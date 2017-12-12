@@ -1,1027 +1,984 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH 18/24] staging: ccree: rename all SSI to CC
-Date: Tue, 12 Dec 2017 14:53:04 +0000
-Message-ID: <1513090395-7938-19-git-send-email-gilad@benyossef.com>
+Subject: [PATCH 19/24] staging: ccree: rename all DX to CC
+Date: Tue, 12 Dec 2017 14:53:05 +0000
+Message-ID: <1513090395-7938-20-git-send-email-gilad@benyossef.com>
 References: <1513090395-7938-1-git-send-email-gilad@benyossef.com>
 Cc: Ofir Drang <ofir.drang@arm.com>, linux-crypto@vger.kernel.org,
         driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
         linux-kernel@vger.kernel.org
 To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from foss.arm.com ([217.140.101.70]:45196 "EHLO foss.arm.com"
+Received: from foss.arm.com ([217.140.101.70]:45208 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752942AbdLLOz6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 12 Dec 2017 09:55:58 -0500
+        id S1752942AbdLLO4H (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 12 Dec 2017 09:56:07 -0500
 In-Reply-To: <1513090395-7938-1-git-send-email-gilad@benyossef.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Unify naming convention by renaming all SSI macros to CC.
+Unify naming convention by renaming all DX macros to CC.
 
 Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 ---
- drivers/staging/ccree/ssi_aead.c        | 26 +++++------
- drivers/staging/ccree/ssi_aead.h        |  6 +--
- drivers/staging/ccree/ssi_buffer_mgr.c  | 78 ++++++++++++++++-----------------
- drivers/staging/ccree/ssi_buffer_mgr.h  | 14 +++---
- drivers/staging/ccree/ssi_cipher.c      |  4 +-
- drivers/staging/ccree/ssi_cipher.h      |  6 +--
- drivers/staging/ccree/ssi_config.h      |  4 +-
- drivers/staging/ccree/ssi_driver.c      | 26 +++++------
- drivers/staging/ccree/ssi_driver.h      | 22 +++++-----
- drivers/staging/ccree/ssi_fips.c        |  2 +-
- drivers/staging/ccree/ssi_fips.h        |  6 +--
- drivers/staging/ccree/ssi_hash.c        |  6 +--
- drivers/staging/ccree/ssi_hash.h        |  6 +--
- drivers/staging/ccree/ssi_ivgen.c       |  8 ++--
- drivers/staging/ccree/ssi_ivgen.h       |  8 ++--
- drivers/staging/ccree/ssi_pm.c          |  2 +-
- drivers/staging/ccree/ssi_pm.h          |  6 +--
- drivers/staging/ccree/ssi_request_mgr.c | 16 +++----
- drivers/staging/ccree/ssi_sram_mgr.c    |  2 +-
- drivers/staging/ccree/ssi_sram_mgr.h    | 10 ++---
- drivers/staging/ccree/ssi_sysfs.h       |  6 +--
- 21 files changed, 132 insertions(+), 132 deletions(-)
+ drivers/staging/ccree/cc_hw_queue_defs.h |   4 +-
+ drivers/staging/ccree/cc_lli_defs.h      |   2 +-
+ drivers/staging/ccree/dx_crys_kernel.h   | 314 +++++++++++++++----------------
+ drivers/staging/ccree/dx_host.h          | 262 +++++++++++++-------------
+ drivers/staging/ccree/dx_reg_common.h    |  10 +-
+ drivers/staging/ccree/ssi_config.h       |   8 +-
+ drivers/staging/ccree/ssi_driver.c       |  18 +-
+ drivers/staging/ccree/ssi_driver.h       |  26 +--
+ drivers/staging/ccree/ssi_hash.c         |  18 +-
+ drivers/staging/ccree/ssi_hash.h         |   2 +-
+ drivers/staging/ccree/ssi_request_mgr.c  |   2 +-
+ drivers/staging/ccree/ssi_sysfs.c        |  10 +-
+ 12 files changed, 338 insertions(+), 338 deletions(-)
 
-diff --git a/drivers/staging/ccree/ssi_aead.c b/drivers/staging/ccree/ssi_aead.c
-index ac9961c..d07b38d 100644
---- a/drivers/staging/ccree/ssi_aead.c
-+++ b/drivers/staging/ccree/ssi_aead.c
-@@ -257,7 +257,7 @@ static void cc_aead_complete(struct device *dev, void *ssi_req)
- 			cc_copy_sg_portion(dev, areq_ctx->mac_buf,
- 					   areq_ctx->dst_sgl, skip,
- 					   (skip + ctx->authsize),
--					   SSI_SG_FROM_BUF);
-+					   CC_SG_FROM_BUF);
- 		}
+diff --git a/drivers/staging/ccree/cc_hw_queue_defs.h b/drivers/staging/ccree/cc_hw_queue_defs.h
+index 3ca548d..7c25a4f 100644
+--- a/drivers/staging/ccree/cc_hw_queue_defs.h
++++ b/drivers/staging/ccree/cc_hw_queue_defs.h
+@@ -31,11 +31,11 @@
+ #define HW_QUEUE_SLOTS_MAX              15
  
- 		/* If an IV was generated, copy it back to the user provided
-@@ -739,7 +739,7 @@ static void cc_set_assoc_desc(struct aead_request *areq, unsigned int flow_mode,
- 	struct device *dev = drvdata_to_dev(ctx->drvdata);
+ #define CC_REG_LOW(word, name)  \
+-	(DX_DSCRPTR_QUEUE_WORD ## word ## _ ## name ## _BIT_SHIFT)
++	(CC_DSCRPTR_QUEUE_WORD ## word ## _ ## name ## _BIT_SHIFT)
  
- 	switch (assoc_dma_type) {
--	case SSI_DMA_BUF_DLLI:
-+	case CC_DMA_BUF_DLLI:
- 		dev_dbg(dev, "ASSOC buffer type DLLI\n");
- 		hw_desc_init(&desc[idx]);
- 		set_din_type(&desc[idx], DMA_DLLI, sg_dma_address(areq->src),
-@@ -749,7 +749,7 @@ static void cc_set_assoc_desc(struct aead_request *areq, unsigned int flow_mode,
- 		    areq_ctx->cryptlen > 0)
- 			set_din_not_last_indication(&desc[idx]);
- 		break;
--	case SSI_DMA_BUF_MLLI:
-+	case CC_DMA_BUF_MLLI:
- 		dev_dbg(dev, "ASSOC buffer type MLLI\n");
- 		hw_desc_init(&desc[idx]);
- 		set_din_type(&desc[idx], DMA_MLLI, areq_ctx->assoc.sram_addr,
-@@ -759,7 +759,7 @@ static void cc_set_assoc_desc(struct aead_request *areq, unsigned int flow_mode,
- 		    areq_ctx->cryptlen > 0)
- 			set_din_not_last_indication(&desc[idx]);
- 		break;
--	case SSI_DMA_BUF_NULL:
-+	case CC_DMA_BUF_NULL:
- 	default:
- 		dev_err(dev, "Invalid ASSOC buffer type\n");
- 	}
-@@ -780,7 +780,7 @@ static void cc_proc_authen_desc(struct aead_request *areq,
- 	struct device *dev = drvdata_to_dev(ctx->drvdata);
+ #define CC_REG_HIGH(word, name) \
+ 	(CC_REG_LOW(word, name) + \
+-	 DX_DSCRPTR_QUEUE_WORD ## word ## _ ## name ## _BIT_SIZE - 1)
++	 CC_DSCRPTR_QUEUE_WORD ## word ## _ ## name ## _BIT_SIZE - 1)
  
- 	switch (data_dma_type) {
--	case SSI_DMA_BUF_DLLI:
-+	case CC_DMA_BUF_DLLI:
- 	{
- 		struct scatterlist *cipher =
- 			(direct == DRV_CRYPTO_DIRECTION_ENCRYPT) ?
-@@ -797,7 +797,7 @@ static void cc_proc_authen_desc(struct aead_request *areq,
- 		set_flow_mode(&desc[idx], flow_mode);
- 		break;
- 	}
--	case SSI_DMA_BUF_MLLI:
-+	case CC_DMA_BUF_MLLI:
- 	{
- 		/* DOUBLE-PASS flow (as default)
- 		 * assoc. + iv + data -compact in one table
-@@ -823,7 +823,7 @@ static void cc_proc_authen_desc(struct aead_request *areq,
- 		set_flow_mode(&desc[idx], flow_mode);
- 		break;
- 	}
--	case SSI_DMA_BUF_NULL:
-+	case CC_DMA_BUF_NULL:
- 	default:
- 		dev_err(dev, "AUTHENC: Invalid SRC/DST buffer type\n");
- 	}
-@@ -847,7 +847,7 @@ static void cc_proc_cipher_desc(struct aead_request *areq,
- 		return; /*null processing*/
+ #define CC_GENMASK(word, name) \
+ 	GENMASK(CC_REG_HIGH(word, name), CC_REG_LOW(word, name))
+diff --git a/drivers/staging/ccree/cc_lli_defs.h b/drivers/staging/ccree/cc_lli_defs.h
+index a9c417b..861634a 100644
+--- a/drivers/staging/ccree/cc_lli_defs.h
++++ b/drivers/staging/ccree/cc_lli_defs.h
+@@ -20,7 +20,7 @@
+ #include <linux/types.h>
  
- 	switch (data_dma_type) {
--	case SSI_DMA_BUF_DLLI:
-+	case CC_DMA_BUF_DLLI:
- 		dev_dbg(dev, "CIPHER: SRC/DST buffer type DLLI\n");
- 		hw_desc_init(&desc[idx]);
- 		set_din_type(&desc[idx], DMA_DLLI,
-@@ -860,7 +860,7 @@ static void cc_proc_cipher_desc(struct aead_request *areq,
- 			      areq_ctx->cryptlen, NS_BIT, 0);
- 		set_flow_mode(&desc[idx], flow_mode);
- 		break;
--	case SSI_DMA_BUF_MLLI:
-+	case CC_DMA_BUF_MLLI:
- 		dev_dbg(dev, "CIPHER: SRC/DST buffer type MLLI\n");
- 		hw_desc_init(&desc[idx]);
- 		set_din_type(&desc[idx], DMA_MLLI, areq_ctx->src.sram_addr,
-@@ -869,7 +869,7 @@ static void cc_proc_cipher_desc(struct aead_request *areq,
- 			      areq_ctx->dst.mlli_nents, NS_BIT, 0);
- 		set_flow_mode(&desc[idx], flow_mode);
- 		break;
--	case SSI_DMA_BUF_NULL:
-+	case CC_DMA_BUF_NULL:
- 	default:
- 		dev_err(dev, "CIPHER: Invalid SRC/DST buffer type\n");
- 	}
-@@ -1171,8 +1171,8 @@ static void cc_mlli_to_sram(struct aead_request *req,
- 	struct cc_aead_ctx *ctx = crypto_aead_ctx(tfm);
- 	struct device *dev = drvdata_to_dev(ctx->drvdata);
+ /* Max DLLI size
+- *  AKA DX_DSCRPTR_QUEUE_WORD1_DIN_SIZE_BIT_SIZE
++ *  AKA CC_DSCRPTR_QUEUE_WORD1_DIN_SIZE_BIT_SIZE
+  */
+ #define DLLI_SIZE_BIT_SIZE	0x18
  
--	if (req_ctx->assoc_buff_type == SSI_DMA_BUF_MLLI ||
--	    req_ctx->data_buff_type == SSI_DMA_BUF_MLLI ||
-+	if (req_ctx->assoc_buff_type == CC_DMA_BUF_MLLI ||
-+	    req_ctx->data_buff_type == CC_DMA_BUF_MLLI ||
- 	    !req_ctx->is_single_pass) {
- 		dev_dbg(dev, "Copy-to-sram: mlli_dma=%08x, mlli_size=%u\n",
- 			(unsigned int)ctx->drvdata->mlli_sram_addr,
-@@ -2670,7 +2670,7 @@ static struct ssi_crypto_alg *cc_create_aead_alg(struct ssi_alg_template *tmpl,
- 	snprintf(alg->base.cra_driver_name, CRYPTO_MAX_ALG_NAME, "%s",
- 		 tmpl->driver_name);
- 	alg->base.cra_module = THIS_MODULE;
--	alg->base.cra_priority = SSI_CRA_PRIO;
-+	alg->base.cra_priority = CC_CRA_PRIO;
- 
- 	alg->base.cra_ctxsize = sizeof(struct cc_aead_ctx);
- 	alg->base.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_KERN_DRIVER_ONLY |
-diff --git a/drivers/staging/ccree/ssi_aead.h b/drivers/staging/ccree/ssi_aead.h
-index 5172241..e41040e 100644
---- a/drivers/staging/ccree/ssi_aead.h
-+++ b/drivers/staging/ccree/ssi_aead.h
-@@ -18,8 +18,8 @@
-  * ARM CryptoCell AEAD Crypto API
+diff --git a/drivers/staging/ccree/dx_crys_kernel.h b/drivers/staging/ccree/dx_crys_kernel.h
+index 2196030..30719f4 100644
+--- a/drivers/staging/ccree/dx_crys_kernel.h
++++ b/drivers/staging/ccree/dx_crys_kernel.h
+@@ -14,167 +14,167 @@
+  * along with this program; if not, see <http://www.gnu.org/licenses/>.
   */
  
--#ifndef __SSI_AEAD_H__
--#define __SSI_AEAD_H__
-+#ifndef __CC_AEAD_H__
-+#define __CC_AEAD_H__
+-#ifndef __DX_CRYS_KERNEL_H__
+-#define __DX_CRYS_KERNEL_H__
++#ifndef __CC_CRYS_KERNEL_H__
++#define __CC_CRYS_KERNEL_H__
  
- #include <linux/kernel.h>
- #include <crypto/algapi.h>
-@@ -119,4 +119,4 @@ struct aead_req_ctx {
- int cc_aead_alloc(struct ssi_drvdata *drvdata);
- int cc_aead_free(struct ssi_drvdata *drvdata);
- 
--#endif /*__SSI_AEAD_H__*/
-+#endif /*__CC_AEAD_H__*/
-diff --git a/drivers/staging/ccree/ssi_buffer_mgr.c b/drivers/staging/ccree/ssi_buffer_mgr.c
-index c28ce7c..ee5c086 100644
---- a/drivers/staging/ccree/ssi_buffer_mgr.c
-+++ b/drivers/staging/ccree/ssi_buffer_mgr.c
-@@ -61,11 +61,11 @@ struct buffer_array {
- static inline char *cc_dma_buf_type(enum ssi_req_dma_buf_type type)
- {
- 	switch (type) {
--	case SSI_DMA_BUF_NULL:
-+	case CC_DMA_BUF_NULL:
- 		return "BUF_NULL";
--	case SSI_DMA_BUF_DLLI:
-+	case CC_DMA_BUF_DLLI:
- 		return "BUF_DLLI";
--	case SSI_DMA_BUF_MLLI:
-+	case CC_DMA_BUF_MLLI:
- 		return "BUF_MLLI";
- 	default:
- 		return "BUF_INVALID";
-@@ -163,7 +163,7 @@ void cc_copy_sg_portion(struct device *dev, u8 *dest, struct scatterlist *sg,
- 
- 	nents = cc_get_sgl_nents(dev, sg, end, &lbytes, NULL);
- 	sg_copy_buffer(sg, nents, (void *)dest, (end - to_skip + 1), to_skip,
--		       (direct == SSI_SG_TO_BUF));
-+		       (direct == CC_SG_TO_BUF));
- }
- 
- static int cc_render_buff_to_mlli(struct device *dev, dma_addr_t buff_dma,
-@@ -457,7 +457,7 @@ static int ssi_ahash_handle_curr_buf(struct device *dev,
- 		&sg_dma_address(areq_ctx->buff_sg), sg_page(areq_ctx->buff_sg),
- 		sg_virt(areq_ctx->buff_sg), areq_ctx->buff_sg->offset,
- 		areq_ctx->buff_sg->length);
--	areq_ctx->data_dma_buf_type = SSI_DMA_BUF_DLLI;
-+	areq_ctx->data_dma_buf_type = CC_DMA_BUF_DLLI;
- 	areq_ctx->curr_sg = areq_ctx->buff_sg;
- 	areq_ctx->in_nents = 0;
- 	/* prepare for case of MLLI */
-@@ -481,7 +481,7 @@ void cc_unmap_blkcipher_request(struct device *dev, void *ctx,
- 				 DMA_TO_DEVICE);
- 	}
- 	/* Release pool */
--	if (req_ctx->dma_buf_type == SSI_DMA_BUF_MLLI) {
-+	if (req_ctx->dma_buf_type == CC_DMA_BUF_MLLI) {
- 		dma_pool_free(req_ctx->mlli_params.curr_pool,
- 			      req_ctx->mlli_params.mlli_virt_addr,
- 			      req_ctx->mlli_params.mlli_dma_addr);
-@@ -510,7 +510,7 @@ int cc_map_blkcipher_request(struct ssi_drvdata *drvdata, void *ctx,
- 	int rc = 0;
- 	u32 mapped_nents = 0;
- 
--	req_ctx->dma_buf_type = SSI_DMA_BUF_DLLI;
-+	req_ctx->dma_buf_type = CC_DMA_BUF_DLLI;
- 	mlli_params->curr_pool = NULL;
- 	sg_data.num_of_buffers = 0;
- 
-@@ -541,11 +541,11 @@ int cc_map_blkcipher_request(struct ssi_drvdata *drvdata, void *ctx,
- 		goto ablkcipher_exit;
- 	}
- 	if (mapped_nents > 1)
--		req_ctx->dma_buf_type = SSI_DMA_BUF_MLLI;
-+		req_ctx->dma_buf_type = CC_DMA_BUF_MLLI;
- 
- 	if (src == dst) {
- 		/* Handle inplace operation */
--		if (req_ctx->dma_buf_type == SSI_DMA_BUF_MLLI) {
-+		if (req_ctx->dma_buf_type == CC_DMA_BUF_MLLI) {
- 			req_ctx->out_nents = 0;
- 			cc_add_sg_entry(dev, &sg_data, req_ctx->in_nents, src,
- 					nbytes, 0, true,
-@@ -560,9 +560,9 @@ int cc_map_blkcipher_request(struct ssi_drvdata *drvdata, void *ctx,
- 			goto ablkcipher_exit;
- 		}
- 		if (mapped_nents > 1)
--			req_ctx->dma_buf_type = SSI_DMA_BUF_MLLI;
-+			req_ctx->dma_buf_type = CC_DMA_BUF_MLLI;
- 
--		if (req_ctx->dma_buf_type == SSI_DMA_BUF_MLLI) {
-+		if (req_ctx->dma_buf_type == CC_DMA_BUF_MLLI) {
- 			cc_add_sg_entry(dev, &sg_data, req_ctx->in_nents, src,
- 					nbytes, 0, true,
- 					&req_ctx->in_mlli_nents);
-@@ -572,7 +572,7 @@ int cc_map_blkcipher_request(struct ssi_drvdata *drvdata, void *ctx,
- 		}
- 	}
- 
--	if (req_ctx->dma_buf_type == SSI_DMA_BUF_MLLI) {
-+	if (req_ctx->dma_buf_type == CC_DMA_BUF_MLLI) {
- 		mlli_params->curr_pool = buff_mgr->mlli_buffs_pool;
- 		rc = cc_generate_mlli(dev, &sg_data, mlli_params);
- 		if (rc)
-@@ -679,7 +679,7 @@ void cc_unmap_aead_request(struct device *dev, struct aead_request *req)
- 		 * data memory overriding that caused by cache coherence
- 		 * problem.
- 		 */
--		cc_copy_mac(dev, req, SSI_SG_FROM_BUF);
-+		cc_copy_mac(dev, req, CC_SG_FROM_BUF);
- 	}
- }
- 
-@@ -771,7 +771,7 @@ static int cc_aead_chain_iv(struct ssi_drvdata *drvdata,
- 				    (areq_ctx->gen_ctx.iv_dma_addr + iv_ofs),
- 				    iv_size_to_authenc, is_last,
- 				    &areq_ctx->assoc.mlli_nents);
--		areq_ctx->assoc_buff_type = SSI_DMA_BUF_MLLI;
-+		areq_ctx->assoc_buff_type = CC_DMA_BUF_MLLI;
- 	}
- 
- chain_iv_exit:
-@@ -801,7 +801,7 @@ static int cc_aead_chain_assoc(struct ssi_drvdata *drvdata,
- 	}
- 
- 	if (req->assoclen == 0) {
--		areq_ctx->assoc_buff_type = SSI_DMA_BUF_NULL;
-+		areq_ctx->assoc_buff_type = CC_DMA_BUF_NULL;
- 		areq_ctx->assoc.nents = 0;
- 		areq_ctx->assoc.mlli_nents = 0;
- 		dev_dbg(dev, "Chain assoc of length 0: buff_type=%s nents=%u\n",
-@@ -851,18 +851,18 @@ static int cc_aead_chain_assoc(struct ssi_drvdata *drvdata,
- 	}
- 
- 	if (mapped_nents == 1 && areq_ctx->ccm_hdr_size == ccm_header_size_null)
--		areq_ctx->assoc_buff_type = SSI_DMA_BUF_DLLI;
-+		areq_ctx->assoc_buff_type = CC_DMA_BUF_DLLI;
- 	else
--		areq_ctx->assoc_buff_type = SSI_DMA_BUF_MLLI;
-+		areq_ctx->assoc_buff_type = CC_DMA_BUF_MLLI;
- 
--	if (do_chain || areq_ctx->assoc_buff_type == SSI_DMA_BUF_MLLI) {
-+	if (do_chain || areq_ctx->assoc_buff_type == CC_DMA_BUF_MLLI) {
- 		dev_dbg(dev, "Chain assoc: buff_type=%s nents=%u\n",
- 			cc_dma_buf_type(areq_ctx->assoc_buff_type),
- 			areq_ctx->assoc.nents);
- 		cc_add_sg_entry(dev, sg_data, areq_ctx->assoc.nents, req->src,
- 				req->assoclen, 0, is_last,
- 				&areq_ctx->assoc.mlli_nents);
--		areq_ctx->assoc_buff_type = SSI_DMA_BUF_MLLI;
-+		areq_ctx->assoc_buff_type = CC_DMA_BUF_MLLI;
- 	}
- 
- chain_assoc_exit:
-@@ -939,7 +939,7 @@ static int cc_prepare_aead_data_mlli(struct ssi_drvdata *drvdata,
- 				 * we must neglect this code.
- 				 */
- 				if (!drvdata->coherent)
--					cc_copy_mac(dev, req, SSI_SG_TO_BUF);
-+					cc_copy_mac(dev, req, CC_SG_TO_BUF);
- 
- 				areq_ctx->icv_virt_addr = areq_ctx->backup_mac;
- 			} else {
-@@ -981,7 +981,7 @@ static int cc_prepare_aead_data_mlli(struct ssi_drvdata *drvdata,
- 		 * MAC verification upon request completion
- 		 */
- 		if (areq_ctx->is_icv_fragmented) {
--			cc_copy_mac(dev, req, SSI_SG_TO_BUF);
-+			cc_copy_mac(dev, req, CC_SG_TO_BUF);
- 			areq_ctx->icv_virt_addr = areq_ctx->backup_mac;
- 
- 		} else { /* Contig. ICV */
-@@ -1136,12 +1136,12 @@ static int cc_aead_chain_data(struct ssi_drvdata *drvdata,
- 	if (src_mapped_nents > 1 ||
- 	    dst_mapped_nents  > 1 ||
- 	    do_chain) {
--		areq_ctx->data_buff_type = SSI_DMA_BUF_MLLI;
-+		areq_ctx->data_buff_type = CC_DMA_BUF_MLLI;
- 		rc = cc_prepare_aead_data_mlli(drvdata, req, sg_data,
- 					       &src_last_bytes,
- 					       &dst_last_bytes, is_last_table);
- 	} else {
--		areq_ctx->data_buff_type = SSI_DMA_BUF_DLLI;
-+		areq_ctx->data_buff_type = CC_DMA_BUF_DLLI;
- 		cc_prepare_aead_data_dlli(req, &src_last_bytes,
- 					  &dst_last_bytes);
- 	}
-@@ -1156,13 +1156,13 @@ static void cc_update_aead_mlli_nents(struct ssi_drvdata *drvdata,
- 	struct aead_req_ctx *areq_ctx = aead_request_ctx(req);
- 	u32 curr_mlli_size = 0;
- 
--	if (areq_ctx->assoc_buff_type == SSI_DMA_BUF_MLLI) {
-+	if (areq_ctx->assoc_buff_type == CC_DMA_BUF_MLLI) {
- 		areq_ctx->assoc.sram_addr = drvdata->mlli_sram_addr;
- 		curr_mlli_size = areq_ctx->assoc.mlli_nents *
- 						LLI_ENTRY_BYTE_SIZE;
- 	}
- 
--	if (areq_ctx->data_buff_type == SSI_DMA_BUF_MLLI) {
-+	if (areq_ctx->data_buff_type == CC_DMA_BUF_MLLI) {
- 		/*Inplace case dst nents equal to src nents*/
- 		if (req->src == req->dst) {
- 			areq_ctx->dst.mlli_nents = areq_ctx->src.mlli_nents;
-@@ -1226,7 +1226,7 @@ int cc_map_aead_request(struct ssi_drvdata *drvdata, struct aead_request *req)
- 	if (drvdata->coherent &&
- 	    areq_ctx->gen_ctx.op_type == DRV_CRYPTO_DIRECTION_DECRYPT &&
- 	    req->src == req->dst)
--		cc_copy_mac(dev, req, SSI_SG_TO_BUF);
-+		cc_copy_mac(dev, req, CC_SG_TO_BUF);
- 
- 	/* cacluate the size for cipher remove ICV in decrypt*/
- 	areq_ctx->cryptlen = (areq_ctx->gen_ctx.op_type ==
-@@ -1380,8 +1380,8 @@ int cc_map_aead_request(struct ssi_drvdata *drvdata, struct aead_request *req)
- 	/* Mlli support -start building the MLLI according to the above
- 	 * results
- 	 */
--	if (areq_ctx->assoc_buff_type == SSI_DMA_BUF_MLLI ||
--	    areq_ctx->data_buff_type == SSI_DMA_BUF_MLLI) {
-+	if (areq_ctx->assoc_buff_type == CC_DMA_BUF_MLLI ||
-+	    areq_ctx->data_buff_type == CC_DMA_BUF_MLLI) {
- 		mlli_params->curr_pool = buff_mgr->mlli_buffs_pool;
- 		rc = cc_generate_mlli(dev, &sg_data, mlli_params);
- 		if (rc)
-@@ -1419,7 +1419,7 @@ int cc_map_hash_request_final(struct ssi_drvdata *drvdata, void *ctx,
- 	dev_dbg(dev, "final params : curr_buff=%pK curr_buff_cnt=0x%X nbytes = 0x%X src=%pK curr_index=%u\n",
- 		curr_buff, *curr_buff_cnt, nbytes, src, areq_ctx->buff_index);
- 	/* Init the type of the dma buffer */
--	areq_ctx->data_dma_buf_type = SSI_DMA_BUF_NULL;
-+	areq_ctx->data_dma_buf_type = CC_DMA_BUF_NULL;
- 	mlli_params->curr_pool = NULL;
- 	sg_data.num_of_buffers = 0;
- 	areq_ctx->in_nents = 0;
-@@ -1445,19 +1445,19 @@ int cc_map_hash_request_final(struct ssi_drvdata *drvdata, void *ctx,
- 			goto unmap_curr_buff;
- 		}
- 		if (src && mapped_nents == 1 &&
--		    areq_ctx->data_dma_buf_type == SSI_DMA_BUF_NULL) {
-+		    areq_ctx->data_dma_buf_type == CC_DMA_BUF_NULL) {
- 			memcpy(areq_ctx->buff_sg, src,
- 			       sizeof(struct scatterlist));
- 			areq_ctx->buff_sg->length = nbytes;
- 			areq_ctx->curr_sg = areq_ctx->buff_sg;
--			areq_ctx->data_dma_buf_type = SSI_DMA_BUF_DLLI;
-+			areq_ctx->data_dma_buf_type = CC_DMA_BUF_DLLI;
- 		} else {
--			areq_ctx->data_dma_buf_type = SSI_DMA_BUF_MLLI;
-+			areq_ctx->data_dma_buf_type = CC_DMA_BUF_MLLI;
- 		}
- 	}
- 
- 	/*build mlli */
--	if (areq_ctx->data_dma_buf_type == SSI_DMA_BUF_MLLI) {
-+	if (areq_ctx->data_dma_buf_type == CC_DMA_BUF_MLLI) {
- 		mlli_params->curr_pool = buff_mgr->mlli_buffs_pool;
- 		/* add the src data to the sg_data */
- 		cc_add_sg_entry(dev, &sg_data, areq_ctx->in_nents, src, nbytes,
-@@ -1507,7 +1507,7 @@ int cc_map_hash_request_update(struct ssi_drvdata *drvdata, void *ctx,
- 	dev_dbg(dev, " update params : curr_buff=%pK curr_buff_cnt=0x%X nbytes=0x%X src=%pK curr_index=%u\n",
- 		curr_buff, *curr_buff_cnt, nbytes, src, areq_ctx->buff_index);
- 	/* Init the type of the dma buffer */
--	areq_ctx->data_dma_buf_type = SSI_DMA_BUF_NULL;
-+	areq_ctx->data_dma_buf_type = CC_DMA_BUF_NULL;
- 	mlli_params->curr_pool = NULL;
- 	areq_ctx->curr_sg = NULL;
- 	sg_data.num_of_buffers = 0;
-@@ -1539,7 +1539,7 @@ int cc_map_hash_request_update(struct ssi_drvdata *drvdata, void *ctx,
- 			*next_buff_cnt);
- 		cc_copy_sg_portion(dev, next_buff, src,
- 				   (update_data_len - *curr_buff_cnt),
--				   nbytes, SSI_SG_TO_BUF);
-+				   nbytes, CC_SG_TO_BUF);
- 		/* change the buffer index for next operation */
- 		swap_index = 1;
- 	}
-@@ -1561,19 +1561,19 @@ int cc_map_hash_request_update(struct ssi_drvdata *drvdata, void *ctx,
- 			goto unmap_curr_buff;
- 		}
- 		if (mapped_nents == 1 &&
--		    areq_ctx->data_dma_buf_type == SSI_DMA_BUF_NULL) {
-+		    areq_ctx->data_dma_buf_type == CC_DMA_BUF_NULL) {
- 			/* only one entry in the SG and no previous data */
- 			memcpy(areq_ctx->buff_sg, src,
- 			       sizeof(struct scatterlist));
- 			areq_ctx->buff_sg->length = update_data_len;
--			areq_ctx->data_dma_buf_type = SSI_DMA_BUF_DLLI;
-+			areq_ctx->data_dma_buf_type = CC_DMA_BUF_DLLI;
- 			areq_ctx->curr_sg = areq_ctx->buff_sg;
- 		} else {
--			areq_ctx->data_dma_buf_type = SSI_DMA_BUF_MLLI;
-+			areq_ctx->data_dma_buf_type = CC_DMA_BUF_MLLI;
- 		}
- 	}
- 
--	if (areq_ctx->data_dma_buf_type == SSI_DMA_BUF_MLLI) {
-+	if (areq_ctx->data_dma_buf_type == CC_DMA_BUF_MLLI) {
- 		mlli_params->curr_pool = buff_mgr->mlli_buffs_pool;
- 		/* add the src data to the sg_data */
- 		cc_add_sg_entry(dev, &sg_data, areq_ctx->in_nents, src,
-diff --git a/drivers/staging/ccree/ssi_buffer_mgr.h b/drivers/staging/ccree/ssi_buffer_mgr.h
-index f6411de..77744a6 100644
---- a/drivers/staging/ccree/ssi_buffer_mgr.h
-+++ b/drivers/staging/ccree/ssi_buffer_mgr.h
-@@ -18,8 +18,8 @@
-  * Buffer Manager
+ // --------------------------------------
+ // BLOCK: DSCRPTR
+ // --------------------------------------
+-#define DX_DSCRPTR_COMPLETION_COUNTER_REG_OFFSET	0xE00UL
+-#define DX_DSCRPTR_COMPLETION_COUNTER_COMPLETION_COUNTER_BIT_SHIFT	0x0UL
+-#define DX_DSCRPTR_COMPLETION_COUNTER_COMPLETION_COUNTER_BIT_SIZE	0x6UL
+-#define DX_DSCRPTR_COMPLETION_COUNTER_OVERFLOW_COUNTER_BIT_SHIFT	0x6UL
+-#define DX_DSCRPTR_COMPLETION_COUNTER_OVERFLOW_COUNTER_BIT_SIZE	0x1UL
+-#define DX_DSCRPTR_SW_RESET_REG_OFFSET	0xE40UL
+-#define DX_DSCRPTR_SW_RESET_VALUE_BIT_SHIFT	0x0UL
+-#define DX_DSCRPTR_SW_RESET_VALUE_BIT_SIZE	0x1UL
+-#define DX_DSCRPTR_QUEUE_SRAM_SIZE_REG_OFFSET	0xE60UL
+-#define DX_DSCRPTR_QUEUE_SRAM_SIZE_NUM_OF_DSCRPTR_BIT_SHIFT	0x0UL
+-#define DX_DSCRPTR_QUEUE_SRAM_SIZE_NUM_OF_DSCRPTR_BIT_SIZE	0xAUL
+-#define DX_DSCRPTR_QUEUE_SRAM_SIZE_DSCRPTR_SRAM_SIZE_BIT_SHIFT	0xAUL
+-#define DX_DSCRPTR_QUEUE_SRAM_SIZE_DSCRPTR_SRAM_SIZE_BIT_SIZE	0xCUL
+-#define DX_DSCRPTR_QUEUE_SRAM_SIZE_SRAM_SIZE_BIT_SHIFT	0x16UL
+-#define DX_DSCRPTR_QUEUE_SRAM_SIZE_SRAM_SIZE_BIT_SIZE	0x3UL
+-#define DX_DSCRPTR_SINGLE_ADDR_EN_REG_OFFSET	0xE64UL
+-#define DX_DSCRPTR_SINGLE_ADDR_EN_VALUE_BIT_SHIFT	0x0UL
+-#define DX_DSCRPTR_SINGLE_ADDR_EN_VALUE_BIT_SIZE	0x1UL
+-#define DX_DSCRPTR_MEASURE_CNTR_REG_OFFSET	0xE68UL
+-#define DX_DSCRPTR_MEASURE_CNTR_VALUE_BIT_SHIFT	0x0UL
+-#define DX_DSCRPTR_MEASURE_CNTR_VALUE_BIT_SIZE	0x20UL
+-#define DX_DSCRPTR_QUEUE_WORD0_REG_OFFSET	0xE80UL
+-#define DX_DSCRPTR_QUEUE_WORD0_VALUE_BIT_SHIFT	0x0UL
+-#define DX_DSCRPTR_QUEUE_WORD0_VALUE_BIT_SIZE	0x20UL
+-#define DX_DSCRPTR_QUEUE_WORD1_REG_OFFSET	0xE84UL
+-#define DX_DSCRPTR_QUEUE_WORD1_DIN_DMA_MODE_BIT_SHIFT	0x0UL
+-#define DX_DSCRPTR_QUEUE_WORD1_DIN_DMA_MODE_BIT_SIZE	0x2UL
+-#define DX_DSCRPTR_QUEUE_WORD1_DIN_SIZE_BIT_SHIFT	0x2UL
+-#define DX_DSCRPTR_QUEUE_WORD1_DIN_SIZE_BIT_SIZE	0x18UL
+-#define DX_DSCRPTR_QUEUE_WORD1_NS_BIT_BIT_SHIFT	0x1AUL
+-#define DX_DSCRPTR_QUEUE_WORD1_NS_BIT_BIT_SIZE	0x1UL
+-#define DX_DSCRPTR_QUEUE_WORD1_DIN_CONST_VALUE_BIT_SHIFT	0x1BUL
+-#define DX_DSCRPTR_QUEUE_WORD1_DIN_CONST_VALUE_BIT_SIZE	0x1UL
+-#define DX_DSCRPTR_QUEUE_WORD1_NOT_LAST_BIT_SHIFT	0x1CUL
+-#define DX_DSCRPTR_QUEUE_WORD1_NOT_LAST_BIT_SIZE	0x1UL
+-#define DX_DSCRPTR_QUEUE_WORD1_LOCK_QUEUE_BIT_SHIFT	0x1DUL
+-#define DX_DSCRPTR_QUEUE_WORD1_LOCK_QUEUE_BIT_SIZE	0x1UL
+-#define DX_DSCRPTR_QUEUE_WORD1_NOT_USED_BIT_SHIFT	0x1EUL
+-#define DX_DSCRPTR_QUEUE_WORD1_NOT_USED_BIT_SIZE	0x2UL
+-#define DX_DSCRPTR_QUEUE_WORD2_REG_OFFSET	0xE88UL
+-#define DX_DSCRPTR_QUEUE_WORD2_VALUE_BIT_SHIFT	0x0UL
+-#define DX_DSCRPTR_QUEUE_WORD2_VALUE_BIT_SIZE	0x20UL
+-#define DX_DSCRPTR_QUEUE_WORD3_REG_OFFSET	0xE8CUL
+-#define DX_DSCRPTR_QUEUE_WORD3_DOUT_DMA_MODE_BIT_SHIFT	0x0UL
+-#define DX_DSCRPTR_QUEUE_WORD3_DOUT_DMA_MODE_BIT_SIZE	0x2UL
+-#define DX_DSCRPTR_QUEUE_WORD3_DOUT_SIZE_BIT_SHIFT	0x2UL
+-#define DX_DSCRPTR_QUEUE_WORD3_DOUT_SIZE_BIT_SIZE	0x18UL
+-#define DX_DSCRPTR_QUEUE_WORD3_NS_BIT_BIT_SHIFT	0x1AUL
+-#define DX_DSCRPTR_QUEUE_WORD3_NS_BIT_BIT_SIZE	0x1UL
+-#define DX_DSCRPTR_QUEUE_WORD3_DOUT_LAST_IND_BIT_SHIFT	0x1BUL
+-#define DX_DSCRPTR_QUEUE_WORD3_DOUT_LAST_IND_BIT_SIZE	0x1UL
+-#define DX_DSCRPTR_QUEUE_WORD3_HASH_XOR_BIT_BIT_SHIFT	0x1DUL
+-#define DX_DSCRPTR_QUEUE_WORD3_HASH_XOR_BIT_BIT_SIZE	0x1UL
+-#define DX_DSCRPTR_QUEUE_WORD3_NOT_USED_BIT_SHIFT	0x1EUL
+-#define DX_DSCRPTR_QUEUE_WORD3_NOT_USED_BIT_SIZE	0x1UL
+-#define DX_DSCRPTR_QUEUE_WORD3_QUEUE_LAST_IND_BIT_SHIFT	0x1FUL
+-#define DX_DSCRPTR_QUEUE_WORD3_QUEUE_LAST_IND_BIT_SIZE	0x1UL
+-#define DX_DSCRPTR_QUEUE_WORD4_REG_OFFSET	0xE90UL
+-#define DX_DSCRPTR_QUEUE_WORD4_DATA_FLOW_MODE_BIT_SHIFT	0x0UL
+-#define DX_DSCRPTR_QUEUE_WORD4_DATA_FLOW_MODE_BIT_SIZE	0x6UL
+-#define DX_DSCRPTR_QUEUE_WORD4_AES_SEL_N_HASH_BIT_SHIFT	0x6UL
+-#define DX_DSCRPTR_QUEUE_WORD4_AES_SEL_N_HASH_BIT_SIZE	0x1UL
+-#define DX_DSCRPTR_QUEUE_WORD4_AES_XOR_CRYPTO_KEY_BIT_SHIFT	0x7UL
+-#define DX_DSCRPTR_QUEUE_WORD4_AES_XOR_CRYPTO_KEY_BIT_SIZE	0x1UL
+-#define DX_DSCRPTR_QUEUE_WORD4_ACK_NEEDED_BIT_SHIFT	0x8UL
+-#define DX_DSCRPTR_QUEUE_WORD4_ACK_NEEDED_BIT_SIZE	0x2UL
+-#define DX_DSCRPTR_QUEUE_WORD4_CIPHER_MODE_BIT_SHIFT	0xAUL
+-#define DX_DSCRPTR_QUEUE_WORD4_CIPHER_MODE_BIT_SIZE	0x4UL
+-#define DX_DSCRPTR_QUEUE_WORD4_CMAC_SIZE0_BIT_SHIFT	0xEUL
+-#define DX_DSCRPTR_QUEUE_WORD4_CMAC_SIZE0_BIT_SIZE	0x1UL
+-#define DX_DSCRPTR_QUEUE_WORD4_CIPHER_DO_BIT_SHIFT	0xFUL
+-#define DX_DSCRPTR_QUEUE_WORD4_CIPHER_DO_BIT_SIZE	0x2UL
+-#define DX_DSCRPTR_QUEUE_WORD4_CIPHER_CONF0_BIT_SHIFT	0x11UL
+-#define DX_DSCRPTR_QUEUE_WORD4_CIPHER_CONF0_BIT_SIZE	0x2UL
+-#define DX_DSCRPTR_QUEUE_WORD4_CIPHER_CONF1_BIT_SHIFT	0x13UL
+-#define DX_DSCRPTR_QUEUE_WORD4_CIPHER_CONF1_BIT_SIZE	0x1UL
+-#define DX_DSCRPTR_QUEUE_WORD4_CIPHER_CONF2_BIT_SHIFT	0x14UL
+-#define DX_DSCRPTR_QUEUE_WORD4_CIPHER_CONF2_BIT_SIZE	0x2UL
+-#define DX_DSCRPTR_QUEUE_WORD4_KEY_SIZE_BIT_SHIFT	0x16UL
+-#define DX_DSCRPTR_QUEUE_WORD4_KEY_SIZE_BIT_SIZE	0x2UL
+-#define DX_DSCRPTR_QUEUE_WORD4_SETUP_OPERATION_BIT_SHIFT	0x18UL
+-#define DX_DSCRPTR_QUEUE_WORD4_SETUP_OPERATION_BIT_SIZE	0x4UL
+-#define DX_DSCRPTR_QUEUE_WORD4_DIN_SRAM_ENDIANNESS_BIT_SHIFT	0x1CUL
+-#define DX_DSCRPTR_QUEUE_WORD4_DIN_SRAM_ENDIANNESS_BIT_SIZE	0x1UL
+-#define DX_DSCRPTR_QUEUE_WORD4_DOUT_SRAM_ENDIANNESS_BIT_SHIFT	0x1DUL
+-#define DX_DSCRPTR_QUEUE_WORD4_DOUT_SRAM_ENDIANNESS_BIT_SIZE	0x1UL
+-#define DX_DSCRPTR_QUEUE_WORD4_WORD_SWAP_BIT_SHIFT	0x1EUL
+-#define DX_DSCRPTR_QUEUE_WORD4_WORD_SWAP_BIT_SIZE	0x1UL
+-#define DX_DSCRPTR_QUEUE_WORD4_BYTES_SWAP_BIT_SHIFT	0x1FUL
+-#define DX_DSCRPTR_QUEUE_WORD4_BYTES_SWAP_BIT_SIZE	0x1UL
+-#define DX_DSCRPTR_QUEUE_WORD5_REG_OFFSET	0xE94UL
+-#define DX_DSCRPTR_QUEUE_WORD5_DIN_ADDR_HIGH_BIT_SHIFT	0x0UL
+-#define DX_DSCRPTR_QUEUE_WORD5_DIN_ADDR_HIGH_BIT_SIZE	0x10UL
+-#define DX_DSCRPTR_QUEUE_WORD5_DOUT_ADDR_HIGH_BIT_SHIFT	0x10UL
+-#define DX_DSCRPTR_QUEUE_WORD5_DOUT_ADDR_HIGH_BIT_SIZE	0x10UL
+-#define DX_DSCRPTR_QUEUE_WATERMARK_REG_OFFSET	0xE98UL
+-#define DX_DSCRPTR_QUEUE_WATERMARK_VALUE_BIT_SHIFT	0x0UL
+-#define DX_DSCRPTR_QUEUE_WATERMARK_VALUE_BIT_SIZE	0xAUL
+-#define DX_DSCRPTR_QUEUE_CONTENT_REG_OFFSET	0xE9CUL
+-#define DX_DSCRPTR_QUEUE_CONTENT_VALUE_BIT_SHIFT	0x0UL
+-#define DX_DSCRPTR_QUEUE_CONTENT_VALUE_BIT_SIZE	0xAUL
++#define CC_DSCRPTR_COMPLETION_COUNTER_REG_OFFSET	0xE00UL
++#define CC_DSCRPTR_COMPLETION_COUNTER_COMPLETION_COUNTER_BIT_SHIFT	0x0UL
++#define CC_DSCRPTR_COMPLETION_COUNTER_COMPLETION_COUNTER_BIT_SIZE	0x6UL
++#define CC_DSCRPTR_COMPLETION_COUNTER_OVERFLOW_COUNTER_BIT_SHIFT	0x6UL
++#define CC_DSCRPTR_COMPLETION_COUNTER_OVERFLOW_COUNTER_BIT_SIZE	0x1UL
++#define CC_DSCRPTR_SW_RESET_REG_OFFSET	0xE40UL
++#define CC_DSCRPTR_SW_RESET_VALUE_BIT_SHIFT	0x0UL
++#define CC_DSCRPTR_SW_RESET_VALUE_BIT_SIZE	0x1UL
++#define CC_DSCRPTR_QUEUE_SRAM_SIZE_REG_OFFSET	0xE60UL
++#define CC_DSCRPTR_QUEUE_SRAM_SIZE_NUM_OF_DSCRPTR_BIT_SHIFT	0x0UL
++#define CC_DSCRPTR_QUEUE_SRAM_SIZE_NUM_OF_DSCRPTR_BIT_SIZE	0xAUL
++#define CC_DSCRPTR_QUEUE_SRAM_SIZE_DSCRPTR_SRAM_SIZE_BIT_SHIFT	0xAUL
++#define CC_DSCRPTR_QUEUE_SRAM_SIZE_DSCRPTR_SRAM_SIZE_BIT_SIZE	0xCUL
++#define CC_DSCRPTR_QUEUE_SRAM_SIZE_SRAM_SIZE_BIT_SHIFT	0x16UL
++#define CC_DSCRPTR_QUEUE_SRAM_SIZE_SRAM_SIZE_BIT_SIZE	0x3UL
++#define CC_DSCRPTR_SINGLE_ADDR_EN_REG_OFFSET	0xE64UL
++#define CC_DSCRPTR_SINGLE_ADDR_EN_VALUE_BIT_SHIFT	0x0UL
++#define CC_DSCRPTR_SINGLE_ADDR_EN_VALUE_BIT_SIZE	0x1UL
++#define CC_DSCRPTR_MEASURE_CNTR_REG_OFFSET	0xE68UL
++#define CC_DSCRPTR_MEASURE_CNTR_VALUE_BIT_SHIFT	0x0UL
++#define CC_DSCRPTR_MEASURE_CNTR_VALUE_BIT_SIZE	0x20UL
++#define CC_DSCRPTR_QUEUE_WORD0_REG_OFFSET	0xE80UL
++#define CC_DSCRPTR_QUEUE_WORD0_VALUE_BIT_SHIFT	0x0UL
++#define CC_DSCRPTR_QUEUE_WORD0_VALUE_BIT_SIZE	0x20UL
++#define CC_DSCRPTR_QUEUE_WORD1_REG_OFFSET	0xE84UL
++#define CC_DSCRPTR_QUEUE_WORD1_DIN_DMA_MODE_BIT_SHIFT	0x0UL
++#define CC_DSCRPTR_QUEUE_WORD1_DIN_DMA_MODE_BIT_SIZE	0x2UL
++#define CC_DSCRPTR_QUEUE_WORD1_DIN_SIZE_BIT_SHIFT	0x2UL
++#define CC_DSCRPTR_QUEUE_WORD1_DIN_SIZE_BIT_SIZE	0x18UL
++#define CC_DSCRPTR_QUEUE_WORD1_NS_BIT_BIT_SHIFT	0x1AUL
++#define CC_DSCRPTR_QUEUE_WORD1_NS_BIT_BIT_SIZE	0x1UL
++#define CC_DSCRPTR_QUEUE_WORD1_DIN_CONST_VALUE_BIT_SHIFT	0x1BUL
++#define CC_DSCRPTR_QUEUE_WORD1_DIN_CONST_VALUE_BIT_SIZE	0x1UL
++#define CC_DSCRPTR_QUEUE_WORD1_NOT_LAST_BIT_SHIFT	0x1CUL
++#define CC_DSCRPTR_QUEUE_WORD1_NOT_LAST_BIT_SIZE	0x1UL
++#define CC_DSCRPTR_QUEUE_WORD1_LOCK_QUEUE_BIT_SHIFT	0x1DUL
++#define CC_DSCRPTR_QUEUE_WORD1_LOCK_QUEUE_BIT_SIZE	0x1UL
++#define CC_DSCRPTR_QUEUE_WORD1_NOT_USED_BIT_SHIFT	0x1EUL
++#define CC_DSCRPTR_QUEUE_WORD1_NOT_USED_BIT_SIZE	0x2UL
++#define CC_DSCRPTR_QUEUE_WORD2_REG_OFFSET	0xE88UL
++#define CC_DSCRPTR_QUEUE_WORD2_VALUE_BIT_SHIFT	0x0UL
++#define CC_DSCRPTR_QUEUE_WORD2_VALUE_BIT_SIZE	0x20UL
++#define CC_DSCRPTR_QUEUE_WORD3_REG_OFFSET	0xE8CUL
++#define CC_DSCRPTR_QUEUE_WORD3_DOUT_DMA_MODE_BIT_SHIFT	0x0UL
++#define CC_DSCRPTR_QUEUE_WORD3_DOUT_DMA_MODE_BIT_SIZE	0x2UL
++#define CC_DSCRPTR_QUEUE_WORD3_DOUT_SIZE_BIT_SHIFT	0x2UL
++#define CC_DSCRPTR_QUEUE_WORD3_DOUT_SIZE_BIT_SIZE	0x18UL
++#define CC_DSCRPTR_QUEUE_WORD3_NS_BIT_BIT_SHIFT	0x1AUL
++#define CC_DSCRPTR_QUEUE_WORD3_NS_BIT_BIT_SIZE	0x1UL
++#define CC_DSCRPTR_QUEUE_WORD3_DOUT_LAST_IND_BIT_SHIFT	0x1BUL
++#define CC_DSCRPTR_QUEUE_WORD3_DOUT_LAST_IND_BIT_SIZE	0x1UL
++#define CC_DSCRPTR_QUEUE_WORD3_HASH_XOR_BIT_BIT_SHIFT	0x1DUL
++#define CC_DSCRPTR_QUEUE_WORD3_HASH_XOR_BIT_BIT_SIZE	0x1UL
++#define CC_DSCRPTR_QUEUE_WORD3_NOT_USED_BIT_SHIFT	0x1EUL
++#define CC_DSCRPTR_QUEUE_WORD3_NOT_USED_BIT_SIZE	0x1UL
++#define CC_DSCRPTR_QUEUE_WORD3_QUEUE_LAST_IND_BIT_SHIFT	0x1FUL
++#define CC_DSCRPTR_QUEUE_WORD3_QUEUE_LAST_IND_BIT_SIZE	0x1UL
++#define CC_DSCRPTR_QUEUE_WORD4_REG_OFFSET	0xE90UL
++#define CC_DSCRPTR_QUEUE_WORD4_DATA_FLOW_MODE_BIT_SHIFT	0x0UL
++#define CC_DSCRPTR_QUEUE_WORD4_DATA_FLOW_MODE_BIT_SIZE	0x6UL
++#define CC_DSCRPTR_QUEUE_WORD4_AES_SEL_N_HASH_BIT_SHIFT	0x6UL
++#define CC_DSCRPTR_QUEUE_WORD4_AES_SEL_N_HASH_BIT_SIZE	0x1UL
++#define CC_DSCRPTR_QUEUE_WORD4_AES_XOR_CRYPTO_KEY_BIT_SHIFT	0x7UL
++#define CC_DSCRPTR_QUEUE_WORD4_AES_XOR_CRYPTO_KEY_BIT_SIZE	0x1UL
++#define CC_DSCRPTR_QUEUE_WORD4_ACK_NEEDED_BIT_SHIFT	0x8UL
++#define CC_DSCRPTR_QUEUE_WORD4_ACK_NEEDED_BIT_SIZE	0x2UL
++#define CC_DSCRPTR_QUEUE_WORD4_CIPHER_MODE_BIT_SHIFT	0xAUL
++#define CC_DSCRPTR_QUEUE_WORD4_CIPHER_MODE_BIT_SIZE	0x4UL
++#define CC_DSCRPTR_QUEUE_WORD4_CMAC_SIZE0_BIT_SHIFT	0xEUL
++#define CC_DSCRPTR_QUEUE_WORD4_CMAC_SIZE0_BIT_SIZE	0x1UL
++#define CC_DSCRPTR_QUEUE_WORD4_CIPHER_DO_BIT_SHIFT	0xFUL
++#define CC_DSCRPTR_QUEUE_WORD4_CIPHER_DO_BIT_SIZE	0x2UL
++#define CC_DSCRPTR_QUEUE_WORD4_CIPHER_CONF0_BIT_SHIFT	0x11UL
++#define CC_DSCRPTR_QUEUE_WORD4_CIPHER_CONF0_BIT_SIZE	0x2UL
++#define CC_DSCRPTR_QUEUE_WORD4_CIPHER_CONF1_BIT_SHIFT	0x13UL
++#define CC_DSCRPTR_QUEUE_WORD4_CIPHER_CONF1_BIT_SIZE	0x1UL
++#define CC_DSCRPTR_QUEUE_WORD4_CIPHER_CONF2_BIT_SHIFT	0x14UL
++#define CC_DSCRPTR_QUEUE_WORD4_CIPHER_CONF2_BIT_SIZE	0x2UL
++#define CC_DSCRPTR_QUEUE_WORD4_KEY_SIZE_BIT_SHIFT	0x16UL
++#define CC_DSCRPTR_QUEUE_WORD4_KEY_SIZE_BIT_SIZE	0x2UL
++#define CC_DSCRPTR_QUEUE_WORD4_SETUP_OPERATION_BIT_SHIFT	0x18UL
++#define CC_DSCRPTR_QUEUE_WORD4_SETUP_OPERATION_BIT_SIZE	0x4UL
++#define CC_DSCRPTR_QUEUE_WORD4_DIN_SRAM_ENDIANNESS_BIT_SHIFT	0x1CUL
++#define CC_DSCRPTR_QUEUE_WORD4_DIN_SRAM_ENDIANNESS_BIT_SIZE	0x1UL
++#define CC_DSCRPTR_QUEUE_WORD4_DOUT_SRAM_ENDIANNESS_BIT_SHIFT	0x1DUL
++#define CC_DSCRPTR_QUEUE_WORD4_DOUT_SRAM_ENDIANNESS_BIT_SIZE	0x1UL
++#define CC_DSCRPTR_QUEUE_WORD4_WORD_SWAP_BIT_SHIFT	0x1EUL
++#define CC_DSCRPTR_QUEUE_WORD4_WORD_SWAP_BIT_SIZE	0x1UL
++#define CC_DSCRPTR_QUEUE_WORD4_BYTES_SWAP_BIT_SHIFT	0x1FUL
++#define CC_DSCRPTR_QUEUE_WORD4_BYTES_SWAP_BIT_SIZE	0x1UL
++#define CC_DSCRPTR_QUEUE_WORD5_REG_OFFSET	0xE94UL
++#define CC_DSCRPTR_QUEUE_WORD5_DIN_ADDR_HIGH_BIT_SHIFT	0x0UL
++#define CC_DSCRPTR_QUEUE_WORD5_DIN_ADDR_HIGH_BIT_SIZE	0x10UL
++#define CC_DSCRPTR_QUEUE_WORD5_DOUT_ADDR_HIGH_BIT_SHIFT	0x10UL
++#define CC_DSCRPTR_QUEUE_WORD5_DOUT_ADDR_HIGH_BIT_SIZE	0x10UL
++#define CC_DSCRPTR_QUEUE_WATERMARK_REG_OFFSET	0xE98UL
++#define CC_DSCRPTR_QUEUE_WATERMARK_VALUE_BIT_SHIFT	0x0UL
++#define CC_DSCRPTR_QUEUE_WATERMARK_VALUE_BIT_SIZE	0xAUL
++#define CC_DSCRPTR_QUEUE_CONTENT_REG_OFFSET	0xE9CUL
++#define CC_DSCRPTR_QUEUE_CONTENT_VALUE_BIT_SHIFT	0x0UL
++#define CC_DSCRPTR_QUEUE_CONTENT_VALUE_BIT_SIZE	0xAUL
+ // --------------------------------------
+ // BLOCK: AXI_P
+ // --------------------------------------
+-#define DX_AXIM_MON_INFLIGHT_REG_OFFSET	0xB00UL
+-#define DX_AXIM_MON_INFLIGHT_VALUE_BIT_SHIFT	0x0UL
+-#define DX_AXIM_MON_INFLIGHT_VALUE_BIT_SIZE	0x8UL
+-#define DX_AXIM_MON_INFLIGHTLAST_REG_OFFSET	0xB40UL
+-#define DX_AXIM_MON_INFLIGHTLAST_VALUE_BIT_SHIFT	0x0UL
+-#define DX_AXIM_MON_INFLIGHTLAST_VALUE_BIT_SIZE	0x8UL
+-#define DX_AXIM_MON_COMP_REG_OFFSET	0xB80UL
+-#define DX_AXIM_MON_COMP_VALUE_BIT_SHIFT	0x0UL
+-#define DX_AXIM_MON_COMP_VALUE_BIT_SIZE	0x10UL
+-#define DX_AXIM_MON_ERR_REG_OFFSET	0xBC4UL
+-#define DX_AXIM_MON_ERR_BRESP_BIT_SHIFT	0x0UL
+-#define DX_AXIM_MON_ERR_BRESP_BIT_SIZE	0x2UL
+-#define DX_AXIM_MON_ERR_BID_BIT_SHIFT	0x2UL
+-#define DX_AXIM_MON_ERR_BID_BIT_SIZE	0x4UL
+-#define DX_AXIM_MON_ERR_RRESP_BIT_SHIFT	0x10UL
+-#define DX_AXIM_MON_ERR_RRESP_BIT_SIZE	0x2UL
+-#define DX_AXIM_MON_ERR_RID_BIT_SHIFT	0x12UL
+-#define DX_AXIM_MON_ERR_RID_BIT_SIZE	0x4UL
+-#define DX_AXIM_CFG_REG_OFFSET	0xBE8UL
+-#define DX_AXIM_CFG_BRESPMASK_BIT_SHIFT	0x4UL
+-#define DX_AXIM_CFG_BRESPMASK_BIT_SIZE	0x1UL
+-#define DX_AXIM_CFG_RRESPMASK_BIT_SHIFT	0x5UL
+-#define DX_AXIM_CFG_RRESPMASK_BIT_SIZE	0x1UL
+-#define DX_AXIM_CFG_INFLTMASK_BIT_SHIFT	0x6UL
+-#define DX_AXIM_CFG_INFLTMASK_BIT_SIZE	0x1UL
+-#define DX_AXIM_CFG_COMPMASK_BIT_SHIFT	0x7UL
+-#define DX_AXIM_CFG_COMPMASK_BIT_SIZE	0x1UL
+-#define DX_AXIM_ACE_CONST_REG_OFFSET	0xBECUL
+-#define DX_AXIM_ACE_CONST_ARDOMAIN_BIT_SHIFT	0x0UL
+-#define DX_AXIM_ACE_CONST_ARDOMAIN_BIT_SIZE	0x2UL
+-#define DX_AXIM_ACE_CONST_AWDOMAIN_BIT_SHIFT	0x2UL
+-#define DX_AXIM_ACE_CONST_AWDOMAIN_BIT_SIZE	0x2UL
+-#define DX_AXIM_ACE_CONST_ARBAR_BIT_SHIFT	0x4UL
+-#define DX_AXIM_ACE_CONST_ARBAR_BIT_SIZE	0x2UL
+-#define DX_AXIM_ACE_CONST_AWBAR_BIT_SHIFT	0x6UL
+-#define DX_AXIM_ACE_CONST_AWBAR_BIT_SIZE	0x2UL
+-#define DX_AXIM_ACE_CONST_ARSNOOP_BIT_SHIFT	0x8UL
+-#define DX_AXIM_ACE_CONST_ARSNOOP_BIT_SIZE	0x4UL
+-#define DX_AXIM_ACE_CONST_AWSNOOP_NOT_ALIGNED_BIT_SHIFT	0xCUL
+-#define DX_AXIM_ACE_CONST_AWSNOOP_NOT_ALIGNED_BIT_SIZE	0x3UL
+-#define DX_AXIM_ACE_CONST_AWSNOOP_ALIGNED_BIT_SHIFT	0xFUL
+-#define DX_AXIM_ACE_CONST_AWSNOOP_ALIGNED_BIT_SIZE	0x3UL
+-#define DX_AXIM_ACE_CONST_AWADDR_NOT_MASKED_BIT_SHIFT	0x12UL
+-#define DX_AXIM_ACE_CONST_AWADDR_NOT_MASKED_BIT_SIZE	0x7UL
+-#define DX_AXIM_ACE_CONST_AWLEN_VAL_BIT_SHIFT	0x19UL
+-#define DX_AXIM_ACE_CONST_AWLEN_VAL_BIT_SIZE	0x4UL
+-#define DX_AXIM_CACHE_PARAMS_REG_OFFSET	0xBF0UL
+-#define DX_AXIM_CACHE_PARAMS_AWCACHE_LAST_BIT_SHIFT	0x0UL
+-#define DX_AXIM_CACHE_PARAMS_AWCACHE_LAST_BIT_SIZE	0x4UL
+-#define DX_AXIM_CACHE_PARAMS_AWCACHE_BIT_SHIFT	0x4UL
+-#define DX_AXIM_CACHE_PARAMS_AWCACHE_BIT_SIZE	0x4UL
+-#define DX_AXIM_CACHE_PARAMS_ARCACHE_BIT_SHIFT	0x8UL
+-#define DX_AXIM_CACHE_PARAMS_ARCACHE_BIT_SIZE	0x4UL
+-#endif	// __DX_CRYS_KERNEL_H__
++#define CC_AXIM_MON_INFLIGHT_REG_OFFSET	0xB00UL
++#define CC_AXIM_MON_INFLIGHT_VALUE_BIT_SHIFT	0x0UL
++#define CC_AXIM_MON_INFLIGHT_VALUE_BIT_SIZE	0x8UL
++#define CC_AXIM_MON_INFLIGHTLAST_REG_OFFSET	0xB40UL
++#define CC_AXIM_MON_INFLIGHTLAST_VALUE_BIT_SHIFT	0x0UL
++#define CC_AXIM_MON_INFLIGHTLAST_VALUE_BIT_SIZE	0x8UL
++#define CC_AXIM_MON_COMP_REG_OFFSET	0xB80UL
++#define CC_AXIM_MON_COMP_VALUE_BIT_SHIFT	0x0UL
++#define CC_AXIM_MON_COMP_VALUE_BIT_SIZE	0x10UL
++#define CC_AXIM_MON_ERR_REG_OFFSET	0xBC4UL
++#define CC_AXIM_MON_ERR_BRESP_BIT_SHIFT	0x0UL
++#define CC_AXIM_MON_ERR_BRESP_BIT_SIZE	0x2UL
++#define CC_AXIM_MON_ERR_BID_BIT_SHIFT	0x2UL
++#define CC_AXIM_MON_ERR_BID_BIT_SIZE	0x4UL
++#define CC_AXIM_MON_ERR_RRESP_BIT_SHIFT	0x10UL
++#define CC_AXIM_MON_ERR_RRESP_BIT_SIZE	0x2UL
++#define CC_AXIM_MON_ERR_RID_BIT_SHIFT	0x12UL
++#define CC_AXIM_MON_ERR_RID_BIT_SIZE	0x4UL
++#define CC_AXIM_CFG_REG_OFFSET	0xBE8UL
++#define CC_AXIM_CFG_BRESPMASK_BIT_SHIFT	0x4UL
++#define CC_AXIM_CFG_BRESPMASK_BIT_SIZE	0x1UL
++#define CC_AXIM_CFG_RRESPMASK_BIT_SHIFT	0x5UL
++#define CC_AXIM_CFG_RRESPMASK_BIT_SIZE	0x1UL
++#define CC_AXIM_CFG_INFLTMASK_BIT_SHIFT	0x6UL
++#define CC_AXIM_CFG_INFLTMASK_BIT_SIZE	0x1UL
++#define CC_AXIM_CFG_COMPMASK_BIT_SHIFT	0x7UL
++#define CC_AXIM_CFG_COMPMASK_BIT_SIZE	0x1UL
++#define CC_AXIM_ACE_CONST_REG_OFFSET	0xBECUL
++#define CC_AXIM_ACE_CONST_ARDOMAIN_BIT_SHIFT	0x0UL
++#define CC_AXIM_ACE_CONST_ARDOMAIN_BIT_SIZE	0x2UL
++#define CC_AXIM_ACE_CONST_AWDOMAIN_BIT_SHIFT	0x2UL
++#define CC_AXIM_ACE_CONST_AWDOMAIN_BIT_SIZE	0x2UL
++#define CC_AXIM_ACE_CONST_ARBAR_BIT_SHIFT	0x4UL
++#define CC_AXIM_ACE_CONST_ARBAR_BIT_SIZE	0x2UL
++#define CC_AXIM_ACE_CONST_AWBAR_BIT_SHIFT	0x6UL
++#define CC_AXIM_ACE_CONST_AWBAR_BIT_SIZE	0x2UL
++#define CC_AXIM_ACE_CONST_ARSNOOP_BIT_SHIFT	0x8UL
++#define CC_AXIM_ACE_CONST_ARSNOOP_BIT_SIZE	0x4UL
++#define CC_AXIM_ACE_CONST_AWSNOOP_NOT_ALIGNED_BIT_SHIFT	0xCUL
++#define CC_AXIM_ACE_CONST_AWSNOOP_NOT_ALIGNED_BIT_SIZE	0x3UL
++#define CC_AXIM_ACE_CONST_AWSNOOP_ALIGNED_BIT_SHIFT	0xFUL
++#define CC_AXIM_ACE_CONST_AWSNOOP_ALIGNED_BIT_SIZE	0x3UL
++#define CC_AXIM_ACE_CONST_AWADDR_NOT_MASKED_BIT_SHIFT	0x12UL
++#define CC_AXIM_ACE_CONST_AWADDR_NOT_MASKED_BIT_SIZE	0x7UL
++#define CC_AXIM_ACE_CONST_AWLEN_VAL_BIT_SHIFT	0x19UL
++#define CC_AXIM_ACE_CONST_AWLEN_VAL_BIT_SIZE	0x4UL
++#define CC_AXIM_CACHE_PARAMS_REG_OFFSET	0xBF0UL
++#define CC_AXIM_CACHE_PARAMS_AWCACHE_LAST_BIT_SHIFT	0x0UL
++#define CC_AXIM_CACHE_PARAMS_AWCACHE_LAST_BIT_SIZE	0x4UL
++#define CC_AXIM_CACHE_PARAMS_AWCACHE_BIT_SHIFT	0x4UL
++#define CC_AXIM_CACHE_PARAMS_AWCACHE_BIT_SIZE	0x4UL
++#define CC_AXIM_CACHE_PARAMS_ARCACHE_BIT_SHIFT	0x8UL
++#define CC_AXIM_CACHE_PARAMS_ARCACHE_BIT_SIZE	0x4UL
++#endif	// __CC_CRYS_KERNEL_H__
+diff --git a/drivers/staging/ccree/dx_host.h b/drivers/staging/ccree/dx_host.h
+index 863c267..e90afbc 100644
+--- a/drivers/staging/ccree/dx_host.h
++++ b/drivers/staging/ccree/dx_host.h
+@@ -14,142 +14,142 @@
+  * along with this program; if not, see <http://www.gnu.org/licenses/>.
   */
  
--#ifndef __SSI_BUFFER_MGR_H__
--#define __SSI_BUFFER_MGR_H__
-+#ifndef __CC_BUFFER_MGR_H__
-+#define __CC_BUFFER_MGR_H__
+-#ifndef __DX_HOST_H__
+-#define __DX_HOST_H__
++#ifndef __CC_HOST_H__
++#define __CC_HOST_H__
  
- #include <crypto/algapi.h>
+ // --------------------------------------
+ // BLOCK: HOST_P
+ // --------------------------------------
+-#define DX_HOST_IRR_REG_OFFSET	0xA00UL
+-#define DX_HOST_IRR_DSCRPTR_COMPLETION_LOW_INT_BIT_SHIFT	0x2UL
+-#define DX_HOST_IRR_DSCRPTR_COMPLETION_LOW_INT_BIT_SIZE	0x1UL
+-#define DX_HOST_IRR_AXI_ERR_INT_BIT_SHIFT	0x8UL
+-#define DX_HOST_IRR_AXI_ERR_INT_BIT_SIZE	0x1UL
+-#define DX_HOST_IRR_GPR0_BIT_SHIFT	0xBUL
+-#define DX_HOST_IRR_GPR0_BIT_SIZE	0x1UL
+-#define DX_HOST_IRR_DSCRPTR_WATERMARK_INT_BIT_SHIFT	0x13UL
+-#define DX_HOST_IRR_DSCRPTR_WATERMARK_INT_BIT_SIZE	0x1UL
+-#define DX_HOST_IRR_AXIM_COMP_INT_BIT_SHIFT	0x17UL
+-#define DX_HOST_IRR_AXIM_COMP_INT_BIT_SIZE	0x1UL
+-#define DX_HOST_IMR_REG_OFFSET	0xA04UL
+-#define DX_HOST_IMR_NOT_USED_MASK_BIT_SHIFT	0x1UL
+-#define DX_HOST_IMR_NOT_USED_MASK_BIT_SIZE	0x1UL
+-#define DX_HOST_IMR_DSCRPTR_COMPLETION_MASK_BIT_SHIFT	0x2UL
+-#define DX_HOST_IMR_DSCRPTR_COMPLETION_MASK_BIT_SIZE	0x1UL
+-#define DX_HOST_IMR_AXI_ERR_MASK_BIT_SHIFT	0x8UL
+-#define DX_HOST_IMR_AXI_ERR_MASK_BIT_SIZE	0x1UL
+-#define DX_HOST_IMR_GPR0_BIT_SHIFT	0xBUL
+-#define DX_HOST_IMR_GPR0_BIT_SIZE	0x1UL
+-#define DX_HOST_IMR_DSCRPTR_WATERMARK_MASK0_BIT_SHIFT	0x13UL
+-#define DX_HOST_IMR_DSCRPTR_WATERMARK_MASK0_BIT_SIZE	0x1UL
+-#define DX_HOST_IMR_AXIM_COMP_INT_MASK_BIT_SHIFT	0x17UL
+-#define DX_HOST_IMR_AXIM_COMP_INT_MASK_BIT_SIZE	0x1UL
+-#define DX_HOST_ICR_REG_OFFSET	0xA08UL
+-#define DX_HOST_ICR_DSCRPTR_COMPLETION_BIT_SHIFT	0x2UL
+-#define DX_HOST_ICR_DSCRPTR_COMPLETION_BIT_SIZE	0x1UL
+-#define DX_HOST_ICR_AXI_ERR_CLEAR_BIT_SHIFT	0x8UL
+-#define DX_HOST_ICR_AXI_ERR_CLEAR_BIT_SIZE	0x1UL
+-#define DX_HOST_ICR_GPR_INT_CLEAR_BIT_SHIFT	0xBUL
+-#define DX_HOST_ICR_GPR_INT_CLEAR_BIT_SIZE	0x1UL
+-#define DX_HOST_ICR_DSCRPTR_WATERMARK_QUEUE0_CLEAR_BIT_SHIFT	0x13UL
+-#define DX_HOST_ICR_DSCRPTR_WATERMARK_QUEUE0_CLEAR_BIT_SIZE	0x1UL
+-#define DX_HOST_ICR_AXIM_COMP_INT_CLEAR_BIT_SHIFT	0x17UL
+-#define DX_HOST_ICR_AXIM_COMP_INT_CLEAR_BIT_SIZE	0x1UL
+-#define DX_HOST_SIGNATURE_REG_OFFSET	0xA24UL
+-#define DX_HOST_SIGNATURE_VALUE_BIT_SHIFT	0x0UL
+-#define DX_HOST_SIGNATURE_VALUE_BIT_SIZE	0x20UL
+-#define DX_HOST_BOOT_REG_OFFSET	0xA28UL
+-#define DX_HOST_BOOT_SYNTHESIS_CONFIG_BIT_SHIFT	0x0UL
+-#define DX_HOST_BOOT_SYNTHESIS_CONFIG_BIT_SIZE	0x1UL
+-#define DX_HOST_BOOT_LARGE_RKEK_LOCAL_BIT_SHIFT	0x1UL
+-#define DX_HOST_BOOT_LARGE_RKEK_LOCAL_BIT_SIZE	0x1UL
+-#define DX_HOST_BOOT_HASH_IN_FUSES_LOCAL_BIT_SHIFT	0x2UL
+-#define DX_HOST_BOOT_HASH_IN_FUSES_LOCAL_BIT_SIZE	0x1UL
+-#define DX_HOST_BOOT_EXT_MEM_SECURED_LOCAL_BIT_SHIFT	0x3UL
+-#define DX_HOST_BOOT_EXT_MEM_SECURED_LOCAL_BIT_SIZE	0x1UL
+-#define DX_HOST_BOOT_RKEK_ECC_EXISTS_LOCAL_N_BIT_SHIFT	0x5UL
+-#define DX_HOST_BOOT_RKEK_ECC_EXISTS_LOCAL_N_BIT_SIZE	0x1UL
+-#define DX_HOST_BOOT_SRAM_SIZE_LOCAL_BIT_SHIFT	0x6UL
+-#define DX_HOST_BOOT_SRAM_SIZE_LOCAL_BIT_SIZE	0x3UL
+-#define DX_HOST_BOOT_DSCRPTR_EXISTS_LOCAL_BIT_SHIFT	0x9UL
+-#define DX_HOST_BOOT_DSCRPTR_EXISTS_LOCAL_BIT_SIZE	0x1UL
+-#define DX_HOST_BOOT_PAU_EXISTS_LOCAL_BIT_SHIFT	0xAUL
+-#define DX_HOST_BOOT_PAU_EXISTS_LOCAL_BIT_SIZE	0x1UL
+-#define DX_HOST_BOOT_RNG_EXISTS_LOCAL_BIT_SHIFT	0xBUL
+-#define DX_HOST_BOOT_RNG_EXISTS_LOCAL_BIT_SIZE	0x1UL
+-#define DX_HOST_BOOT_PKA_EXISTS_LOCAL_BIT_SHIFT	0xCUL
+-#define DX_HOST_BOOT_PKA_EXISTS_LOCAL_BIT_SIZE	0x1UL
+-#define DX_HOST_BOOT_RC4_EXISTS_LOCAL_BIT_SHIFT	0xDUL
+-#define DX_HOST_BOOT_RC4_EXISTS_LOCAL_BIT_SIZE	0x1UL
+-#define DX_HOST_BOOT_SHA_512_PRSNT_LOCAL_BIT_SHIFT	0xEUL
+-#define DX_HOST_BOOT_SHA_512_PRSNT_LOCAL_BIT_SIZE	0x1UL
+-#define DX_HOST_BOOT_SHA_256_PRSNT_LOCAL_BIT_SHIFT	0xFUL
+-#define DX_HOST_BOOT_SHA_256_PRSNT_LOCAL_BIT_SIZE	0x1UL
+-#define DX_HOST_BOOT_MD5_PRSNT_LOCAL_BIT_SHIFT	0x10UL
+-#define DX_HOST_BOOT_MD5_PRSNT_LOCAL_BIT_SIZE	0x1UL
+-#define DX_HOST_BOOT_HASH_EXISTS_LOCAL_BIT_SHIFT	0x11UL
+-#define DX_HOST_BOOT_HASH_EXISTS_LOCAL_BIT_SIZE	0x1UL
+-#define DX_HOST_BOOT_C2_EXISTS_LOCAL_BIT_SHIFT	0x12UL
+-#define DX_HOST_BOOT_C2_EXISTS_LOCAL_BIT_SIZE	0x1UL
+-#define DX_HOST_BOOT_DES_EXISTS_LOCAL_BIT_SHIFT	0x13UL
+-#define DX_HOST_BOOT_DES_EXISTS_LOCAL_BIT_SIZE	0x1UL
+-#define DX_HOST_BOOT_AES_XCBC_MAC_EXISTS_LOCAL_BIT_SHIFT	0x14UL
+-#define DX_HOST_BOOT_AES_XCBC_MAC_EXISTS_LOCAL_BIT_SIZE	0x1UL
+-#define DX_HOST_BOOT_AES_CMAC_EXISTS_LOCAL_BIT_SHIFT	0x15UL
+-#define DX_HOST_BOOT_AES_CMAC_EXISTS_LOCAL_BIT_SIZE	0x1UL
+-#define DX_HOST_BOOT_AES_CCM_EXISTS_LOCAL_BIT_SHIFT	0x16UL
+-#define DX_HOST_BOOT_AES_CCM_EXISTS_LOCAL_BIT_SIZE	0x1UL
+-#define DX_HOST_BOOT_AES_XEX_HW_T_CALC_LOCAL_BIT_SHIFT	0x17UL
+-#define DX_HOST_BOOT_AES_XEX_HW_T_CALC_LOCAL_BIT_SIZE	0x1UL
+-#define DX_HOST_BOOT_AES_XEX_EXISTS_LOCAL_BIT_SHIFT	0x18UL
+-#define DX_HOST_BOOT_AES_XEX_EXISTS_LOCAL_BIT_SIZE	0x1UL
+-#define DX_HOST_BOOT_CTR_EXISTS_LOCAL_BIT_SHIFT	0x19UL
+-#define DX_HOST_BOOT_CTR_EXISTS_LOCAL_BIT_SIZE	0x1UL
+-#define DX_HOST_BOOT_AES_DIN_BYTE_RESOLUTION_LOCAL_BIT_SHIFT	0x1AUL
+-#define DX_HOST_BOOT_AES_DIN_BYTE_RESOLUTION_LOCAL_BIT_SIZE	0x1UL
+-#define DX_HOST_BOOT_TUNNELING_ENB_LOCAL_BIT_SHIFT	0x1BUL
+-#define DX_HOST_BOOT_TUNNELING_ENB_LOCAL_BIT_SIZE	0x1UL
+-#define DX_HOST_BOOT_SUPPORT_256_192_KEY_LOCAL_BIT_SHIFT	0x1CUL
+-#define DX_HOST_BOOT_SUPPORT_256_192_KEY_LOCAL_BIT_SIZE	0x1UL
+-#define DX_HOST_BOOT_ONLY_ENCRYPT_LOCAL_BIT_SHIFT	0x1DUL
+-#define DX_HOST_BOOT_ONLY_ENCRYPT_LOCAL_BIT_SIZE	0x1UL
+-#define DX_HOST_BOOT_AES_EXISTS_LOCAL_BIT_SHIFT	0x1EUL
+-#define DX_HOST_BOOT_AES_EXISTS_LOCAL_BIT_SIZE	0x1UL
+-#define DX_HOST_VERSION_REG_OFFSET	0xA40UL
+-#define DX_HOST_VERSION_VALUE_BIT_SHIFT	0x0UL
+-#define DX_HOST_VERSION_VALUE_BIT_SIZE	0x20UL
+-#define DX_HOST_KFDE0_VALID_REG_OFFSET	0xA60UL
+-#define DX_HOST_KFDE0_VALID_VALUE_BIT_SHIFT	0x0UL
+-#define DX_HOST_KFDE0_VALID_VALUE_BIT_SIZE	0x1UL
+-#define DX_HOST_KFDE1_VALID_REG_OFFSET	0xA64UL
+-#define DX_HOST_KFDE1_VALID_VALUE_BIT_SHIFT	0x0UL
+-#define DX_HOST_KFDE1_VALID_VALUE_BIT_SIZE	0x1UL
+-#define DX_HOST_KFDE2_VALID_REG_OFFSET	0xA68UL
+-#define DX_HOST_KFDE2_VALID_VALUE_BIT_SHIFT	0x0UL
+-#define DX_HOST_KFDE2_VALID_VALUE_BIT_SIZE	0x1UL
+-#define DX_HOST_KFDE3_VALID_REG_OFFSET	0xA6CUL
+-#define DX_HOST_KFDE3_VALID_VALUE_BIT_SHIFT	0x0UL
+-#define DX_HOST_KFDE3_VALID_VALUE_BIT_SIZE	0x1UL
+-#define DX_HOST_GPR0_REG_OFFSET	0xA70UL
+-#define DX_HOST_GPR0_VALUE_BIT_SHIFT	0x0UL
+-#define DX_HOST_GPR0_VALUE_BIT_SIZE	0x20UL
+-#define DX_GPR_HOST_REG_OFFSET	0xA74UL
+-#define DX_GPR_HOST_VALUE_BIT_SHIFT	0x0UL
+-#define DX_GPR_HOST_VALUE_BIT_SIZE	0x20UL
+-#define DX_HOST_POWER_DOWN_EN_REG_OFFSET	0xA78UL
+-#define DX_HOST_POWER_DOWN_EN_VALUE_BIT_SHIFT	0x0UL
+-#define DX_HOST_POWER_DOWN_EN_VALUE_BIT_SIZE	0x1UL
++#define CC_HOST_IRR_REG_OFFSET	0xA00UL
++#define CC_HOST_IRR_DSCRPTR_COMPLETION_LOW_INT_BIT_SHIFT	0x2UL
++#define CC_HOST_IRR_DSCRPTR_COMPLETION_LOW_INT_BIT_SIZE	0x1UL
++#define CC_HOST_IRR_AXI_ERR_INT_BIT_SHIFT	0x8UL
++#define CC_HOST_IRR_AXI_ERR_INT_BIT_SIZE	0x1UL
++#define CC_HOST_IRR_GPR0_BIT_SHIFT	0xBUL
++#define CC_HOST_IRR_GPR0_BIT_SIZE	0x1UL
++#define CC_HOST_IRR_DSCRPTR_WATERMARK_INT_BIT_SHIFT	0x13UL
++#define CC_HOST_IRR_DSCRPTR_WATERMARK_INT_BIT_SIZE	0x1UL
++#define CC_HOST_IRR_AXIM_COMP_INT_BIT_SHIFT	0x17UL
++#define CC_HOST_IRR_AXIM_COMP_INT_BIT_SIZE	0x1UL
++#define CC_HOST_IMR_REG_OFFSET	0xA04UL
++#define CC_HOST_IMR_NOT_USED_MASK_BIT_SHIFT	0x1UL
++#define CC_HOST_IMR_NOT_USED_MASK_BIT_SIZE	0x1UL
++#define CC_HOST_IMR_DSCRPTR_COMPLETION_MASK_BIT_SHIFT	0x2UL
++#define CC_HOST_IMR_DSCRPTR_COMPLETION_MASK_BIT_SIZE	0x1UL
++#define CC_HOST_IMR_AXI_ERR_MASK_BIT_SHIFT	0x8UL
++#define CC_HOST_IMR_AXI_ERR_MASK_BIT_SIZE	0x1UL
++#define CC_HOST_IMR_GPR0_BIT_SHIFT	0xBUL
++#define CC_HOST_IMR_GPR0_BIT_SIZE	0x1UL
++#define CC_HOST_IMR_DSCRPTR_WATERMARK_MASK0_BIT_SHIFT	0x13UL
++#define CC_HOST_IMR_DSCRPTR_WATERMARK_MASK0_BIT_SIZE	0x1UL
++#define CC_HOST_IMR_AXIM_COMP_INT_MASK_BIT_SHIFT	0x17UL
++#define CC_HOST_IMR_AXIM_COMP_INT_MASK_BIT_SIZE	0x1UL
++#define CC_HOST_ICR_REG_OFFSET	0xA08UL
++#define CC_HOST_ICR_DSCRPTR_COMPLETION_BIT_SHIFT	0x2UL
++#define CC_HOST_ICR_DSCRPTR_COMPLETION_BIT_SIZE	0x1UL
++#define CC_HOST_ICR_AXI_ERR_CLEAR_BIT_SHIFT	0x8UL
++#define CC_HOST_ICR_AXI_ERR_CLEAR_BIT_SIZE	0x1UL
++#define CC_HOST_ICR_GPR_INT_CLEAR_BIT_SHIFT	0xBUL
++#define CC_HOST_ICR_GPR_INT_CLEAR_BIT_SIZE	0x1UL
++#define CC_HOST_ICR_DSCRPTR_WATERMARK_QUEUE0_CLEAR_BIT_SHIFT	0x13UL
++#define CC_HOST_ICR_DSCRPTR_WATERMARK_QUEUE0_CLEAR_BIT_SIZE	0x1UL
++#define CC_HOST_ICR_AXIM_COMP_INT_CLEAR_BIT_SHIFT	0x17UL
++#define CC_HOST_ICR_AXIM_COMP_INT_CLEAR_BIT_SIZE	0x1UL
++#define CC_HOST_SIGNATURE_REG_OFFSET	0xA24UL
++#define CC_HOST_SIGNATURE_VALUE_BIT_SHIFT	0x0UL
++#define CC_HOST_SIGNATURE_VALUE_BIT_SIZE	0x20UL
++#define CC_HOST_BOOT_REG_OFFSET	0xA28UL
++#define CC_HOST_BOOT_SYNTHESIS_CONFIG_BIT_SHIFT	0x0UL
++#define CC_HOST_BOOT_SYNTHESIS_CONFIG_BIT_SIZE	0x1UL
++#define CC_HOST_BOOT_LARGE_RKEK_LOCAL_BIT_SHIFT	0x1UL
++#define CC_HOST_BOOT_LARGE_RKEK_LOCAL_BIT_SIZE	0x1UL
++#define CC_HOST_BOOT_HASH_IN_FUSES_LOCAL_BIT_SHIFT	0x2UL
++#define CC_HOST_BOOT_HASH_IN_FUSES_LOCAL_BIT_SIZE	0x1UL
++#define CC_HOST_BOOT_EXT_MEM_SECURED_LOCAL_BIT_SHIFT	0x3UL
++#define CC_HOST_BOOT_EXT_MEM_SECURED_LOCAL_BIT_SIZE	0x1UL
++#define CC_HOST_BOOT_RKEK_ECC_EXISTS_LOCAL_N_BIT_SHIFT	0x5UL
++#define CC_HOST_BOOT_RKEK_ECC_EXISTS_LOCAL_N_BIT_SIZE	0x1UL
++#define CC_HOST_BOOT_SRAM_SIZE_LOCAL_BIT_SHIFT	0x6UL
++#define CC_HOST_BOOT_SRAM_SIZE_LOCAL_BIT_SIZE	0x3UL
++#define CC_HOST_BOOT_DSCRPTR_EXISTS_LOCAL_BIT_SHIFT	0x9UL
++#define CC_HOST_BOOT_DSCRPTR_EXISTS_LOCAL_BIT_SIZE	0x1UL
++#define CC_HOST_BOOT_PAU_EXISTS_LOCAL_BIT_SHIFT	0xAUL
++#define CC_HOST_BOOT_PAU_EXISTS_LOCAL_BIT_SIZE	0x1UL
++#define CC_HOST_BOOT_RNG_EXISTS_LOCAL_BIT_SHIFT	0xBUL
++#define CC_HOST_BOOT_RNG_EXISTS_LOCAL_BIT_SIZE	0x1UL
++#define CC_HOST_BOOT_PKA_EXISTS_LOCAL_BIT_SHIFT	0xCUL
++#define CC_HOST_BOOT_PKA_EXISTS_LOCAL_BIT_SIZE	0x1UL
++#define CC_HOST_BOOT_RC4_EXISTS_LOCAL_BIT_SHIFT	0xDUL
++#define CC_HOST_BOOT_RC4_EXISTS_LOCAL_BIT_SIZE	0x1UL
++#define CC_HOST_BOOT_SHA_512_PRSNT_LOCAL_BIT_SHIFT	0xEUL
++#define CC_HOST_BOOT_SHA_512_PRSNT_LOCAL_BIT_SIZE	0x1UL
++#define CC_HOST_BOOT_SHA_256_PRSNT_LOCAL_BIT_SHIFT	0xFUL
++#define CC_HOST_BOOT_SHA_256_PRSNT_LOCAL_BIT_SIZE	0x1UL
++#define CC_HOST_BOOT_MD5_PRSNT_LOCAL_BIT_SHIFT	0x10UL
++#define CC_HOST_BOOT_MD5_PRSNT_LOCAL_BIT_SIZE	0x1UL
++#define CC_HOST_BOOT_HASH_EXISTS_LOCAL_BIT_SHIFT	0x11UL
++#define CC_HOST_BOOT_HASH_EXISTS_LOCAL_BIT_SIZE	0x1UL
++#define CC_HOST_BOOT_C2_EXISTS_LOCAL_BIT_SHIFT	0x12UL
++#define CC_HOST_BOOT_C2_EXISTS_LOCAL_BIT_SIZE	0x1UL
++#define CC_HOST_BOOT_DES_EXISTS_LOCAL_BIT_SHIFT	0x13UL
++#define CC_HOST_BOOT_DES_EXISTS_LOCAL_BIT_SIZE	0x1UL
++#define CC_HOST_BOOT_AES_XCBC_MAC_EXISTS_LOCAL_BIT_SHIFT	0x14UL
++#define CC_HOST_BOOT_AES_XCBC_MAC_EXISTS_LOCAL_BIT_SIZE	0x1UL
++#define CC_HOST_BOOT_AES_CMAC_EXISTS_LOCAL_BIT_SHIFT	0x15UL
++#define CC_HOST_BOOT_AES_CMAC_EXISTS_LOCAL_BIT_SIZE	0x1UL
++#define CC_HOST_BOOT_AES_CCM_EXISTS_LOCAL_BIT_SHIFT	0x16UL
++#define CC_HOST_BOOT_AES_CCM_EXISTS_LOCAL_BIT_SIZE	0x1UL
++#define CC_HOST_BOOT_AES_XEX_HW_T_CALC_LOCAL_BIT_SHIFT	0x17UL
++#define CC_HOST_BOOT_AES_XEX_HW_T_CALC_LOCAL_BIT_SIZE	0x1UL
++#define CC_HOST_BOOT_AES_XEX_EXISTS_LOCAL_BIT_SHIFT	0x18UL
++#define CC_HOST_BOOT_AES_XEX_EXISTS_LOCAL_BIT_SIZE	0x1UL
++#define CC_HOST_BOOT_CTR_EXISTS_LOCAL_BIT_SHIFT	0x19UL
++#define CC_HOST_BOOT_CTR_EXISTS_LOCAL_BIT_SIZE	0x1UL
++#define CC_HOST_BOOT_AES_DIN_BYTE_RESOLUTION_LOCAL_BIT_SHIFT	0x1AUL
++#define CC_HOST_BOOT_AES_DIN_BYTE_RESOLUTION_LOCAL_BIT_SIZE	0x1UL
++#define CC_HOST_BOOT_TUNNELING_ENB_LOCAL_BIT_SHIFT	0x1BUL
++#define CC_HOST_BOOT_TUNNELING_ENB_LOCAL_BIT_SIZE	0x1UL
++#define CC_HOST_BOOT_SUPPORT_256_192_KEY_LOCAL_BIT_SHIFT	0x1CUL
++#define CC_HOST_BOOT_SUPPORT_256_192_KEY_LOCAL_BIT_SIZE	0x1UL
++#define CC_HOST_BOOT_ONLY_ENCRYPT_LOCAL_BIT_SHIFT	0x1DUL
++#define CC_HOST_BOOT_ONLY_ENCRYPT_LOCAL_BIT_SIZE	0x1UL
++#define CC_HOST_BOOT_AES_EXISTS_LOCAL_BIT_SHIFT	0x1EUL
++#define CC_HOST_BOOT_AES_EXISTS_LOCAL_BIT_SIZE	0x1UL
++#define CC_HOST_VERSION_REG_OFFSET	0xA40UL
++#define CC_HOST_VERSION_VALUE_BIT_SHIFT	0x0UL
++#define CC_HOST_VERSION_VALUE_BIT_SIZE	0x20UL
++#define CC_HOST_KFDE0_VALID_REG_OFFSET	0xA60UL
++#define CC_HOST_KFDE0_VALID_VALUE_BIT_SHIFT	0x0UL
++#define CC_HOST_KFDE0_VALID_VALUE_BIT_SIZE	0x1UL
++#define CC_HOST_KFDE1_VALID_REG_OFFSET	0xA64UL
++#define CC_HOST_KFDE1_VALID_VALUE_BIT_SHIFT	0x0UL
++#define CC_HOST_KFDE1_VALID_VALUE_BIT_SIZE	0x1UL
++#define CC_HOST_KFDE2_VALID_REG_OFFSET	0xA68UL
++#define CC_HOST_KFDE2_VALID_VALUE_BIT_SHIFT	0x0UL
++#define CC_HOST_KFDE2_VALID_VALUE_BIT_SIZE	0x1UL
++#define CC_HOST_KFDE3_VALID_REG_OFFSET	0xA6CUL
++#define CC_HOST_KFDE3_VALID_VALUE_BIT_SHIFT	0x0UL
++#define CC_HOST_KFDE3_VALID_VALUE_BIT_SIZE	0x1UL
++#define CC_HOST_GPR0_REG_OFFSET	0xA70UL
++#define CC_HOST_GPR0_VALUE_BIT_SHIFT	0x0UL
++#define CC_HOST_GPR0_VALUE_BIT_SIZE	0x20UL
++#define CC_GPR_HOST_REG_OFFSET	0xA74UL
++#define CC_GPR_HOST_VALUE_BIT_SHIFT	0x0UL
++#define CC_GPR_HOST_VALUE_BIT_SIZE	0x20UL
++#define CC_HOST_POWER_DOWN_EN_REG_OFFSET	0xA78UL
++#define CC_HOST_POWER_DOWN_EN_VALUE_BIT_SHIFT	0x0UL
++#define CC_HOST_POWER_DOWN_EN_VALUE_BIT_SIZE	0x1UL
+ // --------------------------------------
+ // BLOCK: HOST_SRAM
+ // --------------------------------------
+-#define DX_SRAM_DATA_REG_OFFSET	0xF00UL
+-#define DX_SRAM_DATA_VALUE_BIT_SHIFT	0x0UL
+-#define DX_SRAM_DATA_VALUE_BIT_SIZE	0x20UL
+-#define DX_SRAM_ADDR_REG_OFFSET	0xF04UL
+-#define DX_SRAM_ADDR_VALUE_BIT_SHIFT	0x0UL
+-#define DX_SRAM_ADDR_VALUE_BIT_SIZE	0xFUL
+-#define DX_SRAM_DATA_READY_REG_OFFSET	0xF08UL
+-#define DX_SRAM_DATA_READY_VALUE_BIT_SHIFT	0x0UL
+-#define DX_SRAM_DATA_READY_VALUE_BIT_SIZE	0x1UL
++#define CC_SRAM_DATA_REG_OFFSET	0xF00UL
++#define CC_SRAM_DATA_VALUE_BIT_SHIFT	0x0UL
++#define CC_SRAM_DATA_VALUE_BIT_SIZE	0x20UL
++#define CC_SRAM_ADDR_REG_OFFSET	0xF04UL
++#define CC_SRAM_ADDR_VALUE_BIT_SHIFT	0x0UL
++#define CC_SRAM_ADDR_VALUE_BIT_SIZE	0xFUL
++#define CC_SRAM_DATA_READY_REG_OFFSET	0xF08UL
++#define CC_SRAM_DATA_READY_VALUE_BIT_SHIFT	0x0UL
++#define CC_SRAM_DATA_READY_VALUE_BIT_SIZE	0x1UL
  
-@@ -27,14 +27,14 @@
- #include "ssi_driver.h"
- 
- enum ssi_req_dma_buf_type {
--	SSI_DMA_BUF_NULL = 0,
--	SSI_DMA_BUF_DLLI,
--	SSI_DMA_BUF_MLLI
-+	CC_DMA_BUF_NULL = 0,
-+	CC_DMA_BUF_DLLI,
-+	CC_DMA_BUF_MLLI
- };
- 
- enum ssi_sg_cpy_direct {
--	SSI_SG_TO_BUF = 0,
--	SSI_SG_FROM_BUF = 1
-+	CC_SG_TO_BUF = 0,
-+	CC_SG_FROM_BUF = 1
- };
- 
- struct ssi_mlli {
-diff --git a/drivers/staging/ccree/ssi_cipher.c b/drivers/staging/ccree/ssi_cipher.c
-index 299e73a..c437a79 100644
---- a/drivers/staging/ccree/ssi_cipher.c
-+++ b/drivers/staging/ccree/ssi_cipher.c
-@@ -541,7 +541,7 @@ static void cc_setup_cipher_data(struct crypto_tfm *tfm,
- 		return;
- 	}
- 	/* Process */
--	if (req_ctx->dma_buf_type == SSI_DMA_BUF_DLLI) {
-+	if (req_ctx->dma_buf_type == CC_DMA_BUF_DLLI) {
- 		dev_dbg(dev, " data params addr %pad length 0x%X\n",
- 			&sg_dma_address(src), nbytes);
- 		dev_dbg(dev, " data params addr %pad length 0x%X\n",
-@@ -1091,7 +1091,7 @@ struct ssi_crypto_alg *cc_cipher_create_alg(struct ssi_alg_template *template,
- 	snprintf(alg->cra_driver_name, CRYPTO_MAX_ALG_NAME, "%s",
- 		 template->driver_name);
- 	alg->cra_module = THIS_MODULE;
--	alg->cra_priority = SSI_CRA_PRIO;
-+	alg->cra_priority = CC_CRA_PRIO;
- 	alg->cra_blocksize = template->blocksize;
- 	alg->cra_alignmask = 0;
- 	alg->cra_ctxsize = sizeof(struct cc_cipher_ctx);
-diff --git a/drivers/staging/ccree/ssi_cipher.h b/drivers/staging/ccree/ssi_cipher.h
-index ef6d6e9..977b543 100644
---- a/drivers/staging/ccree/ssi_cipher.h
-+++ b/drivers/staging/ccree/ssi_cipher.h
-@@ -18,8 +18,8 @@
-  * ARM CryptoCell Cipher Crypto API
+-#endif //__DX_HOST_H__
++#endif //__CC_HOST_H__
+diff --git a/drivers/staging/ccree/dx_reg_common.h b/drivers/staging/ccree/dx_reg_common.h
+index d5132ff..8334d9f 100644
+--- a/drivers/staging/ccree/dx_reg_common.h
++++ b/drivers/staging/ccree/dx_reg_common.h
+@@ -14,13 +14,13 @@
+  * along with this program; if not, see <http://www.gnu.org/licenses/>.
   */
  
--#ifndef __SSI_CIPHER_H__
--#define __SSI_CIPHER_H__
-+#ifndef __CC_CIPHER_H__
-+#define __CC_CIPHER_H__
+-#ifndef __DX_REG_COMMON_H__
+-#define __DX_REG_COMMON_H__
++#ifndef __CC_REG_COMMON_H__
++#define __CC_REG_COMMON_H__
  
- #include <linux/kernel.h>
- #include <crypto/algapi.h>
-@@ -84,4 +84,4 @@ static inline bool cc_is_hw_key(struct crypto_tfm *tfm)
+-#define DX_DEV_SIGNATURE 0xDCC71200UL
++#define CC_DEV_SIGNATURE 0xDCC71200UL
  
- #endif /* CRYPTO_TFM_REQ_HW_KEY */
+ #define CC_HW_VERSION 0xef840015UL
  
--#endif /*__SSI_CIPHER_H__*/
-+#endif /*__CC_CIPHER_H__*/
+-#define DX_DEV_SHA_MAX 512
++#define CC_DEV_SHA_MAX 512
+ 
+-#endif /*__DX_REG_COMMON_H__*/
++#endif /*__CC_REG_COMMON_H__*/
 diff --git a/drivers/staging/ccree/ssi_config.h b/drivers/staging/ccree/ssi_config.h
-index ea74845..e97bc68 100644
+index e97bc68..ee2d310 100644
 --- a/drivers/staging/ccree/ssi_config.h
 +++ b/drivers/staging/ccree/ssi_config.h
-@@ -18,8 +18,8 @@
-  * Definitions for ARM CryptoCell Linux Crypto Driver
-  */
+@@ -25,14 +25,14 @@
  
--#ifndef __SSI_CONFIG_H__
--#define __SSI_CONFIG_H__
-+#ifndef __CC_CONFIG_H__
-+#define __CC_CONFIG_H__
+ //#define FLUSH_CACHE_ALL
+ //#define COMPLETION_DELAY
+-//#define DX_DUMP_DESCS
+-// #define DX_DUMP_BYTES
++//#define CC_DUMP_DESCS
++// #define CC_DUMP_BYTES
+ // #define CC_DEBUG
+ /* Enable sysfs interface for debugging REE driver */
+ #define ENABLE_CC_SYSFS
+-//#define DX_IRQ_DELAY 100000
++//#define CC_IRQ_DELAY 100000
+ /* was 32 bit, but for juno's sake it was enlarged to 48 bit */
+ #define DMA_BIT_MASK_LEN	48
  
- #include <linux/version.h>
+-#endif /*__DX_CONFIG_H__*/
++#endif /*__CC_CONFIG_H__*/
  
 diff --git a/drivers/staging/ccree/ssi_driver.c b/drivers/staging/ccree/ssi_driver.c
-index f4164eb..dce12e1 100644
+index dce12e1..078d146 100644
 --- a/drivers/staging/ccree/ssi_driver.c
 +++ b/drivers/staging/ccree/ssi_driver.c
-@@ -110,27 +110,27 @@ static irqreturn_t cc_isr(int irq, void *dev_id)
+@@ -72,7 +72,7 @@
+ #include "ssi_pm.h"
+ #include "ssi_fips.h"
  
- 	drvdata->irq = irr;
- 	/* Completion interrupt - most probable */
--	if (irr & SSI_COMP_IRQ_MASK) {
-+	if (irr & CC_COMP_IRQ_MASK) {
- 		/* Mask AXI completion interrupt - will be unmasked in
- 		 * Deferred service handler
- 		 */
--		cc_iowrite(drvdata, CC_REG(HOST_IMR), imr | SSI_COMP_IRQ_MASK);
--		irr &= ~SSI_COMP_IRQ_MASK;
-+		cc_iowrite(drvdata, CC_REG(HOST_IMR), imr | CC_COMP_IRQ_MASK);
-+		irr &= ~CC_COMP_IRQ_MASK;
- 		complete_request(drvdata);
- 	}
- #ifdef CC_SUPPORT_FIPS
- 	/* TEE FIPS interrupt */
--	if (irr & SSI_GPR0_IRQ_MASK) {
-+	if (irr & CC_GPR0_IRQ_MASK) {
- 		/* Mask interrupt - will be unmasked in Deferred service
- 		 * handler
- 		 */
--		cc_iowrite(drvdata, CC_REG(HOST_IMR), imr | SSI_GPR0_IRQ_MASK);
--		irr &= ~SSI_GPR0_IRQ_MASK;
-+		cc_iowrite(drvdata, CC_REG(HOST_IMR), imr | CC_GPR0_IRQ_MASK);
-+		irr &= ~CC_GPR0_IRQ_MASK;
- 		fips_handler(drvdata);
- 	}
- #endif
- 	/* AXI error interrupt */
--	if (irr & SSI_AXI_ERR_IRQ_MASK) {
-+	if (irr & CC_AXI_ERR_IRQ_MASK) {
- 		u32 axi_err;
- 
- 		/* Read the AXI error ID */
-@@ -138,7 +138,7 @@ static irqreturn_t cc_isr(int irq, void *dev_id)
- 		dev_dbg(dev, "AXI completion error: axim_mon_err=0x%08X\n",
- 			axi_err);
- 
--		irr &= ~SSI_AXI_ERR_IRQ_MASK;
-+		irr &= ~CC_AXI_ERR_IRQ_MASK;
- 	}
- 
- 	if (irr) {
-@@ -157,7 +157,7 @@ int init_cc_regs(struct ssi_drvdata *drvdata, bool is_probe)
- 
- 	/* Unmask all AXI interrupt sources AXI_CFG1 register */
- 	val = cc_ioread(drvdata, CC_REG(AXIM_CFG));
--	cc_iowrite(drvdata, CC_REG(AXIM_CFG), val & ~SSI_AXI_IRQ_MASK);
-+	cc_iowrite(drvdata, CC_REG(AXIM_CFG), val & ~CC_AXI_IRQ_MASK);
- 	dev_dbg(dev, "AXIM_CFG=0x%08X\n",
- 		cc_ioread(drvdata, CC_REG(AXIM_CFG)));
- 
-@@ -167,8 +167,8 @@ int init_cc_regs(struct ssi_drvdata *drvdata, bool is_probe)
- 	cc_iowrite(drvdata, CC_REG(HOST_ICR), val);
- 
- 	/* Unmask relevant interrupt cause */
--	val = (unsigned int)(~(SSI_COMP_IRQ_MASK | SSI_AXI_ERR_IRQ_MASK |
--			       SSI_GPR0_IRQ_MASK));
-+	val = (unsigned int)(~(CC_COMP_IRQ_MASK | CC_AXI_ERR_IRQ_MASK |
-+			       CC_GPR0_IRQ_MASK));
+-#ifdef DX_DUMP_BYTES
++#ifdef CC_DUMP_BYTES
+ void dump_byte_array(const char *name, const u8 *buf, size_t len)
+ {
+ 	char prefix[NAME_LEN];
+@@ -171,10 +171,10 @@ int init_cc_regs(struct ssi_drvdata *drvdata, bool is_probe)
+ 			       CC_GPR0_IRQ_MASK));
  	cc_iowrite(drvdata, CC_REG(HOST_IMR), val);
  
- #ifdef DX_HOST_IRQ_TIMER_INIT_VAL_REG_OFFSET
-@@ -289,7 +289,7 @@ static int init_cc_resources(struct platform_device *plat_dev)
+-#ifdef DX_HOST_IRQ_TIMER_INIT_VAL_REG_OFFSET
+-#ifdef DX_IRQ_DELAY
++#ifdef CC_HOST_IRQ_TIMER_INIT_VAL_REG_OFFSET
++#ifdef CC_IRQ_DELAY
+ 	/* Set CC IRQ delay */
+-	cc_iowrite(drvdata, CC_REG(HOST_IRQ_TIMER_INIT_VAL), DX_IRQ_DELAY);
++	cc_iowrite(drvdata, CC_REG(HOST_IRQ_TIMER_INIT_VAL), CC_IRQ_DELAY);
+ #endif
+ 	if (cc_ioread(drvdata, CC_REG(HOST_IRQ_TIMER_INIT_VAL)) > 0) {
+ 		dev_dbg(dev, "irq_delay=%d CC cycles\n",
+@@ -279,9 +279,9 @@ static int init_cc_resources(struct platform_device *plat_dev)
  
- 	/* Display HW versions */
- 	dev_info(dev, "ARM CryptoCell %s Driver: HW version 0x%08X, Driver version %s\n",
--		 SSI_DEV_NAME_STR,
-+		 CC_DEV_NAME_STR,
- 		 cc_ioread(new_drvdata, CC_REG(HOST_VERSION)),
- 		 DRV_MODULE_VERSION);
- 
-@@ -309,7 +309,7 @@ static int init_cc_resources(struct platform_device *plat_dev)
- 
- 	rc = ssi_fips_init(new_drvdata);
- 	if (rc) {
--		dev_err(dev, "SSI_FIPS_INIT failed 0x%x\n", rc);
-+		dev_err(dev, "CC_FIPS_INIT failed 0x%x\n", rc);
- 		goto post_sysfs_err;
+ 	/* Verify correct mapping */
+ 	signature_val = cc_ioread(new_drvdata, CC_REG(HOST_SIGNATURE));
+-	if (signature_val != DX_DEV_SIGNATURE) {
++	if (signature_val != CC_DEV_SIGNATURE) {
+ 		dev_err(dev, "Invalid CC signature: SIGNATURE=0x%08X != expected=0x%08X\n",
+-			signature_val, (u32)DX_DEV_SIGNATURE);
++			signature_val, (u32)CC_DEV_SIGNATURE);
+ 		rc = -EINVAL;
+ 		goto post_clk_err;
  	}
- 	rc = ssi_sram_mgr_init(new_drvdata);
-diff --git a/drivers/staging/ccree/ssi_driver.h b/drivers/staging/ccree/ssi_driver.h
-index c9fdb89..3d4513b 100644
---- a/drivers/staging/ccree/ssi_driver.h
-+++ b/drivers/staging/ccree/ssi_driver.h
-@@ -18,8 +18,8 @@
-  * ARM CryptoCell Linux Crypto Driver
-  */
- 
--#ifndef __SSI_DRIVER_H__
--#define __SSI_DRIVER_H__
-+#ifndef __CC_DRIVER_H__
-+#define __CC_DRIVER_H__
- 
- #include "ssi_config.h"
- #ifdef COMP_IN_WQ
-@@ -51,17 +51,17 @@
- 
- #define DRV_MODULE_VERSION "3.0"
- 
--#define SSI_DEV_NAME_STR "cc715ree"
-+#define CC_DEV_NAME_STR "cc715ree"
- #define CC_COHERENT_CACHE_PARAMS 0xEEE
- 
--#define SSI_AXI_IRQ_MASK ((1 << DX_AXIM_CFG_BRESPMASK_BIT_SHIFT) | \
-+#define CC_AXI_IRQ_MASK ((1 << DX_AXIM_CFG_BRESPMASK_BIT_SHIFT) | \
- 			  (1 << DX_AXIM_CFG_RRESPMASK_BIT_SHIFT) | \
- 			  (1 << DX_AXIM_CFG_INFLTMASK_BIT_SHIFT) | \
- 			  (1 << DX_AXIM_CFG_COMPMASK_BIT_SHIFT))
- 
--#define SSI_AXI_ERR_IRQ_MASK BIT(DX_HOST_IRR_AXI_ERR_INT_BIT_SHIFT)
-+#define CC_AXI_ERR_IRQ_MASK BIT(DX_HOST_IRR_AXI_ERR_INT_BIT_SHIFT)
- 
--#define SSI_COMP_IRQ_MASK BIT(DX_HOST_IRR_AXIM_COMP_INT_BIT_SHIFT)
-+#define CC_COMP_IRQ_MASK BIT(DX_HOST_IRR_AXIM_COMP_INT_BIT_SHIFT)
- 
- #define AXIM_MON_COMP_VALUE GENMASK(DX_AXIM_MON_COMP_VALUE_BIT_SIZE + \
- 				    DX_AXIM_MON_COMP_VALUE_BIT_SHIFT, \
-@@ -71,9 +71,9 @@
- #define CC_REG(reg_name) DX_ ## reg_name ## _REG_OFFSET
- 
- /* TEE FIPS status interrupt */
--#define SSI_GPR0_IRQ_MASK BIT(DX_HOST_IRR_GPR0_BIT_SHIFT)
-+#define CC_GPR0_IRQ_MASK BIT(DX_HOST_IRR_GPR0_BIT_SHIFT)
- 
--#define SSI_CRA_PRIO 3000
-+#define CC_CRA_PRIO 3000
- 
- #define MIN_HW_QUEUE_SIZE 50 /* Minimum size required for proper function */
- 
-@@ -88,11 +88,11 @@
-  * field in the HW descriptor. The DMA engine +8 that value.
-  */
- 
--#define SSI_MAX_IVGEN_DMA_ADDRESSES	3
-+#define CC_MAX_IVGEN_DMA_ADDRESSES	3
- struct ssi_crypto_req {
- 	void (*user_cb)(struct device *dev, void *req);
- 	void *user_arg;
--	dma_addr_t ivgen_dma_addr[SSI_MAX_IVGEN_DMA_ADDRESSES];
-+	dma_addr_t ivgen_dma_addr[CC_MAX_IVGEN_DMA_ADDRESSES];
- 	/* For the first 'ivgen_dma_addr_len' addresses of this array,
- 	 * generated IV would be placed in it by send_request().
- 	 * Same generated IV for all addresses!
-@@ -192,5 +192,5 @@ static inline u32 cc_ioread(struct ssi_drvdata *drvdata, u32 reg)
- 	return ioread32(drvdata->cc_base + reg);
- }
- 
--#endif /*__SSI_DRIVER_H__*/
-+#endif /*__CC_DRIVER_H__*/
- 
-diff --git a/drivers/staging/ccree/ssi_fips.c b/drivers/staging/ccree/ssi_fips.c
-index 4aea99f..273b414 100644
---- a/drivers/staging/ccree/ssi_fips.c
-+++ b/drivers/staging/ccree/ssi_fips.c
-@@ -88,7 +88,7 @@ static void fips_dsr(unsigned long devarg)
- 	struct device *dev = drvdata_to_dev(drvdata);
- 	u32 irq, state, val;
- 
--	irq = (drvdata->irq & (SSI_GPR0_IRQ_MASK));
-+	irq = (drvdata->irq & (CC_GPR0_IRQ_MASK));
- 
- 	if (irq) {
- 		state = cc_ioread(drvdata, CC_REG(GPR_HOST));
-diff --git a/drivers/staging/ccree/ssi_fips.h b/drivers/staging/ccree/ssi_fips.h
-index 8cb1893..1889c74 100644
---- a/drivers/staging/ccree/ssi_fips.h
-+++ b/drivers/staging/ccree/ssi_fips.h
-@@ -14,8 +14,8 @@
-  * along with this program; if not, see <http://www.gnu.org/licenses/>.
-  */
- 
--#ifndef __SSI_FIPS_H__
--#define __SSI_FIPS_H__
-+#ifndef __CC_FIPS_H__
-+#define __CC_FIPS_H__
- 
- #ifdef CONFIG_CRYPTO_FIPS
- 
-@@ -46,5 +46,5 @@ static inline void fips_handler(struct ssi_drvdata *drvdata) {}
- 
- #endif /* CONFIG_CRYPTO_FIPS */
- 
--#endif  /*__SSI_FIPS_H__*/
-+#endif  /*__CC_FIPS_H__*/
- 
-diff --git a/drivers/staging/ccree/ssi_hash.c b/drivers/staging/ccree/ssi_hash.c
-index 10c73ef..7458c24 100644
---- a/drivers/staging/ccree/ssi_hash.c
-+++ b/drivers/staging/ccree/ssi_hash.c
-@@ -1988,7 +1988,7 @@ static struct cc_hash_alg *cc_alloc_hash_alg(struct cc_hash_template *template,
- 	}
- 	alg->cra_module = THIS_MODULE;
- 	alg->cra_ctxsize = sizeof(struct cc_hash_ctx);
--	alg->cra_priority = SSI_CRA_PRIO;
-+	alg->cra_priority = CC_CRA_PRIO;
- 	alg->cra_blocksize = template->blocksize;
- 	alg->cra_alignmask = 0;
- 	alg->cra_exit = cc_cra_exit;
-@@ -2345,7 +2345,7 @@ static void cc_set_desc(struct ahash_req_ctx *areq_ctx,
- 	unsigned int idx = *seq_size;
- 	struct device *dev = drvdata_to_dev(ctx->drvdata);
- 
--	if (areq_ctx->data_dma_buf_type == SSI_DMA_BUF_DLLI) {
-+	if (areq_ctx->data_dma_buf_type == CC_DMA_BUF_DLLI) {
- 		hw_desc_init(&desc[idx]);
- 		set_din_type(&desc[idx], DMA_DLLI,
- 			     sg_dma_address(areq_ctx->curr_sg),
-@@ -2353,7 +2353,7 @@ static void cc_set_desc(struct ahash_req_ctx *areq_ctx,
- 		set_flow_mode(&desc[idx], flow_mode);
- 		idx++;
- 	} else {
--		if (areq_ctx->data_dma_buf_type == SSI_DMA_BUF_NULL) {
-+		if (areq_ctx->data_dma_buf_type == CC_DMA_BUF_NULL) {
- 			dev_dbg(dev, " NULL mode\n");
- 			/* nothing to build */
- 			return;
-diff --git a/drivers/staging/ccree/ssi_hash.h b/drivers/staging/ccree/ssi_hash.h
-index ade4119..19fc4cf 100644
---- a/drivers/staging/ccree/ssi_hash.h
-+++ b/drivers/staging/ccree/ssi_hash.h
-@@ -18,8 +18,8 @@
-  * ARM CryptoCell Hash Crypto API
-  */
- 
--#ifndef __SSI_HASH_H__
--#define __SSI_HASH_H__
-+#ifndef __CC_HASH_H__
-+#define __CC_HASH_H__
- 
- #include "ssi_buffer_mgr.h"
- 
-@@ -103,5 +103,5 @@ cc_digest_len_addr(void *drvdata, u32 mode);
-  */
- ssi_sram_addr_t cc_larval_digest_addr(void *drvdata, u32 mode);
- 
--#endif /*__SSI_HASH_H__*/
-+#endif /*__CC_HASH_H__*/
- 
-diff --git a/drivers/staging/ccree/ssi_ivgen.c b/drivers/staging/ccree/ssi_ivgen.c
-index c499361..d362bf6 100644
---- a/drivers/staging/ccree/ssi_ivgen.c
-+++ b/drivers/staging/ccree/ssi_ivgen.c
-@@ -62,7 +62,7 @@ static int cc_gen_iv_pool(struct cc_ivgen_ctx *ivgen_ctx,
- {
- 	unsigned int idx = *iv_seq_len;
- 
--	if ((*iv_seq_len + CC_IVPOOL_GEN_SEQ_LEN) > SSI_IVPOOL_SEQ_LEN) {
-+	if ((*iv_seq_len + CC_IVPOOL_GEN_SEQ_LEN) > CC_IVPOOL_SEQ_LEN) {
- 		/* The sequence will be longer than allowed */
- 		return -EINVAL;
- 	}
-@@ -119,7 +119,7 @@ static int cc_gen_iv_pool(struct cc_ivgen_ctx *ivgen_ctx,
- int cc_init_iv_sram(struct ssi_drvdata *drvdata)
- {
- 	struct cc_ivgen_ctx *ivgen_ctx = drvdata->ivgen_handle;
--	struct cc_hw_desc iv_seq[SSI_IVPOOL_SEQ_LEN];
-+	struct cc_hw_desc iv_seq[CC_IVPOOL_SEQ_LEN];
- 	unsigned int iv_seq_len = 0;
- 	int rc;
- 
-@@ -247,7 +247,7 @@ int cc_get_iv(struct ssi_drvdata *drvdata, dma_addr_t iv_out_dma[],
- 	    iv_out_size != CTR_RFC3686_IV_SIZE) {
- 		return -EINVAL;
- 	}
--	if ((iv_out_dma_len + 1) > SSI_IVPOOL_SEQ_LEN) {
-+	if ((iv_out_dma_len + 1) > CC_IVPOOL_SEQ_LEN) {
- 		/* The sequence will be longer than allowed */
- 		return -EINVAL;
- 	}
-@@ -255,7 +255,7 @@ int cc_get_iv(struct ssi_drvdata *drvdata, dma_addr_t iv_out_dma[],
- 	/* check that number of generated IV is limited to max dma address
- 	 * iv buffer size
- 	 */
--	if (iv_out_dma_len > SSI_MAX_IVGEN_DMA_ADDRESSES) {
-+	if (iv_out_dma_len > CC_MAX_IVGEN_DMA_ADDRESSES) {
- 		/* The sequence will be longer than allowed */
- 		return -EINVAL;
- 	}
-diff --git a/drivers/staging/ccree/ssi_ivgen.h b/drivers/staging/ccree/ssi_ivgen.h
-index bbd0245..9890f62 100644
---- a/drivers/staging/ccree/ssi_ivgen.h
-+++ b/drivers/staging/ccree/ssi_ivgen.h
-@@ -14,12 +14,12 @@
-  * along with this program; if not, see <http://www.gnu.org/licenses/>.
-  */
- 
--#ifndef __SSI_IVGEN_H__
--#define __SSI_IVGEN_H__
-+#ifndef __CC_IVGEN_H__
-+#define __CC_IVGEN_H__
- 
- #include "cc_hw_queue_defs.h"
- 
--#define SSI_IVPOOL_SEQ_LEN 8
-+#define CC_IVPOOL_SEQ_LEN 8
- 
- /*!
-  * Allocates iv-pool and maps resources.
-@@ -65,4 +65,4 @@ int cc_get_iv(struct ssi_drvdata *drvdata, dma_addr_t iv_out_dma[],
- 	      unsigned int iv_out_dma_len, unsigned int iv_out_size,
- 	      struct cc_hw_desc iv_seq[], unsigned int *iv_seq_len);
- 
--#endif /*__SSI_IVGEN_H__*/
-+#endif /*__CC_IVGEN_H__*/
-diff --git a/drivers/staging/ccree/ssi_pm.c b/drivers/staging/ccree/ssi_pm.c
-index f0e3baf..e387d46 100644
---- a/drivers/staging/ccree/ssi_pm.c
-+++ b/drivers/staging/ccree/ssi_pm.c
-@@ -123,7 +123,7 @@ int cc_pm_init(struct ssi_drvdata *drvdata)
- 	struct device *dev = drvdata_to_dev(drvdata);
- 
- 	/* must be before the enabling to avoid resdundent suspending */
--	pm_runtime_set_autosuspend_delay(dev, SSI_SUSPEND_TIMEOUT);
-+	pm_runtime_set_autosuspend_delay(dev, CC_SUSPEND_TIMEOUT);
- 	pm_runtime_use_autosuspend(dev);
- 	/* activate the PM module */
- 	rc = pm_runtime_set_active(dev);
-diff --git a/drivers/staging/ccree/ssi_pm.h b/drivers/staging/ccree/ssi_pm.h
-index 50bcf03..940ef2d 100644
---- a/drivers/staging/ccree/ssi_pm.h
-+++ b/drivers/staging/ccree/ssi_pm.h
-@@ -17,13 +17,13 @@
- /* \file ssi_pm.h
-  */
- 
--#ifndef __SSI_POWER_MGR_H__
--#define __SSI_POWER_MGR_H__
-+#ifndef __CC_POWER_MGR_H__
-+#define __CC_POWER_MGR_H__
- 
- #include "ssi_config.h"
- #include "ssi_driver.h"
- 
--#define SSI_SUSPEND_TIMEOUT 3000
-+#define CC_SUSPEND_TIMEOUT 3000
- 
- int cc_pm_init(struct ssi_drvdata *drvdata);
- 
-diff --git a/drivers/staging/ccree/ssi_request_mgr.c b/drivers/staging/ccree/ssi_request_mgr.c
-index 3d25b72..436e035 100644
---- a/drivers/staging/ccree/ssi_request_mgr.c
-+++ b/drivers/staging/ccree/ssi_request_mgr.c
-@@ -31,7 +31,7 @@
- #include "ssi_ivgen.h"
- #include "ssi_pm.h"
- 
--#define SSI_MAX_POLL_ITER	10
-+#define CC_MAX_POLL_ITER	10
- 
- struct cc_req_mgr_handle {
- 	/* Request manager resources */
-@@ -223,7 +223,7 @@ static int cc_queues_status(struct ssi_drvdata *drvdata,
- 		return 0;
- 
- 	/* Wait for space in HW queue. Poll constant num of iterations. */
--	for (poll_queue = 0; poll_queue < SSI_MAX_POLL_ITER ; poll_queue++) {
-+	for (poll_queue = 0; poll_queue < CC_MAX_POLL_ITER ; poll_queue++) {
- 		req_mgr_h->q_free_slots =
- 			cc_ioread(drvdata, CC_REG(DSCRPTR_QUEUE_CONTENT));
- 		if (req_mgr_h->q_free_slots < req_mgr_h->min_free_hw_slots)
-@@ -265,13 +265,13 @@ int send_request(struct ssi_drvdata *drvdata, struct ssi_crypto_req *ssi_req,
- 	unsigned int used_sw_slots;
- 	unsigned int iv_seq_len = 0;
- 	unsigned int total_seq_len = len; /*initial sequence length*/
--	struct cc_hw_desc iv_seq[SSI_IVPOOL_SEQ_LEN];
-+	struct cc_hw_desc iv_seq[CC_IVPOOL_SEQ_LEN];
- 	struct device *dev = drvdata_to_dev(drvdata);
- 	int rc;
- 	unsigned int max_required_seq_len =
- 		(total_seq_len +
- 		 ((ssi_req->ivgen_dma_addr_len == 0) ? 0 :
--		  SSI_IVPOOL_SEQ_LEN) + (!is_dout ? 1 : 0));
-+		  CC_IVPOOL_SEQ_LEN) + (!is_dout ? 1 : 0));
- 
- #if defined(CONFIG_PM)
- 	rc = cc_pm_get(dev);
-@@ -541,13 +541,13 @@ static void comp_handler(unsigned long devarg)
- 
- 	u32 irq;
- 
--	irq = (drvdata->irq & SSI_COMP_IRQ_MASK);
-+	irq = (drvdata->irq & CC_COMP_IRQ_MASK);
- 
--	if (irq & SSI_COMP_IRQ_MASK) {
-+	if (irq & CC_COMP_IRQ_MASK) {
- 		/* To avoid the interrupt from firing as we unmask it,
- 		 * we clear it now
- 		 */
--		cc_iowrite(drvdata, CC_REG(HOST_ICR), SSI_COMP_IRQ_MASK);
-+		cc_iowrite(drvdata, CC_REG(HOST_ICR), CC_COMP_IRQ_MASK);
- 
- 		/* Avoid race with above clear: Test completion counter
- 		 * once more
-@@ -566,7 +566,7 @@ static void comp_handler(unsigned long devarg)
- 			} while (request_mgr_handle->axi_completed > 0);
- 
- 			cc_iowrite(drvdata, CC_REG(HOST_ICR),
--				   SSI_COMP_IRQ_MASK);
-+				   CC_COMP_IRQ_MASK);
- 
- 			request_mgr_handle->axi_completed +=
- 					cc_axi_comp_count(drvdata);
-diff --git a/drivers/staging/ccree/ssi_sram_mgr.c b/drivers/staging/ccree/ssi_sram_mgr.c
-index 0704031..cbe5e3b 100644
---- a/drivers/staging/ccree/ssi_sram_mgr.c
-+++ b/drivers/staging/ccree/ssi_sram_mgr.c
-@@ -80,7 +80,7 @@ ssi_sram_addr_t cc_sram_alloc(struct ssi_drvdata *drvdata, u32 size)
- 			size);
- 		return NULL_SRAM_ADDR;
- 	}
--	if (size > (SSI_CC_SRAM_SIZE - smgr_ctx->sram_free_offset)) {
-+	if (size > (CC_CC_SRAM_SIZE - smgr_ctx->sram_free_offset)) {
- 		dev_err(dev, "Not enough space to allocate %u B (at offset %llu)\n",
- 			size, smgr_ctx->sram_free_offset);
- 		return NULL_SRAM_ADDR;
-diff --git a/drivers/staging/ccree/ssi_sram_mgr.h b/drivers/staging/ccree/ssi_sram_mgr.h
-index 76719ec..fdd325b 100644
---- a/drivers/staging/ccree/ssi_sram_mgr.h
-+++ b/drivers/staging/ccree/ssi_sram_mgr.h
-@@ -14,11 +14,11 @@
-  * along with this program; if not, see <http://www.gnu.org/licenses/>.
-  */
- 
--#ifndef __SSI_SRAM_MGR_H__
--#define __SSI_SRAM_MGR_H__
-+#ifndef __CC_SRAM_MGR_H__
-+#define __CC_SRAM_MGR_H__
- 
--#ifndef SSI_CC_SRAM_SIZE
--#define SSI_CC_SRAM_SIZE 4096
-+#ifndef CC_CC_SRAM_SIZE
-+#define CC_CC_SRAM_SIZE 4096
+@@ -507,9 +507,9 @@ static const struct dev_pm_ops arm_cc7x_driver_pm = {
  #endif
  
- struct ssi_drvdata;
-@@ -75,4 +75,4 @@ void cc_set_sram_desc(const u32 *src, ssi_sram_addr_t dst,
- 		      unsigned int nelement, struct cc_hw_desc *seq,
- 		      unsigned int *seq_len);
+ #if defined(CONFIG_PM)
+-#define	DX_DRIVER_RUNTIME_PM	(&arm_cc7x_driver_pm)
++#define	CC_DRIVER_RUNTIME_PM	(&arm_cc7x_driver_pm)
+ #else
+-#define	DX_DRIVER_RUNTIME_PM	NULL
++#define	CC_DRIVER_RUNTIME_PM	NULL
+ #endif
  
--#endif /*__SSI_SRAM_MGR_H__*/
-+#endif /*__CC_SRAM_MGR_H__*/
-diff --git a/drivers/staging/ccree/ssi_sysfs.h b/drivers/staging/ccree/ssi_sysfs.h
-index 5124528..de68bc6 100644
---- a/drivers/staging/ccree/ssi_sysfs.h
-+++ b/drivers/staging/ccree/ssi_sysfs.h
-@@ -18,8 +18,8 @@
-  * ARM CryptoCell sysfs APIs
-  */
+ #ifdef CONFIG_OF
+@@ -526,7 +526,7 @@ static struct platform_driver cc7x_driver = {
+ #ifdef CONFIG_OF
+ 		   .of_match_table = arm_cc7x_dev_of_match,
+ #endif
+-		   .pm = DX_DRIVER_RUNTIME_PM,
++		   .pm = CC_DRIVER_RUNTIME_PM,
+ 	},
+ 	.probe = cc7x_probe,
+ 	.remove = cc7x_remove,
+diff --git a/drivers/staging/ccree/ssi_driver.h b/drivers/staging/ccree/ssi_driver.h
+index 3d4513b..4d94a06 100644
+--- a/drivers/staging/ccree/ssi_driver.h
++++ b/drivers/staging/ccree/ssi_driver.h
+@@ -42,7 +42,7 @@
+ /* Registers definitions from shared/hw/ree_include */
+ #include "dx_host.h"
+ #include "dx_reg_common.h"
+-#define CC_SUPPORT_SHA DX_DEV_SHA_MAX
++#define CC_SUPPORT_SHA CC_DEV_SHA_MAX
+ #include "cc_crypto_ctx.h"
+ #include "ssi_sysfs.h"
+ #include "hash_defs.h"
+@@ -54,24 +54,24 @@
+ #define CC_DEV_NAME_STR "cc715ree"
+ #define CC_COHERENT_CACHE_PARAMS 0xEEE
  
--#ifndef __SSI_SYSFS_H__
--#define __SSI_SYSFS_H__
-+#ifndef __CC_SYSFS_H__
-+#define __CC_SYSFS_H__
+-#define CC_AXI_IRQ_MASK ((1 << DX_AXIM_CFG_BRESPMASK_BIT_SHIFT) | \
+-			  (1 << DX_AXIM_CFG_RRESPMASK_BIT_SHIFT) | \
+-			  (1 << DX_AXIM_CFG_INFLTMASK_BIT_SHIFT) | \
+-			  (1 << DX_AXIM_CFG_COMPMASK_BIT_SHIFT))
++#define CC_AXI_IRQ_MASK ((1 << CC_AXIM_CFG_BRESPMASK_BIT_SHIFT) | \
++			  (1 << CC_AXIM_CFG_RRESPMASK_BIT_SHIFT) | \
++			  (1 << CC_AXIM_CFG_INFLTMASK_BIT_SHIFT) | \
++			  (1 << CC_AXIM_CFG_COMPMASK_BIT_SHIFT))
  
- #include <asm/timex.h>
+-#define CC_AXI_ERR_IRQ_MASK BIT(DX_HOST_IRR_AXI_ERR_INT_BIT_SHIFT)
++#define CC_AXI_ERR_IRQ_MASK BIT(CC_HOST_IRR_AXI_ERR_INT_BIT_SHIFT)
  
-@@ -29,4 +29,4 @@ struct ssi_drvdata;
- int ssi_sysfs_init(struct kobject *sys_dev_obj, struct ssi_drvdata *drvdata);
- void ssi_sysfs_fini(void);
+-#define CC_COMP_IRQ_MASK BIT(DX_HOST_IRR_AXIM_COMP_INT_BIT_SHIFT)
++#define CC_COMP_IRQ_MASK BIT(CC_HOST_IRR_AXIM_COMP_INT_BIT_SHIFT)
  
--#endif /*__SSI_SYSFS_H__*/
-+#endif /*__CC_SYSFS_H__*/
+-#define AXIM_MON_COMP_VALUE GENMASK(DX_AXIM_MON_COMP_VALUE_BIT_SIZE + \
+-				    DX_AXIM_MON_COMP_VALUE_BIT_SHIFT, \
+-				    DX_AXIM_MON_COMP_VALUE_BIT_SHIFT)
++#define AXIM_MON_COMP_VALUE GENMASK(CC_AXIM_MON_COMP_VALUE_BIT_SIZE + \
++				    CC_AXIM_MON_COMP_VALUE_BIT_SHIFT, \
++				    CC_AXIM_MON_COMP_VALUE_BIT_SHIFT)
+ 
+ /* Register name mangling macro */
+-#define CC_REG(reg_name) DX_ ## reg_name ## _REG_OFFSET
++#define CC_REG(reg_name) CC_ ## reg_name ## _REG_OFFSET
+ 
+ /* TEE FIPS status interrupt */
+-#define CC_GPR0_IRQ_MASK BIT(DX_HOST_IRR_GPR0_BIT_SHIFT)
++#define CC_GPR0_IRQ_MASK BIT(CC_HOST_IRR_GPR0_BIT_SHIFT)
+ 
+ #define CC_CRA_PRIO 3000
+ 
+@@ -169,7 +169,7 @@ static inline struct device *drvdata_to_dev(struct ssi_drvdata *drvdata)
+ 	return &drvdata->plat_dev->dev;
+ }
+ 
+-#ifdef DX_DUMP_BYTES
++#ifdef CC_DUMP_BYTES
+ void dump_byte_array(const char *name, const u8 *the_array,
+ 		     unsigned long size);
+ #else
+diff --git a/drivers/staging/ccree/ssi_hash.c b/drivers/staging/ccree/ssi_hash.c
+index 7458c24..5a041bb 100644
+--- a/drivers/staging/ccree/ssi_hash.c
++++ b/drivers/staging/ccree/ssi_hash.c
+@@ -53,7 +53,7 @@ static const u32 sha224_init[] = {
+ static const u32 sha256_init[] = {
+ 	SHA256_H7, SHA256_H6, SHA256_H5, SHA256_H4,
+ 	SHA256_H3, SHA256_H2, SHA256_H1, SHA256_H0 };
+-#if (DX_DEV_SHA_MAX > 256)
++#if (CC_DEV_SHA_MAX > 256)
+ static const u32 digest_len_sha512_init[] = {
+ 	0x00000080, 0x00000000, 0x00000000, 0x00000000 };
+ static const u64 sha384_init[] = {
+@@ -209,7 +209,7 @@ static int cc_map_req(struct device *dev, struct ahash_req_ctx *state,
+ 		} else { /*sha*/
+ 			memcpy(state->digest_buff, ctx->digest_buff,
+ 			       ctx->inter_digestsize);
+-#if (DX_DEV_SHA_MAX > 256)
++#if (CC_DEV_SHA_MAX > 256)
+ 			if (ctx->hash_mode == DRV_HASH_SHA512 ||
+ 			    ctx->hash_mode == DRV_HASH_SHA384)
+ 				memcpy(state->digest_bytes_len,
+@@ -1839,7 +1839,7 @@ static struct cc_hash_template driver_hash[] = {
+ 		.hw_mode = DRV_HASH_HW_SHA256,
+ 		.inter_digestsize = SHA256_DIGEST_SIZE,
+ 	},
+-#if (DX_DEV_SHA_MAX > 256)
++#if (CC_DEV_SHA_MAX > 256)
+ 	{
+ 		.name = "sha384",
+ 		.driver_name = "sha384-dx",
+@@ -2013,7 +2013,7 @@ int cc_init_hash_sram(struct ssi_drvdata *drvdata)
+ 	struct cc_hw_desc larval_seq[CC_DIGEST_SIZE_MAX / sizeof(u32)];
+ 	struct device *dev = drvdata_to_dev(drvdata);
+ 	int rc = 0;
+-#if (DX_DEV_SHA_MAX > 256)
++#if (CC_DEV_SHA_MAX > 256)
+ 	int i;
+ #endif
+ 
+@@ -2028,7 +2028,7 @@ int cc_init_hash_sram(struct ssi_drvdata *drvdata)
+ 	sram_buff_ofs += sizeof(digest_len_init);
+ 	larval_seq_len = 0;
+ 
+-#if (DX_DEV_SHA_MAX > 256)
++#if (CC_DEV_SHA_MAX > 256)
+ 	/* Copy-to-sram digest-len for sha384/512 */
+ 	cc_set_sram_desc(digest_len_sha512_init, sram_buff_ofs,
+ 			 ARRAY_SIZE(digest_len_sha512_init),
+@@ -2081,7 +2081,7 @@ int cc_init_hash_sram(struct ssi_drvdata *drvdata)
+ 	sram_buff_ofs += sizeof(sha256_init);
+ 	larval_seq_len = 0;
+ 
+-#if (DX_DEV_SHA_MAX > 256)
++#if (CC_DEV_SHA_MAX > 256)
+ 	/* We are forced to swap each double-word larval before copying to
+ 	 * sram
+ 	 */
+@@ -2142,7 +2142,7 @@ int cc_hash_alloc(struct ssi_drvdata *drvdata)
+ 	drvdata->hash_handle = hash_handle;
+ 
+ 	sram_size_to_alloc = sizeof(digest_len_init) +
+-#if (DX_DEV_SHA_MAX > 256)
++#if (CC_DEV_SHA_MAX > 256)
+ 			sizeof(digest_len_sha512_init) +
+ 			sizeof(sha384_init) +
+ 			sizeof(sha512_init) +
+@@ -2413,7 +2413,7 @@ ssi_sram_addr_t cc_larval_digest_addr(void *drvdata, u32 mode)
+ 			sizeof(md5_init) +
+ 			sizeof(sha1_init) +
+ 			sizeof(sha224_init));
+-#if (DX_DEV_SHA_MAX > 256)
++#if (CC_DEV_SHA_MAX > 256)
+ 	case DRV_HASH_SHA384:
+ 		return (hash_handle->larval_digest_sram_addr +
+ 			sizeof(md5_init) +
+@@ -2449,7 +2449,7 @@ cc_digest_len_addr(void *drvdata, u32 mode)
+ 	case DRV_HASH_SHA256:
+ 	case DRV_HASH_MD5:
+ 		return digest_len_addr;
+-#if (DX_DEV_SHA_MAX > 256)
++#if (CC_DEV_SHA_MAX > 256)
+ 	case DRV_HASH_SHA384:
+ 	case DRV_HASH_SHA512:
+ 		return  digest_len_addr + sizeof(digest_len_init);
+diff --git a/drivers/staging/ccree/ssi_hash.h b/drivers/staging/ccree/ssi_hash.h
+index 19fc4cf..9d1af96 100644
+--- a/drivers/staging/ccree/ssi_hash.h
++++ b/drivers/staging/ccree/ssi_hash.h
+@@ -25,7 +25,7 @@
+ 
+ #define HMAC_IPAD_CONST	0x36363636
+ #define HMAC_OPAD_CONST	0x5C5C5C5C
+-#if (DX_DEV_SHA_MAX > 256)
++#if (CC_DEV_SHA_MAX > 256)
+ #define HASH_LEN_SIZE 16
+ #define CC_MAX_HASH_DIGEST_SIZE	SHA512_DIGEST_SIZE
+ #define CC_MAX_HASH_BLCK_SIZE SHA512_BLOCK_SIZE
+diff --git a/drivers/staging/ccree/ssi_request_mgr.c b/drivers/staging/ccree/ssi_request_mgr.c
+index 436e035..f1356d1 100644
+--- a/drivers/staging/ccree/ssi_request_mgr.c
++++ b/drivers/staging/ccree/ssi_request_mgr.c
+@@ -179,7 +179,7 @@ static void enqueue_seq(void __iomem *cc_base, struct cc_hw_desc seq[],
+ 	for (i = 0; i < seq_len; i++) {
+ 		for (w = 0; w <= 5; w++)
+ 			writel_relaxed(seq[i].word[w], reg);
+-#ifdef DX_DUMP_DESCS
++#ifdef CC_DUMP_DESCS
+ 		dev_dbg(dev, "desc[%02d]: 0x%08X 0x%08X 0x%08X 0x%08X 0x%08X 0x%08X\n",
+ 			i, seq[i].word[0], seq[i].word[1], seq[i].word[2],
+ 			seq[i].word[3], seq[i].word[4], seq[i].word[5]);
+diff --git a/drivers/staging/ccree/ssi_sysfs.c b/drivers/staging/ccree/ssi_sysfs.c
+index 08858a4..6b11a72 100644
+--- a/drivers/staging/ccree/ssi_sysfs.c
++++ b/drivers/staging/ccree/ssi_sysfs.c
+@@ -34,23 +34,23 @@ static ssize_t ssi_sys_regdump_show(struct kobject *kobj,
+ 	register_value = cc_ioread(drvdata, CC_REG(HOST_SIGNATURE));
+ 	offset += scnprintf(buf + offset, PAGE_SIZE - offset,
+ 			    "%s \t(0x%lX)\t 0x%08X\n", "HOST_SIGNATURE       ",
+-			    DX_HOST_SIGNATURE_REG_OFFSET, register_value);
++			    CC_HOST_SIGNATURE_REG_OFFSET, register_value);
+ 	register_value = cc_ioread(drvdata, CC_REG(HOST_IRR));
+ 	offset += scnprintf(buf + offset, PAGE_SIZE - offset,
+ 			    "%s \t(0x%lX)\t 0x%08X\n", "HOST_IRR             ",
+-			    DX_HOST_IRR_REG_OFFSET, register_value);
++			    CC_HOST_IRR_REG_OFFSET, register_value);
+ 	register_value = cc_ioread(drvdata, CC_REG(HOST_POWER_DOWN_EN));
+ 	offset += scnprintf(buf + offset, PAGE_SIZE - offset,
+ 			    "%s \t(0x%lX)\t 0x%08X\n", "HOST_POWER_DOWN_EN   ",
+-			    DX_HOST_POWER_DOWN_EN_REG_OFFSET, register_value);
++			    CC_HOST_POWER_DOWN_EN_REG_OFFSET, register_value);
+ 	register_value =  cc_ioread(drvdata, CC_REG(AXIM_MON_ERR));
+ 	offset += scnprintf(buf + offset, PAGE_SIZE - offset,
+ 			    "%s \t(0x%lX)\t 0x%08X\n", "AXIM_MON_ERR         ",
+-			    DX_AXIM_MON_ERR_REG_OFFSET, register_value);
++			    CC_AXIM_MON_ERR_REG_OFFSET, register_value);
+ 	register_value = cc_ioread(drvdata, CC_REG(DSCRPTR_QUEUE_CONTENT));
+ 	offset += scnprintf(buf + offset, PAGE_SIZE - offset,
+ 			    "%s \t(0x%lX)\t 0x%08X\n", "DSCRPTR_QUEUE_CONTENT",
+-			    DX_DSCRPTR_QUEUE_CONTENT_REG_OFFSET,
++			    CC_DSCRPTR_QUEUE_CONTENT_REG_OFFSET,
+ 			    register_value);
+ 	return offset;
+ }
 -- 
 2.7.4
