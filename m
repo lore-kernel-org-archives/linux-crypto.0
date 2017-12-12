@@ -1,69 +1,63 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH 03/24] staging: ccree: amend hash func def for readability
-Date: Tue, 12 Dec 2017 14:52:49 +0000
-Message-ID: <1513090395-7938-4-git-send-email-gilad@benyossef.com>
+Subject: [PATCH 04/24] staging: ccree: func params should follow func name
+Date: Tue, 12 Dec 2017 14:52:50 +0000
+Message-ID: <1513090395-7938-5-git-send-email-gilad@benyossef.com>
 References: <1513090395-7938-1-git-send-email-gilad@benyossef.com>
-Cc: Ofir Drang <ofir.drang@arm.com>, linux-crypto@vger.kernel.org,
-        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
-        linux-kernel@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: devel@driverdev.osuosl.org, linux-kernel@vger.kernel.org,
+ driverdev-devel@linuxdriverproject.org, linux-crypto@vger.kernel.org,
+ Ofir Drang <ofir.drang@arm.com>
 To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
 In-Reply-To: <1513090395-7938-1-git-send-email-gilad@benyossef.com>
-Sender: linux-kernel-owner@vger.kernel.org
+List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
+List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
+List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
+List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
+List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
+Errors-To: driverdev-devel-bounces@linuxdriverproject.org
+Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
 List-Id: linux-crypto.vger.kernel.org
 
-Func definitions in the hash implementation were did not adhere to
-coding style. Fix them for better readability.
+Fix some call sites with func params not following func name in AEAD
+code.
 
 Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 ---
- drivers/staging/ccree/ssi_hash.c | 20 +++++++-------------
- 1 file changed, 7 insertions(+), 13 deletions(-)
+ drivers/staging/ccree/ssi_aead.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/staging/ccree/ssi_hash.c b/drivers/staging/ccree/ssi_hash.c
-index 6bc42e4..a80279e 100644
---- a/drivers/staging/ccree/ssi_hash.c
-+++ b/drivers/staging/ccree/ssi_hash.c
-@@ -64,10 +64,8 @@ static const u64 sha512_init[] = {
- 	SHA512_H3, SHA512_H2, SHA512_H1, SHA512_H0 };
- #endif
+diff --git a/drivers/staging/ccree/ssi_aead.c b/drivers/staging/ccree/ssi_aead.c
+index 408ea24..75a578e 100644
+--- a/drivers/staging/ccree/ssi_aead.c
++++ b/drivers/staging/ccree/ssi_aead.c
+@@ -1226,8 +1226,9 @@ static void cc_hmac_authenc(struct aead_request *req, struct cc_hw_desc desc[],
+ 	struct cc_aead_ctx *ctx = crypto_aead_ctx(tfm);
+ 	struct aead_req_ctx *req_ctx = aead_request_ctx(req);
+ 	int direct = req_ctx->gen_ctx.op_type;
+-	unsigned int data_flow_mode = cc_get_data_flow(
+-		direct, ctx->flow_mode, req_ctx->is_single_pass);
++	unsigned int data_flow_mode =
++		cc_get_data_flow(direct, ctx->flow_mode,
++				 req_ctx->is_single_pass);
  
--static void cc_setup_xcbc(
--	struct ahash_request *areq,
--	struct cc_hw_desc desc[],
--	unsigned int *seq_size);
-+static void cc_setup_xcbc(struct ahash_request *areq, struct cc_hw_desc desc[],
-+			  unsigned int *seq_size);
+ 	if (req_ctx->is_single_pass) {
+ 		/**
+@@ -1278,8 +1279,9 @@ cc_xcbc_authenc(struct aead_request *req, struct cc_hw_desc desc[],
+ 	struct cc_aead_ctx *ctx = crypto_aead_ctx(tfm);
+ 	struct aead_req_ctx *req_ctx = aead_request_ctx(req);
+ 	int direct = req_ctx->gen_ctx.op_type;
+-	unsigned int data_flow_mode = cc_get_data_flow(
+-		direct, ctx->flow_mode, req_ctx->is_single_pass);
++	unsigned int data_flow_mode =
++		cc_get_data_flow(direct, ctx->flow_mode,
++				 req_ctx->is_single_pass);
  
- static void cc_setup_cmac(struct ahash_request *areq, struct cc_hw_desc desc[],
- 			  unsigned int *seq_size);
-@@ -106,12 +104,9 @@ struct cc_hash_ctx {
- 	bool is_hmac;
- };
- 
--static void cc_set_desc(
--	struct ahash_req_ctx *areq_ctx,
--	struct cc_hash_ctx *ctx,
--	unsigned int flow_mode, struct cc_hw_desc desc[],
--	bool is_not_last_data,
--	unsigned int *seq_size);
-+static void cc_set_desc(struct ahash_req_ctx *areq_ctx, struct cc_hash_ctx *ctx,
-+			unsigned int flow_mode, struct cc_hw_desc desc[],
-+			bool is_not_last_data, unsigned int *seq_size);
- 
- static void cc_set_endianity(u32 mode, struct cc_hw_desc *desc)
- {
-@@ -1971,9 +1966,8 @@ static struct cc_hash_template driver_hash[] = {
- 
- };
- 
--static struct cc_hash_alg *
--cc_alloc_hash_alg(struct cc_hash_template *template, struct device *dev,
--		  bool keyed)
-+static struct cc_hash_alg *cc_alloc_hash_alg(struct cc_hash_template *template,
-+					     struct device *dev, bool keyed)
- {
- 	struct cc_hash_alg *t_crypto_alg;
- 	struct crypto_alg *alg;
+ 	if (req_ctx->is_single_pass) {
+ 		/**
 -- 
 2.7.4
