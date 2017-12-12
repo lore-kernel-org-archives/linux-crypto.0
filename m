@@ -1,78 +1,107 @@
-From: Lars Persson <lars.persson@axis.com>
-Subject: [PATCH v2] crypto: artpec6: set correct iv size for gcm(aes)
-Date: Tue, 12 Dec 2017 12:40:22 +0100
-Message-ID: <20171212114022.11327-1-larper@axis.com>
-Cc: Lars Persson <larper@axis.com>
-To: linux-arm-kernel@axis.com, linux-crypto@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from bastet.se.axis.com ([195.60.68.11]:36183 "EHLO
-        bastet.se.axis.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751566AbdLLLkt (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 12 Dec 2017 06:40:49 -0500
-Received: from localhost (localhost [127.0.0.1])
-        by bastet.se.axis.com (Postfix) with ESMTP id D01DE18355
-        for <linux-crypto@vger.kernel.org>; Tue, 12 Dec 2017 12:40:47 +0100 (CET)
-Received: from bastet.se.axis.com ([IPv6:::ffff:127.0.0.1])
-        by localhost (bastet.se.axis.com [::ffff:127.0.0.1]) (amavisd-new, port 10024)
-        with LMTP id R747NO5vkt2i for <linux-crypto@vger.kernel.org>;
-        Tue, 12 Dec 2017 12:40:47 +0100 (CET)
-Received: from boulder03.se.axis.com (boulder03.se.axis.com [10.0.8.17])
-        by bastet.se.axis.com (Postfix) with ESMTPS id F20051834E
-        for <linux-crypto@vger.kernel.org>; Tue, 12 Dec 2017 12:40:46 +0100 (CET)
-Received: from boulder03.se.axis.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DF4511E081
-        for <linux-crypto@vger.kernel.org>; Tue, 12 Dec 2017 12:40:46 +0100 (CET)
-Received: from boulder03.se.axis.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D40C51E080
-        for <linux-crypto@vger.kernel.org>; Tue, 12 Dec 2017 12:40:46 +0100 (CET)
-Received: from thoth.se.axis.com (unknown [10.0.2.173])
-        by boulder03.se.axis.com (Postfix) with ESMTP
-        for <linux-crypto@vger.kernel.org>; Tue, 12 Dec 2017 12:40:46 +0100 (CET)
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Atul Gupta <atul.gupta@chelsio.com>
+Subject: [RFC crypto v2 0/9] Chelsio Inline TLS
+Date: Tue, 12 Dec 2017 17:32:25 +0530
+Message-ID: <1513080145-11275-1-git-send-email-atul.gupta@chelsio.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, davejwatson@fb.com
+To: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
+Return-path: <netdev-owner@vger.kernel.org>
+Sender: netdev-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-The IV size should not include the 32 bit counter. Because we had the
-IV size set as 16 the transform only worked when the IV input was zero
-padded.
+RFC series for Chelsio Inline TLS driver (chtls.ko)
 
-Fixes: a21eb94fc4d3 ("crypto: axis - add ARTPEC-6/7 crypto accelerator driver")
-Signed-off-by: Lars Persson <larper@axis.com>
----
-v2: Use GCM_AES_IV_SIZE instead of 12.
----
- drivers/crypto/axis/artpec6_crypto.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+Driver use the ULP infrastructure to register chtls as Inline TLS ULP.
+Chtls use TCP Sockets to transmit and receive TLS record. TCP proto_ops
+is extended to offload TLS record.
 
-diff --git a/drivers/crypto/axis/artpec6_crypto.c b/drivers/crypto/axis/artpec6_crypto.c
-index 456278440863..22df6b55e172 100644
---- a/drivers/crypto/axis/artpec6_crypto.c
-+++ b/drivers/crypto/axis/artpec6_crypto.c
-@@ -22,6 +22,7 @@
- #include <linux/slab.h>
- 
- #include <crypto/aes.h>
-+#include <crypto/gcm.h>
- #include <crypto/internal/aead.h>
- #include <crypto/internal/hash.h>
- #include <crypto/internal/skcipher.h>
-@@ -1934,7 +1935,7 @@ static int artpec6_crypto_prepare_aead(struct aead_request *areq)
- 
- 	memcpy(req_ctx->hw_ctx.J0, areq->iv, crypto_aead_ivsize(cipher));
- 	// The HW omits the initial increment of the counter field.
--	crypto_inc(req_ctx->hw_ctx.J0+12, 4);
-+	memcpy(req_ctx->hw_ctx.J0 + GCM_AES_IV_SIZE, "\x00\x00\x00\x01", 4);
- 
- 	ret = artpec6_crypto_setup_out_descr(common, &req_ctx->hw_ctx,
- 		sizeof(struct artpec6_crypto_aead_hw_ctx), false, false);
-@@ -2956,7 +2957,7 @@ static struct aead_alg aead_algos[] = {
- 		.setkey = artpec6_crypto_aead_set_key,
- 		.encrypt = artpec6_crypto_aead_encrypt,
- 		.decrypt = artpec6_crypto_aead_decrypt,
--		.ivsize = AES_BLOCK_SIZE,
-+		.ivsize = GCM_AES_IV_SIZE,
- 		.maxauthsize = AES_BLOCK_SIZE,
- 
- 		.base = {
+T6 adapter provides the following features:
+        -TLS record offload, TLS header, encrypt, digest and transmit
+        -TLS record receive and decrypt
+        -TLS keys store
+        -TCP/IP engine
+        -TLS engine
+        -GCM crypto engine [support CBC also]
+
+TLS provides security at the transport layer. It uses TCP to provide
+reliable end-to-end transport of application data. It relies on TCP
+for any retransmission. TLS session comprises of three parts:
+a. TCP/IP connection
+b. TLS handshake
+c. Record layer processing
+
+TLS handshake state machine is executed in host (refer standard
+implementation eg. OpenSSL).  Setsockopt [SOL_TCP, TCP_ULP] initialize
+TCP proto-ops for Chelsio inline tls support. setsockopt(sock, SOL_TCP,
+TCP_ULP, "chtls", sizeof("chtls"));
+
+Tx and Rx Keys are decided during handshake and programmed onto the chip
+after CCS is exchanged.
+struct tls12_crypto_info_aes_gcm_128 crypto_info
+setsockopt(sock, SOL_TLS, TLS_TX, &crypto_info, sizeof(crypto_info))
+Finish is the first encrypted/decrypted message tx/rx inline.
+
+On the Tx path TLS engine receive plain text from openssl, insert IV,
+fetches the tx key, create cipher text records and generate MAC. TLS
+header is added to cipher text and forward to TCP/IP engine for transport
+layer processing and transmission on wire.
+TX:
+Application--openssl--chtls---TLS engine---encrypt/auth---TCP/IP
+engine---wire.
+
+On the Rx side, data received is PDU aligned at record
+boundaries. TLS processes only the complete record. If rx key is programmed
+on CCS receive, data is decrypted and plain text is posted to host.
+RX:
+Wire--cipher-text--TCP/IP engine [PDU align]---TLS engine---
+decrypt/auth---plain-text--chtls--openssl--application
+
+v2: fixed the following based on the review comments of Stephan Mueller,
+    Stefano Brivio and Hannes Frederic
+    -Added more details in cover letter
+    -Fixed indentation and formating issues
+    -Using aes instead of aes-generic
+    -memset key info after programing the key on chip
+    -reordered the patch sequence
+
+Atul Gupta (9):
+  chtls: structure and macro definiton
+  cxgb4: Inline TLS FW Interface
+  cxgb4: LLD driver changes to enable TLS
+  chcr: Key Macro
+  chtls: Key program
+  chtls: CPL handler definition
+  chtls: Inline crypto request Tx/Rx
+  chtls: Register the ULP
+  Makefile Kconfig
+
+ drivers/crypto/chelsio/Kconfig                     |   10 +
+ drivers/crypto/chelsio/Makefile                    |    1 +
+ drivers/crypto/chelsio/chcr_algo.h                 |   42 +
+ drivers/crypto/chelsio/chcr_core.h                 |   55 +-
+ drivers/crypto/chelsio/chtls/Makefile              |    4 +
+ drivers/crypto/chelsio/chtls/chtls.h               |  480 +++++
+ drivers/crypto/chelsio/chtls/chtls_cm.c            | 2045 ++++++++++++++++++++
+ drivers/crypto/chelsio/chtls/chtls_cm.h            |  203 ++
+ drivers/crypto/chelsio/chtls/chtls_hw.c            |  394 ++++
+ drivers/crypto/chelsio/chtls/chtls_io.c            | 1866 ++++++++++++++++++
+ drivers/crypto/chelsio/chtls/chtls_main.c          |  584 ++++++
+ drivers/net/ethernet/chelsio/cxgb4/cxgb4_debugfs.c |   18 +-
+ drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c    |   32 +-
+ drivers/net/ethernet/chelsio/cxgb4/cxgb4_uld.h     |    7 +
+ drivers/net/ethernet/chelsio/cxgb4/sge.c           |   98 +-
+ drivers/net/ethernet/chelsio/cxgb4/t4_msg.h        |  121 +-
+ drivers/net/ethernet/chelsio/cxgb4/t4_regs.h       |    2 +
+ drivers/net/ethernet/chelsio/cxgb4/t4fw_api.h      |  165 +-
+ include/uapi/linux/tls.h                           |    1 +
+ net/ipv4/tcp_minisocks.c                           |    1 +
+ 20 files changed, 6110 insertions(+), 19 deletions(-)
+ create mode 100644 drivers/crypto/chelsio/chtls/Makefile
+ create mode 100644 drivers/crypto/chelsio/chtls/chtls.h
+ create mode 100644 drivers/crypto/chelsio/chtls/chtls_cm.c
+ create mode 100644 drivers/crypto/chelsio/chtls/chtls_cm.h
+ create mode 100644 drivers/crypto/chelsio/chtls/chtls_hw.c
+ create mode 100644 drivers/crypto/chelsio/chtls/chtls_io.c
+ create mode 100644 drivers/crypto/chelsio/chtls/chtls_main.c
+
 -- 
-2.11.0
+1.8.3.1
