@@ -1,179 +1,55 @@
 From: =?utf-8?Q?=C5=81ukasz_Stelmach?= <l.stelmach@samsung.com>
-Subject: Re: [PATCH v2 4/4] crypto: exynos - Introduce mutex to prevent
- concurrent access to hardware
-Date: Tue, 12 Dec 2017 11:30:14 +0100
-Message-ID: <87o9n46xxl.fsf%l.stelmach@samsung.com>
-References: <CAJKOXPeXHuOVScgBE0WS5Wh79zbAPJ-9P+QvG+Y+NYkxGzNXxA@mail.gmail.com>
-        <CGME20171212103021eucas1p19a2a24930cadde55eac2f822a6a9f80c@eucas1p1.samsung.com>
+Subject: Re: [PATCH v3 3/3] ARM: dts: exynos: Add nodes for True Random
+ Number Generator
+Date: Tue, 12 Dec 2017 11:35:56 +0100
+Message-ID: <87k1xs6xo3.fsf%l.stelmach@samsung.com>
+References: <20171211184913.n67q7vbv2gzknjeb@kozik-lap>
+        <CGME20171212103557eucas1p202966a9335d52149ce69ef122f1758d8@eucas1p2.samsung.com>
 Mime-Version: 1.0
 Content-Type: multipart/signed; boundary="=-=-="; micalg="pgp-sha256";
         protocol="application/pgp-signature"
-Cc: robh+dt@kernel.org, Stephan Mueller <smueller@chronox.de>,
+Cc: "Andrew F . Davis" <afd@ti.com>,
+        PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Matt Mackall <mpm@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Kukjin Kim <kgene@kernel.org>, linux-crypto@vger.kernel.org,
-        linux-samsung-soc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Kukjin Kim <kgene@kernel.org>, devicetree@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-samsung-soc@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
         Marek Szyprowski <m.szyprowski@samsung.com>,
         Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
 To: Krzysztof Kozlowski <krzk@kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mailout1.w1.samsung.com ([210.118.77.11]:40883 "EHLO
-        mailout1.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751281AbdLLKaZ (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 12 Dec 2017 05:30:25 -0500
-In-reply-to: <CAJKOXPeXHuOVScgBE0WS5Wh79zbAPJ-9P+QvG+Y+NYkxGzNXxA@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-samsung-soc-owner@vger.kernel.org>
+In-reply-to: <20171211184913.n67q7vbv2gzknjeb@kozik-lap>
+Sender: linux-samsung-soc-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
 --=-=-=
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 
-It was <2017-12-11 pon 16:03>, when Krzysztof Kozlowski wrote:
-> On Mon, Dec 11, 2017 at 3:06 PM, =C5=81ukasz Stelmach <l.stelmach@samsung=
-.com> wrote:
->> Cc: Marek Szyprowski <m.szyprowski@samsung.com>, Bartlomiej Zolnierkiewi=
-cz <b.zolnierkie@samsung.com>
->>
->> Hardware operations like reading random numbers and setting a seed need
->> to be conducted in a single thread. Therefore a mutex is required to
->> prevent multiple threads (processes) from accessing the hardware at the
->> same time.
->>
->> The sequence of mutex_lock() and mutex_unlock() in the exynos_rng_reseed=
-()
->> function enables switching between different threads waiting for the
->> driver to generate random numbers for them.
->>
+It was <2017-12-11 pon 19:49>, when Krzysztof Kozlowski wrote:
+> On Mon, Dec 04, 2017 at 01:53:51PM +0100, =C5=81ukasz Stelmach wrote:
+>> Add nodes for the True Random Number Generator found in Samsung Exynos
+>> 5250+ SoCs.
+>>=20
 >> Signed-off-by: =C5=81ukasz Stelmach <l.stelmach@samsung.com>
 >> ---
->>  drivers/crypto/exynos-rng.c | 21 +++++++++++++++++++++
->>  1 file changed, 21 insertions(+)
+>>  arch/arm/boot/dts/exynos5.dtsi    | 5 +++++
+>>  arch/arm/boot/dts/exynos5250.dtsi | 5 +++++
+>>  arch/arm/boot/dts/exynos5410.dtsi | 5 +++++
+>>  arch/arm/boot/dts/exynos5420.dtsi | 5 +++++
+>>  4 files changed, 20 insertions(+)
 >>
->> diff --git a/drivers/crypto/exynos-rng.c b/drivers/crypto/exynos-rng.c
->> index c72a838f1932..6209035ca659 100644
->> --- a/drivers/crypto/exynos-rng.c
->> +++ b/drivers/crypto/exynos-rng.c
->> @@ -22,6 +22,7 @@
->>  #include <linux/err.h>
->>  #include <linux/io.h>
->>  #include <linux/module.h>
->> +#include <linux/mutex.h>
->>  #include <linux/of_device.h>
->>  #include <linux/platform_device.h>
->>
->> @@ -79,6 +80,7 @@ struct exynos_rng_dev {
->>         enum exynos_prng_type           type;
->>         void __iomem                    *mem;
->>         struct clk                      *clk;
->> +       struct mutex                    lock;
->>         /* Generated numbers stored for seeding during resume */
->>         u8                              seed_save[EXYNOS_RNG_SEED_SIZE];
->>         unsigned int                    seed_save_len;
->> @@ -192,6 +194,10 @@ static void exynos_rng_reseed(struct exynos_rng_dev=
- *rng)
->>                 return;
->>
->>         exynos_rng_set_seed(rng, seed, read);
->> +
->> +       /* Let others do some of their job. */
->> +       mutex_unlock(&rng->lock);
->> +       mutex_lock(&rng->lock);
->>  }
->>
->>  static int exynos_rng_generate(struct crypto_rng *tfm,
->> @@ -207,6 +213,7 @@ static int exynos_rng_generate(struct crypto_rng *tf=
-m,
->>         if (ret)
->>                 return ret;
->>
->> +       mutex_lock(&rng->lock);
->>         do {
->>                 ret =3D exynos_rng_get_random(rng, dst, dlen, &read);
->>                 if (ret)
->> @@ -217,6 +224,7 @@ static int exynos_rng_generate(struct crypto_rng *tf=
-m,
->>
->>                 exynos_rng_reseed(rng);
->>         } while (dlen > 0);
->> +       mutex_unlock(&rng->lock);
->>
->>         clk_disable_unprepare(rng->clk);
->>
->> @@ -234,7 +242,9 @@ static int exynos_rng_seed(struct crypto_rng *tfm, c=
-onst u8 *seed,
->>         if (ret)
->>                 return ret;
->>
->> +       mutex_lock(&rng->lock);
->>         ret =3D exynos_rng_set_seed(ctx->rng, seed, slen);
->> +       mutex_unlock(&rng->lock);
 >
-> I think the number of mutex locks/unlock statements can be reduced
-> (including the mutex unlock+lock pattern) after moving the mutex to
-> exynos_rng_set_seed() and exynos_rng_get_random() because actually you
-> want to protect them. This would remove the new code from suspend and
-> resume path and gave you the fairness.
+> Unfortunately the same story as with your PRNG patch - does not apply on
+> top of my next/dt (after taking PRNG). Also did not apply on v4.15-rc1 +
+> PRNG.
 >
-> On the other hand the mutex would be unlocked+locked many times for
-> large generate() calls...
+> Could you rebase on my next/dt?
 
-Moving locks/unlocks to exynos_rng_get_random() means taking a lock to
-retrieve 20 bytes. It doesn't scale at all. I really wanted to avoid it,
-because the performance loss is quite noticable in such case. That is
-why I put the lock around the loop in exynos_rng_generatr(). As a
-consequence I had to move locks out of exynos_rng_set_seed() too.
-
->>         clk_disable_unprepare(rng->clk);
->>
->> @@ -284,6 +294,8 @@ static int exynos_rng_probe(struct platform_device *=
-pdev)
->>                 return -ENOTSUPP;
->>         }
->>
->> +       mutex_init(&rng->lock);
->> +
->>         rng->dev =3D &pdev->dev;
->>         rng->clk =3D devm_clk_get(&pdev->dev, "secss");
->>         if (IS_ERR(rng->clk)) {
->> @@ -334,9 +346,14 @@ static int __maybe_unused exynos_rng_suspend(struct=
- device *dev)
->>         if (ret)
->>                 return ret;
->>
->> +       mutex_lock(&rng->lock);
->> +
->>         /* Get new random numbers and store them for seeding on resume. =
-*/
->>         exynos_rng_get_random(rng, rng->seed_save, sizeof(rng->seed_save=
-),
->>                               &(rng->seed_save_len));
->> +
->> +       mutex_unlock(&rng->lock);
->> +
->>         dev_dbg(rng->dev, "Stored %u bytes for seeding on system resume\=
-n",
->>                 rng->seed_save_len);
->>
->> @@ -359,8 +376,12 @@ static int __maybe_unused exynos_rng_resume(struct =
-device *dev)
->>         if (ret)
->>                 return ret;
->>
->> +       mutex_lock(&rng->lock);
->> +
->>         ret =3D exynos_rng_set_seed(rng, rng->seed_save, rng->seed_save_=
-len);
->>
->> +       mutex_unlock(&rng->lock);
->> +
->>         clk_disable_unprepare(rng->clk);
->>
->>         return ret;
->> --
->> 2.11.0
-
+Sure. Should I send it as along with the other two patches, if there were
+no changes in them since?
 
 =2D-=20
 =C5=81ukasz Stelmach
@@ -186,12 +62,12 @@ Content-Type: application/pgp-signature; name="signature.asc"
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1
 
-iQEcBAEBCAAGBQJaL6+2AAoJELCuHpyYpYAQ3k4IAKxh/mvnjv8QK4GZMjaoVhVU
-gYKsBltiIOgvWGencXSVN0BMBWtMJZ8gOirz1xKvprRMlHSx2+j0fJJe0XtirTS9
-aBGgzwKkHgamsMNx1wR5yotjHPS7oL2OX0VQJ8Fy2VDbrWKYGnqmS9shdAhKj7uR
-60xKkVI6ybB5f7rKFmFLVVK+idbpU94ceqWxdzIuyo4MxF8IEmWgzSk63aK/BpZA
-C3LJT4Df18jCz/LIVUoMsGEEdCLN2U9EVelov9QZ6cA7qCmhy4GSES9t2S2wwVKu
-64zCCBnLr0XMDepRuZls7ejV03n8ZC517cx5BSVNY4+cGlQ35H9MQlE62fcX8cg=
-=50IR
+iQEcBAEBCAAGBQJaL7EMAAoJELCuHpyYpYAQm8gH/1fXvDs208U1zfesgTY1okfO
+HD7Gzp8aRLP3s99nD89fncOtjp21EfC+uDPFlbtR9q1rkNs95USfzMj+1axGBnJb
+sp2/VKDaGAY6Pa/nV3y42fIR0U1jBghMoUO//Vu8VPUgJVFCeWk6o7cq/aJB9oqW
+LtJn2tmNlEclRRDe0hKJuX/b3TSAQKOjwlfpFtQpO/U4NIOrbpn3UOO1e/SEADNK
+DYJa25df21/mGmZAUpT6f5D+DSj8CnlDsDO2k0JyWPUUcpVo39it42cVeiY7p9x1
+hx+xke5oIa2tWL6ehxec0NXDibKQ+FwVSVzk1aGsPhmSSUOyfFLif/78vPmW1mQ=
+=PWl1
 -----END PGP SIGNATURE-----
 --=-=-=--
