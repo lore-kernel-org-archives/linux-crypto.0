@@ -1,7 +1,7 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH 09/24] staging: ccree: fix reg mgr naming convention
-Date: Tue, 12 Dec 2017 14:52:55 +0000
-Message-ID: <1513090395-7938-10-git-send-email-gilad@benyossef.com>
+Subject: [PATCH 11/24] staging: ccree: remove cipher sync blkcipher remains
+Date: Tue, 12 Dec 2017 14:52:57 +0000
+Message-ID: <1513090395-7938-12-git-send-email-gilad@benyossef.com>
 References: <1513090395-7938-1-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -23,229 +23,276 @@ Errors-To: driverdev-devel-bounces@linuxdriverproject.org
 Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
 List-Id: linux-crypto.vger.kernel.org
 
-The request manager files were using a func naming convention which was
-inconsistent (ssi vs. cc), included a useless prefix (ssi_request_mgr)
-and often too long.
-
-Make the code more readable by switching to a simpler, consistent naming
-convention.
+Remove the remains of no longer existing support for running
+blkcipher is sync mode.
 
 Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 ---
- drivers/staging/ccree/ssi_driver.c      |  8 +++----
- drivers/staging/ccree/ssi_request_mgr.c | 40 ++++++++++++++++-----------------
- drivers/staging/ccree/ssi_request_mgr.h |  4 ++--
- 3 files changed, 25 insertions(+), 27 deletions(-)
+ drivers/staging/ccree/ssi_cipher.c | 156 ++++++++++++-------------------------
+ 1 file changed, 51 insertions(+), 105 deletions(-)
 
-diff --git a/drivers/staging/ccree/ssi_driver.c b/drivers/staging/ccree/ssi_driver.c
-index 513c5e4..491e2b9 100644
---- a/drivers/staging/ccree/ssi_driver.c
-+++ b/drivers/staging/ccree/ssi_driver.c
-@@ -326,9 +326,9 @@ static int init_cc_resources(struct platform_device *plat_dev)
- 		goto post_sram_mgr_err;
- 	}
- 
--	rc = request_mgr_init(new_drvdata);
-+	rc = cc_req_mgr_init(new_drvdata);
- 	if (rc) {
--		dev_err(dev, "request_mgr_init failed\n");
-+		dev_err(dev, "cc_req_mgr_init failed\n");
- 		goto post_sram_mgr_err;
- 	}
- 
-@@ -389,7 +389,7 @@ static int init_cc_resources(struct platform_device *plat_dev)
- post_buf_mgr_err:
- 	 cc_buffer_mgr_fini(new_drvdata);
- post_req_mgr_err:
--	request_mgr_fini(new_drvdata);
-+	cc_req_mgr_fini(new_drvdata);
- post_sram_mgr_err:
- 	ssi_sram_mgr_fini(new_drvdata);
- post_fips_init_err:
-@@ -422,7 +422,7 @@ static void cleanup_cc_resources(struct platform_device *plat_dev)
- 	ssi_ivgen_fini(drvdata);
- 	cc_pm_fini(drvdata);
- 	cc_buffer_mgr_fini(drvdata);
--	request_mgr_fini(drvdata);
-+	cc_req_mgr_fini(drvdata);
- 	ssi_sram_mgr_fini(drvdata);
- 	ssi_fips_fini(drvdata);
- #ifdef ENABLE_CC_SYSFS
-diff --git a/drivers/staging/ccree/ssi_request_mgr.c b/drivers/staging/ccree/ssi_request_mgr.c
-index 5f34336..dbdfd0c 100644
---- a/drivers/staging/ccree/ssi_request_mgr.c
-+++ b/drivers/staging/ccree/ssi_request_mgr.c
-@@ -33,7 +33,7 @@
- 
- #define SSI_MAX_POLL_ITER	10
- 
--struct ssi_request_mgr_handle {
-+struct cc_req_mgr_handle {
- 	/* Request manager resources */
- 	unsigned int hw_queue_size; /* HW capability */
- 	unsigned int min_free_hw_slots;
-@@ -68,9 +68,9 @@ static void comp_handler(unsigned long devarg);
- static void comp_work_handler(struct work_struct *work);
- #endif
- 
--void request_mgr_fini(struct ssi_drvdata *drvdata)
-+void cc_req_mgr_fini(struct ssi_drvdata *drvdata)
- {
--	struct ssi_request_mgr_handle *req_mgr_h = drvdata->request_mgr_handle;
-+	struct cc_req_mgr_handle *req_mgr_h = drvdata->request_mgr_handle;
- 	struct device *dev = drvdata_to_dev(drvdata);
- 
- 	if (!req_mgr_h)
-@@ -92,14 +92,14 @@ void request_mgr_fini(struct ssi_drvdata *drvdata)
- 	/* Kill tasklet */
- 	tasklet_kill(&req_mgr_h->comptask);
- #endif
--	memset(req_mgr_h, 0, sizeof(struct ssi_request_mgr_handle));
-+	memset(req_mgr_h, 0, sizeof(struct cc_req_mgr_handle));
- 	kfree(req_mgr_h);
- 	drvdata->request_mgr_handle = NULL;
+diff --git a/drivers/staging/ccree/ssi_cipher.c b/drivers/staging/ccree/ssi_cipher.c
+index 7b484f1..0dc63f1 100644
+--- a/drivers/staging/ccree/ssi_cipher.c
++++ b/drivers/staging/ccree/ssi_cipher.c
+@@ -180,7 +180,7 @@ static unsigned int get_max_keysize(struct crypto_tfm *tfm)
+ 	return 0;
  }
  
--int request_mgr_init(struct ssi_drvdata *drvdata)
-+int cc_req_mgr_init(struct ssi_drvdata *drvdata)
+-static int ssi_blkcipher_init(struct crypto_tfm *tfm)
++static int ssi_ablkcipher_init(struct crypto_tfm *tfm)
  {
--	struct ssi_request_mgr_handle *req_mgr_h;
-+	struct cc_req_mgr_handle *req_mgr_h;
- 	struct device *dev = drvdata_to_dev(drvdata);
+ 	struct ssi_ablkcipher_ctx *ctx_p = crypto_tfm_ctx(tfm);
+ 	struct crypto_alg *alg = tfm->__crt_alg;
+@@ -189,10 +189,13 @@ static int ssi_blkcipher_init(struct crypto_tfm *tfm)
+ 	struct device *dev = drvdata_to_dev(ssi_alg->drvdata);
  	int rc = 0;
+ 	unsigned int max_key_buf_size = get_max_keysize(tfm);
++	struct ablkcipher_tfm *ablktfm = &tfm->crt_ablkcipher;
  
-@@ -161,7 +161,7 @@ int request_mgr_init(struct ssi_drvdata *drvdata)
- 	return 0;
+ 	dev_dbg(dev, "Initializing context @%p for %s\n", ctx_p,
+ 		crypto_tfm_alg_name(tfm));
  
- req_mgr_init_err:
--	request_mgr_fini(drvdata);
-+	cc_req_mgr_fini(drvdata);
++	ablktfm->reqsize = sizeof(struct blkcipher_req_ctx);
++
+ 	ctx_p->cipher_mode = ssi_alg->cipher_mode;
+ 	ctx_p->flow_mode = ssi_alg->flow_mode;
+ 	ctx_p->drvdata = ssi_alg->drvdata;
+@@ -297,10 +300,10 @@ static enum cc_hw_crypto_key hw_key_to_cc_hw_key(int slot_num)
+ 	return END_OF_KEYS;
+ }
+ 
+-static int ssi_blkcipher_setkey(struct crypto_tfm *tfm,
+-				const u8 *key,
++static int ssi_ablkcipher_setkey(struct crypto_ablkcipher *atfm, const u8 *key,
+ 				unsigned int keylen)
+ {
++	struct crypto_tfm *tfm = crypto_ablkcipher_tfm(atfm);
+ 	struct ssi_ablkcipher_ctx *ctx_p = crypto_tfm_ctx(tfm);
+ 	struct device *dev = drvdata_to_dev(ctx_p->drvdata);
+ 	u32 tmp[DES_EXPKEY_WORDS];
+@@ -700,62 +703,59 @@ ssi_blkcipher_create_data_desc(
+ 	}
+ }
+ 
+-static int ssi_blkcipher_complete(struct device *dev,
+-				  struct ssi_ablkcipher_ctx *ctx_p,
+-				  struct blkcipher_req_ctx *req_ctx,
+-				  struct scatterlist *dst,
+-				  struct scatterlist *src,
+-				  unsigned int ivsize,
+-				  void *areq)
++static void ssi_ablkcipher_complete(struct device *dev, void *ssi_req)
+ {
++	struct ablkcipher_request *areq = (struct ablkcipher_request *)ssi_req;
++	struct scatterlist *dst = areq->dst;
++	struct scatterlist *src = areq->src;
++	struct blkcipher_req_ctx *req_ctx = ablkcipher_request_ctx(areq);
++	struct crypto_ablkcipher *tfm = crypto_ablkcipher_reqtfm(areq);
++	unsigned int ivsize = crypto_ablkcipher_ivsize(tfm);
+ 	int completion_error = 0;
+ 	struct ablkcipher_request *req = (struct ablkcipher_request *)areq;
+ 
+ 	cc_unmap_blkcipher_request(dev, req_ctx, ivsize, src, dst);
+ 	kfree(req_ctx->iv);
+ 
+-	if (areq) {
+-		/*
+-		 * The crypto API expects us to set the req->info to the last
+-		 * ciphertext block. For encrypt, simply copy from the result.
+-		 * For decrypt, we must copy from a saved buffer since this
+-		 * could be an in-place decryption operation and the src is
+-		 * lost by this point.
+-		 */
+-		if (req_ctx->gen_ctx.op_type == DRV_CRYPTO_DIRECTION_DECRYPT)  {
+-			memcpy(req->info, req_ctx->backup_info, ivsize);
+-			kfree(req_ctx->backup_info);
+-		} else {
+-			scatterwalk_map_and_copy(req->info, req->dst,
+-						 (req->nbytes - ivsize),
+-						 ivsize, 0);
+-		}
+-
+-		ablkcipher_request_complete(areq, completion_error);
+-		return 0;
++	/*
++	 * The crypto API expects us to set the req->info to the last
++	 * ciphertext block. For encrypt, simply copy from the result.
++	 * For decrypt, we must copy from a saved buffer since this
++	 * could be an in-place decryption operation and the src is
++	 * lost by this point.
++	 */
++	if (req_ctx->gen_ctx.op_type == DRV_CRYPTO_DIRECTION_DECRYPT)  {
++		memcpy(req->info, req_ctx->backup_info, ivsize);
++		kfree(req_ctx->backup_info);
++	} else {
++		scatterwalk_map_and_copy(req->info, req->dst,
++					 (req->nbytes - ivsize),
++					 ivsize, 0);
+ 	}
+-	return completion_error;
++
++	ablkcipher_request_complete(areq, completion_error);
+ }
+ 
+-static int ssi_blkcipher_process(
+-	struct crypto_tfm *tfm,
+-	struct blkcipher_req_ctx *req_ctx,
+-	struct scatterlist *dst, struct scatterlist *src,
+-	unsigned int nbytes,
+-	void *info, //req info
+-	unsigned int ivsize,
+-	void *areq,
+-	enum drv_crypto_direction direction)
++static int cc_cipher_process(struct ablkcipher_request *req,
++			     enum drv_crypto_direction direction)
+ {
++	struct crypto_ablkcipher *ablk_tfm = crypto_ablkcipher_reqtfm(req);
++	struct crypto_tfm *tfm = crypto_ablkcipher_tfm(ablk_tfm);
++	struct blkcipher_req_ctx *req_ctx = ablkcipher_request_ctx(req);
++	unsigned int ivsize = crypto_ablkcipher_ivsize(ablk_tfm);
++	struct scatterlist *dst = req->dst;
++	struct scatterlist *src = req->src;
++	unsigned int nbytes = req->nbytes;
++	void *info = req->info;
+ 	struct ssi_ablkcipher_ctx *ctx_p = crypto_tfm_ctx(tfm);
+ 	struct device *dev = drvdata_to_dev(ctx_p->drvdata);
+ 	struct cc_hw_desc desc[MAX_ABLKCIPHER_SEQ_LEN];
+ 	struct ssi_crypto_req ssi_req = {};
+ 	int rc, seq_len = 0, cts_restore_flag = 0;
+ 
+-	dev_dbg(dev, "%s areq=%p info=%p nbytes=%d\n",
++	dev_dbg(dev, "%s req=%p info=%p nbytes=%d\n",
+ 		((direction == DRV_CRYPTO_DIRECTION_ENCRYPT) ?
+-		"Encrypt" : "Decrypt"), areq, info, nbytes);
++		"Encrypt" : "Decrypt"), req, info, nbytes);
+ 
+ 	/* STAT_PHASE_0: Init and sanity checks */
+ 
+@@ -791,7 +791,7 @@ static int ssi_blkcipher_process(
+ 
+ 	/* Setup DX request structure */
+ 	ssi_req.user_cb = (void *)ssi_ablkcipher_complete;
+-	ssi_req.user_arg = (void *)areq;
++	ssi_req.user_arg = (void *)req;
+ 
+ #ifdef ENABLE_CYCLE_COUNT
+ 	ssi_req.op_type = (direction == DRV_CRYPTO_DIRECTION_DECRYPT) ?
+@@ -823,7 +823,7 @@ static int ssi_blkcipher_process(
+ 		ssi_blkcipher_create_setup_desc(tfm, req_ctx, ivsize, nbytes,
+ 						desc, &seq_len);
+ 	/* Data processing */
+-	ssi_blkcipher_create_data_desc(tfm, req_ctx, dst, src, nbytes, areq,
++	ssi_blkcipher_create_data_desc(tfm, req_ctx, dst, src, nbytes, req,
+ 				       desc, &seq_len);
+ 
+ 	/* do we need to generate IV? */
+@@ -836,25 +836,12 @@ static int ssi_blkcipher_process(
+ 
+ 	/* STAT_PHASE_3: Lock HW and push sequence */
+ 
+-	rc = send_request(ctx_p->drvdata, &ssi_req, desc, seq_len,
+-			  (!areq) ? 0 : 1);
+-	if (areq) {
+-		if (rc != -EINPROGRESS) {
+-			/* Failed to send the request or request completed
+-			 * synchronously
+-			 */
+-			cc_unmap_blkcipher_request(dev, req_ctx, ivsize, src,
+-						   dst);
+-		}
+-
+-	} else {
+-		if (rc) {
+-			cc_unmap_blkcipher_request(dev, req_ctx, ivsize, src,
+-						   dst);
+-		} else {
+-			rc = ssi_blkcipher_complete(dev, ctx_p, req_ctx, dst,
+-						    src, ivsize, NULL);
+-		}
++	rc = send_request(ctx_p->drvdata, &ssi_req, desc, seq_len, 1);
++	if (rc != -EINPROGRESS) {
++		/* Failed to send the request or request completed
++		 * synchronously
++		 */
++		cc_unmap_blkcipher_request(dev, req_ctx, ivsize, src, dst);
+ 	}
+ 
+ exit_process:
+@@ -869,56 +856,19 @@ static int ssi_blkcipher_process(
  	return rc;
  }
  
-@@ -202,9 +202,9 @@ static void request_mgr_complete(struct device *dev, void *dx_compl_h)
- 	complete(this_compl);
+-static void ssi_ablkcipher_complete(struct device *dev, void *ssi_req)
+-{
+-	struct ablkcipher_request *areq = (struct ablkcipher_request *)ssi_req;
+-	struct blkcipher_req_ctx *req_ctx = ablkcipher_request_ctx(areq);
+-	struct crypto_ablkcipher *tfm = crypto_ablkcipher_reqtfm(areq);
+-	struct ssi_ablkcipher_ctx *ctx_p = crypto_ablkcipher_ctx(tfm);
+-	unsigned int ivsize = crypto_ablkcipher_ivsize(tfm);
+-
+-	ssi_blkcipher_complete(dev, ctx_p, req_ctx, areq->dst, areq->src,
+-			       ivsize, areq);
+-}
+-
+-/* Async wrap functions */
+-
+-static int ssi_ablkcipher_init(struct crypto_tfm *tfm)
+-{
+-	struct ablkcipher_tfm *ablktfm = &tfm->crt_ablkcipher;
+-
+-	ablktfm->reqsize = sizeof(struct blkcipher_req_ctx);
+-
+-	return ssi_blkcipher_init(tfm);
+-}
+-
+-static int ssi_ablkcipher_setkey(struct crypto_ablkcipher *tfm,
+-				 const u8 *key,
+-				 unsigned int keylen)
+-{
+-	return ssi_blkcipher_setkey(crypto_ablkcipher_tfm(tfm), key, keylen);
+-}
+-
+ static int ssi_ablkcipher_encrypt(struct ablkcipher_request *req)
+ {
+-	struct crypto_ablkcipher *ablk_tfm = crypto_ablkcipher_reqtfm(req);
+-	struct crypto_tfm *tfm = crypto_ablkcipher_tfm(ablk_tfm);
+ 	struct blkcipher_req_ctx *req_ctx = ablkcipher_request_ctx(req);
+-	unsigned int ivsize = crypto_ablkcipher_ivsize(ablk_tfm);
+ 
+ 	req_ctx->is_giv = false;
+ 	req_ctx->backup_info = NULL;
+ 
+-	return ssi_blkcipher_process(tfm, req_ctx, req->dst, req->src,
+-				     req->nbytes, req->info, ivsize,
+-				     (void *)req,
+-				     DRV_CRYPTO_DIRECTION_ENCRYPT);
++	return cc_cipher_process(req, DRV_CRYPTO_DIRECTION_ENCRYPT);
  }
  
--static int request_mgr_queues_status_check(
-+static int cc_queues_status(
- 		struct ssi_drvdata *drvdata,
--		struct ssi_request_mgr_handle *req_mgr_h,
-+		struct cc_req_mgr_handle *req_mgr_h,
- 		unsigned int total_seq_len)
+ static int ssi_ablkcipher_decrypt(struct ablkcipher_request *req)
  {
- 	unsigned long poll_queue;
-@@ -264,7 +264,7 @@ int send_request(
- 	struct cc_hw_desc *desc, unsigned int len, bool is_dout)
- {
- 	void __iomem *cc_base = drvdata->cc_base;
--	struct ssi_request_mgr_handle *req_mgr_h = drvdata->request_mgr_handle;
-+	struct cc_req_mgr_handle *req_mgr_h = drvdata->request_mgr_handle;
- 	unsigned int used_sw_slots;
- 	unsigned int iv_seq_len = 0;
- 	unsigned int total_seq_len = len; /*initial sequence length*/
-@@ -291,8 +291,7 @@ int send_request(
- 		 * in case iv gen add the max size and in case of no dout add 1
- 		 * for the internal completion descriptor
- 		 */
--		rc = request_mgr_queues_status_check(drvdata, req_mgr_h,
--						     max_required_seq_len);
-+		rc = cc_queues_status(drvdata, req_mgr_h, max_required_seq_len);
- 		if (rc == 0)
- 			/* There is enough place in the queue */
- 			break;
-@@ -418,14 +417,13 @@ int send_request_init(
- 	struct ssi_drvdata *drvdata, struct cc_hw_desc *desc, unsigned int len)
- {
- 	void __iomem *cc_base = drvdata->cc_base;
--	struct ssi_request_mgr_handle *req_mgr_h = drvdata->request_mgr_handle;
-+	struct cc_req_mgr_handle *req_mgr_h = drvdata->request_mgr_handle;
- 	unsigned int total_seq_len = len; /*initial sequence length*/
- 	int rc = 0;
+ 	struct crypto_ablkcipher *ablk_tfm = crypto_ablkcipher_reqtfm(req);
+-	struct crypto_tfm *tfm = crypto_ablkcipher_tfm(ablk_tfm);
+ 	struct blkcipher_req_ctx *req_ctx = ablkcipher_request_ctx(req);
+ 	unsigned int ivsize = crypto_ablkcipher_ivsize(ablk_tfm);
  
- 	/* Wait for space in HW and SW FIFO. Poll for as much as FIFO_TIMEOUT.
- 	 */
--	rc = request_mgr_queues_status_check(drvdata, req_mgr_h,
--					     total_seq_len);
-+	rc = cc_queues_status(drvdata, req_mgr_h, total_seq_len);
- 	if (rc)
- 		return rc;
+@@ -934,15 +884,11 @@ static int ssi_ablkcipher_decrypt(struct ablkcipher_request *req)
+ 				 (req->nbytes - ivsize), ivsize, 0);
+ 	req_ctx->is_giv = false;
  
-@@ -448,7 +446,7 @@ int send_request_init(
+-	return ssi_blkcipher_process(tfm, req_ctx, req->dst, req->src,
+-				     req->nbytes, req->info, ivsize,
+-				     (void *)req,
+-				     DRV_CRYPTO_DIRECTION_DECRYPT);
++	return cc_cipher_process(req, DRV_CRYPTO_DIRECTION_DECRYPT);
+ }
  
- void complete_request(struct ssi_drvdata *drvdata)
- {
--	struct ssi_request_mgr_handle *request_mgr_handle =
-+	struct cc_req_mgr_handle *request_mgr_handle =
- 						drvdata->request_mgr_handle;
- 
- 	complete(&drvdata->hw_queue_avail);
-@@ -474,7 +472,7 @@ static void proc_completions(struct ssi_drvdata *drvdata)
- {
- 	struct ssi_crypto_req *ssi_req;
- 	struct device *dev = drvdata_to_dev(drvdata);
--	struct ssi_request_mgr_handle *request_mgr_handle =
-+	struct cc_req_mgr_handle *request_mgr_handle =
- 						drvdata->request_mgr_handle;
- 	unsigned int *tail = &request_mgr_handle->req_queue_tail;
- 	unsigned int *head = &request_mgr_handle->req_queue_head;
-@@ -540,7 +538,7 @@ static inline u32 cc_axi_comp_count(struct ssi_drvdata *drvdata)
- static void comp_handler(unsigned long devarg)
- {
- 	struct ssi_drvdata *drvdata = (struct ssi_drvdata *)devarg;
--	struct ssi_request_mgr_handle *request_mgr_handle =
-+	struct cc_req_mgr_handle *request_mgr_handle =
- 						drvdata->request_mgr_handle;
- 
- 	u32 irq;
-@@ -590,7 +588,7 @@ static void comp_handler(unsigned long devarg)
- #if defined(CONFIG_PM)
- int cc_resume_req_queue(struct ssi_drvdata *drvdata)
- {
--	struct ssi_request_mgr_handle *request_mgr_handle =
-+	struct cc_req_mgr_handle *request_mgr_handle =
- 		drvdata->request_mgr_handle;
- 
- 	spin_lock_bh(&request_mgr_handle->hw_lock);
-@@ -606,7 +604,7 @@ int cc_resume_req_queue(struct ssi_drvdata *drvdata)
-  */
- int cc_suspend_req_queue(struct ssi_drvdata *drvdata)
- {
--	struct ssi_request_mgr_handle *request_mgr_handle =
-+	struct cc_req_mgr_handle *request_mgr_handle =
- 						drvdata->request_mgr_handle;
- 
- 	/* lock the send_request */
-@@ -624,7 +622,7 @@ int cc_suspend_req_queue(struct ssi_drvdata *drvdata)
- 
- bool cc_req_queue_suspended(struct ssi_drvdata *drvdata)
- {
--	struct ssi_request_mgr_handle *request_mgr_handle =
-+	struct cc_req_mgr_handle *request_mgr_handle =
- 						drvdata->request_mgr_handle;
- 
- 	return	request_mgr_handle->is_runtime_suspended;
-diff --git a/drivers/staging/ccree/ssi_request_mgr.h b/drivers/staging/ccree/ssi_request_mgr.h
-index 53eed5f..d018f51 100644
---- a/drivers/staging/ccree/ssi_request_mgr.h
-+++ b/drivers/staging/ccree/ssi_request_mgr.h
-@@ -23,7 +23,7 @@
- 
- #include "cc_hw_queue_defs.h"
- 
--int request_mgr_init(struct ssi_drvdata *drvdata);
-+int cc_req_mgr_init(struct ssi_drvdata *drvdata);
- 
- /*!
-  * Enqueue caller request to crypto hardware.
-@@ -47,7 +47,7 @@ int send_request_init(
- 
- void complete_request(struct ssi_drvdata *drvdata);
- 
--void request_mgr_fini(struct ssi_drvdata *drvdata);
-+void cc_req_mgr_fini(struct ssi_drvdata *drvdata);
- 
- #if defined(CONFIG_PM)
- int cc_resume_req_queue(struct ssi_drvdata *drvdata);
+ /* DX Block cipher alg */
+ static struct ssi_alg_template blkcipher_algs[] = {
+-/* Async template */
+ #if SSI_CC_HAS_AES_XTS
+ 	{
+ 		.name = "xts(aes)",
 -- 
 2.7.4
