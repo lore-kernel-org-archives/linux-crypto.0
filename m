@@ -1,121 +1,81 @@
-From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH 24/24] staging: ccree: fix FIPS mgr naming convention
-Date: Tue, 12 Dec 2017 14:53:10 +0000
-Message-ID: <1513090395-7938-25-git-send-email-gilad@benyossef.com>
-References: <1513090395-7938-1-git-send-email-gilad@benyossef.com>
+From: =?UTF-8?q?=C5=81ukasz=20Stelmach?= <l.stelmach@samsung.com>
+Subject: [PATCH v3 0/4] Assorted changes for Exynos PRNG driver
+Date: Tue, 12 Dec 2017 17:36:03 +0100
+Message-ID: <20171212163607.2985-1-l.stelmach@samsung.com>
+References: <20171211140623.7673-1-l.stelmach@samsung.com>
+        <CGME20171212163609eucas1p2aaee0a21276b66f4cb492a4502f66756@eucas1p2.samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: devel@driverdev.osuosl.org, linux-kernel@vger.kernel.org,
- driverdev-devel@linuxdriverproject.org, linux-crypto@vger.kernel.org,
- Ofir Drang <ofir.drang@arm.com>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
-In-Reply-To: <1513090395-7938-1-git-send-email-gilad@benyossef.com>
-List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
-List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
-List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
-List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
-List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
-Errors-To: driverdev-devel-bounces@linuxdriverproject.org
-Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+Cc: =?UTF-8?q?=C5=81ukasz=20Stelmach?= <l.stelmach@samsung.com>,
+        Marek Szyprowski <m.szyprowski@samsung.com>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
+To: Krzysztof Kozlowski <krzk@kernel.org>, robh+dt@kernel.org,
+        Stephan Mueller <smueller@chronox.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Kukjin Kim <kgene@kernel.org>, linux-crypto@vger.kernel.org,
+        linux-samsung-soc@vger.kernel.org, linux-kernel@vger.kernel.org
+Return-path: <linux-samsung-soc-owner@vger.kernel.org>
+In-reply-to: <20171211140623.7673-1-l.stelmach@samsung.com>
+Sender: linux-samsung-soc-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-The FIPS manager files were using a naming convention which was
-inconsistent (ssi vs. cc) and often too long.
+Hello,
 
-Make the code more readable by switching to a simpler, consistent naming
-convention.
+This is a series of patches for exynos-rng driver I've decided to
+create after adding support for Exynos5250+ chips. They do not
+strictly depend on each other, but I think it is better to send them
+as a single patch-set.
 
-Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
----
- drivers/staging/ccree/ssi_driver.c | 6 +++---
- drivers/staging/ccree/ssi_fips.c   | 4 ++--
- drivers/staging/ccree/ssi_fips.h   | 8 ++++----
- 3 files changed, 9 insertions(+), 9 deletions(-)
+The driver requires appropriate DT configuration introduced in
 
-diff --git a/drivers/staging/ccree/ssi_driver.c b/drivers/staging/ccree/ssi_driver.c
-index 6e7a396..28cfbb4 100644
---- a/drivers/staging/ccree/ssi_driver.c
-+++ b/drivers/staging/ccree/ssi_driver.c
-@@ -307,7 +307,7 @@ static int init_cc_resources(struct platform_device *plat_dev)
- 	}
- #endif
- 
--	rc = ssi_fips_init(new_drvdata);
-+	rc = cc_fips_init(new_drvdata);
- 	if (rc) {
- 		dev_err(dev, "CC_FIPS_INIT failed 0x%x\n", rc);
- 		goto post_sysfs_err;
-@@ -393,7 +393,7 @@ static int init_cc_resources(struct platform_device *plat_dev)
- post_sram_mgr_err:
- 	cc_sram_mgr_fini(new_drvdata);
- post_fips_init_err:
--	ssi_fips_fini(new_drvdata);
-+	cc_fips_fini(new_drvdata);
- post_sysfs_err:
- #ifdef ENABLE_CC_SYSFS
- 	ssi_sysfs_fini();
-@@ -424,7 +424,7 @@ static void cleanup_cc_resources(struct platform_device *plat_dev)
- 	cc_buffer_mgr_fini(drvdata);
- 	cc_req_mgr_fini(drvdata);
- 	cc_sram_mgr_fini(drvdata);
--	ssi_fips_fini(drvdata);
-+	cc_fips_fini(drvdata);
- #ifdef ENABLE_CC_SYSFS
- 	ssi_sysfs_fini();
- #endif
-diff --git a/drivers/staging/ccree/ssi_fips.c b/drivers/staging/ccree/ssi_fips.c
-index 036215f..a1d7782 100644
---- a/drivers/staging/ccree/ssi_fips.c
-+++ b/drivers/staging/ccree/ssi_fips.c
-@@ -51,7 +51,7 @@ void cc_set_ree_fips_status(struct cc_drvdata *drvdata, bool status)
- 	cc_iowrite(drvdata, CC_REG(HOST_GPR0), val);
- }
- 
--void ssi_fips_fini(struct cc_drvdata *drvdata)
-+void cc_fips_fini(struct cc_drvdata *drvdata)
- {
- 	struct cc_fips_handle *fips_h = drvdata->fips_handle;
- 
-@@ -105,7 +105,7 @@ static void fips_dsr(unsigned long devarg)
- }
- 
- /* The function called once at driver entry point .*/
--int ssi_fips_init(struct cc_drvdata *p_drvdata)
-+int cc_fips_init(struct cc_drvdata *p_drvdata)
- {
- 	struct cc_fips_handle *fips_h;
- 	struct device *dev = drvdata_to_dev(p_drvdata);
-diff --git a/drivers/staging/ccree/ssi_fips.h b/drivers/staging/ccree/ssi_fips.h
-index 5eed9f6..8321dde 100644
---- a/drivers/staging/ccree/ssi_fips.h
-+++ b/drivers/staging/ccree/ssi_fips.h
-@@ -27,19 +27,19 @@ enum cc_fips_status {
- 	CC_FIPS_SYNC_STATUS_RESERVE32B = S32_MAX
- };
- 
--int ssi_fips_init(struct cc_drvdata *p_drvdata);
--void ssi_fips_fini(struct cc_drvdata *drvdata);
-+int cc_fips_init(struct cc_drvdata *p_drvdata);
-+void cc_fips_fini(struct cc_drvdata *drvdata);
- void fips_handler(struct cc_drvdata *drvdata);
- void cc_set_ree_fips_status(struct cc_drvdata *drvdata, bool ok);
- 
- #else  /* CONFIG_CRYPTO_FIPS */
- 
--static inline int ssi_fips_init(struct cc_drvdata *p_drvdata)
-+static inline int cc_fips_init(struct cc_drvdata *p_drvdata)
- {
- 	return 0;
- }
- 
--static inline void ssi_fips_fini(struct cc_drvdata *drvdata) {}
-+static inline void cc_fips_fini(struct cc_drvdata *drvdata) {}
- static inline void cc_set_ree_fips_status(struct cc_drvdata *drvdata,
- 					  bool ok) {}
- static inline void fips_handler(struct cc_drvdata *drvdata) {}
+    https://patchwork.kernel.org/patch/10106797/
+
+Patch #1 Add support for PRNG in Exynos5250+ SoCs
+
+Patch #2 Improve output performance by using memcpy() rather than a
+custom function to retrieve random bytes from registers. Rearrange
+the loop for polling the hardware.
+
+Patch #3 Reseed the PRNG after reading 2^16 bytes. Simmilar approach
+is implemented in DRBG. (Thanks Stephan Mueller)
+
+Patch #4 Introduce locking to prevent simultaneous access to the
+hardware from more than one thread/process.
+
+Changes since v2:
+
+- Remove changes in the loop polling the status register in
+  exynos_rng_get_random(). Thanks Krzysztof Kozłowski.
+- Remove the check for valid values of rng->type from
+  exynos_rng_probe(). The function wouldn't be called with values other
+  than mentioned in exynos_rng_dt_match array.
+- Applied changes to the commit message of patch #3 requested by Stephan
+  Mueller.
+
+Changes since v1:
+
+- Added Patch #4.
+- Extended commit message for patch #3.
+- Changed exynos_prng_type enum and a define according to Krzysztof Kozłowski's
+  recommendations.
+- Brought back cpu_relax() in a rearranged loop in
+  exynos_rng_get_random().
+- Moved an assignment of the read valuea away from an error path.
+- Removed dev_info() reporting hardware presence from
+  exynos_rng_probe().
+
+Łukasz Stelmach (4):
+  crypto: exynos - Support Exynos5250+ SoCs
+  crypto: exynos - Improve performance of PRNG
+  crypto: exynos - Reseed PRNG after generating 2^16 random bytes
+  crypto: exynos - Introduce mutex to prevent concurrent access to
+    hardware
+
+ .../bindings/crypto/samsung,exynos-rng4.txt        |  4 +-
+ drivers/crypto/exynos-rng.c                        | 94 ++++++++++++++--------
+ 2 files changed, 62 insertions(+), 36 deletions(-)
+
 -- 
-2.7.4
+2.11.0
