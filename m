@@ -1,47 +1,47 @@
-From: Corentin Labbe <clabbe@baylibre.com>
-Subject: [PATCH 2/2] crypto: seqiv - Remove unused alg/spawn variable
-Date: Tue, 12 Dec 2017 19:30:14 +0000
-Message-ID: <1513107014-11975-2-git-send-email-clabbe@baylibre.com>
-References: <1513107014-11975-1-git-send-email-clabbe@baylibre.com>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Corentin Labbe <clabbe@baylibre.com>
-To: herbert@gondor.apana.org.au, davem@davemloft.net
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1513107014-11975-1-git-send-email-clabbe@baylibre.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Gary R Hook <gary.hook@amd.com>
+Subject: [PATCH] hwrng: Clean up RNG list when last hwrng is unregisterd
+Date: Tue, 12 Dec 2017 16:19:38 -0600
+Message-ID: <151311717859.2551.8429053600468961607.stgit@sosxen2.amd.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: thomas.lendacky@amd.com, prasannatsmkumar@gmail.com,
+        herbert@gondor.apana.org.au, davem@davemloft.net
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-sn1nam02on0070.outbound.protection.outlook.com ([104.47.36.70]:55814
+        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1752320AbdLLWTo (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 12 Dec 2017 17:19:44 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-This patch remove two unused variable and some dead "code" using it.
+Commit 142a27f0a731 added support for a "best" RNG, and in doing so
+introduced a hang from rmmod/modprobe -r when the last RNG on the list
+was unloaded.
 
-Fixes: 92932d03c2b3 ("crypto: seqiv - Remove AEAD compatibility code")
+When the hwrng list is depleted, return the global variables to their
+original state and decrement all references to the object.
 
-Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
+Fixes: 142a27f0a731 ("hwrng: core - Reset user selected rng by writing "" to rng_current")
+Signed-off-by: Gary R Hook <gary.hook@amd.com>
 ---
- crypto/seqiv.c | 5 -----
- 1 file changed, 5 deletions(-)
+ drivers/char/hw_random/core.c |    4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/crypto/seqiv.c b/crypto/seqiv.c
-index 570b7d1aa0ca..39dbf2f7e5f5 100644
---- a/crypto/seqiv.c
-+++ b/crypto/seqiv.c
-@@ -144,8 +144,6 @@ static int seqiv_aead_decrypt(struct aead_request *req)
- static int seqiv_aead_create(struct crypto_template *tmpl, struct rtattr **tb)
- {
- 	struct aead_instance *inst;
--	struct crypto_aead_spawn *spawn;
--	struct aead_alg *alg;
- 	int err;
+diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
+index 657b8770b6b9..91bb98c42a1c 100644
+--- a/drivers/char/hw_random/core.c
++++ b/drivers/char/hw_random/core.c
+@@ -306,6 +306,10 @@ static int enable_best_rng(void)
+ 		ret = ((new_rng == current_rng) ? 0 : set_current_rng(new_rng));
+ 		if (!ret)
+ 			cur_rng_set_by_user = 0;
++	} else {
++		drop_current_rng();
++		cur_rng_set_by_user = 0;
++		ret = 0;
+ 	}
  
- 	inst = aead_geniv_alloc(tmpl, tb, 0, 0);
-@@ -153,9 +151,6 @@ static int seqiv_aead_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	if (IS_ERR(inst))
- 		return PTR_ERR(inst);
- 
--	spawn = aead_instance_ctx(inst);
--	alg = crypto_spawn_aead_alg(spawn);
--
- 	err = -EINVAL;
- 	if (inst->alg.ivsize != sizeof(u64))
- 		goto free_inst;
--- 
-2.13.6
+ 	return ret;
