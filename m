@@ -1,49 +1,51 @@
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Subject: Re: [PATCH v4] ARM: dts: exynos: Add nodes for True Random Number
- Generator
-Date: Tue, 12 Dec 2017 18:44:08 +0100
-Message-ID: <20171212174408.bnyedkd2qebqtpiq@kozik-lap>
-References: <20171204125351.26805-4-l.stelmach@samsung.com>
- <CGME20171212120906eucas1p23883590efde24a67800473b0d34871e5@eucas1p2.samsung.com>
- <20171212120902.16561-1-l.stelmach@samsung.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
-Cc: "Andrew F . Davis" <afd@ti.com>,
-        PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Kukjin Kim <kgene@kernel.org>, devicetree@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-samsung-soc@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Marek Szyprowski <m.szyprowski@samsung.com>,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
-To: =?utf-8?Q?=C5=81ukasz?= Stelmach <l.stelmach@samsung.com>
-Return-path: <linux-samsung-soc-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20171212120902.16561-1-l.stelmach@samsung.com>
-Sender: linux-samsung-soc-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Corentin Labbe <clabbe@baylibre.com>
+Subject: [PATCH 1/2] crypto: echainiv - Remove unused alg/spawn variable
+Date: Tue, 12 Dec 2017 19:30:13 +0000
+Message-ID: <1513107014-11975-1-git-send-email-clabbe@baylibre.com>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Corentin Labbe <clabbe@baylibre.com>
+To: herbert@gondor.apana.org.au, davem@davemloft.net
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-wm0-f66.google.com ([74.125.82.66]:42022 "EHLO
+        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752247AbdLLTaa (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 12 Dec 2017 14:30:30 -0500
+Received: by mail-wm0-f66.google.com with SMTP id b199so834856wme.1
+        for <linux-crypto@vger.kernel.org>; Tue, 12 Dec 2017 11:30:29 -0800 (PST)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Dec 12, 2017 at 01:09:02PM +0100, Łukasz Stelmach wrote:
-> Add nodes for the True Random Number Generator found in Samsung Exynos
-> 5250+ SoCs.
-> 
-> Signed-off-by: Łukasz Stelmach <l.stelmach@samsung.com>
-> ---
-> Changes since v3:
-> 
-> - Rebased accroding to Krzysztof Kozłowski's request
-> 
->  arch/arm/boot/dts/exynos5.dtsi    | 5 +++++
->  arch/arm/boot/dts/exynos5250.dtsi | 5 +++++
->  arch/arm/boot/dts/exynos5410.dtsi | 5 +++++
->  arch/arm/boot/dts/exynos5420.dtsi | 5 +++++
->  4 files changed, 20 insertions(+)
-> 
+This patch remove two unused variable and some dead "code" using it.
 
-Thanks, applied.
+Fixes: 66008d4230f6 ("crypto: echainiv - Remove AEAD compatibility code")
+Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
+---
+ crypto/echainiv.c | 5 -----
+ 1 file changed, 5 deletions(-)
 
-Best regards,
-Krzysztof
+diff --git a/crypto/echainiv.c b/crypto/echainiv.c
+index e3d889b122e0..45819e6015bf 100644
+--- a/crypto/echainiv.c
++++ b/crypto/echainiv.c
+@@ -118,8 +118,6 @@ static int echainiv_aead_create(struct crypto_template *tmpl,
+ 				struct rtattr **tb)
+ {
+ 	struct aead_instance *inst;
+-	struct crypto_aead_spawn *spawn;
+-	struct aead_alg *alg;
+ 	int err;
+ 
+ 	inst = aead_geniv_alloc(tmpl, tb, 0, 0);
+@@ -127,9 +125,6 @@ static int echainiv_aead_create(struct crypto_template *tmpl,
+ 	if (IS_ERR(inst))
+ 		return PTR_ERR(inst);
+ 
+-	spawn = aead_instance_ctx(inst);
+-	alg = crypto_spawn_aead_alg(spawn);
+-
+ 	err = -EINVAL;
+ 	if (inst->alg.ivsize & (sizeof(u64) - 1) || !inst->alg.ivsize)
+ 		goto free_inst;
+-- 
+2.13.6
