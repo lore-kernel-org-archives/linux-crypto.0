@@ -1,87 +1,87 @@
-From: =?utf-8?Q?=C5=81ukasz_Stelmach?= <l.stelmach@samsung.com>
-Subject: Re: [PATCH v2 2/4] crypto: exynos - Improve performance of PRNG
-Date: Tue, 12 Dec 2017 15:49:47 +0100
-Message-ID: <877ets6lx0.fsf%l.stelmach@samsung.com>
-References: <CAJKOXPf-Znkiq49ny=uOuTrY+=LX+CxZOQyqbKTy5EBi5MQSTg@mail.gmail.com>
-        <CGME20171212144953eucas1p2079156cb46dc72e2a73868ca2d88ba05@eucas1p2.samsung.com>
-Mime-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-="; micalg="pgp-sha256";
-        protocol="application/pgp-signature"
-Cc: robh+dt@kernel.org, Stephan Mueller <smueller@chronox.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Kukjin Kim <kgene@kernel.org>, linux-crypto@vger.kernel.org,
-        linux-samsung-soc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Marek Szyprowski <m.szyprowski@samsung.com>,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
-To: Krzysztof Kozlowski <krzk@kernel.org>
+From: Gilad Ben-Yossef <gilad@benyossef.com>
+Subject: [PATCH 00/24] staging: ccree: cleanups and simplification
+Date: Tue, 12 Dec 2017 14:52:46 +0000
+Message-ID: <1513090395-7938-1-git-send-email-gilad@benyossef.com>
+Cc: Ofir Drang <ofir.drang@arm.com>, linux-crypto@vger.kernel.org,
+        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
+        linux-kernel@vger.kernel.org
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mailout2.w1.samsung.com ([210.118.77.12]:41688 "EHLO
-        mailout2.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752294AbdLLOt7 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 12 Dec 2017 09:49:59 -0500
-In-reply-to: <CAJKOXPf-Znkiq49ny=uOuTrY+=LX+CxZOQyqbKTy5EBi5MQSTg@mail.gmail.com>
+Received: from foss.arm.com ([217.140.101.70]:44972 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751729AbdLLOxY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 12 Dec 2017 09:53:24 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
---=-=-=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+More CCREE code cleanup and simplifications, including:
+- Drop code supporting long code synch cipher and hash usage
+- Drop ifdef out code for features not supported by HW
+- More naming convention and name space cleanup
+- Coding style fixes
 
-It was <2017-12-11 pon 15:54>, when Krzysztof Kozlowski wrote:
-> On Mon, Dec 11, 2017 at 3:06 PM, =C5=81ukasz Stelmach <l.stelmach@samsung=
-.com> wrote:
->> Cc: Marek Szyprowski <m.szyprowski@samsung.com>, Bartlomiej
->> Zolnierkiewicz <b.zolnierkie@samsung.com>
->
-> This should not appear here.
+This patch set goes on top of Dan Carpenter's patch entitled
+"staging: ccree: Uninitialized return in ssi_ahash_import()"
+sent to the list.
 
-A glitch in a scripted invocation of git-format-patch, fixed.
+Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 
->> Use memcpy_fromio() instead of custom exynos_rng_copy_random() function
->> to retrieve generated numbers from the registers of PRNG.
->>
->> Rearrange the loop around cpu_relax(). In a loop with while() at the
->> beginning and the cpu_relax() removed the retry variable is decremented
->> twice (down to 98).
->
-> I had troubles with understanding this sentence... and then I figured
-> out that you are referring to some case without cpu_relax(). I do not
-> see how it is relevant to this case. Compare the new code with old,
-> not with some imaginary case without barriers (thus maybe reordered?).
->
-> Your solution is strictly performance oriented so it would be nice to
-> see here the exact difference in numbers justifying the change. But
-> only the change for while() -> do-while(), not mixed with
-> memcpy_fromio.
+Gilad Ben-Yossef (24):
+  staging: ccree: remove ahash wrappers
+  staging: ccree: fix hash naming convention
+  staging: ccree: amend hash func def for readability
+  staging: ccree: func params should follow func name
+  staging: ccree: shorten parameter name
+  staging: ccree: fix func def and decl coding style
+  staging: ccree: simplify expression with local var
+  staging: ccree: fix func call param indentation
+  staging: ccree: fix reg mgr naming convention
+  staging: ccree: fix req mgr func def coding style
+  staging: ccree: remove cipher sync blkcipher remains
+  staging: ccree: fix cipher naming convention
+  staging: ccree: fix cipher func def coding style
+  staging: ccree: fix ivgen naming convention
+  staging: ccree: fix ivgen func def coding style
+  staging: ccree: drop unsupported MULTI2 mode code
+  staging: ccree: remove SSI_CC_HAS_ macros
+  staging: ccree: rename all SSI to CC
+  staging: ccree: rename all DX to CC
+  staging: ccree: rename vars/structs/enums from ssi_ to cc_
+  staging: ccree: fix buf mgr naming convention
+  staging: ccree: fix sram mgr naming convention
+  staging: ccree: simplify freeing SRAM memory address
+  staging: ccree: fix FIPS mgr naming convention
 
-Apparently, after trhough tests, I must admit, the way the status
-register is being polled is insignificant for the performance. I will
-remove from the patch any changes in the loop.
+ drivers/staging/ccree/cc_crypto_ctx.h    |  17 -
+ drivers/staging/ccree/cc_hw_queue_defs.h |   6 +-
+ drivers/staging/ccree/cc_lli_defs.h      |   2 +-
+ drivers/staging/ccree/dx_crys_kernel.h   | 314 +++++------
+ drivers/staging/ccree/dx_host.h          | 262 +++++-----
+ drivers/staging/ccree/dx_reg_common.h    |  10 +-
+ drivers/staging/ccree/ssi_aead.c         | 176 +++----
+ drivers/staging/ccree/ssi_aead.h         |  20 +-
+ drivers/staging/ccree/ssi_buffer_mgr.c   | 320 +++++-------
+ drivers/staging/ccree/ssi_buffer_mgr.h   |  36 +-
+ drivers/staging/ccree/ssi_cipher.c       | 604 ++++++++--------------
+ drivers/staging/ccree/ssi_cipher.h       |  16 +-
+ drivers/staging/ccree/ssi_config.h       |  12 +-
+ drivers/staging/ccree/ssi_driver.c       | 106 ++--
+ drivers/staging/ccree/ssi_driver.h       |  79 ++-
+ drivers/staging/ccree/ssi_fips.c         |  22 +-
+ drivers/staging/ccree/ssi_fips.h         |  22 +-
+ drivers/staging/ccree/ssi_hash.c         | 857 +++++++++++++------------------
+ drivers/staging/ccree/ssi_hash.h         |  30 +-
+ drivers/staging/ccree/ssi_ivgen.c        |  88 ++--
+ drivers/staging/ccree/ssi_ivgen.h        |  24 +-
+ drivers/staging/ccree/ssi_pm.c           |  18 +-
+ drivers/staging/ccree/ssi_pm.h           |  10 +-
+ drivers/staging/ccree/ssi_request_mgr.c  | 136 +++--
+ drivers/staging/ccree/ssi_request_mgr.h  |  23 +-
+ drivers/staging/ccree/ssi_sram_mgr.c     |  31 +-
+ drivers/staging/ccree/ssi_sram_mgr.h     |  29 +-
+ drivers/staging/ccree/ssi_sysfs.c        |  22 +-
+ drivers/staging/ccree/ssi_sysfs.h        |  10 +-
+ 29 files changed, 1419 insertions(+), 1883 deletions(-)
 
-It is the way, the random bytes are copied from the regiesteres, that
-makes the difference (5.9 MB/s vs 7.1 MB/s)
-
-Thank you very much for your assistance in reaching this conclusion.
-
-=2D-=20
-=C5=81ukasz Stelmach
-Samsung R&D Institute Poland
-Samsung Electronics
-
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
-
-iQEcBAEBCAAGBQJaL+yMAAoJELCuHpyYpYAQDDEIAJEkaEUo7tLg/+kYYdmhBa2a
-PgYBu4rSJ/xF4MDLpFOZJCW4iuspSBc2nLjnqScQ0h5C9IDlcQS5cRy400pY9x6U
-X5o6NOPJ8R3QrbUYeMZoUIPuMOzQOMKwPAHdXq6HAx0nPHd4gDLfUIUiInLHHZ9o
-+O9nlOvH/AZ/i4KizNJK4CDpbTV/0tRJWLBs3ajmNxh6kkc/a+RvF3OAojutPre8
-lPY11Q+MyEugnuhVGdU4rrHuJvZ3fUydWtiiCXnZ4vpWgOemNdQjC5yrWXCBkoUu
-fbW8OOGhZphKoNd1iQWuQ4rvCjt3tqetWUcHMNM6aUFuu0XgW1myAq7RJvYE8Ds=
-=L6rH
------END PGP SIGNATURE-----
---=-=-=--
+-- 
+2.7.4
