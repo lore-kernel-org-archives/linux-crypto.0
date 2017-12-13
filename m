@@ -1,9 +1,10 @@
 From: Krzysztof Kozlowski <krzk@kernel.org>
-Subject: Re: [PATCH v3 2/4] crypto: exynos - Improve performance of PRNG
-Date: Wed, 13 Dec 2017 09:07:57 +0100
-Message-ID: <CAJKOXPfs5roMrxg39EU6S2dUmaGmhD6kAx-cSSp3R8CPNR7k8A@mail.gmail.com>
-References: <CGME20171212163611eucas1p2bb80c67eb0e0a8411abcc1f65242c362@eucas1p2.samsung.com>
- <20171212163607.2985-1-l.stelmach@samsung.com> <20171212163607.2985-3-l.stelmach@samsung.com>
+Subject: Re: [PATCH v3 3/4] crypto: exynos - Reseed PRNG after generating 2^16
+ random bytes
+Date: Wed, 13 Dec 2017 09:12:35 +0100
+Message-ID: <CAJKOXPe7M-J7uwm=7n=RvHacqroyHfqjQmVYLRGUBWKcdDmgzw@mail.gmail.com>
+References: <CGME20171212163612eucas1p2a16e3bb7cb36a50ec2c5c88a185c529a@eucas1p2.samsung.com>
+ <20171212163607.2985-1-l.stelmach@samsung.com> <20171212163607.2985-4-l.stelmach@samsung.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8BIT
@@ -15,83 +16,30 @@ Cc: robh+dt@kernel.org, Stephan Mueller <smueller@chronox.de>,
         Marek Szyprowski <m.szyprowski@samsung.com>,
         Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
 To: =?UTF-8?Q?=C5=81ukasz_Stelmach?= <l.stelmach@samsung.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:49556 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750749AbdLMIIA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 13 Dec 2017 03:08:00 -0500
-In-Reply-To: <20171212163607.2985-3-l.stelmach@samsung.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-samsung-soc-owner@vger.kernel.org>
+In-Reply-To: <20171212163607.2985-4-l.stelmach@samsung.com>
+Sender: linux-samsung-soc-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
 On Tue, Dec 12, 2017 at 5:36 PM, Łukasz Stelmach <l.stelmach@samsung.com> wrote:
-> Use memcpy_fromio() instead of custom exynos_rng_copy_random() function
-> to retrieve generated numbers from the registers of PRNG.
+> Reseed PRNG after reading 65 kB of randomness. Although this may reduce
+> performance, in most cases the loss is not noticeable. Also the time
+> based threshold for reseeding is changed to one second. Reseeding is
+> performed whenever either limit is exceeded.
+>
+> Reseeding of a PRNG does not increase entropy, but it helps preventing
+> backtracking the internal state of the device from its output sequence,
+> and hence, prevents potential attacker from predicting numbers to be
+> generated.
+>
+> Signed-off-by: Łukasz Stelmach <l.stelmach@samsung.com>
+> Reviewed-by: Stephan Mueller <smueller@chronox.de>
+> ---
+>  drivers/crypto/exynos-rng.c | 15 +++++++++++----
+>  1 file changed, 11 insertions(+), 4 deletions(-)
+>
 
-If I recall correctly, you mentioned before that it improves the
-performance. If so it would be nice to mention some numbers here.
-
-Anyway it is fine with me:
 Reviewed-by: Krzysztof Kozlowski <krzk@kernel.org>
 
 Best regards,
 Krzysztof
-
->
-> Signed-off-by: Łukasz Stelmach <l.stelmach@samsung.com>
-> ---
->  drivers/crypto/exynos-rng.c | 31 ++-----------------------------
->  1 file changed, 2 insertions(+), 29 deletions(-)
->
-> diff --git a/drivers/crypto/exynos-rng.c b/drivers/crypto/exynos-rng.c
-> index 825c09619eb8..dcdd444d0b3b 100644
-> --- a/drivers/crypto/exynos-rng.c
-> +++ b/drivers/crypto/exynos-rng.c
-> @@ -131,34 +131,6 @@ static int exynos_rng_set_seed(struct exynos_rng_dev *rng,
->  }
->
->  /*
-> - * Read from output registers and put the data under 'dst' array,
-> - * up to dlen bytes.
-> - *
-> - * Returns number of bytes actually stored in 'dst' (dlen
-> - * or EXYNOS_RNG_SEED_SIZE).
-> - */
-> -static unsigned int exynos_rng_copy_random(struct exynos_rng_dev *rng,
-> -                                          u8 *dst, unsigned int dlen)
-> -{
-> -       unsigned int cnt = 0;
-> -       int i, j;
-> -       u32 val;
-> -
-> -       for (j = 0; j < EXYNOS_RNG_SEED_REGS; j++) {
-> -               val = exynos_rng_readl(rng, EXYNOS_RNG_OUT(j));
-> -
-> -               for (i = 0; i < 4; i++) {
-> -                       dst[cnt] = val & 0xff;
-> -                       val >>= 8;
-> -                       if (++cnt >= dlen)
-> -                               return cnt;
-> -               }
-> -       }
-> -
-> -       return cnt;
-> -}
-> -
-> -/*
->   * Start the engine and poll for finish.  Then read from output registers
->   * filling the 'dst' buffer up to 'dlen' bytes or up to size of generated
->   * random data (EXYNOS_RNG_SEED_SIZE).
-> @@ -190,7 +162,8 @@ static int exynos_rng_get_random(struct exynos_rng_dev *rng,
->         /* Clear status bit */
->         exynos_rng_writel(rng, EXYNOS_RNG_STATUS_RNG_DONE,
->                           EXYNOS_RNG_STATUS);
-> -       *read = exynos_rng_copy_random(rng, dst, dlen);
-> +       *read = min_t(size_t, dlen, EXYNOS_RNG_SEED_SIZE);
-> +       memcpy_fromio(dst, rng->mem + EXYNOS_RNG_OUT_BASE, *read);
->
->         return 0;
->  }
-> --
-> 2.11.0
->
