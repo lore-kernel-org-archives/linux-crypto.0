@@ -1,152 +1,59 @@
-From: Sabrina Dubroca <sd@queasysnail.net>
-Subject: [PATCH crypto] crypto: aesni - add wrapper for generic gcm(aes)
-Date: Wed, 13 Dec 2017 14:54:36 +0100
-Message-ID: <0a60d233428e2e9bca747a29712688b6e66b59ac.1513172421.git.sd@queasysnail.net>
-Cc: linux-kernel@vger.kernel.org, sbrivio@redhat.com,
-        herbert@gondor.apana.org.au, ilyal@mellanox.com,
-        Sabrina Dubroca <sd@queasysnail.net>
-To: linux-crypto@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Georg Sauthoff <mail@georg.so>
+Subject: Encrypt selftest fails with qat_c3xxx
+Date: Wed, 13 Dec 2017 20:27:58 +0100
+Message-ID: <20171213192758.GA24992@dell12.lru.li>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Salvatore Benedetto <salvatore.benedetto@intel.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Pablo Marcos Oltra <pablo.marcos.oltra@intel.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: qat-linux@intel.com
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from escher.lru.li ([217.146.132.159]:56826 "EHLO escher.lru.li"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1753130AbdLMThj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 13 Dec 2017 14:37:39 -0500
+Content-Disposition: inline
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-When I added generic-gcm-aes I didn't add a wrapper like the one
-provided for rfc4106(gcm(aes)). We need to add a cryptd wrapper to fall
-back on in case the FPU is not available, otherwise we might corrupt the
-FPU state.
+Hello,
 
-Fixes: cce2ea8d90fe ("crypto: aesni - add generic gcm(aes)")
-Reported-by: Ilya Lesokhin <ilyal@mellanox.com>
-Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
-Reviewed-by: Stefano Brivio <sbrivio@redhat.com>
----
- arch/x86/crypto/aesni-intel_glue.c | 66 +++++++++++++++++++++++++++++++-------
- 1 file changed, 54 insertions(+), 12 deletions(-)
+running Fedora 27 on an Intel Atom C3758 CPU Supermicro system
+(A2SDi-8C+-HLN4F) I've noticed that crypto selftests fail when the
+qat_c3xxx module is loaded (it is loaded, by default). That means that
+stuff like `modprobe dm-crypt`, `cryptsetup benchmark` and `cryptsetup
+luksOpen` fail.
 
-diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
-index 8981ed1eb7ad..a5ee78d723cd 100644
---- a/arch/x86/crypto/aesni-intel_glue.c
-+++ b/arch/x86/crypto/aesni-intel_glue.c
-@@ -690,8 +690,8 @@ static int common_rfc4106_set_key(struct crypto_aead *aead, const u8 *key,
- 	       rfc4106_set_hash_subkey(ctx->hash_subkey, key, key_len);
- }
- 
--static int rfc4106_set_key(struct crypto_aead *parent, const u8 *key,
--			   unsigned int key_len)
-+static int gcmaes_wrapper_set_key(struct crypto_aead *parent, const u8 *key,
-+				  unsigned int key_len)
- {
- 	struct cryptd_aead **ctx = crypto_aead_ctx(parent);
- 	struct cryptd_aead *cryptd_tfm = *ctx;
-@@ -716,8 +716,8 @@ static int common_rfc4106_set_authsize(struct crypto_aead *aead,
- 
- /* This is the Integrity Check Value (aka the authentication tag length and can
-  * be 8, 12 or 16 bytes long. */
--static int rfc4106_set_authsize(struct crypto_aead *parent,
--				unsigned int authsize)
-+static int gcmaes_wrapper_set_authsize(struct crypto_aead *parent,
-+				       unsigned int authsize)
- {
- 	struct cryptd_aead **ctx = crypto_aead_ctx(parent);
- 	struct cryptd_aead *cryptd_tfm = *ctx;
-@@ -929,7 +929,7 @@ static int helper_rfc4106_decrypt(struct aead_request *req)
- 			      aes_ctx);
- }
- 
--static int rfc4106_encrypt(struct aead_request *req)
-+static int gcmaes_wrapper_encrypt(struct aead_request *req)
- {
- 	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
- 	struct cryptd_aead **ctx = crypto_aead_ctx(tfm);
-@@ -945,7 +945,7 @@ static int rfc4106_encrypt(struct aead_request *req)
- 	return crypto_aead_encrypt(req);
- }
- 
--static int rfc4106_decrypt(struct aead_request *req)
-+static int gcmaes_wrapper_decrypt(struct aead_request *req)
- {
- 	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
- 	struct cryptd_aead **ctx = crypto_aead_ctx(tfm);
-@@ -1128,6 +1128,30 @@ static int generic_gcmaes_decrypt(struct aead_request *req)
- 			      aes_ctx);
- }
- 
-+static int generic_gcmaes_init(struct crypto_aead *aead)
-+{
-+	struct cryptd_aead *cryptd_tfm;
-+	struct cryptd_aead **ctx = crypto_aead_ctx(aead);
-+
-+	cryptd_tfm = cryptd_alloc_aead("__driver-generic-gcm-aes-aesni",
-+				       CRYPTO_ALG_INTERNAL,
-+				       CRYPTO_ALG_INTERNAL);
-+	if (IS_ERR(cryptd_tfm))
-+		return PTR_ERR(cryptd_tfm);
-+
-+	*ctx = cryptd_tfm;
-+	crypto_aead_set_reqsize(aead, crypto_aead_reqsize(&cryptd_tfm->base));
-+
-+	return 0;
-+}
-+
-+static void generic_gcmaes_exit(struct crypto_aead *aead)
-+{
-+	struct cryptd_aead **ctx = crypto_aead_ctx(aead);
-+
-+	cryptd_free_aead(*ctx);
-+}
-+
- static struct aead_alg aesni_aead_algs[] = { {
- 	.setkey			= common_rfc4106_set_key,
- 	.setauthsize		= common_rfc4106_set_authsize,
-@@ -1147,10 +1171,10 @@ static struct aead_alg aesni_aead_algs[] = { {
- }, {
- 	.init			= rfc4106_init,
- 	.exit			= rfc4106_exit,
--	.setkey			= rfc4106_set_key,
--	.setauthsize		= rfc4106_set_authsize,
--	.encrypt		= rfc4106_encrypt,
--	.decrypt		= rfc4106_decrypt,
-+	.setkey			= gcmaes_wrapper_set_key,
-+	.setauthsize		= gcmaes_wrapper_set_authsize,
-+	.encrypt		= gcmaes_wrapper_encrypt,
-+	.decrypt		= gcmaes_wrapper_decrypt,
- 	.ivsize			= GCM_RFC4106_IV_SIZE,
- 	.maxauthsize		= 16,
- 	.base = {
-@@ -1169,14 +1193,32 @@ static struct aead_alg aesni_aead_algs[] = { {
- 	.decrypt		= generic_gcmaes_decrypt,
- 	.ivsize			= GCM_AES_IV_SIZE,
- 	.maxauthsize		= 16,
-+	.base = {
-+		.cra_name		= "__generic-gcm-aes-aesni",
-+		.cra_driver_name	= "__driver-generic-gcm-aes-aesni",
-+		.cra_priority		= 0,
-+		.cra_flags		= CRYPTO_ALG_INTERNAL,
-+		.cra_blocksize		= 1,
-+		.cra_ctxsize		= sizeof(struct generic_gcmaes_ctx),
-+		.cra_alignmask		= AESNI_ALIGN - 1,
-+		.cra_module		= THIS_MODULE,
-+	},
-+}, {
-+	.init			= generic_gcmaes_init,
-+	.exit			= generic_gcmaes_exit,
-+	.setkey			= gcmaes_wrapper_set_key,
-+	.setauthsize		= gcmaes_wrapper_set_authsize,
-+	.encrypt		= gcmaes_wrapper_encrypt,
-+	.decrypt		= gcmaes_wrapper_decrypt,
-+	.ivsize			= GCM_AES_IV_SIZE,
-+	.maxauthsize		= 16,
- 	.base = {
- 		.cra_name		= "gcm(aes)",
- 		.cra_driver_name	= "generic-gcm-aesni",
- 		.cra_priority		= 400,
- 		.cra_flags		= CRYPTO_ALG_ASYNC,
- 		.cra_blocksize		= 1,
--		.cra_ctxsize		= sizeof(struct generic_gcmaes_ctx),
--		.cra_alignmask		= AESNI_ALIGN - 1,
-+		.cra_ctxsize		= sizeof(struct cryptd_aead *),
- 		.cra_module		= THIS_MODULE,
- 	},
- } };
+The kernel log then contains the following messages:
+
+alg: akcipher: encrypt test failed. err -22
+alg: akcipher: test 1 failed for pkcs1pad(qat-rsa,sha256), err=-22
+
+When I blacklist the qat_c3xxx/intel_qat modules the crypto works
+as expected.
+
+I can reproduce this issue with 4.14.3-300.fc27.x86_64,
+kernel-4.13.16-302.fc27.x86_64 and kernel-4.13.9-300.fc27.x86-64.
+
+See also my report in the Fedora bug tracker:
+
+https://bugzilla.redhat.com/show_bug.cgi?id=1522962#c5
+
+The loaded firmware has this checksum:
+
+md5sum /lib/firmware/qat_c3xxx_mmp.bin
+fb7deea913d87aed7676222269a593e6  /lib/firmware/qat_c3xxx_mmp.bin
+
+Is this an issue with the driver, the firmware or does the QAT
+co-processor need some additional setup?
+
+Best regards
+Georg
 -- 
-2.15.1
+'(EE) Caught signal 11 (Segmentation fault). Server aborting
+ (EE) Please also check the log file at "/dev/null" for additional information.'
+(Fedora 21, gdm-Xorg)
