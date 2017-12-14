@@ -1,50 +1,42 @@
-From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH 09/10] staging: ccree: fix fips event irq handling build
-Date: Thu, 14 Dec 2017 14:02:46 +0000
-Message-ID: <1513260170-26346-10-git-send-email-gilad@benyossef.com>
-References: <1513260170-26346-1-git-send-email-gilad@benyossef.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: devel@driverdev.osuosl.org, driverdev-devel@linuxdriverproject.org,
- linux-kernel@vger.kernel.org, stable@vger.kernel.org,
- linux-crypto@vger.kernel.org, Ofir Drang <ofir.drang@arm.com>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
-In-Reply-To: <1513260170-26346-1-git-send-email-gilad@benyossef.com>
-List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
-List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
-List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
-List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
-List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
-Errors-To: driverdev-devel-bounces@linuxdriverproject.org
-Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
-List-Id: linux-crypto.vger.kernel.org
+From: Antoine Tenart <antoine.tenart@free-electrons.com>
+Subject: [PATCH 01/17] crypto: inside-secure - remove extra empty line
+Date: Thu, 14 Dec 2017 15:26:43 +0100
+Message-ID: <20171214142659.16987-2-antoine.tenart@free-electrons.com>
+References: <20171214142659.16987-1-antoine.tenart@free-electrons.com>
+Cc: Antoine Tenart <antoine.tenart@free-electrons.com>,
+        thomas.petazzoni@free-electrons.com,
+        gregory.clement@free-electrons.com,
+        miquel.raynal@free-electrons.com, oferh@marvell.com,
+        igall@marvell.com, nadavh@marvell.com, linux-crypto@vger.kernel.org
+To: herbert@gondor.apana.org.au, davem@davemloft.net
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.free-electrons.com ([62.4.15.54]:36741 "EHLO
+        mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753123AbdLNOaD (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 14 Dec 2017 09:30:03 -0500
+In-Reply-To: <20171214142659.16987-1-antoine.tenart@free-electrons.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-When moving from internal for kernel FIPS infrastructure the FIPS event irq
-handling code was left with the old ifdef by mistake. Fix it.
+Cosmetic patch removing an extra empty line between header inclusions.
 
-Fixes: b7e607bf33a2 ("staging: ccree: move FIPS support to kernel infrastructure")
-Cc: stable@vger.kernel.org
-Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+Signed-off-by: Antoine Tenart <antoine.tenart@free-electrons.com>
 ---
- drivers/staging/ccree/ssi_driver.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/crypto/inside-secure/safexcel_hash.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/drivers/staging/ccree/ssi_driver.c b/drivers/staging/ccree/ssi_driver.c
-index df6d415..56b5d45 100644
---- a/drivers/staging/ccree/ssi_driver.c
-+++ b/drivers/staging/ccree/ssi_driver.c
-@@ -123,7 +123,7 @@ static irqreturn_t cc_isr(int irq, void *dev_id)
- 		irr &= ~CC_COMP_IRQ_MASK;
- 		complete_request(drvdata);
- 	}
--#ifdef CC_SUPPORT_FIPS
-+#ifdef CONFIG_CRYPTO_FIPS
- 	/* TEE FIPS interrupt */
- 	if (irr & CC_GPR0_IRQ_MASK) {
- 		/* Mask interrupt - will be unmasked in Deferred service
+diff --git a/drivers/crypto/inside-secure/safexcel_hash.c b/drivers/crypto/inside-secure/safexcel_hash.c
+index 0c5a5820b06e..d2d4551565fa 100644
+--- a/drivers/crypto/inside-secure/safexcel_hash.c
++++ b/drivers/crypto/inside-secure/safexcel_hash.c
+@@ -14,7 +14,6 @@
+ #include <linux/dma-mapping.h>
+ #include <linux/dmapool.h>
+ 
+-
+ #include "safexcel.h"
+ 
+ struct safexcel_ahash_ctx {
 -- 
-2.7.4
+2.14.3
