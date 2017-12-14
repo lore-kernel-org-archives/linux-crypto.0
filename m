@@ -1,7 +1,7 @@
 From: Antoine Tenart <antoine.tenart@free-electrons.com>
-Subject: [PATCH 14/17] crypto: inside-secure - handle more result requests when counter is full
-Date: Thu, 14 Dec 2017 15:26:56 +0100
-Message-ID: <20171214142659.16987-15-antoine.tenart@free-electrons.com>
+Subject: [PATCH 17/17] Documentation/bindings: crypto: document the SafeXcel EIP97 compatible
+Date: Thu, 14 Dec 2017 15:26:59 +0100
+Message-ID: <20171214142659.16987-18-antoine.tenart@free-electrons.com>
 References: <20171214142659.16987-1-antoine.tenart@free-electrons.com>
 Cc: Antoine Tenart <antoine.tenart@free-electrons.com>,
         thomas.petazzoni@free-electrons.com,
@@ -10,74 +10,36 @@ Cc: Antoine Tenart <antoine.tenart@free-electrons.com>,
         igall@marvell.com, nadavh@marvell.com, linux-crypto@vger.kernel.org
 To: herbert@gondor.apana.org.au, davem@davemloft.net
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.free-electrons.com ([62.4.15.54]:36779 "EHLO
+Received: from mail.free-electrons.com ([62.4.15.54]:36777 "EHLO
         mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753166AbdLNOaI (ORCPT
+        with ESMTP id S1753141AbdLNOaF (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 14 Dec 2017 09:30:08 -0500
+        Thu, 14 Dec 2017 09:30:05 -0500
 In-Reply-To: <20171214142659.16987-1-antoine.tenart@free-electrons.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch modifies the result handling logic to continue handling
-results when the completed requests counter is full and not showing the
-actual number of requests to handle.
+This patch adds the SafeXcel EIP97 compatible to the Inside Secure
+device tree bindings documentation.
 
-Suggested-by: Ofer Heifetz <oferh@marvell.com>
 Signed-off-by: Antoine Tenart <antoine.tenart@free-electrons.com>
 ---
- drivers/crypto/inside-secure/safexcel.c | 15 ++++++++++++---
- drivers/crypto/inside-secure/safexcel.h |  2 ++
- 2 files changed, 14 insertions(+), 3 deletions(-)
+ Documentation/devicetree/bindings/crypto/inside-secure-safexcel.txt | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/inside-secure/safexcel.c
-index 36c9a72c47b1..8042922b4ed8 100644
---- a/drivers/crypto/inside-secure/safexcel.c
-+++ b/drivers/crypto/inside-secure/safexcel.c
-@@ -600,12 +600,15 @@ static inline void safexcel_handle_result_descriptor(struct safexcel_crypto_priv
- {
- 	struct safexcel_request *sreq;
- 	struct safexcel_context *ctx;
--	int ret, i, nreq, ndesc = 0, tot_descs = 0, done;
-+	int ret, i, nreq, ndesc, tot_descs, done;
- 	bool should_complete;
+diff --git a/Documentation/devicetree/bindings/crypto/inside-secure-safexcel.txt b/Documentation/devicetree/bindings/crypto/inside-secure-safexcel.txt
+index fbc07d12322f..30c3ce6b502e 100644
+--- a/Documentation/devicetree/bindings/crypto/inside-secure-safexcel.txt
++++ b/Documentation/devicetree/bindings/crypto/inside-secure-safexcel.txt
+@@ -1,7 +1,8 @@
+ Inside Secure SafeXcel cryptographic engine
  
-+handle_results:
-+	tot_descs = 0;
-+
- 	nreq = readl(priv->base + EIP197_HIA_RDR(ring) + EIP197_HIA_xDR_PROC_COUNT);
--	nreq >>= 24;
--	nreq &= GENMASK(6, 0);
-+	nreq >>= EIP197_xDR_PROC_xD_PKT_OFFSET;
-+	nreq &= EIP197_xDR_PROC_xD_PKT_MASK;
- 	if (!nreq)
- 		goto requests_left;
- 
-@@ -642,6 +645,12 @@ static inline void safexcel_handle_result_descriptor(struct safexcel_crypto_priv
- 		       priv->base + EIP197_HIA_RDR(ring) + EIP197_HIA_xDR_PROC_COUNT);
- 	}
- 
-+	/* If the number of requests overflowed the counter, try to proceed more
-+	 * requests.
-+	 */
-+	if (nreq == EIP197_xDR_PROC_xD_PKT_MASK)
-+		goto handle_results;
-+
- requests_left:
- 	spin_lock_bh(&priv->ring[ring].egress_lock);
- 
-diff --git a/drivers/crypto/inside-secure/safexcel.h b/drivers/crypto/inside-secure/safexcel.h
-index 2a0ab6ce716a..0c47e792192d 100644
---- a/drivers/crypto/inside-secure/safexcel.h
-+++ b/drivers/crypto/inside-secure/safexcel.h
-@@ -117,6 +117,8 @@
- #define EIP197_xDR_PREP_CLR_COUNT		BIT(31)
- 
- /* EIP197_HIA_xDR_PROC_COUNT */
-+#define EIP197_xDR_PROC_xD_PKT_OFFSET		24
-+#define EIP197_xDR_PROC_xD_PKT_MASK		GENMASK(6, 0)
- #define EIP197_xDR_PROC_xD_COUNT(n)		((n) << 2)
- #define EIP197_xDR_PROC_xD_PKT(n)		((n) << 24)
- #define EIP197_xDR_PROC_CLR_COUNT		BIT(31)
+ Required properties:
+-- compatible: Should be "inside-secure,safexcel-eip197".
++- compatible: Should be "inside-secure,safexcel-eip197" or
++              "inside-secure,safexcel-eip97".
+ - reg: Base physical address of the engine and length of memory mapped region.
+ - interrupts: Interrupt numbers for the rings and engine.
+ - interrupt-names: Should be "ring0", "ring1", "ring2", "ring3", "eip", "mem".
 -- 
 2.14.3
