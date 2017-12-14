@@ -1,92 +1,75 @@
 From: Antoine Tenart <antoine.tenart@free-electrons.com>
-Subject: [PATCH 07/17] crypto: inside-secure - move cipher crypto mode to request context
-Date: Thu, 14 Dec 2017 15:26:49 +0100
-Message-ID: <20171214142659.16987-8-antoine.tenart@free-electrons.com>
+Subject: [PATCH 13/17] crypto: inside-secure - acknowledge the result requests all at once
+Date: Thu, 14 Dec 2017 15:26:55 +0100
+Message-ID: <20171214142659.16987-14-antoine.tenart@free-electrons.com>
 References: <20171214142659.16987-1-antoine.tenart@free-electrons.com>
-Cc: Ofer Heifetz <oferh@marvell.com>,
+Cc: Antoine Tenart <antoine.tenart@free-electrons.com>,
         thomas.petazzoni@free-electrons.com,
         gregory.clement@free-electrons.com,
-        miquel.raynal@free-electrons.com, igall@marvell.com,
-        nadavh@marvell.com, linux-crypto@vger.kernel.org,
-        Antoine Tenart <antoine.tenart@free-electrons.com>
+        miquel.raynal@free-electrons.com, oferh@marvell.com,
+        igall@marvell.com, nadavh@marvell.com, linux-crypto@vger.kernel.org
 To: herbert@gondor.apana.org.au, davem@davemloft.net
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.free-electrons.com ([62.4.15.54]:36767 "EHLO
+Received: from mail.free-electrons.com ([62.4.15.54]:36771 "EHLO
         mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753149AbdLNOaF (ORCPT
+        with ESMTP id S1753164AbdLNOaI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 14 Dec 2017 09:30:05 -0500
+        Thu, 14 Dec 2017 09:30:08 -0500
 In-Reply-To: <20171214142659.16987-1-antoine.tenart@free-electrons.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Ofer Heifetz <oferh@marvell.com>
+This patches moves the result request acknowledgment from a per request
+process to acknowledging all the result requests handled at once.
 
-The cipher direction can be different for requests within the same
-transformation context. This patch moves the direction flag from the
-context to the request scope.
-
-Signed-off-by: Ofer Heifetz <oferh@marvell.com>
-[Antoine: commit message]
+Suggested-by: Ofer Heifetz <oferh@marvell.com>
 Signed-off-by: Antoine Tenart <antoine.tenart@free-electrons.com>
 ---
- drivers/crypto/inside-secure/safexcel_cipher.c | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+ drivers/crypto/inside-secure/safexcel.c | 16 ++++++++++------
+ 1 file changed, 10 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/crypto/inside-secure/safexcel_cipher.c b/drivers/crypto/inside-secure/safexcel_cipher.c
-index 794849b859a7..62382a7c4cbe 100644
---- a/drivers/crypto/inside-secure/safexcel_cipher.c
-+++ b/drivers/crypto/inside-secure/safexcel_cipher.c
-@@ -27,7 +27,6 @@ struct safexcel_cipher_ctx {
- 	struct safexcel_context base;
- 	struct safexcel_crypto_priv *priv;
- 
--	enum safexcel_cipher_direction direction;
- 	u32 mode;
- 
- 	__le32 key[8];
-@@ -35,6 +34,7 @@ struct safexcel_cipher_ctx {
- };
- 
- struct safexcel_cipher_req {
-+	enum safexcel_cipher_direction direction;
- 	bool needs_inv;
- };
- 
-@@ -97,12 +97,15 @@ static int safexcel_aes_setkey(struct crypto_skcipher *ctfm, const u8 *key,
- }
- 
- static int safexcel_context_control(struct safexcel_cipher_ctx *ctx,
-+				    struct crypto_async_request *async,
- 				    struct safexcel_command_desc *cdesc)
+diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/inside-secure/safexcel.c
+index db7ad9d3eeed..36c9a72c47b1 100644
+--- a/drivers/crypto/inside-secure/safexcel.c
++++ b/drivers/crypto/inside-secure/safexcel.c
+@@ -600,7 +600,7 @@ static inline void safexcel_handle_result_descriptor(struct safexcel_crypto_priv
  {
- 	struct safexcel_crypto_priv *priv = ctx->priv;
-+	struct skcipher_request *req = skcipher_request_cast(async);
-+	struct safexcel_cipher_req *sreq = skcipher_request_ctx(req);
- 	int ctrl_size;
+ 	struct safexcel_request *sreq;
+ 	struct safexcel_context *ctx;
+-	int ret, i, nreq, ndesc = 0, done;
++	int ret, i, nreq, ndesc = 0, tot_descs = 0, done;
+ 	bool should_complete;
  
--	if (ctx->direction == SAFEXCEL_ENCRYPT)
-+	if (sreq->direction == SAFEXCEL_ENCRYPT)
- 		cdesc->control_data.control0 |= CONTEXT_CONTROL_TYPE_CRYPTO_OUT;
- 	else
- 		cdesc->control_data.control0 |= CONTEXT_CONTROL_TYPE_CRYPTO_IN;
-@@ -245,7 +248,7 @@ static int safexcel_aes_send(struct crypto_async_request *async,
- 		n_cdesc++;
- 
- 		if (n_cdesc == 1) {
--			safexcel_context_control(ctx, cdesc);
-+			safexcel_context_control(ctx, async, cdesc);
- 			safexcel_cipher_token(ctx, async, cdesc, req->cryptlen);
+ 	nreq = readl(priv->base + EIP197_HIA_RDR(ring) + EIP197_HIA_xDR_PROC_COUNT);
+@@ -622,13 +622,9 @@ static inline void safexcel_handle_result_descriptor(struct safexcel_crypto_priv
+ 		if (ndesc < 0) {
+ 			kfree(sreq);
+ 			dev_err(priv->dev, "failed to handle result (%d)", ndesc);
+-			goto requests_left;
++			goto acknowledge;
  		}
  
-@@ -469,7 +472,7 @@ static int safexcel_aes(struct skcipher_request *req,
- 	int ret, ring;
+-		writel(EIP197_xDR_PROC_xD_PKT(1) |
+-		       EIP197_xDR_PROC_xD_COUNT(ndesc * priv->config.rd_offset),
+-		       priv->base + EIP197_HIA_RDR(ring) + EIP197_HIA_xDR_PROC_COUNT);
+-
+ 		if (should_complete) {
+ 			local_bh_disable();
+ 			sreq->req->complete(sreq->req, ret);
+@@ -636,6 +632,14 @@ static inline void safexcel_handle_result_descriptor(struct safexcel_crypto_priv
+ 		}
  
- 	sreq->needs_inv = false;
--	ctx->direction = dir;
-+	sreq->direction = dir;
- 	ctx->mode = mode;
+ 		kfree(sreq);
++		tot_descs += ndesc;
++	}
++
++acknowledge:
++	if (i) {
++		writel(EIP197_xDR_PROC_xD_PKT(i) |
++		       EIP197_xDR_PROC_xD_COUNT(tot_descs * priv->config.rd_offset),
++		       priv->base + EIP197_HIA_RDR(ring) + EIP197_HIA_xDR_PROC_COUNT);
+ 	}
  
- 	if (ctx->base.ctxr) {
+ requests_left:
 -- 
 2.14.3
