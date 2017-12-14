@@ -1,7 +1,7 @@
 From: Antoine Tenart <antoine.tenart@free-electrons.com>
-Subject: [PATCH 13/17] crypto: inside-secure - acknowledge the result requests all at once
-Date: Thu, 14 Dec 2017 15:26:55 +0100
-Message-ID: <20171214142659.16987-14-antoine.tenart@free-electrons.com>
+Subject: [PATCH 11/17] crypto: inside-secure - dequeue all requests at once
+Date: Thu, 14 Dec 2017 15:26:53 +0100
+Message-ID: <20171214142659.16987-12-antoine.tenart@free-electrons.com>
 References: <20171214142659.16987-1-antoine.tenart@free-electrons.com>
 Cc: Antoine Tenart <antoine.tenart@free-electrons.com>,
         thomas.petazzoni@free-electrons.com,
@@ -10,66 +10,184 @@ Cc: Antoine Tenart <antoine.tenart@free-electrons.com>,
         igall@marvell.com, nadavh@marvell.com, linux-crypto@vger.kernel.org
 To: herbert@gondor.apana.org.au, davem@davemloft.net
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.free-electrons.com ([62.4.15.54]:36771 "EHLO
+Received: from mail.free-electrons.com ([62.4.15.54]:36797 "EHLO
         mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753164AbdLNOaI (ORCPT
+        with ESMTP id S1753161AbdLNOaH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 14 Dec 2017 09:30:08 -0500
+        Thu, 14 Dec 2017 09:30:07 -0500
 In-Reply-To: <20171214142659.16987-1-antoine.tenart@free-electrons.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patches moves the result request acknowledgment from a per request
-process to acknowledging all the result requests handled at once.
+This patch updates the dequeueing logic to dequeue all requests at once.
+Since we can have many requests in the queue, the interrupt coalescing
+is kept so that the ring interrupt fires every EIP197_MAX_BATCH_SZ at
+most.
+
+To allow dequeueing all requests at once while still using reasonable
+settings for the interrupt coalescing, the result handling function was
+updated to setup the threshold interrupt when needed (i.e. when more
+requests than EIP197_MAX_BATCH_SZ are in the queue). When using this
+capability the ring is marked as busy so that the dequeue function
+enqueue new requests without setting the threshold interrupt.
 
 Suggested-by: Ofer Heifetz <oferh@marvell.com>
 Signed-off-by: Antoine Tenart <antoine.tenart@free-electrons.com>
 ---
- drivers/crypto/inside-secure/safexcel.c | 16 ++++++++++------
- 1 file changed, 10 insertions(+), 6 deletions(-)
+ drivers/crypto/inside-secure/safexcel.c | 60 ++++++++++++++++++++++++++-------
+ drivers/crypto/inside-secure/safexcel.h |  8 +++++
+ 2 files changed, 56 insertions(+), 12 deletions(-)
 
 diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/inside-secure/safexcel.c
-index db7ad9d3eeed..36c9a72c47b1 100644
+index aa4943cad55e..db7ad9d3eeed 100644
 --- a/drivers/crypto/inside-secure/safexcel.c
 +++ b/drivers/crypto/inside-secure/safexcel.c
-@@ -600,7 +600,7 @@ static inline void safexcel_handle_result_descriptor(struct safexcel_crypto_priv
+@@ -422,6 +422,23 @@ static int safexcel_hw_init(struct safexcel_crypto_priv *priv)
+ 	return 0;
+ }
+ 
++/* Called with ring's lock taken */
++int safexcel_try_push_requests(struct safexcel_crypto_priv *priv, int ring,
++			       int reqs)
++{
++	int coal = min_t(int, reqs, EIP197_MAX_BATCH_SZ);
++
++	if (!coal)
++		return 0;
++
++	/* Configure when we want an interrupt */
++	writel(EIP197_HIA_RDR_THRESH_PKT_MODE |
++	       EIP197_HIA_RDR_THRESH_PROC_PKT(coal),
++	       priv->base + EIP197_HIA_RDR(ring) + EIP197_HIA_xDR_THRESH);
++
++	return coal;
++}
++
+ void safexcel_dequeue(struct safexcel_crypto_priv *priv, int ring)
+ {
+ 	struct crypto_async_request *req, *backlog;
+@@ -429,7 +446,7 @@ void safexcel_dequeue(struct safexcel_crypto_priv *priv, int ring)
+ 	struct safexcel_request *request;
+ 	int ret, nreq = 0, cdesc = 0, rdesc = 0, commands, results;
+ 
+-	do {
++	while (true) {
+ 		spin_lock_bh(&priv->ring[ring].queue_lock);
+ 		backlog = crypto_get_backlog(&priv->ring[ring].queue);
+ 		req = crypto_dequeue_request(&priv->ring[ring].queue);
+@@ -463,18 +480,24 @@ void safexcel_dequeue(struct safexcel_crypto_priv *priv, int ring)
+ 
+ 		cdesc += commands;
+ 		rdesc += results;
+-	} while (nreq++ < EIP197_MAX_BATCH_SZ);
++		nreq++;
++	}
+ 
+ finalize:
+ 	if (!nreq)
+ 		return;
+ 
+-	spin_lock_bh(&priv->ring[ring].lock);
++	spin_lock_bh(&priv->ring[ring].egress_lock);
+ 
+-	/* Configure when we want an interrupt */
+-	writel(EIP197_HIA_RDR_THRESH_PKT_MODE |
+-	       EIP197_HIA_RDR_THRESH_PROC_PKT(nreq),
+-	       priv->base + EIP197_HIA_RDR(ring) + EIP197_HIA_xDR_THRESH);
++	if (!priv->ring[ring].busy) {
++		nreq -= safexcel_try_push_requests(priv, ring, nreq);
++		if (nreq)
++			priv->ring[ring].busy = true;
++	}
++
++	priv->ring[ring].requests_left += nreq;
++
++	spin_unlock_bh(&priv->ring[ring].egress_lock);
+ 
+ 	/* let the RDR know we have pending descriptors */
+ 	writel((rdesc * priv->config.rd_offset) << 2,
+@@ -483,8 +506,6 @@ void safexcel_dequeue(struct safexcel_crypto_priv *priv, int ring)
+ 	/* let the CDR know we have pending descriptors */
+ 	writel((cdesc * priv->config.cd_offset) << 2,
+ 	       priv->base + EIP197_HIA_CDR(ring) + EIP197_HIA_xDR_PREP_COUNT);
+-
+-	spin_unlock_bh(&priv->ring[ring].lock);
+ }
+ 
+ void safexcel_free_context(struct safexcel_crypto_priv *priv,
+@@ -579,14 +600,14 @@ static inline void safexcel_handle_result_descriptor(struct safexcel_crypto_priv
  {
  	struct safexcel_request *sreq;
  	struct safexcel_context *ctx;
--	int ret, i, nreq, ndesc = 0, done;
-+	int ret, i, nreq, ndesc = 0, tot_descs = 0, done;
+-	int ret, i, nreq, ndesc = 0;
++	int ret, i, nreq, ndesc = 0, done;
  	bool should_complete;
  
  	nreq = readl(priv->base + EIP197_HIA_RDR(ring) + EIP197_HIA_xDR_PROC_COUNT);
-@@ -622,13 +622,9 @@ static inline void safexcel_handle_result_descriptor(struct safexcel_crypto_priv
+ 	nreq >>= 24;
+ 	nreq &= GENMASK(6, 0);
+ 	if (!nreq)
+-		return;
++		goto requests_left;
+ 
+ 	for (i = 0; i < nreq; i++) {
+ 		spin_lock_bh(&priv->ring[ring].egress_lock);
+@@ -601,7 +622,7 @@ static inline void safexcel_handle_result_descriptor(struct safexcel_crypto_priv
  		if (ndesc < 0) {
  			kfree(sreq);
  			dev_err(priv->dev, "failed to handle result (%d)", ndesc);
--			goto requests_left;
-+			goto acknowledge;
+-			return;
++			goto requests_left;
  		}
  
--		writel(EIP197_xDR_PROC_xD_PKT(1) |
--		       EIP197_xDR_PROC_xD_COUNT(ndesc * priv->config.rd_offset),
--		       priv->base + EIP197_HIA_RDR(ring) + EIP197_HIA_xDR_PROC_COUNT);
--
- 		if (should_complete) {
- 			local_bh_disable();
- 			sreq->req->complete(sreq->req, ret);
-@@ -636,6 +632,14 @@ static inline void safexcel_handle_result_descriptor(struct safexcel_crypto_priv
- 		}
+ 		writel(EIP197_xDR_PROC_xD_PKT(1) |
+@@ -616,6 +637,18 @@ static inline void safexcel_handle_result_descriptor(struct safexcel_crypto_priv
  
  		kfree(sreq);
-+		tot_descs += ndesc;
-+	}
-+
-+acknowledge:
-+	if (i) {
-+		writel(EIP197_xDR_PROC_xD_PKT(i) |
-+		       EIP197_xDR_PROC_xD_COUNT(tot_descs * priv->config.rd_offset),
-+		       priv->base + EIP197_HIA_RDR(ring) + EIP197_HIA_xDR_PROC_COUNT);
  	}
++
++requests_left:
++	spin_lock_bh(&priv->ring[ring].egress_lock);
++
++	done = safexcel_try_push_requests(priv, ring,
++					  priv->ring[ring].requests_left);
++
++	priv->ring[ring].requests_left -= done;
++	if (!done && !priv->ring[ring].requests_left)
++		priv->ring[ring].busy = false;
++
++	spin_unlock_bh(&priv->ring[ring].egress_lock);
+ }
  
- requests_left:
+ static void safexcel_dequeue_work(struct work_struct *work)
+@@ -861,6 +894,9 @@ static int safexcel_probe(struct platform_device *pdev)
+ 			goto err_clk;
+ 		}
+ 
++		priv->ring[i].requests_left = 0;
++		priv->ring[i].busy = false;
++
+ 		crypto_init_queue(&priv->ring[i].queue,
+ 				  EIP197_DEFAULT_RING_SIZE);
+ 
+diff --git a/drivers/crypto/inside-secure/safexcel.h b/drivers/crypto/inside-secure/safexcel.h
+index fffddefb0d9b..531e3e9d8384 100644
+--- a/drivers/crypto/inside-secure/safexcel.h
++++ b/drivers/crypto/inside-secure/safexcel.h
+@@ -489,6 +489,14 @@ struct safexcel_crypto_priv {
+ 		/* queue */
+ 		struct crypto_queue queue;
+ 		spinlock_t queue_lock;
++
++		/* Number of requests in the engine that needs the threshold
++		 * interrupt to be set up.
++		 */
++		int requests_left;
++
++		/* The ring is currently handling at least one request */
++		bool busy;
+ 	} ring[EIP197_MAX_RINGS];
+ };
+ 
 -- 
 2.14.3
