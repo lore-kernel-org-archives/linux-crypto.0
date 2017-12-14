@@ -1,8 +1,7 @@
 From: Antoine Tenart <antoine.tenart@free-electrons.com>
-Subject: [PATCH 15/17] crypto: inside-secure - retry to proceed the request later on fail
-Date: Thu, 14 Dec 2017 15:26:57 +0100
-Message-ID: <20171214142659.16987-16-antoine.tenart@free-electrons.com>
-References: <20171214142659.16987-1-antoine.tenart@free-electrons.com>
+Subject: [PATCH 00/17] crypto: inside-secure - various improvements
+Date: Thu, 14 Dec 2017 15:26:42 +0100
+Message-ID: <20171214142659.16987-1-antoine.tenart@free-electrons.com>
 Cc: Antoine Tenart <antoine.tenart@free-electrons.com>,
         thomas.petazzoni@free-electrons.com,
         gregory.clement@free-electrons.com,
@@ -10,107 +9,66 @@ Cc: Antoine Tenart <antoine.tenart@free-electrons.com>,
         igall@marvell.com, nadavh@marvell.com, linux-crypto@vger.kernel.org
 To: herbert@gondor.apana.org.au, davem@davemloft.net
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.free-electrons.com ([62.4.15.54]:36767 "EHLO
+Received: from mail.free-electrons.com ([62.4.15.54]:36764 "EHLO
         mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753135AbdLNOaE (ORCPT
+        with ESMTP id S1753130AbdLNOaE (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Thu, 14 Dec 2017 09:30:04 -0500
-In-Reply-To: <20171214142659.16987-1-antoine.tenart@free-electrons.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The dequeueing function was putting back a request in the crypto queue
-on failure (when not enough resources are available) which is not
-perfect as the request will be handled much later. This patch updates
-this logic by keeping a reference on the failed request to try
-proceeding it later when enough resources are available.
+Hi Herbert,
 
-Signed-off-by: Antoine Tenart <antoine.tenart@free-electrons.com>
----
- drivers/crypto/inside-secure/safexcel.c | 32 +++++++++++++++++++++++---------
- drivers/crypto/inside-secure/safexcel.h |  6 ++++++
- 2 files changed, 29 insertions(+), 9 deletions(-)
+This series depends on the previous one, "crypto: inside-secure - set of
+fixes"[1]. The series contains various improvements to the Inside Secure
+SafeXcel driver, which are bundled in a single series to avoid any
+conflict.
 
-diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/inside-secure/safexcel.c
-index 8042922b4ed8..4c7f205d83f0 100644
---- a/drivers/crypto/inside-secure/safexcel.c
-+++ b/drivers/crypto/inside-secure/safexcel.c
-@@ -446,29 +446,36 @@ void safexcel_dequeue(struct safexcel_crypto_priv *priv, int ring)
- 	struct safexcel_request *request;
- 	int ret, nreq = 0, cdesc = 0, rdesc = 0, commands, results;
- 
-+	/* If a request wasn't properly dequeued because of a lack of resources,
-+	 * proceeded it first,
-+	 */
-+	req = priv->ring[ring].req;
-+	backlog = priv->ring[ring].backlog;
-+	if (req)
-+		goto handle_req;
-+
- 	while (true) {
- 		spin_lock_bh(&priv->ring[ring].queue_lock);
- 		backlog = crypto_get_backlog(&priv->ring[ring].queue);
- 		req = crypto_dequeue_request(&priv->ring[ring].queue);
- 		spin_unlock_bh(&priv->ring[ring].queue_lock);
- 
--		if (!req)
-+		if (!req) {
-+			priv->ring[ring].req = NULL;
-+			priv->ring[ring].backlog = NULL;
- 			goto finalize;
-+		}
- 
-+handle_req:
- 		request = kzalloc(sizeof(*request), EIP197_GFP_FLAGS(*req));
--		if (!request) {
--			spin_lock_bh(&priv->ring[ring].queue_lock);
--			crypto_enqueue_request(&priv->ring[ring].queue, req);
--			spin_unlock_bh(&priv->ring[ring].queue_lock);
--			goto finalize;
--		}
-+		if (!request)
-+			goto request_failed;
- 
- 		ctx = crypto_tfm_ctx(req->tfm);
- 		ret = ctx->send(req, ring, request, &commands, &results);
- 		if (ret) {
- 			kfree(request);
--			req->complete(req, ret);
--			goto finalize;
-+			goto request_failed;
- 		}
- 
- 		if (backlog)
-@@ -483,6 +490,13 @@ void safexcel_dequeue(struct safexcel_crypto_priv *priv, int ring)
- 		nreq++;
- 	}
- 
-+request_failed:
-+	/* Not enough resources to handle all the requests. Bail out and save
-+	 * the request and the backlog for the next dequeue call (per-ring).
-+	 */
-+	priv->ring[ring].req = req;
-+	priv->ring[ring].backlog = backlog;
-+
- finalize:
- 	if (!nreq)
- 		return;
-diff --git a/drivers/crypto/inside-secure/safexcel.h b/drivers/crypto/inside-secure/safexcel.h
-index 0c47e792192d..d4955abf873b 100644
---- a/drivers/crypto/inside-secure/safexcel.h
-+++ b/drivers/crypto/inside-secure/safexcel.h
-@@ -499,6 +499,12 @@ struct safexcel_crypto_priv {
- 
- 		/* The ring is currently handling at least one request */
- 		bool busy;
-+
-+		/* Store for current requests when bailing out of the dequeueing
-+		 * function when no enough resources are available.
-+		 */
-+		struct crypto_async_request *req;
-+		struct crypto_async_request *backlog;
- 	} ring[EIP197_MAX_RINGS];
- };
- 
+- Patches 1-4 are cosmetic fixes (typo, more comments and dead code removal).
+- Patches 5-8 are small improvements, mostly to improve the invalidation
+  path.
+- Patches 9-15 improve the request processing in the driver, by moving
+  the requests dequeing into a workqueue and the result handling into a
+  threaded IRQ thread. Other small improvements are made in the same
+  direction.
+- Patches 16-17 introduce the support of another revision of this crypto
+  engine, similar to the one already supported. This crypto engine can be
+  found on Marvell boards. (The corresponding device tree patches will follow
+  once this series lands in).
+
+Thanks!
+Antoine
+
+[1] https://www.spinics.net/lists/linux-crypto/msg30313.html
+
+Antoine Tenart (13):
+  crypto: inside-secure - remove extra empty line
+  crypto: inside-secure - fix typo in a comment
+  crypto: inside-secure - remove useless memset
+  crypto: inside-secure - comment the caching function
+  crypto: inside-secure - move request dequeueing into a workqueue
+  crypto: inside-secure - use threaded IRQs for result handling
+  crypto: inside-secure - dequeue all requests at once
+  crypto: inside-secure - increase the ring size
+  crypto: inside-secure - acknowledge the result requests all at once
+  crypto: inside-secure - handle more result requests when counter is
+    full
+  crypto: inside-secure - retry to proceed the request later on fail
+  crypto: inside-secure - EIP97 support
+  Documentation/bindings: crypto: document the SafeXcel EIP97 compatible
+
+Ofer Heifetz (4):
+  crypto: inside-secure - refrain from unneeded invalidations
+  crypto: inside-secure - EBUSY is not an error on async request
+  crypto: inside-secure - move cipher crypto mode to request context
+  crypto: inside-secure - remove unused parameter in invalidate_cache
+
+ .../bindings/crypto/inside-secure-safexcel.txt     |   3 +-
+ drivers/crypto/inside-secure/safexcel.c            | 370 ++++++++++++++-------
+ drivers/crypto/inside-secure/safexcel.h            | 173 +++++++---
+ drivers/crypto/inside-secure/safexcel_cipher.c     |  53 +--
+ drivers/crypto/inside-secure/safexcel_hash.c       |  69 ++--
+ 5 files changed, 449 insertions(+), 219 deletions(-)
+
 -- 
 2.14.3
