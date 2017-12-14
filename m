@@ -1,7 +1,7 @@
 From: Antoine Tenart <antoine.tenart@free-electrons.com>
-Subject: [PATCH 10/17] crypto: inside-secure - use threaded IRQs for result handling
-Date: Thu, 14 Dec 2017 15:26:52 +0100
-Message-ID: <20171214142659.16987-11-antoine.tenart@free-electrons.com>
+Subject: [PATCH 12/17] crypto: inside-secure - increase the ring size
+Date: Thu, 14 Dec 2017 15:26:54 +0100
+Message-ID: <20171214142659.16987-13-antoine.tenart@free-electrons.com>
 References: <20171214142659.16987-1-antoine.tenart@free-electrons.com>
 Cc: Antoine Tenart <antoine.tenart@free-electrons.com>,
         thomas.petazzoni@free-electrons.com,
@@ -10,140 +10,42 @@ Cc: Antoine Tenart <antoine.tenart@free-electrons.com>,
         igall@marvell.com, nadavh@marvell.com, linux-crypto@vger.kernel.org
 To: herbert@gondor.apana.org.au, davem@davemloft.net
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.free-electrons.com ([62.4.15.54]:36795 "EHLO
+Received: from mail.free-electrons.com ([62.4.15.54]:36799 "EHLO
         mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753141AbdLNOaH (ORCPT
+        with ESMTP id S1753163AbdLNOaI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 14 Dec 2017 09:30:07 -0500
+        Thu, 14 Dec 2017 09:30:08 -0500
 In-Reply-To: <20171214142659.16987-1-antoine.tenart@free-electrons.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch moves the result handling from an IRQ handler to a threaded
-IRQ handler, to improve the number of complete requests being handled at
-once.
+Increase the ring size to handle more requests in parallel, while
+keeping the batch size (for interrupt coalescing) to its previous value.
+The ring size and batch size are now unlinked.
 
 Suggested-by: Ofer Heifetz <oferh@marvell.com>
 Signed-off-by: Antoine Tenart <antoine.tenart@free-electrons.com>
 ---
- drivers/crypto/inside-secure/safexcel.c | 41 ++++++++++++++++++---------------
- drivers/crypto/inside-secure/safexcel.h |  1 -
- 2 files changed, 22 insertions(+), 20 deletions(-)
+ drivers/crypto/inside-secure/safexcel.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/inside-secure/safexcel.c
-index f422af3eed2f..aa4943cad55e 100644
---- a/drivers/crypto/inside-secure/safexcel.c
-+++ b/drivers/crypto/inside-secure/safexcel.c
-@@ -618,15 +618,6 @@ static inline void safexcel_handle_result_descriptor(struct safexcel_crypto_priv
- 	}
- }
- 
--static void safexcel_handle_result_work(struct work_struct *work)
--{
--	struct safexcel_work_data *data =
--			container_of(work, struct safexcel_work_data, result_work);
--	struct safexcel_crypto_priv *priv = data->priv;
--
--	safexcel_handle_result_descriptor(priv, data->ring);
--}
--
- static void safexcel_dequeue_work(struct work_struct *work)
- {
- 	struct safexcel_work_data *data =
-@@ -644,12 +635,12 @@ static irqreturn_t safexcel_irq_ring(int irq, void *data)
- {
- 	struct safexcel_ring_irq_data *irq_data = data;
- 	struct safexcel_crypto_priv *priv = irq_data->priv;
--	int ring = irq_data->ring;
-+	int ring = irq_data->ring, rc = IRQ_NONE;
- 	u32 status, stat;
- 
- 	status = readl(priv->base + EIP197_HIA_AIC_R_ENABLED_STAT(ring));
- 	if (!status)
--		return IRQ_NONE;
-+		return rc;
- 
- 	/* RDR interrupts */
- 	if (status & EIP197_RDR_IRQ(ring)) {
-@@ -663,10 +654,7 @@ static irqreturn_t safexcel_irq_ring(int irq, void *data)
- 			 */
- 			dev_err(priv->dev, "RDR: fatal error.");
- 		} else if (likely(stat & EIP197_xDR_THRESH)) {
--			queue_work(priv->ring[ring].workqueue,
--				   &priv->ring[ring].work_data.result_work);
--			queue_work(priv->ring[ring].workqueue,
--				   &priv->ring[ring].work_data.work);
-+			rc = IRQ_WAKE_THREAD;
- 		}
- 
- 		/* ACK the interrupts */
-@@ -677,11 +665,26 @@ static irqreturn_t safexcel_irq_ring(int irq, void *data)
- 	/* ACK the interrupts */
- 	writel(status, priv->base + EIP197_HIA_AIC_R_ACK(ring));
- 
-+	return rc;
-+}
-+
-+static irqreturn_t safexcel_irq_ring_thread(int irq, void *data)
-+{
-+	struct safexcel_ring_irq_data *irq_data = data;
-+	struct safexcel_crypto_priv *priv = irq_data->priv;
-+	int ring = irq_data->ring;
-+
-+	safexcel_handle_result_descriptor(priv, ring);
-+
-+	queue_work(priv->ring[ring].workqueue,
-+		   &priv->ring[ring].work_data.work);
-+
- 	return IRQ_HANDLED;
- }
- 
- static int safexcel_request_ring_irq(struct platform_device *pdev, const char *name,
- 				     irq_handler_t handler,
-+				     irq_handler_t threaded_handler,
- 				     struct safexcel_ring_irq_data *ring_irq_priv)
- {
- 	int ret, irq = platform_get_irq_byname(pdev, name);
-@@ -691,8 +694,9 @@ static int safexcel_request_ring_irq(struct platform_device *pdev, const char *n
- 		return irq;
- 	}
- 
--	ret = devm_request_irq(&pdev->dev, irq, handler, 0,
--			       dev_name(&pdev->dev), ring_irq_priv);
-+	ret = devm_request_threaded_irq(&pdev->dev, irq, handler,
-+					threaded_handler, IRQF_ONESHOT,
-+					dev_name(&pdev->dev), ring_irq_priv);
- 	if (ret) {
- 		dev_err(&pdev->dev, "unable to request IRQ %d\n", irq);
- 		return ret;
-@@ -839,6 +843,7 @@ static int safexcel_probe(struct platform_device *pdev)
- 
- 		snprintf(irq_name, 6, "ring%d", i);
- 		irq = safexcel_request_ring_irq(pdev, irq_name, safexcel_irq_ring,
-+						safexcel_irq_ring_thread,
- 						ring_irq);
- 		if (irq < 0) {
- 			ret = irq;
-@@ -847,8 +852,6 @@ static int safexcel_probe(struct platform_device *pdev)
- 
- 		priv->ring[i].work_data.priv = priv;
- 		priv->ring[i].work_data.ring = i;
--		INIT_WORK(&priv->ring[i].work_data.result_work,
--			  safexcel_handle_result_work);
- 		INIT_WORK(&priv->ring[i].work_data.work, safexcel_dequeue_work);
- 
- 		snprintf(wq_name, 9, "wq_ring%d", i);
 diff --git a/drivers/crypto/inside-secure/safexcel.h b/drivers/crypto/inside-secure/safexcel.h
-index 8e9c65183439..fffddefb0d9b 100644
+index 531e3e9d8384..2a0ab6ce716a 100644
 --- a/drivers/crypto/inside-secure/safexcel.h
 +++ b/drivers/crypto/inside-secure/safexcel.h
-@@ -459,7 +459,6 @@ struct safexcel_config {
+@@ -19,11 +19,11 @@
+ #define EIP197_HIA_VERSION_BE			0x35ca
  
- struct safexcel_work_data {
- 	struct work_struct work;
--	struct work_struct result_work;
- 	struct safexcel_crypto_priv *priv;
- 	int ring;
- };
+ /* Static configuration */
+-#define EIP197_DEFAULT_RING_SIZE		64
++#define EIP197_DEFAULT_RING_SIZE		400
+ #define EIP197_MAX_TOKENS			5
+ #define EIP197_MAX_RINGS			4
+ #define EIP197_FETCH_COUNT			1
+-#define EIP197_MAX_BATCH_SZ			EIP197_DEFAULT_RING_SIZE
++#define EIP197_MAX_BATCH_SZ			64
+ 
+ #define EIP197_GFP_FLAGS(base)	((base).flags & CRYPTO_TFM_REQ_MAY_SLEEP ? \
+ 				 GFP_KERNEL : GFP_ATOMIC)
 -- 
 2.14.3
