@@ -1,7 +1,7 @@
 From: Antoine Tenart <antoine.tenart@free-electrons.com>
-Subject: [PATCH 04/17] crypto: inside-secure - comment the caching function
-Date: Thu, 14 Dec 2017 15:26:46 +0100
-Message-ID: <20171214142659.16987-5-antoine.tenart@free-electrons.com>
+Subject: [PATCH 03/17] crypto: inside-secure - remove useless memset
+Date: Thu, 14 Dec 2017 15:26:45 +0100
+Message-ID: <20171214142659.16987-4-antoine.tenart@free-electrons.com>
 References: <20171214142659.16987-1-antoine.tenart@free-electrons.com>
 Cc: Antoine Tenart <antoine.tenart@free-electrons.com>,
         thomas.petazzoni@free-electrons.com,
@@ -10,51 +10,35 @@ Cc: Antoine Tenart <antoine.tenart@free-electrons.com>,
         igall@marvell.com, nadavh@marvell.com, linux-crypto@vger.kernel.org
 To: herbert@gondor.apana.org.au, davem@davemloft.net
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.free-electrons.com ([62.4.15.54]:36758 "EHLO
+Received: from mail.free-electrons.com ([62.4.15.54]:36749 "EHLO
         mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753127AbdLNOaE (ORCPT
+        with ESMTP id S1752803AbdLNOaD (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 14 Dec 2017 09:30:04 -0500
+        Thu, 14 Dec 2017 09:30:03 -0500
 In-Reply-To: <20171214142659.16987-1-antoine.tenart@free-electrons.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Cosmetic patch adding a few comments to the ahash caching function to
-understand easily what calculations are made in the functions; and how
-the function is working.
+This patch removes an useless memset in the ahash_export function, as
+the zeroed buffer will be entirely overridden the next line.
 
+Suggested-by: Ofer Heifetz <oferh@marvell.com>
 Signed-off-by: Antoine Tenart <antoine.tenart@free-electrons.com>
 ---
- drivers/crypto/inside-secure/safexcel_hash.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ drivers/crypto/inside-secure/safexcel_hash.c | 1 -
+ 1 file changed, 1 deletion(-)
 
 diff --git a/drivers/crypto/inside-secure/safexcel_hash.c b/drivers/crypto/inside-secure/safexcel_hash.c
-index ac922b91b2d7..e53e6b2331db 100644
+index d4afc070ff58..ac922b91b2d7 100644
 --- a/drivers/crypto/inside-secure/safexcel_hash.c
 +++ b/drivers/crypto/inside-secure/safexcel_hash.c
-@@ -484,13 +484,23 @@ static int safexcel_ahash_exit_inv(struct crypto_tfm *tfm)
+@@ -624,7 +624,6 @@ static int safexcel_ahash_export(struct ahash_request *areq, void *out)
+ 	export->processed = req->processed;
+ 
+ 	memcpy(export->state, req->state, req->state_sz);
+-	memset(export->cache, 0, crypto_ahash_blocksize(ahash));
+ 	memcpy(export->cache, req->cache, crypto_ahash_blocksize(ahash));
+ 
  	return 0;
- }
- 
-+/* safexcel_ahash_cache: cache data until at least one request can be sent to
-+ * the engine, aka. when there is at least 1 block size in the pipe.
-+ */
- static int safexcel_ahash_cache(struct ahash_request *areq)
- {
- 	struct safexcel_ahash_req *req = ahash_request_ctx(areq);
- 	struct crypto_ahash *ahash = crypto_ahash_reqtfm(areq);
- 	int queued, cache_len;
- 
-+	/* cache_len: everyting accepted by the driver but not sent yet,
-+	 * tot sz handled by update() - last req sz - tot sz handled by send()
-+	 */
- 	cache_len = req->len - areq->nbytes - req->processed;
-+	/* queued: everything accepted by the driver which will be handled by
-+	 * the next send() calls.
-+	 * tot sz handled by update() - tot sz handled by send()
-+	 */
- 	queued = req->len - req->processed;
- 
- 	/*
 -- 
 2.14.3
