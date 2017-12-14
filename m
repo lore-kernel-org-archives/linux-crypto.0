@@ -1,170 +1,193 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH 06/10] staging: ccree: remove useless debug code
-Date: Thu, 14 Dec 2017 14:02:43 +0000
-Message-ID: <1513260170-26346-7-git-send-email-gilad@benyossef.com>
+Subject: [PATCH 07/10] staging: ccree: turn compile time debug log to params
+Date: Thu, 14 Dec 2017 14:02:44 +0000
+Message-ID: <1513260170-26346-8-git-send-email-gilad@benyossef.com>
 References: <1513260170-26346-1-git-send-email-gilad@benyossef.com>
 Cc: Ofir Drang <ofir.drang@arm.com>, linux-kernel@vger.kernel.org,
         linux-crypto@vger.kernel.org,
         driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org
 To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:42210 "EHLO
+        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752547AbdLNODf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 14 Dec 2017 09:03:35 -0500
 In-Reply-To: <1513260170-26346-1-git-send-email-gilad@benyossef.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Remove a bunch of useless debug code ifdef'ed out
+The ccree driver has some support to dump runtime data
+to kernel log to assist in debugging. The code used to be
+enabled by a build time flag. Refactor to enable it via
+module/kernel parameters.
 
 Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 ---
- drivers/staging/ccree/ssi_aead.c        | 45 ---------------------------------
- drivers/staging/ccree/ssi_config.h      |  3 ---
- drivers/staging/ccree/ssi_driver.c      | 13 ----------
- drivers/staging/ccree/ssi_request_mgr.c | 23 -----------------
- 4 files changed, 84 deletions(-)
+ drivers/staging/ccree/ssi_config.h      |  2 --
+ drivers/staging/ccree/ssi_driver.c      | 18 ++++++++++++------
+ drivers/staging/ccree/ssi_driver.h      | 16 ++++++++++------
+ drivers/staging/ccree/ssi_request_mgr.c | 26 +++++++++++++-------------
+ 4 files changed, 35 insertions(+), 27 deletions(-)
 
-diff --git a/drivers/staging/ccree/ssi_aead.c b/drivers/staging/ccree/ssi_aead.c
-index dde6797..ce26e68 100644
---- a/drivers/staging/ccree/ssi_aead.c
-+++ b/drivers/staging/ccree/ssi_aead.c
-@@ -1834,51 +1834,6 @@ static int cc_gcm(struct aead_request *req, struct cc_hw_desc desc[],
- 	return 0;
- }
- 
--#ifdef CC_DEBUG
--static void cc_dump_gcm(const char *title, struct aead_request *req)
--{
--	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
--	struct cc_aead_ctx *ctx = crypto_aead_ctx(tfm);
--	struct aead_req_ctx *req_ctx = aead_request_ctx(req);
--
--	if (ctx->cipher_mode != DRV_CIPHER_GCTR)
--		return;
--
--	if (title) {
--		dev_dbg(dev, "----------------------------------------------------------------------------------");
--		dev_dbg(dev, "%s\n", title);
--	}
--
--	dev_dbg(dev, "cipher_mode %d, authsize %d, enc_keylen %d, assoclen %d, cryptlen %d\n",
--		ctx->cipher_mode, ctx->authsize, ctx->enc_keylen,
--		req->assoclen, req_ctx->cryptlen);
--
--	if (ctx->enckey)
--		dump_byte_array("mac key", ctx->enckey, 16);
--
--	dump_byte_array("req->iv", req->iv, AES_BLOCK_SIZE);
--
--	dump_byte_array("gcm_iv_inc1", req_ctx->gcm_iv_inc1, AES_BLOCK_SIZE);
--
--	dump_byte_array("gcm_iv_inc2", req_ctx->gcm_iv_inc2, AES_BLOCK_SIZE);
--
--	dump_byte_array("hkey", req_ctx->hkey, AES_BLOCK_SIZE);
--
--	dump_byte_array("mac_buf", req_ctx->mac_buf, AES_BLOCK_SIZE);
--
--	dump_byte_array("gcm_len_block", req_ctx->gcm_len_block.len_a,
--			AES_BLOCK_SIZE);
--
--	if (req->src && req->cryptlen)
--		dump_byte_array("req->src", sg_virt(req->src),
--				req->cryptlen + req->assoclen);
--
--	if (req->dst)
--		dump_byte_array("req->dst", sg_virt(req->dst),
--				req->cryptlen + ctx->authsize + req->assoclen);
--}
--#endif
--
- static int config_gcm_context(struct aead_request *req)
- {
- 	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
 diff --git a/drivers/staging/ccree/ssi_config.h b/drivers/staging/ccree/ssi_config.h
-index e809103..b530974 100644
+index b530974..bc90ad0 100644
 --- a/drivers/staging/ccree/ssi_config.h
 +++ b/drivers/staging/ccree/ssi_config.h
-@@ -23,11 +23,8 @@
+@@ -23,8 +23,6 @@
  
  #include <linux/version.h>
  
--//#define FLUSH_CACHE_ALL
--//#define COMPLETION_DELAY
- //#define CC_DUMP_DESCS
- // #define CC_DUMP_BYTES
--// #define CC_DEBUG
+-//#define CC_DUMP_DESCS
+-// #define CC_DUMP_BYTES
  /* was 32 bit, but for juno's sake it was enlarged to 48 bit */
  #define DMA_BIT_MASK_LEN	48
  
 diff --git a/drivers/staging/ccree/ssi_driver.c b/drivers/staging/ccree/ssi_driver.c
-index 6158794..dbca241 100644
+index dbca241..195fb27 100644
 --- a/drivers/staging/ccree/ssi_driver.c
 +++ b/drivers/staging/ccree/ssi_driver.c
-@@ -446,19 +446,6 @@ static int cc7x_probe(struct platform_device *plat_dev)
+@@ -72,20 +72,26 @@
+ #include "ssi_pm.h"
+ #include "ssi_fips.h"
+ 
+-#ifdef CC_DUMP_BYTES
+-void dump_byte_array(const char *name, const u8 *buf, size_t len)
++bool cc_dump_desc;
++module_param_named(dump_desc, cc_dump_desc, bool, 0600);
++MODULE_PARM_DESC(cc_dump_desc, "Dump descriptors to kernel log as debugging aid");
++
++bool cc_dump_bytes;
++module_param_named(dump_bytes, cc_dump_bytes, bool, 0600);
++MODULE_PARM_DESC(cc_dump_bytes, "Dump buffers to kernel log as debugging aid");
++
++void __dump_byte_array(const char *name, const u8 *buf, size_t len)
  {
- 	int rc;
- 	struct device *dev = &plat_dev->dev;
--#if defined(CONFIG_ARM) && defined(CC_DEBUG)
--	u32 ctr, cacheline_size;
--
--	asm volatile("mrc p15, 0, %0, c0, c0, 1" : "=r" (ctr));
--	cacheline_size =  4 << ((ctr >> 16) & 0xf);
--	dev_dbg(dev, "CP15(L1_CACHE_BYTES) = %u , Kconfig(L1_CACHE_BYTES) = %u\n",
--		cacheline_size, L1_CACHE_BYTES);
--
--	asm volatile("mrc p15, 0, %0, c0, c0, 0" : "=r" (ctr));
--	dev_dbg(dev, "Main ID register (MIDR): Implementer 0x%02X, Arch 0x%01X, Part 0x%03X, Rev r%dp%d\n",
--		(ctr >> 24), (ctr >> 16) & 0xF, (ctr >> 4) & 0xFFF,
--		(ctr >> 20) & 0xF, ctr & 0xF);
+-	char prefix[NAME_LEN];
++	char prefix[64];
+ 
+ 	if (!buf)
+ 		return;
+ 
+ 	snprintf(prefix, sizeof(prefix), "%s[%lu]: ", name, len);
+ 
+-	print_hex_dump(KERN_DEBUG, prefix, DUMP_PREFIX_ADDRESS, 16, 1, len,
+-		       false);
++	print_hex_dump(KERN_DEBUG, prefix, DUMP_PREFIX_ADDRESS, 16, 1, buf,
++		       len, false);
+ }
 -#endif
  
- 	/* Map registers space */
- 	rc = init_cc_resources(plat_dev);
+ static irqreturn_t cc_isr(int irq, void *dev_id)
+ {
+diff --git a/drivers/staging/ccree/ssi_driver.h b/drivers/staging/ccree/ssi_driver.h
+index 4e05386..12e2a8b 100644
+--- a/drivers/staging/ccree/ssi_driver.h
++++ b/drivers/staging/ccree/ssi_driver.h
+@@ -48,6 +48,9 @@
+ #include "cc_hw_queue_defs.h"
+ #include "ssi_sram_mgr.h"
+ 
++extern bool cc_dump_desc;
++extern bool cc_dump_bytes;
++
+ #define DRV_MODULE_VERSION "3.0"
+ 
+ #define CC_DEV_NAME_STR "cc715ree"
+@@ -169,13 +172,14 @@ static inline struct device *drvdata_to_dev(struct cc_drvdata *drvdata)
+ 	return &drvdata->plat_dev->dev;
+ }
+ 
+-#ifdef CC_DUMP_BYTES
+-void dump_byte_array(const char *name, const u8 *the_array,
+-		     unsigned long size);
+-#else
++void __dump_byte_array(const char *name, const u8 *the_array,
++		       unsigned long size);
+ static inline void dump_byte_array(const char *name, const u8 *the_array,
+-				   unsigned long size) {};
+-#endif
++				   unsigned long size)
++{
++	if (cc_dump_bytes)
++		__dump_byte_array(name, the_array, size);
++}
+ 
+ int init_cc_regs(struct cc_drvdata *drvdata, bool is_probe);
+ void fini_cc_regs(struct cc_drvdata *drvdata);
 diff --git a/drivers/staging/ccree/ssi_request_mgr.c b/drivers/staging/ccree/ssi_request_mgr.c
-index 07b9404..f6374b0 100644
+index f6374b0..2aa21f8 100644
 --- a/drivers/staging/ccree/ssi_request_mgr.c
 +++ b/drivers/staging/ccree/ssi_request_mgr.c
-@@ -20,9 +20,6 @@
- #include <linux/interrupt.h>
- #include <linux/delay.h>
- #include <crypto/ctr.h>
--#ifdef FLUSH_CACHE_ALL
--#include <asm/cacheflush.h>
--#endif
- #include <linux/pm_runtime.h>
- #include "ssi_driver.h"
- #include "ssi_buffer_mgr.h"
-@@ -359,9 +356,6 @@ int send_request(struct cc_drvdata *drvdata, struct cc_crypto_req *cc_req,
+@@ -161,11 +161,12 @@ int cc_req_mgr_init(struct cc_drvdata *drvdata)
+ 	return rc;
+ }
  
- 	dev_dbg(dev, "Enqueue request head=%u\n", req_mgr_h->req_queue_head);
+-static void enqueue_seq(void __iomem *cc_base, struct cc_hw_desc seq[],
++static void enqueue_seq(struct cc_drvdata *drvdata, struct cc_hw_desc seq[],
+ 			unsigned int seq_len)
+ {
+ 	int i, w;
+-	void * __iomem reg = cc_base + CC_REG(DSCRPTR_QUEUE_WORD0);
++	void * __iomem reg = drvdata->cc_base + CC_REG(DSCRPTR_QUEUE_WORD0);
++	struct device *dev = drvdata_to_dev(drvdata);
  
--#ifdef FLUSH_CACHE_ALL
--	flush_cache_all();
--#endif
  	/*
- 	 * We are about to push command to the HW via the command registers
- 	 * that may refernece hsot memory. We need to issue a memory barrier
-@@ -493,23 +487,6 @@ static void proc_completions(struct cc_drvdata *drvdata)
- 
- 		cc_req = &request_mgr_handle->req_queue[*tail];
- 
--#ifdef FLUSH_CACHE_ALL
--		flush_cache_all();
+ 	 * We do indeed write all 6 command words to the same
+@@ -175,11 +176,12 @@ static void enqueue_seq(void __iomem *cc_base, struct cc_hw_desc seq[],
+ 	for (i = 0; i < seq_len; i++) {
+ 		for (w = 0; w <= 5; w++)
+ 			writel_relaxed(seq[i].word[w], reg);
+-#ifdef CC_DUMP_DESCS
+-		dev_dbg(dev, "desc[%02d]: 0x%08X 0x%08X 0x%08X 0x%08X 0x%08X 0x%08X\n",
+-			i, seq[i].word[0], seq[i].word[1], seq[i].word[2],
+-			seq[i].word[3], seq[i].word[4], seq[i].word[5]);
 -#endif
--
--#ifdef COMPLETION_DELAY
--		/* Delay */
--		{
--			u32 axi_err;
--			int i;
--
--			dev_info(dev, "Delay\n");
--			for (i = 0; i < 1000000; i++)
--				axi_err = cc_ioread(drvdata,
--						    CC_REG(AXIM_MON_ERR));
--		}
--#endif /* COMPLETION_DELAY */
--
- 		if (cc_req->user_cb)
- 			cc_req->user_cb(dev, cc_req->user_arg);
- 		*tail = (*tail + 1) & (MAX_REQUEST_QUEUE_SIZE - 1);
++
++		if (cc_dump_desc)
++			dev_dbg(dev, "desc[%02d]: 0x%08X 0x%08X 0x%08X 0x%08X 0x%08X 0x%08X\n",
++				i, seq[i].word[0], seq[i].word[1],
++				seq[i].word[2], seq[i].word[3],
++				seq[i].word[4], seq[i].word[5]);
+ 	}
+ }
+ 
+@@ -256,7 +258,6 @@ static int cc_queues_status(struct cc_drvdata *drvdata,
+ int send_request(struct cc_drvdata *drvdata, struct cc_crypto_req *cc_req,
+ 		 struct cc_hw_desc *desc, unsigned int len, bool is_dout)
+ {
+-	void __iomem *cc_base = drvdata->cc_base;
+ 	struct cc_req_mgr_handle *req_mgr_h = drvdata->request_mgr_handle;
+ 	unsigned int used_sw_slots;
+ 	unsigned int iv_seq_len = 0;
+@@ -364,9 +365,9 @@ int send_request(struct cc_drvdata *drvdata, struct cc_crypto_req *cc_req,
+ 	wmb();
+ 
+ 	/* STAT_PHASE_4: Push sequence */
+-	enqueue_seq(cc_base, iv_seq, iv_seq_len);
+-	enqueue_seq(cc_base, desc, len);
+-	enqueue_seq(cc_base, &req_mgr_h->compl_desc, (is_dout ? 0 : 1));
++	enqueue_seq(drvdata, iv_seq, iv_seq_len);
++	enqueue_seq(drvdata, desc, len);
++	enqueue_seq(drvdata, &req_mgr_h->compl_desc, (is_dout ? 0 : 1));
+ 
+ 	if (req_mgr_h->q_free_slots < total_seq_len) {
+ 		/* This situation should never occur. Maybe indicating problem
+@@ -407,7 +408,6 @@ int send_request(struct cc_drvdata *drvdata, struct cc_crypto_req *cc_req,
+ int send_request_init(struct cc_drvdata *drvdata, struct cc_hw_desc *desc,
+ 		      unsigned int len)
+ {
+-	void __iomem *cc_base = drvdata->cc_base;
+ 	struct cc_req_mgr_handle *req_mgr_h = drvdata->request_mgr_handle;
+ 	unsigned int total_seq_len = len; /*initial sequence length*/
+ 	int rc = 0;
+@@ -426,7 +426,7 @@ int send_request_init(struct cc_drvdata *drvdata, struct cc_hw_desc *desc,
+ 	 * to make sure there are no outstnading memory writes
+ 	 */
+ 	wmb();
+-	enqueue_seq(cc_base, desc, len);
++	enqueue_seq(drvdata, desc, len);
+ 
+ 	/* Update the free slots in HW queue */
+ 	req_mgr_h->q_free_slots =
 -- 
 2.7.4
