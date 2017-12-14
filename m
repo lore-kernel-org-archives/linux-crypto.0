@@ -1,193 +1,107 @@
 From: Antoine Tenart <antoine.tenart@free-electrons.com>
-Subject: [PATCH 11/17] crypto: inside-secure - dequeue all requests at once
-Date: Thu, 14 Dec 2017 15:26:53 +0100
-Message-ID: <20171214142659.16987-12-antoine.tenart@free-electrons.com>
+Subject: [PATCH 05/17] crypto: inside-secure - refrain from unneeded invalidations
+Date: Thu, 14 Dec 2017 15:26:47 +0100
+Message-ID: <20171214142659.16987-6-antoine.tenart@free-electrons.com>
 References: <20171214142659.16987-1-antoine.tenart@free-electrons.com>
-Cc: Antoine Tenart <antoine.tenart@free-electrons.com>,
+Cc: Ofer Heifetz <oferh@marvell.com>,
         thomas.petazzoni@free-electrons.com,
         gregory.clement@free-electrons.com,
-        miquel.raynal@free-electrons.com, oferh@marvell.com,
-        igall@marvell.com, nadavh@marvell.com, linux-crypto@vger.kernel.org
+        miquel.raynal@free-electrons.com, igall@marvell.com,
+        nadavh@marvell.com, linux-crypto@vger.kernel.org,
+        Antoine Tenart <antoine.tenart@free-electrons.com>
 To: herbert@gondor.apana.org.au, davem@davemloft.net
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.free-electrons.com ([62.4.15.54]:36797 "EHLO
+Received: from mail.free-electrons.com ([62.4.15.54]:36767 "EHLO
         mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753161AbdLNOaH (ORCPT
+        with ESMTP id S1753168AbdLNOaI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 14 Dec 2017 09:30:07 -0500
+        Thu, 14 Dec 2017 09:30:08 -0500
 In-Reply-To: <20171214142659.16987-1-antoine.tenart@free-electrons.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch updates the dequeueing logic to dequeue all requests at once.
-Since we can have many requests in the queue, the interrupt coalescing
-is kept so that the ring interrupt fires every EIP197_MAX_BATCH_SZ at
-most.
+From: Ofer Heifetz <oferh@marvell.com>
 
-To allow dequeueing all requests at once while still using reasonable
-settings for the interrupt coalescing, the result handling function was
-updated to setup the threshold interrupt when needed (i.e. when more
-requests than EIP197_MAX_BATCH_SZ are in the queue). When using this
-capability the ring is marked as busy so that the dequeue function
-enqueue new requests without setting the threshold interrupt.
+The check to know if an invalidation is needed (i.e. when the context
+changes) is done even if the context does not exist yet. This happens
+when first setting a key for ciphers and/or hmac operations.
 
-Suggested-by: Ofer Heifetz <oferh@marvell.com>
+This commits adds a check in the _setkey functions to only check if an
+invalidation is needed when a context exists, as there is no need to
+perform this check otherwise.
+
+Signed-off-by: Ofer Heifetz <oferh@marvell.com>
+[Antoine: commit message and added a comment and reworked one of the
+checks]
 Signed-off-by: Antoine Tenart <antoine.tenart@free-electrons.com>
 ---
- drivers/crypto/inside-secure/safexcel.c | 60 ++++++++++++++++++++++++++-------
- drivers/crypto/inside-secure/safexcel.h |  8 +++++
- 2 files changed, 56 insertions(+), 12 deletions(-)
+ drivers/crypto/inside-secure/safexcel_cipher.c | 10 ++++++----
+ drivers/crypto/inside-secure/safexcel_hash.c   | 24 ++++++++++++++++--------
+ 2 files changed, 22 insertions(+), 12 deletions(-)
 
-diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/inside-secure/safexcel.c
-index aa4943cad55e..db7ad9d3eeed 100644
---- a/drivers/crypto/inside-secure/safexcel.c
-+++ b/drivers/crypto/inside-secure/safexcel.c
-@@ -422,6 +422,23 @@ static int safexcel_hw_init(struct safexcel_crypto_priv *priv)
- 	return 0;
- }
- 
-+/* Called with ring's lock taken */
-+int safexcel_try_push_requests(struct safexcel_crypto_priv *priv, int ring,
-+			       int reqs)
-+{
-+	int coal = min_t(int, reqs, EIP197_MAX_BATCH_SZ);
-+
-+	if (!coal)
-+		return 0;
-+
-+	/* Configure when we want an interrupt */
-+	writel(EIP197_HIA_RDR_THRESH_PKT_MODE |
-+	       EIP197_HIA_RDR_THRESH_PROC_PKT(coal),
-+	       priv->base + EIP197_HIA_RDR(ring) + EIP197_HIA_xDR_THRESH);
-+
-+	return coal;
-+}
-+
- void safexcel_dequeue(struct safexcel_crypto_priv *priv, int ring)
- {
- 	struct crypto_async_request *req, *backlog;
-@@ -429,7 +446,7 @@ void safexcel_dequeue(struct safexcel_crypto_priv *priv, int ring)
- 	struct safexcel_request *request;
- 	int ret, nreq = 0, cdesc = 0, rdesc = 0, commands, results;
- 
--	do {
-+	while (true) {
- 		spin_lock_bh(&priv->ring[ring].queue_lock);
- 		backlog = crypto_get_backlog(&priv->ring[ring].queue);
- 		req = crypto_dequeue_request(&priv->ring[ring].queue);
-@@ -463,18 +480,24 @@ void safexcel_dequeue(struct safexcel_crypto_priv *priv, int ring)
- 
- 		cdesc += commands;
- 		rdesc += results;
--	} while (nreq++ < EIP197_MAX_BATCH_SZ);
-+		nreq++;
-+	}
- 
- finalize:
- 	if (!nreq)
- 		return;
- 
--	spin_lock_bh(&priv->ring[ring].lock);
-+	spin_lock_bh(&priv->ring[ring].egress_lock);
- 
--	/* Configure when we want an interrupt */
--	writel(EIP197_HIA_RDR_THRESH_PKT_MODE |
--	       EIP197_HIA_RDR_THRESH_PROC_PKT(nreq),
--	       priv->base + EIP197_HIA_RDR(ring) + EIP197_HIA_xDR_THRESH);
-+	if (!priv->ring[ring].busy) {
-+		nreq -= safexcel_try_push_requests(priv, ring, nreq);
-+		if (nreq)
-+			priv->ring[ring].busy = true;
-+	}
-+
-+	priv->ring[ring].requests_left += nreq;
-+
-+	spin_unlock_bh(&priv->ring[ring].egress_lock);
- 
- 	/* let the RDR know we have pending descriptors */
- 	writel((rdesc * priv->config.rd_offset) << 2,
-@@ -483,8 +506,6 @@ void safexcel_dequeue(struct safexcel_crypto_priv *priv, int ring)
- 	/* let the CDR know we have pending descriptors */
- 	writel((cdesc * priv->config.cd_offset) << 2,
- 	       priv->base + EIP197_HIA_CDR(ring) + EIP197_HIA_xDR_PREP_COUNT);
--
--	spin_unlock_bh(&priv->ring[ring].lock);
- }
- 
- void safexcel_free_context(struct safexcel_crypto_priv *priv,
-@@ -579,14 +600,14 @@ static inline void safexcel_handle_result_descriptor(struct safexcel_crypto_priv
- {
- 	struct safexcel_request *sreq;
- 	struct safexcel_context *ctx;
--	int ret, i, nreq, ndesc = 0;
-+	int ret, i, nreq, ndesc = 0, done;
- 	bool should_complete;
- 
- 	nreq = readl(priv->base + EIP197_HIA_RDR(ring) + EIP197_HIA_xDR_PROC_COUNT);
- 	nreq >>= 24;
- 	nreq &= GENMASK(6, 0);
- 	if (!nreq)
--		return;
-+		goto requests_left;
- 
- 	for (i = 0; i < nreq; i++) {
- 		spin_lock_bh(&priv->ring[ring].egress_lock);
-@@ -601,7 +622,7 @@ static inline void safexcel_handle_result_descriptor(struct safexcel_crypto_priv
- 		if (ndesc < 0) {
- 			kfree(sreq);
- 			dev_err(priv->dev, "failed to handle result (%d)", ndesc);
--			return;
-+			goto requests_left;
- 		}
- 
- 		writel(EIP197_xDR_PROC_xD_PKT(1) |
-@@ -616,6 +637,18 @@ static inline void safexcel_handle_result_descriptor(struct safexcel_crypto_priv
- 
- 		kfree(sreq);
+diff --git a/drivers/crypto/inside-secure/safexcel_cipher.c b/drivers/crypto/inside-secure/safexcel_cipher.c
+index fcc0a606d748..794849b859a7 100644
+--- a/drivers/crypto/inside-secure/safexcel_cipher.c
++++ b/drivers/crypto/inside-secure/safexcel_cipher.c
+@@ -78,10 +78,12 @@ static int safexcel_aes_setkey(struct crypto_skcipher *ctfm, const u8 *key,
+ 		return ret;
  	}
-+
-+requests_left:
-+	spin_lock_bh(&priv->ring[ring].egress_lock);
-+
-+	done = safexcel_try_push_requests(priv, ring,
-+					  priv->ring[ring].requests_left);
-+
-+	priv->ring[ring].requests_left -= done;
-+	if (!done && !priv->ring[ring].requests_left)
-+		priv->ring[ring].busy = false;
-+
-+	spin_unlock_bh(&priv->ring[ring].egress_lock);
- }
  
- static void safexcel_dequeue_work(struct work_struct *work)
-@@ -861,6 +894,9 @@ static int safexcel_probe(struct platform_device *pdev)
- 			goto err_clk;
+-	for (i = 0; i < len / sizeof(u32); i++) {
+-		if (ctx->key[i] != cpu_to_le32(aes.key_enc[i])) {
+-			ctx->base.needs_inv = true;
+-			break;
++	if (ctx->base.ctxr_dma) {
++		for (i = 0; i < len / sizeof(u32); i++) {
++			if (ctx->key[i] != cpu_to_le32(aes.key_enc[i])) {
++				ctx->base.needs_inv = true;
++				break;
++			}
  		}
+ 	}
  
-+		priv->ring[i].requests_left = 0;
-+		priv->ring[i].busy = false;
-+
- 		crypto_init_queue(&priv->ring[i].queue,
- 				  EIP197_DEFAULT_RING_SIZE);
+diff --git a/drivers/crypto/inside-secure/safexcel_hash.c b/drivers/crypto/inside-secure/safexcel_hash.c
+index e53e6b2331db..d156637d6144 100644
+--- a/drivers/crypto/inside-secure/safexcel_hash.c
++++ b/drivers/crypto/inside-secure/safexcel_hash.c
+@@ -527,10 +527,16 @@ static int safexcel_ahash_enqueue(struct ahash_request *areq)
  
-diff --git a/drivers/crypto/inside-secure/safexcel.h b/drivers/crypto/inside-secure/safexcel.h
-index fffddefb0d9b..531e3e9d8384 100644
---- a/drivers/crypto/inside-secure/safexcel.h
-+++ b/drivers/crypto/inside-secure/safexcel.h
-@@ -489,6 +489,14 @@ struct safexcel_crypto_priv {
- 		/* queue */
- 		struct crypto_queue queue;
- 		spinlock_t queue_lock;
+ 	req->needs_inv = false;
+ 
+-	if (req->processed && ctx->digest == CONTEXT_CONTROL_DIGEST_PRECOMPUTED)
+-		ctx->base.needs_inv = safexcel_ahash_needs_inv_get(areq);
+-
+ 	if (ctx->base.ctxr) {
++		if (!ctx->base.needs_inv && req->processed &&
++		    ctx->digest == CONTEXT_CONTROL_DIGEST_PRECOMPUTED)
++			/* We're still setting needs_inv here, even though it is
++			 * cleared right away, because the needs_inv flag can be
++			 * set in other functions and we want to keep the same
++			 * logic.
++			 */
++			ctx->base.needs_inv = safexcel_ahash_needs_inv_get(areq);
 +
-+		/* Number of requests in the engine that needs the threshold
-+		 * interrupt to be set up.
-+		 */
-+		int requests_left;
-+
-+		/* The ring is currently handling at least one request */
-+		bool busy;
- 	} ring[EIP197_MAX_RINGS];
- };
+ 		if (ctx->base.needs_inv) {
+ 			ctx->base.needs_inv = false;
+ 			req->needs_inv = true;
+@@ -928,11 +934,13 @@ static int safexcel_hmac_sha1_setkey(struct crypto_ahash *tfm, const u8 *key,
+ 	if (ret)
+ 		return ret;
+ 
+-	for (i = 0; i < SHA1_DIGEST_SIZE / sizeof(u32); i++) {
+-		if (ctx->ipad[i] != le32_to_cpu(istate.state[i]) ||
+-		    ctx->opad[i] != le32_to_cpu(ostate.state[i])) {
+-			ctx->base.needs_inv = true;
+-			break;
++	if (ctx->base.ctxr) {
++		for (i = 0; i < SHA1_DIGEST_SIZE / sizeof(u32); i++) {
++			if (ctx->ipad[i] != le32_to_cpu(istate.state[i]) ||
++			    ctx->opad[i] != le32_to_cpu(ostate.state[i])) {
++				ctx->base.needs_inv = true;
++				break;
++			}
+ 		}
+ 	}
  
 -- 
 2.14.3
