@@ -1,75 +1,45 @@
-From: Philippe Ombredanne <pombredanne@nexb.com>
-Subject: Re: [PATCH 04/10] staging: ccree: staging: ccree: replace sysfs by
- debugfs interface
-Date: Thu, 14 Dec 2017 15:30:27 +0100
-Message-ID: <CAOFm3uHgcmO0bS6HXX9x+zdWsqAxd3BfeDePF_=Q_SpwB4ox3A@mail.gmail.com>
-References: <1513260170-26346-1-git-send-email-gilad@benyossef.com>
- <1513260170-26346-5-git-send-email-gilad@benyossef.com>
+From: Eric Biggers <ebiggers3@gmail.com>
+Subject: Re: general protection fault in ___cache_free
+Date: Fri, 15 Dec 2017 09:21:48 -0800
+Message-ID: <20171215172148.GA629@zzz.localdomain>
+References: <f403045fbfa060791f05605c6a5e@google.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: devel@driverdev.osuosl.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- driverdev-devel@linuxdriverproject.org, LKML <linux-kernel@vger.kernel.org>,
- linux-crypto@vger.kernel.org, Ofir Drang <ofir.drang@arm.com>
-To: Gilad Ben-Yossef <gilad@benyossef.com>
-Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
-In-Reply-To: <1513260170-26346-5-git-send-email-gilad@benyossef.com>
-List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
-List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
-List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
-List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
-List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
-Errors-To: driverdev-devel-bounces@linuxdriverproject.org
-Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: davem@davemloft.net, herbert@gondor.apana.org.au,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com
+To: syzbot
+        <bot+1cfe6406582d72de07f78837946d111c2aea6936@syzkaller.appspotmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pg0-f49.google.com ([74.125.83.49]:43947 "EHLO
+        mail-pg0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755449AbdLORVv (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 15 Dec 2017 12:21:51 -0500
+Content-Disposition: inline
+In-Reply-To: <f403045fbfa060791f05605c6a5e@google.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Gilad,
+On Fri, Dec 15, 2017 at 12:02:01AM -0800, syzbot wrote:
+> Call Trace:
+>  __cache_free mm/slab.c:3494 [inline]
+>  kfree+0x1a3/0x250 mm/slab.c:3806
+>  blkcipher_walk_done+0x72b/0xde0 crypto/blkcipher.c:139
+>  encrypt+0x20e/0x540 arch/x86/crypto/salsa20_glue.c:79
+>  skcipher_crypt_blkcipher crypto/skcipher.c:622 [inline]
+>  skcipher_decrypt_blkcipher+0x213/0x310 crypto/skcipher.c:640
+>  crypto_skcipher_decrypt include/crypto/skcipher.h:463 [inline]
+>  _skcipher_recvmsg crypto/algif_skcipher.c:144 [inline]
+>  skcipher_recvmsg+0xa54/0xf20 crypto/algif_skcipher.c:165
+>  sock_recvmsg_nosec net/socket.c:809 [inline]
+>  sock_recvmsg+0xc9/0x110 net/socket.c:816
+>  ___sys_recvmsg+0x29b/0x630 net/socket.c:2185
+>  __sys_recvmsg+0xe2/0x210 net/socket.c:2230
+>  SYSC_recvmsg net/socket.c:2242 [inline]
+>  SyS_recvmsg+0x2d/0x50 net/socket.c:2237
+>  entry_SYSCALL_64_fastpath+0x1f/0x96
 
-On Thu, Dec 14, 2017 at 3:02 PM, Gilad Ben-Yossef <gilad@benyossef.com> wrote:
-> The ccree driver has had a none standard sysfs interface for debugging.
-> Replace it with a proper debugfs interface.
->
-> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+Already fixed:
 
-<snip>
-
-> --- /dev/null
-> +++ b/drivers/staging/ccree/cc_debugfs.c
-> @@ -0,0 +1,114 @@
-> +/*
-> + * Copyright (C) 2012-2017 ARM Limited or its affiliates.
-> + *
-> + * This program is free software; you can redistribute it and/or modify
-> + * it under the terms of the GNU General Public License version 2 as
-> + * published by the Free Software Foundation.
-> + *
-> + * This program is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + * GNU General Public License for more details.
-> + *
-> + * You should have received a copy of the GNU General Public License
-> + * along with this program; if not, see <http://www.gnu.org/licenses/>.
-> + */
-
-Could you use the new SPDX tags instead of this fine and long
-boilerplate? See Thomas doc for details [1]
-
-You could spare the world from ~14 lines of this fine legalese with this:
-
-// SPDX-License-Identifier: GPL-2.0
-// Copyright (C) 2012-2017 ARM Limited or its affiliates.
-
-If you wonder about the C++ style comment, read Thomas doc patches [1]
-and check the comments made on the list by Linus.
-
-If you could spread the word out in your team too, this would be much welcomed!
-Thanks!
-
-[1] https://lkml.org/lkml/2017/12/4/934
-
---
-Cordially
-Philippe Ombredanne
+#syz fix: crypto: salsa20 - fix blkcipher_walk API usage
