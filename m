@@ -1,94 +1,162 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH v2 2/6] crypto: tcrypt: fix AEAD decryption speed test
-Date: Sun, 17 Dec 2017 08:29:01 +0000
-Message-ID: <1513499346-9047-3-git-send-email-gilad@benyossef.com>
+Subject: [PATCH v2 4/6] crypto: tcrypt: add multi buf ahash jiffies test
+Date: Sun, 17 Dec 2017 08:29:03 +0000
+Message-ID: <1513499346-9047-5-git-send-email-gilad@benyossef.com>
 References: <1513499346-9047-1-git-send-email-gilad@benyossef.com>
 Cc: Ofir Drang <ofir.drang@arm.com>, linux-crypto@vger.kernel.org,
         linux-kernel@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from foss.arm.com ([217.140.101.70]:40914 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751005AbdLQIaI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 17 Dec 2017 03:30:08 -0500
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1513499346-9047-1-git-send-email-gilad@benyossef.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-The AEAD speed test pretended to support decryption, however that support
-was broken as decryption requires a valid auth field which the test did
-not provide.
+The multi buffer concurrent requests ahash speed test only
+supported the cycles mode. Add support for the so called
+jiffies mode that test performance of bytes/sec.
 
-Fix this by running the encryption path once with inout/output sgls
-switched to calculate the auth field prior to performing decryption
-speed tests.
+We only add support for digest mode at the moment.
 
 Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 ---
- crypto/tcrypt.c | 30 +++++++++++++++++++++++++++++-
- 1 file changed, 29 insertions(+), 1 deletion(-)
+ crypto/tcrypt.c | 112 +++++++++++++++++++++++++++++++++++++++++---------------
+ 1 file changed, 82 insertions(+), 30 deletions(-)
 
 diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
-index a0c4e0d..69c8e63 100644
+index 2604360..e406b00 100644
 --- a/crypto/tcrypt.c
 +++ b/crypto/tcrypt.c
-@@ -329,10 +329,30 @@ static void test_aead_speed(const char *algo, int enc, unsigned int secs,
- 				     *b_size + (enc ? authsize : 0), assoc,
- 				     aad_size);
+@@ -413,13 +413,87 @@ struct test_mb_ahash_data {
+ 	char *xbuf[XBUFSIZE];
+ };
  
-+			aead_request_set_ad(req, aad_size);
+-static void test_mb_ahash_speed(const char *algo, unsigned int sec,
++static inline int do_mult_ahash_op(struct test_mb_ahash_data *data, u32 num_mb)
++{
++	int i, rc[num_mb], err = 0;
 +
-+			if (!enc) {
++	/* Fire up a bunch of concurrent requests */
++	for (i = 0; i < num_mb; i++)
++		rc[i] = crypto_ahash_digest(data[i].req);
 +
-+				/*
-+				 * For decryption we need a proper auth so
-+				 * we do the encryption path once with buffers
-+				 * reversed (input <-> output) to calculate it
-+				 */
-+				aead_request_set_crypt(req, sgout, sg,
-+						       *b_size, iv);
-+				ret = do_one_aead_op(req,
-+						     crypto_aead_encrypt(req));
++	/* Wait for all requests to finish */
++	for (i = 0; i < num_mb; i++) {
++		rc[i] = crypto_wait_req(rc[i], &data[i].wait);
 +
-+				if (ret) {
-+					pr_err("calculating auth failed failed (%d)\n",
-+					       ret);
-+					break;
-+				}
-+			}
++		if (rc[i]) {
++			pr_info("concurrent request %d error %d\n", i, rc[i]);
++			err = rc[i];
++		}
++	}
 +
- 			aead_request_set_crypt(req, sg, sgout,
- 					       *b_size + (enc ? 0 : authsize),
- 					       iv);
--			aead_request_set_ad(req, aad_size);
++	return err;
++}
++
++static int test_mb_ahash_jiffies(struct test_mb_ahash_data *data, int blen,
++				 int secs, u32 num_mb)
++{
++	unsigned long start, end;
++	int bcount;
++	int ret;
++
++	for (start = jiffies, end = start + secs * HZ, bcount = 0;
++	     time_before(jiffies, end); bcount++) {
++		ret = do_mult_ahash_op(data, num_mb);
++		if (ret)
++			return ret;
++	}
++
++	pr_cont("%d operations in %d seconds (%ld bytes)\n",
++		bcount * num_mb, secs, (long)bcount * blen * num_mb);
++	return 0;
++}
++
++static int test_mb_ahash_cycles(struct test_mb_ahash_data *data, int blen,
++				u32 num_mb)
++{
++	unsigned long cycles = 0;
++	int ret = 0;
++	int i;
++
++	/* Warm-up run. */
++	for (i = 0; i < 4; i++) {
++		ret = do_mult_ahash_op(data, num_mb);
++		if (ret)
++			goto out;
++	}
++
++	/* The real thing. */
++	for (i = 0; i < 8; i++) {
++		cycles_t start, end;
++
++		start = get_cycles();
++		ret = do_mult_ahash_op(data, num_mb);
++		end = get_cycles();
++
++		if (ret)
++			goto out;
++
++		cycles += end - start;
++	}
++
++out:
++	if (ret == 0)
++		pr_cont("1 operation in %lu cycles (%d bytes)\n",
++			(cycles + 4) / (8 * num_mb), blen);
++
++	return ret;
++}
++
++static void test_mb_ahash_speed(const char *algo, unsigned int secs,
+ 				struct hash_speed *speed, u32 num_mb)
+ {
+ 	struct test_mb_ahash_data *data;
+ 	struct crypto_ahash *tfm;
+-	unsigned long start, end;
+-	unsigned long cycles;
+ 	unsigned int i, j, k;
+ 	int ret;
  
- 			if (secs)
- 				ret = test_aead_jiffies(req, enc, *b_size,
-@@ -1566,16 +1586,24 @@ static int do_test(const char *alg, u32 type, u32 mask, int m)
- 				NULL, 0, 16, 16, aead_speed_template_20);
- 		test_aead_speed("gcm(aes)", ENCRYPT, sec,
- 				NULL, 0, 16, 8, speed_template_16_24_32);
-+		test_aead_speed("rfc4106(gcm(aes))", DECRYPT, sec,
-+				NULL, 0, 16, 16, aead_speed_template_20);
-+		test_aead_speed("gcm(aes)", DECRYPT, sec,
-+				NULL, 0, 16, 8, speed_template_16_24_32);
- 		break;
+@@ -483,34 +557,12 @@ static void test_mb_ahash_speed(const char *algo, unsigned int sec,
+ 			i, speed[i].blen, speed[i].plen,
+ 			speed[i].blen / speed[i].plen);
  
- 	case 212:
- 		test_aead_speed("rfc4309(ccm(aes))", ENCRYPT, sec,
- 				NULL, 0, 16, 16, aead_speed_template_19);
-+		test_aead_speed("rfc4309(ccm(aes))", DECRYPT, sec,
-+				NULL, 0, 16, 16, aead_speed_template_19);
- 		break;
+-		start = get_cycles();
+-
+-		for (k = 0; k < num_mb; k++) {
+-			ret = crypto_ahash_digest(data[k].req);
+-			if (ret == -EINPROGRESS) {
+-				ret = 0;
+-				continue;
+-			}
+-
+-			if (ret)
+-				break;
+-
+-			crypto_req_done(&data[k].req->base, 0);
+-		}
+-
+-		for (j = 0; j < k; j++) {
+-			struct crypto_wait *wait = &data[j].wait;
+-			int wait_ret;
+-
+-			wait_ret = crypto_wait_req(-EINPROGRESS, wait);
+-			if (wait_ret)
+-				ret = wait_ret;
+-		}
++		if (secs)
++			ret = test_mb_ahash_jiffies(data, speed[i].blen, secs,
++						    num_mb);
++		else
++			ret = test_mb_ahash_cycles(data, speed[i].blen, num_mb);
  
- 	case 213:
- 		test_aead_speed("rfc7539esp(chacha20,poly1305)", ENCRYPT, sec,
- 				NULL, 0, 16, 8, aead_speed_template_36);
-+		test_aead_speed("rfc7539esp(chacha20,poly1305)", DECRYPT, sec,
-+				NULL, 0, 16, 8, aead_speed_template_36);
- 		break;
+-		end = get_cycles();
+-		cycles = end - start;
+-		pr_cont("%6lu cycles/operation, %4lu cycles/byte\n",
+-			cycles, cycles / (num_mb * speed[i].blen));
  
- 	case 214:
+ 		if (ret) {
+ 			pr_err("At least one hashing failed ret=%d\n", ret);
 -- 
 2.7.4
