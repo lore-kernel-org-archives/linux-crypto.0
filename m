@@ -1,8 +1,8 @@
 From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: BUG: unable to handle kernel NULL pointer dereference in __crypto_alg_lookup
-Date: Mon, 18 Dec 2017 07:25:41 +0100
-Message-ID: <1722846.rDtNfF0TEk@tauon.chronox.de>
-References: <001a1144a1eed09825056096eb88@google.com>
+Subject: Re: KASAN: use-after-free Read in __list_del_entry_valid (2)
+Date: Mon, 18 Dec 2017 07:36:00 +0100
+Message-ID: <14556514.LfxTAgkPiZ@tauon.chronox.de>
+References: <94eb2c05a380d3908b056096eb58@google.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
@@ -10,13 +10,13 @@ Cc: davem@davemloft.net, herbert@gondor.apana.org.au,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         syzkaller-bugs@googlegroups.com
 To: syzbot
-        <bot+08fafbe591c1d2980114c828ef2d7b5a46c19bff@syzkaller.appspotmail.com>
+        <bot+29cf0a34886ca39d13fc0451b174140973b5bed3@syzkaller.appspotmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:44372 "EHLO mail.eperm.de"
+Received: from mail.eperm.de ([89.247.134.16]:44384 "EHLO mail.eperm.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753352AbdLRGZs (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 18 Dec 2017 01:25:48 -0500
-In-Reply-To: <001a1144a1eed09825056096eb88@google.com>
+        id S1750752AbdLRGgD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 18 Dec 2017 01:36:03 -0500
+In-Reply-To: <94eb2c05a380d3908b056096eb58@google.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
@@ -27,8 +27,8 @@ Hi,
 > Hello,
 > 
 > syzkaller hit the following crash on
-> 41d8c16909ebda40f7b4982a7f5e2ad102705ade
-> git://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/master
+> 82bcf1def3b5f1251177ad47c44f7e17af039b4b
+> git://git.cmpxchg.org/linux-mmots.git/master
 > compiler: gcc (GCC) 7.1.1 20170620
 > .config is attached
 > Raw console output is attached.
@@ -37,53 +37,41 @@ Hi,
 > for information about syzkaller reproducers
 > 
 > 
-> BUG: unable to handle kernel NULL pointer dereference at 0000000000000020
-> IP: __crypto_alg_lookup+0x43/0x190 crypto/api.c:63
-> PGD 0 P4D 0
-> Oops: 0000 [#1] SMP
-> Dumping ftrace buffer:
->     (ftrace buffer empty)
-> Modules linked in:
-> CPU: 1 PID: 3321 Comm: cryptomgr_probe Not tainted
-> 4.15.0-rc3-next-20171213+ #66
+> ==================================================================
+> BUG: KASAN: use-after-free in __list_del_entry_valid+0x11d/0x150
+> lib/list_debug.c:42
+> Read of size 8 at addr ffff8801c4471248 by task syzkaller960526/6767
+> 
+> CPU: 0 PID: 6767 Comm: syzkaller960526 Not tainted 4.15.0-rc2-mm1+ #39
 > Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS
 > Google 01/01/2011
-> RIP: 0010:__crypto_alg_lookup+0x43/0x190 crypto/api.c:63
-> RSP: 0018:ffffc900017ebd28 EFLAGS: 00010293
-> RAX: ffff880216762080 RBX: 0000000000000000 RCX: ffffffff81673d23
-> RDX: 0000000000000000 RSI: 0000000000000403 RDI: ffff880214eba120
-> RBP: ffffc900017ebd70 R08: 0000000000000001 R09: 0000000000000001
-> R10: ffffc900017ebcf0 R11: 0000000000000000 R12: 0000000000000000
-> R13: 0000000000000000 R14: 000000000000240f R15: 0000000000000403
-> FS:  0000000000000000(0000) GS:ffff88021fd00000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 0000000000000020 CR3: 000000020dc6b000 CR4: 00000000001406e0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
 > Call Trace:
->   crypto_alg_lookup+0x31/0x50 crypto/api.c:201
->   crypto_larval_lookup.part.8+0x34/0x1c0 crypto/api.c:218
->   crypto_larval_lookup crypto/api.c:212 [inline]
->   crypto_alg_mod_lookup+0x77/0x120 crypto/api.c:271
->   crypto_find_alg+0x63/0x70 crypto/api.c:501
->   crypto_grab_spawn+0x2f/0x80 crypto/algapi.c:631
->   crypto_grab_aead+0x35/0x40 crypto/aead.c:336
->   pcrypt_create_aead crypto/pcrypt.c:298 [inline]
->   pcrypt_create+0xca/0x2c0 crypto/pcrypt.c:346
->   cryptomgr_probe+0x40/0x100 crypto/algboss.c:75
->   kthread+0x149/0x170 kernel/kthread.c:238
->   ret_from_fork+0x24/0x30 arch/x86/entry/entry_64.S:524
-> Code: 89 7d d0 e8 70 66 c4 ff 48 8b 1d 59 e4 a6 01 48 81 fb 60 21 0e 83 0f
-> 84 4c 01 00 00 c7 45 c4 fe ff ff ff 45 31 e4 e8 4d 66 c4 ff <44> 8b 6b 20
-> 41 f6 c5 60 0f 85 03 01 00 00 e8 3a 66 c4 ff 44 89
-> RIP: __crypto_alg_lookup+0x43/0x190 crypto/api.c:63 RSP: ffffc900017ebd28
-> CR2: 0000000000000020
-> ---[ end trace ff8e3661b9c3aa04 ]---
-> Kernel panic - not syncing: Fatal exception
-> Dumping ftrace buffer:
->     (ftrace buffer empty)
-> Kernel Offset: disabled
-> Rebooting in 86400 seconds..
+>   __dump_stack lib/dump_stack.c:17 [inline]
+>   dump_stack+0x194/0x257 lib/dump_stack.c:53
+>   print_address_description+0x73/0x250 mm/kasan/report.c:252
+>   kasan_report_error mm/kasan/report.c:351 [inline]
+>   kasan_report+0x25b/0x340 mm/kasan/report.c:409
+>   __asan_report_load8_noabort+0x14/0x20 mm/kasan/report.c:430
+>   __list_del_entry_valid+0x11d/0x150 lib/list_debug.c:42
+>   __list_del_entry include/linux/list.h:117 [inline]
+>   list_del include/linux/list.h:125 [inline]
+>   crypto_larval_kill+0x79/0x2e0 crypto/api.c:164
+>   crypto_alg_mod_lookup+0x178/0x1b0 crypto/api.c:283
+>   crypto_find_alg crypto/api.c:501 [inline]
+>   crypto_alloc_tfm+0xf3/0x2f0 crypto/api.c:534
+>   crypto_alloc_aead+0x2c/0x40 crypto/aead.c:342
+>   aead_bind+0x70/0x140 crypto/algif_aead.c:482
+>   alg_bind+0x1ab/0x440 crypto/af_alg.c:179
+>   SYSC_bind+0x1b4/0x3f0 net/socket.c:1454
+>   SyS_bind+0x24/0x30 net/socket.c:1440
+>   entry_SYSCALL_64_fastpath+0x1f/0x96
+> RIP: 0033:0x4406f9
+> RSP: 002b:00007ffe2d384878 EFLAGS: 00000203 ORIG_RAX: 0000000000000031
+> RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00000000004406f9
+> RDX: 0000000000000058 RSI: 0000000020269000 RDI: 0000000000000003
+> RBP: 000000000000ac2d R08: 0000000000000000 R09: 0000000000000000
+> R10: 0000000000000000 R11: 0000000000000203 R12: 0000000000000000
+> R13: 0000000000401c30 R14: 0000000000000000 R15: 0000000000000000
 
 This bug seems to be triggerable again by the fact that some strange mask/type 
 combo is used. When setting it to zero, there is no crash.
