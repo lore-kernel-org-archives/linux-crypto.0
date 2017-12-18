@@ -1,49 +1,41 @@
-From: Li Kun <hw.likun@huawei.com>
-Subject: [PATCH RESEND] crypto: af_alg - add keylen checking to avoid NULL ptr passing down
-Date: Mon, 18 Dec 2017 13:40:36 +0000
-Message-ID: <1513604436-43814-1-git-send-email-hw.likun@huawei.com>
+From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Subject: RFC: Crypto: Race in updating available writable socket memory.
+Date: Mon, 18 Dec 2017 14:26:00 +0000
+Message-ID: <20171218142600.0000549d@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-To: <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+To: <linux-crypto@vger.kernel.org>, <linuxarm@huawei.com>,
+        Stephan Mueller <smueller@chronox.de>, <davem@davemloft.net>,
+        <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from szxga05-in.huawei.com ([45.249.212.191]:2731 "EHLO huawei.com"
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2692 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1758598AbdLRNtk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 18 Dec 2017 08:49:40 -0500
-Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id 9DEB1F56713C4
-        for <linux-crypto@vger.kernel.org>; Mon, 18 Dec 2017 21:49:25 +0800 (CST)
+        id S1752954AbdLRO0g (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 18 Dec 2017 09:26:36 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-alg_setkey do not check the keylen whether it is zero, so the key
-may be ZERO_SIZE_PTR when keylen is 0, which will pass the
-copy_from_user's checking and be passed to the lower functions as key.
+Hi All,
 
-If the lower functions only check the key if it is NULL, ZERO_SIZE_PTR
-will pass the checking, and will cause null ptr dereference, so it's
-better to intercept the invalid parameters in the upper functions.
+I came across this one but am not sure how heavy weight a fix we want to apply.
 
-This patch is also suitable to fix CVE-2017-15116 for stable trees.
+I was getting failures on af_alg_readable in af_alg_get_rsgl which made little
+sense as I had wmem set to a very large value.  This was caused by a race between
+ctx->rcvused += err in af_alg_get_rsgl and
+ctx->rcvused -= rsgl->sg_num_bytes in af_alg_free_areq_sgls which was being
+called from an interrupt thread.  It was wrapping in a downwards direction once
+in a large number of cycles.
 
-Signed-off-by: Li Kun <hw.likun@huawei.com>
-Cc: stable@vger.kernel.org
----
- crypto/af_alg.c | 2 ++
- 1 file changed, 2 insertions(+)
+Testing was using the AIO interface and libkcapi on the userspace side and a
+(hopefully) soon to be posted new Hisilicon 161x crypto accelerator driver.
 
-diff --git a/crypto/af_alg.c b/crypto/af_alg.c
-index 337cf38..10f22f3 100644
---- a/crypto/af_alg.c
-+++ b/crypto/af_alg.c
-@@ -210,6 +210,8 @@ static int alg_setkey(struct sock *sk, char __user *ukey,
- 	u8 *key;
- 	int err;
- 
-+	if (!keylen)
-+		return -EINVAL;
- 	key = sock_kmalloc(sk, keylen, GFP_KERNEL);
- 	if (!key)
- 		return -ENOMEM;
--- 
-1.8.3.4
+So it seems that this field needs some protection.
+1. Could make it an atomic_t (works fine, but feels rather inelegant!)
+2. Leverage the complexity seen in sock.c if it is needed...
+
+So the question is whether making it an atomic_t is the right way to go.
+
+Thanks,
+
+Jonathan  
