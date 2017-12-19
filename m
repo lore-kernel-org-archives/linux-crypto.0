@@ -1,29 +1,52 @@
-From: David Miller <davem@davemloft.net>
-Subject: Re: [PATCH] crypto: n2 - cure use after free
-Date: Tue, 19 Dec 2017 11:38:20 -0500 (EST)
-Message-ID: <20171219.113820.1629794046915223777.davem@davemloft.net>
-References: <20171216010117.13275-1-jengelh@inai.de>
-        <20171219.103116.1726291053594167469.davem@davemloft.net>
-        <nycvar.YFH.7.76.1712191637300.11660@n3.vanv.qr>
+From: Ingo Molnar <mingo@kernel.org>
+Subject: Re: [PATCH] crypto: x86/twofish-3way - Fix %rbp usage
+Date: Tue, 19 Dec 2017 18:35:33 +0100
+Message-ID: <20171219173533.25evvqns4tlxztzj@gmail.com>
+References: <001a113f2cd26f3532055f0f4a79@google.com>
+ <20171219004026.170565-1-ebiggers3@gmail.com>
+ <20171219075443.tdpt2l72eelhpi7j@gmail.com>
 Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-Cc: sparclinux@vger.kernel.org, herbert@gondor.apana.org.au,
-        linux-crypto@vger.kernel.org, rmk+kernel@arm.linux.org.uk
-To: jengelh@inai.de
-Return-path: <sparclinux-owner@vger.kernel.org>
-In-Reply-To: <nycvar.YFH.7.76.1712191637300.11660@n3.vanv.qr>
-Sender: sparclinux-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        Jussi Kivilinna <jussi.kivilinna@iki.fi>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
+        Eric Biggers <ebiggers@google.com>,
+        Peter Zijlstra <a.p.zijlstra@chello.nl>
+To: Eric Biggers <ebiggers3@gmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-wm0-f52.google.com ([74.125.82.52]:44580 "EHLO
+        mail-wm0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750723AbdLSRfh (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 19 Dec 2017 12:35:37 -0500
+Content-Disposition: inline
+In-Reply-To: <20171219075443.tdpt2l72eelhpi7j@gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-From: Jan Engelhardt <jengelh@inai.de>
-Date: Tue, 19 Dec 2017 16:42:39 +0100 (CET)
 
-> Nevertheless, I think that the error pathing in n2_core.c should be made 
-> robust as well.
+* Ingo Molnar <mingo@kernel.org> wrote:
 
-I completely agree.
+> 
+> * Eric Biggers <ebiggers3@gmail.com> wrote:
+> 
+> > There may be a small overhead caused by replacing 'xchg REG, REG' with
+> > the needed sequence 'mov MEM, REG; mov REG, MEM; mov REG, REG' once per
+> > round.  But, counterintuitively, when I tested "ctr-twofish-3way" on a
+> > Haswell processor, the new version was actually about 2% faster.
+> > (Perhaps 'xchg' is not as well optimized as plain moves.)
+> 
+> XCHG has implicit LOCK semantics on all x86 CPUs, so that's not a surprising 
+> result I think.
 
-> Should I resubmit with a new commit message?
+Correction: I think XCHG only implies LOCK if there's a memory operand involved - 
+register-register XCHG should not imply any barriers.
 
-Yes.
+So the result is indeed unintuitive.
+
+Thanks,
+
+	Ingo
