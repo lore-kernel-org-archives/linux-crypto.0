@@ -1,69 +1,43 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: [PATCH v2] crypto: AF_ALG - limit mask and type
-Date: Tue, 19 Dec 2017 07:25:04 +0100
-Message-ID: <3658547.Hu7AXH7hma@positron.chronox.de>
-References: <001a1141c43ad30ccf055efb76ed@google.com> <4450500.tGvsruIfR8@positron.chronox.de>
+From: Ingo Molnar <mingo@kernel.org>
+Subject: Re: [PATCH] crypto: x86/twofish-3way - Fix %rbp usage
+Date: Tue, 19 Dec 2017 08:54:43 +0100
+Message-ID: <20171219075443.tdpt2l72eelhpi7j@gmail.com>
+References: <001a113f2cd26f3532055f0f4a79@google.com>
+ <20171219004026.170565-1-ebiggers3@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: syzbot
-        <bot+b6e703f648ebbbf57a4528d4314e0c2a5c893dc2@syzkaller.appspotmail.com>,
-        davem@davemloft.net, herbert@gondor.apana.org.au,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com, ebiggers3@gmail.com
-To: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        Jussi Kivilinna <jussi.kivilinna@iki.fi>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
+        Eric Biggers <ebiggers@google.com>,
+        Peter Zijlstra <a.p.zijlstra@chello.nl>
+To: Eric Biggers <ebiggers3@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:44400 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S933780AbdLSGZH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 19 Dec 2017 01:25:07 -0500
-In-Reply-To: <4450500.tGvsruIfR8@positron.chronox.de>
+Received: from mail-wm0-f43.google.com ([74.125.82.43]:43189 "EHLO
+        mail-wm0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S966514AbdLSHyr (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 19 Dec 2017 02:54:47 -0500
+Content-Disposition: inline
+In-Reply-To: <20171219004026.170565-1-ebiggers3@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The user space interface allows specifying the type and the mask field
-used to allocate the cipher. As user space can precisely select the
-desired cipher by using either the name or the driver name, additional
-selection options for cipher are not considered necessary and relevant
-for user space.
 
-This fixes a bug where user space is able to cause one cipher to be
-registered multiple times potentially exhausting kernel memory.
+* Eric Biggers <ebiggers3@gmail.com> wrote:
 
-Reported-by: syzbot <syzkaller@googlegroups.com>
-Cc: <stable@vger.kernel.org>
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
----
- crypto/af_alg.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+> There may be a small overhead caused by replacing 'xchg REG, REG' with
+> the needed sequence 'mov MEM, REG; mov REG, MEM; mov REG, REG' once per
+> round.  But, counterintuitively, when I tested "ctr-twofish-3way" on a
+> Haswell processor, the new version was actually about 2% faster.
+> (Perhaps 'xchg' is not as well optimized as plain moves.)
 
-diff --git a/crypto/af_alg.c b/crypto/af_alg.c
-index 1e5353f62067..4f4cfc5a7ef3 100644
---- a/crypto/af_alg.c
-+++ b/crypto/af_alg.c
-@@ -150,7 +150,6 @@ EXPORT_SYMBOL_GPL(af_alg_release_parent);
- 
- static int alg_bind(struct socket *sock, struct sockaddr *uaddr, int addr_len)
- {
--	const u32 forbidden = CRYPTO_ALG_INTERNAL;
- 	struct sock *sk = sock->sk;
- 	struct alg_sock *ask = alg_sk(sk);
- 	struct sockaddr_alg *sa = (void *)uaddr;
-@@ -176,9 +175,12 @@ static int alg_bind(struct socket *sock, struct sockaddr *uaddr, int addr_len)
- 	if (IS_ERR(type))
- 		return PTR_ERR(type);
- 
--	private = type->bind(sa->salg_name,
--			     sa->salg_feat & ~forbidden,
--			     sa->salg_mask & ~forbidden);
-+	/*
-+	 * The use of the salg_feat and salg_mask are forbidden as they expose
-+	 * too much of the low-level handling which is not suitable for
-+	 * hostile code.
-+	 */
-+	private = type->bind(sa->salg_name, 0, 0);
- 	if (IS_ERR(private)) {
- 		module_put(type->owner);
- 		return PTR_ERR(private);
--- 
-2.14.3
+XCHG has implicit LOCK semantics on all x86 CPUs, so that's not a surprising 
+result I think.
+
+Thanks,
+
+	Ingo
