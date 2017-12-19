@@ -1,74 +1,34 @@
-From: Jan Engelhardt <jengelh@inai.de>
-Subject: [PATCH] crypto: n2 - cure use after free
-Date: Tue, 19 Dec 2017 19:09:07 +0100
-Message-ID: <20171219180907.12895-1-jengelh@inai.de>
+From: David Miller <davem@davemloft.net>
+Subject: Re: [PATCH] crypto: n2 - cure use after free
+Date: Tue, 19 Dec 2017 13:39:13 -0500 (EST)
+Message-ID: <20171219.133913.989258584455045384.davem@davemloft.net>
 References: <20171219.113820.1629794046915223777.davem@davemloft.net>
-Cc: sparclinux@vger.kernel.org, jengelh@inai.de,
-        linux-crypto@vger.kernel.org, rmk+kernel@arm.linux.org.uk
-To: davem@davemloft.net
+        <20171219180907.12895-1-jengelh@inai.de>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+Cc: sparclinux@vger.kernel.org, linux-crypto@vger.kernel.org,
+        rmk+kernel@arm.linux.org.uk
+To: jengelh@inai.de
 Return-path: <sparclinux-owner@vger.kernel.org>
-In-Reply-To: <20171219.113820.1629794046915223777.davem@davemloft.net>
+In-Reply-To: <20171219180907.12895-1-jengelh@inai.de>
 Sender: sparclinux-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-queue_cache_init is first called for the Control Word Queue
-(n2_crypto_probe). At that time, queue_cache[0] is NULL and a new
-kmem_cache will be allocated. If the subsequent n2_register_algs call
-fails, the kmem_cache will be released in queue_cache_destroy, but
-queue_cache_init[0] is not set back to NULL.
+From: Jan Engelhardt <jengelh@inai.de>
+Date: Tue, 19 Dec 2017 19:09:07 +0100
 
-So when the Module Arithmetic Unit gets probed next (n2_mau_probe),
-queue_cache_init will not allocate a kmem_cache again, but leave it
-as its bogus value, causing a BUG() to trigger when queue_cache[0] is
-eventually passed to kmem_cache_zalloc:
+> queue_cache_init is first called for the Control Word Queue
+> (n2_crypto_probe). At that time, queue_cache[0] is NULL and a new
+> kmem_cache will be allocated. If the subsequent n2_register_algs call
+> fails, the kmem_cache will be released in queue_cache_destroy, but
+> queue_cache_init[0] is not set back to NULL.
+> 
+> So when the Module Arithmetic Unit gets probed next (n2_mau_probe),
+> queue_cache_init will not allocate a kmem_cache again, but leave it
+> as its bogus value, causing a BUG() to trigger when queue_cache[0] is
+> eventually passed to kmem_cache_zalloc:
+ ...
+> Signed-off-by: Jan Engelhardt <jengelh@inai.de>
 
-	n2_crypto: Found N2CP at /virtual-devices@100/n2cp@7
-	n2_crypto: Registered NCS HVAPI version 2.0
-	called queue_cache_init
-	n2_crypto: md5 alg registration failed
-	n2cp f028687c: /virtual-devices@100/n2cp@7: Unable to register algorithms.
-	called queue_cache_destroy
-	n2cp: probe of f028687c failed with error -22
-	n2_crypto: Found NCP at /virtual-devices@100/ncp@6
-	n2_crypto: Registered NCS HVAPI version 2.0
-	called queue_cache_init
-	kernel BUG at mm/slab.c:2993!
-	Call Trace:
-	 [0000000000604488] kmem_cache_alloc+0x1a8/0x1e0
-                  (inlined) kmem_cache_zalloc
-                  (inlined) new_queue
-                  (inlined) spu_queue_setup
-                  (inlined) handle_exec_unit
-	 [0000000010c61eb4] spu_mdesc_scan+0x1f4/0x460 [n2_crypto]
-	 [0000000010c62b80] n2_mau_probe+0x100/0x220 [n2_crypto]
-	 [000000000084b174] platform_drv_probe+0x34/0xc0
-
-Signed-off-by: Jan Engelhardt <jengelh@inai.de>
----
- drivers/crypto/n2_core.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/drivers/crypto/n2_core.c b/drivers/crypto/n2_core.c
-index 48de52cf2ecc..662e709812cc 100644
---- a/drivers/crypto/n2_core.c
-+++ b/drivers/crypto/n2_core.c
-@@ -1625,6 +1625,7 @@ static int queue_cache_init(void)
- 					  CWQ_ENTRY_SIZE, 0, NULL);
- 	if (!queue_cache[HV_NCS_QTYPE_CWQ - 1]) {
- 		kmem_cache_destroy(queue_cache[HV_NCS_QTYPE_MAU - 1]);
-+		queue_cache[HV_NCS_QTYPE_MAU - 1] = NULL;
- 		return -ENOMEM;
- 	}
- 	return 0;
-@@ -1634,6 +1635,8 @@ static void queue_cache_destroy(void)
- {
- 	kmem_cache_destroy(queue_cache[HV_NCS_QTYPE_MAU - 1]);
- 	kmem_cache_destroy(queue_cache[HV_NCS_QTYPE_CWQ - 1]);
-+	queue_cache[HV_NCS_QTYPE_MAU - 1] = NULL;
-+	queue_cache[HV_NCS_QTYPE_CWQ - 1] = NULL;
- }
- 
- static long spu_queue_register_workfn(void *arg)
--- 
-2.12.3
-
+Acked-by: David S. Miller <davem@davemloft.net>
