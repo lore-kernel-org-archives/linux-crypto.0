@@ -1,93 +1,69 @@
-From: Li Kun <hw.likun@huawei.com>
-Subject: Re: [PATCH RESEND] crypto: af_alg - add keylen checking to avoid NULL
- ptr passing down
-Date: Tue, 19 Dec 2017 09:19:36 +0800
-Message-ID: <e096dabe-33d0-57f1-bffd-c37ff9f8baee@huawei.com>
-References: <1513604436-43814-1-git-send-email-hw.likun@huawei.com>
- <20171218191233.GA55142@gmail.com>
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Subject: [PATCH v2] crypto: AF_ALG - limit mask and type
+Date: Tue, 19 Dec 2017 07:25:04 +0100
+Message-ID: <3658547.Hu7AXH7hma@positron.chronox.de>
+References: <001a1141c43ad30ccf055efb76ed@google.com> <4450500.tGvsruIfR8@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-Cc: <linux-crypto@vger.kernel.org>
-To: Eric Biggers <ebiggers3@gmail.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: syzbot
+        <bot+b6e703f648ebbbf57a4528d4314e0c2a5c893dc2@syzkaller.appspotmail.com>,
+        davem@davemloft.net, herbert@gondor.apana.org.au,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com, ebiggers3@gmail.com
+To: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from szxga05-in.huawei.com ([45.249.212.191]:12009 "EHLO
-        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1759758AbdLSBTn (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 18 Dec 2017 20:19:43 -0500
-In-Reply-To: <20171218191233.GA55142@gmail.com>
+Received: from mail.eperm.de ([89.247.134.16]:44400 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S933780AbdLSGZH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 19 Dec 2017 01:25:07 -0500
+In-Reply-To: <4450500.tGvsruIfR8@positron.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+The user space interface allows specifying the type and the mask field
+used to allocate the cipher. As user space can precisely select the
+desired cipher by using either the name or the driver name, additional
+selection options for cipher are not considered necessary and relevant
+for user space.
 
+This fixes a bug where user space is able to cause one cipher to be
+registered multiple times potentially exhausting kernel memory.
 
-在 2017/12/19 3:12, Eric Biggers 写道:
-> On Mon, Dec 18, 2017 at 01:40:36PM +0000, Li Kun wrote:
->> alg_setkey do not check the keylen whether it is zero, so the key
->> may be ZERO_SIZE_PTR when keylen is 0, which will pass the
->> copy_from_user's checking and be passed to the lower functions as key.
->>
->> If the lower functions only check the key if it is NULL, ZERO_SIZE_PTR
->> will pass the checking, and will cause null ptr dereference, so it's
->> better to intercept the invalid parameters in the upper functions.
->>
->> This patch is also suitable to fix CVE-2017-15116 for stable trees.
->>
->> Signed-off-by: Li Kun <hw.likun@huawei.com>
->> Cc: stable@vger.kernel.org
->> ---
->>   crypto/af_alg.c | 2 ++
->>   1 file changed, 2 insertions(+)
->>
->> diff --git a/crypto/af_alg.c b/crypto/af_alg.c
->> index 337cf38..10f22f3 100644
->> --- a/crypto/af_alg.c
->> +++ b/crypto/af_alg.c
->> @@ -210,6 +210,8 @@ static int alg_setkey(struct sock *sk, char __user *ukey,
->>   	u8 *key;
->>   	int err;
->>   
->> +	if (!keylen)
->> +		return -EINVAL;
->>   	key = sock_kmalloc(sk, keylen, GFP_KERNEL);
->>   	if (!key)
->>   		return -ENOMEM;
->> -- 
-> If the length is 0 then why is the underlying ->setkey() method dereferencing
-> the pointer?  Which algorithm does this happen for?  Checking for NULL makes no
-> sense; the length needs to be checked instead.
-The drbg_kcapi_reset has wrongly treated the (length == 0) && (data != 
-NULL) as an valid
-combination of parameters which has been fixed by herbert in
-commit 8fded59 (crypto: drbg - Convert to new rng interface).
-But i think to avoid such things happening again, maybe we could 
-intercept the length 0 error
-in the entry of setkey ?
+Reported-by: syzbot <syzkaller@googlegroups.com>
+Cc: <stable@vger.kernel.org>
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+---
+ crypto/af_alg.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-
-static int drbg_kcapi_reset(struct crypto_rng *tfm, u8 *seed, unsigned 
-int slen)
-{
-     ......
-     if (0 < slen) {
-         drbg_string_fill(&seed_string, seed, slen);
-         return drbg_instantiate(drbg, &seed_string, coreref, pr);
-     } else {
-         struct drbg_gen *data = (struct drbg_gen *)seed;
-         /* allow invocation of API call with NULL, 0 */
-         if (!data)
-             return drbg_instantiate(drbg, NULL, coreref, pr);
-         drbg_set_testdata(drbg, data->test_data);
-         /* linked list variable is now local to allow modification */
-         drbg_string_fill(&seed_string, data->addtl->buf,
-                  data->addtl->len);
-         return drbg_instantiate(drbg, &seed_string, coreref, pr);
-     }
-}
->
-> Eric
-
+diff --git a/crypto/af_alg.c b/crypto/af_alg.c
+index 1e5353f62067..4f4cfc5a7ef3 100644
+--- a/crypto/af_alg.c
++++ b/crypto/af_alg.c
+@@ -150,7 +150,6 @@ EXPORT_SYMBOL_GPL(af_alg_release_parent);
+ 
+ static int alg_bind(struct socket *sock, struct sockaddr *uaddr, int addr_len)
+ {
+-	const u32 forbidden = CRYPTO_ALG_INTERNAL;
+ 	struct sock *sk = sock->sk;
+ 	struct alg_sock *ask = alg_sk(sk);
+ 	struct sockaddr_alg *sa = (void *)uaddr;
+@@ -176,9 +175,12 @@ static int alg_bind(struct socket *sock, struct sockaddr *uaddr, int addr_len)
+ 	if (IS_ERR(type))
+ 		return PTR_ERR(type);
+ 
+-	private = type->bind(sa->salg_name,
+-			     sa->salg_feat & ~forbidden,
+-			     sa->salg_mask & ~forbidden);
++	/*
++	 * The use of the salg_feat and salg_mask are forbidden as they expose
++	 * too much of the low-level handling which is not suitable for
++	 * hostile code.
++	 */
++	private = type->bind(sa->salg_name, 0, 0);
+ 	if (IS_ERR(private)) {
+ 		module_put(type->owner);
+ 		return PTR_ERR(private);
 -- 
-Best Regards
-Li Kun
+2.14.3
