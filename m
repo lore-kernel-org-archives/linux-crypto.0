@@ -1,92 +1,74 @@
-From: Gary R Hook <gary.hook@amd.com>
-Subject: Re: [PATCH v2] hwrng: Clean up RNG list when last hwrng is
- unregistered
-Date: Tue, 19 Dec 2017 11:52:05 -0600
-Message-ID: <a7acdf4b-343d-e8d4-e28c-4167cc8e9035@amd.com>
-References: <151336772989.60446.16322941485803241258.stgit@sosxen2.amd.com>
- <CANc+2y6DaMs+GbZT6tWKU5Boyjs_8wU49B+N4kcx-ZJWiFtisQ@mail.gmail.com>
- <CANc+2y4hKW8gdv633GissBKeUm+7m18pGu2tG8NDXqZ+xe6tEg@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>, thomas.lendacky@amd.com,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>
-To: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-by2nam03on0069.outbound.protection.outlook.com ([104.47.42.69]:59796
-        "EHLO NAM03-BY2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751281AbdLSRwM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 19 Dec 2017 12:52:12 -0500
-In-Reply-To: <CANc+2y4hKW8gdv633GissBKeUm+7m18pGu2tG8NDXqZ+xe6tEg@mail.gmail.com>
-Content-Language: en-US
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Jan Engelhardt <jengelh@inai.de>
+Subject: [PATCH] crypto: n2 - cure use after free
+Date: Tue, 19 Dec 2017 19:09:07 +0100
+Message-ID: <20171219180907.12895-1-jengelh@inai.de>
+References: <20171219.113820.1629794046915223777.davem@davemloft.net>
+Cc: sparclinux@vger.kernel.org, jengelh@inai.de,
+        linux-crypto@vger.kernel.org, rmk+kernel@arm.linux.org.uk
+To: davem@davemloft.net
+Return-path: <sparclinux-owner@vger.kernel.org>
+In-Reply-To: <20171219.113820.1629794046915223777.davem@davemloft.net>
+Sender: sparclinux-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 12/17/2017 03:49 AM, PrasannaKumar Muralidharan wrote:
-> On 17 December 2017 at 14:53, PrasannaKumar Muralidharan
-> <prasannatsmkumar@gmail.com> wrote:
->> Hi Gary,
->>
->> Some minor comments below.
->>
->> On 16 December 2017 at 01:25, Gary R Hook <gary.hook@amd.com> wrote:
->>>
->>> Commit 142a27f0a731 added support for a "best" RNG, and in doing so
->>> introduced a hang from rmmod/modprobe -r when the last RNG on the list
->>> was unloaded.
->>
->> Nice catch. Thanks for fixing this.
->>
->>> When the hwrng list is depleted, return the global variables to their
->>> original state and decrement all references to the object.
->>>
->>> Fixes: 142a27f0a731 ("hwrng: core - Reset user selected rng by writing "" to rng_current")
->>
->> Please cc the commit author (in this case its me) so that this patch
->> gets noticed easily.
+queue_cache_init is first called for the Control Word Queue
+(n2_crypto_probe). At that time, queue_cache[0] is NULL and a new
+kmem_cache will be allocated. If the subsequent n2_register_algs call
+fails, the kmem_cache will be released in queue_cache_destroy, but
+queue_cache_init[0] is not set back to NULL.
 
-D'oh! I did not do so on this version. My apologies.
+So when the Module Arithmetic Unit gets probed next (n2_mau_probe),
+queue_cache_init will not allocate a kmem_cache again, but leave it
+as its bogus value, causing a BUG() to trigger when queue_cache[0] is
+eventually passed to kmem_cache_zalloc:
 
->>
->>> Signed-off-by: Gary R Hook <gary.hook@amd.com>
->>> ---
->>>
->>> Changes since v1: fix misspelled word in subject
->>>
->>>   drivers/char/hw_random/core.c |    4 ++++
->>>   1 file changed, 4 insertions(+)
->>>
->>> diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
->>> index 657b8770b6b9..91bb98c42a1c 100644
->>> --- a/drivers/char/hw_random/core.c
->>> +++ b/drivers/char/hw_random/core.c
->>> @@ -306,6 +306,10 @@ static int enable_best_rng(void)
->>>                  ret = ((new_rng == current_rng) ? 0 : set_current_rng(new_rng));
->>>                  if (!ret)
->>>                          cur_rng_set_by_user = 0;
->>> +       } else {
->>> +               drop_current_rng();
->>
->> When the hwrng list is empty just set current_rng = NULL instead of
->> calling drop_current_rng().
->>
->>> +               cur_rng_set_by_user = 0;
->>> +               ret = 0;
->>>          }
->>>
->>>          return ret;
->>>
->>
->> Regards,
->> PrasannaKumar
-> 
-> I am fine with the code as is.
-> 
-> Reviewed-by: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
-> 
-> Regards,
-> PrasannaKumar
-> 
+	n2_crypto: Found N2CP at /virtual-devices@100/n2cp@7
+	n2_crypto: Registered NCS HVAPI version 2.0
+	called queue_cache_init
+	n2_crypto: md5 alg registration failed
+	n2cp f028687c: /virtual-devices@100/n2cp@7: Unable to register algorithms.
+	called queue_cache_destroy
+	n2cp: probe of f028687c failed with error -22
+	n2_crypto: Found NCP at /virtual-devices@100/ncp@6
+	n2_crypto: Registered NCS HVAPI version 2.0
+	called queue_cache_init
+	kernel BUG at mm/slab.c:2993!
+	Call Trace:
+	 [0000000000604488] kmem_cache_alloc+0x1a8/0x1e0
+                  (inlined) kmem_cache_zalloc
+                  (inlined) new_queue
+                  (inlined) spu_queue_setup
+                  (inlined) handle_exec_unit
+	 [0000000010c61eb4] spu_mdesc_scan+0x1f4/0x460 [n2_crypto]
+	 [0000000010c62b80] n2_mau_probe+0x100/0x220 [n2_crypto]
+	 [000000000084b174] platform_drv_probe+0x34/0xc0
+
+Signed-off-by: Jan Engelhardt <jengelh@inai.de>
+---
+ drivers/crypto/n2_core.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/drivers/crypto/n2_core.c b/drivers/crypto/n2_core.c
+index 48de52cf2ecc..662e709812cc 100644
+--- a/drivers/crypto/n2_core.c
++++ b/drivers/crypto/n2_core.c
+@@ -1625,6 +1625,7 @@ static int queue_cache_init(void)
+ 					  CWQ_ENTRY_SIZE, 0, NULL);
+ 	if (!queue_cache[HV_NCS_QTYPE_CWQ - 1]) {
+ 		kmem_cache_destroy(queue_cache[HV_NCS_QTYPE_MAU - 1]);
++		queue_cache[HV_NCS_QTYPE_MAU - 1] = NULL;
+ 		return -ENOMEM;
+ 	}
+ 	return 0;
+@@ -1634,6 +1635,8 @@ static void queue_cache_destroy(void)
+ {
+ 	kmem_cache_destroy(queue_cache[HV_NCS_QTYPE_MAU - 1]);
+ 	kmem_cache_destroy(queue_cache[HV_NCS_QTYPE_CWQ - 1]);
++	queue_cache[HV_NCS_QTYPE_MAU - 1] = NULL;
++	queue_cache[HV_NCS_QTYPE_CWQ - 1] = NULL;
+ }
+ 
+ static long spu_queue_register_workfn(void *arg)
+-- 
+2.12.3
+
