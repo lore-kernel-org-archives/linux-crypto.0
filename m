@@ -1,36 +1,31 @@
-From: David Laight <David.Laight@ACULAB.COM>
-Subject: RE: [PATCH] crypto: x86/twofish-3way - Fix %rbp usage
-Date: Tue, 19 Dec 2017 14:37:07 +0000
-Message-ID: <a4fecc01e8a14142a9add860aa2ec67a@AcuMS.aculab.com>
-References: <001a113f2cd26f3532055f0f4a79@google.com>
- <20171219004026.170565-1-ebiggers3@gmail.com>
- <20171219075443.tdpt2l72eelhpi7j@gmail.com>
- <44b42058-c465-4d1e-7710-198754efabe4@suse.com>
+From: Jan Engelhardt <jengelh@inai.de>
+Subject: Re: [PATCH] crypto: n2 - cure use after free
+Date: Tue, 19 Dec 2017 16:42:39 +0100 (CET)
+Message-ID: <nycvar.YFH.7.76.1712191637300.11660@n3.vanv.qr>
+References: <nycvar.YFH.7.76.1712151444211.6644@n3.vanv.qr> <20171216010117.13275-1-jengelh@inai.de> <20171219.103116.1726291053594167469.davem@davemloft.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        "Josh Poimboeuf" <jpoimboe@redhat.com>,
-        Jussi Kivilinna <jussi.kivilinna@iki.fi>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "syzkaller-bugs@googlegroups.com" <syzkaller-bugs@googlegroups.com>,
-        Eric Biggers <ebiggers@google.com>,
-        "Peter Zijlstra" <a.p.zijlstra@chello.nl>
-To: 'Juergen Gross' <jgross@suse.com>, Ingo Molnar <mingo@kernel.org>,
-        "Eric Biggers" <ebiggers3@gmail.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <44b42058-c465-4d1e-7710-198754efabe4@suse.com>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Cc: sparclinux@vger.kernel.org, herbert@gondor.apana.org.au,
+        linux-crypto@vger.kernel.org, rmk+kernel@arm.linux.org.uk
+To: David Miller <davem@davemloft.net>
+Return-path: <sparclinux-owner@vger.kernel.org>
+In-Reply-To: <20171219.103116.1726291053594167469.davem@davemloft.net>
+Sender: sparclinux-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-RnJvbTogSnVlcmdlbiBHcm9zcw0KPiBTZW50OiAxOSBEZWNlbWJlciAyMDE3IDA4OjA1DQouLg0K
-PiANCj4gRXhjaGFuZ2luZyAyIHJlZ2lzdGVycyBjYW4gYmUgZG9uZSB3aXRob3V0IG1lbW9yeSBh
-Y2Nlc3MgdmlhOg0KPiANCj4geG9yIHJlZzEsIHJlZzINCj4geG9yIHJlZzIsIHJlZzENCj4geG9y
-IHJlZzEsIHJlZzINCg0KVGhhdCdsbCBnZW5lcmF0ZSBob3JyaWQgZGF0YSBkZXBlbmRlbmNpZXMu
-DQpJU1RSIHRoYXQgdGhlcmUgYXJlIHNvbWUgb3B0aW1pc2F0aW9ucyBmb3IgdGhlIHN0YWNrLA0K
-c28gZXZlbiAncHVzaCByZWcxJywgJ21vdiByZWcyLHJlZzEnLCAncG9wIHJlZzInIG1pZ2h0DQpi
-ZSBmYXN0ZXIgdGhhbiB0aGUgYWJvdmUuDQoNCglEYXZpZA0KDQo=
+
+On Tuesday 2017-12-19 16:31, David Miller wrote:
+>
+>Instead, what fails is the algorithm registry which you should look
+>more deeply into the cause of.
+
+You are right. The registration failure is because the crypto layer 
+expects halg->statesize to be non-zero, and drivers/crypto/n2_core.c 
+does not set it, causing breakage since possibly 
+v4.2-rc1-182-g8996eafdcbad (commit by rmk):
+
+(1471)  halg = &ahash->halg;
+        halg->digestsize = tmpl->digest_size;
+
+Nevertheless, I think that the error pathing in n2_core.c should be made 
+robust as well. Should I resubmit with a new commit message?
