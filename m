@@ -1,63 +1,51 @@
-From: Cheah Kok Cheong <thrust73@gmail.com>
-Subject: Re: [PATCH 1/2] padata: Remove FSF address
-Date: Thu, 21 Dec 2017 05:17:28 +0800
-Message-ID: <20171220211728.GA2383@linux-Precision-WorkStation-T5500>
-References: <1513800921-12452-1-git-send-email-thrust73@gmail.com>
- <CAOFm3uGvuyHcKQ9vvZ1=U3D3Qp8N4npU-JSkWmyr-=9aYv=vzw@mail.gmail.com>
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [PATCH] [RFT] crypto: aes-generic - turn off -ftree-pre and -ftree-sra
+Date: Wed, 20 Dec 2017 22:31:08 +0100
+Message-ID: <CAK8P3a0sFKB0Zs=R_Ban7R-Xgydd4ptxmPj03fS7B364abkOHg@mail.gmail.com>
+References: <20171220205213.1025257-1-arnd@arndb.de> <CAKv+Gu_2V1C61N6iRQaarpb_dF+bDWVJTG3YLXF5Hzd04v72uw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: steffen.klassert@secunet.com, linux-crypto@vger.kernel.org,
-        LKML <linux-kernel@vger.kernel.org>
-To: Philippe Ombredanne <pombredanne@nexb.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <CAOFm3uGvuyHcKQ9vvZ1=U3D3Qp8N4npU-JSkWmyr-=9aYv=vzw@mail.gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        James Morris <james.l.morris@oracle.com>,
+        Richard Biener <rguenther@suse.de>,
+        Jakub Jelinek <jakub@gcc.gnu.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-ot0-f193.google.com ([74.125.82.193]:46092 "EHLO
+        mail-ot0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1756004AbdLTVbJ (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 20 Dec 2017 16:31:09 -0500
+In-Reply-To: <CAKv+Gu_2V1C61N6iRQaarpb_dF+bDWVJTG3YLXF5Hzd04v72uw@mail.gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Dec 20, 2017 at 09:20:48PM +0100, Philippe Ombredanne wrote:
-> On Wed, Dec 20, 2017 at 9:15 PM, Cheah Kok Cheong <thrust73@gmail.com> wrote:
-> > Remove FSF address otherwise checkpatch will flag my next patch.
-> >
-> > Signed-off-by: Cheah Kok Cheong <thrust73@gmail.com>
-> > ---
-> >  kernel/padata.c | 4 ----
-> >  1 file changed, 4 deletions(-)
-> >
-> > diff --git a/kernel/padata.c b/kernel/padata.c
-> > index 57c0074..9d91909 100644
-> > --- a/kernel/padata.c
-> > +++ b/kernel/padata.c
-> > @@ -14,10 +14,6 @@
-> >   * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-> >   * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-> >   * more details.
-> > - *
-> > - * You should have received a copy of the GNU General Public License along with
-> > - * this program; if not, write to the Free Software Foundation, Inc.,
-> > - * 51 Franklin St - Fifth Floor, Boston, MA 02110-1301 USA.
-> >   */
-> >
-> >  #include <linux/export.h>
-> > --
-> > 2.7.4
-> >
-> 
-> 
-> Why not use instead the simpler SPDX ids?
-> -- 
-> Cordially
-> Philippe Ombredanne
+On Wed, Dec 20, 2017 at 10:14 PM, Ard Biesheuvel
+<ard.biesheuvel@linaro.org> wrote:
+> On 20 December 2017 at 20:52, Arnd Bergmann <arnd@arndb.de> wrote:
+>
+> You can use the tcrypt.ko module to benchmark AES.
+>
+> modprobe tcrypt mode=200 sec=1
 
-Hi Philippe,
-  Adding the SPDX id can be the subject of a separate patch.
-Believe you are part of the team doing an audit in this matter.
-I shall leave adding the SPDX id to you guys the professionals.
-Looks like you guys are using script to do this en masse.
+Ok, that's what I was looking for. I don't think I'll have time to
+analyze this before
+my Christmas break (I'm only here one more day, and have not set up a test
+environment for this)
 
-But if you insist and our maintainer is agreeable, I can send
-another patch to add the SPDX id.
+> to run a (lengthy) AES benchmark in various modes. AES-128 in ECB mode
+> using the largest block size tested is what I usually use for
+> comparison.
+>
+> On my Cortex-A57, the generic AES code runs at ~18 cycles per byte.
+> Note that we have alternative scalar implementations on ARM and arm64
+> that are faster so the performance of aes-generic is not really
+> relevant (and so it is essentially dead code)
 
-Thanks.
-Brgds,
-CheahKC 
+Ok. arm64 is also the least affected by this problem out of all architectures,
+but it most architectures don't have an optimized implementation.
+
+      Arnd
