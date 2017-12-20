@@ -1,38 +1,87 @@
-From: Eric Biggers <ebiggers3@gmail.com>
-Subject: Re: BUG: unable to handle kernel paging request in hmac_init_tfm
-Date: Wed, 20 Dec 2017 15:09:47 -0800
-Message-ID: <20171220230947.GF38504@gmail.com>
-References: <94eb2c0d010ad8f1660560a275fd@google.com>
+From: Randy Dunlap <rdunlap@infradead.org>
+Subject: Re: [PATCH RFC 3/3] crypto: tools: Add cryptostat userspace
+Date: Wed, 20 Dec 2017 15:37:24 -0800
+Message-ID: <167f88c3-a70e-57f4-6715-129d40d1e4a9@infradead.org>
+References: <1513800567-12764-1-git-send-email-clabbe@baylibre.com>
+ <1513800567-12764-4-git-send-email-clabbe@baylibre.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, herbert@gondor.apana.org.au,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com
-To: syzbot
-        <bot+428944d1a848e9d7464aa96da32ba353cc812457@syzkaller.appspotmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Corentin Labbe <clabbe@baylibre.com>, davem@davemloft.net,
+        herbert@gondor.apana.org.au, nhorman@tuxdriver.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-it0-f65.google.com ([209.85.214.65]:39102 "EHLO
-        mail-it0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755691AbdLTXJv (ORCPT
+Received: from merlin.infradead.org ([205.233.59.134]:52102 "EHLO
+        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755928AbdLTXh0 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 20 Dec 2017 18:09:51 -0500
-Content-Disposition: inline
-In-Reply-To: <94eb2c0d010ad8f1660560a275fd@google.com>
+        Wed, 20 Dec 2017 18:37:26 -0500
+In-Reply-To: <1513800567-12764-4-git-send-email-clabbe@baylibre.com>
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Dec 18, 2017 at 11:36:01AM -0800, syzbot wrote:
-> Hello,
+On 12/20/2017 12:09 PM, Corentin Labbe wrote:
+> Add an example tool for getting easily crypto statistics.
 > 
-> syzkaller hit the following crash on
-> 6084b576dca2e898f5c101baef151f7bfdbb606d
-> git://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/master
-> compiler: gcc (GCC) 7.1.1 20170620
-> .config is attached
+> Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
+> ---
+>  tools/crypto/cryptostat | 40 ++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 40 insertions(+)
+>  create mode 100755 tools/crypto/cryptostat
+> 
+> diff --git a/tools/crypto/cryptostat b/tools/crypto/cryptostat
+> new file mode 100755
+> index 000000000000..314e108eb608
+> --- /dev/null
+> +++ b/tools/crypto/cryptostat
+> @@ -0,0 +1,40 @@
+> +#!/bin/bash
+> +
+> +for dn in `ls /sys/kernel/crypto/`
+> +do
+> +	dnpath=/sys/kernel/crypto/$dn/
+> +	algtype=$(cat $dnpath/algtype)
+> +	algname=$(cat $dnpath/algname)
+> +	echo "$dn ($algtype) $algname"
+> +	case $algtype in
+> +	hash)
+> +	echo -e "\tHash: $(cat $dnpath/enc_cnt)\tbytes $(cat $dnpath/enc_tlen)"
+> +	;;
+> +	cipher)
+> +	echo -e "\tEncrypt: $(cat $dnpath/enc_cnt)\tbytes $(cat $dnpath/enc_tlen)"
+> +	echo -e "\tDecrypt: $(cat $dnpath/dec_cnt)\tbytes $(cat $dnpath/dec_tlen)"
+> +	;;
+> +	compress)
+> +	echo -e "\tCompress: $(cat $dnpath/enc_cnt)\tbytes $(cat $dnpath/enc_tlen)"
+> +	echo -e "\tDecompress: $(cat $dnpath/dec_cnt)\tbytes $(cat $dnpath/dec_tlen)"
+> +	;;
+> +	asymetric)
 
-FYI, in linux-next KASAN and other memory debugging options are now behind
-CONFIG_DEBUG_MEMORY.  So, I think KASAN isn't getting turned on anymore, despite
-the CONFIG_KASAN=y.  (Patch was "lib/: make "Memory Debugging" a menuconfig to
-ease disabling it all".)
+spello:
+	asymmetric)
 
-Eric
+> +	echo -e "\tEncrypt: $(cat $dnpath/enc_cnt)\tbytes $(cat $dnpath/enc_tlen)"
+> +	echo -e "\tDecrypt: $(cat $dnpath/dec_cnt)\tbytes $(cat $dnpath/dec_tlen)"
+> +	echo -e "\tVerify: $(cat $dnpath/verify_cnt)"
+> +	echo -e "\tSign: $(cat $dnpath/sign_cnt)"
+> +	;;
+> +	rng)
+> +	echo -e "\tGenerate: $(cat $dnpath/enc_cnt)\tbytes $(cat $dnpath/enc_tlen)"
+> +	echo -e "\tSeed: $(cat $dnpath/dec_cnt)"
+> +	;;
+> +	kpp)
+> +	echo -e "\tSet_secret: $(cat $dnpath/dec_cnt)"
+> +	echo -e "\tGenerate_public_key: $(cat $dnpath/enc_cnt)"
+> +	echo -e "\tCompute_shared_secret: $(cat $dnpath/verify_cnt)"
+> +	;;
+> +	*)
+> +	echo -e "\t$(cat $dnpath/enc_cnt)\tbytes $(cat $dnpath/enc_tlen)"
+> +	;;
+> +	esac
+> +done
+> 
+
+
+-- 
+~Randy
