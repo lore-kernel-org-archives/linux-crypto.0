@@ -1,197 +1,157 @@
 From: Junaid Shahid <junaids@google.com>
-Subject: [PATCH v2 1/2] crypto: Fix out-of-bounds access of the data buffer in generic-gcm-aesni
-Date: Tue, 19 Dec 2017 20:42:58 -0800
-Message-ID: <20171220044259.61106-2-junaids@google.com>
+Subject: [PATCH v2 2/2] crypto: Fix out-of-bounds access of the AAD buffer in generic-gcm-aesni
+Date: Tue, 19 Dec 2017 20:42:59 -0800
+Message-ID: <20171220044259.61106-3-junaids@google.com>
 References: <20171220044259.61106-1-junaids@google.com>
 Cc: linux-crypto@vger.kernel.org, andreslc@google.com,
         davem@davemloft.net, gthelen@google.com
 To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pf0-f194.google.com ([209.85.192.194]:46531 "EHLO
-        mail-pf0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754098AbdLTEnD (ORCPT
+Received: from mail-pf0-f193.google.com ([209.85.192.193]:33752 "EHLO
+        mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753890AbdLTEnE (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 19 Dec 2017 23:43:03 -0500
-Received: by mail-pf0-f194.google.com with SMTP id c204so12102836pfc.13
-        for <linux-crypto@vger.kernel.org>; Tue, 19 Dec 2017 20:43:03 -0800 (PST)
+        Tue, 19 Dec 2017 23:43:04 -0500
+Received: by mail-pf0-f193.google.com with SMTP id y89so12127760pfk.0
+        for <linux-crypto@vger.kernel.org>; Tue, 19 Dec 2017 20:43:04 -0800 (PST)
 In-Reply-To: <20171220044259.61106-1-junaids@google.com>
 In-Reply-To: <20171219221750.34148-1-junaids@google.com>
 References: <20171219221750.34148-1-junaids@google.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The aesni_gcm_enc/dec functions can access memory before the start of
-the data buffer if the length of the data buffer is less than 16 bytes.
-This is because they perform the read via a single 16-byte load. This
-can potentially result in accessing a page that is not mapped and thus
-causing the machine to crash. This patch fixes that by reading the
-partial block byte-by-byte and optionally an via 8-byte load if the block
-was at least 8 bytes.
+The aesni_gcm_enc/dec functions can access memory after the end of
+the AAD buffer if the AAD length is not a multiple of 4 bytes.
+It didn't matter with rfc4106-gcm-aesni as in that case the AAD was
+always followed by the 8 byte IV, but that is no longer the case with
+generic-gcm-aesni. This can potentially result in accessing a page that
+is not mapped and thus causing the machine to crash. This patch fixes
+that by reading the last <16 byte block of the AAD byte-by-byte and
+optionally via an 8-byte load if the block was at least 8 bytes.
 
 Fixes: 0487ccac ("crypto: aesni - make non-AVX AES-GCM work with any aadlen")
 Signed-off-by: Junaid Shahid <junaids@google.com>
 ---
- arch/x86/crypto/aesni-intel_asm.S | 86 ++++++++++++++++++++-------------------
- 1 file changed, 44 insertions(+), 42 deletions(-)
+ arch/x86/crypto/aesni-intel_asm.S | 80 +++++----------------------------------
+ 1 file changed, 10 insertions(+), 70 deletions(-)
 
 diff --git a/arch/x86/crypto/aesni-intel_asm.S b/arch/x86/crypto/aesni-intel_asm.S
-index 16627fec80b2..4b16f31cb359 100644
+index 4b16f31cb359..03846f2d32c9 100644
 --- a/arch/x86/crypto/aesni-intel_asm.S
 +++ b/arch/x86/crypto/aesni-intel_asm.S
-@@ -85,6 +85,7 @@ enc:        .octa 0x2
- # and zero should follow ALL_F
- .section	.rodata, "a", @progbits
- .align 16
-+            .octa 0xffffffffffffffffffffffffffffffff
- SHIFT_MASK: .octa 0x0f0e0d0c0b0a09080706050403020100
- ALL_F:      .octa 0xffffffffffffffffffffffffffffffff
-             .octa 0x00000000000000000000000000000000
-@@ -256,6 +257,36 @@ aad_shift_arr:
- 	pxor      \TMP1, \GH            # result is in TMP1
- .endm
+@@ -309,7 +309,7 @@ XMM2 XMM3 XMM4 XMMDst TMP6 TMP7 i i_seq operation
+ 	pxor       \XMM2, \XMM2
  
-+# read the last <16 byte block
-+# Clobbers %rax, DPTR, TMP1 and XMM1-2
-+.macro READ_PARTIAL_BLOCK DPTR DLEN TMP1 XMM1 XMM2 XMMDst
-+        pxor \XMMDst, \XMMDst
-+        mov \DLEN, \TMP1
-+        cmp $8, \DLEN
-+        jl _read_last_lt8_\@
-+        mov (\DPTR), %rax
-+        MOVQ_R64_XMM %rax, \XMMDst
-+	add $8, \DPTR
-+        sub $8, \TMP1
-+        jz _done_read_last_partial_block_\@
-+_read_last_lt8_\@:
-+	shl $8, %rax
-+        mov -1(\DPTR, \TMP1, 1), %al
-+        dec \TMP1
-+        jnz _read_last_lt8_\@
-+        MOVQ_R64_XMM %rax, \XMM1
-+	# adjust the shuffle mask pointer to be able to shift either 0 or 8
-+	# bytes depending on whether the last block is <8 bytes or not
-+        mov \DLEN, \TMP1
-+        and $8, \TMP1
-+	lea SHIFT_MASK(%rip), %rax
-+	sub \TMP1, %rax
-+	movdqu (%rax), \XMM2		# get the appropriate shuffle mask
-+	PSHUFB_XMM \XMM2, \XMM1		# shift left either 0 or 8 bytes
-+	por \XMM1, \XMMDst
-+_done_read_last_partial_block_\@:
-+.endm
+ 	cmp	   $16, %r11
+-	jl	   _get_AAD_rest8\num_initial_blocks\operation
++	jl	   _get_AAD_rest\num_initial_blocks\operation
+ _get_AAD_blocks\num_initial_blocks\operation:
+ 	movdqu	   (%r10), %xmm\i
+ 	PSHUFB_XMM %xmm14, %xmm\i # byte-reflect the AAD data
+@@ -322,43 +322,13 @@ _get_AAD_blocks\num_initial_blocks\operation:
+ 	jge	   _get_AAD_blocks\num_initial_blocks\operation
+ 
+ 	movdqu	   \XMM2, %xmm\i
 +
- /*
- * if a = number of total plaintext bytes
- * b = floor(a/16)
-@@ -1310,6 +1341,7 @@ _esb_loop_\@:
- 	MOVADQ		(%r10),\TMP1
- 	AESENCLAST	\TMP1,\XMM0
- .endm
-+
- /*****************************************************************************
- * void aesni_gcm_dec(void *aes_ctx,    // AES Key schedule. Starts on a 16 byte boundary.
- *                   u8 *out,           // Plaintext output. Encrypt in-place is allowed.
-@@ -1385,14 +1417,6 @@ _esb_loop_\@:
- *
- *                        AAD Format with 64-bit Extended Sequence Number
- *
--* aadLen:
--*       from the definition of the spec, aadLen can only be 8 or 12 bytes.
--*       The code supports 16 too but for other sizes, the code will fail.
--*
--* TLen:
--*       from the definition of the spec, TLen can only be 8, 12 or 16 bytes.
--*       For other sizes, the code will fail.
--*
- * poly = x^128 + x^127 + x^126 + x^121 + 1
- *
- *****************************************************************************/
-@@ -1486,19 +1510,15 @@ _zero_cipher_left_decrypt:
- 	PSHUFB_XMM %xmm10, %xmm0
++	/* read the last <16B of AAD */
++_get_AAD_rest\num_initial_blocks\operation:
+ 	cmp	   $0, %r11
+ 	je	   _get_AAD_done\num_initial_blocks\operation
  
- 	ENCRYPT_SINGLE_BLOCK  %xmm0, %xmm1    # E(K, Yn)
--	sub $16, %r11
--	add %r13, %r11
--	movdqu (%arg3,%r11,1), %xmm1   # receive the last <16 byte block
--	lea SHIFT_MASK+16(%rip), %r12
--	sub %r13, %r12
--# adjust the shuffle mask pointer to be able to shift 16-%r13 bytes
--# (%r13 is the number of bytes in plaintext mod 16)
--	movdqu (%r12), %xmm2           # get the appropriate shuffle mask
--	PSHUFB_XMM %xmm2, %xmm1            # right shift 16-%r13 butes
- 
-+	lea (%arg3,%r11,1), %r10
-+	READ_PARTIAL_BLOCK %r10 %r13 %r12 %xmm2 %xmm3 %xmm1
-+
-+	lea ALL_F+16(%rip), %r12
-+	sub %r13, %r12
- 	movdqa  %xmm1, %xmm2
- 	pxor %xmm1, %xmm0            # Ciphertext XOR E(K, Yn)
--	movdqu ALL_F-SHIFT_MASK(%r12), %xmm1
-+	movdqu (%r12), %xmm1
- 	# get the appropriate mask to mask out top 16-%r13 bytes of %xmm0
- 	pand %xmm1, %xmm0            # mask out top 16-%r13 bytes of %xmm0
- 	pand    %xmm1, %xmm2
-@@ -1507,9 +1527,6 @@ _zero_cipher_left_decrypt:
- 
- 	pxor %xmm2, %xmm8
- 	GHASH_MUL %xmm8, %xmm13, %xmm9, %xmm10, %xmm11, %xmm5, %xmm6
--	          # GHASH computation for the last <16 byte block
--	sub %r13, %r11
--	add $16, %r11
- 
-         # output %r13 bytes
- 	MOVQ_R64_XMM	%xmm0, %rax
-@@ -1663,14 +1680,6 @@ ENDPROC(aesni_gcm_dec)
- *
- *                         AAD Format with 64-bit Extended Sequence Number
- *
--* aadLen:
--*       from the definition of the spec, aadLen can only be 8 or 12 bytes.
--*       The code supports 16 too but for other sizes, the code will fail.
--*
--* TLen:
--*       from the definition of the spec, TLen can only be 8, 12 or 16 bytes.
--*       For other sizes, the code will fail.
--*
- * poly = x^128 + x^127 + x^126 + x^121 + 1
- ***************************************************************************/
- ENTRY(aesni_gcm_enc)
-@@ -1763,19 +1772,15 @@ _zero_cipher_left_encrypt:
-         movdqa SHUF_MASK(%rip), %xmm10
- 	PSHUFB_XMM %xmm10, %xmm0
- 
+-	pxor	   %xmm\i,%xmm\i
 -
- 	ENCRYPT_SINGLE_BLOCK	%xmm0, %xmm1        # Encrypt(K, Yn)
--	sub $16, %r11
--	add %r13, %r11
--	movdqu (%arg3,%r11,1), %xmm1     # receive the last <16 byte blocks
--	lea SHIFT_MASK+16(%rip), %r12
-+
-+	lea (%arg3,%r11,1), %r10
-+	READ_PARTIAL_BLOCK %r10 %r13 %r12 %xmm2 %xmm3 %xmm1
-+
-+	lea ALL_F+16(%rip), %r12
- 	sub %r13, %r12
--	# adjust the shuffle mask pointer to be able to shift 16-r13 bytes
--	# (%r13 is the number of bytes in plaintext mod 16)
--	movdqu	(%r12), %xmm2           # get the appropriate shuffle mask
--	PSHUFB_XMM	%xmm2, %xmm1            # shift right 16-r13 byte
- 	pxor	%xmm1, %xmm0            # Plaintext XOR Encrypt(K, Yn)
--	movdqu	ALL_F-SHIFT_MASK(%r12), %xmm1
-+	movdqu	(%r12), %xmm1
- 	# get the appropriate mask to mask out top 16-r13 bytes of xmm0
- 	pand	%xmm1, %xmm0            # mask out top 16-r13 bytes of xmm0
-         movdqa SHUF_MASK(%rip), %xmm10
-@@ -1784,9 +1789,6 @@ _zero_cipher_left_encrypt:
- 	pxor	%xmm0, %xmm8
- 	GHASH_MUL %xmm8, %xmm13, %xmm9, %xmm10, %xmm11, %xmm5, %xmm6
- 	# GHASH computation for the last <16 byte block
--	sub	%r13, %r11
--	add	$16, %r11
--
- 	movdqa SHUF_MASK(%rip), %xmm10
- 	PSHUFB_XMM %xmm10, %xmm0
+-	/* read the last <16B of AAD. since we have at least 4B of
+-	data right after the AAD (the ICV, and maybe some CT), we can
+-	read 4B/8B blocks safely, and then get rid of the extra stuff */
+-_get_AAD_rest8\num_initial_blocks\operation:
+-	cmp	   $4, %r11
+-	jle	   _get_AAD_rest4\num_initial_blocks\operation
+-	movq	   (%r10), \TMP1
+-	add	   $8, %r10
+-	sub	   $8, %r11
+-	pslldq	   $8, \TMP1
+-	psrldq	   $8, %xmm\i
+-	pxor	   \TMP1, %xmm\i
+-	jmp	   _get_AAD_rest8\num_initial_blocks\operation
+-_get_AAD_rest4\num_initial_blocks\operation:
+-	cmp	   $0, %r11
+-	jle	   _get_AAD_rest0\num_initial_blocks\operation
+-	mov	   (%r10), %eax
+-	movq	   %rax, \TMP1
+-	add	   $4, %r10
+-	sub	   $4, %r10
+-	pslldq	   $12, \TMP1
+-	psrldq	   $4, %xmm\i
+-	pxor	   \TMP1, %xmm\i
+-_get_AAD_rest0\num_initial_blocks\operation:
+-	/* finalize: shift out the extra bytes we read, and align
+-	left. since pslldq can only shift by an immediate, we use
+-	vpshufb and an array of shuffle masks */
+-	movq	   %r12, %r11
+-	salq	   $4, %r11
+-	movdqu	   aad_shift_arr(%r11), \TMP1
+-	PSHUFB_XMM \TMP1, %xmm\i
+-_get_AAD_rest_final\num_initial_blocks\operation:
++	READ_PARTIAL_BLOCK %r10, %r12, %r11, \TMP1, \TMP2, %xmm\i
+ 	PSHUFB_XMM   %xmm14, %xmm\i # byte-reflect the AAD data
+ 	pxor	   \XMM2, %xmm\i
+ 	GHASH_MUL  %xmm\i, \TMP3, \TMP1, \TMP2, \TMP4, \TMP5, \XMM1
+@@ -568,7 +538,7 @@ XMM2 XMM3 XMM4 XMMDst TMP6 TMP7 i i_seq operation
+ 	pxor	   \XMM2, \XMM2
  
+ 	cmp	   $16, %r11
+-	jl	   _get_AAD_rest8\num_initial_blocks\operation
++	jl	   _get_AAD_rest\num_initial_blocks\operation
+ _get_AAD_blocks\num_initial_blocks\operation:
+ 	movdqu	   (%r10), %xmm\i
+ 	PSHUFB_XMM   %xmm14, %xmm\i # byte-reflect the AAD data
+@@ -581,43 +551,13 @@ _get_AAD_blocks\num_initial_blocks\operation:
+ 	jge	   _get_AAD_blocks\num_initial_blocks\operation
+ 
+ 	movdqu	   \XMM2, %xmm\i
++
++	/* read the last <16B of AAD */
++_get_AAD_rest\num_initial_blocks\operation:
+ 	cmp	   $0, %r11
+ 	je	   _get_AAD_done\num_initial_blocks\operation
+ 
+-	pxor	   %xmm\i,%xmm\i
+-
+-	/* read the last <16B of AAD. since we have at least 4B of
+-	data right after the AAD (the ICV, and maybe some PT), we can
+-	read 4B/8B blocks safely, and then get rid of the extra stuff */
+-_get_AAD_rest8\num_initial_blocks\operation:
+-	cmp	   $4, %r11
+-	jle	   _get_AAD_rest4\num_initial_blocks\operation
+-	movq	   (%r10), \TMP1
+-	add	   $8, %r10
+-	sub	   $8, %r11
+-	pslldq	   $8, \TMP1
+-	psrldq	   $8, %xmm\i
+-	pxor	   \TMP1, %xmm\i
+-	jmp	   _get_AAD_rest8\num_initial_blocks\operation
+-_get_AAD_rest4\num_initial_blocks\operation:
+-	cmp	   $0, %r11
+-	jle	   _get_AAD_rest0\num_initial_blocks\operation
+-	mov	   (%r10), %eax
+-	movq	   %rax, \TMP1
+-	add	   $4, %r10
+-	sub	   $4, %r10
+-	pslldq	   $12, \TMP1
+-	psrldq	   $4, %xmm\i
+-	pxor	   \TMP1, %xmm\i
+-_get_AAD_rest0\num_initial_blocks\operation:
+-	/* finalize: shift out the extra bytes we read, and align
+-	left. since pslldq can only shift by an immediate, we use
+-	vpshufb and an array of shuffle masks */
+-	movq	   %r12, %r11
+-	salq	   $4, %r11
+-	movdqu	   aad_shift_arr(%r11), \TMP1
+-	PSHUFB_XMM \TMP1, %xmm\i
+-_get_AAD_rest_final\num_initial_blocks\operation:
++	READ_PARTIAL_BLOCK %r10, %r12, %r11, \TMP1, \TMP2, %xmm\i
+ 	PSHUFB_XMM   %xmm14, %xmm\i # byte-reflect the AAD data
+ 	pxor	   \XMM2, %xmm\i
+ 	GHASH_MUL  %xmm\i, \TMP3, \TMP1, \TMP2, \TMP4, \TMP5, \XMM1
 -- 
 2.15.1.620.gb9897f4670-goog
