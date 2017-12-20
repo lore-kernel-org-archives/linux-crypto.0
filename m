@@ -1,57 +1,51 @@
-From: Josh Poimboeuf <jpoimboe@redhat.com>
-Subject: Re: [PATCH] crypto: x86/twofish-3way - Fix %rbp usage
-Date: Tue, 19 Dec 2017 16:37:04 -0600
-Message-ID: <20171219223704.x2mrgejbkzkuuqxr@treble>
-References: <001a113f2cd26f3532055f0f4a79@google.com>
- <20171219004026.170565-1-ebiggers3@gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Cc: linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Jussi Kivilinna <jussi.kivilinna@iki.fi>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-        Eric Biggers <ebiggers@google.com>
-To: Eric Biggers <ebiggers3@gmail.com>
+From: Junaid Shahid <junaids@google.com>
+Subject: [PATCH v2 0/2] Fix out-of-bounds memory accesses in generic-gcm-aesni
+Date: Tue, 19 Dec 2017 20:42:57 -0800
+Message-ID: <20171220044259.61106-1-junaids@google.com>
+References: <20171219221750.34148-1-junaids@google.com>
+Cc: linux-crypto@vger.kernel.org, andreslc@google.com,
+        davem@davemloft.net, gthelen@google.com
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:32256 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751496AbdLSWhI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 19 Dec 2017 17:37:08 -0500
-Content-Disposition: inline
-In-Reply-To: <20171219004026.170565-1-ebiggers3@gmail.com>
+Received: from mail-pf0-f195.google.com ([209.85.192.195]:34309 "EHLO
+        mail-pf0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753890AbdLTEnD (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 19 Dec 2017 23:43:03 -0500
+Received: by mail-pf0-f195.google.com with SMTP id a90so12125049pfk.1
+        for <linux-crypto@vger.kernel.org>; Tue, 19 Dec 2017 20:43:02 -0800 (PST)
+In-Reply-To: <20171219221750.34148-1-junaids@google.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Dec 18, 2017 at 04:40:26PM -0800, Eric Biggers wrote:
-> From: Eric Biggers <ebiggers@google.com>
-> 
-> Using %rbp as a temporary register breaks frame pointer convention and
-> breaks stack traces when unwinding from an interrupt in the crypto code.
-> 
-> In twofish-3way, we can't simply replace %rbp with another register
-> because there are none available.  Instead, we use the stack to hold the
-> values that %rbp, %r11, and %r12 were holding previously.  Each of these
-> values represents the half of the output from the previous Feistel round
-> that is being passed on unchanged to the following round.  They are only
-> used once per round, when they are exchanged with %rax, %rbx, and %rcx.
-> 
-> As a result, we free up 3 registers (one per block) and can reassign
-> them so that %rbp is not used, and additionally %r14 and %r15 are not
-> used so they do not need to be saved/restored.
-> 
-> There may be a small overhead caused by replacing 'xchg REG, REG' with
-> the needed sequence 'mov MEM, REG; mov REG, MEM; mov REG, REG' once per
-> round.  But, counterintuitively, when I tested "ctr-twofish-3way" on a
-> Haswell processor, the new version was actually about 2% faster.
-> (Perhaps 'xchg' is not as well optimized as plain moves.)
-> 
-> Reported-by: syzbot <syzkaller@googlegroups.com>
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
+Changes in v2:
+	- Also fixed issue 2 described below in addition to issue 1 in v1
+	
+The aesni_gcm_enc/dec functions can access memory before the start or end of
+the supplied src buffer. This can happen if either:
 
-Thanks a lot for fixing this!
+1. The data length is less than 16 bytes and there is no AAD or the AAD
+   length is not enough to cover the underrun. In this case, memory before
+   the start of the buffer would be accessed.
+2. The AAD length is not a multiple of 4 bytes and the data length is too
+   small to cover the overrun. In this case, memory after the end of the
+   buffer would be accessed.
 
-Reviewed-by: Josh Poimboeuf <jpoimboe@redhat.com>
+This was not a problem when rfc4106-gcm-aesni was the only mode supported by
+the aesni module, as in that case there is always enough AAD and IV bytes to
+cover the out-of-bounds accesses. However, that is no longer the case with
+the generic-gcm-aesni mode. This could potentially result in accessing pages
+that are not mapped, thus causing a crash.
+
+
+Junaid Shahid (2):
+  crypto: Fix out-of-bounds access of the data buffer in
+    generic-gcm-aesni
+  crypto: Fix out-of-bounds access of the AAD buffer in
+    generic-gcm-aesni
+
+ arch/x86/crypto/aesni-intel_asm.S | 166 +++++++++++++-------------------------
+ 1 file changed, 54 insertions(+), 112 deletions(-)
 
 -- 
-Josh
+2.15.1.620.gb9897f4670-goog
