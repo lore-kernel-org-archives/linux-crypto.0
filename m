@@ -1,67 +1,89 @@
-From: Junaid Shahid <junaids@google.com>
-Subject: Re: [PATCH v2 2/2] crypto: Fix out-of-bounds access of the AAD buffer in generic-gcm-aesni
-Date: Wed, 20 Dec 2017 13:51:26 -0800
-Message-ID: <3380731.nSvSnl1kt0@js-desktop.svl.corp.google.com>
-References: <20171219221750.34148-1-junaids@google.com> <2283674.Cix72tvP9W@js-desktop.svl.corp.google.com> <20171220211254.GB38504@gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-        andreslc@google.com, davem@davemloft.net, gthelen@google.com
-To: Eric Biggers <ebiggers3@gmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pg0-f45.google.com ([74.125.83.45]:34499 "EHLO
-        mail-pg0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755501AbdLTVv3 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 20 Dec 2017 16:51:29 -0500
-Received: by mail-pg0-f45.google.com with SMTP id j4so12448561pgp.1
-        for <linux-crypto@vger.kernel.org>; Wed, 20 Dec 2017 13:51:29 -0800 (PST)
-In-Reply-To: <20171220211254.GB38504@gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Eric Biggers <ebiggers3@gmail.com>
+Subject: [PATCH] crypto: pcrypt - fix freeing pcrypt instances
+Date: Wed, 20 Dec 2017 14:28:25 -0800
+Message-ID: <20171220222825.207321-1-ebiggers3@gmail.com>
+References: <94eb2c05a380d3908b056096eb58@google.com>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
+        Eric Biggers <ebiggers@google.com>, stable@vger.kernel.org
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <94eb2c05a380d3908b056096eb58@google.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Wednesday, December 20, 2017 1:12:54 PM PST Eric Biggers wrote:
-> >=20
-> > We do need both registers, though we could certainly swap their usage t=
-o make
-> > r12 the temp register. The reason we need the second register is becaus=
-e we
-> > need to keep the original length to perform the pshufb at the end. But,=
- of
-> > course, that will not be needed anymore if we avoid the pshufb by dupli=
-cating
-> > the _read_last_lt8 block or utilizing pslldq some other way.
-> >=20
->=20
-> If READ_PARTIAL_BLOCK can clobber 'DLEN' that would simplify it even more=
- (no
-> need for 'TMP1'), but what I am talking about here is how INITIAL_BLOCKS_=
-DEC and
-> INITIAL_BLOCKS_ENC maintain two copies of the remaining length in lock-st=
-ep in
-> r11 and r12:
->=20
-> _get_AAD_blocks\num_initial_blocks\operation:
->         movdqu     (%r10), %xmm\i
->         PSHUFB_XMM %xmm14, %xmm\i # byte-reflect the AAD data
->         pxor       %xmm\i, \XMM2
->         GHASH_MUL  \XMM2, \TMP3, \TMP1, \TMP2, \TMP4, \TMP5, \XMM1
->         add        $16, %r10
->         sub        $16, %r12
->         sub        $16, %r11
->         cmp        $16, %r11
->         jge        _get_AAD_blocks\num_initial_blocks\operation
->=20
-> The code which you are replacing with READ_PARTIAL_BLOCK actually needed =
-the two
-> copies, but now it seems that only one copy is needed, so it can be simpl=
-ified
-> by only using r11.
->=20
+From: Eric Biggers <ebiggers@google.com>
 
-Sorry, I misunderstood earlier. I=E2=80=99ll remove the extra register from=
- the preceding code in INIITIAL_BLOCKS_ENC/DEC.
+pcrypt is using the old way of freeing instances, where the ->free()
+method specified in the 'struct crypto_template' is passed a pointer to
+the 'struct crypto_instance'.  But the crypto_instance is being
+kfree()'d directly, which is incorrect because the memory was actually
+allocated as an aead_instance, which contains the crypto_instance at a
+nonzero offset.  Thus, the wrong pointer was being kfree()'d.
 
-Thanks,
-Junaid
+Fix it by switching to the new way to free aead_instance's where the
+->free() method is specified in the aead_instance itself.
+
+Reported-by: syzbot <syzkaller@googlegroups.com>
+Fixes: 0496f56065e0 ("crypto: pcrypt - Add support for new AEAD interface")
+Cc: <stable@vger.kernel.org> # v4.2+
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ crypto/pcrypt.c | 19 ++++++++++---------
+ 1 file changed, 10 insertions(+), 9 deletions(-)
+
+diff --git a/crypto/pcrypt.c b/crypto/pcrypt.c
+index ee9cfb99fe25..f8ec3d4ba4a8 100644
+--- a/crypto/pcrypt.c
++++ b/crypto/pcrypt.c
+@@ -254,6 +254,14 @@ static void pcrypt_aead_exit_tfm(struct crypto_aead *tfm)
+ 	crypto_free_aead(ctx->child);
+ }
+ 
++static void pcrypt_free(struct aead_instance *inst)
++{
++	struct pcrypt_instance_ctx *ctx = aead_instance_ctx(inst);
++
++	crypto_drop_aead(&ctx->spawn);
++	kfree(inst);
++}
++
+ static int pcrypt_init_instance(struct crypto_instance *inst,
+ 				struct crypto_alg *alg)
+ {
+@@ -319,6 +327,8 @@ static int pcrypt_create_aead(struct crypto_template *tmpl, struct rtattr **tb,
+ 	inst->alg.encrypt = pcrypt_aead_encrypt;
+ 	inst->alg.decrypt = pcrypt_aead_decrypt;
+ 
++	inst->free = pcrypt_free;
++
+ 	err = aead_register_instance(tmpl, inst);
+ 	if (err)
+ 		goto out_drop_aead;
+@@ -349,14 +359,6 @@ static int pcrypt_create(struct crypto_template *tmpl, struct rtattr **tb)
+ 	return -EINVAL;
+ }
+ 
+-static void pcrypt_free(struct crypto_instance *inst)
+-{
+-	struct pcrypt_instance_ctx *ctx = crypto_instance_ctx(inst);
+-
+-	crypto_drop_aead(&ctx->spawn);
+-	kfree(inst);
+-}
+-
+ static int pcrypt_cpumask_change_notify(struct notifier_block *self,
+ 					unsigned long val, void *data)
+ {
+@@ -469,7 +471,6 @@ static void pcrypt_fini_padata(struct padata_pcrypt *pcrypt)
+ static struct crypto_template pcrypt_tmpl = {
+ 	.name = "pcrypt",
+ 	.create = pcrypt_create,
+-	.free = pcrypt_free,
+ 	.module = THIS_MODULE,
+ };
+ 
+-- 
+2.15.1.620.gb9897f4670-goog
