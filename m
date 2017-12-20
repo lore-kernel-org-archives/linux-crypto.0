@@ -1,8 +1,8 @@
 From: syzbot
         <bot+e5e6fab2d4dc3d9877ac240fed364027bb960ad0@syzkaller.appspotmail.com>
 Subject: Re: KASAN: use-after-free Read in crypto_aead_free_instance
-Date: Wed, 20 Dec 2017 01:55:30 -0800
-Message-ID: <001a113f861e70dc700560c295dc@google.com>
+Date: Wed, 20 Dec 2017 01:55:29 -0800
+Message-ID: <001a1143d40c663a920560c295ca@google.com>
 References: <18467907.EfXNf1iGip@tauon.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
@@ -66,12 +66,3 @@ unknown command "proposed:"
 
 > Ciao
 > Stephan
-
-> --
-> You received this message because you are subscribed to the Google  
-> Groups "syzkaller-bugs" group.
-> To unsubscribe from this group and stop receiving emails from it, send an  
-> email to syzkaller-bugs+unsubscribe@googlegroups.com.
-> To view this discussion on the web visit  
-> https://groups.google.com/d/msgid/syzkaller-bugs/18467907.EfXNf1iGip%40tauon.chronox.de.
-> For more options, visit https://groups.google.com/d/optout.
