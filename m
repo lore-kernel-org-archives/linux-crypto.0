@@ -1,48 +1,29 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: KASAN: use-after-free Read in crypto_aead_free_instance
-Date: Wed, 20 Dec 2017 10:29:05 +0100
-Message-ID: <7081028.ZNJKGTzsya@tauon.chronox.de>
-References: <001a11c14bc887c2c60560c0cdda@google.com> <2720015.COYl3plZzm@positron.chronox.de> <CACT4Y+Zgm=g2Tnne-p2J1sXEhfa2BVZsLXox3sxzq_NW4MBKmQ@mail.gmail.com>
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: Re: [PATCH RESEND] checkpatch: add *_ON_STACK to declaration_macros
+Date: Wed, 20 Dec 2017 10:33:19 +0100
+Message-ID: <20171220093319.GB16177@kroah.com>
+References: <1513758679-14532-1-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: syzbot
-        <bot+e5e6fab2d4dc3d9877ac240fed364027bb960ad0@syzkaller.appspotmail.com>,
-        David Miller <davem@davemloft.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-        syzkaller-bugs@googlegroups.com
-To: Dmitry Vyukov <dvyukov@google.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:44452 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1754153AbdLTJ3I (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 20 Dec 2017 04:29:08 -0500
-In-Reply-To: <CACT4Y+Zgm=g2Tnne-p2J1sXEhfa2BVZsLXox3sxzq_NW4MBKmQ@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: Andy Whitcroft <apw@canonical.com>, Joe Perches <joe@perches.com>,
+        Ofir Drang <ofir.drang@arm.com>, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+To: Gilad Ben-Yossef <gilad@benyossef.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1513758679-14532-1-git-send-email-gilad@benyossef.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Am Mittwoch, 20. Dezember 2017, 10:19:43 CET schrieb Dmitry Vyukov:
-
-Hi Dmitry,
-> > 
-> > This issue vanishes after applying the patch "[PATCH v2] crypto: AF_ALG -
-> > limit mask and type".
+On Wed, Dec 20, 2017 at 08:31:19AM +0000, Gilad Ben-Yossef wrote:
+> Add the crypto API *_ON_STACK to $declaration_macros.
 > 
-> Hi Stephan,
+> Resolves the following false warning:
 > 
-> syzbot does not understand arbitrary English prose, it only understands 
-this:
-> > Once a fix for this bug is merged into any tree, reply to this email with:
-> > #syz fix: exact-commit-title
+> WARNING: Missing a blank line after declarations
+> +			int err;
+> +			SHASH_DESC_ON_STACK(desc, ctx_p->shash_tfm);
 > 
-> Let's tell it about the fix:
-> 
-> #syz fix: crypto: AF_ALG - limit mask and type
+> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 
-I have seen that this is the approach, but the fix is not yet in the tree. I 
-just want to let folks know that there is a patch.
-
-
-Ciao
-Stephan
+Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
