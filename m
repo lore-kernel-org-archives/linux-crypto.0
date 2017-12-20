@@ -1,62 +1,55 @@
-From: Joe Perches <joe@perches.com>
-Subject: Re: [PATCH] checkpatch: add *_ON_STACK to $declaration_macros
-Date: Wed, 20 Dec 2017 01:41:55 -0800
-Message-ID: <1513762915.1234.91.camel@perches.com>
-References: <1498550116-12475-1-git-send-email-gilad@benyossef.com>
+From: Dmitry Vyukov <dvyukov@google.com>
+Subject: Re: KASAN: use-after-free Read in crypto_aead_free_instance
+Date: Wed, 20 Dec 2017 10:50:10 +0100
+Message-ID: <CACT4Y+Y5SdeqYv9fUyr83k8C-FmpcmFtCRRO_r9_TbvqpNyH7Q@mail.gmail.com>
+References: <001a11c14bc887c2c60560c0cdda@google.com> <2720015.COYl3plZzm@positron.chronox.de>
+ <CACT4Y+Zgm=g2Tnne-p2J1sXEhfa2BVZsLXox3sxzq_NW4MBKmQ@mail.gmail.com> <7081028.ZNJKGTzsya@tauon.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
-Cc: Ofir Drang <ofir.drang@arm.com>, linux-crypto@vger.kernel.org
-To: Gilad Ben-Yossef <gilad@benyossef.com>,
-        Andy Whitcroft <apw@canonical.com>,
-        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Cc: syzbot
+        <bot+e5e6fab2d4dc3d9877ac240fed364027bb960ad0@syzkaller.appspotmail.com>,
+        David Miller <davem@davemloft.net>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+        syzkaller-bugs@googlegroups.com
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from smtprelay0050.hostedemail.com ([216.40.44.50]:48367 "EHLO
-        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1754235AbdLTJl7 (ORCPT
+Received: from mail-pl0-f46.google.com ([209.85.160.46]:34154 "EHLO
+        mail-pl0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754070AbdLTJub (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 20 Dec 2017 04:41:59 -0500
-In-Reply-To: <1498550116-12475-1-git-send-email-gilad@benyossef.com>
+        Wed, 20 Dec 2017 04:50:31 -0500
+Received: by mail-pl0-f46.google.com with SMTP id d21so8700409pll.1
+        for <linux-crypto@vger.kernel.org>; Wed, 20 Dec 2017 01:50:31 -0800 (PST)
+In-Reply-To: <7081028.ZNJKGTzsya@tauon.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, 2017-06-27 at 10:55 +0300, Gilad Ben-Yossef wrote:
-> Add the crypto API *_ON_STACK to $declaration_macros.
-> 
-> Resolves the following false warning:
-> 
-> WARNING: Missing a blank line after declarations
-> +			int err;
-> +			SHASH_DESC_ON_STACK(desc, ctx_p->shash_tfm);
-[]
-> diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
-[]
-> @@ -733,6 +733,7 @@ our $FuncArg = qr{$Typecast{0,1}($LvalOrFunc|$Constant|$String)};
->  our $declaration_macros = qr{(?x:
->  	(?:$Storage\s+)?(?:[A-Z_][A-Z0-9]*_){0,2}(?:DEFINE|DECLARE)(?:_[A-Z0-9]+){1,6}\s*\(|
->  	(?:$Storage\s+)?LIST_HEAD\s*\(|
-> +	(?:$Storage\s+)?[A-Z_]*_ON_STACK\(|
+On Wed, Dec 20, 2017 at 10:29 AM, Stephan Mueller <smueller@chronox.de> wrote:
+> Am Mittwoch, 20. Dezember 2017, 10:19:43 CET schrieb Dmitry Vyukov:
+>
+> Hi Dmitry,
+>> >
+>> > This issue vanishes after applying the patch "[PATCH v2] crypto: AF_ALG -
+>> > limit mask and type".
+>>
+>> Hi Stephan,
+>>
+>> syzbot does not understand arbitrary English prose, it only understands
+> this:
+>> > Once a fix for this bug is merged into any tree, reply to this email with:
+>> > #syz fix: exact-commit-title
+>>
+>> Let's tell it about the fix:
+>>
+>> #syz fix: crypto: AF_ALG - limit mask and type
+>
+> I have seen that this is the approach, but the fix is not yet in the tree. I
+> just want to let folks know that there is a patch.
 
-A few things:
-
-The crypto _ON_STACK declarations cannot have a $Storage type.
-
-There should be a \s* between the ON_STACK and the open parenthesis
-
-There are other _ON_STACK types than the crypto uses
-
-$ grep -rP --include=*.[ch] -oh "\b[A-Z_]+_ON_STACK\b" * | \
-  sort | uniq -c | sort -rn
-     68 SKCIPHER_REQUEST_ON_STACK
-     45 SHASH_DESC_ON_STACK
-     10 AHASH_REQUEST_ON_STACK
-      4 PC_LOC_ON_STACK
-      4 DECLARE_DPM_WATCHDOG_ON_STACK
-      3 HISI_SAS_DECLARE_RST_WORK_ON_STACK
-      3 CONFIG_ARCH_TASK_STRUCT_ON_STACK
-      1 PT_SIZE_ON_STACK
-      1 ALLOC_PT_GPREGS_ON_STACK
-
-So perhaps:
-
-	(?:SKCIPHER_REQUEST|SHASH_DESC|AHASH_REQUEST)_ON_STACK\s*\(
+Ah, ok, sorry. It's just difficult to tell when there is a reason to
+not provide the tag right now, or when people are don't know about
+them or ignore.
+If the patch is merged with this title, then there is nothing else to
+do. If it's merged under a different title, a new "#syz fix:" tag will
+override the old one.
