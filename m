@@ -1,47 +1,115 @@
-From: Dmitry Vyukov <dvyukov@google.com>
-Subject: Re: KASAN: use-after-free Read in crypto_aead_free_instance
-Date: Wed, 20 Dec 2017 12:59:43 +0100
-Message-ID: <CACT4Y+ZPvO-nEMJsHvzm9zPOdB803Eh9+UO_E++Wx6xBxw=mLA@mail.gmail.com>
-References: <001a11c14bc887c2c60560c0cdda@google.com> <18467907.EfXNf1iGip@tauon.chronox.de>
- <CACT4Y+bg6GjHbLpSkB6joS_dgu3ZYH=mJXHJ8AnuWiPVokhBdA@mail.gmail.com> <12415329.MInO136rYd@tauon.chronox.de>
+From: Gary R Hook <gary.hook@amd.com>
+Subject: [PATCH] iommu/amd - Set the device table entry PPR bit for IOMMU V2
+ devices
+Date: Wed, 20 Dec 2017 10:57:31 -0600
+Message-ID: <151378905140.769.2045094569843732393.stgit@sosxen2.amd.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: syzbot
-        <bot+e5e6fab2d4dc3d9877ac240fed364027bb960ad0@syzkaller.appspotmail.com>,
-        David Miller <davem@davemloft.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-        syzkaller-bugs@googlegroups.com
-To: Stephan Mueller <smueller@chronox.de>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <12415329.MInO136rYd@tauon.chronox.de>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: thomas.lendacky@amd.com, herbert@gondor.apana.org.au,
+        davem@davemloft.net
+To: yong.zhao@amd.com, linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-bl2nam02on0077.outbound.protection.outlook.com ([104.47.38.77]:49056
+        "EHLO NAM02-BL2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1755532AbdLTQ5i (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 20 Dec 2017 11:57:38 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Dec 20, 2017 at 12:49 PM, Stephan Mueller <smueller@chronox.de> wrote:
-> Am Mittwoch, 20. Dezember 2017, 11:15:38 CET schrieb Dmitry Vyukov:
->
-> Hi Dmitry,
->
->>
->> What will be its meaning? How will it differ from fix?
->
-> Maybe a short clarification would help: what is the meaning of the syz fix
-> marker?
+The AMD IOMMU specification Rev 3.00 (December 2016) introduces a
+new Enhanced PPR Handling Support (EPHSup) bit in the MMIO register
+offset 0030h (IOMMU Extended Feature Register).
 
-It's described here:
-https://github.com/google/syzkaller/blob/master/docs/syzbot.md#bug-status-tracking
+When EPHSup=1, the IOMMU hardware requires the PPR bit of the
+device table entry (DTE) to be set in order to support PPR for a
+particular endpoint device.
 
-> Depending on this answer, all that I am thinking of is to mark bug
-> reports for which there are fixes actively discussed, but yet not integrated.
-> Thus, such marker should only help others to point them to active discussions
-> instead of them trying to find fixes alone.
+Please see https://support.amd.com/TechDocs/48882_IOMMU.pdf for
+this revision of the AMD IOMMU specification.
 
-If it's only for humans, then there is no need to make a special
-machine-readable command for this.
-So basically what you wrote above is good:
+Signed-off-by: Gary R Hook <gary.hook@amd.com>
+---
+ drivers/iommu/amd_iommu.c       |   20 +++++++++++++++-----
+ drivers/iommu/amd_iommu_types.h |    2 ++
+ 2 files changed, 17 insertions(+), 5 deletions(-)
 
-> This issue vanishes after applying the patch "[PATCH v2] crypto: AF_ALG - limit mask and type".
-
-I just didn't understand that's still pending (but perhaps that's what
-you meant by including "[PATCH v2]" part).
+diff --git a/drivers/iommu/amd_iommu.c b/drivers/iommu/amd_iommu.c
+index cb78933ef53f..5f3da95ff6a0 100644
+--- a/drivers/iommu/amd_iommu.c
++++ b/drivers/iommu/amd_iommu.c
+@@ -1818,7 +1818,8 @@ static bool dma_ops_domain(struct protection_domain *domain)
+ 	return domain->flags & PD_DMA_OPS_MASK;
+ }
+ 
+-static void set_dte_entry(u16 devid, struct protection_domain *domain, bool ats)
++static void set_dte_entry(u16 devid, struct protection_domain *domain,
++			  bool ats, bool ppr)
+ {
+ 	u64 pte_root = 0;
+ 	u64 flags = 0;
+@@ -1835,6 +1836,13 @@ static void set_dte_entry(u16 devid, struct protection_domain *domain, bool ats)
+ 	if (ats)
+ 		flags |= DTE_FLAG_IOTLB;
+ 
++	if (ppr) {
++		struct amd_iommu *iommu = amd_iommu_rlookup_table[devid];
++
++		if (iommu_feature(iommu, FEATURE_EPHSUP))
++			pte_root |= 1ULL << DEV_ENTRY_PPR;
++	}
++
+ 	if (domain->flags & PD_IOMMUV2_MASK) {
+ 		u64 gcr3 = iommu_virt_to_phys(domain->gcr3_tbl);
+ 		u64 glx  = domain->glx;
+@@ -1897,9 +1905,9 @@ static void do_attach(struct iommu_dev_data *dev_data,
+ 	domain->dev_cnt                 += 1;
+ 
+ 	/* Update device table */
+-	set_dte_entry(dev_data->devid, domain, ats);
++	set_dte_entry(dev_data->devid, domain, ats, dev_data->iommu_v2);
+ 	if (alias != dev_data->devid)
+-		set_dte_entry(alias, domain, ats);
++		set_dte_entry(alias, domain, ats, dev_data->iommu_v2);
+ 
+ 	device_flush_dte(dev_data);
+ }
+@@ -2278,13 +2286,15 @@ static void update_device_table(struct protection_domain *domain)
+ 	struct iommu_dev_data *dev_data;
+ 
+ 	list_for_each_entry(dev_data, &domain->dev_list, list) {
+-		set_dte_entry(dev_data->devid, domain, dev_data->ats.enabled);
++		set_dte_entry(dev_data->devid, domain, dev_data->ats.enabled,
++			      dev_data->iommu_v2);
+ 
+ 		if (dev_data->devid == dev_data->alias)
+ 			continue;
+ 
+ 		/* There is an alias, update device table entry for it */
+-		set_dte_entry(dev_data->alias, domain, dev_data->ats.enabled);
++		set_dte_entry(dev_data->alias, domain, dev_data->ats.enabled,
++			      dev_data->iommu_v2);
+ 	}
+ }
+ 
+diff --git a/drivers/iommu/amd_iommu_types.h b/drivers/iommu/amd_iommu_types.h
+index f6b24c7d8b70..6a877ebd058b 100644
+--- a/drivers/iommu/amd_iommu_types.h
++++ b/drivers/iommu/amd_iommu_types.h
+@@ -98,6 +98,7 @@
+ #define FEATURE_HE		(1ULL<<8)
+ #define FEATURE_PC		(1ULL<<9)
+ #define FEATURE_GAM_VAPIC	(1ULL<<21)
++#define FEATURE_EPHSUP		(1ULL<<50)
+ 
+ #define FEATURE_PASID_SHIFT	32
+ #define FEATURE_PASID_MASK	(0x1fULL << FEATURE_PASID_SHIFT)
+@@ -192,6 +193,7 @@
+ /* macros and definitions for device table entries */
+ #define DEV_ENTRY_VALID         0x00
+ #define DEV_ENTRY_TRANSLATION   0x01
++#define DEV_ENTRY_PPR           0x34
+ #define DEV_ENTRY_IR            0x3d
+ #define DEV_ENTRY_IW            0x3e
+ #define DEV_ENTRY_NO_PAGE_FAULT	0x62
