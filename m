@@ -1,80 +1,102 @@
-From: Eric Biggers <ebiggers3@gmail.com>
-Subject: Re: [PATCH v2 2/2] crypto: Fix out-of-bounds access of the AAD
- buffer in generic-gcm-aesni
-Date: Wed, 20 Dec 2017 13:12:54 -0800
-Message-ID: <20171220211254.GB38504@gmail.com>
-References: <20171219221750.34148-1-junaids@google.com>
- <20171220044259.61106-3-junaids@google.com>
- <20171220084210.GC6565@zzz.localdomain>
- <2283674.Cix72tvP9W@js-desktop.svl.corp.google.com>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH] [RFT] crypto: aes-generic - turn off -ftree-pre and -ftree-sra
+Date: Wed, 20 Dec 2017 21:14:08 +0000
+Message-ID: <CAKv+Gu_2V1C61N6iRQaarpb_dF+bDWVJTG3YLXF5Hzd04v72uw@mail.gmail.com>
+References: <20171220205213.1025257-1-arnd@arndb.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-        andreslc@google.com, davem@davemloft.net, gthelen@google.com
-To: Junaid Shahid <junaids@google.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-it0-f67.google.com ([209.85.214.67]:34798 "EHLO
-        mail-it0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755607AbdLTVM6 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 20 Dec 2017 16:12:58 -0500
-Received: by mail-it0-f67.google.com with SMTP id m11so12657142iti.1
-        for <linux-crypto@vger.kernel.org>; Wed, 20 Dec 2017 13:12:58 -0800 (PST)
-Content-Disposition: inline
-In-Reply-To: <2283674.Cix72tvP9W@js-desktop.svl.corp.google.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        James Morris <james.l.morris@oracle.com>,
+        Richard Biener <rguenther@suse.de>,
+        Jakub Jelinek <jakub@gcc.gnu.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Arnd Bergmann <arnd@arndb.de>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20171220205213.1025257-1-arnd@arndb.de>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Dec 20, 2017 at 11:35:44AM -0800, Junaid Shahid wrote:
-> On Wednesday, December 20, 2017 12:42:10 AM PST Eric Biggers wrote:
-> > > -_get_AAD_rest0\num_initial_blocks\operation:
-> > > -	/* finalize: shift out the extra bytes we read, and align
-> > > -	left. since pslldq can only shift by an immediate, we use
-> > > -	vpshufb and an array of shuffle masks */
-> > > -	movq	   %r12, %r11
-> > > -	salq	   $4, %r11
-> > > -	movdqu	   aad_shift_arr(%r11), \TMP1
-> > > -	PSHUFB_XMM \TMP1, %xmm\i
-> > 
-> > aad_shift_arr is no longer used, so it should be removed.
-> 
-> Ack.
-> 
-> > 
-> > > -_get_AAD_rest_final\num_initial_blocks\operation:
-> > > +	READ_PARTIAL_BLOCK %r10, %r12, %r11, \TMP1, \TMP2, %xmm\i
-> > 
-> > It seems that INITIAL_BLOCKS_DEC and INITIAL_BLOCKS_ENC maintain both %r11 and
-> > %r12 as the AAD length.  %r11 is used for real earlier, but here %r12 is used
-> > for real while %r11 is a temporary register.  Can this be simplified to have the
-> > AAD length in %r11 only?
-> > 
-> 
-> We do need both registers, though we could certainly swap their usage to make
-> r12 the temp register. The reason we need the second register is because we
-> need to keep the original length to perform the pshufb at the end. But, of
-> course, that will not be needed anymore if we avoid the pshufb by duplicating
-> the _read_last_lt8 block or utilizing pslldq some other way.
-> 
+On 20 December 2017 at 20:52, Arnd Bergmann <arnd@arndb.de> wrote:
+> While testing other changes, I discovered that gcc-7.2.1 produces badly
+> optimized code for aes_encrypt/aes_decrypt. This is especially true when
+> CONFIG_UBSAN_SANITIZE_ALL is enabled, where it leads to extremely
+> large stack usage that in turn might cause kernel stack overflows:
+>
+> crypto/aes_generic.c: In function 'aes_encrypt':
+> crypto/aes_generic.c:1371:1: warning: the frame size of 4880 bytes is larger than 2048 bytes [-Wframe-larger-than=]
+> crypto/aes_generic.c: In function 'aes_decrypt':
+> crypto/aes_generic.c:1441:1: warning: the frame size of 4864 bytes is larger than 2048 bytes [-Wframe-larger-than=]
+>
+> I verified that this problem exists on all architectures that are
+> supported by gcc-7.2, though arm64 in particular is less affected than
+> the others. I also found that gcc-7.1 and gcc-8 do not show the extreme
+> stack usage but still produce worse code than earlier versions for this
+> file, apparently because of optimization passes that generally provide
+> a substantial improvement in object code quality but understandably fail
+> to find any shortcuts in the AES algorithm.
+>
+> Turning off the tree-pre and tree-sra optimization steps seems to
+> reverse the effect, and could be used as a workaround in case we
+> don't get a good gcc fix.
+>
+> Link: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=83356
+> Cc: Richard Biener <rguenther@suse.de>
+> Cc: Jakub Jelinek <jakub@gcc.gnu.org>
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
+> Jakub and Richard have done a more detailed analysis of this, and are
+> working on ways to improve the code again. In the meantime, I'm sending
+> this workaround to the Linux crypto maintainers to make them aware of
+> this issue and for testing.
+>
+> What would be a good way to test the performance of the AES code with
+> the various combinations of compiler versions, as well as UBSAN and this
+> patch enabled or disabled?
 
-If READ_PARTIAL_BLOCK can clobber 'DLEN' that would simplify it even more (no
-need for 'TMP1'), but what I am talking about here is how INITIAL_BLOCKS_DEC and
-INITIAL_BLOCKS_ENC maintain two copies of the remaining length in lock-step in
-r11 and r12:
+You can use the tcrypt.ko module to benchmark AES.
 
-_get_AAD_blocks\num_initial_blocks\operation:
-        movdqu     (%r10), %xmm\i
-        PSHUFB_XMM %xmm14, %xmm\i # byte-reflect the AAD data
-        pxor       %xmm\i, \XMM2
-        GHASH_MUL  \XMM2, \TMP3, \TMP1, \TMP2, \TMP4, \TMP5, \XMM1
-        add        $16, %r10
-        sub        $16, %r12
-        sub        $16, %r11
-        cmp        $16, %r11
-        jge        _get_AAD_blocks\num_initial_blocks\operation
+modprobe tcrypt mode=200 sec=1
 
-The code which you are replacing with READ_PARTIAL_BLOCK actually needed the two
-copies, but now it seems that only one copy is needed, so it can be simplified
-by only using r11.
+to run a (lengthy) AES benchmark in various modes. AES-128 in ECB mode
+using the largest block size tested is what I usually use for
+comparison.
 
-Eric
+On my Cortex-A57, the generic AES code runs at ~18 cycles per byte.
+Note that we have alternative scalar implementations on ARM and arm64
+that are faster so the performance of aes-generic is not really
+relevant (and so it is essentially dead code)
+
+
+> ---
+>  crypto/aes_generic.c | 14 ++++++++++++++
+>  1 file changed, 14 insertions(+)
+>
+> diff --git a/crypto/aes_generic.c b/crypto/aes_generic.c
+> index ca554d57d01e..35f973ba9878 100644
+> --- a/crypto/aes_generic.c
+> +++ b/crypto/aes_generic.c
+> @@ -1331,6 +1331,20 @@ EXPORT_SYMBOL_GPL(crypto_aes_set_key);
+>         f_rl(bo, bi, 3, k);     \
+>  } while (0)
+>
+> +#if __GNUC__ >= 7
+> +/*
+> + * Newer compilers try to optimize integer arithmetic more aggressively,
+> + * which generally improves code quality a lot, but in this specific case
+> + * ends up hurting more than it helps, in some configurations drastically
+> + * so. This turns off two optimization steps that have been shown to
+> + * lead to rather badly optimized code with gcc-7.
+> + *
+> + * See also https://gcc.gnu.org/bugzilla/show_bug.cgi?id=83356
+> + */
+> +#pragma GCC optimize("-fno-tree-pre")
+> +#pragma GCC optimize("-fno-tree-sra")
+> +#endif
+> +
+>  static void aes_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
+>  {
+>         const struct crypto_aes_ctx *ctx = crypto_tfm_ctx(tfm);
+> --
+> 2.9.0
+>
