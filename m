@@ -1,47 +1,66 @@
 From: Corentin Labbe <clabbe@baylibre.com>
-Subject: [PATCH] staging: ccree: fix __dump_byte_array() declaration mismatch
-Date: Wed, 20 Dec 2017 18:16:08 +0000
-Message-ID: <1513793768-11051-1-git-send-email-clabbe@baylibre.com>
-Cc: linux-crypto@vger.kernel.org,
-        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
+Subject: [PATCH] crypto: stm32 - Use standard CONFIG name
+Date: Wed, 20 Dec 2017 18:19:32 +0000
+Message-ID: <1513793972-11173-1-git-send-email-clabbe@baylibre.com>
+Cc: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
         linux-kernel@vger.kernel.org, Corentin Labbe <clabbe@baylibre.com>
-To: gilad@benyossef.com, gregkh@linuxfoundation.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wr0-f195.google.com ([209.85.128.195]:38556 "EHLO
-        mail-wr0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755818AbdLTSQQ (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 20 Dec 2017 13:16:16 -0500
-Received: by mail-wr0-f195.google.com with SMTP id o2so23048819wro.5
-        for <linux-crypto@vger.kernel.org>; Wed, 20 Dec 2017 10:16:15 -0800 (PST)
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+To: herbert@gondor.apana.org.au, davem@davemloft.net,
+        mcoquelin.stm32@gmail.com, alexandre.torgue@st.com,
+        lionel.debieve@st.com, fabien.dessenne@st.com
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-This patch corrects the type of the size argument in __dump_byte_array()
-from unsigned long to size_t as done only in drivers/staging/ccree/ssi_driver.c
+All hardware crypto devices have their CONFIG names using the following
+convention:
+CRYPTO_DEV_name_algo
 
-This fix also a build error:
-drivers/staging/ccree/ssi_driver.c:82:6: error: conflicting types for '__dump_byte_array'
+This patch apply this conventions on STM32 CONFIG names.
 
-Fixes: 3f268f5d6669 ("staging: ccree: turn compile time debug log to params")
 Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
 ---
- drivers/staging/ccree/ssi_driver.h | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ drivers/crypto/stm32/Kconfig  | 6 +++---
+ drivers/crypto/stm32/Makefile | 6 +++---
+ 2 files changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/staging/ccree/ssi_driver.h b/drivers/staging/ccree/ssi_driver.h
-index 5a56f7a76b71..0f57c9a8b8a6 100644
---- a/drivers/staging/ccree/ssi_driver.h
-+++ b/drivers/staging/ccree/ssi_driver.h
-@@ -174,8 +174,7 @@ static inline struct device *drvdata_to_dev(struct cc_drvdata *drvdata)
- 	return &drvdata->plat_dev->dev;
- }
+diff --git a/drivers/crypto/stm32/Kconfig b/drivers/crypto/stm32/Kconfig
+index 61ef00b6bf45..63aa78c0b12b 100644
+--- a/drivers/crypto/stm32/Kconfig
++++ b/drivers/crypto/stm32/Kconfig
+@@ -1,4 +1,4 @@
+-config CRC_DEV_STM32
++config CRYPTO_DEV_STM32_CRC
+ 	tristate "Support for STM32 crc accelerators"
+ 	depends on ARCH_STM32
+ 	select CRYPTO_HASH
+@@ -6,7 +6,7 @@ config CRC_DEV_STM32
+           This enables support for the CRC32 hw accelerator which can be found
+ 	  on STMicroelectronics STM32 SOC.
  
--void __dump_byte_array(const char *name, const u8 *the_array,
--		       unsigned long size);
-+void __dump_byte_array(const char *name, const u8 *buf, size_t size);
- static inline void dump_byte_array(const char *name, const u8 *the_array,
- 				   unsigned long size)
- {
+-config HASH_DEV_STM32
++config CRYPTO_DEV_STM32_HASH
+ 	tristate "Support for STM32 hash accelerators"
+ 	depends on ARCH_STM32
+ 	depends on HAS_DMA
+@@ -19,7 +19,7 @@ config HASH_DEV_STM32
+           This enables support for the HASH hw accelerator which can be found
+ 	  on STMicroelectronics STM32 SOC.
+ 
+-config CRYP_DEV_STM32
++config CRYPTO_DEV_STM32_CRYP
+ 	tristate "Support for STM32 cryp accelerators"
+ 	depends on ARCH_STM32
+ 	select CRYPTO_HASH
+diff --git a/drivers/crypto/stm32/Makefile b/drivers/crypto/stm32/Makefile
+index 2c19fc155bfd..53d1bb94b221 100644
+--- a/drivers/crypto/stm32/Makefile
++++ b/drivers/crypto/stm32/Makefile
+@@ -1,3 +1,3 @@
+-obj-$(CONFIG_CRC_DEV_STM32) += stm32_crc32.o
+-obj-$(CONFIG_HASH_DEV_STM32) += stm32-hash.o
+-obj-$(CONFIG_CRYP_DEV_STM32) += stm32-cryp.o
++obj-$(CONFIG_CRYPTO_DEV_STM32_CRC) += stm32_crc32.o
++obj-$(CONFIG_CRYPTO_DEV_STM32_HASH) += stm32-hash.o
++obj-$(CONFIG_CRYPTO_DEV_STM32_CRYP) += stm32-cryp.o
 -- 
 2.13.6
