@@ -1,55 +1,67 @@
-From: Jakub Jelinek <jakub@redhat.com>
-Subject: Re: [PATCH] [RFT] crypto: aes-generic - turn off -ftree-pre and
- -ftree-sra
-Date: Wed, 20 Dec 2017 22:46:48 +0100
-Message-ID: <20171220214648.GO2353@tucnak>
-References: <20171220205213.1025257-1-arnd@arndb.de>
-Reply-To: Jakub Jelinek <jakub@redhat.com>
+From: Junaid Shahid <junaids@google.com>
+Subject: Re: [PATCH v2 2/2] crypto: Fix out-of-bounds access of the AAD buffer in generic-gcm-aesni
+Date: Wed, 20 Dec 2017 13:51:26 -0800
+Message-ID: <3380731.nSvSnl1kt0@js-desktop.svl.corp.google.com>
+References: <20171219221750.34148-1-junaids@google.com> <2283674.Cix72tvP9W@js-desktop.svl.corp.google.com> <20171220211254.GB38504@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        James Morris <james.l.morris@oracle.com>,
-        Richard Biener <rguenther@suse.de>,
-        Jakub Jelinek <jakub@gcc.gnu.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Arnd Bergmann <arnd@arndb.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+        andreslc@google.com, davem@davemloft.net, gthelen@google.com
+To: Eric Biggers <ebiggers3@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:50184 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1756348AbdLTVrH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 20 Dec 2017 16:47:07 -0500
-Content-Disposition: inline
-In-Reply-To: <20171220205213.1025257-1-arnd@arndb.de>
+Received: from mail-pg0-f45.google.com ([74.125.83.45]:34499 "EHLO
+        mail-pg0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755501AbdLTVv3 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 20 Dec 2017 16:51:29 -0500
+Received: by mail-pg0-f45.google.com with SMTP id j4so12448561pgp.1
+        for <linux-crypto@vger.kernel.org>; Wed, 20 Dec 2017 13:51:29 -0800 (PST)
+In-Reply-To: <20171220211254.GB38504@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Dec 20, 2017 at 09:52:05PM +0100, Arnd Bergmann wrote:
-> diff --git a/crypto/aes_generic.c b/crypto/aes_generic.c
-> index ca554d57d01e..35f973ba9878 100644
-> --- a/crypto/aes_generic.c
-> +++ b/crypto/aes_generic.c
-> @@ -1331,6 +1331,20 @@ EXPORT_SYMBOL_GPL(crypto_aes_set_key);
->  	f_rl(bo, bi, 3, k);	\
->  } while (0)
->  
-> +#if __GNUC__ >= 7
-> +/*
-> + * Newer compilers try to optimize integer arithmetic more aggressively,
-> + * which generally improves code quality a lot, but in this specific case
-> + * ends up hurting more than it helps, in some configurations drastically
-> + * so. This turns off two optimization steps that have been shown to
-> + * lead to rather badly optimized code with gcc-7.
-> + *
-> + * See also https://gcc.gnu.org/bugzilla/show_bug.cgi?id=83356
-> + */
-> +#pragma GCC optimize("-fno-tree-pre")
-> +#pragma GCC optimize("-fno-tree-sra")
+On Wednesday, December 20, 2017 1:12:54 PM PST Eric Biggers wrote:
+> >=20
+> > We do need both registers, though we could certainly swap their usage t=
+o make
+> > r12 the temp register. The reason we need the second register is becaus=
+e we
+> > need to keep the original length to perform the pshufb at the end. But,=
+ of
+> > course, that will not be needed anymore if we avoid the pshufb by dupli=
+cating
+> > the _read_last_lt8 block or utilizing pslldq some other way.
+> >=20
+>=20
+> If READ_PARTIAL_BLOCK can clobber 'DLEN' that would simplify it even more=
+ (no
+> need for 'TMP1'), but what I am talking about here is how INITIAL_BLOCKS_=
+DEC and
+> INITIAL_BLOCKS_ENC maintain two copies of the remaining length in lock-st=
+ep in
+> r11 and r12:
+>=20
+> _get_AAD_blocks\num_initial_blocks\operation:
+>         movdqu     (%r10), %xmm\i
+>         PSHUFB_XMM %xmm14, %xmm\i # byte-reflect the AAD data
+>         pxor       %xmm\i, \XMM2
+>         GHASH_MUL  \XMM2, \TMP3, \TMP1, \TMP2, \TMP4, \TMP5, \XMM1
+>         add        $16, %r10
+>         sub        $16, %r12
+>         sub        $16, %r11
+>         cmp        $16, %r11
+>         jge        _get_AAD_blocks\num_initial_blocks\operation
+>=20
+> The code which you are replacing with READ_PARTIAL_BLOCK actually needed =
+the two
+> copies, but now it seems that only one copy is needed, so it can be simpl=
+ified
+> by only using r11.
+>=20
 
-So do it only when UBSAN is enabled?  GCC doesn't have a particular
-predefined macro for those (only for asan and tsan), but either the kernel
-does have something already, or could have something added in the
-corresponding Makefile.
+Sorry, I misunderstood earlier. I=E2=80=99ll remove the extra register from=
+ the preceding code in INIITIAL_BLOCKS_ENC/DEC.
 
-	Jakub
+Thanks,
+Junaid
