@@ -1,723 +1,441 @@
 From: Atul Gupta <atul.gupta@chelsio.com>
-Subject: [RFC crypto v3 1/9] chtls: structure and macro definiton
-Date: Wed, 20 Dec 2017 17:03:20 +0530
-Message-ID: <1513769600-25829-1-git-send-email-atul.gupta@chelsio.com>
+Subject: [RFC crypto v3 2/9] cxgb4: Inline TLS FW Interface
+Date: Wed, 20 Dec 2017 17:05:12 +0530
+Message-ID: <1513769712-26619-1-git-send-email-atul.gupta@chelsio.com>
 Cc: netdev@vger.kernel.org, davem@davemloft.net, davejwatson@fb.com
 To: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
         ganeshgr@chelsio.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from stargate.chelsio.com ([12.32.117.8]:8368 "EHLO
+Received: from stargate.chelsio.com ([12.32.117.8]:26542 "EHLO
         stargate.chelsio.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755127AbdLTLdc (ORCPT
+        with ESMTP id S1754708AbdLTLfX (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 20 Dec 2017 06:33:32 -0500
+        Wed, 20 Dec 2017 06:35:23 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Inline TLS state, connection management. Supporting macros definition.
+Key area size in hw-config file. CPL struct for TLS request
+and response. Work request for Inline TLS.
 
 Signed-off-by: Atul Gupta <atul.gupta@chelsio.com>
 ---
- drivers/crypto/chelsio/chtls/chtls.h    | 480 ++++++++++++++++++++++++++++++++
- drivers/crypto/chelsio/chtls/chtls_cm.h | 203 ++++++++++++++
- 2 files changed, 683 insertions(+)
- create mode 100644 drivers/crypto/chelsio/chtls/chtls.h
- create mode 100644 drivers/crypto/chelsio/chtls/chtls_cm.h
+ drivers/net/ethernet/chelsio/cxgb4/t4_msg.h   | 121 ++++++++++++++++++-
+ drivers/net/ethernet/chelsio/cxgb4/t4_regs.h  |   2 +
+ drivers/net/ethernet/chelsio/cxgb4/t4fw_api.h | 165 +++++++++++++++++++++++++-
+ 3 files changed, 283 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/crypto/chelsio/chtls/chtls.h b/drivers/crypto/chelsio/chtls/chtls.h
-new file mode 100644
-index 0000000..33d3ed4
---- /dev/null
-+++ b/drivers/crypto/chelsio/chtls/chtls.h
-@@ -0,0 +1,480 @@
-+/*
-+ * Copyright (c) 2016 Chelsio Communications, Inc.
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ */
+diff --git a/drivers/net/ethernet/chelsio/cxgb4/t4_msg.h b/drivers/net/ethernet/chelsio/cxgb4/t4_msg.h
+index 7e12f24..9a56e0d 100644
+--- a/drivers/net/ethernet/chelsio/cxgb4/t4_msg.h
++++ b/drivers/net/ethernet/chelsio/cxgb4/t4_msg.h
+@@ -81,6 +81,7 @@ enum {
+ 	CPL_RX_ISCSI_CMP      = 0x45,
+ 	CPL_TRACE_PKT_T5      = 0x48,
+ 	CPL_RX_ISCSI_DDP      = 0x49,
++	CPL_RX_TLS_CMP        = 0x4E,
+ 
+ 	CPL_RDMA_READ_REQ     = 0x60,
+ 
+@@ -88,6 +89,7 @@ enum {
+ 	CPL_ACT_OPEN_REQ6     = 0x83,
+ 
+ 	CPL_TX_TLS_PDU     =    0x88,
++	CPL_TX_TLS_SFO        = 0x89,
+ 	CPL_TX_SEC_PDU        = 0x8A,
+ 	CPL_TX_TLS_ACK        = 0x8B,
+ 
+@@ -97,6 +99,7 @@ enum {
+ 	CPL_RX_MPS_PKT        = 0xAF,
+ 
+ 	CPL_TRACE_PKT         = 0xB0,
++	CPL_TLS_DATA          = 0xB1,
+ 	CPL_ISCSI_DATA	      = 0xB2,
+ 
+ 	CPL_FW4_MSG           = 0xC0,
+@@ -150,6 +153,7 @@ enum {
+ 	ULP_MODE_RDMA          = 4,
+ 	ULP_MODE_TCPDDP	       = 5,
+ 	ULP_MODE_FCOE          = 6,
++	ULP_MODE_TLS           = 8,
+ };
+ 
+ enum {
+@@ -1414,6 +1418,14 @@ struct cpl_tx_data {
+ #define TX_FORCE_S	13
+ #define TX_FORCE_V(x)	((x) << TX_FORCE_S)
+ 
++#define TX_SHOVE_S    14
++#define TX_SHOVE_V(x) ((x) << TX_SHOVE_S)
 +
-+#ifndef __CHTLS_H__
-+#define __CHTLS_H__
++#define TX_ULP_MODE_S    10
++#define TX_ULP_MODE_M    0x7
++#define TX_ULP_MODE_V(x) ((x) << TX_ULP_MODE_S)
++#define TX_ULP_MODE_G(x) (((x) >> TX_ULP_MODE_S) & TX_ULP_MODE_M)
 +
-+#include <crypto/aes.h>
-+#include <crypto/algapi.h>
-+#include <crypto/hash.h>
-+#include <crypto/sha.h>
-+#include <crypto/authenc.h>
-+#include <crypto/ctr.h>
-+#include <crypto/gf128mul.h>
-+#include <crypto/internal/aead.h>
-+#include <crypto/null.h>
-+#include <crypto/internal/skcipher.h>
-+#include <crypto/aead.h>
-+#include <crypto/scatterwalk.h>
-+#include <crypto/internal/hash.h>
-+#include <linux/tls.h>
+ #define T6_TX_FORCE_S		20
+ #define T6_TX_FORCE_V(x)	((x) << T6_TX_FORCE_S)
+ #define T6_TX_FORCE_F		T6_TX_FORCE_V(1U)
+@@ -1428,12 +1440,21 @@ enum {
+ 	ULP_TX_SC_NOOP = 0x80,
+ 	ULP_TX_SC_IMM  = 0x81,
+ 	ULP_TX_SC_DSGL = 0x82,
+-	ULP_TX_SC_ISGL = 0x83
++	ULP_TX_SC_ISGL = 0x83,
++	ULP_TX_SC_MEMRD = 0x86
+ };
+ 
+ #define ULPTX_CMD_S    24
+ #define ULPTX_CMD_V(x) ((x) << ULPTX_CMD_S)
+ 
++#define ULPTX_LEN16_S    0
++#define ULPTX_LEN16_M    0xFF
++#define ULPTX_LEN16_V(x) ((x) << ULPTX_LEN16_S)
 +
-+#include "t4fw_api.h"
-+#include "t4_msg.h"
-+#include "cxgb4.h"
-+#include "cxgb4_uld.h"
-+#include "l2t.h"
-+#include "chcr_algo.h"
-+#include "chcr_core.h"
-+#include "chcr_crypto.h"
++#define ULP_TX_SC_MORE_S 23
++#define ULP_TX_SC_MORE_V(x) ((x) << ULP_TX_SC_MORE_S)
++#define ULP_TX_SC_MORE_F  ULP_TX_SC_MORE_V(1U)
 +
-+#define CIPHER_BLOCK_SIZE               16
-+#define MAX_IVS_PAGE                    256
-+#define TLS_KEY_CONTEXT_SZ		64
-+#define TLS_HEADER_LENGTH		5
-+#define SCMD_CIPH_MODE_AES_GCM          2
-+#define GCM_TAG_SIZE                    16
-+#define AEAD_EXPLICIT_DATA_SIZE         8
-+/* Any MFS size should work and come from openssl */
-+#define TLS_MFS				16384
+ struct ulptx_sge_pair {
+ 	__be32 len[2];
+ 	__be64 addr[2];
+@@ -1948,4 +1969,102 @@ enum {
+ 	X_CPL_RX_MPS_PKT_TYPE_QFC   = 1 << 2,
+ 	X_CPL_RX_MPS_PKT_TYPE_PTP   = 1 << 3
+ };
 +
-+#define SOCK_INLINE (31)
-+#define RSS_HDR sizeof(struct rss_header)
-+
-+enum {
-+	CHTLS_KEY_CONTEXT_DSGL,
-+	CHTLS_KEY_CONTEXT_IMM,
-+	CHTLS_KEY_CONTEXT_DDR,
-+};
-+
-+enum {
-+	CHTLS_LISTEN_START,
-+	CHTLS_LISTEN_STOP,
-+};
-+
-+/* Flags for return value of CPL message handlers */
-+enum {
-+	CPL_RET_BUF_DONE = 1,   /* buffer processing done */
-+	CPL_RET_BAD_MSG = 2,    /* bad CPL message */
-+	CPL_RET_UNKNOWN_TID = 4 /* unexpected unknown TID */
-+};
-+
-+#define TLS_RCV_ST_READ_HEADER          0xF0
-+#define TLS_RCV_ST_READ_BODY            0xF1
-+#define TLS_RCV_ST_READ_DONE            0xF2
-+#define TLS_RCV_ST_READ_NB              0xF3
-+
-+#define RSPQ_HASH_BITS 5
-+#define LISTEN_INFO_HASH_SIZE 32
-+struct listen_info {
-+	struct listen_info *next;  /* Link to next entry */
-+	struct sock *sk;           /* The listening socket */
-+	unsigned int stid;         /* The server TID */
-+};
-+
-+enum {
-+	T4_LISTEN_START_PENDING,
-+	T4_LISTEN_STARTED
-+};
-+
-+enum csk_flags {
-+	CSK_CALLBACKS_CHKD,	/* socket callbacks have been sanitized */
-+	CSK_ABORT_REQ_RCVD,	/* received one ABORT_REQ_RSS message */
-+	CSK_TX_MORE_DATA,	/* sending ULP data; don't set SHOVE bit */
-+	CSK_TX_WAIT_IDLE,	/* suspend Tx until in-flight data is ACKed */
-+	CSK_ABORT_SHUTDOWN,	/* shouldn't send more abort requests */
-+	CSK_ABORT_RPL_PENDING,	/* expecting an abort reply */
-+	CSK_CLOSE_CON_REQUESTED,/* we've sent a close_conn_req */
-+	CSK_TX_DATA_SENT,	/* sent a TX_DATA WR on this connection */
-+	CSK_TX_FAILOVER,	/* Tx traffic failing over */
-+	CSK_UPDATE_RCV_WND,	/* Need to update rcv window */
-+	CSK_RST_ABORTED,	/* outgoing RST was aborted */
-+	CSK_TLS_HANDSHK,	/* TLS Handshake */
-+};
-+
-+struct listen_ctx {
-+	struct sock *lsk;
-+	struct chtls_dev *cdev;
-+	u32 state;
-+};
-+
-+struct key_map {
-+	unsigned long *addr;
-+	unsigned int start;
-+	unsigned int available;
-+	unsigned int size;
-+	spinlock_t lock; /* lock for key id request from map */
-+} __packed;
-+
-+struct tls_scmd {
++struct cpl_tx_tls_sfo {
++	__be32 op_to_seg_len;
++	__be32 pld_len;
++	__be32 type_protover;
++	__be32 r1_lo;
 +	__be32 seqno_numivs;
 +	__be32 ivgen_hdrlen;
++	__be64 scmd1;
 +};
 +
-+struct chtls_dev {
-+	struct list_head list;
-+	struct cxgb4_lld_info *lldi;
-+	struct pci_dev *pdev;
-+	struct listen_info *listen_hash_tab[LISTEN_INFO_HASH_SIZE];
-+	spinlock_t listen_lock; /* lock for listen list */
-+	struct net_device **ports;
-+	struct tid_info *tids;
-+	unsigned int pfvf;
-+	const unsigned short *mtus;
++/* cpl_tx_tls_sfo macros */
++#define CPL_TX_TLS_SFO_OPCODE_S         24
++#define CPL_TX_TLS_SFO_OPCODE_V(x)      ((x) << CPL_TX_TLS_SFO_OPCODE_S)
 +
-+	spinlock_t aidr_lock ____cacheline_aligned_in_smp;
-+	struct idr aidr; /* ATID id space */
-+	struct idr hwtid_idr;
-+	struct idr stid_idr;
++#define CPL_TX_TLS_SFO_DATA_TYPE_S      20
++#define CPL_TX_TLS_SFO_DATA_TYPE_V(x)   ((x) << CPL_TX_TLS_SFO_DATA_TYPE_S)
 +
-+	spinlock_t idr_lock ____cacheline_aligned_in_smp;
++#define CPL_TX_TLS_SFO_CPL_LEN_S        16
++#define CPL_TX_TLS_SFO_CPL_LEN_V(x)     ((x) << CPL_TX_TLS_SFO_CPL_LEN_S)
 +
-+	struct net_device *egr_dev[NCHAN * 2];
-+	struct sk_buff *rspq_skb_cache[1 << RSPQ_HASH_BITS];
-+	struct sk_buff *askb;
++#define CPL_TX_TLS_SFO_SEG_LEN_S        0
++#define CPL_TX_TLS_SFO_SEG_LEN_M        0xffff
++#define CPL_TX_TLS_SFO_SEG_LEN_V(x)     ((x) << CPL_TX_TLS_SFO_SEG_LEN_S)
++#define CPL_TX_TLS_SFO_SEG_LEN_G(x)     \
++	(((x) >> CPL_TX_TLS_SFO_SEG_LEN_S) & CPL_TX_TLS_SFO_SEG_LEN_M)
 +
-+	struct sk_buff_head deferq;
-+	struct work_struct deferq_task;
++#define CPL_TX_TLS_SFO_TYPE_S           24
++#define CPL_TX_TLS_SFO_TYPE_M           0xff
++#define CPL_TX_TLS_SFO_TYPE_V(x)        ((x) << CPL_TX_TLS_SFO_TYPE_S)
++#define CPL_TX_TLS_SFO_TYPE_G(x)        \
++	(((x) >> CPL_TX_TLS_SFO_TYPE_S) & CPL_TX_TLS_SFO_TYPE_M)
 +
-+	struct list_head list_node;
-+	struct list_head rcu_node;
-+	struct list_head na_node;
-+	unsigned int send_page_order;
-+	struct key_map kmap;
++#define CPL_TX_TLS_SFO_PROTOVER_S       8
++#define CPL_TX_TLS_SFO_PROTOVER_M       0xffff
++#define CPL_TX_TLS_SFO_PROTOVER_V(x)    ((x) << CPL_TX_TLS_SFO_PROTOVER_S)
++#define CPL_TX_TLS_SFO_PROTOVER_G(x)    \
++	(((x) >> CPL_TX_TLS_SFO_PROTOVER_S) & CPL_TX_TLS_SFO_PROTOVER_M)
++
++struct cpl_tls_data {
++	struct rss_header rsshdr;
++	union opcode_tid ot;
++	__be32 length_pkd;
++	__be32 seq;
++	__be32 r1;
 +};
 +
-+struct chtls_hws {
-+	struct sk_buff_head sk_recv_queue;
-+	u8 txqid;
-+	u8 ofld;
-+	u16 type;
-+	u16 rstate;
-+	u16 keyrpl;
-+	u16 pldlen;
-+	u16 rcvpld;
-+	u16 compute;
-+	u16 expansion;
-+	u16 keylen;
-+	u16 pdus;
-+	u16 adjustlen;
-+	u16 ivsize;
-+	u16 txleft;
-+	u32 mfs;
-+	s32 txkey;
-+	s32 rxkey;
-+	u32 fcplenmax;
-+	u32 copied_seq;
-+	u64 tx_seq_no;
-+	struct tls_scmd scmd;
-+	struct tls12_crypto_info_aes_gcm_128 crypto_info;
++#define CPL_TLS_DATA_OPCODE_S           24
++#define CPL_TLS_DATA_OPCODE_M           0xff
++#define CPL_TLS_DATA_OPCODE_V(x)        ((x) << CPL_TLS_DATA_OPCODE_S)
++#define CPL_TLS_DATA_OPCODE_G(x)        \
++	(((x) >> CPL_TLS_DATA_OPCODE_S) & CPL_TLS_DATA_OPCODE_M)
++
++#define CPL_TLS_DATA_TID_S              0
++#define CPL_TLS_DATA_TID_M              0xffffff
++#define CPL_TLS_DATA_TID_V(x)           ((x) << CPL_TLS_DATA_TID_S)
++#define CPL_TLS_DATA_TID_G(x)           \
++	(((x) >> CPL_TLS_DATA_TID_S) & CPL_TLS_DATA_TID_M)
++
++#define CPL_TLS_DATA_LENGTH_S           0
++#define CPL_TLS_DATA_LENGTH_M           0xffff
++#define CPL_TLS_DATA_LENGTH_V(x)        ((x) << CPL_TLS_DATA_LENGTH_S)
++#define CPL_TLS_DATA_LENGTH_G(x)        \
++	(((x) >> CPL_TLS_DATA_LENGTH_S) & CPL_TLS_DATA_LENGTH_M)
++
++struct cpl_rx_tls_cmp {
++	struct rss_header rsshdr;
++	union opcode_tid ot;
++	__be32 pdulength_length;
++	__be32 seq;
++	__be32 ddp_report;
++	__be32 r;
++	__be32 ddp_valid;
 +};
 +
-+struct chtls_sock {
-+	struct sock *sk;
-+	struct chtls_dev *cdev;
-+	struct l2t_entry *l2t_entry;    /* pointer to the L2T entry */
-+	struct net_device *egress_dev;  /* TX_CHAN for act open retry */
++#define CPL_RX_TLS_CMP_OPCODE_S         24
++#define CPL_RX_TLS_CMP_OPCODE_M         0xff
++#define CPL_RX_TLS_CMP_OPCODE_V(x)      ((x) << CPL_RX_TLS_CMP_OPCODE_S)
++#define CPL_RX_TLS_CMP_OPCODE_G(x)      \
++	(((x) >> CPL_RX_TLS_CMP_OPCODE_S) & CPL_RX_TLS_CMP_OPCODE_M)
 +
-+	struct sk_buff_head txq;
-+	struct sk_buff_head ooo_queue;
-+	struct sk_buff *wr_skb_head;
-+	struct sk_buff *wr_skb_tail;
-+	struct sk_buff *ctrl_skb_cache;
-+	struct sk_buff *txdata_skb_cache; /* abort path messages */
-+	struct kref kref;
-+	unsigned long flags;
-+	u32 opt2;
-+	u32 wr_credits;
-+	u32 wr_unacked;
-+	u32 wr_max_credits;
-+	u32 wr_nondata;
-+	u32 hwtid;               /* TCP Control Block ID */
-+	u32 txq_idx;
-+	u32 rss_qid;
-+	u32 tid;
-+	u32 idr;
-+	u32 mss;
-+	u32 ulp_mode;
-+	u32 tx_chan;
-+	u32 rx_chan;
-+	u32 sndbuf;
-+	u32 txplen_max;
-+	u32 mtu_idx;           /* MTU table index */
-+	u32 smac_idx;
-+	u8 port_id;
-+	u8 tos;
-+	u16 resv2;
-+	u32 delack_mode;
-+	u32 delack_seq;
++#define CPL_RX_TLS_CMP_TID_S            0
++#define CPL_RX_TLS_CMP_TID_M            0xffffff
++#define CPL_RX_TLS_CMP_TID_V(x)         ((x) << CPL_RX_TLS_CMP_TID_S)
++#define CPL_RX_TLS_CMP_TID_G(x)         \
++	(((x) >> CPL_RX_TLS_CMP_TID_S) & CPL_RX_TLS_CMP_TID_M)
 +
-+	void *passive_reap_next;        /* placeholder for passive */
-+	struct chtls_hws tlshws;
++#define CPL_RX_TLS_CMP_PDULENGTH_S      16
++#define CPL_RX_TLS_CMP_PDULENGTH_M      0xffff
++#define CPL_RX_TLS_CMP_PDULENGTH_V(x)   ((x) << CPL_RX_TLS_CMP_PDULENGTH_S)
++#define CPL_RX_TLS_CMP_PDULENGTH_G(x)   \
++	(((x) >> CPL_RX_TLS_CMP_PDULENGTH_S) & CPL_RX_TLS_CMP_PDULENGTH_M)
++
++#define CPL_RX_TLS_CMP_LENGTH_S         0
++#define CPL_RX_TLS_CMP_LENGTH_M         0xffff
++#define CPL_RX_TLS_CMP_LENGTH_V(x)      ((x) << CPL_RX_TLS_CMP_LENGTH_S)
++#define CPL_RX_TLS_CMP_LENGTH_G(x)      \
++	(((x) >> CPL_RX_TLS_CMP_LENGTH_S) & CPL_RX_TLS_CMP_LENGTH_M)
+ #endif  /* __T4_MSG_H */
+diff --git a/drivers/net/ethernet/chelsio/cxgb4/t4_regs.h b/drivers/net/ethernet/chelsio/cxgb4/t4_regs.h
+index a7cfece..5316b4b 100644
+--- a/drivers/net/ethernet/chelsio/cxgb4/t4_regs.h
++++ b/drivers/net/ethernet/chelsio/cxgb4/t4_regs.h
+@@ -2740,6 +2740,8 @@
+ #define ULP_RX_LA_RDPTR_A 0x19240
+ #define ULP_RX_LA_RDDATA_A 0x19244
+ #define ULP_RX_LA_WRPTR_A 0x19248
++#define ULP_RX_TLS_KEY_LLIMIT_A 0x192ac
++#define ULP_RX_TLS_KEY_ULIMIT_A 0x192b0
+ 
+ #define HPZ3_S    24
+ #define HPZ3_V(x) ((x) << HPZ3_S)
+diff --git a/drivers/net/ethernet/chelsio/cxgb4/t4fw_api.h b/drivers/net/ethernet/chelsio/cxgb4/t4fw_api.h
+index be36583..c9f75fc 100644
+--- a/drivers/net/ethernet/chelsio/cxgb4/t4fw_api.h
++++ b/drivers/net/ethernet/chelsio/cxgb4/t4fw_api.h
+@@ -104,6 +104,7 @@ enum fw_wr_opcodes {
+ 	FW_RI_INV_LSTAG_WR             = 0x1a,
+ 	FW_ISCSI_TX_DATA_WR	       = 0x45,
+ 	FW_PTP_TX_PKT_WR               = 0x46,
++	FW_TLSTX_DATA_WR	       = 0x68,
+ 	FW_CRYPTO_LOOKASIDE_WR         = 0X6d,
+ 	FW_LASTC2E_WR                  = 0x70,
+ 	FW_FILTER2_WR		       = 0x77
+@@ -634,6 +635,30 @@ struct fw_ofld_connection_wr {
+ #define FW_OFLD_CONNECTION_WR_CPLPASSACCEPTRPL_F       \
+ 	FW_OFLD_CONNECTION_WR_CPLPASSACCEPTRPL_V(1U)
+ 
++enum fw_flowc_mnem_tcpstate {
++	FW_FLOWC_MNEM_TCPSTATE_CLOSED   = 0, /* illegal */
++	FW_FLOWC_MNEM_TCPSTATE_LISTEN   = 1, /* illegal */
++	FW_FLOWC_MNEM_TCPSTATE_SYNSENT  = 2, /* illegal */
++	FW_FLOWC_MNEM_TCPSTATE_SYNRECEIVED = 3, /* illegal */
++	FW_FLOWC_MNEM_TCPSTATE_ESTABLISHED = 4, /* default */
++	FW_FLOWC_MNEM_TCPSTATE_CLOSEWAIT = 5, /* got peer close already */
++	FW_FLOWC_MNEM_TCPSTATE_FINWAIT1 = 6, /* haven't gotten ACK for FIN and
++					      * will resend FIN - equiv ESTAB
++					      */
++	FW_FLOWC_MNEM_TCPSTATE_CLOSING  = 7, /* haven't gotten ACK for FIN and
++					      * will resend FIN but have
++					      * received FIN
++					      */
++	FW_FLOWC_MNEM_TCPSTATE_LASTACK  = 8, /* haven't gotten ACK for FIN and
++					      * will resend FIN but have
++					      * received FIN
++					      */
++	FW_FLOWC_MNEM_TCPSTATE_FINWAIT2 = 9, /* sent FIN and got FIN + ACK,
++					      * waiting for FIN
++					      */
++	FW_FLOWC_MNEM_TCPSTATE_TIMEWAIT = 10, /* not expected */
 +};
 +
-+struct tls_hdr {
-+	u8  type;
-+	u16 version;
-+	u16 length;
-+} __packed;
+ enum fw_flowc_mnem {
+ 	FW_FLOWC_MNEM_PFNVFN,		/* PFN [15:8] VFN [7:0] */
+ 	FW_FLOWC_MNEM_CH,
+@@ -650,6 +675,8 @@ enum fw_flowc_mnem {
+ 	FW_FLOWC_MNEM_DCBPRIO,
+ 	FW_FLOWC_MNEM_SND_SCALE,
+ 	FW_FLOWC_MNEM_RCV_SCALE,
++	FW_FLOWC_MNEM_ULD_MODE,
++	FW_FLOWC_MNEM_MAX,
+ };
+ 
+ struct fw_flowc_mnemval {
+@@ -674,6 +701,14 @@ struct fw_ofld_tx_data_wr {
+ 	__be32 tunnel_to_proxy;
+ };
+ 
++#define FW_OFLD_TX_DATA_WR_ALIGNPLD_S           30
++#define FW_OFLD_TX_DATA_WR_ALIGNPLD_V(x) ((x) << FW_OFLD_TX_DATA_WR_ALIGNPLD_S)
++#define FW_OFLD_TX_DATA_WR_ALIGNPLD_F   FW_OFLD_TX_DATA_WR_ALIGNPLD_V(1U)
 +
-+struct tlsrx_cmp_hdr {
-+	u8  type;
-+	u16 version;
-+	u16 length;
++#define FW_OFLD_TX_DATA_WR_SHOVE_S           29
++#define FW_OFLD_TX_DATA_WR_SHOVE_V(x)   ((x) << FW_OFLD_TX_DATA_WR_SHOVE_S)
++#define FW_OFLD_TX_DATA_WR_SHOVE_F      FW_OFLD_TX_DATA_WR_SHOVE_V(1U)
 +
-+	u64 tls_seq;
-+	u16 reserved1;
-+	u8  res_to_mac_error;
-+} __packed;
-+
-+/* res_to_mac_error fields */
-+#define TLSRX_HDR_PKT_INT_ERROR_S   4
-+#define TLSRX_HDR_PKT_INT_ERROR_M   0x1
-+#define TLSRX_HDR_PKT_INT_ERROR_V(x) \
-+	((x) << TLSRX_HDR_PKT_INT_ERROR_S)
-+#define TLSRX_HDR_PKT_INT_ERROR_G(x) \
-+	(((x) >> TLSRX_HDR_PKT_INT_ERROR_S) & TLSRX_HDR_PKT_INT_ERROR_M)
-+#define TLSRX_HDR_PKT_INT_ERROR_F   TLSRX_HDR_PKT_INT_ERROR_V(1U)
-+
-+#define TLSRX_HDR_PKT_SPP_ERROR_S        3
-+#define TLSRX_HDR_PKT_SPP_ERROR_M        0x1
-+#define TLSRX_HDR_PKT_SPP_ERROR_V(x)     ((x) << TLSRX_HDR_PKT_SPP_ERROR)
-+#define TLSRX_HDR_PKT_SPP_ERROR_G(x)     \
-+	(((x) >> TLSRX_HDR_PKT_SPP_ERROR_S) & TLSRX_HDR_PKT_SPP_ERROR_M)
-+#define TLSRX_HDR_PKT_SPP_ERROR_F        TLSRX_HDR_PKT_SPP_ERROR_V(1U)
-+
-+#define TLSRX_HDR_PKT_CCDX_ERROR_S       2
-+#define TLSRX_HDR_PKT_CCDX_ERROR_M       0x1
-+#define TLSRX_HDR_PKT_CCDX_ERROR_V(x)    ((x) << TLSRX_HDR_PKT_CCDX_ERROR_S)
-+#define TLSRX_HDR_PKT_CCDX_ERROR_G(x)    \
-+	(((x) >> TLSRX_HDR_PKT_CCDX_ERROR_S) & TLSRX_HDR_PKT_CCDX_ERROR_M)
-+#define TLSRX_HDR_PKT_CCDX_ERROR_F       TLSRX_HDR_PKT_CCDX_ERROR_V(1U)
-+
-+#define TLSRX_HDR_PKT_PAD_ERROR_S        1
-+#define TLSRX_HDR_PKT_PAD_ERROR_M        0x1
-+#define TLSRX_HDR_PKT_PAD_ERROR_V(x)     ((x) << TLSRX_HDR_PKT_PAD_ERROR_S)
-+#define TLSRX_HDR_PKT_PAD_ERROR_G(x)     \
-+	(((x) >> TLSRX_HDR_PKT_PAD_ERROR_S) & TLSRX_HDR_PKT_PAD_ERROR_M)
-+#define TLSRX_HDR_PKT_PAD_ERROR_F        TLSRX_HDR_PKT_PAD_ERROR_V(1U)
-+
-+#define TLSRX_HDR_PKT_MAC_ERROR_S        0
-+#define TLSRX_HDR_PKT_MAC_ERROR_M        0x1
-+#define TLSRX_HDR_PKT_MAC_ERROR_V(x)     ((x) << TLSRX_HDR_PKT_MAC_ERROR)
-+#define TLSRX_HDR_PKT_MAC_ERROR_G(x)     \
-+	(((x) >> S_TLSRX_HDR_PKT_MAC_ERROR_S) & TLSRX_HDR_PKT_MAC_ERROR_M)
-+#define TLSRX_HDR_PKT_MAC_ERROR_F        TLSRX_HDR_PKT_MAC_ERROR_V(1U)
-+
-+#define TLSRX_HDR_PKT_ERROR_M           0x1F
-+
-+struct ulp_mem_rw {
-+	__be32 cmd;
-+	__be32 len16;             /* command length */
-+	__be32 dlen;              /* data length in 32-byte units */
-+	__be32 lock_addr;
+ #define FW_OFLD_TX_DATA_WR_TUNNEL_S     19
+ #define FW_OFLD_TX_DATA_WR_TUNNEL_V(x)  ((x) << FW_OFLD_TX_DATA_WR_TUNNEL_S)
+ 
+@@ -690,10 +725,6 @@ struct fw_ofld_tx_data_wr {
+ #define FW_OFLD_TX_DATA_WR_MORE_S       15
+ #define FW_OFLD_TX_DATA_WR_MORE_V(x)    ((x) << FW_OFLD_TX_DATA_WR_MORE_S)
+ 
+-#define FW_OFLD_TX_DATA_WR_SHOVE_S      14
+-#define FW_OFLD_TX_DATA_WR_SHOVE_V(x)   ((x) << FW_OFLD_TX_DATA_WR_SHOVE_S)
+-#define FW_OFLD_TX_DATA_WR_SHOVE_F      FW_OFLD_TX_DATA_WR_SHOVE_V(1U)
+-
+ #define FW_OFLD_TX_DATA_WR_ULPMODE_S    10
+ #define FW_OFLD_TX_DATA_WR_ULPMODE_V(x) ((x) << FW_OFLD_TX_DATA_WR_ULPMODE_S)
+ 
+@@ -1118,6 +1149,12 @@ enum fw_caps_config_iscsi {
+ 	FW_CAPS_CONFIG_ISCSI_TARGET_CNXOFLD = 0x00000008,
+ };
+ 
++enum fw_caps_config_crypto {
++	FW_CAPS_CONFIG_CRYPTO_LOOKASIDE = 0x00000001,
++	FW_CAPS_CONFIG_TLS_INLINE = 0x00000002,
++	FW_CAPS_CONFIG_IPSEC_INLINE = 0x00000004,
 +};
 +
-+struct tls_key_wr {
-+	__be32 op_to_compl;
+ enum fw_caps_config_fcoe {
+ 	FW_CAPS_CONFIG_FCOE_INITIATOR	= 0x00000001,
+ 	FW_CAPS_CONFIG_FCOE_TARGET	= 0x00000002,
+@@ -1258,6 +1295,8 @@ enum fw_params_param_pfvf {
+ 	FW_PARAMS_PARAM_PFVF_HPFILTER_START = 0x32,
+ 	FW_PARAMS_PARAM_PFVF_HPFILTER_END = 0x33,
+ 	FW_PARAMS_PARAM_PFVF_NCRYPTO_LOOKASIDE = 0x39,
++	FW_PARAMS_PARAM_PFVF_TLS_START = 0x34,
++	FW_PARAMS_PARAM_PFVF_TLS_END = 0x35,
+ 	FW_PARAMS_PARAM_PFVF_PORT_CAPS32 = 0x3A,
+ };
+ 
+@@ -3741,4 +3780,122 @@ struct fw_crypto_lookaside_wr {
+ 	(((x) >> FW_CRYPTO_LOOKASIDE_WR_HASH_SIZE_S) & \
+ 	 FW_CRYPTO_LOOKASIDE_WR_HASH_SIZE_M)
+ 
++struct fw_tlstx_data_wr {
++	__be32 op_to_immdlen;
 +	__be32 flowid_len16;
-+	__be32 ftid;
-+	__u8   reneg_to_write_rx;
-+	__u8   protocol;
++	__be32 plen;
++	__be32 lsodisable_to_flags;
++	__be32 r5;
++	__be32 ctxloc_to_exp;
 +	__be16 mfs;
++	__be16 adjustedplen_pkd;
++	__be16 expinplenmax_pkd;
++	__u8   pdusinplenmax_pkd;
++	__u8   r10;
 +};
 +
-+struct tls_key_req {
-+	struct tls_key_wr wr;
-+	struct ulp_mem_rw req;
-+	struct ulptx_idata sc_imm;
-+};
++#define FW_TLSTX_DATA_WR_OPCODE_S       24
++#define FW_TLSTX_DATA_WR_OPCODE_M       0xff
++#define FW_TLSTX_DATA_WR_OPCODE_V(x)    ((x) << FW_TLSTX_DATA_WR_OPCODE_S)
++#define FW_TLSTX_DATA_WR_OPCODE_G(x)    \
++	(((x) >> FW_TLSTX_DATA_WR_OPCODE_S) & FW_TLSTX_DATA_WR_OPCODE_M)
 +
-+/*
-+ * This lives in skb->cb and is used to chain WRs in a linked list.
-+ */
-+struct wr_skb_cb {
-+	struct l2t_skb_cb l2t;          /* reserve space for l2t CB */
-+	struct sk_buff *next_wr;        /* next write request */
-+};
++#define FW_TLSTX_DATA_WR_COMPL_S        21
++#define FW_TLSTX_DATA_WR_COMPL_M        0x1
++#define FW_TLSTX_DATA_WR_COMPL_V(x)     ((x) << FW_TLSTX_DATA_WR_COMPL_S)
++#define FW_TLSTX_DATA_WR_COMPL_G(x)     \
++	(((x) >> FW_TLSTX_DATA_WR_COMPL_S) & FW_TLSTX_DATA_WR_COMPL_M)
++#define FW_TLSTX_DATA_WR_COMPL_F        FW_TLSTX_DATA_WR_COMPL_V(1U)
 +
-+/* Per-skb backlog handler.  Run when a socket's backlog is processed. */
-+struct blog_skb_cb {
-+	void (*backlog_rcv)(struct sock *sk, struct sk_buff *skb);
-+	struct chtls_dev *cdev;
-+};
++#define FW_TLSTX_DATA_WR_IMMDLEN_S      0
++#define FW_TLSTX_DATA_WR_IMMDLEN_M      0xff
++#define FW_TLSTX_DATA_WR_IMMDLEN_V(x)   ((x) << FW_TLSTX_DATA_WR_IMMDLEN_S)
++#define FW_TLSTX_DATA_WR_IMMDLEN_G(x)   \
++	(((x) >> FW_TLSTX_DATA_WR_IMMDLEN_S) & FW_TLSTX_DATA_WR_IMMDLEN_M)
 +
-+/*
-+ * Similar to tcp_skb_cb but with ULP elements added to support TLS,
-+ * etc.
-+ */
-+struct ulp_skb_cb {
-+	struct wr_skb_cb wr;		/* reserve space for write request */
-+	u16 flags;			/* TCP-like flags */
-+	u8 psh;
-+	u8 ulp_mode;			/* ULP mode/submode of sk_buff */
-+	u32 seq;			/* TCP sequence number */
-+	union { /* ULP-specific fields */
-+		struct {
-+			u8  type;
-+			u8  ofld;
-+			u8  iv;
-+		} tls;
-+	} ulp;
-+};
++#define FW_TLSTX_DATA_WR_FLOWID_S       8
++#define FW_TLSTX_DATA_WR_FLOWID_M       0xfffff
++#define FW_TLSTX_DATA_WR_FLOWID_V(x)    ((x) << FW_TLSTX_DATA_WR_FLOWID_S)
++#define FW_TLSTX_DATA_WR_FLOWID_G(x)    \
++	(((x) >> FW_TLSTX_DATA_WR_FLOWID_S) & FW_TLSTX_DATA_WR_FLOWID_M)
 +
-+#define ULP_SKB_CB(skb) ((struct ulp_skb_cb *)&((skb)->cb[0]))
-+#define BLOG_SKB_CB(skb) ((struct blog_skb_cb *)(skb)->cb)
++#define FW_TLSTX_DATA_WR_LEN16_S        0
++#define FW_TLSTX_DATA_WR_LEN16_M        0xff
++#define FW_TLSTX_DATA_WR_LEN16_V(x)     ((x) << FW_TLSTX_DATA_WR_LEN16_S)
++#define FW_TLSTX_DATA_WR_LEN16_G(x)     \
++	(((x) >> FW_TLSTX_DATA_WR_LEN16_S) & FW_TLSTX_DATA_WR_LEN16_M)
 +
-+/*
-+ * Flags for ulp_skb_cb.flags.
-+ */
-+enum {
-+	ULPCB_FLAG_NEED_HDR  = 1 << 0,	/* packet needs a TX_DATA_WR header */
-+	ULPCB_FLAG_NO_APPEND = 1 << 1,	/* don't grow this skb */
-+	ULPCB_FLAG_BARRIER   = 1 << 2,	/* set TX_WAIT_IDLE after sending */
-+	ULPCB_FLAG_HOLD      = 1 << 3,	/* skb not ready for Tx yet */
-+	ULPCB_FLAG_COMPL     = 1 << 4,	/* request WR completion */
-+	ULPCB_FLAG_URG       = 1 << 5,	/* urgent data */
-+	ULPCB_FLAG_TLS_ND    = 1 << 6, /* payload of zero length */
-+	ULPCB_FLAG_NO_HDR    = 1 << 7, /* not a ofld wr */
-+};
++#define FW_TLSTX_DATA_WR_LSODISABLE_S   31
++#define FW_TLSTX_DATA_WR_LSODISABLE_M   0x1
++#define FW_TLSTX_DATA_WR_LSODISABLE_V(x) \
++	((x) << FW_TLSTX_DATA_WR_LSODISABLE_S)
++#define FW_TLSTX_DATA_WR_LSODISABLE_G(x) \
++	(((x) >> FW_TLSTX_DATA_WR_LSODISABLE_S) & FW_TLSTX_DATA_WR_LSODISABLE_M)
++#define FW_TLSTX_DATA_WR_LSODISABLE_F   FW_TLSTX_DATA_WR_LSODISABLE_V(1U)
 +
-+/* The ULP mode/submode of an skbuff */
-+#define skb_ulp_mode(skb)  (ULP_SKB_CB(skb)->ulp_mode)
-+#define TCP_PAGE(sk)   (sk->sk_frag.page)
-+#define TCP_OFF(sk)    (sk->sk_frag.offset)
++#define FW_TLSTX_DATA_WR_ALIGNPLD_S     30
++#define FW_TLSTX_DATA_WR_ALIGNPLD_M     0x1
++#define FW_TLSTX_DATA_WR_ALIGNPLD_V(x)  ((x) << FW_TLSTX_DATA_WR_ALIGNPLD_S)
++#define FW_TLSTX_DATA_WR_ALIGNPLD_G(x)  \
++	(((x) >> FW_TLSTX_DATA_WR_ALIGNPLD_S) & FW_TLSTX_DATA_WR_ALIGNPLD_M)
++#define FW_TLSTX_DATA_WR_ALIGNPLD_F     FW_TLSTX_DATA_WR_ALIGNPLD_V(1U)
 +
-+static inline void csk_set_flag(struct chtls_sock *csk,
-+				enum csk_flags flag)
-+{
-+	__set_bit(flag, &csk->flags);
-+}
++#define FW_TLSTX_DATA_WR_ALIGNPLDSHOVE_S 29
++#define FW_TLSTX_DATA_WR_ALIGNPLDSHOVE_M 0x1
++#define FW_TLSTX_DATA_WR_ALIGNPLDSHOVE_V(x) \
++	((x) << FW_TLSTX_DATA_WR_ALIGNPLDSHOVE_S)
++#define FW_TLSTX_DATA_WR_ALIGNPLDSHOVE_G(x) \
++	(((x) >> FW_TLSTX_DATA_WR_ALIGNPLDSHOVE_S) & \
++	FW_TLSTX_DATA_WR_ALIGNPLDSHOVE_M)
++#define FW_TLSTX_DATA_WR_ALIGNPLDSHOVE_F FW_TLSTX_DATA_WR_ALIGNPLDSHOVE_V(1U)
 +
-+static inline void csk_reset_flag(struct chtls_sock *csk,
-+				  enum csk_flags flag)
-+{
-+	__clear_bit(flag, &csk->flags);
-+}
++#define FW_TLSTX_DATA_WR_FLAGS_S        0
++#define FW_TLSTX_DATA_WR_FLAGS_M        0xfffffff
++#define FW_TLSTX_DATA_WR_FLAGS_V(x)     ((x) << FW_TLSTX_DATA_WR_FLAGS_S)
++#define FW_TLSTX_DATA_WR_FLAGS_G(x)     \
++	(((x) >> FW_TLSTX_DATA_WR_FLAGS_S) & FW_TLSTX_DATA_WR_FLAGS_M)
 +
-+static inline int csk_flag(const struct sock *sk, enum csk_flags flag)
-+{
-+	struct chtls_sock *csk = rcu_dereference_sk_user_data(sk);
++#define FW_TLSTX_DATA_WR_CTXLOC_S       30
++#define FW_TLSTX_DATA_WR_CTXLOC_M       0x3
++#define FW_TLSTX_DATA_WR_CTXLOC_V(x)    ((x) << FW_TLSTX_DATA_WR_CTXLOC_S)
++#define FW_TLSTX_DATA_WR_CTXLOC_G(x)    \
++	(((x) >> FW_TLSTX_DATA_WR_CTXLOC_S) & FW_TLSTX_DATA_WR_CTXLOC_M)
 +
-+	if (!sock_flag(sk, SOCK_INLINE))
-+		return 0;
-+	return test_bit(flag, &csk->flags);
-+}
++#define FW_TLSTX_DATA_WR_IVDSGL_S       29
++#define FW_TLSTX_DATA_WR_IVDSGL_M       0x1
++#define FW_TLSTX_DATA_WR_IVDSGL_V(x)    ((x) << FW_TLSTX_DATA_WR_IVDSGL_S)
++#define FW_TLSTX_DATA_WR_IVDSGL_G(x)    \
++	(((x) >> FW_TLSTX_DATA_WR_IVDSGL_S) & FW_TLSTX_DATA_WR_IVDSGL_M)
++#define FW_TLSTX_DATA_WR_IVDSGL_F       FW_TLSTX_DATA_WR_IVDSGL_V(1U)
 +
-+static inline int csk_flag_nochk(const struct chtls_sock *csk,
-+				 enum csk_flags flag)
-+{
-+	return test_bit(flag, &csk->flags);
-+}
++#define FW_TLSTX_DATA_WR_KEYSIZE_S      24
++#define FW_TLSTX_DATA_WR_KEYSIZE_M      0x1f
++#define FW_TLSTX_DATA_WR_KEYSIZE_V(x)   ((x) << FW_TLSTX_DATA_WR_KEYSIZE_S)
++#define FW_TLSTX_DATA_WR_KEYSIZE_G(x)   \
++	(((x) >> FW_TLSTX_DATA_WR_KEYSIZE_S) & FW_TLSTX_DATA_WR_KEYSIZE_M)
 +
-+static inline void *cplhdr(struct sk_buff *skb)
-+{
-+	return skb->data;
-+}
++#define FW_TLSTX_DATA_WR_NUMIVS_S       14
++#define FW_TLSTX_DATA_WR_NUMIVS_M       0xff
++#define FW_TLSTX_DATA_WR_NUMIVS_V(x)    ((x) << FW_TLSTX_DATA_WR_NUMIVS_S)
++#define FW_TLSTX_DATA_WR_NUMIVS_G(x)    \
++	(((x) >> FW_TLSTX_DATA_WR_NUMIVS_S) & FW_TLSTX_DATA_WR_NUMIVS_M)
 +
-+static inline void set_queue(struct sk_buff *skb,
-+			     unsigned int queue, const struct sock *sk)
-+{
-+	skb->queue_mapping = queue;
-+}
++#define FW_TLSTX_DATA_WR_EXP_S          0
++#define FW_TLSTX_DATA_WR_EXP_M          0x3fff
++#define FW_TLSTX_DATA_WR_EXP_V(x)       ((x) << FW_TLSTX_DATA_WR_EXP_S)
++#define FW_TLSTX_DATA_WR_EXP_G(x)       \
++	(((x) >> FW_TLSTX_DATA_WR_EXP_S) & FW_TLSTX_DATA_WR_EXP_M)
 +
-+static inline int is_neg_adv(unsigned int status)
-+{
-+	return status == CPL_ERR_RTX_NEG_ADVICE ||
-+	       status == CPL_ERR_KEEPALV_NEG_ADVICE ||
-+	       status == CPL_ERR_PERSIST_NEG_ADVICE;
-+}
++#define FW_TLSTX_DATA_WR_ADJUSTEDPLEN_S 1
++#define FW_TLSTX_DATA_WR_ADJUSTEDPLEN_V(x) \
++	((x) << FW_TLSTX_DATA_WR_ADJUSTEDPLEN_S)
 +
-+static inline void process_cpl_msg(void (*fn)(struct sock *, struct sk_buff *),
-+				   struct sock *sk,
-+				   struct sk_buff *skb)
-+{
-+	skb_reset_mac_header(skb);
-+	skb_reset_network_header(skb);
-+	skb_reset_transport_header(skb);
++#define FW_TLSTX_DATA_WR_EXPINPLENMAX_S 4
++#define FW_TLSTX_DATA_WR_EXPINPLENMAX_V(x) \
++	((x) << FW_TLSTX_DATA_WR_EXPINPLENMAX_S)
 +
-+	bh_lock_sock(sk);
-+	if (unlikely(sock_owned_by_user(sk))) {
-+		BLOG_SKB_CB(skb)->backlog_rcv = fn;
-+		__sk_add_backlog(sk, skb);
-+	} else {
-+		fn(sk, skb);
-+	}
-+	bh_unlock_sock(sk);
-+}
++#define FW_TLSTX_DATA_WR_PDUSINPLENMAX_S 2
++#define FW_TLSTX_DATA_WR_PDUSINPLENMAX_V(x) \
++	((x) << FW_TLSTX_DATA_WR_PDUSINPLENMAX_S)
 +
-+static inline void chtls_sock_free(struct kref *ref)
-+{
-+	struct chtls_sock *csk = container_of(ref, struct chtls_sock,
-+					      kref);
-+	kfree(csk);
-+}
-+
-+static inline void __chtls_sock_put(const char *fn, struct chtls_sock *csk)
-+{
-+	kref_put(&csk->kref, chtls_sock_free);
-+}
-+
-+static inline void __chtls_sock_get(const char *fn,
-+				    struct chtls_sock *csk)
-+{
-+	kref_get(&csk->kref);
-+}
-+
-+static inline void remove_handle(struct chtls_dev *cdev, int tid)
-+{
-+	spin_lock(&cdev->aidr_lock);
-+	idr_remove(&cdev->aidr, tid);
-+	spin_unlock(&cdev->aidr_lock);
-+}
-+
-+static inline void send_or_defer(struct sock *sk, struct tcp_sock *tp,
-+				 struct sk_buff *skb, int through_l2t)
-+{
-+	struct chtls_sock *csk = rcu_dereference_sk_user_data(sk);
-+
-+	if (unlikely(sk->sk_state == TCP_SYN_SENT)) {
-+		/* defer */
-+		__skb_queue_tail(&csk->ooo_queue, skb);
-+	} else if (through_l2t) {
-+		/* send through L2T */
-+		cxgb4_l2t_send(csk->egress_dev, skb, csk->l2t_entry);
-+	} else {
-+		/* send directly */
-+		cxgb4_ofld_send(csk->egress_dev, skb);
-+	}
-+}
-+
-+typedef int (*chtls_handler_func)(struct chtls_dev *, struct sk_buff *);
-+extern chtls_handler_func chtls_handlers[NUM_CPL_CMDS];
-+void chtls_install_cpl_ops(struct sock *sk);
-+int chtls_init_kmap(struct chtls_dev *cdev, struct cxgb4_lld_info *lldi);
-+void chtls_free_kmap(struct chtls_dev *cdev);
-+void chtls_listen_stop(struct chtls_dev *cdev, struct sock *sk);
-+int chtls_listen_start(struct chtls_dev *cdev, struct sock *sk);
-+void chtls_close(struct sock *sk, long timeout);
-+int chtls_disconnect(struct sock *sk, int flags);
-+void chtls_shutdown(struct sock *sk, int how);
-+void chtls_destroy_sock(struct sock *sk);
-+int chtls_sendmsg(struct sock *sk, struct msghdr *msg, size_t size);
-+int chtls_recvmsg(struct sock *sk, struct msghdr *msg,
-+		  size_t len, int nonblock, int flags, int *addr_len);
-+int chtls_sendpage(struct sock *sk, struct page *page,
-+		   int offset, size_t size, int flags);
-+int send_tx_flowc_wr(struct sock *sk, int compl,
-+		     u32 snd_nxt, u32 rcv_nxt);
-+void chtls_tcp_push(struct sock *sk, int flags);
-+int chtls_push_frames(struct chtls_sock *csk, int comp);
-+int chtls_set_tcb_tflag(struct sock *sk, unsigned int bit_pos, int val);
-+int chtls_setkey(struct chtls_sock *csk, u32 keylen, u32 mode);
-+void skb_entail(struct sock *sk, struct sk_buff *skb, int flags);
-+void free_tls_keyid(struct sock *sk);
-+#endif
-diff --git a/drivers/crypto/chelsio/chtls/chtls_cm.h b/drivers/crypto/chelsio/chtls/chtls_cm.h
-new file mode 100644
-index 0000000..2beca82
---- /dev/null
-+++ b/drivers/crypto/chelsio/chtls/chtls_cm.h
-@@ -0,0 +1,203 @@
-+/*
-+ * Copyright (c) 2017 Chelsio Communications, Inc.
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ */
-+
-+#ifndef __CHTLS_CM_H__
-+#define __CHTLS_CM_H__
-+
-+/*
-+ * TCB settings
-+ */
-+/* 3:0 */
-+#define TCB_ULP_TYPE_W    0
-+#define TCB_ULP_TYPE_S    0
-+#define TCB_ULP_TYPE_M    0xfULL
-+#define TCB_ULP_TYPE_V(x) ((x) << TCB_ULP_TYPE_S)
-+
-+/* 11:4 */
-+#define TCB_ULP_RAW_W    0
-+#define TCB_ULP_RAW_S    4
-+#define TCB_ULP_RAW_M    0xffULL
-+#define TCB_ULP_RAW_V(x) ((x) << TCB_ULP_RAW_S)
-+
-+#define TF_TLS_KEY_SIZE_S    7
-+#define TF_TLS_KEY_SIZE_V(x) ((x) << TF_TLS_KEY_SIZE_S)
-+
-+#define TF_TLS_CONTROL_S     2
-+#define TF_TLS_CONTROL_V(x) ((x) << TF_TLS_CONTROL_S)
-+
-+#define TF_TLS_ACTIVE_S      1
-+#define TF_TLS_ACTIVE_V(x) ((x) << TF_TLS_ACTIVE_S)
-+
-+#define TF_TLS_ENABLE_S      0
-+#define TF_TLS_ENABLE_V(x) ((x) << TF_TLS_ENABLE_S)
-+
-+#define TF_RX_QUIESCE_S    15
-+#define TF_RX_QUIESCE_V(x) ((x) << TF_RX_QUIESCE_S)
-+
-+/*
-+ * Max receive window supported by HW in bytes.  Only a small part of it can
-+ * be set through option0, the rest needs to be set through RX_DATA_ACK.
-+ */
-+#define MAX_RCV_WND ((1U << 27) - 1)
-+#define MAX_MSS     65536
-+
-+/*
-+ * Min receive window.  We want it to be large enough to accommodate receive
-+ * coalescing, handle jumbo frames, and not trigger sender SWS avoidance.
-+ */
-+#define MIN_RCV_WND (24 * 1024U)
-+#define LOOPBACK(x)     (((x) & htonl(0xff000000)) == htonl(0x7f000000))
-+
-+/* ulp_mem_io + ulptx_idata + payload + padding */
-+#define MAX_IMM_ULPTX_WR_LEN (32 + 8 + 256 + 8)
-+
-+/* for TX: a skb must have a headroom of at least TX_HEADER_LEN bytes */
-+#define TX_HEADER_LEN \
-+	(sizeof(struct fw_ofld_tx_data_wr) + sizeof(struct sge_opaque_hdr))
-+#define TX_TLSHDR_LEN \
-+	(sizeof(struct fw_tlstx_data_wr) + sizeof(struct cpl_tx_tls_sfo) + \
-+	 sizeof(struct sge_opaque_hdr))
-+#define TXDATA_SKB_LEN 128
-+
-+enum {
-+	CPL_TX_TLS_SFO_TYPE_CCS,
-+	CPL_TX_TLS_SFO_TYPE_ALERT,
-+	CPL_TX_TLS_SFO_TYPE_HANDSHAKE,
-+	CPL_TX_TLS_SFO_TYPE_DATA,
-+	CPL_TX_TLS_SFO_TYPE_HEARTBEAT,
-+};
-+
-+enum {
-+	TLS_HDR_TYPE_CCS = 20,
-+	TLS_HDR_TYPE_ALERT,
-+	TLS_HDR_TYPE_HANDSHAKE,
-+	TLS_HDR_TYPE_RECORD,
-+	TLS_HDR_TYPE_HEARTBEAT,
-+};
-+
-+typedef void (*defer_handler_t)(struct chtls_dev *dev, struct sk_buff *skb);
-+
-+struct deferred_skb_cb {
-+	defer_handler_t handler;
-+	struct chtls_dev *dev;
-+};
-+
-+#define DEFERRED_SKB_CB(skb) ((struct deferred_skb_cb *)(skb)->cb)
-+#define failover_flowc_wr_len offsetof(struct fw_flowc_wr, mnemval[3])
-+#define WR_SKB_CB(skb) ((struct wr_skb_cb *)(skb)->cb)
-+#define ACCEPT_QUEUE(sk) (&inet_csk(sk)->icsk_accept_queue.rskq_accept_head)
-+
-+#define SND_WSCALE(tp) ((tp)->rx_opt.snd_wscale)
-+#define RCV_WSCALE(tp) ((tp)->rx_opt.rcv_wscale)
-+#define USER_MSS(tp) ((tp)->rx_opt.user_mss)
-+#define TS_RECENT_STAMP(tp) ((tp)->rx_opt.ts_recent_stamp)
-+#define WSCALE_OK(tp) ((tp)->rx_opt.wscale_ok)
-+#define TSTAMP_OK(tp) ((tp)->rx_opt.tstamp_ok)
-+#define SACK_OK(tp) ((tp)->rx_opt.sack_ok)
-+#define INC_ORPHAN_COUNT(sk) percpu_counter_inc((sk)->sk_prot->orphan_count)
-+
-+/* TLS SKB */
-+#define skb_ulp_tls_skb_flags(skb)      (ULP_SKB_CB(skb)->ulp.tls.ofld)
-+#define skb_ulp_tls_skb_iv(skb)         (ULP_SKB_CB(skb)->ulp.tls.iv)
-+
-+void chtls_defer_reply(struct sk_buff *skb, struct chtls_dev *dev,
-+		       defer_handler_t handler);
-+
-+/*
-+ * Returns true if the socket is in one of the supplied states.
-+ */
-+static inline unsigned int sk_in_state(const struct sock *sk,
-+				       unsigned int states)
-+{
-+	return states & (1 << sk->sk_state);
-+}
-+
-+static void chtls_rsk_destructor(struct request_sock *req)
-+{
-+	/* do nothing */
-+}
-+
-+static inline void chtls_init_rsk_ops(struct proto *chtls_tcp_prot,
-+				      struct request_sock_ops *chtls_tcp_ops,
-+				      struct proto *tcp_prot, int family)
-+{
-+	memset(chtls_tcp_ops, 0, sizeof(*chtls_tcp_ops));
-+	chtls_tcp_ops->family = family;
-+	chtls_tcp_ops->obj_size = sizeof(struct tcp_request_sock);
-+	chtls_tcp_ops->destructor = chtls_rsk_destructor;
-+	chtls_tcp_ops->slab = tcp_prot->rsk_prot->slab;
-+	chtls_tcp_prot->rsk_prot = chtls_tcp_ops;
-+}
-+
-+static inline void chtls_reqsk_free(struct request_sock *req)
-+{
-+	if (req->rsk_listener)
-+		sock_put(req->rsk_listener);
-+	kmem_cache_free(req->rsk_ops->slab, req);
-+}
-+
-+#define DECLARE_TASK_FUNC(task, task_param) \
-+		static void task(struct work_struct *task_param)
-+
-+static inline bool sk_has_sleepers(struct sock *sk)
-+{
-+	/* wq_has_sleeper() has smp_mb() in it ... */
-+	return skwq_has_sleeper(sk->sk_wq);
-+}
-+
-+static inline void sk_wakeup_sleepers(struct sock *sk, bool interruptable)
-+{
-+	if (sk_has_sleepers(sk)) {
-+		if (interruptable)
-+			wake_up_interruptible(sk_sleep(sk));
-+		else
-+			wake_up_all(sk_sleep(sk));
-+	}
-+}
-+
-+static inline void chtls_set_req_port(struct request_sock *oreq,
-+				      __be16 source, __be16 dest)
-+{
-+	inet_rsk(oreq)->ir_rmt_port = source;
-+	inet_rsk(oreq)->ir_num = ntohs(dest);
-+}
-+
-+static inline void chtls_set_req_addr(struct request_sock *oreq,
-+				      __u32 local_ip, __u32 peer_ip)
-+{
-+	inet_rsk(oreq)->ir_loc_addr = local_ip;
-+	inet_rsk(oreq)->ir_rmt_addr = peer_ip;
-+}
-+
-+static inline void chtls_free_skb(struct sock *sk, struct sk_buff *skb)
-+{
-+	skb_dst_set(skb, NULL);
-+	__skb_unlink(skb, &sk->sk_receive_queue);
-+	__kfree_skb(skb);
-+}
-+
-+static inline void chtls_kfree_skb(struct sock *sk, struct sk_buff *skb)
-+{
-+	skb_dst_set(skb, NULL);
-+	__skb_unlink(skb, &sk->sk_receive_queue);
-+	kfree_skb(skb);
-+}
-+
-+static inline void enqueue_wr(struct chtls_sock *csk, struct sk_buff *skb)
-+{
-+	WR_SKB_CB(skb)->next_wr = NULL;
-+
-+	skb_get(skb);
-+
-+	if (!csk->wr_skb_head)
-+		csk->wr_skb_head = skb;
-+	else
-+		WR_SKB_CB(csk->wr_skb_tail)->next_wr = skb;
-+	csk->wr_skb_tail = skb;
-+}
-+#endif
+ #endif /* _T4FW_INTERFACE_H_ */
 -- 
 1.8.3.1
