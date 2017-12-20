@@ -1,49 +1,58 @@
-From: Zhou Wang <wangzhou1@hisilicon.com>
-Subject: [PATCH] crypto: scomp - delete unused comments
-Date: Wed, 20 Dec 2017 16:03:12 +0800
-Message-ID: <1513756992-175134-1-git-send-email-wangzhou1@hisilicon.com>
-Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <linux-crypto@vger.kernel.org>, <giovanni.cabiddu@intel.com>,
-        Zhou Wang <wangzhou1@hisilicon.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
+From: Gilad Ben-Yossef <gilad@benyossef.com>
+Subject: [PATCH] staging: ccree: use size_t consistently
+Date: Wed, 20 Dec 2017 07:23:31 +0000
+Message-ID: <1513754611-14409-1-git-send-email-gilad@benyossef.com>
+Cc: Ofir Drang <ofir.drang@arm.com>, linux-crypto@vger.kernel.org,
+        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
+        linux-kernel@vger.kernel.org
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from szxga05-in.huawei.com ([45.249.212.191]:2736 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1752446AbdLTHQl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 20 Dec 2017 02:16:41 -0500
+Received: from foss.arm.com ([217.140.101.70]:47844 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1754433AbdLTHYZ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 20 Dec 2017 02:24:25 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-There are no init and exit callbacks, so delete its comments.
+Fix declaration, implementation and wrapper function to use
+the same size_t type we actually define the parameter to be.
 
-Signed-off-by: Zhou Wang <wangzhou1@hisilicon.com>
+Fixes: 3f268f5d6669 ("staging: ccree: turn compile time debug log to params")
+Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 ---
- include/crypto/internal/scompress.h | 11 -----------
- 1 file changed, 11 deletions(-)
+ drivers/staging/ccree/ssi_driver.c | 2 +-
+ drivers/staging/ccree/ssi_driver.h | 5 ++---
+ 2 files changed, 3 insertions(+), 4 deletions(-)
 
-diff --git a/include/crypto/internal/scompress.h b/include/crypto/internal/scompress.h
-index ccad9b2..0f6ddac 100644
---- a/include/crypto/internal/scompress.h
-+++ b/include/crypto/internal/scompress.h
-@@ -28,17 +28,6 @@ struct crypto_scomp {
-  * @free_ctx:	Function frees context allocated with alloc_ctx
-  * @compress:	Function performs a compress operation
-  * @decompress:	Function performs a de-compress operation
-- * @init:	Initialize the cryptographic transformation object.
-- *		This function is used to initialize the cryptographic
-- *		transformation object. This function is called only once at
-- *		the instantiation time, right after the transformation context
-- *		was allocated. In case the cryptographic hardware has some
-- *		special requirements which need to be handled by software, this
-- *		function shall check for the precise requirement of the
-- *		transformation and put any software fallbacks in place.
-- * @exit:	Deinitialize the cryptographic transformation object. This is a
-- *		counterpart to @init, used to remove various changes set in
-- *		@init.
-  * @base:	Common crypto API algorithm data structure
-  */
- struct scomp_alg {
+diff --git a/drivers/staging/ccree/ssi_driver.c b/drivers/staging/ccree/ssi_driver.c
+index 56b5d45..1254c69 100644
+--- a/drivers/staging/ccree/ssi_driver.c
++++ b/drivers/staging/ccree/ssi_driver.c
+@@ -86,7 +86,7 @@ void __dump_byte_array(const char *name, const u8 *buf, size_t len)
+ 	if (!buf)
+ 		return;
+ 
+-	snprintf(prefix, sizeof(prefix), "%s[%lu]: ", name, len);
++	snprintf(prefix, sizeof(prefix), "%s[%zu]: ", name, len);
+ 
+ 	print_hex_dump(KERN_DEBUG, prefix, DUMP_PREFIX_ADDRESS, 16, 1, buf,
+ 		       len, false);
+diff --git a/drivers/staging/ccree/ssi_driver.h b/drivers/staging/ccree/ssi_driver.h
+index 5a56f7a..bf83f3e 100644
+--- a/drivers/staging/ccree/ssi_driver.h
++++ b/drivers/staging/ccree/ssi_driver.h
+@@ -174,10 +174,9 @@ static inline struct device *drvdata_to_dev(struct cc_drvdata *drvdata)
+ 	return &drvdata->plat_dev->dev;
+ }
+ 
+-void __dump_byte_array(const char *name, const u8 *the_array,
+-		       unsigned long size);
++void __dump_byte_array(const char *name, const u8 *buf, size_t len);
+ static inline void dump_byte_array(const char *name, const u8 *the_array,
+-				   unsigned long size)
++				   size_t size)
+ {
+ 	if (cc_dump_bytes)
+ 		__dump_byte_array(name, the_array, size);
 -- 
-1.9.1
+2.7.4
