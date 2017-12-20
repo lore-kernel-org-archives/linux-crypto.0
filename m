@@ -1,65 +1,39 @@
-From: Atul Gupta <atul.gupta@chelsio.com>
-Subject: [RFC crypto v3 9/9] Makefile Kconfig
-Date: Wed, 20 Dec 2017 17:08:39 +0530
-Message-ID: <1513769919-26985-1-git-send-email-atul.gupta@chelsio.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, davejwatson@fb.com
-To: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-        ganeshgr@chelsio.co
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: KASAN: use-after-free Read in crypto_aead_free_instance
+Date: Wed, 20 Dec 2017 12:49:47 +0100
+Message-ID: <12415329.MInO136rYd@tauon.chronox.de>
+References: <001a11c14bc887c2c60560c0cdda@google.com> <18467907.EfXNf1iGip@tauon.chronox.de> <CACT4Y+bg6GjHbLpSkB6joS_dgu3ZYH=mJXHJ8AnuWiPVokhBdA@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: syzbot
+        <bot+e5e6fab2d4dc3d9877ac240fed364027bb960ad0@syzkaller.appspotmail.com>,
+        David Miller <davem@davemloft.net>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+        syzkaller-bugs@googlegroups.com
+To: Dmitry Vyukov <dvyukov@google.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from stargate.chelsio.com ([12.32.117.8]:43629 "EHLO
-        stargate.chelsio.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754746AbdLTLis (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 20 Dec 2017 06:38:48 -0500
+Received: from mail.eperm.de ([89.247.134.16]:44474 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1754692AbdLTLtu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 20 Dec 2017 06:49:50 -0500
+In-Reply-To: <CACT4Y+bg6GjHbLpSkB6joS_dgu3ZYH=mJXHJ8AnuWiPVokhBdA@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Entry for Inline TLS as another driver dependent on cxgb4 and chcr
+Am Mittwoch, 20. Dezember 2017, 11:15:38 CET schrieb Dmitry Vyukov:
 
-Signed-off-by: Atul Gupta <atul.gupta@chelsio.com>
----
- drivers/crypto/chelsio/Kconfig        | 10 ++++++++++
- drivers/crypto/chelsio/Makefile       |  1 +
- drivers/crypto/chelsio/chtls/Makefile |  4 ++++
- 3 files changed, 15 insertions(+)
- create mode 100644 drivers/crypto/chelsio/chtls/Makefile
+Hi Dmitry,
 
-diff --git a/drivers/crypto/chelsio/Kconfig b/drivers/crypto/chelsio/Kconfig
-index 51932c7..686d246 100644
---- a/drivers/crypto/chelsio/Kconfig
-+++ b/drivers/crypto/chelsio/Kconfig
-@@ -28,3 +28,13 @@ config CHELSIO_IPSEC_INLINE
-         default n
-         ---help---
-           Enable support for IPSec Tx Inline.
-+
-+config CRYPTO_DEV_CHELSIO_TLS
-+        tristate "Chelsio Crypto Inline TLS Driver"
-+        depends on CHELSIO_T4
-+        select CRYPTO_DEV_CHELSIO
-+        ---help---
-+          Support Chelsio Inline TLS with Chelsio crypto accelerator.
-+
-+          To compile this driver as a module, choose M here: the module
-+          will be called chtls.
-diff --git a/drivers/crypto/chelsio/Makefile b/drivers/crypto/chelsio/Makefile
-index eaecaf1..639e571 100644
---- a/drivers/crypto/chelsio/Makefile
-+++ b/drivers/crypto/chelsio/Makefile
-@@ -3,3 +3,4 @@ ccflags-y := -Idrivers/net/ethernet/chelsio/cxgb4
- obj-$(CONFIG_CRYPTO_DEV_CHELSIO) += chcr.o
- chcr-objs :=  chcr_core.o chcr_algo.o
- chcr-$(CONFIG_CHELSIO_IPSEC_INLINE) += chcr_ipsec.o
-+obj-$(CONFIG_CRYPTO_DEV_CHELSIO_TLS) += chtls/
-diff --git a/drivers/crypto/chelsio/chtls/Makefile b/drivers/crypto/chelsio/chtls/Makefile
-new file mode 100644
-index 0000000..df13795
---- /dev/null
-+++ b/drivers/crypto/chelsio/chtls/Makefile
-@@ -0,0 +1,4 @@
-+ccflags-y := -Idrivers/net/ethernet/chelsio/cxgb4 -Idrivers/crypto/chelsio/
-+
-+obj-$(CONFIG_CRYPTO_DEV_CHELSIO_TLS) += chtls.o
-+chtls-objs := chtls_main.o chtls_cm.o chtls_io.o chtls_hw.o
--- 
-1.8.3.1
+> 
+> What will be its meaning? How will it differ from fix?
+
+Maybe a short clarification would help: what is the meaning of the syz fix 
+marker? Depending on this answer, all that I am thinking of is to mark bug 
+reports for which there are fixes actively discussed, but yet not integrated. 
+Thus, such marker should only help others to point them to active discussions 
+instead of them trying to find fixes alone.
+
+Ciao
+Stephan
