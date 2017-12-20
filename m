@@ -1,122 +1,101 @@
-From: Gary R Hook <gary.hook@amd.com>
-Subject: Re: [PATCH] iommu/amd - Set the device table entry PPR bit for IOMMU
- V2 devices
-Date: Wed, 20 Dec 2017 12:35:00 -0600
-Message-ID: <cf7cf4c9-b3cc-0a0b-52d1-22f048488e89@amd.com>
-References: <151378905140.769.2045094569843732393.stgit@sosxen2.amd.com>
+From: Junaid Shahid <junaids@google.com>
+Subject: Re: [PATCH v2 1/2] crypto: Fix out-of-bounds access of the data buffer in generic-gcm-aesni
+Date: Wed, 20 Dec 2017 11:28:27 -0800
+Message-ID: <9910967.v2CO5Rsaj0@js-desktop.svl.corp.google.com>
+References: <20171219221750.34148-1-junaids@google.com> <20171220044259.61106-2-junaids@google.com> <20171220083616.GB6565@zzz.localdomain>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: thomas.lendacky@amd.com, herbert@gondor.apana.org.au,
-        davem@davemloft.net
-To: linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+        andreslc@google.com, davem@davemloft.net, gthelen@google.com
+To: Eric Biggers <ebiggers3@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-sn1nam02on0056.outbound.protection.outlook.com ([104.47.36.56]:18609
-        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1755498AbdLTSfH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 20 Dec 2017 13:35:07 -0500
-In-Reply-To: <151378905140.769.2045094569843732393.stgit@sosxen2.amd.com>
-Content-Language: en-US
+Received: from mail-io0-f178.google.com ([209.85.223.178]:44588 "EHLO
+        mail-io0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755501AbdLTT2a (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 20 Dec 2017 14:28:30 -0500
+Received: by mail-io0-f178.google.com with SMTP id w127so18492301iow.11
+        for <linux-crypto@vger.kernel.org>; Wed, 20 Dec 2017 11:28:30 -0800 (PST)
+In-Reply-To: <20171220083616.GB6565@zzz.localdomain>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Please ignore; sent to the wrong list. Mea culpa.
+On Wednesday, December 20, 2017 12:36:16 AM PST Eric Biggers wrote:
+>=20
+> Did you run the self-tests (boot with CONFIG_CRYPTO_MANAGER_DISABLE_TESTS
+> unset)?  The second patch causes them to start failing:
+>=20
+> [    1.169640] alg: aead: Test 7 failed on encryption for rfc4106-gcm-aes=
+ni
+> [    1.178308] alg: aead: Test 4 failed on encryption for generic-gcm-aes=
+ni
 
-On 12/20/2017 10:57 AM, Gary R Hook wrote:
-> The AMD IOMMU specification Rev 3.00 (December 2016) introduces a
-> new Enhanced PPR Handling Support (EPHSup) bit in the MMIO register
-> offset 0030h (IOMMU Extended Feature Register).
-> 
-> When EPHSup=1, the IOMMU hardware requires the PPR bit of the
-> device table entry (DTE) to be set in order to support PPR for a
-> particular endpoint device.
-> 
-> Please see https://support.amd.com/TechDocs/48882_IOMMU.pdf for
-> this revision of the AMD IOMMU specification.
-> 
-> Signed-off-by: Gary R Hook <gary.hook@amd.com>
-> ---
->   drivers/iommu/amd_iommu.c       |   20 +++++++++++++++-----
->   drivers/iommu/amd_iommu_types.h |    2 ++
->   2 files changed, 17 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/iommu/amd_iommu.c b/drivers/iommu/amd_iommu.c
-> index cb78933ef53f..5f3da95ff6a0 100644
-> --- a/drivers/iommu/amd_iommu.c
-> +++ b/drivers/iommu/amd_iommu.c
-> @@ -1818,7 +1818,8 @@ static bool dma_ops_domain(struct protection_domain *domain)
->   	return domain->flags & PD_DMA_OPS_MASK;
->   }
->   
-> -static void set_dte_entry(u16 devid, struct protection_domain *domain, bool ats)
-> +static void set_dte_entry(u16 devid, struct protection_domain *domain,
-> +			  bool ats, bool ppr)
->   {
->   	u64 pte_root = 0;
->   	u64 flags = 0;
-> @@ -1835,6 +1836,13 @@ static void set_dte_entry(u16 devid, struct protection_domain *domain, bool ats)
->   	if (ats)
->   		flags |= DTE_FLAG_IOTLB;
->   
-> +	if (ppr) {
-> +		struct amd_iommu *iommu = amd_iommu_rlookup_table[devid];
-> +
-> +		if (iommu_feature(iommu, FEATURE_EPHSUP))
-> +			pte_root |= 1ULL << DEV_ENTRY_PPR;
-> +	}
-> +
->   	if (domain->flags & PD_IOMMUV2_MASK) {
->   		u64 gcr3 = iommu_virt_to_phys(domain->gcr3_tbl);
->   		u64 glx  = domain->glx;
-> @@ -1897,9 +1905,9 @@ static void do_attach(struct iommu_dev_data *dev_data,
->   	domain->dev_cnt                 += 1;
->   
->   	/* Update device table */
-> -	set_dte_entry(dev_data->devid, domain, ats);
-> +	set_dte_entry(dev_data->devid, domain, ats, dev_data->iommu_v2);
->   	if (alias != dev_data->devid)
-> -		set_dte_entry(alias, domain, ats);
-> +		set_dte_entry(alias, domain, ats, dev_data->iommu_v2);
->   
->   	device_flush_dte(dev_data);
->   }
-> @@ -2278,13 +2286,15 @@ static void update_device_table(struct protection_domain *domain)
->   	struct iommu_dev_data *dev_data;
->   
->   	list_for_each_entry(dev_data, &domain->dev_list, list) {
-> -		set_dte_entry(dev_data->devid, domain, dev_data->ats.enabled);
-> +		set_dte_entry(dev_data->devid, domain, dev_data->ats.enabled,
-> +			      dev_data->iommu_v2);
->   
->   		if (dev_data->devid == dev_data->alias)
->   			continue;
->   
->   		/* There is an alias, update device table entry for it */
-> -		set_dte_entry(dev_data->alias, domain, dev_data->ats.enabled);
-> +		set_dte_entry(dev_data->alias, domain, dev_data->ats.enabled,
-> +			      dev_data->iommu_v2);
->   	}
->   }
->   
-> diff --git a/drivers/iommu/amd_iommu_types.h b/drivers/iommu/amd_iommu_types.h
-> index f6b24c7d8b70..6a877ebd058b 100644
-> --- a/drivers/iommu/amd_iommu_types.h
-> +++ b/drivers/iommu/amd_iommu_types.h
-> @@ -98,6 +98,7 @@
->   #define FEATURE_HE		(1ULL<<8)
->   #define FEATURE_PC		(1ULL<<9)
->   #define FEATURE_GAM_VAPIC	(1ULL<<21)
-> +#define FEATURE_EPHSUP		(1ULL<<50)
->   
->   #define FEATURE_PASID_SHIFT	32
->   #define FEATURE_PASID_MASK	(0x1fULL << FEATURE_PASID_SHIFT)
-> @@ -192,6 +193,7 @@
->   /* macros and definitions for device table entries */
->   #define DEV_ENTRY_VALID         0x00
->   #define DEV_ENTRY_TRANSLATION   0x01
-> +#define DEV_ENTRY_PPR           0x34
->   #define DEV_ENTRY_IR            0x3d
->   #define DEV_ENTRY_IW            0x3e
->   #define DEV_ENTRY_NO_PAGE_FAULT	0x62
-> 
+Thanks for the pointer. Let me run the self-tests and see.
+
+>=20
+> Also, don't the AVX and AVX2 versions have the same bug?  These patches o=
+nly fix
+> the non-AVX version.
+
+The AVX/AVX2 versions are used only when the data length is at least 640/4K=
+ bytes respectively. Therefore, the first bug doesn=E2=80=99t apply at all.=
+ The second bug does exist, but it won=E2=80=99t cause any ill effect at th=
+e present time because the overrun will be covered by the data bytes. Howev=
+er, I am planning to send out a separate patch series that allows for non-c=
+ontiguous AAD, data and AuthTag buffers, which will cause the AAD overrun t=
+o manifest even in the AVX versions, so I am going to include the AVX versi=
+on fixes in that series.
+
+>=20
+> > +# read the last <16 byte block
+> > +# Clobbers %rax, DPTR, TMP1 and XMM1-2
+> > +.macro READ_PARTIAL_BLOCK DPTR DLEN TMP1 XMM1 XMM2 XMMDst
+> > +        pxor \XMMDst, \XMMDst
+> > +        mov \DLEN, \TMP1
+> > +        cmp $8, \DLEN
+> > +        jl _read_last_lt8_\@
+> > +        mov (\DPTR), %rax
+> > +        MOVQ_R64_XMM %rax, \XMMDst
+> > +	add $8, \DPTR
+> > +        sub $8, \TMP1
+> > +        jz _done_read_last_partial_block_\@
+> > +_read_last_lt8_\@:
+> > +	shl $8, %rax
+> > +        mov -1(\DPTR, \TMP1, 1), %al
+> > +        dec \TMP1
+> > +        jnz _read_last_lt8_\@
+> > +        MOVQ_R64_XMM %rax, \XMM1
+>=20
+> Doesn't %rax needs to be zeroed at '_read_last_lt8' so that the padding is
+> zeroed?
+>=20
+
+Ah, yes. It actually isn=E2=80=99t needed for the first patch, as in that c=
+ase the result returned by this macro is masked appropriately at the call-s=
+ites anyway. But that is not the case for the second patch. That is probabl=
+y also the reason for the failures that you noticed.
+
+> > +	# adjust the shuffle mask pointer to be able to shift either 0 or 8
+> > +	# bytes depending on whether the last block is <8 bytes or not
+> > +        mov \DLEN, \TMP1
+> > +        and $8, \TMP1
+> > +	lea SHIFT_MASK(%rip), %rax
+> > +	sub \TMP1, %rax
+> > +	movdqu (%rax), \XMM2		# get the appropriate shuffle mask
+> > +	PSHUFB_XMM \XMM2, \XMM1		# shift left either 0 or 8 bytes
+>=20
+> Is there any way this can be simplified to use pslldq?  The shift is just=
+ 8
+> bytes or nothing, and we already had to branch earlier depending on wheth=
+er we
+> needed to read the 8 bytes or not.
+
+I am not sure if we can use a simple pslldq without either introducing anot=
+her branch, or duplicating the _read_last_lt8 block for each case of the or=
+iginal branch. Do you think that it is better to just duplicate the _read_l=
+ast_lt8 block instead of using pshufb? Or do you have any other suggestion =
+about how to do it?
+
+Thanks,
+Junaid
