@@ -1,28 +1,26 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH RFC 1/3] crypto: Prevent to register duplicate cra_driver_name
-Date: Thu, 21 Dec 2017 07:27:31 +0100
-Message-ID: <40918176.d7CsG1ORth@tauon.chronox.de>
-References: <1513800567-12764-1-git-send-email-clabbe@baylibre.com> <1513800567-12764-2-git-send-email-clabbe@baylibre.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH RFC 1/3] crypto: Prevent to register duplicate
+ cra_driver_name
+Date: Thu, 21 Dec 2017 17:35:22 +1100
+Message-ID: <20171221063522.GA18211@gondor.apana.org.au>
+References: <1513800567-12764-1-git-send-email-clabbe@baylibre.com>
+ <1513800567-12764-2-git-send-email-clabbe@baylibre.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: davem@davemloft.net, herbert@gondor.apana.org.au,
-        nhorman@tuxdriver.com, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: davem@davemloft.net, nhorman@tuxdriver.com,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 To: Corentin Labbe <clabbe@baylibre.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:44260 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750871AbdLUG2I (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 21 Dec 2017 01:28:08 -0500
+Received: from [128.1.224.119] ([128.1.224.119]:45410 "EHLO ringil.hmeau.com"
+        rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
+        id S1750768AbdLUGf6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 21 Dec 2017 01:35:58 -0500
+Content-Disposition: inline
 In-Reply-To: <1513800567-12764-2-git-send-email-clabbe@baylibre.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Mittwoch, 20. Dezember 2017, 21:09:25 CET schrieb Corentin Labbe:
-
-Hi Corentin,
-
+On Wed, Dec 20, 2017 at 08:09:25PM +0000, Corentin Labbe wrote:
 > Each crypto algorithm "cra_name" can have multiple implementation called
 > "cra_driver_name".
 > If two different implementation have the same cra_driver_name, nothing
@@ -33,11 +31,16 @@ Hi Corentin,
 > 
 > So this patch prevent the registration of two implementation with the
 > same cra_driver_name.
+> 
+> Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
 
-Have you seen that happen? The driver_name should be an unambiguous name that 
-is unique throughout all crypto implementations.
+No this is intentional.  The idea is that you can hot-replace
+an implementation by registering a new version of it while the
+old one is still in use.  The new one will be used for all new
+allocations.
 
-If you have seen a duplication, then this duplication should be fixed.
-
-Ciao
-Stephan
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
