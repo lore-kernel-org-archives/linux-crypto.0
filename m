@@ -1,210 +1,37 @@
 From: Junaid Shahid <junaids@google.com>
-Subject: [PATCH v3 2/2] crypto: Fix out-of-bounds access of the AAD buffer in generic-gcm-aesni
-Date: Wed, 20 Dec 2017 17:08:38 -0800
-Message-ID: <20171221010838.54243-3-junaids@google.com>
-References: <20171221010838.54243-1-junaids@google.com>
+Subject: Re: [PATCH v3 1/2] crypto: Fix out-of-bounds access of the data buffer in generic-gcm-aesni
+Date: Wed, 20 Dec 2017 18:09:40 -0800
+Message-ID: <14368087.35hhKrHupz@js-desktop.svl.corp.google.com>
+References: <20171221010838.54243-1-junaids@google.com> <20171221010838.54243-2-junaids@google.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
 Cc: linux-crypto@vger.kernel.org, andreslc@google.com,
         davem@davemloft.net, gthelen@google.com, ebiggers3@gmail.com
 To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-it0-f66.google.com ([209.85.214.66]:33396 "EHLO
-        mail-it0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1757251AbdLUBIp (ORCPT
+Received: from mail-pl0-f45.google.com ([209.85.160.45]:36907 "EHLO
+        mail-pl0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755868AbdLUCJn (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 20 Dec 2017 20:08:45 -0500
-Received: by mail-it0-f66.google.com with SMTP id o130so13106259itg.0
-        for <linux-crypto@vger.kernel.org>; Wed, 20 Dec 2017 17:08:45 -0800 (PST)
-In-Reply-To: <20171221010838.54243-1-junaids@google.com>
+        Wed, 20 Dec 2017 21:09:43 -0500
+Received: by mail-pl0-f45.google.com with SMTP id s3so10133016plp.4
+        for <linux-crypto@vger.kernel.org>; Wed, 20 Dec 2017 18:09:43 -0800 (PST)
+In-Reply-To: <20171221010838.54243-2-junaids@google.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The aesni_gcm_enc/dec functions can access memory after the end of
-the AAD buffer if the AAD length is not a multiple of 4 bytes.
-It didn't matter with rfc4106-gcm-aesni as in that case the AAD was
-always followed by the 8 byte IV, but that is no longer the case with
-generic-gcm-aesni. This can potentially result in accessing a page that
-is not mapped and thus causing the machine to crash. This patch fixes
-that by reading the last <16 byte block of the AAD byte-by-byte and
-optionally via an 8-byte load if the block was at least 8 bytes.
+On Wednesday, December 20, 2017 5:08:37 PM PST Junaid Shahid wrote:
+> +.macro READ_PARTIAL_BLOCK DPTR DLEN XMM1 XMMDst
+> +        cmp $8, \DLEN
+> +        jl _read_lt8_\@
 
-Fixes: 0487ccac ("crypto: aesni - make non-AVX AES-GCM work with any aadlen")
-Signed-off-by: Junaid Shahid <junaids@google.com>
----
- arch/x86/crypto/aesni-intel_asm.S | 112 ++++----------------------------------
- 1 file changed, 12 insertions(+), 100 deletions(-)
+> +        mov (\DPTR), %rax
+> +        MOVQ_R64_XMM %rax, \XMMDst
+Just noticed that these two can be replaced with:
++        movq (\DPTR), \XMMDst
 
-diff --git a/arch/x86/crypto/aesni-intel_asm.S b/arch/x86/crypto/aesni-intel_asm.S
-index c36b850fdc81..76d8cd426a31 100644
---- a/arch/x86/crypto/aesni-intel_asm.S
-+++ b/arch/x86/crypto/aesni-intel_asm.S
-@@ -89,30 +89,6 @@ SHIFT_MASK: .octa 0x0f0e0d0c0b0a09080706050403020100
- ALL_F:      .octa 0xffffffffffffffffffffffffffffffff
-             .octa 0x00000000000000000000000000000000
- 
--.section .rodata
--.align 16
--.type aad_shift_arr, @object
--.size aad_shift_arr, 272
--aad_shift_arr:
--        .octa     0xffffffffffffffffffffffffffffffff
--        .octa     0xffffffffffffffffffffffffffffff0C
--        .octa     0xffffffffffffffffffffffffffff0D0C
--        .octa     0xffffffffffffffffffffffffff0E0D0C
--        .octa     0xffffffffffffffffffffffff0F0E0D0C
--        .octa     0xffffffffffffffffffffff0C0B0A0908
--        .octa     0xffffffffffffffffffff0D0C0B0A0908
--        .octa     0xffffffffffffffffff0E0D0C0B0A0908
--        .octa     0xffffffffffffffff0F0E0D0C0B0A0908
--        .octa     0xffffffffffffff0C0B0A090807060504
--        .octa     0xffffffffffff0D0C0B0A090807060504
--        .octa     0xffffffffff0E0D0C0B0A090807060504
--        .octa     0xffffffff0F0E0D0C0B0A090807060504
--        .octa     0xffffff0C0B0A09080706050403020100
--        .octa     0xffff0D0C0B0A09080706050403020100
--        .octa     0xff0E0D0C0B0A09080706050403020100
--        .octa     0x0F0E0D0C0B0A09080706050403020100
--
--
- .text
- 
- 
-@@ -303,62 +279,30 @@ _done_read_partial_block_\@:
- XMM2 XMM3 XMM4 XMMDst TMP6 TMP7 i i_seq operation
-         MOVADQ     SHUF_MASK(%rip), %xmm14
- 	mov	   arg7, %r10           # %r10 = AAD
--	mov	   arg8, %r12           # %r12 = aadLen
--	mov	   %r12, %r11
-+	mov	   arg8, %r11           # %r11 = aadLen
- 	pxor	   %xmm\i, %xmm\i
- 	pxor       \XMM2, \XMM2
- 
- 	cmp	   $16, %r11
--	jl	   _get_AAD_rest8\num_initial_blocks\operation
-+	jl	   _get_AAD_rest\num_initial_blocks\operation
- _get_AAD_blocks\num_initial_blocks\operation:
- 	movdqu	   (%r10), %xmm\i
- 	PSHUFB_XMM %xmm14, %xmm\i # byte-reflect the AAD data
- 	pxor	   %xmm\i, \XMM2
- 	GHASH_MUL  \XMM2, \TMP3, \TMP1, \TMP2, \TMP4, \TMP5, \XMM1
- 	add	   $16, %r10
--	sub	   $16, %r12
- 	sub	   $16, %r11
- 	cmp	   $16, %r11
- 	jge	   _get_AAD_blocks\num_initial_blocks\operation
- 
- 	movdqu	   \XMM2, %xmm\i
-+
-+	/* read the last <16B of AAD */
-+_get_AAD_rest\num_initial_blocks\operation:
- 	cmp	   $0, %r11
- 	je	   _get_AAD_done\num_initial_blocks\operation
- 
--	pxor	   %xmm\i,%xmm\i
--
--	/* read the last <16B of AAD. since we have at least 4B of
--	data right after the AAD (the ICV, and maybe some CT), we can
--	read 4B/8B blocks safely, and then get rid of the extra stuff */
--_get_AAD_rest8\num_initial_blocks\operation:
--	cmp	   $4, %r11
--	jle	   _get_AAD_rest4\num_initial_blocks\operation
--	movq	   (%r10), \TMP1
--	add	   $8, %r10
--	sub	   $8, %r11
--	pslldq	   $8, \TMP1
--	psrldq	   $8, %xmm\i
--	pxor	   \TMP1, %xmm\i
--	jmp	   _get_AAD_rest8\num_initial_blocks\operation
--_get_AAD_rest4\num_initial_blocks\operation:
--	cmp	   $0, %r11
--	jle	   _get_AAD_rest0\num_initial_blocks\operation
--	mov	   (%r10), %eax
--	movq	   %rax, \TMP1
--	add	   $4, %r10
--	sub	   $4, %r10
--	pslldq	   $12, \TMP1
--	psrldq	   $4, %xmm\i
--	pxor	   \TMP1, %xmm\i
--_get_AAD_rest0\num_initial_blocks\operation:
--	/* finalize: shift out the extra bytes we read, and align
--	left. since pslldq can only shift by an immediate, we use
--	vpshufb and an array of shuffle masks */
--	movq	   %r12, %r11
--	salq	   $4, %r11
--	movdqu	   aad_shift_arr(%r11), \TMP1
--	PSHUFB_XMM \TMP1, %xmm\i
--_get_AAD_rest_final\num_initial_blocks\operation:
-+	READ_PARTIAL_BLOCK %r10, %r11, \TMP1, %xmm\i
- 	PSHUFB_XMM   %xmm14, %xmm\i # byte-reflect the AAD data
- 	pxor	   \XMM2, %xmm\i
- 	GHASH_MUL  %xmm\i, \TMP3, \TMP1, \TMP2, \TMP4, \TMP5, \XMM1
-@@ -562,62 +506,30 @@ _initial_blocks_done\num_initial_blocks\operation:
- XMM2 XMM3 XMM4 XMMDst TMP6 TMP7 i i_seq operation
-         MOVADQ     SHUF_MASK(%rip), %xmm14
- 	mov	   arg7, %r10           # %r10 = AAD
--	mov	   arg8, %r12           # %r12 = aadLen
--	mov	   %r12, %r11
-+	mov	   arg8, %r11           # %r11 = aadLen
- 	pxor	   %xmm\i, %xmm\i
- 	pxor	   \XMM2, \XMM2
- 
- 	cmp	   $16, %r11
--	jl	   _get_AAD_rest8\num_initial_blocks\operation
-+	jl	   _get_AAD_rest\num_initial_blocks\operation
- _get_AAD_blocks\num_initial_blocks\operation:
- 	movdqu	   (%r10), %xmm\i
- 	PSHUFB_XMM   %xmm14, %xmm\i # byte-reflect the AAD data
- 	pxor	   %xmm\i, \XMM2
- 	GHASH_MUL  \XMM2, \TMP3, \TMP1, \TMP2, \TMP4, \TMP5, \XMM1
- 	add	   $16, %r10
--	sub	   $16, %r12
- 	sub	   $16, %r11
- 	cmp	   $16, %r11
- 	jge	   _get_AAD_blocks\num_initial_blocks\operation
- 
- 	movdqu	   \XMM2, %xmm\i
-+
-+	/* read the last <16B of AAD */
-+_get_AAD_rest\num_initial_blocks\operation:
- 	cmp	   $0, %r11
- 	je	   _get_AAD_done\num_initial_blocks\operation
- 
--	pxor	   %xmm\i,%xmm\i
--
--	/* read the last <16B of AAD. since we have at least 4B of
--	data right after the AAD (the ICV, and maybe some PT), we can
--	read 4B/8B blocks safely, and then get rid of the extra stuff */
--_get_AAD_rest8\num_initial_blocks\operation:
--	cmp	   $4, %r11
--	jle	   _get_AAD_rest4\num_initial_blocks\operation
--	movq	   (%r10), \TMP1
--	add	   $8, %r10
--	sub	   $8, %r11
--	pslldq	   $8, \TMP1
--	psrldq	   $8, %xmm\i
--	pxor	   \TMP1, %xmm\i
--	jmp	   _get_AAD_rest8\num_initial_blocks\operation
--_get_AAD_rest4\num_initial_blocks\operation:
--	cmp	   $0, %r11
--	jle	   _get_AAD_rest0\num_initial_blocks\operation
--	mov	   (%r10), %eax
--	movq	   %rax, \TMP1
--	add	   $4, %r10
--	sub	   $4, %r10
--	pslldq	   $12, \TMP1
--	psrldq	   $4, %xmm\i
--	pxor	   \TMP1, %xmm\i
--_get_AAD_rest0\num_initial_blocks\operation:
--	/* finalize: shift out the extra bytes we read, and align
--	left. since pslldq can only shift by an immediate, we use
--	vpshufb and an array of shuffle masks */
--	movq	   %r12, %r11
--	salq	   $4, %r11
--	movdqu	   aad_shift_arr(%r11), \TMP1
--	PSHUFB_XMM \TMP1, %xmm\i
--_get_AAD_rest_final\num_initial_blocks\operation:
-+	READ_PARTIAL_BLOCK %r10, %r11, \TMP1, %xmm\i
- 	PSHUFB_XMM   %xmm14, %xmm\i # byte-reflect the AAD data
- 	pxor	   \XMM2, %xmm\i
- 	GHASH_MUL  %xmm\i, \TMP3, \TMP1, \TMP2, \TMP4, \TMP5, \XMM1
--- 
-2.15.1.620.gb9897f4670-goog
+> +        sub $8, \DLEN
+> +        jz _done_read_partial_block_\@
+> +	xor %eax, %eax
+> +_read_next_byte_\@:
