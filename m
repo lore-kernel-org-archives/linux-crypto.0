@@ -1,63 +1,117 @@
 From: Dmitry Vyukov <dvyukov@google.com>
-Subject: Re: BUG: unable to handle kernel paging request in hmac_init_tfm
-Date: Thu, 21 Dec 2017 08:44:03 +0100
-Message-ID: <CACT4Y+bRD5C=ffgOBZNCVFNheH=W304CVRzyGr1FB3W=aYuBNA@mail.gmail.com>
-References: <94eb2c0d010ad8f1660560a275fd@google.com> <20171220230947.GF38504@gmail.com>
+Subject: Re: [PATCH] crypto: pcrypt - fix freeing pcrypt instances
+Date: Thu, 21 Dec 2017 09:54:36 +0100
+Message-ID: <CACT4Y+Yeo0wsui3i66jyED5O8ziVODxgfiJ-Yfdf6iZQ94XCoA@mail.gmail.com>
+References: <94eb2c05a380d3908b056096eb58@google.com> <20171220222825.207321-1-ebiggers3@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Cc: syzbot
-        <bot+428944d1a848e9d7464aa96da32ba353cc812457@syzkaller.appspotmail.com>,
-        David Miller <davem@davemloft.net>,
+Cc: linux-crypto@vger.kernel.org,
+        Steffen Klassert <steffen.klassert@secunet.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-        syzkaller-bugs@googlegroups.com
+        "David S . Miller" <davem@davemloft.net>,
+        LKML <linux-kernel@vger.kernel.org>,
+        syzkaller-bugs@googlegroups.com,
+        Eric Biggers <ebiggers@google.com>,
+        stable <stable@vger.kernel.org>,
+        kasan-dev <kasan-dev@googlegroups.com>
 To: Eric Biggers <ebiggers3@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pg0-f65.google.com ([74.125.83.65]:45904 "EHLO
-        mail-pg0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750782AbdLUHoY (ORCPT
+Received: from mail-pl0-f68.google.com ([209.85.160.68]:35418 "EHLO
+        mail-pl0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751525AbdLUIy5 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 21 Dec 2017 02:44:24 -0500
-Received: by mail-pg0-f65.google.com with SMTP id m25so12949867pgv.12
-        for <linux-crypto@vger.kernel.org>; Wed, 20 Dec 2017 23:44:24 -0800 (PST)
-In-Reply-To: <20171220230947.GF38504@gmail.com>
+        Thu, 21 Dec 2017 03:54:57 -0500
+Received: by mail-pl0-f68.google.com with SMTP id b96so10619717pli.2
+        for <linux-crypto@vger.kernel.org>; Thu, 21 Dec 2017 00:54:57 -0800 (PST)
+In-Reply-To: <20171220222825.207321-1-ebiggers3@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Dec 21, 2017 at 12:09 AM, Eric Biggers <ebiggers3@gmail.com> wrote:
-> On Mon, Dec 18, 2017 at 11:36:01AM -0800, syzbot wrote:
->> Hello,
->>
->> syzkaller hit the following crash on
->> 6084b576dca2e898f5c101baef151f7bfdbb606d
->> git://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/master
->> compiler: gcc (GCC) 7.1.1 20170620
->> .config is attached
+On Wed, Dec 20, 2017 at 11:28 PM, Eric Biggers <ebiggers3@gmail.com> wrote:
+> From: Eric Biggers <ebiggers@google.com>
 >
-> FYI, in linux-next KASAN and other memory debugging options are now behind
-> CONFIG_DEBUG_MEMORY.  So, I think KASAN isn't getting turned on anymore, despite
-> the CONFIG_KASAN=y.  (Patch was "lib/: make "Memory Debugging" a menuconfig to
-> ease disabling it all".)
+> pcrypt is using the old way of freeing instances, where the ->free()
+> method specified in the 'struct crypto_template' is passed a pointer to
+> the 'struct crypto_instance'.  But the crypto_instance is being
+> kfree()'d directly, which is incorrect because the memory was actually
+> allocated as an aead_instance, which contains the crypto_instance at a
+> nonzero offset.  Thus, the wrong pointer was being kfree()'d.
 
-Ouch! That would be pretty bad.
 
-But I've tried both linux-next HEAD at:
+That's interesting. KASAN does not detect frees of invalid pointers
+(e.g. into a middle of an object). It should.
+I've requested a component for KASAN in kernel bugzilla to file this
+(not sure if anybody is actually reading these emails), and so far
+filed it in an internal bug tracker.
 
-commit 0e08c463db387a2adcb0243b15ab868a73f87807 (HEAD, tag:
-next-20171221, linux-next/master)
-Author: Stephen Rothwell <sfr@canb.auug.org.au>
-Date:   Thu Dec 21 15:37:39 2017 +1100
-    Add linux-next specific files for 20171221
 
-and mmots HEAD at:
-
-commit 75aa5540627fdb3d8f86229776ea87f995275351 (HEAD, tag:
-v4.15-rc4-mmots-2017-12-20-19-10, mmots/master)
-Author: Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Thu Dec 21 04:02:17 2017 +0000
-    pci: test for unexpectedly disabled bridges
-
-and after running make olddefconfig I still see CONFIG_KASAN=y in
-.config, nor I can find CONFIG_DEBUG_MEMORY in menuconfig.
-
-What am I missing? What commit has added the config?
+> Fix it by switching to the new way to free aead_instance's where the
+> ->free() method is specified in the aead_instance itself.
+>
+> Reported-by: syzbot <syzkaller@googlegroups.com>
+> Fixes: 0496f56065e0 ("crypto: pcrypt - Add support for new AEAD interface")
+> Cc: <stable@vger.kernel.org> # v4.2+
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> ---
+>  crypto/pcrypt.c | 19 ++++++++++---------
+>  1 file changed, 10 insertions(+), 9 deletions(-)
+>
+> diff --git a/crypto/pcrypt.c b/crypto/pcrypt.c
+> index ee9cfb99fe25..f8ec3d4ba4a8 100644
+> --- a/crypto/pcrypt.c
+> +++ b/crypto/pcrypt.c
+> @@ -254,6 +254,14 @@ static void pcrypt_aead_exit_tfm(struct crypto_aead *tfm)
+>         crypto_free_aead(ctx->child);
+>  }
+>
+> +static void pcrypt_free(struct aead_instance *inst)
+> +{
+> +       struct pcrypt_instance_ctx *ctx = aead_instance_ctx(inst);
+> +
+> +       crypto_drop_aead(&ctx->spawn);
+> +       kfree(inst);
+> +}
+> +
+>  static int pcrypt_init_instance(struct crypto_instance *inst,
+>                                 struct crypto_alg *alg)
+>  {
+> @@ -319,6 +327,8 @@ static int pcrypt_create_aead(struct crypto_template *tmpl, struct rtattr **tb,
+>         inst->alg.encrypt = pcrypt_aead_encrypt;
+>         inst->alg.decrypt = pcrypt_aead_decrypt;
+>
+> +       inst->free = pcrypt_free;
+> +
+>         err = aead_register_instance(tmpl, inst);
+>         if (err)
+>                 goto out_drop_aead;
+> @@ -349,14 +359,6 @@ static int pcrypt_create(struct crypto_template *tmpl, struct rtattr **tb)
+>         return -EINVAL;
+>  }
+>
+> -static void pcrypt_free(struct crypto_instance *inst)
+> -{
+> -       struct pcrypt_instance_ctx *ctx = crypto_instance_ctx(inst);
+> -
+> -       crypto_drop_aead(&ctx->spawn);
+> -       kfree(inst);
+> -}
+> -
+>  static int pcrypt_cpumask_change_notify(struct notifier_block *self,
+>                                         unsigned long val, void *data)
+>  {
+> @@ -469,7 +471,6 @@ static void pcrypt_fini_padata(struct padata_pcrypt *pcrypt)
+>  static struct crypto_template pcrypt_tmpl = {
+>         .name = "pcrypt",
+>         .create = pcrypt_create,
+> -       .free = pcrypt_free,
+>         .module = THIS_MODULE,
+>  };
+>
+> --
+> 2.15.1.620.gb9897f4670-goog
+>
+> --
+> You received this message because you are subscribed to the Google Groups "syzkaller-bugs" group.
+> To unsubscribe from this group and stop receiving emails from it, send an email to syzkaller-bugs+unsubscribe@googlegroups.com.
+> To view this discussion on the web visit https://groups.google.com/d/msgid/syzkaller-bugs/20171220222825.207321-1-ebiggers3%40gmail.com.
+> For more options, visit https://groups.google.com/d/optout.
