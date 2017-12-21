@@ -1,117 +1,86 @@
-From: Dmitry Vyukov <dvyukov@google.com>
-Subject: Re: [PATCH] crypto: pcrypt - fix freeing pcrypt instances
-Date: Thu, 21 Dec 2017 09:54:36 +0100
-Message-ID: <CACT4Y+Yeo0wsui3i66jyED5O8ziVODxgfiJ-Yfdf6iZQ94XCoA@mail.gmail.com>
-References: <94eb2c05a380d3908b056096eb58@google.com> <20171220222825.207321-1-ebiggers3@gmail.com>
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [PATCH] [RFT] crypto: aes-generic - turn off -ftree-pre and -ftree-sra
+Date: Thu, 21 Dec 2017 11:20:19 +0100
+Message-ID: <CAK8P3a2b7+KxJ5kKYcnrAV8jDkNBiCR4gCg47iRsiZGdyPoGVg@mail.gmail.com>
+References: <20171220205213.1025257-1-arnd@arndb.de> <20171220214648.GO2353@tucnak>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Cc: linux-crypto@vger.kernel.org,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        LKML <linux-kernel@vger.kernel.org>,
-        syzkaller-bugs@googlegroups.com,
-        Eric Biggers <ebiggers@google.com>,
-        stable <stable@vger.kernel.org>,
-        kasan-dev <kasan-dev@googlegroups.com>
-To: Eric Biggers <ebiggers3@gmail.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        James Morris <james.l.morris@oracle.com>,
+        Richard Biener <rguenther@suse.de>,
+        Jakub Jelinek <jakub@gcc.gnu.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        linux-crypto@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Jakub Jelinek <jakub@redhat.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pl0-f68.google.com ([209.85.160.68]:35418 "EHLO
-        mail-pl0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751525AbdLUIy5 (ORCPT
+Received: from mail-oi0-f66.google.com ([209.85.218.66]:36422 "EHLO
+        mail-oi0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752433AbdLUKUV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 21 Dec 2017 03:54:57 -0500
-Received: by mail-pl0-f68.google.com with SMTP id b96so10619717pli.2
-        for <linux-crypto@vger.kernel.org>; Thu, 21 Dec 2017 00:54:57 -0800 (PST)
-In-Reply-To: <20171220222825.207321-1-ebiggers3@gmail.com>
+        Thu, 21 Dec 2017 05:20:21 -0500
+In-Reply-To: <20171220214648.GO2353@tucnak>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Dec 20, 2017 at 11:28 PM, Eric Biggers <ebiggers3@gmail.com> wrote:
-> From: Eric Biggers <ebiggers@google.com>
+On Wed, Dec 20, 2017 at 10:46 PM, Jakub Jelinek <jakub@redhat.com> wrote:
+> On Wed, Dec 20, 2017 at 09:52:05PM +0100, Arnd Bergmann wrote:
+>> diff --git a/crypto/aes_generic.c b/crypto/aes_generic.c
+>> index ca554d57d01e..35f973ba9878 100644
+>> --- a/crypto/aes_generic.c
+>> +++ b/crypto/aes_generic.c
+>> @@ -1331,6 +1331,20 @@ EXPORT_SYMBOL_GPL(crypto_aes_set_key);
+>>       f_rl(bo, bi, 3, k);     \
+>>  } while (0)
+>>
+>> +#if __GNUC__ >= 7
+>> +/*
+>> + * Newer compilers try to optimize integer arithmetic more aggressively,
+>> + * which generally improves code quality a lot, but in this specific case
+>> + * ends up hurting more than it helps, in some configurations drastically
+>> + * so. This turns off two optimization steps that have been shown to
+>> + * lead to rather badly optimized code with gcc-7.
+>> + *
+>> + * See also https://gcc.gnu.org/bugzilla/show_bug.cgi?id=83356
+>> + */
+>> +#pragma GCC optimize("-fno-tree-pre")
+>> +#pragma GCC optimize("-fno-tree-sra")
 >
-> pcrypt is using the old way of freeing instances, where the ->free()
-> method specified in the 'struct crypto_template' is passed a pointer to
-> the 'struct crypto_instance'.  But the crypto_instance is being
-> kfree()'d directly, which is incorrect because the memory was actually
-> allocated as an aead_instance, which contains the crypto_instance at a
-> nonzero offset.  Thus, the wrong pointer was being kfree()'d.
+> So do it only when UBSAN is enabled?  GCC doesn't have a particular
+> predefined macro for those (only for asan and tsan), but either the kernel
+> does have something already, or could have something added in the
+> corresponding Makefile.
+
+My original interpretation of the resulting object code suggested that disabling
+those two optimizations produced better results for this particular
+file even without
+UBSAN, on both gcc-7 and gcc-8 (but not gcc-6), so my patch might have
+been better, but I did some measurements now as Ard suggested, showing
+cycles/byte for AES256/CBC with 8KB blocks:
 
 
-That's interesting. KASAN does not detect frees of invalid pointers
-(e.g. into a middle of an object). It should.
-I've requested a component for KASAN in kernel bugzilla to file this
-(not sure if anybody is actually reading these emails), and so far
-filed it in an internal bug tracker.
+               default      ubsan         patched        patched+ubsan
+gcc-4.3.6        14.9        ----           14.9         ----
+gcc-4.6.4        15.0        ----           15.8         ----
+gcc-4.9.4        15.5        20.7           15.9         20.9
+gcc-5.5.0        15.6        47.3           86.4         48.8
+gcc-6.3.1        14.6        49.4           94.3         50.9
+gcc-7.1.1        13.5        54.6           15.2         52.0
+gcc-7.2.1        16.8       124.7           92.0         52.2
+gcc-8.0.0        15.0      no boot          15.3        no boot
 
+I checked that there are actually three significant digits on the measurements,
+detailed output is available at https://pastebin.com/eFsWYjQp
 
-> Fix it by switching to the new way to free aead_instance's where the
-> ->free() method is specified in the aead_instance itself.
->
-> Reported-by: syzbot <syzkaller@googlegroups.com>
-> Fixes: 0496f56065e0 ("crypto: pcrypt - Add support for new AEAD interface")
-> Cc: <stable@vger.kernel.org> # v4.2+
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
-> ---
->  crypto/pcrypt.c | 19 ++++++++++---------
->  1 file changed, 10 insertions(+), 9 deletions(-)
->
-> diff --git a/crypto/pcrypt.c b/crypto/pcrypt.c
-> index ee9cfb99fe25..f8ec3d4ba4a8 100644
-> --- a/crypto/pcrypt.c
-> +++ b/crypto/pcrypt.c
-> @@ -254,6 +254,14 @@ static void pcrypt_aead_exit_tfm(struct crypto_aead *tfm)
->         crypto_free_aead(ctx->child);
->  }
->
-> +static void pcrypt_free(struct aead_instance *inst)
-> +{
-> +       struct pcrypt_instance_ctx *ctx = aead_instance_ctx(inst);
-> +
-> +       crypto_drop_aead(&ctx->spawn);
-> +       kfree(inst);
-> +}
-> +
->  static int pcrypt_init_instance(struct crypto_instance *inst,
->                                 struct crypto_alg *alg)
->  {
-> @@ -319,6 +327,8 @@ static int pcrypt_create_aead(struct crypto_template *tmpl, struct rtattr **tb,
->         inst->alg.encrypt = pcrypt_aead_encrypt;
->         inst->alg.decrypt = pcrypt_aead_decrypt;
->
-> +       inst->free = pcrypt_free;
-> +
->         err = aead_register_instance(tmpl, inst);
->         if (err)
->                 goto out_drop_aead;
-> @@ -349,14 +359,6 @@ static int pcrypt_create(struct crypto_template *tmpl, struct rtattr **tb)
->         return -EINVAL;
->  }
->
-> -static void pcrypt_free(struct crypto_instance *inst)
-> -{
-> -       struct pcrypt_instance_ctx *ctx = crypto_instance_ctx(inst);
-> -
-> -       crypto_drop_aead(&ctx->spawn);
-> -       kfree(inst);
-> -}
-> -
->  static int pcrypt_cpumask_change_notify(struct notifier_block *self,
->                                         unsigned long val, void *data)
->  {
-> @@ -469,7 +471,6 @@ static void pcrypt_fini_padata(struct padata_pcrypt *pcrypt)
->  static struct crypto_template pcrypt_tmpl = {
->         .name = "pcrypt",
->         .create = pcrypt_create,
-> -       .free = pcrypt_free,
->         .module = THIS_MODULE,
->  };
->
-> --
-> 2.15.1.620.gb9897f4670-goog
->
-> --
-> You received this message because you are subscribed to the Google Groups "syzkaller-bugs" group.
-> To unsubscribe from this group and stop receiving emails from it, send an email to syzkaller-bugs+unsubscribe@googlegroups.com.
-> To view this discussion on the web visit https://groups.google.com/d/msgid/syzkaller-bugs/20171220222825.207321-1-ebiggers3%40gmail.com.
-> For more options, visit https://groups.google.com/d/optout.
+It seems that I was wrong about the interpretation that disabling
+the optimization would be a win on gcc-7 and higher, it almost
+always makes things worse even with UBSAN. Making that
+check "#if __GNUC__ == 7 && IS_ENABLED(CONFIG_UBSAN_SANITIZE_ALL)"
+would help here, or we could list the file as an exception for
+UBSAN and never sanitize it.
+
+Looking at the 'default' column, I wonder if anyone would be interested
+in looking at why the throughput regressed with gcc-7.2 and gcc-8.
+
+       Arnd
