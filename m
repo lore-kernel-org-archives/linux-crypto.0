@@ -1,37 +1,43 @@
-From: Junaid Shahid <junaids@google.com>
-Subject: Re: [PATCH v3 1/2] crypto: Fix out-of-bounds access of the data buffer in generic-gcm-aesni
-Date: Wed, 20 Dec 2017 18:09:40 -0800
-Message-ID: <14368087.35hhKrHupz@js-desktop.svl.corp.google.com>
-References: <20171221010838.54243-1-junaids@google.com> <20171221010838.54243-2-junaids@google.com>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: [PATCH RFC 1/3] crypto: Prevent to register duplicate cra_driver_name
+Date: Thu, 21 Dec 2017 07:27:31 +0100
+Message-ID: <40918176.d7CsG1ORth@tauon.chronox.de>
+References: <1513800567-12764-1-git-send-email-clabbe@baylibre.com> <1513800567-12764-2-git-send-email-clabbe@baylibre.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org, andreslc@google.com,
-        davem@davemloft.net, gthelen@google.com, ebiggers3@gmail.com
-To: herbert@gondor.apana.org.au
+Cc: davem@davemloft.net, herbert@gondor.apana.org.au,
+        nhorman@tuxdriver.com, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+To: Corentin Labbe <clabbe@baylibre.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pl0-f45.google.com ([209.85.160.45]:36907 "EHLO
-        mail-pl0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755868AbdLUCJn (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 20 Dec 2017 21:09:43 -0500
-Received: by mail-pl0-f45.google.com with SMTP id s3so10133016plp.4
-        for <linux-crypto@vger.kernel.org>; Wed, 20 Dec 2017 18:09:43 -0800 (PST)
-In-Reply-To: <20171221010838.54243-2-junaids@google.com>
+Received: from mail.eperm.de ([89.247.134.16]:44260 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750871AbdLUG2I (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 21 Dec 2017 01:28:08 -0500
+In-Reply-To: <1513800567-12764-2-git-send-email-clabbe@baylibre.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wednesday, December 20, 2017 5:08:37 PM PST Junaid Shahid wrote:
-> +.macro READ_PARTIAL_BLOCK DPTR DLEN XMM1 XMMDst
-> +        cmp $8, \DLEN
-> +        jl _read_lt8_\@
+Am Mittwoch, 20. Dezember 2017, 21:09:25 CET schrieb Corentin Labbe:
 
-> +        mov (\DPTR), %rax
-> +        MOVQ_R64_XMM %rax, \XMMDst
-Just noticed that these two can be replaced with:
-+        movq (\DPTR), \XMMDst
+Hi Corentin,
 
-> +        sub $8, \DLEN
-> +        jz _done_read_partial_block_\@
-> +	xor %eax, %eax
-> +_read_next_byte_\@:
+> Each crypto algorithm "cra_name" can have multiple implementation called
+> "cra_driver_name".
+> If two different implementation have the same cra_driver_name, nothing
+> can easily differentiate them.
+> Furthermore the mechanism for getting a crypto algorithm with its
+> implementation name (crypto_alg_match() in crypto/crypto_user.c) will
+> get only the first one found.
+> 
+> So this patch prevent the registration of two implementation with the
+> same cra_driver_name.
+
+Have you seen that happen? The driver_name should be an unambiguous name that 
+is unique throughout all crypto implementations.
+
+If you have seen a duplication, then this duplication should be fixed.
+
+Ciao
+Stephan
