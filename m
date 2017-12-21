@@ -1,79 +1,63 @@
-From: Philippe Ombredanne <pombredanne@nexb.com>
-Subject: Re: [PATCH 1/2] padata: Remove FSF address
-Date: Thu, 21 Dec 2017 08:34:37 +0100
-Message-ID: <CAOFm3uEf+ZcoQqvAeiKWY5S36RtFeVS+HBpYh2o2TXk2mqvgow@mail.gmail.com>
-References: <1513800921-12452-1-git-send-email-thrust73@gmail.com>
- <CAOFm3uGvuyHcKQ9vvZ1=U3D3Qp8N4npU-JSkWmyr-=9aYv=vzw@mail.gmail.com> <20171220211728.GA2383@linux-Precision-WorkStation-T5500>
+From: Dmitry Vyukov <dvyukov@google.com>
+Subject: Re: BUG: unable to handle kernel paging request in hmac_init_tfm
+Date: Thu, 21 Dec 2017 08:44:03 +0100
+Message-ID: <CACT4Y+bRD5C=ffgOBZNCVFNheH=W304CVRzyGr1FB3W=aYuBNA@mail.gmail.com>
+References: <94eb2c0d010ad8f1660560a275fd@google.com> <20171220230947.GF38504@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Cc: steffen.klassert@secunet.com, linux-crypto@vger.kernel.org,
-        LKML <linux-kernel@vger.kernel.org>
-To: Cheah Kok Cheong <thrust73@gmail.com>
+Cc: syzbot
+        <bot+428944d1a848e9d7464aa96da32ba353cc812457@syzkaller.appspotmail.com>,
+        David Miller <davem@davemloft.net>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+        syzkaller-bugs@googlegroups.com
+To: Eric Biggers <ebiggers3@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f65.google.com ([74.125.82.65]:34887 "EHLO
-        mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750965AbdLUHfT (ORCPT
+Received: from mail-pg0-f65.google.com ([74.125.83.65]:45904 "EHLO
+        mail-pg0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750782AbdLUHoY (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 21 Dec 2017 02:35:19 -0500
-Received: by mail-wm0-f65.google.com with SMTP id f9so14007100wmh.0
-        for <linux-crypto@vger.kernel.org>; Wed, 20 Dec 2017 23:35:18 -0800 (PST)
-In-Reply-To: <20171220211728.GA2383@linux-Precision-WorkStation-T5500>
+        Thu, 21 Dec 2017 02:44:24 -0500
+Received: by mail-pg0-f65.google.com with SMTP id m25so12949867pgv.12
+        for <linux-crypto@vger.kernel.org>; Wed, 20 Dec 2017 23:44:24 -0800 (PST)
+In-Reply-To: <20171220230947.GF38504@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Dear CheahKC,
-
-On Wed, Dec 20, 2017 at 10:17 PM, Cheah Kok Cheong <thrust73@gmail.com> wrote:
-> On Wed, Dec 20, 2017 at 09:20:48PM +0100, Philippe Ombredanne wrote:
->> On Wed, Dec 20, 2017 at 9:15 PM, Cheah Kok Cheong <thrust73@gmail.com> wrote:
->> > Remove FSF address otherwise checkpatch will flag my next patch.
->> >
->> > Signed-off-by: Cheah Kok Cheong <thrust73@gmail.com>
->> > ---
->> >  kernel/padata.c | 4 ----
->> >  1 file changed, 4 deletions(-)
->> >
->> > diff --git a/kernel/padata.c b/kernel/padata.c
->> > index 57c0074..9d91909 100644
->> > --- a/kernel/padata.c
->> > +++ b/kernel/padata.c
->> > @@ -14,10 +14,6 @@
->> >   * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
->> >   * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
->> >   * more details.
->> > - *
->> > - * You should have received a copy of the GNU General Public License along with
->> > - * this program; if not, write to the Free Software Foundation, Inc.,
->> > - * 51 Franklin St - Fifth Floor, Boston, MA 02110-1301 USA.
->> >   */
->> >
->> >  #include <linux/export.h>
->> > --
->> > 2.7.4
->> >
+On Thu, Dec 21, 2017 at 12:09 AM, Eric Biggers <ebiggers3@gmail.com> wrote:
+> On Mon, Dec 18, 2017 at 11:36:01AM -0800, syzbot wrote:
+>> Hello,
 >>
->>
->> Why not use instead the simpler SPDX ids?
->> --
->> Cordially
->> Philippe Ombredanne
+>> syzkaller hit the following crash on
+>> 6084b576dca2e898f5c101baef151f7bfdbb606d
+>> git://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/master
+>> compiler: gcc (GCC) 7.1.1 20170620
+>> .config is attached
 >
-> Hi Philippe,
->   Adding the SPDX id can be the subject of a separate patch.
-> Believe you are part of the team doing an audit in this matter.
-> I shall leave adding the SPDX id to you guys the professionals.
-> Looks like you guys are using script to do this en masse.
->
-> But if you insist and our maintainer is agreeable, I can send
-> another patch to add the SPDX id.
+> FYI, in linux-next KASAN and other memory debugging options are now behind
+> CONFIG_DEBUG_MEMORY.  So, I think KASAN isn't getting turned on anymore, despite
+> the CONFIG_KASAN=y.  (Patch was "lib/: make "Memory Debugging" a menuconfig to
+> ease disabling it all".)
 
-If you could work it out directly that would be best. There are a lot
-of files in the kernel and each one needs a careful review even with
-best license detection script (which . So tagging files on the go when
-they are updated is the best way to help!
+Ouch! That would be pretty bad.
 
-Thank you.
+But I've tried both linux-next HEAD at:
 
--- 
-Cordially
-Philippe Ombredanne
+commit 0e08c463db387a2adcb0243b15ab868a73f87807 (HEAD, tag:
+next-20171221, linux-next/master)
+Author: Stephen Rothwell <sfr@canb.auug.org.au>
+Date:   Thu Dec 21 15:37:39 2017 +1100
+    Add linux-next specific files for 20171221
+
+and mmots HEAD at:
+
+commit 75aa5540627fdb3d8f86229776ea87f995275351 (HEAD, tag:
+v4.15-rc4-mmots-2017-12-20-19-10, mmots/master)
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Thu Dec 21 04:02:17 2017 +0000
+    pci: test for unexpectedly disabled bridges
+
+and after running make olddefconfig I still see CONFIG_KASAN=y in
+.config, nor I can find CONFIG_DEBUG_MEMORY in menuconfig.
+
+What am I missing? What commit has added the config?
