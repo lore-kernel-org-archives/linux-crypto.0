@@ -1,68 +1,53 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] lib/mpi: Fix umul_ppmm() for MIPS64r6
-Date: Fri, 22 Dec 2017 18:08:08 +1100
-Message-ID: <20171222070808.GB27149@gondor.apana.org.au>
-References: <20171205233135.1763-1-james.hogan@mips.com>
+Subject: Re: [PATCH v2] crypto: AF_ALG - limit mask and type
+Date: Fri, 22 Dec 2017 18:36:07 +1100
+Message-ID: <20171222073606.GC27149@gondor.apana.org.au>
+References: <001a1141c43ad30ccf055efb76ed@google.com>
+ <4450500.tGvsruIfR8@positron.chronox.de>
+ <3658547.Hu7AXH7hma@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Ralf Baechle <ralf@linux-mips.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        James Hogan <jhogan@kernel.org>, linux-mips@linux-mips.org,
-        linux-crypto@vger.kernel.org
-To: James Hogan <james.hogan@mips.com>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+Cc: syzbot
+        <bot+b6e703f648ebbbf57a4528d4314e0c2a5c893dc2@syzkaller.appspotmail.com>,
+        davem@davemloft.net, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
+        ebiggers3@gmail.com
+To: Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [128.1.224.119] ([128.1.224.119]:45972 "EHLO ringil.hmeau.com"
+Received: from [128.1.224.119] ([128.1.224.119]:46008 "EHLO ringil.hmeau.com"
         rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
-        id S1751104AbdLVHIZ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 22 Dec 2017 02:08:25 -0500
+        id S1751514AbdLVHgZ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 22 Dec 2017 02:36:25 -0500
 Content-Disposition: inline
-In-Reply-To: <20171205233135.1763-1-james.hogan@mips.com>
+In-Reply-To: <3658547.Hu7AXH7hma@positron.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Dec 05, 2017 at 11:31:35PM +0000, James Hogan wrote:
-> From: James Hogan <jhogan@kernel.org>
+On Tue, Dec 19, 2017 at 07:25:04AM +0100, Stephan Müller wrote:
+> The user space interface allows specifying the type and the mask field
+> used to allocate the cipher. As user space can precisely select the
+> desired cipher by using either the name or the driver name, additional
+> selection options for cipher are not considered necessary and relevant
+> for user space.
 > 
-> Current MIPS64r6 toolchains aren't able to generate efficient
-> DMULU/DMUHU based code for the C implementation of umul_ppmm(), which
-> performs an unsigned 64 x 64 bit multiply and returns the upper and
-> lower 64-bit halves of the 128-bit result. Instead it widens the 64-bit
-> inputs to 128-bits and emits a __multi3 intrinsic call to perform a 128
-> x 128 multiply. This is both inefficient, and it results in a link error
-> since we don't include __multi3 in MIPS linux.
+> This fixes a bug where user space is able to cause one cipher to be
+> registered multiple times potentially exhausting kernel memory.
 > 
-> For example commit 90a53e4432b1 ("cfg80211: implement regdb signature
-> checking") merged in v4.15-rc1 recently broke the 64r6_defconfig and
-> 64r6el_defconfig builds by indirectly selecting MPILIB. The same build
-> errors can be reproduced on older kernels by enabling e.g. CRYPTO_RSA:
-> 
-> lib/mpi/generic_mpih-mul1.o: In function `mpihelp_mul_1':
-> lib/mpi/generic_mpih-mul1.c:50: undefined reference to `__multi3'
-> lib/mpi/generic_mpih-mul2.o: In function `mpihelp_addmul_1':
-> lib/mpi/generic_mpih-mul2.c:49: undefined reference to `__multi3'
-> lib/mpi/generic_mpih-mul3.o: In function `mpihelp_submul_1':
-> lib/mpi/generic_mpih-mul3.c:49: undefined reference to `__multi3'
-> lib/mpi/mpih-div.o In function `mpihelp_divrem':
-> lib/mpi/mpih-div.c:205: undefined reference to `__multi3'
-> lib/mpi/mpih-div.c:142: undefined reference to `__multi3'
-> 
-> Therefore add an efficient MIPS64r6 implementation of umul_ppmm() using
-> inline assembly and the DMULU/DMUHU instructions, to prevent __multi3
-> calls being emitted.
-> 
-> Fixes: 7fd08ca58ae6 ("MIPS: Add build support for the MIPS R6 ISA")
-> Signed-off-by: James Hogan <jhogan@kernel.org>
-> Cc: Ralf Baechle <ralf@linux-mips.org>
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: linux-mips@linux-mips.org
-> Cc: linux-crypto@vger.kernel.org
-> ---
-> Please can somebody apply this fix for v4.15, as the MIPS 64r6_defconfig
-> and 64r6el_defconfig builds are broken without it.
+> Reported-by: syzbot <syzkaller@googlegroups.com>
+> Cc: <stable@vger.kernel.org>
+> Signed-off-by: Stephan Mueller <smueller@chronox.de>
 
-I can take this but I'd like to see an ack from someone on the
-MIPS side.
+This will break users of CRYPTO_ALG_KERN_DRIVER_ONLY.  I think
+we should add CRYPTO_ALG_TESTED to the blacklist since there is
+no sane reason to use it here.
+
+Most other problems however would be bugs in the template code.
+The first thing a template does when it creates an instance is
+to check whether the resulting algorithm would fulfil the requested
+type/mask using crypto_check_attr_type.  So if that's not working
+then we should fix it there as it may also be triggered via other
+code paths that can create instances.
 
 Thanks,
 -- 
