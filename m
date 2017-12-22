@@ -1,62 +1,44 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH v2] crypto: AF_ALG - limit mask and type
-Date: Fri, 22 Dec 2017 08:41:10 +0100
-Message-ID: <1779114.sJA4SrkMo1@tauon.chronox.de>
-References: <001a1141c43ad30ccf055efb76ed@google.com> <3658547.Hu7AXH7hma@positron.chronox.de> <20171222073606.GC27149@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] crypto: Fix race around ctx->rcvused by making it
+ atomic_t
+Date: Fri, 22 Dec 2017 18:48:03 +1100
+Message-ID: <20171222074803.GD27149@gondor.apana.org.au>
+References: <20171218161045.0000161c@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: 8BIT
-Cc: syzbot
-        <bot+b6e703f648ebbbf57a4528d4314e0c2a5c893dc2@syzkaller.appspotmail.com>,
-        davem@davemloft.net, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-        ebiggers3@gmail.com
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, linuxarm@huawei.com,
+        Stephan Mueller <smueller@chronox.de>, davem@davemloft.net
+To: Jonathan Cameron <Jonathan.Cameron@huawei.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:44304 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751246AbdLVHlM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 22 Dec 2017 02:41:12 -0500
-In-Reply-To: <20171222073606.GC27149@gondor.apana.org.au>
+Received: from [128.1.224.119] ([128.1.224.119]:46022 "EHLO ringil.hmeau.com"
+        rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
+        id S1751069AbdLVHsK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 22 Dec 2017 02:48:10 -0500
+Content-Disposition: inline
+In-Reply-To: <20171218161045.0000161c@huawei.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Freitag, 22. Dezember 2017, 08:36:07 CET schrieb Herbert Xu:
-
-Hi Herbert,
-
-> On Tue, Dec 19, 2017 at 07:25:04AM +0100, Stephan Müller wrote:
-> > The user space interface allows specifying the type and the mask field
-> > used to allocate the cipher. As user space can precisely select the
-> > desired cipher by using either the name or the driver name, additional
-> > selection options for cipher are not considered necessary and relevant
-> > for user space.
-> > 
-> > This fixes a bug where user space is able to cause one cipher to be
-> > registered multiple times potentially exhausting kernel memory.
-> > 
-> > Reported-by: syzbot <syzkaller@googlegroups.com>
-> > Cc: <stable@vger.kernel.org>
-> > Signed-off-by: Stephan Mueller <smueller@chronox.de>
+On Tue, Dec 19, 2017 at 10:31:22AM +0000, Jonathan Cameron wrote:
+> This variable was increased and decreased without any protection.
+> Result was an occasional misscount and negative wrap around resulting
+> in false resource allocation failures.
 > 
-> This will break users of CRYPTO_ALG_KERN_DRIVER_ONLY.  I think
-> we should add CRYPTO_ALG_TESTED to the blacklist since there is
-> no sane reason to use it here.
+> Signed-off-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+> Fixes: 2d97591ef43d ("crypto: af_alg - consolidation of duplicate code")
 
-Shouldn't we then rather use a white list instead of a black list?
-> 
-> Most other problems however would be bugs in the template code.
-> The first thing a template does when it creates an instance is
-> to check whether the resulting algorithm would fulfil the requested
-> type/mask using crypto_check_attr_type.  So if that's not working
-> then we should fix it there as it may also be triggered via other
-> code paths that can create instances.
+Actually I think it used to be fine because we held the socket
+lock in the async callback.  It only got broken when we removed
+the socket lock from the callback.
 
-I think I understand that, but does user space need to utilize this logic?
-> 
-> Thanks,
+commit 7d2c3f54e6f646887d019faa45f35d6fe9fe82ce
+Author: Stephan Mueller <smueller@chronox.de>
+Date:   Fri Nov 10 13:20:55 2017 +0100
 
+    crypto: af_alg - remove locking in async callback
 
-
-Ciao
-Stephan
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
