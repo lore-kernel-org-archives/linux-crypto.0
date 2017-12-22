@@ -1,53 +1,40 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: n2 - cure use after free
-Date: Fri, 22 Dec 2017 19:36:16 +1100
-Message-ID: <20171222083616.GA30844@gondor.apana.org.au>
-References: <20171219180907.12895-1-jengelh@inai.de>
+Subject: Re: [PATCH] crypto: pcrypt - fix freeing pcrypt instances
+Date: Fri, 22 Dec 2017 19:36:36 +1100
+Message-ID: <20171222083635.GA30861@gondor.apana.org.au>
+References: <94eb2c05a380d3908b056096eb58@google.com>
+ <20171220222825.207321-1-ebiggers3@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, sparclinux@vger.kernel.org, jengelh@inai.de,
-        linux-crypto@vger.kernel.org, rmk+kernel@arm.linux.org.uk
-To: Jan Engelhardt <jengelh@inai.de>
-Return-path: <sparclinux-owner@vger.kernel.org>
+Cc: linux-crypto@vger.kernel.org,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
+        Eric Biggers <ebiggers@google.com>, stable@vger.kernel.org
+To: Eric Biggers <ebiggers3@gmail.com>
+Return-path: <stable-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20171219180907.12895-1-jengelh@inai.de>
-Sender: sparclinux-owner@vger.kernel.org
+In-Reply-To: <20171220222825.207321-1-ebiggers3@gmail.com>
+Sender: stable-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Jan Engelhardt <jengelh@inai.de> wrote:
-> queue_cache_init is first called for the Control Word Queue
-> (n2_crypto_probe). At that time, queue_cache[0] is NULL and a new
-> kmem_cache will be allocated. If the subsequent n2_register_algs call
-> fails, the kmem_cache will be released in queue_cache_destroy, but
-> queue_cache_init[0] is not set back to NULL.
+On Wed, Dec 20, 2017 at 02:28:25PM -0800, Eric Biggers wrote:
+> From: Eric Biggers <ebiggers@google.com>
 > 
-> So when the Module Arithmetic Unit gets probed next (n2_mau_probe),
-> queue_cache_init will not allocate a kmem_cache again, but leave it
-> as its bogus value, causing a BUG() to trigger when queue_cache[0] is
-> eventually passed to kmem_cache_zalloc:
+> pcrypt is using the old way of freeing instances, where the ->free()
+> method specified in the 'struct crypto_template' is passed a pointer to
+> the 'struct crypto_instance'.  But the crypto_instance is being
+> kfree()'d directly, which is incorrect because the memory was actually
+> allocated as an aead_instance, which contains the crypto_instance at a
+> nonzero offset.  Thus, the wrong pointer was being kfree()'d.
 > 
->        n2_crypto: Found N2CP at /virtual-devices@100/n2cp@7
->        n2_crypto: Registered NCS HVAPI version 2.0
->        called queue_cache_init
->        n2_crypto: md5 alg registration failed
->        n2cp f028687c: /virtual-devices@100/n2cp@7: Unable to register algorithms.
->        called queue_cache_destroy
->        n2cp: probe of f028687c failed with error -22
->        n2_crypto: Found NCP at /virtual-devices@100/ncp@6
->        n2_crypto: Registered NCS HVAPI version 2.0
->        called queue_cache_init
->        kernel BUG at mm/slab.c:2993!
->        Call Trace:
->         [0000000000604488] kmem_cache_alloc+0x1a8/0x1e0
->                  (inlined) kmem_cache_zalloc
->                  (inlined) new_queue
->                  (inlined) spu_queue_setup
->                  (inlined) handle_exec_unit
->         [0000000010c61eb4] spu_mdesc_scan+0x1f4/0x460 [n2_crypto]
->         [0000000010c62b80] n2_mau_probe+0x100/0x220 [n2_crypto]
->         [000000000084b174] platform_drv_probe+0x34/0xc0
+> Fix it by switching to the new way to free aead_instance's where the
+> ->free() method is specified in the aead_instance itself.
 > 
-> Signed-off-by: Jan Engelhardt <jengelh@inai.de>
+> Reported-by: syzbot <syzkaller@googlegroups.com>
+> Fixes: 0496f56065e0 ("crypto: pcrypt - Add support for new AEAD interface")
+> Cc: <stable@vger.kernel.org> # v4.2+
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
 
 Patch applied.  Thanks.
 -- 
