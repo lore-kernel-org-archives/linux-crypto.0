@@ -1,50 +1,41 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: Fix race around ctx->rcvused by making it
- atomic_t
-Date: Fri, 22 Dec 2017 18:57:03 +1100
-Message-ID: <20171222075703.GA27971@gondor.apana.org.au>
-References: <20171218161045.0000161c@huawei.com>
- <20171222074803.GD27149@gondor.apana.org.au>
- <11744235.QUrfmsyV1D@tauon.chronox.de>
+Subject: Re: [PATCH v2] crypto: AF_ALG - limit mask and type
+Date: Fri, 22 Dec 2017 18:58:43 +1100
+Message-ID: <20171222075843.GB27971@gondor.apana.org.au>
+References: <001a1141c43ad30ccf055efb76ed@google.com>
+ <3658547.Hu7AXH7hma@positron.chronox.de>
+ <20171222073606.GC27149@gondor.apana.org.au>
+ <1779114.sJA4SrkMo1@tauon.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-        linux-crypto@vger.kernel.org, linuxarm@huawei.com,
-        davem@davemloft.net
+Cc: syzbot
+        <bot+b6e703f648ebbbf57a4528d4314e0c2a5c893dc2@syzkaller.appspotmail.com>,
+        davem@davemloft.net, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
+        ebiggers3@gmail.com
 To: Stephan Mueller <smueller@chronox.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [128.1.224.119] ([128.1.224.119]:46062 "EHLO ringil.hmeau.com"
-        rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
-        id S1753416AbdLVH5L (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 22 Dec 2017 02:57:11 -0500
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <11744235.QUrfmsyV1D@tauon.chronox.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <1779114.sJA4SrkMo1@tauon.chronox.de>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Dec 22, 2017 at 08:50:01AM +0100, Stephan Mueller wrote:
-> Am Freitag, 22. Dezember 2017, 08:48:03 CET schrieb Herbert Xu:
-> 
-> Hi Herbert,
-> 
-> > On Tue, Dec 19, 2017 at 10:31:22AM +0000, Jonathan Cameron wrote:
-> > > This variable was increased and decreased without any protection.
-> > > Result was an occasional misscount and negative wrap around resulting
-> > > in false resource allocation failures.
-> > > 
-> > > Signed-off-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-> > > Fixes: 2d97591ef43d ("crypto: af_alg - consolidation of duplicate code")
+On Fri, Dec 22, 2017 at 08:41:10AM +0100, Stephan Mueller wrote:
+>
+> Shouldn't we then rather use a white list instead of a black list?
 > > 
-> > Actually I think it used to be fine because we held the socket
-> > lock in the async callback.  It only got broken when we removed
-> > the socket lock from the callback.
+> > Most other problems however would be bugs in the template code.
+> > The first thing a template does when it creates an instance is
+> > to check whether the resulting algorithm would fulfil the requested
+> > type/mask using crypto_check_attr_type.  So if that's not working
+> > then we should fix it there as it may also be triggered via other
+> > code paths that can create instances.
 > 
-> But we cannot hold the lock in the async callback since it may be called in 
-> interrupt context.
+> I think I understand that, but does user space need to utilize this logic?
 
-I know.  I'm just saying that the bug was introduced in the commit
-that removed the socket lock rather than the commit that introduced
-this originally.
+I'm open to a white list as well.  But we should certainly fix
+the underlying bugs rather than just papering over them as they
+could come back via other channels.
 
 Cheers,
 -- 
