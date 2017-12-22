@@ -1,54 +1,26 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v3 0/4] Assorted changes for Exynos PRNG driver
-Date: Fri, 22 Dec 2017 20:09:57 +1100
-Message-ID: <20171222090956.GE32542@gondor.apana.org.au>
-References: <20171211140623.7673-1-l.stelmach@samsung.com>
- <CGME20171212163609eucas1p2aaee0a21276b66f4cb492a4502f66756@eucas1p2.samsung.com>
- <20171212163607.2985-1-l.stelmach@samsung.com>
+Subject: Re: [PATCH 1/2] crypto: echainiv - Remove unused alg/spawn variable
+Date: Fri, 22 Dec 2017 20:10:15 +1100
+Message-ID: <20171222091015.GF32542@gondor.apana.org.au>
+References: <1513107014-11975-1-git-send-email-clabbe@baylibre.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Cc: Krzysztof Kozlowski <krzk@kernel.org>, robh+dt@kernel.org,
-        Stephan Mueller <smueller@chronox.de>,
-        "David S . Miller" <davem@davemloft.net>,
-        Kukjin Kim <kgene@kernel.org>, linux-crypto@vger.kernel.org,
-        linux-samsung-soc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Marek Szyprowski <m.szyprowski@samsung.com>,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
-To: =?utf-8?Q?=C5=81ukasz?= Stelmach <l.stelmach@samsung.com>
-Return-path: <linux-samsung-soc-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+To: Corentin Labbe <clabbe@baylibre.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20171212163607.2985-1-l.stelmach@samsung.com>
-Sender: linux-samsung-soc-owner@vger.kernel.org
+In-Reply-To: <1513107014-11975-1-git-send-email-clabbe@baylibre.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Dec 12, 2017 at 05:36:03PM +0100, Łukasz Stelmach wrote:
-> Hello,
+On Tue, Dec 12, 2017 at 07:30:13PM +0000, Corentin Labbe wrote:
+> This patch remove two unused variable and some dead "code" using it.
 > 
-> This is a series of patches for exynos-rng driver I've decided to
-> create after adding support for Exynos5250+ chips. They do not
-> strictly depend on each other, but I think it is better to send them
-> as a single patch-set.
-> 
-> The driver requires appropriate DT configuration introduced in
-> 
->     https://patchwork.kernel.org/patch/10106797/
-> 
-> Patch #1 Add support for PRNG in Exynos5250+ SoCs
-> 
-> Patch #2 Improve output performance by using memcpy() rather than a
-> custom function to retrieve random bytes from registers. Rearrange
-> the loop for polling the hardware.
-> 
-> Patch #3 Reseed the PRNG after reading 2^16 bytes. Simmilar approach
-> is implemented in DRBG. (Thanks Stephan Mueller)
-> 
-> Patch #4 Introduce locking to prevent simultaneous access to the
-> hardware from more than one thread/process.
-> 
-> Changes since v2:
+> Fixes: 66008d4230f6 ("crypto: echainiv - Remove AEAD compatibility code")
+> Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
 
-All applied.  Thanks.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
