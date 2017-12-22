@@ -1,134 +1,351 @@
-From: =?utf-8?Q?=C5=81ukasz_Stelmach?= <l.stelmach@samsung.com>
-Subject: Re: [PATCH v4] hwrng: exynos - add Samsung Exynos True RNG driver
-Date: Fri, 22 Dec 2017 17:38:56 +0100
-Message-ID: <87y3luhg4f.fsf%l.stelmach@samsung.com>
-References: <CAOFm3uG2aBHWUgVyzPuU8XJaLbm78cWEuWvgLEvNfc-hiefAbw@mail.gmail.com>
-        <CGME20171222163901eucas1p253c4258fb141ea955c40185cd2f38197@eucas1p2.samsung.com>
+From: =?UTF-8?q?=C5=81ukasz=20Stelmach?= <l.stelmach@samsung.com>
+Subject: [PATCH v5] hwrng: exynos - add Samsung Exynos True RNG driver
+Date: Fri, 22 Dec 2017 17:48:35 +0100
+Message-ID: <20171222164835.1051-1-l.stelmach@samsung.com>
+References: <20171222132338.30054-1-l.stelmach@samsung.com>
+        <CGME20171222164840eucas1p17e3d17666ba3d0c5fced2d1c9259bf0b@eucas1p1.samsung.com>
 Mime-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-="; micalg="pgp-sha256";
-        protocol="application/pgp-signature"
-Cc: "Andrew F . Davis" <afd@ti.com>,
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+Cc: =?UTF-8?q?=C5=81ukasz=20Stelmach?= <l.stelmach@samsung.com>,
+        Marek Szyprowski <m.szyprowski@samsung.com>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
+To: Philippe Ombredanne <pombredanne@nexb.com>,
+        "Andrew F . Davis" <afd@ti.com>,
         PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
         Rob Herring <robh+dt@kernel.org>,
         Matt Mackall <mpm@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Krzysztof Kozlowski <krzk@kernel.org>,
-        Kukjin Kim <kgene@kernel.org>,
-        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS"
-        <devicetree@vger.kernel.org>, linux-crypto@vger.kernel.org,
-        linux-samsung-soc@vger.kernel.org,
-        LKML <linux-kernel@vger.kernel.org>,
-        Marek Szyprowski <m.szyprowski@samsung.com>,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
-To: Philippe Ombredanne <pombredanne@nexb.com>
+        Kukjin Kim <kgene@kernel.org>, devicetree@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-samsung-soc@vger.kernel.org,
+        linux-kernel@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mailout1.w1.samsung.com ([210.118.77.11]:56962 "EHLO
+Received: from mailout1.w1.samsung.com ([210.118.77.11]:58131 "EHLO
         mailout1.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753456AbdLVQjG (ORCPT
+        with ESMTP id S1753456AbdLVQsp (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 22 Dec 2017 11:39:06 -0500
-In-reply-to: <CAOFm3uG2aBHWUgVyzPuU8XJaLbm78cWEuWvgLEvNfc-hiefAbw@mail.gmail.com>
+        Fri, 22 Dec 2017 11:48:45 -0500
+In-reply-to: <20171222132338.30054-1-l.stelmach@samsung.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
---=-=-=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+Add support for True Random Number Generator found in Samsung Exynos
+5250+ SoCs.
 
-It was <2017-12-22 pi=C4=85 14:34>, when Philippe Ombredanne wrote:
-> =C5=81ukasz,
->
-> On Fri, Dec 22, 2017 at 2:23 PM, =C5=81ukasz Stelmach <l.stelmach@samsung=
-.com> wrote:
->> Add support for True Random Number Generator found in Samsung Exynos
->> 5250+ SoCs.
->>
->> Signed-off-by: =C5=81ukasz Stelmach <l.stelmach@samsung.com>
->> Reviewed-by: Krzysztof Kozlowski <krzk@kernel.org>
->
-> <snip>
->
->> --- /dev/null
->> +++ b/drivers/char/hw_random/exynos-trng.c
->> @@ -0,0 +1,245 @@
->> +/*
->> + * RNG driver for Exynos TRNGs
->> + *
->> + * Author: =C5=81ukasz Stelmach <l.stelmach@samsung.com>
->> + *
->> + * Copyright 2017 (c) Samsung Electronics Software, Inc.
->> + *
->> + * Based on the Exynos PRNG driver drivers/crypto/exynos-rng by
->> + * Krzysztof Koz=C5=82owski <krzk@kernel.org>
->> + *
->> + * This program is free software; you can redistribute it and/or modify
->> + * it under the terms of the GNU General Public License as published by
->> + * the Free Software Foundation;
->> + *
->> + * This program is distributed in the hope that it will be useful,
->> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
->> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
->> + * GNU General Public License for more details.
->> + */
->
->
-> Would you mind using the new SPDX tags documented in Thomas patch set
-> [1] rather than this fine but longer legalese?
->
-> And if you could spread the word to others in your team this would be ver=
-y nice.
-> See also this fine article posted by Mauro on the Samsung Open Source
-> Group Blog [2]
-> Thank you!
+Signed-off-by: Łukasz Stelmach <l.stelmach@samsung.com>
+Reviewed-by: Krzysztof Kozlowski <krzk@kernel.org>
+---
+Changes since v4:
+ 
+- SPDX license header instead of the traditional blurb.
 
-Cool! We've been using SPDX to tag RPM packages in Tizen for three years or
-more. ;-)
+- MODULE_LICENSE("GPL v2") instead of "GPL"
+ 
+Thank you, Philippe Ombredanne.
 
->> +MODULE_LICENSE("GPL");
->
-> Per module.h this means GPL2 or later. This is not matching your
-> license above which does not state any version and therefore would
-> mean GPL1 or later,
+ MAINTAINERS                          |   7 ++
+ drivers/char/hw_random/Kconfig       |  12 ++
+ drivers/char/hw_random/Makefile      |   1 +
+ drivers/char/hw_random/exynos-trng.c | 237 +++++++++++++++++++++++++++++++++++
+ 4 files changed, 257 insertions(+)
+ create mode 100644 drivers/char/hw_random/exynos-trng.c
 
-Thanks for spotting. My intention is GPL-2.0.
-
-> Please make sure you use something and common rather than this and
-> make sure your MODULE_LICENSE is consistent with the top level
-> license.
->
-> Was it this way in the code from Krzysztof?
-
-Yes. And omap-rng, the second of my sources of reference, too. Actually,
-the majority of modules still specify "GPL".
-
- 281 | "Dual */*"
-2082 | "GPL v2"
-6359 | "GPL"
-=2D--- +---------
-8784 | Total
-
-Fixing.
-
-> [1] https://lkml.org/lkml/2017/12/4/934
-> [2] https://blogs.s-osg.org/linux-kernel-license-practices-revisited-spdx/
-
-=2D-=20
-=C5=81ukasz Stelmach
-Samsung R&D Institute Poland
-Samsung Electronics
-
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
-
-iQEcBAEBCAAGBQJaPTUgAAoJELCuHpyYpYAQ/OkIAKYGU0bLnSiPYYpkSPelFEpo
-O9BvqvnYHbZFIuUU1OEpiJcHk2ITBFvyxAewA3+1tkwVKuY5iG2zdY3yM91PWO5Q
-qpyFODOfsJznEOrEI7Q81D2pzcur/Vs4fai38VqRKmDyYb7BnlPdWEl6mznT5fed
-GhgS9uLbOIb+UL9Nj4vBRcNoPjViZgB3rZ3xCiRHFean7mjhfK5pxedHCDmdWq4m
-+ZRmAaMByuxPN78gFE3ZxYIyTACNq3UFljoP0X5wJ6LT2WlSSQJ30QqmORkhs275
-T7EtdjDAI2NAO9PJYzBWVwBE+Yie8sXFyuLe02fThzho+nz1nRgGz4WQ3RGdBBA=
-=8cE6
------END PGP SIGNATURE-----
---=-=-=--
+diff --git a/MAINTAINERS b/MAINTAINERS
+index e6d849d0d153..1082846edb9b 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -11933,6 +11933,13 @@ S:	Maintained
+ F:	drivers/crypto/exynos-rng.c
+ F:	Documentation/devicetree/bindings/crypto/samsung,exynos-rng4.txt
+ 
++SAMSUNG EXYNOS TRUE RANDOM NUMBER GENERATOR (TRNG) DRIVER
++M:	Łukasz Stelmach <l.stelmach@samsung.com>
++L:	linux-samsung-soc@vger.kernel.org
++S:	Maintained
++F:	drivers/char/hw_random/exynos-trng.c
++F:	Documentation/devicetree/bindings/rng/samsung,exynos5250-trng.txt
++
+ SAMSUNG FRAMEBUFFER DRIVER
+ M:	Jingoo Han <jingoohan1@gmail.com>
+ L:	linux-fbdev@vger.kernel.org
+diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
+index 90e4bb24819e..32f715394904 100644
+--- a/drivers/char/hw_random/Kconfig
++++ b/drivers/char/hw_random/Kconfig
+@@ -437,6 +437,18 @@ config HW_RANDOM_S390
+ 
+ 	  If unsure, say Y.
+ 
++config HW_RANDOM_EXYNOS
++	tristate "Samsung Exynos True Random Number Generator support"
++	depends on ARCH_EXYNOS || COMPILE_TEST
++	default HW_RANDOM
++	---help---
++	  This driver provides support for the True Random Number
++	  Generator available in Exynos SoCs.
++
++	  To compile this driver as a module, choose M here: the module
++	  will be called exynos-trng.
++
++	  If unsure, say Y.
+ endif # HW_RANDOM
+ 
+ config UML_RANDOM
+diff --git a/drivers/char/hw_random/Makefile b/drivers/char/hw_random/Makefile
+index e7146a84d44a..7c8a66fe8cf6 100644
+--- a/drivers/char/hw_random/Makefile
++++ b/drivers/char/hw_random/Makefile
+@@ -13,6 +13,7 @@ obj-$(CONFIG_HW_RANDOM_GEODE) += geode-rng.o
+ obj-$(CONFIG_HW_RANDOM_N2RNG) += n2-rng.o
+ n2-rng-y := n2-drv.o n2-asm.o
+ obj-$(CONFIG_HW_RANDOM_VIA) += via-rng.o
++obj-$(CONFIG_HW_RANDOM_EXYNOS) += exynos-trng.o
+ obj-$(CONFIG_HW_RANDOM_IXP4XX) += ixp4xx-rng.o
+ obj-$(CONFIG_HW_RANDOM_OMAP) += omap-rng.o
+ obj-$(CONFIG_HW_RANDOM_OMAP3_ROM) += omap3-rom-rng.o
+diff --git a/drivers/char/hw_random/exynos-trng.c b/drivers/char/hw_random/exynos-trng.c
+new file mode 100644
+index 000000000000..34d6f51ecbee
+--- /dev/null
++++ b/drivers/char/hw_random/exynos-trng.c
+@@ -0,0 +1,237 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * RNG driver for Exynos TRNGs
++ *
++ * Author: Łukasz Stelmach <l.stelmach@samsung.com>
++ *
++ * Copyright 2017 (c) Samsung Electronics Software, Inc.
++ *
++ * Based on the Exynos PRNG driver drivers/crypto/exynos-rng by
++ * Krzysztof Kozłowski <krzk@kernel.org>
++ */
++
++#include <linux/clk.h>
++#include <linux/crypto.h>
++#include <linux/delay.h>
++#include <linux/err.h>
++#include <linux/hw_random.h>
++#include <linux/io.h>
++#include <linux/iopoll.h>
++#include <linux/kernel.h>
++#include <linux/module.h>
++#include <linux/platform_device.h>
++#include <linux/pm_runtime.h>
++
++#define EXYNOS_TRNG_CLKDIV         (0x0)
++
++#define EXYNOS_TRNG_CTRL           (0x20)
++#define EXYNOS_TRNG_CTRL_RNGEN     BIT(31)
++
++#define EXYNOS_TRNG_POST_CTRL      (0x30)
++#define EXYNOS_TRNG_ONLINE_CTRL    (0x40)
++#define EXYNOS_TRNG_ONLINE_STAT    (0x44)
++#define EXYNOS_TRNG_ONLINE_MAXCHI2 (0x48)
++#define EXYNOS_TRNG_FIFO_CTRL      (0x50)
++#define EXYNOS_TRNG_FIFO_0         (0x80)
++#define EXYNOS_TRNG_FIFO_1         (0x84)
++#define EXYNOS_TRNG_FIFO_2         (0x88)
++#define EXYNOS_TRNG_FIFO_3         (0x8c)
++#define EXYNOS_TRNG_FIFO_4         (0x90)
++#define EXYNOS_TRNG_FIFO_5         (0x94)
++#define EXYNOS_TRNG_FIFO_6         (0x98)
++#define EXYNOS_TRNG_FIFO_7         (0x9c)
++#define EXYNOS_TRNG_FIFO_LEN       (8)
++#define EXYNOS_TRNG_CLOCK_RATE     (500000)
++
++
++struct exynos_trng_dev {
++	struct device    *dev;
++	void __iomem     *mem;
++	struct clk       *clk;
++	struct hwrng rng;
++};
++
++static int exynos_trng_do_read(struct hwrng *rng, void *data, size_t max,
++			       bool wait)
++{
++	struct exynos_trng_dev *trng;
++	u32 val;
++
++	max = min_t(size_t, max, (EXYNOS_TRNG_FIFO_LEN * 4));
++
++	trng = (struct exynos_trng_dev *)rng->priv;
++
++	writel_relaxed(max * 8, trng->mem + EXYNOS_TRNG_FIFO_CTRL);
++	val = readl_poll_timeout(trng->mem + EXYNOS_TRNG_FIFO_CTRL, val,
++				 val == 0, 200, 1000000);
++	if (val < 0)
++		return val;
++
++	memcpy_fromio(data, trng->mem + EXYNOS_TRNG_FIFO_0, max);
++
++	return max;
++}
++
++static int exynos_trng_init(struct hwrng *rng)
++{
++	struct exynos_trng_dev *trng = (struct exynos_trng_dev *)rng->priv;
++	unsigned long sss_rate;
++	u32 val;
++
++	sss_rate = clk_get_rate(trng->clk);
++
++	/*
++	 * For most TRNG circuits the clock frequency of under 500 kHz
++	 * is safe.
++	 */
++	val = sss_rate / (EXYNOS_TRNG_CLOCK_RATE * 2);
++	if (val > 0x7fff) {
++		dev_err(trng->dev, "clock divider too large: %d", val);
++		return -ERANGE;
++	}
++	val = val << 1;
++	writel_relaxed(val, trng->mem + EXYNOS_TRNG_CLKDIV);
++
++	/* Enable the generator. */
++	val = EXYNOS_TRNG_CTRL_RNGEN;
++	writel_relaxed(val, trng->mem + EXYNOS_TRNG_CTRL);
++
++	/*
++	 * Disable post-processing. /dev/hwrng is supposed to deliver
++	 * unprocessed data.
++	 */
++	writel_relaxed(0, trng->mem + EXYNOS_TRNG_POST_CTRL);
++
++	return 0;
++}
++
++static int exynos_trng_probe(struct platform_device *pdev)
++{
++	struct exynos_trng_dev *trng;
++	struct resource *res;
++	int ret = -ENOMEM;
++
++	trng = devm_kzalloc(&pdev->dev, sizeof(*trng), GFP_KERNEL);
++	if (!trng)
++		return ret;
++
++	trng->rng.name = devm_kstrdup(&pdev->dev, dev_name(&pdev->dev),
++				      GFP_KERNEL);
++	if (!trng->rng.name)
++		return ret;
++
++	trng->rng.init = exynos_trng_init;
++	trng->rng.read = exynos_trng_do_read;
++	trng->rng.priv = (unsigned long) trng;
++
++	platform_set_drvdata(pdev, trng);
++	trng->dev = &pdev->dev;
++
++	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
++	trng->mem = devm_ioremap_resource(&pdev->dev, res);
++	if (IS_ERR(trng->mem)) {
++		dev_err(&pdev->dev, "Could not map IO resources.\n");
++		return PTR_ERR(trng->mem);
++	}
++
++	pm_runtime_enable(&pdev->dev);
++	ret = pm_runtime_get_sync(&pdev->dev);
++	if (ret < 0) {
++		dev_err(&pdev->dev, "Could not get runtime PM.\n");
++		goto err_pm_get;
++	}
++
++	trng->clk = devm_clk_get(&pdev->dev, "secss");
++	if (IS_ERR(trng->clk)) {
++		ret = PTR_ERR(trng->clk);
++		dev_err(&pdev->dev, "Could not get clock.\n");
++		goto err_clock;
++	}
++
++	ret = clk_prepare_enable(trng->clk);
++	if (ret) {
++		dev_err(&pdev->dev, "Could not enable the clk.\n");
++		goto err_clock;
++	}
++
++	ret = hwrng_register(&trng->rng);
++	if (ret) {
++		dev_err(&pdev->dev, "Could not register hwrng device.\n");
++		goto err_register;
++	}
++
++	dev_info(&pdev->dev, "Exynos True Random Number Generator.\n");
++
++	return 0;
++
++err_register:
++	clk_disable_unprepare(trng->clk);
++
++err_clock:
++	pm_runtime_put_sync(&pdev->dev);
++
++err_pm_get:
++	pm_runtime_disable(&pdev->dev);
++
++	return ret;
++}
++
++static int exynos_trng_remove(struct platform_device *pdev)
++{
++	struct exynos_trng_dev *trng =  platform_get_drvdata(pdev);
++
++	hwrng_unregister(&trng->rng);
++	clk_disable_unprepare(trng->clk);
++
++	pm_runtime_put_sync(&pdev->dev);
++	pm_runtime_disable(&pdev->dev);
++
++	return 0;
++}
++
++static int __maybe_unused exynos_trng_suspend(struct device *dev)
++{
++	pm_runtime_put_sync(dev);
++
++	return 0;
++}
++
++static int __maybe_unused exynos_trng_resume(struct device *dev)
++{
++	int ret;
++
++	ret = pm_runtime_get_sync(dev);
++	if (ret < 0) {
++		dev_err(dev, "Could not get runtime PM.\n");
++		pm_runtime_put_noidle(dev);
++		return ret;
++	}
++
++	return 0;
++}
++
++static SIMPLE_DEV_PM_OPS(exynos_trng_pm_ops, exynos_trng_suspend,
++			 exynos_trng_resume);
++
++static const struct of_device_id exynos_trng_dt_match[] = {
++	{
++		.compatible = "samsung,exynos5250-trng",
++	},
++	{ },
++};
++MODULE_DEVICE_TABLE(of, exynos_trng_dt_match);
++
++static struct platform_driver exynos_trng_driver = {
++	.driver = {
++		.name = "exynos-trng",
++		.pm = &exynos_trng_pm_ops,
++		.of_match_table = exynos_trng_dt_match,
++	},
++	.probe = exynos_trng_probe,
++	.remove = exynos_trng_remove,
++};
++
++module_platform_driver(exynos_trng_driver);
++MODULE_AUTHOR("Łukasz Stelmach");
++MODULE_DESCRIPTION("H/W TRNG driver for Exynos chips");
++MODULE_LICENSE("GPL v2");
+-- 
+2.11.0
