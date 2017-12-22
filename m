@@ -1,52 +1,39 @@
-From: Marek Szyprowski <m.szyprowski@samsung.com>
-Subject: Re: [PATCH v3 2/3] hwrng: exynos - add Samsung Exynos True RNG
- driver
-Date: Fri, 22 Dec 2017 09:29:38 +0100
-Message-ID: <916163bb-594b-779d-700c-de9fa15239dd@samsung.com>
-References: <20171204125351.26805-1-l.stelmach@samsung.com>
-        <CGME20171204125415eucas1p1f94e6996f08938f686c08c00247c62ce@eucas1p1.samsung.com>
-        <20171204125351.26805-3-l.stelmach@samsung.com>
-        <20171222082412.GB29663@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] crypto: chcr: select CRYPTO_GF128MUL
+Date: Fri, 22 Dec 2017 19:33:59 +1100
+Message-ID: <20171222083359.GC29663@gondor.apana.org.au>
+References: <20171205101032.985159-1-arnd@arndb.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Transfer-Encoding: 8bit
-Cc: "Andrew F . Davis" <afd@ti.com>,
-        PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Matt Mackall <mpm@selenic.com>,
-        Krzysztof Kozlowski <krzk@kernel.org>,
-        Kukjin Kim <kgene@kernel.org>, devicetree@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-samsung-soc@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        =?UTF-8?Q?=c5=81ukasz_Stelmach?= <l.stelmach@samsung.com>
-Return-path: <linux-samsung-soc-owner@vger.kernel.org>
-In-reply-to: <20171222082412.GB29663@gondor.apana.org.au>
-Content-language: en-US
-Sender: linux-samsung-soc-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: Harsh Jain <harsh@chelsio.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Arnd Bergmann <arnd@arndb.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from [128.1.224.119] ([128.1.224.119]:46164 "EHLO ringil.hmeau.com"
+        rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
+        id S1753417AbdLVIeJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 22 Dec 2017 03:34:09 -0500
+Content-Disposition: inline
+In-Reply-To: <20171205101032.985159-1-arnd@arndb.de>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
+On Tue, Dec 05, 2017 at 11:10:26AM +0100, Arnd Bergmann wrote:
+> Without the gf128mul library support, we can run into a link
+> error:
+> 
+> drivers/crypto/chelsio/chcr_algo.o: In function `chcr_update_tweak':
+> chcr_algo.c:(.text+0x7e0): undefined reference to `gf128mul_x8_ble'
+> 
+> This adds a Kconfig select statement for it, next to the ones we
+> already have.
+> 
+> Fixes: b8fd1f4170e7 ("crypto: chcr - Add ctr mode and process large sg entries for cipher")
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 
-On 2017-12-22 09:24, Herbert Xu wrote:
-> On Mon, Dec 04, 2017 at 01:53:50PM +0100, Łukasz Stelmach wrote:
->> Add support for True Random Number Generator found in Samsung Exynos
->> 5250+ SoCs.
->>
->> Signed-off-by: Łukasz Stelmach <l.stelmach@samsung.com>
-> This doesn't build for me:
->
->    CC [M]  drivers/char/hw_random/exynos-trng.o
-> ../drivers/char/hw_random/exynos-trng.c:230:1: error: \u2018exynos_rng_dt_match\u2019 undeclared here (not in a function)
-> ../drivers/char/hw_random/exynos-trng.c:230:1: error: \u2018__mod_of__exynos_rng_dt_match_device_table\u2019 aliased to undefined symbol \u2018exynos_rng_dt_match\u2019
-> make[2]: *** [drivers/char/hw_random/exynos-trng.o] Error 1
-> make[1]: *** [_module_drivers/char/hw_random] Error 2
-
-This looks like a missing dependency on "OF" when "COMPILE_TEST" is 
-selected.
-
-Best regards
+Patch applied.  Thanks.
 -- 
-Marek Szyprowski, PhD
-Samsung R&D Institute Poland
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
