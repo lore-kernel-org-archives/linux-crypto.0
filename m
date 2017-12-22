@@ -1,94 +1,60 @@
-From: Philippe Ombredanne <pombredanne@nexb.com>
-Subject: Re: [PATCH v4] hwrng: exynos - add Samsung Exynos True RNG driver
-Date: Fri, 22 Dec 2017 14:34:35 +0100
-Message-ID: <CAOFm3uG2aBHWUgVyzPuU8XJaLbm78cWEuWvgLEvNfc-hiefAbw@mail.gmail.com>
-References: <CGME20171222132349eucas1p2270e45b81c9d77cb09addfd769877098@eucas1p2.samsung.com>
- <20171204125351.26805-3-l.stelmach@samsung.com> <20171222132338.30054-1-l.stelmach@samsung.com>
+From: Antoine Tenart <antoine.tenart@free-electrons.com>
+Subject: Re: [PATCH 00/17] crypto: inside-secure - various improvements
+Date: Fri, 22 Dec 2017 15:28:38 +0100
+Message-ID: <20171222142838.GB8067@kwain>
+References: <20171214142659.16987-1-antoine.tenart@free-electrons.com>
+ <20171222091154.GJ32542@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Cc: "Andrew F . Davis" <afd@ti.com>,
-        PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Krzysztof Kozlowski <krzk@kernel.org>,
-        Kukjin Kim <kgene@kernel.org>,
-        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS"
-        <devicetree@vger.kernel.org>, linux-crypto@vger.kernel.org,
-        linux-samsung-soc@vger.kernel.org,
-        LKML <linux-kernel@vger.kernel.org>,
-        Marek Szyprowski <m.szyprowski@samsung.com>,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
-To: =?UTF-8?Q?=C5=81ukasz_Stelmach?= <l.stelmach@samsung.com>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+Cc: Antoine Tenart <antoine.tenart@free-electrons.com>,
+        davem@davemloft.net, thomas.petazzoni@free-electrons.com,
+        gregory.clement@free-electrons.com,
+        miquel.raynal@free-electrons.com, oferh@marvell.com,
+        igall@marvell.com, nadavh@marvell.com, linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f66.google.com ([74.125.82.66]:35886 "EHLO
-        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751737AbdLVNfR (ORCPT
+Received: from mail.free-electrons.com ([62.4.15.54]:52671 "EHLO
+        mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751980AbdLVO2u (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 22 Dec 2017 08:35:17 -0500
-Received: by mail-wm0-f66.google.com with SMTP id b76so21811131wmg.1
-        for <linux-crypto@vger.kernel.org>; Fri, 22 Dec 2017 05:35:16 -0800 (PST)
-In-Reply-To: <20171222132338.30054-1-l.stelmach@samsung.com>
+        Fri, 22 Dec 2017 09:28:50 -0500
+Content-Disposition: inline
+In-Reply-To: <20171222091154.GJ32542@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-=C5=81ukasz,
+Hi Herbert,
 
-On Fri, Dec 22, 2017 at 2:23 PM, =C5=81ukasz Stelmach <l.stelmach@samsung.c=
-om> wrote:
-> Add support for True Random Number Generator found in Samsung Exynos
-> 5250+ SoCs.
->
-> Signed-off-by: =C5=81ukasz Stelmach <l.stelmach@samsung.com>
-> Reviewed-by: Krzysztof Kozlowski <krzk@kernel.org>
+On Fri, Dec 22, 2017 at 08:11:54PM +1100, Herbert Xu wrote:
+> On Thu, Dec 14, 2017 at 03:26:42PM +0100, Antoine Tenart wrote:
+> > 
+> > This series depends on the previous one, "crypto: inside-secure - set of
+> > fixes"[1]. The series contains various improvements to the Inside Secure
+> > SafeXcel driver, which are bundled in a single series to avoid any
+> > conflict.
+> > 
+> > - Patches 1-4 are cosmetic fixes (typo, more comments and dead code removal).
+> > - Patches 5-8 are small improvements, mostly to improve the invalidation
+> >   path.
+> > - Patches 9-15 improve the request processing in the driver, by moving
+> >   the requests dequeing into a workqueue and the result handling into a
+> >   threaded IRQ thread. Other small improvements are made in the same
+> >   direction.
+> > - Patches 16-17 introduce the support of another revision of this crypto
+> >   engine, similar to the one already supported. This crypto engine can be
+> >   found on Marvell boards. (The corresponding device tree patches will follow
+> >   once this series lands in).
+> 
+> Patches 1-16 applied.  If patch 17 needs to go through the crypto
+> tree please let me know.
 
-<snip>
+Thanks! Yes patch 17 should got through the crypto tree as well.
 
-> --- /dev/null
-> +++ b/drivers/char/hw_random/exynos-trng.c
-> @@ -0,0 +1,245 @@
-> +/*
-> + * RNG driver for Exynos TRNGs
-> + *
-> + * Author: =C5=81ukasz Stelmach <l.stelmach@samsung.com>
-> + *
-> + * Copyright 2017 (c) Samsung Electronics Software, Inc.
-> + *
-> + * Based on the Exynos PRNG driver drivers/crypto/exynos-rng by
-> + * Krzysztof Koz=C5=82owski <krzk@kernel.org>
-> + *
-> + * This program is free software; you can redistribute it and/or modify
-> + * it under the terms of the GNU General Public License as published by
-> + * the Free Software Foundation;
-> + *
-> + * This program is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + * GNU General Public License for more details.
-> + */
+Thanks,
+Antoine
 
-
-Would you mind using the new SPDX tags documented in Thomas patch set
-[1] rather than this fine but longer legalese?
-
-And if you could spread the word to others in your team this would be very =
-nice.
-See also this fine article posted by Mauro on the Samsung Open Source
-Group Blog [2]
-Thank you!
-
-> +MODULE_LICENSE("GPL");
-
-Per module.h this means GPL2 or later. This is not matching your
-license above which does not state any version and therefore would
-mean GPL1 or later,
-Please make sure you use something and common rather than this and
-make sure your MODULE_LICENSE is consistent with the top level
-license.
-
-Was it this way in the code from Krzysztof?
-
-
-[1] https://lkml.org/lkml/2017/12/4/934
-[2] https://blogs.s-osg.org/linux-kernel-license-practices-revisited-spdx/
+-- 
+Antoine Ténart, Free Electrons
+Embedded Linux and Kernel engineering
+http://free-electrons.com
