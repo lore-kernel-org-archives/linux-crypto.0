@@ -1,49 +1,30 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 00/17] crypto: inside-secure - various improvements
-Date: Fri, 22 Dec 2017 20:11:54 +1100
-Message-ID: <20171222091154.GJ32542@gondor.apana.org.au>
-References: <20171214142659.16987-1-antoine.tenart@free-electrons.com>
+Subject: Re: [PATCH crypto] crypto: aesni - fix typo in generic_gcmaes_decrypt
+Date: Fri, 22 Dec 2017 20:10:46 +1100
+Message-ID: <20171222091045.GH32542@gondor.apana.org.au>
+References: <750b6e05579d7c186557be03acb1b6937a3f4498.1513172423.git.sd@queasysnail.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, thomas.petazzoni@free-electrons.com,
-        gregory.clement@free-electrons.com,
-        miquel.raynal@free-electrons.com, oferh@marvell.com,
-        igall@marvell.com, nadavh@marvell.com, linux-crypto@vger.kernel.org
-To: Antoine Tenart <antoine.tenart@free-electrons.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [128.1.224.119] ([128.1.224.119]:46530 "EHLO ringil.hmeau.com"
-        rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
-        id S965461AbdLVJOp (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 22 Dec 2017 04:14:45 -0500
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        sbrivio@redhat.com
+To: Sabrina Dubroca <sd@queasysnail.net>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20171214142659.16987-1-antoine.tenart@free-electrons.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <750b6e05579d7c186557be03acb1b6937a3f4498.1513172423.git.sd@queasysnail.net>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Dec 14, 2017 at 03:26:42PM +0100, Antoine Tenart wrote:
-> Hi Herbert,
+On Wed, Dec 13, 2017 at 02:53:43PM +0100, Sabrina Dubroca wrote:
+> generic_gcmaes_decrypt needs to use generic_gcmaes_ctx, not
+> aesni_rfc4106_gcm_ctx. This is actually harmless because the fields in
+> struct generic_gcmaes_ctx share the layout of the same fields in
+> aesni_rfc4106_gcm_ctx.
 > 
-> This series depends on the previous one, "crypto: inside-secure - set of
-> fixes"[1]. The series contains various improvements to the Inside Secure
-> SafeXcel driver, which are bundled in a single series to avoid any
-> conflict.
-> 
-> - Patches 1-4 are cosmetic fixes (typo, more comments and dead code removal).
-> - Patches 5-8 are small improvements, mostly to improve the invalidation
->   path.
-> - Patches 9-15 improve the request processing in the driver, by moving
->   the requests dequeing into a workqueue and the result handling into a
->   threaded IRQ thread. Other small improvements are made in the same
->   direction.
-> - Patches 16-17 introduce the support of another revision of this crypto
->   engine, similar to the one already supported. This crypto engine can be
->   found on Marvell boards. (The corresponding device tree patches will follow
->   once this series lands in).
+> Fixes: cce2ea8d90fe ("crypto: aesni - add generic gcm(aes)")
+> Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
+> Reviewed-by: Stefano Brivio <sbrivio@redhat.com>
 
-Patches 1-16 applied.  If patch 17 needs to go through the crypto
-tree please let me know.
-
-Thanks,
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
