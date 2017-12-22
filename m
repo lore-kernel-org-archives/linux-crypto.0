@@ -1,31 +1,30 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: gf128mul - remove incorrect comment
-Date: Fri, 22 Dec 2017 20:07:10 +1100
-Message-ID: <20171222090710.GD32542@gondor.apana.org.au>
-References: <20171211215826.72183-1-ebiggers3@gmail.com>
+Subject: Re: [PATCH v2] crypto: artpec6: set correct iv size for gcm(aes)
+Date: Fri, 22 Dec 2017 20:09:32 +1100
+Message-ID: <20171222090932.GA32660@gondor.apana.org.au>
+References: <20171212114022.11327-1-larper@axis.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, Eric Biggers <ebiggers@google.com>,
-        Harsh Jain <harsh@chelsio.com>
-To: Eric Biggers <ebiggers3@gmail.com>
+Cc: linux-arm-kernel@axis.com, linux-crypto@vger.kernel.org,
+        larper@axis.com
+To: Lars Persson <lars.persson@axis.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [128.1.224.119] ([128.1.224.119]:46420 "EHLO ringil.hmeau.com"
+Received: from [128.1.224.119] ([128.1.224.119]:46456 "EHLO ringil.hmeau.com"
         rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
-        id S933922AbdLVJHR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 22 Dec 2017 04:07:17 -0500
+        id S965671AbdLVJJg (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 22 Dec 2017 04:09:36 -0500
 Content-Disposition: inline
-In-Reply-To: <20171211215826.72183-1-ebiggers3@gmail.com>
+In-Reply-To: <20171212114022.11327-1-larper@axis.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Dec 11, 2017 at 01:58:26PM -0800, Eric Biggers wrote:
-> From: Eric Biggers <ebiggers@google.com>
+Lars Persson <lars.persson@axis.com> wrote:
+> The IV size should not include the 32 bit counter. Because we had the
+> IV size set as 16 the transform only worked when the IV input was zero
+> padded.
 > 
-> The comment in gf128mul_x8_ble() was copy-and-pasted from gf128mul.h and
-> makes no sense in the new context.  Remove it.
-> 
-> Cc: Harsh Jain <harsh@chelsio.com>
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> Fixes: a21eb94fc4d3 ("crypto: axis - add ARTPEC-6/7 crypto accelerator driver")
+> Signed-off-by: Lars Persson <larper@axis.com>
 
 Patch applied.  Thanks.
 -- 
