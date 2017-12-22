@@ -1,30 +1,34 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 2/2] crypto: seqiv - Remove unused alg/spawn variable
-Date: Fri, 22 Dec 2017 20:10:22 +1100
-Message-ID: <20171222091022.GG32542@gondor.apana.org.au>
-References: <1513107014-11975-1-git-send-email-clabbe@baylibre.com>
- <1513107014-11975-2-git-send-email-clabbe@baylibre.com>
+Subject: Re: [PATCH v2] hwrng: Clean up RNG list when last hwrng is
+ unregistered
+Date: Fri, 22 Dec 2017 20:12:19 +1100
+Message-ID: <20171222091219.GK32542@gondor.apana.org.au>
+References: <151336772989.60446.16322941485803241258.stgit@sosxen2.amd.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-To: Corentin Labbe <clabbe@baylibre.com>
+Cc: linux-crypto@vger.kernel.org, thomas.lendacky@amd.com,
+        davem@davemloft.net
+To: Gary R Hook <gary.hook@amd.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [128.1.224.119] ([128.1.224.119]:46486 "EHLO ringil.hmeau.com"
+Received: from [128.1.224.119] ([128.1.224.119]:46500 "EHLO ringil.hmeau.com"
         rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
-        id S965148AbdLVJK3 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 22 Dec 2017 04:10:29 -0500
+        id S932637AbdLVJNt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 22 Dec 2017 04:13:49 -0500
 Content-Disposition: inline
-In-Reply-To: <1513107014-11975-2-git-send-email-clabbe@baylibre.com>
+In-Reply-To: <151336772989.60446.16322941485803241258.stgit@sosxen2.amd.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Dec 12, 2017 at 07:30:14PM +0000, Corentin Labbe wrote:
-> This patch remove two unused variable and some dead "code" using it.
+On Fri, Dec 15, 2017 at 01:55:59PM -0600, Gary R Hook wrote:
+> Commit 142a27f0a731 added support for a "best" RNG, and in doing so
+> introduced a hang from rmmod/modprobe -r when the last RNG on the list
+> was unloaded.
 > 
-> Fixes: 92932d03c2b3 ("crypto: seqiv - Remove AEAD compatibility code")
+> When the hwrng list is depleted, return the global variables to their
+> original state and decrement all references to the object.
 > 
-> Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
+> Fixes: 142a27f0a731 ("hwrng: core - Reset user selected rng by writing "" to rng_current")
+> Signed-off-by: Gary R Hook <gary.hook@amd.com>
 
 Patch applied.  Thanks.
 -- 
