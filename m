@@ -1,40 +1,40 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: pcrypt - fix freeing pcrypt instances
-Date: Fri, 22 Dec 2017 19:36:36 +1100
-Message-ID: <20171222083635.GA30861@gondor.apana.org.au>
-References: <94eb2c05a380d3908b056096eb58@google.com>
- <20171220222825.207321-1-ebiggers3@gmail.com>
+Subject: Re: [PATCH 02/45] drivers: crypto: remove duplicate includes
+Date: Fri, 22 Dec 2017 19:37:31 +1100
+Message-ID: <20171222083731.GA30924@gondor.apana.org.au>
+References: <1512439057-15443-1-git-send-email-pravin.shedge4linux@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-        Eric Biggers <ebiggers@google.com>, stable@vger.kernel.org
-To: Eric Biggers <ebiggers3@gmail.com>
-Return-path: <stable-owner@vger.kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Gary Hook <gary.hook@amd.com>,
+        Corentin LABBE <clabbe.montjoie@gmail.com>,
+        Steve Lin <steven.lin1@broadcom.com>,
+        Rob Rice <rob.rice@broadcom.com>,
+        raveendra padasalagi <raveendra.padasalagi@broadcom.com>,
+        Colin Ian King <colin.king@canonical.com>,
+        "Gustavo A. R. Silva" <garsilva@embeddedor.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Kate Stewart <kstewart@linuxfoundation.org>,
+        Srikanth Jampala <Jampala.Srikanth@cavium.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Pravin Shedge <pravin.shedge4linux@gmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from [128.1.224.119] ([128.1.224.119]:46260 "EHLO ringil.hmeau.com"
+        rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
+        id S1751349AbdLVIiC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 22 Dec 2017 03:38:02 -0500
 Content-Disposition: inline
-In-Reply-To: <20171220222825.207321-1-ebiggers3@gmail.com>
-Sender: stable-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <1512439057-15443-1-git-send-email-pravin.shedge4linux@gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Dec 20, 2017 at 02:28:25PM -0800, Eric Biggers wrote:
-> From: Eric Biggers <ebiggers@google.com>
+On Tue, Dec 05, 2017 at 07:27:22AM +0530, Pravin Shedge wrote:
+> These duplicate includes have been found with scripts/checkincludes.pl but
+> they have been removed manually to avoid removing false positives.
 > 
-> pcrypt is using the old way of freeing instances, where the ->free()
-> method specified in the 'struct crypto_template' is passed a pointer to
-> the 'struct crypto_instance'.  But the crypto_instance is being
-> kfree()'d directly, which is incorrect because the memory was actually
-> allocated as an aead_instance, which contains the crypto_instance at a
-> nonzero offset.  Thus, the wrong pointer was being kfree()'d.
-> 
-> Fix it by switching to the new way to free aead_instance's where the
-> ->free() method is specified in the aead_instance itself.
-> 
-> Reported-by: syzbot <syzkaller@googlegroups.com>
-> Fixes: 0496f56065e0 ("crypto: pcrypt - Add support for new AEAD interface")
-> Cc: <stable@vger.kernel.org> # v4.2+
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> Signed-off-by: Pravin Shedge <pravin.shedge4linux@gmail.com>
 
 Patch applied.  Thanks.
 -- 
