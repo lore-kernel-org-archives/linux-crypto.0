@@ -1,60 +1,55 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v3 2/3] hwrng: exynos - add Samsung Exynos True RNG driver
-Date: Fri, 22 Dec 2017 19:35:51 +1100
-Message-ID: <20171222083551.GF29663@gondor.apana.org.au>
-References: <20171204125351.26805-1-l.stelmach@samsung.com>
- <CGME20171204125415eucas1p1f94e6996f08938f686c08c00247c62ce@eucas1p1.samsung.com>
- <20171204125351.26805-3-l.stelmach@samsung.com>
- <20171222082412.GB29663@gondor.apana.org.au>
- <916163bb-594b-779d-700c-de9fa15239dd@samsung.com>
+Subject: Re: [PATCH] crypto: n2 - cure use after free
+Date: Fri, 22 Dec 2017 19:36:16 +1100
+Message-ID: <20171222083616.GA30844@gondor.apana.org.au>
+References: <20171219180907.12895-1-jengelh@inai.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Cc: =?utf-8?Q?=C5=81ukasz?= Stelmach <l.stelmach@samsung.com>,
-        "Andrew F . Davis" <afd@ti.com>,
-        PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Matt Mackall <mpm@selenic.com>,
-        Krzysztof Kozlowski <krzk@kernel.org>,
-        Kukjin Kim <kgene@kernel.org>, devicetree@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-samsung-soc@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
-To: Marek Szyprowski <m.szyprowski@samsung.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [128.1.224.119] ([128.1.224.119]:46198 "EHLO ringil.hmeau.com"
-        rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
-        id S1751885AbdLVIf7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 22 Dec 2017 03:35:59 -0500
+Content-Type: text/plain; charset=us-ascii
+Cc: davem@davemloft.net, sparclinux@vger.kernel.org, jengelh@inai.de,
+        linux-crypto@vger.kernel.org, rmk+kernel@arm.linux.org.uk
+To: Jan Engelhardt <jengelh@inai.de>
+Return-path: <sparclinux-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <916163bb-594b-779d-700c-de9fa15239dd@samsung.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <20171219180907.12895-1-jengelh@inai.de>
+Sender: sparclinux-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Dec 22, 2017 at 09:29:38AM +0100, Marek Szyprowski wrote:
-> Hi,
+Jan Engelhardt <jengelh@inai.de> wrote:
+> queue_cache_init is first called for the Control Word Queue
+> (n2_crypto_probe). At that time, queue_cache[0] is NULL and a new
+> kmem_cache will be allocated. If the subsequent n2_register_algs call
+> fails, the kmem_cache will be released in queue_cache_destroy, but
+> queue_cache_init[0] is not set back to NULL.
 > 
-> On 2017-12-22 09:24, Herbert Xu wrote:
-> >On Mon, Dec 04, 2017 at 01:53:50PM +0100, Łukasz Stelmach wrote:
-> >>Add support for True Random Number Generator found in Samsung Exynos
-> >>5250+ SoCs.
-> >>
-> >>Signed-off-by: Łukasz Stelmach <l.stelmach@samsung.com>
-> >This doesn't build for me:
-> >
-> >   CC [M]  drivers/char/hw_random/exynos-trng.o
-> >../drivers/char/hw_random/exynos-trng.c:230:1: error: \u2018exynos_rng_dt_match\u2019 undeclared here (not in a function)
-> >../drivers/char/hw_random/exynos-trng.c:230:1: error: \u2018__mod_of__exynos_rng_dt_match_device_table\u2019 aliased to undefined symbol \u2018exynos_rng_dt_match\u2019
-> >make[2]: *** [drivers/char/hw_random/exynos-trng.o] Error 1
-> >make[1]: *** [_module_drivers/char/hw_random] Error 2
+> So when the Module Arithmetic Unit gets probed next (n2_mau_probe),
+> queue_cache_init will not allocate a kmem_cache again, but leave it
+> as its bogus value, causing a BUG() to trigger when queue_cache[0] is
+> eventually passed to kmem_cache_zalloc:
 > 
-> This looks like a missing dependency on "OF" when "COMPILE_TEST" is
-> selected.
+>        n2_crypto: Found N2CP at /virtual-devices@100/n2cp@7
+>        n2_crypto: Registered NCS HVAPI version 2.0
+>        called queue_cache_init
+>        n2_crypto: md5 alg registration failed
+>        n2cp f028687c: /virtual-devices@100/n2cp@7: Unable to register algorithms.
+>        called queue_cache_destroy
+>        n2cp: probe of f028687c failed with error -22
+>        n2_crypto: Found NCP at /virtual-devices@100/ncp@6
+>        n2_crypto: Registered NCS HVAPI version 2.0
+>        called queue_cache_init
+>        kernel BUG at mm/slab.c:2993!
+>        Call Trace:
+>         [0000000000604488] kmem_cache_alloc+0x1a8/0x1e0
+>                  (inlined) kmem_cache_zalloc
+>                  (inlined) new_queue
+>                  (inlined) spu_queue_setup
+>                  (inlined) handle_exec_unit
+>         [0000000010c61eb4] spu_mdesc_scan+0x1f4/0x460 [n2_crypto]
+>         [0000000010c62b80] n2_mau_probe+0x100/0x220 [n2_crypto]
+>         [000000000084b174] platform_drv_probe+0x34/0xc0
+> 
+> Signed-off-by: Jan Engelhardt <jengelh@inai.de>
 
-Actually it looks like a typo.  The variable is actually called
-exynos_trng_dt_match as opposed to exynos_rng_dt_match.
-
-Cheers,
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
