@@ -1,31 +1,34 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH crypto] crypto: aesni - add wrapper for generic gcm(aes)
-Date: Fri, 22 Dec 2017 20:10:53 +1100
-Message-ID: <20171222091053.GI32542@gondor.apana.org.au>
-References: <0a60d233428e2e9bca747a29712688b6e66b59ac.1513172421.git.sd@queasysnail.net>
+Subject: Re: [PATCH v4 0/4] crypto: inside-secure - set of fixes
+Date: Fri, 22 Dec 2017 20:04:37 +1100
+Message-ID: <20171222090437.GA32542@gondor.apana.org.au>
+References: <20171211111058.8878-1-antoine.tenart@free-electrons.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        sbrivio@redhat.com, ilyal@mellanox.com
-To: Sabrina Dubroca <sd@queasysnail.net>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Cc: davem@davemloft.net, thomas.petazzoni@free-electrons.com,
+        gregory.clement@free-electrons.com,
+        miquel.raynal@free-electrons.com, oferh@marvell.com,
+        igall@marvell.com, nadavh@marvell.com, linux-crypto@vger.kernel.org
+To: Antoine Tenart <antoine.tenart@free-electrons.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from [128.1.224.119] ([128.1.224.119]:46374 "EHLO ringil.hmeau.com"
+        rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
+        id S934029AbdLVJEv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 22 Dec 2017 04:04:51 -0500
 Content-Disposition: inline
-In-Reply-To: <0a60d233428e2e9bca747a29712688b6e66b59ac.1513172421.git.sd@queasysnail.net>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <20171211111058.8878-1-antoine.tenart@free-electrons.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Dec 13, 2017 at 02:54:36PM +0100, Sabrina Dubroca wrote:
-> When I added generic-gcm-aes I didn't add a wrapper like the one
-> provided for rfc4106(gcm(aes)). We need to add a cryptd wrapper to fall
-> back on in case the FPU is not available, otherwise we might corrupt the
-> FPU state.
+On Mon, Dec 11, 2017 at 12:10:54PM +0100, Antoine Tenart wrote:
+> Hi Herbert,
 > 
-> Fixes: cce2ea8d90fe ("crypto: aesni - add generic gcm(aes)")
-> Reported-by: Ilya Lesokhin <ilyal@mellanox.com>
-> Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
-> Reviewed-by: Stefano Brivio <sbrivio@redhat.com>
+> This series is a set of 4 fixes on the Inside Secure SafeXcel crypto
+> engine driver. The series will be followed by another non-fix one.
+> 
+> This is based on v4.15-rc3.
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
