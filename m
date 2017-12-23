@@ -1,172 +1,136 @@
-From: Christian Lamparter <chunkeey@gmail.com>
-Subject: [PATCH v1] crypto: crypto4xx - perform aead icv check in the driver
-Date: Sat, 23 Dec 2017 19:45:46 +0100
-Message-ID: <7d26eb8de324eb17d99d2e4b0aa271b6c75ef889.1514054717.git.chunkeey@gmail.com>
-To: linux-crypto@vger.kernel.org
+From: Eric Biggers <ebiggers3@gmail.com>
+Subject: Re: INFO: task hung in lock_sock_nested
+Date: Sat, 23 Dec 2017 14:15:47 -0600
+Message-ID: <20171223201547.GA10162@zzz.localdomain>
+References: <f403043d11cc35affd055ffc8374@google.com>
+ <CACT4Y+ZAYckRqi4v+XTdn-eq6LdrxoXsCDvCycthsn44kLJNzQ@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: syzbot
+        <bot+b09be8359497f2f986abf4f2db0e26de6ab1a00e@syzkaller.appspotmail.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        syzkaller-bugs@googlegroups.com,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        David Miller <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org
+To: Dmitry Vyukov <dvyukov@google.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f66.google.com ([74.125.82.66]:40588 "EHLO
-        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752902AbdLWSpu (ORCPT
+Received: from mail-io0-f194.google.com ([209.85.223.194]:36657 "EHLO
+        mail-io0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750802AbdLWUPw (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 23 Dec 2017 13:45:50 -0500
-Received: by mail-wm0-f66.google.com with SMTP id f206so26678051wmf.5
-        for <linux-crypto@vger.kernel.org>; Sat, 23 Dec 2017 10:45:50 -0800 (PST)
-Received: from debian64.daheim (p5B0D7224.dip0.t-ipconnect.de. [91.13.114.36])
-        by smtp.gmail.com with ESMTPSA id d71sm14574629wma.7.2017.12.23.10.45.47
-        for <linux-crypto@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Sat, 23 Dec 2017 10:45:47 -0800 (PST)
-Received: from chuck by debian64.daheim with local (Exim 4.90_RC4)
-        (envelope-from <chunkeey@gmail.com>)
-        id 1eSonq-00046p-Se
-        for linux-crypto@vger.kernel.org; Sat, 23 Dec 2017 19:45:46 +0100
+        Sat, 23 Dec 2017 15:15:52 -0500
+Content-Disposition: inline
+In-Reply-To: <CACT4Y+ZAYckRqi4v+XTdn-eq6LdrxoXsCDvCycthsn44kLJNzQ@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The ccm-aes-ppc4xx now fails one of testmgr's expected
-failure test cases as such:
+On Tue, Dec 12, 2017 at 05:47:34PM +0100, Dmitry Vyukov wrote:
+> On Sun, Dec 10, 2017 at 2:37 PM, syzbot
+> <bot+b09be8359497f2f986abf4f2db0e26de6ab1a00e@syzkaller.appspotmail.com>
+> wrote:
+> > Hello,
+> >
+> > syzkaller hit the following crash on
+> > 51e18a453f5f59a40c721d4aeab082b4e2e9fac6
+> > git://git.kernel.org/pub/scm/linux/kernel/git/davem/net-next.git/master
+> > compiler: gcc (GCC) 7.1.1 20170620
+> > .config is attached
+> > Raw console output is attached.
+> >
+> > Unfortunately, I don't have any reproducer for this bug yet.
+> >
+> >
+> > RDS: rds_bind could not find a transport for 172.20.1.187, load rds_tcp or
+> > rds_rdma?
+> > INFO: task syz-executor2:19495 blocked for more than 120 seconds.
+> >       Not tainted 4.15.0-rc2+ #148
+> > "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+> > syz-executor2   D25200 19495   3406 0x00000004
+> > Call Trace:
+> >  context_switch kernel/sched/core.c:2799 [inline]
+> >  __schedule+0x8eb/0x2060 kernel/sched/core.c:3375
+> >  schedule+0xf5/0x430 kernel/sched/core.c:3434
+> >  __lock_sock+0x1dc/0x2f0 net/core/sock.c:2240
+> >  lock_sock_nested+0xf3/0x110 net/core/sock.c:2764
+> >  lock_sock include/net/sock.h:1461 [inline]
+> >  af_alg_sendmsg+0x349/0x1080 crypto/af_alg.c:858
+> >  aead_sendmsg+0x103/0x150 crypto/algif_aead.c:76
+> >  sock_sendmsg_nosec net/socket.c:636 [inline]
+> >  sock_sendmsg+0xca/0x110 net/socket.c:646
+> >  ___sys_sendmsg+0x75b/0x8a0 net/socket.c:2026
+> >  __sys_sendmsg+0xe5/0x210 net/socket.c:2060
+> >  SYSC_sendmsg net/socket.c:2071 [inline]
+> >  SyS_sendmsg+0x2d/0x50 net/socket.c:2067
+> >  entry_SYSCALL_64_fastpath+0x1f/0x96
+> > RIP: 0033:0x452a39
+> > RSP: 002b:00007f63f58cfc58 EFLAGS: 00000212 ORIG_RAX: 000000000000002e
+> > RAX: ffffffffffffffda RBX: 0000000000758020 RCX: 0000000000452a39
+> > RDX: 0000000000000040 RSI: 0000000020630000 RDI: 0000000000000015
+> > RBP: 0000000000000001 R08: 0000000000000000 R09: 0000000000000000
+> > R10: 0000000000000000 R11: 0000000000000212 R12: 00000000006ee0b8
+> > R13: 00000000ffffffff R14: 00007f63f58d06d4 R15: 0000000000000000
+> >
+> > Showing all locks held in the system:
+> > 2 locks held by khungtaskd/663:
+> >  #0:  (rcu_read_lock){....}, at: [<00000000b2540f7c>]
+> > check_hung_uninterruptible_tasks kernel/hung_task.c:175 [inline]
+> >  #0:  (rcu_read_lock){....}, at: [<00000000b2540f7c>] watchdog+0x1c5/0xd60
+> > kernel/hung_task.c:249
+> >  #1:  (tasklist_lock){.+.+}, at: [<00000000b425f323>]
+> > debug_show_all_locks+0xd3/0x400 kernel/locking/lockdep.c:4554
+> > 1 lock held by rsyslogd/3008:
+> >  #0:  (&f->f_pos_lock){+.+.}, at: [<00000000d620dede>]
+> > __fdget_pos+0x131/0x1a0 fs/file.c:770
+> > 2 locks held by getty/3130:
+> >  #0:  (&tty->ldisc_sem){++++}, at: [<00000000ed362dba>]
+> > ldsem_down_read+0x37/0x40 drivers/tty/tty_ldsem.c:365
+> >  #1:  (&ldata->atomic_read_lock){+.+.}, at: [<000000002bd4e259>]
+> > n_tty_read+0x2f2/0x1a10 drivers/tty/n_tty.c:2131
+> > 2 locks held by getty/3131:
+> >  #0:  (&tty->ldisc_sem){++++}, at: [<00000000ed362dba>]
+> > ldsem_down_read+0x37/0x40 drivers/tty/tty_ldsem.c:365
+> >  #1:  (&ldata->atomic_read_lock){+.+.}, at: [<000000002bd4e259>]
+> > n_tty_read+0x2f2/0x1a10 drivers/tty/n_tty.c:2131
+> > 2 locks held by getty/3132:
+> >  #0:  (&tty->ldisc_sem){++++}, at: [<00000000ed362dba>]
+> > ldsem_down_read+0x37/0x40 drivers/tty/tty_ldsem.c:365
+> >  #1:  (&ldata->atomic_read_lock){+.+.}, at: [<000000002bd4e259>]
+> > n_tty_read+0x2f2/0x1a10 drivers/tty/n_tty.c:2131
+> > 2 locks held by getty/3133:
+> >  #0:  (&tty->ldisc_sem){++++}, at: [<00000000ed362dba>]
+> > ldsem_down_read+0x37/0x40 drivers/tty/tty_ldsem.c:365
+> >  #1:  (&ldata->atomic_read_lock){+.+.}, at: [<000000002bd4e259>]
+> > n_tty_read+0x2f2/0x1a10 drivers/tty/n_tty.c:2131
+> > 2 locks held by getty/3134:
+> >  #0:  (&tty->ldisc_sem){++++}, at: [<00000000ed362dba>]
+> > ldsem_down_read+0x37/0x40 drivers/tty/tty_ldsem.c:365
+> >  #1:  (&ldata->atomic_read_lock){+.+.}, at: [<000000002bd4e259>]
+> > n_tty_read+0x2f2/0x1a10 drivers/tty/n_tty.c:2131
+> > 2 locks held by getty/3135:
+> >  #0:  (&tty->ldisc_sem){++++}, at: [<00000000ed362dba>]
+> > ldsem_down_read+0x37/0x40 drivers/tty/tty_ldsem.c:365
+> >  #1:  (&ldata->atomic_read_lock){+.+.}, at: [<000000002bd4e259>]
+> > n_tty_read+0x2f2/0x1a10 drivers/tty/n_tty.c:2131
+> > 2 locks held by getty/3136:
+> >  #0:  (&tty->ldisc_sem){++++}, at: [<00000000ed362dba>]
+> > ldsem_down_read+0x37/0x40 drivers/tty/tty_ldsem.c:365
+> >  #1:  (&ldata->atomic_read_lock){+.+.}, at: [<000000002bd4e259>]
+> > n_tty_read+0x2f2/0x1a10 drivers/tty/n_tty.c:2131
+> > 1 lock held by syz-executor2/19506:
+> >  #0:  (sk_lock-AF_ALG){+.+.}, at: [<00000000bb9361fc>] lock_sock
+> > include/net/sock.h:1461 [inline]
+> >  #0:  (sk_lock-AF_ALG){+.+.}, at: [<00000000bb9361fc>]
+> > aead_recvmsg+0xb3/0x1bc0 crypto/algif_aead.c:327
+> >
 
-|decryption failed on test 10 for ccm-aes-ppc4xx:
-|ret was 0, |expected -EBADMSG
+I think this is a duplicate:
 
-It doesn't look like the hardware sets the authentication failure
-flag. The original vendor source from which this was ported does
-not have any special code or notes about why this would happen or
-if there are any WAs.
+#syz dup: INFO: task hung in aead_recvmsg
 
-Hence, this patch converts the aead_done callback handler to
-perform the icv check in the driver. And this fixes the false
-negative and the ccm-aes-ppc4xx passes the selftests once again.
+There is a thread hung in aead_recvmsg() while holding the socket lock, so it's
+blocking other threads too.
 
-|name         : ccm(aes)
-|driver       : ccm-aes-ppc4xx
-|module       : crypto4xx
-|priority     : 300
-|refcnt       : 1
-|selftest     : passed
-|internal     : no
-|type         : aead
-|async        : yes
-|blocksize    : 1
-|ivsize       : 16
-|maxauthsize  : 16
-|geniv        : <none>
-
-Signed-off-by: Christian Lamparter <chunkeey@gmail.com>
----
- drivers/crypto/amcc/crypto4xx_alg.c  |  6 +---
- drivers/crypto/amcc/crypto4xx_core.c | 54 ++++++++++++++++++------------------
- 2 files changed, 28 insertions(+), 32 deletions(-)
-
-diff --git a/drivers/crypto/amcc/crypto4xx_alg.c b/drivers/crypto/amcc/crypto4xx_alg.c
-index eeaf27859d80..ea83d0bff0e9 100644
---- a/drivers/crypto/amcc/crypto4xx_alg.c
-+++ b/drivers/crypto/amcc/crypto4xx_alg.c
-@@ -256,10 +256,6 @@ static inline bool crypto4xx_aead_need_fallback(struct aead_request *req,
- 	if (is_ccm && !(req->iv[0] == 1 || req->iv[0] == 3))
- 		return true;
- 
--	/* CCM - fix CBC MAC mismatch in special case */
--	if (is_ccm && decrypt && !req->assoclen)
--		return true;
--
- 	return false;
- }
- 
-@@ -330,7 +326,7 @@ int crypto4xx_setkey_aes_ccm(struct crypto_aead *cipher, const u8 *key,
- 	sa = (struct dynamic_sa_ctl *) ctx->sa_in;
- 	sa->sa_contents.w = SA_AES_CCM_CONTENTS | (keylen << 2);
- 
--	set_dynamic_sa_command_0(sa, SA_NOT_SAVE_HASH, SA_NOT_SAVE_IV,
-+	set_dynamic_sa_command_0(sa, SA_SAVE_HASH, SA_NOT_SAVE_IV,
- 				 SA_LOAD_HASH_FROM_SA, SA_LOAD_IV_FROM_STATE,
- 				 SA_NO_HEADER_PROC, SA_HASH_ALG_CBC_MAC,
- 				 SA_CIPHER_ALG_AES,
-diff --git a/drivers/crypto/amcc/crypto4xx_core.c b/drivers/crypto/amcc/crypto4xx_core.c
-index f148627e925c..ad19aa806931 100644
---- a/drivers/crypto/amcc/crypto4xx_core.c
-+++ b/drivers/crypto/amcc/crypto4xx_core.c
-@@ -577,15 +577,14 @@ static void crypto4xx_aead_done(struct crypto4xx_device *dev,
- 				struct pd_uinfo *pd_uinfo,
- 				struct ce_pd *pd)
- {
--	struct aead_request *aead_req;
--	struct crypto4xx_ctx *ctx;
-+	struct aead_request *aead_req = container_of(pd_uinfo->async_req,
-+		struct aead_request, base);
- 	struct scatterlist *dst = pd_uinfo->dest_va;
-+	size_t cp_len = crypto_aead_authsize(
-+		crypto_aead_reqtfm(aead_req));
-+	u32 icv[cp_len];
- 	int err = 0;
- 
--	aead_req = container_of(pd_uinfo->async_req, struct aead_request,
--				base);
--	ctx  = crypto_tfm_ctx(aead_req->base.tfm);
--
- 	if (pd_uinfo->using_sd) {
- 		crypto4xx_copy_pkt_to_dst(dev, pd, pd_uinfo,
- 					  pd->pd_ctl_len.bf.pkt_len,
-@@ -597,38 +596,39 @@ static void crypto4xx_aead_done(struct crypto4xx_device *dev,
- 
- 	if (pd_uinfo->sa_va->sa_command_0.bf.dir == DIR_OUTBOUND) {
- 		/* append icv at the end */
--		size_t cp_len = crypto_aead_authsize(
--			crypto_aead_reqtfm(aead_req));
--		u32 icv[cp_len];
--
- 		crypto4xx_memcpy_from_le32(icv, pd_uinfo->sr_va->save_digest,
- 					   cp_len);
- 
- 		scatterwalk_map_and_copy(icv, dst, aead_req->cryptlen,
- 					 cp_len, 1);
-+	} else {
-+		/* check icv at the end */
-+		scatterwalk_map_and_copy(icv, aead_req->src,
-+			aead_req->assoclen + aead_req->cryptlen -
-+			cp_len, cp_len, 0);
-+
-+		crypto4xx_memcpy_from_le32(icv, icv, cp_len);
-+
-+		if (crypto_memneq(icv, pd_uinfo->sr_va->save_digest, cp_len))
-+			err = -EBADMSG;
- 	}
- 
- 	crypto4xx_ret_sg_desc(dev, pd_uinfo);
- 
- 	if (pd->pd_ctl.bf.status & 0xff) {
--		if (pd->pd_ctl.bf.status & 0x1) {
--			/* authentication error */
--			err = -EBADMSG;
--		} else {
--			if (!__ratelimit(&dev->aead_ratelimit)) {
--				if (pd->pd_ctl.bf.status & 2)
--					pr_err("pad fail error\n");
--				if (pd->pd_ctl.bf.status & 4)
--					pr_err("seqnum fail\n");
--				if (pd->pd_ctl.bf.status & 8)
--					pr_err("error _notify\n");
--				pr_err("aead return err status = 0x%02x\n",
--					pd->pd_ctl.bf.status & 0xff);
--				pr_err("pd pad_ctl = 0x%08x\n",
--					pd->pd_ctl.bf.pd_pad_ctl);
--			}
--			err = -EINVAL;
-+		if (!__ratelimit(&dev->aead_ratelimit)) {
-+			if (pd->pd_ctl.bf.status & 2)
-+				pr_err("pad fail error\n");
-+			if (pd->pd_ctl.bf.status & 4)
-+				pr_err("seqnum fail\n");
-+			if (pd->pd_ctl.bf.status & 8)
-+				pr_err("error _notify\n");
-+			pr_err("aead return err status = 0x%02x\n",
-+				pd->pd_ctl.bf.status & 0xff);
-+			pr_err("pd pad_ctl = 0x%08x\n",
-+				pd->pd_ctl.bf.pd_pad_ctl);
- 		}
-+		err = -EINVAL;
- 	}
- 
- 	if (pd_uinfo->state & PD_ENTRY_BUSY)
--- 
-2.15.1
+Eric
