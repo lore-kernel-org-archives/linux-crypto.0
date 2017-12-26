@@ -1,83 +1,81 @@
-From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: Re: [QUESTION] hash import and request initialization
-Date: Tue, 26 Dec 2017 14:21:53 +0200
-Message-ID: <CAOtvUMeEw88mYVjb7bDLwGb67aXi2p5e-uRXn0XrDe0uddyT6g@mail.gmail.com>
-References: <CAOtvUMdsqEpUSSBZXxHPzuO-84B3VKxRLLN=y1cxfNbt+5qpSQ@mail.gmail.com>
- <20171226030751.GA11758@gondor.apana.org.au> <CAOtvUMfkGgyhCTUpfpegfmR3DNYhvfRN4oHL1tY9RMRh5sfCfQ@mail.gmail.com>
- <20171226104010.GA28275@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+From: Antoine Tenart <antoine.tenart@free-electrons.com>
+Subject: [PATCH 2/2] crypto: inside-secure - fix hash when length is a multiple of a block
+Date: Tue, 26 Dec 2017 17:21:17 +0100
+Message-ID: <20171226162117.4885-3-antoine.tenart@free-electrons.com>
+References: <20171226162117.4885-1-antoine.tenart@free-electrons.com>
+Cc: Antoine Tenart <antoine.tenart@free-electrons.com>,
+        thomas.petazzoni@free-electrons.com,
+        gregory.clement@free-electrons.com,
+        miquel.raynal@free-electrons.com, oferh@marvell.com,
+        igall@marvell.com, nadavh@marvell.com, linux-crypto@vger.kernel.org
+To: herbert@gondor.apana.org.au, davem@davemloft.net
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ot0-f172.google.com ([74.125.82.172]:35696 "EHLO
-        mail-ot0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750781AbdLZMVy (ORCPT
+Received: from mail.free-electrons.com ([62.4.15.54]:53374 "EHLO
+        mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750777AbdLZQfE (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 26 Dec 2017 07:21:54 -0500
-Received: by mail-ot0-f172.google.com with SMTP id q5so8740497oth.2
-        for <linux-crypto@vger.kernel.org>; Tue, 26 Dec 2017 04:21:54 -0800 (PST)
-In-Reply-To: <20171226104010.GA28275@gondor.apana.org.au>
+        Tue, 26 Dec 2017 11:35:04 -0500
+In-Reply-To: <20171226162117.4885-1-antoine.tenart@free-electrons.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Dec 26, 2017 at 12:40 PM, Herbert Xu
-<herbert@gondor.apana.org.au> wrote:
-> On Tue, Dec 26, 2017 at 11:06:02AM +0200, Gilad Ben-Yossef wrote:
->>
->> The hash state needs to be DMAed in and out of the hardware on each operation
->> and I have no guarantee that the ahash request is allocated from DMAable memory
->> (i.e. AHASH_REQUEST_ON_STACK).
->
-> AHASH_REQUEST_ON_STACK cannot possibly be used on an async ahash
-> implementation for obvious reasons so this shouldn't be an issue.
->
+This patch fixes the hash support in the SafeXcel driver when the update
+size is a multiple of a block size, and when a final call is made just
+after with a size of 0. In such cases the driver should cache the last
+block from the update to avoid handling 0 length data on the final call
+(that's a hardware limitation).
 
-OK, you lost me on this statement.
+Fixes: 1b44c5a60c13 ("crypto: inside-secure - add SafeXcel EIP197 crypto engine driver")
+Signed-off-by: Antoine Tenart <antoine.tenart@free-electrons.com>
+---
+ drivers/crypto/inside-secure/safexcel_hash.c | 34 ++++++++++++++++++++--------
+ 1 file changed, 24 insertions(+), 10 deletions(-)
 
-See how SKCIPHER_REQUEST_ON_STACK is being used with an asymmetric skcipher
-in drivers/md/dm-integrity.c
-
-The case with AHASH_REQUEST_ON_STACK looks symmetric to me.
-
-E.g. why would this dummy code be illegal -
-
-DECLARE_CRYPTO_WAIT(wait);
-AHASH_REQUEST_ON_STACK(req, tfm);
-sg_init_table(&sg, 1);
-sg_set_buf(&sg, buf);
-
-ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_SLEEP |
-                                        CRYPTO_TFM_REQ_MAY_BACKLOG,
-                                        crypto_req_done, (void *)wait);
-
-ahash_request_set_crypt(req, &sg, NULL, len);
-
-rc = crypto_ahash_digest(req);
-
-/* do some stuff here, possibly stuff that can sleep */
-
-rc = crypto_wait_req(r, wait);
-...
-
-> The construct is simply a compatibility aid for sync-only users
-> to use the ahash interface.
-
-Please don't get me wrong, I'm not trying to argue. Simply putting the
-internal state in the
-request context is the simplest most straight forward thing for me. If
-you say I don't need
-to worry about it I'm fine with that. I just want to understand why
-it's OK so I can understand
-the system better.
-
-Thanks,
-Gilad
-
+diff --git a/drivers/crypto/inside-secure/safexcel_hash.c b/drivers/crypto/inside-secure/safexcel_hash.c
+index fbc03d6e7db7..122a2a58e98f 100644
+--- a/drivers/crypto/inside-secure/safexcel_hash.c
++++ b/drivers/crypto/inside-secure/safexcel_hash.c
+@@ -189,17 +189,31 @@ static int safexcel_ahash_send_req(struct crypto_async_request *async, int ring,
+ 	else
+ 		cache_len = queued - areq->nbytes;
+ 
+-	/*
+-	 * If this is not the last request and the queued data does not fit
+-	 * into full blocks, cache it for the next send() call.
+-	 */
+-	extra = queued & (crypto_ahash_blocksize(ahash) - 1);
+-	if (!req->last_req && extra) {
+-		sg_pcopy_to_buffer(areq->src, sg_nents(areq->src),
+-				   req->cache_next, extra, areq->nbytes - extra);
++	if (!req->last_req) {
++		/* If this is not the last request and the queued data does not
++		 * fit into full blocks, cache it for the next send() call.
++		 */
++		extra = queued & (crypto_ahash_blocksize(ahash) - 1);
++		if (!extra)
++			/* If this is not the last request and the queued data
++			 * is a multiple of a block, cache the last one for now.
++			 */
++			extra = queued - crypto_ahash_blocksize(ahash);
+ 
+-		queued -= extra;
+-		len -= extra;
++		if (extra) {
++			sg_pcopy_to_buffer(areq->src, sg_nents(areq->src),
++					   req->cache_next, extra,
++					   areq->nbytes - extra);
++
++			queued -= extra;
++			len -= extra;
++
++			if (!queued) {
++				*commands = 0;
++				*results = 0;
++				return 0;
++			}
++		}
+ 	}
+ 
+ 	spin_lock_bh(&priv->ring[ring].egress_lock);
 -- 
-Gilad Ben-Yossef
-Chief Coffee Drinker
-
-"If you take a class in large-scale robotics, can you end up in a
-situation where the homework eats your dog?"
- -- Jean-Baptiste Queru
+2.14.3
