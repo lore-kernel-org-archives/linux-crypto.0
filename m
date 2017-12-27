@@ -1,47 +1,107 @@
-From: Dmitry Vyukov <dvyukov@google.com>
-Subject: Re: WARNING: kernel stack regs has bad 'bp' value (2)
-Date: Wed, 27 Dec 2017 19:29:32 +0100
-Message-ID: <CACT4Y+aUt1Y1Y9tHGaAare-6+DcGpee85NgJFk7EYrb=b4RT3g@mail.gmail.com>
-References: <001a113f2cd26f3532055f0f4a79@google.com> <20171130091724.GC5451@zzz.localdomain>
+From: Philippe Ombredanne <pombredanne-od1rfyK75/E@public.gmane.org>
+Subject: Re: [PATCH v4] hwrng: exynos - add Samsung Exynos True RNG driver
+Date: Wed, 27 Dec 2017 22:51:02 +0100
+Message-ID: <CAOFm3uFbkFAbA5U_d8uDYZ-4+ezEWdjnuVyqkpXQ0tg8u3Ds9A@mail.gmail.com>
+References: <CGME20171227101226eucas1p2baa0309227b8e6a1e77dd7ca88f6412b@eucas1p2.samsung.com>
+ <CAOFm3uEj7MDa_7OtigHcUPwvxkR+8cRS=UQq3x_y9k+ypcJPrg@mail.gmail.com> <87shbwh43f.fsf%l.stelmach@samsung.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Cc: syzbot
-        <bot+e01a53d277c86c4e61e7c84ec83432ed395c7df8@syzkaller.appspotmail.com>,
-        David Miller <davem@davemloft.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-crypto@vger.kernel.org,
-        LKML <linux-kernel@vger.kernel.org>,
-        syzkaller-bugs@googlegroups.com,
-        Thomas Gleixner <tglx@linutronix.de>,
-        "the arch/x86 maintainers" <x86@kernel.org>
-To: Eric Biggers <ebiggers3@gmail.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20171130091724.GC5451@zzz.localdomain>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Cc: "Andrew F . Davis" <afd-l0cyMroinI0@public.gmane.org>,
+        PrasannaKumar Muralidharan <prasannatsmkumar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+        Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+        Matt Mackall <mpm-VDJrAJ4Gl5ZBDgjK7y7TUQ@public.gmane.org>,
+        Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+        Krzysztof Kozlowski <krzk-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+        Kukjin Kim <kgene-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS"
+        <devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        linux-samsung-soc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        Marek Szyprowski <m.szyprowski-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
+To: =?UTF-8?Q?=C5=81ukasz_Stelmach?= <l.stelmach-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <87shbwh43f.fsf%l.stelmach-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Nov 30, 2017 at 10:17 AM, Eric Biggers <ebiggers3@gmail.com> wrote:
-> On Tue, Nov 28, 2017 at 10:36:01AM -0800, syzbot wrote:
->> WARNING: kernel stack regs at ffff8801c1e5f468 in syzkaller196611:6199 has
->> bad 'bp' value 0000000000000001
->> unwind stack type:0 next_sp:          (null) mask:0x6 graph_idx:0
->> ffff8801db4075a8: ffff8801db407630 (0xffff8801db407630)
->> ffff8801db4075b0: ffffffff8128a84e (__save_stack_trace+0x6e/0xd0)
->> ffff8801db4075b8: 0000000000000000 ...
->> ffff8801db4075c0: ffff8801c1e58000 (0xffff8801c1e58000)
->> ffff8801db4075c8: ffff8801c1e60000 (0xffff8801c1e60000)
->> ffff8801db4075d0: 0000000000000000 ...
->> ffff8801db4075d8: 0000000000000006 (0x6)
->> ffff8801db4075e0: ffff8801c1e4e000 (0xffff8801c1e4e000)
->> ffff8801db4075e8: 0000010100000000 (0x10100000000)
->> ffff8801db4075f0: 0000000000000000 ...
->> ffff8801db4075f8: ffff8801db4075a8 (0xffff8801db4075a8)
->> ffff8801db407600: ffffffff8134ff7d (__twofish_enc_blk_3way+0x1b1d/0x1b30)
+=C5=81ukasz,
+
+On Wed, Dec 27, 2017 at 11:12 AM, =C5=81ukasz Stelmach
+<l.stelmach-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org> wrote:
+> It was <2017-12-22 pi=C4=85 19:30>, when Philippe Ombredanne wrote:
+>> On Fri, Dec 22, 2017 at 5:38 PM, =C5=81ukasz Stelmach <l.stelmach@samsun=
+g.com> wrote:
+>>> It was <2017-12-22 pi=C4=85 14:34>, when Philippe Ombredanne wrote:
+>>>> =C5=81ukasz,
+>>>>
+>>>> On Fri, Dec 22, 2017 at 2:23 PM, =C5=81ukasz Stelmach <l.stelmach@sams=
+ung.com> wrote:
+>>>>> Add support for True Random Number Generator found in Samsung Exynos
+>>>>> 5250+ SoCs.
+>>>>>
+>>>>> Signed-off-by: =C5=81ukasz Stelmach <l.stelmach-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
+>>>>> Reviewed-by: Krzysztof Kozlowski <krzk-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+>>>>
+>>>> <snip>
+>>>>
+>>>>> --- /dev/null
+>>>>> +++ b/drivers/char/hw_random/exynos-trng.c
+>>>>> @@ -0,0 +1,245 @@
+>>>>> +/*
+>>>>> + * RNG driver for Exynos TRNGs
+>>>>> + *
+>>>>> + * Author: =C5=81ukasz Stelmach <l.stelmach-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
+>>>>> + *
+>>>>> + * Copyright 2017 (c) Samsung Electronics Software, Inc.
+>>>>> + *
+>>>>> + * Based on the Exynos PRNG driver drivers/crypto/exynos-rng by
+>>>>> + * Krzysztof Koz=C5=82owski <krzk-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+>>>>> + *
+>>>>> + * This program is free software; you can redistribute it and/or mod=
+ify
+>>>>> + * it under the terms of the GNU General Public License as published=
+ by
+>>>>> + * the Free Software Foundation;
+>>>>> + *
+>>>>> + * This program is distributed in the hope that it will be useful,
+>>>>> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+>>>>> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+>>>>> + * GNU General Public License for more details.
+>>>>> + */
+>>>>
+>>>>
+>>>> Would you mind using the new SPDX tags documented in Thomas patch set
+>>>> [1] rather than this fine but longer legalese?
+>>>>
+>>>> And if you could spread the word to others in your team this would be =
+very nice.
+>>>> See also this fine article posted by Mauro on the Samsung Open Source
+>>>> Group Blog [2]
+>>>> Thank you!
+>>>
+>>> Cool! We've been using SPDX to tag RPM packages in Tizen for three year=
+s or
+>>> more. ;-)
+>>
+>> Very nice! any pubic pointers?
+>                  ^^^^^
 >
-> Looks like the x86_64 "3 way" version of Twofish (twofish-x86_64-asm_64-3way.S)
-> needs to be updated to not use %rbp.
+> I assume you request an URL of a publicly available web-page ;-)
+>
+> https://wiki.tizen.org/Packaging/Guidelines#License_Tag
 
+Thank you!
+I reckon it took me a minute to figure why you were making a somewhat
+cryptic URL related comment.
+Then I realized that I had made a rather unfortunate typo, or may be
+it was a freudian slip of sorts :D
 
-This is what is supposed to be fixed with "crypto: x86/twofish-3way -
-Fix %rbp usage", right? Was it merged anywhere?
-This is one of top crashers with 15K crashes.
+--=20
+Cordially
+Philippe Ombredanne
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
