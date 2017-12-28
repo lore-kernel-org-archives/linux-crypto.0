@@ -1,27 +1,33 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: scomp - delete unused comments
-Date: Thu, 28 Dec 2017 18:08:08 +1100
-Message-ID: <20171228070808.GD9639@gondor.apana.org.au>
-References: <1513756992-175134-1-git-send-email-wangzhou1@hisilicon.com>
+Subject: Re: [PATCH] crypto: stm32 - Use standard CONFIG name
+Date: Thu, 28 Dec 2017 18:08:17 +1100
+Message-ID: <20171228070817.GE9639@gondor.apana.org.au>
+References: <1513793972-11173-1-git-send-email-clabbe@baylibre.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, giovanni.cabiddu@intel.com
-To: Zhou Wang <wangzhou1@hisilicon.com>
+Cc: davem@davemloft.net, mcoquelin.stm32@gmail.com,
+        alexandre.torgue@st.com, lionel.debieve@st.com,
+        fabien.dessenne@st.com, linux-crypto@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+To: Corentin Labbe <clabbe@baylibre.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [128.1.224.119] ([128.1.224.119]:48998 "EHLO ringil.hmeau.com"
+Received: from [128.1.224.119] ([128.1.224.119]:49012 "EHLO ringil.hmeau.com"
         rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
-        id S1750981AbdL1HIZ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 28 Dec 2017 02:08:25 -0500
+        id S1750981AbdL1HIl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 28 Dec 2017 02:08:41 -0500
 Content-Disposition: inline
-In-Reply-To: <1513756992-175134-1-git-send-email-wangzhou1@hisilicon.com>
+In-Reply-To: <1513793972-11173-1-git-send-email-clabbe@baylibre.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Dec 20, 2017 at 04:03:12PM +0800, Zhou Wang wrote:
-> There are no init and exit callbacks, so delete its comments.
+On Wed, Dec 20, 2017 at 06:19:32PM +0000, Corentin Labbe wrote:
+> All hardware crypto devices have their CONFIG names using the following
+> convention:
+> CRYPTO_DEV_name_algo
 > 
-> Signed-off-by: Zhou Wang <wangzhou1@hisilicon.com>
+> This patch apply this conventions on STM32 CONFIG names.
+> 
+> Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
 
 Patch applied.  Thanks.
 -- 
