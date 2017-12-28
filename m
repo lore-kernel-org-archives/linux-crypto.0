@@ -1,32 +1,59 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v3 0/2] Fix out-of-bounds memory accesses in
- generic-gcm-aesni
-Date: Thu, 28 Dec 2017 18:08:59 +1100
-Message-ID: <20171228070859.GA9960@gondor.apana.org.au>
-References: <20171221010838.54243-1-junaids@google.com>
+From: Dmitry Vyukov <dvyukov@google.com>
+Subject: Re: WARNING: kernel stack regs has bad 'bp' value (2)
+Date: Thu, 28 Dec 2017 08:30:44 +0100
+Message-ID: <CACT4Y+aju=eN--HZK5jbK2B0A=nxcWAC9-cuF9BZQud5XOX6iA@mail.gmail.com>
+References: <001a113f2cd26f3532055f0f4a79@google.com> <20171130091724.GC5451@zzz.localdomain>
+ <CACT4Y+aUt1Y1Y9tHGaAare-6+DcGpee85NgJFk7EYrb=b4RT3g@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, andreslc@google.com,
-        davem@davemloft.net, gthelen@google.com, ebiggers3@gmail.com
-To: Junaid Shahid <junaids@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Cc: syzbot
+        <bot+e01a53d277c86c4e61e7c84ec83432ed395c7df8@syzkaller.appspotmail.com>,
+        David Miller <davem@davemloft.net>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-crypto@vger.kernel.org,
+        LKML <linux-kernel@vger.kernel.org>,
+        syzkaller-bugs@googlegroups.com,
+        Thomas Gleixner <tglx@linutronix.de>,
+        "the arch/x86 maintainers" <x86@kernel.org>
+To: Eric Biggers <ebiggers3@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [128.1.224.119] ([128.1.224.119]:49020 "EHLO ringil.hmeau.com"
-        rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
-        id S1750981AbdL1HJC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 28 Dec 2017 02:09:02 -0500
-Content-Disposition: inline
-In-Reply-To: <20171221010838.54243-1-junaids@google.com>
+Received: from mail-pl0-f52.google.com ([209.85.160.52]:39118 "EHLO
+        mail-pl0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751043AbdL1HbF (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 28 Dec 2017 02:31:05 -0500
+Received: by mail-pl0-f52.google.com with SMTP id bi12so20759456plb.6
+        for <linux-crypto@vger.kernel.org>; Wed, 27 Dec 2017 23:31:05 -0800 (PST)
+In-Reply-To: <CACT4Y+aUt1Y1Y9tHGaAare-6+DcGpee85NgJFk7EYrb=b4RT3g@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Dec 20, 2017 at 05:08:36PM -0800, Junaid Shahid wrote:
-> Changelog:
-> v3:
-> - Fixed a bug in READ_PARTIAL_BLOCK when used for reading the AAD
-> - Some refactoring per CR feedback
+On Wed, Dec 27, 2017 at 7:29 PM, Dmitry Vyukov <dvyukov@google.com> wrote:
+> On Thu, Nov 30, 2017 at 10:17 AM, Eric Biggers <ebiggers3@gmail.com> wrote:
+>> On Tue, Nov 28, 2017 at 10:36:01AM -0800, syzbot wrote:
+>>> WARNING: kernel stack regs at ffff8801c1e5f468 in syzkaller196611:6199 has
+>>> bad 'bp' value 0000000000000001
+>>> unwind stack type:0 next_sp:          (null) mask:0x6 graph_idx:0
+>>> ffff8801db4075a8: ffff8801db407630 (0xffff8801db407630)
+>>> ffff8801db4075b0: ffffffff8128a84e (__save_stack_trace+0x6e/0xd0)
+>>> ffff8801db4075b8: 0000000000000000 ...
+>>> ffff8801db4075c0: ffff8801c1e58000 (0xffff8801c1e58000)
+>>> ffff8801db4075c8: ffff8801c1e60000 (0xffff8801c1e60000)
+>>> ffff8801db4075d0: 0000000000000000 ...
+>>> ffff8801db4075d8: 0000000000000006 (0x6)
+>>> ffff8801db4075e0: ffff8801c1e4e000 (0xffff8801c1e4e000)
+>>> ffff8801db4075e8: 0000010100000000 (0x10100000000)
+>>> ffff8801db4075f0: 0000000000000000 ...
+>>> ffff8801db4075f8: ffff8801db4075a8 (0xffff8801db4075a8)
+>>> ffff8801db407600: ffffffff8134ff7d (__twofish_enc_blk_3way+0x1b1d/0x1b30)
+>>
+>> Looks like the x86_64 "3 way" version of Twofish (twofish-x86_64-asm_64-3way.S)
+>> needs to be updated to not use %rbp.
+>
+>
+> This is what is supposed to be fixed with "crypto: x86/twofish-3way -
+> Fix %rbp usage", right? Was it merged anywhere?
+> This is one of top crashers with 15K crashes.
 
-All applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+
+#syz fix: crypto: x86/twofish-3way - Fix %rbp usage
