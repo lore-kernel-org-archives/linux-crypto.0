@@ -1,42 +1,51 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2 0/6] crypto: tcrypt: fix and add multi buf speed tests
-Date: Thu, 28 Dec 2017 18:02:06 +1100
-Message-ID: <20171228070206.GA9639@gondor.apana.org.au>
-References: <1513499346-9047-1-git-send-email-gilad@benyossef.com>
+Subject: Re: [PATCH] crypto: x86/twofish-3way - Fix %rbp usage
+Date: Thu, 28 Dec 2017 18:02:22 +1100
+Message-ID: <20171228070222.GB9639@gondor.apana.org.au>
+References: <001a113f2cd26f3532055f0f4a79@google.com>
+ <20171219004026.170565-1-ebiggers3@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-        Ofir Drang <ofir.drang@arm.com>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-To: Gilad Ben-Yossef <gilad@benyossef.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [128.1.224.119] ([128.1.224.119]:48968 "EHLO ringil.hmeau.com"
-        rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
-        id S1750981AbdL1HCX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 28 Dec 2017 02:02:23 -0500
+Cc: linux-crypto@vger.kernel.org,
+        "David S . Miller" <davem@davemloft.net>,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        Jussi Kivilinna <jussi.kivilinna@iki.fi>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
+        Eric Biggers <ebiggers@google.com>
+To: Eric Biggers <ebiggers3@gmail.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1513499346-9047-1-git-send-email-gilad@benyossef.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <20171219004026.170565-1-ebiggers3@gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Sun, Dec 17, 2017 at 08:28:59AM +0000, Gilad Ben-Yossef wrote:
-> The performance of some crypto tfm providers is affected by
-> the amount of parallelism possible with the processing.
+On Mon, Dec 18, 2017 at 04:40:26PM -0800, Eric Biggers wrote:
+> From: Eric Biggers <ebiggers@google.com>
 > 
-> We already had some support for speed test of multiple concurrent
-> requests, dubbed multi buffer, in ahash speed tests.
->                                                                                 
-> This patch set extends said support and add similar support for skcipher
-> and AEAD, as well as fixes some odd bugs discovered along the way.
->                                                                                 
-> It is noted that it is possible to consolidate some of the none multi
-> buffer speed test code better, but given that tcrypt as a whole is a
-> developer testing harness rather than production code, the value of
-> this activity seems questionable. Do let me know if you disagree.
+> Using %rbp as a temporary register breaks frame pointer convention and
+> breaks stack traces when unwinding from an interrupt in the crypto code.
 > 
-> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+> In twofish-3way, we can't simply replace %rbp with another register
+> because there are none available.  Instead, we use the stack to hold the
+> values that %rbp, %r11, and %r12 were holding previously.  Each of these
+> values represents the half of the output from the previous Feistel round
+> that is being passed on unchanged to the following round.  They are only
+> used once per round, when they are exchanged with %rax, %rbx, and %rcx.
+> 
+> As a result, we free up 3 registers (one per block) and can reassign
+> them so that %rbp is not used, and additionally %r14 and %r15 are not
+> used so they do not need to be saved/restored.
+> 
+> There may be a small overhead caused by replacing 'xchg REG, REG' with
+> the needed sequence 'mov MEM, REG; mov REG, MEM; mov REG, REG' once per
+> round.  But, counterintuitively, when I tested "ctr-twofish-3way" on a
+> Haswell processor, the new version was actually about 2% faster.
+> (Perhaps 'xchg' is not as well optimized as plain moves.)
+> 
+> Reported-by: syzbot <syzkaller@googlegroups.com>
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
 
-All applied.  Thanks.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
