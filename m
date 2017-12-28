@@ -1,31 +1,29 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2 1/4] crypto: caam - constify key data
-Date: Thu, 28 Dec 2017 18:02:39 +1100
-Message-ID: <20171228070239.GC9639@gondor.apana.org.au>
-References: <20171219101607.15323-1-horia.geanta@nxp.com>
+Subject: Re: [PATCH] crypto: scomp - delete unused comments
+Date: Thu, 28 Dec 2017 18:08:08 +1100
+Message-ID: <20171228070808.GD9639@gondor.apana.org.au>
+References: <1513756992-175134-1-git-send-email-wangzhou1@hisilicon.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
 Cc: "David S. Miller" <davem@davemloft.net>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        linux-crypto@vger.kernel.org
-To: Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>
+        linux-crypto@vger.kernel.org, giovanni.cabiddu@intel.com
+To: Zhou Wang <wangzhou1@hisilicon.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [128.1.224.119] ([128.1.224.119]:48990 "EHLO ringil.hmeau.com"
+Received: from [128.1.224.119] ([128.1.224.119]:48998 "EHLO ringil.hmeau.com"
         rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
-        id S1751994AbdL1HCq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 28 Dec 2017 02:02:46 -0500
+        id S1750981AbdL1HIZ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 28 Dec 2017 02:08:25 -0500
 Content-Disposition: inline
-In-Reply-To: <20171219101607.15323-1-horia.geanta@nxp.com>
+In-Reply-To: <1513756992-175134-1-git-send-email-wangzhou1@hisilicon.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Dec 19, 2017 at 12:16:04PM +0200, Horia Geantă wrote:
-> Key data is not modified, it is copied in the shared descriptor.
+On Wed, Dec 20, 2017 at 04:03:12PM +0800, Zhou Wang wrote:
+> There are no init and exit callbacks, so delete its comments.
 > 
-> Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
+> Signed-off-by: Zhou Wang <wangzhou1@hisilicon.com>
 
-All applied.  Thanks.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
