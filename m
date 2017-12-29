@@ -1,87 +1,64 @@
 From: Eric Biggers <ebiggers3@gmail.com>
-Subject: [PATCH] crypto: algapi - remove unused notifications
-Date: Fri, 29 Dec 2017 10:06:46 -0600
-Message-ID: <20171229160646.25273-1-ebiggers3@gmail.com>
+Subject: [PATCH 1/3] crypto: poly1305 - use unaligned access macros to output digest
+Date: Fri, 29 Dec 2017 10:10:24 -0600
+Message-ID: <20171229161026.28102-2-ebiggers3@gmail.com>
+References: <20171229161026.28102-1-ebiggers3@gmail.com>
 Cc: "David S . Miller" <davem@davemloft.net>,
+        "Jason A . Donenfeld" <Jason@zx2c4.com>,
+        Martin Willi <martin@strongswan.org>,
         Eric Biggers <ebiggers@google.com>
 To: linux-crypto@vger.kernel.org,
         Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-io0-f196.google.com ([209.85.223.196]:46360 "EHLO
-        mail-io0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750869AbdL2QHJ (ORCPT
+Received: from mail-it0-f66.google.com ([209.85.214.66]:45995 "EHLO
+        mail-it0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751246AbdL2QM7 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 29 Dec 2017 11:07:09 -0500
-Received: by mail-io0-f196.google.com with SMTP id x129so41575059iod.13
-        for <linux-crypto@vger.kernel.org>; Fri, 29 Dec 2017 08:07:09 -0800 (PST)
+        Fri, 29 Dec 2017 11:12:59 -0500
+Received: by mail-it0-f66.google.com with SMTP id z6so31440614iti.4
+        for <linux-crypto@vger.kernel.org>; Fri, 29 Dec 2017 08:12:58 -0800 (PST)
+In-Reply-To: <20171229161026.28102-1-ebiggers3@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 From: Eric Biggers <ebiggers@google.com>
 
-There is a message posted to the crypto notifier chain when an algorithm
-is unregistered, and when a template is registered or unregistered.  But
-nothing is listening for those messages; currently there are only
-listeners for the algorithm request and registration messages.
-
-Get rid of these unused notifications for now.
+Currently the only part of poly1305-generic which is assuming special
+alignment is the part where the final digest is written.  Switch this
+over to the unaligned access macros so that we'll be able to remove the
+cra_alignmask.
 
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- crypto/algapi.c   | 5 -----
- crypto/internal.h | 3 ---
- 2 files changed, 8 deletions(-)
+ crypto/poly1305_generic.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
 
-diff --git a/crypto/algapi.c b/crypto/algapi.c
-index 8084a76e01d8..9895cafcce7e 100644
---- a/crypto/algapi.c
-+++ b/crypto/algapi.c
-@@ -123,7 +123,6 @@ static void crypto_remove_instance(struct crypto_instance *inst,
- 	if (!tmpl || !crypto_tmpl_get(tmpl))
- 		return;
+diff --git a/crypto/poly1305_generic.c b/crypto/poly1305_generic.c
+index b1c2d57dc734..d752901ba0bc 100644
+--- a/crypto/poly1305_generic.c
++++ b/crypto/poly1305_generic.c
+@@ -210,7 +210,6 @@ EXPORT_SYMBOL_GPL(crypto_poly1305_update);
+ int crypto_poly1305_final(struct shash_desc *desc, u8 *dst)
+ {
+ 	struct poly1305_desc_ctx *dctx = shash_desc_ctx(desc);
+-	__le32 *mac = (__le32 *)dst;
+ 	u32 h0, h1, h2, h3, h4;
+ 	u32 g0, g1, g2, g3, g4;
+ 	u32 mask;
+@@ -267,10 +266,10 @@ int crypto_poly1305_final(struct shash_desc *desc, u8 *dst)
+ 	h3 = (h3 >> 18) | (h4 <<  8);
  
--	crypto_notify(CRYPTO_MSG_ALG_UNREGISTER, &inst->alg);
- 	list_move(&inst->alg.cra_list, list);
- 	hlist_del(&inst->list);
- 	inst->alg.cra_destroy = crypto_destroy_instance;
-@@ -380,7 +379,6 @@ static int crypto_remove_alg(struct crypto_alg *alg, struct list_head *list)
+ 	/* mac = (h + s) % (2^128) */
+-	f = (f >> 32) + h0 + dctx->s[0]; mac[0] = cpu_to_le32(f);
+-	f = (f >> 32) + h1 + dctx->s[1]; mac[1] = cpu_to_le32(f);
+-	f = (f >> 32) + h2 + dctx->s[2]; mac[2] = cpu_to_le32(f);
+-	f = (f >> 32) + h3 + dctx->s[3]; mac[3] = cpu_to_le32(f);
++	f = (f >> 32) + h0 + dctx->s[0]; put_unaligned_le32(f, dst +  0);
++	f = (f >> 32) + h1 + dctx->s[1]; put_unaligned_le32(f, dst +  4);
++	f = (f >> 32) + h2 + dctx->s[2]; put_unaligned_le32(f, dst +  8);
++	f = (f >> 32) + h3 + dctx->s[3]; put_unaligned_le32(f, dst + 12);
  
- 	alg->cra_flags |= CRYPTO_ALG_DEAD;
- 
--	crypto_notify(CRYPTO_MSG_ALG_UNREGISTER, alg);
- 	list_del_init(&alg->cra_list);
- 	crypto_remove_spawns(alg, list, NULL);
- 
-@@ -458,7 +456,6 @@ int crypto_register_template(struct crypto_template *tmpl)
- 	}
- 
- 	list_add(&tmpl->list, &crypto_template_list);
--	crypto_notify(CRYPTO_MSG_TMPL_REGISTER, tmpl);
- 	err = 0;
- out:
- 	up_write(&crypto_alg_sem);
-@@ -485,8 +482,6 @@ void crypto_unregister_template(struct crypto_template *tmpl)
- 		BUG_ON(err);
- 	}
- 
--	crypto_notify(CRYPTO_MSG_TMPL_UNREGISTER, tmpl);
--
- 	up_write(&crypto_alg_sem);
- 
- 	hlist_for_each_entry_safe(inst, n, list, list) {
-diff --git a/crypto/internal.h b/crypto/internal.h
-index 1388af6da85a..5ac27fba10e8 100644
---- a/crypto/internal.h
-+++ b/crypto/internal.h
-@@ -30,9 +30,6 @@
- enum {
- 	CRYPTO_MSG_ALG_REQUEST,
- 	CRYPTO_MSG_ALG_REGISTER,
--	CRYPTO_MSG_ALG_UNREGISTER,
--	CRYPTO_MSG_TMPL_REGISTER,
--	CRYPTO_MSG_TMPL_UNREGISTER,
- };
- 
- struct crypto_instance;
+ 	return 0;
+ }
 -- 
 2.15.1
