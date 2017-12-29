@@ -1,49 +1,72 @@
 From: Eric Biggers <ebiggers3@gmail.com>
-Subject: [PATCH 3/3] crypto: x86/poly1305 - remove cra_alignmask
-Date: Fri, 29 Dec 2017 10:10:26 -0600
-Message-ID: <20171229161026.28102-4-ebiggers3@gmail.com>
-References: <20171229161026.28102-1-ebiggers3@gmail.com>
+Subject: [PATCH] crypto: algapi - fix NULL dereference in crypto_remove_spawns()
+Date: Fri, 29 Dec 2017 14:30:19 -0600
+Message-ID: <20171229203019.1413-1-ebiggers3@gmail.com>
+References: <001a1141c43ad30ccf055efb76ed@google.com>
 Cc: "David S . Miller" <davem@davemloft.net>,
-        "Jason A . Donenfeld" <Jason@zx2c4.com>,
-        Martin Willi <martin@strongswan.org>,
-        Eric Biggers <ebiggers@google.com>
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
+        Eric Biggers <ebiggers@google.com>, stable@vger.kernel.org
 To: linux-crypto@vger.kernel.org,
         Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-io0-f196.google.com ([209.85.223.196]:41364 "EHLO
-        mail-io0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751381AbdL2QNC (ORCPT
+Received: from mail-io0-f195.google.com ([209.85.223.195]:38139 "EHLO
+        mail-io0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751443AbdL2Ubh (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 29 Dec 2017 11:13:02 -0500
-Received: by mail-io0-f196.google.com with SMTP id f6so5250151ioh.8
-        for <linux-crypto@vger.kernel.org>; Fri, 29 Dec 2017 08:13:01 -0800 (PST)
-In-Reply-To: <20171229161026.28102-1-ebiggers3@gmail.com>
+        Fri, 29 Dec 2017 15:31:37 -0500
+In-Reply-To: <001a1141c43ad30ccf055efb76ed@google.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 From: Eric Biggers <ebiggers@google.com>
 
-crypto_poly1305_final() no longer requires a cra_alignmask, and nothing
-else in the x86 poly1305-simd implementation does either.  So remove the
-cra_alignmask so that the crypto API does not have to unnecessarily
-align the buffers.
+syzkaller triggered a NULL pointer dereference in crypto_remove_spawns()
+via a program that repeatedly and concurrently requests AEADs
+"authenc(cmac(des3_ede-asm),pcbc-aes-aesni)" and hashes "cmac(des3_ede)"
+through AF_ALG, where the hashes are requested as "untested"
+(CRYPTO_ALG_TESTED is set in ->salg_mask but clear in ->salg_feat; this
+causes the template to be instantiated for every request).
 
+Although AF_ALG users really shouldn't be able to request an "untested"
+algorithm, the NULL pointer dereference is actually caused by a
+longstanding race condition where crypto_remove_spawns() can encounter
+an instance which has had spawn(s) "grabbed" but hasn't yet been
+registered, resulting in ->cra_users still being NULL.
+
+We probably should properly initialize ->cra_users earlier, but that
+would require updating many templates individually.  For now just fix
+the bug in a simple way that can easily be backported: make
+crypto_remove_spawns() treat a NULL ->cra_users list as empty.
+
+Reported-by: syzbot <syzkaller@googlegroups.com>
+Cc: stable@vger.kernel.org
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- arch/x86/crypto/poly1305_glue.c | 1 -
- 1 file changed, 1 deletion(-)
+ crypto/algapi.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-diff --git a/arch/x86/crypto/poly1305_glue.c b/arch/x86/crypto/poly1305_glue.c
-index e32142bc071d..f58f89b05a7f 100644
---- a/arch/x86/crypto/poly1305_glue.c
-+++ b/arch/x86/crypto/poly1305_glue.c
-@@ -171,7 +171,6 @@ static struct shash_alg alg = {
- 		.cra_driver_name	= "poly1305-simd",
- 		.cra_priority		= 300,
- 		.cra_flags		= CRYPTO_ALG_TYPE_SHASH,
--		.cra_alignmask		= sizeof(u32) - 1,
- 		.cra_blocksize		= POLY1305_BLOCK_SIZE,
- 		.cra_module		= THIS_MODULE,
- 	},
+diff --git a/crypto/algapi.c b/crypto/algapi.c
+index 9895cafcce7e..395b082d03a9 100644
+--- a/crypto/algapi.c
++++ b/crypto/algapi.c
+@@ -166,6 +166,18 @@ void crypto_remove_spawns(struct crypto_alg *alg, struct list_head *list,
+ 
+ 			spawn->alg = NULL;
+ 			spawns = &inst->alg.cra_users;
++
++			/*
++			 * We may encounter an unregistered instance here, since
++			 * an instance's spawns are set up prior to the instance
++			 * being registered.  An unregistered instance will have
++			 * NULL ->cra_users.next, since ->cra_users isn't
++			 * properly initialized until registration.  But an
++			 * unregistered instance cannot have any users, so treat
++			 * it the same as ->cra_users being empty.
++			 */
++			if (spawns->next == NULL)
++				break;
+ 		}
+ 	} while ((spawns = crypto_more_spawns(alg, &stack, &top,
+ 					      &secondary_spawns)));
 -- 
 2.15.1
