@@ -1,27 +1,48 @@
-From: Loretta Robles <Loretta.Robles@hci.utah.edu>
-Subject: RE: ATTENTION!!!
-Date: Sat, 30 Dec 2017 00:28:56 +0000
-Message-ID: <35D4F79A8B8138489F38DE5CF6200454E572AB2F__42610.9122731306$1514594425$gmane$org@HCI-EX-MB2.hci.utah.edu>
-References: <35D4F79A8B8138489F38DE5CF6200454E570015C@HCI-EX-MB2.hci.utah.edu>
+From: Steffen Klassert <steffen.klassert@secunet.com>
+Subject: Re: [PATCH] padata: add SPDX identifier
+Date: Sat, 30 Dec 2017 09:21:09 +0100
+Message-ID: <20171230082109.ckm5mwkgusz233ro@gauss3.secunet.de>
+References: <1513856130-7843-1-git-send-email-thrust73@gmail.com>
+ <20171228065327.GA9066@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: 8BIT
-To: Loretta Robles <Loretta.Robles@hci.utah.edu>
+Content-Type: text/plain; charset="us-ascii"
+Cc: Cheah Kok Cheong <thrust73@gmail.com>,
+        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <pombredanne@nexb.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ipo7.cc.utah.edu ([155.97.144.42]:56546 "EHLO ipo7.cc.utah.edu"
+Received: from a.mx.secunet.com ([62.96.220.36]:41084 "EHLO a.mx.secunet.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750709AbdL3AlD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 29 Dec 2017 19:41:03 -0500
-In-Reply-To: <35D4F79A8B8138489F38DE5CF6200454E570015C@HCI-EX-MB2.hci.utah.edu>
-Content-Language: en-US
+        id S1750815AbdL3IVL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 30 Dec 2017 03:21:11 -0500
+Content-Disposition: inline
+In-Reply-To: <20171228065327.GA9066@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+On Thu, Dec 28, 2017 at 05:53:27PM +1100, Herbert Xu wrote:
+> Cheah Kok Cheong <thrust73@gmail.com> wrote:
+> > Add SPDX license identifier according to the type of license text found
+> > in the file.
+> > 
+> > Cc: Philippe Ombredanne <pombredanne@nexb.com>
+> > Signed-off-by: Cheah Kok Cheong <thrust73@gmail.com>
+> > ---
+> > kernel/padata.c | 1 +
+> > 1 file changed, 1 insertion(+)
+> > 
+> > diff --git a/kernel/padata.c b/kernel/padata.c
+> > index e265953..eb9a9d9 100644
+> > --- a/kernel/padata.c
+> > +++ b/kernel/padata.c
+> > @@ -1,3 +1,4 @@
+> > +// SPDX-License-Identifier: GPL-2.0
+> > /*
+> >  * padata.c - generic interface to process data streams in parallel
+> >  *
+> 
+> Steffen, are you OK with this patch?
 
-________________________________
-From: Loretta Robles
-Sent: Friday, December 29, 2017 1:01 PM
-To: Loretta Robles
-Subject: ATTENTION!!!
+Yes, I'm ok with this.
 
-You have been randomly selected for a donation. Contact soriz4040@gmail.com for claims.
+Acked-by: Steffen Klassert <steffen.klassert@secunet.com>
