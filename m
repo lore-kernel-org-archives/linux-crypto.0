@@ -1,55 +1,51 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH 12/26] staging: ccree: failing the suspend is not an error
-Date: Mon,  1 Jan 2018 12:06:39 +0000
-Message-ID: <1514808421-21993-13-git-send-email-gilad@benyossef.com>
+Subject: [PATCH 13/26] staging: ccree: check DMA pool buf !NULL  before free
+Date: Mon,  1 Jan 2018 12:06:40 +0000
+Message-ID: <1514808421-21993-14-git-send-email-gilad@benyossef.com>
 References: <1514808421-21993-1-git-send-email-gilad@benyossef.com>
-Cc: Ofir Drang <ofir.drang@arm.com>, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org,
-        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: devel@driverdev.osuosl.org, driverdev-devel@linuxdriverproject.org,
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+ linux-crypto@vger.kernel.org, Ofir Drang <ofir.drang@arm.com>
 To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from foss.arm.com ([217.140.101.70]:59146 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751531AbeAAMJZ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 1 Jan 2018 07:09:25 -0500
+Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
 In-Reply-To: <1514808421-21993-1-git-send-email-gilad@benyossef.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
+List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
+List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
+List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
+List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
+Errors-To: driverdev-devel-bounces@linuxdriverproject.org
+Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
+List-Id: linux-crypto.vger.kernel.org
 
-PM suspend returning a none zero value is not an error. It simply
-indicates a suspend is not advised right now so don't treat it as
-an error.
+If we ran out of DMA pool buffers, we get into the unmap
+code path with a NULL before. Deal with this by checking
+the virtual mapping is not NULL.
 
+Cc: stable@vger.kernel.org
 Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 ---
- drivers/staging/ccree/ssi_request_mgr.c | 8 +-------
- 1 file changed, 1 insertion(+), 7 deletions(-)
+ drivers/staging/ccree/ssi_buffer_mgr.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/staging/ccree/ssi_request_mgr.c b/drivers/staging/ccree/ssi_request_mgr.c
-index 530ba7e..e0b1d95 100644
---- a/drivers/staging/ccree/ssi_request_mgr.c
-+++ b/drivers/staging/ccree/ssi_request_mgr.c
-@@ -598,9 +598,6 @@ static void proc_completions(struct cc_drvdata *drvdata)
- 						drvdata->request_mgr_handle;
- 	unsigned int *tail = &request_mgr_handle->req_queue_tail;
- 	unsigned int *head = &request_mgr_handle->req_queue_head;
--#if defined(CONFIG_PM)
--	int rc = 0;
--#endif
- 
- 	while (request_mgr_handle->axi_completed) {
- 		request_mgr_handle->axi_completed--;
-@@ -625,10 +622,7 @@ static void proc_completions(struct cc_drvdata *drvdata)
- 		dev_dbg(dev, "Request completed. axi_completed=%d\n",
- 			request_mgr_handle->axi_completed);
- #if defined(CONFIG_PM)
--		rc = cc_pm_put_suspend(dev);
--		if (rc)
--			dev_err(dev, "Failed to set runtime suspension %d\n",
--				rc);
-+		cc_pm_put_suspend(dev);
- #endif
+diff --git a/drivers/staging/ccree/ssi_buffer_mgr.c b/drivers/staging/ccree/ssi_buffer_mgr.c
+index 795f403..33b9709 100644
+--- a/drivers/staging/ccree/ssi_buffer_mgr.c
++++ b/drivers/staging/ccree/ssi_buffer_mgr.c
+@@ -465,7 +465,8 @@ void cc_unmap_blkcipher_request(struct device *dev, void *ctx,
+ 				 DMA_TO_DEVICE);
  	}
- }
+ 	/* Release pool */
+-	if (req_ctx->dma_buf_type == CC_DMA_BUF_MLLI) {
++	if (req_ctx->dma_buf_type == CC_DMA_BUF_MLLI &&
++	    req_ctx->mlli_params.mlli_virt_addr) {
+ 		dma_pool_free(req_ctx->mlli_params.curr_pool,
+ 			      req_ctx->mlli_params.mlli_virt_addr,
+ 			      req_ctx->mlli_params.mlli_dma_addr);
 -- 
 2.7.4
