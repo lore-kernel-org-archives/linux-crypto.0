@@ -1,7 +1,7 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH 05/26] staging: ccree: pick alloc mem flags based on req flags
-Date: Mon,  1 Jan 2018 12:06:32 +0000
-Message-ID: <1514808421-21993-6-git-send-email-gilad@benyossef.com>
+Subject: [PATCH 06/26] staging: ccree: copy larval digest from RAM
+Date: Mon,  1 Jan 2018 12:06:33 +0000
+Message-ID: <1514808421-21993-7-git-send-email-gilad@benyossef.com>
 References: <1514808421-21993-1-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -23,413 +23,239 @@ Errors-To: driverdev-devel-bounces@linuxdriverproject.org
 Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
 List-Id: linux-crypto.vger.kernel.org
 
-The ccree driver was allocating memory using GFP_KERNEL flag
-always, ignoring the flags set in the crypto request. Fix it
-by choosing gfp flags based on crypto request flags.
+The ccree driver was using a DMA operation to copy larval digest
+from the ccree SRAM to RAM. Replace it with a simple memcpy.
 
 Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 ---
- drivers/staging/ccree/ssi_buffer_mgr.c | 19 +++++++------
- drivers/staging/ccree/ssi_buffer_mgr.h |  6 ++--
- drivers/staging/ccree/ssi_cipher.c     |  8 ++++--
- drivers/staging/ccree/ssi_driver.h     |  6 ++++
- drivers/staging/ccree/ssi_hash.c       | 50 ++++++++++++++++++++--------------
- 5 files changed, 54 insertions(+), 35 deletions(-)
+ drivers/staging/ccree/ssi_driver.c |   2 +
+ drivers/staging/ccree/ssi_hash.c   | 121 ++++++++++++++++++++-----------------
+ drivers/staging/ccree/ssi_hash.h   |   2 +
+ 3 files changed, 68 insertions(+), 57 deletions(-)
 
-diff --git a/drivers/staging/ccree/ssi_buffer_mgr.c b/drivers/staging/ccree/ssi_buffer_mgr.c
-index df03bad..795f403 100644
---- a/drivers/staging/ccree/ssi_buffer_mgr.c
-+++ b/drivers/staging/ccree/ssi_buffer_mgr.c
-@@ -217,7 +217,7 @@ static int cc_render_sg_to_mlli(struct device *dev, struct scatterlist *sgl,
- }
- 
- static int cc_generate_mlli(struct device *dev, struct buffer_array *sg_data,
--			    struct mlli_params *mlli_params)
-+			    struct mlli_params *mlli_params, gfp_t flags)
+diff --git a/drivers/staging/ccree/ssi_driver.c b/drivers/staging/ccree/ssi_driver.c
+index f50121b..75c7ade 100644
+--- a/drivers/staging/ccree/ssi_driver.c
++++ b/drivers/staging/ccree/ssi_driver.c
+@@ -484,6 +484,8 @@ static int __init ccree_init(void)
  {
- 	u32 *mlli_p;
- 	u32 total_nents = 0, prev_total_nents = 0;
-@@ -227,7 +227,7 @@ static int cc_generate_mlli(struct device *dev, struct buffer_array *sg_data,
+ 	int ret;
  
- 	/* Allocate memory from the pointed pool */
- 	mlli_params->mlli_virt_addr =
--		dma_pool_alloc(mlli_params->curr_pool, GFP_KERNEL,
-+		dma_pool_alloc(mlli_params->curr_pool, flags,
- 			       &mlli_params->mlli_dma_addr);
- 	if (!mlli_params->mlli_virt_addr) {
- 		dev_err(dev, "dma_pool_alloc() failed\n");
-@@ -483,7 +483,7 @@ void cc_unmap_blkcipher_request(struct device *dev, void *ctx,
- int cc_map_blkcipher_request(struct cc_drvdata *drvdata, void *ctx,
- 			     unsigned int ivsize, unsigned int nbytes,
- 			     void *info, struct scatterlist *src,
--			     struct scatterlist *dst)
-+			     struct scatterlist *dst, gfp_t flags)
- {
- 	struct blkcipher_req_ctx *req_ctx = (struct blkcipher_req_ctx *)ctx;
- 	struct mlli_params *mlli_params = &req_ctx->mlli_params;
-@@ -558,7 +558,7 @@ int cc_map_blkcipher_request(struct cc_drvdata *drvdata, void *ctx,
- 
- 	if (req_ctx->dma_buf_type == CC_DMA_BUF_MLLI) {
- 		mlli_params->curr_pool = buff_mgr->mlli_buffs_pool;
--		rc = cc_generate_mlli(dev, &sg_data, mlli_params);
-+		rc = cc_generate_mlli(dev, &sg_data, mlli_params, flags);
- 		if (rc)
- 			goto ablkcipher_exit;
- 	}
-@@ -1200,6 +1200,7 @@ int cc_map_aead_request(struct cc_drvdata *drvdata, struct aead_request *req)
- 	u32 mapped_nents = 0;
- 	u32 dummy = 0; /*used for the assoc data fragments */
- 	u32 size_to_map = 0;
-+	gfp_t flags = cc_gfp_flags(&req->base);
- 
- 	mlli_params->curr_pool = NULL;
- 	sg_data.num_of_buffers = 0;
-@@ -1366,7 +1367,7 @@ int cc_map_aead_request(struct cc_drvdata *drvdata, struct aead_request *req)
- 	if (areq_ctx->assoc_buff_type == CC_DMA_BUF_MLLI ||
- 	    areq_ctx->data_buff_type == CC_DMA_BUF_MLLI) {
- 		mlli_params->curr_pool = buff_mgr->mlli_buffs_pool;
--		rc = cc_generate_mlli(dev, &sg_data, mlli_params);
-+		rc = cc_generate_mlli(dev, &sg_data, mlli_params, flags);
- 		if (rc)
- 			goto aead_map_failure;
- 
-@@ -1385,7 +1386,7 @@ int cc_map_aead_request(struct cc_drvdata *drvdata, struct aead_request *req)
- 
- int cc_map_hash_request_final(struct cc_drvdata *drvdata, void *ctx,
- 			      struct scatterlist *src, unsigned int nbytes,
--			      bool do_update)
-+			      bool do_update, gfp_t flags)
- {
- 	struct ahash_req_ctx *areq_ctx = (struct ahash_req_ctx *)ctx;
- 	struct device *dev = drvdata_to_dev(drvdata);
-@@ -1445,7 +1446,7 @@ int cc_map_hash_request_final(struct cc_drvdata *drvdata, void *ctx,
- 		/* add the src data to the sg_data */
- 		cc_add_sg_entry(dev, &sg_data, areq_ctx->in_nents, src, nbytes,
- 				0, true, &areq_ctx->mlli_nents);
--		if (cc_generate_mlli(dev, &sg_data, mlli_params))
-+		if (cc_generate_mlli(dev, &sg_data, mlli_params, flags))
- 			goto fail_unmap_din;
- 	}
- 	/* change the buffer index for the unmap function */
-@@ -1466,7 +1467,7 @@ int cc_map_hash_request_final(struct cc_drvdata *drvdata, void *ctx,
- 
- int cc_map_hash_request_update(struct cc_drvdata *drvdata, void *ctx,
- 			       struct scatterlist *src, unsigned int nbytes,
--			       unsigned int block_size)
-+			       unsigned int block_size, gfp_t flags)
- {
- 	struct ahash_req_ctx *areq_ctx = (struct ahash_req_ctx *)ctx;
- 	struct device *dev = drvdata_to_dev(drvdata);
-@@ -1562,7 +1563,7 @@ int cc_map_hash_request_update(struct cc_drvdata *drvdata, void *ctx,
- 		cc_add_sg_entry(dev, &sg_data, areq_ctx->in_nents, src,
- 				(update_data_len - *curr_buff_cnt), 0, true,
- 				&areq_ctx->mlli_nents);
--		if (cc_generate_mlli(dev, &sg_data, mlli_params))
-+		if (cc_generate_mlli(dev, &sg_data, mlli_params, flags))
- 			goto fail_unmap_din;
- 	}
- 	areq_ctx->buff_index = (areq_ctx->buff_index ^ swap_index);
-diff --git a/drivers/staging/ccree/ssi_buffer_mgr.h b/drivers/staging/ccree/ssi_buffer_mgr.h
-index 9482927..c4749d7 100644
---- a/drivers/staging/ccree/ssi_buffer_mgr.h
-+++ b/drivers/staging/ccree/ssi_buffer_mgr.h
-@@ -43,7 +43,7 @@ int cc_buffer_mgr_fini(struct cc_drvdata *drvdata);
- int cc_map_blkcipher_request(struct cc_drvdata *drvdata, void *ctx,
- 			     unsigned int ivsize, unsigned int nbytes,
- 			     void *info, struct scatterlist *src,
--			     struct scatterlist *dst);
-+			     struct scatterlist *dst, gfp_t flags);
- 
- void cc_unmap_blkcipher_request(struct device *dev, void *ctx,
- 				unsigned int ivsize,
-@@ -56,11 +56,11 @@ void cc_unmap_aead_request(struct device *dev, struct aead_request *req);
- 
- int cc_map_hash_request_final(struct cc_drvdata *drvdata, void *ctx,
- 			      struct scatterlist *src, unsigned int nbytes,
--			      bool do_update);
-+			      bool do_update, gfp_t flags);
- 
- int cc_map_hash_request_update(struct cc_drvdata *drvdata, void *ctx,
- 			       struct scatterlist *src, unsigned int nbytes,
--			       unsigned int block_size);
-+			       unsigned int block_size, gfp_t flags);
- 
- void cc_unmap_hash_request(struct device *dev, void *ctx,
- 			   struct scatterlist *src, bool do_revert);
-diff --git a/drivers/staging/ccree/ssi_cipher.c b/drivers/staging/ccree/ssi_cipher.c
-index 4adf1f6..24196d1 100644
---- a/drivers/staging/ccree/ssi_cipher.c
-+++ b/drivers/staging/ccree/ssi_cipher.c
-@@ -639,6 +639,7 @@ static int cc_cipher_process(struct ablkcipher_request *req,
- 	struct cc_hw_desc desc[MAX_ABLKCIPHER_SEQ_LEN];
- 	struct cc_crypto_req cc_req = {};
- 	int rc, seq_len = 0, cts_restore_flag = 0;
-+	gfp_t flags = cc_gfp_flags(&req->base);
- 
- 	dev_dbg(dev, "%s req=%p info=%p nbytes=%d\n",
- 		((direction == DRV_CRYPTO_DIRECTION_ENCRYPT) ?
-@@ -662,7 +663,7 @@ static int cc_cipher_process(struct ablkcipher_request *req,
- 	/* The IV we are handed may be allocted from the stack so
- 	 * we must copy it to a DMAable buffer before use.
- 	 */
--	req_ctx->iv = kmalloc(ivsize, GFP_KERNEL);
-+	req_ctx->iv = kmalloc(ivsize, flags);
- 	if (!req_ctx->iv) {
- 		rc = -ENOMEM;
- 		goto exit_process;
-@@ -692,7 +693,7 @@ static int cc_cipher_process(struct ablkcipher_request *req,
- 	/* STAT_PHASE_1: Map buffers */
- 
- 	rc = cc_map_blkcipher_request(ctx_p->drvdata, req_ctx, ivsize, nbytes,
--				      req_ctx->iv, src, dst);
-+				      req_ctx->iv, src, dst, flags);
- 	if (rc) {
- 		dev_err(dev, "map_request() failed\n");
- 		goto exit_process;
-@@ -751,12 +752,13 @@ static int cc_cipher_decrypt(struct ablkcipher_request *req)
- 	struct crypto_ablkcipher *ablk_tfm = crypto_ablkcipher_reqtfm(req);
- 	struct blkcipher_req_ctx *req_ctx = ablkcipher_request_ctx(req);
- 	unsigned int ivsize = crypto_ablkcipher_ivsize(ablk_tfm);
-+	gfp_t flags = cc_gfp_flags(&req->base);
- 
- 	/*
- 	 * Allocate and save the last IV sized bytes of the source, which will
- 	 * be lost in case of in-place decryption and might be needed for CTS.
- 	 */
--	req_ctx->backup_info = kmalloc(ivsize, GFP_KERNEL);
-+	req_ctx->backup_info = kmalloc(ivsize, flags);
- 	if (!req_ctx->backup_info)
- 		return -ENOMEM;
- 
-diff --git a/drivers/staging/ccree/ssi_driver.h b/drivers/staging/ccree/ssi_driver.h
-index fae070c..4041c43 100644
---- a/drivers/staging/ccree/ssi_driver.h
-+++ b/drivers/staging/ccree/ssi_driver.h
-@@ -184,5 +184,11 @@ static inline u32 cc_ioread(struct cc_drvdata *drvdata, u32 reg)
- 	return ioread32(drvdata->cc_base + reg);
- }
- 
-+static inline gfp_t cc_gfp_flags(struct crypto_async_request *req)
-+{
-+	return (req->flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
-+			GFP_KERNEL : GFP_ATOMIC;
-+}
++	cc_hash_global_init();
 +
- #endif /*__CC_DRIVER_H__*/
- 
+ 	ret = cc_debugfs_global_init();
+ 	if (ret)
+ 		return ret;
 diff --git a/drivers/staging/ccree/ssi_hash.c b/drivers/staging/ccree/ssi_hash.c
-index 085a69a..37c0217 100644
+index 37c0217..1564854 100644
 --- a/drivers/staging/ccree/ssi_hash.c
 +++ b/drivers/staging/ccree/ssi_hash.c
-@@ -123,7 +123,7 @@ static int cc_map_result(struct device *dev, struct ahash_req_ctx *state,
- }
+@@ -41,10 +41,10 @@ static const u32 sha256_init[] = {
+ #if (CC_DEV_SHA_MAX > 256)
+ static const u32 digest_len_sha512_init[] = {
+ 	0x00000080, 0x00000000, 0x00000000, 0x00000000 };
+-static const u64 sha384_init[] = {
++static u64 sha384_init[] = {
+ 	SHA384_H7, SHA384_H6, SHA384_H5, SHA384_H4,
+ 	SHA384_H3, SHA384_H2, SHA384_H1, SHA384_H0 };
+-static const u64 sha512_init[] = {
++static u64 sha512_init[] = {
+ 	SHA512_H7, SHA512_H6, SHA512_H5, SHA512_H4,
+ 	SHA512_H3, SHA512_H2, SHA512_H1, SHA512_H0 };
+ #endif
+@@ -55,6 +55,8 @@ static void cc_setup_xcbc(struct ahash_request *areq, struct cc_hw_desc desc[],
+ static void cc_setup_cmac(struct ahash_request *areq, struct cc_hw_desc desc[],
+ 			  unsigned int *seq_size);
  
- static int cc_map_req(struct device *dev, struct ahash_req_ctx *state,
--		      struct cc_hash_ctx *ctx)
-+		      struct cc_hash_ctx *ctx, gfp_t flags)
++static const void *cc_larval_digest(struct device *dev, u32 mode);
++
+ struct cc_hash_alg {
+ 	struct list_head entry;
+ 	int hash_mode;
+@@ -126,10 +128,6 @@ static int cc_map_req(struct device *dev, struct ahash_req_ctx *state,
+ 		      struct cc_hash_ctx *ctx, gfp_t flags)
  {
  	bool is_hmac = ctx->is_hmac;
- 	cc_sram_addr_t larval_digest_addr =
-@@ -132,27 +132,26 @@ static int cc_map_req(struct device *dev, struct ahash_req_ctx *state,
- 	struct cc_hw_desc desc;
+-	cc_sram_addr_t larval_digest_addr =
+-		cc_larval_digest_addr(ctx->drvdata, ctx->hash_mode);
+-	struct cc_crypto_req cc_req = {};
+-	struct cc_hw_desc desc;
  	int rc = -ENOMEM;
  
--	state->buff0 = kzalloc(CC_MAX_HASH_BLCK_SIZE, GFP_KERNEL);
-+	state->buff0 = kzalloc(CC_MAX_HASH_BLCK_SIZE, flags);
- 	if (!state->buff0)
- 		goto fail0;
+ 	state->buff0 = kzalloc(CC_MAX_HASH_BLCK_SIZE, flags);
+@@ -203,9 +201,6 @@ static int cc_map_req(struct device *dev, struct ahash_req_ctx *state,
+ 			       HASH_LEN_SIZE);
+ #endif
+ 		}
+-		dma_sync_single_for_device(dev, state->digest_buff_dma_addr,
+-					   ctx->inter_digestsize,
+-					   DMA_BIDIRECTIONAL);
  
--	state->buff1 = kzalloc(CC_MAX_HASH_BLCK_SIZE, GFP_KERNEL);
-+	state->buff1 = kzalloc(CC_MAX_HASH_BLCK_SIZE, flags);
- 	if (!state->buff1)
- 		goto fail_buff0;
+ 		if (ctx->hash_mode != DRV_HASH_NULL) {
+ 			dma_sync_single_for_cpu(dev,
+@@ -216,22 +211,15 @@ static int cc_map_req(struct device *dev, struct ahash_req_ctx *state,
+ 			       ctx->opad_tmp_keys_buff, ctx->inter_digestsize);
+ 		}
+ 	} else { /*hash*/
+-		/* Copy the initial digests if hash flow. The SRAM contains the
+-		 * initial digests in the expected order for all SHA*
+-		 */
+-		hw_desc_init(&desc);
+-		set_din_sram(&desc, larval_digest_addr, ctx->inter_digestsize);
+-		set_dout_dlli(&desc, state->digest_buff_dma_addr,
+-			      ctx->inter_digestsize, NS_BIT, 0);
+-		set_flow_mode(&desc, BYPASS);
++		/* Copy the initial digests if hash flow. */
++		const void *larval = cc_larval_digest(dev, ctx->hash_mode);
  
--	state->digest_result_buff = kzalloc(CC_MAX_HASH_DIGEST_SIZE,
--					    GFP_KERNEL);
-+	state->digest_result_buff = kzalloc(CC_MAX_HASH_DIGEST_SIZE, flags);
- 	if (!state->digest_result_buff)
- 		goto fail_buff1;
+-		rc = send_request(ctx->drvdata, &cc_req, &desc, 1, 0);
+-		if (rc) {
+-			dev_err(dev, "send_request() failed (rc=%d)\n", rc);
+-			goto fail4;
+-		}
++		memcpy(state->digest_buff, larval, ctx->inter_digestsize);
+ 	}
  
--	state->digest_buff = kzalloc(ctx->inter_digestsize, GFP_KERNEL);
-+	state->digest_buff = kzalloc(ctx->inter_digestsize, flags);
- 	if (!state->digest_buff)
- 		goto fail_digest_result_buff;
- 
- 	dev_dbg(dev, "Allocated digest-buffer in context ctx->digest_buff=@%p\n",
- 		state->digest_buff);
++	dma_sync_single_for_device(dev, state->digest_buff_dma_addr,
++				   ctx->inter_digestsize, DMA_BIDIRECTIONAL);
++
  	if (ctx->hw_mode != DRV_CIPHER_XCBC_MAC) {
--		state->digest_bytes_len = kzalloc(HASH_LEN_SIZE, GFP_KERNEL);
-+		state->digest_bytes_len = kzalloc(HASH_LEN_SIZE, flags);
- 		if (!state->digest_bytes_len)
- 			goto fail1;
- 
-@@ -162,7 +161,7 @@ static int cc_map_req(struct device *dev, struct ahash_req_ctx *state,
- 		state->digest_bytes_len = NULL;
- 	}
- 
--	state->opad_digest_buff = kzalloc(ctx->inter_digestsize, GFP_KERNEL);
-+	state->opad_digest_buff = kzalloc(ctx->inter_digestsize, flags);
- 	if (!state->opad_digest_buff)
- 		goto fail2;
- 
-@@ -415,11 +414,12 @@ static int cc_hash_digest(struct ahash_request *req)
- 		cc_larval_digest_addr(ctx->drvdata, ctx->hash_mode);
- 	int idx = 0;
+ 		state->digest_bytes_len_dma_addr =
+ 			dma_map_single(dev, (void *)state->digest_bytes_len,
+@@ -2003,11 +1991,7 @@ int cc_init_hash_sram(struct cc_drvdata *drvdata)
+ 	cc_sram_addr_t sram_buff_ofs = hash_handle->digest_len_sram_addr;
+ 	unsigned int larval_seq_len = 0;
+ 	struct cc_hw_desc larval_seq[CC_DIGEST_SIZE_MAX / sizeof(u32)];
+-	struct device *dev = drvdata_to_dev(drvdata);
  	int rc = 0;
-+	gfp_t flags = cc_gfp_flags(&req->base);
+-#if (CC_DEV_SHA_MAX > 256)
+-	int i;
+-#endif
  
- 	dev_dbg(dev, "===== %s-digest (%d) ====\n", is_hmac ? "hmac" : "hash",
- 		nbytes);
+ 	/* Copy-to-sram digest-len */
+ 	cc_set_sram_desc(digest_len_init, sram_buff_ofs,
+@@ -2074,49 +2058,49 @@ int cc_init_hash_sram(struct cc_drvdata *drvdata)
+ 	larval_seq_len = 0;
  
--	if (cc_map_req(dev, state, ctx)) {
-+	if (cc_map_req(dev, state, ctx, flags)) {
- 		dev_err(dev, "map_ahash_source() failed\n");
- 		return -ENOMEM;
- 	}
-@@ -429,7 +429,8 @@ static int cc_hash_digest(struct ahash_request *req)
- 		return -ENOMEM;
- 	}
- 
--	if (cc_map_hash_request_final(ctx->drvdata, state, src, nbytes, 1)) {
-+	if (cc_map_hash_request_final(ctx->drvdata, state, src, nbytes, 1,
-+				      flags)) {
- 		dev_err(dev, "map_ahash_request_final() failed\n");
- 		return -ENOMEM;
- 	}
-@@ -566,6 +567,7 @@ static int cc_hash_update(struct ahash_request *req)
- 	struct cc_hw_desc desc[CC_MAX_HASH_SEQ_LEN];
- 	u32 idx = 0;
- 	int rc;
-+	gfp_t flags = cc_gfp_flags(&req->base);
- 
- 	dev_dbg(dev, "===== %s-update (%d) ====\n", ctx->is_hmac ?
- 		"hmac" : "hash", nbytes);
-@@ -576,7 +578,7 @@ static int cc_hash_update(struct ahash_request *req)
- 	}
- 
- 	rc = cc_map_hash_request_update(ctx->drvdata, state, src, nbytes,
--					block_size);
-+					block_size, flags);
- 	if (rc) {
- 		if (rc == 1) {
- 			dev_dbg(dev, " data size not require HW update %x\n",
-@@ -653,11 +655,13 @@ static int cc_hash_finup(struct ahash_request *req)
- 	struct cc_hw_desc desc[CC_MAX_HASH_SEQ_LEN];
- 	int idx = 0;
- 	int rc;
-+	gfp_t flags = cc_gfp_flags(&req->base);
- 
- 	dev_dbg(dev, "===== %s-finup (%d) ====\n", is_hmac ? "hmac" : "hash",
- 		nbytes);
- 
--	if (cc_map_hash_request_final(ctx->drvdata, state, src, nbytes, 1)) {
-+	if (cc_map_hash_request_final(ctx->drvdata, state, src, nbytes, 1,
-+				      flags)) {
- 		dev_err(dev, "map_ahash_request_final() failed\n");
- 		return -ENOMEM;
- 	}
-@@ -773,11 +777,13 @@ static int cc_hash_final(struct ahash_request *req)
- 	struct cc_hw_desc desc[CC_MAX_HASH_SEQ_LEN];
- 	int idx = 0;
- 	int rc;
-+	gfp_t flags = cc_gfp_flags(&req->base);
- 
- 	dev_dbg(dev, "===== %s-final (%d) ====\n", is_hmac ? "hmac" : "hash",
- 		nbytes);
- 
--	if (cc_map_hash_request_final(ctx->drvdata, state, src, nbytes, 0)) {
-+	if (cc_map_hash_request_final(ctx->drvdata, state, src, nbytes, 0,
-+				      flags)) {
- 		dev_err(dev, "map_ahash_request_final() failed\n");
- 		return -ENOMEM;
- 	}
-@@ -894,11 +900,12 @@ static int cc_hash_init(struct ahash_request *req)
- 	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
- 	struct cc_hash_ctx *ctx = crypto_ahash_ctx(tfm);
- 	struct device *dev = drvdata_to_dev(ctx->drvdata);
-+	gfp_t flags = cc_gfp_flags(&req->base);
- 
- 	dev_dbg(dev, "===== init (%d) ====\n", req->nbytes);
- 
- 	state->xcbc_count = 0;
--	cc_map_req(dev, state, ctx);
-+	cc_map_req(dev, state, ctx, flags);
- 
- 	return 0;
- }
-@@ -1317,6 +1324,7 @@ static int cc_mac_update(struct ahash_request *req)
- 	struct cc_hw_desc desc[CC_MAX_HASH_SEQ_LEN];
- 	int rc;
- 	u32 idx = 0;
-+	gfp_t flags = cc_gfp_flags(&req->base);
- 
- 	if (req->nbytes == 0) {
- 		/* no real updates required */
-@@ -1326,7 +1334,7 @@ static int cc_mac_update(struct ahash_request *req)
- 	state->xcbc_count++;
- 
- 	rc = cc_map_hash_request_update(ctx->drvdata, state, req->src,
--					req->nbytes, block_size);
-+					req->nbytes, block_size, flags);
- 	if (rc) {
- 		if (rc == 1) {
- 			dev_dbg(dev, " data size not require HW update %x\n",
-@@ -1379,7 +1387,7 @@ static int cc_mac_final(struct ahash_request *req)
- 	int rc = 0;
- 	u32 key_size, key_len;
- 	u32 digestsize = crypto_ahash_digestsize(tfm);
+ #if (CC_DEV_SHA_MAX > 256)
+-	/* We are forced to swap each double-word larval before copying to
+-	 * sram
+-	 */
+-	for (i = 0; i < ARRAY_SIZE(sha384_init); i++) {
+-		const u32 const0 = ((u32 *)((u64 *)&sha384_init[i]))[1];
+-		const u32 const1 = ((u32 *)((u64 *)&sha384_init[i]))[0];
 -
-+	gfp_t flags = cc_gfp_flags(&req->base);
- 	u32 rem_cnt = state->buff_index ? state->buff1_cnt :
- 			state->buff0_cnt;
+-		cc_set_sram_desc(&const0, sram_buff_ofs, 1, larval_seq,
+-				 &larval_seq_len);
+-		sram_buff_ofs += sizeof(u32);
+-		cc_set_sram_desc(&const1, sram_buff_ofs, 1, larval_seq,
+-				 &larval_seq_len);
+-		sram_buff_ofs += sizeof(u32);
+-	}
++	cc_set_sram_desc((u32 *)sha384_init, sram_buff_ofs,
++			 (ARRAY_SIZE(sha384_init) * 2), larval_seq,
++			 &larval_seq_len);
+ 	rc = send_request_init(drvdata, larval_seq, larval_seq_len);
+-	if (rc) {
+-		dev_err(dev, "send_request() failed (rc = %d)\n", rc);
++	if (rc)
+ 		goto init_digest_const_err;
+-	}
++	sram_buff_ofs += sizeof(sha384_init);
+ 	larval_seq_len = 0;
  
-@@ -1395,7 +1403,7 @@ static int cc_mac_final(struct ahash_request *req)
- 	dev_dbg(dev, "===== final  xcbc reminder (%d) ====\n", rem_cnt);
+-	for (i = 0; i < ARRAY_SIZE(sha512_init); i++) {
+-		const u32 const0 = ((u32 *)((u64 *)&sha512_init[i]))[1];
+-		const u32 const1 = ((u32 *)((u64 *)&sha512_init[i]))[0];
+-
+-		cc_set_sram_desc(&const0, sram_buff_ofs, 1, larval_seq,
+-				 &larval_seq_len);
+-		sram_buff_ofs += sizeof(u32);
+-		cc_set_sram_desc(&const1, sram_buff_ofs, 1, larval_seq,
+-				 &larval_seq_len);
+-		sram_buff_ofs += sizeof(u32);
+-	}
++	cc_set_sram_desc((u32 *)sha512_init, sram_buff_ofs,
++			 (ARRAY_SIZE(sha512_init) * 2), larval_seq,
++			 &larval_seq_len);
+ 	rc = send_request_init(drvdata, larval_seq, larval_seq_len);
+-	if (rc) {
+-		dev_err(dev, "send_request() failed (rc = %d)\n", rc);
++	if (rc)
+ 		goto init_digest_const_err;
+-	}
+ #endif
  
- 	if (cc_map_hash_request_final(ctx->drvdata, state, req->src,
--				      req->nbytes, 0)) {
-+				      req->nbytes, 0, flags)) {
- 		dev_err(dev, "map_ahash_request_final() failed\n");
- 		return -ENOMEM;
- 	}
-@@ -1493,6 +1501,7 @@ static int cc_mac_finup(struct ahash_request *req)
- 	int rc = 0;
- 	u32 key_len = 0;
- 	u32 digestsize = crypto_ahash_digestsize(tfm);
-+	gfp_t flags = cc_gfp_flags(&req->base);
+ init_digest_const_err:
+ 	return rc;
+ }
  
- 	dev_dbg(dev, "===== finup xcbc(%d) ====\n", req->nbytes);
- 	if (state->xcbc_count > 0 && req->nbytes == 0) {
-@@ -1501,7 +1510,7 @@ static int cc_mac_finup(struct ahash_request *req)
- 	}
++static void __init cc_swap_dwords(u32 *buf, unsigned long size)
++{
++	int i;
++	u32 tmp;
++
++	for (i = 0; i < size; i += 2) {
++		tmp = buf[i];
++		buf[i] = buf[i + 1];
++		buf[i + 1] = tmp;
++	}
++}
++
++/*
++ * Due to the way the HW works we need to swap every
++ * double word in the SHA384 and SHA512 larval hashes
++ */
++void __init cc_hash_global_init(void)
++{
++	cc_swap_dwords((u32 *)&sha384_init, (ARRAY_SIZE(sha384_init) * 2));
++	cc_swap_dwords((u32 *)&sha512_init, (ARRAY_SIZE(sha512_init) * 2));
++}
++
+ int cc_hash_alloc(struct cc_drvdata *drvdata)
+ {
+ 	struct cc_hash_handle *hash_handle;
+@@ -2373,6 +2357,29 @@ static void cc_set_desc(struct ahash_req_ctx *areq_ctx,
+ 	*seq_size = idx;
+ }
  
- 	if (cc_map_hash_request_final(ctx->drvdata, state, req->src,
--				      req->nbytes, 1)) {
-+				      req->nbytes, 1, flags)) {
- 		dev_err(dev, "map_ahash_request_final() failed\n");
- 		return -ENOMEM;
- 	}
-@@ -1565,10 +1574,11 @@ static int cc_mac_digest(struct ahash_request *req)
- 	u32 key_len;
- 	int idx = 0;
- 	int rc;
-+	gfp_t flags = cc_gfp_flags(&req->base);
++static const void *cc_larval_digest(struct device *dev, u32 mode)
++{
++	switch (mode) {
++	case DRV_HASH_MD5:
++		return md5_init;
++	case DRV_HASH_SHA1:
++		return sha1_init;
++	case DRV_HASH_SHA224:
++		return sha224_init;
++	case DRV_HASH_SHA256:
++		return sha256_init;
++#if (CC_DEV_SHA_MAX > 256)
++	case DRV_HASH_SHA384:
++		return sha384_init;
++	case DRV_HASH_SHA512:
++		return sha512_init;
++#endif
++	default:
++		dev_err(dev, "Invalid hash mode (%d)\n", mode);
++		return md5_init;
++	}
++}
++
+ /*!
+  * Gets the address of the initial digest in SRAM
+  * according to the given hash mode
+diff --git a/drivers/staging/ccree/ssi_hash.h b/drivers/staging/ccree/ssi_hash.h
+index dc5eaf6..9387428 100644
+--- a/drivers/staging/ccree/ssi_hash.h
++++ b/drivers/staging/ccree/ssi_hash.h
+@@ -90,5 +90,7 @@ cc_digest_len_addr(void *drvdata, u32 mode);
+  */
+ cc_sram_addr_t cc_larval_digest_addr(void *drvdata, u32 mode);
  
- 	dev_dbg(dev, "===== -digest mac (%d) ====\n",  req->nbytes);
++void cc_hash_global_init(void);
++
+ #endif /*__CC_HASH_H__*/
  
--	if (cc_map_req(dev, state, ctx)) {
-+	if (cc_map_req(dev, state, ctx, flags)) {
- 		dev_err(dev, "map_ahash_source() failed\n");
- 		return -ENOMEM;
- 	}
-@@ -1578,7 +1588,7 @@ static int cc_mac_digest(struct ahash_request *req)
- 	}
- 
- 	if (cc_map_hash_request_final(ctx->drvdata, state, req->src,
--				      req->nbytes, 1)) {
-+				      req->nbytes, 1, flags)) {
- 		dev_err(dev, "map_ahash_request_final() failed\n");
- 		return -ENOMEM;
- 	}
 -- 
 2.7.4
