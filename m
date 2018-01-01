@@ -1,7 +1,7 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH 02/26] staging: ccree: fold hash defs into queue defs
-Date: Mon,  1 Jan 2018 12:06:29 +0000
-Message-ID: <1514808421-21993-3-git-send-email-gilad@benyossef.com>
+Subject: [PATCH 03/26] staging: ccree: fold reg common defines into driver
+Date: Mon,  1 Jan 2018 12:06:30 +0000
+Message-ID: <1514808421-21993-4-git-send-email-gilad@benyossef.com>
 References: <1514808421-21993-1-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -23,81 +23,80 @@ Errors-To: driverdev-devel-bounces@linuxdriverproject.org
 Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
 List-Id: linux-crypto.vger.kernel.org
 
-Fold the two remaining enum in hash defs into the queue defs
-that are using them and delete the hash defs include file.
+Fold the 2 macro defined in dx_reg_common.h into the file they
+are used in and delete the file.
 
 Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 ---
- drivers/staging/ccree/cc_hw_queue_defs.h | 13 +++++++++++++
- drivers/staging/ccree/hash_defs.h        | 23 -----------------------
- drivers/staging/ccree/ssi_driver.h       |  1 -
- 3 files changed, 13 insertions(+), 24 deletions(-)
- delete mode 100644 drivers/staging/ccree/hash_defs.h
+ drivers/staging/ccree/cc_crypto_ctx.h |  4 ++--
+ drivers/staging/ccree/dx_reg_common.h | 13 -------------
+ drivers/staging/ccree/ssi_driver.h    |  5 +++--
+ 3 files changed, 5 insertions(+), 17 deletions(-)
+ delete mode 100644 drivers/staging/ccree/dx_reg_common.h
 
-diff --git a/drivers/staging/ccree/cc_hw_queue_defs.h b/drivers/staging/ccree/cc_hw_queue_defs.h
-index d691141..da5aabc 100644
---- a/drivers/staging/ccree/cc_hw_queue_defs.h
-+++ b/drivers/staging/ccree/cc_hw_queue_defs.h
-@@ -186,6 +186,19 @@ enum cc_hw_des_key_size {
- 	END_OF_DES_KEYS = S32_MAX,
- };
+diff --git a/drivers/staging/ccree/cc_crypto_ctx.h b/drivers/staging/ccree/cc_crypto_ctx.h
+index e556177..396829e 100644
+--- a/drivers/staging/ccree/cc_crypto_ctx.h
++++ b/drivers/staging/ccree/cc_crypto_ctx.h
+@@ -8,7 +8,7 @@
  
-+enum cc_hash_conf_pad {
-+	HASH_PADDING_DISABLED = 0,
-+	HASH_PADDING_ENABLED = 1,
-+	HASH_DIGEST_RESULT_LITTLE_ENDIAN = 2,
-+	HASH_CONFIG1_PADDING_RESERVE32 = S32_MAX,
-+};
-+
-+enum cc_hash_cipher_pad {
-+	DO_NOT_PAD = 0,
-+	DO_PAD = 1,
-+	HASH_CIPHER_DO_PADDING_RESERVE32 = S32_MAX,
-+};
-+
- /*****************************/
- /* Descriptor packing macros */
- /*****************************/
-diff --git a/drivers/staging/ccree/hash_defs.h b/drivers/staging/ccree/hash_defs.h
+ /* context size */
+ #ifndef CC_CTX_SIZE_LOG2
+-#if (CC_SUPPORT_SHA > 256)
++#if (CC_DEV_SHA_MAX > 256)
+ #define CC_CTX_SIZE_LOG2 8
+ #else
+ #define CC_CTX_SIZE_LOG2 7
+@@ -59,7 +59,7 @@
+ #define CC_SHA384_BLOCK_SIZE 128
+ #define CC_SHA512_BLOCK_SIZE 128
+ 
+-#if (CC_SUPPORT_SHA > 256)
++#if (CC_DEV_SHA_MAX > 256)
+ #define CC_DIGEST_SIZE_MAX CC_SHA512_DIGEST_SIZE
+ #define CC_HASH_BLOCK_SIZE_MAX CC_SHA512_BLOCK_SIZE /*1024b*/
+ #else /* Only up to SHA256 */
+diff --git a/drivers/staging/ccree/dx_reg_common.h b/drivers/staging/ccree/dx_reg_common.h
 deleted file mode 100644
-index d527e06..0000000
---- a/drivers/staging/ccree/hash_defs.h
+index 6898bf3..0000000
+--- a/drivers/staging/ccree/dx_reg_common.h
 +++ /dev/null
-@@ -1,23 +0,0 @@
+@@ -1,13 +0,0 @@
 -// SPDX-License-Identifier: GPL-2.0
 -// Copyright (C) 2012-2017 ARM Limited or its affiliates.
 -
--#ifndef _HASH_DEFS_H_
--#define _HASH_DEFS_H_
+-#ifndef __CC_REG_COMMON_H__
+-#define __CC_REG_COMMON_H__
 -
--#include "cc_crypto_ctx.h"
+-#define CC_DEV_SIGNATURE 0xDCC71200UL
 -
--enum cc_hash_conf_pad {
--	HASH_PADDING_DISABLED = 0,
--	HASH_PADDING_ENABLED = 1,
--	HASH_DIGEST_RESULT_LITTLE_ENDIAN = 2,
--	HASH_CONFIG1_PADDING_RESERVE32 = S32_MAX,
--};
+-#define CC_HW_VERSION 0xef840015UL
 -
--enum cc_hash_cipher_pad {
--	DO_NOT_PAD = 0,
--	DO_PAD = 1,
--	HASH_CIPHER_DO_PADDING_RESERVE32 = S32_MAX,
--};
+-#define CC_DEV_SHA_MAX 512
 -
--#endif /*_HASH_DEFS_H_*/
--
+-#endif /*__CC_REG_COMMON_H__*/
 diff --git a/drivers/staging/ccree/ssi_driver.h b/drivers/staging/ccree/ssi_driver.h
-index e8d70c8..bf3aec8 100644
+index bf3aec8..fae070c 100644
 --- a/drivers/staging/ccree/ssi_driver.h
 +++ b/drivers/staging/ccree/ssi_driver.h
-@@ -30,7 +30,6 @@
- #include "dx_reg_common.h"
- #define CC_SUPPORT_SHA CC_DEV_SHA_MAX
+@@ -27,8 +27,7 @@
+ 
+ /* Registers definitions from shared/hw/ree_include */
+ #include "dx_host.h"
+-#include "dx_reg_common.h"
+-#define CC_SUPPORT_SHA CC_DEV_SHA_MAX
++#define CC_DEV_SHA_MAX 512
  #include "cc_crypto_ctx.h"
--#include "hash_defs.h"
  #include "cc_hw_queue_defs.h"
  #include "ssi_sram_mgr.h"
+@@ -44,6 +43,8 @@ extern bool cc_dump_bytes;
+ /* Maximum DMA mask supported by IP */
+ #define DMA_BIT_MASK_LEN 48
  
++#define CC_DEV_SIGNATURE 0xDCC71200UL
++
+ #define CC_AXI_IRQ_MASK ((1 << CC_AXIM_CFG_BRESPMASK_BIT_SHIFT) | \
+ 			  (1 << CC_AXIM_CFG_RRESPMASK_BIT_SHIFT) | \
+ 			  (1 << CC_AXIM_CFG_INFLTMASK_BIT_SHIFT) | \
 -- 
 2.7.4
