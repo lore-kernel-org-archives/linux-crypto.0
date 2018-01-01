@@ -1,70 +1,55 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH 11/26] stating: ccree: revert "staging: ccree: fix leak of
- import() after init()"
-Date: Mon,  1 Jan 2018 12:06:38 +0000
-Message-ID: <1514808421-21993-12-git-send-email-gilad@benyossef.com>
+Subject: [PATCH 12/26] staging: ccree: failing the suspend is not an error
+Date: Mon,  1 Jan 2018 12:06:39 +0000
+Message-ID: <1514808421-21993-13-git-send-email-gilad@benyossef.com>
 References: <1514808421-21993-1-git-send-email-gilad@benyossef.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: devel@driverdev.osuosl.org, driverdev-devel@linuxdriverproject.org,
- linux-kernel@vger.kernel.org, stable@vger.kernel.org,
- linux-crypto@vger.kernel.org, Ofir Drang <ofir.drang@arm.com>
+Cc: Ofir Drang <ofir.drang@arm.com>, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org,
+        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org
 To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from foss.arm.com ([217.140.101.70]:59146 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751531AbeAAMJZ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 1 Jan 2018 07:09:25 -0500
 In-Reply-To: <1514808421-21993-1-git-send-email-gilad@benyossef.com>
-List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
-List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
-List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
-List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
-List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
-Errors-To: driverdev-devel-bounces@linuxdriverproject.org
-Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-This reverts commit c5f39d07860c ("staging: ccree: fix leak of import()
-after init()") and commit aece09024414 ("staging: ccree: Uninitialized
-return in ssi_ahash_import()").
+PM suspend returning a none zero value is not an error. It simply
+indicates a suspend is not advised right now so don't treat it as
+an error.
 
-This is the wrong solution and ends up relying on uninitialized memory,
-although it was not obvious to me at the time.
-
-Cc: stable@vger.kernel.org
 Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 ---
- drivers/staging/ccree/ssi_hash.c | 11 ++++-------
- 1 file changed, 4 insertions(+), 7 deletions(-)
+ drivers/staging/ccree/ssi_request_mgr.c | 8 +-------
+ 1 file changed, 1 insertion(+), 7 deletions(-)
 
-diff --git a/drivers/staging/ccree/ssi_hash.c b/drivers/staging/ccree/ssi_hash.c
-index cc11344..9d71b33 100644
---- a/drivers/staging/ccree/ssi_hash.c
-+++ b/drivers/staging/ccree/ssi_hash.c
-@@ -1673,7 +1673,7 @@ static int cc_hash_import(struct ahash_request *req, const void *in)
- 	struct device *dev = drvdata_to_dev(ctx->drvdata);
- 	struct ahash_req_ctx *state = ahash_request_ctx(req);
- 	u32 tmp;
+diff --git a/drivers/staging/ccree/ssi_request_mgr.c b/drivers/staging/ccree/ssi_request_mgr.c
+index 530ba7e..e0b1d95 100644
+--- a/drivers/staging/ccree/ssi_request_mgr.c
++++ b/drivers/staging/ccree/ssi_request_mgr.c
+@@ -598,9 +598,6 @@ static void proc_completions(struct cc_drvdata *drvdata)
+ 						drvdata->request_mgr_handle;
+ 	unsigned int *tail = &request_mgr_handle->req_queue_tail;
+ 	unsigned int *head = &request_mgr_handle->req_queue_head;
+-#if defined(CONFIG_PM)
 -	int rc = 0;
-+	int rc;
+-#endif
  
- 	memcpy(&tmp, in, sizeof(u32));
- 	if (tmp != CC_EXPORT_MAGIC) {
-@@ -1682,12 +1682,9 @@ static int cc_hash_import(struct ahash_request *req, const void *in)
- 	}
- 	in += sizeof(u32);
- 
--	/* call init() to allocate bufs if the user hasn't */
--	if (!state->digest_buff) {
--		rc = cc_hash_init(req);
+ 	while (request_mgr_handle->axi_completed) {
+ 		request_mgr_handle->axi_completed--;
+@@ -625,10 +622,7 @@ static void proc_completions(struct cc_drvdata *drvdata)
+ 		dev_dbg(dev, "Request completed. axi_completed=%d\n",
+ 			request_mgr_handle->axi_completed);
+ #if defined(CONFIG_PM)
+-		rc = cc_pm_put_suspend(dev);
 -		if (rc)
--			goto out;
--	}
-+	rc = cc_hash_init(req);
-+	if (rc)
-+		goto out;
- 
- 	dma_sync_single_for_cpu(dev, state->digest_buff_dma_addr,
- 				ctx->inter_digestsize, DMA_BIDIRECTIONAL);
+-			dev_err(dev, "Failed to set runtime suspension %d\n",
+-				rc);
++		cc_pm_put_suspend(dev);
+ #endif
+ 	}
+ }
 -- 
 2.7.4
