@@ -1,25 +1,32 @@
 From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: [PATCH v3] crypto: AF_ALG - whitelist mask and type
-Date: Tue, 02 Jan 2018 08:53:41 +0100
-Message-ID: <2019517.bqA8BTu5nT@positron.chronox.de>
-References: <001a1141c43ad30ccf055efb76ed@google.com> <1779114.sJA4SrkMo1@tauon.chronox.de> <20171222075843.GB27971@gondor.apana.org.au>
+Subject: [PATCH v4] crypto: AF_ALG - whitelist mask and type
+Date: Tue, 02 Jan 2018 08:55:25 +0100
+Message-ID: <4952955.He5JCySAi4@positron.chronox.de>
+References: <001a1141c43ad30ccf055efb76ed@google.com> <20171222075843.GB27971@gondor.apana.org.au> <2019517.bqA8BTu5nT@positron.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
-Cc: syzbot
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        syzbot
         <bot+b6e703f648ebbbf57a4528d4314e0c2a5c893dc2@syzkaller.appspotmail.com>,
         davem@davemloft.net, linux-crypto@vger.kernel.org,
         linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
         ebiggers3@gmail.com
-To: Herbert Xu <herbert@gondor.apana.org.au>
+To: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:44346 "EHLO mail.eperm.de"
+Received: from mail.eperm.de ([89.247.134.16]:44364 "EHLO mail.eperm.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751374AbeABHxo (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 2 Jan 2018 02:53:44 -0500
-In-Reply-To: <20171222075843.GB27971@gondor.apana.org.au>
+        id S1751354AbeABHz1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 2 Jan 2018 02:55:27 -0500
+In-Reply-To: <2019517.bqA8BTu5nT@positron.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
+
+Hi,
+
+sorry, I forgot the right tags.
+
+---8<---
 
 The user space interface allows specifying the type and mask field used
 to allocate the cipher. Only a subset of the possible flags are intended
@@ -28,6 +35,8 @@ for user space. Therefore, white-list the allowed flags.
 In case the user space caller uses at least one non-allowed flag, EINVAL
 is returned.
 
+Reported-by: syzbot <syzkaller@googlegroups.com>
+Cc: <stable@vger.kernel.org>
 Signed-off-by: Stephan Mueller <smueller@chronox.de>
 ---
  crypto/af_alg.c | 10 ++++++----
