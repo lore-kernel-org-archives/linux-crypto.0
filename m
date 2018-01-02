@@ -1,78 +1,72 @@
-From: Joey Pabalinas <joeypabalinas@gmail.com>
-Subject: [PATCH v2] crypto: testmgr: change `guard` to unsigned char
-Date: Mon, 1 Jan 2018 10:40:14 -1000
-Message-ID: <20180101204014.643vntmxqdbfqmvb@gmail.com>
-References: <20180101103319.fmmlpeg6kjdmhloq@gmail.com>
- <1514819026.1967.37.camel@perches.com>
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Subject: [PATCH v3] crypto: AF_ALG - whitelist mask and type
+Date: Tue, 02 Jan 2018 08:53:41 +0100
+Message-ID: <2019517.bqA8BTu5nT@positron.chronox.de>
+References: <001a1141c43ad30ccf055efb76ed@google.com> <1779114.sJA4SrkMo1@tauon.chronox.de> <20171222075843.GB27971@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="7ihfx5dpudnfdo2m"
-Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
-        linux-kernel@vger.kernel.org,
-        Joey Pabalinas <joeypabalinas@gmail.com>
-To: Joe Perches <joe@perches.com>, linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: syzbot
+        <bot+b6e703f648ebbbf57a4528d4314e0c2a5c893dc2@syzkaller.appspotmail.com>,
+        davem@davemloft.net, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
+        ebiggers3@gmail.com
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pg0-f66.google.com ([74.125.83.66]:39400 "EHLO
-        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752048AbeAAUkR (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 1 Jan 2018 15:40:17 -0500
-Content-Disposition: inline
-In-Reply-To: <1514819026.1967.37.camel@perches.com>
+Received: from mail.eperm.de ([89.247.134.16]:44346 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751374AbeABHxo (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 2 Jan 2018 02:53:44 -0500
+In-Reply-To: <20171222075843.GB27971@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+The user space interface allows specifying the type and mask field used
+to allocate the cipher. Only a subset of the possible flags are intended
+for user space. Therefore, white-list the allowed flags.
 
---7ihfx5dpudnfdo2m
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+In case the user space caller uses at least one non-allowed flag, EINVAL
+is returned.
 
-When char is signed, storing the values 0xba (186) and 0xad (173) in the
-`guard` array produces signed overflow. Change the type of `guard` to
-static unsigned char to correct undefined behavior and reduce function
-stack usage.
-
-Signed-off-by: Joey Pabalinas <joeypabalinas@gmail.com>
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
 ---
- crypto/testmgr.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ crypto/af_alg.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 29d7020b8826faa3f0..44a85d4b3561acbca6 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -185,7 +185,7 @@ static int ahash_partial_update(struct ahash_request **=
-preq,
- 	char *state;
- 	struct ahash_request *req;
- 	int statesize, ret =3D -EINVAL;
--	const char guard[] =3D { 0x00, 0xba, 0xad, 0x00 };
-+	static const unsigned char guard[] =3D { 0x00, 0xba, 0xad, 0x00 };
-=20
- 	req =3D *preq;
- 	statesize =3D crypto_ahash_statesize(
---=20
-2.15.1
-
---7ihfx5dpudnfdo2m
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEKlZXrihdNOcUPZTNruvLfWhyVBkFAlpKnK4ACgkQruvLfWhy
-VBlUfA/7B4AWBNB+yrkSotHbySPpX4Z6NO8jojDuOk1Ef/ji0qcwAZZPjS7sO8sx
-7aEngOlXwh8mmBgxtRP/ftRId9mUNhLhsPGwV5XLftZuvpToFezjm83gvLcitbD1
-i42mj4EjVhHc27HBhlNzqA3r/iDUrmuvQAOPt06IMdIBuim3NhIHGrBFNVq4a8Aw
-b6wxeBA2hyzQ5TgCNUYTs5AQa8y6qQiLxp8VKimW5yCmmpU7lwJf8u5E6uxSAvnT
-xrh/ByN33DFj0aH255lMi4HVdiF2ofbfGDwTyqxI6Mqv/px9eG2/O+/Hv+2l6AZT
-XvOQxWNWrrC+TB87vQmJCbwSk3iAXHuLN1uBO85A+SG8W+KPgkvyPFadUuQ9vsuf
-4Ctdc2iZI8AJYhaNfKY1jjiTxL/hPsl7Qsgb948BHJACp7Sv5Ng8UFaEHJAYOnE9
-py2mx7pUQu/67sa/Hn3DoOq2sr6g0OaCBXFYsW50KSEV7cD0rtIxKWYdgp/ySaLK
-vMo2BtOThhHD1xKYZcxafGUbJks9PiJtjMQww3kKcS4e8VkWIiBsbVDpz6JL0bCN
-UxBSmHzRy92GiwQeU8vWx6nsW9fJCzSgpb1Z8Db0hZUVHeSmNn04JQmbvTTw8SKt
-89WUTFx3uRXTN11/8ZhAVHe52vzAMK9ZPiZD8Jci07QGgsApxr0=
-=g1hN
------END PGP SIGNATURE-----
-
---7ihfx5dpudnfdo2m--
+diff --git a/crypto/af_alg.c b/crypto/af_alg.c
+index 35d4dcea381f..5231f421ad00 100644
+--- a/crypto/af_alg.c
++++ b/crypto/af_alg.c
+@@ -150,7 +150,7 @@ EXPORT_SYMBOL_GPL(af_alg_release_parent);
+ 
+ static int alg_bind(struct socket *sock, struct sockaddr *uaddr, int addr_len)
+ {
+-	const u32 forbidden = CRYPTO_ALG_INTERNAL;
++	const u32 allowed = CRYPTO_ALG_KERN_DRIVER_ONLY;
+ 	struct sock *sk = sock->sk;
+ 	struct alg_sock *ask = alg_sk(sk);
+ 	struct sockaddr_alg *sa = (void *)uaddr;
+@@ -158,6 +158,10 @@ static int alg_bind(struct socket *sock, struct sockaddr *uaddr, int addr_len)
+ 	void *private;
+ 	int err;
+ 
++	/* If caller uses non-allowed flag, return error. */
++	if ((sa->salg_feat & ~allowed) || (sa->salg_mask & ~allowed))
++		return -EINVAL;
++
+ 	if (sock->state == SS_CONNECTED)
+ 		return -EINVAL;
+ 
+@@ -176,9 +180,7 @@ static int alg_bind(struct socket *sock, struct sockaddr *uaddr, int addr_len)
+ 	if (IS_ERR(type))
+ 		return PTR_ERR(type);
+ 
+-	private = type->bind(sa->salg_name,
+-			     sa->salg_feat & ~forbidden,
+-			     sa->salg_mask & ~forbidden);
++	private = type->bind(sa->salg_name, sa->salg_feat, sa->salg_mask);
+ 	if (IS_ERR(private)) {
+ 		module_put(type->owner);
+ 		return PTR_ERR(private);
+-- 
+2.14.3
