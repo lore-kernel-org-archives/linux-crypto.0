@@ -1,47 +1,79 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH v2 22/27] staging: ccree: put pointer next to var name
-Date: Wed,  3 Jan 2018 13:35:29 +0000
-Message-ID: <1514986544-5888-23-git-send-email-gilad@benyossef.com>
+Subject: [PATCH v2 23/27] stating: ccree: fix allocation of void sized buf
+Date: Wed,  3 Jan 2018 13:35:30 +0000
+Message-ID: <1514986544-5888-24-git-send-email-gilad@benyossef.com>
 References: <1514986544-5888-1-git-send-email-gilad@benyossef.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, devel@driverdev.osuosl.org,
- driverdev-devel@linuxdriverproject.org, linux-kernel@vger.kernel.org,
- Ofir Drang <ofir.drang@arm.com>
+Cc: Ofir Drang <ofir.drang@arm.com>, stable@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org
 To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1514986544-5888-1-git-send-email-gilad@benyossef.com>
-List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
-List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
-List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
-List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
-List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
-Errors-To: driverdev-devel-bounces@linuxdriverproject.org
-Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Put pointer next to var name as per coding style.
+We were allocating buffers using sizeof(*struct->field) where field was
+type void.  Fix it by having a local variable with the real type.
 
+Cc: stable@vger.kernel.org
 Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 ---
- drivers/staging/ccree/ssi_request_mgr.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/staging/ccree/ssi_ivgen.c    | 9 ++++-----
+ drivers/staging/ccree/ssi_sram_mgr.c | 9 ++++++---
+ 2 files changed, 10 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/staging/ccree/ssi_request_mgr.c b/drivers/staging/ccree/ssi_request_mgr.c
-index 01f4756..82377d2 100644
---- a/drivers/staging/ccree/ssi_request_mgr.c
-+++ b/drivers/staging/ccree/ssi_request_mgr.c
-@@ -166,7 +166,7 @@ static void enqueue_seq(struct cc_drvdata *drvdata, struct cc_hw_desc seq[],
- 			unsigned int seq_len)
- {
- 	int i, w;
--	void * __iomem reg = drvdata->cc_base + CC_REG(DSCRPTR_QUEUE_WORD0);
-+	void __iomem *reg = drvdata->cc_base + CC_REG(DSCRPTR_QUEUE_WORD0);
- 	struct device *dev = drvdata_to_dev(drvdata);
+diff --git a/drivers/staging/ccree/ssi_ivgen.c b/drivers/staging/ccree/ssi_ivgen.c
+index 94a0502..9d8d307 100644
+--- a/drivers/staging/ccree/ssi_ivgen.c
++++ b/drivers/staging/ccree/ssi_ivgen.c
+@@ -175,13 +175,10 @@ int cc_ivgen_init(struct cc_drvdata *drvdata)
+ 	int rc;
  
- 	/*
+ 	/* Allocate "this" context */
+-	drvdata->ivgen_handle = kzalloc(sizeof(*drvdata->ivgen_handle),
+-					GFP_KERNEL);
+-	if (!drvdata->ivgen_handle)
++	ivgen_ctx = kzalloc(sizeof(*ivgen_ctx), GFP_KERNEL);
++	if (!ivgen_ctx)
+ 		return -ENOMEM;
+ 
+-	ivgen_ctx = drvdata->ivgen_handle;
+-
+ 	/* Allocate pool's header for initial enc. key/IV */
+ 	ivgen_ctx->pool_meta = dma_alloc_coherent(device, CC_IVPOOL_META_SIZE,
+ 						  &ivgen_ctx->pool_meta_dma,
+@@ -200,6 +197,8 @@ int cc_ivgen_init(struct cc_drvdata *drvdata)
+ 		goto out;
+ 	}
+ 
++	drvdata->ivgen_handle = ivgen_ctx;
++
+ 	return cc_init_iv_sram(drvdata);
+ 
+ out:
+diff --git a/drivers/staging/ccree/ssi_sram_mgr.c b/drivers/staging/ccree/ssi_sram_mgr.c
+index e178385..3a93299 100644
+--- a/drivers/staging/ccree/ssi_sram_mgr.c
++++ b/drivers/staging/ccree/ssi_sram_mgr.c
+@@ -32,13 +32,16 @@ void cc_sram_mgr_fini(struct cc_drvdata *drvdata)
+  */
+ int cc_sram_mgr_init(struct cc_drvdata *drvdata)
+ {
++	struct cc_sram_ctx *ctx;
++
+ 	/* Allocate "this" context */
+-	drvdata->sram_mgr_handle = kzalloc(sizeof(*drvdata->sram_mgr_handle),
+-					   GFP_KERNEL);
++	ctx = kzalloc(sizeof(*ctx), GFP_KERNEL);
+ 
+-	if (!drvdata->sram_mgr_handle)
++	if (!ctx)
+ 		return -ENOMEM;
+ 
++	drvdata->sram_mgr_handle = ctx;
++
+ 	return 0;
+ }
+ 
 -- 
 2.7.4
