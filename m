@@ -1,77 +1,66 @@
-From: Philippe Ombredanne <pombredanne@nexb.com>
-Subject: Re: [PATCH v2 01/27] staging: ccree: SPDXify driver
-Date: Wed, 3 Jan 2018 16:01:20 +0100
-Message-ID: <CAOFm3uGDz+ZXfST=dHO3H-WqeudxWEovc=jngvBfX_KHPV9e_w@mail.gmail.com>
-References: <1514986544-5888-1-git-send-email-gilad@benyossef.com> <1514986544-5888-2-git-send-email-gilad@benyossef.com>
+From: Wilfred Kabore <friendsmotors2424@gmail.com>
+Subject: HELLO
+Date: Wed, 3 Jan 2018 16:19:20 +0000
+Message-ID: <CANc+iOkBnt94hsgugU+vHtc6hg9Bd0h499xwzDDatQj1d7xc2w@mail.gmail.com>
+Reply-To: drwilfred.kabore@yandex.com
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Ofir Drang <ofir.drang@arm.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        linux-crypto@vger.kernel.org,
-        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
-        Thomas Gleixner <tglx@linutronix.de>
-To: Gilad Ben-Yossef <gilad@benyossef.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1514986544-5888-2-git-send-email-gilad@benyossef.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
-
-Gilad,
-
-On Wed, Jan 3, 2018 at 2:35 PM, Gilad Ben-Yossef <gilad@benyossef.com> wrote:
-> Replace verbatim GPL v2 copy with SPDX tag.
->
-> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
-
-<snip>
-
-> --- a/drivers/staging/ccree/cc_crypto_ctx.h
-> +++ b/drivers/staging/ccree/cc_crypto_ctx.h
-> @@ -1,18 +1,5 @@
-> -/*
-> - * Copyright (C) 2012-2017 ARM Limited or its affiliates.
-> - *
-> - * This program is free software; you can redistribute it and/or modify
-> - * it under the terms of the GNU General Public License version 2 as
-> - * published by the Free Software Foundation.
-> - *
-> - * This program is distributed in the hope that it will be useful,
-> - * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> - * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> - * GNU General Public License for more details.
-> - *
-> - * You should have received a copy of the GNU General Public License
-> - * along with this program; if not, see <http://www.gnu.org/licenses/>.
-> - */
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +/* Copyright (C) 2012-2018 ARM Limited or its affiliates. */
-
-Thank you for using the SPDX tags!
-
-Now, while I appreciate your attempt to use the latest and greatest
-SPDX license id definitions (published by SPDX a few days agao), THIS
-IS NOT a welcomed initiative. Please stick instead to use ONLY the
-SPDX license ids that are defined in Thomas doc patches [1]: e.g. use
-instead:  SPDX-License-Identifier: GPL-2.0 and please DO NOT USE
-GPL-2.0-only for now.
-
-The rationale is simple: from a kernel standpoint we cannot depend on
-the latest changes of an external spec such as SPDX (and I am involved
-with SPDX alright but I am wearing a kernel hat here). This is why
-things have been carefully documented for the kernel proper by Thomas.
-It is perfectly fine at some times in the future to adopt the newest
-license ids, but this will have to happen in an orderly fashion with a
-proper doc update and the eventual tree-wide changes to update every
-occurrence. This cannot happen any other way or this would defeat the
-whole purpose to have clear licensing kernel-wide: using the latest
-and greatest introduces variations and creates a mess that we want to
-avoid in the first place.
-
-CC: Thomas Gleixner <tglx@linutronix.de>
-
-[1] https://lkml.org/lkml/2017/12/28/323
+To: undisclosed-recipients:;
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-wm0-f68.google.com ([74.125.82.68]:43759 "EHLO
+        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751087AbeACQTW (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 3 Jan 2018 11:19:22 -0500
+Received: by mail-wm0-f68.google.com with SMTP id n138so3555428wmg.2
+        for <linux-crypto@vger.kernel.org>; Wed, 03 Jan 2018 08:19:22 -0800 (PST)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
 -- 
-Cordially
-Philippe Ombredanne
+Dear Friend,
+
+I am MR. WILFRED KABORE, THE MANAGER, BILL AND EXCHANGE DEPT., BANK OF
+AFRICA - Burkina Faso.
+
+I know this message will come to you as a surprise. Don't worry I was
+totally convinced to write you, I hope that you will not expose or
+betray this
+trust and confident that i am about to repose on you for the mutual
+benefits of our families.
+
+I need your urgent assistance in transferring the sum of
+US$12.8M(Twelve Million Eight Hundred Thousand USD) into your account
+within 10 to 14 working days. This requires a private arrangement; I
+shall forward to you the details of the transaction if you indicate
+your interest in this proposal.
+
+This money has been dormant for years in our bank without claim, I
+want the bank to release the money to you as the closest person to the
+late bank's customer (owner of the account) who died along with his
+entire family during the Iraq war in 2006. I don't want the money to
+go into our bank treasurer account as an abandoned fund. So this is
+the reason why i contact you so that the bank will release the money
+to you as the next of kin to the dead customer and we share the money
+together. Please i would like you to keep this proposal as a top
+secret.
+
+Upon receipt of your reply, I will give you full details on how the
+business deal will be executed and also note that you will have 40% of
+the above
+mentioned sum.
+
+Kindly fill out this information's requested below in return then i
+will give you more details with application form for the claim.
+
+Your full name: --------
+Your Country: --------
+Phone Number: --------
+Your Age : ----------
+Your Occupation: ----------
+
+I expect your urgent response if you agree to handle this project with me.
+
+Best Regards.
+
+Wilfred Kabore
