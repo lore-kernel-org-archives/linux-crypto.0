@@ -1,7 +1,7 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH v2 25/27] staging: ccree: remove unneeded includes
-Date: Wed,  3 Jan 2018 13:35:32 +0000
-Message-ID: <1514986544-5888-26-git-send-email-gilad@benyossef.com>
+Subject: [PATCH v2 26/27] staging: ccree: update TODO
+Date: Wed,  3 Jan 2018 13:35:33 +0000
+Message-ID: <1514986544-5888-27-git-send-email-gilad@benyossef.com>
 References: <1514986544-5888-1-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -23,186 +23,23 @@ Errors-To: driverdev-devel-bounces@linuxdriverproject.org
 Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
 List-Id: linux-crypto.vger.kernel.org
 
-Remove include files not needed for compilation.
+Update TODO to reflect work done
 
 Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 ---
- drivers/staging/ccree/cc_aead.c        |  7 -------
- drivers/staging/ccree/cc_buffer_mgr.c  |  6 ------
- drivers/staging/ccree/cc_cipher.c      |  4 ----
- drivers/staging/ccree/cc_driver.c      | 31 -------------------------------
- drivers/staging/ccree/cc_hash.c        |  2 --
- drivers/staging/ccree/cc_ivgen.c       |  1 -
- drivers/staging/ccree/cc_pm.c          |  2 --
- drivers/staging/ccree/cc_request_mgr.c |  5 -----
- 8 files changed, 58 deletions(-)
+ drivers/staging/ccree/TODO | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/staging/ccree/cc_aead.c b/drivers/staging/ccree/cc_aead.c
-index 0560cc9..494f973 100644
---- a/drivers/staging/ccree/cc_aead.c
-+++ b/drivers/staging/ccree/cc_aead.c
-@@ -3,18 +3,11 @@
+diff --git a/drivers/staging/ccree/TODO b/drivers/staging/ccree/TODO
+index 6d8702b..b8e163d 100644
+--- a/drivers/staging/ccree/TODO
++++ b/drivers/staging/ccree/TODO
+@@ -6,5 +6,5 @@
+ *									*
+ *************************************************************************
  
- #include <linux/kernel.h>
- #include <linux/module.h>
--#include <linux/platform_device.h>
- #include <crypto/algapi.h>
--#include <crypto/internal/skcipher.h>
--#include <crypto/internal/hash.h>
- #include <crypto/internal/aead.h>
--#include <crypto/sha.h>
--#include <crypto/ctr.h>
- #include <crypto/authenc.h>
--#include <crypto/aes.h>
- #include <crypto/des.h>
- #include <linux/rtnetlink.h>
--#include <linux/version.h>
- #include "cc_driver.h"
- #include "cc_buffer_mgr.h"
- #include "cc_aead.h"
-diff --git a/drivers/staging/ccree/cc_buffer_mgr.c b/drivers/staging/ccree/cc_buffer_mgr.c
-index 13275eb..85408ca 100644
---- a/drivers/staging/ccree/cc_buffer_mgr.c
-+++ b/drivers/staging/ccree/cc_buffer_mgr.c
-@@ -1,17 +1,11 @@
- // SPDX-License-Identifier: GPL-2.0-only
- /* Copyright (C) 2012-2018 ARM Limited or its affiliates. */
+-1. Handle HW FIFO fullness more cleanly.
++1. ???
  
--#include <linux/crypto.h>
--#include <linux/version.h>
--#include <crypto/algapi.h>
- #include <crypto/internal/aead.h>
--#include <crypto/hash.h>
- #include <crypto/authenc.h>
- #include <crypto/scatterwalk.h>
- #include <linux/dmapool.h>
- #include <linux/dma-mapping.h>
--#include <linux/module.h>
--#include <linux/platform_device.h>
- 
- #include "cc_buffer_mgr.h"
- #include "cc_lli_defs.h"
-diff --git a/drivers/staging/ccree/cc_cipher.c b/drivers/staging/ccree/cc_cipher.c
-index 37635aa..a768710 100644
---- a/drivers/staging/ccree/cc_cipher.c
-+++ b/drivers/staging/ccree/cc_cipher.c
-@@ -3,12 +3,8 @@
- 
- #include <linux/kernel.h>
- #include <linux/module.h>
--#include <linux/platform_device.h>
--#include <linux/semaphore.h>
- #include <crypto/algapi.h>
- #include <crypto/internal/skcipher.h>
--#include <crypto/aes.h>
--#include <crypto/ctr.h>
- #include <crypto/des.h>
- #include <crypto/xts.h>
- #include <crypto/scatterwalk.h>
-diff --git a/drivers/staging/ccree/cc_driver.c b/drivers/staging/ccree/cc_driver.c
-index ddf0cb8..0197aa2 100644
---- a/drivers/staging/ccree/cc_driver.c
-+++ b/drivers/staging/ccree/cc_driver.c
-@@ -5,43 +5,12 @@
- #include <linux/module.h>
- 
- #include <linux/crypto.h>
--#include <crypto/algapi.h>
--#include <crypto/aes.h>
--#include <crypto/sha.h>
--#include <crypto/aead.h>
--#include <crypto/authenc.h>
--#include <crypto/scatterwalk.h>
--#include <crypto/internal/skcipher.h>
--
--#include <linux/init.h>
- #include <linux/moduleparam.h>
- #include <linux/types.h>
--#include <linux/random.h>
--#include <linux/ioport.h>
- #include <linux/interrupt.h>
--#include <linux/fcntl.h>
--#include <linux/poll.h>
--#include <linux/proc_fs.h>
--#include <linux/mutex.h>
--#include <linux/sysctl.h>
--#include <linux/fs.h>
--#include <linux/cdev.h>
- #include <linux/platform_device.h>
--#include <linux/mm.h>
--#include <linux/delay.h>
--#include <linux/dma-mapping.h>
--#include <linux/dmapool.h>
--#include <linux/list.h>
- #include <linux/slab.h>
- #include <linux/spinlock.h>
--#include <linux/pm.h>
--
--/* cache.h required for L1_CACHE_ALIGN() and cache_line_size() */
--#include <linux/cache.h>
--#include <linux/io.h>
--#include <linux/uaccess.h>
--#include <linux/pagemap.h>
--#include <linux/sched.h>
- #include <linux/of.h>
- #include <linux/clk.h>
- #include <linux/of_address.h>
-diff --git a/drivers/staging/ccree/cc_hash.c b/drivers/staging/ccree/cc_hash.c
-index c47084b..de49314 100644
---- a/drivers/staging/ccree/cc_hash.c
-+++ b/drivers/staging/ccree/cc_hash.c
-@@ -3,10 +3,8 @@
- 
- #include <linux/kernel.h>
- #include <linux/module.h>
--#include <linux/platform_device.h>
- #include <crypto/algapi.h>
- #include <crypto/hash.h>
--#include <crypto/sha.h>
- #include <crypto/md5.h>
- #include <crypto/internal/hash.h>
- 
-diff --git a/drivers/staging/ccree/cc_ivgen.c b/drivers/staging/ccree/cc_ivgen.c
-index 892cd78..5defe1f 100644
---- a/drivers/staging/ccree/cc_ivgen.c
-+++ b/drivers/staging/ccree/cc_ivgen.c
-@@ -1,7 +1,6 @@
- // SPDX-License-Identifier: GPL-2.0-only
- /* Copyright (C) 2012-2018 ARM Limited or its affiliates. */
- 
--#include <linux/platform_device.h>
- #include <crypto/ctr.h>
- #include "cc_driver.h"
- #include "cc_ivgen.h"
-diff --git a/drivers/staging/ccree/cc_pm.c b/drivers/staging/ccree/cc_pm.c
-index 8a28cfd..273216d 100644
---- a/drivers/staging/ccree/cc_pm.c
-+++ b/drivers/staging/ccree/cc_pm.c
-@@ -2,9 +2,7 @@
- /* Copyright (C) 2012-2018 ARM Limited or its affiliates. */
- 
- #include <linux/kernel.h>
--#include <linux/platform_device.h>
- #include <linux/interrupt.h>
--#include <crypto/ctr.h>
- #include <linux/pm_runtime.h>
- #include "cc_driver.h"
- #include "cc_buffer_mgr.h"
-diff --git a/drivers/staging/ccree/cc_request_mgr.c b/drivers/staging/ccree/cc_request_mgr.c
-index eacf944..fe62dd8 100644
---- a/drivers/staging/ccree/cc_request_mgr.c
-+++ b/drivers/staging/ccree/cc_request_mgr.c
-@@ -2,11 +2,6 @@
- /* Copyright (C) 2012-2018 ARM Limited or its affiliates. */
- 
- #include <linux/kernel.h>
--#include <linux/platform_device.h>
--#include <linux/interrupt.h>
--#include <linux/delay.h>
--#include <crypto/ctr.h>
--#include <linux/pm_runtime.h>
- #include "cc_driver.h"
- #include "cc_buffer_mgr.h"
- #include "cc_request_mgr.h"
 -- 
 2.7.4
