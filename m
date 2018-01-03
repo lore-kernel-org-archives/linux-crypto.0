@@ -1,45 +1,35 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH v2 26/27] staging: ccree: update TODO
-Date: Wed,  3 Jan 2018 13:35:33 +0000
-Message-ID: <1514986544-5888-27-git-send-email-gilad@benyossef.com>
+Subject: [PATCH v2 27/27] staging: ccree: add missing include
+Date: Wed,  3 Jan 2018 13:35:34 +0000
+Message-ID: <1514986544-5888-28-git-send-email-gilad@benyossef.com>
 References: <1514986544-5888-1-git-send-email-gilad@benyossef.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, devel@driverdev.osuosl.org,
- driverdev-devel@linuxdriverproject.org, linux-kernel@vger.kernel.org,
- Ofir Drang <ofir.drang@arm.com>
+Cc: Ofir Drang <ofir.drang@arm.com>, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org,
+        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org
 To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1514986544-5888-1-git-send-email-gilad@benyossef.com>
-List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
-List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
-List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
-List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
-List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
-Errors-To: driverdev-devel-bounces@linuxdriverproject.org
-Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Update TODO to reflect work done
+Add the missing include of include file with function declarations.
 
 Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 ---
- drivers/staging/ccree/TODO | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/staging/ccree/cc_debugfs.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/staging/ccree/TODO b/drivers/staging/ccree/TODO
-index 6d8702b..b8e163d 100644
---- a/drivers/staging/ccree/TODO
-+++ b/drivers/staging/ccree/TODO
-@@ -6,5 +6,5 @@
- *									*
- *************************************************************************
+diff --git a/drivers/staging/ccree/cc_debugfs.c b/drivers/staging/ccree/cc_debugfs.c
+index 363a0ef..e07cbb1 100644
+--- a/drivers/staging/ccree/cc_debugfs.c
++++ b/drivers/staging/ccree/cc_debugfs.c
+@@ -6,6 +6,7 @@
+ #include <linux/stringify.h>
+ #include "cc_driver.h"
+ #include "cc_crypto_ctx.h"
++#include "cc_debugfs.h"
  
--1. Handle HW FIFO fullness more cleanly.
-+1. ???
- 
+ struct cc_debugfs_ctx {
+ 	struct dentry *dir;
 -- 
 2.7.4
