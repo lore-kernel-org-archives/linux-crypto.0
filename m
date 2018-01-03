@@ -1,7 +1,7 @@
 From: Corentin Labbe <clabbe.montjoie@gmail.com>
-Subject: [PATCH 4/6] crypto: virtio: convert to new crypto engine API
-Date: Wed,  3 Jan 2018 21:11:07 +0100
-Message-ID: <20180103201109.16077-5-clabbe.montjoie@gmail.com>
+Subject: [PATCH 5/6] crypto: stm32-hash: convert to the new crypto engine API
+Date: Wed,  3 Jan 2018 21:11:08 +0100
+Message-ID: <20180103201109.16077-6-clabbe.montjoie@gmail.com>
 References: <20180103201109.16077-1-clabbe.montjoie@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -26,85 +26,78 @@ Sender: virtualization-bounces@lists.linux-foundation.org
 Errors-To: virtualization-bounces@lists.linux-foundation.org
 List-Id: linux-crypto.vger.kernel.org
 
-This patch convert the driver to the new crypto engine API.
+This patch convert the stm32-hash driver to the new crypto engine API.
 
 Signed-off-by: Corentin Labbe <clabbe.montjoie@gmail.com>
 ---
- drivers/crypto/virtio/virtio_crypto_algs.c   | 10 +++++++---
- drivers/crypto/virtio/virtio_crypto_common.h |  3 +--
- drivers/crypto/virtio/virtio_crypto_core.c   |  3 ---
- 3 files changed, 8 insertions(+), 8 deletions(-)
+ drivers/crypto/stm32/stm32-hash.c | 18 +++++++++++++-----
+ 1 file changed, 13 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/crypto/virtio/virtio_crypto_algs.c b/drivers/crypto/virtio/virtio_crypto_algs.c
-index abe8c15450df..060824a8ab0a 100644
---- a/drivers/crypto/virtio/virtio_crypto_algs.c
-+++ b/drivers/crypto/virtio/virtio_crypto_algs.c
-@@ -29,6 +29,7 @@
+diff --git a/drivers/crypto/stm32/stm32-hash.c b/drivers/crypto/stm32/stm32-hash.c
+index 4ca4a264a833..9790c2c936c7 100644
+--- a/drivers/crypto/stm32/stm32-hash.c
++++ b/drivers/crypto/stm32/stm32-hash.c
+@@ -122,6 +122,7 @@ enum stm32_hash_data_format {
+ #define HASH_DMA_THRESHOLD		50
  
- 
- struct virtio_crypto_ablkcipher_ctx {
+ struct stm32_hash_ctx {
 +	struct crypto_engine_reqctx enginectx;
- 	struct virtio_crypto *vcrypto;
- 	struct crypto_tfm *tfm;
+ 	struct stm32_hash_dev	*hdev;
+ 	unsigned long		flags;
  
-@@ -521,6 +522,9 @@ static int virtio_crypto_ablkcipher_init(struct crypto_tfm *tfm)
- 	tfm->crt_ablkcipher.reqsize = sizeof(struct virtio_crypto_sym_request);
- 	ctx->tfm = tfm;
+@@ -828,6 +829,11 @@ static int stm32_hash_hw_init(struct stm32_hash_dev *hdev,
+ 	return 0;
+ }
  
-+	ctx->enginectx.op.do_one_request = virtio_crypto_ablkcipher_crypt_req;
-+	ctx->enginectx.op.prepare_request = NULL;
++static int stm32_hash_one_request(struct crypto_engine *engine,
++				  void *areq);
++static int stm32_hash_prepare_req(struct crypto_engine *engine,
++				  void *areq);
++
+ static int stm32_hash_handle_queue(struct stm32_hash_dev *hdev,
+ 				   struct ahash_request *req)
+ {
+@@ -835,8 +841,9 @@ static int stm32_hash_handle_queue(struct stm32_hash_dev *hdev,
+ }
+ 
+ static int stm32_hash_prepare_req(struct crypto_engine *engine,
+-				  struct ahash_request *req)
++				  void *areq)
+ {
++	struct ahash_request *req = container_of(areq, struct ahash_request, base);
+ 	struct stm32_hash_ctx *ctx = crypto_ahash_ctx(crypto_ahash_reqtfm(req));
+ 	struct stm32_hash_dev *hdev = stm32_hash_find_dev(ctx);
+ 	struct stm32_hash_request_ctx *rctx;
+@@ -855,8 +862,9 @@ static int stm32_hash_prepare_req(struct crypto_engine *engine,
+ }
+ 
+ static int stm32_hash_one_request(struct crypto_engine *engine,
+-				  struct ahash_request *req)
++				  void *areq)
+ {
++	struct ahash_request *req = container_of(areq, struct ahash_request, base);
+ 	struct stm32_hash_ctx *ctx = crypto_ahash_ctx(crypto_ahash_reqtfm(req));
+ 	struct stm32_hash_dev *hdev = stm32_hash_find_dev(ctx);
+ 	struct stm32_hash_request_ctx *rctx;
+@@ -1033,6 +1041,9 @@ static int stm32_hash_cra_init_algs(struct crypto_tfm *tfm,
+ 	if (algs_hmac_name)
+ 		ctx->flags |= HASH_FLAGS_HMAC;
+ 
++	ctx->enginectx.op.do_one_request = stm32_hash_one_request;
++	ctx->enginectx.op.prepare_request = stm32_hash_prepare_req;
 +	ctx->enginectx.op.unprepare_request = NULL;
  	return 0;
  }
  
-@@ -538,9 +542,9 @@ static void virtio_crypto_ablkcipher_exit(struct crypto_tfm *tfm)
- }
- 
- int virtio_crypto_ablkcipher_crypt_req(
--	struct crypto_engine *engine,
--	struct ablkcipher_request *req)
-+	struct crypto_engine *engine, void *vreq)
- {
-+	struct ablkcipher_request *req = container_of(vreq, struct ablkcipher_request, base);
- 	struct virtio_crypto_sym_request *vc_sym_req =
- 				ablkcipher_request_ctx(req);
- 	struct virtio_crypto_request *vc_req = &vc_sym_req->base;
-@@ -562,7 +566,7 @@ static void virtio_crypto_ablkcipher_finalize_req(
- 	int err)
- {
- 	crypto_finalize_cipher_request(vc_sym_req->base.dataq->engine,
--					req, err);
-+				       req, err);
- 	kzfree(vc_sym_req->iv);
- 	virtcrypto_clear_request(&vc_sym_req->base);
- }
-diff --git a/drivers/crypto/virtio/virtio_crypto_common.h b/drivers/crypto/virtio/virtio_crypto_common.h
-index e976539a05d9..72621bd67211 100644
---- a/drivers/crypto/virtio/virtio_crypto_common.h
-+++ b/drivers/crypto/virtio/virtio_crypto_common.h
-@@ -107,8 +107,7 @@ struct virtio_crypto *virtcrypto_get_dev_node(int node);
- int virtcrypto_dev_start(struct virtio_crypto *vcrypto);
- void virtcrypto_dev_stop(struct virtio_crypto *vcrypto);
- int virtio_crypto_ablkcipher_crypt_req(
--	struct crypto_engine *engine,
--	struct ablkcipher_request *req);
-+	struct crypto_engine *engine, void *vreq);
- 
- void
- virtcrypto_clear_request(struct virtio_crypto_request *vc_req);
-diff --git a/drivers/crypto/virtio/virtio_crypto_core.c b/drivers/crypto/virtio/virtio_crypto_core.c
-index ff1410a32c2b..83326986c113 100644
---- a/drivers/crypto/virtio/virtio_crypto_core.c
-+++ b/drivers/crypto/virtio/virtio_crypto_core.c
-@@ -111,9 +111,6 @@ static int virtcrypto_find_vqs(struct virtio_crypto *vi)
- 			ret = -ENOMEM;
- 			goto err_engine;
- 		}
--
--		vi->data_vq[i].engine->cipher_one_request =
--			virtio_crypto_ablkcipher_crypt_req;
+@@ -1493,9 +1504,6 @@ static int stm32_hash_probe(struct platform_device *pdev)
+ 		goto err_engine;
  	}
  
- 	kfree(names);
+-	hdev->engine->prepare_hash_request = stm32_hash_prepare_req;
+-	hdev->engine->hash_one_request = stm32_hash_one_request;
+-
+ 	ret = crypto_engine_start(hdev->engine);
+ 	if (ret)
+ 		goto err_engine_start;
 -- 
 2.13.6
