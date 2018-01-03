@@ -1,50 +1,73 @@
 From: Eric Biggers <ebiggers3@gmail.com>
-Subject: [RFC PATCH 3/9] crypto: mcryptd - pass through absence of ->setkey()
-Date: Wed,  3 Jan 2018 11:16:24 -0800
-Message-ID: <20180103191630.79917-4-ebiggers3@gmail.com>
+Subject: [RFC PATCH 1/9] crypto: hash - introduce crypto_hash_alg_has_setkey()
+Date: Wed,  3 Jan 2018 11:16:22 -0800
+Message-ID: <20180103191630.79917-2-ebiggers3@gmail.com>
 References: <20180103191630.79917-1-ebiggers3@gmail.com>
 Cc: Herbert Xu <herbert@gondor.apana.org.au>,
         "David S . Miller" <davem@davemloft.net>,
         Eric Biggers <ebiggers@google.com>
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-io0-f195.google.com ([209.85.223.195]:37017 "EHLO
-        mail-io0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750831AbeACTS2 (ORCPT
+Received: from mail-io0-f194.google.com ([209.85.223.194]:38830 "EHLO
+        mail-io0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750831AbeACTS0 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 3 Jan 2018 14:18:28 -0500
-Received: by mail-io0-f195.google.com with SMTP id n14so3146864iob.4
-        for <linux-crypto@vger.kernel.org>; Wed, 03 Jan 2018 11:18:27 -0800 (PST)
+        Wed, 3 Jan 2018 14:18:26 -0500
+Received: by mail-io0-f194.google.com with SMTP id 87so3150505ior.5
+        for <linux-crypto@vger.kernel.org>; Wed, 03 Jan 2018 11:18:26 -0800 (PST)
 In-Reply-To: <20180103191630.79917-1-ebiggers3@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 From: Eric Biggers <ebiggers@google.com>
 
-When the mcryptd template is used to wrap an unkeyed hash algorithm,
-don't install a ->setkey() method to the mcryptd instance.  This change
-is necessary for mcryptd to keep working with unkeyed hash algorithms
-once we start enforcing that ->setkey() is called when present.
+Templates that use an shash spawn can use crypto_shash_alg_has_setkey()
+to determine whether the underlying algorithm requires a key or not.
+But there was no corresponding function for ahash spawns.  Add it.
+
+Note that the new function actually has to support both shash and ahash
+algorithms, since the ahash API can be used with either.
 
 Cc: stable@vger.kernel.org
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- crypto/mcryptd.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ crypto/ahash.c                 | 11 +++++++++++
+ include/crypto/internal/hash.h |  2 ++
+ 2 files changed, 13 insertions(+)
 
-diff --git a/crypto/mcryptd.c b/crypto/mcryptd.c
-index 2908382861ee..ace346b976b3 100644
---- a/crypto/mcryptd.c
-+++ b/crypto/mcryptd.c
-@@ -534,7 +534,8 @@ static int mcryptd_create_hash(struct crypto_template *tmpl, struct rtattr **tb,
- 	inst->alg.finup  = mcryptd_hash_finup_enqueue;
- 	inst->alg.export = mcryptd_hash_export;
- 	inst->alg.import = mcryptd_hash_import;
--	inst->alg.setkey = mcryptd_hash_setkey;
-+	if (crypto_hash_alg_has_setkey(halg))
-+		inst->alg.setkey = mcryptd_hash_setkey;
- 	inst->alg.digest = mcryptd_hash_digest_enqueue;
+diff --git a/crypto/ahash.c b/crypto/ahash.c
+index 3a35d67de7d9..d2c8895bb2fe 100644
+--- a/crypto/ahash.c
++++ b/crypto/ahash.c
+@@ -649,5 +649,16 @@ struct hash_alg_common *ahash_attr_alg(struct rtattr *rta, u32 type, u32 mask)
+ }
+ EXPORT_SYMBOL_GPL(ahash_attr_alg);
  
- 	err = ahash_register_instance(tmpl, inst);
++bool crypto_hash_alg_has_setkey(struct hash_alg_common *halg)
++{
++	struct crypto_alg *alg = &halg->base;
++
++	if (alg->cra_type != &crypto_ahash_type)
++		return crypto_shash_alg_has_setkey(__crypto_shash_alg(alg));
++
++	return __crypto_ahash_alg(alg)->setkey != NULL;
++}
++EXPORT_SYMBOL_GPL(crypto_hash_alg_has_setkey);
++
+ MODULE_LICENSE("GPL");
+ MODULE_DESCRIPTION("Asynchronous cryptographic hash type");
+diff --git a/include/crypto/internal/hash.h b/include/crypto/internal/hash.h
+index c2bae8da642c..27040a46d50a 100644
+--- a/include/crypto/internal/hash.h
++++ b/include/crypto/internal/hash.h
+@@ -90,6 +90,8 @@ static inline bool crypto_shash_alg_has_setkey(struct shash_alg *alg)
+ 	return alg->setkey != shash_no_setkey;
+ }
+ 
++bool crypto_hash_alg_has_setkey(struct hash_alg_common *halg);
++
+ int crypto_init_ahash_spawn(struct crypto_ahash_spawn *spawn,
+ 			    struct hash_alg_common *alg,
+ 			    struct crypto_instance *inst);
 -- 
 2.15.1.620.gb9897f4670-goog
