@@ -1,7 +1,7 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH v2 07/27] staging: ccree: tag debugfs init/exit func properly
-Date: Wed,  3 Jan 2018 13:35:14 +0000
-Message-ID: <1514986544-5888-8-git-send-email-gilad@benyossef.com>
+Subject: [PATCH v2 08/27] staging: ccree: remove unused leftover field
+Date: Wed,  3 Jan 2018 13:35:15 +0000
+Message-ID: <1514986544-5888-9-git-send-email-gilad@benyossef.com>
 References: <1514986544-5888-1-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -23,35 +23,24 @@ Errors-To: driverdev-devel-bounces@linuxdriverproject.org
 Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
 List-Id: linux-crypto.vger.kernel.org
 
-The debugfs global init and exit functions were missing
-__init and __exit tags, potentially wasting memory.
-Fix it by properly tagging them.
+Remove the unused monitor_desc field.
 
 Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 ---
- drivers/staging/ccree/cc_debugfs.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/staging/ccree/ssi_request_mgr.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/drivers/staging/ccree/cc_debugfs.c b/drivers/staging/ccree/cc_debugfs.c
-index 518cefd..128c994 100644
---- a/drivers/staging/ccree/cc_debugfs.c
-+++ b/drivers/staging/ccree/cc_debugfs.c
-@@ -38,14 +38,14 @@ static struct debugfs_reg32 debug_regs[] = {
- 	CC_DEBUG_REG(AXIM_MON_COMP),
- };
+diff --git a/drivers/staging/ccree/ssi_request_mgr.c b/drivers/staging/ccree/ssi_request_mgr.c
+index ac6846f..18e2e1d 100644
+--- a/drivers/staging/ccree/ssi_request_mgr.c
++++ b/drivers/staging/ccree/ssi_request_mgr.c
+@@ -32,7 +32,6 @@ struct cc_req_mgr_handle {
+ 	struct cc_hw_desc compl_desc;
+ 	u8 *dummy_comp_buff;
+ 	dma_addr_t dummy_comp_buff_dma;
+-	struct cc_hw_desc monitor_desc;
  
--int cc_debugfs_global_init(void)
-+int __init cc_debugfs_global_init(void)
- {
- 	cc_debugfs_dir = debugfs_create_dir("ccree", NULL);
- 
- 	return !cc_debugfs_dir;
- }
- 
--void cc_debugfs_global_fini(void)
-+void __exit cc_debugfs_global_fini(void)
- {
- 	debugfs_remove(cc_debugfs_dir);
- }
+ #ifdef COMP_IN_WQ
+ 	struct workqueue_struct *workq;
 -- 
 2.7.4
