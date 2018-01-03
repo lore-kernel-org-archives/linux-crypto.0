@@ -1,98 +1,111 @@
 From: Logan Gunthorpe <logang@deltatee.com>
-Subject: [PATCH v9 6/8] ntb: ntb_hw_intel: use io-64-nonatomic instead of in-driver hacks
-Date: Wed,  3 Jan 2018 11:06:16 -0700
-Message-ID: <20180103180618.18401-7-logang@deltatee.com>
+Subject: [PATCH v9 3/8] powerpc: iomap.c: introduce io{read|write}64_{lo_hi|hi_lo}
+Date: Wed,  3 Jan 2018 11:06:13 -0700
+Message-ID: <20180103180618.18401-4-logang@deltatee.com>
 References: <20180103180618.18401-1-logang@deltatee.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Cc: Arnd Bergmann <arnd@arndb.de>,
         Andy Shevchenko <andy.shevchenko@gmail.com>,
         =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
-        Logan Gunthorpe <logang@deltatee.com>
+        Logan Gunthorpe <logang@deltatee.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>,
+        Michael Ellerman <mpe@ellerman.id.au>
 To: linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
         linux-ntb@googlegroups.com, linux-crypto@vger.kernel.org,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-arch-owner@vger.kernel.org>
 In-Reply-To: <20180103180618.18401-1-logang@deltatee.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Sender: linux-arch-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Now that ioread64 and iowrite64 are available in io-64-nonatomic,
-we can remove the hack at the top of ntb_hw_intel.c and replace it
-with an include.
+These functions will be introduced into the generic iomap.c so
+they can deal with PIO accesses in hi-lo/lo-hi variants. Thus,
+the powerpc version of iomap.c will need to provide the same
+functions even though, in this arch, they are identical to the
+regular io{read|write}64 functions.
 
 Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+Tested-by: Horia Geantă <horia.geanta@nxp.com>
 Reviewed-by: Andy Shevchenko <andy.shevchenko@gmail.com>
-Acked-by: Dave Jiang <dave.jiang@intel.com>
-Acked-by: Allen Hubbe <Allen.Hubbe@dell.com>
-Acked-by: Jon Mason <jdmason@kudzu.us>
-
-# Please enter the commit message for your changes. Lines starting
-# with '#' will be ignored, and an empty message aborts the commit.
-#
-# Date:      Mon Jun 19 12:18:31 2017 -0600
-#
-# interactive rebase in progress; onto ae64f9bd1d36
-# Last commands done (6 commands done):
-#    pick cf3e4dab2173 io-64-nonatomic: add io{read|write}64[be]{_lo_hi|_hi_lo} macros
-#    r 79b4c4b8490c ntb: ntb_hw_intel: use io-64-nonatomic instead of in-driver hacks
-# Next commands to do (2 remaining commands):
-#    r 19b6c1f3b15d crypto: caam: cleanup CONFIG_64BIT ifdefs when using io{read|write}64
-#    r f3c8723446ef ntb_hw_switchtec: Cleanup 64bit IO defines to use the common header
-# You are currently editing a commit while rebasing branch 'io64_v9' on 'ae64f9bd1d36'.
-#
-# Changes to be committed:
-#	modified:   drivers/ntb/hw/intel/ntb_hw_intel.c
-#
+Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Cc: Paul Mackerras <paulus@samba.org>
+Cc: Michael Ellerman <mpe@ellerman.id.au>
 ---
- drivers/ntb/hw/intel/ntb_hw_intel.c | 30 +-----------------------------
- 1 file changed, 1 insertion(+), 29 deletions(-)
+ arch/powerpc/kernel/iomap.c | 40 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 40 insertions(+)
 
-diff --git a/drivers/ntb/hw/intel/ntb_hw_intel.c b/drivers/ntb/hw/intel/ntb_hw_intel.c
-index 4de074a86073..119cfc45617e 100644
---- a/drivers/ntb/hw/intel/ntb_hw_intel.c
-+++ b/drivers/ntb/hw/intel/ntb_hw_intel.c
-@@ -59,6 +59,7 @@
- #include <linux/random.h>
- #include <linux/slab.h>
- #include <linux/ntb.h>
-+#include <linux/io-64-nonatomic-lo-hi.h>
- 
- #include "ntb_hw_intel.h"
- 
-@@ -155,35 +156,6 @@ MODULE_PARM_DESC(xeon_b2b_dsd_bar5_addr32,
- static inline enum ntb_topo xeon_ppd_topo(struct intel_ntb_dev *ndev, u8 ppd);
- static int xeon_init_isr(struct intel_ntb_dev *ndev);
- 
--#ifndef ioread64
--#ifdef readq
--#define ioread64 readq
--#else
--#define ioread64 _ioread64
--static inline u64 _ioread64(void __iomem *mmio)
--{
--	u64 low, high;
--
--	low = ioread32(mmio);
--	high = ioread32(mmio + sizeof(u32));
--	return low | (high << 32);
--}
--#endif
--#endif
--
--#ifndef iowrite64
--#ifdef writeq
--#define iowrite64 writeq
--#else
--#define iowrite64 _iowrite64
--static inline void _iowrite64(u64 val, void __iomem *mmio)
--{
--	iowrite32(val, mmio);
--	iowrite32(val >> 32, mmio + sizeof(u32));
--}
--#endif
--#endif
--
- static inline int pdev_is_atom(struct pci_dev *pdev)
+diff --git a/arch/powerpc/kernel/iomap.c b/arch/powerpc/kernel/iomap.c
+index aab456ed2a00..5ac84efc6ede 100644
+--- a/arch/powerpc/kernel/iomap.c
++++ b/arch/powerpc/kernel/iomap.c
+@@ -45,12 +45,32 @@ u64 ioread64(void __iomem *addr)
  {
- 	switch (pdev->device) {
+ 	return readq(addr);
+ }
++u64 ioread64_lo_hi(void __iomem *addr)
++{
++	return readq(addr);
++}
++u64 ioread64_hi_lo(void __iomem *addr)
++{
++	return readq(addr);
++}
+ u64 ioread64be(void __iomem *addr)
+ {
+ 	return readq_be(addr);
+ }
++u64 ioread64be_lo_hi(void __iomem *addr)
++{
++	return readq_be(addr);
++}
++u64 ioread64be_hi_lo(void __iomem *addr)
++{
++	return readq_be(addr);
++}
+ EXPORT_SYMBOL(ioread64);
++EXPORT_SYMBOL(ioread64_lo_hi);
++EXPORT_SYMBOL(ioread64_hi_lo);
+ EXPORT_SYMBOL(ioread64be);
++EXPORT_SYMBOL(ioread64be_lo_hi);
++EXPORT_SYMBOL(ioread64be_hi_lo);
+ #endif /* __powerpc64__ */
+ 
+ void iowrite8(u8 val, void __iomem *addr)
+@@ -83,12 +103,32 @@ void iowrite64(u64 val, void __iomem *addr)
+ {
+ 	writeq(val, addr);
+ }
++void iowrite64_lo_hi(u64 val, void __iomem *addr)
++{
++	writeq(val, addr);
++}
++void iowrite64_hi_lo(u64 val, void __iomem *addr)
++{
++	writeq(val, addr);
++}
+ void iowrite64be(u64 val, void __iomem *addr)
+ {
+ 	writeq_be(val, addr);
+ }
++void iowrite64be_lo_hi(u64 val, void __iomem *addr)
++{
++	writeq_be(val, addr);
++}
++void iowrite64be_hi_lo(u64 val, void __iomem *addr)
++{
++	writeq_be(val, addr);
++}
+ EXPORT_SYMBOL(iowrite64);
++EXPORT_SYMBOL(iowrite64_lo_hi);
++EXPORT_SYMBOL(iowrite64_hi_lo);
+ EXPORT_SYMBOL(iowrite64be);
++EXPORT_SYMBOL(iowrite64be_lo_hi);
++EXPORT_SYMBOL(iowrite64be_hi_lo);
+ #endif /* __powerpc64__ */
+ 
+ /*
 -- 
 2.11.0
