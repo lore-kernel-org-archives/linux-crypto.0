@@ -1,54 +1,95 @@
 From: Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [PATCH] [RFT] crypto: aes-generic - turn off -ftree-pre and -ftree-sra
-Date: Wed, 3 Jan 2018 21:38:30 +0100
-Message-ID: <CAK8P3a1P9Qa3p+AT3UDTa7qVjm5H-RTq7hfvxYK3DcNeTij1VQ@mail.gmail.com>
-References: <20171220205213.1025257-1-arnd@arndb.de> <20171220214648.GO2353@tucnak>
- <CAK8P3a2b7+KxJ5kKYcnrAV8jDkNBiCR4gCg47iRsiZGdyPoGVg@mail.gmail.com>
- <CAKv+Gu_BYU3JZBVOqeV4CwustnV+Z_Ok6jFipXEzeTpQ8Svy9g@mail.gmail.com>
- <CANc+2y61_o80Wf4JAYB1xi3bb3=6oai77QskSVNjSvpnNZJP0Q@mail.gmail.com>
- <CAKv+Gu8BQfe1ye-q2MQu=omkbMob6dPp9WpZuR0YkoH=Dsnq2g@mail.gmail.com>
- <CAK8P3a11y=HFaVZkyUFQMNO+47cuAF408+=vTFpEB9zJM8iRFA@mail.gmail.com> <CAKv+Gu_+nQA15NuOEA6QLbEFRJkztJ7YcPvFuX5p5j8dkiJrAg@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
-        Jakub Jelinek <jakub@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        James Morris <james.l.morris@oracle.com>,
-        Richard Biener <rguenther@suse.de>,
+Subject: [PATCH] [v2] crypto: aes-generic - build with -Os on gcc-7+
+Date: Wed,  3 Jan 2018 23:39:27 +0100
+Message-ID: <20180103223940.3715372-1-arnd@arndb.de>
+Cc: Arnd Bergmann <arnd@arndb.de>, Richard Biener <rguenther@suse.de>,
         Jakub Jelinek <jakub@gcc.gnu.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAKv+Gu_+nQA15NuOEA6QLbEFRJkztJ7YcPvFuX5p5j8dkiJrAg@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Jan 3, 2018 at 6:36 PM, Ard Biesheuvel
-<ard.biesheuvel@linaro.org> wrote:
-> On 3 January 2018 at 16:37, Arnd Bergmann <arnd@arndb.de> wrote:
->> On Fri, Dec 22, 2017 at 4:47 PM, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
->>
->> A minimal patch would be to disable UBSAN specifically for aes-generic.c
->> for gcc-7.2+ but not gcc-8 to avoid the potential stack overflow. We could
->> also force building with -Os on gcc-7, and leave UBSAN enabled,
->> this would improve performance some 3-5% on x86 with gcc-7 (both
->> 7.1 and 7.2.1) and avoid the stack overflow.
->>
->
-> Can't we just disable UBSAN for that file for all GCC versions and be
-> done with it? It is not a production feature, and that code is
-> unlikely to change in ways where UBSAN would make a difference anyway,
-> nor is it ever executed on 99.9% of systems running Linux.
+While testing other changes, I discovered that gcc-7.2.1 produces badly
+optimized code for aes_encrypt/aes_decrypt. This is especially true when
+CONFIG_UBSAN_SANITIZE_ALL is enabled, where it leads to extremely
+large stack usage that in turn might cause kernel stack overflows:
 
-It's up to Herbert in the end. I'm leaning to the -Os change in the Makefile,
-since it improves the performance for the common case as well, and
-once we start disabling UBSAN for performance-critical files, it becomes
-a slippery slope.
+crypto/aes_generic.c: In function 'aes_encrypt':
+crypto/aes_generic.c:1371:1: warning: the frame size of 4880 bytes is larger than 2048 bytes [-Wframe-larger-than=]
+crypto/aes_generic.c: In function 'aes_decrypt':
+crypto/aes_generic.c:1441:1: warning: the frame size of 4864 bytes is larger than 2048 bytes [-Wframe-larger-than=]
 
-I'll send the patch with the -Os change as v2, and note the ubsan-disabling
-alternative in the changelog.
+I verified that this problem exists on all architectures that are
+supported by gcc-7.2, though arm64 in particular is less affected than
+the others. I also found that gcc-7.1 and gcc-8 do not show the extreme
+stack usage but still produce worse code than earlier versions for this
+file, apparently because of optimization passes that generally provide
+a substantial improvement in object code quality but understandably fail
+to find any shortcuts in the AES algorithm.
 
-       Arnd
+Possible workarounds include
+
+a) disabling -ftree-pre and -ftree-sra optimizations, this was an earlier
+   patch I tried, which reliably fixed the stack usage, but caused a
+   serious performance regression in some versions, as later testing
+   found.
+
+b) disabling UBSAN on this file or all ciphers, as suggested by Ard
+   Biesheuvel. This would lead to massively better crypto performance in
+   UBSAN-enabled kernels and avoid the stack usage, but there is a concern
+   over whether we should exclude arbitrary files from UBSAN at all.
+
+c) Forcing the optimization level in a different way. Similar to a),
+   but rather than deselecting specific optimization stages,
+   this now uses "gcc -Os" for this file, regardless of the
+   CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE/SIZE option. This is a reliable
+   workaround for the stack consumption on all architecture, and I've
+   retested the performance results now on x86, cycles/byte (lower is
+   better) for cbc(aes-generic) with 256 bit keys:
+
+			-O2     -Os
+	gcc-6.3.1	14.9	15.1
+	gcc-7.0.1	14.7	15.3
+	gcc-7.1.1	15.3	14.7
+	gcc-7.2.1	16.8	15.9
+	gcc-8.0.0	15.5	15.6
+
+This implements the option c) by enabling forcing -Os on all compiler
+versions starting with gcc-7.1. As a workaround for PR83356, it would
+only be needed for gcc-7.2+ with UBSAN enabled, but since it also shows
+better performance on gcc-7.1 without UBSAN, it seems appropriate to
+use the faster version here as well.
+
+Side note: during testing, I also played with the AES code in libressl,
+which had a similar performance regression from gcc-6 to gcc-7.2,
+but was three times slower overall. It might be interesting to
+investigate that further and possibly port the Linux implementation
+into that.
+
+Link: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=83356
+Link: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=83651
+Cc: Richard Biener <rguenther@suse.de>
+Cc: Jakub Jelinek <jakub@gcc.gnu.org>
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+ crypto/Makefile | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/crypto/Makefile b/crypto/Makefile
+index d674884b2d51..daa69360e054 100644
+--- a/crypto/Makefile
++++ b/crypto/Makefile
+@@ -99,6 +99,7 @@ obj-$(CONFIG_CRYPTO_TWOFISH_COMMON) += twofish_common.o
+ obj-$(CONFIG_CRYPTO_SERPENT) += serpent_generic.o
+ CFLAGS_serpent_generic.o := $(call cc-option,-fsched-pressure)  # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=79149
+ obj-$(CONFIG_CRYPTO_AES) += aes_generic.o
++CFLAGS_aes_generic.o := $(call cc-ifversion, -ge, 0701, -Os) # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=83356
+ obj-$(CONFIG_CRYPTO_AES_TI) += aes_ti.o
+ obj-$(CONFIG_CRYPTO_CAMELLIA) += camellia_generic.o
+ obj-$(CONFIG_CRYPTO_CAST_COMMON) += cast_common.o
+-- 
+2.9.0
