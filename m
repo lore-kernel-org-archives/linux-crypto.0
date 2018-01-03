@@ -1,302 +1,50 @@
 From: Eric Biggers <ebiggers3@gmail.com>
-Subject: [RFC PATCH 5/9] crypto: hash - annotate algorithms taking optional key
-Date: Wed,  3 Jan 2018 11:16:26 -0800
-Message-ID: <20180103191630.79917-6-ebiggers3@gmail.com>
+Subject: [RFC PATCH 3/9] crypto: mcryptd - pass through absence of ->setkey()
+Date: Wed,  3 Jan 2018 11:16:24 -0800
+Message-ID: <20180103191630.79917-4-ebiggers3@gmail.com>
 References: <20180103191630.79917-1-ebiggers3@gmail.com>
 Cc: Herbert Xu <herbert@gondor.apana.org.au>,
         "David S . Miller" <davem@davemloft.net>,
         Eric Biggers <ebiggers@google.com>
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-io0-f196.google.com ([209.85.223.196]:41471 "EHLO
-        mail-io0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750819AbeACTSa (ORCPT
+Received: from mail-io0-f195.google.com ([209.85.223.195]:37017 "EHLO
+        mail-io0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750831AbeACTS2 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 3 Jan 2018 14:18:30 -0500
-Received: by mail-io0-f196.google.com with SMTP id f6so3136079ioh.8
-        for <linux-crypto@vger.kernel.org>; Wed, 03 Jan 2018 11:18:29 -0800 (PST)
+        Wed, 3 Jan 2018 14:18:28 -0500
+Received: by mail-io0-f195.google.com with SMTP id n14so3146864iob.4
+        for <linux-crypto@vger.kernel.org>; Wed, 03 Jan 2018 11:18:27 -0800 (PST)
 In-Reply-To: <20180103191630.79917-1-ebiggers3@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 From: Eric Biggers <ebiggers@google.com>
 
-We need to consistently enforce that keyed hashes cannot be used without
-setting the key.  To do this we need a reliable way to determine whether
-a given hash algorithm is keyed or not.  AF_ALG currently does this by
-checking for the presence of a ->setkey() method.  However, this is
-actually slightly broken because the CRC-32 algorithms implement
-->setkey() but can also be used without a key.  (The CRC-32 "key" is not
-actually a cryptographic key but rather represents the initial state.
-If not overridden, then a default initial state is used.)
-
-Prepare to fix this by introducing a flag CRYPTO_ALG_OPTIONAL_KEY which
-indicates that the algorithm has a ->setkey() method, but it is not
-required to be called.  Then set it on all the CRC-32 algorithms.
-
-The same also applies to the Adler-32 implementation in Lustre.
-
-Also, the cryptd and mcryptd templates have to pass through the flag
-from their underlying algorithm.
+When the mcryptd template is used to wrap an unkeyed hash algorithm,
+don't install a ->setkey() method to the mcryptd instance.  This change
+is necessary for mcryptd to keep working with unkeyed hash algorithms
+once we start enforcing that ->setkey() is called when present.
 
 Cc: stable@vger.kernel.org
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- arch/arm/crypto/crc32-ce-glue.c                               | 2 ++
- arch/arm64/crypto/crc32-ce-glue.c                             | 2 ++
- arch/powerpc/crypto/crc32c-vpmsum_glue.c                      | 1 +
- arch/s390/crypto/crc32-vx.c                                   | 3 +++
- arch/sparc/crypto/crc32c_glue.c                               | 1 +
- arch/x86/crypto/crc32-pclmul_glue.c                           | 1 +
- arch/x86/crypto/crc32c-intel_glue.c                           | 1 +
- crypto/crc32_generic.c                                        | 1 +
- crypto/crc32c_generic.c                                       | 1 +
- crypto/cryptd.c                                               | 7 +++----
- crypto/mcryptd.c                                              | 7 +++----
- drivers/crypto/bfin_crc.c                                     | 3 ++-
- drivers/crypto/stm32/stm32_crc32.c                            | 2 ++
- drivers/staging/lustre/lnet/libcfs/linux/linux-crypto-adler.c | 1 +
- include/linux/crypto.h                                        | 6 ++++++
- 15 files changed, 30 insertions(+), 9 deletions(-)
+ crypto/mcryptd.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm/crypto/crc32-ce-glue.c b/arch/arm/crypto/crc32-ce-glue.c
-index 1b0e0e86ee9c..96e62ec105d0 100644
---- a/arch/arm/crypto/crc32-ce-glue.c
-+++ b/arch/arm/crypto/crc32-ce-glue.c
-@@ -188,6 +188,7 @@ static struct shash_alg crc32_pmull_algs[] = { {
- 	.base.cra_name		= "crc32",
- 	.base.cra_driver_name	= "crc32-arm-ce",
- 	.base.cra_priority	= 200,
-+	.base.cra_flags		= CRYPTO_ALG_OPTIONAL_KEY,
- 	.base.cra_blocksize	= 1,
- 	.base.cra_module	= THIS_MODULE,
- }, {
-@@ -203,6 +204,7 @@ static struct shash_alg crc32_pmull_algs[] = { {
- 	.base.cra_name		= "crc32c",
- 	.base.cra_driver_name	= "crc32c-arm-ce",
- 	.base.cra_priority	= 200,
-+	.base.cra_flags		= CRYPTO_ALG_OPTIONAL_KEY,
- 	.base.cra_blocksize	= 1,
- 	.base.cra_module	= THIS_MODULE,
- } };
-diff --git a/arch/arm64/crypto/crc32-ce-glue.c b/arch/arm64/crypto/crc32-ce-glue.c
-index 624f4137918c..34b4e3d46aab 100644
---- a/arch/arm64/crypto/crc32-ce-glue.c
-+++ b/arch/arm64/crypto/crc32-ce-glue.c
-@@ -185,6 +185,7 @@ static struct shash_alg crc32_pmull_algs[] = { {
- 	.base.cra_name		= "crc32",
- 	.base.cra_driver_name	= "crc32-arm64-ce",
- 	.base.cra_priority	= 200,
-+	.base.cra_flags		= CRYPTO_ALG_OPTIONAL_KEY,
- 	.base.cra_blocksize	= 1,
- 	.base.cra_module	= THIS_MODULE,
- }, {
-@@ -200,6 +201,7 @@ static struct shash_alg crc32_pmull_algs[] = { {
- 	.base.cra_name		= "crc32c",
- 	.base.cra_driver_name	= "crc32c-arm64-ce",
- 	.base.cra_priority	= 200,
-+	.base.cra_flags		= CRYPTO_ALG_OPTIONAL_KEY,
- 	.base.cra_blocksize	= 1,
- 	.base.cra_module	= THIS_MODULE,
- } };
-diff --git a/arch/powerpc/crypto/crc32c-vpmsum_glue.c b/arch/powerpc/crypto/crc32c-vpmsum_glue.c
-index f058e0c3e4d4..fd1d6c83f0c0 100644
---- a/arch/powerpc/crypto/crc32c-vpmsum_glue.c
-+++ b/arch/powerpc/crypto/crc32c-vpmsum_glue.c
-@@ -141,6 +141,7 @@ static struct shash_alg alg = {
- 		.cra_name		= "crc32c",
- 		.cra_driver_name	= "crc32c-vpmsum",
- 		.cra_priority		= 200,
-+		.cra_flags		= CRYPTO_ALG_OPTIONAL_KEY,
- 		.cra_blocksize		= CHKSUM_BLOCK_SIZE,
- 		.cra_ctxsize		= sizeof(u32),
- 		.cra_module		= THIS_MODULE,
-diff --git a/arch/s390/crypto/crc32-vx.c b/arch/s390/crypto/crc32-vx.c
-index 436865926c26..423ee05887e6 100644
---- a/arch/s390/crypto/crc32-vx.c
-+++ b/arch/s390/crypto/crc32-vx.c
-@@ -239,6 +239,7 @@ static struct shash_alg crc32_vx_algs[] = {
- 			.cra_name	 = "crc32",
- 			.cra_driver_name = "crc32-vx",
- 			.cra_priority	 = 200,
-+			.cra_flags	 = CRYPTO_ALG_OPTIONAL_KEY,
- 			.cra_blocksize	 = CRC32_BLOCK_SIZE,
- 			.cra_ctxsize	 = sizeof(struct crc_ctx),
- 			.cra_module	 = THIS_MODULE,
-@@ -259,6 +260,7 @@ static struct shash_alg crc32_vx_algs[] = {
- 			.cra_name	 = "crc32be",
- 			.cra_driver_name = "crc32be-vx",
- 			.cra_priority	 = 200,
-+			.cra_flags	 = CRYPTO_ALG_OPTIONAL_KEY,
- 			.cra_blocksize	 = CRC32_BLOCK_SIZE,
- 			.cra_ctxsize	 = sizeof(struct crc_ctx),
- 			.cra_module	 = THIS_MODULE,
-@@ -279,6 +281,7 @@ static struct shash_alg crc32_vx_algs[] = {
- 			.cra_name	 = "crc32c",
- 			.cra_driver_name = "crc32c-vx",
- 			.cra_priority	 = 200,
-+			.cra_flags	 = CRYPTO_ALG_OPTIONAL_KEY,
- 			.cra_blocksize	 = CRC32_BLOCK_SIZE,
- 			.cra_ctxsize	 = sizeof(struct crc_ctx),
- 			.cra_module	 = THIS_MODULE,
-diff --git a/arch/sparc/crypto/crc32c_glue.c b/arch/sparc/crypto/crc32c_glue.c
-index d1064e46efe8..8aa664638c3c 100644
---- a/arch/sparc/crypto/crc32c_glue.c
-+++ b/arch/sparc/crypto/crc32c_glue.c
-@@ -133,6 +133,7 @@ static struct shash_alg alg = {
- 		.cra_name		=	"crc32c",
- 		.cra_driver_name	=	"crc32c-sparc64",
- 		.cra_priority		=	SPARC_CR_OPCODE_PRIORITY,
-+		.cra_flags		=	CRYPTO_ALG_OPTIONAL_KEY,
- 		.cra_blocksize		=	CHKSUM_BLOCK_SIZE,
- 		.cra_ctxsize		=	sizeof(u32),
- 		.cra_alignmask		=	7,
-diff --git a/arch/x86/crypto/crc32-pclmul_glue.c b/arch/x86/crypto/crc32-pclmul_glue.c
-index 27226df3f7d8..c8d9cdacbf10 100644
---- a/arch/x86/crypto/crc32-pclmul_glue.c
-+++ b/arch/x86/crypto/crc32-pclmul_glue.c
-@@ -162,6 +162,7 @@ static struct shash_alg alg = {
- 			.cra_name		= "crc32",
- 			.cra_driver_name	= "crc32-pclmul",
- 			.cra_priority		= 200,
-+			.cra_flags		= CRYPTO_ALG_OPTIONAL_KEY,
- 			.cra_blocksize		= CHKSUM_BLOCK_SIZE,
- 			.cra_ctxsize		= sizeof(u32),
- 			.cra_module		= THIS_MODULE,
-diff --git a/arch/x86/crypto/crc32c-intel_glue.c b/arch/x86/crypto/crc32c-intel_glue.c
-index c194d5717ae5..5773e1161072 100644
---- a/arch/x86/crypto/crc32c-intel_glue.c
-+++ b/arch/x86/crypto/crc32c-intel_glue.c
-@@ -226,6 +226,7 @@ static struct shash_alg alg = {
- 		.cra_name		=	"crc32c",
- 		.cra_driver_name	=	"crc32c-intel",
- 		.cra_priority		=	200,
-+		.cra_flags		=	CRYPTO_ALG_OPTIONAL_KEY,
- 		.cra_blocksize		=	CHKSUM_BLOCK_SIZE,
- 		.cra_ctxsize		=	sizeof(u32),
- 		.cra_module		=	THIS_MODULE,
-diff --git a/crypto/crc32_generic.c b/crypto/crc32_generic.c
-index aa2a25fc7482..718cbce8d169 100644
---- a/crypto/crc32_generic.c
-+++ b/crypto/crc32_generic.c
-@@ -133,6 +133,7 @@ static struct shash_alg alg = {
- 		.cra_name		= "crc32",
- 		.cra_driver_name	= "crc32-generic",
- 		.cra_priority		= 100,
-+		.cra_flags		= CRYPTO_ALG_OPTIONAL_KEY,
- 		.cra_blocksize		= CHKSUM_BLOCK_SIZE,
- 		.cra_ctxsize		= sizeof(u32),
- 		.cra_module		= THIS_MODULE,
-diff --git a/crypto/crc32c_generic.c b/crypto/crc32c_generic.c
-index 4c0a0e271876..372320399622 100644
---- a/crypto/crc32c_generic.c
-+++ b/crypto/crc32c_generic.c
-@@ -146,6 +146,7 @@ static struct shash_alg alg = {
- 		.cra_name		=	"crc32c",
- 		.cra_driver_name	=	"crc32c-generic",
- 		.cra_priority		=	100,
-+		.cra_flags		=	CRYPTO_ALG_OPTIONAL_KEY,
- 		.cra_blocksize		=	CHKSUM_BLOCK_SIZE,
- 		.cra_alignmask		=	3,
- 		.cra_ctxsize		=	sizeof(struct chksum_ctx),
-diff --git a/crypto/cryptd.c b/crypto/cryptd.c
-index 457ae3e66a41..addca7bae33f 100644
---- a/crypto/cryptd.c
-+++ b/crypto/cryptd.c
-@@ -896,10 +896,9 @@ static int cryptd_create_hash(struct crypto_template *tmpl, struct rtattr **tb,
- 	if (err)
- 		goto out_free_inst;
- 
--	type = CRYPTO_ALG_ASYNC;
--	if (alg->cra_flags & CRYPTO_ALG_INTERNAL)
--		type |= CRYPTO_ALG_INTERNAL;
--	inst->alg.halg.base.cra_flags = type;
-+	inst->alg.halg.base.cra_flags = CRYPTO_ALG_ASYNC |
-+		(alg->cra_flags & (CRYPTO_ALG_INTERNAL |
-+				   CRYPTO_ALG_OPTIONAL_KEY));
- 
- 	inst->alg.halg.digestsize = salg->digestsize;
- 	inst->alg.halg.statesize = salg->statesize;
 diff --git a/crypto/mcryptd.c b/crypto/mcryptd.c
-index ace346b976b3..fe5129d6ff4e 100644
+index 2908382861ee..ace346b976b3 100644
 --- a/crypto/mcryptd.c
 +++ b/crypto/mcryptd.c
-@@ -516,10 +516,9 @@ static int mcryptd_create_hash(struct crypto_template *tmpl, struct rtattr **tb,
- 	if (err)
- 		goto out_free_inst;
+@@ -534,7 +534,8 @@ static int mcryptd_create_hash(struct crypto_template *tmpl, struct rtattr **tb,
+ 	inst->alg.finup  = mcryptd_hash_finup_enqueue;
+ 	inst->alg.export = mcryptd_hash_export;
+ 	inst->alg.import = mcryptd_hash_import;
+-	inst->alg.setkey = mcryptd_hash_setkey;
++	if (crypto_hash_alg_has_setkey(halg))
++		inst->alg.setkey = mcryptd_hash_setkey;
+ 	inst->alg.digest = mcryptd_hash_digest_enqueue;
  
--	type = CRYPTO_ALG_ASYNC;
--	if (alg->cra_flags & CRYPTO_ALG_INTERNAL)
--		type |= CRYPTO_ALG_INTERNAL;
--	inst->alg.halg.base.cra_flags = type;
-+	inst->alg.halg.base.cra_flags = CRYPTO_ALG_ASYNC |
-+		(alg->cra_flags & (CRYPTO_ALG_INTERNAL |
-+				   CRYPTO_ALG_OPTIONAL_KEY));
- 
- 	inst->alg.halg.digestsize = halg->digestsize;
- 	inst->alg.halg.statesize = halg->statesize;
-diff --git a/drivers/crypto/bfin_crc.c b/drivers/crypto/bfin_crc.c
-index a118b9bed669..bfbf8bf77f03 100644
---- a/drivers/crypto/bfin_crc.c
-+++ b/drivers/crypto/bfin_crc.c
-@@ -494,7 +494,8 @@ static struct ahash_alg algs = {
- 		.cra_driver_name	= DRIVER_NAME,
- 		.cra_priority		= 100,
- 		.cra_flags		= CRYPTO_ALG_TYPE_AHASH |
--						CRYPTO_ALG_ASYNC,
-+						CRYPTO_ALG_ASYNC |
-+						CRYPTO_ALG_OPTIONAL_KEY,
- 		.cra_blocksize		= CHKSUM_BLOCK_SIZE,
- 		.cra_ctxsize		= sizeof(struct bfin_crypto_crc_ctx),
- 		.cra_alignmask		= 3,
-diff --git a/drivers/crypto/stm32/stm32_crc32.c b/drivers/crypto/stm32/stm32_crc32.c
-index 090582baecfe..8f09b8430893 100644
---- a/drivers/crypto/stm32/stm32_crc32.c
-+++ b/drivers/crypto/stm32/stm32_crc32.c
-@@ -208,6 +208,7 @@ static struct shash_alg algs[] = {
- 			.cra_name               = "crc32",
- 			.cra_driver_name        = DRIVER_NAME,
- 			.cra_priority           = 200,
-+			.cra_flags		= CRYPTO_ALG_OPTIONAL_KEY,
- 			.cra_blocksize          = CHKSUM_BLOCK_SIZE,
- 			.cra_alignmask          = 3,
- 			.cra_ctxsize            = sizeof(struct stm32_crc_ctx),
-@@ -229,6 +230,7 @@ static struct shash_alg algs[] = {
- 			.cra_name               = "crc32c",
- 			.cra_driver_name        = DRIVER_NAME,
- 			.cra_priority           = 200,
-+			.cra_flags		= CRYPTO_ALG_OPTIONAL_KEY,
- 			.cra_blocksize          = CHKSUM_BLOCK_SIZE,
- 			.cra_alignmask          = 3,
- 			.cra_ctxsize            = sizeof(struct stm32_crc_ctx),
-diff --git a/drivers/staging/lustre/lnet/libcfs/linux/linux-crypto-adler.c b/drivers/staging/lustre/lnet/libcfs/linux/linux-crypto-adler.c
-index 2e5d311d2438..db81ed527452 100644
---- a/drivers/staging/lustre/lnet/libcfs/linux/linux-crypto-adler.c
-+++ b/drivers/staging/lustre/lnet/libcfs/linux/linux-crypto-adler.c
-@@ -120,6 +120,7 @@ static struct shash_alg alg = {
- 		.cra_name		= "adler32",
- 		.cra_driver_name	= "adler32-zlib",
- 		.cra_priority		= 100,
-+		.cra_flags		= CRYPTO_ALG_OPTIONAL_KEY,
- 		.cra_blocksize		= CHKSUM_BLOCK_SIZE,
- 		.cra_ctxsize		= sizeof(u32),
- 		.cra_module		= THIS_MODULE,
-diff --git a/include/linux/crypto.h b/include/linux/crypto.h
-index 78508ca4b108..72e47b3ecdc8 100644
---- a/include/linux/crypto.h
-+++ b/include/linux/crypto.h
-@@ -106,6 +106,12 @@
-  */
- #define CRYPTO_ALG_INTERNAL		0x00002000
- 
-+/*
-+ * Set if the algorithm has a ->setkey() method but can be used without
-+ * calling it first, i.e. there is a default key.
-+ */
-+#define CRYPTO_ALG_OPTIONAL_KEY		0x00004000
-+
- /*
-  * Transform masks and values (for crt_flags).
-  */
+ 	err = ahash_register_instance(tmpl, inst);
 -- 
 2.15.1.620.gb9897f4670-goog
