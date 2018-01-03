@@ -1,392 +1,110 @@
 From: Eric Biggers <ebiggers3@gmail.com>
-Subject: [RFC PATCH 6/9] crypto: hash - prevent using keyed hashes without setting key
-Date: Wed,  3 Jan 2018 11:16:27 -0800
-Message-ID: <20180103191630.79917-7-ebiggers3@gmail.com>
+Subject: [RFC PATCH 4/9] crypto: poly1305 - remove ->setkey() method
+Date: Wed,  3 Jan 2018 11:16:25 -0800
+Message-ID: <20180103191630.79917-5-ebiggers3@gmail.com>
 References: <20180103191630.79917-1-ebiggers3@gmail.com>
 Cc: Herbert Xu <herbert@gondor.apana.org.au>,
         "David S . Miller" <davem@davemloft.net>,
         Eric Biggers <ebiggers@google.com>
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-io0-f195.google.com ([209.85.223.195]:33792 "EHLO
-        mail-io0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751021AbeACTSb (ORCPT
+Received: from mail-io0-f194.google.com ([209.85.223.194]:36155 "EHLO
+        mail-io0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750989AbeACTS3 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 3 Jan 2018 14:18:31 -0500
-Received: by mail-io0-f195.google.com with SMTP id q188so3162453iod.1
-        for <linux-crypto@vger.kernel.org>; Wed, 03 Jan 2018 11:18:30 -0800 (PST)
+        Wed, 3 Jan 2018 14:18:29 -0500
+Received: by mail-io0-f194.google.com with SMTP id i143so3166336ioa.3
+        for <linux-crypto@vger.kernel.org>; Wed, 03 Jan 2018 11:18:28 -0800 (PST)
 In-Reply-To: <20180103191630.79917-1-ebiggers3@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 From: Eric Biggers <ebiggers@google.com>
 
-Currently, almost none of the keyed hash algorithms check whether a key
-has been set before proceeding.  Some algorithms are okay with this and
-will effectively just use a key of all 0's or some other bogus default.
-However, others will severely break, as demonstrated using
-"hmac(sha3-512-generic)", the unkeyed use of which causes a kernel crash
-via a (potentially exploitable) stack buffer overflow.
+Since Poly1305 requires a nonce per invocation, the Linux kernel
+implementations of Poly1305 don't use the crypto API's keying mechanism
+and instead expect the key and nonce as the first 32 bytes of the data.
+But ->setkey() is still defined as a stub returning an error code.  This
+prevents Poly1305 from being used through AF_ALG and will also break it
+completely once we start enforcing that all crypto API users (not just
+AF_ALG) call ->setkey() if present.
 
-A while ago, this problem was solved for AF_ALG by pairing each hash
-transform with a 'has_key' bool.  However, there are still other places
-in the kernel where userspace can specify an arbitrary hash algorithm by
-name, and the kernel uses it as unkeyed hash without checking whether it
-is really unkeyed.  Examples of this include:
+Fix it by removing crypto_poly1305_setkey(), leaving ->setkey as NULL.
 
-    - KEYCTL_DH_COMPUTE, via the KDF extension
-    - dm-verity
-    - dm-crypt, via the ESSIV support
-    - dm-integrity, via the "internal hash" mode with no key given
-    - drbd (Distributed Replicated Block Device)
-
-This bug is especially bad for KEYCTL_DH_COMPUTE as that requires no
-privileges to call.
-
-Fix the bug for all users by adding a flag CRYPTO_TFM_NEED_KEY to the
-->crt_flags of each hash transform that indicates whether the transform
-still needs to be keyed or not.  Then, make the hash init, import, and
-digest functions return -ENOKEY if the key is still needed.
-
-The new flag also replaces the 'has_key' bool which algif_hash was
-previously using, thereby simplifying the algif_hash implementation.
-
-Reported-by: syzbot <syzkaller@googlegroups.com>
 Cc: stable@vger.kernel.org
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- crypto/ahash.c         | 22 ++++++++++++++++-----
- crypto/algif_hash.c    | 52 +++++++++++---------------------------------------
- crypto/shash.c         | 25 ++++++++++++++++++++----
- include/crypto/hash.h  | 34 +++++++++++++++++++++++----------
- include/linux/crypto.h |  2 ++
- 5 files changed, 75 insertions(+), 60 deletions(-)
+ arch/x86/crypto/poly1305_glue.c |  1 -
+ crypto/poly1305_generic.c       | 17 +++++------------
+ include/crypto/poly1305.h       |  2 --
+ 3 files changed, 5 insertions(+), 15 deletions(-)
 
-diff --git a/crypto/ahash.c b/crypto/ahash.c
-index d2c8895bb2fe..266fc1d64f61 100644
---- a/crypto/ahash.c
-+++ b/crypto/ahash.c
-@@ -193,11 +193,18 @@ int crypto_ahash_setkey(struct crypto_ahash *tfm, const u8 *key,
- 			unsigned int keylen)
- {
- 	unsigned long alignmask = crypto_ahash_alignmask(tfm);
-+	int err;
- 
- 	if ((unsigned long)key & alignmask)
--		return ahash_setkey_unaligned(tfm, key, keylen);
-+		err = ahash_setkey_unaligned(tfm, key, keylen);
-+	else
-+		err = tfm->setkey(tfm, key, keylen);
-+
-+	if (err)
-+		return err;
- 
--	return tfm->setkey(tfm, key, keylen);
-+	crypto_ahash_clear_flags(tfm, CRYPTO_TFM_NEED_KEY);
-+	return 0;
+diff --git a/arch/x86/crypto/poly1305_glue.c b/arch/x86/crypto/poly1305_glue.c
+index e32142bc071d..28c372003e44 100644
+--- a/arch/x86/crypto/poly1305_glue.c
++++ b/arch/x86/crypto/poly1305_glue.c
+@@ -164,7 +164,6 @@ static struct shash_alg alg = {
+ 	.init		= poly1305_simd_init,
+ 	.update		= poly1305_simd_update,
+ 	.final		= crypto_poly1305_final,
+-	.setkey		= crypto_poly1305_setkey,
+ 	.descsize	= sizeof(struct poly1305_simd_desc_ctx),
+ 	.base		= {
+ 		.cra_name		= "poly1305",
+diff --git a/crypto/poly1305_generic.c b/crypto/poly1305_generic.c
+index b1c2d57dc734..ba39eb308c79 100644
+--- a/crypto/poly1305_generic.c
++++ b/crypto/poly1305_generic.c
+@@ -47,17 +47,6 @@ int crypto_poly1305_init(struct shash_desc *desc)
  }
- EXPORT_SYMBOL_GPL(crypto_ahash_setkey);
+ EXPORT_SYMBOL_GPL(crypto_poly1305_init);
  
-@@ -368,7 +375,12 @@ EXPORT_SYMBOL_GPL(crypto_ahash_finup);
- 
- int crypto_ahash_digest(struct ahash_request *req)
- {
--	return crypto_ahash_op(req, crypto_ahash_reqtfm(req)->digest);
-+	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
-+
-+	if (crypto_ahash_get_flags(tfm) & CRYPTO_TFM_NEED_KEY)
-+		return -ENOKEY;
-+
-+	return crypto_ahash_op(req, tfm->digest);
- }
- EXPORT_SYMBOL_GPL(crypto_ahash_digest);
- 
-@@ -450,7 +462,6 @@ static int crypto_ahash_init_tfm(struct crypto_tfm *tfm)
- 	struct ahash_alg *alg = crypto_ahash_alg(hash);
- 
- 	hash->setkey = ahash_nosetkey;
--	hash->has_setkey = false;
- 	hash->export = ahash_no_export;
- 	hash->import = ahash_no_import;
- 
-@@ -465,7 +476,8 @@ static int crypto_ahash_init_tfm(struct crypto_tfm *tfm)
- 
- 	if (alg->setkey) {
- 		hash->setkey = alg->setkey;
--		hash->has_setkey = true;
-+		if (!(alg->halg.base.cra_flags & CRYPTO_ALG_OPTIONAL_KEY))
-+			crypto_ahash_set_flags(hash, CRYPTO_TFM_NEED_KEY);
- 	}
- 	if (alg->export)
- 		hash->export = alg->export;
-diff --git a/crypto/algif_hash.c b/crypto/algif_hash.c
-index 76d2e716c792..6c9b1927a520 100644
---- a/crypto/algif_hash.c
-+++ b/crypto/algif_hash.c
-@@ -34,11 +34,6 @@ struct hash_ctx {
- 	struct ahash_request req;
- };
- 
--struct algif_hash_tfm {
--	struct crypto_ahash *hash;
--	bool has_key;
--};
--
- static int hash_alloc_result(struct sock *sk, struct hash_ctx *ctx)
- {
- 	unsigned ds;
-@@ -307,7 +302,7 @@ static int hash_check_key(struct socket *sock)
- 	int err = 0;
- 	struct sock *psk;
- 	struct alg_sock *pask;
--	struct algif_hash_tfm *tfm;
-+	struct crypto_ahash *tfm;
- 	struct sock *sk = sock->sk;
- 	struct alg_sock *ask = alg_sk(sk);
- 
-@@ -321,7 +316,7 @@ static int hash_check_key(struct socket *sock)
- 
- 	err = -ENOKEY;
- 	lock_sock_nested(psk, SINGLE_DEPTH_NESTING);
--	if (!tfm->has_key)
-+	if (crypto_ahash_get_flags(tfm) & CRYPTO_TFM_NEED_KEY)
- 		goto unlock;
- 
- 	if (!pask->refcnt++)
-@@ -412,41 +407,17 @@ static struct proto_ops algif_hash_ops_nokey = {
- 
- static void *hash_bind(const char *name, u32 type, u32 mask)
- {
--	struct algif_hash_tfm *tfm;
--	struct crypto_ahash *hash;
--
--	tfm = kzalloc(sizeof(*tfm), GFP_KERNEL);
--	if (!tfm)
--		return ERR_PTR(-ENOMEM);
--
--	hash = crypto_alloc_ahash(name, type, mask);
--	if (IS_ERR(hash)) {
--		kfree(tfm);
--		return ERR_CAST(hash);
--	}
--
--	tfm->hash = hash;
--
--	return tfm;
-+	return crypto_alloc_ahash(name, type, mask);
- }
- 
- static void hash_release(void *private)
- {
--	struct algif_hash_tfm *tfm = private;
--
--	crypto_free_ahash(tfm->hash);
--	kfree(tfm);
-+	crypto_free_ahash(private);
- }
- 
- static int hash_setkey(void *private, const u8 *key, unsigned int keylen)
- {
--	struct algif_hash_tfm *tfm = private;
--	int err;
--
--	err = crypto_ahash_setkey(tfm->hash, key, keylen);
--	tfm->has_key = !err;
--
--	return err;
-+	return crypto_ahash_setkey(private, key, keylen);
- }
- 
- static void hash_sock_destruct(struct sock *sk)
-@@ -461,11 +432,10 @@ static void hash_sock_destruct(struct sock *sk)
- 
- static int hash_accept_parent_nokey(void *private, struct sock *sk)
- {
--	struct hash_ctx *ctx;
-+	struct crypto_ahash *tfm = private;
- 	struct alg_sock *ask = alg_sk(sk);
--	struct algif_hash_tfm *tfm = private;
--	struct crypto_ahash *hash = tfm->hash;
--	unsigned len = sizeof(*ctx) + crypto_ahash_reqsize(hash);
-+	struct hash_ctx *ctx;
-+	unsigned int len = sizeof(*ctx) + crypto_ahash_reqsize(tfm);
- 
- 	ctx = sock_kmalloc(sk, len, GFP_KERNEL);
- 	if (!ctx)
-@@ -478,7 +448,7 @@ static int hash_accept_parent_nokey(void *private, struct sock *sk)
- 
- 	ask->private = ctx;
- 
--	ahash_request_set_tfm(&ctx->req, hash);
-+	ahash_request_set_tfm(&ctx->req, tfm);
- 	ahash_request_set_callback(&ctx->req, CRYPTO_TFM_REQ_MAY_BACKLOG,
- 				   crypto_req_done, &ctx->wait);
- 
-@@ -489,9 +459,9 @@ static int hash_accept_parent_nokey(void *private, struct sock *sk)
- 
- static int hash_accept_parent(void *private, struct sock *sk)
- {
--	struct algif_hash_tfm *tfm = private;
-+	struct crypto_ahash *tfm = private;
- 
--	if (!tfm->has_key && crypto_ahash_has_setkey(tfm->hash))
-+	if (crypto_ahash_get_flags(tfm) & CRYPTO_TFM_NEED_KEY)
- 		return -ENOKEY;
- 
- 	return hash_accept_parent_nokey(private, sk);
-diff --git a/crypto/shash.c b/crypto/shash.c
-index e849d3ee2e27..5d732c6bb4b2 100644
---- a/crypto/shash.c
-+++ b/crypto/shash.c
-@@ -58,11 +58,18 @@ int crypto_shash_setkey(struct crypto_shash *tfm, const u8 *key,
- {
- 	struct shash_alg *shash = crypto_shash_alg(tfm);
- 	unsigned long alignmask = crypto_shash_alignmask(tfm);
-+	int err;
- 
- 	if ((unsigned long)key & alignmask)
--		return shash_setkey_unaligned(tfm, key, keylen);
-+		err = shash_setkey_unaligned(tfm, key, keylen);
-+	else
-+		err = shash->setkey(tfm, key, keylen);
-+
-+	if (err)
-+		return err;
- 
--	return shash->setkey(tfm, key, keylen);
-+	crypto_shash_clear_flags(tfm, CRYPTO_TFM_NEED_KEY);
-+	return 0;
- }
- EXPORT_SYMBOL_GPL(crypto_shash_setkey);
- 
-@@ -181,6 +188,9 @@ int crypto_shash_digest(struct shash_desc *desc, const u8 *data,
- 	struct shash_alg *shash = crypto_shash_alg(tfm);
- 	unsigned long alignmask = crypto_shash_alignmask(tfm);
- 
-+	if (crypto_shash_get_flags(tfm) & CRYPTO_TFM_NEED_KEY)
-+		return -ENOKEY;
-+
- 	if (((unsigned long)data | (unsigned long)out) & alignmask)
- 		return shash_digest_unaligned(desc, data, len, out);
- 
-@@ -360,7 +370,8 @@ int crypto_init_shash_ops_async(struct crypto_tfm *tfm)
- 	crt->digest = shash_async_digest;
- 	crt->setkey = shash_async_setkey;
- 
--	crt->has_setkey = alg->setkey != shash_no_setkey;
-+	crypto_ahash_set_flags(crt, crypto_shash_get_flags(shash) &
-+				    CRYPTO_TFM_NEED_KEY);
- 
- 	if (alg->export)
- 		crt->export = shash_async_export;
-@@ -375,8 +386,14 @@ int crypto_init_shash_ops_async(struct crypto_tfm *tfm)
- static int crypto_shash_init_tfm(struct crypto_tfm *tfm)
- {
- 	struct crypto_shash *hash = __crypto_shash_cast(tfm);
-+	struct shash_alg *alg = crypto_shash_alg(hash);
-+
-+	hash->descsize = alg->descsize;
-+
-+	if (crypto_shash_alg_has_setkey(alg) &&
-+	    !(alg->base.cra_flags & CRYPTO_ALG_OPTIONAL_KEY))
-+		crypto_shash_set_flags(hash, CRYPTO_TFM_NEED_KEY);
- 
--	hash->descsize = crypto_shash_alg(hash)->descsize;
- 	return 0;
- }
- 
-diff --git a/include/crypto/hash.h b/include/crypto/hash.h
-index 0ed31fd80242..3880793e280e 100644
---- a/include/crypto/hash.h
-+++ b/include/crypto/hash.h
-@@ -210,7 +210,6 @@ struct crypto_ahash {
- 		      unsigned int keylen);
- 
- 	unsigned int reqsize;
--	bool has_setkey;
- 	struct crypto_tfm base;
- };
- 
-@@ -410,11 +409,6 @@ static inline void *ahash_request_ctx(struct ahash_request *req)
- int crypto_ahash_setkey(struct crypto_ahash *tfm, const u8 *key,
- 			unsigned int keylen);
- 
--static inline bool crypto_ahash_has_setkey(struct crypto_ahash *tfm)
+-int crypto_poly1305_setkey(struct crypto_shash *tfm,
+-			   const u8 *key, unsigned int keylen)
 -{
--	return tfm->has_setkey;
+-	/* Poly1305 requires a unique key for each tag, which implies that
+-	 * we can't set it on the tfm that gets accessed by multiple users
+-	 * simultaneously. Instead we expect the key as the first 32 bytes in
+-	 * the update() call. */
+-	return -ENOTSUPP;
 -}
+-EXPORT_SYMBOL_GPL(crypto_poly1305_setkey);
 -
- /**
-  * crypto_ahash_finup() - update and finalize message digest
-  * @req: reference to the ahash_request handle that holds all information
-@@ -487,7 +481,12 @@ static inline int crypto_ahash_export(struct ahash_request *req, void *out)
-  */
- static inline int crypto_ahash_import(struct ahash_request *req, const void *in)
+ static void poly1305_setrkey(struct poly1305_desc_ctx *dctx, const u8 *key)
  {
--	return crypto_ahash_reqtfm(req)->import(req, in);
-+	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
-+
-+	if (crypto_ahash_get_flags(tfm) & CRYPTO_TFM_NEED_KEY)
-+		return -ENOKEY;
-+
-+	return tfm->import(req, in);
+ 	/* r &= 0xffffffc0ffffffc0ffffffc0fffffff */
+@@ -76,6 +65,11 @@ static void poly1305_setskey(struct poly1305_desc_ctx *dctx, const u8 *key)
+ 	dctx->s[3] = get_unaligned_le32(key + 12);
  }
  
- /**
-@@ -503,7 +502,12 @@ static inline int crypto_ahash_import(struct ahash_request *req, const void *in)
-  */
- static inline int crypto_ahash_init(struct ahash_request *req)
++/*
++ * Poly1305 requires a unique key for each tag, which implies that we can't set
++ * it on the tfm that gets accessed by multiple users simultaneously. Instead we
++ * expect the key as the first 32 bytes in the update() call.
++ */
+ unsigned int crypto_poly1305_setdesckey(struct poly1305_desc_ctx *dctx,
+ 					const u8 *src, unsigned int srclen)
  {
--	return crypto_ahash_reqtfm(req)->init(req);
-+	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
-+
-+	if (crypto_ahash_get_flags(tfm) & CRYPTO_TFM_NEED_KEY)
-+		return -ENOKEY;
-+
-+	return tfm->init(req);
- }
+@@ -281,7 +275,6 @@ static struct shash_alg poly1305_alg = {
+ 	.init		= crypto_poly1305_init,
+ 	.update		= crypto_poly1305_update,
+ 	.final		= crypto_poly1305_final,
+-	.setkey		= crypto_poly1305_setkey,
+ 	.descsize	= sizeof(struct poly1305_desc_ctx),
+ 	.base		= {
+ 		.cra_name		= "poly1305",
+diff --git a/include/crypto/poly1305.h b/include/crypto/poly1305.h
+index c65567d01e8e..f718a19da82f 100644
+--- a/include/crypto/poly1305.h
++++ b/include/crypto/poly1305.h
+@@ -31,8 +31,6 @@ struct poly1305_desc_ctx {
+ };
  
- /**
-@@ -855,7 +859,12 @@ static inline int crypto_shash_export(struct shash_desc *desc, void *out)
-  */
- static inline int crypto_shash_import(struct shash_desc *desc, const void *in)
- {
--	return crypto_shash_alg(desc->tfm)->import(desc, in);
-+	struct crypto_shash *tfm = desc->tfm;
-+
-+	if (crypto_shash_get_flags(tfm) & CRYPTO_TFM_NEED_KEY)
-+		return -ENOKEY;
-+
-+	return crypto_shash_alg(tfm)->import(desc, in);
- }
- 
- /**
-@@ -871,7 +880,12 @@ static inline int crypto_shash_import(struct shash_desc *desc, const void *in)
-  */
- static inline int crypto_shash_init(struct shash_desc *desc)
- {
--	return crypto_shash_alg(desc->tfm)->init(desc);
-+	struct crypto_shash *tfm = desc->tfm;
-+
-+	if (crypto_shash_get_flags(tfm) & CRYPTO_TFM_NEED_KEY)
-+		return -ENOKEY;
-+
-+	return crypto_shash_alg(tfm)->init(desc);
- }
- 
- /**
-diff --git a/include/linux/crypto.h b/include/linux/crypto.h
-index 72e47b3ecdc8..29c4257f9c5b 100644
---- a/include/linux/crypto.h
-+++ b/include/linux/crypto.h
-@@ -115,6 +115,8 @@
- /*
-  * Transform masks and values (for crt_flags).
-  */
-+#define CRYPTO_TFM_NEED_KEY		0x00000001
-+
- #define CRYPTO_TFM_REQ_MASK		0x000fff00
- #define CRYPTO_TFM_RES_MASK		0xfff00000
- 
+ int crypto_poly1305_init(struct shash_desc *desc);
+-int crypto_poly1305_setkey(struct crypto_shash *tfm,
+-			   const u8 *key, unsigned int keylen);
+ unsigned int crypto_poly1305_setdesckey(struct poly1305_desc_ctx *dctx,
+ 					const u8 *src, unsigned int srclen);
+ int crypto_poly1305_update(struct shash_desc *desc,
 -- 
 2.15.1.620.gb9897f4670-goog
