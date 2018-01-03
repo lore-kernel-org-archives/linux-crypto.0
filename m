@@ -1,88 +1,174 @@
 From: Corentin Labbe <clabbe.montjoie@gmail.com>
-Subject: [PATCH 0/6] crypto: engine - Permit to enqueue all async requests
-Date: Wed,  3 Jan 2018 21:11:03 +0100
-Message-ID: <20180103201109.16077-1-clabbe.montjoie@gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	fabien.dessenne@st.com, virtualization@lists.linux-foundation.org,
-	Corentin Labbe <clabbe.montjoie@gmail.com>, linux-crypto@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
+Subject: [PATCH 3/6] crypto: omap: convert to new crypto engine API
+Date: Wed,  3 Jan 2018 21:11:06 +0100
+Message-ID: <20180103201109.16077-4-clabbe.montjoie@gmail.com>
+References: <20180103201109.16077-1-clabbe.montjoie@gmail.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, fabien.dessenne@st.com,
+        Corentin Labbe <clabbe.montjoie@gmail.com>
 To: alexandre.torgue@st.com, arei.gonglei@huawei.com, corbet@lwn.net,
-	davem@davemloft.net, herbert@gondor.apana.org.au, jasowang@redhat.com,
-	mcoquelin.stm32@gmail.com, mst@redhat.com
-Return-path: <virtualization-bounces@lists.linux-foundation.org>
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/virtualization>,
-	<mailto:virtualization-request@lists.linux-foundation.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/virtualization/>
-List-Post: <mailto:virtualization@lists.linux-foundation.org>
-List-Help: <mailto:virtualization-request@lists.linux-foundation.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/virtualization>,
-	<mailto:virtualization-request@lists.linux-foundation.org?subject=subscribe>
-Sender: virtualization-bounces@lists.linux-foundation.org
-Errors-To: virtualization-bounces@lists.linux-foundation.org
+        davem@davemloft.net, herbert@gondor.apana.org.au,
+        jasowang@redhat.com, mcoquelin.stm32@gmail.com, mst@redhat.com
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20180103201109.16077-1-clabbe.montjoie@gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hello
+This patch convert the driver to the new crypto engine API.
 
-The current crypto_engine support only ahash and ablkcipher request.
-My first patch which try to add skcipher was Nacked, it will add too many functions
-and adding other algs(aead, asymetric_key) will make the situation worst.
+Signed-off-by: Corentin Labbe <clabbe.montjoie@gmail.com>
+---
+ drivers/crypto/omap-aes.c | 17 +++++++++++++----
+ drivers/crypto/omap-aes.h |  3 +++
+ drivers/crypto/omap-des.c | 20 ++++++++++++++++----
+ 3 files changed, 32 insertions(+), 8 deletions(-)
 
-This patchset remove all algs specific stuff and now only process generic crypto_async_request.
-
-The requests handler function pointer are now moved out of struct engine and
-are now stored directly in a crypto_engine_reqctx.
-
-The original proposal of Herbert [1] cannot be done completly since the crypto_engine
-could only dequeue crypto_async_request and it is impossible to access any request_ctx
-without knowing the underlying request type.
-
-So I do something near that was requested: adding crypto_engine_reqctx in TFM context.
-Note that the current implementation expect that crypto_engine_reqctx
-is the first member of the context.
-
-The first patch is a try to document the crypto engine API.
-The second patch convert the crypto engine with the new way,
-while the following patchs convert the 4 existing users of crypto_engine.
-Note that this split break bisection, so probably the final commit will be all merged.
-
-Appart from virtio, all 4 latest patch were compile tested only.
-But the crypto engine is tested with my new sun8i-ce driver.
-
-Regards
-
-[1] https://www.mail-archive.com/linux-kernel@vger.kernel.org/msg1474434.html
-
-Changes since RFC:
-- Added a documentation patch
-- Added patch for stm32-cryp
-- Changed parameter of all crypto_engine_op functions from
-  crypto_async_request to void*
-- Reintroduced crypto_transfer_xxx_request_to_engine functions
-
-Corentin Labbe (6):
-  Documentation: crypto: document crypto engine API
-  crypto: engine - Permit to enqueue all async requests
-  crypto: omap: convert to new crypto engine API
-  crypto: virtio: convert to new crypto engine API
-  crypto: stm32-hash: convert to the new crypto engine API
-  crypto: stm32-cryp: convert to the new crypto engine API
-
- Documentation/crypto/crypto_engine.rst       |  46 ++++++
- crypto/crypto_engine.c                       | 230 +++++++++++++--------------
- drivers/crypto/omap-aes.c                    |  17 +-
- drivers/crypto/omap-aes.h                    |   3 +
- drivers/crypto/omap-des.c                    |  20 ++-
- drivers/crypto/stm32/stm32-cryp.c            |  21 ++-
- drivers/crypto/stm32/stm32-hash.c            |  18 ++-
- drivers/crypto/virtio/virtio_crypto_algs.c   |  10 +-
- drivers/crypto/virtio/virtio_crypto_common.h |   3 +-
- drivers/crypto/virtio/virtio_crypto_core.c   |   3 -
- include/crypto/engine.h                      |  59 ++++---
- 11 files changed, 263 insertions(+), 167 deletions(-)
- create mode 100644 Documentation/crypto/crypto_engine.rst
-
+diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
+index fbec0a2e76dd..518b94628166 100644
+--- a/drivers/crypto/omap-aes.c
++++ b/drivers/crypto/omap-aes.c
+@@ -414,8 +414,9 @@ static int omap_aes_handle_queue(struct omap_aes_dev *dd,
+ }
+ 
+ static int omap_aes_prepare_req(struct crypto_engine *engine,
+-				struct ablkcipher_request *req)
++				void *areq)
+ {
++	struct ablkcipher_request *req = container_of(areq, struct ablkcipher_request, base);
+ 	struct omap_aes_ctx *ctx = crypto_ablkcipher_ctx(
+ 			crypto_ablkcipher_reqtfm(req));
+ 	struct omap_aes_reqctx *rctx = ablkcipher_request_ctx(req);
+@@ -468,8 +469,9 @@ static int omap_aes_prepare_req(struct crypto_engine *engine,
+ }
+ 
+ static int omap_aes_crypt_req(struct crypto_engine *engine,
+-			      struct ablkcipher_request *req)
++			      void *areq)
+ {
++	struct ablkcipher_request *req = container_of(areq, struct ablkcipher_request, base);
+ 	struct omap_aes_reqctx *rctx = ablkcipher_request_ctx(req);
+ 	struct omap_aes_dev *dd = rctx->dd;
+ 
+@@ -601,6 +603,11 @@ static int omap_aes_ctr_decrypt(struct ablkcipher_request *req)
+ 	return omap_aes_crypt(req, FLAGS_CTR);
+ }
+ 
++static int omap_aes_prepare_req(struct crypto_engine *engine,
++				void *req);
++static int omap_aes_crypt_req(struct crypto_engine *engine,
++			      void *req);
++
+ static int omap_aes_cra_init(struct crypto_tfm *tfm)
+ {
+ 	const char *name = crypto_tfm_alg_name(tfm);
+@@ -616,6 +623,10 @@ static int omap_aes_cra_init(struct crypto_tfm *tfm)
+ 
+ 	tfm->crt_ablkcipher.reqsize = sizeof(struct omap_aes_reqctx);
+ 
++	ctx->enginectx.op.prepare_request = omap_aes_prepare_req;
++	ctx->enginectx.op.unprepare_request = NULL;
++	ctx->enginectx.op.do_one_request = omap_aes_crypt_req;
++
+ 	return 0;
+ }
+ 
+@@ -1119,8 +1130,6 @@ static int omap_aes_probe(struct platform_device *pdev)
+ 		goto err_engine;
+ 	}
+ 
+-	dd->engine->prepare_cipher_request = omap_aes_prepare_req;
+-	dd->engine->cipher_one_request = omap_aes_crypt_req;
+ 	err = crypto_engine_start(dd->engine);
+ 	if (err)
+ 		goto err_engine;
+diff --git a/drivers/crypto/omap-aes.h b/drivers/crypto/omap-aes.h
+index 8906342e2b9a..f6ce94907ade 100644
+--- a/drivers/crypto/omap-aes.h
++++ b/drivers/crypto/omap-aes.h
+@@ -13,6 +13,8 @@
+ #ifndef __OMAP_AES_H__
+ #define __OMAP_AES_H__
+ 
++#include <crypto/engine.h>
++
+ #define DST_MAXBURST			4
+ #define DMA_MIN				(DST_MAXBURST * sizeof(u32))
+ 
+@@ -95,6 +97,7 @@ struct omap_aes_gcm_result {
+ };
+ 
+ struct omap_aes_ctx {
++	struct crypto_engine_reqctx enginectx;
+ 	int		keylen;
+ 	u32		key[AES_KEYSIZE_256 / sizeof(u32)];
+ 	u8		nonce[4];
+diff --git a/drivers/crypto/omap-des.c b/drivers/crypto/omap-des.c
+index ebc5c0f11f03..c6a3b0490616 100644
+--- a/drivers/crypto/omap-des.c
++++ b/drivers/crypto/omap-des.c
+@@ -86,6 +86,7 @@
+ #define FLAGS_OUT_DATA_ST_SHIFT	10
+ 
+ struct omap_des_ctx {
++	struct crypto_engine_reqctx enginectx;
+ 	struct omap_des_dev *dd;
+ 
+ 	int		keylen;
+@@ -526,8 +527,9 @@ static int omap_des_handle_queue(struct omap_des_dev *dd,
+ }
+ 
+ static int omap_des_prepare_req(struct crypto_engine *engine,
+-				struct ablkcipher_request *req)
++				void *areq)
+ {
++	struct ablkcipher_request *req = container_of(areq, struct ablkcipher_request, base);
+ 	struct omap_des_ctx *ctx = crypto_ablkcipher_ctx(
+ 			crypto_ablkcipher_reqtfm(req));
+ 	struct omap_des_dev *dd = omap_des_find_dev(ctx);
+@@ -582,8 +584,9 @@ static int omap_des_prepare_req(struct crypto_engine *engine,
+ }
+ 
+ static int omap_des_crypt_req(struct crypto_engine *engine,
+-			      struct ablkcipher_request *req)
++			      void *areq)
+ {
++	struct ablkcipher_request *req = container_of(areq, struct ablkcipher_request, base);
+ 	struct omap_des_ctx *ctx = crypto_ablkcipher_ctx(
+ 			crypto_ablkcipher_reqtfm(req));
+ 	struct omap_des_dev *dd = omap_des_find_dev(ctx);
+@@ -695,12 +698,23 @@ static int omap_des_cbc_decrypt(struct ablkcipher_request *req)
+ 	return omap_des_crypt(req, FLAGS_CBC);
+ }
+ 
++static int omap_des_prepare_req(struct crypto_engine *engine,
++				void *areq);
++static int omap_des_crypt_req(struct crypto_engine *engine,
++			      void *areq);
++
+ static int omap_des_cra_init(struct crypto_tfm *tfm)
+ {
++	struct omap_des_ctx *ctx = crypto_tfm_ctx(tfm);
++
+ 	pr_debug("enter\n");
+ 
+ 	tfm->crt_ablkcipher.reqsize = sizeof(struct omap_des_reqctx);
+ 
++	ctx->enginectx.op.prepare_request = omap_des_prepare_req;
++	ctx->enginectx.op.unprepare_request = NULL;
++	ctx->enginectx.op.do_one_request = omap_des_crypt_req;
++
+ 	return 0;
+ }
+ 
+@@ -1046,8 +1060,6 @@ static int omap_des_probe(struct platform_device *pdev)
+ 		goto err_engine;
+ 	}
+ 
+-	dd->engine->prepare_cipher_request = omap_des_prepare_req;
+-	dd->engine->cipher_one_request = omap_des_crypt_req;
+ 	err = crypto_engine_start(dd->engine);
+ 	if (err)
+ 		goto err_engine;
 -- 
 2.13.6
