@@ -1,15 +1,13 @@
 From: Logan Gunthorpe <logang@deltatee.com>
-Subject: [PATCH v9 1/8] drm/tilcdc: ensure nonatomic iowrite64 is not used
-Date: Wed,  3 Jan 2018 11:06:11 -0700
-Message-ID: <20180103180618.18401-2-logang@deltatee.com>
+Subject: [PATCH v9 8/8] ntb: ntb_hw_switchtec: Cleanup 64bit IO defines to use the common header
+Date: Wed,  3 Jan 2018 11:06:18 -0700
+Message-ID: <20180103180618.18401-9-logang@deltatee.com>
 References: <20180103180618.18401-1-logang@deltatee.com>
 Cc: Arnd Bergmann <arnd@arndb.de>,
         Andy Shevchenko <andy.shevchenko@gmail.com>,
         =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
         Logan Gunthorpe <logang@deltatee.com>,
-        Jyri Sarha <jsarha@ti.com>,
-        Tomi Valkeinen <tomi.valkeinen@ti.com>,
-        David Airlie <airlied@linux.ie>
+        Jon Mason <jdmason@kudzu.us>
 To: linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
         linux-ntb@googlegroups.com, linux-crypto@vger.kernel.org,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>
@@ -18,46 +16,62 @@ In-Reply-To: <20180103180618.18401-1-logang@deltatee.com>
 Sender: linux-arch-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Add a check to ensure iowrite64 is only used if it is atomic.
-
-It was decided in [1] that the tilcdc driver should not be using an
-atomic operation (so it was left out of this patchset). However, it turns
-out that through the drm code, a nonatomic header is actually included:
-
-include/linux/io-64-nonatomic-lo-hi.h
-is included from include/drm/drm_os_linux.h:9:0,
-            from include/drm/drmP.h:74,
-            from include/drm/drm_modeset_helper.h:26,
-            from include/drm/drm_atomic_helper.h:33,
-            from drivers/gpu/drm/tilcdc/tilcdc_crtc.c:19:
-
-And thus, without this change, this patchset would inadvertantly
-change the behaviour of the tilcdc driver.
-
-[1] lkml.kernel.org/r/CAK8P3a2HhO_zCnsTzq7hmWSz5La5Thu19FWZpun16iMnyyNreQ@mail.gmail.com
+Clean up the ifdefs which conditionally defined the io{read|write}64
+functions in favour of the new common io-64-nonatomic-lo-hi header.
 
 Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-Reviewed-by: Andy Shevchenko <andy.shevchenko@gmail.com>
-Cc: Jyri Sarha <jsarha@ti.com>
-Cc: Arnd Bergmann <arnd@arndb.de>
-Cc: Tomi Valkeinen <tomi.valkeinen@ti.com>
-Cc: David Airlie <airlied@linux.ie>
+Cc: Jon Mason <jdmason@kudzu.us>
 ---
- drivers/gpu/drm/tilcdc/tilcdc_regs.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/ntb/hw/mscc/ntb_hw_switchtec.c | 30 +-----------------------------
+ 1 file changed, 1 insertion(+), 29 deletions(-)
 
-diff --git a/drivers/gpu/drm/tilcdc/tilcdc_regs.h b/drivers/gpu/drm/tilcdc/tilcdc_regs.h
-index 9d528c0a67a4..5048ebb86835 100644
---- a/drivers/gpu/drm/tilcdc/tilcdc_regs.h
-+++ b/drivers/gpu/drm/tilcdc/tilcdc_regs.h
-@@ -133,7 +133,7 @@ static inline void tilcdc_write64(struct drm_device *dev, u32 reg, u64 data)
- 	struct tilcdc_drm_private *priv = dev->dev_private;
- 	volatile void __iomem *addr = priv->mmio + reg;
+diff --git a/drivers/ntb/hw/mscc/ntb_hw_switchtec.c b/drivers/ntb/hw/mscc/ntb_hw_switchtec.c
+index afe8ed6f3b23..53d3a34cddf3 100644
+--- a/drivers/ntb/hw/mscc/ntb_hw_switchtec.c
++++ b/drivers/ntb/hw/mscc/ntb_hw_switchtec.c
+@@ -19,6 +19,7 @@
+ #include <linux/kthread.h>
+ #include <linux/interrupt.h>
+ #include <linux/ntb.h>
++#include <linux/io-64-nonatomic-lo-hi.h>
  
--#ifdef iowrite64
-+#if defined(iowrite64) && !defined(iowrite64_is_nonatomic)
- 	iowrite64(data, addr);
- #else
- 	__iowmb();
+ MODULE_DESCRIPTION("Microsemi Switchtec(tm) NTB Driver");
+ MODULE_VERSION("0.1");
+@@ -35,35 +36,6 @@ module_param(use_lut_mws, bool, 0644);
+ MODULE_PARM_DESC(use_lut_mws,
+ 		 "Enable the use of the LUT based memory windows");
+ 
+-#ifndef ioread64
+-#ifdef readq
+-#define ioread64 readq
+-#else
+-#define ioread64 _ioread64
+-static inline u64 _ioread64(void __iomem *mmio)
+-{
+-	u64 low, high;
+-
+-	low = ioread32(mmio);
+-	high = ioread32(mmio + sizeof(u32));
+-	return low | (high << 32);
+-}
+-#endif
+-#endif
+-
+-#ifndef iowrite64
+-#ifdef writeq
+-#define iowrite64 writeq
+-#else
+-#define iowrite64 _iowrite64
+-static inline void _iowrite64(u64 val, void __iomem *mmio)
+-{
+-	iowrite32(val, mmio);
+-	iowrite32(val >> 32, mmio + sizeof(u32));
+-}
+-#endif
+-#endif
+-
+ #define SWITCHTEC_NTB_MAGIC 0x45CC0001
+ #define MAX_MWS     128
+ 
 -- 
 2.11.0
