@@ -1,7 +1,7 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH v2 17/27] staging: ccree: use array for double buffer
-Date: Wed,  3 Jan 2018 13:35:24 +0000
-Message-ID: <1514986544-5888-18-git-send-email-gilad@benyossef.com>
+Subject: [PATCH v2 18/27] staging: ccree: allocate hash bufs inside req ctx
+Date: Wed,  3 Jan 2018 13:35:25 +0000
+Message-ID: <1514986544-5888-19-git-send-email-gilad@benyossef.com>
 References: <1514986544-5888-1-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -23,208 +23,159 @@ Errors-To: driverdev-devel-bounces@linuxdriverproject.org
 Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
 List-Id: linux-crypto.vger.kernel.org
 
-The ccree hash code is using a double buffer to hold data
-for processing but manages the buffers and their associated
-data count in two separate fields and uses a predicate to
-chose which to use.
-
-Move to using a proper 2 members array for a much cleaner code.
+Move to allocating the buffers needed for requests as part of
+the request structure instead of malloc'ing each one on it's
+own, making for simpler (and more efficient) code.
 
 Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 ---
- drivers/staging/ccree/ssi_buffer_mgr.c | 21 +++++++-------------
- drivers/staging/ccree/ssi_hash.c       | 36 ++++++++++++++++------------------
- drivers/staging/ccree/ssi_hash.h       | 26 ++++++++++++++++++++----
- 3 files changed, 46 insertions(+), 37 deletions(-)
+ drivers/staging/ccree/ssi_hash.c | 68 ++++------------------------------------
+ drivers/staging/ccree/ssi_hash.h | 12 +++----
+ 2 files changed, 12 insertions(+), 68 deletions(-)
 
-diff --git a/drivers/staging/ccree/ssi_buffer_mgr.c b/drivers/staging/ccree/ssi_buffer_mgr.c
-index 9e3f557..9f67bb7 100644
---- a/drivers/staging/ccree/ssi_buffer_mgr.c
-+++ b/drivers/staging/ccree/ssi_buffer_mgr.c
-@@ -1391,10 +1391,8 @@ int cc_map_hash_request_final(struct cc_drvdata *drvdata, void *ctx,
- {
- 	struct ahash_req_ctx *areq_ctx = (struct ahash_req_ctx *)ctx;
- 	struct device *dev = drvdata_to_dev(drvdata);
--	u8 *curr_buff = areq_ctx->buff_index ? areq_ctx->buff1 :
--			areq_ctx->buff0;
--	u32 *curr_buff_cnt = areq_ctx->buff_index ? &areq_ctx->buff1_cnt :
--			&areq_ctx->buff0_cnt;
-+	u8 *curr_buff = cc_hash_buf(areq_ctx);
-+	u32 *curr_buff_cnt = cc_hash_buf_cnt(areq_ctx);
- 	struct mlli_params *mlli_params = &areq_ctx->mlli_params;
- 	struct buffer_array sg_data;
- 	struct buff_mgr_handle *buff_mgr = drvdata->buff_mgr_handle;
-@@ -1472,14 +1470,10 @@ int cc_map_hash_request_update(struct cc_drvdata *drvdata, void *ctx,
- {
- 	struct ahash_req_ctx *areq_ctx = (struct ahash_req_ctx *)ctx;
- 	struct device *dev = drvdata_to_dev(drvdata);
--	u8 *curr_buff = areq_ctx->buff_index ? areq_ctx->buff1 :
--			areq_ctx->buff0;
--	u32 *curr_buff_cnt = areq_ctx->buff_index ? &areq_ctx->buff1_cnt :
--			&areq_ctx->buff0_cnt;
--	u8 *next_buff = areq_ctx->buff_index ? areq_ctx->buff0 :
--			areq_ctx->buff1;
--	u32 *next_buff_cnt = areq_ctx->buff_index ? &areq_ctx->buff0_cnt :
--			&areq_ctx->buff1_cnt;
-+	u8 *curr_buff = cc_hash_buf(areq_ctx);
-+	u32 *curr_buff_cnt = cc_hash_buf_cnt(areq_ctx);
-+	u8 *next_buff = cc_next_buf(areq_ctx);
-+	u32 *next_buff_cnt = cc_next_buf_cnt(areq_ctx);
- 	struct mlli_params *mlli_params = &areq_ctx->mlli_params;
- 	unsigned int update_data_len;
- 	u32 total_in_len = nbytes + *curr_buff_cnt;
-@@ -1585,8 +1579,7 @@ void cc_unmap_hash_request(struct device *dev, void *ctx,
- 			   struct scatterlist *src, bool do_revert)
- {
- 	struct ahash_req_ctx *areq_ctx = (struct ahash_req_ctx *)ctx;
--	u32 *prev_len = areq_ctx->buff_index ?  &areq_ctx->buff0_cnt :
--						&areq_ctx->buff1_cnt;
-+	u32 *prev_len = cc_next_buf_cnt(areq_ctx);
- 
- 	/*In case a pool was set, a table was
- 	 *allocated and should be released
 diff --git a/drivers/staging/ccree/ssi_hash.c b/drivers/staging/ccree/ssi_hash.c
-index 4e11b5d..a8ea6a2 100644
+index a8ea6a2..69fc2fcf3 100644
 --- a/drivers/staging/ccree/ssi_hash.c
 +++ b/drivers/staging/ccree/ssi_hash.c
-@@ -129,12 +129,12 @@ static int cc_map_req(struct device *dev, struct ahash_req_ctx *state,
+@@ -108,7 +108,7 @@ static int cc_map_result(struct device *dev, struct ahash_req_ctx *state,
+ 			 unsigned int digestsize)
+ {
+ 	state->digest_result_dma_addr =
+-		dma_map_single(dev, (void *)state->digest_result_buff,
++		dma_map_single(dev, state->digest_result_buff,
+ 			       digestsize,
+ 			       DMA_BIDIRECTIONAL);
+ 	if (dma_mapping_error(dev, state->digest_result_dma_addr)) {
+@@ -129,49 +129,15 @@ static int cc_map_req(struct device *dev, struct ahash_req_ctx *state,
  	bool is_hmac = ctx->is_hmac;
  	int rc = -ENOMEM;
  
--	state->buff0 = kzalloc(CC_MAX_HASH_BLCK_SIZE, flags);
--	if (!state->buff0)
-+	state->buffers[0] = kzalloc(CC_MAX_HASH_BLCK_SIZE, flags);
-+	if (!state->buffers[0])
- 		goto fail0;
+-	state->buffers[0] = kzalloc(CC_MAX_HASH_BLCK_SIZE, flags);
+-	if (!state->buffers[0])
+-		goto fail0;
+-
+-	state->buffers[1] = kzalloc(CC_MAX_HASH_BLCK_SIZE, flags);
+-	if (!state->buffers[1])
+-		goto fail_buff0;
+-
+-	state->digest_result_buff = kzalloc(CC_MAX_HASH_DIGEST_SIZE, flags);
+-	if (!state->digest_result_buff)
+-		goto fail_buff1;
+-
+-	state->digest_buff = kzalloc(ctx->inter_digestsize, flags);
+-	if (!state->digest_buff)
+-		goto fail_digest_result_buff;
+-
+-	dev_dbg(dev, "Allocated digest-buffer in context ctx->digest_buff=@%p\n",
+-		state->digest_buff);
+-	if (ctx->hw_mode != DRV_CIPHER_XCBC_MAC) {
+-		state->digest_bytes_len = kzalloc(HASH_LEN_SIZE, flags);
+-		if (!state->digest_bytes_len)
+-			goto fail1;
+-
+-		dev_dbg(dev, "Allocated digest-bytes-len in context state->>digest_bytes_len=@%p\n",
+-			state->digest_bytes_len);
+-	} else {
+-		state->digest_bytes_len = NULL;
+-	}
+-
+-	state->opad_digest_buff = kzalloc(ctx->inter_digestsize, flags);
+-	if (!state->opad_digest_buff)
+-		goto fail2;
+-
+-	dev_dbg(dev, "Allocated opad-digest-buffer in context state->digest_bytes_len=@%p\n",
+-		state->opad_digest_buff);
++	memset(state, 0, sizeof(*state));
  
--	state->buff1 = kzalloc(CC_MAX_HASH_BLCK_SIZE, flags);
--	if (!state->buff1)
-+	state->buffers[1] = kzalloc(CC_MAX_HASH_BLCK_SIZE, flags);
-+	if (!state->buffers[1])
- 		goto fail_buff0;
- 
- 	state->digest_result_buff = kzalloc(CC_MAX_HASH_DIGEST_SIZE, flags);
-@@ -252,8 +252,8 @@ static int cc_map_req(struct device *dev, struct ahash_req_ctx *state,
- 	} else {
- 		state->opad_digest_dma_addr = 0;
+ 	state->digest_buff_dma_addr =
+-		dma_map_single(dev, (void *)state->digest_buff,
++		dma_map_single(dev, state->digest_buff,
+ 			       ctx->inter_digestsize, DMA_BIDIRECTIONAL);
+ 	if (dma_mapping_error(dev, state->digest_buff_dma_addr)) {
+ 		dev_err(dev, "Mapping digest len %d B at va=%pK for DMA failed\n",
+ 			ctx->inter_digestsize, state->digest_buff);
+-		goto fail3;
++		goto fail0;
  	}
--	state->buff0_cnt = 0;
--	state->buff1_cnt = 0;
-+	state->buf_cnt[0] = 0;
-+	state->buf_cnt[1] = 0;
- 	state->buff_index = 0;
- 	state->mlli_params.curr_pool = NULL;
+ 	dev_dbg(dev, "Mapped digest %d B at va=%pK to dma=%pad\n",
+ 		ctx->inter_digestsize, state->digest_buff,
+@@ -221,7 +187,7 @@ static int cc_map_req(struct device *dev, struct ahash_req_ctx *state,
  
-@@ -281,11 +281,11 @@ static int cc_map_req(struct device *dev, struct ahash_req_ctx *state,
- 	kfree(state->digest_result_buff);
- 	state->digest_result_buff = NULL;
- fail_buff1:
--	kfree(state->buff1);
--	state->buff1 = NULL;
-+	kfree(state->buffers[1]);
-+	state->buffers[1] = NULL;
- fail_buff0:
--	kfree(state->buff0);
--	state->buff0 = NULL;
-+	kfree(state->buffers[0]);
-+	state->buffers[0] = NULL;
+ 	if (ctx->hw_mode != DRV_CIPHER_XCBC_MAC) {
+ 		state->digest_bytes_len_dma_addr =
+-			dma_map_single(dev, (void *)state->digest_bytes_len,
++			dma_map_single(dev, state->digest_bytes_len,
+ 				       HASH_LEN_SIZE, DMA_BIDIRECTIONAL);
+ 		if (dma_mapping_error(dev, state->digest_bytes_len_dma_addr)) {
+ 			dev_err(dev, "Mapping digest len %u B at va=%pK for DMA failed\n",
+@@ -237,7 +203,7 @@ static int cc_map_req(struct device *dev, struct ahash_req_ctx *state,
+ 
+ 	if (is_hmac && ctx->hash_mode != DRV_HASH_NULL) {
+ 		state->opad_digest_dma_addr =
+-			dma_map_single(dev, (void *)state->opad_digest_buff,
++			dma_map_single(dev, state->opad_digest_buff,
+ 				       ctx->inter_digestsize,
+ 				       DMA_BIDIRECTIONAL);
+ 		if (dma_mapping_error(dev, state->opad_digest_dma_addr)) {
+@@ -271,21 +237,6 @@ static int cc_map_req(struct device *dev, struct ahash_req_ctx *state,
+ 				 ctx->inter_digestsize, DMA_BIDIRECTIONAL);
+ 		state->digest_buff_dma_addr = 0;
+ 	}
+-fail3:
+-	kfree(state->opad_digest_buff);
+-fail2:
+-	kfree(state->digest_bytes_len);
+-fail1:
+-	 kfree(state->digest_buff);
+-fail_digest_result_buff:
+-	kfree(state->digest_result_buff);
+-	state->digest_result_buff = NULL;
+-fail_buff1:
+-	kfree(state->buffers[1]);
+-	state->buffers[1] = NULL;
+-fail_buff0:
+-	kfree(state->buffers[0]);
+-	state->buffers[0] = NULL;
  fail0:
  	return rc;
  }
-@@ -319,8 +319,8 @@ static void cc_unmap_req(struct device *dev, struct ahash_req_ctx *state,
- 	kfree(state->digest_bytes_len);
- 	kfree(state->digest_buff);
- 	kfree(state->digest_result_buff);
--	kfree(state->buff1);
--	kfree(state->buff0);
-+	kfree(state->buffers[1]);
-+	kfree(state->buffers[0]);
+@@ -314,13 +265,6 @@ static void cc_unmap_req(struct device *dev, struct ahash_req_ctx *state,
+ 			&state->opad_digest_dma_addr);
+ 		state->opad_digest_dma_addr = 0;
+ 	}
+-
+-	kfree(state->opad_digest_buff);
+-	kfree(state->digest_bytes_len);
+-	kfree(state->digest_buff);
+-	kfree(state->digest_result_buff);
+-	kfree(state->buffers[1]);
+-	kfree(state->buffers[0]);
  }
  
  static void cc_unmap_result(struct device *dev, struct ahash_req_ctx *state,
-@@ -1375,8 +1375,7 @@ static int cc_mac_final(struct ahash_request *req)
- 	u32 key_size, key_len;
- 	u32 digestsize = crypto_ahash_digestsize(tfm);
- 	gfp_t flags = cc_gfp_flags(&req->base);
--	u32 rem_cnt = state->buff_index ? state->buff1_cnt :
--			state->buff0_cnt;
-+	u32 rem_cnt = *cc_hash_buf_cnt(state);
- 
- 	if (ctx->hw_mode == DRV_CIPHER_XCBC_MAC) {
- 		key_size = CC_AES_128_BIT_KEY_SIZE;
-@@ -1630,9 +1629,8 @@ static int cc_hash_export(struct ahash_request *req, void *out)
- 	struct cc_hash_ctx *ctx = crypto_ahash_ctx(ahash);
- 	struct device *dev = drvdata_to_dev(ctx->drvdata);
- 	struct ahash_req_ctx *state = ahash_request_ctx(req);
--	u8 *curr_buff = state->buff_index ? state->buff1 : state->buff0;
--	u32 curr_buff_cnt = state->buff_index ? state->buff1_cnt :
--				state->buff0_cnt;
-+	u8 *curr_buff = cc_hash_buf(state);
-+	u32 curr_buff_cnt = *cc_hash_buf_cnt(state);
- 	const u32 tmp = CC_EXPORT_MAGIC;
- 
- 	memcpy(out, &tmp, sizeof(u32));
-@@ -1715,8 +1713,8 @@ static int cc_hash_import(struct ahash_request *req, const void *in)
- 	}
- 	in += sizeof(u32);
- 
--	state->buff0_cnt = tmp;
--	memcpy(state->buff0, in, state->buff0_cnt);
-+	state->buf_cnt[0] = tmp;
-+	memcpy(state->buffers[0], in, tmp);
- 
- out:
- 	return rc;
 diff --git a/drivers/staging/ccree/ssi_hash.h b/drivers/staging/ccree/ssi_hash.h
-index 484cbb4..78f193b 100644
+index 78f193b..3d3c024 100644
 --- a/drivers/staging/ccree/ssi_hash.h
 +++ b/drivers/staging/ccree/ssi_hash.h
-@@ -39,8 +39,7 @@ struct aeshash_state {
+@@ -39,13 +39,13 @@ struct aeshash_state {
  
  /* ahash state */
  struct ahash_req_ctx {
--	u8 *buff0;
--	u8 *buff1;
-+	u8 *buffers[2];
- 	u8 *digest_result_buff;
- 	struct async_gen_req_ctx gen_ctx;
+-	u8 *buffers[2];
+-	u8 *digest_result_buff;
+-	struct async_gen_req_ctx gen_ctx;
++	u8 buffers[2][CC_MAX_HASH_BLCK_SIZE] ____cacheline_aligned;
++	u8 digest_result_buff[CC_MAX_HASH_DIGEST_SIZE] ____cacheline_aligned;
++	u8 digest_buff[CC_MAX_HASH_DIGEST_SIZE] ____cacheline_aligned;
++	u8 opad_digest_buff[CC_MAX_HASH_DIGEST_SIZE] ____cacheline_aligned;
++	u8 digest_bytes_len[HASH_LEN_SIZE] ____cacheline_aligned;
++	struct async_gen_req_ctx gen_ctx ____cacheline_aligned;
  	enum cc_req_dma_buf_type data_dma_buf_type;
-@@ -51,8 +50,7 @@ struct ahash_req_ctx {
+-	u8 *digest_buff;
+-	u8 *opad_digest_buff;
+-	u8 *digest_bytes_len;
+ 	dma_addr_t opad_digest_dma_addr;
  	dma_addr_t digest_buff_dma_addr;
  	dma_addr_t digest_bytes_len_dma_addr;
- 	dma_addr_t digest_result_dma_addr;
--	u32 buff0_cnt;
--	u32 buff1_cnt;
-+	u32 buf_cnt[2];
- 	u32 buff_index;
- 	u32 xcbc_count; /* count xcbc update operatations */
- 	struct scatterlist buff_sg[2];
-@@ -62,6 +60,26 @@ struct ahash_req_ctx {
- 	struct mlli_params mlli_params;
- };
- 
-+static inline u32 *cc_hash_buf_cnt(struct ahash_req_ctx *state)
-+{
-+	return &state->buf_cnt[state->buff_index];
-+}
-+
-+static inline u8 *cc_hash_buf(struct ahash_req_ctx *state)
-+{
-+	return state->buffers[state->buff_index];
-+}
-+
-+static inline u32 *cc_next_buf_cnt(struct ahash_req_ctx *state)
-+{
-+	return &state->buf_cnt[state->buff_index ^ 1];
-+}
-+
-+static inline u8 *cc_next_buf(struct ahash_req_ctx *state)
-+{
-+	return state->buffers[state->buff_index ^ 1];
-+}
-+
- int cc_hash_alloc(struct cc_drvdata *drvdata);
- int cc_init_hash_sram(struct cc_drvdata *drvdata);
- int cc_hash_free(struct cc_drvdata *drvdata);
 -- 
 2.7.4
