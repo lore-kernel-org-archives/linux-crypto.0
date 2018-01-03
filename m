@@ -1,102 +1,87 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH v2 03/27] staging: ccree: fold reg common defines into driver
-Date: Wed,  3 Jan 2018 13:35:10 +0000
-Message-ID: <1514986544-5888-4-git-send-email-gilad@benyossef.com>
+Subject: [PATCH v2 04/27] staging: ccree: remove GFP_DMA flag from mem allocs
+Date: Wed,  3 Jan 2018 13:35:11 +0000
+Message-ID: <1514986544-5888-5-git-send-email-gilad@benyossef.com>
 References: <1514986544-5888-1-git-send-email-gilad@benyossef.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, devel@driverdev.osuosl.org,
- driverdev-devel@linuxdriverproject.org, linux-kernel@vger.kernel.org,
- Ofir Drang <ofir.drang@arm.com>
+Cc: Ofir Drang <ofir.drang@arm.com>, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org,
+        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org
 To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1514986544-5888-1-git-send-email-gilad@benyossef.com>
-List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
-List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
-List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
-List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
-List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
-Errors-To: driverdev-devel-bounces@linuxdriverproject.org
-Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Fold the 2 macro defined in dx_reg_common.h into the file they
-are used in and delete the file.
+Remove bogus GFP_DMA flag from memory allocations. ccree driver
+does not operate over an ISA or similar limited bus.
 
 Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 ---
- drivers/staging/ccree/cc_crypto_ctx.h |  4 ++--
- drivers/staging/ccree/dx_reg_common.h | 13 -------------
- drivers/staging/ccree/ssi_driver.h    |  5 +++--
- 3 files changed, 5 insertions(+), 17 deletions(-)
- delete mode 100644 drivers/staging/ccree/dx_reg_common.h
+ drivers/staging/ccree/ssi_cipher.c |  2 +-
+ drivers/staging/ccree/ssi_hash.c   | 15 ++++++---------
+ 2 files changed, 7 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/staging/ccree/cc_crypto_ctx.h b/drivers/staging/ccree/cc_crypto_ctx.h
-index 1b2698f..88b6e88 100644
---- a/drivers/staging/ccree/cc_crypto_ctx.h
-+++ b/drivers/staging/ccree/cc_crypto_ctx.h
-@@ -8,7 +8,7 @@
+diff --git a/drivers/staging/ccree/ssi_cipher.c b/drivers/staging/ccree/ssi_cipher.c
+index 71d3e79..479186f 100644
+--- a/drivers/staging/ccree/ssi_cipher.c
++++ b/drivers/staging/ccree/ssi_cipher.c
+@@ -166,7 +166,7 @@ static int cc_cipher_init(struct crypto_tfm *tfm)
+ 	ctx_p->drvdata = cc_alg->drvdata;
  
- /* context size */
- #ifndef CC_CTX_SIZE_LOG2
--#if (CC_SUPPORT_SHA > 256)
-+#if (CC_DEV_SHA_MAX > 256)
- #define CC_CTX_SIZE_LOG2 8
- #else
- #define CC_CTX_SIZE_LOG2 7
-@@ -59,7 +59,7 @@
- #define CC_SHA384_BLOCK_SIZE 128
- #define CC_SHA512_BLOCK_SIZE 128
+ 	/* Allocate key buffer, cache line aligned */
+-	ctx_p->user.key = kmalloc(max_key_buf_size, GFP_KERNEL | GFP_DMA);
++	ctx_p->user.key = kmalloc(max_key_buf_size, GFP_KERNEL);
+ 	if (!ctx_p->user.key)
+ 		return -ENOMEM;
  
--#if (CC_SUPPORT_SHA > 256)
-+#if (CC_DEV_SHA_MAX > 256)
- #define CC_DIGEST_SIZE_MAX CC_SHA512_DIGEST_SIZE
- #define CC_HASH_BLOCK_SIZE_MAX CC_SHA512_BLOCK_SIZE /*1024b*/
- #else /* Only up to SHA256 */
-diff --git a/drivers/staging/ccree/dx_reg_common.h b/drivers/staging/ccree/dx_reg_common.h
-deleted file mode 100644
-index 84184d2..0000000
---- a/drivers/staging/ccree/dx_reg_common.h
-+++ /dev/null
-@@ -1,13 +0,0 @@
--/* SPDX-License-Identifier: GPL-2.0-only */
--/* Copyright (C) 2012-2018 ARM Limited or its affiliates. */
--
--#ifndef __CC_REG_COMMON_H__
--#define __CC_REG_COMMON_H__
--
--#define CC_DEV_SIGNATURE 0xDCC71200UL
--
--#define CC_HW_VERSION 0xef840015UL
--
--#define CC_DEV_SHA_MAX 512
--
--#endif /*__CC_REG_COMMON_H__*/
-diff --git a/drivers/staging/ccree/ssi_driver.h b/drivers/staging/ccree/ssi_driver.h
-index b978862..3810740 100644
---- a/drivers/staging/ccree/ssi_driver.h
-+++ b/drivers/staging/ccree/ssi_driver.h
-@@ -27,8 +27,7 @@
+diff --git a/drivers/staging/ccree/ssi_hash.c b/drivers/staging/ccree/ssi_hash.c
+index c409dcd..a6702cf 100644
+--- a/drivers/staging/ccree/ssi_hash.c
++++ b/drivers/staging/ccree/ssi_hash.c
+@@ -132,29 +132,27 @@ static int cc_map_req(struct device *dev, struct ahash_req_ctx *state,
+ 	struct cc_hw_desc desc;
+ 	int rc = -ENOMEM;
  
- /* Registers definitions from shared/hw/ree_include */
- #include "dx_host.h"
--#include "dx_reg_common.h"
--#define CC_SUPPORT_SHA CC_DEV_SHA_MAX
-+#define CC_DEV_SHA_MAX 512
- #include "cc_crypto_ctx.h"
- #include "cc_hw_queue_defs.h"
- #include "ssi_sram_mgr.h"
-@@ -44,6 +43,8 @@ extern bool cc_dump_bytes;
- /* Maximum DMA mask supported by IP */
- #define DMA_BIT_MASK_LEN 48
+-	state->buff0 = kzalloc(CC_MAX_HASH_BLCK_SIZE, GFP_KERNEL | GFP_DMA);
++	state->buff0 = kzalloc(CC_MAX_HASH_BLCK_SIZE, GFP_KERNEL);
+ 	if (!state->buff0)
+ 		goto fail0;
  
-+#define CC_DEV_SIGNATURE 0xDCC71200UL
-+
- #define CC_AXI_IRQ_MASK ((1 << CC_AXIM_CFG_BRESPMASK_BIT_SHIFT) | \
- 			  (1 << CC_AXIM_CFG_RRESPMASK_BIT_SHIFT) | \
- 			  (1 << CC_AXIM_CFG_INFLTMASK_BIT_SHIFT) | \
+-	state->buff1 = kzalloc(CC_MAX_HASH_BLCK_SIZE, GFP_KERNEL | GFP_DMA);
++	state->buff1 = kzalloc(CC_MAX_HASH_BLCK_SIZE, GFP_KERNEL);
+ 	if (!state->buff1)
+ 		goto fail_buff0;
+ 
+ 	state->digest_result_buff = kzalloc(CC_MAX_HASH_DIGEST_SIZE,
+-					    GFP_KERNEL | GFP_DMA);
++					    GFP_KERNEL);
+ 	if (!state->digest_result_buff)
+ 		goto fail_buff1;
+ 
+-	state->digest_buff = kzalloc(ctx->inter_digestsize,
+-				     GFP_KERNEL | GFP_DMA);
++	state->digest_buff = kzalloc(ctx->inter_digestsize, GFP_KERNEL);
+ 	if (!state->digest_buff)
+ 		goto fail_digest_result_buff;
+ 
+ 	dev_dbg(dev, "Allocated digest-buffer in context ctx->digest_buff=@%p\n",
+ 		state->digest_buff);
+ 	if (ctx->hw_mode != DRV_CIPHER_XCBC_MAC) {
+-		state->digest_bytes_len = kzalloc(HASH_LEN_SIZE,
+-						  GFP_KERNEL | GFP_DMA);
++		state->digest_bytes_len = kzalloc(HASH_LEN_SIZE, GFP_KERNEL);
+ 		if (!state->digest_bytes_len)
+ 			goto fail1;
+ 
+@@ -164,8 +162,7 @@ static int cc_map_req(struct device *dev, struct ahash_req_ctx *state,
+ 		state->digest_bytes_len = NULL;
+ 	}
+ 
+-	state->opad_digest_buff = kzalloc(ctx->inter_digestsize,
+-					  GFP_KERNEL | GFP_DMA);
++	state->opad_digest_buff = kzalloc(ctx->inter_digestsize, GFP_KERNEL);
+ 	if (!state->opad_digest_buff)
+ 		goto fail2;
+ 
 -- 
 2.7.4
