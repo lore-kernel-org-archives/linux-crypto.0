@@ -1,104 +1,63 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [PATCH] [RFT] crypto: aes-generic - turn off -ftree-pre and -ftree-sra
-Date: Wed, 3 Jan 2018 17:36:09 +0000
-Message-ID: <CAKv+Gu_+nQA15NuOEA6QLbEFRJkztJ7YcPvFuX5p5j8dkiJrAg@mail.gmail.com>
-References: <20171220205213.1025257-1-arnd@arndb.de> <20171220214648.GO2353@tucnak>
- <CAK8P3a2b7+KxJ5kKYcnrAV8jDkNBiCR4gCg47iRsiZGdyPoGVg@mail.gmail.com>
- <CAKv+Gu_BYU3JZBVOqeV4CwustnV+Z_Ok6jFipXEzeTpQ8Svy9g@mail.gmail.com>
- <CANc+2y61_o80Wf4JAYB1xi3bb3=6oai77QskSVNjSvpnNZJP0Q@mail.gmail.com>
- <CAKv+Gu8BQfe1ye-q2MQu=omkbMob6dPp9WpZuR0YkoH=Dsnq2g@mail.gmail.com> <CAK8P3a11y=HFaVZkyUFQMNO+47cuAF408+=vTFpEB9zJM8iRFA@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
-        Jakub Jelinek <jakub@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        James Morris <james.l.morris@oracle.com>,
-        Richard Biener <rguenther@suse.de>,
-        Jakub Jelinek <jakub@gcc.gnu.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-io0-f176.google.com ([209.85.223.176]:33156 "EHLO
-        mail-io0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750873AbeACRgL (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 3 Jan 2018 12:36:11 -0500
-Received: by mail-io0-f176.google.com with SMTP id t63so2861456iod.0
-        for <linux-crypto@vger.kernel.org>; Wed, 03 Jan 2018 09:36:10 -0800 (PST)
-In-Reply-To: <CAK8P3a11y=HFaVZkyUFQMNO+47cuAF408+=vTFpEB9zJM8iRFA@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Logan Gunthorpe <logang@deltatee.com>
+Subject: [PATCH v9 1/8] drm/tilcdc: ensure nonatomic iowrite64 is not used
+Date: Wed,  3 Jan 2018 11:06:11 -0700
+Message-ID: <20180103180618.18401-2-logang@deltatee.com>
+References: <20180103180618.18401-1-logang@deltatee.com>
+Cc: Arnd Bergmann <arnd@arndb.de>,
+        Andy Shevchenko <andy.shevchenko@gmail.com>,
+        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Jyri Sarha <jsarha@ti.com>,
+        Tomi Valkeinen <tomi.valkeinen@ti.com>,
+        David Airlie <airlied@linux.ie>
+To: linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
+        linux-ntb@googlegroups.com, linux-crypto@vger.kernel.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Return-path: <linux-arch-owner@vger.kernel.org>
+In-Reply-To: <20180103180618.18401-1-logang@deltatee.com>
+Sender: linux-arch-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 3 January 2018 at 16:37, Arnd Bergmann <arnd@arndb.de> wrote:
-> On Fri, Dec 22, 2017 at 4:47 PM, Ard Biesheuvel
-> <ard.biesheuvel@linaro.org> wrote:
->> On 21 December 2017 at 13:47, PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com> wrote:
->>> On 21 December 2017 at 17:52, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
->>>> On 21 December 2017 at 10:20, Arnd Bergmann <arnd@arndb.de> wrote:
->>>>
->>>> So my vote is to disable UBSAN for all such cipher implementations:
->>>> aes_generic, but also aes_ti, which has a similar 256 byte lookup
->>>> table [although it does not seem to be affected by the same issue as
->>>> aes_generic], and possibly others as well.
->>>>
->>>> Perhaps it makes sense to move core cipher code into a separate
->>>> sub-directory, and disable UBSAN at the directory level?
->>>>
->>>> It would involve the following files
->>>>
->>>> crypto/aes_generic.c
->>>> crypto/aes_ti.c
->>>> crypto/anubis.c
->>>> crypto/arc4.c
->>>> crypto/blowfish_generic.c
->>>> crypto/camellia_generic.c
->>>> crypto/cast5_generic.c
->>>> crypto/cast6_generic.c
->>>> crypto/des_generic.c
->>>> crypto/fcrypt.c
->>>> crypto/khazad.c
->>>> crypto/seed.c
->>>> crypto/serpent_generic.c
->>>> crypto/tea.c
->>>> crypto/twofish_generic.c
->>>
->>> As *SAN is enabled only on developer setup, is such a change required?
->>> Looks like I am missing something here. Can you explain what value it
->>> provides?
->>>
->>
->> Well, in this particular case, the value it provides is that the
->> kernel can still boot and invoke the AES code without overflowing the
->> kernel stack. Of course, this is a compiler issue that hopefully gets
->> fixed, but I think it may be reasonable to exclude some C code from
->> UBSAN by default.
->
-> Any idea how to proceed here? I've retested with the latest gcc snapshot
-> and verified that the problem is still there. No idea what the chance of
-> getting it fixed before the 7.3 release is. From the performance tests
-> I've done, the patch I posted is pretty much useless, it causes significant
-> performance regressions on most other compiler versions.
->
-> A minimal patch would be to disable UBSAN specifically for aes-generic.c
-> for gcc-7.2+ but not gcc-8 to avoid the potential stack overflow. We could
-> also force building with -Os on gcc-7, and leave UBSAN enabled,
-> this would improve performance some 3-5% on x86 with gcc-7 (both
-> 7.1 and 7.2.1) and avoid the stack overflow.
->
+Add a check to ensure iowrite64 is only used if it is atomic.
 
-Can't we just disable UBSAN for that file for all GCC versions and be
-done with it? It is not a production feature, and that code is
-unlikely to change in ways where UBSAN would make a difference anyway,
-nor is it ever executed on 99.9% of systems running Linux.
+It was decided in [1] that the tilcdc driver should not be using an
+atomic operation (so it was left out of this patchset). However, it turns
+out that through the drm code, a nonatomic header is actually included:
 
-> For the performance regression in gcc-7.2.1 on this file, I've opened
-> a separate gcc PR now, see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=83651
-> I've also tested the libressl version of their generic AES code, with
-> mixed results (it's appears to be much slower than the kernel version
-> to start with, and while it has further performance regressions with recent
-> compilers, those are with a different set of versions compared to the
-> kernel implementation, and it does not suffer from the high stack usage).
->
+include/linux/io-64-nonatomic-lo-hi.h
+is included from include/drm/drm_os_linux.h:9:0,
+            from include/drm/drmP.h:74,
+            from include/drm/drm_modeset_helper.h:26,
+            from include/drm/drm_atomic_helper.h:33,
+            from drivers/gpu/drm/tilcdc/tilcdc_crtc.c:19:
+
+And thus, without this change, this patchset would inadvertantly
+change the behaviour of the tilcdc driver.
+
+[1] lkml.kernel.org/r/CAK8P3a2HhO_zCnsTzq7hmWSz5La5Thu19FWZpun16iMnyyNreQ@mail.gmail.com
+
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+Reviewed-by: Andy Shevchenko <andy.shevchenko@gmail.com>
+Cc: Jyri Sarha <jsarha@ti.com>
+Cc: Arnd Bergmann <arnd@arndb.de>
+Cc: Tomi Valkeinen <tomi.valkeinen@ti.com>
+Cc: David Airlie <airlied@linux.ie>
+---
+ drivers/gpu/drm/tilcdc/tilcdc_regs.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/gpu/drm/tilcdc/tilcdc_regs.h b/drivers/gpu/drm/tilcdc/tilcdc_regs.h
+index 9d528c0a67a4..5048ebb86835 100644
+--- a/drivers/gpu/drm/tilcdc/tilcdc_regs.h
++++ b/drivers/gpu/drm/tilcdc/tilcdc_regs.h
+@@ -133,7 +133,7 @@ static inline void tilcdc_write64(struct drm_device *dev, u32 reg, u64 data)
+ 	struct tilcdc_drm_private *priv = dev->dev_private;
+ 	volatile void __iomem *addr = priv->mmio + reg;
+ 
+-#ifdef iowrite64
++#if defined(iowrite64) && !defined(iowrite64_is_nonatomic)
+ 	iowrite64(data, addr);
+ #else
+ 	__iowmb();
+-- 
+2.11.0
