@@ -1,10 +1,10 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH v2 11/27] stating: ccree: revert "staging: ccree: fix leak of import() after init()"
-Date: Wed,  3 Jan 2018 13:35:18 +0000
-Message-ID: <1514986544-5888-12-git-send-email-gilad@benyossef.com>
+Subject: [PATCH v2 12/27] staging: ccree: failing the suspend is not an error
+Date: Wed,  3 Jan 2018 13:35:19 +0000
+Message-ID: <1514986544-5888-13-git-send-email-gilad@benyossef.com>
 References: <1514986544-5888-1-git-send-email-gilad@benyossef.com>
-Cc: Ofir Drang <ofir.drang@arm.com>, stable@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+Cc: Ofir Drang <ofir.drang@arm.com>, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org,
         driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org
 To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
@@ -12,47 +12,40 @@ In-Reply-To: <1514986544-5888-1-git-send-email-gilad@benyossef.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This reverts commit c5f39d07860c ("staging: ccree: fix leak of import()
-after init()") and commit aece09024414 ("staging: ccree: Uninitialized
-return in ssi_ahash_import()").
+PM suspend returning a none zero value is not an error. It simply
+indicates a suspend is not advised right now so don't treat it as
+an error.
 
-This is the wrong solution and ends up relying on uninitialized memory,
-although it was not obvious to me at the time.
-
-Cc: stable@vger.kernel.org
 Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 ---
- drivers/staging/ccree/ssi_hash.c | 11 ++++-------
- 1 file changed, 4 insertions(+), 7 deletions(-)
+ drivers/staging/ccree/ssi_request_mgr.c | 8 +-------
+ 1 file changed, 1 insertion(+), 7 deletions(-)
 
-diff --git a/drivers/staging/ccree/ssi_hash.c b/drivers/staging/ccree/ssi_hash.c
-index ffcd1f0..e05c87d 100644
---- a/drivers/staging/ccree/ssi_hash.c
-+++ b/drivers/staging/ccree/ssi_hash.c
-@@ -1673,7 +1673,7 @@ static int cc_hash_import(struct ahash_request *req, const void *in)
- 	struct device *dev = drvdata_to_dev(ctx->drvdata);
- 	struct ahash_req_ctx *state = ahash_request_ctx(req);
- 	u32 tmp;
+diff --git a/drivers/staging/ccree/ssi_request_mgr.c b/drivers/staging/ccree/ssi_request_mgr.c
+index db3b29f..e99c148 100644
+--- a/drivers/staging/ccree/ssi_request_mgr.c
++++ b/drivers/staging/ccree/ssi_request_mgr.c
+@@ -598,9 +598,6 @@ static void proc_completions(struct cc_drvdata *drvdata)
+ 						drvdata->request_mgr_handle;
+ 	unsigned int *tail = &request_mgr_handle->req_queue_tail;
+ 	unsigned int *head = &request_mgr_handle->req_queue_head;
+-#if defined(CONFIG_PM)
 -	int rc = 0;
-+	int rc;
+-#endif
  
- 	memcpy(&tmp, in, sizeof(u32));
- 	if (tmp != CC_EXPORT_MAGIC) {
-@@ -1682,12 +1682,9 @@ static int cc_hash_import(struct ahash_request *req, const void *in)
- 	}
- 	in += sizeof(u32);
- 
--	/* call init() to allocate bufs if the user hasn't */
--	if (!state->digest_buff) {
--		rc = cc_hash_init(req);
+ 	while (request_mgr_handle->axi_completed) {
+ 		request_mgr_handle->axi_completed--;
+@@ -625,10 +622,7 @@ static void proc_completions(struct cc_drvdata *drvdata)
+ 		dev_dbg(dev, "Request completed. axi_completed=%d\n",
+ 			request_mgr_handle->axi_completed);
+ #if defined(CONFIG_PM)
+-		rc = cc_pm_put_suspend(dev);
 -		if (rc)
--			goto out;
--	}
-+	rc = cc_hash_init(req);
-+	if (rc)
-+		goto out;
- 
- 	dma_sync_single_for_cpu(dev, state->digest_buff_dma_addr,
- 				ctx->inter_digestsize, DMA_BIDIRECTIONAL);
+-			dev_err(dev, "Failed to set runtime suspension %d\n",
+-				rc);
++		cc_pm_put_suspend(dev);
+ #endif
+ 	}
+ }
 -- 
 2.7.4
