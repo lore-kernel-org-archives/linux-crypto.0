@@ -1,127 +1,106 @@
-From: =?iso-8859-2?Q?Horia_Geant=E3?= <horia.geanta@nxp.com>
-Subject: Re: [PATCH v9 7/8] crypto: caam: cleanup CONFIG_64BIT ifdefs when
- using io{read|write}64
-Date: Thu, 4 Jan 2018 07:25:55 +0000
-Message-ID: <VI1PR0402MB3342D07D8173696E94B38C54981F0@VI1PR0402MB3342.eurprd04.prod.outlook.com>
-References: <20180103180618.18401-1-logang@deltatee.com>
- <20180103180618.18401-8-logang@deltatee.com>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH] [v2] crypto: aes-generic - build with -Os on gcc-7+
+Date: Thu, 4 Jan 2018 09:08:23 +0000
+Message-ID: <CAKv+Gu9BUjQ_v9gcYxjSPLx1_8hi1ZWYw4xaFrZ_=M1_-Y-JEQ@mail.gmail.com>
+References: <20180103223940.3715372-1-arnd@arndb.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-2"
-Content-Transfer-Encoding: quoted-printable
-Cc: Arnd Bergmann <arnd@arndb.de>,
-        Andy Shevchenko <andy.shevchenko@gmail.com>,
-        Dan Douglass <dan.douglass@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
+Content-Type: text/plain; charset="UTF-8"
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        "Aymen Sghaier" <aymen.sghaier@nxp.com>
-To: Logan Gunthorpe <logang@deltatee.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
-        "linux-ntb@googlegroups.com" <linux-ntb@googlegroups.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-eopbgr30086.outbound.protection.outlook.com ([40.107.3.86]:18720
-        "EHLO EUR03-AM5-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1750990AbeADHZ7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 4 Jan 2018 02:25:59 -0500
-Content-Language: en-US
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+        Richard Biener <rguenther@suse.de>,
+        Jakub Jelinek <jakub@gcc.gnu.org>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Arnd Bergmann <arnd@arndb.de>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20180103223940.3715372-1-arnd@arndb.de>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 1/3/2018 8:07 PM, Logan Gunthorpe wrote:=0A=
-> Clean up the extra ifdefs which defined the wr_reg64 and rd_reg64=0A=
-> functions in non-64bit cases in favour of the new common=0A=
-> io-64-nonatomic-lo-hi header.=0A=
-> =0A=
-> Signed-off-by: Logan Gunthorpe <logang@deltatee.com>=0A=
-> Cc: Andy Shevchenko <andy.shevchenko@gmail.com>=0A=
-> Cc: Horia Geant=E3 <horia.geanta@nxp.com>=0A=
-> Cc: Dan Douglass <dan.douglass@nxp.com>=0A=
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>=0A=
-> Cc: "David S. Miller" <davem@davemloft.net>=0A=
-> ---=0A=
->  drivers/crypto/caam/regs.h | 26 +-------------------------=0A=
->  1 file changed, 1 insertion(+), 25 deletions(-)=0A=
-> =0A=
-> diff --git a/drivers/crypto/caam/regs.h b/drivers/crypto/caam/regs.h=0A=
-> index fee363865d88..ec6528e5ce9d 100644=0A=
-> --- a/drivers/crypto/caam/regs.h=0A=
-> +++ b/drivers/crypto/caam/regs.h=0A=
-> @@ -10,7 +10,7 @@=0A=
->  =0A=
->  #include <linux/types.h>=0A=
->  #include <linux/bitops.h>=0A=
-> -#include <linux/io.h>=0A=
-> +#include <linux/io-64-nonatomic-hi-lo.h>=0A=
-Typo: lo-hi should be used instead (see previous patch versions).=0A=
-=0A=
-Please add in the commit message the explanation (which was there in v8 but=
-=0A=
-removed in v9):=0A=
-To be consistent with CAAM engine HW spec: in case of 64-bit registers,=0A=
-irrespective of device endianness, the lower address should be read from=0A=
-/ written to first, followed by the upper address. Indeed the I/O=0A=
-accessors in CAAM driver currently don't follow the spec, however this=0A=
-is a good opportunity to fix the code.=0A=
-=0A=
->  =0A=
->  /*=0A=
->   * Architecture-specific register access methods=0A=
-> @@ -136,7 +136,6 @@ static inline void clrsetbits_32(void __iomem *reg, u=
-32 clear, u32 set)=0A=
->   *    base + 0x0000 : least-significant 32 bits=0A=
->   *    base + 0x0004 : most-significant 32 bits=0A=
->   */=0A=
-> -#ifdef CONFIG_64BIT=0A=
->  static inline void wr_reg64(void __iomem *reg, u64 data)=0A=
->  {=0A=
->  	if (caam_little_end)=0A=
-Since the 2 cases (32/64-bit) are merged, caam_imx should be accounted for =
-the=0A=
-logic to stay the same.=0A=
-=0A=
-This means for e.g. for wr_reg64 (similar for rd_reg64):=0A=
-static inline void wr_reg64(void __iomem *reg, u64 data)=0A=
-{=0A=
-	if (!caam_imx && caam_little_end)=0A=
-		iowrite64(data, reg);=0A=
-	else=0A=
-		iowrite64be(data, reg);=0A=
-}=0A=
-=0A=
-Thanks,=0A=
-Horia=0A=
-=0A=
-> @@ -153,29 +152,6 @@ static inline u64 rd_reg64(void __iomem *reg)=0A=
->  		return ioread64be(reg);=0A=
->  }=0A=
->  =0A=
-> -#else /* CONFIG_64BIT */=0A=
-> -static inline void wr_reg64(void __iomem *reg, u64 data)=0A=
-> -{=0A=
-> -	if (!caam_imx && caam_little_end) {=0A=
-> -		wr_reg32((u32 __iomem *)(reg) + 1, data >> 32);=0A=
-> -		wr_reg32((u32 __iomem *)(reg), data);=0A=
-> -	} else {=0A=
-> -		wr_reg32((u32 __iomem *)(reg), data >> 32);=0A=
-> -		wr_reg32((u32 __iomem *)(reg) + 1, data);=0A=
-> -	}=0A=
-> -}=0A=
-> -=0A=
-> -static inline u64 rd_reg64(void __iomem *reg)=0A=
-> -{=0A=
-> -	if (!caam_imx && caam_little_end)=0A=
-> -		return ((u64)rd_reg32((u32 __iomem *)(reg) + 1) << 32 |=0A=
-> -			(u64)rd_reg32((u32 __iomem *)(reg)));=0A=
-> -=0A=
-> -	return ((u64)rd_reg32((u32 __iomem *)(reg)) << 32 |=0A=
-> -		(u64)rd_reg32((u32 __iomem *)(reg) + 1));=0A=
-> -}=0A=
-> -#endif /* CONFIG_64BIT  */=0A=
-> -=0A=
->  static inline u64 cpu_to_caam_dma64(dma_addr_t value)=0A=
->  {=0A=
->  	if (caam_imx)=0A=
-> =0A=
+On 3 January 2018 at 22:39, Arnd Bergmann <arnd@arndb.de> wrote:
+> While testing other changes, I discovered that gcc-7.2.1 produces badly
+> optimized code for aes_encrypt/aes_decrypt. This is especially true when
+> CONFIG_UBSAN_SANITIZE_ALL is enabled, where it leads to extremely
+> large stack usage that in turn might cause kernel stack overflows:
+>
+> crypto/aes_generic.c: In function 'aes_encrypt':
+> crypto/aes_generic.c:1371:1: warning: the frame size of 4880 bytes is larger than 2048 bytes [-Wframe-larger-than=]
+> crypto/aes_generic.c: In function 'aes_decrypt':
+> crypto/aes_generic.c:1441:1: warning: the frame size of 4864 bytes is larger than 2048 bytes [-Wframe-larger-than=]
+>
+> I verified that this problem exists on all architectures that are
+> supported by gcc-7.2, though arm64 in particular is less affected than
+> the others. I also found that gcc-7.1 and gcc-8 do not show the extreme
+> stack usage but still produce worse code than earlier versions for this
+> file, apparently because of optimization passes that generally provide
+> a substantial improvement in object code quality but understandably fail
+> to find any shortcuts in the AES algorithm.
+>
+> Possible workarounds include
+>
+> a) disabling -ftree-pre and -ftree-sra optimizations, this was an earlier
+>    patch I tried, which reliably fixed the stack usage, but caused a
+>    serious performance regression in some versions, as later testing
+>    found.
+>
+> b) disabling UBSAN on this file or all ciphers, as suggested by Ard
+>    Biesheuvel. This would lead to massively better crypto performance in
+>    UBSAN-enabled kernels and avoid the stack usage, but there is a concern
+>    over whether we should exclude arbitrary files from UBSAN at all.
+>
+> c) Forcing the optimization level in a different way. Similar to a),
+>    but rather than deselecting specific optimization stages,
+>    this now uses "gcc -Os" for this file, regardless of the
+>    CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE/SIZE option. This is a reliable
+>    workaround for the stack consumption on all architecture, and I've
+>    retested the performance results now on x86, cycles/byte (lower is
+>    better) for cbc(aes-generic) with 256 bit keys:
+>
+>                         -O2     -Os
+>         gcc-6.3.1       14.9    15.1
+>         gcc-7.0.1       14.7    15.3
+>         gcc-7.1.1       15.3    14.7
+>         gcc-7.2.1       16.8    15.9
+>         gcc-8.0.0       15.5    15.6
+>
+> This implements the option c) by enabling forcing -Os on all compiler
+> versions starting with gcc-7.1. As a workaround for PR83356, it would
+> only be needed for gcc-7.2+ with UBSAN enabled, but since it also shows
+> better performance on gcc-7.1 without UBSAN, it seems appropriate to
+> use the faster version here as well.
+>
+> Side note: during testing, I also played with the AES code in libressl,
+> which had a similar performance regression from gcc-6 to gcc-7.2,
+> but was three times slower overall. It might be interesting to
+> investigate that further and possibly port the Linux implementation
+> into that.
+>
+> Link: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=83356
+> Link: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=83651
+> Cc: Richard Biener <rguenther@suse.de>
+> Cc: Jakub Jelinek <jakub@gcc.gnu.org>
+> Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+
+Acked-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+
+> ---
+>  crypto/Makefile | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/crypto/Makefile b/crypto/Makefile
+> index d674884b2d51..daa69360e054 100644
+> --- a/crypto/Makefile
+> +++ b/crypto/Makefile
+> @@ -99,6 +99,7 @@ obj-$(CONFIG_CRYPTO_TWOFISH_COMMON) += twofish_common.o
+>  obj-$(CONFIG_CRYPTO_SERPENT) += serpent_generic.o
+>  CFLAGS_serpent_generic.o := $(call cc-option,-fsched-pressure)  # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=79149
+>  obj-$(CONFIG_CRYPTO_AES) += aes_generic.o
+> +CFLAGS_aes_generic.o := $(call cc-ifversion, -ge, 0701, -Os) # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=83356
+>  obj-$(CONFIG_CRYPTO_AES_TI) += aes_ti.o
+>  obj-$(CONFIG_CRYPTO_CAMELLIA) += camellia_generic.o
+>  obj-$(CONFIG_CRYPTO_CAST_COMMON) += cast_common.o
+> --
+> 2.9.0
+>
