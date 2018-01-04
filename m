@@ -1,106 +1,30 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [PATCH] [v2] crypto: aes-generic - build with -Os on gcc-7+
-Date: Thu, 4 Jan 2018 09:08:23 +0000
-Message-ID: <CAKv+Gu9BUjQ_v9gcYxjSPLx1_8hi1ZWYw4xaFrZ_=M1_-Y-JEQ@mail.gmail.com>
-References: <20180103223940.3715372-1-arnd@arndb.de>
+From: "Peter Deng" <peterddeng2000@securemailer.com>
+Subject: Business Possibility
+Date: Thu, 4 Jan 2018 16:13:50 +0000
+Message-ID: <253240646175232864385@nadneaa2>
+Reply-To: peterddeng2000@secsuremailer.com
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Richard Biener <rguenther@suse.de>,
-        Jakub Jelinek <jakub@gcc.gnu.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180103223940.3715372-1-arnd@arndb.de>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain
+Content-Transfer-Encoding: 8BIT
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from host116-16-237-212.serverdedicati.aruba.it ([212.237.16.116]:41912
+        "EHLO host.arubacloud.com" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1753408AbeADQTZ (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 4 Jan 2018 11:19:25 -0500
+Received: from slsourcinggroup.com (nadneaa2.miniserver.com [78.31.108.146])
+        by host.arubacloud.com (Postfix) with ESMTPA id AD0BF7566C
+        for <linux-crypto@vger.kernel.org>; Thu,  4 Jan 2018 17:13:21 +0100 (CET)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On 3 January 2018 at 22:39, Arnd Bergmann <arnd@arndb.de> wrote:
-> While testing other changes, I discovered that gcc-7.2.1 produces badly
-> optimized code for aes_encrypt/aes_decrypt. This is especially true when
-> CONFIG_UBSAN_SANITIZE_ALL is enabled, where it leads to extremely
-> large stack usage that in turn might cause kernel stack overflows:
->
-> crypto/aes_generic.c: In function 'aes_encrypt':
-> crypto/aes_generic.c:1371:1: warning: the frame size of 4880 bytes is larger than 2048 bytes [-Wframe-larger-than=]
-> crypto/aes_generic.c: In function 'aes_decrypt':
-> crypto/aes_generic.c:1441:1: warning: the frame size of 4864 bytes is larger than 2048 bytes [-Wframe-larger-than=]
->
-> I verified that this problem exists on all architectures that are
-> supported by gcc-7.2, though arm64 in particular is less affected than
-> the others. I also found that gcc-7.1 and gcc-8 do not show the extreme
-> stack usage but still produce worse code than earlier versions for this
-> file, apparently because of optimization passes that generally provide
-> a substantial improvement in object code quality but understandably fail
-> to find any shortcuts in the AES algorithm.
->
-> Possible workarounds include
->
-> a) disabling -ftree-pre and -ftree-sra optimizations, this was an earlier
->    patch I tried, which reliably fixed the stack usage, but caused a
->    serious performance regression in some versions, as later testing
->    found.
->
-> b) disabling UBSAN on this file or all ciphers, as suggested by Ard
->    Biesheuvel. This would lead to massively better crypto performance in
->    UBSAN-enabled kernels and avoid the stack usage, but there is a concern
->    over whether we should exclude arbitrary files from UBSAN at all.
->
-> c) Forcing the optimization level in a different way. Similar to a),
->    but rather than deselecting specific optimization stages,
->    this now uses "gcc -Os" for this file, regardless of the
->    CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE/SIZE option. This is a reliable
->    workaround for the stack consumption on all architecture, and I've
->    retested the performance results now on x86, cycles/byte (lower is
->    better) for cbc(aes-generic) with 256 bit keys:
->
->                         -O2     -Os
->         gcc-6.3.1       14.9    15.1
->         gcc-7.0.1       14.7    15.3
->         gcc-7.1.1       15.3    14.7
->         gcc-7.2.1       16.8    15.9
->         gcc-8.0.0       15.5    15.6
->
-> This implements the option c) by enabling forcing -Os on all compiler
-> versions starting with gcc-7.1. As a workaround for PR83356, it would
-> only be needed for gcc-7.2+ with UBSAN enabled, but since it also shows
-> better performance on gcc-7.1 without UBSAN, it seems appropriate to
-> use the faster version here as well.
->
-> Side note: during testing, I also played with the AES code in libressl,
-> which had a similar performance regression from gcc-6 to gcc-7.2,
-> but was three times slower overall. It might be interesting to
-> investigate that further and possibly port the Linux implementation
-> into that.
->
-> Link: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=83356
-> Link: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=83651
-> Cc: Richard Biener <rguenther@suse.de>
-> Cc: Jakub Jelinek <jakub@gcc.gnu.org>
-> Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+Hello there, My name is Peter Deng a South African citizen and a friend to Mrs Mugabe sister . I got your contact through Korean business online directory. I represent the interest of Mrs Mugabe who wishes to move a total amount of $19 million  into a safe account owns by a trusted business man who is capable of accommodating such volume of funds with absolute trust & confidentiality.
 
-Acked-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+We are willing to give 5-10 percent of the total money for this efforts . A non disclosure non circumvent agreement will be signed before the eventual transfer of funds. It is important for to know that the fund owner is going through a period of political turmoil and she is in a precarious position, so this transaction has to be highly secretive & very confidential.
 
-> ---
->  crypto/Makefile | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/crypto/Makefile b/crypto/Makefile
-> index d674884b2d51..daa69360e054 100644
-> --- a/crypto/Makefile
-> +++ b/crypto/Makefile
-> @@ -99,6 +99,7 @@ obj-$(CONFIG_CRYPTO_TWOFISH_COMMON) += twofish_common.o
->  obj-$(CONFIG_CRYPTO_SERPENT) += serpent_generic.o
->  CFLAGS_serpent_generic.o := $(call cc-option,-fsched-pressure)  # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=79149
->  obj-$(CONFIG_CRYPTO_AES) += aes_generic.o
-> +CFLAGS_aes_generic.o := $(call cc-ifversion, -ge, 0701, -Os) # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=83356
->  obj-$(CONFIG_CRYPTO_AES_TI) += aes_ti.o
->  obj-$(CONFIG_CRYPTO_CAMELLIA) += camellia_generic.o
->  obj-$(CONFIG_CRYPTO_CAST_COMMON) += cast_common.o
-> --
-> 2.9.0
->
+Kindly respond back to me if this is what you can handle .
+
+Regards,
+
+Peter.
