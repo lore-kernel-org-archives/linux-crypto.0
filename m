@@ -1,41 +1,37 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/3] crypto: poly1305 - get rid of cra_alignmask
-Date: Fri, 5 Jan 2018 22:17:40 +1100
-Message-ID: <20180105111740.GE16156@gondor.apana.org.au>
-References: <20171229161026.28102-1-ebiggers3@gmail.com>
+Subject: Re: [PATCH] crypto: algapi - remove unused notifications
+Date: Fri, 5 Jan 2018 22:17:30 +1100
+Message-ID: <20180105111729.GD16156@gondor.apana.org.au>
+References: <20171229160646.25273-1-ebiggers3@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org,
         "David S . Miller" <davem@davemloft.net>,
-        "Jason A . Donenfeld" <Jason@zx2c4.com>,
-        Martin Willi <martin@strongswan.org>
+        Eric Biggers <ebiggers@google.com>
 To: Eric Biggers <ebiggers3@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [128.1.224.119] ([128.1.224.119]:50010 "EHLO ringil.hmeau.com"
+Received: from [128.1.224.119] ([128.1.224.119]:49996 "EHLO ringil.hmeau.com"
         rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
-        id S1751642AbeAELRq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 5 Jan 2018 06:17:46 -0500
+        id S1751589AbeAELRd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 5 Jan 2018 06:17:33 -0500
 Content-Disposition: inline
-In-Reply-To: <20171229161026.28102-1-ebiggers3@gmail.com>
+In-Reply-To: <20171229160646.25273-1-ebiggers3@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Dec 29, 2017 at 10:10:23AM -0600, Eric Biggers wrote:
-> This series gets rid of the cra_alignmask set on poly1305-generic and
-> poly1305-simd, since it was only actually used when outputting the final
-> digest.  By removing the alignmask, the crypto API will no longer need
-> to waste time aligning the buffers.
+On Fri, Dec 29, 2017 at 10:06:46AM -0600, Eric Biggers wrote:
+> From: Eric Biggers <ebiggers@google.com>
 > 
-> Eric Biggers (3):
->   crypto: poly1305 - use unaligned access macros to output digest
->   crypto: poly1305 - remove cra_alignmask
->   crypto: x86/poly1305 - remove cra_alignmask
+> There is a message posted to the crypto notifier chain when an algorithm
+> is unregistered, and when a template is registered or unregistered.  But
+> nothing is listening for those messages; currently there are only
+> listeners for the algorithm request and registration messages.
 > 
->  arch/x86/crypto/poly1305_glue.c |  1 -
->  crypto/poly1305_generic.c       | 10 ++++------
->  2 files changed, 4 insertions(+), 7 deletions(-)
+> Get rid of these unused notifications for now.
+> 
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
 
-All applied.  Thanks.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
