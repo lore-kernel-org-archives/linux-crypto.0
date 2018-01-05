@@ -1,81 +1,92 @@
-From: "Yang Shi" <yang.s@alibaba-inc.com>
-Subject: Re: [PATCH 6/8] net: caif: remove unused hardirq.h
-Date: Fri, 05 Jan 2018 06:51:36 +0800
-Message-ID: <a2f9ddc4-f3e1-4f80-6b05-398d1243e225@alibaba-inc.com>
-References: <1510959741-31109-1-git-send-email-yang.s@alibaba-inc.com>
- <1510959741-31109-6-git-send-email-yang.s@alibaba-inc.com>
- <9ad5b35a-8d4c-448a-912b-2816c4c8c53f@alibaba-inc.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Crypto Fixes for 4.15
+Date: Fri, 5 Jan 2018 18:38:08 +1100
+Message-ID: <20180105073808.GA14405@gondor.apana.org.au>
+References: <20161119102748.GA4277@gondor.apana.org.au>
+ <20161213132414.GA7898@gondor.apana.org.au>
+ <20170223125141.GA17400@gondor.apana.org.au>
+ <20170714141855.GA29426@gondor.apana.org.au>
+ <20170922084401.GA15541@gondor.apana.org.au>
+ <20171128230929.GA17783@gondor.apana.org.au>
+ <20171222064931.GA27068@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
- linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
- Dmitry Tarnyagin <dmitry.tarnyagin@lockless.no>,
- "David S. Miller" <davem@davemloft.net>
-To: linux-kernel@vger.kernel.org
-Return-path: <owner-linux-mm@kvack.org>
-In-Reply-To: <9ad5b35a-8d4c-448a-912b-2816c4c8c53f@alibaba-inc.com>
-Content-Language: en-US
-Sender: owner-linux-mm@kvack.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from [128.1.224.119] ([128.1.224.119]:49930 "EHLO ringil.hmeau.com"
+        rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
+        id S1751320AbeAEHiU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 5 Jan 2018 02:38:20 -0500
+Content-Disposition: inline
+In-Reply-To: <20171222064931.GA27068@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi David,
+Hi Linus: 
 
-I'm not sure if CAIF is still maintained by Dmitry Tarnyagin. Do you 
-have any comment on this one?
+This push fixes the following issues:
+
+- Racy use of ctx->rcvused in af_alg.
+- algif_aead crash in chacha20poly1305.
+- Freeing bogus pointer in pcrypt.
+- Build error on MIPS in mpi.
+- Memory leak in inside-secure.
+- Memory overwrite in inside-secure.
+- NULL pointer dereference in inside-secure.
+- State corruption in inside-secure.
+- Build error without CRYPTO_GF128MUL in chelsio.
+- Use after free in n2.
+
+
+Please pull from
+
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
+
+
+Antoine Ténart (3):
+      crypto: inside-secure - free requests even if their handling failed
+      crypto: inside-secure - fix request allocations in invalidation path
+      crypto: inside-secure - do not use areq->result for partial results
+
+Arnd Bergmann (1):
+      crypto: chelsio - select CRYPTO_GF128MUL
+
+Eric Biggers (2):
+      crypto: chacha20poly1305 - validate the digest size
+      crypto: pcrypt - fix freeing pcrypt instances
+
+James Hogan (1):
+      lib/mpi: Fix umul_ppmm() for MIPS64r6
+
+Jan Engelhardt (1):
+      crypto: n2 - cure use after free
+
+Jonathan Cameron (1):
+      crypto: af_alg - Fix race around ctx->rcvused by making it atomic_t
+
+Ofer Heifetz (1):
+      crypto: inside-secure - per request invalidation
+
+ crypto/af_alg.c                                |    4 +-
+ crypto/algif_aead.c                            |    2 +-
+ crypto/algif_skcipher.c                        |    2 +-
+ crypto/chacha20poly1305.c                      |    6 +-
+ crypto/pcrypt.c                                |   19 ++---
+ drivers/crypto/chelsio/Kconfig                 |    1 +
+ drivers/crypto/inside-secure/safexcel.c        |    1 +
+ drivers/crypto/inside-secure/safexcel_cipher.c |   85 ++++++++++++++++------
+ drivers/crypto/inside-secure/safexcel_hash.c   |   89 +++++++++++++++++-------
+ drivers/crypto/n2_core.c                       |    3 +
+ include/crypto/if_alg.h                        |    5 +-
+ lib/mpi/longlong.h                             |   18 ++++-
+ 12 files changed, 173 insertions(+), 62 deletions(-)
 
 Thanks,
-Yang
-
-
-On 12/7/17 11:13 AM, Yang Shi wrote:
-> Hi folks,
-> 
-> Any comment on this one?
-> 
-> Thanks,
-> Yang
-> 
-> 
-> On 11/17/17 3:02 PM, Yang Shi wrote:
->> Preempt counter APIs have been split out, currently, hardirq.h just
->> includes irq_enter/exit APIs which are not used by caif at all.
->>
->> So, remove the unused hardirq.h.
->>
->> Signed-off-by: Yang Shi <yang.s@alibaba-inc.com>
->> Cc: Dmitry Tarnyagin <dmitry.tarnyagin@lockless.no>
->> Cc: "David S. Miller" <davem@davemloft.net>
->> ---
->>   net/caif/cfpkt_skbuff.c | 1 -
->>   net/caif/chnl_net.c     | 1 -
->>   2 files changed, 2 deletions(-)
->>
->> diff --git a/net/caif/cfpkt_skbuff.c b/net/caif/cfpkt_skbuff.c
->> index 71b6ab2..38c2b7a 100644
->> --- a/net/caif/cfpkt_skbuff.c
->> +++ b/net/caif/cfpkt_skbuff.c
->> @@ -8,7 +8,6 @@
->>   #include <linux/string.h>
->>   #include <linux/skbuff.h>
->> -#include <linux/hardirq.h>
->>   #include <linux/export.h>
->>   #include <net/caif/cfpkt.h>
->> diff --git a/net/caif/chnl_net.c b/net/caif/chnl_net.c
->> index 922ac1d..53ecda1 100644
->> --- a/net/caif/chnl_net.c
->> +++ b/net/caif/chnl_net.c
->> @@ -8,7 +8,6 @@
->>   #define pr_fmt(fmt) KBUILD_MODNAME ":%s(): " fmt, __func__
->>   #include <linux/fs.h>
->> -#include <linux/hardirq.h>
->>   #include <linux/init.h>
->>   #include <linux/module.h>
->>   #include <linux/netdevice.h>
->>
-
---
-To unsubscribe, send a message with 'unsubscribe linux-mm' in
-the body to majordomo@kvack.org.  For more info on Linux MM,
-see: http://www.linux-mm.org/ .
-Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
