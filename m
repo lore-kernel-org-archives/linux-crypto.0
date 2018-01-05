@@ -1,55 +1,44 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [v1] crypto: crypto4xx - perform aead icv check in the driver
-Date: Fri, 5 Jan 2018 22:15:45 +1100
-Message-ID: <20180105111545.GB16271@gondor.apana.org.au>
-References: <7d26eb8de324eb17d99d2e4b0aa271b6c75ef889.1514054717.git.chunkeey@gmail.com>
+Subject: Re: [PATCH 0/2] crypto: inside-secure - 2 extra fixes
+Date: Fri, 5 Jan 2018 22:16:00 +1100
+Message-ID: <20180105111600.GB16156@gondor.apana.org.au>
+References: <20171226162117.4885-1-antoine.tenart@free-electrons.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Christian Lamparter <chunkeey@gmail.com>
+Cc: davem@davemloft.net, thomas.petazzoni@free-electrons.com,
+        gregory.clement@free-electrons.com,
+        miquel.raynal@free-electrons.com, oferh@marvell.com,
+        igall@marvell.com, nadavh@marvell.com, linux-crypto@vger.kernel.org
+To: Antoine Tenart <antoine.tenart@free-electrons.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [128.1.224.119] ([128.1.224.119]:49976 "EHLO ringil.hmeau.com"
+Received: from [128.1.224.119] ([128.1.224.119]:49986 "EHLO ringil.hmeau.com"
         rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
-        id S1751316AbeAELPr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 5 Jan 2018 06:15:47 -0500
+        id S1751002AbeAELQQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 5 Jan 2018 06:16:16 -0500
 Content-Disposition: inline
-In-Reply-To: <7d26eb8de324eb17d99d2e4b0aa271b6c75ef889.1514054717.git.chunkeey@gmail.com>
+In-Reply-To: <20171226162117.4885-1-antoine.tenart@free-electrons.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sat, Dec 23, 2017 at 07:45:46PM +0100, Christian Lamparter wrote:
-> The ccm-aes-ppc4xx now fails one of testmgr's expected
-> failure test cases as such:
+On Tue, Dec 26, 2017 at 05:21:15PM +0100, Antoine Tenart wrote:
+> Hi Herbert,
 > 
-> |decryption failed on test 10 for ccm-aes-ppc4xx:
-> |ret was 0, |expected -EBADMSG
+> This series contains two fixes for the Inside Secure SafeXcel crypto
+> engine driver. The first one removes a warning when the DMA-API debug is
+> activated and the second one is fixing an issue with the driver in
+> certain cases where the input length is a multiple of a block size.
 > 
-> It doesn't look like the hardware sets the authentication failure
-> flag. The original vendor source from which this was ported does
-> not have any special code or notes about why this would happen or
-> if there are any WAs.
+> Thanks!
+> Antoine
 > 
-> Hence, this patch converts the aead_done callback handler to
-> perform the icv check in the driver. And this fixes the false
-> negative and the ccm-aes-ppc4xx passes the selftests once again.
+> Antoine Tenart (2):
+>   crypto: inside-secure - avoid unmapping DMA memory that was not mapped
+>   crypto: inside-secure - fix hash when length is a multiple of a block
 > 
-> |name         : ccm(aes)
-> |driver       : ccm-aes-ppc4xx
-> |module       : crypto4xx
-> |priority     : 300
-> |refcnt       : 1
-> |selftest     : passed
-> |internal     : no
-> |type         : aead
-> |async        : yes
-> |blocksize    : 1
-> |ivsize       : 16
-> |maxauthsize  : 16
-> |geniv        : <none>
-> 
-> Signed-off-by: Christian Lamparter <chunkeey@gmail.com>
+>  drivers/crypto/inside-secure/safexcel_hash.c | 54 ++++++++++++++++++----------
+>  1 file changed, 36 insertions(+), 18 deletions(-)
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
