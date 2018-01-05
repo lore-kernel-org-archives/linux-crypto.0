@@ -1,34 +1,46 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: algapi - remove unused notifications
-Date: Fri, 5 Jan 2018 22:17:30 +1100
-Message-ID: <20180105111729.GD16156@gondor.apana.org.au>
-References: <20171229160646.25273-1-ebiggers3@gmail.com>
+Subject: Re: [PATCH] crypto: algapi - fix NULL dereference in
+ crypto_remove_spawns()
+Date: Fri, 5 Jan 2018 22:18:07 +1100
+Message-ID: <20180105111807.GF16156@gondor.apana.org.au>
+References: <001a1141c43ad30ccf055efb76ed@google.com>
+ <20171229203019.1413-1-ebiggers3@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org,
         "David S . Miller" <davem@davemloft.net>,
-        Eric Biggers <ebiggers@google.com>
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
+        Eric Biggers <ebiggers@google.com>, stable@vger.kernel.org
 To: Eric Biggers <ebiggers3@gmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [128.1.224.119] ([128.1.224.119]:49996 "EHLO ringil.hmeau.com"
-        rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
-        id S1751589AbeAELRd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 5 Jan 2018 06:17:33 -0500
+Return-path: <stable-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20171229160646.25273-1-ebiggers3@gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <20171229203019.1413-1-ebiggers3@gmail.com>
+Sender: stable-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Dec 29, 2017 at 10:06:46AM -0600, Eric Biggers wrote:
+On Fri, Dec 29, 2017 at 02:30:19PM -0600, Eric Biggers wrote:
 > From: Eric Biggers <ebiggers@google.com>
 > 
-> There is a message posted to the crypto notifier chain when an algorithm
-> is unregistered, and when a template is registered or unregistered.  But
-> nothing is listening for those messages; currently there are only
-> listeners for the algorithm request and registration messages.
+> syzkaller triggered a NULL pointer dereference in crypto_remove_spawns()
+> via a program that repeatedly and concurrently requests AEADs
+> "authenc(cmac(des3_ede-asm),pcbc-aes-aesni)" and hashes "cmac(des3_ede)"
+> through AF_ALG, where the hashes are requested as "untested"
+> (CRYPTO_ALG_TESTED is set in ->salg_mask but clear in ->salg_feat; this
+> causes the template to be instantiated for every request).
 > 
-> Get rid of these unused notifications for now.
+> Although AF_ALG users really shouldn't be able to request an "untested"
+> algorithm, the NULL pointer dereference is actually caused by a
+> longstanding race condition where crypto_remove_spawns() can encounter
+> an instance which has had spawn(s) "grabbed" but hasn't yet been
+> registered, resulting in ->cra_users still being NULL.
 > 
+> We probably should properly initialize ->cra_users earlier, but that
+> would require updating many templates individually.  For now just fix
+> the bug in a simple way that can easily be backported: make
+> crypto_remove_spawns() treat a NULL ->cra_users list as empty.
+> 
+> Reported-by: syzbot <syzkaller@googlegroups.com>
+> Cc: stable@vger.kernel.org
 > Signed-off-by: Eric Biggers <ebiggers@google.com>
 
 Patch applied.  Thanks.
