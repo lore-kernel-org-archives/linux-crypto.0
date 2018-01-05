@@ -1,39 +1,34 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v5] hwrng: exynos - add Samsung Exynos True RNG driver
-Date: Fri, 5 Jan 2018 22:14:44 +1100
-Message-ID: <20180105111444.GA16156@gondor.apana.org.au>
-References: <20171222132338.30054-1-l.stelmach@samsung.com>
- <CGME20171222164840eucas1p17e3d17666ba3d0c5fced2d1c9259bf0b@eucas1p1.samsung.com>
- <20171222164835.1051-1-l.stelmach@samsung.com>
+Subject: Re: [v1,1/4] crypto: crypto4xx - shuffle iomap in front of
+ request_irq
+Date: Fri, 5 Jan 2018 22:15:24 +1100
+Message-ID: <20180105111524.GA16271@gondor.apana.org.au>
+References: <4baa099377d73ea99c7802a9685815b32e8bf119.1513908140.git.chunkeey@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Cc: Philippe Ombredanne <pombredanne@nexb.com>,
-        "Andrew F . Davis" <afd@ti.com>,
-        PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Matt Mackall <mpm@selenic.com>,
-        Krzysztof Kozlowski <krzk@kernel.org>,
-        Kukjin Kim <kgene@kernel.org>, devicetree@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-samsung-soc@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Marek Szyprowski <m.szyprowski@samsung.com>,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
-To: =?utf-8?Q?=C5=81ukasz?= Stelmach <l.stelmach@samsung.com>
-Return-path: <linux-samsung-soc-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org
+To: Christian Lamparter <chunkeey@gmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from [128.1.224.119] ([128.1.224.119]:49972 "EHLO ringil.hmeau.com"
+        rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
+        id S1751577AbeAELP0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 5 Jan 2018 06:15:26 -0500
 Content-Disposition: inline
-In-Reply-To: <20171222164835.1051-1-l.stelmach@samsung.com>
-Sender: linux-samsung-soc-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <4baa099377d73ea99c7802a9685815b32e8bf119.1513908140.git.chunkeey@gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Dec 22, 2017 at 05:48:35PM +0100, Łukasz Stelmach wrote:
-> Add support for True Random Number Generator found in Samsung Exynos
-> 5250+ SoCs.
+On Fri, Dec 22, 2017 at 09:18:35PM +0100, Christian Lamparter wrote:
+> It is possible to avoid the ce_base null pointer check in the
+> drivers' interrupt handler routine "crypto4xx_ce_interrupt_handler()"
+> by simply doing the iomap in front of the IRQ registration.
 > 
-> Signed-off-by: Łukasz Stelmach <l.stelmach@samsung.com>
-> Reviewed-by: Krzysztof Kozlowski <krzk@kernel.org>
+> This way, the ce_base will always be valid in the handler and
+> a branch in an critical path can be avoided.
+> 
+> Signed-off-by: Christian Lamparter <chunkeey@gmail.com>
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
