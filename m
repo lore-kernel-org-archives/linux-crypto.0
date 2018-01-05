@@ -1,92 +1,55 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Crypto Fixes for 4.15
-Date: Fri, 5 Jan 2018 18:38:08 +1100
-Message-ID: <20180105073808.GA14405@gondor.apana.org.au>
-References: <20161119102748.GA4277@gondor.apana.org.au>
- <20161213132414.GA7898@gondor.apana.org.au>
- <20170223125141.GA17400@gondor.apana.org.au>
- <20170714141855.GA29426@gondor.apana.org.au>
- <20170922084401.GA15541@gondor.apana.org.au>
- <20171128230929.GA17783@gondor.apana.org.au>
- <20171222064931.GA27068@gondor.apana.org.au>
+From: =?iso-8859-2?Q?Horia_Geant=E3?= <horia.geanta@nxp.com>
+Subject: Re: [PATCH v10 7/8] crypto: caam: cleanup CONFIG_64BIT ifdefs when
+ using io{read|write}64
+Date: Fri, 5 Jan 2018 08:01:13 +0000
+Message-ID: <VI1PR0402MB334282217BC0AE1F8DA8BFC3981C0@VI1PR0402MB3342.eurprd04.prod.outlook.com>
+References: <20180104191645.10006-1-logang@deltatee.com>
+ <20180104191645.10006-8-logang@deltatee.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="iso-8859-2"
+Content-Transfer-Encoding: quoted-printable
+Cc: Arnd Bergmann <arnd@arndb.de>,
+        Andy Shevchenko <andy.shevchenko@gmail.com>,
+        Dan Douglass <dan.douglass@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+To: Logan Gunthorpe <logang@deltatee.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
+        "linux-ntb@googlegroups.com" <linux-ntb@googlegroups.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [128.1.224.119] ([128.1.224.119]:49930 "EHLO ringil.hmeau.com"
-        rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
-        id S1751320AbeAEHiU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 5 Jan 2018 02:38:20 -0500
-Content-Disposition: inline
-In-Reply-To: <20171222064931.GA27068@gondor.apana.org.au>
+Received: from mail-ve1eur01on0049.outbound.protection.outlook.com ([104.47.1.49]:4128
+        "EHLO EUR01-VE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751235AbeAEIBU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 5 Jan 2018 03:01:20 -0500
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Linus: 
-
-This push fixes the following issues:
-
-- Racy use of ctx->rcvused in af_alg.
-- algif_aead crash in chacha20poly1305.
-- Freeing bogus pointer in pcrypt.
-- Build error on MIPS in mpi.
-- Memory leak in inside-secure.
-- Memory overwrite in inside-secure.
-- NULL pointer dereference in inside-secure.
-- State corruption in inside-secure.
-- Build error without CRYPTO_GF128MUL in chelsio.
-- Use after free in n2.
-
-
-Please pull from
-
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
-
-
-Antoine Ténart (3):
-      crypto: inside-secure - free requests even if their handling failed
-      crypto: inside-secure - fix request allocations in invalidation path
-      crypto: inside-secure - do not use areq->result for partial results
-
-Arnd Bergmann (1):
-      crypto: chelsio - select CRYPTO_GF128MUL
-
-Eric Biggers (2):
-      crypto: chacha20poly1305 - validate the digest size
-      crypto: pcrypt - fix freeing pcrypt instances
-
-James Hogan (1):
-      lib/mpi: Fix umul_ppmm() for MIPS64r6
-
-Jan Engelhardt (1):
-      crypto: n2 - cure use after free
-
-Jonathan Cameron (1):
-      crypto: af_alg - Fix race around ctx->rcvused by making it atomic_t
-
-Ofer Heifetz (1):
-      crypto: inside-secure - per request invalidation
-
- crypto/af_alg.c                                |    4 +-
- crypto/algif_aead.c                            |    2 +-
- crypto/algif_skcipher.c                        |    2 +-
- crypto/chacha20poly1305.c                      |    6 +-
- crypto/pcrypt.c                                |   19 ++---
- drivers/crypto/chelsio/Kconfig                 |    1 +
- drivers/crypto/inside-secure/safexcel.c        |    1 +
- drivers/crypto/inside-secure/safexcel_cipher.c |   85 ++++++++++++++++------
- drivers/crypto/inside-secure/safexcel_hash.c   |   89 +++++++++++++++++-------
- drivers/crypto/n2_core.c                       |    3 +
- include/crypto/if_alg.h                        |    5 +-
- lib/mpi/longlong.h                             |   18 ++++-
- 12 files changed, 173 insertions(+), 62 deletions(-)
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+On 1/4/2018 9:16 PM, Logan Gunthorpe wrote:=0A=
+> Clean up the extra ifdefs which defined the wr_reg64 and rd_reg64=0A=
+> functions in non-64bit cases in favour of the new common=0A=
+> io-64-nonatomic-lo-hi header.=0A=
+> =0A=
+> To be consistent with CAAM engine HW spec: in case of 64-bit registers,=
+=0A=
+> irrespective of device endianness, the lower address should be read from=
+=0A=
+> / written to first, followed by the upper address. Indeed the I/O=0A=
+> accessors in CAAM driver currently don't follow the spec, however this=0A=
+> is a good opportunity to fix the code.=0A=
+> =0A=
+> Signed-off-by: Logan Gunthorpe <logang@deltatee.com>=0A=
+> Cc: Andy Shevchenko <andy.shevchenko@gmail.com>=0A=
+> Cc: Horia Geant=E3 <horia.geanta@nxp.com>=0A=
+> Cc: Dan Douglass <dan.douglass@nxp.com>=0A=
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>=0A=
+> Cc: "David S. Miller" <davem@davemloft.net>=0A=
+Reviewed-by: Horia Geant=E3 <horia.geanta@nxp.com>=0A=
+=0A=
+Thanks,=0A=
+Horia=0A=
+=0A=
