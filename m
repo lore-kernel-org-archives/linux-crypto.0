@@ -1,133 +1,96 @@
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: Re: [PATCH v3 24/27] staging: ccree: use a consistent file naming
- convention
-Date: Mon, 8 Jan 2018 16:28:18 +0100
-Message-ID: <20180108152818.GA7701@kroah.com>
-References: <1515327285-8948-1-git-send-email-gilad@benyossef.com>
- <1515327285-8948-25-git-send-email-gilad@benyossef.com>
+From: Kamil Konieczny <k.konieczny@partner.samsung.com>
+Subject: Re: [PATCH] crypto: clear htmldocs build warnings for crypto/hash
+Date: Mon, 08 Jan 2018 17:43:18 +0100
+Message-ID: <2b4fa5b0-dadb-47fe-2bbd-b051ad343bc4@partner.samsung.com>
+References: <CGME20180106230157epcas2p2a3dc70ac85fbd7861ddf916fde5dd2be@epcas2p2.samsung.com>
+        <1515279703-14070-1-git-send-email-me@tobin.cc>
+        <724b85c9-f3df-15b2-7aa2-4089f232c155@partner.samsung.com>
+        <20180108155619.GA5350@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, devel@driverdev.osuosl.org,
-        driverdev-devel@linuxdriverproject.org,
-        linux-kernel@vger.kernel.org, Ofir Drang <ofir.drang@arm.com>
-To: Gilad Ben-Yossef <gilad@benyossef.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: "Tobin C. Harding" <me@tobin.cc>,
+        "David S. Miller" <davem@davemloft.net>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        linux-kernel@vger.kernel.org,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.linuxfoundation.org ([140.211.169.12]:58742 "EHLO
-        mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933081AbeAHP2Q (ORCPT
+Received: from mailout2.w1.samsung.com ([210.118.77.12]:33894 "EHLO
+        mailout2.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932623AbeAHQnX (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 8 Jan 2018 10:28:16 -0500
-Content-Disposition: inline
-In-Reply-To: <1515327285-8948-25-git-send-email-gilad@benyossef.com>
+        Mon, 8 Jan 2018 11:43:23 -0500
+In-reply-to: <20180108155619.GA5350@gondor.apana.org.au>
+Content-language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Jan 07, 2018 at 12:14:35PM +0000, Gilad Ben-Yossef wrote:
-> The ccree driver source files were using an inconsistent
-> naming convention stemming from what the company was called
-> when they were added.
+
+
+On 08.01.2018 16:56, Herbert Xu wrote:
+> On Mon, Jan 08, 2018 at 02:11:21PM +0100, Kamil Konieczny wrote:
+>>
+>>
+>> On 07.01.2018 00:01, Tobin C. Harding wrote:
+>>> SPHINX build emits multiple warnings of kind:
+>>>
+>>> 	warning: duplicate section name 'Note'
+>>>
+>>> (when building kernel via make target 'htmldocs')
+>>>
+>>> This is caused by repeated use of comments of form:
+>>>
+>>> 	* Note: soau soaeusoa uoe
+>>>
+>>> We can change the format without loss of clarity and clear the build
+>>> warnings.
+>>>
+>>> Add '**[mandatory]**' or '**[optional]**' as kernel-doc field element
+>>> description prefix
+>>>
+>>> This renders in HTML as (prefixes in bold)
+>>>
+>>> final
+>>>     [mandatory] Retrieve result from the driver. This function finalizes the
+>>>     transformation and retrieves the resulting hash from the driver and
+>>>     pushes it back to upper layers. No data processing happens at this
+>>>     point unless hardware requires it to finish the transformation (then
+>>>     the data buffered by the device driver is processed).
+>>>
+>>> Signed-off-by: Tobin C. Harding <me@tobin.cc>
+>>> ---
+>>>
+>>> This patch begs the question why the other members of struct ahash_alg
+>>> are not marked? Some are marked 'optional' some 'mandatory'. It would
+>>> seem that if the marking were necessary for some members it is necessary
+>>> for all to eliminate ambiguity?
+>>>
+>>> thanks
+>>
+>> import, export are optional
 > 
-> Move to a single consistent naming convention for better
-> code readability.
-> 
-> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
-> ---
->  drivers/staging/ccree/Makefile           |    6 +-
->  drivers/staging/ccree/cc_aead.c          | 2709 ++++++++++++++++++++++++++++++
->  drivers/staging/ccree/cc_aead.h          |  109 ++
->  drivers/staging/ccree/cc_buffer_mgr.c    | 1657 ++++++++++++++++++
->  drivers/staging/ccree/cc_buffer_mgr.h    |   74 +
->  drivers/staging/ccree/cc_cipher.c        | 1171 +++++++++++++
->  drivers/staging/ccree/cc_cipher.h        |   74 +
->  drivers/staging/ccree/cc_debugfs.c       |    2 +-
->  drivers/staging/ccree/cc_driver.c        |  508 ++++++
->  drivers/staging/ccree/cc_driver.h        |  194 +++
->  drivers/staging/ccree/cc_fips.c          |  112 ++
->  drivers/staging/ccree/cc_fips.h          |   37 +
->  drivers/staging/ccree/cc_hash.c          | 2299 +++++++++++++++++++++++++
->  drivers/staging/ccree/cc_hash.h          |  114 ++
->  drivers/staging/ccree/cc_host_regs.h     |  142 ++
->  drivers/staging/ccree/cc_hw_queue_defs.h |    2 +-
->  drivers/staging/ccree/cc_ivgen.c         |  281 ++++
->  drivers/staging/ccree/cc_ivgen.h         |   55 +
->  drivers/staging/ccree/cc_kernel_regs.h   |  167 ++
->  drivers/staging/ccree/cc_pm.c            |  125 ++
->  drivers/staging/ccree/cc_pm.h            |   57 +
->  drivers/staging/ccree/cc_request_mgr.c   |  719 ++++++++
->  drivers/staging/ccree/cc_request_mgr.h   |   51 +
->  drivers/staging/ccree/cc_sram_mgr.c      |  107 ++
->  drivers/staging/ccree/cc_sram_mgr.h      |   65 +
->  drivers/staging/ccree/dx_crys_kernel.h   |  167 --
->  drivers/staging/ccree/dx_host.h          |  142 --
->  drivers/staging/ccree/ssi_aead.c         | 2709 ------------------------------
->  drivers/staging/ccree/ssi_aead.h         |  109 --
->  drivers/staging/ccree/ssi_buffer_mgr.c   | 1657 ------------------
->  drivers/staging/ccree/ssi_buffer_mgr.h   |   74 -
->  drivers/staging/ccree/ssi_cipher.c       | 1171 -------------
->  drivers/staging/ccree/ssi_cipher.h       |   74 -
->  drivers/staging/ccree/ssi_driver.c       |  508 ------
->  drivers/staging/ccree/ssi_driver.h       |  194 ---
->  drivers/staging/ccree/ssi_fips.c         |  112 --
->  drivers/staging/ccree/ssi_fips.h         |   37 -
->  drivers/staging/ccree/ssi_hash.c         | 2299 -------------------------
->  drivers/staging/ccree/ssi_hash.h         |  114 --
->  drivers/staging/ccree/ssi_ivgen.c        |  281 ----
->  drivers/staging/ccree/ssi_ivgen.h        |   55 -
->  drivers/staging/ccree/ssi_pm.c           |  125 --
->  drivers/staging/ccree/ssi_pm.h           |   57 -
->  drivers/staging/ccree/ssi_request_mgr.c  |  719 --------
->  drivers/staging/ccree/ssi_request_mgr.h  |   51 -
->  drivers/staging/ccree/ssi_sram_mgr.c     |  107 --
->  drivers/staging/ccree/ssi_sram_mgr.h     |   65 -
->  47 files changed, 10832 insertions(+), 10832 deletions(-)
->  create mode 100644 drivers/staging/ccree/cc_aead.c
->  create mode 100644 drivers/staging/ccree/cc_aead.h
->  create mode 100644 drivers/staging/ccree/cc_buffer_mgr.c
->  create mode 100644 drivers/staging/ccree/cc_buffer_mgr.h
->  create mode 100644 drivers/staging/ccree/cc_cipher.c
->  create mode 100644 drivers/staging/ccree/cc_cipher.h
->  create mode 100644 drivers/staging/ccree/cc_driver.c
->  create mode 100644 drivers/staging/ccree/cc_driver.h
->  create mode 100644 drivers/staging/ccree/cc_fips.c
->  create mode 100644 drivers/staging/ccree/cc_fips.h
->  create mode 100644 drivers/staging/ccree/cc_hash.c
->  create mode 100644 drivers/staging/ccree/cc_hash.h
->  create mode 100644 drivers/staging/ccree/cc_host_regs.h
->  create mode 100644 drivers/staging/ccree/cc_ivgen.c
->  create mode 100644 drivers/staging/ccree/cc_ivgen.h
->  create mode 100644 drivers/staging/ccree/cc_kernel_regs.h
->  create mode 100644 drivers/staging/ccree/cc_pm.c
->  create mode 100644 drivers/staging/ccree/cc_pm.h
->  create mode 100644 drivers/staging/ccree/cc_request_mgr.c
->  create mode 100644 drivers/staging/ccree/cc_request_mgr.h
->  create mode 100644 drivers/staging/ccree/cc_sram_mgr.c
->  create mode 100644 drivers/staging/ccree/cc_sram_mgr.h
->  delete mode 100644 drivers/staging/ccree/dx_crys_kernel.h
->  delete mode 100644 drivers/staging/ccree/dx_host.h
->  delete mode 100644 drivers/staging/ccree/ssi_aead.c
->  delete mode 100644 drivers/staging/ccree/ssi_aead.h
->  delete mode 100644 drivers/staging/ccree/ssi_buffer_mgr.c
->  delete mode 100644 drivers/staging/ccree/ssi_buffer_mgr.h
->  delete mode 100644 drivers/staging/ccree/ssi_cipher.c
->  delete mode 100644 drivers/staging/ccree/ssi_cipher.h
->  delete mode 100644 drivers/staging/ccree/ssi_driver.c
->  delete mode 100644 drivers/staging/ccree/ssi_driver.h
->  delete mode 100644 drivers/staging/ccree/ssi_fips.c
->  delete mode 100644 drivers/staging/ccree/ssi_fips.h
->  delete mode 100644 drivers/staging/ccree/ssi_hash.c
->  delete mode 100644 drivers/staging/ccree/ssi_hash.h
->  delete mode 100644 drivers/staging/ccree/ssi_ivgen.c
->  delete mode 100644 drivers/staging/ccree/ssi_ivgen.h
->  delete mode 100644 drivers/staging/ccree/ssi_pm.c
->  delete mode 100644 drivers/staging/ccree/ssi_pm.h
->  delete mode 100644 drivers/staging/ccree/ssi_request_mgr.c
->  delete mode 100644 drivers/staging/ccree/ssi_request_mgr.h
->  delete mode 100644 drivers/staging/ccree/ssi_sram_mgr.c
->  delete mode 100644 drivers/staging/ccree/ssi_sram_mgr.h
+> No import/export must be implemented for all hashes.
 
-Can you redo this with the -M option to git format-patch so we can see
-the files move, and not be deleted and added again?
+Is it mandatory for both async hash and shash ?
 
-thanks,
+in crypto/ahash.c in function
 
-greg k-h
+static int crypto_ahash_init_tfm(struct crypto_tfm *tfm)
+
+there is:
+
+	hash->export = ahash_no_export;
+	hash->import = ahash_no_import;
+
+and later in the same function:
+
+	if (alg->export)
+		hash->export = alg->export;
+	if (alg->import)
+		hash->import = alg->import;
+
+-- 
+Best regards,
+Kamil Konieczny
+Samsung R&D Institute Poland
