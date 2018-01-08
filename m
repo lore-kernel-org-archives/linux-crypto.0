@@ -1,96 +1,52 @@
-From: Kamil Konieczny <k.konieczny@partner.samsung.com>
-Subject: Re: [PATCH] crypto: clear htmldocs build warnings for crypto/hash
-Date: Mon, 08 Jan 2018 17:43:18 +0100
-Message-ID: <2b4fa5b0-dadb-47fe-2bbd-b051ad343bc4@partner.samsung.com>
-References: <CGME20180106230157epcas2p2a3dc70ac85fbd7861ddf916fde5dd2be@epcas2p2.samsung.com>
-        <1515279703-14070-1-git-send-email-me@tobin.cc>
-        <724b85c9-f3df-15b2-7aa2-4089f232c155@partner.samsung.com>
-        <20180108155619.GA5350@gondor.apana.org.au>
+From: "Yang Shi" <yang.s@alibaba-inc.com>
+Subject: Re: [PATCH 8/8] net: tipc: remove unused hardirq.h
+Date: Tue, 09 Jan 2018 03:43:14 +0800
+Message-ID: <6b987b67-ea1a-fa43-ae8d-d70b8801c2f7@alibaba-inc.com>
+References: <1510959741-31109-8-git-send-email-yang.s@alibaba-inc.com>
+ <4ed1efbc-5fb8-7412-4f46-1e3a91a98373@windriver.com>
+ <b48afbb6-771f-84b1-8329-d5941eff086b@alibaba-inc.com>
+ <20180105.101706.344316131945042174.davem@davemloft.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Cc: "Tobin C. Harding" <me@tobin.cc>,
-        "David S. Miller" <davem@davemloft.net>,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-        linux-kernel@vger.kernel.org,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mailout2.w1.samsung.com ([210.118.77.12]:33894 "EHLO
-        mailout2.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932623AbeAHQnX (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 8 Jan 2018 11:43:23 -0500
-In-reply-to: <20180108155619.GA5350@gondor.apana.org.au>
-Content-language: en-US
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: linux-kernel@vger.kernel.org, ying.xue@windriver.com, linux-mm@kvack.org,
+ linux-fsdevel@vger.kernel.org, linux-crypto@vger.kernel.org,
+ netdev@vger.kernel.org, jon.maloy@ericsson.com
+To: David Miller <davem@davemloft.net>
+Return-path: <owner-linux-mm@kvack.org>
+In-Reply-To: <20180105.101706.344316131945042174.davem@davemloft.net>
+Content-Language: en-US
+Sender: owner-linux-mm@kvack.org
+List-Id: linux-crypto.vger.kernel.org
 
 
 
-On 08.01.2018 16:56, Herbert Xu wrote:
-> On Mon, Jan 08, 2018 at 02:11:21PM +0100, Kamil Konieczny wrote:
->>
->>
->> On 07.01.2018 00:01, Tobin C. Harding wrote:
->>> SPHINX build emits multiple warnings of kind:
->>>
->>> 	warning: duplicate section name 'Note'
->>>
->>> (when building kernel via make target 'htmldocs')
->>>
->>> This is caused by repeated use of comments of form:
->>>
->>> 	* Note: soau soaeusoa uoe
->>>
->>> We can change the format without loss of clarity and clear the build
->>> warnings.
->>>
->>> Add '**[mandatory]**' or '**[optional]**' as kernel-doc field element
->>> description prefix
->>>
->>> This renders in HTML as (prefixes in bold)
->>>
->>> final
->>>     [mandatory] Retrieve result from the driver. This function finalizes the
->>>     transformation and retrieves the resulting hash from the driver and
->>>     pushes it back to upper layers. No data processing happens at this
->>>     point unless hardware requires it to finish the transformation (then
->>>     the data buffered by the device driver is processed).
->>>
->>> Signed-off-by: Tobin C. Harding <me@tobin.cc>
->>> ---
->>>
->>> This patch begs the question why the other members of struct ahash_alg
->>> are not marked? Some are marked 'optional' some 'mandatory'. It would
->>> seem that if the marking were necessary for some members it is necessary
->>> for all to eliminate ambiguity?
->>>
->>> thanks
->>
->> import, export are optional
+On 1/5/18 7:17 AM, David Miller wrote:
+> From: "Yang Shi" <yang.s@alibaba-inc.com>
+> Date: Fri, 05 Jan 2018 06:46:48 +0800
 > 
-> No import/export must be implemented for all hashes.
+>> Any more comment on this change?
+> 
+> These patches were not really submitted properly.
+> 
+> If you post a series, the series goes to one destination and
+> one tree.
+> 
+> If they are supposed to go to multiple trees, submit them
+> individually rather than as a series.  With clear indications
+> in the Subject lines which tree should be taking the patch.
 
-Is it mandatory for both async hash and shash ?
+Thanks for the comment. I will resend the net patches in a separate 
+series to you.
 
-in crypto/ahash.c in function
+Yang
 
-static int crypto_ahash_init_tfm(struct crypto_tfm *tfm)
+> 
+> Thank you.
+> 
 
-there is:
-
-	hash->export = ahash_no_export;
-	hash->import = ahash_no_import;
-
-and later in the same function:
-
-	if (alg->export)
-		hash->export = alg->export;
-	if (alg->import)
-		hash->import = alg->import;
-
--- 
-Best regards,
-Kamil Konieczny
-Samsung R&D Institute Poland
+--
+To unsubscribe, send a message with 'unsubscribe linux-mm' in
+the body to majordomo@kvack.org.  For more info on Linux MM,
+see: http://www.linux-mm.org/ .
+Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
