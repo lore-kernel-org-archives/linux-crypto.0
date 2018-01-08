@@ -1,45 +1,51 @@
-From: Gary R Hook <gary.hook@amd.com>
-Subject: Re: [PATCH v2] hwrng: Clean up RNG list when last hwrng is
- unregistered
-Date: Mon, 8 Jan 2018 08:38:45 -0600
-Message-ID: <c1b8293d-328c-6846-c0cd-cd75cf5d3df3@amd.com>
-References: <151336772989.60446.16322941485803241258.stgit@sosxen2.amd.com>
- <d2f7189e-8a25-0352-0e33-a3df26f18c37@amd.com>
- <20180108050520.GA1775@gondor.apana.org.au>
+From: Greg KH <gregkh@linuxfoundation.org>
+Subject: Re: [PATCH] staging: ccree: ssi_hash: remove unnecessary parentheses
+Date: Mon, 8 Jan 2018 16:07:53 +0100
+Message-ID: <20180108150753.GA22928@kroah.com>
+References: <20171228102417.GA10407@ewexler>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, thomas.lendacky@amd.com,
-        davem@davemloft.net, prasannatsmkumar@gmail.com
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=us-ascii
+Cc: gilad@benyossef.com, devel@driverdev.osuosl.org,
+        driverdev-devel@linuxdriverproject.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Elad Wexler <elad.wexler@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-by2nam03on0041.outbound.protection.outlook.com ([104.47.42.41]:5024
-        "EHLO NAM03-BY2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S932575AbeAHOiw (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 8 Jan 2018 09:38:52 -0500
-In-Reply-To: <20180108050520.GA1775@gondor.apana.org.au>
-Content-Language: en-US
+Received: from mail.linuxfoundation.org ([140.211.169.12]:51002 "EHLO
+        mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752168AbeAHPHv (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 8 Jan 2018 10:07:51 -0500
+Content-Disposition: inline
+In-Reply-To: <20171228102417.GA10407@ewexler>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 01/07/2018 11:05 PM, Herbert Xu wrote:
-> On Fri, Jan 05, 2018 at 11:28:23AM -0600, Gary R Hook wrote:
->>
->> It may not have been obvious from the title but this fixes a bug
->> which will impact the use of any HW RNG that is the only RNG
->> registered. The breakage of rmmod/modprobe -r that this fix obviates
->> suggests that it needs to make the 4.15 kernel, please. Just want to
->> ensure this gets the proper attention. Thank you.
+On Thu, Dec 28, 2017 at 12:24:17PM +0200, Elad Wexler wrote:
+> Fixed a coding style issue
 > 
-> I don't think breaking rmmod is sufficiently serious to warrant
-> immediate inclusion at this point.  We can always send it via
-> stable after the release.
-> 
-> Thanks,
-> 
+> Signed-off-by: Elad Wexler <elad.wexler@gmail.com>
+> ---
+>  drivers/staging/ccree/ssi_hash.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 
-Oh. I just figured that problems introduced in a particular kernel level 
-should be resolved (if possible) in that same level.
+Why did you send this twice?
 
-Your call, of course; thank you for the clarification.
+> diff --git a/drivers/staging/ccree/ssi_hash.c b/drivers/staging/ccree/ssi_hash.c
+> index 2035835..8d56fa7 100644
+> --- a/drivers/staging/ccree/ssi_hash.c
+> +++ b/drivers/staging/ccree/ssi_hash.c
+> @@ -2280,8 +2280,8 @@ int ssi_hash_alloc(struct ssi_drvdata *drvdata)
+>  				      &hash_handle->hash_list);
+>  		}
+>  
+> -		if ((hw_mode == DRV_CIPHER_XCBC_MAC) ||
+> -		    (hw_mode == DRV_CIPHER_CMAC))
+> +		if (hw_mode == DRV_CIPHER_XCBC_MAC ||
+> +		    hw_mode == DRV_CIPHER_CMAC)
+
+No, now I have to go look up if == or || comes in which order.  Ick,
+just leave it as-is please.
+
+thanks,
+
+greg k-h
