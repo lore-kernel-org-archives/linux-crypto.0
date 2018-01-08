@@ -1,39 +1,82 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2] hwrng: Clean up RNG list when last hwrng is
- unregistered
-Date: Mon, 8 Jan 2018 16:05:20 +1100
-Message-ID: <20180108050520.GA1775@gondor.apana.org.au>
-References: <151336772989.60446.16322941485803241258.stgit@sosxen2.amd.com>
- <d2f7189e-8a25-0352-0e33-a3df26f18c37@amd.com>
+From: Gilad Ben-Yossef <gilad@benyossef.com>
+Subject: Re: [PATCH] checkpatch: add *_ON_STACK to $declaration_macros
+Date: Mon, 8 Jan 2018 10:22:43 +0200
+Message-ID: <CAOtvUMfeqY2Y0=g0V_mbUjf6s6_e0TD9RfYyZeFtDVX83RG-_g@mail.gmail.com>
+References: <1498550116-12475-1-git-send-email-gilad@benyossef.com> <1513762915.1234.91.camel@perches.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, thomas.lendacky@amd.com,
-        davem@davemloft.net, prasannatsmkumar@gmail.com
-To: Gary R Hook <gary.hook@amd.com>
+Content-Type: text/plain; charset="UTF-8"
+Cc: Andy Whitcroft <apw@canonical.com>,
+        Linux kernel mailing list <linux-kernel@vger.kernel.org>,
+        Ofir Drang <ofir.drang@arm.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Joe Perches <joe@perches.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [128.1.224.119] ([128.1.224.119]:53426 "EHLO ringil.hmeau.com"
-        rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
-        id S1750710AbeAHFFd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 8 Jan 2018 00:05:33 -0500
-Content-Disposition: inline
-In-Reply-To: <d2f7189e-8a25-0352-0e33-a3df26f18c37@amd.com>
+Received: from mail-oi0-f50.google.com ([209.85.218.50]:41136 "EHLO
+        mail-oi0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755009AbeAHIWo (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 8 Jan 2018 03:22:44 -0500
+Received: by mail-oi0-f50.google.com with SMTP id n81so3071382oig.8
+        for <linux-crypto@vger.kernel.org>; Mon, 08 Jan 2018 00:22:44 -0800 (PST)
+In-Reply-To: <1513762915.1234.91.camel@perches.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Jan 05, 2018 at 11:28:23AM -0600, Gary R Hook wrote:
-> 
-> It may not have been obvious from the title but this fixes a bug
-> which will impact the use of any HW RNG that is the only RNG
-> registered. The breakage of rmmod/modprobe -r that this fix obviates
-> suggests that it needs to make the 4.15 kernel, please. Just want to
-> ensure this gets the proper attention. Thank you.
+On Wed, Dec 20, 2017 at 11:41 AM, Joe Perches <joe@perches.com> wrote:
+> On Tue, 2017-06-27 at 10:55 +0300, Gilad Ben-Yossef wrote:
+>> Add the crypto API *_ON_STACK to $declaration_macros.
+>>
+>> Resolves the following false warning:
+>>
+>> WARNING: Missing a blank line after declarations
+>> +                     int err;
+>> +                     SHASH_DESC_ON_STACK(desc, ctx_p->shash_tfm);
+> []
+>> diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+> []
+>> @@ -733,6 +733,7 @@ our $FuncArg = qr{$Typecast{0,1}($LvalOrFunc|$Constant|$String)};
+>>  our $declaration_macros = qr{(?x:
+>>       (?:$Storage\s+)?(?:[A-Z_][A-Z0-9]*_){0,2}(?:DEFINE|DECLARE)(?:_[A-Z0-9]+){1,6}\s*\(|
+>>       (?:$Storage\s+)?LIST_HEAD\s*\(|
+>> +     (?:$Storage\s+)?[A-Z_]*_ON_STACK\(|
+>
+> A few things:
+>
+> The crypto _ON_STACK declarations cannot have a $Storage type.
+>
+> There should be a \s* between the ON_STACK and the open parenthesis
+>
+> There are other _ON_STACK types than the crypto uses
+>
+> $ grep -rP --include=*.[ch] -oh "\b[A-Z_]+_ON_STACK\b" * | \
+>   sort | uniq -c | sort -rn
+>      68 SKCIPHER_REQUEST_ON_STACK
+>      45 SHASH_DESC_ON_STACK
+>      10 AHASH_REQUEST_ON_STACK
+>       4 PC_LOC_ON_STACK
+>       4 DECLARE_DPM_WATCHDOG_ON_STACK
+>       3 HISI_SAS_DECLARE_RST_WORK_ON_STACK
+>       3 CONFIG_ARCH_TASK_STRUCT_ON_STACK
+>       1 PT_SIZE_ON_STACK
+>       1 ALLOC_PT_GPREGS_ON_STACK
+>
+> So perhaps:
+>
+>         (?:SKCIPHER_REQUEST|SHASH_DESC|AHASH_REQUEST)_ON_STACK\s*\(
+>
 
-I don't think breaking rmmod is sufficiently serious to warrant
-immediate inclusion at this point.  We can always send it via
-stable after the release.
+
+Yes, it's better.
+
+I'll send a v2.
 
 Thanks,
+Gilad
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Gilad Ben-Yossef
+Chief Coffee Drinker
+
+"If you take a class in large-scale robotics, can you end up in a
+situation where the homework eats your dog?"
+ -- Jean-Baptiste Queru
