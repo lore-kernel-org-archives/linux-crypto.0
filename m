@@ -1,52 +1,87 @@
-From: "Yang Shi" <yang.s@alibaba-inc.com>
-Subject: Re: [PATCH 8/8] net: tipc: remove unused hardirq.h
-Date: Tue, 09 Jan 2018 03:43:14 +0800
-Message-ID: <6b987b67-ea1a-fa43-ae8d-d70b8801c2f7@alibaba-inc.com>
-References: <1510959741-31109-8-git-send-email-yang.s@alibaba-inc.com>
- <4ed1efbc-5fb8-7412-4f46-1e3a91a98373@windriver.com>
- <b48afbb6-771f-84b1-8329-d5941eff086b@alibaba-inc.com>
- <20180105.101706.344316131945042174.davem@davemloft.net>
+From: Anson Huang <Anson.Huang@nxp.com>
+Subject: [PATCH V2 2/2] ARM: dts: imx7s: add snvs rtc clock
+Date: Tue, 9 Jan 2018 10:51:16 +0800
+Message-ID: <1515466276-5541-2-git-send-email-Anson.Huang@nxp.com>
+References: <1515466276-5541-1-git-send-email-Anson.Huang@nxp.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: linux-kernel@vger.kernel.org, ying.xue@windriver.com, linux-mm@kvack.org,
- linux-fsdevel@vger.kernel.org, linux-crypto@vger.kernel.org,
- netdev@vger.kernel.org, jon.maloy@ericsson.com
-To: David Miller <davem@davemloft.net>
-Return-path: <owner-linux-mm@kvack.org>
-In-Reply-To: <20180105.101706.344316131945042174.davem@davemloft.net>
-Content-Language: en-US
-Sender: owner-linux-mm@kvack.org
+Content-Type: text/plain
+Cc: <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <linux-clk@vger.kernel.org>
+To: <horia.geanta@nxp.com>, <aymen.sghaier@nxp.com>,
+        <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <robh+dt@kernel.org>, <mark.rutland@arm.com>,
+        <shawnguo@kernel.org>, <kernel@pengutronix.de>,
+        <fabio.estevam@nxp.com>, <linux@armlinux.org.uk>,
+        <mturquette@baylibre.com>, <sboyd@codeaurora.org>,
+        <adriana.reus@nxp.com>, <stefan@agner.ch>, <dongas86@gmail.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1515466276-5541-1-git-send-email-Anson.Huang@nxp.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
+Add i.MX7 SNVS RTC clock.
 
+Signed-off-by: Anson Huang <Anson.Huang@nxp.com>
+---
+changes since v1:
+	update snvs lp rtc binding-doc for clock info.
+ Documentation/devicetree/bindings/crypto/fsl-sec4.txt | 16 ++++++++++++++++
+ arch/arm/boot/dts/imx7s.dtsi                          |  2 ++
+ 2 files changed, 18 insertions(+)
 
-On 1/5/18 7:17 AM, David Miller wrote:
-> From: "Yang Shi" <yang.s@alibaba-inc.com>
-> Date: Fri, 05 Jan 2018 06:46:48 +0800
-> 
->> Any more comment on this change?
-> 
-> These patches were not really submitted properly.
-> 
-> If you post a series, the series goes to one destination and
-> one tree.
-> 
-> If they are supposed to go to multiple trees, submit them
-> individually rather than as a series.  With clear indications
-> in the Subject lines which tree should be taking the patch.
-
-Thanks for the comment. I will resend the net patches in a separate 
-series to you.
-
-Yang
-
-> 
-> Thank you.
-> 
-
---
-To unsubscribe, send a message with 'unsubscribe linux-mm' in
-the body to majordomo@kvack.org.  For more info on Linux MM,
-see: http://www.linux-mm.org/ .
-Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
+diff --git a/Documentation/devicetree/bindings/crypto/fsl-sec4.txt b/Documentation/devicetree/bindings/crypto/fsl-sec4.txt
+index 76aec8a..da66ac4 100644
+--- a/Documentation/devicetree/bindings/crypto/fsl-sec4.txt
++++ b/Documentation/devicetree/bindings/crypto/fsl-sec4.txt
+@@ -415,12 +415,26 @@ Secure Non-Volatile Storage (SNVS) Low Power (LP) RTC Node
+ 	value type: <u32>
+ 	Definition: LP register offset. default it is 0x34.
+ 
++   - clocks
++      Usage: required if SNVS LP RTC requires explicit enablement of clocks
++      Value type: <prop_encoded-array>
++      Definition:  A list of phandle and clock specifier pairs describing
++          the clocks required for enabling and disabling SNVS LP RTC.
++
++   - clock-names
++      Usage: required if SNVS LP RTC requires explicit enablement of clocks
++      Value type: <string>
++      Definition: A list of clock name strings in the same order as the
++          clocks property.
++
+ EXAMPLE
+ 	sec_mon_rtc_lp@1 {
+ 		compatible = "fsl,sec-v4.0-mon-rtc-lp";
+ 		interrupts = <93 2>;
+ 		regmap = <&snvs>;
+ 		offset = <0x34>;
++		clocks = <&clks IMX7D_SNVS_CLK>;
++		clock-names = "snvs-rtc";
+ 	};
+ 
+ =====================================================================
+@@ -543,6 +557,8 @@ FULL EXAMPLE
+ 			regmap = <&sec_mon>;
+ 			offset = <0x34>;
+ 			interrupts = <93 2>;
++			clocks = <&clks IMX7D_SNVS_CLK>;
++			clock-names = "snvs-rtc";
+ 		};
+ 
+ 		snvs-pwrkey@020cc000 {
+diff --git a/arch/arm/boot/dts/imx7s.dtsi b/arch/arm/boot/dts/imx7s.dtsi
+index 9aa2bb9..02baf42 100644
+--- a/arch/arm/boot/dts/imx7s.dtsi
++++ b/arch/arm/boot/dts/imx7s.dtsi
+@@ -551,6 +551,8 @@
+ 					offset = <0x34>;
+ 					interrupts = <GIC_SPI 19 IRQ_TYPE_LEVEL_HIGH>,
+ 						     <GIC_SPI 20 IRQ_TYPE_LEVEL_HIGH>;
++					clocks = <&clks IMX7D_SNVS_CLK>;
++					clock-names = "snvs-rtc";
+ 				};
+ 
+ 				snvs_poweroff: snvs-poweroff {
+-- 
+1.9.1
