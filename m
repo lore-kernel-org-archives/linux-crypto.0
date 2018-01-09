@@ -1,7 +1,7 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH 3/5] staging: ccree: add missing include
-Date: Tue,  9 Jan 2018 10:24:31 +0000
-Message-ID: <1515493478-30454-4-git-send-email-gilad@benyossef.com>
+Subject: [PATCH 4/5] staging: ccree: make stub function static inline
+Date: Tue,  9 Jan 2018 10:24:32 +0000
+Message-ID: <1515493478-30454-5-git-send-email-gilad@benyossef.com>
 References: <1515493478-30454-1-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -23,24 +23,42 @@ Errors-To: driverdev-devel-bounces@linuxdriverproject.org
 Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
 List-Id: linux-crypto.vger.kernel.org
 
-Add the missing include of include file with function declarations.
+The debugfs interface defines stub function if debugfs is not
+enabled, which were missing the 'static inline' qualifiers causing
+sparse warnings.
 
 Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 ---
- drivers/staging/ccree/cc_debugfs.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/staging/ccree/cc_debugfs.h | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/staging/ccree/cc_debugfs.c b/drivers/staging/ccree/cc_debugfs.c
-index f927a73..08f8db4 100644
---- a/drivers/staging/ccree/cc_debugfs.c
-+++ b/drivers/staging/ccree/cc_debugfs.c
-@@ -6,6 +6,7 @@
- #include <linux/stringify.h>
- #include "cc_driver.h"
- #include "cc_crypto_ctx.h"
-+#include "cc_debugfs.h"
+diff --git a/drivers/staging/ccree/cc_debugfs.h b/drivers/staging/ccree/cc_debugfs.h
+index 354ec17..5b5320e 100644
+--- a/drivers/staging/ccree/cc_debugfs.h
++++ b/drivers/staging/ccree/cc_debugfs.h
+@@ -13,19 +13,19 @@ void cc_debugfs_fini(struct cc_drvdata *drvdata);
  
- struct cc_debugfs_ctx {
- 	struct dentry *dir;
+ #else
+ 
+-int cc_debugfs_global_init(void)
++static inline int cc_debugfs_global_init(void)
+ {
+ 	return 0;
+ }
+ 
+-void cc_debugfs_global_fini(void) {}
++static inline void cc_debugfs_global_fini(void) {}
+ 
+-int cc_debugfs_init(struct cc_drvdata *drvdata)
++static inline int cc_debugfs_init(struct cc_drvdata *drvdata)
+ {
+ 	return 0;
+ }
+ 
+-void cc_debugfs_fini(struct cc_drvdata *drvdata) {}
++static inline void cc_debugfs_fini(struct cc_drvdata *drvdata) {}
+ 
+ #endif
+ 
 -- 
 2.7.4
