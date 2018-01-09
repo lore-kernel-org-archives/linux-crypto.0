@@ -1,68 +1,85 @@
-From: Anson Huang <Anson.Huang@nxp.com>
-Subject: [PATCH V4 1/2] clk: imx: imx7d: add the snvs clock
-Date: Tue, 9 Jan 2018 17:52:05 +0800
-Message-ID: <1515491526-14060-1-git-send-email-Anson.Huang@nxp.com>
+From: Gilad Ben-Yossef <gilad@benyossef.com>
+Subject: [PATCH 0/5] more cleanups
+Date: Tue,  9 Jan 2018 10:24:28 +0000
+Message-ID: <1515493478-30454-1-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Cc: devicetree@vger.kernel.org, linux-clk@vger.kernel.org,
- linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org
-To: <horia.geanta@nxp.com>, <aymen.sghaier@nxp.com>,
- <herbert@gondor.apana.org.au>, <davem@davemloft.net>, <robh+dt@kernel.org>,
- <mark.rutland@arm.com>, <shawnguo@kernel.org>, <kernel@pengutronix.de>,
- <fabio.estevam@nxp.com>, <linux@armlinux.org.uk>, <mturquette@baylibre.com>,
- <sboyd@codeaurora.org>, <adriana.reus@nxp.com>, <stefan@agner.ch>,
- <dongas86@gmail.com>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+Cc: devel@driverdev.osuosl.org, linux-kernel@vger.kernel.org,
+ driverdev-devel@linuxdriverproject.org, linux-crypto@vger.kernel.org,
+ Ofir Drang <ofir.drang@arm.com>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
+List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
+List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
+List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
+List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
+List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
+Errors-To: driverdev-devel-bounces@linuxdriverproject.org
+Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
 List-Id: linux-crypto.vger.kernel.org
 
-According to the i.MX7D Reference Manual,
-SNVS block has a clock gate, accessing SNVS block
-would need this clock gate to be enabled, add it
-into clock tree so that SNVS module driver can
-operate this clock gate.
+File name consistency renames, include files diet and address
+some sparse warnings.
 
-Signed-off-by: Anson Huang <Anson.Huang@nxp.com>
-Acked-by: Dong Aisheng <aisheng.dong@nxp.com>
-Reviewed-by: Fabio Estevam <fabio.estevam@nxp.com>
----
- drivers/clk/imx/clk-imx7d.c             | 1 +
- include/dt-bindings/clock/imx7d-clock.h | 3 ++-
- 2 files changed, 3 insertions(+), 1 deletion(-)
+Gilad Ben-Yossef (5):
+  staging: ccree: use a consistent file naming convention
+  staging: ccree: remove unneeded includes
+  staging: ccree: add missing include
+  staging: ccree: make stub function static inline
+  staging: ccree: dma mask is type u64
 
-diff --git a/drivers/clk/imx/clk-imx7d.c b/drivers/clk/imx/clk-imx7d.c
-index 80dc211..f34f1ec 100644
---- a/drivers/clk/imx/clk-imx7d.c
-+++ b/drivers/clk/imx/clk-imx7d.c
-@@ -795,6 +795,7 @@ static void __init imx7d_clocks_init(struct device_node *ccm_node)
- 	clks[IMX7D_DRAM_PHYM_ALT_ROOT_CLK] = imx_clk_gate4("dram_phym_alt_root_clk", "dram_phym_alt_post_div", base + 0x4130, 0);
- 	clks[IMX7D_DRAM_ALT_ROOT_CLK] = imx_clk_gate4("dram_alt_root_clk", "dram_alt_post_div", base + 0x4130, 0);
- 	clks[IMX7D_OCOTP_CLK] = imx_clk_gate4("ocotp_clk", "ipg_root_clk", base + 0x4230, 0);
-+	clks[IMX7D_SNVS_CLK] = imx_clk_gate4("snvs_clk", "ipg_root_clk", base + 0x4250, 0);
- 	clks[IMX7D_USB_HSIC_ROOT_CLK] = imx_clk_gate4("usb_hsic_root_clk", "usb_hsic_post_div", base + 0x4420, 0);
- 	clks[IMX7D_SDMA_CORE_CLK] = imx_clk_gate4("sdma_root_clk", "ahb_root_clk", base + 0x4480, 0);
- 	clks[IMX7D_PCIE_CTRL_ROOT_CLK] = imx_clk_gate4("pcie_ctrl_root_clk", "pcie_ctrl_post_div", base + 0x4600, 0);
-diff --git a/include/dt-bindings/clock/imx7d-clock.h b/include/dt-bindings/clock/imx7d-clock.h
-index e2f99ae..dc51904 100644
---- a/include/dt-bindings/clock/imx7d-clock.h
-+++ b/include/dt-bindings/clock/imx7d-clock.h
-@@ -452,5 +452,6 @@
- #define IMX7D_OCOTP_CLK			439
- #define IMX7D_NAND_RAWNAND_CLK		440
- #define IMX7D_NAND_USDHC_BUS_RAWNAND_CLK 441
--#define IMX7D_CLK_END			442
-+#define IMX7D_SNVS_CLK			442
-+#define IMX7D_CLK_END			443
- #endif /* __DT_BINDINGS_CLOCK_IMX7D_H */
+ drivers/staging/ccree/Makefile                     |  6 +--
+ drivers/staging/ccree/{ssi_aead.c => cc_aead.c}    | 19 +++-----
+ drivers/staging/ccree/{ssi_aead.h => cc_aead.h}    |  2 +-
+ .../ccree/{ssi_buffer_mgr.c => cc_buffer_mgr.c}    | 14 ++----
+ .../ccree/{ssi_buffer_mgr.h => cc_buffer_mgr.h}    |  4 +-
+ .../staging/ccree/{ssi_cipher.c => cc_cipher.c}    | 12 ++---
+ .../staging/ccree/{ssi_cipher.h => cc_cipher.h}    |  6 +--
+ drivers/staging/ccree/cc_debugfs.c                 |  3 +-
+ drivers/staging/ccree/cc_debugfs.h                 |  8 ++--
+ .../staging/ccree/{ssi_driver.c => cc_driver.c}    | 55 +++++-----------------
+ .../staging/ccree/{ssi_driver.h => cc_driver.h}    |  6 +--
+ drivers/staging/ccree/{ssi_fips.c => cc_fips.c}    |  4 +-
+ drivers/staging/ccree/{ssi_fips.h => cc_fips.h}    |  0
+ drivers/staging/ccree/{ssi_hash.c => cc_hash.c}    | 12 ++---
+ drivers/staging/ccree/{ssi_hash.h => cc_hash.h}    |  4 +-
+ .../staging/ccree/{dx_host.h => cc_host_regs.h}    |  0
+ drivers/staging/ccree/cc_hw_queue_defs.h           |  2 +-
+ drivers/staging/ccree/{ssi_ivgen.c => cc_ivgen.c}  | 11 ++---
+ drivers/staging/ccree/{ssi_ivgen.h => cc_ivgen.h}  |  0
+ .../ccree/{dx_crys_kernel.h => cc_kernel_regs.h}   |  0
+ drivers/staging/ccree/{ssi_pm.c => cc_pm.c}        | 16 +++----
+ drivers/staging/ccree/{ssi_pm.h => cc_pm.h}        |  4 +-
+ .../ccree/{ssi_request_mgr.c => cc_request_mgr.c}  | 15 ++----
+ .../ccree/{ssi_request_mgr.h => cc_request_mgr.h}  |  2 +-
+ .../ccree/{ssi_sram_mgr.c => cc_sram_mgr.c}        |  4 +-
+ .../ccree/{ssi_sram_mgr.h => cc_sram_mgr.h}        |  0
+ 26 files changed, 76 insertions(+), 133 deletions(-)
+ rename drivers/staging/ccree/{ssi_aead.c => cc_aead.c} (99%)
+ rename drivers/staging/ccree/{ssi_aead.h => cc_aead.h} (99%)
+ rename drivers/staging/ccree/{ssi_buffer_mgr.c => cc_buffer_mgr.c} (99%)
+ rename drivers/staging/ccree/{ssi_buffer_mgr.h => cc_buffer_mgr.h} (97%)
+ rename drivers/staging/ccree/{ssi_cipher.c => cc_cipher.c} (99%)
+ rename drivers/staging/ccree/{ssi_cipher.h => cc_cipher.h} (95%)
+ rename drivers/staging/ccree/{ssi_driver.c => cc_driver.c} (90%)
+ rename drivers/staging/ccree/{ssi_driver.h => cc_driver.h} (98%)
+ rename drivers/staging/ccree/{ssi_fips.c => cc_fips.c} (98%)
+ rename drivers/staging/ccree/{ssi_fips.h => cc_fips.h} (100%)
+ rename drivers/staging/ccree/{ssi_hash.c => cc_hash.c} (99%)
+ rename drivers/staging/ccree/{ssi_hash.h => cc_hash.h} (98%)
+ rename drivers/staging/ccree/{dx_host.h => cc_host_regs.h} (100%)
+ rename drivers/staging/ccree/{ssi_ivgen.c => cc_ivgen.c} (97%)
+ rename drivers/staging/ccree/{ssi_ivgen.h => cc_ivgen.h} (100%)
+ rename drivers/staging/ccree/{dx_crys_kernel.h => cc_kernel_regs.h} (100%)
+ rename drivers/staging/ccree/{ssi_pm.c => cc_pm.c} (91%)
+ rename drivers/staging/ccree/{ssi_pm.h => cc_pm.h} (95%)
+ rename drivers/staging/ccree/{ssi_request_mgr.c => cc_request_mgr.c} (98%)
+ rename drivers/staging/ccree/{ssi_request_mgr.h => cc_request_mgr.h} (98%)
+ rename drivers/staging/ccree/{ssi_sram_mgr.c => cc_sram_mgr.c} (98%)
+ rename drivers/staging/ccree/{ssi_sram_mgr.h => cc_sram_mgr.h} (100%)
+
 -- 
-1.9.1
+2.7.4
