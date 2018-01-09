@@ -1,62 +1,69 @@
 From: Krzysztof Kozlowski <krzk@kernel.org>
-Subject: [PATCH 1/2] crypto: exynos-rng - Add SPDX license identifier and correct module license
-Date: Tue,  9 Jan 2018 18:57:35 +0100
-Message-ID: <20180109175736.6885-1-krzk@kernel.org>
+Subject: [PATCH 2/2] crypto: s5p-sss - Add SPDX license identifier
+Date: Tue,  9 Jan 2018 18:57:36 +0100
+Message-ID: <20180109175736.6885-2-krzk@kernel.org>
+References: <20180109175736.6885-1-krzk@kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 To: Krzysztof Kozlowski <krzk@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Kukjin Kim <kgene@kernel.org>,
-        Vladimir Zapolskiy <vz@mleia.com>,
-        Kamil Konieczny <k.konieczny@partner.samsung.com>,
-        linux-crypto@vger.kernel.org, linux-samsung-soc@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ "David S. Miller" <davem@davemloft.net>, Kukjin Kim <kgene@kernel.org>,
+ Vladimir Zapolskiy <vz@mleia.com>,
+ Kamil Konieczny <k.konieczny@partner.samsung.com>,
+ linux-crypto@vger.kernel.org, linux-samsung-soc@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <20180109175736.6885-1-krzk@kernel.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-Replace GPL license statement with SPDX GPL-2.0 license identifier and
-correct the module license to GPLv2.
-
-The license itself was a generic GPL because of copy-and-paste from old
-drivers/char/hw_random/exynos-rng.c driver (on which this was based on).
-However the module license indicated GPL-2.0 or later.  GPL-2.0 was
-intended by author so fix up this mess.
+Replace GPL license statement with SPDX GPL-2.0 license identifier.
 
 Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
 ---
- drivers/crypto/exynos-rng.c | 12 ++----------
- 1 file changed, 2 insertions(+), 10 deletions(-)
+ drivers/crypto/s5p-sss.c | 24 ++++++++++--------------
+ 1 file changed, 10 insertions(+), 14 deletions(-)
 
-diff --git a/drivers/crypto/exynos-rng.c b/drivers/crypto/exynos-rng.c
-index 451620b475a0..a2e91f94096f 100644
---- a/drivers/crypto/exynos-rng.c
-+++ b/drivers/crypto/exynos-rng.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: GPL-2.0
- /*
-  * exynos-rng.c - Random Number Generator driver for the Exynos
-  *
-@@ -6,15 +7,6 @@
-  * Loosely based on old driver from drivers/char/hw_random/exynos-rng.c:
-  * Copyright (C) 2012 Samsung Electronics
-  * Jonghwa Lee <jonghwa3.lee@samsung.com>
+diff --git a/drivers/crypto/s5p-sss.c b/drivers/crypto/s5p-sss.c
+index 62830a43d959..188f44b7eb27 100644
+--- a/drivers/crypto/s5p-sss.c
++++ b/drivers/crypto/s5p-sss.c
+@@ -1,17 +1,13 @@
+-/*
+- * Cryptographic API.
+- *
+- * Support for Samsung S5PV210 and Exynos HW acceleration.
+- *
+- * Copyright (C) 2011 NetUP Inc. All rights reserved.
+- * Copyright (c) 2017 Samsung Electronics Co., Ltd. All rights reserved.
 - *
 - * This program is free software; you can redistribute it and/or modify
-- * it under the terms of the GNU General Public License as published by
-- * the Free Software Foundation;
+- * it under the terms of the GNU General Public License version 2 as published
+- * by the Free Software Foundation.
 - *
-- * This program is distributed in the hope that it will be useful,
-- * but WITHOUT ANY WARRANTY; without even the implied warranty of
-- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- * GNU General Public License for more details.
-  */
+- * Hash part based on omap-sham.c driver.
+- */
++// SPDX-License-Identifier: GPL-2.0
++//
++// Cryptographic API.
++//
++// Support for Samsung S5PV210 and Exynos HW acceleration.
++//
++// Copyright (C) 2011 NetUP Inc. All rights reserved.
++// Copyright (c) 2017 Samsung Electronics Co., Ltd. All rights reserved.
++//
++// Hash part based on omap-sham.c driver.
  
  #include <linux/clk.h>
-@@ -386,4 +378,4 @@ module_platform_driver(exynos_rng_driver);
- 
- MODULE_DESCRIPTION("Exynos H/W Random Number Generator driver");
- MODULE_AUTHOR("Krzysztof Kozlowski <krzk@kernel.org>");
--MODULE_LICENSE("GPL");
-+MODULE_LICENSE("GPL v2");
+ #include <linux/crypto.h>
 -- 
 2.11.0
