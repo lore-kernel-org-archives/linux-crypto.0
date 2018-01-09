@@ -1,72 +1,68 @@
-From: Anson Huang <anson.huang@nxp.com>
-Subject: RE: [PATCH V3 1/2] clk: imx: imx7d: add the snvs clock
-Date: Tue, 9 Jan 2018 10:10:09 +0000
-Message-ID: <AM3PR04MB1315A6E9A645EC6256914285F5100@AM3PR04MB1315.eurprd04.prod.outlook.com>
-References: <1515489651-13488-1-git-send-email-Anson.Huang@nxp.com>
- <20180109094348.GG26312@b29396-OptiPlex-7040>
+From: Anson Huang <Anson.Huang@nxp.com>
+Subject: [PATCH V4 1/2] clk: imx: imx7d: add the snvs clock
+Date: Tue, 9 Jan 2018 17:52:05 +0800
+Message-ID: <1515491526-14060-1-git-send-email-Anson.Huang@nxp.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-2"
-Content-Transfer-Encoding: quoted-printable
-Cc: =?iso-8859-2?Q?Horia_Geant=E3?= <horia.geanta@nxp.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "robh+dt@kernel.org" <robh+dt@kernel.org>,
-        "mark.rutland@arm.com" <mark.rutland@arm.com>,
-        "shawnguo@kernel.org" <shawnguo@kernel.org>,
-        "kernel@pengutronix.de" <kernel@pengutronix.de>,
-        Fabio Estevam <fabio.estevam@nxp.com>,
-        "linux@armlinux.org.uk" <linux@armlinux.org.uk>,
-        "mturquette@baylibre.com" <mturquette@baylibre.com>,
-        "sboyd@codeaurora.org" <sboyd@codeaurora.org>,
-        Adriana Reus <adriana.reus@nxp.com>,
-        "stefan@agner.ch" <stefan@agner.ch>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-To: Dong Aisheng <dongas86@gmail.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180109094348.GG26312@b29396-OptiPlex-7040>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: devicetree@vger.kernel.org, linux-clk@vger.kernel.org,
+ linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org
+To: <horia.geanta@nxp.com>, <aymen.sghaier@nxp.com>,
+ <herbert@gondor.apana.org.au>, <davem@davemloft.net>, <robh+dt@kernel.org>,
+ <mark.rutland@arm.com>, <shawnguo@kernel.org>, <kernel@pengutronix.de>,
+ <fabio.estevam@nxp.com>, <linux@armlinux.org.uk>, <mturquette@baylibre.com>,
+ <sboyd@codeaurora.org>, <adriana.reus@nxp.com>, <stefan@agner.ch>,
+ <dongas86@gmail.com>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
+According to the i.MX7D Reference Manual,
+SNVS block has a clock gate, accessing SNVS block
+would need this clock gate to be enabled, add it
+into clock tree so that SNVS module driver can
+operate this clock gate.
 
+Signed-off-by: Anson Huang <Anson.Huang@nxp.com>
+Acked-by: Dong Aisheng <aisheng.dong@nxp.com>
+Reviewed-by: Fabio Estevam <fabio.estevam@nxp.com>
+---
+ drivers/clk/imx/clk-imx7d.c             | 1 +
+ include/dt-bindings/clock/imx7d-clock.h | 3 ++-
+ 2 files changed, 3 insertions(+), 1 deletion(-)
 
-Best Regards!
-Anson Huang
-
-
-> -----Original Message-----
-> From: Dong Aisheng [mailto:dongas86@gmail.com]
-> Sent: 2018-01-09 5:44 PM
-> To: Anson Huang <anson.huang@nxp.com>
-> Cc: Horia Geant=E3 <horia.geanta@nxp.com>; Aymen Sghaier
-> <aymen.sghaier@nxp.com>; herbert@gondor.apana.org.au;
-> davem@davemloft.net; robh+dt@kernel.org; mark.rutland@arm.com;
-> shawnguo@kernel.org; kernel@pengutronix.de; Fabio Estevam
-> <fabio.estevam@nxp.com>; linux@armlinux.org.uk;
-> mturquette@baylibre.com; sboyd@codeaurora.org; Adriana Reus
-> <adriana.reus@nxp.com>; stefan@agner.ch; linux-crypto@vger.kernel.org;
-> devicetree@vger.kernel.org; linux-kernel@vger.kernel.org; linux-arm-
-> kernel@lists.infradead.org; linux-clk@vger.kernel.org; dl-linux-imx <linu=
-x-
-> imx@nxp.com>
-> Subject: Re: [PATCH V3 1/2] clk: imx: imx7d: add the snvs clock
->=20
-> On Tue, Jan 09, 2018 at 05:20:50PM +0800, Anson Huang wrote:
-> > According to the i.MX7D Reference Manual, SNVS block has a clock gate,
-> > accessing SNVS block would need this clock gate to be enabled, add it
-> > into clock tree so that SNVS module driver can operate this clock
-> > gate.
-> >
-> > Signed-off-by: Anson Huang <Anson.Huang@nxp.com>
->=20
-> You missed the last round review tags.
->=20
-> Regards
-> Dong Aisheng
-
-
-Thanks for reminder, already sent out a V4 patch set to add tags.
-
-Anson.
+diff --git a/drivers/clk/imx/clk-imx7d.c b/drivers/clk/imx/clk-imx7d.c
+index 80dc211..f34f1ec 100644
+--- a/drivers/clk/imx/clk-imx7d.c
++++ b/drivers/clk/imx/clk-imx7d.c
+@@ -795,6 +795,7 @@ static void __init imx7d_clocks_init(struct device_node *ccm_node)
+ 	clks[IMX7D_DRAM_PHYM_ALT_ROOT_CLK] = imx_clk_gate4("dram_phym_alt_root_clk", "dram_phym_alt_post_div", base + 0x4130, 0);
+ 	clks[IMX7D_DRAM_ALT_ROOT_CLK] = imx_clk_gate4("dram_alt_root_clk", "dram_alt_post_div", base + 0x4130, 0);
+ 	clks[IMX7D_OCOTP_CLK] = imx_clk_gate4("ocotp_clk", "ipg_root_clk", base + 0x4230, 0);
++	clks[IMX7D_SNVS_CLK] = imx_clk_gate4("snvs_clk", "ipg_root_clk", base + 0x4250, 0);
+ 	clks[IMX7D_USB_HSIC_ROOT_CLK] = imx_clk_gate4("usb_hsic_root_clk", "usb_hsic_post_div", base + 0x4420, 0);
+ 	clks[IMX7D_SDMA_CORE_CLK] = imx_clk_gate4("sdma_root_clk", "ahb_root_clk", base + 0x4480, 0);
+ 	clks[IMX7D_PCIE_CTRL_ROOT_CLK] = imx_clk_gate4("pcie_ctrl_root_clk", "pcie_ctrl_post_div", base + 0x4600, 0);
+diff --git a/include/dt-bindings/clock/imx7d-clock.h b/include/dt-bindings/clock/imx7d-clock.h
+index e2f99ae..dc51904 100644
+--- a/include/dt-bindings/clock/imx7d-clock.h
++++ b/include/dt-bindings/clock/imx7d-clock.h
+@@ -452,5 +452,6 @@
+ #define IMX7D_OCOTP_CLK			439
+ #define IMX7D_NAND_RAWNAND_CLK		440
+ #define IMX7D_NAND_USDHC_BUS_RAWNAND_CLK 441
+-#define IMX7D_CLK_END			442
++#define IMX7D_SNVS_CLK			442
++#define IMX7D_CLK_END			443
+ #endif /* __DT_BINDINGS_CLOCK_IMX7D_H */
+-- 
+1.9.1
