@@ -1,8 +1,7 @@
 From: Anson Huang <Anson.Huang@nxp.com>
-Subject: [PATCH V2 2/2] ARM: dts: imx7s: add snvs rtc clock
-Date: Tue, 9 Jan 2018 10:51:16 +0800
-Message-ID: <1515466276-5541-2-git-send-email-Anson.Huang@nxp.com>
-References: <1515466276-5541-1-git-send-email-Anson.Huang@nxp.com>
+Subject: [PATCH V2 1/2] clk: imx: imx7d: add the snvs clock
+Date: Tue, 9 Jan 2018 10:51:15 +0800
+Message-ID: <1515466276-5541-1-git-send-email-Anson.Huang@nxp.com>
 Mime-Version: 1.0
 Content-Type: text/plain
 Cc: <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
@@ -16,72 +15,45 @@ To: <horia.geanta@nxp.com>, <aymen.sghaier@nxp.com>,
         <mturquette@baylibre.com>, <sboyd@codeaurora.org>,
         <adriana.reus@nxp.com>, <stefan@agner.ch>, <dongas86@gmail.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1515466276-5541-1-git-send-email-Anson.Huang@nxp.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Add i.MX7 SNVS RTC clock.
+According to the i.MX7D Reference Manual,
+SNVS block has a clock gate, accessing SNVS block
+would need this clock gate to be enabled, add it
+into clock tree so that SNVS module driver can
+operate this clock gate.
 
 Signed-off-by: Anson Huang <Anson.Huang@nxp.com>
 ---
-changes since v1:
-	update snvs lp rtc binding-doc for clock info.
- Documentation/devicetree/bindings/crypto/fsl-sec4.txt | 16 ++++++++++++++++
- arch/arm/boot/dts/imx7s.dtsi                          |  2 ++
- 2 files changed, 18 insertions(+)
+no changes since v1.
+ drivers/clk/imx/clk-imx7d.c             | 1 +
+ include/dt-bindings/clock/imx7d-clock.h | 3 ++-
+ 2 files changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/Documentation/devicetree/bindings/crypto/fsl-sec4.txt b/Documentation/devicetree/bindings/crypto/fsl-sec4.txt
-index 76aec8a..da66ac4 100644
---- a/Documentation/devicetree/bindings/crypto/fsl-sec4.txt
-+++ b/Documentation/devicetree/bindings/crypto/fsl-sec4.txt
-@@ -415,12 +415,26 @@ Secure Non-Volatile Storage (SNVS) Low Power (LP) RTC Node
- 	value type: <u32>
- 	Definition: LP register offset. default it is 0x34.
- 
-+   - clocks
-+      Usage: required if SNVS LP RTC requires explicit enablement of clocks
-+      Value type: <prop_encoded-array>
-+      Definition:  A list of phandle and clock specifier pairs describing
-+          the clocks required for enabling and disabling SNVS LP RTC.
-+
-+   - clock-names
-+      Usage: required if SNVS LP RTC requires explicit enablement of clocks
-+      Value type: <string>
-+      Definition: A list of clock name strings in the same order as the
-+          clocks property.
-+
- EXAMPLE
- 	sec_mon_rtc_lp@1 {
- 		compatible = "fsl,sec-v4.0-mon-rtc-lp";
- 		interrupts = <93 2>;
- 		regmap = <&snvs>;
- 		offset = <0x34>;
-+		clocks = <&clks IMX7D_SNVS_CLK>;
-+		clock-names = "snvs-rtc";
- 	};
- 
- =====================================================================
-@@ -543,6 +557,8 @@ FULL EXAMPLE
- 			regmap = <&sec_mon>;
- 			offset = <0x34>;
- 			interrupts = <93 2>;
-+			clocks = <&clks IMX7D_SNVS_CLK>;
-+			clock-names = "snvs-rtc";
- 		};
- 
- 		snvs-pwrkey@020cc000 {
-diff --git a/arch/arm/boot/dts/imx7s.dtsi b/arch/arm/boot/dts/imx7s.dtsi
-index 9aa2bb9..02baf42 100644
---- a/arch/arm/boot/dts/imx7s.dtsi
-+++ b/arch/arm/boot/dts/imx7s.dtsi
-@@ -551,6 +551,8 @@
- 					offset = <0x34>;
- 					interrupts = <GIC_SPI 19 IRQ_TYPE_LEVEL_HIGH>,
- 						     <GIC_SPI 20 IRQ_TYPE_LEVEL_HIGH>;
-+					clocks = <&clks IMX7D_SNVS_CLK>;
-+					clock-names = "snvs-rtc";
- 				};
- 
- 				snvs_poweroff: snvs-poweroff {
+diff --git a/drivers/clk/imx/clk-imx7d.c b/drivers/clk/imx/clk-imx7d.c
+index 80dc211..f34f1ec 100644
+--- a/drivers/clk/imx/clk-imx7d.c
++++ b/drivers/clk/imx/clk-imx7d.c
+@@ -795,6 +795,7 @@ static void __init imx7d_clocks_init(struct device_node *ccm_node)
+ 	clks[IMX7D_DRAM_PHYM_ALT_ROOT_CLK] = imx_clk_gate4("dram_phym_alt_root_clk", "dram_phym_alt_post_div", base + 0x4130, 0);
+ 	clks[IMX7D_DRAM_ALT_ROOT_CLK] = imx_clk_gate4("dram_alt_root_clk", "dram_alt_post_div", base + 0x4130, 0);
+ 	clks[IMX7D_OCOTP_CLK] = imx_clk_gate4("ocotp_clk", "ipg_root_clk", base + 0x4230, 0);
++	clks[IMX7D_SNVS_CLK] = imx_clk_gate4("snvs_clk", "ipg_root_clk", base + 0x4250, 0);
+ 	clks[IMX7D_USB_HSIC_ROOT_CLK] = imx_clk_gate4("usb_hsic_root_clk", "usb_hsic_post_div", base + 0x4420, 0);
+ 	clks[IMX7D_SDMA_CORE_CLK] = imx_clk_gate4("sdma_root_clk", "ahb_root_clk", base + 0x4480, 0);
+ 	clks[IMX7D_PCIE_CTRL_ROOT_CLK] = imx_clk_gate4("pcie_ctrl_root_clk", "pcie_ctrl_post_div", base + 0x4600, 0);
+diff --git a/include/dt-bindings/clock/imx7d-clock.h b/include/dt-bindings/clock/imx7d-clock.h
+index e2f99ae..dc51904 100644
+--- a/include/dt-bindings/clock/imx7d-clock.h
++++ b/include/dt-bindings/clock/imx7d-clock.h
+@@ -452,5 +452,6 @@
+ #define IMX7D_OCOTP_CLK			439
+ #define IMX7D_NAND_RAWNAND_CLK		440
+ #define IMX7D_NAND_USDHC_BUS_RAWNAND_CLK 441
+-#define IMX7D_CLK_END			442
++#define IMX7D_SNVS_CLK			442
++#define IMX7D_CLK_END			443
+ #endif /* __DT_BINDINGS_CLOCK_IMX7D_H */
 -- 
 1.9.1
