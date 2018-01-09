@@ -1,40 +1,62 @@
-From: Dong Aisheng <dongas86@gmail.com>
-Subject: Re: [PATCH V4 2/2] ARM: dts: imx7s: add snvs rtc clock
-Date: Tue, 9 Jan 2018 18:26:13 +0800
-Message-ID: <20180109102613.GI26312@b29396-OptiPlex-7040>
-References: <1515491526-14060-1-git-send-email-Anson.Huang@nxp.com>
- <1515491526-14060-2-git-send-email-Anson.Huang@nxp.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: mark.rutland@arm.com, devicetree@vger.kernel.org, aymen.sghaier@nxp.com,
- herbert@gondor.apana.org.au, horia.geanta@nxp.com, mturquette@baylibre.com,
- sboyd@codeaurora.org, linux@armlinux.org.uk, stefan@agner.ch,
- linux-kernel@vger.kernel.org, linux-clk@vger.kernel.org, adriana.reus@nxp.com,
- robh+dt@kernel.org, linux-crypto@vger.kernel.org, kernel@pengutronix.de,
- fabio.estevam@nxp.com, shawnguo@kernel.org, davem@davemloft.net,
- linux-arm-kernel@lists.infradead.org, linux-imx@nxp.com
-To: Anson Huang <Anson.Huang@nxp.com>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-Content-Disposition: inline
-In-Reply-To: <1515491526-14060-2-git-send-email-Anson.Huang@nxp.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Subject: [PATCH 1/2] crypto: exynos-rng - Add SPDX license identifier and correct module license
+Date: Tue,  9 Jan 2018 18:57:35 +0100
+Message-ID: <20180109175736.6885-1-krzk@kernel.org>
+To: Krzysztof Kozlowski <krzk@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Kukjin Kim <kgene@kernel.org>,
+        Vladimir Zapolskiy <vz@mleia.com>,
+        Kamil Konieczny <k.konieczny@partner.samsung.com>,
+        linux-crypto@vger.kernel.org, linux-samsung-soc@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Jan 09, 2018 at 05:52:06PM +0800, Anson Huang wrote:
-> Add i.MX7 SNVS RTC clock.
-> 
-> Signed-off-by: Anson Huang <Anson.Huang@nxp.com>
+Replace GPL license statement with SPDX GPL-2.0 license identifier and
+correct the module license to GPLv2.
 
-Acked-by: Dong Aisheng <aisheng.dong@nxp.com>
+The license itself was a generic GPL because of copy-and-paste from old
+drivers/char/hw_random/exynos-rng.c driver (on which this was based on).
+However the module license indicated GPL-2.0 or later.  GPL-2.0 was
+intended by author so fix up this mess.
 
-Regards
-Dong Aisheng
+Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
+---
+ drivers/crypto/exynos-rng.c | 12 ++----------
+ 1 file changed, 2 insertions(+), 10 deletions(-)
+
+diff --git a/drivers/crypto/exynos-rng.c b/drivers/crypto/exynos-rng.c
+index 451620b475a0..a2e91f94096f 100644
+--- a/drivers/crypto/exynos-rng.c
++++ b/drivers/crypto/exynos-rng.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0
+ /*
+  * exynos-rng.c - Random Number Generator driver for the Exynos
+  *
+@@ -6,15 +7,6 @@
+  * Loosely based on old driver from drivers/char/hw_random/exynos-rng.c:
+  * Copyright (C) 2012 Samsung Electronics
+  * Jonghwa Lee <jonghwa3.lee@samsung.com>
+- *
+- * This program is free software; you can redistribute it and/or modify
+- * it under the terms of the GNU General Public License as published by
+- * the Free Software Foundation;
+- *
+- * This program is distributed in the hope that it will be useful,
+- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- * GNU General Public License for more details.
+  */
+ 
+ #include <linux/clk.h>
+@@ -386,4 +378,4 @@ module_platform_driver(exynos_rng_driver);
+ 
+ MODULE_DESCRIPTION("Exynos H/W Random Number Generator driver");
+ MODULE_AUTHOR("Krzysztof Kozlowski <krzk@kernel.org>");
+-MODULE_LICENSE("GPL");
++MODULE_LICENSE("GPL v2");
+-- 
+2.11.0
