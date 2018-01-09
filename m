@@ -1,58 +1,40 @@
-From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH 5/5] staging: ccree: dma mask is type u64
-Date: Tue,  9 Jan 2018 10:24:33 +0000
-Message-ID: <1515493478-30454-6-git-send-email-gilad@benyossef.com>
-References: <1515493478-30454-1-git-send-email-gilad@benyossef.com>
+From: Dong Aisheng <dongas86@gmail.com>
+Subject: Re: [PATCH V4 2/2] ARM: dts: imx7s: add snvs rtc clock
+Date: Tue, 9 Jan 2018 18:26:13 +0800
+Message-ID: <20180109102613.GI26312@b29396-OptiPlex-7040>
+References: <1515491526-14060-1-git-send-email-Anson.Huang@nxp.com>
+ <1515491526-14060-2-git-send-email-Anson.Huang@nxp.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Cc: devel@driverdev.osuosl.org, linux-kernel@vger.kernel.org,
- driverdev-devel@linuxdriverproject.org, linux-crypto@vger.kernel.org,
- Ofir Drang <ofir.drang@arm.com>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
-In-Reply-To: <1515493478-30454-1-git-send-email-gilad@benyossef.com>
-List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
-List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
-List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
-List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
-List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
-Errors-To: driverdev-devel-bounces@linuxdriverproject.org
-Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
+Cc: mark.rutland@arm.com, devicetree@vger.kernel.org, aymen.sghaier@nxp.com,
+ herbert@gondor.apana.org.au, horia.geanta@nxp.com, mturquette@baylibre.com,
+ sboyd@codeaurora.org, linux@armlinux.org.uk, stefan@agner.ch,
+ linux-kernel@vger.kernel.org, linux-clk@vger.kernel.org, adriana.reus@nxp.com,
+ robh+dt@kernel.org, linux-crypto@vger.kernel.org, kernel@pengutronix.de,
+ fabio.estevam@nxp.com, shawnguo@kernel.org, davem@davemloft.net,
+ linux-arm-kernel@lists.infradead.org, linux-imx@nxp.com
+To: Anson Huang <Anson.Huang@nxp.com>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Disposition: inline
+In-Reply-To: <1515491526-14060-2-git-send-email-Anson.Huang@nxp.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-The dma mask var was defined as dma_addr_t but should be
-u64. This showed as a sparse warning when building for 32 bit.
-Fix it by changing type to u64 and drop the cast.
+On Tue, Jan 09, 2018 at 05:52:06PM +0800, Anson Huang wrote:
+> Add i.MX7 SNVS RTC clock.
+> 
+> Signed-off-by: Anson Huang <Anson.Huang@nxp.com>
 
-Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
----
- drivers/staging/ccree/cc_driver.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Acked-by: Dong Aisheng <aisheng.dong@nxp.com>
 
-diff --git a/drivers/staging/ccree/cc_driver.c b/drivers/staging/ccree/cc_driver.c
-index b49bc25..6682d9d 100644
---- a/drivers/staging/ccree/cc_driver.c
-+++ b/drivers/staging/ccree/cc_driver.c
-@@ -156,7 +156,7 @@ static int init_cc_resources(struct platform_device *plat_dev)
- 	struct device *dev = &plat_dev->dev;
- 	struct device_node *np = dev->of_node;
- 	u32 signature_val;
--	dma_addr_t dma_mask;
-+	u64 dma_mask;
- 	int rc = 0;
- 
- 	new_drvdata = devm_kzalloc(dev, sizeof(*new_drvdata), GFP_KERNEL);
-@@ -205,7 +205,7 @@ static int init_cc_resources(struct platform_device *plat_dev)
- 	if (!plat_dev->dev.dma_mask)
- 		plat_dev->dev.dma_mask = &plat_dev->dev.coherent_dma_mask;
- 
--	dma_mask = (dma_addr_t)(DMA_BIT_MASK(DMA_BIT_MASK_LEN));
-+	dma_mask = DMA_BIT_MASK(DMA_BIT_MASK_LEN);
- 	while (dma_mask > 0x7fffffffUL) {
- 		if (dma_supported(&plat_dev->dev, dma_mask)) {
- 			rc = dma_set_coherent_mask(&plat_dev->dev, dma_mask);
--- 
-2.7.4
+Regards
+Dong Aisheng
