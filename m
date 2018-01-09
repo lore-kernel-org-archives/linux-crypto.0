@@ -1,7 +1,7 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH 4/5] staging: ccree: make stub function static inline
-Date: Tue,  9 Jan 2018 10:24:32 +0000
-Message-ID: <1515493478-30454-5-git-send-email-gilad@benyossef.com>
+Subject: [PATCH 5/5] staging: ccree: dma mask is type u64
+Date: Tue,  9 Jan 2018 10:24:33 +0000
+Message-ID: <1515493478-30454-6-git-send-email-gilad@benyossef.com>
 References: <1515493478-30454-1-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -23,42 +23,36 @@ Errors-To: driverdev-devel-bounces@linuxdriverproject.org
 Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
 List-Id: linux-crypto.vger.kernel.org
 
-The debugfs interface defines stub function if debugfs is not
-enabled, which were missing the 'static inline' qualifiers causing
-sparse warnings.
+The dma mask var was defined as dma_addr_t but should be
+u64. This showed as a sparse warning when building for 32 bit.
+Fix it by changing type to u64 and drop the cast.
 
 Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 ---
- drivers/staging/ccree/cc_debugfs.h | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ drivers/staging/ccree/cc_driver.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/staging/ccree/cc_debugfs.h b/drivers/staging/ccree/cc_debugfs.h
-index 354ec17..5b5320e 100644
---- a/drivers/staging/ccree/cc_debugfs.h
-+++ b/drivers/staging/ccree/cc_debugfs.h
-@@ -13,19 +13,19 @@ void cc_debugfs_fini(struct cc_drvdata *drvdata);
+diff --git a/drivers/staging/ccree/cc_driver.c b/drivers/staging/ccree/cc_driver.c
+index b49bc25..6682d9d 100644
+--- a/drivers/staging/ccree/cc_driver.c
++++ b/drivers/staging/ccree/cc_driver.c
+@@ -156,7 +156,7 @@ static int init_cc_resources(struct platform_device *plat_dev)
+ 	struct device *dev = &plat_dev->dev;
+ 	struct device_node *np = dev->of_node;
+ 	u32 signature_val;
+-	dma_addr_t dma_mask;
++	u64 dma_mask;
+ 	int rc = 0;
  
- #else
+ 	new_drvdata = devm_kzalloc(dev, sizeof(*new_drvdata), GFP_KERNEL);
+@@ -205,7 +205,7 @@ static int init_cc_resources(struct platform_device *plat_dev)
+ 	if (!plat_dev->dev.dma_mask)
+ 		plat_dev->dev.dma_mask = &plat_dev->dev.coherent_dma_mask;
  
--int cc_debugfs_global_init(void)
-+static inline int cc_debugfs_global_init(void)
- {
- 	return 0;
- }
- 
--void cc_debugfs_global_fini(void) {}
-+static inline void cc_debugfs_global_fini(void) {}
- 
--int cc_debugfs_init(struct cc_drvdata *drvdata)
-+static inline int cc_debugfs_init(struct cc_drvdata *drvdata)
- {
- 	return 0;
- }
- 
--void cc_debugfs_fini(struct cc_drvdata *drvdata) {}
-+static inline void cc_debugfs_fini(struct cc_drvdata *drvdata) {}
- 
- #endif
- 
+-	dma_mask = (dma_addr_t)(DMA_BIT_MASK(DMA_BIT_MASK_LEN));
++	dma_mask = DMA_BIT_MASK(DMA_BIT_MASK_LEN);
+ 	while (dma_mask > 0x7fffffffUL) {
+ 		if (dma_supported(&plat_dev->dev, dma_mask)) {
+ 			rc = dma_set_coherent_mask(&plat_dev->dev, dma_mask);
 -- 
 2.7.4
