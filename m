@@ -1,52 +1,66 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH 0/7] arm64: move literal data into .rodata section
-Date: Wed, 10 Jan 2018 12:11:35 +0000
-Message-ID: <20180110121142.18291-1-ard.biesheuvel@linaro.org>
+Subject: [PATCH 1/7] arm64: kernel: avoid executable literal pools
+Date: Wed, 10 Jan 2018 12:11:36 +0000
+Message-ID: <20180110121142.18291-2-ard.biesheuvel@linaro.org>
+References: <20180110121142.18291-1-ard.biesheuvel@linaro.org>
 Cc: herbert@gondor.apana.org.au, will.deacon@arm.com,
         catalin.marinas@arm.com, marc.zyngier@arm.com,
         mark.rutland@arm.com, dann.frazier@canonical.com,
         steve.capper@linaro.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To: linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f68.google.com ([74.125.82.68]:35086 "EHLO
-        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751352AbeAJMLv (ORCPT
+Received: from mail-wm0-f67.google.com ([74.125.82.67]:35092 "EHLO
+        mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751352AbeAJMLx (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 10 Jan 2018 07:11:51 -0500
-Received: by mail-wm0-f68.google.com with SMTP id r78so1361879wme.0
-        for <linux-crypto@vger.kernel.org>; Wed, 10 Jan 2018 04:11:50 -0800 (PST)
+        Wed, 10 Jan 2018 07:11:53 -0500
+Received: by mail-wm0-f67.google.com with SMTP id r78so1362071wme.0
+        for <linux-crypto@vger.kernel.org>; Wed, 10 Jan 2018 04:11:53 -0800 (PST)
+In-Reply-To: <20180110121142.18291-1-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Prevent inadvertently creating speculative gadgets by moving literal data
-into the .rodata section.
+Recent versions of GCC will emit literals into a separate .rodata section
+rather than interspersed with the instruction stream. We disabled this
+in commit 67dfa1751ce71 ("arm64: errata: Add -mpc-relative-literal-loads
+to build flags"), because it uses adrp/add pairs to reference these
+literals even when building with -mcmodel=large, which breaks module
+loading when we have the mitigation for Cortex-A53 erratum #843419
+enabled.
 
-Patch #1 enables this for C code, by reverting a change that disables the
-GCC feature implementing this. Note that this conflicts with the mitigation
-of erratum #843419 for Cortex-A53.
+However, due to the recent discoveries regarding speculative execution,
+we should avoid putting data into executable sections, to prevent
+creating speculative gadgets inadvertently.
 
-Patch #2 - #7 update the crypto asm code to move sboxes and round constant
-tables (which may or may not be hiding 'interesting' opcodes) from .text
-to .rodata
+So set -mpc-relative-literal-loads only for modules, and only if the
+A53 erratum is enabled.
 
-Ard Biesheuvel (7):
-  arm64: kernel: avoid executable literal pools
-  arm64/crypto: aes-cipher: move S-box to .rodata section
-  arm64/crypto: aes-neon: move literal data to .rodata section
-  arm64/crypto: crc32: move literal data to .rodata section
-  arm64/crypto: crct10dif: move literal data to .rodata section
-  arm64/crypto: sha2-ce: move the round constant table to .rodata
-    section
-  arm64/crypto: sha1-ce: get rid of literal pool
+Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+---
+ arch/arm64/Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
- arch/arm64/Makefile                   |  4 ++--
- arch/arm64/crypto/aes-cipher-core.S   | 19 ++++++++++---------
- arch/arm64/crypto/aes-neon.S          |  8 ++++----
- arch/arm64/crypto/crc32-ce-core.S     |  7 ++++---
- arch/arm64/crypto/crct10dif-ce-core.S | 17 +++++++++--------
- arch/arm64/crypto/sha1-ce-core.S      | 20 +++++++++-----------
- arch/arm64/crypto/sha2-ce-core.S      |  4 +++-
- 7 files changed, 41 insertions(+), 38 deletions(-)
-
+diff --git a/arch/arm64/Makefile b/arch/arm64/Makefile
+index b481b4a7c011..bd7cb205e28a 100644
+--- a/arch/arm64/Makefile
++++ b/arch/arm64/Makefile
+@@ -26,7 +26,8 @@ ifeq ($(CONFIG_ARM64_ERRATUM_843419),y)
+   ifeq ($(call ld-option, --fix-cortex-a53-843419),)
+ $(warning ld does not support --fix-cortex-a53-843419; kernel may be susceptible to erratum)
+   else
+-LDFLAGS_vmlinux	+= --fix-cortex-a53-843419
++LDFLAGS_vmlinux		+= --fix-cortex-a53-843419
++KBUILD_CFLAGS_MODULE	+= $(call cc-option, -mpc-relative-literal-loads)
+   endif
+ endif
+ 
+@@ -51,7 +52,6 @@ endif
+ 
+ KBUILD_CFLAGS	+= -mgeneral-regs-only $(lseinstr) $(brokengasinst)
+ KBUILD_CFLAGS	+= -fno-asynchronous-unwind-tables
+-KBUILD_CFLAGS	+= $(call cc-option, -mpc-relative-literal-loads)
+ KBUILD_AFLAGS	+= $(lseinstr) $(brokengasinst)
+ 
+ KBUILD_CFLAGS	+= $(call cc-option,-mabi=lp64)
 -- 
 2.11.0
