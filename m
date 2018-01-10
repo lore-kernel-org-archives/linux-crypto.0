@@ -1,32 +1,134 @@
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Subject: Re: [PATCH -next] hwrng: exynos - remove redundant dev_err call in exynos_trng_probe()
-Date: Wed, 10 Jan 2018 15:24:19 +0100
-Message-ID: <CAJKOXPfQKHNxNe-3kOTpp9rUSoh3nLVhBxtZiyDJSoBgKLR4vg@mail.gmail.com>
-References: <1515591059-73230-1-git-send-email-weiyongjun1@huawei.com>
+From: Fabien DESSENNE <fabien.dessenne@st.com>
+Subject: Re: [PATCH 5/6] crypto: stm32-hash: convert to the new crypto engine
+ API
+Date: Wed, 10 Jan 2018 14:24:08 +0000
+Message-ID: <17d0497d-5c13-f93e-4249-8adff5e71b19@st.com>
+References: <20180103201109.16077-1-clabbe.montjoie@gmail.com>
+ <20180103201109.16077-6-clabbe.montjoie@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: l.stelmach@samsung.com, mpm@selenic.com,
-        herbert@gondor.apana.org.au, arnd@arndb.de,
-        gregkh@linuxfoundation.org, kgene@kernel.org,
-        linux-samsung-soc@vger.kernel.org, linux-crypto@vger.kernel.org,
-        kernel-janitors@vger.kernel.org
-To: Wei Yongjun <weiyongjun1@huawei.com>
-Return-path: <linux-samsung-soc-owner@vger.kernel.org>
-In-Reply-To: <1515591059-73230-1-git-send-email-weiyongjun1@huawei.com>
-Sender: linux-samsung-soc-owner@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Lionel DEBIEVE <lionel.debieve@st.com>,
+ Benjamin GAIGNARD <benjamin.gaignard@st.com>,
+ "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "virtualization@lists.linux-foundation.org"
+ <virtualization@lists.linux-foundation.org>,
+ "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+ "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+To: Corentin Labbe <clabbe.montjoie@gmail.com>, Alexandre TORGUE
+ <alexandre.torgue@st.com>, "arei.gonglei@huawei.com"
+ <arei.gonglei@huawei.com>, "corbet@lwn.net" <corbet@lwn.net>,
+ "davem@davemloft.net" <davem@davemloft.net>, "herbert@gondor.apana.org.au"
+ <herbert@gondor.apana.org.au>, "jasowang@redhat.com" <jasowang@redhat.com>,
+ "mcoquelin.stm32@gmail.com" <mcoquelin.stm32@gmail.com>, "mst@redhat.com"
+ <mst@redhat.com>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <20180103201109.16077-6-clabbe.montjoie@gmail.com>
+Content-Language: en-US
+Content-ID: <F10D02560A631D49906EB7A0148B809F@st.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Jan 10, 2018 at 2:30 PM, Wei Yongjun <weiyongjun1@huawei.com> wrote:
-> There is a error message within devm_ioremap_resource
-> already, so remove the dev_err call to avoid redundant
-> error message.
+
+
+On 03/01/18 21:11, Corentin Labbe wrote:
+> This patch convert the stm32-hash driver to the new crypto engine API.
 >
-> Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
+> Signed-off-by: Corentin Labbe <clabbe.montjoie@gmail.com>
 > ---
->  drivers/char/hw_random/exynos-trng.c | 4 +---
->  1 file changed, 1 insertion(+), 3 deletions(-)
+>   drivers/crypto/stm32/stm32-hash.c | 18 +++++++++++++-----
+>   1 file changed, 13 insertions(+), 5 deletions(-)
+>
+> diff --git a/drivers/crypto/stm32/stm32-hash.c b/drivers/crypto/stm32/stm32-hash.c
+> index 4ca4a264a833..9790c2c936c7 100644
+> --- a/drivers/crypto/stm32/stm32-hash.c
+> +++ b/drivers/crypto/stm32/stm32-hash.c
+> @@ -122,6 +122,7 @@ enum stm32_hash_data_format {
+>   #define HASH_DMA_THRESHOLD		50
+>   
+>   struct stm32_hash_ctx {
+> +	struct crypto_engine_reqctx enginectx;
+>   	struct stm32_hash_dev	*hdev;
+>   	unsigned long		flags;
+>   
+> @@ -828,6 +829,11 @@ static int stm32_hash_hw_init(struct stm32_hash_dev *hdev,
+>   	return 0;
+>   }
+>   
+> +static int stm32_hash_one_request(struct crypto_engine *engine,
+> +				  void *areq);
 
-Reviewed-by: Krzysztof Kozlowski <krzk@kernel.org>
+merge these two lines in a single one
 
-Best regards,
-Krzysztof
+> +static int stm32_hash_prepare_req(struct crypto_engine *engine,
+> +				  void *areq);
+
+merge these two lines in a single one
+
+> +
+>   static int stm32_hash_handle_queue(struct stm32_hash_dev *hdev,
+>   				   struct ahash_request *req)
+>   {
+> @@ -835,8 +841,9 @@ static int stm32_hash_handle_queue(struct stm32_hash_dev *hdev,
+>   }
+>   
+>   static int stm32_hash_prepare_req(struct crypto_engine *engine,
+> -				  struct ahash_request *req)
+> +				  void *areq)
+
+merge these two lines in a single one
+
+>   {
+> +	struct ahash_request *req = container_of(areq, struct ahash_request, base);
+
+ > 80 characters (CHECKPATCH)
+
+>   	struct stm32_hash_ctx *ctx = crypto_ahash_ctx(crypto_ahash_reqtfm(req));
+>   	struct stm32_hash_dev *hdev = stm32_hash_find_dev(ctx);
+>   	struct stm32_hash_request_ctx *rctx;
+> @@ -855,8 +862,9 @@ static int stm32_hash_prepare_req(struct crypto_engine *engine,
+>   }
+>   
+>   static int stm32_hash_one_request(struct crypto_engine *engine,
+> -				  struct ahash_request *req)
+> +				  void *areq)
+
+merge these two lines in a single one
+
+>   {
+> +	struct ahash_request *req = container_of(areq, struct ahash_request, base);
+
+ > 80 characters (CHECKPATCH)
+
+>   	struct stm32_hash_ctx *ctx = crypto_ahash_ctx(crypto_ahash_reqtfm(req));
+>   	struct stm32_hash_dev *hdev = stm32_hash_find_dev(ctx);
+>   	struct stm32_hash_request_ctx *rctx;
+> @@ -1033,6 +1041,9 @@ static int stm32_hash_cra_init_algs(struct crypto_tfm *tfm,
+>   	if (algs_hmac_name)
+>   		ctx->flags |= HASH_FLAGS_HMAC;
+>   
+> +	ctx->enginectx.op.do_one_request = stm32_hash_one_request;
+> +	ctx->enginectx.op.prepare_request = stm32_hash_prepare_req;
+> +	ctx->enginectx.op.unprepare_request = NULL;
+>   	return 0;
+>   }
+>   
+> @@ -1493,9 +1504,6 @@ static int stm32_hash_probe(struct platform_device *pdev)
+>   		goto err_engine;
+>   	}
+>   
+> -	hdev->engine->prepare_hash_request = stm32_hash_prepare_req;
+> -	hdev->engine->hash_one_request = stm32_hash_one_request;
+> -
+>   	ret = crypto_engine_start(hdev->engine);
+>   	if (ret)
+>   		goto err_engine_start;
