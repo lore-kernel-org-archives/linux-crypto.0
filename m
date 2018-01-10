@@ -1,47 +1,58 @@
-From: Boris Brezillon <boris.brezillon@free-electrons.com>
-Subject: Re: [PATCH] crypto: marvell/cesa - Fix DMA API misuse
-Date: Wed, 10 Jan 2018 17:23:20 +0100
-Message-ID: <20180110172320.5ab39e43@bbrezillon>
-References: <55d3177407b00dd4a9d51fe4f8e2bf2282fe8e3d.1515596541.git.robin.murphy@arm.com>
-        <20180110162522.580089a5@bbrezillon>
-        <20180110154817.GA18707@lst.de>
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: Re: Getting the ccree driver out of staging
+Date: Wed, 10 Jan 2018 17:39:26 +0100
+Message-ID: <20180110163926.GA25674@kroah.com>
+References: <CAOtvUMdo_ZJ-M-=apA1a=70KyVBX2J0pEVc+Uc9i=rYWCie6Hw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Cc: Robin Murphy <robin.murphy@arm.com>, arno@natisbad.org,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org
-To: Christoph Hellwig <hch@lst.de>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180110154817.GA18707@lst.de>
-Sender: linux-kernel-owner@vger.kernel.org
+Cc: devel@driverdev.osuosl.org, driverdev-devel@linuxdriverproject.org,
+ Herbert Xu <herbert@gondor.apana.org.au>, Ofir Drang <Ofir.Drang@arm.com>,
+ Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Gilad Ben-Yossef <gilad@benyossef.com>
+Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
+Content-Disposition: inline
+In-Reply-To: <CAOtvUMdo_ZJ-M-=apA1a=70KyVBX2J0pEVc+Uc9i=rYWCie6Hw@mail.gmail.com>
+List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
+List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
+List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
+List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
+List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
+Errors-To: driverdev-devel-bounces@linuxdriverproject.org
+Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
 List-Id: linux-crypto.vger.kernel.org
 
-Hi Christoph,
-
-On Wed, 10 Jan 2018 16:48:17 +0100
-Christoph Hellwig <hch@lst.de> wrote:
-
-> On Wed, Jan 10, 2018 at 04:25:22PM +0100, Boris Brezillon wrote:
-> > On Wed, 10 Jan 2018 15:15:43 +0000
-> > Robin Murphy <robin.murphy@arm.com> wrote:
-> >   
-> > > phys_to_dma() is an internal helper for certain DMA API implementations,
-> > > and is not appropriate for drivers to use. It appears that what the CESA
-> > > driver really wants to be using is dma_map_resource() - admittedly that
-> > > didn't exist when the offending code was first merged, but it does now.
-> > > 
-> > > Signed-off-by: Robin Murphy <robin.murphy@arm.com>  
-> > 
-> > Acked-by: Boris Brezillon <boris.brezillon@free-electrons.com>  
+On Wed, Jan 10, 2018 at 08:54:55AM +0200, Gilad Ben-Yossef wrote:
+> Hi folks,
 > 
-> Thanks.  Robin, Boris: do you want me to pick this up in the
-> dma-mapping tree and move it before the dma-direct.h introduction?
+> With the enormous help of people in the to and CCed lists I've gotten
+> the ccree driver to a point I believe it is ready to graduate out of
+> the staging tree:
+> 
+> - The code base has been reduced by something by 30% and is *much*
+> more  readable and manageable.
+> - The very few checkpatch warnings are all false positives (one due to
+> dt bindings going through the crypto tree, the others due to harmless
+> macro argument reuse)
+> and the few sparse output are equally benign.
+> - The driver follows the crypto API expected behavior as much as I can tell.
+> - Fixed all the bugs I could fine as a result of tcrypt tests.
+> - It works :-)
+> 
+> There are obviously more things todo, but I believe they are out of
+> scope for staging.
+> 
+> So, if you see something that still needs work, kindly let me know.
+> Alternatively, will you accept a patch moving it to drivers/crypto/?
 
-You should probably sync with Herbert, I'm just the maintainer of this
-driver, not the crypto subsystem.
+It might make more sense to just send a "new" patch adding the driver to
+drivers/crypto/ and if that is accepted, we can drop it from staging.
+That way it's easier for the crypto developers to review it.
 
-Regards,
+But it's up to them, whatever they want is fine with me.
 
-Boris
+thanks,
+
+greg k-h
