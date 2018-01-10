@@ -1,56 +1,64 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH 6/7] arm64/crypto: sha2-ce: move the round constant table to .rodata section
-Date: Wed, 10 Jan 2018 12:11:41 +0000
-Message-ID: <20180110121142.18291-7-ard.biesheuvel@linaro.org>
+Subject: [PATCH 3/7] arm64/crypto: aes-neon: move literal data to .rodata
+ section
+Date: Wed, 10 Jan 2018 12:11:38 +0000
+Message-ID: <20180110121142.18291-4-ard.biesheuvel@linaro.org>
 References: <20180110121142.18291-1-ard.biesheuvel@linaro.org>
-Cc: herbert@gondor.apana.org.au, will.deacon@arm.com,
-        catalin.marinas@arm.com, marc.zyngier@arm.com,
-        mark.rutland@arm.com, dann.frazier@canonical.com,
-        steve.capper@linaro.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>
-To: linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f68.google.com ([74.125.82.68]:45848 "EHLO
-        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S964968AbeAJMNq (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 10 Jan 2018 07:13:46 -0500
-Received: by mail-wm0-f68.google.com with SMTP id i186so10102158wmi.4
-        for <linux-crypto@vger.kernel.org>; Wed, 10 Jan 2018 04:13:45 -0800 (PST)
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: mark.rutland@arm.com, steve.capper@linaro.org, herbert@gondor.apana.org.au,
+ Ard Biesheuvel <ard.biesheuvel@linaro.org>, marc.zyngier@arm.com,
+ catalin.marinas@arm.com, will.deacon@arm.com, dann.frazier@canonical.com
+To: linux-arm-kernel@lists.infradead.org,
+	linux-crypto@vger.kernel.org
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 In-Reply-To: <20180110121142.18291-1-ard.biesheuvel@linaro.org>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+List-Id: linux-crypto.vger.kernel.org
 
-Move the SHA2 round constant table to the .rodata section where it is
-safe from being exploited by speculative execution.
+Move the S-boxes and some other literals to the .rodata section where
+it is safe from being exploited by speculative execution.
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- arch/arm64/crypto/sha2-ce-core.S | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ arch/arm64/crypto/aes-neon.S | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm64/crypto/sha2-ce-core.S b/arch/arm64/crypto/sha2-ce-core.S
-index 679c6c002f4f..4c3c89b812ce 100644
---- a/arch/arm64/crypto/sha2-ce-core.S
-+++ b/arch/arm64/crypto/sha2-ce-core.S
-@@ -53,6 +53,7 @@
- 	/*
- 	 * The SHA-256 round constants
- 	 */
+diff --git a/arch/arm64/crypto/aes-neon.S b/arch/arm64/crypto/aes-neon.S
+index f1e3aa2732f9..1c7b45b7268e 100644
+--- a/arch/arm64/crypto/aes-neon.S
++++ b/arch/arm64/crypto/aes-neon.S
+@@ -32,10 +32,10 @@
+ 
+ 	/* preload the entire Sbox */
+ 	.macro		prepare, sbox, shiftrows, temp
+-	adr		\temp, \sbox
+ 	movi		v12.16b, #0x1b
+-	ldr		q13, \shiftrows
+-	ldr		q14, .Lror32by8
++	ldr_l		q13, \shiftrows, \temp
++	ldr_l		q14, .Lror32by8, \temp
++	adr_l		\temp, \sbox
+ 	ld1		{v16.16b-v19.16b}, [\temp], #64
+ 	ld1		{v20.16b-v23.16b}, [\temp], #64
+ 	ld1		{v24.16b-v27.16b}, [\temp], #64
+@@ -272,7 +272,7 @@
+ 
+ #include "aes-modes.S"
+ 
+-	.text
 +	.section	".rodata", "a"
- 	.align		4
- .Lsha2_rcon:
- 	.word		0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5
-@@ -76,9 +77,10 @@
- 	 * void sha2_ce_transform(struct sha256_ce_state *sst, u8 const *src,
- 	 *			  int blocks)
- 	 */
-+	.text
- ENTRY(sha2_ce_transform)
- 	/* load round constants */
--	adr		x8, .Lsha2_rcon
-+	adr_l		x8, .Lsha2_rcon
- 	ld1		{ v0.4s- v3.4s}, [x8], #64
- 	ld1		{ v4.4s- v7.4s}, [x8], #64
- 	ld1		{ v8.4s-v11.4s}, [x8], #64
+ 	.align		6
+ .LForward_Sbox:
+ 	.byte		0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5
 -- 
 2.11.0
