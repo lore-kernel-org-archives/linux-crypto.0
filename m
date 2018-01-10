@@ -1,7 +1,7 @@
 From: Megha Dey <megha.dey@linux.intel.com>
-Subject: [PATCH V8 3/5] crypto: AES CBC multi-buffer scheduler
-Date: Tue,  9 Jan 2018 16:09:06 -0800
-Message-ID: <1515542948-24041-4-git-send-email-megha.dey@linux.intel.com>
+Subject: [PATCH V8 4/5] crypto: AES CBC by8 encryption
+Date: Tue,  9 Jan 2018 16:09:07 -0800
+Message-ID: <1515542948-24041-5-git-send-email-megha.dey@linux.intel.com>
 References: <1515542948-24041-1-git-send-email-megha.dey@linux.intel.com>
 Cc: megha.dey@intel.com, Megha Dey <megha.dey@linux.intel.com>
 To: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
@@ -11,227 +11,28 @@ In-Reply-To: <1515542948-24041-1-git-send-email-megha.dey@linux.intel.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This patch implements in-order scheduler for encrypting multiple buffers
-in parallel supporting AES CBC encryption with key sizes of
-128, 192 and 256 bits. It uses 8 data lanes by taking advantage of the
-SIMD instructions with XMM registers.
+This patch introduces the assembly routine to do a by8 AES CBC
+encryption in support of the AES CBC multi-buffer implementation.
 
-The multibuffer manager and scheduler is mostly written in assembly and
-the initialization support is written C. The AES CBC multibuffer crypto
-driver support interfaces with the multibuffer manager and scheduler
-to support AES CBC encryption in parallel. The scheduler supports
-job submissions, job flushing and and job retrievals after completion.
-
-The basic flow of usage of the CBC multibuffer scheduler is as follows:
-
-- The caller allocates an aes_cbc_mb_mgr_inorder_x8 object
-and initializes it once by calling aes_cbc_init_mb_mgr_inorder_x8().
-
-- The aes_cbc_mb_mgr_inorder_x8 structure has an array of JOB_AES
-objects. Allocation and scheduling of JOB_AES objects are managed
-by the multibuffer scheduler support routines. The caller allocates
-a JOB_AES using aes_cbc_get_next_job_inorder_x8().
-
-- The returned JOB_AES must be filled in with parameters for CBC
-encryption (eg: plaintext buffer, ciphertext buffer, key, iv, etc) and
-submitted to the manager object using aes_cbc_submit_job_inorder_xx().
-
-- If the oldest JOB_AES is completed during a call to
-aes_cbc_submit_job_inorder_x8(), it is returned. Otherwise,
-NULL is returned.
-
-- A call to aes_cbc_flush_job_inorder_x8() always returns the
-oldest job, unless the multibuffer manager is empty of jobs.
-
-- A call to aes_cbc_get_completed_job_inorder_x8() returns
-a completed job. This routine is useful to process completed
-jobs instead of waiting for the flusher to engage.
-
-- When a job is returned from submit or flush, the caller extracts
-the useful data and returns it to the multibuffer manager implicitly
-by the next call to aes_cbc_get_next_job_xx().
-
-Jobs are always returned from submit or flush routines in the order they
-were submitted (hence "inorder").A job allocated using
-aes_cbc_get_next_job_inorder_x8() must be filled in and submitted before
-another call. A job returned by aes_cbc_submit_job_inorder_x8() or
-aes_cbc_flush_job_inorder_x8() is 'deallocated' upon the next call to
-get a job structure. Calls to get_next_job() cannot fail. If all jobs
-are allocated after a call to get_next_job(), the subsequent call to submit
-always returns the oldest job in a completed state.
+It encrypts 8 data streams of the same key size simultaneously.
 
 Originally-by: Chandramouli Narayanan <mouli_7982@yahoo.com>
 Signed-off-by: Megha Dey <megha.dey@linux.intel.com>
 Acked-by: Tim Chen <tim.c.chen@linux.intel.com>
 ---
- arch/x86/crypto/aes-cbc-mb/aes_mb_mgr_init.c       | 146 ++++++++
- arch/x86/crypto/aes-cbc-mb/mb_mgr_inorder_x8_asm.S | 223 +++++++++++
- arch/x86/crypto/aes-cbc-mb/mb_mgr_ooo_x8_asm.S     | 417 +++++++++++++++++++++
- 3 files changed, 786 insertions(+)
- create mode 100644 arch/x86/crypto/aes-cbc-mb/aes_mb_mgr_init.c
- create mode 100644 arch/x86/crypto/aes-cbc-mb/mb_mgr_inorder_x8_asm.S
- create mode 100644 arch/x86/crypto/aes-cbc-mb/mb_mgr_ooo_x8_asm.S
+ arch/x86/crypto/aes-cbc-mb/aes_cbc_enc_x8.S | 775 ++++++++++++++++++++++++++++
+ 1 file changed, 775 insertions(+)
+ create mode 100644 arch/x86/crypto/aes-cbc-mb/aes_cbc_enc_x8.S
 
-diff --git a/arch/x86/crypto/aes-cbc-mb/aes_mb_mgr_init.c b/arch/x86/crypto/aes-cbc-mb/aes_mb_mgr_init.c
+diff --git a/arch/x86/crypto/aes-cbc-mb/aes_cbc_enc_x8.S b/arch/x86/crypto/aes-cbc-mb/aes_cbc_enc_x8.S
 new file mode 100644
-index 0000000..2a2ce6c
+index 0000000..2130574
 --- /dev/null
-+++ b/arch/x86/crypto/aes-cbc-mb/aes_mb_mgr_init.c
-@@ -0,0 +1,146 @@
++++ b/arch/x86/crypto/aes-cbc-mb/aes_cbc_enc_x8.S
+@@ -0,0 +1,775 @@
 +/*
-+ * Initialization code for multi buffer AES CBC algorithm
-+ *
-+ *
-+ * This file is provided under a dual BSD/GPLv2 license.  When using or
-+ * redistributing this file, you may do so under either license.
-+ *
-+ * GPL LICENSE SUMMARY
-+ *
-+ * Copyright(c) 2016 Intel Corporation.
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of version 2 of the GNU General Public License as
-+ * published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful, but
-+ * WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * General Public License for more details.
-+ *
-+ * Contact Information:
-+ * James Guilford <james.guilford@intel.com>
-+ * Sean Gulley <sean.m.gulley@intel.com>
-+ * Tim Chen <tim.c.chen@linux.intel.com>
-+ * Megha Dey <megha.dey@linux.intel.com>
-+ *
-+ * BSD LICENSE
-+ *
-+ * Copyright(c) 2016 Intel Corporation.
-+ *
-+ * Redistribution and use in source and binary forms, with or without
-+ * modification, are permitted provided that the following conditions
-+ * are met:
-+ *
-+ * Redistributions of source code must retain the above copyright
-+ * notice, this list of conditions and the following disclaimer.
-+ * Redistributions in binary form must reproduce the above copyright
-+ * notice, this list of conditions and the following disclaimer in
-+ * the documentation and/or other materials provided with the
-+ * distribution.
-+ * Neither the name of Intel Corporation nor the names of its
-+ * contributors may be used to endorse or promote products derived
-+ * from this software without specific prior written permission.
-+ *
-+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-+ *
-+ */
-+
-+#include "aes_cbc_mb_mgr.h"
-+
-+void aes_cbc_init_mb_mgr_inorder_x8(struct aes_cbc_mb_mgr_inorder_x8 *state)
-+{
-+	/* Init "out of order" components */
-+	state->unused_lanes = 0xF76543210;
-+	state->job_in_lane[0] = NULL;
-+	state->job_in_lane[1] = NULL;
-+	state->job_in_lane[2] = NULL;
-+	state->job_in_lane[3] = NULL;
-+	state->job_in_lane[4] = NULL;
-+	state->job_in_lane[5] = NULL;
-+	state->job_in_lane[6] = NULL;
-+	state->job_in_lane[7] = NULL;
-+
-+	/* Init "in order" components */
-+	state->next_job = 0;
-+	state->earliest_job = -1;
-+
-+}
-+
-+#define JOBS(offset) ((struct job_aes_cbc *)(((u64)state->jobs)+offset))
-+
-+struct job_aes_cbc *
-+aes_cbc_get_next_job_inorder_x8(struct aes_cbc_mb_mgr_inorder_x8 *state)
-+{
-+	return JOBS(state->next_job);
-+}
-+
-+struct job_aes_cbc *
-+aes_cbc_flush_job_inorder_x8(struct aes_cbc_mb_mgr_inorder_x8 *state)
-+{
-+	struct job_aes_cbc *job;
-+
-+	/* checking earliest_job < 0 fails and the code walks over bogus */
-+	if (state->earliest_job == -1)
-+		return NULL; /* empty */
-+
-+	job = JOBS(state->earliest_job);
-+	while (job->status != STS_COMPLETED) {
-+		switch (job->key_len) {
-+		case AES_KEYSIZE_128:
-+			aes_cbc_flush_job_ooo_128x8(state);
-+			break;
-+		case AES_KEYSIZE_192:
-+			aes_cbc_flush_job_ooo_192x8(state);
-+			break;
-+		case AES_KEYSIZE_256:
-+			aes_cbc_flush_job_ooo_256x8(state);
-+			break;
-+		default:
-+			break;
-+		}
-+	}
-+
-+	/* advance earliest job */
-+	state->earliest_job += sizeof(struct job_aes_cbc);
-+	if (state->earliest_job == MAX_AES_JOBS * sizeof(struct job_aes_cbc))
-+		state->earliest_job = 0;
-+
-+	if (state->earliest_job == state->next_job)
-+		state->earliest_job = -1;
-+
-+	return job;
-+}
-+
-+struct job_aes_cbc *
-+aes_cbc_get_completed_job_inorder_x8(struct aes_cbc_mb_mgr_inorder_x8 *state)
-+{
-+	struct job_aes_cbc *job;
-+
-+	if (state->earliest_job == -1)
-+		return NULL; /* empty */
-+
-+	job = JOBS(state->earliest_job);
-+	if (job->status != STS_COMPLETED)
-+		return NULL;
-+
-+	state->earliest_job += sizeof(struct job_aes_cbc);
-+
-+	if (state->earliest_job == MAX_AES_JOBS * sizeof(struct job_aes_cbc))
-+		state->earliest_job = 0;
-+	if (state->earliest_job == state->next_job)
-+		state->earliest_job = -1;
-+
-+	/* we have a completed job */
-+	return job;
-+}
-diff --git a/arch/x86/crypto/aes-cbc-mb/mb_mgr_inorder_x8_asm.S b/arch/x86/crypto/aes-cbc-mb/mb_mgr_inorder_x8_asm.S
-new file mode 100644
-index 0000000..5108875
---- /dev/null
-+++ b/arch/x86/crypto/aes-cbc-mb/mb_mgr_inorder_x8_asm.S
-@@ -0,0 +1,223 @@
-+/*
-+ *	AES CBC by8 multibuffer inorder scheduler optimization (x86_64)
++ *	AES CBC by8 multibuffer optimization (x86_64)
++ *	This file implements 128/192/256 bit AES CBC encryption
 + *
 + *
 + * This file is provided under a dual BSD/GPLv2 license.  When using or
@@ -288,593 +89,721 @@ index 0000000..5108875
 + *
 + */
 +#include <linux/linkage.h>
-+#include "mb_mgr_datastruct.S"
-+#include "reg_sizes.S"
 +
-+#define JUMP
++/* stack size needs to be an odd multiple of 8 for alignment */
 +
-+#define arg1	%rdi
-+#define arg2	%rsi
-+#define state	arg1
++#define AES_KEYSIZE_128        16
++#define AES_KEYSIZE_192        24
++#define AES_KEYSIZE_256        32
 +
-+/* virtual registers used by submit_job_aes_inorder_x8 */
-+#define next_job	%rdx
-+#define earliest_job	%rcx
-+#define zero		%r8
-+#define returned_job	%rax	/* register that returns a value from func */
++#define XMM_SAVE_SIZE	16*10
++#define GPR_SAVE_SIZE	8*9
++#define STACK_SIZE	(XMM_SAVE_SIZE + GPR_SAVE_SIZE)
 +
-+.extern aes_cbc_submit_job_ooo_128x8
-+.extern aes_cbc_submit_job_ooo_192x8
-+.extern aes_cbc_submit_job_ooo_256x8
-+.extern aes_cbc_flush_job_ooo_128x8
-+.extern aes_cbc_flush_job_ooo_192x8
-+.extern aes_cbc_flush_job_ooo_256x8
-+.extern aes_cbc_flush_job_ooo_x8
++#define GPR_SAVE_REG	%rsp
++#define GPR_SAVE_AREA	%rsp + XMM_SAVE_SIZE
++#define LEN_AREA_OFFSET	XMM_SAVE_SIZE + 8*8
++#define LEN_AREA_REG	%rsp
++#define LEN_AREA	%rsp + XMM_SAVE_SIZE + 8*8
++
++#define IN_OFFSET	0
++#define OUT_OFFSET	8*8
++#define KEYS_OFFSET	16*8
++#define IV_OFFSET	24*8
++
++
++#define IDX	%rax
++#define TMP	%rbx
++#define ARG	%rdi
++#define LEN	%rsi
++
++#define KEYS0	%r14
++#define KEYS1	%r15
++#define KEYS2	%rbp
++#define KEYS3	%rdx
++#define KEYS4	%rcx
++#define KEYS5	%r8
++#define KEYS6	%r9
++#define KEYS7	%r10
++
++#define IN0	%r11
++#define IN2	%r12
++#define IN4	%r13
++#define IN6	LEN
++
++#define XDATA0	%xmm0
++#define XDATA1	%xmm1
++#define XDATA2	%xmm2
++#define XDATA3	%xmm3
++#define XDATA4	%xmm4
++#define XDATA5	%xmm5
++#define XDATA6	%xmm6
++#define XDATA7	%xmm7
++
++#define XKEY0_3	%xmm8
++#define XKEY1_4	%xmm9
++#define XKEY2_5	%xmm10
++#define XKEY3_6	%xmm11
++#define XKEY4_7	%xmm12
++#define XKEY5_8	%xmm13
++#define XKEY6_9	%xmm14
++#define XTMP	%xmm15
++
++#define	MOVDQ movdqu /* assume buffers not aligned */
++#define CONCAT(a, b)	a##b
++#define INPUT_REG_SUFX	1	/* IN */
++#define XDATA_REG_SUFX	2	/* XDAT */
++#define KEY_REG_SUFX	3	/* KEY */
++#define XMM_REG_SUFX	4	/* XMM */
 +
 +/*
-+ * struct job_aes* aes_cbc_submit_job_inorder_x8(
-+ *		struct aes_cbc_mb_mgr_inorder_x8 *state)
++ * To avoid positional parameter errors while compiling
++ * three registers need to be passed
 + */
-+
-+.macro aes_cbc_submit_job_inorder_x8 key_len
-+
-+	sub	$8, %rsp	/* align stack for next calls */
-+
-+	mov	_next_job(state), DWORD(next_job)
-+	lea	_jobs(state, next_job), arg2
-+
-+	.if \key_len == AES_KEYSIZE_128
-+		call	aes_cbc_submit_job_ooo_128x8
-+	.elseif \key_len == AES_KEYSIZE_192
-+		call	aes_cbc_submit_job_ooo_192x8
-+	.elseif \key_len == AES_KEYSIZE_256
-+		call	aes_cbc_submit_job_ooo_256x8
-+	.endif
-+
-+	mov	_earliest_job(state), DWORD(earliest_job)
-+	cmp	$0, DWORD(earliest_job)
-+	jl	.Lstate_was_empty\key_len
-+
-+	/* we have a valid earliest_job */
-+
-+	/* advance next_job */
-+	mov	_next_job(state), DWORD(next_job)
-+	add	$_JOB_AES_size, next_job
-+#ifdef JUMP
-+	cmp	$(MAX_AES_JOBS * _JOB_AES_size), next_job
-+	jne	.Lskip1\key_len
-+	xor	next_job, next_job
-+.Lskip1\key_len:
-+#else
-+	xor	zero,zero
-+	cmp	$(MAX_AES_JOBS * _JOB_AES_size), next_job
-+	cmove	zero, next_job
-+#endif
-+	mov	DWORD(next_job), _next_job(state)
-+
-+	lea	_jobs(state, earliest_job), returned_job
-+	cmp	next_job, earliest_job
-+	je	.Lfull\key_len
-+
-+	/* not full */
-+	cmpl	$STS_COMPLETED, _status(returned_job)
-+	jne	.Lreturn_null\key_len
-+
-+	/* advance earliest_job */
-+	add	$_JOB_AES_size, earliest_job
-+	cmp	$(MAX_AES_JOBS * _JOB_AES_size), earliest_job
-+#ifdef JUMP
-+	jne	.Lskip2\key_len
-+	xor	earliest_job, earliest_job
-+.Lskip2\key_len:
-+#else
-+	cmove	zero, earliest_job
-+#endif
-+
-+	add	$8, %rsp
-+	mov	DWORD(earliest_job), _earliest_job(state)
-+	ret
-+
-+.Lreturn_null\key_len:
-+	add	$8, %rsp
-+	xor	returned_job, returned_job
-+	ret
-+
-+.Lfull\key_len:
-+	cmpl	$STS_COMPLETED, _status(returned_job)
-+	je	.Lcompleted\key_len
-+	mov	earliest_job, (%rsp)
-+.Lflush_loop\key_len:
-+	.if \key_len == AES_KEYSIZE_128
-+		call	aes_cbc_flush_job_ooo_128x8
-+	.elseif \key_len == AES_KEYSIZE_192
-+		call	aes_cbc_flush_job_ooo_192x8
-+	.elseif \key_len == AES_KEYSIZE_256
-+		call	aes_cbc_flush_job_ooo_256x8
-+	.endif
-+	/* state is still valid */
-+	mov	(%rsp), earliest_job
-+	cmpl	$STS_COMPLETED, _status(returned_job)
-+	jne	.Lflush_loop\key_len
-+	xor	zero,zero
-+.Lcompleted\key_len:
-+	/* advance earliest_job */
-+	add	$_JOB_AES_size, earliest_job
-+	cmp	$(MAX_AES_JOBS * _JOB_AES_size), earliest_job
-+#ifdef JUMP
-+	jne	.Lskip3\key_len
-+	xor	earliest_job, earliest_job
-+.Lskip3\key_len:
-+#else
-+	cmove	zero, earliest_job
-+#endif
-+
-+	add	$8, %rsp
-+	mov	DWORD(earliest_job), _earliest_job(state)
-+	ret
-+
-+.Lstate_was_empty\key_len:
-+	mov	_next_job(state), DWORD(next_job)
-+	mov	DWORD(next_job), _earliest_job(state)
-+
-+	/* advance next_job */
-+	add	$_JOB_AES_size, next_job
-+#ifdef JUMP
-+	cmp	$(MAX_AES_JOBS * _JOB_AES_size), next_job
-+	jne	.Lskip4\key_len
-+	xor	next_job, next_job
-+.Lskip4\key_len:
-+#else
-+	xor	zero,zero
-+	cmp	$(MAX_AES_JOBS * _JOB_AES_size), next_job
-+	cmove	zero, next_job
-+#endif
-+	mov	DWORD(next_job), _next_job(state)
-+
-+	add	$8, %rsp
-+	xor	returned_job, returned_job
-+	ret
-+.endm
-+
-+ENTRY(aes_cbc_submit_job_inorder_128x8)
-+
-+	aes_cbc_submit_job_inorder_x8 AES_KEYSIZE_128
-+
-+ENDPROC(aes_cbc_submit_job_inorder_128x8)
-+
-+ENTRY(aes_cbc_submit_job_inorder_192x8)
-+
-+	aes_cbc_submit_job_inorder_x8 AES_KEYSIZE_192
-+
-+ENDPROC(aes_cbc_submit_job_inorder_192x8)
-+
-+ENTRY(aes_cbc_submit_job_inorder_256x8)
-+
-+	aes_cbc_submit_job_inorder_x8 AES_KEYSIZE_256
-+
-+ENDPROC(aes_cbc_submit_job_inorder_256x8)
-diff --git a/arch/x86/crypto/aes-cbc-mb/mb_mgr_ooo_x8_asm.S b/arch/x86/crypto/aes-cbc-mb/mb_mgr_ooo_x8_asm.S
-new file mode 100644
-index 0000000..351f30f
---- /dev/null
-+++ b/arch/x86/crypto/aes-cbc-mb/mb_mgr_ooo_x8_asm.S
-@@ -0,0 +1,417 @@
-+/*
-+ *	AES CBC by8 multibuffer out-of-order scheduler optimization (x86_64)
-+ *
-+ *
-+ * This file is provided under a dual BSD/GPLv2 license.  When using or
-+ * redistributing this file, you may do so under either license.
-+ *
-+ * GPL LICENSE SUMMARY
-+ *
-+ * Copyright(c) 2016 Intel Corporation.
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of version 2 of the GNU General Public License as
-+ * published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful, but
-+ * WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * General Public License for more details.
-+ *
-+ * Contact Information:
-+ * James Guilford <james.guilford@intel.com>
-+ * Sean Gulley <sean.m.gulley@intel.com>
-+ * Tim Chen <tim.c.chen@linux.intel.com>
-+ * Megha Dey <megha.dey@linux.intel.com>
-+ *
-+ * BSD LICENSE
-+ *
-+ * Copyright(c) 2016 Intel Corporation.
-+ *
-+ * Redistribution and use in source and binary forms, with or without
-+ * modification, are permitted provided that the following conditions
-+ * are met:
-+ *
-+ * Redistributions of source code must retain the above copyright
-+ * notice, this list of conditions and the following disclaimer.
-+ * Redistributions in binary form must reproduce the above copyright
-+ * notice, this list of conditions and the following disclaimer in
-+ * the documentation and/or other materials provided with the
-+ * distribution.
-+ * Neither the name of Intel Corporation nor the names of its
-+ * contributors may be used to endorse or promote products derived
-+ * from this software without specific prior written permission.
-+ *
-+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-+ *
-+ */
-+
-+#include <linux/linkage.h>
-+#include "mb_mgr_datastruct.S"
-+#include "reg_sizes.S"
-+
-+#define arg1	%rdi
-+#define arg2	%rsi
-+#define state	arg1
-+#define job	arg2
-+
-+/* virtual registers used by aes_cbc_submit_job_ooo_x8 */
-+#define unused_lanes	%rax
-+#define lane		%rdx
-+#define	tmp1		%rcx
-+#define	tmp2		%r8
-+#define	tmp3		%r9
-+#define len		tmp1
-+
-+#define good_lane	lane
-+
-+/* virtual registers used by aes_cbc_submit_job_inorder_x8 */
-+#define new_job		%rdx
-+#define earliest_job	%rcx
-+#define minus1		%r8
-+#define returned_job	%rax	/* register that returns a value from func */
-+
-+.section .rodata
-+.align 16
-+len_masks:
-+	.octa 0x0000000000000000000000000000FFFF
-+	.octa 0x000000000000000000000000FFFF0000
-+	.octa 0x00000000000000000000FFFF00000000
-+	.octa 0x0000000000000000FFFF000000000000
-+	.octa 0x000000000000FFFF0000000000000000
-+	.octa 0x00000000FFFF00000000000000000000
-+	.octa 0x0000FFFF000000000000000000000000
-+	.octa 0xFFFF0000000000000000000000000000
-+
-+dupw:
-+	.octa 0x01000100010001000100010001000100
-+
-+one:	.quad  1
-+two:	.quad  2
-+three:	.quad  3
-+four:	.quad  4
-+five:	.quad  5
-+six:	.quad  6
-+seven:	.quad  7
-+
 +.text
 +
-+.extern aes_cbc_enc_128_x8
-+.extern aes_cbc_enc_192_x8
-+.extern aes_cbc_enc_256_x8
-+
-+/* arg1/state remains intact after call */
-+/*
-+ * void aes_cbc_submit_job__ooo_128x8(
-+ *	struct aes_cbc_mb_mgr_aes_inorder_x8 *state,
-+ *	struct job_aes_cbc *job);
-+ * void aes_cbc_submit_job__ooo_192x8(
-+ *	struct aes_cbc_mb_mgr_aes_inorder_x8 *state,
-+ *	struct job_aes_cbc *job);
-+ * void aes_cbc_submit_job__ooo_256x8(
-+ *	struct aes_cbc_mb_mgr_aes_inorder_x8 *state,
-+ *	struct job_aes_cbc *job);
-+ */
-+
-+.global aes_cbc_submit_job_ooo_128x8
-+.global aes_cbc_submit_job_ooo_192x8
-+.global aes_cbc_submit_job_ooo_256x8
-+
-+
-+.macro aes_cbc_submit_job_ooo_x8 key_len
-+
-+	mov	_unused_lanes(state), unused_lanes
-+	mov	unused_lanes, lane
-+	and	$0xF, lane
-+	shr	$4, unused_lanes
-+
-+	/* state->job_in_lane[lane] = job; */
-+	mov	job, _job_in_lane(state, lane, 8)
-+
-+	/*state->lens[lane] = job->len / AES_BLOCK_SIZE; */
-+	mov	_len(job), DWORD(len)
-+	shr	$4, len
-+	mov	WORD(len), _lens(state, lane, 2)
-+
-+	mov	_plaintext(job), tmp1
-+	mov	_ciphertext(job), tmp2
-+	mov	_keys(job), tmp3
-+	movdqu	_IV(job), %xmm2
-+	mov	tmp1, _args_in(state, lane, 8)
-+	mov	tmp2, _args_out(state , lane, 8)
-+	mov	tmp3, _args_keys(state, lane, 8)
-+	shl	$4, lane
-+	movdqa	%xmm2, _args_IV(state , lane)
-+
-+	movl	$STS_BEING_PROCESSED, _status(job)
-+
-+	mov	unused_lanes, _unused_lanes(state)
-+	cmp	$0xF, unused_lanes
-+	jne	.Lnot_enough_jobs\key_len
-+
-+	movdqa	_lens(state), %xmm0
-+	phminposuw	%xmm0, %xmm1
-+	/*
-+	 * xmm1{15:0} = min value
-+	 * xmm1{18:16} = index of min
-+	 */
-+
-+	/*
-+	 * arg1 = rcx = state = args (and it is not clobbered by routine)
-+	 * arg2 = rdx = min len
-+	 */
-+	movd	%xmm1, arg2
-+	and	$0xFFFF, arg2
-+
-+	/* subtract min len from lengths */
-+	pshufb	dupw(%rip), %xmm1	/* duplicate words across all lanes */
-+	psubw	%xmm1, %xmm0
-+	movdqa	%xmm0, _lens(state)
-+
-+	/* need to align stack */
-+	sub	$8, %rsp
-+	.if \key_len == AES_KEYSIZE_128
-+		call aes_cbc_enc_128_x8
-+	.elseif \key_len == AES_KEYSIZE_192
-+		call aes_cbc_enc_192_x8
-+	.elseif \key_len == AES_KEYSIZE_256
-+		call aes_cbc_enc_256_x8
-+	.endif
-+	add	$8, %rsp
-+	/* arg1/state is still intact */
-+
-+	/* process completed jobs */
-+	movdqa	_lens(state), %xmm0
-+	phminposuw	%xmm0, %xmm1
-+	/*
-+	 * xmm1{15:0} = min value
-+	 * xmm1{18:16} = index of min
-+	 */
-+
-+	/*
-+	 * at this point at least one len should be 0
-+	 * so min value should be 0
-+	 * and the index is the index of that lane [0...7]
-+	 */
-+	lea	len_masks(%rip), tmp3
-+	mov	_unused_lanes(state), unused_lanes
-+	movd	%xmm1, lane
-+.Lcontinue_loop\key_len:
-+	/* assert((lane & 0xFFFF) == 0) */
-+	shr	$16, lane	/* lane is now index */
-+	mov	_job_in_lane(state, lane, 8), job
-+	movl	$STS_COMPLETED, _status(job)
-+	movq	$0, _job_in_lane(state ,lane, 8)
-+	shl	$4, unused_lanes
-+	or	lane, unused_lanes
-+	shl	$4, lane
-+	movdqa	_args_IV(state,lane), %xmm2
-+	movdqu	%xmm2, _IV(job)
-+	por	(tmp3, lane), %xmm0
-+
-+	phminposuw	%xmm0, %xmm1
-+	movd	%xmm1, lane
-+	/* see if bits 15:0 are zero */
-+	test	$0xFFFF, lane
-+	jz	.Lcontinue_loop\key_len
-+
-+	/* done; save registers */
-+	mov	unused_lanes, _unused_lanes(state)
-+	/* don't need to save xmm0/lens */
-+
-+.Lnot_enough_jobs\key_len:
-+	ret
++.macro pxor2 x, y, z
++	MOVDQ	(\x,\y), XTMP
++	pxor	XTMP, \z
 +.endm
 +
-+ENTRY(aes_cbc_submit_job_ooo_128x8)
++.macro inreg n
++	.if (\n == 0)
++		reg_IN = IN0
++	.elseif (\n == 2)
++		reg_IN = IN2
++	.elseif (\n == 4)
++		reg_IN = IN4
++	.elseif (\n == 6)
++		reg_IN = IN6
++	.else
++		error "inreg: incorrect register number"
++	.endif
++.endm
++.macro xdatareg n
++	.if (\n == 0)
++		reg_XDAT = XDATA0
++	.elseif (\n == 1)
++		reg_XDAT = XDATA1
++	.elseif (\n == 2)
++		reg_XDAT = XDATA2
++	.elseif (\n == 3)
++		reg_XDAT = XDATA3
++	.elseif (\n == 4)
++		reg_XDAT = XDATA4
++	.elseif (\n == 5)
++		reg_XDAT = XDATA5
++	.elseif (\n == 6)
++		reg_XDAT = XDATA6
++	.elseif (\n == 7)
++		reg_XDAT = XDATA7
++	.endif
++.endm
++.macro xkeyreg n
++	.if (\n == 0)
++		reg_KEY = KEYS0
++	.elseif (\n == 1)
++		reg_KEY = KEYS1
++	.elseif (\n == 2)
++		reg_KEY = KEYS2
++	.elseif (\n == 3)
++		reg_KEY = KEYS3
++	.elseif (\n == 4)
++		reg_KEY = KEYS4
++	.elseif (\n == 5)
++		reg_KEY = KEYS5
++	.elseif (\n == 6)
++		reg_KEY = KEYS6
++	.elseif (\n == 7)
++		reg_KEY = KEYS7
++	.endif
++.endm
++.macro xmmreg n
++	.if (\n >= 0) && (\n < 16)
++		/* Valid register number */
++		reg_XMM = %xmm\n
++	.else
++		error "xmmreg: incorrect register number"
++	.endif
++.endm
 +
-+	aes_cbc_submit_job_ooo_x8 AES_KEYSIZE_128
-+
-+ENDPROC(aes_cbc_submit_job_ooo_128x8)
-+
-+ENTRY(aes_cbc_submit_job_ooo_192x8)
-+
-+	aes_cbc_submit_job_ooo_x8 AES_KEYSIZE_192
-+
-+ENDPROC(aes_cbc_submit_job_ooo_192x8)
-+
-+ENTRY(aes_cbc_submit_job_ooo_256x8)
-+
-+	aes_cbc_submit_job_ooo_x8 AES_KEYSIZE_256
-+
-+ENDPROC(aes_cbc_submit_job_ooo_256x8)
-+
-+
-+/* arg1/state remains intact after call */
 +/*
-+ * void aes_cbc_flush_job_ooo_128x8(
-+ *	struct aes_cbc_mb_mgr_aes_inorder_x8 *state)
-+ * void aes_cbc_flush_job_ooo_192x8(
-+ *	struct aes_cbc_mb_mgr_aes_inorder_x8 *state)
-+ * void aes_cbc_flush_job_ooo_256x8(
-+ *	struct aes_cbc_mb_mgr_aes_inorder_x8 *state)
++ * suffix - register suffix
++ * set up the register name using the loop index I
 + */
-+.global aes_cbc_flush_job_ooo_128x8
-+.global aes_cbc_flush_job_ooo_192x8
-+.global aes_cbc_flush_job_ooo_256x8
++.macro define_reg suffix
++.altmacro
++	.if (\suffix == INPUT_REG_SUFX)
++		inreg  %I
++	.elseif (\suffix == XDATA_REG_SUFX)
++		xdatareg  %I
++	.elseif (\suffix == KEY_REG_SUFX)
++		xkeyreg  %I
++	.elseif (\suffix == XMM_REG_SUFX)
++		xmmreg  %I
++	.else
++		error "define_reg: unknown register suffix"
++	.endif
++.noaltmacro
++.endm
 +
-+.macro aes_cbc_flush_job_ooo_x8 key_len
++/*
++ * aes_cbc_enc_x8 key_len
++ * macro to encode data for 128bit, 192bit and 256bit keys
++ */
 +
-+	mov	_unused_lanes(state), unused_lanes
++.macro aes_cbc_enc_x8 key_len
 +
-+	/* if bit (32+3) is set, then all lanes are empty */
-+	bt	$(32+3), unused_lanes
-+	jc	.Lreturn\key_len
++	sub	$STACK_SIZE, %rsp
 +
-+	/* find a lane with a non-null job */
-+	xor	good_lane, good_lane
-+	cmpq	$0, (_job_in_lane+8*1)(state)
-+	cmovne	one(%rip), good_lane
-+	cmpq	$0, (_job_in_lane+8*2)(state)
-+	cmovne	two(%rip), good_lane
-+	cmpq	$0, (_job_in_lane+8*3)(state)
-+	cmovne	three(%rip), good_lane
-+	cmpq	$0, (_job_in_lane+8*4)(state)
-+	cmovne	four(%rip), good_lane
-+	cmpq	$0, (_job_in_lane+8*5)(state)
-+	cmovne	five(%rip), good_lane
-+	cmpq	$0, (_job_in_lane+8*6)(state)
-+	cmovne	six(%rip), good_lane
-+	cmpq	$0, (_job_in_lane+8*7)(state)
-+	cmovne	seven(%rip), good_lane
++	mov	%rbx, (XMM_SAVE_SIZE + 8*0)(GPR_SAVE_REG)
++	mov	%rbp, (XMM_SAVE_SIZE + 8*3)(GPR_SAVE_REG)
++	mov	%r12, (XMM_SAVE_SIZE + 8*4)(GPR_SAVE_REG)
++	mov	%r13, (XMM_SAVE_SIZE + 8*5)(GPR_SAVE_REG)
++	mov	%r14, (XMM_SAVE_SIZE + 8*6)(GPR_SAVE_REG)
++	mov	%r15, (XMM_SAVE_SIZE + 8*7)(GPR_SAVE_REG)
 +
-+	/* copy good_lane to empty lanes */
-+	mov	_args_in(state, good_lane, 8), tmp1
-+	mov	_args_out(state, good_lane, 8), tmp2
-+	mov	_args_keys(state, good_lane, 8), tmp3
-+	shl	$4, good_lane
-+	movdqa	_args_IV(state, good_lane), %xmm2
++	mov	$16, IDX
++	shl	$4, LEN	/* LEN = LEN * 16 */
++	/* LEN is now in terms of bytes */
++	mov	LEN, (LEN_AREA_OFFSET)(LEN_AREA_REG)
 +
-+	movdqa	_lens(state), %xmm0
++	/* Run through storing arguments in IN0,2,4,6 */
++	I = 0
++	.rept 4
++		define_reg	INPUT_REG_SUFX
++		mov	(IN_OFFSET + 8*I)(ARG), reg_IN
++		I = (I + 2)
++	.endr
++
++	/* load 1 .. 8 blocks of plain text into XDATA0..XDATA7 */
++	I = 0
++	.rept 4
++		mov		(IN_OFFSET + 8*(I+1))(ARG), TMP
++		define_reg	INPUT_REG_SUFX
++		define_reg	XDATA_REG_SUFX
++		/* load first block of plain text */
++		MOVDQ		(reg_IN), reg_XDAT
++		I = (I + 1)
++		define_reg	XDATA_REG_SUFX
++		/* load next block of plain text */
++		MOVDQ		(TMP), reg_XDAT
++		I = (I + 1)
++	.endr
++
++	/* Run through XDATA0 .. XDATA7 to perform plaintext XOR IV */
++	I = 0
++	.rept 8
++		define_reg	XDATA_REG_SUFX
++		pxor	(IV_OFFSET + 16*I)(ARG), reg_XDAT
++		I = (I + 1)
++	.endr
 +
 +	I = 0
-+
-+.altmacro
 +	.rept 8
-+		cmpq	$0, (_job_in_lane + 8*I)(state)
-+		.if \key_len == AES_KEYSIZE_128
-+			cond_jump jne, .Lskip128_,%I
-+		.elseif \key_len == AES_KEYSIZE_192
-+			cond_jump jne, .Lskip192_,%I
-+		.elseif \key_len == AES_KEYSIZE_256
-+			cond_jump jne, .Lskip256_,%I
-+		.endif
-+		mov	tmp1, (_args_in + 8*I)(state)
-+		mov	tmp2, (_args_out + 8*I)(state)
-+		mov	tmp3, (_args_keys + 8*I)(state)
-+		movdqa	%xmm2, (_args_IV + 16*I)(state)
-+		por	(len_masks + 16*I)(%rip), %xmm0
-+		.if \key_len == AES_KEYSIZE_128
-+			LABEL .Lskip128_,%I
-+		.elseif \key_len == AES_KEYSIZE_192
-+			LABEL .Lskip192_,%I
-+		.elseif \key_len == AES_KEYSIZE_256
-+			LABEL .Lskip256_,%I
-+		.endif
-+		I = (I+1)
++		define_reg	KEY_REG_SUFX
++		mov	(KEYS_OFFSET + 8*I)(ARG), reg_KEY
++		I = (I + 1)
 +	.endr
-+.noaltmacro
 +
-+	phminposuw	%xmm0, %xmm1
++	I = 0
++	/* 0..7 ARK */
++	.rept 8
++		define_reg	XDATA_REG_SUFX
++		define_reg	KEY_REG_SUFX
++		pxor	16*0(reg_KEY), reg_XDAT
++		I = (I + 1)
++	.endr
++
++	I = 0
++		/* 1. ENC */
++	.rept 8
++		define_reg	XDATA_REG_SUFX
++		define_reg	KEY_REG_SUFX
++		aesenc	(16*1)(reg_KEY), reg_XDAT
++		I = (I + 1)
++	.endr
++
++	movdqa		16*3(KEYS0), XKEY0_3	/* load round 3 key */
++
++	I = 0
++		/* 2. ENC */
++	.rept 8
++		define_reg	XDATA_REG_SUFX
++		define_reg	KEY_REG_SUFX
++		aesenc	(16*2)(reg_KEY), reg_XDAT
++		I = (I + 1)
++	.endr
++
++	movdqa		16*4(KEYS1), XKEY1_4	/* load round 4 key */
++
++		/* 3. ENC */
++	aesenc		XKEY0_3, XDATA0
++	I = 1
++	.rept 7
++		define_reg	XDATA_REG_SUFX
++		define_reg	KEY_REG_SUFX
++		aesenc	(16*3)(reg_KEY), reg_XDAT
++		I = (I + 1)
++	.endr
++
 +	/*
-+	 * xmm1{15:0} = min value
-+	 * xmm1{18:16} = index of min
++	 * FIXME:
++	 * why can't we reorder encrypt DATA0..DATA7 and load 5th round?
 +	 */
++	aesenc		(16*4)(KEYS0), XDATA0		/* 4. ENC */
++	movdqa		16*5(KEYS2), XKEY2_5		/* load round 5 key */
++	aesenc		XKEY1_4, XDATA1			/* 4. ENC */
 +
-+	/*
-+	 * arg1 = rcx = state = args (and it is not clobbered by routine)
-+	 * arg2 = rdx = min len
-+	 */
-+	movd	%xmm1, arg2
-+	and	$0xFFFF, arg2
++	I = 2
++	.rept 6
++		define_reg	XDATA_REG_SUFX
++		define_reg	KEY_REG_SUFX
++		aesenc	(16*4)(reg_KEY), reg_XDAT
++		I = (I + 1)
++	.endr
 +
-+	/* subtract min len from lengths */
-+	pshufb	dupw(%rip), %xmm1	/* duplicate words across all lanes */
-+	psubw	%xmm1, %xmm0
-+	movdqa	%xmm0, _lens(state)
++	aesenc		(16*5)(KEYS0), XDATA0		/* 5. ENC */
++	aesenc		(16*5)(KEYS1), XDATA1		/* 5. ENC */
++	movdqa		16*6(KEYS3), XKEY3_6		/* load round 6 key */
++	aesenc		XKEY2_5, XDATA2			/* 5. ENC */
++	I = 3
++	.rept 5
++		define_reg	XDATA_REG_SUFX
++		define_reg	KEY_REG_SUFX
++		aesenc	(16*5)(reg_KEY), reg_XDAT
++		I = (I + 1)
++	.endr
 +
-+	/* need to align stack */
-+	sub	$8, %rsp
-+	.if \key_len == AES_KEYSIZE_128
-+		call aes_cbc_enc_128_x8
-+	.elseif \key_len == AES_KEYSIZE_192
-+		call aes_cbc_enc_192_x8
-+	.elseif \key_len == AES_KEYSIZE_256
-+		call aes_cbc_enc_256_x8
++	aesenc		(16*6)(KEYS0), XDATA0		/* 6. ENC */
++	aesenc		(16*6)(KEYS1), XDATA1		/* 6. ENC */
++	aesenc		(16*6)(KEYS2), XDATA2		/* 6. ENC */
++	movdqa		16*7(KEYS4), XKEY4_7		/* load round 7 key */
++	aesenc		XKEY3_6, XDATA3			/* 6. ENC */
++
++	I = 4
++	.rept 4
++		define_reg	XDATA_REG_SUFX
++		define_reg	KEY_REG_SUFX
++		aesenc	(16*6)(reg_KEY), reg_XDAT
++		I = (I + 1)
++	.endr
++
++	I = 0
++	.rept 4
++		define_reg	XDATA_REG_SUFX
++		define_reg	KEY_REG_SUFX
++		aesenc	(16*7)(reg_KEY), reg_XDAT
++		I = (I + 1)
++	.endr
++	movdqa		16*8(KEYS5), XKEY5_8		/* load round 8 key */
++	aesenc		XKEY4_7, XDATA4			/* 7. ENC */
++	I = 5
++	.rept 3
++		define_reg	XDATA_REG_SUFX
++		define_reg	KEY_REG_SUFX
++		aesenc	(16*7)(reg_KEY), reg_XDAT
++		I = (I + 1)
++	.endr
++
++	I = 0
++	.rept 5
++		define_reg	XDATA_REG_SUFX
++		define_reg	KEY_REG_SUFX
++		aesenc	(16*8)(reg_KEY), reg_XDAT
++		I = (I + 1)
++	.endr
++	movdqa		16*9(KEYS6), XKEY6_9		/* load round 9 key */
++	aesenc		XKEY5_8, XDATA5			/* 8. ENC */
++	aesenc		16*8(KEYS6), XDATA6		/* 8. ENC */
++	aesenc		16*8(KEYS7), XDATA7		/* 8. ENC */
++
++	I = 0
++	.rept 6
++		define_reg	XDATA_REG_SUFX
++		define_reg	KEY_REG_SUFX
++		aesenc	(16*9)(reg_KEY), reg_XDAT
++		I = (I + 1)
++	.endr
++	mov		(OUT_OFFSET + 8*0)(ARG), TMP
++	aesenc		XKEY6_9, XDATA6			/* 9. ENC */
++	aesenc		16*9(KEYS7), XDATA7		/* 9. ENC */
++
++		/* 10. ENC (last for 128bit keys) */
++	I = 0
++	.rept 8
++		define_reg	XDATA_REG_SUFX
++		define_reg	KEY_REG_SUFX
++		.if (\key_len == AES_KEYSIZE_128)
++			aesenclast	(16*10)(reg_KEY), reg_XDAT
++		.else
++			aesenc	(16*10)(reg_KEY), reg_XDAT
++		.endif
++		I = (I + 1)
++	.endr
++
++	.if (\key_len != AES_KEYSIZE_128)
++		/* 11. ENC */
++		I = 0
++		.rept 8
++			define_reg	XDATA_REG_SUFX
++			define_reg	KEY_REG_SUFX
++			aesenc	(16*11)(reg_KEY), reg_XDAT
++			I = (I + 1)
++		.endr
++
++		/* 12. ENC (last for 192bit key) */
++		I = 0
++		.rept 8
++			define_reg	XDATA_REG_SUFX
++			define_reg	KEY_REG_SUFX
++			.if (\key_len == AES_KEYSIZE_192)
++				aesenclast	(16*12)(reg_KEY), reg_XDAT
++			.else
++				aesenc		(16*12)(reg_KEY), reg_XDAT
++			.endif
++			I = (I + 1)
++		.endr
++
++		/* for 256bit, two more rounds */
++		.if \key_len == AES_KEYSIZE_256
++
++			/* 13. ENC */
++			I = 0
++			.rept 8
++				define_reg	XDATA_REG_SUFX
++				define_reg	KEY_REG_SUFX
++				aesenc	(16*13)(reg_KEY), reg_XDAT
++				I = (I + 1)
++			.endr
++
++			/* 14. ENC last encode for 256bit key */
++			I = 0
++			.rept 8
++				define_reg	XDATA_REG_SUFX
++				define_reg	KEY_REG_SUFX
++				aesenclast	(16*14)(reg_KEY), reg_XDAT
++				I = (I + 1)
++			.endr
++		.endif
++
 +	.endif
-+	add	$8, %rsp
-+	/* arg1/state is still intact */
 +
-+	/* process completed jobs */
-+	movdqa	_lens(state), %xmm0
-+	phminposuw	%xmm0, %xmm1
-+	/*
-+	 * xmm1{15:0} = min value
-+	 * xmm1{18:16} = index of min
-+	 */
++	I = 0
++	.rept 8
++		define_reg	XDATA_REG_SUFX
++		MOVDQ	reg_XDAT, (TMP)	/* write back ciphertext */
++		I = (I + 1)
++		.if (I < 8)
++			mov	(OUT_OFFSET + 8*I)(ARG), TMP
++		.endif
++	.endr
 +
-+	/*
-+	 * at this point at least one len should be 0, so min value should be 0
-+	 * and the index is the index of that lane [0...3]
-+	 */
-+	lea	len_masks(%rip), tmp3
-+	mov	_unused_lanes(state), unused_lanes
-+	movd	%xmm1, lane
-+.Lcontinue_loop2\key_len:
-+	/* assert((lane & 0xFFFF) == 0) */
-+	shr	$16, lane	/* lane is now index */
-+	mov	_job_in_lane(state, lane, 8), job
-+	movl	$STS_COMPLETED, _status(job)
-+	movq	$0, _job_in_lane(state, lane, 8)
-+	shl	$4, unused_lanes
-+	or	lane, unused_lanes
-+	shl	$4, lane
-+	movdqa	_args_IV(state, lane), %xmm2
-+	movdqu	%xmm2, _IV(job)
-+	por	(tmp3, lane), %xmm0
++	cmp		IDX, LEN_AREA_OFFSET(LEN_AREA_REG)
++	je		.Ldone\key_len
 +
-+	phminposuw	%xmm0, %xmm1
-+	movd	%xmm1, lane
-+	/* see if bits 15:0 are zero */
-+	test	$0xFFFF, lane
-+	jz	.Lcontinue_loop2\key_len
++.Lmain_loop\key_len:
++	mov		(IN_OFFSET + 8*1)(ARG), TMP
++	pxor2		IN0, IDX, XDATA0	/* next block of plain text */
++	pxor2		TMP, IDX, XDATA1	/* next block of plain text */
 +
-+	/* done; save registers */
-+	mov	unused_lanes, _unused_lanes(state)
-+	/* don't need to save xmm0/lens */
-+.Lreturn\key_len:
++	mov		(IN_OFFSET + 8*3)(ARG), TMP
++	pxor2		IN2, IDX, XDATA2	/* next block of plain text */
++	pxor2		TMP, IDX, XDATA3	/* next block of plain text */
++
++	mov		(IN_OFFSET + 8*5)(ARG), TMP
++	pxor2		IN4, IDX, XDATA4	/* next block of plain text */
++	pxor2		TMP, IDX, XDATA5	/* next block of plain text */
++
++	mov		(IN_OFFSET + 8*7)(ARG), TMP
++	pxor2		IN6, IDX, XDATA6	/* next block of plain text */
++	pxor2		TMP, IDX, XDATA7	/* next block of plain text */
++
++	/* 0. ARK */
++	I = 0
++	.rept 8
++		define_reg	XDATA_REG_SUFX
++		define_reg	KEY_REG_SUFX
++		pxor	16*0(reg_KEY), reg_XDAT
++		I = (I + 1)
++	.endr
++
++	/* 1. ENC */
++	I = 0
++	.rept 8
++		define_reg	XDATA_REG_SUFX
++		define_reg	KEY_REG_SUFX
++		aesenc	16*1(reg_KEY), reg_XDAT
++		I = (I + 1)
++	.endr
++
++	/* 2. ENC */
++	I = 0
++	.rept 8
++		define_reg	XDATA_REG_SUFX
++		define_reg	KEY_REG_SUFX
++		aesenc	16*2(reg_KEY), reg_XDAT
++		I = (I + 1)
++	.endr
++
++	/* 3. ENC */
++	aesenc		XKEY0_3, XDATA0		/* 3. ENC */
++	I = 1
++	.rept 7
++		define_reg	XDATA_REG_SUFX
++		define_reg	KEY_REG_SUFX
++		aesenc	16*3(reg_KEY), reg_XDAT
++		I = (I + 1)
++	.endr
++
++	/* 4. ENC */
++	aesenc		16*4(KEYS0), XDATA0	/* 4. ENC */
++	aesenc		XKEY1_4, XDATA1		/* 4. ENC */
++	I = 2
++	.rept 6
++		define_reg	XDATA_REG_SUFX
++		define_reg	KEY_REG_SUFX
++		aesenc	16*4(reg_KEY), reg_XDAT
++		I = (I + 1)
++	.endr
++
++	/* 5. ENC */
++	aesenc		16*5(KEYS0), XDATA0	/* 5. ENC */
++	aesenc		16*5(KEYS1), XDATA1	/* 5. ENC */
++	aesenc		XKEY2_5, XDATA2		/* 5. ENC */
++
++	I = 3
++	.rept 5
++		define_reg	XDATA_REG_SUFX
++		define_reg	KEY_REG_SUFX
++		aesenc	16*5(reg_KEY), reg_XDAT
++		I = (I + 1)
++	.endr
++
++	/* 6. ENC */
++	I = 0
++	.rept 3
++		define_reg	XDATA_REG_SUFX
++		define_reg	KEY_REG_SUFX
++		aesenc	16*6(reg_KEY), reg_XDAT
++		I = (I + 1)
++	.endr
++	aesenc		XKEY3_6, XDATA3		/* 6. ENC */
++	I = 4
++	.rept 4
++		define_reg	XDATA_REG_SUFX
++		define_reg	KEY_REG_SUFX
++		aesenc	16*6(reg_KEY), reg_XDAT
++		I = (I + 1)
++	.endr
++
++	/* 7. ENC */
++	I = 0
++	.rept 4
++		define_reg	XDATA_REG_SUFX
++		define_reg	KEY_REG_SUFX
++		aesenc	16*7(reg_KEY), reg_XDAT
++		I = (I + 1)
++	.endr
++	aesenc		XKEY4_7, XDATA4		/* 7. ENC */
++	I = 5
++	.rept 3
++		define_reg	XDATA_REG_SUFX
++		define_reg	KEY_REG_SUFX
++		aesenc	16*7(reg_KEY), reg_XDAT
++		I = (I + 1)
++	.endr
++
++	/* 8. ENC */
++	I = 0
++	.rept 5
++		define_reg	XDATA_REG_SUFX
++		define_reg	KEY_REG_SUFX
++		aesenc	16*8(reg_KEY), reg_XDAT
++		I = (I + 1)
++	.endr
++	aesenc		XKEY5_8, XDATA5		/* 8. ENC */
++	aesenc		16*8(KEYS6), XDATA6	/* 8. ENC */
++	aesenc		16*8(KEYS7), XDATA7	/* 8. ENC */
++
++	/* 9. ENC */
++	I = 0
++	.rept 6
++		define_reg	XDATA_REG_SUFX
++		define_reg	KEY_REG_SUFX
++		aesenc	16*9(reg_KEY), reg_XDAT
++		I = (I + 1)
++	.endr
++	mov		(OUT_OFFSET + 8*0)(ARG), TMP
++	aesenc		XKEY6_9, XDATA6		/* 9. ENC */
++	aesenc		16*9(KEYS7), XDATA7	/* 9. ENC */
++
++	/* 10. ENC (last for 128 bit key) */
++	I = 0
++	.rept 8
++		define_reg	XDATA_REG_SUFX
++		define_reg	KEY_REG_SUFX
++		.if (\key_len == AES_KEYSIZE_128)
++			aesenclast	16*10(reg_KEY), reg_XDAT
++		.else
++			aesenc	16*10(reg_KEY), reg_XDAT
++		.endif
++		I = (I + 1)
++	.endr
++
++	.if (\key_len != AES_KEYSIZE_128)
++		/* 11. ENC */
++		I = 0
++		.rept 8
++			define_reg	XDATA_REG_SUFX
++			define_reg	KEY_REG_SUFX
++			aesenc	16*11(reg_KEY), reg_XDAT
++			I = (I + 1)
++		.endr
++
++		/* 12. last ENC for 192bit key */
++		I = 0
++		.rept 8
++			define_reg	XDATA_REG_SUFX
++			define_reg	KEY_REG_SUFX
++			.if (\key_len == AES_KEYSIZE_192)
++				aesenclast	16*12(reg_KEY), reg_XDAT
++			.else
++				aesenc		16*12(reg_KEY), reg_XDAT
++			.endif
++			I = (I + 1)
++		.endr
++
++		.if \key_len == AES_KEYSIZE_256
++			/* for 256bit, two more rounds */
++			/* 13. ENC */
++			I = 0
++			.rept 8
++				define_reg	XDATA_REG_SUFX
++				define_reg	KEY_REG_SUFX
++				aesenc	16*13(reg_KEY), reg_XDAT
++				I = (I + 1)
++			.endr
++
++			/* 14. last ENC for 256bit key */
++			I = 0
++			.rept 8
++				define_reg	XDATA_REG_SUFX
++				define_reg	KEY_REG_SUFX
++				aesenclast	16*14(reg_KEY), reg_XDAT
++				I = (I + 1)
++			.endr
++		.endif
++	.endif
++
++	I = 0
++	.rept 8
++		define_reg	XDATA_REG_SUFX
++		/* write back cipher text */
++		MOVDQ		reg_XDAT, (TMP , IDX)
++		I = (I + 1)
++		.if (I < 8)
++			mov		(OUT_OFFSET + 8*I)(ARG), TMP
++		.endif
++	.endr
++
++	add	$16, IDX
++	cmp	IDX, LEN_AREA_OFFSET(LEN_AREA_REG)
++	jne	.Lmain_loop\key_len
++
++.Ldone\key_len:
++	/* update IV */
++	I = 0
++	.rept 8
++		define_reg	XDATA_REG_SUFX
++		movdqa	reg_XDAT, (IV_OFFSET + 16*I)(ARG)
++		I = (I + 1)
++	.endr
++
++	/* update IN and OUT */
++	movd	LEN_AREA_OFFSET(LEN_AREA_REG), %xmm0
++	pshufd	$0x44, %xmm0, %xmm0
++
++	I = 1
++	.rept 4
++		define_reg	XMM_REG_SUFX
++		movdqa	(IN_OFFSET + 16*(I-1))(ARG), reg_XMM
++		I = (I + 1)
++	.endr
++
++	paddq	%xmm0, %xmm1
++	paddq	%xmm0, %xmm2
++	paddq	%xmm0, %xmm3
++	paddq	%xmm0, %xmm4
++
++	I = 5
++	.rept 4
++		define_reg	XMM_REG_SUFX
++		movdqa	(OUT_OFFSET + 16*(I-5))(ARG), reg_XMM
++		I = (I + 1)
++	.endr
++
++	I = 1
++	.rept 4
++		define_reg	XMM_REG_SUFX
++		movdqa	reg_XMM, (IN_OFFSET + 16*(I-1))(ARG)
++		I = (I + 1)
++	.endr
++
++	paddq	%xmm0, %xmm5
++	paddq	%xmm0, %xmm6
++	paddq	%xmm0, %xmm7
++	paddq	%xmm0, %xmm8
++
++	I = 5
++	.rept 4
++		define_reg	XMM_REG_SUFX
++		movdqa	reg_XMM, (OUT_OFFSET + 16*(I-5))(ARG)
++		I = (I + 1)
++	.endr
++
++	mov	(XMM_SAVE_SIZE + 8*0)(GPR_SAVE_REG), %rbx
++	mov	(XMM_SAVE_SIZE + 8*3)(GPR_SAVE_REG), %rbp
++	mov	(XMM_SAVE_SIZE + 8*4)(GPR_SAVE_REG), %r12
++	mov	(XMM_SAVE_SIZE + 8*5)(GPR_SAVE_REG), %r13
++	mov	(XMM_SAVE_SIZE + 8*6)(GPR_SAVE_REG), %r14
++	mov	(XMM_SAVE_SIZE + 8*7)(GPR_SAVE_REG), %r15
++
++	add	$STACK_SIZE, %rsp
++
 +	ret
 +.endm
 +
-+ENTRY(aes_cbc_flush_job_ooo_128x8)
++/*
++ * AES CBC encryption routine supporting 128/192/256 bit keys
++ *
++ * void aes_cbc_enc_128_x8(struct aes_cbc_args_x8 *args, u64 len);
++ * arg 1: rcx : addr of AES_ARGS_x8 structure
++ * arg 2: rdx : len (in units of 16-byte blocks)
++ * void aes_cbc_enc_192_x8(struct aes_cbc_args_x8 *args, u64 len);
++ * arg 1: rcx : addr of aes_cbc_args_x8 structure
++ * arg 2: rdx : len (in units of 16-byte blocks)
++ * void aes_cbc_enc_256_x8(struct aes_cbc_args_x8 *args, u64 len);
++ * arg 1: rcx : addr of aes_cbc_args_x8 structure
++ * arg 2: rdx : len (in units of 16-byte blocks)
++ */
 +
-+	aes_cbc_flush_job_ooo_x8 AES_KEYSIZE_128
++ENTRY(aes_cbc_enc_128_x8)
 +
-+ENDPROC(aes_cbc_flush_job_ooo_128x8)
++	aes_cbc_enc_x8 AES_KEYSIZE_128
 +
-+ENTRY(aes_cbc_flush_job_ooo_192x8)
++ENDPROC(aes_cbc_enc_128_x8)
 +
-+	aes_cbc_flush_job_ooo_x8 AES_KEYSIZE_192
++ENTRY(aes_cbc_enc_192_x8)
 +
-+ENDPROC(aes_cbc_flush_job_ooo_192x8)
++	aes_cbc_enc_x8 AES_KEYSIZE_192
 +
-+ENTRY(aes_cbc_flush_job_ooo_256x8)
++ENDPROC(aes_cbc_enc_192_x8)
 +
-+	aes_cbc_flush_job_ooo_x8 AES_KEYSIZE_256
++ENTRY(aes_cbc_enc_256_x8)
 +
-+ENDPROC(aes_cbc_flush_job_ooo_256x8)
++	aes_cbc_enc_x8 AES_KEYSIZE_256
++
++ENDPROC(aes_cbc_enc_256_x8)
 -- 
 1.9.1
