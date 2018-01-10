@@ -1,46 +1,90 @@
-From: Wei Yongjun <weiyongjun1@huawei.com>
-Subject: [PATCH -next] hwrng: exynos - remove redundant dev_err call in exynos_trng_probe()
-Date: Wed, 10 Jan 2018 13:30:59 +0000
-Message-ID: <1515591059-73230-1-git-send-email-weiyongjun1@huawei.com>
+From: Fabien DESSENNE <fabien.dessenne@st.com>
+Subject: Re: [PATCH 1/6] Documentation: crypto: document crypto engine API
+Date: Wed, 10 Jan 2018 14:13:13 +0000
+Message-ID: <849600f6-3082-c090-205d-75e3d14b38f9@st.com>
+References: <20180103201109.16077-1-clabbe.montjoie@gmail.com>
+ <20180103201109.16077-2-clabbe.montjoie@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
-Cc: Wei Yongjun <weiyongjun1@huawei.com>,
-        <linux-samsung-soc@vger.kernel.org>,
-        <linux-crypto@vger.kernel.org>, <kernel-janitors@vger.kernel.org>
-To: <l.stelmach@samsung.com>, <mpm@selenic.com>,
-        <herbert@gondor.apana.org.au>, <arnd@arndb.de>,
-        <gregkh@linuxfoundation.org>, <kgene@kernel.org>, <krzk@kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from szxga07-in.huawei.com ([45.249.212.35]:47712 "EHLO huawei.com"
-        rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1755537AbeAJNYn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 10 Jan 2018 08:24:43 -0500
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: "linux-arm-kernel@lists.infradead.org"
+        <linux-arm-kernel@lists.infradead.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org"
+        <virtualization@lists.linux-foundation.org>,
+        Benjamin GAIGNARD <benjamin.gaignard@st.com>
+To: Corentin Labbe <clabbe.montjoie@gmail.com>,
+        Alexandre TORGUE <alexandre.torgue@st.com>,
+        "arei.gonglei@huawei.com" <arei.gonglei@huawei.com>,
+        "corbet@lwn.net" <corbet@lwn.net>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "mcoquelin.stm32@gmail.com" <mcoquelin.stm32@gmail.com>,
+        "mst@redhat.com" <mst@redhat.com>
+Return-path: <linux-doc-owner@vger.kernel.org>
+In-Reply-To: <20180103201109.16077-2-clabbe.montjoie@gmail.com>
+Content-Language: en-US
+Content-ID: <7F40C7A090D5EA46A917E9A48DE4386C@st.com>
+Sender: linux-doc-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-There is a error message within devm_ioremap_resource
-already, so remove the dev_err call to avoid redundant
-error message.
-
-Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
----
- drivers/char/hw_random/exynos-trng.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
-
-diff --git a/drivers/char/hw_random/exynos-trng.c b/drivers/char/hw_random/exynos-trng.c
-index 34d6f51..4c8a2be 100644
---- a/drivers/char/hw_random/exynos-trng.c
-+++ b/drivers/char/hw_random/exynos-trng.c
-@@ -129,10 +129,8 @@ static int exynos_trng_probe(struct platform_device *pdev)
- 
- 	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
- 	trng->mem = devm_ioremap_resource(&pdev->dev, res);
--	if (IS_ERR(trng->mem)) {
--		dev_err(&pdev->dev, "Could not map IO resources.\n");
-+	if (IS_ERR(trng->mem))
- 		return PTR_ERR(trng->mem);
--	}
- 
- 	pm_runtime_enable(&pdev->dev);
- 	ret = pm_runtime_get_sync(&pdev->dev);
+SGkgQ29yZW50aW4sDQoNCg0KVGhhbmsgeW91IGZvciB0aGlzIG5ldyB2ZXJzaW9uIHdoaWNoIEkg
+aGF2ZSB0ZXN0ZXMgc3VjY2Vzc2Z1bGx5IHdpdGggdGhlIA0Kc3RtMzIgaGFzaCAmIGNyeXAgZHJp
+dmVycy4NCg0KQXMgYSBnZW5lcmFsIGNvbW1lbnQgb24gdGhpcyBwYXRjaHNldCwgSSB3b3VsZCBz
+YXkgdGhhdCBpdCBkb2VzIG5vdCANCmNvdmVyIGFsbCBhc3luYyByZXF1ZXN0czogdHlwaWNhbGx5
+IEkgbmVlZCAoZm9yIHRoZSBwZW5kaW5nIHN0bTMyIGNyeXAgDQpkcml2ZXIgdXByYWRlKSB0byB1
+c2UgQ3J5cHRvRW5naW5lIHRvIHByb2Nlc3MgQUVBRCByZXF1ZXN0cyB3aGljaCBpcyBub3QgDQpj
+b3ZlcmVkIGhlcmUuDQoNCkNvdWxkIHlvdSBwbGVhc2UgY29uc2lkZXIgYWRkaW5nIHRoZSAndHJh
+bnNmZXInIGFuZCAnZmluYWxpemUnIEVYUE9SVGVkIA0KZnVuY3Rpb25zIGZvciBhZWFkIHJlcXVl
+c3RzPyAodGhlIGltcGxlbWVudGF0aW9uIGlzIHF1aXRlIHRyaXZpYWwpDQoNCkhhdmUgYWxzbyBh
+IGxvb2sgYXQgc3RydWN0IGFjb21wX3JlcSAoYWNvbXByZXNzLmgpIGFuZCBzdHJ1Y3QgDQprcHBf
+cmVxdWVzdCAoa3BwLmgpIHdoaWNoIGFsc28gdXNlICJzdHJ1Y3QgY3J5cHRvX2FzeW5jX3JlcXVl
+c3QgYmFzZSINCg0KDQpCUg0KDQpGYWJpZW4NCg0KDQpPbiAwMy8wMS8xOCAyMToxMSwgQ29yZW50
+aW4gTGFiYmUgd3JvdGU6DQo+IFNpZ25lZC1vZmYtYnk6IENvcmVudGluIExhYmJlIDxjbGFiYmUu
+bW9udGpvaWVAZ21haWwuY29tPg0KPiAtLS0NCj4gICBEb2N1bWVudGF0aW9uL2NyeXB0by9jcnlw
+dG9fZW5naW5lLnJzdCB8IDQ2ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysNCj4g
+ICAxIGZpbGUgY2hhbmdlZCwgNDYgaW5zZXJ0aW9ucygrKQ0KPiAgIGNyZWF0ZSBtb2RlIDEwMDY0
+NCBEb2N1bWVudGF0aW9uL2NyeXB0by9jcnlwdG9fZW5naW5lLnJzdA0KPg0KPiBkaWZmIC0tZ2l0
+IGEvRG9jdW1lbnRhdGlvbi9jcnlwdG8vY3J5cHRvX2VuZ2luZS5yc3QgYi9Eb2N1bWVudGF0aW9u
+L2NyeXB0by9jcnlwdG9fZW5naW5lLnJzdA0KPiBuZXcgZmlsZSBtb2RlIDEwMDY0NA0KPiBpbmRl
+eCAwMDAwMDAwMDAwMDAuLmIwZWQzN2Y5ZmIwYw0KPiAtLS0gL2Rldi9udWxsDQo+ICsrKyBiL0Rv
+Y3VtZW50YXRpb24vY3J5cHRvL2NyeXB0b19lbmdpbmUucnN0DQo+IEBAIC0wLDAgKzEsNDYgQEAN
+Cj4gKz09PT09PT09PT09PT0NCj4gK0NSWVBUTyBFTkdJTkUNCj4gKz09PT09PT09PT09PT0NCj4g
+Kw0KPiArT3ZlcnZpZXcNCj4gKy0tLS0tLS0tDQo+ICtUaGUgY3J5cHRvIGVuZ2luZSBBUEkgKENF
+KSwgaXMgYSBjcnlwdG8gcXVldWUgbWFuYWdlci4NCj4gKw0KPiArUmVxdWlyZW1lbnQNCj4gKy0t
+LS0tLS0tLS0tDQo+ICtZb3UgaGF2ZSB0byBwdXQgYXQgc3RhcnQgb2YgeW91ciB0Zm1fY3R4IHRo
+ZSBzdHJ1Y3QgY3J5cHRvX2VuZ2luZV9yZXFjdHgNCj4gK3N0cnVjdCB5b3VyX3RmbV9jdHggew0K
+PiArICAgICAgICBzdHJ1Y3QgY3J5cHRvX2VuZ2luZV9yZXFjdHggZW5naW5lY3R4Ow0KPiArICAg
+ICAgICAuLi4NCj4gK307DQo+ICtXaHk6IFNpbmNlIENFIG1hbmFnZSBvbmx5IGNyeXB0b19hc3lu
+Y19yZXF1ZXN0LCBpdCBjYW5ub3Qga25vdyB0aGUgdW5kZXJseWluZw0KPiArcmVxdWVzdF90eXBl
+IGFuZCBzbyBoYXZlIGFjY2VzcyBvbmx5IG9uIHRoZSBURk0uDQo+ICtTbyB1c2luZyBjb250YWlu
+ZXJfb2YgZm9yIGFjY2Vzc2luZyBfX2N0eCBpcyBpbXBvc3NpYmxlLg0KPiArRnVydGhlcm1vcmUs
+IHRoZSBjcnlwdG8gZW5naW5lIGNhbm5vdCBrbm93IHRoZSAic3RydWN0IHlvdXJfdGZtX2N0eCIs
+DQo+ICtzbyBpdCBtdXN0IGFzc3VtZSB0aGF0IGNyeXB0b19lbmdpbmVfcmVxY3R4IGlzIGF0IHN0
+YXJ0IG9mIGl0Lg0KPiArDQo+ICtPcmRlciBvZiBvcGVyYXRpb25zDQo+ICstLS0tLS0tLS0tLS0t
+LS0tLS0tDQo+ICtZb3UgaGF2ZSB0byBvYnRhaW4gYSBzdHJ1Y3QgY3J5cHRvX2VuZ2luZSB2aWEg
+Y3J5cHRvX2VuZ2luZV9hbGxvY19pbml0KCkuDQo+ICtBbmQgc3RhcnQgaXQgdmlhIGNyeXB0b19l
+bmdpbmVfc3RhcnQoKS4NCj4gKw0KPiArQmVmb3JlIHRyYW5zZmVycmluZyBhbnkgcmVxdWVzdCwg
+eW91IGhhdmUgdG8gZmlsbCB0aGUgZW5naW5lY3R4Lg0KPiArLSBwcmVwYXJlX3JlcXVlc3Q6ICh0
+YWtpbmcgYSBmdW5jdGlvbiBwb2ludGVyKSBJZiB5b3UgbmVlZCB0byBkbyBzb21lIHByb2Nlc3Np
+bmcgYmVmb3JlIGRvaW5nIHRoZSByZXF1ZXN0DQo+ICstIHVucHJlcGFyZV9yZXF1ZXN0OiAodGFr
+aW5nIGEgZnVuY3Rpb24gcG9pbnRlcikgVW5kb2luZyB3aGF0J3MgZG9uZSBpbiBwcmVwYXJlX3Jl
+cXVlc3QNCj4gKy0gZG9fb25lX3JlcXVlc3Q6ICh0YWtpbmcgYSBmdW5jdGlvbiBwb2ludGVyKSBE
+byBlbmNyeXB0aW9uIGZvciBjdXJyZW50IHJlcXVlc3QNCj4gKw0KPiArTm90ZTogdGhhdCB0aG9z
+ZSB0aHJlZSBmdW5jdGlvbnMgZ2V0IHRoZSBjcnlwdG9fYXN5bmNfcmVxdWVzdCBhc3NvY2lhdGVk
+IHdpdGggdGhlIHJlY2VpdmVkIHJlcXVlc3QuDQo+ICtTbyB5b3VyIG5lZWQgdG8gZ2V0IHRoZSBv
+cmlnaW5hbCByZXF1ZXN0IHZpYSBjb250YWluZXJfb2YoYXJlcSwgc3RydWN0IHlvdXJyZXF1ZXN0
+dHlwZV9yZXF1ZXN0LCBiYXNlKTsNCj4gKw0KPiArV2hlbiB5b3VyIGRyaXZlciByZWNlaXZlIGEg
+Y3J5cHRvX3JlcXVlc3QsIHlvdSBoYXZlIHRvIHRyYW5zZmVyIGl0IHRvDQo+ICt0aGUgY3J5cHRv
+ZW5naW5lIHZpYSBvbmUgb2Y6DQo+ICstIGNyeXB0b190cmFuc2Zlcl9jaXBoZXJfcmVxdWVzdF90
+b19lbmdpbmUoKQ0KPiArLSBjcnlwdG9fdHJhbnNmZXJfc2tjaXBoZXJfcmVxdWVzdF90b19lbmdp
+bmUoKQ0KPiArLSBjcnlwdG9fdHJhbnNmZXJfYWtjaXBoZXJfcmVxdWVzdF90b19lbmdpbmUoKQ0K
+PiArLSBjcnlwdG9fdHJhbnNmZXJfaGFzaF9yZXF1ZXN0X3RvX2VuZ2luZSgpDQo+ICsNCj4gK0F0
+IHRoZSBlbmQgb2YgdGhlIHJlcXVlc3QgcHJvY2VzcywgYSBjYWxsIHRvIG9uZSBvZiB0aGUgZm9s
+bG93aW5nIGZ1bmN0aW9uIGlzIG5lZWRlZDoNCj4gKy0gY3J5cHRvX2ZpbmFsaXplX2NpcGhlcl9y
+ZXF1ZXN0DQo+ICstIGNyeXB0b19maW5hbGl6ZV9za2NpcGhlcl9yZXF1ZXN0DQo+ICstIGNyeXB0
+b19maW5hbGl6ZV9ha2NpcGhlcl9yZXF1ZXN0DQo+ICstIGNyeXB0b19maW5hbGl6ZV9oYXNoX3Jl
+cXVlc3QNCg==
