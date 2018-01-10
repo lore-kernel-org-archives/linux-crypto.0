@@ -1,64 +1,46 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH 3/7] arm64/crypto: aes-neon: move literal data to .rodata
- section
-Date: Wed, 10 Jan 2018 12:11:38 +0000
-Message-ID: <20180110121142.18291-4-ard.biesheuvel@linaro.org>
-References: <20180110121142.18291-1-ard.biesheuvel@linaro.org>
+From: Wei Yongjun <weiyongjun1@huawei.com>
+Subject: [PATCH -next] hwrng: exynos - remove redundant dev_err call in exynos_trng_probe()
+Date: Wed, 10 Jan 2018 13:30:59 +0000
+Message-ID: <1515591059-73230-1-git-send-email-weiyongjun1@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="ISO-8859-1"
 Content-Transfer-Encoding: 7bit
-Cc: mark.rutland@arm.com, steve.capper@linaro.org, herbert@gondor.apana.org.au,
- Ard Biesheuvel <ard.biesheuvel@linaro.org>, marc.zyngier@arm.com,
- catalin.marinas@arm.com, will.deacon@arm.com, dann.frazier@canonical.com
-To: linux-arm-kernel@lists.infradead.org,
-	linux-crypto@vger.kernel.org
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <20180110121142.18291-1-ard.biesheuvel@linaro.org>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-List-Id: linux-crypto.vger.kernel.org
+Cc: Wei Yongjun <weiyongjun1@huawei.com>,
+        <linux-samsung-soc@vger.kernel.org>,
+        <linux-crypto@vger.kernel.org>, <kernel-janitors@vger.kernel.org>
+To: <l.stelmach@samsung.com>, <mpm@selenic.com>,
+        <herbert@gondor.apana.org.au>, <arnd@arndb.de>,
+        <gregkh@linuxfoundation.org>, <kgene@kernel.org>, <krzk@kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from szxga07-in.huawei.com ([45.249.212.35]:47712 "EHLO huawei.com"
+        rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1755537AbeAJNYn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 10 Jan 2018 08:24:43 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Move the S-boxes and some other literals to the .rodata section where
-it is safe from being exploited by speculative execution.
+There is a error message within devm_ioremap_resource
+already, so remove the dev_err call to avoid redundant
+error message.
 
-Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
 ---
- arch/arm64/crypto/aes-neon.S | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ drivers/char/hw_random/exynos-trng.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/arch/arm64/crypto/aes-neon.S b/arch/arm64/crypto/aes-neon.S
-index f1e3aa2732f9..1c7b45b7268e 100644
---- a/arch/arm64/crypto/aes-neon.S
-+++ b/arch/arm64/crypto/aes-neon.S
-@@ -32,10 +32,10 @@
+diff --git a/drivers/char/hw_random/exynos-trng.c b/drivers/char/hw_random/exynos-trng.c
+index 34d6f51..4c8a2be 100644
+--- a/drivers/char/hw_random/exynos-trng.c
++++ b/drivers/char/hw_random/exynos-trng.c
+@@ -129,10 +129,8 @@ static int exynos_trng_probe(struct platform_device *pdev)
  
- 	/* preload the entire Sbox */
- 	.macro		prepare, sbox, shiftrows, temp
--	adr		\temp, \sbox
- 	movi		v12.16b, #0x1b
--	ldr		q13, \shiftrows
--	ldr		q14, .Lror32by8
-+	ldr_l		q13, \shiftrows, \temp
-+	ldr_l		q14, .Lror32by8, \temp
-+	adr_l		\temp, \sbox
- 	ld1		{v16.16b-v19.16b}, [\temp], #64
- 	ld1		{v20.16b-v23.16b}, [\temp], #64
- 	ld1		{v24.16b-v27.16b}, [\temp], #64
-@@ -272,7 +272,7 @@
+ 	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+ 	trng->mem = devm_ioremap_resource(&pdev->dev, res);
+-	if (IS_ERR(trng->mem)) {
+-		dev_err(&pdev->dev, "Could not map IO resources.\n");
++	if (IS_ERR(trng->mem))
+ 		return PTR_ERR(trng->mem);
+-	}
  
- #include "aes-modes.S"
- 
--	.text
-+	.section	".rodata", "a"
- 	.align		6
- .LForward_Sbox:
- 	.byte		0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5
--- 
-2.11.0
+ 	pm_runtime_enable(&pdev->dev);
+ 	ret = pm_runtime_get_sync(&pdev->dev);
