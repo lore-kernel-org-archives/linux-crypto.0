@@ -1,54 +1,71 @@
-From: Mike Snitzer <snitzer@redhat.com>
-Subject: Re: dm-integrity: don't store cipher request on the stack (was:
- [QUESTION] hash import and request initialization)
-Date: Wed, 10 Jan 2018 10:13:53 -0500
-Message-ID: <20180110151353.GA23626@redhat.com>
-References: <CAOtvUMdsqEpUSSBZXxHPzuO-84B3VKxRLLN=y1cxfNbt+5qpSQ@mail.gmail.com>
- <20171226030751.GA11758@gondor.apana.org.au>
- <CAOtvUMfkGgyhCTUpfpegfmR3DNYhvfRN4oHL1tY9RMRh5sfCfQ@mail.gmail.com>
- <20171226104010.GA28275@gondor.apana.org.au>
- <CAOtvUMeEw88mYVjb7bDLwGb67aXi2p5e-uRXn0XrDe0uddyT6g@mail.gmail.com>
- <20171227033500.GA32764@gondor.apana.org.au>
- <alpine.LRH.2.02.1801100931240.7460@file01.intranet.prod.int.rdu2.redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        Gilad Ben-Yossef <gilad@benyossef.com>, dm-devel@redhat.com,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Mikulas Patocka <mpatocka@redhat.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:42640 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S964976AbeAJPOJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 10 Jan 2018 10:14:09 -0500
-Content-Disposition: inline
-In-Reply-To: <alpine.LRH.2.02.1801100931240.7460@file01.intranet.prod.int.rdu2.redhat.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Robin Murphy <robin.murphy@arm.com>
+Subject: [PATCH] crypto: marvell/cesa - Fix DMA API misuse
+Date: Wed, 10 Jan 2018 15:15:43 +0000
+Message-ID: <55d3177407b00dd4a9d51fe4f8e2bf2282fe8e3d.1515596541.git.robin.murphy@arm.com>
+Cc: herbert@gondor.apana.org.au, davem@davemloft.net, hch@lst.de,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org
+To: boris.brezillon@free-electrons.com, arno@natisbad.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Jan 10 2018 at  9:32am -0500,
-Mikulas Patocka <mpatocka@redhat.com> wrote:
+phys_to_dma() is an internal helper for certain DMA API implementations,
+and is not appropriate for drivers to use. It appears that what the CESA
+driver really wants to be using is dma_map_resource() - admittedly that
+didn't exist when the offending code was first merged, but it does now.
 
-> 
-> 
-> On Wed, 27 Dec 2017, Herbert Xu wrote:
-> 
-> > On Tue, Dec 26, 2017 at 02:21:53PM +0200, Gilad Ben-Yossef wrote:
-> > > 
-> > > See how SKCIPHER_REQUEST_ON_STACK is being used with an asymmetric skcipher
-> > > in drivers/md/dm-integrity.c
-> > 
-> > That's just broken.  SKCIPHER_REQUEST_ON_STACK is only meant for
-> > sync algorithms and this code needs to be changed to either do the
-> > proper request allocation or switch over to allocating sync
-> > algorithms.
-> > 
-> > Cheers,
-> 
-> Hi
-> 
-> Here I send a patch that moves those allocations to the heap.
+Signed-off-by: Robin Murphy <robin.murphy@arm.com>
+---
 
-Thanks, I'll review and hope to stage for 4.16 today.
+Found by inspection and compile-tested only
 
-Mike
+ drivers/crypto/marvell/cesa.c | 19 ++++++++++++-------
+ 1 file changed, 12 insertions(+), 7 deletions(-)
+
+diff --git a/drivers/crypto/marvell/cesa.c b/drivers/crypto/marvell/cesa.c
+index 293832488cc9..f81fa4a3e66b 100644
+--- a/drivers/crypto/marvell/cesa.c
++++ b/drivers/crypto/marvell/cesa.c
+@@ -15,6 +15,7 @@
+  */
+ 
+ #include <linux/delay.h>
++#include <linux/dma-mapping.h>
+ #include <linux/genalloc.h>
+ #include <linux/interrupt.h>
+ #include <linux/io.h>
+@@ -409,8 +410,11 @@ static int mv_cesa_get_sram(struct platform_device *pdev, int idx)
+ 	if (IS_ERR(engine->sram))
+ 		return PTR_ERR(engine->sram);
+ 
+-	engine->sram_dma = phys_to_dma(cesa->dev,
+-				       (phys_addr_t)res->start);
++	engine->sram_dma = dma_map_resource(cesa->dev, res->start,
++					    cesa->sram_size,
++					    DMA_BIDIRECTIONAL, 0);
++	if (dma_mapping_error(cesa->dev, engine->sram_dma))
++		return -ENOMEM;
+ 
+ 	return 0;
+ }
+@@ -420,11 +424,12 @@ static void mv_cesa_put_sram(struct platform_device *pdev, int idx)
+ 	struct mv_cesa_dev *cesa = platform_get_drvdata(pdev);
+ 	struct mv_cesa_engine *engine = &cesa->engines[idx];
+ 
+-	if (!engine->pool)
+-		return;
+-
+-	gen_pool_free(engine->pool, (unsigned long)engine->sram,
+-		      cesa->sram_size);
++	if (engine->pool)
++		gen_pool_free(engine->pool, (unsigned long)engine->sram,
++			      cesa->sram_size);
++	else
++		dma_unmap_resource(cesa->dev, engine->sram_dma,
++				   cesa->sram_size, DMA_BIDIRECTIONAL, 0);
+ }
+ 
+ static int mv_cesa_probe(struct platform_device *pdev)
+-- 
+2.13.4.dirty
