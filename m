@@ -1,54 +1,43 @@
-From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: Getting the ccree driver out of staging
-Date: Wed, 10 Jan 2018 08:54:55 +0200
-Message-ID: <CAOtvUMdo_ZJ-M-=apA1a=70KyVBX2J0pEVc+Uc9i=rYWCie6Hw@mail.gmail.com>
+From: Dan Carpenter <dan.carpenter@oracle.com>
+Subject: [PATCH] hwrng: exynos - Signedness bug in exynos_trng_do_read()
+Date: Wed, 10 Jan 2018 12:36:58 +0300
+Message-ID: <20180110093658.kxnmhqkoow7o2xab@mwanda>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
-        Ofir Drang <Ofir.Drang@arm.com>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=us-ascii
+Cc: Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Kukjin Kim <kgene@kernel.org>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        linux-samsung-soc@vger.kernel.org, linux-crypto@vger.kernel.org,
+        kernel-janitors@vger.kernel.org
+To: =?utf-8?Q?=C5=81ukasz?= Stelmach <l.stelmach@samsung.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-oi0-f51.google.com ([209.85.218.51]:44966 "EHLO
-        mail-oi0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753304AbeAJGy5 (ORCPT
+Received: from aserp2130.oracle.com ([141.146.126.79]:48202 "EHLO
+        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S965080AbeAJJhh (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 10 Jan 2018 01:54:57 -0500
-Received: by mail-oi0-f51.google.com with SMTP id g128so429006oib.11
-        for <linux-crypto@vger.kernel.org>; Tue, 09 Jan 2018 22:54:56 -0800 (PST)
+        Wed, 10 Jan 2018 04:37:37 -0500
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi folks,
+"val" needs to be signed for the error handling to work.
 
-With the enormous help of people in the to and CCed lists I've gotten
-the ccree driver to a point I believe it is ready to graduate out of
-the staging tree:
+Fixes: 6cd225cc5d8a ("hwrng: exynos - add Samsung Exynos True RNG driver")
+Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
 
-- The code base has been reduced by something by 30% and is *much*
-more  readable and manageable.
-- The very few checkpatch warnings are all false positives (one due to
-dt bindings going through the crypto tree, the others due to harmless
-macro argument reuse)
-and the few sparse output are equally benign.
-- The driver follows the crypto API expected behavior as much as I can tell.
-- Fixed all the bugs I could fine as a result of tcrypt tests.
-- It works :-)
-
-There are obviously more things todo, but I believe they are out of
-scope for staging.
-
-So, if you see something that still needs work, kindly let me know.
-Alternatively, will you accept a patch moving it to drivers/crypto/?
-
-Many thanks,
-Gilad
-
--- 
-Gilad Ben-Yossef
-Chief Coffee Drinker
-
-"If you take a class in large-scale robotics, can you end up in a
-situation where the homework eats your dog?"
- -- Jean-Baptiste Queru
+diff --git a/drivers/char/hw_random/exynos-trng.c b/drivers/char/hw_random/exynos-trng.c
+index 34d6f51ecbee..f4643e3ec346 100644
+--- a/drivers/char/hw_random/exynos-trng.c
++++ b/drivers/char/hw_random/exynos-trng.c
+@@ -55,7 +55,7 @@ static int exynos_trng_do_read(struct hwrng *rng, void *data, size_t max,
+ 			       bool wait)
+ {
+ 	struct exynos_trng_dev *trng;
+-	u32 val;
++	int val;
+ 
+ 	max = min_t(size_t, max, (EXYNOS_TRNG_FIFO_LEN * 4));
+ 
