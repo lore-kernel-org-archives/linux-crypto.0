@@ -1,124 +1,121 @@
-From: Corentin Labbe <clabbe.montjoie@gmail.com>
-Subject: Re: [PATCH 1/6] Documentation: crypto: document crypto engine API
-Date: Wed, 10 Jan 2018 20:14:50 +0100
-Message-ID: <20180110191450.GB12214@Red>
-References: <20180103201109.16077-1-clabbe.montjoie@gmail.com>
- <20180103201109.16077-2-clabbe.montjoie@gmail.com>
- <849600f6-3082-c090-205d-75e3d14b38f9@st.com>
+From: Atul Gupta <atul.gupta@chelsio.com>
+Subject: RE: [RFC crypto v3 0/9] Chelsio Inline TLS
+Date: Thu, 11 Jan 2018 05:31:57 +0000
+Message-ID: <CY4PR1201MB0230BECFD91D372CEBDD652F97160@CY4PR1201MB0230.namprd12.prod.outlook.com>
+References: <1513769582-25786-1-git-send-email-atul.gupta@chelsio.com>
+ <61b313d0-6cf7-3b1f-dedc-ed00d6ceb3ae@chelsio.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Alexandre TORGUE <alexandre.torgue@st.com>,
-        "arei.gonglei@huawei.com" <arei.gonglei@huawei.com>,
-        "corbet@lwn.net" <corbet@lwn.net>,
-        "davem@davemloft.net" <davem@davemloft.net>,
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "davejwatson@fb.com" <davejwatson@fb.com>,
+        "smueller@chronox.de" <smueller@chronox.de>,
+        "Stefano Brivio" <sbrivio@redhat.com>,
+        "hannes@stressinduktion.org" <hannes@stressinduktion.org>
+To: "davem@davemloft.net" <davem@davemloft.net>,
         "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "mcoquelin.stm32@gmail.com" <mcoquelin.stm32@gmail.com>,
-        "mst@redhat.com" <mst@redhat.com>,
-        "linux-arm-kernel@lists.infradead.org"
-        <linux-arm-kernel@lists.infradead.org>,
         "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org"
-        <virtualization@lists.linux-foundation.org>,
-        Benjamin GAIGNARD <benjamin.gaignard@st.com>
-To: Fabien DESSENNE <fabien.dessenne@st.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <849600f6-3082-c090-205d-75e3d14b38f9@st.com>
-Sender: linux-kernel-owner@vger.kernel.org
+        Ganesh GR <ganeshgr@chelsio.com>
+Return-path: <netdev-owner@vger.kernel.org>
+In-Reply-To: <61b313d0-6cf7-3b1f-dedc-ed00d6ceb3ae@chelsio.com>
+Content-Language: en-US
+Sender: netdev-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Jan 10, 2018 at 02:13:13PM +0000, Fabien DESSENNE wrote:
-> Hi Corentin,
-> 
-> 
-> Thank you for this new version which I have testes successfully with the 
-> stm32 hash & cryp drivers.
-> 
-> As a general comment on this patchset, I would say that it does not 
-> cover all async requests: typically I need (for the pending stm32 cryp 
-> driver uprade) to use CryptoEngine to process AEAD requests which is not 
-> covered here.
-> 
-> Could you please consider adding the 'transfer' and 'finalize' EXPORTed 
-> functions for aead requests? (the implementation is quite trivial)
-> 
-> Have also a look at struct acomp_req (acompress.h) and struct 
-> kpp_request (kpp.h) which also use "struct crypto_async_request base"
-> 
-> 
-> BR
-> 
-> Fabien
-> 
-
-Hello
-
-Thanks for your review and test (could I add your tested-by ?).
-I didn't add aead (and kpp/acompress), since I do not have any way to test it.
-Since you have a way to test aead, I will add it to the next release.
-
-Regards
-
-> 
-> On 03/01/18 21:11, Corentin Labbe wrote:
-> > Signed-off-by: Corentin Labbe <clabbe.montjoie@gmail.com>
-> > ---
-> >   Documentation/crypto/crypto_engine.rst | 46 ++++++++++++++++++++++++++++++++++
-> >   1 file changed, 46 insertions(+)
-> >   create mode 100644 Documentation/crypto/crypto_engine.rst
-> >
-> > diff --git a/Documentation/crypto/crypto_engine.rst b/Documentation/crypto/crypto_engine.rst
-> > new file mode 100644
-> > index 000000000000..b0ed37f9fb0c
-> > --- /dev/null
-> > +++ b/Documentation/crypto/crypto_engine.rst
-> > @@ -0,0 +1,46 @@
-> > +=============
-> > +CRYPTO ENGINE
-> > +=============
-> > +
-> > +Overview
-> > +--------
-> > +The crypto engine API (CE), is a crypto queue manager.
-> > +
-> > +Requirement
-> > +-----------
-> > +You have to put at start of your tfm_ctx the struct crypto_engine_reqctx
-> > +struct your_tfm_ctx {
-> > +        struct crypto_engine_reqctx enginectx;
-> > +        ...
-> > +};
-> > +Why: Since CE manage only crypto_async_request, it cannot know the underlying
-> > +request_type and so have access only on the TFM.
-> > +So using container_of for accessing __ctx is impossible.
-> > +Furthermore, the crypto engine cannot know the "struct your_tfm_ctx",
-> > +so it must assume that crypto_engine_reqctx is at start of it.
-> > +
-> > +Order of operations
-> > +-------------------
-> > +You have to obtain a struct crypto_engine via crypto_engine_alloc_init().
-> > +And start it via crypto_engine_start().
-> > +
-> > +Before transferring any request, you have to fill the enginectx.
-> > +- prepare_request: (taking a function pointer) If you need to do some processing before doing the request
-> > +- unprepare_request: (taking a function pointer) Undoing what's done in prepare_request
-> > +- do_one_request: (taking a function pointer) Do encryption for current request
-> > +
-> > +Note: that those three functions get the crypto_async_request associated with the received request.
-> > +So your need to get the original request via container_of(areq, struct yourrequesttype_request, base);
-> > +
-> > +When your driver receive a crypto_request, you have to transfer it to
-> > +the cryptoengine via one of:
-> > +- crypto_transfer_cipher_request_to_engine()
-> > +- crypto_transfer_skcipher_request_to_engine()
-> > +- crypto_transfer_akcipher_request_to_engine()
-> > +- crypto_transfer_hash_request_to_engine()
-> > +
-> > +At the end of the request process, a call to one of the following function is needed:
-> > +- crypto_finalize_cipher_request
-> > +- crypto_finalize_skcipher_request
-> > +- crypto_finalize_akcipher_request
-> > +- crypto_finalize_hash_request
+V291bGQgdHJ1bHkgYXBwcmVjaWF0ZSB5b3VyIGZlZWRiYWNrIGFuZCBtYWtlIHByb2dyZXNzLg0K
+DQpUaGFua3MgYW5kIFJlZ2FyZHMNCkF0dWwNCg0KLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0N
+CkZyb206IGxpbnV4LWNyeXB0by1vd25lckB2Z2VyLmtlcm5lbC5vcmcgW21haWx0bzpsaW51eC1j
+cnlwdG8tb3duZXJAdmdlci5rZXJuZWwub3JnXSBPbiBCZWhhbGYgT2YgQXR1bCBHdXB0YQ0KU2Vu
+dDogV2VkbmVzZGF5LCBKYW51YXJ5IDMsIDIwMTggMTI6MzYgUE0NClRvOiBoZXJiZXJ0QGdvbmRv
+ci5hcGFuYS5vcmcuYXU7IGxpbnV4LWNyeXB0b0B2Z2VyLmtlcm5lbC5vcmc7IEdhbmVzaCBHUiA8
+Z2FuZXNoZ3JAY2hlbHNpby5jb20+DQpDYzogbmV0ZGV2QHZnZXIua2VybmVsLm9yZzsgZGF2ZW1A
+ZGF2ZW1sb2Z0Lm5ldDsgZGF2ZWp3YXRzb25AZmIuY29tOyBzbXVlbGxlckBjaHJvbm94LmRlOyBT
+dGVmYW5vIEJyaXZpbyA8c2JyaXZpb0ByZWRoYXQuY29tPjsgaGFubmVzQHN0cmVzc2luZHVrdGlv
+bi5vcmcNClN1YmplY3Q6IFJlOiBbUkZDIGNyeXB0byB2MyAwLzldIENoZWxzaW8gSW5saW5lIFRM
+Uw0KDQpBZGRyZXNzZWQgdGhlIHJldmlldyBjb21tZW50cyBpbiB2MiBhbmQgdjMsIHBsZWFzZSBz
+dWdnZXN0IGlmIHRoZXJlIGlzIGFueSBvdGhlciBjb21tZW50IGFuZCBzdGVwIHRvIHByb2NlZWQ/
+DQoNClRoYW5rcw0KDQpBdHVsIEd1cHRhDQoNCg0KT24gV2VkbmVzZGF5IDIwIERlY2VtYmVyIDIw
+MTcgMDU6MDMgUE0sIEF0dWwgR3VwdGEgd3JvdGU6DQo+IFJGQyBzZXJpZXMgZm9yIENoZWxzaW8g
+SW5saW5lIFRMUyBkcml2ZXIgKGNodGxzLmtvKQ0KPg0KPiBEcml2ZXIgdXNlIHRoZSBVTFAgaW5m
+cmFzdHJ1Y3R1cmUgdG8gcmVnaXN0ZXIgY2h0bHMgYXMgSW5saW5lIFRMUyBVTFAuDQo+IENodGxz
+IHVzZSBUQ1AgU29ja2V0cyB0byB0cmFuc21pdCBhbmQgcmVjZWl2ZSBUTFMgcmVjb3JkLiBUQ1Ag
+DQo+IHByb3RvX29wcyBpcyBleHRlbmRlZCB0byBvZmZsb2FkIFRMUyByZWNvcmQuDQo+DQo+IFQ2
+IGFkYXB0ZXIgcHJvdmlkZXMgdGhlIGZvbGxvd2luZyBmZWF0dXJlczoNCj4gICAgICAgICAgLVRM
+UyByZWNvcmQgb2ZmbG9hZCwgVExTIGhlYWRlciwgZW5jcnlwdCwgZGlnZXN0IGFuZCB0cmFuc21p
+dA0KPiAgICAgICAgICAtVExTIHJlY29yZCByZWNlaXZlIGFuZCBkZWNyeXB0DQo+ICAgICAgICAg
+IC1UTFMga2V5cyBzdG9yZQ0KPiAgICAgICAgICAtVENQL0lQIGVuZ2luZQ0KPiAgICAgICAgICAt
+VExTIGVuZ2luZQ0KPiAgICAgICAgICAtR0NNIGNyeXB0byBlbmdpbmUgW3N1cHBvcnQgQ0JDIGFs
+c29dDQo+DQo+IFRMUyBwcm92aWRlcyBzZWN1cml0eSBhdCB0aGUgdHJhbnNwb3J0IGxheWVyLiBJ
+dCB1c2VzIFRDUCB0byBwcm92aWRlIA0KPiByZWxpYWJsZSBlbmQtdG8tZW5kIHRyYW5zcG9ydCBv
+ZiBhcHBsaWNhdGlvbiBkYXRhLiBJdCByZWxpZXMgb24gVENQIA0KPiBmb3IgYW55IHJldHJhbnNt
+aXNzaW9uLiBUTFMgc2Vzc2lvbiBjb21wcmlzZXMgb2YgdGhyZWUgcGFydHM6DQo+IGEuIFRDUC9J
+UCBjb25uZWN0aW9uDQo+IGIuIFRMUyBoYW5kc2hha2UNCj4gYy4gUmVjb3JkIGxheWVyIHByb2Nl
+c3NpbmcNCj4NCj4gVExTIGhhbmRzaGFrZSBzdGF0ZSBtYWNoaW5lIGlzIGV4ZWN1dGVkIGluIGhv
+c3QgKHJlZmVyIHN0YW5kYXJkIA0KPiBpbXBsZW1lbnRhdGlvbiBlZy4gT3BlblNTTCkuICBTZXRz
+b2Nrb3B0IFtTT0xfVENQLCBUQ1BfVUxQXSBpbml0aWFsaXplIA0KPiBUQ1AgcHJvdG8tb3BzIGZv
+ciBDaGVsc2lvIGlubGluZSB0bHMgc3VwcG9ydC4gc2V0c29ja29wdChzb2NrLCANCj4gU09MX1RD
+UCwgVENQX1VMUCwgImNodGxzIiwgc2l6ZW9mKCJjaHRscyIpKTsNCj4NCj4gVHggYW5kIFJ4IEtl
+eXMgYXJlIGRlY2lkZWQgZHVyaW5nIGhhbmRzaGFrZSBhbmQgcHJvZ3JhbW1lZCBvbnRvIHRoZSAN
+Cj4gY2hpcCBhZnRlciBDQ1MgaXMgZXhjaGFuZ2VkLg0KPiBzdHJ1Y3QgdGxzMTJfY3J5cHRvX2lu
+Zm9fYWVzX2djbV8xMjggY3J5cHRvX2luZm8gc2V0c29ja29wdChzb2NrLCANCj4gU09MX1RMUywg
+VExTX1RYLCAmY3J5cHRvX2luZm8sIHNpemVvZihjcnlwdG9faW5mbykpIEZpbmlzaCBpcyB0aGUg
+DQo+IGZpcnN0IGVuY3J5cHRlZC9kZWNyeXB0ZWQgbWVzc2FnZSB0eC9yeCBpbmxpbmUuDQo+DQo+
+IE9uIHRoZSBUeCBwYXRoIFRMUyBlbmdpbmUgcmVjZWl2ZSBwbGFpbiB0ZXh0IGZyb20gb3BlbnNz
+bCwgaW5zZXJ0IElWLCANCj4gZmV0Y2hlcyB0aGUgdHgga2V5LCBjcmVhdGUgY2lwaGVyIHRleHQg
+cmVjb3JkcyBhbmQgZ2VuZXJhdGUgTUFDLiBUTFMgDQo+IGhlYWRlciBpcyBhZGRlZCB0byBjaXBo
+ZXIgdGV4dCBhbmQgZm9yd2FyZCB0byBUQ1AvSVAgZW5naW5lIGZvciANCj4gdHJhbnNwb3J0IGxh
+eWVyIHByb2Nlc3NpbmcgYW5kIHRyYW5zbWlzc2lvbiBvbiB3aXJlLg0KPiBUWDoNCj4gQXBwbGlj
+YXRpb24tLW9wZW5zc2wtLWNodGxzLS0tVExTIGVuZ2luZS0tLWVuY3J5cHQvYXV0aC0tLVRDUC9J
+UCANCj4gZW5naW5lLS0td2lyZS4NCj4NCj4gT24gdGhlIFJ4IHNpZGUsIGRhdGEgcmVjZWl2ZWQg
+aXMgUERVIGFsaWduZWQgYXQgcmVjb3JkIGJvdW5kYXJpZXMuIFRMUyANCj4gcHJvY2Vzc2VzIG9u
+bHkgdGhlIGNvbXBsZXRlIHJlY29yZC4gSWYgcngga2V5IGlzIHByb2dyYW1tZWQgb24gQ0NTIA0K
+PiByZWNlaXZlLCBkYXRhIGlzIGRlY3J5cHRlZCBhbmQgcGxhaW4gdGV4dCBpcyBwb3N0ZWQgdG8g
+aG9zdC4NCj4gUlg6DQo+IFdpcmUtLWNpcGhlci10ZXh0LS1UQ1AvSVAgZW5naW5lIFtQRFUgYWxp
+Z25dLS0tVExTIGVuZ2luZS0tLSANCj4gZGVjcnlwdC9hdXRoLS0tcGxhaW4tdGV4dC0tY2h0bHMt
+LW9wZW5zc2wtLWFwcGxpY2F0aW9uDQo+DQo+IHYzOiBmaXhlZCB0aGUga2J1aWxkIHRlc3QgaXNz
+dWVzDQo+ICAgICAtbWFkZSBmZXcgZnVudGlvbnMgc3RhdGljDQo+ICAgICAtaW5pdGlhbGl6ZWQg
+ZmV3IHZhcmlhYmxlcw0KPg0KPiB2MjogZml4ZWQgdGhlIGZvbGxvd2luZyBiYXNlZCBvbiB0aGUg
+cmV2aWV3IGNvbW1lbnRzIG9mIFN0ZXBoYW4gTXVlbGxlciwNCj4gICAgICBTdGVmYW5vIEJyaXZp
+byBhbmQgSGFubmVzIEZyZWRlcmljDQo+ICAgICAgLUFkZGVkIG1vcmUgZGV0YWlscyBpbiBjb3Zl
+ciBsZXR0ZXINCj4gICAgICAtRml4ZWQgaW5kZW50YXRpb24gYW5kIGZvcm1hdGluZyBpc3N1ZXMN
+Cj4gICAgICAtVXNpbmcgYWVzIGluc3RlYWQgb2YgYWVzLWdlbmVyaWMNCj4gICAgICAtbWVtc2V0
+IGtleSBpbmZvIGFmdGVyIHByb2dyYW1pbmcgdGhlIGtleSBvbiBjaGlwDQo+ICAgICAgLXJlb3Jk
+ZXJlZCB0aGUgcGF0Y2ggc2VxdWVuY2UNCj4NCj4gQXR1bCBHdXB0YSAoOSk6DQo+ICAgIGNodGxz
+OiBzdHJ1Y3R1cmUgYW5kIG1hY3JvIGRlZmluaXRvbg0KPiAgICBjeGdiNDogSW5saW5lIFRMUyBG
+VyBJbnRlcmZhY2UNCj4gICAgY3hnYjQ6IExMRCBkcml2ZXIgY2hhbmdlcyB0byBlbmFibGUgVExT
+DQo+ICAgIGNoY3I6IEtleSBNYWNybw0KPiAgICBjaHRsczogS2V5IHByb2dyYW0NCj4gICAgY2h0
+bHM6IENQTCBoYW5kbGVyIGRlZmluaXRpb24NCj4gICAgY2h0bHM6IElubGluZSBjcnlwdG8gcmVx
+dWVzdCBUeC9SeA0KPiAgICBjaHRsczogUmVnaXN0ZXIgdGhlIFVMUA0KPiAgICBNYWtlZmlsZSBL
+Y29uZmlnDQo+DQo+ICAgZHJpdmVycy9jcnlwdG8vY2hlbHNpby9LY29uZmlnICAgICAgICAgICAg
+ICAgICAgICAgfCAgIDEwICsNCj4gICBkcml2ZXJzL2NyeXB0by9jaGVsc2lvL01ha2VmaWxlICAg
+ICAgICAgICAgICAgICAgICB8ICAgIDEgKw0KPiAgIGRyaXZlcnMvY3J5cHRvL2NoZWxzaW8vY2hj
+cl9hbGdvLmggICAgICAgICAgICAgICAgIHwgICA0MiArDQo+ICAgZHJpdmVycy9jcnlwdG8vY2hl
+bHNpby9jaGNyX2NvcmUuaCAgICAgICAgICAgICAgICAgfCAgIDU1ICstDQo+ICAgZHJpdmVycy9j
+cnlwdG8vY2hlbHNpby9jaHRscy9NYWtlZmlsZSAgICAgICAgICAgICAgfCAgICA0ICsNCj4gICBk
+cml2ZXJzL2NyeXB0by9jaGVsc2lvL2NodGxzL2NodGxzLmggICAgICAgICAgICAgICB8ICA0ODAg
+KysrKysNCj4gICBkcml2ZXJzL2NyeXB0by9jaGVsc2lvL2NodGxzL2NodGxzX2NtLmMgICAgICAg
+ICAgICB8IDIwNDUgKysrKysrKysrKysrKysrKysrKysNCj4gICBkcml2ZXJzL2NyeXB0by9jaGVs
+c2lvL2NodGxzL2NodGxzX2NtLmggICAgICAgICAgICB8ICAyMDMgKysNCj4gICBkcml2ZXJzL2Ny
+eXB0by9jaGVsc2lvL2NodGxzL2NodGxzX2h3LmMgICAgICAgICAgICB8ICAzOTQgKysrKw0KPiAg
+IGRyaXZlcnMvY3J5cHRvL2NoZWxzaW8vY2h0bHMvY2h0bHNfaW8uYyAgICAgICAgICAgIHwgMTg2
+NyArKysrKysrKysrKysrKysrKysNCj4gICBkcml2ZXJzL2NyeXB0by9jaGVsc2lvL2NodGxzL2No
+dGxzX21haW4uYyAgICAgICAgICB8ICA1ODQgKysrKysrDQo+ICAgZHJpdmVycy9uZXQvZXRoZXJu
+ZXQvY2hlbHNpby9jeGdiNC9jeGdiNF9kZWJ1Z2ZzLmMgfCAgIDE4ICstDQo+ICAgZHJpdmVycy9u
+ZXQvZXRoZXJuZXQvY2hlbHNpby9jeGdiNC9jeGdiNF9tYWluLmMgICAgfCAgIDMyICstDQo+ICAg
+ZHJpdmVycy9uZXQvZXRoZXJuZXQvY2hlbHNpby9jeGdiNC9jeGdiNF91bGQuaCAgICAgfCAgICA3
+ICsNCj4gICBkcml2ZXJzL25ldC9ldGhlcm5ldC9jaGVsc2lvL2N4Z2I0L3NnZS5jICAgICAgICAg
+ICB8ICAgOTggKy0NCj4gICBkcml2ZXJzL25ldC9ldGhlcm5ldC9jaGVsc2lvL2N4Z2I0L3Q0X21z
+Zy5oICAgICAgICB8ICAxMjEgKy0NCj4gICBkcml2ZXJzL25ldC9ldGhlcm5ldC9jaGVsc2lvL2N4
+Z2I0L3Q0X3JlZ3MuaCAgICAgICB8ICAgIDIgKw0KPiAgIGRyaXZlcnMvbmV0L2V0aGVybmV0L2No
+ZWxzaW8vY3hnYjQvdDRmd19hcGkuaCAgICAgIHwgIDE2NSArLQ0KPiAgIGluY2x1ZGUvdWFwaS9s
+aW51eC90bHMuaCAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgICAgMSArDQo+ICAgbmV0L2lw
+djQvdGNwX21pbmlzb2Nrcy5jICAgICAgICAgICAgICAgICAgICAgICAgICAgfCAgICAxICsNCj4g
+ICAyMCBmaWxlcyBjaGFuZ2VkLCA2MTExIGluc2VydGlvbnMoKyksIDE5IGRlbGV0aW9ucygtKQ0K
+PiAgIGNyZWF0ZSBtb2RlIDEwMDY0NCBkcml2ZXJzL2NyeXB0by9jaGVsc2lvL2NodGxzL01ha2Vm
+aWxlDQo+ICAgY3JlYXRlIG1vZGUgMTAwNjQ0IGRyaXZlcnMvY3J5cHRvL2NoZWxzaW8vY2h0bHMv
+Y2h0bHMuaA0KPiAgIGNyZWF0ZSBtb2RlIDEwMDY0NCBkcml2ZXJzL2NyeXB0by9jaGVsc2lvL2No
+dGxzL2NodGxzX2NtLmMNCj4gICBjcmVhdGUgbW9kZSAxMDA2NDQgZHJpdmVycy9jcnlwdG8vY2hl
+bHNpby9jaHRscy9jaHRsc19jbS5oDQo+ICAgY3JlYXRlIG1vZGUgMTAwNjQ0IGRyaXZlcnMvY3J5
+cHRvL2NoZWxzaW8vY2h0bHMvY2h0bHNfaHcuYw0KPiAgIGNyZWF0ZSBtb2RlIDEwMDY0NCBkcml2
+ZXJzL2NyeXB0by9jaGVsc2lvL2NodGxzL2NodGxzX2lvLmMNCj4gICBjcmVhdGUgbW9kZSAxMDA2
+NDQgZHJpdmVycy9jcnlwdG8vY2hlbHNpby9jaHRscy9jaHRsc19tYWluLmMNCj4NCg0K
