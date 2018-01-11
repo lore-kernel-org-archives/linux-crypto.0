@@ -1,74 +1,110 @@
-From: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [Part2 PATCH v9 00/38] x86: Secure Encrypted Virtualization (AMD)
-Date: Thu, 11 Jan 2018 13:20:38 +0100
-Message-ID: <03c41419-4c66-c391-0792-d3c419c12bb0@redhat.com>
-References: <20171205010438.5773-1-brijesh.singh@amd.com>
+From: <gregkh@linuxfoundation.org>
+Subject: Patch "hwrng: core - sleep interruptible in read" has been added to the 4.4-stable tree
+Date: Thu, 11 Jan 2018 15:22:20 +0100
+Message-ID: <1515680540980@kroah.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=ANSI_X3.4-1968
 Content-Transfer-Encoding: 8bit
-Cc: bp@alien8.de, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        =?UTF-8?B?UmFkaW0gS3LDhMKNbcODwqHDheKEog==?= <rkrcmar@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Gary Hook <gary.hook@amd.com>, linux-crypto@vger.kernel.org
-To: Brijesh Singh <brijesh.singh@amd.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, x86@kernel.org
+Cc: <stable@vger.kernel.org>, <stable-commits@vger.kernel.org>
+To: jslaby@suse.cz, gregkh@linuxfoundation.org,
+        herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+        mpm@selenic.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:49332 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S932306AbeAKNZn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 11 Jan 2018 08:25:43 -0500
-In-Reply-To: <20171205010438.5773-1-brijesh.singh@amd.com>
-Content-Language: en-US
+Received: from mail.linuxfoundation.org ([140.211.169.12]:36666 "EHLO
+        mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933639AbeAKOWZ (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 11 Jan 2018 09:22:25 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 05/12/2017 02:04, Brijesh Singh wrote:
-> This part of Secure Encrypted Virtualization (SEV) patch series focuses on KVM
-> changes required to create and manage SEV guests.
-> 
-> SEV is an extension to the AMD-V architecture which supports running encrypted
-> virtual machine (VMs) under the control of a hypervisor. Encrypted VMs have their
-> pages (code and data) secured such that only the guest itself has access to
-> unencrypted version. Each encrypted VM is associated with a unique encryption key;
-> if its data is accessed to a different entity using a different key the encrypted
-> guest's data will be incorrectly decrypted, leading to unintelligible data.
-> This security model ensures that hypervisor will no longer able to inspect or
-> alter any guest code or data.
-> 
-> The key management of this feature is handled by a separate processor known as
-> the AMD Secure Processor (AMD-SP) which is present on AMD SOCs. The SEV Key
-> Management Specification (see below) provides a set of commands which can be
-> used by hypervisor to load virtual machine keys through the AMD-SP driver.
-> 
-> The patch series adds a new ioctl in KVM driver (KVM_MEMORY_ENCRYPT_OP). The
-> ioctl will be used by qemu to issue SEV guest-specific commands defined in Key
-> Management Specification.
-> 
-> The following links provide additional details:
-> 
-> AMD Memory Encryption white paper:
-> http://amd-dev.wpengine.netdna-cdn.com/wordpress/media/2013/12/AMD_Memory_Encryption_Whitepaper_v7-Public.pdf
-> 
-> AMD64 Architecture Programmer's Manual:
->     http://support.amd.com/TechDocs/24593.pdf
->     SME is section 7.10
->     SEV is section 15.34
-> 
-> SEV Key Management:
-> http://support.amd.com/TechDocs/55766_SEV-KM API_Specification.pdf
-> 
-> KVM Forum Presentation:
-> http://www.linux-kvm.org/images/7/74/02x08A-Thomas_Lendacky-AMDs_Virtualizatoin_Memory_Encryption_Technology.pdf
-> 
-> SEV Guest BIOS support:
->   SEV support has been add to EDKII/OVMF BIOS
->   https://github.com/tianocore/edk2
 
-Merged!  Thanks,
+This is a note to let you know that I've just added the patch titled
 
-Paolo
+    hwrng: core - sleep interruptible in read
+
+to the 4.4-stable tree which can be found at:
+    http://www.kernel.org/git/?p=linux/kernel/git/stable/stable-queue.git;a=summary
+
+The filename of the patch is:
+     hwrng-core-sleep-interruptible-in-read.patch
+and it can be found in the queue-4.4 subdirectory.
+
+If you, or anyone else, feels it should not be added to the stable tree,
+please let <stable@vger.kernel.org> know about it.
+
+
+>From 1ab87298cb59b649d8d648d25dc15b36ab865f5a Mon Sep 17 00:00:00 2001
+From: Jiri Slaby <jslaby@suse.cz>
+Date: Fri, 27 Nov 2015 16:50:43 +0100
+Subject: hwrng: core - sleep interruptible in read
+
+From: Jiri Slaby <jslaby@suse.cz>
+
+commit 1ab87298cb59b649d8d648d25dc15b36ab865f5a upstream.
+
+hwrng kthread can be waiting via hwrng_fillfn for some data from a rng
+like virtio-rng:
+hwrng           D ffff880093e17798     0   382      2 0x00000000
+...
+Call Trace:
+ [<ffffffff817339c6>] wait_for_completion_killable+0x96/0x210
+ [<ffffffffa00aa1b7>] virtio_read+0x57/0xf0 [virtio_rng]
+ [<ffffffff814f4a35>] hwrng_fillfn+0x75/0x130
+ [<ffffffff810aa243>] kthread+0xf3/0x110
+
+And when some user program tries to read the /dev node in this state,
+we get:
+rngd            D ffff880093e17798     0   762      1 0x00000004
+...
+Call Trace:
+ [<ffffffff817351ac>] mutex_lock_nested+0x15c/0x3e0
+ [<ffffffff814f478e>] rng_dev_read+0x6e/0x240
+ [<ffffffff81231958>] __vfs_read+0x28/0xe0
+ [<ffffffff81232393>] vfs_read+0x83/0x130
+
+And this is indeed unkillable. So use mutex_lock_interruptible
+instead of mutex_lock in rng_dev_read and exit immediatelly when
+interrupted. And possibly return already read data, if any (as POSIX
+allows).
+
+v2: use ERESTARTSYS instead of EINTR
+
+Signed-off-by: Jiri Slaby <jslaby@suse.cz>
+Cc: Matt Mackall <mpm@selenic.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: <linux-crypto@vger.kernel.org>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+---
+ drivers/char/hw_random/core.c |    6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+--- a/drivers/char/hw_random/core.c
++++ b/drivers/char/hw_random/core.c
+@@ -238,7 +238,10 @@ static ssize_t rng_dev_read(struct file
+ 			goto out;
+ 		}
+ 
+-		mutex_lock(&reading_mutex);
++		if (mutex_lock_interruptible(&reading_mutex)) {
++			err = -ERESTARTSYS;
++			goto out_put;
++		}
+ 		if (!data_avail) {
+ 			bytes_read = rng_get_data(rng, rng_buffer,
+ 				rng_buffer_size(),
+@@ -288,6 +291,7 @@ out:
+ 
+ out_unlock_reading:
+ 	mutex_unlock(&reading_mutex);
++out_put:
+ 	put_rng(rng);
+ 	goto out;
+ }
+
+
+Patches currently in stable-queue which might be from jslaby@suse.cz are
+
+queue-4.4/hwrng-core-sleep-interruptible-in-read.patch
