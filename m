@@ -1,121 +1,72 @@
-From: Atul Gupta <atul.gupta@chelsio.com>
-Subject: RE: [RFC crypto v3 0/9] Chelsio Inline TLS
-Date: Thu, 11 Jan 2018 05:31:57 +0000
-Message-ID: <CY4PR1201MB0230BECFD91D372CEBDD652F97160@CY4PR1201MB0230.namprd12.prod.outlook.com>
-References: <1513769582-25786-1-git-send-email-atul.gupta@chelsio.com>
- <61b313d0-6cf7-3b1f-dedc-ed00d6ceb3ae@chelsio.com>
+From: Gilad Ben-Yossef <gilad@benyossef.com>
+Subject: Re: Getting the ccree driver out of staging
+Date: Thu, 11 Jan 2018 08:33:00 +0200
+Message-ID: <CAOtvUMcntBo_H5bRJWooV7mrw7u0xfxUN9fe2-pkPU-b6yWdFQ@mail.gmail.com>
+References: <CAOtvUMdo_ZJ-M-=apA1a=70KyVBX2J0pEVc+Uc9i=rYWCie6Hw@mail.gmail.com>
+ <20180110163926.GA25674@kroah.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "davejwatson@fb.com" <davejwatson@fb.com>,
-        "smueller@chronox.de" <smueller@chronox.de>,
-        "Stefano Brivio" <sbrivio@redhat.com>,
-        "hannes@stressinduktion.org" <hannes@stressinduktion.org>
-To: "davem@davemloft.net" <davem@davemloft.net>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Ganesh GR <ganeshgr@chelsio.com>
-Return-path: <netdev-owner@vger.kernel.org>
-In-Reply-To: <61b313d0-6cf7-3b1f-dedc-ed00d6ceb3ae@chelsio.com>
-Content-Language: en-US
-Sender: netdev-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        devel@driverdev.osuosl.org, driverdev-devel@linuxdriverproject.org,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Ofir Drang <Ofir.Drang@arm.com>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-oi0-f51.google.com ([209.85.218.51]:40764 "EHLO
+        mail-oi0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932065AbeAKGdB (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 11 Jan 2018 01:33:01 -0500
+Received: by mail-oi0-f51.google.com with SMTP id u83so981955oie.7
+        for <linux-crypto@vger.kernel.org>; Wed, 10 Jan 2018 22:33:01 -0800 (PST)
+In-Reply-To: <20180110163926.GA25674@kroah.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-V291bGQgdHJ1bHkgYXBwcmVjaWF0ZSB5b3VyIGZlZWRiYWNrIGFuZCBtYWtlIHByb2dyZXNzLg0K
-DQpUaGFua3MgYW5kIFJlZ2FyZHMNCkF0dWwNCg0KLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0N
-CkZyb206IGxpbnV4LWNyeXB0by1vd25lckB2Z2VyLmtlcm5lbC5vcmcgW21haWx0bzpsaW51eC1j
-cnlwdG8tb3duZXJAdmdlci5rZXJuZWwub3JnXSBPbiBCZWhhbGYgT2YgQXR1bCBHdXB0YQ0KU2Vu
-dDogV2VkbmVzZGF5LCBKYW51YXJ5IDMsIDIwMTggMTI6MzYgUE0NClRvOiBoZXJiZXJ0QGdvbmRv
-ci5hcGFuYS5vcmcuYXU7IGxpbnV4LWNyeXB0b0B2Z2VyLmtlcm5lbC5vcmc7IEdhbmVzaCBHUiA8
-Z2FuZXNoZ3JAY2hlbHNpby5jb20+DQpDYzogbmV0ZGV2QHZnZXIua2VybmVsLm9yZzsgZGF2ZW1A
-ZGF2ZW1sb2Z0Lm5ldDsgZGF2ZWp3YXRzb25AZmIuY29tOyBzbXVlbGxlckBjaHJvbm94LmRlOyBT
-dGVmYW5vIEJyaXZpbyA8c2JyaXZpb0ByZWRoYXQuY29tPjsgaGFubmVzQHN0cmVzc2luZHVrdGlv
-bi5vcmcNClN1YmplY3Q6IFJlOiBbUkZDIGNyeXB0byB2MyAwLzldIENoZWxzaW8gSW5saW5lIFRM
-Uw0KDQpBZGRyZXNzZWQgdGhlIHJldmlldyBjb21tZW50cyBpbiB2MiBhbmQgdjMsIHBsZWFzZSBz
-dWdnZXN0IGlmIHRoZXJlIGlzIGFueSBvdGhlciBjb21tZW50IGFuZCBzdGVwIHRvIHByb2NlZWQ/
-DQoNClRoYW5rcw0KDQpBdHVsIEd1cHRhDQoNCg0KT24gV2VkbmVzZGF5IDIwIERlY2VtYmVyIDIw
-MTcgMDU6MDMgUE0sIEF0dWwgR3VwdGEgd3JvdGU6DQo+IFJGQyBzZXJpZXMgZm9yIENoZWxzaW8g
-SW5saW5lIFRMUyBkcml2ZXIgKGNodGxzLmtvKQ0KPg0KPiBEcml2ZXIgdXNlIHRoZSBVTFAgaW5m
-cmFzdHJ1Y3R1cmUgdG8gcmVnaXN0ZXIgY2h0bHMgYXMgSW5saW5lIFRMUyBVTFAuDQo+IENodGxz
-IHVzZSBUQ1AgU29ja2V0cyB0byB0cmFuc21pdCBhbmQgcmVjZWl2ZSBUTFMgcmVjb3JkLiBUQ1Ag
-DQo+IHByb3RvX29wcyBpcyBleHRlbmRlZCB0byBvZmZsb2FkIFRMUyByZWNvcmQuDQo+DQo+IFQ2
-IGFkYXB0ZXIgcHJvdmlkZXMgdGhlIGZvbGxvd2luZyBmZWF0dXJlczoNCj4gICAgICAgICAgLVRM
-UyByZWNvcmQgb2ZmbG9hZCwgVExTIGhlYWRlciwgZW5jcnlwdCwgZGlnZXN0IGFuZCB0cmFuc21p
-dA0KPiAgICAgICAgICAtVExTIHJlY29yZCByZWNlaXZlIGFuZCBkZWNyeXB0DQo+ICAgICAgICAg
-IC1UTFMga2V5cyBzdG9yZQ0KPiAgICAgICAgICAtVENQL0lQIGVuZ2luZQ0KPiAgICAgICAgICAt
-VExTIGVuZ2luZQ0KPiAgICAgICAgICAtR0NNIGNyeXB0byBlbmdpbmUgW3N1cHBvcnQgQ0JDIGFs
-c29dDQo+DQo+IFRMUyBwcm92aWRlcyBzZWN1cml0eSBhdCB0aGUgdHJhbnNwb3J0IGxheWVyLiBJ
-dCB1c2VzIFRDUCB0byBwcm92aWRlIA0KPiByZWxpYWJsZSBlbmQtdG8tZW5kIHRyYW5zcG9ydCBv
-ZiBhcHBsaWNhdGlvbiBkYXRhLiBJdCByZWxpZXMgb24gVENQIA0KPiBmb3IgYW55IHJldHJhbnNt
-aXNzaW9uLiBUTFMgc2Vzc2lvbiBjb21wcmlzZXMgb2YgdGhyZWUgcGFydHM6DQo+IGEuIFRDUC9J
-UCBjb25uZWN0aW9uDQo+IGIuIFRMUyBoYW5kc2hha2UNCj4gYy4gUmVjb3JkIGxheWVyIHByb2Nl
-c3NpbmcNCj4NCj4gVExTIGhhbmRzaGFrZSBzdGF0ZSBtYWNoaW5lIGlzIGV4ZWN1dGVkIGluIGhv
-c3QgKHJlZmVyIHN0YW5kYXJkIA0KPiBpbXBsZW1lbnRhdGlvbiBlZy4gT3BlblNTTCkuICBTZXRz
-b2Nrb3B0IFtTT0xfVENQLCBUQ1BfVUxQXSBpbml0aWFsaXplIA0KPiBUQ1AgcHJvdG8tb3BzIGZv
-ciBDaGVsc2lvIGlubGluZSB0bHMgc3VwcG9ydC4gc2V0c29ja29wdChzb2NrLCANCj4gU09MX1RD
-UCwgVENQX1VMUCwgImNodGxzIiwgc2l6ZW9mKCJjaHRscyIpKTsNCj4NCj4gVHggYW5kIFJ4IEtl
-eXMgYXJlIGRlY2lkZWQgZHVyaW5nIGhhbmRzaGFrZSBhbmQgcHJvZ3JhbW1lZCBvbnRvIHRoZSAN
-Cj4gY2hpcCBhZnRlciBDQ1MgaXMgZXhjaGFuZ2VkLg0KPiBzdHJ1Y3QgdGxzMTJfY3J5cHRvX2lu
-Zm9fYWVzX2djbV8xMjggY3J5cHRvX2luZm8gc2V0c29ja29wdChzb2NrLCANCj4gU09MX1RMUywg
-VExTX1RYLCAmY3J5cHRvX2luZm8sIHNpemVvZihjcnlwdG9faW5mbykpIEZpbmlzaCBpcyB0aGUg
-DQo+IGZpcnN0IGVuY3J5cHRlZC9kZWNyeXB0ZWQgbWVzc2FnZSB0eC9yeCBpbmxpbmUuDQo+DQo+
-IE9uIHRoZSBUeCBwYXRoIFRMUyBlbmdpbmUgcmVjZWl2ZSBwbGFpbiB0ZXh0IGZyb20gb3BlbnNz
-bCwgaW5zZXJ0IElWLCANCj4gZmV0Y2hlcyB0aGUgdHgga2V5LCBjcmVhdGUgY2lwaGVyIHRleHQg
-cmVjb3JkcyBhbmQgZ2VuZXJhdGUgTUFDLiBUTFMgDQo+IGhlYWRlciBpcyBhZGRlZCB0byBjaXBo
-ZXIgdGV4dCBhbmQgZm9yd2FyZCB0byBUQ1AvSVAgZW5naW5lIGZvciANCj4gdHJhbnNwb3J0IGxh
-eWVyIHByb2Nlc3NpbmcgYW5kIHRyYW5zbWlzc2lvbiBvbiB3aXJlLg0KPiBUWDoNCj4gQXBwbGlj
-YXRpb24tLW9wZW5zc2wtLWNodGxzLS0tVExTIGVuZ2luZS0tLWVuY3J5cHQvYXV0aC0tLVRDUC9J
-UCANCj4gZW5naW5lLS0td2lyZS4NCj4NCj4gT24gdGhlIFJ4IHNpZGUsIGRhdGEgcmVjZWl2ZWQg
-aXMgUERVIGFsaWduZWQgYXQgcmVjb3JkIGJvdW5kYXJpZXMuIFRMUyANCj4gcHJvY2Vzc2VzIG9u
-bHkgdGhlIGNvbXBsZXRlIHJlY29yZC4gSWYgcngga2V5IGlzIHByb2dyYW1tZWQgb24gQ0NTIA0K
-PiByZWNlaXZlLCBkYXRhIGlzIGRlY3J5cHRlZCBhbmQgcGxhaW4gdGV4dCBpcyBwb3N0ZWQgdG8g
-aG9zdC4NCj4gUlg6DQo+IFdpcmUtLWNpcGhlci10ZXh0LS1UQ1AvSVAgZW5naW5lIFtQRFUgYWxp
-Z25dLS0tVExTIGVuZ2luZS0tLSANCj4gZGVjcnlwdC9hdXRoLS0tcGxhaW4tdGV4dC0tY2h0bHMt
-LW9wZW5zc2wtLWFwcGxpY2F0aW9uDQo+DQo+IHYzOiBmaXhlZCB0aGUga2J1aWxkIHRlc3QgaXNz
-dWVzDQo+ICAgICAtbWFkZSBmZXcgZnVudGlvbnMgc3RhdGljDQo+ICAgICAtaW5pdGlhbGl6ZWQg
-ZmV3IHZhcmlhYmxlcw0KPg0KPiB2MjogZml4ZWQgdGhlIGZvbGxvd2luZyBiYXNlZCBvbiB0aGUg
-cmV2aWV3IGNvbW1lbnRzIG9mIFN0ZXBoYW4gTXVlbGxlciwNCj4gICAgICBTdGVmYW5vIEJyaXZp
-byBhbmQgSGFubmVzIEZyZWRlcmljDQo+ICAgICAgLUFkZGVkIG1vcmUgZGV0YWlscyBpbiBjb3Zl
-ciBsZXR0ZXINCj4gICAgICAtRml4ZWQgaW5kZW50YXRpb24gYW5kIGZvcm1hdGluZyBpc3N1ZXMN
-Cj4gICAgICAtVXNpbmcgYWVzIGluc3RlYWQgb2YgYWVzLWdlbmVyaWMNCj4gICAgICAtbWVtc2V0
-IGtleSBpbmZvIGFmdGVyIHByb2dyYW1pbmcgdGhlIGtleSBvbiBjaGlwDQo+ICAgICAgLXJlb3Jk
-ZXJlZCB0aGUgcGF0Y2ggc2VxdWVuY2UNCj4NCj4gQXR1bCBHdXB0YSAoOSk6DQo+ICAgIGNodGxz
-OiBzdHJ1Y3R1cmUgYW5kIG1hY3JvIGRlZmluaXRvbg0KPiAgICBjeGdiNDogSW5saW5lIFRMUyBG
-VyBJbnRlcmZhY2UNCj4gICAgY3hnYjQ6IExMRCBkcml2ZXIgY2hhbmdlcyB0byBlbmFibGUgVExT
-DQo+ICAgIGNoY3I6IEtleSBNYWNybw0KPiAgICBjaHRsczogS2V5IHByb2dyYW0NCj4gICAgY2h0
-bHM6IENQTCBoYW5kbGVyIGRlZmluaXRpb24NCj4gICAgY2h0bHM6IElubGluZSBjcnlwdG8gcmVx
-dWVzdCBUeC9SeA0KPiAgICBjaHRsczogUmVnaXN0ZXIgdGhlIFVMUA0KPiAgICBNYWtlZmlsZSBL
-Y29uZmlnDQo+DQo+ICAgZHJpdmVycy9jcnlwdG8vY2hlbHNpby9LY29uZmlnICAgICAgICAgICAg
-ICAgICAgICAgfCAgIDEwICsNCj4gICBkcml2ZXJzL2NyeXB0by9jaGVsc2lvL01ha2VmaWxlICAg
-ICAgICAgICAgICAgICAgICB8ICAgIDEgKw0KPiAgIGRyaXZlcnMvY3J5cHRvL2NoZWxzaW8vY2hj
-cl9hbGdvLmggICAgICAgICAgICAgICAgIHwgICA0MiArDQo+ICAgZHJpdmVycy9jcnlwdG8vY2hl
-bHNpby9jaGNyX2NvcmUuaCAgICAgICAgICAgICAgICAgfCAgIDU1ICstDQo+ICAgZHJpdmVycy9j
-cnlwdG8vY2hlbHNpby9jaHRscy9NYWtlZmlsZSAgICAgICAgICAgICAgfCAgICA0ICsNCj4gICBk
-cml2ZXJzL2NyeXB0by9jaGVsc2lvL2NodGxzL2NodGxzLmggICAgICAgICAgICAgICB8ICA0ODAg
-KysrKysNCj4gICBkcml2ZXJzL2NyeXB0by9jaGVsc2lvL2NodGxzL2NodGxzX2NtLmMgICAgICAg
-ICAgICB8IDIwNDUgKysrKysrKysrKysrKysrKysrKysNCj4gICBkcml2ZXJzL2NyeXB0by9jaGVs
-c2lvL2NodGxzL2NodGxzX2NtLmggICAgICAgICAgICB8ICAyMDMgKysNCj4gICBkcml2ZXJzL2Ny
-eXB0by9jaGVsc2lvL2NodGxzL2NodGxzX2h3LmMgICAgICAgICAgICB8ICAzOTQgKysrKw0KPiAg
-IGRyaXZlcnMvY3J5cHRvL2NoZWxzaW8vY2h0bHMvY2h0bHNfaW8uYyAgICAgICAgICAgIHwgMTg2
-NyArKysrKysrKysrKysrKysrKysNCj4gICBkcml2ZXJzL2NyeXB0by9jaGVsc2lvL2NodGxzL2No
-dGxzX21haW4uYyAgICAgICAgICB8ICA1ODQgKysrKysrDQo+ICAgZHJpdmVycy9uZXQvZXRoZXJu
-ZXQvY2hlbHNpby9jeGdiNC9jeGdiNF9kZWJ1Z2ZzLmMgfCAgIDE4ICstDQo+ICAgZHJpdmVycy9u
-ZXQvZXRoZXJuZXQvY2hlbHNpby9jeGdiNC9jeGdiNF9tYWluLmMgICAgfCAgIDMyICstDQo+ICAg
-ZHJpdmVycy9uZXQvZXRoZXJuZXQvY2hlbHNpby9jeGdiNC9jeGdiNF91bGQuaCAgICAgfCAgICA3
-ICsNCj4gICBkcml2ZXJzL25ldC9ldGhlcm5ldC9jaGVsc2lvL2N4Z2I0L3NnZS5jICAgICAgICAg
-ICB8ICAgOTggKy0NCj4gICBkcml2ZXJzL25ldC9ldGhlcm5ldC9jaGVsc2lvL2N4Z2I0L3Q0X21z
-Zy5oICAgICAgICB8ICAxMjEgKy0NCj4gICBkcml2ZXJzL25ldC9ldGhlcm5ldC9jaGVsc2lvL2N4
-Z2I0L3Q0X3JlZ3MuaCAgICAgICB8ICAgIDIgKw0KPiAgIGRyaXZlcnMvbmV0L2V0aGVybmV0L2No
-ZWxzaW8vY3hnYjQvdDRmd19hcGkuaCAgICAgIHwgIDE2NSArLQ0KPiAgIGluY2x1ZGUvdWFwaS9s
-aW51eC90bHMuaCAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgICAgMSArDQo+ICAgbmV0L2lw
-djQvdGNwX21pbmlzb2Nrcy5jICAgICAgICAgICAgICAgICAgICAgICAgICAgfCAgICAxICsNCj4g
-ICAyMCBmaWxlcyBjaGFuZ2VkLCA2MTExIGluc2VydGlvbnMoKyksIDE5IGRlbGV0aW9ucygtKQ0K
-PiAgIGNyZWF0ZSBtb2RlIDEwMDY0NCBkcml2ZXJzL2NyeXB0by9jaGVsc2lvL2NodGxzL01ha2Vm
-aWxlDQo+ICAgY3JlYXRlIG1vZGUgMTAwNjQ0IGRyaXZlcnMvY3J5cHRvL2NoZWxzaW8vY2h0bHMv
-Y2h0bHMuaA0KPiAgIGNyZWF0ZSBtb2RlIDEwMDY0NCBkcml2ZXJzL2NyeXB0by9jaGVsc2lvL2No
-dGxzL2NodGxzX2NtLmMNCj4gICBjcmVhdGUgbW9kZSAxMDA2NDQgZHJpdmVycy9jcnlwdG8vY2hl
-bHNpby9jaHRscy9jaHRsc19jbS5oDQo+ICAgY3JlYXRlIG1vZGUgMTAwNjQ0IGRyaXZlcnMvY3J5
-cHRvL2NoZWxzaW8vY2h0bHMvY2h0bHNfaHcuYw0KPiAgIGNyZWF0ZSBtb2RlIDEwMDY0NCBkcml2
-ZXJzL2NyeXB0by9jaGVsc2lvL2NodGxzL2NodGxzX2lvLmMNCj4gICBjcmVhdGUgbW9kZSAxMDA2
-NDQgZHJpdmVycy9jcnlwdG8vY2hlbHNpby9jaHRscy9jaHRsc19tYWluLmMNCj4NCg0K
+On Wed, Jan 10, 2018 at 6:39 PM, Greg Kroah-Hartman
+<gregkh@linuxfoundation.org> wrote:
+> On Wed, Jan 10, 2018 at 08:54:55AM +0200, Gilad Ben-Yossef wrote:
+>> Hi folks,
+>>
+>> With the enormous help of people in the to and CCed lists I've gotten
+>> the ccree driver to a point I believe it is ready to graduate out of
+>> the staging tree:
+>>
+>> - The code base has been reduced by something by 30% and is *much*
+>> more  readable and manageable.
+>> - The very few checkpatch warnings are all false positives (one due to
+>> dt bindings going through the crypto tree, the others due to harmless
+>> macro argument reuse)
+>> and the few sparse output are equally benign.
+>> - The driver follows the crypto API expected behavior as much as I can tell.
+>> - Fixed all the bugs I could fine as a result of tcrypt tests.
+>> - It works :-)
+>>
+>> There are obviously more things todo, but I believe they are out of
+>> scope for staging.
+>>
+>> So, if you see something that still needs work, kindly let me know.
+>> Alternatively, will you accept a patch moving it to drivers/crypto/?
+>
+> It might make more sense to just send a "new" patch adding the driver to
+> drivers/crypto/ and if that is accepted, we can drop it from staging.
+> That way it's easier for the crypto developers to review it.
+>
+> But it's up to them, whatever they want is fine with me.
+
+Thanks, Greg.
+
+Herbert, it's up to you - shall I send a new patch set or do you want to just
+move what's in the staging tree?
+
+Thanks,
+Gilad
+
+
+-- 
+Gilad Ben-Yossef
+Chief Coffee Drinker
+
+"If you take a class in large-scale robotics, can you end up in a
+situation where the homework eats your dog?"
+ -- Jean-Baptiste Queru
