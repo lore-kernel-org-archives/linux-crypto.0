@@ -1,73 +1,46 @@
-From: Arnd Bergmann <arnd@arndb.de>
+From: Segher Boessenkool <segher@kernel.crashing.org>
 Subject: Re: [cryptodev:master 130/134] aes_generic.c:undefined reference to `_restgpr_31_x'
-Date: Fri, 12 Jan 2018 22:45:31 +0100
-Message-ID: <CAK8P3a3XKwrVpXH9=8n1=qAKtqHE+1sh6OhaJ_39GZcWSP-j=Q@mail.gmail.com>
-References: <201801122249.RHvvGQJ6%fengguang.wu@intel.com> <CAK8P3a0Rfbo=wJgEAm3vVFY1MpPWLE3HMGcUdoOXxqOVm8jRyw@mail.gmail.com>
- <20180112163946.GE21977@gate.crashing.org> <CAK8P3a39=PVpwiSk_3CjRnYBawhXqMatHKSsHCd2KHCgR+Zmyg@mail.gmail.com>
- <20180112204154.GM21977@gate.crashing.org> <CAK8P3a2YVVseBFNoDbwOtqR3-JHFuZ-WZD6-PzztNTO_X_soaw@mail.gmail.com>
- <20180112214111.GQ21977@gate.crashing.org>
+Date: Fri, 12 Jan 2018 16:10:50 -0600
+Message-ID: <20180112221050.GR21977@gate.crashing.org>
+References: <201801122249.RHvvGQJ6%fengguang.wu@intel.com> <CAK8P3a0Rfbo=wJgEAm3vVFY1MpPWLE3HMGcUdoOXxqOVm8jRyw@mail.gmail.com> <20180112163946.GE21977@gate.crashing.org> <CAK8P3a39=PVpwiSk_3CjRnYBawhXqMatHKSsHCd2KHCgR+Zmyg@mail.gmail.com> <20180112204154.GM21977@gate.crashing.org> <CAK8P3a2YVVseBFNoDbwOtqR3-JHFuZ-WZD6-PzztNTO_X_soaw@mail.gmail.com> <20180112214111.GQ21977@gate.crashing.org> <CAK8P3a3XKwrVpXH9=8n1=qAKtqHE+1sh6OhaJ_39GZcWSP-j=Q@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
 Cc: "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
         <linux-crypto@vger.kernel.org>,
         kbuild test robot <fengguang.wu@intel.com>,
         linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
         Herbert Xu <herbert@gondor.apana.org.au>
-To: Segher Boessenkool <segher@kernel.crashing.org>
+To: Arnd Bergmann <arnd@arndb.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-oi0-f45.google.com ([209.85.218.45]:33476 "EHLO
-        mail-oi0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S965253AbeALVpc (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 12 Jan 2018 16:45:32 -0500
-Received: by mail-oi0-f45.google.com with SMTP id y141so4872750oia.0
-        for <linux-crypto@vger.kernel.org>; Fri, 12 Jan 2018 13:45:32 -0800 (PST)
-In-Reply-To: <20180112214111.GQ21977@gate.crashing.org>
+Received: from gate.crashing.org ([63.228.1.57]:41653 "EHLO gate.crashing.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S965133AbeALWLL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 12 Jan 2018 17:11:11 -0500
+Content-Disposition: inline
+In-Reply-To: <CAK8P3a3XKwrVpXH9=8n1=qAKtqHE+1sh6OhaJ_39GZcWSP-j=Q@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Jan 12, 2018 at 10:41 PM, Segher Boessenkool
-<segher@kernel.crashing.org> wrote:
-> On Fri, Jan 12, 2018 at 10:29:01PM +0100, Arnd Bergmann wrote:
->> On Fri, Jan 12, 2018 at 9:41 PM, Segher Boessenkool
->> <segher@kernel.crashing.org> wrote:
->> > On Fri, Jan 12, 2018 at 08:43:21PM +0100, Arnd Bergmann wrote:
->> >> On Fri, Jan 12, 2018 at 5:39 PM, Segher Boessenkool
->>
->> >> We could theoretically work around it by turning that into
->> >> "#if defined(CONFIG_CC_OPTIMIZE_FOR_SIZE) ||
->> >> defined(CONFIG_CRYPTO_AES)", but that seems rather ugly.
->> >>
->> >> My earlier patch already tried to be more specific, turning very
->> >> specific optimizations off rather than moving from -O2 to -Os,
->> >> but that turned out to lead to significantly worse performance,
->> >> where -Os improved performance slightly. Is there a way
->> >> to ask powerpc compilers to use mostly -Os but not the
->> >> specific thing that makes it link to _restgpr_31_x?
->> >
->> > There is no such thing, sorry.  Would be very hard to implement, and
->> > older compilers will never get it, so it won't help you anyway :-(
->>
->> We use -Os only for gcc-7.1 and higher, where it produces faster
->> code for AES and avoids running into
->> https://gcc.gnu.org/bugzilla/show_bug.cgi?id=83356
->>
->> > Maybe for now just enable it in crtsavres.S always, with a comment?
->> > That -Os workaround is hopefully not going to live long either...
->>
->> It depends on whether or how soon someone comes up with a
->> better fix for PR83356.
->> gcc-8.0.0 is currently not affected by it, so we could limit the
->> workaround (and the hack in crtsavres.S) to gcc-7-only.
->
-> I guess you could enable the _x routines whenever you use ubsan?  Ubsan
-> will cause much bigger code growth than the handful of insns in those
-> routines?
+On Fri, Jan 12, 2018 at 10:45:31PM +0100, Arnd Bergmann wrote:
+> > I guess you could enable the _x routines whenever you use ubsan?  Ubsan
+> > will cause much bigger code growth than the handful of insns in those
+> > routines?
+> 
+> Right, that could work, too. My patch that Herbert merged intentionally
+> used -Os also for non-UBSAN builds because it turned out to
+> be much faster (see gcc PR83651),
 
-Right, that could work, too. My patch that Herbert merged intentionally
-used -Os also for non-UBSAN builds because it turned out to
-be much faster (see gcc PR83651), but we could revert that back
-to the default and only use the -Os for UBSAN, essentially
-addressing only PR83356 but not PR83651.
+"Much"?
 
-       Arnd
+-Os is *slower* with 8.0, 5% faster with 7.2, 4% faster with 7.1,
+slower with 7.0 and 6.3.  Your numbers, #c1.
+
+Anf this is the generic code of course, which is slow anyway (not to
+mention insecure).
+
+> but we could revert that back
+> to the default and only use the -Os for UBSAN, essentially
+> addressing only PR83356 but not PR83651.
+
+
+Segher
