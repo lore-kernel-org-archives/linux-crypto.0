@@ -1,45 +1,58 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v4] crypto: AF_ALG - whitelist mask and type
-Date: Fri, 12 Jan 2018 23:23:38 +1100
-Message-ID: <20180112122338.GD21636@gondor.apana.org.au>
-References: <001a1141c43ad30ccf055efb76ed@google.com>
- <20171222075843.GB27971@gondor.apana.org.au>
- <2019517.bqA8BTu5nT@positron.chronox.de>
- <4952955.He5JCySAi4@positron.chronox.de>
+Subject: Re: [PATCH v2 0/3] crypto: salsa20 - cleanup and convert to skcipher
+ API
+Date: Fri, 12 Jan 2018 23:25:47 +1100
+Message-ID: <20180112122547.GI21636@gondor.apana.org.au>
+References: <20180105190959.89682-1-ebiggers3@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-Cc: syzbot
-        <bot+b6e703f648ebbbf57a4528d4314e0c2a5c893dc2@syzkaller.appspotmail.com>,
-        davem@davemloft.net, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-        ebiggers3@gmail.com
-To: Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org,
+        "David S . Miller" <davem@davemloft.net>,
+        Eric Biggers <ebiggers@google.com>
+To: Eric Biggers <ebiggers3@gmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from [128.1.224.119] ([128.1.224.119]:54530 "EHLO ringil.hmeau.com"
+        rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
+        id S933719AbeALMZv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 12 Jan 2018 07:25:51 -0500
 Content-Disposition: inline
-In-Reply-To: <4952955.He5JCySAi4@positron.chronox.de>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <20180105190959.89682-1-ebiggers3@gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Jan 02, 2018 at 08:55:25AM +0100, Stephan Müller wrote:
-> Hi,
+On Fri, Jan 05, 2018 at 11:09:56AM -0800, Eric Biggers wrote:
+> From: Eric Biggers <ebiggers@google.com>
 > 
-> sorry, I forgot the right tags.
+> This series converts the Salsa20 implementations over to the skcipher
+> API, in the process fixing a couple bugs and making them be more similar
+> to the ChaCha20 implementations, rather than doing things slightly
+> differently for no good reason.  (Note, however, that Salsa20 still
+> interprets the IV differently from ChaCha20; I didn't change that.)
 > 
-> ---8<---
+> I'm not sure who is actually using Salsa20 in the kernel, but either way
+> if we're going to have it at all we might as well keep it up to date.
 > 
-> The user space interface allows specifying the type and mask field used
-> to allocate the cipher. Only a subset of the possible flags are intended
-> for user space. Therefore, white-list the allowed flags.
+> The Salsa20 algorithms still pass the self-tests after these changes.
 > 
-> In case the user space caller uses at least one non-allowed flag, EINVAL
-> is returned.
+> Changed since v1:
 > 
-> Reported-by: syzbot <syzkaller@googlegroups.com>
-> Cc: <stable@vger.kernel.org>
-> Signed-off-by: Stephan Mueller <smueller@chronox.de>
+>     - Use '__le32' type for keystream, as suggested by Stephan.
+> 
+> Eric Biggers (3):
+>   crypto: salsa20-generic - cleanup and convert to skcipher API
+>   crypto: salsa20 - export generic helpers
+>   crypto: x86/salsa20 - cleanup and convert to skcipher API
+> 
+>  arch/x86/crypto/salsa20-i586-asm_32.S   | 184 +-----------------------
+>  arch/x86/crypto/salsa20-x86_64-asm_64.S | 114 ---------------
+>  arch/x86/crypto/salsa20_glue.c          | 105 ++++++--------
+>  crypto/Kconfig                          |   2 +
+>  crypto/salsa20_generic.c                | 240 ++++++++++++++------------------
+>  include/crypto/salsa20.h                |  27 ++++
+>  6 files changed, 174 insertions(+), 498 deletions(-)
+>  create mode 100644 include/crypto/salsa20.h
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
