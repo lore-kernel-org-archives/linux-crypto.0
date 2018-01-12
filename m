@@ -1,29 +1,27 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: Use zeroing memory allocator instead of
- allocator/memset
-Date: Fri, 12 Jan 2018 23:23:07 +1100
-Message-ID: <20180112122307.GA21636@gondor.apana.org.au>
-References: <1514723063-5614-1-git-send-email-himanshujha199640@gmail.com>
+Subject: Re: [PATCH][crypto-next] crypto: tcrypt: fix spelling mistake:
+ "bufufer"-> "buffer"
+Date: Fri, 12 Jan 2018 23:23:48 +1100
+Message-ID: <20180112122348.GE21636@gondor.apana.org.au>
+References: <20180102092106.7726-1-colin.king@canonical.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
+Cc: "David S . Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org,
         linux-kernel@vger.kernel.org
-To: Himanshu Jha <himanshujha199640@gmail.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+To: Colin King <colin.king@canonical.com>
+Return-path: <kernel-janitors-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1514723063-5614-1-git-send-email-himanshujha199640@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <20180102092106.7726-1-colin.king@canonical.com>
+Sender: kernel-janitors-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Sun, Dec 31, 2017 at 05:54:23PM +0530, Himanshu Jha wrote:
-> Use dma_zalloc_coherent for allocating zeroed
-> memory and remove unnecessary memset function.
+On Tue, Jan 02, 2018 at 09:21:06AM +0000, Colin King wrote:
+> From: Colin Ian King <colin.king@canonical.com>
 > 
-> Done using Coccinelle.
-> Generated-by: scripts/coccinelle/api/alloc/kzalloc-simple.cocci
-> 0-day tested with no failures.
+> Trivial fix to spelling mistakes in pr_err error message text.
 > 
-> Signed-off-by: Himanshu Jha <himanshujha199640@gmail.com>
+> Signed-off-by: Colin Ian King <colin.king@canonical.com>
 
 Patch applied.  Thanks.
 -- 
