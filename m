@@ -1,46 +1,45 @@
-From: Antoine Tenart <antoine.tenart@free-electrons.com>
-Subject: Re: [PATCH 00/17] crypto: inside-secure - various improvements
-Date: Fri, 12 Jan 2018 14:02:51 +0100
-Message-ID: <20180112130251.GA24774@kwain>
-References: <20171214142659.16987-1-antoine.tenart@free-electrons.com>
- <20171222091154.GJ32542@gondor.apana.org.au>
- <20171222142838.GB8067@kwain>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-Cc: Antoine Tenart <antoine.tenart@free-electrons.com>,
-        davem@davemloft.net, thomas.petazzoni@free-electrons.com,
-        gregory.clement@free-electrons.com,
-        miquel.raynal@free-electrons.com, oferh@marvell.com,
-        igall@marvell.com, nadavh@marvell.com, linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: [PATCH 0/5] sha3 fixes and new implementation for arm64
+Date: Fri, 12 Jan 2018 13:15:17 +0000
+Message-ID: <20180112131522.25663-1-ard.biesheuvel@linaro.org>
+Cc: herbert@gondor.apana.org.au, will.deacon@arm.com,
+        catalin.marinas@arm.com, steve.capper@linaro.org,
+        jgarzik@redhat.com, Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.free-electrons.com ([62.4.15.54]:53120 "EHLO
-        mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932797AbeALNCw (ORCPT
+Received: from mail-wm0-f67.google.com ([74.125.82.67]:43023 "EHLO
+        mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933357AbeALNPg (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 12 Jan 2018 08:02:52 -0500
-Content-Disposition: inline
-In-Reply-To: <20171222142838.GB8067@kwain>
+        Fri, 12 Jan 2018 08:15:36 -0500
+Received: by mail-wm0-f67.google.com with SMTP id g1so11998969wmg.2
+        for <linux-crypto@vger.kernel.org>; Fri, 12 Jan 2018 05:15:36 -0800 (PST)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Herbert,
+Add an implementation of SHA3 to arm64 using the new special instructions (#4)
 
-On Fri, Dec 22, 2017 at 03:28:38PM +0100, Antoine Tenart wrote:
-> On Fri, Dec 22, 2017 at 08:11:54PM +1100, Herbert Xu wrote:
-> > 
-> > Patches 1-16 applied.  If patch 17 needs to go through the crypto
-> > tree please let me know.
-> 
-> Thanks! Yes patch 17 should got through the crypto tree as well.
+In preparation of that, fix a bug in the SHA3 and refactor it a bit so it
+can serve as a fallback for the other code. Also, add some new test vectors
+to get better test coverage.
 
-I'm not sure you took patch 17 in your tree. Could you check?
+Ard Biesheuvel (5):
+  crypto/generic: sha3 - fixes for alignment and big endian operation
+  crypto/generic: sha3 - simplify code
+  crypto/generic: sha3 - export init/update/final routines
+  crypto/arm64: sha3 - new implementation based on special instructions
+  crypto/testmgr: sha3 - add new testcases
 
-Thanks!
-Antoine
+ arch/arm64/crypto/Kconfig        |   6 +
+ arch/arm64/crypto/Makefile       |   3 +
+ arch/arm64/crypto/sha3-ce-core.S | 224 ++++++++
+ arch/arm64/crypto/sha3-ce-glue.c | 156 ++++++
+ crypto/sha3_generic.c            | 198 +++----
+ crypto/testmgr.h                 | 550 ++++++++++++++++++++
+ include/crypto/sha3.h            |   6 +-
+ 7 files changed, 1012 insertions(+), 131 deletions(-)
+ create mode 100644 arch/arm64/crypto/sha3-ce-core.S
+ create mode 100644 arch/arm64/crypto/sha3-ce-glue.c
 
 -- 
-Antoine Ténart, Free Electrons
-Embedded Linux and Kernel engineering
-http://free-electrons.com
+2.11.0
