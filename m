@@ -1,61 +1,54 @@
-From: Joey Pabalinas <joeypabalinas@gmail.com>
-Subject: Re: [PATCH v2] crypto: testmgr: change `guard` to unsigned char
-Date: Fri, 12 Jan 2018 07:09:49 -1000
-Message-ID: <20180112170949.xhpinorvatb46b47@gmail.com>
-References: <20180101103319.fmmlpeg6kjdmhloq@gmail.com>
- <1514819026.1967.37.camel@perches.com>
- <20180101204014.643vntmxqdbfqmvb@gmail.com>
- <20180112122328.GC21636@gondor.apana.org.au>
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [cryptodev:master 130/134] aes_generic.c:undefined reference to `_restgpr_31_x'
+Date: Fri, 12 Jan 2018 20:43:21 +0100
+Message-ID: <CAK8P3a39=PVpwiSk_3CjRnYBawhXqMatHKSsHCd2KHCgR+Zmyg@mail.gmail.com>
+References: <201801122249.RHvvGQJ6%fengguang.wu@intel.com> <CAK8P3a0Rfbo=wJgEAm3vVFY1MpPWLE3HMGcUdoOXxqOVm8jRyw@mail.gmail.com>
+ <20180112163946.GE21977@gate.crashing.org>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="xtjbqoar22hpie5t"
-Cc: Joe Perches <joe@perches.com>, linux-crypto@vger.kernel.org,
-        davem@davemloft.net, linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset="UTF-8"
+Cc: "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>,
+        kbuild test robot <fengguang.wu@intel.com>,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>, kbuild-all@01.org
+To: Segher Boessenkool <segher@kernel.crashing.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pf0-f176.google.com ([209.85.192.176]:34581 "EHLO
-        mail-pf0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S964866AbeALRJx (ORCPT
+Received: from mail-ot0-f196.google.com ([74.125.82.196]:39921 "EHLO
+        mail-ot0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S965085AbeALTnW (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 12 Jan 2018 12:09:53 -0500
-Content-Disposition: inline
-In-Reply-To: <20180112122328.GC21636@gondor.apana.org.au>
+        Fri, 12 Jan 2018 14:43:22 -0500
+Received: by mail-ot0-f196.google.com with SMTP id 37so5960993otv.6
+        for <linux-crypto@vger.kernel.org>; Fri, 12 Jan 2018 11:43:21 -0800 (PST)
+In-Reply-To: <20180112163946.GE21977@gate.crashing.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+On Fri, Jan 12, 2018 at 5:39 PM, Segher Boessenkool
+<segher@kernel.crashing.org> wrote:
 
---xtjbqoar22hpie5t
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+>> or why the aes_generic implementation needs this on
+>> powerpc when built with 'gcc -Os'. FWIW, the -Os change was needed
+>> to work around a possible kernel stack overflow that can happen with
+>> gcc-7.2, see https://patchwork.kernel.org/patch/10143607/ and
+>> https://gcc.gnu.org/bugzilla/show_bug.cgi?id=83356
+>
+> The _x versions are smaller but slower; that's why they are used with -Os.
+> Apparently nothing else was built with -Os (and the other needed flags)
+> before.
 
-On Fri, Jan 12, 2018 at 11:23:28PM +1100, Herbert Xu wrote:
->=20
-> Patch applied.  Thanks.
+Ah, that explains it, the definition is in arch/powerpc/lib/crtsavres.S,
+but inside of #ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE.
 
-No problem, cheers.
+We could theoretically work around it by turning that into
+"#if defined(CONFIG_CC_OPTIMIZE_FOR_SIZE) ||
+defined(CONFIG_CRYPTO_AES)", but that seems rather ugly.
 
---=20
-Joey Pabalinas
+My earlier patch already tried to be more specific, turning very
+specific optimizations off rather than moving from -O2 to -Os,
+but that turned out to lead to significantly worse performance,
+where -Os improved performance slightly. Is there a way
+to ask powerpc compilers to use mostly -Os but not the
+specific thing that makes it link to _restgpr_31_x?
 
---xtjbqoar22hpie5t
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEKlZXrihdNOcUPZTNruvLfWhyVBkFAlpY690ACgkQruvLfWhy
-VBmm1Q//cHlbiD8BqYol7eck6alcYNN0QAbYvvGjy3Y/fiXWD8vtH50yUFkuBaQ7
-tuaH1l6xb/ghkl19BIgkU6m0ifHYR0ruEPw+GXzcg801pNSnt8O7q8fsd/fPjTGT
-8XOipDZNrxEHGWsCfHB91EltYxGlWQcJhXwBB6ZRHxaAQlQ/sEemdw1f0AM3E6nQ
-HNs6IbhdNUe9l9zbIuwe/Kq2xX9tPVsRq2wud03FdSFh6lg4OhKonrayvdo96pja
-Zw6EmxaaYwOqvexMsDFvK652Qqd7QWfWX+R+g7GrnnfHgUDERC/Fy2OQAPuot6bN
-33VVXQU+unCrpOqG/KaJdtsWUJfm+wSwsJorKthYfitGB3+uZXt3h6x2kf97Mb8Q
-8pA68AHk1LfeEJRA7UxoSk/mr0rkLIo4xosYCkHjlreTDbv/W19s/dcz5XyYQ9v4
-osb0NI65zhm5+FpCezd7Ro3GtXidw5vHR+7ncMGGBriAbnljSMHxsllc/hByuckh
-pupKUXI3XOYhudg3x38Y31USp5LpLTgqk4x5tj2mXGlNkIJNvtdUfPVfkQm+CmIT
-U+Xwfv+wAE6MkOceFwBSkeJROW35MA0oFHqoa9cqAnIM/R43vZiph/sQATyDKYKt
-KruuK/He56sr6GiB1RQ9gxgoKPN7bYqeD65OOALPIrY5ksJPAdA=
-=A1HD
------END PGP SIGNATURE-----
-
---xtjbqoar22hpie5t--
+       Arnd
