@@ -1,57 +1,51 @@
 From: Colin King <colin.king@canonical.com>
-Subject: [PATCH][next] staging: ccree: fix memory leaks in cc_ivgen_init
-Date: Fri, 12 Jan 2018 16:10:18 +0000
-Message-ID: <20180112161018.26595-1-colin.king@canonical.com>
+Subject: [PATCH][next] hwrng: exynos: check for -ve error return from readl_poll_timeout
+Date: Fri, 12 Jan 2018 16:30:48 +0000
+Message-ID: <20180112163048.26960-1-colin.king@canonical.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 Cc: kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Gilad Ben-Yossef <gilad@benyossef.com>,
+To: =?UTF-8?q?=C5=81ukasz=20Stelmach?= <l.stelmach@samsung.com>,
+        Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Arnd Bergmann <arnd@arndb.de>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-crypto@vger.kernel.org,
-        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org
+        Kukjin Kim <kgene@kernel.org>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        linux-samsung-soc@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
 From: Colin Ian King <colin.king@canonical.com>
 
-The current error exit path in function cc_ivgen_init via label
-'out' free's resources from the drvdata->ivgen_handle context.
-However, drvdata->ivgen_handle has not been assigned to the
-context ivgen_ctx at this point, so the resources are not freed.
-Fix this by setting drvdata->ivgen_handle to ivgen_ctx as early
-as possible so that the clean up error exit return path can free
-the resources.
+Currently, the return from readl_poll_timeout is being assigned to
+a u32 and this is being checked for a -ve return which is always
+false since a u32 cannot be less than zero.  Fix this by changing
+val to an int so that error returns can be correctly detected.
 
-Detected by CoveritScan, CID#1463795 ("Resource leak")
+Detected by CoverityScan, CID#1463776 ("Logically dead code")
 
+Fixes: 6cd225cc5d8a ("hwrng: exynos - add Samsung Exynos True RNG driver")
 Signed-off-by: Colin Ian King <colin.king@canonical.com>
 ---
- drivers/staging/ccree/cc_ivgen.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/char/hw_random/exynos-trng.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/staging/ccree/cc_ivgen.c b/drivers/staging/ccree/cc_ivgen.c
-index 25a3131a93ce..c47f419b277b 100644
---- a/drivers/staging/ccree/cc_ivgen.c
-+++ b/drivers/staging/ccree/cc_ivgen.c
-@@ -178,6 +178,8 @@ int cc_ivgen_init(struct cc_drvdata *drvdata)
- 	if (!ivgen_ctx)
- 		return -ENOMEM;
+diff --git a/drivers/char/hw_random/exynos-trng.c b/drivers/char/hw_random/exynos-trng.c
+index 34d6f51ecbee..f4643e3ec346 100644
+--- a/drivers/char/hw_random/exynos-trng.c
++++ b/drivers/char/hw_random/exynos-trng.c
+@@ -55,7 +55,7 @@ static int exynos_trng_do_read(struct hwrng *rng, void *data, size_t max,
+ 			       bool wait)
+ {
+ 	struct exynos_trng_dev *trng;
+-	u32 val;
++	int val;
  
-+	drvdata->ivgen_handle = ivgen_ctx;
-+
- 	/* Allocate pool's header for initial enc. key/IV */
- 	ivgen_ctx->pool_meta = dma_alloc_coherent(device, CC_IVPOOL_META_SIZE,
- 						  &ivgen_ctx->pool_meta_dma,
-@@ -196,8 +198,6 @@ int cc_ivgen_init(struct cc_drvdata *drvdata)
- 		goto out;
- 	}
+ 	max = min_t(size_t, max, (EXYNOS_TRNG_FIFO_LEN * 4));
  
--	drvdata->ivgen_handle = ivgen_ctx;
--
- 	return cc_init_iv_sram(drvdata);
- 
- out:
 -- 
 2.15.1
