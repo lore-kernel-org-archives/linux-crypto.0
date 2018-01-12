@@ -1,60 +1,57 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [PATCH 0/5] sha3 fixes and new implementation for arm64
-Date: Fri, 12 Jan 2018 15:13:56 +0000
-Message-ID: <CAKv+Gu9QYve=Tq+mBsmtSgbSi9n8Fsbdh2kiZCG-yM6GZ7+2gg@mail.gmail.com>
-References: <20180112131522.25663-1-ard.biesheuvel@linaro.org>
+From: Colin King <colin.king@canonical.com>
+Subject: [PATCH][next] staging: ccree: fix memory leaks in cc_ivgen_init
+Date: Fri, 12 Jan 2018 16:10:18 +0000
+Message-ID: <20180112161018.26595-1-colin.king@canonical.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        Will Deacon <will.deacon@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Steve Capper <steve.capper@linaro.org>, jgarzik@redhat.com,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>
-To: linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-it0-f68.google.com ([209.85.214.68]:40710 "EHLO
-        mail-it0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933866AbeALPN5 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 12 Jan 2018 10:13:57 -0500
-Received: by mail-it0-f68.google.com with SMTP id f190so9597214ita.5
-        for <linux-crypto@vger.kernel.org>; Fri, 12 Jan 2018 07:13:57 -0800 (PST)
-In-Reply-To: <20180112131522.25663-1-ard.biesheuvel@linaro.org>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Cc: kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Gilad Ben-Yossef <gilad@benyossef.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-crypto@vger.kernel.org,
+        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 12 January 2018 at 13:15, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
-> Add an implementation of SHA3 to arm64 using the new special instructions (#4)
->
-> In preparation of that, fix a bug in the SHA3 and refactor it a bit so it
-> can serve as a fallback for the other code. Also, add some new test vectors
-> to get better test coverage.
->
-> Ard Biesheuvel (5):
->   crypto/generic: sha3 - fixes for alignment and big endian operation
->   crypto/generic: sha3 - simplify code
->   crypto/generic: sha3 - export init/update/final routines
->   crypto/arm64: sha3 - new implementation based on special instructions
+From: Colin Ian King <colin.king@canonical.com>
 
-Forgot to mention: this is an RFT for patch #4, as it has not been
-validated against a real implementation, only against my own QEMU
-code.
+The current error exit path in function cc_ivgen_init via label
+'out' free's resources from the drvdata->ivgen_handle context.
+However, drvdata->ivgen_handle has not been assigned to the
+context ivgen_ctx at this point, so the resources are not freed.
+Fix this by setting drvdata->ivgen_handle to ivgen_ctx as early
+as possible so that the clean up error exit return path can free
+the resources.
 
->   crypto/testmgr: sha3 - add new testcases
->
->  arch/arm64/crypto/Kconfig        |   6 +
->  arch/arm64/crypto/Makefile       |   3 +
->  arch/arm64/crypto/sha3-ce-core.S | 224 ++++++++
->  arch/arm64/crypto/sha3-ce-glue.c | 156 ++++++
->  crypto/sha3_generic.c            | 198 +++----
->  crypto/testmgr.h                 | 550 ++++++++++++++++++++
->  include/crypto/sha3.h            |   6 +-
->  7 files changed, 1012 insertions(+), 131 deletions(-)
->  create mode 100644 arch/arm64/crypto/sha3-ce-core.S
->  create mode 100644 arch/arm64/crypto/sha3-ce-glue.c
->
-> --
-> 2.11.0
->
+Detected by CoveritScan, CID#1463795 ("Resource leak")
+
+Signed-off-by: Colin Ian King <colin.king@canonical.com>
+---
+ drivers/staging/ccree/cc_ivgen.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/staging/ccree/cc_ivgen.c b/drivers/staging/ccree/cc_ivgen.c
+index 25a3131a93ce..c47f419b277b 100644
+--- a/drivers/staging/ccree/cc_ivgen.c
++++ b/drivers/staging/ccree/cc_ivgen.c
+@@ -178,6 +178,8 @@ int cc_ivgen_init(struct cc_drvdata *drvdata)
+ 	if (!ivgen_ctx)
+ 		return -ENOMEM;
+ 
++	drvdata->ivgen_handle = ivgen_ctx;
++
+ 	/* Allocate pool's header for initial enc. key/IV */
+ 	ivgen_ctx->pool_meta = dma_alloc_coherent(device, CC_IVPOOL_META_SIZE,
+ 						  &ivgen_ctx->pool_meta_dma,
+@@ -196,8 +198,6 @@ int cc_ivgen_init(struct cc_drvdata *drvdata)
+ 		goto out;
+ 	}
+ 
+-	drvdata->ivgen_handle = ivgen_ctx;
+-
+ 	return cc_init_iv_sram(drvdata);
+ 
+ out:
+-- 
+2.15.1
