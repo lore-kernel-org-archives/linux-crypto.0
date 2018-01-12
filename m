@@ -1,54 +1,60 @@
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [cryptodev:master 130/134] aes_generic.c:undefined reference to `_restgpr_31_x'
-Date: Fri, 12 Jan 2018 15:55:47 +0100
-Message-ID: <CAK8P3a0Rfbo=wJgEAm3vVFY1MpPWLE3HMGcUdoOXxqOVm8jRyw@mail.gmail.com>
-References: <201801122249.RHvvGQJ6%fengguang.wu@intel.com>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH 0/5] sha3 fixes and new implementation for arm64
+Date: Fri, 12 Jan 2018 15:13:56 +0000
+Message-ID: <CAKv+Gu9QYve=Tq+mBsmtSgbSi9n8Fsbdh2kiZCG-yM6GZ7+2gg@mail.gmail.com>
+References: <20180112131522.25663-1-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Cc: kbuild-all@01.org,
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        Will Deacon <will.deacon@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Steve Capper <steve.capper@linaro.org>, jgarzik@redhat.com,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
         "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
-To: kbuild test robot <fengguang.wu@intel.com>
+        <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-oi0-f68.google.com ([209.85.218.68]:46555 "EHLO
-        mail-oi0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933764AbeALOzs (ORCPT
+Received: from mail-it0-f68.google.com ([209.85.214.68]:40710 "EHLO
+        mail-it0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933866AbeALPN5 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 12 Jan 2018 09:55:48 -0500
-Received: by mail-oi0-f68.google.com with SMTP id d124so4066942oib.13
-        for <linux-crypto@vger.kernel.org>; Fri, 12 Jan 2018 06:55:48 -0800 (PST)
-In-Reply-To: <201801122249.RHvvGQJ6%fengguang.wu@intel.com>
+        Fri, 12 Jan 2018 10:13:57 -0500
+Received: by mail-it0-f68.google.com with SMTP id f190so9597214ita.5
+        for <linux-crypto@vger.kernel.org>; Fri, 12 Jan 2018 07:13:57 -0800 (PST)
+In-Reply-To: <20180112131522.25663-1-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Jan 12, 2018 at 3:11 PM, kbuild test robot
-<fengguang.wu@intel.com> wrote:
-> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-> head:   b40fa82cd6138350f723aa47b37e3e3e80906b40
-> commit: 148b974deea927f5dbb6c468af2707b488bfa2de [130/134] crypto: aes-generic - build with -Os on gcc-7+
-> config: powerpc-linkstation_defconfig (attached as .config)
-> compiler: powerpc-linux-gnu-gcc (Debian 7.2.0-11) 7.2.0
-> reproduce:
->         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
->         chmod +x ~/bin/make.cross
->         git checkout 148b974deea927f5dbb6c468af2707b488bfa2de
->         # save the attached .config to linux build tree
->         make.cross ARCH=powerpc
+On 12 January 2018 at 13:15, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
+> Add an implementation of SHA3 to arm64 using the new special instructions (#4)
 >
-> All errors (new ones prefixed by >>):
+> In preparation of that, fix a bug in the SHA3 and refactor it a bit so it
+> can serve as a fallback for the other code. Also, add some new test vectors
+> to get better test coverage.
 >
->    crypto/aes_generic.o: In function `crypto_aes_set_key':
->>> aes_generic.c:(.text+0x4e0): undefined reference to `_restgpr_31_x'
+> Ard Biesheuvel (5):
+>   crypto/generic: sha3 - fixes for alignment and big endian operation
+>   crypto/generic: sha3 - simplify code
+>   crypto/generic: sha3 - export init/update/final routines
+>   crypto/arm64: sha3 - new implementation based on special instructions
 
-adding linuxpcc-dev to Cc, maybe someone knows a way out of this.
-It appears related to https://gcc.gnu.org/bugzilla/show_bug.cgi?id=43810
-but I don't know what _restgpr_31_x actually does, why it's not provided
-by the kernel or why the aes_generic implementation needs this on
-powerpc when built with 'gcc -Os'. FWIW, the -Os change was needed
-to work around a possible kernel stack overflow that can happen with
-gcc-7.2, see https://patchwork.kernel.org/patch/10143607/ and
-https://gcc.gnu.org/bugzilla/show_bug.cgi?id=83356
+Forgot to mention: this is an RFT for patch #4, as it has not been
+validated against a real implementation, only against my own QEMU
+code.
 
-         Arnd
+>   crypto/testmgr: sha3 - add new testcases
+>
+>  arch/arm64/crypto/Kconfig        |   6 +
+>  arch/arm64/crypto/Makefile       |   3 +
+>  arch/arm64/crypto/sha3-ce-core.S | 224 ++++++++
+>  arch/arm64/crypto/sha3-ce-glue.c | 156 ++++++
+>  crypto/sha3_generic.c            | 198 +++----
+>  crypto/testmgr.h                 | 550 ++++++++++++++++++++
+>  include/crypto/sha3.h            |   6 +-
+>  7 files changed, 1012 insertions(+), 131 deletions(-)
+>  create mode 100644 arch/arm64/crypto/sha3-ce-core.S
+>  create mode 100644 arch/arm64/crypto/sha3-ce-glue.c
+>
+> --
+> 2.11.0
+>
