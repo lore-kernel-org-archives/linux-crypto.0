@@ -1,56 +1,61 @@
-From: Segher Boessenkool <segher@kernel.crashing.org>
-Subject: Re: [cryptodev:master 130/134] aes_generic.c:undefined reference to `_restgpr_31_x'
-Date: Fri, 12 Jan 2018 10:39:46 -0600
-Message-ID: <20180112163946.GE21977@gate.crashing.org>
-References: <201801122249.RHvvGQJ6%fengguang.wu@intel.com> <CAK8P3a0Rfbo=wJgEAm3vVFY1MpPWLE3HMGcUdoOXxqOVm8jRyw@mail.gmail.com>
+From: Joey Pabalinas <joeypabalinas@gmail.com>
+Subject: Re: [PATCH v2] crypto: testmgr: change `guard` to unsigned char
+Date: Fri, 12 Jan 2018 07:09:49 -1000
+Message-ID: <20180112170949.xhpinorvatb46b47@gmail.com>
+References: <20180101103319.fmmlpeg6kjdmhloq@gmail.com>
+ <1514819026.1967.37.camel@perches.com>
+ <20180101204014.643vntmxqdbfqmvb@gmail.com>
+ <20180112122328.GC21636@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: kbuild test robot <fengguang.wu@intel.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, kbuild-all@01.org,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="xtjbqoar22hpie5t"
+Cc: Joe Perches <joe@perches.com>, linux-crypto@vger.kernel.org,
+        davem@davemloft.net, linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from gate.crashing.org ([63.228.1.57]:50186 "EHLO gate.crashing.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S933994AbeALQkK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 12 Jan 2018 11:40:10 -0500
+Received: from mail-pf0-f176.google.com ([209.85.192.176]:34581 "EHLO
+        mail-pf0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S964866AbeALRJx (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 12 Jan 2018 12:09:53 -0500
 Content-Disposition: inline
-In-Reply-To: <CAK8P3a0Rfbo=wJgEAm3vVFY1MpPWLE3HMGcUdoOXxqOVm8jRyw@mail.gmail.com>
+In-Reply-To: <20180112122328.GC21636@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi!
 
-On Fri, Jan 12, 2018 at 03:55:47PM +0100, Arnd Bergmann wrote:
-> >    crypto/aes_generic.o: In function `crypto_aes_set_key':
-> >>> aes_generic.c:(.text+0x4e0): undefined reference to `_restgpr_31_x'
-> 
-> adding linuxpcc-dev to Cc, maybe someone knows a way out of this.
-> It appears related to https://gcc.gnu.org/bugzilla/show_bug.cgi?id=43810
+--xtjbqoar22hpie5t
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-It is not.
+On Fri, Jan 12, 2018 at 11:23:28PM +1100, Herbert Xu wrote:
+>=20
+> Patch applied.  Thanks.
 
-> but I don't know what _restgpr_31_x actually does,
+No problem, cheers.
 
-It restores GPR31 from stack, restores LR from stack, and returns
-(_x is "exit").
+--=20
+Joey Pabalinas
 
-> why it's not provided by the kernel
+--xtjbqoar22hpie5t
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Because the kernel refuses to use libgcc.  Let's, uh, not start that
-again?  :-)
+-----BEGIN PGP SIGNATURE-----
 
-> or why the aes_generic implementation needs this on
-> powerpc when built with 'gcc -Os'. FWIW, the -Os change was needed
-> to work around a possible kernel stack overflow that can happen with
-> gcc-7.2, see https://patchwork.kernel.org/patch/10143607/ and
-> https://gcc.gnu.org/bugzilla/show_bug.cgi?id=83356
+iQIzBAEBCAAdFiEEKlZXrihdNOcUPZTNruvLfWhyVBkFAlpY690ACgkQruvLfWhy
+VBmm1Q//cHlbiD8BqYol7eck6alcYNN0QAbYvvGjy3Y/fiXWD8vtH50yUFkuBaQ7
+tuaH1l6xb/ghkl19BIgkU6m0ifHYR0ruEPw+GXzcg801pNSnt8O7q8fsd/fPjTGT
+8XOipDZNrxEHGWsCfHB91EltYxGlWQcJhXwBB6ZRHxaAQlQ/sEemdw1f0AM3E6nQ
+HNs6IbhdNUe9l9zbIuwe/Kq2xX9tPVsRq2wud03FdSFh6lg4OhKonrayvdo96pja
+Zw6EmxaaYwOqvexMsDFvK652Qqd7QWfWX+R+g7GrnnfHgUDERC/Fy2OQAPuot6bN
+33VVXQU+unCrpOqG/KaJdtsWUJfm+wSwsJorKthYfitGB3+uZXt3h6x2kf97Mb8Q
+8pA68AHk1LfeEJRA7UxoSk/mr0rkLIo4xosYCkHjlreTDbv/W19s/dcz5XyYQ9v4
+osb0NI65zhm5+FpCezd7Ro3GtXidw5vHR+7ncMGGBriAbnljSMHxsllc/hByuckh
+pupKUXI3XOYhudg3x38Y31USp5LpLTgqk4x5tj2mXGlNkIJNvtdUfPVfkQm+CmIT
+U+Xwfv+wAE6MkOceFwBSkeJROW35MA0oFHqoa9cqAnIM/R43vZiph/sQATyDKYKt
+KruuK/He56sr6GiB1RQ9gxgoKPN7bYqeD65OOALPIrY5ksJPAdA=
+=A1HD
+-----END PGP SIGNATURE-----
 
-The _x versions are smaller but slower; that's why they are used with -Os.
-Apparently nothing else was built with -Os (and the other needed flags)
-before.
-
-
-Segher
+--xtjbqoar22hpie5t--
