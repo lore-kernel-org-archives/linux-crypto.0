@@ -1,46 +1,40 @@
-From: Segher Boessenkool <segher@kernel.crashing.org>
-Subject: Re: [cryptodev:master 130/134] aes_generic.c:undefined reference to `_restgpr_31_x'
-Date: Fri, 12 Jan 2018 16:10:50 -0600
-Message-ID: <20180112221050.GR21977@gate.crashing.org>
-References: <201801122249.RHvvGQJ6%fengguang.wu@intel.com> <CAK8P3a0Rfbo=wJgEAm3vVFY1MpPWLE3HMGcUdoOXxqOVm8jRyw@mail.gmail.com> <20180112163946.GE21977@gate.crashing.org> <CAK8P3a39=PVpwiSk_3CjRnYBawhXqMatHKSsHCd2KHCgR+Zmyg@mail.gmail.com> <20180112204154.GM21977@gate.crashing.org> <CAK8P3a2YVVseBFNoDbwOtqR3-JHFuZ-WZD6-PzztNTO_X_soaw@mail.gmail.com> <20180112214111.GQ21977@gate.crashing.org> <CAK8P3a3XKwrVpXH9=8n1=qAKtqHE+1sh6OhaJ_39GZcWSP-j=Q@mail.gmail.com>
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: Re: [PATCH 1/7] staging: ccree: remove ccree from staging tree
+Date: Sat, 13 Jan 2018 14:21:00 +0100
+Message-ID: <20180113132100.GC17515@kroah.com>
+References: <1515662239-1714-1-git-send-email-gilad@benyossef.com>
+ <1515662239-1714-2-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>,
-        kbuild test robot <fengguang.wu@intel.com>,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-To: Arnd Bergmann <arnd@arndb.de>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, devel@driverdev.osuosl.org,
+        linux-kernel@vger.kernel.org, Ofir Drang <ofir.drang@arm.com>
+To: Gilad Ben-Yossef <gilad@benyossef.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from gate.crashing.org ([63.228.1.57]:41653 "EHLO gate.crashing.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S965133AbeALWLL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 12 Jan 2018 17:11:11 -0500
+Received: from mail.linuxfoundation.org ([140.211.169.12]:37992 "EHLO
+        mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754987AbeAMNVA (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 13 Jan 2018 08:21:00 -0500
 Content-Disposition: inline
-In-Reply-To: <CAK8P3a3XKwrVpXH9=8n1=qAKtqHE+1sh6OhaJ_39GZcWSP-j=Q@mail.gmail.com>
+In-Reply-To: <1515662239-1714-2-git-send-email-gilad@benyossef.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Jan 12, 2018 at 10:45:31PM +0100, Arnd Bergmann wrote:
-> > I guess you could enable the _x routines whenever you use ubsan?  Ubsan
-> > will cause much bigger code growth than the handful of insns in those
-> > routines?
+On Thu, Jan 11, 2018 at 09:17:08AM +0000, Gilad Ben-Yossef wrote:
+> Remove the ccree driver from the staging tree in preparation to
+> introducing it in the crypto tree.
 > 
-> Right, that could work, too. My patch that Herbert merged intentionally
-> used -Os also for non-UBSAN builds because it turned out to
-> be much faster (see gcc PR83651),
+> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 
-"Much"?
+Heh, no, just make a patch series that adds the driver to the correct
+location in the crypto tree.
 
--Os is *slower* with 8.0, 5% faster with 7.2, 4% faster with 7.1,
-slower with 7.0 and 6.3.  Your numbers, #c1.
+If that gets accepted, we can then delete the staging driver with a
+separate patch, after the fact.  No need for it to be in this patch
+series.
 
-Anf this is the generic code of course, which is slow anyway (not to
-mention insecure).
+thanks,
 
-> but we could revert that back
-> to the default and only use the -Os for UBSAN, essentially
-> addressing only PR83356 but not PR83651.
-
-
-Segher
+greg k-h
