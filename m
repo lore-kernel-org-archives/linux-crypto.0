@@ -1,64 +1,45 @@
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH v2] [v2] crypto: aes-generic - fix aes-generic regression on powerpc
-Date: Mon, 15 Jan 2018 17:07:22 +0100
-Message-ID: <20180115160735.593519-1-arnd@arndb.de>
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Richard Biener <rguenther@suse.de>,
-        Jakub Jelinek <jakub@gcc.gnu.org>,
-        linux-crypto@vger.kernel.org,
-        Segher Boessenkool <segher@kernel.crashing.org>,
-        Arnd Bergmann <arnd@arndb.de>, linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
+From: Robert Donald Rickett <robert.rickett@gmail.com>
+Subject: [PATCH] crypto: wp512: fixed a brace coding style issue
+Date: Mon, 15 Jan 2018 17:01:46 -0600
+Message-ID: <20180115230146.fsj2tazvjd4yllqp@shadow1911>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: davem@davemloft.net, herbert@gondor.apana.org.au,
+        robert.rickett@gmail.com
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.126.135]:50427 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755656AbeAOQIH (ORCPT
+Received: from mail-yw0-f196.google.com ([209.85.161.196]:38073 "EHLO
+        mail-yw0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750779AbeAOXBt (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 15 Jan 2018 11:08:07 -0500
+        Mon, 15 Jan 2018 18:01:49 -0500
+Received: by mail-yw0-f196.google.com with SMTP id m84so6036974ywd.5
+        for <linux-crypto@vger.kernel.org>; Mon, 15 Jan 2018 15:01:49 -0800 (PST)
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-My last bugfix added -Os on the command line, which unfortunately caused
-a build regression on powerpc in some configurations.
+Fixed a coding style issue.
 
-I've done some more analysis of the original problem and found slightly
-different workaround that avoids this regression and also results in
-better performance on gcc-7.0: -fcode-hoisting is an optimization step
-that got added in gcc-7 and that for all gcc-7 versions causes worse
-performance.
-
-This disables -fcode-hoisting on all compilers that understand the option.
-For gcc-7.1 and 7.2 I found the same performance as my previous patch
-(using -Os), in gcc-7.0 it was even better. On gcc-8 I could see no
-change in performance from this patch. In theory, code hoisting should
-not be able make things better for the AES cipher, so leaving it
-disabled for gcc-8 only serves to simplify the Makefile change.
-
-Reported-by: kbuild test robot <fengguang.wu@intel.com>
-Link: https://www.mail-archive.com/linux-crypto@vger.kernel.org/msg30418.html
-Link: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=83356
-Link: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=83651
-Fixes: 148b974deea9 ("crypto: aes-generic - build with -Os on gcc-7+")
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+Signed-off-by: Robert Donald Rickett <robert.rickett@gmail.com>
 ---
-v2: fix a typo in the Makefile
----
- crypto/Makefile | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ crypto/wp512.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/crypto/Makefile b/crypto/Makefile
-index daa69360e054..cdbc03b35510 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -99,7 +99,7 @@ obj-$(CONFIG_CRYPTO_TWOFISH_COMMON) += twofish_common.o
- obj-$(CONFIG_CRYPTO_SERPENT) += serpent_generic.o
- CFLAGS_serpent_generic.o := $(call cc-option,-fsched-pressure)  # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=79149
- obj-$(CONFIG_CRYPTO_AES) += aes_generic.o
--CFLAGS_aes_generic.o := $(call cc-ifversion, -ge, 0701, -Os) # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=83356
-+CFLAGS_aes_generic.o := $(call cc-option,-fno-code-hoisting) # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=83356
- obj-$(CONFIG_CRYPTO_AES_TI) += aes_ti.o
- obj-$(CONFIG_CRYPTO_CAMELLIA) += camellia_generic.o
- obj-$(CONFIG_CRYPTO_CAST_COMMON) += cast_common.o
+diff --git a/crypto/wp512.c b/crypto/wp512.c
+index 7ee5a043a988..58983e23900d 100644
+--- a/crypto/wp512.c
++++ b/crypto/wp512.c
+@@ -993,9 +993,8 @@ static int wp512_init(struct shash_desc *desc) {
+ 	memset(wctx->bitLength, 0, 32);
+ 	wctx->bufferBits = wctx->bufferPos = 0;
+ 	wctx->buffer[0] = 0;
+-	for (i = 0; i < 8; i++) {
++	for (i = 0; i < 8; i++)
+ 		wctx->hash[i] = 0L;
+-	}
+ 
+ 	return 0;
+ }
 -- 
-2.9.0
+2.14.1
