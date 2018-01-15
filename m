@@ -1,281 +1,91 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [RFC] AF_ALG AIO and IV
-Date: Mon, 15 Jan 2018 13:07:16 +0100
-Message-ID: <2353138.AYbjlSPjUL@tauon.chronox.de>
-References: <2118226.LQArbCsRu5@tauon.chronox.de> <20180115110503.000040fc@huawei.com>
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: [PATCH 4.4 43/87] hwrng: core - sleep interruptible in read
+Date: Mon, 15 Jan 2018 13:34:42 +0100
+Message-ID: <20180115123353.719845276@linuxfoundation.org>
+References: <20180115123349.252309699@linuxfoundation.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org, harsh@chelsio.com,
-        linuxarm@huawei.com
-To: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Content-Type: text/plain; charset=UTF-8
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        stable@vger.kernel.org, Jiri Slaby <jslaby@suse.cz>,
+        Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-crypto@vger.kernel.org
+To: linux-kernel@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:58286 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1754444AbeAOMHT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 15 Jan 2018 07:07:19 -0500
-In-Reply-To: <20180115110503.000040fc@huawei.com>
+Received: from mail.linuxfoundation.org ([140.211.169.12]:46544 "EHLO
+        mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S965709AbeAOMkB (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 15 Jan 2018 07:40:01 -0500
+In-Reply-To: <20180115123349.252309699@linuxfoundation.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Montag, 15. Januar 2018, 12:05:03 CET schrieb Jonathan Cameron:
+4.4-stable review patch.  If anyone has any objections, please let me know.
 
-Hi Jonathan,
+------------------
 
-> On Fri, 12 Jan 2018 14:21:15 +0100
-> 
-> Stephan Mueller <smueller@chronox.de> wrote:
-> > Hi,
-> > 
-> > The kernel crypto API requires the caller to set an IV in the request data
-> > structure. That request data structure shall define one particular cipher
-> > operation. During the cipher operation, the IV is read by the cipher
-> > implementation and eventually the potentially updated IV (e.g. in case of
-> > CBC) is written back to the memory location the request data structure
-> > points to.
-> Silly question, are we obliged to always write it back?
+From: Jiri Slaby <jslaby@suse.cz>
 
-Well, in general, yes. The AF_ALG interface should allow a "stream" mode of 
-operation:
+commit 1ab87298cb59b649d8d648d25dc15b36ab865f5a upstream.
 
-socket
-accept
-setsockopt(setkey)
-sendmsg(IV, data)
-recvmsg(data)
-sendmsg(data)
-recvmsg(data)
-..
+hwrng kthread can be waiting via hwrng_fillfn for some data from a rng
+like virtio-rng:
+hwrng           D ffff880093e17798     0   382      2 0x00000000
+...
+Call Trace:
+ [<ffffffff817339c6>] wait_for_completion_killable+0x96/0x210
+ [<ffffffffa00aa1b7>] virtio_read+0x57/0xf0 [virtio_rng]
+ [<ffffffff814f4a35>] hwrng_fillfn+0x75/0x130
+ [<ffffffff810aa243>] kthread+0xf3/0x110
 
-For such synchronous operation, I guess it is clear that the IV needs to be 
-written back.
+And when some user program tries to read the /dev node in this state,
+we get:
+rngd            D ffff880093e17798     0   762      1 0x00000004
+...
+Call Trace:
+ [<ffffffff817351ac>] mutex_lock_nested+0x15c/0x3e0
+ [<ffffffff814f478e>] rng_dev_read+0x6e/0x240
+ [<ffffffff81231958>] __vfs_read+0x28/0xe0
+ [<ffffffff81232393>] vfs_read+0x83/0x130
 
-If you want to play with it, use the "stream" API of libkcapi and the 
-associated test cases.
+And this is indeed unkillable. So use mutex_lock_interruptible
+instead of mutex_lock in rng_dev_read and exit immediatelly when
+interrupted. And possibly return already read data, if any (as POSIX
+allows).
 
-> In CBC it is
-> obviously the same as the last n bytes of the encrypted message.  I guess
-> for ease of handling it makes sense to do so though.
-> 
-> > AF_ALG allows setting the IV with a sendmsg request, where the IV is
-> > stored in the AF_ALG context that is unique to one particular AF_ALG
-> > socket. Note the analogy: an AF_ALG socket is like a TFM where one
-> > recvmsg operation uses one request with the TFM from the socket.
-> > 
-> > AF_ALG these days supports AIO operations with multiple IOCBs. I.e. with
-> > one recvmsg call, multiple IOVECs can be specified. Each individual IOCB
-> > (derived from one IOVEC) implies that one request data structure is
-> > created with the data to be processed by the cipher implementation. The
-> > IV that was set with the sendmsg call is registered with the request data
-> > structure before the cipher operation.
-> > 
-> > In case of an AIO operation, the cipher operation invocation returns
-> > immediately, queuing the request to the hardware. While the AIO request is
-> > processed by the hardware, recvmsg processes the next IOVEC for which
-> > another request is created. Again, the IV buffer from the AF_ALG socket
-> > context is registered with the new request and the cipher operation is
-> > invoked.
-> > 
-> > You may now see that there is a potential race condition regarding the IV
-> > handling, because there is *no* separate IV buffer for the different
-> > requests. This is nicely demonstrated with libkcapi using the following
-> > command which creates an AIO request with two IOCBs each encrypting one
-> > AES block in CBC mode:
-> > 
-> > kcapi  -d 2 -x 9  -e -c "cbc(aes)" -k
-> > 8d7dd9b0170ce0b5f2f8e1aa768e01e91da8bfc67fd486d081b28254c99eb423 -i
-> > 7fbc02ebf5b93322329df9bfccb635af -p 48981da18e4bb9ef7e2e3162d16b1910
-> > 
-> > When the first AIO request finishes before the 2nd AIO request is
-> > processed, the returned value is:
-> > 
-> > 8b19050f66582cb7f7e4b6c873819b7108afa0eaa7de29bac7d903576b674c32
-> > 
-> > I.e. two blocks where the IV output from the first request is the IV input
-> > to the 2nd block.
-> > 
-> > In case the first AIO request is not completed before the 2nd request
-> > commences, the result is two identical AES blocks (i.e. both use the same
-> > IV):
-> > 
-> > 8b19050f66582cb7f7e4b6c873819b718b19050f66582cb7f7e4b6c873819b71
-> > 
-> > This inconsistent result may even lead to the conclusion that there can be
-> > a memory corruption in the IV buffer if both AIO requests write to the IV
-> > buffer at the same time.
-> > 
-> > This needs to be solved somehow. I see the following options which I would
-> > like to have vetted by the community.
-> 
-> Taking some 'entirely hypothetical' hardware with the following structure
-> for all my responses - it's about as flexible as I think we'll see in the
-> near future - though I'm sure someone has something more complex out there
-> :)
-> 
-> N hardware queues feeding M processing engines in a scheduler driven
-> fashion. Actually we might have P sets of these, but load balancing and
-> tracking and transferring contexts between these is a complexity I think we
-> can ignore. If you want to use more than one of these P you'll just have to
-> handle it yourself in userspace.  Note messages may be shorter than IOCBs
-> which raises another question I've been meaning to ask.  Are all crypto
-> algorithms obliged to run unlimited length IOCBs?
+v2: use ERESTARTSYS instead of EINTR
 
-There are instances where hardware may reject large data chunks. IIRC I have 
-seen some limits around 32k. But in this case, the driver must chunk up the 
-scatter-gather lists (SGLs) with the data and feed it to the hardware in the 
-chunk size necessary.
+Signed-off-by: Jiri Slaby <jslaby@suse.cz>
+Cc: Matt Mackall <mpm@selenic.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: <linux-crypto@vger.kernel.org>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
->From the kernel crypto API point of view, the driver must support unlimited 
-sized IOCBs / SGLs.
-> 
-> If there are M messages in a particular queue and none elsewhere it is
-> capable of processing them all at once (and perhaps returning out of order
-> but we can fudge them back in order in the driver to avoid that additional
-> complexity from an interface point of view).
-> 
-> So I'm going to look at this from the hardware point of view - you have
-> well addressed software management above.
-> 
-> Three ways context management can be handled (in CBC this is basically just
-> the IV).
-> 
-> 1. Each 'work item' queued on a hardware queue has it's IV embedded with the
-> data.  This requires external synchronization if we are chaining across
-> multiple 'work items' - note the hardware may have restrictions that mean
-> it has to split large pieces of data up to encrypt them.  Not all hardware
-> may support per 'work item' IVs (I haven't done a survey to find out if
-> everyone does...)
-> 
-> 2. Each queue has a context assigned.  We get a new queue whenever we want
-> to have a different context.  Runs out eventually but our hypothetical
-> hardware may support a lot of queues.  Note this version could be 'faked'
-> by putting a cryptoengine queue on the front of the hardware queues.
-> 
-> 3. The hardware supports IV dependency tracking in it's queues.  That is,
-> it can check if the address pointing to the IV is in use by one of the
-> processing units which has not yet updated the IV ready for chaining with
-> the next message.  Note it might use a magic token rather than the IV
-> pointer.  For modes with out chaining (including counter modes) the IV
-> pointer will inherently always be different.
-> The hardware then simply schedules something else until it can safely
-> run that particular processing unit.
+---
+ drivers/char/hw_random/core.c |    6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-The kernel crypto API has the following concept:
-
-- a TFM holds the data that is stable for an entire cipher operation, such as 
-the key -- one cipher operation may consist of individual calls
-
-- a request structure holds the volatile data, i.e. the data that is valid for 
-one particular call, such as the input plaintext or the IV
-
-Thus, your hardware queue should expect one request and it must be capable of 
-handling that one request with the given data. If you want to split up the 
-request because you have sufficient hardware resources as you mentioned above, 
-your driver/hardware must process the request accordingly.
-
-Coming back to the AF_ALG interface: in order to support the aforementioned 
-"stream" mode, the requests for each cipher call invoked by one recvmsg 
-syscall points to the same IV buffer.
-
-In case of AIO with multiple IOCBs, user space conceptually calls:
-
-sendmsg
-recvmsg
-recvmsg
-..
-
-where all recvmsg calls execute in parallel. As each recvmsg call has one 
-request associated with it, the question is what happens to a buffer that is 
-pointed to by multiple request structures in such parallel execution.
-
-If your hardware is capable of serializing the recvmsg calls or tracking the 
-dependency, the current AF_ALG interface is fully sufficient.
-
-But there may be hardware that cannot/will not track such dependencies. Yet, 
-it has multiple hardware queues. Such hardware can still handle parallel 
-requests when they are totally independent from each other. For such a case, 
-AF_ALG currently has no support, because it lacks the support for setting 
-multiple IVs for the multiple concurrent calls.
+--- a/drivers/char/hw_random/core.c
++++ b/drivers/char/hw_random/core.c
+@@ -238,7 +238,10 @@ static ssize_t rng_dev_read(struct file
+ 			goto out;
+ 		}
  
-> > 1. Require that the cipher implementations serialize any AIO requests that
-> > have dependencies. I.e. for CBC, requests need to be serialized by the
-> > driver. For, say, ECB or XTS no serialization is necessary.
-> 
-> There is a certain requirement to do this anyway as we may have a streaming
-> type situation and we don't want to have to do the chaining in userspace.
-
-Absolutely. If you have proper hardware/driver support, that would be 
-beneficial. This would be supported with the current AF_ALG interface.
-
-But I guess there are also folks out there who simply want to offer multiple 
-hardware queues to allow independent cipher operations to be invoked 
-concurrently without any dependency handling. This is currently not supported 
-with AF_ALG.
-> 
-> So we send first X MB block to HW but before it has come back we have more
-> data arrive that needs decrypting so we queue that behind it.  The IV
-> then needs to be updated automatically (or the code needs to do it on the
-> first work item coming back). If you don't have option 3 above, you
-> have to do this.  This is what I was planning to implement for our existing
-> hardware before you raised this question and I don't think we get around
-> it being necessary for performance in any case. Setting up IOMMUs etc is
-> costly so we want to be doing everything we can before the IV update is
-> ready.
-> 
-> > 2. Change AF_ALG to require a per-request IV. This could be implemented by
-> > moving the IV submission via CMSG from sendmsg to recvmsg. I.e. the
-> > recvmsg
-> > code path would obtain the IV.
-> > 
-> > I would tend to favor option 2 as this requires code change at only
-> > location. If option 2 is considered, I would recommend to still allow
-> > setting the IV via sendmsg CMSG (to keep the interface stable). If,
-> > however, the caller provides an IV via recvmsg, this takes precedence.
-> 
-> We definitely want to keep option 1 (which runs on the existing interface
-> and does the magic in driver) for those who want it.
-
-Agreed.
-> 
-> So the only one left is the case 3 above where the hardware is capable
-> of doing the dependency tracking.
-> 
-> We can support that in two ways but one is rather heavyweight in terms of
-> resources.
-> 
-> 1) Whenever we want to allocate a new context we spin up a new socket and
-> effectively associate a single IV with that (and it's chained updates) much
-> like we do in the existing interface.
-
-I would not like that because it is too heavyweight. Moreover, considering the 
-kernel crypto API logic, a socket is the user space equivalent of a TFM. I.e. 
-for setting an IV, you do not need to re-instantiate a TFM.
-> 
-> 2) We allow a token based tracking of IVs.  So userspace code maintains
-> a counter and tags ever message and the initial IV setup with that counter.
-
-I think the option I offer with the patch, we have an even more lightweight 
-approach.
-> 
-> As the socket typically belongs to a userspace process tag creation can
-> be in userspace and it can ensure it doesn't overlap tags (or it'll get
-> the wrong answer).
-> 
-> Kernel driver can then handle making sure any internal token / addresses
-> are correct.  I haven't looked at in depth but would imagine this one
-> would be rather more invasive to support.
-> 
-> > If there are other options, please allow us to learn about them.
-> 
-> Glad we are addressing these usecases and that we have AIO support in
-> general.  Makes for a better discussion around whether in kernel support
-> for these interfaces is actually as effective as moving to userspace
-> drivers...
-
-:-)
-
-I would like to have more code in user space than in kernel space...
-
-
-Ciao
-Stephan
+-		mutex_lock(&reading_mutex);
++		if (mutex_lock_interruptible(&reading_mutex)) {
++			err = -ERESTARTSYS;
++			goto out_put;
++		}
+ 		if (!data_avail) {
+ 			bytes_read = rng_get_data(rng, rng_buffer,
+ 				rng_buffer_size(),
+@@ -288,6 +291,7 @@ out:
+ 
+ out_unlock_reading:
+ 	mutex_unlock(&reading_mutex);
++out_put:
+ 	put_rng(rng);
+ 	goto out;
+ }
