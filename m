@@ -1,46 +1,40 @@
-From: Segher Boessenkool <segher@kernel.crashing.org>
-Subject: Re: [cryptodev:master 130/134] aes_generic.c:undefined reference to `_restgpr_31_x'
-Date: Sun, 14 Jan 2018 18:21:09 -0600
-Message-ID: <20180115002109.GX21977@gate.crashing.org>
-References: <201801122249.RHvvGQJ6%fengguang.wu@intel.com> <CAK8P3a0Rfbo=wJgEAm3vVFY1MpPWLE3HMGcUdoOXxqOVm8jRyw@mail.gmail.com> <20180112163946.GE21977@gate.crashing.org> <CAK8P3a39=PVpwiSk_3CjRnYBawhXqMatHKSsHCd2KHCgR+Zmyg@mail.gmail.com> <20180112204154.GM21977@gate.crashing.org> <CAK8P3a2YVVseBFNoDbwOtqR3-JHFuZ-WZD6-PzztNTO_X_soaw@mail.gmail.com> <20180112214111.GQ21977@gate.crashing.org> <CAK8P3a3XKwrVpXH9=8n1=qAKtqHE+1sh6OhaJ_39GZcWSP-j=Q@mail.gmail.com> <20180112221050.GR21977@gate.crashing.org> <CAK8P3a30k-JjMJ0M9KWXqUMT3eHmuuFvAe1KuKdqNoAiSZrgog@mail.gmail.com>
+From: Chris Moore <moore@free.fr>
+Subject: Re: [PATCH v2 1/3] crypto/generic: sha3 - fixes for alignment and big
+ endian operation
+Date: Mon, 15 Jan 2018 06:53:48 +0100
+Message-ID: <cad7b34c-ca50-f856-c3fa-221b4c937d3e@free.fr>
+References: <20180114164118.18330-1-ard.biesheuvel@linaro.org>
+ <20180114164118.18330-2-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>,
-        kbuild test robot <fengguang.wu@intel.com>,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-To: Arnd Bergmann <arnd@arndb.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Cc: steve.capper@linaro.org, herbert@gondor.apana.org.au,
+        arnd@arndb.de, catalin.marinas@arm.com, will.deacon@arm.com,
+        jgarzik@redhat.com
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from gate.crashing.org ([63.228.1.57]:46406 "EHLO gate.crashing.org"
+Received: from smtp4-g21.free.fr ([212.27.42.4]:64790 "EHLO smtp4-g21.free.fr"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752205AbeAOAVz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 14 Jan 2018 19:21:55 -0500
-Content-Disposition: inline
-In-Reply-To: <CAK8P3a30k-JjMJ0M9KWXqUMT3eHmuuFvAe1KuKdqNoAiSZrgog@mail.gmail.com>
+        id S1751253AbeAOFx5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 15 Jan 2018 00:53:57 -0500
+In-Reply-To: <20180114164118.18330-2-ard.biesheuvel@linaro.org>
+Content-Language: fr
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Jan 14, 2018 at 10:40:36PM +0100, Arnd Bergmann wrote:
-> Right. I've done some more investigation anyway, starting over with the
-> analysis of the gcc options that change it. I've found now that turning
-> off '-fcode-hoisting' but leaving on the other options I had suspected
-> earlier (-O2 instead of -Os, -ftree-sra, -ftree-pre) also fixes the
-> stack problem, and appears to result in the best performance so
-> far.
+Hi,
 
-Oh nice!
+Le 14/01/2018 à 17:41, Ard Biesheuvel a écrit :
+> Ensure that the input is byte swabbed before injecting it into the
 
-> I need to rerun the whole test matrix, but that seems rather
-> promising, and the result may also help debug what's really happening.
+Nitpick : s/swabbed/swapped/
 
--fcode-hoisting moves all expression evaluation to as early as possible;
-for this AES code that means it will increase register pressure a lot,
-causing a lot of spilling (well, that is my guess).  If that is so, then
-we need to dial down -fcode-hoisting a bit, maybe make it aware of
-register pressure.
+> SHA3 transform. Use the get_unaligned() accessor for this so that
+> we don't perform unaligned access inadvertently on architectures
+> that do not support that.
+>
+> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-Glad you found a smoking gun,
-
-
-Segher
+Cheers,
+Chris
