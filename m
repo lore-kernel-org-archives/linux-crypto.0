@@ -1,97 +1,51 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [RFC] AF_ALG AIO and IV
-Date: Mon, 15 Jan 2018 14:15:42 +0100
-Message-ID: <2894022.U2pY25BtWW@tauon.chronox.de>
-References: <2118226.LQArbCsRu5@tauon.chronox.de> <2353138.AYbjlSPjUL@tauon.chronox.de> <20180115125927.00007520@huawei.com>
+From: Brijesh Singh <brijesh.singh@amd.com>
+Subject: [PATCH 0/4] KVM: SVM: kbuild test robot warning fixes
+Date: Mon, 15 Jan 2018 07:32:01 -0600
+Message-ID: <20180115133205.93859-1-brijesh.singh@amd.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org, harsh@chelsio.com,
-        linuxarm@huawei.com
-To: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:58292 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1030453AbeAONPo (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 15 Jan 2018 08:15:44 -0500
-In-Reply-To: <20180115125927.00007520@huawei.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Cc: Brijesh Singh <brijesh.singh@amd.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
+        Borislav Petkov <bp@suse.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Gary Hook <gary.hook@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Joerg Roedel <joro@8bytes.org>, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+To: kvm@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Am Montag, 15. Januar 2018, 13:59:27 CET schrieb Jonathan Cameron:
+The patch series fixes the warnings reported by kbuild test robot
+after SEV patches. Additionally, during testing I found that LAUNCH_SECRET
+command was broken and patch series contains the fix for it.
 
-Hi Jonathan,
-> > 
-> > But there may be hardware that cannot/will not track such dependencies.
-> > Yet, it has multiple hardware queues. Such hardware can still handle
-> > parallel requests when they are totally independent from each other. For
-> > such a case, AF_ALG currently has no support, because it lacks the
-> > support for setting multiple IVs for the multiple concurrent calls.
-> 
-> Agreed, something like your new support is needed - I just suspect we need
-> a level between one socket one iv chain and every IOCB with own IV and
-> right now the only way to hit that balance is to have a separate socket
-> for each IV chain.  Not exactly efficient use of resources though it will
-> work.
+The patch series applies on kvm/queue branch. 
 
-How would you propose such support via AF_ALG? Wouldn't it be possible to 
-arrange the IOVEC array in user space appropriately before calling the AF_ALG 
-interface? In this case, I would still see that the current AF_ALG (plus the 
-patch) would support all use cases I am aware of.
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: "Radim Krčmář" <rkrcmar@redhat.com>
+Cc: Borislav Petkov <bp@suse.de>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Gary Hook <gary.hook@amd.com>
+Cc: Tom Lendacky <thomas.lendacky@amd.com>
+Cc: Joerg Roedel <joro@8bytes.org>
+Cc: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
 
-> > > So the only one left is the case 3 above where the hardware is capable
-> > > of doing the dependency tracking.
-> > > 
-> > > We can support that in two ways but one is rather heavyweight in terms
-> > > of
-> > > resources.
-> > > 
-> > > 1) Whenever we want to allocate a new context we spin up a new socket
-> > > and
-> > > effectively associate a single IV with that (and it's chained updates)
-> > > much
-> > > like we do in the existing interface.
-> > 
-> > I would not like that because it is too heavyweight. Moreover, considering
-> > the kernel crypto API logic, a socket is the user space equivalent of a
-> > TFM. I.e. for setting an IV, you do not need to re-instantiate a TFM.
-> 
-> Agreed, though as I mention above if you have multiple processes you
-> probably want to give them their own resources anyway (own socket and
-> probably hardware queue if you can spare one) so as to avoid denial of
-> service from one to another.
+Brijesh Singh (4):
+  crypto: ccp: Fix sparse, use plain integer as NULL pointer
+  KVM: SVM: Fix sparse: incorrect type in argument 1 (different base
+    types)
+  include: psp-sev: Capitalize invalid length enum
+  KVM: SVM: Fix SEV LAUNCH_SECRET command
 
-That is for sure, different processes shall never share a socket as otherwise 
-one can obtain data belonging to the other which would violate process 
-isolation.
+ arch/x86/kvm/svm.c           | 14 ++++++++++----
+ drivers/crypto/ccp/psp-dev.c |  8 ++++----
+ include/uapi/linux/psp-sev.h |  2 +-
+ 3 files changed, 15 insertions(+), 9 deletions(-)
 
-> > > 2) We allow a token based tracking of IVs.  So userspace code maintains
-> > > a counter and tags ever message and the initial IV setup with that
-> > > counter.
-> > 
-> > I think the option I offer with the patch, we have an even more
-> > lightweight
-> > approach.
-> 
-> Except that I think you have to go all the way back to userspace - unless I
-> am missing the point - you can't have multiple elements of a stream queued
-> up. Performance will stink if you have a small number of contexts and can't
-> keep the processing engines busy.  At the moment option 1 here is the only
-> way to implement this.
-
-What AF_ALG should do is to enable different vendors like yourself to use the 
-most appropriate solution. AF_ALG shall not limit users in any way.
-
-Thus, AF_ALG allows multiple sockets, if desired. It allows a stream usage 
-with one setiv call applicable to multiple cipher operations. And with the 
-offered patch it would allow multiple concurrent and yet independent cipher 
-operations. Whichever use case is right for you, AF_ALG should not block you 
-from applying it. Yet, what is good for you may not be good for others. Thus, 
-these others may implement a different usage strategy for AF_ALG. The good 
-thing is that this strategy is defined by user space.
-
-In case you see a use case that is prevented by AF_ALG, it would be great to 
-hear about it to see whether we can support it.
-
-Ciao
-Stephan
+-- 
+2.9.5
