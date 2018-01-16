@@ -1,97 +1,126 @@
-From: Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
-Subject: Re: [RFT PATCH] crypto: ahash.c: Require export/import in ahash
-Date: Tue, 16 Jan 2018 13:20:12 +0100
-Message-ID: <2041364.q1qUov6bzd@amdc3058>
-References: <CGME20180116103545eucas1p230af34b97f903f8dc7db5e634297f4f8@eucas1p2.samsung.com>
-        <2a8e710f-9d1c-726b-3355-5d671e04cb68@partner.samsung.com>
+From: Kamil Konieczny <k.konieczny@partner.samsung.com>
+Subject: [PATCH] crypto: testmgr.c: test misuse of result in ahash
+Date: Tue, 16 Jan 2018 15:26:13 +0100
+Message-ID: <9d678a28-8cb3-1ab8-cefe-1bafff2a18d9@partner.samsung.com>
+References: <CGME20180116142614eucas1p1c171b69192a4b8f7871075ff712bb7ba@eucas1p1.samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: "David S. Miller" <davem@davemloft.net>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Kamil Konieczny <k.konieczny@partner.samsung.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mailout1.samsung.com ([203.254.224.24]:17790 "EHLO
-        mailout1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751781AbeAPMUR (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 16 Jan 2018 07:20:17 -0500
-In-reply-to: <2a8e710f-9d1c-726b-3355-5d671e04cb68@partner.samsung.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Tuesday, January 16, 2018 11:35:44 AM Kamil Konieczny wrote:
-> Export and import were optional in async hash. As drivers were rewritten,
-> they become mandatory now, so correct init of ahash transformation.
-> 
-> Signed-off-by: Kamil Konieczny <k.konieczny@partner.samsung.com>
-> ---
-> Tested with crypto run-time self test on Odroid-U3 with Exynos 4412 CPU,
-> with insmod s5p-sss.ko
-> Please test with other crypto hash drivers.
+Async hash operations can use result pointer in final/finup/digest,
+but not in init/update/export/import, so test it for misuse.
 
-Testing all existing ahash drivers is impossible so the code audit
-should be done instead. From the quick look there are 3 hash drivers
-left that still don't implement ->import/->export methods:
+Signed-off-by: Kamil Konieczny <k.konieczny@partner.samsung.com>
+---
+Tested with crypto run-time self test on Odroid-U3 with Exynos 4412 CPU
+with insmod s5p-sss.ko
 
-drivers/crypto/mxs-dcp.c
-drivers/crypto/n2_core.c
-drivers/crypto/ux500/hash/hash_core.c
+ crypto/testmgr.c | 39 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 39 insertions(+)
 
-It seems that after this patch they will OOPS, currently they now
-return errors on ->import/->export attempts.
-
-Please verify this and if necessary add dummy ->import/->export
-implementations to affected drivers + contact their maintainers
-(or authors if there is no maintainer assigned) to make them
-aware of the problem (maybe some drivers should be removed now?).
-
->  crypto/ahash.c | 18 ++----------------
->  1 file changed, 2 insertions(+), 16 deletions(-)
-> 
-> diff --git a/crypto/ahash.c b/crypto/ahash.c
-> index 3a35d67de7d9..7a8906d5af53 100644
-> --- a/crypto/ahash.c
-> +++ b/crypto/ahash.c
-> @@ -434,16 +434,6 @@ static int ahash_def_finup(struct ahash_request *req)
->  	return ahash_def_finup_finish1(req, err);
->  }
->  
-> -static int ahash_no_export(struct ahash_request *req, void *out)
-> -{
-> -	return -ENOSYS;
-> -}
-> -
-> -static int ahash_no_import(struct ahash_request *req, const void *in)
-> -{
-> -	return -ENOSYS;
-> -}
-> -
->  static int crypto_ahash_init_tfm(struct crypto_tfm *tfm)
->  {
->  	struct crypto_ahash *hash = __crypto_ahash_cast(tfm);
-> @@ -451,8 +441,8 @@ static int crypto_ahash_init_tfm(struct crypto_tfm *tfm)
->  
->  	hash->setkey = ahash_nosetkey;
->  	hash->has_setkey = false;
-> -	hash->export = ahash_no_export;
-> -	hash->import = ahash_no_import;
-> +	hash->export = alg->export;
-> +	hash->import = alg->import;
->  
->  	if (tfm->__crt_alg->cra_type != &crypto_ahash_type)
->  		return crypto_init_shash_ops_async(tfm);
-> @@ -467,10 +457,6 @@ static int crypto_ahash_init_tfm(struct crypto_tfm *tfm)
->  		hash->setkey = alg->setkey;
->  		hash->has_setkey = true;
->  	}
-> -	if (alg->export)
-> -		hash->export = alg->export;
-> -	if (alg->import)
-> -		hash->import = alg->import;
->  
->  	return 0;
->  }
-
-Best regards,
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index 44a85d4b3561..d5e23a142a04 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -177,6 +177,18 @@ static void testmgr_free_buf(char *buf[XBUFSIZE])
+ 		free_page((unsigned long)buf[i]);
+ }
+ 
++static int ahash_guard_result(char *result, char c, int size)
++{
++	int i;
++
++	for (i = 0; i < size; i++) {
++		if (result[i] != c)
++			return -EINVAL;
++	}
++
++	return 0;
++}
++
+ static int ahash_partial_update(struct ahash_request **preq,
+ 	struct crypto_ahash *tfm, const struct hash_testvec *template,
+ 	void *hash_buff, int k, int temp, struct scatterlist *sg,
+@@ -186,6 +198,7 @@ static int ahash_partial_update(struct ahash_request **preq,
+ 	struct ahash_request *req;
+ 	int statesize, ret = -EINVAL;
+ 	static const unsigned char guard[] = { 0x00, 0xba, 0xad, 0x00 };
++	int digestsize = crypto_ahash_digestsize(tfm);
+ 
+ 	req = *preq;
+ 	statesize = crypto_ahash_statesize(
+@@ -196,12 +209,19 @@ static int ahash_partial_update(struct ahash_request **preq,
+ 		goto out_nostate;
+ 	}
+ 	memcpy(state + statesize, guard, sizeof(guard));
++	memset(result, 1, digestsize);
+ 	ret = crypto_ahash_export(req, state);
+ 	WARN_ON(memcmp(state + statesize, guard, sizeof(guard)));
+ 	if (ret) {
+ 		pr_err("alg: hash: Failed to export() for %s\n", algo);
+ 		goto out;
+ 	}
++	ret = ahash_guard_result(result, 1, digestsize);
++	if (ret) {
++		pr_err("alg: hash: Failed, export used req->result for %s\n",
++		       algo);
++		goto out;
++	}
+ 	ahash_request_free(req);
+ 	req = ahash_request_alloc(tfm, GFP_KERNEL);
+ 	if (!req) {
+@@ -221,6 +241,12 @@ static int ahash_partial_update(struct ahash_request **preq,
+ 		pr_err("alg: hash: Failed to import() for %s\n", algo);
+ 		goto out;
+ 	}
++	ret = ahash_guard_result(result, 1, digestsize);
++	if (ret) {
++		pr_err("alg: hash: Failed, import used req->result for %s\n",
++		       algo);
++		goto out;
++	}
+ 	ret = crypto_wait_req(crypto_ahash_update(req), wait);
+ 	if (ret)
+ 		goto out;
+@@ -316,18 +342,31 @@ static int __test_hash(struct crypto_ahash *tfm,
+ 				goto out;
+ 			}
+ 		} else {
++			memset(result, 1, digest_size);
+ 			ret = crypto_wait_req(crypto_ahash_init(req), &wait);
+ 			if (ret) {
+ 				pr_err("alg: hash: init failed on test %d "
+ 				       "for %s: ret=%d\n", j, algo, -ret);
+ 				goto out;
+ 			}
++			ret = ahash_guard_result(result, 1, digest_size);
++			if (ret) {
++				pr_err("alg: hash: init failed on test %d "
++				       "for %s: used req->result\n", j, algo);
++				goto out;
++			}
+ 			ret = crypto_wait_req(crypto_ahash_update(req), &wait);
+ 			if (ret) {
+ 				pr_err("alg: hash: update failed on test %d "
+ 				       "for %s: ret=%d\n", j, algo, -ret);
+ 				goto out;
+ 			}
++			ret = ahash_guard_result(result, 1, digest_size);
++			if (ret) {
++				pr_err("alg: hash: update failed on test %d "
++				       "for %s: used req->result\n", j, algo);
++				goto out;
++			}
+ 			ret = crypto_wait_req(crypto_ahash_final(req), &wait);
+ 			if (ret) {
+ 				pr_err("alg: hash: final failed on test %d "
+-- 
+2.15.0
