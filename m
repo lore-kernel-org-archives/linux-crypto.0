@@ -1,62 +1,86 @@
 From: Kamil Konieczny <k.konieczny@partner.samsung.com>
-Subject: [PATCH] crypto: n2_core: Add empty hash export and import
-Date: Tue, 16 Jan 2018 17:18:43 +0100
-Message-ID: <d46bfcf3-8c75-c7cd-ed6a-98ae8d9cdcaf@partner.samsung.com>
-References: <CGME20180116161844eucas1p27634e8860ca620b45224fa9efe491e2c@eucas1p2.samsung.com>
+Subject: [PATCH] crypto: ux500/hash: Add empty export and import
+Date: Tue, 16 Jan 2018 17:32:18 +0100
+Message-ID: <a83d9022-b8bc-ea50-0707-5812f2306b8e@partner.samsung.com>
+References: <CGME20180116163219eucas1p132fafc2db8cb9b3af1a1f22d8bf2fdaf@eucas1p1.samsung.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
 Cc: "David S. Miller" <davem@davemloft.net>,
+        Linus Walleij <linus.walleij@linaro.org>,
         Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Joakim Bech <joakim.bech@linaro.org>
 To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mailout1.w1.samsung.com ([210.118.77.11]:51629 "EHLO
-        mailout1.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750764AbeAPQSr (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 16 Jan 2018 11:18:47 -0500
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-language: en-US
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
 Crypto framework will require async hash export/import, so add empty
 functions to prevent OOPS.
 
 Signed-off-by: Kamil Konieczny <k.konieczny@partner.samsung.com>
 ---
- drivers/crypto/n2_core.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ drivers/crypto/ux500/hash/hash_core.c | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-diff --git a/drivers/crypto/n2_core.c b/drivers/crypto/n2_core.c
-index 662e709812cc..80e9c842aad4 100644
---- a/drivers/crypto/n2_core.c
-+++ b/drivers/crypto/n2_core.c
-@@ -359,6 +359,16 @@ static int n2_hash_async_finup(struct ahash_request *req)
- 	return crypto_ahash_finup(&rctx->fallback_req);
+diff --git a/drivers/crypto/ux500/hash/hash_core.c b/drivers/crypto/ux500/hash/hash_core.c
+index 9acccad26928..2d0a677bcc76 100644
+--- a/drivers/crypto/ux500/hash/hash_core.c
++++ b/drivers/crypto/ux500/hash/hash_core.c
+@@ -1403,6 +1403,16 @@ static int ahash_sha256_digest(struct ahash_request *req)
+ 	return ret1 ? ret1 : ret2;
  }
  
-+static int n2_hash_async_noimport(struct ahash_request *req, const void *in)
++static int ahash_noimport(struct ahash_request *req, const void *in)
 +{
 +	return -ENOSYS;
 +}
 +
-+static int n2_hash_async_noexport(struct ahash_request *req, void *out)
++static int ahash_noexport(struct ahash_request *req, void *out)
 +{
 +	return -ENOSYS;
 +}
 +
- static int n2_hash_cra_init(struct crypto_tfm *tfm)
+ static int hmac_sha1_init(struct ahash_request *req)
  {
- 	const char *fallback_driver_name = crypto_tfm_alg_name(tfm);
-@@ -1467,6 +1477,8 @@ static int __n2_register_one_ahash(const struct n2_hash_tmpl *tmpl)
- 	ahash->final = n2_hash_async_final;
- 	ahash->finup = n2_hash_async_finup;
- 	ahash->digest = n2_hash_async_digest;
-+	ahash->export = n2_hash_async_noexport;
-+	ahash->import = n2_hash_async_noimport;
- 
- 	halg = &ahash->halg;
- 	halg->digestsize = tmpl->digest_size;
+ 	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
+@@ -1507,6 +1517,8 @@ static struct hash_algo_template hash_algs[] = {
+ 			.update = ahash_update,
+ 			.final = ahash_final,
+ 			.digest = ahash_sha1_digest,
++			.export = ahash_noexport,
++			.import = ahash_noimport,
+ 			.halg.digestsize = SHA1_DIGEST_SIZE,
+ 			.halg.statesize = sizeof(struct hash_ctx),
+ 			.halg.base = {
+@@ -1529,6 +1541,8 @@ static struct hash_algo_template hash_algs[] = {
+ 			.update	= ahash_update,
+ 			.final = ahash_final,
+ 			.digest = ahash_sha256_digest,
++			.export = ahash_noexport,
++			.import = ahash_noimport,
+ 			.halg.digestsize = SHA256_DIGEST_SIZE,
+ 			.halg.statesize = sizeof(struct hash_ctx),
+ 			.halg.base = {
+@@ -1553,6 +1567,8 @@ static struct hash_algo_template hash_algs[] = {
+ 			.final = ahash_final,
+ 			.digest = hmac_sha1_digest,
+ 			.setkey = hmac_sha1_setkey,
++			.export = ahash_noexport,
++			.import = ahash_noimport,
+ 			.halg.digestsize = SHA1_DIGEST_SIZE,
+ 			.halg.statesize = sizeof(struct hash_ctx),
+ 			.halg.base = {
+@@ -1577,6 +1593,8 @@ static struct hash_algo_template hash_algs[] = {
+ 			.final = ahash_final,
+ 			.digest = hmac_sha256_digest,
+ 			.setkey = hmac_sha256_setkey,
++			.export = ahash_noexport,
++			.import = ahash_noimport,
+ 			.halg.digestsize = SHA256_DIGEST_SIZE,
+ 			.halg.statesize = sizeof(struct hash_ctx),
+ 			.halg.base = {
 -- 
 2.15.0
