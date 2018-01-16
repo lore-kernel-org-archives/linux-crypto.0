@@ -1,56 +1,86 @@
 From: Kamil Konieczny <k.konieczny@partner.samsung.com>
-Subject: Re: [PATCH] crypto: mxs-dcp: Add empty hash export and import
-Date: Tue, 16 Jan 2018 19:28:17 +0100
-Message-ID: <7d87fa40-8e17-e855-b83d-48d3623ca345@partner.samsung.com>
-References: <CGME20180116161641eucas1p1f776ccf0d08da2d3b670e5b2ad550ea6@eucas1p1.samsung.com>
-        <4f3389a1-d6aa-b3cc-2299-d638058ddd48@partner.samsung.com>
-        <CAOMZO5AsWyhTUbnQNnAaSGXUpZtKUp-jsmQzwKw=14J9SX4KOg@mail.gmail.com>
+Subject: [PATCH v2] crypto/ahash: Require export/import in ahash
+Date: Tue, 16 Jan 2018 19:38:35 +0100
+Message-ID: <af4995fb-4c68-d265-e78b-26e71402ae40@partner.samsung.com>
+References: <CGME20180116183836eucas1p18da0aa4ef25452069e8f64ef95950f53@eucas1p1.samsung.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        Marek Vasut <marex@denx.de>,
-        "David S. Miller" <davem@davemloft.net>,
+Cc: "David S. Miller" <davem@davemloft.net>,
         Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
         linux-crypto@vger.kernel.org,
         linux-kernel <linux-kernel@vger.kernel.org>
-To: Fabio Estevam <festevam@gmail.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-reply-to: <CAOMZO5AsWyhTUbnQNnAaSGXUpZtKUp-jsmQzwKw=14J9SX4KOg@mail.gmail.com>
 Content-language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
+Export and import were optional in async hash. As most drivers were
+rewritten, they become mandatory now, so correct init of ahash
+transformation.
 
+Signed-off-by: Kamil Konieczny <k.konieczny@partner.samsung.com>
+---
+This is resend of previous patch. As Bartlomiej Zolnierkiewicz pointed out,
+there are still three crypto drivers that didn't have export/import implemented:
 
-On 16.01.2018 18:28, Fabio Estevam wrote:
-> Hi Kamil,
-> 
-> On Tue, Jan 16, 2018 at 2:16 PM, Kamil Konieczny
-> <k.konieczny@partner.samsung.com> wrote:
->> Crypto framework will require async hash export/import, so add empty
->> functions to prevent OOPS.
-> 
-> Which Oops exactly are you getting?
+drivers/crypto/mxs-dcp.c
+drivers/crypto/n2_core.c
+drivers/crypto/ux500/hash/hash_core.c
 
-None now, it is for preparation for patch removing export/import wrappers.
+I have no documentation for them, so I sended patches with the behaviour taken
+from crypto framework, but maybe that hardware is capable of import/export,
+so proper implementation is possible. Unfortunatly, there is no maintainer
+for any of these files.
 
-> 
-> Just booted 4.14.13 and the mxs-dcp driver does not even probe successfully:
-> 
-> [    2.455404] mxs-dcp 80028000.dcp: Failed to register sha1 hash!
-> [    2.464042] mxs-dcp: probe of 80028000.dcp failed with error -22
-> 
+Please take this patch after these remainig drivers will be patched.
 
-With this option turned on in config:
+ crypto/ahash.c | 18 ++----------------
+ 1 file changed, 2 insertions(+), 16 deletions(-)
 
-crypto: Disable run-time self tests 
-
-driver should load. Can you verify ?
-
-Btw, there is no maintainer for this file.
-
+diff --git a/crypto/ahash.c b/crypto/ahash.c
+index 3a35d67de7d9..7a8906d5af53 100644
+--- a/crypto/ahash.c
++++ b/crypto/ahash.c
+@@ -434,16 +434,6 @@ static int ahash_def_finup(struct ahash_request *req)
+ 	return ahash_def_finup_finish1(req, err);
+ }
+ 
+-static int ahash_no_export(struct ahash_request *req, void *out)
+-{
+-	return -ENOSYS;
+-}
+-
+-static int ahash_no_import(struct ahash_request *req, const void *in)
+-{
+-	return -ENOSYS;
+-}
+-
+ static int crypto_ahash_init_tfm(struct crypto_tfm *tfm)
+ {
+ 	struct crypto_ahash *hash = __crypto_ahash_cast(tfm);
+@@ -451,8 +441,8 @@ static int crypto_ahash_init_tfm(struct crypto_tfm *tfm)
+ 
+ 	hash->setkey = ahash_nosetkey;
+ 	hash->has_setkey = false;
+-	hash->export = ahash_no_export;
+-	hash->import = ahash_no_import;
++	hash->export = alg->export;
++	hash->import = alg->import;
+ 
+ 	if (tfm->__crt_alg->cra_type != &crypto_ahash_type)
+ 		return crypto_init_shash_ops_async(tfm);
+@@ -467,10 +457,6 @@ static int crypto_ahash_init_tfm(struct crypto_tfm *tfm)
+ 		hash->setkey = alg->setkey;
+ 		hash->has_setkey = true;
+ 	}
+-	if (alg->export)
+-		hash->export = alg->export;
+-	if (alg->import)
+-		hash->import = alg->import;
+ 
+ 	return 0;
+ }
 -- 
-Best regards,
-Kamil Konieczny
-Samsung R&D Institute Poland
+2.15.0
