@@ -1,78 +1,65 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [RFC] AF_ALG AIO and IV
-Date: Tue, 16 Jan 2018 07:28:06 +0100
-Message-ID: <4179402.uxQ6q131It@tauon.chronox.de>
-References: <2118226.LQArbCsRu5@tauon.chronox.de> <9541120.PIfOYyT9eV@tauon.chronox.de> <20180115144258.00002dbe@huawei.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org, harsh@chelsio.com,
-        linuxarm@huawei.com
-To: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+From: Antoine Tenart <antoine.tenart@free-electrons.com>
+Subject: [PATCH v2] crypto: inside-secure - make function safexcel_try_push_requests static
+Date: Tue, 16 Jan 2018 08:41:58 +0100
+Message-ID: <20180116074158.21571-1-antoine.tenart@free-electrons.com>
+Cc: thomas.petazzoni@free-electrons.com,
+        gregory.clement@free-electrons.com,
+        miquel.raynal@free-electrons.com, oferh@marvell.com,
+        igall@marvell.com, nadavh@marvell.com,
+        linux-crypto@vger.kernel.org,
+        Antoine Tenart <antoine.tenart@free-electrons.com>
+To: colin.king@canonical.com, herbert@gondor.apana.org.au,
+        davem@davemloft.net
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:58308 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750716AbeAPG2J (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 16 Jan 2018 01:28:09 -0500
-In-Reply-To: <20180115144258.00002dbe@huawei.com>
+Received: from mail.free-electrons.com ([62.4.15.54]:39253 "EHLO
+        mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750990AbeAPHpD (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 16 Jan 2018 02:45:03 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Montag, 15. Januar 2018, 15:42:58 CET schrieb Jonathan Cameron:
+From: Colin Ian King <colin.king@canonical.com>
 
-Hi Jonathan,
+The function safexcel_try_push_requests  is local to the source and does
+not need to be in global scope, so make it static.
 
-> > What about:
-> > 
-> > sendmsg(IV, data)
-> > sendmsg(data)
-> > ..
-> > AIO recvmsg with multiple IOCBs
-> > AIO recvmsg with multiple IOCBs
-> > ..
-> > sendmsg(IV, data)
-> > ..
-> > 
-> > This implies, however, that before the sendmsg with the second IV is sent,
-> > all AIO operations from the first invocation would need to be finished.
-> Yes that works fine, but rather restricts the flow - you would end up
-> waiting until you could concatenate a bunch of data in userspace so as to
-> trade off against the slow down whenever you need to synchronize back up to
-> userspace.
+Cleans up sparse warning:
+symbol 'safexcel_try_push_requests' was not declared. Should it be static?
 
-I think the solution is already present and even libkcapi's architecture is 
-set up to handle this scenario:
+Signed-off-by: Colin Ian King <colin.king@canonical.com>
+[Antoine: fixed alignment]
+Signed-off-by: Antoine Tenart <antoine.tenart@free-electrons.com>
+---
 
-We have 2 types of FDs: one obtained from socket() and one from accept(). The 
-socket-FD is akin to the TFM. The accept FD is exactly what you want:
+Hi Colin, Herbert,
 
-tfmfd = socket()
-setkey(tfmfd)
-opfd = accept()
-opfd2 = accept()
-sendmsg(opfd, IV, data)
-recvmsg(opfd, data)
+I took care of making the v2 of this patch since the fix was trivial and
+v1 was sent 2 weeks ago.
 
-sendmsg(opfd2, IV, data)
-recvmsg(opfd2, data)
+Thanks!
+Antoine
 
-sendmsg(opfd, data)
-..
+Since v1:
+  - Fixed the alignment to match open parenthesis.
 
-There can be multipe FDs from accept and these are the "identifiers" for your 
-cipher operation stream that belongs together.
+ drivers/crypto/inside-secure/safexcel.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-libkcapi has already the architecture for this type of work, but it is not 
-exposed to the API yet. The internal calls for sendmsg/recvmsg all take an 
-(op)FD parameter. E.g. _kcapi_common_send_meta_fd has the fdptr variable. 
-internal.h currently wraps this call into _kcapi_common_send_meta where the 
-handle->opfd variable is used.
-
-The idea why I implemented that is because the caller could maintain an array 
-of opfds. If we would expose these internal calls with the FD argument, you 
-can maintain multiple opfds implementing your use case.
-
-The only change would be to expose the internal libkcapi calls.
-
-Ciao
-Stephan
+diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/inside-secure/safexcel.c
+index 0d685be75241..225e74a7f724 100644
+--- a/drivers/crypto/inside-secure/safexcel.c
++++ b/drivers/crypto/inside-secure/safexcel.c
+@@ -432,8 +432,8 @@ static int safexcel_hw_init(struct safexcel_crypto_priv *priv)
+ }
+ 
+ /* Called with ring's lock taken */
+-int safexcel_try_push_requests(struct safexcel_crypto_priv *priv, int ring,
+-			       int reqs)
++static int safexcel_try_push_requests(struct safexcel_crypto_priv *priv,
++				      int ring, int reqs)
+ {
+ 	int coal = min_t(int, reqs, EIP197_MAX_BATCH_SZ);
+ 
+-- 
+2.14.3
