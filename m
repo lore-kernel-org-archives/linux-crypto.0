@@ -1,22 +1,21 @@
 From: Kamil Konieczny <k.konieczny@partner.samsung.com>
-Subject: [PATCH] crypto: mxs-dcp: Add empty hash export and import
-Date: Tue, 16 Jan 2018 17:16:40 +0100
-Message-ID: <4f3389a1-d6aa-b3cc-2299-d638058ddd48@partner.samsung.com>
-References: <CGME20180116161641eucas1p1f776ccf0d08da2d3b670e5b2ad550ea6@eucas1p1.samsung.com>
+Subject: [PATCH] crypto: n2_core: Add empty hash export and import
+Date: Tue, 16 Jan 2018 17:18:43 +0100
+Message-ID: <d46bfcf3-8c75-c7cd-ed6a-98ae8d9cdcaf@partner.samsung.com>
+References: <CGME20180116161844eucas1p27634e8860ca620b45224fa9efe491e2c@eucas1p2.samsung.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Cc: Marek Vasut <marex@denx.de>,
-        "David S. Miller" <davem@davemloft.net>,
+Cc: "David S. Miller" <davem@davemloft.net>,
         Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mailout1.w1.samsung.com ([210.118.77.11]:51226 "EHLO
+Received: from mailout1.w1.samsung.com ([210.118.77.11]:51629 "EHLO
         mailout1.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750817AbeAPQQq (ORCPT
+        with ESMTP id S1750764AbeAPQSr (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 16 Jan 2018 11:16:46 -0500
+        Tue, 16 Jan 2018 11:18:47 -0500
 Content-language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
@@ -26,47 +25,38 @@ functions to prevent OOPS.
 
 Signed-off-by: Kamil Konieczny <k.konieczny@partner.samsung.com>
 ---
- drivers/crypto/mxs-dcp.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+ drivers/crypto/n2_core.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-diff --git a/drivers/crypto/mxs-dcp.c b/drivers/crypto/mxs-dcp.c
-index 764be3e6933c..a10c418d4e5c 100644
---- a/drivers/crypto/mxs-dcp.c
-+++ b/drivers/crypto/mxs-dcp.c
-@@ -759,6 +759,16 @@ static int dcp_sha_digest(struct ahash_request *req)
- 	return dcp_sha_finup(req);
+diff --git a/drivers/crypto/n2_core.c b/drivers/crypto/n2_core.c
+index 662e709812cc..80e9c842aad4 100644
+--- a/drivers/crypto/n2_core.c
++++ b/drivers/crypto/n2_core.c
+@@ -359,6 +359,16 @@ static int n2_hash_async_finup(struct ahash_request *req)
+ 	return crypto_ahash_finup(&rctx->fallback_req);
  }
  
-+static int dcp_sha_noimport(struct ahash_request *req, const void *in)
++static int n2_hash_async_noimport(struct ahash_request *req, const void *in)
 +{
 +	return -ENOSYS;
 +}
 +
-+static int dcp_sha_noexport(struct ahash_request *req, void *out)
++static int n2_hash_async_noexport(struct ahash_request *req, void *out)
 +{
 +	return -ENOSYS;
 +}
 +
- static int dcp_sha_cra_init(struct crypto_tfm *tfm)
+ static int n2_hash_cra_init(struct crypto_tfm *tfm)
  {
- 	crypto_ahash_set_reqsize(__crypto_ahash_cast(tfm),
-@@ -829,6 +839,8 @@ static struct ahash_alg dcp_sha1_alg = {
- 	.final	= dcp_sha_final,
- 	.finup	= dcp_sha_finup,
- 	.digest	= dcp_sha_digest,
-+	.import = dcp_sha_noimport,
-+	.export = dcp_sha_noexport,
- 	.halg	= {
- 		.digestsize	= SHA1_DIGEST_SIZE,
- 		.base		= {
-@@ -853,6 +865,8 @@ static struct ahash_alg dcp_sha256_alg = {
- 	.final	= dcp_sha_final,
- 	.finup	= dcp_sha_finup,
- 	.digest	= dcp_sha_digest,
-+	.import = dcp_sha_noimport,
-+	.export = dcp_sha_noexport,
- 	.halg	= {
- 		.digestsize	= SHA256_DIGEST_SIZE,
- 		.base		= {
+ 	const char *fallback_driver_name = crypto_tfm_alg_name(tfm);
+@@ -1467,6 +1477,8 @@ static int __n2_register_one_ahash(const struct n2_hash_tmpl *tmpl)
+ 	ahash->final = n2_hash_async_final;
+ 	ahash->finup = n2_hash_async_finup;
+ 	ahash->digest = n2_hash_async_digest;
++	ahash->export = n2_hash_async_noexport;
++	ahash->import = n2_hash_async_noimport;
+ 
+ 	halg = &ahash->halg;
+ 	halg->digestsize = tmpl->digest_size;
 -- 
 2.15.0
