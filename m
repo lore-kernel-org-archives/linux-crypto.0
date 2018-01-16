@@ -1,45 +1,74 @@
-From: =?UTF-8?Q?MONIRA_Fran=C3=A7ois?= <monira@thalesgroupes.com>
-Subject: TRADING  ACCOUNT
-Date: Tue, 16 Jan 2018 08:55:26 +0000
-Message-ID: <19541c86b3b58861e0e675fb0a8168e8__28142.8526308902$1516092828$gmane$org@fr-capgemin.com>
-Reply-To: monira@thalesgroupes.com
+From: Kamil Konieczny <k.konieczny@partner.samsung.com>
+Subject: [RFT PATCH] crypto: ahash.c: Require export/import in ahash
+Date: Tue, 16 Jan 2018 11:35:44 +0100
+Message-ID: <2a8e710f-9d1c-726b-3355-5d671e04cb68@partner.samsung.com>
+References: <CGME20180116103545eucas1p230af34b97f903f8dc7db5e634297f4f8@eucas1p2.samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Content-Transfer-Encoding: 8bit
-To: monira@thalesgroupes.com
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from relay3-d.mail.gandi.net ([217.70.183.195]:49092 "EHLO
-        relay3-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750790AbeAPIzg (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 16 Jan 2018 03:55:36 -0500
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: "David S. Miller" <davem@davemloft.net>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi ,
+Export and import were optional in async hash. As drivers were rewritten,
+they become mandatory now, so correct init of ahash transformation.
 
-I MONIRA François  managing director of THALES COMMUNICATIONS & SECURITY 
-S.A.S .I send you this email after visiting your website , regarding the 
-possibility to open a trading account with your company .
-We are a company based in France specialised in supplying Multi -media, 
-wholesaler and other private client.
-We are looking for a long term supplier/partner with good competitive 
-price/quality to fulfil the client demand throughout France and others 
-countries because we are interested of buying couple of your products 
-you sell and want to place an order with you in large quantities.
-Can you give us payment facilities ( 14 , 30 or 60 days payment terms ) 
-depending on the size of our different orders?
-Please inform us of the procedure to open a trade account and apply for 
-a credit insurance account base on credit check
+Signed-off-by: Kamil Konieczny <k.konieczny@partner.samsung.com>
+---
+Tested with crypto run-time self test on Odroid-U3 with Exynos 4412 CPU,
+with insmod s5p-sss.ko
+Please test with other crypto hash drivers.
 
-Cordially
+ crypto/ahash.c | 18 ++----------------
+ 1 file changed, 2 insertions(+), 16 deletions(-)
 
-MONIRA François
-
-THALES COMMUNICATIONS & SECURITY S.A.S
-4 AVENUE DES LOUVRESSES
-92230      GENNEVILLIERS
-Tel : +33173793202
-Fax : +33172703636
-email: monira@thalesgroupes.com
+diff --git a/crypto/ahash.c b/crypto/ahash.c
+index 3a35d67de7d9..7a8906d5af53 100644
+--- a/crypto/ahash.c
++++ b/crypto/ahash.c
+@@ -434,16 +434,6 @@ static int ahash_def_finup(struct ahash_request *req)
+ 	return ahash_def_finup_finish1(req, err);
+ }
+ 
+-static int ahash_no_export(struct ahash_request *req, void *out)
+-{
+-	return -ENOSYS;
+-}
+-
+-static int ahash_no_import(struct ahash_request *req, const void *in)
+-{
+-	return -ENOSYS;
+-}
+-
+ static int crypto_ahash_init_tfm(struct crypto_tfm *tfm)
+ {
+ 	struct crypto_ahash *hash = __crypto_ahash_cast(tfm);
+@@ -451,8 +441,8 @@ static int crypto_ahash_init_tfm(struct crypto_tfm *tfm)
+ 
+ 	hash->setkey = ahash_nosetkey;
+ 	hash->has_setkey = false;
+-	hash->export = ahash_no_export;
+-	hash->import = ahash_no_import;
++	hash->export = alg->export;
++	hash->import = alg->import;
+ 
+ 	if (tfm->__crt_alg->cra_type != &crypto_ahash_type)
+ 		return crypto_init_shash_ops_async(tfm);
+@@ -467,10 +457,6 @@ static int crypto_ahash_init_tfm(struct crypto_tfm *tfm)
+ 		hash->setkey = alg->setkey;
+ 		hash->has_setkey = true;
+ 	}
+-	if (alg->export)
+-		hash->export = alg->export;
+-	if (alg->import)
+-		hash->import = alg->import;
+ 
+ 	return 0;
+ }
+-- 
+2.15.0
