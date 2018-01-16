@@ -1,74 +1,90 @@
-From: Kamil Konieczny <k.konieczny@partner.samsung.com>
-Subject: [RFT PATCH] crypto: ahash.c: Require export/import in ahash
-Date: Tue, 16 Jan 2018 11:35:44 +0100
-Message-ID: <2a8e710f-9d1c-726b-3355-5d671e04cb68@partner.samsung.com>
-References: <CGME20180116103545eucas1p230af34b97f903f8dc7db5e634297f4f8@eucas1p2.samsung.com>
+From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Subject: Re: [RFC] AF_ALG AIO and IV
+Date: Tue, 16 Jan 2018 10:51:47 +0000
+Message-ID: <20180116105147.00002723@huawei.com>
+References: <2118226.LQArbCsRu5@tauon.chronox.de>
+        <9541120.PIfOYyT9eV@tauon.chronox.de>
+        <20180115144258.00002dbe@huawei.com>
+        <4179402.uxQ6q131It@tauon.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="US-ASCII"
 Content-Transfer-Encoding: 7bit
-Cc: "David S. Miller" <davem@davemloft.net>,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Cc: <linux-crypto@vger.kernel.org>, <harsh@chelsio.com>,
+        <linuxarm@huawei.com>
+To: Stephan Mueller <smueller@chronox.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from szxga07-in.huawei.com ([45.249.212.35]:56059 "EHLO huawei.com"
+        rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1750802AbeAPKwI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 16 Jan 2018 05:52:08 -0500
+In-Reply-To: <4179402.uxQ6q131It@tauon.chronox.de>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Export and import were optional in async hash. As drivers were rewritten,
-they become mandatory now, so correct init of ahash transformation.
+On Tue, 16 Jan 2018 07:28:06 +0100
+Stephan Mueller <smueller@chronox.de> wrote:
 
-Signed-off-by: Kamil Konieczny <k.konieczny@partner.samsung.com>
----
-Tested with crypto run-time self test on Odroid-U3 with Exynos 4412 CPU,
-with insmod s5p-sss.ko
-Please test with other crypto hash drivers.
+> Am Montag, 15. Januar 2018, 15:42:58 CET schrieb Jonathan Cameron:
+> 
+> Hi Jonathan,
+> 
+> > > What about:
+> > > 
+> > > sendmsg(IV, data)
+> > > sendmsg(data)
+> > > ..
+> > > AIO recvmsg with multiple IOCBs
+> > > AIO recvmsg with multiple IOCBs
+> > > ..
+> > > sendmsg(IV, data)
+> > > ..
+> > > 
+> > > This implies, however, that before the sendmsg with the second IV is sent,
+> > > all AIO operations from the first invocation would need to be finished.  
+> > Yes that works fine, but rather restricts the flow - you would end up
+> > waiting until you could concatenate a bunch of data in userspace so as to
+> > trade off against the slow down whenever you need to synchronize back up to
+> > userspace.  
+> 
+> I think the solution is already present and even libkcapi's architecture is 
+> set up to handle this scenario:
+> 
+> We have 2 types of FDs: one obtained from socket() and one from accept(). The 
+> socket-FD is akin to the TFM. The accept FD is exactly what you want:
+> 
+> tfmfd = socket()
+> setkey(tfmfd)
+> opfd = accept()
+> opfd2 = accept()
+> sendmsg(opfd, IV, data)
+> recvmsg(opfd, data)
+> 
+> sendmsg(opfd2, IV, data)
+> recvmsg(opfd2, data)
+> 
+> sendmsg(opfd, data)
+> ..
+> 
+> There can be multipe FDs from accept and these are the "identifiers" for your 
+> cipher operation stream that belongs together.
+> 
+> libkcapi has already the architecture for this type of work, but it is not 
+> exposed to the API yet. The internal calls for sendmsg/recvmsg all take an 
+> (op)FD parameter. E.g. _kcapi_common_send_meta_fd has the fdptr variable. 
+> internal.h currently wraps this call into _kcapi_common_send_meta where the 
+> handle->opfd variable is used.
+> 
+> The idea why I implemented that is because the caller could maintain an array 
+> of opfds. If we would expose these internal calls with the FD argument, you 
+> can maintain multiple opfds implementing your use case.
+> 
+> The only change would be to expose the internal libkcapi calls.
+> 
+> Ciao
+> Stephan
 
- crypto/ahash.c | 18 ++----------------
- 1 file changed, 2 insertions(+), 16 deletions(-)
+Thanks, I'll take a look at this soonish. Having a busy week.
 
-diff --git a/crypto/ahash.c b/crypto/ahash.c
-index 3a35d67de7d9..7a8906d5af53 100644
---- a/crypto/ahash.c
-+++ b/crypto/ahash.c
-@@ -434,16 +434,6 @@ static int ahash_def_finup(struct ahash_request *req)
- 	return ahash_def_finup_finish1(req, err);
- }
- 
--static int ahash_no_export(struct ahash_request *req, void *out)
--{
--	return -ENOSYS;
--}
--
--static int ahash_no_import(struct ahash_request *req, const void *in)
--{
--	return -ENOSYS;
--}
--
- static int crypto_ahash_init_tfm(struct crypto_tfm *tfm)
- {
- 	struct crypto_ahash *hash = __crypto_ahash_cast(tfm);
-@@ -451,8 +441,8 @@ static int crypto_ahash_init_tfm(struct crypto_tfm *tfm)
- 
- 	hash->setkey = ahash_nosetkey;
- 	hash->has_setkey = false;
--	hash->export = ahash_no_export;
--	hash->import = ahash_no_import;
-+	hash->export = alg->export;
-+	hash->import = alg->import;
- 
- 	if (tfm->__crt_alg->cra_type != &crypto_ahash_type)
- 		return crypto_init_shash_ops_async(tfm);
-@@ -467,10 +457,6 @@ static int crypto_ahash_init_tfm(struct crypto_tfm *tfm)
- 		hash->setkey = alg->setkey;
- 		hash->has_setkey = true;
- 	}
--	if (alg->export)
--		hash->export = alg->export;
--	if (alg->import)
--		hash->import = alg->import;
- 
- 	return 0;
- }
--- 
-2.15.0
+Jonathan
+> 
+> 
