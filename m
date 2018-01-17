@@ -1,55 +1,39 @@
-From: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
-Subject: Re: [PATCH v3] tpm: use struct tpm_chip for tpm_chip_find_get()
-Date: Wed, 17 Jan 2018 19:43:51 +0530
-Message-ID: <CANc+2y4eGcqTpUPwCuYv1RdLXGhHdb3YAOjL-dnsnvQ-O7FVRQ@mail.gmail.com>
-References: <20171026135453.24672-1-jarkko.sakkinen@linux.intel.com>
- <20171031200303.GB18578@ziepe.ca> <CANc+2y4si3YW5FXWEdKz0UM5c76MBmHWu4RBF7d2dew9i-Ut+Q@mail.gmail.com>
- <20171114143238.looouhjk4bp5ko4g@linux.intel.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Jason Gunthorpe <jgg@ziepe.ca>,
-        open list <linux-kernel@vger.kernel.org>,
-        Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Peter Huewe <peterhuewe@gmx.de>,
-        Marcel Selhorst <tpmdd@selhorst.net>,
-        Mimi Zohar <zohar@linux.vnet.ibm.com>,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        James Morris <james.l.morris@oracle.com>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        David Safford <safford@us.ibm.com>,
-        David Howells <dhowells@redhat.com>,
-        Jerry Snitselaar <jsnitsel@redhat.com>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>,
-        "open list:INTEGRITY MEASUREMENT ARCHITECTURE (IMA)"
-        <linux-security-module@vger.kernel.org>,
-        "open list:KEYS-TRUSTED" <keyrings@vger.kernel.org>
-To: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20171114143238.looouhjk4bp5ko4g@linux.intel.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Corentin Labbe <clabbe.montjoie@gmail.com>
+Subject: [PATCH] crypto: artpec6 - remove select on non-existing CRYPTO_SHA384
+Date: Wed, 17 Jan 2018 19:50:56 +0100
+Message-ID: <20180117185056.11562-1-clabbe.montjoie@gmail.com>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Corentin Labbe <clabbe.montjoie@gmail.com>
+To: davem@davemloft.net, herbert@gondor.apana.org.au
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-wr0-f194.google.com ([209.85.128.194]:33130 "EHLO
+        mail-wr0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754415AbeAQSxC (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 17 Jan 2018 13:53:02 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Jarkko,
+Since CRYPTO_SHA384 does not exists, Kconfig should not select it.
+Anyway, all SHA384 stuff is in CRYPTO_SHA512 which is already selected.
 
-On 14 November 2017 at 20:02, Jarkko Sakkinen
-<jarkko.sakkinen@linux.intel.com> wrote:
-> On Sun, Nov 12, 2017 at 10:53:35AM +0530, PrasannaKumar Muralidharan wrote:
->> Did basic check on tpm rng patch, it works fine. As it depends on this
->> patch this should be working fine too.
->>
->> Tested-by: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
->>
->> Regards,
->> PrasannaKumar
->
-> Thank you.
->
-> /Jarkko
+Fixes: a21eb94fc4d3i ("crypto: axis - add ARTPEC-6/7 crypto accelerator driver")
+Signed-off-by: Corentin Labbe <clabbe.montjoie@gmail.com>
+---
+ drivers/crypto/Kconfig | 1 -
+ 1 file changed, 1 deletion(-)
 
-Wondering what happened to this and tpm rng patch. Is there something
-more to do for this to get merged?
-
-Thanks,
-PrasannaKumar
+diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+index f7f803e78701..e92b9304a8d5 100644
+--- a/drivers/crypto/Kconfig
++++ b/drivers/crypto/Kconfig
+@@ -725,7 +725,6 @@ config CRYPTO_DEV_ARTPEC6
+ 	select CRYPTO_HASH
+ 	select CRYPTO_SHA1
+ 	select CRYPTO_SHA256
+-	select CRYPTO_SHA384
+ 	select CRYPTO_SHA512
+ 	help
+ 	  Enables the driver for the on-chip crypto accelerator
+-- 
+2.13.6
