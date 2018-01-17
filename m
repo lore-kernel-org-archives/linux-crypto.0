@@ -1,43 +1,54 @@
 From: Wei Yongjun <weiyongjun1@huawei.com>
-Subject: [PATCH -next] crypto: axis - remove unnecessary platform_get_resource() error check
-Date: Wed, 17 Jan 2018 11:26:47 +0000
-Message-ID: <1516188407-145156-1-git-send-email-weiyongjun1@huawei.com>
+Subject: [PATCH -next] hwrng: bcm2835 - Remove redundant dev_err call in bcm2835_rng_probe()
+Date: Wed, 17 Jan 2018 11:40:34 +0000
+Message-ID: <1516189234-11957-1-git-send-email-weiyongjun1@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="ISO-8859-1"
 Content-Transfer-Encoding: 7bit
-Cc: Wei Yongjun <weiyongjun1@huawei.com>, <linux-arm-kernel@axis.com>,
-        <linux-crypto@vger.kernel.org>
-To: Jesper Nilsson <jesper.nilsson@axis.com>,
-        Lars Persson <lars.persson@axis.com>,
-        Niklas Cassel <niklas.cassel@axis.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from szxga04-in.huawei.com ([45.249.212.190]:4216 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1752556AbeAQLUa (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 17 Jan 2018 06:20:30 -0500
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: Wei Yongjun <weiyongjun1@huawei.com>,
+        <bcm-kernel-feedback-list@broadcom.com>,
+        <linux-crypto@vger.kernel.org>,
+        <linux-rpi-kernel@lists.infradead.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <kernel-janitors@vger.kernel.org>
+To: Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        "Ray Jui" <rjui@broadcom.com>,
+        Scott Branden <sbranden@broadcom.com>,
+        Eric Anholt <eric@anholt.net>,
+        Stefan Wahren <stefan.wahren@i2se.com>
+Return-path: <kernel-janitors-owner@vger.kernel.org>
+Sender: kernel-janitors-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-devm_ioremap_resource() already checks if the resource is NULL, so
-remove the unnecessary platform_get_resource() error check.
+There is a error message within devm_ioremap_resource
+already, so remove the dev_err call to avoid redundant
+error message.
 
 Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
 ---
- drivers/crypto/axis/artpec6_crypto.c | 3 ---
- 1 file changed, 3 deletions(-)
+ drivers/char/hw_random/bcm2835-rng.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/drivers/crypto/axis/artpec6_crypto.c b/drivers/crypto/axis/artpec6_crypto.c
-index 0f9754e..02e8739 100644
---- a/drivers/crypto/axis/artpec6_crypto.c
-+++ b/drivers/crypto/axis/artpec6_crypto.c
-@@ -3041,9 +3041,6 @@ static int artpec6_crypto_probe(struct platform_device *pdev)
- 	variant = (enum artpec6_crypto_variant)match->data;
+diff --git a/drivers/char/hw_random/bcm2835-rng.c b/drivers/char/hw_random/bcm2835-rng.c
+index 25e5631..7a84cec 100644
+--- a/drivers/char/hw_random/bcm2835-rng.c
++++ b/drivers/char/hw_random/bcm2835-rng.c
+@@ -158,10 +158,8 @@ static int bcm2835_rng_probe(struct platform_device *pdev)
  
- 	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
--	if (!res)
--		return -ENODEV;
--
- 	base = devm_ioremap_resource(&pdev->dev, res);
- 	if (IS_ERR(base))
- 		return PTR_ERR(base);
+ 	/* map peripheral */
+ 	priv->base = devm_ioremap_resource(dev, r);
+-	if (IS_ERR(priv->base)) {
+-		dev_err(dev, "failed to remap rng regs");
++	if (IS_ERR(priv->base))
+ 		return PTR_ERR(priv->base);
+-	}
+ 
+ 	/* Clock is optional on most platforms */
+ 	priv->clk = devm_clk_get(dev, NULL);
+
+
+
