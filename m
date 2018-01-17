@@ -1,44 +1,55 @@
-From: Fabien DESSENNE <fabien.dessenne@st.com>
-Subject: Re: [PATCH -next] crypto: stm32 - remove redundant dev_err call in
- stm32_cryp_probe()
-Date: Wed, 17 Jan 2018 13:02:40 +0000
-Message-ID: <d2641cbb-61fa-00e7-6ac8-f05d3cde0628@st.com>
-References: <1516189224-11877-1-git-send-email-weiyongjun1@huawei.com>
+From: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+Subject: Re: [PATCH v3] tpm: use struct tpm_chip for tpm_chip_find_get()
+Date: Wed, 17 Jan 2018 19:43:51 +0530
+Message-ID: <CANc+2y4eGcqTpUPwCuYv1RdLXGhHdb3YAOjL-dnsnvQ-O7FVRQ@mail.gmail.com>
+References: <20171026135453.24672-1-jarkko.sakkinen@linux.intel.com>
+ <20171031200303.GB18578@ziepe.ca> <CANc+2y4si3YW5FXWEdKz0UM5c76MBmHWu4RBF7d2dew9i-Ut+Q@mail.gmail.com>
+ <20171114143238.looouhjk4bp5ko4g@linux.intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-arm-kernel@lists.infradead.org"
-        <linux-arm-kernel@lists.infradead.org>,
-        "kernel-janitors@vger.kernel.org" <kernel-janitors@vger.kernel.org>
-To: Wei Yongjun <weiyongjun1@huawei.com>,
+Content-Type: text/plain; charset="UTF-8"
+Cc: Jason Gunthorpe <jgg@ziepe.ca>,
+        open list <linux-kernel@vger.kernel.org>,
+        Matt Mackall <mpm@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre TORGUE <alexandre.torgue@st.com>,
-        Corentin LABBE <clabbe.montjoie@gmail.com>
-Return-path: <kernel-janitors-owner@vger.kernel.org>
-In-Reply-To: <1516189224-11877-1-git-send-email-weiyongjun1@huawei.com>
-Content-Language: en-US
-Content-ID: <C16F6955D8EF284D9599FBC4240A63E9@st.com>
-Sender: kernel-janitors-owner@vger.kernel.org
+        Peter Huewe <peterhuewe@gmx.de>,
+        Marcel Selhorst <tpmdd@selhorst.net>,
+        Mimi Zohar <zohar@linux.vnet.ibm.com>,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+        James Morris <james.l.morris@oracle.com>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        David Safford <safford@us.ibm.com>,
+        David Howells <dhowells@redhat.com>,
+        Jerry Snitselaar <jsnitsel@redhat.com>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>,
+        "open list:INTEGRITY MEASUREMENT ARCHITECTURE (IMA)"
+        <linux-security-module@vger.kernel.org>,
+        "open list:KEYS-TRUSTED" <keyrings@vger.kernel.org>
+To: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20171114143238.looouhjk4bp5ko4g@linux.intel.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-SGksDQoNCg0KVGhhbmsgeW91IGZvciB0aGUgcGF0Y2guDQoNCg0KT24gMTcvMDEvMTggMTI6NDAs
-IFdlaSBZb25nanVuIHdyb3RlOg0KPiBUaGVyZSBpcyBhIGVycm9yIG1lc3NhZ2Ugd2l0aGluIGRl
-dm1faW9yZW1hcF9yZXNvdXJjZQ0KPiBhbHJlYWR5LCBzbyByZW1vdmUgdGhlIGRldl9lcnIgY2Fs
-bCB0byBhdm9pZCByZWR1bmRhbnQNCj4gZXJyb3IgbWVzc2FnZS4NCj4NCj4gU2lnbmVkLW9mZi1i
-eTogV2VpIFlvbmdqdW4gPHdlaXlvbmdqdW4xQGh1YXdlaS5jb20+DQpSZXZpZXdlZC1ieTogRmFi
-aWVuIERlc3Nlbm5lIDxmYWJpZW4uZGVzc2VubmVAc3QuY29tPg0KPiAtLS0NCj4gICBkcml2ZXJz
-L2NyeXB0by9zdG0zMi9zdG0zMi1jcnlwLmMgfCA0ICstLS0NCj4gICAxIGZpbGUgY2hhbmdlZCwg
-MSBpbnNlcnRpb24oKyksIDMgZGVsZXRpb25zKC0pDQo+DQo+IGRpZmYgLS1naXQgYS9kcml2ZXJz
-L2NyeXB0by9zdG0zMi9zdG0zMi1jcnlwLmMgYi9kcml2ZXJzL2NyeXB0by9zdG0zMi9zdG0zMi1j
-cnlwLmMNCj4gaW5kZXggY2YxZGRkYi4uNGEwNmE3YSAxMDA2NDQNCj4gLS0tIGEvZHJpdmVycy9j
-cnlwdG8vc3RtMzIvc3RtMzItY3J5cC5jDQo+ICsrKyBiL2RyaXZlcnMvY3J5cHRvL3N0bTMyL3N0
-bTMyLWNyeXAuYw0KPiBAQCAtMTA1MiwxMCArMTA1Miw4IEBAIHN0YXRpYyBpbnQgc3RtMzJfY3J5
-cF9wcm9iZShzdHJ1Y3QgcGxhdGZvcm1fZGV2aWNlICpwZGV2KQ0KPiAgIA0KPiAgIAlyZXMgPSBw
-bGF0Zm9ybV9nZXRfcmVzb3VyY2UocGRldiwgSU9SRVNPVVJDRV9NRU0sIDApOw0KPiAgIAljcnlw
-LT5yZWdzID0gZGV2bV9pb3JlbWFwX3Jlc291cmNlKGRldiwgcmVzKTsNCj4gLQlpZiAoSVNfRVJS
-KGNyeXAtPnJlZ3MpKSB7DQo+IC0JCWRldl9lcnIoZGV2LCAiQ2Fubm90IG1hcCBDUllQIElPXG4i
-KTsNCj4gKwlpZiAoSVNfRVJSKGNyeXAtPnJlZ3MpKQ0KPiAgIAkJcmV0dXJuIFBUUl9FUlIoY3J5
-cC0+cmVncyk7DQo+IC0JfQ0KPiAgIA0KPiAgIAlpcnEgPSBwbGF0Zm9ybV9nZXRfaXJxKHBkZXYs
-IDApOw0KPiAgIAlpZiAoaXJxIDwgMCkgew0KPg0K
+Hi Jarkko,
+
+On 14 November 2017 at 20:02, Jarkko Sakkinen
+<jarkko.sakkinen@linux.intel.com> wrote:
+> On Sun, Nov 12, 2017 at 10:53:35AM +0530, PrasannaKumar Muralidharan wrote:
+>> Did basic check on tpm rng patch, it works fine. As it depends on this
+>> patch this should be working fine too.
+>>
+>> Tested-by: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+>>
+>> Regards,
+>> PrasannaKumar
+>
+> Thank you.
+>
+> /Jarkko
+
+Wondering what happened to this and tpm rng patch. Is there something
+more to do for this to get merged?
+
+Thanks,
+PrasannaKumar
