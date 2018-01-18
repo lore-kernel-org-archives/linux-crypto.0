@@ -1,70 +1,67 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [PATCH v2 0/3] sha3 fixes and new implementation for arm64
-Date: Thu, 18 Jan 2018 13:43:59 +0000
-Message-ID: <CAKv+Gu8-CGFukD-At57=3EAt+YGB--m9KfrVQ+GwwnYgB9gnGw@mail.gmail.com>
-References: <20180114164118.18330-1-ard.biesheuvel@linaro.org>
+From: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
+Subject: Re: [PATCH v3] tpm: use struct tpm_chip for tpm_chip_find_get()
+Date: Thu, 18 Jan 2018 18:20:13 +0200
+Message-ID: <20180118162013.luz36mjsswaxaekq@linux.intel.com>
+References: <20171026135453.24672-1-jarkko.sakkinen@linux.intel.com>
+ <20171031200303.GB18578@ziepe.ca>
+ <CANc+2y4si3YW5FXWEdKz0UM5c76MBmHWu4RBF7d2dew9i-Ut+Q@mail.gmail.com>
+ <20171114143238.looouhjk4bp5ko4g@linux.intel.com>
+ <CANc+2y4eGcqTpUPwCuYv1RdLXGhHdb3YAOjL-dnsnvQ-O7FVRQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        Will Deacon <will.deacon@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Steve Capper <steve.capper@linaro.org>, jgarzik@redhat.com,
-        Arnd Bergmann <arnd@arndb.de>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>
-To: linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+Content-Type: text/plain; charset=us-ascii
+Cc: Jason Gunthorpe <jgg@ziepe.ca>,
+        open list <linux-kernel@vger.kernel.org>,
+        Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Peter Huewe <peterhuewe@gmx.de>,
+        Marcel Selhorst <tpmdd@selhorst.net>,
+        Mimi Zohar <zohar@linux.vnet.ibm.com>,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+        James Morris <james.l.morris@oracle.com>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        David Safford <safford@us.ibm.com>,
+        David Howells <dhowells@redhat.com>,
+        Jerry Snitselaar <jsnitsel@redhat.com>,
         "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>
+        <linux-crypto@vger.kernel.org>,
+        "open list:INTEGRITY MEASUREMENT ARCHITECTURE (IMA)"
+        <linux-security-module@vger.kernel.org>,
+        "open list:KEYS-TRUSTED" <keyrings@vger.kernel.org>
+To: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-it0-f67.google.com ([209.85.214.67]:34116 "EHLO
-        mail-it0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1756197AbeARNoA (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 18 Jan 2018 08:44:00 -0500
-Received: by mail-it0-f67.google.com with SMTP id m11so1942095iti.1
-        for <linux-crypto@vger.kernel.org>; Thu, 18 Jan 2018 05:44:00 -0800 (PST)
-In-Reply-To: <20180114164118.18330-1-ard.biesheuvel@linaro.org>
+Received: from mga03.intel.com ([134.134.136.65]:31004 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S933438AbeARQUO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 18 Jan 2018 11:20:14 -0500
+Content-Disposition: inline
+In-Reply-To: <CANc+2y4eGcqTpUPwCuYv1RdLXGhHdb3YAOjL-dnsnvQ-O7FVRQ@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 14 January 2018 at 16:41, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
-> Add an implementation of SHA3 to arm64 using the new special instructions,
-> and another one using scalar instructions but coded in assembler (#2)
->
-> In preparation of that, fix a bug in the SHA3 (#1) and add some new test
-> vectors to get better test coverage (#3).
->
-> v2: Drop generic SHA3 as a fallback for the arm64 module. Instead, provide
->     a special arm64 version to use as a fallback when the instructions are
->     not available or when executing in a context that does not allow SIMD
->
->     Drop patches that simplify the generic SHA3 and make it reusable by
->     other modules.
->
-> Ard Biesheuvel (3):
->   crypto/generic: sha3 - fixes for alignment and big endian operation
->   crypto/arm64: sha3 - new scalar + v8.2 Crypto Extensions
->     implementation
->   crypto/testmgr: sha3 - add new testcases
->
->  arch/arm64/crypto/Kconfig           |   4 +
->  arch/arm64/crypto/Makefile          |   3 +
->  arch/arm64/crypto/sha3-arm64-core.S | 512 ++++++++++++++++++
->  arch/arm64/crypto/sha3-arm64-glue.c | 192 +++++++
->  crypto/sha3_generic.c               |   5 +-
->  crypto/testmgr.h                    | 550 ++++++++++++++++++++
->  6 files changed, 1264 insertions(+), 2 deletions(-)
->  create mode 100644 arch/arm64/crypto/sha3-arm64-core.S
->  create mode 100644 arch/arm64/crypto/sha3-arm64-glue.c
->
+On Wed, Jan 17, 2018 at 07:43:51PM +0530, PrasannaKumar Muralidharan wrote:
+> Hi Jarkko,
+> 
+> On 14 November 2017 at 20:02, Jarkko Sakkinen
+> <jarkko.sakkinen@linux.intel.com> wrote:
+> > On Sun, Nov 12, 2017 at 10:53:35AM +0530, PrasannaKumar Muralidharan wrote:
+> >> Did basic check on tpm rng patch, it works fine. As it depends on this
+> >> patch this should be working fine too.
+> >>
+> >> Tested-by: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+> >>
+> >> Regards,
+> >> PrasannaKumar
+> >
+> > Thank you.
+> >
+> > /Jarkko
+> 
+> Wondering what happened to this and tpm rng patch. Is there something
+> more to do for this to get merged?
+> 
+> Thanks,
+> PrasannaKumar
 
-Herbert,
+Was part of 4.6 PR.
 
-Could you hold off on the SHA-3 patches for a little while? With the
-performance fix for the generic code, it may no longer be worthwhile
-to have a special arm64 implementation as well. I will respin a series
-containing everything I think is needed.
-
-The SM3 patch is independent, and is good to go IMO (with Steve's Tested-by)
-
-Thanks,
-Ard.
+/Jarkko
