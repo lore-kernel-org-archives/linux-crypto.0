@@ -1,27 +1,41 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: marvell/cesa - Fix DMA API misuse
-Date: Thu, 18 Jan 2018 23:03:14 +1100
-Message-ID: <20180118120314.GG20717@gondor.apana.org.au>
-References: <55d3177407b00dd4a9d51fe4f8e2bf2282fe8e3d.1515596541.git.robin.murphy@arm.com>
+Subject: Re: [PATCH] hwrng: imx-rngc: simplify the power management
+ definitions
+Date: Thu, 18 Jan 2018 23:04:25 +1100
+Message-ID: <20180118120425.GI20717@gondor.apana.org.au>
+References: <1515704804-19468-1-git-send-email-martin@kaiser.cx>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: boris.brezillon@free-electrons.com, arno@natisbad.org,
-        davem@davemloft.net, hch@lst.de, linux-crypto@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-To: Robin Murphy <robin.murphy@arm.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Cc: Matt Mackall <mpm@selenic.com>, Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
+        Steffen Trumtrar <s.trumtrar@pengutronix.de>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Martin Kaiser <martin@kaiser.cx>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from [128.1.224.119] ([128.1.224.119]:55454 "EHLO ringil.hmeau.com"
+        rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
+        id S1755322AbeARMG6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 18 Jan 2018 07:06:58 -0500
 Content-Disposition: inline
-In-Reply-To: <55d3177407b00dd4a9d51fe4f8e2bf2282fe8e3d.1515596541.git.robin.murphy@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <1515704804-19468-1-git-send-email-martin@kaiser.cx>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jan 10, 2018 at 03:15:43PM +0000, Robin Murphy wrote:
-> phys_to_dma() is an internal helper for certain DMA API implementations,
-> and is not appropriate for drivers to use. It appears that what the CESA
-> driver really wants to be using is dma_map_resource() - admittedly that
-> didn't exist when the offending code was first merged, but it does now.
+On Thu, Jan 11, 2018 at 10:06:39PM +0100, Martin Kaiser wrote:
+> Use the SIMPLE_DEV_PM_OPS() macro instead of populating a struct
+> dev_pm_ops directly. The suspend and resume functions will now be used
+> for both hibernation and suspend to ram.
 > 
-> Signed-off-by: Robin Murphy <robin.murphy@arm.com>
+> If power management is disabled, SIMPLE_DEV_PM_OPS() evaluates to
+> nothing, The two functions won't be used and won't be included in the
+> kernel. Mark them as __maybe_unused to clarify that this is intended
+> behaviour.
+> 
+> With these modifications in place, we don't need the #ifdefs for power
+> management any more.
+> 
+> Signed-off-by: Martin Kaiser <martin@kaiser.cx>
 
 Patch applied.  Thanks.
 -- 
