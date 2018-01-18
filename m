@@ -1,66 +1,63 @@
-From: Kamil Konieczny <k.konieczny@partner.samsung.com>
-Subject: Re: [PATCH] crypto: n2_core: Add empty hash export and import
-Date: Thu, 18 Jan 2018 18:53:41 +0100
-Message-ID: <99689cdf-781f-9e24-7fcd-e810e30c57f2@partner.samsung.com>
-References: <CGME20180116161844eucas1p27634e8860ca620b45224fa9efe491e2c@eucas1p2.samsung.com>
-        <d46bfcf3-8c75-c7cd-ed6a-98ae8d9cdcaf@partner.samsung.com>
+From: Eric Biggers <ebiggers3@gmail.com>
+Subject: Re: kernel failure while loading X.509 certificate
+Date: Thu, 18 Jan 2018 10:12:05 -0800
+Message-ID: <20180118181205.4cwclwrh2x3zi5mz@gmail.com>
+References: <88A6FE91-795D-4F17-BF8C-E597239A2C46@linaro.org>
+ <F5505112-180F-4889-A73E-D0AB9054E58E@linaro.org>
+ <CAK8P3a1E6YOXK2heCz0eiaQLpzpb6jjnvyNK_Y4Fu8bjZuPDZw@mail.gmail.com>
+ <48DEA233-E708-4661-B5F0-15CEC60877E4@linaro.org>
+ <20180117051627.GA15527@zzz.localdomain>
+ <11931.1516187333@warthog.procyon.org.uk>
+ <CBA47A21-8E0C-4DFD-ACE5-3872AEAAEEC4@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: "David S. Miller" <davem@davemloft.net>,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-reply-to: <d46bfcf3-8c75-c7cd-ed6a-98ae8d9cdcaf@partner.samsung.com>
-Content-language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: David Howells <dhowells@redhat.com>, Arnd Bergmann <arnd@arndb.de>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Mark Brown <broonie@linaro.org>,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        John Stultz <john.stultz@linaro.org>,
+        Eric Biggers <ebiggers@google.com>,
+        crypto <linux-crypto@vger.kernel.org>,
+        Thorsten Leemhuis <regressions@leemhuis.info>
+To: Paolo Valente <paolo.valente@linaro.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-it0-f68.google.com ([209.85.214.68]:46385 "EHLO
+        mail-it0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753501AbeARSMI (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 18 Jan 2018 13:12:08 -0500
+Received: by mail-it0-f68.google.com with SMTP id c16so14510981itc.5
+        for <linux-crypto@vger.kernel.org>; Thu, 18 Jan 2018 10:12:08 -0800 (PST)
+Content-Disposition: inline
+In-Reply-To: <CBA47A21-8E0C-4DFD-ACE5-3872AEAAEEC4@linaro.org>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Please drop this as I will resend it as part of patchset.
-
-On 16.01.2018 17:18, Kamil Konieczny wrote:
-> Crypto framework will require async hash export/import, so add empty
-> functions to prevent OOPS.
+On Thu, Jan 18, 2018 at 11:07:50AM +0100, Paolo Valente wrote:
 > 
-> Signed-off-by: Kamil Konieczny <k.konieczny@partner.samsung.com>
-> ---
->  drivers/crypto/n2_core.c | 12 ++++++++++++
->  1 file changed, 12 insertions(+)
 > 
-> diff --git a/drivers/crypto/n2_core.c b/drivers/crypto/n2_core.c
-> index 662e709812cc..80e9c842aad4 100644
-> --- a/drivers/crypto/n2_core.c
-> +++ b/drivers/crypto/n2_core.c
-> @@ -359,6 +359,16 @@ static int n2_hash_async_finup(struct ahash_request *req)
->  	return crypto_ahash_finup(&rctx->fallback_req);
->  }
->  
-> +static int n2_hash_async_noimport(struct ahash_request *req, const void *in)
-> +{
-> +	return -ENOSYS;
-> +}
-> +
-> +static int n2_hash_async_noexport(struct ahash_request *req, void *out)
-> +{
-> +	return -ENOSYS;
-> +}
-> +
->  static int n2_hash_cra_init(struct crypto_tfm *tfm)
->  {
->  	const char *fallback_driver_name = crypto_tfm_alg_name(tfm);
-> @@ -1467,6 +1477,8 @@ static int __n2_register_one_ahash(const struct n2_hash_tmpl *tmpl)
->  	ahash->final = n2_hash_async_final;
->  	ahash->finup = n2_hash_async_finup;
->  	ahash->digest = n2_hash_async_digest;
-> +	ahash->export = n2_hash_async_noexport;
-> +	ahash->import = n2_hash_async_noimport;
->  
->  	halg = &ahash->halg;
->  	halg->digestsize = tmpl->digest_size;
+> > Il giorno 17 gen 2018, alle ore 12:08, David Howells <dhowells@redhat.com> ha scritto:
+> > 
+> > If this happened during boot, it could be that you have an X.509 cert for
+> > which the digest algorithm isn't built into the kernel.
+> > 
+> 
+> Yeah.  I did look for such an inconsistency after that failure, but I
+> didn't find it, most certainly because of my lack of expertise on
+> this.
+> 
+> After the success with rc8, I retried with rc7, repeating the same
+> streamline_config.pl procedure as the first time.  Of course, by
+> Murphy's laws, rc7 worked this time.  Sorry for making you waste
+> your time.  Should this happen again, I won't be so superficial not to
+> make a backup of the offending config.
 > 
 
--- 
-Best regards,
-Kamil Konieczny
-Samsung R&D Institute Poland
+No your report is still useful; I think there is a real kernel bug here,
+probably reproducible using add_key() with type "asymmetric", where the
+signature's hash algorithm isn't supported by the kernel.  I'll try to put
+together a reproducer when I have a chance.  Thanks!
+
+Eric
