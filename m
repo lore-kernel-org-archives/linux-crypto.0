@@ -1,51 +1,37 @@
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: Re: [PATCH 1/7] staging: ccree: remove ccree from staging tree
-Date: Thu, 18 Jan 2018 10:41:32 +0100
-Message-ID: <20180118094132.GB28652@kroah.com>
-References: <1515662239-1714-1-git-send-email-gilad@benyossef.com>
- <1515662239-1714-2-git-send-email-gilad@benyossef.com>
- <20180113132100.GC17515@kroah.com>
- <CAOtvUMeypjMxhC0CxSf_+Pj2K5ZZGVXRzO1BtBwv7_2V_0vP-w@mail.gmail.com>
+From: Linus Walleij <linus.walleij@linaro.org>
+Subject: Re: [PATCH] crypto: ux500/hash: Add empty export and import
+Date: Thu, 18 Jan 2018 11:06:46 +0100
+Message-ID: <CACRpkdYLxALiKfaPe5rQwDTWj3y5tV3-491s=wJVa15qs0Z27A@mail.gmail.com>
+References: <CGME20180116163219eucas1p132fafc2db8cb9b3af1a1f22d8bf2fdaf@eucas1p1.samsung.com>
+ <a83d9022-b8bc-ea50-0707-5812f2306b8e@partner.samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="UTF-8"
 Cc: Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        devel@driverdev.osuosl.org,
-        Linux kernel mailing list <linux-kernel@vger.kernel.org>,
-        Ofir Drang <ofir.drang@arm.com>
-To: Gilad Ben-Yossef <gilad@benyossef.com>
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        linux-crypto@vger.kernel.org,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Joakim Bech <joakim.bech@linaro.org>
+To: Kamil Konieczny <k.konieczny@partner.samsung.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <CAOtvUMeypjMxhC0CxSf_+Pj2K5ZZGVXRzO1BtBwv7_2V_0vP-w@mail.gmail.com>
+In-Reply-To: <a83d9022-b8bc-ea50-0707-5812f2306b8e@partner.samsung.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Jan 18, 2018 at 10:39:11AM +0200, Gilad Ben-Yossef wrote:
-> On Sat, Jan 13, 2018 at 3:21 PM, Greg Kroah-Hartman
-> <gregkh@linuxfoundation.org> wrote:
-> > On Thu, Jan 11, 2018 at 09:17:08AM +0000, Gilad Ben-Yossef wrote:
-> >> Remove the ccree driver from the staging tree in preparation to
-> >> introducing it in the crypto tree.
-> >>
-> >> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
-> >
-> > Heh, no, just make a patch series that adds the driver to the correct
-> > location in the crypto tree.
-> >
-> > If that gets accepted, we can then delete the staging driver with a
-> > separate patch, after the fact.  No need for it to be in this patch
-> > series.
-> 
-> Yes, I should have been more communicative as to why I am doing this, sorry.
-> 
-> The problem is that if you apply the patch adding the driver to
-> drivers/crypto/ the kernel
-> no longer links due to symbol name collisions.
+On Tue, Jan 16, 2018 at 5:32 PM, Kamil Konieczny
+<k.konieczny@partner.samsung.com> wrote:
 
-Then as the first patch in your series, just mark the staging driver as
-relying on BROKEN, and all should be fine :)
+> Crypto framework will require async hash export/import, so add empty
+> functions to prevent OOPS.
+>
+> Signed-off-by: Kamil Konieczny <k.konieczny@partner.samsung.com>
 
-thanks,
+Acked-by: Linus Walleij <linus.walleij@linaro.org>
 
-greg k-h
+But why isn't the framework code just checking the vtable for NULL?
+
+if (foo->fp)
+    foo->fp(bar);
+
+Yours,
+Linus Walleij
