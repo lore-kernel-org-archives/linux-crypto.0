@@ -1,61 +1,97 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: [PATCH v2] crypto: AES-NI GCM - handle zero length dst buffer
-Date: Thu, 18 Jan 2018 20:41:09 +0100
-Message-ID: <68925276.69ZJuSpAmI@positron.chronox.de>
-References: <2389839.8lvrU0lKhj@positron.chronox.de>
+From: Marek Vasut <marex@denx.de>
+Subject: Re: [PATCH 5/5] crypto: ahash.c: Require export/import in ahash
+Date: Thu, 18 Jan 2018 22:31:58 +0100
+Message-ID: <5db6f843-cc51-09f2-f388-8dade440c6bc@denx.de>
+References: <20180118183404.12583-1-k.konieczny@partner.samsung.com>
+ <CGME20180118183441eucas1p2ee3f046a594945299ea7b75ffb13e2ca@eucas1p2.samsung.com>
+ <20180118183404.12583-6-k.konieczny@partner.samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org
-To: herbert@gondor.apana.org.au
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:58406 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1756015AbeARTlL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 18 Jan 2018 14:41:11 -0500
-In-Reply-To: <2389839.8lvrU0lKhj@positron.chronox.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Cc: "David S. Miller" <davem@davemloft.net>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        Sonic Zhang <sonic.zhang@analog.com>,
+        Fabio Estevam <fabio.estevam@freescale.com>,
+        Shawn Guo <shawn.guo@linaro.org>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Jan Engelhardt <jengelh@inai.de>,
+        Arvind Yadav <arvind.yadav.cs@gmail.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Joakim Bech <joakim.bech@linaro.org>,
+        linux-kernel@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>
+To: Kamil Konieczny <k.konieczny@partner.samsung.com>,
+        linux-crypto@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20180118183404.12583-6-k.konieczny@partner.samsung.com>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi Herbert,
+On 01/18/2018 07:34 PM, Kamil Konieczny wrote:
+> Export and import are mandatory in async hash. As drivers were
+> rewritten, drop empty wrappers and correct init of ahash transformation.
 
-Sorry, I forgot to CC you on this patch -- v2 is unchanged from the
-original patch. It only adds you in copy.
+Are you moving checks from the core subsystem to drivers ? This looks
+really nonsensical and the commit message doesn't explain the rationale
+for that at all.
 
----8<---
+> Signed-off-by: Kamil Konieczny <k.konieczny@partner.samsung.com>
+> ---
+>  crypto/ahash.c | 18 ++----------------
+>  1 file changed, 2 insertions(+), 16 deletions(-)
+> 
+> diff --git a/crypto/ahash.c b/crypto/ahash.c
+> index 3a35d67de7d9..c3cce508c1d4 100644
+> --- a/crypto/ahash.c
+> +++ b/crypto/ahash.c
+> @@ -434,16 +434,6 @@ static int ahash_def_finup(struct ahash_request *req)
+>  	return ahash_def_finup_finish1(req, err);
+>  }
+>  
+> -static int ahash_no_export(struct ahash_request *req, void *out)
+> -{
+> -	return -ENOSYS;
+> -}
+> -
+> -static int ahash_no_import(struct ahash_request *req, const void *in)
+> -{
+> -	return -ENOSYS;
+> -}
+> -
+>  static int crypto_ahash_init_tfm(struct crypto_tfm *tfm)
+>  {
+>  	struct crypto_ahash *hash = __crypto_ahash_cast(tfm);
+> @@ -451,8 +441,6 @@ static int crypto_ahash_init_tfm(struct crypto_tfm *tfm)
+>  
+>  	hash->setkey = ahash_nosetkey;
+>  	hash->has_setkey = false;
+> -	hash->export = ahash_no_export;
+> -	hash->import = ahash_no_import;
+>  
+>  	if (tfm->__crt_alg->cra_type != &crypto_ahash_type)
+>  		return crypto_init_shash_ops_async(tfm);
+> @@ -462,15 +450,13 @@ static int crypto_ahash_init_tfm(struct crypto_tfm *tfm)
+>  	hash->final = alg->final;
+>  	hash->finup = alg->finup ?: ahash_def_finup;
+>  	hash->digest = alg->digest;
+> +	hash->export = alg->export;
+> +	hash->import = alg->import;
+>  
+>  	if (alg->setkey) {
+>  		hash->setkey = alg->setkey;
+>  		hash->has_setkey = true;
+>  	}
+> -	if (alg->export)
+> -		hash->export = alg->export;
+> -	if (alg->import)
+> -		hash->import = alg->import;
+>  
+>  	return 0;
+>  }
+> 
 
-GCM can be invoked with a zero destination buffer. This is possible if
-the AAD and the ciphertext have zero lengths and only the tag exists in
-the source buffer (i.e. a source buffer cannot be zero). In this case,
-the GCM cipher only performs the authentication and no decryption
-operation.
 
-When the destination buffer has zero length, it is possible that no page
-is mapped to the SG pointing to the destination. In this case,
-sg_page(req->dst) is an invalid access. Therefore, page accesses should
-only be allowed if the req->dst->length is non-zero which is the
-indicator that a page must exist.
-
-This fixes a crash that can be triggered by user space via AF_ALG.
-
-CC: <stable@vger.kernel.org>
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
----
- arch/x86/crypto/aesni-intel_glue.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
-index a5ee78d723cd..34cf1c1f8c98 100644
---- a/arch/x86/crypto/aesni-intel_glue.c
-+++ b/arch/x86/crypto/aesni-intel_glue.c
-@@ -824,7 +824,7 @@ static int gcmaes_decrypt(struct aead_request *req, unsigned int assoclen,
- 	if (sg_is_last(req->src) &&
- 	    (!PageHighMem(sg_page(req->src)) ||
- 	    req->src->offset + req->src->length <= PAGE_SIZE) &&
--	    sg_is_last(req->dst) &&
-+	    sg_is_last(req->dst) && req->dst->length &&
- 	    (!PageHighMem(sg_page(req->dst)) ||
- 	    req->dst->offset + req->dst->length <= PAGE_SIZE)) {
- 		one_entry_in_sg = 1;
 -- 
-2.14.3
+Best regards,
+Marek Vasut
