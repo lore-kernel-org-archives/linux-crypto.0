@@ -1,21 +1,28 @@
 From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: [PATCH] crypto: AES-NI GCM - handle zero length dst buffer
-Date: Thu, 18 Jan 2018 20:38:50 +0100
-Message-ID: <3135206.iU7W5QhZxW@positron.chronox.de>
+Subject: [PATCH v2] crypto: AES-NI GCM - handle zero length dst buffer
+Date: Thu, 18 Jan 2018 20:41:09 +0100
+Message-ID: <68925276.69ZJuSpAmI@positron.chronox.de>
 References: <2389839.8lvrU0lKhj@positron.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
 Cc: linux-crypto@vger.kernel.org
-To: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:58404 "EHLO mail.eperm.de"
+Received: from mail.eperm.de ([89.247.134.16]:58406 "EHLO mail.eperm.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S932730AbeARTix (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 18 Jan 2018 14:38:53 -0500
+        id S1756015AbeARTlL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 18 Jan 2018 14:41:11 -0500
 In-Reply-To: <2389839.8lvrU0lKhj@positron.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
+
+Hi Herbert,
+
+Sorry, I forgot to CC you on this patch -- v2 is unchanged from the
+original patch. It only adds you in copy.
+
+---8<---
 
 GCM can be invoked with a zero destination buffer. This is possible if
 the AAD and the ciphertext have zero lengths and only the tag exists in
