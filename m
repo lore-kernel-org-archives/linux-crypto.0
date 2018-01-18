@@ -1,64 +1,61 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: Re: [PATCH 1/7] staging: ccree: remove ccree from staging tree
-Date: Thu, 18 Jan 2018 10:39:11 +0200
-Message-ID: <CAOtvUMeypjMxhC0CxSf_+Pj2K5ZZGVXRzO1BtBwv7_2V_0vP-w@mail.gmail.com>
-References: <1515662239-1714-1-git-send-email-gilad@benyossef.com>
- <1515662239-1714-2-git-send-email-gilad@benyossef.com>
- <20180113132100.GC17515@kroah.com>
+Subject: Re: [PATCH -next] staging: ccree: remove redundant dev_err call in init_cc_resources()
+Date: Thu, 18 Jan 2018 10:43:05 +0200
+Message-ID: <CAOtvUMdmbWaD3LkCA9gKDmLO1LVh5y8Xc8-2avu3yBsvCrY4nA@mail.gmail.com>
+References: <1515669297-125873-1-git-send-email-weiyongjun1@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: devel@driverdev.osuosl.org, Herbert Xu <herbert@gondor.apana.org.au>,
- Linux kernel mailing list <linux-kernel@vger.kernel.org>,
- Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Ofir Drang <ofir.drang@arm.com>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
-In-Reply-To: <20180113132100.GC17515@kroah.com>
-List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
-List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
-List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
-List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
-List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
-Errors-To: driverdev-devel-bounces@linuxdriverproject.org
-Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        driverdev-devel@linuxdriverproject.org, devel@driverdev.osuosl.org,
+        kernel-janitors@vger.kernel.org
+To: Wei Yongjun <weiyongjun1@huawei.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-ot0-f196.google.com ([74.125.82.196]:45772 "EHLO
+        mail-ot0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754902AbeARInG (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 18 Jan 2018 03:43:06 -0500
+Received: by mail-ot0-f196.google.com with SMTP id r4so15563547oti.12
+        for <linux-crypto@vger.kernel.org>; Thu, 18 Jan 2018 00:43:06 -0800 (PST)
+In-Reply-To: <1515669297-125873-1-git-send-email-weiyongjun1@huawei.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Sat, Jan 13, 2018 at 3:21 PM, Greg Kroah-Hartman
-<gregkh@linuxfoundation.org> wrote:
-> On Thu, Jan 11, 2018 at 09:17:08AM +0000, Gilad Ben-Yossef wrote:
->> Remove the ccree driver from the staging tree in preparation to
->> introducing it in the crypto tree.
->>
->> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+On Thu, Jan 11, 2018 at 1:14 PM, Wei Yongjun <weiyongjun1@huawei.com> wrote:
+> There is a error message within devm_ioremap_resource
+> already, so remove the dev_err call to avoid redundant
+> error message.
 >
-> Heh, no, just make a patch series that adds the driver to the correct
-> location in the crypto tree.
+> Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
+> ---
+>  drivers/staging/ccree/cc_driver.c | 4 +---
+>  1 file changed, 1 insertion(+), 3 deletions(-)
 >
-> If that gets accepted, we can then delete the staging driver with a
-> separate patch, after the fact.  No need for it to be in this patch
-> series.
+> diff --git a/drivers/staging/ccree/cc_driver.c b/drivers/staging/ccree/cc_driver.c
+> index 6682d9d..c27d5a8 100644
+> --- a/drivers/staging/ccree/cc_driver.c
+> +++ b/drivers/staging/ccree/cc_driver.c
+> @@ -174,10 +174,8 @@ static int init_cc_resources(struct platform_device *plat_dev)
+>         req_mem_cc_regs = platform_get_resource(plat_dev, IORESOURCE_MEM, 0);
+>         /* Map registers space */
+>         new_drvdata->cc_base = devm_ioremap_resource(dev, req_mem_cc_regs);
+> -       if (IS_ERR(new_drvdata->cc_base)) {
+> -               dev_err(dev, "Failed to ioremap registers");
+> +       if (IS_ERR(new_drvdata->cc_base))
+>                 return PTR_ERR(new_drvdata->cc_base);
+> -       }
+>
+>         dev_dbg(dev, "Got MEM resource (%s): %pR\n", req_mem_cc_regs->name,
+>                 req_mem_cc_regs);
+>
 
-Yes, I should have been more communicative as to why I am doing this, sorry.
+Yeah, that makes sense.
 
-The problem is that if you apply the patch adding the driver to
-drivers/crypto/ the kernel
-no longer links due to symbol name collisions.
-
-If we really must avoid doing an "atomic" replacement I guess I can change the
-Kconfig name to ...CCREE_OLD or something although I would prefer not doing
-that so that people using the driver in staging/ don't need to change
-their kernel
-build configs when they are upgrading versions.
-
-Does that makes sense?
+Acked-by: Gilad Ben-Yossef <gilad@benyossef.com>
 
 Thanks,
 Gilad
-
-
 
 -- 
 Gilad Ben-Yossef
