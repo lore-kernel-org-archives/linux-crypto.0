@@ -1,40 +1,32 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 1/2] crypto: exynos-rng - Add SPDX license identifier and
- correct module license
-Date: Thu, 18 Jan 2018 23:01:46 +1100
-Message-ID: <20180118120146.GA20717@gondor.apana.org.au>
-References: <20180109175736.6885-1-krzk@kernel.org>
+Subject: Re: [RFT PATCH] crypto: arm64 - implement SHA-512 using special
+ instructions
+Date: Thu, 18 Jan 2018 23:01:59 +1100
+Message-ID: <20180118120159.GB20717@gondor.apana.org.au>
+References: <20180109182302.11521-1-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-        Kukjin Kim <kgene@kernel.org>,
-        Vladimir Zapolskiy <vz@mleia.com>,
-        Kamil Konieczny <k.konieczny@partner.samsung.com>,
-        linux-crypto@vger.kernel.org, linux-samsung-soc@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, peter.maydell@linaro.org,
+        will.deacon@arm.com, catalin.marinas@arm.com,
+        steve.capper@linaro.org, linux-crypto@vger.kernel.org
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [128.1.224.119] ([128.1.224.119]:55322 "EHLO ringil.hmeau.com"
+Received: from [128.1.224.119] ([128.1.224.119]:55332 "EHLO ringil.hmeau.com"
         rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
-        id S1750724AbeARMCM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 18 Jan 2018 07:02:12 -0500
+        id S932411AbeARMCv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 18 Jan 2018 07:02:51 -0500
 Content-Disposition: inline
-In-Reply-To: <20180109175736.6885-1-krzk@kernel.org>
+In-Reply-To: <20180109182302.11521-1-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Jan 09, 2018 at 06:57:35PM +0100, Krzysztof Kozlowski wrote:
-> Replace GPL license statement with SPDX GPL-2.0 license identifier and
-> correct the module license to GPLv2.
+On Tue, Jan 09, 2018 at 06:23:02PM +0000, Ard Biesheuvel wrote:
+> Implement the SHA-512 using the new special instructions that have
+> been introduced as an optional extension in ARMv8.2.
 > 
-> The license itself was a generic GPL because of copy-and-paste from old
-> drivers/char/hw_random/exynos-rng.c driver (on which this was based on).
-> However the module license indicated GPL-2.0 or later.  GPL-2.0 was
-> intended by author so fix up this mess.
-> 
-> Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
+> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-All applied.  Thanks.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
