@@ -1,70 +1,70 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [PATCH v2] [v2] crypto: aes-generic - fix aes-generic regression
- on powerpc
-Date: Thu, 18 Jan 2018 12:59:33 +0000
-Message-ID: <CAKv+Gu9voMA=QM-WCjGi807UNA2FfJFPV-UqLJ=4Y__VS5-UWA@mail.gmail.com>
-References: <20180115160735.593519-1-arnd@arndb.de>
+Subject: Re: [PATCH v2 0/3] sha3 fixes and new implementation for arm64
+Date: Thu, 18 Jan 2018 13:43:59 +0000
+Message-ID: <CAKv+Gu8-CGFukD-At57=3EAt+YGB--m9KfrVQ+GwwnYgB9gnGw@mail.gmail.com>
+References: <20180114164118.18330-1-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Richard Biener <rguenther@suse.de>,
-        Jakub Jelinek <jakub@gcc.gnu.org>,
+        Will Deacon <will.deacon@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Steve Capper <steve.capper@linaro.org>, jgarzik@redhat.com,
+        Arnd Bergmann <arnd@arndb.de>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
         "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>,
-        Segher Boessenkool <segher@kernel.crashing.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180115160735.593519-1-arnd@arndb.de>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+        <linux-crypto@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-it0-f67.google.com ([209.85.214.67]:34116 "EHLO
+        mail-it0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1756197AbeARNoA (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 18 Jan 2018 08:44:00 -0500
+Received: by mail-it0-f67.google.com with SMTP id m11so1942095iti.1
+        for <linux-crypto@vger.kernel.org>; Thu, 18 Jan 2018 05:44:00 -0800 (PST)
+In-Reply-To: <20180114164118.18330-1-ard.biesheuvel@linaro.org>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On 15 January 2018 at 16:07, Arnd Bergmann <arnd@arndb.de> wrote:
-> My last bugfix added -Os on the command line, which unfortunately caused
-> a build regression on powerpc in some configurations.
+On 14 January 2018 at 16:41, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
+> Add an implementation of SHA3 to arm64 using the new special instructions,
+> and another one using scalar instructions but coded in assembler (#2)
 >
-> I've done some more analysis of the original problem and found slightly
-> different workaround that avoids this regression and also results in
-> better performance on gcc-7.0: -fcode-hoisting is an optimization step
-> that got added in gcc-7 and that for all gcc-7 versions causes worse
-> performance.
+> In preparation of that, fix a bug in the SHA3 (#1) and add some new test
+> vectors to get better test coverage (#3).
 >
-> This disables -fcode-hoisting on all compilers that understand the option.
-> For gcc-7.1 and 7.2 I found the same performance as my previous patch
-> (using -Os), in gcc-7.0 it was even better. On gcc-8 I could see no
-> change in performance from this patch. In theory, code hoisting should
-> not be able make things better for the AES cipher, so leaving it
-> disabled for gcc-8 only serves to simplify the Makefile change.
+> v2: Drop generic SHA3 as a fallback for the arm64 module. Instead, provide
+>     a special arm64 version to use as a fallback when the instructions are
+>     not available or when executing in a context that does not allow SIMD
 >
-> Reported-by: kbuild test robot <fengguang.wu@intel.com>
-> Link: https://www.mail-archive.com/linux-crypto@vger.kernel.org/msg30418.html
-> Link: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=83356
-> Link: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=83651
-> Fixes: 148b974deea9 ("crypto: aes-generic - build with -Os on gcc-7+")
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+>     Drop patches that simplify the generic SHA3 and make it reusable by
+>     other modules.
+>
+> Ard Biesheuvel (3):
+>   crypto/generic: sha3 - fixes for alignment and big endian operation
+>   crypto/arm64: sha3 - new scalar + v8.2 Crypto Extensions
+>     implementation
+>   crypto/testmgr: sha3 - add new testcases
+>
+>  arch/arm64/crypto/Kconfig           |   4 +
+>  arch/arm64/crypto/Makefile          |   3 +
+>  arch/arm64/crypto/sha3-arm64-core.S | 512 ++++++++++++++++++
+>  arch/arm64/crypto/sha3-arm64-glue.c | 192 +++++++
+>  crypto/sha3_generic.c               |   5 +-
+>  crypto/testmgr.h                    | 550 ++++++++++++++++++++
+>  6 files changed, 1264 insertions(+), 2 deletions(-)
+>  create mode 100644 arch/arm64/crypto/sha3-arm64-core.S
+>  create mode 100644 arch/arm64/crypto/sha3-arm64-glue.c
+>
 
-Acked-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Herbert,
 
-> ---
-> v2: fix a typo in the Makefile
-> ---
->  crypto/Makefile | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/crypto/Makefile b/crypto/Makefile
-> index daa69360e054..cdbc03b35510 100644
-> --- a/crypto/Makefile
-> +++ b/crypto/Makefile
-> @@ -99,7 +99,7 @@ obj-$(CONFIG_CRYPTO_TWOFISH_COMMON) += twofish_common.o
->  obj-$(CONFIG_CRYPTO_SERPENT) += serpent_generic.o
->  CFLAGS_serpent_generic.o := $(call cc-option,-fsched-pressure)  # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=79149
->  obj-$(CONFIG_CRYPTO_AES) += aes_generic.o
-> -CFLAGS_aes_generic.o := $(call cc-ifversion, -ge, 0701, -Os) # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=83356
-> +CFLAGS_aes_generic.o := $(call cc-option,-fno-code-hoisting) # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=83356
->  obj-$(CONFIG_CRYPTO_AES_TI) += aes_ti.o
->  obj-$(CONFIG_CRYPTO_CAMELLIA) += camellia_generic.o
->  obj-$(CONFIG_CRYPTO_CAST_COMMON) += cast_common.o
-> --
-> 2.9.0
->
+Could you hold off on the SHA-3 patches for a little while? With the
+performance fix for the generic code, it may no longer be worthwhile
+to have a special arm64 implementation as well. I will respin a series
+containing everything I think is needed.
+
+The SM3 patch is independent, and is good to go IMO (with Steve's Tested-by)
+
+Thanks,
+Ard.
