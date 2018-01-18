@@ -1,8 +1,9 @@
 From: Kamil Konieczny <k.konieczny@partner.samsung.com>
-Subject: [PATCH v3 0/5] crypto: ahash.c: Require export/import in ahash
-Date: Thu, 18 Jan 2018 19:33:59 +0100
-Message-ID: <20180118183404.12583-1-k.konieczny@partner.samsung.com>
-References: <CGME20180118183438eucas1p2e2e7be8625ae0950c519e27424f9301a@eucas1p2.samsung.com>
+Subject: [PATCH 2/5] crypto: n2_core: Add empty hash export and import
+Date: Thu, 18 Jan 2018 19:34:01 +0100
+Message-ID: <20180118183404.12583-3-k.konieczny@partner.samsung.com>
+References: <20180118183404.12583-1-k.konieczny@partner.samsung.com>
+        <CGME20180118183439eucas1p26bfb3043619ddcbc25474ac98e5638ff@eucas1p2.samsung.com>
 Cc: Kamil Konieczny <k.konieczny@partner.samsung.com>,
         "David S. Miller" <davem@davemloft.net>,
         Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
@@ -15,40 +16,58 @@ Cc: Kamil Konieczny <k.konieczny@partner.samsung.com>,
         Arvind Yadav <arvind.yadav.cs@gmail.com>,
         Linus Walleij <linus.walleij@linaro.org>,
         Joakim Bech <joakim.bech@linaro.org>,
-        linux-kernel@vger.kernel.org
-To: linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
         Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mailout2.w1.samsung.com ([210.118.77.12]:44284 "EHLO
-        mailout2.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755225AbeARSem (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 18 Jan 2018 13:34:42 -0500
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-reply-to: <20180118183404.12583-1-k.konieczny@partner.samsung.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-First four patches add empty hash export and import functions to each driver,
-with the same behaviour as in crypto framework. The last one drops them from
-crypto framework. Last one for ahash.c depends on all previous.
+Crypto framework requires export/import in async hash. If driver do not
+implement them, wrapper functions in framework will be used, and it will
+cause error during ahash alg registration (unless one disables crypto
+internal tests). To make change in framework and expose this requirement,
+I will remove wrappers from crypto/ahash.c , but this can broke code which
+depends on them. Add empty hash export and import, with the same behaviour
+as in framework and expose this directly in driver. This can also prevent
+OOPS when config option in Cryptographic API 'Disable run-time self tests'
+will be enabled.
 
-Changes in v3:
-added change for bfin_crc.c
-make this a patchset, instead of unreleated patches
-make commit message more descriptive
+Signed-off-by: Kamil Konieczny <k.konieczny@partner.samsung.com>
+---
+ drivers/crypto/n2_core.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-Kamil Konieczny (5):
-  crypto: mxs-dcp: Add empty hash export and import
-  crypto: n2_core: Add empty hash export and import
-  crypto: ux500/hash: Add empty export and import
-  crypto: bfin_crc: Add empty hash export and import
-  crypto: ahash.c: Require export/import in ahash
-
- crypto/ahash.c                        | 18 ++----------------
- drivers/crypto/bfin_crc.c             | 12 ++++++++++++
- drivers/crypto/mxs-dcp.c              | 14 ++++++++++++++
- drivers/crypto/n2_core.c              | 12 ++++++++++++
- drivers/crypto/ux500/hash/hash_core.c | 18 ++++++++++++++++++
- 5 files changed, 58 insertions(+), 16 deletions(-)
-
+diff --git a/drivers/crypto/n2_core.c b/drivers/crypto/n2_core.c
+index 662e709812cc..80e9c842aad4 100644
+--- a/drivers/crypto/n2_core.c
++++ b/drivers/crypto/n2_core.c
+@@ -359,6 +359,16 @@ static int n2_hash_async_finup(struct ahash_request *req)
+ 	return crypto_ahash_finup(&rctx->fallback_req);
+ }
+ 
++static int n2_hash_async_noimport(struct ahash_request *req, const void *in)
++{
++	return -ENOSYS;
++}
++
++static int n2_hash_async_noexport(struct ahash_request *req, void *out)
++{
++	return -ENOSYS;
++}
++
+ static int n2_hash_cra_init(struct crypto_tfm *tfm)
+ {
+ 	const char *fallback_driver_name = crypto_tfm_alg_name(tfm);
+@@ -1467,6 +1477,8 @@ static int __n2_register_one_ahash(const struct n2_hash_tmpl *tmpl)
+ 	ahash->final = n2_hash_async_final;
+ 	ahash->finup = n2_hash_async_finup;
+ 	ahash->digest = n2_hash_async_digest;
++	ahash->export = n2_hash_async_noexport;
++	ahash->import = n2_hash_async_noimport;
+ 
+ 	halg = &ahash->halg;
+ 	halg->digestsize = tmpl->digest_size;
 -- 
 2.15.0
