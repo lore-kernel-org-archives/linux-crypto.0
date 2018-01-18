@@ -1,38 +1,34 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/5] crypto: chelsio - Cleanup and bug fixes
-Date: Thu, 18 Jan 2018 23:04:04 +1100
-Message-ID: <20180118120404.GH20717@gondor.apana.org.au>
-References: <cover.1515669022.git.harsh@chelsio.com>
+Subject: Re: [PATCH -next] hwrng: exynos - remove redundant dev_err call in
+ exynos_trng_probe()
+Date: Thu, 18 Jan 2018 23:03:05 +1100
+Message-ID: <20180118120305.GF20717@gondor.apana.org.au>
+References: <1515591059-73230-1-git-send-email-weiyongjun1@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Harsh Jain <harsh@chelsio.com>
+Cc: l.stelmach@samsung.com, mpm@selenic.com, arnd@arndb.de,
+        gregkh@linuxfoundation.org, kgene@kernel.org, krzk@kernel.org,
+        linux-samsung-soc@vger.kernel.org, linux-crypto@vger.kernel.org,
+        kernel-janitors@vger.kernel.org
+To: Wei Yongjun <weiyongjun1@huawei.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [128.1.224.119] ([128.1.224.119]:55396 "EHLO ringil.hmeau.com"
+Received: from [128.1.224.119] ([128.1.224.119]:55404 "EHLO ringil.hmeau.com"
         rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
-        id S1753505AbeARMEP (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 18 Jan 2018 07:04:15 -0500
+        id S1752184AbeARMEY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 18 Jan 2018 07:04:24 -0500
 Content-Disposition: inline
-In-Reply-To: <cover.1515669022.git.harsh@chelsio.com>
+In-Reply-To: <1515591059-73230-1-git-send-email-weiyongjun1@huawei.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jan 11, 2018 at 04:45:47PM +0530, Harsh Jain wrote:
-> This series include cleanup, bug fixes and authenc algo supporting
->  ctr(aes)-sha operation.
+On Wed, Jan 10, 2018 at 01:30:59PM +0000, Wei Yongjun wrote:
+> There is a error message within devm_ioremap_resource
+> already, so remove the dev_err call to avoid redundant
+> error message.
 > 
-> Harsh Jain (5):
->   crypto: chelsio - Fix Indentation
->   crypto: chelsio - check for sg null
->   crypto: chelsio - Fix IV updated in XTS operation
->   crypto: chelsio - Add authenc versions of ctr and sha
->   crypto: chelsio - Remove dst sg size zero check
-> 
->  drivers/crypto/chelsio/chcr_algo.c   | 299 ++++++++++++++++++++++++++---------
->  drivers/crypto/chelsio/chcr_crypto.h |   7 +-
->  2 files changed, 233 insertions(+), 73 deletions(-)
+> Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
 
-All applied.  Thanks.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
