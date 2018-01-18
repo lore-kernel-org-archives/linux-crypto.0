@@ -1,34 +1,27 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] hw_random: mediatek: Setup default RNG quality
-Date: Thu, 18 Jan 2018 23:02:13 +1100
-Message-ID: <20180118120213.GC20717@gondor.apana.org.au>
-References: <134f98ae3270cc6040121cf75d50c916adfe58dc.1515556571.git.sean.wang@mediatek.com>
+Subject: Re: [PATCH] crypto: marvell/cesa - Fix DMA API misuse
+Date: Thu, 18 Jan 2018 23:03:14 +1100
+Message-ID: <20180118120314.GG20717@gondor.apana.org.au>
+References: <55d3177407b00dd4a9d51fe4f8e2bf2282fe8e3d.1515596541.git.robin.murphy@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: mpm@selenic.com, clabbe.montjoie@gmail.com,
-        prasannatsmkumar@gmail.com, romain.perier@free-electrons.com,
-        shannon.nelson@oracle.com, weiyongjun1@huawei.com,
-        linux-crypto@vger.kernel.org, linux-mediatek@lists.infradead.org,
+Cc: boris.brezillon@free-electrons.com, arno@natisbad.org,
+        davem@davemloft.net, hch@lst.de, linux-crypto@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-To: sean.wang@mediatek.com
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [128.1.224.119] ([128.1.224.119]:55416 "EHLO ringil.hmeau.com"
-        rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
-        id S1754707AbeARME4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 18 Jan 2018 07:04:56 -0500
+To: Robin Murphy <robin.murphy@arm.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <134f98ae3270cc6040121cf75d50c916adfe58dc.1515556571.git.sean.wang@mediatek.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <55d3177407b00dd4a9d51fe4f8e2bf2282fe8e3d.1515596541.git.robin.murphy@arm.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Jan 10, 2018 at 12:02:46PM +0800, sean.wang@mediatek.com wrote:
-> From: Sean Wang <sean.wang@mediatek.com>
+On Wed, Jan 10, 2018 at 03:15:43PM +0000, Robin Murphy wrote:
+> phys_to_dma() is an internal helper for certain DMA API implementations,
+> and is not appropriate for drivers to use. It appears that what the CESA
+> driver really wants to be using is dma_map_resource() - admittedly that
+> didn't exist when the offending code was first merged, but it does now.
 > 
-> When hw_random device's quality is non-zero, it will automatically fill
-> the kernel's entropy pool at boot.  For the purpose, one conservative
-> quality value is being picked up as the default value.
-> 
-> Signed-off-by: Sean Wang <sean.wang@mediatek.com>
+> Signed-off-by: Robin Murphy <robin.murphy@arm.com>
 
 Patch applied.  Thanks.
 -- 
