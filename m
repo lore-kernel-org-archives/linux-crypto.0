@@ -1,9 +1,9 @@
 From: Kamil Konieczny <k.konieczny@partner.samsung.com>
-Subject: [PATCH 4/5] crypto: bfin_crc: Add empty hash export and import
-Date: Thu, 18 Jan 2018 19:34:03 +0100
-Message-ID: <20180118183404.12583-5-k.konieczny@partner.samsung.com>
+Subject: [PATCH 3/5] crypto: ux500/hash: Add empty export and import
+Date: Thu, 18 Jan 2018 19:34:02 +0100
+Message-ID: <20180118183404.12583-4-k.konieczny@partner.samsung.com>
 References: <20180118183404.12583-1-k.konieczny@partner.samsung.com>
-        <CGME20180118183440eucas1p2d435e0100eaf03d3967b28c29a2c91b3@eucas1p2.samsung.com>
+        <CGME20180118183440eucas1p21e1a425cbafe3cbb3856d97fd94228e5@eucas1p2.samsung.com>
 Cc: Kamil Konieczny <k.konieczny@partner.samsung.com>,
         "David S. Miller" <davem@davemloft.net>,
         Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
@@ -20,9 +20,9 @@ Cc: Kamil Konieczny <k.konieczny@partner.samsung.com>,
         Herbert Xu <herbert@gondor.apana.org.au>
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mailout2.w1.samsung.com ([210.118.77.12]:44313 "EHLO
-        mailout2.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755733AbeARSeo (ORCPT
+Received: from mailout1.w1.samsung.com ([210.118.77.11]:33220 "EHLO
+        mailout1.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755571AbeARSeo (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Thu, 18 Jan 2018 13:34:44 -0500
 In-reply-to: <20180118183404.12583-1-k.konieczny@partner.samsung.com>
@@ -34,45 +34,73 @@ implement them, wrapper functions in framework will be used, and it will
 cause error during ahash alg registration (unless one disables crypto
 internal tests). To make change in framework and expose this requirement,
 I will remove wrappers from crypto/ahash.c , but this can broke code which
-depends on them.
-Add empty hash export and import, with the same behaviour as in framework
-and expose this directly in driver. This can also prevent OOPS when config
-option in Cryptographic API 'Disable run-time self tests' will be enabled.
+depends on them. Add empty hash export and import, with the same behaviour
+as in framework and expose this directly in driver. This can also prevent
+OOPS when config option in Cryptographic API 'Disable run-time self tests'
+will be enabled.
 
 Signed-off-by: Kamil Konieczny <k.konieczny@partner.samsung.com>
+Acked-by: Linus Walleij <linus.walleij@linaro.org>
 ---
- drivers/crypto/bfin_crc.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ drivers/crypto/ux500/hash/hash_core.c | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-diff --git a/drivers/crypto/bfin_crc.c b/drivers/crypto/bfin_crc.c
-index a118b9bed669..65a8e07835e8 100644
---- a/drivers/crypto/bfin_crc.c
-+++ b/drivers/crypto/bfin_crc.c
-@@ -450,6 +450,16 @@ static int bfin_crypto_crc_digest(struct ahash_request *req)
- 	return bfin_crypto_crc_finup(req);
+diff --git a/drivers/crypto/ux500/hash/hash_core.c b/drivers/crypto/ux500/hash/hash_core.c
+index 9acccad26928..2d0a677bcc76 100644
+--- a/drivers/crypto/ux500/hash/hash_core.c
++++ b/drivers/crypto/ux500/hash/hash_core.c
+@@ -1403,6 +1403,16 @@ static int ahash_sha256_digest(struct ahash_request *req)
+ 	return ret1 ? ret1 : ret2;
  }
  
-+static int bfin_crypto_crc_noimport(struct ahash_request *req, const void *in)
++static int ahash_noimport(struct ahash_request *req, const void *in)
 +{
 +	return -ENOSYS;
 +}
 +
-+static int bfin_crypto_crc_noexport(struct ahash_request *req, void *out)
++static int ahash_noexport(struct ahash_request *req, void *out)
 +{
 +	return -ENOSYS;
 +}
 +
- static int bfin_crypto_crc_setkey(struct crypto_ahash *tfm, const u8 *key,
- 			unsigned int keylen)
+ static int hmac_sha1_init(struct ahash_request *req)
  {
-@@ -487,6 +497,8 @@ static struct ahash_alg algs = {
- 	.final		= bfin_crypto_crc_final,
- 	.finup		= bfin_crypto_crc_finup,
- 	.digest		= bfin_crypto_crc_digest,
-+	.export		= bfin_crypto_crc_noexport,
-+	.import		= bfin_crypto_crc_noimport,
- 	.setkey		= bfin_crypto_crc_setkey,
- 	.halg.digestsize	= CHKSUM_DIGEST_SIZE,
- 	.halg.base	= {
+ 	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
+@@ -1507,6 +1517,8 @@ static struct hash_algo_template hash_algs[] = {
+ 			.update = ahash_update,
+ 			.final = ahash_final,
+ 			.digest = ahash_sha1_digest,
++			.export = ahash_noexport,
++			.import = ahash_noimport,
+ 			.halg.digestsize = SHA1_DIGEST_SIZE,
+ 			.halg.statesize = sizeof(struct hash_ctx),
+ 			.halg.base = {
+@@ -1529,6 +1541,8 @@ static struct hash_algo_template hash_algs[] = {
+ 			.update	= ahash_update,
+ 			.final = ahash_final,
+ 			.digest = ahash_sha256_digest,
++			.export = ahash_noexport,
++			.import = ahash_noimport,
+ 			.halg.digestsize = SHA256_DIGEST_SIZE,
+ 			.halg.statesize = sizeof(struct hash_ctx),
+ 			.halg.base = {
+@@ -1553,6 +1567,8 @@ static struct hash_algo_template hash_algs[] = {
+ 			.final = ahash_final,
+ 			.digest = hmac_sha1_digest,
+ 			.setkey = hmac_sha1_setkey,
++			.export = ahash_noexport,
++			.import = ahash_noimport,
+ 			.halg.digestsize = SHA1_DIGEST_SIZE,
+ 			.halg.statesize = sizeof(struct hash_ctx),
+ 			.halg.base = {
+@@ -1577,6 +1593,8 @@ static struct hash_algo_template hash_algs[] = {
+ 			.final = ahash_final,
+ 			.digest = hmac_sha256_digest,
+ 			.setkey = hmac_sha256_setkey,
++			.export = ahash_noexport,
++			.import = ahash_noimport,
+ 			.halg.digestsize = SHA256_DIGEST_SIZE,
+ 			.halg.statesize = sizeof(struct hash_ctx),
+ 			.halg.base = {
 -- 
 2.15.0
