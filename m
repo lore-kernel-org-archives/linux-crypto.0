@@ -1,61 +1,58 @@
-From: Paolo Valente <paolo.valente@linaro.org>
-Subject: Re: kernel failure while loading X.509 certificate
-Date: Thu, 18 Jan 2018 11:07:50 +0100
-Message-ID: <CBA47A21-8E0C-4DFD-ACE5-3872AEAAEEC4@linaro.org>
-References: <88A6FE91-795D-4F17-BF8C-E597239A2C46@linaro.org>
- <F5505112-180F-4889-A73E-D0AB9054E58E@linaro.org>
- <CAK8P3a1E6YOXK2heCz0eiaQLpzpb6jjnvyNK_Y4Fu8bjZuPDZw@mail.gmail.com>
- <48DEA233-E708-4661-B5F0-15CEC60877E4@linaro.org>
- <20180117051627.GA15527@zzz.localdomain>
- <11931.1516187333@warthog.procyon.org.uk>
-Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
-Content-Type: text/plain;
-        charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Cc: Eric Biggers <ebiggers3@gmail.com>, Arnd Bergmann <arnd@arndb.de>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Mark Brown <broonie@linaro.org>,
-        Vincent Guittot <vincent.guittot@linaro.org>,
-        John Stultz <john.stultz@linaro.org>,
-        Eric Biggers <ebiggers@google.com>,
-        crypto <linux-crypto@vger.kernel.org>,
-        Thorsten Leemhuis <regressions@leemhuis.info>
-To: David Howells <dhowells@redhat.com>
+From: Dan Carpenter <dan.carpenter@oracle.com>
+Subject: [bug report] crypto: lrw - Convert to skcipher
+Date: Thu, 18 Jan 2018 13:44:15 +0300
+Message-ID: <20180118104415.GB21064@mwanda>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-lf0-f44.google.com ([209.85.215.44]:41584 "EHLO
-        mail-lf0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755127AbeARKHz (ORCPT
+Received: from userp2120.oracle.com ([156.151.31.85]:33282 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755489AbeARKpH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 18 Jan 2018 05:07:55 -0500
-Received: by mail-lf0-f44.google.com with SMTP id f136so4390479lff.8
-        for <linux-crypto@vger.kernel.org>; Thu, 18 Jan 2018 02:07:54 -0800 (PST)
-In-Reply-To: <11931.1516187333@warthog.procyon.org.uk>
+        Thu, 18 Jan 2018 05:45:07 -0500
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+Hello Herbert Xu,
 
+The patch 700cb3f5fe75: "crypto: lrw - Convert to skcipher" from Nov
+22, 2016, leads to the following static checker warning:
 
-> Il giorno 17 gen 2018, alle ore 12:08, David Howells =
-<dhowells@redhat.com> ha scritto:
->=20
-> If this happened during boot, it could be that you have an X.509 cert =
-for
-> which the digest algorithm isn't built into the kernel.
->=20
+	crypto/lrw.c:316 exit_crypt()
+	warn: should '(struct rctx)->ext' be freed with kzfree()'
 
-Yeah.  I did look for such an inconsistency after that failure, but I
-didn't find it, most certainly because of my lack of expertise on
-this.
+crypto/lrw.c
+   309  static void exit_crypt(struct skcipher_request *req)
+   310  {
+   311          struct rctx *rctx = skcipher_request_ctx(req);
+   312  
+   313          rctx->left = 0;
+   314  
+   315          if (rctx->ext)
+   316                  kfree(rctx->ext);
+                        ^^^^^^^^^^^^^^^^
 
-After the success with rc8, I retried with rc7, repeating the same
-streamline_config.pl procedure as the first time.  Of course, by
-Murphy's laws, rc7 worked this time.  Sorry for making you waste
-your time.  Should this happen again, I won't be so superficial not to
-make a backup of the offending config.
+I am working on a Smatch check that complains about stuff we should
+maybe free with kzfree.  It first makes a list of any struct members
+which are freed with kzfree() then it does a second pass and complains
+if any of them are freed with regular kfree().
 
-Thanks,
-Paolo
+   317  }
 
-> David
+Here is the complete list of warnings from v4.15-rc8.  It's not very
+long...
+
+crypto/lrw.c:316 exit_crypt() warn: should '(struct rctx)->ext' be freed with kzfree()'
+drivers/crypto/virtio/virtio_crypto_core.c:411 virtcrypto_free_unused_reqs() warn: should '(struct virtio_crypto_request)->req_data' be freed with kzfree()'
+drivers/net/wireless/intersil/orinoco/wext.c:78 orinoco_set_key() warn: should '(struct key_params)->key' be freed with kzfree()'
+drivers/staging/wlan-ng/p80211conv.c:216 skb_ether_to_p80211() warn: should '(struct p80211_metawep)->data' be freed with kzfree()'
+fs/cifs/connect.c:1710 cifs_parse_mount_options() warn: should '(struct smb_vol)->password' be freed with kzfree()'
+fs/cifs/connect.c:1748 cifs_parse_mount_options() warn: should '(struct smb_vol)->password' be freed with kzfree()'
+fs/cifs/connect.c:4238 cifs_construct_tcon() warn: should '(struct smb_vol)->password' be freed with kzfree()'
+security/apparmor/crypto.c:102 aa_calc_profile_hash() warn: should '(struct aa_profile)->hash' be freed with kzfree()'
+
+regards,
+dan carpenter
