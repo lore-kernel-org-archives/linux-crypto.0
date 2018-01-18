@@ -1,104 +1,82 @@
-From: Kamil Konieczny <k.konieczny@partner.samsung.com>
-Subject: Re: [PATCH v2] crypto/ahash: Require export/import in ahash
-Date: Thu, 18 Jan 2018 11:51:29 +0100
-Message-ID: <9370ae6a-71fd-52b9-bfeb-af44956dea0e@partner.samsung.com>
-References: <CGME20180116183836eucas1p18da0aa4ef25452069e8f64ef95950f53@eucas1p1.samsung.com>
-        <af4995fb-4c68-d265-e78b-26e71402ae40@partner.samsung.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH V8 1/5] crypto: Multi-buffer encryption infrastructure
+ support
+Date: Thu, 18 Jan 2018 22:39:06 +1100
+Message-ID: <20180118113905.GA19904@gondor.apana.org.au>
+References: <1515542948-24041-1-git-send-email-megha.dey@linux.intel.com>
+ <1515542948-24041-2-git-send-email-megha.dey@linux.intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: "David S. Miller" <davem@davemloft.net>,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-        linux-crypto@vger.kernel.org,
-        linux-kernel <linux-kernel@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mailout1.w1.samsung.com ([210.118.77.11]:43098 "EHLO
-        mailout1.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755395AbeARKve (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 18 Jan 2018 05:51:34 -0500
-In-reply-to: <af4995fb-4c68-d265-e78b-26e71402ae40@partner.samsung.com>
-Content-language: en-US
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        davem@davemloft.net, megha.dey@intel.com
+To: Megha Dey <megha.dey@linux.intel.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1515542948-24041-2-git-send-email-megha.dey@linux.intel.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 16.01.2018 19:38, Kamil Konieczny wrote:
-> Export and import were optional in async hash. As most drivers were
-> rewritten, they become mandatory now, so correct init of ahash
-> transformation.
-> 
-> Signed-off-by: Kamil Konieczny <k.konieczny@partner.samsung.com>
+On Tue, Jan 09, 2018 at 04:09:04PM -0800, Megha Dey wrote:
+>
+> +static void mcryptd_skcipher_encrypt(struct crypto_async_request *base,
+> +								int err)
+> +{
+> +	struct skcipher_request *req = skcipher_request_cast(base);
+> +	struct mcryptd_skcipher_request_ctx *rctx = skcipher_request_ctx(req);
+> +	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+> +	struct mcryptd_skcipher_ctx *ctx = crypto_skcipher_ctx(tfm);
+> +	struct crypto_skcipher *child = ctx->child;
+> +	struct skcipher_request subreq;
+> +
+> +	if (unlikely(err == -EINPROGRESS))
+> +		goto out;
+> +
+> +	/* set up the skcipher request to work on */
+> +	skcipher_request_set_tfm(&subreq, child);
+> +	skcipher_request_set_callback(&subreq,
+> +					CRYPTO_TFM_REQ_MAY_SLEEP, 0, 0);
+> +	skcipher_request_set_crypt(&subreq, req->src, req->dst,
+> +					req->cryptlen, req->iv);
+> +
+> +	/*
+> +	 * pass addr of descriptor stored in the request context
+> +	 * so that the callee can get to the request context
+> +	 */
+> +	rctx->desc = subreq;
+> +	err = crypto_skcipher_encrypt(&rctx->desc);
+> +
+> +	if (err) {
+> +		req->base.complete = rctx->complete;
+> +		goto out;
+> +	}
+> +	return;
+> +
+> +out:
+> +	mcryptd_skcipher_complete(req, err);
+> +}
 
-Please drop this patch, as there is one more driver needed for convert,
-namely bfin_crc.c
+OK this looks better but it's still abusing the crypto API interface.
+In particular, you're sharing data with the underlying algorithm
+behind the crypto API's back.  Also, the underlying algorithm does
+callback completion behind the API's back through the shared data
+context.
 
-I will also prepare this as patch series, to be sure that this patch is last
+It seems to me that the current mcryptd scheme is flawed.  You
+want to batch multiple requests and yet this isn't actually being
+done by mcryptd at all.  The actual batching happens at the very
+lowest level, i.e., in the crypto algorithm below mcryptd.  For
+example, with your patch, the batching appears to happen in
+aes_cbc_job_mgr_submit.
 
-> ---
-> This is resend of previous patch. As Bartlomiej Zolnierkiewicz pointed out,
-> there are still three crypto drivers that didn't have export/import implemented:
-> 
-> drivers/crypto/mxs-dcp.c
-> drivers/crypto/n2_core.c
-> drivers/crypto/ux500/hash/hash_core.c
-> 
-> I have no documentation for them, so I sended patches with the behaviour taken
-> from crypto framework, but maybe that hardware is capable of import/export,
-> so proper implementation is possible. Unfortunatly, there is no maintainer
-> for any of these files.
-> 
-> Please take this patch after these remainig drivers will be patched.
-> 
->  crypto/ahash.c | 18 ++----------------
->  1 file changed, 2 insertions(+), 16 deletions(-)
-> 
-> diff --git a/crypto/ahash.c b/crypto/ahash.c
-> index 3a35d67de7d9..7a8906d5af53 100644
-> --- a/crypto/ahash.c
-> +++ b/crypto/ahash.c
-> @@ -434,16 +434,6 @@ static int ahash_def_finup(struct ahash_request *req)
->  	return ahash_def_finup_finish1(req, err);
->  }
->  
-> -static int ahash_no_export(struct ahash_request *req, void *out)
-> -{
-> -	return -ENOSYS;
-> -}
-> -
-> -static int ahash_no_import(struct ahash_request *req, const void *in)
-> -{
-> -	return -ENOSYS;
-> -}
-> -
->  static int crypto_ahash_init_tfm(struct crypto_tfm *tfm)
->  {
->  	struct crypto_ahash *hash = __crypto_ahash_cast(tfm);
-> @@ -451,8 +441,8 @@ static int crypto_ahash_init_tfm(struct crypto_tfm *tfm)
->  
->  	hash->setkey = ahash_nosetkey;
->  	hash->has_setkey = false;
-> -	hash->export = ahash_no_export;
-> -	hash->import = ahash_no_import;
-> +	hash->export = alg->export;
-> +	hash->import = alg->import;
->  
->  	if (tfm->__crt_alg->cra_type != &crypto_ahash_type)
->  		return crypto_init_shash_ops_async(tfm);
-> @@ -467,10 +457,6 @@ static int crypto_ahash_init_tfm(struct crypto_tfm *tfm)
->  		hash->setkey = alg->setkey;
->  		hash->has_setkey = true;
->  	}
-> -	if (alg->export)
-> -		hash->export = alg->export;
-> -	if (alg->import)
-> -		hash->import = alg->import;
->  
->  	return 0;
->  }
-> 
+So the mcryptd template is in fact completely superfluous.  You
+can remove it and just have all the main encrypt/decrypt functions
+invoke the underlying encrypt/decrypt function directly and achieve
+the same result.
 
+Am I missing something?
+
+Cheers,
 -- 
-Best regards,
-Kamil Konieczny
-Samsung R&D Institute Poland
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
