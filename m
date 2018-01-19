@@ -1,311 +1,261 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH 7/8] crypto/arm64: sm3 - new v8.2 Crypto Extensions implementation
-Date: Fri, 19 Jan 2018 12:04:39 +0000
-Message-ID: <20180119120440.31556-8-ard.biesheuvel@linaro.org>
+Subject: [PATCH 8/8] crypto/arm64: sha512 - fix/improve new v8.2 Crypto Extensions code
+Date: Fri, 19 Jan 2018 12:04:40 +0000
+Message-ID: <20180119120440.31556-9-ard.biesheuvel@linaro.org>
 References: <20180119120440.31556-1-ard.biesheuvel@linaro.org>
 Cc: linux-arm-kernel@lists.infradead.org, herbert@gondor.apana.org.au,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f66.google.com ([74.125.82.66]:38063 "EHLO
-        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754232AbeASMF3 (ORCPT
+Received: from mail-wm0-f68.google.com ([74.125.82.68]:46704 "EHLO
+        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754232AbeASMFc (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 19 Jan 2018 07:05:29 -0500
-Received: by mail-wm0-f66.google.com with SMTP id 141so3048774wme.3
-        for <linux-crypto@vger.kernel.org>; Fri, 19 Jan 2018 04:05:29 -0800 (PST)
+        Fri, 19 Jan 2018 07:05:32 -0500
+Received: by mail-wm0-f68.google.com with SMTP id 143so2933601wma.5
+        for <linux-crypto@vger.kernel.org>; Fri, 19 Jan 2018 04:05:31 -0800 (PST)
 In-Reply-To: <20180119120440.31556-1-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Implement the Chinese SM3 secure hash algorithm using the new
-special instructions that have been introduced as an optional
-extension in ARMv8.2.
+Add a missing symbol export that prevents this code to be built as a
+module. Also, move the round constant table to the .rodata section,
+and use a more optimized version of the core transform.
 
-Tested-by: Steve Capper <steve.capper@arm.com>
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- arch/arm64/crypto/Kconfig       |   6 +
- arch/arm64/crypto/Makefile      |   3 +
- arch/arm64/crypto/sm3-ce-core.S | 141 ++++++++++++++++++++
- arch/arm64/crypto/sm3-ce-glue.c |  92 +++++++++++++
- 4 files changed, 242 insertions(+)
+ arch/arm64/crypto/sha512-ce-core.S | 145 ++++++++++----------
+ arch/arm64/crypto/sha512-glue.c    |   1 +
+ 2 files changed, 72 insertions(+), 74 deletions(-)
 
-diff --git a/arch/arm64/crypto/Kconfig b/arch/arm64/crypto/Kconfig
-index 3321b2c9a2b5..285c36c7b408 100644
---- a/arch/arm64/crypto/Kconfig
-+++ b/arch/arm64/crypto/Kconfig
-@@ -41,6 +41,12 @@ config CRYPTO_SHA3_ARM64
- 	select CRYPTO_HASH
- 	select CRYPTO_SHA3
+diff --git a/arch/arm64/crypto/sha512-ce-core.S b/arch/arm64/crypto/sha512-ce-core.S
+index 6c562f8df0b0..7f3bca5c59a2 100644
+--- a/arch/arm64/crypto/sha512-ce-core.S
++++ b/arch/arm64/crypto/sha512-ce-core.S
+@@ -12,10 +12,7 @@
+ #include <linux/linkage.h>
+ #include <asm/assembler.h>
  
-+config CRYPTO_SM3_ARM64_CE
-+	tristate "SM3 digest algorithm (ARMv8.2 Crypto Extensions)"
-+	depends on KERNEL_MODE_NEON
-+	select CRYPTO_HASH
-+	select CRYPTO_SM3
-+
- config CRYPTO_GHASH_ARM64_CE
- 	tristate "GHASH/AES-GCM using ARMv8 Crypto Extensions"
- 	depends on KERNEL_MODE_NEON
-diff --git a/arch/arm64/crypto/Makefile b/arch/arm64/crypto/Makefile
-index 4ca2d146e213..cee9b8d9830b 100644
---- a/arch/arm64/crypto/Makefile
-+++ b/arch/arm64/crypto/Makefile
-@@ -20,6 +20,9 @@ sha512-ce-y := sha512-ce-glue.o sha512-ce-core.o
- obj-$(CONFIG_CRYPTO_SHA3_ARM64) += sha3-ce.o
- sha3-ce-y := sha3-ce-glue.o sha3-ce-core.o
+-	//
+-	// Temporary - for testing only. binutils has no support for these yet
+-	//
+-	.irp		b,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31
++	.irp		b,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19
+ 	.set		.Lq\b, \b
+ 	.set		.Lv\b\().2d, \b
+ 	.endr
+@@ -36,12 +33,10 @@
+ 	.inst		0xce608800 | .L\rd | (.L\rn << 5) | (.L\rm << 16)
+ 	.endm
  
-+obj-$(CONFIG_CRYPTO_SM3_ARM64_CE) += sm3-ce.o
-+sm3-ce-y := sm3-ce-glue.o sm3-ce-core.o
-+
- obj-$(CONFIG_CRYPTO_GHASH_ARM64_CE) += ghash-ce.o
- ghash-ce-y := ghash-ce-glue.o ghash-ce-core.o
- 
-diff --git a/arch/arm64/crypto/sm3-ce-core.S b/arch/arm64/crypto/sm3-ce-core.S
-new file mode 100644
-index 000000000000..27169fe07a68
---- /dev/null
-+++ b/arch/arm64/crypto/sm3-ce-core.S
-@@ -0,0 +1,141 @@
-+/*
-+ * sm3-ce-core.S - SM3 secure hash using ARMv8.2 Crypto Extensions
-+ *
-+ * Copyright (C) 2018 Linaro Ltd <ard.biesheuvel@linaro.org>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ */
-+
-+#include <linux/linkage.h>
-+#include <asm/assembler.h>
-+
-+	.irp		b, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
-+	.set		.Lv\b\().4s, \b
-+	.endr
-+
-+	.macro		sm3partw1, rd, rn, rm
-+	.inst		0xce60c000 | .L\rd | (.L\rn << 5) | (.L\rm << 16)
-+	.endm
-+
-+	.macro		sm3partw2, rd, rn, rm
-+	.inst		0xce60c400 | .L\rd | (.L\rn << 5) | (.L\rm << 16)
-+	.endm
-+
-+	.macro		sm3ss1, rd, rn, rm, ra
-+	.inst		0xce400000 | .L\rd | (.L\rn << 5) | (.L\ra << 10) | (.L\rm << 16)
-+	.endm
-+
-+	.macro		sm3tt1a, rd, rn, rm, imm2
-+	.inst		0xce408000 | .L\rd | (.L\rn << 5) | ((\imm2) << 12) | (.L\rm << 16)
-+	.endm
-+
-+	.macro		sm3tt1b, rd, rn, rm, imm2
-+	.inst		0xce408400 | .L\rd | (.L\rn << 5) | ((\imm2) << 12) | (.L\rm << 16)
-+	.endm
-+
-+	.macro		sm3tt2a, rd, rn, rm, imm2
-+	.inst		0xce408800 | .L\rd | (.L\rn << 5) | ((\imm2) << 12) | (.L\rm << 16)
-+	.endm
-+
-+	.macro		sm3tt2b, rd, rn, rm, imm2
-+	.inst		0xce408c00 | .L\rd | (.L\rn << 5) | ((\imm2) << 12) | (.L\rm << 16)
-+	.endm
-+
-+	.macro		round, ab, s0, t0, t1, i
-+	sm3ss1		v5.4s, v8.4s, \t0\().4s, v9.4s
-+	shl		\t1\().4s, \t0\().4s, #1
-+	sri		\t1\().4s, \t0\().4s, #31
-+	sm3tt1\ab	v8.4s, v5.4s, v10.4s, \i
-+	sm3tt2\ab	v9.4s, v5.4s, \s0\().4s, \i
-+	.endm
-+
-+	.macro		qround, ab, s0, s1, s2, s3, s4
-+	.ifnb		\s4
-+	ext		\s4\().16b, \s1\().16b, \s2\().16b, #12
-+	ext		v6.16b, \s0\().16b, \s1\().16b, #12
-+	ext		v7.16b, \s2\().16b, \s3\().16b, #8
-+	sm3partw1	\s4\().4s, \s0\().4s, \s3\().4s
-+	.endif
-+
-+	eor		v10.16b, \s0\().16b, \s1\().16b
-+
-+	round		\ab, \s0, v11, v12, 0
-+	round		\ab, \s0, v12, v11, 1
-+	round		\ab, \s0, v11, v12, 2
-+	round		\ab, \s0, v12, v11, 3
-+
-+	.ifnb		\s4
-+	sm3partw2	\s4\().4s, v7.4s, v6.4s
-+	.endif
-+	.endm
-+
-+	/*
-+	 * void sm3_ce_transform(struct sm3_state *sst, u8 const *src,
-+	 *                       int blocks)
-+	 */
-+	.text
-+ENTRY(sm3_ce_transform)
-+	/* load state */
-+	ld1		{v8.4s-v9.4s}, [x0]
-+	rev64		v8.4s, v8.4s
-+	rev64		v9.4s, v9.4s
-+	ext		v8.16b, v8.16b, v8.16b, #8
-+	ext		v9.16b, v9.16b, v9.16b, #8
-+
-+	adr_l		x8, .Lt
-+	ldp		s13, s14, [x8]
-+
-+	/* load input */
-+0:	ld1		{v0.16b-v3.16b}, [x1], #64
-+	sub		w2, w2, #1
-+
-+	mov		v15.16b, v8.16b
-+	mov		v16.16b, v9.16b
-+
-+CPU_LE(	rev32		v0.16b, v0.16b		)
-+CPU_LE(	rev32		v1.16b, v1.16b		)
-+CPU_LE(	rev32		v2.16b, v2.16b		)
-+CPU_LE(	rev32		v3.16b, v3.16b		)
-+
-+	ext		v11.16b, v13.16b, v13.16b, #4
-+
-+	qround		a, v0, v1, v2, v3, v4
-+	qround		a, v1, v2, v3, v4, v0
-+	qround		a, v2, v3, v4, v0, v1
-+	qround		a, v3, v4, v0, v1, v2
-+
-+	ext		v11.16b, v14.16b, v14.16b, #4
-+
-+	qround		b, v4, v0, v1, v2, v3
-+	qround		b, v0, v1, v2, v3, v4
-+	qround		b, v1, v2, v3, v4, v0
-+	qround		b, v2, v3, v4, v0, v1
-+	qround		b, v3, v4, v0, v1, v2
-+	qround		b, v4, v0, v1, v2, v3
-+	qround		b, v0, v1, v2, v3, v4
-+	qround		b, v1, v2, v3, v4, v0
-+	qround		b, v2, v3, v4, v0, v1
-+	qround		b, v3, v4
-+	qround		b, v4, v0
-+	qround		b, v0, v1
-+
-+	eor		v8.16b, v8.16b, v15.16b
-+	eor		v9.16b, v9.16b, v16.16b
-+
-+	/* handled all input blocks? */
-+	cbnz		w2, 0b
-+
-+	/* save state */
-+	rev64		v8.4s, v8.4s
-+	rev64		v9.4s, v9.4s
-+	ext		v8.16b, v8.16b, v8.16b, #8
-+	ext		v9.16b, v9.16b, v9.16b, #8
-+	st1		{v8.4s-v9.4s}, [x0]
-+	ret
-+ENDPROC(sm3_ce_transform)
-+
+-	.text
+-	.arch		armv8-a+crypto
+-
+ 	/*
+ 	 * The SHA-512 round constants
+ 	 */
 +	.section	".rodata", "a"
-+	.align		3
-+.Lt:	.word		0x79cc4519, 0x9d8a7a87
-diff --git a/arch/arm64/crypto/sm3-ce-glue.c b/arch/arm64/crypto/sm3-ce-glue.c
-new file mode 100644
-index 000000000000..3b4948f7e26f
---- /dev/null
-+++ b/arch/arm64/crypto/sm3-ce-glue.c
-@@ -0,0 +1,92 @@
-+/*
-+ * sm3-ce-glue.c - SM3 secure hash using ARMv8.2 Crypto Extensions
-+ *
-+ * Copyright (C) 2018 Linaro Ltd <ard.biesheuvel@linaro.org>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ */
+ 	.align		4
+ .Lsha512_rcon:
+ 	.quad		0x428a2f98d728ae22, 0x7137449123ef65cd
+@@ -87,20 +82,20 @@
+ 
+ 	.macro		dround, i0, i1, i2, i3, i4, rc0, rc1, in0, in1, in2, in3, in4
+ 	.ifnb		\rc1
+-	ld1		{v\rc1\().2d}, [x3], #16
++	ld1		{v\rc1\().2d}, [x4], #16
+ 	.endif
+-	add		v\rc0\().2d, v\rc0\().2d, v\in0\().2d
++	add		v5.2d, v\rc0\().2d, v\in0\().2d
+ 	ext		v6.16b, v\i2\().16b, v\i3\().16b, #8
+-	ext		v\rc0\().16b, v\rc0\().16b, v\rc0\().16b, #8
++	ext		v5.16b, v5.16b, v5.16b, #8
+ 	ext		v7.16b, v\i1\().16b, v\i2\().16b, #8
+-	add		v\i3\().2d, v\i3\().2d, v\rc0\().2d
++	add		v\i3\().2d, v\i3\().2d, v5.2d
+ 	.ifnb		\in1
+-	ext		v10.16b, v\in3\().16b, v\in4\().16b, #8
++	ext		v5.16b, v\in3\().16b, v\in4\().16b, #8
+ 	sha512su0	v\in0\().2d, v\in1\().2d
+ 	.endif
+ 	sha512h		q\i3, q6, v7.2d
+ 	.ifnb		\in1
+-	sha512su1	v\in0\().2d, v\in2\().2d, v10.2d
++	sha512su1	v\in0\().2d, v\in2\().2d, v5.2d
+ 	.endif
+ 	add		v\i4\().2d, v\i1\().2d, v\i3\().2d
+ 	sha512h2	q\i3, q\i1, v\i0\().2d
+@@ -110,18 +105,20 @@
+ 	 * void sha512_ce_transform(struct sha512_state *sst, u8 const *src,
+ 	 *			  int blocks)
+ 	 */
++	.text
+ ENTRY(sha512_ce_transform)
+ 	/* load state */
+-	ld1		{v20.2d-v23.2d}, [x0]
++	ld1		{v8.2d-v11.2d}, [x0]
 +
-+#include <asm/neon.h>
-+#include <asm/simd.h>
-+#include <asm/unaligned.h>
-+#include <crypto/internal/hash.h>
-+#include <crypto/sm3.h>
-+#include <crypto/sm3_base.h>
-+#include <linux/cpufeature.h>
-+#include <linux/crypto.h>
-+#include <linux/module.h>
++	/* load first 4 round constants */
++	adr_l		x3, .Lsha512_rcon
++	ld1		{v20.2d-v23.2d}, [x3], #64
+ 
+ 	/* load input */
+ 0:	ld1		{v12.2d-v15.2d}, [x1], #64
+ 	ld1		{v16.2d-v19.2d}, [x1], #64
+ 	sub		w2, w2, #1
+ 
+-	/* load round constants */
+-	adr		x3, .Lsha512_rcon
+-
+ CPU_LE(	rev64		v12.16b, v12.16b	)
+ CPU_LE(	rev64		v13.16b, v13.16b	)
+ CPU_LE(	rev64		v14.16b, v14.16b	)
+@@ -131,12 +128,12 @@ CPU_LE(	rev64		v17.16b, v17.16b	)
+ CPU_LE(	rev64		v18.16b, v18.16b	)
+ CPU_LE(	rev64		v19.16b, v19.16b	)
+ 
+-	ld1		{v8.2d}, [x3], #16
++	mov		x4, x3				// rc pointer
+ 
+-	mov		v0.16b, v20.16b
+-	mov		v1.16b, v21.16b
+-	mov		v2.16b, v22.16b
+-	mov		v3.16b, v23.16b
++	mov		v0.16b, v8.16b
++	mov		v1.16b, v9.16b
++	mov		v2.16b, v10.16b
++	mov		v3.16b, v11.16b
+ 
+ 	// v0  ab  cd  --  ef  gh  ab
+ 	// v1  cd  --  ef  gh  ab  cd
+@@ -144,64 +141,64 @@ CPU_LE(	rev64		v19.16b, v19.16b	)
+ 	// v3  gh  ab  cd  --  ef  gh
+ 	// v4  --  ef  gh  ab  cd  --
+ 
+-	dround		0, 1, 2, 3, 4, 8, 9, 12, 13, 19, 16, 17
+-	dround		3, 0, 4, 2, 1, 9, 8, 13, 14, 12, 17, 18
+-	dround		2, 3, 1, 4, 0, 8, 9, 14, 15, 13, 18, 19
+-	dround		4, 2, 0, 1, 3, 9, 8, 15, 16, 14, 19, 12
+-	dround		1, 4, 3, 0, 2, 8, 9, 16, 17, 15, 12, 13
+-
+-	dround		0, 1, 2, 3, 4, 9, 8, 17, 18, 16, 13, 14
+-	dround		3, 0, 4, 2, 1, 8, 9, 18, 19, 17, 14, 15
+-	dround		2, 3, 1, 4, 0, 9, 8, 19, 12, 18, 15, 16
+-	dround		4, 2, 0, 1, 3, 8, 9, 12, 13, 19, 16, 17
+-	dround		1, 4, 3, 0, 2, 9, 8, 13, 14, 12, 17, 18
+-
+-	dround		0, 1, 2, 3, 4, 8, 9, 14, 15, 13, 18, 19
+-	dround		3, 0, 4, 2, 1, 9, 8, 15, 16, 14, 19, 12
+-	dround		2, 3, 1, 4, 0, 8, 9, 16, 17, 15, 12, 13
+-	dround		4, 2, 0, 1, 3, 9, 8, 17, 18, 16, 13, 14
+-	dround		1, 4, 3, 0, 2, 8, 9, 18, 19, 17, 14, 15
+-
+-	dround		0, 1, 2, 3, 4, 9, 8, 19, 12, 18, 15, 16
+-	dround		3, 0, 4, 2, 1, 8, 9, 12, 13, 19, 16, 17
+-	dround		2, 3, 1, 4, 0, 9, 8, 13, 14, 12, 17, 18
+-	dround		4, 2, 0, 1, 3, 8, 9, 14, 15, 13, 18, 19
+-	dround		1, 4, 3, 0, 2, 9, 8, 15, 16, 14, 19, 12
+-
+-	dround		0, 1, 2, 3, 4, 8, 9, 16, 17, 15, 12, 13
+-	dround		3, 0, 4, 2, 1, 9, 8, 17, 18, 16, 13, 14
+-	dround		2, 3, 1, 4, 0, 8, 9, 18, 19, 17, 14, 15
+-	dround		4, 2, 0, 1, 3, 9, 8, 19, 12, 18, 15, 16
+-	dround		1, 4, 3, 0, 2, 8, 9, 12, 13, 19, 16, 17
+-
+-	dround		0, 1, 2, 3, 4, 9, 8, 13, 14, 12, 17, 18
+-	dround		3, 0, 4, 2, 1, 8, 9, 14, 15, 13, 18, 19
+-	dround		2, 3, 1, 4, 0, 9, 8, 15, 16, 14, 19, 12
+-	dround		4, 2, 0, 1, 3, 8, 9, 16, 17, 15, 12, 13
+-	dround		1, 4, 3, 0, 2, 9, 8, 17, 18, 16, 13, 14
+-
+-	dround		0, 1, 2, 3, 4, 8, 9, 18, 19, 17, 14, 15
+-	dround		3, 0, 4, 2, 1, 9, 8, 19, 12, 18, 15, 16
+-	dround		2, 3, 1, 4, 0, 8, 9, 12
+-	dround		4, 2, 0, 1, 3, 9, 8, 13
+-	dround		1, 4, 3, 0, 2, 8, 9, 14
+-
+-	dround		0, 1, 2, 3, 4, 9, 8, 15
+-	dround		3, 0, 4, 2, 1, 8, 9, 16
+-	dround		2, 3, 1, 4, 0, 9, 8, 17
+-	dround		4, 2, 0, 1, 3, 8, 9, 18
+-	dround		1, 4, 3, 0, 2, 9,  , 19
++	dround		0, 1, 2, 3, 4, 20, 24, 12, 13, 19, 16, 17
++	dround		3, 0, 4, 2, 1, 21, 25, 13, 14, 12, 17, 18
++	dround		2, 3, 1, 4, 0, 22, 26, 14, 15, 13, 18, 19
++	dround		4, 2, 0, 1, 3, 23, 27, 15, 16, 14, 19, 12
++	dround		1, 4, 3, 0, 2, 24, 28, 16, 17, 15, 12, 13
 +
-+MODULE_DESCRIPTION("SM3 secure hash using ARMv8 Crypto Extensions");
-+MODULE_AUTHOR("Ard Biesheuvel <ard.biesheuvel@linaro.org>");
-+MODULE_LICENSE("GPL v2");
++	dround		0, 1, 2, 3, 4, 25, 29, 17, 18, 16, 13, 14
++	dround		3, 0, 4, 2, 1, 26, 30, 18, 19, 17, 14, 15
++	dround		2, 3, 1, 4, 0, 27, 31, 19, 12, 18, 15, 16
++	dround		4, 2, 0, 1, 3, 28, 24, 12, 13, 19, 16, 17
++	dround		1, 4, 3, 0, 2, 29, 25, 13, 14, 12, 17, 18
 +
-+asmlinkage void sm3_ce_transform(struct sm3_state *sst, u8 const *src,
-+				 int blocks);
++	dround		0, 1, 2, 3, 4, 30, 26, 14, 15, 13, 18, 19
++	dround		3, 0, 4, 2, 1, 31, 27, 15, 16, 14, 19, 12
++	dround		2, 3, 1, 4, 0, 24, 28, 16, 17, 15, 12, 13
++	dround		4, 2, 0, 1, 3, 25, 29, 17, 18, 16, 13, 14
++	dround		1, 4, 3, 0, 2, 26, 30, 18, 19, 17, 14, 15
 +
-+static int sm3_ce_update(struct shash_desc *desc, const u8 *data,
-+			 unsigned int len)
-+{
-+	if (!may_use_simd())
-+		return crypto_sm3_update(desc, data, len);
++	dround		0, 1, 2, 3, 4, 27, 31, 19, 12, 18, 15, 16
++	dround		3, 0, 4, 2, 1, 28, 24, 12, 13, 19, 16, 17
++	dround		2, 3, 1, 4, 0, 29, 25, 13, 14, 12, 17, 18
++	dround		4, 2, 0, 1, 3, 30, 26, 14, 15, 13, 18, 19
++	dround		1, 4, 3, 0, 2, 31, 27, 15, 16, 14, 19, 12
 +
-+	kernel_neon_begin();
-+	sm3_base_do_update(desc, data, len, sm3_ce_transform);
-+	kernel_neon_end();
++	dround		0, 1, 2, 3, 4, 24, 28, 16, 17, 15, 12, 13
++	dround		3, 0, 4, 2, 1, 25, 29, 17, 18, 16, 13, 14
++	dround		2, 3, 1, 4, 0, 26, 30, 18, 19, 17, 14, 15
++	dround		4, 2, 0, 1, 3, 27, 31, 19, 12, 18, 15, 16
++	dround		1, 4, 3, 0, 2, 28, 24, 12, 13, 19, 16, 17
 +
-+	return 0;
-+}
++	dround		0, 1, 2, 3, 4, 29, 25, 13, 14, 12, 17, 18
++	dround		3, 0, 4, 2, 1, 30, 26, 14, 15, 13, 18, 19
++	dround		2, 3, 1, 4, 0, 31, 27, 15, 16, 14, 19, 12
++	dround		4, 2, 0, 1, 3, 24, 28, 16, 17, 15, 12, 13
++	dround		1, 4, 3, 0, 2, 25, 29, 17, 18, 16, 13, 14
 +
-+static int sm3_ce_final(struct shash_desc *desc, u8 *out)
-+{
-+	if (!may_use_simd())
-+		return crypto_sm3_finup(desc, NULL, 0, out);
++	dround		0, 1, 2, 3, 4, 26, 30, 18, 19, 17, 14, 15
++	dround		3, 0, 4, 2, 1, 27, 31, 19, 12, 18, 15, 16
++	dround		2, 3, 1, 4, 0, 28, 24, 12
++	dround		4, 2, 0, 1, 3, 29, 25, 13
++	dround		1, 4, 3, 0, 2, 30, 26, 14
 +
-+	kernel_neon_begin();
-+	sm3_base_do_finalize(desc, sm3_ce_transform);
-+	kernel_neon_end();
-+
-+	return sm3_base_finish(desc, out);
-+}
-+
-+static int sm3_ce_finup(struct shash_desc *desc, const u8 *data,
-+			unsigned int len, u8 *out)
-+{
-+	if (!may_use_simd())
-+		return crypto_sm3_finup(desc, data, len, out);
-+
-+	kernel_neon_begin();
-+	sm3_base_do_update(desc, data, len, sm3_ce_transform);
-+	kernel_neon_end();
-+
-+	return sm3_ce_final(desc, out);
-+}
-+
-+static struct shash_alg sm3_alg = {
-+	.digestsize		= SM3_DIGEST_SIZE,
-+	.init			= sm3_base_init,
-+	.update			= sm3_ce_update,
-+	.final			= sm3_ce_final,
-+	.finup			= sm3_ce_finup,
-+	.descsize		= sizeof(struct sm3_state),
-+	.base.cra_name		= "sm3",
-+	.base.cra_driver_name	= "sm3-ce",
-+	.base.cra_flags		= CRYPTO_ALG_TYPE_SHASH,
-+	.base.cra_blocksize	= SM3_BLOCK_SIZE,
-+	.base.cra_module	= THIS_MODULE,
-+	.base.cra_priority	= 200,
-+};
-+
-+static int __init sm3_ce_mod_init(void)
-+{
-+	return crypto_register_shash(&sm3_alg);
-+}
-+
-+static void __exit sm3_ce_mod_fini(void)
-+{
-+	crypto_unregister_shash(&sm3_alg);
-+}
-+
-+module_cpu_feature_match(SM3, sm3_ce_mod_init);
-+module_exit(sm3_ce_mod_fini);
++	dround		0, 1, 2, 3, 4, 31, 27, 15
++	dround		3, 0, 4, 2, 1, 24,   , 16
++	dround		2, 3, 1, 4, 0, 25,   , 17
++	dround		4, 2, 0, 1, 3, 26,   , 18
++	dround		1, 4, 3, 0, 2, 27,   , 19
+ 
+ 	/* update state */
+-	add		v20.2d, v20.2d, v0.2d
+-	add		v21.2d, v21.2d, v1.2d
+-	add		v22.2d, v22.2d, v2.2d
+-	add		v23.2d, v23.2d, v3.2d
++	add		v8.2d, v8.2d, v0.2d
++	add		v9.2d, v9.2d, v1.2d
++	add		v10.2d, v10.2d, v2.2d
++	add		v11.2d, v11.2d, v3.2d
+ 
+ 	/* handled all input blocks? */
+ 	cbnz		w2, 0b
+ 
+ 	/* store new state */
+-3:	st1		{v20.2d-v23.2d}, [x0]
++3:	st1		{v8.2d-v11.2d}, [x0]
+ 	ret
+ ENDPROC(sha512_ce_transform)
+diff --git a/arch/arm64/crypto/sha512-glue.c b/arch/arm64/crypto/sha512-glue.c
+index aff35c9992a4..27db4851e380 100644
+--- a/arch/arm64/crypto/sha512-glue.c
++++ b/arch/arm64/crypto/sha512-glue.c
+@@ -27,6 +27,7 @@ MODULE_ALIAS_CRYPTO("sha512");
+ 
+ asmlinkage void sha512_block_data_order(u32 *digest, const void *data,
+ 					unsigned int num_blks);
++EXPORT_SYMBOL(sha512_block_data_order);
+ 
+ static int sha512_update(struct shash_desc *desc, const u8 *data,
+ 			 unsigned int len)
 -- 
 2.11.0
