@@ -1,64 +1,138 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH 1/8] crypto/generic: sha3 - fixes for alignment and big endian operation
-Date: Fri, 19 Jan 2018 12:04:33 +0000
-Message-ID: <20180119120440.31556-2-ard.biesheuvel@linaro.org>
+Subject: [PATCH 4/8] crypto/generic: sha3 - export init/update/final routines
+Date: Fri, 19 Jan 2018 12:04:36 +0000
+Message-ID: <20180119120440.31556-5-ard.biesheuvel@linaro.org>
 References: <20180119120440.31556-1-ard.biesheuvel@linaro.org>
 Cc: linux-arm-kernel@lists.infradead.org, herbert@gondor.apana.org.au,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wr0-f196.google.com ([209.85.128.196]:38046 "EHLO
-        mail-wr0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751212AbeASMFP (ORCPT
+Received: from mail-wm0-f65.google.com ([74.125.82.65]:43163 "EHLO
+        mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754232AbeASMFW (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 19 Jan 2018 07:05:15 -0500
-Received: by mail-wr0-f196.google.com with SMTP id x1so1372877wrb.5
-        for <linux-crypto@vger.kernel.org>; Fri, 19 Jan 2018 04:05:15 -0800 (PST)
+        Fri, 19 Jan 2018 07:05:22 -0500
+Received: by mail-wm0-f65.google.com with SMTP id g1so2956109wmg.2
+        for <linux-crypto@vger.kernel.org>; Fri, 19 Jan 2018 04:05:21 -0800 (PST)
 In-Reply-To: <20180119120440.31556-1-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Ensure that the input is byte swabbed before injecting it into the
-SHA3 transform. Use the get_unaligned() accessor for this so that
-we don't perform unaligned access inadvertently on architectures
-that do not support that.
+To allow accelerated implementations to fall back to the generic
+routines, e.g., in contexts where a SIMD based implementation is
+not allowed to run, expose the generic SHA3 init/update/final
+routines to other modules.
 
-Cc: <stable@vger.kernel.org>
-Fixes: 53964b9ee63b7075 ("crypto: sha3 - Add SHA-3 hash algorithm")
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- crypto/sha3_generic.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ crypto/sha3_generic.c | 33 +++++++++++---------
+ include/crypto/sha3.h |  5 +++
+ 2 files changed, 23 insertions(+), 15 deletions(-)
 
 diff --git a/crypto/sha3_generic.c b/crypto/sha3_generic.c
-index 7e8ed96236ce..a68be626017c 100644
+index c7084a24eaf9..a965b9d80559 100644
 --- a/crypto/sha3_generic.c
 +++ b/crypto/sha3_generic.c
-@@ -18,6 +18,7 @@
- #include <linux/types.h>
- #include <crypto/sha3.h>
- #include <asm/byteorder.h>
-+#include <asm/unaligned.h>
+@@ -145,7 +145,7 @@ static void __attribute__((__optimize__("O3"))) keccakf(u64 st[25])
+ 	}
+ }
  
- #define KECCAK_ROUNDS 24
+-static int sha3_init(struct shash_desc *desc)
++int crypto_sha3_init(struct shash_desc *desc)
+ {
+ 	struct sha3_state *sctx = shash_desc_ctx(desc);
+ 	unsigned int digest_size = crypto_shash_digestsize(desc->tfm);
+@@ -157,8 +157,9 @@ static int sha3_init(struct shash_desc *desc)
+ 	memset(sctx->st, 0, sizeof(sctx->st));
+ 	return 0;
+ }
++EXPORT_SYMBOL(crypto_sha3_init);
  
-@@ -149,7 +150,7 @@ static int sha3_update(struct shash_desc *desc, const u8 *data,
- 			unsigned int i;
+-static int sha3_update(struct shash_desc *desc, const u8 *data,
++int crypto_sha3_update(struct shash_desc *desc, const u8 *data,
+ 		       unsigned int len)
+ {
+ 	struct sha3_state *sctx = shash_desc_ctx(desc);
+@@ -194,8 +195,9 @@ static int sha3_update(struct shash_desc *desc, const u8 *data,
  
- 			for (i = 0; i < sctx->rsizw; i++)
--				sctx->st[i] ^= ((u64 *) src)[i];
-+				sctx->st[i] ^= get_unaligned_le64(src + 8 * i);
- 			keccakf(sctx->st);
+ 	return 0;
+ }
++EXPORT_SYMBOL(crypto_sha3_update);
  
- 			done += sctx->rsiz;
-@@ -174,7 +175,7 @@ static int sha3_final(struct shash_desc *desc, u8 *out)
- 	sctx->buf[sctx->rsiz - 1] |= 0x80;
+-static int sha3_final(struct shash_desc *desc, u8 *out)
++int crypto_sha3_final(struct shash_desc *desc, u8 *out)
+ {
+ 	struct sha3_state *sctx = shash_desc_ctx(desc);
+ 	unsigned int i, inlen = sctx->partial;
+@@ -220,12 +222,13 @@ static int sha3_final(struct shash_desc *desc, u8 *out)
+ 	memset(sctx, 0, sizeof(*sctx));
+ 	return 0;
+ }
++EXPORT_SYMBOL(crypto_sha3_final);
  
- 	for (i = 0; i < sctx->rsizw; i++)
--		sctx->st[i] ^= ((u64 *) sctx->buf)[i];
-+		sctx->st[i] ^= get_unaligned_le64(sctx->buf + 8 * i);
+ static struct shash_alg algs[] = { {
+ 	.digestsize		= SHA3_224_DIGEST_SIZE,
+-	.init			= sha3_init,
+-	.update			= sha3_update,
+-	.final			= sha3_final,
++	.init			= crypto_sha3_init,
++	.update			= crypto_sha3_update,
++	.final			= crypto_sha3_final,
+ 	.descsize		= sizeof(struct sha3_state),
+ 	.base.cra_name		= "sha3-224",
+ 	.base.cra_driver_name	= "sha3-224-generic",
+@@ -234,9 +237,9 @@ static struct shash_alg algs[] = { {
+ 	.base.cra_module	= THIS_MODULE,
+ }, {
+ 	.digestsize		= SHA3_256_DIGEST_SIZE,
+-	.init			= sha3_init,
+-	.update			= sha3_update,
+-	.final			= sha3_final,
++	.init			= crypto_sha3_init,
++	.update			= crypto_sha3_update,
++	.final			= crypto_sha3_final,
+ 	.descsize		= sizeof(struct sha3_state),
+ 	.base.cra_name		= "sha3-256",
+ 	.base.cra_driver_name	= "sha3-256-generic",
+@@ -245,9 +248,9 @@ static struct shash_alg algs[] = { {
+ 	.base.cra_module	= THIS_MODULE,
+ }, {
+ 	.digestsize		= SHA3_384_DIGEST_SIZE,
+-	.init			= sha3_init,
+-	.update			= sha3_update,
+-	.final			= sha3_final,
++	.init			= crypto_sha3_init,
++	.update			= crypto_sha3_update,
++	.final			= crypto_sha3_final,
+ 	.descsize		= sizeof(struct sha3_state),
+ 	.base.cra_name		= "sha3-384",
+ 	.base.cra_driver_name	= "sha3-384-generic",
+@@ -256,9 +259,9 @@ static struct shash_alg algs[] = { {
+ 	.base.cra_module	= THIS_MODULE,
+ }, {
+ 	.digestsize		= SHA3_512_DIGEST_SIZE,
+-	.init			= sha3_init,
+-	.update			= sha3_update,
+-	.final			= sha3_final,
++	.init			= crypto_sha3_init,
++	.update			= crypto_sha3_update,
++	.final			= crypto_sha3_final,
+ 	.descsize		= sizeof(struct sha3_state),
+ 	.base.cra_name		= "sha3-512",
+ 	.base.cra_driver_name	= "sha3-512-generic",
+diff --git a/include/crypto/sha3.h b/include/crypto/sha3.h
+index 1339dcdbc9b2..080f60c2e6b1 100644
+--- a/include/crypto/sha3.h
++++ b/include/crypto/sha3.h
+@@ -26,4 +26,9 @@ struct sha3_state {
+ 	u8		buf[SHA3_224_BLOCK_SIZE];
+ };
  
- 	keccakf(sctx->st);
- 
++int crypto_sha3_init(struct shash_desc *desc);
++int crypto_sha3_update(struct shash_desc *desc, const u8 *data,
++		       unsigned int len);
++int crypto_sha3_final(struct shash_desc *desc, u8 *out);
++
+ #endif
 -- 
 2.11.0
