@@ -1,51 +1,109 @@
-From: Harsh Jain <harsh@chelsio.com>
-Subject: [PATCH 1/1] crypto: chelsio - Fix indentation warning
-Date: Fri, 19 Jan 2018 11:09:58 +0530
-Message-ID: <a78e3da6475cd66a42d2fe8763daa22d2da8200f.1516339759.git.harsh@chelsio.com>
-References: <cover.1516339759.git.harsh@chelsio.com>
-Cc: Harsh Jain <harsh@chelsio.com>
-To: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-        sfr@canb.auug.org.au
+From: Kamil Konieczny <k.konieczny@partner.samsung.com>
+Subject: Re: [PATCH 5/5] crypto: ahash.c: Require export/import in ahash
+Date: Fri, 19 Jan 2018 10:53:51 +0100
+Message-ID: <9246bbcb-6cd0-8bc9-8286-02c44e6d01bc@partner.samsung.com>
+References: <20180118183404.12583-1-k.konieczny@partner.samsung.com>
+        <CGME20180118183441eucas1p2ee3f046a594945299ea7b75ffb13e2ca@eucas1p2.samsung.com>
+        <20180118183404.12583-6-k.konieczny@partner.samsung.com>
+        <5db6f843-cc51-09f2-f388-8dade440c6bc@denx.de>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: "David S. Miller" <davem@davemloft.net>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        Sonic Zhang <sonic.zhang@analog.com>,
+        Fabio Estevam <fabio.estevam@freescale.com>,
+        Shawn Guo <shawn.guo@linaro.org>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Jan Engelhardt <jengelh@inai.de>,
+        Arvind Yadav <arvind.yadav.cs@gmail.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Joakim Bech <joakim.bech@linaro.org>,
+        linux-kernel@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>
+To: Marek Vasut <marex@denx.de>, linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from stargate.chelsio.com ([12.32.117.8]:10193 "EHLO
-        stargate.chelsio.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750722AbeASFkQ (ORCPT
+Received: from mailout2.w1.samsung.com ([210.118.77.12]:36583 "EHLO
+        mailout2.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754070AbeASJx5 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 19 Jan 2018 00:40:16 -0500
-In-Reply-To: <cover.1516339759.git.harsh@chelsio.com>
+        Fri, 19 Jan 2018 04:53:57 -0500
+In-reply-to: <5db6f843-cc51-09f2-f388-8dade440c6bc@denx.de>
+Content-language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Fix Warning introduced in changeset
+On 18.01.2018 22:31, Marek Vasut wrote:
+> On 01/18/2018 07:34 PM, Kamil Konieczny wrote:
+>> Export and import are mandatory in async hash. As drivers were
+>> rewritten, drop empty wrappers and correct init of ahash transformation.
+> 
+> Are you moving checks from the core subsystem to drivers ? This looks
+> really nonsensical and the commit message doesn't explain the rationale
+> for that at all.
 
-e1a018e607a3 ("crypto: chelsio - Remove dst sg size zero check")
+I am removing checks from core. Export and import were optional in beginnig
+of crypto framework, but as time goes on they become mandatory.
 
-Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
-Signed-off-by: Harsh Jain <harsh@chelsio.com>
----
- drivers/crypto/chelsio/chcr_algo.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+> 
+>> Signed-off-by: Kamil Konieczny <k.konieczny@partner.samsung.com>
+>> ---
+>>  crypto/ahash.c | 18 ++----------------
+>>  1 file changed, 2 insertions(+), 16 deletions(-)
+>>
+>> diff --git a/crypto/ahash.c b/crypto/ahash.c
+>> index 3a35d67de7d9..c3cce508c1d4 100644
+>> --- a/crypto/ahash.c
+>> +++ b/crypto/ahash.c
+>> @@ -434,16 +434,6 @@ static int ahash_def_finup(struct ahash_request *req)
+>>  	return ahash_def_finup_finish1(req, err);
+>>  }
+>>  
+>> -static int ahash_no_export(struct ahash_request *req, void *out)
+>> -{
+>> -	return -ENOSYS;
+>> -}
+>> -
+>> -static int ahash_no_import(struct ahash_request *req, const void *in)
+>> -{
+>> -	return -ENOSYS;
+>> -}
+>> -
+>>  static int crypto_ahash_init_tfm(struct crypto_tfm *tfm)
+>>  {
+>>  	struct crypto_ahash *hash = __crypto_ahash_cast(tfm);
+>> @@ -451,8 +441,6 @@ static int crypto_ahash_init_tfm(struct crypto_tfm *tfm)
+>>  
+>>  	hash->setkey = ahash_nosetkey;
+>>  	hash->has_setkey = false;
+>> -	hash->export = ahash_no_export;
+>> -	hash->import = ahash_no_import;
+>>  
+>>  	if (tfm->__crt_alg->cra_type != &crypto_ahash_type)
+>>  		return crypto_init_shash_ops_async(tfm);
+>> @@ -462,15 +450,13 @@ static int crypto_ahash_init_tfm(struct crypto_tfm *tfm)
+>>  	hash->final = alg->final;
+>>  	hash->finup = alg->finup ?: ahash_def_finup;
+>>  	hash->digest = alg->digest;
+>> +	hash->export = alg->export;
+>> +	hash->import = alg->import;
+>>  
+>>  	if (alg->setkey) {
+>>  		hash->setkey = alg->setkey;
+>>  		hash->has_setkey = true;
+>>  	}
+>> -	if (alg->export)
+>> -		hash->export = alg->export;
+>> -	if (alg->import)
+>> -		hash->import = alg->import;
+>>  
+>>  	return 0;
+>>  }
+>>
+> 
+> 
 
-diff --git a/drivers/crypto/chelsio/chcr_algo.c b/drivers/crypto/chelsio/chcr_algo.c
-index a9c894b..34a02d6 100644
---- a/drivers/crypto/chelsio/chcr_algo.c
-+++ b/drivers/crypto/chelsio/chcr_algo.c
-@@ -2112,11 +2112,11 @@ static struct sk_buff *create_authenc_wr(struct aead_request *req,
- 	error = chcr_aead_common_init(req, op_type);
- 	if (error)
- 		return ERR_PTR(error);
--		dnents = sg_nents_xlen(req->dst, assoclen, CHCR_DST_SG_SIZE, 0);
--		dnents += sg_nents_xlen(req->dst, req->cryptlen +
--			(op_type ? -authsize : authsize), CHCR_DST_SG_SIZE,
--			req->assoclen);
--		dnents += MIN_AUTH_SG; // For IV
-+	dnents = sg_nents_xlen(req->dst, assoclen, CHCR_DST_SG_SIZE, 0);
-+	dnents += sg_nents_xlen(req->dst, req->cryptlen +
-+		(op_type ? -authsize : authsize), CHCR_DST_SG_SIZE,
-+		req->assoclen);
-+	dnents += MIN_AUTH_SG; // For IV
- 
- 	dst_size = get_space_for_phys_dsgl(dnents);
- 	kctx_len = (ntohl(KEY_CONTEXT_CTX_LEN_V(aeadctx->key_ctx_hdr)) << 4)
 -- 
-2.1.4
+Best regards,
+Kamil Konieczny
+Samsung R&D Institute Poland
