@@ -1,62 +1,64 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH 0/8] crypto: arm64+generic - SHA3/SHA-512/SM-3 roundup
-Date: Fri, 19 Jan 2018 12:04:32 +0000
-Message-ID: <20180119120440.31556-1-ard.biesheuvel@linaro.org>
+Subject: [PATCH 1/8] crypto/generic: sha3 - fixes for alignment and big endian operation
+Date: Fri, 19 Jan 2018 12:04:33 +0000
+Message-ID: <20180119120440.31556-2-ard.biesheuvel@linaro.org>
+References: <20180119120440.31556-1-ard.biesheuvel@linaro.org>
 Cc: linux-arm-kernel@lists.infradead.org, herbert@gondor.apana.org.au,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f67.google.com ([74.125.82.67]:33560 "EHLO
-        mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752368AbeASMFJ (ORCPT
+Received: from mail-wr0-f196.google.com ([209.85.128.196]:38046 "EHLO
+        mail-wr0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751212AbeASMFP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 19 Jan 2018 07:05:09 -0500
-Received: by mail-wm0-f67.google.com with SMTP id x4so6960140wmc.0
-        for <linux-crypto@vger.kernel.org>; Fri, 19 Jan 2018 04:05:09 -0800 (PST)
+        Fri, 19 Jan 2018 07:05:15 -0500
+Received: by mail-wr0-f196.google.com with SMTP id x1so1372877wrb.5
+        for <linux-crypto@vger.kernel.org>; Fri, 19 Jan 2018 04:05:15 -0800 (PST)
+In-Reply-To: <20180119120440.31556-1-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This supersedes all outstanding patches from me related to SHA-3, SHA-512
-or SM-3.
+Ensure that the input is byte swabbed before injecting it into the
+SHA3 transform. Use the get_unaligned() accessor for this so that
+we don't perform unaligned access inadvertently on architectures
+that do not support that.
 
-- fix a correctness issue in the SHA-3 code (#1) and a performance issue (#2),
-  the first one is definitely a -stable candidate, the second one potentially
-  as well
-- patches #3 and #4 make the generic SHA-3 code reusable as a fallback for the
-  accelerated code introduced in #6
-- patch #5 adds some SHA-3 test cases
-- patch #6 implements SHA-3 using special arm64 instructions
-- patch #7 implements the Chinese SM3 secure hash algorithm using special
-  arm64 instructions
-- patch #8 contains some fixes for the recently queued SHA-512 arm64 code.
+Cc: <stable@vger.kernel.org>
+Fixes: 53964b9ee63b7075 ("crypto: sha3 - Add SHA-3 hash algorithm")
+Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+---
+ crypto/sha3_generic.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-Ard Biesheuvel (8):
-  crypto/generic: sha3 - fixes for alignment and big endian operation
-  crypto/generic: sha3: rewrite KECCAK transform to help the compiler
-    optimize
-  crypto/generic: sha3 - simplify code
-  crypto/generic: sha3 - export init/update/final routines
-  crypto/testmgr: sha3 - add new testcases
-  crypto/arm64: sha3 - new v8.2 Crypto Extensions implementation
-  crypto/arm64: sm3 - new v8.2 Crypto Extensions implementation
-  crypto/arm64: sha512 - fix/improve new v8.2 Crypto Extensions code
-
- arch/arm64/crypto/Kconfig          |  12 +
- arch/arm64/crypto/Makefile         |   6 +
- arch/arm64/crypto/sha3-ce-core.S   | 210 ++++++++
- arch/arm64/crypto/sha3-ce-glue.c   | 161 ++++++
- arch/arm64/crypto/sha512-ce-core.S | 145 +++---
- arch/arm64/crypto/sha512-glue.c    |   1 +
- arch/arm64/crypto/sm3-ce-core.S    | 141 +++++
- arch/arm64/crypto/sm3-ce-glue.c    |  92 ++++
- crypto/sha3_generic.c              | 332 ++++++------
- crypto/testmgr.h                   | 550 ++++++++++++++++++++
- include/crypto/sha3.h              |   6 +-
- 11 files changed, 1413 insertions(+), 243 deletions(-)
- create mode 100644 arch/arm64/crypto/sha3-ce-core.S
- create mode 100644 arch/arm64/crypto/sha3-ce-glue.c
- create mode 100644 arch/arm64/crypto/sm3-ce-core.S
- create mode 100644 arch/arm64/crypto/sm3-ce-glue.c
-
+diff --git a/crypto/sha3_generic.c b/crypto/sha3_generic.c
+index 7e8ed96236ce..a68be626017c 100644
+--- a/crypto/sha3_generic.c
++++ b/crypto/sha3_generic.c
+@@ -18,6 +18,7 @@
+ #include <linux/types.h>
+ #include <crypto/sha3.h>
+ #include <asm/byteorder.h>
++#include <asm/unaligned.h>
+ 
+ #define KECCAK_ROUNDS 24
+ 
+@@ -149,7 +150,7 @@ static int sha3_update(struct shash_desc *desc, const u8 *data,
+ 			unsigned int i;
+ 
+ 			for (i = 0; i < sctx->rsizw; i++)
+-				sctx->st[i] ^= ((u64 *) src)[i];
++				sctx->st[i] ^= get_unaligned_le64(src + 8 * i);
+ 			keccakf(sctx->st);
+ 
+ 			done += sctx->rsiz;
+@@ -174,7 +175,7 @@ static int sha3_final(struct shash_desc *desc, u8 *out)
+ 	sctx->buf[sctx->rsiz - 1] |= 0x80;
+ 
+ 	for (i = 0; i < sctx->rsizw; i++)
+-		sctx->st[i] ^= ((u64 *) sctx->buf)[i];
++		sctx->st[i] ^= get_unaligned_le64(sctx->buf + 8 * i);
+ 
+ 	keccakf(sctx->st);
+ 
 -- 
 2.11.0
