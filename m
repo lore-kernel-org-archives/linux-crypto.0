@@ -1,278 +1,448 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH 3/8] crypto/generic: sha3 - simplify code
-Date: Fri, 19 Jan 2018 12:04:35 +0000
-Message-ID: <20180119120440.31556-4-ard.biesheuvel@linaro.org>
+Subject: [PATCH 6/8] crypto/arm64: sha3 - new v8.2 Crypto Extensions implementation
+Date: Fri, 19 Jan 2018 12:04:38 +0000
+Message-ID: <20180119120440.31556-7-ard.biesheuvel@linaro.org>
 References: <20180119120440.31556-1-ard.biesheuvel@linaro.org>
 Cc: linux-arm-kernel@lists.infradead.org, herbert@gondor.apana.org.au,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f66.google.com ([74.125.82.66]:35917 "EHLO
-        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754232AbeASMFT (ORCPT
+Received: from mail-wr0-f194.google.com ([209.85.128.194]:35432 "EHLO
+        mail-wr0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754232AbeASMF1 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 19 Jan 2018 07:05:19 -0500
-Received: by mail-wm0-f66.google.com with SMTP id f3so3088780wmc.1
-        for <linux-crypto@vger.kernel.org>; Fri, 19 Jan 2018 04:05:19 -0800 (PST)
+        Fri, 19 Jan 2018 07:05:27 -0500
+Received: by mail-wr0-f194.google.com with SMTP id g38so1374473wrd.2
+        for <linux-crypto@vger.kernel.org>; Fri, 19 Jan 2018 04:05:26 -0800 (PST)
 In-Reply-To: <20180119120440.31556-1-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-In preparation of exposing the generic SHA3 implementation to other
-versions as a fallback, simplify the code, and remove an inconsistency
-in the output handling (endian swabbing rsizw words of state before
-writing the output does not make sense)
+Implement the various flavours of SHA3 using the new optional
+EOR3/RAX1/XAR/BCAX instructions introduced by ARMv8.2.
 
+Tested-by: Steve Capper <steve.capper@arm.com>
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- crypto/sha3_generic.c | 184 +++++++-------------
- include/crypto/sha3.h |   1 -
- 2 files changed, 59 insertions(+), 126 deletions(-)
+ arch/arm64/crypto/Kconfig        |   6 +
+ arch/arm64/crypto/Makefile       |   3 +
+ arch/arm64/crypto/sha3-ce-core.S | 210 ++++++++++++++++++++
+ arch/arm64/crypto/sha3-ce-glue.c | 161 +++++++++++++++
+ 4 files changed, 380 insertions(+)
 
-diff --git a/crypto/sha3_generic.c b/crypto/sha3_generic.c
-index 5fecb609e3be..c7084a24eaf9 100644
---- a/crypto/sha3_generic.c
-+++ b/crypto/sha3_generic.c
-@@ -18,7 +18,6 @@
- #include <linux/module.h>
- #include <linux/types.h>
- #include <crypto/sha3.h>
--#include <asm/byteorder.h>
- #include <asm/unaligned.h>
+diff --git a/arch/arm64/crypto/Kconfig b/arch/arm64/crypto/Kconfig
+index aad288f4b9de..3321b2c9a2b5 100644
+--- a/arch/arm64/crypto/Kconfig
++++ b/arch/arm64/crypto/Kconfig
+@@ -35,6 +35,12 @@ config CRYPTO_SHA512_ARM64_CE
+ 	select CRYPTO_HASH
+ 	select CRYPTO_SHA512_ARM64
  
- #define KECCAK_ROUNDS 24
-@@ -146,43 +145,16 @@ static void __attribute__((__optimize__("O3"))) keccakf(u64 st[25])
- 	}
- }
++config CRYPTO_SHA3_ARM64
++	tristate "SHA3 digest algorithm (ARMv8.2 Crypto Extensions)"
++	depends on KERNEL_MODE_NEON
++	select CRYPTO_HASH
++	select CRYPTO_SHA3
++
+ config CRYPTO_GHASH_ARM64_CE
+ 	tristate "GHASH/AES-GCM using ARMv8 Crypto Extensions"
+ 	depends on KERNEL_MODE_NEON
+diff --git a/arch/arm64/crypto/Makefile b/arch/arm64/crypto/Makefile
+index b438b3dc9b4c..4ca2d146e213 100644
+--- a/arch/arm64/crypto/Makefile
++++ b/arch/arm64/crypto/Makefile
+@@ -17,6 +17,9 @@ sha2-ce-y := sha2-ce-glue.o sha2-ce-core.o
+ obj-$(CONFIG_CRYPTO_SHA512_ARM64_CE) += sha512-ce.o
+ sha512-ce-y := sha512-ce-glue.o sha512-ce-core.o
  
--static void sha3_init(struct sha3_state *sctx, unsigned int digest_sz)
--{
--	memset(sctx, 0, sizeof(*sctx));
--	sctx->md_len = digest_sz;
--	sctx->rsiz = 200 - 2 * digest_sz;
--	sctx->rsizw = sctx->rsiz / 8;
--}
--
--static int sha3_224_init(struct shash_desc *desc)
-+static int sha3_init(struct shash_desc *desc)
- {
- 	struct sha3_state *sctx = shash_desc_ctx(desc);
++obj-$(CONFIG_CRYPTO_SHA3_ARM64) += sha3-ce.o
++sha3-ce-y := sha3-ce-glue.o sha3-ce-core.o
++
+ obj-$(CONFIG_CRYPTO_GHASH_ARM64_CE) += ghash-ce.o
+ ghash-ce-y := ghash-ce-glue.o ghash-ce-core.o
+ 
+diff --git a/arch/arm64/crypto/sha3-ce-core.S b/arch/arm64/crypto/sha3-ce-core.S
+new file mode 100644
+index 000000000000..332ad7530690
+--- /dev/null
++++ b/arch/arm64/crypto/sha3-ce-core.S
+@@ -0,0 +1,210 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * sha3-ce-core.S - core SHA-3 transform using v8.2 Crypto Extensions
++ *
++ * Copyright (C) 2018 Linaro Ltd <ard.biesheuvel@linaro.org>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ */
++
++#include <linux/linkage.h>
++#include <asm/assembler.h>
++
++	.irp	b,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31
++	.set	.Lv\b\().2d, \b
++	.set	.Lv\b\().16b, \b
++	.endr
++
++	/*
++	 * ARMv8.2 Crypto Extensions instructions
++	 */
++	.macro	eor3, rd, rn, rm, ra
++	.inst	0xce000000 | .L\rd | (.L\rn << 5) | (.L\ra << 10) | (.L\rm << 16)
++	.endm
++
++	.macro	rax1, rd, rn, rm
++	.inst	0xce608c00 | .L\rd | (.L\rn << 5) | (.L\rm << 16)
++	.endm
++
++	.macro	bcax, rd, rn, rm, ra
++	.inst	0xce200000 | .L\rd | (.L\rn << 5) | (.L\ra << 10) | (.L\rm << 16)
++	.endm
++
++	.macro	xar, rd, rn, rm, imm6
++	.inst	0xce800000 | .L\rd | (.L\rn << 5) | ((\imm6) << 10) | (.L\rm << 16)
++	.endm
++
++	/*
++	 * sha3_ce_transform(u64 *st, const u8 *data, int blocks, int dg_size)
++	 */
++	.text
++ENTRY(sha3_ce_transform)
++	/* load state */
++	add	x8, x0, #32
++	ld1	{ v0.1d- v3.1d}, [x0]
++	ld1	{ v4.1d- v7.1d}, [x8], #32
++	ld1	{ v8.1d-v11.1d}, [x8], #32
++	ld1	{v12.1d-v15.1d}, [x8], #32
++	ld1	{v16.1d-v19.1d}, [x8], #32
++	ld1	{v20.1d-v23.1d}, [x8], #32
++	ld1	{v24.1d}, [x8]
++
++0:	sub	w2, w2, #1
++	mov	w8, #24
++	adr_l	x9, .Lsha3_rcon
++
++	/* load input */
++	ld1	{v25.8b-v28.8b}, [x1], #32
++	ld1	{v29.8b-v31.8b}, [x1], #24
++	eor	v0.8b, v0.8b, v25.8b
++	eor	v1.8b, v1.8b, v26.8b
++	eor	v2.8b, v2.8b, v27.8b
++	eor	v3.8b, v3.8b, v28.8b
++	eor	v4.8b, v4.8b, v29.8b
++	eor	v5.8b, v5.8b, v30.8b
++	eor	v6.8b, v6.8b, v31.8b
++
++	tbnz	x3, #6, 2f		// SHA3-512
++
++	ld1	{v25.8b-v28.8b}, [x1], #32
++	ld1	{v29.8b-v30.8b}, [x1], #16
++	eor	 v7.8b,  v7.8b, v25.8b
++	eor	 v8.8b,  v8.8b, v26.8b
++	eor	 v9.8b,  v9.8b, v27.8b
++	eor	v10.8b, v10.8b, v28.8b
++	eor	v11.8b, v11.8b, v29.8b
++	eor	v12.8b, v12.8b, v30.8b
++
++	tbnz	x3, #4, 1f		// SHA3-384 or SHA3-224
++
++	// SHA3-256
++	ld1	{v25.8b-v28.8b}, [x1], #32
++	eor	v13.8b, v13.8b, v25.8b
++	eor	v14.8b, v14.8b, v26.8b
++	eor	v15.8b, v15.8b, v27.8b
++	eor	v16.8b, v16.8b, v28.8b
++	b	3f
++
++1:	tbz	x3, #2, 3f		// bit 2 cleared? SHA-384
++
++	// SHA3-224
++	ld1	{v25.8b-v28.8b}, [x1], #32
++	ld1	{v29.8b}, [x1], #8
++	eor	v13.8b, v13.8b, v25.8b
++	eor	v14.8b, v14.8b, v26.8b
++	eor	v15.8b, v15.8b, v27.8b
++	eor	v16.8b, v16.8b, v28.8b
++	eor	v17.8b, v17.8b, v29.8b
++	b	3f
++
++	// SHA3-512
++2:	ld1	{v25.8b-v26.8b}, [x1], #16
++	eor	 v7.8b,  v7.8b, v25.8b
++	eor	 v8.8b,  v8.8b, v26.8b
++
++3:	sub	w8, w8, #1
++
++	eor3	v29.16b,  v4.16b,  v9.16b, v14.16b
++	eor3	v26.16b,  v1.16b,  v6.16b, v11.16b
++	eor3	v28.16b,  v3.16b,  v8.16b, v13.16b
++	eor3	v25.16b,  v0.16b,  v5.16b, v10.16b
++	eor3	v27.16b,  v2.16b,  v7.16b, v12.16b
++	eor3	v29.16b, v29.16b, v19.16b, v24.16b
++	eor3	v26.16b, v26.16b, v16.16b, v21.16b
++	eor3	v28.16b, v28.16b, v18.16b, v23.16b
++	eor3	v25.16b, v25.16b, v15.16b, v20.16b
++	eor3	v27.16b, v27.16b, v17.16b, v22.16b
++
++	rax1	v30.2d, v29.2d, v26.2d	// bc[0]
++	rax1	v26.2d, v26.2d, v28.2d	// bc[2]
++	rax1	v28.2d, v28.2d, v25.2d	// bc[4]
++	rax1	v25.2d, v25.2d, v27.2d	// bc[1]
++	rax1	v27.2d, v27.2d, v29.2d	// bc[3]
++
++	eor	 v0.16b,  v0.16b, v30.16b
++	xar	 v29.2d,   v1.2d,  v25.2d, (64 - 1)
++	xar	  v1.2d,   v6.2d,  v25.2d, (64 - 44)
++	xar	  v6.2d,   v9.2d,  v28.2d, (64 - 20)
++	xar	  v9.2d,  v22.2d,  v26.2d, (64 - 61)
++	xar	 v22.2d,  v14.2d,  v28.2d, (64 - 39)
++	xar	 v14.2d,  v20.2d,  v30.2d, (64 - 18)
++	xar	 v31.2d,   v2.2d,  v26.2d, (64 - 62)
++	xar	  v2.2d,  v12.2d,  v26.2d, (64 - 43)
++	xar	 v12.2d,  v13.2d,  v27.2d, (64 - 25)
++	xar	 v13.2d,  v19.2d,  v28.2d, (64 - 8)
++	xar	 v19.2d,  v23.2d,  v27.2d, (64 - 56)
++	xar	 v23.2d,  v15.2d,  v30.2d, (64 - 41)
++	xar	 v15.2d,   v4.2d,  v28.2d, (64 - 27)
++	xar	 v28.2d,  v24.2d,  v28.2d, (64 - 14)
++	xar	 v24.2d,  v21.2d,  v25.2d, (64 - 2)
++	xar	  v8.2d,   v8.2d,  v27.2d, (64 - 55)
++	xar	  v4.2d,  v16.2d,  v25.2d, (64 - 45)
++	xar	 v16.2d,   v5.2d,  v30.2d, (64 - 36)
++	xar	  v5.2d,   v3.2d,  v27.2d, (64 - 28)
++	xar	 v27.2d,  v18.2d,  v27.2d, (64 - 21)
++	xar	  v3.2d,  v17.2d,  v26.2d, (64 - 15)
++	xar	 v25.2d,  v11.2d,  v25.2d, (64 - 10)
++	xar	 v26.2d,   v7.2d,  v26.2d, (64 - 6)
++	xar	 v30.2d,  v10.2d,  v30.2d, (64 - 3)
++
++	bcax	v20.16b, v31.16b, v22.16b,  v8.16b
++	bcax	v21.16b,  v8.16b, v23.16b, v22.16b
++	bcax	v22.16b, v22.16b, v24.16b, v23.16b
++	bcax	v23.16b, v23.16b, v31.16b, v24.16b
++	bcax	v24.16b, v24.16b,  v8.16b, v31.16b
++
++	ld1r	{v31.2d}, [x9], #8
++
++	bcax	v17.16b, v25.16b, v19.16b,  v3.16b
++	bcax	v18.16b,  v3.16b, v15.16b, v19.16b
++	bcax	v19.16b, v19.16b, v16.16b, v15.16b
++	bcax	v15.16b, v15.16b, v25.16b, v16.16b
++	bcax	v16.16b, v16.16b,  v3.16b, v25.16b
++
++	bcax	v10.16b, v29.16b, v12.16b, v26.16b
++	bcax	v11.16b, v26.16b, v13.16b, v12.16b
++	bcax	v12.16b, v12.16b, v14.16b, v13.16b
++	bcax	v13.16b, v13.16b, v29.16b, v14.16b
++	bcax	v14.16b, v14.16b, v26.16b, v29.16b
++
++	bcax	 v7.16b, v30.16b,  v9.16b,  v4.16b
++	bcax	 v8.16b,  v4.16b,  v5.16b,  v9.16b
++	bcax	 v9.16b,  v9.16b,  v6.16b,  v5.16b
++	bcax	 v5.16b,  v5.16b, v30.16b,  v6.16b
++	bcax	 v6.16b,  v6.16b,  v4.16b, v30.16b
++
++	bcax	 v3.16b, v27.16b,  v0.16b, v28.16b
++	bcax	 v4.16b, v28.16b,  v1.16b,  v0.16b
++	bcax	 v0.16b,  v0.16b,  v2.16b,  v1.16b
++	bcax	 v1.16b,  v1.16b, v27.16b,  v2.16b
++	bcax	 v2.16b,  v2.16b, v28.16b, v27.16b
++
++	eor	 v0.16b,  v0.16b, v31.16b
++
++	cbnz	w8, 3b
++	cbnz	w2, 0b
++
++	/* save state */
++	st1	{ v0.1d- v3.1d}, [x0], #32
++	st1	{ v4.1d- v7.1d}, [x0], #32
++	st1	{ v8.1d-v11.1d}, [x0], #32
++	st1	{v12.1d-v15.1d}, [x0], #32
++	st1	{v16.1d-v19.1d}, [x0], #32
++	st1	{v20.1d-v23.1d}, [x0], #32
++	st1	{v24.1d}, [x0]
++	ret
++ENDPROC(sha3_ce_transform)
++
++	.section	".rodata", "a"
++	.align		8
++.Lsha3_rcon:
++	.quad	0x0000000000000001, 0x0000000000008082, 0x800000000000808a
++	.quad	0x8000000080008000, 0x000000000000808b, 0x0000000080000001
++	.quad	0x8000000080008081, 0x8000000000008009, 0x000000000000008a
++	.quad	0x0000000000000088, 0x0000000080008009, 0x000000008000000a
++	.quad	0x000000008000808b, 0x800000000000008b, 0x8000000000008089
++	.quad	0x8000000000008003, 0x8000000000008002, 0x8000000000000080
++	.quad	0x000000000000800a, 0x800000008000000a, 0x8000000080008081
++	.quad	0x8000000000008080, 0x0000000080000001, 0x8000000080008008
+diff --git a/arch/arm64/crypto/sha3-ce-glue.c b/arch/arm64/crypto/sha3-ce-glue.c
+new file mode 100644
+index 000000000000..da8222e528bd
+--- /dev/null
++++ b/arch/arm64/crypto/sha3-ce-glue.c
+@@ -0,0 +1,161 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * sha3-ce-glue.c - core SHA-3 transform using v8.2 Crypto Extensions
++ *
++ * Copyright (C) 2018 Linaro Ltd <ard.biesheuvel@linaro.org>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ */
++
++#include <asm/hwcap.h>
++#include <asm/neon.h>
++#include <asm/simd.h>
++#include <asm/unaligned.h>
++#include <crypto/internal/hash.h>
++#include <crypto/sha3.h>
++#include <linux/cpufeature.h>
++#include <linux/crypto.h>
++#include <linux/module.h>
++
++MODULE_DESCRIPTION("SHA3 secure hash using ARMv8 Crypto Extensions");
++MODULE_AUTHOR("Ard Biesheuvel <ard.biesheuvel@linaro.org>");
++MODULE_LICENSE("GPL v2");
++
++asmlinkage void sha3_ce_transform(u64 *st, const u8 *data, int blocks,
++				  int md_len);
++
++static int sha3_update(struct shash_desc *desc, const u8 *data,
++		       unsigned int len)
++{
++	struct sha3_state *sctx = shash_desc_ctx(desc);
 +	unsigned int digest_size = crypto_shash_digestsize(desc->tfm);
- 
--	sha3_init(sctx, SHA3_224_DIGEST_SIZE);
--	return 0;
--}
--
--static int sha3_256_init(struct shash_desc *desc)
--{
--	struct sha3_state *sctx = shash_desc_ctx(desc);
--
--	sha3_init(sctx, SHA3_256_DIGEST_SIZE);
--	return 0;
--}
--
--static int sha3_384_init(struct shash_desc *desc)
--{
--	struct sha3_state *sctx = shash_desc_ctx(desc);
--
--	sha3_init(sctx, SHA3_384_DIGEST_SIZE);
--	return 0;
--}
--
--static int sha3_512_init(struct shash_desc *desc)
--{
--	struct sha3_state *sctx = shash_desc_ctx(desc);
-+	sctx->rsiz = 200 - 2 * digest_size;
-+	sctx->rsizw = sctx->rsiz / 8;
-+	sctx->partial = 0;
- 
--	sha3_init(sctx, SHA3_512_DIGEST_SIZE);
-+	memset(sctx->st, 0, sizeof(sctx->st));
- 	return 0;
- }
- 
-@@ -227,6 +199,8 @@ static int sha3_final(struct shash_desc *desc, u8 *out)
- {
- 	struct sha3_state *sctx = shash_desc_ctx(desc);
- 	unsigned int i, inlen = sctx->partial;
++
++	if (!may_use_simd())
++		return crypto_sha3_update(desc, data, len);
++
++	if ((sctx->partial + len) >= sctx->rsiz) {
++		int blocks;
++
++		if (sctx->partial) {
++			int p = sctx->rsiz - sctx->partial;
++
++			memcpy(sctx->buf + sctx->partial, data, p);
++			kernel_neon_begin();
++			sha3_ce_transform(sctx->st, sctx->buf, 1, digest_size);
++			kernel_neon_end();
++
++			data += p;
++			len -= p;
++			sctx->partial = 0;
++		}
++
++		blocks = len / sctx->rsiz;
++		len %= sctx->rsiz;
++
++		if (blocks) {
++			kernel_neon_begin();
++			sha3_ce_transform(sctx->st, data, blocks, digest_size);
++			kernel_neon_end();
++			data += blocks * sctx->rsiz;
++		}
++	}
++
++	if (len) {
++		memcpy(sctx->buf + sctx->partial, data, len);
++		sctx->partial += len;
++	}
++	return 0;
++}
++
++static int sha3_final(struct shash_desc *desc, u8 *out)
++{
++	struct sha3_state *sctx = shash_desc_ctx(desc);
 +	unsigned int digest_size = crypto_shash_digestsize(desc->tfm);
 +	__le64 *digest = (__le64 *)out;
- 
- 	sctx->buf[inlen++] = 0x06;
- 	memset(sctx->buf + inlen, 0, sctx->rsiz - inlen);
-@@ -237,110 +211,70 @@ static int sha3_final(struct shash_desc *desc, u8 *out)
- 
- 	keccakf(sctx->st);
- 
--	for (i = 0; i < sctx->rsizw; i++)
--		sctx->st[i] = cpu_to_le64(sctx->st[i]);
++	int i;
++
++	if (!may_use_simd())
++		return crypto_sha3_final(desc, out);
++
++	sctx->buf[sctx->partial++] = 0x06;
++	memset(sctx->buf + sctx->partial, 0, sctx->rsiz - sctx->partial);
++	sctx->buf[sctx->rsiz - 1] |= 0x80;
++
++	kernel_neon_begin();
++	sha3_ce_transform(sctx->st, sctx->buf, 1, digest_size);
++	kernel_neon_end();
++
 +	for (i = 0; i < digest_size / 8; i++)
 +		put_unaligned_le64(sctx->st[i], digest++);
- 
--	memcpy(out, sctx->st, sctx->md_len);
++
 +	if (digest_size & 4)
 +		put_unaligned_le32(sctx->st[i], (__le32 *)digest);
- 
- 	memset(sctx, 0, sizeof(*sctx));
- 	return 0;
- }
- 
--static struct shash_alg sha3_224 = {
--	.digestsize	=	SHA3_224_DIGEST_SIZE,
--	.init		=	sha3_224_init,
--	.update		=	sha3_update,
--	.final		=	sha3_final,
--	.descsize	=	sizeof(struct sha3_state),
--	.base		=	{
--		.cra_name	=	"sha3-224",
--		.cra_driver_name =	"sha3-224-generic",
--		.cra_flags	=	CRYPTO_ALG_TYPE_SHASH,
--		.cra_blocksize	=	SHA3_224_BLOCK_SIZE,
--		.cra_module	=	THIS_MODULE,
--	}
--};
--
--static struct shash_alg sha3_256 = {
--	.digestsize	=	SHA3_256_DIGEST_SIZE,
--	.init		=	sha3_256_init,
--	.update		=	sha3_update,
--	.final		=	sha3_final,
--	.descsize	=	sizeof(struct sha3_state),
--	.base		=	{
--		.cra_name	=	"sha3-256",
--		.cra_driver_name =	"sha3-256-generic",
--		.cra_flags	=	CRYPTO_ALG_TYPE_SHASH,
--		.cra_blocksize	=	SHA3_256_BLOCK_SIZE,
--		.cra_module	=	THIS_MODULE,
--	}
--};
--
--static struct shash_alg sha3_384 = {
--	.digestsize	=	SHA3_384_DIGEST_SIZE,
--	.init		=	sha3_384_init,
--	.update		=	sha3_update,
--	.final		=	sha3_final,
--	.descsize	=	sizeof(struct sha3_state),
--	.base		=	{
--		.cra_name	=	"sha3-384",
--		.cra_driver_name =	"sha3-384-generic",
--		.cra_flags	=	CRYPTO_ALG_TYPE_SHASH,
--		.cra_blocksize	=	SHA3_384_BLOCK_SIZE,
--		.cra_module	=	THIS_MODULE,
--	}
--};
--
--static struct shash_alg sha3_512 = {
--	.digestsize	=	SHA3_512_DIGEST_SIZE,
--	.init		=	sha3_512_init,
--	.update		=	sha3_update,
--	.final		=	sha3_final,
--	.descsize	=	sizeof(struct sha3_state),
--	.base		=	{
--		.cra_name	=	"sha3-512",
--		.cra_driver_name =	"sha3-512-generic",
--		.cra_flags	=	CRYPTO_ALG_TYPE_SHASH,
--		.cra_blocksize	=	SHA3_512_BLOCK_SIZE,
--		.cra_module	=	THIS_MODULE,
--	}
--};
++
++	*sctx = (struct sha3_state){};
++	return 0;
++}
++
 +static struct shash_alg algs[] = { {
 +	.digestsize		= SHA3_224_DIGEST_SIZE,
-+	.init			= sha3_init,
++	.init			= crypto_sha3_init,
 +	.update			= sha3_update,
 +	.final			= sha3_final,
 +	.descsize		= sizeof(struct sha3_state),
 +	.base.cra_name		= "sha3-224",
-+	.base.cra_driver_name	= "sha3-224-generic",
++	.base.cra_driver_name	= "sha3-224-ce",
 +	.base.cra_flags		= CRYPTO_ALG_TYPE_SHASH,
 +	.base.cra_blocksize	= SHA3_224_BLOCK_SIZE,
 +	.base.cra_module	= THIS_MODULE,
++	.base.cra_priority	= 200,
 +}, {
 +	.digestsize		= SHA3_256_DIGEST_SIZE,
-+	.init			= sha3_init,
++	.init			= crypto_sha3_init,
 +	.update			= sha3_update,
 +	.final			= sha3_final,
 +	.descsize		= sizeof(struct sha3_state),
 +	.base.cra_name		= "sha3-256",
-+	.base.cra_driver_name	= "sha3-256-generic",
++	.base.cra_driver_name	= "sha3-256-ce",
 +	.base.cra_flags		= CRYPTO_ALG_TYPE_SHASH,
 +	.base.cra_blocksize	= SHA3_256_BLOCK_SIZE,
 +	.base.cra_module	= THIS_MODULE,
++	.base.cra_priority	= 200,
 +}, {
 +	.digestsize		= SHA3_384_DIGEST_SIZE,
-+	.init			= sha3_init,
++	.init			= crypto_sha3_init,
 +	.update			= sha3_update,
 +	.final			= sha3_final,
 +	.descsize		= sizeof(struct sha3_state),
 +	.base.cra_name		= "sha3-384",
-+	.base.cra_driver_name	= "sha3-384-generic",
++	.base.cra_driver_name	= "sha3-384-ce",
 +	.base.cra_flags		= CRYPTO_ALG_TYPE_SHASH,
 +	.base.cra_blocksize	= SHA3_384_BLOCK_SIZE,
 +	.base.cra_module	= THIS_MODULE,
++	.base.cra_priority	= 200,
 +}, {
 +	.digestsize		= SHA3_512_DIGEST_SIZE,
-+	.init			= sha3_init,
++	.init			= crypto_sha3_init,
 +	.update			= sha3_update,
 +	.final			= sha3_final,
 +	.descsize		= sizeof(struct sha3_state),
 +	.base.cra_name		= "sha3-512",
-+	.base.cra_driver_name	= "sha3-512-generic",
++	.base.cra_driver_name	= "sha3-512-ce",
 +	.base.cra_flags		= CRYPTO_ALG_TYPE_SHASH,
 +	.base.cra_blocksize	= SHA3_512_BLOCK_SIZE,
 +	.base.cra_module	= THIS_MODULE,
++	.base.cra_priority	= 200,
 +} };
- 
- static int __init sha3_generic_mod_init(void)
- {
--	int ret;
--
--	ret = crypto_register_shash(&sha3_224);
--	if (ret < 0)
--		goto err_out;
--	ret = crypto_register_shash(&sha3_256);
--	if (ret < 0)
--		goto err_out_224;
--	ret = crypto_register_shash(&sha3_384);
--	if (ret < 0)
--		goto err_out_256;
--	ret = crypto_register_shash(&sha3_512);
--	if (ret < 0)
--		goto err_out_384;
--
--	return 0;
--
--err_out_384:
--	crypto_unregister_shash(&sha3_384);
--err_out_256:
--	crypto_unregister_shash(&sha3_256);
--err_out_224:
--	crypto_unregister_shash(&sha3_224);
--err_out:
--	return ret;
++
++static int __init sha3_neon_mod_init(void)
++{
 +	return crypto_register_shashes(algs, ARRAY_SIZE(algs));
- }
- 
- static void __exit sha3_generic_mod_fini(void)
- {
--	crypto_unregister_shash(&sha3_224);
--	crypto_unregister_shash(&sha3_256);
--	crypto_unregister_shash(&sha3_384);
--	crypto_unregister_shash(&sha3_512);
++}
++
++static void __exit sha3_neon_mod_fini(void)
++{
 +	crypto_unregister_shashes(algs, ARRAY_SIZE(algs));
- }
- 
- module_init(sha3_generic_mod_init);
-diff --git a/include/crypto/sha3.h b/include/crypto/sha3.h
-index b9d9bd553b48..1339dcdbc9b2 100644
---- a/include/crypto/sha3.h
-+++ b/include/crypto/sha3.h
-@@ -19,7 +19,6 @@
- 
- struct sha3_state {
- 	u64		st[25];
--	unsigned int	md_len;
- 	unsigned int	rsiz;
- 	unsigned int	rsizw;
- 
++}
++
++module_cpu_feature_match(SHA3, sha3_neon_mod_init);
++module_exit(sha3_neon_mod_fini);
 -- 
 2.11.0
