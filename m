@@ -1,87 +1,57 @@
-From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: Re: Getting the ccree driver out of staging
-Date: Sun, 21 Jan 2018 17:15:58 +0200
-Message-ID: <CAOtvUMcgEi2YGsa_1xrkxXQbG6zeSCVSPidQbWZtcZcFsxc2yQ@mail.gmail.com>
-References: <CAOtvUMdo_ZJ-M-=apA1a=70KyVBX2J0pEVc+Uc9i=rYWCie6Hw@mail.gmail.com>
- <20180111084216.oq7pnj6iwgatdld2@mwanda>
+From: Sabrina Dubroca <sd@queasysnail.net>
+Subject: Re: [RFC crypto v3 0/9] Chelsio Inline TLS
+Date: Sun, 21 Jan 2018 23:16:02 +0100
+Message-ID: <20180121221602.GA527@bistromath.localdomain>
+References: <1513769582-25786-1-git-send-email-atul.gupta@chelsio.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: devel@driverdev.osuosl.org, Herbert Xu <herbert@gondor.apana.org.au>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- driverdev-devel@linuxdriverproject.org,
- Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
- Ofir Drang <Ofir.Drang@arm.com>
-To: Dan Carpenter <dan.carpenter@oracle.com>
-Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
-In-Reply-To: <20180111084216.oq7pnj6iwgatdld2@mwanda>
-List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
-List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
-List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
-List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
-List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
-Errors-To: driverdev-devel-bounces@linuxdriverproject.org
-Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
+Content-Type: text/plain; charset=utf-8
+Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+        ganeshgr@chelsio.com, netdev@vger.kernel.org, davem@davemloft.net,
+        davejwatson@fb.com
+To: Atul Gupta <atul.gupta@chelsio.com>
+Return-path: <netdev-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1513769582-25786-1-git-send-email-atul.gupta@chelsio.com>
+Sender: netdev-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Jan 11, 2018 at 10:42 AM, Dan Carpenter
-<dan.carpenter@oracle.com> wrote:
-> Here are my remaining Smatch warnings:
->
->     drivers/staging/ccree/cc_driver.c:219 init_cc_resources()
->     error: '%pa' can only be followed by one of [dp]
->
-> drivers/staging/ccree/cc_driver.c
->    217
->    218          if (rc) {
->    219                  dev_err(dev, "Failed in dma_set_mask, mask=%par\n",
->                                                                       ^
-> This 'r' is is treated as a 'p'.  Not sure what was intended.
->
->    220                          &dma_mask);
->    221                  return rc;
->    222          }
->    223
->
->
->     drivers/staging/ccree/cc_buffer_mgr.c:1067 cc_aead_chain_data()
->     warn: inconsistent indenting
->
-> drivers/staging/ccree/cc_buffer_mgr.c
->   1064          if (src_mapped_nents > LLI_MAX_NUM_OF_DATA_ENTRIES) {
->   1065                  dev_err(dev, "Too many fragments. current %d max %d\n",
->   1066                          src_mapped_nents, LLI_MAX_NUM_OF_DATA_ENTRIES);
->   1067                          return -ENOMEM;
->                                 ^^^^^^^^^^^^^^
->   1068          }
->
->     drivers/staging/ccree/cc_cipher.c:373 cc_cipher_setkey()
->     warn: inconsistent indenting
->
-> drivers/staging/ccree/cc_cipher.c
->    369          dma_sync_single_for_device(dev, ctx_p->user.key_dma_addr,
->    370                                     max_key_buf_size, DMA_TO_DEVICE);
->    371          ctx_p->keylen = keylen;
->    372
->    373           dev_dbg(dev, "return safely");
->                 ^
-> One extra space.
->
->    374          return 0;
->    375  }
->
+2017-12-20, 17:03:02 +0530, Atul Gupta wrote:
+> RFC series for Chelsio Inline TLS driver (chtls.ko)
+> 
+> Driver use the ULP infrastructure to register chtls as Inline TLS ULP.
 
-Will fix in v2.
+I don't think drivers should be registering their own ULP. TLS
+offloading should be transparent to userspace, whatever HW ends up
+being used. If each driver implements its own ULP, the application has
+to be aware of what HW and what driver it's running on.
 
-Thanks!
-Gilad
+I think this offload should rely on a generic infrastructure, not
+build its own private interface. Look at the current kTLS code, the
+proposal for an offload infrastructure [0] from Mellanox, and see how
+you can fit your driver into that, and extend what's missing.
+
+[0] https://patchwork.ozlabs.org/patch/849984/
+
+
+[...]
+> Atul Gupta (9):
+>   chtls: structure and macro definiton
+>   cxgb4: Inline TLS FW Interface
+>   cxgb4: LLD driver changes to enable TLS
+>   chcr: Key Macro
+>   chtls: Key program
+>   chtls: CPL handler definition
+>   chtls: Inline crypto request Tx/Rx
+>   chtls: Register the ULP
+>   Makefile Kconfig
+
+That patchset is split so that each patch touches a separate set of
+files, and the description of the contents of each patch is very
+limited.  Can you try to group your changes by feature instead?  That
+should help you come up with descriptive commit messages as well.
+
+
+Thanks,
 
 -- 
-Gilad Ben-Yossef
-Chief Coffee Drinker
-
-"If you take a class in large-scale robotics, can you end up in a
-situation where the homework eats your dog?"
- -- Jean-Baptiste Queru
+Sabrina
