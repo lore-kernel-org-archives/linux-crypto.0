@@ -1,44 +1,45 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: Re: [PATCH] crypto: AF_ALG - inline IV support
-Date: Sun, 21 Jan 2018 13:14:30 +0100
-Message-ID: <2165621.DHQGk8sIp3@positron.chronox.de>
-References: <2118226.LQArbCsRu5@tauon.chronox.de> <1972650.zFSS3VNpIS@tauon.chronox.de>
+From: Gilad Ben-Yossef <gilad@benyossef.com>
+Subject: Re: [RFT PATCH] crypto: arm64 - implement SM3 secure hash using
+ special instructions
+Date: Sun, 21 Jan 2018 15:09:41 +0200
+Message-ID: <CAOtvUMeVWzTQh1BM0eoFQLB3aHA2TH078C-zCMHsDRQzf6DRoQ@mail.gmail.com>
+References: <20180116082922.19465-1-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org, harsh@chelsio.com,
-        jonathan.cameron@huawei.com
-To: herbert@gondor.apana.org.au
+Content-Type: text/plain; charset="UTF-8"
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>, steve.capper@arm.com,
+        catalin.marinas@arm.com, will.deacon@arm.com
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:57948 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751019AbeAUMOc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 21 Jan 2018 07:14:32 -0500
-In-Reply-To: <1972650.zFSS3VNpIS@tauon.chronox.de>
+Received: from mail-ot0-f172.google.com ([74.125.82.172]:43887 "EHLO
+        mail-ot0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750748AbeAUNJm (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 21 Jan 2018 08:09:42 -0500
+Received: by mail-ot0-f172.google.com with SMTP id p36so5251491otd.10
+        for <linux-crypto@vger.kernel.org>; Sun, 21 Jan 2018 05:09:42 -0800 (PST)
+In-Reply-To: <20180116082922.19465-1-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Herbert,
+On Tue, Jan 16, 2018 at 10:29 AM, Ard Biesheuvel
+<ard.biesheuvel@linaro.org> wrote:
+> Implement the Chinese SM3 secure hash algorithm using the new
+> special instructions that have been introduced as an optional
+> extension in ARMv8.2.
+>
+> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> ---
 
-I tried to summarize the use cases of the AIO support at [1].
+Looks good to me.
 
-The use case covering the inline IV support is documented in section [2]. It 
-naturally would depend on this patch to be accepted. What is your take on this 
-use case?
+Reviewed-by: Gilad Ben-Yossef <gilad@benyossef.com>
 
-What is your take on the issue outlined at [3]? Should the affected drivers be 
-updated?
 
-Thanks
-Stephan
+-- 
+Gilad Ben-Yossef
+Chief Coffee Drinker
 
-[1] https://github.com/smuellerDD/libkcapi/commit/
-29132075b8f045f3f92367c0190add81ccf5da11
-
-[2] https://github.com/smuellerDD/libkcapi/commit/
-29132075b8f045f3f92367c0190add81ccf5da11#diff-
-dce7a00cbc610df94f0dc27eb769d01dR644
-
-[3] https://github.com/smuellerDD/libkcapi/commit/
-29132075b8f045f3f92367c0190add81ccf5da11#diff-
-dce7a00cbc610df94f0dc27eb769d01dR575
+"If you take a class in large-scale robotics, can you end up in a
+situation where the homework eats your dog?"
+ -- Jean-Baptiste Queru
