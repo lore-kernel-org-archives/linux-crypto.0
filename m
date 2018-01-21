@@ -1,40 +1,82 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: Re: [RFT PATCH] crypto: arm64 - implement SM3 secure hash using
- special instructions
-Date: Sun, 21 Jan 2018 15:09:41 +0200
-Message-ID: <CAOtvUMeVWzTQh1BM0eoFQLB3aHA2TH078C-zCMHsDRQzf6DRoQ@mail.gmail.com>
-References: <20180116082922.19465-1-ard.biesheuvel@linaro.org>
+Subject: Re: Getting the ccree driver out of staging
+Date: Sun, 21 Jan 2018 17:15:58 +0200
+Message-ID: <CAOtvUMcgEi2YGsa_1xrkxXQbG6zeSCVSPidQbWZtcZcFsxc2yQ@mail.gmail.com>
+References: <CAOtvUMdo_ZJ-M-=apA1a=70KyVBX2J0pEVc+Uc9i=rYWCie6Hw@mail.gmail.com>
+ <20180111084216.oq7pnj6iwgatdld2@mwanda>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>, steve.capper@arm.com,
-        catalin.marinas@arm.com, will.deacon@arm.com
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ot0-f172.google.com ([74.125.82.172]:43887 "EHLO
-        mail-ot0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750748AbeAUNJm (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 21 Jan 2018 08:09:42 -0500
-Received: by mail-ot0-f172.google.com with SMTP id p36so5251491otd.10
-        for <linux-crypto@vger.kernel.org>; Sun, 21 Jan 2018 05:09:42 -0800 (PST)
-In-Reply-To: <20180116082922.19465-1-ard.biesheuvel@linaro.org>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: devel@driverdev.osuosl.org, Herbert Xu <herbert@gondor.apana.org.au>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ driverdev-devel@linuxdriverproject.org,
+ Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+ Ofir Drang <Ofir.Drang@arm.com>
+To: Dan Carpenter <dan.carpenter@oracle.com>
+Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
+In-Reply-To: <20180111084216.oq7pnj6iwgatdld2@mwanda>
+List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
+List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
+List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
+List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
+List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
+Errors-To: driverdev-devel-bounces@linuxdriverproject.org
+Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
+List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Jan 16, 2018 at 10:29 AM, Ard Biesheuvel
-<ard.biesheuvel@linaro.org> wrote:
-> Implement the Chinese SM3 secure hash algorithm using the new
-> special instructions that have been introduced as an optional
-> extension in ARMv8.2.
+On Thu, Jan 11, 2018 at 10:42 AM, Dan Carpenter
+<dan.carpenter@oracle.com> wrote:
+> Here are my remaining Smatch warnings:
 >
-> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> ---
+>     drivers/staging/ccree/cc_driver.c:219 init_cc_resources()
+>     error: '%pa' can only be followed by one of [dp]
+>
+> drivers/staging/ccree/cc_driver.c
+>    217
+>    218          if (rc) {
+>    219                  dev_err(dev, "Failed in dma_set_mask, mask=%par\n",
+>                                                                       ^
+> This 'r' is is treated as a 'p'.  Not sure what was intended.
+>
+>    220                          &dma_mask);
+>    221                  return rc;
+>    222          }
+>    223
+>
+>
+>     drivers/staging/ccree/cc_buffer_mgr.c:1067 cc_aead_chain_data()
+>     warn: inconsistent indenting
+>
+> drivers/staging/ccree/cc_buffer_mgr.c
+>   1064          if (src_mapped_nents > LLI_MAX_NUM_OF_DATA_ENTRIES) {
+>   1065                  dev_err(dev, "Too many fragments. current %d max %d\n",
+>   1066                          src_mapped_nents, LLI_MAX_NUM_OF_DATA_ENTRIES);
+>   1067                          return -ENOMEM;
+>                                 ^^^^^^^^^^^^^^
+>   1068          }
+>
+>     drivers/staging/ccree/cc_cipher.c:373 cc_cipher_setkey()
+>     warn: inconsistent indenting
+>
+> drivers/staging/ccree/cc_cipher.c
+>    369          dma_sync_single_for_device(dev, ctx_p->user.key_dma_addr,
+>    370                                     max_key_buf_size, DMA_TO_DEVICE);
+>    371          ctx_p->keylen = keylen;
+>    372
+>    373           dev_dbg(dev, "return safely");
+>                 ^
+> One extra space.
+>
+>    374          return 0;
+>    375  }
+>
 
-Looks good to me.
+Will fix in v2.
 
-Reviewed-by: Gilad Ben-Yossef <gilad@benyossef.com>
-
+Thanks!
+Gilad
 
 -- 
 Gilad Ben-Yossef
