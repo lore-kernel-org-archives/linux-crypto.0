@@ -1,126 +1,228 @@
 From: Junaid Shahid <junaids@google.com>
-Subject: [PATCH 3/4] crypto: aesni - Directly use kmap_atomic instead of scatter_walk object in gcm(aes)
-Date: Mon, 22 Jan 2018 15:04:02 -0800
-Message-ID: <20180122230403.52572-4-junaids@google.com>
+Subject: [PATCH 4/4] crypto: aesni - Use zero-copy for gcm(aes) even if the AAD/Data/AuthTag are separate
+Date: Mon, 22 Jan 2018 15:04:03 -0800
+Message-ID: <20180122230403.52572-5-junaids@google.com>
 References: <20180122230403.52572-1-junaids@google.com>
 Cc: linux-crypto@vger.kernel.org, andreslc@google.com,
         davem@davemloft.net, gthelen@google.com, ebiggers3@gmail.com
 To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pg0-f67.google.com ([74.125.83.67]:38437 "EHLO
-        mail-pg0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751060AbeAVXEJ (ORCPT
+Received: from mail-pf0-f193.google.com ([209.85.192.193]:39601 "EHLO
+        mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751049AbeAVXEK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 22 Jan 2018 18:04:09 -0500
-Received: by mail-pg0-f67.google.com with SMTP id y27so8264303pgc.5
-        for <linux-crypto@vger.kernel.org>; Mon, 22 Jan 2018 15:04:09 -0800 (PST)
+        Mon, 22 Jan 2018 18:04:10 -0500
+Received: by mail-pf0-f193.google.com with SMTP id e11so8251924pff.6
+        for <linux-crypto@vger.kernel.org>; Mon, 22 Jan 2018 15:04:10 -0800 (PST)
 In-Reply-To: <20180122230403.52572-1-junaids@google.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-gcmaes_crypt uses a scatter_walk object to map and unmap the crypto
-request sglists. But the only purpose that appears to serve here is to allow
-the D-Cache to be flushed at the end for pages that were used as output.
-However, that is not applicable on x86, so we can avoid using the scatter_walk
-object for simplicity.
+Enable the use of zero-copy even if the AAD and/or Auth Tag are in different
+buffers than the actual data, as long as each of them individually satisfies
+the zero-copy conditions (i.e. the entire buffer is either in low-mem or
+within a single high-mem page).
 
 Signed-off-by: Junaid Shahid <junaids@google.com>
 ---
- arch/x86/crypto/aesni-intel_glue.c | 36 +++++++++++++++---------------------
- 1 file changed, 15 insertions(+), 21 deletions(-)
+ arch/x86/crypto/aesni-intel_glue.c | 121 +++++++++++++++++++++++++++----------
+ 1 file changed, 89 insertions(+), 32 deletions(-)
 
 diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
-index a46eb2d25f71..03892dd80a12 100644
+index 03892dd80a12..2a44285ed66c 100644
 --- a/arch/x86/crypto/aesni-intel_glue.c
 +++ b/arch/x86/crypto/aesni-intel_glue.c
-@@ -750,6 +750,11 @@ static bool is_mappable(struct scatterlist *sgl, unsigned long len)
- 	       && len <= sgl->length;
+@@ -756,42 +756,91 @@ static u8 *map_buffer(struct scatterlist *sgl)
  }
  
-+static u8 *map_buffer(struct scatterlist *sgl)
-+{
-+	return kmap_atomic(sg_page(sgl)) + sgl->offset;
-+}
-+
  /*
-  * Maps the sglist buffer and returns a pointer to the mapped buffer in
-  * data_buf.
-@@ -762,14 +767,12 @@ static bool is_mappable(struct scatterlist *sgl, unsigned long len)
-  * the data_buf and the bounce_buf should be freed using kfree().
+- * Maps the sglist buffer and returns a pointer to the mapped buffer in
+- * data_buf.
++ * Maps the sglist buffer and returns pointers to the mapped buffers in assoc,
++ * data and (optionally) auth_tag.
+  *
+  * If direct mapping is not feasible, then allocates a bounce buffer if one
+- * isn't already available in bounce_buf, and returns a pointer to the bounce
+- * buffer in data_buf.
++ * isn't already available in bounce_buf, and returns pointers within the bounce
++ * buffer in assoc, data and auth_tag.
+  *
+- * When the buffer is no longer needed, put_request_buffer() should be called on
+- * the data_buf and the bounce_buf should be freed using kfree().
++ * When the buffers are no longer needed, put_request_buffers() should be called
++ * and the bounce_buf should be freed using kfree().
   */
- static int get_request_buffer(struct scatterlist *sgl,
--			      struct scatter_walk *sg_walk,
- 			      unsigned long bounce_buf_size,
- 			      u8 **data_buf, u8 **bounce_buf, bool *mapped)
+-static int get_request_buffer(struct scatterlist *sgl,
+-			      unsigned long bounce_buf_size,
+-			      u8 **data_buf, u8 **bounce_buf, bool *mapped)
++static int get_request_buffers(struct scatterlist *sgl,
++			       unsigned long assoc_len, unsigned long data_len,
++			       unsigned long auth_tag_len,
++			       u8 **assoc, u8 **data, u8 **auth_tag,
++			       u8 **bounce_buf, bool *mapped)
  {
- 	if (sg_is_last(sgl) && is_mappable(sgl, sgl->length)) {
+-	if (sg_is_last(sgl) && is_mappable(sgl, sgl->length)) {
++	struct scatterlist sgl_data_chain[2], sgl_auth_tag_chain[2];
++	struct scatterlist *sgl_data, *sgl_auth_tag;
++
++	sgl_data = scatterwalk_ffwd(sgl_data_chain, sgl, assoc_len);
++	sgl_auth_tag = scatterwalk_ffwd(sgl_auth_tag_chain, sgl,
++					assoc_len + data_len);
++
++	if (is_mappable(sgl, assoc_len) && is_mappable(sgl_data, data_len) &&
++	    (auth_tag == NULL || is_mappable(sgl_auth_tag, auth_tag_len))) {
  		*mapped = true;
--		scatterwalk_start(sg_walk, sgl);
--		*data_buf = scatterwalk_map(sg_walk);
-+		*data_buf = map_buffer(sgl);
+-		*data_buf = map_buffer(sgl);
++
++		*assoc = map_buffer(sgl);
++
++		if (sgl->length >= assoc_len + data_len)
++			*data = *assoc + assoc_len;
++		else
++			*data = map_buffer(sgl_data);
++
++		if (auth_tag != NULL) {
++			if (sgl_data->length >= data_len + auth_tag_len)
++				*auth_tag = *data + data_len;
++			else
++				*auth_tag = map_buffer(sgl_auth_tag);
++		}
++
  		return 0;
  	}
  
-@@ -785,14 +788,10 @@ static int get_request_buffer(struct scatterlist *sgl,
+ 	*mapped = false;
+ 
+ 	if (*bounce_buf == NULL) {
+-		*bounce_buf = kmalloc(bounce_buf_size, GFP_ATOMIC);
++		*bounce_buf = kmalloc(assoc_len + data_len + auth_tag_len,
++				      GFP_ATOMIC);
+ 		if (unlikely(*bounce_buf == NULL))
+ 			return -ENOMEM;
+ 	}
+ 
+-	*data_buf = *bounce_buf;
++	*assoc = *bounce_buf;
++	*data = *assoc + assoc_len;
++
++	if (auth_tag != NULL)
++		*auth_tag = *data + data_len;
++
  	return 0;
  }
  
--static void put_request_buffer(u8 *data_buf, unsigned long len, bool mapped,
--			       struct scatter_walk *sg_walk, bool output)
-+static void put_request_buffer(u8 *data_buf, bool mapped)
+-static void put_request_buffer(u8 *data_buf, bool mapped)
++static void put_request_buffers(struct scatterlist *sgl, bool mapped,
++				u8 *assoc, u8 *data, u8 *auth_tag,
++				unsigned long assoc_len,
++				unsigned long data_len,
++				unsigned long auth_tag_len)
  {
--	if (mapped) {
--		scatterwalk_unmap(data_buf);
--		scatterwalk_advance(sg_walk, len);
--		scatterwalk_done(sg_walk, output, 0);
--	}
-+	if (mapped)
-+		kunmap_atomic(data_buf);
+-	if (mapped)
+-		kunmap_atomic(data_buf);
++	struct scatterlist sgl_data_chain[2];
++	struct scatterlist *sgl_data;
++
++	if (!mapped)
++		return;
++
++	sgl_data = scatterwalk_ffwd(sgl_data_chain, sgl, assoc_len);
++
++	/* The unmaps need to be done in reverse order of the maps. */
++
++	if (auth_tag != NULL && sgl_data->length < data_len + auth_tag_len)
++		kunmap_atomic(auth_tag);
++
++	if (sgl->length < assoc_len + data_len)
++		kunmap_atomic(data);
++
++	kunmap_atomic(assoc);
  }
  
  /*
-@@ -809,16 +808,14 @@ static int gcmaes_crypt(struct aead_request *req, unsigned int assoclen,
+@@ -803,34 +852,38 @@ static void put_request_buffer(u8 *data_buf, bool mapped)
+ static int gcmaes_crypt(struct aead_request *req, unsigned int assoclen,
+ 			u8 *hash_subkey, u8 *iv, void *aes_ctx, bool decrypt)
+ {
+-	u8 *src, *dst, *assoc, *bounce_buf = NULL;
++	u8 *src, *src_assoc;
++	u8 *dst, *dst_assoc;
++	u8 *auth_tag;
++	u8 *bounce_buf = NULL;
+ 	bool src_mapped = false, dst_mapped = false;
  	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
  	unsigned long auth_tag_len = crypto_aead_authsize(tfm);
  	unsigned long data_len = req->cryptlen - (decrypt ? auth_tag_len : 0);
--	struct scatter_walk src_sg_walk;
--	struct scatter_walk dst_sg_walk = {};
  	int retval = 0;
- 	unsigned long bounce_buf_size = data_len + auth_tag_len + req->assoclen;
+-	unsigned long bounce_buf_size = data_len + auth_tag_len + req->assoclen;
  
  	if (auth_tag_len > 16)
  		return -EINVAL;
  
--	retval = get_request_buffer(req->src, &src_sg_walk, bounce_buf_size,
--				    &assoc, &bounce_buf, &src_mapped);
-+	retval = get_request_buffer(req->src, bounce_buf_size, &assoc,
-+				    &bounce_buf, &src_mapped);
+-	retval = get_request_buffer(req->src, bounce_buf_size, &assoc,
+-				    &bounce_buf, &src_mapped);
++	retval = get_request_buffers(req->src, req->assoclen, data_len,
++				     auth_tag_len, &src_assoc, &src,
++				     (decrypt || req->src == req->dst)
++				     ? &auth_tag : NULL,
++				     &bounce_buf, &src_mapped);
  	if (retval)
  		goto exit;
  
-@@ -828,9 +825,8 @@ static int gcmaes_crypt(struct aead_request *req, unsigned int assoclen,
+-	src = assoc + req->assoclen;
+-
+ 	if (req->src == req->dst) {
++		dst_assoc = src_assoc;
  		dst = src;
  		dst_mapped = src_mapped;
  	} else {
--		retval = get_request_buffer(req->dst, &dst_sg_walk,
--					    bounce_buf_size, &dst, &bounce_buf,
--					    &dst_mapped);
-+		retval = get_request_buffer(req->dst, bounce_buf_size, &dst,
-+					    &bounce_buf, &dst_mapped);
+-		retval = get_request_buffer(req->dst, bounce_buf_size, &dst,
+-					    &bounce_buf, &dst_mapped);
++		retval = get_request_buffers(req->dst, req->assoclen, data_len,
++					     auth_tag_len, &dst_assoc, &dst,
++					     decrypt ? NULL : &auth_tag,
++					     &bounce_buf, &dst_mapped);
  		if (retval)
  			goto exit;
+-
+-		dst += req->assoclen;
+ 	}
  
-@@ -866,11 +862,9 @@ static int gcmaes_crypt(struct aead_request *req, unsigned int assoclen,
+ 	if (!src_mapped)
+@@ -843,16 +896,16 @@ static int gcmaes_crypt(struct aead_request *req, unsigned int assoclen,
+ 		u8 gen_auth_tag[16];
+ 
+ 		aesni_gcm_dec_tfm(aes_ctx, dst, src, data_len, iv,
+-				  hash_subkey, assoc, assoclen,
++				  hash_subkey, src_assoc, assoclen,
+ 				  gen_auth_tag, auth_tag_len);
+ 		/* Compare generated tag with passed in tag. */
+-		if (crypto_memneq(src + data_len, gen_auth_tag, auth_tag_len))
++		if (crypto_memneq(auth_tag, gen_auth_tag, auth_tag_len))
+ 			retval = -EBADMSG;
+ 
+ 	} else
+ 		aesni_gcm_enc_tfm(aes_ctx, dst, src, data_len, iv,
+-				  hash_subkey, assoc, assoclen,
+-				  dst + data_len, auth_tag_len);
++				  hash_subkey, src_assoc, assoclen,
++				  auth_tag, auth_tag_len);
+ 
+ 	kernel_fpu_end();
+ 
+@@ -862,9 +915,13 @@ static int gcmaes_crypt(struct aead_request *req, unsigned int assoclen,
  					 1);
  exit:
  	if (req->dst != req->src)
--		put_request_buffer(dst - req->assoclen, req->dst->length,
--				   dst_mapped, &dst_sg_walk, true);
-+		put_request_buffer(dst - req->assoclen, dst_mapped);
+-		put_request_buffer(dst - req->assoclen, dst_mapped);
++		put_request_buffers(req->dst, dst_mapped, dst_assoc, dst,
++				    decrypt ? NULL : auth_tag,
++				    req->assoclen, data_len, auth_tag_len);
  
--	put_request_buffer(assoc, req->src->length, src_mapped, &src_sg_walk,
--			   false);
-+	put_request_buffer(assoc, src_mapped);
+-	put_request_buffer(assoc, src_mapped);
++	put_request_buffers(req->src, src_mapped, src_assoc, src,
++			    (decrypt || req->src == req->dst) ? auth_tag : NULL,
++			    req->assoclen, data_len, auth_tag_len);
  
  	kfree(bounce_buf);
  	return retval;
