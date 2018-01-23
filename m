@@ -1,42 +1,59 @@
-From: Wei Yongjun <weiyongjun1@huawei.com>
-Subject: [PATCH -next] hwrng: make symbol imx_rngc_pm_ops static
-Date: Tue, 23 Jan 2018 02:08:56 +0000
-Message-ID: <1516673336-170194-1-git-send-email-weiyongjun1@huawei.com>
+From: Harsh Jain <harsh@chelsio.com>
+Subject: Re: [PATCH] crypto: chelsio - Delete stray tabs in
+ create_authenc_wr()
+Date: Tue, 23 Jan 2018 09:28:05 +0530
+Message-ID: <6eeb22ce-6423-81df-f86c-dae26e864b7a@chelsio.com>
+References: <20180122102140.GA23912@mwanda>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="ISO-8859-1"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Cc: Wei Yongjun <weiyongjun1@huawei.com>,
-        <linux-crypto@vger.kernel.org>, <kernel-janitors@vger.kernel.org>
-To: Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Martin Kaiser <martin@kaiser.cx>
-Return-path: <kernel-janitors-owner@vger.kernel.org>
-Sender: kernel-janitors-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org
+To: Dan Carpenter <dan.carpenter@oracle.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from stargate.chelsio.com ([12.32.117.8]:20177 "EHLO
+        stargate.chelsio.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751195AbeAWEB1 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 22 Jan 2018 23:01:27 -0500
+In-Reply-To: <20180122102140.GA23912@mwanda>
+Content-Language: en-US
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Fixes the following sparse warnings:
 
-drivers/char/hw_random/imx-rngc.c:303:1: warning:
- symbol 'imx_rngc_pm_ops' was not declared. Should it be static?
 
-Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
----
- drivers/char/hw_random/imx-rngc.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On 22-01-2018 15:51, Dan Carpenter wrote:
+> We removed some if statements but left these statements indented too
+> far.
+HI Dan,
 
-diff --git a/drivers/char/hw_random/imx-rngc.c b/drivers/char/hw_random/imx-rngc.c
-index eca8724..250123b 100644
---- a/drivers/char/hw_random/imx-rngc.c
-+++ b/drivers/char/hw_random/imx-rngc.c
-@@ -300,7 +300,7 @@ static int __maybe_unused imx_rngc_resume(struct device *dev)
- 	return 0;
- }
- 
--SIMPLE_DEV_PM_OPS(imx_rngc_pm_ops, imx_rngc_suspend, imx_rngc_resume);
-+static SIMPLE_DEV_PM_OPS(imx_rngc_pm_ops, imx_rngc_suspend, imx_rngc_resume);
- 
- static const struct of_device_id imx_rngc_dt_ids[] = {
- 	{ .compatible = "fsl,imx25-rngb", .data = NULL, },
+Change already applied to cryptodev tree.
 
+https://www.mail-archive.com/linux-crypto@vger.kernel.org/msg30560.html
+
+>
+> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+>
+> diff --git a/drivers/crypto/chelsio/chcr_algo.c b/drivers/crypto/chelsio/chcr_algo.c
+> index a9c894bf9c01..34a02d690548 100644
+> --- a/drivers/crypto/chelsio/chcr_algo.c
+> +++ b/drivers/crypto/chelsio/chcr_algo.c
+> @@ -2112,11 +2112,11 @@ static struct sk_buff *create_authenc_wr(struct aead_request *req,
+>  	error = chcr_aead_common_init(req, op_type);
+>  	if (error)
+>  		return ERR_PTR(error);
+> -		dnents = sg_nents_xlen(req->dst, assoclen, CHCR_DST_SG_SIZE, 0);
+> -		dnents += sg_nents_xlen(req->dst, req->cryptlen +
+> -			(op_type ? -authsize : authsize), CHCR_DST_SG_SIZE,
+> -			req->assoclen);
+> -		dnents += MIN_AUTH_SG; // For IV
+> +	dnents = sg_nents_xlen(req->dst, assoclen, CHCR_DST_SG_SIZE, 0);
+> +	dnents += sg_nents_xlen(req->dst, req->cryptlen +
+> +		(op_type ? -authsize : authsize), CHCR_DST_SG_SIZE,
+> +		req->assoclen);
+> +	dnents += MIN_AUTH_SG; // For IV
+>  
+>  	dst_size = get_space_for_phys_dsgl(dnents);
+>  	kctx_len = (ntohl(KEY_CONTEXT_CTX_LEN_V(aeadctx->key_ctx_hdr)) << 4)
