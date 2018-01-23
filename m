@@ -1,34 +1,47 @@
-From: Corentin Labbe <clabbe@baylibre.com>
-Subject: [PATCH] sparc64: fix typo in CONFIG_CRYPTO_DES_SPARC64 => CONFIG_CRYPTO_CAMELLIA_SPARC64
-Date: Tue, 23 Jan 2018 14:33:14 +0000
-Message-ID: <1516717994-24407-1-git-send-email-clabbe@baylibre.com>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        sparclinux@vger.kernel.org, Corentin Labbe <clabbe@baylibre.com>
-To: davem@davemloft.net, herbert@gondor.apana.org.au
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Junaid Shahid <junaids@google.com>
+Subject: [PATCH v2 0/4] crypto: aesni - Use zero-copy for gcm(aes) buffers that are partially contiguous
+Date: Tue, 23 Jan 2018 12:19:12 -0800
+Message-ID: <20180123201916.102134-1-junaids@google.com>
+Cc: linux-crypto@vger.kernel.org, andreslc@google.com,
+        davem@davemloft.net, gthelen@google.com, ebiggers3@gmail.com,
+        smueller@chronox.de
+To: herbert@gondor.apana.org.au
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pg0-f65.google.com ([74.125.83.65]:37422 "EHLO
+        mail-pg0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752340AbeAWUTU (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 23 Jan 2018 15:19:20 -0500
+Received: by mail-pg0-f65.google.com with SMTP id z17so1057395pgc.4
+        for <linux-crypto@vger.kernel.org>; Tue, 23 Jan 2018 12:19:20 -0800 (PST)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-This patch fixes the typo CONFIG_CRYPTO_DES_SPARC64 => CONFIG_CRYPTO_CAMELLIA_SPARC64
+Changes in v2:
+- Integrated https://patchwork.kernel.org/patch/10173981
 
-Fixes: 81658ad0d923 ("sparc64: Add CAMELLIA driver making use of the new camellia opcodes.")
-Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
----
- arch/sparc/crypto/Makefile | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Currently, the AESNI gcm(aes) implementation uses zero-copy only when the
+entire src and dest request buffers, including the AAD, the data and the
+Auth Tag are contiguous. This series enables the use of zero-copy even if the
+AAD and/or Auth Tag are in different buffers than the actual data, as long as
+each of them individually satisfies the zero-copy conditions (i.e. the entire
+buffer is either in low-mem or within a single high-mem page). Furthermore,
+it also enables the use of zero-copy even if only one of src and dest satisfies
+these conditions rather than only when both of them do.
 
-diff --git a/arch/sparc/crypto/Makefile b/arch/sparc/crypto/Makefile
-index 818d3aa5172e..d257186c27d1 100644
---- a/arch/sparc/crypto/Makefile
-+++ b/arch/sparc/crypto/Makefile
-@@ -10,7 +10,7 @@ obj-$(CONFIG_CRYPTO_MD5_SPARC64) += md5-sparc64.o
- 
- obj-$(CONFIG_CRYPTO_AES_SPARC64) += aes-sparc64.o
- obj-$(CONFIG_CRYPTO_DES_SPARC64) += des-sparc64.o
--obj-$(CONFIG_CRYPTO_DES_SPARC64) += camellia-sparc64.o
-+obj-$(CONFIG_CRYPTO_CAMELLIA_SPARC64) += camellia-sparc64.o
- 
- obj-$(CONFIG_CRYPTO_CRC32C_SPARC64) += crc32c-sparc64.o
- 
+Junaid Shahid (4):
+  crypto: aesni - Fix out-of-bounds access of the AAD buffer in AVX
+    gcm-aesni
+  crypto: aesni - Enable one-sided zero copy for gcm(aes) request
+    buffers
+  crypto: aesni - Directly use kmap_atomic instead of scatter_walk
+    object in gcm(aes)
+  crypto: aesni - Use zero-copy for gcm(aes) even if the
+    AAD/Data/AuthTag are separate
+
+ arch/x86/crypto/aesni-intel_avx-x86_64.S | 154 +++++-----------
+ arch/x86/crypto/aesni-intel_glue.c       | 307 +++++++++++++++++++------------
+ 2 files changed, 227 insertions(+), 234 deletions(-)
+
 -- 
-2.13.6
+2.16.0.rc1.238.g530d649a79-goog
