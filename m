@@ -1,58 +1,70 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH 2/4] crypto: aesni - Enable one-sided zero copy for gcm(aes) request buffers
-Date: Tue, 23 Jan 2018 07:06:35 +0100
-Message-ID: <1797684.7ixjphp57z@tauon.chronox.de>
-References: <20180122230403.52572-1-junaids@google.com> <20180122230403.52572-3-junaids@google.com>
+From: Atul Gupta <atul.gupta@chelsio.com>
+Subject: Re: [RFC crypto v3 0/9] Chelsio Inline TLS
+Date: Tue, 23 Jan 2018 13:42:00 +0530
+Message-ID: <cf066030-2193-6b4f-05ae-afe7ead52ca7@chelsio.com>
+References: <1513769582-25786-1-git-send-email-atul.gupta@chelsio.com>
+ <20180121221602.GA527@bistromath.localdomain>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org, andreslc@google.com,
-        davem@davemloft.net, gthelen@google.com, ebiggers3@gmail.com
-To: Junaid Shahid <junaids@google.com>, herbert@gondor.apana.org.au
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+        ganeshgr@chelsio.com, netdev@vger.kernel.org, davem@davemloft.net,
+        davejwatson@fb.com
+To: Sabrina Dubroca <sd@queasysnail.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:59672 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751232AbeAWGGi (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 23 Jan 2018 01:06:38 -0500
-In-Reply-To: <20180122230403.52572-3-junaids@google.com>
+Received: from stargate.chelsio.com ([12.32.117.8]:47390 "EHLO
+        stargate.chelsio.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750907AbeAWIMQ (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 23 Jan 2018 03:12:16 -0500
+In-Reply-To: <20180121221602.GA527@bistromath.localdomain>
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Dienstag, 23. Januar 2018, 00:04:01 CET schrieb Junaid Shahid:
 
-Hi Junaid,
 
-> gcmaes_encrypt/decrypt perform zero-copy crypto if both the source and
-> destination satisfy certain conditions (single sglist entry located in
-> low-mem or within a single high-mem page). But two copies are done
-> otherwise, even if one of source or destination still satisfies the
-> zero-copy conditions. This optimization is now extended to avoid the
-> copy on the side that does satisfy the zero-copy conditions.
-> 
-> Signed-off-by: Junaid Shahid <junaids@google.com>
-> ---
->  arch/x86/crypto/aesni-intel_glue.c | 256
-> +++++++++++++++++++------------------ 1 file changed, 134 insertions(+),
-> 122 deletions(-)
-> 
-> diff --git a/arch/x86/crypto/aesni-intel_glue.c
-> b/arch/x86/crypto/aesni-intel_glue.c index 3bf3dcf29825..a46eb2d25f71
-> 100644
-> --- a/arch/x86/crypto/aesni-intel_glue.c
-> +++ b/arch/x86/crypto/aesni-intel_glue.c
-> @@ -744,136 +744,148 @@ static int generic_gcmaes_set_authsize(struct
-> crypto_aead *tfm, return 0;
->  }
-> 
-> +static bool is_mappable(struct scatterlist *sgl, unsigned long len)
-> +{
-> +	return (!PageHighMem(sg_page(sgl)) || sgl->offset + len <= PAGE_SIZE)
-> +	       && len <= sgl->length;
-
-Please integrate the patch https://www.mail-archive.com/linux-crypto@vger.kernel.org/msg30542.html
-
-@Herbert: If this patch series goes in, then the mentioned patch would not be 
-needed for the current implementation, but only for stable.
-
-Ciao
-Stephan
+On Monday 22 January 2018 03:46 AM, Sabrina Dubroca wrote:
+> 2017-12-20, 17:03:02 +0530, Atul Gupta wrote:
+>> RFC series for Chelsio Inline TLS driver (chtls.ko)
+>>
+>> Driver use the ULP infrastructure to register chtls as Inline TLS ULP.
+> I don't think drivers should be registering their own ULP. TLS
+> offloading should be transparent to userspace, whatever HW ends up
+> being used. If each driver implements its own ULP, the application has
+> to be aware of what HW and what driver it's running on.
+using different ULP is derived from 
+https://patchwork.kernel.org/patch/9746381/
+> I think this offload should rely on a generic infrastructure, not
+> build its own private interface. Look at the current kTLS code, the
+> proposal for an offload infrastructure [0] from Mellanox, and see how
+> you can fit your driver into that, and extend what's missing.
+>
+> [0] https://patchwork.ozlabs.org/patch/849984/
+The driver indeed used the proposed offload infrastructure and extended 
+for Inline Rx/Tx
+>
+>
+> [...]
+>> Atul Gupta (9):
+>>    chtls: structure and macro definiton
+>>    cxgb4: Inline TLS FW Interface
+>>    cxgb4: LLD driver changes to enable TLS
+>>    chcr: Key Macro
+>>    chtls: Key program
+>>    chtls: CPL handler definition
+>>    chtls: Inline crypto request Tx/Rx
+>>    chtls: Register the ULP
+>>    Makefile Kconfig
+> That patchset is split so that each patch touches a separate set of
+> files, and the description of the contents of each patch is very
+> limited.  Can you try to group your changes by feature instead?  That
+> should help you come up with descriptive commit messages as well.
+Made all attempts to group the contents based on functionality, the set 
+is broken into
+driver registration, I/O with crypto Inline request, key handling and 
+messages exchanged with
+hardware.
+>
+> Thanks,
+>
