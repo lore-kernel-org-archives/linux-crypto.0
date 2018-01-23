@@ -1,59 +1,58 @@
-From: Harsh Jain <harsh@chelsio.com>
-Subject: Re: [PATCH] crypto: chelsio - Delete stray tabs in
- create_authenc_wr()
-Date: Tue, 23 Jan 2018 09:28:05 +0530
-Message-ID: <6eeb22ce-6423-81df-f86c-dae26e864b7a@chelsio.com>
-References: <20180122102140.GA23912@mwanda>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: [PATCH 2/4] crypto: aesni - Enable one-sided zero copy for gcm(aes) request buffers
+Date: Tue, 23 Jan 2018 07:06:35 +0100
+Message-ID: <1797684.7ixjphp57z@tauon.chronox.de>
+References: <20180122230403.52572-1-junaids@google.com> <20180122230403.52572-3-junaids@google.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org
-To: Dan Carpenter <dan.carpenter@oracle.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: linux-crypto@vger.kernel.org, andreslc@google.com,
+        davem@davemloft.net, gthelen@google.com, ebiggers3@gmail.com
+To: Junaid Shahid <junaids@google.com>, herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from stargate.chelsio.com ([12.32.117.8]:20177 "EHLO
-        stargate.chelsio.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751195AbeAWEB1 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 22 Jan 2018 23:01:27 -0500
-In-Reply-To: <20180122102140.GA23912@mwanda>
-Content-Language: en-US
+Received: from mail.eperm.de ([89.247.134.16]:59672 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751232AbeAWGGi (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 23 Jan 2018 01:06:38 -0500
+In-Reply-To: <20180122230403.52572-3-junaids@google.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+Am Dienstag, 23. Januar 2018, 00:04:01 CET schrieb Junaid Shahid:
 
+Hi Junaid,
 
-On 22-01-2018 15:51, Dan Carpenter wrote:
-> We removed some if statements but left these statements indented too
-> far.
-HI Dan,
+> gcmaes_encrypt/decrypt perform zero-copy crypto if both the source and
+> destination satisfy certain conditions (single sglist entry located in
+> low-mem or within a single high-mem page). But two copies are done
+> otherwise, even if one of source or destination still satisfies the
+> zero-copy conditions. This optimization is now extended to avoid the
+> copy on the side that does satisfy the zero-copy conditions.
+> 
+> Signed-off-by: Junaid Shahid <junaids@google.com>
+> ---
+>  arch/x86/crypto/aesni-intel_glue.c | 256
+> +++++++++++++++++++------------------ 1 file changed, 134 insertions(+),
+> 122 deletions(-)
+> 
+> diff --git a/arch/x86/crypto/aesni-intel_glue.c
+> b/arch/x86/crypto/aesni-intel_glue.c index 3bf3dcf29825..a46eb2d25f71
+> 100644
+> --- a/arch/x86/crypto/aesni-intel_glue.c
+> +++ b/arch/x86/crypto/aesni-intel_glue.c
+> @@ -744,136 +744,148 @@ static int generic_gcmaes_set_authsize(struct
+> crypto_aead *tfm, return 0;
+>  }
+> 
+> +static bool is_mappable(struct scatterlist *sgl, unsigned long len)
+> +{
+> +	return (!PageHighMem(sg_page(sgl)) || sgl->offset + len <= PAGE_SIZE)
+> +	       && len <= sgl->length;
 
-Change already applied to cryptodev tree.
+Please integrate the patch https://www.mail-archive.com/linux-crypto@vger.kernel.org/msg30542.html
 
-https://www.mail-archive.com/linux-crypto@vger.kernel.org/msg30560.html
+@Herbert: If this patch series goes in, then the mentioned patch would not be 
+needed for the current implementation, but only for stable.
 
->
-> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
->
-> diff --git a/drivers/crypto/chelsio/chcr_algo.c b/drivers/crypto/chelsio/chcr_algo.c
-> index a9c894bf9c01..34a02d690548 100644
-> --- a/drivers/crypto/chelsio/chcr_algo.c
-> +++ b/drivers/crypto/chelsio/chcr_algo.c
-> @@ -2112,11 +2112,11 @@ static struct sk_buff *create_authenc_wr(struct aead_request *req,
->  	error = chcr_aead_common_init(req, op_type);
->  	if (error)
->  		return ERR_PTR(error);
-> -		dnents = sg_nents_xlen(req->dst, assoclen, CHCR_DST_SG_SIZE, 0);
-> -		dnents += sg_nents_xlen(req->dst, req->cryptlen +
-> -			(op_type ? -authsize : authsize), CHCR_DST_SG_SIZE,
-> -			req->assoclen);
-> -		dnents += MIN_AUTH_SG; // For IV
-> +	dnents = sg_nents_xlen(req->dst, assoclen, CHCR_DST_SG_SIZE, 0);
-> +	dnents += sg_nents_xlen(req->dst, req->cryptlen +
-> +		(op_type ? -authsize : authsize), CHCR_DST_SG_SIZE,
-> +		req->assoclen);
-> +	dnents += MIN_AUTH_SG; // For IV
->  
->  	dst_size = get_space_for_phys_dsgl(dnents);
->  	kctx_len = (ntohl(KEY_CONTEXT_CTX_LEN_V(aeadctx->key_ctx_hdr)) << 4)
+Ciao
+Stephan
