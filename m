@@ -1,96 +1,77 @@
-From: Yury Norov <ynorov@caviumnetworks.com>
-Subject: Re: [PATCH 3/3] arm64: enable 128-bit memory read/write support
-Date: Wed, 24 Jan 2018 21:19:54 +0300
-Message-ID: <20180124181954.o6e6wfekbdnjn7rc@yury-thinkpad>
-References: <20180124090519.6680-1-ynorov@caviumnetworks.com>
- <20180124090519.6680-4-ynorov@caviumnetworks.com>
- <CAMuHMdU5AHC4ZYkvC=X4UUAnGyysHqayv4m+T5=1Grpo5Qez4g@mail.gmail.com>
+From: "Auer, Lukas" <lukas.auer@aisec.fraunhofer.de>
+Subject: Re: [RESEND PATCH 3/6] ARM: dts: imx7s: add CAAM device node
+Date: Wed, 24 Jan 2018 18:12:46 +0000
+Message-ID: <1516817565.29323.74.camel@aisec.fraunhofer.de>
+References: <1516805435-15034-1-git-send-email-pure.logic@nexus-software.ie>
+         <1516805435-15034-4-git-send-email-pure.logic@nexus-software.ie>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-arm-kernel@lists.infradead.org,
-        Linux-Arch <linux-arch@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Andrew Pinski <Andrew.Pinski@cavium.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Geethasowjanya Akula <Geethasowjanya.Akula@cavium.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Ingo Molnar <mingo@kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Laura Abbott <labbott@redhat.com>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Sunil Goutham <Sunil.Goutham@cavium.com>,
-        Will Deacon <will.deacon@arm.com>
-To: Geert Uytterhoeven <geert@linux-m68k.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: "peng.fan@nxp.com" <peng.fan@nxp.com>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "ryan.harkin@linaro.org" <ryan.harkin@linaro.org>,
+        "fabio.estevam@nxp.com" <fabio.estevam@nxp.com>,
+        "rui.silva@linaro.org" <rui.silva@linaro.org>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>
+To: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "aymen.sghaier@nxp.com" <aymen.sghaier@nxp.com>,
+        "horia.geanta@nxp.com" <horia.geanta@nxp.com>,
+        "pure.logic@nexus-software.ie" <pure.logic@nexus-software.ie>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-by2nam01on0086.outbound.protection.outlook.com ([104.47.34.86]:57760
-        "EHLO NAM01-BY2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S964930AbeAXSUK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 24 Jan 2018 13:20:10 -0500
-Content-Disposition: inline
-In-Reply-To: <CAMuHMdU5AHC4ZYkvC=X4UUAnGyysHqayv4m+T5=1Grpo5Qez4g@mail.gmail.com>
+Received: from mail-edgeka24.fraunhofer.de ([153.96.1.24]:62789 "EHLO
+        mail-edgeKA24.fraunhofer.de" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S964850AbeAXSWt (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 24 Jan 2018 13:22:49 -0500
+In-Reply-To: <1516805435-15034-4-git-send-email-pure.logic@nexus-software.ie>
+Content-Language: en-US
+Content-ID: <8656C3E1D17BA84C8658E91BD9397841@xch.fraunhofer.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jan 24, 2018 at 02:00:42PM +0100, Geert Uytterhoeven wrote:
-> Hi Yury,
-> 
-> On Wed, Jan 24, 2018 at 10:05 AM, Yury Norov <ynorov@caviumnetworks.com> wrote:
-> > Introduce __raw_writeo(), __raw_reado() and other arch-specific
-> > RW functions for 128-bit memory access, and enable it for arm64.
-> >
-> > 128-bit I/O is required for example by Octeon TX2 device to access
-> > some registers. According to Hardware Reference Manual:
-> >
-> > A 128-bit write to the OP_FREE0/1 registers frees a pointer into a
-> > given [...] pool. All other accesses to these registers (e.g. reads
-> > and 64-bit writes) are RAZ/WI.
-> >
-> > Starting from ARMv8.4, stp and ldp instructions become atomic, and
-> > API for 128-bit access would be helpful for core code.
-> >
-> > Signed-off-by: Yury Norov <ynorov@caviumnetworks.com>
-> 
-> Thanks for your patch!
-> 
-> > --- a/arch/Kconfig
-> > +++ b/arch/Kconfig
-> > @@ -116,6 +116,13 @@ config UPROBES
-> >             managed by the kernel and kept transparent to the probed
-> >             application. )
-> >
-> > +config HAVE_128BIT_ACCESS
-> > +       def_bool ARM64
-> 
-> I think it's better to select this symbol from arch/arm64/Kconfig instead.
-> Else this file has to be modified each and every time an architecture
-> adds support for 128-bit, causing conflicts.
-
-Shure, thanks.
-
-Yury
- 
-> > +       help
-> > +         Architectures having 128-bit access require corresponding APIs,
-> > +         like reado() and writeo(), which stands for reading and writing
-> > +         the octet of bytes at once.
-> > +
-> >  config HAVE_64BIT_ALIGNED_ACCESS
-> >         def_bool 64BIT && !HAVE_EFFICIENT_UNALIGNED_ACCESS
-> >         help
-> 
-> Gr{oetje,eeting}s,
-> 
->                         Geert
-> 
-> --
-> Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-> 
-> In personal conversations with technical people, I call myself a hacker. But
-> when I'm talking to journalists I just say "programmer" or something like that.
->                                 -- Linus Torvalds
+T24gV2VkLCAyMDE4LTAxLTI0IGF0IDE0OjUwICswMDAwLCBCcnlhbiBPJ0Rvbm9naHVlIHdyb3Rl
+Og0KPiBGcm9tOiBSdWkgTWlndWVsIFNpbHZhIDxydWkuc2lsdmFAbGluYXJvLm9yZz4NCj4gDQo+
+IEFkZCBDQUFNIGRldmljZSBub2RlIHRvIHRoZSBpLk1YN3MgZGV2aWNlIHRyZWUuDQo+IA0KPiBT
+aWduZWQtb2ZmLWJ5OiBSdWkgTWlndWVsIFNpbHZhIDxydWkuc2lsdmFAbGluYXJvLm9yZz4NCj4g
+Q2M6ICJIb3JpYSBHZWFudMSDIiA8aG9yaWEuZ2VhbnRhQG54cC5jb20+DQo+IENjOiBBeW1lbiBT
+Z2hhaWVyIDxheW1lbi5zZ2hhaWVyQG54cC5jb20+DQo+IENjOiBGYWJpbyBFc3RldmFtIDxmYWJp
+by5lc3RldmFtQG54cC5jb20+DQo+IENjOiBQZW5nIEZhbiA8cGVuZy5mYW5AbnhwLmNvbT4NCj4g
+Q2M6IEhlcmJlcnQgWHUgPGhlcmJlcnRAZ29uZG9yLmFwYW5hLm9yZy5hdT4NCj4gQ2M6ICJEYXZp
+ZCBTLiBNaWxsZXIiIDxkYXZlbUBkYXZlbWxvZnQubmV0Pg0KPiBDYzogTHVrYXMgQXVlciA8bHVr
+YXMuYXVlckBhaXNlYy5mcmF1bmhvZmVyLmRlPg0KPiBTaWduZWQtb2ZmLWJ5OiBCcnlhbiBPJ0Rv
+bm9naHVlIDxwdXJlLmxvZ2ljQG5leHVzLXNvZnR3YXJlLmllPg0KPiAtLS0NCj4gIGFyY2gvYXJt
+L2Jvb3QvZHRzL2lteDdzLmR0c2kgfCAyNiArKysrKysrKysrKysrKysrKysrKysrKysrKw0KPiAg
+MSBmaWxlIGNoYW5nZWQsIDI2IGluc2VydGlvbnMoKykNCj4gDQo+IGRpZmYgLS1naXQgYS9hcmNo
+L2FybS9ib290L2R0cy9pbXg3cy5kdHNpDQo+IGIvYXJjaC9hcm0vYm9vdC9kdHMvaW14N3MuZHRz
+aQ0KPiBpbmRleCA4MmFkMjZlLi4wZGExNDZlIDEwMDY0NA0KPiAtLS0gYS9hcmNoL2FybS9ib290
+L2R0cy9pbXg3cy5kdHNpDQo+ICsrKyBiL2FyY2gvYXJtL2Jvb3QvZHRzL2lteDdzLmR0c2kNCj4g
+QEAgLTgwNSw2ICs4MDUsMzIgQEANCj4gIAkJCQlzdGF0dXMgPSAiZGlzYWJsZWQiOw0KPiAgCQkJ
+fTsNCj4gIA0KPiArCQkJY3J5cHRvOiBjYWFtQDMwOTAwMDAwIHsNCj4gKwkJCQljb21wYXRpYmxl
+ID0gImZzbCxzZWMtdjQuMCI7DQo+ICsJCQkJZnNsLHNlYy1lcmEgPSA8ND47DQo+ICsJCQkJI2Fk
+ZHJlc3MtY2VsbHMgPSA8MT47DQo+ICsJCQkJI3NpemUtY2VsbHMgPSA8MT47DQo+ICsJCQkJcmVn
+ID0gPDB4MzA5MDAwMDAgMHgxMDAwMD47DQo+ICsJCQkJcmFuZ2VzID0gPDAgMHgzMDkwMDAwMCAw
+eDEwMDAwPjsNCj4gKwkJCQljbG9ja3MgPSA8JmNsa3MgSU1YN0RfQ0FBTV9NRU1fQ0xLPiwNCj4g
+KwkJCQkJIDwmY2xrcw0KPiBJTVg3RF9DQUFNX0FDTEtfQ0xLPiwNCj4gKwkJCQkJIDwmY2xrcyBJ
+TVg3RF9DQUFNX0lQR19DTEs+LA0KPiArCQkJCQkgPCZjbGtzIElNWDdEX0VJTV9ST09UX0NMSz47
+DQo+ICsJCQkJY2xvY2stbmFtZXMgPSAibWVtIiwgImFjbGsiLCAiaXBnIiwNCj4gImVtaV9zbG93
+IjsNCj4gKw0KPiArCQkJCXNlY19qcjA6IGpyMEAxMDAwIHsNCj4gKwkJCQkJY29tcGF0aWJsZSA9
+ICJmc2wsc2VjLXY0LjAtDQo+IGpvYi1yaW5nIjsNCj4gKwkJCQkJcmVnID0gPDB4MTAwMCAweDEw
+MDA+Ow0KPiArCQkJCQlpbnRlcnJ1cHRzID0gPEdJQ19TUEkgMTA1DQo+IElSUV9UWVBFX0xFVkVM
+X0hJR0g+Ow0KPiArCQkJCX07DQo+ICsNCj4gKwkJCQlzZWNfanIxOiBqcjFAMjAwMCB7DQo+ICsJ
+CQkJCWNvbXBhdGlibGUgPSAiZnNsLHNlYy12NC4wLQ0KPiBqb2ItcmluZyI7DQo+ICsJCQkJCXJl
+ZyA9IDwweDIwMDAgMHgxMDAwPjsNCj4gKwkJCQkJaW50ZXJydXB0cyA9IDxHSUNfU1BJIDEwNg0K
+PiBJUlFfVFlQRV9MRVZFTF9ISUdIPjsNCj4gKwkJCQl9Ow0KPiArCQkJfTsNCj4gKw0KPiAgCQkJ
+ZmxleGNhbjE6IGNhbkAzMGEwMDAwMCB7DQo+ICAJCQkJY29tcGF0aWJsZSA9ICJmc2wsaW14N2Qt
+ZmxleGNhbiIsDQo+ICJmc2wsaW14NnEtZmxleGNhbiI7DQo+ICAJCQkJcmVnID0gPDB4MzBhMDAw
+MDAgMHgxMDAwMD47DQoNCkxvb2tpbmcgYXQgdGhlIGRldmljZSB0cmVlIGZyb20gdGhlIE5YUCBr
+ZXJuZWwgWzFdLCB0aGUgam9iIHJpbmcgYW5kDQpjbG9jayBjb25maWd1cmF0aW9ucyBzaG91bGQg
+YmUgc2xpZ2h0bHkgZGlmZmVyZW50Lg0KDQpUaGUgam9iIHJpbmcgY29uZmlndXJhdGlvbiBoYXMg
+b25lIGFkZGl0aW9uYWwgam9iIHJpbmcgYXQgb2Zmc2V0IDMwMDANCmFuZCBpbnRlcnJ1cHQgMTE0
+Lg0KDQpUaGUgY2xvY2sgY29uZmlndXJhdGlvbiBoYXMgY2hhbmdlZCB0byBqdXN0IG9uZSBDQUFN
+LXNwZWNpZmljIGNsb2NrIGluDQphZGRpdGlvbiB0byB0aGUgYWhiIGNsb2NrLiBUaGlzIGFsc28g
+bWVhbnMgdGhhdCBhZGRpdGlvbmFsDQptb2RpZmljYXRpb25zIHRvIHRoZSBDQUFNIGRyaXZlciBh
+cmUgbmVjZXNzYXJ5IG9yIGl0IHdpbGwgY29tcGxhaW4gdGhhdA0KaXQgZG9lc24ndCBmaW5kIGFs
+bCBjbG9ja3MuIA0KDQpUaGFua3MsDQpMdWthcw0KDQoNClsxXSBodHRwczovL2dpdGh1Yi5jb20v
+RnJlZXNjYWxlL2xpbnV4LWZzbGMvYmxvYi80LjEtMi4wLngtaW14L2FyY2gvYXJtDQovYm9vdC9k
+dHMvaW14N2QuZHRzaQ==
