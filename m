@@ -1,7 +1,7 @@
 From: Bryan O'Donoghue <pure.logic@nexus-software.ie>
-Subject: [RESEND PATCH 4/6] imx7d: add CAAM clocks
-Date: Wed, 24 Jan 2018 14:50:33 +0000
-Message-ID: <1516805435-15034-5-git-send-email-pure.logic@nexus-software.ie>
+Subject: [RESEND PATCH 3/6] ARM: dts: imx7s: add CAAM device node
+Date: Wed, 24 Jan 2018 14:50:32 +0000
+Message-ID: <1516805435-15034-4-git-send-email-pure.logic@nexus-software.ie>
 References: <1516805435-15034-1-git-send-email-pure.logic@nexus-software.ie>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -13,15 +13,21 @@ Cc: fabio.estevam@nxp.com, peng.fan@nxp.com,
         Bryan O'Donoghue <pure.logic@nexus-software.ie>
 To: horia.geanta@nxp.com, aymen.sghaier@nxp.com,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-wm0-f65.google.com ([74.125.82.65]:42605 "EHLO
+        mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933837AbeAXOus (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 24 Jan 2018 09:50:48 -0500
+Received: by mail-wm0-f65.google.com with SMTP id r71so9038224wmd.1
+        for <linux-crypto@vger.kernel.org>; Wed, 24 Jan 2018 06:50:47 -0800 (PST)
 In-Reply-To: <1516805435-15034-1-git-send-email-pure.logic@nexus-software.ie>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
 From: Rui Miguel Silva <rui.silva@linaro.org>
 
-Add CAAM clocks so that we could use the Cryptographic Acceleration and
-Assurance Module (CAAM) hardware block.
+Add CAAM device node to the i.MX7s device tree.
 
 Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
 Cc: "Horia Geantă" <horia.geanta@nxp.com>
@@ -33,37 +39,45 @@ Cc: "David S. Miller" <davem@davemloft.net>
 Cc: Lukas Auer <lukas.auer@aisec.fraunhofer.de>
 Signed-off-by: Bryan O'Donoghue <pure.logic@nexus-software.ie>
 ---
- drivers/clk/imx/clk-imx7d.c             | 3 +++
- include/dt-bindings/clock/imx7d-clock.h | 5 ++++-
- 2 files changed, 7 insertions(+), 1 deletion(-)
+ arch/arm/boot/dts/imx7s.dtsi | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
 
-diff --git a/drivers/clk/imx/clk-imx7d.c b/drivers/clk/imx/clk-imx7d.c
-index 80dc211..fc4f0c4 100644
---- a/drivers/clk/imx/clk-imx7d.c
-+++ b/drivers/clk/imx/clk-imx7d.c
-@@ -795,6 +795,9 @@ static void __init imx7d_clocks_init(struct device_node *ccm_node)
- 	clks[IMX7D_DRAM_PHYM_ALT_ROOT_CLK] = imx_clk_gate4("dram_phym_alt_root_clk", "dram_phym_alt_post_div", base + 0x4130, 0);
- 	clks[IMX7D_DRAM_ALT_ROOT_CLK] = imx_clk_gate4("dram_alt_root_clk", "dram_alt_post_div", base + 0x4130, 0);
- 	clks[IMX7D_OCOTP_CLK] = imx_clk_gate4("ocotp_clk", "ipg_root_clk", base + 0x4230, 0);
-+	clks[IMX7D_CAAM_MEM_CLK] = imx_clk_gate4("caam_mem_clk", "ahb_root_clk", base + 0x4240, 0);
-+	clks[IMX7D_CAAM_ACLK_CLK] = imx_clk_gate4("caam_aclk_clk", "ahb_root_clk", base + 0x4240, 0);
-+	clks[IMX7D_CAAM_IPG_CLK] = imx_clk_gate4("caam_ipg_clk", "ipg_root_clk", base + 0x4240, 0);
- 	clks[IMX7D_USB_HSIC_ROOT_CLK] = imx_clk_gate4("usb_hsic_root_clk", "usb_hsic_post_div", base + 0x4420, 0);
- 	clks[IMX7D_SDMA_CORE_CLK] = imx_clk_gate4("sdma_root_clk", "ahb_root_clk", base + 0x4480, 0);
- 	clks[IMX7D_PCIE_CTRL_ROOT_CLK] = imx_clk_gate4("pcie_ctrl_root_clk", "pcie_ctrl_post_div", base + 0x4600, 0);
-diff --git a/include/dt-bindings/clock/imx7d-clock.h b/include/dt-bindings/clock/imx7d-clock.h
-index e2f99ae..e17b59e 100644
---- a/include/dt-bindings/clock/imx7d-clock.h
-+++ b/include/dt-bindings/clock/imx7d-clock.h
-@@ -452,5 +452,8 @@
- #define IMX7D_OCOTP_CLK			439
- #define IMX7D_NAND_RAWNAND_CLK		440
- #define IMX7D_NAND_USDHC_BUS_RAWNAND_CLK 441
--#define IMX7D_CLK_END			442
-+#define IMX7D_CAAM_MEM_CLK		442
-+#define IMX7D_CAAM_ACLK_CLK		443
-+#define IMX7D_CAAM_IPG_CLK		444
-+#define IMX7D_CLK_END			445
- #endif /* __DT_BINDINGS_CLOCK_IMX7D_H */
+diff --git a/arch/arm/boot/dts/imx7s.dtsi b/arch/arm/boot/dts/imx7s.dtsi
+index 82ad26e..0da146e 100644
+--- a/arch/arm/boot/dts/imx7s.dtsi
++++ b/arch/arm/boot/dts/imx7s.dtsi
+@@ -805,6 +805,32 @@
+ 				status = "disabled";
+ 			};
+ 
++			crypto: caam@30900000 {
++				compatible = "fsl,sec-v4.0";
++				fsl,sec-era = <4>;
++				#address-cells = <1>;
++				#size-cells = <1>;
++				reg = <0x30900000 0x10000>;
++				ranges = <0 0x30900000 0x10000>;
++				clocks = <&clks IMX7D_CAAM_MEM_CLK>,
++					 <&clks IMX7D_CAAM_ACLK_CLK>,
++					 <&clks IMX7D_CAAM_IPG_CLK>,
++					 <&clks IMX7D_EIM_ROOT_CLK>;
++				clock-names = "mem", "aclk", "ipg", "emi_slow";
++
++				sec_jr0: jr0@1000 {
++					compatible = "fsl,sec-v4.0-job-ring";
++					reg = <0x1000 0x1000>;
++					interrupts = <GIC_SPI 105 IRQ_TYPE_LEVEL_HIGH>;
++				};
++
++				sec_jr1: jr1@2000 {
++					compatible = "fsl,sec-v4.0-job-ring";
++					reg = <0x2000 0x1000>;
++					interrupts = <GIC_SPI 106 IRQ_TYPE_LEVEL_HIGH>;
++				};
++			};
++
+ 			flexcan1: can@30a00000 {
+ 				compatible = "fsl,imx7d-flexcan", "fsl,imx6q-flexcan";
+ 				reg = <0x30a00000 0x10000>;
 -- 
 2.7.4
