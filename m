@@ -1,7 +1,7 @@
 From: Bryan O'Donoghue <pure.logic@nexus-software.ie>
-Subject: [RESEND PATCH 2/6] crypto: caam: Fix endless loop when RNG is already initialized
-Date: Wed, 24 Jan 2018 14:50:31 +0000
-Message-ID: <1516805435-15034-3-git-send-email-pure.logic@nexus-software.ie>
+Subject: [RESEND PATCH 6/6] crypto: caam: detect RNG init when TrustZone is active
+Date: Wed, 24 Jan 2018 14:50:35 +0000
+Message-ID: <1516805435-15034-7-git-send-email-pure.logic@nexus-software.ie>
 References: <1516805435-15034-1-git-send-email-pure.logic@nexus-software.ie>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -13,47 +13,36 @@ Cc: fabio.estevam@nxp.com, peng.fan@nxp.com,
         Bryan O'Donoghue <pure.logic@nexus-software.ie>
 To: horia.geanta@nxp.com, aymen.sghaier@nxp.com,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f65.google.com ([74.125.82.65]:43387 "EHLO
-        mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S934072AbeAXOup (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 24 Jan 2018 09:50:45 -0500
-Received: by mail-wm0-f65.google.com with SMTP id g1so8951375wmg.2
-        for <linux-crypto@vger.kernel.org>; Wed, 24 Jan 2018 06:50:45 -0800 (PST)
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1516805435-15034-1-git-send-email-pure.logic@nexus-software.ie>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-commit 1005bccd7a4a ("crypto: caam - enable instantiation of all RNG4 state
-handles") introduces a control when incrementing ent_delay which contains
-the following comment above it:
+When TrustZone is enabled on sec4 compatible silicon the first page of the
+CAAM is reserved for TrustZone only, this means that access to the deco
+registers is restricted and will return zero when read.
 
-/*
- * If either SH were instantiated by somebody else
- * (e.g. u-boot) then it is assumed that the entropy
- * parameters are properly set and thus the function
- * setting these (kick_trng(...)) is skipped.
- * Also, if a handle was instantiated, do not change
- * the TRNG parameters.
- */
+The solution to this problem is to initialize the RNG prior to TrustZone
+being enabled or to initialize the RNG from a TrustZone context and
+simultaneously to ensure that the job-ring registers have been assigned to
+the correct non-TrustZone context.
 
-The problem is if u-boot has already instantiated the RNG and TEE/OPTEE is
-running then instantiate_rng() will always return -EAGAIN and ent_delay
-will never increment causing the loop to never break.
+Assigning of the job-ring registers is a task for u-boot or OPTEE/TrustZone
+as is the initialization of the RNG. This patch adds logic to detect RNG
+initialization if and only if TrustZone has been detected as active on the
+CAAM block.
 
-This patch fixes commit 1005bccd7a4a ("crypto: caam - enable instantiation
-of all RNG4 state handles") by always incrementing ent_delay if and only if
-both rng4_sh_init and inst_handles are non-zero for a given loop.
+If TrustZone is initialized and the RNG looks to be setup - we mark the RNG
+as good to go and continue to load, else we mark the RNG as bad and bail
+out.
 
-This should allow the current behavior to continue while allowing the loop
-to break should (rng4_sh_init=1 && inst_handles 1) be true and
-instantiate_rng() return -EAGAIN forever.
+More detail on the original problem and the split fix between u-boot and
+Linux is available in these two threads
 
-Fixes: 1005bccd7a4a ("crypto: caam - enable instantiation of all RNG4 state
-handles")
+Link: https://github.com/OP-TEE/optee_os/issues/1408
+Link: https://tinyurl.com/yam5gv9a
+Link: https://patchwork.ozlabs.org/cover/865042
 
-Reported-by: Ryan Harkin <ryan.harkin@linaro.org>
 Signed-off-by: Bryan O'Donoghue <pure.logic@nexus-software.ie>
 Cc: "Horia Geantă" <horia.geanta@nxp.com>
 Cc: Aymen Sghaier <aymen.sghaier@nxp.com>
@@ -63,23 +52,37 @@ Cc: Herbert Xu <herbert@gondor.apana.org.au>
 Cc: "David S. Miller" <davem@davemloft.net>
 Cc: Lukas Auer <lukas.auer@aisec.fraunhofer.de>
 ---
- drivers/crypto/caam/ctrl.c | 3 +++
- 1 file changed, 3 insertions(+)
+ drivers/crypto/caam/ctrl.c | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
 diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
-index 98986d3..0a1e96b 100644
+index 7fd3bfc..66a7c7e 100644
 --- a/drivers/crypto/caam/ctrl.c
 +++ b/drivers/crypto/caam/ctrl.c
-@@ -704,7 +704,10 @@ static int caam_probe(struct platform_device *pdev)
- 					 ent_delay);
- 				kick_trng(pdev, ent_delay);
- 				ent_delay += 400;
-+			} else if (ctrlpriv->rng4_sh_init && inst_handles) {
-+				ent_delay += 400;
- 			}
+@@ -711,6 +711,24 @@ static int caam_probe(struct platform_device *pdev)
+ 			int inst_handles =
+ 				rd_reg32(&ctrl->r4tst[0].rdsta) &
+ 								RDSTA_IFMASK;
++
++			/*
++			 * If TrustZone is active then u-boot or the TrustZone
++			 * firmware must have initialized the RNG for us else we
++			 * cannot do so from Linux.
++			 *
++			 * We've previously detected TrustZone so now let's
++			 * detect if the RNG has been initialized.
++			 */
++			if (ctrlpriv->trust_zone) {
++				ret = -ENODEV;
++				if (ctrlpriv->rng4_sh_init || inst_handles)
++					ret = 0;
++				dev_info(dev, "TrustZone active RNG looks %s\n",
++					 ret ? "uninitialized" : "initialized");
++				break;
++			}
 +
  			/*
- 			 * if instantiate_rng(...) fails, the loop will rerun
- 			 * and the kick_trng(...) function will modfiy the
+ 			 * If either SH were instantiated by somebody else
+ 			 * (e.g. u-boot) then it is assumed that the entropy
 -- 
 2.7.4
