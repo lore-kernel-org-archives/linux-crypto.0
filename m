@@ -1,7 +1,7 @@
 From: Bryan O'Donoghue <pure.logic@nexus-software.ie>
-Subject: [RESEND PATCH 5/6] crypto: caam: add logic to detect when running under TrustZone
-Date: Wed, 24 Jan 2018 14:50:34 +0000
-Message-ID: <1516805435-15034-6-git-send-email-pure.logic@nexus-software.ie>
+Subject: [RESEND PATCH 4/6] imx7d: add CAAM clocks
+Date: Wed, 24 Jan 2018 14:50:33 +0000
+Message-ID: <1516805435-15034-5-git-send-email-pure.logic@nexus-software.ie>
 References: <1516805435-15034-1-git-send-email-pure.logic@nexus-software.ie>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -18,29 +18,12 @@ In-Reply-To: <1516805435-15034-1-git-send-email-pure.logic@nexus-software.ie>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This patch introduces logic to ascertain if the CAAM is running in
-TrustZone mode or not. When running in TrustZone mode the first page of the
-CAAM will read-back all zero for each register. This means for a register
-such as the MCR - if we detect an all zero register - we can run a simple
-test to try to toggle a bit inside of that register.
+From: Rui Miguel Silva <rui.silva@linaro.org>
 
-If the MCR is non-zero we already know we are in a non TrustZone mode.
+Add CAAM clocks so that we could use the Cryptographic Acceleration and
+Assurance Module (CAAM) hardware block.
 
-If we read zero in the MCR but can successfully toggle a bit inside of the
-MCR we know we are in a non TrustZone mode. So we set the bit back to zero
-and continue.
-
-If we read zero and cannot toggle a bit in the MCR we have successfully
-detected TrustZone mode.
-
-Once TrustZone is active the range of functions we can perform on CAAM is
-limited; however the CAAM is still usable provided a previous stage in the
-boot process initialized the block correctly.
-
-Separate patches will handle the case of determining if the block is usable
-when ctrlpriv->trustzone is true.
-
-Signed-off-by: Bryan O'Donoghue <pure.logic@nexus-software.ie>
+Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
 Cc: "Horia Geantă" <horia.geanta@nxp.com>
 Cc: Aymen Sghaier <aymen.sghaier@nxp.com>
 Cc: Fabio Estevam <fabio.estevam@nxp.com>
@@ -48,54 +31,39 @@ Cc: Peng Fan <peng.fan@nxp.com>
 Cc: Herbert Xu <herbert@gondor.apana.org.au>
 Cc: "David S. Miller" <davem@davemloft.net>
 Cc: Lukas Auer <lukas.auer@aisec.fraunhofer.de>
+Signed-off-by: Bryan O'Donoghue <pure.logic@nexus-software.ie>
 ---
- drivers/crypto/caam/ctrl.c   | 21 +++++++++++++++++++++
- drivers/crypto/caam/intern.h |  1 +
- 2 files changed, 22 insertions(+)
+ drivers/clk/imx/clk-imx7d.c             | 3 +++
+ include/dt-bindings/clock/imx7d-clock.h | 5 ++++-
+ 2 files changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
-index 0a1e96b..7fd3bfc 100644
---- a/drivers/crypto/caam/ctrl.c
-+++ b/drivers/crypto/caam/ctrl.c
-@@ -571,6 +571,27 @@ static int caam_probe(struct platform_device *pdev)
- 			       MCFGR_LONG_PTR : 0));
- 
- 	/*
-+	 * Detect if we are in TrustZone mode by trying to set MCFGR_LARGE_BURST
-+	 * In the first instance if TrustZone is active the MCR will read
-+	 * all-zero so if we read non-zero we know we can skip further checks.
-+	 * However its possible MCR is zero in non-TrustZone mode so if
-+	 * ctrl->mcr == 0 try to flip MCFGR_LARGE_BURST. If we cannot set the
-+	 * bit when MCR is zero we've detected TrustZone mode and then we know
-+	 * the first page of the CAAM is not accessible to Linux else flip
-+	 * MCFGR_LARGE_BURST back to off.
-+	 */
-+	if (!rd_reg32(&ctrl->mcr)) {
-+		clrsetbits_32(&ctrl->mcr, 0, MCFGR_LARGE_BURST);
-+		if (!rd_reg32(&ctrl->mcr))
-+			ctrlpriv->trust_zone = true;
-+		else
-+			clrsetbits_32(&ctrl->mcr, MCFGR_LARGE_BURST, 0);
-+
-+		if (ctrlpriv->trust_zone)
-+			dev_info(dev, "TrustZone mode detected\n");
-+	}
-+
-+	/*
- 	 *  Read the Compile Time paramters and SCFGR to determine
- 	 * if Virtualization is enabled for this platform
- 	 */
-diff --git a/drivers/crypto/caam/intern.h b/drivers/crypto/caam/intern.h
-index 91f1107..6ff382b 100644
---- a/drivers/crypto/caam/intern.h
-+++ b/drivers/crypto/caam/intern.h
-@@ -84,6 +84,7 @@ struct caam_drv_private {
- 	u8 qi_present;		/* Nonzero if QI present in device */
- 	int secvio_irq;		/* Security violation interrupt number */
- 	int virt_en;		/* Virtualization enabled in CAAM */
-+	bool trust_zone;	/* TrustZone mode detected */
- 
- #define	RNG4_MAX_HANDLES 2
- 	/* RNG4 block */
+diff --git a/drivers/clk/imx/clk-imx7d.c b/drivers/clk/imx/clk-imx7d.c
+index 80dc211..fc4f0c4 100644
+--- a/drivers/clk/imx/clk-imx7d.c
++++ b/drivers/clk/imx/clk-imx7d.c
+@@ -795,6 +795,9 @@ static void __init imx7d_clocks_init(struct device_node *ccm_node)
+ 	clks[IMX7D_DRAM_PHYM_ALT_ROOT_CLK] = imx_clk_gate4("dram_phym_alt_root_clk", "dram_phym_alt_post_div", base + 0x4130, 0);
+ 	clks[IMX7D_DRAM_ALT_ROOT_CLK] = imx_clk_gate4("dram_alt_root_clk", "dram_alt_post_div", base + 0x4130, 0);
+ 	clks[IMX7D_OCOTP_CLK] = imx_clk_gate4("ocotp_clk", "ipg_root_clk", base + 0x4230, 0);
++	clks[IMX7D_CAAM_MEM_CLK] = imx_clk_gate4("caam_mem_clk", "ahb_root_clk", base + 0x4240, 0);
++	clks[IMX7D_CAAM_ACLK_CLK] = imx_clk_gate4("caam_aclk_clk", "ahb_root_clk", base + 0x4240, 0);
++	clks[IMX7D_CAAM_IPG_CLK] = imx_clk_gate4("caam_ipg_clk", "ipg_root_clk", base + 0x4240, 0);
+ 	clks[IMX7D_USB_HSIC_ROOT_CLK] = imx_clk_gate4("usb_hsic_root_clk", "usb_hsic_post_div", base + 0x4420, 0);
+ 	clks[IMX7D_SDMA_CORE_CLK] = imx_clk_gate4("sdma_root_clk", "ahb_root_clk", base + 0x4480, 0);
+ 	clks[IMX7D_PCIE_CTRL_ROOT_CLK] = imx_clk_gate4("pcie_ctrl_root_clk", "pcie_ctrl_post_div", base + 0x4600, 0);
+diff --git a/include/dt-bindings/clock/imx7d-clock.h b/include/dt-bindings/clock/imx7d-clock.h
+index e2f99ae..e17b59e 100644
+--- a/include/dt-bindings/clock/imx7d-clock.h
++++ b/include/dt-bindings/clock/imx7d-clock.h
+@@ -452,5 +452,8 @@
+ #define IMX7D_OCOTP_CLK			439
+ #define IMX7D_NAND_RAWNAND_CLK		440
+ #define IMX7D_NAND_USDHC_BUS_RAWNAND_CLK 441
+-#define IMX7D_CLK_END			442
++#define IMX7D_CAAM_MEM_CLK		442
++#define IMX7D_CAAM_ACLK_CLK		443
++#define IMX7D_CAAM_IPG_CLK		444
++#define IMX7D_CLK_END			445
+ #endif /* __DT_BINDINGS_CLOCK_IMX7D_H */
 -- 
 2.7.4
