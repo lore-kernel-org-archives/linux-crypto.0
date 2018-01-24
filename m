@@ -1,13 +1,14 @@
 From: Bryan O'Donoghue <pure.logic@nexus-software.ie>
 Subject: Re: [RESEND PATCH 3/6] ARM: dts: imx7s: add CAAM device node
-Date: Wed, 24 Jan 2018 22:48:20 +0000
-Message-ID: <0b3c415f-64e4-1fcf-45ef-c447d65e8e89@nexus-software.ie>
+Date: Wed, 24 Jan 2018 22:56:45 +0000
+Message-ID: <08d9947e-4d2b-61f1-c8ed-0e1350025f76@nexus-software.ie>
 References: <1516805435-15034-1-git-send-email-pure.logic@nexus-software.ie>
  <1516805435-15034-4-git-send-email-pure.logic@nexus-software.ie>
  <1516817565.29323.74.camel@aisec.fraunhofer.de>
+ <0b3c415f-64e4-1fcf-45ef-c447d65e8e89@nexus-software.ie>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Cc: "peng.fan@nxp.com" <peng.fan@nxp.com>,
         "davem@davemloft.net" <davem@davemloft.net>,
         "ryan.harkin@linaro.org" <ryan.harkin@linaro.org>,
@@ -19,96 +20,43 @@ To: "Auer, Lukas" <lukas.auer@aisec.fraunhofer.de>,
         "aymen.sghaier@nxp.com" <aymen.sghaier@nxp.com>,
         "horia.geanta@nxp.com" <horia.geanta@nxp.com>,
         "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1516817565.29323.74.camel@aisec.fraunhofer.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-wm0-f54.google.com ([74.125.82.54]:45029 "EHLO
+        mail-wm0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932294AbeAXW4q (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 24 Jan 2018 17:56:46 -0500
+Received: by mail-wm0-f54.google.com with SMTP id t74so11395434wme.3
+        for <linux-crypto@vger.kernel.org>; Wed, 24 Jan 2018 14:56:46 -0800 (PST)
+In-Reply-To: <0b3c415f-64e4-1fcf-45ef-c447d65e8e89@nexus-software.ie>
 Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On 24/01/18 18:12, Auer, Lukas wrote:
-> On Wed, 2018-01-24 at 14:50 +0000, Bryan O'Donoghue wrote:
->> From: Rui Miguel Silva <rui.silva@linaro.org>
->>
->> Add CAAM device node to the i.MX7s device tree.
->>
->> Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
->> Cc: "Horia Geantă" <horia.geanta@nxp.com>
->> Cc: Aymen Sghaier <aymen.sghaier@nxp.com>
->> Cc: Fabio Estevam <fabio.estevam@nxp.com>
->> Cc: Peng Fan <peng.fan@nxp.com>
->> Cc: Herbert Xu <herbert@gondor.apana.org.au>
->> Cc: "David S. Miller" <davem@davemloft.net>
->> Cc: Lukas Auer <lukas.auer@aisec.fraunhofer.de>
->> Signed-off-by: Bryan O'Donoghue <pure.logic@nexus-software.ie>
->> ---
->>   arch/arm/boot/dts/imx7s.dtsi | 26 ++++++++++++++++++++++++++
->>   1 file changed, 26 insertions(+)
->>
->> diff --git a/arch/arm/boot/dts/imx7s.dtsi
->> b/arch/arm/boot/dts/imx7s.dtsi
->> index 82ad26e..0da146e 100644
->> --- a/arch/arm/boot/dts/imx7s.dtsi
->> +++ b/arch/arm/boot/dts/imx7s.dtsi
->> @@ -805,6 +805,32 @@
->>   				status = "disabled";
->>   			};
->>   
->> +			crypto: caam@30900000 {
->> +				compatible = "fsl,sec-v4.0";
->> +				fsl,sec-era = <4>;
->> +				#address-cells = <1>;
->> +				#size-cells = <1>;
->> +				reg = <0x30900000 0x10000>;
->> +				ranges = <0 0x30900000 0x10000>;
->> +				clocks = <&clks IMX7D_CAAM_MEM_CLK>,
->> +					 <&clks
->> IMX7D_CAAM_ACLK_CLK>,
->> +					 <&clks IMX7D_CAAM_IPG_CLK>,
->> +					 <&clks IMX7D_EIM_ROOT_CLK>;
->> +				clock-names = "mem", "aclk", "ipg",
->> "emi_slow";
->> +
->> +				sec_jr0: jr0@1000 {
->> +					compatible = "fsl,sec-v4.0-
->> job-ring";
->> +					reg = <0x1000 0x1000>;
->> +					interrupts = <GIC_SPI 105
->> IRQ_TYPE_LEVEL_HIGH>;
->> +				};
->> +
->> +				sec_jr1: jr1@2000 {
->> +					compatible = "fsl,sec-v4.0-
->> job-ring";
->> +					reg = <0x2000 0x1000>;
->> +					interrupts = <GIC_SPI 106
->> IRQ_TYPE_LEVEL_HIGH>;
->> +				};
->> +			};
->> +
->>   			flexcan1: can@30a00000 {
->>   				compatible = "fsl,imx7d-flexcan",
->> "fsl,imx6q-flexcan";
->>   				reg = <0x30a00000 0x10000>;
+On 24/01/18 22:48, Bryan O'Donoghue wrote:
+>> The clock configuration has changed to just one CAAM-specific clock in
+>> addition to the ahb clock. This also means that additional
+>> modifications to the CAAM driver are necessary or it will complain that
+>> it doesn't find all clocks.
 > 
-> Looking at the device tree from the NXP kernel [1], the job ring and
-> clock configurations should be slightly different.
+> Sure - but, those clock changes aren't merged to upstream just yet, so 
+> we won't those changes to this DTS addition yet.
 > 
-> The job ring configuration has one additional job ring at offset 3000
-> and interrupt 114.
+> Thanks for the review.
+> 
+> ---
+> bod
 
-Yes true, that should be added.
+Ah Rui has pointed out to me for i.mx7 there are two clocks on on i.mx6 
+there are four clocks.
 
-We will do that in v2, thanks for spotting.
+The bit that confused me there was the clock names on the 4.1 tree you 
+pointed to was clock-names = "caam_ipg", "caam_aclk"; and for 4.15 those 
+should be "ipg" and "aclk" by the looks of it.
 
-> The clock configuration has changed to just one CAAM-specific clock in
-> addition to the ahb clock. This also means that additional
-> modifications to the CAAM driver are necessary or it will complain that
-> it doesn't find all clocks.
+So yes.
 
-Sure - but, those clock changes aren't merged to upstream just yet, so 
-we won't those changes to this DTS addition yet.
-
-Thanks for the review.
+We will add the second job-ring and subtract the two extraneous clocks.
 
 ---
 bod
