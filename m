@@ -1,92 +1,68 @@
-From: "Auer, Lukas" <lukas.auer@aisec.fraunhofer.de>
-Subject: Re: [RESEND PATCH 6/6] crypto: caam: detect RNG init when TrustZone
- is active
-Date: Thu, 25 Jan 2018 13:20:55 +0000
-Message-ID: <1516886454.3733.23.camel@aisec.fraunhofer.de>
-References: <1516805435-15034-1-git-send-email-pure.logic@nexus-software.ie>
-         <1516805435-15034-7-git-send-email-pure.logic@nexus-software.ie>
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [PATCH RFC 0/3] API for 128-bit IO access
+Date: Thu, 25 Jan 2018 14:59:34 +0100
+Message-ID: <CAK8P3a1gn5KFur-Vs9wCW4odLyJ=WbWjcHb7bgEBgUjETG4VEA@mail.gmail.com>
+References: <CAK8P3a3TEV7Uyo_oBcMz_GYEYTB+V5AhDgbOgCEW-+X1h7sXEg@mail.gmail.com>
+ <20180125113843.vgv6kyp7qjd75qif@yury-thinkpad>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: "peng.fan@nxp.com" <peng.fan@nxp.com>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "ryan.harkin@linaro.org" <ryan.harkin@linaro.org>,
-        "fabio.estevam@nxp.com" <fabio.estevam@nxp.com>,
-        "rui.silva@linaro.org" <rui.silva@linaro.org>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>
-To: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "aymen.sghaier@nxp.com" <aymen.sghaier@nxp.com>,
-        "horia.geanta@nxp.com" <horia.geanta@nxp.com>,
-        "pure.logic@nexus-software.ie" <pure.logic@nexus-software.ie>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-edgeka24.fraunhofer.de ([153.96.1.24]:38296 "EHLO
-        mail-edgeKA24.fraunhofer.de" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1751674AbeAYNVE (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 25 Jan 2018 08:21:04 -0500
-In-Reply-To: <1516805435-15034-7-git-send-email-pure.logic@nexus-software.ie>
-Content-Language: en-US
-Content-ID: <0EA716E512C8F84598CEA20171FE1BE0@xch.fraunhofer.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Cc: Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        linux-arch <linux-arch@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>, Al Viro <viro@zeniv.linux.org.uk>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Andrew Pinski <Andrew.Pinski@cavium.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Geethasowjanya Akula <Geethasowjanya.Akula@cavium.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Ingo Molnar <mingo@kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        Laura Abbott <labbott@redhat.com>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Sunil Goutham <Sunil.Goutham@cavium.com>,
+        Will Deacon <will.deacon@arm.com>,
+        Je
+To: Yury Norov <ynorov@caviumnetworks.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20180125113843.vgv6kyp7qjd75qif@yury-thinkpad>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-T24gV2VkLCAyMDE4LTAxLTI0IGF0IDE0OjUwICswMDAwLCBCcnlhbiBPJ0Rvbm9naHVlIHdyb3Rl
-Og0KPiBXaGVuIFRydXN0Wm9uZSBpcyBlbmFibGVkIG9uIHNlYzQgY29tcGF0aWJsZSBzaWxpY29u
-IHRoZSBmaXJzdCBwYWdlDQo+IG9mIHRoZQ0KPiBDQUFNIGlzIHJlc2VydmVkIGZvciBUcnVzdFpv
-bmUgb25seSwgdGhpcyBtZWFucyB0aGF0IGFjY2VzcyB0byB0aGUNCj4gZGVjbw0KPiByZWdpc3Rl
-cnMgaXMgcmVzdHJpY3RlZCBhbmQgd2lsbCByZXR1cm4gemVybyB3aGVuIHJlYWQuDQo+IA0KPiBU
-aGUgc29sdXRpb24gdG8gdGhpcyBwcm9ibGVtIGlzIHRvIGluaXRpYWxpemUgdGhlIFJORyBwcmlv
-ciB0bw0KPiBUcnVzdFpvbmUNCj4gYmVpbmcgZW5hYmxlZCBvciB0byBpbml0aWFsaXplIHRoZSBS
-TkcgZnJvbSBhIFRydXN0Wm9uZSBjb250ZXh0IGFuZA0KPiBzaW11bHRhbmVvdXNseSB0byBlbnN1
-cmUgdGhhdCB0aGUgam9iLXJpbmcgcmVnaXN0ZXJzIGhhdmUgYmVlbg0KPiBhc3NpZ25lZCB0bw0K
-PiB0aGUgY29ycmVjdCBub24tVHJ1c3Rab25lIGNvbnRleHQuDQo+IA0KPiBBc3NpZ25pbmcgb2Yg
-dGhlIGpvYi1yaW5nIHJlZ2lzdGVycyBpcyBhIHRhc2sgZm9yIHUtYm9vdCBvcg0KPiBPUFRFRS9U
-cnVzdFpvbmUNCj4gYXMgaXMgdGhlIGluaXRpYWxpemF0aW9uIG9mIHRoZSBSTkcuIFRoaXMgcGF0
-Y2ggYWRkcyBsb2dpYyB0byBkZXRlY3QNCj4gUk5HDQo+IGluaXRpYWxpemF0aW9uIGlmIGFuZCBv
-bmx5IGlmIFRydXN0Wm9uZSBoYXMgYmVlbiBkZXRlY3RlZCBhcyBhY3RpdmUNCj4gb24gdGhlDQo+
-IENBQU0gYmxvY2suDQo+IA0KPiBJZiBUcnVzdFpvbmUgaXMgaW5pdGlhbGl6ZWQgYW5kIHRoZSBS
-TkcgbG9va3MgdG8gYmUgc2V0dXAgLSB3ZSBtYXJrDQo+IHRoZSBSTkcNCj4gYXMgZ29vZCB0byBn
-byBhbmQgY29udGludWUgdG8gbG9hZCwgZWxzZSB3ZSBtYXJrIHRoZSBSTkcgYXMgYmFkIGFuZA0K
-PiBiYWlsDQo+IG91dC4NCj4gDQo+IE1vcmUgZGV0YWlsIG9uIHRoZSBvcmlnaW5hbCBwcm9ibGVt
-IGFuZCB0aGUgc3BsaXQgZml4IGJldHdlZW4gdS1ib290DQo+IGFuZA0KPiBMaW51eCBpcyBhdmFp
-bGFibGUgaW4gdGhlc2UgdHdvIHRocmVhZHMNCj4gDQo+IExpbms6IGh0dHBzOi8vZ2l0aHViLmNv
-bS9PUC1URUUvb3B0ZWVfb3MvaXNzdWVzLzE0MDgNCj4gTGluazogaHR0cHM6Ly90aW55dXJsLmNv
-bS95YW01Z3Y5YQ0KPiBMaW5rOiBodHRwczovL3BhdGNod29yay5vemxhYnMub3JnL2NvdmVyLzg2
-NTA0Mg0KPiANCj4gU2lnbmVkLW9mZi1ieTogQnJ5YW4gTydEb25vZ2h1ZSA8cHVyZS5sb2dpY0Bu
-ZXh1cy1zb2Z0d2FyZS5pZT4NCj4gQ2M6ICJIb3JpYSBHZWFudMSDIiA8aG9yaWEuZ2VhbnRhQG54
-cC5jb20+DQo+IENjOiBBeW1lbiBTZ2hhaWVyIDxheW1lbi5zZ2hhaWVyQG54cC5jb20+DQo+IENj
-OiBGYWJpbyBFc3RldmFtIDxmYWJpby5lc3RldmFtQG54cC5jb20+DQo+IENjOiBQZW5nIEZhbiA8
-cGVuZy5mYW5AbnhwLmNvbT4NCj4gQ2M6IEhlcmJlcnQgWHUgPGhlcmJlcnRAZ29uZG9yLmFwYW5h
-Lm9yZy5hdT4NCj4gQ2M6ICJEYXZpZCBTLiBNaWxsZXIiIDxkYXZlbUBkYXZlbWxvZnQubmV0Pg0K
-PiBDYzogTHVrYXMgQXVlciA8bHVrYXMuYXVlckBhaXNlYy5mcmF1bmhvZmVyLmRlPg0KPiAtLS0N
-Cj4gIGRyaXZlcnMvY3J5cHRvL2NhYW0vY3RybC5jIHwgMTggKysrKysrKysrKysrKysrKysrDQo+
-ICAxIGZpbGUgY2hhbmdlZCwgMTggaW5zZXJ0aW9ucygrKQ0KPiANCj4gZGlmZiAtLWdpdCBhL2Ry
-aXZlcnMvY3J5cHRvL2NhYW0vY3RybC5jIGIvZHJpdmVycy9jcnlwdG8vY2FhbS9jdHJsLmMNCj4g
-aW5kZXggN2ZkM2JmYy4uNjZhN2M3ZSAxMDA2NDQNCj4gLS0tIGEvZHJpdmVycy9jcnlwdG8vY2Fh
-bS9jdHJsLmMNCj4gKysrIGIvZHJpdmVycy9jcnlwdG8vY2FhbS9jdHJsLmMNCj4gQEAgLTcxMSw2
-ICs3MTEsMjQgQEAgc3RhdGljIGludCBjYWFtX3Byb2JlKHN0cnVjdCBwbGF0Zm9ybV9kZXZpY2UN
-Cj4gKnBkZXYpDQo+ICAJCQlpbnQgaW5zdF9oYW5kbGVzID0NCj4gIAkJCQlyZF9yZWczMigmY3Ry
-bC0+cjR0c3RbMF0ucmRzdGEpICYNCj4gIAkJCQkJCQkJUkRTVA0KPiBBX0lGTUFTSzsNCj4gKw0K
-PiArCQkJLyoNCj4gKwkJCSAqIElmIFRydXN0Wm9uZSBpcyBhY3RpdmUgdGhlbiB1LWJvb3Qgb3Ig
-dGhlDQo+IFRydXN0Wm9uZQ0KPiArCQkJICogZmlybXdhcmUgbXVzdCBoYXZlIGluaXRpYWxpemVk
-IHRoZSBSTkcNCj4gZm9yIHVzIGVsc2Ugd2UNCj4gKwkJCSAqIGNhbm5vdCBkbyBzbyBmcm9tIExp
-bnV4Lg0KPiArCQkJICoNCj4gKwkJCSAqIFdlJ3ZlIHByZXZpb3VzbHkgZGV0ZWN0ZWQgVHJ1c3Ra
-b25lIHNvDQo+IG5vdyBsZXQncw0KPiArCQkJICogZGV0ZWN0IGlmIHRoZSBSTkcgaGFzIGJlZW4g
-aW5pdGlhbGl6ZWQuDQo+ICsJCQkgKi8NCj4gKwkJCWlmIChjdHJscHJpdi0+dHJ1c3Rfem9uZSkg
-ew0KPiArCQkJCXJldCA9IC1FTk9ERVY7DQo+ICsJCQkJaWYgKGN0cmxwcml2LT5ybmc0X3NoX2lu
-aXQgfHwNCj4gaW5zdF9oYW5kbGVzKQ0KPiArCQkJCQlyZXQgPSAwOw0KPiArCQkJCWRldl9pbmZv
-KGRldiwgIlRydXN0Wm9uZSBhY3RpdmUgUk5HDQo+IGxvb2tzICVzXG4iLA0KPiArCQkJCQkgcmV0
-ID8gInVuaW5pdGlhbGl6ZWQiIDoNCj4gImluaXRpYWxpemVkIik7DQo+ICsJCQkJYnJlYWs7DQo+
-ICsJCQl9DQo+ICsNCj4gIAkJCS8qDQo+ICAJCQkgKiBJZiBlaXRoZXIgU0ggd2VyZSBpbnN0YW50
-aWF0ZWQgYnkNCj4gc29tZWJvZHkgZWxzZQ0KPiAgCQkJICogKGUuZy4gdS1ib290KSB0aGVuIGl0
-IGlzIGFzc3VtZWQgdGhhdCB0aGUNCj4gZW50cm9weQ0KDQpUaGlzIChpbiBhZGRpdGlvbiB0byBw
-YXRjaCA1KSBzaG91bGQgbm90IGJlIHJlcXVpcmVkIGlmIGFsbCBSTkcgc3RhdGUNCmhhbmRsZXMg
-YXJlIGFscmVhZHkgaW5zdGFudGlhdGVkLiBUaGUgaW5zdGFudGlhdGVfcm5nKCkgZnVuY3Rpb24g
-Y2hlY2tzDQplYWNoIHN0YXRlIGhhbmRsZSBpZiBpdCBpcyBhbHJlYWR5IGluc3RhbnRpYXRlZCBi
-ZWZvcmUgdHJ5aW5nIHRvIGRvIHNvDQppdHNlbGYuIERFQzAgd291bGQgdGhlcmVmb3JlIG5ldmVy
-IGJlIHVzZWQgYW5kIHRoZSBwcm9iZSBjYWxsIHNob3VsZA0Kc3VjY2VlZCBpbiBub24tc2VjdXJl
-IG1vZGUuDQoNCkkgaGF2ZSBzdWJtaXR0ZWQgYSBwYXRjaCBbMV0gdG8gdS1ib290IHRoYXQgaW5z
-dGFudGlhdGVzIGFsbCBSTkcgc3RhdGUNCmhhbmRsZXMuDQoNClRoYW5rcywNCkx1a2FzDQoNClsx
-XSBodHRwczovL3d3dy5tYWlsLWFyY2hpdmUuY29tL3UtYm9vdEBsaXN0cy5kZW54LmRlL21zZzI3
-NjE4NC5odG1s
+On Thu, Jan 25, 2018 at 12:38 PM, Yury Norov <ynorov@caviumnetworks.com> wrote:
+> On Wed, Jan 24, 2018 at 11:28:55AM +0100, Arnd Bergmann wrote:
+>> On Wed, Jan 24, 2018 at 10:05 AM, Yury Norov <ynorov@caviumnetworks.com> wrote:
+
+> Thanks for doing this test. Looking at this I realize that this is
+> not the architecture feature but compiler feature. So if we add
+> 128-bit interface, it would be reasonable to add it for all targets
+> that compiled with toolchain supporting 128-bit accesses.
+>
+> There's already the option ARCH_SUPPORTS_INT128 that is enabled for
+> x86_64 in arch/x86/Kconfig and conditionally enabled for arm64 in
+> arch/arm64/Makefile:
+> KBUILD_CFLAGS    += $(call cc-ifversion, -ge, 0500, -DCONFIG_ARCH_SUPPORTS_INT128)
+>
+> It is used in include/linux/math64.h and in lib/ubsan.c, not so wide.
+>
+> So I find things little messed. Crypto code ignores compilers' ability
+> to operate with 128-bit numbers. Ubsan and math64 relies on compiler
+> version (at least for arm64, and I doubt it would work correctly with clang).
+> And now I introduce HAVE_128BIT_ACCESS with the same meaning for memory
+> access.
+>
+> I think it's time to unify 128-bit code:
+>  - enable CONFIG_ARCH_SUPPORTS_INT128 if compiler supports it, ie check
+>    it like you do below;
+>  - declare u128 as structure or typedef depending on ARCH_SUPPORTS_INT128
+>    in generic include/linux/int128.h, as you suggest here;
+>  - switch this series to ARCH_SUPPORTS_INT128.
+>
+> Does it sound reasonable?
+
+The CONFIG_* symbol namespace should not be set dynamically. However, you
+can define a symbol with another name, e.g. ARCH_SUPPORTS_INT128 (without
+CONFIG_ prefix) in linux/compiler-gcc.h based on the version and BITS_PER_LONG.
+
+         Arnd
