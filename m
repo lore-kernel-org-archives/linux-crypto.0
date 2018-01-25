@@ -1,68 +1,61 @@
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [PATCH RFC 0/3] API for 128-bit IO access
-Date: Thu, 25 Jan 2018 14:59:34 +0100
-Message-ID: <CAK8P3a1gn5KFur-Vs9wCW4odLyJ=WbWjcHb7bgEBgUjETG4VEA@mail.gmail.com>
-References: <CAK8P3a3TEV7Uyo_oBcMz_GYEYTB+V5AhDgbOgCEW-+X1h7sXEg@mail.gmail.com>
- <20180125113843.vgv6kyp7qjd75qif@yury-thinkpad>
+From: =?iso-8859-2?Q?Horia_Geant=E3?= <horia.geanta@nxp.com>
+Subject: Re: [RESEND PATCH 1/6] crypto: caam: Fix null dereference at error
+ path
+Date: Thu, 25 Jan 2018 17:09:42 +0000
+Message-ID: <VI1PR0402MB33427BA4CB6A5D768E35CA9498E10@VI1PR0402MB3342.eurprd04.prod.outlook.com>
+References: <1516805435-15034-1-git-send-email-pure.logic@nexus-software.ie>
+ <1516805435-15034-2-git-send-email-pure.logic@nexus-software.ie>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        linux-arch <linux-arch@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>, Al Viro <viro@zeniv.linux.org.uk>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Andrew Pinski <Andrew.Pinski@cavium.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Geethasowjanya Akula <Geethasowjanya.Akula@cavium.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Ingo Molnar <mingo@kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Laura Abbott <labbott@redhat.com>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Sunil Goutham <Sunil.Goutham@cavium.com>,
-        Will Deacon <will.deacon@arm.com>,
-        Je
-To: Yury Norov <ynorov@caviumnetworks.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180125113843.vgv6kyp7qjd75qif@yury-thinkpad>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="iso-8859-2"
+Content-Transfer-Encoding: quoted-printable
+Cc: Fabio Estevam <fabio.estevam@nxp.com>, Peng Fan <peng.fan@nxp.com>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "lukas.auer@aisec.fraunhofer.de" <lukas.auer@aisec.fraunhofer.de>,
+        "rui.silva@linaro.org" <rui.silva@linaro.org>,
+        "ryan.harkin@linaro.org" <ryan.harkin@linaro.org>
+To: Bryan O'Donoghue <pure.logic@nexus-software.ie>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-db5eur01on0083.outbound.protection.outlook.com ([104.47.2.83]:24992
+        "EHLO EUR01-DB5-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1750992AbeAYRJq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 25 Jan 2018 12:09:46 -0500
+Content-Language: en-US
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jan 25, 2018 at 12:38 PM, Yury Norov <ynorov@caviumnetworks.com> wrote:
-> On Wed, Jan 24, 2018 at 11:28:55AM +0100, Arnd Bergmann wrote:
->> On Wed, Jan 24, 2018 at 10:05 AM, Yury Norov <ynorov@caviumnetworks.com> wrote:
-
-> Thanks for doing this test. Looking at this I realize that this is
-> not the architecture feature but compiler feature. So if we add
-> 128-bit interface, it would be reasonable to add it for all targets
-> that compiled with toolchain supporting 128-bit accesses.
->
-> There's already the option ARCH_SUPPORTS_INT128 that is enabled for
-> x86_64 in arch/x86/Kconfig and conditionally enabled for arm64 in
-> arch/arm64/Makefile:
-> KBUILD_CFLAGS    += $(call cc-ifversion, -ge, 0500, -DCONFIG_ARCH_SUPPORTS_INT128)
->
-> It is used in include/linux/math64.h and in lib/ubsan.c, not so wide.
->
-> So I find things little messed. Crypto code ignores compilers' ability
-> to operate with 128-bit numbers. Ubsan and math64 relies on compiler
-> version (at least for arm64, and I doubt it would work correctly with clang).
-> And now I introduce HAVE_128BIT_ACCESS with the same meaning for memory
-> access.
->
-> I think it's time to unify 128-bit code:
->  - enable CONFIG_ARCH_SUPPORTS_INT128 if compiler supports it, ie check
->    it like you do below;
->  - declare u128 as structure or typedef depending on ARCH_SUPPORTS_INT128
->    in generic include/linux/int128.h, as you suggest here;
->  - switch this series to ARCH_SUPPORTS_INT128.
->
-> Does it sound reasonable?
-
-The CONFIG_* symbol namespace should not be set dynamically. However, you
-can define a symbol with another name, e.g. ARCH_SUPPORTS_INT128 (without
-CONFIG_ prefix) in linux/compiler-gcc.h based on the version and BITS_PER_LONG.
-
-         Arnd
+On 1/24/2018 4:50 PM, Bryan O'Donoghue wrote:=0A=
+> From: Rui Miguel Silva <rui.silva@linaro.org>=0A=
+> =0A=
+> caam_remove already removes the debugfs entry, so we need to remove the o=
+ne=0A=
+> immediately before calling caam_remove.=0A=
+> =0A=
+> This fix a NULL dereference at error paths is caam_probe fail.=0A=
+> =0A=
+> [bod: changed name prefix to "crypto: caam: Fix .."]=0A=
+> [bod: added Fixes tag]=0A=
+> =0A=
+> Fixes: 67c2315def06 ("crypto: caam - add Queue Interface (QI) backend=0A=
+> support")=0A=
+Cc: <stable@vger.kernel.org> # 4.12+=0A=
+=0A=
+> =0A=
+> Tested-by: Ryan Harkin <ryan.harkin@linaro.org>=0A=
+> Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>=0A=
+> Cc: "Horia Geant=E3" <horia.geanta@nxp.com>=0A=
+> Cc: Aymen Sghaier <aymen.sghaier@nxp.com>=0A=
+> Cc: Fabio Estevam <fabio.estevam@nxp.com>=0A=
+> Cc: Peng Fan <peng.fan@nxp.com>=0A=
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>=0A=
+> Cc: "David S. Miller" <davem@davemloft.net>=0A=
+> Cc: Lukas Auer <lukas.auer@aisec.fraunhofer.de>=0A=
+> Signed-off-by: Bryan O'Donoghue <pure.logic@nexus-software.ie>=0A=
+Reviewed-by: Horia Geant=E3 <horia.geanta@nxp.com>=0A=
+=0A=
+Thanks,=0A=
+Horia=0A=
