@@ -1,122 +1,109 @@
 From: Eric Biggers <ebiggers3@gmail.com>
-Subject: [PATCH] crypto: mcryptd - remove pointless wrapper functions
-Date: Wed, 24 Jan 2018 19:09:07 -0800
-Message-ID: <20180125030907.679-1-ebiggers3@gmail.com>
+Subject: [PATCH] crypto: sha1-mb - remove HASH_FIRST flag
+Date: Wed, 24 Jan 2018 19:10:08 -0800
+Message-ID: <20180125031008.778-1-ebiggers3@gmail.com>
 Cc: "David S . Miller" <davem@davemloft.net>,
         Tim Chen <tim.c.chen@linux.intel.com>,
         Eric Biggers <ebiggers@google.com>
 To: linux-crypto@vger.kernel.org,
         Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pf0-f196.google.com ([209.85.192.196]:46822 "EHLO
-        mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932956AbeAYDKC (ORCPT
+Received: from mail-pg0-f68.google.com ([74.125.83.68]:44410 "EHLO
+        mail-pg0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932956AbeAYDKM (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 24 Jan 2018 22:10:02 -0500
-Received: by mail-pf0-f196.google.com with SMTP id y5so4759691pff.13
-        for <linux-crypto@vger.kernel.org>; Wed, 24 Jan 2018 19:10:01 -0800 (PST)
+        Wed, 24 Jan 2018 22:10:12 -0500
+Received: by mail-pg0-f68.google.com with SMTP id m20so4173422pgc.11
+        for <linux-crypto@vger.kernel.org>; Wed, 24 Jan 2018 19:10:12 -0800 (PST)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 From: Eric Biggers <ebiggers@google.com>
 
-There is no need for ahash_mcryptd_{update,final,finup,digest}(); we
-should just call crypto_ahash_*() directly.
+The HASH_FIRST flag is never set.  Remove it.
 
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- crypto/mcryptd.c               | 34 ++++------------------------------
- include/crypto/internal/hash.h |  5 -----
- 2 files changed, 4 insertions(+), 35 deletions(-)
+ arch/x86/crypto/sha1-mb/sha1_mb.c     | 28 +++-------------------------
+ arch/x86/crypto/sha1-mb/sha1_mb_ctx.h |  8 +++-----
+ 2 files changed, 6 insertions(+), 30 deletions(-)
 
-diff --git a/crypto/mcryptd.c b/crypto/mcryptd.c
-index fe5129d6ff4e..f14152147ce8 100644
---- a/crypto/mcryptd.c
-+++ b/crypto/mcryptd.c
-@@ -367,7 +367,7 @@ static void mcryptd_hash_update(struct crypto_async_request *req_async, int err)
- 		goto out;
+diff --git a/arch/x86/crypto/sha1-mb/sha1_mb.c b/arch/x86/crypto/sha1-mb/sha1_mb.c
+index acf9fdf01671..e17655ffde79 100644
+--- a/arch/x86/crypto/sha1-mb/sha1_mb.c
++++ b/arch/x86/crypto/sha1-mb/sha1_mb.c
+@@ -106,13 +106,6 @@ static asmlinkage struct job_sha1* (*sha1_job_mgr_flush)
+ static asmlinkage struct job_sha1* (*sha1_job_mgr_get_comp_job)
+ 						(struct sha1_mb_mgr *state);
  
- 	rctx->out = req->result;
--	err = ahash_mcryptd_update(&rctx->areq);
-+	err = crypto_ahash_update(&rctx->areq);
- 	if (err) {
- 		req->base.complete = rctx->complete;
- 		goto out;
-@@ -394,7 +394,7 @@ static void mcryptd_hash_final(struct crypto_async_request *req_async, int err)
- 		goto out;
- 
- 	rctx->out = req->result;
--	err = ahash_mcryptd_final(&rctx->areq);
-+	err = crypto_ahash_final(&rctx->areq);
- 	if (err) {
- 		req->base.complete = rctx->complete;
- 		goto out;
-@@ -420,7 +420,7 @@ static void mcryptd_hash_finup(struct crypto_async_request *req_async, int err)
- 	if (unlikely(err == -EINPROGRESS))
- 		goto out;
- 	rctx->out = req->result;
--	err = ahash_mcryptd_finup(&rctx->areq);
-+	err = crypto_ahash_finup(&rctx->areq);
- 
- 	if (err) {
- 		req->base.complete = rctx->complete;
-@@ -455,7 +455,7 @@ static void mcryptd_hash_digest(struct crypto_async_request *req_async, int err)
- 						rctx->complete, req_async);
- 
- 	rctx->out = req->result;
--	err = ahash_mcryptd_digest(desc);
-+	err = crypto_ahash_init(desc) ?: crypto_ahash_finup(desc);
- 
- out:
- 	local_bh_disable();
-@@ -612,32 +612,6 @@ struct mcryptd_ahash *mcryptd_alloc_ahash(const char *alg_name,
- }
- EXPORT_SYMBOL_GPL(mcryptd_alloc_ahash);
- 
--int ahash_mcryptd_digest(struct ahash_request *desc)
+-static inline void sha1_init_digest(uint32_t *digest)
 -{
--	return crypto_ahash_init(desc) ?: ahash_mcryptd_finup(desc);
+-	static const uint32_t initial_digest[SHA1_DIGEST_LENGTH] = {SHA1_H0,
+-					SHA1_H1, SHA1_H2, SHA1_H3, SHA1_H4 };
+-	memcpy(digest, initial_digest, sizeof(initial_digest));
 -}
 -
--int ahash_mcryptd_update(struct ahash_request *desc)
--{
--	/* alignment is to be done by multi-buffer crypto algorithm if needed */
--
--	return crypto_ahash_update(desc);
--}
--
--int ahash_mcryptd_finup(struct ahash_request *desc)
--{
--	/* alignment is to be done by multi-buffer crypto algorithm if needed */
--
--	return crypto_ahash_finup(desc);
--}
--
--int ahash_mcryptd_final(struct ahash_request *desc)
--{
--	/* alignment is to be done by multi-buffer crypto algorithm if needed */
--
--	return crypto_ahash_final(desc);
--}
--
- struct crypto_ahash *mcryptd_ahash_child(struct mcryptd_ahash *tfm)
+ static inline uint32_t sha1_pad(uint8_t padblock[SHA1_BLOCK_SIZE * 2],
+ 			 uint64_t total_len)
  {
- 	struct mcryptd_hash_ctx *ctx = crypto_ahash_ctx(&tfm->base);
-diff --git a/include/crypto/internal/hash.h b/include/crypto/internal/hash.h
-index 27040a46d50a..a0b0ad9d585e 100644
---- a/include/crypto/internal/hash.h
-+++ b/include/crypto/internal/hash.h
-@@ -126,11 +126,6 @@ int shash_ahash_update(struct ahash_request *req, struct shash_desc *desc);
- int shash_ahash_finup(struct ahash_request *req, struct shash_desc *desc);
- int shash_ahash_digest(struct ahash_request *req, struct shash_desc *desc);
+@@ -244,11 +237,8 @@ static struct sha1_hash_ctx *sha1_ctx_mgr_submit(struct sha1_ctx_mgr *mgr,
+ 					  uint32_t len,
+ 					  int flags)
+ {
+-	if (flags & (~HASH_ENTIRE)) {
+-		/*
+-		 * User should not pass anything other than FIRST, UPDATE, or
+-		 * LAST
+-		 */
++	if (flags & ~(HASH_UPDATE | HASH_LAST)) {
++		/* User should not pass anything other than UPDATE or LAST */
+ 		ctx->error = HASH_CTX_ERROR_INVALID_FLAGS;
+ 		return ctx;
+ 	}
+@@ -259,24 +249,12 @@ static struct sha1_hash_ctx *sha1_ctx_mgr_submit(struct sha1_ctx_mgr *mgr,
+ 		return ctx;
+ 	}
  
--int ahash_mcryptd_update(struct ahash_request *desc);
--int ahash_mcryptd_final(struct ahash_request *desc);
--int ahash_mcryptd_finup(struct ahash_request *desc);
--int ahash_mcryptd_digest(struct ahash_request *desc);
+-	if ((ctx->status & HASH_CTX_STS_COMPLETE) && !(flags & HASH_FIRST)) {
++	if (ctx->status & HASH_CTX_STS_COMPLETE) {
+ 		/* Cannot update a finished job. */
+ 		ctx->error = HASH_CTX_ERROR_ALREADY_COMPLETED;
+ 		return ctx;
+ 	}
+ 
 -
- int crypto_init_shash_ops_async(struct crypto_tfm *tfm);
+-	if (flags & HASH_FIRST) {
+-		/* Init digest */
+-		sha1_init_digest(ctx->job.result_digest);
+-
+-		/* Reset byte counter */
+-		ctx->total_length = 0;
+-
+-		/* Clear extra blocks */
+-		ctx->partial_block_buffer_length = 0;
+-	}
+-
+ 	/*
+ 	 * If we made it here, there were no errors during this call to
+ 	 * submit
+diff --git a/arch/x86/crypto/sha1-mb/sha1_mb_ctx.h b/arch/x86/crypto/sha1-mb/sha1_mb_ctx.h
+index 13590ccf965c..9454bd16f9f8 100644
+--- a/arch/x86/crypto/sha1-mb/sha1_mb_ctx.h
++++ b/arch/x86/crypto/sha1-mb/sha1_mb_ctx.h
+@@ -57,11 +57,9 @@
+ #include "sha1_mb_mgr.h"
  
- static inline void *crypto_ahash_ctx(struct crypto_ahash *tfm)
+ #define HASH_UPDATE          0x00
+-#define HASH_FIRST           0x01
+-#define HASH_LAST            0x02
+-#define HASH_ENTIRE          0x03
+-#define HASH_DONE	     0x04
+-#define HASH_FINAL	     0x08
++#define HASH_LAST            0x01
++#define HASH_DONE	     0x02
++#define HASH_FINAL	     0x04
+ 
+ #define HASH_CTX_STS_IDLE       0x00
+ #define HASH_CTX_STS_PROCESSING 0x01
 -- 
 2.16.0
