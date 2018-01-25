@@ -1,62 +1,122 @@
-From: Bryan O'Donoghue <pure.logic@nexus-software.ie>
-Subject: Re: [RESEND PATCH 3/6] ARM: dts: imx7s: add CAAM device node
-Date: Wed, 24 Jan 2018 22:56:45 +0000
-Message-ID: <08d9947e-4d2b-61f1-c8ed-0e1350025f76@nexus-software.ie>
-References: <1516805435-15034-1-git-send-email-pure.logic@nexus-software.ie>
- <1516805435-15034-4-git-send-email-pure.logic@nexus-software.ie>
- <1516817565.29323.74.camel@aisec.fraunhofer.de>
- <0b3c415f-64e4-1fcf-45ef-c447d65e8e89@nexus-software.ie>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: "peng.fan@nxp.com" <peng.fan@nxp.com>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "ryan.harkin@linaro.org" <ryan.harkin@linaro.org>,
-        "fabio.estevam@nxp.com" <fabio.estevam@nxp.com>,
-        "rui.silva@linaro.org" <rui.silva@linaro.org>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>
-To: "Auer, Lukas" <lukas.auer@aisec.fraunhofer.de>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "aymen.sghaier@nxp.com" <aymen.sghaier@nxp.com>,
-        "horia.geanta@nxp.com" <horia.geanta@nxp.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+From: Eric Biggers <ebiggers3@gmail.com>
+Subject: [PATCH] crypto: mcryptd - remove pointless wrapper functions
+Date: Wed, 24 Jan 2018 19:09:07 -0800
+Message-ID: <20180125030907.679-1-ebiggers3@gmail.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+        Tim Chen <tim.c.chen@linux.intel.com>,
+        Eric Biggers <ebiggers@google.com>
+To: linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f54.google.com ([74.125.82.54]:45029 "EHLO
-        mail-wm0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932294AbeAXW4q (ORCPT
+Received: from mail-pf0-f196.google.com ([209.85.192.196]:46822 "EHLO
+        mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932956AbeAYDKC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 24 Jan 2018 17:56:46 -0500
-Received: by mail-wm0-f54.google.com with SMTP id t74so11395434wme.3
-        for <linux-crypto@vger.kernel.org>; Wed, 24 Jan 2018 14:56:46 -0800 (PST)
-In-Reply-To: <0b3c415f-64e4-1fcf-45ef-c447d65e8e89@nexus-software.ie>
-Content-Language: en-US
+        Wed, 24 Jan 2018 22:10:02 -0500
+Received: by mail-pf0-f196.google.com with SMTP id y5so4759691pff.13
+        for <linux-crypto@vger.kernel.org>; Wed, 24 Jan 2018 19:10:01 -0800 (PST)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 24/01/18 22:48, Bryan O'Donoghue wrote:
->> The clock configuration has changed to just one CAAM-specific clock in
->> addition to the ahb clock. This also means that additional
->> modifications to the CAAM driver are necessary or it will complain that
->> it doesn't find all clocks.
-> 
-> Sure - but, those clock changes aren't merged to upstream just yet, so 
-> we won't those changes to this DTS addition yet.
-> 
-> Thanks for the review.
-> 
-> ---
-> bod
+From: Eric Biggers <ebiggers@google.com>
 
-Ah Rui has pointed out to me for i.mx7 there are two clocks on on i.mx6 
-there are four clocks.
+There is no need for ahash_mcryptd_{update,final,finup,digest}(); we
+should just call crypto_ahash_*() directly.
 
-The bit that confused me there was the clock names on the 4.1 tree you 
-pointed to was clock-names = "caam_ipg", "caam_aclk"; and for 4.15 those 
-should be "ipg" and "aclk" by the looks of it.
-
-So yes.
-
-We will add the second job-ring and subtract the two extraneous clocks.
-
+Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
-bod
+ crypto/mcryptd.c               | 34 ++++------------------------------
+ include/crypto/internal/hash.h |  5 -----
+ 2 files changed, 4 insertions(+), 35 deletions(-)
+
+diff --git a/crypto/mcryptd.c b/crypto/mcryptd.c
+index fe5129d6ff4e..f14152147ce8 100644
+--- a/crypto/mcryptd.c
++++ b/crypto/mcryptd.c
+@@ -367,7 +367,7 @@ static void mcryptd_hash_update(struct crypto_async_request *req_async, int err)
+ 		goto out;
+ 
+ 	rctx->out = req->result;
+-	err = ahash_mcryptd_update(&rctx->areq);
++	err = crypto_ahash_update(&rctx->areq);
+ 	if (err) {
+ 		req->base.complete = rctx->complete;
+ 		goto out;
+@@ -394,7 +394,7 @@ static void mcryptd_hash_final(struct crypto_async_request *req_async, int err)
+ 		goto out;
+ 
+ 	rctx->out = req->result;
+-	err = ahash_mcryptd_final(&rctx->areq);
++	err = crypto_ahash_final(&rctx->areq);
+ 	if (err) {
+ 		req->base.complete = rctx->complete;
+ 		goto out;
+@@ -420,7 +420,7 @@ static void mcryptd_hash_finup(struct crypto_async_request *req_async, int err)
+ 	if (unlikely(err == -EINPROGRESS))
+ 		goto out;
+ 	rctx->out = req->result;
+-	err = ahash_mcryptd_finup(&rctx->areq);
++	err = crypto_ahash_finup(&rctx->areq);
+ 
+ 	if (err) {
+ 		req->base.complete = rctx->complete;
+@@ -455,7 +455,7 @@ static void mcryptd_hash_digest(struct crypto_async_request *req_async, int err)
+ 						rctx->complete, req_async);
+ 
+ 	rctx->out = req->result;
+-	err = ahash_mcryptd_digest(desc);
++	err = crypto_ahash_init(desc) ?: crypto_ahash_finup(desc);
+ 
+ out:
+ 	local_bh_disable();
+@@ -612,32 +612,6 @@ struct mcryptd_ahash *mcryptd_alloc_ahash(const char *alg_name,
+ }
+ EXPORT_SYMBOL_GPL(mcryptd_alloc_ahash);
+ 
+-int ahash_mcryptd_digest(struct ahash_request *desc)
+-{
+-	return crypto_ahash_init(desc) ?: ahash_mcryptd_finup(desc);
+-}
+-
+-int ahash_mcryptd_update(struct ahash_request *desc)
+-{
+-	/* alignment is to be done by multi-buffer crypto algorithm if needed */
+-
+-	return crypto_ahash_update(desc);
+-}
+-
+-int ahash_mcryptd_finup(struct ahash_request *desc)
+-{
+-	/* alignment is to be done by multi-buffer crypto algorithm if needed */
+-
+-	return crypto_ahash_finup(desc);
+-}
+-
+-int ahash_mcryptd_final(struct ahash_request *desc)
+-{
+-	/* alignment is to be done by multi-buffer crypto algorithm if needed */
+-
+-	return crypto_ahash_final(desc);
+-}
+-
+ struct crypto_ahash *mcryptd_ahash_child(struct mcryptd_ahash *tfm)
+ {
+ 	struct mcryptd_hash_ctx *ctx = crypto_ahash_ctx(&tfm->base);
+diff --git a/include/crypto/internal/hash.h b/include/crypto/internal/hash.h
+index 27040a46d50a..a0b0ad9d585e 100644
+--- a/include/crypto/internal/hash.h
++++ b/include/crypto/internal/hash.h
+@@ -126,11 +126,6 @@ int shash_ahash_update(struct ahash_request *req, struct shash_desc *desc);
+ int shash_ahash_finup(struct ahash_request *req, struct shash_desc *desc);
+ int shash_ahash_digest(struct ahash_request *req, struct shash_desc *desc);
+ 
+-int ahash_mcryptd_update(struct ahash_request *desc);
+-int ahash_mcryptd_final(struct ahash_request *desc);
+-int ahash_mcryptd_finup(struct ahash_request *desc);
+-int ahash_mcryptd_digest(struct ahash_request *desc);
+-
+ int crypto_init_shash_ops_async(struct crypto_tfm *tfm);
+ 
+ static inline void *crypto_ahash_ctx(struct crypto_ahash *tfm)
+-- 
+2.16.0
