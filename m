@@ -1,7 +1,7 @@
 From: Bryan O'Donoghue <pure.logic@nexus-software.ie>
-Subject: [PATCH v2 3/5] crypto: caam: do not use mem and emi_slow clock for imx7x
-Date: Fri, 26 Jan 2018 17:00:02 +0000
-Message-ID: <1516986004-25452-4-git-send-email-pure.logic@nexus-software.ie>
+Subject: [PATCH v2 4/5] clk: imx7d: add CAAM clock
+Date: Fri, 26 Jan 2018 17:00:03 +0000
+Message-ID: <1516986004-25452-5-git-send-email-pure.logic@nexus-software.ie>
 References: <1516986004-25452-1-git-send-email-pure.logic@nexus-software.ie>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -20,11 +20,8 @@ List-Id: linux-crypto.vger.kernel.org
 
 From: Rui Miguel Silva <rui.silva@linaro.org>
 
-I.MX7x only use two clocks for the CAAM module, so make sure we do not try to
-use the mem and the emi_slow clock when running in that imx7d and imx7s machine
-type.
-
-[bod: fixed minor trailing whitespace issue]
+Add CAAM clock so that we could use the Cryptographic Acceleration and
+Assurance Module (CAAM) hardware block.
 
 Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
 Cc: "Horia Geantă" <horia.geanta@nxp.com>
@@ -36,87 +33,33 @@ Cc: "David S. Miller" <davem@davemloft.net>
 Cc: Lukas Auer <lukas.auer@aisec.fraunhofer.de>
 Signed-off-by: Bryan O'Donoghue <pure.logic@nexus-software.ie>
 ---
- drivers/crypto/caam/ctrl.c | 39 ++++++++++++++++++++++++---------------
- 1 file changed, 24 insertions(+), 15 deletions(-)
+ drivers/clk/imx/clk-imx7d.c             | 1 +
+ include/dt-bindings/clock/imx7d-clock.h | 3 ++-
+ 2 files changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
-index 0a1e96b..1f2dd6a 100644
---- a/drivers/crypto/caam/ctrl.c
-+++ b/drivers/crypto/caam/ctrl.c
-@@ -333,7 +333,8 @@ static int caam_remove(struct platform_device *pdev)
- 
- 	/* shut clocks off before finalizing shutdown */
- 	clk_disable_unprepare(ctrlpriv->caam_ipg);
--	clk_disable_unprepare(ctrlpriv->caam_mem);
-+	if (ctrlpriv->caam_mem)
-+		clk_disable_unprepare(ctrlpriv->caam_mem);
- 	clk_disable_unprepare(ctrlpriv->caam_aclk);
- 	if (ctrlpriv->caam_emi_slow)
- 		clk_disable_unprepare(ctrlpriv->caam_emi_slow);
-@@ -462,14 +463,17 @@ static int caam_probe(struct platform_device *pdev)
- 	}
- 	ctrlpriv->caam_ipg = clk;
- 
--	clk = caam_drv_identify_clk(&pdev->dev, "mem");
--	if (IS_ERR(clk)) {
--		ret = PTR_ERR(clk);
--		dev_err(&pdev->dev,
--			"can't identify CAAM mem clk: %d\n", ret);
--		return ret;
-+	if (!of_machine_is_compatible("fsl,imx7d") &&
-+	    !of_machine_is_compatible("fsl,imx7s")) {
-+		clk = caam_drv_identify_clk(&pdev->dev, "mem");
-+		if (IS_ERR(clk)) {
-+			ret = PTR_ERR(clk);
-+			dev_err(&pdev->dev,
-+				"can't identify CAAM mem clk: %d\n", ret);
-+			return ret;
-+		}
-+		ctrlpriv->caam_mem = clk;
- 	}
--	ctrlpriv->caam_mem = clk;
- 
- 	clk = caam_drv_identify_clk(&pdev->dev, "aclk");
- 	if (IS_ERR(clk)) {
-@@ -480,7 +484,9 @@ static int caam_probe(struct platform_device *pdev)
- 	}
- 	ctrlpriv->caam_aclk = clk;
- 
--	if (!of_machine_is_compatible("fsl,imx6ul")) {
-+	if (!of_machine_is_compatible("fsl,imx6ul") &&
-+	    !of_machine_is_compatible("fsl,imx7d") &&
-+	    !of_machine_is_compatible("fsl,imx7s")) {
- 		clk = caam_drv_identify_clk(&pdev->dev, "emi_slow");
- 		if (IS_ERR(clk)) {
- 			ret = PTR_ERR(clk);
-@@ -497,11 +503,13 @@ static int caam_probe(struct platform_device *pdev)
- 		return ret;
- 	}
- 
--	ret = clk_prepare_enable(ctrlpriv->caam_mem);
--	if (ret < 0) {
--		dev_err(&pdev->dev, "can't enable CAAM secure mem clock: %d\n",
--			ret);
--		goto disable_caam_ipg;
-+	if (ctrlpriv->caam_mem) {
-+		ret = clk_prepare_enable(ctrlpriv->caam_mem);
-+		if (ret < 0) {
-+			dev_err(&pdev->dev, "can't enable CAAM secure mem clock: %d\n",
-+				ret);
-+			goto disable_caam_ipg;
-+		}
- 	}
- 
- 	ret = clk_prepare_enable(ctrlpriv->caam_aclk);
-@@ -823,7 +831,8 @@ static int caam_probe(struct platform_device *pdev)
- disable_caam_aclk:
- 	clk_disable_unprepare(ctrlpriv->caam_aclk);
- disable_caam_mem:
--	clk_disable_unprepare(ctrlpriv->caam_mem);
-+	if (ctrlpriv->caam_mem)
-+		clk_disable_unprepare(ctrlpriv->caam_mem);
- disable_caam_ipg:
- 	clk_disable_unprepare(ctrlpriv->caam_ipg);
- 	return ret;
+diff --git a/drivers/clk/imx/clk-imx7d.c b/drivers/clk/imx/clk-imx7d.c
+index 80dc211..52ab096 100644
+--- a/drivers/clk/imx/clk-imx7d.c
++++ b/drivers/clk/imx/clk-imx7d.c
+@@ -795,6 +795,7 @@ static void __init imx7d_clocks_init(struct device_node *ccm_node)
+ 	clks[IMX7D_DRAM_PHYM_ALT_ROOT_CLK] = imx_clk_gate4("dram_phym_alt_root_clk", "dram_phym_alt_post_div", base + 0x4130, 0);
+ 	clks[IMX7D_DRAM_ALT_ROOT_CLK] = imx_clk_gate4("dram_alt_root_clk", "dram_alt_post_div", base + 0x4130, 0);
+ 	clks[IMX7D_OCOTP_CLK] = imx_clk_gate4("ocotp_clk", "ipg_root_clk", base + 0x4230, 0);
++	clks[IMX7D_CAAM_CLK] = imx_clk_gate4("caam_clk", "ipg_root_clk", base + 0x4240, 0);
+ 	clks[IMX7D_USB_HSIC_ROOT_CLK] = imx_clk_gate4("usb_hsic_root_clk", "usb_hsic_post_div", base + 0x4420, 0);
+ 	clks[IMX7D_SDMA_CORE_CLK] = imx_clk_gate4("sdma_root_clk", "ahb_root_clk", base + 0x4480, 0);
+ 	clks[IMX7D_PCIE_CTRL_ROOT_CLK] = imx_clk_gate4("pcie_ctrl_root_clk", "pcie_ctrl_post_div", base + 0x4600, 0);
+diff --git a/include/dt-bindings/clock/imx7d-clock.h b/include/dt-bindings/clock/imx7d-clock.h
+index e2f99ae..2bc5618 100644
+--- a/include/dt-bindings/clock/imx7d-clock.h
++++ b/include/dt-bindings/clock/imx7d-clock.h
+@@ -452,5 +452,6 @@
+ #define IMX7D_OCOTP_CLK			439
+ #define IMX7D_NAND_RAWNAND_CLK		440
+ #define IMX7D_NAND_USDHC_BUS_RAWNAND_CLK 441
+-#define IMX7D_CLK_END			442
++#define IMX7D_CAAM_CLK			442
++#define IMX7D_CLK_END			443
+ #endif /* __DT_BINDINGS_CLOCK_IMX7D_H */
 -- 
 2.7.4
