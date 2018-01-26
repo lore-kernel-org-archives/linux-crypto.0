@@ -1,46 +1,54 @@
-From: Peter Schuster <femi.ageuh@gmail.com>
-Subject: =?UTF-8?Q?Darlehen_Geld_f=C3=BCr_Einzelpersonen_und_Fachleute_in_w?=
-        =?UTF-8?Q?eniger_als_72_Stunden?=
-Date: Fri, 26 Jan 2018 08:22:47 +0100
-Message-ID: <CACKcKZ-YTVoO8xO=VcRR-F_91T=fQ=MZa2wBTk_EaRT7GRz52Q__19378.6019961864$1516951330$gmane$org@mail.gmail.com>
-Reply-To: klaus.peterschuster@outlook.de
+From: Yury Norov <ynorov@caviumnetworks.com>
+Subject: Re: [PATCH RFC 0/3] API for 128-bit IO access
+Date: Fri, 26 Jan 2018 12:05:42 +0300
+Message-ID: <20180126090542.bsza7hqqinqwllcr@yury-thinkpad>
+References: <20180124090519.6680-1-ynorov@caviumnetworks.com>
+ <20180124102212.GC20586@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-To: undisclosed-recipients:;
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ot0-f174.google.com ([74.125.82.174]:34054 "EHLO
-        mail-ot0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751883AbeAZHWt (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 26 Jan 2018 02:22:49 -0500
-Received: by mail-ot0-f174.google.com with SMTP id x15so9372401ote.1
-        for <linux-crypto@vger.kernel.org>; Thu, 25 Jan 2018 23:22:49 -0800 (PST)
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-arm-kernel@lists.infradead.org, linux-arch@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Andrew Pinski <Andrew.Pinski@cavium.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Geethasowjanya Akula <Geethasowjanya.Akula@cavium.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Ingo Molnar <mingo@kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        Laura Abbott <labbott@redhat.com>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Sunil Goutham <Sunil.Goutham@cavium.com>
+To: Will Deacon <will.deacon@arm.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20180124102212.GC20586@arm.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hallo,
+On Wed, Jan 24, 2018 at 10:22:13AM +0000, Will Deacon wrote:
+> On Wed, Jan 24, 2018 at 12:05:16PM +0300, Yury Norov wrote:
+> > This series adds API for 128-bit memory IO access and enables it for ARM64.
+> > The original motivation for 128-bit API came from new Cavium network device
+> > driver. The hardware requires 128-bit access to make things work. See
+> > description in patch 3 for details.
+> > 
+> > Also, starting from ARMv8.4, stp and ldp instructions become atomic, and
+> > API for 128-bit access would be helpful in core arm64 code.
+> 
+> Only for normal, cacheable memory, so they're not suitable for IO accesses
+> as you're proposing here.
 
-Sind Sie in einer schwierigen Situation, f=C3=BCr die Sie sich f=C3=BCr ein
-Darlehen suchen? Ben=C3=B6tigen Sie eine Finanzierung, um eine Schuld zu
-begleichen oder eine Aktivit=C3=A4t zu finanzieren? Haben Sie einen
-Verbraucherkredit, eine Hypothek, einen pers=C3=B6nlichen Kredit, eine
-Hypothek, Investition Darlehen, Schuldenkonsolidierung Darlehen oder
-andere braucht?
+Hi Will,
 
-Ich bin ein einzelner Investor. I zur Verf=C3=BCgung stellen die Kredit
-kurz-, mittel- und langfristige. Ihr Finanzierungsbedingungen sind
-sehr einfach und meine Zinssatz betr=C3=A4gt 3% pro Jahr.
+Thanks for clarification.
 
-F=C3=BCr alle Anfragen, bleibe ich zur Verf=C3=BCgung, um Ihre Fragen zu be=
-antworten.
+Could you elaborate, do you find 128-bit read/write API useless, or
+you just correct my comment?
 
-Danke, dass Sie mir per E-Mail an Sie von  :   klaus.peterschuster@outlook.=
-de
+I think that ordered uniform 128-bit access API would be helpful, even
+if not atomic.
 
-Mit freundlichen Gr=C3=BC=C3=9Fen.
-
-Peter Schuster
-
-Financial Bank
-https://firstfinancialsa.com/de
+Yury.
