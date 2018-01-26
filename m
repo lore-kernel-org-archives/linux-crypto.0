@@ -1,73 +1,97 @@
-From: Will Deacon <will.deacon@arm.com>
-Subject: Re: [PATCH RFC 0/3] API for 128-bit IO access
-Date: Fri, 26 Jan 2018 18:11:49 +0000
-Message-ID: <20180126181149.GA17922@arm.com>
-References: <20180124090519.6680-1-ynorov@caviumnetworks.com>
- <20180124102212.GC20586@arm.com>
- <20180126090542.bsza7hqqinqwllcr@yury-thinkpad>
+From: Bryan O'Donoghue <pure.logic@nexus-software.ie>
+Subject: [RESEND PATCH v2 0/5] Enable CAAM on i.MX7s fix TrustZone issues
+Date: Fri, 26 Jan 2018 19:04:56 +0000
+Message-ID: <1516993501-29646-1-git-send-email-pure.logic@nexus-software.ie>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-arm-kernel@lists.infradead.org, linux-arch@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Andrew Pinski <Andrew.Pinski@cavium.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Geethasowjanya Akula <Geethasowjanya.Akula@cavium.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Ingo Molnar <mingo@kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Laura Abbott <labbott@redhat.com>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Sunil Goutham <Sunil.Goutham@cavium.com>
-To: Yury Norov <ynorov@caviumnetworks.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from foss.arm.com ([217.140.101.70]:51948 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750864AbeAZSLv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 26 Jan 2018 13:11:51 -0500
-Content-Disposition: inline
-In-Reply-To: <20180126090542.bsza7hqqinqwllcr@yury-thinkpad>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Cc: fabio.estevam@nxp.com, peng.fan@nxp.com,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        lukas.auer@aisec.fraunhofer.de, rui.silva@linaro.org,
+        ryan.harkin@linaro.org,
+        Bryan O'Donoghue <pure.logic@nexus-software.ie>
+To: horia.geanta@nxp.com, aymen.sghaier@nxp.com,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Jan 26, 2018 at 12:05:42PM +0300, Yury Norov wrote:
-> On Wed, Jan 24, 2018 at 10:22:13AM +0000, Will Deacon wrote:
-> > On Wed, Jan 24, 2018 at 12:05:16PM +0300, Yury Norov wrote:
-> > > This series adds API for 128-bit memory IO access and enables it for ARM64.
-> > > The original motivation for 128-bit API came from new Cavium network device
-> > > driver. The hardware requires 128-bit access to make things work. See
-> > > description in patch 3 for details.
-> > > 
-> > > Also, starting from ARMv8.4, stp and ldp instructions become atomic, and
-> > > API for 128-bit access would be helpful in core arm64 code.
-> > 
-> > Only for normal, cacheable memory, so they're not suitable for IO accesses
-> > as you're proposing here.
-> 
-> Hi Will,
-> 
-> Thanks for clarification.
-> 
-> Could you elaborate, do you find 128-bit read/write API useless, or
-> you just correct my comment?
-> 
-> I think that ordered uniform 128-bit access API would be helpful, even
-> if not atomic.
+V2-resend:
+- Patch 0005 lost in the ether - resending
 
-Sorry, but I strongly disagree here. Having an IO accessor that isn't
-guaranteed to be atomic is a recipe for disaster if it's not called out
-explicitly. You're much better off implementing something along the lines
-of <linux/io-128-nonatomic-hi-lo.h> using 2x64-bit accessors like we already
-have for the 2x32-bit case.
+V2:
+- Endian detection is ok with TrustZone enabled Horia.
+  Endian detection logic tested with TrustZone enabled. The register that
+  this relies on though isn't affected by the lock-down in the first page.
+  Assuming set of affected registers is actually just the 'deco' registers
+  though there is no formal statement of that, that I am aware of.
 
-However, that doesn't solve your problem and is somewhat of a distraction.
-I'd suggest that in your case, where you have a device that relies on
-128-bit atomic access that is assumedly tightly integrated into your SoC,
-then the driver just codes it's own local implementation of the accessor,
-given that there isn't a way to guarantee the atomicity architecturally
-(and even within your SoC it might not be atomic to all endpoints).
+- Moving of TrustZone work-around into u-boot
+  This set actually doesn't need to deal with TrustZone at all now but, for
+  the sake of consistency keeping thread title
 
-Will
+  https://patchwork.ozlabs.org/patch/866460/
+  https://patchwork.ozlabs.org/patch/866462/
+  https://patchwork.ozlabs.org/patch/865890/
+
+- Reworded endless loop fix to read a bit better
+
+- Fixes to DTS additions - Rui
+
+- Fixes to number of clocks declared - Rui
+
+V1:
+This patch-set enables CAAM on the i.MX7s and fixes a number of issues
+identified with the CAAM driver and hardware when TrustZone mode is
+enabled.
+
+The first block of patches are simple bug-fixes, followed by a second block
+of patches which are simple enabling patches for the i.MX7Solo - note we
+aren't enabling for the i.MX7Dual since we don't have hardware to test that
+out but it should be a 1:1 mapping for others to enable when appropriate.
+
+The final block in this series implements a fix for using the CAAM when
+OPTEE/TrustZone is enabled. The various details are logged in these
+threads.
+
+Link: https://github.com/OP-TEE/optee_os/issues/1408
+Link: https://tinyurl.com/yam5gv9a
+Link: https://patchwork.ozlabs.org/cover/865042
+
+In simple terms, when TrustZone is active the first page of the CAAM
+becomes inaccessible to Linux as it has a special 'TZ bit' associated with
+it that software cannot toggle or even view AFAIK.
+
+The patches here then
+
+1. Detect when TrustZone is active
+2. Detect if u-boot (or OPTEE) has already initialized the RNG
+
+and loads the CAAM driver in a different way - skipping over the RNG
+initialization that Linux now no-longer has permissions to carry out.
+
+Should #1 be true but #2 not be true, driver loading stops (and Rui's patch
+for the NULL pointer dereference fixes a cash on this path). If #2 is true
+but #1 is not then it's a NOP as Linux has full permission to rewrite the
+deco registers in the first page of CAAM registers.
+
+Finally then if #1 and #2 are true, the fixes here allow the CAAM to come
+up and for the RNG to be useable again.
+
+Bryan O'Donoghue (1):
+  crypto: caam: Fix endless loop when RNG is already initialized
+
+Rui Miguel Silva (4):
+  crypto: caam: Fix null dereference at error path
+  crypto: caam: do not use mem and emi_slow clock for imx7x
+  clk: imx7d: add CAAM clock
+  ARM: dts: imx7s: add CAAM device node
+
+ arch/arm/boot/dts/imx7s.dtsi            | 31 +++++++++++++++++++++++
+ drivers/clk/imx/clk-imx7d.c             |  1 +
+ drivers/crypto/caam/ctrl.c              | 45 ++++++++++++++++++++-------------
+ include/dt-bindings/clock/imx7d-clock.h |  3 ++-
+ 4 files changed, 61 insertions(+), 19 deletions(-)
+
+-- 
+2.7.4
