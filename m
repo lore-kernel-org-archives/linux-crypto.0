@@ -1,7 +1,7 @@
 From: Bryan O'Donoghue <pure.logic@nexus-software.ie>
-Subject: [PATCH v2 2/5] crypto: caam: Fix endless loop when RNG is already initialized
-Date: Fri, 26 Jan 2018 17:00:01 +0000
-Message-ID: <1516986004-25452-3-git-send-email-pure.logic@nexus-software.ie>
+Subject: [PATCH v2 5/5] ARM: dts: imx7s: add CAAM device node
+Date: Fri, 26 Jan 2018 17:00:04 +0000
+Message-ID: <1516986004-25452-6-git-send-email-pure.logic@nexus-software.ie>
 References: <1516986004-25452-1-git-send-email-pure.logic@nexus-software.ie>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -10,44 +10,19 @@ Cc: fabio.estevam@nxp.com, peng.fan@nxp.com,
         herbert@gondor.apana.org.au, davem@davemloft.net,
         lukas.auer@aisec.fraunhofer.de, rui.silva@linaro.org,
         ryan.harkin@linaro.org,
-        Bryan O'Donoghue <pure.logic@nexus-software.ie>,
-        "# 4 . 12+" <stable@vger.kernel.org>
+        Bryan O'Donoghue <pure.logic@nexus-software.ie>
 To: horia.geanta@nxp.com, aymen.sghaier@nxp.com,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f65.google.com ([74.125.82.65]:52887 "EHLO
-        mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752013AbeAZRAL (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 26 Jan 2018 12:00:11 -0500
-Received: by mail-wm0-f65.google.com with SMTP id g1so2570268wmg.2
-        for <linux-crypto@vger.kernel.org>; Fri, 26 Jan 2018 09:00:10 -0800 (PST)
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1516986004-25452-1-git-send-email-pure.logic@nexus-software.ie>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-commit 1005bccd7a4a ("crypto: caam - enable instantiation of all RNG4 state
-handles") introduces a control when incrementing ent_delay which contains
-the following comment above it:
+From: Rui Miguel Silva <rui.silva@linaro.org>
 
-/*
- * If either SH were instantiated by somebody else
- * (e.g. u-boot) then it is assumed that the entropy
- * parameters are properly set and thus the function
- * setting these (kick_trng(...)) is skipped.
- * Also, if a handle was instantiated, do not change
- * the TRNG parameters.
- */
+Add CAAM device node to the i.MX7s device tree.
 
-This is a problem observed when sec_init() has been run in u-boot and
-and TrustZone is enabled. We can fix this by instantiating all rng state
-handles in u-boot but, on the Kernel side we should ensure that this
-non-terminating path is dealt with.
-
-Fixes: 1005bccd7a4a ("crypto: caam - enable instantiation of all RNG4 state
-handles")
-
-Reported-by: Ryan Harkin <ryan.harkin@linaro.org>
+Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
 Cc: "Horia Geantă" <horia.geanta@nxp.com>
 Cc: Aymen Sghaier <aymen.sghaier@nxp.com>
 Cc: Fabio Estevam <fabio.estevam@nxp.com>
@@ -55,26 +30,52 @@ Cc: Peng Fan <peng.fan@nxp.com>
 Cc: Herbert Xu <herbert@gondor.apana.org.au>
 Cc: "David S. Miller" <davem@davemloft.net>
 Cc: Lukas Auer <lukas.auer@aisec.fraunhofer.de>
-Cc: <stable@vger.kernel.org> # 4.12+
 Signed-off-by: Bryan O'Donoghue <pure.logic@nexus-software.ie>
 ---
- drivers/crypto/caam/ctrl.c | 3 +++
- 1 file changed, 3 insertions(+)
+ arch/arm/boot/dts/imx7s.dtsi | 31 +++++++++++++++++++++++++++++++
+ 1 file changed, 31 insertions(+)
 
-diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
-index 98986d3..0a1e96b 100644
---- a/drivers/crypto/caam/ctrl.c
-+++ b/drivers/crypto/caam/ctrl.c
-@@ -704,7 +704,10 @@ static int caam_probe(struct platform_device *pdev)
- 					 ent_delay);
- 				kick_trng(pdev, ent_delay);
- 				ent_delay += 400;
-+			} else if (ctrlpriv->rng4_sh_init && inst_handles) {
-+				ent_delay += 400;
- 			}
+diff --git a/arch/arm/boot/dts/imx7s.dtsi b/arch/arm/boot/dts/imx7s.dtsi
+index 82ad26e..e38c159 100644
+--- a/arch/arm/boot/dts/imx7s.dtsi
++++ b/arch/arm/boot/dts/imx7s.dtsi
+@@ -805,6 +805,37 @@
+ 				status = "disabled";
+ 			};
+ 
++			crypto: caam@30900000 {
++				compatible = "fsl,sec-v4.0";
++				fsl,sec-era = <4>;
++				#address-cells = <1>;
++				#size-cells = <1>;
++				reg = <0x30900000 0x40000>;
++				ranges = <0 0x30900000 0x40000>;
++				interrupts = <GIC_SPI 91 IRQ_TYPE_LEVEL_HIGH>;
++				clocks = <&clks IMX7D_CAAM_CLK>,
++					 <&clks IMX7D_AHB_CHANNEL_ROOT_CLK>;
++				clock-names = "ipg", "aclk";
 +
- 			/*
- 			 * if instantiate_rng(...) fails, the loop will rerun
- 			 * and the kick_trng(...) function will modfiy the
++				sec_jr0: jr0@1000 {
++					compatible = "fsl,sec-v4.0-job-ring";
++					reg = <0x1000 0x1000>;
++					interrupts = <GIC_SPI 105 IRQ_TYPE_LEVEL_HIGH>;
++				};
++
++				sec_jr1: jr1@2000 {
++					compatible = "fsl,sec-v4.0-job-ring";
++					reg = <0x2000 0x1000>;
++					interrupts = <GIC_SPI 106 IRQ_TYPE_LEVEL_HIGH>;
++				};
++
++				sec_jr2: jr1@3000 {
++					compatible = "fsl,sec-v4.0-job-ring";
++					reg = <0x3000 0x1000>;
++					interrupts = <GIC_SPI 114 IRQ_TYPE_LEVEL_HIGH>;
++				};
++			};
++
+ 			flexcan1: can@30a00000 {
+ 				compatible = "fsl,imx7d-flexcan", "fsl,imx6q-flexcan";
+ 				reg = <0x30a00000 0x10000>;
 -- 
 2.7.4
