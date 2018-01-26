@@ -1,7 +1,7 @@
 From: Bryan O'Donoghue <pure.logic@nexus-software.ie>
-Subject: [PATCH v2 4/5] clk: imx7d: add CAAM clock
-Date: Fri, 26 Jan 2018 17:00:03 +0000
-Message-ID: <1516986004-25452-5-git-send-email-pure.logic@nexus-software.ie>
+Subject: [PATCH v2 2/5] crypto: caam: Fix endless loop when RNG is already initialized
+Date: Fri, 26 Jan 2018 17:00:01 +0000
+Message-ID: <1516986004-25452-3-git-send-email-pure.logic@nexus-software.ie>
 References: <1516986004-25452-1-git-send-email-pure.logic@nexus-software.ie>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -10,20 +10,44 @@ Cc: fabio.estevam@nxp.com, peng.fan@nxp.com,
         herbert@gondor.apana.org.au, davem@davemloft.net,
         lukas.auer@aisec.fraunhofer.de, rui.silva@linaro.org,
         ryan.harkin@linaro.org,
-        Bryan O'Donoghue <pure.logic@nexus-software.ie>
+        Bryan O'Donoghue <pure.logic@nexus-software.ie>,
+        "# 4 . 12+" <stable@vger.kernel.org>
 To: horia.geanta@nxp.com, aymen.sghaier@nxp.com,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-wm0-f65.google.com ([74.125.82.65]:52887 "EHLO
+        mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752013AbeAZRAL (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 26 Jan 2018 12:00:11 -0500
+Received: by mail-wm0-f65.google.com with SMTP id g1so2570268wmg.2
+        for <linux-crypto@vger.kernel.org>; Fri, 26 Jan 2018 09:00:10 -0800 (PST)
 In-Reply-To: <1516986004-25452-1-git-send-email-pure.logic@nexus-software.ie>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-From: Rui Miguel Silva <rui.silva@linaro.org>
+commit 1005bccd7a4a ("crypto: caam - enable instantiation of all RNG4 state
+handles") introduces a control when incrementing ent_delay which contains
+the following comment above it:
 
-Add CAAM clock so that we could use the Cryptographic Acceleration and
-Assurance Module (CAAM) hardware block.
+/*
+ * If either SH were instantiated by somebody else
+ * (e.g. u-boot) then it is assumed that the entropy
+ * parameters are properly set and thus the function
+ * setting these (kick_trng(...)) is skipped.
+ * Also, if a handle was instantiated, do not change
+ * the TRNG parameters.
+ */
 
-Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
+This is a problem observed when sec_init() has been run in u-boot and
+and TrustZone is enabled. We can fix this by instantiating all rng state
+handles in u-boot but, on the Kernel side we should ensure that this
+non-terminating path is dealt with.
+
+Fixes: 1005bccd7a4a ("crypto: caam - enable instantiation of all RNG4 state
+handles")
+
+Reported-by: Ryan Harkin <ryan.harkin@linaro.org>
 Cc: "Horia Geantă" <horia.geanta@nxp.com>
 Cc: Aymen Sghaier <aymen.sghaier@nxp.com>
 Cc: Fabio Estevam <fabio.estevam@nxp.com>
@@ -31,35 +55,26 @@ Cc: Peng Fan <peng.fan@nxp.com>
 Cc: Herbert Xu <herbert@gondor.apana.org.au>
 Cc: "David S. Miller" <davem@davemloft.net>
 Cc: Lukas Auer <lukas.auer@aisec.fraunhofer.de>
+Cc: <stable@vger.kernel.org> # 4.12+
 Signed-off-by: Bryan O'Donoghue <pure.logic@nexus-software.ie>
 ---
- drivers/clk/imx/clk-imx7d.c             | 1 +
- include/dt-bindings/clock/imx7d-clock.h | 3 ++-
- 2 files changed, 3 insertions(+), 1 deletion(-)
+ drivers/crypto/caam/ctrl.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/drivers/clk/imx/clk-imx7d.c b/drivers/clk/imx/clk-imx7d.c
-index 80dc211..52ab096 100644
---- a/drivers/clk/imx/clk-imx7d.c
-+++ b/drivers/clk/imx/clk-imx7d.c
-@@ -795,6 +795,7 @@ static void __init imx7d_clocks_init(struct device_node *ccm_node)
- 	clks[IMX7D_DRAM_PHYM_ALT_ROOT_CLK] = imx_clk_gate4("dram_phym_alt_root_clk", "dram_phym_alt_post_div", base + 0x4130, 0);
- 	clks[IMX7D_DRAM_ALT_ROOT_CLK] = imx_clk_gate4("dram_alt_root_clk", "dram_alt_post_div", base + 0x4130, 0);
- 	clks[IMX7D_OCOTP_CLK] = imx_clk_gate4("ocotp_clk", "ipg_root_clk", base + 0x4230, 0);
-+	clks[IMX7D_CAAM_CLK] = imx_clk_gate4("caam_clk", "ipg_root_clk", base + 0x4240, 0);
- 	clks[IMX7D_USB_HSIC_ROOT_CLK] = imx_clk_gate4("usb_hsic_root_clk", "usb_hsic_post_div", base + 0x4420, 0);
- 	clks[IMX7D_SDMA_CORE_CLK] = imx_clk_gate4("sdma_root_clk", "ahb_root_clk", base + 0x4480, 0);
- 	clks[IMX7D_PCIE_CTRL_ROOT_CLK] = imx_clk_gate4("pcie_ctrl_root_clk", "pcie_ctrl_post_div", base + 0x4600, 0);
-diff --git a/include/dt-bindings/clock/imx7d-clock.h b/include/dt-bindings/clock/imx7d-clock.h
-index e2f99ae..2bc5618 100644
---- a/include/dt-bindings/clock/imx7d-clock.h
-+++ b/include/dt-bindings/clock/imx7d-clock.h
-@@ -452,5 +452,6 @@
- #define IMX7D_OCOTP_CLK			439
- #define IMX7D_NAND_RAWNAND_CLK		440
- #define IMX7D_NAND_USDHC_BUS_RAWNAND_CLK 441
--#define IMX7D_CLK_END			442
-+#define IMX7D_CAAM_CLK			442
-+#define IMX7D_CLK_END			443
- #endif /* __DT_BINDINGS_CLOCK_IMX7D_H */
+diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
+index 98986d3..0a1e96b 100644
+--- a/drivers/crypto/caam/ctrl.c
++++ b/drivers/crypto/caam/ctrl.c
+@@ -704,7 +704,10 @@ static int caam_probe(struct platform_device *pdev)
+ 					 ent_delay);
+ 				kick_trng(pdev, ent_delay);
+ 				ent_delay += 400;
++			} else if (ctrlpriv->rng4_sh_init && inst_handles) {
++				ent_delay += 400;
+ 			}
++
+ 			/*
+ 			 * if instantiate_rng(...) fails, the loop will rerun
+ 			 * and the kick_trng(...) function will modfiy the
 -- 
 2.7.4
