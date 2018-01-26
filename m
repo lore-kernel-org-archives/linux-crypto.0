@@ -1,8 +1,9 @@
 From: Corentin Labbe <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [PATCH v2 0/6] crypto: engine - Permit to enqueue all
- async requests
-Date: Fri, 26 Jan 2018 20:15:28 +0100
-Message-ID: <20180126191534.17569-1-clabbe.montjoie@gmail.com>
+Subject: [PATCH v2 1/6] Documentation: crypto: document crypto
+ engine API
+Date: Fri, 26 Jan 2018 20:15:29 +0100
+Message-ID: <20180126191534.17569-2-clabbe.montjoie@gmail.com>
+References: <20180126191534.17569-1-clabbe.montjoie@gmail.com>
 Reply-To: clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
@@ -22,8 +23,9 @@ To: alexandre.torgue-qxv4g6HH51o@public.gmane.org,
 	mcoquelin.stm32-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org,
 	mst-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org,
 	fabien.dessenne-qxv4g6HH51o@public.gmane.org
-Return-path: <linux-sunxi+bncBD7YLCN32UNBB2P5VXJQKGQETWHR5GY-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+Return-path: <linux-sunxi+bncBD7YLCN32UNBB275VXJQKGQEOLHIOOI-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
 Sender: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
+In-Reply-To: <20180126191534.17569-1-clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 List-Post: <https://groups.google.com/group/linux-sunxi/post>, <mailto:linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
 List-Help: <https://groups.google.com/support/>, <mailto:linux-sunxi+help-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
 List-Archive: <https://groups.google.com/group/linux-sunxi
@@ -32,72 +34,65 @@ List-Unsubscribe: <mailto:googlegroups-manage+1076902468213+unsubscribe-/JYPxA39
  <https://groups.google.com/group/linux-sunxi/subscribe>
 List-Id: linux-crypto.vger.kernel.org
 
-Hello
-
-The current crypto_engine support only ahash and ablkcipher request.
-My first patch which try to add skcipher was Nacked, it will add too many functions
-and adding other algs(aead, asymetric_key) will make the situation worst.
-
-This patchset remove all algs specific stuff and now only process generic crypto_async_request.
-
-The requests handler function pointer are now moved out of struct engine and
-are now stored directly in a crypto_engine_reqctx.
-
-The original proposal of Herbert [1] cannot be done completly since the crypto_engine
-could only dequeue crypto_async_request and it is impossible to access any request_ctx
-without knowing the underlying request type.
-
-So I do something near that was requested: adding crypto_engine_reqctx in TFM context.
-Note that the current implementation expect that crypto_engine_reqctx
-is the first member of the context.
-
-The first patch is a try to document the crypto engine API.
-The second patch convert the crypto engine with the new way,
-while the following patchs convert the 4 existing users of crypto_engine.
-Note that this split break bisection, so probably the final commit will be all merged.
-
-Appart from virtio, all 4 latest patch were compile tested only.
-But the crypto engine is tested with my new sun8i-ce driver.
-
-Regards
-
-[1] https://www.mail-archive.com/linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org/msg1474434.html
-
-Changes since V1:
-- renamed crypto_engine_reqctx to crypto_engine_ctx
-- indentation fix in function parameter
-- do not export crypto_transfer_request
-- Add aead support
-- crypto_finalize_request is now static
-
-Changes since RFC:
-- Added a documentation patch
-- Added patch for stm32-cryp
-- Changed parameter of all crypto_engine_op functions from
-	crypto_async_request to void*
-- Reintroduced crypto_transfer_xxx_request_to_engine functions
-
-Corentin Labbe (6):
-  Documentation: crypto: document crypto engine API
-  crypto: engine - Permit to enqueue all async requests
-  crypto: omap: convert to new crypto engine API
-  crypto: virtio: convert to new crypto engine API
-  crypto: stm32-hash: convert to the new crypto engine API
-  crypto: stm32-cryp: convert to the new crypto engine API
-
- Documentation/crypto/crypto_engine.rst       |  48 +++++
- crypto/crypto_engine.c                       | 301 +++++++++++++++------------
- drivers/crypto/omap-aes.c                    |  21 +-
- drivers/crypto/omap-aes.h                    |   3 +
- drivers/crypto/omap-des.c                    |  24 ++-
- drivers/crypto/stm32/stm32-cryp.c            |  29 ++-
- drivers/crypto/stm32/stm32-hash.c            |  20 +-
- drivers/crypto/virtio/virtio_crypto_algs.c   |  16 +-
- drivers/crypto/virtio/virtio_crypto_common.h |   3 +-
- drivers/crypto/virtio/virtio_crypto_core.c   |   3 -
- include/crypto/engine.h                      |  68 +++---
- 11 files changed, 332 insertions(+), 204 deletions(-)
+Signed-off-by: Corentin Labbe <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+---
+ Documentation/crypto/crypto_engine.rst | 48 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 48 insertions(+)
  create mode 100644 Documentation/crypto/crypto_engine.rst
 
+diff --git a/Documentation/crypto/crypto_engine.rst b/Documentation/crypto/crypto_engine.rst
+new file mode 100644
+index 000000000000..8272ac92a14f
+--- /dev/null
++++ b/Documentation/crypto/crypto_engine.rst
+@@ -0,0 +1,48 @@
++=============
++CRYPTO ENGINE
++=============
++
++Overview
++--------
++The crypto engine API (CE), is a crypto queue manager.
++
++Requirement
++-----------
++You have to put at start of your tfm_ctx the struct crypto_engine_ctx
++struct your_tfm_ctx {
++        struct crypto_engine_ctx enginectx;
++        ...
++};
++Why: Since CE manage only crypto_async_request, it cannot know the underlying
++request_type and so have access only on the TFM.
++So using container_of for accessing __ctx is impossible.
++Furthermore, the crypto engine cannot know the "struct your_tfm_ctx",
++so it must assume that crypto_engine_ctx is at start of it.
++
++Order of operations
++-------------------
++You have to obtain a struct crypto_engine via crypto_engine_alloc_init().
++And start it via crypto_engine_start().
++
++Before transferring any request, you have to fill the enginectx.
++- prepare_request: (taking a function pointer) If you need to do some processing before doing the request
++- unprepare_request: (taking a function pointer) Undoing what's done in prepare_request
++- do_one_request: (taking a function pointer) Do encryption for current request
++
++Note: that those three functions get the crypto_async_request associated with the received request.
++So your need to get the original request via container_of(areq, struct yourrequesttype_request, base);
++
++When your driver receive a crypto_request, you have to transfer it to
++the cryptoengine via one of:
++- crypto_transfer_ablkcipher_request_to_engine()
++- crypto_transfer_aead_request_to_engine()
++- crypto_transfer_akcipher_request_to_engine()
++- crypto_transfer_hash_request_to_engine()
++- crypto_transfer_skcipher_request_to_engine()
++
++At the end of the request process, a call to one of the following function is needed:
++- crypto_finalize_ablkcipher_request
++- crypto_finalize_aead_request
++- crypto_finalize_akcipher_request
++- crypto_finalize_hash_request
++- crypto_finalize_skcipher_request
 -- 
 2.13.6
