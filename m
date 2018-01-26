@@ -1,97 +1,65 @@
 From: Bryan O'Donoghue <pure.logic@nexus-software.ie>
-Subject: [RESEND PATCH v2 0/5] Enable CAAM on i.MX7s fix TrustZone issues
-Date: Fri, 26 Jan 2018 19:04:56 +0000
-Message-ID: <1516993501-29646-1-git-send-email-pure.logic@nexus-software.ie>
+Subject: [RESEND PATCH v2 1/5] crypto: caam: Fix null dereference at error path
+Date: Fri, 26 Jan 2018 19:04:57 +0000
+Message-ID: <1516993501-29646-2-git-send-email-pure.logic@nexus-software.ie>
+References: <1516993501-29646-1-git-send-email-pure.logic@nexus-software.ie>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Cc: fabio.estevam@nxp.com, peng.fan@nxp.com,
         herbert@gondor.apana.org.au, davem@davemloft.net,
         lukas.auer@aisec.fraunhofer.de, rui.silva@linaro.org,
-        ryan.harkin@linaro.org,
+        ryan.harkin@linaro.org, "# 4 . 12+" <stable@vger.kernel.org>,
         Bryan O'Donoghue <pure.logic@nexus-software.ie>
 To: horia.geanta@nxp.com, aymen.sghaier@nxp.com,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
+Return-path: <stable-owner@vger.kernel.org>
+In-Reply-To: <1516993501-29646-1-git-send-email-pure.logic@nexus-software.ie>
+Sender: stable-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-V2-resend:
-- Patch 0005 lost in the ether - resending
+From: Rui Miguel Silva <rui.silva@linaro.org>
 
-V2:
-- Endian detection is ok with TrustZone enabled Horia.
-  Endian detection logic tested with TrustZone enabled. The register that
-  this relies on though isn't affected by the lock-down in the first page.
-  Assuming set of affected registers is actually just the 'deco' registers
-  though there is no formal statement of that, that I am aware of.
+caam_remove already removes the debugfs entry, so we need to remove the one
+immediately before calling caam_remove.
 
-- Moving of TrustZone work-around into u-boot
-  This set actually doesn't need to deal with TrustZone at all now but, for
-  the sake of consistency keeping thread title
+This fix a NULL dereference at error paths is caam_probe fail.
 
-  https://patchwork.ozlabs.org/patch/866460/
-  https://patchwork.ozlabs.org/patch/866462/
-  https://patchwork.ozlabs.org/patch/865890/
+[bod: changed name prefix to "crypto: caam: Fix .."]
+[bod: added Fixes tag]
 
-- Reworded endless loop fix to read a bit better
+Fixes: 67c2315def06 ("crypto: caam - add Queue Interface (QI) backend
+support")
 
-- Fixes to DTS additions - Rui
+Tested-by: Ryan Harkin <ryan.harkin@linaro.org>
+Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
+Cc: "Horia Geantă" <horia.geanta@nxp.com>
+Cc: Aymen Sghaier <aymen.sghaier@nxp.com>
+Cc: Fabio Estevam <fabio.estevam@nxp.com>
+Cc: Peng Fan <peng.fan@nxp.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Lukas Auer <lukas.auer@aisec.fraunhofer.de>
+Cc: <stable@vger.kernel.org> # 4.12+
+Reviewed-by: Horia Geantă <horia.geanta@nxp.com>
+Signed-off-by: Bryan O'Donoghue <pure.logic@nexus-software.ie>
+---
+ drivers/crypto/caam/ctrl.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-- Fixes to number of clocks declared - Rui
-
-V1:
-This patch-set enables CAAM on the i.MX7s and fixes a number of issues
-identified with the CAAM driver and hardware when TrustZone mode is
-enabled.
-
-The first block of patches are simple bug-fixes, followed by a second block
-of patches which are simple enabling patches for the i.MX7Solo - note we
-aren't enabling for the i.MX7Dual since we don't have hardware to test that
-out but it should be a 1:1 mapping for others to enable when appropriate.
-
-The final block in this series implements a fix for using the CAAM when
-OPTEE/TrustZone is enabled. The various details are logged in these
-threads.
-
-Link: https://github.com/OP-TEE/optee_os/issues/1408
-Link: https://tinyurl.com/yam5gv9a
-Link: https://patchwork.ozlabs.org/cover/865042
-
-In simple terms, when TrustZone is active the first page of the CAAM
-becomes inaccessible to Linux as it has a special 'TZ bit' associated with
-it that software cannot toggle or even view AFAIK.
-
-The patches here then
-
-1. Detect when TrustZone is active
-2. Detect if u-boot (or OPTEE) has already initialized the RNG
-
-and loads the CAAM driver in a different way - skipping over the RNG
-initialization that Linux now no-longer has permissions to carry out.
-
-Should #1 be true but #2 not be true, driver loading stops (and Rui's patch
-for the NULL pointer dereference fixes a cash on this path). If #2 is true
-but #1 is not then it's a NOP as Linux has full permission to rewrite the
-deco registers in the first page of CAAM registers.
-
-Finally then if #1 and #2 are true, the fixes here allow the CAAM to come
-up and for the RNG to be useable again.
-
-Bryan O'Donoghue (1):
-  crypto: caam: Fix endless loop when RNG is already initialized
-
-Rui Miguel Silva (4):
-  crypto: caam: Fix null dereference at error path
-  crypto: caam: do not use mem and emi_slow clock for imx7x
-  clk: imx7d: add CAAM clock
-  ARM: dts: imx7s: add CAAM device node
-
- arch/arm/boot/dts/imx7s.dtsi            | 31 +++++++++++++++++++++++
- drivers/clk/imx/clk-imx7d.c             |  1 +
- drivers/crypto/caam/ctrl.c              | 45 ++++++++++++++++++++-------------
- include/dt-bindings/clock/imx7d-clock.h |  3 ++-
- 4 files changed, 61 insertions(+), 19 deletions(-)
-
+diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
+index 027e121..98986d3 100644
+--- a/drivers/crypto/caam/ctrl.c
++++ b/drivers/crypto/caam/ctrl.c
+@@ -809,9 +809,6 @@ static int caam_probe(struct platform_device *pdev)
+ 	return 0;
+ 
+ caam_remove:
+-#ifdef CONFIG_DEBUG_FS
+-	debugfs_remove_recursive(ctrlpriv->dfs_root);
+-#endif
+ 	caam_remove(pdev);
+ 	return ret;
+ 
 -- 
 2.7.4
