@@ -1,103 +1,104 @@
-From: Eric Biggers <ebiggers3@gmail.com>
-Subject: Re: [PATCH] crypto: sha1-mb - remove HASH_FIRST flag
-Date: Thu, 25 Jan 2018 14:03:40 -0800
-Message-ID: <20180125220340.l2t2v7jjc5dwoe43@gmail.com>
-References: <20180125031008.778-1-ebiggers3@gmail.com>
- <b5918f68-e4d3-e98c-00eb-d54c2d6e3329@linux.intel.com>
+From: Bryan O'Donoghue <pure.logic@nexus-software.ie>
+Subject: Re: [RESEND PATCH 0/6] Enable CAAM on i.MX7s fix TrustZone issues
+Date: Fri, 26 Jan 2018 01:06:00 +0000
+Message-ID: <1c7a9b01-d12b-0887-27ed-dbd8c66910c9@nexus-software.ie>
+References: <1516805435-15034-1-git-send-email-pure.logic@nexus-software.ie>
+ <VI1PR0402MB3342F22397EEF7CF009BA4C598E10@VI1PR0402MB3342.eurprd04.prod.outlook.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Eric Biggers <ebiggers@google.com>,
-        Megha Dey <megha.dey@linux.intel.com>
-To: Tim Chen <tim.c.chen@linux.intel.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ot0-f193.google.com ([74.125.82.193]:41170 "EHLO
-        mail-ot0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751301AbeAYWDn (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 25 Jan 2018 17:03:43 -0500
-Received: by mail-ot0-f193.google.com with SMTP id 44so8313771otk.8
-        for <linux-crypto@vger.kernel.org>; Thu, 25 Jan 2018 14:03:43 -0800 (PST)
-Content-Disposition: inline
-In-Reply-To: <b5918f68-e4d3-e98c-00eb-d54c2d6e3329@linux.intel.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=iso-8859-2; format=flowed
+Content-Transfer-Encoding: 8bit
+Cc: Fabio Estevam <fabio.estevam@nxp.com>, Peng Fan <peng.fan@nxp.com>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "lukas.auer@aisec.fraunhofer.de" <lukas.auer@aisec.fraunhofer.de>,
+        "rui.silva@linaro.org" <rui.silva@linaro.org>,
+        "ryan.harkin@linaro.org" <ryan.harkin@linaro.org>
+To: =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@nxp.com>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <VI1PR0402MB3342F22397EEF7CF009BA4C598E10@VI1PR0402MB3342.eurprd04.prod.outlook.com>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Jan 25, 2018 at 01:58:38PM -0800, Tim Chen wrote:
-> On 01/24/2018 07:10 PM, Eric Biggers wrote:
-> > From: Eric Biggers <ebiggers@google.com>
-> > 
-> > The HASH_FIRST flag is never set.  Remove it.
-> > 
-> > Signed-off-by: Eric Biggers <ebiggers@google.com>
-> > ---
-> >  arch/x86/crypto/sha1-mb/sha1_mb.c     | 28 +++-------------------------
-> >  arch/x86/crypto/sha1-mb/sha1_mb_ctx.h |  8 +++-----
-> >  2 files changed, 6 insertions(+), 30 deletions(-)
-> > 
-> > diff --git a/arch/x86/crypto/sha1-mb/sha1_mb.c b/arch/x86/crypto/sha1-mb/sha1_mb.c
-> > index acf9fdf01671..e17655ffde79 100644
-> > --- a/arch/x86/crypto/sha1-mb/sha1_mb.c
-> > +++ b/arch/x86/crypto/sha1-mb/sha1_mb.c
-> > @@ -106,13 +106,6 @@ static asmlinkage struct job_sha1* (*sha1_job_mgr_flush)
-> >  static asmlinkage struct job_sha1* (*sha1_job_mgr_get_comp_job)
-> >  						(struct sha1_mb_mgr *state);
-> >  
-> > -static inline void sha1_init_digest(uint32_t *digest)
-> > -{
-> > -	static const uint32_t initial_digest[SHA1_DIGEST_LENGTH] = {SHA1_H0,
-> > -					SHA1_H1, SHA1_H2, SHA1_H3, SHA1_H4 };
-> > -	memcpy(digest, initial_digest, sizeof(initial_digest));
-> > -}
-> > -
-> >  static inline uint32_t sha1_pad(uint8_t padblock[SHA1_BLOCK_SIZE * 2],
-> >  			 uint64_t total_len)
-> >  {
-> > @@ -244,11 +237,8 @@ static struct sha1_hash_ctx *sha1_ctx_mgr_submit(struct sha1_ctx_mgr *mgr,
-> >  					  uint32_t len,
-> >  					  int flags)
-> >  {
-> > -	if (flags & (~HASH_ENTIRE)) {
-> > -		/*
-> > -		 * User should not pass anything other than FIRST, UPDATE, or
-> > -		 * LAST
-> > -		 */
-> > +	if (flags & ~(HASH_UPDATE | HASH_LAST)) {
-> > +		/* User should not pass anything other than UPDATE or LAST */
-> >  		ctx->error = HASH_CTX_ERROR_INVALID_FLAGS;
-> >  		return ctx;
-> >  	}
-> > @@ -259,24 +249,12 @@ static struct sha1_hash_ctx *sha1_ctx_mgr_submit(struct sha1_ctx_mgr *mgr,
-> >  		return ctx;
-> >  	}
-> >  
-> > -	if ((ctx->status & HASH_CTX_STS_COMPLETE) && !(flags & HASH_FIRST)) {
-> > +	if (ctx->status & HASH_CTX_STS_COMPLETE) {
-> >  		/* Cannot update a finished job. */
-> >  		ctx->error = HASH_CTX_ERROR_ALREADY_COMPLETED;
-> >  		return ctx;
-> >  	}
-> >  
-> > -
-> > -	if (flags & HASH_FIRST) {
-> > -		/* Init digest */
-> > -		sha1_init_digest(ctx->job.result_digest);
-> > -
-> > -		/* Reset byte counter */
-> > -		ctx->total_length = 0;
-> > -
-> > -		/* Clear extra blocks */
-> > -		ctx->partial_block_buffer_length = 0;
-> > -	}
-> > -
-> 
-> I suppose this will be okay as we are really doing the initialization in
-> sha1_mb_init.  Megha is now maintaining this code.  Copying her
-> so she can do some verification of this change.
-> 
+On 25/01/18 17:50, Horia Geantã wrote:
+> If the first ("global") caam register page is not accessible, RNG init is not
+> the only problem. For e.g. device endianness detection won't work.
 
-Please update the MAINTAINERS file so that people know who to Cc on patches.
+Hi Horia,
 
-Eric
+Yes I had that thought that there were other gotchas lurking once the 
+CAAM was in a more restricted mode.
+
+
+
+> A complete list could be generated by auditing all places where this page is r/w.
+
+quote:
+
+"The CAAM address space is divided into 16 4 KB pages to
+match the access granularity of the MMU. Registers that are
+intended to be accessed by a specific processor or process are
+grouped into one of these 16 pages so that access to these
+registers can be restricted via CAAM's own MID-based access
+control mechanism, or via the CPU's MMU. For instance, the
+general configuration and status registers are located within
+page 0 and are intended to be accessed only by privileged
+software. The registers that control each job ring are located in
+a separate address block so that access to each job ring can be
+restricted to a particular process. Some registers, such as the
+version ID registers, are intended to be shared among processes.
+Rather than require each CAAM driver process to have two
+MMU page entries, one page for its private registers and one
+for the shared registers, CAAM "aliases" these shared registers
+into the upper section of each of the 16 address blocks. Reading
+any one of the address aliases for the same register returns the
+same information. Some of these aliased registers are writable,
+so access to these registers may require that software implement
+a concurrency control construct, as would be the case with any
+register that is read/write accessible by multiple processes."
+
+Not all of the first page is restricted - just some of it, I haven't 
+found a detailed explanation of which parts are restricted and which 
+parts are not.
+
+Referring to "Security Reference Manual for i.MX 7Dual and 7Solo 
+Applications Processors, Rev. 0, 03/2017" section 8.10.1 you'll see 
+there are alias registers for example offset 0x204 DMA Control (DMAC) 
+which is r/w.
+
+The above is the best description of the behavior I've found - I assume 
+there's some internal documentation (or RTL test benches) you guys can 
+refer to in NXP. I don't know if that's something you or Peng of Fabio 
+can follow up on internally.
+
+> IMHO the correct direction for solving such cases (i.e. Linux kernel is provided
+> only with access to a few job rings) is to split the driver in two independent
+> ones - controller driver and job ring driver - and have corresponding DT nodes
+> for them. Controller DT node and one or more of the job ring DT nodes would be
+> deleted by the boot loader / trusted firmware if needed.
+> Of course, the job ring DT node might need additional properties for the driver
+> to work.
+
+Well, I certainly take your point that there are probably other things 
+that are broken which we just haven't stumbled over yet. RNG broke for 
+us, we fixed it but, for example we haven't tried using RSA acceleration 
+so that might necessitate that type of change - or indeed what happens 
+if you make a call into the HAB (which will use the CAAM for crypto 
+acceleration) when the TZ restrictions are in-place.
+
+Does HAB/ROM even run @ EL3 ? I expect so but, I don't know.
+
+This series in V2 will just be about
+
+1. Enabling for i.MX7
+2. Fixing a few bugs we've found along the way.
+
+It does look like we can solve the RNG permissions problem exclusively 
+in u-boot... but I will take some time to look at endianess and any 
+other low-hanging fruit you can suggest for that V2 series.
+
+---
+bod
