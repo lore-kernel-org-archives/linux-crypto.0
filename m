@@ -1,65 +1,103 @@
-From: Bryan O'Donoghue <pure.logic@nexus-software.ie>
-Subject: [RESEND PATCH v2 4/5] clk: imx7d: add CAAM clock
-Date: Fri, 26 Jan 2018 19:05:00 +0000
-Message-ID: <1516993501-29646-5-git-send-email-pure.logic@nexus-software.ie>
-References: <1516993501-29646-1-git-send-email-pure.logic@nexus-software.ie>
+From: Corentin Labbe <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [PATCH v2 0/6] crypto: engine - Permit to enqueue all
+ async requests
+Date: Fri, 26 Jan 2018 20:15:28 +0100
+Message-ID: <20180126191534.17569-1-clabbe.montjoie@gmail.com>
+Reply-To: clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Cc: fabio.estevam@nxp.com, peng.fan@nxp.com,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        lukas.auer@aisec.fraunhofer.de, rui.silva@linaro.org,
-        ryan.harkin@linaro.org,
-        Bryan O'Donoghue <pure.logic@nexus-software.ie>
-To: horia.geanta@nxp.com, aymen.sghaier@nxp.com,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1516993501-29646-1-git-send-email-pure.logic@nexus-software.ie>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Cc: linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
+	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-doc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	virtualization-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org,
+	linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org,
+	Corentin Labbe <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: alexandre.torgue-qxv4g6HH51o@public.gmane.org,
+	arei.gonglei-hv44wF8Li93QT0dZR+AlfA@public.gmane.org,
+	corbet-T1hC0tSOHrs@public.gmane.org,
+	davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org,
+	herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org,
+	jasowang-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org,
+	mcoquelin.stm32-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org,
+	mst-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org,
+	fabien.dessenne-qxv4g6HH51o@public.gmane.org
+Return-path: <linux-sunxi+bncBD7YLCN32UNBB2P5VXJQKGQETWHR5GY-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+Sender: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
+List-Post: <https://groups.google.com/group/linux-sunxi/post>, <mailto:linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Help: <https://groups.google.com/support/>, <mailto:linux-sunxi+help-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Archive: <https://groups.google.com/group/linux-sunxi
+List-Subscribe: <https://groups.google.com/group/linux-sunxi/subscribe>, <mailto:linux-sunxi+subscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Unsubscribe: <mailto:googlegroups-manage+1076902468213+unsubscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>,
+ <https://groups.google.com/group/linux-sunxi/subscribe>
 List-Id: linux-crypto.vger.kernel.org
 
-From: Rui Miguel Silva <rui.silva@linaro.org>
+Hello
 
-Add CAAM clock so that we could use the Cryptographic Acceleration and
-Assurance Module (CAAM) hardware block.
+The current crypto_engine support only ahash and ablkcipher request.
+My first patch which try to add skcipher was Nacked, it will add too many functions
+and adding other algs(aead, asymetric_key) will make the situation worst.
 
-Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
-Cc: "Horia Geantă" <horia.geanta@nxp.com>
-Cc: Aymen Sghaier <aymen.sghaier@nxp.com>
-Cc: Fabio Estevam <fabio.estevam@nxp.com>
-Cc: Peng Fan <peng.fan@nxp.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Lukas Auer <lukas.auer@aisec.fraunhofer.de>
-Signed-off-by: Bryan O'Donoghue <pure.logic@nexus-software.ie>
----
- drivers/clk/imx/clk-imx7d.c             | 1 +
- include/dt-bindings/clock/imx7d-clock.h | 3 ++-
- 2 files changed, 3 insertions(+), 1 deletion(-)
+This patchset remove all algs specific stuff and now only process generic crypto_async_request.
 
-diff --git a/drivers/clk/imx/clk-imx7d.c b/drivers/clk/imx/clk-imx7d.c
-index 80dc211..52ab096 100644
---- a/drivers/clk/imx/clk-imx7d.c
-+++ b/drivers/clk/imx/clk-imx7d.c
-@@ -795,6 +795,7 @@ static void __init imx7d_clocks_init(struct device_node *ccm_node)
- 	clks[IMX7D_DRAM_PHYM_ALT_ROOT_CLK] = imx_clk_gate4("dram_phym_alt_root_clk", "dram_phym_alt_post_div", base + 0x4130, 0);
- 	clks[IMX7D_DRAM_ALT_ROOT_CLK] = imx_clk_gate4("dram_alt_root_clk", "dram_alt_post_div", base + 0x4130, 0);
- 	clks[IMX7D_OCOTP_CLK] = imx_clk_gate4("ocotp_clk", "ipg_root_clk", base + 0x4230, 0);
-+	clks[IMX7D_CAAM_CLK] = imx_clk_gate4("caam_clk", "ipg_root_clk", base + 0x4240, 0);
- 	clks[IMX7D_USB_HSIC_ROOT_CLK] = imx_clk_gate4("usb_hsic_root_clk", "usb_hsic_post_div", base + 0x4420, 0);
- 	clks[IMX7D_SDMA_CORE_CLK] = imx_clk_gate4("sdma_root_clk", "ahb_root_clk", base + 0x4480, 0);
- 	clks[IMX7D_PCIE_CTRL_ROOT_CLK] = imx_clk_gate4("pcie_ctrl_root_clk", "pcie_ctrl_post_div", base + 0x4600, 0);
-diff --git a/include/dt-bindings/clock/imx7d-clock.h b/include/dt-bindings/clock/imx7d-clock.h
-index e2f99ae..2bc5618 100644
---- a/include/dt-bindings/clock/imx7d-clock.h
-+++ b/include/dt-bindings/clock/imx7d-clock.h
-@@ -452,5 +452,6 @@
- #define IMX7D_OCOTP_CLK			439
- #define IMX7D_NAND_RAWNAND_CLK		440
- #define IMX7D_NAND_USDHC_BUS_RAWNAND_CLK 441
--#define IMX7D_CLK_END			442
-+#define IMX7D_CAAM_CLK			442
-+#define IMX7D_CLK_END			443
- #endif /* __DT_BINDINGS_CLOCK_IMX7D_H */
+The requests handler function pointer are now moved out of struct engine and
+are now stored directly in a crypto_engine_reqctx.
+
+The original proposal of Herbert [1] cannot be done completly since the crypto_engine
+could only dequeue crypto_async_request and it is impossible to access any request_ctx
+without knowing the underlying request type.
+
+So I do something near that was requested: adding crypto_engine_reqctx in TFM context.
+Note that the current implementation expect that crypto_engine_reqctx
+is the first member of the context.
+
+The first patch is a try to document the crypto engine API.
+The second patch convert the crypto engine with the new way,
+while the following patchs convert the 4 existing users of crypto_engine.
+Note that this split break bisection, so probably the final commit will be all merged.
+
+Appart from virtio, all 4 latest patch were compile tested only.
+But the crypto engine is tested with my new sun8i-ce driver.
+
+Regards
+
+[1] https://www.mail-archive.com/linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org/msg1474434.html
+
+Changes since V1:
+- renamed crypto_engine_reqctx to crypto_engine_ctx
+- indentation fix in function parameter
+- do not export crypto_transfer_request
+- Add aead support
+- crypto_finalize_request is now static
+
+Changes since RFC:
+- Added a documentation patch
+- Added patch for stm32-cryp
+- Changed parameter of all crypto_engine_op functions from
+	crypto_async_request to void*
+- Reintroduced crypto_transfer_xxx_request_to_engine functions
+
+Corentin Labbe (6):
+  Documentation: crypto: document crypto engine API
+  crypto: engine - Permit to enqueue all async requests
+  crypto: omap: convert to new crypto engine API
+  crypto: virtio: convert to new crypto engine API
+  crypto: stm32-hash: convert to the new crypto engine API
+  crypto: stm32-cryp: convert to the new crypto engine API
+
+ Documentation/crypto/crypto_engine.rst       |  48 +++++
+ crypto/crypto_engine.c                       | 301 +++++++++++++++------------
+ drivers/crypto/omap-aes.c                    |  21 +-
+ drivers/crypto/omap-aes.h                    |   3 +
+ drivers/crypto/omap-des.c                    |  24 ++-
+ drivers/crypto/stm32/stm32-cryp.c            |  29 ++-
+ drivers/crypto/stm32/stm32-hash.c            |  20 +-
+ drivers/crypto/virtio/virtio_crypto_algs.c   |  16 +-
+ drivers/crypto/virtio/virtio_crypto_common.h |   3 +-
+ drivers/crypto/virtio/virtio_crypto_core.c   |   3 -
+ include/crypto/engine.h                      |  68 +++---
+ 11 files changed, 332 insertions(+), 204 deletions(-)
+ create mode 100644 Documentation/crypto/crypto_engine.rst
+
 -- 
-2.7.4
+2.13.6
