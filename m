@@ -1,7 +1,7 @@
 From: Bryan O'Donoghue <pure.logic@nexus-software.ie>
-Subject: [RESEND PATCH v2 5/5] ARM: dts: imx7s: add CAAM device node
-Date: Fri, 26 Jan 2018 19:05:01 +0000
-Message-ID: <1516993501-29646-6-git-send-email-pure.logic@nexus-software.ie>
+Subject: [RESEND PATCH v2 3/5] crypto: caam: do not use mem and emi_slow clock for imx7x
+Date: Fri, 26 Jan 2018 19:04:59 +0000
+Message-ID: <1516993501-29646-4-git-send-email-pure.logic@nexus-software.ie>
 References: <1516993501-29646-1-git-send-email-pure.logic@nexus-software.ie>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -20,7 +20,11 @@ List-Id: linux-crypto.vger.kernel.org
 
 From: Rui Miguel Silva <rui.silva@linaro.org>
 
-Add CAAM device node to the i.MX7s device tree.
+I.MX7x only use two clocks for the CAAM module, so make sure we do not try to
+use the mem and the emi_slow clock when running in that imx7d and imx7s machine
+type.
+
+[bod: fixed minor trailing whitespace issue]
 
 Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
 Cc: "Horia Geantă" <horia.geanta@nxp.com>
@@ -32,50 +36,87 @@ Cc: "David S. Miller" <davem@davemloft.net>
 Cc: Lukas Auer <lukas.auer@aisec.fraunhofer.de>
 Signed-off-by: Bryan O'Donoghue <pure.logic@nexus-software.ie>
 ---
- arch/arm/boot/dts/imx7s.dtsi | 31 +++++++++++++++++++++++++++++++
- 1 file changed, 31 insertions(+)
+ drivers/crypto/caam/ctrl.c | 39 ++++++++++++++++++++++++---------------
+ 1 file changed, 24 insertions(+), 15 deletions(-)
 
-diff --git a/arch/arm/boot/dts/imx7s.dtsi b/arch/arm/boot/dts/imx7s.dtsi
-index 82ad26e..e38c159 100644
---- a/arch/arm/boot/dts/imx7s.dtsi
-+++ b/arch/arm/boot/dts/imx7s.dtsi
-@@ -805,6 +805,37 @@
- 				status = "disabled";
- 			};
+diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
+index 0a1e96b..1f2dd6a 100644
+--- a/drivers/crypto/caam/ctrl.c
++++ b/drivers/crypto/caam/ctrl.c
+@@ -333,7 +333,8 @@ static int caam_remove(struct platform_device *pdev)
  
-+			crypto: caam@30900000 {
-+				compatible = "fsl,sec-v4.0";
-+				fsl,sec-era = <4>;
-+				#address-cells = <1>;
-+				#size-cells = <1>;
-+				reg = <0x30900000 0x40000>;
-+				ranges = <0 0x30900000 0x40000>;
-+				interrupts = <GIC_SPI 91 IRQ_TYPE_LEVEL_HIGH>;
-+				clocks = <&clks IMX7D_CAAM_CLK>,
-+					 <&clks IMX7D_AHB_CHANNEL_ROOT_CLK>;
-+				clock-names = "ipg", "aclk";
-+
-+				sec_jr0: jr0@1000 {
-+					compatible = "fsl,sec-v4.0-job-ring";
-+					reg = <0x1000 0x1000>;
-+					interrupts = <GIC_SPI 105 IRQ_TYPE_LEVEL_HIGH>;
-+				};
-+
-+				sec_jr1: jr1@2000 {
-+					compatible = "fsl,sec-v4.0-job-ring";
-+					reg = <0x2000 0x1000>;
-+					interrupts = <GIC_SPI 106 IRQ_TYPE_LEVEL_HIGH>;
-+				};
-+
-+				sec_jr2: jr1@3000 {
-+					compatible = "fsl,sec-v4.0-job-ring";
-+					reg = <0x3000 0x1000>;
-+					interrupts = <GIC_SPI 114 IRQ_TYPE_LEVEL_HIGH>;
-+				};
-+			};
-+
- 			flexcan1: can@30a00000 {
- 				compatible = "fsl,imx7d-flexcan", "fsl,imx6q-flexcan";
- 				reg = <0x30a00000 0x10000>;
+ 	/* shut clocks off before finalizing shutdown */
+ 	clk_disable_unprepare(ctrlpriv->caam_ipg);
+-	clk_disable_unprepare(ctrlpriv->caam_mem);
++	if (ctrlpriv->caam_mem)
++		clk_disable_unprepare(ctrlpriv->caam_mem);
+ 	clk_disable_unprepare(ctrlpriv->caam_aclk);
+ 	if (ctrlpriv->caam_emi_slow)
+ 		clk_disable_unprepare(ctrlpriv->caam_emi_slow);
+@@ -462,14 +463,17 @@ static int caam_probe(struct platform_device *pdev)
+ 	}
+ 	ctrlpriv->caam_ipg = clk;
+ 
+-	clk = caam_drv_identify_clk(&pdev->dev, "mem");
+-	if (IS_ERR(clk)) {
+-		ret = PTR_ERR(clk);
+-		dev_err(&pdev->dev,
+-			"can't identify CAAM mem clk: %d\n", ret);
+-		return ret;
++	if (!of_machine_is_compatible("fsl,imx7d") &&
++	    !of_machine_is_compatible("fsl,imx7s")) {
++		clk = caam_drv_identify_clk(&pdev->dev, "mem");
++		if (IS_ERR(clk)) {
++			ret = PTR_ERR(clk);
++			dev_err(&pdev->dev,
++				"can't identify CAAM mem clk: %d\n", ret);
++			return ret;
++		}
++		ctrlpriv->caam_mem = clk;
+ 	}
+-	ctrlpriv->caam_mem = clk;
+ 
+ 	clk = caam_drv_identify_clk(&pdev->dev, "aclk");
+ 	if (IS_ERR(clk)) {
+@@ -480,7 +484,9 @@ static int caam_probe(struct platform_device *pdev)
+ 	}
+ 	ctrlpriv->caam_aclk = clk;
+ 
+-	if (!of_machine_is_compatible("fsl,imx6ul")) {
++	if (!of_machine_is_compatible("fsl,imx6ul") &&
++	    !of_machine_is_compatible("fsl,imx7d") &&
++	    !of_machine_is_compatible("fsl,imx7s")) {
+ 		clk = caam_drv_identify_clk(&pdev->dev, "emi_slow");
+ 		if (IS_ERR(clk)) {
+ 			ret = PTR_ERR(clk);
+@@ -497,11 +503,13 @@ static int caam_probe(struct platform_device *pdev)
+ 		return ret;
+ 	}
+ 
+-	ret = clk_prepare_enable(ctrlpriv->caam_mem);
+-	if (ret < 0) {
+-		dev_err(&pdev->dev, "can't enable CAAM secure mem clock: %d\n",
+-			ret);
+-		goto disable_caam_ipg;
++	if (ctrlpriv->caam_mem) {
++		ret = clk_prepare_enable(ctrlpriv->caam_mem);
++		if (ret < 0) {
++			dev_err(&pdev->dev, "can't enable CAAM secure mem clock: %d\n",
++				ret);
++			goto disable_caam_ipg;
++		}
+ 	}
+ 
+ 	ret = clk_prepare_enable(ctrlpriv->caam_aclk);
+@@ -823,7 +831,8 @@ static int caam_probe(struct platform_device *pdev)
+ disable_caam_aclk:
+ 	clk_disable_unprepare(ctrlpriv->caam_aclk);
+ disable_caam_mem:
+-	clk_disable_unprepare(ctrlpriv->caam_mem);
++	if (ctrlpriv->caam_mem)
++		clk_disable_unprepare(ctrlpriv->caam_mem);
+ disable_caam_ipg:
+ 	clk_disable_unprepare(ctrlpriv->caam_ipg);
+ 	return ret;
 -- 
 2.7.4
