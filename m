@@ -1,18 +1,14 @@
 From: Christophe Leroy <christophe.leroy@c-s.fr>
 Subject: [PATCH] crypto: talitos: fix Kernel Oops on hashing an empty file
-Date: Fri, 26 Jan 2018 17:09:59 +0100 (CET)
-Message-ID: <20180126160959.BEA466EFCA@localhost.localdomain>
+Date: Fri, 26 Jan 2018 17:11:04 +0100 (CET)
+Message-ID: <20180126161104.980526EFCA@localhost.localdomain>
 Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         linuxppc-dev@lists.ozlabs.org
 To: Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from pegase1.c-s.fr ([93.17.236.30]:43724 "EHLO pegase1.c-s.fr"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751776AbeAZQKC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 26 Jan 2018 11:10:02 -0500
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <stable-owner@vger.kernel.org>
+Sender: stable-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
 Performing the hash of an empty file leads to a kernel Oops
 
