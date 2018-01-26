@@ -1,72 +1,73 @@
-From: Bryan O'Donoghue <pure.logic@nexus-software.ie>
-Subject: [PATCH v2 1/5] crypto: caam: Fix null dereference at error path
-Date: Fri, 26 Jan 2018 17:00:00 +0000
-Message-ID: <1516986004-25452-2-git-send-email-pure.logic@nexus-software.ie>
-References: <1516986004-25452-1-git-send-email-pure.logic@nexus-software.ie>
+From: Will Deacon <will.deacon@arm.com>
+Subject: Re: [PATCH RFC 0/3] API for 128-bit IO access
+Date: Fri, 26 Jan 2018 18:11:49 +0000
+Message-ID: <20180126181149.GA17922@arm.com>
+References: <20180124090519.6680-1-ynorov@caviumnetworks.com>
+ <20180124102212.GC20586@arm.com>
+ <20180126090542.bsza7hqqinqwllcr@yury-thinkpad>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Cc: fabio.estevam@nxp.com, peng.fan@nxp.com,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        lukas.auer@aisec.fraunhofer.de, rui.silva@linaro.org,
-        ryan.harkin@linaro.org, "# 4 . 12+" <stable@vger.kernel.org>,
-        Bryan O'Donoghue <pure.logic@nexus-software.ie>
-To: horia.geanta@nxp.com, aymen.sghaier@nxp.com,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-arm-kernel@lists.infradead.org, linux-arch@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Andrew Pinski <Andrew.Pinski@cavium.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Geethasowjanya Akula <Geethasowjanya.Akula@cavium.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Ingo Molnar <mingo@kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        Laura Abbott <labbott@redhat.com>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Sunil Goutham <Sunil.Goutham@cavium.com>
+To: Yury Norov <ynorov@caviumnetworks.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wm0-f65.google.com ([74.125.82.65]:55021 "EHLO
-        mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751860AbeAZRAI (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 26 Jan 2018 12:00:08 -0500
-Received: by mail-wm0-f65.google.com with SMTP id i186so2570637wmi.4
-        for <linux-crypto@vger.kernel.org>; Fri, 26 Jan 2018 09:00:08 -0800 (PST)
-In-Reply-To: <1516986004-25452-1-git-send-email-pure.logic@nexus-software.ie>
+Received: from foss.arm.com ([217.140.101.70]:51948 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750864AbeAZSLv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 26 Jan 2018 13:11:51 -0500
+Content-Disposition: inline
+In-Reply-To: <20180126090542.bsza7hqqinqwllcr@yury-thinkpad>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Rui Miguel Silva <rui.silva@linaro.org>
+On Fri, Jan 26, 2018 at 12:05:42PM +0300, Yury Norov wrote:
+> On Wed, Jan 24, 2018 at 10:22:13AM +0000, Will Deacon wrote:
+> > On Wed, Jan 24, 2018 at 12:05:16PM +0300, Yury Norov wrote:
+> > > This series adds API for 128-bit memory IO access and enables it for ARM64.
+> > > The original motivation for 128-bit API came from new Cavium network device
+> > > driver. The hardware requires 128-bit access to make things work. See
+> > > description in patch 3 for details.
+> > > 
+> > > Also, starting from ARMv8.4, stp and ldp instructions become atomic, and
+> > > API for 128-bit access would be helpful in core arm64 code.
+> > 
+> > Only for normal, cacheable memory, so they're not suitable for IO accesses
+> > as you're proposing here.
+> 
+> Hi Will,
+> 
+> Thanks for clarification.
+> 
+> Could you elaborate, do you find 128-bit read/write API useless, or
+> you just correct my comment?
+> 
+> I think that ordered uniform 128-bit access API would be helpful, even
+> if not atomic.
 
-caam_remove already removes the debugfs entry, so we need to remove the one
-immediately before calling caam_remove.
+Sorry, but I strongly disagree here. Having an IO accessor that isn't
+guaranteed to be atomic is a recipe for disaster if it's not called out
+explicitly. You're much better off implementing something along the lines
+of <linux/io-128-nonatomic-hi-lo.h> using 2x64-bit accessors like we already
+have for the 2x32-bit case.
 
-This fix a NULL dereference at error paths is caam_probe fail.
+However, that doesn't solve your problem and is somewhat of a distraction.
+I'd suggest that in your case, where you have a device that relies on
+128-bit atomic access that is assumedly tightly integrated into your SoC,
+then the driver just codes it's own local implementation of the accessor,
+given that there isn't a way to guarantee the atomicity architecturally
+(and even within your SoC it might not be atomic to all endpoints).
 
-[bod: changed name prefix to "crypto: caam: Fix .."]
-[bod: added Fixes tag]
-
-Fixes: 67c2315def06 ("crypto: caam - add Queue Interface (QI) backend
-support")
-
-Tested-by: Ryan Harkin <ryan.harkin@linaro.org>
-Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
-Cc: "Horia Geantă" <horia.geanta@nxp.com>
-Cc: Aymen Sghaier <aymen.sghaier@nxp.com>
-Cc: Fabio Estevam <fabio.estevam@nxp.com>
-Cc: Peng Fan <peng.fan@nxp.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Lukas Auer <lukas.auer@aisec.fraunhofer.de>
-Cc: <stable@vger.kernel.org> # 4.12+
-Reviewed-by: Horia Geantă <horia.geanta@nxp.com>
-Signed-off-by: Bryan O'Donoghue <pure.logic@nexus-software.ie>
----
- drivers/crypto/caam/ctrl.c | 3 ---
- 1 file changed, 3 deletions(-)
-
-diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
-index 027e121..98986d3 100644
---- a/drivers/crypto/caam/ctrl.c
-+++ b/drivers/crypto/caam/ctrl.c
-@@ -809,9 +809,6 @@ static int caam_probe(struct platform_device *pdev)
- 	return 0;
- 
- caam_remove:
--#ifdef CONFIG_DEBUG_FS
--	debugfs_remove_recursive(ctrlpriv->dfs_root);
--#endif
- 	caam_remove(pdev);
- 	return ret;
- 
--- 
-2.7.4
+Will
