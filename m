@@ -1,48 +1,49 @@
-From: Fabio Estevam <festevam@gmail.com>
-Subject: Re: [RESEND PATCH v2 0/5] Enable CAAM on i.MX7s fix TrustZone issues
-Date: Fri, 26 Jan 2018 22:42:46 -0200
-Message-ID: <CAOMZO5BdCyS-spEuD6rFxBhqCStH7uOcJ7XQT_xc-GP4ru4apg@mail.gmail.com>
-References: <1516993501-29646-1-git-send-email-pure.logic@nexus-software.ie>
+From: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+Subject: Re: [PATCH v2] tpm: Move Linux RNG connection to hwrng
+Date: Sat, 27 Jan 2018 12:20:18 +0530
+Message-ID: <CANc+2y4nALRpw9dY8PK8A56St4NONQoTLc8aHqxuV1RWg_PiCw@mail.gmail.com>
+References: <20171031200503.GC18578@ziepe.ca> <20171105110506.usxmuzrvcjvxahr6@linux.intel.com>
+ <20171106022704.GD26011@ziepe.ca> <CANc+2y6dx_2zOzFA5aFs7RpEV8aNqxpDghmx+q_+XyendYJoew@mail.gmail.com>
+ <20171107160404.GG21466@ziepe.ca> <20171114143421.3jxn6fzvgp2xmyk6@linux.intel.com>
+ <20171117132853.cmr3wmsc3biedv7p@linux.intel.com> <20171117135758.wvx3w5phndvfmfsh@linux.intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Cc: Horia Geanta Neag <horia.geanta@nxp.com>, aymen.sghaier@nxp.com,
-        linux-crypto@vger.kernel.org,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Fabio Estevam <fabio.estevam@nxp.com>,
-        Peng Fan <peng.fan@nxp.com>,
+Cc: Jason Gunthorpe <jgg@ziepe.ca>,
+        Stefan Berger <stefanb@linux.vnet.ibm.com>,
+        linux-integrity@vger.kernel.org,
+        David Howells <dhowells@redhat.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        lukas.auer@aisec.fraunhofer.de, rui.silva@linaro.org,
-        Ryan Harkin <ryan.harkin@linaro.org>
-To: "Bryan O'Donoghue" <pure.logic@nexus-software.ie>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ot0-f176.google.com ([74.125.82.176]:43373 "EHLO
-        mail-ot0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751946AbeA0Amr (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 26 Jan 2018 19:42:47 -0500
-In-Reply-To: <1516993501-29646-1-git-send-email-pure.logic@nexus-software.ie>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+        open list <linux-kernel@vger.kernel.org>,
+        "open list:INTEGRITY MEASUREMENT ARCHITECTURE (IMA)"
+        <linux-security-module@vger.kernel.org>,
+        "open list:KEYS-TRUSTED" <keyrings@vger.kernel.org>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>,
+        James Morris <james.l.morris@oracle.com>,
+        Matt Mackall <mpm@selenic.com>,
+        David Safford <safford@us.ibm.com>,
+        Mimi Zohar <zohar@linux.vnet.ibm.com>,
+        "Serge E. Hallyn" <serge@hallyn.com>
+To: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20171117135758.wvx3w5phndvfmfsh@linux.intel.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi Bryan,
+Hi Jarkko,
 
-On Fri, Jan 26, 2018 at 5:04 PM, Bryan O'Donoghue
-<pure.logic@nexus-software.ie> wrote:
-
-> Bryan O'Donoghue (1):
->   crypto: caam: Fix endless loop when RNG is already initialized
+On 17 November 2017 at 19:27, Jarkko Sakkinen
+<jarkko.sakkinen@linux.intel.com> wrote:
+> On Fri, Nov 17, 2017 at 03:28:53PM +0200, Jarkko Sakkinen wrote:
 >
-> Rui Miguel Silva (4):
->   crypto: caam: Fix null dereference at error path
->   crypto: caam: do not use mem and emi_slow clock for imx7x
+> At least signed-off-by from PrassanaKumar is missing from the 2nd
+> commit. I'll add it.
 
-Thanks for your series!
+I had the impression that my signed-off-by will be present in this
+change. But it is missing in [1]. Is it supposed to be that way?
 
->   clk: imx7d: add CAAM clock
+1. https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/commit/?id=6e592a065d51d26f9d62b8b7501a5114076af8b4
 
-This one should be posted to the clock driver maintainers.
-
->   ARM: dts: imx7s: add CAAM device node
-
-This one should be posted to the i.MX arch maintainers.
+Thanks,
+PrasannaKumar
