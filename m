@@ -1,95 +1,61 @@
-From: Atul Gupta <atul.gupta@chelsio.com>
-Subject: RE: [RFC crypto v3 8/9] chtls: Register the ULP
-Date: Sun, 28 Jan 2018 05:55:55 +0000
-Message-ID: <CY4PR1201MB0230C0D2D0F24900A084574D97E60@CY4PR1201MB0230.namprd12.prod.outlook.com>
-References: <20180125210850.GA69117@davejwatson-mba>
+From: Rui Miguel Silva <rui.silva@linaro.org>
+Subject: Re: [RESEND PATCH 3/6] ARM: dts: imx7s: add CAAM device node
+Date: Sun, 28 Jan 2018 15:42:32 +0000
+Message-ID: <m3607m2dnb.fsf@linaro.org>
+References: <1516805435-15034-4-git-send-email-pure.logic@nexus-software.ie> <201801272345.TyvgLQ8s%fengguang.wu@intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-Cc: "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "ganeshgr@chelsio.co" <ganeshgr@chelsio.co>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "Boris Pismenny" <borisp@mellanox.com>,
-        Ilya Lesokhin <ilyal@mellanox.com>
-To: Dave Watson <davejwatson@fb.com>
+Content-Type: text/plain
+Cc: kbuild-all@01.org, horia.geanta@nxp.com, aymen.sghaier@nxp.com,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        fabio.estevam@nxp.com, peng.fan@nxp.com,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        lukas.auer@aisec.fraunhofer.de, rui.silva@linaro.org,
+        ryan.harkin@linaro.org,
+        Bryan O'Donoghue <pure.logic@nexus-software.ie>
+To: kbuild test robot <lkp@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-by2nam01on0112.outbound.protection.outlook.com ([104.47.34.112]:62736
-        "EHLO NAM01-BY2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751083AbeA1Fz6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 28 Jan 2018 00:55:58 -0500
-In-Reply-To: <20180125210850.GA69117@davejwatson-mba>
-Content-Language: en-US
+Received: from mail-wr0-f194.google.com ([209.85.128.194]:39440 "EHLO
+        mail-wr0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751733AbeA1Pmg (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 28 Jan 2018 10:42:36 -0500
+Received: by mail-wr0-f194.google.com with SMTP id f6so2917929wra.6
+        for <linux-crypto@vger.kernel.org>; Sun, 28 Jan 2018 07:42:35 -0800 (PST)
+In-reply-to: <201801272345.TyvgLQ8s%fengguang.wu@intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+Hi,
+Thanks for the report.
+On Sat 27 Jan 2018 at 15:49, kbuild test robot wrote:
+> Hi Rui,
+>
+> I love your patch! Yet something to improve:
+>
+> [auto build test ERROR on crypto/master]
+> [also build test ERROR on v4.15-rc9 next-20180126]
+> [cannot apply to cryptodev/master]
+> [if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
+>
+> url:    https://github.com/0day-ci/linux/commits/Bryan-O-Donoghue/Enable-CAAM-on-i-MX7s-fix-TrustZone-issues/20180127-185422
+> base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git master
+> config: arm-u8500_defconfig (attached as .config)
+> compiler: arm-linux-gnueabi-gcc (Debian 7.2.0-11) 7.2.0
+> reproduce:
+>         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+>         chmod +x ~/bin/make.cross
+>         # save the attached .config to linux build tree
+>         make.cross ARCH=arm 
+>
+> Note: the linux-review/Bryan-O-Donoghue/Enable-CAAM-on-i-MX7s-fix-TrustZone-issues/20180127-185422 HEAD f907a172373d2c61dd7bf25a88621abc6e410f15 builds fine.
+>       It only hurts bisectibility.
 
+Yeah, the order of the patches in the series were wrong and break
+bisectibility.
 
------Original Message-----
-From: Dave Watson [mailto:davejwatson@fb.com]=20
-Sent: Friday, January 26, 2018 2:39 AM
-To: Atul Gupta <atul.gupta@chelsio.com>
-Cc: herbert@gondor.apana.org.au; linux-crypto@vger.kernel.org; ganeshgr@che=
-lsio.co; netdev@vger.kernel.org; davem@davemloft.net; Boris Pismenny <boris=
-p@mellanox.com>; Ilya Lesokhin <ilyal@mellanox.com>
-Subject: Re: [RFC crypto v3 8/9] chtls: Register the ULP
+V2 of this series already sent, besides other fixes, also fix this.
+Once again many thanks.
 
-<1513769897-26945-1-git-send-email-atul.gupta@chelsio.com>
-
-On 12/20/17 05:08 PM, Atul Gupta wrote:
-> +static void __init chtls_init_ulp_ops(void) {
-> +	chtls_base_prot			=3D tcp_prot;
-> +	chtls_base_prot.hash		=3D chtls_hash;
-> +	chtls_base_prot.unhash		=3D chtls_unhash;
-> +	chtls_base_prot.close		=3D chtls_lsk_close;
-> +
-> +	chtls_cpl_prot			=3D chtls_base_prot;
-> +	chtls_init_rsk_ops(&chtls_cpl_prot, &chtls_rsk_ops,
-> +			   &tcp_prot, PF_INET);
-> +	chtls_cpl_prot.close		=3D chtls_close;
-> +	chtls_cpl_prot.disconnect	=3D chtls_disconnect;
-> +	chtls_cpl_prot.destroy		=3D chtls_destroy_sock;
-> +	chtls_cpl_prot.shutdown		=3D chtls_shutdown;
-> +	chtls_cpl_prot.sendmsg		=3D chtls_sendmsg;
-> +	chtls_cpl_prot.recvmsg		=3D chtls_recvmsg;
-> +	chtls_cpl_prot.sendpage		=3D chtls_sendpage;
-> +	chtls_cpl_prot.setsockopt	=3D chtls_setsockopt;
-> +	chtls_cpl_prot.getsockopt	=3D chtls_getsockopt;
-> +}
-
-Much of this file should go in tls_main.c, reusing as much as possible. For=
- example it doesn't look like the get/set sockopts have changed at all for =
-chtls.
-
-Agree, should common code and anything other than TLS_BASE_TX/TLS_SW_TX pro=
-t should go in vendor specific file/driver. Since, prot require redefinitio=
-n for hardware the code is kept in chtls_main.c
-
-> +
-> +static int __init chtls_register(void) {
-> +	chtls_init_ulp_ops();
-> +	register_listen_notifier(&listen_notifier);
-> +	cxgb4_register_uld(CXGB4_ULD_TLS, &chtls_uld_info);
-> +	tcp_register_ulp(&tcp_chtls_ulp_ops);
-> +	return 0;
-> +}
-> +
-> +static void __exit chtls_unregister(void) {
-> +	unregister_listen_notifier(&listen_notifier);
-> +	tcp_unregister_ulp(&tcp_chtls_ulp_ops);
-> +	chtls_free_all_uld();
-> +	cxgb4_unregister_uld(CXGB4_ULD_TLS);
-> +}
-
-The idea with ULP is that there is one ULP hook per protocol, not per drive=
-r. =20
-
-One thought is that apps/lib calling setsockopt pass the required ulp type =
-[tls or chtls or xtls], this enables any HW assist to define base_prot as r=
-equired and keep common code [tls_main] independent of underlying HW.=20
-If we are to have single TLS ULP hook [good from user point] then need a wa=
-y to determine which Inline tls hw is used? System with multiple Inline TLS=
- capable hw and differing functionality would require checks in tls_main to=
- exercise that specific functionality/callback?
+---
+Cheers,
+	Rui
