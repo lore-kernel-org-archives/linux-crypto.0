@@ -1,77 +1,90 @@
-From: Yury Norov <ynorov@caviumnetworks.com>
-Subject: Re: [PATCH RFC 0/3] API for 128-bit IO access
-Date: Mon, 29 Jan 2018 13:25:58 +0300
-Message-ID: <20180129102558.jcnusie6y6wwooan@yury-thinkpad>
-References: <20180124090519.6680-1-ynorov@caviumnetworks.com>
- <20180124102212.GC20586@arm.com>
- <20180126090542.bsza7hqqinqwllcr@yury-thinkpad>
- <20180126181149.GA17922@arm.com>
+From: =?utf-8?Q?=C5=81ukasz_Stelmach?= <l.stelmach@samsung.com>
+Subject: Re: [PATCH][next] hwrng: exynos: check for -ve error return from
+ readl_poll_timeout
+Date: Mon, 29 Jan 2018 14:24:00 +0100
+Message-ID: <87fu6oyf0v.fsf%l.stelmach@samsung.com>
+References: <20180112163048.26960-1-colin.king@canonical.com>
+        <CGME20180129132405eucas1p244f341793274cd1c11aa09e0b1d2c4bd@eucas1p2.samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-arm-kernel@lists.infradead.org, linux-arch@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Andrew Pinski <Andrew.Pinski@cavium.com>,
+Content-Type: multipart/signed; boundary="=-=-="; micalg="pgp-sha256";
+        protocol="application/pgp-signature"
+Cc: Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
         Arnd Bergmann <arnd@arndb.de>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Geethasowjanya Akula <Geethasowjanya.Akula@cavium.com>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Ingo Molnar <mingo@kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Laura Abbott <labbott@redhat.com>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Sunil Goutham <Sunil.Goutham@cavium.com>
-To: Will Deacon <will.deacon@arm.com>
-Return-path: <linux-arch-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20180126181149.GA17922@arm.com>
-Sender: linux-arch-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+        Kukjin Kim <kgene@kernel.org>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        linux-samsung-soc@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Colin King <colin.king@canonical.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mailout1.w1.samsung.com ([210.118.77.11]:41319 "EHLO
+        mailout1.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751298AbeA2NYK (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 29 Jan 2018 08:24:10 -0500
+In-reply-to: <20180112163048.26960-1-colin.king@canonical.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Jan 26, 2018 at 06:11:49PM +0000, Will Deacon wrote:
-> On Fri, Jan 26, 2018 at 12:05:42PM +0300, Yury Norov wrote:
-> > On Wed, Jan 24, 2018 at 10:22:13AM +0000, Will Deacon wrote:
-> > > On Wed, Jan 24, 2018 at 12:05:16PM +0300, Yury Norov wrote:
-> > > > This series adds API for 128-bit memory IO access and enables it for ARM64.
-> > > > The original motivation for 128-bit API came from new Cavium network device
-> > > > driver. The hardware requires 128-bit access to make things work. See
-> > > > description in patch 3 for details.
-> > > > 
-> > > > Also, starting from ARMv8.4, stp and ldp instructions become atomic, and
-> > > > API for 128-bit access would be helpful in core arm64 code.
-> > > 
-> > > Only for normal, cacheable memory, so they're not suitable for IO accesses
-> > > as you're proposing here.
-> > 
-> > Hi Will,
-> > 
-> > Thanks for clarification.
-> > 
-> > Could you elaborate, do you find 128-bit read/write API useless, or
-> > you just correct my comment?
-> > 
-> > I think that ordered uniform 128-bit access API would be helpful, even
-> > if not atomic.
-> 
-> Sorry, but I strongly disagree here. Having an IO accessor that isn't
-> guaranteed to be atomic is a recipe for disaster if it's not called out
-> explicitly. You're much better off implementing something along the lines
-> of <linux/io-128-nonatomic-hi-lo.h> using 2x64-bit accessors like we already
-> have for the 2x32-bit case.
-> 
-> However, that doesn't solve your problem and is somewhat of a distraction.
-> I'd suggest that in your case, where you have a device that relies on
-> 128-bit atomic access that is assumedly tightly integrated into your SoC,
-> then the driver just codes it's own local implementation of the accessor,
-> given that there isn't a way to guarantee the atomicity architecturally
-> (and even within your SoC it might not be atomic to all endpoints).
+--=-=-=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-OK. Understand that. So we'll drop this RFC and implement those accessors 
-in driver.
+It was <2018-01-12 pi=C4=85 17:30>, when Colin King wrote:
+> From: Colin Ian King <colin.king@canonical.com>
+>
+> Currently, the return from readl_poll_timeout is being assigned to
+> a u32 and this is being checked for a -ve return which is always
+> false since a u32 cannot be less than zero.  Fix this by changing
+> val to an int so that error returns can be correctly detected.
+>
+> Detected by CoverityScan, CID#1463776 ("Logically dead code")
+>
+> Fixes: 6cd225cc5d8a ("hwrng: exynos - add Samsung Exynos True RNG driver")
+> Signed-off-by: Colin Ian King <colin.king@canonical.com>
+> ---
+>  drivers/char/hw_random/exynos-trng.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/drivers/char/hw_random/exynos-trng.c b/drivers/char/hw_rando=
+m/exynos-trng.c
+> index 34d6f51ecbee..f4643e3ec346 100644
+> --- a/drivers/char/hw_random/exynos-trng.c
+> +++ b/drivers/char/hw_random/exynos-trng.c
+> @@ -55,7 +55,7 @@ static int exynos_trng_do_read(struct hwrng *rng, void =
+*data, size_t max,
+>  			       bool wait)
+>  {
+>  	struct exynos_trng_dev *trng;
+> -	u32 val;
+> +	int val;
+>=20=20
+>  	max =3D min_t(size_t, max, (EXYNOS_TRNG_FIFO_LEN * 4));
 
-Thank you and all for the review. Maybe later I'll submit 128-bit unification
-patch that was discussed here.
+Fixed.
 
-Yury
+https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git/c=
+ommit/?id=3Da8bc71d4960391f732ec0307ebd69e4a25aaf4d3
+
+=2D-=20
+=C5=81ukasz Stelmach
+Samsung R&D Institute Poland
+Samsung Electronics
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBCAAGBQJabyBwAAoJELCuHpyYpYAQZwYH/RlxAx/YurLQ/T+cRM8BRMoE
+t5RVRMByVZKd0J6ReIPtgKUeO8QF+HJYvgbXdKGFZ1GcQWBzY/57Zix5lryC9lZR
+2kWKXrW0Ji3G6XEPjnvknCTVK24uZ9tO84sh34yuXd6b0JnESraORsoT6ryq32jv
+LVNlXH2fsoEixNbQHsBwyRCwa+Ov9PuMHRS1yU/m8+MkucIy4kNX4tcdlOTVN8l7
+pI2Jxz4pUFCju6lySUTT4Nh7GzU3M8oIC/s8tVQkpTOF0q81AYCg55666gnGtwSr
+19Ynrr9CikelpWhtqoPHusunbRuLrQBrm4Pexd+U88PkkbszCw4mE7+TsOsmxCA=
+=i0mm
+-----END PGP SIGNATURE-----
+--=-=-=--
