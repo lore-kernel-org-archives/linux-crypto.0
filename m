@@ -1,440 +1,77 @@
-From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
-Subject: [PATCH 3/3] crypto: caam/qi - add GCM support
-Date: Mon, 29 Jan 2018 10:38:37 +0200
-Message-ID: <20180129083837.21174-3-horia.geanta@nxp.com>
-References: <20180129083837.21174-1-horia.geanta@nxp.com>
+From: Yury Norov <ynorov@caviumnetworks.com>
+Subject: Re: [PATCH RFC 0/3] API for 128-bit IO access
+Date: Mon, 29 Jan 2018 13:25:58 +0300
+Message-ID: <20180129102558.jcnusie6y6wwooan@yury-thinkpad>
+References: <20180124090519.6680-1-ynorov@caviumnetworks.com>
+ <20180124102212.GC20586@arm.com>
+ <20180126090542.bsza7hqqinqwllcr@yury-thinkpad>
+ <20180126181149.GA17922@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-Cc: "David S. Miller" <davem@davemloft.net>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        <linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-sn1nam02on0048.outbound.protection.outlook.com ([104.47.36.48]:47136
-        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751298AbeA2IjR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 29 Jan 2018 03:39:17 -0500
-In-Reply-To: <20180129083837.21174-1-horia.geanta@nxp.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-arm-kernel@lists.infradead.org, linux-arch@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Andrew Pinski <Andrew.Pinski@cavium.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Geethasowjanya Akula <Geethasowjanya.Akula@cavium.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Ingo Molnar <mingo@kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        Laura Abbott <labbott@redhat.com>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Sunil Goutham <Sunil.Goutham@cavium.com>
+To: Will Deacon <will.deacon@arm.com>
+Return-path: <linux-arch-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20180126181149.GA17922@arm.com>
+Sender: linux-arch-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Add support for AES working in Galois Counter Mode.
-The following algorithms are added:
-gcm(aes)
-rfc4106(gcm(aes))
-rfc4543(gcm(aes))
+On Fri, Jan 26, 2018 at 06:11:49PM +0000, Will Deacon wrote:
+> On Fri, Jan 26, 2018 at 12:05:42PM +0300, Yury Norov wrote:
+> > On Wed, Jan 24, 2018 at 10:22:13AM +0000, Will Deacon wrote:
+> > > On Wed, Jan 24, 2018 at 12:05:16PM +0300, Yury Norov wrote:
+> > > > This series adds API for 128-bit memory IO access and enables it for ARM64.
+> > > > The original motivation for 128-bit API came from new Cavium network device
+> > > > driver. The hardware requires 128-bit access to make things work. See
+> > > > description in patch 3 for details.
+> > > > 
+> > > > Also, starting from ARMv8.4, stp and ldp instructions become atomic, and
+> > > > API for 128-bit access would be helpful in core arm64 code.
+> > > 
+> > > Only for normal, cacheable memory, so they're not suitable for IO accesses
+> > > as you're proposing here.
+> > 
+> > Hi Will,
+> > 
+> > Thanks for clarification.
+> > 
+> > Could you elaborate, do you find 128-bit read/write API useless, or
+> > you just correct my comment?
+> > 
+> > I think that ordered uniform 128-bit access API would be helpful, even
+> > if not atomic.
+> 
+> Sorry, but I strongly disagree here. Having an IO accessor that isn't
+> guaranteed to be atomic is a recipe for disaster if it's not called out
+> explicitly. You're much better off implementing something along the lines
+> of <linux/io-128-nonatomic-hi-lo.h> using 2x64-bit accessors like we already
+> have for the 2x32-bit case.
+> 
+> However, that doesn't solve your problem and is somewhat of a distraction.
+> I'd suggest that in your case, where you have a device that relies on
+> 128-bit atomic access that is assumedly tightly integrated into your SoC,
+> then the driver just codes it's own local implementation of the accessor,
+> given that there isn't a way to guarantee the atomicity architecturally
+> (and even within your SoC it might not be atomic to all endpoints).
 
-There is a limitation related to IV size, similar to the one present in
-SW implementation (crypto/gcm.c):
-The only IV size allowed is 12 bytes. It will be padded by HW to the right
-with 0x0000_0001 (up to 16 bytes - AES block size), according to the
-GCM specification.
+OK. Understand that. So we'll drop this RFC and implement those accessors 
+in driver.
 
-Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
----
- drivers/crypto/caam/caamalg_qi.c | 374 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 374 insertions(+)
+Thank you and all for the review. Maybe later I'll submit 128-bit unification
+patch that was discussed here.
 
-diff --git a/drivers/crypto/caam/caamalg_qi.c b/drivers/crypto/caam/caamalg_qi.c
-index f4db39495d22..c2b5762d56a0 100644
---- a/drivers/crypto/caam/caamalg_qi.c
-+++ b/drivers/crypto/caam/caamalg_qi.c
-@@ -284,6 +284,309 @@ static int aead_setkey(struct crypto_aead *aead, const u8 *key,
- 	return -EINVAL;
- }
- 
-+static int gcm_set_sh_desc(struct crypto_aead *aead)
-+{
-+	struct caam_ctx *ctx = crypto_aead_ctx(aead);
-+	unsigned int ivsize = crypto_aead_ivsize(aead);
-+	int rem_bytes = CAAM_DESC_BYTES_MAX - DESC_JOB_IO_LEN -
-+			ctx->cdata.keylen;
-+
-+	if (!ctx->cdata.keylen || !ctx->authsize)
-+		return 0;
-+
-+	/*
-+	 * Job Descriptor and Shared Descriptor
-+	 * must fit into the 64-word Descriptor h/w Buffer
-+	 */
-+	if (rem_bytes >= DESC_QI_GCM_ENC_LEN) {
-+		ctx->cdata.key_inline = true;
-+		ctx->cdata.key_virt = ctx->key;
-+	} else {
-+		ctx->cdata.key_inline = false;
-+		ctx->cdata.key_dma = ctx->key_dma;
-+	}
-+
-+	cnstr_shdsc_gcm_encap(ctx->sh_desc_enc, &ctx->cdata, ivsize,
-+			      ctx->authsize, true);
-+
-+	/*
-+	 * Job Descriptor and Shared Descriptor
-+	 * must fit into the 64-word Descriptor h/w Buffer
-+	 */
-+	if (rem_bytes >= DESC_QI_GCM_DEC_LEN) {
-+		ctx->cdata.key_inline = true;
-+		ctx->cdata.key_virt = ctx->key;
-+	} else {
-+		ctx->cdata.key_inline = false;
-+		ctx->cdata.key_dma = ctx->key_dma;
-+	}
-+
-+	cnstr_shdsc_gcm_decap(ctx->sh_desc_dec, &ctx->cdata, ivsize,
-+			      ctx->authsize, true);
-+
-+	return 0;
-+}
-+
-+static int gcm_setauthsize(struct crypto_aead *authenc, unsigned int authsize)
-+{
-+	struct caam_ctx *ctx = crypto_aead_ctx(authenc);
-+
-+	ctx->authsize = authsize;
-+	gcm_set_sh_desc(authenc);
-+
-+	return 0;
-+}
-+
-+static int gcm_setkey(struct crypto_aead *aead,
-+		      const u8 *key, unsigned int keylen)
-+{
-+	struct caam_ctx *ctx = crypto_aead_ctx(aead);
-+	struct device *jrdev = ctx->jrdev;
-+	int ret;
-+
-+#ifdef DEBUG
-+	print_hex_dump(KERN_ERR, "key in @" __stringify(__LINE__)": ",
-+		       DUMP_PREFIX_ADDRESS, 16, 4, key, keylen, 1);
-+#endif
-+
-+	memcpy(ctx->key, key, keylen);
-+	dma_sync_single_for_device(jrdev, ctx->key_dma, keylen, ctx->dir);
-+	ctx->cdata.keylen = keylen;
-+
-+	ret = gcm_set_sh_desc(aead);
-+	if (ret)
-+		return ret;
-+
-+	/* Now update the driver contexts with the new shared descriptor */
-+	if (ctx->drv_ctx[ENCRYPT]) {
-+		ret = caam_drv_ctx_update(ctx->drv_ctx[ENCRYPT],
-+					  ctx->sh_desc_enc);
-+		if (ret) {
-+			dev_err(jrdev, "driver enc context update failed\n");
-+			return ret;
-+		}
-+	}
-+
-+	if (ctx->drv_ctx[DECRYPT]) {
-+		ret = caam_drv_ctx_update(ctx->drv_ctx[DECRYPT],
-+					  ctx->sh_desc_dec);
-+		if (ret) {
-+			dev_err(jrdev, "driver dec context update failed\n");
-+			return ret;
-+		}
-+	}
-+
-+	return 0;
-+}
-+
-+static int rfc4106_set_sh_desc(struct crypto_aead *aead)
-+{
-+	struct caam_ctx *ctx = crypto_aead_ctx(aead);
-+	unsigned int ivsize = crypto_aead_ivsize(aead);
-+	int rem_bytes = CAAM_DESC_BYTES_MAX - DESC_JOB_IO_LEN -
-+			ctx->cdata.keylen;
-+
-+	if (!ctx->cdata.keylen || !ctx->authsize)
-+		return 0;
-+
-+	ctx->cdata.key_virt = ctx->key;
-+
-+	/*
-+	 * Job Descriptor and Shared Descriptor
-+	 * must fit into the 64-word Descriptor h/w Buffer
-+	 */
-+	if (rem_bytes >= DESC_QI_RFC4106_ENC_LEN) {
-+		ctx->cdata.key_inline = true;
-+	} else {
-+		ctx->cdata.key_inline = false;
-+		ctx->cdata.key_dma = ctx->key_dma;
-+	}
-+
-+	cnstr_shdsc_rfc4106_encap(ctx->sh_desc_enc, &ctx->cdata, ivsize,
-+				  ctx->authsize, true);
-+
-+	/*
-+	 * Job Descriptor and Shared Descriptor
-+	 * must fit into the 64-word Descriptor h/w Buffer
-+	 */
-+	if (rem_bytes >= DESC_QI_RFC4106_DEC_LEN) {
-+		ctx->cdata.key_inline = true;
-+	} else {
-+		ctx->cdata.key_inline = false;
-+		ctx->cdata.key_dma = ctx->key_dma;
-+	}
-+
-+	cnstr_shdsc_rfc4106_decap(ctx->sh_desc_dec, &ctx->cdata, ivsize,
-+				  ctx->authsize, true);
-+
-+	return 0;
-+}
-+
-+static int rfc4106_setauthsize(struct crypto_aead *authenc,
-+			       unsigned int authsize)
-+{
-+	struct caam_ctx *ctx = crypto_aead_ctx(authenc);
-+
-+	ctx->authsize = authsize;
-+	rfc4106_set_sh_desc(authenc);
-+
-+	return 0;
-+}
-+
-+static int rfc4106_setkey(struct crypto_aead *aead,
-+			  const u8 *key, unsigned int keylen)
-+{
-+	struct caam_ctx *ctx = crypto_aead_ctx(aead);
-+	struct device *jrdev = ctx->jrdev;
-+	int ret;
-+
-+	if (keylen < 4)
-+		return -EINVAL;
-+
-+#ifdef DEBUG
-+	print_hex_dump(KERN_ERR, "key in @" __stringify(__LINE__)": ",
-+		       DUMP_PREFIX_ADDRESS, 16, 4, key, keylen, 1);
-+#endif
-+
-+	memcpy(ctx->key, key, keylen);
-+	/*
-+	 * The last four bytes of the key material are used as the salt value
-+	 * in the nonce. Update the AES key length.
-+	 */
-+	ctx->cdata.keylen = keylen - 4;
-+	dma_sync_single_for_device(jrdev, ctx->key_dma, ctx->cdata.keylen,
-+				   ctx->dir);
-+
-+	ret = rfc4106_set_sh_desc(aead);
-+	if (ret)
-+		return ret;
-+
-+	/* Now update the driver contexts with the new shared descriptor */
-+	if (ctx->drv_ctx[ENCRYPT]) {
-+		ret = caam_drv_ctx_update(ctx->drv_ctx[ENCRYPT],
-+					  ctx->sh_desc_enc);
-+		if (ret) {
-+			dev_err(jrdev, "driver enc context update failed\n");
-+			return ret;
-+		}
-+	}
-+
-+	if (ctx->drv_ctx[DECRYPT]) {
-+		ret = caam_drv_ctx_update(ctx->drv_ctx[DECRYPT],
-+					  ctx->sh_desc_dec);
-+		if (ret) {
-+			dev_err(jrdev, "driver dec context update failed\n");
-+			return ret;
-+		}
-+	}
-+
-+	return 0;
-+}
-+
-+static int rfc4543_set_sh_desc(struct crypto_aead *aead)
-+{
-+	struct caam_ctx *ctx = crypto_aead_ctx(aead);
-+	unsigned int ivsize = crypto_aead_ivsize(aead);
-+	int rem_bytes = CAAM_DESC_BYTES_MAX - DESC_JOB_IO_LEN -
-+			ctx->cdata.keylen;
-+
-+	if (!ctx->cdata.keylen || !ctx->authsize)
-+		return 0;
-+
-+	ctx->cdata.key_virt = ctx->key;
-+
-+	/*
-+	 * Job Descriptor and Shared Descriptor
-+	 * must fit into the 64-word Descriptor h/w Buffer
-+	 */
-+	if (rem_bytes >= DESC_QI_RFC4543_ENC_LEN) {
-+		ctx->cdata.key_inline = true;
-+	} else {
-+		ctx->cdata.key_inline = false;
-+		ctx->cdata.key_dma = ctx->key_dma;
-+	}
-+
-+	cnstr_shdsc_rfc4543_encap(ctx->sh_desc_enc, &ctx->cdata, ivsize,
-+				  ctx->authsize, true);
-+
-+	/*
-+	 * Job Descriptor and Shared Descriptor
-+	 * must fit into the 64-word Descriptor h/w Buffer
-+	 */
-+	if (rem_bytes >= DESC_QI_RFC4543_DEC_LEN) {
-+		ctx->cdata.key_inline = true;
-+	} else {
-+		ctx->cdata.key_inline = false;
-+		ctx->cdata.key_dma = ctx->key_dma;
-+	}
-+
-+	cnstr_shdsc_rfc4543_decap(ctx->sh_desc_dec, &ctx->cdata, ivsize,
-+				  ctx->authsize, true);
-+
-+	return 0;
-+}
-+
-+static int rfc4543_setauthsize(struct crypto_aead *authenc,
-+			       unsigned int authsize)
-+{
-+	struct caam_ctx *ctx = crypto_aead_ctx(authenc);
-+
-+	ctx->authsize = authsize;
-+	rfc4543_set_sh_desc(authenc);
-+
-+	return 0;
-+}
-+
-+static int rfc4543_setkey(struct crypto_aead *aead,
-+			  const u8 *key, unsigned int keylen)
-+{
-+	struct caam_ctx *ctx = crypto_aead_ctx(aead);
-+	struct device *jrdev = ctx->jrdev;
-+	int ret;
-+
-+	if (keylen < 4)
-+		return -EINVAL;
-+
-+#ifdef DEBUG
-+	print_hex_dump(KERN_ERR, "key in @" __stringify(__LINE__)": ",
-+		       DUMP_PREFIX_ADDRESS, 16, 4, key, keylen, 1);
-+#endif
-+
-+	memcpy(ctx->key, key, keylen);
-+	/*
-+	 * The last four bytes of the key material are used as the salt value
-+	 * in the nonce. Update the AES key length.
-+	 */
-+	ctx->cdata.keylen = keylen - 4;
-+	dma_sync_single_for_device(jrdev, ctx->key_dma, ctx->cdata.keylen,
-+				   ctx->dir);
-+
-+	ret = rfc4543_set_sh_desc(aead);
-+	if (ret)
-+		return ret;
-+
-+	/* Now update the driver contexts with the new shared descriptor */
-+	if (ctx->drv_ctx[ENCRYPT]) {
-+		ret = caam_drv_ctx_update(ctx->drv_ctx[ENCRYPT],
-+					  ctx->sh_desc_enc);
-+		if (ret) {
-+			dev_err(jrdev, "driver enc context update failed\n");
-+			return ret;
-+		}
-+	}
-+
-+	if (ctx->drv_ctx[DECRYPT]) {
-+		ret = caam_drv_ctx_update(ctx->drv_ctx[DECRYPT],
-+					  ctx->sh_desc_dec);
-+		if (ret) {
-+			dev_err(jrdev, "driver dec context update failed\n");
-+			return ret;
-+		}
-+	}
-+
-+	return 0;
-+}
-+
- static int ablkcipher_setkey(struct crypto_ablkcipher *ablkcipher,
- 			     const u8 *key, unsigned int keylen)
- {
-@@ -817,6 +1120,22 @@ static int aead_decrypt(struct aead_request *req)
- 	return aead_crypt(req, false);
- }
- 
-+static int ipsec_gcm_encrypt(struct aead_request *req)
-+{
-+	if (req->assoclen < 8)
-+		return -EINVAL;
-+
-+	return aead_crypt(req, true);
-+}
-+
-+static int ipsec_gcm_decrypt(struct aead_request *req)
-+{
-+	if (req->assoclen < 8)
-+		return -EINVAL;
-+
-+	return aead_crypt(req, false);
-+}
-+
- static void ablkcipher_done(struct caam_drv_req *drv_req, u32 status)
- {
- 	struct ablkcipher_edesc *edesc;
-@@ -1337,6 +1656,61 @@ static struct caam_alg_template driver_algs[] = {
- };
- 
- static struct caam_aead_alg driver_aeads[] = {
-+	{
-+		.aead = {
-+			.base = {
-+				.cra_name = "rfc4106(gcm(aes))",
-+				.cra_driver_name = "rfc4106-gcm-aes-caam-qi",
-+				.cra_blocksize = 1,
-+			},
-+			.setkey = rfc4106_setkey,
-+			.setauthsize = rfc4106_setauthsize,
-+			.encrypt = ipsec_gcm_encrypt,
-+			.decrypt = ipsec_gcm_decrypt,
-+			.ivsize = 8,
-+			.maxauthsize = AES_BLOCK_SIZE,
-+		},
-+		.caam = {
-+			.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_GCM,
-+		},
-+	},
-+	{
-+		.aead = {
-+			.base = {
-+				.cra_name = "rfc4543(gcm(aes))",
-+				.cra_driver_name = "rfc4543-gcm-aes-caam-qi",
-+				.cra_blocksize = 1,
-+			},
-+			.setkey = rfc4543_setkey,
-+			.setauthsize = rfc4543_setauthsize,
-+			.encrypt = ipsec_gcm_encrypt,
-+			.decrypt = ipsec_gcm_decrypt,
-+			.ivsize = 8,
-+			.maxauthsize = AES_BLOCK_SIZE,
-+		},
-+		.caam = {
-+			.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_GCM,
-+		},
-+	},
-+	/* Galois Counter Mode */
-+	{
-+		.aead = {
-+			.base = {
-+				.cra_name = "gcm(aes)",
-+				.cra_driver_name = "gcm-aes-caam-qi",
-+				.cra_blocksize = 1,
-+			},
-+			.setkey = gcm_setkey,
-+			.setauthsize = gcm_setauthsize,
-+			.encrypt = aead_encrypt,
-+			.decrypt = aead_decrypt,
-+			.ivsize = 12,
-+			.maxauthsize = AES_BLOCK_SIZE,
-+		},
-+		.caam = {
-+			.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_GCM,
-+		}
-+	},
- 	/* single-pass ipsec_esp descriptor */
- 	{
- 		.aead = {
--- 
-2.12.0.264.gd6db3f216544
+Yury
