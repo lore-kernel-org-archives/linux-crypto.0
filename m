@@ -1,8 +1,7 @@
 From: Lionel Debieve <lionel.Debieve@st.com>
-Subject: [PATCH 1/3] crypto: stm32/hash: avoid error if maxburst not defined
-Date: Mon, 29 Jan 2018 15:28:09 +0100
-Message-ID: <20180129142811.13273-2-lionel.Debieve@st.com>
-References: <20180129142811.13273-1-lionel.Debieve@st.com>
+Subject: [PATCH 0/3] crypto: stm32/hash: Correction to improve robustness
+Date: Mon, 29 Jan 2018 15:28:08 +0100
+Message-ID: <20180129142811.13273-1-lionel.Debieve@st.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
@@ -16,7 +15,6 @@ To: Herbert Xu <herbert@gondor.apana.org.au>, "David S . Miller"
  <linux-crypto@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
  <linux-kernel@vger.kernel.org>
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <20180129142811.13273-1-lionel.Debieve@st.com>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -30,42 +28,24 @@ List-Id: linux-crypto.vger.kernel.org
 
 From: Lionel Debieve <lionel.debieve@st.com>
 
-dma-maxburst is an optional value and must not return
-error in case of dma not used (or max-burst not defined).
+Hi,
 
-Signed-off-by: Lionel Debieve <lionel.debieve@st.com>
----
- drivers/crypto/stm32/stm32-hash.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+This patch serie will improve global robustness for stm32-hash driver. 
 
-diff --git a/drivers/crypto/stm32/stm32-hash.c b/drivers/crypto/stm32/stm32-hash.c
-index 4ca4a264a833..73cdc3b4dca8 100644
---- a/drivers/crypto/stm32/stm32-hash.c
-+++ b/drivers/crypto/stm32/stm32-hash.c
-@@ -1404,18 +1404,19 @@ MODULE_DEVICE_TABLE(of, stm32_hash_of_match);
- static int stm32_hash_get_of_match(struct stm32_hash_dev *hdev,
- 				   struct device *dev)
- {
--	int err;
--
- 	hdev->pdata = of_device_get_match_data(dev);
- 	if (!hdev->pdata) {
- 		dev_err(dev, "no compatible OF match\n");
- 		return -EINVAL;
- 	}
- 
--	err = of_property_read_u32(dev->of_node, "dma-maxburst",
--				   &hdev->dma_maxburst);
-+	if (of_property_read_u32(dev->of_node, "dma-maxburst",
-+				 &hdev->dma_maxburst)) {
-+		dev_info(dev, "dma-maxburst not specified, using 0\n");
-+		hdev->dma_maxburst = 0;
-+	}
- 
--	return err;
-+	return 0;
- }
- 
- static int stm32_hash_probe(struct platform_device *pdev)
+Patch #1 is fixing dma-burst issue when configuration is not set.
+Patch #2 solves issue that occurs when irq append during final req processing.
+Patch #3 is fixing an issue that have been introduced while managing padding but
+breaking the padding length calculation by hardware to generate correct hash.
+
+Regards,
+
+Lionel Debieve (3):
+  crypto: stm32/hash: avoid error if maxburst not defined
+  crypto: stm32/hash: fix performance issues
+  crypto: stm32/hash: rework padding length
+
+ drivers/crypto/stm32/stm32-hash.c | 21 +++++++++++++--------
+ 1 file changed, 13 insertions(+), 8 deletions(-)
+
 -- 
 2.15.1
