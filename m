@@ -1,7 +1,7 @@
 From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
-Subject: [PATCH 2/3] crypto: caam - prepare for gcm(aes) support over QI interface
-Date: Mon, 29 Jan 2018 10:38:36 +0200
-Message-ID: <20180129083837.21174-2-horia.geanta@nxp.com>
+Subject: [PATCH 3/3] crypto: caam/qi - add GCM support
+Date: Mon, 29 Jan 2018 10:38:37 +0200
+Message-ID: <20180129083837.21174-3-horia.geanta@nxp.com>
 References: <20180129083837.21174-1-horia.geanta@nxp.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
@@ -11,477 +11,430 @@ Cc: "David S. Miller" <davem@davemloft.net>,
         <linux-crypto@vger.kernel.org>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn3nam01on0047.outbound.protection.outlook.com ([104.47.33.47]:52736
-        "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
+Received: from mail-sn1nam02on0048.outbound.protection.outlook.com ([104.47.36.48]:47136
+        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751298AbeA2IjN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 29 Jan 2018 03:39:13 -0500
+        id S1751298AbeA2IjR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 29 Jan 2018 03:39:17 -0500
 In-Reply-To: <20180129083837.21174-1-horia.geanta@nxp.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Update gcm(aes) descriptors (generic, rfc4106 and rfc4543) such that
-they would also work when submitted via the QI interface.
+Add support for AES working in Galois Counter Mode.
+The following algorithms are added:
+gcm(aes)
+rfc4106(gcm(aes))
+rfc4543(gcm(aes))
+
+There is a limitation related to IV size, similar to the one present in
+SW implementation (crypto/gcm.c):
+The only IV size allowed is 12 bytes. It will be padded by HW to the right
+with 0x0000_0001 (up to 16 bytes - AES block size), according to the
+GCM specification.
 
 Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
 ---
- drivers/crypto/caam/caamalg.c      |  19 +++--
- drivers/crypto/caam/caamalg_desc.c | 165 ++++++++++++++++++++++++++++++++++---
- drivers/crypto/caam/caamalg_desc.h |  24 ++++--
- 3 files changed, 183 insertions(+), 25 deletions(-)
+ drivers/crypto/caam/caamalg_qi.c | 374 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 374 insertions(+)
 
-diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
-index 2188235be02d..584a6c183548 100644
---- a/drivers/crypto/caam/caamalg.c
-+++ b/drivers/crypto/caam/caamalg.c
-@@ -328,6 +328,7 @@ static int gcm_set_sh_desc(struct crypto_aead *aead)
- {
- 	struct caam_ctx *ctx = crypto_aead_ctx(aead);
- 	struct device *jrdev = ctx->jrdev;
+diff --git a/drivers/crypto/caam/caamalg_qi.c b/drivers/crypto/caam/caamalg_qi.c
+index f4db39495d22..c2b5762d56a0 100644
+--- a/drivers/crypto/caam/caamalg_qi.c
++++ b/drivers/crypto/caam/caamalg_qi.c
+@@ -284,6 +284,309 @@ static int aead_setkey(struct crypto_aead *aead, const u8 *key,
+ 	return -EINVAL;
+ }
+ 
++static int gcm_set_sh_desc(struct crypto_aead *aead)
++{
++	struct caam_ctx *ctx = crypto_aead_ctx(aead);
 +	unsigned int ivsize = crypto_aead_ivsize(aead);
- 	u32 *desc;
- 	int rem_bytes = CAAM_DESC_BYTES_MAX - GCM_DESC_JOB_IO_LEN -
- 			ctx->cdata.keylen;
-@@ -349,7 +350,7 @@ static int gcm_set_sh_desc(struct crypto_aead *aead)
- 	}
- 
- 	desc = ctx->sh_desc_enc;
--	cnstr_shdsc_gcm_encap(desc, &ctx->cdata, ctx->authsize);
-+	cnstr_shdsc_gcm_encap(desc, &ctx->cdata, ivsize, ctx->authsize, false);
- 	dma_sync_single_for_device(jrdev, ctx->sh_desc_enc_dma,
- 				   desc_bytes(desc), ctx->dir);
- 
-@@ -366,7 +367,7 @@ static int gcm_set_sh_desc(struct crypto_aead *aead)
- 	}
- 
- 	desc = ctx->sh_desc_dec;
--	cnstr_shdsc_gcm_decap(desc, &ctx->cdata, ctx->authsize);
-+	cnstr_shdsc_gcm_decap(desc, &ctx->cdata, ivsize, ctx->authsize, false);
- 	dma_sync_single_for_device(jrdev, ctx->sh_desc_dec_dma,
- 				   desc_bytes(desc), ctx->dir);
- 
-@@ -387,6 +388,7 @@ static int rfc4106_set_sh_desc(struct crypto_aead *aead)
- {
- 	struct caam_ctx *ctx = crypto_aead_ctx(aead);
- 	struct device *jrdev = ctx->jrdev;
-+	unsigned int ivsize = crypto_aead_ivsize(aead);
- 	u32 *desc;
- 	int rem_bytes = CAAM_DESC_BYTES_MAX - GCM_DESC_JOB_IO_LEN -
- 			ctx->cdata.keylen;
-@@ -408,7 +410,8 @@ static int rfc4106_set_sh_desc(struct crypto_aead *aead)
- 	}
- 
- 	desc = ctx->sh_desc_enc;
--	cnstr_shdsc_rfc4106_encap(desc, &ctx->cdata, ctx->authsize);
-+	cnstr_shdsc_rfc4106_encap(desc, &ctx->cdata, ivsize, ctx->authsize,
-+				  false);
- 	dma_sync_single_for_device(jrdev, ctx->sh_desc_enc_dma,
- 				   desc_bytes(desc), ctx->dir);
- 
-@@ -425,7 +428,8 @@ static int rfc4106_set_sh_desc(struct crypto_aead *aead)
- 	}
- 
- 	desc = ctx->sh_desc_dec;
--	cnstr_shdsc_rfc4106_decap(desc, &ctx->cdata, ctx->authsize);
-+	cnstr_shdsc_rfc4106_decap(desc, &ctx->cdata, ivsize, ctx->authsize,
-+				  false);
- 	dma_sync_single_for_device(jrdev, ctx->sh_desc_dec_dma,
- 				   desc_bytes(desc), ctx->dir);
- 
-@@ -447,6 +451,7 @@ static int rfc4543_set_sh_desc(struct crypto_aead *aead)
- {
- 	struct caam_ctx *ctx = crypto_aead_ctx(aead);
- 	struct device *jrdev = ctx->jrdev;
-+	unsigned int ivsize = crypto_aead_ivsize(aead);
- 	u32 *desc;
- 	int rem_bytes = CAAM_DESC_BYTES_MAX - GCM_DESC_JOB_IO_LEN -
- 			ctx->cdata.keylen;
-@@ -468,7 +473,8 @@ static int rfc4543_set_sh_desc(struct crypto_aead *aead)
- 	}
- 
- 	desc = ctx->sh_desc_enc;
--	cnstr_shdsc_rfc4543_encap(desc, &ctx->cdata, ctx->authsize);
-+	cnstr_shdsc_rfc4543_encap(desc, &ctx->cdata, ivsize, ctx->authsize,
-+				  false);
- 	dma_sync_single_for_device(jrdev, ctx->sh_desc_enc_dma,
- 				   desc_bytes(desc), ctx->dir);
- 
-@@ -485,7 +491,8 @@ static int rfc4543_set_sh_desc(struct crypto_aead *aead)
- 	}
- 
- 	desc = ctx->sh_desc_dec;
--	cnstr_shdsc_rfc4543_decap(desc, &ctx->cdata, ctx->authsize);
-+	cnstr_shdsc_rfc4543_decap(desc, &ctx->cdata, ivsize, ctx->authsize,
-+				  false);
- 	dma_sync_single_for_device(jrdev, ctx->sh_desc_dec_dma,
- 				   desc_bytes(desc), ctx->dir);
- 
-diff --git a/drivers/crypto/caam/caamalg_desc.c b/drivers/crypto/caam/caamalg_desc.c
-index ceb93fbb76e6..8ae7a1be7dfd 100644
---- a/drivers/crypto/caam/caamalg_desc.c
-+++ b/drivers/crypto/caam/caamalg_desc.c
-@@ -625,10 +625,13 @@ EXPORT_SYMBOL(cnstr_shdsc_aead_givencap);
-  * @desc: pointer to buffer used for descriptor construction
-  * @cdata: pointer to block cipher transform definitions
-  *         Valid algorithm values - OP_ALG_ALGSEL_AES ANDed with OP_ALG_AAI_GCM.
-+ * @ivsize: initialization vector size
-  * @icvsize: integrity check value (ICV) size (truncated or full)
-+ * @is_qi: true when called from caam/qi
-  */
- void cnstr_shdsc_gcm_encap(u32 * const desc, struct alginfo *cdata,
--			   unsigned int icvsize)
-+			   unsigned int ivsize, unsigned int icvsize,
-+			   const bool is_qi)
- {
- 	u32 *key_jump_cmd, *zero_payload_jump_cmd, *zero_assoc_jump_cmd1,
- 	    *zero_assoc_jump_cmd2;
-@@ -650,11 +653,35 @@ void cnstr_shdsc_gcm_encap(u32 * const desc, struct alginfo *cdata,
- 	append_operation(desc, cdata->algtype | OP_ALG_AS_INITFINAL |
- 			 OP_ALG_ENCRYPT);
- 
-+	if (is_qi) {
-+		u32 *wait_load_cmd;
++	int rem_bytes = CAAM_DESC_BYTES_MAX - DESC_JOB_IO_LEN -
++			ctx->cdata.keylen;
 +
-+		/* REG3 = assoclen */
-+		append_seq_load(desc, 4, LDST_CLASS_DECO |
-+				LDST_SRCDST_WORD_DECO_MATH3 |
-+				(4 << LDST_OFFSET_SHIFT));
++	if (!ctx->cdata.keylen || !ctx->authsize)
++		return 0;
 +
-+		wait_load_cmd = append_jump(desc, JUMP_JSL | JUMP_TEST_ALL |
-+					    JUMP_COND_CALM | JUMP_COND_NCP |
-+					    JUMP_COND_NOP | JUMP_COND_NIP |
-+					    JUMP_COND_NIFP);
-+		set_jump_tgt_here(desc, wait_load_cmd);
-+
-+		append_math_sub_imm_u32(desc, VARSEQOUTLEN, SEQINLEN, IMM,
-+					ivsize);
++	/*
++	 * Job Descriptor and Shared Descriptor
++	 * must fit into the 64-word Descriptor h/w Buffer
++	 */
++	if (rem_bytes >= DESC_QI_GCM_ENC_LEN) {
++		ctx->cdata.key_inline = true;
++		ctx->cdata.key_virt = ctx->key;
 +	} else {
-+		append_math_sub(desc, VARSEQOUTLEN, SEQINLEN, REG0,
-+				CAAM_CMD_SZ);
++		ctx->cdata.key_inline = false;
++		ctx->cdata.key_dma = ctx->key_dma;
 +	}
 +
- 	/* if assoclen + cryptlen is ZERO, skip to ICV write */
--	append_math_sub(desc, VARSEQOUTLEN, SEQINLEN, REG0, CAAM_CMD_SZ);
- 	zero_assoc_jump_cmd2 = append_jump(desc, JUMP_TEST_ALL |
- 						 JUMP_COND_MATH_Z);
- 
-+	if (is_qi)
-+		append_seq_fifo_load(desc, ivsize, FIFOLD_CLASS_CLASS1 |
-+				     FIFOLD_TYPE_IV | FIFOLD_TYPE_FLUSH1);
++	cnstr_shdsc_gcm_encap(ctx->sh_desc_enc, &ctx->cdata, ivsize,
++			      ctx->authsize, true);
 +
- 	/* if assoclen is ZERO, skip reading the assoc data */
- 	append_math_add(desc, VARSEQINLEN, ZERO, REG3, CAAM_CMD_SZ);
- 	zero_assoc_jump_cmd1 = append_jump(desc, JUMP_TEST_ALL |
-@@ -686,8 +713,11 @@ void cnstr_shdsc_gcm_encap(u32 * const desc, struct alginfo *cdata,
- 	append_seq_fifo_load(desc, 0, FIFOLD_CLASS_CLASS1 | FIFOLDST_VLF |
- 			     FIFOLD_TYPE_MSG | FIFOLD_TYPE_LAST1);
- 
--	/* jump the zero-payload commands */
--	append_jump(desc, JUMP_TEST_ALL | 2);
-+	/* jump to ICV writing */
-+	if (is_qi)
-+		append_jump(desc, JUMP_TEST_ALL | 4);
-+	else
-+		append_jump(desc, JUMP_TEST_ALL | 2);
- 
- 	/* zero-payload commands */
- 	set_jump_tgt_here(desc, zero_payload_jump_cmd);
-@@ -695,10 +725,18 @@ void cnstr_shdsc_gcm_encap(u32 * const desc, struct alginfo *cdata,
- 	/* read assoc data */
- 	append_seq_fifo_load(desc, 0, FIFOLD_CLASS_CLASS1 | FIFOLDST_VLF |
- 			     FIFOLD_TYPE_AAD | FIFOLD_TYPE_LAST1);
-+	if (is_qi)
-+		/* jump to ICV writing */
-+		append_jump(desc, JUMP_TEST_ALL | 2);
- 
- 	/* There is no input data */
- 	set_jump_tgt_here(desc, zero_assoc_jump_cmd2);
- 
-+	if (is_qi)
-+		append_seq_fifo_load(desc, ivsize, FIFOLD_CLASS_CLASS1 |
-+				     FIFOLD_TYPE_IV | FIFOLD_TYPE_FLUSH1 |
-+				     FIFOLD_TYPE_LAST1);
++	/*
++	 * Job Descriptor and Shared Descriptor
++	 * must fit into the 64-word Descriptor h/w Buffer
++	 */
++	if (rem_bytes >= DESC_QI_GCM_DEC_LEN) {
++		ctx->cdata.key_inline = true;
++		ctx->cdata.key_virt = ctx->key;
++	} else {
++		ctx->cdata.key_inline = false;
++		ctx->cdata.key_dma = ctx->key_dma;
++	}
 +
- 	/* write ICV */
- 	append_seq_store(desc, icvsize, LDST_CLASS_1_CCB |
- 			 LDST_SRCDST_BYTE_CONTEXT);
-@@ -715,10 +753,13 @@ EXPORT_SYMBOL(cnstr_shdsc_gcm_encap);
-  * @desc: pointer to buffer used for descriptor construction
-  * @cdata: pointer to block cipher transform definitions
-  *         Valid algorithm values - OP_ALG_ALGSEL_AES ANDed with OP_ALG_AAI_GCM.
-+ * @ivsize: initialization vector size
-  * @icvsize: integrity check value (ICV) size (truncated or full)
-+ * @is_qi: true when called from caam/qi
-  */
- void cnstr_shdsc_gcm_decap(u32 * const desc, struct alginfo *cdata,
--			   unsigned int icvsize)
-+			   unsigned int ivsize, unsigned int icvsize,
-+			   const bool is_qi)
++	cnstr_shdsc_gcm_decap(ctx->sh_desc_dec, &ctx->cdata, ivsize,
++			      ctx->authsize, true);
++
++	return 0;
++}
++
++static int gcm_setauthsize(struct crypto_aead *authenc, unsigned int authsize)
++{
++	struct caam_ctx *ctx = crypto_aead_ctx(authenc);
++
++	ctx->authsize = authsize;
++	gcm_set_sh_desc(authenc);
++
++	return 0;
++}
++
++static int gcm_setkey(struct crypto_aead *aead,
++		      const u8 *key, unsigned int keylen)
++{
++	struct caam_ctx *ctx = crypto_aead_ctx(aead);
++	struct device *jrdev = ctx->jrdev;
++	int ret;
++
++#ifdef DEBUG
++	print_hex_dump(KERN_ERR, "key in @" __stringify(__LINE__)": ",
++		       DUMP_PREFIX_ADDRESS, 16, 4, key, keylen, 1);
++#endif
++
++	memcpy(ctx->key, key, keylen);
++	dma_sync_single_for_device(jrdev, ctx->key_dma, keylen, ctx->dir);
++	ctx->cdata.keylen = keylen;
++
++	ret = gcm_set_sh_desc(aead);
++	if (ret)
++		return ret;
++
++	/* Now update the driver contexts with the new shared descriptor */
++	if (ctx->drv_ctx[ENCRYPT]) {
++		ret = caam_drv_ctx_update(ctx->drv_ctx[ENCRYPT],
++					  ctx->sh_desc_enc);
++		if (ret) {
++			dev_err(jrdev, "driver enc context update failed\n");
++			return ret;
++		}
++	}
++
++	if (ctx->drv_ctx[DECRYPT]) {
++		ret = caam_drv_ctx_update(ctx->drv_ctx[DECRYPT],
++					  ctx->sh_desc_dec);
++		if (ret) {
++			dev_err(jrdev, "driver dec context update failed\n");
++			return ret;
++		}
++	}
++
++	return 0;
++}
++
++static int rfc4106_set_sh_desc(struct crypto_aead *aead)
++{
++	struct caam_ctx *ctx = crypto_aead_ctx(aead);
++	unsigned int ivsize = crypto_aead_ivsize(aead);
++	int rem_bytes = CAAM_DESC_BYTES_MAX - DESC_JOB_IO_LEN -
++			ctx->cdata.keylen;
++
++	if (!ctx->cdata.keylen || !ctx->authsize)
++		return 0;
++
++	ctx->cdata.key_virt = ctx->key;
++
++	/*
++	 * Job Descriptor and Shared Descriptor
++	 * must fit into the 64-word Descriptor h/w Buffer
++	 */
++	if (rem_bytes >= DESC_QI_RFC4106_ENC_LEN) {
++		ctx->cdata.key_inline = true;
++	} else {
++		ctx->cdata.key_inline = false;
++		ctx->cdata.key_dma = ctx->key_dma;
++	}
++
++	cnstr_shdsc_rfc4106_encap(ctx->sh_desc_enc, &ctx->cdata, ivsize,
++				  ctx->authsize, true);
++
++	/*
++	 * Job Descriptor and Shared Descriptor
++	 * must fit into the 64-word Descriptor h/w Buffer
++	 */
++	if (rem_bytes >= DESC_QI_RFC4106_DEC_LEN) {
++		ctx->cdata.key_inline = true;
++	} else {
++		ctx->cdata.key_inline = false;
++		ctx->cdata.key_dma = ctx->key_dma;
++	}
++
++	cnstr_shdsc_rfc4106_decap(ctx->sh_desc_dec, &ctx->cdata, ivsize,
++				  ctx->authsize, true);
++
++	return 0;
++}
++
++static int rfc4106_setauthsize(struct crypto_aead *authenc,
++			       unsigned int authsize)
++{
++	struct caam_ctx *ctx = crypto_aead_ctx(authenc);
++
++	ctx->authsize = authsize;
++	rfc4106_set_sh_desc(authenc);
++
++	return 0;
++}
++
++static int rfc4106_setkey(struct crypto_aead *aead,
++			  const u8 *key, unsigned int keylen)
++{
++	struct caam_ctx *ctx = crypto_aead_ctx(aead);
++	struct device *jrdev = ctx->jrdev;
++	int ret;
++
++	if (keylen < 4)
++		return -EINVAL;
++
++#ifdef DEBUG
++	print_hex_dump(KERN_ERR, "key in @" __stringify(__LINE__)": ",
++		       DUMP_PREFIX_ADDRESS, 16, 4, key, keylen, 1);
++#endif
++
++	memcpy(ctx->key, key, keylen);
++	/*
++	 * The last four bytes of the key material are used as the salt value
++	 * in the nonce. Update the AES key length.
++	 */
++	ctx->cdata.keylen = keylen - 4;
++	dma_sync_single_for_device(jrdev, ctx->key_dma, ctx->cdata.keylen,
++				   ctx->dir);
++
++	ret = rfc4106_set_sh_desc(aead);
++	if (ret)
++		return ret;
++
++	/* Now update the driver contexts with the new shared descriptor */
++	if (ctx->drv_ctx[ENCRYPT]) {
++		ret = caam_drv_ctx_update(ctx->drv_ctx[ENCRYPT],
++					  ctx->sh_desc_enc);
++		if (ret) {
++			dev_err(jrdev, "driver enc context update failed\n");
++			return ret;
++		}
++	}
++
++	if (ctx->drv_ctx[DECRYPT]) {
++		ret = caam_drv_ctx_update(ctx->drv_ctx[DECRYPT],
++					  ctx->sh_desc_dec);
++		if (ret) {
++			dev_err(jrdev, "driver dec context update failed\n");
++			return ret;
++		}
++	}
++
++	return 0;
++}
++
++static int rfc4543_set_sh_desc(struct crypto_aead *aead)
++{
++	struct caam_ctx *ctx = crypto_aead_ctx(aead);
++	unsigned int ivsize = crypto_aead_ivsize(aead);
++	int rem_bytes = CAAM_DESC_BYTES_MAX - DESC_JOB_IO_LEN -
++			ctx->cdata.keylen;
++
++	if (!ctx->cdata.keylen || !ctx->authsize)
++		return 0;
++
++	ctx->cdata.key_virt = ctx->key;
++
++	/*
++	 * Job Descriptor and Shared Descriptor
++	 * must fit into the 64-word Descriptor h/w Buffer
++	 */
++	if (rem_bytes >= DESC_QI_RFC4543_ENC_LEN) {
++		ctx->cdata.key_inline = true;
++	} else {
++		ctx->cdata.key_inline = false;
++		ctx->cdata.key_dma = ctx->key_dma;
++	}
++
++	cnstr_shdsc_rfc4543_encap(ctx->sh_desc_enc, &ctx->cdata, ivsize,
++				  ctx->authsize, true);
++
++	/*
++	 * Job Descriptor and Shared Descriptor
++	 * must fit into the 64-word Descriptor h/w Buffer
++	 */
++	if (rem_bytes >= DESC_QI_RFC4543_DEC_LEN) {
++		ctx->cdata.key_inline = true;
++	} else {
++		ctx->cdata.key_inline = false;
++		ctx->cdata.key_dma = ctx->key_dma;
++	}
++
++	cnstr_shdsc_rfc4543_decap(ctx->sh_desc_dec, &ctx->cdata, ivsize,
++				  ctx->authsize, true);
++
++	return 0;
++}
++
++static int rfc4543_setauthsize(struct crypto_aead *authenc,
++			       unsigned int authsize)
++{
++	struct caam_ctx *ctx = crypto_aead_ctx(authenc);
++
++	ctx->authsize = authsize;
++	rfc4543_set_sh_desc(authenc);
++
++	return 0;
++}
++
++static int rfc4543_setkey(struct crypto_aead *aead,
++			  const u8 *key, unsigned int keylen)
++{
++	struct caam_ctx *ctx = crypto_aead_ctx(aead);
++	struct device *jrdev = ctx->jrdev;
++	int ret;
++
++	if (keylen < 4)
++		return -EINVAL;
++
++#ifdef DEBUG
++	print_hex_dump(KERN_ERR, "key in @" __stringify(__LINE__)": ",
++		       DUMP_PREFIX_ADDRESS, 16, 4, key, keylen, 1);
++#endif
++
++	memcpy(ctx->key, key, keylen);
++	/*
++	 * The last four bytes of the key material are used as the salt value
++	 * in the nonce. Update the AES key length.
++	 */
++	ctx->cdata.keylen = keylen - 4;
++	dma_sync_single_for_device(jrdev, ctx->key_dma, ctx->cdata.keylen,
++				   ctx->dir);
++
++	ret = rfc4543_set_sh_desc(aead);
++	if (ret)
++		return ret;
++
++	/* Now update the driver contexts with the new shared descriptor */
++	if (ctx->drv_ctx[ENCRYPT]) {
++		ret = caam_drv_ctx_update(ctx->drv_ctx[ENCRYPT],
++					  ctx->sh_desc_enc);
++		if (ret) {
++			dev_err(jrdev, "driver enc context update failed\n");
++			return ret;
++		}
++	}
++
++	if (ctx->drv_ctx[DECRYPT]) {
++		ret = caam_drv_ctx_update(ctx->drv_ctx[DECRYPT],
++					  ctx->sh_desc_dec);
++		if (ret) {
++			dev_err(jrdev, "driver dec context update failed\n");
++			return ret;
++		}
++	}
++
++	return 0;
++}
++
+ static int ablkcipher_setkey(struct crypto_ablkcipher *ablkcipher,
+ 			     const u8 *key, unsigned int keylen)
  {
- 	u32 *key_jump_cmd, *zero_payload_jump_cmd, *zero_assoc_jump_cmd1;
+@@ -817,6 +1120,22 @@ static int aead_decrypt(struct aead_request *req)
+ 	return aead_crypt(req, false);
+ }
  
-@@ -739,6 +780,24 @@ void cnstr_shdsc_gcm_decap(u32 * const desc, struct alginfo *cdata,
- 	append_operation(desc, cdata->algtype | OP_ALG_AS_INITFINAL |
- 			 OP_ALG_DECRYPT | OP_ALG_ICV_ON);
- 
-+	if (is_qi) {
-+		u32 *wait_load_cmd;
++static int ipsec_gcm_encrypt(struct aead_request *req)
++{
++	if (req->assoclen < 8)
++		return -EINVAL;
 +
-+		/* REG3 = assoclen */
-+		append_seq_load(desc, 4, LDST_CLASS_DECO |
-+				LDST_SRCDST_WORD_DECO_MATH3 |
-+				(4 << LDST_OFFSET_SHIFT));
++	return aead_crypt(req, true);
++}
 +
-+		wait_load_cmd = append_jump(desc, JUMP_JSL | JUMP_TEST_ALL |
-+					    JUMP_COND_CALM | JUMP_COND_NCP |
-+					    JUMP_COND_NOP | JUMP_COND_NIP |
-+					    JUMP_COND_NIFP);
-+		set_jump_tgt_here(desc, wait_load_cmd);
++static int ipsec_gcm_decrypt(struct aead_request *req)
++{
++	if (req->assoclen < 8)
++		return -EINVAL;
 +
-+		append_seq_fifo_load(desc, ivsize, FIFOLD_CLASS_CLASS1 |
-+				     FIFOLD_TYPE_IV | FIFOLD_TYPE_FLUSH1);
-+	}
++	return aead_crypt(req, false);
++}
 +
- 	/* if assoclen is ZERO, skip reading the assoc data */
- 	append_math_add(desc, VARSEQINLEN, ZERO, REG3, CAAM_CMD_SZ);
- 	zero_assoc_jump_cmd1 = append_jump(desc, JUMP_TEST_ALL |
-@@ -791,10 +850,13 @@ EXPORT_SYMBOL(cnstr_shdsc_gcm_decap);
-  * @desc: pointer to buffer used for descriptor construction
-  * @cdata: pointer to block cipher transform definitions
-  *         Valid algorithm values - OP_ALG_ALGSEL_AES ANDed with OP_ALG_AAI_GCM.
-+ * @ivsize: initialization vector size
-  * @icvsize: integrity check value (ICV) size (truncated or full)
-+ * @is_qi: true when called from caam/qi
-  */
- void cnstr_shdsc_rfc4106_encap(u32 * const desc, struct alginfo *cdata,
--			       unsigned int icvsize)
-+			       unsigned int ivsize, unsigned int icvsize,
-+			       const bool is_qi)
+ static void ablkcipher_done(struct caam_drv_req *drv_req, u32 status)
  {
- 	u32 *key_jump_cmd;
+ 	struct ablkcipher_edesc *edesc;
+@@ -1337,6 +1656,61 @@ static struct caam_alg_template driver_algs[] = {
+ };
  
-@@ -815,7 +877,29 @@ void cnstr_shdsc_rfc4106_encap(u32 * const desc, struct alginfo *cdata,
- 	append_operation(desc, cdata->algtype | OP_ALG_AS_INITFINAL |
- 			 OP_ALG_ENCRYPT);
- 
--	append_math_sub_imm_u32(desc, VARSEQINLEN, REG3, IMM, 8);
-+	if (is_qi) {
-+		u32 *wait_load_cmd;
-+
-+		/* REG3 = assoclen */
-+		append_seq_load(desc, 4, LDST_CLASS_DECO |
-+				LDST_SRCDST_WORD_DECO_MATH3 |
-+				(4 << LDST_OFFSET_SHIFT));
-+
-+		wait_load_cmd = append_jump(desc, JUMP_JSL | JUMP_TEST_ALL |
-+					    JUMP_COND_CALM | JUMP_COND_NCP |
-+					    JUMP_COND_NOP | JUMP_COND_NIP |
-+					    JUMP_COND_NIFP);
-+		set_jump_tgt_here(desc, wait_load_cmd);
-+
-+		/* Read salt and IV */
-+		append_fifo_load_as_imm(desc, (void *)(cdata->key_virt +
-+					cdata->keylen), 4, FIFOLD_CLASS_CLASS1 |
-+					FIFOLD_TYPE_IV);
-+		append_seq_fifo_load(desc, ivsize, FIFOLD_CLASS_CLASS1 |
-+				     FIFOLD_TYPE_IV | FIFOLD_TYPE_FLUSH1);
-+	}
-+
-+	append_math_sub_imm_u32(desc, VARSEQINLEN, REG3, IMM, ivsize);
- 	append_math_add(desc, VARSEQOUTLEN, ZERO, REG3, CAAM_CMD_SZ);
- 
- 	/* Read assoc data */
-@@ -823,7 +907,7 @@ void cnstr_shdsc_rfc4106_encap(u32 * const desc, struct alginfo *cdata,
- 			     FIFOLD_TYPE_AAD | FIFOLD_TYPE_FLUSH1);
- 
- 	/* Skip IV */
--	append_seq_fifo_load(desc, 8, FIFOLD_CLASS_SKIP);
-+	append_seq_fifo_load(desc, ivsize, FIFOLD_CLASS_SKIP);
- 
- 	/* Will read cryptlen bytes */
- 	append_math_sub(desc, VARSEQINLEN, SEQINLEN, REG0, CAAM_CMD_SZ);
-@@ -862,10 +946,13 @@ EXPORT_SYMBOL(cnstr_shdsc_rfc4106_encap);
-  * @desc: pointer to buffer used for descriptor construction
-  * @cdata: pointer to block cipher transform definitions
-  *         Valid algorithm values - OP_ALG_ALGSEL_AES ANDed with OP_ALG_AAI_GCM.
-+ * @ivsize: initialization vector size
-  * @icvsize: integrity check value (ICV) size (truncated or full)
-+ * @is_qi: true when called from caam/qi
-  */
- void cnstr_shdsc_rfc4106_decap(u32 * const desc, struct alginfo *cdata,
--			       unsigned int icvsize)
-+			       unsigned int ivsize, unsigned int icvsize,
-+			       const bool is_qi)
- {
- 	u32 *key_jump_cmd;
- 
-@@ -887,7 +974,29 @@ void cnstr_shdsc_rfc4106_decap(u32 * const desc, struct alginfo *cdata,
- 	append_operation(desc, cdata->algtype | OP_ALG_AS_INITFINAL |
- 			 OP_ALG_DECRYPT | OP_ALG_ICV_ON);
- 
--	append_math_sub_imm_u32(desc, VARSEQINLEN, REG3, IMM, 8);
-+	if (is_qi) {
-+		u32 *wait_load_cmd;
-+
-+		/* REG3 = assoclen */
-+		append_seq_load(desc, 4, LDST_CLASS_DECO |
-+				LDST_SRCDST_WORD_DECO_MATH3 |
-+				(4 << LDST_OFFSET_SHIFT));
-+
-+		wait_load_cmd = append_jump(desc, JUMP_JSL | JUMP_TEST_ALL |
-+					    JUMP_COND_CALM | JUMP_COND_NCP |
-+					    JUMP_COND_NOP | JUMP_COND_NIP |
-+					    JUMP_COND_NIFP);
-+		set_jump_tgt_here(desc, wait_load_cmd);
-+
-+		/* Read salt and IV */
-+		append_fifo_load_as_imm(desc, (void *)(cdata->key_virt +
-+					cdata->keylen), 4, FIFOLD_CLASS_CLASS1 |
-+					FIFOLD_TYPE_IV);
-+		append_seq_fifo_load(desc, ivsize, FIFOLD_CLASS_CLASS1 |
-+				     FIFOLD_TYPE_IV | FIFOLD_TYPE_FLUSH1);
-+	}
-+
-+	append_math_sub_imm_u32(desc, VARSEQINLEN, REG3, IMM, ivsize);
- 	append_math_add(desc, VARSEQOUTLEN, ZERO, REG3, CAAM_CMD_SZ);
- 
- 	/* Read assoc data */
-@@ -895,7 +1004,7 @@ void cnstr_shdsc_rfc4106_decap(u32 * const desc, struct alginfo *cdata,
- 			     FIFOLD_TYPE_AAD | FIFOLD_TYPE_FLUSH1);
- 
- 	/* Skip IV */
--	append_seq_fifo_load(desc, 8, FIFOLD_CLASS_SKIP);
-+	append_seq_fifo_load(desc, ivsize, FIFOLD_CLASS_SKIP);
- 
- 	/* Will read cryptlen bytes */
- 	append_math_sub(desc, VARSEQINLEN, SEQOUTLEN, REG3, CAAM_CMD_SZ);
-@@ -934,10 +1043,13 @@ EXPORT_SYMBOL(cnstr_shdsc_rfc4106_decap);
-  * @desc: pointer to buffer used for descriptor construction
-  * @cdata: pointer to block cipher transform definitions
-  *         Valid algorithm values - OP_ALG_ALGSEL_AES ANDed with OP_ALG_AAI_GCM.
-+ * @ivsize: initialization vector size
-  * @icvsize: integrity check value (ICV) size (truncated or full)
-+ * @is_qi: true when called from caam/qi
-  */
- void cnstr_shdsc_rfc4543_encap(u32 * const desc, struct alginfo *cdata,
--			       unsigned int icvsize)
-+			       unsigned int ivsize, unsigned int icvsize,
-+			       const bool is_qi)
- {
- 	u32 *key_jump_cmd, *read_move_cmd, *write_move_cmd;
- 
-@@ -958,6 +1070,18 @@ void cnstr_shdsc_rfc4543_encap(u32 * const desc, struct alginfo *cdata,
- 	append_operation(desc, cdata->algtype | OP_ALG_AS_INITFINAL |
- 			 OP_ALG_ENCRYPT);
- 
-+	if (is_qi) {
-+		/* assoclen is not needed, skip it */
-+		append_seq_fifo_load(desc, 4, FIFOLD_CLASS_SKIP);
-+
-+		/* Read salt and IV */
-+		append_fifo_load_as_imm(desc, (void *)(cdata->key_virt +
-+					cdata->keylen), 4, FIFOLD_CLASS_CLASS1 |
-+					FIFOLD_TYPE_IV);
-+		append_seq_fifo_load(desc, ivsize, FIFOLD_CLASS_CLASS1 |
-+				     FIFOLD_TYPE_IV | FIFOLD_TYPE_FLUSH1);
-+	}
-+
- 	/* assoclen + cryptlen = seqinlen */
- 	append_math_sub(desc, REG3, SEQINLEN, REG0, CAAM_CMD_SZ);
- 
-@@ -1004,10 +1128,13 @@ EXPORT_SYMBOL(cnstr_shdsc_rfc4543_encap);
-  * @desc: pointer to buffer used for descriptor construction
-  * @cdata: pointer to block cipher transform definitions
-  *         Valid algorithm values - OP_ALG_ALGSEL_AES ANDed with OP_ALG_AAI_GCM.
-+ * @ivsize: initialization vector size
-  * @icvsize: integrity check value (ICV) size (truncated or full)
-+ * @is_qi: true when called from caam/qi
-  */
- void cnstr_shdsc_rfc4543_decap(u32 * const desc, struct alginfo *cdata,
--			       unsigned int icvsize)
-+			       unsigned int ivsize, unsigned int icvsize,
-+			       const bool is_qi)
- {
- 	u32 *key_jump_cmd, *read_move_cmd, *write_move_cmd;
- 
-@@ -1028,6 +1155,18 @@ void cnstr_shdsc_rfc4543_decap(u32 * const desc, struct alginfo *cdata,
- 	append_operation(desc, cdata->algtype | OP_ALG_AS_INITFINAL |
- 			 OP_ALG_DECRYPT | OP_ALG_ICV_ON);
- 
-+	if (is_qi) {
-+		/* assoclen is not needed, skip it */
-+		append_seq_fifo_load(desc, 4, FIFOLD_CLASS_SKIP);
-+
-+		/* Read salt and IV */
-+		append_fifo_load_as_imm(desc, (void *)(cdata->key_virt +
-+					cdata->keylen), 4, FIFOLD_CLASS_CLASS1 |
-+					FIFOLD_TYPE_IV);
-+		append_seq_fifo_load(desc, ivsize, FIFOLD_CLASS_CLASS1 |
-+				     FIFOLD_TYPE_IV | FIFOLD_TYPE_FLUSH1);
-+	}
-+
- 	/* assoclen + cryptlen = seqoutlen */
- 	append_math_sub(desc, REG3, SEQOUTLEN, REG0, CAAM_CMD_SZ);
- 
-diff --git a/drivers/crypto/caam/caamalg_desc.h b/drivers/crypto/caam/caamalg_desc.h
-index 5f9445ae2114..a917af5776ce 100644
---- a/drivers/crypto/caam/caamalg_desc.h
-+++ b/drivers/crypto/caam/caamalg_desc.h
-@@ -27,14 +27,20 @@
- #define DESC_GCM_BASE			(3 * CAAM_CMD_SZ)
- #define DESC_GCM_ENC_LEN		(DESC_GCM_BASE + 16 * CAAM_CMD_SZ)
- #define DESC_GCM_DEC_LEN		(DESC_GCM_BASE + 12 * CAAM_CMD_SZ)
-+#define DESC_QI_GCM_ENC_LEN		(DESC_GCM_ENC_LEN + 6 * CAAM_CMD_SZ)
-+#define DESC_QI_GCM_DEC_LEN		(DESC_GCM_DEC_LEN + 3 * CAAM_CMD_SZ)
- 
- #define DESC_RFC4106_BASE		(3 * CAAM_CMD_SZ)
- #define DESC_RFC4106_ENC_LEN		(DESC_RFC4106_BASE + 13 * CAAM_CMD_SZ)
- #define DESC_RFC4106_DEC_LEN		(DESC_RFC4106_BASE + 13 * CAAM_CMD_SZ)
-+#define DESC_QI_RFC4106_ENC_LEN		(DESC_RFC4106_ENC_LEN + 5 * CAAM_CMD_SZ)
-+#define DESC_QI_RFC4106_DEC_LEN		(DESC_RFC4106_DEC_LEN + 5 * CAAM_CMD_SZ)
- 
- #define DESC_RFC4543_BASE		(3 * CAAM_CMD_SZ)
- #define DESC_RFC4543_ENC_LEN		(DESC_RFC4543_BASE + 11 * CAAM_CMD_SZ)
- #define DESC_RFC4543_DEC_LEN		(DESC_RFC4543_BASE + 12 * CAAM_CMD_SZ)
-+#define DESC_QI_RFC4543_ENC_LEN		(DESC_RFC4543_ENC_LEN + 4 * CAAM_CMD_SZ)
-+#define DESC_QI_RFC4543_DEC_LEN		(DESC_RFC4543_DEC_LEN + 4 * CAAM_CMD_SZ)
- 
- #define DESC_ABLKCIPHER_BASE		(3 * CAAM_CMD_SZ)
- #define DESC_ABLKCIPHER_ENC_LEN		(DESC_ABLKCIPHER_BASE + \
-@@ -67,22 +73,28 @@ void cnstr_shdsc_aead_givencap(u32 * const desc, struct alginfo *cdata,
- 			       const bool is_qi, int era);
- 
- void cnstr_shdsc_gcm_encap(u32 * const desc, struct alginfo *cdata,
--			   unsigned int icvsize);
-+			   unsigned int ivsize, unsigned int icvsize,
-+			   const bool is_qi);
- 
- void cnstr_shdsc_gcm_decap(u32 * const desc, struct alginfo *cdata,
--			   unsigned int icvsize);
-+			   unsigned int ivsize, unsigned int icvsize,
-+			   const bool is_qi);
- 
- void cnstr_shdsc_rfc4106_encap(u32 * const desc, struct alginfo *cdata,
--			       unsigned int icvsize);
-+			       unsigned int ivsize, unsigned int icvsize,
-+			       const bool is_qi);
- 
- void cnstr_shdsc_rfc4106_decap(u32 * const desc, struct alginfo *cdata,
--			       unsigned int icvsize);
-+			       unsigned int ivsize, unsigned int icvsize,
-+			       const bool is_qi);
- 
- void cnstr_shdsc_rfc4543_encap(u32 * const desc, struct alginfo *cdata,
--			       unsigned int icvsize);
-+			       unsigned int ivsize, unsigned int icvsize,
-+			       const bool is_qi);
- 
- void cnstr_shdsc_rfc4543_decap(u32 * const desc, struct alginfo *cdata,
--			       unsigned int icvsize);
-+			       unsigned int ivsize, unsigned int icvsize,
-+			       const bool is_qi);
- 
- void cnstr_shdsc_ablkcipher_encap(u32 * const desc, struct alginfo *cdata,
- 				  unsigned int ivsize, const bool is_rfc3686,
+ static struct caam_aead_alg driver_aeads[] = {
++	{
++		.aead = {
++			.base = {
++				.cra_name = "rfc4106(gcm(aes))",
++				.cra_driver_name = "rfc4106-gcm-aes-caam-qi",
++				.cra_blocksize = 1,
++			},
++			.setkey = rfc4106_setkey,
++			.setauthsize = rfc4106_setauthsize,
++			.encrypt = ipsec_gcm_encrypt,
++			.decrypt = ipsec_gcm_decrypt,
++			.ivsize = 8,
++			.maxauthsize = AES_BLOCK_SIZE,
++		},
++		.caam = {
++			.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_GCM,
++		},
++	},
++	{
++		.aead = {
++			.base = {
++				.cra_name = "rfc4543(gcm(aes))",
++				.cra_driver_name = "rfc4543-gcm-aes-caam-qi",
++				.cra_blocksize = 1,
++			},
++			.setkey = rfc4543_setkey,
++			.setauthsize = rfc4543_setauthsize,
++			.encrypt = ipsec_gcm_encrypt,
++			.decrypt = ipsec_gcm_decrypt,
++			.ivsize = 8,
++			.maxauthsize = AES_BLOCK_SIZE,
++		},
++		.caam = {
++			.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_GCM,
++		},
++	},
++	/* Galois Counter Mode */
++	{
++		.aead = {
++			.base = {
++				.cra_name = "gcm(aes)",
++				.cra_driver_name = "gcm-aes-caam-qi",
++				.cra_blocksize = 1,
++			},
++			.setkey = gcm_setkey,
++			.setauthsize = gcm_setauthsize,
++			.encrypt = aead_encrypt,
++			.decrypt = aead_decrypt,
++			.ivsize = 12,
++			.maxauthsize = AES_BLOCK_SIZE,
++		},
++		.caam = {
++			.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_GCM,
++		}
++	},
+ 	/* single-pass ipsec_esp descriptor */
+ 	{
+ 		.aead = {
 -- 
 2.12.0.264.gd6db3f216544
