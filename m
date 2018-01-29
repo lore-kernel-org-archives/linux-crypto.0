@@ -1,61 +1,80 @@
-From: Rui Miguel Silva <rui.silva@linaro.org>
-Subject: Re: [RESEND PATCH 3/6] ARM: dts: imx7s: add CAAM device node
-Date: Sun, 28 Jan 2018 15:42:32 +0000
-Message-ID: <m3607m2dnb.fsf@linaro.org>
-References: <1516805435-15034-4-git-send-email-pure.logic@nexus-software.ie> <201801272345.TyvgLQ8s%fengguang.wu@intel.com>
+From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
+Subject: [PATCH 1/3] crypto: caam/qi - return -EBADMSG for ICV check failure
+Date: Mon, 29 Jan 2018 10:38:35 +0200
+Message-ID: <20180129083837.21174-1-horia.geanta@nxp.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: kbuild-all@01.org, horia.geanta@nxp.com, aymen.sghaier@nxp.com,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        fabio.estevam@nxp.com, peng.fan@nxp.com,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        lukas.auer@aisec.fraunhofer.de, rui.silva@linaro.org,
-        ryan.harkin@linaro.org,
-        Bryan O'Donoghue <pure.logic@nexus-software.ie>
-To: kbuild test robot <lkp@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Cc: "David S. Miller" <davem@davemloft.net>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        <linux-crypto@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wr0-f194.google.com ([209.85.128.194]:39440 "EHLO
-        mail-wr0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751733AbeA1Pmg (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 28 Jan 2018 10:42:36 -0500
-Received: by mail-wr0-f194.google.com with SMTP id f6so2917929wra.6
-        for <linux-crypto@vger.kernel.org>; Sun, 28 Jan 2018 07:42:35 -0800 (PST)
-In-reply-to: <201801272345.TyvgLQ8s%fengguang.wu@intel.com>
+Received: from mail-bl2nam02on0066.outbound.protection.outlook.com ([104.47.38.66]:29632
+        "EHLO NAM02-BL2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751298AbeA2Ii7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 29 Jan 2018 03:38:59 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
-Thanks for the report.
-On Sat 27 Jan 2018 at 15:49, kbuild test robot wrote:
-> Hi Rui,
->
-> I love your patch! Yet something to improve:
->
-> [auto build test ERROR on crypto/master]
-> [also build test ERROR on v4.15-rc9 next-20180126]
-> [cannot apply to cryptodev/master]
-> [if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
->
-> url:    https://github.com/0day-ci/linux/commits/Bryan-O-Donoghue/Enable-CAAM-on-i-MX7s-fix-TrustZone-issues/20180127-185422
-> base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git master
-> config: arm-u8500_defconfig (attached as .config)
-> compiler: arm-linux-gnueabi-gcc (Debian 7.2.0-11) 7.2.0
-> reproduce:
->         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
->         chmod +x ~/bin/make.cross
->         # save the attached .config to linux build tree
->         make.cross ARCH=arm 
->
-> Note: the linux-review/Bryan-O-Donoghue/Enable-CAAM-on-i-MX7s-fix-TrustZone-issues/20180127-185422 HEAD f907a172373d2c61dd7bf25a88621abc6e410f15 builds fine.
->       It only hurts bisectibility.
+Crypto drivers are expected to return -EBADMSG in case of
+ICV check (authentication) failure.
 
-Yeah, the order of the patches in the series were wrong and break
-bisectibility.
+In this case it also makes sense to suppress the error message
+in the QI dequeue callback.
 
-V2 of this series already sent, besides other fixes, also fix this.
-Once again many thanks.
-
+Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
 ---
-Cheers,
-	Rui
+ drivers/crypto/caam/caamalg_qi.c | 12 +++++++++++-
+ drivers/crypto/caam/qi.c         | 11 +++++++++--
+ 2 files changed, 20 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/crypto/caam/caamalg_qi.c b/drivers/crypto/caam/caamalg_qi.c
+index 4aecc9435f69..f4db39495d22 100644
+--- a/drivers/crypto/caam/caamalg_qi.c
++++ b/drivers/crypto/caam/caamalg_qi.c
+@@ -562,8 +562,18 @@ static void aead_done(struct caam_drv_req *drv_req, u32 status)
+ 	qidev = caam_ctx->qidev;
+ 
+ 	if (unlikely(status)) {
++		u32 ssrc = status & JRSTA_SSRC_MASK;
++		u8 err_id = status & JRSTA_CCBERR_ERRID_MASK;
++
+ 		caam_jr_strstatus(qidev, status);
+-		ecode = -EIO;
++		/*
++		 * verify hw auth check passed else return -EBADMSG
++		 */
++		if (ssrc == JRSTA_SSRC_CCB_ERROR &&
++		    err_id == JRSTA_CCBERR_ERRID_ICVCHK)
++			ecode = -EBADMSG;
++		else
++			ecode = -EIO;
+ 	}
+ 
+ 	edesc = container_of(drv_req, typeof(*edesc), drv_req);
+diff --git a/drivers/crypto/caam/qi.c b/drivers/crypto/caam/qi.c
+index f9a44f485aac..b9480828da38 100644
+--- a/drivers/crypto/caam/qi.c
++++ b/drivers/crypto/caam/qi.c
+@@ -579,8 +579,15 @@ static enum qman_cb_dqrr_result caam_rsp_fq_dqrr_cb(struct qman_portal *p,
+ 
+ 	fd = &dqrr->fd;
+ 	status = be32_to_cpu(fd->status);
+-	if (unlikely(status))
+-		dev_err(qidev, "Error: %#x in CAAM response FD\n", status);
++	if (unlikely(status)) {
++		u32 ssrc = status & JRSTA_SSRC_MASK;
++		u8 err_id = status & JRSTA_CCBERR_ERRID_MASK;
++
++		if (ssrc != JRSTA_SSRC_CCB_ERROR ||
++		    err_id != JRSTA_CCBERR_ERRID_ICVCHK)
++			dev_err(qidev, "Error: %#x in CAAM response FD\n",
++				status);
++	}
+ 
+ 	if (unlikely(qm_fd_get_format(fd) != qm_fd_compound)) {
+ 		dev_err(qidev, "Non-compound FD from CAAM\n");
+-- 
+2.12.0.264.gd6db3f216544
