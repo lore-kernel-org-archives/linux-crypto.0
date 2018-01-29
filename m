@@ -1,78 +1,70 @@
 From: Lionel Debieve <lionel.debieve@st.com>
-Subject: [PATCH 3/5] hwrng: stm32 - allow disable clock error detection
-Date: Mon, 29 Jan 2018 18:05:19 +0100
-Message-ID: <20180129170521.1862-4-lionel.debieve@st.com>
+Subject: [PATCH 1/5] hwrng: stm32 - add reset during probe
+Date: Mon, 29 Jan 2018 18:05:17 +0100
+Message-ID: <20180129170521.1862-2-lionel.debieve@st.com>
 References: <20180129170521.1862-1-lionel.debieve@st.com>
 Mime-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Cc: Benjamin Gaignard <benjamin.gaignard@st.com>,
-        Ludovic Barre <ludovic.barre@st.com>
-To: Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@st.com>,
-        <linux-crypto@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx08-00178001.pphosted.com ([91.207.212.93]:42327 "EHLO
-        mx07-00178001.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1751249AbeA2RGo (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 29 Jan 2018 12:06:44 -0500
+ Ludovic Barre <ludovic.barre@st.com>
+To: Matt Mackall <mpm@selenic.com>, Herbert Xu <herbert@gondor.apana.org.au>,
+ Arnd Bergmann <arnd@arndb.de>, Greg Kroah-Hartman
+ <gregkh@linuxfoundation.org>, Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@st.com>,
+ <linux-crypto@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+ <linux-kernel@vger.kernel.org>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 In-Reply-To: <20180129170521.1862-1-lionel.debieve@st.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+List-Id: linux-crypto.vger.kernel.org
 
-Add a new property that allow to disable the clock error
-detection which is required when the clock source selected
-is out of specification (which is not mandatory).
+Avoid issue when probing the RNG without
+reset if bad status has been detected previously
 
 Signed-off-by: Lionel Debieve <lionel.debieve@st.com>
 ---
- drivers/char/hw_random/stm32-rng.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+ drivers/char/hw_random/stm32-rng.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
 diff --git a/drivers/char/hw_random/stm32-rng.c b/drivers/char/hw_random/stm32-rng.c
-index 83c695938a2d..709a8d061be3 100644
+index 63d84e6f1891..83c695938a2d 100644
 --- a/drivers/char/hw_random/stm32-rng.c
 +++ b/drivers/char/hw_random/stm32-rng.c
-@@ -26,6 +26,7 @@
+@@ -21,6 +21,7 @@
+ #include <linux/of_address.h>
+ #include <linux/of_platform.h>
+ #include <linux/pm_runtime.h>
++#include <linux/reset.h>
+ #include <linux/slab.h>
  
  #define RNG_CR 0x00
- #define RNG_CR_RNGEN BIT(2)
-+#define RNG_CR_CED BIT(5)
- 
- #define RNG_SR 0x04
- #define RNG_SR_SEIS BIT(6)
-@@ -48,6 +49,7 @@ struct stm32_rng_private {
+@@ -46,6 +47,7 @@ struct stm32_rng_private {
+ 	struct hwrng rng;
  	void __iomem *base;
  	struct clk *clk;
- 	struct reset_control *rst;
-+	bool ced;
++	struct reset_control *rst;
  };
  
  static int stm32_rng_read(struct hwrng *rng, void *data, size_t max, bool wait)
-@@ -101,7 +103,11 @@ static int stm32_rng_init(struct hwrng *rng)
- 	if (err)
- 		return err;
+@@ -140,6 +142,13 @@ static int stm32_rng_probe(struct platform_device *ofdev)
+ 	if (IS_ERR(priv->clk))
+ 		return PTR_ERR(priv->clk);
  
--	writel_relaxed(RNG_CR_RNGEN, priv->base + RNG_CR);
-+	if (priv->ced)
-+		writel_relaxed(RNG_CR_RNGEN, priv->base + RNG_CR);
-+	else
-+		writel_relaxed(RNG_CR_RNGEN | RNG_CR_CED,
-+			       priv->base + RNG_CR);
- 
- 	/* clear error indicators */
- 	writel_relaxed(0, priv->base + RNG_SR);
-@@ -149,6 +155,8 @@ static int stm32_rng_probe(struct platform_device *ofdev)
- 		reset_control_deassert(priv->rst);
- 	}
- 
-+	priv->ced = of_property_read_bool(np, "clock-error-detect");
++	priv->rst = devm_reset_control_get(&ofdev->dev, NULL);
++	if (!IS_ERR(priv->rst)) {
++		reset_control_assert(priv->rst);
++		udelay(2);
++		reset_control_deassert(priv->rst);
++	}
 +
  	dev_set_drvdata(dev, priv);
  
