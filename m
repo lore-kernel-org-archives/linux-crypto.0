@@ -1,122 +1,180 @@
-From: Atul Gupta <atul.gupta@chelsio.com>
-Subject: RE: [RFC crypto v3 8/9] chtls: Register the ULP
-Date: Tue, 30 Jan 2018 06:51:46 +0000
-Message-ID: <CY4PR1201MB0230042A4D0EA83DC8F1BE7397E40@CY4PR1201MB0230.namprd12.prod.outlook.com>
-References: <20180125210850.GA69117@davejwatson-mba>
- <CY4PR1201MB0230C0D2D0F24900A084574D97E60@CY4PR1201MB0230.namprd12.prod.outlook.com>
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Subject: [PATCH] crypto: AF_ALG AIO - lock context IV
+Date: Tue, 30 Jan 2018 09:27:04 +0100
+Message-ID: <11410454.xUfCo2NHDh@positron.chronox.de>
+References: <2118226.LQArbCsRu5@tauon.chronox.de> <2165621.DHQGk8sIp3@positron.chronox.de> <51c57076-4a01-308c-583b-8c34afc3b2e4@chelsio.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-Cc: "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "ganeshgr@chelsio.co" <ganeshgr@chelsio.co>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "Boris Pismenny" <borisp@mellanox.com>,
-        Ilya Lesokhin <ilyal@mellanox.com>
-To: Dave Watson <davejwatson@fb.com>,
-        "sd@queasysnail.net" <sd@queasysnail.net>
+Content-Transfer-Encoding: 7Bit
+Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+        jonathan.cameron@huawei.com
+To: Harsh Jain <harsh@chelsio.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-sn1nam02on0115.outbound.protection.outlook.com ([104.47.36.115]:27136
-        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751631AbeA3Gvt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 30 Jan 2018 01:51:49 -0500
-In-Reply-To: <CY4PR1201MB0230C0D2D0F24900A084574D97E60@CY4PR1201MB0230.namprd12.prod.outlook.com>
-Content-Language: en-US
+Received: from mail.eperm.de ([89.247.134.16]:58958 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751511AbeA3I1y (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 30 Jan 2018 03:27:54 -0500
+In-Reply-To: <51c57076-4a01-308c-583b-8c34afc3b2e4@chelsio.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-@Dave Watson, Did you get chance to look at my response?
+Hi Harsh,
 
-What I was referring is that passing "tls" ulp type in setsockopt may be in=
-sufficient to make the decision when multi HW assist Inline TLS solution ex=
-ists.
-Some HW may go beyond defining sendmsg/sendpage of the prot and require add=
-itional info to setup the env? Also, we need to keep vendor specific code o=
-ut of tls_main.c i.e anything other than base/sw_tx prot perhaps go to hw d=
-river.
+may I as you to try the attached patch on your Chelsio driver? Please invoke 
+the following command from libkcapi:
 
-Sabrina echoed similar concern early last week, can we discuss or have thou=
-ghts how to address this?
+kcapi  -d 2 -x 9  -e -c "cbc(aes)" -k 
+8d7dd9b0170ce0b5f2f8e1aa768e01e91da8bfc67fd486d081b28254c99eb423 -i 
+7fbc02ebf5b93322329df9bfccb635af -p 48981da18e4bb9ef7e2e3162d16b1910
+
+The result should now be a fully block-chained result.
+
+Note, the patch goes on top of the inline IV patch.
 
 Thanks
-Atul
 
------Original Message-----
-From: Atul Gupta=20
-Sent: Sunday, January 28, 2018 11:26 AM
-To: 'Dave Watson' <davejwatson@fb.com>
-Cc: herbert@gondor.apana.org.au; linux-crypto@vger.kernel.org; ganeshgr@che=
-lsio.co; netdev@vger.kernel.org; davem@davemloft.net; Boris Pismenny <boris=
-p@mellanox.com>; Ilya Lesokhin <ilyal@mellanox.com>
-Subject: RE: [RFC crypto v3 8/9] chtls: Register the ULP
+---8<---
 
+In case of AIO where multiple IOCBs are sent to the kernel and inline IV
+is not used, the ctx->iv is used for each IOCB. The ctx->iv is read for
+the crypto operation and written back after the crypto operation. Thus,
+processing of multiple IOCBs must be serialized.
 
+As the AF_ALG interface is used by user space, a mutex provides the
+serialization which puts the caller to sleep in case a previous IOCB
+processing is not yet finished.
 
------Original Message-----
-From: Dave Watson [mailto:davejwatson@fb.com]=20
-Sent: Friday, January 26, 2018 2:39 AM
-To: Atul Gupta <atul.gupta@chelsio.com>
-Cc: herbert@gondor.apana.org.au; linux-crypto@vger.kernel.org; ganeshgr@che=
-lsio.co; netdev@vger.kernel.org; davem@davemloft.net; Boris Pismenny <boris=
-p@mellanox.com>; Ilya Lesokhin <ilyal@mellanox.com>
-Subject: Re: [RFC crypto v3 8/9] chtls: Register the ULP
+If multiple IOCBs arrive that all are blocked, the mutex' FIFO operation
+of processing arriving requests ensures that the blocked IOCBs are
+unblocked in the right order.
 
-<1513769897-26945-1-git-send-email-atul.gupta@chelsio.com>
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+---
+ crypto/af_alg.c         | 22 ++++++++++++++++++++++
+ crypto/algif_aead.c     |  2 ++
+ crypto/algif_skcipher.c |  2 ++
+ include/crypto/if_alg.h |  3 +++
+ 4 files changed, 29 insertions(+)
 
-On 12/20/17 05:08 PM, Atul Gupta wrote:
-> +static void __init chtls_init_ulp_ops(void) {
-> +	chtls_base_prot			=3D tcp_prot;
-> +	chtls_base_prot.hash		=3D chtls_hash;
-> +	chtls_base_prot.unhash		=3D chtls_unhash;
-> +	chtls_base_prot.close		=3D chtls_lsk_close;
-> +
-> +	chtls_cpl_prot			=3D chtls_base_prot;
-> +	chtls_init_rsk_ops(&chtls_cpl_prot, &chtls_rsk_ops,
-> +			   &tcp_prot, PF_INET);
-> +	chtls_cpl_prot.close		=3D chtls_close;
-> +	chtls_cpl_prot.disconnect	=3D chtls_disconnect;
-> +	chtls_cpl_prot.destroy		=3D chtls_destroy_sock;
-> +	chtls_cpl_prot.shutdown		=3D chtls_shutdown;
-> +	chtls_cpl_prot.sendmsg		=3D chtls_sendmsg;
-> +	chtls_cpl_prot.recvmsg		=3D chtls_recvmsg;
-> +	chtls_cpl_prot.sendpage		=3D chtls_sendpage;
-> +	chtls_cpl_prot.setsockopt	=3D chtls_setsockopt;
-> +	chtls_cpl_prot.getsockopt	=3D chtls_getsockopt;
-> +}
-
-Much of this file should go in tls_main.c, reusing as much as possible. For=
- example it doesn't look like the get/set sockopts have changed at all for =
-chtls.
-
-Agree, should common code and anything other than TLS_BASE_TX/TLS_SW_TX pro=
-t should go in vendor specific file/driver. Since, prot require redefinitio=
-n for hardware the code is kept in chtls_main.c
-
-> +
-> +static int __init chtls_register(void) {
-> +	chtls_init_ulp_ops();
-> +	register_listen_notifier(&listen_notifier);
-> +	cxgb4_register_uld(CXGB4_ULD_TLS, &chtls_uld_info);
-> +	tcp_register_ulp(&tcp_chtls_ulp_ops);
-> +	return 0;
-> +}
-> +
-> +static void __exit chtls_unregister(void) {
-> +	unregister_listen_notifier(&listen_notifier);
-> +	tcp_unregister_ulp(&tcp_chtls_ulp_ops);
-> +	chtls_free_all_uld();
-> +	cxgb4_unregister_uld(CXGB4_ULD_TLS);
-> +}
-
-The idea with ULP is that there is one ULP hook per protocol, not per drive=
-r. =20
-
-One thought is that apps/lib calling setsockopt pass the required ulp type =
-[tls or chtls or xtls], this enables any HW assist to define base_prot as r=
-equired and keep common code [tls_main] independent of underlying HW.=20
-If we are to have single TLS ULP hook [good from user point] then need a wa=
-y to determine which Inline tls hw is used? System with multiple Inline TLS=
- capable hw and differing functionality would require checks in tls_main to=
- exercise that specific functionality/callback?
+diff --git a/crypto/af_alg.c b/crypto/af_alg.c
+index 87394dc90ac0..3007c9d899da 100644
+--- a/crypto/af_alg.c
++++ b/crypto/af_alg.c
+@@ -1059,6 +1059,8 @@ void af_alg_async_cb(struct crypto_async_request *_req, 
+int err)
+ 	struct kiocb *iocb = areq->iocb;
+ 	unsigned int resultlen;
+ 
++	af_alg_put_iv(sk);
++
+ 	/* Buffer size written by crypto operation. */
+ 	resultlen = areq->outlen;
+ 
+@@ -1227,6 +1229,11 @@ int af_alg_get_iv(struct sock *sk, struct 
+af_alg_async_req *areq)
+ 
+ 	/* No inline IV or cipher has no IV, use ctx IV buffer. */
+ 	if (!ctx->iiv || !ctx->ivlen) {
++		int ret = mutex_lock_interruptible(&ctx->ivlock);
++
++		if (ret)
++			return ret;
++
+ 		areq->iv = ctx->iv;
+ 		areq->ivlen = 0;	// areq->iv will not be freed
+ 		return 0;
+@@ -1252,6 +1259,21 @@ int af_alg_get_iv(struct sock *sk, struct 
+af_alg_async_req *areq)
+ }
+ EXPORT_SYMBOL_GPL(af_alg_get_iv);
+ 
++/**
++ * af_alg_put_iv - release lock on IV in case CTX IV is used
++ *
++ * @sk [in] AF_ALG socket
++ */
++void af_alg_put_iv(struct sock *sk)
++{
++	struct alg_sock *ask = alg_sk(sk);
++	struct af_alg_ctx *ctx = ask->private;
++
++	if (!ctx->iiv || !ctx->ivlen)
++		mutex_unlock(&ctx->ivlock);
++}
++EXPORT_SYMBOL_GPL(af_alg_put_iv);
++
+ static int __init af_alg_init(void)
+ {
+ 	int err = proto_register(&alg_proto, 0);
+diff --git a/crypto/algif_aead.c b/crypto/algif_aead.c
+index 7eb7cb132c09..165b2ca82e51 100644
+--- a/crypto/algif_aead.c
++++ b/crypto/algif_aead.c
+@@ -309,6 +309,7 @@ static int _aead_recvmsg(struct socket *sock, struct 
+msghdr *msg,
+ 				&ctx->wait);
+ 	}
+ 
++	af_alg_put_iv(sk);
+ 
+ free:
+ 	af_alg_free_resources(areq);
+@@ -555,6 +556,7 @@ static int aead_accept_parent_nokey(void *private, struct 
+sock *sk)
+ 		return -ENOMEM;
+ 	}
+ 	memset(ctx->iv, 0, ctx->ivlen);
++	mutex_init(&ctx->ivlock);
+ 
+ 	INIT_LIST_HEAD(&ctx->tsgl_list);
+ 	ctx->len = len;
+diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
+index d40e1d6797d8..a759cec446b4 100644
+--- a/crypto/algif_skcipher.c
++++ b/crypto/algif_skcipher.c
+@@ -151,6 +151,7 @@ static int _skcipher_recvmsg(struct socket *sock, struct 
+msghdr *msg,
+ 						 &ctx->wait);
+ 	}
++	af_alg_put_iv(sk);
+ 
+ free:
+ 	af_alg_free_resources(areq);
+@@ -358,6 +359,7 @@ static int skcipher_accept_parent_nokey(void *private, 
+struct sock *sk)
+ 	}
+ 	memset(ctx->iv, 0, ctx->ivlen);
++	mutex_init(&ctx->ivlock);
+ 
+ 	INIT_LIST_HEAD(&ctx->tsgl_list);
+ 	ctx->len = len;
+diff --git a/include/crypto/if_alg.h b/include/crypto/if_alg.h
+index ebc651ceb54a..666be8ac683c 100644
+--- a/include/crypto/if_alg.h
++++ b/include/crypto/if_alg.h
+@@ -19,6 +19,7 @@
+ #include <linux/scatterlist.h>
+ #include <linux/types.h>
+ #include <linux/atomic.h>
++#include <linux/mutex.h>
+ #include <net/sock.h>
+ 
+ #include <crypto/aead.h>
+@@ -160,6 +161,7 @@ struct af_alg_ctx {
+ 
+ 	void *iv;
+ 	unsigned int ivlen;
++	struct mutex ivlock;
+ 	size_t aead_assoclen;
+ 
+ 	struct crypto_wait wait;
+@@ -268,6 +270,7 @@ int af_alg_get_rsgl(struct sock *sk, struct msghdr *msg, 
+int flags,
+ 		    struct af_alg_async_req *areq, size_t maxsize,
+ 		    size_t *outlen);
+ int af_alg_get_iv(struct sock *sk, struct af_alg_async_req *areq);
++void af_alg_put_iv(struct sock *sk);
+ struct scatterlist *af_alg_get_tsgl_sg(struct af_alg_ctx *ctx);
+ 
+ #endif	/* _CRYPTO_IF_ALG_H */
+-- 
