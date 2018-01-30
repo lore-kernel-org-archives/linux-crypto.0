@@ -1,32 +1,32 @@
 From: Eric Biggers <ebiggers3@gmail.com>
-Subject: Re: BUG: unable to handle kernel paging request in
- aead_accept_parent_nokey
-Date: Tue, 30 Jan 2018 14:24:46 -0800
-Message-ID: <20180130222446.4aim3hgarhlv5a2v@gmail.com>
-References: <001a1143fd0067065e056096ef90@google.com>
+Subject: Re: BUG: unable to handle kernel NULL pointer dereference in
+ crypto_destroy_tfm
+Date: Tue, 30 Jan 2018 15:06:59 -0800
+Message-ID: <20180130230659.nnmcdbma4yewr3cs@gmail.com>
+References: <001a1143d742f280a50560fef72a@google.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: davem@davemloft.net, herbert@gondor.apana.org.au,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         syzkaller-bugs@googlegroups.com
 To: syzbot
-        <bot+4d8b9d4de3fb89b15eb7f8b5c30d004f1836ee02@syzkaller.appspotmail.com>
+        <bot+257773a84d5b2bfc2dfad2f945e773bd96d66aa9@syzkaller.appspotmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-io0-f171.google.com ([209.85.223.171]:46169 "EHLO
-        mail-io0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751606AbeA3WYt (ORCPT
+Received: from mail-it0-f50.google.com ([209.85.214.50]:38680 "EHLO
+        mail-it0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753620AbeA3XHC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 30 Jan 2018 17:24:49 -0500
+        Tue, 30 Jan 2018 18:07:02 -0500
 Content-Disposition: inline
-In-Reply-To: <001a1143fd0067065e056096ef90@google.com>
+In-Reply-To: <001a1143d742f280a50560fef72a@google.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Dec 17, 2017 at 09:51:01PM -0800, syzbot wrote:
+On Sat, Dec 23, 2017 at 01:58:01AM -0800, syzbot wrote:
 > Hello,
 > 
 > syzkaller hit the following crash on
-> 41d8c16909ebda40f7b4982a7f5e2ad102705ade
+> 6084b576dca2e898f5c101baef151f7bfdbb606d
 > git://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/master
 > compiler: gcc (GCC) 7.1.1 20170620
 > .config is attached
@@ -35,58 +35,67 @@ On Sun, Dec 17, 2017 at 09:51:01PM -0800, syzbot wrote:
 > Unfortunately, I don't have any reproducer for this bug yet.
 > 
 > 
-> device lo entered promiscuous mode
-> BUG: unable to handle kernel paging request at fffffffffffffff0
-> Bearer <> rejected, not supported in standalone mode
-> IP: aead_accept_parent_nokey+0x2a/0x150 crypto/algif_aead.c:559
-> PGD 3021067 P4D 3021067 PUD 3023067 PMD 0
+> BUG: unable to handle kernel NULL pointer dereference at 0000000000000188
+> IP: crypto_destroy_tfm+0x9f/0xf0 crypto/api.c:577
+> PGD 0 P4D 0
 > Oops: 0000 [#1] SMP
-> Bearer <> rejected, not supported in standalone mode
 > Dumping ftrace buffer:
 >    (ftrace buffer empty)
 > Modules linked in:
-> CPU: 1 PID: 5971 Comm: syz-executor1 Not tainted 4.15.0-rc3-next-20171213+
-> #66
+> CPU: 0 PID: 21787 Comm: syz-executor4 Not tainted 4.15.0-rc3-next-20171214+
+> #67
 > Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS
 > Google 01/01/2011
-> RIP: 0010:aead_accept_parent_nokey+0x2a/0x150 crypto/algif_aead.c:559
-> RSP: 0018:ffffc90000d7bda8 EFLAGS: 00010216
-> RAX: 0000000000000000 RBX: ffff88020ab17540 RCX: ffffffff816ca746
-> RDX: 00000000014000c0 RSI: 0000000000000090 RDI: ffff8801e2c0e800
-> RBP: ffffc90000d7bdc8 R08: 0000000000000001 R09: 0000000000000000
-> R10: 0000000000000000 R11: 0000000000000000 R12: ffff8801e2c0e800
-> R13: ffffffff82a95520 R14: ffff880213fd5400 R15: 0000000000000000
-> FS:  00007f60fba0c700(0000) GS:ffff88021fd00000(0000) knlGS:0000000000000000
+> RIP: 0010:crypto_destroy_tfm+0x9f/0xf0 crypto/api.c:577
+> RSP: 0018:ffffc90000df7c40 EFLAGS: 00010293
+> RAX: ffff8801f8518040 RBX: 0000000000000000 RCX: ffffffff8167415f
+> RDX: 0000000000000000 RSI: ffff8801f8586c08 RDI: ffff8801f8586c00
+> RBP: ffffc90000df7c60 R08: 0000000000000000 R09: 0000000000000000
+> R10: ffffc90000df7d20 R11: 0000000000000002 R12: ffff8801f8586c08
+> R13: ffff8801f8586c00 R14: 0000000000000000 R15: ffff880213fc0030
+> FS:  0000000002991940(0000) GS:ffff88021fc00000(0000) knlGS:0000000000000000
 > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: fffffffffffffff0 CR3: 00000001e10a4000 CR4: 00000000001426e0
+> CR2: 0000000000000188 CR3: 000000000301e002 CR4: 00000000001626f0
 > Call Trace:
->  aead_accept_parent+0x28/0x40 crypto/algif_aead.c:595
->  af_alg_accept+0x9c/0x1f0 crypto/af_alg.c:294
->  alg_accept+0x25/0x30 crypto/af_alg.c:330
->  SYSC_accept4+0x114/0x260 net/socket.c:1551
->  SyS_accept4 net/socket.c:1502 [inline]
->  SYSC_accept net/socket.c:1585 [inline]
->  SyS_accept+0x26/0x30 net/socket.c:1582
+>  crypto_free_aead include/crypto/aead.h:193 [inline]
+>  crypto_rfc4106_exit_tfm+0x1a/0x20 crypto/gcm.c:895
+>  crypto_aead_exit_tfm+0x18/0x20 crypto/aead.c:88
+>  crypto_exit_ops crypto/api.c:315 [inline]
+>  crypto_destroy_tfm+0x49/0xf0 crypto/api.c:579
+>  crypto_free_aead include/crypto/aead.h:193 [inline]
+>  aead_release+0x19/0x30 crypto/algif_aead.c:511
+>  alg_do_release crypto/af_alg.c:119 [inline]
+>  alg_sock_destruct+0x2d/0x40 crypto/af_alg.c:360
+>  __sk_destruct+0x2e/0x250 net/core/sock.c:1558
+>  sk_destruct+0x2f/0x60 net/core/sock.c:1593
+>  __sk_free+0xbe/0xf0 net/core/sock.c:1601
+>  sk_free+0x2a/0x40 net/core/sock.c:1612
+>  sock_put include/net/sock.h:1653 [inline]
+>  af_alg_release+0x42/0x50 crypto/af_alg.c:126
+>  sock_release+0x2c/0xc0 net/socket.c:600
+>  sock_close+0x16/0x20 net/socket.c:1129
+>  __fput+0x120/0x270 fs/file_table.c:209
+>  ____fput+0x15/0x20 fs/file_table.c:243
+>  task_work_run+0xa3/0xe0 kernel/task_work.c:113
+>  exit_task_work include/linux/task_work.h:22 [inline]
+>  do_exit+0x3e6/0x1050 kernel/exit.c:869
+>  do_group_exit+0x60/0x100 kernel/exit.c:972
+>  SYSC_exit_group kernel/exit.c:983 [inline]
+>  SyS_exit_group+0x18/0x20 kernel/exit.c:981
 >  entry_SYSCALL_64_fastpath+0x1f/0x96
-> RIP: 0033:0x452a39
-> RSP: 002b:00007f60fba0bc58 EFLAGS: 00000212 ORIG_RAX: 000000000000002b
-> RAX: ffffffffffffffda RBX: 0000000000758020 RCX: 0000000000452a39
-> RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000016
-> RBP: 000000000000001a R08: 0000000000000000 R09: 0000000000000000
-> R10: 0000000000000000 R11: 0000000000000212 R12: 00000000006ee310
-> R13: 00000000ffffffff R14: 00007f60fba0c6d4 R15: 0000000000000000
-> Code: 00 55 48 89 e5 41 56 41 55 41 54 53 48 89 fb 49 89 f4 e8 2a fc be ff
-> 48 8b 03 ba c0 00 40 01 be 90 00 00 00 4c 89 e7 48 8b 40 40 <44> 8b 68 f0 e8
-> 7d a7 9d 00 48 85 c0 0f 84 ed 00 00 00 48 89 c3
-> RIP: aead_accept_parent_nokey+0x2a/0x150 crypto/algif_aead.c:559 RSP:
-> ffffc90000d7bda8
-> CR2: fffffffffffffff0
-> ---[ end trace 1608f1470cd99fdb ]---
-> Kernel panic - not syncing: Fatal exception
-> Dumping ftrace buffer:
->    (ftrace buffer empty)
-> Kernel Offset: disabled
-> Rebooting in 86400 seconds..
+> RIP: 0033:0x452a09
+> RSP: 002b:0000000000a2fa08 EFLAGS: 00000202 ORIG_RAX: 00000000000000e7
+> RAX: ffffffffffffffda RBX: 000000000071bec8 RCX: 0000000000452a09
+> RDX: 0000000000000000 RSI: 0000000000722750 RDI: 0000000000000000
+> RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000852
+> R10: 000000000000000c R11: 0000000000000202 R12: 0000000000a2f9b0
+> R13: 000000000071bea0 R14: 0000000000000519 R15: 000000000000000c
+> Code: 41 ff d6 e8 04 62 c4 ff 4c 89 e7 e8 4c 8d c0 ff 4c 89 ef e8 54 fa d0
+> ff e8 ef 61 c4 ff 5b 41 5c 41 5d 41 5e 5d c3 e8 e1 61 c4 ff <4c> 8b b3 88 01
+> 00 00 4d 85 f6 74 32 e8 d0 61 c4 ff 4c 89 e7 41
+> RIP: crypto_destroy_tfm+0x9f/0xf0 crypto/api.c:577 RSP: ffffc90000df7c40
+> CR2: 0000000000000188
+> ---[ end trace 51087c3b0b04438f ]---
 
 Invalidating this bug since it hasn't been seen again, and it was reported while
 KASAN was accidentally disabled in the syzbot kconfig due to a change to the
