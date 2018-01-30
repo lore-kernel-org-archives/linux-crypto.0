@@ -1,83 +1,122 @@
-From: Tim Chen <tim.c.chen@linux.intel.com>
-Subject: Re: [PATCH] crypto: sha1-mb - remove HASH_FIRST flag
-Date: Mon, 29 Jan 2018 17:09:08 -0800
-Message-ID: <edd01e7e-3778-8b83-c81e-c7ce914828dd@linux.intel.com>
-References: <20180125031008.778-1-ebiggers3@gmail.com>
- <b5918f68-e4d3-e98c-00eb-d54c2d6e3329@linux.intel.com>
- <20180125220340.l2t2v7jjc5dwoe43@gmail.com>
+From: Atul Gupta <atul.gupta@chelsio.com>
+Subject: RE: [RFC crypto v3 8/9] chtls: Register the ULP
+Date: Tue, 30 Jan 2018 06:51:46 +0000
+Message-ID: <CY4PR1201MB0230042A4D0EA83DC8F1BE7397E40@CY4PR1201MB0230.namprd12.prod.outlook.com>
+References: <20180125210850.GA69117@davejwatson-mba>
+ <CY4PR1201MB0230C0D2D0F24900A084574D97E60@CY4PR1201MB0230.namprd12.prod.outlook.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Eric Biggers <ebiggers@google.com>,
-        Megha Dey <megha.dey@linux.intel.com>
-To: Eric Biggers <ebiggers3@gmail.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+Cc: "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "ganeshgr@chelsio.co" <ganeshgr@chelsio.co>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "Boris Pismenny" <borisp@mellanox.com>,
+        Ilya Lesokhin <ilyal@mellanox.com>
+To: Dave Watson <davejwatson@fb.com>,
+        "sd@queasysnail.net" <sd@queasysnail.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:41231 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752316AbeA3BJJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 29 Jan 2018 20:09:09 -0500
-In-Reply-To: <20180125220340.l2t2v7jjc5dwoe43@gmail.com>
+Received: from mail-sn1nam02on0115.outbound.protection.outlook.com ([104.47.36.115]:27136
+        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751631AbeA3Gvt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 30 Jan 2018 01:51:49 -0500
+In-Reply-To: <CY4PR1201MB0230C0D2D0F24900A084574D97E60@CY4PR1201MB0230.namprd12.prod.outlook.com>
 Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+@Dave Watson, Did you get chance to look at my response?
 
->>
->> I suppose this will be okay as we are really doing the initialization in
->> sha1_mb_init.  Megha is now maintaining this code.  Copying her
->> so she can do some verification of this change.
->>
-> 
-> Please update the MAINTAINERS file so that people know who to Cc on patches.
-> 
-> Eric
-> 
+What I was referring is that passing "tls" ulp type in setsockopt may be in=
+sufficient to make the decision when multi HW assist Inline TLS solution ex=
+ists.
+Some HW may go beyond defining sendmsg/sendpage of the prot and require add=
+itional info to setup the env? Also, we need to keep vendor specific code o=
+ut of tls_main.c i.e anything other than base/sw_tx prot perhaps go to hw d=
+river.
 
-Herbert,
+Sabrina echoed similar concern early last week, can we discuss or have thou=
+ghts how to address this?
 
-Can you pull in the patch below to update MAINTAINERS for sha multibuffer?
+Thanks
+Atul
 
-Tim
+-----Original Message-----
+From: Atul Gupta=20
+Sent: Sunday, January 28, 2018 11:26 AM
+To: 'Dave Watson' <davejwatson@fb.com>
+Cc: herbert@gondor.apana.org.au; linux-crypto@vger.kernel.org; ganeshgr@che=
+lsio.co; netdev@vger.kernel.org; davem@davemloft.net; Boris Pismenny <boris=
+p@mellanox.com>; Ilya Lesokhin <ilyal@mellanox.com>
+Subject: RE: [RFC crypto v3 8/9] chtls: Register the ULP
 
->From 884095fccd36d2de8c6edfe6f4d60ab4a1b9339b Mon Sep 17 00:00:00 2001
-From: Tim Chen <tim.c.chen@linux.intel.com>
-Date: Mon, 29 Jan 2018 09:22:41 -0800
-Subject: [PATCH] x86/crypto: Designate maintainer for SHA-1/256/512
- multibuffer driver
 
-Even though I created the original implementation of SHA1 multibuffer
-driver, Megha extended it to SHA256 and SHA512 and she is now maintaining
-the code for SHA1/SHA256/SHA512 multi-buffer driver.
 
-Add the entry in the MAINTAINERS file so any update patch can find
-its way properly to Megha.
+-----Original Message-----
+From: Dave Watson [mailto:davejwatson@fb.com]=20
+Sent: Friday, January 26, 2018 2:39 AM
+To: Atul Gupta <atul.gupta@chelsio.com>
+Cc: herbert@gondor.apana.org.au; linux-crypto@vger.kernel.org; ganeshgr@che=
+lsio.co; netdev@vger.kernel.org; davem@davemloft.net; Boris Pismenny <boris=
+p@mellanox.com>; Ilya Lesokhin <ilyal@mellanox.com>
+Subject: Re: [RFC crypto v3 8/9] chtls: Register the ULP
 
-Signed-off-by: Tim Chen <tim.c.chen@linux.intel.com>
----
- MAINTAINERS | 8 ++++++++
- 1 file changed, 8 insertions(+)
+<1513769897-26945-1-git-send-email-atul.gupta@chelsio.com>
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 2811a21..2085171 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -7064,6 +7064,14 @@ L:	linux-rdma@vger.kernel.org
- S:	Supported
- F:	drivers/infiniband/hw/i40iw/
- 
-+INTEL SHA MULTIBUFFER DRIVER
-+M:	Megha Dey <megha.dey@linux.intel.com>
-+R:	Tim Chen <tim.c.chen@linux.intel.com>
-+L:	linux-crypto@vger.kernel.org
-+S:	Supported
-+F:	arch/x86/crypto/sha*-mb
-+F:	crypto/mcryptd.c
-+
- INTEL TELEMETRY DRIVER
- M:	Souvik Kumar Chakravarty <souvik.k.chakravarty@intel.com>
- L:	platform-driver-x86@vger.kernel.org
--- 
-2.7.4
+On 12/20/17 05:08 PM, Atul Gupta wrote:
+> +static void __init chtls_init_ulp_ops(void) {
+> +	chtls_base_prot			=3D tcp_prot;
+> +	chtls_base_prot.hash		=3D chtls_hash;
+> +	chtls_base_prot.unhash		=3D chtls_unhash;
+> +	chtls_base_prot.close		=3D chtls_lsk_close;
+> +
+> +	chtls_cpl_prot			=3D chtls_base_prot;
+> +	chtls_init_rsk_ops(&chtls_cpl_prot, &chtls_rsk_ops,
+> +			   &tcp_prot, PF_INET);
+> +	chtls_cpl_prot.close		=3D chtls_close;
+> +	chtls_cpl_prot.disconnect	=3D chtls_disconnect;
+> +	chtls_cpl_prot.destroy		=3D chtls_destroy_sock;
+> +	chtls_cpl_prot.shutdown		=3D chtls_shutdown;
+> +	chtls_cpl_prot.sendmsg		=3D chtls_sendmsg;
+> +	chtls_cpl_prot.recvmsg		=3D chtls_recvmsg;
+> +	chtls_cpl_prot.sendpage		=3D chtls_sendpage;
+> +	chtls_cpl_prot.setsockopt	=3D chtls_setsockopt;
+> +	chtls_cpl_prot.getsockopt	=3D chtls_getsockopt;
+> +}
+
+Much of this file should go in tls_main.c, reusing as much as possible. For=
+ example it doesn't look like the get/set sockopts have changed at all for =
+chtls.
+
+Agree, should common code and anything other than TLS_BASE_TX/TLS_SW_TX pro=
+t should go in vendor specific file/driver. Since, prot require redefinitio=
+n for hardware the code is kept in chtls_main.c
+
+> +
+> +static int __init chtls_register(void) {
+> +	chtls_init_ulp_ops();
+> +	register_listen_notifier(&listen_notifier);
+> +	cxgb4_register_uld(CXGB4_ULD_TLS, &chtls_uld_info);
+> +	tcp_register_ulp(&tcp_chtls_ulp_ops);
+> +	return 0;
+> +}
+> +
+> +static void __exit chtls_unregister(void) {
+> +	unregister_listen_notifier(&listen_notifier);
+> +	tcp_unregister_ulp(&tcp_chtls_ulp_ops);
+> +	chtls_free_all_uld();
+> +	cxgb4_unregister_uld(CXGB4_ULD_TLS);
+> +}
+
+The idea with ULP is that there is one ULP hook per protocol, not per drive=
+r. =20
+
+One thought is that apps/lib calling setsockopt pass the required ulp type =
+[tls or chtls or xtls], this enables any HW assist to define base_prot as r=
+equired and keep common code [tls_main] independent of underlying HW.=20
+If we are to have single TLS ULP hook [good from user point] then need a wa=
+y to determine which Inline tls hw is used? System with multiple Inline TLS=
+ capable hw and differing functionality would require checks in tls_main to=
+ exercise that specific functionality/callback?
