@@ -1,62 +1,87 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: Re: Subject: [PATCH] crypto: add zbewalgo compression algorithm for zram
-Date: Tue, 30 Jan 2018 22:26:46 +0100
-Message-ID: <11497171.7hPfTiqTsK@positron.chronox.de>
-References: <450300D8-6A7C-4D63-971A-AB6279C3B3DD@informatik.uni-hamburg.de> <2893047.8sTGZPTY3e@tauon.chronox.de> <C1EF6641-08EB-436C-AD2A-F2581A5BE3FE@informatik.uni-hamburg.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
+From: Benjamin Warnke <4bwarnke@informatik.uni-hamburg.de>
+Subject: Re: Subject: [PATCH] crypto: add zbewalgo compression algorithm for
+ zram
+Date: Tue, 30 Jan 2018 22:27:52 +0100
+Message-ID: <A2E3026A-BF61-4DD8-A61D-D768CE450EE4@informatik.uni-hamburg.de>
+References: <450300D8-6A7C-4D63-971A-AB6279C3B3DD@informatik.uni-hamburg.de>
+ <20180130202439.gjnly72x3ebbtxf4@gmail.com>
+Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
+Content-Type: text/plain;
+        charset=us-ascii
+Content-Transfer-Encoding: 8BIT
 Cc: linux-crypto@vger.kernel.org
-To: Benjamin Warnke <4bwarnke@informatik.uni-hamburg.de>
+To: Eric Biggers <ebiggers3@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:59064 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751373AbeA3V11 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 30 Jan 2018 16:27:27 -0500
-In-Reply-To: <C1EF6641-08EB-436C-AD2A-F2581A5BE3FE@informatik.uni-hamburg.de>
+Received: from mailhost.informatik.uni-hamburg.de ([134.100.9.70]:49206 "EHLO
+        mailhost.informatik.uni-hamburg.de" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1751653AbeA3V1z (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 30 Jan 2018 16:27:55 -0500
+In-Reply-To: <20180130202439.gjnly72x3ebbtxf4@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Dienstag, 30. Januar 2018, 20:49:00 CET schrieb Benjamin Warnke:
+Hi Eric,
 
-Hi Benjamin,
-
-> > In general: I do not think that having larger C functions in header files
-> > is a proper coding style.
+>> Currently ZRAM uses the compression-algorithms from the crypto-api.
+>> None of the current compression-algorithms in the crypto-api is designed
+>> to compress 4KiB chunks of data efficiently.
+>> This patch adds a new compression-algorithm especially designed for ZRAM,
+>> to compress small pieces of data more efficiently.
 > 
-> How should I solve this?
-> 
-> Option 1:
-> Move everything in the lib/zbewalgo folder into a single source file.
-> This way there is no function defined in a header file.
-> I separated the code into different files because the different partial
-> compression algorithms are independent from each other.
-> 
-> Option 2:
-> Move each header file in its own *.c file, while keeping the
-> function-declarations in the header. If the code is scattered in multiple
-> source files each of the partial algorithms would show up as an independent
-> module. All these modules would load simultaneously with the module
-> zbewalgo_compress The module zbewalgo_compress requires an array of all
-> partial algorithms. This would spam the 'lsmod' list with unneccessary
-> details.
+> This is some interesting work, and I like the idea of doing transforms
+> specialized for in-memory data.  However, where can I find more information
+> about this new compression algorithm?  
 
-A module may be compiled from multiple C files. So, moving the code into 
-separate C files and link them into one object / KO should be considered.
+I invented this algorithm during the last months for an university lecture. I have not published it before, that is why you can not find anything at google.
 
-> 
-> > Why are there __attribute__ ((unused)) function parameters, such as in
-> > compress_bitshuffle and others?
-> 
-> The zbewalgo algorithm is a container-algorithm for compression functions
-> with the ability to concatenate multiple algorithms. To be able to call any
-> compression algorithm the same way, I defined 'struct zbewalgo_alg' as the
-> interface for all those independent compression algorithms. Some of the
-> partial algorithms do not require all parameters. To silence compiler
-> warnings (if additional warning flags are enabled) I explicitly add the
-> 'unused'-parameter
+> What does "zbewalgo" even stand for /
+> mean?  Googling it turns up nothing.
 
-Linux does not enable the compiler warning about unused parameters.
+zbewalgo: z=zram be=Benjamin wa=Warnke algo=Algorithm
 
-Ciao
-Stephan
+> You are going to have to be much more specific what you mean by "efficiently".
+> Efficiency usually implies speed, yet even by your own numbers LZ4 is much
+> faster than "zbewalgo", both for compression and decompression.
+
+In this context efficient refers to the compression ratio.
+
+> If the goal is to provide an algorithm more tuned for compression ratio than
+> speed in comparison to LZ4, then the omission of Zstandard from your benchmarks
+> is strange, especially given that Zstandard is available in the kernel now.
+
+I was not aware of Zstandard in the kernel.
+
+#echo zstandard > /sys/block/zram0/comp_algorithm
+returns 
+"write error: Invalid argument"
+
+#cat /sys/block/zram0/comp_algorithm
+does not show Zstandard
+
+I pulled the latest commit from git://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git
+There is no CONFIG_CRYPTO_ZSTD (or similar) flag in my .config file.
+
+How can I enable Zstandard for use within zram?
+
+> The proposed "zbewalgo" decompressor also doesn't handle invalid inputs, which
+> means it cannot be used on untrusted data.  
+> This isn't acceptable without
+> justification (since people may use it on untrusted data, creating security
+> vulnerabilities), and it also makes it not really a fair comparison with LZ4
+> since the LZ4 decompressor does handle invalid inputs, at least in the mode
+> exposed through the crypto API.
+
+Since zbewalgo is intended for use within zram, the data-source for the decompression algorithm is the same computer.
+I assume, that the data is never corrupted in any way, because it is never exposed to untrusted hardware.
+
+To catch all invalid inputs a lot of branches would be required.
+Each additional if-branch in the code for handling untrusted data slows down the algorithm.
+In the zram context only blocks of 4KiB are going to be compressed.
+The zbewalgo algorithm executes multiple (de)compression steps in a row.
+Each step would need to fully verify, that the data is valid, even if the preceding algorithm does not detect an error.
+All together, the relative cpu-time cost for invalid data is high.
+
+I could add a comment to the decompression functions, but that would not be visible for the final user.
+
+Benjamin
