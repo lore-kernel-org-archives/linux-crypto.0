@@ -1,33 +1,83 @@
-From: Benjamin Warnke <4bwarnke@informatik.uni-hamburg.de>
-Subject: Re: Subject: [PATCH] crypto: add zbewalgo compression algorithm for
- zram
-Date: Wed, 31 Jan 2018 09:36:34 +0100
-Message-ID: <17252E89-A9B7-4BBA-99FD-14F707521F9A@informatik.uni-hamburg.de>
-References: <450300D8-6A7C-4D63-971A-AB6279C3B3DD@informatik.uni-hamburg.de>
- <2893047.8sTGZPTY3e@tauon.chronox.de>
- <C1EF6641-08EB-436C-AD2A-F2581A5BE3FE@informatik.uni-hamburg.de>
- <11497171.7hPfTiqTsK@positron.chronox.de>
- <AD307ECF-E18F-402B-83DE-9A12496653E8@informatik.uni-hamburg.de>
- <360D7326-8FF2-45A8-9FCA-53796768C5D0@informatik.uni-hamburg.de>
-Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
-Content-Type: text/plain;
-        charset=us-ascii
-Content-Transfer-Encoding: 8BIT
-Cc: linux-crypto@vger.kernel.org
-To: =?utf-8?Q?Stephan_M=C3=BCller?= <smueller@chronox.de>
+From: Vakul Garg <vakul.garg@nxp.com>
+Subject: [PATCH] tls: Add support for encryption using async offload accelerator
+Date: Wed, 31 Jan 2018 21:29:05 +0530
+Message-ID: <20180131155905.6523-1-vakul.garg@nxp.com>
+Mime-Version: 1.0
+Content-Type: text/plain
+Cc: ilyal@mellanox.com, aviadye@mellanox.com, davejwatson@fb.com,
+        davem@davemloft.net, netdev@vger.kernel.org,
+        Vakul Garg <vakul.garg@nxp.com>
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mailhost.informatik.uni-hamburg.de ([134.100.9.70]:46427 "EHLO
-        mailhost.informatik.uni-hamburg.de" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1752115AbeAaIgj (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 31 Jan 2018 03:36:39 -0500
-In-Reply-To: <360D7326-8FF2-45A8-9FCA-53796768C5D0@informatik.uni-hamburg.de>
+Received: from mail-ve1eur01on0088.outbound.protection.outlook.com ([104.47.1.88]:13860
+        "EHLO EUR01-VE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751700AbeAaKg2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 31 Jan 2018 05:36:28 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
+Async crypto accelerators (e.g. drivers/crypto/caam) support offloading
+GCM operation. If they are enabled, crypto_aead_encrypt() return error
+code -EINPROGRESS. In this case tls_do_encryption() needs to wait on a
+completion till the time the response for crypto offload request is
+received.
 
-I am working on a new Version for this patch addressing all comments, and following all guidelines.
+Signed-off-by: Vakul Garg <vakul.garg@nxp.com>
+---
+v1-v2:
+ - Used crypto_wait_req() to wait for async operation completion
+ - Passed CRYPTO_TFM_REQ_MAY_BACKLOG to crypto_aead_encrypt
 
-Best Regards,
-Benjamin Warnke
+ include/net/tls.h | 2 ++
+ net/tls/tls_sw.c  | 8 +++++++-
+ 2 files changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/include/net/tls.h b/include/net/tls.h
+index 936cfc5cab7d..8a8e1256caee 100644
+--- a/include/net/tls.h
++++ b/include/net/tls.h
+@@ -36,6 +36,7 @@
+ 
+ #include <linux/types.h>
+ #include <asm/byteorder.h>
++#include <linux/crypto.h>
+ #include <linux/socket.h>
+ #include <linux/tcp.h>
+ #include <net/tcp.h>
+@@ -57,6 +58,7 @@
+ 
+ struct tls_sw_context {
+ 	struct crypto_aead *aead_send;
++	struct crypto_wait async_wait;
+ 
+ 	/* Sending context */
+ 	char aad_space[TLS_AAD_SPACE_SIZE];
+diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
+index 73d19210dd49..31a9f0ef8af6 100644
+--- a/net/tls/tls_sw.c
++++ b/net/tls/tls_sw.c
+@@ -214,7 +214,11 @@ static int tls_do_encryption(struct tls_context *tls_ctx,
+ 	aead_request_set_ad(aead_req, TLS_AAD_SPACE_SIZE);
+ 	aead_request_set_crypt(aead_req, ctx->sg_aead_in, ctx->sg_aead_out,
+ 			       data_len, tls_ctx->iv);
+-	rc = crypto_aead_encrypt(aead_req);
++
++	aead_request_set_callback(aead_req, CRYPTO_TFM_REQ_MAY_BACKLOG,
++				  crypto_req_done, &ctx->async_wait);
++
++	rc = crypto_wait_req(crypto_aead_encrypt(aead_req), &ctx->async_wait);
+ 
+ 	ctx->sg_encrypted_data[0].offset -= tls_ctx->prepend_size;
+ 	ctx->sg_encrypted_data[0].length += tls_ctx->prepend_size;
+@@ -663,6 +667,8 @@ int tls_set_sw_offload(struct sock *sk, struct tls_context *ctx)
+ 		goto out;
+ 	}
+ 
++	crypto_init_wait(&sw_ctx->async_wait);
++
+ 	ctx->priv_ctx = (struct tls_offload_context *)sw_ctx;
+ 
+ 	crypto_info = &ctx->crypto_send;
+-- 
+2.13.6
