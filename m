@@ -1,53 +1,87 @@
-From: Steffen Klassert <steffen.klassert@secunet.com>
-Subject: Re: [PATCH v2 0/4] crypto: aesni - Use zero-copy for gcm(aes)
- buffers that are partially contiguous
-Date: Wed, 31 Jan 2018 09:13:16 +0100
-Message-ID: <20180131081316.kzkj65hljugdahfl@gauss3.secunet.de>
-References: <20180123201916.102134-1-junaids@google.com>
+From: Vakul Garg <vakul.garg@nxp.com>
+Subject: [PATCH] tls: Add support for encryption using async offload accelerator
+Date: Wed, 31 Jan 2018 15:40:26 +0530
+Message-ID: <20180131101026.5523-1-vakul.garg@nxp.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Cc: <herbert@gondor.apana.org.au>, <linux-crypto@vger.kernel.org>,
-        <andreslc@google.com>, <davem@davemloft.net>, <gthelen@google.com>,
-        <ebiggers3@gmail.com>, <smueller@chronox.de>
-To: Junaid Shahid <junaids@google.com>
+Content-Type: text/plain
+Cc: <ilyal@mellanox.com>, <aviadye@mellanox.com>, <davejwatson@fb.com>,
+        <davem@davemloft.net>, <netdev@vger.kernel.org>,
+        Vakul Garg <vakul.garg@nxp.com>
+To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from a.mx.secunet.com ([62.96.220.36]:57760 "EHLO a.mx.secunet.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753502AbeAaINT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 31 Jan 2018 03:13:19 -0500
-Content-Disposition: inline
-In-Reply-To: <20180123201916.102134-1-junaids@google.com>
+Received: from mail-bl2nam02on0070.outbound.protection.outlook.com ([104.47.38.70]:25711
+        "EHLO NAM02-BL2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751320AbeAaId1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 31 Jan 2018 03:33:27 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Junaid.
+Async crypto accelerators (e.g. drivers/crypto/caam) support offloading
+GCM operation. If they are enabled, crypto_aead_encrypt() return error
+code -EINPROGRESS. In this case tls_do_encryption() needs to wait on a
+completion till the time the response for crypto offload request is
+received.
 
-On Tue, Jan 23, 2018 at 12:19:12PM -0800, Junaid Shahid wrote:
-> Changes in v2:
-> - Integrated https://patchwork.kernel.org/patch/10173981
-> 
-> Currently, the AESNI gcm(aes) implementation uses zero-copy only when the
-> entire src and dest request buffers, including the AAD, the data and the
-> Auth Tag are contiguous. This series enables the use of zero-copy even if the
-> AAD and/or Auth Tag are in different buffers than the actual data, as long as
-> each of them individually satisfies the zero-copy conditions (i.e. the entire
-> buffer is either in low-mem or within a single high-mem page). Furthermore,
-> it also enables the use of zero-copy even if only one of src and dest satisfies
-> these conditions rather than only when both of them do.
+Signed-off-by: Vakul Garg <vakul.garg@nxp.com>
+---
+ net/tls/tls_sw.c | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
 
-I wonder which special usecase you have in mind that will be improved
-by your patches.
-
-For IPsec, the crypto layer either gets a contiguous buffer because
-networking already linearized the packet data, or the packet data
-and IPsec trailer are scattered over multiple page fragments.
-So in the first case, it is OK already without your patches. In
-the second case, your zero-copy conditions are not satisfied.
-
-This looks a bit like a workaround of the real problem, that is
-that the gcm-aesni implementation does not support SG operations.
-
-Maybe it would be better to investigate in the direction to
-support SG operations with gcm-aesni instead of trying to
-find all corner cases where the existing implementation can
-do zero-copy.
+diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
+index 73d19210dd49..390e6dc7b135 100644
+--- a/net/tls/tls_sw.c
++++ b/net/tls/tls_sw.c
+@@ -39,6 +39,11 @@
+ 
+ #include <net/tls.h>
+ 
++struct crypto_completion {
++	struct completion comp;
++	int result;
++};
++
+ static void trim_sg(struct sock *sk, struct scatterlist *sg,
+ 		    int *sg_num_elem, unsigned int *sg_size, int target_size)
+ {
+@@ -194,6 +199,14 @@ static void tls_free_both_sg(struct sock *sk)
+ 		&ctx->sg_plaintext_size);
+ }
+ 
++static void crypto_complete(struct crypto_async_request *req, int err)
++{
++	struct crypto_completion *x = req->data;
++
++	x->result = err;
++	complete(&x->comp);
++}
++
+ static int tls_do_encryption(struct tls_context *tls_ctx,
+ 			     struct tls_sw_context *ctx, size_t data_len,
+ 			     gfp_t flags)
+@@ -202,6 +215,7 @@ static int tls_do_encryption(struct tls_context *tls_ctx,
+ 		crypto_aead_reqsize(ctx->aead_send);
+ 	struct aead_request *aead_req;
+ 	int rc;
++	struct crypto_completion crypto_done;
+ 
+ 	aead_req = kzalloc(req_size, flags);
+ 	if (!aead_req)
+@@ -214,7 +228,15 @@ static int tls_do_encryption(struct tls_context *tls_ctx,
+ 	aead_request_set_ad(aead_req, TLS_AAD_SPACE_SIZE);
+ 	aead_request_set_crypt(aead_req, ctx->sg_aead_in, ctx->sg_aead_out,
+ 			       data_len, tls_ctx->iv);
++	aead_request_set_callback(aead_req, 0, crypto_complete, &crypto_done);
++
++	init_completion(&crypto_done.comp);
++
+ 	rc = crypto_aead_encrypt(aead_req);
++	if (rc == -EINPROGRESS) {
++		wait_for_completion(&crypto_done.comp);
++		rc = crypto_done.result;
++	}
+ 
+ 	ctx->sg_encrypted_data[0].offset -= tls_ctx->prepend_size;
+ 	ctx->sg_encrypted_data[0].length += tls_ctx->prepend_size;
+-- 
+2.13.6
