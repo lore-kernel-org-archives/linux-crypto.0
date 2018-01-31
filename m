@@ -1,87 +1,39 @@
-From: Vakul Garg <vakul.garg@nxp.com>
-Subject: [PATCH] tls: Add support for encryption using async offload accelerator
-Date: Wed, 31 Jan 2018 15:40:26 +0530
-Message-ID: <20180131101026.5523-1-vakul.garg@nxp.com>
+From: Steffen Klassert <steffen.klassert@secunet.com>
+Subject: Re: [PATCH 1/2] crypto: Implement a generic crypto statistics
+Date: Wed, 31 Jan 2018 09:33:37 +0100
+Message-ID: <20180131083337.rvshu72x5xhh22ef@gauss3.secunet.de>
+References: <1515700617-3513-1-git-send-email-clabbe@baylibre.com>
+ <3297958.ndliyBY1jk@tauon.chronox.de>
+ <20180112090730.GA15630@Red>
+ <16302559.hxlYq3rOsN@tauon.chronox.de>
+ <20180118085813.GA1988@Red>
+ <20180126154328.GA4002@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <ilyal@mellanox.com>, <aviadye@mellanox.com>, <davejwatson@fb.com>,
-        <davem@davemloft.net>, <netdev@vger.kernel.org>,
-        Vakul Garg <vakul.garg@nxp.com>
-To: <linux-crypto@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bl2nam02on0070.outbound.protection.outlook.com ([104.47.38.70]:25711
-        "EHLO NAM02-BL2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751320AbeAaId1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 31 Jan 2018 03:33:27 -0500
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Cc: LABBE Corentin <clabbe@baylibre.com>, <davem@davemloft.net>,
+        <nhorman@tuxdriver.com>, <linux-crypto@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <smueller@chronox.de>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20180126154328.GA4002@gondor.apana.org.au>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Async crypto accelerators (e.g. drivers/crypto/caam) support offloading
-GCM operation. If they are enabled, crypto_aead_encrypt() return error
-code -EINPROGRESS. In this case tls_do_encryption() needs to wait on a
-completion till the time the response for crypto offload request is
-received.
+On Fri, Jan 26, 2018 at 11:43:28PM +0800, Herbert Xu wrote:
+> On Thu, Jan 18, 2018 at 09:58:13AM +0100, LABBE Corentin wrote:
+> >
+> > I have two way of adding a new netlink request
+> > - keep the current patch and simply add a new CRYPTO_MSG_GETSTAT which use the same function than CRYPTO_MSG_GETALG
+> > 	=> minimal changes, in fact CRYPTO_MSG_GETSTAT and CRYPTO_MSG_GETALG would be the same, but it is easy for userspace to test presence of stat.
+> > - Create a new CRYPTO_MSG_GETSTAT which imply lot of code and add a new crypto_user_stat.c
+> > 	=> this imply also to change makefile (rename crypto_user.c to crypto_user_base.c) since crypto_user.ko is made of two files.
+> > 
+> > Which one do you prefer ?
+> 
+> I think you should check with the crconf author, Steffen Klassert
+> since that will be affected by this change.
 
-Signed-off-by: Vakul Garg <vakul.garg@nxp.com>
----
- net/tls/tls_sw.c | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
-
-diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
-index 73d19210dd49..390e6dc7b135 100644
---- a/net/tls/tls_sw.c
-+++ b/net/tls/tls_sw.c
-@@ -39,6 +39,11 @@
- 
- #include <net/tls.h>
- 
-+struct crypto_completion {
-+	struct completion comp;
-+	int result;
-+};
-+
- static void trim_sg(struct sock *sk, struct scatterlist *sg,
- 		    int *sg_num_elem, unsigned int *sg_size, int target_size)
- {
-@@ -194,6 +199,14 @@ static void tls_free_both_sg(struct sock *sk)
- 		&ctx->sg_plaintext_size);
- }
- 
-+static void crypto_complete(struct crypto_async_request *req, int err)
-+{
-+	struct crypto_completion *x = req->data;
-+
-+	x->result = err;
-+	complete(&x->comp);
-+}
-+
- static int tls_do_encryption(struct tls_context *tls_ctx,
- 			     struct tls_sw_context *ctx, size_t data_len,
- 			     gfp_t flags)
-@@ -202,6 +215,7 @@ static int tls_do_encryption(struct tls_context *tls_ctx,
- 		crypto_aead_reqsize(ctx->aead_send);
- 	struct aead_request *aead_req;
- 	int rc;
-+	struct crypto_completion crypto_done;
- 
- 	aead_req = kzalloc(req_size, flags);
- 	if (!aead_req)
-@@ -214,7 +228,15 @@ static int tls_do_encryption(struct tls_context *tls_ctx,
- 	aead_request_set_ad(aead_req, TLS_AAD_SPACE_SIZE);
- 	aead_request_set_crypt(aead_req, ctx->sg_aead_in, ctx->sg_aead_out,
- 			       data_len, tls_ctx->iv);
-+	aead_request_set_callback(aead_req, 0, crypto_complete, &crypto_done);
-+
-+	init_completion(&crypto_done.comp);
-+
- 	rc = crypto_aead_encrypt(aead_req);
-+	if (rc == -EINPROGRESS) {
-+		wait_for_completion(&crypto_done.comp);
-+		rc = crypto_done.result;
-+	}
- 
- 	ctx->sg_encrypted_data[0].offset -= tls_ctx->prepend_size;
- 	ctx->sg_encrypted_data[0].length += tls_ctx->prepend_size;
--- 
-2.13.6
+I still haven't had time to look into the details, but I'm
+fine with everything that does not break existing userspace.
+Everything else would be a 'no go'.
