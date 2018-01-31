@@ -1,58 +1,90 @@
-From: Dave Watson <davejwatson@fb.com>
-Subject: Re: [RFC crypto v3 8/9] chtls: Register the ULP
-Date: Wed, 31 Jan 2018 08:43:47 -0800
-Message-ID: <20180131164347.GA34501@davejwatson-mba>
-References: <20180125210850.GA69117@davejwatson-mba>
- <CY4PR1201MB0230C0D2D0F24900A084574D97E60@CY4PR1201MB0230.namprd12.prod.outlook.com>
- <CY4PR1201MB0230042A4D0EA83DC8F1BE7397E40@CY4PR1201MB0230.namprd12.prod.outlook.com>
- <20180130171144.GA42146@davejwatson-mba>
- <9e81c5b4-f319-8b33-5dec-dad19582bde4@chelsio.com>
+From: Vakul Garg <vakul.garg@nxp.com>
+Subject: RE: [PATCHv2] tls: Add support for encryption using async offload
+ accelerator
+Date: Wed, 31 Jan 2018 17:22:38 +0000
+Message-ID: <HE1PR04MB30827E0097BB30E4E2EE51648BFB0@HE1PR04MB3082.eurprd04.prod.outlook.com>
+References: <20180131160437.6583-1-vakul.garg@nxp.com>
+ <20180131152228.GA24247@davejwatson-mba>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: 8bit
-Cc: "sd@queasysnail.net" <sd@queasysnail.net>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "ganeshgr@chelsio.co" <ganeshgr@chelsio.co>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "ilyal@mellanox.com" <ilyal@mellanox.com>,
+        "aviadye@mellanox.com" <aviadye@mellanox.com>,
         "davem@davemloft.net" <davem@davemloft.net>,
-        Boris Pismenny <borisp@mellanox.com>,
-        Ilya Lesokhin <ilyal@mellanox.com>
-To: Atul Gupta <atul.gupta@chelsio.com>
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        Gilad Ben-Yossef <gilad@benyossef.com>
+To: Dave Watson <davejwatson@fb.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:39630 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S932099AbeAaQoL (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 31 Jan 2018 11:44:11 -0500
-Content-Disposition: inline
-In-Reply-To: <9e81c5b4-f319-8b33-5dec-dad19582bde4@chelsio.com>
+Received: from mail-db5eur01on0072.outbound.protection.outlook.com ([104.47.2.72]:26304
+        "EHLO EUR01-DB5-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1752431AbeAaRWl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 31 Jan 2018 12:22:41 -0500
+In-Reply-To: <20180131152228.GA24247@davejwatson-mba>
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 01/31/18 04:14 PM, Atul Gupta wrote:
-> 
-> 
-> On Tuesday 30 January 2018 10:41 PM, Dave Watson wrote:
-> > On 01/30/18 06:51 AM, Atul Gupta wrote:
-> > 
-> > > What I was referring is that passing "tls" ulp type in setsockopt
-> > > may be insufficient to make the decision when multi HW assist Inline
-> > > TLS solution exists.
-> > Setting the ULP doesn't choose HW or SW implementation, I think that
-> > should be done later when setting up crypto with
-> > 
-> > setsockopt(SOL_TLS, TLS_TX, struct crypto_info).
-> setsockpot [mentioned above] is quite late for driver to enable HW
-> implementation, we require something as early as tls_init [setsockopt(sock,
-> SOL_TCP, TCP_ULP, "tls", sizeof("tls"))], for driver to set HW prot and
-> offload connection beside Inline Tx/Rx.
-> > 
-> > Any reason we can't use ethtool to choose HW vs SW implementation, if
-> > available on the device?
-> Thought about it,  the interface index is not available to fetch netdev and
-> caps check to set HW prot eg. bind [prot.hash] --> tls_hash to program HW.
 
-Perhaps this is the part I don't follow - why do you need to override
-hash and check for LISTEN?  I briefly looked through the patch named
-"CPL handler definition", this looks like it is a full TCP offload?
+
+> -----Original Message-----
+> From: Dave Watson [mailto:davejwatson@fb.com]
+> Sent: Wednesday, January 31, 2018 8:52 PM
+> To: Vakul Garg <vakul.garg@nxp.com>
+> Cc: linux-crypto@vger.kernel.org; ilyal@mellanox.com;
+> aviadye@mellanox.com; davem@davemloft.net; netdev@vger.kernel.org;
+> Gilad Ben-Yossef <gilad@benyossef.com>
+> Subject: Re: [PATCHv2] tls: Add support for encryption using async offloa=
+d
+> accelerator
+>=20
+> On 01/31/18 09:34 PM, Vakul Garg wrote:
+> > Async crypto accelerators (e.g. drivers/crypto/caam) support
+> > offloading GCM operation. If they are enabled, crypto_aead_encrypt()
+> > return error code -EINPROGRESS. In this case tls_do_encryption() needs
+> > to wait on a completion till the time the response for crypto offload
+> > request is received.
+>=20
+> Comments from V1
+> > On Wed, Jan 31, 2018 at 8:10 AM, Gilad Ben-Yossef
+> <gilad@benyossef.com> wrote:
+> >> Hi Vakul,
+> >>
+> >> On Wed, Jan 31, 2018 at 12:36 PM, Vakul Garg <vakul.garg@nxp.com>
+> wrote:
+> >>> Async crypto accelerators (e.g. drivers/crypto/caam) support
+> >>> offloading GCM operation. If they are enabled, crypto_aead_encrypt()
+> >>> return error code -EINPROGRESS. In this case tls_do_encryption()
+> >>> needs to wait on a completion till the time the response for crypto
+> >>> offload request is received.
+> >>>
+> >>
+> >> Thank you for this patch. I think it is actually a bug fix and should
+> >> probably go into stable
+> >
+> > On second though in stable we should probably just disable async tfm
+> > allocations.
+> > It's simpler. But this approach is still good for -next
+> >
+> >
+> > Gilad
+>=20
+> I agree with Gilad, just disable async for now.
+>=20
+
+How to do it? Can you help with the api name?
+
+> If the flag MSG_DONTWAIT is set, we should be returning -EINPROGRESS and
+> not wait for a response.  I had started working on a patch for that, but =
+it's
+> pretty tricky to get right.
+
+Can you point me to your WIP code branch for this?
+
+If MSG_DONTWAIT is not used, will it be sane if enqueue the crypto request =
+to=20
+accelerator and return to user space back so that user space can send more =
+plaintext data while=20
+crypto accelerator is working in parallel?
+=20
