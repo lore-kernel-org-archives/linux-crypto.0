@@ -1,39 +1,51 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH] crypto: AF_ALG AIO - lock context IV
-Date: Thu, 01 Feb 2018 11:15:48 +0100
-Message-ID: <3443894.2QtSl4gYip@tauon.chronox.de>
-References: <2118226.LQArbCsRu5@tauon.chronox.de> <1794487.2xX5c1mbjk@tauon.chronox.de> <CAOtvUMeLGRS-NJvf7R_J5bX1CB77htasZO0wKCU4uXeNE93Ttw@mail.gmail.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Subject: [PATCH 3/3] crypto: sha3-generic - Use __optimize to support old compilers
+Date: Thu,  1 Feb 2018 11:22:00 +0100
+Message-ID: <1517480520-4465-3-git-send-email-geert@linux-m68k.org>
+References: <1517480520-4465-1-git-send-email-geert@linux-m68k.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-        Harsh Jain <harsh@chelsio.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        linuxarm@huawei.com
-To: Gilad Ben-Yossef <gilad@benyossef.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:59118 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751749AbeBAKPu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 1 Feb 2018 05:15:50 -0500
-In-Reply-To: <CAOtvUMeLGRS-NJvf7R_J5bX1CB77htasZO0wKCU4uXeNE93Ttw@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Cc: Arnd Bergmann <arnd@arndb.de>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-crypto@vger.kernel.org, linux-sparse@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Geert Uytterhoeven <geert@linux-m68k.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Christopher Li <sparse@chrisli.org>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Tom Lendacky <thomas.lendacky@amd.com>
+Return-path: <linux-sparse-owner@vger.kernel.org>
+In-Reply-To: <1517480520-4465-1-git-send-email-geert@linux-m68k.org>
+Sender: linux-sparse-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Am Donnerstag, 1. Februar 2018, 11:06:30 CET schrieb Gilad Ben-Yossef:
+With gcc-4.1.2:
 
-Hi Gilad,
+    crypto/sha3_generic.c:39: warning: ‘__optimize__’ attribute directive ignored
 
-> 2. Pointing out that the problem solved (and rightfully so) by mutex in
-> AF_ALG AIO implementation must exists elsewhere as well - for example
-> IPsec, and is probably solved there too, so if we add the flag as
-> suggested, it can be used there as well to gain similar benefits to what
-> Jonathan is suggesting.
+Use the newly introduced __optimize macro to fix this.
 
-You are quite right. this patch could speed up things for IPSec and the disk 
-encryption logic too. So I think we should CC also the IPSec folks and the 
-disk crypto folks to review the patch.
+Fixes: 83dee2ce1ae791c3 ("crypto: sha3-generic - rewrite KECCAK transform to help the compiler optimize")
+Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
+---
+ crypto/sha3_generic.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Ciao
-Stephan
+diff --git a/crypto/sha3_generic.c b/crypto/sha3_generic.c
+index a965b9d8055983af..c409cd87fea5decd 100644
+--- a/crypto/sha3_generic.c
++++ b/crypto/sha3_generic.c
+@@ -35,7 +35,7 @@ static const u64 keccakf_rndc[24] = {
+ 
+ /* update the state with given number of rounds */
+ 
+-static void __attribute__((__optimize__("O3"))) keccakf(u64 st[25])
++static void __optimize("O3") keccakf(u64 st[25])
+ {
+ 	u64 t[5], tt, bc[5];
+ 	int round;
+-- 
+2.7.4
+
