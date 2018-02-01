@@ -1,45 +1,54 @@
-From: Fabio Estevam <festevam@gmail.com>
-Subject: Re: [PATCH v3 4/5] clk: imx7d: add CAAM clock
-Date: Thu, 1 Feb 2018 12:53:59 -0200
-Message-ID: <CAOMZO5AncBkkA7azkZx2LWJ=O_dgmiHAYvV4iAgy5+VaTKijOQ@mail.gmail.com>
-References: <1517364040-27607-1-git-send-email-pure.logic@nexus-software.ie> <1517364040-27607-5-git-send-email-pure.logic@nexus-software.ie>
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [PATCH 2/3] compiler-gcc.h: __nostackprotector needs gcc-4.4 and up
+Date: Thu, 1 Feb 2018 16:29:53 +0100
+Message-ID: <CAK8P3a1kW=c0p6wnNMu_85z4Rq1aRA02+mqRYkhnGTsuXsVjmw@mail.gmail.com>
+References: <1517480520-4465-1-git-send-email-geert@linux-m68k.org>
+ <1517480520-4465-2-git-send-email-geert@linux-m68k.org> <CAK8P3a1Tm7zJf1VEGFPmhwqS=h92=_ssfAENJcrmxGg0eJCqnA@mail.gmail.com>
+ <CAMuHMdWHZMxRg91LVz6n1GsM+6jezdzzfnDtBTXixHh=Updt5A@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Cc: Horia Geanta Neag <horia.geanta@nxp.com>, aymen.sghaier@nxp.com,
-        linux-crypto@vger.kernel.org,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Fabio Estevam <fabio.estevam@nxp.com>,
-        Peng Fan <peng.fan@nxp.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        lukas.auer@aisec.fraunhofer.de, rui.silva@linaro.org,
-        Ryan Harkin <ryan.harkin@linaro.org>,
-        Michael Turquette <mturquette@baylibre.com>,
-        Stephen Boyd <sboyd@codeaurora.org>,
-        linux-clk <linux-clk@vger.kernel.org>
-To: "Bryan O'Donoghue" <pure.logic@nexus-software.ie>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1517364040-27607-5-git-send-email-pure.logic@nexus-software.ie>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Christopher Li <sparse@chrisli.org>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>, linux-sparse@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-oi0-f65.google.com ([209.85.218.65]:46052 "EHLO
+        mail-oi0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751948AbeBAP3z (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 1 Feb 2018 10:29:55 -0500
+In-Reply-To: <CAMuHMdWHZMxRg91LVz6n1GsM+6jezdzzfnDtBTXixHh=Updt5A@mail.gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jan 31, 2018 at 12:00 AM, Bryan O'Donoghue
-<pure.logic@nexus-software.ie> wrote:
-> From: Rui Miguel Silva <rui.silva@linaro.org>
+On Thu, Feb 1, 2018 at 12:55 PM, Geert Uytterhoeven
+<geert@linux-m68k.org> wrote:
+> Hi Arnd,
 >
-> Add CAAM clock so that we could use the Cryptographic Acceleration and
-> Assurance Module (CAAM) hardware block.
->
-> Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
-> Cc: Michael Turquette <mturquette@baylibre.com>
-> Cc: Stephen Boyd <sboyd@codeaurora.org>
-> Cc: linux-clk@vger.kernel.org
-> Cc: "Horia Geant=C4=83" <horia.geanta@nxp.com>
-> Cc: Aymen Sghaier <aymen.sghaier@nxp.com>
-> Cc: Fabio Estevam <fabio.estevam@nxp.com>
-> Cc: Peng Fan <peng.fan@nxp.com>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: Lukas Auer <lukas.auer@aisec.fraunhofer.de>
-> Signed-off-by: Bryan O'Donoghue <pure.logic@nexus-software.ie>
+> On Thu, Feb 1, 2018 at 12:46 PM, Arnd Bergmann <arnd@arndb.de> wrote:
+>> On Thu, Feb 1, 2018 at 11:21 AM, Geert Uytterhoeven
+>> <geert@linux-m68k.org> wrote:
+>>> Gcc versions before 4.4 do not recognize the __optimize__ compiler
+>>> attribute:
 
-Reviewed-by: Fabio Estevam <fabio.estevam@nxp.com>
+>
+> And we might want to remove the dummy in include/linux/compiler_types.h:
+>
+> #ifndef __nostackprotector
+> # define __nostackprotector
+> #endif
+>
+> BTW, how does this work with non-gcc compilers?
+
+clang should in theory accept the same flags, and it pretends to be an older
+version of gcc.
+
+I don't think anyone cares about ICC or any other compiler.
+
+    Arnd
