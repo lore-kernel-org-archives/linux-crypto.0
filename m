@@ -1,76 +1,39 @@
-From: Gilad Ben-Yossef <gilad@benyossef.com>
+From: Stephan Mueller <smueller@chronox.de>
 Subject: Re: [PATCH] crypto: AF_ALG AIO - lock context IV
-Date: Thu, 1 Feb 2018 12:07:21 +0200
-Message-ID: <CAOtvUMe8gqBJtFjkO-Jssw1Q32GdR0oZNPRitt81skKO2f_+yg@mail.gmail.com>
-References: <2118226.LQArbCsRu5@tauon.chronox.de> <20180131122956.000061a3@huawei.com>
- <CAOtvUMd=T8WkeMRhcF6PzDerzBsszBOCp9x=DpCjQMtLxgTPvg@mail.gmail.com> <2665140.KarSQuFonJ@tauon.chronox.de>
+Date: Thu, 01 Feb 2018 11:15:48 +0100
+Message-ID: <3443894.2QtSl4gYip@tauon.chronox.de>
+References: <2118226.LQArbCsRu5@tauon.chronox.de> <1794487.2xX5c1mbjk@tauon.chronox.de> <CAOtvUMeLGRS-NJvf7R_J5bX1CB77htasZO0wKCU4uXeNE93Ttw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
 Cc: Jonathan Cameron <Jonathan.Cameron@huawei.com>,
         Harsh Jain <harsh@chelsio.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         linuxarm@huawei.com
-To: Stephan Mueller <smueller@chronox.de>
+To: Gilad Ben-Yossef <gilad@benyossef.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-vk0-f67.google.com ([209.85.213.67]:42572 "EHLO
-        mail-vk0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751520AbeBAKHX (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 1 Feb 2018 05:07:23 -0500
-Received: by mail-vk0-f67.google.com with SMTP id t4so10902244vkb.9
-        for <linux-crypto@vger.kernel.org>; Thu, 01 Feb 2018 02:07:22 -0800 (PST)
-In-Reply-To: <2665140.KarSQuFonJ@tauon.chronox.de>
+Received: from mail.eperm.de ([89.247.134.16]:59118 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751749AbeBAKPu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 1 Feb 2018 05:15:50 -0500
+In-Reply-To: <CAOtvUMeLGRS-NJvf7R_J5bX1CB77htasZO0wKCU4uXeNE93Ttw@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Feb 1, 2018 at 12:04 PM, Stephan Mueller <smueller@chronox.de> wrote:
-> Am Donnerstag, 1. Februar 2018, 10:35:07 CET schrieb Gilad Ben-Yossef:
->
-> Hi Gilad,
->
->> >
->> > Which works well for the sort of optimization I did and for hardware that
->> > can do iv dependency tracking itself. If hardware dependency tracking was
->> > avilable, you would be able to queue up requests with a chained IV
->> > without taking any special precautions at all. The hardware would
->> > handle the IV update dependencies.
->> >
->> > So in conclusion, Stephan's approach should work and give us a nice
->> > small patch suitable for stable inclusion.
->> >
->> > However, if people know that their setup overhead can be put in parallel
->> > with previous requests (even when the IV is not yet updated) then they
->> > will
->> > probably want to do something inside their own driver and set the flag
->> > that Stephan is proposing adding to bypass the mutex approach.
->>
->> The patches from Stephan looks good to me, but I think we can do better
->> for the long term approach you are discussing.
->
-> What you made me think of is the following: shouldn't we relay the inline IV
-> flag on to the crypto drivers?
->
-> The reason is to allow a clean implementation of the enabling or disabling of
-> the dependency handling in the driver. Jonathan's driver, for example, decides
-> based on the pointer value of the IV buffer whether it is the same buffer and
-> thus dependency handling is to be applied. This is fragile.
->
-> As AF_ALG knows whether the inline IV with separate IVs per request or the
-> serialization with one IV buffer for all requests is requested, it should
-> relay this state on to the drivers. Thus, for example, Jonathan's driver can
-> be changed to rely on this flag instead on the buffer pointer value to decide
-> whether to enable its dependency handling.
+Am Donnerstag, 1. Februar 2018, 11:06:30 CET schrieb Gilad Ben-Yossef:
 
-Yes, that is exactly what I was trying to point out :-)
+Hi Gilad,
 
-Thanks,
-Gilad
+> 2. Pointing out that the problem solved (and rightfully so) by mutex in
+> AF_ALG AIO implementation must exists elsewhere as well - for example
+> IPsec, and is probably solved there too, so if we add the flag as
+> suggested, it can be used there as well to gain similar benefits to what
+> Jonathan is suggesting.
 
--- 
-Gilad Ben-Yossef
-Chief Coffee Drinker
+You are quite right. this patch could speed up things for IPSec and the disk 
+encryption logic too. So I think we should CC also the IPSec folks and the 
+disk crypto folks to review the patch.
 
-"If you take a class in large-scale robotics, can you end up in a
-situation where the homework eats your dog?"
- -- Jean-Baptiste Queru
+Ciao
+Stephan
