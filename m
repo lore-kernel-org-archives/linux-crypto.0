@@ -1,71 +1,57 @@
-From: =?iso-8859-2?Q?Horia_Geant=E3?= <horia.geanta@nxp.com>
-Subject: Re: [PATCH v3 5/5] ARM: dts: imx7s: add CAAM device node
-Date: Thu, 1 Feb 2018 11:44:23 +0000
-Message-ID: <VI1PR0402MB334269ACFE0805A2E31D604B98FA0@VI1PR0402MB3342.eurprd04.prod.outlook.com>
-References: <1517364040-27607-1-git-send-email-pure.logic@nexus-software.ie>
- <1517364040-27607-6-git-send-email-pure.logic@nexus-software.ie>
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [PATCH 2/3] compiler-gcc.h: __nostackprotector needs gcc-4.4 and up
+Date: Thu, 1 Feb 2018 12:46:02 +0100
+Message-ID: <CAK8P3a1Tm7zJf1VEGFPmhwqS=h92=_ssfAENJcrmxGg0eJCqnA@mail.gmail.com>
+References: <1517480520-4465-1-git-send-email-geert@linux-m68k.org> <1517480520-4465-2-git-send-email-geert@linux-m68k.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-2"
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Cc: Fabio Estevam <fabio.estevam@nxp.com>, Peng Fan <peng.fan@nxp.com>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "lukas.auer@aisec.fraunhofer.de" <lukas.auer@aisec.fraunhofer.de>,
-        "rui.silva@linaro.org" <rui.silva@linaro.org>,
-        "ryan.harkin@linaro.org" <ryan.harkin@linaro.org>,
-        Shawn Guo <shawnguo@kernel.org>,
-        Sascha Hauer <kernel@pengutronix.de>,
-        "linux-arm-kernel@lists.infradead.org"
-        <linux-arm-kernel@lists.infradead.org>
-To: Bryan O'Donoghue <pure.logic@nexus-software.ie>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-db5eur01on0088.outbound.protection.outlook.com ([104.47.2.88]:61660
-        "EHLO EUR01-DB5-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1752038AbeBALo2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 1 Feb 2018 06:44:28 -0500
-Content-Language: en-US
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Christopher Li <sparse@chrisli.org>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>, linux-sparse@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Return-path: <linux-sparse-owner@vger.kernel.org>
+In-Reply-To: <1517480520-4465-2-git-send-email-geert@linux-m68k.org>
+Sender: linux-sparse-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 1/31/2018 4:00 AM, Bryan O'Donoghue wrote:=0A=
-> From: Rui Miguel Silva <rui.silva@linaro.org>=0A=
-> =0A=
-> Add CAAM device node to the i.MX7s device tree.=0A=
-> =0A=
-> Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>=0A=
-> Cc: Shawn Guo <shawnguo@kernel.org>=0A=
-> Cc: Sascha Hauer <kernel@pengutronix.de>=0A=
-> Cc: linux-arm-kernel@lists.infradead.org=0A=
-> Cc: "Horia Geant=E3" <horia.geanta@nxp.com>=0A=
-> Cc: Aymen Sghaier <aymen.sghaier@nxp.com>=0A=
-> Cc: Fabio Estevam <fabio.estevam@nxp.com>=0A=
-> Cc: Peng Fan <peng.fan@nxp.com>=0A=
-> Cc: "David S. Miller" <davem@davemloft.net>=0A=
-> Cc: Lukas Auer <lukas.auer@aisec.fraunhofer.de>=0A=
-> Signed-off-by: Bryan O'Donoghue <pure.logic@nexus-software.ie>=0A=
-> ---=0A=
->  arch/arm/boot/dts/imx7s.dtsi | 31 +++++++++++++++++++++++++++++++=0A=
->  1 file changed, 31 insertions(+)=0A=
-> =0A=
-> diff --git a/arch/arm/boot/dts/imx7s.dtsi b/arch/arm/boot/dts/imx7s.dtsi=
-=0A=
-> index 82ad26e..e38c159 100644=0A=
-> --- a/arch/arm/boot/dts/imx7s.dtsi=0A=
-> +++ b/arch/arm/boot/dts/imx7s.dtsi=0A=
-> @@ -805,6 +805,37 @@=0A=
->  				status =3D "disabled";=0A=
->  			};=0A=
->  =0A=
-> +			crypto: caam@30900000 {=0A=
-> +				compatible =3D "fsl,sec-v4.0";=0A=
-> +				fsl,sec-era =3D <4>;=0A=
-CCBVID[CAAM_ERA] =3D 8.=0A=
-Either remove this (optional) property and let the bootloader add it=0A=
-dynamically, or provide a correct value for it.=0A=
-=0A=
-Thanks,=0A=
-Horia=0A=
-=0A=
+On Thu, Feb 1, 2018 at 11:21 AM, Geert Uytterhoeven
+<geert@linux-m68k.org> wrote:
+> Gcc versions before 4.4 do not recognize the __optimize__ compiler
+> attribute:
+>
+>     warning: =E2=80=98__optimize__=E2=80=99 attribute directive ignored
+>
+> Fixes: 7375ae3a0b79ea07 ("compiler-gcc.h: Introduce __nostackprotector fu=
+nction attribute")
+> Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
+> ---
+> Can anyone please verify this?
+> Apparently __nostackprotector is used on x86 only, which is usually
+> served by modern compilers.
+
+I've checked that __optimize("no-stack-protector") is accepted by exactly t=
+hose
+compilers that your 40400 version check tests for, across all architectures=
+, so
+that's fine.
+
+However,  looking at commit 91cfc88c66bf ("x86: Use __nostackprotect for
+sme_encrypt_kernel"), I suspect that gcc-4.1 through 4.3 will now cause
+a runtime failure in sme_encrypt_kernel() without a compile-time warning.
+
+I would leave __nostackprotector unchanged here, so we at least get
+a warning for functions that need to disable the stack protector to work
+correctly.
+
+We might want to add an #ifdef CONFIG_CC_STACKPROTECTOR around
+the __nostackprotector definition, so that we only warn if stackprotector
+is globally enabled.
+
+       Arnd
