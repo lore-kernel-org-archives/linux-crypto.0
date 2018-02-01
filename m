@@ -1,72 +1,83 @@
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Subject: [PATCH 1/3] compiler-gcc.h: Introduce __optimize function attribute
-Date: Thu,  1 Feb 2018 11:21:58 +0100
-Message-ID: <1517480520-4465-1-git-send-email-geert@linux-m68k.org>
+From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Subject: Re: [PATCH] crypto: AF_ALG AIO - lock context IV
+Date: Thu, 1 Feb 2018 10:25:19 +0000
+Message-ID: <20180201102519.000044c1@huawei.com>
+References: <2118226.LQArbCsRu5@tauon.chronox.de>
+        <20180131122956.000061a3@huawei.com>
+        <CAOtvUMd=T8WkeMRhcF6PzDerzBsszBOCp9x=DpCjQMtLxgTPvg@mail.gmail.com>
+        <2665140.KarSQuFonJ@tauon.chronox.de>
+        <CAOtvUMe8gqBJtFjkO-Jssw1Q32GdR0oZNPRitt81skKO2f_+yg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Cc: Arnd Bergmann <arnd@arndb.de>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-crypto@vger.kernel.org, linux-sparse@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Geert Uytterhoeven <geert@linux-m68k.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Christopher Li <sparse@chrisli.org>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Tom Lendacky <thomas.lendacky@amd.com>
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+Cc: Stephan Mueller <smueller@chronox.de>,
+        Harsh Jain <harsh@chelsio.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        <linuxarm@huawei.com>
+To: Gilad Ben-Yossef <gilad@benyossef.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from andre.telenet-ops.be ([195.130.132.53]:46118 "EHLO
-        andre.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751774AbeBAKWI (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 1 Feb 2018 05:22:08 -0500
+Received: from szxga06-in.huawei.com ([45.249.212.32]:49776 "EHLO huawei.com"
+        rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751771AbeBAKZt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 1 Feb 2018 05:25:49 -0500
+In-Reply-To: <CAOtvUMe8gqBJtFjkO-Jssw1Q32GdR0oZNPRitt81skKO2f_+yg@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Create a new function attribute __optimize, which allows to specify an
-optimization level on a per-function basis.
+On Thu, 1 Feb 2018 12:07:21 +0200
+Gilad Ben-Yossef <gilad@benyossef.com> wrote:
 
-Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
----
-I assume this is supported as of gcc-4.4:
-  - gcc version 4.3.3 (GCC): warning: ‘__optimize__’ attribute directive
-    ignored
-  - gcc version 4.4.7 (Ubuntu/Linaro 4.4.7-1ubuntu2): OK
----
- include/linux/compiler-gcc.h | 4 ++++
- include/linux/compiler.h     | 4 ++++
- 2 files changed, 8 insertions(+)
+> On Thu, Feb 1, 2018 at 12:04 PM, Stephan Mueller <smueller@chronox.de> wrote:
+> > Am Donnerstag, 1. Februar 2018, 10:35:07 CET schrieb Gilad Ben-Yossef:
+> >
+> > Hi Gilad,
+> >  
+> >> >
+> >> > Which works well for the sort of optimization I did and for hardware that
+> >> > can do iv dependency tracking itself. If hardware dependency tracking was
+> >> > avilable, you would be able to queue up requests with a chained IV
+> >> > without taking any special precautions at all. The hardware would
+> >> > handle the IV update dependencies.
+> >> >
+> >> > So in conclusion, Stephan's approach should work and give us a nice
+> >> > small patch suitable for stable inclusion.
+> >> >
+> >> > However, if people know that their setup overhead can be put in parallel
+> >> > with previous requests (even when the IV is not yet updated) then they
+> >> > will
+> >> > probably want to do something inside their own driver and set the flag
+> >> > that Stephan is proposing adding to bypass the mutex approach.  
+> >>
+> >> The patches from Stephan looks good to me, but I think we can do better
+> >> for the long term approach you are discussing.  
+> >
+> > What you made me think of is the following: shouldn't we relay the inline IV
+> > flag on to the crypto drivers?
+> >
+> > The reason is to allow a clean implementation of the enabling or disabling of
+> > the dependency handling in the driver. Jonathan's driver, for example, decides
+> > based on the pointer value of the IV buffer whether it is the same buffer and
+> > thus dependency handling is to be applied. This is fragile.
 
-diff --git a/include/linux/compiler-gcc.h b/include/linux/compiler-gcc.h
-index 631354acfa720475..0a278a527944ad2f 100644
---- a/include/linux/compiler-gcc.h
-+++ b/include/linux/compiler-gcc.h
-@@ -196,6 +196,10 @@
- #endif /* __CHECKER__ */
- #endif /* GCC_VERSION >= 40300 */
- 
-+#if GCC_VERSION >= 40400
-+#define __optimize(level)	__attribute__((__optimize__(level)))
-+#endif /* GCC_VERSION >= 40400 */
-+
- #if GCC_VERSION >= 40500
- 
- #ifndef __CHECKER__
-diff --git a/include/linux/compiler.h b/include/linux/compiler.h
-index 52e611ab9a6cf6fd..5ff818e9a836e898 100644
---- a/include/linux/compiler.h
-+++ b/include/linux/compiler.h
-@@ -271,6 +271,10 @@ static __always_inline void __write_once_size(volatile void *p, void *res, int s
- 
- #endif /* __ASSEMBLY__ */
- 
-+#ifndef __optimize
-+# define __optimize(level)
-+#endif
-+
- /* Compile time object size, -1 for unknown */
- #ifndef __compiletime_object_size
- # define __compiletime_object_size(obj) -1
--- 
-2.7.4
+I agree it's inelegant and a flag would be better than pointer tricks (though
+they are safe currently - we never know what might change in future)
+It was really a minimal example rather than a suggestion of the ultimate
+solution ;)  I was planning on suggesting a flag myself once the basic
+discussion concluded the approach was worthwhile.
+
+> >
+> > As AF_ALG knows whether the inline IV with separate IVs per request or the
+> > serialization with one IV buffer for all requests is requested, it should
+> > relay this state on to the drivers. Thus, for example, Jonathan's driver can
+> > be changed to rely on this flag instead on the buffer pointer value to decide
+> > whether to enable its dependency handling.  
+> 
+> Yes, that is exactly what I was trying to point out :-)
+
+Agreed - make things explicit rather than basically relying on knowing how
+the above layers are working.
+
+Thanks,
+
+Jonathan
