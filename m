@@ -1,8 +1,7 @@
 From: Geert Uytterhoeven <geert@linux-m68k.org>
-Subject: [PATCH 2/3] compiler-gcc.h: __nostackprotector needs gcc-4.4 and up
-Date: Thu,  1 Feb 2018 11:21:59 +0100
-Message-ID: <1517480520-4465-2-git-send-email-geert@linux-m68k.org>
-References: <1517480520-4465-1-git-send-email-geert@linux-m68k.org>
+Subject: [PATCH 1/3] compiler-gcc.h: Introduce __optimize function attribute
+Date: Thu,  1 Feb 2018 11:21:58 +0100
+Message-ID: <1517480520-4465-1-git-send-email-geert@linux-m68k.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -17,50 +16,57 @@ To: Herbert Xu <herbert@gondor.apana.org.au>,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>,
         Tom Lendacky <thomas.lendacky@amd.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from baptiste.telenet-ops.be ([195.130.132.51]:33010 "EHLO
-        baptiste.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752023AbeBAKWI (ORCPT
+Received: from andre.telenet-ops.be ([195.130.132.53]:46118 "EHLO
+        andre.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751774AbeBAKWI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Thu, 1 Feb 2018 05:22:08 -0500
-In-Reply-To: <1517480520-4465-1-git-send-email-geert@linux-m68k.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Gcc versions before 4.4 do not recognize the __optimize__ compiler
-attribute:
+Create a new function attribute __optimize, which allows to specify an
+optimization level on a per-function basis.
 
-    warning: ‘__optimize__’ attribute directive ignored
-
-Fixes: 7375ae3a0b79ea07 ("compiler-gcc.h: Introduce __nostackprotector function attribute")
 Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
 ---
-Can anyone please verify this?
-Apparently __nostackprotector is used on x86 only, which is usually
-served by modern compilers.
+I assume this is supported as of gcc-4.4:
+  - gcc version 4.3.3 (GCC): warning: ‘__optimize__’ attribute directive
+    ignored
+  - gcc version 4.4.7 (Ubuntu/Linaro 4.4.7-1ubuntu2): OK
 ---
- include/linux/compiler-gcc.h | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ include/linux/compiler-gcc.h | 4 ++++
+ include/linux/compiler.h     | 4 ++++
+ 2 files changed, 8 insertions(+)
 
 diff --git a/include/linux/compiler-gcc.h b/include/linux/compiler-gcc.h
-index 0a278a527944ad2f..73bc63e0a1c4b664 100644
+index 631354acfa720475..0a278a527944ad2f 100644
 --- a/include/linux/compiler-gcc.h
 +++ b/include/linux/compiler-gcc.h
-@@ -167,8 +167,6 @@
+@@ -196,6 +196,10 @@
+ #endif /* __CHECKER__ */
+ #endif /* GCC_VERSION >= 40300 */
  
- #if GCC_VERSION >= 40100
- # define __compiletime_object_size(obj) __builtin_object_size(obj, 0)
--
--#define __nostackprotector	__attribute__((__optimize__("no-stack-protector")))
- #endif
- 
- #if GCC_VERSION >= 40300
-@@ -198,6 +196,7 @@
- 
- #if GCC_VERSION >= 40400
- #define __optimize(level)	__attribute__((__optimize__(level)))
-+#define __nostackprotector	__optimize("no-stack-protector")
- #endif /* GCC_VERSION >= 40400 */
- 
++#if GCC_VERSION >= 40400
++#define __optimize(level)	__attribute__((__optimize__(level)))
++#endif /* GCC_VERSION >= 40400 */
++
  #if GCC_VERSION >= 40500
+ 
+ #ifndef __CHECKER__
+diff --git a/include/linux/compiler.h b/include/linux/compiler.h
+index 52e611ab9a6cf6fd..5ff818e9a836e898 100644
+--- a/include/linux/compiler.h
++++ b/include/linux/compiler.h
+@@ -271,6 +271,10 @@ static __always_inline void __write_once_size(volatile void *p, void *res, int s
+ 
+ #endif /* __ASSEMBLY__ */
+ 
++#ifndef __optimize
++# define __optimize(level)
++#endif
++
+ /* Compile time object size, -1 for unknown */
+ #ifndef __compiletime_object_size
+ # define __compiletime_object_size(obj) -1
 -- 
 2.7.4
