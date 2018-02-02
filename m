@@ -1,66 +1,61 @@
-From: Kamil Konieczny <k.konieczny@partner.samsung.com>
-Subject: Re: Odroid HC1 cryptsetup:encrypt sata driver
-Date: Fri, 02 Feb 2018 12:27:04 +0100
-Message-ID: <fc3accfc-0dc1-d37b-3345-56aa981bbdfd@partner.samsung.com>
-References: <CGME20180124130437epcas2p251156941d5fd0dab2c24807a26a156be@epcas2p2.samsung.com>
-        <CANAwSgQ3WE9XmjmzHxJstDz52fj_SFvmBKnMjY3MVjhxJuoFmg@mail.gmail.com>
-        <f1966769-106e-a95e-8068-642e93c390b4@partner.samsung.com>
-        <CANAwSgT5buQ2ROmt-Bk0sh8=cSU5hp3GiHRuKwSagn0s57Nevw@mail.gmail.com>
+From: "Auer, Lukas" <lukas.auer@aisec.fraunhofer.de>
+Subject: Re: [PATCH v3 2/5] crypto: caam: Fix endless loop when RNG is
+ already initialized
+Date: Fri, 2 Feb 2018 12:54:24 +0000
+Message-ID: <1517576063.2002.19.camel@aisec.fraunhofer.de>
+References: <1517364040-27607-1-git-send-email-pure.logic@nexus-software.ie>
+         <1517364040-27607-3-git-send-email-pure.logic@nexus-software.ie>
+         <VI1PR0402MB334297558BB1984131546B1D98FA0@VI1PR0402MB3342.eurprd04.prod.outlook.com>
+         <78ad6a62-190c-e4fe-dd23-e1d058f9bbb2@nexus-software.ie>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: Krzysztof Kozlowski <krzk@kernel.org>,
-        Marek Szyprowski <m.szyprowski@samsung.com>,
-        linux-samsung-soc@vger.kernel.org, linux-crypto@vger.kernel.org,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
-To: Anand Moon <linux.amoon@gmail.com>
-Return-path: <linux-samsung-soc-owner@vger.kernel.org>
-In-reply-to: <CANAwSgT5buQ2ROmt-Bk0sh8=cSU5hp3GiHRuKwSagn0s57Nevw@mail.gmail.com>
-Content-language: en-US
-Sender: linux-samsung-soc-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Transfer-Encoding: base64
+Cc: "peng.fan@nxp.com" <peng.fan@nxp.com>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "ryan.harkin@linaro.org" <ryan.harkin@linaro.org>,
+        "fabio.estevam@nxp.com" <fabio.estevam@nxp.com>,
+        "rui.silva@linaro.org" <rui.silva@linaro.org>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>
+To: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "aymen.sghaier@nxp.com" <aymen.sghaier@nxp.com>,
+        "horia.geanta@nxp.com" <horia.geanta@nxp.com>,
+        "pure.logic@nexus-software.ie" <pure.logic@nexus-software.ie>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-edgeka24.fraunhofer.de ([153.96.1.24]:43233 "EHLO
+        mail-edgeKA24.fraunhofer.de" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1751848AbeBBMya (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 2 Feb 2018 07:54:30 -0500
+In-Reply-To: <78ad6a62-190c-e4fe-dd23-e1d058f9bbb2@nexus-software.ie>
+Content-Language: en-US
+Content-ID: <319A159D028DB7489AE7EEE5F58C047B@xch.fraunhofer.de>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-
-On 31.01.2018 06:51, Anand Moon wrote:
-> Hi Kamil,
-> 
-> On 30 January 2018 at 21:02, Kamil Konieczny
-> <k.konieczny@partner.samsung.com> wrote:
->> Hi Anand,
->>
->> On 24.01.2018 14:04, Anand Moon wrote:
->>> Hi Kamil Konieczny,
->>>
->>> I am looking in setup of encrypted sata hard-disk on Odroid XU4/HC1 device.
->>> using following encryption method.
->>>
->>> aes-cbc-essiv:sha256 128
->>> aes-cbc-essiv:sha256 256
->>>
->>> Here is my defconfig I am using. https://pastebin.com/gF5T2stp
->>>
->>> Following crypt benchmark we use to test : https://pastebin.com/WiexsJA2
->>>
->>> When I am trying to format the the hard drive I am getting kernel panic.
->>> I have tired different option like below.
->>>
->>> *Please guide me in how to fix this bug*
->>> [...]
->>
->> Sorry for late response, I was on holidays. Try latest kernel 4.15
->> and turn off option:
->> [...]
-> 
-> Thanks for your input, but I tried your suggestion on latest kernel.
-> but the result is the same.
-> 
-> How can I help trace this bug. please guide me.
-
-I was able to reproduce this bug with latest kernel 4.15 on Odroid HC1,
-I am debugging it now.
-Thank you for reporting it.
-
--- 
-Best regards,
-Kamil Konieczny
-Samsung R&D Institute Poland
+T24gRnJpLCAyMDE4LTAyLTAyIGF0IDExOjIwICswMDAwLCBCcnlhbiBPJ0Rvbm9naHVlIHdyb3Rl
+Og0KPiBPbiAwMS8wMi8xOCAxMjoxNiwgSG9yaWEgR2VhbnTEgyB3cm90ZToNCj4gPiBJZiB0aGUg
+bG9vcCBjYW5ub3QgZXhpdCBiYXNlZCBvbiB2YWx1ZSBvZiAicmV0IiAhPSAtRUFHQUlOLCB0aGVu
+IGl0DQo+ID4gbWVhbnMNCj4gPiBjYWFtX3Byb2JlKCkgd2lsbCBldmVudHVhbGx5IGZhaWwgZHVl
+IHRvIHJldCA9PSAtRUFHQUlOOg0KPiA+IAlpZiAocmV0KSB7DQo+ID4gCQlkZXZfZXJyKGRldiwg
+ImZhaWxlZCB0byBpbnN0YW50aWF0ZSBSTkciKTsNCj4gPiAJCWdvdG8gY2FhbV9yZW1vdmU7DQo+
+ID4gCX0NCj4gDQo+IEZvciBtZSBpdCdzIGFuIGVuZGxlc3MgbG9vcCBhcHBseWluZyB0aGUgZmly
+c3QgdHdvDQo+IA0KPiBodHRwczovL3BhdGNod29yay5vemxhYnMub3JnL3BhdGNoLzg2NjQ2MC8N
+Cj4gaHR0cHM6Ly9wYXRjaHdvcmsub3psYWJzLm9yZy9wYXRjaC84NjY0NjIvDQo+IA0KPiBidXQg
+bm90IHRoaXMgb25lDQo+IA0KPiBodHRwczovL3BhdGNod29yay5vemxhYnMub3JnL3BhdGNoLzg2
+NTg5MC8NCj4gDQo+ID4gUGxlYXNlIHByb3ZpZGUgbW9yZSBkZXRhaWxzLCBzbyB0aGF0IHRoZSBy
+b290IGNhdXNlIGlzIGZvdW5kIGFuZA0KPiA+IGZpeGVkLg0KPiANCj4gbnANCj4gDQo+IC0tLQ0K
+PiBib2QNCg0KSSB0aGluayB0aGUgcHJvYmxlbSBsaWVzIGluIHRoZSBpbnN0YW50aWF0ZV9ybmco
+KSBmdW5jdGlvbi4gSWYgdGhlDQpkcml2ZXIgaXMgdW5hYmxlIHRvIGFjcXVpcmUgREVDMCBpdCds
+bCByZXR1cm4gLUVOT0RFVi4gVGhpcyBzaG91bGQNCnRlcm1pbmF0ZSB0aGUgd2hpbGUgbG9vcCBp
+biB0aGUgcHJvYmUgZnVuY3Rpb24uIEhvd2V2ZXIsIHRoZSByZXR1cm4NCnZhbHVlIGlzIG5ldmVy
+IGNoZWNrZWQgYW5kIGlzIGluc3RlYWQgb3ZlcndyaXR0ZW4gd2l0aCAtRUFHQUlOLCBjYXVzaW5n
+DQp0aGUgZW5kbGVzcyBsb29wLg0KDQpUaGlzIHByb2JsZW0gb25seSBvY2N1cnMgaWYgdS1ib290
+IGluc3RhbnRpYXRlcyBvbmx5IG9uZSBvZiB0aGUgc3RhdGUNCmhhbmRsZXMgKGVudF9kZWxheSBk
+b2Vzbid0IGdldCBpbmNyZW1lbnRlZCkgYW5kIHRoZSBrZXJuZWwgcnVucyBpbiBub24tDQpzZWN1
+cmUgbW9kZSAoREVDMCBjYW4ndCBnZXQgYWNxdWlyZWQpLiBJbnN0YW50aWF0aW5nIGFsbCBzdGF0
+ZSBoYW5kbGVzDQppbiB1LWJvb3QgdGhlcmVmb3JlIGZpeGVzIHRoaXMgcHJvYmxlbS4gSW4gYWRk
+aXRpb24sIHRoZSByZXR1cm4gdmFsdWUNCmluIGluc3RhbnRpYXRlX3JuZygpIHNob3VsZCBiZSBo
+YW5kbGVkIGNvcnJlY3RseSBieSBpbmNsdWRpbmcNCg0KaWYgKHJldCkNCglicmVhazsNCg0Kcmln
+aHQgYWZ0ZXIgInJldCA9IHJ1bl9kZXNjcmlwdG9yX2RlY28wKGN0cmxkZXYsIGRlc2MsICZzdGF0
+dXMpOyIuDQoNClRoYW5rcywNCkx1a2Fz
