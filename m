@@ -1,50 +1,66 @@
-From: Bryan O'Donoghue <pure.logic@nexus-software.ie>
-Subject: Re: [PATCH v3 2/5] crypto: caam: Fix endless loop when RNG is already
- initialized
-Date: Fri, 2 Feb 2018 11:20:56 +0000
-Message-ID: <78ad6a62-190c-e4fe-dd23-e1d058f9bbb2@nexus-software.ie>
-References: <1517364040-27607-1-git-send-email-pure.logic@nexus-software.ie>
- <1517364040-27607-3-git-send-email-pure.logic@nexus-software.ie>
- <VI1PR0402MB334297558BB1984131546B1D98FA0@VI1PR0402MB3342.eurprd04.prod.outlook.com>
+From: Kamil Konieczny <k.konieczny@partner.samsung.com>
+Subject: Re: Odroid HC1 cryptsetup:encrypt sata driver
+Date: Fri, 02 Feb 2018 12:27:04 +0100
+Message-ID: <fc3accfc-0dc1-d37b-3345-56aa981bbdfd@partner.samsung.com>
+References: <CGME20180124130437epcas2p251156941d5fd0dab2c24807a26a156be@epcas2p2.samsung.com>
+        <CANAwSgQ3WE9XmjmzHxJstDz52fj_SFvmBKnMjY3MVjhxJuoFmg@mail.gmail.com>
+        <f1966769-106e-a95e-8068-642e93c390b4@partner.samsung.com>
+        <CANAwSgT5buQ2ROmt-Bk0sh8=cSU5hp3GiHRuKwSagn0s57Nevw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-2; format=flowed
-Content-Transfer-Encoding: 8bit
-Cc: Fabio Estevam <fabio.estevam@nxp.com>, Peng Fan <peng.fan@nxp.com>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "lukas.auer@aisec.fraunhofer.de" <lukas.auer@aisec.fraunhofer.de>,
-        "rui.silva@linaro.org" <rui.silva@linaro.org>,
-        "ryan.harkin@linaro.org" <ryan.harkin@linaro.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-To: =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@nxp.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <VI1PR0402MB334297558BB1984131546B1D98FA0@VI1PR0402MB3342.eurprd04.prod.outlook.com>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: Krzysztof Kozlowski <krzk@kernel.org>,
+        Marek Szyprowski <m.szyprowski@samsung.com>,
+        linux-samsung-soc@vger.kernel.org, linux-crypto@vger.kernel.org,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
+To: Anand Moon <linux.amoon@gmail.com>
+Return-path: <linux-samsung-soc-owner@vger.kernel.org>
+In-reply-to: <CANAwSgT5buQ2ROmt-Bk0sh8=cSU5hp3GiHRuKwSagn0s57Nevw@mail.gmail.com>
+Content-language: en-US
+Sender: linux-samsung-soc-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 01/02/18 12:16, Horia Geantã wrote:
-> If the loop cannot exit based on value of "ret" != -EAGAIN, then it means
-> caam_probe() will eventually fail due to ret == -EAGAIN:
-> 	if (ret) {
-> 		dev_err(dev, "failed to instantiate RNG");
-> 		goto caam_remove;
-> 	}
 
-For me it's an endless loop applying the first two
+On 31.01.2018 06:51, Anand Moon wrote:
+> Hi Kamil,
+> 
+> On 30 January 2018 at 21:02, Kamil Konieczny
+> <k.konieczny@partner.samsung.com> wrote:
+>> Hi Anand,
+>>
+>> On 24.01.2018 14:04, Anand Moon wrote:
+>>> Hi Kamil Konieczny,
+>>>
+>>> I am looking in setup of encrypted sata hard-disk on Odroid XU4/HC1 device.
+>>> using following encryption method.
+>>>
+>>> aes-cbc-essiv:sha256 128
+>>> aes-cbc-essiv:sha256 256
+>>>
+>>> Here is my defconfig I am using. https://pastebin.com/gF5T2stp
+>>>
+>>> Following crypt benchmark we use to test : https://pastebin.com/WiexsJA2
+>>>
+>>> When I am trying to format the the hard drive I am getting kernel panic.
+>>> I have tired different option like below.
+>>>
+>>> *Please guide me in how to fix this bug*
+>>> [...]
+>>
+>> Sorry for late response, I was on holidays. Try latest kernel 4.15
+>> and turn off option:
+>> [...]
+> 
+> Thanks for your input, but I tried your suggestion on latest kernel.
+> but the result is the same.
+> 
+> How can I help trace this bug. please guide me.
 
-https://patchwork.ozlabs.org/patch/866460/
-https://patchwork.ozlabs.org/patch/866462/
+I was able to reproduce this bug with latest kernel 4.15 on Odroid HC1,
+I am debugging it now.
+Thank you for reporting it.
 
-but not this one
-
-https://patchwork.ozlabs.org/patch/865890/
-
-> Please provide more details, so that the root cause is found and fixed.
-
-np
-
----
-bod
+-- 
+Best regards,
+Kamil Konieczny
+Samsung R&D Institute Poland
