@@ -1,67 +1,50 @@
-From: Kamil Konieczny <k.konieczny@partner.samsung.com>
-Subject: Re: Odroid HC1 cryptsetup:encrypt sata driver
-Date: Fri, 02 Feb 2018 18:35:13 +0100
-Message-ID: <c9a4ea55-4ab1-3f9a-6381-af1ce7d56590@partner.samsung.com>
-References: <CANAwSgQ3WE9XmjmzHxJstDz52fj_SFvmBKnMjY3MVjhxJuoFmg@mail.gmail.com>
-        <CGME20180124140134epcas1p1e219c8e4e75e52a512220dc5788ac70b@epcas1p1.samsung.com>
-        <CAJKOXPeudajDX9EouSz=eB7r+OG1vcJD8Yg139CDpWGs-7bSOw@mail.gmail.com>
+From: Eric Biggers <ebiggers3@gmail.com>
+Subject: Re: WARNING: kernel stack regs has bad 'bp' value (3)
+Date: Fri, 2 Feb 2018 14:18:29 -0800
+Message-ID: <20180202221829.tdiji2332t7orcxj@gmail.com>
+References: <001a11449aa2faf11805643af581@google.com>
+ <CACT4Y+YOmbZGdBbFpmjRJXABGe1tD=F+3na77DwoPCEaROADyw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: Marek Szyprowski <m.szyprowski@samsung.com>,
-        linux-samsung-soc@vger.kernel.org, linux-crypto@vger.kernel.org,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
-To: Krzysztof Kozlowski <krzk@kernel.org>,
-        Anand Moon <linux.amoon@gmail.com>
-Return-path: <linux-samsung-soc-owner@vger.kernel.org>
-In-reply-to: <CAJKOXPeudajDX9EouSz=eB7r+OG1vcJD8Yg139CDpWGs-7bSOw@mail.gmail.com>
-Content-language: en-US
-Sender: linux-samsung-soc-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: syzbot <syzbot+ffa3a158337bbc01ff09@syzkaller.appspotmail.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        David Miller <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        syzkaller-bugs@googlegroups.com
+To: Dmitry Vyukov <dvyukov@google.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-it0-f67.google.com ([209.85.214.67]:35102 "EHLO
+        mail-it0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752215AbeBBWSd (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 2 Feb 2018 17:18:33 -0500
+Content-Disposition: inline
+In-Reply-To: <CACT4Y+YOmbZGdBbFpmjRJXABGe1tD=F+3na77DwoPCEaROADyw@mail.gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-
-
-On 24.01.2018 15:01, Krzysztof Kozlowski wrote:
-> On Wed, Jan 24, 2018 at 2:04 PM, Anand Moon <linux.amoon@gmail.com> wrote:
->> Hi Kamil Konieczny,
->>
->> I am looking in setup of encrypted sata hard-disk on Odroid XU4/HC1 device.
->> using following encryption method.
->>
->> aes-cbc-essiv:sha256 128
->> aes-cbc-essiv:sha256 256
->>
->> Here is my defconfig I am using. https://pastebin.com/gF5T2stp
->>
->> Following crypt benchmark we use to test : https://pastebin.com/WiexsJA2
+On Fri, Feb 02, 2018 at 02:57:32PM +0100, Dmitry Vyukov wrote:
+> On Fri, Feb 2, 2018 at 2:48 PM, syzbot
+> <syzbot+ffa3a158337bbc01ff09@syzkaller.appspotmail.com> wrote:
+> > Hello,
+> >
+> > syzbot hit the following crash on upstream commit
+> > 7109a04eae81c41ed529da9f3c48c3655ccea741 (Thu Feb 1 17:37:30 2018 +0000)
+> > Merge git://git.kernel.org/pub/scm/linux/kernel/git/davem/ide
+> >
+> > So far this crash happened 4 times on net-next, upstream.
+> > C reproducer is attached.
+> > syzkaller reproducer is attached.
+> > Raw console output is attached.
+> > compiler: gcc (GCC) 7.1.1 20170620
+> > .config is attached.
 > 
-> No problems on my side with a 128 MB file (not a device):
-> # cryptsetup -v luksFormat /tmp/testcrypt /dev/urandom
-> --keyfile-size=32 --cipher aes-cbc-essiv:sha256
-> # Command successful.
-> # cryptsetup -v luksFormat ~/testcrypt /dev/urandom --keyfile-size=32
-> --cipher aes-cbc-essiv:sha256
-> # Command successful.
-
-What version is cryptsetup ?
-
 > 
-> Linux 4.15.0-rc9-00023-g1f07476ec143.
+> From suspicious frames I see salsa20_asm_crypt there, so +crypto maintainers.
 > 
-> Some time ago you were building from not usual source code and your
-> kernel version from WARN is not unambiguous.
-> 
-> What is necessary to reproduce it?
->>[...]
 
-I get OOPS with cryptsetup 2.0.0, kernel 4.15
+Looks like the x86 implementations of Salsa20 (both i586 and x86_64) need to be
+updated to not use %ebp/%rbp.
 
-If you have older cryptsetup, please keep it for reference.
-
-For now, I found that crypto-api or dm-crypt try to use aes-ecb
-instead of aes-cbc, and sets req->info (pointer used for passing IV) to 0x10
-
--- 
-Best regards,
-Kamil Konieczny
-Samsung R&D Institute Poland
+- Eric
