@@ -1,66 +1,67 @@
-From: David Sterba <dsterba@suse.cz>
-Subject: Re: [PATCH 1/2] libcrc32c: Add crc32c_impl function
-Date: Fri, 2 Feb 2018 18:29:42 +0100
-Message-ID: <20180202172942.GU18553@twin.jikos.cz>
-References: <1515404705-490-1-git-send-email-nborisov@suse.com>
- <1515404705-490-2-git-send-email-nborisov@suse.com>
-Reply-To: dsterba@suse.cz
+From: Kamil Konieczny <k.konieczny@partner.samsung.com>
+Subject: Re: Odroid HC1 cryptsetup:encrypt sata driver
+Date: Fri, 02 Feb 2018 18:35:13 +0100
+Message-ID: <c9a4ea55-4ab1-3f9a-6381-af1ce7d56590@partner.samsung.com>
+References: <CANAwSgQ3WE9XmjmzHxJstDz52fj_SFvmBKnMjY3MVjhxJuoFmg@mail.gmail.com>
+        <CGME20180124140134epcas1p1e219c8e4e75e52a512220dc5788ac70b@epcas1p1.samsung.com>
+        <CAJKOXPeudajDX9EouSz=eB7r+OG1vcJD8Yg139CDpWGs-7bSOw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-btrfs@vger.kernel.org, linux-kernel@vger.kernel.org,
-        herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
-To: Nikolay Borisov <nborisov@suse.com>
-Return-path: <linux-btrfs-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1515404705-490-2-git-send-email-nborisov@suse.com>
-Sender: linux-btrfs-owner@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: Marek Szyprowski <m.szyprowski@samsung.com>,
+        linux-samsung-soc@vger.kernel.org, linux-crypto@vger.kernel.org,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
+To: Krzysztof Kozlowski <krzk@kernel.org>,
+        Anand Moon <linux.amoon@gmail.com>
+Return-path: <linux-samsung-soc-owner@vger.kernel.org>
+In-reply-to: <CAJKOXPeudajDX9EouSz=eB7r+OG1vcJD8Yg139CDpWGs-7bSOw@mail.gmail.com>
+Content-language: en-US
+Sender: linux-samsung-soc-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Adding linux-crypto@vger.kernel.org to CC
 
-Link to the 2/2 patch https://patchwork.kernel.org/patch/10149203/
 
-On Mon, Jan 08, 2018 at 11:45:04AM +0200, Nikolay Borisov wrote:
-> This function returns a string with the currently in-use implementation
-> of the crc32c algorithm, i.e crc32c-generic (for unoptimised, generic
-> implementation) or crc32c-intel for the sse optimised version. This
-> will be used by btrfs.
+On 24.01.2018 15:01, Krzysztof Kozlowski wrote:
+> On Wed, Jan 24, 2018 at 2:04 PM, Anand Moon <linux.amoon@gmail.com> wrote:
+>> Hi Kamil Konieczny,
+>>
+>> I am looking in setup of encrypted sata hard-disk on Odroid XU4/HC1 device.
+>> using following encryption method.
+>>
+>> aes-cbc-essiv:sha256 128
+>> aes-cbc-essiv:sha256 256
+>>
+>> Here is my defconfig I am using. https://pastebin.com/gF5T2stp
+>>
+>> Following crypt benchmark we use to test : https://pastebin.com/WiexsJA2
 > 
-> Signed-off-by: Nikolay Borisov <nborisov@suse.com>
-> ---
->  include/linux/crc32c.h | 1 +
->  lib/libcrc32c.c        | 6 ++++++
->  2 files changed, 7 insertions(+)
+> No problems on my side with a 128 MB file (not a device):
+> # cryptsetup -v luksFormat /tmp/testcrypt /dev/urandom
+> --keyfile-size=32 --cipher aes-cbc-essiv:sha256
+> # Command successful.
+> # cryptsetup -v luksFormat ~/testcrypt /dev/urandom --keyfile-size=32
+> --cipher aes-cbc-essiv:sha256
+> # Command successful.
+
+What version is cryptsetup ?
+
 > 
-> diff --git a/include/linux/crc32c.h b/include/linux/crc32c.h
-> index 357ae4611a45..bd21af828ff6 100644
-> --- a/include/linux/crc32c.h
-> +++ b/include/linux/crc32c.h
-> @@ -5,6 +5,7 @@
->  #include <linux/types.h>
->  
->  extern u32 crc32c(u32 crc, const void *address, unsigned int length);
-> +extern const char *crc32c_impl(void);
->  
->  /* This macro exists for backwards-compatibility. */
->  #define crc32c_le crc32c
-> diff --git a/lib/libcrc32c.c b/lib/libcrc32c.c
-> index 9f79547d1b97..eaf71e0e04be 100644
-> --- a/lib/libcrc32c.c
-> +++ b/lib/libcrc32c.c
-> @@ -71,6 +71,12 @@ static void __exit libcrc32c_mod_fini(void)
->  	crypto_free_shash(tfm);
->  }
->  
-> +const char *crc32c_impl(void)
-> +{
-> +	return crypto_tfm_alg_driver_name(crypto_shash_tfm(tfm));
-> +}
-> +EXPORT_SYMBOL(crc32c_impl);
+> Linux 4.15.0-rc9-00023-g1f07476ec143.
+> 
+> Some time ago you were building from not usual source code and your
+> kernel version from WARN is not unambiguous.
+> 
+> What is necessary to reproduce it?
+>>[...]
 
-Crypto maintainers, would it be still possible to squeeze this patch to
-4.16? It's quite trivial, but as it is not in a code I maintain I'm not
-comfortable to add it to my tree (unless I get an ACK).
+I get OOPS with cryptsetup 2.0.0, kernel 4.15
 
-The linked patch depends on that change and would let us get rid of some
-custom crypto wrappers around crc32c.
+If you have older cryptsetup, please keep it for reference.
+
+For now, I found that crypto-api or dm-crypt try to use aes-ecb
+instead of aes-cbc, and sets req->info (pointer used for passing IV) to 0x10
+
+-- 
+Best regards,
+Kamil Konieczny
+Samsung R&D Institute Poland
