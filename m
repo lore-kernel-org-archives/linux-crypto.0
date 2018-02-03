@@ -1,8 +1,9 @@
 From: Sasha Levin <Alexander.Levin@microsoft.com>
-Subject: [PATCH AUTOSEL for 4.4 11/32] lib/mpi: Fix umul_ppmm() for MIPS64r6
-Date: Sat, 3 Feb 2018 18:04:29 +0000
-Message-ID: <20180203180413.7438-11-alexander.levin@microsoft.com>
-References: <20180203180413.7438-1-alexander.levin@microsoft.com>
+Subject: [PATCH AUTOSEL for 4.14 053/110] lib/mpi: Fix umul_ppmm() for
+ MIPS64r6
+Date: Sat, 3 Feb 2018 18:00:53 +0000
+Message-ID: <20180203180015.29073-53-alexander.levin@microsoft.com>
+References: <20180203180015.29073-1-alexander.levin@microsoft.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
@@ -16,12 +17,12 @@ Cc: James Hogan <jhogan@kernel.org>,
 To: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "stable@vger.kernel.org" <stable@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-by2nam03on0129.outbound.protection.outlook.com ([104.47.42.129]:52828
-        "EHLO NAM03-BY2-obe.outbound.protection.outlook.com"
+Received: from mail-dm3nam03on0113.outbound.protection.outlook.com ([104.47.41.113]:19232
+        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1753493AbeBCSGu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 3 Feb 2018 13:06:50 -0500
-In-Reply-To: <20180203180413.7438-1-alexander.levin@microsoft.com>
+        id S1752768AbeBCSDc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 3 Feb 2018 13:03:32 -0500
+In-Reply-To: <20180203180015.29073-1-alexander.levin@microsoft.com>
 Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
@@ -71,7 +72,7 @@ Signed-off-by: Sasha Levin <alexander.levin@microsoft.com>
  1 file changed, 17 insertions(+), 1 deletion(-)
 
 diff --git a/lib/mpi/longlong.h b/lib/mpi/longlong.h
-index b90e255c2a68..d2ecf0a09180 100644
+index 57fd45ab7af1..08c60d10747f 100644
 --- a/lib/mpi/longlong.h
 +++ b/lib/mpi/longlong.h
 @@ -671,7 +671,23 @@ do {						\
