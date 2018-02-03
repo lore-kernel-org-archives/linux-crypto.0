@@ -1,84 +1,171 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 1/2] libcrc32c: Add crc32c_impl function
-Date: Sat, 3 Feb 2018 17:51:37 +0800
-Message-ID: <20180203095137.GD28936@gondor.apana.org.au>
-References: <1515404705-490-1-git-send-email-nborisov@suse.com>
- <1515404705-490-2-git-send-email-nborisov@suse.com>
- <20180202172942.GU18553@twin.jikos.cz>
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>
+Subject: Re: [RFC PATCH 2/3] crypto: hisilicon hacv1 driver
+Date: Sat, 03 Feb 2018 12:16:18 +0100
+Message-ID: <7706135.m10557lhAe@positron.chronox.de>
+References: <20180130152953.14068-1-jonathan.cameron@huawei.com> <20180130152953.14068-3-jonathan.cameron@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: dsterba@suse.cz, Nikolay Borisov <nborisov@suse.com>,
-        linux-btrfs@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:54444 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750802AbeBCJvt (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 3 Feb 2018 04:51:49 -0500
-Content-Disposition: inline
-In-Reply-To: <20180202172942.GU18553@twin.jikos.cz>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: base64
+Cc: linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linuxarm-hv44wF8Li93QT0dZR+AlfA@public.gmane.org,
+        xuzaibo-hv44wF8Li93QT0dZR+AlfA@public.gmane.org, Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+        "David S . Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
+        devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Mark Brown <broonie-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+        Xiongfeng Wang <xiongfeng.wang-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>,
+        Jonathan Cameron <Jonathan.Cameron-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>
+To: Jonathan Cameron <jonathan.cameron-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20180130152953.14068-3-jonathan.cameron-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Feb 02, 2018 at 06:29:42PM +0100, David Sterba wrote:
-> Adding linux-crypto@vger.kernel.org to CC
-> 
-> Link to the 2/2 patch https://patchwork.kernel.org/patch/10149203/
-> 
-> On Mon, Jan 08, 2018 at 11:45:04AM +0200, Nikolay Borisov wrote:
-> > This function returns a string with the currently in-use implementation
-> > of the crc32c algorithm, i.e crc32c-generic (for unoptimised, generic
-> > implementation) or crc32c-intel for the sse optimised version. This
-> > will be used by btrfs.
-> > 
-> > Signed-off-by: Nikolay Borisov <nborisov@suse.com>
-> > ---
-> >  include/linux/crc32c.h | 1 +
-> >  lib/libcrc32c.c        | 6 ++++++
-> >  2 files changed, 7 insertions(+)
-> > 
-> > diff --git a/include/linux/crc32c.h b/include/linux/crc32c.h
-> > index 357ae4611a45..bd21af828ff6 100644
-> > --- a/include/linux/crc32c.h
-> > +++ b/include/linux/crc32c.h
-> > @@ -5,6 +5,7 @@
-> >  #include <linux/types.h>
-> >  
-> >  extern u32 crc32c(u32 crc, const void *address, unsigned int length);
-> > +extern const char *crc32c_impl(void);
-> >  
-> >  /* This macro exists for backwards-compatibility. */
-> >  #define crc32c_le crc32c
-> > diff --git a/lib/libcrc32c.c b/lib/libcrc32c.c
-> > index 9f79547d1b97..eaf71e0e04be 100644
-> > --- a/lib/libcrc32c.c
-> > +++ b/lib/libcrc32c.c
-> > @@ -71,6 +71,12 @@ static void __exit libcrc32c_mod_fini(void)
-> >  	crypto_free_shash(tfm);
-> >  }
-> >  
-> > +const char *crc32c_impl(void)
-> > +{
-> > +	return crypto_tfm_alg_driver_name(crypto_shash_tfm(tfm));
-> > +}
-> > +EXPORT_SYMBOL(crc32c_impl);
+QW0gRGllbnN0YWcsIDMwLiBKYW51YXIgMjAxOCwgMTY6Mjk6NTIgQ0VUIHNjaHJpZWIgSm9uYXRo
+YW4gQ2FtZXJvbjoKCkhpIEpvbmF0aGFuLAoKPiArCS8qIFNwZWNpYWwgcGF0aCBmb3Igc2luZ2xl
+IGVsZW1lbnQgU0dMcyB3aXRoIHNtYWxsIHBhY2tldHMuICovCj4gKwlpZiAoc2dfaXNfbGFzdChz
+Z2wpICYmIHNnbC0+bGVuZ3RoIDw9IFNFQ19TTUFMTF9QQUNLRVRfU0laRSkgewoKVGhpcyBsb29r
+cyBzdHJhbmdlbHkgZmFtaWxpYXIuIElzIHRoaXMgY29kZSBhZmZlY3RlZCBieSBhIHNpbWlsYXIg
+aXNzdWUgZml4ZWQgCmluIGh0dHBzOi8vcGF0Y2h3b3JrLmtlcm5lbC5vcmcvcGF0Y2gvMTAxNzM5
+ODE/Cgo+ICtzdGF0aWMgaW50IHNlY19hbGdfc2tjaXBoZXJfc2V0a2V5KHN0cnVjdCBjcnlwdG9f
+c2tjaXBoZXIgKnRmbSwKPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGNvbnN0
+IHU4ICprZXksIHVuc2lnbmVkIGludCBrZXlsZW4sCj4gKyAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICBlbnVtIHNlY19jaXBoZXJfYWxnIGFsZykKPiArewo+ICsgICAgICAgc3RydWN0
+IHNlY19hbGdfc2tjaXBoZXJfY3R4ICpjdHggPSBjcnlwdG9fc2tjaXBoZXJfY3R4KHRmbSk7Cj4g
+KyAgICAgICBzdHJ1Y3QgZGV2aWNlICpkZXY7Cj4gKwo+ICsgICAgICAgc3Bpbl9sb2NrKCZjdHgt
+PmxvY2spOwo+ICsgICAgICAgaWYgKGN0eC0+ZW5jX2tleSkgewo+ICsgICAgICAgICAgICAgICAv
+KiByZWtleWluZyAqLwo+ICsgICAgICAgICAgICAgICBkZXYgPSBTRUNfUV9ERVYoY3R4LT5xdWV1
+ZSk7Cj4gKyAgICAgICAgICAgICAgIG1lbXNldChjdHgtPmVuY19rZXksIDAsIFNFQ19NQVhfQ0lQ
+SEVSX0tFWSk7Cj4gKyAgICAgICAgICAgICAgIG1lbXNldChjdHgtPmRlY19rZXksIDAsIFNFQ19N
+QVhfQ0lQSEVSX0tFWSk7Cj4gKyAgICAgICAgICAgICAgIG1lbXNldCgmY3R4LT5lbmNfcmVxLCAw
+LCBzaXplb2YoY3R4LT5lbmNfcmVxKSk7Cj4gKyAgICAgICAgICAgICAgIG1lbXNldCgmY3R4LT5k
+ZWNfcmVxLCAwLCBzaXplb2YoY3R4LT5kZWNfcmVxKSk7Cj4gKyAgICAgICB9IGVsc2Ugewo+ICsg
+ICAgICAgICAgICAgICAvKiBuZXcga2V5ICovCj4gKyAgICAgICAgICAgICAgIGRldiA9IFNFQ19R
+X0RFVihjdHgtPnF1ZXVlKTsKPiArICAgICAgICAgICAgICAgY3R4LT5lbmNfa2V5ID0gZG1hX3ph
+bGxvY19jb2hlcmVudChkZXYsIFNFQ19NQVhfQ0lQSEVSX0tFWSwKPiArICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAmY3R4LT5lbmNfcGtleSwKPiBHRlBf
+QVRPTUlDKTsgKyAgICAgICAgICAgICAgIGlmICghY3R4LT5lbmNfa2V5KSB7Cj4gKyAgICAgICAg
+ICAgICAgICAgICAgICAgc3Bpbl91bmxvY2soJmN0eC0+bG9jayk7Cj4gKyAgICAgICAgICAgICAg
+ICAgICAgICAgcmV0dXJuIC1FTk9NRU07Cj4gKyAgICAgICAgICAgICAgIH0KPiArICAgICAgICAg
+ICAgICAgY3R4LT5kZWNfa2V5ID0gZG1hX3phbGxvY19jb2hlcmVudChkZXYsIFNFQ19NQVhfQ0lQ
+SEVSX0tFWSwKPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAmY3R4LT5kZWNfcGtleSwKPiBHRlBfQVRPTUlDKTsgKyAgICAgICAgICAgICAgIGlmICgh
+Y3R4LT5kZWNfa2V5KSB7Cj4gKyAgICAgICAgICAgICAgICAgICAgICAgc3Bpbl91bmxvY2soJmN0
+eC0+bG9jayk7Cj4gKyAgICAgICAgICAgICAgICAgICAgICAgZ290byBvdXRfZnJlZV9lbmM7Cj4g
+KyAgICAgICAgICAgICAgIH0KPiArICAgICAgIH0KPiArICAgICAgIHNwaW5fdW5sb2NrKCZjdHgt
+PmxvY2spOwo+ICsgICAgICAgaWYgKHNlY19hbGdfc2tjaXBoZXJfaW5pdF9jb250ZXh0KHRmbSwg
+a2V5LCBrZXlsZW4sIGFsZykpCj4gKyAgICAgICAgICAgICAgIGdvdG8gb3V0X2ZyZWVfYWxsOwo+
+ICsKPiArICAgICAgIHJldHVybiAwOwo+ICsKPiArb3V0X2ZyZWVfYWxsOgo+ICsgICAgICAgbWVt
+c2V0KGN0eC0+ZGVjX2tleSwgMCwgU0VDX01BWF9DSVBIRVJfS0VZKTsKPiArICAgICAgIGRtYV9m
+cmVlX2NvaGVyZW50KGRldiwgU0VDX01BWF9DSVBIRVJfS0VZLAo+ICsgICAgICAgICAgICAgICAg
+ICAgICAgICAgY3R4LT5kZWNfa2V5LCBjdHgtPmRlY19wa2V5KTsKPiArICAgICAgIGN0eC0+ZGVj
+X2tleSA9IE5VTEw7Cj4gK291dF9mcmVlX2VuYzoKPiArICAgICAgIG1lbXNldChjdHgtPmVuY19r
+ZXksIDAsIFNFQ19NQVhfQ0lQSEVSX0tFWSk7Cj4gKyAgICAgICBkbWFfZnJlZV9jb2hlcmVudChk
+ZXYsIFNFQ19NQVhfQ0lQSEVSX0tFWSwKPiArICAgICAgICAgICAgICAgICAgICAgICAgIGN0eC0+
+ZW5jX2tleSwgY3R4LT5lbmNfcGtleSk7Cj4gKyAgICAgICBjdHgtPmVuY19rZXkgPSBOVUxMOwoK
+UGxlYXNlIHVzZSBtZW16ZXJvX2V4cGxpY2l0Lgo+ICsKPiArICAgICAgIHJldHVybiAtRU5PTUVN
+Owo+ICt9AAoKPiArc3RhdGljIGludCBzZWNfYWxnX3NrY2lwaGVyX3NldGtleV9hZXNfeHRzKHN0
+cnVjdCBjcnlwdG9fc2tjaXBoZXIgKnRmbSwKPiArICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgY29uc3QgdTggKmtleSwgdW5zaWduZWQgaW50Cj4ga2V5bGVuKSArewo+
+ICsgICAgICAgZW51bSBzZWNfY2lwaGVyX2FsZyBhbGc7Cj4gKwo+ICsgICAgICAgc3dpdGNoIChr
+ZXlsZW4pIHsKPiArICAgICAgIGNhc2UgQUVTX0tFWVNJWkVfMTI4ICogMjoKPiArICAgICAgICAg
+ICAgICAgYWxnID0gU0VDX0FFU19YVFNfMTI4Owo+ICsgICAgICAgICAgICAgICBicmVhazsKPiAr
+ICAgICAgIGNhc2UgQUVTX0tFWVNJWkVfMjU2ICogMjoKPiArICAgICAgICAgICAgICAgYWxnID0g
+U0VDX0FFU19YVFNfMjU2Owo+ICsgICAgICAgICAgICAgICBicmVhazsKPiArICAgICAgIGRlZmF1
+bHQ6Cj4gKyAgICAgICAgICAgICAgIHJldHVybiAtRUlOVkFMOwo+ICsgICAgICAgfQoKUGxlYXNl
+IGFkZCB4dHNfY2hlY2tfa2V5KCkKPiArCj4gKyAgICAgICByZXR1cm4gc2VjX2FsZ19za2NpcGhl
+cl9zZXRrZXkodGZtLCBrZXksIGtleWxlbiwgYWxnKTsACgo+ICtzdGF0aWMgaW50IHNlY19hbGdf
+c2tjaXBoZXJfc2V0a2V5XzNkZXNfZWNiKHN0cnVjdCBjcnlwdG9fc2tjaXBoZXIgKnRmbSwKPiAr
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGNvbnN0IHU4ICprZXks
+IHVuc2lnbmVkIGludAo+IGtleWxlbikgK3sKPiArICAgICAgIGlmIChrZXlsZW4gIT0gREVTX0tF
+WV9TSVpFICogMykKPiArICAgICAgICAgICAgICAgcmV0dXJuIC1FSU5WQUw7Cj4gKwo+ICsgICAg
+ICAgcmV0dXJuIHNlY19hbGdfc2tjaXBoZXJfc2V0a2V5KHRmbSwga2V5LCBrZXlsZW4sCj4gU0VD
+XzNERVNfRUNCXzE5Ml8zS0VZKTsgK30KPiArCj4gK3N0YXRpYyBpbnQgc2VjX2FsZ19za2NpcGhl
+cl9zZXRrZXlfM2Rlc19jYmMoc3RydWN0IGNyeXB0b19za2NpcGhlciAqdGZtLAo+ICsgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgY29uc3QgdTggKmtleSwgdW5zaWdu
+ZWQgaW50Cj4ga2V5bGVuKSArewo+ICsgICAgICAgaWYgKGtleWxlbiAhPSBERVMzX0VERV9LRVlf
+U0laRSkKPiArICAgICAgICAgICAgICAgcmV0dXJuIC1FSU5WQUw7Cj4gKwo+ICsgICAgICAgcmV0
+dXJuIHNlY19hbGdfc2tjaXBoZXJfc2V0a2V5KHRmbSwga2V5LCBrZXlsZW4sCj4gU0VDXzNERVNf
+Q0JDXzE5Ml8zS0VZKTsgK30ACgpQbGVhc2UgdXNlIF9fZGVzM19lZGVfc2V0a2V5Cgo+ICtzdGF0
+aWMgdm9pZCBzZWNfc2tjaXBoZXJfYWxnX2NhbGxiYWNrKHN0cnVjdCBzZWNfYmRfaW5mbyAqc2Vj
+X3Jlc3AsCj4gKwkJCQkgICAgICBzdHJ1Y3Qgc2tjaXBoZXJfcmVxdWVzdCAqc2tyZXEpCj4gK3sK
+PiArCXN0cnVjdCBzZWNfY3J5cHRvX3JlcXVlc3QgKnNlY19yZXEgPSBza2NpcGhlcl9yZXF1ZXN0
+X2N0eChza3JlcSk7Cj4gKwlzdHJ1Y3Qgc2VjX2FsZ19za2NpcGhlcl9jdHggKmN0eCA9IHNlY19y
+ZXEtPnNrY2lwaGVyX2N0eDsKPiArCXN0cnVjdCBjcnlwdG9fc2tjaXBoZXIgKmF0Zm0gPSBjcnlw
+dG9fc2tjaXBoZXJfcmVxdGZtKHNrcmVxKTsKPiArCXN0cnVjdCBjcnlwdG9fYXN5bmNfcmVxdWVz
+dCAqbmV4dHJlcXVlc3Q7Cj4gKwlzdHJ1Y3Qgc2VjX2NyeXB0b19yZXF1ZXN0ICpuZXh0c2VjX3Jl
+cTsKPiArCXN0cnVjdCBza2NpcGhlcl9yZXF1ZXN0ICpuZXh0c2tyZXE7Cj4gKwlpbnQgaWN2X29y
+X3NrZXlfZW47Cj4gKwlpbnQgZXJyID0gMDsKPiArCj4gKwlpY3Zfb3Jfc2tleV9lbiA9IChzZWNf
+cmVzcC0+dzAgJiBTRUNfQkRfVzBfSUNWX09SX1NLRVlfRU5fTSkgPj4KPiArCQlTRUNfQkRfVzBf
+SUNWX09SX1NLRVlfRU5fUzsKPiArCWlmIChzZWNfcmVzcC0+dzEgJiBTRUNfQkRfVzFfQkRfSU5W
+QUxJRCB8fCBpY3Zfb3Jfc2tleV9lbiA9PSAzKSB7Cj4gKwkJZGV2X2VycihjdHgtPnF1ZXVlLT5k
+ZXZfaW5mby0+ZGV2LAo+ICsJCQkiR290IGFuIGludmFsaWQgYW5zd2VyICVsdSAlZFxuIiwKPiAr
+CQkJc2VjX3Jlc3AtPncxICYgU0VDX0JEX1cxX0JEX0lOVkFMSUQsCj4gKwkJCWljdl9vcl9za2V5
+X2VuKTsKPiArCQllcnIgPSAtRUlOVkFMOwo+ICsJCS8qCj4gKwkJICogV2UgbmVlZCB0byBtdWRk
+bGUgb24gdG8gYXZvaWQgZ2V0dGluZyBzdHVjayB3aXRoIGVsZW1lbnRzCj4gKwkJICogb24gdGhl
+IHF1ZXVlLiBFcnJvciB3aWxsIGJlIHJlcG9ydGVkIHNvIHVzZXJzcGFjZSBzaG91bGQKPiArCQkg
+KiBrbm93IGEgbWVzcyBoYXMgb2NjdXJyZWQuCj4gKwkJICovCj4gKwl9Cj4gKwo+ICsJc3Bpbl9s
+b2NrKCZjdHgtPnF1ZXVlLT5xdWV1ZWxvY2spOwo+ICsJc2VjX2ZyZWVfb3BkYXRhKGN0eC0+cXVl
+dWUsIHNrcmVxLT5zcmMsIHNrcmVxLT5kc3QsIHNrcmVxKTsKPiArCS8qIFB1dCB0aGUgSVYgaW4g
+cGxhY2UgZm9yIGNoYWluZWQgY2FzZXMgKi8KPiArCXN3aXRjaCAoY3R4LT5jaXBoZXJfYWxnKSB7
+Cj4gKwljYXNlIFNFQ19BRVNfQ0JDXzEyODoKPiArCWNhc2UgU0VDX0FFU19DQkNfMTkyOgo+ICsJ
+Y2FzZSBTRUNfQUVTX0NCQ18yNTY6Cj4gKwkJaWYgKHNlY19yZXEtPnJlcS53MCAmIFNFQ19CRF9X
+MF9ERSkKPiArCQkJc2dfcGNvcHlfdG9fYnVmZmVyKHNrcmVxLT5kc3QsIHNlY19yZXEtPmxlbl9v
+dXQsCj4gKwkJCQkJICAgc2tyZXEtPml2LAo+ICsJCQkJCSAgIGNyeXB0b19za2NpcGhlcl9pdnNp
+emUoYXRmbSksCj4gKwkJCQkJICAgc2tyZXEtPmNyeXB0bGVuIC0KPiArCQkJCQkgICBjcnlwdG9f
+c2tjaXBoZXJfaXZzaXplKGF0Zm0pKTsKPiArCQllbHNlCj4gKwkJCXNnX3Bjb3B5X3RvX2J1ZmZl
+cihza3JlcS0+c3JjLCBzZWNfcmVxLT5sZW5faW4sCj4gKwkJCQkJICAgc2tyZXEtPml2LAo+ICsJ
+CQkJCSAgIGNyeXB0b19za2NpcGhlcl9pdnNpemUoYXRmbSksCj4gKwkJCQkJICAgc2tyZXEtPmNy
+eXB0bGVuIC0gMTYpOwo+ICsJCWJyZWFrOwo+ICsJY2FzZSBTRUNfQUVTX0NUUl8xMjg6Cj4gKwlj
+YXNlIFNFQ19BRVNfQ1RSXzE5MjoKPiArCWNhc2UgU0VDX0FFU19DVFJfMjU2Ogo+ICsJCWNyeXB0
+b19pbmMoc2tyZXEtPml2LCAxNik7Cj4gKwkJYnJlYWs7Cj4gKwlkZWZhdWx0Ogo+ICsJCS8qIERv
+IG5vdCB1cGRhdGUgKi8KPiArCQlicmVhazsKPiArCX0KPiArCj4gKwlpZiAoY3R4LT5xdWV1ZS0+
+aGF2ZXNvZnRxdWV1ZSAmJgo+ICsJICAgICFsaXN0X2VtcHR5KCZjdHgtPnF1ZXVlLT5zb2Z0cXVl
+dWUubGlzdCkgJiYKPiArCSAgICBzZWNfcXVldWVfZW1wdHkoY3R4LT5xdWV1ZSkpIHsKPiArCQlu
+ZXh0cmVxdWVzdCA9IGNyeXB0b19kZXF1ZXVlX3JlcXVlc3QoJmN0eC0+cXVldWUtPnNvZnRxdWV1
+ZSk7Cj4gKwkJbmV4dHNrcmVxID0gY29udGFpbmVyX29mKG5leHRyZXF1ZXN0LCBzdHJ1Y3Qgc2tj
+aXBoZXJfcmVxdWVzdCwKPiArCQkJCQkgYmFzZSk7Cj4gKwkJbmV4dHNlY19yZXEgPSBza2NpcGhl
+cl9yZXF1ZXN0X2N0eChuZXh0c2tyZXEpOwo+ICsJCS8qIFdlIGtub3cgdGhlcmUgaXMgc3BhY2Ug
+c28gdGhpcyBjYW5ub3QgZmFpbCAqLwo+ICsJCXNlY19xdWV1ZV9zZW5kKGN0eC0+cXVldWUsICZu
+ZXh0c2VjX3JlcS0+cmVxLCBuZXh0c2tyZXEpOwoKCkxvb2tpbmcgYXQgdGhhdCBjb2RlIGFuZCBj
+b25zaWRlcmluZyB3aGF0IHlvdSBzYWlkIHRoYXQgb25seSBmb3IgQ1RSIGFuZCBDQkMgCnlvdSBu
+ZWVkIHRvIGFwcGx5IHByb3BlciBJViBkZXBlbmRlbmN5IGhhbmRsaW5nLCBJIGFtIHdvbmRlcmlu
+ZyB3aHkgWFRTIGlzIG5vdCAKY292ZXJlZCAodGhlcmUgaXMgYW4gSVYpLiBXaGF0IGFib3V0IHRo
+ZSBERVMvM0RFUyBjaXBoZXJzPwoKPiArCS8qCj4gKwkgKiBBZGQgdG8gaGFyZHdhcmUgcXVldWUg
+b25seSB1bmRlciBmb2xsb3dpbmcgY2lyY3Vtc3RhbmNlcwo+ICsJICogMSkgU29mdHdhcmUgYW5k
+IGhhcmR3YXJlIHF1ZXVlIGVtcHR5IHNvIG5vIGNoYWluIGRlcGVuZGVuY2llcwo+ICsJICogMikg
+Tm8gZGVwZW5kZW5jaWVzIGFzIG5ldyBJViAtIChjaGVjayBzb2Z0d2FyZSBxdWV1ZSBlbXB0eQo+
+ICsJICogICAgdG8gbWFpbnRhaW4gb3JkZXIpCj4gKwkgKiAzKSBObyBkZXBlbmRlbmNpZXMgYmVj
+YXVzZSB0aGUgbW9kZSBkb2VzIG5vIGNoYWluaW5nLgo+ICsJICoKPiArCSAqIEluIG90aGVyIGNh
+c2VzIGZpcnN0IGluc2VydCBvbnRvIHRoZSBzb2Z0d2FyZSBxdWV1ZSB3aGljaCBpcyB0aGVuCj4g
+KwkgKiBlbXB0aWVkIGFzIHJlcXVlc3RzIGNvbXBsZXRlCj4gKwkgKi8KPiArCWlmICghY3R4LT5x
+dWV1ZS0+aGF2ZXNvZnRxdWV1ZSB8fAo+ICsJICAgIChsaXN0X2VtcHR5KCZjdHgtPnF1ZXVlLT5z
+b2Z0cXVldWUubGlzdCkgJiYKPiArCSAgICAgKHNlY19xdWV1ZV9lbXB0eShjdHgtPnF1ZXVlKSB8
+fAo+ICsJICAgICAgY3R4LT5wcmV2X2l2X2FkZHJlc3MgIT0gc2tyZXEtPml2KSkpIHsKCk1heWJl
+IHlvdSB3YW50IHRvIHJlbHkgb24gdGhlIGZsYWcgZ2l2ZW4gYnkgdGhlIHVwcGVyIGxheWVyIHRo
+YXQgSSB3aWxsIApwcm9wb3NlIHNob3J0bHkuCgo+ICsKPiArc3RhdGljIHZvaWQgc2VjX2FsZ19z
+a2NpcGhlcl9leGl0KHN0cnVjdCBjcnlwdG9fc2tjaXBoZXIgKnRmbSkKPiArewo+ICsJc3RydWN0
+IHNlY19hbGdfc2tjaXBoZXJfY3R4ICpjdHggPSBjcnlwdG9fc2tjaXBoZXJfY3R4KHRmbSk7Cj4g
+KwlzdHJ1Y3QgZGV2aWNlICpkZXYgPSBTRUNfUV9ERVYoY3R4LT5xdWV1ZSk7Cj4gKwo+ICsJaWYg
+KGN0eC0+ZW5jX2tleSkgewo+ICsJCW1lbXNldChjdHgtPmVuY19rZXksIDAsIFNFQ19NQVhfQ0lQ
+SEVSX0tFWSk7Cj4gKwkJZG1hX2ZyZWVfY29oZXJlbnQoZGV2LCBTRUNfTUFYX0NJUEhFUl9LRVks
+Cj4gKwkJCQkgIGN0eC0+ZW5jX2tleSwgY3R4LT5lbmNfcGtleSk7Cj4gKwl9Cj4gKwlpZiAoY3R4
+LT5kZWNfa2V5KSB7Cj4gKwkJbWVtc2V0KGN0eC0+ZGVjX2tleSwgMCwgU0VDX01BWF9DSVBIRVJf
+S0VZKTsKPiArCQlkbWFfZnJlZV9jb2hlcmVudChkZXYsIFNFQ19NQVhfQ0lQSEVSX0tFWSwKPiAr
+CQkJCSAgY3R4LT5kZWNfa2V5LCBjdHgtPmRlY19wa2V5KTsKClBsZWFzZSB1c2UgbWVtemVyb19l
+eHBsaWNpdC4KCj4gKwo+ICsJLyogR2V0IHRoZSBmaXJzdCBpZGxlIHF1ZXVlIGluIFNFQyBkZXZp
+Y2UgKi8KPiArCWZvciAoaSA9IDA7IGkgPCBTRUNfUV9OVU07IGkrKykKCkkgdGhpbmsgeW91IHNo
+b3VsZCB1c2UgY3VybHkgYnJhY2VzIGhlcmUgdG9vLiBDb25zaWRlciB3aGF0IGNoZWNrcGF0Y2gu
+cGwgCnRoaW5rcy4KCj4gKwkJaWYgKCFzZWNfcXVldWVfaW5fdXNlX2dldCgmaW5mby0+cXVldWVz
+W2ldKSkgewo+ICsJCQlzZWNfcXVldWVfaW5fdXNlKCZpbmZvLT5xdWV1ZXNbaV0sIDEpOwo+ICsJ
+CQlzcGluX3VubG9jaygmaW5mby0+ZGV2X2xvY2spOwo+ICsJCQkqcSA9ICZpbmZvLT5xdWV1ZXNb
+aV07Cj4gKwkJCXJldHVybiAwOwo+ICsJCX0KPiArCXNwaW5fdW5sb2NrKCZpbmZvLT5kZXZfbG9j
+ayk7Cj4gKwo+ICsJcmV0dXJuIC1FTk9ERVY7Cj4gK30KPiArCj4gK3N0YXRpYyBpbnQgc2VjX2Nv
+dW50X3F1ZXVlc19pbl91c2Uoc3RydWN0IHNlY19kZXZfaW5mbyAqaW5mbykKPiArewo+ICsJaW50
+IGksIGNvdW50ID0gMDsKPiArCj4gKwlzcGluX2xvY2soJmluZm8tPmRldl9sb2NrKTsKPiArCWZv
+ciAoaSA9IDA7IGkgPCBTRUNfUV9OVU07IGkrKykKCmR0by4KCkNpYW8KU3RlcGhhbg==
 
-You could just use crypto_shash_driver_name.
 
-> Crypto maintainers, would it be still possible to squeeze this patch to
-> 4.16? It's quite trivial, but as it is not in a code I maintain I'm not
-> comfortable to add it to my tree (unless I get an ACK).
-> 
-> The linked patch depends on that change and would let us get rid of some
-> custom crypto wrappers around crc32c.
 
-I'm fine with the patch otherwise.
 
-Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
