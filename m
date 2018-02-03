@@ -1,88 +1,88 @@
-From: Eric Biggers <ebiggers3@gmail.com>
-Subject: Re: BUG: unable to handle kernel NULL pointer dereference in
- __crypto_register_alg
-Date: Fri, 2 Feb 2018 15:26:11 -0800
-Message-ID: <20180202232611.s45ho7ckhrbh7ued@gmail.com>
-References: <94eb2c1170ce51d6440561115a0c@google.com>
+From: Anand Moon <linux.amoon@gmail.com>
+Subject: Re: Odroid HC1 cryptsetup:encrypt sata driver
+Date: Sat, 3 Feb 2018 12:10:54 +0530
+Message-ID: <CANAwSgQqCfD243x8F-boToqMT0K3qgQ=aVyvQXi1=ux0aV+Rqg@mail.gmail.com>
+References: <CANAwSgQ3WE9XmjmzHxJstDz52fj_SFvmBKnMjY3MVjhxJuoFmg@mail.gmail.com>
+ <CGME20180124140134epcas1p1e219c8e4e75e52a512220dc5788ac70b@epcas1p1.samsung.com>
+ <CAJKOXPeudajDX9EouSz=eB7r+OG1vcJD8Yg139CDpWGs-7bSOw@mail.gmail.com> <c9a4ea55-4ab1-3f9a-6381-af1ce7d56590@partner.samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, herbert@gondor.apana.org.au,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com
-To: syzbot
-        <bot+485d9c375867a8a90d6b2950c7b2c53797524c3b@syzkaller.appspotmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Cc: Krzysztof Kozlowski <krzk@kernel.org>,
+        Marek Szyprowski <m.szyprowski@samsung.com>,
+        linux-samsung-soc@vger.kernel.org, linux-crypto@vger.kernel.org,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
+To: Kamil Konieczny <k.konieczny@partner.samsung.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-io0-f176.google.com ([209.85.223.176]:35835 "EHLO
-        mail-io0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751702AbeBBX0O (ORCPT
+Received: from mail-ot0-f178.google.com ([74.125.82.178]:39485 "EHLO
+        mail-ot0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751594AbeBCGlP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 2 Feb 2018 18:26:14 -0500
-Content-Disposition: inline
-In-Reply-To: <94eb2c1170ce51d6440561115a0c@google.com>
+        Sat, 3 Feb 2018 01:41:15 -0500
+In-Reply-To: <c9a4ea55-4ab1-3f9a-6381-af1ce7d56590@partner.samsung.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sat, Dec 23, 2017 at 11:54:01PM -0800, syzbot wrote:
-> Hello,
-> 
-> syzkaller hit the following crash on
-> 6084b576dca2e898f5c101baef151f7bfdbb606d
-> git://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/master
-> compiler: gcc (GCC) 7.1.1 20170620
-> .config is attached
-> Raw console output is attached.
-> 
-> Unfortunately, I don't have any reproducer for this bug yet.
-> 
-> 
-> netlink: 'syz-executor4': attribute type 29 has an invalid length.
-> BUG: unable to handle kernel NULL pointer dereference at 0000000000000020
-> IP: __crypto_register_alg+0x7b/0x300 crypto/algapi.c:212
-> PGD 0 P4D 0
-> Oops: 0000 [#1] SMP
-> Dumping ftrace buffer:
->    (ftrace buffer empty)
-> Modules linked in:
-> CPU: 0 PID: 19130 Comm: cryptomgr_probe Not tainted
-> 4.15.0-rc3-next-20171214+ #67
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS
-> Google 01/01/2011
-> RIP: 0010:__crypto_register_alg+0x7b/0x300 crypto/algapi.c:212
-> RSP: 0018:ffffc90000fefe00 EFLAGS: 00010293
-> RAX: ffff88020df4c240 RBX: 0000000000000000 RCX: ffffffff8167622b
-> RDX: 0000000000000000 RSI: ffff8801fa6f8559 RDI: ffff8801fa6f8881
-> RBP: ffffc90000fefe30 R08: 0000000000000001 R09: 0000000000000004
-> R10: ffffc90000fefdb0 R11: 0000000000000004 R12: ffff8801fa6f84a0
-> R13: 0000000000000000 R14: 000000000000080e R15: ffff8801fa6f8900
-> FS:  0000000000000000(0000) GS:ffff88021fc00000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 0000000000000020 CR3: 000000000301e004 CR4: 00000000001626f0
-> DR0: 0000000020000000 DR1: 0000000020000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000ffff0ff0 DR7: 0000000000000600
-> Call Trace:
->  crypto_register_instance+0x83/0x140 crypto/algapi.c:544
->  shash_register_instance+0x34/0x50 crypto/shash.c:532
->  cbcmac_create+0x15c/0x190 crypto/ccm.c:988
->  cryptomgr_probe+0x40/0x100 crypto/algboss.c:75
->  kthread+0x149/0x170 kernel/kthread.c:238
->  ret_from_fork+0x24/0x30 arch/x86/entry/entry_64.S:524
-> Code: 10 49 89 44 24 18 48 81 fb 60 21 0e 83 0f 84 bb 00 00 00 e8 28 41 c4
-> ff 49 39 dc 74 43 49 8d 44 24 38 48 89 45 d0 e8 15 41 c4 ff <44> 8b 6b 20 41
-> f6 c5 60 75 78 e8 06 41 c4 ff 41 83 e5 10 4c 8d
-> RIP: __crypto_register_alg+0x7b/0x300 crypto/algapi.c:212 RSP:
-> ffffc90000fefe00
-> CR2: 0000000000000020
-> ---[ end trace 598f24e6511387a3 ]---
-> Kernel panic - not syncing: Fatal exception
-> Dumping ftrace buffer:
->    (ftrace buffer empty)
-> Kernel Offset: disabled
-> Rebooting in 86400 seconds..
-> 
+Hi Kamil,
 
-This is yet another one that was reported while KASAN was accidentally disabled,
-and it only happened once, so invalidating:
+On 2 February 2018 at 23:05, Kamil Konieczny
+<k.konieczny@partner.samsung.com> wrote:
+>
+>
+> On 24.01.2018 15:01, Krzysztof Kozlowski wrote:
+>> On Wed, Jan 24, 2018 at 2:04 PM, Anand Moon <linux.amoon@gmail.com> wrote:
+>>> Hi Kamil Konieczny,
+>>>
+>>> I am looking in setup of encrypted sata hard-disk on Odroid XU4/HC1 device.
+>>> using following encryption method.
+>>>
+>>> aes-cbc-essiv:sha256 128
+>>> aes-cbc-essiv:sha256 256
+>>>
+>>> Here is my defconfig I am using. https://pastebin.com/gF5T2stp
+>>>
+>>> Following crypt benchmark we use to test : https://pastebin.com/WiexsJA2
+>>
+>> No problems on my side with a 128 MB file (not a device):
+>> # cryptsetup -v luksFormat /tmp/testcrypt /dev/urandom
+>> --keyfile-size=32 --cipher aes-cbc-essiv:sha256
+>> # Command successful.
+>> # cryptsetup -v luksFormat ~/testcrypt /dev/urandom --keyfile-size=32
+>> --cipher aes-cbc-essiv:sha256
+>> # Command successful.
+>
+> What version is cryptsetup ?
+>
+At my end I am using below version.
 
-#syz invalid
+root@odroid:~# cryptsetup --version
+cryptsetup 1.6.6
 
-- Eric
+>>
+>> Linux 4.15.0-rc9-00023-g1f07476ec143.
+>>
+>> Some time ago you were building from not usual source code and your
+>> kernel version from WARN is not unambiguous.
+>>
+>> What is necessary to reproduce it?
+>>>[...]
+>
+> I get OOPS with cryptsetup 2.0.0, kernel 4.15
+>
+
+I will try to get test with new version of cryptsetup 2.0.0.
+
+> If you have older cryptsetup, please keep it for reference.
+>
+> For now, I found that crypto-api or dm-crypt try to use aes-ecb
+> instead of aes-cbc, and sets req->info (pointer used for passing IV) to 0x10
+>
+Ok.
+
+Best Regards
+-Anand
+
+> --
+> Best regards,
+> Kamil Konieczny
+> Samsung R&D Institute Poland
+>
