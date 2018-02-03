@@ -1,8 +1,8 @@
 From: Sasha Levin <Alexander.Levin@microsoft.com>
-Subject: [PATCH AUTOSEL for 4.9 22/52] lib/mpi: Fix umul_ppmm() for MIPS64r6
-Date: Sat, 3 Feb 2018 18:03:45 +0000
-Message-ID: <20180203180303.8490-22-alexander.levin@microsoft.com>
-References: <20180203180303.8490-1-alexander.levin@microsoft.com>
+Subject: [PATCH AUTOSEL for 4.4 11/32] lib/mpi: Fix umul_ppmm() for MIPS64r6
+Date: Sat, 3 Feb 2018 18:04:29 +0000
+Message-ID: <20180203180413.7438-11-alexander.levin@microsoft.com>
+References: <20180203180413.7438-1-alexander.levin@microsoft.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
@@ -15,11 +15,16 @@ Cc: James Hogan <jhogan@kernel.org>,
         Sasha Levin <Alexander.Levin@microsoft.com>
 To: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "stable@vger.kernel.org" <stable@vger.kernel.org>
-Return-path: <stable-owner@vger.kernel.org>
-In-Reply-To: <20180203180303.8490-1-alexander.levin@microsoft.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-by2nam03on0129.outbound.protection.outlook.com ([104.47.42.129]:52828
+        "EHLO NAM03-BY2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1753493AbeBCSGu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 3 Feb 2018 13:06:50 -0500
+In-Reply-To: <20180203180413.7438-1-alexander.levin@microsoft.com>
 Content-Language: en-US
-Sender: stable-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
 From: James Hogan <jhogan@kernel.org>
 
@@ -66,7 +71,7 @@ Signed-off-by: Sasha Levin <alexander.levin@microsoft.com>
  1 file changed, 17 insertions(+), 1 deletion(-)
 
 diff --git a/lib/mpi/longlong.h b/lib/mpi/longlong.h
-index 93336502af08..0f64fcee4ccd 100644
+index b90e255c2a68..d2ecf0a09180 100644
 --- a/lib/mpi/longlong.h
 +++ b/lib/mpi/longlong.h
 @@ -671,7 +671,23 @@ do {						\
