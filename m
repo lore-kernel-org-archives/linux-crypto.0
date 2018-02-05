@@ -1,76 +1,107 @@
-From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
-Subject: [PATCH] crypto: caam - fix endless loop when DECO acquire fails
-Date: Mon, 5 Feb 2018 11:15:52 +0200
-Message-ID: <20180205091552.11057-1-horia.geanta@nxp.com>
-References: <VI1PR0402MB3342899B009D1A6CC0569CFE98FE0@VI1PR0402MB3342.eurprd04.prod.outlook.com>
+From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Subject: Re: [RFC PATCH 2/3] crypto: hisilicon hacv1 driver
+Date: Mon, 5 Feb 2018 14:02:03 +0000
+Message-ID: <20180205140203.00007e46@huawei.com>
+References: <20180130152953.14068-1-jonathan.cameron@huawei.com>
+        <20180130152953.14068-3-jonathan.cameron@huawei.com>
+        <7706135.m10557lhAe@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-Cc: "David S. Miller" <davem@davemloft.net>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        Alexandru Porosanu <alexandru.porosanu@nxp.com>,
-        Fabio Estevam <fabio.estevam@nxp.com>,
-        Peng Fan <peng.fan@nxp.com>, Rui Silva <rui.silva@linaro.org>,
-        Ryan Harkin <ryan.harkin@linaro.org>,
-        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        Bryan O'Donoghue <pure.logic@nexus-software.ie>,
-        Auer Lukas <lukas.auer@aisec.fraunhofer.de>
+Content-Type: text/plain; charset="ISO-8859-1"
+Content-Transfer-Encoding: 8BIT
+Cc: <linux-crypto@vger.kernel.org>, <linuxarm@huawei.com>,
+        <xuzaibo@huawei.com>, Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        <devicetree@vger.kernel.org>, Mark Brown <broonie@kernel.org>,
+        Xiongfeng Wang <xiongfeng.wang@linaro.org>
+To: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-dm3nam03on0051.outbound.protection.outlook.com ([104.47.41.51]:47512
-        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1750949AbeBEJRH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 5 Feb 2018 04:17:07 -0500
-In-Reply-To: <VI1PR0402MB3342899B009D1A6CC0569CFE98FE0@VI1PR0402MB3342.eurprd04.prod.outlook.com>
+Received: from szxga06-in.huawei.com ([45.249.212.32]:57851 "EHLO huawei.com"
+        rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1753128AbeBEOCj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 5 Feb 2018 09:02:39 -0500
+In-Reply-To: <7706135.m10557lhAe@positron.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-In case DECO0 cannot be acquired - i.e. run_descriptor_deco0() fails
-with -ENODEV, caam_probe() enters an endless loop:
+On Sat, 3 Feb 2018 12:16:18 +0100
+Stephan Müller <smueller@chronox.de> wrote:
 
-run_descriptor_deco0
-	ret -ENODEV
-	-> instantiate_rng
-		-ENODEV, overwritten by -EAGAIN
-		ret -EAGAIN
-		-> caam_probe
-			-EAGAIN results in endless loop
+> Am Dienstag, 30. Januar 2018, 16:29:52 CET schrieb Jonathan Cameron:
+> 
+> Hi Jonathan,
+> 
+> > +	/* Special path for single element SGLs with small packets. */
+> > +	if (sg_is_last(sgl) && sgl->length <= SEC_SMALL_PACKET_SIZE) {  
+> 
+> This looks strangely familiar. Is this code affected by a similar issue fixed 
+> in https://patchwork.kernel.org/patch/10173981?
 
-It turns out the error path in instantiate_rng() is incorrect,
-the checks are done in the wrong order.
+Not as far as I know - this section is about optimizing the setup of
+the IOMMU. It's purely a performance optimization.
 
-Cc: <stable@vger.kernel.org> # 3.13+
-Fixes: 1005bccd7a4a6 ("crypto: caam - enable instantiation of all RNG4 state handles")
-Reported-by: Bryan O'Donoghue <pure.logic@nexus-software.ie>
-Suggested-by: Auer Lukas <lukas.auer@aisec.fraunhofer.de>
-Signed-off-by: Horia GeantÄƒ <horia.geanta@nxp.com>
----
- drivers/crypto/caam/ctrl.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+It is really costly to do the translation setup for lots of small regions.
+These small regions are often contiguous anyway making the cost even more
+ridiculous.  The use of a dma pool allows us to keep the iommu setup
+constant(ish). It is cheaper to copy into an element of this, already
+mapped, pool than it is to set up the iommu mappings for a new region.
 
-diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
-index 75d280cb2dc0..e843cf410373 100644
---- a/drivers/crypto/caam/ctrl.c
-+++ b/drivers/crypto/caam/ctrl.c
-@@ -228,12 +228,16 @@ static int instantiate_rng(struct device *ctrldev, int state_handle_mask,
- 		 * without any error (HW optimizations for later
- 		 * CAAM eras), then try again.
- 		 */
-+		if (ret)
-+			break;
-+
- 		rdsta_val = rd_reg32(&ctrl->r4tst[0].rdsta) & RDSTA_IFMASK;
- 		if ((status && status != JRSTA_SSRC_JUMP_HALT_CC) ||
--		    !(rdsta_val & (1 << sh_idx)))
-+		    !(rdsta_val & (1 << sh_idx))) {
- 			ret = -EAGAIN;
--		if (ret)
- 			break;
-+		}
-+
- 		dev_info(ctrldev, "Instantiated RNG4 SH%d\n", sh_idx);
- 		/* Clear the contents before recreating the descriptor */
- 		memset(desc, 0x00, CAAM_CMD_SZ * 7);
--- 
-2.12.0.264.gd6db3f216544
+I could drop this for the initial submission and bring it in as an
+optimization with supporting numbers as a follow up patch.
+
+> 
+> > +static int sec_alg_skcipher_setkey(struct crypto_skcipher *tfm,
+> > +                                  const u8 *key, unsigned int keylen,
+> > +                                  enum sec_cipher_alg alg)
+> > +{
+> > +       struct sec_alg_skcipher_ctx *ctx = crypto_skcipher_ctx(tfm);
+> > +       struct device *dev;
+> > +
+> > +       spin_lock(&ctx->lock);
+> > +       if (ctx->enc_key) {
+> > +               /* rekeying */
+> > +               dev = SEC_Q_DEV(ctx->queue);
+> > +               memset(ctx->enc_key, 0, SEC_MAX_CIPHER_KEY);
+> > +               memset(ctx->dec_key, 0, SEC_MAX_CIPHER_KEY);
+> > +               memset(&ctx->enc_req, 0, sizeof(ctx->enc_req));
+> > +               memset(&ctx->dec_req, 0, sizeof(ctx->dec_req));
+> > +       } else {
+> > +               /* new key */
+> > +               dev = SEC_Q_DEV(ctx->queue);
+> > +               ctx->enc_key = dma_zalloc_coherent(dev, SEC_MAX_CIPHER_KEY,
+> > +                                                  &ctx->enc_pkey,
+> > GFP_ATOMIC); +               if (!ctx->enc_key) {
+> > +                       spin_unlock(&ctx->lock);
+> > +                       return -ENOMEM;
+> > +               }
+> > +               ctx->dec_key = dma_zalloc_coherent(dev, SEC_MAX_CIPHER_KEY,
+> > +                                                  &ctx->dec_pkey,
+> > GFP_ATOMIC); +               if (!ctx->dec_key) {
+> > +                       spin_unlock(&ctx->lock);
+> > +                       goto out_free_enc;
+> > +               }
+> > +       }
+> > +       spin_unlock(&ctx->lock);
+> > +       if (sec_alg_skcipher_init_context(tfm, key, keylen, alg))
+> > +               goto out_free_all;
+> > +
+> > +       return 0;
+> > +
+> > +out_free_all:
+> > +       memset(ctx->dec_key, 0, SEC_MAX_CIPHER_KEY);
+> > +       dma_free_coherent(dev, SEC_MAX_CIPHER_KEY,
+> > +                         ctx->dec_key, ctx->dec_pkey);
+> > +       ctx->dec_key = NULL;
+> > +out_free_enc:
+> > +       memset(ctx->enc_key, 0, SEC_MAX_CIPHER_KEY);
+> > +       dma_free_coherent(dev, SEC_MAX_CIPHER_KEY,
+> > +                         ctx->enc_key, ctx->enc_pkey);
+> > +       ctx->enc_key = NULL;  
+> 
+> Please use memzero_explicit.
+
+Will do - thanks!
+
+Jonathan
+> > +
+> > +       return -ENOMEM;
+> > +  
