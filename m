@@ -1,52 +1,46 @@
 From: Colin King <colin.king@canonical.com>
-Subject: [PATCH] crypto: chelsio - Make function aead_ccm_validate_input static
-Date: Tue,  6 Feb 2018 23:09:20 +0000
-Message-ID: <20180206230920.13764-1-colin.king@canonical.com>
+Subject: [PATCH] crypto: ccp - Make function ccp_get_dma_chan_attr static
+Date: Tue,  6 Feb 2018 23:20:01 +0000
+Message-ID: <20180206232001.14102-1-colin.king@canonical.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 Cc: kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Harsh Jain <harsh@chelsio.com>,
+To: Tom Lendacky <thomas.lendacky@amd.com>,
+        Gary Hook <gary.hook@amd.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S . Miller" <davem@davemloft.net>,
         linux-crypto@vger.kernel.org
-Return-path: <kernel-janitors-owner@vger.kernel.org>
-Sender: kernel-janitors-owner@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
 From: Colin Ian King <colin.king@canonical.com>
 
-Function aead_ccm_validate_input is local to the source and does not
+Function ccp_get_dma_chan_attr is local to the source and does not
 need to be in global scope, so make it static.
 
 Cleans up sparse warning:
-drivers/crypto/chelsio/chcr_algo.c:2627:5: warning: symbol
-'aead_ccm_validate_input' was not declared. Should it be static?
+drivers/crypto/ccp/ccp-dmaengine.c:41:14: warning: symbol
+'ccp_get_dma_chan_attr' was not declared. Should it be static?
 
 Signed-off-by: Colin Ian King <colin.king@canonical.com>
 ---
- drivers/crypto/chelsio/chcr_algo.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ drivers/crypto/ccp/ccp-dmaengine.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/chelsio/chcr_algo.c b/drivers/crypto/chelsio/chcr_algo.c
-index 34a02d690548..8a67884512e4 100644
---- a/drivers/crypto/chelsio/chcr_algo.c
-+++ b/drivers/crypto/chelsio/chcr_algo.c
-@@ -2636,10 +2636,10 @@ static void fill_sec_cpl_for_aead(struct cpl_tx_sec_pdu *sec_cpl,
- 					0, dst_size);
- }
+diff --git a/drivers/crypto/ccp/ccp-dmaengine.c b/drivers/crypto/ccp/ccp-dmaengine.c
+index 8b9da58459df..67155cb21636 100644
+--- a/drivers/crypto/ccp/ccp-dmaengine.c
++++ b/drivers/crypto/ccp/ccp-dmaengine.c
+@@ -38,7 +38,7 @@ static unsigned int dma_chan_attr = CCP_DMA_DFLT;
+ module_param(dma_chan_attr, uint, 0444);
+ MODULE_PARM_DESC(dma_chan_attr, "Set DMA channel visibility: 0 (default) = device defaults, 1 = make private, 2 = make public");
  
--int aead_ccm_validate_input(unsigned short op_type,
--			    struct aead_request *req,
--			    struct chcr_aead_ctx *aeadctx,
--			    unsigned int sub_type)
-+static int aead_ccm_validate_input(unsigned short op_type,
-+				   struct aead_request *req,
-+				   struct chcr_aead_ctx *aeadctx,
-+				   unsigned int sub_type)
+-unsigned int ccp_get_dma_chan_attr(struct ccp_device *ccp)
++static unsigned int ccp_get_dma_chan_attr(struct ccp_device *ccp)
  {
- 	if (sub_type != CRYPTO_ALG_SUB_TYPE_AEAD_RFC4309) {
- 		if (crypto_ccm_check_iv(req->iv)) {
+ 	switch (dma_chan_attr) {
+ 	case CCP_DMA_DFLT:
 -- 
 2.15.1
-
