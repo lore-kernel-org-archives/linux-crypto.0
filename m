@@ -1,72 +1,184 @@
-From: Krzysztof Kozlowski <krzk@kernel.org>
+From: Anand Moon <linux.amoon@gmail.com>
 Subject: Re: [PATCH] crypto: s5p-sss.c: Fix kernel Oops in AES-ECB mode
-Date: Tue, 6 Feb 2018 13:11:35 +0100
-Message-ID: <CAJKOXPcugCtU8OdK+vvT3SP49HFLCPuND2vLSomkENrOyVvYzQ@mail.gmail.com>
+Date: Tue, 6 Feb 2018 22:18:26 +0530
+Message-ID: <CANAwSgTO5_mL9GEYrXDJyKakY3JTeF+VxbCTuHczAvfVY0zUsg@mail.gmail.com>
 References: <CGME20180205174022eucas1p101e8339284c1f0ac8f40f70c24de1c1f@eucas1p1.samsung.com>
  <224788c7-426b-d3a9-d0a6-412d2b8afb75@partner.samsung.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
         Vladimir Zapolskiy <vz@mleia.com>,
         "David S. Miller" <davem@davemloft.net>,
         Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
         Marek Szyprowski <m.szyprowski@samsung.com>,
-        Anand Moon <linux.amoon@gmail.com>,
         linux-crypto@vger.kernel.org, linux-samsung-soc@vger.kernel.org,
         linux-kernel <linux-kernel@vger.kernel.org>
 To: Kamil Konieczny <k.konieczny@partner.samsung.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:53666 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752324AbeBFMLi (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 6 Feb 2018 07:11:38 -0500
+Received: from mail-ot0-f196.google.com ([74.125.82.196]:36091 "EHLO
+        mail-ot0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752259AbeBFQsr (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 6 Feb 2018 11:48:47 -0500
 In-Reply-To: <224788c7-426b-d3a9-d0a6-412d2b8afb75@partner.samsung.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Feb 5, 2018 at 6:40 PM, Kamil Konieczny
+Hi Kamil,
+
+Thanks for providing the fix to this issue.
+
+On 5 February 2018 at 23:10, Kamil Konieczny
 <k.konieczny@partner.samsung.com> wrote:
 >
 > In AES-ECB mode crypt is done with key only, so any use of IV
 > can cause kernel Oops, as reported by Anand Moon.
+
+If possible could you avoid the name in commit message.
+
 > Fixed it by using IV only in AES-CBC and AES-CTR.
 >
 > Signed-off-by: Kamil Konieczny <k.konieczny@partner.samsung.com>
 > Reported-by: Anand Moon <linux.amoon@gmail.com>
-> ---
-> Tested on Odroid XU4/HC1, kernel 4.15 with following command:
->
-> fallocate -l 128MiB /tmp/test.bin
-> dd if=/dev/urandom of=/tmp/testkey.key bs=128 count=1
-> sync
-> cryptsetup luksFormat --debug -q -d /tmp/testkey.key \
->   --cipher aes-cbc-essiv:sha256 -h sha256 -s 128 /tmp/test.bin
->
-> The original report by Anand Moon:
-> https://www.spinics.net/lists/linux-crypto/msg31180.html
->
-> Oops reproduced with cryptsetup 2.0.0, kernel 4.15,
-> in .config in crypto API ECB support was turned off, and s5p-sss AES driver on.
->
-> cryptsetup is using aes-ecb and has req->info in aes_ctx set to 0x10,
-> which caused Oops:
->
-> [ 2078.683779] Internal error: Oops: 17 [#1] PREEMPT SMP ARM
-> [ 2078.689148] Modules linked in: algif_skcipher af_alg sd_mod sg
-> evdev uas usb_storage scsi_mod gpio_keys fbtft(C) spidev spi_s3c64xx
-> ipv6
-> [ 2078.701377] CPU: 1 PID: 15 Comm: ksoftirqd/1 Tainted: G         C
->     4.15.0-rc9-xu4krck #1
-> [ 2078.709861] Hardware name: SAMSUNG EXYNOS (Flattened Device Tree)
-> [ 2078.715932] PC is at memcpy+0x80/0x330
-> [ 2078.719652] LR is at s5p_tasklet_cb+0x19c/0x328
->
->  drivers/crypto/s5p-sss.c | 12 +++++++++---
->  1 file changed, 9 insertions(+), 3 deletions(-)
 
-Fixes and cc-stable?
+[snip]
 
-Reviewed-by: Krzysztof Kozlowski <krzk@kernel.org>
+Please add my. Tested on Odroid HC2
 
-Best regards,
-Krzysztof
+Tested-by: Anand Moon <linux.amoon@gmail.com>
+
+Below are the result at my end.
+
+aes-cbc-essiv:sha256 (128 bit key)
+WRITE:
+100+0 records in
+100+0 records out
+838860800 bytes (839 MB, 800 MiB) copied, 11.7225 s, 71.6 MB/s
+READ:
+100+0 records in
+100+0 records out
+838860800 bytes (839 MB, 800 MiB) copied, 22.112 s, 37.9 MB/s
+
+aes-cbc-essiv:sha256 (256 bit key)
+WRITE:
+100+0 records in
+100+0 records out
+838860800 bytes (839 MB, 800 MiB) copied, 13.096 s, 64.1 MB/s
+READ:
+100+0 records in
+100+0 records out
+838860800 bytes (839 MB, 800 MiB) copied, 24.4165 s, 34.4 MB/s
+
+aes-ctr-plain (128 bit key)
+WRITE:
+100+0 records in
+100+0 records out
+838860800 bytes (839 MB, 800 MiB) copied, 11.2246 s, 74.7 MB/s
+READ:
+100+0 records in
+100+0 records out
+838860800 bytes (839 MB, 800 MiB) copied, 20.426 s, 41.1 MB/s
+
+aes-xts-plain64 (256 bit key)
+WRITE:
+100+0 records in
+100+0 records out
+838860800 bytes (839 MB, 800 MiB) copied, 11.1533 s, 75.2 MB/s
+READ:
+100+0 records in
+100+0 records out
+838860800 bytes (839 MB, 800 MiB) copied, 20.8821 s, 40.2 MB/s
+
+aes-xts-plain64 (512 bit key)
+WRITE:
+100+0 records in
+100+0 records out
+838860800 bytes (839 MB, 800 MiB) copied, 12.0614 s, 69.5 MB/s
+READ:
+100+0 records in
+100+0 records out
+838860800 bytes (839 MB, 800 MiB) copied, 23.0717 s, 36.4 MB/s
+
+twofish-cbc-essiv:sha256 (128 bit key)
+WRITE:
+100+0 records in
+100+0 records out
+838860800 bytes (839 MB, 800 MiB) copied, 13.031 s, 64.4 MB/s
+READ:
+100+0 records in
+100+0 records out
+838860800 bytes (839 MB, 800 MiB) copied, 20.7202 s, 40.5 MB/s
+
+twofish-cbc-essiv:sha256 (256 bit key)
+WRITE:
+100+0 records in
+100+0 records out
+838860800 bytes (839 MB, 800 MiB) copied, 12.9995 s, 64.5 MB/s
+READ:
+100+0 records in
+100+0 records out
+838860800 bytes (839 MB, 800 MiB) copied, 24.2369 s, 34.6 MB/s
+
+twofish-xts-plain64 (256 bit key)
+WRITE:
+100+0 records in
+100+0 records out
+838860800 bytes (839 MB, 800 MiB) copied, 14.607 s, 57.4 MB/s
+READ:
+100+0 records in
+100+0 records out
+838860800 bytes (839 MB, 800 MiB) copied, 26.2963 s, 31.9 MB/s
+
+twofish-xts-plain64 (512 bit key)
+WRITE:
+100+0 records in
+100+0 records out
+838860800 bytes (839 MB, 800 MiB) copied, 14.5783 s, 57.5 MB/s
+READ:
+100+0 records in
+100+0 records out
+838860800 bytes (839 MB, 800 MiB) copied, 25.3593 s, 33.1 MB/s
+
+serpent-cbc-essiv:sha256 (128 bit key)
+WRITE:
+100+0 records in
+100+0 records out
+838860800 bytes (839 MB, 800 MiB) copied, 15.5157 s, 54.1 MB/s
+READ:
+100+0 records in
+100+0 records out
+838860800 bytes (839 MB, 800 MiB) copied, 37.0526 s, 22.6 MB/s
+
+serpent-cbc-essiv:sha256 (256 bit key)
+WRITE:
+100+0 records in
+100+0 records out
+838860800 bytes (839 MB, 800 MiB) copied, 16.1138 s, 52.1 MB/s
+READ:
+100+0 records in
+100+0 records out
+838860800 bytes (839 MB, 800 MiB) copied, 36.922 s, 22.7 MB/s
+
+serpent-xts-plain64 (256 bit key)
+WRITE:
+100+0 records in
+100+0 records out
+838860800 bytes (839 MB, 800 MiB) copied, 17.287 s, 48.5 MB/s
+READ:
+100+0 records in
+100+0 records out
+838860800 bytes (839 MB, 800 MiB) copied, 39.279 s, 21.4 MB/s
+
+serpent-xts-plain64 (512 bit key)
+WRITE:
+100+0 records in
+100+0 records out
+838860800 bytes (839 MB, 800 MiB) copied, 16.9464 s, 49.5 MB/s
+READ:
+100+0 records in
+100+0 records out
+838860800 bytes (839 MB, 800 MiB) copied, 38.3389 s, 21.9 MB/s
+
+Best Regards
+-Anand
