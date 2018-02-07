@@ -1,57 +1,66 @@
 From: Eric Biggers <ebiggers3@gmail.com>
-Subject: [PATCH 0/9] PKCS#7 / X.509 fixes and cleanups
-Date: Tue,  6 Feb 2018 17:10:03 -0800
-Message-ID: <20180207011012.5928-1-ebiggers3@gmail.com>
+Subject: [PATCH 1/9] PKCS#7: fix certificate chain verification
+Date: Tue,  6 Feb 2018 17:10:04 -0800
+Message-ID: <20180207011012.5928-2-ebiggers3@gmail.com>
+References: <20180207011012.5928-1-ebiggers3@gmail.com>
 Cc: linux-crypto@vger.kernel.org,
         Michael Halcrow <mhalcrow@google.com>,
-        Eric Biggers <ebiggers@google.com>
+        Eric Biggers <ebiggers@google.com>, stable@vger.kernel.org
 To: David Howells <dhowells@redhat.com>, keyrings@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-io0-f196.google.com ([209.85.223.196]:41398 "EHLO
-        mail-io0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932154AbeBGBPz (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 6 Feb 2018 20:15:55 -0500
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <stable-owner@vger.kernel.org>
+In-Reply-To: <20180207011012.5928-1-ebiggers3@gmail.com>
+Sender: stable-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
 From: Eric Biggers <ebiggers@google.com>
 
-Hi David, here is another set of fixes and cleanups for the PKCS#7 and
-X.509 code:
+When pkcs7_verify_sig_chain() is building the certificate chain for a
+SignerInfo using the certificates in the PKCS#7 message, it is passing
+the wrong arguments to public_key_verify_signature().  Consequently,
+when the next certificate is supposed to be used to verify the previous
+certificate, the next certificate is actually used to verify itself.
 
-Patches 1-5 fix the BUG_ON() in public_key_verify_signature() reported
-by Paolo Valente as well as several other bugs I found.  Notably both
-the PKCS#7 certificate chain verification and certificate blacklisting
-were broken.  With the certificate chaining bug (introduced in v4.7) it
-is almost possible to bypass PKCS#7 signature verification completely,
-though I couldn't quite make it work.
+An attacker can use this bug to create a bogus certificate chain that
+has no cryptographic relationship between the beginning and end.
 
-Patches 6-9 remove dead code related to the unsupported_key and
-unsupported_sig flags on struct x509_certificate's.  It's possible these
-flags should be fixed instead, so that we handle unrecognized or
-unsupported algorithms more gracefully.  But evidently no one is
-complaining about the current behavior, and removing the dead code is
-strictly an improvement as it doesn't actually change the behavior...
+Fortunately I couldn't quite find a way to use this to bypass the
+overall signature verification, though it comes very close.  Here's the
+reasoning: due to the bug, every certificate in the chain beyond the
+first actually has to be self-signed (where "self-signed" here refers to
+the actual key and signature; an attacker might still manipulate the
+certificate fields such that the self_signed flag doesn't actually get
+set, and thus the chain doesn't end immediately).  But to pass trust
+validation (pkcs7_validate_trust()), either the SignerInfo or one of the
+certificates has to actually be signed by a trusted key.  Since only
+self-signed certificates can be added to the chain, the only way for an
+attacker to introduce a trusted signature is to include a self-signed
+trusted certificate.
 
-Eric Biggers (9):
-  PKCS#7: fix certificate chain verification
-  PKCS#7: fix certificate blacklisting
-  PKCS#7: fix direct verification of SignerInfo signature
-  X.509: fix BUG_ON() when hash algorithm is unsupported
-  X.509: fix NULL dereference when restricting key with unsupported_sig
-  PKCS#7: remove unnecessary check for NULL sinfo->sig->hash_algo
-  X.509: remove never-set ->unsupported_key flag
-  X.509: remove dead code that set ->unsupported_sig
-  X.509: self_signed implies !unsupported_sig
+But, when pkcs7_validate_trust_one() reaches that certificate, instead
+of trying to verify the signature on that certificate, it will actually
+look up the corresponding trusted key, which will succeed, and then try
+to verify the *previous* certificate, which will fail.  Thus, disaster
+is narrowly averted (as far as I could tell).
 
- crypto/asymmetric_keys/pkcs7_trust.c     |  1 +
- crypto/asymmetric_keys/pkcs7_verify.c    | 36 +++++++++-----------------------
- crypto/asymmetric_keys/public_key.c      |  4 +++-
- crypto/asymmetric_keys/restrict.c        | 21 ++++++++++++-------
- crypto/asymmetric_keys/x509_parser.h     |  3 +--
- crypto/asymmetric_keys/x509_public_key.c | 18 ----------------
- 6 files changed, 28 insertions(+), 55 deletions(-)
+Fixes: 6c2dc5ae4ab7 ("X.509: Extract signature digest and make self-signed cert checks earlier")
+Cc: <stable@vger.kernel.org> # v4.7+
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ crypto/asymmetric_keys/pkcs7_verify.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/crypto/asymmetric_keys/pkcs7_verify.c b/crypto/asymmetric_keys/pkcs7_verify.c
+index 39e6de0c2761..2f6a768b91d7 100644
+--- a/crypto/asymmetric_keys/pkcs7_verify.c
++++ b/crypto/asymmetric_keys/pkcs7_verify.c
+@@ -270,7 +270,7 @@ static int pkcs7_verify_sig_chain(struct pkcs7_message *pkcs7,
+ 				sinfo->index);
+ 			return 0;
+ 		}
+-		ret = public_key_verify_signature(p->pub, p->sig);
++		ret = public_key_verify_signature(p->pub, x509->sig);
+ 		if (ret < 0)
+ 			return ret;
+ 		x509->signer = p;
 -- 
 2.16.0.rc1.238.g530d649a79-goog
