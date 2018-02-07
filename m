@@ -1,58 +1,94 @@
-From: =?iso-8859-2?Q?Horia_Geant=E3?= <horia.geanta@nxp.com>
-Subject: Re: [PATCH 16/18] crypto: talitos - do hw_context DMA mapping outside
- the requests
-Date: Wed, 7 Feb 2018 14:39:52 +0000
-Message-ID: <VI1PR0402MB3342A0A8530F74D408CA2F0298FC0@VI1PR0402MB3342.eurprd04.prod.outlook.com>
-References: <cover.1507284818.git.christophe.leroy@c-s.fr>
- <e47bf94ae44f23230b1647e31c9623f1075d3b79.1507284818.git.christophe.leroy@c-s.fr>
+From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Subject: Re: [PATCH v2 0/4] crypto: AF_ALG AIO improvements
+Date: Wed, 7 Feb 2018 15:37:25 +0000
+Message-ID: <20180207153725.0000042a@huawei.com>
+References: <2118226.LQArbCsRu5@tauon.chronox.de>
+        <CAOtvUMe8gqBJtFjkO-Jssw1Q32GdR0oZNPRitt81skKO2f_+yg@mail.gmail.com>
+        <20180201102519.000044c1@huawei.com>
+        <1842104.0gXuQuQB9D@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-2"
-Content-Transfer-Encoding: quoted-printable
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>
-To: Christophe Leroy <christophe.leroy@c-s.fr>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="ISO-8859-1"
+Content-Transfer-Encoding: 8BIT
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        Gilad Ben-Yossef <gilad@benyossef.com>,
+        Harsh Jain <harsh@chelsio.com>,
+        "Linux Crypto Mailing List" <linux-crypto@vger.kernel.org>,
+        <linuxarm@huawei.com>
+To: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from szxga07-in.huawei.com ([45.249.212.35]:46725 "EHLO huawei.com"
+        rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1754543AbeBGPhr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 7 Feb 2018 10:37:47 -0500
+In-Reply-To: <1842104.0gXuQuQB9D@positron.chronox.de>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On 10/6/2017 4:06 PM, Christophe Leroy wrote:=0A=
-> At every request, we map and unmap the same hash hw_context.=0A=
-> =0A=
-> This patch moves the dma mapping/unmapping in functions ahash_init()=0A=
-> and ahash_import().=0A=
-> =0A=
-> Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>=0A=
-> ---=0A=
->  drivers/crypto/talitos.c | 80 ++++++++++++++++++++++++++++++++++--------=
-------=0A=
->  1 file changed, 57 insertions(+), 23 deletions(-)=0A=
-> =0A=
-> diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c=0A=
-> index ebfd6d982ed6..d495649d5267 100644=0A=
-> --- a/drivers/crypto/talitos.c=0A=
-> +++ b/drivers/crypto/talitos.c=0A=
-> @@ -819,6 +819,7 @@ struct talitos_ctx {=0A=
->  	unsigned int keylen;=0A=
->  	unsigned int enckeylen;=0A=
->  	unsigned int authkeylen;=0A=
-> +	dma_addr_t dma_hw_context;=0A=
-This doesn't look correct.=0A=
-=0A=
-talitos_ctx structure is the tfm context.=0A=
-dma_hw_context is the IOVA of hw_context, located in talitos_ahash_req_ctx=
-=0A=
-structure (request context).=0A=
-=0A=
-If there are multiple requests in flight for the same tfm, dma_hw_context w=
-ill=0A=
-be overwritten.=0A=
-=0A=
-dma_hw_context needs to be moved in request context (talitos_ahash_req_ctx =
-struct).=0A=
-=0A=
-Thanks,=0A=
-Horia=0A=
+On Wed, 7 Feb 2018 08:42:59 +0100
+Stephan Müller <smueller@chronox.de> wrote:
+
+> Hi Herbert,
+> 
+> Herbert, the patch 1 is meant for stable. However, this patch as is
+> only applies to the new AF_ALG interface implementation. Though,
+> the issue goes back to the first implementation of AIO support.
+> Shall I try prepare a patch for the old AF_ALG implementation
+> as well?
+> 
+> Changes from v1:
+> 
+> * integrate the inline IV and locking patch into one patch set
+> 
+> * reverse the order of lock context IV patch and inline IV patch --
+>   the reason is to allow the first patch to be back-ported to stable
+> 
+> * mark the first patch (locking of the context IV) as applicable to
+>   stable as there is an existing inconsistency which was demonstrated
+>   by Harsh with the Chelsio driver vs the AES-NI driver
+> 
+> * modify the inline IV patch to have proper unlocking of the mutex
+>   in case of errors
+> 
+> * prevent locking if no IV is defined by cipher
+> 
+> * add a patch to allow crypto drivers to report whether they support
+>   serialization -- in this case the locking in AF_ALG shall be
+>   disabled
+> 
+> * add a patch to inform the crypto drivers that their serialization
+>   support should actually be enabled and used because AF_ALG does not
+>   serialize the interdependent parallel AIO requests
+> 
+> * streamline the code in patch 1 and 2 slightly
+> 
+> I would like to ask the folks with real AIO hardware (Harsh, Jonathan)
+> to test the patches. Especially, is the locking patch should be tested
+> by Harsh as you have seen the issue with your hardware.
+> 
+
+I've updated my driver to take advantage of this and it is working
+pretty much the same as it was with the dirty hacks I was running before.
+
+So Tested-by: Jonathan Cameron <Jonathan.Cameron@huawei.com> with
+that minor change to sensitivity to having it set to IIV multiple times.
+
+Hmm. Naming of the parallel request probably needs some thought though.
+Will reply to that patch.
+
+
+> Thanks.
+> 
+> Stephan Mueller (4):
+>   crypto: AF_ALG AIO - lock context IV
+>   crypto: AF_ALG - inline IV support
+>   crypto: AF_ALG - allow driver to serialize IV access
+>   crypto: add CRYPTO_TFM_REQ_PARALLEL flag
+> 
+>  crypto/af_alg.c             | 119 +++++++++++++++++++++++++++++++++++++++++++-
+>  crypto/algif_aead.c         |  86 +++++++++++++++++---------------
+>  crypto/algif_skcipher.c     |  38 ++++++++++----
+>  include/crypto/if_alg.h     |  37 ++++++++++++++
+>  include/linux/crypto.h      |  16 ++++++
+>  include/uapi/linux/if_alg.h |   6 ++-
+>  6 files changed, 249 insertions(+), 53 deletions(-)
+> 
