@@ -1,64 +1,92 @@
-From: Artem Savkov <asavkov@redhat.com>
-Subject: Re: [PATCH 1/2] sun4i_ss_prng: fix return value of
- sun4i_ss_prng_generate
-Date: Wed, 7 Feb 2018 11:52:01 +0100
-Message-ID: <20180207105201.pnn2s57wdk5zuda2@shodan.usersys.redhat.com>
-References: <20180206212022.1309-1-artem.savkov@gmail.com>
- <20180206212022.1309-2-artem.savkov@gmail.com>
- <20180207095659.GA19249@Red>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: [PATCH v2 4/4] crypto: add CRYPTO_TFM_REQ_PARALLEL flag
+Date: Wed, 07 Feb 2018 13:48:32 +0100
+Message-ID: <3051095.6v3pDGNVZ5@tauon.chronox.de>
+References: <2118226.LQArbCsRu5@tauon.chronox.de> <1842104.0gXuQuQB9D@positron.chronox.de> <3375426.msL1YKqpVq@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Cc: Artem Savkov <artem.savkov@gmail.com>, herbert@gondor.apana.org.au,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org
-To: Corentin Labbe <clabbe.montjoie@gmail.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20180207095659.GA19249@Red>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: 8BIT
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+        Gilad Ben-Yossef <gilad@benyossef.com>,
+        Harsh Jain <harsh@chelsio.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        linuxarm@huawei.com
+To: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.eperm.de ([89.247.134.16]:59386 "EHLO mail.eperm.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1753763AbeBGMsi (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 7 Feb 2018 07:48:38 -0500
+In-Reply-To: <3375426.msL1YKqpVq@positron.chronox.de>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Feb 07, 2018 at 10:56:59AM +0100, Corentin Labbe wrote:
-> On Tue, Feb 06, 2018 at 10:20:21PM +0100, Artem Savkov wrote:
-> > According to crypto/rng.h generate function should return 0 on success
-> > and < 0 on error.
-> > 
-> > Fixes: b8ae5c7387ad ("crypto: sun4i-ss - support the Security System PRNG")
-> > Signed-off-by: Artem Savkov <artem.savkov@gmail.com>
-> > ---
-> >  drivers/crypto/sunxi-ss/sun4i-ss-prng.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/drivers/crypto/sunxi-ss/sun4i-ss-prng.c b/drivers/crypto/sunxi-ss/sun4i-ss-prng.c
-> > index 0d01d1624252..5754e0b92fb0 100644
-> > --- a/drivers/crypto/sunxi-ss/sun4i-ss-prng.c
-> > +++ b/drivers/crypto/sunxi-ss/sun4i-ss-prng.c
-> > @@ -52,5 +52,5 @@ int sun4i_ss_prng_generate(struct crypto_rng *tfm, const u8 *src,
-> >  
-> >  	writel(0, ss->base + SS_CTL);
-> >  	spin_unlock(&ss->slock);
-> > -	return dlen;
-> > +	return 0;
-> >  }
-> > -- 
-> > 2.15.1
-> > 
+Am Mittwoch, 7. Februar 2018, 08:44:04 CET schrieb Stephan Müller:
+
+Hi,
+
+
+> diff --git a/crypto/algif_aead.c b/crypto/algif_aead.c
+> index 3970ad7f6fd0..da010405eea0 100644
+> --- a/crypto/algif_aead.c
+> +++ b/crypto/algif_aead.c
+> @@ -66,13 +66,22 @@ static int aead_sendmsg(struct socket *sock, struct
+> msghdr *msg, size_t size) {
+>  	struct sock *sk = sock->sk;
+>  	struct alg_sock *ask = alg_sk(sk);
+> +	struct af_alg_ctx *ctx = ask->private;
+>  	struct sock *psk = ask->parent;
+>  	struct alg_sock *pask = alg_sk(psk);
+>  	struct aead_tfm *aeadc = pask->private;
+> -	struct crypto_aead *tfm = aeadc->aead;
+> -	unsigned int ivsize = crypto_aead_ivsize(tfm);
+> +	struct crypto_aead *aead = aeadc->aead;
+> +	struct crypto_tfm *tfm = crypto_aead_tfm(aead);
+> +	unsigned int ivsize = crypto_aead_ivsize(aead);
+> +	int ret = af_alg_sendmsg(sock, msg, size, ivsize);
+> +
+> +	if (ret < 0)
+> +		return ret;
 > 
-> According to Documentation/crypto/api-samples.rst ("Code Example For Random Number Generator Usage")
-> you must return the length of data generated.
+> -	return af_alg_sendmsg(sock, msg, size, ivsize);
+> +	if (ctx->iiv == ALG_IIV_USE)
 
-I don't think that example is the same as rng_alg.generate, it has a
-different protottype.
+This should be ALG_IIV_DISABLE of course.
 
-> So crypto_rng_generate/crypto_rng_get_bytes documentation in crypto/rng.h must be fixed.
+> +		tfm->crt_flags |= CRYPTO_TFM_REQ_PARALLEL;
+> +
+> +	return ret;
+>  }
+> 
+>  static int crypto_aead_copy_sgl(struct crypto_skcipher *null_tfm,
+> diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
+> index aee602a3ec24..225546666cf7 100644
+> --- a/crypto/algif_skcipher.c
+> +++ b/crypto/algif_skcipher.c
+> @@ -43,12 +43,21 @@ static int skcipher_sendmsg(struct socket *sock, struct
+> msghdr *msg, {
+>  	struct sock *sk = sock->sk;
+>  	struct alg_sock *ask = alg_sk(sk);
+> +	struct af_alg_ctx *ctx = ask->private;
+>  	struct sock *psk = ask->parent;
+>  	struct alg_sock *pask = alg_sk(psk);
+> -	struct crypto_skcipher *tfm = pask->private;
+> -	unsigned ivsize = crypto_skcipher_ivsize(tfm);
+> +	struct crypto_skcipher *skc = pask->private;
+> +	struct crypto_tfm *tfm = crypto_skcipher_tfm(skc);
+> +	unsigned int ivsize = crypto_skcipher_ivsize(skc);
+> +	int ret = af_alg_sendmsg(sock, msg, size, ivsize);
+> +
+> +	if (ret < 0)
+> +		return ret;
+> 
+> -	return af_alg_sendmsg(sock, msg, size, ivsize);
+> +	if (ctx->iiv == ALG_IIV_USE)
 
-It's not just documentation, every other rng driver returns it this way
-and it gets aead_init_geniv() (and subsequently crypto_create_tfm())
-really confused because they expect the return value to be 0 or < 0.
+Dto.
 
-> Herbert could you confirm ?
+I will wait for some more comments before sending a new patch.
 
-
--- 
-Regards,
-  Artem
+Ciao
+Stephan
