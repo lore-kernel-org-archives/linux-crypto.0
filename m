@@ -1,106 +1,64 @@
-From: Kamil Konieczny <k.konieczny@partner.samsung.com>
-Subject: [PATCH v2] crypto: s5p-sss.c: Fix kernel Oops in AES-ECB mode
-Date: Wed, 07 Feb 2018 11:38:57 +0100
-Message-ID: <64a5e903-c6c1-28f4-8af4-dbbd7bef17ef@partner.samsung.com>
-References: <CGME20180207103859eucas1p13385c140fe1874645ee3ae5127d0e232@eucas1p1.samsung.com>
+From: Artem Savkov <asavkov@redhat.com>
+Subject: Re: [PATCH 1/2] sun4i_ss_prng: fix return value of
+ sun4i_ss_prng_generate
+Date: Wed, 7 Feb 2018 11:52:01 +0100
+Message-ID: <20180207105201.pnn2s57wdk5zuda2@shodan.usersys.redhat.com>
+References: <20180206212022.1309-1-artem.savkov@gmail.com>
+ <20180206212022.1309-2-artem.savkov@gmail.com>
+ <20180207095659.GA19249@Red>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: Krzysztof Kozlowski <krzk@kernel.org>,
-        Vladimir Zapolskiy <vz@mleia.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Anand Moon <linux.amoon@gmail.com>,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-        Marek Szyprowski <m.szyprowski@samsung.com>,
-        linux-crypto@vger.kernel.org, linux-samsung-soc@vger.kernel.org,
-        linux-kernel <linux-kernel@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=utf-8
+Cc: Artem Savkov <artem.savkov@gmail.com>, herbert@gondor.apana.org.au,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org
+To: Corentin Labbe <clabbe.montjoie@gmail.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-language: en-US
+Content-Disposition: inline
+In-Reply-To: <20180207095659.GA19249@Red>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-In AES-ECB mode crypt is done with key only, so any use of IV
-can cause kernel Oops. Use IV only in AES-CBC and AES-CTR.
+On Wed, Feb 07, 2018 at 10:56:59AM +0100, Corentin Labbe wrote:
+> On Tue, Feb 06, 2018 at 10:20:21PM +0100, Artem Savkov wrote:
+> > According to crypto/rng.h generate function should return 0 on success
+> > and < 0 on error.
+> > 
+> > Fixes: b8ae5c7387ad ("crypto: sun4i-ss - support the Security System PRNG")
+> > Signed-off-by: Artem Savkov <artem.savkov@gmail.com>
+> > ---
+> >  drivers/crypto/sunxi-ss/sun4i-ss-prng.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/drivers/crypto/sunxi-ss/sun4i-ss-prng.c b/drivers/crypto/sunxi-ss/sun4i-ss-prng.c
+> > index 0d01d1624252..5754e0b92fb0 100644
+> > --- a/drivers/crypto/sunxi-ss/sun4i-ss-prng.c
+> > +++ b/drivers/crypto/sunxi-ss/sun4i-ss-prng.c
+> > @@ -52,5 +52,5 @@ int sun4i_ss_prng_generate(struct crypto_rng *tfm, const u8 *src,
+> >  
+> >  	writel(0, ss->base + SS_CTL);
+> >  	spin_unlock(&ss->slock);
+> > -	return dlen;
+> > +	return 0;
+> >  }
+> > -- 
+> > 2.15.1
+> > 
+> 
+> According to Documentation/crypto/api-samples.rst ("Code Example For Random Number Generator Usage")
+> you must return the length of data generated.
 
-Signed-off-by: Kamil Konieczny <k.konieczny@partner.samsung.com>
-Reported-by: Anand Moon <linux.amoon@gmail.com>
-Reviewed-by: Krzysztof Kozlowski <krzk@kernel.org>
-Tested-by: Anand Moon <linux.amoon@gmail.com>
-Cc: stable@vger.kernel.org
-Fixes: 8f9702aad138 ("crypto: s5p-sss - validate iv before memcpy")
+I don't think that example is the same as rng_alg.generate, it has a
+different protottype.
 
----
-version 2:
-Change commit message.
+> So crypto_rng_generate/crypto_rng_get_bytes documentation in crypto/rng.h must be fixed.
 
-Tested on Odroid XU4/HC1, kernel 4.15 with following command:
+It's not just documentation, every other rng driver returns it this way
+and it gets aead_init_geniv() (and subsequently crypto_create_tfm())
+really confused because they expect the return value to be 0 or < 0.
 
-fallocate -l 128MiB /tmp/test.bin
-dd if=/dev/urandom of=/tmp/testkey.key bs=128 count=1
-sync
-cryptsetup luksFormat --debug -q -d /tmp/testkey.key \
-  --cipher aes-cbc-essiv:sha256 -h sha256 -s 128 /tmp/test.bin
-
-The original report by Anand Moon:
-https://www.spinics.net/lists/linux-crypto/msg31180.html
-
-Oops reproduced with cryptsetup 2.0.0, kernel 4.15,
-in .config in crypto API ECB support was turned off, and s5p-sss AES driver on.
-
-cryptsetup is using aes-ecb and has req->info in aes_ctx set to 0x10,
-which caused Oops:
-
-[ 2078.683779] Internal error: Oops: 17 [#1] PREEMPT SMP ARM
-[ 2078.689148] Modules linked in: algif_skcipher af_alg sd_mod sg
-evdev uas usb_storage scsi_mod gpio_keys fbtft(C) spidev spi_s3c64xx
-ipv6
-[ 2078.701377] CPU: 1 PID: 15 Comm: ksoftirqd/1 Tainted: G         C
-    4.15.0-rc9-xu4krck #1
-[ 2078.709861] Hardware name: SAMSUNG EXYNOS (Flattened Device Tree)
-[ 2078.715932] PC is at memcpy+0x80/0x330
-[ 2078.719652] LR is at s5p_tasklet_cb+0x19c/0x328
+> Herbert could you confirm ?
 
 
- drivers/crypto/s5p-sss.c | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/crypto/s5p-sss.c b/drivers/crypto/s5p-sss.c
-index 142c6020cec7..5c0496d1ed41 100644
---- a/drivers/crypto/s5p-sss.c
-+++ b/drivers/crypto/s5p-sss.c
-@@ -1926,15 +1926,21 @@ static void s5p_aes_crypt_start(struct s5p_aes_dev *dev, unsigned long mode)
- 	uint32_t aes_control;
- 	unsigned long flags;
- 	int err;
-+	u8 *iv;
- 
- 	aes_control = SSS_AES_KEY_CHANGE_MODE;
- 	if (mode & FLAGS_AES_DECRYPT)
- 		aes_control |= SSS_AES_MODE_DECRYPT;
- 
--	if ((mode & FLAGS_AES_MODE_MASK) == FLAGS_AES_CBC)
-+	if ((mode & FLAGS_AES_MODE_MASK) == FLAGS_AES_CBC) {
- 		aes_control |= SSS_AES_CHAIN_MODE_CBC;
--	else if ((mode & FLAGS_AES_MODE_MASK) == FLAGS_AES_CTR)
-+		iv = req->info;
-+	} else if ((mode & FLAGS_AES_MODE_MASK) == FLAGS_AES_CTR) {
- 		aes_control |= SSS_AES_CHAIN_MODE_CTR;
-+		iv = req->info;
-+	} else {
-+		iv = NULL; /* AES_ECB */
-+	}
- 
- 	if (dev->ctx->keylen == AES_KEYSIZE_192)
- 		aes_control |= SSS_AES_KEY_SIZE_192;
-@@ -1965,7 +1971,7 @@ static void s5p_aes_crypt_start(struct s5p_aes_dev *dev, unsigned long mode)
- 		goto outdata_error;
- 
- 	SSS_AES_WRITE(dev, AES_CONTROL, aes_control);
--	s5p_set_aes(dev, dev->ctx->aes_key, req->info, dev->ctx->keylen);
-+	s5p_set_aes(dev, dev->ctx->aes_key, iv, dev->ctx->keylen);
- 
- 	s5p_set_dma_indata(dev,  dev->sg_src);
- 	s5p_set_dma_outdata(dev, dev->sg_dst);
 -- 
-2.16.0
+Regards,
+  Artem
