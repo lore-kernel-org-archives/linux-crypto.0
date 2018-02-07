@@ -1,92 +1,57 @@
 From: Eric Biggers <ebiggers3@gmail.com>
-Subject: [PATCH 7/9] X.509: remove never-set ->unsupported_key flag
-Date: Tue,  6 Feb 2018 17:10:10 -0800
-Message-ID: <20180207011012.5928-8-ebiggers3@gmail.com>
-References: <20180207011012.5928-1-ebiggers3@gmail.com>
+Subject: [PATCH 0/9] PKCS#7 / X.509 fixes and cleanups
+Date: Tue,  6 Feb 2018 17:10:03 -0800
+Message-ID: <20180207011012.5928-1-ebiggers3@gmail.com>
 Cc: linux-crypto@vger.kernel.org,
         Michael Halcrow <mhalcrow@google.com>,
         Eric Biggers <ebiggers@google.com>
 To: David Howells <dhowells@redhat.com>, keyrings@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-io0-f193.google.com ([209.85.223.193]:34586 "EHLO
-        mail-io0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932311AbeBGBQK (ORCPT
+Received: from mail-io0-f196.google.com ([209.85.223.196]:41398 "EHLO
+        mail-io0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932154AbeBGBPz (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 6 Feb 2018 20:16:10 -0500
-In-Reply-To: <20180207011012.5928-1-ebiggers3@gmail.com>
+        Tue, 6 Feb 2018 20:15:55 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 From: Eric Biggers <ebiggers@google.com>
 
-The X.509 parser is guaranteed to set cert->pub->pkey_algo, since
-x509_extract_key_data() is a mandatory action in the X.509 ASN.1
-grammar, and it returns an error code if an unrecognized
-AlgorithmIdentifier is given rather than leaving the algorithm as NULL.
+Hi David, here is another set of fixes and cleanups for the PKCS#7 and
+X.509 code:
 
-Therefore, remove the dead code which handled this algorithm being NULL.
-This results in the ->unsupported_key flag never being set at all, so
-remove that too.
+Patches 1-5 fix the BUG_ON() in public_key_verify_signature() reported
+by Paolo Valente as well as several other bugs I found.  Notably both
+the PKCS#7 certificate chain verification and certificate blacklisting
+were broken.  With the certificate chaining bug (introduced in v4.7) it
+is almost possible to bypass PKCS#7 signature verification completely,
+though I couldn't quite make it work.
 
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- crypto/asymmetric_keys/pkcs7_verify.c    | 3 ---
- crypto/asymmetric_keys/x509_parser.h     | 1 -
- crypto/asymmetric_keys/x509_public_key.c | 9 ---------
- 3 files changed, 13 deletions(-)
+Patches 6-9 remove dead code related to the unsupported_key and
+unsupported_sig flags on struct x509_certificate's.  It's possible these
+flags should be fixed instead, so that we handle unrecognized or
+unsupported algorithms more gracefully.  But evidently no one is
+complaining about the current behavior, and removing the dead code is
+strictly an improvement as it doesn't actually change the behavior...
 
-diff --git a/crypto/asymmetric_keys/pkcs7_verify.c b/crypto/asymmetric_keys/pkcs7_verify.c
-index a9e03f5c52e7..beb47fd2fca5 100644
---- a/crypto/asymmetric_keys/pkcs7_verify.c
-+++ b/crypto/asymmetric_keys/pkcs7_verify.c
-@@ -196,9 +196,6 @@ static int pkcs7_verify_sig_chain(struct pkcs7_message *pkcs7,
- 			return 0;
- 		}
- 
--		if (x509->unsupported_key)
--			goto unsupported_crypto_in_x509;
--
- 		pr_debug("- issuer %s\n", x509->issuer);
- 		sig = x509->sig;
- 		if (sig->auth_ids[0])
-diff --git a/crypto/asymmetric_keys/x509_parser.h b/crypto/asymmetric_keys/x509_parser.h
-index e373e7483812..217341276ae0 100644
---- a/crypto/asymmetric_keys/x509_parser.h
-+++ b/crypto/asymmetric_keys/x509_parser.h
-@@ -40,7 +40,6 @@ struct x509_certificate {
- 	bool		seen;			/* Infinite recursion prevention */
- 	bool		verified;
- 	bool		self_signed;		/* T if self-signed (check unsupported_sig too) */
--	bool		unsupported_key;	/* T if key uses unsupported crypto */
- 	bool		unsupported_sig;	/* T if signature uses unsupported crypto */
- 	bool		blacklisted;
- };
-diff --git a/crypto/asymmetric_keys/x509_public_key.c b/crypto/asymmetric_keys/x509_public_key.c
-index 9338b4558cdc..514007932ec9 100644
---- a/crypto/asymmetric_keys/x509_public_key.c
-+++ b/crypto/asymmetric_keys/x509_public_key.c
-@@ -34,9 +34,6 @@ int x509_get_sig_params(struct x509_certificate *cert)
- 
- 	pr_devel("==>%s()\n", __func__);
- 
--	if (!cert->pub->pkey_algo)
--		cert->unsupported_key = true;
--
- 	if (!sig->pkey_algo)
- 		cert->unsupported_sig = true;
- 
-@@ -173,12 +170,6 @@ static int x509_key_preparse(struct key_preparsed_payload *prep)
- 
- 	pr_devel("Cert Issuer: %s\n", cert->issuer);
- 	pr_devel("Cert Subject: %s\n", cert->subject);
--
--	if (cert->unsupported_key) {
--		ret = -ENOPKG;
--		goto error_free_cert;
--	}
--
- 	pr_devel("Cert Key Algo: %s\n", cert->pub->pkey_algo);
- 	pr_devel("Cert Valid period: %lld-%lld\n", cert->valid_from, cert->valid_to);
- 
+Eric Biggers (9):
+  PKCS#7: fix certificate chain verification
+  PKCS#7: fix certificate blacklisting
+  PKCS#7: fix direct verification of SignerInfo signature
+  X.509: fix BUG_ON() when hash algorithm is unsupported
+  X.509: fix NULL dereference when restricting key with unsupported_sig
+  PKCS#7: remove unnecessary check for NULL sinfo->sig->hash_algo
+  X.509: remove never-set ->unsupported_key flag
+  X.509: remove dead code that set ->unsupported_sig
+  X.509: self_signed implies !unsupported_sig
+
+ crypto/asymmetric_keys/pkcs7_trust.c     |  1 +
+ crypto/asymmetric_keys/pkcs7_verify.c    | 36 +++++++++-----------------------
+ crypto/asymmetric_keys/public_key.c      |  4 +++-
+ crypto/asymmetric_keys/restrict.c        | 21 ++++++++++++-------
+ crypto/asymmetric_keys/x509_parser.h     |  3 +--
+ crypto/asymmetric_keys/x509_public_key.c | 18 ----------------
+ 6 files changed, 28 insertions(+), 55 deletions(-)
+
 -- 
 2.16.0.rc1.238.g530d649a79-goog
