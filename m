@@ -1,85 +1,60 @@
-From: Harsh Jain <harsh@chelsio.com>
-Subject: Re: [PATCH v2 0/4] crypto: AF_ALG AIO improvements
-Date: Wed, 7 Feb 2018 14:22:20 +0530
-Message-ID: <dafca383-f380-80ff-3939-c1b6d6513239@chelsio.com>
-References: <2118226.LQArbCsRu5@tauon.chronox.de>
- <CAOtvUMe8gqBJtFjkO-Jssw1Q32GdR0oZNPRitt81skKO2f_+yg@mail.gmail.com>
- <20180201102519.000044c1@huawei.com> <1842104.0gXuQuQB9D@positron.chronox.de>
+From: Corentin Labbe <clabbe.montjoie@gmail.com>
+Subject: Re: [PATCH 1/2] sun4i_ss_prng: fix return value of
+ sun4i_ss_prng_generate
+Date: Wed, 7 Feb 2018 10:56:59 +0100
+Message-ID: <20180207095659.GA19249@Red>
+References: <20180206212022.1309-1-artem.savkov@gmail.com>
+ <20180206212022.1309-2-artem.savkov@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Cc: Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-        Gilad Ben-Yossef <gilad@benyossef.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        linuxarm@huawei.com
-To: =?UTF-8?Q?Stephan_M=c3=bcller?= <smueller@chronox.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from stargate.chelsio.com ([12.32.117.8]:38636 "EHLO
-        stargate.chelsio.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752829AbeBGIwn (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 7 Feb 2018 03:52:43 -0500
-In-Reply-To: <1842104.0gXuQuQB9D@positron.chronox.de>
-Content-Language: en-US
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org
+To: Artem Savkov <artem.savkov@gmail.com>, herbert@gondor.apana.org.au
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Disposition: inline
+In-Reply-To: <20180206212022.1309-2-artem.savkov@gmail.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+List-Id: linux-crypto.vger.kernel.org
 
+On Tue, Feb 06, 2018 at 10:20:21PM +0100, Artem Savkov wrote:
+> According to crypto/rng.h generate function should return 0 on success
+> and < 0 on error.
+> 
+> Fixes: b8ae5c7387ad ("crypto: sun4i-ss - support the Security System PRNG")
+> Signed-off-by: Artem Savkov <artem.savkov@gmail.com>
+> ---
+>  drivers/crypto/sunxi-ss/sun4i-ss-prng.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/crypto/sunxi-ss/sun4i-ss-prng.c b/drivers/crypto/sunxi-ss/sun4i-ss-prng.c
+> index 0d01d1624252..5754e0b92fb0 100644
+> --- a/drivers/crypto/sunxi-ss/sun4i-ss-prng.c
+> +++ b/drivers/crypto/sunxi-ss/sun4i-ss-prng.c
+> @@ -52,5 +52,5 @@ int sun4i_ss_prng_generate(struct crypto_rng *tfm, const u8 *src,
+>  
+>  	writel(0, ss->base + SS_CTL);
+>  	spin_unlock(&ss->slock);
+> -	return dlen;
+> +	return 0;
+>  }
+> -- 
+> 2.15.1
+> 
 
+According to Documentation/crypto/api-samples.rst ("Code Example For Random Number Generator Usage")
+you must return the length of data generated.
 
-On 07-02-2018 13:12, Stephan Müller wrote:
-> Hi Herbert,
->
-> Herbert, the patch 1 is meant for stable. However, this patch as is
-> only applies to the new AF_ALG interface implementation. Though,
-> the issue goes back to the first implementation of AIO support.
-> Shall I try prepare a patch for the old AF_ALG implementation
-> as well?
->
-> Changes from v1:
->
-> * integrate the inline IV and locking patch into one patch set
->
-> * reverse the order of lock context IV patch and inline IV patch --
->   the reason is to allow the first patch to be back-ported to stable
->
-> * mark the first patch (locking of the context IV) as applicable to
->   stable as there is an existing inconsistency which was demonstrated
->   by Harsh with the Chelsio driver vs the AES-NI driver
->
-> * modify the inline IV patch to have proper unlocking of the mutex
->   in case of errors
->
-> * prevent locking if no IV is defined by cipher
->
-> * add a patch to allow crypto drivers to report whether they support
->   serialization -- in this case the locking in AF_ALG shall be
->   disabled
->
-> * add a patch to inform the crypto drivers that their serialization
->   support should actually be enabled and used because AF_ALG does not
->   serialize the interdependent parallel AIO requests
->
-> * streamline the code in patch 1 and 2 slightly
->
-> I would like to ask the folks with real AIO hardware (Harsh, Jonathan)
-> to test the patches. Especially, is the locking patch should be tested
-> by Harsh as you have seen the issue with your hardware.
-Sure I will test the patch and let you know.
->
-> Thanks.
->
-> Stephan Mueller (4):
->   crypto: AF_ALG AIO - lock context IV
->   crypto: AF_ALG - inline IV support
->   crypto: AF_ALG - allow driver to serialize IV access
->   crypto: add CRYPTO_TFM_REQ_PARALLEL flag
->
->  crypto/af_alg.c             | 119 +++++++++++++++++++++++++++++++++++++++++++-
->  crypto/algif_aead.c         |  86 +++++++++++++++++---------------
->  crypto/algif_skcipher.c     |  38 ++++++++++----
->  include/crypto/if_alg.h     |  37 ++++++++++++++
->  include/linux/crypto.h      |  16 ++++++
->  include/uapi/linux/if_alg.h |   6 ++-
->  6 files changed, 249 insertions(+), 53 deletions(-)
->
+So crypto_rng_generate/crypto_rng_get_bytes documentation in crypto/rng.h must be fixed.
+
+Herbert could you confirm ?
+
+Regards
