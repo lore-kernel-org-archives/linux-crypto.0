@@ -1,92 +1,58 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH v2 4/4] crypto: add CRYPTO_TFM_REQ_PARALLEL flag
-Date: Wed, 07 Feb 2018 13:48:32 +0100
-Message-ID: <3051095.6v3pDGNVZ5@tauon.chronox.de>
-References: <2118226.LQArbCsRu5@tauon.chronox.de> <1842104.0gXuQuQB9D@positron.chronox.de> <3375426.msL1YKqpVq@positron.chronox.de>
+From: Fabien Dessenne <fabien.dessenne@st.com>
+Subject: [PATCH 2/2] crypto: stm32/cryp - add stm32mp1 support
+Date: Wed, 7 Feb 2018 14:08:55 +0100
+Message-ID: <1518008935-30428-3-git-send-email-fabien.dessenne@st.com>
+References: <1518008935-30428-1-git-send-email-fabien.dessenne@st.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: 8BIT
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-        Gilad Ben-Yossef <gilad@benyossef.com>,
-        Harsh Jain <harsh@chelsio.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        linuxarm@huawei.com
-To: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:59386 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753763AbeBGMsi (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 7 Feb 2018 07:48:38 -0500
-In-Reply-To: <3375426.msL1YKqpVq@positron.chronox.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Lionel Debieve <lionel.debieve@st.com>,
+ Benjamin Gaignard <benjamin.gaignard@st.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>, "David S . Miller"
+ <davem@davemloft.net>, Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ "Alexandre Torgue" <alexandre.torgue@st.com>, Corentin LABBE
+ <clabbe.montjoie@gmail.com>,
+ <linux-crypto@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+ <linux-kernel@vger.kernel.org>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <1518008935-30428-1-git-send-email-fabien.dessenne@st.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+List-Id: linux-crypto.vger.kernel.org
 
-Am Mittwoch, 7. Februar 2018, 08:44:04 CET schrieb Stephan Müller:
+stm32mp1 differs from stm32f7 in the way it handles byte ordering and
+padding for aes gcm & ccm algo.
 
-Hi,
+Signed-off-by: Fabien Dessenne <fabien.dessenne@st.com>
+---
+ drivers/crypto/stm32/stm32-cryp.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-
-> diff --git a/crypto/algif_aead.c b/crypto/algif_aead.c
-> index 3970ad7f6fd0..da010405eea0 100644
-> --- a/crypto/algif_aead.c
-> +++ b/crypto/algif_aead.c
-> @@ -66,13 +66,22 @@ static int aead_sendmsg(struct socket *sock, struct
-> msghdr *msg, size_t size) {
->  	struct sock *sk = sock->sk;
->  	struct alg_sock *ask = alg_sk(sk);
-> +	struct af_alg_ctx *ctx = ask->private;
->  	struct sock *psk = ask->parent;
->  	struct alg_sock *pask = alg_sk(psk);
->  	struct aead_tfm *aeadc = pask->private;
-> -	struct crypto_aead *tfm = aeadc->aead;
-> -	unsigned int ivsize = crypto_aead_ivsize(tfm);
-> +	struct crypto_aead *aead = aeadc->aead;
-> +	struct crypto_tfm *tfm = crypto_aead_tfm(aead);
-> +	unsigned int ivsize = crypto_aead_ivsize(aead);
-> +	int ret = af_alg_sendmsg(sock, msg, size, ivsize);
-> +
-> +	if (ret < 0)
-> +		return ret;
-> 
-> -	return af_alg_sendmsg(sock, msg, size, ivsize);
-> +	if (ctx->iiv == ALG_IIV_USE)
-
-This should be ALG_IIV_DISABLE of course.
-
-> +		tfm->crt_flags |= CRYPTO_TFM_REQ_PARALLEL;
-> +
-> +	return ret;
->  }
-> 
->  static int crypto_aead_copy_sgl(struct crypto_skcipher *null_tfm,
-> diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
-> index aee602a3ec24..225546666cf7 100644
-> --- a/crypto/algif_skcipher.c
-> +++ b/crypto/algif_skcipher.c
-> @@ -43,12 +43,21 @@ static int skcipher_sendmsg(struct socket *sock, struct
-> msghdr *msg, {
->  	struct sock *sk = sock->sk;
->  	struct alg_sock *ask = alg_sk(sk);
-> +	struct af_alg_ctx *ctx = ask->private;
->  	struct sock *psk = ask->parent;
->  	struct alg_sock *pask = alg_sk(psk);
-> -	struct crypto_skcipher *tfm = pask->private;
-> -	unsigned ivsize = crypto_skcipher_ivsize(tfm);
-> +	struct crypto_skcipher *skc = pask->private;
-> +	struct crypto_tfm *tfm = crypto_skcipher_tfm(skc);
-> +	unsigned int ivsize = crypto_skcipher_ivsize(skc);
-> +	int ret = af_alg_sendmsg(sock, msg, size, ivsize);
-> +
-> +	if (ret < 0)
-> +		return ret;
-> 
-> -	return af_alg_sendmsg(sock, msg, size, ivsize);
-> +	if (ctx->iiv == ALG_IIV_USE)
-
-Dto.
-
-I will wait for some more comments before sending a new patch.
-
-Ciao
-Stephan
+diff --git a/drivers/crypto/stm32/stm32-cryp.c b/drivers/crypto/stm32/stm32-cryp.c
+index 6a1fe98..c5d3efc 100644
+--- a/drivers/crypto/stm32/stm32-cryp.c
++++ b/drivers/crypto/stm32/stm32-cryp.c
+@@ -1906,8 +1906,14 @@ static const struct stm32_cryp_caps f7_data = {
+ 	.padding_wa = true,
+ };
+ 
++static const struct stm32_cryp_caps mp1_data = {
++	.swap_final = false,
++	.padding_wa = false,
++};
++
+ static const struct of_device_id stm32_dt_ids[] = {
+ 	{ .compatible = "st,stm32f756-cryp", .data = &f7_data},
++	{ .compatible = "st,stm32mp1-cryp", .data = &mp1_data},
+ 	{},
+ };
+ MODULE_DEVICE_TABLE(of, stm32_dt_ids);
+-- 
+2.7.4
