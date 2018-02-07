@@ -1,102 +1,92 @@
 From: Eric Biggers <ebiggers3@gmail.com>
-Subject: [PATCH 5/9] X.509: fix NULL dereference when restricting key with unsupported_sig
-Date: Tue,  6 Feb 2018 17:10:08 -0800
-Message-ID: <20180207011012.5928-6-ebiggers3@gmail.com>
+Subject: [PATCH 7/9] X.509: remove never-set ->unsupported_key flag
+Date: Tue,  6 Feb 2018 17:10:10 -0800
+Message-ID: <20180207011012.5928-8-ebiggers3@gmail.com>
 References: <20180207011012.5928-1-ebiggers3@gmail.com>
 Cc: linux-crypto@vger.kernel.org,
         Michael Halcrow <mhalcrow@google.com>,
-        Eric Biggers <ebiggers@google.com>, stable@vger.kernel.org
+        Eric Biggers <ebiggers@google.com>
 To: David Howells <dhowells@redhat.com>, keyrings@vger.kernel.org
-Return-path: <stable-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-io0-f193.google.com ([209.85.223.193]:34586 "EHLO
+        mail-io0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932311AbeBGBQK (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 6 Feb 2018 20:16:10 -0500
 In-Reply-To: <20180207011012.5928-1-ebiggers3@gmail.com>
-Sender: stable-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
 From: Eric Biggers <ebiggers@google.com>
 
-The asymmetric key type allows an X.509 certificate to be added even if
-its signature's hash algorithm is not available in the crypto API.  In
-that case 'payload.data[asym_auth]' will be NULL.  But the key
-restriction code failed to check for this case before trying to use the
-signature, resulting in a NULL pointer dereference in
-key_or_keyring_common() or in restrict_link_by_signature().
+The X.509 parser is guaranteed to set cert->pub->pkey_algo, since
+x509_extract_key_data() is a mandatory action in the X.509 ASN.1
+grammar, and it returns an error code if an unrecognized
+AlgorithmIdentifier is given rather than leaving the algorithm as NULL.
 
-Fix this by returning -ENOPKG when the signature is unsupported.
+Therefore, remove the dead code which handled this algorithm being NULL.
+This results in the ->unsupported_key flag never being set at all, so
+remove that too.
 
-Reproducer when all the CONFIG_CRYPTO_SHA512* options are disabled and
-keyctl has support for the 'restrict_keyring' command:
-
-    keyctl new_session
-    keyctl restrict_keyring @s asymmetric builtin_trusted
-    openssl req -new -sha512 -x509 -batch -nodes -outform der \
-        | keyctl padd asymmetric desc @s
-
-Fixes: a511e1af8b12 ("KEYS: Move the point of trust determination to __key_link()")
-Cc: <stable@vger.kernel.org> # v4.7+
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- crypto/asymmetric_keys/restrict.c | 21 +++++++++++++--------
- 1 file changed, 13 insertions(+), 8 deletions(-)
+ crypto/asymmetric_keys/pkcs7_verify.c    | 3 ---
+ crypto/asymmetric_keys/x509_parser.h     | 1 -
+ crypto/asymmetric_keys/x509_public_key.c | 9 ---------
+ 3 files changed, 13 deletions(-)
 
-diff --git a/crypto/asymmetric_keys/restrict.c b/crypto/asymmetric_keys/restrict.c
-index 86fb68508952..7c93c7728454 100644
---- a/crypto/asymmetric_keys/restrict.c
-+++ b/crypto/asymmetric_keys/restrict.c
-@@ -67,8 +67,9 @@ __setup("ca_keys=", ca_keys_setup);
-  *
-  * Returns 0 if the new certificate was accepted, -ENOKEY if we couldn't find a
-  * matching parent certificate in the trusted list, -EKEYREJECTED if the
-- * signature check fails or the key is blacklisted and some other error if
-- * there is a matching certificate but the signature check cannot be performed.
-+ * signature check fails or the key is blacklisted, -ENOPKG if the signature
-+ * uses unsupported crypto, or some other error if there is a matching
-+ * certificate but the signature check cannot be performed.
-  */
- int restrict_link_by_signature(struct key *dest_keyring,
- 			       const struct key_type *type,
-@@ -88,6 +89,8 @@ int restrict_link_by_signature(struct key *dest_keyring,
- 		return -EOPNOTSUPP;
+diff --git a/crypto/asymmetric_keys/pkcs7_verify.c b/crypto/asymmetric_keys/pkcs7_verify.c
+index a9e03f5c52e7..beb47fd2fca5 100644
+--- a/crypto/asymmetric_keys/pkcs7_verify.c
++++ b/crypto/asymmetric_keys/pkcs7_verify.c
+@@ -196,9 +196,6 @@ static int pkcs7_verify_sig_chain(struct pkcs7_message *pkcs7,
+ 			return 0;
+ 		}
  
- 	sig = payload->data[asym_auth];
-+	if (!sig)
-+		return -ENOPKG;
- 	if (!sig->auth_ids[0] && !sig->auth_ids[1])
- 		return -ENOKEY;
+-		if (x509->unsupported_key)
+-			goto unsupported_crypto_in_x509;
+-
+ 		pr_debug("- issuer %s\n", x509->issuer);
+ 		sig = x509->sig;
+ 		if (sig->auth_ids[0])
+diff --git a/crypto/asymmetric_keys/x509_parser.h b/crypto/asymmetric_keys/x509_parser.h
+index e373e7483812..217341276ae0 100644
+--- a/crypto/asymmetric_keys/x509_parser.h
++++ b/crypto/asymmetric_keys/x509_parser.h
+@@ -40,7 +40,6 @@ struct x509_certificate {
+ 	bool		seen;			/* Infinite recursion prevention */
+ 	bool		verified;
+ 	bool		self_signed;		/* T if self-signed (check unsupported_sig too) */
+-	bool		unsupported_key;	/* T if key uses unsupported crypto */
+ 	bool		unsupported_sig;	/* T if signature uses unsupported crypto */
+ 	bool		blacklisted;
+ };
+diff --git a/crypto/asymmetric_keys/x509_public_key.c b/crypto/asymmetric_keys/x509_public_key.c
+index 9338b4558cdc..514007932ec9 100644
+--- a/crypto/asymmetric_keys/x509_public_key.c
++++ b/crypto/asymmetric_keys/x509_public_key.c
+@@ -34,9 +34,6 @@ int x509_get_sig_params(struct x509_certificate *cert)
  
-@@ -139,6 +142,8 @@ static int key_or_keyring_common(struct key *dest_keyring,
- 		return -EOPNOTSUPP;
+ 	pr_devel("==>%s()\n", __func__);
  
- 	sig = payload->data[asym_auth];
-+	if (!sig)
-+		return -ENOPKG;
- 	if (!sig->auth_ids[0] && !sig->auth_ids[1])
- 		return -ENOKEY;
+-	if (!cert->pub->pkey_algo)
+-		cert->unsupported_key = true;
+-
+ 	if (!sig->pkey_algo)
+ 		cert->unsupported_sig = true;
  
-@@ -222,9 +227,9 @@ static int key_or_keyring_common(struct key *dest_keyring,
-  *
-  * Returns 0 if the new certificate was accepted, -ENOKEY if we
-  * couldn't find a matching parent certificate in the trusted list,
-- * -EKEYREJECTED if the signature check fails, and some other error if
-- * there is a matching certificate but the signature check cannot be
-- * performed.
-+ * -EKEYREJECTED if the signature check fails, -ENOPKG if the signature uses
-+ * unsupported crypto, or some other error if there is a matching certificate
-+ * but the signature check cannot be performed.
-  */
- int restrict_link_by_key_or_keyring(struct key *dest_keyring,
- 				    const struct key_type *type,
-@@ -249,9 +254,9 @@ int restrict_link_by_key_or_keyring(struct key *dest_keyring,
-  *
-  * Returns 0 if the new certificate was accepted, -ENOKEY if we
-  * couldn't find a matching parent certificate in the trusted list,
-- * -EKEYREJECTED if the signature check fails, and some other error if
-- * there is a matching certificate but the signature check cannot be
-- * performed.
-+ * -EKEYREJECTED if the signature check fails, -ENOPKG if the signature uses
-+ * unsupported crypto, or some other error if there is a matching certificate
-+ * but the signature check cannot be performed.
-  */
- int restrict_link_by_key_or_keyring_chain(struct key *dest_keyring,
- 					  const struct key_type *type,
+@@ -173,12 +170,6 @@ static int x509_key_preparse(struct key_preparsed_payload *prep)
+ 
+ 	pr_devel("Cert Issuer: %s\n", cert->issuer);
+ 	pr_devel("Cert Subject: %s\n", cert->subject);
+-
+-	if (cert->unsupported_key) {
+-		ret = -ENOPKG;
+-		goto error_free_cert;
+-	}
+-
+ 	pr_devel("Cert Key Algo: %s\n", cert->pub->pkey_algo);
+ 	pr_devel("Cert Valid period: %lld-%lld\n", cert->valid_from, cert->valid_to);
+ 
 -- 
 2.16.0.rc1.238.g530d649a79-goog
