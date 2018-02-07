@@ -1,79 +1,109 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH v2 4/4] crypto: add CRYPTO_TFM_REQ_PARALLEL flag
-Date: Wed, 07 Feb 2018 16:43:10 +0100
-Message-ID: <2396074.YQ3hgbV6mL@tauon.chronox.de>
-References: <2118226.LQArbCsRu5@tauon.chronox.de> <3051095.6v3pDGNVZ5@tauon.chronox.de> <20180207153911.00002ac6@huawei.com>
+From: Kamil Konieczny <k.konieczny@partner.samsung.com>
+Subject: [PATCH v3] crypto: s5p-sss.c: Fix kernel Oops in AES-ECB mode
+Date: Wed, 07 Feb 2018 16:52:09 +0100
+Message-ID: <77384548-9870-40b8-46fc-4bd62747efd6@partner.samsung.com>
+References: <CGME20180207155211eucas1p2d8d04871aaeb49efc30909d46e47e028@eucas1p2.samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: 8BIT
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        Gilad Ben-Yossef <gilad@benyossef.com>,
-        Harsh Jain <harsh@chelsio.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        linuxarm@huawei.com
-To: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:59416 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1754138AbeBGPnM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 7 Feb 2018 10:43:12 -0500
-In-Reply-To: <20180207153911.00002ac6@huawei.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: Krzysztof Kozlowski <krzk@kernel.org>,
+        Vladimir Zapolskiy <vz@mleia.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Anand Moon <linux.amoon@gmail.com>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        Marek Szyprowski <m.szyprowski@samsung.com>,
+        linux-crypto@vger.kernel.org, linux-samsung-soc@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-samsung-soc-owner@vger.kernel.org>
+Content-language: en-US
+Sender: linux-samsung-soc-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Am Mittwoch, 7. Februar 2018, 16:39:11 CET schrieb Jonathan Cameron:
+In AES-ECB mode crypt is done with key only, so any use of IV
+can cause kernel Oops. Use IV only in AES-CBC and AES-CTR.
 
-Hi Jonathan,
+Signed-off-by: Kamil Konieczny <k.konieczny@partner.samsung.com>
+Reported-by: Anand Moon <linux.amoon@gmail.com>
+Reviewed-by: Krzysztof Kozlowski <krzk@kernel.org>
+Tested-by: Anand Moon <linux.amoon@gmail.com>
+Cc: stable@vger.kernel.org # can be applied after commit 8f9702aad138
 
-> On Wed, 7 Feb 2018 13:48:32 +0100
-> 
-> Stephan Mueller <smueller@chronox.de> wrote:
-> > Am Mittwoch, 7. Februar 2018, 08:44:04 CET schrieb Stephan Müller:
-> > 
-> > Hi,
-> > 
-> > > diff --git a/crypto/algif_aead.c b/crypto/algif_aead.c
-> > > index 3970ad7f6fd0..da010405eea0 100644
-> > > --- a/crypto/algif_aead.c
-> > > +++ b/crypto/algif_aead.c
-> > > @@ -66,13 +66,22 @@ static int aead_sendmsg(struct socket *sock, struct
-> > > msghdr *msg, size_t size) {
-> > > 
-> > >  	struct sock *sk = sock->sk;
-> > >  	struct alg_sock *ask = alg_sk(sk);
-> > > 
-> > > +	struct af_alg_ctx *ctx = ask->private;
-> > > 
-> > >  	struct sock *psk = ask->parent;
-> > >  	struct alg_sock *pask = alg_sk(psk);
-> > >  	struct aead_tfm *aeadc = pask->private;
-> > > 
-> > > -	struct crypto_aead *tfm = aeadc->aead;
-> > > -	unsigned int ivsize = crypto_aead_ivsize(tfm);
-> > > +	struct crypto_aead *aead = aeadc->aead;
-> > > +	struct crypto_tfm *tfm = crypto_aead_tfm(aead);
-> > > +	unsigned int ivsize = crypto_aead_ivsize(aead);
-> > > +	int ret = af_alg_sendmsg(sock, msg, size, ivsize);
-> > > +
-> > > +	if (ret < 0)
-> > > +		return ret;
-> > > 
-> > > -	return af_alg_sendmsg(sock, msg, size, ivsize);
-> > > +	if (ctx->iiv == ALG_IIV_USE)
-> > 
-> > This should be ALG_IIV_DISABLE of course.
-> 
-> You say that, but my initial reading was that the core
-> was requesting that the driver do things in parallel
-> irrespective of whether the driver thought it was safe.
-> So I would think this was correct.
-> 
-> Definitely needs some documentation or a clearer name.
+---
+version 3:
+Change commit message: drop 'Fixes: 8f9702aad138' as the error was
+introduced earlier.
 
-How about:
+version 2:
+Change commit message.
 
-ALG_IV_SERIAL_PROCESSING (was ALG_IIV_DISABLE)
-ALG_IV_PARALLEL_PROCESSING (was ALG_IIV_USE)
+Tested on Odroid XU4/HC1, kernel 4.15 with following command:
 
-Ciao
-Stephan
+fallocate -l 128MiB /tmp/test.bin
+dd if=/dev/urandom of=/tmp/testkey.key bs=128 count=1
+sync
+cryptsetup luksFormat --debug -q -d /tmp/testkey.key \
+  --cipher aes-cbc-essiv:sha256 -h sha256 -s 128 /tmp/test.bin
+
+The original report by Anand Moon:
+https://www.spinics.net/lists/linux-crypto/msg31180.html
+
+Oops reproduced with cryptsetup 2.0.0, kernel 4.15,
+in .config in crypto API ECB support was turned off, and s5p-sss AES driver on.
+
+cryptsetup is using aes-ecb and has req->info in aes_ctx set to 0x10,
+which caused Oops:
+
+[ 2078.683779] Internal error: Oops: 17 [#1] PREEMPT SMP ARM
+[ 2078.689148] Modules linked in: algif_skcipher af_alg sd_mod sg
+evdev uas usb_storage scsi_mod gpio_keys fbtft(C) spidev spi_s3c64xx
+ipv6
+[ 2078.701377] CPU: 1 PID: 15 Comm: ksoftirqd/1 Tainted: G         C
+    4.15.0-rc9-xu4krck #1
+[ 2078.709861] Hardware name: SAMSUNG EXYNOS (Flattened Device Tree)
+[ 2078.715932] PC is at memcpy+0x80/0x330
+[ 2078.719652] LR is at s5p_tasklet_cb+0x19c/0x328
+
+
+ drivers/crypto/s5p-sss.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/crypto/s5p-sss.c b/drivers/crypto/s5p-sss.c
+index 142c6020cec7..5c0496d1ed41 100644
+--- a/drivers/crypto/s5p-sss.c
++++ b/drivers/crypto/s5p-sss.c
+@@ -1926,15 +1926,21 @@ static void s5p_aes_crypt_start(struct s5p_aes_dev *dev, unsigned long mode)
+ 	uint32_t aes_control;
+ 	unsigned long flags;
+ 	int err;
++	u8 *iv;
+ 
+ 	aes_control = SSS_AES_KEY_CHANGE_MODE;
+ 	if (mode & FLAGS_AES_DECRYPT)
+ 		aes_control |= SSS_AES_MODE_DECRYPT;
+ 
+-	if ((mode & FLAGS_AES_MODE_MASK) == FLAGS_AES_CBC)
++	if ((mode & FLAGS_AES_MODE_MASK) == FLAGS_AES_CBC) {
+ 		aes_control |= SSS_AES_CHAIN_MODE_CBC;
+-	else if ((mode & FLAGS_AES_MODE_MASK) == FLAGS_AES_CTR)
++		iv = req->info;
++	} else if ((mode & FLAGS_AES_MODE_MASK) == FLAGS_AES_CTR) {
+ 		aes_control |= SSS_AES_CHAIN_MODE_CTR;
++		iv = req->info;
++	} else {
++		iv = NULL; /* AES_ECB */
++	}
+ 
+ 	if (dev->ctx->keylen == AES_KEYSIZE_192)
+ 		aes_control |= SSS_AES_KEY_SIZE_192;
+@@ -1965,7 +1971,7 @@ static void s5p_aes_crypt_start(struct s5p_aes_dev *dev, unsigned long mode)
+ 		goto outdata_error;
+ 
+ 	SSS_AES_WRITE(dev, AES_CONTROL, aes_control);
+-	s5p_set_aes(dev, dev->ctx->aes_key, req->info, dev->ctx->keylen);
++	s5p_set_aes(dev, dev->ctx->aes_key, iv, dev->ctx->keylen);
+ 
+ 	s5p_set_dma_indata(dev,  dev->sg_src);
+ 	s5p_set_dma_outdata(dev, dev->sg_dst);
+-- 
+2.16.0
