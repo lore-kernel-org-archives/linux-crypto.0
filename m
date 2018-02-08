@@ -1,91 +1,95 @@
-From: Jeffrey Walton <noloader@gmail.com>
-Subject: Re: [PATCH 0/5] crypto: Speck support
-Date: Wed, 7 Feb 2018 20:47:05 -0500
-Message-ID: <CAH8yC8m4F9SWum9D5ZV2wzVAsJaDxnkc1L6eSeEOV-cOdkcg6Q@mail.gmail.com>
-References: <20180208001001.19180-1-ebiggers@google.com>
-Reply-To: noloader@gmail.com
+From: Atul Gupta <atul.gupta@chelsio.com>
+Subject: RE: [RFC crypto v3 8/9] chtls: Register the ULP
+Date: Thu, 8 Feb 2018 10:26:13 +0000
+Message-ID: <CY4PR1201MB0230DF6A9692BED46F6A469297F30@CY4PR1201MB0230.namprd12.prod.outlook.com>
+References: <20180125210850.GA69117@davejwatson-mba>
+ <CY4PR1201MB0230C0D2D0F24900A084574D97E60@CY4PR1201MB0230.namprd12.prod.outlook.com>
+ <CY4PR1201MB0230042A4D0EA83DC8F1BE7397E40@CY4PR1201MB0230.namprd12.prod.outlook.com>
+ <20180130171144.GA42146@davejwatson-mba>
+ <9e81c5b4-f319-8b33-5dec-dad19582bde4@chelsio.com>
+ <20180131164347.GA34501@davejwatson-mba>
+ <CY4PR1201MB0230A8289700B877C2CFA71097FB0@CY4PR1201MB0230.namprd12.prod.outlook.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-fscrypt@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Paul Crowley <paulcrowley@google.com>,
-        Patrik Torstensson <totte@google.com>,
-        Paul Lawrence <paullawrence@google.com>,
-        Michael Halcrow <mhalcrow@google.com>,
-        Alex Cope <alexcope@google.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Eric Biggers <ebiggers@google.com>
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Cc: "sd@queasysnail.net" <sd@queasysnail.net>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "ganeshgr@chelsio.co" <ganeshgr@chelsio.co>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        Boris Pismenny <borisp@mellanox.com>,
+        Ilya Lesokhin <ilyal@mellanox.com>
+To: Dave Watson <davejwatson@fb.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ot0-f194.google.com ([74.125.82.194]:46259 "EHLO
-        mail-ot0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750987AbeBHBrG (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 7 Feb 2018 20:47:06 -0500
-In-Reply-To: <20180208001001.19180-1-ebiggers@google.com>
+Received: from mail-bl2nam02on0136.outbound.protection.outlook.com ([104.47.38.136]:7713
+        "EHLO NAM02-BL2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1750806AbeBHK0Q (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 8 Feb 2018 05:26:16 -0500
+In-Reply-To: <CY4PR1201MB0230A8289700B877C2CFA71097FB0@CY4PR1201MB0230.namprd12.prod.outlook.com>
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Feb 7, 2018 at 7:09 PM, Eric Biggers <ebiggers@google.com> wrote:
-> Hello,
->
-> This series adds Speck support to the crypto API, including the Speck128
-> and Speck64 variants.  Speck is a lightweight block cipher that can be
-> much faster than AES on processors that don't have AES instructions.
->
-> We are planning to offer Speck-XTS (probably Speck128/256-XTS) as an
-> option for dm-crypt and fscrypt on Android, for low-end mobile devices
-> with older CPUs such as ARMv7 which don't have the Cryptography
-> Extensions.  Currently, such devices are unencrypted because AES is not
-> fast enough, even when the NEON bit-sliced implementation of AES is
-> used.  Other AES alternatives such as Blowfish, Twofish, Camellia,
-> Cast6, and Serpent aren't fast enough either; it seems that only a
-> modern ARX cipher can provide sufficient performance on these devices.
->
-> This is a replacement for our original proposal
-> (https://patchwork.kernel.org/patch/10101451/) which was to offer
-> ChaCha20 for these devices.  However, the use of a stream cipher for
-> disk/file encryption with no space to store nonces would have been much
-> more insecure than we thought initially, given that it would be used on
-> top of flash storage as well as potentially on top of F2FS, neither of
-> which is guaranteed to overwrite data in-place.
->
-> Speck has been somewhat controversial due to its origin.  Nevertheless,
-> it has a straightforward design (it's an ARX cipher), and it appears to
-> be the leading software-optimized lightweight block cipher currently,
-> with the most cryptanalysis.  It's also easy to implement without side
-> channels, unlike AES.  Moreover, we only intend Speck to be used when
-> the status quo is no encryption, due to AES not being fast enough.
->
-> We've also considered a novel length-preserving encryption mode based on
-> ChaCha20 and Poly1305.  While theoretically attractive, such a mode
-> would be a brand new crypto construction and would be more complicated
-> and difficult to implement efficiently in comparison to Speck-XTS.
->
-> Thus, patch 1 adds a generic implementation of Speck, and the following
-> patches add a 32-bit ARM NEON implementation of Speck-XTS.  The
-> NEON-accelerated implementation is much faster than the generic
-> implementation and therefore is the implementation that would primarily
-> be used in practice on the devices we are targeting.
->
-> There is no AArch64 implementation added, since such CPUs are likely to
-> have the Cryptography Extensions, allowing the use of AES.
+I thought about this and approach below can avoid new ulp type:
 
-+1 on SPECK.
+1. Register Inline TLS driver to net TLS=20
+2. enable ethtool -K <interface> tls-hw-record-offload on
+3. Issue " setsockopt(fd, SOL_TCP, TCP_ULP, "tls", sizeof("tls")) " after B=
+ind, this will enable user fetch net_device corresponding to ipaadr bound t=
+o interface, if dev found is the one registered and record-offload enabled,=
+ program the sk->sk_prot as required.
+4. fallback to SW TLS for any other case, bind to inaddr_any falls in this =
+category and need proper handling?
 
-Its a nice cipher that runs fast. It is nice because the security
-engineering and parameter selection is well specified, and you can
-push the margins as low as you like. It does not guess at security
-parameters like some of the other ciphers used in dm-crypt.
+tls-hw-record-offload is TLS record offload to HW, which does tx/rx and rec=
+ord creation Inline.
 
-On a modern Core-i5 6th gen I've seen numbers as low as ...
-SPECK-64/128 runs around 2.1 cpb, and SPECK-128/256 runs around 2.4
-cpb.
+enum {
+        TLS_BASE_TX,
+        TLS_SW_TX,
+        TLS_RECORD_HW, /* TLS record processed Inline */
+        TLS_NUM_CONFIG,
+};
 
-I've already done some work for a US contractor who wanted/needed
-SPECK for a possible NASA contract. NASA is looking at SPECK for some
-satellite comms.
+-----Original Message-----
+From: Dave Watson [mailto:davejwatson@fb.com]
+Sent: Wednesday, January 31, 2018 10:14 PM
+To: Atul Gupta <atul.gupta@chelsio.com>
+Cc: sd@queasysnail.net; herbert@gondor.apana.org.au; linux-crypto@vger.kern=
+el.org; ganeshgr@chelsio.co; netdev@vger.kernel.org; davem@davemloft.net; B=
+oris Pismenny <borisp@mellanox.com>; Ilya Lesokhin <ilyal@mellanox.com>
+Subject: Re: [RFC crypto v3 8/9] chtls: Register the ULP
 
-Jeff
+On 01/31/18 04:14 PM, Atul Gupta wrote:
+>=20
+>=20
+> On Tuesday 30 January 2018 10:41 PM, Dave Watson wrote:
+> > On 01/30/18 06:51 AM, Atul Gupta wrote:
+> >=20
+> > > What I was referring is that passing "tls" ulp type in setsockopt=20
+> > > may be insufficient to make the decision when multi HW assist=20
+> > > Inline TLS solution exists.
+> > Setting the ULP doesn't choose HW or SW implementation, I think that=20
+> > should be done later when setting up crypto with
+> >=20
+> > setsockopt(SOL_TLS, TLS_TX, struct crypto_info).
+> setsockpot [mentioned above] is quite late for driver to enable HW=20
+> implementation, we require something as early as tls_init=20
+> [setsockopt(sock, SOL_TCP, TCP_ULP, "tls", sizeof("tls"))], for driver=20
+> to set HW prot and offload connection beside Inline Tx/Rx.
+> >=20
+> > Any reason we can't use ethtool to choose HW vs SW implementation,=20
+> > if available on the device?
+> Thought about it,=A0 the interface index is not available to fetch=20
+> netdev and caps check to set HW prot eg. bind [prot.hash] --> tls_hash to=
+ program HW.
+
+Perhaps this is the part I don't follow - why do you need to override hash =
+and check for LISTEN?  I briefly looked through the patch named "CPL handle=
+r definition", this looks like it is a full TCP offload?
+
+Yes, this is connection and record layer offload, and the reason I used dif=
+ferent ulp type, need to see what additional info or check can help setup t=
+he required sk prot.
