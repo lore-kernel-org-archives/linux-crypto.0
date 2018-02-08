@@ -1,37 +1,96 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH v2 4/4] crypto: add CRYPTO_TFM_REQ_PARALLEL flag
-Date: Wed, 07 Feb 2018 17:25:19 +0100
-Message-ID: <3566380.RG3SDDhjom@tauon.chronox.de>
-References: <2118226.LQArbCsRu5@tauon.chronox.de> <2396074.YQ3hgbV6mL@tauon.chronox.de> <20180207161412.00007bbe@huawei.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        Gilad Ben-Yossef <gilad@benyossef.com>,
-        Harsh Jain <harsh@chelsio.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        linuxarm@huawei.com
-To: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+From: Eric Biggers <ebiggers@google.com>
+Subject: [PATCH 0/5] crypto: Speck support
+Date: Wed,  7 Feb 2018 16:09:56 -0800
+Message-ID: <20180208001001.19180-1-ebiggers@google.com>
+Cc: linux-fscrypt@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Paul Crowley <paulcrowley@google.com>,
+        Patrik Torstensson <totte@google.com>,
+        Paul Lawrence <paullawrence@google.com>,
+        Michael Halcrow <mhalcrow@google.com>,
+        Alex Cope <alexcope@google.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Eric Biggers <ebiggers@google.com>
+To: linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:59426 "EHLO mail.eperm.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1754138AbeBGQZV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 7 Feb 2018 11:25:21 -0500
-In-Reply-To: <20180207161412.00007bbe@huawei.com>
+Received: from mail-it0-f67.google.com ([209.85.214.67]:53020 "EHLO
+        mail-it0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750807AbeBHAK6 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 7 Feb 2018 19:10:58 -0500
+Received: by mail-it0-f67.google.com with SMTP id o13so4487875ito.2
+        for <linux-crypto@vger.kernel.org>; Wed, 07 Feb 2018 16:10:58 -0800 (PST)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Mittwoch, 7. Februar 2018, 17:14:12 CET schrieb Jonathan Cameron:
+Hello,
 
-Hi Jonathan,
+This series adds Speck support to the crypto API, including the Speck128
+and Speck64 variants.  Speck is a lightweight block cipher that can be
+much faster than AES on processors that don't have AES instructions.
 
-> Actually those were fine on the basis that inline iv is
-> obvious enough, it was CRYPTO_TFM_REQ_PARALLEL that
-> was causing me confusion.
-> 
-> Sorry, wasn't terribly clear on that!
+We are planning to offer Speck-XTS (probably Speck128/256-XTS) as an
+option for dm-crypt and fscrypt on Android, for low-end mobile devices
+with older CPUs such as ARMv7 which don't have the Cryptography
+Extensions.  Currently, such devices are unencrypted because AES is not
+fast enough, even when the NEON bit-sliced implementation of AES is
+used.  Other AES alternatives such as Blowfish, Twofish, Camellia,
+Cast6, and Serpent aren't fast enough either; it seems that only a
+modern ARX cipher can provide sufficient performance on these devices.
 
-Ok, I will add some comments around that new REQ flag.
+This is a replacement for our original proposal
+(https://patchwork.kernel.org/patch/10101451/) which was to offer
+ChaCha20 for these devices.  However, the use of a stream cipher for
+disk/file encryption with no space to store nonces would have been much
+more insecure than we thought initially, given that it would be used on
+top of flash storage as well as potentially on top of F2FS, neither of
+which is guaranteed to overwrite data in-place.
 
-Ciao
-Stephan
+Speck has been somewhat controversial due to its origin.  Nevertheless,
+it has a straightforward design (it's an ARX cipher), and it appears to
+be the leading software-optimized lightweight block cipher currently,
+with the most cryptanalysis.  It's also easy to implement without side
+channels, unlike AES.  Moreover, we only intend Speck to be used when
+the status quo is no encryption, due to AES not being fast enough.
+
+We've also considered a novel length-preserving encryption mode based on
+ChaCha20 and Poly1305.  While theoretically attractive, such a mode
+would be a brand new crypto construction and would be more complicated
+and difficult to implement efficiently in comparison to Speck-XTS.
+
+Thus, patch 1 adds a generic implementation of Speck, and the following
+patches add a 32-bit ARM NEON implementation of Speck-XTS.  The
+NEON-accelerated implementation is much faster than the generic
+implementation and therefore is the implementation that would primarily
+be used in practice on the devices we are targeting.
+
+There is no AArch64 implementation added, since such CPUs are likely to
+have the Cryptography Extensions, allowing the use of AES.
+
+Eric Biggers (5):
+  crypto: add support for the Speck block cipher
+  crypto: speck - export common helpers
+  crypto: arm/speck: add NEON-accelerated implementation of Speck-XTS
+  crypto: speck - add test vectors for Speck128-XTS
+  crypto: speck - add test vectors for Speck64-XTS
+
+ arch/arm/crypto/Kconfig           |    6 +
+ arch/arm/crypto/Makefile          |    2 +
+ arch/arm/crypto/speck-neon-core.S |  431 +++++++++++
+ arch/arm/crypto/speck-neon-glue.c |  290 ++++++++
+ crypto/Kconfig                    |   14 +
+ crypto/Makefile                   |    1 +
+ crypto/speck.c                    |  302 ++++++++
+ crypto/testmgr.c                  |   36 +
+ crypto/testmgr.h                  | 1478 +++++++++++++++++++++++++++++++++++++
+ include/crypto/speck.h            |   62 ++
+ 10 files changed, 2622 insertions(+)
+ create mode 100644 arch/arm/crypto/speck-neon-core.S
+ create mode 100644 arch/arm/crypto/speck-neon-glue.c
+ create mode 100644 crypto/speck.c
+ create mode 100644 include/crypto/speck.h
+
+-- 
+2.16.0.rc1.238.g530d649a79-goog
