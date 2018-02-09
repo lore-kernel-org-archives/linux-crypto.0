@@ -1,52 +1,37 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto/generic - sha3: deal with oversize stack frames
-Date: Fri, 9 Feb 2018 23:50:00 +0800
-Message-ID: <20180209155000.GC22273@gondor.apana.org.au>
-References: <20180127091832.24435-1-ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH 0/2] sun4i_ss_prng fixes
+Date: Fri, 9 Feb 2018 23:51:32 +0800
+Message-ID: <20180209155132.GD22273@gondor.apana.org.au>
+References: <20180206212022.1309-1-artem.savkov@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, arnd@arndb.de
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: Corentin Labbe <clabbe.montjoie@gmail.com>,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org
+To: Artem Savkov <artem.savkov@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:56818 "EHLO
+Received: from orcrist.hmeau.com ([104.223.48.154]:56828 "EHLO
         deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751031AbeBIPuH (ORCPT
+        with ESMTP id S1751004AbeBIPvi (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 9 Feb 2018 10:50:07 -0500
+        Fri, 9 Feb 2018 10:51:38 -0500
 Content-Disposition: inline
-In-Reply-To: <20180127091832.24435-1-ard.biesheuvel@linaro.org>
+In-Reply-To: <20180206212022.1309-1-artem.savkov@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sat, Jan 27, 2018 at 09:18:32AM +0000, Ard Biesheuvel wrote:
-> As reported by kbuild test robot, the optimized SHA3 C implementation
-> compiles to mn10300 code that uses a disproportionate amount of stack
-> space, i.e.,
+On Tue, Feb 06, 2018 at 10:20:20PM +0100, Artem Savkov wrote:
+> IPSec hasn't been working on my a10 board since 4.14 and it turned out to be
+> caused by sun4i_ss_rng driver.
 > 
->   crypto/sha3_generic.c: In function 'keccakf':
->   crypto/sha3_generic.c:147:1: warning: the frame size of 1232 bytes is larger than 1024 bytes [-Wframe-larger-than=]
+> Artem Savkov (2):
+>   sun4i_ss_prng: fix return value of sun4i_ss_prng_generate
+>   sun4i_ss_prng: convert lock to _bh in sun4i_ss_prng_generate
 > 
-> As kindly diagnosed by Arnd, this does not only occur when building for
-> the mn10300 architecture (which is what the report was about) but also
-> for h8300, and builds for other 32-bit architectures show an increase in
-> stack space utilization as well.
-> 
-> Given that SHA3 operates on 64-bit quantities, and keeps a state matrix
-> of 25 64-bit words, it is not surprising that 32-bit architectures with
-> few general purpose registers are impacted the most by this, and it is
-> therefore reasonable to implement a workaround that distinguishes between
-> 32-bit and 64-bit architectures.
-> 
-> Arnd figured out that taking the round calculation out of the loop, and
-> inlining it explicitly but only on 64-bit architectures preserves most
-> of the performance gain achieved by the rewrite, and also gets rid of
-> the excessive use of stack space.
-> 
-> Reported-by: kbuild test robot <fengguang.wu@intel.com>
-> Suggested-by: Arnd Bergmann <arnd@arndb.de>
-> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+>  drivers/crypto/sunxi-ss/sun4i-ss-prng.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
