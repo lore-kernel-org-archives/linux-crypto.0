@@ -1,7 +1,7 @@
 From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: [PATCH v3 3/4] crypto: AF_ALG - allow driver to serialize IV access
-Date: Fri, 09 Feb 2018 23:04:19 +0100
-Message-ID: <6275858.xaVr4mir3Q@positron.chronox.de>
+Subject: [PATCH v3 1/4] crypto: AF_ALG AIO - lock context IV
+Date: Fri, 09 Feb 2018 23:03:07 +0100
+Message-ID: <4507333.JelVKMRNjF@positron.chronox.de>
 References: <2118226.LQArbCsRu5@tauon.chronox.de> <1842104.0gXuQuQB9D@positron.chronox.de> <2808558.OTeCt0oKkL@positron.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -13,225 +13,302 @@ Cc: Jonathan Cameron <Jonathan.Cameron@huawei.com>,
         linuxarm@huawei.com
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mo4-p00-ob.smtp.rzone.de ([81.169.146.163]:27847 "EHLO
+Received: from mo4-p00-ob.smtp.rzone.de ([81.169.146.220]:22406 "EHLO
         mo4-p00-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753006AbeBIWOa (ORCPT
+        with ESMTP id S1753047AbeBIWOd (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 9 Feb 2018 17:14:30 -0500
+        Fri, 9 Feb 2018 17:14:33 -0500
 In-Reply-To: <2808558.OTeCt0oKkL@positron.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The mutex in AF_ALG to serialize access to the IV ensures full
-serialization of requests sent to the crypto driver.
+The kernel crypto API requires the caller to set an IV in the request data
+structure. That request data structure shall define one particular cipher
+operation. During the cipher operation, the IV is read by the cipher
+implementation and eventually the potentially updated IV (e.g. in case of
+CBC) is written back to the memory location the request data structure
+points to.
 
-However, the hardware may implement serialization to the IV such that
-preparation work without touching the IV can already happen while the IV
-is processed by another operation. This may speed up the AIO processing.
+AF_ALG allows setting the IV with a sendmsg request, where the IV is stored
+in the AF_ALG context that is unique to one particular AF_ALG socket. Note
+the analogy: an AF_ALG socket is like a TFM where one recvmsg operation
+uses one request with the TFM from the socket.
 
-The following ASCII art demonstrates this.
+AF_ALG these days supports AIO operations with multiple IOCBs. I.e. with
+one recvmsg call, multiple IOVECs can be specified. Each individual IOCB
+(derived from one IOVEC) implies that one request data structure is
+created with the data to be processed by the cipher implementation. The
+IV that was set with the sendmsg call is registered with the request data
+structure before the cipher operation.
 
-AF_ALG mutex handling implements the following logic:
+In case of an AIO operation, the cipher operation invocation returns
+immediately, queuing the request to the hardware. While the AIO request is
+processed by the hardware, recvmsg processes the next IOVEC for which
+another request is created. Again, the IV buffer from the AF_ALG socket
+context is registered with the new request and the cipher operation is
+invoked.
 
-[REQUEST 1 from userspace]   [REQUEST 2 from userspace]
-             |                            |
-     [AF_ALG/SOCKET]               [AF_ALG/SOCKET]
-             |                            |
-NOTHING BLOCKING (lock mutex)             |
-             |                     Queued on Mutex
- [BUILD / MAP HW DESCS]                   |
-             |                            |
-   [Place in HW Queue]                    |
-             |                            |
-         [Process]                        |
-             |                            |
-        [Interrupt]                       |
-             |                            |
- [Respond and update IV]                  |
-             |                            |
-        [unlock mutex]       Nothing Blocking (lock mutex)
-             |                            |
-    Don't care beyond here.       [BUILD / MAP HW DESCS]
-                                          |
-                                  [Place in HW Queue]
-                                          |
-                                      [Process]
-                                          |
-                                     [Interrupt]
-                                          |
-                                [Respond and update IV]
-                                          |
-                                Don't care beyond here.
+You may now see that there is a potential race condition regarding the IV
+handling, because there is *no* separate IV buffer for the different
+requests. This is nicely demonstrated with libkcapi using the following
+command which creates an AIO request with two IOCBs each encrypting one
+AES block in CBC mode:
 
-A crypto driver may implement the following serialization:
+kcapi  -d 2 -x 9  -e -c "cbc(aes)" -k
+8d7dd9b0170ce0b5f2f8e1aa768e01e91da8bfc67fd486d081b28254c99eb423 -i
+7fbc02ebf5b93322329df9bfccb635af -p 48981da18e4bb9ef7e2e3162d16b1910
 
-[REQUEST 1 from userspace]   [REQUEST 2 from userspace]
-             |                            |
-      [AF_ALG/SOCKET]              [AF_ALG/SOCKET]
-             |                            |
-  [BUILD / MAP HW DESCS]         [BUILD / MAP HW DESCS]
-             |                            |
-    NOTHING BLOCKING         IV in flight (enqueue sw queue)
-             |                            |
-   [Place in HW Queue]                    |
-             |                            |
-         [Process]                        |
-             |                            |
-        [Interrupt]                       |
-             |                            |
- [Respond and update IV]     Nothing Blocking (dequeue sw queue)
-             |                            |
-  Don't care beyond here.          [Place in HW Queue]
-                                          |
-                                      [Process]
-                                          |
-                                     [Interrupt]
-                                          |
-                                [Respond and update IV]
-                                          |
-                                Don't care beyond here.
+When the first AIO request finishes before the 2nd AIO request is
+processed, the returned value is:
 
-If the driver implements its own serialization (i.e. AF_ALG does not
-serialize the access to the IV), the crypto implementation must set the
-flag CRYPTO_ALG_SERIALIZES_IV_ACCESS.
+8b19050f66582cb7f7e4b6c873819b7108afa0eaa7de29bac7d903576b674c32
 
+I.e. two blocks where the IV output from the first request is the IV input
+to the 2nd block.
+
+In case the first AIO request is not completed before the 2nd request
+commences, the result is two identical AES blocks (i.e. both use the same
+IV):
+
+8b19050f66582cb7f7e4b6c873819b718b19050f66582cb7f7e4b6c873819b71
+
+This inconsistent result may even lead to the conclusion that there can be
+a memory corruption in the IV buffer if both AIO requests write to the IV
+buffer at the same time.
+
+As the AF_ALG interface is used by user space, a mutex provides the
+serialization which puts the caller to sleep in case a previous IOCB
+processing is not yet finished.
+
+If multiple IOCBs arrive that all are blocked, the mutex' FIFO operation
+of processing arriving requests ensures that the blocked IOCBs are
+unblocked in the right order.
+
+CC: <stable@vger.kernel.org> #4.14
+Fixes: e870456d8e7c8 ("crypto: algif_skcipher - overhaul memory management")
+Fixes: d887c52d6ae43 ("crypto: algif_aead - overhaul memory management")
 Signed-off-by: Stephan Mueller <smueller@chronox.de>
 ---
- crypto/af_alg.c         | 13 ++++++++-----
- crypto/algif_aead.c     |  1 +
- crypto/algif_skcipher.c |  1 +
- include/crypto/if_alg.h | 13 +++++++++++++
- include/linux/crypto.h  | 15 +++++++++++++++
- 5 files changed, 38 insertions(+), 5 deletions(-)
+ crypto/af_alg.c         | 31 +++++++++++++++++++++++++++++++
+ crypto/algif_aead.c     | 20 +++++++++++++-------
+ crypto/algif_skcipher.c | 12 +++++++++---
+ include/crypto/if_alg.h |  5 +++++
+ 4 files changed, 58 insertions(+), 10 deletions(-)
 
 diff --git a/crypto/af_alg.c b/crypto/af_alg.c
-index 7f80dcfc12a6..56b4da65025a 100644
+index 5231f421ad00..e7887621aa44 100644
 --- a/crypto/af_alg.c
 +++ b/crypto/af_alg.c
-@@ -1247,8 +1247,10 @@ int af_alg_get_iv(struct sock *sk, struct af_alg_async_req *areq)
- 		return 0;
+@@ -1051,6 +1051,8 @@ void af_alg_async_cb(struct crypto_async_request *_req, int err)
+ 	struct kiocb *iocb = areq->iocb;
+ 	unsigned int resultlen;
  
- 	/* No inline IV, use ctx IV buffer and lock it */
--	if (ctx->iiv == ALG_IV_SERIAL_PROCESSING)
--		return mutex_lock_interruptible(&ctx->ivlock);
-+	if (ctx->iiv == ALG_IV_SERIAL_PROCESSING) {
-+		return (ctx->lock_iv) ?
-+				mutex_lock_interruptible(&ctx->ivlock) : 0;
-+	}
++	af_alg_put_iv(sk);
++
+ 	/* Buffer size written by crypto operation. */
+ 	resultlen = areq->outlen;
  
- 	/* Inline IV handling: There must be the IV data present. */
- 	if (ctx->used < ctx->ivlen || list_empty(&ctx->tsgl_list))
-@@ -1280,12 +1282,13 @@ void af_alg_put_iv(struct sock *sk)
- 	struct alg_sock *ask = alg_sk(sk);
- 	struct af_alg_ctx *ctx = ask->private;
- 
--	/* To resemble af_alg_get_iv, do not merge the two branches. */
- 	if (!ctx->ivlen)
- 		return;
- 
--	if (ctx->iiv == ALG_IV_SERIAL_PROCESSING)
--		mutex_unlock(&ctx->ivlock);
-+	if (ctx->iiv == ALG_IV_SERIAL_PROCESSING) {
-+		if (ctx->lock_iv)
-+			mutex_unlock(&ctx->ivlock);
-+	}
+@@ -1175,6 +1177,35 @@ int af_alg_get_rsgl(struct sock *sk, struct msghdr *msg, int flags,
  }
- EXPORT_SYMBOL_GPL(af_alg_put_iv);
- 
-diff --git a/crypto/algif_aead.c b/crypto/algif_aead.c
-index 4c425effc5a5..619147792cc9 100644
---- a/crypto/algif_aead.c
-+++ b/crypto/algif_aead.c
-@@ -565,6 +565,7 @@ static int aead_accept_parent_nokey(void *private, struct sock *sk)
- 	ctx->more = 0;
- 	ctx->merge = 0;
- 	ctx->enc = 0;
-+	ctx->lock_iv = af_alg_lock_iv(crypto_aead_tfm(aead));
- 	ctx->iiv = ALG_IV_PROCESSING_UNDEF;
- 	ctx->aead_assoclen = 0;
- 	crypto_init_wait(&ctx->wait);
-diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
-index f2a671b6ddf3..cf27dda6a181 100644
---- a/crypto/algif_skcipher.c
-+++ b/crypto/algif_skcipher.c
-@@ -368,6 +368,7 @@ static int skcipher_accept_parent_nokey(void *private, struct sock *sk)
- 	ctx->more = 0;
- 	ctx->merge = 0;
- 	ctx->enc = 0;
-+	ctx->lock_iv = af_alg_lock_iv(crypto_skcipher_tfm(tfm));
- 	ctx->iiv = ALG_IV_PROCESSING_UNDEF;
- 	crypto_init_wait(&ctx->wait);
- 
-diff --git a/include/crypto/if_alg.h b/include/crypto/if_alg.h
-index ef114b72813a..4b48a48464c3 100644
---- a/include/crypto/if_alg.h
-+++ b/include/crypto/if_alg.h
-@@ -154,6 +154,7 @@ struct af_alg_async_req {
-  *			SG?
-  * @enc:		Cryptographic operation to be performed when
-  *			recvmsg is invoked.
-+ * @lock_iv:		Shall IV be locked?
-  * @iiv:		Use inline IV: first part of TX data is IV
-  * @len:		Length of memory allocated for this data structure.
-  */
-@@ -173,6 +174,7 @@ struct af_alg_ctx {
- 	bool more;
- 	bool merge;
- 	bool enc;
-+	bool lock_iv;
- 	int iiv;
- 
- 	unsigned int len;
-@@ -251,6 +253,17 @@ static inline bool af_alg_readable(struct sock *sk)
- 	return PAGE_SIZE <= af_alg_rcvbuf(sk);
- }
+ EXPORT_SYMBOL_GPL(af_alg_get_rsgl);
  
 +/**
-+ * Shall access to the ctx->iv be serialized using a mutex?
++ * af_alg_get_iv
 + *
-+ * @tfm TFM of to be used for cipher operation
-+ * @return true => lock, false => do not lock
++ * @sk [in] AF_ALG socket
++ * @return 0 on success, < 0 on error
 + */
-+static inline bool af_alg_lock_iv(struct crypto_tfm *tfm)
++int af_alg_get_iv(struct sock *sk)
 +{
-+	return !(crypto_tfm_alg_flags(tfm) & CRYPTO_ALG_SERIALIZES_IV_ACCESS);
-+}
++	struct alg_sock *ask = alg_sk(sk);
++	struct af_alg_ctx *ctx = ask->private;
 +
- int af_alg_alloc_tsgl(struct sock *sk);
- unsigned int af_alg_count_tsgl(struct sock *sk, size_t bytes, size_t offset);
- void af_alg_pull_tsgl(struct sock *sk, size_t used, struct scatterlist *dst,
-diff --git a/include/linux/crypto.h b/include/linux/crypto.h
-index 7e6e84cf6383..4860aa2c9be4 100644
---- a/include/linux/crypto.h
-+++ b/include/linux/crypto.h
-@@ -112,6 +112,16 @@
-  */
- #define CRYPTO_ALG_OPTIONAL_KEY		0x00004000
- 
-+/*
-+ * Set if the algorithm implementation provides its own serialization
-+ * of IV accesses. This prevents the AF_ALG interface to serialize
-+ * cipher requests. This flag allows the implementation to implement
-+ * a more streamlined IV serialization logic, such as only serializing
-+ * the submission of a request to hardware whereas the preparation steps
-+ * for sending data to hardware are not serialized.
++	return mutex_lock_interruptible(&ctx->ivlock);
++}
++EXPORT_SYMBOL_GPL(af_alg_get_iv);
++
++/**
++ * af_alg_put_iv - release lock on IV in case CTX IV is used
++ *
++ * @sk [in] AF_ALG socket
 + */
-+#define CRYPTO_ALG_SERIALIZES_IV_ACCESS	0x00008000
-+
- /*
-  * Transform masks and values (for crt_flags).
-  */
-@@ -674,6 +684,11 @@ static inline u32 crypto_tfm_alg_type(struct crypto_tfm *tfm)
- 	return tfm->__crt_alg->cra_flags & CRYPTO_ALG_TYPE_MASK;
- }
- 
-+static inline u32 crypto_tfm_alg_flags(struct crypto_tfm *tfm)
++void af_alg_put_iv(struct sock *sk)
 +{
-+	return tfm->__crt_alg->cra_flags;
-+}
++	struct alg_sock *ask = alg_sk(sk);
++	struct af_alg_ctx *ctx = ask->private;
 +
- static inline unsigned int crypto_tfm_alg_blocksize(struct crypto_tfm *tfm)
++	mutex_unlock(&ctx->ivlock);
++}
++EXPORT_SYMBOL_GPL(af_alg_put_iv);
++
+ static int __init af_alg_init(void)
  {
- 	return tfm->__crt_alg->cra_blocksize;
+ 	int err = proto_register(&alg_proto, 0);
+diff --git a/crypto/algif_aead.c b/crypto/algif_aead.c
+index 4b07edd5a9ff..402de50d4a58 100644
+--- a/crypto/algif_aead.c
++++ b/crypto/algif_aead.c
+@@ -159,10 +159,14 @@ static int _aead_recvmsg(struct socket *sock, struct msghdr *msg,
+ 	if (IS_ERR(areq))
+ 		return PTR_ERR(areq);
+ 
++	err = af_alg_get_iv(sk);
++	if (err)
++		goto free;
++
+ 	/* convert iovecs of output buffers into RX SGL */
+ 	err = af_alg_get_rsgl(sk, msg, flags, areq, outlen, &usedpages);
+ 	if (err)
+-		goto free;
++		goto unlock;
+ 
+ 	/*
+ 	 * Ensure output buffer is sufficiently large. If the caller provides
+@@ -176,7 +180,7 @@ static int _aead_recvmsg(struct socket *sock, struct msghdr *msg,
+ 
+ 		if (used < less) {
+ 			err = -EINVAL;
+-			goto free;
++			goto unlock;
+ 		}
+ 		used -= less;
+ 		outlen -= less;
+@@ -197,7 +201,7 @@ static int _aead_recvmsg(struct socket *sock, struct msghdr *msg,
+ 	}
+ 	if (processed && !tsgl_src) {
+ 		err = -EFAULT;
+-		goto free;
++		goto unlock;
+ 	}
+ 
+ 	/*
+@@ -230,7 +234,7 @@ static int _aead_recvmsg(struct socket *sock, struct msghdr *msg,
+ 		err = crypto_aead_copy_sgl(null_tfm, tsgl_src,
+ 					   areq->first_rsgl.sgl.sg, processed);
+ 		if (err)
+-			goto free;
++			goto unlock;
+ 		af_alg_pull_tsgl(sk, processed, NULL, 0);
+ 	} else {
+ 		/*
+@@ -248,7 +252,7 @@ static int _aead_recvmsg(struct socket *sock, struct msghdr *msg,
+ 		err = crypto_aead_copy_sgl(null_tfm, tsgl_src,
+ 					   areq->first_rsgl.sgl.sg, outlen);
+ 		if (err)
+-			goto free;
++			goto unlock;
+ 
+ 		/* Create TX SGL for tag and chain it to RX SGL. */
+ 		areq->tsgl_entries = af_alg_count_tsgl(sk, processed,
+@@ -260,7 +264,7 @@ static int _aead_recvmsg(struct socket *sock, struct msghdr *msg,
+ 					  GFP_KERNEL);
+ 		if (!areq->tsgl) {
+ 			err = -ENOMEM;
+-			goto free;
++			goto unlock;
+ 		}
+ 		sg_init_table(areq->tsgl, areq->tsgl_entries);
+ 
+@@ -316,7 +320,8 @@ static int _aead_recvmsg(struct socket *sock, struct msghdr *msg,
+ 				&ctx->wait);
+ 	}
+ 
+-
++unlock:
++	af_alg_put_iv(sk);
+ free:
+ 	af_alg_free_resources(areq);
+ 
+@@ -562,6 +567,7 @@ static int aead_accept_parent_nokey(void *private, struct sock *sk)
+ 		return -ENOMEM;
+ 	}
+ 	memset(ctx->iv, 0, ivlen);
++	mutex_init(&ctx->ivlock);
+ 
+ 	INIT_LIST_HEAD(&ctx->tsgl_list);
+ 	ctx->len = len;
+diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
+index c88e5e4cd6a6..b65b9a89d6bb 100644
+--- a/crypto/algif_skcipher.c
++++ b/crypto/algif_skcipher.c
+@@ -77,10 +77,14 @@ static int _skcipher_recvmsg(struct socket *sock, struct msghdr *msg,
+ 	if (IS_ERR(areq))
+ 		return PTR_ERR(areq);
+ 
++	err = af_alg_get_iv(sk);
++	if (err)
++		goto free;
++
+ 	/* convert iovecs of output buffers into RX SGL */
+ 	err = af_alg_get_rsgl(sk, msg, flags, areq, -1, &len);
+ 	if (err)
+-		goto free;
++		goto unlock;
+ 
+ 	/* Process only as much RX buffers for which we have TX data */
+ 	if (len > ctx->used)
+@@ -104,7 +108,7 @@ static int _skcipher_recvmsg(struct socket *sock, struct msghdr *msg,
+ 				  GFP_KERNEL);
+ 	if (!areq->tsgl) {
+ 		err = -ENOMEM;
+-		goto free;
++		goto unlock;
+ 	}
+ 	sg_init_table(areq->tsgl, areq->tsgl_entries);
+ 	af_alg_pull_tsgl(sk, len, areq->tsgl, 0);
+@@ -146,7 +150,8 @@ static int _skcipher_recvmsg(struct socket *sock, struct msghdr *msg,
+ 						 &ctx->wait);
+ 	}
+ 
+-
++unlock:
++	af_alg_put_iv(sk);
+ free:
+ 	af_alg_free_resources(areq);
+ 
+@@ -353,6 +358,7 @@ static int skcipher_accept_parent_nokey(void *private, struct sock *sk)
+ 	}
+ 
+ 	memset(ctx->iv, 0, crypto_skcipher_ivsize(tfm));
++	mutex_init(&ctx->ivlock);
+ 
+ 	INIT_LIST_HEAD(&ctx->tsgl_list);
+ 	ctx->len = len;
+diff --git a/include/crypto/if_alg.h b/include/crypto/if_alg.h
+index f38227a78eae..c48eff27e5a9 100644
+--- a/include/crypto/if_alg.h
++++ b/include/crypto/if_alg.h
+@@ -19,6 +19,7 @@
+ #include <linux/scatterlist.h>
+ #include <linux/types.h>
+ #include <linux/atomic.h>
++#include <linux/mutex.h>
+ #include <net/sock.h>
+ 
+ #include <crypto/aead.h>
+@@ -127,6 +128,7 @@ struct af_alg_async_req {
+  *
+  * @tsgl_list:		Link to TX SGL
+  * @iv:			IV for cipher operation
++ * @ivlock:		Mutex to serialize access to the IV
+  * @aead_assoclen:	Length of AAD for AEAD cipher operations
+  * @completion:		Work queue for synchronous operation
+  * @used:		TX bytes sent to kernel. This variable is used to
+@@ -146,6 +148,7 @@ struct af_alg_ctx {
+ 	struct list_head tsgl_list;
+ 
+ 	void *iv;
++	struct mutex ivlock;
+ 	size_t aead_assoclen;
+ 
+ 	struct crypto_wait wait;
+@@ -252,5 +255,7 @@ struct af_alg_async_req *af_alg_alloc_areq(struct sock *sk,
+ int af_alg_get_rsgl(struct sock *sk, struct msghdr *msg, int flags,
+ 		    struct af_alg_async_req *areq, size_t maxsize,
+ 		    size_t *outlen);
++int af_alg_get_iv(struct sock *sk);
++void af_alg_put_iv(struct sock *sk);
+ 
+ #endif	/* _CRYPTO_IF_ALG_H */
 -- 
 2.14.3
