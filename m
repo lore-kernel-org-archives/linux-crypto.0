@@ -1,51 +1,54 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: sha512-mb - initialize pending lengths correctly
-Date: Fri, 9 Feb 2018 23:48:49 +0800
-Message-ID: <20180209154849.GA22273@gondor.apana.org.au>
-References: <001a113fae28e4fe39055f757ab5@google.com>
- <20180124083127.11239-1-ebiggers3@gmail.com>
+Subject: Re: [PATCH] crypto: talitos: fix Kernel Oops on hashing an empty file
+Date: Fri, 9 Feb 2018 23:49:20 +0800
+Message-ID: <20180209154920.GB22273@gondor.apana.org.au>
+References: <20180126160959.BEA466EFCA@localhost.localdomain>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org,
-        "David S . Miller" <davem@davemloft.net>,
-        Megha Dey <megha.dey@linux.intel.com>,
-        Fenghua Yu <fenghua.yu@intel.com>,
-        Tim Chen <tim.c.chen@linux.intel.com>,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-        Eric Biggers <ebiggers@google.com>, stable@vger.kernel.org
-To: Eric Biggers <ebiggers3@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org
+To: Christophe Leroy <christophe.leroy@c-s.fr>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20180124083127.11239-1-ebiggers3@gmail.com>
+In-Reply-To: <20180126160959.BEA466EFCA@localhost.localdomain>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Jan 24, 2018 at 12:31:27AM -0800, Eric Biggers wrote:
-> From: Eric Biggers <ebiggers@google.com>
+On Fri, Jan 26, 2018 at 05:09:59PM +0100, Christophe Leroy wrote:
+> Performing the hash of an empty file leads to a kernel Oops
 > 
-> The SHA-512 multibuffer code keeps track of the number of blocks pending
-> in each lane.  The minimum of these values is used to identify the next
-> lane that will be completed.  Unused lanes are set to a large number
-> (0xFFFFFFFF) so that they don't affect this calculation.
+> [   44.504600] Unable to handle kernel paging request for data at address 0x0000000c
+> [   44.512819] Faulting instruction address: 0xc02d2be8
+> [   44.524088] Oops: Kernel access of bad area, sig: 11 [#1]
+> [   44.529171] BE PREEMPT CMPC885
+> [   44.532232] CPU: 0 PID: 491 Comm: md5sum Not tainted 4.15.0-rc8-00211-g3a968610b6ea #81
+> [   44.540814] NIP:  c02d2be8 LR: c02d2984 CTR: 00000000
+> [   44.545812] REGS: c6813c90 TRAP: 0300   Not tainted  (4.15.0-rc8-00211-g3a968610b6ea)
+> [   44.554223] MSR:  00009032 <EE,ME,IR,DR,RI>  CR: 48222822  XER: 20000000
+> [   44.560855] DAR: 0000000c DSISR: c0000000
+> [   44.560855] GPR00: c02d28fc c6813d40 c6828000 c646fa40 00000001 00000001 00000001 00000000
+> [   44.560855] GPR08: 0000004c 00000000 c000bfcc 00000000 28222822 100280d4 00000000 10020008
+> [   44.560855] GPR16: 00000000 00000020 00000000 00000000 10024008 00000000 c646f9f0 c6179a10
+> [   44.560855] GPR24: 00000000 00000001 c62f0018 c6179a10 00000000 c6367a30 c62f0000 c646f9c0
+> [   44.598542] NIP [c02d2be8] ahash_process_req+0x448/0x700
+> [   44.603751] LR [c02d2984] ahash_process_req+0x1e4/0x700
+> [   44.608868] Call Trace:
+> [   44.611329] [c6813d40] [c02d28fc] ahash_process_req+0x15c/0x700 (unreliable)
+> [   44.618302] [c6813d90] [c02060c4] hash_recvmsg+0x11c/0x210
+> [   44.623716] [c6813db0] [c0331354] ___sys_recvmsg+0x98/0x138
+> [   44.629226] [c6813eb0] [c03332c0] __sys_recvmsg+0x40/0x84
+> [   44.634562] [c6813f10] [c03336c0] SyS_socketcall+0xb8/0x1d4
+> [   44.640073] [c6813f40] [c000d1ac] ret_from_syscall+0x0/0x38
+> [   44.645530] Instruction dump:
+> [   44.648465] 38c00001 7f63db78 4e800421 7c791b78 54690ffe 0f090000 80ff0190 2f870000
+> [   44.656122] 40befe50 2f990001 409e0210 813f01bc <8129000c> b39e003a 7d29c214 913e003c
 > 
-> However, it was forgotten to set the lengths to this value in the
-> initial state, where all lanes are unused.  As a result it was possible
-> for sha512_mb_mgr_get_comp_job_avx2() to select an unused lane, causing
-> a NULL pointer dereference.  Specifically this could happen in the case
-> where ->update() was passed fewer than SHA512_BLOCK_SIZE bytes of data,
-> so it then called sha_complete_job() without having actually submitted
-> any blocks to the multi-buffer code.  This hit a NULL pointer
-> dereference if another task happened to have submitted blocks
-> concurrently to the same CPU and the flush timer had not yet expired.
+> This patch fixes that Oops by checking if src is NULL.
 > 
-> Fix this by initializing sha512_mb_mgr->lens correctly.
-> 
-> As usual, this bug was found by syzkaller.
-> 
-> Fixes: 45691e2d9b18 ("crypto: sha512-mb - submit/flush routines for AVX2")
-> Reported-by: syzbot <syzkaller@googlegroups.com>
-> Cc: <stable@vger.kernel.org> # v4.8+
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> Fixes: 6a1e8d14156d4 ("crypto: talitos - making mapping helpers more generic")
+> Cc: <stable@vger.kernel.org>
+> Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
 
 Patch applied.  Thanks.
 -- 
