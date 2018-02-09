@@ -1,54 +1,50 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: talitos: fix Kernel Oops on hashing an empty file
-Date: Fri, 9 Feb 2018 23:49:20 +0800
-Message-ID: <20180209154920.GB22273@gondor.apana.org.au>
-References: <20180126160959.BEA466EFCA@localhost.localdomain>
+Subject: Re: [PATCH] crypto/generic - sha3: deal with oversize stack frames
+Date: Fri, 9 Feb 2018 23:50:00 +0800
+Message-ID: <20180209155000.GC22273@gondor.apana.org.au>
+References: <20180127091832.24435-1-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org
-To: Christophe Leroy <christophe.leroy@c-s.fr>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Cc: linux-crypto@vger.kernel.org, arnd@arndb.de
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:56818 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751031AbeBIPuH (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 9 Feb 2018 10:50:07 -0500
 Content-Disposition: inline
-In-Reply-To: <20180126160959.BEA466EFCA@localhost.localdomain>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <20180127091832.24435-1-ard.biesheuvel@linaro.org>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Jan 26, 2018 at 05:09:59PM +0100, Christophe Leroy wrote:
-> Performing the hash of an empty file leads to a kernel Oops
+On Sat, Jan 27, 2018 at 09:18:32AM +0000, Ard Biesheuvel wrote:
+> As reported by kbuild test robot, the optimized SHA3 C implementation
+> compiles to mn10300 code that uses a disproportionate amount of stack
+> space, i.e.,
 > 
-> [   44.504600] Unable to handle kernel paging request for data at address 0x0000000c
-> [   44.512819] Faulting instruction address: 0xc02d2be8
-> [   44.524088] Oops: Kernel access of bad area, sig: 11 [#1]
-> [   44.529171] BE PREEMPT CMPC885
-> [   44.532232] CPU: 0 PID: 491 Comm: md5sum Not tainted 4.15.0-rc8-00211-g3a968610b6ea #81
-> [   44.540814] NIP:  c02d2be8 LR: c02d2984 CTR: 00000000
-> [   44.545812] REGS: c6813c90 TRAP: 0300   Not tainted  (4.15.0-rc8-00211-g3a968610b6ea)
-> [   44.554223] MSR:  00009032 <EE,ME,IR,DR,RI>  CR: 48222822  XER: 20000000
-> [   44.560855] DAR: 0000000c DSISR: c0000000
-> [   44.560855] GPR00: c02d28fc c6813d40 c6828000 c646fa40 00000001 00000001 00000001 00000000
-> [   44.560855] GPR08: 0000004c 00000000 c000bfcc 00000000 28222822 100280d4 00000000 10020008
-> [   44.560855] GPR16: 00000000 00000020 00000000 00000000 10024008 00000000 c646f9f0 c6179a10
-> [   44.560855] GPR24: 00000000 00000001 c62f0018 c6179a10 00000000 c6367a30 c62f0000 c646f9c0
-> [   44.598542] NIP [c02d2be8] ahash_process_req+0x448/0x700
-> [   44.603751] LR [c02d2984] ahash_process_req+0x1e4/0x700
-> [   44.608868] Call Trace:
-> [   44.611329] [c6813d40] [c02d28fc] ahash_process_req+0x15c/0x700 (unreliable)
-> [   44.618302] [c6813d90] [c02060c4] hash_recvmsg+0x11c/0x210
-> [   44.623716] [c6813db0] [c0331354] ___sys_recvmsg+0x98/0x138
-> [   44.629226] [c6813eb0] [c03332c0] __sys_recvmsg+0x40/0x84
-> [   44.634562] [c6813f10] [c03336c0] SyS_socketcall+0xb8/0x1d4
-> [   44.640073] [c6813f40] [c000d1ac] ret_from_syscall+0x0/0x38
-> [   44.645530] Instruction dump:
-> [   44.648465] 38c00001 7f63db78 4e800421 7c791b78 54690ffe 0f090000 80ff0190 2f870000
-> [   44.656122] 40befe50 2f990001 409e0210 813f01bc <8129000c> b39e003a 7d29c214 913e003c
+>   crypto/sha3_generic.c: In function 'keccakf':
+>   crypto/sha3_generic.c:147:1: warning: the frame size of 1232 bytes is larger than 1024 bytes [-Wframe-larger-than=]
 > 
-> This patch fixes that Oops by checking if src is NULL.
+> As kindly diagnosed by Arnd, this does not only occur when building for
+> the mn10300 architecture (which is what the report was about) but also
+> for h8300, and builds for other 32-bit architectures show an increase in
+> stack space utilization as well.
 > 
-> Fixes: 6a1e8d14156d4 ("crypto: talitos - making mapping helpers more generic")
-> Cc: <stable@vger.kernel.org>
-> Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
+> Given that SHA3 operates on 64-bit quantities, and keeps a state matrix
+> of 25 64-bit words, it is not surprising that 32-bit architectures with
+> few general purpose registers are impacted the most by this, and it is
+> therefore reasonable to implement a workaround that distinguishes between
+> 32-bit and 64-bit architectures.
+> 
+> Arnd figured out that taking the round calculation out of the loop, and
+> inlining it explicitly but only on 64-bit architectures preserves most
+> of the performance gain achieved by the rewrite, and also gets rid of
+> the excessive use of stack space.
+> 
+> Reported-by: kbuild test robot <fengguang.wu@intel.com>
+> Suggested-by: Arnd Bergmann <arnd@arndb.de>
+> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
 Patch applied.  Thanks.
 -- 
