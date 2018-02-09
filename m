@@ -1,38 +1,118 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/2] sun4i_ss_prng fixes
-Date: Fri, 9 Feb 2018 23:51:32 +0800
-Message-ID: <20180209155132.GD22273@gondor.apana.org.au>
-References: <20180206212022.1309-1-artem.savkov@gmail.com>
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Subject: [PATCH v3 4/4] crypto: add CRYPTO_TFM_REQ_IV_SERIALIZE flag
+Date: Fri, 09 Feb 2018 23:04:52 +0100
+Message-ID: <3191772.GlMloJJ0Yf@positron.chronox.de>
+References: <2118226.LQArbCsRu5@tauon.chronox.de> <1842104.0gXuQuQB9D@positron.chronox.de> <2808558.OTeCt0oKkL@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Corentin Labbe <clabbe.montjoie@gmail.com>,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org
-To: Artem Savkov <artem.savkov@gmail.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+        Gilad Ben-Yossef <gilad@benyossef.com>,
+        Harsh Jain <harsh@chelsio.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        linuxarm@huawei.com
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:56828 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751004AbeBIPvi (ORCPT
+Received: from mo4-p00-ob.smtp.rzone.de ([81.169.146.220]:18704 "EHLO
+        mo4-p00-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753076AbeBIWIY (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 9 Feb 2018 10:51:38 -0500
-Content-Disposition: inline
-In-Reply-To: <20180206212022.1309-1-artem.savkov@gmail.com>
+        Fri, 9 Feb 2018 17:08:24 -0500
+In-Reply-To: <2808558.OTeCt0oKkL@positron.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Feb 06, 2018 at 10:20:20PM +0100, Artem Savkov wrote:
-> IPSec hasn't been working on my a10 board since 4.14 and it turned out to be
-> caused by sun4i_ss_rng driver.
-> 
-> Artem Savkov (2):
->   sun4i_ss_prng: fix return value of sun4i_ss_prng_generate
->   sun4i_ss_prng: convert lock to _bh in sun4i_ss_prng_generate
-> 
->  drivers/crypto/sunxi-ss/sun4i-ss-prng.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+Crypto drivers may implement a streamlined serialization support for AIO
+requests that is reported by the CRYPTO_ALG_SERIALIZES_IV_ACCESS flag to
+the crypto user. When the user decides that he wants to send multiple
+AIO requests concurrently and wants the crypto driver to handle the
+serialization, the caller has to set CRYPTO_TFM_REQ_IV_SERIALIZE to notify
+the crypto driver.
 
-All applied.  Thanks.
+Only when this flag is enabled, the crypto driver shall apply its
+serialization logic for handling IV updates between requests. If this
+flag is not provided, the serialization logic shall not be applied by
+the driver as the caller decides that it does not need it (because no
+parallel AIO requests are sent) or that it performs its own
+serialization.
+
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+---
+ crypto/algif_aead.c     | 15 ++++++++++++---
+ crypto/algif_skcipher.c | 15 ++++++++++++---
+ include/linux/crypto.h  |  1 +
+ 3 files changed, 25 insertions(+), 6 deletions(-)
+
+diff --git a/crypto/algif_aead.c b/crypto/algif_aead.c
+index 619147792cc9..5ec4dec6e6a1 100644
+--- a/crypto/algif_aead.c
++++ b/crypto/algif_aead.c
+@@ -66,13 +66,22 @@ static int aead_sendmsg(struct socket *sock, struct msghdr *msg, size_t size)
+ {
+ 	struct sock *sk = sock->sk;
+ 	struct alg_sock *ask = alg_sk(sk);
++	struct af_alg_ctx *ctx = ask->private;
+ 	struct sock *psk = ask->parent;
+ 	struct alg_sock *pask = alg_sk(psk);
+ 	struct aead_tfm *aeadc = pask->private;
+-	struct crypto_aead *tfm = aeadc->aead;
+-	unsigned int ivsize = crypto_aead_ivsize(tfm);
++	struct crypto_aead *aead = aeadc->aead;
++	struct crypto_tfm *tfm = crypto_aead_tfm(aead);
++	unsigned int ivsize = crypto_aead_ivsize(aead);
++	int ret = af_alg_sendmsg(sock, msg, size, ivsize);
++
++	if (ret < 0)
++		return ret;
+ 
+-	return af_alg_sendmsg(sock, msg, size, ivsize);
++	if (ctx->iiv == ALG_IV_SERIAL_PROCESSING)
++		tfm->crt_flags |= CRYPTO_TFM_REQ_IV_SERIALIZE;
++
++	return ret;
+ }
+ 
+ static int crypto_aead_copy_sgl(struct crypto_skcipher *null_tfm,
+diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
+index cf27dda6a181..fd2a0ba32feb 100644
+--- a/crypto/algif_skcipher.c
++++ b/crypto/algif_skcipher.c
+@@ -43,12 +43,21 @@ static int skcipher_sendmsg(struct socket *sock, struct msghdr *msg,
+ {
+ 	struct sock *sk = sock->sk;
+ 	struct alg_sock *ask = alg_sk(sk);
++	struct af_alg_ctx *ctx = ask->private;
+ 	struct sock *psk = ask->parent;
+ 	struct alg_sock *pask = alg_sk(psk);
+-	struct crypto_skcipher *tfm = pask->private;
+-	unsigned ivsize = crypto_skcipher_ivsize(tfm);
++	struct crypto_skcipher *skc = pask->private;
++	struct crypto_tfm *tfm = crypto_skcipher_tfm(skc);
++	unsigned int ivsize = crypto_skcipher_ivsize(skc);
++	int ret = af_alg_sendmsg(sock, msg, size, ivsize);
++
++	if (ret < 0)
++		return ret;
+ 
+-	return af_alg_sendmsg(sock, msg, size, ivsize);
++	if (ctx->iiv == ALG_IV_SERIAL_PROCESSING)
++		tfm->crt_flags |= CRYPTO_TFM_REQ_IV_SERIALIZE;
++
++	return ret;
+ }
+ 
+ static int _skcipher_recvmsg(struct socket *sock, struct msghdr *msg,
+diff --git a/include/linux/crypto.h b/include/linux/crypto.h
+index 4860aa2c9be4..4d54f2b30692 100644
+--- a/include/linux/crypto.h
++++ b/include/linux/crypto.h
+@@ -133,6 +133,7 @@
+ #define CRYPTO_TFM_REQ_WEAK_KEY		0x00000100
+ #define CRYPTO_TFM_REQ_MAY_SLEEP	0x00000200
+ #define CRYPTO_TFM_REQ_MAY_BACKLOG	0x00000400
++#define CRYPTO_TFM_REQ_IV_SERIALIZE	0x00000800
+ #define CRYPTO_TFM_RES_WEAK_KEY		0x00100000
+ #define CRYPTO_TFM_RES_BAD_KEY_LEN   	0x00200000
+ #define CRYPTO_TFM_RES_BAD_KEY_SCHED 	0x00400000
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.14.3
