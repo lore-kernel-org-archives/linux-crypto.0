@@ -1,137 +1,44 @@
-From: Eric Biggers <ebiggers@google.com>
-Subject: Re: [PATCH 0/5] crypto: Speck support
-Date: Mon, 12 Feb 2018 12:18:48 -0800
-Message-ID: <20180212201848.GG193902@google.com>
-References: <20180208001001.19180-1-ebiggers@google.com>
- <CAH8yC8m4F9SWum9D5ZV2wzVAsJaDxnkc1L6eSeEOV-cOdkcg6Q@mail.gmail.com>
- <20180208210107.GA6720@google.com>
- <CAH8yC8k2ZNffeb6oak0_xCUVS+kyO_9SiFmbTjY7SdseN2xULw@mail.gmail.com>
- <20180212191903.GD193902@google.com>
- <CAH8yC8numVB=XX2M9GhsH8-xOQpsxEE3i6JJLd_nfUd7v7hDFw@mail.gmail.com>
+From: Florian Fainelli <f.fainelli@gmail.com>
+Subject: Re: [PATCH] hwrng: bcm2835: Handle deferred clock properly
+Date: Mon, 12 Feb 2018 12:22:21 -0800
+Message-ID: <d3f5b375-d2e8-2e7c-526d-aa5d49751ed4@gmail.com>
+References: <1518466296-30161-1-git-send-email-stefan.wahren@i2se.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-fscrypt@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Paul Crowley <paulcrowley@google.com>,
-        Patrik Torstensson <totte@google.com>,
-        Paul Lawrence <paullawrence@google.com>,
-        Michael Halcrow <mhalcrow@google.com>,
-        Alex Cope <alexcope@google.com>,
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Cc: Arnd Bergmann <arnd@arndb.de>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Wingers, Louis R." <lrwinge@tycho.ncsc.mil>,
-        "Weeks, Bryan" <beweeks@tycho.ncsc.mil>
-To: Jeffrey Walton <noloader@gmail.com>
+        Eric Anholt <eric@anholt.net>, Ray Jui <rjui@broadcom.com>,
+        Scott Branden <sbranden@broadcom.com>,
+        Jon Mason <jonmason@broadcom.com>,
+        linux-arm-kernel@lists.infradead.org,
+        bcm-kernel-feedback-list@broadcom.com, linux-crypto@vger.kernel.org
+To: Stefan Wahren <stefan.wahren@i2se.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Matt Mackall <mpm@selenic.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-io0-f193.google.com ([209.85.223.193]:38739 "EHLO
-        mail-io0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753193AbeBLUSx (ORCPT
+Received: from mail-qk0-f195.google.com ([209.85.220.195]:38655 "EHLO
+        mail-qk0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751554AbeBLUWe (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 12 Feb 2018 15:18:53 -0500
-Received: by mail-io0-f193.google.com with SMTP id d13so18690233iog.5
-        for <linux-crypto@vger.kernel.org>; Mon, 12 Feb 2018 12:18:52 -0800 (PST)
-Content-Disposition: inline
-In-Reply-To: <CAH8yC8numVB=XX2M9GhsH8-xOQpsxEE3i6JJLd_nfUd7v7hDFw@mail.gmail.com>
+        Mon, 12 Feb 2018 15:22:34 -0500
+Received: by mail-qk0-f195.google.com with SMTP id s198so3783104qke.5
+        for <linux-crypto@vger.kernel.org>; Mon, 12 Feb 2018 12:22:33 -0800 (PST)
+In-Reply-To: <1518466296-30161-1-git-send-email-stefan.wahren@i2se.com>
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Jeff,
-
-On Mon, Feb 12, 2018 at 02:57:06PM -0500, Jeffrey Walton wrote:
-> On Mon, Feb 12, 2018 at 2:19 PM, Eric Biggers <ebiggers@google.com> wrote:
-> > Hi all,
-> >
-> > On Fri, Feb 09, 2018 at 07:07:01PM -0500, Jeffrey Walton wrote:
-> >> > Hi Jeffrey,
-> >> >
-> >> > I see you wrote the SPECK implementation in Crypto++, and you are treating the
-> >> > words as big endian.
-> >> >
-> >> > Do you have a reference for this being the "correct" order?  Unfortunately the
-> >> > authors of the cipher failed to mention the byte order in their paper.  And they
-> >> > gave the test vectors as words, so the test vectors don't clarify it either.
-> >> >
-> >> > I had assumed little endian words, but now I am having second thoughts...  And
-> >> > to confuse things further, it seems that some implementations (including the
-> >> > authors own implementation for the SUPERCOP benchmark toolkit [1]) even consider
-> >> > the words themselves in the order (y, x) rather than the more intuitive (x, y).
-> >> >
-> >> > [1] https://github.com/iadgov/simon-speck-supercop/blob/master/crypto_stream/speck128128ctr/ref/stream.c
-> >> >
-> >> > In fact, even the reference code from the paper treats pt[0] as y and pt[1] as
-> >> > x, where 'pt' is a u64 array -- although that being said, it's not shown how the
-> >> > actual bytes should be translated to/from those u64 arrays.
-> >> >
-> >> > I'd really like to avoid people having to add additional versions of SPECK later
-> >> > for the different byte and word orders...
-> >>
-> >> Hi Eric,
-> >>
-> >> Yeah, this was a point of confusion for us as well. After the sidebar
-> >> conversations I am wondering about the correctness of Crypto++
-> >> implementation.
-> >>
-> >
-> > We've received another response from one of the Speck creators (Louis Wingers)
-> > that (to summarize) the intended byte order is little endian, and the intended
-> > word order is (y, x), i.e. 'y' is at a lower memory address than 'x'.  Or
-> > equivalently: the test vectors given in the original paper need to be read as
-> > byte arrays from *right-to-left*.
-> >
-> > (y, x) is not the intuitive order, but it's not a huge deal.  The more important
-> > thing is that we don't end up with multiple implementations with different byte
-> > and/or word orders.
-> >
-> > So, barring any additional confusion, I'll send a revised version of this
-> > patchset that flips the word order.  Jeff would need to flip both the byte and
-> > word orders in his implementation in Crypto++ as well.
+On 02/12/2018 12:11 PM, Stefan Wahren wrote:
+> In case the probe of the clock is deferred, we would assume it is
+> optional. This is wrong, so defer the probe of this driver until
+> the clock is available.
 > 
-> Thanks Eric.
-> 
-> Yeah, the (y,x) explains a lot of the confusion, and explains the
-> modification I needed in my GitHub clone of the IAD Team's SUPERCOP to
-> arrive at test vector results. My clone is available at
-> https://github.com/noloader/simon-speck-supercop.
-> 
-> So let me ask you... Given the Speck-128(128) test vector from Appendix C:
-> 
->     Key: 0f0e0d0c0b0a0908 0706050403020100
->     Plaintext: 6c61766975716520 7469206564616d20
->     Ciphertext: a65d985179783265 7860fedf5c570d18
-> 
-> Will the Linux implementation arrive at the published result, or will
-> it arrive at a different result? I guess what I am asking, where is
-> the presentation detail going to be handled?
-> 
-> A related question is, will the kernel be parsing just the key as
-> (y,x), or will all parameters be handled as (y,x)? At this point I
-> believe it only needs to apply to the key but I did not investigate
-> the word swapping in detail because I was chasing the test vector.
-> 
+> Fixes: 791af4f4907a ("hwrng: bcm2835 - Manage an optional clock")
+> Signed-off-by: Stefan Wahren <stefan.wahren@i2se.com>
 
-The kernel implementation has to operate on byte arrays.  But the test vectors
-in the original paper are given as *words* in the order (x, y) and likewise for
-the key (i.e. the rightmost word shown becomes the first round key).  But based
-on the clarifications from the Speck team, the actual byte arrays that
-correspond to the Speck-128/128 test vector would be:
+Acked-by: Florian Fainelli <f.fainelli@gmail.com>
 
-const uint8_t key[16] = "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f";
-const uint8_t plaintext[16] = "\x20\x6d\x61\x64\x65\x20\x69\x74\x20\x65\x71\x75\x69\x76\x61\x6c";
-const uint8_t ciphertext[16] = "\x18\x0d\x57\x5c\xdf\xfe\x60\x78\x65\x32\x78\x79\x51\x98\x5d\xa6";
-
-So equivalently, if we consider the printed test vectors as just listing the
-bytes (ignoring the whitespace between the words), then they are backwards.
-That applies to all 3 parts (Key, Plaintext, and Ciphertext).
-
-Note that my patch 1/5 adds the Speck test vectors to testmgr.h so that they are
-hooked into the Linux kernel's crypto self-tests, so on appropriately-configured
-kernels it will be automatically verified that the implementation matches the
-test vectors.  The ones in the current version of the patchset have the "wrong"
-word order though, so I will need to send out a new version with the correct
-implementation and test vectors.
-
-Thanks,
-
-Eric
+Thanks Stephan!
+-- 
+Florian
