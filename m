@@ -1,61 +1,59 @@
-From: Atul Gupta <atul.gupta@chelsio.com>
-Subject: [Crypto v4 12/12] Makefile Kconfig
-Date: Mon, 12 Feb 2018 17:37:29 +0530
-Message-ID: <1518437249-14732-1-git-send-email-atul.gupta@chelsio.com>
-Cc: sd@queasysnail.net, linux-crypto@vger.kernel.org,
-        davem@davemloft.net, netdev@vger.kernel.org, ganeshgr@chelsio.com
-To: davejwatson@fb.com, herbert@gondor.apana.org.au
-Return-path: <netdev-owner@vger.kernel.org>
-Sender: netdev-owner@vger.kernel.org
+From: Jinbum Park <jinb.park7@gmail.com>
+Subject: [PATCH] crypto: arm/aes-cipher - move S-box to .rodata section
+Date: Mon, 12 Feb 2018 22:52:37 +0900
+Message-ID: <20180212135237.GA3011@pjb1027-Latitude-E5410>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
+        ard.biesheuvel@linaro.org
+To: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Entry for Inline TLS as another driver dependent on cxgb4 and chcr
+Move the AES inverse S-box to the .rodata section
+where it is safe from abuse by speculation.
 
-Signed-off-by: Atul Gupta <atul.gupta@chelsio.com>
+Signed-off-by: Jinbum Park <jinb.park7@gmail.com>
 ---
- drivers/crypto/chelsio/Kconfig        | 11 +++++++++++
- drivers/crypto/chelsio/Makefile       |  1 +
- drivers/crypto/chelsio/chtls/Makefile |  4 ++++
- 3 files changed, 16 insertions(+)
- create mode 100644 drivers/crypto/chelsio/chtls/Makefile
+ arch/arm/crypto/aes-cipher-core.S | 19 ++++++++++---------
+ 1 file changed, 10 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/crypto/chelsio/Kconfig b/drivers/crypto/chelsio/Kconfig
-index 5ae9f87..930d82d 100644
---- a/drivers/crypto/chelsio/Kconfig
-+++ b/drivers/crypto/chelsio/Kconfig
-@@ -29,3 +29,14 @@ config CHELSIO_IPSEC_INLINE
-         default n
-         ---help---
-           Enable support for IPSec Tx Inline.
+diff --git a/arch/arm/crypto/aes-cipher-core.S b/arch/arm/crypto/aes-cipher-core.S
+index 54b3840..184d6c2 100644
+--- a/arch/arm/crypto/aes-cipher-core.S
++++ b/arch/arm/crypto/aes-cipher-core.S
+@@ -174,6 +174,16 @@
+ 	.ltorg
+ 	.endm
+ 
++ENTRY(__aes_arm_encrypt)
++	do_crypt	fround, crypto_ft_tab, crypto_ft_tab + 1, 2
++ENDPROC(__aes_arm_encrypt)
 +
-+config CRYPTO_DEV_CHELSIO_TLS
-+        tristate "Chelsio Crypto Inline TLS Driver"
-+        depends on CHELSIO_T4
-+        depends on TLS
-+        select CRYPTO_DEV_CHELSIO
-+        ---help---
-+          Support Chelsio Inline TLS with Chelsio crypto accelerator.
++	.align		5
++ENTRY(__aes_arm_decrypt)
++	do_crypt	iround, crypto_it_tab, __aes_arm_inverse_sbox, 0
++ENDPROC(__aes_arm_decrypt)
 +
-+          To compile this driver as a module, choose M here: the module
-+          will be called chtls.
-diff --git a/drivers/crypto/chelsio/Makefile b/drivers/crypto/chelsio/Makefile
-index eaecaf1..639e571 100644
---- a/drivers/crypto/chelsio/Makefile
-+++ b/drivers/crypto/chelsio/Makefile
-@@ -3,3 +3,4 @@ ccflags-y := -Idrivers/net/ethernet/chelsio/cxgb4
- obj-$(CONFIG_CRYPTO_DEV_CHELSIO) += chcr.o
- chcr-objs :=  chcr_core.o chcr_algo.o
- chcr-$(CONFIG_CHELSIO_IPSEC_INLINE) += chcr_ipsec.o
-+obj-$(CONFIG_CRYPTO_DEV_CHELSIO_TLS) += chtls/
-diff --git a/drivers/crypto/chelsio/chtls/Makefile b/drivers/crypto/chelsio/chtls/Makefile
-new file mode 100644
-index 0000000..df13795
---- /dev/null
-+++ b/drivers/crypto/chelsio/chtls/Makefile
-@@ -0,0 +1,4 @@
-+ccflags-y := -Idrivers/net/ethernet/chelsio/cxgb4 -Idrivers/crypto/chelsio/
-+
-+obj-$(CONFIG_CRYPTO_DEV_CHELSIO_TLS) += chtls.o
-+chtls-objs := chtls_main.o chtls_cm.o chtls_io.o chtls_hw.o
++	.section	".rodata", "a"
+ 	.align		L1_CACHE_SHIFT
+ 	.type		__aes_arm_inverse_sbox, %object
+ __aes_arm_inverse_sbox:
+@@ -210,12 +220,3 @@ __aes_arm_inverse_sbox:
+ 	.byte		0x17, 0x2b, 0x04, 0x7e, 0xba, 0x77, 0xd6, 0x26
+ 	.byte		0xe1, 0x69, 0x14, 0x63, 0x55, 0x21, 0x0c, 0x7d
+ 	.size		__aes_arm_inverse_sbox, . - __aes_arm_inverse_sbox
+-
+-ENTRY(__aes_arm_encrypt)
+-	do_crypt	fround, crypto_ft_tab, crypto_ft_tab + 1, 2
+-ENDPROC(__aes_arm_encrypt)
+-
+-	.align		5
+-ENTRY(__aes_arm_decrypt)
+-	do_crypt	iround, crypto_it_tab, __aes_arm_inverse_sbox, 0
+-ENDPROC(__aes_arm_decrypt)
 -- 
-1.8.3.1
+1.9.1
