@@ -1,44 +1,55 @@
-From: Florian Fainelli <f.fainelli@gmail.com>
-Subject: Re: [PATCH] hwrng: bcm2835: Handle deferred clock properly
-Date: Mon, 12 Feb 2018 12:22:21 -0800
-Message-ID: <d3f5b375-d2e8-2e7c-526d-aa5d49751ed4@gmail.com>
-References: <1518466296-30161-1-git-send-email-stefan.wahren@i2se.com>
+From: Junaid Shahid <junaids@google.com>
+Subject: Re: [PATCH 14/14] x86/crypto: aesni: Update aesni-intel_glue to use
+ scatter/gather
+Date: Mon, 12 Feb 2018 15:12:16 -0800
+Message-ID: <dc69bdfa-6dc2-da54-9d9a-b171aeb3212b@google.com>
+References: <cover.1518211765.git.davejwatson@fb.com>
+ <20180212195128.GA61087@davejwatson-mba.local>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Cc: Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Eric Anholt <eric@anholt.net>, Ray Jui <rjui@broadcom.com>,
-        Scott Branden <sbranden@broadcom.com>,
-        Jon Mason <jonmason@broadcom.com>,
-        linux-arm-kernel@lists.infradead.org,
-        bcm-kernel-feedback-list@broadcom.com, linux-crypto@vger.kernel.org
-To: Stefan Wahren <stefan.wahren@i2se.com>,
+Cc: "David S. Miller" <davem@davemloft.net>,
+        Hannes Frederic Sowa <hannes@stressinduktion.org>,
+        Tim Chen <tim.c.chen@linux.intel.com>,
+        Sabrina Dubroca <sd@queasysnail.net>,
+        linux-kernel@vger.kernel.org,
+        Stephan Mueller <smueller@chronox.de>,
+        Ilya Lesokhin <ilyal@mellanox.com>
+To: Dave Watson <davejwatson@fb.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Matt Mackall <mpm@selenic.com>
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-qk0-f195.google.com ([209.85.220.195]:38655 "EHLO
-        mail-qk0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751554AbeBLUWe (ORCPT
+Received: from mail-pg0-f49.google.com ([74.125.83.49]:47069 "EHLO
+        mail-pg0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932368AbeBLXMU (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 12 Feb 2018 15:22:34 -0500
-Received: by mail-qk0-f195.google.com with SMTP id s198so3783104qke.5
-        for <linux-crypto@vger.kernel.org>; Mon, 12 Feb 2018 12:22:33 -0800 (PST)
-In-Reply-To: <1518466296-30161-1-git-send-email-stefan.wahren@i2se.com>
+        Mon, 12 Feb 2018 18:12:20 -0500
+Received: by mail-pg0-f49.google.com with SMTP id a11so8525499pgu.13
+        for <linux-crypto@vger.kernel.org>; Mon, 12 Feb 2018 15:12:20 -0800 (PST)
+In-Reply-To: <20180212195128.GA61087@davejwatson-mba.local>
 Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 02/12/2018 12:11 PM, Stefan Wahren wrote:
-> In case the probe of the clock is deferred, we would assume it is
-> optional. This is wrong, so defer the probe of this driver until
-> the clock is available.
-> 
-> Fixes: 791af4f4907a ("hwrng: bcm2835 - Manage an optional clock")
-> Signed-off-by: Stefan Wahren <stefan.wahren@i2se.com>
+Hi Dave,
 
-Acked-by: Florian Fainelli <f.fainelli@gmail.com>
 
-Thanks Stephan!
--- 
-Florian
+On 02/12/2018 11:51 AM, Dave Watson wrote:
+
+> +static int gcmaes_encrypt_sg(struct aead_request *req, unsigned int assoclen,
+> +			u8 *hash_subkey, u8 *iv, void *aes_ctx)
+>  
+> +static int gcmaes_decrypt_sg(struct aead_request *req, unsigned int assoclen,
+> +			u8 *hash_subkey, u8 *iv, void *aes_ctx)
+
+These two functions are almost identical. Wouldn't it be better to combine them into a single encrypt/decrypt function, similar to what you have done for the assembly macros?
+
+> +	if (((struct crypto_aes_ctx *)aes_ctx)->key_length != AES_KEYSIZE_128 ||
+> +		aesni_gcm_enc_tfm == aesni_gcm_enc) {
+
+Shouldn't we also include a check for the buffer length being less than AVX_GEN2_OPTSIZE? AVX will not be used in that case either.
+
+
+Thanks,
+Junaid
