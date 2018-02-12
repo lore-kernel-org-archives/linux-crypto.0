@@ -1,43 +1,78 @@
-From: Peter Robinson <pbrobinson@gmail.com>
-Subject: [PATCH] crypto: sunxi-ss: Add MODULE_ALIAS to sun4i-ss
-Date: Sun, 11 Feb 2018 23:15:37 +0000
-Message-ID: <20180211231537.26487-1-pbrobinson@gmail.com>
-Cc: Peter Robinson <pbrobinson@gmail.com>, stable@vger.kernel.org
-To: Corentin Labbe <clabbe.montjoie@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Maxime Ripard <maxime.ripard@free-electrons.com>,
-        Chen-Yu Tsai <wens@csie.org>, linux-crypto@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ot0-f195.google.com ([74.125.82.195]:34919 "EHLO
-        mail-ot0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932160AbeBKXPx (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 11 Feb 2018 18:15:53 -0500
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Crypto Fixes for 4.16
+Date: Mon, 12 Feb 2018 11:17:02 +0800
+Message-ID: <20180212031702.GA26153@gondor.apana.org.au>
+References: <20161119102748.GA4277@gondor.apana.org.au>
+ <20161213132414.GA7898@gondor.apana.org.au>
+ <20170223125141.GA17400@gondor.apana.org.au>
+ <20170714141855.GA29426@gondor.apana.org.au>
+ <20170922084401.GA15541@gondor.apana.org.au>
+ <20171128230929.GA17783@gondor.apana.org.au>
+ <20171222064931.GA27068@gondor.apana.org.au>
+ <20180105073808.GA14405@gondor.apana.org.au>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20180105073808.GA14405@gondor.apana.org.au>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-The MODULE_ALIAS is required to enable the sun4i-ss driver to load
-automatically when built at a module. Tested on a Cubietruck.
+Hi Linus: 
 
-Fixes: 6298e948215f ("crypto: sunxi-ss - Add Allwinner Security System crypto accelerator")
-Cc: <stable@vger.kernel.org>
-Signed-off-by: Peter Robinson <pbrobinson@gmail.com>
----
- drivers/crypto/sunxi-ss/sun4i-ss-core.c | 1 +
- 1 file changed, 1 insertion(+)
+This push fixes the following issues:
 
-diff --git a/drivers/crypto/sunxi-ss/sun4i-ss-core.c b/drivers/crypto/sunxi-ss/sun4i-ss-core.c
-index 1547cbe13dc2..a81d89b3b7d8 100644
---- a/drivers/crypto/sunxi-ss/sun4i-ss-core.c
-+++ b/drivers/crypto/sunxi-ss/sun4i-ss-core.c
-@@ -451,6 +451,7 @@ static struct platform_driver sun4i_ss_driver = {
- 
- module_platform_driver(sun4i_ss_driver);
- 
-+MODULE_ALIAS("platform:sun4i-ss");
- MODULE_DESCRIPTION("Allwinner Security System cryptographic accelerator");
- MODULE_LICENSE("GPL");
- MODULE_AUTHOR("Corentin LABBE <clabbe.montjoie@gmail.com>");
+- Fix oversize stack frames on mn10300 in sha3-generic.
+- Fix warning on old compilers in sha3-generic.
+- Fix API error in sun4i_ss_prng.
+- Fix potential dead-lock in sun4i_ss_prng.
+- Fix null-pointer dereference in sha512-mb.
+- Fix endless loop when DECO acquire fails in caam.
+- Fix kernel oops when hashing empty message in talitos.
+
+
+Please pull from
+
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
+
+
+Ard Biesheuvel (1):
+      crypto: sha3-generic - deal with oversize stack frames
+
+Artem Savkov (2):
+      crypto: sun4i_ss_prng - fix return value of sun4i_ss_prng_generate
+      crypto: sun4i_ss_prng - convert lock to _bh in sun4i_ss_prng_generate
+
+Eric Biggers (1):
+      crypto: sha512-mb - initialize pending lengths correctly
+
+Geert Uytterhoeven (3):
+      compiler-gcc.h: Introduce __optimize function attribute
+      compiler-gcc.h: __nostackprotector needs gcc-4.4 and up
+      crypto: sha3-generic - Use __optimize to support old compilers
+
+Horia Geantă (1):
+      crypto: caam - fix endless loop when DECO acquire fails
+
+LEROY Christophe (1):
+      crypto: talitos - fix Kernel Oops on hashing an empty file
+
+ .../x86/crypto/sha512-mb/sha512_mb_mgr_init_avx2.c |   10 +-
+ crypto/sha3_generic.c                              |  218 +++++++++++---------
+ drivers/crypto/caam/ctrl.c                         |    8 +-
+ drivers/crypto/sunxi-ss/sun4i-ss-prng.c            |    6 +-
+ drivers/crypto/talitos.c                           |    4 +
+ include/linux/compiler-gcc.h                       |    7 +-
+ include/linux/compiler.h                           |    4 +
+ 7 files changed, 146 insertions(+), 111 deletions(-)
+
+Thanks,
 -- 
-2.14.3
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
