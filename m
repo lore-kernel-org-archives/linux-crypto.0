@@ -1,131 +1,69 @@
-From: Dave Watson <davejwatson@fb.com>
-Subject: [PATCH 02/14] x86/crypto: aesni: Macro-ify func save/restore
-Date: Mon, 12 Feb 2018 11:48:15 -0800
-Message-ID: <20180212194815.GA60401@davejwatson-mba.local>
-References: <cover.1518211765.git.davejwatson@fb.com>
+From: David Miller <davem@davemloft.net>
+Subject: Re: [Crypto v4 03/12] support for inline tls
+Date: Mon, 12 Feb 2018 14:48:35 -0500 (EST)
+Message-ID: <20180212.144835.1319578385440687217.davem@davemloft.net>
+References: <1518437068-14338-1-git-send-email-atul.gupta@chelsio.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Cc: "David S. Miller" <davem@davemloft.net>,
-        Hannes Frederic Sowa <hannes@stressinduktion.org>,
-        Tim Chen <tim.c.chen@linux.intel.com>,
-        Sabrina Dubroca <sd@queasysnail.net>,
-        <linux-kernel@vger.kernel.org>,
-        Stephan Mueller <smueller@chronox.de>,
-        Ilya Lesokhin <ilyal@mellanox.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        Junaid Shahid <junaids@google.com>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        <linux-crypto@vger.kernel.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <cover.1518211765.git.davejwatson@fb.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+Cc: davejwatson@fb.com, herbert@gondor.apana.org.au,
+        sd@queasysnail.net, linux-crypto@vger.kernel.org,
+        netdev@vger.kernel.org, ganeshgr@chelsio.com
+To: atul.gupta@chelsio.com
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from shards.monkeyblade.net ([184.105.139.130]:57236 "EHLO
+        shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753269AbeBLTsi (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 12 Feb 2018 14:48:38 -0500
+In-Reply-To: <1518437068-14338-1-git-send-email-atul.gupta@chelsio.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Macro-ify function save and restore.  These will be used in new functions
-added for scatter/gather update operations.
+From: Atul Gupta <atul.gupta@chelsio.com>
+Date: Mon, 12 Feb 2018 17:34:28 +0530
 
-Signed-off-by: Dave Watson <davejwatson@fb.com>
----
- arch/x86/crypto/aesni-intel_asm.S | 53 ++++++++++++++++++---------------------
- 1 file changed, 24 insertions(+), 29 deletions(-)
+> +static int get_tls_prot(struct sock *sk)
+> +{
+> +	struct tls_context *ctx = tls_get_ctx(sk);
+> +	struct net_device *netdev;
+> +	struct tls_device *dev;
+> +
+> +	/* Device bound to specific IP */
+> +	if (inet_sk(sk)->inet_rcv_saddr) {
+> +		netdev = find_netdev(sk);
+> +		if (!netdev)
+> +			goto out;
+> +
+> +		/* Device supports Inline record processing */
+> +		if (!(netdev->features & NETIF_F_HW_TLS_INLINE))
+> +			goto out;
+> +
+> +		mutex_lock(&device_mutex);
+> +		list_for_each_entry(dev, &device_list, dev_list) {
+> +			if (dev->netdev && dev->netdev(dev, netdev))
+> +				break;
+> +		}
+> +		mutex_unlock(&device_mutex);
+> +
+> +		ctx->tx_conf = TLS_FULL_HW;
+> +		if (dev->prot)
+> +			dev->prot(dev, sk);
 
-diff --git a/arch/x86/crypto/aesni-intel_asm.S b/arch/x86/crypto/aesni-intel_asm.S
-index 48911fe..39b42b1 100644
---- a/arch/x86/crypto/aesni-intel_asm.S
-+++ b/arch/x86/crypto/aesni-intel_asm.S
-@@ -170,6 +170,26 @@ ALL_F:      .octa 0xffffffffffffffffffffffffffffffff
- #define TKEYP	T1
- #endif
- 
-+.macro FUNC_SAVE
-+	push	%r12
-+	push	%r13
-+	push	%r14
-+	mov	%rsp, %r14
-+#
-+# states of %xmm registers %xmm6:%xmm15 not saved
-+# all %xmm registers are clobbered
-+#
-+	sub	$VARIABLE_OFFSET, %rsp
-+	and	$~63, %rsp
-+.endm
-+
-+
-+.macro FUNC_RESTORE
-+	mov	%r14, %rsp
-+	pop	%r14
-+	pop	%r13
-+	pop	%r12
-+.endm
- 
- #ifdef __x86_64__
- /* GHASH_MUL MACRO to implement: Data*HashKey mod (128,127,126,121,0)
-@@ -1130,16 +1150,7 @@ _esb_loop_\@:
- *
- *****************************************************************************/
- ENTRY(aesni_gcm_dec)
--	push	%r12
--	push	%r13
--	push	%r14
--	mov	%rsp, %r14
--/*
--* states of %xmm registers %xmm6:%xmm15 not saved
--* all %xmm registers are clobbered
--*/
--	sub	$VARIABLE_OFFSET, %rsp
--	and	$~63, %rsp                        # align rsp to 64 bytes
-+	FUNC_SAVE
- 	mov	%arg6, %r12
- 	movdqu	(%r12), %xmm13			  # %xmm13 = HashKey
-         movdqa  SHUF_MASK(%rip), %xmm2
-@@ -1309,10 +1320,7 @@ _T_1_decrypt:
- _T_16_decrypt:
- 	movdqu	%xmm0, (%r10)
- _return_T_done_decrypt:
--	mov	%r14, %rsp
--	pop	%r14
--	pop	%r13
--	pop	%r12
-+	FUNC_RESTORE
- 	ret
- ENDPROC(aesni_gcm_dec)
- 
-@@ -1393,22 +1401,12 @@ ENDPROC(aesni_gcm_dec)
- * poly = x^128 + x^127 + x^126 + x^121 + 1
- ***************************************************************************/
- ENTRY(aesni_gcm_enc)
--	push	%r12
--	push	%r13
--	push	%r14
--	mov	%rsp, %r14
--#
--# states of %xmm registers %xmm6:%xmm15 not saved
--# all %xmm registers are clobbered
--#
--	sub	$VARIABLE_OFFSET, %rsp
--	and	$~63, %rsp
-+	FUNC_SAVE
- 	mov	%arg6, %r12
- 	movdqu	(%r12), %xmm13
-         movdqa  SHUF_MASK(%rip), %xmm2
- 	PSHUFB_XMM %xmm2, %xmm13
- 
--
- # precompute HashKey<<1 mod poly from the HashKey (required for GHASH)
- 
- 	movdqa	%xmm13, %xmm2
-@@ -1576,10 +1574,7 @@ _T_1_encrypt:
- _T_16_encrypt:
- 	movdqu	%xmm0, (%r10)
- _return_T_done_encrypt:
--	mov	%r14, %rsp
--	pop	%r14
--	pop	%r13
--	pop	%r12
-+	FUNC_RESTORE
- 	ret
- ENDPROC(aesni_gcm_enc)
- 
--- 
-2.9.5
+What if the same IP address is configured on multiple interfaces?
+
+> +	} else { /* src address not known or INADDR_ANY */
+> +		mutex_lock(&device_mutex);
+> +		list_for_each_entry(dev, &device_list, dev_list) {
+> +			if (dev->feature && dev->feature(dev)) {
+> +				ctx->tx_conf = TLS_FULL_HW;
+> +				break;
+> +			}
+> +		}
+> +		mutex_unlock(&device_mutex);
+> +		update_sk_prot(sk, ctx);
+
+And I think this is even more of a stretch.  Just because you find
+an inline TLS device on the global list doesn't mean traffic will
+necessarily flow through it once the connection is fully established
+and therefore be able to provide inline TLS offloading.
