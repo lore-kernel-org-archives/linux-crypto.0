@@ -1,92 +1,179 @@
-From: Eric Biggers <ebiggers3@gmail.com>
-Subject: Re: BUG: unable to handle kernel NULL pointer dereference in
- sha512_mb_mgr_get_comp_job_avx2
-Date: Mon, 12 Feb 2018 10:21:05 -0800
-Message-ID: <20180212182105.GA193902@gmail.com>
-References: <001a113ec900d65ea5055f70560f@google.com>
- <001a113fae28e4fe39055f757ab5@google.com>
+From: Eric Biggers <ebiggers@google.com>
+Subject: Re: [PATCH 0/5] crypto: Speck support
+Date: Mon, 12 Feb 2018 11:19:03 -0800
+Message-ID: <20180212191903.GD193902@google.com>
+References: <20180208001001.19180-1-ebiggers@google.com>
+ <CAH8yC8m4F9SWum9D5ZV2wzVAsJaDxnkc1L6eSeEOV-cOdkcg6Q@mail.gmail.com>
+ <20180208210107.GA6720@google.com>
+ <CAH8yC8k2ZNffeb6oak0_xCUVS+kyO_9SiFmbTjY7SdseN2xULw@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: syzkaller-bugs@googlegroups.com, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-To: syzbot
-        <bot+5ac9d43b97a33f321ed58e24960e30defaef843f@syzkaller.appspotmail.com>
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-fscrypt@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Paul Crowley <paulcrowley@google.com>,
+        Patrik Torstensson <totte@google.com>,
+        Paul Lawrence <paullawrence@google.com>,
+        Michael Halcrow <mhalcrow@google.com>,
+        Alex Cope <alexcope@google.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "Wingers, Louis R." <lrwinge@tycho.ncsc.mil>,
+        "Weeks, Bryan" <beweeks@tycho.ncsc.mil>
+To: Jeffrey Walton <noloader@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-io0-f194.google.com ([209.85.223.194]:46213 "EHLO
-        mail-io0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751176AbeBLSVJ (ORCPT
+Received: from mail-io0-f193.google.com ([209.85.223.193]:41816 "EHLO
+        mail-io0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752469AbeBLTTI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 12 Feb 2018 13:21:09 -0500
+        Mon, 12 Feb 2018 14:19:08 -0500
+Received: by mail-io0-f193.google.com with SMTP id f4so18485817ioh.8
+        for <linux-crypto@vger.kernel.org>; Mon, 12 Feb 2018 11:19:07 -0800 (PST)
 Content-Disposition: inline
-In-Reply-To: <001a113fae28e4fe39055f757ab5@google.com>
+In-Reply-To: <CAH8yC8k2ZNffeb6oak0_xCUVS+kyO_9SiFmbTjY7SdseN2xULw@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Dec 03, 2017 at 12:31:01PM -0800, syzbot wrote:
-> syzkaller has found reproducer for the following crash on
-> 4131d5166185d0d75b5f1d4bf362a9e0bac05598
-> git://git.cmpxchg.org/linux-mmots.git/master
-> compiler: gcc (GCC) 7.1.1 20170620
-> .config is attached
-> Raw console output is attached.
-> 
-> syzkaller reproducer is attached. See https://goo.gl/kgGztJ
-> for information about syzkaller reproducers
-> 
-> 
-> BUG: unable to handle kernel NULL pointer dereference at 00000000c58b0b19
-> IP: sha512_mb_mgr_get_comp_job_avx2+0x6e/0xee
-> arch/x86/crypto/sha512-mb/sha512_mb_mgr_flush_avx2.S:251
-> PGD 1cb562067 P4D 1cb562067 PUD 1cb563067 PMD 0
-> Oops: 0002 [#1] SMP KASAN
-> Dumping ftrace buffer:
->    (ftrace buffer empty)
-> Modules linked in:
-> CPU: 1 PID: 24 Comm: kworker/1:1 Not tainted 4.15.0-rc1-mm1+ #29
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS
-> Google 01/01/2011
-> Workqueue: crypto mcryptd_queue_worker
-> task: 0000000018ff7174 task.stack: 000000004c6e7fb4
-> RIP: 0010:sha512_mb_mgr_get_comp_job_avx2+0x6e/0xee
-> arch/x86/crypto/sha512-mb/sha512_mb_mgr_flush_avx2.S:251
-> RSP: 0018:ffff8801d9d171b8 EFLAGS: 00010002
-> RAX: 0000000000000000 RBX: ffff8801d5aa38d0 RCX: 0000000000000000
-> RDX: 0000000000000001 RSI: 0000000000000000 RDI: ffff8801d5aa3780
-> RBP: ffff8801d9d171e0 R08: 0000000100000000 R09: 0000000000000001
-> R10: 0000000000000002 R11: 0000000000000003 R12: ffff8801d5aa3780
-> R13: 0000000000000282 R14: ffff8801cc115760 R15: ffffe8ffffd10630
-> FS:  0000000000000000(0000) GS:ffff8801db500000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 0000000000000060 CR3: 00000001cb55f000 CR4: 00000000001406e0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> Call Trace:
->  sha_complete_job+0x276/0x830 arch/x86/crypto/sha512-mb/sha512_mb.c:510
->  sha512_mb_update+0x2f6/0x530 arch/x86/crypto/sha512-mb/sha512_mb.c:610
->  crypto_ahash_update include/crypto/hash.h:522 [inline]
->  ahash_mcryptd_update crypto/mcryptd.c:628 [inline]
->  mcryptd_hash_update+0xcd/0x1c0 crypto/mcryptd.c:374
->  mcryptd_queue_worker+0xfe/0x660 crypto/mcryptd.c:182
->  process_one_work+0xbfd/0x1bc0 kernel/workqueue.c:2113
->  worker_thread+0x223/0x1990 kernel/workqueue.c:2247
->  kthread+0x37a/0x440 kernel/kthread.c:238
->  ret_from_fork+0x24/0x30 arch/x86/entry/entry_64.S:517
-> Code: 49 0f 42 d3 48 f7 c2 f0 ff ff ff 0f 85 9a 00 00 00 48 83 e2 0f 48 6b
-> da 08 48 8d 9c 1f 48 01 00 00 48 8b 03 48 c7 03 00 00 00 00 <c7> 40 60 02 00
-> 00 00 48 8b 9f 40 01 00 00 48 c1 e3 08 48 09 d3
-> RIP: sha512_mb_mgr_get_comp_job_avx2+0x6e/0xee
-> arch/x86/crypto/sha512-mb/sha512_mb_mgr_flush_avx2.S:251 RSP:
-> ffff8801d9d171b8
-> CR2: 0000000000000060
-> ---[ end trace 2003a6fbb2bb168e ]---
-> Kernel panic - not syncing: Fatal exception
-> Dumping ftrace buffer:
->    (ftrace buffer empty)
-> Kernel Offset: disabled
-> Rebooting in 86400 seconds..
+Hi all,
 
-Fixed by commit eff84b379089cd, so marking it fixed for syzbot:
+On Fri, Feb 09, 2018 at 07:07:01PM -0500, Jeffrey Walton wrote:
+> > Hi Jeffrey,
+> >
+> > I see you wrote the SPECK implementation in Crypto++, and you are treating the
+> > words as big endian.
+> >
+> > Do you have a reference for this being the "correct" order?  Unfortunately the
+> > authors of the cipher failed to mention the byte order in their paper.  And they
+> > gave the test vectors as words, so the test vectors don't clarify it either.
+> >
+> > I had assumed little endian words, but now I am having second thoughts...  And
+> > to confuse things further, it seems that some implementations (including the
+> > authors own implementation for the SUPERCOP benchmark toolkit [1]) even consider
+> > the words themselves in the order (y, x) rather than the more intuitive (x, y).
+> >
+> > [1] https://github.com/iadgov/simon-speck-supercop/blob/master/crypto_stream/speck128128ctr/ref/stream.c
+> >
+> > In fact, even the reference code from the paper treats pt[0] as y and pt[1] as
+> > x, where 'pt' is a u64 array -- although that being said, it's not shown how the
+> > actual bytes should be translated to/from those u64 arrays.
+> >
+> > I'd really like to avoid people having to add additional versions of SPECK later
+> > for the different byte and word orders...
+> 
+> Hi Eric,
+> 
+> Yeah, this was a point of confusion for us as well. After the sidebar
+> conversations I am wondering about the correctness of Crypto++
+> implementation.
+> 
 
-#syz fix: crypto: sha512-mb - initialize pending lengths correctly
+We've received another response from one of the Speck creators (Louis Wingers)
+that (to summarize) the intended byte order is little endian, and the intended
+word order is (y, x), i.e. 'y' is at a lower memory address than 'x'.  Or
+equivalently: the test vectors given in the original paper need to be read as
+byte arrays from *right-to-left*.
+
+(y, x) is not the intuitive order, but it's not a huge deal.  The more important
+thing is that we don't end up with multiple implementations with different byte
+and/or word orders.
+
+So, barring any additional confusion, I'll send a revised version of this
+patchset that flips the word order.  Jeff would need to flip both the byte and
+word orders in his implementation in Crypto++ as well.
 
 - Eric
+
+> As a first step here is the official test vector for Speck-128(128)
+> from Appendix C, p. 42 (https://eprint.iacr.org/2013/404.pdf):
+> 
+>     Speck128/128
+>     Key: 0f0e0d0c0b0a0908 0706050403020100
+>     Plaintext: 6c61766975716520 7469206564616d20
+>     Ciphertext: a65d985179783265 7860fedf5c570d18
+> 
+> We had some confusion over the presentation. Here is what the Simon
+> and Speck team sent when I asked about it, what gets plugged into the
+> algorithm, and how it gets plugged in:
+> 
+> <BEGIN SNIP PERSONAL EMAIL>
+> 
+> On Mon, Nov 20, 2017 at 10:50 AM, <lrwinge@xxxx.xxxx.xxx> wrote:
+> > ...
+> > I'll explain the problem you have been having with our test vectors.
+> >
+> > The key is:  0x0f0e0d0c0b0a0908 0x0706050403020100
+> > The plaintext is:  6c61766975716520 7469206564616d20
+> > The ciphertext is:  a65d985179783265 7860fedf5c570d18
+> >
+> > The problem is essentially one of what goes where and we probably could
+> > have done a better job explaining things.
+> >
+> > For the key, with two words, K=(K[1],K[0]).  With three words K=(K[2],K[1],K[0]),
+> > with four words K=(K[3],K[2],K[1],K[0]).
+> >
+> > So for the test vector you should have K[0]= 0x0706050403020100, K[1]= 0x0f0e0d0c0b0a0908
+> > which is the opposite of what you have done.
+> >
+> > If we put this K into ExpandKey(K,sk) then the first few round keys
+> > are:
+> >
+> > 0706050403020100
+> > 37253b31171d0309
+> > f91d89cc90c4085c
+> > c6b1f07852cc7689
+> > ...
+> >
+> > For the plaintext, P=(P[1],P[0]), i.e., P[1] goes into the left word of the block cipher
+> > and P[0] goes into the right word of the block cipher.  So you should have
+> > m[0]= 7469206564616d20 and m[1]= 6c61766975716520, which is again opposite of what you
+> > have. If c[0]=m[0] and c[1]=m[1], then the encrypt function should be called as
+> > Encrypt(c+1,c+0,sk).   The resulting ciphertext is (c+1,c+0).
+> >
+> > In general, everything goes in as a byte stream (not 64-bit words).  In this case,
+> > if the 16 bytes of key are 00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f then
+> > we first need to turn these into two 64-bit words.  The first word, K[0] is
+> > 0706050403020100 and the second word is K[1]=0f0e0d0c0b0a0908.  On x86 processors,
+> > if the key bytes are in the array k[] of type uint8_t, then a simple
+> > casting should get you K[1] and K[0].  That is, K[0]=((uint64_t *)k)[0] and
+> > K[1]=((uint64_t *)k)[1].  The key expansion is run with ExpandKey(K,sk).
+> > So that was what we had in mind.
+> >
+> > Similarly, if the plaintext "bytes" were:  20 6d 61 64 65 20 69 74 20 65 71 75 69 76 61 6c
+> > (which is ascii for " made it equival")
+> > then we first need to turn these into two 64-bit words.  The first word is
+> > pt[0]=7469206564616d20 and the second word is pt[1]= 6c61766975716520.  The Encrypt
+> > routine is run as Encrypt(pt[1],pt[0],sk).  The resulting ciphertext is (ct[1],ct[0])
+> > which you would turn back into a byte stream in the reverse of what we did.  For
+> > example, if ct[1]= a65d985179783265 and ct[0]= 7860fedf5c570d18, then if c[] is a
+> > byte stream (i.e., of type uint8_t), then we would have c[0]=18, c[1]=0d, c[2]=57, c[3]=5c, etc.
+> > This is easy to do on x86 with a cast.
+> >
+> > Let me know if all of this is now clear.
+> >
+> > Best regards,
+> 
+> <END SNIP PERSONAL EMAIL>
+> 
+> Finally, here is the Simon and Speck team GitHub. It is the
+> implementation the team submitted to SUPERCOP:
+> https://github.com/iadgov/simon-speck-supercop . The files of interest
+> are in crypto_stream:
+> 
+>    * speck128128ctr/ref/stream.c
+>    * speck128192ctr/ref/stream.c
+>    * speck128256ctr/ref/stream.c
+>    * speck64128ctr/ref/stream.c
+>    * speck6496ctr/ref/stream.c
+> 
+> The reference implementation uses CTR mode rather then ECB mode. After
+> the CTR -> ECB conversion (mostly trivial), and then plugging in the
+> test vectors data (key and message), we could not arrive at the same
+> answer as the published test vector. However, we may have been
+> plugging things in incorrectly. We were able to arrive at test vector
+> results after a minor modification, but it may have been the wrong
+> thing to do (in hindsight). I'll be revisiting this shortly.
+> 
+> Hopefully this should get things started on sorting out the details.
+> 
+> Jeff
