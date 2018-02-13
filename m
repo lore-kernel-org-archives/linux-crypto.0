@@ -1,7 +1,7 @@
 From: Antoine Tenart <antoine.tenart@bootlin.com>
-Subject: [PATCH 1/8] MAINTAINERS: update the Inside Secure maintainer email
-Date: Tue, 13 Feb 2018 09:26:50 +0100
-Message-ID: <20180213082657.4759-2-antoine.tenart@bootlin.com>
+Subject: [PATCH 7/8] crypto: inside-secure - keep the requests push/pop synced
+Date: Tue, 13 Feb 2018 09:26:56 +0100
+Message-ID: <20180213082657.4759-8-antoine.tenart@bootlin.com>
 References: <20180213082657.4759-1-antoine.tenart@bootlin.com>
 Cc: Antoine Tenart <antoine.tenart@bootlin.com>,
         thomas.petazzoni@bootlin.com, gregory.clement@bootlin.com,
@@ -9,34 +9,140 @@ Cc: Antoine Tenart <antoine.tenart@bootlin.com>,
         nadavh@marvell.com, linux-crypto@vger.kernel.org
 To: herbert@gondor.apana.org.au, davem@davemloft.net
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.free-electrons.com ([62.4.15.54]:44251 "EHLO
+Received: from mail.free-electrons.com ([62.4.15.54]:44285 "EHLO
         mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933584AbeBMIaN (ORCPT
+        with ESMTP id S933692AbeBMIaX (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 13 Feb 2018 03:30:13 -0500
+        Tue, 13 Feb 2018 03:30:23 -0500
 In-Reply-To: <20180213082657.4759-1-antoine.tenart@bootlin.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Free Electrons became Bootlin. Update my email accordingly.
+This patch updates the Inside Secure SafeXcel driver to avoid being
+out-of-sync between the number of requests sent and the one being
+completed.
 
+The number of requests acknowledged by the driver can be different than
+the threshold that was configured if new requests were being pushed to
+the h/w in the meantime. The driver wasn't taking those into account,
+and the number of remaining requests to handled (to reconfigure the
+interrupt threshold) could be out-of sync.
+
+This patch fixes it by not taking in account the number of requests
+left, but by taking in account the total number of requests being sent
+to the hardware, so that new requests are being taken into account.
+
+Fixes: dc7e28a3286e ("crypto: inside-secure - dequeue all requests at once")
+Suggested-by: Ofer Heifetz <oferh@marvell.com>
 Signed-off-by: Antoine Tenart <antoine.tenart@bootlin.com>
 ---
- MAINTAINERS | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/crypto/inside-secure/safexcel.c | 28 +++++++++++++---------------
+ drivers/crypto/inside-secure/safexcel.h |  6 ++----
+ 2 files changed, 15 insertions(+), 19 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 3bdc260e36b7..d0f6811b9eed 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -6990,7 +6990,7 @@ F:	drivers/input/input-mt.c
- K:	\b(ABS|SYN)_MT_
+diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/inside-secure/safexcel.c
+index 0642d7181c9e..956a37692e42 100644
+--- a/drivers/crypto/inside-secure/safexcel.c
++++ b/drivers/crypto/inside-secure/safexcel.c
+@@ -432,20 +432,18 @@ static int safexcel_hw_init(struct safexcel_crypto_priv *priv)
+ }
  
- INSIDE SECURE CRYPTO DRIVER
--M:	Antoine Tenart <antoine.tenart@free-electrons.com>
-+M:	Antoine Tenart <antoine.tenart@bootlin.com>
- F:	drivers/crypto/inside-secure/
- S:	Maintained
- L:	linux-crypto@vger.kernel.org
+ /* Called with ring's lock taken */
+-static int safexcel_try_push_requests(struct safexcel_crypto_priv *priv,
+-				      int ring, int reqs)
++static void safexcel_try_push_requests(struct safexcel_crypto_priv *priv,
++				       int ring)
+ {
+-	int coal = min_t(int, reqs, EIP197_MAX_BATCH_SZ);
++	int coal = min_t(int, priv->ring[ring].requests, EIP197_MAX_BATCH_SZ);
+ 
+ 	if (!coal)
+-		return 0;
++		return;
+ 
+ 	/* Configure when we want an interrupt */
+ 	writel(EIP197_HIA_RDR_THRESH_PKT_MODE |
+ 	       EIP197_HIA_RDR_THRESH_PROC_PKT(coal),
+ 	       EIP197_HIA_RDR(priv, ring) + EIP197_HIA_xDR_THRESH);
+-
+-	return coal;
+ }
+ 
+ void safexcel_dequeue(struct safexcel_crypto_priv *priv, int ring)
+@@ -521,13 +519,13 @@ void safexcel_dequeue(struct safexcel_crypto_priv *priv, int ring)
+ 
+ 	spin_lock_bh(&priv->ring[ring].egress_lock);
+ 
++	priv->ring[ring].requests += nreq;
++
+ 	if (!priv->ring[ring].busy) {
+-		nreq -= safexcel_try_push_requests(priv, ring, nreq);
++		safexcel_try_push_requests(priv, ring);
+ 		priv->ring[ring].busy = true;
+ 	}
+ 
+-	priv->ring[ring].requests_left += nreq;
+-
+ 	spin_unlock_bh(&priv->ring[ring].egress_lock);
+ 
+ 	/* let the RDR know we have pending descriptors */
+@@ -631,7 +629,7 @@ static inline void safexcel_handle_result_descriptor(struct safexcel_crypto_priv
+ {
+ 	struct safexcel_request *sreq;
+ 	struct safexcel_context *ctx;
+-	int ret, i, nreq, ndesc, tot_descs, done;
++	int ret, i, nreq, ndesc, tot_descs, handled = 0;
+ 	bool should_complete;
+ 
+ handle_results:
+@@ -667,6 +665,7 @@ static inline void safexcel_handle_result_descriptor(struct safexcel_crypto_priv
+ 
+ 		kfree(sreq);
+ 		tot_descs += ndesc;
++		handled++;
+ 	}
+ 
+ acknowledge:
+@@ -685,11 +684,10 @@ static inline void safexcel_handle_result_descriptor(struct safexcel_crypto_priv
+ requests_left:
+ 	spin_lock_bh(&priv->ring[ring].egress_lock);
+ 
+-	done = safexcel_try_push_requests(priv, ring,
+-					  priv->ring[ring].requests_left);
++	priv->ring[ring].requests -= handled;
++	safexcel_try_push_requests(priv, ring);
+ 
+-	priv->ring[ring].requests_left -= done;
+-	if (!done && !priv->ring[ring].requests_left)
++	if (!priv->ring[ring].requests)
+ 		priv->ring[ring].busy = false;
+ 
+ 	spin_unlock_bh(&priv->ring[ring].egress_lock);
+@@ -970,7 +968,7 @@ static int safexcel_probe(struct platform_device *pdev)
+ 			goto err_clk;
+ 		}
+ 
+-		priv->ring[i].requests_left = 0;
++		priv->ring[i].requests = 0;
+ 		priv->ring[i].busy = false;
+ 
+ 		crypto_init_queue(&priv->ring[i].queue,
+diff --git a/drivers/crypto/inside-secure/safexcel.h b/drivers/crypto/inside-secure/safexcel.h
+index 4e219c21608b..caaf6a81b162 100644
+--- a/drivers/crypto/inside-secure/safexcel.h
++++ b/drivers/crypto/inside-secure/safexcel.h
+@@ -551,10 +551,8 @@ struct safexcel_crypto_priv {
+ 		struct crypto_queue queue;
+ 		spinlock_t queue_lock;
+ 
+-		/* Number of requests in the engine that needs the threshold
+-		 * interrupt to be set up.
+-		 */
+-		int requests_left;
++		/* Number of requests in the engine. */
++		int requests;
+ 
+ 		/* The ring is currently handling at least one request */
+ 		bool busy;
 -- 
 2.14.3
