@@ -1,44 +1,41 @@
-From: Antoine Tenart <antoine.tenart@bootlin.com>
-Subject: [PATCH 3/8] crypto: inside-secure - fix the extra cache computation
-Date: Tue, 13 Feb 2018 09:26:52 +0100
-Message-ID: <20180213082657.4759-4-antoine.tenart@bootlin.com>
-References: <20180213082657.4759-1-antoine.tenart@bootlin.com>
-Cc: Antoine Tenart <antoine.tenart@bootlin.com>,
-        thomas.petazzoni@bootlin.com, gregory.clement@bootlin.com,
-        miquel.raynal@bootlin.com, oferh@marvell.com, igall@marvell.com,
-        nadavh@marvell.com, linux-crypto@vger.kernel.org
-To: herbert@gondor.apana.org.au, davem@davemloft.net
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: [PATCH] crypto: Fix incorrect values in PKCS#1 test vector
+Date: Tue, 13 Feb 2018 09:37:07 +0100
+Message-ID: <2550703.8XkIRpotY3@tauon.chronox.de>
+References: <CE2E46B8F68C4948A08D2E78E3D946C152762D35@IRSMSX104.ger.corp.intel.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+To: "Mcloughlin, Conor" <conor.mcloughlin@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.free-electrons.com ([62.4.15.54]:44294 "EHLO
-        mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933697AbeBMIaX (ORCPT
+Received: from mo4-p00-ob.smtp.rzone.de ([81.169.146.218]:25784 "EHLO
+        mo4-p00-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933631AbeBMIhN (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 13 Feb 2018 03:30:23 -0500
-In-Reply-To: <20180213082657.4759-1-antoine.tenart@bootlin.com>
+        Tue, 13 Feb 2018 03:37:13 -0500
+In-Reply-To: <CE2E46B8F68C4948A08D2E78E3D946C152762D35@IRSMSX104.ger.corp.intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch fixes the extra cache computation when the queued data is a
-multiple of a block size. This fixes the hash support in some cases.
+Am Dienstag, 13. Februar 2018, 09:29:56 CET schrieb Mcloughlin, Conor:
 
-Fixes: 809778e02cd4 ("crypto: inside-secure - fix hash when length is a multiple of a block")
-Signed-off-by: Antoine Tenart <antoine.tenart@bootlin.com>
----
- drivers/crypto/inside-secure/safexcel_hash.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Hi Conor,
 
-diff --git a/drivers/crypto/inside-secure/safexcel_hash.c b/drivers/crypto/inside-secure/safexcel_hash.c
-index 122a2a58e98f..8fac23b78da5 100644
---- a/drivers/crypto/inside-secure/safexcel_hash.c
-+++ b/drivers/crypto/inside-secure/safexcel_hash.c
-@@ -198,7 +198,7 @@ static int safexcel_ahash_send_req(struct crypto_async_request *async, int ring,
- 			/* If this is not the last request and the queued data
- 			 * is a multiple of a block, cache the last one for now.
- 			 */
--			extra = queued - crypto_ahash_blocksize(ahash);
-+			extra = crypto_ahash_blocksize(ahash);
- 
- 		if (extra) {
- 			sg_pcopy_to_buffer(areq->src, sg_nents(areq->src),
--- 
-2.14.3
+> The RSA private key for the first form should have
+> version, prime1, prime2, exponent1, exponent2, coefficient
+> values 0.
+> With non-zero values for prime1,2, exponent 1,2 and coefficient
+> the Intel QAT driver will assume that values are provided for the
+> private key second form. This will result in signature verification
+> failures for modules where QAT device is present and the modules
+> are signed with rsa,sha256.
+> 
+> Cc: <stable@vger.kernel.org>
+> Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+> Signed-off-by: Conor McLoughlin <conor.mcloughlin@intel.com>
+
+Reviewed-by: Stephan Mueller <smueller@chronox.de>
+
+Ciao
+Stephan
