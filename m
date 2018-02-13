@@ -1,41 +1,75 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH] crypto: Fix incorrect values in PKCS#1 test vector
-Date: Tue, 13 Feb 2018 09:37:07 +0100
-Message-ID: <2550703.8XkIRpotY3@tauon.chronox.de>
-References: <CE2E46B8F68C4948A08D2E78E3D946C152762D35@IRSMSX104.ger.corp.intel.com>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH] crypto: arm/aes-cipher - move S-box to .rodata section
+Date: Tue, 13 Feb 2018 10:57:25 +0000
+Message-ID: <CAKv+Gu93OdaWyMcm3nqV38-RmoYoCceQ4f4DfT65t9amRm_gFA@mail.gmail.com>
+References: <20180212135237.GA3011@pjb1027-Latitude-E5410>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: "Mcloughlin, Conor" <conor.mcloughlin@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Cc: "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+To: Jinbum Park <jinb.park7@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mo4-p00-ob.smtp.rzone.de ([81.169.146.218]:25784 "EHLO
-        mo4-p00-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933631AbeBMIhN (ORCPT
+Received: from mail-it0-f67.google.com ([209.85.214.67]:33911 "EHLO
+        mail-it0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S934077AbeBMK50 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 13 Feb 2018 03:37:13 -0500
-In-Reply-To: <CE2E46B8F68C4948A08D2E78E3D946C152762D35@IRSMSX104.ger.corp.intel.com>
+        Tue, 13 Feb 2018 05:57:26 -0500
+Received: by mail-it0-f67.google.com with SMTP id j21so9223253ita.1
+        for <linux-crypto@vger.kernel.org>; Tue, 13 Feb 2018 02:57:26 -0800 (PST)
+In-Reply-To: <20180212135237.GA3011@pjb1027-Latitude-E5410>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Dienstag, 13. Februar 2018, 09:29:56 CET schrieb Mcloughlin, Conor:
+On 12 February 2018 at 13:52, Jinbum Park <jinb.park7@gmail.com> wrote:
+> Move the AES inverse S-box to the .rodata section
+> where it is safe from abuse by speculation.
+>
+> Signed-off-by: Jinbum Park <jinb.park7@gmail.com>
 
-Hi Conor,
+Acked-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-> The RSA private key for the first form should have
-> version, prime1, prime2, exponent1, exponent2, coefficient
-> values 0.
-> With non-zero values for prime1,2, exponent 1,2 and coefficient
-> the Intel QAT driver will assume that values are provided for the
-> private key second form. This will result in signature verification
-> failures for modules where QAT device is present and the modules
-> are signed with rsa,sha256.
-> 
-> Cc: <stable@vger.kernel.org>
-> Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-> Signed-off-by: Conor McLoughlin <conor.mcloughlin@intel.com>
-
-Reviewed-by: Stephan Mueller <smueller@chronox.de>
-
-Ciao
-Stephan
+> ---
+>  arch/arm/crypto/aes-cipher-core.S | 19 ++++++++++---------
+>  1 file changed, 10 insertions(+), 9 deletions(-)
+>
+> diff --git a/arch/arm/crypto/aes-cipher-core.S b/arch/arm/crypto/aes-cipher-core.S
+> index 54b3840..184d6c2 100644
+> --- a/arch/arm/crypto/aes-cipher-core.S
+> +++ b/arch/arm/crypto/aes-cipher-core.S
+> @@ -174,6 +174,16 @@
+>         .ltorg
+>         .endm
+>
+> +ENTRY(__aes_arm_encrypt)
+> +       do_crypt        fround, crypto_ft_tab, crypto_ft_tab + 1, 2
+> +ENDPROC(__aes_arm_encrypt)
+> +
+> +       .align          5
+> +ENTRY(__aes_arm_decrypt)
+> +       do_crypt        iround, crypto_it_tab, __aes_arm_inverse_sbox, 0
+> +ENDPROC(__aes_arm_decrypt)
+> +
+> +       .section        ".rodata", "a"
+>         .align          L1_CACHE_SHIFT
+>         .type           __aes_arm_inverse_sbox, %object
+>  __aes_arm_inverse_sbox:
+> @@ -210,12 +220,3 @@ __aes_arm_inverse_sbox:
+>         .byte           0x17, 0x2b, 0x04, 0x7e, 0xba, 0x77, 0xd6, 0x26
+>         .byte           0xe1, 0x69, 0x14, 0x63, 0x55, 0x21, 0x0c, 0x7d
+>         .size           __aes_arm_inverse_sbox, . - __aes_arm_inverse_sbox
+> -
+> -ENTRY(__aes_arm_encrypt)
+> -       do_crypt        fround, crypto_ft_tab, crypto_ft_tab + 1, 2
+> -ENDPROC(__aes_arm_encrypt)
+> -
+> -       .align          5
+> -ENTRY(__aes_arm_decrypt)
+> -       do_crypt        iround, crypto_it_tab, __aes_arm_inverse_sbox, 0
+> -ENDPROC(__aes_arm_decrypt)
+> --
+> 1.9.1
+>
