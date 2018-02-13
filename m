@@ -1,54 +1,58 @@
 From: Antoine Tenart <antoine.tenart@bootlin.com>
-Subject: [PATCH 8/8] crypto: inside-secure - unmap the result in the hash send error path
-Date: Tue, 13 Feb 2018 09:26:57 +0100
-Message-ID: <20180213082657.4759-9-antoine.tenart@bootlin.com>
-References: <20180213082657.4759-1-antoine.tenart@bootlin.com>
+Subject: [PATCH 0/8] crypto: inside-secure - stabilization and fixes
+Date: Tue, 13 Feb 2018 09:26:49 +0100
+Message-ID: <20180213082657.4759-1-antoine.tenart@bootlin.com>
 Cc: Antoine Tenart <antoine.tenart@bootlin.com>,
         thomas.petazzoni@bootlin.com, gregory.clement@bootlin.com,
         miquel.raynal@bootlin.com, oferh@marvell.com, igall@marvell.com,
         nadavh@marvell.com, linux-crypto@vger.kernel.org
 To: herbert@gondor.apana.org.au, davem@davemloft.net
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.free-electrons.com ([62.4.15.54]:44287 "EHLO
+Received: from mail.free-electrons.com ([62.4.15.54]:44261 "EHLO
         mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933695AbeBMIaX (ORCPT
+        with ESMTP id S933663AbeBMIaN (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 13 Feb 2018 03:30:23 -0500
-In-Reply-To: <20180213082657.4759-1-antoine.tenart@bootlin.com>
+        Tue, 13 Feb 2018 03:30:13 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch adds a label to unmap the result buffer in the hash send
-function error path.
+Hi Herbert,
 
-Fixes: 1b44c5a60c13 ("crypto: inside-secure - add SafeXcel EIP197 crypto engine driver")
-Suggested-by: Ofer Heifetz <oferh@marvell.com>
-Signed-off-by: Antoine Tenart <antoine.tenart@bootlin.com>
----
- drivers/crypto/inside-secure/safexcel_hash.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+We spent a lot of time with Ofer to test various use cases of the Inside
+Secure driver. We performed many tests in addition to the crypto
+subsystem ones (IPsec, openssl speed, tcrypt...). As a result the driver
+is a lot more stable in various configurations, with this series
+applied.
 
-diff --git a/drivers/crypto/inside-secure/safexcel_hash.c b/drivers/crypto/inside-secure/safexcel_hash.c
-index 43e94cd59c86..a4960a934eef 100644
---- a/drivers/crypto/inside-secure/safexcel_hash.c
-+++ b/drivers/crypto/inside-secure/safexcel_hash.c
-@@ -303,7 +303,7 @@ static int safexcel_ahash_send_req(struct crypto_async_request *async, int ring,
- 				   req->state_sz);
- 	if (IS_ERR(rdesc)) {
- 		ret = PTR_ERR(rdesc);
--		goto cdesc_rollback;
-+		goto unmap_result;
- 	}
- 
- 	spin_unlock_bh(&priv->ring[ring].egress_lock);
-@@ -315,6 +315,8 @@ static int safexcel_ahash_send_req(struct crypto_async_request *async, int ring,
- 	*results = 1;
- 	return 0;
- 
-+unmap_result:
-+	dma_unmap_sg(priv->dev, areq->src, req->nents, DMA_TO_DEVICE);
- cdesc_rollback:
- 	for (i = 0; i < n_cdesc; i++)
- 		safexcel_ring_rollback_wptr(priv, &priv->ring[ring].cdr);
+The fixes of this series aren't all related, but were all found while
+performing these stabilization process and tests.
+
+Also as the company I'm working at changed its name from Free Electrons
+to Bootlin, the first patch updates my email address in the MAINTAINERS
+file.
+
+The series is based on v4.16-rc1.
+
+Thanks!
+Antoine
+
+Antoine Tenart (8):
+  MAINTAINERS: update the Inside Secure maintainer email
+  crypto: inside-secure - do not overwrite the threshold value
+  crypto: inside-secure - fix the extra cache computation
+  crypto: inside-secure - fix the cache_len computation
+  crypto: inside-secure - do not process request if no command was
+    issued
+  crypto: inside-secure - fix the invalidation step during cra_exit
+  crypto: inside-secure - keep the requests push/pop synced
+  crypto: inside-secure - unmap the result in the hash send error path
+
+ MAINTAINERS                                    |  2 +-
+ drivers/crypto/inside-secure/safexcel.c        | 40 +++++++++++++++-----------
+ drivers/crypto/inside-secure/safexcel.h        |  6 ++--
+ drivers/crypto/inside-secure/safexcel_cipher.c |  2 +-
+ drivers/crypto/inside-secure/safexcel_hash.c   | 10 ++++---
+ 5 files changed, 33 insertions(+), 27 deletions(-)
+
 -- 
 2.14.3
