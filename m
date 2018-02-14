@@ -1,7 +1,7 @@
 From: Dave Watson <davejwatson@fb.com>
-Subject: [PATCH v2 02/14] x86/crypto: aesni: Macro-ify func save/restore
-Date: Wed, 14 Feb 2018 09:38:35 -0800
-Message-ID: <20180214173835.GA61851@davejwatson-mba>
+Subject: [PATCH v2 03/14] x86/crypto: aesni: Add GCM_INIT macro
+Date: Wed, 14 Feb 2018 09:38:45 -0800
+Message-ID: <20180214173845.GA61871@davejwatson-mba>
 References: <cover.1518628278.git.davejwatson@fb.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -22,110 +22,129 @@ In-Reply-To: <cover.1518628278.git.davejwatson@fb.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Macro-ify function save and restore.  These will be used in new functions
-added for scatter/gather update operations.
+Reduce code duplication by introducting GCM_INIT macro.  This macro
+will also be exposed as a function for implementing scatter/gather
+support, since INIT only needs to be called once for the full
+operation.
 
 Signed-off-by: Dave Watson <davejwatson@fb.com>
 ---
- arch/x86/crypto/aesni-intel_asm.S | 53 ++++++++++++++++++---------------------
- 1 file changed, 24 insertions(+), 29 deletions(-)
+ arch/x86/crypto/aesni-intel_asm.S | 84 +++++++++++++++------------------------
+ 1 file changed, 33 insertions(+), 51 deletions(-)
 
 diff --git a/arch/x86/crypto/aesni-intel_asm.S b/arch/x86/crypto/aesni-intel_asm.S
-index 48911fe..39b42b1 100644
+index 39b42b1..b9fe2ab 100644
 --- a/arch/x86/crypto/aesni-intel_asm.S
 +++ b/arch/x86/crypto/aesni-intel_asm.S
-@@ -170,6 +170,26 @@ ALL_F:      .octa 0xffffffffffffffffffffffffffffffff
- #define TKEYP	T1
- #endif
+@@ -191,6 +191,37 @@ ALL_F:      .octa 0xffffffffffffffffffffffffffffffff
+ 	pop	%r12
+ .endm
  
-+.macro FUNC_SAVE
-+	push	%r12
-+	push	%r13
-+	push	%r14
-+	mov	%rsp, %r14
-+#
-+# states of %xmm registers %xmm6:%xmm15 not saved
-+# all %xmm registers are clobbered
-+#
-+	sub	$VARIABLE_OFFSET, %rsp
-+	and	$~63, %rsp
++
++# GCM_INIT initializes a gcm_context struct to prepare for encoding/decoding.
++# Clobbers rax, r10-r13 and xmm0-xmm6, %xmm13
++.macro GCM_INIT
++	mov	%arg6, %r12
++	movdqu	(%r12), %xmm13
++	movdqa  SHUF_MASK(%rip), %xmm2
++	PSHUFB_XMM %xmm2, %xmm13
++
++	# precompute HashKey<<1 mod poly from the HashKey (required for GHASH)
++
++	movdqa	%xmm13, %xmm2
++	psllq	$1, %xmm13
++	psrlq	$63, %xmm2
++	movdqa	%xmm2, %xmm1
++	pslldq	$8, %xmm2
++	psrldq	$8, %xmm1
++	por	%xmm2, %xmm13
++
++	# reduce HashKey<<1
++
++	pshufd	$0x24, %xmm1, %xmm2
++	pcmpeqd TWOONE(%rip), %xmm2
++	pand	POLY(%rip), %xmm2
++	pxor	%xmm2, %xmm13
++	movdqa	%xmm13, HashKey(%rsp)
++	mov	%arg4, %r13			# %xmm13 holds HashKey<<1 (mod poly)
++	and	$-16, %r13
++	mov	%r13, %r12
 +.endm
 +
-+
-+.macro FUNC_RESTORE
-+	mov	%r14, %rsp
-+	pop	%r14
-+	pop	%r13
-+	pop	%r12
-+.endm
- 
  #ifdef __x86_64__
  /* GHASH_MUL MACRO to implement: Data*HashKey mod (128,127,126,121,0)
-@@ -1130,16 +1150,7 @@ _esb_loop_\@:
  *
+@@ -1151,36 +1182,11 @@ _esb_loop_\@:
  *****************************************************************************/
  ENTRY(aesni_gcm_dec)
--	push	%r12
--	push	%r13
--	push	%r14
--	mov	%rsp, %r14
--/*
--* states of %xmm registers %xmm6:%xmm15 not saved
--* all %xmm registers are clobbered
--*/
--	sub	$VARIABLE_OFFSET, %rsp
--	and	$~63, %rsp                        # align rsp to 64 bytes
-+	FUNC_SAVE
- 	mov	%arg6, %r12
- 	movdqu	(%r12), %xmm13			  # %xmm13 = HashKey
-         movdqa  SHUF_MASK(%rip), %xmm2
-@@ -1309,10 +1320,7 @@ _T_1_decrypt:
- _T_16_decrypt:
- 	movdqu	%xmm0, (%r10)
- _return_T_done_decrypt:
--	mov	%r14, %rsp
--	pop	%r14
--	pop	%r13
--	pop	%r12
-+	FUNC_RESTORE
- 	ret
- ENDPROC(aesni_gcm_dec)
+ 	FUNC_SAVE
+-	mov	%arg6, %r12
+-	movdqu	(%r12), %xmm13			  # %xmm13 = HashKey
+-        movdqa  SHUF_MASK(%rip), %xmm2
+-	PSHUFB_XMM %xmm2, %xmm13
+-
+-
+-# Precompute HashKey<<1 (mod poly) from the hash key (required for GHASH)
+-
+-	movdqa	%xmm13, %xmm2
+-	psllq	$1, %xmm13
+-	psrlq	$63, %xmm2
+-	movdqa	%xmm2, %xmm1
+-	pslldq	$8, %xmm2
+-	psrldq	$8, %xmm1
+-	por	%xmm2, %xmm13
+-
+-        # Reduction
+-
+-	pshufd	$0x24, %xmm1, %xmm2
+-	pcmpeqd TWOONE(%rip), %xmm2
+-	pand	POLY(%rip), %xmm2
+-	pxor	%xmm2, %xmm13     # %xmm13 holds the HashKey<<1 (mod poly)
  
-@@ -1393,22 +1401,12 @@ ENDPROC(aesni_gcm_dec)
- * poly = x^128 + x^127 + x^126 + x^121 + 1
++	GCM_INIT
+ 
+         # Decrypt first few blocks
+ 
+-	movdqa %xmm13, HashKey(%rsp)           # store HashKey<<1 (mod poly)
+-	mov %arg4, %r13    # save the number of bytes of plaintext/ciphertext
+-	and $-16, %r13                      # %r13 = %r13 - (%r13 mod 16)
+-	mov %r13, %r12
+ 	and $(3<<4), %r12
+ 	jz _initial_num_blocks_is_0_decrypt
+ 	cmp $(2<<4), %r12
+@@ -1402,32 +1408,8 @@ ENDPROC(aesni_gcm_dec)
  ***************************************************************************/
  ENTRY(aesni_gcm_enc)
--	push	%r12
--	push	%r13
--	push	%r14
--	mov	%rsp, %r14
--#
--# states of %xmm registers %xmm6:%xmm15 not saved
--# all %xmm registers are clobbered
--#
--	sub	$VARIABLE_OFFSET, %rsp
--	and	$~63, %rsp
-+	FUNC_SAVE
- 	mov	%arg6, %r12
- 	movdqu	(%r12), %xmm13
-         movdqa  SHUF_MASK(%rip), %xmm2
- 	PSHUFB_XMM %xmm2, %xmm13
- 
+ 	FUNC_SAVE
+-	mov	%arg6, %r12
+-	movdqu	(%r12), %xmm13
+-        movdqa  SHUF_MASK(%rip), %xmm2
+-	PSHUFB_XMM %xmm2, %xmm13
 -
- # precompute HashKey<<1 mod poly from the HashKey (required for GHASH)
+-# precompute HashKey<<1 mod poly from the HashKey (required for GHASH)
+-
+-	movdqa	%xmm13, %xmm2
+-	psllq	$1, %xmm13
+-	psrlq	$63, %xmm2
+-	movdqa	%xmm2, %xmm1
+-	pslldq	$8, %xmm2
+-	psrldq	$8, %xmm1
+-	por	%xmm2, %xmm13
+-
+-        # reduce HashKey<<1
+-
+-	pshufd	$0x24, %xmm1, %xmm2
+-	pcmpeqd TWOONE(%rip), %xmm2
+-	pand	POLY(%rip), %xmm2
+-	pxor	%xmm2, %xmm13
+-	movdqa	%xmm13, HashKey(%rsp)
+-	mov	%arg4, %r13            # %xmm13 holds HashKey<<1 (mod poly)
+-	and	$-16, %r13
+-	mov	%r13, %r12
  
- 	movdqa	%xmm13, %xmm2
-@@ -1576,10 +1574,7 @@ _T_1_encrypt:
- _T_16_encrypt:
- 	movdqu	%xmm0, (%r10)
- _return_T_done_encrypt:
--	mov	%r14, %rsp
--	pop	%r14
--	pop	%r13
--	pop	%r12
-+	FUNC_RESTORE
- 	ret
- ENDPROC(aesni_gcm_enc)
++	GCM_INIT
+         # Encrypt first few blocks
  
+ 	and	$(3<<4), %r12
 -- 
 2.9.5
