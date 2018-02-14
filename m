@@ -1,12 +1,12 @@
 From: SF Markus Elfring <elfring@users.sourceforge.net>
-Subject: [PATCH 1/2] crypto: bcm: Delete an error message for a failed memory
- allocation in do_shash()
-Date: Wed, 14 Feb 2018 22:39:25 +0100
-Message-ID: <35f107c8-c640-07f9-c10f-83fbe1ce4259@users.sourceforge.net>
+Subject: [PATCH 2/2] crypto: bcm: One function call less in do_shash() after
+ error detection
+Date: Wed, 14 Feb 2018 22:40:26 +0100
+Message-ID: <55bdcf76-f1c9-180d-6798-959e617b10ac@users.sourceforge.net>
 References: <68946b12-83d6-ab74-fd54-71b23cf9b7ef@users.sourceforge.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Cc: LKML <linux-kernel@vger.kernel.org>,
         kernel-janitors@vger.kernel.org
 To: linux-crypto@vger.kernel.org,
@@ -23,28 +23,44 @@ Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
 From: Markus Elfring <elfring@users.sourceforge.net>
-Date: Wed, 14 Feb 2018 22:05:11 +0100
+Date: Wed, 14 Feb 2018 22:22:20 +0100
 
-Omit an extra message for a memory allocation failure in this function.
+The kfree() function was called in one case by the do_shash() function
+during error handling even if the passed variable contained a null pointer.
 
-This issue was detected by using the Coccinelle software.
+* Reorder two function calls at the end.
+
+* Add a jump target.
 
 Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
 ---
- drivers/crypto/bcm/util.c | 1 -
- 1 file changed, 1 deletion(-)
+ drivers/crypto/bcm/util.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/crypto/bcm/util.c b/drivers/crypto/bcm/util.c
-index d543c010ccd9..a912c6ad3e85 100644
+index a912c6ad3e85..c141a0242223 100644
 --- a/drivers/crypto/bcm/util.c
 +++ b/drivers/crypto/bcm/util.c
-@@ -279,7 +279,6 @@ int do_shash(unsigned char *name, unsigned char *result,
+@@ -279,7 +279,7 @@ int do_shash(unsigned char *name, unsigned char *result,
  	sdesc = kmalloc(size, GFP_KERNEL);
  	if (!sdesc) {
  		rc = -ENOMEM;
--		pr_err("%s: Memory allocation failure\n", __func__);
- 		goto do_shash_err;
+-		goto do_shash_err;
++		goto free_shash;
  	}
  	sdesc->shash.tfm = hash;
+ 	sdesc->shash.flags = 0x0;
+@@ -314,9 +314,9 @@ int do_shash(unsigned char *name, unsigned char *result,
+ 		pr_err("%s: Could not generate %s hash\n", __func__, name);
+ 
+ do_shash_err:
+-	crypto_free_shash(hash);
+ 	kfree(sdesc);
+-
++free_shash:
++	crypto_free_shash(hash);
+ 	return rc;
+ }
+ 
 -- 
 2.16.1
