@@ -1,184 +1,108 @@
-From: SF Markus Elfring <elfring@users.sourceforge.net>
-Subject: [PATCH 2/2] crypto: caam: Use common error handling code in four
- functions
-Date: Wed, 14 Feb 2018 19:32:33 +0100
-Message-ID: <3c2905a1-b3a4-be87-618e-8562d3a5d8b4@users.sourceforge.net>
-References: <9a9a602d-93da-457d-c37d-2acbb4b7b5d5@users.sourceforge.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Cc: LKML <linux-kernel@vger.kernel.org>,
-        kernel-janitors@vger.kernel.org
+From: Eric Biggers <ebiggers@google.com>
+Subject: [PATCH v3 0/5] crypto: Speck support
+Date: Wed, 14 Feb 2018 10:42:18 -0800
+Message-ID: <20180214184223.254359-1-ebiggers@google.com>
+Cc: linux-fscrypt@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Jeffrey Walton <noloader@gmail.com>,
+        Paul Crowley <paulcrowley@google.com>,
+        Patrik Torstensson <totte@google.com>,
+        Greg Kaiser <gkaiser@google.com>,
+        Paul Lawrence <paullawrence@google.com>,
+        Michael Halcrow <mhalcrow@google.com>,
+        Alex Cope <alexcope@google.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Eric Biggers <ebiggers@google.com>
 To: linux-crypto@vger.kernel.org,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@nxp.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <9a9a602d-93da-457d-c37d-2acbb4b7b5d5@users.sourceforge.net>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+        Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-it0-f65.google.com ([209.85.214.65]:37154 "EHLO
+        mail-it0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754703AbeBNSoK (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 14 Feb 2018 13:44:10 -0500
+Received: by mail-it0-f65.google.com with SMTP id d10so10185052itj.2
+        for <linux-crypto@vger.kernel.org>; Wed, 14 Feb 2018 10:44:10 -0800 (PST)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-From: Markus Elfring <elfring@users.sourceforge.net>
-Date: Wed, 14 Feb 2018 19:14:49 +0100
+Hello,
 
-Add jump targets so that a bit of exception handling can be better reused
-at the end of these functions.
+This series adds Speck support to the crypto API, including the Speck128
+and Speck64 variants.  Speck is a lightweight block cipher that can be
+much faster than AES on processors that don't have AES instructions.
 
-Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
----
- drivers/crypto/caam/caamalg.c  | 32 ++++++++++++++++----------------
- drivers/crypto/caam/caamhash.c | 23 ++++++++++-------------
- 2 files changed, 26 insertions(+), 29 deletions(-)
+We are planning to offer Speck-XTS (probably Speck128/256-XTS) as an
+option for dm-crypt and fscrypt on Android, for low-end mobile devices
+with older CPUs such as ARMv7 which don't have the Cryptography
+Extensions.  Currently, such devices are unencrypted because AES is not
+fast enough, even when the NEON bit-sliced implementation of AES is
+used.  Other AES alternatives such as Twofish, Threefish, Camellia,
+CAST6, and Serpent aren't fast enough either; it seems that only a
+modern ARX cipher can provide sufficient performance on these devices.
 
-diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
-index d1f25a90552a..3d26c44040c7 100644
---- a/drivers/crypto/caam/caamalg.c
-+++ b/drivers/crypto/caam/caamalg.c
-@@ -1560,11 +1560,8 @@ static struct ablkcipher_edesc *ablkcipher_edesc_alloc(struct ablkcipher_request
- 	/* allocate space for base edesc and hw desc commands, link tables */
- 	edesc = kzalloc(sizeof(*edesc) + desc_bytes + sec4_sg_bytes,
- 			GFP_DMA | flags);
--	if (!edesc) {
--		caam_unmap(jrdev, req->src, req->dst, src_nents, dst_nents,
--			   iv_dma, ivsize, 0, 0);
--		return ERR_PTR(-ENOMEM);
--	}
-+	if (!edesc)
-+		goto unmap_caam;
- 
- 	edesc->src_nents = src_nents;
- 	edesc->dst_nents = dst_nents;
-@@ -1587,10 +1584,8 @@ static struct ablkcipher_edesc *ablkcipher_edesc_alloc(struct ablkcipher_request
- 					    sec4_sg_bytes, DMA_TO_DEVICE);
- 	if (dma_mapping_error(jrdev, edesc->sec4_sg_dma)) {
- 		dev_err(jrdev, "unable to map S/G table\n");
--		caam_unmap(jrdev, req->src, req->dst, src_nents, dst_nents,
--			   iv_dma, ivsize, 0, 0);
- 		kfree(edesc);
--		return ERR_PTR(-ENOMEM);
-+		goto unmap_caam;
- 	}
- 
- 	edesc->iv_dma = iv_dma;
-@@ -1603,6 +1598,11 @@ static struct ablkcipher_edesc *ablkcipher_edesc_alloc(struct ablkcipher_request
- 
- 	*iv_contig_out = in_contig;
- 	return edesc;
-+
-+unmap_caam:
-+	caam_unmap(jrdev, req->src, req->dst, src_nents, dst_nents,
-+		   iv_dma, ivsize, 0, 0);
-+	return ERR_PTR(-ENOMEM);
- }
- 
- static int ablkcipher_encrypt(struct ablkcipher_request *req)
-@@ -1768,11 +1768,8 @@ static struct ablkcipher_edesc *ablkcipher_giv_edesc_alloc(
- 	sec4_sg_bytes = sec4_sg_ents * sizeof(struct sec4_sg_entry);
- 	edesc = kzalloc(sizeof(*edesc) + desc_bytes + sec4_sg_bytes,
- 			GFP_DMA | flags);
--	if (!edesc) {
--		caam_unmap(jrdev, req->src, req->dst, src_nents, dst_nents,
--			   iv_dma, ivsize, 0, 0);
--		return ERR_PTR(-ENOMEM);
--	}
-+	if (!edesc)
-+		goto unmap_caam;
- 
- 	edesc->src_nents = src_nents;
- 	edesc->dst_nents = dst_nents;
-@@ -1795,10 +1792,8 @@ static struct ablkcipher_edesc *ablkcipher_giv_edesc_alloc(
- 					    sec4_sg_bytes, DMA_TO_DEVICE);
- 	if (dma_mapping_error(jrdev, edesc->sec4_sg_dma)) {
- 		dev_err(jrdev, "unable to map S/G table\n");
--		caam_unmap(jrdev, req->src, req->dst, src_nents, dst_nents,
--			   iv_dma, ivsize, 0, 0);
- 		kfree(edesc);
--		return ERR_PTR(-ENOMEM);
-+		goto unmap_caam;
- 	}
- 	edesc->iv_dma = iv_dma;
- 
-@@ -1811,6 +1806,11 @@ static struct ablkcipher_edesc *ablkcipher_giv_edesc_alloc(
- 
- 	*iv_contig_out = out_contig;
- 	return edesc;
-+
-+unmap_caam:
-+	caam_unmap(jrdev, req->src, req->dst, src_nents, dst_nents,
-+		   iv_dma, ivsize, 0, 0);
-+	return ERR_PTR(-ENOMEM);
- }
- 
- static int ablkcipher_givencrypt(struct skcipher_givcrypt_request *creq)
-diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
-index dc269eba08ad..b5e43a1f38f0 100644
---- a/drivers/crypto/caam/caamhash.c
-+++ b/drivers/crypto/caam/caamhash.c
-@@ -371,16 +371,16 @@ static int hash_digest_key(struct caam_hash_ctx *ctx, const u8 *key_in,
- 				 DMA_TO_DEVICE);
- 	if (dma_mapping_error(jrdev, src_dma)) {
- 		dev_err(jrdev, "unable to map key input memory\n");
--		kfree(desc);
--		return -ENOMEM;
-+		ret = -ENOMEM;
-+		goto free_desc;
- 	}
- 	dst_dma = dma_map_single(jrdev, (void *)key_out, digestsize,
- 				 DMA_FROM_DEVICE);
- 	if (dma_mapping_error(jrdev, dst_dma)) {
- 		dev_err(jrdev, "unable to map key output memory\n");
- 		dma_unmap_single(jrdev, src_dma, *keylen, DMA_TO_DEVICE);
--		kfree(desc);
--		return -ENOMEM;
-+		ret = -ENOMEM;
-+		goto free_desc;
- 	}
- 
- 	/* Job descriptor to perform unkeyed hash on key_in */
-@@ -419,7 +419,7 @@ static int hash_digest_key(struct caam_hash_ctx *ctx, const u8 *key_in,
- 	dma_unmap_single(jrdev, dst_dma, digestsize, DMA_FROM_DEVICE);
- 
- 	*keylen = digestsize;
--
-+free_desc:
- 	kfree(desc);
- 
- 	return ret;
-@@ -1070,11 +1070,8 @@ static int ahash_digest(struct ahash_request *req)
- 
- 	ret = ahash_edesc_add_src(ctx, edesc, req, mapped_nents, 0, 0,
- 				  req->nbytes);
--	if (ret) {
--		ahash_unmap(jrdev, edesc, req, digestsize);
--		kfree(edesc);
--		return ret;
--	}
-+	if (ret)
-+		goto unmap_hash;
- 
- 	desc = edesc->hw_desc;
- 
-@@ -1082,9 +1079,8 @@ static int ahash_digest(struct ahash_request *req)
- 						digestsize);
- 	if (dma_mapping_error(jrdev, edesc->dst_dma)) {
- 		dev_err(jrdev, "unable to map dst\n");
--		ahash_unmap(jrdev, edesc, req, digestsize);
--		kfree(edesc);
--		return -ENOMEM;
-+		ret = -ENOMEM;
-+		goto unmap_hash;
- 	}
- 
- #ifdef DEBUG
-@@ -1096,6 +1092,7 @@ static int ahash_digest(struct ahash_request *req)
- 	if (!ret) {
- 		ret = -EINPROGRESS;
- 	} else {
-+unmap_hash:
- 		ahash_unmap(jrdev, edesc, req, digestsize);
- 		kfree(edesc);
- 	}
+This is a replacement for our original proposal
+(https://patchwork.kernel.org/patch/10101451/) which was to offer
+ChaCha20 for these devices.  However, the use of a stream cipher for
+disk/file encryption with no space to store nonces would have been much
+more insecure than we thought initially, given that it would be used on
+top of flash storage as well as potentially on top of F2FS, neither of
+which is guaranteed to overwrite data in-place.
+
+Speck has been somewhat controversial due to its origin.  Nevertheless,
+it has a straightforward design (it's an ARX cipher), and it appears to
+be the leading software-optimized lightweight block cipher currently,
+with the most cryptanalysis.  It's also easy to implement without side
+channels, unlike AES.  Moreover, we only intend Speck to be used when
+the status quo is no encryption, due to AES not being fast enough.
+
+We've also considered a novel length-preserving encryption mode based on
+ChaCha20 and Poly1305.  While theoretically attractive, such a mode
+would be a brand new crypto construction and would be more complicated
+and difficult to implement efficiently in comparison to Speck-XTS.
+
+Thus, patch 1 adds a generic implementation of Speck, and the following
+patches add a 32-bit ARM NEON implementation of Speck-XTS.  The
+NEON-accelerated implementation is much faster than the generic
+implementation and therefore is the implementation that would primarily
+be used in practice on the devices we are targeting.
+
+There is no AArch64 implementation included, since most such CPUs have
+the Cryptography Extensions, allowing the use of AES.  An AArch64
+implementation can be added later if there is interest though.
+
+Changed since v2:
+
+  - Fix __speck64_xts_crypt() to work on big endian CPUs.
+
+Changed since v1:
+
+  - Use the word order recommended by the Speck authors.  All test
+    vectors were updated.
+
+Eric Biggers (5):
+  crypto: add support for the Speck block cipher
+  crypto: speck - export common helpers
+  crypto: arm/speck - add NEON-accelerated implementation of Speck-XTS
+  crypto: speck - add test vectors for Speck128-XTS
+  crypto: speck - add test vectors for Speck64-XTS
+
+ arch/arm/crypto/Kconfig           |    6 +
+ arch/arm/crypto/Makefile          |    2 +
+ arch/arm/crypto/speck-neon-core.S |  432 +++++++++
+ arch/arm/crypto/speck-neon-glue.c |  288 ++++++
+ crypto/Kconfig                    |   14 +
+ crypto/Makefile                   |    1 +
+ crypto/speck.c                    |  307 ++++++
+ crypto/testmgr.c                  |   36 +
+ crypto/testmgr.h                  | 1486 +++++++++++++++++++++++++++++
+ include/crypto/speck.h            |   62 ++
+ 10 files changed, 2634 insertions(+)
+ create mode 100644 arch/arm/crypto/speck-neon-core.S
+ create mode 100644 arch/arm/crypto/speck-neon-glue.c
+ create mode 100644 crypto/speck.c
+ create mode 100644 include/crypto/speck.h
+
 -- 
-2.16.1
+2.16.1.291.g4437f3f132-goog
