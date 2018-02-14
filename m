@@ -1,53 +1,68 @@
-From: SF Markus Elfring <elfring@users.sourceforge.net>
-Subject: [PATCH 4/4] crypto: ux500: Delete two unnecessary variable
- initialisations in ux500_cryp_probe()
-Date: Wed, 14 Feb 2018 11:22:28 +0100
-Message-ID: <b8fb9abe-2ac4-d720-b676-79083fc7e5e6@users.sourceforge.net>
-References: <20dcb583-5455-b5b9-94df-db9d1e21931f@users.sourceforge.net>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: [PATCH v3 4/4] crypto: add CRYPTO_TFM_REQ_IV_SERIALIZE flag
+Date: Wed, 14 Feb 2018 13:47:41 +0100
+Message-ID: <1608123.Kiafq77GoN@tauon.chronox.de>
+References: <2118226.LQArbCsRu5@tauon.chronox.de> <3191772.GlMloJJ0Yf@positron.chronox.de> <57d07371-8ad5-0f79-d511-2a0000f4eda1@chelsio.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Cc: LKML <linux-kernel@vger.kernel.org>,
-        kernel-janitors@vger.kernel.org
-To: linux-crypto@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Geliang Tang <geliangtang@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+        Gilad Ben-Yossef <gilad@benyossef.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        linuxarm@huawei.com
+To: Harsh Jain <harsh@chelsio.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mout.web.de ([212.227.17.12]:33111 "EHLO mout.web.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S966996AbeBNKWk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 14 Feb 2018 05:22:40 -0500
-In-Reply-To: <20dcb583-5455-b5b9-94df-db9d1e21931f@users.sourceforge.net>
-Content-Language: en-US
+Received: from mo4-p00-ob.smtp.rzone.de ([81.169.146.163]:8430 "EHLO
+        mo4-p00-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S967589AbeBNMrq (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 14 Feb 2018 07:47:46 -0500
+In-Reply-To: <57d07371-8ad5-0f79-d511-2a0000f4eda1@chelsio.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Markus Elfring <elfring@users.sourceforge.net>
-Date: Wed, 14 Feb 2018 10:56:38 +0100
+Am Mittwoch, 14. Februar 2018, 06:50:38 CET schrieb Harsh Jain:
 
-Two local variables will eventually be set to appropriate pointers
-a bit later. Thus omit their explicit initialisation at the beginning.
+Hi Harsh,
 
-Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
----
- drivers/crypto/ux500/cryp/cryp_core.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+> On 10-02-2018 03:34, Stephan M=FCller wrote:
+> > Crypto drivers may implement a streamlined serialization support for AIO
+> > requests that is reported by the CRYPTO_ALG_SERIALIZES_IV_ACCESS flag to
+> > the crypto user. When the user decides that he wants to send multiple
+> > AIO requests concurrently and wants the crypto driver to handle the
+> > serialization, the caller has to set CRYPTO_TFM_REQ_IV_SERIALIZE to not=
+ify
+> > the crypto driver.
+>=20
+> Will crypto_alloc_* API takes cares of this flag?. For Kernel Crypto user=
+ IV
+> Synchronization logic depends on weather tfm allocated supports IV
+> Serialisation or not.
 
-diff --git a/drivers/crypto/ux500/cryp/cryp_core.c b/drivers/crypto/ux500/cryp/cryp_core.c
-index 7c811d7eb274..cb31b59c9d53 100644
---- a/drivers/crypto/ux500/cryp/cryp_core.c
-+++ b/drivers/crypto/ux500/cryp/cryp_core.c
-@@ -1404,8 +1404,8 @@ static void cryp_algs_unregister_all(void)
- static int ux500_cryp_probe(struct platform_device *pdev)
- {
- 	int ret;
--	struct resource *res = NULL;
--	struct resource *res_irq = NULL;
-+	struct resource *res;
-+	struct resource *res_irq;
- 	struct cryp_device_data *device_data;
- 	struct cryp_protection_config prot = {
- 		.privilege_access = CRYP_STATE_ENABLE
--- 
-2.16.1
+The alloc API calls are not related to this flag. This flag is set in the=20
+request sent to the driver. If the driver sees this flag, it shall perform =
+its=20
+serialization.
+
+The idea is the following: the driver reports CRYPTO_ALG_SERIALIZES_IV_ACCE=
+SS=20
+if it can serialize requests. In this case, the higher level functions (lik=
+e=20
+AF_ALG) would not serialize the request. Now, the higher level functions mu=
+st=20
+inform the driver that its serialization function shall be performed which=
+=20
+implemented with CRYPTO_TFM_REQ_IV_SERIALIZE.
+
+Note, the higher level functions may decide that no serialization is necess=
+ary=20
+(e.g. in the case the inline IV handling is followed by AF_ALG). This impli=
+es=20
+that the CRYPTO_TFM_REQ_IV_SERIALIZE flag would not be set even though the=
+=20
+driver is capable of serializing (and thus would report=20
+CRYPTO_ALG_SERIALIZES_IV_ACCESS).
+
+Ciao
+Stephan
