@@ -1,8 +1,8 @@
 From: Dave Watson <davejwatson@fb.com>
-Subject: [PATCH v2 13/14] x86/crypto: aesni: Introduce scatter/gather asm
- function stubs
-Date: Wed, 14 Feb 2018 09:40:47 -0800
-Message-ID: <20180214174047.GA62219@davejwatson-mba>
+Subject: [PATCH v2 14/14] x86/crypto: aesni: Update aesni-intel_glue to use
+ scatter/gather
+Date: Wed, 14 Feb 2018 09:40:58 -0800
+Message-ID: <20180214174058.GA62239@davejwatson-mba>
 References: <cover.1518628278.git.davejwatson@fb.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -17,271 +17,194 @@ To: Herbert Xu <herbert@gondor.apana.org.au>,
         Junaid Shahid <junaids@google.com>,
         Steffen Klassert <steffen.klassert@secunet.com>,
         <linux-crypto@vger.kernel.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:53384 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1161361AbeBNRlp (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 14 Feb 2018 12:41:45 -0500
 Content-Disposition: inline
 In-Reply-To: <cover.1518628278.git.davejwatson@fb.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-The asm macros are all set up now, introduce entry points.
+Add gcmaes_crypt_by_sg routine, that will do scatter/gather
+by sg. Either src or dst may contain multiple buffers, so
+iterate over both at the same time if they are different.
+If the input is the same as the output, iterate only over one.
 
-GCM_INIT and GCM_COMPLETE have arguments supplied, so that
-the new scatter/gather entry points don't have to take all the
-arguments, and only the ones they need.
+Currently both the AAD and TAG must be linear, so copy them out
+with scatterlist_map_and_copy.  If first buffer contains the
+entire AAD, we can optimize and not copy.   Since the AAD
+can be any size, if copied it must be on the heap.  TAG can
+be on the stack since it is always < 16 bytes.
+
+Only the SSE routines are updated so far, so leave the previous
+gcmaes_en/decrypt routines, and branch to the sg ones if the
+keysize is inappropriate for avx, or we are SSE only.
 
 Signed-off-by: Dave Watson <davejwatson@fb.com>
 ---
- arch/x86/crypto/aesni-intel_asm.S  | 116 ++++++++++++++++++++++++++++---------
- arch/x86/crypto/aesni-intel_glue.c |  16 +++++
- 2 files changed, 106 insertions(+), 26 deletions(-)
+ arch/x86/crypto/aesni-intel_glue.c | 133 +++++++++++++++++++++++++++++++++++++
+ 1 file changed, 133 insertions(+)
 
-diff --git a/arch/x86/crypto/aesni-intel_asm.S b/arch/x86/crypto/aesni-intel_asm.S
-index b941952..311b2de 100644
---- a/arch/x86/crypto/aesni-intel_asm.S
-+++ b/arch/x86/crypto/aesni-intel_asm.S
-@@ -200,8 +200,8 @@ ALL_F:      .octa 0xffffffffffffffffffffffffffffffff
- # Output: HashKeys stored in gcm_context_data.  Only needs to be called
- # once per key.
- # clobbers r12, and tmp xmm registers.
--.macro PRECOMPUTE TMP1 TMP2 TMP3 TMP4 TMP5 TMP6 TMP7
--	mov	arg7, %r12
-+.macro PRECOMPUTE SUBKEY TMP1 TMP2 TMP3 TMP4 TMP5 TMP6 TMP7
-+	mov	\SUBKEY, %r12
- 	movdqu	(%r12), \TMP3
- 	movdqa	SHUF_MASK(%rip), \TMP2
- 	PSHUFB_XMM \TMP2, \TMP3
-@@ -254,14 +254,14 @@ ALL_F:      .octa 0xffffffffffffffffffffffffffffffff
- 
- # GCM_INIT initializes a gcm_context struct to prepare for encoding/decoding.
- # Clobbers rax, r10-r13 and xmm0-xmm6, %xmm13
--.macro GCM_INIT
--	mov arg9, %r11
-+.macro GCM_INIT Iv SUBKEY AAD AADLEN
-+	mov \AADLEN, %r11
- 	mov %r11, AadLen(%arg2) # ctx_data.aad_length = aad_length
- 	xor %r11, %r11
- 	mov %r11, InLen(%arg2) # ctx_data.in_length = 0
- 	mov %r11, PBlockLen(%arg2) # ctx_data.partial_block_length = 0
- 	mov %r11, PBlockEncKey(%arg2) # ctx_data.partial_block_enc_key = 0
--	mov %arg6, %rax
-+	mov \Iv, %rax
- 	movdqu (%rax), %xmm0
- 	movdqu %xmm0, OrigIV(%arg2) # ctx_data.orig_IV = iv
- 
-@@ -269,11 +269,11 @@ ALL_F:      .octa 0xffffffffffffffffffffffffffffffff
- 	PSHUFB_XMM %xmm2, %xmm0
- 	movdqu %xmm0, CurCount(%arg2) # ctx_data.current_counter = iv
- 
--	PRECOMPUTE %xmm1 %xmm2 %xmm3 %xmm4 %xmm5 %xmm6 %xmm7
-+	PRECOMPUTE \SUBKEY, %xmm1, %xmm2, %xmm3, %xmm4, %xmm5, %xmm6, %xmm7,
- 	movdqa HashKey(%arg2), %xmm13
- 
--	CALC_AAD_HASH %xmm13 %xmm0 %xmm1 %xmm2 %xmm3 %xmm4 \
--	%xmm5 %xmm6
-+	CALC_AAD_HASH %xmm13, \AAD, \AADLEN, %xmm0, %xmm1, %xmm2, %xmm3, \
-+	%xmm4, %xmm5, %xmm6
- .endm
- 
- # GCM_ENC_DEC Encodes/Decodes given data. Assumes that the passed gcm_context
-@@ -435,7 +435,7 @@ _multiple_of_16_bytes_\@:
- # GCM_COMPLETE Finishes update of tag of last partial block
- # Output: Authorization Tag (AUTH_TAG)
- # Clobbers rax, r10-r12, and xmm0, xmm1, xmm5-xmm15
--.macro GCM_COMPLETE
-+.macro GCM_COMPLETE AUTHTAG AUTHTAGLEN
- 	movdqu AadHash(%arg2), %xmm8
- 	movdqu HashKey(%arg2), %xmm13
- 
-@@ -466,8 +466,8 @@ _partial_done\@:
- 	ENCRYPT_SINGLE_BLOCK	%xmm0,  %xmm1	  # E(K, Y0)
- 	pxor	%xmm8, %xmm0
- _return_T_\@:
--	mov	arg10, %r10                     # %r10 = authTag
--	mov	arg11, %r11                    # %r11 = auth_tag_len
-+	mov	\AUTHTAG, %r10                     # %r10 = authTag
-+	mov	\AUTHTAGLEN, %r11                    # %r11 = auth_tag_len
- 	cmp	$16, %r11
- 	je	_T_16_\@
- 	cmp	$8, %r11
-@@ -599,11 +599,11 @@ _done_read_partial_block_\@:
- 
- # CALC_AAD_HASH: Calculates the hash of the data which will not be encrypted.
- # clobbers r10-11, xmm14
--.macro CALC_AAD_HASH HASHKEY TMP1 TMP2 TMP3 TMP4 TMP5 \
-+.macro CALC_AAD_HASH HASHKEY AAD AADLEN TMP1 TMP2 TMP3 TMP4 TMP5 \
- 	TMP6 TMP7
- 	MOVADQ	   SHUF_MASK(%rip), %xmm14
--	mov	   arg8, %r10		# %r10 = AAD
--	mov	   arg9, %r11		# %r11 = aadLen
-+	mov	   \AAD, %r10		# %r10 = AAD
-+	mov	   \AADLEN, %r11		# %r11 = aadLen
- 	pxor	   \TMP7, \TMP7
- 	pxor	   \TMP6, \TMP6
- 
-@@ -1103,18 +1103,18 @@ TMP6 XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 XMM8 operation
- 	mov	  keysize,%eax
- 	shr	  $2,%eax			# 128->4, 192->6, 256->8
- 	sub	  $4,%eax			# 128->0, 192->2, 256->4
--	jz	  aes_loop_par_enc_done
-+	jz	  aes_loop_par_enc_done\@
- 
--aes_loop_par_enc:
-+aes_loop_par_enc\@:
- 	MOVADQ	  (%r10),\TMP3
- .irpc	index, 1234
- 	AESENC	  \TMP3, %xmm\index
- .endr
- 	add	  $16,%r10
- 	sub	  $1,%eax
--	jnz	  aes_loop_par_enc
-+	jnz	  aes_loop_par_enc\@
- 
--aes_loop_par_enc_done:
-+aes_loop_par_enc_done\@:
- 	MOVADQ	  (%r10), \TMP3
- 	AESENCLAST \TMP3, \XMM1           # Round 10
- 	AESENCLAST \TMP3, \XMM2
-@@ -1311,18 +1311,18 @@ TMP6 XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 XMM8 operation
- 	mov	  keysize,%eax
- 	shr	  $2,%eax		        # 128->4, 192->6, 256->8
- 	sub	  $4,%eax			# 128->0, 192->2, 256->4
--	jz	  aes_loop_par_dec_done
-+	jz	  aes_loop_par_dec_done\@
- 
--aes_loop_par_dec:
-+aes_loop_par_dec\@:
- 	MOVADQ	  (%r10),\TMP3
- .irpc	index, 1234
- 	AESENC	  \TMP3, %xmm\index
- .endr
- 	add	  $16,%r10
- 	sub	  $1,%eax
--	jnz	  aes_loop_par_dec
-+	jnz	  aes_loop_par_dec\@
- 
--aes_loop_par_dec_done:
-+aes_loop_par_dec_done\@:
- 	MOVADQ	  (%r10), \TMP3
- 	AESENCLAST \TMP3, \XMM1           # last round
- 	AESENCLAST \TMP3, \XMM2
-@@ -1598,9 +1598,9 @@ _esb_loop_\@:
- ENTRY(aesni_gcm_dec)
- 	FUNC_SAVE
- 
--	GCM_INIT
-+	GCM_INIT %arg6, arg7, arg8, arg9
- 	GCM_ENC_DEC dec
--	GCM_COMPLETE
-+	GCM_COMPLETE arg10, arg11
- 	FUNC_RESTORE
- 	ret
- ENDPROC(aesni_gcm_dec)
-@@ -1686,13 +1686,77 @@ ENDPROC(aesni_gcm_dec)
- ENTRY(aesni_gcm_enc)
- 	FUNC_SAVE
- 
--	GCM_INIT
-+	GCM_INIT %arg6, arg7, arg8, arg9
- 	GCM_ENC_DEC enc
--	GCM_COMPLETE
-+
-+	GCM_COMPLETE arg10, arg11
- 	FUNC_RESTORE
- 	ret
- ENDPROC(aesni_gcm_enc)
- 
-+/*****************************************************************************
-+* void aesni_gcm_init(void *aes_ctx,      // AES Key schedule. Starts on a 16 byte boundary.
-+*                     struct gcm_context_data *data,
-+*                                         // context data
-+*                     u8 *iv,             // Pre-counter block j0: 4 byte salt (from Security Association)
-+*                                         // concatenated with 8 byte Initialisation Vector (from IPSec ESP Payload)
-+*                                         // concatenated with 0x00000001. 16-byte aligned pointer.
-+*                     u8 *hash_subkey,    // H, the Hash sub key input. Data starts on a 16-byte boundary.
-+*                     const u8 *aad,      // Additional Authentication Data (AAD)
-+*                     u64 aad_len)        // Length of AAD in bytes.
-+*/
-+ENTRY(aesni_gcm_init)
-+	FUNC_SAVE
-+	GCM_INIT %arg3, %arg4,%arg5, %arg6
-+	FUNC_RESTORE
-+	ret
-+ENDPROC(aesni_gcm_init)
-+
-+/*****************************************************************************
-+* void aesni_gcm_enc_update(void *aes_ctx,      // AES Key schedule. Starts on a 16 byte boundary.
-+*                    struct gcm_context_data *data,
-+*                                        // context data
-+*                    u8 *out,            // Ciphertext output. Encrypt in-place is allowed.
-+*                    const u8 *in,       // Plaintext input
-+*                    u64 plaintext_len,  // Length of data in bytes for encryption.
-+*/
-+ENTRY(aesni_gcm_enc_update)
-+	FUNC_SAVE
-+	GCM_ENC_DEC enc
-+	FUNC_RESTORE
-+	ret
-+ENDPROC(aesni_gcm_enc_update)
-+
-+/*****************************************************************************
-+* void aesni_gcm_dec_update(void *aes_ctx,      // AES Key schedule. Starts on a 16 byte boundary.
-+*                    struct gcm_context_data *data,
-+*                                        // context data
-+*                    u8 *out,            // Ciphertext output. Encrypt in-place is allowed.
-+*                    const u8 *in,       // Plaintext input
-+*                    u64 plaintext_len,  // Length of data in bytes for encryption.
-+*/
-+ENTRY(aesni_gcm_dec_update)
-+	FUNC_SAVE
-+	GCM_ENC_DEC dec
-+	FUNC_RESTORE
-+	ret
-+ENDPROC(aesni_gcm_dec_update)
-+
-+/*****************************************************************************
-+* void aesni_gcm_finalize(void *aes_ctx,      // AES Key schedule. Starts on a 16 byte boundary.
-+*                    struct gcm_context_data *data,
-+*                                        // context data
-+*                    u8 *auth_tag,       // Authenticated Tag output.
-+*                    u64 auth_tag_len);  // Authenticated Tag Length in bytes. Valid values are 16 (most likely),
-+*                                        // 12 or 8.
-+*/
-+ENTRY(aesni_gcm_finalize)
-+	FUNC_SAVE
-+	GCM_COMPLETE %arg3 %arg4
-+	FUNC_RESTORE
-+	ret
-+ENDPROC(aesni_gcm_finalize)
-+
- #endif
- 
- 
 diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
-index 4dd5b9b..de986f9 100644
+index de986f9..acbe7e8 100644
 --- a/arch/x86/crypto/aesni-intel_glue.c
 +++ b/arch/x86/crypto/aesni-intel_glue.c
-@@ -161,6 +161,22 @@ asmlinkage void aesni_gcm_dec(void *ctx,
- 			u8 *hash_subkey, const u8 *aad, unsigned long aad_len,
- 			u8 *auth_tag, unsigned long auth_tag_len);
+@@ -791,6 +791,127 @@ static int generic_gcmaes_set_authsize(struct crypto_aead *tfm,
+ 	return 0;
+ }
  
-+/* Scatter / Gather routines, with args similar to above */
-+asmlinkage void aesni_gcm_init(void *ctx,
-+			       struct gcm_context_data *gdata,
-+			       u8 *iv,
-+			       u8 *hash_subkey, const u8 *aad,
-+			       unsigned long aad_len);
-+asmlinkage void aesni_gcm_enc_update(void *ctx,
-+				     struct gcm_context_data *gdata, u8 *out,
-+				     const u8 *in, unsigned long plaintext_len);
-+asmlinkage void aesni_gcm_dec_update(void *ctx,
-+				     struct gcm_context_data *gdata, u8 *out,
-+				     const u8 *in,
-+				     unsigned long ciphertext_len);
-+asmlinkage void aesni_gcm_finalize(void *ctx,
-+				   struct gcm_context_data *gdata,
-+				   u8 *auth_tag, unsigned long auth_tag_len);
++static int gcmaes_crypt_by_sg(bool enc, struct aead_request *req,
++			      unsigned int assoclen, u8 *hash_subkey,
++			      u8 *iv, void *aes_ctx)
++{
++	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
++	unsigned long auth_tag_len = crypto_aead_authsize(tfm);
++	struct gcm_context_data data AESNI_ALIGN_ATTR;
++	struct scatter_walk dst_sg_walk = {};
++	unsigned long left = req->cryptlen;
++	unsigned long len, srclen, dstlen;
++	struct scatter_walk assoc_sg_walk;
++	struct scatter_walk src_sg_walk;
++	struct scatterlist src_start[2];
++	struct scatterlist dst_start[2];
++	struct scatterlist *src_sg;
++	struct scatterlist *dst_sg;
++	u8 *src, *dst, *assoc;
++	u8 *assocmem = NULL;
++	u8 authTag[16];
++
++	if (!enc)
++		left -= auth_tag_len;
++
++	/* Linearize assoc, if not already linear */
++	if (req->src->length >= assoclen && req->src->length &&
++		(!PageHighMem(sg_page(req->src)) ||
++			req->src->offset + req->src->length < PAGE_SIZE)) {
++		scatterwalk_start(&assoc_sg_walk, req->src);
++		assoc = scatterwalk_map(&assoc_sg_walk);
++	} else {
++		/* assoc can be any length, so must be on heap */
++		assocmem = kmalloc(assoclen, GFP_ATOMIC);
++		if (unlikely(!assocmem))
++			return -ENOMEM;
++		assoc = assocmem;
++
++		scatterwalk_map_and_copy(assoc, req->src, 0, assoclen, 0);
++	}
++
++	src_sg = scatterwalk_ffwd(src_start, req->src, req->assoclen);
++	scatterwalk_start(&src_sg_walk, src_sg);
++	if (req->src != req->dst) {
++		dst_sg = scatterwalk_ffwd(dst_start, req->dst, req->assoclen);
++		scatterwalk_start(&dst_sg_walk, dst_sg);
++	}
++
++	kernel_fpu_begin();
++	aesni_gcm_init(aes_ctx, &data, iv,
++		hash_subkey, assoc, assoclen);
++	if (req->src != req->dst) {
++		while (left) {
++			src = scatterwalk_map(&src_sg_walk);
++			dst = scatterwalk_map(&dst_sg_walk);
++			srclen = scatterwalk_clamp(&src_sg_walk, left);
++			dstlen = scatterwalk_clamp(&dst_sg_walk, left);
++			len = min(srclen, dstlen);
++			if (len) {
++				if (enc)
++					aesni_gcm_enc_update(aes_ctx, &data,
++							     dst, src, len);
++				else
++					aesni_gcm_dec_update(aes_ctx, &data,
++							     dst, src, len);
++			}
++			left -= len;
++
++			scatterwalk_unmap(src);
++			scatterwalk_unmap(dst);
++			scatterwalk_advance(&src_sg_walk, len);
++			scatterwalk_advance(&dst_sg_walk, len);
++			scatterwalk_done(&src_sg_walk, 0, left);
++			scatterwalk_done(&dst_sg_walk, 1, left);
++		}
++	} else {
++		while (left) {
++			dst = src = scatterwalk_map(&src_sg_walk);
++			len = scatterwalk_clamp(&src_sg_walk, left);
++			if (len) {
++				if (enc)
++					aesni_gcm_enc_update(aes_ctx, &data,
++							     src, src, len);
++				else
++					aesni_gcm_dec_update(aes_ctx, &data,
++							     src, src, len);
++			}
++			left -= len;
++			scatterwalk_unmap(src);
++			scatterwalk_advance(&src_sg_walk, len);
++			scatterwalk_done(&src_sg_walk, 1, left);
++		}
++	}
++	aesni_gcm_finalize(aes_ctx, &data, authTag, auth_tag_len);
++	kernel_fpu_end();
++
++	if (!assocmem)
++		scatterwalk_unmap(assoc);
++	else
++		kfree(assocmem);
++
++	if (!enc) {
++		u8 authTagMsg[16];
++
++		/* Copy out original authTag */
++		scatterwalk_map_and_copy(authTagMsg, req->src,
++					 req->assoclen + req->cryptlen -
++					 auth_tag_len,
++					 auth_tag_len, 0);
++
++		/* Compare generated tag with passed in tag. */
++		return crypto_memneq(authTagMsg, authTag, auth_tag_len) ?
++			-EBADMSG : 0;
++	}
++
++	/* Copy in the authTag */
++	scatterwalk_map_and_copy(authTag, req->dst,
++				 req->assoclen + req->cryptlen,
++				 auth_tag_len, 1);
++
++	return 0;
++}
++
+ static int gcmaes_encrypt(struct aead_request *req, unsigned int assoclen,
+ 			  u8 *hash_subkey, u8 *iv, void *aes_ctx)
+ {
+@@ -802,6 +923,12 @@ static int gcmaes_encrypt(struct aead_request *req, unsigned int assoclen,
+ 	struct scatter_walk dst_sg_walk = {};
+ 	struct gcm_context_data data AESNI_ALIGN_ATTR;
  
- #ifdef CONFIG_AS_AVX
- asmlinkage void aes_ctr_enc_128_avx_by8(const u8 *in, u8 *iv,
++	if (((struct crypto_aes_ctx *)aes_ctx)->key_length != AES_KEYSIZE_128 ||
++		aesni_gcm_enc_tfm == aesni_gcm_enc ||
++		req->cryptlen < AVX_GEN2_OPTSIZE) {
++		return gcmaes_crypt_by_sg(true, req, assoclen, hash_subkey, iv,
++					  aes_ctx);
++	}
+ 	if (sg_is_last(req->src) &&
+ 	    (!PageHighMem(sg_page(req->src)) ||
+ 	    req->src->offset + req->src->length <= PAGE_SIZE) &&
+@@ -868,6 +995,12 @@ static int gcmaes_decrypt(struct aead_request *req, unsigned int assoclen,
+ 	struct gcm_context_data data AESNI_ALIGN_ATTR;
+ 	int retval = 0;
+ 
++	if (((struct crypto_aes_ctx *)aes_ctx)->key_length != AES_KEYSIZE_128 ||
++		aesni_gcm_enc_tfm == aesni_gcm_enc ||
++		req->cryptlen < AVX_GEN2_OPTSIZE) {
++		return gcmaes_crypt_by_sg(false, req, assoclen, hash_subkey, iv,
++					  aes_ctx);
++	}
+ 	tempCipherLen = (unsigned long)(req->cryptlen - auth_tag_len);
+ 
+ 	if (sg_is_last(req->src) &&
 -- 
 2.9.5
