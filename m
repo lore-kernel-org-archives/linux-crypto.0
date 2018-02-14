@@ -1,14 +1,14 @@
 From: Dave Watson <davejwatson@fb.com>
-Subject: [PATCH v2 03/14] x86/crypto: aesni: Add GCM_INIT macro
-Date: Wed, 14 Feb 2018 09:38:45 -0800
-Message-ID: <20180214173845.GA61871@davejwatson-mba>
+Subject: [PATCH v2 04/14] x86/crypto: aesni: Add GCM_COMPLETE macro
+Date: Wed, 14 Feb 2018 09:38:57 -0800
+Message-ID: <20180214173857.GA61900@davejwatson-mba>
 References: <cover.1518628278.git.davejwatson@fb.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Cc: "David S. Miller" <davem@davemloft.net>,
         Hannes Frederic Sowa <hannes@stressinduktion.org>,
         Tim Chen <tim.c.chen@linux.intel.com>,
-        Sabrina Dubroca <sd@queasysnail.net>,
+        "Sabrina Dubroca" <sd@queasysnail.net>,
         <linux-kernel@vger.kernel.org>,
         Stephan Mueller <smueller@chronox.de>,
         Ilya Lesokhin <ilyal@mellanox.com>
@@ -22,129 +22,212 @@ In-Reply-To: <cover.1518628278.git.davejwatson@fb.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Reduce code duplication by introducting GCM_INIT macro.  This macro
-will also be exposed as a function for implementing scatter/gather
-support, since INIT only needs to be called once for the full
-operation.
+Merge encode and decode tag calculations in GCM_COMPLETE macro.
+Scatter/gather routines will call this once at the end of encryption
+or decryption.
 
 Signed-off-by: Dave Watson <davejwatson@fb.com>
 ---
- arch/x86/crypto/aesni-intel_asm.S | 84 +++++++++++++++------------------------
- 1 file changed, 33 insertions(+), 51 deletions(-)
+ arch/x86/crypto/aesni-intel_asm.S | 172 ++++++++++++++------------------------
+ 1 file changed, 63 insertions(+), 109 deletions(-)
 
 diff --git a/arch/x86/crypto/aesni-intel_asm.S b/arch/x86/crypto/aesni-intel_asm.S
-index 39b42b1..b9fe2ab 100644
+index b9fe2ab..529c542 100644
 --- a/arch/x86/crypto/aesni-intel_asm.S
 +++ b/arch/x86/crypto/aesni-intel_asm.S
-@@ -191,6 +191,37 @@ ALL_F:      .octa 0xffffffffffffffffffffffffffffffff
- 	pop	%r12
+@@ -222,6 +222,67 @@ ALL_F:      .octa 0xffffffffffffffffffffffffffffffff
+ 	mov	%r13, %r12
  .endm
  
++# GCM_COMPLETE Finishes update of tag of last partial block
++# Output: Authorization Tag (AUTH_TAG)
++# Clobbers rax, r10-r12, and xmm0, xmm1, xmm5-xmm15
++.macro GCM_COMPLETE
++	mov	arg8, %r12		  # %r13 = aadLen (number of bytes)
++	shl	$3, %r12		  # convert into number of bits
++	movd	%r12d, %xmm15		  # len(A) in %xmm15
++	shl	$3, %arg4		  # len(C) in bits (*128)
++	MOVQ_R64_XMM	%arg4, %xmm1
++	pslldq	$8, %xmm15		  # %xmm15 = len(A)||0x0000000000000000
++	pxor	%xmm1, %xmm15		  # %xmm15 = len(A)||len(C)
++	pxor	%xmm15, %xmm8
++	GHASH_MUL	%xmm8, %xmm13, %xmm9, %xmm10, %xmm11, %xmm5, %xmm6
++	# final GHASH computation
++	movdqa SHUF_MASK(%rip), %xmm10
++	PSHUFB_XMM %xmm10, %xmm8
 +
-+# GCM_INIT initializes a gcm_context struct to prepare for encoding/decoding.
-+# Clobbers rax, r10-r13 and xmm0-xmm6, %xmm13
-+.macro GCM_INIT
-+	mov	%arg6, %r12
-+	movdqu	(%r12), %xmm13
-+	movdqa  SHUF_MASK(%rip), %xmm2
-+	PSHUFB_XMM %xmm2, %xmm13
-+
-+	# precompute HashKey<<1 mod poly from the HashKey (required for GHASH)
-+
-+	movdqa	%xmm13, %xmm2
-+	psllq	$1, %xmm13
-+	psrlq	$63, %xmm2
-+	movdqa	%xmm2, %xmm1
-+	pslldq	$8, %xmm2
-+	psrldq	$8, %xmm1
-+	por	%xmm2, %xmm13
-+
-+	# reduce HashKey<<1
-+
-+	pshufd	$0x24, %xmm1, %xmm2
-+	pcmpeqd TWOONE(%rip), %xmm2
-+	pand	POLY(%rip), %xmm2
-+	pxor	%xmm2, %xmm13
-+	movdqa	%xmm13, HashKey(%rsp)
-+	mov	%arg4, %r13			# %xmm13 holds HashKey<<1 (mod poly)
-+	and	$-16, %r13
-+	mov	%r13, %r12
++	mov	%arg5, %rax		  # %rax = *Y0
++	movdqu	(%rax), %xmm0		  # %xmm0 = Y0
++	ENCRYPT_SINGLE_BLOCK	%xmm0,  %xmm1	  # E(K, Y0)
++	pxor	%xmm8, %xmm0
++_return_T_\@:
++	mov	arg9, %r10                     # %r10 = authTag
++	mov	arg10, %r11                    # %r11 = auth_tag_len
++	cmp	$16, %r11
++	je	_T_16_\@
++	cmp	$8, %r11
++	jl	_T_4_\@
++_T_8_\@:
++	MOVQ_R64_XMM	%xmm0, %rax
++	mov	%rax, (%r10)
++	add	$8, %r10
++	sub	$8, %r11
++	psrldq	$8, %xmm0
++	cmp	$0, %r11
++	je	_return_T_done_\@
++_T_4_\@:
++	movd	%xmm0, %eax
++	mov	%eax, (%r10)
++	add	$4, %r10
++	sub	$4, %r11
++	psrldq	$4, %xmm0
++	cmp	$0, %r11
++	je	_return_T_done_\@
++_T_123_\@:
++	movd	%xmm0, %eax
++	cmp	$2, %r11
++	jl	_T_1_\@
++	mov	%ax, (%r10)
++	cmp	$2, %r11
++	je	_return_T_done_\@
++	add	$2, %r10
++	sar	$16, %eax
++_T_1_\@:
++	mov	%al, (%r10)
++	jmp	_return_T_done_\@
++_T_16_\@:
++	movdqu	%xmm0, (%r10)
++_return_T_done_\@:
 +.endm
 +
  #ifdef __x86_64__
  /* GHASH_MUL MACRO to implement: Data*HashKey mod (128,127,126,121,0)
  *
-@@ -1151,36 +1182,11 @@ _esb_loop_\@:
- *****************************************************************************/
- ENTRY(aesni_gcm_dec)
- 	FUNC_SAVE
--	mov	%arg6, %r12
--	movdqu	(%r12), %xmm13			  # %xmm13 = HashKey
--        movdqa  SHUF_MASK(%rip), %xmm2
--	PSHUFB_XMM %xmm2, %xmm13
+@@ -1271,61 +1332,7 @@ _less_than_8_bytes_left_decrypt:
+ 	sub	$1, %r13
+ 	jne	_less_than_8_bytes_left_decrypt
+ _multiple_of_16_bytes_decrypt:
+-	mov	arg8, %r12		  # %r13 = aadLen (number of bytes)
+-	shl	$3, %r12		  # convert into number of bits
+-	movd	%r12d, %xmm15		  # len(A) in %xmm15
+-	shl	$3, %arg4		  # len(C) in bits (*128)
+-	MOVQ_R64_XMM	%arg4, %xmm1
+-	pslldq	$8, %xmm15		  # %xmm15 = len(A)||0x0000000000000000
+-	pxor	%xmm1, %xmm15		  # %xmm15 = len(A)||len(C)
+-	pxor	%xmm15, %xmm8
+-	GHASH_MUL	%xmm8, %xmm13, %xmm9, %xmm10, %xmm11, %xmm5, %xmm6
+-	         # final GHASH computation
+-        movdqa SHUF_MASK(%rip), %xmm10
+-	PSHUFB_XMM %xmm10, %xmm8
 -
+-	mov	%arg5, %rax		  # %rax = *Y0
+-	movdqu	(%rax), %xmm0		  # %xmm0 = Y0
+-	ENCRYPT_SINGLE_BLOCK	%xmm0,  %xmm1	  # E(K, Y0)
+-	pxor	%xmm8, %xmm0
+-_return_T_decrypt:
+-	mov	arg9, %r10                # %r10 = authTag
+-	mov	arg10, %r11               # %r11 = auth_tag_len
+-	cmp	$16, %r11
+-	je	_T_16_decrypt
+-	cmp	$8, %r11
+-	jl	_T_4_decrypt
+-_T_8_decrypt:
+-	MOVQ_R64_XMM	%xmm0, %rax
+-	mov	%rax, (%r10)
+-	add	$8, %r10
+-	sub	$8, %r11
+-	psrldq	$8, %xmm0
+-	cmp	$0, %r11
+-	je	_return_T_done_decrypt
+-_T_4_decrypt:
+-	movd	%xmm0, %eax
+-	mov	%eax, (%r10)
+-	add	$4, %r10
+-	sub	$4, %r11
+-	psrldq	$4, %xmm0
+-	cmp	$0, %r11
+-	je	_return_T_done_decrypt
+-_T_123_decrypt:
+-	movd	%xmm0, %eax
+-	cmp	$2, %r11
+-	jl	_T_1_decrypt
+-	mov	%ax, (%r10)
+-	cmp	$2, %r11
+-	je	_return_T_done_decrypt
+-	add	$2, %r10
+-	sar	$16, %eax
+-_T_1_decrypt:
+-	mov	%al, (%r10)
+-	jmp	_return_T_done_decrypt
+-_T_16_decrypt:
+-	movdqu	%xmm0, (%r10)
+-_return_T_done_decrypt:
++	GCM_COMPLETE
+ 	FUNC_RESTORE
+ 	ret
+ ENDPROC(aesni_gcm_dec)
+@@ -1501,61 +1508,8 @@ _less_than_8_bytes_left_encrypt:
+ 	sub $1, %r13
+ 	jne _less_than_8_bytes_left_encrypt
+ _multiple_of_16_bytes_encrypt:
+-	mov	arg8, %r12    # %r12 = addLen (number of bytes)
+-	shl	$3, %r12
+-	movd	%r12d, %xmm15       # len(A) in %xmm15
+-	shl	$3, %arg4               # len(C) in bits (*128)
+-	MOVQ_R64_XMM	%arg4, %xmm1
+-	pslldq	$8, %xmm15          # %xmm15 = len(A)||0x0000000000000000
+-	pxor	%xmm1, %xmm15       # %xmm15 = len(A)||len(C)
+-	pxor	%xmm15, %xmm8
+-	GHASH_MUL	%xmm8, %xmm13, %xmm9, %xmm10, %xmm11, %xmm5, %xmm6
+-	# final GHASH computation
+-        movdqa SHUF_MASK(%rip), %xmm10
+-	PSHUFB_XMM %xmm10, %xmm8         # perform a 16 byte swap
 -
--# Precompute HashKey<<1 (mod poly) from the hash key (required for GHASH)
--
--	movdqa	%xmm13, %xmm2
--	psllq	$1, %xmm13
--	psrlq	$63, %xmm2
--	movdqa	%xmm2, %xmm1
--	pslldq	$8, %xmm2
--	psrldq	$8, %xmm1
--	por	%xmm2, %xmm13
--
--        # Reduction
--
--	pshufd	$0x24, %xmm1, %xmm2
--	pcmpeqd TWOONE(%rip), %xmm2
--	pand	POLY(%rip), %xmm2
--	pxor	%xmm2, %xmm13     # %xmm13 holds the HashKey<<1 (mod poly)
- 
-+	GCM_INIT
- 
-         # Decrypt first few blocks
- 
--	movdqa %xmm13, HashKey(%rsp)           # store HashKey<<1 (mod poly)
--	mov %arg4, %r13    # save the number of bytes of plaintext/ciphertext
--	and $-16, %r13                      # %r13 = %r13 - (%r13 mod 16)
--	mov %r13, %r12
- 	and $(3<<4), %r12
- 	jz _initial_num_blocks_is_0_decrypt
- 	cmp $(2<<4), %r12
-@@ -1402,32 +1408,8 @@ ENDPROC(aesni_gcm_dec)
- ***************************************************************************/
- ENTRY(aesni_gcm_enc)
- 	FUNC_SAVE
--	mov	%arg6, %r12
--	movdqu	(%r12), %xmm13
--        movdqa  SHUF_MASK(%rip), %xmm2
--	PSHUFB_XMM %xmm2, %xmm13
--
--# precompute HashKey<<1 mod poly from the HashKey (required for GHASH)
--
--	movdqa	%xmm13, %xmm2
--	psllq	$1, %xmm13
--	psrlq	$63, %xmm2
--	movdqa	%xmm2, %xmm1
--	pslldq	$8, %xmm2
--	psrldq	$8, %xmm1
--	por	%xmm2, %xmm13
--
--        # reduce HashKey<<1
--
--	pshufd	$0x24, %xmm1, %xmm2
--	pcmpeqd TWOONE(%rip), %xmm2
--	pand	POLY(%rip), %xmm2
--	pxor	%xmm2, %xmm13
--	movdqa	%xmm13, HashKey(%rsp)
--	mov	%arg4, %r13            # %xmm13 holds HashKey<<1 (mod poly)
--	and	$-16, %r13
--	mov	%r13, %r12
- 
-+	GCM_INIT
-         # Encrypt first few blocks
- 
- 	and	$(3<<4), %r12
+-	mov	%arg5, %rax		       # %rax  = *Y0
+-	movdqu	(%rax), %xmm0		       # %xmm0 = Y0
+-	ENCRYPT_SINGLE_BLOCK	%xmm0, %xmm15         # Encrypt(K, Y0)
+-	pxor	%xmm8, %xmm0
+ _return_T_encrypt:
+-	mov	arg9, %r10                     # %r10 = authTag
+-	mov	arg10, %r11                    # %r11 = auth_tag_len
+-	cmp	$16, %r11
+-	je	_T_16_encrypt
+-	cmp	$8, %r11
+-	jl	_T_4_encrypt
+-_T_8_encrypt:
+-	MOVQ_R64_XMM	%xmm0, %rax
+-	mov	%rax, (%r10)
+-	add	$8, %r10
+-	sub	$8, %r11
+-	psrldq	$8, %xmm0
+-	cmp	$0, %r11
+-	je	_return_T_done_encrypt
+-_T_4_encrypt:
+-	movd	%xmm0, %eax
+-	mov	%eax, (%r10)
+-	add	$4, %r10
+-	sub	$4, %r11
+-	psrldq	$4, %xmm0
+-	cmp	$0, %r11
+-	je	_return_T_done_encrypt
+-_T_123_encrypt:
+-	movd	%xmm0, %eax
+-	cmp	$2, %r11
+-	jl	_T_1_encrypt
+-	mov	%ax, (%r10)
+-	cmp	$2, %r11
+-	je	_return_T_done_encrypt
+-	add	$2, %r10
+-	sar	$16, %eax
+-_T_1_encrypt:
+-	mov	%al, (%r10)
+-	jmp	_return_T_done_encrypt
+-_T_16_encrypt:
+-	movdqu	%xmm0, (%r10)
+-_return_T_done_encrypt:
++	GCM_COMPLETE
+ 	FUNC_RESTORE
+ 	ret
+ ENDPROC(aesni_gcm_enc)
 -- 
 2.9.5
