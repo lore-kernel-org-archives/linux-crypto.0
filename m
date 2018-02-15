@@ -1,285 +1,75 @@
-From: David Howells <dhowells@redhat.com>
-Subject: [RFC PATCH] KEYS: Use individual pages in big_key for crypto buffers
-Date: Thu, 15 Feb 2018 15:54:26 +0000
-Message-ID: <151871006638.2759.15708879200455370908.stgit@warthog.procyon.org.uk>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v2 0/7] crypto: ccree: Introduce Arm TrustZone CryptoCell
+Date: Thu, 15 Feb 2018 23:41:50 +0800
+Message-ID: <20180215154150.GB7352@gondor.apana.org.au>
+References: <1516613230-4524-1-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Cc: dhowells@redhat.com, Jason@zx2c4.com, herbert@gondor.apana.org.au,
-        k.marinushkin@gmail.com, linux-crypto@vger.kernel.org
-To: keyrings@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42258 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1424947AbeBOPyc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 15 Feb 2018 10:54:32 -0500
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: devel@driverdev.osuosl.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>, Ofir Drang <ofir.drang@arm.com>
+To: Gilad Ben-Yossef <gilad@benyossef.com>
+Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
+Content-Disposition: inline
+In-Reply-To: <1516613230-4524-1-git-send-email-gilad@benyossef.com>
+List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
+List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
+List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
+List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
+List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
+Errors-To: driverdev-devel-bounces@linuxdriverproject.org
+Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
+List-Id: linux-crypto.vger.kernel.org
 
-kmalloc() can't always allocate large enough buffers for big_key to use for
-crypto (1MB + some metadata) so we cannot use that to allocate the buffer.
-Further, vmalloc'd pages can't be passed to sg_init_one() and the aead
-crypto accessors cannot be called progressively and must be passed all the
-data in one go (which means we can't pass the data in one block at a time).
+On Mon, Jan 22, 2018 at 09:26:58AM +0000, Gilad Ben-Yossef wrote:
+> Arm TrustZone CryptoCell is a security hardware IP that
+> includes support for hardware based hash, digest, cipher
+> and AEAD operations. This driver provides support for
+> these as part of the Linux Crypto sub-system.
+> 
+> The driver spent some time now in the staging tree being
+> cleaned up and is now submitted for review for the
+> purpose of moving into the crypto tree. The first patch
+> therefore renames its copy in the staging directory
+> Kconfig define and marks it broken, otherwise there is a
+> build failure due to global symbols collisions.
+> 
+> Please note that the driver include stubs for yet
+> unexposed functionality (ivgen and secure HW keys),
+> which will be added later.
+> 
+> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+> 
+> Changes from v1:
+> - Use KConfig directive to stop staging tree version to not
+>   collide during link time as opposed to deleting it as indicated
+>   by Greg KH.
+> - Switched from legacy ablkcipher to skcipher interface as
+>   indicated by Corentin Labbe.
+> - Removed unused zero_buff struct as indicated by Corentin Labbe.
+> - Moved to kzfree for all IV/key buffers as indicated by
+>   Corentin Labbe.
+> - Moved to using __des3_ede_setkey() in lieu of home grown
+>   version as indicated by Stephan Mueller.
+> - Fixed multiple small coding style from Dan Carpenter and others.
+> - Fixed pointer signedness sparse warnings as indicated by Jeremy
+>   Sowden.
+> - Rename all registered algs driver name to -ccree prefix
+> 
+> Gilad Ben-Yossef (7):
+>   staging: ccree: rename staging ver and mark as broken
+>   crypto: ccree: introduce CryptoCell driver
+>   crypto: ccree: add skcipher support
+>   crypto: ccree: add ahash support
+>   crypto: ccree: add AEAD support
+>   crypto: ccree: add FIPS support
+>   MAINTAINERS: update ccree entry
 
-Fix this by allocating the buffer pages individually and passing them
-through a multientry scatterlist to the crypto layer.  This has the bonus
-advantage that we don't have to allocate a contiguous series of pages.
-
-We then vmap() the page list and pass that through to the VFS read/write
-routines.
-
-This can trigger a warning:
-
-	WARNING: CPU: 0 PID: 60912 at mm/page_alloc.c:3883 __alloc_pages_nodemask+0xb7c/0x15f8
-	([<00000000002acbb6>] __alloc_pages_nodemask+0x1ee/0x15f8)
-	 [<00000000002dd356>] kmalloc_order+0x46/0x90
-	 [<00000000002dd3e0>] kmalloc_order_trace+0x40/0x1f8
-	 [<0000000000326a10>] __kmalloc+0x430/0x4c0
-	 [<00000000004343e4>] big_key_preparse+0x7c/0x210
-	 [<000000000042c040>] key_create_or_update+0x128/0x420
-	 [<000000000042e52c>] SyS_add_key+0x124/0x220
-	 [<00000000007bba2c>] system_call+0xc4/0x2b0
-
-from the keyctl/padd/useradd test of the keyutils testsuite on s390x.
-
-Note that it might be better to shovel data through in page-sized lumps
-instead as there's no particular need to use a monolithic buffer unless the
-kernel itself wants to access the data.
-
-Fixes: 13100a72f40f ("Security: Keys: Big keys stored encrypted")
-Reported-by: Paul Bunyan <pbunyan@redhat.com>
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Kirill Marinushkin <k.marinushkin@gmail.com>
----
-
- security/keys/big_key.c |  108 +++++++++++++++++++++++++++++++++++++----------
- 1 file changed, 85 insertions(+), 23 deletions(-)
-
-diff --git a/security/keys/big_key.c b/security/keys/big_key.c
-index 929e14978c42..0ffea9601619 100644
---- a/security/keys/big_key.c
-+++ b/security/keys/big_key.c
-@@ -22,6 +22,13 @@
- #include <keys/big_key-type.h>
- #include <crypto/aead.h>
- 
-+struct big_key_buf {
-+	int			nr_pages;
-+	void			*virt;
-+	struct scatterlist	*sg;
-+	struct page		*pages[];
-+};
-+
- /*
-  * Layout of key payload words.
-  */
-@@ -91,10 +98,9 @@ static DEFINE_MUTEX(big_key_aead_lock);
- /*
-  * Encrypt/decrypt big_key data
-  */
--static int big_key_crypt(enum big_key_op op, u8 *data, size_t datalen, u8 *key)
-+static int big_key_crypt(enum big_key_op op, struct big_key_buf *buf, size_t datalen, u8 *key)
- {
- 	int ret;
--	struct scatterlist sgio;
- 	struct aead_request *aead_req;
- 	/* We always use a zero nonce. The reason we can get away with this is
- 	 * because we're using a different randomly generated key for every
-@@ -109,8 +115,7 @@ static int big_key_crypt(enum big_key_op op, u8 *data, size_t datalen, u8 *key)
- 		return -ENOMEM;
- 
- 	memset(zero_nonce, 0, sizeof(zero_nonce));
--	sg_init_one(&sgio, data, datalen + (op == BIG_KEY_ENC ? ENC_AUTHTAG_SIZE : 0));
--	aead_request_set_crypt(aead_req, &sgio, &sgio, datalen, zero_nonce);
-+	aead_request_set_crypt(aead_req, buf->sg, buf->sg, datalen, zero_nonce);
- 	aead_request_set_callback(aead_req, CRYPTO_TFM_REQ_MAY_SLEEP, NULL, NULL);
- 	aead_request_set_ad(aead_req, 0);
- 
-@@ -130,21 +135,76 @@ static int big_key_crypt(enum big_key_op op, u8 *data, size_t datalen, u8 *key)
- }
- 
- /*
-+ * Free up the buffer.
-+ */
-+static void big_key_free_buffer(struct big_key_buf *buf)
-+{
-+	unsigned int i;
-+
-+	vunmap(buf->virt);
-+	for (i = 0; i < buf->nr_pages; i++)
-+		__free_page(buf->pages[i]);
-+
-+	kfree(buf);
-+}
-+
-+/*
-+ * Allocate a buffer consisting of a set of pages with a virtual mapping
-+ * applied over them.
-+ */
-+static void *big_key_alloc_buffer(size_t len)
-+{
-+	struct big_key_buf *buf;
-+	unsigned int npg = (len + PAGE_SIZE - 1) >> PAGE_SHIFT;
-+	unsigned int i, l;
-+
-+	buf = kzalloc(sizeof(struct big_key_buf) +
-+		      sizeof(struct page) * npg +
-+		      sizeof(struct scatterlist) * npg,
-+		      GFP_KERNEL);
-+	if (!buf)
-+		return NULL;
-+
-+	buf->nr_pages = npg;
-+	buf->sg = (void *)(buf->pages + npg);
-+	sg_init_table(buf->sg, npg);
-+
-+	for (i = 0; i < buf->nr_pages; i++) {
-+		buf->pages[i] = alloc_page(GFP_KERNEL);
-+		if (!buf->pages[i])
-+			goto nomem;
-+
-+		l = min(len, PAGE_SIZE);
-+		sg_set_page(&buf->sg[i], buf->pages[i], l, 0);
-+		len -= l;
-+	}
-+
-+	buf->virt = vmap(buf->pages, buf->nr_pages, VM_MAP, PAGE_KERNEL);
-+	if (!buf->virt)
-+		goto nomem;
-+
-+	return buf;
-+
-+nomem:
-+	big_key_free_buffer(buf);
-+	return NULL;
-+}
-+
-+/*
-  * Preparse a big key
-  */
- int big_key_preparse(struct key_preparsed_payload *prep)
- {
-+	struct big_key_buf *buf;
- 	struct path *path = (struct path *)&prep->payload.data[big_key_path];
- 	struct file *file;
- 	u8 *enckey;
--	u8 *data = NULL;
- 	ssize_t written;
--	size_t datalen = prep->datalen;
-+	size_t datalen = prep->datalen, enclen = datalen + ENC_AUTHTAG_SIZE;
- 	int ret;
- 
--	ret = -EINVAL;
- 	if (datalen <= 0 || datalen > 1024 * 1024 || !prep->data)
--		goto error;
-+		return -EINVAL;
- 
- 	/* Set an arbitrary quota */
- 	prep->quotalen = 16;
-@@ -157,13 +217,12 @@ int big_key_preparse(struct key_preparsed_payload *prep)
- 		 *
- 		 * File content is stored encrypted with randomly generated key.
- 		 */
--		size_t enclen = datalen + ENC_AUTHTAG_SIZE;
- 		loff_t pos = 0;
- 
--		data = kmalloc(enclen, GFP_KERNEL);
--		if (!data)
-+		buf = big_key_alloc_buffer(enclen);
-+		if (!buf)
- 			return -ENOMEM;
--		memcpy(data, prep->data, datalen);
-+		memcpy(buf->virt, prep->data, datalen);
- 
- 		/* generate random key */
- 		enckey = kmalloc(ENC_KEY_SIZE, GFP_KERNEL);
-@@ -176,7 +235,7 @@ int big_key_preparse(struct key_preparsed_payload *prep)
- 			goto err_enckey;
- 
- 		/* encrypt aligned data */
--		ret = big_key_crypt(BIG_KEY_ENC, data, datalen, enckey);
-+		ret = big_key_crypt(BIG_KEY_ENC, buf, datalen, enckey);
- 		if (ret)
- 			goto err_enckey;
- 
-@@ -187,7 +246,7 @@ int big_key_preparse(struct key_preparsed_payload *prep)
- 			goto err_enckey;
- 		}
- 
--		written = kernel_write(file, data, enclen, &pos);
-+		written = kernel_write(file, buf->virt, enclen, &pos);
- 		if (written != enclen) {
- 			ret = written;
- 			if (written >= 0)
-@@ -202,7 +261,8 @@ int big_key_preparse(struct key_preparsed_payload *prep)
- 		*path = file->f_path;
- 		path_get(path);
- 		fput(file);
--		kzfree(data);
-+		memset(buf->virt, 0, enclen);
-+		big_key_free_buffer(buf);
- 	} else {
- 		/* Just store the data in a buffer */
- 		void *data = kmalloc(datalen, GFP_KERNEL);
-@@ -220,7 +280,8 @@ int big_key_preparse(struct key_preparsed_payload *prep)
- err_enckey:
- 	kzfree(enckey);
- error:
--	kzfree(data);
-+	memset(buf->virt, 0, enclen);
-+	big_key_free_buffer(buf);
- 	return ret;
- }
- 
-@@ -298,15 +359,15 @@ long big_key_read(const struct key *key, char __user *buffer, size_t buflen)
- 		return datalen;
- 
- 	if (datalen > BIG_KEY_FILE_THRESHOLD) {
-+		struct big_key_buf *buf;
- 		struct path *path = (struct path *)&key->payload.data[big_key_path];
- 		struct file *file;
--		u8 *data;
- 		u8 *enckey = (u8 *)key->payload.data[big_key_data];
- 		size_t enclen = datalen + ENC_AUTHTAG_SIZE;
- 		loff_t pos = 0;
- 
--		data = kmalloc(enclen, GFP_KERNEL);
--		if (!data)
-+		buf = big_key_alloc_buffer(enclen);
-+		if (!buf)
- 			return -ENOMEM;
- 
- 		file = dentry_open(path, O_RDONLY, current_cred());
-@@ -316,26 +377,27 @@ long big_key_read(const struct key *key, char __user *buffer, size_t buflen)
- 		}
- 
- 		/* read file to kernel and decrypt */
--		ret = kernel_read(file, data, enclen, &pos);
-+		ret = kernel_read(file, buf->virt, enclen, &pos);
- 		if (ret >= 0 && ret != enclen) {
- 			ret = -EIO;
- 			goto err_fput;
- 		}
- 
--		ret = big_key_crypt(BIG_KEY_DEC, data, enclen, enckey);
-+		ret = big_key_crypt(BIG_KEY_DEC, buf, enclen, enckey);
- 		if (ret)
- 			goto err_fput;
- 
- 		ret = datalen;
- 
- 		/* copy decrypted data to user */
--		if (copy_to_user(buffer, data, datalen) != 0)
-+		if (copy_to_user(buffer, buf->virt, datalen) != 0)
- 			ret = -EFAULT;
- 
- err_fput:
- 		fput(file);
- error:
--		kzfree(data);
-+		memset(buf->virt, 0, enclen);
-+		big_key_free_buffer(buf);
- 	} else {
- 		ret = datalen;
- 		if (copy_to_user(buffer, key->payload.data[big_key_data],
+All applied.  Thanks.
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
