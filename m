@@ -1,57 +1,56 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v3 0/5] crypto: ahash.c: Require export/import in ahash
-Date: Thu, 15 Feb 2018 23:41:32 +0800
-Message-ID: <20180215154132.GA7352@gondor.apana.org.au>
-References: <CGME20180118183438eucas1p2e2e7be8625ae0950c519e27424f9301a@eucas1p2.samsung.com>
- <20180118183404.12583-1-k.konieczny@partner.samsung.com>
+From: Atul Gupta <atul.gupta@chelsio.com>
+Subject: RE: [Crypto v5 03/12] support for inline tls
+Date: Thu, 15 Feb 2018 16:31:34 +0000
+Message-ID: <MWHPR1201MB02388A5E288110BAF52C4EE297F40@MWHPR1201MB0238.namprd12.prod.outlook.com>
+References: <1518677694-28448-1-git-send-email-atul.gupta@chelsio.com>
+ <1518677694-28448-4-git-send-email-atul.gupta@chelsio.com>
+ <20180215155157.GA32691@davejwatson-mba>
+ <MWHPR1201MB0238985353DFF78FE95108FF97F40@MWHPR1201MB0238.namprd12.prod.outlook.com>
+ <20180215162615.GA38304@davejwatson-mba>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-        Marek Vasut <marex@denx.de>,
-        Sonic Zhang <sonic.zhang@analog.com>,
-        Fabio Estevam <fabio.estevam@freescale.com>,
-        Shawn Guo <shawn.guo@linaro.org>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Jan Engelhardt <jengelh@inai.de>,
-        Arvind Yadav <arvind.yadav.cs@gmail.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Joakim Bech <joakim.bech@linaro.org>,
-        linux-kernel@vger.kernel.org
-To: Kamil Konieczny <k.konieczny@partner.samsung.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20180118183404.12583-1-k.konieczny@partner.samsung.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+Cc: "davem@davemloft.net" <davem@davemloft.net>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "sd@queasysnail.net" <sd@queasysnail.net>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        Ganesh GR <ganeshgr@chelsio.com>
+To: Dave Watson <davejwatson@fb.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-sn1nam01on0128.outbound.protection.outlook.com ([104.47.32.128]:23008
+        "EHLO NAM01-SN1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1424185AbeBOQbh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 15 Feb 2018 11:31:37 -0500
+In-Reply-To: <20180215162615.GA38304@davejwatson-mba>
+Content-Language: en-US
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jan 18, 2018 at 07:33:59PM +0100, Kamil Konieczny wrote:
-> First four patches add empty hash export and import functions to each driver,
-> with the same behaviour as in crypto framework. The last one drops them from
-> crypto framework. Last one for ahash.c depends on all previous.
-> 
-> Changes in v3:
-> added change for bfin_crc.c
-> make this a patchset, instead of unreleated patches
-> make commit message more descriptive
-> 
-> Kamil Konieczny (5):
->   crypto: mxs-dcp: Add empty hash export and import
->   crypto: n2_core: Add empty hash export and import
->   crypto: ux500/hash: Add empty export and import
->   crypto: bfin_crc: Add empty hash export and import
->   crypto: ahash.c: Require export/import in ahash
-> 
->  crypto/ahash.c                        | 18 ++----------------
->  drivers/crypto/bfin_crc.c             | 12 ++++++++++++
->  drivers/crypto/mxs-dcp.c              | 14 ++++++++++++++
->  drivers/crypto/n2_core.c              | 12 ++++++++++++
->  drivers/crypto/ux500/hash/hash_core.c | 18 ++++++++++++++++++
->  5 files changed, 58 insertions(+), 16 deletions(-)
+> > > @@ -401,6 +430,15 @@ static int do_tls_setsockopt_tx(struct sock *sk,=
+ char __user *optval,
+> > >  		goto out;
+> > >  	}
+> > > =20
+> > > +	rc =3D get_tls_offload_dev(sk);
+> > > +	if (rc) {
+> > > +		goto out;
+> > > +	} else {
+> > > +		/* Retain HW unhash for cleanup and move to SW Tx */
+> > > +		sk->sk_prot[TLS_BASE_TX].unhash =3D
+> > > +			sk->sk_prot[TLS_FULL_HW].unhash;
+> >=20
+> > Isn't sk->sk_prot a pointer to a global shared struct here still?  It l=
+ooks like this would actually modify the global struct, and not just for th=
+is sk.
+> Yes, its global. It require add on check to modify only when tls_offload =
+dev list has an entry. I will revisit and correct.=20
+>=20
+> Can you look through other changes please?
 
-All applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+I looked through 1,2,3,11 (the tls-related ones) and don't have any other c=
+ode comments.  Patch 11 commit message still mentions ULP, could use updati=
+ng / clarification.
+
+Thank you, I will collate and clean for v6.
