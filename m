@@ -1,45 +1,38 @@
-From: Robin Murphy <robin.murphy@arm.com>
-Subject: [PATCH] crypto: marvell/cesa - Clean up redundant #include
-Date: Mon, 19 Feb 2018 13:55:36 +0000
-Message-ID: <99d8deb60039adf572aec26b091f2b0c61edf397.1519048413.git.robin.murphy@arm.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] crypto: crypto_user: Replace GFP_ATOMIC with GFP_KERNEL
+ in crypto_report
+Date: Thu, 15 Feb 2018 23:43:21 +0800
+Message-ID: <20180215154321.GI7352@gondor.apana.org.au>
+References: <1516874762-12046-1-git-send-email-baijiaju1990@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-To: boris.brezillon@free-electrons.com, arno@natisbad.org,
- herbert@gondor.apana.org.au, davem@davemloft.net
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+To: Jia-Ju Bai <baijiaju1990@gmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:39522 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1033987AbeBOPn0 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 15 Feb 2018 10:43:26 -0500
+Content-Disposition: inline
+In-Reply-To: <1516874762-12046-1-git-send-email-baijiaju1990@gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-The inclusion of dma-direct.h was only needed temporarily to prevent
-breakage from the DMA API rework, since the actual CESA fix making it
-redundant was merged in parallel. Now that both have landed, it can go.
+On Thu, Jan 25, 2018 at 06:06:02PM +0800, Jia-Ju Bai wrote:
+> After checking all possible call chains to crypto_report here,
+> my tool finds that crypto_report is never called in atomic context.
+> And crypto_report calls crypto_alg_match which calls down_read, 
+> thus it proves again that crypto_report can call functions which may sleep.
+> Thus GFP_ATOMIC is not necessary, and it can be replaced with GFP_KERNEL.
+> 
+> This is found by a static analysis tool named DCNS written by myself.
+> 
+> Signed-off-by: Jia-Ju Bai <baijiaju1990@gmail.com>
 
-Signed-off-by: Robin Murphy <robin.murphy@arm.com>
----
- drivers/crypto/marvell/cesa.c | 1 -
- 1 file changed, 1 deletion(-)
-
-diff --git a/drivers/crypto/marvell/cesa.c b/drivers/crypto/marvell/cesa.c
-index aca2373fa1de..f81fa4a3e66b 100644
---- a/drivers/crypto/marvell/cesa.c
-+++ b/drivers/crypto/marvell/cesa.c
-@@ -25,7 +25,6 @@
- #include <linux/scatterlist.h>
- #include <linux/slab.h>
- #include <linux/module.h>
--#include <linux/dma-direct.h> /* XXX: drivers shall never use this directly! */
- #include <linux/clk.h>
- #include <linux/of.h>
- #include <linux/of_platform.h>
+Patch applied.  Thanks.
 -- 
-2.16.1.dirty
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
