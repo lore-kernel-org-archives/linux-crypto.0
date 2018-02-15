@@ -1,7 +1,8 @@
 From: Lionel Debieve <lionel.debieve@st.com>
-Subject: [PATCH Resend 0/5] hwrng: stm32 - Improvement for stm32-rng
-Date: Thu, 15 Feb 2018 14:03:07 +0100
-Message-ID: <20180215130312.23612-1-lionel.debieve@st.com>
+Subject: [PATCH Resend 1/5] hwrng: stm32 - add reset during probe
+Date: Thu, 15 Feb 2018 14:03:08 +0100
+Message-ID: <20180215130312.23612-2-lionel.debieve@st.com>
+References: <20180215130312.23612-1-lionel.debieve@st.com>
 Mime-Version: 1.0
 Content-Type: text/plain
 Cc: Benjamin Gaignard <benjamin.gaignard@st.com>,
@@ -17,31 +18,51 @@ To: Matt Mackall <mpm@selenic.com>,
         <linux-arm-kernel@lists.infradead.org>,
         <linux-kernel@vger.kernel.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20180215130312.23612-1-lionel.debieve@st.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This set of patches add extended functionalities for stm32 rng
-driver.
-Patch #1 includes a reset during probe to avoid any error status
-which can occur during bootup process and keep safe rng integrity.
+Avoid issue when probing the RNG without
+reset if bad status has been detected previously
 
-Patch #3 adds a new property to manage the clock error detection
-feature which can be disabled on specific target.
+Signed-off-by: Lionel Debieve <lionel.debieve@st.com>
+---
+ drivers/char/hw_random/stm32-rng.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-Patch #5 rework the timeout calculation for read value that was
-previously defined based on loop operation and is now based on
-timer.
-
-Lionel Debieve (5):
-  hwrng: stm32 - add reset during probe
-  dt-bindings: rng: add reset node for stm32
-  hwrng: stm32 - allow disable clock error detection
-  dt-bindings: rng: add clock detection error for stm32
-  hwrng: stm32 - rework read timeout calculation
-
- .../devicetree/bindings/rng/st,stm32-rng.txt       |  4 ++
- drivers/char/hw_random/stm32-rng.c                 | 44 ++++++++++++++--------
- 2 files changed, 32 insertions(+), 16 deletions(-)
-
+diff --git a/drivers/char/hw_random/stm32-rng.c b/drivers/char/hw_random/stm32-rng.c
+index 63d84e6f1891..83c695938a2d 100644
+--- a/drivers/char/hw_random/stm32-rng.c
++++ b/drivers/char/hw_random/stm32-rng.c
+@@ -21,6 +21,7 @@
+ #include <linux/of_address.h>
+ #include <linux/of_platform.h>
+ #include <linux/pm_runtime.h>
++#include <linux/reset.h>
+ #include <linux/slab.h>
+ 
+ #define RNG_CR 0x00
+@@ -46,6 +47,7 @@ struct stm32_rng_private {
+ 	struct hwrng rng;
+ 	void __iomem *base;
+ 	struct clk *clk;
++	struct reset_control *rst;
+ };
+ 
+ static int stm32_rng_read(struct hwrng *rng, void *data, size_t max, bool wait)
+@@ -140,6 +142,13 @@ static int stm32_rng_probe(struct platform_device *ofdev)
+ 	if (IS_ERR(priv->clk))
+ 		return PTR_ERR(priv->clk);
+ 
++	priv->rst = devm_reset_control_get(&ofdev->dev, NULL);
++	if (!IS_ERR(priv->rst)) {
++		reset_control_assert(priv->rst);
++		udelay(2);
++		reset_control_deassert(priv->rst);
++	}
++
+ 	dev_set_drvdata(dev, priv);
+ 
+ 	priv->rng.name = dev_driver_string(dev),
 -- 
 2.15.1
