@@ -1,120 +1,51 @@
-From: Marek Vasut <marex@denx.de>
-Subject: Re: [PATCH v3 0/5] crypto: ahash.c: Require export/import in ahash
-Date: Thu, 15 Feb 2018 19:32:31 +0100
-Message-ID: <14364c45-8f56-e6d6-66f2-8357bf89a894@denx.de>
-References: <CGME20180118183438eucas1p2e2e7be8625ae0950c519e27424f9301a@eucas1p2.samsung.com>
- <20180118183404.12583-1-k.konieczny@partner.samsung.com>
- <20180215154132.GA7352@gondor.apana.org.au>
- <6b29116a-c39c-9813-34a0-d5c05bd30c9d@denx.de>
- <32069edc-e816-6ab0-f057-b1dab5d30db4@partner.samsung.com>
- <d7300e36-392a-18cf-5176-6eaf4c16eb43@denx.de>
- <cdb62a71-bb7e-8c62-06bc-ab91c9642e06@partner.samsung.com>
+From: Brijesh Singh <brijesh.singh@amd.com>
+Subject: [PATCH 2/2] include: psp-sev: Capitalize invalid length enum
+Date: Thu, 15 Feb 2018 13:34:45 -0600
+Message-ID: <20180215193445.40046-2-brijesh.singh@amd.com>
+References: <20180215193445.40046-1-brijesh.singh@amd.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-        Sonic Zhang <sonic.zhang@analog.com>,
-        Fabio Estevam <fabio.estevam@freescale.com>,
-        Shawn Guo <shawn.guo@linaro.org>,
+Content-Type: text/plain
+Cc: Brijesh Singh <brijesh.singh@amd.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Borislav Petkov <bp@suse.de>,
         Tom Lendacky <thomas.lendacky@amd.com>,
-        Jan Engelhardt <jengelh@inai.de>,
-        Arvind Yadav <arvind.yadav.cs@gmail.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Joakim Bech <joakim.bech@linaro.org>,
-        linux-kernel@vger.kernel.org
-To: Kamil Konieczny <k.konieczny@partner.samsung.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <cdb62a71-bb7e-8c62-06bc-ab91c9642e06@partner.samsung.com>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+        Gary R Hook <gary.hook@amd.com>
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-dm3nam03on0047.outbound.protection.outlook.com ([104.47.41.47]:58919
+        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1755506AbeBOTfP (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 15 Feb 2018 14:35:15 -0500
+In-Reply-To: <20180215193445.40046-1-brijesh.singh@amd.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On 02/15/2018 07:06 PM, Kamil Konieczny wrote:
-> 
-> 
-> On 15.02.2018 18:06, Marek Vasut wrote:
->> On 02/15/2018 06:00 PM, Kamil Konieczny wrote:
->>>
->>>
->>> On 15.02.2018 17:27, Marek Vasut wrote:
->>>> On 02/15/2018 04:41 PM, Herbert Xu wrote:
->>>>> On Thu, Jan 18, 2018 at 07:33:59PM +0100, Kamil Konieczny wrote:
->>>>>> First four patches add empty hash export and import functions to each driver,
->>>>>> with the same behaviour as in crypto framework. The last one drops them from
->>>>>> crypto framework. Last one for ahash.c depends on all previous.
->>>>>>
->>>>>> Changes in v3:
->>>>>> added change for bfin_crc.c
->>>>>> make this a patchset, instead of unreleated patches
->>>>>> make commit message more descriptive
->>>>>>
->>>>>> Kamil Konieczny (5):
->>>>>>   crypto: mxs-dcp: Add empty hash export and import
->>>>>>   crypto: n2_core: Add empty hash export and import
->>>>>>   crypto: ux500/hash: Add empty export and import
->>>>>>   crypto: bfin_crc: Add empty hash export and import
->>>>>>   crypto: ahash.c: Require export/import in ahash
->>>>>>
->>>>>>  crypto/ahash.c                        | 18 ++----------------
->>>>>>  drivers/crypto/bfin_crc.c             | 12 ++++++++++++
->>>>>>  drivers/crypto/mxs-dcp.c              | 14 ++++++++++++++
->>>>>>  drivers/crypto/n2_core.c              | 12 ++++++++++++
->>>>>>  drivers/crypto/ux500/hash/hash_core.c | 18 ++++++++++++++++++
->>>>>>  5 files changed, 58 insertions(+), 16 deletions(-)
->>>>>
->>>>> All applied.  Thanks.
->>>>
->>>> This makes no sense, cfr my comment on 5/5
->>>>
->>>> Seems like if the driver doesn't implement those, the core can easily
->>>> detect that and perform the necessary action. Moving the checks out of
->>>> core seems like the wrong thing to do, rather you should enhance the
->>>> checks in core if they're insufficient in my opinion.
->>>
->>> The bug can only be in driver which will not implement those two functions,
->>> but we already had all drivers with those due to patches 1..4
->>> All other drivers do have them.
->>
->> The core can very well check if these functions are not populated and
->> return ENOSYS
->>
->>> Additionally, with crypto we want minimize code and run as fast as possible.
->>
->> So you remove all NULL pointer checks ? Esp. in security-sensitive code?
->> What is the impact of this non-critical path code on performance?
->>
->> Come on ...
->>
-> 
-> Why you want checks for something that not exist ?
-> 
-> Those without them will not work and will do Oops in crypto testmgr,
-> so such drivers should not be used nor accepted in drivers/crypto
-> 
-> Ask yourself why crypto do not check for NULL in ahash digest or other
-> required ahash functions.
+Commit 1d57b17c60ff ("crypto: ccp: Define SEV userspace ioctl and command
+id") added the invalid length enum but we missed capitalizing it.
 
-Are you suggesting that the kernel code should NOT perform NULL pointer
-checks ?
+Fixes: 1d57b17c60ff (crypto: ccp: Define SEV userspace ioctl ...)
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Borislav Petkov <bp@suse.de>
+Cc: Tom Lendacky <thomas.lendacky@amd.com>
+CC: Gary R Hook <gary.hook@amd.com>
+Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+---
+ include/uapi/linux/psp-sev.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Are you suggesting each driver should implement every single callback
-available and if it is not implemented, return -ENOSYS ? This looks like
-a MASSIVE code duplication.
-
->>> Moving checks out of core will impose on driver author need for implement
->>> those functions, or declare them empty, but in case of empty ones 
->>> crypto will not work properly with such driver.
->>
->> You can very well impose that in the core, except you don't duplicate
->> the code.
-> 
-> Now size of crypto core is reduced.
-
-You implemented the same code thrice, it surely is not reduced.
-
+diff --git a/include/uapi/linux/psp-sev.h b/include/uapi/linux/psp-sev.h
+index 3d77fe91239a..9008f31c7eb6 100644
+--- a/include/uapi/linux/psp-sev.h
++++ b/include/uapi/linux/psp-sev.h
+@@ -42,7 +42,7 @@ typedef enum {
+ 	SEV_RET_INVALID_PLATFORM_STATE,
+ 	SEV_RET_INVALID_GUEST_STATE,
+ 	SEV_RET_INAVLID_CONFIG,
+-	SEV_RET_INVALID_len,
++	SEV_RET_INVALID_LEN,
+ 	SEV_RET_ALREADY_OWNED,
+ 	SEV_RET_INVALID_CERTIFICATE,
+ 	SEV_RET_POLICY_FAILURE,
 -- 
-Best regards,
-Marek Vasut
+2.14.3
