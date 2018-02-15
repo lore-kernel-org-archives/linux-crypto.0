@@ -1,79 +1,120 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH v3 1/4] crypto: AF_ALG AIO - lock context IV
-Date: Thu, 15 Feb 2018 19:09:02 +0100
-Message-ID: <3343102.1189f6ocM2@tauon.chronox.de>
-References: <2118226.LQArbCsRu5@tauon.chronox.de> <a4a6d87e-4910-1718-a2a4-e7a5a4d12177@chelsio.com> <1855300.7RfVcKporS@tauon.chronox.de>
+From: Marek Vasut <marex@denx.de>
+Subject: Re: [PATCH v3 0/5] crypto: ahash.c: Require export/import in ahash
+Date: Thu, 15 Feb 2018 19:32:31 +0100
+Message-ID: <14364c45-8f56-e6d6-66f2-8357bf89a894@denx.de>
+References: <CGME20180118183438eucas1p2e2e7be8625ae0950c519e27424f9301a@eucas1p2.samsung.com>
+ <20180118183404.12583-1-k.konieczny@partner.samsung.com>
+ <20180215154132.GA7352@gondor.apana.org.au>
+ <6b29116a-c39c-9813-34a0-d5c05bd30c9d@denx.de>
+ <32069edc-e816-6ab0-f057-b1dab5d30db4@partner.samsung.com>
+ <d7300e36-392a-18cf-5176-6eaf4c16eb43@denx.de>
+ <cdb62a71-bb7e-8c62-06bc-ab91c9642e06@partner.samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Harsh Jain <harsh@chelsio.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-        Gilad Ben-Yossef <gilad@benyossef.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        linuxarm@huawei.com
-To: Stephan Mueller <smueller@chronox.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mo4-p00-ob.smtp.rzone.de ([81.169.146.216]:20133 "EHLO
-        mo4-p00-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1163624AbeBOSJH (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 15 Feb 2018 13:09:07 -0500
-In-Reply-To: <1855300.7RfVcKporS@tauon.chronox.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        Sonic Zhang <sonic.zhang@analog.com>,
+        Fabio Estevam <fabio.estevam@freescale.com>,
+        Shawn Guo <shawn.guo@linaro.org>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Jan Engelhardt <jengelh@inai.de>,
+        Arvind Yadav <arvind.yadav.cs@gmail.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Joakim Bech <joakim.bech@linaro.org>,
+        linux-kernel@vger.kernel.org
+To: Kamil Konieczny <k.konieczny@partner.samsung.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <cdb62a71-bb7e-8c62-06bc-ab91c9642e06@partner.samsung.com>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Am Donnerstag, 15. Februar 2018, 14:04:53 CET schrieb Stephan Mueller:
-
-Hi Stephan,
-
-> Am Donnerstag, 15. Februar 2018, 13:45:53 CET schrieb Harsh Jain:
+On 02/15/2018 07:06 PM, Kamil Konieczny wrote:
 > 
-> Hi Harsh,
 > 
-> > > Could you please elaborate what you mean with "partial tag" support?
-> > 
-> > Here is the catch, Calculation of tag depends on total payload length
-> > atleast for shaX, gcm,ccm mode on which I have worked.
-> > 
-> > If we take an example of shaX. It appends 1 special block at the end of
-> > user data which includes total input length in bit. Refer
-> > "sha1_base_do_finalize" Suppose we have 32 byte and we break this in 2
-> > IOCB
-> > of 16 bytes each. Expected result : 32 encrypted bytes + sha auth tag
-> > considering length 32 bytes. What we will  get : 16 bytes + sha auth tag
-> > considering length 16 bytes + 16 encrypted bytes + another sha tag
-> > considering 16 bytes.
+> On 15.02.2018 18:06, Marek Vasut wrote:
+>> On 02/15/2018 06:00 PM, Kamil Konieczny wrote:
+>>>
+>>>
+>>> On 15.02.2018 17:27, Marek Vasut wrote:
+>>>> On 02/15/2018 04:41 PM, Herbert Xu wrote:
+>>>>> On Thu, Jan 18, 2018 at 07:33:59PM +0100, Kamil Konieczny wrote:
+>>>>>> First four patches add empty hash export and import functions to each driver,
+>>>>>> with the same behaviour as in crypto framework. The last one drops them from
+>>>>>> crypto framework. Last one for ahash.c depends on all previous.
+>>>>>>
+>>>>>> Changes in v3:
+>>>>>> added change for bfin_crc.c
+>>>>>> make this a patchset, instead of unreleated patches
+>>>>>> make commit message more descriptive
+>>>>>>
+>>>>>> Kamil Konieczny (5):
+>>>>>>   crypto: mxs-dcp: Add empty hash export and import
+>>>>>>   crypto: n2_core: Add empty hash export and import
+>>>>>>   crypto: ux500/hash: Add empty export and import
+>>>>>>   crypto: bfin_crc: Add empty hash export and import
+>>>>>>   crypto: ahash.c: Require export/import in ahash
+>>>>>>
+>>>>>>  crypto/ahash.c                        | 18 ++----------------
+>>>>>>  drivers/crypto/bfin_crc.c             | 12 ++++++++++++
+>>>>>>  drivers/crypto/mxs-dcp.c              | 14 ++++++++++++++
+>>>>>>  drivers/crypto/n2_core.c              | 12 ++++++++++++
+>>>>>>  drivers/crypto/ux500/hash/hash_core.c | 18 ++++++++++++++++++
+>>>>>>  5 files changed, 58 insertions(+), 16 deletions(-)
+>>>>>
+>>>>> All applied.  Thanks.
+>>>>
+>>>> This makes no sense, cfr my comment on 5/5
+>>>>
+>>>> Seems like if the driver doesn't implement those, the core can easily
+>>>> detect that and perform the necessary action. Moving the checks out of
+>>>> core seems like the wrong thing to do, rather you should enhance the
+>>>> checks in core if they're insufficient in my opinion.
+>>>
+>>> The bug can only be in driver which will not implement those two functions,
+>>> but we already had all drivers with those due to patches 1..4
+>>> All other drivers do have them.
+>>
+>> The core can very well check if these functions are not populated and
+>> return ENOSYS
+>>
+>>> Additionally, with crypto we want minimize code and run as fast as possible.
+>>
+>> So you remove all NULL pointer checks ? Esp. in security-sensitive code?
+>> What is the impact of this non-critical path code on performance?
+>>
+>> Come on ...
+>>
 > 
-> As AF_ALG for AEAD is implemented, there is no stream support where the hash
-> is calculated at the end. This is even not supported in the current AEAD
-> API of the kernel crypto API as far as I see. The only "stream-like"
-> support is that you can invoke multiple separate sendmsg calls to provide
-> the input data for the AEAD. But once you call recvmsg, the ciphertext and
-> the tag is calculated and thus the recvmsg is akin to a hash_final
-> operation.
+> Why you want checks for something that not exist ?
 > 
-> Complete parallel execution of multiple independent AEAD cipher operations
-> with AIO is possible using the inline IV as suggested in the patch set.
+> Those without them will not work and will do Oops in crypto testmgr,
+> so such drivers should not be used nor accepted in drivers/crypto
 > 
-> The locking of the ctx->iv is only there to support a driver not to whack
-> the IV buffer. However, if others also agree that the ctx->ivlock should
-> not be taken in the AEAD code path because a potential whacking the IV
-> buffer by a driver does not need to be prevented, I would change the patch.
+> Ask yourself why crypto do not check for NULL in ahash digest or other
+> required ahash functions.
 
-I was about to change the implementation. However, I already found an 
-implementation where the driver changes the IV of the request buffer: 
-crypto_ccm_init_crypt modifies the original buffer of the IV. I expect that 
-there are more.
+Are you suggesting that the kernel code should NOT perform NULL pointer
+checks ?
 
-Therefore, I would think that keeping the patch set as it is right now is the 
-right thing to do. Thus, we should cover the AEAD ciphers with the lock and 
-thus serialize the AEAD request. This guarantees that the IV buffer is at 
-least not mangled while the cipher operation is ongoing.
+Are you suggesting each driver should implement every single callback
+available and if it is not implemented, return -ENOSYS ? This looks like
+a MASSIVE code duplication.
 
-Again, if a particular AEAD driver guarantees the IV is not mangled, it can 
-very well set CRYPTO_ALG_SERIALIZES_IV_ACCESS in its flag set. This would 
-imply the lock is not set.
+>>> Moving checks out of core will impose on driver author need for implement
+>>> those functions, or declare them empty, but in case of empty ones 
+>>> crypto will not work properly with such driver.
+>>
+>> You can very well impose that in the core, except you don't duplicate
+>> the code.
+> 
+> Now size of crypto core is reduced.
 
-Ciao
-Stephan
+You implemented the same code thrice, it surely is not reduced.
+
+-- 
+Best regards,
+Marek Vasut
