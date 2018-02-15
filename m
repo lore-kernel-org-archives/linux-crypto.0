@@ -1,57 +1,68 @@
-From: =?iso-8859-2?Q?Horia_Geant=E3?= <horia.geanta@nxp.com>
-Subject: Re: [PATCH 2/2] crypto: caam: Use common error handling code in four
- functions
-Date: Thu, 15 Feb 2018 08:03:24 +0000
-Message-ID: <VI1PR0402MB3342F9E0700AA3A7CC20D8DC98F40@VI1PR0402MB3342.eurprd04.prod.outlook.com>
-References: <9a9a602d-93da-457d-c37d-2acbb4b7b5d5@users.sourceforge.net>
- <3c2905a1-b3a4-be87-618e-8562d3a5d8b4@users.sourceforge.net>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v3 2/3] MIPS: crypto: Add crc32 and crc32c hw accelerated
+ module
+Date: Thu, 15 Feb 2018 16:33:16 +0800
+Message-ID: <20180215083316.GA5212@gondor.apana.org.au>
+References: <cover.a1aaa0593f5afd4b00e8131611adda3a02c060d1.1518214143.git-series.jhogan@kernel.org>
+ <77eab2cb46e52be3639610a7ad574bac7bf78d73.1518214143.git-series.jhogan@kernel.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-2"
-Content-Transfer-Encoding: quoted-printable
-Cc: LKML <linux-kernel@vger.kernel.org>,
-        "kernel-janitors@vger.kernel.org" <kernel-janitors@vger.kernel.org>
-To: SF Markus Elfring <elfring@users.sourceforge.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-mips@linux-mips.org,
+        Marcin Nowakowski <marcin.nowakowski@mips.com>,
+        Ralf Baechle <ralf@linux-mips.org>,
         "David S. Miller" <davem@davemloft.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <kernel-janitors-owner@vger.kernel.org>
-Content-Language: en-US
-Sender: kernel-janitors-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+        linux-crypto@vger.kernel.org
+To: James Hogan <jhogan@kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:38828 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755118AbeBOIdf (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 15 Feb 2018 03:33:35 -0500
+Content-Disposition: inline
+In-Reply-To: <77eab2cb46e52be3639610a7ad574bac7bf78d73.1518214143.git-series.jhogan@kernel.org>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On 2/14/2018 8:32 PM, SF Markus Elfring wrote:=0A=
-> From: Markus Elfring <elfring@users.sourceforge.net>=0A=
-> Date: Wed, 14 Feb 2018 19:14:49 +0100=0A=
-> =0A=
-> Add jump targets so that a bit of exception handling can be better reused=
-=0A=
-> at the end of these functions.=0A=
-> =0A=
-> Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>=0A=
-[snip]=0A=
-> @@ -1096,6 +1092,7 @@ static int ahash_digest(struct ahash_request *req)=
-=0A=
->  	if (!ret) {=0A=
->  		ret =3D -EINPROGRESS;=0A=
->  	} else {=0A=
-> +unmap_hash:=0A=
->  		ahash_unmap(jrdev, edesc, req, digestsize);=0A=
->  		kfree(edesc);=0A=
->  	}=0A=
-> =0A=
-I understand jumps are a necessary evil for dealing with shortcomings of C,=
-=0A=
-however please avoid jumping in an if/else branch.=0A=
-=0A=
-Code could be rewritten as:=0A=
-=0A=
-  	if (!ret)=0A=
-  		return -EINPROGRESS;=0A=
-=0A=
-unmap_hash:=0A=
-  	ahash_unmap(jrdev, edesc, req, digestsize);=0A=
-  	kfree(edesc);=0A=
-=0A=
-Thanks,=0A=
-Horia=0A=
+On Fri, Feb 09, 2018 at 10:11:06PM +0000, James Hogan wrote:
+> From: Marcin Nowakowski <marcin.nowakowski@mips.com>
+> 
+> This module registers crc32 and crc32c algorithms that use the
+> optional CRC32[bhwd] and CRC32C[bhwd] instructions in MIPSr6 cores.
+> 
+> Signed-off-by: Marcin Nowakowski <marcin.nowakowski@mips.com>
+> Signed-off-by: James Hogan <jhogan@kernel.org>
+> Cc: Ralf Baechle <ralf@linux-mips.org>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: linux-mips@linux-mips.org
+> Cc: linux-crypto@vger.kernel.org
+> ---
+> Changes in v3:
+>  - Convert to using assembler macros to support CRC instructions on
+>    older toolchains, using the helpers merged for 4.16. This removes the
+>    need to hardcode either rt or rs (i.e. as $v0 (CRC_REGISTER) and
+>    $at), and drops the C "register" keywords sprinkled everywhere.
+>  - Minor whitespace rearrangement of _CRC32 macro.
+>  - Add SPDX-License-Identifier to crc32-mips.c and the crypo Makefile.
+>  - Update copyright from ImgTec to MIPS Tech, LLC.
+>  - Update imgtec.com email addresses to mips.com.
+> 
+> Changes in v2:
+>  - minor code refactoring as suggested by JamesH which produces
+>    a better assembly output for 32-bit builds
+> ---
+>  arch/mips/Kconfig             |   4 +-
+>  arch/mips/Makefile            |   3 +-
+>  arch/mips/crypto/Makefile     |   6 +-
+>  arch/mips/crypto/crc32-mips.c | 346 +++++++++++++++++++++++++++++++++++-
+>  crypto/Kconfig                |   9 +-
+>  5 files changed, 368 insertions(+)
+>  create mode 100644 arch/mips/crypto/Makefile
+>  create mode 100644 arch/mips/crypto/crc32-mips.c
+
+Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
