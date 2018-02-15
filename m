@@ -1,141 +1,113 @@
-From: kbuild test robot <lkp@intel.com>
-Subject: Re: [Crypto v4 12/12] Makefile Kconfig
-Date: Thu, 15 Feb 2018 20:26:39 +0800
-Message-ID: <201802152055.B3IZAVD3%fengguang.wu@intel.com>
-References: <1518437249-14732-1-git-send-email-atul.gupta@chelsio.com>
+From: Harsh Jain <harsh@chelsio.com>
+Subject: Re: [PATCH v3 1/4] crypto: AF_ALG AIO - lock context IV
+Date: Thu, 15 Feb 2018 18:15:53 +0530
+Message-ID: <a4a6d87e-4910-1718-a2a4-e7a5a4d12177@chelsio.com>
+References: <2118226.LQArbCsRu5@tauon.chronox.de>
+ <2417115.3KYcYg1eVS@tauon.chronox.de>
+ <558ccbb2-040d-232e-179b-92f0522f4bc2@chelsio.com>
+ <1927702.eDKbX5ILji@tauon.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: kbuild-all@01.org, davejwatson@fb.com, herbert@gondor.apana.org.au,
-        sd@queasysnail.net, linux-crypto@vger.kernel.org,
-        davem@davemloft.net, netdev@vger.kernel.org, ganeshgr@chelsio.com
-To: Atul Gupta <atul.gupta@chelsio.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+        Gilad Ben-Yossef <gilad@benyossef.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        linuxarm@huawei.com
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga07.intel.com ([134.134.136.100]:43449 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1030909AbeBOM1E (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 15 Feb 2018 07:27:04 -0500
-Content-Disposition: inline
-In-Reply-To: <1518437249-14732-1-git-send-email-atul.gupta@chelsio.com>
+Received: from stargate.chelsio.com ([12.32.117.8]:24346 "EHLO
+        stargate.chelsio.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1030245AbeBOMqO (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 15 Feb 2018 07:46:14 -0500
+In-Reply-To: <1927702.eDKbX5ILji@tauon.chronox.de>
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Atul,
-
-Thank you for the patch! Perhaps something to improve:
-
-[auto build test WARNING on cryptodev/master]
-[cannot apply to net/master net-next/master v4.16-rc1 next-20180214]
-[if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
-
-url:    https://github.com/0day-ci/linux/commits/Atul-Gupta/Chelsio-Inline-TLS/20180215-072600
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-reproduce:
-        # apt-get install sparse
-        make ARCH=x86_64 allmodconfig
-        make C=1 CF=-D__CHECK_ENDIAN__
 
 
-sparse warnings: (new ones prefixed by >>)
+On 15-02-2018 17:15, Stephan Mueller wrote:
+> Am Donnerstag, 15. Februar 2018, 12:38:12 CET schrieb Harsh Jain:
+>
+> Hi Harsh,
+>
+>> On 15-02-2018 12:47, Stephan Mueller wrote:
+>>> Am Donnerstag, 15. Februar 2018, 08:03:20 CET schrieb Harsh Jain:
+>>>
+>>> Hi Harsh,
+>>>
+>>>> Even after guarantee of serialization, In the end we will get wrong
+>>>> result
+>>>> as mentioned above. which destination side cannot decrypt it. What I feel
+>>>> is scenario of sending 2 of more IOCB in case of AEAD itself is wrong.
+>>> Without the inline IV handling, I would concur.
+>> Even with Inline IV, We will have 2 Auth Tag. can we authenticate the data
+>> with 2 Auth Tags?
+> The AAD and the tag are both sent to the kernel like in the inline IV case as 
+> part of the data via sendmsg.
+>
+> Thus, when you use inline IV support, an entire self-contained AEAD cipher 
+> operation can be defined with one IOCB. Thus, if you have multiple IOCBs, 
+> inline IV allow fully parallel execution of different AEAD requests.
+>
+> See the following kernel comment:
+>
+>                 /*
+>                  * Encryption operation - The in-place cipher operation is
+>                  * achieved by the following operation:
+>                  *
+>                  * TX SGL: AAD || PT
+>                  *          |      |
+>                  *          | copy |
+>                  *          v      v
+>                  * RX SGL: AAD || PT || Tag
+>
+>                 /*
+>                  * Decryption operation - To achieve an in-place cipher
+>                  * operation, the following  SGL structure is used:
+>                  *
+>                  * TX SGL: AAD || CT || Tag
+>                  *          |      |     ^
+>                  *          | copy |     | Create SGL link.
+>                  *          v      v     |
+>                  * RX SGL: AAD || CT ----+
+>                  */
+>
+> Note, the TX SGL is what the caller submitted via sendmsg and the RX SGL is 
+> the data the caller obtains via recvmsg.
+>
+> Hence, in inline IV support, the caller sends the following:
+>
+> encryption: IV || AAD || PT
+>
+> decryption: IV || AAD || CT || Tag
+>
+>>>> We
+>>>> should not allow this type of requests for AEAD.
+>>> "Not allow" as in "technically block"? As a user would only shoot itself
+>>> when he does that not knowing the consequences, I am not in favor of such
+>>> an artificial block.
+>> Agreed, It may not be right thing to do, but if we allowed it, What he will
+>> do with Auth( each processed with final Block) tags received in each
+>> request.
+> Each tag is returned as part of the recvmsg data. Thus, AEAD cipher operations 
+> can commence fully parallel if inline IV handling is used.
+>> I personally feels AEAD IV serialization logic is incomplete without partial
+>> tag support.
+> Could you please elaborate what you mean with "partial tag" support?
+Here is the catch, Calculation of tag depends on total payload length atleast for shaX, gcm,ccm mode on which I have worked.
 
->> drivers/crypto/chelsio/chtls/chtls_main.c:139:19: sparse: symbol 'chtls_netdev' was not declared. Should it be
->> drivers/crypto/chelsio/chtls/chtls_main.c:152:6: sparse: symbol 'chtls_update_prot' was not declared. Should it be
->> drivers/crypto/chelsio/chtls/chtls_main.c:157:5: sparse: symbol 'chtls_inline_feature' was not declared. Should it be
->> drivers/crypto/chelsio/chtls/chtls_main.c:171:5: sparse: symbol 'chtls_create_hash' was not declared. Should it be
->> drivers/crypto/chelsio/chtls/chtls_main.c:178:6: sparse: symbol 'chtls_destroy_hash' was not declared. Should it be
---
->> drivers/crypto/chelsio/chtls/chtls_cm.c:373:27: sparse: incorrect type in assignment (different address spaces) @@ expected struct socket_wq @@ got @@
-   drivers/crypto/chelsio/chtls/chtls_cm.c:373:27: expected struct socket_wq
-   drivers/crypto/chelsio/chtls/chtls_cm.c:373:27: got struct socket_wq
->> drivers/crypto/chelsio/chtls/chtls_cm.c:395:23: sparse: incompatible types in comparison expression (different address spaces)
-   drivers/crypto/chelsio/chtls/chtls_cm.c:714:6: sparse: symbol 'free_atid' was not declared. Should it be
->> drivers/crypto/chelsio/chtls/chtls_cm.h:150:35: sparse: incorrect type in argument 1 (different address spaces) @@ expected struct socket_wq @@ got struct socket_wq struct socket_wq @@
-   drivers/crypto/chelsio/chtls/chtls_cm.h:150:35: expected struct socket_wq
-   drivers/crypto/chelsio/chtls/chtls_cm.h:150:35: got struct socket_wq
->> drivers/crypto/chelsio/chtls/chtls_cm.c:1165:37: sparse: incorrect type in argument 2 (different base types) @@ expected unsigned int local_ip @@ got ed int local_ip @@
-   drivers/crypto/chelsio/chtls/chtls_cm.c:1165:37: expected unsigned int local_ip
-   drivers/crypto/chelsio/chtls/chtls_cm.c:1165:37: got restricted __be32 daddr
->> drivers/crypto/chelsio/chtls/chtls_cm.c:1165:49: sparse: incorrect type in argument 3 (different base types) @@ expected unsigned int peer_ip @@ got ed int peer_ip @@
-   drivers/crypto/chelsio/chtls/chtls_cm.c:1165:49: expected unsigned int peer_ip
-   drivers/crypto/chelsio/chtls/chtls_cm.c:1165:49: got restricted __be32 saddr
->> drivers/crypto/chelsio/chtls/chtls_cm.h:173:37: sparse: incorrect type in assignment (different base types) @@ expected restricted __be32 skc_rcv_saddr @@ got unsignrestricted __be32 skc_rcv_saddr @@
-   drivers/crypto/chelsio/chtls/chtls_cm.h:173:37: expected restricted __be32 skc_rcv_saddr
-   drivers/crypto/chelsio/chtls/chtls_cm.h:173:37: got unsigned int local_ip
->> drivers/crypto/chelsio/chtls/chtls_cm.h:174:37: sparse: incorrect type in assignment (different base types) @@ expected restricted __be32 skc_daddr @@ got unsignrestricted __be32 skc_daddr @@
-   drivers/crypto/chelsio/chtls/chtls_cm.h:174:37: expected restricted __be32 skc_daddr
-   drivers/crypto/chelsio/chtls/chtls_cm.h:174:37: got unsigned int peer_ip
->> drivers/crypto/chelsio/chtls/chtls_cm.c:1243:23: sparse: incorrect type in argument 1 (different address spaces) @@ expected struct dst_entry @@ got struct dst_entry struct dst_entry @@
-   drivers/crypto/chelsio/chtls/chtls_cm.c:1243:23: expected struct dst_entry
-   drivers/crypto/chelsio/chtls/chtls_cm.c:1243:23: got struct dst_entry
->> drivers/crypto/chelsio/chtls/chtls_cm.c:1539:24: sparse: cast to restricted __be16
->> drivers/crypto/chelsio/chtls/chtls_cm.c:1539:24: sparse: cast to restricted __be16
->> drivers/crypto/chelsio/chtls/chtls_cm.c:1539:24: sparse: cast to restricted __be16
->> drivers/crypto/chelsio/chtls/chtls_cm.c:1539:24: sparse: cast to restricted __be16
-   drivers/crypto/chelsio/chtls/chtls_cm.c:1540:31: sparse: cast to restricted __be16
-   drivers/crypto/chelsio/chtls/chtls_cm.c:1540:31: sparse: cast to restricted __be16
-   drivers/crypto/chelsio/chtls/chtls_cm.c:1540:31: sparse: cast to restricted __be16
-   drivers/crypto/chelsio/chtls/chtls_cm.c:1540:31: sparse: cast to restricted __be16
-   drivers/crypto/chelsio/chtls/chtls_cm.c:1664:31: sparse: incorrect type in argument 1 (different address spaces) @@ expected struct dst_entry @@ got struct dst_entry struct dst_entry @@
-   drivers/crypto/chelsio/chtls/chtls_cm.c:1664:31: expected struct dst_entry
-   drivers/crypto/chelsio/chtls/chtls_cm.c:1664:31: got struct dst_entry
->> drivers/crypto/chelsio/chtls/chtls_cm.c:1983:21: sparse: restricted __wsum degrades to integer
->> drivers/crypto/chelsio/chtls/chtls_cm.c:1984:36: sparse: bad assignment (-=) to restricted __wsum
->> drivers/crypto/chelsio/chtls/chtls_cm.c:1988:25: sparse: invalid assignment: -=
-   drivers/crypto/chelsio/chtls/chtls_cm.c:1988:25: left side has type unsigned char
-   drivers/crypto/chelsio/chtls/chtls_cm.c:1988:25: right side has type restricted __wsum
-   drivers/crypto/chelsio/chtls/chtls_cm.c:1999:39: sparse: incorrect type in argument 1 (different address spaces) @@ expected struct dst_entry @@ got struct dst_entry struct dst_entry @@
-   drivers/crypto/chelsio/chtls/chtls_cm.c:1999:39: expected struct dst_entry
-   drivers/crypto/chelsio/chtls/chtls_cm.c:1999:39: got struct dst_entry
->> drivers/crypto/chelsio/chtls/chtls_cm.c:1062:22: sparse: context imbalance in 'chtls_recv_sock' - unexpected unlock
-   drivers/crypto/chelsio/chtls/chtls_cm.c: In function 'chtls_rx_ack':
-   drivers/crypto/chelsio/chtls/chtls_cm.c:1979:4: warning: this 'if' clause does not guard...
-    if (csk->wr_nondata)
-    ^~
-   drivers/crypto/chelsio/chtls/chtls_cm.c:1981:5: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the 'if'
-    break;
-    ^~~~~
---
->> drivers/crypto/chelsio/chtls/chtls_io.c:343:31: sparse: incorrect type in return expression (different base types) @@ expected restricted __be64 @@ got urestricted __be64 @@
-   drivers/crypto/chelsio/chtls/chtls_io.c:343:31: expected restricted __be64
-   drivers/crypto/chelsio/chtls/chtls_io.c:343:31: got unsigned long long
->> drivers/crypto/chelsio/chtls/chtls_io.c:399:36: sparse: invalid assignment: &=
-   drivers/crypto/chelsio/chtls/chtls_io.c:399:36: left side has type restricted __be32
-   drivers/crypto/chelsio/chtls/chtls_io.c:399:36: right side has type unsigned int
-   drivers/crypto/chelsio/chtls/chtls_io.c:400:36: sparse: invalid assignment: |=
-   drivers/crypto/chelsio/chtls/chtls_io.c:400:36: left side has type restricted __be32
-   drivers/crypto/chelsio/chtls/chtls_io.c:400:36: right side has type int
->> drivers/crypto/chelsio/chtls/chtls_io.c:462:34: sparse: cast from restricted __be32
->> drivers/crypto/chelsio/chtls/chtls_io.c:462:34: sparse: incorrect type in argument 1 (different base types) @@ expected unsigned int val @@ got ed int val @@
-   drivers/crypto/chelsio/chtls/chtls_io.c:462:34: expected unsigned int val
-   drivers/crypto/chelsio/chtls/chtls_io.c:462:34: got restricted __be32 seqno_numivs
->> drivers/crypto/chelsio/chtls/chtls_io.c:462:34: sparse: cast from restricted __be32
->> drivers/crypto/chelsio/chtls/chtls_io.c:462:34: sparse: cast from restricted __be32
->> drivers/crypto/chelsio/chtls/chtls_io.c:462:34: sparse: cast from restricted __be32
->> drivers/crypto/chelsio/chtls/chtls_io.c:462:34: sparse: cast from restricted __be32
-   drivers/crypto/chelsio/chtls/chtls_io.c:463:33: sparse: cast from restricted __be32
-   drivers/crypto/chelsio/chtls/chtls_io.c:463:33: sparse: incorrect type in argument 1 (different base types) @@ expected unsigned int val @@ got ed int val @@
-   drivers/crypto/chelsio/chtls/chtls_io.c:463:33: expected unsigned int val
-   drivers/crypto/chelsio/chtls/chtls_io.c:463:33: got restricted __be32 ivgen_hdrlen
-   drivers/crypto/chelsio/chtls/chtls_io.c:463:33: sparse: cast from restricted __be32
-   drivers/crypto/chelsio/chtls/chtls_io.c:463:33: sparse: cast from restricted __be32
-   drivers/crypto/chelsio/chtls/chtls_io.c:463:33: sparse: cast from restricted __be32
-   drivers/crypto/chelsio/chtls/chtls_io.c:463:33: sparse: cast from restricted __be32
->> drivers/crypto/chelsio/chtls/chtls_io.c:464:26: sparse: cast from restricted __be64
->> drivers/crypto/chelsio/chtls/chtls_io.c:464:26: sparse: incorrect type in argument 1 (different base types) @@ expected unsigned long long val @@ got gned] val @@
-   drivers/crypto/chelsio/chtls/chtls_io.c:464:26: expected unsigned long long val
-   drivers/crypto/chelsio/chtls/chtls_io.c:464:26: got restricted __be64
->> drivers/crypto/chelsio/chtls/chtls_io.c:464:26: sparse: cast from restricted __be64
->> drivers/crypto/chelsio/chtls/chtls_io.c:464:26: sparse: cast from restricted __be64
->> drivers/crypto/chelsio/chtls/chtls_io.c:464:26: sparse: cast from restricted __be64
->> drivers/crypto/chelsio/chtls/chtls_io.c:464:26: sparse: cast from restricted __be64
->> drivers/crypto/chelsio/chtls/chtls_io.c:464:26: sparse: cast from restricted __be64
->> drivers/crypto/chelsio/chtls/chtls_io.c:464:26: sparse: cast from restricted __be64
->> drivers/crypto/chelsio/chtls/chtls_io.c:464:26: sparse: cast from restricted __be64
->> drivers/crypto/chelsio/chtls/chtls_io.c:464:26: sparse: cast from restricted __be64
->> drivers/crypto/chelsio/chtls/chtls_io.c:484:21: sparse: restricted __be32 degrades to integer
->> drivers/crypto/chelsio/chtls/chtls_io.c:516:6: sparse: symbol 'make_tlstx_data_wr' was not declared. Should it be
->> drivers/crypto/chelsio/chtls/chtls_io.c:692:27: sparse: incorrect type in assignment (different base types) @@ expected restricted __wsum csum @@ got csum @@
-   drivers/crypto/chelsio/chtls/chtls_io.c:692:27: expected restricted __wsum csum
-   drivers/crypto/chelsio/chtls/chtls_io.c:692:27: got unsigned int
->> drivers/crypto/chelsio/chtls/chtls_io.c:938:16: sparse: incorrect type in return expression (different base types) @@ expected int @@ got restricted __be16 [usertypint @@
-   drivers/crypto/chelsio/chtls/chtls_io.c:938:16: expected int
-   drivers/crypto/chelsio/chtls/chtls_io.c:938:16: got restricted __be16 <noident>
+If we take an example of shaX. It appends 1 special block at the end of user data which includes total input length in bit. Refer "sha1_base_do_finalize"
+Suppose we have 32 byte and we break this in 2 IOCB of 16 bytes each.
+Expected result : 32 encrypted bytes + sha auth tag considering length 32 bytes.
+What we will  get : 16 bytes + sha auth tag considering length 16 bytes + 16 encrypted bytes + another sha tag considering 16 bytes.
+
+
+
+>
+> Ciao
+> Stephan
+>
+>
