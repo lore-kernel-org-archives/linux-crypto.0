@@ -1,55 +1,76 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/5] hwrng: stm32 - Improvement for stm32-rng
-Date: Thu, 15 Feb 2018 16:48:55 +0800
-Message-ID: <20180215084855.GB5577@gondor.apana.org.au>
-References: <20180129170521.1862-1-lionel.debieve@st.com>
+From: Harsh Jain <harsh@chelsio.com>
+Subject: Re: [PATCH v3 1/4] crypto: AF_ALG AIO - lock context IV
+Date: Thu, 15 Feb 2018 17:08:12 +0530
+Message-ID: <558ccbb2-040d-232e-179b-92f0522f4bc2@chelsio.com>
+References: <2118226.LQArbCsRu5@tauon.chronox.de>
+ <2405649.UvqtvHuhOS@tauon.chronox.de>
+ <614650e1-66c7-ca0d-d642-ede029c15f58@chelsio.com>
+ <2417115.3KYcYg1eVS@tauon.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Matt Mackall <mpm@selenic.com>, Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@st.com>,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org,
-        Benjamin Gaignard <benjamin.gaignard@st.com>,
-        Ludovic Barre <ludovic.barre@st.com>
-To: Lionel Debieve <lionel.debieve@st.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20180129170521.1862-1-lionel.debieve@st.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+        Gilad Ben-Yossef <gilad@benyossef.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        linuxarm@huawei.com
+To: Stephan Mueller <smueller@chronox.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from stargate.chelsio.com ([12.32.117.8]:55984 "EHLO
+        stargate.chelsio.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S967814AbeBOLia (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 15 Feb 2018 06:38:30 -0500
+In-Reply-To: <2417115.3KYcYg1eVS@tauon.chronox.de>
+Content-Language: en-US
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Jan 29, 2018 at 06:05:16PM +0100, Lionel Debieve wrote:
-> This set of patches add extended functionalities for stm32 rng
-> driver.
-> Patch #1 includes a reset during probe to avoid any error status
-> which can occur during bootup process and keep safe rng integrity.
-> 
-> Patch #3 adds a new property to manage the clock error detection
-> feature which can be disabled on specific target.
-> 
-> Patch #5 rework the timeout calculation for read value that was
-> previously defined based on loop operation and is now based on
-> timer.
-> 
-> Lionel Debieve (5):
->   hwrng: stm32 - add reset during probe
->   dt-bindings: rng: add reset node for stm32
->   hwrng: stm32 - allow disable clock error detection
->   dt-bindings: rng: add clock detection error for stm32
->   hwrng: stm32 - rework read timeout calculation
-> 
->  .../devicetree/bindings/rng/st,stm32-rng.txt       |  4 ++
->  drivers/char/hw_random/stm32-rng.c                 | 44 ++++++++++++++--------
->  2 files changed, 32 insertions(+), 16 deletions(-)
 
-I never received patch 5.
 
-Which trees are patch 2 and 4 meant to go through?
+On 15-02-2018 12:47, Stephan Mueller wrote:
+> Am Donnerstag, 15. Februar 2018, 08:03:20 CET schrieb Harsh Jain:
+>
+> Hi Harsh,
+>
+>> Even after guarantee of serialization, In the end we will get wrong result
+>> as mentioned above. which destination side cannot decrypt it. What I feel
+>> is scenario of sending 2 of more IOCB in case of AEAD itself is wrong.
+> Without the inline IV handling, I would concur.
+Even with Inline IV, We will have 2 Auth Tag. can we authenticate the data with 2 Auth Tags?
+>
+>> We
+>> should not allow this type of requests for AEAD.
+> "Not allow" as in "technically block"? As a user would only shoot itself when 
+> he does that not knowing the consequences, I am not in favor of such an 
+> artificial block.
+Agreed, It may not be right thing to do, but if we allowed it, What he will do with Auth( each processed with final Block) tags received in each request.
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+I personally feels AEAD IV serialization logic is incomplete without partial tag support.
+
+>> Can you think of any use
+>> case it is going to solve?
+> Well, I could fathom a use case of this. In FIPS 140-2 (yes, a term not well 
+> received by some here), NIST insists for GCM that the IV is handled by the 
+> cryptographic implementation.
+>
+> So, when using GCM for TLS, for example, the GCM implementation would know a 
+> bit about how the IV is updated as a session ID. I.e. after the end of one 
+> AEAD operation, the IV is written back but modified such to comply with the 
+> rules of some higher level proto. Thus, if such a scenarios is implemented by 
+> a driver here, multiple IOCBs could be used with such "TLSified" GCM, for 
+> example.
+>
+> And such "TLSification" could be as simple as implementing an IV generator 
+> that can be used with every (AEAD) cipher implementation.
+>
+>> Can receiver decrypt(with 2 IOCB) the same request successfully without
+>> knowing  sender has done the operation in 2 request with size "x" each?
+>>> Ciao
+>>> Stephan
+>
+>
+> Ciao
+> Stephan
+>
+>
