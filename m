@@ -1,429 +1,276 @@
 From: Atul Gupta <atul.gupta@chelsio.com>
-Subject: [Crypto v5 08/12] chtls: Key program
-Date: Thu, 15 Feb 2018 12:24:50 +0530
-Message-ID: <1518677694-28448-9-git-send-email-atul.gupta@chelsio.com>
+Subject: [Crypto v5 06/12] cxgb4: LLD driver changes to enable TLS
+Date: Thu, 15 Feb 2018 12:24:48 +0530
+Message-ID: <1518677694-28448-7-git-send-email-atul.gupta@chelsio.com>
 References: <1518677694-28448-1-git-send-email-atul.gupta@chelsio.com>
 Cc: sd@queasysnail.net, linux-crypto@vger.kernel.org,
         netdev@vger.kernel.org, ganeshgr@chelsio.com
 To: davejwatson@fb.com, davem@davemloft.net,
         herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from stargate.chelsio.com ([12.32.117.8]:46333 "EHLO
+Received: from stargate.chelsio.com ([12.32.117.8]:60696 "EHLO
         stargate.chelsio.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754863AbeBOGz5 (ORCPT
+        with ESMTP id S1754858AbeBOGzu (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 15 Feb 2018 01:55:57 -0500
+        Thu, 15 Feb 2018 01:55:50 -0500
 In-Reply-To: <1518677694-28448-1-git-send-email-atul.gupta@chelsio.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Program the tx and rx key on chip.
+Read FW capability. Read key area size. Dump the TLS record count.
 
 Signed-off-by: Atul Gupta <atul.gupta@chelsio.com>
 ---
- drivers/crypto/chelsio/chtls/chtls_hw.c | 394 ++++++++++++++++++++++++++++++++
- 1 file changed, 394 insertions(+)
- create mode 100644 drivers/crypto/chelsio/chtls/chtls_hw.c
+ drivers/net/ethernet/chelsio/cxgb4/cxgb4_debugfs.c | 18 +++-
+ drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c    | 32 +++++--
+ drivers/net/ethernet/chelsio/cxgb4/cxgb4_uld.h     |  7 ++
+ drivers/net/ethernet/chelsio/cxgb4/sge.c           | 98 +++++++++++++++++++++-
+ 4 files changed, 142 insertions(+), 13 deletions(-)
 
-diff --git a/drivers/crypto/chelsio/chtls/chtls_hw.c b/drivers/crypto/chelsio/chtls/chtls_hw.c
-new file mode 100644
-index 0000000..c3e17159
---- /dev/null
-+++ b/drivers/crypto/chelsio/chtls/chtls_hw.c
-@@ -0,0 +1,394 @@
-+/*
-+ * Copyright (c) 2017 Chelsio Communications, Inc.
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ *
-+ * Written by: Atul Gupta (atul.gupta@chelsio.com)
-+ */
+diff --git a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_debugfs.c b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_debugfs.c
+index cf47183..cfc9210 100644
+--- a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_debugfs.c
++++ b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_debugfs.c
+@@ -2826,8 +2826,8 @@ static int meminfo_show(struct seq_file *seq, void *v)
+ 		"Tx payload:", "Rx payload:", "LE hash:", "iSCSI region:",
+ 		"TDDP region:", "TPT region:", "STAG region:", "RQ region:",
+ 		"RQUDP region:", "PBL region:", "TXPBL region:",
+-		"DBVFIFO region:", "ULPRX state:", "ULPTX state:",
+-		"On-chip queues:"
++		"TLSKey region:", "DBVFIFO region:", "ULPRX state:",
++		"ULPTX state:", "On-chip queues:"
+ 	};
+ 
+ 	int i, n;
+@@ -2943,6 +2943,12 @@ static int meminfo_show(struct seq_file *seq, void *v)
+ 	ulp_region(RX_RQUDP);
+ 	ulp_region(RX_PBL);
+ 	ulp_region(TX_PBL);
++	if (adap->params.crypto & FW_CAPS_CONFIG_TLS_INLINE) {
++		ulp_region(RX_TLS_KEY);
++	} else {
++		md->base = 0;
++		md->idx = ARRAY_SIZE(region);
++	}
+ #undef ulp_region
+ 	md->base = 0;
+ 	md->idx = ARRAY_SIZE(region);
+@@ -3098,6 +3104,14 @@ static int chcr_show(struct seq_file *seq, void *v)
+ 		   atomic_read(&adap->chcr_stats.fallback));
+ 	seq_printf(seq, "IPSec PDU: %10u\n",
+ 		   atomic_read(&adap->chcr_stats.ipsec_cnt));
 +
-+#include <linux/module.h>
-+#include <linux/list.h>
-+#include <linux/workqueue.h>
-+#include <linux/skbuff.h>
-+#include <linux/timer.h>
-+#include <linux/notifier.h>
-+#include <linux/inetdevice.h>
-+#include <linux/ip.h>
-+#include <linux/tcp.h>
-+#include <linux/tls.h>
-+#include <net/tls.h>
-+
-+#include "chtls.h"
-+#include "chtls_cm.h"
-+
-+static void __set_tcb_field_direct(struct chtls_sock *csk,
-+				   struct cpl_set_tcb_field *req, u16 word,
-+				   u64 mask, u64 val, u8 cookie, int no_reply)
++	seq_puts(seq, "\nChelsio Inline TLS Stats\n");
++	seq_printf(seq, "TLS PDU Tx: %u\n",
++		   atomic_read(&adap->chcr_stats.tls_pdu_tx));
++	seq_printf(seq, "TLS PDU Rx: %u\n",
++		   atomic_read(&adap->chcr_stats.tls_pdu_rx));
++	seq_printf(seq, "TLS Keys (DDR) Count: %u\n",
++		   atomic_read(&adap->chcr_stats.tls_key));
+ 	return 0;
+ }
+ 
+diff --git a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c
+index 05a4abf..60eb18b 100644
+--- a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c
++++ b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c
+@@ -4086,18 +4086,32 @@ static int adap_init0(struct adapter *adap)
+ 		adap->num_ofld_uld += 2;
+ 	}
+ 	if (caps_cmd.cryptocaps) {
+-		/* Should query params here...TODO */
+-		params[0] = FW_PARAM_PFVF(NCRYPTO_LOOKASIDE);
+-		ret = t4_query_params(adap, adap->mbox, adap->pf, 0, 2,
+-				      params, val);
+-		if (ret < 0) {
+-			if (ret != -EINVAL)
++		if (ntohs(caps_cmd.cryptocaps) &
++		    FW_CAPS_CONFIG_CRYPTO_LOOKASIDE) {
++			params[0] = FW_PARAM_PFVF(NCRYPTO_LOOKASIDE);
++			ret = t4_query_params(adap, adap->mbox, adap->pf, 0,
++					      2, params, val);
++			if (ret < 0) {
++				if (ret != -EINVAL)
++					goto bye;
++			} else {
++				adap->vres.ncrypto_fc = val[0];
++			}
++			adap->num_ofld_uld += 1;
++		}
++		if (ntohs(caps_cmd.cryptocaps) &
++		    FW_CAPS_CONFIG_TLS_INLINE) {
++			params[0] = FW_PARAM_PFVF(TLS_START);
++			params[1] = FW_PARAM_PFVF(TLS_END);
++			ret = t4_query_params(adap, adap->mbox, adap->pf, 0,
++					      2, params, val);
++			if (ret < 0)
+ 				goto bye;
+-		} else {
+-			adap->vres.ncrypto_fc = val[0];
++			adap->vres.key.start = val[0];
++			adap->vres.key.size = val[1] - val[0] + 1;
++			adap->num_uld += 1;
+ 		}
+ 		adap->params.crypto = ntohs(caps_cmd.cryptocaps);
+-		adap->num_uld += 1;
+ 	}
+ #undef FW_PARAM_PFVF
+ #undef FW_PARAM_DEV
+diff --git a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_uld.h b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_uld.h
+index 1d37672..55863f6 100644
+--- a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_uld.h
++++ b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_uld.h
+@@ -237,6 +237,7 @@ enum cxgb4_uld {
+ 	CXGB4_ULD_ISCSI,
+ 	CXGB4_ULD_ISCSIT,
+ 	CXGB4_ULD_CRYPTO,
++	CXGB4_ULD_TLS,
+ 	CXGB4_ULD_MAX
+ };
+ 
+@@ -287,6 +288,7 @@ struct cxgb4_virt_res {                      /* virtualized HW resources */
+ 	struct cxgb4_range qp;
+ 	struct cxgb4_range cq;
+ 	struct cxgb4_range ocq;
++	struct cxgb4_range key;
+ 	unsigned int ncrypto_fc;
+ };
+ 
+@@ -298,6 +300,9 @@ struct chcr_stats_debug {
+ 	atomic_t error;
+ 	atomic_t fallback;
+ 	atomic_t ipsec_cnt;
++	atomic_t tls_pdu_tx;
++	atomic_t tls_pdu_rx;
++	atomic_t tls_key;
+ };
+ 
+ #define OCQ_WIN_OFFSET(pdev, vres) \
+@@ -378,6 +383,8 @@ struct cxgb4_uld_info {
+ int cxgb4_register_uld(enum cxgb4_uld type, const struct cxgb4_uld_info *p);
+ int cxgb4_unregister_uld(enum cxgb4_uld type);
+ int cxgb4_ofld_send(struct net_device *dev, struct sk_buff *skb);
++int cxgb4_immdata_send(struct net_device *dev, unsigned int idx,
++		       const void *src, unsigned int len);
+ int cxgb4_crypto_send(struct net_device *dev, struct sk_buff *skb);
+ unsigned int cxgb4_dbfifo_count(const struct net_device *dev, int lpfifo);
+ unsigned int cxgb4_port_chan(const struct net_device *dev);
+diff --git a/drivers/net/ethernet/chelsio/cxgb4/sge.c b/drivers/net/ethernet/chelsio/cxgb4/sge.c
+index 6c7b0ac..ec3d2c6 100644
+--- a/drivers/net/ethernet/chelsio/cxgb4/sge.c
++++ b/drivers/net/ethernet/chelsio/cxgb4/sge.c
+@@ -1593,9 +1593,9 @@ static void txq_stop_maperr(struct sge_uld_txq *q)
+  *	Stops an offload Tx queue that has become full and modifies the packet
+  *	being written to request a wakeup.
+  */
+-static void ofldtxq_stop(struct sge_uld_txq *q, struct sk_buff *skb)
++static void ofldtxq_stop(struct sge_uld_txq *q, void *src)
+ {
+-	struct fw_wr_hdr *wr = (struct fw_wr_hdr *)skb->data;
++	struct fw_wr_hdr *wr = (struct fw_wr_hdr *)src;
+ 
+ 	wr->lo |= htonl(FW_WR_EQUEQ_F | FW_WR_EQUIQ_F);
+ 	q->q.stops++;
+@@ -1858,6 +1858,100 @@ int cxgb4_ofld_send(struct net_device *dev, struct sk_buff *skb)
+ }
+ EXPORT_SYMBOL(cxgb4_ofld_send);
+ 
++static void *inline_tx_header(const void *src,
++			      const struct sge_txq *q,
++			      void *pos, int length)
 +{
-+	struct ulptx_idata *sc;
++	u64 *p;
++	int left = (void *)q->stat - pos;
 +
-+	INIT_TP_WR_CPL(req, CPL_SET_TCB_FIELD, csk->tid);
-+	req->wr.wr_mid |= htonl(FW_WR_FLOWID_V(csk->tid));
-+	req->reply_ctrl = htons(NO_REPLY_V(no_reply) |
-+				QUEUENO_V(csk->rss_qid));
-+	req->word_cookie = htons(TCB_WORD_V(word) | TCB_COOKIE_V(cookie));
-+	req->mask = cpu_to_be64(mask);
-+	req->val = cpu_to_be64(val);
-+	sc = (struct ulptx_idata *)(req + 1);
-+	sc->cmd_more = htonl(ULPTX_CMD_V(ULP_TX_SC_NOOP));
-+	sc->len = htonl(0);
-+}
-+
-+static void __set_tcb_field(struct sock *sk, struct sk_buff *skb, u16 word,
-+			    u64 mask, u64 val, u8 cookie, int no_reply)
-+{
-+	struct chtls_sock *csk = rcu_dereference_sk_user_data(sk);
-+	struct cpl_set_tcb_field *req;
-+	struct ulptx_idata *sc;
-+	unsigned int wrlen = roundup(sizeof(*req) + sizeof(*sc), 16);
-+
-+	req = (struct cpl_set_tcb_field *)__skb_put(skb, wrlen);
-+	__set_tcb_field_direct(csk, req, word, mask, val, cookie, no_reply);
-+	set_wr_txq(skb, CPL_PRIORITY_CONTROL, csk->port_id);
-+}
-+
-+static int chtls_set_tcb_field(struct sock *sk, u16 word, u64 mask, u64 val)
-+{
-+	struct chtls_sock *csk = rcu_dereference_sk_user_data(sk);
-+	struct sk_buff *skb;
-+	struct cpl_set_tcb_field *req;
-+	struct ulptx_idata *sc;
-+	unsigned int wrlen = roundup(sizeof(*req) + sizeof(*sc), 16);
-+	unsigned int credits_needed = DIV_ROUND_UP(wrlen, 16);
-+
-+	skb = alloc_skb(wrlen, GFP_ATOMIC);
-+	if (!skb)
-+		return -ENOMEM;
-+
-+	__set_tcb_field(sk, skb, word, mask, val, 0, 1);
-+	set_queue(skb, (csk->txq_idx << 1) | CPL_PRIORITY_DATA, sk);
-+	csk->wr_credits -= credits_needed;
-+	csk->wr_unacked += credits_needed;
-+	enqueue_wr(csk, skb);
-+	cxgb4_ofld_send(csk->egress_dev, skb);
-+	return 0;
-+}
-+
-+/*
-+ * Set one of the t_flags bits in the TCB.
-+ */
-+int chtls_set_tcb_tflag(struct sock *sk, unsigned int bit_pos, int val)
-+{
-+	return chtls_set_tcb_field(sk, 1, 1ULL << bit_pos,
-+			    val << bit_pos);
-+}
-+
-+static int chtls_set_tcb_keyid(struct sock *sk, int keyid)
-+{
-+	return chtls_set_tcb_field(sk, 31, 0xFFFFFFFFULL, keyid);
-+}
-+
-+static int chtls_set_tcb_seqno(struct sock *sk)
-+{
-+	return chtls_set_tcb_field(sk, 28, ~0ULL, 0);
-+}
-+
-+static int chtls_set_tcb_quiesce(struct sock *sk, int val)
-+{
-+	return chtls_set_tcb_field(sk, 1, (1ULL << TF_RX_QUIESCE_S),
-+				   TF_RX_QUIESCE_V(val));
-+}
-+
-+static void *chtls_alloc_mem(unsigned long size)
-+{
-+	void *p = kmalloc(size, GFP_KERNEL);
-+
-+	if (!p)
-+		p = vmalloc(size);
-+	if (p)
-+		memset(p, 0, size);
++	if (likely(length <= left)) {
++		memcpy(pos, src, length);
++		pos += length;
++	} else {
++		memcpy(pos, src, left);
++		memcpy(q->desc, src + left, length - left);
++		pos = (void *)q->desc + (length - left);
++	}
++	/* 0-pad to multiple of 16 */
++	p = PTR_ALIGN(pos, 8);
++	if ((uintptr_t)p & 8) {
++		*p = 0;
++		return p + 1;
++	}
 +	return p;
 +}
 +
-+static void chtls_free_mem(void *addr)
++/**
++ *      ofld_xmit_direct - copy a WR into offload queue
++ *      @q: the Tx offload queue
++ *      @src: location of WR
++ *      @len: WR length
++ *
++ *      Copy an immediate WR into an uncontended SGE offload queue.
++ */
++static int ofld_xmit_direct(struct sge_uld_txq *q, const void *src,
++			    unsigned int len)
 +{
-+	unsigned long p = (unsigned long)addr;
++	u64 *pos;
++	int credits;
++	unsigned int ndesc;
 +
-+	if (p >= VMALLOC_START && p < VMALLOC_END)
-+		vfree(addr);
-+	else
-+		kfree(addr);
++	/* Use the lower limit as the cut-off */
++	if (len > MAX_IMM_OFLD_TX_DATA_WR_LEN) {
++		WARN_ON(1);
++		return NET_XMIT_DROP;
++	}
++
++	/* Don't return NET_XMIT_CN here as the current
++	 * implementation doesn't queue the request
++	 * using an skb when the following conditions not met
++	 */
++	if (!spin_trylock(&q->sendq.lock))
++		return NET_XMIT_DROP;
++
++	if (q->full || !skb_queue_empty(&q->sendq) ||
++	    q->service_ofldq_running) {
++		spin_unlock(&q->sendq.lock);
++		return NET_XMIT_DROP;
++	}
++	ndesc = flits_to_desc(DIV_ROUND_UP(len, 8));
++	credits = txq_avail(&q->q) - ndesc;
++	pos = (u64 *)&q->q.desc[q->q.pidx];
++
++	/* ofldtxq_stop modifies WR header in-situ */
++	inline_tx_header(src, &q->q, pos, len);
++	if (unlikely(credits < TXQ_STOP_THRES))
++		ofldtxq_stop(q, pos);
++	txq_advance(&q->q, ndesc);
++	cxgb4_ring_tx_db(q->adap, &q->q, ndesc);
++
++	spin_unlock(&q->sendq.lock);
++	return NET_XMIT_SUCCESS;
 +}
 +
-+/* TLS Key bitmap processing */
-+int chtls_init_kmap(struct chtls_dev *cdev, struct cxgb4_lld_info *lldi)
++int cxgb4_immdata_send(struct net_device *dev, unsigned int idx,
++		       const void *src, unsigned int len)
 +{
-+	unsigned int num_key_ctx, bsize;
-+
-+	num_key_ctx = (lldi->vr->key.size / TLS_KEY_CONTEXT_SZ);
-+	bsize = BITS_TO_LONGS(num_key_ctx);
-+
-+	cdev->kmap.size = num_key_ctx;
-+	cdev->kmap.available = bsize;
-+	cdev->kmap.addr = chtls_alloc_mem(sizeof(*cdev->kmap.addr) *
-+					  bsize);
-+	if (!cdev->kmap.addr)
-+		return -1;
-+
-+	cdev->kmap.start = lldi->vr->key.start;
-+	spin_lock_init(&cdev->kmap.lock);
-+	return 0;
-+}
-+
-+void chtls_free_kmap(struct chtls_dev *cdev)
-+{
-+	if (cdev->kmap.addr)
-+		chtls_free_mem(cdev->kmap.addr);
-+}
-+
-+static int get_new_keyid(struct chtls_sock *csk, u32 optname)
-+{
-+	struct chtls_dev *cdev = csk->cdev;
-+	struct chtls_hws *hws = &csk->tlshws;
-+	struct net_device *dev = csk->egress_dev;
 +	struct adapter *adap = netdev2adap(dev);
-+	int keyid;
-+
-+	spin_lock_bh(&cdev->kmap.lock);
-+	keyid = find_first_zero_bit(cdev->kmap.addr, cdev->kmap.size);
-+	if (keyid < cdev->kmap.size) {
-+		__set_bit(keyid, cdev->kmap.addr);
-+		if (optname == TLS_RX)
-+			hws->rxkey = keyid;
-+		else
-+			hws->txkey = keyid;
-+		atomic_inc(&adap->chcr_stats.tls_key);
-+	} else {
-+		keyid = -1;
-+	}
-+	spin_unlock_bh(&cdev->kmap.lock);
-+	return keyid;
-+}
-+
-+void free_tls_keyid(struct sock *sk)
-+{
-+	struct chtls_sock *csk = rcu_dereference_sk_user_data(sk);
-+	struct net_device *dev = csk->egress_dev;
-+	struct adapter *adap = netdev2adap(dev);
-+	struct chtls_dev *cdev = csk->cdev;
-+	struct chtls_hws *hws = &csk->tlshws;
-+
-+	if (!cdev->kmap.addr)
-+		return;
-+
-+	spin_lock_bh(&cdev->kmap.lock);
-+	if (hws->rxkey >= 0) {
-+		__clear_bit(hws->rxkey, cdev->kmap.addr);
-+		atomic_dec(&adap->chcr_stats.tls_key);
-+		hws->rxkey = -1;
-+	}
-+	if (hws->txkey >= 0) {
-+		__clear_bit(hws->txkey, cdev->kmap.addr);
-+		atomic_dec(&adap->chcr_stats.tls_key);
-+		hws->txkey = -1;
-+	}
-+	spin_unlock_bh(&cdev->kmap.lock);
-+}
-+
-+static unsigned int keyid_to_addr(int start_addr, int keyid)
-+{
-+	return ((start_addr + (keyid * TLS_KEY_CONTEXT_SZ)) >> 5);
-+}
-+
-+static void chtls_rxkey_ivauth(struct _key_ctx *kctx)
-+{
-+	kctx->iv_to_auth = cpu_to_be64(KEYCTX_TX_WR_IV_V(6ULL) |
-+				  KEYCTX_TX_WR_AAD_V(1ULL) |
-+				  KEYCTX_TX_WR_AADST_V(5ULL) |
-+				  KEYCTX_TX_WR_CIPHER_V(14ULL) |
-+				  KEYCTX_TX_WR_CIPHERST_V(0ULL) |
-+				  KEYCTX_TX_WR_AUTH_V(14ULL) |
-+				  KEYCTX_TX_WR_AUTHST_V(16ULL) |
-+				  KEYCTX_TX_WR_AUTHIN_V(16ULL));
-+}
-+
-+static int chtls_key_info(struct chtls_sock *csk,
-+			  struct _key_ctx *kctx,
-+			  u32 keylen, u32 optname)
-+{
-+	unsigned char key[CHCR_KEYCTX_CIPHER_KEY_SIZE_256];
-+	struct crypto_cipher *cipher;
-+	struct tls12_crypto_info_aes_gcm_128 *gcm_ctx =
-+		(struct tls12_crypto_info_aes_gcm_128 *)
-+		&csk->tlshws.crypto_info;
-+	unsigned char ghash_h[AEAD_H_SIZE];
-+	int ck_size, key_ctx_size;
++	struct sge_uld_txq_info *txq_info;
++	struct sge_uld_txq *txq;
 +	int ret;
 +
-+	key_ctx_size = sizeof(struct _key_ctx) +
-+		       roundup(keylen, 16) + AEAD_H_SIZE;
-+
-+	if (keylen == AES_KEYSIZE_128) {
-+		ck_size = CHCR_KEYCTX_CIPHER_KEY_SIZE_128;
-+	} else if (keylen == AES_KEYSIZE_192) {
-+		ck_size = CHCR_KEYCTX_CIPHER_KEY_SIZE_192;
-+	} else if (keylen == AES_KEYSIZE_256) {
-+		ck_size = CHCR_KEYCTX_CIPHER_KEY_SIZE_256;
-+	} else {
-+		pr_err("GCM: Invalid key length %d\n", keylen);
-+		return -EINVAL;
++	local_bh_disable();
++	txq_info = adap->sge.uld_txq_info[CXGB4_TX_OFLD];
++	if (unlikely(!txq_info)) {
++		WARN_ON(true);
++		return NET_XMIT_DROP;
 +	}
-+	memcpy(key, gcm_ctx->key, keylen);
++	txq = &txq_info->uldtxq[idx];
 +
-+	/* Calculate the H = CIPH(K, 0 repeated 16 times).
-+	 * It will go in key context
-+	 */
-+	cipher = crypto_alloc_cipher("aes", 0, 0);
-+	if (IS_ERR(cipher)) {
-+		ret = -ENOMEM;
-+		goto out;
-+	}
-+
-+	ret = crypto_cipher_setkey(cipher, key, keylen);
-+	if (ret)
-+		goto out1;
-+
-+	memset(ghash_h, 0, AEAD_H_SIZE);
-+	crypto_cipher_encrypt_one(cipher, ghash_h, ghash_h);
-+	csk->tlshws.keylen = key_ctx_size;
-+
-+	/* Copy the Key context */
-+	if (optname == TLS_RX) {
-+		int key_ctx;
-+
-+		key_ctx = ((key_ctx_size >> 4) << 3);
-+		kctx->ctx_hdr = FILL_KEY_CRX_HDR(ck_size,
-+						 CHCR_KEYCTX_MAC_KEY_SIZE_128,
-+						 0, 0, key_ctx);
-+		chtls_rxkey_ivauth(kctx);
-+	} else {
-+		kctx->ctx_hdr = FILL_KEY_CTX_HDR(ck_size,
-+						 CHCR_KEYCTX_MAC_KEY_SIZE_128,
-+						 0, 0, key_ctx_size >> 4);
-+	}
-+
-+	memcpy(kctx->salt, gcm_ctx->salt, TLS_CIPHER_AES_GCM_128_SALT_SIZE);
-+	memcpy(kctx->key, gcm_ctx->key, keylen);
-+	memcpy(kctx->key + keylen, ghash_h, AEAD_H_SIZE);
-+	/* erase key info from driver */
-+	memset(gcm_ctx->key, 0, keylen);
-+
-+out1:
-+	crypto_free_cipher(cipher);
-+out:
-+	return ret;
++	ret = ofld_xmit_direct(txq, src, len);
++	local_bh_enable();
++	return net_xmit_eval(ret);
 +}
++EXPORT_SYMBOL(cxgb4_immdata_send);
 +
-+static void chtls_set_scmd(struct chtls_sock *csk)
-+{
-+	struct chtls_hws *hws = &csk->tlshws;
-+
-+	hws->scmd.seqno_numivs =
-+		SCMD_SEQ_NO_CTRL_V(3) |
-+		SCMD_PROTO_VERSION_V(0) |
-+		SCMD_ENC_DEC_CTRL_V(0) |
-+		SCMD_CIPH_AUTH_SEQ_CTRL_V(1) |
-+		SCMD_CIPH_MODE_V(2) |
-+		SCMD_AUTH_MODE_V(4) |
-+		SCMD_HMAC_CTRL_V(0) |
-+		SCMD_IV_SIZE_V(4) |
-+		SCMD_NUM_IVS_V(1);
-+
-+	hws->scmd.ivgen_hdrlen =
-+		SCMD_IV_GEN_CTRL_V(1) |
-+		SCMD_KEY_CTX_INLINE_V(0) |
-+		SCMD_TLS_FRAG_ENABLE_V(1);
-+}
-+
-+int chtls_setkey(struct chtls_sock *csk, u32 keylen, u32 optname)
-+{
-+	struct chtls_dev *cdev = csk->cdev;
-+	struct sock *sk = csk->sk;
-+	struct tls_key_req *kwr;
-+	struct _key_ctx *kctx;
-+	struct sk_buff *skb;
-+	int wrlen, klen, len;
-+	int keyid;
-+	int ret = 0;
-+
-+	klen = roundup((keylen + AEAD_H_SIZE) + sizeof(*kctx), 32);
-+	wrlen = roundup(sizeof(*kwr), 16);
-+	len = klen + wrlen;
-+
-+	/* Flush out-standing data before new key takes effect */
-+	if (optname == TLS_TX) {
-+		lock_sock(sk);
-+		if (skb_queue_len(&csk->txq))
-+			chtls_push_frames(csk, 0);
-+		release_sock(sk);
-+	}
-+
-+	keyid = get_new_keyid(csk, optname);
-+	if (keyid < 0)
-+		return -ENOSPC;
-+
-+	skb = alloc_skb(len, GFP_KERNEL);
-+	if (!skb)
-+		return -ENOMEM;
-+
-+	kwr = (struct tls_key_req *)__skb_put_zero(skb, len);
-+	kwr->wr.op_to_compl =
-+		cpu_to_be32(FW_WR_OP_V(FW_ULPTX_WR) | FW_WR_COMPL_F |
-+		      FW_WR_ATOMIC_V(1U));
-+	kwr->wr.flowid_len16 =
-+		cpu_to_be32(FW_WR_LEN16_V(DIV_ROUND_UP(len, 16) |
-+			    FW_WR_FLOWID_V(csk->tid)));
-+	kwr->wr.protocol = 0;
-+	kwr->wr.mfs = htons(TLS_MFS);
-+	kwr->wr.reneg_to_write_rx = optname;
-+
-+	/* ulptx command */
-+	kwr->req.cmd = cpu_to_be32(ULPTX_CMD_V(ULP_TX_MEM_WRITE) |
-+			    T5_ULP_MEMIO_ORDER_V(1) |
-+			    T5_ULP_MEMIO_IMM_V(1));
-+	kwr->req.len16 = cpu_to_be32((csk->tid << 8) |
-+			      DIV_ROUND_UP(len - sizeof(kwr->wr), 16));
-+	kwr->req.dlen = cpu_to_be32(ULP_MEMIO_DATA_LEN_V(klen >> 5));
-+	kwr->req.lock_addr = cpu_to_be32(ULP_MEMIO_ADDR_V(keyid_to_addr
-+					(cdev->kmap.start, keyid)));
-+
-+	/* sub command */
-+	kwr->sc_imm.cmd_more = cpu_to_be32(ULPTX_CMD_V(ULP_TX_SC_IMM));
-+	kwr->sc_imm.len = cpu_to_be32(klen);
-+
-+	/* key info */
-+	kctx = (struct _key_ctx *)(kwr + 1);
-+	ret = chtls_key_info(csk, kctx, keylen, optname);
-+
-+	csk->wr_credits -= DIV_ROUND_UP(len, 16);
-+	csk->wr_unacked += DIV_ROUND_UP(len, 16);
-+	enqueue_wr(csk, skb);
-+	cxgb4_ofld_send(csk->egress_dev, skb);
-+
-+	chtls_set_scmd(csk);
-+	/* Clear quiesce for Rx key */
-+	if (optname == TLS_RX) {
-+		chtls_set_tcb_keyid(sk, keyid);
-+		chtls_set_tcb_field(sk, 0,
-+				    TCB_ULP_RAW_V(TCB_ULP_RAW_M),
-+				    TCB_ULP_RAW_V((TF_TLS_KEY_SIZE_V(1) |
-+						  TF_TLS_CONTROL_V(1) |
-+						  TF_TLS_ACTIVE_V(1) |
-+						  TF_TLS_ENABLE_V(1))));
-+		chtls_set_tcb_seqno(sk);
-+		chtls_set_tcb_quiesce(sk, 0);
-+		csk->tlshws.rxkey = keyid;
-+	} else {
-+		csk->tlshws.tx_seq_no = 0;
-+		csk->tlshws.txkey = keyid;
-+	}
-+
-+	return ret;
-+}
+ /**
+  *	t4_crypto_send - send crypto packet
+  *	@adap: the adapter
 -- 
 1.8.3.1
