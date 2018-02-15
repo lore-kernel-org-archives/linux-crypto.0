@@ -1,65 +1,137 @@
 From: Atul Gupta <atul.gupta@chelsio.com>
-Subject: [Crypto v5 01/12] tls: tls_device struct to register TLS drivers
-Date: Thu, 15 Feb 2018 12:24:43 +0530
-Message-ID: <1518677694-28448-2-git-send-email-atul.gupta@chelsio.com>
-References: <1518677694-28448-1-git-send-email-atul.gupta@chelsio.com>
+Subject: [Crypto v5 00/12] Chelsio Inline TLS
+Date: Thu, 15 Feb 2018 12:24:42 +0530
+Message-ID: <1518677694-28448-1-git-send-email-atul.gupta@chelsio.com>
 Cc: sd@queasysnail.net, linux-crypto@vger.kernel.org,
         netdev@vger.kernel.org, ganeshgr@chelsio.com
 To: davejwatson@fb.com, davem@davemloft.net,
         herbert@gondor.apana.org.au
-Return-path: <netdev-owner@vger.kernel.org>
-In-Reply-To: <1518677694-28448-1-git-send-email-atul.gupta@chelsio.com>
-Sender: netdev-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from stargate.chelsio.com ([12.32.117.8]:52521 "EHLO
+        stargate.chelsio.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754783AbeBOGzT (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 15 Feb 2018 01:55:19 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-tls_device structure to register Inline TLS drivers
-with net/tls
+Series for Chelsio Inline TLS driver (chtls.ko)
 
-Signed-off-by: Atul Gupta <atul.gupta@chelsio.com>
----
- include/net/tls.h | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
+Driver use the ULP infrastructure to register chtls as Inline TLS ULP.
+Chtls use TCP Sockets to transmit and receive TLS record. TCP proto_ops
+is extended to offload TLS record.
 
-diff --git a/include/net/tls.h b/include/net/tls.h
-index 936cfc5..6b64510 100644
---- a/include/net/tls.h
-+++ b/include/net/tls.h
-@@ -55,6 +55,28 @@
- 
- #define TLS_AAD_SPACE_SIZE		13
- 
-+#define TLS_DEVICE_NAME_MAX             32
-+
-+enum {
-+	TLS_BASE_TX,
-+	TLS_SW_TX,
-+	TLS_FULL_HW, /* TLS record processed Inline */
-+	TLS_NUM_CONFIG,
-+};
-+extern struct proto tls_prots[TLS_NUM_CONFIG];
-+
-+struct tls_device {
-+	char name[TLS_DEVICE_NAME_MAX];
-+	struct list_head dev_list;
-+
-+	/* netdev present in registered inline tls driver */
-+	int (*netdev)(struct tls_device *device,
-+		      struct net_device *netdev);
-+	int (*feature)(struct tls_device *device);
-+	int (*hash)(struct tls_device *device, struct sock *sk);
-+	void (*unhash)(struct tls_device *device, struct sock *sk);
-+};
-+
- struct tls_sw_context {
- 	struct crypto_aead *aead_send;
- 
-@@ -254,5 +276,7 @@ static inline struct tls_offload_context *tls_offload_ctx(
- 
- int tls_proccess_cmsg(struct sock *sk, struct msghdr *msg,
- 		      unsigned char *record_type);
-+void tls_register_device(struct tls_device *device);
-+void tls_unregister_device(struct tls_device *device);
- 
- #endif /* _TLS_OFFLOAD_H */
+T6 adapter provides the following features:
+        -TLS record offload, TLS header, encrypt, digest and transmit
+        -TLS record receive and decrypt
+        -TLS keys store
+        -TCP/IP engine
+        -TLS engine
+        -GCM crypto engine [support CBC also]
+
+TLS provides security at the transport layer. It uses TCP to provide
+reliable end-to-end transport of application data. It relies on TCP
+for any retransmission. TLS session comprises of three parts:
+a. TCP/IP connection
+b. TLS handshake
+c. Record layer processing
+
+TLS handshake state machine is executed in host (refer standard
+implementation eg. OpenSSL).  Setsockopt [SOL_TCP, TCP_ULP] initialize
+TCP proto-ops for Chelsio inline tls support. setsockopt(sock, SOL_TCP,
+TCP_ULP, "tls", sizeof("tls"));
+
+Tx and Rx Keys are decided during handshake and programmed onto the chip
+after CCS is exchanged.
+struct tls12_crypto_info_aes_gcm_128 crypto_info
+setsockopt(sock, SOL_TLS, TLS_TX, &crypto_info, sizeof(crypto_info))
+Finish is the first encrypted/decrypted message tx/rx inline.
+
+On the Tx path TLS engine receive plain text from openssl, insert IV,
+fetches the tx key, create cipher text records and generate MAC. TLS
+header is added to cipher text and forward to TCP/IP engine for transport
+layer processing and transmission on wire.
+TX:
+Application--openssl--chtls---TLS engine---encrypt/auth---TCP/IP
+engine---wire.
+
+On the Rx side, data received is PDU aligned at record
+boundaries. TLS processes only the complete record. If rx key is programmed
+on CCS receive, data is decrypted and plain text is posted to host.
+RX:
+Wire--cipher-text--TCP/IP engine [PDU align]---TLS engine---
+decrypt/auth---plain-text--chtls--openssl--application
+
+v5: set TLS_FULL_HW for registered inline tls drivers
+   -set TLS_FULL_HW prot for offload connection else move
+    to TLS_SW_TX
+   -Case handled for interface with same IP [David Miller]
+   -Removed Specific IP and INADDR_ANY handling [v4]
+
+v4: removed chtls ULP type, retained tls ULP
+   -registered chtls with net tls
+   -defined struct tls_device to register the Inline drivers
+   -ethtool interface tls-inline to enable Inline TLS for interface
+   -prot update to support inline TLS
+
+v3: fixed the kbuild test issues
+   -made few funtions static
+   -initialized few variables
+
+v2: fixed the following based on the review comments of Stephan Mueller,
+    Stefano Brivio and Hannes Frederic
+    -Added more details in cover letter
+    -Fixed indentation and formating issues
+    -Using aes instead of aes-generic
+    -memset key info after programing the key on chip
+    -reordered the patch sequence
+
+Atul Gupta (12):
+  tls: tls_device struct to register TLS drivers
+  ethtool: feature for Inline TLS in HW
+  support for inline tls
+  chtls: structure and macro definiton
+  cxgb4: Inline TLS FW Interface
+  cxgb4: LLD driver changes to enable TLS
+  chcr: Key Macro
+  chtls: Key program
+  chtls: CPL handler definition
+  chtls: Inline crypto request Tx/Rx
+  chtls: Register the chtls Inline TLS with net tls
+  Makefile Kconfig
+
+ drivers/crypto/chelsio/Kconfig                     |   11 +
+ drivers/crypto/chelsio/Makefile                    |    1 +
+ drivers/crypto/chelsio/chcr_algo.h                 |   42 +
+ drivers/crypto/chelsio/chcr_core.h                 |   55 +-
+ drivers/crypto/chelsio/chtls/Makefile              |    4 +
+ drivers/crypto/chelsio/chtls/chtls.h               |  487 +++++
+ drivers/crypto/chelsio/chtls/chtls_cm.c            | 2046 ++++++++++++++++++++
+ drivers/crypto/chelsio/chtls/chtls_cm.h            |  203 ++
+ drivers/crypto/chelsio/chtls/chtls_hw.c            |  394 ++++
+ drivers/crypto/chelsio/chtls/chtls_io.c            | 1867 ++++++++++++++++++
+ drivers/crypto/chelsio/chtls/chtls_main.c          |  574 ++++++
+ drivers/net/ethernet/chelsio/cxgb4/cxgb4_debugfs.c |   18 +-
+ drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c    |   32 +-
+ drivers/net/ethernet/chelsio/cxgb4/cxgb4_uld.h     |    7 +
+ drivers/net/ethernet/chelsio/cxgb4/sge.c           |   98 +-
+ drivers/net/ethernet/chelsio/cxgb4/t4_msg.h        |  121 +-
+ drivers/net/ethernet/chelsio/cxgb4/t4_regs.h       |    2 +
+ drivers/net/ethernet/chelsio/cxgb4/t4fw_api.h      |  165 +-
+ include/linux/netdev_features.h                    |    2 +
+ include/net/tls.h                                  |   24 +
+ include/uapi/linux/tls.h                           |    1 +
+ net/core/ethtool.c                                 |    1 +
+ net/ipv4/tcp_minisocks.c                           |    1 +
+ net/tls/tls_main.c                                 |  124 +-
+ 24 files changed, 6254 insertions(+), 26 deletions(-)
+ create mode 100644 drivers/crypto/chelsio/chtls/Makefile
+ create mode 100644 drivers/crypto/chelsio/chtls/chtls.h
+ create mode 100644 drivers/crypto/chelsio/chtls/chtls_cm.c
+ create mode 100644 drivers/crypto/chelsio/chtls/chtls_cm.h
+ create mode 100644 drivers/crypto/chelsio/chtls/chtls_hw.c
+ create mode 100644 drivers/crypto/chelsio/chtls/chtls_io.c
+ create mode 100644 drivers/crypto/chelsio/chtls/chtls_main.c
+
 -- 
 1.8.3.1
