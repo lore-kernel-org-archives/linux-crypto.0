@@ -1,33 +1,28 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: mcryptd - remove pointless wrapper functions
-Date: Thu, 15 Feb 2018 23:42:40 +0800
-Message-ID: <20180215154240.GD7352@gondor.apana.org.au>
-References: <20180125030907.679-1-ebiggers3@gmail.com>
+Subject: Re: [PATCH -next] hwrng: make symbol imx_rngc_pm_ops static
+Date: Thu, 15 Feb 2018 23:42:21 +0800
+Message-ID: <20180215154221.GC7352@gondor.apana.org.au>
+References: <1516673336-170194-1-git-send-email-weiyongjun1@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org,
-        "David S . Miller" <davem@davemloft.net>,
-        Tim Chen <tim.c.chen@linux.intel.com>,
-        Eric Biggers <ebiggers@google.com>
-To: Eric Biggers <ebiggers3@gmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:39476 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1424241AbeBOPmu (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 15 Feb 2018 10:42:50 -0500
+Cc: Matt Mackall <mpm@selenic.com>, Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Martin Kaiser <martin@kaiser.cx>, linux-crypto@vger.kernel.org,
+        kernel-janitors@vger.kernel.org
+To: Wei Yongjun <weiyongjun1@huawei.com>
+Return-path: <kernel-janitors-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20180125030907.679-1-ebiggers3@gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <1516673336-170194-1-git-send-email-weiyongjun1@huawei.com>
+Sender: kernel-janitors-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Jan 24, 2018 at 07:09:07PM -0800, Eric Biggers wrote:
-> From: Eric Biggers <ebiggers@google.com>
+On Tue, Jan 23, 2018 at 02:08:56AM +0000, Wei Yongjun wrote:
+> Fixes the following sparse warnings:
 > 
-> There is no need for ahash_mcryptd_{update,final,finup,digest}(); we
-> should just call crypto_ahash_*() directly.
+> drivers/char/hw_random/imx-rngc.c:303:1: warning:
+>  symbol 'imx_rngc_pm_ops' was not declared. Should it be static?
 > 
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
 
 Patch applied.  Thanks.
 -- 
