@@ -1,42 +1,39 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: s5p-sss.c: Fix kernel Oops in AES-ECB mode
-Date: Thu, 15 Feb 2018 23:51:59 +0800
-Message-ID: <20180215155158.GM7352@gondor.apana.org.au>
-References: <CGME20180205174022eucas1p101e8339284c1f0ac8f40f70c24de1c1f@eucas1p1.samsung.com>
- <224788c7-426b-d3a9-d0a6-412d2b8afb75@partner.samsung.com>
+From: Dave Watson <davejwatson@fb.com>
+Subject: Re: [Crypto v5 03/12] support for inline tls
+Date: Thu, 15 Feb 2018 07:51:57 -0800
+Message-ID: <20180215155157.GA32691@davejwatson-mba>
+References: <1518677694-28448-1-git-send-email-atul.gupta@chelsio.com>
+ <1518677694-28448-4-git-send-email-atul.gupta@chelsio.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Krzysztof Kozlowski <krzk@kernel.org>,
-        Vladimir Zapolskiy <vz@mleia.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-        Marek Szyprowski <m.szyprowski@samsung.com>,
-        Anand Moon <linux.amoon@gmail.com>,
-        linux-crypto@vger.kernel.org, linux-samsung-soc@vger.kernel.org,
-        linux-kernel <linux-kernel@vger.kernel.org>
-To: Kamil Konieczny <k.konieczny@partner.samsung.com>
+Content-Type: text/plain; charset="us-ascii"
+Cc: <davem@davemloft.net>, <herbert@gondor.apana.org.au>,
+        <sd@queasysnail.net>, <linux-crypto@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <ganeshgr@chelsio.com>
+To: Atul Gupta <atul.gupta@chelsio.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:39622 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1424999AbeBOPwL (ORCPT
+Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:34626 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1424319AbeBOPwK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 15 Feb 2018 10:52:11 -0500
+        Thu, 15 Feb 2018 10:52:10 -0500
 Content-Disposition: inline
-In-Reply-To: <224788c7-426b-d3a9-d0a6-412d2b8afb75@partner.samsung.com>
+In-Reply-To: <1518677694-28448-4-git-send-email-atul.gupta@chelsio.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Feb 05, 2018 at 06:40:20PM +0100, Kamil Konieczny wrote:
-> 
-> In AES-ECB mode crypt is done with key only, so any use of IV
-> can cause kernel Oops, as reported by Anand Moon.
-> Fixed it by using IV only in AES-CBC and AES-CTR.
-> 
-> Signed-off-by: Kamil Konieczny <k.konieczny@partner.samsung.com>
-> Reported-by: Anand Moon <linux.amoon@gmail.com>
+On 02/15/18 12:24 PM, Atul Gupta wrote:
+> @@ -401,6 +430,15 @@ static int do_tls_setsockopt_tx(struct sock *sk, char __user *optval,
+>  		goto out;
+>  	}
+>  
+> +	rc = get_tls_offload_dev(sk);
+> +	if (rc) {
+> +		goto out;
+> +	} else {
+> +		/* Retain HW unhash for cleanup and move to SW Tx */
+> +		sk->sk_prot[TLS_BASE_TX].unhash =
+> +			sk->sk_prot[TLS_FULL_HW].unhash;
 
-Patch applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Isn't sk->sk_prot a pointer to a global shared struct here still?  It
+looks like this would actually modify the global struct, and not just
+for this sk.
