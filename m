@@ -1,35 +1,52 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: sha512-mb - remove HASH_FIRST flag
-Date: Thu, 15 Feb 2018 23:43:06 +0800
-Message-ID: <20180215154306.GG7352@gondor.apana.org.au>
-References: <20180125031021.888-1-ebiggers3@gmail.com>
+From: Dave Watson <davejwatson@fb.com>
+Subject: Re: [Crypto v5 03/12] support for inline tls
+Date: Thu, 15 Feb 2018 08:26:15 -0800
+Message-ID: <20180215162615.GA38304@davejwatson-mba>
+References: <1518677694-28448-1-git-send-email-atul.gupta@chelsio.com>
+ <1518677694-28448-4-git-send-email-atul.gupta@chelsio.com>
+ <20180215155157.GA32691@davejwatson-mba>
+ <MWHPR1201MB0238985353DFF78FE95108FF97F40@MWHPR1201MB0238.namprd12.prod.outlook.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org,
-        "David S . Miller" <davem@davemloft.net>,
-        Tim Chen <tim.c.chen@linux.intel.com>,
-        Eric Biggers <ebiggers@google.com>
-To: Eric Biggers <ebiggers3@gmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:39508 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1033608AbeBOPnK (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 15 Feb 2018 10:43:10 -0500
+Content-Type: text/plain; charset="us-ascii"
+Cc: "davem@davemloft.net" <davem@davemloft.net>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "sd@queasysnail.net" <sd@queasysnail.net>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        Ganesh GR <ganeshgr@chelsio.com>
+To: Atul Gupta <atul.gupta@chelsio.com>
+Return-path: <netdev-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20180125031021.888-1-ebiggers3@gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <MWHPR1201MB0238985353DFF78FE95108FF97F40@MWHPR1201MB0238.namprd12.prod.outlook.com>
+Sender: netdev-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Jan 24, 2018 at 07:10:21PM -0800, Eric Biggers wrote:
-> From: Eric Biggers <ebiggers@google.com>
+On 02/15/18 04:10 PM, Atul Gupta wrote:
+> > -----Original Message-----
+> > From: Dave Watson [mailto:davejwatson@fb.com] 
+> > Sent: Thursday, February 15, 2018 9:22 PM
+> > To: Atul Gupta <atul.gupta@chelsio.com>
+> > Cc: davem@davemloft.net; herbert@gondor.apana.org.au; sd@queasysnail.net; linux-crypto@vger.kernel.org; netdev@vger.kernel.org; Ganesh GR <ganeshgr@chelsio.com>
+> > Subject: Re: [Crypto v5 03/12] support for inline tls
+> > 
+> > On 02/15/18 12:24 PM, Atul Gupta wrote:
+> > > @@ -401,6 +430,15 @@ static int do_tls_setsockopt_tx(struct sock *sk, char __user *optval,
+> > >  		goto out;
+> > >  	}
+> > >  
+> > > +	rc = get_tls_offload_dev(sk);
+> > > +	if (rc) {
+> > > +		goto out;
+> > > +	} else {
+> > > +		/* Retain HW unhash for cleanup and move to SW Tx */
+> > > +		sk->sk_prot[TLS_BASE_TX].unhash =
+> > > +			sk->sk_prot[TLS_FULL_HW].unhash;
+> > 
+> > Isn't sk->sk_prot a pointer to a global shared struct here still?  It looks like this would actually modify the global struct, and not just for this sk.
+> Yes, its global. It require add on check to modify only when tls_offload dev list has an entry. I will revisit and correct. 
 > 
-> The HASH_FIRST flag is never set.  Remove it.
-> 
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> Can you look through other changes please?
 
-Patch applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+I looked through 1,2,3,11 (the tls-related ones) and don't have any
+other code comments.  Patch 11 commit message still mentions ULP,
+could use updating / clarification.
