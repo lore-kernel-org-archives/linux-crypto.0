@@ -1,103 +1,133 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH v3 1/4] crypto: AF_ALG AIO - lock context IV
-Date: Thu, 15 Feb 2018 12:45:54 +0100
-Message-ID: <1927702.eDKbX5ILji@tauon.chronox.de>
-References: <2118226.LQArbCsRu5@tauon.chronox.de> <2417115.3KYcYg1eVS@tauon.chronox.de> <558ccbb2-040d-232e-179b-92f0522f4bc2@chelsio.com>
+From: SF Markus Elfring <elfring@users.sourceforge.net>
+Subject: [PATCH] crypto: atmel: Delete error messages for a failed memory
+ allocation in six functions
+Date: Thu, 15 Feb 2018 13:24:18 +0100
+Message-ID: <77cf1006-966d-78a9-0fdc-b53ccdd80df2@users.sourceforge.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-        Gilad Ben-Yossef <gilad@benyossef.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        linuxarm@huawei.com
-To: Harsh Jain <harsh@chelsio.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mo4-p00-ob.smtp.rzone.de ([81.169.146.221]:34855 "EHLO
-        mo4-p00-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S967814AbeBOLp7 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 15 Feb 2018 06:45:59 -0500
-In-Reply-To: <558ccbb2-040d-232e-179b-92f0522f4bc2@chelsio.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Cc: LKML <linux-kernel@vger.kernel.org>,
+        kernel-janitors@vger.kernel.org
+To: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        Alexandre Belloni <alexandre.belloni@free-electrons.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Nicolas Ferre <nicolas.ferre@microchip.com>
+Return-path: <kernel-janitors-owner@vger.kernel.org>
+Content-Language: en-US
+Sender: kernel-janitors-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Am Donnerstag, 15. Februar 2018, 12:38:12 CET schrieb Harsh Jain:
+From: Markus Elfring <elfring@users.sourceforge.net>
+Date: Thu, 15 Feb 2018 11:38:30 +0100
 
-Hi Harsh,
+Omit extra messages for a memory allocation failure in these functions.
 
-> On 15-02-2018 12:47, Stephan Mueller wrote:
-> > Am Donnerstag, 15. Februar 2018, 08:03:20 CET schrieb Harsh Jain:
-> > 
-> > Hi Harsh,
-> > 
-> >> Even after guarantee of serialization, In the end we will get wrong
-> >> result
-> >> as mentioned above. which destination side cannot decrypt it. What I feel
-> >> is scenario of sending 2 of more IOCB in case of AEAD itself is wrong.
-> > 
-> > Without the inline IV handling, I would concur.
-> 
-> Even with Inline IV, We will have 2 Auth Tag. can we authenticate the data
-> with 2 Auth Tags?
+This issue was detected by using the Coccinelle software.
 
-The AAD and the tag are both sent to the kernel like in the inline IV case as 
-part of the data via sendmsg.
+Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+---
+ drivers/crypto/atmel-aes.c  | 6 +-----
+ drivers/crypto/atmel-sha.c  | 9 ++-------
+ drivers/crypto/atmel-tdes.c | 9 ++-------
+ 3 files changed, 5 insertions(+), 19 deletions(-)
 
-Thus, when you use inline IV support, an entire self-contained AEAD cipher 
-operation can be defined with one IOCB. Thus, if you have multiple IOCBs, 
-inline IV allow fully parallel execution of different AEAD requests.
+diff --git a/drivers/crypto/atmel-aes.c b/drivers/crypto/atmel-aes.c
+index 691c6465b71e..6fb24fc94b1f 100644
+--- a/drivers/crypto/atmel-aes.c
++++ b/drivers/crypto/atmel-aes.c
+@@ -2602,16 +2602,13 @@ static struct crypto_platform_data *atmel_aes_of_init(struct platform_device *pd
+ 	}
+ 
+ 	pdata = devm_kzalloc(&pdev->dev, sizeof(*pdata), GFP_KERNEL);
+-	if (!pdata) {
+-		dev_err(&pdev->dev, "could not allocate memory for pdata\n");
++	if (!pdata)
+ 		return ERR_PTR(-ENOMEM);
+-	}
+ 
+ 	pdata->dma_slave = devm_kzalloc(&pdev->dev,
+ 					sizeof(*(pdata->dma_slave)),
+ 					GFP_KERNEL);
+ 	if (!pdata->dma_slave) {
+-		dev_err(&pdev->dev, "could not allocate memory for dma_slave\n");
+ 		devm_kfree(&pdev->dev, pdata);
+ 		return ERR_PTR(-ENOMEM);
+ 	}
+@@ -2649,7 +2646,6 @@ static int atmel_aes_probe(struct platform_device *pdev)
+ 
+ 	aes_dd = devm_kzalloc(&pdev->dev, sizeof(*aes_dd), GFP_KERNEL);
+ 	if (aes_dd == NULL) {
+-		dev_err(dev, "unable to alloc data struct.\n");
+ 		err = -ENOMEM;
+ 		goto aes_dd_err;
+ 	}
+diff --git a/drivers/crypto/atmel-sha.c b/drivers/crypto/atmel-sha.c
+index 8874aa5ca0f7..4d43081120db 100644
+--- a/drivers/crypto/atmel-sha.c
++++ b/drivers/crypto/atmel-sha.c
+@@ -2726,18 +2726,14 @@ static struct crypto_platform_data *atmel_sha_of_init(struct platform_device *pd
+ 	}
+ 
+ 	pdata = devm_kzalloc(&pdev->dev, sizeof(*pdata), GFP_KERNEL);
+-	if (!pdata) {
+-		dev_err(&pdev->dev, "could not allocate memory for pdata\n");
++	if (!pdata)
+ 		return ERR_PTR(-ENOMEM);
+-	}
+ 
+ 	pdata->dma_slave = devm_kzalloc(&pdev->dev,
+ 					sizeof(*(pdata->dma_slave)),
+ 					GFP_KERNEL);
+-	if (!pdata->dma_slave) {
+-		dev_err(&pdev->dev, "could not allocate memory for dma_slave\n");
++	if (!pdata->dma_slave)
+ 		return ERR_PTR(-ENOMEM);
+-	}
+ 
+ 	return pdata;
+ }
+@@ -2758,7 +2754,6 @@ static int atmel_sha_probe(struct platform_device *pdev)
+ 
+ 	sha_dd = devm_kzalloc(&pdev->dev, sizeof(*sha_dd), GFP_KERNEL);
+ 	if (sha_dd == NULL) {
+-		dev_err(dev, "unable to alloc data struct.\n");
+ 		err = -ENOMEM;
+ 		goto sha_dd_err;
+ 	}
+diff --git a/drivers/crypto/atmel-tdes.c b/drivers/crypto/atmel-tdes.c
+index 592124f8382b..97b0423efa7f 100644
+--- a/drivers/crypto/atmel-tdes.c
++++ b/drivers/crypto/atmel-tdes.c
+@@ -1312,18 +1312,14 @@ static struct crypto_platform_data *atmel_tdes_of_init(struct platform_device *p
+ 	}
+ 
+ 	pdata = devm_kzalloc(&pdev->dev, sizeof(*pdata), GFP_KERNEL);
+-	if (!pdata) {
+-		dev_err(&pdev->dev, "could not allocate memory for pdata\n");
++	if (!pdata)
+ 		return ERR_PTR(-ENOMEM);
+-	}
+ 
+ 	pdata->dma_slave = devm_kzalloc(&pdev->dev,
+ 					sizeof(*(pdata->dma_slave)),
+ 					GFP_KERNEL);
+-	if (!pdata->dma_slave) {
+-		dev_err(&pdev->dev, "could not allocate memory for dma_slave\n");
++	if (!pdata->dma_slave)
+ 		return ERR_PTR(-ENOMEM);
+-	}
+ 
+ 	return pdata;
+ }
+@@ -1344,7 +1340,6 @@ static int atmel_tdes_probe(struct platform_device *pdev)
+ 
+ 	tdes_dd = devm_kmalloc(&pdev->dev, sizeof(*tdes_dd), GFP_KERNEL);
+ 	if (tdes_dd == NULL) {
+-		dev_err(dev, "unable to alloc data struct.\n");
+ 		err = -ENOMEM;
+ 		goto tdes_dd_err;
+ 	}
+-- 
+2.16.1
 
-See the following kernel comment:
-
-                /*
-                 * Encryption operation - The in-place cipher operation is
-                 * achieved by the following operation:
-                 *
-                 * TX SGL: AAD || PT
-                 *          |      |
-                 *          | copy |
-                 *          v      v
-                 * RX SGL: AAD || PT || Tag
-
-                /*
-                 * Decryption operation - To achieve an in-place cipher
-                 * operation, the following  SGL structure is used:
-                 *
-                 * TX SGL: AAD || CT || Tag
-                 *          |      |     ^
-                 *          | copy |     | Create SGL link.
-                 *          v      v     |
-                 * RX SGL: AAD || CT ----+
-                 */
-
-Note, the TX SGL is what the caller submitted via sendmsg and the RX SGL is 
-the data the caller obtains via recvmsg.
-
-Hence, in inline IV support, the caller sends the following:
-
-encryption: IV || AAD || PT
-
-decryption: IV || AAD || CT || Tag
-
-> >> We
-> >> should not allow this type of requests for AEAD.
-> > 
-> > "Not allow" as in "technically block"? As a user would only shoot itself
-> > when he does that not knowing the consequences, I am not in favor of such
-> > an artificial block.
-> 
-> Agreed, It may not be right thing to do, but if we allowed it, What he will
-> do with Auth( each processed with final Block) tags received in each
-> request.
-
-Each tag is returned as part of the recvmsg data. Thus, AEAD cipher operations 
-can commence fully parallel if inline IV handling is used.
-> 
-> I personally feels AEAD IV serialization logic is incomplete without partial
-> tag support.
-
-Could you please elaborate what you mean with "partial tag" support?
-
-Ciao
-Stephan
