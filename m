@@ -1,82 +1,285 @@
-From: Eric Biggers <ebiggers3@gmail.com>
-Subject: Re: [PATCH v3 2/3] MIPS: crypto: Add crc32 and crc32c hw accelerated
- module
-Date: Thu, 15 Feb 2018 14:22:14 -0800
-Message-ID: <20180215222214.GB49445@gmail.com>
-References: <cover.a1aaa0593f5afd4b00e8131611adda3a02c060d1.1518214143.git-series.jhogan@kernel.org>
- <77eab2cb46e52be3639610a7ad574bac7bf78d73.1518214143.git-series.jhogan@kernel.org>
+From: David Howells <dhowells@redhat.com>
+Subject: [RFC PATCH] KEYS: Use individual pages in big_key for crypto
+ buffers [ver #2]
+Date: Thu, 15 Feb 2018 22:53:49 +0000
+Message-ID: <151873522941.16065.2576464502758911341.stgit@warthog.procyon.org.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-mips@linux-mips.org,
-        Marcin Nowakowski <marcin.nowakowski@mips.com>,
-        Ralf Baechle <ralf@linux-mips.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org
-To: James Hogan <jhogan@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: dhowells@redhat.com, Jason@zx2c4.com, herbert@gondor.apana.org.au,
+        k.marinushkin@gmail.com, linux-crypto@vger.kernel.org
+To: keyrings@vger.kernel.org, ebiggers3@gmail.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-io0-f194.google.com ([209.85.223.194]:44452 "EHLO
-        mail-io0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1163980AbeBOWWS (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 15 Feb 2018 17:22:18 -0500
-Received: by mail-io0-f194.google.com with SMTP id z6so2301551iob.11
-        for <linux-crypto@vger.kernel.org>; Thu, 15 Feb 2018 14:22:17 -0800 (PST)
-Content-Disposition: inline
-In-Reply-To: <77eab2cb46e52be3639610a7ad574bac7bf78d73.1518214143.git-series.jhogan@kernel.org>
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47740 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1756495AbeBOWxv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 15 Feb 2018 17:53:51 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Feb 09, 2018 at 10:11:06PM +0000, James Hogan wrote:
-> +static struct shash_alg crc32_alg = {
-> +	.digestsize		=	CHKSUM_DIGEST_SIZE,
-> +	.setkey			=	chksum_setkey,
-> +	.init			=	chksum_init,
-> +	.update			=	chksum_update,
-> +	.final			=	chksum_final,
-> +	.finup			=	chksum_finup,
-> +	.digest			=	chksum_digest,
-> +	.descsize		=	sizeof(struct chksum_desc_ctx),
-> +	.base			=	{
-> +		.cra_name		=	"crc32",
-> +		.cra_driver_name	=	"crc32-mips-hw",
-> +		.cra_priority		=	300,
-> +		.cra_blocksize		=	CHKSUM_BLOCK_SIZE,
-> +		.cra_alignmask		=	0,
-> +		.cra_ctxsize		=	sizeof(struct chksum_ctx),
-> +		.cra_module		=	THIS_MODULE,
-> +		.cra_init		=	chksum_cra_init,
-> +	}
-> +};
-> +
-> +
-> +static struct shash_alg crc32c_alg = {
-> +       .digestsize             =       CHKSUM_DIGEST_SIZE,
-> +       .setkey                 =       chksum_setkey,
-> +       .init                   =       chksum_init,
-> +       .update                 =       chksumc_update,
-> +       .final                  =       chksumc_final,
-> +       .finup                  =       chksumc_finup,
-> +       .digest                 =       chksumc_digest,
-> +       .descsize               =       sizeof(struct chksum_desc_ctx),
-> +       .base                   =       {
-> +               .cra_name               =       "crc32c",
-> +               .cra_driver_name        =       "crc32c-mips-hw",
-> +               .cra_priority           =       300,
-> +               .cra_blocksize          =       CHKSUM_BLOCK_SIZE,
-> +               .cra_alignmask          =       0,
-> +               .cra_ctxsize            =       sizeof(struct chksum_ctx),
-> +               .cra_module             =       THIS_MODULE,
-> +               .cra_init               =       chksum_cra_init,
-> +       }
-> +};
+kmalloc() can't always allocate large enough buffers for big_key to use for
+crypto (1MB + some metadata) so we cannot use that to allocate the buffer.
+Further, vmalloc'd pages can't be passed to sg_init_one() and the aead
+crypto accessors cannot be called progressively and must be passed all the
+data in one go (which means we can't pass the data in one block at a time).
 
-Does this actually work on the latest kernel?  Now hash algorithms must have
-CRYPTO_ALG_OPTIONAL_KEY in .cra_flags if they have a .setkey method but don't
-require it to be called, otherwise the crypto API will think it's a keyed hash
-and not allow it to be used without a key.  I had to add this flag to the other
-CRC32 and CRC32C algorithms (commit a208fa8f33031).  One of the CRC32C test
-vectors even doesn't set a key so it should be causing the self-tests to fail
-for "crc32c-mips-hw".  (We should add such a test vector for CRC32 too, though.)
+Fix this by allocating the buffer pages individually and passing them
+through a multientry scatterlist to the crypto layer.  This has the bonus
+advantage that we don't have to allocate a contiguous series of pages.
 
-Eric
+We then vmap() the page list and pass that through to the VFS read/write
+routines.
+
+This can trigger a warning:
+
+	WARNING: CPU: 0 PID: 60912 at mm/page_alloc.c:3883 __alloc_pages_nodemask+0xb7c/0x15f8
+	([<00000000002acbb6>] __alloc_pages_nodemask+0x1ee/0x15f8)
+	 [<00000000002dd356>] kmalloc_order+0x46/0x90
+	 [<00000000002dd3e0>] kmalloc_order_trace+0x40/0x1f8
+	 [<0000000000326a10>] __kmalloc+0x430/0x4c0
+	 [<00000000004343e4>] big_key_preparse+0x7c/0x210
+	 [<000000000042c040>] key_create_or_update+0x128/0x420
+	 [<000000000042e52c>] SyS_add_key+0x124/0x220
+	 [<00000000007bba2c>] system_call+0xc4/0x2b0
+
+from the keyctl/padd/useradd test of the keyutils testsuite on s390x.
+
+Note that it might be better to shovel data through in page-sized lumps
+instead as there's no particular need to use a monolithic buffer unless the
+kernel itself wants to access the data.
+
+Fixes: 13100a72f40f ("Security: Keys: Big keys stored encrypted")
+Reported-by: Paul Bunyan <pbunyan@redhat.com>
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Kirill Marinushkin <k.marinushkin@gmail.com>
+---
+
+ security/keys/big_key.c |  107 +++++++++++++++++++++++++++++++++++++----------
+ 1 file changed, 84 insertions(+), 23 deletions(-)
+
+diff --git a/security/keys/big_key.c b/security/keys/big_key.c
+index 929e14978c42..4deb7df56ec8 100644
+--- a/security/keys/big_key.c
++++ b/security/keys/big_key.c
+@@ -22,6 +22,13 @@
+ #include <keys/big_key-type.h>
+ #include <crypto/aead.h>
+ 
++struct big_key_buf {
++	unsigned int		nr_pages;
++	void			*virt;
++	struct scatterlist	*sg;
++	struct page		*pages[];
++};
++
+ /*
+  * Layout of key payload words.
+  */
+@@ -91,10 +98,9 @@ static DEFINE_MUTEX(big_key_aead_lock);
+ /*
+  * Encrypt/decrypt big_key data
+  */
+-static int big_key_crypt(enum big_key_op op, u8 *data, size_t datalen, u8 *key)
++static int big_key_crypt(enum big_key_op op, struct big_key_buf *buf, size_t datalen, u8 *key)
+ {
+ 	int ret;
+-	struct scatterlist sgio;
+ 	struct aead_request *aead_req;
+ 	/* We always use a zero nonce. The reason we can get away with this is
+ 	 * because we're using a different randomly generated key for every
+@@ -109,8 +115,7 @@ static int big_key_crypt(enum big_key_op op, u8 *data, size_t datalen, u8 *key)
+ 		return -ENOMEM;
+ 
+ 	memset(zero_nonce, 0, sizeof(zero_nonce));
+-	sg_init_one(&sgio, data, datalen + (op == BIG_KEY_ENC ? ENC_AUTHTAG_SIZE : 0));
+-	aead_request_set_crypt(aead_req, &sgio, &sgio, datalen, zero_nonce);
++	aead_request_set_crypt(aead_req, buf->sg, buf->sg, datalen, zero_nonce);
+ 	aead_request_set_callback(aead_req, CRYPTO_TFM_REQ_MAY_SLEEP, NULL, NULL);
+ 	aead_request_set_ad(aead_req, 0);
+ 
+@@ -130,21 +135,78 @@ static int big_key_crypt(enum big_key_op op, u8 *data, size_t datalen, u8 *key)
+ }
+ 
+ /*
++ * Free up the buffer.
++ */
++static void big_key_free_buffer(struct big_key_buf *buf)
++{
++	unsigned int i;
++
++	vunmap(buf->virt);
++	for (i = 0; i < buf->nr_pages; i++)
++		if (buf->pages[i])
++			__free_page(buf->pages[i]);
++
++	memset(buf->virt, 0, buf->nr_pages * PAGE_SIZE);
++	kfree(buf);
++}
++
++/*
++ * Allocate a buffer consisting of a set of pages with a virtual mapping
++ * applied over them.
++ */
++static void *big_key_alloc_buffer(size_t len)
++{
++	struct big_key_buf *buf;
++	unsigned int npg = (len + PAGE_SIZE - 1) >> PAGE_SHIFT;
++	unsigned int i, l;
++
++	buf = kzalloc(sizeof(struct big_key_buf) +
++		      sizeof(struct page) * npg +
++		      sizeof(struct scatterlist) * npg,
++		      GFP_KERNEL);
++	if (!buf)
++		return NULL;
++
++	buf->nr_pages = npg;
++	buf->sg = (void *)(buf->pages + npg);
++	sg_init_table(buf->sg, npg);
++
++	for (i = 0; i < buf->nr_pages; i++) {
++		buf->pages[i] = alloc_page(GFP_KERNEL);
++		if (!buf->pages[i])
++			goto nomem;
++
++		l = min(len, PAGE_SIZE);
++		sg_set_page(&buf->sg[i], buf->pages[i], l, 0);
++		len -= l;
++	}
++
++	buf->virt = vmap(buf->pages, buf->nr_pages, VM_MAP, PAGE_KERNEL);
++	if (!buf->virt)
++		goto nomem;
++
++	return buf;
++
++nomem:
++	big_key_free_buffer(buf);
++	return NULL;
++}
++
++/*
+  * Preparse a big key
+  */
+ int big_key_preparse(struct key_preparsed_payload *prep)
+ {
++	struct big_key_buf *buf;
+ 	struct path *path = (struct path *)&prep->payload.data[big_key_path];
+ 	struct file *file;
+ 	u8 *enckey;
+-	u8 *data = NULL;
+ 	ssize_t written;
+-	size_t datalen = prep->datalen;
++	size_t datalen = prep->datalen, enclen = datalen + ENC_AUTHTAG_SIZE;
+ 	int ret;
+ 
+-	ret = -EINVAL;
+ 	if (datalen <= 0 || datalen > 1024 * 1024 || !prep->data)
+-		goto error;
++		return -EINVAL;
+ 
+ 	/* Set an arbitrary quota */
+ 	prep->quotalen = 16;
+@@ -157,13 +219,12 @@ int big_key_preparse(struct key_preparsed_payload *prep)
+ 		 *
+ 		 * File content is stored encrypted with randomly generated key.
+ 		 */
+-		size_t enclen = datalen + ENC_AUTHTAG_SIZE;
+ 		loff_t pos = 0;
+ 
+-		data = kmalloc(enclen, GFP_KERNEL);
+-		if (!data)
++		buf = big_key_alloc_buffer(enclen);
++		if (!buf)
+ 			return -ENOMEM;
+-		memcpy(data, prep->data, datalen);
++		memcpy(buf->virt, prep->data, datalen);
+ 
+ 		/* generate random key */
+ 		enckey = kmalloc(ENC_KEY_SIZE, GFP_KERNEL);
+@@ -176,7 +237,7 @@ int big_key_preparse(struct key_preparsed_payload *prep)
+ 			goto err_enckey;
+ 
+ 		/* encrypt aligned data */
+-		ret = big_key_crypt(BIG_KEY_ENC, data, datalen, enckey);
++		ret = big_key_crypt(BIG_KEY_ENC, buf, datalen, enckey);
+ 		if (ret)
+ 			goto err_enckey;
+ 
+@@ -187,7 +248,7 @@ int big_key_preparse(struct key_preparsed_payload *prep)
+ 			goto err_enckey;
+ 		}
+ 
+-		written = kernel_write(file, data, enclen, &pos);
++		written = kernel_write(file, buf->virt, enclen, &pos);
+ 		if (written != enclen) {
+ 			ret = written;
+ 			if (written >= 0)
+@@ -202,7 +263,7 @@ int big_key_preparse(struct key_preparsed_payload *prep)
+ 		*path = file->f_path;
+ 		path_get(path);
+ 		fput(file);
+-		kzfree(data);
++		big_key_free_buffer(buf);
+ 	} else {
+ 		/* Just store the data in a buffer */
+ 		void *data = kmalloc(datalen, GFP_KERNEL);
+@@ -220,7 +281,7 @@ int big_key_preparse(struct key_preparsed_payload *prep)
+ err_enckey:
+ 	kzfree(enckey);
+ error:
+-	kzfree(data);
++	big_key_free_buffer(buf);
+ 	return ret;
+ }
+ 
+@@ -298,15 +359,15 @@ long big_key_read(const struct key *key, char __user *buffer, size_t buflen)
+ 		return datalen;
+ 
+ 	if (datalen > BIG_KEY_FILE_THRESHOLD) {
++		struct big_key_buf *buf;
+ 		struct path *path = (struct path *)&key->payload.data[big_key_path];
+ 		struct file *file;
+-		u8 *data;
+ 		u8 *enckey = (u8 *)key->payload.data[big_key_data];
+ 		size_t enclen = datalen + ENC_AUTHTAG_SIZE;
+ 		loff_t pos = 0;
+ 
+-		data = kmalloc(enclen, GFP_KERNEL);
+-		if (!data)
++		buf = big_key_alloc_buffer(enclen);
++		if (!buf)
+ 			return -ENOMEM;
+ 
+ 		file = dentry_open(path, O_RDONLY, current_cred());
+@@ -316,26 +377,26 @@ long big_key_read(const struct key *key, char __user *buffer, size_t buflen)
+ 		}
+ 
+ 		/* read file to kernel and decrypt */
+-		ret = kernel_read(file, data, enclen, &pos);
++		ret = kernel_read(file, buf->virt, enclen, &pos);
+ 		if (ret >= 0 && ret != enclen) {
+ 			ret = -EIO;
+ 			goto err_fput;
+ 		}
+ 
+-		ret = big_key_crypt(BIG_KEY_DEC, data, enclen, enckey);
++		ret = big_key_crypt(BIG_KEY_DEC, buf, enclen, enckey);
+ 		if (ret)
+ 			goto err_fput;
+ 
+ 		ret = datalen;
+ 
+ 		/* copy decrypted data to user */
+-		if (copy_to_user(buffer, data, datalen) != 0)
++		if (copy_to_user(buffer, buf->virt, datalen) != 0)
+ 			ret = -EFAULT;
+ 
+ err_fput:
+ 		fput(file);
+ error:
+-		kzfree(data);
++		big_key_free_buffer(buf);
+ 	} else {
+ 		ret = datalen;
+ 		if (copy_to_user(buffer, key->payload.data[big_key_data],
