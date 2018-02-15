@@ -1,52 +1,67 @@
-From: Dave Watson <davejwatson@fb.com>
-Subject: Re: [Crypto v5 03/12] support for inline tls
-Date: Thu, 15 Feb 2018 08:26:15 -0800
-Message-ID: <20180215162615.GA38304@davejwatson-mba>
-References: <1518677694-28448-1-git-send-email-atul.gupta@chelsio.com>
- <1518677694-28448-4-git-send-email-atul.gupta@chelsio.com>
- <20180215155157.GA32691@davejwatson-mba>
- <MWHPR1201MB0238985353DFF78FE95108FF97F40@MWHPR1201MB0238.namprd12.prod.outlook.com>
+From: Marek Vasut <marex@denx.de>
+Subject: Re: [PATCH v3 0/5] crypto: ahash.c: Require export/import in ahash
+Date: Thu, 15 Feb 2018 17:27:32 +0100
+Message-ID: <6b29116a-c39c-9813-34a0-d5c05bd30c9d@denx.de>
+References: <CGME20180118183438eucas1p2e2e7be8625ae0950c519e27424f9301a@eucas1p2.samsung.com>
+ <20180118183404.12583-1-k.konieczny@partner.samsung.com>
+ <20180215154132.GA7352@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Cc: "davem@davemloft.net" <davem@davemloft.net>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "sd@queasysnail.net" <sd@queasysnail.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        Ganesh GR <ganeshgr@chelsio.com>
-To: Atul Gupta <atul.gupta@chelsio.com>
-Return-path: <netdev-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <MWHPR1201MB0238985353DFF78FE95108FF97F40@MWHPR1201MB0238.namprd12.prod.outlook.com>
-Sender: netdev-owner@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        Sonic Zhang <sonic.zhang@analog.com>,
+        Fabio Estevam <fabio.estevam@freescale.com>,
+        Shawn Guo <shawn.guo@linaro.org>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Jan Engelhardt <jengelh@inai.de>,
+        Arvind Yadav <arvind.yadav.cs@gmail.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Joakim Bech <joakim.bech@linaro.org>,
+        linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        Kamil Konieczny <k.konieczny@partner.samsung.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20180215154132.GA7352@gondor.apana.org.au>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 02/15/18 04:10 PM, Atul Gupta wrote:
-> > -----Original Message-----
-> > From: Dave Watson [mailto:davejwatson@fb.com] 
-> > Sent: Thursday, February 15, 2018 9:22 PM
-> > To: Atul Gupta <atul.gupta@chelsio.com>
-> > Cc: davem@davemloft.net; herbert@gondor.apana.org.au; sd@queasysnail.net; linux-crypto@vger.kernel.org; netdev@vger.kernel.org; Ganesh GR <ganeshgr@chelsio.com>
-> > Subject: Re: [Crypto v5 03/12] support for inline tls
-> > 
-> > On 02/15/18 12:24 PM, Atul Gupta wrote:
-> > > @@ -401,6 +430,15 @@ static int do_tls_setsockopt_tx(struct sock *sk, char __user *optval,
-> > >  		goto out;
-> > >  	}
-> > >  
-> > > +	rc = get_tls_offload_dev(sk);
-> > > +	if (rc) {
-> > > +		goto out;
-> > > +	} else {
-> > > +		/* Retain HW unhash for cleanup and move to SW Tx */
-> > > +		sk->sk_prot[TLS_BASE_TX].unhash =
-> > > +			sk->sk_prot[TLS_FULL_HW].unhash;
-> > 
-> > Isn't sk->sk_prot a pointer to a global shared struct here still?  It looks like this would actually modify the global struct, and not just for this sk.
-> Yes, its global. It require add on check to modify only when tls_offload dev list has an entry. I will revisit and correct. 
+On 02/15/2018 04:41 PM, Herbert Xu wrote:
+> On Thu, Jan 18, 2018 at 07:33:59PM +0100, Kamil Konieczny wrote:
+>> First four patches add empty hash export and import functions to each driver,
+>> with the same behaviour as in crypto framework. The last one drops them from
+>> crypto framework. Last one for ahash.c depends on all previous.
+>>
+>> Changes in v3:
+>> added change for bfin_crc.c
+>> make this a patchset, instead of unreleated patches
+>> make commit message more descriptive
+>>
+>> Kamil Konieczny (5):
+>>   crypto: mxs-dcp: Add empty hash export and import
+>>   crypto: n2_core: Add empty hash export and import
+>>   crypto: ux500/hash: Add empty export and import
+>>   crypto: bfin_crc: Add empty hash export and import
+>>   crypto: ahash.c: Require export/import in ahash
+>>
+>>  crypto/ahash.c                        | 18 ++----------------
+>>  drivers/crypto/bfin_crc.c             | 12 ++++++++++++
+>>  drivers/crypto/mxs-dcp.c              | 14 ++++++++++++++
+>>  drivers/crypto/n2_core.c              | 12 ++++++++++++
+>>  drivers/crypto/ux500/hash/hash_core.c | 18 ++++++++++++++++++
+>>  5 files changed, 58 insertions(+), 16 deletions(-)
 > 
-> Can you look through other changes please?
+> All applied.  Thanks.
 
-I looked through 1,2,3,11 (the tls-related ones) and don't have any
-other code comments.  Patch 11 commit message still mentions ULP,
-could use updating / clarification.
+This makes no sense, cfr my comment on 5/5
+
+Seems like if the driver doesn't implement those, the core can easily
+detect that and perform the necessary action. Moving the checks out of
+core seems like the wrong thing to do, rather you should enhance the
+checks in core if they're insufficient in my opinion.
+
+-- 
+Best regards,
+Marek Vasut
