@@ -1,133 +1,71 @@
-From: SF Markus Elfring <elfring@users.sourceforge.net>
-Subject: [PATCH] crypto: atmel: Delete error messages for a failed memory
- allocation in six functions
-Date: Thu, 15 Feb 2018 13:24:18 +0100
-Message-ID: <77cf1006-966d-78a9-0fdc-b53ccdd80df2@users.sourceforge.net>
+From: kbuild test robot <lkp@intel.com>
+Subject: [RFC PATCH] chtls_netdev() can be static
+Date: Thu, 15 Feb 2018 20:26:39 +0800
+Message-ID: <20180215122639.GA128160@lkp-hsx02>
+References: <1518437249-14732-1-git-send-email-atul.gupta@chelsio.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Cc: LKML <linux-kernel@vger.kernel.org>,
-        kernel-janitors@vger.kernel.org
-To: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        Alexandre Belloni <alexandre.belloni@free-electrons.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Nicolas Ferre <nicolas.ferre@microchip.com>
-Return-path: <kernel-janitors-owner@vger.kernel.org>
-Content-Language: en-US
-Sender: kernel-janitors-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: kbuild-all@01.org, davejwatson@fb.com, herbert@gondor.apana.org.au,
+        sd@queasysnail.net, linux-crypto@vger.kernel.org,
+        davem@davemloft.net, netdev@vger.kernel.org, ganeshgr@chelsio.com
+To: Atul Gupta <atul.gupta@chelsio.com>
+Return-path: <netdev-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1518437249-14732-1-git-send-email-atul.gupta@chelsio.com>
+Sender: netdev-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-From: Markus Elfring <elfring@users.sourceforge.net>
-Date: Thu, 15 Feb 2018 11:38:30 +0100
 
-Omit extra messages for a memory allocation failure in these functions.
-
-This issue was detected by using the Coccinelle software.
-
-Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+Fixes: 5995a3b59239 ("Makefile Kconfig")
+Signed-off-by: Fengguang Wu <fengguang.wu@intel.com>
 ---
- drivers/crypto/atmel-aes.c  | 6 +-----
- drivers/crypto/atmel-sha.c  | 9 ++-------
- drivers/crypto/atmel-tdes.c | 9 ++-------
- 3 files changed, 5 insertions(+), 19 deletions(-)
+ chtls_main.c |   12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/crypto/atmel-aes.c b/drivers/crypto/atmel-aes.c
-index 691c6465b71e..6fb24fc94b1f 100644
---- a/drivers/crypto/atmel-aes.c
-+++ b/drivers/crypto/atmel-aes.c
-@@ -2602,16 +2602,13 @@ static struct crypto_platform_data *atmel_aes_of_init(struct platform_device *pd
- 	}
- 
- 	pdata = devm_kzalloc(&pdev->dev, sizeof(*pdata), GFP_KERNEL);
--	if (!pdata) {
--		dev_err(&pdev->dev, "could not allocate memory for pdata\n");
-+	if (!pdata)
- 		return ERR_PTR(-ENOMEM);
--	}
- 
- 	pdata->dma_slave = devm_kzalloc(&pdev->dev,
- 					sizeof(*(pdata->dma_slave)),
- 					GFP_KERNEL);
- 	if (!pdata->dma_slave) {
--		dev_err(&pdev->dev, "could not allocate memory for dma_slave\n");
- 		devm_kfree(&pdev->dev, pdata);
- 		return ERR_PTR(-ENOMEM);
- 	}
-@@ -2649,7 +2646,6 @@ static int atmel_aes_probe(struct platform_device *pdev)
- 
- 	aes_dd = devm_kzalloc(&pdev->dev, sizeof(*aes_dd), GFP_KERNEL);
- 	if (aes_dd == NULL) {
--		dev_err(dev, "unable to alloc data struct.\n");
- 		err = -ENOMEM;
- 		goto aes_dd_err;
- 	}
-diff --git a/drivers/crypto/atmel-sha.c b/drivers/crypto/atmel-sha.c
-index 8874aa5ca0f7..4d43081120db 100644
---- a/drivers/crypto/atmel-sha.c
-+++ b/drivers/crypto/atmel-sha.c
-@@ -2726,18 +2726,14 @@ static struct crypto_platform_data *atmel_sha_of_init(struct platform_device *pd
- 	}
- 
- 	pdata = devm_kzalloc(&pdev->dev, sizeof(*pdata), GFP_KERNEL);
--	if (!pdata) {
--		dev_err(&pdev->dev, "could not allocate memory for pdata\n");
-+	if (!pdata)
- 		return ERR_PTR(-ENOMEM);
--	}
- 
- 	pdata->dma_slave = devm_kzalloc(&pdev->dev,
- 					sizeof(*(pdata->dma_slave)),
- 					GFP_KERNEL);
--	if (!pdata->dma_slave) {
--		dev_err(&pdev->dev, "could not allocate memory for dma_slave\n");
-+	if (!pdata->dma_slave)
- 		return ERR_PTR(-ENOMEM);
--	}
- 
- 	return pdata;
+diff --git a/drivers/crypto/chelsio/chtls/chtls_main.c b/drivers/crypto/chelsio/chtls/chtls_main.c
+index 58efb4a..3452f44 100644
+--- a/drivers/crypto/chelsio/chtls/chtls_main.c
++++ b/drivers/crypto/chelsio/chtls/chtls_main.c
+@@ -136,8 +136,8 @@ static int chtls_stop_listen(struct sock *sk)
+ 	return 0;
  }
-@@ -2758,7 +2754,6 @@ static int atmel_sha_probe(struct platform_device *pdev)
  
- 	sha_dd = devm_kzalloc(&pdev->dev, sizeof(*sha_dd), GFP_KERNEL);
- 	if (sha_dd == NULL) {
--		dev_err(dev, "unable to alloc data struct.\n");
- 		err = -ENOMEM;
- 		goto sha_dd_err;
- 	}
-diff --git a/drivers/crypto/atmel-tdes.c b/drivers/crypto/atmel-tdes.c
-index 592124f8382b..97b0423efa7f 100644
---- a/drivers/crypto/atmel-tdes.c
-+++ b/drivers/crypto/atmel-tdes.c
-@@ -1312,18 +1312,14 @@ static struct crypto_platform_data *atmel_tdes_of_init(struct platform_device *p
- 	}
- 
- 	pdata = devm_kzalloc(&pdev->dev, sizeof(*pdata), GFP_KERNEL);
--	if (!pdata) {
--		dev_err(&pdev->dev, "could not allocate memory for pdata\n");
-+	if (!pdata)
- 		return ERR_PTR(-ENOMEM);
--	}
- 
- 	pdata->dma_slave = devm_kzalloc(&pdev->dev,
- 					sizeof(*(pdata->dma_slave)),
- 					GFP_KERNEL);
--	if (!pdata->dma_slave) {
--		dev_err(&pdev->dev, "could not allocate memory for dma_slave\n");
-+	if (!pdata->dma_slave)
- 		return ERR_PTR(-ENOMEM);
--	}
- 
- 	return pdata;
+-struct net_device *chtls_netdev(struct tls_device *dev,
+-				struct net_device *netdev)
++static struct net_device *chtls_netdev(struct tls_device *dev,
++				       struct net_device *netdev)
+ {
+ 	struct chtls_dev *cdev = to_chtls_dev(dev);
+ 	int i;
+@@ -149,12 +149,12 @@ struct net_device *chtls_netdev(struct tls_device *dev,
+ 	return cdev->ports[i];
  }
-@@ -1344,7 +1340,6 @@ static int atmel_tdes_probe(struct platform_device *pdev)
  
- 	tdes_dd = devm_kmalloc(&pdev->dev, sizeof(*tdes_dd), GFP_KERNEL);
- 	if (tdes_dd == NULL) {
--		dev_err(dev, "unable to alloc data struct.\n");
- 		err = -ENOMEM;
- 		goto tdes_dd_err;
- 	}
--- 
-2.16.1
-
+-void chtls_update_prot(struct tls_device *dev, struct sock *sk)
++static void chtls_update_prot(struct tls_device *dev, struct sock *sk)
+ {
+ 	sk->sk_prot = &chtls_base_prot;
+ }
+ 
+-int chtls_inline_feature(struct tls_device *dev)
++static int chtls_inline_feature(struct tls_device *dev)
+ {
+ 	struct chtls_dev *cdev = to_chtls_dev(dev);
+ 	struct net_device *netdev;
+@@ -168,14 +168,14 @@ int chtls_inline_feature(struct tls_device *dev)
+ 	return 1;
+ }
+ 
+-int chtls_create_hash(struct tls_device *dev, struct sock *sk)
++static int chtls_create_hash(struct tls_device *dev, struct sock *sk)
+ {
+ 	if (sk->sk_state == TCP_LISTEN)
+ 		return chtls_start_listen(sk);
+ 	return 0;
+ }
+ 
+-void chtls_destroy_hash(struct tls_device *dev, struct sock *sk)
++static void chtls_destroy_hash(struct tls_device *dev, struct sock *sk)
+ {
+ 	if (sk->sk_state == TCP_LISTEN)
+ 		chtls_stop_listen(sk);
