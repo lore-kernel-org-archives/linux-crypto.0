@@ -1,35 +1,43 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 1/3] crypto: caam/qi - return -EBADMSG for ICV check
- failure
-Date: Thu, 15 Feb 2018 23:51:14 +0800
-Message-ID: <20180215155114.GK7352@gondor.apana.org.au>
-References: <20180129083837.21174-1-horia.geanta@nxp.com>
+Subject: Re: [PATCH 0/3] crypto: stm32/hash: Correction to improve robustness
+Date: Thu, 15 Feb 2018 23:51:34 +0800
+Message-ID: <20180215155133.GL7352@gondor.apana.org.au>
+References: <20180129142811.13273-1-lionel.Debieve@st.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Cc: "David S. Miller" <davem@davemloft.net>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        linux-crypto@vger.kernel.org
-To: Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:39594 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1424663AbeBOPvZ (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 15 Feb 2018 10:51:25 -0500
+Content-Type: text/plain; charset=us-ascii
+Cc: "David S . Miller" <davem@davemloft.net>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@st.com>,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org,
+        Benjamin Gaignard <benjamin.gaignard@st.com>,
+        Fabien Dessenne <fabien.dessenne@st.com>,
+        Ludovic Barre <ludovic.barre@st.com>
+To: Lionel Debieve <lionel.Debieve@st.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20180129083837.21174-1-horia.geanta@nxp.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <20180129142811.13273-1-lionel.Debieve@st.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Jan 29, 2018 at 10:38:35AM +0200, Horia Geantă wrote:
-> Crypto drivers are expected to return -EBADMSG in case of
-> ICV check (authentication) failure.
+On Mon, Jan 29, 2018 at 03:28:08PM +0100, Lionel Debieve wrote:
+> From: Lionel Debieve <lionel.debieve@st.com>
 > 
-> In this case it also makes sense to suppress the error message
-> in the QI dequeue callback.
+> Hi,
 > 
-> Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
+> This patch serie will improve global robustness for stm32-hash driver. 
+> 
+> Patch #1 is fixing dma-burst issue when configuration is not set.
+> Patch #2 solves issue that occurs when irq append during final req processing.
+> Patch #3 is fixing an issue that have been introduced while managing padding but
+> breaking the padding length calculation by hardware to generate correct hash.
+> 
+> Regards,
+> 
+> Lionel Debieve (3):
+>   crypto: stm32/hash: avoid error if maxburst not defined
+>   crypto: stm32/hash: fix performance issues
+>   crypto: stm32/hash: rework padding length
 
 All applied.  Thanks.
 -- 
