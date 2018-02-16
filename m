@@ -1,50 +1,42 @@
-From: Eric Biggers <ebiggers3@gmail.com>
-Subject: Re: [RFC PATCH] KEYS: Use individual pages in big_key for crypto
- buffers [ver #2]
-Date: Thu, 15 Feb 2018 17:56:29 -0800
-Message-ID: <20180216015629.GA136603@gmail.com>
-References: <151873522941.16065.2576464502758911341.stgit@warthog.procyon.org.uk>
+From: Tudor Ambarus <tudor.ambarus@microchip.com>
+Subject: Re: [PATCH] crypto: atmel: Delete error messages for a failed memory
+ allocation in six functions
+Date: Fri, 16 Feb 2018 10:41:51 +0200
+Message-ID: <285d8666-5992-cccb-6c91-e83e85947a7d@microchip.com>
+References: <77cf1006-966d-78a9-0fdc-b53ccdd80df2@users.sourceforge.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: keyrings@vger.kernel.org, Jason@zx2c4.com,
-        herbert@gondor.apana.org.au, k.marinushkin@gmail.com,
-        linux-crypto@vger.kernel.org
-To: David Howells <dhowells@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: <kernel-janitors@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+To: SF Markus Elfring <elfring@users.sourceforge.net>,
+        <linux-crypto@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        Alexandre Belloni <alexandre.belloni@free-electrons.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Nicolas Ferre <nicolas.ferre@microchip.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-io0-f176.google.com ([209.85.223.176]:43719 "EHLO
-        mail-io0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1757198AbeBPB4e (ORCPT
+Received: from esa2.microchip.iphmx.com ([68.232.149.84]:43579 "EHLO
+        esa2.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754775AbeBPIl5 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 15 Feb 2018 20:56:34 -0500
-Content-Disposition: inline
-In-Reply-To: <151873522941.16065.2576464502758911341.stgit@warthog.procyon.org.uk>
+        Fri, 16 Feb 2018 03:41:57 -0500
+In-Reply-To: <77cf1006-966d-78a9-0fdc-b53ccdd80df2@users.sourceforge.net>
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi David,
 
-On Thu, Feb 15, 2018 at 10:53:49PM +0000, David Howells wrote:
->  /*
-> + * Free up the buffer.
-> + */
-> +static void big_key_free_buffer(struct big_key_buf *buf)
-> +{
-> +	unsigned int i;
-> +
-> +	vunmap(buf->virt);
-> +	for (i = 0; i < buf->nr_pages; i++)
-> +		if (buf->pages[i])
-> +			__free_page(buf->pages[i]);
-> +
-> +	memset(buf->virt, 0, buf->nr_pages * PAGE_SIZE);
-> +	kfree(buf);
-> +}
 
-memset() after vunmap(), and also when buf->virt can be NULL?  I had suggested:
+On 02/15/2018 02:24 PM, SF Markus Elfring wrote:
+> From: Markus Elfring<elfring@users.sourceforge.net>
+> Date: Thu, 15 Feb 2018 11:38:30 +0100
+> 
+> Omit extra messages for a memory allocation failure in these functions.
+> 
+> This issue was detected by using the Coccinelle software.
+> 
+> Signed-off-by: Markus Elfring<elfring@users.sourceforge.net>
 
-        if (buf->virt) {
-                memset(buf->virt, 0, buf->nr_pages * PAGE_SIZE);
-                vunmap(buf->virt);
-        }
-
-- Eric
+Reviewed-by: Tudor Ambarus <tudor.ambarus@microchip.com>
