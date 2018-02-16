@@ -1,117 +1,93 @@
-From: Kamil Konieczny <k.konieczny@partner.samsung.com>
-Subject: Re: [PATCH] Update Boris Brezillon email address
-Date: Fri, 16 Feb 2018 16:35:27 +0100
-Message-ID: <9c05d969-b488-fbc4-4143-6446d8a6d7ab@partner.samsung.com>
-References: <CGME20180216104523epcas3p1c45769e365a181963f8328237d270854@epcas3p1.samsung.com>
-        <20180216104449.15546-1-boris.brezillon@bootlin.com>
-        <dbe89241-4d05-d369-2894-fdc0b2d80b80@partner.samsung.com>
-        <20180216121619.3edad6fb@bbrezillon>
-        <4086d3a7-c79d-6906-2778-caccd647ffe6@partner.samsung.com>
-        <20180216150050.6051cc26@bbrezillon>
-        <138ed639-992d-2d87-4dd4-973323cdcad7@partner.samsung.com>
-        <20180216155455.36168609@bbrezillon>
+From: Corentin Labbe <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH v2 0/6] crypto: engine - Permit to enqueue
+ all async requests
+Date: Fri, 16 Feb 2018 16:36:56 +0100
+Message-ID: <20180216153656.GA22492@Red>
+References: <20180126191534.17569-1-clabbe.montjoie@gmail.com>
+ <20180215155100.GJ7352@gondor.apana.org.au>
+Reply-To: clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Cc: David Woodhouse <dwmw2@infradead.org>,
-        Brian Norris <computersforpeace@gmail.com>,
-        Marek Vasut <marek.vasut@gmail.com>,
-        Richard Weinberger <richard@nod.at>,
-        Cyrille Pitchen <cyrille.pitchen@wedev4u.fr>,
-        linux-mtd@lists.infradead.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org,
-        Mike Turquette <mturquette@baylibre.com>,
-        Stephen Boyd <sboyd@codeaurora.org>, linux-clk@vger.kernel.org,
-        David Airlie <airlied@linux.ie>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org
-To: Boris Brezillon <boris.brezillon@bootlin.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mailout2.w1.samsung.com ([210.118.77.12]:45982 "EHLO
-        mailout2.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752865AbeBPPfd (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 16 Feb 2018 10:35:33 -0500
-In-reply-to: <20180216155455.36168609@bbrezillon>
-Content-language: en-US
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Cc: alexandre.torgue-qxv4g6HH51o@public.gmane.org, arei.gonglei-hv44wF8Li93QT0dZR+AlfA@public.gmane.org, corbet-T1hC0tSOHrs@public.gmane.org,
+	davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org, jasowang-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, mcoquelin.stm32-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org,
+	mst-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, fabien.dessenne-qxv4g6HH51o@public.gmane.org,
+	linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-doc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	virtualization-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org,
+	linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
+To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Return-path: <linux-sunxi+bncBD7YLCN32UNBBHPVTPKAKGQE5WOXQMA-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+Sender: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
+Content-Disposition: inline
+In-Reply-To: <20180215155100.GJ7352-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+List-Post: <https://groups.google.com/group/linux-sunxi/post>, <mailto:linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Help: <https://groups.google.com/support/>, <mailto:linux-sunxi+help-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Archive: <https://groups.google.com/group/linux-sunxi
+List-Subscribe: <https://groups.google.com/group/linux-sunxi/subscribe>, <mailto:linux-sunxi+subscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Unsubscribe: <mailto:googlegroups-manage+1076902468213+unsubscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>,
+ <https://groups.google.com/group/linux-sunxi/subscribe>
+List-Id: linux-crypto.vger.kernel.org
 
-On 16.02.2018 15:54, Boris Brezillon wrote:
-> Adding back all the people that were Cc-ed on the initial email.
+On Thu, Feb 15, 2018 at 11:51:00PM +0800, Herbert Xu wrote:
+> On Fri, Jan 26, 2018 at 08:15:28PM +0100, Corentin Labbe wrote:
+> > Hello
+> > 
+> > The current crypto_engine support only ahash and ablkcipher request.
+> > My first patch which try to add skcipher was Nacked, it will add too many functions
+> > and adding other algs(aead, asymetric_key) will make the situation worst.
+> > 
+> > This patchset remove all algs specific stuff and now only process generic crypto_async_request.
+> > 
+> > The requests handler function pointer are now moved out of struct engine and
+> > are now stored directly in a crypto_engine_reqctx.
+> > 
+> > The original proposal of Herbert [1] cannot be done completly since the crypto_engine
+> > could only dequeue crypto_async_request and it is impossible to access any request_ctx
+> > without knowing the underlying request type.
+> > 
+> > So I do something near that was requested: adding crypto_engine_reqctx in TFM context.
+> > Note that the current implementation expect that crypto_engine_reqctx
+> > is the first member of the context.
+> > 
+> > The first patch is a try to document the crypto engine API.
+> > The second patch convert the crypto engine with the new way,
+> > while the following patchs convert the 4 existing users of crypto_engine.
+> > Note that this split break bisection, so probably the final commit will be all merged.
+> > 
+> > Appart from virtio, all 4 latest patch were compile tested only.
+> > But the crypto engine is tested with my new sun8i-ce driver.
+> > 
+> > Regards
+> > 
+> > [1] https://www.mail-archive.com/linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org/msg1474434.html
+> > 
+> > Changes since V1:
+> > - renamed crypto_engine_reqctx to crypto_engine_ctx
+> > - indentation fix in function parameter
+> > - do not export crypto_transfer_request
+> > - Add aead support
+> > - crypto_finalize_request is now static
+> > 
+> > Changes since RFC:
+> > - Added a documentation patch
+> > - Added patch for stm32-cryp
+> > - Changed parameter of all crypto_engine_op functions from
+> > 	crypto_async_request to void*
+> > - Reintroduced crypto_transfer_xxx_request_to_engine functions
+> > 
+> > Corentin Labbe (6):
+> >   Documentation: crypto: document crypto engine API
+> >   crypto: engine - Permit to enqueue all async requests
+> >   crypto: omap: convert to new crypto engine API
+> >   crypto: virtio: convert to new crypto engine API
+> >   crypto: stm32-hash: convert to the new crypto engine API
+> >   crypto: stm32-cryp: convert to the new crypto engine API
 > 
-> On Fri, 16 Feb 2018 15:18:21 +0100
-> Kamil Konieczny <k.konieczny@partner.samsung.com> wrote:
-> 
->> On 16.02.2018 15:00, Boris Brezillon wrote:
->>> On Fri, 16 Feb 2018 12:21:53 +0100
->>> Kamil Konieczny <k.konieczny@partner.samsung.com> wrote:
->>>   
->>>> On 16.02.2018 12:16, Boris Brezillon wrote:  
->>>>> On Fri, 16 Feb 2018 12:07:42 +0100
->>>>> Kamil Konieczny <k.konieczny@partner.samsung.com> wrote:
->>>>>     
->>>>>> On 16.02.2018 11:44, Boris Brezillon wrote:    
->>>>>>> Free Electrons is now Bootlin.
->>>>>>>
->>>>>>> Signed-off-by: Boris Brezillon <boris.brezillon@bootlin.com>
->>>>>>> ---
->>>>>>> Note that I'm planning to take this patch through the MTD tree.
->>>>>>> ---
->>>>>>>  .mailmap    |  7 ++++---
->>>>>>>  MAINTAINERS | 10 +++++-----
->>>>>>>  2 files changed, 9 insertions(+), 8 deletions(-)
->>>>>>>
->>>>>>> diff --git a/.mailmap b/.mailmap
->>>>>>> index e18cab73e209..50c1d6bf36b2 100644
->>>>>>> --- a/.mailmap
->>>>>>> +++ b/.mailmap
->>>>>>> @@ -33,9 +33,10 @@ Axel Lin <axel.lin@gmail.com>
->>>>>>>  Ben Gardner <bgardner@wabtec.com>
->>>>>>>  Ben M Cahill <ben.m.cahill@intel.com>
->>>>>>>  Björn Steinbrink <B.Steinbrink@gmx.de>
->>>>>>> -Boris Brezillon <boris.brezillon@free-electrons.com>
->>>>>>> -Boris Brezillon <boris.brezillon@free-electrons.com> <b.brezillon.dev@gmail.com>
->>>>>>> -Boris Brezillon <boris.brezillon@free-electrons.com> <b.brezillon@overkiz.com>
->>>>>>> +Boris Brezillon <boris.brezillon@bootlin.com>
->>>>>>> +Boris Brezillon <boris.brezillon@bootlin.com> <boris.brezillon@free-electrons.com>      
->>>>>>
->>>>>> ------------------------------------------------------------------ ??????????????????    
->>>>>
->>>>> Is there a problem with this line?
->>>>>     
->>>>
->>>> I think you want to delete all 'free-electrons', yet here you add this  
->>>
->>> I'm clearly not a git expert, but according to man git-shortlog [1], the
->>> format I'm using here allows mailmap to replace the old email by the
->>> new one, which is exactly what I want.
->>>
->>> [1]https://git-scm.com/docs/git-shortlog
->>>   
->>
->> Ah, I see, but why do you send patch for .mailmap ?
->> it is your private file, not global one, I do not want mine .mailmap
->> to be replaced by yours :)
-> 
-> No, it's not private, it's part of the git tree.
-> 
->> But beside this, you can use sed script
->>
->> sed -i -e 's/free-electrons/bootlin/g' .mailmap
->>
->> Please just resend this with patch for MAINTAINER's only
->>
-> 
-> .mailmap is versioned for a good reason, and I don't see why I couldn't
-> update entries for my emails, especially since those entries already
-> existed before this patch.
+> All applied.  Thanks.
 
-I am newbie, it looks you are right, sorry for questions.
+Hello
 
--- 
-Best regards,
-Kamil Konieczny
-Samsung R&D Institute Poland
+As mentionned in the cover letter, all patchs (except documentation one) should be squashed.
+A kbuild robot reported a build error on cryptodev due to this.
+
+Regards
