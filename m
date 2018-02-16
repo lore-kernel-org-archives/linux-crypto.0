@@ -1,93 +1,99 @@
-From: Corentin Labbe <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH v2 0/6] crypto: engine - Permit to enqueue
- all async requests
-Date: Fri, 16 Feb 2018 16:36:56 +0100
-Message-ID: <20180216153656.GA22492@Red>
-References: <20180126191534.17569-1-clabbe.montjoie@gmail.com>
- <20180215155100.GJ7352@gondor.apana.org.au>
-Reply-To: clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+From: Boris Brezillon <boris.brezillon@bootlin.com>
+Subject: Re: [PATCH] Update Boris Brezillon email address
+Date: Fri, 16 Feb 2018 16:51:47 +0100
+Message-ID: <20180216165147.41c0d9e7@bbrezillon>
+References: <CGME20180216104523epcas3p1c45769e365a181963f8328237d270854@epcas3p1.samsung.com>
+ <20180216104449.15546-1-boris.brezillon@bootlin.com>
+ <dbe89241-4d05-d369-2894-fdc0b2d80b80@partner.samsung.com>
+ <20180216121619.3edad6fb@bbrezillon>
+ <4086d3a7-c79d-6906-2778-caccd647ffe6@partner.samsung.com>
+ <20180216150050.6051cc26@bbrezillon>
+ <138ed639-992d-2d87-4dd4-973323cdcad7@partner.samsung.com>
+ <20180216155455.36168609@bbrezillon>
+ <9c05d969-b488-fbc4-4143-6446d8a6d7ab@partner.samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: alexandre.torgue-qxv4g6HH51o@public.gmane.org, arei.gonglei-hv44wF8Li93QT0dZR+AlfA@public.gmane.org, corbet-T1hC0tSOHrs@public.gmane.org,
-	davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org, jasowang-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, mcoquelin.stm32-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org,
-	mst-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, fabien.dessenne-qxv4g6HH51o@public.gmane.org,
-	linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-doc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	virtualization-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org,
-	linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
-To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Return-path: <linux-sunxi+bncBD7YLCN32UNBBHPVTPKAKGQE5WOXQMA-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-Sender: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
-Content-Disposition: inline
-In-Reply-To: <20180215155100.GJ7352-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-List-Post: <https://groups.google.com/group/linux-sunxi/post>, <mailto:linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-List-Help: <https://groups.google.com/support/>, <mailto:linux-sunxi+help-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-List-Archive: <https://groups.google.com/group/linux-sunxi
-List-Subscribe: <https://groups.google.com/group/linux-sunxi/subscribe>, <mailto:linux-sunxi+subscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-List-Unsubscribe: <mailto:googlegroups-manage+1076902468213+unsubscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>,
- <https://groups.google.com/group/linux-sunxi/subscribe>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, David Airlie <airlied@linux.ie>,
+ Richard Weinberger <richard@nod.at>, Mike Turquette <mturquette@baylibre.com>,
+ Stephen Boyd <sboyd@codeaurora.org>, linux-kernel@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-clk@vger.kernel.org,
+ Marek Vasut <marek.vasut@gmail.com>, linux-mtd@lists.infradead.org,
+ linux-crypto@vger.kernel.org, Cyrille Pitchen <cyrille.pitchen@wedev4u.fr>,
+ Brian Norris <computersforpeace@gmail.com>,
+ David Woodhouse <dwmw2@infradead.org>, "David S. Miller" <davem@davemloft.net>
+To: Kamil Konieczny <k.konieczny@partner.samsung.com>
+Return-path: <dri-devel-bounces@lists.freedesktop.org>
+In-Reply-To: <9c05d969-b488-fbc4-4143-6446d8a6d7ab@partner.samsung.com>
+List-Unsubscribe: <https://lists.freedesktop.org/mailman/options/dri-devel>,
+ <mailto:dri-devel-request@lists.freedesktop.org?subject=unsubscribe>
+List-Archive: <https://lists.freedesktop.org/archives/dri-devel>
+List-Post: <mailto:dri-devel@lists.freedesktop.org>
+List-Help: <mailto:dri-devel-request@lists.freedesktop.org?subject=help>
+List-Subscribe: <https://lists.freedesktop.org/mailman/listinfo/dri-devel>,
+ <mailto:dri-devel-request@lists.freedesktop.org?subject=subscribe>
+Errors-To: dri-devel-bounces@lists.freedesktop.org
+Sender: "dri-devel" <dri-devel-bounces@lists.freedesktop.org>
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Feb 15, 2018 at 11:51:00PM +0800, Herbert Xu wrote:
-> On Fri, Jan 26, 2018 at 08:15:28PM +0100, Corentin Labbe wrote:
-> > Hello
-> > 
-> > The current crypto_engine support only ahash and ablkcipher request.
-> > My first patch which try to add skcipher was Nacked, it will add too many functions
-> > and adding other algs(aead, asymetric_key) will make the situation worst.
-> > 
-> > This patchset remove all algs specific stuff and now only process generic crypto_async_request.
-> > 
-> > The requests handler function pointer are now moved out of struct engine and
-> > are now stored directly in a crypto_engine_reqctx.
-> > 
-> > The original proposal of Herbert [1] cannot be done completly since the crypto_engine
-> > could only dequeue crypto_async_request and it is impossible to access any request_ctx
-> > without knowing the underlying request type.
-> > 
-> > So I do something near that was requested: adding crypto_engine_reqctx in TFM context.
-> > Note that the current implementation expect that crypto_engine_reqctx
-> > is the first member of the context.
-> > 
-> > The first patch is a try to document the crypto engine API.
-> > The second patch convert the crypto engine with the new way,
-> > while the following patchs convert the 4 existing users of crypto_engine.
-> > Note that this split break bisection, so probably the final commit will be all merged.
-> > 
-> > Appart from virtio, all 4 latest patch were compile tested only.
-> > But the crypto engine is tested with my new sun8i-ce driver.
-> > 
-> > Regards
-> > 
-> > [1] https://www.mail-archive.com/linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org/msg1474434.html
-> > 
-> > Changes since V1:
-> > - renamed crypto_engine_reqctx to crypto_engine_ctx
-> > - indentation fix in function parameter
-> > - do not export crypto_transfer_request
-> > - Add aead support
-> > - crypto_finalize_request is now static
-> > 
-> > Changes since RFC:
-> > - Added a documentation patch
-> > - Added patch for stm32-cryp
-> > - Changed parameter of all crypto_engine_op functions from
-> > 	crypto_async_request to void*
-> > - Reintroduced crypto_transfer_xxx_request_to_engine functions
-> > 
-> > Corentin Labbe (6):
-> >   Documentation: crypto: document crypto engine API
-> >   crypto: engine - Permit to enqueue all async requests
-> >   crypto: omap: convert to new crypto engine API
-> >   crypto: virtio: convert to new crypto engine API
-> >   crypto: stm32-hash: convert to the new crypto engine API
-> >   crypto: stm32-cryp: convert to the new crypto engine API
-> 
-> All applied.  Thanks.
-
-Hello
-
-As mentionned in the cover letter, all patchs (except documentation one) should be squashed.
-A kbuild robot reported a build error on cryptodev due to this.
-
-Regards
+T24gRnJpLCAxNiBGZWIgMjAxOCAxNjozNToyNyArMDEwMApLYW1pbCBLb25pZWN6bnkgPGsua29u
+aWVjem55QHBhcnRuZXIuc2Ftc3VuZy5jb20+IHdyb3RlOgoKPiBPbiAxNi4wMi4yMDE4IDE1OjU0
+LCBCb3JpcyBCcmV6aWxsb24gd3JvdGU6Cj4gPiBBZGRpbmcgYmFjayBhbGwgdGhlIHBlb3BsZSB0
+aGF0IHdlcmUgQ2MtZWQgb24gdGhlIGluaXRpYWwgZW1haWwuCj4gPiAKPiA+IE9uIEZyaSwgMTYg
+RmViIDIwMTggMTU6MTg6MjEgKzAxMDAKPiA+IEthbWlsIEtvbmllY3pueSA8ay5rb25pZWN6bnlA
+cGFydG5lci5zYW1zdW5nLmNvbT4gd3JvdGU6Cj4gPiAgIAo+ID4+IE9uIDE2LjAyLjIwMTggMTU6
+MDAsIEJvcmlzIEJyZXppbGxvbiB3cm90ZTogIAo+ID4+PiBPbiBGcmksIDE2IEZlYiAyMDE4IDEy
+OjIxOjUzICswMTAwCj4gPj4+IEthbWlsIEtvbmllY3pueSA8ay5rb25pZWN6bnlAcGFydG5lci5z
+YW1zdW5nLmNvbT4gd3JvdGU6Cj4gPj4+ICAgICAKPiA+Pj4+IE9uIDE2LjAyLjIwMTggMTI6MTYs
+IEJvcmlzIEJyZXppbGxvbiB3cm90ZTogICAgCj4gPj4+Pj4gT24gRnJpLCAxNiBGZWIgMjAxOCAx
+MjowNzo0MiArMDEwMAo+ID4+Pj4+IEthbWlsIEtvbmllY3pueSA8ay5rb25pZWN6bnlAcGFydG5l
+ci5zYW1zdW5nLmNvbT4gd3JvdGU6Cj4gPj4+Pj4gICAgICAgCj4gPj4+Pj4+IE9uIDE2LjAyLjIw
+MTggMTE6NDQsIEJvcmlzIEJyZXppbGxvbiB3cm90ZTogICAgICAKPiA+Pj4+Pj4+IEZyZWUgRWxl
+Y3Ryb25zIGlzIG5vdyBCb290bGluLgo+ID4+Pj4+Pj4KPiA+Pj4+Pj4+IFNpZ25lZC1vZmYtYnk6
+IEJvcmlzIEJyZXppbGxvbiA8Ym9yaXMuYnJlemlsbG9uQGJvb3RsaW4uY29tPgo+ID4+Pj4+Pj4g
+LS0tCj4gPj4+Pj4+PiBOb3RlIHRoYXQgSSdtIHBsYW5uaW5nIHRvIHRha2UgdGhpcyBwYXRjaCB0
+aHJvdWdoIHRoZSBNVEQgdHJlZS4KPiA+Pj4+Pj4+IC0tLQo+ID4+Pj4+Pj4gIC5tYWlsbWFwICAg
+IHwgIDcgKysrKy0tLQo+ID4+Pj4+Pj4gIE1BSU5UQUlORVJTIHwgMTAgKysrKystLS0tLQo+ID4+
+Pj4+Pj4gIDIgZmlsZXMgY2hhbmdlZCwgOSBpbnNlcnRpb25zKCspLCA4IGRlbGV0aW9ucygtKQo+
+ID4+Pj4+Pj4KPiA+Pj4+Pj4+IGRpZmYgLS1naXQgYS8ubWFpbG1hcCBiLy5tYWlsbWFwCj4gPj4+
+Pj4+PiBpbmRleCBlMThjYWI3M2UyMDkuLjUwYzFkNmJmMzZiMiAxMDA2NDQKPiA+Pj4+Pj4+IC0t
+LSBhLy5tYWlsbWFwCj4gPj4+Pj4+PiArKysgYi8ubWFpbG1hcAo+ID4+Pj4+Pj4gQEAgLTMzLDkg
+KzMzLDEwIEBAIEF4ZWwgTGluIDxheGVsLmxpbkBnbWFpbC5jb20+Cj4gPj4+Pj4+PiAgQmVuIEdh
+cmRuZXIgPGJnYXJkbmVyQHdhYnRlYy5jb20+Cj4gPj4+Pj4+PiAgQmVuIE0gQ2FoaWxsIDxiZW4u
+bS5jYWhpbGxAaW50ZWwuY29tPgo+ID4+Pj4+Pj4gIEJqw7ZybiBTdGVpbmJyaW5rIDxCLlN0ZWlu
+YnJpbmtAZ214LmRlPgo+ID4+Pj4+Pj4gLUJvcmlzIEJyZXppbGxvbiA8Ym9yaXMuYnJlemlsbG9u
+QGZyZWUtZWxlY3Ryb25zLmNvbT4KPiA+Pj4+Pj4+IC1Cb3JpcyBCcmV6aWxsb24gPGJvcmlzLmJy
+ZXppbGxvbkBmcmVlLWVsZWN0cm9ucy5jb20+IDxiLmJyZXppbGxvbi5kZXZAZ21haWwuY29tPgo+
+ID4+Pj4+Pj4gLUJvcmlzIEJyZXppbGxvbiA8Ym9yaXMuYnJlemlsbG9uQGZyZWUtZWxlY3Ryb25z
+LmNvbT4gPGIuYnJlemlsbG9uQG92ZXJraXouY29tPgo+ID4+Pj4+Pj4gK0JvcmlzIEJyZXppbGxv
+biA8Ym9yaXMuYnJlemlsbG9uQGJvb3RsaW4uY29tPgo+ID4+Pj4+Pj4gK0JvcmlzIEJyZXppbGxv
+biA8Ym9yaXMuYnJlemlsbG9uQGJvb3RsaW4uY29tPiA8Ym9yaXMuYnJlemlsbG9uQGZyZWUtZWxl
+Y3Ryb25zLmNvbT4gICAgICAgIAo+ID4+Pj4+Pgo+ID4+Pj4+PiAtLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0gPz8/Pz8/Pz8/
+Pz8/Pz8/Pz8/ICAgICAgCj4gPj4+Pj4KPiA+Pj4+PiBJcyB0aGVyZSBhIHByb2JsZW0gd2l0aCB0
+aGlzIGxpbmU/Cj4gPj4+Pj4gICAgICAgCj4gPj4+Pgo+ID4+Pj4gSSB0aGluayB5b3Ugd2FudCB0
+byBkZWxldGUgYWxsICdmcmVlLWVsZWN0cm9ucycsIHlldCBoZXJlIHlvdSBhZGQgdGhpcyAgICAK
+PiA+Pj4KPiA+Pj4gSSdtIGNsZWFybHkgbm90IGEgZ2l0IGV4cGVydCwgYnV0IGFjY29yZGluZyB0
+byBtYW4gZ2l0LXNob3J0bG9nIFsxXSwgdGhlCj4gPj4+IGZvcm1hdCBJJ20gdXNpbmcgaGVyZSBh
+bGxvd3MgbWFpbG1hcCB0byByZXBsYWNlIHRoZSBvbGQgZW1haWwgYnkgdGhlCj4gPj4+IG5ldyBv
+bmUsIHdoaWNoIGlzIGV4YWN0bHkgd2hhdCBJIHdhbnQuCj4gPj4+Cj4gPj4+IFsxXWh0dHBzOi8v
+Z2l0LXNjbS5jb20vZG9jcy9naXQtc2hvcnRsb2cKPiA+Pj4gICAgIAo+ID4+Cj4gPj4gQWgsIEkg
+c2VlLCBidXQgd2h5IGRvIHlvdSBzZW5kIHBhdGNoIGZvciAubWFpbG1hcCA/Cj4gPj4gaXQgaXMg
+eW91ciBwcml2YXRlIGZpbGUsIG5vdCBnbG9iYWwgb25lLCBJIGRvIG5vdCB3YW50IG1pbmUgLm1h
+aWxtYXAKPiA+PiB0byBiZSByZXBsYWNlZCBieSB5b3VycyA6KSAgCj4gPiAKPiA+IE5vLCBpdCdz
+IG5vdCBwcml2YXRlLCBpdCdzIHBhcnQgb2YgdGhlIGdpdCB0cmVlLgo+ID4gICAKPiA+PiBCdXQg
+YmVzaWRlIHRoaXMsIHlvdSBjYW4gdXNlIHNlZCBzY3JpcHQKPiA+Pgo+ID4+IHNlZCAtaSAtZSAn
+cy9mcmVlLWVsZWN0cm9ucy9ib290bGluL2cnIC5tYWlsbWFwCj4gPj4KPiA+PiBQbGVhc2UganVz
+dCByZXNlbmQgdGhpcyB3aXRoIHBhdGNoIGZvciBNQUlOVEFJTkVSJ3Mgb25seQo+ID4+ICAKPiA+
+IAo+ID4gLm1haWxtYXAgaXMgdmVyc2lvbmVkIGZvciBhIGdvb2QgcmVhc29uLCBhbmQgSSBkb24n
+dCBzZWUgd2h5IEkgY291bGRuJ3QKPiA+IHVwZGF0ZSBlbnRyaWVzIGZvciBteSBlbWFpbHMsIGVz
+cGVjaWFsbHkgc2luY2UgdGhvc2UgZW50cmllcyBhbHJlYWR5Cj4gPiBleGlzdGVkIGJlZm9yZSB0
+aGlzIHBhdGNoLiAgCj4gCj4gSSBhbSBuZXdiaWUsIGl0IGxvb2tzIHlvdSBhcmUgcmlnaHQsIHNv
+cnJ5IGZvciBxdWVzdGlvbnMuCj4gCgpObyBwcm9ibGVtLCBidXQgd2hlbiB5b3UncmUgbm90IHN1
+cmUgYWJvdXQgc29tZXRoaW5nIHlvdSBzaG91bGQgbm90IGFjdApsaWtlIHlvdSBrbm93IGhvdyB0
+aGluZ3Mgc2hvdWxkIGJlIGRvbmUuCgpSZWdhcmRzLAoKQm9yaXMKCi0tIApCb3JpcyBCcmV6aWxs
+b24sIEJvb3RsaW4gKGZvcm1lcmx5IEZyZWUgRWxlY3Ryb25zKQpFbWJlZGRlZCBMaW51eCBhbmQg
+S2VybmVsIGVuZ2luZWVyaW5nCmh0dHA6Ly9ib290bGluLmNvbQpfX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fXwpkcmktZGV2ZWwgbWFpbGluZyBsaXN0CmRyaS1k
+ZXZlbEBsaXN0cy5mcmVlZGVza3RvcC5vcmcKaHR0cHM6Ly9saXN0cy5mcmVlZGVza3RvcC5vcmcv
+bWFpbG1hbi9saXN0aW5mby9kcmktZGV2ZWwK
