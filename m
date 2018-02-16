@@ -1,137 +1,288 @@
-From: Kamil Konieczny <k.konieczny@partner.samsung.com>
-Subject: Re: [PATCH v3 0/5] crypto: ahash.c: Require export/import in ahash
-Date: Fri, 16 Feb 2018 10:16:29 +0100
-Message-ID: <77b4e0a0-0e2c-af7a-690e-4d516d616717@partner.samsung.com>
-References: <CGME20180118183438eucas1p2e2e7be8625ae0950c519e27424f9301a@eucas1p2.samsung.com>
-        <20180118183404.12583-1-k.konieczny@partner.samsung.com>
-        <20180215154132.GA7352@gondor.apana.org.au>
-        <6b29116a-c39c-9813-34a0-d5c05bd30c9d@denx.de>
-        <32069edc-e816-6ab0-f057-b1dab5d30db4@partner.samsung.com>
-        <d7300e36-392a-18cf-5176-6eaf4c16eb43@denx.de>
-        <cdb62a71-bb7e-8c62-06bc-ab91c9642e06@partner.samsung.com>
-        <14364c45-8f56-e6d6-66f2-8357bf89a894@denx.de>
+From: David Howells <dhowells@redhat.com>
+Subject: [RFC PATCH] KEYS: Use individual pages in big_key for crypto
+ buffers [ver #3]
+Date: Fri, 16 Feb 2018 09:41:47 +0000
+Message-ID: <151877410770.5727.12576130474850181890.stgit@warthog.procyon.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-        Sonic Zhang <sonic.zhang@analog.com>,
-        Fabio Estevam <fabio.estevam@freescale.com>,
-        Shawn Guo <shawn.guo@linaro.org>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Jan Engelhardt <jengelh@inai.de>,
-        Arvind Yadav <arvind.yadav.cs@gmail.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Joakim Bech <joakim.bech@linaro.org>,
-        linux-kernel@vger.kernel.org
-To: Marek Vasut <marex@denx.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>
+Cc: dhowells@redhat.com, Jason@zx2c4.com, herbert@gondor.apana.org.au,
+        k.marinushkin@gmail.com, linux-crypto@vger.kernel.org
+To: keyrings@vger.kernel.org, ebiggers3@gmail.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mailout2.w1.samsung.com ([210.118.77.12]:47022 "EHLO
-        mailout2.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1757760AbeBPJQi (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 16 Feb 2018 04:16:38 -0500
-In-reply-to: <14364c45-8f56-e6d6-66f2-8357bf89a894@denx.de>
-Content-language: en-US
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45860 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S932120AbeBPJlt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 16 Feb 2018 04:41:49 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+kmalloc() can't always allocate large enough buffers for big_key to use for
+crypto (1MB + some metadata) so we cannot use that to allocate the buffer.
+Further, vmalloc'd pages can't be passed to sg_init_one() and the aead
+crypto accessors cannot be called progressively and must be passed all the
+data in one go (which means we can't pass the data in one block at a time).
 
-On 15.02.2018 19:32, Marek Vasut wrote:
-> On 02/15/2018 07:06 PM, Kamil Konieczny wrote:
->>
->>
->> On 15.02.2018 18:06, Marek Vasut wrote:
->>> On 02/15/2018 06:00 PM, Kamil Konieczny wrote:
->>>>
->>>>
->>>> On 15.02.2018 17:27, Marek Vasut wrote:
->>>>> On 02/15/2018 04:41 PM, Herbert Xu wrote:
->>>>>> On Thu, Jan 18, 2018 at 07:33:59PM +0100, Kamil Konieczny wrote:
->>>>>>> First four patches add empty hash export and import functions to each driver,
->>>>>>> with the same behaviour as in crypto framework. The last one drops them from
->>>>>>> crypto framework. Last one for ahash.c depends on all previous.
->>>>>>>
->>>>>>> Changes in v3:
->>>>>>> added change for bfin_crc.c
->>>>>>> make this a patchset, instead of unreleated patches
->>>>>>> make commit message more descriptive
->>>>>>>
->>>>>>> Kamil Konieczny (5):
->>>>>>>   crypto: mxs-dcp: Add empty hash export and import
->>>>>>>   crypto: n2_core: Add empty hash export and import
->>>>>>>   crypto: ux500/hash: Add empty export and import
->>>>>>>   crypto: bfin_crc: Add empty hash export and import
->>>>>>>   crypto: ahash.c: Require export/import in ahash
->>>>>>>
->>>>>>>  crypto/ahash.c                        | 18 ++----------------
->>>>>>>  drivers/crypto/bfin_crc.c             | 12 ++++++++++++
->>>>>>>  drivers/crypto/mxs-dcp.c              | 14 ++++++++++++++
->>>>>>>  drivers/crypto/n2_core.c              | 12 ++++++++++++
->>>>>>>  drivers/crypto/ux500/hash/hash_core.c | 18 ++++++++++++++++++
->>>>>>>  5 files changed, 58 insertions(+), 16 deletions(-)
->>>>>>
->>>>>> All applied.  Thanks.
->>>>>
->>>>> This makes no sense, cfr my comment on 5/5
->>>>>
->>>>> Seems like if the driver doesn't implement those, the core can easily
->>>>> detect that and perform the necessary action. Moving the checks out of
->>>>> core seems like the wrong thing to do, rather you should enhance the
->>>>> checks in core if they're insufficient in my opinion.
->>>>
->>>> The bug can only be in driver which will not implement those two functions,
->>>> but we already had all drivers with those due to patches 1..4
->>>> All other drivers do have them.
->>>
->>> The core can very well check if these functions are not populated and
->>> return ENOSYS
->>>
->>>> Additionally, with crypto we want minimize code and run as fast as possible.
->>>
->>> So you remove all NULL pointer checks ? Esp. in security-sensitive code?
->>> What is the impact of this non-critical path code on performance?
->>>
->>> Come on ...
->>>
->>
->> Why you want checks for something that not exist ?
->>
->> Those without them will not work and will do Oops in crypto testmgr,
->> so such drivers should not be used nor accepted in drivers/crypto
->>
->> Ask yourself why crypto do not check for NULL in ahash digest or other
->> required ahash functions.
-> 
-> Are you suggesting that the kernel code should NOT perform NULL pointer
-> checks ?
-> 
-> Are you suggesting each driver should implement every single callback
-> available and if it is not implemented, return -ENOSYS ? This looks like
-> a MASSIVE code duplication.
+Fix this by allocating the buffer pages individually and passing them
+through a multientry scatterlist to the crypto layer.  This has the bonus
+advantage that we don't have to allocate a contiguous series of pages.
 
-It is source code duplication. One do not load all crypto drivers at once,
-simple because one board has only one crypto HW (or few closely related),
-and if one even try, almost none of them will initialize on given
-hardware. E.g. on Exynos board only exynos drivers will load, on board with
-omap crypto only omap crypto will load.
+We then vmap() the page list and pass that through to the VFS read/write
+routines.
+
+This can trigger a warning:
+
+	WARNING: CPU: 0 PID: 60912 at mm/page_alloc.c:3883 __alloc_pages_nodemask+0xb7c/0x15f8
+	([<00000000002acbb6>] __alloc_pages_nodemask+0x1ee/0x15f8)
+	 [<00000000002dd356>] kmalloc_order+0x46/0x90
+	 [<00000000002dd3e0>] kmalloc_order_trace+0x40/0x1f8
+	 [<0000000000326a10>] __kmalloc+0x430/0x4c0
+	 [<00000000004343e4>] big_key_preparse+0x7c/0x210
+	 [<000000000042c040>] key_create_or_update+0x128/0x420
+	 [<000000000042e52c>] SyS_add_key+0x124/0x220
+	 [<00000000007bba2c>] system_call+0xc4/0x2b0
+
+from the keyctl/padd/useradd test of the keyutils testsuite on s390x.
+
+Note that it might be better to shovel data through in page-sized lumps
+instead as there's no particular need to use a monolithic buffer unless the
+kernel itself wants to access the data.
+
+Fixes: 13100a72f40f ("Security: Keys: Big keys stored encrypted")
+Reported-by: Paul Bunyan <pbunyan@redhat.com>
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Kirill Marinushkin <k.marinushkin@gmail.com>
+---
+
+ security/keys/big_key.c |  110 +++++++++++++++++++++++++++++++++++++----------
+ 1 file changed, 87 insertions(+), 23 deletions(-)
+
+diff --git a/security/keys/big_key.c b/security/keys/big_key.c
+index 929e14978c42..4e99e8ba8612 100644
+--- a/security/keys/big_key.c
++++ b/security/keys/big_key.c
+@@ -22,6 +22,13 @@
+ #include <keys/big_key-type.h>
+ #include <crypto/aead.h>
  
->>>> Moving checks out of core will impose on driver author need for implement
->>>> those functions, or declare them empty, but in case of empty ones 
->>>> crypto will not work properly with such driver.
->>>
->>> You can very well impose that in the core, except you don't duplicate
->>> the code.
->>
->> Now size of crypto core is reduced.
-> 
-> You implemented the same code thrice, it surely is not reduced.
-
-As I said above, it reduces binary size at cost of more source code in few drivers.
-
--- 
-Best regards,
-Kamil Konieczny
-Samsung R&D Institute Poland
++struct big_key_buf {
++	unsigned int		nr_pages;
++	void			*virt;
++	struct scatterlist	*sg;
++	struct page		*pages[];
++};
++
+ /*
+  * Layout of key payload words.
+  */
+@@ -91,10 +98,9 @@ static DEFINE_MUTEX(big_key_aead_lock);
+ /*
+  * Encrypt/decrypt big_key data
+  */
+-static int big_key_crypt(enum big_key_op op, u8 *data, size_t datalen, u8 *key)
++static int big_key_crypt(enum big_key_op op, struct big_key_buf *buf, size_t datalen, u8 *key)
+ {
+ 	int ret;
+-	struct scatterlist sgio;
+ 	struct aead_request *aead_req;
+ 	/* We always use a zero nonce. The reason we can get away with this is
+ 	 * because we're using a different randomly generated key for every
+@@ -109,8 +115,7 @@ static int big_key_crypt(enum big_key_op op, u8 *data, size_t datalen, u8 *key)
+ 		return -ENOMEM;
+ 
+ 	memset(zero_nonce, 0, sizeof(zero_nonce));
+-	sg_init_one(&sgio, data, datalen + (op == BIG_KEY_ENC ? ENC_AUTHTAG_SIZE : 0));
+-	aead_request_set_crypt(aead_req, &sgio, &sgio, datalen, zero_nonce);
++	aead_request_set_crypt(aead_req, buf->sg, buf->sg, datalen, zero_nonce);
+ 	aead_request_set_callback(aead_req, CRYPTO_TFM_REQ_MAY_SLEEP, NULL, NULL);
+ 	aead_request_set_ad(aead_req, 0);
+ 
+@@ -130,21 +135,81 @@ static int big_key_crypt(enum big_key_op op, u8 *data, size_t datalen, u8 *key)
+ }
+ 
+ /*
++ * Free up the buffer.
++ */
++static void big_key_free_buffer(struct big_key_buf *buf)
++{
++	unsigned int i;
++
++	if (buf->virt) {
++		memset(buf->virt, 0, buf->nr_pages * PAGE_SIZE);
++		vunmap(buf->virt);
++	}
++
++	for (i = 0; i < buf->nr_pages; i++)
++		if (buf->pages[i])
++			__free_page(buf->pages[i]);
++
++	kfree(buf);
++}
++
++/*
++ * Allocate a buffer consisting of a set of pages with a virtual mapping
++ * applied over them.
++ */
++static void *big_key_alloc_buffer(size_t len)
++{
++	struct big_key_buf *buf;
++	unsigned int npg = (len + PAGE_SIZE - 1) >> PAGE_SHIFT;
++	unsigned int i, l;
++
++	buf = kzalloc(sizeof(struct big_key_buf) +
++		      sizeof(struct page) * npg +
++		      sizeof(struct scatterlist) * npg,
++		      GFP_KERNEL);
++	if (!buf)
++		return NULL;
++
++	buf->nr_pages = npg;
++	buf->sg = (void *)(buf->pages + npg);
++	sg_init_table(buf->sg, npg);
++
++	for (i = 0; i < buf->nr_pages; i++) {
++		buf->pages[i] = alloc_page(GFP_KERNEL);
++		if (!buf->pages[i])
++			goto nomem;
++
++		l = min(len, PAGE_SIZE);
++		sg_set_page(&buf->sg[i], buf->pages[i], l, 0);
++		len -= l;
++	}
++
++	buf->virt = vmap(buf->pages, buf->nr_pages, VM_MAP, PAGE_KERNEL);
++	if (!buf->virt)
++		goto nomem;
++
++	return buf;
++
++nomem:
++	big_key_free_buffer(buf);
++	return NULL;
++}
++
++/*
+  * Preparse a big key
+  */
+ int big_key_preparse(struct key_preparsed_payload *prep)
+ {
++	struct big_key_buf *buf;
+ 	struct path *path = (struct path *)&prep->payload.data[big_key_path];
+ 	struct file *file;
+ 	u8 *enckey;
+-	u8 *data = NULL;
+ 	ssize_t written;
+-	size_t datalen = prep->datalen;
++	size_t datalen = prep->datalen, enclen = datalen + ENC_AUTHTAG_SIZE;
+ 	int ret;
+ 
+-	ret = -EINVAL;
+ 	if (datalen <= 0 || datalen > 1024 * 1024 || !prep->data)
+-		goto error;
++		return -EINVAL;
+ 
+ 	/* Set an arbitrary quota */
+ 	prep->quotalen = 16;
+@@ -157,13 +222,12 @@ int big_key_preparse(struct key_preparsed_payload *prep)
+ 		 *
+ 		 * File content is stored encrypted with randomly generated key.
+ 		 */
+-		size_t enclen = datalen + ENC_AUTHTAG_SIZE;
+ 		loff_t pos = 0;
+ 
+-		data = kmalloc(enclen, GFP_KERNEL);
+-		if (!data)
++		buf = big_key_alloc_buffer(enclen);
++		if (!buf)
+ 			return -ENOMEM;
+-		memcpy(data, prep->data, datalen);
++		memcpy(buf->virt, prep->data, datalen);
+ 
+ 		/* generate random key */
+ 		enckey = kmalloc(ENC_KEY_SIZE, GFP_KERNEL);
+@@ -176,7 +240,7 @@ int big_key_preparse(struct key_preparsed_payload *prep)
+ 			goto err_enckey;
+ 
+ 		/* encrypt aligned data */
+-		ret = big_key_crypt(BIG_KEY_ENC, data, datalen, enckey);
++		ret = big_key_crypt(BIG_KEY_ENC, buf, datalen, enckey);
+ 		if (ret)
+ 			goto err_enckey;
+ 
+@@ -187,7 +251,7 @@ int big_key_preparse(struct key_preparsed_payload *prep)
+ 			goto err_enckey;
+ 		}
+ 
+-		written = kernel_write(file, data, enclen, &pos);
++		written = kernel_write(file, buf->virt, enclen, &pos);
+ 		if (written != enclen) {
+ 			ret = written;
+ 			if (written >= 0)
+@@ -202,7 +266,7 @@ int big_key_preparse(struct key_preparsed_payload *prep)
+ 		*path = file->f_path;
+ 		path_get(path);
+ 		fput(file);
+-		kzfree(data);
++		big_key_free_buffer(buf);
+ 	} else {
+ 		/* Just store the data in a buffer */
+ 		void *data = kmalloc(datalen, GFP_KERNEL);
+@@ -220,7 +284,7 @@ int big_key_preparse(struct key_preparsed_payload *prep)
+ err_enckey:
+ 	kzfree(enckey);
+ error:
+-	kzfree(data);
++	big_key_free_buffer(buf);
+ 	return ret;
+ }
+ 
+@@ -298,15 +362,15 @@ long big_key_read(const struct key *key, char __user *buffer, size_t buflen)
+ 		return datalen;
+ 
+ 	if (datalen > BIG_KEY_FILE_THRESHOLD) {
++		struct big_key_buf *buf;
+ 		struct path *path = (struct path *)&key->payload.data[big_key_path];
+ 		struct file *file;
+-		u8 *data;
+ 		u8 *enckey = (u8 *)key->payload.data[big_key_data];
+ 		size_t enclen = datalen + ENC_AUTHTAG_SIZE;
+ 		loff_t pos = 0;
+ 
+-		data = kmalloc(enclen, GFP_KERNEL);
+-		if (!data)
++		buf = big_key_alloc_buffer(enclen);
++		if (!buf)
+ 			return -ENOMEM;
+ 
+ 		file = dentry_open(path, O_RDONLY, current_cred());
+@@ -316,26 +380,26 @@ long big_key_read(const struct key *key, char __user *buffer, size_t buflen)
+ 		}
+ 
+ 		/* read file to kernel and decrypt */
+-		ret = kernel_read(file, data, enclen, &pos);
++		ret = kernel_read(file, buf->virt, enclen, &pos);
+ 		if (ret >= 0 && ret != enclen) {
+ 			ret = -EIO;
+ 			goto err_fput;
+ 		}
+ 
+-		ret = big_key_crypt(BIG_KEY_DEC, data, enclen, enckey);
++		ret = big_key_crypt(BIG_KEY_DEC, buf, enclen, enckey);
+ 		if (ret)
+ 			goto err_fput;
+ 
+ 		ret = datalen;
+ 
+ 		/* copy decrypted data to user */
+-		if (copy_to_user(buffer, data, datalen) != 0)
++		if (copy_to_user(buffer, buf->virt, datalen) != 0)
+ 			ret = -EFAULT;
+ 
+ err_fput:
+ 		fput(file);
+ error:
+-		kzfree(data);
++		big_key_free_buffer(buf);
+ 	} else {
+ 		ret = datalen;
+ 		if (copy_to_user(buffer, key->payload.data[big_key_data],
