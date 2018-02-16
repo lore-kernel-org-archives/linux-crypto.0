@@ -1,83 +1,108 @@
 From: Boris Brezillon <boris.brezillon@bootlin.com>
-Subject: [PATCH] Update Boris Brezillon email address
-Date: Fri, 16 Feb 2018 11:44:49 +0100
-Message-ID: <20180216104449.15546-1-boris.brezillon@bootlin.com>
+Subject: Re: [PATCH] Update Boris Brezillon email address
+Date: Fri, 16 Feb 2018 15:54:55 +0100
+Message-ID: <20180216155455.36168609@bbrezillon>
+References: <CGME20180216104523epcas3p1c45769e365a181963f8328237d270854@epcas3p1.samsung.com>
+        <20180216104449.15546-1-boris.brezillon@bootlin.com>
+        <dbe89241-4d05-d369-2894-fdc0b2d80b80@partner.samsung.com>
+        <20180216121619.3edad6fb@bbrezillon>
+        <4086d3a7-c79d-6906-2778-caccd647ffe6@partner.samsung.com>
+        <20180216150050.6051cc26@bbrezillon>
+        <138ed639-992d-2d87-4dd4-973323cdcad7@partner.samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
- Marek Vasut <marek.vasut@gmail.com>, David Airlie <airlied@linux.ie>,
- Richard Weinberger <richard@nod.at>, Mike Turquette <mturquette@baylibre.com>,
- Stephen Boyd <sboyd@codeaurora.org>, dri-devel@lists.freedesktop.org,
- linux-clk@vger.kernel.org, Boris Brezillon <boris.brezillon@bootlin.com>,
- linux-mtd@lists.infradead.org, linux-crypto@vger.kernel.org,
- Cyrille Pitchen <cyrille.pitchen@wedev4u.fr>,
- Brian Norris <computersforpeace@gmail.com>,
- David Woodhouse <dwmw2@infradead.org>, "David S. Miller" <davem@davemloft.net>
-To: linux-kernel@vger.kernel.org
-Return-path: <dri-devel-bounces@lists.freedesktop.org>
-List-Unsubscribe: <https://lists.freedesktop.org/mailman/options/dri-devel>,
- <mailto:dri-devel-request@lists.freedesktop.org?subject=unsubscribe>
-List-Archive: <https://lists.freedesktop.org/archives/dri-devel>
-List-Post: <mailto:dri-devel@lists.freedesktop.org>
-List-Help: <mailto:dri-devel-request@lists.freedesktop.org?subject=help>
-List-Subscribe: <https://lists.freedesktop.org/mailman/listinfo/dri-devel>,
- <mailto:dri-devel-request@lists.freedesktop.org?subject=subscribe>
-Errors-To: dri-devel-bounces@lists.freedesktop.org
-Sender: "dri-devel" <dri-devel-bounces@lists.freedesktop.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
+Cc: David Woodhouse <dwmw2@infradead.org>,
+        Brian Norris <computersforpeace@gmail.com>,
+        Boris Brezillon <boris.brezillon@bootlin.com>,
+        Marek Vasut <marek.vasut@gmail.com>,
+        Richard Weinberger <richard@nod.at>,
+        Cyrille Pitchen <cyrille.pitchen@wedev4u.fr>,
+        linux-mtd@lists.infradead.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org,
+        Mike Turquette <mturquette@baylibre.com>,
+        Stephen Boyd <sboyd@codeaurora.org>, linux-clk@vger.kernel.org,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org
+To: Kamil Konieczny <k.konieczny@partner.samsung.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <138ed639-992d-2d87-4dd4-973323cdcad7@partner.samsung.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-RnJlZSBFbGVjdHJvbnMgaXMgbm93IEJvb3RsaW4uCgpTaWduZWQtb2ZmLWJ5OiBCb3JpcyBCcmV6
-aWxsb24gPGJvcmlzLmJyZXppbGxvbkBib290bGluLmNvbT4KLS0tCk5vdGUgdGhhdCBJJ20gcGxh
-bm5pbmcgdG8gdGFrZSB0aGlzIHBhdGNoIHRocm91Z2ggdGhlIE1URCB0cmVlLgotLS0KIC5tYWls
-bWFwICAgIHwgIDcgKysrKy0tLQogTUFJTlRBSU5FUlMgfCAxMCArKysrKy0tLS0tCiAyIGZpbGVz
-IGNoYW5nZWQsIDkgaW5zZXJ0aW9ucygrKSwgOCBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS8u
-bWFpbG1hcCBiLy5tYWlsbWFwCmluZGV4IGUxOGNhYjczZTIwOS4uNTBjMWQ2YmYzNmIyIDEwMDY0
-NAotLS0gYS8ubWFpbG1hcAorKysgYi8ubWFpbG1hcApAQCAtMzMsOSArMzMsMTAgQEAgQXhlbCBM
-aW4gPGF4ZWwubGluQGdtYWlsLmNvbT4KIEJlbiBHYXJkbmVyIDxiZ2FyZG5lckB3YWJ0ZWMuY29t
-PgogQmVuIE0gQ2FoaWxsIDxiZW4ubS5jYWhpbGxAaW50ZWwuY29tPgogQmrDtnJuIFN0ZWluYnJp
-bmsgPEIuU3RlaW5icmlua0BnbXguZGU+Ci1Cb3JpcyBCcmV6aWxsb24gPGJvcmlzLmJyZXppbGxv
-bkBmcmVlLWVsZWN0cm9ucy5jb20+Ci1Cb3JpcyBCcmV6aWxsb24gPGJvcmlzLmJyZXppbGxvbkBm
-cmVlLWVsZWN0cm9ucy5jb20+IDxiLmJyZXppbGxvbi5kZXZAZ21haWwuY29tPgotQm9yaXMgQnJl
-emlsbG9uIDxib3Jpcy5icmV6aWxsb25AZnJlZS1lbGVjdHJvbnMuY29tPiA8Yi5icmV6aWxsb25A
-b3Zlcmtpei5jb20+CitCb3JpcyBCcmV6aWxsb24gPGJvcmlzLmJyZXppbGxvbkBib290bGluLmNv
-bT4KK0JvcmlzIEJyZXppbGxvbiA8Ym9yaXMuYnJlemlsbG9uQGJvb3RsaW4uY29tPiA8Ym9yaXMu
-YnJlemlsbG9uQGZyZWUtZWxlY3Ryb25zLmNvbT4KK0JvcmlzIEJyZXppbGxvbiA8Ym9yaXMuYnJl
-emlsbG9uQGJvb3RsaW4uY29tPiA8Yi5icmV6aWxsb24uZGV2QGdtYWlsLmNvbT4KK0JvcmlzIEJy
-ZXppbGxvbiA8Ym9yaXMuYnJlemlsbG9uQGJvb3RsaW4uY29tPiA8Yi5icmV6aWxsb25Ab3Zlcmtp
-ei5jb20+CiBCcmlhbiBBdmVyeSA8Yi5hdmVyeUBocC5jb20+CiBCcmlhbiBLaW5nIDxicmtpbmdA
-dXMuaWJtLmNvbT4KIENocmlzdG9waCBIZWxsd2lnIDxoY2hAbHN0LmRlPgpkaWZmIC0tZ2l0IGEv
-TUFJTlRBSU5FUlMgYi9NQUlOVEFJTkVSUwppbmRleCAzNGIyZTllZDZkM2QuLjM4ZmNiYWJiYzU1
-YiAxMDA2NDQKLS0tIGEvTUFJTlRBSU5FUlMKKysrIGIvTUFJTlRBSU5FUlMKQEAgLTEyMzIsNyAr
-MTIzMiw3IEBAIEY6CWFyY2gvYXJtL2Jvb3QvZHRzL2FzcGVlZC0qCiBGOglkcml2ZXJzLyovKmFz
-cGVlZCoKIAogQVJNL0FUTUVMIEFUOTEgQ2xvY2sgU3VwcG9ydAotTToJQm9yaXMgQnJlemlsbG9u
-IDxib3Jpcy5icmV6aWxsb25AZnJlZS1lbGVjdHJvbnMuY29tPgorTToJQm9yaXMgQnJlemlsbG9u
-IDxib3Jpcy5icmV6aWxsb25AYm9vdGxpbi5jb20+CiBTOglNYWludGFpbmVkCiBGOglkcml2ZXJz
-L2Nsay9hdDkxCiAKQEAgLTQ2NDQsNyArNDY0NCw3IEBAIEY6CURvY3VtZW50YXRpb24vZ3B1L21l
-c29uLnJzdAogVDoJZ2l0IGdpdDovL2Fub25naXQuZnJlZWRlc2t0b3Aub3JnL2RybS9kcm0tbWlz
-YwogCiBEUk0gRFJJVkVSUyBGT1IgQVRNRUwgSExDREMKLU06CUJvcmlzIEJyZXppbGxvbiA8Ym9y
-aXMuYnJlemlsbG9uQGZyZWUtZWxlY3Ryb25zLmNvbT4KK006CUJvcmlzIEJyZXppbGxvbiA8Ym9y
-aXMuYnJlemlsbG9uQGJvb3RsaW4uY29tPgogTDoJZHJpLWRldmVsQGxpc3RzLmZyZWVkZXNrdG9w
-Lm9yZwogUzoJU3VwcG9ydGVkCiBGOglkcml2ZXJzL2dwdS9kcm0vYXRtZWwtaGxjZGMvCkBAIC04
-NDEyLDcgKzg0MTIsNyBAQCBGOglpbmNsdWRlL3VhcGkvZHJtL2FybWFkYV9kcm0uaAogRjoJRG9j
-dW1lbnRhdGlvbi9kZXZpY2V0cmVlL2JpbmRpbmdzL2Rpc3BsYXkvYXJtYWRhLwogCiBNQVJWRUxM
-IENSWVBUTyBEUklWRVIKLU06CUJvcmlzIEJyZXppbGxvbiA8Ym9yaXMuYnJlemlsbG9uQGZyZWUt
-ZWxlY3Ryb25zLmNvbT4KK006CUJvcmlzIEJyZXppbGxvbiA8Ym9yaXMuYnJlemlsbG9uQGJvb3Rs
-aW4uY29tPgogTToJQXJuYXVkIEViYWxhcmQgPGFybm9AbmF0aXNiYWQub3JnPgogRjoJZHJpdmVy
-cy9jcnlwdG8vbWFydmVsbC8KIFM6CU1haW50YWluZWQKQEAgLTkwMzQsNyArOTAzNCw3IEBAIEY6
-CW1tLwogTUVNT1JZIFRFQ0hOT0xPR1kgREVWSUNFUyAoTVREKQogTToJRGF2aWQgV29vZGhvdXNl
-IDxkd213MkBpbmZyYWRlYWQub3JnPgogTToJQnJpYW4gTm9ycmlzIDxjb21wdXRlcnNmb3JwZWFj
-ZUBnbWFpbC5jb20+Ci1NOglCb3JpcyBCcmV6aWxsb24gPGJvcmlzLmJyZXppbGxvbkBmcmVlLWVs
-ZWN0cm9ucy5jb20+CitNOglCb3JpcyBCcmV6aWxsb24gPGJvcmlzLmJyZXppbGxvbkBib290bGlu
-LmNvbT4KIE06CU1hcmVrIFZhc3V0IDxtYXJlay52YXN1dEBnbWFpbC5jb20+CiBNOglSaWNoYXJk
-IFdlaW5iZXJnZXIgPHJpY2hhcmRAbm9kLmF0PgogTToJQ3lyaWxsZSBQaXRjaGVuIDxjeXJpbGxl
-LnBpdGNoZW5Ad2VkZXY0dS5mcj4KQEAgLTk0NTIsNyArOTQ1Miw3IEBAIFM6CVN1cHBvcnRlZAog
-RjoJZHJpdmVycy9uZXQvZXRoZXJuZXQvbXlyaWNvbS9teXJpMTBnZS8KIAogTkFORCBGTEFTSCBT
-VUJTWVNURU0KLU06CUJvcmlzIEJyZXppbGxvbiA8Ym9yaXMuYnJlemlsbG9uQGZyZWUtZWxlY3Ry
-b25zLmNvbT4KK006CUJvcmlzIEJyZXppbGxvbiA8Ym9yaXMuYnJlemlsbG9uQGJvb3RsaW4uY29t
-PgogUjoJUmljaGFyZCBXZWluYmVyZ2VyIDxyaWNoYXJkQG5vZC5hdD4KIEw6CWxpbnV4LW10ZEBs
-aXN0cy5pbmZyYWRlYWQub3JnCiBXOglodHRwOi8vd3d3LmxpbnV4LW10ZC5pbmZyYWRlYWQub3Jn
-LwotLSAKMi4xNC4xCgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fXwpkcmktZGV2ZWwgbWFpbGluZyBsaXN0CmRyaS1kZXZlbEBsaXN0cy5mcmVlZGVza3RvcC5v
-cmcKaHR0cHM6Ly9saXN0cy5mcmVlZGVza3RvcC5vcmcvbWFpbG1hbi9saXN0aW5mby9kcmktZGV2
-ZWwK
+Adding back all the people that were Cc-ed on the initial email.
+
+On Fri, 16 Feb 2018 15:18:21 +0100
+Kamil Konieczny <k.konieczny@partner.samsung.com> wrote:
+
+> On 16.02.2018 15:00, Boris Brezillon wrote:
+> > On Fri, 16 Feb 2018 12:21:53 +0100
+> > Kamil Konieczny <k.konieczny@partner.samsung.com> wrote:
+> >   
+> >> On 16.02.2018 12:16, Boris Brezillon wrote:  
+> >>> On Fri, 16 Feb 2018 12:07:42 +0100
+> >>> Kamil Konieczny <k.konieczny@partner.samsung.com> wrote:
+> >>>     
+> >>>> On 16.02.2018 11:44, Boris Brezillon wrote:    
+> >>>>> Free Electrons is now Bootlin.
+> >>>>>
+> >>>>> Signed-off-by: Boris Brezillon <boris.brezillon@bootlin.com>
+> >>>>> ---
+> >>>>> Note that I'm planning to take this patch through the MTD tree.
+> >>>>> ---
+> >>>>>  .mailmap    |  7 ++++---
+> >>>>>  MAINTAINERS | 10 +++++-----
+> >>>>>  2 files changed, 9 insertions(+), 8 deletions(-)
+> >>>>>
+> >>>>> diff --git a/.mailmap b/.mailmap
+> >>>>> index e18cab73e209..50c1d6bf36b2 100644
+> >>>>> --- a/.mailmap
+> >>>>> +++ b/.mailmap
+> >>>>> @@ -33,9 +33,10 @@ Axel Lin <axel.lin@gmail.com>
+> >>>>>  Ben Gardner <bgardner@wabtec.com>
+> >>>>>  Ben M Cahill <ben.m.cahill@intel.com>
+> >>>>>  Björn Steinbrink <B.Steinbrink@gmx.de>
+> >>>>> -Boris Brezillon <boris.brezillon@free-electrons.com>
+> >>>>> -Boris Brezillon <boris.brezillon@free-electrons.com> <b.brezillon.dev@gmail.com>
+> >>>>> -Boris Brezillon <boris.brezillon@free-electrons.com> <b.brezillon@overkiz.com>
+> >>>>> +Boris Brezillon <boris.brezillon@bootlin.com>
+> >>>>> +Boris Brezillon <boris.brezillon@bootlin.com> <boris.brezillon@free-electrons.com>      
+> >>>>
+> >>>> ------------------------------------------------------------------ ??????????????????    
+> >>>
+> >>> Is there a problem with this line?
+> >>>     
+> >>
+> >> I think you want to delete all 'free-electrons', yet here you add this  
+> > 
+> > I'm clearly not a git expert, but according to man git-shortlog [1], the
+> > format I'm using here allows mailmap to replace the old email by the
+> > new one, which is exactly what I want.
+> > 
+> > [1]https://git-scm.com/docs/git-shortlog
+> >   
+> 
+> Ah, I see, but why do you send patch for .mailmap ?
+> it is your private file, not global one, I do not want mine .mailmap
+> to be replaced by yours :)
+
+No, it's not private, it's part of the git tree.
+
+> But beside this, you can use sed script
+> 
+> sed -i -e 's/free-electrons/bootlin/g' .mailmap
+> 
+> Please just resend this with patch for MAINTAINER's only
+> 
+
+.mailmap is versioned for a good reason, and I don't see why I couldn't
+update entries for my emails, especially since those entries already
+existed before this patch.
+
+-- 
+Boris Brezillon, Bootlin (formerly Free Electrons)
+Embedded Linux and Kernel engineering
+http://bootlin.com
