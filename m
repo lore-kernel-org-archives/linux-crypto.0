@@ -1,99 +1,42 @@
-From: Boris Brezillon <boris.brezillon@bootlin.com>
-Subject: Re: [PATCH] Update Boris Brezillon email address
-Date: Fri, 16 Feb 2018 16:51:47 +0100
-Message-ID: <20180216165147.41c0d9e7@bbrezillon>
-References: <CGME20180216104523epcas3p1c45769e365a181963f8328237d270854@epcas3p1.samsung.com>
- <20180216104449.15546-1-boris.brezillon@bootlin.com>
- <dbe89241-4d05-d369-2894-fdc0b2d80b80@partner.samsung.com>
- <20180216121619.3edad6fb@bbrezillon>
- <4086d3a7-c79d-6906-2778-caccd647ffe6@partner.samsung.com>
- <20180216150050.6051cc26@bbrezillon>
- <138ed639-992d-2d87-4dd4-973323cdcad7@partner.samsung.com>
- <20180216155455.36168609@bbrezillon>
- <9c05d969-b488-fbc4-4143-6446d8a6d7ab@partner.samsung.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v2 0/6] crypto: engine - Permit to enqueue all async
+ requests
+Date: Sat, 17 Feb 2018 12:42:26 +0800
+Message-ID: <20180217044226.GA12701@gondor.apana.org.au>
+References: <20180126191534.17569-1-clabbe.montjoie@gmail.com>
+ <20180215155100.GJ7352@gondor.apana.org.au>
+ <20180216153656.GA22492@Red>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, David Airlie <airlied@linux.ie>,
- Richard Weinberger <richard@nod.at>, Mike Turquette <mturquette@baylibre.com>,
- Stephen Boyd <sboyd@codeaurora.org>, linux-kernel@vger.kernel.org,
- dri-devel@lists.freedesktop.org, linux-clk@vger.kernel.org,
- Marek Vasut <marek.vasut@gmail.com>, linux-mtd@lists.infradead.org,
- linux-crypto@vger.kernel.org, Cyrille Pitchen <cyrille.pitchen@wedev4u.fr>,
- Brian Norris <computersforpeace@gmail.com>,
- David Woodhouse <dwmw2@infradead.org>, "David S. Miller" <davem@davemloft.net>
-To: Kamil Konieczny <k.konieczny@partner.samsung.com>
-Return-path: <dri-devel-bounces@lists.freedesktop.org>
-In-Reply-To: <9c05d969-b488-fbc4-4143-6446d8a6d7ab@partner.samsung.com>
-List-Unsubscribe: <https://lists.freedesktop.org/mailman/options/dri-devel>,
- <mailto:dri-devel-request@lists.freedesktop.org?subject=unsubscribe>
-List-Archive: <https://lists.freedesktop.org/archives/dri-devel>
-List-Post: <mailto:dri-devel@lists.freedesktop.org>
-List-Help: <mailto:dri-devel-request@lists.freedesktop.org?subject=help>
-List-Subscribe: <https://lists.freedesktop.org/mailman/listinfo/dri-devel>,
- <mailto:dri-devel-request@lists.freedesktop.org?subject=subscribe>
-Errors-To: dri-devel-bounces@lists.freedesktop.org
-Sender: "dri-devel" <dri-devel-bounces@lists.freedesktop.org>
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: alexandre.torgue@st.com, arei.gonglei@huawei.com, corbet@lwn.net,
+        davem@davemloft.net, jasowang@redhat.com,
+        mcoquelin.stm32@gmail.com, mst@redhat.com, fabien.dessenne@st.com,
+        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-sunxi@googlegroups.com
+To: Corentin Labbe <clabbe.montjoie@gmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:43816 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750948AbeBQEmv (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 16 Feb 2018 23:42:51 -0500
+Content-Disposition: inline
+In-Reply-To: <20180216153656.GA22492@Red>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-T24gRnJpLCAxNiBGZWIgMjAxOCAxNjozNToyNyArMDEwMApLYW1pbCBLb25pZWN6bnkgPGsua29u
-aWVjem55QHBhcnRuZXIuc2Ftc3VuZy5jb20+IHdyb3RlOgoKPiBPbiAxNi4wMi4yMDE4IDE1OjU0
-LCBCb3JpcyBCcmV6aWxsb24gd3JvdGU6Cj4gPiBBZGRpbmcgYmFjayBhbGwgdGhlIHBlb3BsZSB0
-aGF0IHdlcmUgQ2MtZWQgb24gdGhlIGluaXRpYWwgZW1haWwuCj4gPiAKPiA+IE9uIEZyaSwgMTYg
-RmViIDIwMTggMTU6MTg6MjEgKzAxMDAKPiA+IEthbWlsIEtvbmllY3pueSA8ay5rb25pZWN6bnlA
-cGFydG5lci5zYW1zdW5nLmNvbT4gd3JvdGU6Cj4gPiAgIAo+ID4+IE9uIDE2LjAyLjIwMTggMTU6
-MDAsIEJvcmlzIEJyZXppbGxvbiB3cm90ZTogIAo+ID4+PiBPbiBGcmksIDE2IEZlYiAyMDE4IDEy
-OjIxOjUzICswMTAwCj4gPj4+IEthbWlsIEtvbmllY3pueSA8ay5rb25pZWN6bnlAcGFydG5lci5z
-YW1zdW5nLmNvbT4gd3JvdGU6Cj4gPj4+ICAgICAKPiA+Pj4+IE9uIDE2LjAyLjIwMTggMTI6MTYs
-IEJvcmlzIEJyZXppbGxvbiB3cm90ZTogICAgCj4gPj4+Pj4gT24gRnJpLCAxNiBGZWIgMjAxOCAx
-MjowNzo0MiArMDEwMAo+ID4+Pj4+IEthbWlsIEtvbmllY3pueSA8ay5rb25pZWN6bnlAcGFydG5l
-ci5zYW1zdW5nLmNvbT4gd3JvdGU6Cj4gPj4+Pj4gICAgICAgCj4gPj4+Pj4+IE9uIDE2LjAyLjIw
-MTggMTE6NDQsIEJvcmlzIEJyZXppbGxvbiB3cm90ZTogICAgICAKPiA+Pj4+Pj4+IEZyZWUgRWxl
-Y3Ryb25zIGlzIG5vdyBCb290bGluLgo+ID4+Pj4+Pj4KPiA+Pj4+Pj4+IFNpZ25lZC1vZmYtYnk6
-IEJvcmlzIEJyZXppbGxvbiA8Ym9yaXMuYnJlemlsbG9uQGJvb3RsaW4uY29tPgo+ID4+Pj4+Pj4g
-LS0tCj4gPj4+Pj4+PiBOb3RlIHRoYXQgSSdtIHBsYW5uaW5nIHRvIHRha2UgdGhpcyBwYXRjaCB0
-aHJvdWdoIHRoZSBNVEQgdHJlZS4KPiA+Pj4+Pj4+IC0tLQo+ID4+Pj4+Pj4gIC5tYWlsbWFwICAg
-IHwgIDcgKysrKy0tLQo+ID4+Pj4+Pj4gIE1BSU5UQUlORVJTIHwgMTAgKysrKystLS0tLQo+ID4+
-Pj4+Pj4gIDIgZmlsZXMgY2hhbmdlZCwgOSBpbnNlcnRpb25zKCspLCA4IGRlbGV0aW9ucygtKQo+
-ID4+Pj4+Pj4KPiA+Pj4+Pj4+IGRpZmYgLS1naXQgYS8ubWFpbG1hcCBiLy5tYWlsbWFwCj4gPj4+
-Pj4+PiBpbmRleCBlMThjYWI3M2UyMDkuLjUwYzFkNmJmMzZiMiAxMDA2NDQKPiA+Pj4+Pj4+IC0t
-LSBhLy5tYWlsbWFwCj4gPj4+Pj4+PiArKysgYi8ubWFpbG1hcAo+ID4+Pj4+Pj4gQEAgLTMzLDkg
-KzMzLDEwIEBAIEF4ZWwgTGluIDxheGVsLmxpbkBnbWFpbC5jb20+Cj4gPj4+Pj4+PiAgQmVuIEdh
-cmRuZXIgPGJnYXJkbmVyQHdhYnRlYy5jb20+Cj4gPj4+Pj4+PiAgQmVuIE0gQ2FoaWxsIDxiZW4u
-bS5jYWhpbGxAaW50ZWwuY29tPgo+ID4+Pj4+Pj4gIEJqw7ZybiBTdGVpbmJyaW5rIDxCLlN0ZWlu
-YnJpbmtAZ214LmRlPgo+ID4+Pj4+Pj4gLUJvcmlzIEJyZXppbGxvbiA8Ym9yaXMuYnJlemlsbG9u
-QGZyZWUtZWxlY3Ryb25zLmNvbT4KPiA+Pj4+Pj4+IC1Cb3JpcyBCcmV6aWxsb24gPGJvcmlzLmJy
-ZXppbGxvbkBmcmVlLWVsZWN0cm9ucy5jb20+IDxiLmJyZXppbGxvbi5kZXZAZ21haWwuY29tPgo+
-ID4+Pj4+Pj4gLUJvcmlzIEJyZXppbGxvbiA8Ym9yaXMuYnJlemlsbG9uQGZyZWUtZWxlY3Ryb25z
-LmNvbT4gPGIuYnJlemlsbG9uQG92ZXJraXouY29tPgo+ID4+Pj4+Pj4gK0JvcmlzIEJyZXppbGxv
-biA8Ym9yaXMuYnJlemlsbG9uQGJvb3RsaW4uY29tPgo+ID4+Pj4+Pj4gK0JvcmlzIEJyZXppbGxv
-biA8Ym9yaXMuYnJlemlsbG9uQGJvb3RsaW4uY29tPiA8Ym9yaXMuYnJlemlsbG9uQGZyZWUtZWxl
-Y3Ryb25zLmNvbT4gICAgICAgIAo+ID4+Pj4+Pgo+ID4+Pj4+PiAtLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0gPz8/Pz8/Pz8/
-Pz8/Pz8/Pz8/ICAgICAgCj4gPj4+Pj4KPiA+Pj4+PiBJcyB0aGVyZSBhIHByb2JsZW0gd2l0aCB0
-aGlzIGxpbmU/Cj4gPj4+Pj4gICAgICAgCj4gPj4+Pgo+ID4+Pj4gSSB0aGluayB5b3Ugd2FudCB0
-byBkZWxldGUgYWxsICdmcmVlLWVsZWN0cm9ucycsIHlldCBoZXJlIHlvdSBhZGQgdGhpcyAgICAK
-PiA+Pj4KPiA+Pj4gSSdtIGNsZWFybHkgbm90IGEgZ2l0IGV4cGVydCwgYnV0IGFjY29yZGluZyB0
-byBtYW4gZ2l0LXNob3J0bG9nIFsxXSwgdGhlCj4gPj4+IGZvcm1hdCBJJ20gdXNpbmcgaGVyZSBh
-bGxvd3MgbWFpbG1hcCB0byByZXBsYWNlIHRoZSBvbGQgZW1haWwgYnkgdGhlCj4gPj4+IG5ldyBv
-bmUsIHdoaWNoIGlzIGV4YWN0bHkgd2hhdCBJIHdhbnQuCj4gPj4+Cj4gPj4+IFsxXWh0dHBzOi8v
-Z2l0LXNjbS5jb20vZG9jcy9naXQtc2hvcnRsb2cKPiA+Pj4gICAgIAo+ID4+Cj4gPj4gQWgsIEkg
-c2VlLCBidXQgd2h5IGRvIHlvdSBzZW5kIHBhdGNoIGZvciAubWFpbG1hcCA/Cj4gPj4gaXQgaXMg
-eW91ciBwcml2YXRlIGZpbGUsIG5vdCBnbG9iYWwgb25lLCBJIGRvIG5vdCB3YW50IG1pbmUgLm1h
-aWxtYXAKPiA+PiB0byBiZSByZXBsYWNlZCBieSB5b3VycyA6KSAgCj4gPiAKPiA+IE5vLCBpdCdz
-IG5vdCBwcml2YXRlLCBpdCdzIHBhcnQgb2YgdGhlIGdpdCB0cmVlLgo+ID4gICAKPiA+PiBCdXQg
-YmVzaWRlIHRoaXMsIHlvdSBjYW4gdXNlIHNlZCBzY3JpcHQKPiA+Pgo+ID4+IHNlZCAtaSAtZSAn
-cy9mcmVlLWVsZWN0cm9ucy9ib290bGluL2cnIC5tYWlsbWFwCj4gPj4KPiA+PiBQbGVhc2UganVz
-dCByZXNlbmQgdGhpcyB3aXRoIHBhdGNoIGZvciBNQUlOVEFJTkVSJ3Mgb25seQo+ID4+ICAKPiA+
-IAo+ID4gLm1haWxtYXAgaXMgdmVyc2lvbmVkIGZvciBhIGdvb2QgcmVhc29uLCBhbmQgSSBkb24n
-dCBzZWUgd2h5IEkgY291bGRuJ3QKPiA+IHVwZGF0ZSBlbnRyaWVzIGZvciBteSBlbWFpbHMsIGVz
-cGVjaWFsbHkgc2luY2UgdGhvc2UgZW50cmllcyBhbHJlYWR5Cj4gPiBleGlzdGVkIGJlZm9yZSB0
-aGlzIHBhdGNoLiAgCj4gCj4gSSBhbSBuZXdiaWUsIGl0IGxvb2tzIHlvdSBhcmUgcmlnaHQsIHNv
-cnJ5IGZvciBxdWVzdGlvbnMuCj4gCgpObyBwcm9ibGVtLCBidXQgd2hlbiB5b3UncmUgbm90IHN1
-cmUgYWJvdXQgc29tZXRoaW5nIHlvdSBzaG91bGQgbm90IGFjdApsaWtlIHlvdSBrbm93IGhvdyB0
-aGluZ3Mgc2hvdWxkIGJlIGRvbmUuCgpSZWdhcmRzLAoKQm9yaXMKCi0tIApCb3JpcyBCcmV6aWxs
-b24sIEJvb3RsaW4gKGZvcm1lcmx5IEZyZWUgRWxlY3Ryb25zKQpFbWJlZGRlZCBMaW51eCBhbmQg
-S2VybmVsIGVuZ2luZWVyaW5nCmh0dHA6Ly9ib290bGluLmNvbQpfX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fXwpkcmktZGV2ZWwgbWFpbGluZyBsaXN0CmRyaS1k
-ZXZlbEBsaXN0cy5mcmVlZGVza3RvcC5vcmcKaHR0cHM6Ly9saXN0cy5mcmVlZGVza3RvcC5vcmcv
-bWFpbG1hbi9saXN0aW5mby9kcmktZGV2ZWwK
+On Fri, Feb 16, 2018 at 04:36:56PM +0100, Corentin Labbe wrote:
+>
+> As mentionned in the cover letter, all patchs (except documentation one) should be squashed.
+> A kbuild robot reported a build error on cryptodev due to this.
+
+It's too late now.  In future if you want the patches to be squashed
+then please send them in one email.
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
