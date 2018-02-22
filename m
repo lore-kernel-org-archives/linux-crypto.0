@@ -1,47 +1,52 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH Resend 0/5] hwrng: stm32 - Improvement for stm32-rng
-Date: Thu, 22 Feb 2018 22:03:29 +0800
-Message-ID: <20180222140328.GE28447@gondor.apana.org.au>
-References: <20180215130312.23612-1-lionel.debieve@st.com>
+Subject: Re: [PATCH 16/18] crypto: talitos - do hw_context DMA mapping
+ outside the requests
+Date: Thu, 22 Feb 2018 21:46:24 +0800
+Message-ID: <20180222134624.GD28447@gondor.apana.org.au>
+References: <2338eb8d-a26a-9722-d667-5a9785b32977@c-s.fr>
+ <VI1PR0402MB3342D90D574C8829701882BE98C90@VI1PR0402MB3342.eurprd04.prod.outlook.com>
+ <630c313c-5eca-224d-a5ac-fb3f2783573a@c-s.fr>
+ <VI1PR0402MB334256E1706A4E1AED09F4A598C80@VI1PR0402MB3342.eurprd04.prod.outlook.com>
+ <d5809df9-fc17-03da-b7f4-038d973dbd1f@c-s.fr>
+ <VI1PR0402MB334299B37F17771BFA9AFDDA98C80@VI1PR0402MB3342.eurprd04.prod.outlook.com>
+ <20180220103436.GA20571@gondor.apana.org.au>
+ <VI1PR0402MB3342B99A1BEA5622F29F79EF98CF0@VI1PR0402MB3342.eurprd04.prod.outlook.com>
+ <20180222114741.GA27631@gondor.apana.org.au>
+ <AM0PR0402MB3329F899D4777EE356BBE2B698CD0@AM0PR0402MB3329.eurprd04.prod.outlook.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Rob Herring <rob.herring@linaro.org>,
- Alexandre Torgue <alexandre.torgue@st.com>, Arnd Bergmann <arnd@arndb.de>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>, linux-kernel@vger.kernel.org,
- linux-crypto@vger.kernel.org, Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Matt Mackall <mpm@selenic.com>, Ludovic Barre <ludovic.barre@st.com>,
- linux-arm-kernel@lists.infradead.org,
- Benjamin Gaignard <benjamin.gaignard@st.com>
-To: Lionel Debieve <lionel.debieve@st.com>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+ "David S. Miller" <davem@davemloft.net>,
+ "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+To: Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>
+Return-path: <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
 Content-Disposition: inline
-In-Reply-To: <20180215130312.23612-1-lionel.debieve@st.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+In-Reply-To: <AM0PR0402MB3329F899D4777EE356BBE2B698CD0@AM0PR0402MB3329.eurprd04.prod.outlook.com>
+List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
+List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev/>
+List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
+List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
+List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
+Errors-To: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
+Sender: "Linuxppc-dev"
+ <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Feb 15, 2018 at 02:03:07PM +0100, Lionel Debieve wrote:
-> This set of patches add extended functionalities for stm32 rng
-> driver.
-> Patch #1 includes a reset during probe to avoid any error status
-> which can occur during bootup process and keep safe rng integrity.
-> 
-> Patch #3 adds a new property to manage the clock error detection
-> feature which can be disabled on specific target.
-> 
-> Patch #5 rework the timeout calculation for read value that was
-> previously defined based on loop operation and is now based on
-> timer.
+On Thu, Feb 22, 2018 at 12:29:28PM +0000, Horia Geantă wrote:
+>
+> IIUC this means that there is no room for improvement.
+> This patch needs to be reverted, to restore previous behaviour when the
+> hw_context was mapped / unmapped for every request.
 
-I should take only patches 1/3/5, right?
+In general we should avoid trying to do batching in drivers.  Such
+optimisations should instead be done at a higher level.  For example,
+for disk encryption we want to do the aggregation at the block layer
+rather than the crypto API because that has innate knowledge of the
+data layout which we can only guess.
 
 Cheers,
 -- 
