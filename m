@@ -1,18 +1,22 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: arm/aes-cipher - move S-box to .rodata section
-Date: Thu, 22 Feb 2018 23:11:38 +0800
-Message-ID: <20180222151138.GC29815@gondor.apana.org.au>
-References: <20180212135237.GA3011@pjb1027-Latitude-E5410>
+Subject: Re: [PATCH] hwrng: bcm2835: Handle deferred clock properly
+Date: Thu, 22 Feb 2018 23:11:49 +0800
+Message-ID: <20180222151149.GD29815@gondor.apana.org.au>
+References: <1518466296-30161-1-git-send-email-stefan.wahren@i2se.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Cc: ard.biesheuvel@linaro.org, davem@davemloft.net,
- linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org
-To: Jinbum Park <jinb.park7@gmail.com>
+Cc: Florian Fainelli <f.fainelli@gmail.com>,
+ Scott Branden <sbranden@broadcom.com>, Arnd Bergmann <arnd@arndb.de>,
+ Jon Mason <jonmason@broadcom.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Matt Mackall <mpm@selenic.com>, Eric Anholt <eric@anholt.net>,
+ bcm-kernel-feedback-list@broadcom.com, linux-crypto@vger.kernel.org,
+ Ray Jui <rjui@broadcom.com>, linux-arm-kernel@lists.infradead.org
+To: Stefan Wahren <stefan.wahren@i2se.com>
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 Content-Disposition: inline
-In-Reply-To: <20180212135237.GA3011@pjb1027-Latitude-E5410>
+In-Reply-To: <1518466296-30161-1-git-send-email-stefan.wahren@i2se.com>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -24,11 +28,13 @@ Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Feb 12, 2018 at 10:52:37PM +0900, Jinbum Park wrote:
-> Move the AES inverse S-box to the .rodata section
-> where it is safe from abuse by speculation.
+On Mon, Feb 12, 2018 at 09:11:36PM +0100, Stefan Wahren wrote:
+> In case the probe of the clock is deferred, we would assume it is
+> optional. This is wrong, so defer the probe of this driver until
+> the clock is available.
 > 
-> Signed-off-by: Jinbum Park <jinb.park7@gmail.com>
+> Fixes: 791af4f4907a ("hwrng: bcm2835 - Manage an optional clock")
+> Signed-off-by: Stefan Wahren <stefan.wahren@i2se.com>
 
 Patch applied.  Thanks.
 -- 
