@@ -1,68 +1,91 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 16/18] crypto: talitos - do hw_context DMA mapping
- outside the requests
-Date: Thu, 22 Feb 2018 19:47:41 +0800
-Message-ID: <20180222114741.GA27631@gondor.apana.org.au>
-References: <e47bf94ae44f23230b1647e31c9623f1075d3b79.1507284818.git.christophe.leroy@c-s.fr>
- <VI1PR0402MB3342A0A8530F74D408CA2F0298FC0@VI1PR0402MB3342.eurprd04.prod.outlook.com>
- <2338eb8d-a26a-9722-d667-5a9785b32977@c-s.fr>
- <VI1PR0402MB3342D90D574C8829701882BE98C90@VI1PR0402MB3342.eurprd04.prod.outlook.com>
- <630c313c-5eca-224d-a5ac-fb3f2783573a@c-s.fr>
- <VI1PR0402MB334256E1706A4E1AED09F4A598C80@VI1PR0402MB3342.eurprd04.prod.outlook.com>
- <d5809df9-fc17-03da-b7f4-038d973dbd1f@c-s.fr>
- <VI1PR0402MB334299B37F17771BFA9AFDDA98C80@VI1PR0402MB3342.eurprd04.prod.outlook.com>
- <20180220103436.GA20571@gondor.apana.org.au>
- <VI1PR0402MB3342B99A1BEA5622F29F79EF98CF0@VI1PR0402MB3342.eurprd04.prod.outlook.com>
+From: Boris Brezillon <boris.brezillon@bootlin.com>
+Subject: Re: [PATCH] Update Boris Brezillon email address
+Date: Thu, 22 Feb 2018 13:38:24 +0100
+Message-ID: <20180222133824.6494645f@bbrezillon>
+References: <20180216104449.15546-1-boris.brezillon@bootlin.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
- "David S. Miller" <davem@davemloft.net>,
- "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>
-Return-path: <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
-Content-Disposition: inline
-In-Reply-To: <VI1PR0402MB3342B99A1BEA5622F29F79EF98CF0@VI1PR0402MB3342.eurprd04.prod.outlook.com>
-List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
- <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
-List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev/>
-List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
-List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
-List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
- <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
-Errors-To: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
-Sender: "Linuxppc-dev"
- <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, David Airlie <airlied@linux.ie>,
+ Richard Weinberger <richard@nod.at>, Mike Turquette <mturquette@baylibre.com>,
+ Stephen Boyd <sboyd@codeaurora.org>, dri-devel@lists.freedesktop.org,
+ "David S. Miller" <davem@davemloft.net>, Marek Vasut <marek.vasut@gmail.com>,
+ linux-mtd@lists.infradead.org, linux-crypto@vger.kernel.org,
+ Cyrille Pitchen <cyrille.pitchen@wedev4u.fr>,
+ Brian Norris <computersforpeace@gmail.com>,
+ David Woodhouse <dwmw2@infradead.org>, linux-clk@vger.kernel.org
+To: linux-kernel@vger.kernel.org
+Return-path: <dri-devel-bounces@lists.freedesktop.org>
+In-Reply-To: <20180216104449.15546-1-boris.brezillon@bootlin.com>
+List-Unsubscribe: <https://lists.freedesktop.org/mailman/options/dri-devel>,
+ <mailto:dri-devel-request@lists.freedesktop.org?subject=unsubscribe>
+List-Archive: <https://lists.freedesktop.org/archives/dri-devel>
+List-Post: <mailto:dri-devel@lists.freedesktop.org>
+List-Help: <mailto:dri-devel-request@lists.freedesktop.org?subject=help>
+List-Subscribe: <https://lists.freedesktop.org/mailman/listinfo/dri-devel>,
+ <mailto:dri-devel-request@lists.freedesktop.org?subject=subscribe>
+Errors-To: dri-devel-bounces@lists.freedesktop.org
+Sender: "dri-devel" <dri-devel-bounces@lists.freedesktop.org>
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Feb 20, 2018 at 11:32:25AM +0000, Horia Geantă wrote:
->
-> If final/finup is optional, how is the final hash supposed to be retrieved?
-
-Sometimes the computation ends with a partial hash, that's what
-export is for.  Also it is completely legal to abandon the hash
-state entirely.
-
-> According to documentation, these are the accepted flows (with the option to
-> export/import a partial hash b/w update and final/finup):
-> 
-> .init() -> .update() -> .final()
->             ^    |         |
->             '----'         '---> HASH
-> 
-> .init() -> .update() -> .finup()
->             ^    |         |
->             '----'         '---> HASH
-> 
->            .digest()
->                |
->                '---------------> HASH
-
-The documentation is simply incomplete in this regard.
-
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+T24gRnJpLCAxNiBGZWIgMjAxOCAxMTo0NDo0OSArMDEwMApCb3JpcyBCcmV6aWxsb24gPGJvcmlz
+LmJyZXppbGxvbkBib290bGluLmNvbT4gd3JvdGU6Cgo+IEZyZWUgRWxlY3Ryb25zIGlzIG5vdyBC
+b290bGluLgo+IAo+IFNpZ25lZC1vZmYtYnk6IEJvcmlzIEJyZXppbGxvbiA8Ym9yaXMuYnJlemls
+bG9uQGJvb3RsaW4uY29tPgo+IC0tLQo+IE5vdGUgdGhhdCBJJ20gcGxhbm5pbmcgdG8gdGFrZSB0
+aGlzIHBhdGNoIHRocm91Z2ggdGhlIE1URCB0cmVlLgoKQXBwbGllZCB0byB0aGUgbmFuZC9uZXh0
+IGJyYW5jaCBvZiB0aGUgTVREIHRyZWUuCgo+IC0tLQo+ICAubWFpbG1hcCAgICB8ICA3ICsrKyst
+LS0KPiAgTUFJTlRBSU5FUlMgfCAxMCArKysrKy0tLS0tCj4gIDIgZmlsZXMgY2hhbmdlZCwgOSBp
+bnNlcnRpb25zKCspLCA4IGRlbGV0aW9ucygtKQo+IAo+IGRpZmYgLS1naXQgYS8ubWFpbG1hcCBi
+Ly5tYWlsbWFwCj4gaW5kZXggZTE4Y2FiNzNlMjA5Li41MGMxZDZiZjM2YjIgMTAwNjQ0Cj4gLS0t
+IGEvLm1haWxtYXAKPiArKysgYi8ubWFpbG1hcAo+IEBAIC0zMyw5ICszMywxMCBAQCBBeGVsIExp
+biA8YXhlbC5saW5AZ21haWwuY29tPgo+ICBCZW4gR2FyZG5lciA8YmdhcmRuZXJAd2FidGVjLmNv
+bT4KPiAgQmVuIE0gQ2FoaWxsIDxiZW4ubS5jYWhpbGxAaW50ZWwuY29tPgo+ICBCasO2cm4gU3Rl
+aW5icmluayA8Qi5TdGVpbmJyaW5rQGdteC5kZT4KPiAtQm9yaXMgQnJlemlsbG9uIDxib3Jpcy5i
+cmV6aWxsb25AZnJlZS1lbGVjdHJvbnMuY29tPgo+IC1Cb3JpcyBCcmV6aWxsb24gPGJvcmlzLmJy
+ZXppbGxvbkBmcmVlLWVsZWN0cm9ucy5jb20+IDxiLmJyZXppbGxvbi5kZXZAZ21haWwuY29tPgo+
+IC1Cb3JpcyBCcmV6aWxsb24gPGJvcmlzLmJyZXppbGxvbkBmcmVlLWVsZWN0cm9ucy5jb20+IDxi
+LmJyZXppbGxvbkBvdmVya2l6LmNvbT4KPiArQm9yaXMgQnJlemlsbG9uIDxib3Jpcy5icmV6aWxs
+b25AYm9vdGxpbi5jb20+Cj4gK0JvcmlzIEJyZXppbGxvbiA8Ym9yaXMuYnJlemlsbG9uQGJvb3Rs
+aW4uY29tPiA8Ym9yaXMuYnJlemlsbG9uQGZyZWUtZWxlY3Ryb25zLmNvbT4KPiArQm9yaXMgQnJl
+emlsbG9uIDxib3Jpcy5icmV6aWxsb25AYm9vdGxpbi5jb20+IDxiLmJyZXppbGxvbi5kZXZAZ21h
+aWwuY29tPgo+ICtCb3JpcyBCcmV6aWxsb24gPGJvcmlzLmJyZXppbGxvbkBib290bGluLmNvbT4g
+PGIuYnJlemlsbG9uQG92ZXJraXouY29tPgo+ICBCcmlhbiBBdmVyeSA8Yi5hdmVyeUBocC5jb20+
+Cj4gIEJyaWFuIEtpbmcgPGJya2luZ0B1cy5pYm0uY29tPgo+ICBDaHJpc3RvcGggSGVsbHdpZyA8
+aGNoQGxzdC5kZT4KPiBkaWZmIC0tZ2l0IGEvTUFJTlRBSU5FUlMgYi9NQUlOVEFJTkVSUwo+IGlu
+ZGV4IDM0YjJlOWVkNmQzZC4uMzhmY2JhYmJjNTViIDEwMDY0NAo+IC0tLSBhL01BSU5UQUlORVJT
+Cj4gKysrIGIvTUFJTlRBSU5FUlMKPiBAQCAtMTIzMiw3ICsxMjMyLDcgQEAgRjoJYXJjaC9hcm0v
+Ym9vdC9kdHMvYXNwZWVkLSoKPiAgRjoJZHJpdmVycy8qLyphc3BlZWQqCj4gIAo+ICBBUk0vQVRN
+RUwgQVQ5MSBDbG9jayBTdXBwb3J0Cj4gLU06CUJvcmlzIEJyZXppbGxvbiA8Ym9yaXMuYnJlemls
+bG9uQGZyZWUtZWxlY3Ryb25zLmNvbT4KPiArTToJQm9yaXMgQnJlemlsbG9uIDxib3Jpcy5icmV6
+aWxsb25AYm9vdGxpbi5jb20+Cj4gIFM6CU1haW50YWluZWQKPiAgRjoJZHJpdmVycy9jbGsvYXQ5
+MQo+ICAKPiBAQCAtNDY0NCw3ICs0NjQ0LDcgQEAgRjoJRG9jdW1lbnRhdGlvbi9ncHUvbWVzb24u
+cnN0Cj4gIFQ6CWdpdCBnaXQ6Ly9hbm9uZ2l0LmZyZWVkZXNrdG9wLm9yZy9kcm0vZHJtLW1pc2MK
+PiAgCj4gIERSTSBEUklWRVJTIEZPUiBBVE1FTCBITENEQwo+IC1NOglCb3JpcyBCcmV6aWxsb24g
+PGJvcmlzLmJyZXppbGxvbkBmcmVlLWVsZWN0cm9ucy5jb20+Cj4gK006CUJvcmlzIEJyZXppbGxv
+biA8Ym9yaXMuYnJlemlsbG9uQGJvb3RsaW4uY29tPgo+ICBMOglkcmktZGV2ZWxAbGlzdHMuZnJl
+ZWRlc2t0b3Aub3JnCj4gIFM6CVN1cHBvcnRlZAo+ICBGOglkcml2ZXJzL2dwdS9kcm0vYXRtZWwt
+aGxjZGMvCj4gQEAgLTg0MTIsNyArODQxMiw3IEBAIEY6CWluY2x1ZGUvdWFwaS9kcm0vYXJtYWRh
+X2RybS5oCj4gIEY6CURvY3VtZW50YXRpb24vZGV2aWNldHJlZS9iaW5kaW5ncy9kaXNwbGF5L2Fy
+bWFkYS8KPiAgCj4gIE1BUlZFTEwgQ1JZUFRPIERSSVZFUgo+IC1NOglCb3JpcyBCcmV6aWxsb24g
+PGJvcmlzLmJyZXppbGxvbkBmcmVlLWVsZWN0cm9ucy5jb20+Cj4gK006CUJvcmlzIEJyZXppbGxv
+biA8Ym9yaXMuYnJlemlsbG9uQGJvb3RsaW4uY29tPgo+ICBNOglBcm5hdWQgRWJhbGFyZCA8YXJu
+b0BuYXRpc2JhZC5vcmc+Cj4gIEY6CWRyaXZlcnMvY3J5cHRvL21hcnZlbGwvCj4gIFM6CU1haW50
+YWluZWQKPiBAQCAtOTAzNCw3ICs5MDM0LDcgQEAgRjoJbW0vCj4gIE1FTU9SWSBURUNITk9MT0dZ
+IERFVklDRVMgKE1URCkKPiAgTToJRGF2aWQgV29vZGhvdXNlIDxkd213MkBpbmZyYWRlYWQub3Jn
+Pgo+ICBNOglCcmlhbiBOb3JyaXMgPGNvbXB1dGVyc2ZvcnBlYWNlQGdtYWlsLmNvbT4KPiAtTToJ
+Qm9yaXMgQnJlemlsbG9uIDxib3Jpcy5icmV6aWxsb25AZnJlZS1lbGVjdHJvbnMuY29tPgo+ICtN
+OglCb3JpcyBCcmV6aWxsb24gPGJvcmlzLmJyZXppbGxvbkBib290bGluLmNvbT4KPiAgTToJTWFy
+ZWsgVmFzdXQgPG1hcmVrLnZhc3V0QGdtYWlsLmNvbT4KPiAgTToJUmljaGFyZCBXZWluYmVyZ2Vy
+IDxyaWNoYXJkQG5vZC5hdD4KPiAgTToJQ3lyaWxsZSBQaXRjaGVuIDxjeXJpbGxlLnBpdGNoZW5A
+d2VkZXY0dS5mcj4KPiBAQCAtOTQ1Miw3ICs5NDUyLDcgQEAgUzoJU3VwcG9ydGVkCj4gIEY6CWRy
+aXZlcnMvbmV0L2V0aGVybmV0L215cmljb20vbXlyaTEwZ2UvCj4gIAo+ICBOQU5EIEZMQVNIIFNV
+QlNZU1RFTQo+IC1NOglCb3JpcyBCcmV6aWxsb24gPGJvcmlzLmJyZXppbGxvbkBmcmVlLWVsZWN0
+cm9ucy5jb20+Cj4gK006CUJvcmlzIEJyZXppbGxvbiA8Ym9yaXMuYnJlemlsbG9uQGJvb3RsaW4u
+Y29tPgo+ICBSOglSaWNoYXJkIFdlaW5iZXJnZXIgPHJpY2hhcmRAbm9kLmF0Pgo+ICBMOglsaW51
+eC1tdGRAbGlzdHMuaW5mcmFkZWFkLm9yZwo+ICBXOglodHRwOi8vd3d3LmxpbnV4LW10ZC5pbmZy
+YWRlYWQub3JnLwoKCgotLSAKQm9yaXMgQnJlemlsbG9uLCBCb290bGluIChmb3JtZXJseSBGcmVl
+IEVsZWN0cm9ucykKRW1iZWRkZWQgTGludXggYW5kIEtlcm5lbCBlbmdpbmVlcmluZwpodHRwczov
+L2Jvb3RsaW4uY29tCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fCmRyaS1kZXZlbCBtYWlsaW5nIGxpc3QKZHJpLWRldmVsQGxpc3RzLmZyZWVkZXNrdG9wLm9y
+ZwpodHRwczovL2xpc3RzLmZyZWVkZXNrdG9wLm9yZy9tYWlsbWFuL2xpc3RpbmZvL2RyaS1kZXZl
+bAo=
