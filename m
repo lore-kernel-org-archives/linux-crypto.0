@@ -1,23 +1,29 @@
-From: Christophe LEROY <christophe.leroy@c-s.fr>
-Subject: Re: [PATCH 4.14, 4.9] crypto: talitos - fix Kernel Oops on hashing an
- empty file
-Date: Thu, 22 Feb 2018 11:17:52 +0100
-Message-ID: <2477a391-ab2c-5454-af00-2507269662fb@c-s.fr>
-References: <20180222070616.A15E36CBD4@po15720vm.idsi0.si.c-s.fr>
- <AM0PR0402MB3329F7DB21610C75674BA7AD98CD0@AM0PR0402MB3329.eurprd04.prod.outlook.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 16/18] crypto: talitos - do hw_context DMA mapping
+ outside the requests
+Date: Thu, 22 Feb 2018 19:47:41 +0800
+Message-ID: <20180222114741.GA27631@gondor.apana.org.au>
+References: <e47bf94ae44f23230b1647e31c9623f1075d3b79.1507284818.git.christophe.leroy@c-s.fr>
+ <VI1PR0402MB3342A0A8530F74D408CA2F0298FC0@VI1PR0402MB3342.eurprd04.prod.outlook.com>
+ <2338eb8d-a26a-9722-d667-5a9785b32977@c-s.fr>
+ <VI1PR0402MB3342D90D574C8829701882BE98C90@VI1PR0402MB3342.eurprd04.prod.outlook.com>
+ <630c313c-5eca-224d-a5ac-fb3f2783573a@c-s.fr>
+ <VI1PR0402MB334256E1706A4E1AED09F4A598C80@VI1PR0402MB3342.eurprd04.prod.outlook.com>
+ <d5809df9-fc17-03da-b7f4-038d973dbd1f@c-s.fr>
+ <VI1PR0402MB334299B37F17771BFA9AFDDA98C80@VI1PR0402MB3342.eurprd04.prod.outlook.com>
+ <20180220103436.GA20571@gondor.apana.org.au>
+ <VI1PR0402MB3342B99A1BEA5622F29F79EF98CF0@VI1PR0402MB3342.eurprd04.prod.outlook.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
 Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
  "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- "stable@vger.kernel.org" <stable@vger.kernel.org>,
+ "David S. Miller" <davem@davemloft.net>,
  "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@nxp.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>
 Return-path: <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
-In-Reply-To: <AM0PR0402MB3329F7DB21610C75674BA7AD98CD0@AM0PR0402MB3329.eurprd04.prod.outlook.com>
-Content-Language: fr
+Content-Disposition: inline
+In-Reply-To: <VI1PR0402MB3342B99A1BEA5622F29F79EF98CF0@VI1PR0402MB3342.eurprd04.prod.outlook.com>
 List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
  <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
 List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev/>
@@ -30,54 +36,33 @@ Sender: "Linuxppc-dev"
  <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
 List-Id: linux-crypto.vger.kernel.org
 
+On Tue, Feb 20, 2018 at 11:32:25AM +0000, Horia Geantă wrote:
+>
+> If final/finup is optional, how is the final hash supposed to be retrieved?
 
+Sometimes the computation ends with a partial hash, that's what
+export is for.  Also it is completely legal to abandon the hash
+state entirely.
 
-Le 22/02/2018 à 09:30, Horia Geantă a écrit :
-> On 2/22/2018 9:08 AM, Christophe Leroy wrote:
->> Upstream 87a81dce53b1ea61acaeefa5191a0376a2d1d721
->>
->> Performing the hash of an empty file leads to a kernel Oops
->>
->> [   44.504600] Unable to handle kernel paging request for data at address 0x0000000c
->> [   44.512819] Faulting instruction address: 0xc02d2be8
->> [   44.524088] Oops: Kernel access of bad area, sig: 11 [#1]
->> [   44.529171] BE PREEMPT CMPC885
->> [   44.532232] CPU: 0 PID: 491 Comm: md5sum Not tainted 4.15.0-rc8-00211-g3a968610b6ea #81
->> [   44.540814] NIP:  c02d2be8 LR: c02d2984 CTR: 00000000
->> [   44.545812] REGS: c6813c90 TRAP: 0300   Not tainted  (4.15.0-rc8-00211-g3a968610b6ea)
->> [   44.554223] MSR:  00009032 <EE,ME,IR,DR,RI>  CR: 48222822  XER: 20000000
->> [   44.560855] DAR: 0000000c DSISR: c0000000
->> [   44.560855] GPR00: c02d28fc c6813d40 c6828000 c646fa40 00000001 00000001 00000001 00000000
->> [   44.560855] GPR08: 0000004c 00000000 c000bfcc 00000000 28222822 100280d4 00000000 10020008
->> [   44.560855] GPR16: 00000000 00000020 00000000 00000000 10024008 00000000 c646f9f0 c6179a10
->> [   44.560855] GPR24: 00000000 00000001 c62f0018 c6179a10 00000000 c6367a30 c62f0000 c646f9c0
->> [   44.598542] NIP [c02d2be8] ahash_process_req+0x448/0x700
->> [   44.603751] LR [c02d2984] ahash_process_req+0x1e4/0x700
->> [   44.608868] Call Trace:
->> [   44.611329] [c6813d40] [c02d28fc] ahash_process_req+0x15c/0x700 (unreliable)
->> [   44.618302] [c6813d90] [c02060c4] hash_recvmsg+0x11c/0x210
->> [   44.623716] [c6813db0] [c0331354] ___sys_recvmsg+0x98/0x138
->> [   44.629226] [c6813eb0] [c03332c0] __sys_recvmsg+0x40/0x84
->> [   44.634562] [c6813f10] [c03336c0] SyS_socketcall+0xb8/0x1d4
->> [   44.640073] [c6813f40] [c000d1ac] ret_from_syscall+0x0/0x38
->> [   44.645530] Instruction dump:
->> [   44.648465] 38c00001 7f63db78 4e800421 7c791b78 54690ffe 0f090000 80ff0190 2f870000
->> [   44.656122] 40befe50 2f990001 409e0210 813f01bc <8129000c> b39e003a 7d29c214 913e003c
->>
->> This patch fixes that Oops by checking if src is NULL.
->>
->> Fixes: 6a1e8d14156d4 ("crypto: talitos - making mapping helpers more generic")
->> Cc: <stable@vger.kernel.org>
->> Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
+> According to documentation, these are the accepted flows (with the option to
+> export/import a partial hash b/w update and final/finup):
 > 
-> Isn't this needed also in 4.15.y?
-
-It is already in 4.15, see 
-https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable.git/commit/drivers/crypto/talitos.c?h=v4.15.4&id=e76a4b126d1e7fbd0124cb885331a45e9a24f32b
-
-Christophe
-
+> .init() -> .update() -> .final()
+>             ^    |         |
+>             '----'         '---> HASH
 > 
-> Thanks,
-> Horia
+> .init() -> .update() -> .finup()
+>             ^    |         |
+>             '----'         '---> HASH
 > 
+>            .digest()
+>                |
+>                '---------------> HASH
+
+The documentation is simply incomplete in this regard.
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
