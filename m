@@ -1,36 +1,36 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: atmel: Delete error messages for a failed memory
- allocation in six functions
-Date: Thu, 22 Feb 2018 23:13:56 +0800
-Message-ID: <20180222151356.GM29815@gondor.apana.org.au>
-References: <77cf1006-966d-78a9-0fdc-b53ccdd80df2@users.sourceforge.net>
+Subject: Re: [PATCH] crypto: nx-842: Delete an error message for a failed
+ memory allocation in nx842_pseries_init()
+Date: Thu, 22 Feb 2018 23:12:49 +0800
+Message-ID: <20180222151249.GH29815@gondor.apana.org.au>
+References: <8261d041-ccd9-c0f8-4530-a4afb43ee7ab@users.sourceforge.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Cc: kernel-janitors@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
- Alexandre Belloni <alexandre.belloni@free-electrons.com>,
- linux-crypto@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- linux-arm-kernel@lists.infradead.org
+ Paul Mackerras <paulus@samba.org>, linuxppc-dev@lists.ozlabs.org,
+ "David S. Miller" <davem@davemloft.net>, Dan Streetman <ddstreet@ieee.org>,
+ linux-crypto@vger.kernel.org
 To: SF Markus Elfring <elfring@users.sourceforge.net>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Return-path: <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
 Content-Disposition: inline
-In-Reply-To: <77cf1006-966d-78a9-0fdc-b53ccdd80df2@users.sourceforge.net>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+In-Reply-To: <8261d041-ccd9-c0f8-4530-a4afb43ee7ab@users.sourceforge.net>
+List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
+List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev/>
+List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
+List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
+List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
+Errors-To: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
+Sender: "Linuxppc-dev"
+ <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Feb 15, 2018 at 01:24:18PM +0100, SF Markus Elfring wrote:
+On Wed, Feb 14, 2018 at 05:17:08PM +0100, SF Markus Elfring wrote:
 > From: Markus Elfring <elfring@users.sourceforge.net>
-> Date: Thu, 15 Feb 2018 11:38:30 +0100
+> Date: Wed, 14 Feb 2018 17:05:13 +0100
 > 
-> Omit extra messages for a memory allocation failure in these functions.
+> Omit an extra message for a memory allocation failure in this function.
 > 
 > This issue was detected by using the Coccinelle software.
 > 
