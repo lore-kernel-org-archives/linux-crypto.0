@@ -1,23 +1,20 @@
-From: Alexandre Torgue <alexandre.torgue@st.com>
-Subject: Re: [PATCH Resend 0/5] hwrng: stm32 - Improvement for stm32-rng
-Date: Thu, 22 Feb 2018 16:25:46 +0100
-Message-ID: <8dcbcea1-78f7-27ff-66a0-a6180d32a05e@st.com>
-References: <20180215130312.23612-1-lionel.debieve@st.com>
- <20180222140328.GE28447@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] crypto: atmel: Delete error messages for a failed memory
+ allocation in six functions
+Date: Thu, 22 Feb 2018 23:13:56 +0800
+Message-ID: <20180222151356.GM29815@gondor.apana.org.au>
+References: <77cf1006-966d-78a9-0fdc-b53ccdd80df2@users.sourceforge.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Cc: Rob Herring <rob.herring@linaro.org>,
- Benjamin Gaignard <benjamin.gaignard@st.com>, Arnd Bergmann <arnd@arndb.de>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>, linux-kernel@vger.kernel.org,
- linux-crypto@vger.kernel.org, Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Matt Mackall <mpm@selenic.com>, Ludovic Barre <ludovic.barre@st.com>,
+Cc: kernel-janitors@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+ Alexandre Belloni <alexandre.belloni@free-electrons.com>,
+ linux-crypto@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
  linux-arm-kernel@lists.infradead.org
-To: Herbert Xu <herbert@gondor.apana.org.au>, Lionel Debieve
- <lionel.debieve@st.com>
+To: SF Markus Elfring <elfring@users.sourceforge.net>
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <20180222140328.GE28447@gondor.apana.org.au>
-Content-Language: en-US
+Content-Disposition: inline
+In-Reply-To: <77cf1006-966d-78a9-0fdc-b53ccdd80df2@users.sourceforge.net>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -29,29 +26,18 @@ Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi
-
-On 02/22/2018 03:03 PM, Herbert Xu wrote:
-> On Thu, Feb 15, 2018 at 02:03:07PM +0100, Lionel Debieve wrote:
->> This set of patches add extended functionalities for stm32 rng
->> driver.
->> Patch #1 includes a reset during probe to avoid any error status
->> which can occur during bootup process and keep safe rng integrity.
->>
->> Patch #3 adds a new property to manage the clock error detection
->> feature which can be disabled on specific target.
->>
->> Patch #5 rework the timeout calculation for read value that was
->> previously defined based on loop operation and is now based on
->> timer.
+On Thu, Feb 15, 2018 at 01:24:18PM +0100, SF Markus Elfring wrote:
+> From: Markus Elfring <elfring@users.sourceforge.net>
+> Date: Thu, 15 Feb 2018 11:38:30 +0100
 > 
-> I should take only patches 1/3/5, right?
-
-You could take all (dt-bindings + drivers part).
-
-regards
-alex
-
+> Omit extra messages for a memory allocation failure in these functions.
 > 
-> Cheers,
+> This issue was detected by using the Coccinelle software.
 > 
+> Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+
+Patch applied.  Thanks.
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
