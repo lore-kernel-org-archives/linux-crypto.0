@@ -1,385 +1,298 @@
-From: Gigi W <gigitekwork@gmail.com>
-Subject: Re: Integrity checking fails with Atmel SHA hw
-	accelerator enabled
-Date: Mon, 26 Feb 2018 08:31:31 +0200
-Message-ID: <CAAm399SksqBEReTYP0Oc7gMn5Xxa_Aiirem8Yc34qOGk9_TL4A@mail.gmail.com>
-References: <CAAm399SnigNFoHgNL4v4q167K3NheyYHzRp76Lxi9xpu6W0YPw@mail.gmail.com>
-	<CAOtvUMdwtUg4dRq6=bcRjvtuJByQPUhJLGrLvF-Dxxt3fc1iJw@mail.gmail.com>
-	<CAAm399Tvq7nLs=LUb+u+oob1r37Nsstz6vm-=WGF+wQ+6189UA@mail.gmail.com>
-	<CAOtvUMdgWwHuHwh-vcVkW5gUR5ukZfCMOGhVv1civkynj9oX=A@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="===============1805525051288673233=="
-Cc: device-mapper development <dm-devel@redhat.com>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Gilad Ben-Yossef <gilad@benyossef.com>
-Return-path: <dm-devel-bounces@redhat.com>
-In-Reply-To: <CAOtvUMdgWwHuHwh-vcVkW5gUR5ukZfCMOGhVv1civkynj9oX=A@mail.gmail.com>
-List-Unsubscribe: <https://www.redhat.com/mailman/options/dm-devel>,
-	<mailto:dm-devel-request@redhat.com?subject=unsubscribe>
-List-Archive: <https://www.redhat.com/archives/dm-devel>
-List-Post: <mailto:dm-devel@redhat.com>
-List-Help: <mailto:dm-devel-request@redhat.com?subject=help>
-List-Subscribe: <https://www.redhat.com/mailman/listinfo/dm-devel>,
-	<mailto:dm-devel-request@redhat.com?subject=subscribe>
-Sender: dm-devel-bounces@redhat.com
-Errors-To: dm-devel-bounces@redhat.com
+From: Christophe Leroy <christophe.leroy@c-s.fr>
+Subject: [PATCH  1/2] crypto: talitos - don't persistently map
+ req_ctx->hw_context and req_ctx->buf
+Date: Mon, 26 Feb 2018 17:40:04 +0100 (CET)
+Message-ID: <7c934f0788d60bd82fb1cb51d712c9ab1ea7fcb4.1519660621.git.christophe.leroy@c-s.fr>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Horia Geanta <horia.geanta@nxp.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
---===============1805525051288673233==
-Content-Type: multipart/alternative; boundary="001a113f6ad82be368056617a934"
+Commit 49f9783b0cea ("crypto: talitos - do hw_context DMA mapping
+outside the requests") introduced a persistent dma mapping of
+req_ctx->hw_context
+Commit 37b5e8897eb5 ("crypto: talitos - chain in buffered data for ahash
+on SEC1") introduced a persistent dma mapping of req_ctx->buf
 
---001a113f6ad82be368056617a934
-Content-Type: text/plain; charset="UTF-8"
+As there is no destructor for req_ctx (the request context), the
+associated dma handlers where set in ctx (the tfm context). This is
+wrong as several hash operations can run with the same ctx.
 
-Thanks again for feedback !
-Yes, I can do some additional tests in order to isolate the problem.
-I'm not that familiar with the code responsible for this so I'll ask for
-your help with a patch. It will be quicker that way.
+This patch removes this persistent mapping.
 
-Best regards
-Mircea
+Reported-by: Horia Geanta <horia.geanta@nxp.com>
+Fixes: 49f9783b0cea ("crypto: talitos - do hw_context DMA mapping outside the requests")
+Fixes: 37b5e8897eb5 ("crypto: talitos - chain in buffered data for ahash on SEC1")
+Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
+---
+ drivers/crypto/talitos.c | 132 ++++++++++++++++-------------------------------
+ 1 file changed, 44 insertions(+), 88 deletions(-)
 
-
-On Sat, Feb 24, 2018 at 10:59 AM, Gilad Ben-Yossef <gilad@benyossef.com>
-wrote:
-
-> Hi,
->
-> I'm adding the linux crypto mailing list because it seems relevant.
->
->
-> On Fri, Feb 23, 2018 at 2:25 PM, Gigi W <gigitekwork@gmail.com> wrote:
-> > Thanks for the input!
-> >
-> > See below
-> >
-> >
-> > On Fri, Feb 23, 2018 at 10:53 AM Gilad Ben-Yossef <gilad@benyossef.com>
-> > wrote:
-> >>
-> >> On Fri, Feb 23, 2018 at 10:30 AM, Gigi W <gigitekwork@gmail.com> wrote:
-> >> > Hi
-> >> >
-> >> > I'm having some trouble using dm-verity for a squashfs root file
-> system
-> >> > that
-> >> > seems to be related to the
-> >> > Atmel SHA hw accelerator in the kernel, CONFIG_CRYPTO_DEV_ATMEL_SHA
-> >> >
-> >> > Some info about my setup:
-> >> > * I'm using a board with a SAMA5D4 CPU.
-> >> > * I'm using Yocto rocko for building an image for that device.
-> >> >
-> >> > The idea is that Using the 4.14.14 Kernel, Integrity checking using
-> >> > Kernel
-> >> > crypto fails with Atmel SHA hw accelerator enabled in kernel.
-> >> > By disabling it, `CONFIG_CRYPTO_DEV_ATMEL_SHA=n`, and using the
-> software
-> >> > sha256 algo, integrity checking works as expected.
-> >> > This is my kernel config [3]
-> >> >
-> >> > Using the 4.8.4 Kernel and Atmel SHA hw accelerator enabled,
-> everything
-> >> > was
-> >> > ok.
-> >> >
-> >> > This is what triggers the error during verified boot:
-> >> >
-> >> > status=`veritysetup create vroot $root_dev $verity_dev --hash-offset
-> >> > $hashoffset $root_hash`
-> >> >
-> >> >     mount /dev/mapper/vroot /mnt/
-> >> >     mount_ok=`cat /proc/mounts | grep mnt`
-> >> >     if [ -z "$mount_ok" ] ; then
-> >> >         echo "Failed to mount $root_dev on mnt/"
-> >> >     else
-> >> >         echo "Switch rootfs"
-> >> >         exec switch_root -c /dev/console /mnt /sbin/init
-> >> >     fi
-> >> >
-> >> > The mount operation fails:
-> >> >
-> >> > device-mapper: verity: 179:4: metadata block 2 is corrupted
-> >> > EXT4-fs (dm-0): unable to read superblock
-> >> > device-mapper: verity: 179:4: metadata block 2 is corrupted
-> >> > EXT4-fs (dm-0): unable to read superblock
-> >> > device-mapper: verity: 179:4: metadata block 2 is corrupted
-> >> > EXT4-fs (dm-0): unable to read superblock
-> >> > device-mapper: verity: 179:4: metadata block 2 is corrupted
-> >> > SQUASHFS error: squashfs_read_data failed to read block 0x0
-> >> > squashfs: SQUASHFS error: unable to read squashfs_super_block
-> >> > device-mapper: verity: 179:4: metadata block 2 is corrupted
-> >> > FAT-fs (dm-0): unable to read boot sector
-> >> > mount: mounting /dev/mapper/vroot on /mnt/ failed: Input/output error
-> >> > Failed to mount /dev/mmcblk0p4 on mnt/
-> >> > reboot: Restarting system
-> >> > Reboot failed -- System halted
-> >> >
-> >> > Using veritysetup to verify the integrity against the hashes is
-> >> > successful,
-> >> > as it's not using the kernel for that ...
-> >> >
-> >> >
-> >> > So it looks like it something changed from 4.8.4 to 4.14.14.
-> >>
-> >> If I am not mistaken the Atmel SHA hw accelerator is an async (read:
-> >> off CPU) crypto accelerator.
-> >>  Up until 4.12 (I think...) DM-Verity did not use async crypto
-> >> accelerators (even if present and have high
-> >> priority). I've changed this is commit d1ac3ff008fb ("dm verity:
-> >> switch to using asynchronous hash crypto API").
-> >
-> >
-> > This would explain some things, like the same speeds while reading from a
-> > verity device, having the CONFIG_CRYPTO_DEV_ATMEL_SHA enabled and then
-> > disabled, on the 4.8.4 kernel -> it was always using the sync API.
-> >
-> >>
-> >>
-> >> Is it possible that whatever issue you are seeing has always been
-> >> there and when DM-Verity started using
-> >> async. accelerators it was only exposed?
-> >
-> >
-> > It looks like it.
-> >
-> > From my understandings + tests described above, Atmel SHA hw accelerator
-> > works correctly - output hashes are ok, dm-verity with other async crypto
-> > accelerators is working ok,
-> > but dm-verity + Atmel SHA hw accelerator don't play nice together.
-> >
-> > I couldn't find anyone else complaining about this.
-> >
->
-> I agree that that the possibility that there is something wrong in the
-> Atmel SHA accelerator is one possible direction.
-> The other one is that there is something wrong in DM-Verity that only
-> manifests under certain conditions when working with async crypto HW
-> providers.
-> I don't think it is the case, because I tested DM-Verity after my
-> changes with the CryptoCell async HW provider and did not get any
-> other bug reports, but I'd like to be sure.
->
-> Can you do a little experiment? add debug printk to show the data
-> being hashed, the hash produced by atmel and the expected
-> pre-calculated hash.
->
-> If the theory that there is something wrong with atmel accelerator, we
-> can calculate the hash on the data with other means (software) and
-> should get a different hash.
->
-> If you are having trouble adding the printk's in the right place let
-> me know and I'll create a patch for you to test.
->
-> Cheers,
-> Gilad
->
->
-> --
-> Gilad Ben-Yossef
-> Chief Coffee Drinker
->
-> "If you take a class in large-scale robotics, can you end up in a
-> situation where the homework eats your dog?"
->  -- Jean-Baptiste Queru
->
-
---001a113f6ad82be368056617a934
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div><div><div><div>Thanks again for feedback !<br></div>Y=
-es, I can do some additional tests in order to isolate the problem.<br></di=
-v>I&#39;m not that familiar with the code responsible for this so I&#39;ll =
-ask for your help with a patch. It will be quicker that way.<br><br></div>B=
-est regards<br></div>Mircea<br><br></div><div class=3D"gmail_extra"><br><di=
-v class=3D"gmail_quote">On Sat, Feb 24, 2018 at 10:59 AM, Gilad Ben-Yossef =
-<span dir=3D"ltr">&lt;<a href=3D"mailto:gilad@benyossef.com" target=3D"_bla=
-nk">gilad@benyossef.com</a>&gt;</span> wrote:<br><blockquote class=3D"gmail=
-_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:=
-1ex">Hi,<br>
-<br>
-I&#39;m adding the linux crypto mailing list because it seems relevant.<br>
-<div><div class=3D"h5"><br>
-<br>
-On Fri, Feb 23, 2018 at 2:25 PM, Gigi W &lt;<a href=3D"mailto:gigitekwork@g=
-mail.com">gigitekwork@gmail.com</a>&gt; wrote:<br>
-&gt; Thanks for the input!<br>
-&gt;<br>
-&gt; See below<br>
-&gt;<br>
-&gt;<br>
-&gt; On Fri, Feb 23, 2018 at 10:53 AM Gilad Ben-Yossef &lt;<a href=3D"mailt=
-o:gilad@benyossef.com">gilad@benyossef.com</a>&gt;<br>
-&gt; wrote:<br>
-&gt;&gt;<br>
-&gt;&gt; On Fri, Feb 23, 2018 at 10:30 AM, Gigi W &lt;<a href=3D"mailto:gig=
-itekwork@gmail.com">gigitekwork@gmail.com</a>&gt; wrote:<br>
-&gt;&gt; &gt; Hi<br>
-&gt;&gt; &gt;<br>
-&gt;&gt; &gt; I&#39;m having some trouble using dm-verity for a squashfs ro=
-ot file system<br>
-&gt;&gt; &gt; that<br>
-&gt;&gt; &gt; seems to be related to the<br>
-&gt;&gt; &gt; Atmel SHA hw accelerator in the kernel, CONFIG_CRYPTO_DEV_ATM=
-EL_SHA<br>
-&gt;&gt; &gt;<br>
-&gt;&gt; &gt; Some info about my setup:<br>
-&gt;&gt; &gt; * I&#39;m using a board with a SAMA5D4 CPU.<br>
-&gt;&gt; &gt; * I&#39;m using Yocto rocko for building an image for that de=
-vice.<br>
-&gt;&gt; &gt;<br>
-&gt;&gt; &gt; The idea is that Using the 4.14.14 Kernel, Integrity checking=
- using<br>
-&gt;&gt; &gt; Kernel<br>
-&gt;&gt; &gt; crypto fails with Atmel SHA hw accelerator enabled in kernel.=
-<br>
-&gt;&gt; &gt; By disabling it, `CONFIG_CRYPTO_DEV_ATMEL_SHA=3D<wbr>n`, and =
-using the software<br>
-&gt;&gt; &gt; sha256 algo, integrity checking works as expected.<br>
-&gt;&gt; &gt; This is my kernel config [3]<br>
-&gt;&gt; &gt;<br>
-&gt;&gt; &gt; Using the 4.8.4 Kernel and Atmel SHA hw accelerator enabled, =
-everything<br>
-&gt;&gt; &gt; was<br>
-&gt;&gt; &gt; ok.<br>
-&gt;&gt; &gt;<br>
-&gt;&gt; &gt; This is what triggers the error during verified boot:<br>
-&gt;&gt; &gt;<br>
-&gt;&gt; &gt; status=3D`veritysetup create vroot $root_dev $verity_dev --ha=
-sh-offset<br>
-&gt;&gt; &gt; $hashoffset $root_hash`<br>
-&gt;&gt; &gt;<br>
-&gt;&gt; &gt;=C2=A0 =C2=A0 =C2=A0mount /dev/mapper/vroot /mnt/<br>
-&gt;&gt; &gt;=C2=A0 =C2=A0 =C2=A0mount_ok=3D`cat /proc/mounts | grep mnt`<b=
-r>
-&gt;&gt; &gt;=C2=A0 =C2=A0 =C2=A0if [ -z &quot;$mount_ok&quot; ] ; then<br>
-&gt;&gt; &gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0echo &quot;Failed to mount $=
-root_dev on mnt/&quot;<br>
-&gt;&gt; &gt;=C2=A0 =C2=A0 =C2=A0else<br>
-&gt;&gt; &gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0echo &quot;Switch rootfs&quo=
-t;<br>
-&gt;&gt; &gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0exec switch_root -c /dev/con=
-sole /mnt /sbin/init<br>
-&gt;&gt; &gt;=C2=A0 =C2=A0 =C2=A0fi<br>
-&gt;&gt; &gt;<br>
-&gt;&gt; &gt; The mount operation fails:<br>
-&gt;&gt; &gt;<br>
-&gt;&gt; &gt; device-mapper: verity: 179:4: metadata block 2 is corrupted<b=
-r>
-&gt;&gt; &gt; EXT4-fs (dm-0): unable to read superblock<br>
-&gt;&gt; &gt; device-mapper: verity: 179:4: metadata block 2 is corrupted<b=
-r>
-&gt;&gt; &gt; EXT4-fs (dm-0): unable to read superblock<br>
-&gt;&gt; &gt; device-mapper: verity: 179:4: metadata block 2 is corrupted<b=
-r>
-&gt;&gt; &gt; EXT4-fs (dm-0): unable to read superblock<br>
-&gt;&gt; &gt; device-mapper: verity: 179:4: metadata block 2 is corrupted<b=
-r>
-&gt;&gt; &gt; SQUASHFS error: squashfs_read_data failed to read block 0x0<b=
-r>
-&gt;&gt; &gt; squashfs: SQUASHFS error: unable to read squashfs_super_block=
-<br>
-&gt;&gt; &gt; device-mapper: verity: 179:4: metadata block 2 is corrupted<b=
-r>
-&gt;&gt; &gt; FAT-fs (dm-0): unable to read boot sector<br>
-&gt;&gt; &gt; mount: mounting /dev/mapper/vroot on /mnt/ failed: Input/outp=
-ut error<br>
-&gt;&gt; &gt; Failed to mount /dev/mmcblk0p4 on mnt/<br>
-&gt;&gt; &gt; reboot: Restarting system<br>
-&gt;&gt; &gt; Reboot failed -- System halted<br>
-&gt;&gt; &gt;<br>
-&gt;&gt; &gt; Using veritysetup to verify the integrity against the hashes =
-is<br>
-&gt;&gt; &gt; successful,<br>
-&gt;&gt; &gt; as it&#39;s not using the kernel for that ...<br>
-&gt;&gt; &gt;<br>
-&gt;&gt; &gt;<br>
-&gt;&gt; &gt; So it looks like it something changed from 4.8.4 to 4.14.14.<=
-br>
-&gt;&gt;<br>
-&gt;&gt; If I am not mistaken the Atmel SHA hw accelerator is an async (rea=
-d:<br>
-&gt;&gt; off CPU) crypto accelerator.<br>
-&gt;&gt;=C2=A0 Up until 4.12 (I think...) DM-Verity did not use async crypt=
-o<br>
-&gt;&gt; accelerators (even if present and have high<br>
-&gt;&gt; priority). I&#39;ve changed this is commit d1ac3ff008fb (&quot;dm =
-verity:<br>
-&gt;&gt; switch to using asynchronous hash crypto API&quot;).<br>
-&gt;<br>
-&gt;<br>
-&gt; This would explain some things, like the same speeds while reading fro=
-m a<br>
-&gt; verity device, having the CONFIG_CRYPTO_DEV_ATMEL_SHA enabled and then=
-<br>
-&gt; disabled, on the 4.8.4 kernel -&gt; it was always using the sync API.<=
-br>
-&gt;<br>
-&gt;&gt;<br>
-&gt;&gt;<br>
-&gt;&gt; Is it possible that whatever issue you are seeing has always been<=
-br>
-&gt;&gt; there and when DM-Verity started using<br>
-&gt;&gt; async. accelerators it was only exposed?<br>
-&gt;<br>
-&gt;<br>
-&gt; It looks like it.<br>
-&gt;<br>
-&gt; From my understandings + tests described above, Atmel SHA hw accelerat=
-or<br>
-&gt; works correctly - output hashes are ok, dm-verity with other async cry=
-pto<br>
-&gt; accelerators is working ok,<br>
-&gt; but dm-verity + Atmel SHA hw accelerator don&#39;t play nice together.=
-<br>
-&gt;<br>
-&gt; I couldn&#39;t find anyone else complaining about this.<br>
-&gt;<br>
-<br>
-</div></div>I agree that that the possibility that there is something wrong=
- in the<br>
-Atmel SHA accelerator is one possible direction.<br>
-The other one is that there is something wrong in DM-Verity that only<br>
-manifests under certain conditions when working with async crypto HW<br>
-providers.<br>
-I don&#39;t think it is the case, because I tested DM-Verity after my<br>
-changes with the CryptoCell async HW provider and did not get any<br>
-other bug reports, but I&#39;d like to be sure.<br>
-<br>
-Can you do a little experiment? add debug printk to show the data<br>
-being hashed, the hash produced by atmel and the expected<br>
-pre-calculated hash.<br>
-<br>
-If the theory that there is something wrong with atmel accelerator, we<br>
-can calculate the hash on the data with other means (software) and<br>
-should get a different hash.<br>
-<br>
-If you are having trouble adding the printk&#39;s in the right place let<br=
->
-me know and I&#39;ll create a patch for you to test.<br>
-<br>
-Cheers,<br>
-Gilad<br>
-<div class=3D"HOEnZb"><div class=3D"h5"><br>
-<br>
---<br>
-Gilad Ben-Yossef<br>
-Chief Coffee Drinker<br>
-<br>
-&quot;If you take a class in large-scale robotics, can you end up in a<br>
-situation where the homework eats your dog?&quot;<br>
-=C2=A0-- Jean-Baptiste Queru<br>
-</div></div></blockquote></div><br></div>
-
---001a113f6ad82be368056617a934--
-
-
---===============1805525051288673233==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-
---===============1805525051288673233==--
+diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
+index 6882fa2f8bad..bb44df1c1f2d 100644
+--- a/drivers/crypto/talitos.c
++++ b/drivers/crypto/talitos.c
+@@ -832,8 +832,6 @@ struct talitos_ctx {
+ 	unsigned int keylen;
+ 	unsigned int enckeylen;
+ 	unsigned int authkeylen;
+-	dma_addr_t dma_buf;
+-	dma_addr_t dma_hw_context;
+ };
+ 
+ #define HASH_MAX_BLOCK_SIZE		SHA512_BLOCK_SIZE
+@@ -1690,9 +1688,30 @@ static void common_nonsnoop_hash_unmap(struct device *dev,
+ 				       struct ahash_request *areq)
+ {
+ 	struct talitos_ahash_req_ctx *req_ctx = ahash_request_ctx(areq);
++	struct talitos_private *priv = dev_get_drvdata(dev);
++	bool is_sec1 = has_ftr_sec1(priv);
++	struct talitos_desc *desc = &edesc->desc;
++	struct talitos_desc *desc2 = desc + 1;
++
++	unmap_single_talitos_ptr(dev, &edesc->desc.ptr[5], DMA_FROM_DEVICE);
++	if (desc->next_desc &&
++	    desc->ptr[5].ptr != desc2->ptr[5].ptr)
++		unmap_single_talitos_ptr(dev, &desc2->ptr[5], DMA_FROM_DEVICE);
+ 
+ 	talitos_sg_unmap(dev, edesc, req_ctx->psrc, NULL, 0, 0);
+ 
++	/* When using hashctx-in, must unmap it. */
++	if (from_talitos_ptr_len(&edesc->desc.ptr[1], is_sec1))
++		unmap_single_talitos_ptr(dev, &edesc->desc.ptr[1],
++					 DMA_TO_DEVICE);
++	else if (desc->next_desc)
++		unmap_single_talitos_ptr(dev, &desc2->ptr[1],
++					 DMA_TO_DEVICE);
++
++	if (is_sec1 && req_ctx->nbuf)
++		unmap_single_talitos_ptr(dev, &desc->ptr[3],
++					 DMA_TO_DEVICE);
++
+ 	if (edesc->dma_len)
+ 		dma_unmap_single(dev, edesc->dma_link_tbl, edesc->dma_len,
+ 				 DMA_BIDIRECTIONAL);
+@@ -1766,8 +1785,10 @@ static int common_nonsnoop_hash(struct talitos_edesc *edesc,
+ 
+ 	/* hash context in */
+ 	if (!req_ctx->first || req_ctx->swinit) {
+-		to_talitos_ptr(&desc->ptr[1], ctx->dma_hw_context,
+-			       req_ctx->hw_context_size, is_sec1);
++		map_single_talitos_ptr(dev, &desc->ptr[1],
++				       req_ctx->hw_context_size,
++				       (char *)req_ctx->hw_context,
++				       DMA_TO_DEVICE);
+ 		req_ctx->swinit = 0;
+ 	}
+ 	/* Indicate next op is not the first. */
+@@ -1793,10 +1814,9 @@ static int common_nonsnoop_hash(struct talitos_edesc *edesc,
+ 	 * data in
+ 	 */
+ 	if (is_sec1 && req_ctx->nbuf) {
+-		dma_addr_t dma_buf = ctx->dma_buf + req_ctx->buf_idx *
+-						    HASH_MAX_BLOCK_SIZE;
+-
+-		to_talitos_ptr(&desc->ptr[3], dma_buf, req_ctx->nbuf, is_sec1);
++		map_single_talitos_ptr(dev, &desc->ptr[3], req_ctx->nbuf,
++				       req_ctx->buf[req_ctx->buf_idx],
++				       DMA_TO_DEVICE);
+ 	} else {
+ 		sg_count = talitos_sg_map(dev, req_ctx->psrc, length, edesc,
+ 					  &desc->ptr[3], sg_count, offset, 0);
+@@ -1812,8 +1832,9 @@ static int common_nonsnoop_hash(struct talitos_edesc *edesc,
+ 				       crypto_ahash_digestsize(tfm),
+ 				       areq->result, DMA_FROM_DEVICE);
+ 	else
+-		to_talitos_ptr(&desc->ptr[5], ctx->dma_hw_context,
+-			       req_ctx->hw_context_size, is_sec1);
++		map_single_talitos_ptr(dev, &desc->ptr[5],
++				       req_ctx->hw_context_size,
++				       req_ctx->hw_context, DMA_FROM_DEVICE);
+ 
+ 	/* last DWORD empty */
+ 
+@@ -1832,9 +1853,14 @@ static int common_nonsnoop_hash(struct talitos_edesc *edesc,
+ 		desc->hdr |= DESC_HDR_MODE0_MDEU_CONT;
+ 		desc->hdr &= ~DESC_HDR_DONE_NOTIFY;
+ 
+-		to_talitos_ptr(&desc2->ptr[1], ctx->dma_hw_context,
+-			       req_ctx->hw_context_size, is_sec1);
+-
++		if (desc->ptr[1].ptr)
++			copy_talitos_ptr(&desc2->ptr[1], &desc->ptr[1],
++					 is_sec1);
++		else
++			map_single_talitos_ptr(dev, &desc2->ptr[1],
++					       req_ctx->hw_context_size,
++					       req_ctx->hw_context,
++					       DMA_TO_DEVICE);
+ 		copy_talitos_ptr(&desc2->ptr[2], &desc->ptr[2], is_sec1);
+ 		sg_count = talitos_sg_map(dev, req_ctx->psrc, length, edesc,
+ 					  &desc2->ptr[3], sg_count, offset, 0);
+@@ -1842,8 +1868,10 @@ static int common_nonsnoop_hash(struct talitos_edesc *edesc,
+ 			sync_needed = true;
+ 		copy_talitos_ptr(&desc2->ptr[5], &desc->ptr[5], is_sec1);
+ 		if (req_ctx->last)
+-			to_talitos_ptr(&desc->ptr[5], ctx->dma_hw_context,
+-				       req_ctx->hw_context_size, is_sec1);
++			map_single_talitos_ptr(dev, &desc->ptr[5],
++					       req_ctx->hw_context_size,
++					       req_ctx->hw_context,
++					       DMA_FROM_DEVICE);
+ 
+ 		next_desc = dma_map_single(dev, &desc2->hdr1, TALITOS_DESC_SIZE,
+ 					   DMA_BIDIRECTIONAL);
+@@ -1881,12 +1909,8 @@ static struct talitos_edesc *ahash_edesc_alloc(struct ahash_request *areq,
+ static int ahash_init(struct ahash_request *areq)
+ {
+ 	struct crypto_ahash *tfm = crypto_ahash_reqtfm(areq);
+-	struct talitos_ctx *ctx = crypto_ahash_ctx(tfm);
+-	struct device *dev = ctx->dev;
+ 	struct talitos_ahash_req_ctx *req_ctx = ahash_request_ctx(areq);
+ 	unsigned int size;
+-	struct talitos_private *priv = dev_get_drvdata(dev);
+-	bool is_sec1 = has_ftr_sec1(priv);
+ 
+ 	/* Initialize the context */
+ 	req_ctx->buf_idx = 0;
+@@ -1898,18 +1922,6 @@ static int ahash_init(struct ahash_request *areq)
+ 			: TALITOS_MDEU_CONTEXT_SIZE_SHA384_SHA512;
+ 	req_ctx->hw_context_size = size;
+ 
+-	if (ctx->dma_hw_context)
+-		dma_unmap_single(dev, ctx->dma_hw_context, size,
+-				 DMA_BIDIRECTIONAL);
+-	ctx->dma_hw_context = dma_map_single(dev, req_ctx->hw_context, size,
+-					     DMA_BIDIRECTIONAL);
+-	if (ctx->dma_buf)
+-		dma_unmap_single(dev, ctx->dma_buf, sizeof(req_ctx->buf),
+-				 DMA_TO_DEVICE);
+-	if (is_sec1)
+-		ctx->dma_buf = dma_map_single(dev, req_ctx->buf,
+-					      sizeof(req_ctx->buf),
+-					      DMA_TO_DEVICE);
+ 	return 0;
+ }
+ 
+@@ -1920,9 +1932,6 @@ static int ahash_init(struct ahash_request *areq)
+ static int ahash_init_sha224_swinit(struct ahash_request *areq)
+ {
+ 	struct talitos_ahash_req_ctx *req_ctx = ahash_request_ctx(areq);
+-	struct crypto_ahash *tfm = crypto_ahash_reqtfm(areq);
+-	struct talitos_ctx *ctx = crypto_ahash_ctx(tfm);
+-	struct device *dev = ctx->dev;
+ 
+ 	ahash_init(areq);
+ 	req_ctx->swinit = 1;/* prevent h/w initting context with sha256 values*/
+@@ -1940,9 +1949,6 @@ static int ahash_init_sha224_swinit(struct ahash_request *areq)
+ 	req_ctx->hw_context[8] = 0;
+ 	req_ctx->hw_context[9] = 0;
+ 
+-	dma_sync_single_for_device(dev, ctx->dma_hw_context,
+-				   req_ctx->hw_context_size, DMA_TO_DEVICE);
+-
+ 	return 0;
+ }
+ 
+@@ -2046,13 +2052,6 @@ static int ahash_process_req(struct ahash_request *areq, unsigned int nbytes)
+ 	/* request SEC to INIT hash. */
+ 	if (req_ctx->first && !req_ctx->swinit)
+ 		edesc->desc.hdr |= DESC_HDR_MODE0_MDEU_INIT;
+-	if (is_sec1) {
+-		dma_addr_t dma_buf = ctx->dma_buf + req_ctx->buf_idx *
+-						    HASH_MAX_BLOCK_SIZE;
+-
+-		dma_sync_single_for_device(dev, dma_buf,
+-					   req_ctx->nbuf, DMA_TO_DEVICE);
+-	}
+ 
+ 	/* When the tfm context has a keylen, it's an HMAC.
+ 	 * A first or last (ie. not middle) descriptor must request HMAC.
+@@ -2106,12 +2105,7 @@ static int ahash_export(struct ahash_request *areq, void *out)
+ {
+ 	struct talitos_ahash_req_ctx *req_ctx = ahash_request_ctx(areq);
+ 	struct talitos_export_state *export = out;
+-	struct crypto_ahash *ahash = crypto_ahash_reqtfm(areq);
+-	struct talitos_ctx *ctx = crypto_ahash_ctx(ahash);
+-	struct device *dev = ctx->dev;
+ 
+-	dma_sync_single_for_cpu(dev, ctx->dma_hw_context,
+-				req_ctx->hw_context_size, DMA_FROM_DEVICE);
+ 	memcpy(export->hw_context, req_ctx->hw_context,
+ 	       req_ctx->hw_context_size);
+ 	memcpy(export->buf, req_ctx->buf[req_ctx->buf_idx], req_ctx->nbuf);
+@@ -2130,31 +2124,14 @@ static int ahash_import(struct ahash_request *areq, const void *in)
+ 	struct crypto_ahash *tfm = crypto_ahash_reqtfm(areq);
+ 	const struct talitos_export_state *export = in;
+ 	unsigned int size;
+-	struct talitos_ctx *ctx = crypto_ahash_ctx(tfm);
+-	struct device *dev = ctx->dev;
+-	struct talitos_private *priv = dev_get_drvdata(dev);
+-	bool is_sec1 = has_ftr_sec1(priv);
+ 
+ 	memset(req_ctx, 0, sizeof(*req_ctx));
+ 	size = (crypto_ahash_digestsize(tfm) <= SHA256_DIGEST_SIZE)
+ 			? TALITOS_MDEU_CONTEXT_SIZE_MD5_SHA1_SHA256
+ 			: TALITOS_MDEU_CONTEXT_SIZE_SHA384_SHA512;
+ 	req_ctx->hw_context_size = size;
+-	if (ctx->dma_hw_context)
+-		dma_unmap_single(dev, ctx->dma_hw_context, size,
+-				 DMA_BIDIRECTIONAL);
+-
+ 	memcpy(req_ctx->hw_context, export->hw_context, size);
+-	ctx->dma_hw_context = dma_map_single(dev, req_ctx->hw_context, size,
+-					     DMA_BIDIRECTIONAL);
+-	if (ctx->dma_buf)
+-		dma_unmap_single(dev, ctx->dma_buf, sizeof(req_ctx->buf),
+-				 DMA_TO_DEVICE);
+ 	memcpy(req_ctx->buf[0], export->buf, export->nbuf);
+-	if (is_sec1)
+-		ctx->dma_buf = dma_map_single(dev, req_ctx->buf,
+-					      sizeof(req_ctx->buf),
+-					      DMA_TO_DEVICE);
+ 	req_ctx->swinit = export->swinit;
+ 	req_ctx->first = export->first;
+ 	req_ctx->last = export->last;
+@@ -3064,27 +3041,6 @@ static void talitos_cra_exit(struct crypto_tfm *tfm)
+ 		dma_unmap_single(dev, ctx->dma_key, ctx->keylen, DMA_TO_DEVICE);
+ }
+ 
+-static void talitos_cra_exit_ahash(struct crypto_tfm *tfm)
+-{
+-	struct talitos_ctx *ctx = crypto_tfm_ctx(tfm);
+-	struct device *dev = ctx->dev;
+-	unsigned int size;
+-
+-	talitos_cra_exit(tfm);
+-
+-	size = (crypto_ahash_digestsize(__crypto_ahash_cast(tfm)) <=
+-		SHA256_DIGEST_SIZE)
+-	       ? TALITOS_MDEU_CONTEXT_SIZE_MD5_SHA1_SHA256
+-	       : TALITOS_MDEU_CONTEXT_SIZE_SHA384_SHA512;
+-
+-	if (ctx->dma_hw_context)
+-		dma_unmap_single(dev, ctx->dma_hw_context, size,
+-				 DMA_BIDIRECTIONAL);
+-	if (ctx->dma_buf)
+-		dma_unmap_single(dev, ctx->dma_buf, HASH_MAX_BLOCK_SIZE * 2,
+-				 DMA_TO_DEVICE);
+-}
+-
+ /*
+  * given the alg's descriptor header template, determine whether descriptor
+  * type and primary/secondary execution units required match the hw
+@@ -3183,7 +3139,7 @@ static struct talitos_crypto_alg *talitos_alg_alloc(struct device *dev,
+ 	case CRYPTO_ALG_TYPE_AHASH:
+ 		alg = &t_alg->algt.alg.hash.halg.base;
+ 		alg->cra_init = talitos_cra_init_ahash;
+-		alg->cra_exit = talitos_cra_exit_ahash;
++		alg->cra_exit = talitos_cra_exit;
+ 		alg->cra_type = &crypto_ahash_type;
+ 		t_alg->algt.alg.hash.init = ahash_init;
+ 		t_alg->algt.alg.hash.update = ahash_update;
+-- 
+2.13.3
