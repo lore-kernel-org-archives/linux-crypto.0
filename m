@@ -1,56 +1,45 @@
-From: Gary R Hook <gary.hook@amd.com>
-Subject: Re: Can a driver->probe be called for two devices at the same time
- (WAS: Re: [PATCH] crypto/ccp: don't disable interrupts while setting up
- debugfs)
-Date: Tue, 27 Feb 2018 14:11:24 -0600
-Message-ID: <d9fd273b-5d48-a005-ac30-c8bc8aa803ab@amd.com>
-References: <20180223223307.18882-1-bigeasy@linutronix.de>
- <3f0e1a62-a7ea-6d0c-d305-67080803aefd@amd.com>
- <20180226083508.th2m3xssp36lx3zh@linutronix.de>
- <372b353d-017d-a72c-b750-9417f6265874@amd.com>
- <20180227173314.uko5xpf4od2fn74g@linutronix.de>
- <20180227184034.GI20601@kroah.com>
- <20180227193605.nhkagbqjkadqqruo@linutronix.de>
+From: =?UTF-8?q?Hern=C3=A1n=20Gonzalez?= <hernan@vanguardiasur.com.ar>
+Subject: [PATCH 1/4] crypto: bcm: Remove unused variable (char *tag_to_hash_idx[])
+Date: Tue, 27 Feb 2018 19:01:25 -0300
+Message-ID: <1519768888-19866-1-git-send-email-hernan@vanguardiasur.com.ar>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: "Hook, Gary" <ghook@amd.com>, linux-crypto@vger.kernel.org,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+To: herbert@gondor.apana.org.au, davem@davemloft.net,
+        hernan@vanguardiasur.com.ar, steven.lin1@broadcom.com,
+        arvind.yadav.cs@gmail.com, colin.king@canonical.com,
+        raveendra.padasalagi@broadcom.com, ray.jui@broadcom.com,
+        scott.branden@broadcom.com, linux-crypto@vger.kernel.org,
         linux-kernel@vger.kernel.org
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180227193605.nhkagbqjkadqqruo@linutronix.de>
-Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 02/27/2018 01:36 PM, Sebastian Andrzej Siewior wrote:
-> On 2018-02-27 19:40:34 [+0100], Greg Kroah-Hartman wrote:
->> On Tue, Feb 27, 2018 at 06:33:14PM +0100, Sebastian Andrzej Siewior wrote:
->>> On 2018-02-27 11:08:56 [-0600], Gary R Hook wrote:
->>>> That issue remains unclear to me: Are probes of PCI devices guaranteed to be
->>>> serialized? Observations on my CCPs says that they occur in order, but I
->>>> don't know for certain that serialization is guaranteed.
->>>>
->>>> Is there a definitive statement on this somewhere that I just don't know
->>>> about?
->>
->> The bus enforces this.
->>
->>> So the question if a driver can probe two devices simultaneously.
->>
->> Depends on the bus type.
-> 
-> PCI
+Note: this is compile only tested.
+Variable was not used anywhere in the code, remove it and save 20 bytes.
 
-So the question is whether or not PCI enforces serial activity within a 
-domain. The CCPs are all on different buses, so that doesn't matter.
+add/remove: 0/1 grow/shrink: 0/0 up/down: 0/-20 (-20)
+Function                                     old     new   delta
+tag_to_hash_idx                               20       -     -20
+Total: Before=9185256, After=9185236, chg -0.00%
 
-I think we don't care in this situation, given that the CCP driver has 
-minor requirements for locking. I just found it an interesting (albeit 
-somewhat academic) question.
+Signed-off-by: Hernán Gonzalez <hernan@vanguardiasur.com.ar>
+---
+ drivers/crypto/bcm/spu.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-Thanks,
-Gary
+diff --git a/drivers/crypto/bcm/spu.c b/drivers/crypto/bcm/spu.c
+index dbb5c03..c3d177d 100644
+--- a/drivers/crypto/bcm/spu.c
++++ b/drivers/crypto/bcm/spu.c
+@@ -23,8 +23,6 @@
+ #include "cipher.h"
+ 
+ /* This array is based on the hash algo type supported in spu.h */
+-char *tag_to_hash_idx[] = { "none", "md5", "sha1", "sha224", "sha256" };
+-
+ char *hash_alg_name[] = { "None", "md5", "sha1", "sha224", "sha256", "aes",
+ 	"sha384", "sha512", "sha3_224", "sha3_256", "sha3_384", "sha3_512" };
+ 
+-- 
+2.7.4
