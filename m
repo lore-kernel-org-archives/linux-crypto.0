@@ -1,9 +1,7 @@
 From: Gregory CLEMENT <gregory.clement@bootlin.com>
-Subject: [PATCH 1/2] hwrng: omap - Remove useless test before
- clk_disable_unprepare
-Date: Wed, 28 Feb 2018 15:27:22 +0100
-Message-ID: <20180228142723.11562-2-gregory.clement@bootlin.com>
-References: <20180228142723.11562-1-gregory.clement@bootlin.com>
+Subject: [PATCH 0/2] hwrng: omap: Fix clock resource for Armada 7K/8K
+Date: Wed, 28 Feb 2018 15:27:21 +0100
+Message-ID: <20180228142723.11562-1-gregory.clement@bootlin.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
@@ -20,7 +18,6 @@ Cc: Andrew Lunn <andrew@lunn.ch>, Jason Cooper <jason@lakedaemon.net>,
 To: Herbert Xu <herbert@gondor.apana.org.au>,
  Deepak Saxena <dsaxena@plexity.net>, linux-crypto@vger.kernel.org
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <20180228142723.11562-1-gregory.clement@bootlin.com>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -32,37 +29,27 @@ Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-clk_disable_unprepare() already checks that the clock pointer is valid.
-No need to test it before calling it.
+Hi,
 
-Signed-off-by: Gregory CLEMENT <gregory.clement@bootlin.com>
----
- drivers/char/hw_random/omap-rng.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+This short series fixes the way the clocks are used for the SafeXcel
+IP-76 controller embedded in the Marvell Armada 7K/8K SoCs. On these
+SoCs a second one is needed in order to clock the registers. It was
+not noticed until now because we relied on the bootloader and also
+because the clock driver was wrong.
 
-diff --git a/drivers/char/hw_random/omap-rng.c b/drivers/char/hw_random/omap-rng.c
-index 74d11ae6abe9..159d4a1347b8 100644
---- a/drivers/char/hw_random/omap-rng.c
-+++ b/drivers/char/hw_random/omap-rng.c
-@@ -499,8 +499,7 @@ static int omap_rng_probe(struct platform_device *pdev)
- 	pm_runtime_put_sync(&pdev->dev);
- 	pm_runtime_disable(&pdev->dev);
- 
--	if (!IS_ERR(priv->clk))
--		clk_disable_unprepare(priv->clk);
-+	clk_disable_unprepare(priv->clk);
- err_ioremap:
- 	dev_err(dev, "initialization failed.\n");
- 	return ret;
-@@ -517,8 +516,7 @@ static int omap_rng_remove(struct platform_device *pdev)
- 	pm_runtime_put_sync(&pdev->dev);
- 	pm_runtime_disable(&pdev->dev);
- 
--	if (!IS_ERR(priv->clk))
--		clk_disable_unprepare(priv->clk);
-+	clk_disable_unprepare(priv->clk);
- 
- 	return 0;
- }
+Thanks to this fix, it would be possible to fix the clock driver
+without introducing a regression.
+
+The first patch is just a small cleanup found when I wrote the main
+patch.
+
+Gregory CLEMENT (2):
+  hwrng: omap - Remove useless test before clk_disable_unprepare
+  hwrng: omap - Fix clock resource by adding a register clock
+
+ Documentation/devicetree/bindings/rng/omap_rng.txt |  7 ++++++-
+ drivers/char/hw_random/omap-rng.c                  | 22 ++++++++++++++++++----
+ 2 files changed, 24 insertions(+), 5 deletions(-)
+
 -- 
 2.16.1
