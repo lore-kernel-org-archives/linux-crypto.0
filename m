@@ -1,79 +1,41 @@
-From: =?UTF-8?q?Hern=C3=A1n=20Gonzalez?= <hernan@vanguardiasur.com.ar>
-Subject: [PATCH 4/4] crypto: bcm: Constify variables in spu2.c
-Date: Tue, 27 Feb 2018 19:01:28 -0300
-Message-ID: <1519768888-19866-4-git-send-email-hernan@vanguardiasur.com.ar>
-References: <1519768888-19866-1-git-send-email-hernan@vanguardiasur.com.ar>
+From: Shawn Guo <shawnguo@kernel.org>
+Subject: Re: [PATCH v4 4/4] ARM: dts: imx7s: add CAAM device node
+Date: Wed, 28 Feb 2018 09:41:49 +0800
+Message-ID: <20180228014148.GA3217@dragon>
+References: <20180222142250.31348-1-rui.silva@linaro.org>
+ <20180222142250.31348-5-rui.silva@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-To: herbert@gondor.apana.org.au, davem@davemloft.net,
-        hernan@vanguardiasur.com.ar, steven.lin1@broadcom.com,
-        arvind.yadav.cs@gmail.com, colin.king@canonical.com,
-        raveendra.padasalagi@broadcom.com, ray.jui@broadcom.com,
-        scott.branden@broadcom.com, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
+Cc: horia.geanta@nxp.com, aymen.sghaier@nxp.com,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Ryan Harkin <ryan.harkin@linaro.org>,
+        Bryan O'Donoghue <pure.logic@nexus-software.ie>,
+        Sascha Hauer <kernel@pengutronix.de>,
+        devicetree@vger.kernel.org, Fabio Estevam <fabio.estevam@nxp.com>,
+        Peng Fan <peng.fan@nxp.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Lukas Auer <lukas.auer@aisec.fraunhofer.de>
+To: Rui Miguel Silva <rui.silva@linaro.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1519768888-19866-1-git-send-email-hernan@vanguardiasur.com.ar>
+Content-Disposition: inline
+In-Reply-To: <20180222142250.31348-5-rui.silva@linaro.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Note: This is compile only tested.
-Variables constified:
-*spu2_cipher_type_names
-*spu2_hash_mode_names
-*spu2_cipher_mode_names
-*spu2_hash_type_names
+On Thu, Feb 22, 2018 at 02:22:50PM +0000, Rui Miguel Silva wrote:
+> Add CAAM device node to the i.MX7s device tree.
+> 
+> Cc: Shawn Guo <shawnguo@kernel.org>
+> Cc: Sascha Hauer <kernel@pengutronix.de>
+> Cc: devicetree@vger.kernel.org
+> Cc: "Horia Geantă" <horia.geanta@nxp.com>
+> Cc: Aymen Sghaier <aymen.sghaier@nxp.com>
+> Cc: Fabio Estevam <fabio.estevam@nxp.com>
+> Cc: Peng Fan <peng.fan@nxp.com>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Lukas Auer <lukas.auer@aisec.fraunhofer.de>
+> Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
 
-Constifying and declaring as static saves 160 bytes.
-
-add/remove: 0/4 grow/shrink: 0/0 up/down: 0/-160 (-160)
-Function                                     old     new   delta
-spu2_cipher_type_names                        24       -     -24
-spu2_hash_mode_names                          32       -     -32
-spu2_cipher_mode_names                        32       -     -32
-spu2_hash_type_names                          72       -     -72
-Total: Before=9185236, After=9185076, chg -0.00%
-
-Signed-off-by: Hernán Gonzalez <hernan@vanguardiasur.com.ar>
----
- drivers/crypto/bcm/spu2.c | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
-
-diff --git a/drivers/crypto/bcm/spu2.c b/drivers/crypto/bcm/spu2.c
-index bf7ac62..fcf3885 100644
---- a/drivers/crypto/bcm/spu2.c
-+++ b/drivers/crypto/bcm/spu2.c
-@@ -49,22 +49,22 @@ enum spu2_proto_sel {
- 	SPU2_DTLS_AEAD = 10
- };
- 
--char *spu2_cipher_type_names[] = { "None", "AES128", "AES192", "AES256",
--	"DES", "3DES"
-+static char * const spu2_cipher_type_names[] = { "None", "AES128", "AES192",
-+	"AES256", "DES", "3DES"
- };
- 
--char *spu2_cipher_mode_names[] = { "ECB", "CBC", "CTR", "CFB", "OFB", "XTS",
--	"CCM", "GCM"
-+static char * const spu2_cipher_mode_names[] = { "ECB", "CBC", "CTR", "CFB",
-+	"OFB", "XTS", "CCM", "GCM"
- };
- 
--char *spu2_hash_type_names[] = { "None", "AES128", "AES192", "AES256",
--	"Reserved", "Reserved", "MD5", "SHA1", "SHA224", "SHA256", "SHA384",
--	"SHA512", "SHA512/224", "SHA512/256", "SHA3-224", "SHA3-256",
-+static char * const spu2_hash_type_names[] = { "None", "AES128", "AES192",
-+	"AES256", "Reserved", "Reserved", "MD5", "SHA1", "SHA224", "SHA256",
-+	"SHA384", "SHA512", "SHA512/224", "SHA512/256", "SHA3-224", "SHA3-256",
- 	"SHA3-384", "SHA3-512"
- };
- 
--char *spu2_hash_mode_names[] = { "CMAC", "CBC-MAC", "XCBC-MAC", "HMAC",
--	"Rabin", "CCM", "GCM", "Reserved"
-+static char * const spu2_hash_mode_names[] = { "CMAC", "CBC-MAC", "XCBC-MAC",
-+	"HMAC", "Rabin", "CCM", "GCM", "Reserved"
- };
- 
- static char *spu2_ciph_type_name(enum spu2_cipher_type cipher_type)
--- 
-2.7.4
+Applied this one and "clk: imx7d: add CAAM clock", thanks.
