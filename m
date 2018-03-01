@@ -1,7 +1,8 @@
 From: Krzysztof Kozlowski <krzk@kernel.org>
-Subject: [PATCH 1/4] crypto: omap-sham: Remove useless check for non-null request
-Date: Thu,  1 Mar 2018 21:50:10 +0100
-Message-ID: <1519937413-24468-1-git-send-email-krzk@kernel.org>
+Subject: [PATCH 3/4] crypto: s5p-sss: Remove useless check for non-null request
+Date: Thu,  1 Mar 2018 21:50:12 +0100
+Message-ID: <1519937413-24468-3-git-send-email-krzk@kernel.org>
+References: <1519937413-24468-1-git-send-email-krzk@kernel.org>
 To: Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
         Krzysztof Kozlowski <krzk@kernel.org>,
@@ -10,34 +11,35 @@ To: Herbert Xu <herbert@gondor.apana.org.au>,
         Tero Kristo <t-kristo@ti.com>, linux-crypto@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-samsung-soc@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1519937413-24468-1-git-send-email-krzk@kernel.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
 ahash_request 'req' argument passed by the caller
-omap_sham_handle_queue() cannot be NULL here because it is obtained from
+s5p_hash_handle_queue() cannot be NULL here because it is obtained from
 non-NULL pointer via container_of().
 
 This fixes smatch warning:
-    drivers/crypto/omap-sham.c:812 omap_sham_prepare_request() warn: variable dereferenced before check 'req' (see line 805)
+    drivers/crypto/s5p-sss.c:1213 s5p_hash_prepare_request() warn: variable dereferenced before check 'req' (see line 1208)
 
 Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
 ---
- drivers/crypto/omap-sham.c | 3 ---
+ drivers/crypto/s5p-sss.c | 3 ---
  1 file changed, 3 deletions(-)
 
-diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
-index 86b89ace836f..7650b1b449bb 100644
---- a/drivers/crypto/omap-sham.c
-+++ b/drivers/crypto/omap-sham.c
-@@ -809,9 +809,6 @@ static int omap_sham_prepare_request(struct ahash_request *req, bool update)
- 	bool final = rctx->flags & BIT(FLAGS_FINUP);
- 	int xmit_len, hash_later;
+diff --git a/drivers/crypto/s5p-sss.c b/drivers/crypto/s5p-sss.c
+index 5d64c08b7f47..d7c8163e5068 100644
+--- a/drivers/crypto/s5p-sss.c
++++ b/drivers/crypto/s5p-sss.c
+@@ -1210,9 +1210,6 @@ static int s5p_hash_prepare_request(struct ahash_request *req, bool update)
+ 	int xmit_len, hash_later, nbytes;
+ 	int ret;
  
 -	if (!req)
 -		return 0;
 -
- 	bs = get_block_size(rctx);
- 
  	if (update)
+ 		nbytes = req->nbytes;
+ 	else
 -- 
 2.7.4
