@@ -1,32 +1,43 @@
-From: Vitaly Andrianov <vitalya@ti.com>
-Subject: [PATCH 0/2] Keystone2 HW random generator
-Date: Thu, 1 Mar 2018 07:54:58 -0500
-Message-ID: <1519908900-10388-1-git-send-email-vitalya@ti.com>
-Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <t-kristo@ti.com>, <vitalya@ti.com>, <m-karicheri2@ti.com>
-To: <mpm@selenic.com>, <herbert@gondor.apana.org.au>, <arnd@arndb.de>,
-        <gregkh@linuxfoundation.org>, <linux-kernel@vger.kernel.org>,
-        <linux-crypto@vger.kernel.org>, <robh+dt@kernel.org>,
-        <mark.rutland@arm.com>, <devicetree@vger.kernel.org>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Subject: [PATCH 1/4] crypto: omap-sham: Remove useless check for non-null request
+Date: Thu,  1 Mar 2018 21:50:10 +0100
+Message-ID: <1519937413-24468-1-git-send-email-krzk@kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        Vladimir Zapolskiy <vz@mleia.com>,
+        Kamil Konieczny <k.konieczny@partner.samsung.com>,
+        Tero Kristo <t-kristo@ti.com>, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-samsung-soc@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Keyston2 Security Accelerator has a hardware random generator sub-module.
-This series adds the driver for the sub-module.
+ahash_request 'req' argument passed by the caller
+omap_sham_handle_queue() cannot be NULL here because it is obtained from
+non-NULL pointer via container_of().
 
-Vitaly Andrianov (2):
-  Documentation: dt: rng: add bindings doc for Keystone SA HWRNG driver
-  hw_random: keystone2: add hw_random driver
+This fixes smatch warning:
+    drivers/crypto/omap-sham.c:812 omap_sham_prepare_request() warn: variable dereferenced before check 'req' (see line 805)
 
- .../devicetree/bindings/rng/ks-sa-rng.txt          |  21 ++
- drivers/char/hw_random/Kconfig                     |   7 +
- drivers/char/hw_random/Makefile                    |   1 +
- drivers/char/hw_random/ks-sa-rng.c                 | 257 +++++++++++++++++++++
- 4 files changed, 286 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/rng/ks-sa-rng.txt
- create mode 100644 drivers/char/hw_random/ks-sa-rng.c
+Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
+---
+ drivers/crypto/omap-sham.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
+diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
+index 86b89ace836f..7650b1b449bb 100644
+--- a/drivers/crypto/omap-sham.c
++++ b/drivers/crypto/omap-sham.c
+@@ -809,9 +809,6 @@ static int omap_sham_prepare_request(struct ahash_request *req, bool update)
+ 	bool final = rctx->flags & BIT(FLAGS_FINUP);
+ 	int xmit_len, hash_later;
+ 
+-	if (!req)
+-		return 0;
+-
+ 	bs = get_block_size(rctx);
+ 
+ 	if (update)
 -- 
 2.7.4
