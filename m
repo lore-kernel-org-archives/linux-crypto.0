@@ -1,114 +1,68 @@
-From: Gregory CLEMENT <gregory.clement@bootlin.com>
-Subject: [PATCH 2/2] hwrng: omap - Fix clock resource by adding a register
- clock
-Date: Wed, 28 Feb 2018 15:27:23 +0100
-Message-ID: <20180228142723.11562-3-gregory.clement@bootlin.com>
-References: <20180228142723.11562-1-gregory.clement@bootlin.com>
+From: Gary R Hook <gary.hook@amd.com>
+Subject: Re: [PATCH 2/3] crypto: ccp - return an actual key size from RSA
+ max_size callback
+Date: Wed, 28 Feb 2018 18:34:09 -0600
+Message-ID: <510c8c85-8619-5fe6-9275-1549a73bd545@amd.com>
+References: <51c265e4-6153-3e5e-316a-ebef059ac36a@maciej.szmigiero.name>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=iso-8859-2; format=flowed
 Content-Transfer-Encoding: 7bit
-Cc: Andrew Lunn <andrew@lunn.ch>, Jason Cooper <jason@lakedaemon.net>,
- Antoine Tenart <antoine.tenart@bootlin.com>,
- Gregory CLEMENT <gregory.clement@bootlin.com>, Omri Itach <omrii@marvell.com>,
- Nadav Haklai <nadavh@marvell.com>, Shadi Ammouri <shadi@marvell.com>,
- Igal Liberman <igall@marvell.com>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
- =?UTF-8?q?Miqu=C3=A8l=20Raynal?= <miquel.raynal@bootlin.com>,
- Marcin Wojtas <mw@semihalf.com>, Hanna Hawa <hannah@marvell.com>,
- linux-arm-kernel@lists.infradead.org,
- Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
- Deepak Saxena <dsaxena@plexity.net>, linux-crypto@vger.kernel.org
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <20180228142723.11562-1-gregory.clement@bootlin.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+Cc: David Howells <dhowells@redhat.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+To: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <51c265e4-6153-3e5e-316a-ebef059ac36a@maciej.szmigiero.name>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Armada 7K/8K we need to explicitly enable the register clock. This
-clock is optional because not all the SoCs using this IP need it but at
-least for Armada 7K/8K it is actually mandatory.
+On 02/24/2018 10:03 AM, Maciej S. Szmigiero wrote:
+> rsa-pkcs1pad uses a value returned from a RSA implementation max_size
+> callback as a size of an input buffer passed to the RSA implementation for
+> encrypt and sign operations.
+> 
+> CCP RSA implementation uses a hardware input buffer which size depends only
+> on the current RSA key length, so it should return this key length in
+> the max_size callback, too.
+> This also matches what the kernel software RSA implementation does.
+> 
+> Previously, the value returned from this callback was always the maximum
+> RSA key size the CCP hardware supports.
+> This resulted in this huge buffer being passed by rsa-pkcs1pad to CCP even
+> for smaller key sizes and then in a buffer overflow when ccp_run_rsa_cmd()
+> tried to copy this large input buffer into a RSA key length-sized hardware
+> input buffer.
+> 
+> Signed-off-by: Maciej S. Szmigiero <mail@maciej.szmigiero.name>
 
-The binding documentation is updating accordingly.
+Acked-by: Gary R Hook <gary.hook@amd.com>
 
-Signed-off-by: Gregory CLEMENT <gregory.clement@bootlin.com>
----
- Documentation/devicetree/bindings/rng/omap_rng.txt |  7 ++++++-
- drivers/char/hw_random/omap-rng.c                  | 16 ++++++++++++++++
- 2 files changed, 22 insertions(+), 1 deletion(-)
-
-diff --git a/Documentation/devicetree/bindings/rng/omap_rng.txt b/Documentation/devicetree/bindings/rng/omap_rng.txt
-index 9cf7876ab434..ea434ce50f36 100644
---- a/Documentation/devicetree/bindings/rng/omap_rng.txt
-+++ b/Documentation/devicetree/bindings/rng/omap_rng.txt
-@@ -13,7 +13,12 @@ Required properties:
- - interrupts : the interrupt number for the RNG module.
- 		Used for "ti,omap4-rng" and "inside-secure,safexcel-eip76"
- - clocks: the trng clock source. Only mandatory for the
--  "inside-secure,safexcel-eip76" compatible.
-+  "inside-secure,safexcel-eip76" compatible, the second clock is
-+  needed for the Armada 7K/8K SoCs
-+- clock-names: mandatory if there is a second clock, in this case the
-+  name must be "core" for the first clock and "reg" for the second
-+  one
-+
- 
- Example:
- /* AM335x */
-diff --git a/drivers/char/hw_random/omap-rng.c b/drivers/char/hw_random/omap-rng.c
-index 159d4a1347b8..b65ff6962899 100644
---- a/drivers/char/hw_random/omap-rng.c
-+++ b/drivers/char/hw_random/omap-rng.c
-@@ -150,6 +150,7 @@ struct omap_rng_dev {
- 	const struct omap_rng_pdata	*pdata;
- 	struct hwrng rng;
- 	struct clk 			*clk;
-+	struct clk			*clk_reg;
- };
- 
- static inline u32 omap_rng_read(struct omap_rng_dev *priv, u16 reg)
-@@ -480,6 +481,19 @@ static int omap_rng_probe(struct platform_device *pdev)
- 		}
- 	}
- 
-+	priv->clk_reg = devm_clk_get(&pdev->dev, "reg");
-+	if (IS_ERR(priv->clk_reg) && PTR_ERR(priv->clk_reg) == -EPROBE_DEFER)
-+		return -EPROBE_DEFER;
-+	if (!IS_ERR(priv->clk_reg)) {
-+		ret = clk_prepare_enable(priv->clk_reg);
-+		if (ret) {
-+			dev_err(&pdev->dev,
-+				"Unable to enable the register clk: %d\n",
-+				ret);
-+			goto err_register;
-+		}
-+	}
-+
- 	ret = (dev->of_node) ? of_get_omap_rng_device_details(priv, pdev) :
- 				get_omap_rng_device_details(priv);
- 	if (ret)
-@@ -499,6 +513,7 @@ static int omap_rng_probe(struct platform_device *pdev)
- 	pm_runtime_put_sync(&pdev->dev);
- 	pm_runtime_disable(&pdev->dev);
- 
-+	clk_disable_unprepare(priv->clk_reg);
- 	clk_disable_unprepare(priv->clk);
- err_ioremap:
- 	dev_err(dev, "initialization failed.\n");
-@@ -517,6 +532,7 @@ static int omap_rng_remove(struct platform_device *pdev)
- 	pm_runtime_disable(&pdev->dev);
- 
- 	clk_disable_unprepare(priv->clk);
-+	clk_disable_unprepare(priv->clk_reg);
- 
- 	return 0;
- }
--- 
-2.16.1
+> Fixes: ceeec0afd684 ("crypto: ccp - Add support for RSA on the CCP")
+> Cc: stable@vger.kernel.org
+> ---
+>   drivers/crypto/ccp/ccp-crypto-rsa.c | 7 +++----
+>   1 file changed, 3 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/crypto/ccp/ccp-crypto-rsa.c b/drivers/crypto/ccp/ccp-crypto-rsa.c
+> index e6db8672d89c..05850dfd7940 100644
+> --- a/drivers/crypto/ccp/ccp-crypto-rsa.c
+> +++ b/drivers/crypto/ccp/ccp-crypto-rsa.c
+> @@ -60,10 +60,9 @@ static int ccp_rsa_complete(struct crypto_async_request *async_req, int ret)
+>   
+>   static unsigned int ccp_rsa_maxsize(struct crypto_akcipher *tfm)
+>   {
+> -	if (ccp_version() > CCP_VERSION(3, 0))
+> -		return CCP5_RSA_MAXMOD;
+> -	else
+> -		return CCP_RSA_MAXMOD;
+> +	struct ccp_ctx *ctx = akcipher_tfm_ctx(tfm);
+> +
+> +	return ctx->u.rsa.n_len;
+>   }
+>   
+>   static int ccp_rsa_crypt(struct akcipher_request *req, bool encrypt)
+> 
