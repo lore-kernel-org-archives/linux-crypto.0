@@ -1,9 +1,9 @@
 From: Gary R Hook <gary.hook@amd.com>
-Subject: Re: [PATCH 2/3] crypto: ccp - return an actual key size from RSA
- max_size callback
-Date: Wed, 28 Feb 2018 18:34:09 -0600
-Message-ID: <510c8c85-8619-5fe6-9275-1549a73bd545@amd.com>
-References: <51c265e4-6153-3e5e-316a-ebef059ac36a@maciej.szmigiero.name>
+Subject: Re: [PATCH 3/3] crypto: ccp - protect RSA implementation from too
+ large input data
+Date: Wed, 28 Feb 2018 18:35:07 -0600
+Message-ID: <49db7800-b052-79e8-8d8d-24ddc6382e48@amd.com>
+References: <4af6c02f-db3f-3d82-9685-367913c684ff@maciej.szmigiero.name>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-2; format=flowed
 Content-Transfer-Encoding: 7bit
@@ -15,54 +15,71 @@ To: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <51c265e4-6153-3e5e-316a-ebef059ac36a@maciej.szmigiero.name>
+In-Reply-To: <4af6c02f-db3f-3d82-9685-367913c684ff@maciej.szmigiero.name>
 Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
 On 02/24/2018 10:03 AM, Maciej S. Szmigiero wrote:
-> rsa-pkcs1pad uses a value returned from a RSA implementation max_size
-> callback as a size of an input buffer passed to the RSA implementation for
-> encrypt and sign operations.
-> 
 > CCP RSA implementation uses a hardware input buffer which size depends only
-> on the current RSA key length, so it should return this key length in
-> the max_size callback, too.
-> This also matches what the kernel software RSA implementation does.
+> on the current RSA key length. Key modulus and a message to be processed
+> is then copied to this buffer based on their own lengths.
 > 
-> Previously, the value returned from this callback was always the maximum
-> RSA key size the CCP hardware supports.
-> This resulted in this huge buffer being passed by rsa-pkcs1pad to CCP even
-> for smaller key sizes and then in a buffer overflow when ccp_run_rsa_cmd()
-> tried to copy this large input buffer into a RSA key length-sized hardware
-> input buffer.
+> Since the price for providing too long input data is a buffer overflow and
+> there already has been a case when this has happened let's better reject
+> such oversized input data and log an error message in this case so we know
+> what is going on.
 > 
 > Signed-off-by: Maciej S. Szmigiero <mail@maciej.szmigiero.name>
-
-Acked-by: Gary R Hook <gary.hook@amd.com>
-
-> Fixes: ceeec0afd684 ("crypto: ccp - Add support for RSA on the CCP")
-> Cc: stable@vger.kernel.org
 > ---
->   drivers/crypto/ccp/ccp-crypto-rsa.c | 7 +++----
->   1 file changed, 3 insertions(+), 4 deletions(-)
+>   drivers/crypto/ccp/ccp-ops.c | 24 ++++++++++++++++++++----
+>   1 file changed, 20 insertions(+), 4 deletions(-)
 > 
-> diff --git a/drivers/crypto/ccp/ccp-crypto-rsa.c b/drivers/crypto/ccp/ccp-crypto-rsa.c
-> index e6db8672d89c..05850dfd7940 100644
-> --- a/drivers/crypto/ccp/ccp-crypto-rsa.c
-> +++ b/drivers/crypto/ccp/ccp-crypto-rsa.c
-> @@ -60,10 +60,9 @@ static int ccp_rsa_complete(struct crypto_async_request *async_req, int ret)
+> diff --git a/drivers/crypto/ccp/ccp-ops.c b/drivers/crypto/ccp/ccp-ops.c
+> index 406b95329b3d..517aeee30abf 100644
+> --- a/drivers/crypto/ccp/ccp-ops.c
+> +++ b/drivers/crypto/ccp/ccp-ops.c
+> @@ -1770,10 +1770,6 @@ static int ccp_run_rsa_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+>   	if (!rsa->exp || !rsa->mod || !rsa->src || !rsa->dst)
+>   		return -EINVAL;
 >   
->   static unsigned int ccp_rsa_maxsize(struct crypto_akcipher *tfm)
->   {
-> -	if (ccp_version() > CCP_VERSION(3, 0))
-> -		return CCP5_RSA_MAXMOD;
-> -	else
-> -		return CCP_RSA_MAXMOD;
-> +	struct ccp_ctx *ctx = akcipher_tfm_ctx(tfm);
+> -	memset(&op, 0, sizeof(op));
+> -	op.cmd_q = cmd_q;
+> -	op.jobid = CCP_NEW_JOBID(cmd_q->ccp);
+> -
+>   	/* The RSA modulus must precede the message being acted upon, so
+>   	 * it must be copied to a DMA area where the message and the
+>   	 * modulus can be concatenated.  Therefore the input buffer
+> @@ -1785,6 +1781,26 @@ static int ccp_run_rsa_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+>   	o_len = 32 * ((rsa->key_size + 255) / 256);
+>   	i_len = o_len * 2;
+>   
+> +	if (rsa->mod_len > o_len) {
+> +		dev_err(cmd_q->ccp->dev,
+> +			"RSA modulus of %u bytes too large for key size of %u bits\n",
+> +			(unsigned int)rsa->mod_len,
+> +			(unsigned int)rsa->key_size);
+> +		return -EINVAL;
+> +	}
 > +
-> +	return ctx->u.rsa.n_len;
->   }
->   
->   static int ccp_rsa_crypt(struct akcipher_request *req, bool encrypt)
+> +	if (rsa->src_len > o_len) {
+> +		dev_err(cmd_q->ccp->dev,
+> +			"RSA data of %u bytes too large for key size of %u bits\n",
+> +			(unsigned int)rsa->src_len,
+> +			(unsigned int)rsa->key_size);
+> +		return -EINVAL;
+> +	}
+
+We've talked about this, and we believe that a more central fix is 
+warranted. I intend to post another patch tomorrow that should address
+this problem.
+
+> +
+> +	memset(&op, 0, sizeof(op));
+> +	op.cmd_q = cmd_q;
+> +	op.jobid = CCP_NEW_JOBID(cmd_q->ccp);
+> +
+>   	sb_count = 0;
+>   	if (cmd_q->ccp->vdata->version < CCP_VERSION(5, 0)) {
+>   		/* sb_count is the number of storage block slots required
 > 
