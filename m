@@ -1,49 +1,49 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH Resend 0/5] hwrng: stm32 - Improvement for stm32-rng
-Date: Sat, 3 Mar 2018 00:33:50 +0800
-Message-ID: <20180302163350.GA21579@gondor.apana.org.au>
-References: <20180215130312.23612-1-lionel.debieve@st.com>
+Subject: Re: [PATCH 0/4] cleanups and new HW rev support
+Date: Sat, 3 Mar 2018 00:42:12 +0800
+Message-ID: <20180302164212.GE21579@gondor.apana.org.au>
+References: <1519051887-4668-1-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Matt Mackall <mpm@selenic.com>, Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@st.com>,
-        Rob Herring <rob.herring@linaro.org>,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org,
-        Benjamin Gaignard <benjamin.gaignard@st.com>,
-        Ludovic Barre <ludovic.barre@st.com>
-To: Lionel Debieve <lionel.debieve@st.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Ofir Drang <ofir.drang@arm.com>, linux-crypto@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Gilad Ben-Yossef <gilad@benyossef.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20180215130312.23612-1-lionel.debieve@st.com>
+In-Reply-To: <1519051887-4668-1-git-send-email-gilad@benyossef.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Feb 15, 2018 at 02:03:07PM +0100, Lionel Debieve wrote:
-> This set of patches add extended functionalities for stm32 rng
-> driver.
-> Patch #1 includes a reset during probe to avoid any error status
-> which can occur during bootup process and keep safe rng integrity.
+On Mon, Feb 19, 2018 at 02:51:20PM +0000, Gilad Ben-Yossef wrote:
+> This patch set introduces backward compatible support for the older
+> CryptoCell hardware revision 710 and 630 along some minor code
+> cleanups.
 > 
-> Patch #3 adds a new property to manage the clock error detection
-> feature which can be disabled on specific target.
+> Gilad Ben-Yossef (4):
+>   crypto: ccree: remove unused definitions
+>   dt-bindings: Add DT bindings for ccree 710 and 630p
+>   crypto: ccree: add support for older HW revs
+>   crypto: ccree: replace memset+kfree with kzfree
 > 
-> Patch #5 rework the timeout calculation for read value that was
-> previously defined based on loop operation and is now based on
-> timer.
-> 
-> Lionel Debieve (5):
->   hwrng: stm32 - add reset during probe
->   dt-bindings: rng: add reset node for stm32
->   hwrng: stm32 - allow disable clock error detection
->   dt-bindings: rng: add clock detection error for stm32
->   hwrng: stm32 - rework read timeout calculation
-> 
->  .../devicetree/bindings/rng/st,stm32-rng.txt       |  4 ++
->  drivers/char/hw_random/stm32-rng.c                 | 44 ++++++++++++++--------
->  2 files changed, 32 insertions(+), 16 deletions(-)
+>  .../devicetree/bindings/crypto/arm-cryptocell.txt  |   3 +-
+>  drivers/crypto/Kconfig                             |   6 +-
+>  drivers/crypto/ccree/cc_aead.c                     |  34 +++--
+>  drivers/crypto/ccree/cc_cipher.c                   |  25 +++-
+>  drivers/crypto/ccree/cc_crypto_ctx.h               |  36 -----
+>  drivers/crypto/ccree/cc_driver.c                   |  68 ++++++++--
+>  drivers/crypto/ccree/cc_driver.h                   |  23 +++-
+>  drivers/crypto/ccree/cc_fips.c                     |  13 +-
+>  drivers/crypto/ccree/cc_hash.c                     | 149 +++++++++++----------
+>  drivers/crypto/ccree/cc_hash.h                     |  12 +-
+>  drivers/crypto/ccree/cc_host_regs.h                |   3 +
+>  drivers/crypto/ccree/cc_hw_queue_defs.h            |   2 +-
+>  drivers/crypto/ccree/cc_kernel_regs.h              |   1 +
+>  drivers/crypto/ccree/cc_request_mgr.c              |   9 +-
+>  drivers/crypto/ccree/cc_sram_mgr.c                 |  14 ++
+>  15 files changed, 240 insertions(+), 158 deletions(-)
 
 All applied.  Thanks.
 -- 
