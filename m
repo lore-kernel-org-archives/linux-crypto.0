@@ -1,97 +1,51 @@
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: [PATCH 4.4 12/34] lib/mpi: Fix umul_ppmm() for MIPS64r6
-Date: Fri,  2 Mar 2018 09:51:08 +0100
-Message-ID: <20180302084436.750827407@linuxfoundation.org>
-References: <20180302084435.842679610@linuxfoundation.org>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH Resend 0/5] hwrng: stm32 - Improvement for stm32-rng
+Date: Sat, 3 Mar 2018 00:34:00 +0800
+Message-ID: <20180302163359.GB21579@gondor.apana.org.au>
+References: <20180215130312.23612-1-lionel.debieve@st.com>
+ <20180222140328.GE28447@gondor.apana.org.au>
+ <8dcbcea1-78f7-27ff-66a0-a6180d32a05e@st.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        stable@vger.kernel.org, James Hogan <jhogan@kernel.org>,
-        Ralf Baechle <ralf@linux-mips.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>, linux-mips@linux-mips.org,
-        linux-crypto@vger.kernel.org,
-        Sasha Levin <alexander.levin@microsoft.com>
-To: linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: Lionel Debieve <lionel.debieve@st.com>,
+        Matt Mackall <mpm@selenic.com>, Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Rob Herring <rob.herring@linaro.org>,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org,
+        Benjamin Gaignard <benjamin.gaignard@st.com>,
+        Ludovic Barre <ludovic.barre@st.com>
+To: Alexandre Torgue <alexandre.torgue@st.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180302084435.842679610@linuxfoundation.org>
+Content-Disposition: inline
+In-Reply-To: <8dcbcea1-78f7-27ff-66a0-a6180d32a05e@st.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-4.4-stable review patch.  If anyone has any objections, please let me know.
+On Thu, Feb 22, 2018 at 04:25:46PM +0100, Alexandre Torgue wrote:
+> Hi
+> 
+> On 02/22/2018 03:03 PM, Herbert Xu wrote:
+> >On Thu, Feb 15, 2018 at 02:03:07PM +0100, Lionel Debieve wrote:
+> >>This set of patches add extended functionalities for stm32 rng
+> >>driver.
+> >>Patch #1 includes a reset during probe to avoid any error status
+> >>which can occur during bootup process and keep safe rng integrity.
+> >>
+> >>Patch #3 adds a new property to manage the clock error detection
+> >>feature which can be disabled on specific target.
+> >>
+> >>Patch #5 rework the timeout calculation for read value that was
+> >>previously defined based on loop operation and is now based on
+> >>timer.
+> >
+> >I should take only patches 1/3/5, right?
+> 
+> You could take all (dt-bindings + drivers part).
 
-------------------
-
-From: James Hogan <jhogan@kernel.org>
-
-
-[ Upstream commit bbc25bee37d2b32cf3a1fab9195b6da3a185614a ]
-
-Current MIPS64r6 toolchains aren't able to generate efficient
-DMULU/DMUHU based code for the C implementation of umul_ppmm(), which
-performs an unsigned 64 x 64 bit multiply and returns the upper and
-lower 64-bit halves of the 128-bit result. Instead it widens the 64-bit
-inputs to 128-bits and emits a __multi3 intrinsic call to perform a 128
-x 128 multiply. This is both inefficient, and it results in a link error
-since we don't include __multi3 in MIPS linux.
-
-For example commit 90a53e4432b1 ("cfg80211: implement regdb signature
-checking") merged in v4.15-rc1 recently broke the 64r6_defconfig and
-64r6el_defconfig builds by indirectly selecting MPILIB. The same build
-errors can be reproduced on older kernels by enabling e.g. CRYPTO_RSA:
-
-lib/mpi/generic_mpih-mul1.o: In function `mpihelp_mul_1':
-lib/mpi/generic_mpih-mul1.c:50: undefined reference to `__multi3'
-lib/mpi/generic_mpih-mul2.o: In function `mpihelp_addmul_1':
-lib/mpi/generic_mpih-mul2.c:49: undefined reference to `__multi3'
-lib/mpi/generic_mpih-mul3.o: In function `mpihelp_submul_1':
-lib/mpi/generic_mpih-mul3.c:49: undefined reference to `__multi3'
-lib/mpi/mpih-div.o In function `mpihelp_divrem':
-lib/mpi/mpih-div.c:205: undefined reference to `__multi3'
-lib/mpi/mpih-div.c:142: undefined reference to `__multi3'
-
-Therefore add an efficient MIPS64r6 implementation of umul_ppmm() using
-inline assembly and the DMULU/DMUHU instructions, to prevent __multi3
-calls being emitted.
-
-Fixes: 7fd08ca58ae6 ("MIPS: Add build support for the MIPS R6 ISA")
-Signed-off-by: James Hogan <jhogan@kernel.org>
-Cc: Ralf Baechle <ralf@linux-mips.org>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: linux-mips@linux-mips.org
-Cc: linux-crypto@vger.kernel.org
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-Signed-off-by: Sasha Levin <alexander.levin@microsoft.com>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
----
- lib/mpi/longlong.h |   18 +++++++++++++++++-
- 1 file changed, 17 insertions(+), 1 deletion(-)
-
---- a/lib/mpi/longlong.h
-+++ b/lib/mpi/longlong.h
-@@ -671,7 +671,23 @@ do {						\
- 	**************  MIPS/64  **************
- 	***************************************/
- #if (defined(__mips) && __mips >= 3) && W_TYPE_SIZE == 64
--#if (__GNUC__ >= 5) || (__GNUC__ >= 4 && __GNUC_MINOR__ >= 4)
-+#if defined(__mips_isa_rev) && __mips_isa_rev >= 6
-+/*
-+ * GCC ends up emitting a __multi3 intrinsic call for MIPS64r6 with the plain C
-+ * code below, so we special case MIPS64r6 until the compiler can do better.
-+ */
-+#define umul_ppmm(w1, w0, u, v)						\
-+do {									\
-+	__asm__ ("dmulu %0,%1,%2"					\
-+		 : "=d" ((UDItype)(w0))					\
-+		 : "d" ((UDItype)(u)),					\
-+		   "d" ((UDItype)(v)));					\
-+	__asm__ ("dmuhu %0,%1,%2"					\
-+		 : "=d" ((UDItype)(w1))					\
-+		 : "d" ((UDItype)(u)),					\
-+		   "d" ((UDItype)(v)));					\
-+} while (0)
-+#elif (__GNUC__ >= 5) || (__GNUC__ >= 4 && __GNUC_MINOR__ >= 4)
- #define umul_ppmm(w1, w0, u, v) \
- do {									\
- 	typedef unsigned int __ll_UTItype __attribute__((mode(TI)));	\
+Thanks!
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
