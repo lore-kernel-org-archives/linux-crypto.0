@@ -1,8 +1,8 @@
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: [PATCH 4.9 24/56] lib/mpi: Fix umul_ppmm() for MIPS64r6
-Date: Fri,  2 Mar 2018 09:51:10 +0100
-Message-ID: <20180302084450.814588166@linuxfoundation.org>
-References: <20180302084449.568562222@linuxfoundation.org>
+Subject: [PATCH 4.4 12/34] lib/mpi: Fix umul_ppmm() for MIPS64r6
+Date: Fri,  2 Mar 2018 09:51:08 +0100
+Message-ID: <20180302084436.750827407@linuxfoundation.org>
+References: <20180302084435.842679610@linuxfoundation.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -14,11 +14,11 @@ Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Sasha Levin <alexander.levin@microsoft.com>
 To: linux-kernel@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180302084449.568562222@linuxfoundation.org>
+In-Reply-To: <20180302084435.842679610@linuxfoundation.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-4.9-stable review patch.  If anyone has any objections, please let me know.
+4.4-stable review patch.  If anyone has any objections, please let me know.
 
 ------------------
 
