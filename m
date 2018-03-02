@@ -1,88 +1,45 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v4 0/4] Enable CAAM on i.MX7s fix TrustZone issues
-Date: Sat, 3 Mar 2018 00:44:03 +0800
-Message-ID: <20180302164403.GG21579@gondor.apana.org.au>
-References: <20180222142250.31348-1-rui.silva@linaro.org>
+Subject: Re: [PATCH 2/3] crypto: ccp - return an actual key size from RSA
+ max_size callback
+Date: Sat, 3 Mar 2018 00:44:51 +0800
+Message-ID: <20180302164451.GJ21579@gondor.apana.org.au>
+References: <51c265e4-6153-3e5e-316a-ebef059ac36a@maciej.szmigiero.name>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: horia.geanta@nxp.com, aymen.sghaier@nxp.com,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Ryan Harkin <ryan.harkin@linaro.org>,
-        Bryan O'Donoghue <pure.logic@nexus-software.ie>
-To: Rui Miguel Silva <rui.silva@linaro.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+        David Howells <dhowells@redhat.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Gary Hook <gary.hook@amd.com>, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20180222142250.31348-1-rui.silva@linaro.org>
+In-Reply-To: <51c265e4-6153-3e5e-316a-ebef059ac36a@maciej.szmigiero.name>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Feb 22, 2018 at 02:22:46PM +0000, Rui Miguel Silva wrote:
-> For v4 I am taking over this patch series as all the left over patches were
-> implemented by me.
+On Sat, Feb 24, 2018 at 05:03:21PM +0100, Maciej S. Szmigiero wrote:
+> rsa-pkcs1pad uses a value returned from a RSA implementation max_size
+> callback as a size of an input buffer passed to the RSA implementation for
+> encrypt and sign operations.
 > 
-> V4:
-> - removed patch: [PATCH v3 2/5] crypto: caam: Fix endless loop when RNG is
-> already initialized from the series since Horia presented a better fix for the
->  endless loop in case of fail to acquire DECO:
->  225ece3e7dad4 crypto: caam - fix endless loop when DECO acquire fails
-> - add Fabio Estevam reviewed by tag in PATCH 3/3.
-> - removed CAAM ERA from dts since bootloader will add it - Horia.
+> CCP RSA implementation uses a hardware input buffer which size depends only
+> on the current RSA key length, so it should return this key length in
+> the max_size callback, too.
+> This also matches what the kernel software RSA implementation does.
 > 
-> V3:
-> - Added Cc: clk driver maintainers - Fabio Estevam
-> - Added Cc: i.MX arch maintainers - Fabio Estevam
-> - Removed bouncing email address for Herbert Xu
+> Previously, the value returned from this callback was always the maximum
+> RSA key size the CCP hardware supports.
+> This resulted in this huge buffer being passed by rsa-pkcs1pad to CCP even
+> for smaller key sizes and then in a buffer overflow when ccp_run_rsa_cmd()
+> tried to copy this large input buffer into a RSA key length-sized hardware
+> input buffer.
 > 
-> V2-resend:
-> - Patch 0005 lost in the ether - resending
-> 
-> V2:
-> - Endian detection is ok with TrustZone enabled Horia.
->   Endian detection logic tested with TrustZone enabled. The register that
->   this relies on though isn't affected by the lock-down in the first page.
->   Assuming set of affected registers is actually just the 'deco' registers
->   though there is no formal statement of that, that I am aware of.
-> 
-> - Moving of TrustZone work-around into u-boot
->   This set actually doesn't need to deal with TrustZone at all now but, for
->   the sake of consistency keeping thread title
-> 
->   https://patchwork.ozlabs.org/patch/866460/
->   https://patchwork.ozlabs.org/patch/866462/
->   https://patchwork.ozlabs.org/patch/865890/
-> 
-> - Reworded endless loop fix to read a bit better
-> 
-> - Fixes to DTS additions - Rui
-> 
-> - Fixes to number of clocks declared - Rui
-> 
-> V1:
-> This patch-set enables CAAM on the i.MX7s and fixes a number of issues
-> identified with the CAAM driver and hardware when TrustZone mode is
-> enabled.
-> 
-> The first block of patches are simple bug-fixes, followed by a second block
-> of patches which are simple enabling patches for the i.MX7Solo - note we
-> aren't enabling for the i.MX7Dual since we don't have hardware to test that
-> out but it should be a 1:1 mapping for others to enable when appropriate.
-> 
-> Cheers,
->     Rui
-> 
-> Rui Miguel Silva (4):
->   crypto: caam - Fix null dereference at error path
->   crypto: caam - do not use mem and emi_slow clock for imx7x
->   clk: imx7d: add CAAM clock
->   ARM: dts: imx7s: add CAAM device node
-> 
->  arch/arm/boot/dts/imx7s.dtsi            | 30 +++++++++++++++++++++++
->  drivers/clk/imx/clk-imx7d.c             |  1 +
->  drivers/crypto/caam/ctrl.c              | 42 +++++++++++++++++++--------------
->  include/dt-bindings/clock/imx7d-clock.h |  3 ++-
->  4 files changed, 57 insertions(+), 19 deletions(-)
+> Signed-off-by: Maciej S. Szmigiero <mail@maciej.szmigiero.name>
+> Fixes: ceeec0afd684 ("crypto: ccp - Add support for RSA on the CCP")
+> Cc: stable@vger.kernel.org
 
-Patches 1 and 2 applied.  Thanks.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
