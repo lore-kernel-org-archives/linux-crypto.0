@@ -1,46 +1,55 @@
-From: =?iso-8859-2?Q?Horia_Geant=E3?= <horia.geanta@nxp.com>
-Subject: Re: [PATCH 1/2] crypto: talitos - don't persistently map
- req_ctx->hw_context and req_ctx->buf
-Date: Fri, 2 Mar 2018 18:19:23 +0000
-Message-ID: <VI1PR0402MB3342DC809DACC396FAA21A4698C50@VI1PR0402MB3342.eurprd04.prod.outlook.com>
-References: <7c934f0788d60bd82fb1cb51d712c9ab1ea7fcb4.1519660621.git.christophe.leroy@c-s.fr>
+From: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+Subject: Re: [PATCH 2/3] crypto: ccp - return an actual key size from RSA
+ max_size callback
+Date: Sat, 3 Mar 2018 00:15:20 +0100
+Message-ID: <087e7b27-f839-8d4b-8da8-5d0fa2f8caf1@maciej.szmigiero.name>
+References: <51c265e4-6153-3e5e-316a-ebef059ac36a@maciej.szmigiero.name>
+ <20180302164451.GJ21579@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-2"
-Content-Transfer-Encoding: quoted-printable
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>
-To: Christophe Leroy <christophe.leroy@c-s.fr>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Cc: "David S. Miller" <davem@davemloft.net>,
+        David Howells <dhowells@redhat.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Gary Hook <gary.hook@amd.com>, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20180302164451.GJ21579@gondor.apana.org.au>
 Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 2/26/2018 6:40 PM, Christophe Leroy wrote:=0A=
-> Commit 49f9783b0cea ("crypto: talitos - do hw_context DMA mapping=0A=
-> outside the requests") introduced a persistent dma mapping of=0A=
-> req_ctx->hw_context=0A=
-> Commit 37b5e8897eb5 ("crypto: talitos - chain in buffered data for ahash=
-=0A=
-> on SEC1") introduced a persistent dma mapping of req_ctx->buf=0A=
-> =0A=
-> As there is no destructor for req_ctx (the request context), the=0A=
-> associated dma handlers where set in ctx (the tfm context). This is=0A=
-> wrong as several hash operations can run with the same ctx.=0A=
-> =0A=
-> This patch removes this persistent mapping.=0A=
-> =0A=
-> Reported-by: Horia Geanta <horia.geanta@nxp.com>=0A=
-> Fixes: 49f9783b0cea ("crypto: talitos - do hw_context DMA mapping outside=
- the requests")=0A=
-> Fixes: 37b5e8897eb5 ("crypto: talitos - chain in buffered data for ahash =
-on SEC1")=0A=
-> Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>=0A=
-Tested-by: Horia Geant=E3 <horia.geanta@nxp.com>=0A=
-=0A=
-Please add this to 4.15.y -stable tree.=0A=
-=0A=
-Thanks,=0A=
-Horia=0A=
+On 02.03.2018 17:44, Herbert Xu wrote:
+> On Sat, Feb 24, 2018 at 05:03:21PM +0100, Maciej S. Szmigiero wrote:
+>> rsa-pkcs1pad uses a value returned from a RSA implementation max_size
+>> callback as a size of an input buffer passed to the RSA implementation for
+>> encrypt and sign operations.
+>>
+>> CCP RSA implementation uses a hardware input buffer which size depends only
+>> on the current RSA key length, so it should return this key length in
+>> the max_size callback, too.
+>> This also matches what the kernel software RSA implementation does.
+>>
+>> Previously, the value returned from this callback was always the maximum
+>> RSA key size the CCP hardware supports.
+>> This resulted in this huge buffer being passed by rsa-pkcs1pad to CCP even
+>> for smaller key sizes and then in a buffer overflow when ccp_run_rsa_cmd()
+>> tried to copy this large input buffer into a RSA key length-sized hardware
+>> input buffer.
+>>
+>> Signed-off-by: Maciej S. Szmigiero <mail@maciej.szmigiero.name>
+>> Fixes: ceeec0afd684 ("crypto: ccp - Add support for RSA on the CCP")
+>> Cc: stable@vger.kernel.org
+> 
+> Patch applied.  Thanks.
+
+Thanks.
+
+However, what about the first patch from this series?
+Without it, while it no longer should cause a buffer overflow, in-kernel
+X.509 certificate verification will still fail with CCP driver loaded
+(since CCP RSA implementation has a higher priority than the software
+RSA implementation).
+
+Maciej
