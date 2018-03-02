@@ -1,45 +1,97 @@
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Subject: [PATCH 2/4] crypto: omap-sham - Fix misleading indentation
-Date: Thu,  1 Mar 2018 21:50:11 +0100
-Message-ID: <1519937413-24468-2-git-send-email-krzk@kernel.org>
-References: <1519937413-24468-1-git-send-email-krzk@kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Krzysztof Kozlowski <krzk@kernel.org>,
-        Vladimir Zapolskiy <vz@mleia.com>,
-        Kamil Konieczny <k.konieczny@partner.samsung.com>,
-        Tero Kristo <t-kristo@ti.com>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-samsung-soc@vger.kernel.org
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: [PATCH 4.14 050/115] lib/mpi: Fix umul_ppmm() for MIPS64r6
+Date: Fri,  2 Mar 2018 09:50:53 +0100
+Message-ID: <20180302084505.903142217@linuxfoundation.org>
+References: <20180302084503.856536800@linuxfoundation.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        stable@vger.kernel.org, James Hogan <jhogan@kernel.org>,
+        Ralf Baechle <ralf@linux-mips.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>, linux-mips@linux-mips.org,
+        linux-crypto@vger.kernel.org,
+        Sasha Levin <alexander.levin@verizon.com>
+To: linux-kernel@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1519937413-24468-1-git-send-email-krzk@kernel.org>
+In-Reply-To: <20180302084503.856536800@linuxfoundation.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Commit 8043bb1ae03c ("crypto: omap-sham - convert driver logic to use
-sgs for data xmit") removed the if() clause leaving the statement as is.
-The intention was in that case to finish the request always so the goto
-instruction seems sensible.
+4.14-stable review patch.  If anyone has any objections, please let me know.
 
-Remove the indentation to fix Smatch warning:
-    drivers/crypto/omap-sham.c:1761 omap_sham_done_task() warn: inconsistent indenting
+------------------
 
-Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
+From: James Hogan <jhogan@kernel.org>
+
+
+[ Upstream commit bbc25bee37d2b32cf3a1fab9195b6da3a185614a ]
+
+Current MIPS64r6 toolchains aren't able to generate efficient
+DMULU/DMUHU based code for the C implementation of umul_ppmm(), which
+performs an unsigned 64 x 64 bit multiply and returns the upper and
+lower 64-bit halves of the 128-bit result. Instead it widens the 64-bit
+inputs to 128-bits and emits a __multi3 intrinsic call to perform a 128
+x 128 multiply. This is both inefficient, and it results in a link error
+since we don't include __multi3 in MIPS linux.
+
+For example commit 90a53e4432b1 ("cfg80211: implement regdb signature
+checking") merged in v4.15-rc1 recently broke the 64r6_defconfig and
+64r6el_defconfig builds by indirectly selecting MPILIB. The same build
+errors can be reproduced on older kernels by enabling e.g. CRYPTO_RSA:
+
+lib/mpi/generic_mpih-mul1.o: In function `mpihelp_mul_1':
+lib/mpi/generic_mpih-mul1.c:50: undefined reference to `__multi3'
+lib/mpi/generic_mpih-mul2.o: In function `mpihelp_addmul_1':
+lib/mpi/generic_mpih-mul2.c:49: undefined reference to `__multi3'
+lib/mpi/generic_mpih-mul3.o: In function `mpihelp_submul_1':
+lib/mpi/generic_mpih-mul3.c:49: undefined reference to `__multi3'
+lib/mpi/mpih-div.o In function `mpihelp_divrem':
+lib/mpi/mpih-div.c:205: undefined reference to `__multi3'
+lib/mpi/mpih-div.c:142: undefined reference to `__multi3'
+
+Therefore add an efficient MIPS64r6 implementation of umul_ppmm() using
+inline assembly and the DMULU/DMUHU instructions, to prevent __multi3
+calls being emitted.
+
+Fixes: 7fd08ca58ae6 ("MIPS: Add build support for the MIPS R6 ISA")
+Signed-off-by: James Hogan <jhogan@kernel.org>
+Cc: Ralf Baechle <ralf@linux-mips.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: linux-mips@linux-mips.org
+Cc: linux-crypto@vger.kernel.org
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Sasha Levin <alexander.levin@verizon.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 ---
- drivers/crypto/omap-sham.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ lib/mpi/longlong.h |   18 +++++++++++++++++-
+ 1 file changed, 17 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
-index 7650b1b449bb..6cb6ab6f52c0 100644
---- a/drivers/crypto/omap-sham.c
-+++ b/drivers/crypto/omap-sham.c
-@@ -1758,7 +1758,7 @@ static void omap_sham_done_task(unsigned long data)
- 		if (test_and_clear_bit(FLAGS_OUTPUT_READY, &dd->flags)) {
- 			/* hash or semi-hash ready */
- 			clear_bit(FLAGS_DMA_READY, &dd->flags);
--				goto finish;
-+			goto finish;
- 		}
- 	}
- 
--- 
-2.7.4
+--- a/lib/mpi/longlong.h
++++ b/lib/mpi/longlong.h
+@@ -671,7 +671,23 @@ do {						\
+ 	**************  MIPS/64  **************
+ 	***************************************/
+ #if (defined(__mips) && __mips >= 3) && W_TYPE_SIZE == 64
+-#if (__GNUC__ >= 5) || (__GNUC__ >= 4 && __GNUC_MINOR__ >= 4)
++#if defined(__mips_isa_rev) && __mips_isa_rev >= 6
++/*
++ * GCC ends up emitting a __multi3 intrinsic call for MIPS64r6 with the plain C
++ * code below, so we special case MIPS64r6 until the compiler can do better.
++ */
++#define umul_ppmm(w1, w0, u, v)						\
++do {									\
++	__asm__ ("dmulu %0,%1,%2"					\
++		 : "=d" ((UDItype)(w0))					\
++		 : "d" ((UDItype)(u)),					\
++		   "d" ((UDItype)(v)));					\
++	__asm__ ("dmuhu %0,%1,%2"					\
++		 : "=d" ((UDItype)(w1))					\
++		 : "d" ((UDItype)(u)),					\
++		   "d" ((UDItype)(v)));					\
++} while (0)
++#elif (__GNUC__ >= 5) || (__GNUC__ >= 4 && __GNUC_MINOR__ >= 4)
+ #define umul_ppmm(w1, w0, u, v) \
+ do {									\
+ 	typedef unsigned int __ll_UTItype __attribute__((mode(TI)));	\
