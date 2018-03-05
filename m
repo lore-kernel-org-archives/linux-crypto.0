@@ -1,72 +1,47 @@
-From: SF Markus Elfring <elfring@users.sourceforge.net>
-Subject: [PATCH] crypto: ccp: Use memdup_user() rather than duplicating its
- implementation
-Date: Mon, 5 Mar 2018 14:10:20 +0100
-Message-ID: <ccd82e60-ba87-d224-3662-365662fa4e6e@users.sourceforge.net>
+From: Colin King <colin.king@canonical.com>
+Subject: [PATCH][next] crypto: x86/des3_ede: make array des3_ede_skciphers static
+Date: Mon,  5 Mar 2018 14:18:00 +0100
+Message-ID: <20180305131800.26647-1-colin.king@canonical.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Cc: LKML <linux-kernel@vger.kernel.org>,
-        kernel-janitors@vger.kernel.org, kvm@vger.kernel.org,
-        Borislav Petkov <bp@suse.de>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-To: linux-crypto@vger.kernel.org,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Gary Hook <gary.hook@amd.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Tom Lendacky <thomas.lendacky@amd.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Cc: kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H . Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
+        linux-crypto@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Language: en-GB
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-From: Markus Elfring <elfring@users.sourceforge.net>
-Date: Mon, 5 Mar 2018 13:50:13 +0100
+From: Colin Ian King <colin.king@canonical.com>
 
-Reuse existing functionality from memdup_user() instead of keeping
-duplicate source code.
+The array des3_ede_skciphers is local to the source and does not need
+to be in global scope, so make it static.
 
-This issue was detected by using the Coccinelle software.
+Cleans up sparse warning:
+arch/x86/crypto/des3_ede_glue.c:407:21: warning: symbol
+'des3_ede_skciphers' was not declared. Should it be static?
 
-Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+Signed-off-by: Colin Ian King <colin.king@canonical.com>
 ---
- drivers/crypto/ccp/psp-dev.c | 15 +--------------
- 1 file changed, 1 insertion(+), 14 deletions(-)
+ arch/x86/crypto/des3_ede_glue.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
-index fcfa5b1eae61..8255258cd040 100644
---- a/drivers/crypto/ccp/psp-dev.c
-+++ b/drivers/crypto/ccp/psp-dev.c
-@@ -367,8 +367,6 @@ static int sev_ioctl_do_pek_csr(struct sev_issue_cmd *argp)
+diff --git a/arch/x86/crypto/des3_ede_glue.c b/arch/x86/crypto/des3_ede_glue.c
+index f9c7bdc5be5a..5c610d4ef9fc 100644
+--- a/arch/x86/crypto/des3_ede_glue.c
++++ b/arch/x86/crypto/des3_ede_glue.c
+@@ -404,7 +404,7 @@ static struct crypto_alg des3_ede_cipher = {
+ 	}
+ };
  
- void *psp_copy_user_blob(u64 __user uaddr, u32 len)
- {
--	void *data;
--
- 	if (!uaddr || !len)
- 		return ERR_PTR(-EINVAL);
- 
-@@ -376,18 +374,7 @@ void *psp_copy_user_blob(u64 __user uaddr, u32 len)
- 	if (len > SEV_FW_BLOB_MAX_SIZE)
- 		return ERR_PTR(-EINVAL);
- 
--	data = kmalloc(len, GFP_KERNEL);
--	if (!data)
--		return ERR_PTR(-ENOMEM);
--
--	if (copy_from_user(data, (void __user *)(uintptr_t)uaddr, len))
--		goto e_free;
--
--	return data;
--
--e_free:
--	kfree(data);
--	return ERR_PTR(-EFAULT);
-+	return memdup_user((void __user *)(uintptr_t)uaddr, len);
- }
- EXPORT_SYMBOL_GPL(psp_copy_user_blob);
- 
+-struct skcipher_alg des3_ede_skciphers[] = {
++static struct skcipher_alg des3_ede_skciphers[] = {
+ 	{
+ 		.base.cra_name		= "ecb(des3_ede)",
+ 		.base.cra_driver_name	= "ecb-des3_ede-asm",
 -- 
-2.16.2
+2.15.1
