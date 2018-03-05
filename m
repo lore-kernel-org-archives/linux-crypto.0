@@ -1,37 +1,56 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 2/3] crypto: ccp - return an actual key size from RSA
- max_size callback
-Date: Sun, 4 Mar 2018 20:56:02 +0800
-Message-ID: <20180304125602.GA24397@gondor.apana.org.au>
-References: <51c265e4-6153-3e5e-316a-ebef059ac36a@maciej.szmigiero.name>
- <20180302164451.GJ21579@gondor.apana.org.au>
- <087e7b27-f839-8d4b-8da8-5d0fa2f8caf1@maciej.szmigiero.name>
+From: Tero Kristo <t-kristo@ti.com>
+Subject: Re: [PATCH 1/4] crypto: omap-sham: Remove useless check for non-null
+ request
+Date: Mon, 5 Mar 2018 10:58:57 +0200
+Message-ID: <4062df04-e605-60c1-0cab-2d519efdc4b1@ti.com>
+References: <1519937413-24468-1-git-send-email-krzk@kernel.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-        David Howells <dhowells@redhat.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Gary Hook <gary.hook@amd.com>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+To: Krzysztof Kozlowski <krzk@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Vladimir Zapolskiy <vz@mleia.com>,
+        Kamil Konieczny <k.konieczny@partner.samsung.com>,
+        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-samsung-soc@vger.kernel.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <087e7b27-f839-8d4b-8da8-5d0fa2f8caf1@maciej.szmigiero.name>
+In-Reply-To: <1519937413-24468-1-git-send-email-krzk@kernel.org>
+Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Sat, Mar 03, 2018 at 12:15:20AM +0100, Maciej S. Szmigiero wrote:
->
-> However, what about the first patch from this series?
-> Without it, while it no longer should cause a buffer overflow, in-kernel
-> X.509 certificate verification will still fail with CCP driver loaded
-> (since CCP RSA implementation has a higher priority than the software
-> RSA implementation).
+On 01/03/18 22:50, Krzysztof Kozlowski wrote:
+> ahash_request 'req' argument passed by the caller
+> omap_sham_handle_queue() cannot be NULL here because it is obtained from
+> non-NULL pointer via container_of().
+> 
+> This fixes smatch warning:
+>      drivers/crypto/omap-sham.c:812 omap_sham_prepare_request() warn: variable dereferenced before check 'req' (see line 805)
+> 
+> Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
 
-That normally goes through the security tree.
+Acked-by: Tero Kristo <t-kristo@ti.com>
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> ---
+>   drivers/crypto/omap-sham.c | 3 ---
+>   1 file changed, 3 deletions(-)
+> 
+> diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
+> index 86b89ace836f..7650b1b449bb 100644
+> --- a/drivers/crypto/omap-sham.c
+> +++ b/drivers/crypto/omap-sham.c
+> @@ -809,9 +809,6 @@ static int omap_sham_prepare_request(struct ahash_request *req, bool update)
+>   	bool final = rctx->flags & BIT(FLAGS_FINUP);
+>   	int xmit_len, hash_later;
+>   
+> -	if (!req)
+> -		return 0;
+> -
+>   	bs = get_block_size(rctx);
+>   
+>   	if (update)
+> 
+
+--
+Texas Instruments Finland Oy, Porkkalankatu 22, 00180 Helsinki. Y-tunnus/Business ID: 0615521-4. Kotipaikka/Domicile: Helsinki
