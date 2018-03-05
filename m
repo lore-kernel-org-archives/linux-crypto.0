@@ -1,56 +1,50 @@
-From: Tero Kristo <t-kristo@ti.com>
-Subject: Re: [PATCH 2/4] crypto: omap-sham - Fix misleading indentation
-Date: Mon, 5 Mar 2018 10:59:29 +0200
-Message-ID: <fe1ae684-9f16-e31e-c88e-3e9df083e012@ti.com>
-References: <1519937413-24468-1-git-send-email-krzk@kernel.org>
- <1519937413-24468-2-git-send-email-krzk@kernel.org>
+From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
+Subject: [PATCH] crypto: doc - clarify hash callbacks state machine
+Date: Mon, 5 Mar 2018 12:39:45 +0200
+Message-ID: <20180305103945.3517-1-horia.geanta@nxp.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-To: Krzysztof Kozlowski <krzk@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Cc: <linux-crypto@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        Vladimir Zapolskiy <vz@mleia.com>,
-        Kamil Konieczny <k.konieczny@partner.samsung.com>,
-        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-samsung-soc@vger.kernel.org>
+        Jonathan Corbet <corbet@lwn.net>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1519937413-24468-2-git-send-email-krzk@kernel.org>
-Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 01/03/18 22:50, Krzysztof Kozlowski wrote:
-> Commit 8043bb1ae03c ("crypto: omap-sham - convert driver logic to use
-> sgs for data xmit") removed the if() clause leaving the statement as is.
-> The intention was in that case to finish the request always so the goto
-> instruction seems sensible.
-> 
-> Remove the indentation to fix Smatch warning:
->      drivers/crypto/omap-sham.c:1761 omap_sham_done_task() warn: inconsistent indenting
-> 
-> Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
+Even though it doesn't make too much sense, it is perfectly legal to:
+- call .init() and then (as many times) .update()
+- subseqently _not_ call any of .final(), .finup() or .export()
 
-Acked-by: Tero Kristo <t-kristo@ti.com>
+Update documentation since this is an important issue to consider
+from resource management perspective.
 
-> ---
->   drivers/crypto/omap-sham.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
-> index 7650b1b449bb..6cb6ab6f52c0 100644
-> --- a/drivers/crypto/omap-sham.c
-> +++ b/drivers/crypto/omap-sham.c
-> @@ -1758,7 +1758,7 @@ static void omap_sham_done_task(unsigned long data)
->   		if (test_and_clear_bit(FLAGS_OUTPUT_READY, &dd->flags)) {
->   			/* hash or semi-hash ready */
->   			clear_bit(FLAGS_DMA_READY, &dd->flags);
-> -				goto finish;
-> +			goto finish;
->   		}
->   	}
->   
-> 
+Link: https://lkml.kernel.org/r/20180222114741.GA27631@gondor.apana.org.au
+Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
+---
+ Documentation/crypto/devel-algos.rst | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
---
-Texas Instruments Finland Oy, Porkkalankatu 22, 00180 Helsinki. Y-tunnus/Business ID: 0615521-4. Kotipaikka/Domicile: Helsinki
+diff --git a/Documentation/crypto/devel-algos.rst b/Documentation/crypto/devel-algos.rst
+index 66f50d32dcec..0f4617019227 100644
+--- a/Documentation/crypto/devel-algos.rst
++++ b/Documentation/crypto/devel-algos.rst
+@@ -236,6 +236,14 @@ when used from another part of the kernel.
+                                |
+                                '---------------> HASH2
+ 
++Note that it is perfectly legal to:
++- call .init() and then (as many times) .update()
++- subseqently _not_ call any of .final(), .finup() or .export()
++
++In other words mind the resource allocation and clean-up,
++since this basically means no resources can remain allocated
++after a call to .init() or .update().
++
+ 
+ Specifics Of Asynchronous HASH Transformation
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-- 
+2.16.2
