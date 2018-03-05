@@ -1,50 +1,72 @@
-From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
-Subject: [PATCH] crypto: doc - clarify hash callbacks state machine
-Date: Mon, 5 Mar 2018 12:39:45 +0200
-Message-ID: <20180305103945.3517-1-horia.geanta@nxp.com>
+From: SF Markus Elfring <elfring@users.sourceforge.net>
+Subject: [PATCH] crypto: ccp: Use memdup_user() rather than duplicating its
+ implementation
+Date: Mon, 5 Mar 2018 14:10:20 +0100
+Message-ID: <ccd82e60-ba87-d224-3662-365662fa4e6e@users.sourceforge.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-Cc: <linux-crypto@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Cc: LKML <linux-kernel@vger.kernel.org>,
+        kernel-janitors@vger.kernel.org, kvm@vger.kernel.org,
+        Borislav Petkov <bp@suse.de>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
+To: linux-crypto@vger.kernel.org,
+        Brijesh Singh <brijesh.singh@amd.com>,
         "David S. Miller" <davem@davemloft.net>,
-        Jonathan Corbet <corbet@lwn.net>
+        Gary Hook <gary.hook@amd.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Tom Lendacky <thomas.lendacky@amd.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Language: en-GB
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Even though it doesn't make too much sense, it is perfectly legal to:
-- call .init() and then (as many times) .update()
-- subseqently _not_ call any of .final(), .finup() or .export()
+From: Markus Elfring <elfring@users.sourceforge.net>
+Date: Mon, 5 Mar 2018 13:50:13 +0100
 
-Update documentation since this is an important issue to consider
-from resource management perspective.
+Reuse existing functionality from memdup_user() instead of keeping
+duplicate source code.
 
-Link: https://lkml.kernel.org/r/20180222114741.GA27631@gondor.apana.org.au
-Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
+This issue was detected by using the Coccinelle software.
+
+Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
 ---
- Documentation/crypto/devel-algos.rst | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ drivers/crypto/ccp/psp-dev.c | 15 +--------------
+ 1 file changed, 1 insertion(+), 14 deletions(-)
 
-diff --git a/Documentation/crypto/devel-algos.rst b/Documentation/crypto/devel-algos.rst
-index 66f50d32dcec..0f4617019227 100644
---- a/Documentation/crypto/devel-algos.rst
-+++ b/Documentation/crypto/devel-algos.rst
-@@ -236,6 +236,14 @@ when used from another part of the kernel.
-                                |
-                                '---------------> HASH2
+diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
+index fcfa5b1eae61..8255258cd040 100644
+--- a/drivers/crypto/ccp/psp-dev.c
++++ b/drivers/crypto/ccp/psp-dev.c
+@@ -367,8 +367,6 @@ static int sev_ioctl_do_pek_csr(struct sev_issue_cmd *argp)
  
-+Note that it is perfectly legal to:
-+- call .init() and then (as many times) .update()
-+- subseqently _not_ call any of .final(), .finup() or .export()
-+
-+In other words mind the resource allocation and clean-up,
-+since this basically means no resources can remain allocated
-+after a call to .init() or .update().
-+
+ void *psp_copy_user_blob(u64 __user uaddr, u32 len)
+ {
+-	void *data;
+-
+ 	if (!uaddr || !len)
+ 		return ERR_PTR(-EINVAL);
  
- Specifics Of Asynchronous HASH Transformation
- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+@@ -376,18 +374,7 @@ void *psp_copy_user_blob(u64 __user uaddr, u32 len)
+ 	if (len > SEV_FW_BLOB_MAX_SIZE)
+ 		return ERR_PTR(-EINVAL);
+ 
+-	data = kmalloc(len, GFP_KERNEL);
+-	if (!data)
+-		return ERR_PTR(-ENOMEM);
+-
+-	if (copy_from_user(data, (void __user *)(uintptr_t)uaddr, len))
+-		goto e_free;
+-
+-	return data;
+-
+-e_free:
+-	kfree(data);
+-	return ERR_PTR(-EFAULT);
++	return memdup_user((void __user *)(uintptr_t)uaddr, len);
+ }
+ EXPORT_SYMBOL_GPL(psp_copy_user_blob);
+ 
 -- 
 2.16.2
