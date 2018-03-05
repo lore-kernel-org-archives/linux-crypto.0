@@ -1,79 +1,77 @@
-From: Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCH] crypto: ccp: Use memdup_user() rather than duplicating
- its implementation
-Date: Mon, 5 Mar 2018 12:52:11 -0600
-Message-ID: <a4fc5dc1-1378-313a-9909-6b5891fd8d81@amd.com>
-References: <ccd82e60-ba87-d224-3662-365662fa4e6e@users.sourceforge.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Cc: brijesh.singh@amd.com, LKML <linux-kernel@vger.kernel.org>,
-        kernel-janitors@vger.kernel.org, kvm@vger.kernel.org,
-        Borislav Petkov <bp@suse.de>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-To: SF Markus Elfring <elfring@users.sourceforge.net>,
-        linux-crypto@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Gary Hook <gary.hook@amd.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Tom Lendacky <thomas.lendacky@amd.com>
+From: Logan Gunthorpe <logang@deltatee.com>
+Subject: [PATCH v11 7/7] ntb: ntb_hw_switchtec: Cleanup 64bit IO defines to use the common header
+Date: Mon,  5 Mar 2018 12:08:24 -0700
+Message-ID: <20180305190824.847-8-logang@deltatee.com>
+References: <20180305190824.847-1-logang@deltatee.com>
+Cc: Arnd Bergmann <arnd@arndb.de>,
+        Andy Shevchenko <andy.shevchenko@gmail.com>,
+        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Jon Mason <jdmason@kudzu.us>
+To: linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
+        linux-ntb@googlegroups.com, linux-crypto@vger.kernel.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <ccd82e60-ba87-d224-3662-365662fa4e6e@users.sourceforge.net>
-Content-Language: en-US
+In-Reply-To: <20180305190824.847-1-logang@deltatee.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
+Clean up the ifdefs which conditionally defined the io{read|write}64
+functions in favour of the new common io-64-nonatomic-lo-hi header.
 
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+Cc: Jon Mason <jdmason@kudzu.us>
+---
+ drivers/ntb/hw/mscc/ntb_hw_switchtec.c | 30 +-----------------------------
+ 1 file changed, 1 insertion(+), 29 deletions(-)
 
-On 3/5/18 7:10 AM, SF Markus Elfring wrote:
-> From: Markus Elfring <elfring@users.sourceforge.net>
-> Date: Mon, 5 Mar 2018 13:50:13 +0100
->
-> Reuse existing functionality from memdup_user() instead of keeping
-> duplicate source code.
->
-> This issue was detected by using the Coccinelle software.
->
-> Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
-> ---
->  drivers/crypto/ccp/psp-dev.c | 15 +--------------
->  1 file changed, 1 insertion(+), 14 deletions(-)
-
-Reviewed-by: Brijesh Singh <brijesh.singh@amd.com>
-
-thanks
-
-> diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
-> index fcfa5b1eae61..8255258cd040 100644
-> --- a/drivers/crypto/ccp/psp-dev.c
-> +++ b/drivers/crypto/ccp/psp-dev.c
-> @@ -367,8 +367,6 @@ static int sev_ioctl_do_pek_csr(struct sev_issue_cmd *argp)
->  
->  void *psp_copy_user_blob(u64 __user uaddr, u32 len)
->  {
-> -	void *data;
-> -
->  	if (!uaddr || !len)
->  		return ERR_PTR(-EINVAL);
->  
-> @@ -376,18 +374,7 @@ void *psp_copy_user_blob(u64 __user uaddr, u32 len)
->  	if (len > SEV_FW_BLOB_MAX_SIZE)
->  		return ERR_PTR(-EINVAL);
->  
-> -	data = kmalloc(len, GFP_KERNEL);
-> -	if (!data)
-> -		return ERR_PTR(-ENOMEM);
-> -
-> -	if (copy_from_user(data, (void __user *)(uintptr_t)uaddr, len))
-> -		goto e_free;
-> -
-> -	return data;
-> -
-> -e_free:
-> -	kfree(data);
-> -	return ERR_PTR(-EFAULT);
-> +	return memdup_user((void __user *)(uintptr_t)uaddr, len);
->  }
->  EXPORT_SYMBOL_GPL(psp_copy_user_blob);
->  
+diff --git a/drivers/ntb/hw/mscc/ntb_hw_switchtec.c b/drivers/ntb/hw/mscc/ntb_hw_switchtec.c
+index f624ae27eabe..d2a1e746b335 100644
+--- a/drivers/ntb/hw/mscc/ntb_hw_switchtec.c
++++ b/drivers/ntb/hw/mscc/ntb_hw_switchtec.c
+@@ -19,6 +19,7 @@
+ #include <linux/kthread.h>
+ #include <linux/interrupt.h>
+ #include <linux/ntb.h>
++#include <linux/io-64-nonatomic-lo-hi.h>
+ 
+ MODULE_DESCRIPTION("Microsemi Switchtec(tm) NTB Driver");
+ MODULE_VERSION("0.1");
+@@ -35,35 +36,6 @@ module_param(use_lut_mws, bool, 0644);
+ MODULE_PARM_DESC(use_lut_mws,
+ 		 "Enable the use of the LUT based memory windows");
+ 
+-#ifndef ioread64
+-#ifdef readq
+-#define ioread64 readq
+-#else
+-#define ioread64 _ioread64
+-static inline u64 _ioread64(void __iomem *mmio)
+-{
+-	u64 low, high;
+-
+-	low = ioread32(mmio);
+-	high = ioread32(mmio + sizeof(u32));
+-	return low | (high << 32);
+-}
+-#endif
+-#endif
+-
+-#ifndef iowrite64
+-#ifdef writeq
+-#define iowrite64 writeq
+-#else
+-#define iowrite64 _iowrite64
+-static inline void _iowrite64(u64 val, void __iomem *mmio)
+-{
+-	iowrite32(val, mmio);
+-	iowrite32(val >> 32, mmio + sizeof(u32));
+-}
+-#endif
+-#endif
+-
+ #define SWITCHTEC_NTB_MAGIC 0x45CC0001
+ #define MAX_MWS     128
+ 
+-- 
+2.11.0
