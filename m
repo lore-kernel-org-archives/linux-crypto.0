@@ -1,77 +1,71 @@
-From: Gary R Hook <gary.hook@amd.com>
-Subject: Re: [PATCH] crypto: ccp: Use memdup_user() rather than duplicating
- its implementation
-Date: Mon, 5 Mar 2018 13:41:02 -0600
-Message-ID: <f4ab2412-04ec-738a-0e82-65f4f4fb9bb3@amd.com>
-References: <ccd82e60-ba87-d224-3662-365662fa4e6e@users.sourceforge.net>
+From: Rob Herring <robh@kernel.org>
+Subject: Re: [PATCH 1/2] Documentation: dt: rng: add bindings doc for
+ Keystone SA HWRNG driver
+Date: Mon, 5 Mar 2018 20:40:38 -0600
+Message-ID: <20180306024038.uszf3r4nb4pw6kkf@rob-hp-laptop>
+References: <1519908900-10388-1-git-send-email-vitalya@ti.com>
+ <1519908900-10388-2-git-send-email-vitalya@ti.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: LKML <linux-kernel@vger.kernel.org>,
-        kernel-janitors@vger.kernel.org, kvm@vger.kernel.org,
-        Borislav Petkov <bp@suse.de>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-To: SF Markus Elfring <elfring@users.sourceforge.net>,
-        linux-crypto@vger.kernel.org,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Tom Lendacky <thomas.lendacky@amd.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: mpm@selenic.com, herbert@gondor.apana.org.au, arnd@arndb.de,
+        gregkh@linuxfoundation.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, mark.rutland@arm.com,
+        devicetree@vger.kernel.org, t-kristo@ti.com, m-karicheri2@ti.com
+To: Vitaly Andrianov <vitalya@ti.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <ccd82e60-ba87-d224-3662-365662fa4e6e@users.sourceforge.net>
-Content-Language: en-US
+Content-Disposition: inline
+In-Reply-To: <1519908900-10388-2-git-send-email-vitalya@ti.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 03/05/2018 07:10 AM, SF Markus Elfring wrote:
-> From: Markus Elfring <elfring@users.sourceforge.net>
-> Date: Mon, 5 Mar 2018 13:50:13 +0100
-> 
-> Reuse existing functionality from memdup_user() instead of keeping
-> duplicate source code.
-> 
-> This issue was detected by using the Coccinelle software.
-> 
-> Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+On Thu, Mar 01, 2018 at 07:54:59AM -0500, Vitaly Andrianov wrote:
+> The Keystone SA module has a hardware random generator module.
+> This commit adds binding doc for the KS2 SA HWRNG driver.
 
-Acked-by: Gary R Hook <gary.hook@amd.com>
+Preferred subject prefix is "dt-bindings: rng: ..."
 
+> 
+> Signed-off-by: Vitaly Andrianov <vitalya@ti.com>
+> Signed-off-by: Murali Karicheri <m-karicheri2@ti.com>
 > ---
->   drivers/crypto/ccp/psp-dev.c | 15 +--------------
->   1 file changed, 1 insertion(+), 14 deletions(-)
+>  Documentation/devicetree/bindings/rng/ks-sa-rng.txt | 21 +++++++++++++++++++++
+>  1 file changed, 21 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/rng/ks-sa-rng.txt
 > 
-> diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
-> index fcfa5b1eae61..8255258cd040 100644
-> --- a/drivers/crypto/ccp/psp-dev.c
-> +++ b/drivers/crypto/ccp/psp-dev.c
-> @@ -367,8 +367,6 @@ static int sev_ioctl_do_pek_csr(struct sev_issue_cmd *argp)
->   
->   void *psp_copy_user_blob(u64 __user uaddr, u32 len)
->   {
-> -	void *data;
-> -
->   	if (!uaddr || !len)
->   		return ERR_PTR(-EINVAL);
->   
-> @@ -376,18 +374,7 @@ void *psp_copy_user_blob(u64 __user uaddr, u32 len)
->   	if (len > SEV_FW_BLOB_MAX_SIZE)
->   		return ERR_PTR(-EINVAL);
->   
-> -	data = kmalloc(len, GFP_KERNEL);
-> -	if (!data)
-> -		return ERR_PTR(-ENOMEM);
-> -
-> -	if (copy_from_user(data, (void __user *)(uintptr_t)uaddr, len))
-> -		goto e_free;
-> -
-> -	return data;
-> -
-> -e_free:
-> -	kfree(data);
-> -	return ERR_PTR(-EFAULT);
-> +	return memdup_user((void __user *)(uintptr_t)uaddr, len);
->   }
->   EXPORT_SYMBOL_GPL(psp_copy_user_blob);
->   
+> diff --git a/Documentation/devicetree/bindings/rng/ks-sa-rng.txt b/Documentation/devicetree/bindings/rng/ks-sa-rng.txt
+> new file mode 100644
+> index 0000000..cc8ee44
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/rng/ks-sa-rng.txt
+> @@ -0,0 +1,21 @@
+> +Keystone SoC Hardware Random Number Generator(HWRNG) Module
+> +
+> +On Keystone SoCs HWRNG module is a submodule of the Security Accelerator.
+> +
+> +- compatible: should be "ti,keystone-rng"
+> +- ti,syscon-sa-cfg: phandle to syscon node of the SA configuration registers.
+> +		    This registers are shared between hwrng and crypto drivers.
+> +- clocks: phandle to the reference clocks for the subsystem
+> +- clock-names: functional clock name. Should be set to "fck"
+> +- reg: HWRNG module register space
+> +
+> +Example:
+> +/* K2HK */
+> +
+> +hwrng@0x24000 {
+
+rng@24000
+
+With those,
+
+Reviewed-by: Rob Herring <robh@kernel.org>                                 
+
+> +	compatible = "ti,keystone-rng";
+> +	ti,syscon-sa-cfg = <&sa_config>;
+> +	clocks = <&clksa>;
+> +	clock-names = "fck";
+> +	reg = <0x24000 0x1000>;
+> +};
+> -- 
+> 2.7.4
 > 
