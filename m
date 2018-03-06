@@ -1,201 +1,37 @@
-From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH 2/2] crypto: introduce SM4 testmgr tests
-Date: Tue,  6 Mar 2018 09:44:43 +0000
-Message-ID: <1520329484-23317-3-git-send-email-gilad@benyossef.com>
-References: <1520329484-23317-1-git-send-email-gilad@benyossef.com>
-Cc: Ofir Drang <ofir.drang@arm.com>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
+From: Andy Shevchenko <andy.shevchenko@gmail.com>
+Subject: Re: [PATCH v11 7/7] ntb: ntb_hw_switchtec: Cleanup 64bit IO defines
+ to use the common header
+Date: Tue, 6 Mar 2018 12:48:29 +0200
+Message-ID: <CAHp75Vc41MwtDr24-z3po2nx3Hr7_=tFUD0odcrbnVTP4SnJ1g@mail.gmail.com>
+References: <20180305190824.847-1-logang@deltatee.com> <20180305190824.847-8-logang@deltatee.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux-Arch <linux-arch@vger.kernel.org>,
+        linux-ntb@googlegroups.com,
+        linux-crypto <linux-crypto@vger.kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        =?UTF-8?Q?Horia_Geant=C4=83?= <horia.geanta@nxp.com>,
+        Jon Mason <jdmason@kudzu.us>
+To: Logan Gunthorpe <logang@deltatee.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1520329484-23317-1-git-send-email-gilad@benyossef.com>
+In-Reply-To: <20180305190824.847-8-logang@deltatee.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Add testmgr tests for the newly introduced SM4 ECB symmetric cipher.
+On Mon, Mar 5, 2018 at 9:08 PM, Logan Gunthorpe <logang@deltatee.com> wrote:
+> Clean up the ifdefs which conditionally defined the io{read|write}64
+> functions in favour of the new common io-64-nonatomic-lo-hi header.
 
-Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
----
- crypto/tcrypt.c  |   3 ++
- crypto/testmgr.c |   9 ++++
- crypto/testmgr.h | 131 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 143 insertions(+)
+>  #include <linux/kthread.h>
+>  #include <linux/interrupt.h>
+>  #include <linux/ntb.h>
+> +#include <linux/io-64-nonatomic-lo-hi.h>
 
-diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
-index 14213a0..51fe7c8 100644
---- a/crypto/tcrypt.c
-+++ b/crypto/tcrypt.c
-@@ -1983,6 +1983,9 @@ static int do_test(const char *alg, u32 type, u32 mask, int m)
- 	case 190:
- 		ret += tcrypt_test("authenc(hmac(sha512),cbc(des3_ede))");
- 		break;
-+	case 191:
-+		ret += tcrypt_test("ecb(sm4)");
-+		break;
- 	case 200:
- 		test_cipher_speed("ecb(aes)", ENCRYPT, sec, NULL, 0,
- 				speed_template_16_24_32);
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 9f82e7b..af4a01c 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -3001,6 +3001,15 @@ static const struct alg_test_desc alg_test_descs[] = {
- 			}
- 		}
- 	}, {
-+		.alg = "ecb(sm4)",
-+		.test = alg_test_skcipher,
-+		.suite = {
-+			.cipher = {
-+				.enc = __VECS(sm4_enc_tv_template),
-+				.dec = __VECS(sm4_dec_tv_template)
-+			}
-+		}
-+	}, {
- 		.alg = "ecb(speck128)",
- 		.test = alg_test_skcipher,
- 		.suite = {
-diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index 73ba22c..c80ed56 100644
---- a/crypto/testmgr.h
-+++ b/crypto/testmgr.h
-@@ -14324,6 +14324,137 @@ static const struct cipher_testvec serpent_xts_dec_tv_template[] = {
- };
- 
- /*
-+ * SM4 test vector taken from the draft RFC
-+ * https://tools.ietf.org/html/draft-crypto-sm4-00#ref-GBT.32907-2016
-+ */
-+
-+static const struct cipher_testvec sm4_enc_tv_template[] = {
-+	{ /* SM4 Appendix A: Example Calculations. Example 1. */
-+		.key	= "\x01\x23\x45\x67\x89\xAB\xCD\xEF"
-+			  "\xFE\xDC\xBA\x98\x76\x54\x32\x10",
-+		.klen	= 16,
-+		.input	= "\x01\x23\x45\x67\x89\xAB\xCD\xEF"
-+			  "\xFE\xDC\xBA\x98\x76\x54\x32\x10",
-+		.ilen	= 16,
-+		.result	= "\x68\x1E\xDF\x34\xD2\x06\x96\x5E"
-+			  "\x86\xB3\xE9\x4F\x53\x6E\x42\x46",
-+		.rlen	= 16,
-+	}, { /*
-+	      *  SM4 Appendix A: Example Calculations.
-+	      *  Last 10 iterations of Example 2.
-+	      */
-+		.key    = "\x01\x23\x45\x67\x89\xAB\xCD\xEF"
-+			  "\xFE\xDC\xBA\x98\x76\x54\x32\x10",
-+		.klen	= 16,
-+		.input	= "\x99\x4a\xc3\xe7\xc3\x57\x89\x6a"
-+			  "\x81\xfc\xa8\xe\x38\x3e\xef\x80"
-+			  "\xb1\x98\xf2\xde\x3f\x4b\xae\xd1"
-+			  "\xf0\xf1\x30\x4c\x1\x27\x5a\x8f"
-+			  "\x45\xe1\x39\xb7\xae\xff\x1f\x27"
-+			  "\xad\x57\x15\xab\x31\x5d\xc\xef"
-+			  "\x8c\xc8\x80\xbd\x11\x98\xf3\x7b"
-+			  "\xa2\xdd\x14\x20\xf9\xe8\xbb\x82"
-+			  "\xf7\x32\xca\x4b\xa8\xf7\xb3\x4d"
-+			  "\x27\xd1\xcd\xe6\xb6\x65\x5a\x23"
-+			  "\xc2\xf3\x54\x84\x53\xe3\xb9\x20"
-+			  "\xa5\x37\x0\xbe\xe7\x7b\x48\xfb"
-+			  "\x21\x3d\x9e\x48\x1d\x9e\xf5\xbf"
-+			  "\x77\xd5\xb4\x4a\x53\x71\x94\x7a"
-+			  "\x88\xa6\x6e\x6\x93\xca\x43\xa5"
-+			  "\xc4\xf6\xcd\x53\x4b\x7b\x8e\xfe"
-+			  "\xb4\x28\x7c\x42\x29\x32\x5d\x88"
-+			  "\xed\xce\x0\x19\xe\x16\x2\x6e"
-+			  "\x87\xff\x2c\xac\xe8\xe7\xe9\xbf"
-+			  "\x31\x51\xec\x47\xc3\x51\x83\xc1",
-+		.ilen	= 160,
-+		.result	= "\xb1\x98\xf2\xde\x3f\x4b\xae\xd1"
-+			  "\xf0\xf1\x30\x4c\x1\x27\x5a\x8f"
-+			  "\x45\xe1\x39\xb7\xae\xff\x1f\x27"
-+			  "\xad\x57\x15\xab\x31\x5d\xc\xef"
-+			  "\x8c\xc8\x80\xbd\x11\x98\xf3\x7b"
-+			  "\xa2\xdd\x14\x20\xf9\xe8\xbb\x82"
-+			  "\xf7\x32\xca\x4b\xa8\xf7\xb3\x4d"
-+			  "\x27\xd1\xcd\xe6\xb6\x65\x5a\x23"
-+			  "\xc2\xf3\x54\x84\x53\xe3\xb9\x20"
-+			  "\xa5\x37\x0\xbe\xe7\x7b\x48\xfb"
-+			  "\x21\x3d\x9e\x48\x1d\x9e\xf5\xbf"
-+			  "\x77\xd5\xb4\x4a\x53\x71\x94\x7a"
-+			  "\x88\xa6\x6e\x6\x93\xca\x43\xa5"
-+			  "\xc4\xf6\xcd\x53\x4b\x7b\x8e\xfe"
-+			  "\xb4\x28\x7c\x42\x29\x32\x5d\x88"
-+			  "\xed\xce\x0\x19\xe\x16\x2\x6e"
-+			  "\x87\xff\x2c\xac\xe8\xe7\xe9\xbf"
-+			  "\x31\x51\xec\x47\xc3\x51\x83\xc1"
-+			  "\x59\x52\x98\xc7\xc6\xfd\x27\x1f"
-+			  "\x4\x2\xf8\x4\xc3\x3d\x3f\x66",
-+		.rlen	= 160
-+	}
-+};
-+
-+static const struct cipher_testvec sm4_dec_tv_template[] = {
-+	{ /* SM4 Appendix A: Example Calculations. Example 1. */
-+		.key	= "\x01\x23\x45\x67\x89\xAB\xCD\xEF"
-+			  "\xFE\xDC\xBA\x98\x76\x54\x32\x10",
-+		.klen	= 16,
-+		.input	= "\x68\x1E\xDF\x34\xD2\x06\x96\x5E"
-+			  "\x86\xB3\xE9\x4F\x53\x6E\x42\x46",
-+		.ilen	= 16,
-+		.result	= "\x01\x23\x45\x67\x89\xAB\xCD\xEF"
-+			  "\xFE\xDC\xBA\x98\x76\x54\x32\x10",
-+		.rlen	= 16,
-+	}, { /*
-+	      *  SM4 Appendix A: Example Calculations.
-+	      *  Last 10 iterations of Example 2.
-+	      */
-+		.key    = "\x01\x23\x45\x67\x89\xAB\xCD\xEF"
-+			  "\xFE\xDC\xBA\x98\x76\x54\x32\x10",
-+		.klen	= 16,
-+		.input	= "\xb1\x98\xf2\xde\x3f\x4b\xae\xd1"
-+			  "\xf0\xf1\x30\x4c\x1\x27\x5a\x8f"
-+			  "\x45\xe1\x39\xb7\xae\xff\x1f\x27"
-+			  "\xad\x57\x15\xab\x31\x5d\xc\xef"
-+			  "\x8c\xc8\x80\xbd\x11\x98\xf3\x7b"
-+			  "\xa2\xdd\x14\x20\xf9\xe8\xbb\x82"
-+			  "\xf7\x32\xca\x4b\xa8\xf7\xb3\x4d"
-+			  "\x27\xd1\xcd\xe6\xb6\x65\x5a\x23"
-+			  "\xc2\xf3\x54\x84\x53\xe3\xb9\x20"
-+			  "\xa5\x37\x0\xbe\xe7\x7b\x48\xfb"
-+			  "\x21\x3d\x9e\x48\x1d\x9e\xf5\xbf"
-+			  "\x77\xd5\xb4\x4a\x53\x71\x94\x7a"
-+			  "\x88\xa6\x6e\x6\x93\xca\x43\xa5"
-+			  "\xc4\xf6\xcd\x53\x4b\x7b\x8e\xfe"
-+			  "\xb4\x28\x7c\x42\x29\x32\x5d\x88"
-+			  "\xed\xce\x0\x19\xe\x16\x2\x6e"
-+			  "\x87\xff\x2c\xac\xe8\xe7\xe9\xbf"
-+			  "\x31\x51\xec\x47\xc3\x51\x83\xc1"
-+			  "\x59\x52\x98\xc7\xc6\xfd\x27\x1f"
-+			  "\x4\x2\xf8\x4\xc3\x3d\x3f\x66",
-+		.ilen	= 160,
-+		.result	= "\x99\x4a\xc3\xe7\xc3\x57\x89\x6a"
-+			  "\x81\xfc\xa8\xe\x38\x3e\xef\x80"
-+			  "\xb1\x98\xf2\xde\x3f\x4b\xae\xd1"
-+			  "\xf0\xf1\x30\x4c\x1\x27\x5a\x8f"
-+			  "\x45\xe1\x39\xb7\xae\xff\x1f\x27"
-+			  "\xad\x57\x15\xab\x31\x5d\xc\xef"
-+			  "\x8c\xc8\x80\xbd\x11\x98\xf3\x7b"
-+			  "\xa2\xdd\x14\x20\xf9\xe8\xbb\x82"
-+			  "\xf7\x32\xca\x4b\xa8\xf7\xb3\x4d"
-+			  "\x27\xd1\xcd\xe6\xb6\x65\x5a\x23"
-+			  "\xc2\xf3\x54\x84\x53\xe3\xb9\x20"
-+			  "\xa5\x37\x0\xbe\xe7\x7b\x48\xfb"
-+			  "\x21\x3d\x9e\x48\x1d\x9e\xf5\xbf"
-+			  "\x77\xd5\xb4\x4a\x53\x71\x94\x7a"
-+			  "\x88\xa6\x6e\x6\x93\xca\x43\xa5"
-+			  "\xc4\xf6\xcd\x53\x4b\x7b\x8e\xfe"
-+			  "\xb4\x28\x7c\x42\x29\x32\x5d\x88"
-+			  "\xed\xce\x0\x19\xe\x16\x2\x6e"
-+			  "\x87\xff\x2c\xac\xe8\xe7\xe9\xbf"
-+			  "\x31\x51\xec\x47\xc3\x51\x83\xc1",
-+		.rlen	= 160
-+	}
-+};
-+
-+/*
-  * Speck test vectors taken from the original paper:
-  * "The Simon and Speck Families of Lightweight Block Ciphers"
-  * https://eprint.iacr.org/2013/404.pdf
+A nit, can we preserve alphabetical ordering?
+
+
 -- 
-2.7.4
+With Best Regards,
+Andy Shevchenko
