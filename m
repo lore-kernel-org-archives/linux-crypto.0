@@ -1,56 +1,61 @@
 From: Logan Gunthorpe <logang@deltatee.com>
-Subject: Re: [PATCH v11 6/7] crypto: caam: cleanup CONFIG_64BIT ifdefs when
- using io{read|write}64
-Date: Tue, 6 Mar 2018 09:56:22 -0700
-Message-ID: <06d07fd5-a73c-34b0-079c-f4b44ef7a0cb@deltatee.com>
+Subject: Re: [PATCH v11 7/7] ntb: ntb_hw_switchtec: Cleanup 64bit IO defines
+ to use the common header
+Date: Tue, 6 Mar 2018 10:03:55 -0700
+Message-ID: <18e6f79d-04db-463a-8916-09d7d859d273@deltatee.com>
 References: <20180305190824.847-1-logang@deltatee.com>
- <20180305190824.847-7-logang@deltatee.com>
- <VI1PR0402MB33422D83AE168D84FDED974698D90@VI1PR0402MB3342.eurprd04.prod.outlook.com>
+ <20180305190824.847-8-logang@deltatee.com>
+ <CAHp75Vc41MwtDr24-z3po2nx3Hr7_=tFUD0odcrbnVTP4SnJ1g@mail.gmail.com>
+ <20180306114632.GB16784@kroah.com>
+ <CAHp75Vf6sYss8q5FjgLYaQXYN761M4awmLVjZ48Cdd8+NrrhxQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-2; format=flowed
-Content-Transfer-Encoding: 8bit
-Cc: Arnd Bergmann <arnd@arndb.de>,
-        Andy Shevchenko <andy.shevchenko@gmail.com>,
-        Dan Douglass <dan.douglass@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-To: =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@nxp.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
-        "linux-ntb@googlegroups.com" <linux-ntb@googlegroups.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux-Arch <linux-arch@vger.kernel.org>,
+        linux-ntb@googlegroups.com,
+        linux-crypto <linux-crypto@vger.kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@nxp.com>,
+        Jon Mason <jdmason@kudzu.us>
+To: Andy Shevchenko <andy.shevchenko@gmail.com>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <VI1PR0402MB33422D83AE168D84FDED974698D90@VI1PR0402MB3342.eurprd04.prod.outlook.com>
+In-Reply-To: <CAHp75Vf6sYss8q5FjgLYaQXYN761M4awmLVjZ48Cdd8+NrrhxQ@mail.gmail.com>
 Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
 
 
-On 06/03/18 05:37 AM, Horia Geantã wrote:
-> On 3/5/2018 9:08 PM, Logan Gunthorpe wrote:
->> Clean up the extra ifdefs which defined the wr_reg64 and rd_reg64
->> functions in non-64bit cases in favour of the new common
->> io-64-nonatomic-lo-hi header.
+On 06/03/18 04:57 AM, Andy Shevchenko wrote:
+> On Tue, Mar 6, 2018 at 1:46 PM, Greg Kroah-Hartman
+> <gregkh@linuxfoundation.org> wrote:
+>> On Tue, Mar 06, 2018 at 12:48:29PM +0200, Andy Shevchenko wrote:
+>>> On Mon, Mar 5, 2018 at 9:08 PM, Logan Gunthorpe <logang@deltatee.com> wrote:
+>>>> Clean up the ifdefs which conditionally defined the io{read|write}64
+>>>> functions in favour of the new common io-64-nonatomic-lo-hi header.
+>>>
+>>>>   #include <linux/kthread.h>
+>>>>   #include <linux/interrupt.h>
+>>>>   #include <linux/ntb.h>
+>>>> +#include <linux/io-64-nonatomic-lo-hi.h>
+>>>
+>>> A nit, can we preserve alphabetical ordering?
 >>
->> To be consistent with CAAM engine HW spec: in case of 64-bit registers,
->> irrespective of device endianness, the lower address should be read from
->> / written to first, followed by the upper address. Indeed the I/O
->> accessors in CAAM driver currently don't follow the spec, however this
->> is a good opportunity to fix the code.
->>
->> Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
->> Cc: Andy Shevchenko <andy.shevchenko@gmail.com>
->> Cc: Horia Geantã <horia.geanta@nxp.com>
->> Cc: Dan Douglass <dan.douglass@nxp.com>
->> Cc: Herbert Xu <herbert@gondor.apana.org.au>
->> Cc: "David S. Miller" <davem@davemloft.net>
-> Reviewed-by: Horia Geantã <horia.geanta@nxp.com>
+>> Ugh, why, it doesn't matter at all :)
 > 
-> Please get used to carrying Reviewed-bys from previous iterations when patches
-> stay the same:
+> I'm fine with either way, but ordering is a good thing to have in long
+> term prospective.
+> Easy to find what headers are in there, easy to understand if you need
+> another one or not, easy to maintain the list w/o duplications.
+> 
+> I saw already few examples where long list of headers contained
+> duplications b/c it was in messy order.
+> 
 
-Sorry, I usually do this but I must have missed the email. Thanks.
+I agree with Greg here. This is a bit silly. The list isn't even 
+alphabetical to begin with so it can't be preserved. However, if I do a 
+v12 I'll make it alphabetical.
 
 Logan
