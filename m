@@ -1,77 +1,63 @@
-From: Tom Lendacky <thomas.lendacky@amd.com>
-Subject: Re: [PATCH] crypto: hash.h: Prevent use of req->digest in ahash
- update
-Date: Tue, 6 Mar 2018 12:04:04 -0600
-Message-ID: <0d5cfbd5-8675-290b-f840-d9121872f8da@amd.com>
-References: <CGME20180306114512eucas1p286d36bafa1bc719d7e7ccbaa9f549fc1@eucas1p2.samsung.com>
- <c29d442e-22b6-9013-05a4-32c8eb04b692@partner.samsung.com>
+From: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+Subject: [PATCH] X.509: unpack RSA signatureValue field from BIT STRING
+Date: Tue, 6 Mar 2018 20:13:18 +0100
+Message-ID: <88da0c24-385c-64a9-6d56-36696d433bc7@maciej.szmigiero.name>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Cc: "David S. Miller" <davem@davemloft.net>,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7BIT
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Gary Hook <gary.hook@amd.com>, keyrings@vger.kernel.org,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Kamil Konieczny <k.konieczny@partner.samsung.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
+To: David Howells <dhowells@redhat.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <c29d442e-22b6-9013-05a4-32c8eb04b692@partner.samsung.com>
 Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 3/6/2018 5:45 AM, Kamil Konieczny wrote:
-> Prevent improper use of req->digest field in ahash update, init, export and
+The signatureValue field of a X.509 certificate is encoded as a BIT STRING.
+For RSA signatures this BIT STRING is of so-called primitive subtype, which
+contains a u8 prefix indicating a count of unused bits in the encoding.
 
-Shouldn't that be req->result (here and below)?
+We have to strip this prefix from signature data, just as we already do for
+key data in x509_extract_key_data() function.
 
-Thanks,
-Tom
+This wasn't noticed earlier because this prefix byte is zero for RSA key
+sizes divisible by 8. Since BIT STRING is a big-endian encoding adding zero
+prefixes has no bearing on its value.
 
-> import functions in drivers code. A driver should use ahash request context
-> if it needs to save internal state.
-> 
-> Signed-off-by: Kamil Konieczny <k.konieczny@partner.samsung.com>
-> ---
->  include/crypto/hash.h | 11 +++++++----
->  1 file changed, 7 insertions(+), 4 deletions(-)
-> 
-> diff --git a/include/crypto/hash.h b/include/crypto/hash.h
-> index 2d1849dffb80..e97c2e662d6a 100644
-> --- a/include/crypto/hash.h
-> +++ b/include/crypto/hash.h
-> @@ -74,7 +74,8 @@ struct ahash_request {
->   * @init: **[mandatory]** Initialize the transformation context. Intended only to initialize the
->   *	  state of the HASH transformation at the beginning. This shall fill in
->   *	  the internal structures used during the entire duration of the whole
-> - *	  transformation. No data processing happens at this point.
-> + *	  transformation. No data processing happens at this point. Driver code
-> + *	  implementation must not use req->digest.
->   * @update: **[mandatory]** Push a chunk of data into the driver for transformation. This
->   *	   function actually pushes blocks of data from upper layers into the
->   *	   driver, which then passes those to the hardware as seen fit. This
-> @@ -83,7 +84,8 @@ struct ahash_request {
->   *	   transformation. This function shall not modify the transformation
->   *	   context, as this function may be called in parallel with the same
->   *	   transformation object. Data processing can happen synchronously
-> - *	   [SHASH] or asynchronously [AHASH] at this point.
-> + *	   [SHASH] or asynchronously [AHASH] at this point. Driver must not use
-> + *	   req->digest.
->   * @final: **[mandatory]** Retrieve result from the driver. This function finalizes the
->   *	   transformation and retrieves the resulting hash from the driver and
->   *	   pushes it back to upper layers. No data processing happens at this
-> @@ -120,11 +122,12 @@ struct ahash_request {
->   *	    you want to save partial result of the transformation after
->   *	    processing certain amount of data and reload this partial result
->   *	    multiple times later on for multiple re-use. No data processing
-> - *	    happens at this point.
-> + *	    happens at this point. Driver must not use req->digest.
->   * @import: Import partial state of the transformation. This function loads the
->   *	    entire state of the ongoing transformation from a provided block of
->   *	    data so the transformation can continue from this point onward. No
-> - *	    data processing happens at this point.
-> + *	    data processing happens at this point. Driver must not use
-> + *	    req->digest.
->   * @halg: see struct hash_alg_common
->   */
->  struct ahash_alg {
-> 
+The signature length, however was incorrect, which is a problem for RSA
+implementations that need it to be exactly correct (like AMD CCP).
+
+Signed-off-by: Maciej S. Szmigiero <mail@maciej.szmigiero.name>
+Fixes: c26fd69fa009 ("X.509: Add a crypto key parser for binary (DER) X.509 certificates")
+Cc: stable@vger.kernel.org
+---
+This is a resend without changes of a patch that was previously
+submitted in one series with CCP driver changes since this particular
+patch should go through the security (rather than crypto) tree.
+
+ crypto/asymmetric_keys/x509_cert_parser.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/crypto/asymmetric_keys/x509_cert_parser.c b/crypto/asymmetric_keys/x509_cert_parser.c
+index ce2df8c9c583..88c26a4538ae 100644
+--- a/crypto/asymmetric_keys/x509_cert_parser.c
++++ b/crypto/asymmetric_keys/x509_cert_parser.c
+@@ -249,6 +249,15 @@ int x509_note_signature(void *context, size_t hdrlen,
+ 		return -EINVAL;
+ 	}
+ 
++	if (!strcmp(ctx->cert->sig->pkey_algo, "rsa")) {
++		/* Discard the BIT STRING metadata */
++		if (vlen < 1 || *(const u8 *)value != 0)
++			return -EBADMSG;
++
++		value++;
++		vlen--;
++	}
++
+ 	ctx->cert->raw_sig = value;
+ 	ctx->cert->raw_sig_size = vlen;
+ 	return 0;
