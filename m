@@ -1,61 +1,77 @@
-From: Logan Gunthorpe <logang@deltatee.com>
-Subject: Re: [PATCH v11 7/7] ntb: ntb_hw_switchtec: Cleanup 64bit IO defines
- to use the common header
-Date: Tue, 6 Mar 2018 10:03:55 -0700
-Message-ID: <18e6f79d-04db-463a-8916-09d7d859d273@deltatee.com>
-References: <20180305190824.847-1-logang@deltatee.com>
- <20180305190824.847-8-logang@deltatee.com>
- <CAHp75Vc41MwtDr24-z3po2nx3Hr7_=tFUD0odcrbnVTP4SnJ1g@mail.gmail.com>
- <20180306114632.GB16784@kroah.com>
- <CAHp75Vf6sYss8q5FjgLYaQXYN761M4awmLVjZ48Cdd8+NrrhxQ@mail.gmail.com>
+From: Tom Lendacky <thomas.lendacky@amd.com>
+Subject: Re: [PATCH] crypto: hash.h: Prevent use of req->digest in ahash
+ update
+Date: Tue, 6 Mar 2018 12:04:04 -0600
+Message-ID: <0d5cfbd5-8675-290b-f840-d9121872f8da@amd.com>
+References: <CGME20180306114512eucas1p286d36bafa1bc719d7e7ccbaa9f549fc1@eucas1p2.samsung.com>
+ <c29d442e-22b6-9013-05a4-32c8eb04b692@partner.samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux-Arch <linux-arch@vger.kernel.org>,
-        linux-ntb@googlegroups.com,
-        linux-crypto <linux-crypto@vger.kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@nxp.com>,
-        Jon Mason <jdmason@kudzu.us>
-To: Andy Shevchenko <andy.shevchenko@gmail.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Kamil Konieczny <k.konieczny@partner.samsung.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAHp75Vf6sYss8q5FjgLYaQXYN761M4awmLVjZ48Cdd8+NrrhxQ@mail.gmail.com>
+In-Reply-To: <c29d442e-22b6-9013-05a4-32c8eb04b692@partner.samsung.com>
 Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
+On 3/6/2018 5:45 AM, Kamil Konieczny wrote:
+> Prevent improper use of req->digest field in ahash update, init, export and
 
+Shouldn't that be req->result (here and below)?
 
-On 06/03/18 04:57 AM, Andy Shevchenko wrote:
-> On Tue, Mar 6, 2018 at 1:46 PM, Greg Kroah-Hartman
-> <gregkh@linuxfoundation.org> wrote:
->> On Tue, Mar 06, 2018 at 12:48:29PM +0200, Andy Shevchenko wrote:
->>> On Mon, Mar 5, 2018 at 9:08 PM, Logan Gunthorpe <logang@deltatee.com> wrote:
->>>> Clean up the ifdefs which conditionally defined the io{read|write}64
->>>> functions in favour of the new common io-64-nonatomic-lo-hi header.
->>>
->>>>   #include <linux/kthread.h>
->>>>   #include <linux/interrupt.h>
->>>>   #include <linux/ntb.h>
->>>> +#include <linux/io-64-nonatomic-lo-hi.h>
->>>
->>> A nit, can we preserve alphabetical ordering?
->>
->> Ugh, why, it doesn't matter at all :)
+Thanks,
+Tom
+
+> import functions in drivers code. A driver should use ahash request context
+> if it needs to save internal state.
 > 
-> I'm fine with either way, but ordering is a good thing to have in long
-> term prospective.
-> Easy to find what headers are in there, easy to understand if you need
-> another one or not, easy to maintain the list w/o duplications.
+> Signed-off-by: Kamil Konieczny <k.konieczny@partner.samsung.com>
+> ---
+>  include/crypto/hash.h | 11 +++++++----
+>  1 file changed, 7 insertions(+), 4 deletions(-)
 > 
-> I saw already few examples where long list of headers contained
-> duplications b/c it was in messy order.
+> diff --git a/include/crypto/hash.h b/include/crypto/hash.h
+> index 2d1849dffb80..e97c2e662d6a 100644
+> --- a/include/crypto/hash.h
+> +++ b/include/crypto/hash.h
+> @@ -74,7 +74,8 @@ struct ahash_request {
+>   * @init: **[mandatory]** Initialize the transformation context. Intended only to initialize the
+>   *	  state of the HASH transformation at the beginning. This shall fill in
+>   *	  the internal structures used during the entire duration of the whole
+> - *	  transformation. No data processing happens at this point.
+> + *	  transformation. No data processing happens at this point. Driver code
+> + *	  implementation must not use req->digest.
+>   * @update: **[mandatory]** Push a chunk of data into the driver for transformation. This
+>   *	   function actually pushes blocks of data from upper layers into the
+>   *	   driver, which then passes those to the hardware as seen fit. This
+> @@ -83,7 +84,8 @@ struct ahash_request {
+>   *	   transformation. This function shall not modify the transformation
+>   *	   context, as this function may be called in parallel with the same
+>   *	   transformation object. Data processing can happen synchronously
+> - *	   [SHASH] or asynchronously [AHASH] at this point.
+> + *	   [SHASH] or asynchronously [AHASH] at this point. Driver must not use
+> + *	   req->digest.
+>   * @final: **[mandatory]** Retrieve result from the driver. This function finalizes the
+>   *	   transformation and retrieves the resulting hash from the driver and
+>   *	   pushes it back to upper layers. No data processing happens at this
+> @@ -120,11 +122,12 @@ struct ahash_request {
+>   *	    you want to save partial result of the transformation after
+>   *	    processing certain amount of data and reload this partial result
+>   *	    multiple times later on for multiple re-use. No data processing
+> - *	    happens at this point.
+> + *	    happens at this point. Driver must not use req->digest.
+>   * @import: Import partial state of the transformation. This function loads the
+>   *	    entire state of the ongoing transformation from a provided block of
+>   *	    data so the transformation can continue from this point onward. No
+> - *	    data processing happens at this point.
+> + *	    data processing happens at this point. Driver must not use
+> + *	    req->digest.
+>   * @halg: see struct hash_alg_common
+>   */
+>  struct ahash_alg {
 > 
-
-I agree with Greg here. This is a bit silly. The list isn't even 
-alphabetical to begin with so it can't be preserved. However, if I do a 
-v12 I'll make it alphabetical.
-
-Logan
