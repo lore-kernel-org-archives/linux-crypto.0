@@ -1,71 +1,43 @@
-From: Rob Herring <robh@kernel.org>
-Subject: Re: [PATCH 1/2] Documentation: dt: rng: add bindings doc for
- Keystone SA HWRNG driver
-Date: Mon, 5 Mar 2018 20:40:38 -0600
-Message-ID: <20180306024038.uszf3r4nb4pw6kkf@rob-hp-laptop>
-References: <1519908900-10388-1-git-send-email-vitalya@ti.com>
- <1519908900-10388-2-git-send-email-vitalya@ti.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: mpm@selenic.com, herbert@gondor.apana.org.au, arnd@arndb.de,
-        gregkh@linuxfoundation.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, mark.rutland@arm.com,
-        devicetree@vger.kernel.org, t-kristo@ti.com, m-karicheri2@ti.com
-To: Vitaly Andrianov <vitalya@ti.com>
+From: Gilad Ben-Yossef <gilad@benyossef.com>
+Subject: [PATCH 0/2] crypto: introduce SM4 symmetric cipher algorithm
+Date: Tue,  6 Mar 2018 09:44:41 +0000
+Message-ID: <1520329484-23317-1-git-send-email-gilad@benyossef.com>
+Cc: Ofir Drang <ofir.drang@arm.com>, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1519908900-10388-2-git-send-email-vitalya@ti.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Mar 01, 2018 at 07:54:59AM -0500, Vitaly Andrianov wrote:
-> The Keystone SA module has a hardware random generator module.
-> This commit adds binding doc for the KS2 SA HWRNG driver.
+Introduce the SM4 cipher algorithms (OSCCA GB/T 32907-2016) and
+related tests.
 
-Preferred subject prefix is "dt-bindings: rng: ..."
+SM4 (GBT.32907-2016) is a cryptographic standard issued by the
+Organization of State Commercial Administration of China (OSCCA)
+as an authorized cryptographic algorithms for the use within China.
 
-> 
-> Signed-off-by: Vitaly Andrianov <vitalya@ti.com>
-> Signed-off-by: Murali Karicheri <m-karicheri2@ti.com>
-> ---
->  Documentation/devicetree/bindings/rng/ks-sa-rng.txt | 21 +++++++++++++++++++++
->  1 file changed, 21 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/rng/ks-sa-rng.txt
-> 
-> diff --git a/Documentation/devicetree/bindings/rng/ks-sa-rng.txt b/Documentation/devicetree/bindings/rng/ks-sa-rng.txt
-> new file mode 100644
-> index 0000000..cc8ee44
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/rng/ks-sa-rng.txt
-> @@ -0,0 +1,21 @@
-> +Keystone SoC Hardware Random Number Generator(HWRNG) Module
-> +
-> +On Keystone SoCs HWRNG module is a submodule of the Security Accelerator.
-> +
-> +- compatible: should be "ti,keystone-rng"
-> +- ti,syscon-sa-cfg: phandle to syscon node of the SA configuration registers.
-> +		    This registers are shared between hwrng and crypto drivers.
-> +- clocks: phandle to the reference clocks for the subsystem
-> +- clock-names: functional clock name. Should be set to "fck"
-> +- reg: HWRNG module register space
-> +
-> +Example:
-> +/* K2HK */
-> +
-> +hwrng@0x24000 {
+SMS4 was originally created for use in protecting wireless
+networks, and is mandated in the Chinese National Standard for
+Wireless LAN WAPI (Wired Authentication and Privacy Infrastructure)
+(GB.15629.11-2003).
 
-rng@24000
+Tested on arm 64 and 32 bit.
 
-With those,
+Gilad Ben-Yossef (2):
+  crypto: introduce SM4 symmetric cipher algorithm
+  crypto: introduce SM4 testmgr tests
 
-Reviewed-by: Rob Herring <robh@kernel.org>                                 
+ crypto/Kconfig       |  25 ++++++
+ crypto/Makefile      |   1 +
+ crypto/sm4_generic.c | 244 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ crypto/tcrypt.c      |   3 +
+ crypto/testmgr.c     |   9 ++
+ crypto/testmgr.h     | 131 +++++++++++++++++++++++++++
+ include/crypto/sm4.h |  28 ++++++
+ 7 files changed, 441 insertions(+)
+ create mode 100644 crypto/sm4_generic.c
+ create mode 100644 include/crypto/sm4.h
 
-> +	compatible = "ti,keystone-rng";
-> +	ti,syscon-sa-cfg = <&sa_config>;
-> +	clocks = <&clksa>;
-> +	clock-names = "fck";
-> +	reg = <0x24000 0x1000>;
-> +};
-> -- 
-> 2.7.4
-> 
+-- 
+2.7.4
