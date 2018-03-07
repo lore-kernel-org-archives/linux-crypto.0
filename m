@@ -1,90 +1,85 @@
-From: Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>
-Subject: Re: [RESEND PATCH v3] crypto: add zBeWalgo compression for zram
-Date: Wed, 7 Mar 2018 11:12:52 +0900
-Message-ID: <20180307021252.GA802@jagdpanzerIV>
-References: <8CFBD60E-6A2B-4766-B6F9-09A98DEA26CB@informatik.uni-hamburg.de>
+From: Kamil Konieczny <k.konieczny@partner.samsung.com>
+Subject: Re: [PATCH] crypto: hash.h: Prevent use of req->digest in ahash
+ update
+Date: Wed, 07 Mar 2018 11:22:22 +0100
+Message-ID: <6fbd6e11-8c5c-4935-6f9e-0cea8f5dd178@partner.samsung.com>
+References: <CGME20180306114512eucas1p286d36bafa1bc719d7e7ccbaa9f549fc1@eucas1p2.samsung.com>
+        <c29d442e-22b6-9013-05a4-32c8eb04b692@partner.samsung.com>
+        <0d5cfbd5-8675-290b-f840-d9121872f8da@amd.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        linux-kernel@vger.kernel.org, herbert@gondor.apana.org.au,
-        davem@davemloft.net, minchan@kernel.org, ngupta@vflare.org,
-        sergey.senozhatsky.work@gmail.com
-To: Benjamin Warnke <4bwarnke@informatik.uni-hamburg.de>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: "David S. Miller" <davem@davemloft.net>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Tom Lendacky <thomas.lendacky@amd.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <8CFBD60E-6A2B-4766-B6F9-09A98DEA26CB@informatik.uni-hamburg.de>
+In-reply-to: <0d5cfbd5-8675-290b-f840-d9121872f8da@amd.com>
+Content-language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hello,
+On 06.03.2018 19:04, Tom Lendacky wrote:
+> On 3/6/2018 5:45 AM, Kamil Konieczny wrote:
+>> Prevent improper use of req->digest field in ahash update, init, export and
+> 
+> Shouldn't that be req->result (here and below)?
 
-On (03/06/18 20:59), Benjamin Warnke wrote:
->    Currently ZRAM uses compression-algorithms from the crypto-api. ZRAM
->    compresses each page individually. As a result the compression algorithm
->    is
->    forced to use a very small sliding window. None of the available
->    compression
->    algorithms is designed to achieve high compression ratios with small
->    inputs.
+Yes, it should, I will send version 2 soon,
+thank you.
 
-I think you first need to merge zBeWalgo (looks like a long way to go)
-And then add ZRAM support, as a separate patch.
+Best regards,
+Kamil Konieczny
 
->    - 'ecoham' (100 MiB) This dataset is one of the input files for the
->    scientific
->    application ECOHAM which runs an ocean simulation. This dataset contains a
->    lot of zeros. Where the data is not zero there are arrays of floating
->    point
->    values, adjacent float values are likely to be similar to each other,
->    allowing for high compression ratios.
+>> import functions in drivers code. A driver should use ahash request context
+>> if it needs to save internal state.
+>>
+>> Signed-off-by: Kamil Konieczny <k.konieczny@partner.samsung.com>
+>> ---
+>>  include/crypto/hash.h | 11 +++++++----
+>>  1 file changed, 7 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/include/crypto/hash.h b/include/crypto/hash.h
+>> index 2d1849dffb80..e97c2e662d6a 100644
+>> --- a/include/crypto/hash.h
+>> +++ b/include/crypto/hash.h
+>> @@ -74,7 +74,8 @@ struct ahash_request {
+>>   * @init: **[mandatory]** Initialize the transformation context. Intended only to initialize the
+>>   *	  state of the HASH transformation at the beginning. This shall fill in
+>>   *	  the internal structures used during the entire duration of the whole
+>> - *	  transformation. No data processing happens at this point.
+>> + *	  transformation. No data processing happens at this point. Driver code
+>> + *	  implementation must not use req->digest.
+>>   * @update: **[mandatory]** Push a chunk of data into the driver for transformation. This
+>>   *	   function actually pushes blocks of data from upper layers into the
+>>   *	   driver, which then passes those to the hardware as seen fit. This
+>> @@ -83,7 +84,8 @@ struct ahash_request {
+>>   *	   transformation. This function shall not modify the transformation
+>>   *	   context, as this function may be called in parallel with the same
+>>   *	   transformation object. Data processing can happen synchronously
+>> - *	   [SHASH] or asynchronously [AHASH] at this point.
+>> + *	   [SHASH] or asynchronously [AHASH] at this point. Driver must not use
+>> + *	   req->digest.
+>>   * @final: **[mandatory]** Retrieve result from the driver. This function finalizes the
+>>   *	   transformation and retrieves the resulting hash from the driver and
+>>   *	   pushes it back to upper layers. No data processing happens at this
+>> @@ -120,11 +122,12 @@ struct ahash_request {
+>>   *	    you want to save partial result of the transformation after
+>>   *	    processing certain amount of data and reload this partial result
+>>   *	    multiple times later on for multiple re-use. No data processing
+>> - *	    happens at this point.
+>> + *	    happens at this point. Driver must not use req->digest.
+>>   * @import: Import partial state of the transformation. This function loads the
+>>   *	    entire state of the ongoing transformation from a provided block of
+>>   *	    data so the transformation can continue from this point onward. No
+>> - *	    data processing happens at this point.
+>> + *	    data processing happens at this point. Driver must not use
+>> + *	    req->digest.
+>>   * @halg: see struct hash_alg_common
+>>   */
+>>  struct ahash_alg {
+>>
 > 
->    algorithm | ratio   | compression    | decompression
->    zbewalgo  |   12.94 |  294.10 MBit/s | 1242.59 MBit/s
->    deflate   |   12.54 |   75.51 MBit/s |  736.39 MBit/s
->    842       |   12.26 |  182.59 MBit/s |  683.61 MBit/s
->    lz4hc     |   12.00 |   51.23 MBit/s | 1524.73 MBit/s
->    lz4       |   10.68 | 1334.37 MBit/s | 1603.54 MBit/s
->    lzo       |    9.79 | 1333.76 MBit/s | 1534.63 MBit/s
 > 
->    - 'source-code' (800 MiB) This dataset is a tarball of the source-code
->    from a
->    linux-kernel.
 > 
->    algorithm | ratio   | compression    | decompression
->    deflate   |    3.27 |   42.48 MBit/s |  250.36 MBit/s
->    lz4hc     |    2.40 |  104.14 MBit/s | 1150.53 MBit/s
->    lzo       |    2.27 |  444.77 MBit/s |  886.97 MBit/s
->    lz4       |    2.18 |  453.08 MBit/s | 1101.45 MBit/s
->    842       |    1.65 |   64.10 MBit/s |  158.40 MBit/s
->    zbewalgo  |    1.19 |   52.89 MBit/s |  197.58 MBit/s
-> 
->    - 'hpcg' (8 GiB) This dataset is a (partial) memory-snapshot of the
->    running hpcg-benchmark. At the time of the snapshot, that application
->    performed a sparse matrix - vector multiplication.
-> 
->    algorithm | ratio   | compression    | decompression
->    zbewalgo  |   16.16 |  179.97 MBit/s |  468.36 MBit/s
->    deflate   |    9.52 |   65.11 MBit/s |  632.69 MBit/s
->    lz4hc     |    4.96 |  193.33 MBit/s | 1607.12 MBit/s
->    842       |    4.20 |  150.99 MBit/s |  316.22 MBit/s
->    lzo       |    4.14 |  922.74 MBit/s |  865.32 MBit/s
->    lz4       |    3.79 |  908.39 MBit/s | 1375.33 MBit/s
-> 
->    - 'partdiff' (8 GiB) Array of double values. Adjacent doubles are similar,
->    but
->    not equal. This array is produced by a partial differential equation
->    solver
->    using a Jakobi-implementation.
-> 
->    algorithm | ratio   | compression    | decompression
->    zbewalgo  |    1.30 |  203.30 MBit/s |  530.87 MBit/s
->    deflate   |    1.02 |   37.06 MBit/s | 1131.88 MBit/s
->    lzo       |    1.00 | 1741.46 MBit/s | 2012.78 MBit/s
->    lz4       |    1.00 | 1458.08 MBit/s | 2013.88 MBit/s
->    lz4hc     |    1.00 |  173.19 MBit/s | 2012.37 MBit/s
->    842       |    1.00 |   64.10 MBit/s | 2013.64 MBit/s
-
-Hm, mixed feelings.
-
-	-ss
