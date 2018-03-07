@@ -1,10 +1,11 @@
-From: Eric Biggers <ebiggers3@gmail.com>
+From: Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>
 Subject: Re: [RESEND PATCH v3] crypto: add zBeWalgo compression for zram
-Date: Tue, 6 Mar 2018 14:13:42 -0800
-Message-ID: <20180306221342.GA178079@gmail.com>
-References: <A4A8A981-9668-4F3F-B718-8F05B0506074@informatik.uni-hamburg.de>
+Date: Wed, 7 Mar 2018 11:12:52 +0900
+Message-ID: <20180307021252.GA802@jagdpanzerIV>
+References: <8CFBD60E-6A2B-4766-B6F9-09A98DEA26CB@informatik.uni-hamburg.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         linux-kernel@vger.kernel.org, herbert@gondor.apana.org.au,
         davem@davemloft.net, minchan@kernel.org, ngupta@vflare.org,
@@ -12,70 +13,78 @@ Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
 To: Benjamin Warnke <4bwarnke@informatik.uni-hamburg.de>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <A4A8A981-9668-4F3F-B718-8F05B0506074@informatik.uni-hamburg.de>
+In-Reply-To: <8CFBD60E-6A2B-4766-B6F9-09A98DEA26CB@informatik.uni-hamburg.de>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi Benjamin,
+Hello,
 
-On Tue, Mar 06, 2018 at 09:23:08PM +0100, Benjamin Warnke wrote:
-> Currently ZRAM uses compression-algorithms from the crypto-api. ZRAM
-> compresses each page individually. As a result the compression algorithm is
-> forced to use a very small sliding window. None of the available compression
-> algorithms is designed to achieve high compression ratios with small inputs.
+On (03/06/18 20:59), Benjamin Warnke wrote:
+>    Currently ZRAM uses compression-algorithms from the crypto-api. ZRAM
+>    compresses each page individually. As a result the compression algorithm
+>    is
+>    forced to use a very small sliding window. None of the available
+>    compression
+>    algorithms is designed to achieve high compression ratios with small
+>    inputs.
+
+I think you first need to merge zBeWalgo (looks like a long way to go)
+And then add ZRAM support, as a separate patch.
+
+>    - 'ecoham' (100 MiB) This dataset is one of the input files for the
+>    scientific
+>    application ECOHAM which runs an ocean simulation. This dataset contains a
+>    lot of zeros. Where the data is not zero there are arrays of floating
+>    point
+>    values, adjacent float values are likely to be similar to each other,
+>    allowing for high compression ratios.
 > 
-> This patch adds a new compression algorithm 'zBeWalgo' to the crypto api. This
-> algorithm focusses on increasing the capacity of the compressed block-device
-> created by ZRAM. The choice of compression algorithms is always a tradeoff
-> between speed and compression ratio.
+>    algorithm | ratio   | compression    | decompression
+>    zbewalgo  |   12.94 |  294.10 MBit/s | 1242.59 MBit/s
+>    deflate   |   12.54 |   75.51 MBit/s |  736.39 MBit/s
+>    842       |   12.26 |  182.59 MBit/s |  683.61 MBit/s
+>    lz4hc     |   12.00 |   51.23 MBit/s | 1524.73 MBit/s
+>    lz4       |   10.68 | 1334.37 MBit/s | 1603.54 MBit/s
+>    lzo       |    9.79 | 1333.76 MBit/s | 1534.63 MBit/s
 > 
-[...]
+>    - 'source-code' (800 MiB) This dataset is a tarball of the source-code
+>    from a
+>    linux-kernel.
 > 
-> Zstd is not in the list of compared algorithms, because it is not available
-> for Zram in the currently available kernel trees.
->
+>    algorithm | ratio   | compression    | decompression
+>    deflate   |    3.27 |   42.48 MBit/s |  250.36 MBit/s
+>    lz4hc     |    2.40 |  104.14 MBit/s | 1150.53 MBit/s
+>    lzo       |    2.27 |  444.77 MBit/s |  886.97 MBit/s
+>    lz4       |    2.18 |  453.08 MBit/s | 1101.45 MBit/s
+>    842       |    1.65 |   64.10 MBit/s |  158.40 MBit/s
+>    zbewalgo  |    1.19 |   52.89 MBit/s |  197.58 MBit/s
+> 
+>    - 'hpcg' (8 GiB) This dataset is a (partial) memory-snapshot of the
+>    running hpcg-benchmark. At the time of the snapshot, that application
+>    performed a sparse matrix - vector multiplication.
+> 
+>    algorithm | ratio   | compression    | decompression
+>    zbewalgo  |   16.16 |  179.97 MBit/s |  468.36 MBit/s
+>    deflate   |    9.52 |   65.11 MBit/s |  632.69 MBit/s
+>    lz4hc     |    4.96 |  193.33 MBit/s | 1607.12 MBit/s
+>    842       |    4.20 |  150.99 MBit/s |  316.22 MBit/s
+>    lzo       |    4.14 |  922.74 MBit/s |  865.32 MBit/s
+>    lz4       |    3.79 |  908.39 MBit/s | 1375.33 MBit/s
+> 
+>    - 'partdiff' (8 GiB) Array of double values. Adjacent doubles are similar,
+>    but
+>    not equal. This array is produced by a partial differential equation
+>    solver
+>    using a Jakobi-implementation.
+> 
+>    algorithm | ratio   | compression    | decompression
+>    zbewalgo  |    1.30 |  203.30 MBit/s |  530.87 MBit/s
+>    deflate   |    1.02 |   37.06 MBit/s | 1131.88 MBit/s
+>    lzo       |    1.00 | 1741.46 MBit/s | 2012.78 MBit/s
+>    lz4       |    1.00 | 1458.08 MBit/s | 2013.88 MBit/s
+>    lz4hc     |    1.00 |  173.19 MBit/s | 2012.37 MBit/s
+>    842       |    1.00 |   64.10 MBit/s | 2013.64 MBit/s
 
-This still isn't a valid excuse for not comparing it to Zstandard.  Zstandard is
-already in the kernel in lib/.  It would only need glue code to wire it up as an
-scomp_alg to the crypto API.  In contrast you're proposing an entirely new
-algorithm.  Ultimately, by proposing a new algorithm you're on the hook to
-demonstrate that existing algorithms aren't good enough.  Note that many of the
-existing algorithms including Zstandard also have multiple compression levels
-available to choose from.
+Hm, mixed feelings.
 
-It's also rare to add a compression or encryption algorithm to the Linux kernel
-that isn't already used somewhere else.  Have you at least written a formal
-specification of the 'zBeWalgo' data format?  Zstandard, for example, had a
-well-tested and optimized userspace library and a specification of the data
-format before it was added to the kernel.  And even before that it took a couple
-years of development to stabilize the Zstandard data format.
-
-Now, it's true that you don't strictly need a stable data format if the
-algorithm will only ever be used for RAM compression.  But, if you want to take
-that shortcut, then you're on the hook to justify it, and perhaps to enlighten
-the crypto API about algorithms that don't have a stable data format (e.g. using
-a new CRYPTO_ALG_* flag) so that users have to more explicitly opt-in to using
-them.
-
-You cannot just ignore fuzz-safety in the decompressor either.  The existing
-decompressors exposed through the crypto API are fuzz-safe, so it's not valid to
-compare an unsafe decompressor to them.  If you really do want to add an unsafe
-decompressor then you'd likely need to look into adding crypto API support for
-users to request unsafe decompression -- which could also be used to expose the
-unsafe version of the LZ4 decompressor (LZ4_decompress_fast() instead of
-LZ4_decompress_safe()).  Or if you do make the decompressor safe, then of course
-you'd actually need to fuzz it; I suggest porting the code to userspace and
-running american fuzzy lop (afl-fuzz) on it: http://lcamtuf.coredump.cx/afl/
-
-Separately, given that this is a brand new algorithm and it seems to have
-various corner cases, it would be a good idea to demonstrate a higher guarantee
-of the correctness of the compression-decompression round trip.  afl-fuzz can be
-good for that too: you could port the code to userspace and write a simple
-program which compresses and decompresses a file and aborts if it was corrupted.
-Then by passing the program to afl-fuzz it will eventually cover most of the
-compressor and decompressor.  I've done that when testing compression code in
-the past.
-
-Hope this is helpful!
-
-Eric
+	-ss
