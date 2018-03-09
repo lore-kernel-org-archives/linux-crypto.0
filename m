@@ -1,33 +1,54 @@
-From: Tudor Ambarus <tudor.ambarus@microchip.com>
-Subject: Re: [PATCH v2] crypto/ecc: Remove stack VLA usage
-Date: Fri, 9 Mar 2018 10:31:17 +0200
-Message-ID: <470bdece-b9a6-17fa-5dec-f4dfec51ef73@microchip.com>
-References: <20180308215702.GA9902@beast>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 3/4] crypto: bcm: Constify *hash_alg_name[]
+Date: Fri, 9 Mar 2018 22:29:55 +0800
+Message-ID: <20180309142954.GA12852@gondor.apana.org.au>
+References: <1519768888-19866-1-git-send-email-hernan@vanguardiasur.com.ar>
+ <1519768888-19866-3-git-send-email-hernan@vanguardiasur.com.ar>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: "David S. Miller" <davem@davemloft.net>,
-        <linux-crypto@vger.kernel.org>,
-        <kernel-hardening@lists.openwall.com>,
-        <linux-kernel@vger.kernel.org>
-To: Kees Cook <keescook@chromium.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+Cc: davem@davemloft.net, steven.lin1@broadcom.com,
+        arvind.yadav.cs@gmail.com, colin.king@canonical.com,
+        raveendra.padasalagi@broadcom.com, ray.jui@broadcom.com,
+        scott.branden@broadcom.com, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+To: =?iso-8859-1?Q?Hern=E1n?= Gonzalez <hernan@vanguardiasur.com.ar>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180308215702.GA9902@beast>
-Content-Language: en-US
+Content-Disposition: inline
+In-Reply-To: <1519768888-19866-3-git-send-email-hernan@vanguardiasur.com.ar>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-
-
-On 03/08/2018 11:57 PM, Kees Cook wrote:
-> On the quest to remove all VLAs from the kernel[1], this switches to
-> a pair of kmalloc regions instead of using the stack. This also moves
-> the get_random_bytes() after all allocations (and drops the needless
-> "nbytes" variable).
+On Tue, Feb 27, 2018 at 07:01:27PM -0300, Hernán Gonzalez wrote:
+> Note: This is compile only tested.
+> No gain from this except some self-documenting.
 > 
-> [1]https://lkml.org/lkml/2018/3/7/621
+> Signed-off-by: Hernán Gonzalez <hernan@vanguardiasur.com.ar>
+> ---
+>  drivers/crypto/bcm/spu.c | 5 +++--
+>  drivers/crypto/bcm/spu.h | 2 +-
+>  2 files changed, 4 insertions(+), 3 deletions(-)
 > 
-> Signed-off-by: Kees Cook<keescook@chromium.org>
+> diff --git a/drivers/crypto/bcm/spu.c b/drivers/crypto/bcm/spu.c
+> index efaf3cf..c7bb79e 100644
+> --- a/drivers/crypto/bcm/spu.c
+> +++ b/drivers/crypto/bcm/spu.c
+> @@ -23,8 +23,9 @@
+>  #include "cipher.h"
+>  
+>  /* This array is based on the hash algo type supported in spu.h */
+> -char *hash_alg_name[] = { "None", "md5", "sha1", "sha224", "sha256", "aes",
+> -	"sha384", "sha512", "sha3_224", "sha3_256", "sha3_384", "sha3_512" };
+> +char const * const hash_alg_name[] = { "None", "md5", "sha1", "sha224",
 
-Reviewed-by: Tudor Ambarus <tudor.ambarus@microchip.com>
+Please make that
+
+	const char *const
+
+Ditto with patch 4.
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
