@@ -1,57 +1,32 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/2] hwrng: omap: Fix clock resource for Armada 7K/8K
-Date: Fri, 9 Mar 2018 23:18:53 +0800
-Message-ID: <20180309151853.GF13567@gondor.apana.org.au>
-References: <20180228142723.11562-1-gregory.clement@bootlin.com>
+Subject: Re: [PATCH 1/4] crypto: omap-sham: Remove useless check for non-null
+ request
+Date: Fri, 9 Mar 2018 23:19:53 +0800
+Message-ID: <20180309151952.GG13567@gondor.apana.org.au>
+References: <1519937413-24468-1-git-send-email-krzk@kernel.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Andrew Lunn <andrew@lunn.ch>, Deepak Saxena <dsaxena@plexity.net>,
- Jason Cooper <jason@lakedaemon.net>,
- Antoine Tenart <antoine.tenart@bootlin.com>, Hanna Hawa <hannah@marvell.com>,
- Omri Itach <omrii@marvell.com>, Nadav Haklai <nadavh@marvell.com>,
- Igal Liberman <igall@marvell.com>, Shadi Ammouri <shadi@marvell.com>,
- linux-crypto@vger.kernel.org, Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
- =?iso-8859-1?Q?Miqu=E8l?= Raynal <miquel.raynal@bootlin.com>,
- Marcin Wojtas <mw@semihalf.com>, linux-arm-kernel@lists.infradead.org,
- Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>
-To: Gregory CLEMENT <gregory.clement@bootlin.com>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: "David S. Miller" <davem@davemloft.net>,
+        Vladimir Zapolskiy <vz@mleia.com>,
+        Kamil Konieczny <k.konieczny@partner.samsung.com>,
+        Tero Kristo <t-kristo@ti.com>, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-samsung-soc@vger.kernel.org
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20180228142723.11562-1-gregory.clement@bootlin.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+In-Reply-To: <1519937413-24468-1-git-send-email-krzk@kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Feb 28, 2018 at 03:27:21PM +0100, Gregory CLEMENT wrote:
-> Hi,
+On Thu, Mar 01, 2018 at 09:50:10PM +0100, Krzysztof Kozlowski wrote:
+> ahash_request 'req' argument passed by the caller
+> omap_sham_handle_queue() cannot be NULL here because it is obtained from
+> non-NULL pointer via container_of().
 > 
-> This short series fixes the way the clocks are used for the SafeXcel
-> IP-76 controller embedded in the Marvell Armada 7K/8K SoCs. On these
-> SoCs a second one is needed in order to clock the registers. It was
-> not noticed until now because we relied on the bootloader and also
-> because the clock driver was wrong.
+> This fixes smatch warning:
+>     drivers/crypto/omap-sham.c:812 omap_sham_prepare_request() warn: variable dereferenced before check 'req' (see line 805)
 > 
-> Thanks to this fix, it would be possible to fix the clock driver
-> without introducing a regression.
-> 
-> The first patch is just a small cleanup found when I wrote the main
-> patch.
-> 
-> Gregory CLEMENT (2):
->   hwrng: omap - Remove useless test before clk_disable_unprepare
->   hwrng: omap - Fix clock resource by adding a register clock
-> 
->  Documentation/devicetree/bindings/rng/omap_rng.txt |  7 ++++++-
->  drivers/char/hw_random/omap-rng.c                  | 22 ++++++++++++++++++----
->  2 files changed, 24 insertions(+), 5 deletions(-)
+> Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
 
 All applied.  Thanks.
 -- 
