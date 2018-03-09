@@ -1,41 +1,59 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH  1/2] crypto: talitos - don't persistently map
- req_ctx->hw_context and req_ctx->buf
-Date: Fri, 9 Mar 2018 23:17:52 +0800
-Message-ID: <20180309151751.GC13567@gondor.apana.org.au>
-References: <7c934f0788d60bd82fb1cb51d712c9ab1ea7fcb4.1519660621.git.christophe.leroy@c-s.fr>
+Subject: Re: [PATCH 0/2] hwrng: omap: Fix clock resource for Armada 7K/8K
+Date: Fri, 9 Mar 2018 23:18:53 +0800
+Message-ID: <20180309151853.GF13567@gondor.apana.org.au>
+References: <20180228142723.11562-1-gregory.clement@bootlin.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-        Horia Geanta <horia.geanta@nxp.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org
-To: Christophe Leroy <christophe.leroy@c-s.fr>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Andrew Lunn <andrew@lunn.ch>, Deepak Saxena <dsaxena@plexity.net>,
+ Jason Cooper <jason@lakedaemon.net>,
+ Antoine Tenart <antoine.tenart@bootlin.com>, Hanna Hawa <hannah@marvell.com>,
+ Omri Itach <omrii@marvell.com>, Nadav Haklai <nadavh@marvell.com>,
+ Igal Liberman <igall@marvell.com>, Shadi Ammouri <shadi@marvell.com>,
+ linux-crypto@vger.kernel.org, Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+ =?iso-8859-1?Q?Miqu=E8l?= Raynal <miquel.raynal@bootlin.com>,
+ Marcin Wojtas <mw@semihalf.com>, linux-arm-kernel@lists.infradead.org,
+ Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>
+To: Gregory CLEMENT <gregory.clement@bootlin.com>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 Content-Disposition: inline
-In-Reply-To: <7c934f0788d60bd82fb1cb51d712c9ab1ea7fcb4.1519660621.git.christophe.leroy@c-s.fr>
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <20180228142723.11562-1-gregory.clement@bootlin.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Feb 26, 2018 at 05:40:04PM +0100, Christophe Leroy wrote:
-> Commit 49f9783b0cea ("crypto: talitos - do hw_context DMA mapping
-> outside the requests") introduced a persistent dma mapping of
-> req_ctx->hw_context
-> Commit 37b5e8897eb5 ("crypto: talitos - chain in buffered data for ahash
-> on SEC1") introduced a persistent dma mapping of req_ctx->buf
+On Wed, Feb 28, 2018 at 03:27:21PM +0100, Gregory CLEMENT wrote:
+> Hi,
 > 
-> As there is no destructor for req_ctx (the request context), the
-> associated dma handlers where set in ctx (the tfm context). This is
-> wrong as several hash operations can run with the same ctx.
+> This short series fixes the way the clocks are used for the SafeXcel
+> IP-76 controller embedded in the Marvell Armada 7K/8K SoCs. On these
+> SoCs a second one is needed in order to clock the registers. It was
+> not noticed until now because we relied on the bootloader and also
+> because the clock driver was wrong.
 > 
-> This patch removes this persistent mapping.
+> Thanks to this fix, it would be possible to fix the clock driver
+> without introducing a regression.
 > 
-> Reported-by: Horia Geanta <horia.geanta@nxp.com>
-> Fixes: 49f9783b0cea ("crypto: talitos - do hw_context DMA mapping outside the requests")
-> Fixes: 37b5e8897eb5 ("crypto: talitos - chain in buffered data for ahash on SEC1")
-> Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
+> The first patch is just a small cleanup found when I wrote the main
+> patch.
+> 
+> Gregory CLEMENT (2):
+>   hwrng: omap - Remove useless test before clk_disable_unprepare
+>   hwrng: omap - Fix clock resource by adding a register clock
+> 
+>  Documentation/devicetree/bindings/rng/omap_rng.txt |  7 ++++++-
+>  drivers/char/hw_random/omap-rng.c                  | 22 ++++++++++++++++++----
+>  2 files changed, 24 insertions(+), 5 deletions(-)
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
