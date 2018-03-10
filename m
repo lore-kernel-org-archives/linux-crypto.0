@@ -1,7 +1,8 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v5 23/23] DO NOT MERGE
-Date: Sat, 10 Mar 2018 15:22:08 +0000
-Message-ID: <20180310152208.10369-24-ard.biesheuvel@linaro.org>
+Subject: [PATCH v5 22/23] crypto: arm64/sm3-ce - yield NEON after every block
+ of input
+Date: Sat, 10 Mar 2018 15:22:07 +0000
+Message-ID: <20180310152208.10369-23-ard.biesheuvel@linaro.org>
 References: <20180310152208.10369-1-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -30,62 +31,75 @@ Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-Test code to force a kernel_neon_end+begin sequence at every yield point,
-and wipe the entire NEON state before resuming the algorithm.
----
- arch/arm64/include/asm/assembler.h | 33 ++++++++++++++++++++
- 1 file changed, 33 insertions(+)
+Avoid excessive scheduling delays under a preemptible kernel by
+conditionally yielding the NEON after every block of input.
 
-diff --git a/arch/arm64/include/asm/assembler.h b/arch/arm64/include/asm/assembler.h
-index 61168cbe9781..b471b0bbdfe6 100644
---- a/arch/arm64/include/asm/assembler.h
-+++ b/arch/arm64/include/asm/assembler.h
-@@ -678,6 +678,7 @@ alternative_else_nop_endif
- 	cmp		w1, #PREEMPT_DISABLE_OFFSET
- 	csel		x0, x0, xzr, eq
- 	tbnz		x0, #TIF_NEED_RESCHED, .Lyield_\@	// needs rescheduling?
-+	b		.Lyield_\@
- #endif
- 	/* fall through to endif_yield_neon */
- 	.subsection	1
-@@ -687,6 +688,38 @@ alternative_else_nop_endif
- 	.macro		do_cond_yield_neon
- 	bl		kernel_neon_end
- 	bl		kernel_neon_begin
-+	movi		v0.16b, #0x55
-+	movi		v1.16b, #0x55
-+	movi		v2.16b, #0x55
-+	movi		v3.16b, #0x55
-+	movi		v4.16b, #0x55
-+	movi		v5.16b, #0x55
-+	movi		v6.16b, #0x55
-+	movi		v7.16b, #0x55
-+	movi		v8.16b, #0x55
-+	movi		v9.16b, #0x55
-+	movi		v10.16b, #0x55
-+	movi		v11.16b, #0x55
-+	movi		v12.16b, #0x55
-+	movi		v13.16b, #0x55
-+	movi		v14.16b, #0x55
-+	movi		v15.16b, #0x55
-+	movi		v16.16b, #0x55
-+	movi		v17.16b, #0x55
-+	movi		v18.16b, #0x55
-+	movi		v19.16b, #0x55
-+	movi		v20.16b, #0x55
-+	movi		v21.16b, #0x55
-+	movi		v22.16b, #0x55
-+	movi		v23.16b, #0x55
-+	movi		v24.16b, #0x55
-+	movi		v25.16b, #0x55
-+	movi		v26.16b, #0x55
-+	movi		v27.16b, #0x55
-+	movi		v28.16b, #0x55
-+	movi		v29.16b, #0x55
-+	movi		v30.16b, #0x55
-+	movi		v31.16b, #0x55
- 	.endm
+Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+---
+ arch/arm64/crypto/sm3-ce-core.S | 30 +++++++++++++++-----
+ 1 file changed, 23 insertions(+), 7 deletions(-)
+
+diff --git a/arch/arm64/crypto/sm3-ce-core.S b/arch/arm64/crypto/sm3-ce-core.S
+index 27169fe07a68..5a116c8d0cee 100644
+--- a/arch/arm64/crypto/sm3-ce-core.S
++++ b/arch/arm64/crypto/sm3-ce-core.S
+@@ -77,19 +77,25 @@
+ 	 */
+ 	.text
+ ENTRY(sm3_ce_transform)
++	frame_push	3
++
++	mov		x19, x0
++	mov		x20, x1
++	mov		x21, x2
++
+ 	/* load state */
+-	ld1		{v8.4s-v9.4s}, [x0]
++	ld1		{v8.4s-v9.4s}, [x19]
+ 	rev64		v8.4s, v8.4s
+ 	rev64		v9.4s, v9.4s
+ 	ext		v8.16b, v8.16b, v8.16b, #8
+ 	ext		v9.16b, v9.16b, v9.16b, #8
  
- 	.macro		endif_yield_neon, lbl
+-	adr_l		x8, .Lt
++0:	adr_l		x8, .Lt
+ 	ldp		s13, s14, [x8]
+ 
+ 	/* load input */
+-0:	ld1		{v0.16b-v3.16b}, [x1], #64
+-	sub		w2, w2, #1
++1:	ld1		{v0.16b-v3.16b}, [x20], #64
++	sub		w21, w21, #1
+ 
+ 	mov		v15.16b, v8.16b
+ 	mov		v16.16b, v9.16b
+@@ -125,14 +131,24 @@ CPU_LE(	rev32		v3.16b, v3.16b		)
+ 	eor		v9.16b, v9.16b, v16.16b
+ 
+ 	/* handled all input blocks? */
+-	cbnz		w2, 0b
++	cbz		w21, 2f
++
++	if_will_cond_yield_neon
++	st1		{v8.4s-v9.4s}, [x19]
++	do_cond_yield_neon
++	ld1		{v8.4s-v9.4s}, [x19]
++	b		0b
++	endif_yield_neon
++
++	b		1b
+ 
+ 	/* save state */
+-	rev64		v8.4s, v8.4s
++2:	rev64		v8.4s, v8.4s
+ 	rev64		v9.4s, v9.4s
+ 	ext		v8.16b, v8.16b, v8.16b, #8
+ 	ext		v9.16b, v9.16b, v9.16b, #8
+-	st1		{v8.4s-v9.4s}, [x0]
++	st1		{v8.4s-v9.4s}, [x19]
++	frame_pop
+ 	ret
+ ENDPROC(sm3_ce_transform)
+ 
 -- 
 2.15.1
