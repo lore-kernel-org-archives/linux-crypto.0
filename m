@@ -1,8 +1,8 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v5 03/23] crypto: arm64/aes-blk - move kernel mode neon
- en/disable into loop
-Date: Sat, 10 Mar 2018 15:21:48 +0000
-Message-ID: <20180310152208.10369-4-ard.biesheuvel@linaro.org>
+Subject: [PATCH v5 06/23] crypto: arm64/aes-blk - remove configurable
+ interleave
+Date: Sat, 10 Mar 2018 15:21:51 +0000
+Message-ID: <20180310152208.10369-7-ard.biesheuvel@linaro.org>
 References: <20180310152208.10369-1-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -31,580 +31,492 @@ Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-When kernel mode NEON was first introduced on arm64, the preserve and
-restore of the userland NEON state was completely unoptimized, and
-involved saving all registers on each call to kernel_neon_begin(),
-and restoring them on each call to kernel_neon_end(). For this reason,
-the NEON crypto code that was introduced at the time keeps the NEON
-enabled throughout the execution of the crypto API methods, which may
-include calls back into the crypto API that could result in memory
-allocation or other actions that we should avoid when running with
-preemption disabled.
+The AES block mode implementation using Crypto Extensions or plain NEON
+was written before real hardware existed, and so its interleave factor
+was made build time configurable (as well as an option to instantiate
+all interleaved sequences inline rather than as subroutines)
 
-Since then, we have optimized the kernel mode NEON handling, which now
-restores lazily (upon return to userland), and so the preserve action
-is only costly the first time it is called after entering the kernel.
-
-So let's put the kernel_neon_begin() and kernel_neon_end() calls around
-the actual invocations of the NEON crypto code, and run the remainder of
-the code with kernel mode NEON disabled (and preemption enabled)
-
-Note that this requires some reshuffling of the registers in the asm
-code, because the XTS routines can no longer rely on the registers to
-retain their contents between invocations.
+We ended up using INTERLEAVE=4 with inlining disabled for both flavors
+of the core AES routines, so let's stick with that, and remove the option
+to configure this at build time. This makes the code easier to modify,
+which is nice now that we're adding yield support.
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- arch/arm64/crypto/aes-glue.c        | 95 ++++++++++----------
- arch/arm64/crypto/aes-modes.S       | 90 +++++++++----------
- arch/arm64/crypto/aes-neonbs-glue.c | 14 ++-
- 3 files changed, 97 insertions(+), 102 deletions(-)
+ arch/arm64/crypto/Makefile    |   3 -
+ arch/arm64/crypto/aes-modes.S | 237 ++++----------------
+ 2 files changed, 40 insertions(+), 200 deletions(-)
 
-diff --git a/arch/arm64/crypto/aes-glue.c b/arch/arm64/crypto/aes-glue.c
-index 2fa850e86aa8..253188fb8cb0 100644
---- a/arch/arm64/crypto/aes-glue.c
-+++ b/arch/arm64/crypto/aes-glue.c
-@@ -64,17 +64,17 @@ MODULE_LICENSE("GPL v2");
+diff --git a/arch/arm64/crypto/Makefile b/arch/arm64/crypto/Makefile
+index cee9b8d9830b..b6b624602582 100644
+--- a/arch/arm64/crypto/Makefile
++++ b/arch/arm64/crypto/Makefile
+@@ -59,9 +59,6 @@ aes-arm64-y := aes-cipher-core.o aes-cipher-glue.o
+ obj-$(CONFIG_CRYPTO_AES_ARM64_BS) += aes-neon-bs.o
+ aes-neon-bs-y := aes-neonbs-core.o aes-neonbs-glue.o
  
- /* defined in aes-modes.S */
- asmlinkage void aes_ecb_encrypt(u8 out[], u8 const in[], u8 const rk[],
--				int rounds, int blocks, int first);
-+				int rounds, int blocks);
- asmlinkage void aes_ecb_decrypt(u8 out[], u8 const in[], u8 const rk[],
--				int rounds, int blocks, int first);
-+				int rounds, int blocks);
+-AFLAGS_aes-ce.o		:= -DINTERLEAVE=4
+-AFLAGS_aes-neon.o	:= -DINTERLEAVE=4
+-
+ CFLAGS_aes-glue-ce.o	:= -DUSE_V8_CRYPTO_EXTENSIONS
  
- asmlinkage void aes_cbc_encrypt(u8 out[], u8 const in[], u8 const rk[],
--				int rounds, int blocks, u8 iv[], int first);
-+				int rounds, int blocks, u8 iv[]);
- asmlinkage void aes_cbc_decrypt(u8 out[], u8 const in[], u8 const rk[],
--				int rounds, int blocks, u8 iv[], int first);
-+				int rounds, int blocks, u8 iv[]);
- 
- asmlinkage void aes_ctr_encrypt(u8 out[], u8 const in[], u8 const rk[],
--				int rounds, int blocks, u8 ctr[], int first);
-+				int rounds, int blocks, u8 ctr[]);
- 
- asmlinkage void aes_xts_encrypt(u8 out[], u8 const in[], u8 const rk1[],
- 				int rounds, int blocks, u8 const rk2[], u8 iv[],
-@@ -133,19 +133,19 @@ static int ecb_encrypt(struct skcipher_request *req)
- {
- 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
- 	struct crypto_aes_ctx *ctx = crypto_skcipher_ctx(tfm);
--	int err, first, rounds = 6 + ctx->key_length / 4;
-+	int err, rounds = 6 + ctx->key_length / 4;
- 	struct skcipher_walk walk;
- 	unsigned int blocks;
- 
--	err = skcipher_walk_virt(&walk, req, true);
-+	err = skcipher_walk_virt(&walk, req, false);
- 
--	kernel_neon_begin();
--	for (first = 1; (blocks = (walk.nbytes / AES_BLOCK_SIZE)); first = 0) {
-+	while ((blocks = (walk.nbytes / AES_BLOCK_SIZE))) {
-+		kernel_neon_begin();
- 		aes_ecb_encrypt(walk.dst.virt.addr, walk.src.virt.addr,
--				(u8 *)ctx->key_enc, rounds, blocks, first);
-+				(u8 *)ctx->key_enc, rounds, blocks);
-+		kernel_neon_end();
- 		err = skcipher_walk_done(&walk, walk.nbytes % AES_BLOCK_SIZE);
- 	}
--	kernel_neon_end();
- 	return err;
- }
- 
-@@ -153,19 +153,19 @@ static int ecb_decrypt(struct skcipher_request *req)
- {
- 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
- 	struct crypto_aes_ctx *ctx = crypto_skcipher_ctx(tfm);
--	int err, first, rounds = 6 + ctx->key_length / 4;
-+	int err, rounds = 6 + ctx->key_length / 4;
- 	struct skcipher_walk walk;
- 	unsigned int blocks;
- 
--	err = skcipher_walk_virt(&walk, req, true);
-+	err = skcipher_walk_virt(&walk, req, false);
- 
--	kernel_neon_begin();
--	for (first = 1; (blocks = (walk.nbytes / AES_BLOCK_SIZE)); first = 0) {
-+	while ((blocks = (walk.nbytes / AES_BLOCK_SIZE))) {
-+		kernel_neon_begin();
- 		aes_ecb_decrypt(walk.dst.virt.addr, walk.src.virt.addr,
--				(u8 *)ctx->key_dec, rounds, blocks, first);
-+				(u8 *)ctx->key_dec, rounds, blocks);
-+		kernel_neon_end();
- 		err = skcipher_walk_done(&walk, walk.nbytes % AES_BLOCK_SIZE);
- 	}
--	kernel_neon_end();
- 	return err;
- }
- 
-@@ -173,20 +173,19 @@ static int cbc_encrypt(struct skcipher_request *req)
- {
- 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
- 	struct crypto_aes_ctx *ctx = crypto_skcipher_ctx(tfm);
--	int err, first, rounds = 6 + ctx->key_length / 4;
-+	int err, rounds = 6 + ctx->key_length / 4;
- 	struct skcipher_walk walk;
- 	unsigned int blocks;
- 
--	err = skcipher_walk_virt(&walk, req, true);
-+	err = skcipher_walk_virt(&walk, req, false);
- 
--	kernel_neon_begin();
--	for (first = 1; (blocks = (walk.nbytes / AES_BLOCK_SIZE)); first = 0) {
-+	while ((blocks = (walk.nbytes / AES_BLOCK_SIZE))) {
-+		kernel_neon_begin();
- 		aes_cbc_encrypt(walk.dst.virt.addr, walk.src.virt.addr,
--				(u8 *)ctx->key_enc, rounds, blocks, walk.iv,
--				first);
-+				(u8 *)ctx->key_enc, rounds, blocks, walk.iv);
-+		kernel_neon_end();
- 		err = skcipher_walk_done(&walk, walk.nbytes % AES_BLOCK_SIZE);
- 	}
--	kernel_neon_end();
- 	return err;
- }
- 
-@@ -194,20 +193,19 @@ static int cbc_decrypt(struct skcipher_request *req)
- {
- 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
- 	struct crypto_aes_ctx *ctx = crypto_skcipher_ctx(tfm);
--	int err, first, rounds = 6 + ctx->key_length / 4;
-+	int err, rounds = 6 + ctx->key_length / 4;
- 	struct skcipher_walk walk;
- 	unsigned int blocks;
- 
--	err = skcipher_walk_virt(&walk, req, true);
-+	err = skcipher_walk_virt(&walk, req, false);
- 
--	kernel_neon_begin();
--	for (first = 1; (blocks = (walk.nbytes / AES_BLOCK_SIZE)); first = 0) {
-+	while ((blocks = (walk.nbytes / AES_BLOCK_SIZE))) {
-+		kernel_neon_begin();
- 		aes_cbc_decrypt(walk.dst.virt.addr, walk.src.virt.addr,
--				(u8 *)ctx->key_dec, rounds, blocks, walk.iv,
--				first);
-+				(u8 *)ctx->key_dec, rounds, blocks, walk.iv);
-+		kernel_neon_end();
- 		err = skcipher_walk_done(&walk, walk.nbytes % AES_BLOCK_SIZE);
- 	}
--	kernel_neon_end();
- 	return err;
- }
- 
-@@ -215,20 +213,18 @@ static int ctr_encrypt(struct skcipher_request *req)
- {
- 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
- 	struct crypto_aes_ctx *ctx = crypto_skcipher_ctx(tfm);
--	int err, first, rounds = 6 + ctx->key_length / 4;
-+	int err, rounds = 6 + ctx->key_length / 4;
- 	struct skcipher_walk walk;
- 	int blocks;
- 
--	err = skcipher_walk_virt(&walk, req, true);
-+	err = skcipher_walk_virt(&walk, req, false);
- 
--	first = 1;
--	kernel_neon_begin();
- 	while ((blocks = (walk.nbytes / AES_BLOCK_SIZE))) {
-+		kernel_neon_begin();
- 		aes_ctr_encrypt(walk.dst.virt.addr, walk.src.virt.addr,
--				(u8 *)ctx->key_enc, rounds, blocks, walk.iv,
--				first);
-+				(u8 *)ctx->key_enc, rounds, blocks, walk.iv);
- 		err = skcipher_walk_done(&walk, walk.nbytes % AES_BLOCK_SIZE);
--		first = 0;
-+		kernel_neon_end();
- 	}
- 	if (walk.nbytes) {
- 		u8 __aligned(8) tail[AES_BLOCK_SIZE];
-@@ -241,12 +237,13 @@ static int ctr_encrypt(struct skcipher_request *req)
- 		 */
- 		blocks = -1;
- 
-+		kernel_neon_begin();
- 		aes_ctr_encrypt(tail, NULL, (u8 *)ctx->key_enc, rounds,
--				blocks, walk.iv, first);
-+				blocks, walk.iv);
-+		kernel_neon_end();
- 		crypto_xor_cpy(tdst, tsrc, tail, nbytes);
- 		err = skcipher_walk_done(&walk, 0);
- 	}
--	kernel_neon_end();
- 
- 	return err;
- }
-@@ -270,16 +267,16 @@ static int xts_encrypt(struct skcipher_request *req)
- 	struct skcipher_walk walk;
- 	unsigned int blocks;
- 
--	err = skcipher_walk_virt(&walk, req, true);
-+	err = skcipher_walk_virt(&walk, req, false);
- 
--	kernel_neon_begin();
- 	for (first = 1; (blocks = (walk.nbytes / AES_BLOCK_SIZE)); first = 0) {
-+		kernel_neon_begin();
- 		aes_xts_encrypt(walk.dst.virt.addr, walk.src.virt.addr,
- 				(u8 *)ctx->key1.key_enc, rounds, blocks,
- 				(u8 *)ctx->key2.key_enc, walk.iv, first);
-+		kernel_neon_end();
- 		err = skcipher_walk_done(&walk, walk.nbytes % AES_BLOCK_SIZE);
- 	}
--	kernel_neon_end();
- 
- 	return err;
- }
-@@ -292,16 +289,16 @@ static int xts_decrypt(struct skcipher_request *req)
- 	struct skcipher_walk walk;
- 	unsigned int blocks;
- 
--	err = skcipher_walk_virt(&walk, req, true);
-+	err = skcipher_walk_virt(&walk, req, false);
- 
--	kernel_neon_begin();
- 	for (first = 1; (blocks = (walk.nbytes / AES_BLOCK_SIZE)); first = 0) {
-+		kernel_neon_begin();
- 		aes_xts_decrypt(walk.dst.virt.addr, walk.src.virt.addr,
- 				(u8 *)ctx->key1.key_dec, rounds, blocks,
- 				(u8 *)ctx->key2.key_enc, walk.iv, first);
-+		kernel_neon_end();
- 		err = skcipher_walk_done(&walk, walk.nbytes % AES_BLOCK_SIZE);
- 	}
--	kernel_neon_end();
- 
- 	return err;
- }
-@@ -425,7 +422,7 @@ static int cmac_setkey(struct crypto_shash *tfm, const u8 *in_key,
- 
- 	/* encrypt the zero vector */
- 	kernel_neon_begin();
--	aes_ecb_encrypt(ctx->consts, (u8[AES_BLOCK_SIZE]){}, rk, rounds, 1, 1);
-+	aes_ecb_encrypt(ctx->consts, (u8[AES_BLOCK_SIZE]){}, rk, rounds, 1);
- 	kernel_neon_end();
- 
- 	cmac_gf128_mul_by_x(consts, consts);
-@@ -454,8 +451,8 @@ static int xcbc_setkey(struct crypto_shash *tfm, const u8 *in_key,
- 		return err;
- 
- 	kernel_neon_begin();
--	aes_ecb_encrypt(key, ks[0], rk, rounds, 1, 1);
--	aes_ecb_encrypt(ctx->consts, ks[1], rk, rounds, 2, 0);
-+	aes_ecb_encrypt(key, ks[0], rk, rounds, 1);
-+	aes_ecb_encrypt(ctx->consts, ks[1], rk, rounds, 2);
- 	kernel_neon_end();
- 
- 	return cbcmac_setkey(tfm, key, sizeof(key));
+ $(obj)/aes-glue-%.o: $(src)/aes-glue.c FORCE
 diff --git a/arch/arm64/crypto/aes-modes.S b/arch/arm64/crypto/aes-modes.S
-index 2674d43d1384..65b273667b34 100644
+index 65b273667b34..27a235b2ddee 100644
 --- a/arch/arm64/crypto/aes-modes.S
 +++ b/arch/arm64/crypto/aes-modes.S
-@@ -40,24 +40,24 @@
- #if INTERLEAVE == 2
+@@ -13,44 +13,6 @@
+ 	.text
+ 	.align		4
  
- aes_encrypt_block2x:
--	encrypt_block2x	v0, v1, w3, x2, x6, w7
-+	encrypt_block2x	v0, v1, w3, x2, x8, w7
- 	ret
- ENDPROC(aes_encrypt_block2x)
- 
- aes_decrypt_block2x:
--	decrypt_block2x	v0, v1, w3, x2, x6, w7
-+	decrypt_block2x	v0, v1, w3, x2, x8, w7
- 	ret
- ENDPROC(aes_decrypt_block2x)
- 
- #elif INTERLEAVE == 4
- 
+-/*
+- * There are several ways to instantiate this code:
+- * - no interleave, all inline
+- * - 2-way interleave, 2x calls out of line (-DINTERLEAVE=2)
+- * - 2-way interleave, all inline (-DINTERLEAVE=2 -DINTERLEAVE_INLINE)
+- * - 4-way interleave, 4x calls out of line (-DINTERLEAVE=4)
+- * - 4-way interleave, all inline (-DINTERLEAVE=4 -DINTERLEAVE_INLINE)
+- *
+- * Macros imported by this code:
+- * - enc_prepare	- setup NEON registers for encryption
+- * - dec_prepare	- setup NEON registers for decryption
+- * - enc_switch_key	- change to new key after having prepared for encryption
+- * - encrypt_block	- encrypt a single block
+- * - decrypt block	- decrypt a single block
+- * - encrypt_block2x	- encrypt 2 blocks in parallel (if INTERLEAVE == 2)
+- * - decrypt_block2x	- decrypt 2 blocks in parallel (if INTERLEAVE == 2)
+- * - encrypt_block4x	- encrypt 4 blocks in parallel (if INTERLEAVE == 4)
+- * - decrypt_block4x	- decrypt 4 blocks in parallel (if INTERLEAVE == 4)
+- */
+-
+-#if defined(INTERLEAVE) && !defined(INTERLEAVE_INLINE)
+-#define FRAME_PUSH	stp x29, x30, [sp,#-16]! ; mov x29, sp
+-#define FRAME_POP	ldp x29, x30, [sp],#16
+-
+-#if INTERLEAVE == 2
+-
+-aes_encrypt_block2x:
+-	encrypt_block2x	v0, v1, w3, x2, x8, w7
+-	ret
+-ENDPROC(aes_encrypt_block2x)
+-
+-aes_decrypt_block2x:
+-	decrypt_block2x	v0, v1, w3, x2, x8, w7
+-	ret
+-ENDPROC(aes_decrypt_block2x)
+-
+-#elif INTERLEAVE == 4
+-
  aes_encrypt_block4x:
--	encrypt_block4x	v0, v1, v2, v3, w3, x2, x6, w7
-+	encrypt_block4x	v0, v1, v2, v3, w3, x2, x8, w7
+ 	encrypt_block4x	v0, v1, v2, v3, w3, x2, x8, w7
  	ret
- ENDPROC(aes_encrypt_block4x)
- 
- aes_decrypt_block4x:
--	decrypt_block4x	v0, v1, v2, v3, w3, x2, x6, w7
-+	decrypt_block4x	v0, v1, v2, v3, w3, x2, x8, w7
+@@ -61,48 +23,6 @@ aes_decrypt_block4x:
  	ret
  ENDPROC(aes_decrypt_block4x)
  
-@@ -86,33 +86,32 @@ ENDPROC(aes_decrypt_block4x)
- #define FRAME_POP
- 
- 	.macro		do_encrypt_block2x
--	encrypt_block2x	v0, v1, w3, x2, x6, w7
-+	encrypt_block2x	v0, v1, w3, x2, x8, w7
- 	.endm
- 
- 	.macro		do_decrypt_block2x
--	decrypt_block2x	v0, v1, w3, x2, x6, w7
-+	decrypt_block2x	v0, v1, w3, x2, x8, w7
- 	.endm
- 
- 	.macro		do_encrypt_block4x
--	encrypt_block4x	v0, v1, v2, v3, w3, x2, x6, w7
-+	encrypt_block4x	v0, v1, v2, v3, w3, x2, x8, w7
- 	.endm
- 
- 	.macro		do_decrypt_block4x
--	decrypt_block4x	v0, v1, v2, v3, w3, x2, x6, w7
-+	decrypt_block4x	v0, v1, v2, v3, w3, x2, x8, w7
- 	.endm
- 
- #endif
- 
+-#else
+-#error INTERLEAVE should equal 2 or 4
+-#endif
+-
+-	.macro		do_encrypt_block2x
+-	bl		aes_encrypt_block2x
+-	.endm
+-
+-	.macro		do_decrypt_block2x
+-	bl		aes_decrypt_block2x
+-	.endm
+-
+-	.macro		do_encrypt_block4x
+-	bl		aes_encrypt_block4x
+-	.endm
+-
+-	.macro		do_decrypt_block4x
+-	bl		aes_decrypt_block4x
+-	.endm
+-
+-#else
+-#define FRAME_PUSH
+-#define FRAME_POP
+-
+-	.macro		do_encrypt_block2x
+-	encrypt_block2x	v0, v1, w3, x2, x8, w7
+-	.endm
+-
+-	.macro		do_decrypt_block2x
+-	decrypt_block2x	v0, v1, w3, x2, x8, w7
+-	.endm
+-
+-	.macro		do_encrypt_block4x
+-	encrypt_block4x	v0, v1, v2, v3, w3, x2, x8, w7
+-	.endm
+-
+-	.macro		do_decrypt_block4x
+-	decrypt_block4x	v0, v1, v2, v3, w3, x2, x8, w7
+-	.endm
+-
+-#endif
+-
  	/*
  	 * aes_ecb_encrypt(u8 out[], u8 const in[], u8 const rk[], int rounds,
--	 *		   int blocks, int first)
-+	 *		   int blocks)
- 	 * aes_ecb_decrypt(u8 out[], u8 const in[], u8 const rk[], int rounds,
--	 *		   int blocks, int first)
-+	 *		   int blocks)
+ 	 *		   int blocks)
+@@ -111,28 +31,21 @@ ENDPROC(aes_decrypt_block4x)
  	 */
  
  AES_ENTRY(aes_ecb_encrypt)
- 	FRAME_PUSH
--	cbz		w5, .LecbencloopNx
+-	FRAME_PUSH
++	stp		x29, x30, [sp, #-16]!
++	mov		x29, sp
  
  	enc_prepare	w3, x2, x5
  
-@@ -148,7 +147,6 @@ AES_ENDPROC(aes_ecb_encrypt)
+ .LecbencloopNx:
+-#if INTERLEAVE >= 2
+-	subs		w4, w4, #INTERLEAVE
++	subs		w4, w4, #4
+ 	bmi		.Lecbenc1x
+-#if INTERLEAVE == 2
+-	ld1		{v0.16b-v1.16b}, [x1], #32	/* get 2 pt blocks */
+-	do_encrypt_block2x
+-	st1		{v0.16b-v1.16b}, [x0], #32
+-#else
+ 	ld1		{v0.16b-v3.16b}, [x1], #64	/* get 4 pt blocks */
+-	do_encrypt_block4x
++	bl		aes_encrypt_block4x
+ 	st1		{v0.16b-v3.16b}, [x0], #64
+-#endif
+ 	b		.LecbencloopNx
+ .Lecbenc1x:
+-	adds		w4, w4, #INTERLEAVE
++	adds		w4, w4, #4
+ 	beq		.Lecbencout
+-#endif
+ .Lecbencloop:
+ 	ld1		{v0.16b}, [x1], #16		/* get next pt block */
+ 	encrypt_block	v0, w3, x2, x5, w6
+@@ -140,34 +53,27 @@ AES_ENTRY(aes_ecb_encrypt)
+ 	subs		w4, w4, #1
+ 	bne		.Lecbencloop
+ .Lecbencout:
+-	FRAME_POP
++	ldp		x29, x30, [sp], #16
+ 	ret
+ AES_ENDPROC(aes_ecb_encrypt)
+ 
  
  AES_ENTRY(aes_ecb_decrypt)
- 	FRAME_PUSH
--	cbz		w5, .LecbdecloopNx
+-	FRAME_PUSH
++	stp		x29, x30, [sp, #-16]!
++	mov		x29, sp
  
  	dec_prepare	w3, x2, x5
  
-@@ -184,14 +182,12 @@ AES_ENDPROC(aes_ecb_decrypt)
+ .LecbdecloopNx:
+-#if INTERLEAVE >= 2
+-	subs		w4, w4, #INTERLEAVE
++	subs		w4, w4, #4
+ 	bmi		.Lecbdec1x
+-#if INTERLEAVE == 2
+-	ld1		{v0.16b-v1.16b}, [x1], #32	/* get 2 ct blocks */
+-	do_decrypt_block2x
+-	st1		{v0.16b-v1.16b}, [x0], #32
+-#else
+ 	ld1		{v0.16b-v3.16b}, [x1], #64	/* get 4 ct blocks */
+-	do_decrypt_block4x
++	bl		aes_decrypt_block4x
+ 	st1		{v0.16b-v3.16b}, [x0], #64
+-#endif
+ 	b		.LecbdecloopNx
+ .Lecbdec1x:
+-	adds		w4, w4, #INTERLEAVE
++	adds		w4, w4, #4
+ 	beq		.Lecbdecout
+-#endif
+ .Lecbdecloop:
+ 	ld1		{v0.16b}, [x1], #16		/* get next ct block */
+ 	decrypt_block	v0, w3, x2, x5, w6
+@@ -175,7 +81,7 @@ AES_ENTRY(aes_ecb_decrypt)
+ 	subs		w4, w4, #1
+ 	bne		.Lecbdecloop
+ .Lecbdecout:
+-	FRAME_POP
++	ldp		x29, x30, [sp], #16
+ 	ret
+ AES_ENDPROC(aes_ecb_decrypt)
  
- 	/*
- 	 * aes_cbc_encrypt(u8 out[], u8 const in[], u8 const rk[], int rounds,
--	 *		   int blocks, u8 iv[], int first)
-+	 *		   int blocks, u8 iv[])
- 	 * aes_cbc_decrypt(u8 out[], u8 const in[], u8 const rk[], int rounds,
--	 *		   int blocks, u8 iv[], int first)
-+	 *		   int blocks, u8 iv[])
- 	 */
+@@ -204,30 +110,20 @@ AES_ENDPROC(aes_cbc_encrypt)
  
- AES_ENTRY(aes_cbc_encrypt)
--	cbz		w6, .Lcbcencloop
--
- 	ld1		{v0.16b}, [x5]			/* get iv */
- 	enc_prepare	w3, x2, x6
- 
-@@ -209,7 +205,6 @@ AES_ENDPROC(aes_cbc_encrypt)
  
  AES_ENTRY(aes_cbc_decrypt)
- 	FRAME_PUSH
--	cbz		w6, .LcbcdecloopNx
+-	FRAME_PUSH
++	stp		x29, x30, [sp, #-16]!
++	mov		x29, sp
  
  	ld1		{v7.16b}, [x5]			/* get iv */
  	dec_prepare	w3, x2, x6
-@@ -264,20 +259,19 @@ AES_ENDPROC(aes_cbc_decrypt)
  
- 	/*
- 	 * aes_ctr_encrypt(u8 out[], u8 const in[], u8 const rk[], int rounds,
--	 *		   int blocks, u8 ctr[], int first)
-+	 *		   int blocks, u8 ctr[])
+ .LcbcdecloopNx:
+-#if INTERLEAVE >= 2
+-	subs		w4, w4, #INTERLEAVE
++	subs		w4, w4, #4
+ 	bmi		.Lcbcdec1x
+-#if INTERLEAVE == 2
+-	ld1		{v0.16b-v1.16b}, [x1], #32	/* get 2 ct blocks */
+-	mov		v2.16b, v0.16b
+-	mov		v3.16b, v1.16b
+-	do_decrypt_block2x
+-	eor		v0.16b, v0.16b, v7.16b
+-	eor		v1.16b, v1.16b, v2.16b
+-	mov		v7.16b, v3.16b
+-	st1		{v0.16b-v1.16b}, [x0], #32
+-#else
+ 	ld1		{v0.16b-v3.16b}, [x1], #64	/* get 4 ct blocks */
+ 	mov		v4.16b, v0.16b
+ 	mov		v5.16b, v1.16b
+ 	mov		v6.16b, v2.16b
+-	do_decrypt_block4x
++	bl		aes_decrypt_block4x
+ 	sub		x1, x1, #16
+ 	eor		v0.16b, v0.16b, v7.16b
+ 	eor		v1.16b, v1.16b, v4.16b
+@@ -235,12 +131,10 @@ AES_ENTRY(aes_cbc_decrypt)
+ 	eor		v2.16b, v2.16b, v5.16b
+ 	eor		v3.16b, v3.16b, v6.16b
+ 	st1		{v0.16b-v3.16b}, [x0], #64
+-#endif
+ 	b		.LcbcdecloopNx
+ .Lcbcdec1x:
+-	adds		w4, w4, #INTERLEAVE
++	adds		w4, w4, #4
+ 	beq		.Lcbcdecout
+-#endif
+ .Lcbcdecloop:
+ 	ld1		{v1.16b}, [x1], #16		/* get next ct block */
+ 	mov		v0.16b, v1.16b			/* ...and copy to v0 */
+@@ -251,8 +145,8 @@ AES_ENTRY(aes_cbc_decrypt)
+ 	subs		w4, w4, #1
+ 	bne		.Lcbcdecloop
+ .Lcbcdecout:
+-	FRAME_POP
+ 	st1		{v7.16b}, [x5]			/* return iv */
++	ldp		x29, x30, [sp], #16
+ 	ret
+ AES_ENDPROC(aes_cbc_decrypt)
+ 
+@@ -263,34 +157,19 @@ AES_ENDPROC(aes_cbc_decrypt)
  	 */
  
  AES_ENTRY(aes_ctr_encrypt)
- 	FRAME_PUSH
--	cbz		w6, .Lctrnotfirst	/* 1st time around? */
-+
+-	FRAME_PUSH
++	stp		x29, x30, [sp, #-16]!
++	mov		x29, sp
+ 
  	enc_prepare	w3, x2, x6
  	ld1		{v4.16b}, [x5]
  
--.Lctrnotfirst:
--	umov		x8, v4.d[1]		/* keep swabbed ctr in reg */
--	rev		x8, x8
-+	umov		x6, v4.d[1]		/* keep swabbed ctr in reg */
-+	rev		x6, x6
- #if INTERLEAVE >= 2
--	cmn		w8, w4			/* 32 bit overflow? */
-+	cmn		w6, w4			/* 32 bit overflow? */
+ 	umov		x6, v4.d[1]		/* keep swabbed ctr in reg */
+ 	rev		x6, x6
+-#if INTERLEAVE >= 2
+ 	cmn		w6, w4			/* 32 bit overflow? */
  	bcs		.Lctrloop
  .LctrloopNx:
- 	subs		w4, w4, #INTERLEAVE
-@@ -285,11 +279,11 @@ AES_ENTRY(aes_ctr_encrypt)
- #if INTERLEAVE == 2
- 	mov		v0.8b, v4.8b
- 	mov		v1.8b, v4.8b
--	rev		x7, x8
--	add		x8, x8, #1
-+	rev		x7, x6
-+	add		x6, x6, #1
- 	ins		v0.d[1], x7
--	rev		x7, x8
--	add		x8, x8, #1
-+	rev		x7, x6
-+	add		x6, x6, #1
- 	ins		v1.d[1], x7
- 	ld1		{v2.16b-v3.16b}, [x1], #32	/* get 2 input blocks */
- 	do_encrypt_block2x
-@@ -298,7 +292,7 @@ AES_ENTRY(aes_ctr_encrypt)
- 	st1		{v0.16b-v1.16b}, [x0], #32
- #else
+-	subs		w4, w4, #INTERLEAVE
++	subs		w4, w4, #4
+ 	bmi		.Lctr1x
+-#if INTERLEAVE == 2
+-	mov		v0.8b, v4.8b
+-	mov		v1.8b, v4.8b
+-	rev		x7, x6
+-	add		x6, x6, #1
+-	ins		v0.d[1], x7
+-	rev		x7, x6
+-	add		x6, x6, #1
+-	ins		v1.d[1], x7
+-	ld1		{v2.16b-v3.16b}, [x1], #32	/* get 2 input blocks */
+-	do_encrypt_block2x
+-	eor		v0.16b, v0.16b, v2.16b
+-	eor		v1.16b, v1.16b, v3.16b
+-	st1		{v0.16b-v1.16b}, [x0], #32
+-#else
  	ldr		q8, =0x30000000200000001	/* addends 1,2,3[,0] */
--	dup		v7.4s, w8
-+	dup		v7.4s, w6
+ 	dup		v7.4s, w6
  	mov		v0.16b, v4.16b
- 	add		v7.4s, v7.4s, v8.4s
- 	mov		v1.16b, v4.16b
-@@ -316,9 +310,9 @@ AES_ENTRY(aes_ctr_encrypt)
+@@ -303,23 +182,21 @@ AES_ENTRY(aes_ctr_encrypt)
+ 	mov		v2.s[3], v8.s[1]
+ 	mov		v3.s[3], v8.s[2]
+ 	ld1		{v5.16b-v7.16b}, [x1], #48	/* get 3 input blocks */
+-	do_encrypt_block4x
++	bl		aes_encrypt_block4x
+ 	eor		v0.16b, v5.16b, v0.16b
+ 	ld1		{v5.16b}, [x1], #16		/* get 1 input block  */
+ 	eor		v1.16b, v6.16b, v1.16b
  	eor		v2.16b, v7.16b, v2.16b
  	eor		v3.16b, v5.16b, v3.16b
  	st1		{v0.16b-v3.16b}, [x0], #64
--	add		x8, x8, #INTERLEAVE
-+	add		x6, x6, #INTERLEAVE
- #endif
--	rev		x7, x8
-+	rev		x7, x6
+-	add		x6, x6, #INTERLEAVE
+-#endif
++	add		x6, x6, #4
+ 	rev		x7, x6
  	ins		v4.d[1], x7
  	cbz		w4, .Lctrout
  	b		.LctrloopNx
-@@ -328,10 +322,10 @@ AES_ENTRY(aes_ctr_encrypt)
- #endif
+ .Lctr1x:
+-	adds		w4, w4, #INTERLEAVE
++	adds		w4, w4, #4
+ 	beq		.Lctrout
+-#endif
  .Lctrloop:
  	mov		v0.16b, v4.16b
--	encrypt_block	v0, w3, x2, x6, w7
-+	encrypt_block	v0, w3, x2, x8, w7
+ 	encrypt_block	v0, w3, x2, x8, w7
+@@ -339,12 +216,12 @@ AES_ENTRY(aes_ctr_encrypt)
  
--	adds		x8, x8, #1		/* increment BE ctr */
--	rev		x7, x8
-+	adds		x6, x6, #1		/* increment BE ctr */
-+	rev		x7, x6
- 	ins		v4.d[1], x7
- 	bcs		.Lctrcarry		/* overflow? */
+ .Lctrout:
+ 	st1		{v4.16b}, [x5]		/* return next CTR value */
+-	FRAME_POP
++	ldp		x29, x30, [sp], #16
+ 	ret
  
-@@ -385,15 +379,17 @@ CPU_BE(	.quad		0x87, 1		)
+ .Lctrtailblock:
+ 	st1		{v0.16b}, [x0]
+-	FRAME_POP
++	ldp		x29, x30, [sp], #16
+ 	ret
+ 
+ .Lctrcarry:
+@@ -378,7 +255,9 @@ CPU_LE(	.quad		1, 0x87		)
+ CPU_BE(	.quad		0x87, 1		)
  
  AES_ENTRY(aes_xts_encrypt)
- 	FRAME_PUSH
--	cbz		w7, .LxtsencloopNx
--
- 	ld1		{v4.16b}, [x6]
--	enc_prepare	w3, x5, x6
--	encrypt_block	v4, w3, x5, x6, w7		/* first tweak */
--	enc_switch_key	w3, x2, x6
-+	cbz		w7, .Lxtsencnotfirst
+-	FRAME_PUSH
++	stp		x29, x30, [sp, #-16]!
++	mov		x29, sp
 +
-+	enc_prepare	w3, x5, x8
-+	encrypt_block	v4, w3, x5, x8, w7		/* first tweak */
-+	enc_switch_key	w3, x2, x8
- 	ldr		q7, .Lxts_mul_x
- 	b		.LxtsencNx
+ 	ld1		{v4.16b}, [x6]
+ 	cbz		w7, .Lxtsencnotfirst
  
-+.Lxtsencnotfirst:
-+	enc_prepare	w3, x2, x8
- .LxtsencloopNx:
+@@ -394,25 +273,8 @@ AES_ENTRY(aes_xts_encrypt)
  	ldr		q7, .Lxts_mul_x
  	next_tweak	v4, v4, v7, v8
-@@ -442,7 +438,7 @@ AES_ENTRY(aes_xts_encrypt)
+ .LxtsencNx:
+-#if INTERLEAVE >= 2
+-	subs		w4, w4, #INTERLEAVE
++	subs		w4, w4, #4
+ 	bmi		.Lxtsenc1x
+-#if INTERLEAVE == 2
+-	ld1		{v0.16b-v1.16b}, [x1], #32	/* get 2 pt blocks */
+-	next_tweak	v5, v4, v7, v8
+-	eor		v0.16b, v0.16b, v4.16b
+-	eor		v1.16b, v1.16b, v5.16b
+-	do_encrypt_block2x
+-	eor		v0.16b, v0.16b, v4.16b
+-	eor		v1.16b, v1.16b, v5.16b
+-	st1		{v0.16b-v1.16b}, [x0], #32
+-	cbz		w4, .LxtsencoutNx
+-	next_tweak	v4, v5, v7, v8
+-	b		.LxtsencNx
+-.LxtsencoutNx:
+-	mov		v4.16b, v5.16b
+-	b		.Lxtsencout
+-#else
+ 	ld1		{v0.16b-v3.16b}, [x1], #64	/* get 4 pt blocks */
+ 	next_tweak	v5, v4, v7, v8
+ 	eor		v0.16b, v0.16b, v4.16b
+@@ -421,7 +283,7 @@ AES_ENTRY(aes_xts_encrypt)
+ 	eor		v2.16b, v2.16b, v6.16b
+ 	next_tweak	v7, v6, v7, v8
+ 	eor		v3.16b, v3.16b, v7.16b
+-	do_encrypt_block4x
++	bl		aes_encrypt_block4x
+ 	eor		v3.16b, v3.16b, v7.16b
+ 	eor		v0.16b, v0.16b, v4.16b
+ 	eor		v1.16b, v1.16b, v5.16b
+@@ -430,11 +292,9 @@ AES_ENTRY(aes_xts_encrypt)
+ 	mov		v4.16b, v7.16b
+ 	cbz		w4, .Lxtsencout
+ 	b		.LxtsencloopNx
+-#endif
+ .Lxtsenc1x:
+-	adds		w4, w4, #INTERLEAVE
++	adds		w4, w4, #4
+ 	beq		.Lxtsencout
+-#endif
  .Lxtsencloop:
  	ld1		{v1.16b}, [x1], #16
  	eor		v0.16b, v1.16b, v4.16b
--	encrypt_block	v0, w3, x2, x6, w7
-+	encrypt_block	v0, w3, x2, x8, w7
- 	eor		v0.16b, v0.16b, v4.16b
- 	st1		{v0.16b}, [x0], #16
- 	subs		w4, w4, #1
-@@ -450,6 +446,7 @@ AES_ENTRY(aes_xts_encrypt)
- 	next_tweak	v4, v4, v7, v8
+@@ -447,13 +307,15 @@ AES_ENTRY(aes_xts_encrypt)
  	b		.Lxtsencloop
  .Lxtsencout:
-+	st1		{v4.16b}, [x6]
- 	FRAME_POP
+ 	st1		{v4.16b}, [x6]
+-	FRAME_POP
++	ldp		x29, x30, [sp], #16
  	ret
  AES_ENDPROC(aes_xts_encrypt)
-@@ -457,15 +454,17 @@ AES_ENDPROC(aes_xts_encrypt)
+ 
  
  AES_ENTRY(aes_xts_decrypt)
- 	FRAME_PUSH
--	cbz		w7, .LxtsdecloopNx
--
- 	ld1		{v4.16b}, [x6]
--	enc_prepare	w3, x5, x6
--	encrypt_block	v4, w3, x5, x6, w7		/* first tweak */
--	dec_prepare	w3, x2, x6
-+	cbz		w7, .Lxtsdecnotfirst
+-	FRAME_PUSH
++	stp		x29, x30, [sp, #-16]!
++	mov		x29, sp
 +
-+	enc_prepare	w3, x5, x8
-+	encrypt_block	v4, w3, x5, x8, w7		/* first tweak */
-+	dec_prepare	w3, x2, x8
- 	ldr		q7, .Lxts_mul_x
- 	b		.LxtsdecNx
+ 	ld1		{v4.16b}, [x6]
+ 	cbz		w7, .Lxtsdecnotfirst
  
-+.Lxtsdecnotfirst:
-+	dec_prepare	w3, x2, x8
- .LxtsdecloopNx:
+@@ -469,25 +331,8 @@ AES_ENTRY(aes_xts_decrypt)
  	ldr		q7, .Lxts_mul_x
  	next_tweak	v4, v4, v7, v8
-@@ -514,7 +513,7 @@ AES_ENTRY(aes_xts_decrypt)
+ .LxtsdecNx:
+-#if INTERLEAVE >= 2
+-	subs		w4, w4, #INTERLEAVE
++	subs		w4, w4, #4
+ 	bmi		.Lxtsdec1x
+-#if INTERLEAVE == 2
+-	ld1		{v0.16b-v1.16b}, [x1], #32	/* get 2 ct blocks */
+-	next_tweak	v5, v4, v7, v8
+-	eor		v0.16b, v0.16b, v4.16b
+-	eor		v1.16b, v1.16b, v5.16b
+-	do_decrypt_block2x
+-	eor		v0.16b, v0.16b, v4.16b
+-	eor		v1.16b, v1.16b, v5.16b
+-	st1		{v0.16b-v1.16b}, [x0], #32
+-	cbz		w4, .LxtsdecoutNx
+-	next_tweak	v4, v5, v7, v8
+-	b		.LxtsdecNx
+-.LxtsdecoutNx:
+-	mov		v4.16b, v5.16b
+-	b		.Lxtsdecout
+-#else
+ 	ld1		{v0.16b-v3.16b}, [x1], #64	/* get 4 ct blocks */
+ 	next_tweak	v5, v4, v7, v8
+ 	eor		v0.16b, v0.16b, v4.16b
+@@ -496,7 +341,7 @@ AES_ENTRY(aes_xts_decrypt)
+ 	eor		v2.16b, v2.16b, v6.16b
+ 	next_tweak	v7, v6, v7, v8
+ 	eor		v3.16b, v3.16b, v7.16b
+-	do_decrypt_block4x
++	bl		aes_decrypt_block4x
+ 	eor		v3.16b, v3.16b, v7.16b
+ 	eor		v0.16b, v0.16b, v4.16b
+ 	eor		v1.16b, v1.16b, v5.16b
+@@ -505,11 +350,9 @@ AES_ENTRY(aes_xts_decrypt)
+ 	mov		v4.16b, v7.16b
+ 	cbz		w4, .Lxtsdecout
+ 	b		.LxtsdecloopNx
+-#endif
+ .Lxtsdec1x:
+-	adds		w4, w4, #INTERLEAVE
++	adds		w4, w4, #4
+ 	beq		.Lxtsdecout
+-#endif
  .Lxtsdecloop:
  	ld1		{v1.16b}, [x1], #16
  	eor		v0.16b, v1.16b, v4.16b
--	decrypt_block	v0, w3, x2, x6, w7
-+	decrypt_block	v0, w3, x2, x8, w7
- 	eor		v0.16b, v0.16b, v4.16b
- 	st1		{v0.16b}, [x0], #16
- 	subs		w4, w4, #1
-@@ -522,6 +521,7 @@ AES_ENTRY(aes_xts_decrypt)
- 	next_tweak	v4, v4, v7, v8
+@@ -522,7 +365,7 @@ AES_ENTRY(aes_xts_decrypt)
  	b		.Lxtsdecloop
  .Lxtsdecout:
-+	st1		{v4.16b}, [x6]
- 	FRAME_POP
+ 	st1		{v4.16b}, [x6]
+-	FRAME_POP
++	ldp		x29, x30, [sp], #16
  	ret
  AES_ENDPROC(aes_xts_decrypt)
-diff --git a/arch/arm64/crypto/aes-neonbs-glue.c b/arch/arm64/crypto/aes-neonbs-glue.c
-index c55d68ccb89f..9d823c77ec84 100644
---- a/arch/arm64/crypto/aes-neonbs-glue.c
-+++ b/arch/arm64/crypto/aes-neonbs-glue.c
-@@ -46,10 +46,9 @@ asmlinkage void aesbs_xts_decrypt(u8 out[], u8 const in[], u8 const rk[],
  
- /* borrowed from aes-neon-blk.ko */
- asmlinkage void neon_aes_ecb_encrypt(u8 out[], u8 const in[], u32 const rk[],
--				     int rounds, int blocks, int first);
-+				     int rounds, int blocks);
- asmlinkage void neon_aes_cbc_encrypt(u8 out[], u8 const in[], u32 const rk[],
--				     int rounds, int blocks, u8 iv[],
--				     int first);
-+				     int rounds, int blocks, u8 iv[]);
- 
- struct aesbs_ctx {
- 	u8	rk[13 * (8 * AES_BLOCK_SIZE) + 32];
-@@ -157,7 +156,7 @@ static int cbc_encrypt(struct skcipher_request *req)
- 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
- 	struct aesbs_cbc_ctx *ctx = crypto_skcipher_ctx(tfm);
- 	struct skcipher_walk walk;
--	int err, first = 1;
-+	int err;
- 
- 	err = skcipher_walk_virt(&walk, req, true);
- 
-@@ -167,10 +166,9 @@ static int cbc_encrypt(struct skcipher_request *req)
- 
- 		/* fall back to the non-bitsliced NEON implementation */
- 		neon_aes_cbc_encrypt(walk.dst.virt.addr, walk.src.virt.addr,
--				     ctx->enc, ctx->key.rounds, blocks, walk.iv,
--				     first);
-+				     ctx->enc, ctx->key.rounds, blocks,
-+				     walk.iv);
- 		err = skcipher_walk_done(&walk, walk.nbytes % AES_BLOCK_SIZE);
--		first = 0;
- 	}
- 	kernel_neon_end();
- 	return err;
-@@ -311,7 +309,7 @@ static int __xts_crypt(struct skcipher_request *req,
- 	kernel_neon_begin();
- 
- 	neon_aes_ecb_encrypt(walk.iv, walk.iv, ctx->twkey,
--			     ctx->key.rounds, 1, 1);
-+			     ctx->key.rounds, 1);
- 
- 	while (walk.nbytes >= AES_BLOCK_SIZE) {
- 		unsigned int blocks = walk.nbytes / AES_BLOCK_SIZE;
 -- 
 2.15.1
