@@ -1,8 +1,8 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v5 12/23] crypto: arm64/sha1-ce - yield NEON after every block
- of input
-Date: Sat, 10 Mar 2018 15:21:57 +0000
-Message-ID: <20180310152208.10369-13-ard.biesheuvel@linaro.org>
+Subject: [PATCH v5 11/23] arm64: assembler: add macros to conditionally yield
+ the NEON under PREEMPT
+Date: Sat, 10 Mar 2018 15:21:56 +0000
+Message-ID: <20180310152208.10369-12-ard.biesheuvel@linaro.org>
 References: <20180310152208.10369-1-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -31,105 +31,107 @@ Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-Avoid excessive scheduling delays under a preemptible kernel by
-conditionally yielding the NEON after every block of input.
+Add support macros to conditionally yield the NEON (and thus the CPU)
+that may be called from the assembler code.
+
+In some cases, yielding the NEON involves saving and restoring a non
+trivial amount of context (especially in the CRC folding algorithms),
+and so the macro is split into three, and the code in between is only
+executed when the yield path is taken, allowing the context to be preserved.
+The third macro takes an optional label argument that marks the resume
+path after a yield has been performed.
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- arch/arm64/crypto/sha1-ce-core.S | 42 ++++++++++++++------
- 1 file changed, 29 insertions(+), 13 deletions(-)
+ arch/arm64/include/asm/assembler.h | 64 ++++++++++++++++++++
+ arch/arm64/kernel/asm-offsets.c    |  2 +
+ 2 files changed, 66 insertions(+)
 
-diff --git a/arch/arm64/crypto/sha1-ce-core.S b/arch/arm64/crypto/sha1-ce-core.S
-index 46049850727d..78eb35fb5056 100644
---- a/arch/arm64/crypto/sha1-ce-core.S
-+++ b/arch/arm64/crypto/sha1-ce-core.S
-@@ -69,30 +69,36 @@
- 	 *			  int blocks)
- 	 */
- ENTRY(sha1_ce_transform)
-+	frame_push	3
+diff --git a/arch/arm64/include/asm/assembler.h b/arch/arm64/include/asm/assembler.h
+index eef1fd2c1c0b..61168cbe9781 100644
+--- a/arch/arm64/include/asm/assembler.h
++++ b/arch/arm64/include/asm/assembler.h
+@@ -635,4 +635,68 @@ alternative_else_nop_endif
+ 	.endif
+ 	.endm
+ 
++/*
++ * Check whether to yield to another runnable task from kernel mode NEON code
++ * (which runs with preemption disabled).
++ *
++ * if_will_cond_yield_neon
++ *        // pre-yield patchup code
++ * do_cond_yield_neon
++ *        // post-yield patchup code
++ * endif_yield_neon    <label>
++ *
++ * where <label> is optional, and marks the point where execution will resume
++ * after a yield has been performed. If omitted, execution resumes right after
++ * the endif_yield_neon invocation.
++ *
++ * Note that the patchup code does not support assembler directives that change
++ * the output section, any use of such directives is undefined.
++ *
++ * The yield itself consists of the following:
++ * - Check whether the preempt count is exactly 1, in which case disabling
++ *   preemption once will make the task preemptible. If this is not the case,
++ *   yielding is pointless.
++ * - Check whether TIF_NEED_RESCHED is set, and if so, disable and re-enable
++ *   kernel mode NEON (which will trigger a reschedule), and branch to the
++ *   yield fixup code.
++ *
++ * This macro sequence clobbers x0, x1 and the flags register unconditionally,
++ * and may clobber x2 .. x18 if the yield path is taken.
++ */
 +
-+	mov		x19, x0
-+	mov		x20, x1
-+	mov		x21, x2
-+
- 	/* load round constants */
--	loadrc		k0.4s, 0x5a827999, w6
-+0:	loadrc		k0.4s, 0x5a827999, w6
- 	loadrc		k1.4s, 0x6ed9eba1, w6
- 	loadrc		k2.4s, 0x8f1bbcdc, w6
- 	loadrc		k3.4s, 0xca62c1d6, w6
- 
- 	/* load state */
--	ld1		{dgav.4s}, [x0]
--	ldr		dgb, [x0, #16]
-+	ld1		{dgav.4s}, [x19]
-+	ldr		dgb, [x19, #16]
- 
- 	/* load sha1_ce_state::finalize */
- 	ldr_l		w4, sha1_ce_offsetof_finalize, x4
--	ldr		w4, [x0, x4]
-+	ldr		w4, [x19, x4]
- 
- 	/* load input */
--0:	ld1		{v8.4s-v11.4s}, [x1], #64
--	sub		w2, w2, #1
-+1:	ld1		{v8.4s-v11.4s}, [x20], #64
-+	sub		w21, w21, #1
- 
- CPU_LE(	rev32		v8.16b, v8.16b		)
- CPU_LE(	rev32		v9.16b, v9.16b		)
- CPU_LE(	rev32		v10.16b, v10.16b	)
- CPU_LE(	rev32		v11.16b, v11.16b	)
- 
--1:	add		t0.4s, v8.4s, k0.4s
-+2:	add		t0.4s, v8.4s, k0.4s
- 	mov		dg0v.16b, dgav.16b
- 
- 	add_update	c, ev, k0,  8,  9, 10, 11, dgb
-@@ -123,16 +129,25 @@ CPU_LE(	rev32		v11.16b, v11.16b	)
- 	add		dgbv.2s, dgbv.2s, dg1v.2s
- 	add		dgav.4s, dgav.4s, dg0v.4s
- 
--	cbnz		w2, 0b
-+	cbz		w21, 3f
-+
++	.macro		cond_yield_neon, lbl
 +	if_will_cond_yield_neon
-+	st1		{dgav.4s}, [x19]
-+	str		dgb, [x19, #16]
 +	do_cond_yield_neon
-+	b		0b
-+	endif_yield_neon
++	endif_yield_neon	\lbl
++	.endm
 +
-+	b		1b
- 
- 	/*
- 	 * Final block: add padding and total bit count.
- 	 * Skip if the input size was not a round multiple of the block size,
- 	 * the padding is handled by the C code in that case.
- 	 */
--	cbz		x4, 3f
-+3:	cbz		x4, 4f
- 	ldr_l		w4, sha1_ce_offsetof_count, x4
--	ldr		x4, [x0, x4]
-+	ldr		x4, [x19, x4]
- 	movi		v9.2d, #0
- 	mov		x8, #0x80000000
- 	movi		v10.2d, #0
-@@ -141,10 +156,11 @@ CPU_LE(	rev32		v11.16b, v11.16b	)
- 	mov		x4, #0
- 	mov		v11.d[0], xzr
- 	mov		v11.d[1], x7
--	b		1b
-+	b		2b
- 
- 	/* store new state */
--3:	st1		{dgav.4s}, [x0]
--	str		dgb, [x0, #16]
-+4:	st1		{dgav.4s}, [x19]
-+	str		dgb, [x19, #16]
-+	frame_pop
- 	ret
- ENDPROC(sha1_ce_transform)
++	.macro		if_will_cond_yield_neon
++#ifdef CONFIG_PREEMPT
++	get_thread_info	x0
++	ldr		w1, [x0, #TSK_TI_PREEMPT]
++	ldr		x0, [x0, #TSK_TI_FLAGS]
++	cmp		w1, #PREEMPT_DISABLE_OFFSET
++	csel		x0, x0, xzr, eq
++	tbnz		x0, #TIF_NEED_RESCHED, .Lyield_\@	// needs rescheduling?
++#endif
++	/* fall through to endif_yield_neon */
++	.subsection	1
++.Lyield_\@ :
++	.endm
++
++	.macro		do_cond_yield_neon
++	bl		kernel_neon_end
++	bl		kernel_neon_begin
++	.endm
++
++	.macro		endif_yield_neon, lbl
++	.ifnb		\lbl
++	b		\lbl
++	.else
++	b		.Lyield_out_\@
++	.endif
++	.previous
++.Lyield_out_\@ :
++	.endm
++
+ #endif	/* __ASM_ASSEMBLER_H */
+diff --git a/arch/arm64/kernel/asm-offsets.c b/arch/arm64/kernel/asm-offsets.c
+index 1303e04110cd..1e2ea2e51acb 100644
+--- a/arch/arm64/kernel/asm-offsets.c
++++ b/arch/arm64/kernel/asm-offsets.c
+@@ -93,6 +93,8 @@ int main(void)
+   DEFINE(DMA_TO_DEVICE,		DMA_TO_DEVICE);
+   DEFINE(DMA_FROM_DEVICE,	DMA_FROM_DEVICE);
+   BLANK();
++  DEFINE(PREEMPT_DISABLE_OFFSET, PREEMPT_DISABLE_OFFSET);
++  BLANK();
+   DEFINE(CLOCK_REALTIME,	CLOCK_REALTIME);
+   DEFINE(CLOCK_MONOTONIC,	CLOCK_MONOTONIC);
+   DEFINE(CLOCK_MONOTONIC_RAW,	CLOCK_MONOTONIC_RAW);
 -- 
 2.15.1
