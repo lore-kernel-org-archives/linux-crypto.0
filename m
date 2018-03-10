@@ -1,8 +1,8 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v5 15/23] crypto: arm64/aes-blk - yield NEON after every block
+Subject: [PATCH v5 16/23] crypto: arm64/aes-bs - yield NEON after every block
  of input
-Date: Sat, 10 Mar 2018 15:22:00 +0000
-Message-ID: <20180310152208.10369-16-ard.biesheuvel@linaro.org>
+Date: Sat, 10 Mar 2018 15:22:01 +0000
+Message-ID: <20180310152208.10369-17-ard.biesheuvel@linaro.org>
 References: <20180310152208.10369-1-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -36,112 +36,17 @@ conditionally yielding the NEON after every block of input.
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- arch/arm64/crypto/aes-ce.S    |  15 +-
- arch/arm64/crypto/aes-modes.S | 331 ++++++++++++--------
- 2 files changed, 216 insertions(+), 130 deletions(-)
+ arch/arm64/crypto/aes-neonbs-core.S | 305 +++++++++++---------
+ 1 file changed, 170 insertions(+), 135 deletions(-)
 
-diff --git a/arch/arm64/crypto/aes-ce.S b/arch/arm64/crypto/aes-ce.S
-index 50330f5c3adc..623e74ed1c67 100644
---- a/arch/arm64/crypto/aes-ce.S
-+++ b/arch/arm64/crypto/aes-ce.S
-@@ -30,18 +30,21 @@
- 	.endm
- 
- 	/* prepare for encryption with key in rk[] */
--	.macro		enc_prepare, rounds, rk, ignore
--	load_round_keys	\rounds, \rk
-+	.macro		enc_prepare, rounds, rk, temp
-+	mov		\temp, \rk
-+	load_round_keys	\rounds, \temp
- 	.endm
- 
- 	/* prepare for encryption (again) but with new key in rk[] */
--	.macro		enc_switch_key, rounds, rk, ignore
--	load_round_keys	\rounds, \rk
-+	.macro		enc_switch_key, rounds, rk, temp
-+	mov		\temp, \rk
-+	load_round_keys	\rounds, \temp
- 	.endm
- 
- 	/* prepare for decryption with key in rk[] */
--	.macro		dec_prepare, rounds, rk, ignore
--	load_round_keys	\rounds, \rk
-+	.macro		dec_prepare, rounds, rk, temp
-+	mov		\temp, \rk
-+	load_round_keys	\rounds, \temp
- 	.endm
- 
- 	.macro		do_enc_Nx, de, mc, k, i0, i1, i2, i3
-diff --git a/arch/arm64/crypto/aes-modes.S b/arch/arm64/crypto/aes-modes.S
-index a68412e1e3a4..483a7130cf0e 100644
---- a/arch/arm64/crypto/aes-modes.S
-+++ b/arch/arm64/crypto/aes-modes.S
-@@ -14,12 +14,12 @@
- 	.align		4
- 
- aes_encrypt_block4x:
--	encrypt_block4x	v0, v1, v2, v3, w3, x2, x8, w7
-+	encrypt_block4x	v0, v1, v2, v3, w22, x21, x8, w7
- 	ret
- ENDPROC(aes_encrypt_block4x)
- 
- aes_decrypt_block4x:
--	decrypt_block4x	v0, v1, v2, v3, w3, x2, x8, w7
-+	decrypt_block4x	v0, v1, v2, v3, w22, x21, x8, w7
- 	ret
- ENDPROC(aes_decrypt_block4x)
- 
-@@ -31,57 +31,71 @@ ENDPROC(aes_decrypt_block4x)
+diff --git a/arch/arm64/crypto/aes-neonbs-core.S b/arch/arm64/crypto/aes-neonbs-core.S
+index ca0472500433..e613a87f8b53 100644
+--- a/arch/arm64/crypto/aes-neonbs-core.S
++++ b/arch/arm64/crypto/aes-neonbs-core.S
+@@ -565,54 +565,61 @@ ENDPROC(aesbs_decrypt8)
+ 	 *		     int blocks)
  	 */
- 
- AES_ENTRY(aes_ecb_encrypt)
--	stp		x29, x30, [sp, #-16]!
--	mov		x29, sp
-+	frame_push	5
- 
--	enc_prepare	w3, x2, x5
-+	mov		x19, x0
-+	mov		x20, x1
-+	mov		x21, x2
-+	mov		x22, x3
-+	mov		x23, x4
-+
-+.Lecbencrestart:
-+	enc_prepare	w22, x21, x5
- 
- .LecbencloopNx:
--	subs		w4, w4, #4
-+	subs		w23, w23, #4
- 	bmi		.Lecbenc1x
--	ld1		{v0.16b-v3.16b}, [x1], #64	/* get 4 pt blocks */
-+	ld1		{v0.16b-v3.16b}, [x20], #64	/* get 4 pt blocks */
- 	bl		aes_encrypt_block4x
--	st1		{v0.16b-v3.16b}, [x0], #64
-+	st1		{v0.16b-v3.16b}, [x19], #64
-+	cond_yield_neon	.Lecbencrestart
- 	b		.LecbencloopNx
- .Lecbenc1x:
--	adds		w4, w4, #4
-+	adds		w23, w23, #4
- 	beq		.Lecbencout
- .Lecbencloop:
--	ld1		{v0.16b}, [x1], #16		/* get next pt block */
--	encrypt_block	v0, w3, x2, x5, w6
--	st1		{v0.16b}, [x0], #16
--	subs		w4, w4, #1
-+	ld1		{v0.16b}, [x20], #16		/* get next pt block */
-+	encrypt_block	v0, w22, x21, x5, w6
-+	st1		{v0.16b}, [x19], #16
-+	subs		w23, w23, #1
- 	bne		.Lecbencloop
- .Lecbencout:
--	ldp		x29, x30, [sp], #16
-+	frame_pop
- 	ret
- AES_ENDPROC(aes_ecb_encrypt)
- 
- 
- AES_ENTRY(aes_ecb_decrypt)
+ 	.macro		__ecb_crypt, do8, o0, o1, o2, o3, o4, o5, o6, o7
 -	stp		x29, x30, [sp, #-16]!
 -	mov		x29, sp
 +	frame_push	5
@@ -152,505 +57,510 @@ index a68412e1e3a4..483a7130cf0e 100644
 +	mov		x22, x3
 +	mov		x23, x4
  
--	dec_prepare	w3, x2, x5
-+.Lecbdecrestart:
-+	dec_prepare	w22, x21, x5
+ 99:	mov		x5, #1
+-	lsl		x5, x5, x4
+-	subs		w4, w4, #8
+-	csel		x4, x4, xzr, pl
++	lsl		x5, x5, x23
++	subs		w23, w23, #8
++	csel		x23, x23, xzr, pl
+ 	csel		x5, x5, xzr, mi
  
- .LecbdecloopNx:
--	subs		w4, w4, #4
-+	subs		w23, w23, #4
- 	bmi		.Lecbdec1x
--	ld1		{v0.16b-v3.16b}, [x1], #64	/* get 4 ct blocks */
-+	ld1		{v0.16b-v3.16b}, [x20], #64	/* get 4 ct blocks */
- 	bl		aes_decrypt_block4x
--	st1		{v0.16b-v3.16b}, [x0], #64
-+	st1		{v0.16b-v3.16b}, [x19], #64
-+	cond_yield_neon	.Lecbdecrestart
- 	b		.LecbdecloopNx
- .Lecbdec1x:
--	adds		w4, w4, #4
-+	adds		w23, w23, #4
- 	beq		.Lecbdecout
- .Lecbdecloop:
--	ld1		{v0.16b}, [x1], #16		/* get next ct block */
--	decrypt_block	v0, w3, x2, x5, w6
--	st1		{v0.16b}, [x0], #16
--	subs		w4, w4, #1
-+	ld1		{v0.16b}, [x20], #16		/* get next ct block */
-+	decrypt_block	v0, w22, x21, x5, w6
-+	st1		{v0.16b}, [x19], #16
-+	subs		w23, w23, #1
- 	bne		.Lecbdecloop
- .Lecbdecout:
--	ldp		x29, x30, [sp], #16
-+	frame_pop
- 	ret
- AES_ENDPROC(aes_ecb_decrypt)
- 
-@@ -94,78 +108,100 @@ AES_ENDPROC(aes_ecb_decrypt)
- 	 */
- 
- AES_ENTRY(aes_cbc_encrypt)
--	ld1		{v4.16b}, [x5]			/* get iv */
--	enc_prepare	w3, x2, x6
-+	frame_push	6
-+
-+	mov		x19, x0
-+	mov		x20, x1
-+	mov		x21, x2
-+	mov		x22, x3
-+	mov		x23, x4
-+	mov		x24, x5
-+
-+.Lcbcencrestart:
-+	ld1		{v4.16b}, [x24]			/* get iv */
-+	enc_prepare	w22, x21, x6
- 
- .Lcbcencloop4x:
--	subs		w4, w4, #4
-+	subs		w23, w23, #4
- 	bmi		.Lcbcenc1x
--	ld1		{v0.16b-v3.16b}, [x1], #64	/* get 4 pt blocks */
-+	ld1		{v0.16b-v3.16b}, [x20], #64	/* get 4 pt blocks */
- 	eor		v0.16b, v0.16b, v4.16b		/* ..and xor with iv */
--	encrypt_block	v0, w3, x2, x6, w7
-+	encrypt_block	v0, w22, x21, x6, w7
- 	eor		v1.16b, v1.16b, v0.16b
--	encrypt_block	v1, w3, x2, x6, w7
-+	encrypt_block	v1, w22, x21, x6, w7
- 	eor		v2.16b, v2.16b, v1.16b
--	encrypt_block	v2, w3, x2, x6, w7
-+	encrypt_block	v2, w22, x21, x6, w7
- 	eor		v3.16b, v3.16b, v2.16b
--	encrypt_block	v3, w3, x2, x6, w7
--	st1		{v0.16b-v3.16b}, [x0], #64
-+	encrypt_block	v3, w22, x21, x6, w7
-+	st1		{v0.16b-v3.16b}, [x19], #64
- 	mov		v4.16b, v3.16b
-+	st1		{v4.16b}, [x24]			/* return iv */
-+	cond_yield_neon	.Lcbcencrestart
- 	b		.Lcbcencloop4x
- .Lcbcenc1x:
--	adds		w4, w4, #4
-+	adds		w23, w23, #4
- 	beq		.Lcbcencout
- .Lcbcencloop:
--	ld1		{v0.16b}, [x1], #16		/* get next pt block */
-+	ld1		{v0.16b}, [x20], #16		/* get next pt block */
- 	eor		v4.16b, v4.16b, v0.16b		/* ..and xor with iv */
--	encrypt_block	v4, w3, x2, x6, w7
--	st1		{v4.16b}, [x0], #16
--	subs		w4, w4, #1
-+	encrypt_block	v4, w22, x21, x6, w7
-+	st1		{v4.16b}, [x19], #16
-+	subs		w23, w23, #1
- 	bne		.Lcbcencloop
- .Lcbcencout:
--	st1		{v4.16b}, [x5]			/* return iv */
-+	st1		{v4.16b}, [x24]			/* return iv */
-+	frame_pop
- 	ret
- AES_ENDPROC(aes_cbc_encrypt)
- 
- 
- AES_ENTRY(aes_cbc_decrypt)
--	stp		x29, x30, [sp, #-16]!
--	mov		x29, sp
-+	frame_push	6
-+
-+	mov		x19, x0
-+	mov		x20, x1
-+	mov		x21, x2
-+	mov		x22, x3
-+	mov		x23, x4
-+	mov		x24, x5
- 
--	ld1		{v7.16b}, [x5]			/* get iv */
--	dec_prepare	w3, x2, x6
-+.Lcbcdecrestart:
-+	ld1		{v7.16b}, [x24]			/* get iv */
-+	dec_prepare	w22, x21, x6
- 
- .LcbcdecloopNx:
--	subs		w4, w4, #4
-+	subs		w23, w23, #4
- 	bmi		.Lcbcdec1x
--	ld1		{v0.16b-v3.16b}, [x1], #64	/* get 4 ct blocks */
-+	ld1		{v0.16b-v3.16b}, [x20], #64	/* get 4 ct blocks */
- 	mov		v4.16b, v0.16b
- 	mov		v5.16b, v1.16b
- 	mov		v6.16b, v2.16b
- 	bl		aes_decrypt_block4x
--	sub		x1, x1, #16
-+	sub		x20, x20, #16
- 	eor		v0.16b, v0.16b, v7.16b
- 	eor		v1.16b, v1.16b, v4.16b
--	ld1		{v7.16b}, [x1], #16		/* reload 1 ct block */
-+	ld1		{v7.16b}, [x20], #16		/* reload 1 ct block */
- 	eor		v2.16b, v2.16b, v5.16b
- 	eor		v3.16b, v3.16b, v6.16b
--	st1		{v0.16b-v3.16b}, [x0], #64
-+	st1		{v0.16b-v3.16b}, [x19], #64
-+	st1		{v7.16b}, [x24]			/* return iv */
-+	cond_yield_neon	.Lcbcdecrestart
- 	b		.LcbcdecloopNx
- .Lcbcdec1x:
--	adds		w4, w4, #4
-+	adds		w23, w23, #4
- 	beq		.Lcbcdecout
- .Lcbcdecloop:
--	ld1		{v1.16b}, [x1], #16		/* get next ct block */
-+	ld1		{v1.16b}, [x20], #16		/* get next ct block */
- 	mov		v0.16b, v1.16b			/* ...and copy to v0 */
--	decrypt_block	v0, w3, x2, x6, w7
-+	decrypt_block	v0, w22, x21, x6, w7
- 	eor		v0.16b, v0.16b, v7.16b		/* xor with iv => pt */
- 	mov		v7.16b, v1.16b			/* ct is next iv */
--	st1		{v0.16b}, [x0], #16
--	subs		w4, w4, #1
-+	st1		{v0.16b}, [x19], #16
-+	subs		w23, w23, #1
- 	bne		.Lcbcdecloop
- .Lcbcdecout:
--	st1		{v7.16b}, [x5]			/* return iv */
--	ldp		x29, x30, [sp], #16
-+	st1		{v7.16b}, [x24]			/* return iv */
-+	frame_pop
- 	ret
- AES_ENDPROC(aes_cbc_decrypt)
- 
-@@ -176,19 +212,26 @@ AES_ENDPROC(aes_cbc_decrypt)
- 	 */
- 
- AES_ENTRY(aes_ctr_encrypt)
--	stp		x29, x30, [sp, #-16]!
--	mov		x29, sp
-+	frame_push	6
- 
--	enc_prepare	w3, x2, x6
--	ld1		{v4.16b}, [x5]
-+	mov		x19, x0
-+	mov		x20, x1
-+	mov		x21, x2
-+	mov		x22, x3
-+	mov		x23, x4
-+	mov		x24, x5
-+
-+.Lctrrestart:
-+	enc_prepare	w22, x21, x6
-+	ld1		{v4.16b}, [x24]
- 
- 	umov		x6, v4.d[1]		/* keep swabbed ctr in reg */
- 	rev		x6, x6
--	cmn		w6, w4			/* 32 bit overflow? */
--	bcs		.Lctrloop
- .LctrloopNx:
--	subs		w4, w4, #4
-+	subs		w23, w23, #4
- 	bmi		.Lctr1x
-+	cmn		w6, #4			/* 32 bit overflow? */
-+	bcs		.Lctr1x
- 	ldr		q8, =0x30000000200000001	/* addends 1,2,3[,0] */
- 	dup		v7.4s, w6
- 	mov		v0.16b, v4.16b
-@@ -200,25 +243,27 @@ AES_ENTRY(aes_ctr_encrypt)
- 	mov		v1.s[3], v8.s[0]
- 	mov		v2.s[3], v8.s[1]
- 	mov		v3.s[3], v8.s[2]
--	ld1		{v5.16b-v7.16b}, [x1], #48	/* get 3 input blocks */
-+	ld1		{v5.16b-v7.16b}, [x20], #48	/* get 3 input blocks */
- 	bl		aes_encrypt_block4x
- 	eor		v0.16b, v5.16b, v0.16b
--	ld1		{v5.16b}, [x1], #16		/* get 1 input block  */
-+	ld1		{v5.16b}, [x20], #16		/* get 1 input block  */
- 	eor		v1.16b, v6.16b, v1.16b
- 	eor		v2.16b, v7.16b, v2.16b
- 	eor		v3.16b, v5.16b, v3.16b
--	st1		{v0.16b-v3.16b}, [x0], #64
-+	st1		{v0.16b-v3.16b}, [x19], #64
- 	add		x6, x6, #4
- 	rev		x7, x6
- 	ins		v4.d[1], x7
--	cbz		w4, .Lctrout
-+	cbz		w23, .Lctrout
-+	st1		{v4.16b}, [x24]		/* return next CTR value */
-+	cond_yield_neon	.Lctrrestart
- 	b		.LctrloopNx
- .Lctr1x:
--	adds		w4, w4, #4
-+	adds		w23, w23, #4
- 	beq		.Lctrout
- .Lctrloop:
- 	mov		v0.16b, v4.16b
--	encrypt_block	v0, w3, x2, x8, w7
-+	encrypt_block	v0, w22, x21, x8, w7
- 
- 	adds		x6, x6, #1		/* increment BE ctr */
- 	rev		x7, x6
-@@ -226,22 +271,22 @@ AES_ENTRY(aes_ctr_encrypt)
- 	bcs		.Lctrcarry		/* overflow? */
- 
- .Lctrcarrydone:
--	subs		w4, w4, #1
-+	subs		w23, w23, #1
- 	bmi		.Lctrtailblock		/* blocks <0 means tail block */
+-	ld1		{v0.16b}, [x1], #16
++	ld1		{v0.16b}, [x20], #16
+ 	tbnz		x5, #1, 0f
+-	ld1		{v1.16b}, [x1], #16
++	ld1		{v1.16b}, [x20], #16
+ 	tbnz		x5, #2, 0f
+-	ld1		{v2.16b}, [x1], #16
++	ld1		{v2.16b}, [x20], #16
+ 	tbnz		x5, #3, 0f
 -	ld1		{v3.16b}, [x1], #16
 +	ld1		{v3.16b}, [x20], #16
- 	eor		v3.16b, v0.16b, v3.16b
+ 	tbnz		x5, #4, 0f
+-	ld1		{v4.16b}, [x1], #16
++	ld1		{v4.16b}, [x20], #16
+ 	tbnz		x5, #5, 0f
+-	ld1		{v5.16b}, [x1], #16
++	ld1		{v5.16b}, [x20], #16
+ 	tbnz		x5, #6, 0f
+-	ld1		{v6.16b}, [x1], #16
++	ld1		{v6.16b}, [x20], #16
+ 	tbnz		x5, #7, 0f
+-	ld1		{v7.16b}, [x1], #16
++	ld1		{v7.16b}, [x20], #16
+ 
+-0:	mov		bskey, x2
+-	mov		rounds, x3
++0:	mov		bskey, x21
++	mov		rounds, x22
+ 	bl		\do8
+ 
+-	st1		{\o0\().16b}, [x0], #16
++	st1		{\o0\().16b}, [x19], #16
+ 	tbnz		x5, #1, 1f
+-	st1		{\o1\().16b}, [x0], #16
++	st1		{\o1\().16b}, [x19], #16
+ 	tbnz		x5, #2, 1f
+-	st1		{\o2\().16b}, [x0], #16
++	st1		{\o2\().16b}, [x19], #16
+ 	tbnz		x5, #3, 1f
+-	st1		{\o3\().16b}, [x0], #16
++	st1		{\o3\().16b}, [x19], #16
+ 	tbnz		x5, #4, 1f
+-	st1		{\o4\().16b}, [x0], #16
++	st1		{\o4\().16b}, [x19], #16
+ 	tbnz		x5, #5, 1f
+-	st1		{\o5\().16b}, [x0], #16
++	st1		{\o5\().16b}, [x19], #16
+ 	tbnz		x5, #6, 1f
+-	st1		{\o6\().16b}, [x0], #16
++	st1		{\o6\().16b}, [x19], #16
+ 	tbnz		x5, #7, 1f
+-	st1		{\o7\().16b}, [x0], #16
++	st1		{\o7\().16b}, [x19], #16
+ 
+-	cbnz		x4, 99b
++	cbz		x23, 1f
++	cond_yield_neon
++	b		99b
+ 
+-1:	ldp		x29, x30, [sp], #16
++1:	frame_pop
+ 	ret
+ 	.endm
+ 
+@@ -632,43 +639,49 @@ ENDPROC(aesbs_ecb_decrypt)
+ 	 */
+ 	.align		4
+ ENTRY(aesbs_cbc_decrypt)
+-	stp		x29, x30, [sp, #-16]!
+-	mov		x29, sp
++	frame_push	6
++
++	mov		x19, x0
++	mov		x20, x1
++	mov		x21, x2
++	mov		x22, x3
++	mov		x23, x4
++	mov		x24, x5
+ 
+ 99:	mov		x6, #1
+-	lsl		x6, x6, x4
+-	subs		w4, w4, #8
+-	csel		x4, x4, xzr, pl
++	lsl		x6, x6, x23
++	subs		w23, w23, #8
++	csel		x23, x23, xzr, pl
+ 	csel		x6, x6, xzr, mi
+ 
+-	ld1		{v0.16b}, [x1], #16
++	ld1		{v0.16b}, [x20], #16
+ 	mov		v25.16b, v0.16b
+ 	tbnz		x6, #1, 0f
+-	ld1		{v1.16b}, [x1], #16
++	ld1		{v1.16b}, [x20], #16
+ 	mov		v26.16b, v1.16b
+ 	tbnz		x6, #2, 0f
+-	ld1		{v2.16b}, [x1], #16
++	ld1		{v2.16b}, [x20], #16
+ 	mov		v27.16b, v2.16b
+ 	tbnz		x6, #3, 0f
+-	ld1		{v3.16b}, [x1], #16
++	ld1		{v3.16b}, [x20], #16
+ 	mov		v28.16b, v3.16b
+ 	tbnz		x6, #4, 0f
+-	ld1		{v4.16b}, [x1], #16
++	ld1		{v4.16b}, [x20], #16
+ 	mov		v29.16b, v4.16b
+ 	tbnz		x6, #5, 0f
+-	ld1		{v5.16b}, [x1], #16
++	ld1		{v5.16b}, [x20], #16
+ 	mov		v30.16b, v5.16b
+ 	tbnz		x6, #6, 0f
+-	ld1		{v6.16b}, [x1], #16
++	ld1		{v6.16b}, [x20], #16
+ 	mov		v31.16b, v6.16b
+ 	tbnz		x6, #7, 0f
+-	ld1		{v7.16b}, [x1]
++	ld1		{v7.16b}, [x20]
+ 
+-0:	mov		bskey, x2
+-	mov		rounds, x3
++0:	mov		bskey, x21
++	mov		rounds, x22
+ 	bl		aesbs_decrypt8
+ 
+-	ld1		{v24.16b}, [x5]			// load IV
++	ld1		{v24.16b}, [x24]		// load IV
+ 
+ 	eor		v1.16b, v1.16b, v25.16b
+ 	eor		v6.16b, v6.16b, v26.16b
+@@ -679,34 +692,36 @@ ENTRY(aesbs_cbc_decrypt)
+ 	eor		v3.16b, v3.16b, v30.16b
+ 	eor		v5.16b, v5.16b, v31.16b
+ 
+-	st1		{v0.16b}, [x0], #16
++	st1		{v0.16b}, [x19], #16
+ 	mov		v24.16b, v25.16b
+ 	tbnz		x6, #1, 1f
+-	st1		{v1.16b}, [x0], #16
++	st1		{v1.16b}, [x19], #16
+ 	mov		v24.16b, v26.16b
+ 	tbnz		x6, #2, 1f
+-	st1		{v6.16b}, [x0], #16
++	st1		{v6.16b}, [x19], #16
+ 	mov		v24.16b, v27.16b
+ 	tbnz		x6, #3, 1f
+-	st1		{v4.16b}, [x0], #16
++	st1		{v4.16b}, [x19], #16
+ 	mov		v24.16b, v28.16b
+ 	tbnz		x6, #4, 1f
+-	st1		{v2.16b}, [x0], #16
++	st1		{v2.16b}, [x19], #16
+ 	mov		v24.16b, v29.16b
+ 	tbnz		x6, #5, 1f
+-	st1		{v7.16b}, [x0], #16
++	st1		{v7.16b}, [x19], #16
+ 	mov		v24.16b, v30.16b
+ 	tbnz		x6, #6, 1f
 -	st1		{v3.16b}, [x0], #16
 +	st1		{v3.16b}, [x19], #16
- 	bne		.Lctrloop
+ 	mov		v24.16b, v31.16b
+ 	tbnz		x6, #7, 1f
+-	ld1		{v24.16b}, [x1], #16
+-	st1		{v5.16b}, [x0], #16
+-1:	st1		{v24.16b}, [x5]			// store IV
++	ld1		{v24.16b}, [x20], #16
++	st1		{v5.16b}, [x19], #16
++1:	st1		{v24.16b}, [x24]		// store IV
  
- .Lctrout:
--	st1		{v4.16b}, [x5]		/* return next CTR value */
+-	cbnz		x4, 99b
++	cbz		x23, 2f
++	cond_yield_neon
++	b		99b
+ 
 -	ldp		x29, x30, [sp], #16
-+	st1		{v4.16b}, [x24]		/* return next CTR value */
-+.Lctrret:
-+	frame_pop
++2:	frame_pop
  	ret
+ ENDPROC(aesbs_cbc_decrypt)
  
- .Lctrtailblock:
--	st1		{v0.16b}, [x0]
--	ldp		x29, x30, [sp], #16
--	ret
-+	st1		{v0.16b}, [x19]
-+	b		.Lctrret
- 
- .Lctrcarry:
- 	umov		x7, v4.d[0]		/* load upper word of ctr  */
-@@ -274,10 +319,16 @@ CPU_LE(	.quad		1, 0x87		)
- CPU_BE(	.quad		0x87, 1		)
- 
- AES_ENTRY(aes_xts_encrypt)
--	stp		x29, x30, [sp, #-16]!
--	mov		x29, sp
-+	frame_push	6
-+
-+	mov		x19, x0
-+	mov		x20, x1
-+	mov		x21, x2
-+	mov		x22, x3
-+	mov		x23, x4
-+	mov		x24, x6
- 
--	ld1		{v4.16b}, [x6]
-+	ld1		{v4.16b}, [x24]
- 	cbz		w7, .Lxtsencnotfirst
- 
- 	enc_prepare	w3, x5, x8
-@@ -286,15 +337,17 @@ AES_ENTRY(aes_xts_encrypt)
- 	ldr		q7, .Lxts_mul_x
- 	b		.LxtsencNx
- 
-+.Lxtsencrestart:
-+	ld1		{v4.16b}, [x24]
- .Lxtsencnotfirst:
--	enc_prepare	w3, x2, x8
-+	enc_prepare	w22, x21, x8
- .LxtsencloopNx:
- 	ldr		q7, .Lxts_mul_x
- 	next_tweak	v4, v4, v7, v8
- .LxtsencNx:
--	subs		w4, w4, #4
-+	subs		w23, w23, #4
- 	bmi		.Lxtsenc1x
--	ld1		{v0.16b-v3.16b}, [x1], #64	/* get 4 pt blocks */
-+	ld1		{v0.16b-v3.16b}, [x20], #64	/* get 4 pt blocks */
- 	next_tweak	v5, v4, v7, v8
- 	eor		v0.16b, v0.16b, v4.16b
- 	next_tweak	v6, v5, v7, v8
-@@ -307,35 +360,43 @@ AES_ENTRY(aes_xts_encrypt)
- 	eor		v0.16b, v0.16b, v4.16b
- 	eor		v1.16b, v1.16b, v5.16b
- 	eor		v2.16b, v2.16b, v6.16b
--	st1		{v0.16b-v3.16b}, [x0], #64
-+	st1		{v0.16b-v3.16b}, [x19], #64
- 	mov		v4.16b, v7.16b
--	cbz		w4, .Lxtsencout
-+	cbz		w23, .Lxtsencout
-+	st1		{v4.16b}, [x24]
-+	cond_yield_neon	.Lxtsencrestart
- 	b		.LxtsencloopNx
- .Lxtsenc1x:
--	adds		w4, w4, #4
-+	adds		w23, w23, #4
- 	beq		.Lxtsencout
- .Lxtsencloop:
--	ld1		{v1.16b}, [x1], #16
-+	ld1		{v1.16b}, [x20], #16
- 	eor		v0.16b, v1.16b, v4.16b
--	encrypt_block	v0, w3, x2, x8, w7
-+	encrypt_block	v0, w22, x21, x8, w7
- 	eor		v0.16b, v0.16b, v4.16b
--	st1		{v0.16b}, [x0], #16
--	subs		w4, w4, #1
-+	st1		{v0.16b}, [x19], #16
-+	subs		w23, w23, #1
- 	beq		.Lxtsencout
- 	next_tweak	v4, v4, v7, v8
- 	b		.Lxtsencloop
- .Lxtsencout:
--	st1		{v4.16b}, [x6]
--	ldp		x29, x30, [sp], #16
-+	st1		{v4.16b}, [x24]
-+	frame_pop
- 	ret
- AES_ENDPROC(aes_xts_encrypt)
- 
- 
- AES_ENTRY(aes_xts_decrypt)
--	stp		x29, x30, [sp, #-16]!
--	mov		x29, sp
-+	frame_push	6
- 
--	ld1		{v4.16b}, [x6]
-+	mov		x19, x0
-+	mov		x20, x1
-+	mov		x21, x2
-+	mov		x22, x3
-+	mov		x23, x4
-+	mov		x24, x6
-+
-+	ld1		{v4.16b}, [x24]
- 	cbz		w7, .Lxtsdecnotfirst
- 
- 	enc_prepare	w3, x5, x8
-@@ -344,15 +405,17 @@ AES_ENTRY(aes_xts_decrypt)
- 	ldr		q7, .Lxts_mul_x
- 	b		.LxtsdecNx
- 
-+.Lxtsdecrestart:
-+	ld1		{v4.16b}, [x24]
- .Lxtsdecnotfirst:
--	dec_prepare	w3, x2, x8
-+	dec_prepare	w22, x21, x8
- .LxtsdecloopNx:
- 	ldr		q7, .Lxts_mul_x
- 	next_tweak	v4, v4, v7, v8
- .LxtsdecNx:
--	subs		w4, w4, #4
-+	subs		w23, w23, #4
- 	bmi		.Lxtsdec1x
--	ld1		{v0.16b-v3.16b}, [x1], #64	/* get 4 ct blocks */
-+	ld1		{v0.16b-v3.16b}, [x20], #64	/* get 4 ct blocks */
- 	next_tweak	v5, v4, v7, v8
- 	eor		v0.16b, v0.16b, v4.16b
- 	next_tweak	v6, v5, v7, v8
-@@ -365,26 +428,28 @@ AES_ENTRY(aes_xts_decrypt)
- 	eor		v0.16b, v0.16b, v4.16b
- 	eor		v1.16b, v1.16b, v5.16b
- 	eor		v2.16b, v2.16b, v6.16b
--	st1		{v0.16b-v3.16b}, [x0], #64
-+	st1		{v0.16b-v3.16b}, [x19], #64
- 	mov		v4.16b, v7.16b
--	cbz		w4, .Lxtsdecout
-+	cbz		w23, .Lxtsdecout
-+	st1		{v4.16b}, [x24]
-+	cond_yield_neon	.Lxtsdecrestart
- 	b		.LxtsdecloopNx
- .Lxtsdec1x:
--	adds		w4, w4, #4
-+	adds		w23, w23, #4
- 	beq		.Lxtsdecout
- .Lxtsdecloop:
--	ld1		{v1.16b}, [x1], #16
-+	ld1		{v1.16b}, [x20], #16
- 	eor		v0.16b, v1.16b, v4.16b
--	decrypt_block	v0, w3, x2, x8, w7
-+	decrypt_block	v0, w22, x21, x8, w7
- 	eor		v0.16b, v0.16b, v4.16b
--	st1		{v0.16b}, [x0], #16
--	subs		w4, w4, #1
-+	st1		{v0.16b}, [x19], #16
-+	subs		w23, w23, #1
- 	beq		.Lxtsdecout
- 	next_tweak	v4, v4, v7, v8
- 	b		.Lxtsdecloop
- .Lxtsdecout:
--	st1		{v4.16b}, [x6]
--	ldp		x29, x30, [sp], #16
-+	st1		{v4.16b}, [x24]
-+	frame_pop
- 	ret
- AES_ENDPROC(aes_xts_decrypt)
- 
-@@ -393,43 +458,61 @@ AES_ENDPROC(aes_xts_decrypt)
- 	 *		  int blocks, u8 dg[], int enc_before, int enc_after)
+@@ -731,87 +746,93 @@ CPU_BE(	.quad		0x87, 1		)
  	 */
- AES_ENTRY(aes_mac_update)
--	ld1		{v0.16b}, [x4]			/* get dg */
-+	frame_push	6
+ __xts_crypt8:
+ 	mov		x6, #1
+-	lsl		x6, x6, x4
+-	subs		w4, w4, #8
+-	csel		x4, x4, xzr, pl
++	lsl		x6, x6, x23
++	subs		w23, w23, #8
++	csel		x23, x23, xzr, pl
+ 	csel		x6, x6, xzr, mi
+ 
+-	ld1		{v0.16b}, [x1], #16
++	ld1		{v0.16b}, [x20], #16
+ 	next_tweak	v26, v25, v30, v31
+ 	eor		v0.16b, v0.16b, v25.16b
+ 	tbnz		x6, #1, 0f
+ 
+-	ld1		{v1.16b}, [x1], #16
++	ld1		{v1.16b}, [x20], #16
+ 	next_tweak	v27, v26, v30, v31
+ 	eor		v1.16b, v1.16b, v26.16b
+ 	tbnz		x6, #2, 0f
+ 
+-	ld1		{v2.16b}, [x1], #16
++	ld1		{v2.16b}, [x20], #16
+ 	next_tweak	v28, v27, v30, v31
+ 	eor		v2.16b, v2.16b, v27.16b
+ 	tbnz		x6, #3, 0f
+ 
+-	ld1		{v3.16b}, [x1], #16
++	ld1		{v3.16b}, [x20], #16
+ 	next_tweak	v29, v28, v30, v31
+ 	eor		v3.16b, v3.16b, v28.16b
+ 	tbnz		x6, #4, 0f
+ 
+-	ld1		{v4.16b}, [x1], #16
+-	str		q29, [sp, #16]
++	ld1		{v4.16b}, [x20], #16
++	str		q29, [sp, #.Lframe_local_offset]
+ 	eor		v4.16b, v4.16b, v29.16b
+ 	next_tweak	v29, v29, v30, v31
+ 	tbnz		x6, #5, 0f
+ 
+-	ld1		{v5.16b}, [x1], #16
+-	str		q29, [sp, #32]
++	ld1		{v5.16b}, [x20], #16
++	str		q29, [sp, #.Lframe_local_offset + 16]
+ 	eor		v5.16b, v5.16b, v29.16b
+ 	next_tweak	v29, v29, v30, v31
+ 	tbnz		x6, #6, 0f
+ 
+-	ld1		{v6.16b}, [x1], #16
+-	str		q29, [sp, #48]
++	ld1		{v6.16b}, [x20], #16
++	str		q29, [sp, #.Lframe_local_offset + 32]
+ 	eor		v6.16b, v6.16b, v29.16b
+ 	next_tweak	v29, v29, v30, v31
+ 	tbnz		x6, #7, 0f
+ 
+-	ld1		{v7.16b}, [x1], #16
+-	str		q29, [sp, #64]
++	ld1		{v7.16b}, [x20], #16
++	str		q29, [sp, #.Lframe_local_offset + 48]
+ 	eor		v7.16b, v7.16b, v29.16b
+ 	next_tweak	v29, v29, v30, v31
+ 
+-0:	mov		bskey, x2
+-	mov		rounds, x3
++0:	mov		bskey, x21
++	mov		rounds, x22
+ 	br		x7
+ ENDPROC(__xts_crypt8)
+ 
+ 	.macro		__xts_crypt, do8, o0, o1, o2, o3, o4, o5, o6, o7
+-	stp		x29, x30, [sp, #-80]!
+-	mov		x29, sp
++	frame_push	6, 64
+ 
+-	ldr		q30, .Lxts_mul_x
+-	ld1		{v25.16b}, [x5]
++	mov		x19, x0
++	mov		x20, x1
++	mov		x21, x2
++	mov		x22, x3
++	mov		x23, x4
++	mov		x24, x5
++
++0:	ldr		q30, .Lxts_mul_x
++	ld1		{v25.16b}, [x24]
+ 
+ 99:	adr		x7, \do8
+ 	bl		__xts_crypt8
+ 
+-	ldp		q16, q17, [sp, #16]
+-	ldp		q18, q19, [sp, #48]
++	ldp		q16, q17, [sp, #.Lframe_local_offset]
++	ldp		q18, q19, [sp, #.Lframe_local_offset + 32]
+ 
+ 	eor		\o0\().16b, \o0\().16b, v25.16b
+ 	eor		\o1\().16b, \o1\().16b, v26.16b
+ 	eor		\o2\().16b, \o2\().16b, v27.16b
+ 	eor		\o3\().16b, \o3\().16b, v28.16b
+ 
+-	st1		{\o0\().16b}, [x0], #16
++	st1		{\o0\().16b}, [x19], #16
+ 	mov		v25.16b, v26.16b
+ 	tbnz		x6, #1, 1f
+-	st1		{\o1\().16b}, [x0], #16
++	st1		{\o1\().16b}, [x19], #16
+ 	mov		v25.16b, v27.16b
+ 	tbnz		x6, #2, 1f
+-	st1		{\o2\().16b}, [x0], #16
++	st1		{\o2\().16b}, [x19], #16
+ 	mov		v25.16b, v28.16b
+ 	tbnz		x6, #3, 1f
+-	st1		{\o3\().16b}, [x0], #16
++	st1		{\o3\().16b}, [x19], #16
+ 	mov		v25.16b, v29.16b
+ 	tbnz		x6, #4, 1f
+ 
+@@ -820,18 +841,22 @@ ENDPROC(__xts_crypt8)
+ 	eor		\o6\().16b, \o6\().16b, v18.16b
+ 	eor		\o7\().16b, \o7\().16b, v19.16b
+ 
+-	st1		{\o4\().16b}, [x0], #16
++	st1		{\o4\().16b}, [x19], #16
+ 	tbnz		x6, #5, 1f
+-	st1		{\o5\().16b}, [x0], #16
++	st1		{\o5\().16b}, [x19], #16
+ 	tbnz		x6, #6, 1f
+-	st1		{\o6\().16b}, [x0], #16
++	st1		{\o6\().16b}, [x19], #16
+ 	tbnz		x6, #7, 1f
+-	st1		{\o7\().16b}, [x0], #16
++	st1		{\o7\().16b}, [x19], #16
++
++	cbz		x23, 1f
++	st1		{v25.16b}, [x24]
+ 
+-	cbnz		x4, 99b
++	cond_yield_neon	0b
++	b		99b
+ 
+-1:	st1		{v25.16b}, [x5]
+-	ldp		x29, x30, [sp], #80
++1:	st1		{v25.16b}, [x24]
++	frame_pop
+ 	ret
+ 	.endm
+ 
+@@ -856,24 +881,31 @@ ENDPROC(aesbs_xts_decrypt)
+ 	 *		     int rounds, int blocks, u8 iv[], u8 final[])
+ 	 */
+ ENTRY(aesbs_ctr_encrypt)
+-	stp		x29, x30, [sp, #-16]!
+-	mov		x29, sp
+-
+-	cmp		x6, #0
+-	cset		x10, ne
+-	add		x4, x4, x10		// do one extra block if final
+-
+-	ldp		x7, x8, [x5]
+-	ld1		{v0.16b}, [x5]
++	frame_push	8
 +
 +	mov		x19, x0
 +	mov		x20, x1
 +	mov		x21, x2
 +	mov		x22, x3
 +	mov		x23, x4
-+	mov		x24, x6
++	mov		x24, x5
++	mov		x25, x6
 +
-+	ld1		{v0.16b}, [x23]			/* get dg */
- 	enc_prepare	w2, x1, x7
- 	cbz		w5, .Lmacloop4x
++	cmp		x25, #0
++	cset		x26, ne
++	add		x23, x23, x26		// do one extra block if final
++
++98:	ldp		x7, x8, [x24]
++	ld1		{v0.16b}, [x24]
+ CPU_LE(	rev		x7, x7		)
+ CPU_LE(	rev		x8, x8		)
+ 	adds		x8, x8, #1
+ 	adc		x7, x7, xzr
  
- 	encrypt_block	v0, w2, x1, x7, w8
+ 99:	mov		x9, #1
+-	lsl		x9, x9, x4
+-	subs		w4, w4, #8
+-	csel		x4, x4, xzr, pl
++	lsl		x9, x9, x23
++	subs		w23, w23, #8
++	csel		x23, x23, xzr, pl
+ 	csel		x9, x9, xzr, le
  
- .Lmacloop4x:
--	subs		w3, w3, #4
-+	subs		w22, w22, #4
- 	bmi		.Lmac1x
--	ld1		{v1.16b-v4.16b}, [x0], #64	/* get next pt block */
-+	ld1		{v1.16b-v4.16b}, [x19], #64	/* get next pt block */
- 	eor		v0.16b, v0.16b, v1.16b		/* ..and xor with dg */
--	encrypt_block	v0, w2, x1, x7, w8
-+	encrypt_block	v0, w21, x20, x7, w8
- 	eor		v0.16b, v0.16b, v2.16b
--	encrypt_block	v0, w2, x1, x7, w8
-+	encrypt_block	v0, w21, x20, x7, w8
- 	eor		v0.16b, v0.16b, v3.16b
--	encrypt_block	v0, w2, x1, x7, w8
-+	encrypt_block	v0, w21, x20, x7, w8
- 	eor		v0.16b, v0.16b, v4.16b
--	cmp		w3, wzr
--	csinv		x5, x6, xzr, eq
-+	cmp		w22, wzr
-+	csinv		x5, x24, xzr, eq
- 	cbz		w5, .Lmacout
--	encrypt_block	v0, w2, x1, x7, w8
-+	encrypt_block	v0, w21, x20, x7, w8
-+	st1		{v0.16b}, [x23]			/* return dg */
-+	cond_yield_neon	.Lmacrestart
- 	b		.Lmacloop4x
- .Lmac1x:
--	add		w3, w3, #4
-+	add		w22, w22, #4
- .Lmacloop:
--	cbz		w3, .Lmacout
--	ld1		{v1.16b}, [x0], #16		/* get next pt block */
-+	cbz		w22, .Lmacout
-+	ld1		{v1.16b}, [x19], #16		/* get next pt block */
- 	eor		v0.16b, v0.16b, v1.16b		/* ..and xor with dg */
+ 	tbnz		x9, #1, 0f
+@@ -891,82 +923,85 @@ CPU_LE(	rev		x8, x8		)
+ 	tbnz		x9, #7, 0f
+ 	next_ctr	v7
  
--	subs		w3, w3, #1
--	csinv		x5, x6, xzr, eq
-+	subs		w22, w22, #1
-+	csinv		x5, x24, xzr, eq
- 	cbz		w5, .Lmacout
+-0:	mov		bskey, x2
+-	mov		rounds, x3
++0:	mov		bskey, x21
++	mov		rounds, x22
+ 	bl		aesbs_encrypt8
  
--	encrypt_block	v0, w2, x1, x7, w8
-+.Lmacenc:
-+	encrypt_block	v0, w21, x20, x7, w8
- 	b		.Lmacloop
+-	lsr		x9, x9, x10		// disregard the extra block
++	lsr		x9, x9, x26		// disregard the extra block
+ 	tbnz		x9, #0, 0f
  
- .Lmacout:
--	st1		{v0.16b}, [x4]			/* return dg */
-+	st1		{v0.16b}, [x23]			/* return dg */
-+	frame_pop
+-	ld1		{v8.16b}, [x1], #16
++	ld1		{v8.16b}, [x20], #16
+ 	eor		v0.16b, v0.16b, v8.16b
+-	st1		{v0.16b}, [x0], #16
++	st1		{v0.16b}, [x19], #16
+ 	tbnz		x9, #1, 1f
+ 
+-	ld1		{v9.16b}, [x1], #16
++	ld1		{v9.16b}, [x20], #16
+ 	eor		v1.16b, v1.16b, v9.16b
+-	st1		{v1.16b}, [x0], #16
++	st1		{v1.16b}, [x19], #16
+ 	tbnz		x9, #2, 2f
+ 
+-	ld1		{v10.16b}, [x1], #16
++	ld1		{v10.16b}, [x20], #16
+ 	eor		v4.16b, v4.16b, v10.16b
+-	st1		{v4.16b}, [x0], #16
++	st1		{v4.16b}, [x19], #16
+ 	tbnz		x9, #3, 3f
+ 
+-	ld1		{v11.16b}, [x1], #16
++	ld1		{v11.16b}, [x20], #16
+ 	eor		v6.16b, v6.16b, v11.16b
+-	st1		{v6.16b}, [x0], #16
++	st1		{v6.16b}, [x19], #16
+ 	tbnz		x9, #4, 4f
+ 
+-	ld1		{v12.16b}, [x1], #16
++	ld1		{v12.16b}, [x20], #16
+ 	eor		v3.16b, v3.16b, v12.16b
+-	st1		{v3.16b}, [x0], #16
++	st1		{v3.16b}, [x19], #16
+ 	tbnz		x9, #5, 5f
+ 
+-	ld1		{v13.16b}, [x1], #16
++	ld1		{v13.16b}, [x20], #16
+ 	eor		v7.16b, v7.16b, v13.16b
+-	st1		{v7.16b}, [x0], #16
++	st1		{v7.16b}, [x19], #16
+ 	tbnz		x9, #6, 6f
+ 
+-	ld1		{v14.16b}, [x1], #16
++	ld1		{v14.16b}, [x20], #16
+ 	eor		v2.16b, v2.16b, v14.16b
+-	st1		{v2.16b}, [x0], #16
++	st1		{v2.16b}, [x19], #16
+ 	tbnz		x9, #7, 7f
+ 
+-	ld1		{v15.16b}, [x1], #16
++	ld1		{v15.16b}, [x20], #16
+ 	eor		v5.16b, v5.16b, v15.16b
+-	st1		{v5.16b}, [x0], #16
++	st1		{v5.16b}, [x19], #16
+ 
+ 8:	next_ctr	v0
+-	cbnz		x4, 99b
++	st1		{v0.16b}, [x24]
++	cbz		x23, 0f
++
++	cond_yield_neon	98b
++	b		99b
+ 
+-0:	st1		{v0.16b}, [x5]
+-	ldp		x29, x30, [sp], #16
++0:	frame_pop
  	ret
-+
-+.Lmacrestart:
-+	ld1		{v0.16b}, [x23]			/* get dg */
-+	enc_prepare	w21, x20, x0
-+	b		.Lmacloop4x
- AES_ENDPROC(aes_mac_update)
+ 
+ 	/*
+ 	 * If we are handling the tail of the input (x6 != NULL), return the
+ 	 * final keystream block back to the caller.
+ 	 */
+-1:	cbz		x6, 8b
+-	st1		{v1.16b}, [x6]
++1:	cbz		x25, 8b
++	st1		{v1.16b}, [x25]
+ 	b		8b
+-2:	cbz		x6, 8b
+-	st1		{v4.16b}, [x6]
++2:	cbz		x25, 8b
++	st1		{v4.16b}, [x25]
+ 	b		8b
+-3:	cbz		x6, 8b
+-	st1		{v6.16b}, [x6]
++3:	cbz		x25, 8b
++	st1		{v6.16b}, [x25]
+ 	b		8b
+-4:	cbz		x6, 8b
+-	st1		{v3.16b}, [x6]
++4:	cbz		x25, 8b
++	st1		{v3.16b}, [x25]
+ 	b		8b
+-5:	cbz		x6, 8b
+-	st1		{v7.16b}, [x6]
++5:	cbz		x25, 8b
++	st1		{v7.16b}, [x25]
+ 	b		8b
+-6:	cbz		x6, 8b
+-	st1		{v2.16b}, [x6]
++6:	cbz		x25, 8b
++	st1		{v2.16b}, [x25]
+ 	b		8b
+-7:	cbz		x6, 8b
+-	st1		{v5.16b}, [x6]
++7:	cbz		x25, 8b
++	st1		{v5.16b}, [x25]
+ 	b		8b
+ ENDPROC(aesbs_ctr_encrypt)
 -- 
 2.15.1
