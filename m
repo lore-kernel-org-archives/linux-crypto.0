@@ -1,8 +1,8 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v5 18/23] crypto: arm64/crc32-ce - yield NEON after every
- block of input
-Date: Sat, 10 Mar 2018 15:22:03 +0000
-Message-ID: <20180310152208.10369-19-ard.biesheuvel@linaro.org>
+Subject: [PATCH v5 20/23] crypto: arm64/sha3-ce - yield NEON after every block
+ of input
+Date: Sat, 10 Mar 2018 15:22:05 +0000
+Message-ID: <20180310152208.10369-21-ard.biesheuvel@linaro.org>
 References: <20180310152208.10369-1-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -36,103 +36,150 @@ conditionally yielding the NEON after every block of input.
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- arch/arm64/crypto/crc32-ce-core.S | 40 +++++++++++++++-----
- 1 file changed, 30 insertions(+), 10 deletions(-)
+ arch/arm64/crypto/sha3-ce-core.S | 77 +++++++++++++-------
+ 1 file changed, 50 insertions(+), 27 deletions(-)
 
-diff --git a/arch/arm64/crypto/crc32-ce-core.S b/arch/arm64/crypto/crc32-ce-core.S
-index 16ed3c7ebd37..8061bf0f9c66 100644
---- a/arch/arm64/crypto/crc32-ce-core.S
-+++ b/arch/arm64/crypto/crc32-ce-core.S
-@@ -100,9 +100,10 @@
- 	dCONSTANT	.req	d0
- 	qCONSTANT	.req	q0
- 
--	BUF		.req	x0
--	LEN		.req	x1
--	CRC		.req	x2
-+	BUF		.req	x19
-+	LEN		.req	x20
-+	CRC		.req	x21
-+	CONST		.req	x22
- 
- 	vzr		.req	v9
- 
-@@ -123,7 +124,14 @@ ENTRY(crc32_pmull_le)
- ENTRY(crc32c_pmull_le)
- 	adr_l		x3, .Lcrc32c_constants
- 
--0:	bic		LEN, LEN, #15
-+0:	frame_push	4, 64
+diff --git a/arch/arm64/crypto/sha3-ce-core.S b/arch/arm64/crypto/sha3-ce-core.S
+index 332ad7530690..a7d587fa54f6 100644
+--- a/arch/arm64/crypto/sha3-ce-core.S
++++ b/arch/arm64/crypto/sha3-ce-core.S
+@@ -41,9 +41,16 @@
+ 	 */
+ 	.text
+ ENTRY(sha3_ce_transform)
+-	/* load state */
+-	add	x8, x0, #32
+-	ld1	{ v0.1d- v3.1d}, [x0]
++	frame_push	4
 +
-+	mov		BUF, x0
-+	mov		LEN, x1
-+	mov		CRC, x2
-+	mov		CONST, x3
++	mov	x19, x0
++	mov	x20, x1
++	mov	x21, x2
++	mov	x22, x3
 +
-+	bic		LEN, LEN, #15
- 	ld1		{v1.16b-v4.16b}, [BUF], #0x40
- 	movi		vzr.16b, #0
- 	fmov		dCONSTANT, CRC
-@@ -132,7 +140,7 @@ ENTRY(crc32c_pmull_le)
- 	cmp		LEN, #0x40
- 	b.lt		less_64
++0:	/* load state */
++	add	x8, x19, #32
++	ld1	{ v0.1d- v3.1d}, [x19]
+ 	ld1	{ v4.1d- v7.1d}, [x8], #32
+ 	ld1	{ v8.1d-v11.1d}, [x8], #32
+ 	ld1	{v12.1d-v15.1d}, [x8], #32
+@@ -51,13 +58,13 @@ ENTRY(sha3_ce_transform)
+ 	ld1	{v20.1d-v23.1d}, [x8], #32
+ 	ld1	{v24.1d}, [x8]
  
--	ldr		qCONSTANT, [x3]
-+	ldr		qCONSTANT, [CONST]
+-0:	sub	w2, w2, #1
++1:	sub	w21, w21, #1
+ 	mov	w8, #24
+ 	adr_l	x9, .Lsha3_rcon
  
- loop_64:		/* 64 bytes Full cache line folding */
- 	sub		LEN, LEN, #0x40
-@@ -162,10 +170,21 @@ loop_64:		/* 64 bytes Full cache line folding */
- 	eor		v4.16b, v4.16b, v8.16b
+ 	/* load input */
+-	ld1	{v25.8b-v28.8b}, [x1], #32
+-	ld1	{v29.8b-v31.8b}, [x1], #24
++	ld1	{v25.8b-v28.8b}, [x20], #32
++	ld1	{v29.8b-v31.8b}, [x20], #24
+ 	eor	v0.8b, v0.8b, v25.8b
+ 	eor	v1.8b, v1.8b, v26.8b
+ 	eor	v2.8b, v2.8b, v27.8b
+@@ -66,10 +73,10 @@ ENTRY(sha3_ce_transform)
+ 	eor	v5.8b, v5.8b, v30.8b
+ 	eor	v6.8b, v6.8b, v31.8b
  
- 	cmp		LEN, #0x40
--	b.ge		loop_64
-+	b.lt		less_64
+-	tbnz	x3, #6, 2f		// SHA3-512
++	tbnz	x22, #6, 3f		// SHA3-512
+ 
+-	ld1	{v25.8b-v28.8b}, [x1], #32
+-	ld1	{v29.8b-v30.8b}, [x1], #16
++	ld1	{v25.8b-v28.8b}, [x20], #32
++	ld1	{v29.8b-v30.8b}, [x20], #16
+ 	eor	 v7.8b,  v7.8b, v25.8b
+ 	eor	 v8.8b,  v8.8b, v26.8b
+ 	eor	 v9.8b,  v9.8b, v27.8b
+@@ -77,34 +84,34 @@ ENTRY(sha3_ce_transform)
+ 	eor	v11.8b, v11.8b, v29.8b
+ 	eor	v12.8b, v12.8b, v30.8b
+ 
+-	tbnz	x3, #4, 1f		// SHA3-384 or SHA3-224
++	tbnz	x22, #4, 2f		// SHA3-384 or SHA3-224
+ 
+ 	// SHA3-256
+-	ld1	{v25.8b-v28.8b}, [x1], #32
++	ld1	{v25.8b-v28.8b}, [x20], #32
+ 	eor	v13.8b, v13.8b, v25.8b
+ 	eor	v14.8b, v14.8b, v26.8b
+ 	eor	v15.8b, v15.8b, v27.8b
+ 	eor	v16.8b, v16.8b, v28.8b
+-	b	3f
++	b	4f
+ 
+-1:	tbz	x3, #2, 3f		// bit 2 cleared? SHA-384
++2:	tbz	x22, #2, 4f		// bit 2 cleared? SHA-384
+ 
+ 	// SHA3-224
+-	ld1	{v25.8b-v28.8b}, [x1], #32
+-	ld1	{v29.8b}, [x1], #8
++	ld1	{v25.8b-v28.8b}, [x20], #32
++	ld1	{v29.8b}, [x20], #8
+ 	eor	v13.8b, v13.8b, v25.8b
+ 	eor	v14.8b, v14.8b, v26.8b
+ 	eor	v15.8b, v15.8b, v27.8b
+ 	eor	v16.8b, v16.8b, v28.8b
+ 	eor	v17.8b, v17.8b, v29.8b
+-	b	3f
++	b	4f
+ 
+ 	// SHA3-512
+-2:	ld1	{v25.8b-v26.8b}, [x1], #16
++3:	ld1	{v25.8b-v26.8b}, [x20], #16
+ 	eor	 v7.8b,  v7.8b, v25.8b
+ 	eor	 v8.8b,  v8.8b, v26.8b
+ 
+-3:	sub	w8, w8, #1
++4:	sub	w8, w8, #1
+ 
+ 	eor3	v29.16b,  v4.16b,  v9.16b, v14.16b
+ 	eor3	v26.16b,  v1.16b,  v6.16b, v11.16b
+@@ -183,17 +190,33 @@ ENTRY(sha3_ce_transform)
+ 
+ 	eor	 v0.16b,  v0.16b, v31.16b
+ 
+-	cbnz	w8, 3b
+-	cbnz	w2, 0b
++	cbnz	w8, 4b
++	cbz	w21, 5f
 +
 +	if_will_cond_yield_neon
-+	stp		q1, q2, [sp, #.Lframe_local_offset]
-+	stp		q3, q4, [sp, #.Lframe_local_offset + 32]
++	add	x8, x19, #32
++	st1	{ v0.1d- v3.1d}, [x19]
++	st1	{ v4.1d- v7.1d}, [x8], #32
++	st1	{ v8.1d-v11.1d}, [x8], #32
++	st1	{v12.1d-v15.1d}, [x8], #32
++	st1	{v16.1d-v19.1d}, [x8], #32
++	st1	{v20.1d-v23.1d}, [x8], #32
++	st1	{v24.1d}, [x8]
 +	do_cond_yield_neon
-+	ldp		q1, q2, [sp, #.Lframe_local_offset]
-+	ldp		q3, q4, [sp, #.Lframe_local_offset + 32]
-+	ldr		qCONSTANT, [CONST]
-+	movi		vzr.16b, #0
++	b		0b
 +	endif_yield_neon
-+	b		loop_64
++
++	b	1b
  
- less_64:		/* Folding cache line into 128bit */
--	ldr		qCONSTANT, [x3, #16]
-+	ldr		qCONSTANT, [CONST, #16]
- 
- 	pmull2		v5.1q, v1.2d, vCONSTANT.2d
- 	pmull		v1.1q, v1.1d, vCONSTANT.1d
-@@ -204,8 +223,8 @@ fold_64:
- 	eor		v1.16b, v1.16b, v2.16b
- 
- 	/* final 32-bit fold */
--	ldr		dCONSTANT, [x3, #32]
--	ldr		d3, [x3, #40]
-+	ldr		dCONSTANT, [CONST, #32]
-+	ldr		d3, [CONST, #40]
- 
- 	ext		v2.16b, v1.16b, vzr.16b, #4
- 	and		v1.16b, v1.16b, v3.16b
-@@ -213,7 +232,7 @@ fold_64:
- 	eor		v1.16b, v1.16b, v2.16b
- 
- 	/* Finish up with the bit-reversed barrett reduction 64 ==> 32 bits */
--	ldr		qCONSTANT, [x3, #48]
-+	ldr		qCONSTANT, [CONST, #48]
- 
- 	and		v2.16b, v1.16b, v3.16b
- 	ext		v2.16b, vzr.16b, v2.16b, #8
-@@ -223,6 +242,7 @@ fold_64:
- 	eor		v1.16b, v1.16b, v2.16b
- 	mov		w0, v1.s[1]
- 
+ 	/* save state */
+-	st1	{ v0.1d- v3.1d}, [x0], #32
+-	st1	{ v4.1d- v7.1d}, [x0], #32
+-	st1	{ v8.1d-v11.1d}, [x0], #32
+-	st1	{v12.1d-v15.1d}, [x0], #32
+-	st1	{v16.1d-v19.1d}, [x0], #32
+-	st1	{v20.1d-v23.1d}, [x0], #32
+-	st1	{v24.1d}, [x0]
++5:	st1	{ v0.1d- v3.1d}, [x19], #32
++	st1	{ v4.1d- v7.1d}, [x19], #32
++	st1	{ v8.1d-v11.1d}, [x19], #32
++	st1	{v12.1d-v15.1d}, [x19], #32
++	st1	{v16.1d-v19.1d}, [x19], #32
++	st1	{v20.1d-v23.1d}, [x19], #32
++	st1	{v24.1d}, [x19]
 +	frame_pop
  	ret
- ENDPROC(crc32_pmull_le)
- ENDPROC(crc32c_pmull_le)
+ ENDPROC(sha3_ce_transform)
+ 
 -- 
 2.15.1
