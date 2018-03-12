@@ -1,18 +1,19 @@
-From: Tudor Ambarus <tudor.ambarus-UWL1GkI3JZL3oGB3hsPCZA@public.gmane.org>
-Subject: in-kernel user of ecdsa
-Date: Mon, 12 Mar 2018 19:07:53 +0200
-Message-ID: <0f698592-8ade-14d4-7891-1c35501c6285@microchip.com>
+From: James Bottomley <jejb-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org>
+Subject: Re: in-kernel user of ecdsa
+Date: Mon, 12 Mar 2018 11:09:18 -0700
+Message-ID: <1520878158.4522.31.camel@linux.vnet.ibm.com>
+References: <0f698592-8ade-14d4-7891-1c35501c6285@microchip.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
-Content-Transfer-Encoding: 7bit
-Cc: "bluez mailin list
- \(linux-bluetooth-u79uwXL29TY76Z2rM5mHXA@public.gmane.org\)" <linux-bluetooth-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
- linux-security-module-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, tpmdd-devel-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org,
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: "bluez mailin list \(linux-bluetooth-u79uwXL29TY76Z2rM5mHXA@public.gmane.org\)"
+ <linux-bluetooth-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, linux-security-module-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+ tpmdd-devel-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org, keyrings-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
  Linux Crypto Mailing List <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, <dwmw2-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
- <keyrings-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Tudor Ambarus <tudor.ambarus-UWL1GkI3JZL3oGB3hsPCZA@public.gmane.org>, David Howells
+ <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, dwmw2-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org, keyrings-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <tpmdd-devel-bounces-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org>
-Content-Language: en-US
+In-Reply-To: <0f698592-8ade-14d4-7891-1c35501c6285-UWL1GkI3JZL3oGB3hsPCZA@public.gmane.org>
 List-Unsubscribe: <https://lists.sourceforge.net/lists/options/tpmdd-devel>,
  <mailto:tpmdd-devel-request-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org?subject=unsubscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=tpmdd-devel>
@@ -23,56 +24,24 @@ List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/tpmdd-devel>,
 Errors-To: tpmdd-devel-bounces-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi,
-
-Would you consider using ECDSA in the kernel module signing facility?
-When compared with RSA, ECDSA has shorter keys, the key generation
-process is faster, the sign operation is faster, but the verify
-operation is slower than with RSA.
-
-Smaller key sizes imply reduced memory footprint and bandwidth that are
-especially attractive for memory constrained devices. I'm working with
-such a device, capable of generating ecc keys, secure key storage and
-ecdsa/ecdh crypto acceleration. I'm trying to find an in-kernel user of
-ecdsa.
-
-
-ECDSA and RSA comparison
-------------------------
--> ECDSA requires a much smaller key length in order to provide the same
-security strength as RSA [1]:
-
-Security Strength    RSA (bits)        ECDSA (bits)
-112                   2048             224 - 255
-128                   3072             256 - 383
-192                   7680             384 - 511
-256                  15360             512+
-
-7680 and 15360  keys are not included in the NIST standards for
-interoperability and efficiency reasons, the keys are just too big.
-
--> key generation: ECC key generation is faster than IFC (Integer -
-Factorization Cryptography). RSA private key is based on large prime
-numbers, while for ECDSA any positive integer less than n is a valid
-private key.
-
--> ECDSA sign operations are faster than RSA, but verify operations are
-slower. Here's an openssl speed test that I've run on my computer:
-
-                   sign    verify    sign/s verify/s
-rsa 2048 bits 0.000604s 0.000018s   1656.3  56813.7
-rsa 4096 bits 0.004027s 0.000062s    248.3  16052.5
-
-                              sign    verify    sign/s verify/s
-256 bit ecdsa (nistp256)   0.0000s   0.0001s  28986.4  13516.3
-384 bit ecdsa (nistp384)   0.0002s   0.0008s   5541.0   1322.2
-521 bit ecdsa (nistp521)   0.0003s   0.0006s   3104.2   1756.2
-
-Best,
-ta
-
-[1] NIST SP 800-57 Pt. 1 Rev. 4, Recommendation for key management
-
-------------------------------------------------------------------------------
-Check out the vibrant tech community on one of the world's most
-engaging tech sites, Slashdot.org! http://sdm.link/slashdot
+T24gTW9uLCAyMDE4LTAzLTEyIGF0IDE5OjA3ICswMjAwLCBUdWRvciBBbWJhcnVzIHdyb3RlOgo+
+IEhpLAo+IAo+IFdvdWxkIHlvdSBjb25zaWRlciB1c2luZyBFQ0RTQSBpbiB0aGUga2VybmVsIG1v
+ZHVsZSBzaWduaW5nIGZhY2lsaXR5Pwo+IFdoZW4gY29tcGFyZWQgd2l0aCBSU0EsIEVDRFNBIGhh
+cyBzaG9ydGVyIGtleXMsIHRoZSBrZXkgZ2VuZXJhdGlvbgo+IHByb2Nlc3MgaXMgZmFzdGVyLCB0
+aGUgc2lnbiBvcGVyYXRpb24gaXMgZmFzdGVyLCBidXQgdGhlIHZlcmlmeQo+IG9wZXJhdGlvbiBp
+cyBzbG93ZXIgdGhhbiB3aXRoIFJTQS4KCllvdSBtaXNzZWQgdGhlIGtleXJpbmdzIGxpc3QsIHdo
+aWNoIGlzIHdoZXJlIHRoZSBtb2R1bGUgc2lnbmluZyB1dGlsaXR5CmlzIGRpc2N1c3NlZC4KCkZp
+cnN0IHF1ZXN0aW9uIGlzLCBoYXZlIHlvdSBhY3R1YWxseSB0cmllZD8gwqBJdCBsb29rcyBsaWtl
+IHNpZ24tZmlsZQpkb2Vzbid0IGRvIGFueXRoaW5nIFJTQSBzcGVjaWZpYyBzbyBpZiB5b3UgZ2l2
+ZSBpdCBhbiBFQyBYLjUwOQpjZXJ0aWZpY2F0ZSBpdCB3aWxsIHByb2R1Y2UgYW4gRUNEU0Egc2ln
+bmF0dXJlLgoKSSB0aGluayBvdXIga2VybmVsIGludGVybmFsIHg1MDkgcGFyc2VycyBkb24ndCBo
+YXZlIHRoZSBFQyBPSURzLCBzbwpzaWduYXR1cmUgdmVyaWZpY2F0aW9uIHdpbGwgZmFpbDsgYnV0
+LCBlc3BlY2lhbGx5IHNpbmNlIHdlIGhhdmUgdGhlCnJlc3Qgb2YgdGhlIEVDIG1hY2hpbmVyeSBp
+biB0aGUgY3J5cHRvIHN1YnN5c3RlbSwgdGhhdCBsb29rcyB0byBiZQpzaW1wbHkgZml4YWJsZS4K
+CkphbWVzCgoKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCkNoZWNrIG91dCB0aGUgdmlicmFudCB0ZWNo
+IGNvbW11bml0eSBvbiBvbmUgb2YgdGhlIHdvcmxkJ3MgbW9zdAplbmdhZ2luZyB0ZWNoIHNpdGVz
+LCBTbGFzaGRvdC5vcmchIGh0dHA6Ly9zZG0ubGluay9zbGFzaGRvdApfX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwp0cG1kZC1kZXZlbCBtYWlsaW5nIGxpc3QK
+dHBtZGQtZGV2ZWxAbGlzdHMuc291cmNlZm9yZ2UubmV0Cmh0dHBzOi8vbGlzdHMuc291cmNlZm9y
+Z2UubmV0L2xpc3RzL2xpc3RpbmZvL3RwbWRkLWRldmVsCg==
