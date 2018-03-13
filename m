@@ -1,8 +1,8 @@
 From: Thomas Garnier via Virtualization
 	<virtualization@lists.linux-foundation.org>
-Subject: [PATCH v2 03/27] x86: Use symbol name in jump table for PIE support
-Date: Tue, 13 Mar 2018 13:59:21 -0700
-Message-ID: <20180313205945.245105-4-thgarnie@google.com>
+Subject: [PATCH v2 04/27] x86: Add macro to get symbol address for PIE support
+Date: Tue, 13 Mar 2018 13:59:22 -0700
+Message-ID: <20180313205945.245105-5-thgarnie@google.com>
 References: <20180313205945.245105-1-thgarnie@google.com>
 Reply-To: Thomas Garnier <thgarnie@google.com>
 Mime-Version: 1.0
@@ -44,44 +44,26 @@ Sender: virtualization-bounces@lists.linux-foundation.org
 Errors-To: virtualization-bounces@lists.linux-foundation.org
 List-Id: linux-crypto.vger.kernel.org
 
-Replace the %c constraint with %P. The %c is incompatible with PIE
-because it implies an immediate value whereas %P reference a symbol.
-
-Position Independent Executable (PIE) support will allow to extended the
-KASLR randomization range below the -2G memory limit.
+Add a new _ASM_MOVABS macro to fetch a symbol address. It will be used
+to replace "_ASM_MOV $<symbol>, %dst" code construct that are not compatible
+with PIE.
 
 Signed-off-by: Thomas Garnier <thgarnie@google.com>
 ---
- arch/x86/include/asm/jump_label.h | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ arch/x86/include/asm/asm.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/arch/x86/include/asm/jump_label.h b/arch/x86/include/asm/jump_label.h
-index 8c0de4282659..dfdcdc39604a 100644
---- a/arch/x86/include/asm/jump_label.h
-+++ b/arch/x86/include/asm/jump_label.h
-@@ -37,9 +37,9 @@ static __always_inline bool arch_static_branch(struct static_key *key, bool bran
- 		".byte " __stringify(STATIC_KEY_INIT_NOP) "\n\t"
- 		".pushsection __jump_table,  \"aw\" \n\t"
- 		_ASM_ALIGN "\n\t"
--		_ASM_PTR "1b, %l[l_yes], %c0 + %c1 \n\t"
-+		_ASM_PTR "1b, %l[l_yes], %P0 \n\t"
- 		".popsection \n\t"
--		: :  "i" (key), "i" (branch) : : l_yes);
-+		: :  "X" (&((char *)key)[branch]) : : l_yes);
+diff --git a/arch/x86/include/asm/asm.h b/arch/x86/include/asm/asm.h
+index 386a6900e206..653d8b82f015 100644
+--- a/arch/x86/include/asm/asm.h
++++ b/arch/x86/include/asm/asm.h
+@@ -30,6 +30,7 @@
+ #define _ASM_ALIGN	__ASM_SEL(.balign 4, .balign 8)
  
- 	return false;
- l_yes:
-@@ -53,9 +53,9 @@ static __always_inline bool arch_static_branch_jump(struct static_key *key, bool
- 		"2:\n\t"
- 		".pushsection __jump_table,  \"aw\" \n\t"
- 		_ASM_ALIGN "\n\t"
--		_ASM_PTR "1b, %l[l_yes], %c0 + %c1 \n\t"
-+		_ASM_PTR "1b, %l[l_yes], %P0 \n\t"
- 		".popsection \n\t"
--		: :  "i" (key), "i" (branch) : : l_yes);
-+		: :  "X" (&((char *)key)[branch]) : : l_yes);
- 
- 	return false;
- l_yes:
+ #define _ASM_MOV	__ASM_SIZE(mov)
++#define _ASM_MOVABS	__ASM_SEL(movl, movabsq)
+ #define _ASM_INC	__ASM_SIZE(inc)
+ #define _ASM_DEC	__ASM_SIZE(dec)
+ #define _ASM_ADD	__ASM_SIZE(add)
 -- 
 2.16.2.660.g709887971b-goog
