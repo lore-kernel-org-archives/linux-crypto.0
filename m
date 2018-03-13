@@ -1,59 +1,54 @@
-From: James Bottomley <jejb-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org>
-Subject: Re: in-kernel user of ecdsa
-Date: Mon, 12 Mar 2018 14:55:35 -0700
-Message-ID: <1520891735.4522.45.camel@linux.vnet.ibm.com>
-References: <0f698592-8ade-14d4-7891-1c35501c6285@microchip.com>
- <1520878158.4522.31.camel@linux.vnet.ibm.com>
- <31045526.HZb3ddfbbg@tauon.chronox.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: tpmdd-devel-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org, David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
- "bluez mailin list \(linux-bluetooth-u79uwXL29TY76Z2rM5mHXA@public.gmane.org\)"
- <linux-bluetooth-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, linux-security-module-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
- keyrings-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
- Linux Crypto Mailing List <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, dwmw2-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org
-To: Stephan Mueller <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>
-Return-path: <tpmdd-devel-bounces-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org>
-In-Reply-To: <31045526.HZb3ddfbbg-b2PLbiJbNv8ftSvlWXw0+g@public.gmane.org>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/options/tpmdd-devel>,
- <mailto:tpmdd-devel-request-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=tpmdd-devel>
-List-Post: <mailto:tpmdd-devel-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org>
-List-Help: <mailto:tpmdd-devel-request-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/tpmdd-devel>,
- <mailto:tpmdd-devel-request-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org?subject=subscribe>
-Errors-To: tpmdd-devel-bounces-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org
+From: Gregory CLEMENT <gregory.clement@bootlin.com>
+Subject: [PATCH 1/3] crypto: inside-secure - fix clock management
+Date: Tue, 13 Mar 2018 17:48:40 +0100
+Message-ID: <20180313164842.20042-2-gregory.clement@bootlin.com>
+References: <20180313164842.20042-1-gregory.clement@bootlin.com>
+Cc: Jason Cooper <jason@lakedaemon.net>, Andrew Lunn <andrew@lunn.ch>,
+        Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
+        Gregory CLEMENT <gregory.clement@bootlin.com>,
+        Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+        linux-arm-kernel@lists.infradead.org,
+        =?UTF-8?q?Miqu=C3=A8l=20Raynal?= <miquel.raynal@bootlin.com>,
+        Nadav Haklai <nadavh@marvell.com>,
+        Shadi Ammouri <shadi@marvell.com>,
+        Omri Itach <omrii@marvell.com>,
+        Hanna Hawa <hannah@marvell.com>,
+        Igal Liberman <igall@marvell.com>,
+        Marcin Wojtas <mw@semihalf.com>, stable@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>, davem@davemloft.net,
+        linux-crypto@vger.kernel.org,
+        Antoine Tenart <antoine.tenart@bootlin.com>, oferh@marvell.com
+Return-path: <stable-owner@vger.kernel.org>
+In-Reply-To: <20180313164842.20042-1-gregory.clement@bootlin.com>
+Sender: stable-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-T24gTW9uLCAyMDE4LTAzLTEyIGF0IDIwOjU2ICswMTAwLCBTdGVwaGFuIE11ZWxsZXIgd3JvdGU6
-Cj4gQW0gTW9udGFnLCAxMi4gTcOkcnogMjAxOCwgMTk6MDk6MTggQ0VUIHNjaHJpZWIgSmFtZXMg
-Qm90dG9tbGV5Ogo+IAo+IEhpIEphbWVzLAo+IAo+ID4gCj4gPiBPbiBNb24sIDIwMTgtMDMtMTIg
-YXQgMTk6MDcgKzAyMDAsIFR1ZG9yIEFtYmFydXMgd3JvdGU6Cj4gPiA+IAo+ID4gPiBIaSwKPiA+
-ID4gCj4gPiA+IFdvdWxkIHlvdSBjb25zaWRlciB1c2luZyBFQ0RTQSBpbiB0aGUga2VybmVsIG1v
-ZHVsZSBzaWduaW5nCj4gPiA+IGZhY2lsaXR5PyBXaGVuIGNvbXBhcmVkIHdpdGggUlNBLCBFQ0RT
-QSBoYXMgc2hvcnRlciBrZXlzLCB0aGUga2V5Cj4gPiA+IGdlbmVyYXRpb24gcHJvY2VzcyBpcyBm
-YXN0ZXIsIHRoZSBzaWduIG9wZXJhdGlvbiBpcyBmYXN0ZXIsIGJ1dAo+ID4gPiB0aGUgdmVyaWZ5
-IG9wZXJhdGlvbiBpcyBzbG93ZXIgdGhhbiB3aXRoIFJTQS4KPiA+IAo+ID4gWW91IG1pc3NlZCB0
-aGUga2V5cmluZ3MgbGlzdCwgd2hpY2ggaXMgd2hlcmUgdGhlIG1vZHVsZSBzaWduaW5nCj4gPiB1
-dGlsaXR5IGlzIGRpc2N1c3NlZC4KPiA+IAo+ID4gRmlyc3QgcXVlc3Rpb24gaXMsIGhhdmUgeW91
-IGFjdHVhbGx5IHRyaWVkP8KgwqBJdCBsb29rcyBsaWtlIHNpZ24tCj4gPiBmaWxlIGRvZXNuJ3Qg
-ZG8gYW55dGhpbmcgUlNBIHNwZWNpZmljIHNvIGlmIHlvdSBnaXZlIGl0IGFuIEVDIFguNTA5Cj4g
-PiBjZXJ0aWZpY2F0ZSBpdCB3aWxsIHByb2R1Y2UgYW4gRUNEU0Egc2lnbmF0dXJlLgo+ID4gCj4g
-PiBJIHRoaW5rIG91ciBrZXJuZWwgaW50ZXJuYWwgeDUwOSBwYXJzZXJzIGRvbid0IGhhdmUgdGhl
-IEVDIE9JRHMsIHNvCj4gPiBzaWduYXR1cmUgdmVyaWZpY2F0aW9uIHdpbGwgZmFpbDsgYnV0LCBl
-c3BlY2lhbGx5IHNpbmNlIHdlIGhhdmUgdGhlCj4gPiByZXN0IG9mIHRoZSBFQyBtYWNoaW5lcnkg
-aW4gdGhlIGNyeXB0byBzdWJzeXN0ZW0sIHRoYXQgbG9va3MgdG8gYmUKPiA+IHNpbXBseSBmaXhh
-YmxlLgo+IAo+IEVDRFNBIGlzIG5vdCBpbXBsZW1lbnRlZCBjdXJyZW50bHkgaW4gdGhlIGtlcm5l
-bCBjcnlwdG8gQVBJLgoKYW4gRUNEU0Egc2lnbmF0dXJlIGlzIHByb2R1Y2VkIGFzIGEgRUNESCBv
-cGVyYXRpb24gdXNpbmcgdGhlIERTQQphbGdvcml0aG0gaW5zdGVhZCBvZiBLREZlLCBzbyBpdCdz
-IHRyaXZpYWwgd2l0aCB3aGF0IHdlIGhhdmU7IHNpZ25hdHVyZQp2ZXJpZmljYXRpb24gaW52b2x2
-ZXMgYSBzZXBhcmF0ZSBwb2ludCBhZGRpdGlvbiBidXQgd2UgaGF2ZSBhbGwgdGhlCnByaW1pdGl2
-ZXMgZm9yIHRoaXMgaW4gY3J5cHRvL2VjYy5jIHNvIGFkZGluZyBpdCBpc24ndCByZWFsbHkKZGlm
-ZmljdWx0LCBpcyBpdD8KCkphbWVzCgoKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCkNoZWNrIG91dCB0
-aGUgdmlicmFudCB0ZWNoIGNvbW11bml0eSBvbiBvbmUgb2YgdGhlIHdvcmxkJ3MgbW9zdAplbmdh
-Z2luZyB0ZWNoIHNpdGVzLCBTbGFzaGRvdC5vcmchIGh0dHA6Ly9zZG0ubGluay9zbGFzaGRvdApf
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwp0cG1kZC1kZXZl
-bCBtYWlsaW5nIGxpc3QKdHBtZGQtZGV2ZWxAbGlzdHMuc291cmNlZm9yZ2UubmV0Cmh0dHBzOi8v
-bGlzdHMuc291cmNlZm9yZ2UubmV0L2xpc3RzL2xpc3RpbmZvL3RwbWRkLWRldmVsCg==
+In this driver the clock is got but never put when the driver is removed
+or if there is an error in the probe.
+
+Using the managed version of clk_get() allows to let the kernel take care
+of it.
+
+Fixes: 1b44c5a60c13 ("crypto: inside-secure - add SafeXcel EIP197 crypto
+engine driver")
+cc: stable@vger.kernel.org
+Signed-off-by: Gregory CLEMENT <gregory.clement@bootlin.com>
+---
+ drivers/crypto/inside-secure/safexcel.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/inside-secure/safexcel.c
+index 384b4ceb37f0..09adeaa0da6b 100644
+--- a/drivers/crypto/inside-secure/safexcel.c
++++ b/drivers/crypto/inside-secure/safexcel.c
+@@ -881,7 +881,7 @@ static int safexcel_probe(struct platform_device *pdev)
+ 		return PTR_ERR(priv->base);
+ 	}
+ 
+-	priv->clk = of_clk_get(dev->of_node, 0);
++	priv->clk = devm_clk_get(&pdev->dev, NULL);
+ 	if (!IS_ERR(priv->clk)) {
+ 		ret = clk_prepare_enable(priv->clk);
+ 		if (ret) {
+-- 
+2.16.1
