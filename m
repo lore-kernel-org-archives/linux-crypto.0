@@ -1,128 +1,55 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [PATCH] crypto: arm,arm64 - Fix random regeneration of S_shipped
-Date: Wed, 14 Mar 2018 07:45:44 +0000
-Message-ID: <CAKv+Gu85AQPLezV3vs7Nzpd=kOgFrYm9MVY3Axtn6onOtW9WGA@mail.gmail.com>
-References: <db77e20709db11b951a28c3303feb63990ef82d7.1520972030.git.leonard.crestez@nxp.com>
- <CAK7LNARF6vEXVxABcdQtcx0TxNaiX9_vWho1XVG0+51bu05RUg@mail.gmail.com>
+From: Peter Zijlstra <peterz@infradead.org>
+Subject: Re: [PATCH v2 06/27] x86/entry/64: Adapt assembly for PIE support
+Date: Wed, 14 Mar 2018 11:29:51 +0100
+Message-ID: <20180314102951.GQ4043@hirez.programming.kicks-ass.net>
+References: <20180313205945.245105-1-thgarnie@google.com>
+	<20180313205945.245105-7-thgarnie@google.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Leonard Crestez <leonard.crestez@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Russell King <linux@armlinux.org.uk>,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        stable <stable@vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Return-path: <stable-owner@vger.kernel.org>
-In-Reply-To: <CAK7LNARF6vEXVxABcdQtcx0TxNaiX9_vWho1XVG0+51bu05RUg@mail.gmail.com>
-Sender: stable-owner@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Kate Stewart <kstewart@linuxfoundation.org>,
+	Nicolas Pitre <nicolas.pitre@linaro.org>, Michal Hocko <mhocko@suse.com>,
+	Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
+	Petr Mladek <pmladek@suse.com>, Len Brown <len.brown@intel.com>,
+	Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+	Christopher Li <sparse@chrisli.org>,
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	Dominik Brodowski <linux@dominikbrodowski.net>,
+	linux-kernel@vger.kernel.org,
+	Masahiro Yamada <yamada.masahiro@socionext.com>,
+	Pavel Machek <pavel@ucw.cz>, "H . Peter Anvin" <hpa@zytor.com>,
+	kernel-hardening@lists.openwall.com,
+	Christoph Lameter <cl@linux.com>, Jiri Slaby <jslaby@suse.cz>,
+	Alok Kataria <akataria@vmware.com>, linux-doc@vger.kernel.org,
+	linux-arch@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
+	Baoquan He <bhe@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
+	Joerg Roede
+To: Thomas Garnier <thgarnie@google.com>
+Return-path: <virtualization-bounces@lists.linux-foundation.org>
+Content-Disposition: inline
+In-Reply-To: <20180313205945.245105-7-thgarnie@google.com>
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/virtualization>,
+	<mailto:virtualization-request@lists.linux-foundation.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/virtualization/>
+List-Post: <mailto:virtualization@lists.linux-foundation.org>
+List-Help: <mailto:virtualization-request@lists.linux-foundation.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/virtualization>,
+	<mailto:virtualization-request@lists.linux-foundation.org?subject=subscribe>
+Sender: virtualization-bounces@lists.linux-foundation.org
+Errors-To: virtualization-bounces@lists.linux-foundation.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 14 March 2018 at 02:31, Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
-> 2018-03-14 5:17 GMT+09:00 Leonard Crestez <leonard.crestez@nxp.com>:
->> The decision to rebuild .S_shipped is made based on the relative
->> timestamps of .S_shipped and .pl files but git makes this essentially
->> random. This means that the perl script might run anyway (usually at
->> most once per checkout), defeating the whole purpose of _shipped.
->>
->> Fix by skipping the rule unless explicit make variables are provided:
->> REGENERATE_ARM_CRYPTO or REGENERATE_ARM64_CRYPTO.
->>
->> This can produce nasty occasional build failures downstream, for example
->> for toolchains with broken perl. The solution is minimally intrusive to
->> make it easier to push into stable.
->>
->> Another report on a similar issue here: https://lkml.org/lkml/2018/3/8/1379
->>
->> Signed-off-by: Leonard Crestez <leonard.crestez@nxp.com>
->> Cc: <stable@vger.kernel.org>
->> ---
->
->
->
-> Reviewed-by: Masahiro Yamada <yamada.masahiro@socionext.com>
->
+On Tue, Mar 13, 2018 at 01:59:24PM -0700, Thomas Garnier wrote:
+> @@ -1576,7 +1578,9 @@ first_nmi:
+>  	addq	$8, (%rsp)	/* Fix up RSP */
+>  	pushfq			/* RFLAGS */
+>  	pushq	$__KERNEL_CS	/* CS */
+> -	pushq	$1f		/* RIP */
+> +	pushq	%rax		/* Support Position Independent Code */
+> +	leaq	1f(%rip), %rax	/* RIP */
+> +	xchgq	%rax, (%rsp)	/* Restore RAX, put 1f */
+>  	iretq			/* continues at repeat_nmi below */
+>  	UNWIND_HINT_IRET_REGS
+>  1:
 
-Acked-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-
->
->
->>  arch/arm/crypto/Makefile   | 2 ++
->>  arch/arm64/crypto/Makefile | 2 ++
->>  2 files changed, 4 insertions(+)
->>
->> Not clear if this needs to go through crypto or arm but all commits in these
->> directories start with "crypto:".
->>
->> My problems were only on arm64 because of a yocto toolchain which ships a version
->> of perl which fails on "use integer;".
->>
->> CC stable because this can cause trouble for downstream packagers.
->>
->> diff --git a/arch/arm/crypto/Makefile b/arch/arm/crypto/Makefile
->> index 30ef8e2..c9919c2 100644
->> --- a/arch/arm/crypto/Makefile
->> +++ b/arch/arm/crypto/Makefile
->> @@ -47,20 +47,22 @@ sha256-arm-y        := sha256-core.o sha256_glue.o $(sha256-arm-neon-y)
->>  sha512-arm-neon-$(CONFIG_KERNEL_MODE_NEON) := sha512-neon-glue.o
->>  sha512-arm-y   := sha512-core.o sha512-glue.o $(sha512-arm-neon-y)
->>  sha1-arm-ce-y  := sha1-ce-core.o sha1-ce-glue.o
->>  sha2-arm-ce-y  := sha2-ce-core.o sha2-ce-glue.o
->>  aes-arm-ce-y   := aes-ce-core.o aes-ce-glue.o
->>  ghash-arm-ce-y := ghash-ce-core.o ghash-ce-glue.o
->>  crct10dif-arm-ce-y     := crct10dif-ce-core.o crct10dif-ce-glue.o
->>  crc32-arm-ce-y:= crc32-ce-core.o crc32-ce-glue.o
->>  chacha20-neon-y := chacha20-neon-core.o chacha20-neon-glue.o
->>
->> +ifdef REGENERATE_ARM_CRYPTO
->>  quiet_cmd_perl = PERL    $@
->>        cmd_perl = $(PERL) $(<) > $(@)
->>
->>  $(src)/sha256-core.S_shipped: $(src)/sha256-armv4.pl
->>         $(call cmd,perl)
->>
->>  $(src)/sha512-core.S_shipped: $(src)/sha512-armv4.pl
->>         $(call cmd,perl)
->> +endif
->>
->>  .PRECIOUS: $(obj)/sha256-core.S $(obj)/sha512-core.S
->> diff --git a/arch/arm64/crypto/Makefile b/arch/arm64/crypto/Makefile
->> index cee9b8d9..dfe651b 100644
->> --- a/arch/arm64/crypto/Makefile
->> +++ b/arch/arm64/crypto/Makefile
->> @@ -60,20 +60,22 @@ obj-$(CONFIG_CRYPTO_AES_ARM64_BS) += aes-neon-bs.o
->>  aes-neon-bs-y := aes-neonbs-core.o aes-neonbs-glue.o
->>
->>  AFLAGS_aes-ce.o                := -DINTERLEAVE=4
->>  AFLAGS_aes-neon.o      := -DINTERLEAVE=4
->>
->>  CFLAGS_aes-glue-ce.o   := -DUSE_V8_CRYPTO_EXTENSIONS
->>
->>  $(obj)/aes-glue-%.o: $(src)/aes-glue.c FORCE
->>         $(call if_changed_rule,cc_o_c)
->>
->> +ifdef REGENERATE_ARM64_CRYPTO
->>  quiet_cmd_perlasm = PERLASM $@
->>        cmd_perlasm = $(PERL) $(<) void $(@)
->>
->>  $(src)/sha256-core.S_shipped: $(src)/sha512-armv8.pl
->>         $(call cmd,perlasm)
->>
->>  $(src)/sha512-core.S_shipped: $(src)/sha512-armv8.pl
->>         $(call cmd,perlasm)
->> +endif
->>
->>  .PRECIOUS: $(obj)/sha256-core.S $(obj)/sha512-core.S
->> --
->> 2.7.4
->>
->
->
->
-> --
-> Best Regards
-> Masahiro Yamada
+Urgh, xchg with a memop has an implicit LOCK prefix.
