@@ -1,183 +1,121 @@
-From: Thomas Garnier <thgarnie@google.com>
-Subject: [PATCH v2 27/27] x86/kaslr: Add option to extend KASLR
-	range from 1GB to 3GB
-Date: Tue, 13 Mar 2018 13:59:45 -0700
-Message-ID: <20180313205945.245105-28-thgarnie@google.com>
-References: <20180313205945.245105-1-thgarnie@google.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: Re: [PATCH] crypto: arm,arm64 - Fix random regeneration of S_shipped
+Date: Wed, 14 Mar 2018 11:31:47 +0900
+Message-ID: <CAK7LNARF6vEXVxABcdQtcx0TxNaiX9_vWho1XVG0+51bu05RUg@mail.gmail.com>
+References: <db77e20709db11b951a28c3303feb63990ef82d7.1520972030.git.leonard.crestez@nxp.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: linux-arch@vger.kernel.org, kvm@vger.kernel.org, linux-pm@vger.kernel.org,
- x86@kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- virtualization@lists.linux-foundation.org, linux-sparse@vger.kernel.org,
- linux-crypto@vger.kernel.org, kernel-hardening@lists.openwall.com,
- xen-devel@lists.xenproject.org
-To: Herbert Xu <herbert@gondor.apana.org.au>,
- "David S . Miller" <davem@davemloft.net>,
- Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
- "H . Peter Anvin" <hpa@zytor.com>, Peter Zijlstra <peterz@infradead.org>,
- Josh Poimboeuf <jpoimboe@redhat.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Kate Stewart <kstewart@linuxfoundation.org>,
- Thomas Garnier <thgarnie@google.com>, Arnd Bergmann <arnd@arndb.de>,
- Philippe Ombredanne <pombredanne@nexb.com>,
- Arnaldo Carvalho de Melo <acme@redhat.com>,
- Andrey Ryabinin <aryabinin@virtuozzo.com>,
- Matthias Kaehlcke <mka@chromium.org>, Kees Cook <keescook@chromium.org>,
- Tom Lendacky <thomas.lendacky@amd.com>,
- "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
- Andy Lutomirski <luto@kernel.org>,
- Dominik Brodowski <linux@dominikbrodowski.net>,
- Borislav Petkov <bp@alien8.de>, Borislav Petkov <bp@suse.de>,
- "Raf
-Return-path: <xen-devel-bounces@lists.xenproject.org>
-In-Reply-To: <20180313205945.245105-1-thgarnie@google.com>
-List-Unsubscribe: <https://lists.xenproject.org/mailman/options/xen-devel>,
- <mailto:xen-devel-request@lists.xenproject.org?subject=unsubscribe>
-List-Post: <mailto:xen-devel@lists.xenproject.org>
-List-Help: <mailto:xen-devel-request@lists.xenproject.org?subject=help>
-List-Subscribe: <https://lists.xenproject.org/mailman/listinfo/xen-devel>,
- <mailto:xen-devel-request@lists.xenproject.org?subject=subscribe>
-Errors-To: xen-devel-bounces@lists.xenproject.org
-Sender: "Xen-devel" <xen-devel-bounces@lists.xenproject.org>
+Content-Type: text/plain; charset="UTF-8"
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Russell King <linux@armlinux.org.uk>,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        linux-crypto@vger.kernel.org,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        stable <stable@vger.kernel.org>
+To: Leonard Crestez <leonard.crestez@nxp.com>
+Return-path: <stable-owner@vger.kernel.org>
+In-Reply-To: <db77e20709db11b951a28c3303feb63990ef82d7.1520972030.git.leonard.crestez@nxp.com>
+Sender: stable-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-QWRkIGEgbmV3IENPTkZJR19SQU5ET01JWkVfQkFTRV9MQVJHRSBvcHRpb24gdG8gYmVuZWZpdCBm
-cm9tIFBJRQpzdXBwb3J0LiBJdCBpbmNyZWFzZXMgdGhlIEtBU0xSIHJhbmdlIGZyb20gMUdCIHRv
-IDNHQi4gVGhlIG5ldyByYW5nZQpzdGFycyBhdCAweGZmZmZmZmZmMDAwMDAwMDAganVzdCBhYm92
-ZSB0aGUgRUZJIG1lbW9yeSByZWdpb24uIFRoaXMKb3B0aW9uIGlzIG9mZiBieSBkZWZhdWx0LgoK
-VGhlIGJvb3QgY29kZSBpcyBhZGFwdGVkIHRvIGNyZWF0ZSB0aGUgYXBwcm9wcmlhdGUgcGFnZSB0
-YWJsZSBzcGFubmluZwp0aHJlZSBQVUQgcGFnZXMuCgpUaGUgcmVsb2NhdGlvbiB0YWJsZSB1c2Vz
-IDY0LWJpdCBpbnRlZ2VycyBnZW5lcmF0ZWQgd2l0aCB0aGUgdXBkYXRlZApyZWxvY2F0aW9uIHRv
-b2wgd2l0aCB0aGUgbGFyZ2UtcmVsb2Mgb3B0aW9uLgoKU2lnbmVkLW9mZi1ieTogVGhvbWFzIEdh
-cm5pZXIgPHRoZ2FybmllQGdvb2dsZS5jb20+Ci0tLQogYXJjaC94ODYvS2NvbmZpZyAgICAgICAg
-ICAgICAgICAgICAgIHwgMjEgKysrKysrKysrKysrKysrKysrKysrCiBhcmNoL3g4Ni9ib290L2Nv
-bXByZXNzZWQvTWFrZWZpbGUgICAgfCAgNSArKysrKwogYXJjaC94ODYvYm9vdC9jb21wcmVzc2Vk
-L21pc2MuYyAgICAgIHwgMTAgKysrKysrKysrLQogYXJjaC94ODYvaW5jbHVkZS9hc20vcGFnZV82
-NF90eXBlcy5oIHwgIDkgKysrKysrKysrCiBhcmNoL3g4Ni9rZXJuZWwvaGVhZDY0LmMgICAgICAg
-ICAgICAgfCAxNSArKysrKysrKysrKystLS0KIGFyY2gveDg2L2tlcm5lbC9oZWFkXzY0LlMgICAg
-ICAgICAgICB8IDExICsrKysrKysrKystCiA2IGZpbGVzIGNoYW5nZWQsIDY2IGluc2VydGlvbnMo
-KyksIDUgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvYXJjaC94ODYvS2NvbmZpZyBiL2FyY2gv
-eDg2L0tjb25maWcKaW5kZXggNGIxNjE1ZTY2MWQ2Li43ZWE2OWNiMDE1M2YgMTAwNjQ0Ci0tLSBh
-L2FyY2gveDg2L0tjb25maWcKKysrIGIvYXJjaC94ODYvS2NvbmZpZwpAQCAtMjI2MCw2ICsyMjYw
-LDI3IEBAIGNvbmZpZyBYODZfUElFCiAJc2VsZWN0IERZTkFNSUNfTU9EVUxFX0JBU0UKIAlzZWxl
-Y3QgTU9EVUxFX1JFTF9DUkNTIGlmIE1PRFZFUlNJT05TCiAKK2NvbmZpZyBSQU5ET01JWkVfQkFT
-RV9MQVJHRQorCWJvb2wgIkluY3JlYXNlIHRoZSByYW5kb21pemF0aW9uIHJhbmdlIG9mIHRoZSBr
-ZXJuZWwgaW1hZ2UiCisJZGVwZW5kcyBvbiBYODZfNjQgJiYgUkFORE9NSVpFX0JBU0UKKwlzZWxl
-Y3QgWDg2X1BJRQorCXNlbGVjdCBYODZfTU9EVUxFX1BMVFMgaWYgTU9EVUxFUworCWRlZmF1bHQg
-bgorCS0tLWhlbHAtLS0KKwkgIEJ1aWxkIHRoZSBrZXJuZWwgYXMgYSBQb3NpdGlvbiBJbmRlcGVu
-ZGVudCBFeGVjdXRhYmxlIChQSUUpIGFuZAorCSAgaW5jcmVhc2UgdGhlIGF2YWlsYWJsZSByYW5k
-b21pemF0aW9uIHJhbmdlIGZyb20gMUdCIHRvIDNHQi4KKworCSAgVGhpcyBvcHRpb24gaW1wYWN0
-cyBwZXJmb3JtYW5jZSBvbiBrZXJuZWwgQ1BVIGludGVuc2l2ZSB3b3JrbG9hZHMgdXAKKwkgIHRv
-IDEwJSBkdWUgdG8gUElFIGdlbmVyYXRlZCBjb2RlLiBJbXBhY3Qgb24gdXNlci1tb2RlIHByb2Nl
-c3NlcyBhbmQKKwkgIHR5cGljYWwgdXNhZ2Ugd291bGQgYmUgc2lnbmlmaWNhbnRseSBsZXNzICgw
-LjUwJSB3aGVuIHlvdSBidWlsZCB0aGUKKwkgIGtlcm5lbCkuCisKKwkgIFRoZSBrZXJuZWwgYW5k
-IG1vZHVsZXMgd2lsbCBnZW5lcmF0ZSBzbGlnaHRseSBtb3JlIGFzc2VtYmx5ICgxIHRvIDIlCisJ
-ICBpbmNyZWFzZSBvbiB0aGUgLnRleHQgc2VjdGlvbnMpLiBUaGUgdm1saW51eCBiaW5hcnkgd2ls
-bCBiZQorCSAgc2lnbmlmaWNhbnRseSBzbWFsbGVyIGR1ZSB0byBsZXNzIHJlbG9jYXRpb25zLgor
-CisJICBJZiB1bnN1cmUgc2F5IE4KKwogY29uZmlnIEhPVFBMVUdfQ1BVCiAJYm9vbCAiU3VwcG9y
-dCBmb3IgaG90LXBsdWdnYWJsZSBDUFVzIgogCWRlcGVuZHMgb24gU01QCmRpZmYgLS1naXQgYS9h
-cmNoL3g4Ni9ib290L2NvbXByZXNzZWQvTWFrZWZpbGUgYi9hcmNoL3g4Ni9ib290L2NvbXByZXNz
-ZWQvTWFrZWZpbGUKaW5kZXggMWY3MzRjZDk4ZmQzLi5mYjcyZjUzZGVmZDAgMTAwNjQ0Ci0tLSBh
-L2FyY2gveDg2L2Jvb3QvY29tcHJlc3NlZC9NYWtlZmlsZQorKysgYi9hcmNoL3g4Ni9ib290L2Nv
-bXByZXNzZWQvTWFrZWZpbGUKQEAgLTExNiw3ICsxMTYsMTIgQEAgJChvYmopL3ZtbGludXguYmlu
-OiB2bWxpbnV4IEZPUkNFCiAKIHRhcmdldHMgKz0gJChwYXRzdWJzdCAkKG9iaikvJSwlLCQodm1s
-aW51eC1vYmpzLXkpKSB2bWxpbnV4LmJpbi5hbGwgdm1saW51eC5yZWxvY3MKIAorIyBMYXJnZSBy
-YW5kb21pemF0aW9uIHJlcXVpcmUgYmlnZ2VyIHJlbG9jYXRpb24gdGFibGUKK2lmZXEgKCQoQ09O
-RklHX1JBTkRPTUlaRV9CQVNFX0xBUkdFKSx5KQorQ01EX1JFTE9DUyA9IGFyY2gveDg2L3Rvb2xz
-L3JlbG9jcyAtLWxhcmdlLXJlbG9jCitlbHNlCiBDTURfUkVMT0NTID0gYXJjaC94ODYvdG9vbHMv
-cmVsb2NzCitlbmRpZgogcXVpZXRfY21kX3JlbG9jcyA9IFJFTE9DUyAgJEAKICAgICAgIGNtZF9y
-ZWxvY3MgPSAkKENNRF9SRUxPQ1MpICQ8ID4gJEA7JChDTURfUkVMT0NTKSAtLWFicy1yZWxvY3Mg
-JDwKICQob2JqKS92bWxpbnV4LnJlbG9jczogdm1saW51eCBGT1JDRQpkaWZmIC0tZ2l0IGEvYXJj
-aC94ODYvYm9vdC9jb21wcmVzc2VkL21pc2MuYyBiL2FyY2gveDg2L2Jvb3QvY29tcHJlc3NlZC9t
-aXNjLmMKaW5kZXggYjUwYzQyNDU1ZTI1Li43NDZhOTY4NjkwZDUgMTAwNjQ0Ci0tLSBhL2FyY2gv
-eDg2L2Jvb3QvY29tcHJlc3NlZC9taXNjLmMKKysrIGIvYXJjaC94ODYvYm9vdC9jb21wcmVzc2Vk
-L21pc2MuYwpAQCAtMTcwLDEwICsxNzAsMTggQEAgdm9pZCBfX3B1dGhleCh1bnNpZ25lZCBsb25n
-IHZhbHVlKQogfQogCiAjaWYgQ09ORklHX1g4Nl9ORUVEX1JFTE9DUworCisvKiBMYXJnZSByYW5k
-b21pemF0aW9uIGdvIGxvd2VyIHRoYW4gLTJHIGFuZCB1c2UgbGFyZ2UgcmVsb2NhdGlvbiB0YWJs
-ZSAqLworI2lmZGVmIENPTkZJR19SQU5ET01JWkVfQkFTRV9MQVJHRQordHlwZWRlZiBsb25nIHJl
-bF90OworI2Vsc2UKK3R5cGVkZWYgaW50IHJlbF90OworI2VuZGlmCisKIHN0YXRpYyB2b2lkIGhh
-bmRsZV9yZWxvY2F0aW9ucyh2b2lkICpvdXRwdXQsIHVuc2lnbmVkIGxvbmcgb3V0cHV0X2xlbiwK
-IAkJCSAgICAgICB1bnNpZ25lZCBsb25nIHZpcnRfYWRkcikKIHsKLQlpbnQgKnJlbG9jOworCXJl
-bF90ICpyZWxvYzsKIAl1bnNpZ25lZCBsb25nIGRlbHRhLCBtYXAsIHB0cjsKIAl1bnNpZ25lZCBs
-b25nIG1pbl9hZGRyID0gKHVuc2lnbmVkIGxvbmcpb3V0cHV0OwogCXVuc2lnbmVkIGxvbmcgbWF4
-X2FkZHIgPSBtaW5fYWRkciArIChWT19fX2Jzc19zdGFydCAtIFZPX190ZXh0KTsKZGlmZiAtLWdp
-dCBhL2FyY2gveDg2L2luY2x1ZGUvYXNtL3BhZ2VfNjRfdHlwZXMuaCBiL2FyY2gveDg2L2luY2x1
-ZGUvYXNtL3BhZ2VfNjRfdHlwZXMuaAppbmRleCAyYzVhOTY2ZGMyMjIuLjg1ZWE2ODE0MjFkMiAx
-MDA2NDQKLS0tIGEvYXJjaC94ODYvaW5jbHVkZS9hc20vcGFnZV82NF90eXBlcy5oCisrKyBiL2Fy
-Y2gveDg2L2luY2x1ZGUvYXNtL3BhZ2VfNjRfdHlwZXMuaApAQCAtNDYsNyArNDYsMTEgQEAKICNk
-ZWZpbmUgX19QQUdFX09GRlNFVCAgICAgICAgICAgX19QQUdFX09GRlNFVF9CQVNFX0w0CiAjZW5k
-aWYgLyogQ09ORklHX0RZTkFNSUNfTUVNT1JZX0xBWU9VVCAqLwogCisjaWZkZWYgQ09ORklHX1JB
-TkRPTUlaRV9CQVNFX0xBUkdFCisjZGVmaW5lIF9fU1RBUlRfS0VSTkVMX21hcAlfQUMoMHhmZmZm
-ZmZmZjAwMDAwMDAwLCBVTCkKKyNlbHNlCiAjZGVmaW5lIF9fU1RBUlRfS0VSTkVMX21hcAlfQUMo
-MHhmZmZmZmZmZjgwMDAwMDAwLCBVTCkKKyNlbmRpZiAvKiBDT05GSUdfUkFORE9NSVpFX0JBU0Vf
-TEFSR0UgKi8KIAogLyogU2VlIERvY3VtZW50YXRpb24veDg2L3g4Nl82NC9tbS50eHQgZm9yIGEg
-ZGVzY3JpcHRpb24gb2YgdGhlIG1lbW9yeSBtYXAuICovCiAKQEAgLTY0LDkgKzY4LDE0IEBACiAg
-KiA1MTJNaUIgYnkgZGVmYXVsdCwgbGVhdmluZyAxLjVHaUIgZm9yIG1vZHVsZXMgb25jZSB0aGUg
-cGFnZSB0YWJsZXMKICAqIGFyZSBmdWxseSBzZXQgdXAuIElmIGtlcm5lbCBBU0xSIGlzIGNvbmZp
-Z3VyZWQsIGl0IGNhbiBleHRlbmQgdGhlCiAgKiBrZXJuZWwgcGFnZSB0YWJsZSBtYXBwaW5nLCBy
-ZWR1Y2luZyB0aGUgc2l6ZSBvZiB0aGUgbW9kdWxlcyBhcmVhLgorICogT24gUElFLCB3ZSByZWxv
-Y2F0ZSB0aGUgYmluYXJ5IDJHIGxvd2VyIHNvIGFkZCB0aGlzIGV4dHJhIHNwYWNlLgogICovCiAj
-aWYgZGVmaW5lZChDT05GSUdfUkFORE9NSVpFX0JBU0UpCisjaWZkZWYgQ09ORklHX1JBTkRPTUla
-RV9CQVNFX0xBUkdFCisjZGVmaW5lIEtFUk5FTF9JTUFHRV9TSVpFCShfQUMoMywgVUwpICogMTAy
-NCAqIDEwMjQgKiAxMDI0KQorI2Vsc2UKICNkZWZpbmUgS0VSTkVMX0lNQUdFX1NJWkUJKDEwMjQg
-KiAxMDI0ICogMTAyNCkKKyNlbmRpZgogI2Vsc2UKICNkZWZpbmUgS0VSTkVMX0lNQUdFX1NJWkUJ
-KDUxMiAqIDEwMjQgKiAxMDI0KQogI2VuZGlmCmRpZmYgLS1naXQgYS9hcmNoL3g4Ni9rZXJuZWwv
-aGVhZDY0LmMgYi9hcmNoL3g4Ni9rZXJuZWwvaGVhZDY0LmMKaW5kZXggZWE0YzQ5ODM2OWQ4Li41
-NzdiNDczODFiYTIgMTAwNjQ0Ci0tLSBhL2FyY2gveDg2L2tlcm5lbC9oZWFkNjQuYworKysgYi9h
-cmNoL3g4Ni9rZXJuZWwvaGVhZDY0LmMKQEAgLTYzLDYgKzYzLDcgQEAgRVhQT1JUX1NZTUJPTCh2
-bWVtbWFwX2Jhc2UpOwogI2VuZGlmCiAKICNkZWZpbmUgX19oZWFkCV9fc2VjdGlvbiguaGVhZC50
-ZXh0KQorI2RlZmluZSBwdWRfY291bnQoeCkgICAoKCh4ICsgKFBVRF9TSVpFIC0gMSkpICYgfihQ
-VURfU0laRSAtIDEpKSA+PiBQVURfU0hJRlQpCiAKIC8qIFJlcXVpcmVkIGZvciByZWFkX2NyMyB3
-aGVuIGJ1aWxkaW5nIGFzIFBJRSAqLwogdW5zaWduZWQgbG9uZyBfX2ZvcmNlX29yZGVyOwpAQCAt
-MTEyLDYgKzExMyw4IEBAIHVuc2lnbmVkIGxvbmcgX19oZWFkIF9fc3RhcnR1cF82NCh1bnNpZ25l
-ZCBsb25nIHBoeXNhZGRyLAogewogCXVuc2lnbmVkIGxvbmcgbG9hZF9kZWx0YSwgKnA7CiAJdW5z
-aWduZWQgbG9uZyBwZ3RhYmxlX2ZsYWdzOworCXVuc2lnbmVkIGxvbmcgbGV2ZWwzX2tlcm5lbF9z
-dGFydCwgbGV2ZWwzX2tlcm5lbF9jb3VudDsKKwl1bnNpZ25lZCBsb25nIGxldmVsM19maXhtYXBf
-c3RhcnQ7CiAJcGdkdmFsX3QgKnBnZDsKIAlwNGR2YWxfdCAqcDRkOwogCXB1ZHZhbF90ICpwdWQ7
-CkBAIC0xNDIsNiArMTQ1LDExIEBAIHVuc2lnbmVkIGxvbmcgX19oZWFkIF9fc3RhcnR1cF82NCh1
-bnNpZ25lZCBsb25nIHBoeXNhZGRyLAogCS8qIEluY2x1ZGUgdGhlIFNNRSBlbmNyeXB0aW9uIG1h
-c2sgaW4gdGhlIGZpeHVwIHZhbHVlICovCiAJbG9hZF9kZWx0YSArPSBzbWVfZ2V0X21lX21hc2so
-KTsKIAorCS8qIExvb2sgYXQgdGhlIHJhbmRvbWl6YXRpb24gc3ByZWFkIHRvIGFkYXB0IHBhZ2Ug
-dGFibGUgdXNlZCAqLworCWxldmVsM19rZXJuZWxfc3RhcnQgPSBwdWRfaW5kZXgoX19TVEFSVF9L
-RVJORUxfbWFwKTsKKwlsZXZlbDNfa2VybmVsX2NvdW50ID0gcHVkX2NvdW50KEtFUk5FTF9JTUFH
-RV9TSVpFKTsKKwlsZXZlbDNfZml4bWFwX3N0YXJ0ID0gbGV2ZWwzX2tlcm5lbF9zdGFydCArIGxl
-dmVsM19rZXJuZWxfY291bnQ7CisKIAkvKiBGaXh1cCB0aGUgcGh5c2ljYWwgYWRkcmVzc2VzIGlu
-IHRoZSBwYWdlIHRhYmxlICovCiAKIAlwZ2QgPSBmaXh1cF9wb2ludGVyKCZlYXJseV90b3BfcGd0
-LCBwaHlzYWRkcik7CkBAIC0xNTgsOCArMTY2LDkgQEAgdW5zaWduZWQgbG9uZyBfX2hlYWQgX19z
-dGFydHVwXzY0KHVuc2lnbmVkIGxvbmcgcGh5c2FkZHIsCiAJfQogCiAJcHVkID0gZml4dXBfcG9p
-bnRlcigmbGV2ZWwzX2tlcm5lbF9wZ3QsIHBoeXNhZGRyKTsKLQlwdWRbNTEwXSArPSBsb2FkX2Rl
-bHRhOwotCXB1ZFs1MTFdICs9IGxvYWRfZGVsdGE7CisJZm9yIChpID0gMDsgaSA8IGxldmVsM19r
-ZXJuZWxfY291bnQ7IGkrKykKKwkJcHVkW2xldmVsM19rZXJuZWxfc3RhcnQgKyBpXSArPSBsb2Fk
-X2RlbHRhOworCXB1ZFtsZXZlbDNfZml4bWFwX3N0YXJ0XSArPSBsb2FkX2RlbHRhOwogCiAJcG1k
-ID0gZml4dXBfcG9pbnRlcihsZXZlbDJfZml4bWFwX3BndCwgcGh5c2FkZHIpOwogCXBtZFs1MDZd
-ICs9IGxvYWRfZGVsdGE7CkBAIC0yMTQsNyArMjIzLDcgQEAgdW5zaWduZWQgbG9uZyBfX2hlYWQg
-X19zdGFydHVwXzY0KHVuc2lnbmVkIGxvbmcgcGh5c2FkZHIsCiAJICovCiAKIAlwbWQgPSBmaXh1
-cF9wb2ludGVyKGxldmVsMl9rZXJuZWxfcGd0LCBwaHlzYWRkcik7Ci0JZm9yIChpID0gMDsgaSA8
-IFBUUlNfUEVSX1BNRDsgaSsrKSB7CisJZm9yIChpID0gMDsgaSA8IFBUUlNfUEVSX1BNRCAqIGxl
-dmVsM19rZXJuZWxfY291bnQ7IGkrKykgewogCQlpZiAocG1kW2ldICYgX1BBR0VfUFJFU0VOVCkK
-IAkJCXBtZFtpXSArPSBsb2FkX2RlbHRhOwogCX0KZGlmZiAtLWdpdCBhL2FyY2gveDg2L2tlcm5l
-bC9oZWFkXzY0LlMgYi9hcmNoL3g4Ni9rZXJuZWwvaGVhZF82NC5TCmluZGV4IDg3NjI0ZTFmZTIy
-Zi4uYzg2ZDkyNjIwMTVmIDEwMDY0NAotLS0gYS9hcmNoL3g4Ni9rZXJuZWwvaGVhZF82NC5TCisr
-KyBiL2FyY2gveDg2L2tlcm5lbC9oZWFkXzY0LlMKQEAgLTQxLDEyICs0MSwxNiBAQAogCiAjZGVm
-aW5lIGw0X2luZGV4KHgpCSgoKHgpID4+IDM5KSAmIDUxMSkKICNkZWZpbmUgcHVkX2luZGV4KHgp
-CSgoKHgpID4+IFBVRF9TSElGVCkgJiAoUFRSU19QRVJfUFVELTEpKQorI2RlZmluZSBwdWRfY291
-bnQoeCkgICAoKCh4ICsgKFBVRF9TSVpFIC0gMSkpICYgfihQVURfU0laRSAtIDEpKSA+PiBQVURf
-U0hJRlQpCiAKIEw0X1BBR0VfT0ZGU0VUID0gbDRfaW5kZXgoX19QQUdFX09GRlNFVF9CQVNFX0w0
-KQogTDRfU1RBUlRfS0VSTkVMID0gbDRfaW5kZXgoX19TVEFSVF9LRVJORUxfbWFwKQogCiBMM19T
-VEFSVF9LRVJORUwgPSBwdWRfaW5kZXgoX19TVEFSVF9LRVJORUxfbWFwKQogCisvKiBBZGFwdCBw
-YWdlIHRhYmxlIEwzIHNwYWNlIGJhc2VkIG9uIHJhbmdlIG9mIHJhbmRvbWl6YXRpb24gKi8KK0wz
-X0tFUk5FTF9FTlRSWV9DT1VOVCA9IHB1ZF9jb3VudChLRVJORUxfSU1BR0VfU0laRSkKKwogCS50
-ZXh0CiAJX19IRUFECiAJLmNvZGU2NApAQCAtNDM2LDcgKzQ0MCwxMiBAQCBORVhUX1BBR0UobGV2
-ZWw0X2tlcm5lbF9wZ3QpCiBORVhUX1BBR0UobGV2ZWwzX2tlcm5lbF9wZ3QpCiAJLmZpbGwJTDNf
-U1RBUlRfS0VSTkVMLDgsMAogCS8qICgyXjQ4LSgyKjEwMjQqMTAyNCoxMDI0KS0oKDJeMzkpKjUx
-MSkpLygyXjMwKSA9IDUxMCAqLwotCS5xdWFkCWxldmVsMl9rZXJuZWxfcGd0IC0gX19TVEFSVF9L
-RVJORUxfbWFwICsgX0tFUk5QR19UQUJMRV9OT0VOQworCWkgPSAwCisJLnJlcHQJTDNfS0VSTkVM
-X0VOVFJZX0NPVU5UCisJLnF1YWQJbGV2ZWwyX2tlcm5lbF9wZ3QgLSBfX1NUQVJUX0tFUk5FTF9t
-YXAgKyBfS0VSTlBHX1RBQkxFX05PRU5DIFwKKwkJKyBQQUdFX1NJWkUqaQorCWkgPSBpICsgMQor
-CS5lbmRyCiAJLnF1YWQJbGV2ZWwyX2ZpeG1hcF9wZ3QgLSBfX1NUQVJUX0tFUk5FTF9tYXAgKyBf
-UEFHRV9UQUJMRV9OT0VOQwogCiBORVhUX1BBR0UobGV2ZWwyX2tlcm5lbF9wZ3QpCi0tIAoyLjE2
-LjIuNjYwLmc3MDk4ODc5NzFiLWdvb2cKCgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fXwpYZW4tZGV2ZWwgbWFpbGluZyBsaXN0Clhlbi1kZXZlbEBsaXN0cy54
-ZW5wcm9qZWN0Lm9yZwpodHRwczovL2xpc3RzLnhlbnByb2plY3Qub3JnL21haWxtYW4vbGlzdGlu
-Zm8veGVuLWRldmVs
+2018-03-14 5:17 GMT+09:00 Leonard Crestez <leonard.crestez@nxp.com>:
+> The decision to rebuild .S_shipped is made based on the relative
+> timestamps of .S_shipped and .pl files but git makes this essentially
+> random. This means that the perl script might run anyway (usually at
+> most once per checkout), defeating the whole purpose of _shipped.
+>
+> Fix by skipping the rule unless explicit make variables are provided:
+> REGENERATE_ARM_CRYPTO or REGENERATE_ARM64_CRYPTO.
+>
+> This can produce nasty occasional build failures downstream, for example
+> for toolchains with broken perl. The solution is minimally intrusive to
+> make it easier to push into stable.
+>
+> Another report on a similar issue here: https://lkml.org/lkml/2018/3/8/1379
+>
+> Signed-off-by: Leonard Crestez <leonard.crestez@nxp.com>
+> Cc: <stable@vger.kernel.org>
+> ---
+
+
+
+Reviewed-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+
+
+
+>  arch/arm/crypto/Makefile   | 2 ++
+>  arch/arm64/crypto/Makefile | 2 ++
+>  2 files changed, 4 insertions(+)
+>
+> Not clear if this needs to go through crypto or arm but all commits in these
+> directories start with "crypto:".
+>
+> My problems were only on arm64 because of a yocto toolchain which ships a version
+> of perl which fails on "use integer;".
+>
+> CC stable because this can cause trouble for downstream packagers.
+>
+> diff --git a/arch/arm/crypto/Makefile b/arch/arm/crypto/Makefile
+> index 30ef8e2..c9919c2 100644
+> --- a/arch/arm/crypto/Makefile
+> +++ b/arch/arm/crypto/Makefile
+> @@ -47,20 +47,22 @@ sha256-arm-y        := sha256-core.o sha256_glue.o $(sha256-arm-neon-y)
+>  sha512-arm-neon-$(CONFIG_KERNEL_MODE_NEON) := sha512-neon-glue.o
+>  sha512-arm-y   := sha512-core.o sha512-glue.o $(sha512-arm-neon-y)
+>  sha1-arm-ce-y  := sha1-ce-core.o sha1-ce-glue.o
+>  sha2-arm-ce-y  := sha2-ce-core.o sha2-ce-glue.o
+>  aes-arm-ce-y   := aes-ce-core.o aes-ce-glue.o
+>  ghash-arm-ce-y := ghash-ce-core.o ghash-ce-glue.o
+>  crct10dif-arm-ce-y     := crct10dif-ce-core.o crct10dif-ce-glue.o
+>  crc32-arm-ce-y:= crc32-ce-core.o crc32-ce-glue.o
+>  chacha20-neon-y := chacha20-neon-core.o chacha20-neon-glue.o
+>
+> +ifdef REGENERATE_ARM_CRYPTO
+>  quiet_cmd_perl = PERL    $@
+>        cmd_perl = $(PERL) $(<) > $(@)
+>
+>  $(src)/sha256-core.S_shipped: $(src)/sha256-armv4.pl
+>         $(call cmd,perl)
+>
+>  $(src)/sha512-core.S_shipped: $(src)/sha512-armv4.pl
+>         $(call cmd,perl)
+> +endif
+>
+>  .PRECIOUS: $(obj)/sha256-core.S $(obj)/sha512-core.S
+> diff --git a/arch/arm64/crypto/Makefile b/arch/arm64/crypto/Makefile
+> index cee9b8d9..dfe651b 100644
+> --- a/arch/arm64/crypto/Makefile
+> +++ b/arch/arm64/crypto/Makefile
+> @@ -60,20 +60,22 @@ obj-$(CONFIG_CRYPTO_AES_ARM64_BS) += aes-neon-bs.o
+>  aes-neon-bs-y := aes-neonbs-core.o aes-neonbs-glue.o
+>
+>  AFLAGS_aes-ce.o                := -DINTERLEAVE=4
+>  AFLAGS_aes-neon.o      := -DINTERLEAVE=4
+>
+>  CFLAGS_aes-glue-ce.o   := -DUSE_V8_CRYPTO_EXTENSIONS
+>
+>  $(obj)/aes-glue-%.o: $(src)/aes-glue.c FORCE
+>         $(call if_changed_rule,cc_o_c)
+>
+> +ifdef REGENERATE_ARM64_CRYPTO
+>  quiet_cmd_perlasm = PERLASM $@
+>        cmd_perlasm = $(PERL) $(<) void $(@)
+>
+>  $(src)/sha256-core.S_shipped: $(src)/sha512-armv8.pl
+>         $(call cmd,perlasm)
+>
+>  $(src)/sha512-core.S_shipped: $(src)/sha512-armv8.pl
+>         $(call cmd,perlasm)
+> +endif
+>
+>  .PRECIOUS: $(obj)/sha256-core.S $(obj)/sha512-core.S
+> --
+> 2.7.4
+>
+
+
+
+-- 
+Best Regards
+Masahiro Yamada
