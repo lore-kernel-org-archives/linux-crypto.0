@@ -1,7 +1,7 @@
 From: Antoine Tenart <antoine.tenart@bootlin.com>
-Subject: [PATCH 10/12] crypto: inside-secure - the context ipad/opad should use the state sz
-Date: Thu, 15 Mar 2018 16:38:49 +0100
-Message-ID: <20180315153851.9958-11-antoine.tenart@bootlin.com>
+Subject: [PATCH 09/12] crypto: inside-secure - improve the skcipher token
+Date: Thu, 15 Mar 2018 16:38:48 +0100
+Message-ID: <20180315153851.9958-10-antoine.tenart@bootlin.com>
 References: <20180315153851.9958-1-antoine.tenart@bootlin.com>
 Cc: Antoine Tenart <antoine.tenart@bootlin.com>,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -14,37 +14,32 @@ In-Reply-To: <20180315153851.9958-1-antoine.tenart@bootlin.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This patches uses the state size of the algorithms instead of their
-digest size to copy the ipad and opad in the context. This doesn't fix
-anything as the state and digest size are the same for many algorithms,
-and for all the hmac currently supported by this driver. However
-hmac(sha224) use the sha224 hash function which has a different digest
-and state size. This commit prepares the addition of such algorithms.
+The token used for encryption and decryption of skcipher algorithms sets
+its stat field to "last packet". As it's a cipher only algorithm, there
+is not hash operation and thus the "last hash" bit should be set to tell
+the internal engine no hash operation should be performed.
+
+This does not fix a bug, but improves the token definition to follow
+exactly what's advised by the datasheet.
 
 Signed-off-by: Antoine Tenart <antoine.tenart@bootlin.com>
 ---
- drivers/crypto/inside-secure/safexcel_hash.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ drivers/crypto/inside-secure/safexcel_cipher.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/inside-secure/safexcel_hash.c b/drivers/crypto/inside-secure/safexcel_hash.c
-index b9ec82f3dee1..845a5ebf25b4 100644
---- a/drivers/crypto/inside-secure/safexcel_hash.c
-+++ b/drivers/crypto/inside-secure/safexcel_hash.c
-@@ -120,11 +120,11 @@ static void safexcel_context_control(struct safexcel_ahash_ctx *ctx,
- 				ctx->base.ctxr->data[i] = cpu_to_le32(req->processed / blocksize);
- 		}
- 	} else if (req->digest == CONTEXT_CONTROL_DIGEST_HMAC) {
--		cdesc->control_data.control0 |= CONTEXT_CONTROL_SIZE(10);
-+		cdesc->control_data.control0 |= CONTEXT_CONTROL_SIZE(2 * req->state_sz / sizeof(u32));
+diff --git a/drivers/crypto/inside-secure/safexcel_cipher.c b/drivers/crypto/inside-secure/safexcel_cipher.c
+index 17a7725a6f6d..bafb60505fab 100644
+--- a/drivers/crypto/inside-secure/safexcel_cipher.c
++++ b/drivers/crypto/inside-secure/safexcel_cipher.c
+@@ -58,7 +58,8 @@ static void safexcel_cipher_token(struct safexcel_cipher_ctx *ctx,
  
--		memcpy(ctx->base.ctxr->data, ctx->ipad, digestsize);
--		memcpy(ctx->base.ctxr->data + digestsize / sizeof(u32),
--		       ctx->opad, digestsize);
-+		memcpy(ctx->base.ctxr->data, ctx->ipad, req->state_sz);
-+		memcpy(ctx->base.ctxr->data + req->state_sz / sizeof(u32),
-+		       ctx->opad, req->state_sz);
- 	}
- }
- 
+ 	token[0].opcode = EIP197_TOKEN_OPCODE_DIRECTION;
+ 	token[0].packet_length = length;
+-	token[0].stat = EIP197_TOKEN_STAT_LAST_PACKET;
++	token[0].stat = EIP197_TOKEN_STAT_LAST_PACKET |
++			EIP197_TOKEN_STAT_LAST_HASH;
+ 	token[0].instructions = EIP197_TOKEN_INS_LAST |
+ 				EIP197_TOKEN_INS_TYPE_CRYTO |
+ 				EIP197_TOKEN_INS_TYPE_OUTPUT;
 -- 
 2.14.3
