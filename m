@@ -1,7 +1,8 @@
 From: Antoine Tenart <antoine.tenart@bootlin.com>
-Subject: [PATCH 00/12] crypto: inside-secure - hmac(sha256/sha224) support
-Date: Thu, 15 Mar 2018 16:38:39 +0100
-Message-ID: <20180315153851.9958-1-antoine.tenart@bootlin.com>
+Subject: [PATCH 08/12] crypto: inside-secure - do not access buffers mapped to the device
+Date: Thu, 15 Mar 2018 16:38:47 +0100
+Message-ID: <20180315153851.9958-9-antoine.tenart@bootlin.com>
+References: <20180315153851.9958-1-antoine.tenart@bootlin.com>
 Cc: Antoine Tenart <antoine.tenart@bootlin.com>,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         thomas.petazzoni@bootlin.com, maxime.chevallier@bootlin.com,
@@ -9,47 +10,45 @@ Cc: Antoine Tenart <antoine.tenart@bootlin.com>,
         nadavh@marvell.com, oferh@marvell.com, igall@marvell.com
 To: herbert@gondor.apana.org.au, davem@davemloft.net
 Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20180315153851.9958-1-antoine.tenart@bootlin.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi Herbert,
+This patches update the way the digest is copied from the state buffer
+to the result buffer, so that the copy only happen after the state
+buffer was DMA unmapped, as otherwise the buffer would be owned by the
+device.
 
-This series brings hmac(sha256) and hmac(sha224) support to the Inside
-Secure cryptographic engine driver.
+Signed-off-by: Antoine Tenart <antoine.tenart@bootlin.com>
+---
+ drivers/crypto/inside-secure/safexcel_hash.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-The first 10 patches are fixes and reworks needed for the hmac(sha256)
-and hmac(224) support to land in. Then 2 patches adds the 2 new
-algorithms.
-
-This has been tested with boot tests, tcrypt and IPsec traffic. This
-series is a preparation series for more algorithms support (so that
-the series are smaller and easier to review).
-
-Thanks,
-Antoine
-
-Antoine Tenart (11):
-  crypto: inside-secure - move cache result dma mapping to request
-  crypto: inside-secure - wait for the request to complete if in the
-    backlog
-  crypto: inside-secure - move the digest to the request context
-  crypto: inside-secure - fix typo s/allways/always/ in a define
-  crypto: inside-secure - fix a typo in a register name
-  crypto: inside-secure - improve the send error path
-  crypto: inside-secure - do not access buffers mapped to the device
-  crypto: inside-secure - improve the skcipher token
-  crypto: inside-secure - the context ipad/opad should use the state sz
-  crypto: inside-secure - hmac(sha256) support
-  crypto: inside-secure - hmac(sha224) support
-
-Ofer Heifetz (1):
-  crypto: inside-secure - move hash result dma mapping to request
-
- drivers/crypto/inside-secure/safexcel.c        |  27 +--
- drivers/crypto/inside-secure/safexcel.h        |  15 +-
- drivers/crypto/inside-secure/safexcel_cipher.c |   3 +-
- drivers/crypto/inside-secure/safexcel_hash.c   | 248 +++++++++++++++++++------
- 4 files changed, 200 insertions(+), 93 deletions(-)
-
+diff --git a/drivers/crypto/inside-secure/safexcel_hash.c b/drivers/crypto/inside-secure/safexcel_hash.c
+index ef3e0c1c0f2c..b9ec82f3dee1 100644
+--- a/drivers/crypto/inside-secure/safexcel_hash.c
++++ b/drivers/crypto/inside-secure/safexcel_hash.c
+@@ -156,10 +156,6 @@ static int safexcel_handle_req_result(struct safexcel_crypto_priv *priv, int rin
+ 	safexcel_complete(priv, ring);
+ 	spin_unlock_bh(&priv->ring[ring].egress_lock);
+ 
+-	if (sreq->finish)
+-		memcpy(areq->result, sreq->state,
+-		       crypto_ahash_digestsize(ahash));
+-
+ 	if (sreq->nents) {
+ 		dma_unmap_sg(priv->dev, areq->src, sreq->nents, DMA_TO_DEVICE);
+ 		sreq->nents = 0;
+@@ -177,6 +173,10 @@ static int safexcel_handle_req_result(struct safexcel_crypto_priv *priv, int rin
+ 		sreq->cache_dma = 0;
+ 	}
+ 
++	if (sreq->finish)
++		memcpy(areq->result, sreq->state,
++		       crypto_ahash_digestsize(ahash));
++
+ 	cache_len = sreq->len - sreq->processed;
+ 	if (cache_len)
+ 		memcpy(sreq->cache, sreq->cache_next, cache_len);
 -- 
 2.14.3
