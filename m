@@ -1,98 +1,81 @@
-From: Pavel Machek <pavel@ucw.cz>
-Subject: Re: [PATCH v2 00/27] x86: PIE support and option to extend KASLR
-	randomization
-Date: Thu, 15 Mar 2018 09:48:36 +0100
-Message-ID: <20180315084836.GA15953@amd>
-References: <20180313205945.245105-1-thgarnie@google.com>
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [PATCH 00/47] arch-removal: device drivers
+Date: Thu, 15 Mar 2018 10:09:43 +0100
+Message-ID: <CAK8P3a151M35ywHyABt2KFypPaiZROYuL10ztChwjSwqS9haHg@mail.gmail.com>
+References: <20180314153603.3127932-1-arnd@arndb.de>
+ <20180315063238.3303b8d1@bbrezillon>
 Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="===============2098409007256012406=="
-Cc: Kate Stewart <kstewart@linuxfoundation.org>,
-	Nicolas Pitre <nicolas.pitre@linaro.org>, Michal Hocko <mhocko@suse.com>,
-	Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
-	Petr Mladek <pmladek@suse.com>, Len Brown <len.brown@intel.com>,
-	Peter Zijlstra <peterz@infradead.org>, Christopher Li <sparse@chrisli.org>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	Dominik Brodowski <linux@dominikbrodowski.net>,
-	linux-kernel@vger.kernel.org,
-	Masahiro Yamada <yamada.masahiro@socionext.com>,
-	"H . Peter Anvin" <hpa@zytor.com>, kernel-hardening@lists.openwall.com,
-	Christoph Lameter <cl@linux.com>, Jiri Slaby <jslaby@suse.cz>,
-	Alok Kataria <akataria@vmware.com>, linux-doc@vger.kernel.org,
-	linux-arch@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
-	Baoquan He <bhe@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
-	Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-	Ra
-To: Thomas Garnier <thgarnie@google.com>
-Return-path: <virtualization-bounces@lists.linux-foundation.org>
-In-Reply-To: <20180313205945.245105-1-thgarnie@google.com>
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/virtualization>,
-	<mailto:virtualization-request@lists.linux-foundation.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/virtualization/>
-List-Post: <mailto:virtualization@lists.linux-foundation.org>
-List-Help: <mailto:virtualization-request@lists.linux-foundation.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/virtualization>,
-	<mailto:virtualization-request@lists.linux-foundation.org?subject=subscribe>
-Sender: virtualization-bounces@lists.linux-foundation.org
-Errors-To: virtualization-bounces@lists.linux-foundation.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Ulf Hansson <ulf.hansson@linaro.org>, linux-usb@vger.kernel.org,
+ Wolfram Sang <wsa@the-dreams.de>, linux-iio@vger.kernel.org,
+ Viresh Kumar <viresh.kumar@linaro.org>,
+ Linus Walleij <linus.walleij@linaro.org>,
+ Alexandre Belloni <alexandre.belloni@bootlin.com>,
+ IDE-ML <linux-ide@vger.kernel.org>, Networking <netdev@vger.kernel.org>,
+ linux-mtd <linux-mtd@lists.infradead.org>, linux-i2c@vger.kernel.org,
+ linux-rtc@vger.kernel.org, Lars-Peter Clausen <lars@metafoo.de>,
+ Herbert Xu <herbert@gondor.apana.org.au>, Jonathan Corbet <corbet@lwn.net>,
+ "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+ Alan Stern <stern@rowland.harvard.edu>, linux-serial@vger.kernel.org,
+ Jiri Slaby <jslaby@suse.com>, linux-mmc <linux-mmc@vger.kernel.org>,
+ Shaohua Li <shli@kernel.org>, wg@grandegger.com,
+ "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+ <linux-crypto@vger.kernel.org>, linux-pwm@vger
+To: Boris Brezillon <boris.brezillon@bootlin.com>
+Return-path: <linux-mtd-bounces+gldm-linux-mtd-36=gmane.org@lists.infradead.org>
+In-Reply-To: <20180315063238.3303b8d1@bbrezillon>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-mtd>,
+ <mailto:linux-mtd-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-mtd/>
+List-Post: <mailto:linux-mtd@lists.infradead.org>
+List-Help: <mailto:linux-mtd-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-mtd>,
+ <mailto:linux-mtd-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-mtd" <linux-mtd-bounces@lists.infradead.org>
+Errors-To: linux-mtd-bounces+gldm-linux-mtd-36=gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
+On Thu, Mar 15, 2018 at 6:32 AM, Boris Brezillon
+<boris.brezillon@bootlin.com> wrote:
+> Hi Arnd,
+>
+> On Wed, 14 Mar 2018 16:35:13 +0100
+> Arnd Bergmann <arnd@arndb.de> wrote:
+>
+>> Hi driver maintainers,
+>>
+>> I just posted one series with the removal of eight architectures,
+>> see https://lkml.org/lkml/2018/3/14/505 for details, or
+>> https://lwn.net/Articles/748074/ for more background.
+>>
+>> These are the device drivers that go along with them. I have already
+>> picked up the drivers for arch/metag/ into my tree, they were reviewed
+>> earlier.
+>>
+>> Please let me know if you have any concerns with the patch, or if you
+>> prefer to pick up the patches in your respective trees.  I created
+>> the patches with 'git format-patch -D', so they will not apply without
+>> manually removing those files.
+>>
+>> For anything else, I'd keep the removal patches in my asm-generic tree
+>> and will send a pull request for 4.17 along with the actual arch removal.
+>>
 
---===============2098409007256012406==
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="0OAP2g/MAC+5xKAE"
-Content-Disposition: inline
+>
+> If you don't mind, I'd like to take the mtd patches through the MTD
+> tree. As you've probably noticed, nand code has been moved around and
+> it's easier for me to carry those 2 simple changes in my tree than
+> creating an immutable branch.
+>
+> Let me know if this is a problem.
 
+Sounds good, I've removed the two patches from my tree now.
+I've already sent a version of those that is based on your latest tree to
+you for inclusion.
 
---0OAP2g/MAC+5xKAE
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+      Arnd
 
-Hi!
-
-> These patches make the changes necessary to build the kernel as Position
-> Independent Executable (PIE) on x86_64. A PIE kernel can be relocated bel=
-ow
-> the top 2G of the virtual address space. It allows to optionally extend t=
-he
-> KASLR randomization range from 1G to 3G.
-
-Would you explain why PIE code is good idea?
-
-You are adding less than 2 bits of randomness. Cost is new config
-option, some size and performance impact, and more than 1000 lines of
-code...
-
-Is there some grand plan of adding 30 more bits of randomness with
-future patch or something?
-									Pavel
---=20
-(english) http://www.livejournal.com/~pavelmachek
-(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blo=
-g.html
-
---0OAP2g/MAC+5xKAE
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
-
-iEYEARECAAYFAlqqM2QACgkQMOfwapXb+vIPUQCgiwtu3igz+Mea6JgZEWaFBEa4
-DdUAn1zcqcTDjpsItrwfFnQZ9XU/fRNQ
-=OpfY
------END PGP SIGNATURE-----
-
---0OAP2g/MAC+5xKAE--
-
---===============2098409007256012406==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-_______________________________________________
-Virtualization mailing list
-Virtualization@lists.linux-foundation.org
-https://lists.linuxfoundation.org/mailman/listinfo/virtualization
---===============2098409007256012406==--
+______________________________________________________
+Linux MTD discussion mailing list
+http://lists.infradead.org/mailman/listinfo/linux-mtd/
