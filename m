@@ -1,7 +1,7 @@
 From: Antoine Tenart <antoine.tenart@bootlin.com>
-Subject: [PATCH 02/12] crypto: inside-secure - move cache result dma mapping to request
-Date: Thu, 15 Mar 2018 16:38:41 +0100
-Message-ID: <20180315153851.9958-3-antoine.tenart@bootlin.com>
+Subject: [PATCH 07/12] crypto: inside-secure - improve the send error path
+Date: Thu, 15 Mar 2018 16:38:46 +0100
+Message-ID: <20180315153851.9958-8-antoine.tenart@bootlin.com>
 References: <20180315153851.9958-1-antoine.tenart@bootlin.com>
 Cc: Antoine Tenart <antoine.tenart@bootlin.com>,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -14,150 +14,46 @@ In-Reply-To: <20180315153851.9958-1-antoine.tenart@bootlin.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-In heavy traffic the DMA mapping is overwritten by multiple requests as
-the DMA address is stored in a global context. This patch moves this
-information to the per-hash request context so that it can't be
-overwritten.
+This patch improves the send error path as it wasn't handling all error
+cases. A new label is added, and some of the goto are updated to point
+to the right labels, so that the code is more robust to errors.
 
-As now the cache is directly mapped from safexcel_ahash_req, it's not
-dynamically allocated anymore.
-
-Fixes: 1b44c5a60c13 ("crypto: inside-secure - add SafeXcel EIP197 crypto engine driver")
 Signed-off-by: Antoine Tenart <antoine.tenart@bootlin.com>
 ---
- drivers/crypto/inside-secure/safexcel.c      | 14 ----------
- drivers/crypto/inside-secure/safexcel.h      |  7 -----
- drivers/crypto/inside-secure/safexcel_hash.c | 42 ++++++++++++----------------
- 3 files changed, 18 insertions(+), 45 deletions(-)
+ drivers/crypto/inside-secure/safexcel_hash.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/inside-secure/safexcel.c
-index 0c33bdbe48fc..384b4ceb37f0 100644
---- a/drivers/crypto/inside-secure/safexcel.c
-+++ b/drivers/crypto/inside-secure/safexcel.c
-@@ -537,20 +537,6 @@ void safexcel_dequeue(struct safexcel_crypto_priv *priv, int ring)
- 	       EIP197_HIA_CDR(priv, ring) + EIP197_HIA_xDR_PREP_COUNT);
- }
- 
--void safexcel_free_context(struct safexcel_crypto_priv *priv,
--			   struct crypto_async_request *req)
--{
--	struct safexcel_context *ctx = crypto_tfm_ctx(req->tfm);
--
--	if (ctx->cache) {
--		dma_unmap_single(priv->dev, ctx->cache_dma, ctx->cache_sz,
--				 DMA_TO_DEVICE);
--		kfree(ctx->cache);
--		ctx->cache = NULL;
--		ctx->cache_sz = 0;
--	}
--}
--
- void safexcel_complete(struct safexcel_crypto_priv *priv, int ring)
- {
- 	struct safexcel_command_desc *cdesc;
-diff --git a/drivers/crypto/inside-secure/safexcel.h b/drivers/crypto/inside-secure/safexcel.h
-index 4e14c7e730c4..d8dff65fc311 100644
---- a/drivers/crypto/inside-secure/safexcel.h
-+++ b/drivers/crypto/inside-secure/safexcel.h
-@@ -578,11 +578,6 @@ struct safexcel_context {
- 	int ring;
- 	bool needs_inv;
- 	bool exit_inv;
--
--	/* Used for ahash requests */
--	void *cache;
--	dma_addr_t cache_dma;
--	unsigned int cache_sz;
- };
- 
- /*
-@@ -606,8 +601,6 @@ struct safexcel_inv_result {
- 
- void safexcel_dequeue(struct safexcel_crypto_priv *priv, int ring);
- void safexcel_complete(struct safexcel_crypto_priv *priv, int ring);
--void safexcel_free_context(struct safexcel_crypto_priv *priv,
--				  struct crypto_async_request *req);
- int safexcel_invalidate_cache(struct crypto_async_request *async,
- 			      struct safexcel_crypto_priv *priv,
- 			      dma_addr_t ctxr_dma, int ring,
 diff --git a/drivers/crypto/inside-secure/safexcel_hash.c b/drivers/crypto/inside-secure/safexcel_hash.c
-index e33f089185d6..4953a2a86c10 100644
+index bb2be12a8f4a..ef3e0c1c0f2c 100644
 --- a/drivers/crypto/inside-secure/safexcel_hash.c
 +++ b/drivers/crypto/inside-secure/safexcel_hash.c
-@@ -43,6 +43,9 @@ struct safexcel_ahash_req {
- 	u64 processed;
+@@ -279,7 +279,7 @@ static int safexcel_ahash_send_req(struct crypto_async_request *async, int ring,
+ 					   sglen, len, ctx->base.ctxr_dma);
+ 		if (IS_ERR(cdesc)) {
+ 			ret = PTR_ERR(cdesc);
+-			goto cdesc_rollback;
++			goto unmap_sg;
+ 		}
+ 		n_cdesc++;
  
- 	u8 cache[SHA256_BLOCK_SIZE] __aligned(sizeof(u32));
-+	dma_addr_t cache_dma;
-+	unsigned int cache_sz;
-+
- 	u8 cache_next[SHA256_BLOCK_SIZE] __aligned(sizeof(u32));
- };
- 
-@@ -165,7 +168,11 @@ static int safexcel_handle_req_result(struct safexcel_crypto_priv *priv, int rin
- 		sreq->result_dma = 0;
+@@ -303,7 +303,7 @@ static int safexcel_ahash_send_req(struct crypto_async_request *async, int ring,
+ 					 DMA_FROM_DEVICE);
+ 	if (dma_mapping_error(priv->dev, req->result_dma)) {
+ 		ret = -EINVAL;
+-		goto cdesc_rollback;
++		goto unmap_sg;
  	}
  
--	safexcel_free_context(priv, async);
-+	if (sreq->cache_dma) {
-+		dma_unmap_single(priv->dev, sreq->cache_dma, sreq->cache_sz,
-+				 DMA_TO_DEVICE);
-+		sreq->cache_dma = 0;
-+	}
+ 	/* Add a result descriptor */
+@@ -324,6 +324,9 @@ static int safexcel_ahash_send_req(struct crypto_async_request *async, int ring,
+ 	return 0;
  
- 	cache_len = sreq->len - sreq->processed;
- 	if (cache_len)
-@@ -227,24 +234,15 @@ static int safexcel_ahash_send_req(struct crypto_async_request *async, int ring,
- 
- 	/* Add a command descriptor for the cached data, if any */
- 	if (cache_len) {
--		ctx->base.cache = kzalloc(cache_len, EIP197_GFP_FLAGS(*async));
--		if (!ctx->base.cache) {
--			ret = -ENOMEM;
--			goto unlock;
--		}
--		memcpy(ctx->base.cache, req->cache, cache_len);
--		ctx->base.cache_dma = dma_map_single(priv->dev, ctx->base.cache,
--						     cache_len, DMA_TO_DEVICE);
--		if (dma_mapping_error(priv->dev, ctx->base.cache_dma)) {
--			ret = -EINVAL;
--			goto free_cache;
--		}
-+		req->cache_dma = dma_map_single(priv->dev, req->cache,
-+						cache_len, DMA_TO_DEVICE);
-+		if (dma_mapping_error(priv->dev, req->cache_dma))
-+			return -EINVAL;
- 
--		ctx->base.cache_sz = cache_len;
-+		req->cache_sz = cache_len;
- 		first_cdesc = safexcel_add_cdesc(priv, ring, 1,
- 						 (cache_len == len),
--						 ctx->base.cache_dma,
--						 cache_len, len,
-+						 req->cache_dma, cache_len, len,
- 						 ctx->base.ctxr_dma);
- 		if (IS_ERR(first_cdesc)) {
- 			ret = PTR_ERR(first_cdesc);
-@@ -328,16 +326,12 @@ static int safexcel_ahash_send_req(struct crypto_async_request *async, int ring,
+ unmap_result:
++	dma_unmap_single(priv->dev, req->result_dma, req->state_sz,
++			 DMA_FROM_DEVICE);
++unmap_sg:
+ 	dma_unmap_sg(priv->dev, areq->src, req->nents, DMA_TO_DEVICE);
+ cdesc_rollback:
  	for (i = 0; i < n_cdesc; i++)
- 		safexcel_ring_rollback_wptr(priv, &priv->ring[ring].cdr);
- unmap_cache:
--	if (ctx->base.cache_dma) {
--		dma_unmap_single(priv->dev, ctx->base.cache_dma,
--				 ctx->base.cache_sz, DMA_TO_DEVICE);
--		ctx->base.cache_sz = 0;
-+	if (req->cache_dma) {
-+		dma_unmap_single(priv->dev, req->cache_dma, req->cache_sz,
-+				 DMA_TO_DEVICE);
-+		req->cache_sz = 0;
- 	}
--free_cache:
--	kfree(ctx->base.cache);
--	ctx->base.cache = NULL;
- 
--unlock:
- 	spin_unlock_bh(&priv->ring[ring].egress_lock);
- 	return ret;
- }
 -- 
 2.14.3
