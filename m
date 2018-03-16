@@ -1,7 +1,7 @@
 From: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
-Subject: [PATCH v6 06/12] integrity: Introduce asymmetric_sig_has_known_key()
-Date: Fri, 16 Mar 2018 17:38:31 -0300
-Message-ID: <20180316203837.10174-7-bauerman@linux.vnet.ibm.com>
+Subject: [PATCH v6 08/12] ima: Export func_tokens
+Date: Fri, 16 Mar 2018 17:38:33 -0300
+Message-ID: <20180316203837.10174-9-bauerman@linux.vnet.ibm.com>
 References: <20180316203837.10174-1-bauerman@linux.vnet.ibm.com>
 Cc: linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
         linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
@@ -23,113 +23,54 @@ In-Reply-To: <20180316203837.10174-1-bauerman@linux.vnet.ibm.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-IMA will only look for a modsig if the xattr sig references a key which is
-not in the expected kernel keyring. To that end, introduce
-asymmetric_sig_has_known_key().
-
-The logic of extracting the key used in the xattr sig is factored out from
-asymmetric_verify() so that it can be used by the new function.
+ima_read_modsig() will need it so that it can show an error message.
 
 Signed-off-by: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
 ---
- security/integrity/digsig_asymmetric.c | 44 +++++++++++++++++++++++++---------
- security/integrity/integrity.h         |  8 +++++++
- 2 files changed, 41 insertions(+), 11 deletions(-)
+ security/integrity/ima/ima.h        |  2 ++
+ security/integrity/ima/ima_policy.c | 12 ++++++------
+ 2 files changed, 8 insertions(+), 6 deletions(-)
 
-diff --git a/security/integrity/digsig_asymmetric.c b/security/integrity/digsig_asymmetric.c
-index ab6a029062a1..241647970c19 100644
---- a/security/integrity/digsig_asymmetric.c
-+++ b/security/integrity/digsig_asymmetric.c
-@@ -79,26 +79,48 @@ static struct key *request_asymmetric_key(struct key *keyring, uint32_t keyid)
- 	return key;
+diff --git a/security/integrity/ima/ima.h b/security/integrity/ima/ima.h
+index 4bafa6a97967..99f2bab15009 100644
+--- a/security/integrity/ima/ima.h
++++ b/security/integrity/ima/ima.h
+@@ -196,6 +196,8 @@ enum ima_hooks {
+ 	__ima_hooks(__ima_hook_enumify)
+ };
+ 
++extern const char *const func_tokens[];
++
+ /* LIM API function definitions */
+ int ima_get_action(struct inode *inode, const struct cred *cred, u32 secid,
+ 		   int mask, enum ima_hooks func, int *pcr);
+diff --git a/security/integrity/ima/ima_policy.c b/security/integrity/ima/ima_policy.c
+index 51a4cd999a49..833da24c7009 100644
+--- a/security/integrity/ima/ima_policy.c
++++ b/security/integrity/ima/ima_policy.c
+@@ -992,6 +992,12 @@ void ima_delete_rules(void)
+ 	}
  }
  
--int asymmetric_verify(struct key *keyring, const char *sig,
--		      int siglen, const char *data, int datalen)
-+static struct key *asymmetric_key_from_sig(struct key *keyring, const char *sig,
-+					   int siglen)
++#define __ima_hook_stringify(str)	(#str),
++
++const char *const func_tokens[] = {
++	__ima_hooks(__ima_hook_stringify)
++};
++
+ #ifdef	CONFIG_IMA_READ_POLICY
+ enum {
+ 	mask_exec = 0, mask_write, mask_read, mask_append
+@@ -1004,12 +1010,6 @@ static const char *const mask_tokens[] = {
+ 	"MAY_APPEND"
+ };
+ 
+-#define __ima_hook_stringify(str)	(#str),
+-
+-static const char *const func_tokens[] = {
+-	__ima_hooks(__ima_hook_stringify)
+-};
+-
+ void *ima_policy_start(struct seq_file *m, loff_t *pos)
  {
--	struct public_key_signature pks;
--	struct signature_v2_hdr *hdr = (struct signature_v2_hdr *)sig;
--	struct key *key;
--	int ret = -ENOMEM;
-+	const struct signature_v2_hdr *hdr = (struct signature_v2_hdr *) sig;
- 
- 	if (siglen <= sizeof(*hdr))
--		return -EBADMSG;
-+		return ERR_PTR(-EBADMSG);
- 
- 	siglen -= sizeof(*hdr);
- 
- 	if (siglen != be16_to_cpu(hdr->sig_size))
--		return -EBADMSG;
-+		return ERR_PTR(-EBADMSG);
- 
- 	if (hdr->hash_algo >= HASH_ALGO__LAST)
--		return -ENOPKG;
-+		return ERR_PTR(-ENOPKG);
-+
-+	return request_asymmetric_key(keyring, be32_to_cpu(hdr->keyid));
-+}
-+
-+bool asymmetric_sig_has_known_key(struct key *keyring, const char *sig,
-+				  int siglen)
-+{
-+	struct key *key;
-+
-+	key = asymmetric_key_from_sig(keyring, sig, siglen);
-+	if (IS_ERR_OR_NULL(key))
-+		return false;
-+
-+	key_put(key);
-+
-+	return true;
-+}
-+
-+int asymmetric_verify(struct key *keyring, const char *sig,
-+		      int siglen, const char *data, int datalen)
-+{
-+	struct public_key_signature pks;
-+	struct signature_v2_hdr *hdr = (struct signature_v2_hdr *)sig;
-+	struct key *key;
-+	int ret = -ENOMEM;
- 
--	key = request_asymmetric_key(keyring, be32_to_cpu(hdr->keyid));
-+	key = asymmetric_key_from_sig(keyring, sig, siglen);
- 	if (IS_ERR(key))
- 		return PTR_ERR(key);
- 
-@@ -109,7 +131,7 @@ int asymmetric_verify(struct key *keyring, const char *sig,
- 	pks.digest = (u8 *)data;
- 	pks.digest_size = datalen;
- 	pks.s = hdr->sig;
--	pks.s_size = siglen;
-+	pks.s_size = siglen - sizeof(*hdr);
- 	ret = verify_signature(key, &pks);
- 	key_put(key);
- 	pr_debug("%s() = %d\n", __func__, ret);
-diff --git a/security/integrity/integrity.h b/security/integrity/integrity.h
-index 2d245f44ca26..4c381b992e11 100644
---- a/security/integrity/integrity.h
-+++ b/security/integrity/integrity.h
-@@ -179,12 +179,20 @@ static inline int integrity_init_keyring(const unsigned int id)
- #ifdef CONFIG_INTEGRITY_ASYMMETRIC_KEYS
- int asymmetric_verify(struct key *keyring, const char *sig,
- 		      int siglen, const char *data, int datalen);
-+bool asymmetric_sig_has_known_key(struct key *keyring, const char *sig,
-+				  int siglen);
- #else
- static inline int asymmetric_verify(struct key *keyring, const char *sig,
- 				    int siglen, const char *data, int datalen)
- {
- 	return -EOPNOTSUPP;
- }
-+
-+static inline bool asymmetric_sig_has_known_key(struct key *keyring,
-+						const char *sig, int siglen)
-+{
-+	return false;
-+}
- #endif
- 
- #ifdef CONFIG_IMA_LOAD_X509
+ 	loff_t l = *pos;
