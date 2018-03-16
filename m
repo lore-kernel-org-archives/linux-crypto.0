@@ -1,28 +1,35 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2] crypto: hash.h: Prevent use of req->result in ahash
- update
-Date: Fri, 16 Mar 2018 23:56:10 +0800
-Message-ID: <20180316155610.GG7095@gondor.apana.org.au>
-References: <CGME20180307104934eucas1p18af0e65a519299997b5d2f7fb78cd39f@eucas1p1.samsung.com>
- <7850c31c-8703-51fb-0710-3b4920935bfc@partner.samsung.com>
+Subject: Re: [PATCH] crypto: virtio - remove dependency on CRYPTO_AUTHENC
+Date: Fri, 16 Mar 2018 23:56:01 +0800
+Message-ID: <20180316155601.GF7095@gondor.apana.org.au>
+References: <20180306235315.11550-1-peter@lekensteyn.nl>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Kamil Konieczny <k.konieczny@partner.samsung.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: virtualization@lists.linux-foundation.org, linux-crypto@vger.kernel.org,
+	"Michael S . Tsirkin" <mst@redhat.com>
+To: Peter Wu <peter@lekensteyn.nl>
+Return-path: <virtualization-bounces@lists.linux-foundation.org>
 Content-Disposition: inline
-In-Reply-To: <7850c31c-8703-51fb-0710-3b4920935bfc@partner.samsung.com>
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <20180306235315.11550-1-peter@lekensteyn.nl>
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/virtualization>,
+	<mailto:virtualization-request@lists.linux-foundation.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/virtualization/>
+List-Post: <mailto:virtualization@lists.linux-foundation.org>
+List-Help: <mailto:virtualization-request@lists.linux-foundation.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/virtualization>,
+	<mailto:virtualization-request@lists.linux-foundation.org?subject=subscribe>
+Sender: virtualization-bounces@lists.linux-foundation.org
+Errors-To: virtualization-bounces@lists.linux-foundation.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Mar 07, 2018 at 11:49:33AM +0100, Kamil Konieczny wrote:
-> Prevent improper use of req->result field in ahash update, init, export and
-> import functions in drivers code. A driver should use ahash request context
-> if it needs to save internal state.
+On Wed, Mar 07, 2018 at 12:53:15AM +0100, Peter Wu wrote:
+> virtio_crypto does not use function crypto_authenc_extractkeys, remove
+> this unnecessary dependency. Compiles fine and passes cryptodev-linux
+> cipher and speed tests from https://wiki.qemu.org/Features/VirtioCrypto
 > 
-> Signed-off-by: Kamil Konieczny <k.konieczny@partner.samsung.com>
+> Fixes: dbaf0624ffa5 ("crypto: add virtio-crypto driver")
+> Signed-off-by: Peter Wu <peter@lekensteyn.nl>
 
 Patch applied.  Thanks.
 -- 
