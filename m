@@ -1,50 +1,51 @@
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Subject: [PATCH v2 02/21] ata: Remove depends on HAS_DMA in case of platform
- dependency
-Date: Fri, 16 Mar 2018 14:51:35 +0100
-Message-ID: <1521208314-4783-3-git-send-email-geert@linux-m68k.org>
+From: Geert Uytterhoeven <geert-Td1EMuHUCqxL1ZNQvxDV9g@public.gmane.org>
+Subject: [PATCH v2 09/21] iommu: Remove depends on HAS_DMA in case of platform
+	dependency
+Date: Fri, 16 Mar 2018 14:51:42 +0100
+Message-ID: <1521208314-4783-10-git-send-email-geert@linux-m68k.org>
 References: <1521208314-4783-1-git-send-email-geert@linux-m68k.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Cc: alsa-devel@alsa-project.org, linux-iio@vger.kernel.org,
- linux-fpga@vger.kernel.org, linux-remoteproc@vger.kernel.org,
- linux-fbdev@vger.kernel.org, linux-ide@vger.kernel.org,
- linux-mtd@lists.infradead.org, linux-i2c@vger.kernel.org,
- linux1394-devel@lists.sourceforge.net, devel@driverdev.osuosl.org,
- linux-scsi@vger.kernel.org, Geert Uytterhoeven <geert@linux-m68k.org>,
- linux-serial@vger.kernel.org, linux-media@vger.kernel.org,
- linux-block@vger.kernel.org, netdev@vger.kernel.org, linux-usb@vger.kernel.org,
- linux-mmc@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-spi@vger.kernel.org, iommu@lists.linux-foundation.org,
- linux-crypto@vger.kernel.org
-To: Christoph Hellwig <hch@lst.de>,
- Marek Szyprowski <m.szyprowski@samsung.com>,
- Robin Murphy <robin.murphy@arm.com>, Felipe Balbi <balbi@kernel.org>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
- "Martin K . Petersen" <martin.petersen@oracle.com>,
- Andrew Morton <akpm@linux-foundation.org>, Mark Brown <broonie@kernel.org>,
- Liam Girdwood <lgirdwood@gmail.com>, Tejun Heo <tj@kernel.org>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- "David S . Miller" <davem@davemloft.net>,
- Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
- Stefan Richter <stefanr@s5r6.in-berlin.de>, Alan Tull <atull@kernel.org>,
- Moritz Fischer <mdf@kernel.org>, Wolfram Sang <wsa@the-dreams.de>,
- Jonathan Cameron <jic23@kernel.org>, Joerg Roedel <joro@8bytes.org>,
- Matias Bjorling <mb@lightnvm.io>, Jassi Brar <jassisinghbrar@gmail.com>,
- Mauro Carvalho Cheh
-Return-path: <linux-mtd-bounces+gldm-linux-mtd-36=gmane.org@lists.infradead.org>
-In-Reply-To: <1521208314-4783-1-git-send-email-geert@linux-m68k.org>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-mtd>,
- <mailto:linux-mtd-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-mtd/>
-List-Post: <mailto:linux-mtd@lists.infradead.org>
-List-Help: <mailto:linux-mtd-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-mtd>,
- <mailto:linux-mtd-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-mtd" <linux-mtd-bounces@lists.infradead.org>
-Errors-To: linux-mtd-bounces+gldm-linux-mtd-36=gmane.org@lists.infradead.org
+Cc: alsa-devel-K7yf7f+aM1XWsZ/bQMPhNw@public.gmane.org, linux-iio-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-fpga-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-remoteproc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-fbdev-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-ide-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-mtd-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-i2c-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux1394-devel-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org,
+	devel-gWbeCf7V1WCQmaza687I9mD2FQJk+8+b@public.gmane.org, linux-scsi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Geert Uytterhoeven <geert-Td1EMuHUCqxL1ZNQvxDV9g@public.gmane.org>,
+	linux-serial-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-media-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-block-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, netdev-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-usb-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-mmc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-spi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Christoph Hellwig <hch-jcswGhMUV9g@public.gmane.org>,
+	Marek Szyprowski <m.szyprowski-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>,
+	Robin Murphy <robin.murphy-5wv7dgnIgG8@public.gmane.org>, Felipe Balbi <balbi-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+	Greg Kroah-Hartman <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>,
+	"James E . J . Bottomley" <jejb-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org>,
+	"Martin K . Petersen" <martin.petersen-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>,
+	Andrew Morton <akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>, Mark Brown <broonie-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+	Liam Girdwood <lgirdwood-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, Tejun Heo <tj-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+	Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+	"David S . Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
+	Bartlomiej Zolnierkiewicz <b.zolnierkie-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>,
+	Stefan Richter <stefanr-MtYdepGKPcBMYopoZt5u/LNAH6kLmebB@public.gmane.org>, Alan Tull <atull-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+	Moritz Fischer <mdf-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, Wolfram Sang <wsa-z923LK4zBo2bacvFa/9K2g@public.gmane.org>,
+	Jonathan Cameron <jic23-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, Joerg Roedel <joro-zLv9SwRftAIdnm+yROfE0A@public.gmane.org>,
+	Matias Bjorling <mb-VR7NuqX4VJ8tq7phqP6ubQ@public.gmane.org>, Jassi Brar <jassisinghbrar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	Mauro Carvalho Cheh
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+In-Reply-To: <1521208314-4783-1-git-send-email-geert-Td1EMuHUCqxL1ZNQvxDV9g@public.gmane.org>
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
 Remove dependencies on HAS_DMA where a Kconfig symbol depends on another
@@ -58,42 +59,47 @@ cannot work anyway.
 
 This simplifies the dependencies, and allows to improve compile-testing.
 
-Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
-Reviewed-by: Mark Brown <broonie@kernel.org>
-Acked-by: Robin Murphy <robin.murphy@arm.com>
+Signed-off-by: Geert Uytterhoeven <geert-Td1EMuHUCqxL1ZNQvxDV9g@public.gmane.org>
+Reviewed-by: Mark Brown <broonie-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+Acked-by: Robin Murphy <robin.murphy-5wv7dgnIgG8@public.gmane.org>
 ---
 v2:
   - Add Reviewed-by, Acked-by,
   - Drop RFC state,
   - Split per subsystem.
 ---
- drivers/ata/Kconfig | 2 --
- 1 file changed, 2 deletions(-)
+ drivers/iommu/Kconfig | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/ata/Kconfig b/drivers/ata/Kconfig
-index a7120d6211546949..9eaeed1fb237fa33 100644
---- a/drivers/ata/Kconfig
-+++ b/drivers/ata/Kconfig
-@@ -398,7 +398,6 @@ config SATA_DWC_VDEBUG
- 
- config SATA_HIGHBANK
- 	tristate "Calxeda Highbank SATA support"
--	depends on HAS_DMA
- 	depends on ARCH_HIGHBANK || COMPILE_TEST
+diff --git a/drivers/iommu/Kconfig b/drivers/iommu/Kconfig
+index f3a21343e636a8f2..32e91398c0555272 100644
+--- a/drivers/iommu/Kconfig
++++ b/drivers/iommu/Kconfig
+@@ -23,7 +23,7 @@ config IOMMU_IO_PGTABLE
+ config IOMMU_IO_PGTABLE_LPAE
+ 	bool "ARMv7/v8 Long Descriptor Format"
+ 	select IOMMU_IO_PGTABLE
+-	depends on HAS_DMA && (ARM || ARM64 || (COMPILE_TEST && !GENERIC_ATOMIC64))
++	depends on ARM || ARM64 || (COMPILE_TEST && !GENERIC_ATOMIC64)
  	help
- 	  This option enables support for the Calxeda Highbank SoC's
-@@ -408,7 +407,6 @@ config SATA_HIGHBANK
- 
- config SATA_MV
- 	tristate "Marvell SATA support"
+ 	  Enable support for the ARM long descriptor pagetable format.
+ 	  This allocator supports 4K/2M/1G, 16K/32M and 64K/512M page
+@@ -42,7 +42,7 @@ config IOMMU_IO_PGTABLE_LPAE_SELFTEST
+ config IOMMU_IO_PGTABLE_ARMV7S
+ 	bool "ARMv7/v8 Short Descriptor Format"
+ 	select IOMMU_IO_PGTABLE
+-	depends on HAS_DMA && (ARM || ARM64 || COMPILE_TEST)
++	depends on ARM || ARM64 || COMPILE_TEST
+ 	help
+ 	  Enable support for the ARM Short-descriptor pagetable format.
+ 	  This supports 32-bit virtual and physical addresses mapped using
+@@ -374,7 +374,6 @@ config QCOM_IOMMU
+ 	# Note: iommu drivers cannot (yet?) be built as modules
+ 	bool "Qualcomm IOMMU Support"
+ 	depends on ARCH_QCOM || (COMPILE_TEST && !GENERIC_ATOMIC64)
 -	depends on HAS_DMA
- 	depends on PCI || ARCH_DOVE || ARCH_MV78XX0 || \
- 		   ARCH_MVEBU || ARCH_ORION5X || COMPILE_TEST
- 	select GENERIC_PHY
+ 	select IOMMU_API
+ 	select IOMMU_IO_PGTABLE_LPAE
+ 	select ARM_DMA_USE_IOMMU
 -- 
 2.7.4
-
-
-______________________________________________________
-Linux MTD discussion mailing list
-http://lists.infradead.org/mailman/listinfo/linux-mtd/
