@@ -1,18 +1,18 @@
 From: Logan Gunthorpe <logang@deltatee.com>
-Subject: [PATCH v12 4/9] powerpc: iomap.c: introduce io{read|write}64_{lo_hi|hi_lo}
-Date: Fri, 16 Mar 2018 09:48:47 -0600
-Message-ID: <20180316154852.13206-5-logang@deltatee.com>
+Subject: [PATCH v12 3/9] powerpc: io.h: move iomap.h include so that it can use readq/writeq defs
+Date: Fri, 16 Mar 2018 09:48:46 -0600
+Message-ID: <20180316154852.13206-4-logang@deltatee.com>
 References: <20180316154852.13206-1-logang@deltatee.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 Cc: Arnd Bergmann <arnd@arndb.de>,
         Andy Shevchenko <andy.shevchenko@gmail.com>,
         =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
         Logan Gunthorpe <logang@deltatee.com>,
         Benjamin Herrenschmidt <benh@kernel.crashing.org>,
         Paul Mackerras <paulus@samba.org>,
-        Michael Ellerman <mpe@ellerman.id.au>
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Suresh Warrier <warrier@linux.vnet.ibm.com>,
+        "Oliver O'Halloran" <oohall@gmail.com>
 To: linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
         linux-ntb@googlegroups.com, linux-crypto@vger.kernel.org,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>
@@ -21,91 +21,45 @@ In-Reply-To: <20180316154852.13206-1-logang@deltatee.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-These functions will be introduced into the generic iomap.c so
-they can deal with PIO accesses in hi-lo/lo-hi variants. Thus,
-the powerpc version of iomap.c will need to provide the same
-functions even though, in this arch, they are identical to the
-regular io{read|write}64 functions.
+Subsequent patches in this series makes use of the readq and writeq
+defines in iomap.h. However, as is, they get missed on the powerpc
+platform seeing the include comes before the define. This patch
+moves the include down to fix this.
 
 Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-Tested-by: Horia Geantă <horia.geanta@nxp.com>
+Acked-by: Michael Ellerman <mpe@ellerman.id.au>
 Reviewed-by: Andy Shevchenko <andy.shevchenko@gmail.com>
 Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
 Cc: Paul Mackerras <paulus@samba.org>
 Cc: Michael Ellerman <mpe@ellerman.id.au>
+Cc: Nicholas Piggin <npiggin@gmail.com>
+Cc: Suresh Warrier <warrier@linux.vnet.ibm.com>
+Cc: "Oliver O'Halloran" <oohall@gmail.com>
 ---
- arch/powerpc/kernel/iomap.c | 40 ++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 40 insertions(+)
+ arch/powerpc/include/asm/io.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arch/powerpc/kernel/iomap.c b/arch/powerpc/kernel/iomap.c
-index aab456ed2a00..5ac84efc6ede 100644
---- a/arch/powerpc/kernel/iomap.c
-+++ b/arch/powerpc/kernel/iomap.c
-@@ -45,12 +45,32 @@ u64 ioread64(void __iomem *addr)
- {
- 	return readq(addr);
- }
-+u64 ioread64_lo_hi(void __iomem *addr)
-+{
-+	return readq(addr);
-+}
-+u64 ioread64_hi_lo(void __iomem *addr)
-+{
-+	return readq(addr);
-+}
- u64 ioread64be(void __iomem *addr)
- {
- 	return readq_be(addr);
- }
-+u64 ioread64be_lo_hi(void __iomem *addr)
-+{
-+	return readq_be(addr);
-+}
-+u64 ioread64be_hi_lo(void __iomem *addr)
-+{
-+	return readq_be(addr);
-+}
- EXPORT_SYMBOL(ioread64);
-+EXPORT_SYMBOL(ioread64_lo_hi);
-+EXPORT_SYMBOL(ioread64_hi_lo);
- EXPORT_SYMBOL(ioread64be);
-+EXPORT_SYMBOL(ioread64be_lo_hi);
-+EXPORT_SYMBOL(ioread64be_hi_lo);
- #endif /* __powerpc64__ */
+diff --git a/arch/powerpc/include/asm/io.h b/arch/powerpc/include/asm/io.h
+index 422f99cf9924..af074923d598 100644
+--- a/arch/powerpc/include/asm/io.h
++++ b/arch/powerpc/include/asm/io.h
+@@ -33,8 +33,6 @@ extern struct pci_dev *isa_bridge_pcidev;
+ #include <asm/mmu.h>
+ #include <asm/ppc_asm.h>
  
- void iowrite8(u8 val, void __iomem *addr)
-@@ -83,12 +103,32 @@ void iowrite64(u64 val, void __iomem *addr)
- {
- 	writeq(val, addr);
- }
-+void iowrite64_lo_hi(u64 val, void __iomem *addr)
-+{
-+	writeq(val, addr);
-+}
-+void iowrite64_hi_lo(u64 val, void __iomem *addr)
-+{
-+	writeq(val, addr);
-+}
- void iowrite64be(u64 val, void __iomem *addr)
- {
- 	writeq_be(val, addr);
- }
-+void iowrite64be_lo_hi(u64 val, void __iomem *addr)
-+{
-+	writeq_be(val, addr);
-+}
-+void iowrite64be_hi_lo(u64 val, void __iomem *addr)
-+{
-+	writeq_be(val, addr);
-+}
- EXPORT_SYMBOL(iowrite64);
-+EXPORT_SYMBOL(iowrite64_lo_hi);
-+EXPORT_SYMBOL(iowrite64_hi_lo);
- EXPORT_SYMBOL(iowrite64be);
-+EXPORT_SYMBOL(iowrite64be_lo_hi);
-+EXPORT_SYMBOL(iowrite64be_hi_lo);
- #endif /* __powerpc64__ */
+-#include <asm-generic/iomap.h>
+-
+ #ifdef CONFIG_PPC64
+ #include <asm/paca.h>
+ #endif
+@@ -663,6 +661,8 @@ static inline void name at					\
+ #define writel_relaxed(v, addr)	writel(v, addr)
+ #define writeq_relaxed(v, addr)	writeq(v, addr)
  
- /*
++#include <asm-generic/iomap.h>
++
+ #ifdef CONFIG_PPC32
+ #define mmiowb()
+ #else
 -- 
 2.11.0
