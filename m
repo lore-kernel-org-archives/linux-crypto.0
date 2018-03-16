@@ -1,7 +1,7 @@
 From: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
-Subject: [PATCH v6 04/12] ima: Introduce is_ima_sig()
-Date: Fri, 16 Mar 2018 17:38:29 -0300
-Message-ID: <20180316203837.10174-5-bauerman@linux.vnet.ibm.com>
+Subject: [PATCH v6 06/12] integrity: Introduce asymmetric_sig_has_known_key()
+Date: Fri, 16 Mar 2018 17:38:31 -0300
+Message-ID: <20180316203837.10174-7-bauerman@linux.vnet.ibm.com>
 References: <20180316203837.10174-1-bauerman@linux.vnet.ibm.com>
 Cc: linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
         linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
@@ -23,76 +23,113 @@ In-Reply-To: <20180316203837.10174-1-bauerman@linux.vnet.ibm.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-With the introduction of another IMA signature type (modsig), some places
-will need to check for both of them. It is cleaner to do that if there's a
-helper function to tell whether an xattr_value represents an IMA
-signature.
+IMA will only look for a modsig if the xattr sig references a key which is
+not in the expected kernel keyring. To that end, introduce
+asymmetric_sig_has_known_key().
 
-Suggested-by: Mimi Zohar <zohar@linux.vnet.ibm.com>
+The logic of extracting the key used in the xattr sig is factored out from
+asymmetric_verify() so that it can be used by the new function.
+
 Signed-off-by: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
 ---
- security/integrity/ima/ima.h              | 5 +++++
- security/integrity/ima/ima_appraise.c     | 7 +++----
- security/integrity/ima/ima_template_lib.c | 2 +-
- 3 files changed, 9 insertions(+), 5 deletions(-)
+ security/integrity/digsig_asymmetric.c | 44 +++++++++++++++++++++++++---------
+ security/integrity/integrity.h         |  8 +++++++
+ 2 files changed, 41 insertions(+), 11 deletions(-)
 
-diff --git a/security/integrity/ima/ima.h b/security/integrity/ima/ima.h
-index 35fe91aa1fc9..4bafa6a97967 100644
---- a/security/integrity/ima/ima.h
-+++ b/security/integrity/ima/ima.h
-@@ -155,6 +155,11 @@ unsigned long ima_get_binary_runtime_size(void);
- int ima_init_template(void);
- void ima_init_template_list(void);
+diff --git a/security/integrity/digsig_asymmetric.c b/security/integrity/digsig_asymmetric.c
+index ab6a029062a1..241647970c19 100644
+--- a/security/integrity/digsig_asymmetric.c
++++ b/security/integrity/digsig_asymmetric.c
+@@ -79,26 +79,48 @@ static struct key *request_asymmetric_key(struct key *keyring, uint32_t keyid)
+ 	return key;
+ }
  
-+static inline bool is_ima_sig(const struct evm_ima_xattr_data *xattr_value)
-+{
-+	return xattr_value && xattr_value->type == EVM_IMA_XATTR_DIGSIG;
+-int asymmetric_verify(struct key *keyring, const char *sig,
+-		      int siglen, const char *data, int datalen)
++static struct key *asymmetric_key_from_sig(struct key *keyring, const char *sig,
++					   int siglen)
+ {
+-	struct public_key_signature pks;
+-	struct signature_v2_hdr *hdr = (struct signature_v2_hdr *)sig;
+-	struct key *key;
+-	int ret = -ENOMEM;
++	const struct signature_v2_hdr *hdr = (struct signature_v2_hdr *) sig;
+ 
+ 	if (siglen <= sizeof(*hdr))
+-		return -EBADMSG;
++		return ERR_PTR(-EBADMSG);
+ 
+ 	siglen -= sizeof(*hdr);
+ 
+ 	if (siglen != be16_to_cpu(hdr->sig_size))
+-		return -EBADMSG;
++		return ERR_PTR(-EBADMSG);
+ 
+ 	if (hdr->hash_algo >= HASH_ALGO__LAST)
+-		return -ENOPKG;
++		return ERR_PTR(-ENOPKG);
++
++	return request_asymmetric_key(keyring, be32_to_cpu(hdr->keyid));
 +}
 +
- /*
-  * used to protect h_table and sha_table
-  */
-diff --git a/security/integrity/ima/ima_appraise.c b/security/integrity/ima/ima_appraise.c
-index a6b2995b7d0b..01172eab297b 100644
---- a/security/integrity/ima/ima_appraise.c
-+++ b/security/integrity/ima/ima_appraise.c
-@@ -325,15 +325,14 @@ int ima_appraise_measurement(enum ima_hooks func,
- 	} else if (status != INTEGRITY_PASS) {
- 		/* Fix mode, but don't replace file signatures. */
- 		if ((ima_appraise & IMA_APPRAISE_FIX) &&
--		    (!xattr_value ||
--		     xattr_value->type != EVM_IMA_XATTR_DIGSIG)) {
-+		    !is_ima_sig(xattr_value)) {
- 			if (!ima_fix_xattr(dentry, iint))
- 				status = INTEGRITY_PASS;
- 		}
++bool asymmetric_sig_has_known_key(struct key *keyring, const char *sig,
++				  int siglen)
++{
++	struct key *key;
++
++	key = asymmetric_key_from_sig(keyring, sig, siglen);
++	if (IS_ERR_OR_NULL(key))
++		return false;
++
++	key_put(key);
++
++	return true;
++}
++
++int asymmetric_verify(struct key *keyring, const char *sig,
++		      int siglen, const char *data, int datalen)
++{
++	struct public_key_signature pks;
++	struct signature_v2_hdr *hdr = (struct signature_v2_hdr *)sig;
++	struct key *key;
++	int ret = -ENOMEM;
  
- 		/* Permit new files with file signatures, but without data. */
- 		if (inode->i_size == 0 && iint->flags & IMA_NEW_FILE &&
--		    xattr_value && xattr_value->type == EVM_IMA_XATTR_DIGSIG) {
-+		    is_ima_sig(xattr_value)) {
- 			status = INTEGRITY_PASS;
- 		}
+-	key = request_asymmetric_key(keyring, be32_to_cpu(hdr->keyid));
++	key = asymmetric_key_from_sig(keyring, sig, siglen);
+ 	if (IS_ERR(key))
+ 		return PTR_ERR(key);
  
-@@ -448,7 +447,7 @@ int ima_inode_setxattr(struct dentry *dentry, const char *xattr_name,
- 		if (!xattr_value_len || (xvalue->type >= IMA_XATTR_LAST))
- 			return -EINVAL;
- 		ima_reset_appraise_flags(d_backing_inode(dentry),
--			xvalue->type == EVM_IMA_XATTR_DIGSIG);
-+					 is_ima_sig(xvalue));
- 		result = 0;
- 	}
- 	return result;
-diff --git a/security/integrity/ima/ima_template_lib.c b/security/integrity/ima/ima_template_lib.c
-index 5afaa53decc5..afb52a90e532 100644
---- a/security/integrity/ima/ima_template_lib.c
-+++ b/security/integrity/ima/ima_template_lib.c
-@@ -380,7 +380,7 @@ int ima_eventsig_init(struct ima_event_data *event_data,
+@@ -109,7 +131,7 @@ int asymmetric_verify(struct key *keyring, const char *sig,
+ 	pks.digest = (u8 *)data;
+ 	pks.digest_size = datalen;
+ 	pks.s = hdr->sig;
+-	pks.s_size = siglen;
++	pks.s_size = siglen - sizeof(*hdr);
+ 	ret = verify_signature(key, &pks);
+ 	key_put(key);
+ 	pr_debug("%s() = %d\n", __func__, ret);
+diff --git a/security/integrity/integrity.h b/security/integrity/integrity.h
+index 2d245f44ca26..4c381b992e11 100644
+--- a/security/integrity/integrity.h
++++ b/security/integrity/integrity.h
+@@ -179,12 +179,20 @@ static inline int integrity_init_keyring(const unsigned int id)
+ #ifdef CONFIG_INTEGRITY_ASYMMETRIC_KEYS
+ int asymmetric_verify(struct key *keyring, const char *sig,
+ 		      int siglen, const char *data, int datalen);
++bool asymmetric_sig_has_known_key(struct key *keyring, const char *sig,
++				  int siglen);
+ #else
+ static inline int asymmetric_verify(struct key *keyring, const char *sig,
+ 				    int siglen, const char *data, int datalen)
  {
- 	struct evm_ima_xattr_data *xattr_value = event_data->xattr_value;
+ 	return -EOPNOTSUPP;
+ }
++
++static inline bool asymmetric_sig_has_known_key(struct key *keyring,
++						const char *sig, int siglen)
++{
++	return false;
++}
+ #endif
  
--	if ((!xattr_value) || (xattr_value->type != EVM_IMA_XATTR_DIGSIG))
-+	if (!is_ima_sig(xattr_value))
- 		return 0;
- 
- 	return ima_write_template_field_data(xattr_value, event_data->xattr_len,
+ #ifdef CONFIG_IMA_LOAD_X509
