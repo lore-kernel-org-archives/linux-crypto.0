@@ -1,59 +1,52 @@
-From: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Subject: Re: [PATCH v2 00/21] Allow compile-testing NO_DMA (drivers)
-Date: Fri, 16 Mar 2018 23:52:50 +0800
-Message-ID: <20180316155250.GA7095@gondor.apana.org.au>
-References: <1521208314-4783-1-git-send-email-geert@linux-m68k.org>
-	<20180316151410.GA6527@gondor.apana.org.au>
-	<CAMuHMdUKULvoB6-6EhsYpdbWEEEfjtn27GbzpXj7+Mz+=qeOnw@mail.gmail.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 0/2] crypto: introduce SM4 symmetric cipher algorithm
+Date: Fri, 16 Mar 2018 23:55:36 +0800
+Message-ID: <20180316155536.GE7095@gondor.apana.org.au>
+References: <1520329484-23317-1-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Ulf Hansson <ulf.hansson-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, Wolfram Sang <wsa-z923LK4zBo2bacvFa/9K2g@public.gmane.org>,
-	linux-iio-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fpga-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-remoteproc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	ALSA Development Mailing List <alsa-devel-K7yf7f+aM1XWsZ/bQMPhNw@public.gmane.org>,
-	Bjorn Andersson <bjorn.andersson-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>,
-	Eric Anholt <eric-WhKQ6XTQaPysTnJN9+BGXg@public.gmane.org>, netdev <netdev-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	MTD Maling List <linux-mtd-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>,
-	Linux I2C <linux-i2c-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	linux1394-devel-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org, Christoph Hellwig <hch-jcswGhMUV9g@public.gmane.org>,
-	Stefan Wahren <stefan.wahren-eS4NqCHxEME@public.gmane.org>,
-	Boris Brezillon <boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>,
-	"James E . J . Bottomley" <jejb-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org>,
-	scsi <linux-scsi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, Richard Weinberger <richard-/L3Ra7n9ekc@public.gmane.org>,
-	Jassi Brar <jassisinghbrar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, Marek Vasut <marek.vasut-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	linux-serial-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Matias Bjorling <mb-VR7NuqX4VJ8tq7phqP6ubQ@public.gmane.org>,
-	David Woodhouse <dwmw2@infradea
-To: Geert Uytterhoeven <geert-Td1EMuHUCqxL1ZNQvxDV9g@public.gmane.org>
-Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: "David S. Miller" <davem@davemloft.net>,
+        Ofir Drang <ofir.drang@arm.com>, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+To: Gilad Ben-Yossef <gilad@benyossef.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <CAMuHMdUKULvoB6-6EhsYpdbWEEEfjtn27GbzpXj7+Mz+=qeOnw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
-List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
-Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+In-Reply-To: <1520329484-23317-1-git-send-email-gilad@benyossef.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Mar 16, 2018 at 04:41:57PM +0100, Geert Uytterhoeven wrote:
->
-> | To avoid allmodconfig/allyesconfig regressions on NO_DMA=y platforms,
-> | this (drivers) series should be applied after the previous (core)
-> | series (but not many people may notice/care ;-)
+On Tue, Mar 06, 2018 at 09:44:41AM +0000, Gilad Ben-Yossef wrote:
+> Introduce the SM4 cipher algorithms (OSCCA GB/T 32907-2016) and
+> related tests.
+> 
+> SM4 (GBT.32907-2016) is a cryptographic standard issued by the
+> Organization of State Commercial Administration of China (OSCCA)
+> as an authorized cryptographic algorithms for the use within China.
+> 
+> SMS4 was originally created for use in protecting wireless
+> networks, and is mandated in the Chinese National Standard for
+> Wireless LAN WAPI (Wired Authentication and Privacy Infrastructure)
+> (GB.15629.11-2003).
+> 
+> Tested on arm 64 and 32 bit.
+> 
+> Gilad Ben-Yossef (2):
+>   crypto: introduce SM4 symmetric cipher algorithm
+>   crypto: introduce SM4 testmgr tests
+> 
+>  crypto/Kconfig       |  25 ++++++
+>  crypto/Makefile      |   1 +
+>  crypto/sm4_generic.c | 244 +++++++++++++++++++++++++++++++++++++++++++++++++++
+>  crypto/tcrypt.c      |   3 +
+>  crypto/testmgr.c     |   9 ++
+>  crypto/testmgr.h     | 131 +++++++++++++++++++++++++++
+>  include/crypto/sm4.h |  28 ++++++
+>  7 files changed, 441 insertions(+)
+>  create mode 100644 crypto/sm4_generic.c
+>  create mode 100644 include/crypto/sm4.h
 
-Oops, didn't notice it :)
-
-> Apart from introducing build failures in allmodconfig/allyesconfig builds on
-> (uncommon) NO_DMA=y platforms, they can be applied directly and individually.
-
-I think I'll leave this with you then.
-
-Thanks,
+All applied.  Thanks.
 -- 
-Email: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
 PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
