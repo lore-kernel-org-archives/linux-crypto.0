@@ -1,85 +1,98 @@
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Subject: Re: [PATCH v2 00/21] Allow compile-testing NO_DMA (drivers)
-Date: Fri, 16 Mar 2018 16:41:57 +0100
-Message-ID: <CAMuHMdUKULvoB6-6EhsYpdbWEEEfjtn27GbzpXj7+Mz+=qeOnw@mail.gmail.com>
-References: <1521208314-4783-1-git-send-email-geert@linux-m68k.org>
- <20180316151410.GA6527@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Ulf Hansson <ulf.hansson@linaro.org>, Wolfram Sang <wsa@the-dreams.de>,
- linux-iio@vger.kernel.org, linux-fpga@vger.kernel.org,
- linux-remoteproc@vger.kernel.org,
- ALSA Development Mailing List <alsa-devel@alsa-project.org>,
- Bjorn Andersson <bjorn.andersson@linaro.org>, Eric Anholt <eric@anholt.net>,
- netdev <netdev@vger.kernel.org>,
- MTD Maling List <linux-mtd@lists.infradead.org>,
- Linux I2C <linux-i2c@vger.kernel.org>, linux1394-devel@lists.sourceforge.net,
- Christoph Hellwig <hch@lst.de>, Marek Szyprowski <m.szyprowski@samsung.com>,
- Stefan Wahren <stefan.wahren@i2se.com>,
- Boris Brezillon <boris.brezillon@free-electrons.com>,
- "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
- scsi <linux-scsi@vger.kernel.org>, Richard Weinberger <richard@nod.at>,
- Joerg Roedel <joro@8bytes.org>, Jassi Brar <jassisinghbrar@gmail.com>,
- Marek Vasut <marek.vasut@gmail.com>, linux-serial@vger.k
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
-In-Reply-To: <20180316151410.GA6527@gondor.apana.org.au>
-List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
-List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
-List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
-List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
-List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
-Errors-To: driverdev-devel-bounces@linuxdriverproject.org
-Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
+From: Logan Gunthorpe <logang@deltatee.com>
+Subject: [PATCH v12 7/9] ntb: ntb_hw_intel: use io-64-nonatomic instead of in-driver hacks
+Date: Fri, 16 Mar 2018 09:48:50 -0600
+Message-ID: <20180316154852.13206-8-logang@deltatee.com>
+References: <20180316154852.13206-1-logang@deltatee.com>
+Cc: Arnd Bergmann <arnd@arndb.de>,
+        Andy Shevchenko <andy.shevchenko@gmail.com>,
+        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
+        Logan Gunthorpe <logang@deltatee.com>
+To: linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
+        linux-ntb@googlegroups.com, linux-crypto@vger.kernel.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20180316154852.13206-1-logang@deltatee.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi Herbert,
+Now that ioread64 and iowrite64 are available in io-64-nonatomic,
+we can remove the hack at the top of ntb_hw_intel.c and replace it
+with an include.
 
-On Fri, Mar 16, 2018 at 4:14 PM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> On Fri, Mar 16, 2018 at 02:51:33PM +0100, Geert Uytterhoeven wrote:
->> This patch series:
->>   - Removes dependencies on HAS_DMA for symbols that already have
->>     platform dependencies implying HAS_DMA.
->>
->> To avoid allmodconfig/allyesconfig regressions on NO_DMA=y platforms,
->> this (drivers) series should be applied after the previous (core)
->> series (but not many people may notice/care ;-)
->>
->> Changes compared to v1:
->>   - Add Reviewed-by, Acked-by,
->>   - Drop dependency of SND_SOC_LPASS_IPQ806X on HAS_DMA,
->>   - Drop dependency of VIDEOBUF{,2}_DMA_{CONTIG,SG} on HAS_DMA,
->>   - Drop new dependencies of VIDEO_IPU3_CIO2, DVB_C8SECTPFE, and
->>     MTD_NAND_MARVELL on HAS_DMA,
->>   - Split in per-subsystem patches,
->>   - Split-off the core part in a separate series.
->>
->> This series is against v4.16-rc5. It can also be found at
->> https://git.kernel.org/pub/scm/linux/kernel/git/geert/linux-m68k.git/log/?h=no-dma-compile-testing-v2
->>
->> It has been compile-tested with allmodconfig and allyesconfig for
->> m68k/sun3, and has received attention from the kbuild test robot.
->
-> Do these patches have any dependencies? Can they be applied directly
-> in a subsystem tree?
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+Reviewed-by: Andy Shevchenko <andy.shevchenko@gmail.com>
+Acked-by: Dave Jiang <dave.jiang@intel.com>
+Acked-by: Allen Hubbe <Allen.Hubbe@dell.com>
+Acked-by: Jon Mason <jdmason@kudzu.us>
 
-| To avoid allmodconfig/allyesconfig regressions on NO_DMA=y platforms,
-| this (drivers) series should be applied after the previous (core)
-| series (but not many people may notice/care ;-)
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+#
+# Date:      Mon Jun 19 12:18:31 2017 -0600
+#
+# interactive rebase in progress; onto ae64f9bd1d36
+# Last commands done (6 commands done):
+#    pick cf3e4dab2173 io-64-nonatomic: add io{read|write}64[be]{_lo_hi|_hi_lo} macros
+#    r 79b4c4b8490c ntb: ntb_hw_intel: use io-64-nonatomic instead of in-driver hacks
+# Next commands to do (2 remaining commands):
+#    r 19b6c1f3b15d crypto: caam: cleanup CONFIG_64BIT ifdefs when using io{read|write}64
+#    r f3c8723446ef ntb_hw_switchtec: Cleanup 64bit IO defines to use the common header
+# You are currently editing a commit while rebasing branch 'io64_v9' on 'ae64f9bd1d36'.
+#
+# Changes to be committed:
+#	modified:   drivers/ntb/hw/intel/ntb_hw_intel.c
+#
+---
+ drivers/ntb/hw/intel/ntb_hw_intel.c | 30 +-----------------------------
+ 1 file changed, 1 insertion(+), 29 deletions(-)
 
-Apart from introducing build failures in allmodconfig/allyesconfig builds on
-(uncommon) NO_DMA=y platforms, they can be applied directly and individually.
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+diff --git a/drivers/ntb/hw/intel/ntb_hw_intel.c b/drivers/ntb/hw/intel/ntb_hw_intel.c
+index 156b45cd4a19..5cf40ab21366 100644
+--- a/drivers/ntb/hw/intel/ntb_hw_intel.c
++++ b/drivers/ntb/hw/intel/ntb_hw_intel.c
+@@ -59,6 +59,7 @@
+ #include <linux/random.h>
+ #include <linux/slab.h>
+ #include <linux/ntb.h>
++#include <linux/io-64-nonatomic-lo-hi.h>
+ 
+ #include "ntb_hw_intel.h"
+ 
+@@ -149,35 +150,6 @@ MODULE_PARM_DESC(xeon_b2b_dsd_bar5_addr32,
+ static inline enum ntb_topo xeon_ppd_topo(struct intel_ntb_dev *ndev, u8 ppd);
+ static int xeon_init_isr(struct intel_ntb_dev *ndev);
+ 
+-#ifndef ioread64
+-#ifdef readq
+-#define ioread64 readq
+-#else
+-#define ioread64 _ioread64
+-static inline u64 _ioread64(void __iomem *mmio)
+-{
+-	u64 low, high;
+-
+-	low = ioread32(mmio);
+-	high = ioread32(mmio + sizeof(u32));
+-	return low | (high << 32);
+-}
+-#endif
+-#endif
+-
+-#ifndef iowrite64
+-#ifdef writeq
+-#define iowrite64 writeq
+-#else
+-#define iowrite64 _iowrite64
+-static inline void _iowrite64(u64 val, void __iomem *mmio)
+-{
+-	iowrite32(val, mmio);
+-	iowrite32(val >> 32, mmio + sizeof(u32));
+-}
+-#endif
+-#endif
+-
+ static inline int pdev_is_xeon(struct pci_dev *pdev)
+ {
+ 	switch (pdev->device) {
+-- 
+2.11.0
