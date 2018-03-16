@@ -1,317 +1,87 @@
-From: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
-Subject: [PATCH v6 10/12] ima: Add functions to read and verify a modsig signature
-Date: Fri, 16 Mar 2018 17:38:35 -0300
-Message-ID: <20180316203837.10174-11-bauerman@linux.vnet.ibm.com>
-References: <20180316203837.10174-1-bauerman@linux.vnet.ibm.com>
-Cc: linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-kernel@vger.kernel.org,
-        Mimi Zohar <zohar@linux.vnet.ibm.com>,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        David Howells <dhowells@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Jessica Yu <jeyu@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        "AKASHI, Takahiro" <takahiro.akashi@linaro.org>,
-        Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
-To: linux-integrity@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180316203837.10174-1-bauerman@linux.vnet.ibm.com>
-Sender: linux-kernel-owner@vger.kernel.org
+From: Wolfram Sang <wsa-z923LK4zBo2bacvFa/9K2g@public.gmane.org>
+Subject: Re: [PATCH v2 00/21] Allow compile-testing NO_DMA (drivers)
+Date: Fri, 16 Mar 2018 22:23:17 +0100
+Message-ID: <20180316212317.7d5rri3p25hpmx44@ninjato>
+References: <1521208314-4783-1-git-send-email-geert@linux-m68k.org>
+Mime-Version: 1.0
+Content-Type: multipart/mixed; boundary="===============4452806862283032698=="
+Cc: Ulf Hansson <ulf.hansson-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, linux-iio-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-fpga-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-remoteproc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	alsa-devel-K7yf7f+aM1XWsZ/bQMPhNw@public.gmane.org, Bjorn Andersson <bjorn.andersson-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>,
+	Eric Anholt <eric-WhKQ6XTQaPysTnJN9+BGXg@public.gmane.org>, netdev-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-mtd-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-i2c-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux1394-devel-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org, Christoph Hellwig <hch-jcswGhMUV9g@public.gmane.org>,
+	Stefan Wahren <stefan.wahren-eS4NqCHxEME@public.gmane.org>,
+	Boris Brezillon <boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>,
+	"James E . J . Bottomley" <jejb-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org>,
+	Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+	linux-scsi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Richard Weinberger <richard-/L3Ra7n9ekc@public.gmane.org>,
+	Jassi Brar <jassisinghbrar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, Marek Vasut <marek.vasut-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	linux-serial-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Matias Bjorling <mb-VR7NuqX4VJ8tq7phqP6ubQ@public.gmane.org>,
+	David Woodhouse <dwmw2-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
+	linux-media-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Ohad Ben-Cohen <ohad-Ix1uc/W3ht7QT0dZR+AlfA@public.gmane.org>,
+To: Geert Uytterhoeven <geert-Td1EMuHUCqxL1ZNQvxDV9g@public.gmane.org>
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+In-Reply-To: <1521208314-4783-1-git-send-email-geert-Td1EMuHUCqxL1ZNQvxDV9g@public.gmane.org>
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-This is the code needed by IMA-appraise to work with modsig signatures.
-It will be used by the next two patches.
 
-Signed-off-by: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
----
- security/integrity/ima/Kconfig      |   3 +
- security/integrity/ima/ima.h        |  41 ++++++++
- security/integrity/ima/ima_modsig.c | 181 ++++++++++++++++++++++++++++++++++++
- security/integrity/integrity.h      |   1 +
- 4 files changed, 226 insertions(+)
+--===============4452806862283032698==
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="jn72qj2wgis6yzej"
+Content-Disposition: inline
 
-diff --git a/security/integrity/ima/Kconfig b/security/integrity/ima/Kconfig
-index ee278189e0bb..306601d62f0b 100644
---- a/security/integrity/ima/Kconfig
-+++ b/security/integrity/ima/Kconfig
-@@ -167,6 +167,9 @@ config IMA_APPRAISE_BOOTPARAM
- config IMA_APPRAISE_MODSIG
- 	bool "Support module-style signatures for appraisal"
- 	depends on IMA_APPRAISE
-+	depends on INTEGRITY_ASYMMETRIC_KEYS
-+	select PKCS7_MESSAGE_PARSER
-+	select MODULE_SIG_FORMAT
- 	default n
- 	help
- 	   Adds support for signatures appended to files. The format of the
-diff --git a/security/integrity/ima/ima.h b/security/integrity/ima/ima.h
-index c61d8fc5190d..49aef56dc96d 100644
---- a/security/integrity/ima/ima.h
-+++ b/security/integrity/ima/ima.h
-@@ -301,11 +301,52 @@ static inline int ima_read_xattr(struct dentry *dentry,
- 
- #ifdef CONFIG_IMA_APPRAISE_MODSIG
- bool ima_hook_supports_modsig(enum ima_hooks func);
-+int ima_read_modsig(enum ima_hooks func, const void *buf, loff_t buf_len,
-+		    struct evm_ima_xattr_data **xattr_value,
-+		    int *xattr_len);
-+int ima_get_modsig_hash(struct evm_ima_xattr_data *hdr, enum hash_algo *algo,
-+			const u8 **hash, u8 *len);
-+int ima_modsig_serialize_data(struct evm_ima_xattr_data **data, int *data_len);
-+int ima_modsig_verify(const unsigned int keyring_id,
-+		      struct evm_ima_xattr_data *hdr);
-+void ima_free_xattr_data(struct evm_ima_xattr_data *hdr);
- #else
- static inline bool ima_hook_supports_modsig(enum ima_hooks func)
- {
- 	return false;
- }
-+
-+static inline int ima_read_modsig(enum ima_hooks func, const void *buf,
-+				  loff_t buf_len,
-+				  struct evm_ima_xattr_data **xattr_value,
-+				  int *xattr_len)
-+{
-+	return -ENOTSUPP;
-+}
-+
-+static inline int ima_get_modsig_hash(struct evm_ima_xattr_data *hdr,
-+				      enum hash_algo *algo, const u8 **hash,
-+				      u8 *len)
-+{
-+	return -ENOTSUPP;
-+}
-+
-+static inline int ima_modsig_serialize_data(struct evm_ima_xattr_data **data,
-+					    int *data_len)
-+{
-+	return -ENOTSUPP;
-+}
-+
-+static inline int ima_modsig_verify(const unsigned int keyring_id,
-+				    struct evm_ima_xattr_data *hdr)
-+{
-+	return -ENOTSUPP;
-+}
-+
-+static inline void ima_free_xattr_data(struct evm_ima_xattr_data *hdr)
-+{
-+	kfree(hdr);
-+}
- #endif /* CONFIG_IMA_APPRAISE_MODSIG */
- 
- /* LSM based policy rules require audit */
-diff --git a/security/integrity/ima/ima_modsig.c b/security/integrity/ima/ima_modsig.c
-index d8ea811b6f74..105fd04d585e 100644
---- a/security/integrity/ima/ima_modsig.c
-+++ b/security/integrity/ima/ima_modsig.c
-@@ -8,8 +8,25 @@
-  * Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
-  */
- 
-+#include <linux/types.h>
-+#include <linux/module_signature.h>
-+#include <keys/asymmetric-type.h>
-+#include <crypto/pkcs7.h>
-+
- #include "ima.h"
- 
-+struct modsig_hdr {
-+	uint8_t type;		/* Should be IMA_MODSIG. */
-+	struct pkcs7_message *pkcs7_msg;
-+	int raw_pkcs7_len;
-+
-+	/*
-+	 * This is what will go to the measurement list if the template requires
-+	 * storing the signature.
-+	 */
-+	struct evm_ima_xattr_data raw_pkcs7;
-+};
-+
- /**
-  * ima_hook_supports_modsig - can the policy allow modsig for this hook?
-  *
-@@ -29,3 +46,167 @@ bool ima_hook_supports_modsig(enum ima_hooks func)
- 		return false;
- 	}
- }
-+
-+static bool modsig_has_known_key(struct modsig_hdr *hdr)
-+{
-+	const struct public_key_signature *pks;
-+	struct key *keyring;
-+	struct key *key;
-+
-+	keyring = integrity_keyring_from_id(INTEGRITY_KEYRING_IMA);
-+	if (IS_ERR(keyring))
-+		return false;
-+
-+	pks = pkcs7_get_message_sig(hdr->pkcs7_msg);
-+	if (!pks)
-+		return false;
-+
-+	key = find_asymmetric_key(keyring, pks->auth_ids[0], NULL, false);
-+	if (IS_ERR(key))
-+		return false;
-+
-+	key_put(key);
-+
-+	return true;
-+}
-+
-+int ima_read_modsig(enum ima_hooks func, const void *buf, loff_t buf_len,
-+		    struct evm_ima_xattr_data **xattr_value,
-+		    int *xattr_len)
-+{
-+	const size_t marker_len = sizeof(MODULE_SIG_STRING) - 1;
-+	const struct module_signature *sig;
-+	struct modsig_hdr *hdr;
-+	size_t sig_len;
-+	const void *p;
-+	int rc;
-+
-+	/*
-+	 * Not supposed to happen. Hooks that support modsig are whitelisted
-+	 * when parsing the policy using ima_hooks_supports_modsig().
-+	 */
-+	if (!buf || !buf_len) {
-+		WARN_ONCE(true, "%s doesn't support modsig\n",
-+			  func_tokens[func]);
-+		return -ENOENT;
-+	} else if (buf_len <= marker_len + sizeof(*sig))
-+		return -ENOENT;
-+
-+	p = buf + buf_len - marker_len;
-+	if (memcmp(p, MODULE_SIG_STRING, marker_len))
-+		return -ENOENT;
-+
-+	buf_len -= marker_len;
-+	sig = (const struct module_signature *) (p - sizeof(*sig));
-+
-+	rc = validate_module_sig(sig, buf_len);
-+	if (rc)
-+		return rc;
-+
-+	sig_len = be32_to_cpu(sig->sig_len);
-+	buf_len -= sig_len + sizeof(*sig);
-+
-+	/* Allocate sig_len additional bytes to hold the raw PKCS#7 data. */
-+	hdr = kmalloc(sizeof(*hdr) + sig_len, GFP_KERNEL);
-+	if (!hdr)
-+		return -ENOMEM;
-+
-+	hdr->pkcs7_msg = pkcs7_parse_message(buf + buf_len, sig_len);
-+	if (IS_ERR(hdr->pkcs7_msg)) {
-+		rc = PTR_ERR(hdr->pkcs7_msg);
-+		goto err_no_msg;
-+	}
-+
-+	rc = pkcs7_supply_detached_data(hdr->pkcs7_msg, buf, buf_len);
-+	if (rc)
-+		goto err;
-+
-+	if (!modsig_has_known_key(hdr)) {
-+		rc = -ENOKEY;
-+		goto err;
-+	}
-+
-+	memcpy(hdr->raw_pkcs7.data, buf + buf_len, sig_len);
-+	hdr->raw_pkcs7_len = sig_len + 1;
-+	hdr->raw_pkcs7.type = IMA_MODSIG;
-+
-+	hdr->type = IMA_MODSIG;
-+
-+	*xattr_value = (typeof(*xattr_value)) hdr;
-+	*xattr_len = sizeof(*hdr);
-+
-+	return 0;
-+
-+ err:
-+	pkcs7_free_message(hdr->pkcs7_msg);
-+ err_no_msg:
-+	kfree(hdr);
-+	return rc;
-+}
-+
-+int ima_get_modsig_hash(struct evm_ima_xattr_data *hdr, enum hash_algo *algo,
-+			const u8 **hash, u8 *len)
-+{
-+	struct modsig_hdr *modsig = (typeof(modsig)) hdr;
-+	const struct public_key_signature *pks;
-+	int i;
-+
-+	if (!hdr || hdr->type != IMA_MODSIG)
-+		return -EINVAL;
-+
-+	pks = pkcs7_get_message_sig(modsig->pkcs7_msg);
-+	if (!pks)
-+		return -EBADMSG;
-+
-+	for (i = 0; i < HASH_ALGO__LAST; i++)
-+		if (!strcmp(hash_algo_name[i], pks->hash_algo))
-+			break;
-+
-+	*algo = i;
-+
-+	return pkcs7_get_digest(modsig->pkcs7_msg, hash, len);
-+}
-+
-+int ima_modsig_serialize_data(struct evm_ima_xattr_data **data, int *data_len)
-+{
-+	struct modsig_hdr *modsig = (struct modsig_hdr *) *data;
-+
-+	if (!*data || (*data)->type != IMA_MODSIG)
-+		return -EINVAL;
-+
-+	*data = &modsig->raw_pkcs7;
-+	*data_len = modsig->raw_pkcs7_len;
-+
-+	return 0;
-+}
-+
-+int ima_modsig_verify(const unsigned int keyring_id,
-+		      struct evm_ima_xattr_data *hdr)
-+{
-+	struct modsig_hdr *modsig = (struct modsig_hdr *) hdr;
-+	struct key *keyring;
-+
-+	if (!hdr || hdr->type != IMA_MODSIG)
-+		return -EINVAL;
-+
-+	keyring = integrity_keyring_from_id(keyring_id);
-+	if (IS_ERR(keyring))
-+		return PTR_ERR(keyring);
-+
-+	return verify_pkcs7_message_sig(NULL, 0, modsig->pkcs7_msg, keyring,
-+					VERIFYING_MODULE_SIGNATURE, NULL, NULL);
-+}
-+
-+void ima_free_xattr_data(struct evm_ima_xattr_data *hdr)
-+{
-+	if (!hdr)
-+		return;
-+
-+	if (hdr->type == IMA_MODSIG) {
-+		struct modsig_hdr *modsig = (struct modsig_hdr *) hdr;
-+
-+		pkcs7_free_message(modsig->pkcs7_msg);
-+	}
-+
-+	kfree(hdr);
-+}
-diff --git a/security/integrity/integrity.h b/security/integrity/integrity.h
-index 6643c6550787..4acb1fb86b3b 100644
---- a/security/integrity/integrity.h
-+++ b/security/integrity/integrity.h
-@@ -74,6 +74,7 @@ enum evm_ima_xattr_type {
- 	EVM_IMA_XATTR_DIGSIG,
- 	IMA_XATTR_DIGEST_NG,
- 	EVM_XATTR_PORTABLE_DIGSIG,
-+	IMA_MODSIG,
- 	IMA_XATTR_LAST
- };
- 
+
+--jn72qj2wgis6yzej
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+
+> To avoid allmodconfig/allyesconfig regressions on NO_DMA=y platforms,
+> this (drivers) series should be applied after the previous (core)
+> series (but not many people may notice/care ;-)
+
+I still don't get if there is a dependency on the core patches. I.e.
+shall I apply the subsystem patch now by myself or do you want to push
+the series after the core patch and need my ack here?
+
+
+--jn72qj2wgis6yzej
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCAAdFiEEOZGx6rniZ1Gk92RdFA3kzBSgKbYFAlqsNcAACgkQFA3kzBSg
+KbZoeA/+NmqFAw+9cAaOVzf/+nl/mZIFlENg9U18xEPNRmtBUBLBVqxRPuFqBhxm
+XA8XO+eUOvtG3pBePwHGQbaFDdSgsvkDateYYp7yUUvssQaROgG8OT+cOyZvSLUw
+x6f1R2+fPNGVC2r8ilpYr9xubYlAsT1Uc9IFJ8gKJK3xceYDxMxvlAQGYaXL8GbT
+tglbckIXElRlToMLTZnS5HEau7PuQUnJkPZ4LmKND8b0JQT5Q40x7PPVo7fnwD5r
+xzDhzfniBrs4XJuIaQsYwcGL7v2bnLLL7X8w2Y7mQeoVi2hRSau8KDMi56fyQq7Y
+SCd4kmBCyn1R7WUzb2p4feuv4W1FJkZIFS9dJq188EhrHR07Tq18N7YLRNufyVmu
+zf4q7vC/KEeUOG0agyU/DJvr4Mymef8ieC+NBq9fejxl/7Y2sIeJOC8O6MDusfH8
+it0UgQpUmALewJxPfiEtMjNk4K5c+Cn2syy7gESZN8vBt0oV+7F2UvKNCzot3pMO
++TEiMPiOb4ILXKZMXpnwr3YPAwYqTuoqz5xVxvuCYICEww7Q1nHL83PTGJYGHDgm
+tP5tEHSTvmviNdwk3DCIvG4vQCZiolzb8nsrxHKIheXZQiCgfVjUTK3nV/l4/0nx
+q6LaetLOaZIc8CRlKpGx6WnvD0N6i+oeWeyaBIdunKLFLi/oCwY=
+=65ZV
+-----END PGP SIGNATURE-----
+
+--jn72qj2wgis6yzej--
+
+--===============4452806862283032698==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+
+--===============4452806862283032698==--
