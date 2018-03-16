@@ -1,10 +1,10 @@
 From: Greg Kroah-Hartman <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>
-Subject: Re: [PATCH v2 18/21] serial: Remove depends on HAS_DMA in case of
-	platform dependency
-Date: Fri, 16 Mar 2018 15:34:32 +0100
-Message-ID: <20180316143432.GA29333@kroah.com>
+Subject: Re: [PATCH v2 20/21] staging: vc04_services: Remove depends on
+	HAS_DMA in case of platform dependency
+Date: Fri, 16 Mar 2018 15:34:39 +0100
+Message-ID: <20180316143439.GB29333@kroah.com>
 References: <1521208314-4783-1-git-send-email-geert@linux-m68k.org>
-	<1521208314-4783-19-git-send-email-geert@linux-m68k.org>
+	<1521208314-4783-21-git-send-email-geert@linux-m68k.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
@@ -27,7 +27,7 @@ Cc: Ulf Hansson <ulf.hansson-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, Wolfram S
 To: Geert Uytterhoeven <geert-Td1EMuHUCqxL1ZNQvxDV9g@public.gmane.org>
 Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
 Content-Disposition: inline
-In-Reply-To: <1521208314-4783-19-git-send-email-geert-Td1EMuHUCqxL1ZNQvxDV9g@public.gmane.org>
+In-Reply-To: <1521208314-4783-21-git-send-email-geert-Td1EMuHUCqxL1ZNQvxDV9g@public.gmane.org>
 List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
 	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
 List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
@@ -39,7 +39,7 @@ Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.o
 Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Mar 16, 2018 at 02:51:51PM +0100, Geert Uytterhoeven wrote:
+On Fri, Mar 16, 2018 at 02:51:53PM +0100, Geert Uytterhoeven wrote:
 > Remove dependencies on HAS_DMA where a Kconfig symbol depends on another
 > symbol that implies HAS_DMA, and, optionally, on "|| COMPILE_TEST".
 > In most cases this other symbol is an architecture or platform specific
