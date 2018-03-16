@@ -1,51 +1,30 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/2] crypto: introduce SM4 symmetric cipher algorithm
-Date: Fri, 16 Mar 2018 23:55:36 +0800
-Message-ID: <20180316155536.GE7095@gondor.apana.org.au>
-References: <1520329484-23317-1-git-send-email-gilad@benyossef.com>
+Subject: Re: [PATCH v2] crypto: hash.h: Prevent use of req->result in ahash
+ update
+Date: Fri, 16 Mar 2018 23:56:10 +0800
+Message-ID: <20180316155610.GG7095@gondor.apana.org.au>
+References: <CGME20180307104934eucas1p18af0e65a519299997b5d2f7fb78cd39f@eucas1p1.samsung.com>
+ <7850c31c-8703-51fb-0710-3b4920935bfc@partner.samsung.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: "David S. Miller" <davem@davemloft.net>,
-        Ofir Drang <ofir.drang@arm.com>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-To: Gilad Ben-Yossef <gilad@benyossef.com>
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Kamil Konieczny <k.konieczny@partner.samsung.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1520329484-23317-1-git-send-email-gilad@benyossef.com>
+In-Reply-To: <7850c31c-8703-51fb-0710-3b4920935bfc@partner.samsung.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Mar 06, 2018 at 09:44:41AM +0000, Gilad Ben-Yossef wrote:
-> Introduce the SM4 cipher algorithms (OSCCA GB/T 32907-2016) and
-> related tests.
+On Wed, Mar 07, 2018 at 11:49:33AM +0100, Kamil Konieczny wrote:
+> Prevent improper use of req->result field in ahash update, init, export and
+> import functions in drivers code. A driver should use ahash request context
+> if it needs to save internal state.
 > 
-> SM4 (GBT.32907-2016) is a cryptographic standard issued by the
-> Organization of State Commercial Administration of China (OSCCA)
-> as an authorized cryptographic algorithms for the use within China.
-> 
-> SMS4 was originally created for use in protecting wireless
-> networks, and is mandated in the Chinese National Standard for
-> Wireless LAN WAPI (Wired Authentication and Privacy Infrastructure)
-> (GB.15629.11-2003).
-> 
-> Tested on arm 64 and 32 bit.
-> 
-> Gilad Ben-Yossef (2):
->   crypto: introduce SM4 symmetric cipher algorithm
->   crypto: introduce SM4 testmgr tests
-> 
->  crypto/Kconfig       |  25 ++++++
->  crypto/Makefile      |   1 +
->  crypto/sm4_generic.c | 244 +++++++++++++++++++++++++++++++++++++++++++++++++++
->  crypto/tcrypt.c      |   3 +
->  crypto/testmgr.c     |   9 ++
->  crypto/testmgr.h     | 131 +++++++++++++++++++++++++++
->  include/crypto/sm4.h |  28 ++++++
->  7 files changed, 441 insertions(+)
->  create mode 100644 crypto/sm4_generic.c
->  create mode 100644 include/crypto/sm4.h
+> Signed-off-by: Kamil Konieczny <k.konieczny@partner.samsung.com>
 
-All applied.  Thanks.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
