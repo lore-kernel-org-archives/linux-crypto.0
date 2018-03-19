@@ -1,7 +1,7 @@
 From: Antoine Tenart <antoine.tenart@bootlin.com>
-Subject: [PATCH v2 6/9] crypto: inside-secure - improve the skcipher token
-Date: Mon, 19 Mar 2018 09:21:18 +0100
-Message-ID: <20180319082121.32103-7-antoine.tenart@bootlin.com>
+Subject: [PATCH v2 5/9] crypto: inside-secure - do not access buffers mapped to the device
+Date: Mon, 19 Mar 2018 09:21:17 +0100
+Message-ID: <20180319082121.32103-6-antoine.tenart@bootlin.com>
 References: <20180319082121.32103-1-antoine.tenart@bootlin.com>
 Cc: Antoine Tenart <antoine.tenart@bootlin.com>,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -14,32 +14,41 @@ In-Reply-To: <20180319082121.32103-1-antoine.tenart@bootlin.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-The token used for encryption and decryption of skcipher algorithms sets
-its stat field to "last packet". As it's a cipher only algorithm, there
-is not hash operation and thus the "last hash" bit should be set to tell
-the internal engine no hash operation should be performed.
-
-This does not fix a bug, but improves the token definition to follow
-exactly what's advised by the datasheet.
+This patches update the way the digest is copied from the state buffer
+to the result buffer, so that the copy only happen after the state
+buffer was DMA unmapped, as otherwise the buffer would be owned by the
+device.
 
 Signed-off-by: Antoine Tenart <antoine.tenart@bootlin.com>
 ---
- drivers/crypto/inside-secure/safexcel_cipher.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ drivers/crypto/inside-secure/safexcel_hash.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/crypto/inside-secure/safexcel_cipher.c b/drivers/crypto/inside-secure/safexcel_cipher.c
-index 17a7725a6f6d..bafb60505fab 100644
---- a/drivers/crypto/inside-secure/safexcel_cipher.c
-+++ b/drivers/crypto/inside-secure/safexcel_cipher.c
-@@ -58,7 +58,8 @@ static void safexcel_cipher_token(struct safexcel_cipher_ctx *ctx,
+diff --git a/drivers/crypto/inside-secure/safexcel_hash.c b/drivers/crypto/inside-secure/safexcel_hash.c
+index ef3e0c1c0f2c..b9ec82f3dee1 100644
+--- a/drivers/crypto/inside-secure/safexcel_hash.c
++++ b/drivers/crypto/inside-secure/safexcel_hash.c
+@@ -156,10 +156,6 @@ static int safexcel_handle_req_result(struct safexcel_crypto_priv *priv, int rin
+ 	safexcel_complete(priv, ring);
+ 	spin_unlock_bh(&priv->ring[ring].egress_lock);
  
- 	token[0].opcode = EIP197_TOKEN_OPCODE_DIRECTION;
- 	token[0].packet_length = length;
--	token[0].stat = EIP197_TOKEN_STAT_LAST_PACKET;
-+	token[0].stat = EIP197_TOKEN_STAT_LAST_PACKET |
-+			EIP197_TOKEN_STAT_LAST_HASH;
- 	token[0].instructions = EIP197_TOKEN_INS_LAST |
- 				EIP197_TOKEN_INS_TYPE_CRYTO |
- 				EIP197_TOKEN_INS_TYPE_OUTPUT;
+-	if (sreq->finish)
+-		memcpy(areq->result, sreq->state,
+-		       crypto_ahash_digestsize(ahash));
+-
+ 	if (sreq->nents) {
+ 		dma_unmap_sg(priv->dev, areq->src, sreq->nents, DMA_TO_DEVICE);
+ 		sreq->nents = 0;
+@@ -177,6 +173,10 @@ static int safexcel_handle_req_result(struct safexcel_crypto_priv *priv, int rin
+ 		sreq->cache_dma = 0;
+ 	}
+ 
++	if (sreq->finish)
++		memcpy(areq->result, sreq->state,
++		       crypto_ahash_digestsize(ahash));
++
+ 	cache_len = sreq->len - sreq->processed;
+ 	if (cache_len)
+ 		memcpy(sreq->cache, sreq->cache_next, cache_len);
 -- 
 2.14.3
