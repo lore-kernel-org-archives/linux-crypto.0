@@ -1,53 +1,53 @@
-From: =?iso-8859-2?Q?Horia_Geant=E3?= <horia.geanta@nxp.com>
-Subject: Re: [PATCH] crypto: doc - clarify hash callbacks state machine
-Date: Mon, 19 Mar 2018 06:39:50 +0000
-Message-ID: <AM3PR04MB45284A83B66E00785872DE698D40@AM3PR04MB452.eurprd04.prod.outlook.com>
-References: <20180305103945.3517-1-horia.geanta@nxp.com>
- <20180316151642.GA6606@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-2"
-Content-Transfer-Encoding: quoted-printable
-Cc: "David S. Miller" <davem@davemloft.net>,
-        Jonathan Corbet <corbet@lwn.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+From: Antoine Tenart <antoine.tenart@bootlin.com>
+Subject: [PATCH v2 2/9] crypto: inside-secure - fix typo s/allways/always/ in a define
+Date: Mon, 19 Mar 2018 09:21:14 +0100
+Message-ID: <20180319082121.32103-3-antoine.tenart@bootlin.com>
+References: <20180319082121.32103-1-antoine.tenart@bootlin.com>
+Cc: Antoine Tenart <antoine.tenart@bootlin.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        thomas.petazzoni@bootlin.com, maxime.chevallier@bootlin.com,
+        gregory.clement@bootlin.com, miquel.raynal@bootlin.com,
+        nadavh@marvell.com, oferh@marvell.com, igall@marvell.com
+To: herbert@gondor.apana.org.au, davem@davemloft.net
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Language: en-US
+In-Reply-To: <20180319082121.32103-1-antoine.tenart@bootlin.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 3/16/2018 5:16 PM, Herbert Xu wrote:=0A=
-> On Mon, Mar 05, 2018 at 12:39:45PM +0200, Horia Geant=E3 wrote:=0A=
->> Even though it doesn't make too much sense, it is perfectly legal to:=0A=
->> - call .init() and then (as many times) .update()=0A=
->> - subseqently _not_ call any of .final(), .finup() or .export()=0A=
-> =0A=
-> Actually it makes perfect sense, because there can be an arbitrary=0A=
-> number of requests for a given tfm.  There is no requirement that=0A=
-> you must finalise the first request before submitting new ones.=0A=
-> =0A=
-> IOW there can be an arbitrary number of outstanding requests even=0A=
-> without the user intentionally abandoning any hash request.=0A=
-> =0A=
-The fact that there can be multiple requests in parallel (for a given tfm) =
-is a=0A=
-different topic.=0A=
-Each request object has its state in its own state machine, independent fro=
-m the=0A=
-other request objects.=0A=
-I assume this is clear enough.=0A=
-=0A=
-Why I wanted to underline is that "abandoning" a hash request is allowed (e=
-ven=0A=
-though doing this is at least questionable), thus implementations must take=
-=0A=
-special care not to leak resources in this case.=0A=
-=0A=
-If you think the commit message should be updated, then probably so should =
-the=0A=
-documentation update.=0A=
-=0A=
-Thanks,=0A=
-Horia=0A=
+Small cosmetic patch fixing one typo in the
+EIP197_HIA_DSE_CFG_ALLWAYS_BUFFERABLE macro, it should be _ALWAYS_.
+
+Signed-off-by: Antoine Tenart <antoine.tenart@bootlin.com>
+---
+ drivers/crypto/inside-secure/safexcel.c | 2 +-
+ drivers/crypto/inside-secure/safexcel.h | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/inside-secure/safexcel.c
+index 384b4ceb37f0..5fe85b9dad64 100644
+--- a/drivers/crypto/inside-secure/safexcel.c
++++ b/drivers/crypto/inside-secure/safexcel.c
+@@ -332,7 +332,7 @@ static int safexcel_hw_init(struct safexcel_crypto_priv *priv)
+ 	val = EIP197_HIA_DSE_CFG_DIS_DEBUG;
+ 	val |= EIP197_HIA_DxE_CFG_MIN_DATA_SIZE(7) | EIP197_HIA_DxE_CFG_MAX_DATA_SIZE(8);
+ 	val |= EIP197_HIA_DxE_CFG_DATA_CACHE_CTRL(WR_CACHE_3BITS);
+-	val |= EIP197_HIA_DSE_CFG_ALLWAYS_BUFFERABLE;
++	val |= EIP197_HIA_DSE_CFG_ALWAYS_BUFFERABLE;
+ 	/* FIXME: instability issues can occur for EIP97 but disabling it impact
+ 	 * performances.
+ 	 */
+diff --git a/drivers/crypto/inside-secure/safexcel.h b/drivers/crypto/inside-secure/safexcel.h
+index d8dff65fc311..2b7bed3cfb75 100644
+--- a/drivers/crypto/inside-secure/safexcel.h
++++ b/drivers/crypto/inside-secure/safexcel.h
+@@ -179,7 +179,7 @@
+ #define EIP197_HIA_DxE_CFG_MIN_DATA_SIZE(n)	((n) << 0)
+ #define EIP197_HIA_DxE_CFG_DATA_CACHE_CTRL(n)	(((n) & 0x7) << 4)
+ #define EIP197_HIA_DxE_CFG_MAX_DATA_SIZE(n)	((n) << 8)
+-#define EIP197_HIA_DSE_CFG_ALLWAYS_BUFFERABLE	GENMASK(15, 14)
++#define EIP197_HIA_DSE_CFG_ALWAYS_BUFFERABLE	GENMASK(15, 14)
+ #define EIP197_HIA_DxE_CFG_MIN_CTRL_SIZE(n)	((n) << 16)
+ #define EIP197_HIA_DxE_CFG_CTRL_CACHE_CTRL(n)	(((n) & 0x7) << 20)
+ #define EIP197_HIA_DxE_CFG_MAX_CTRL_SIZE(n)	((n) << 24)
+-- 
+2.14.3
