@@ -1,54 +1,54 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: doc - clarify hash callbacks state machine
-Date: Tue, 20 Mar 2018 07:33:23 +0800
-Message-ID: <20180319233323.GA15897@gondor.apana.org.au>
-References: <20180305103945.3517-1-horia.geanta@nxp.com>
- <20180316151642.GA6606@gondor.apana.org.au>
- <AM3PR04MB45284A83B66E00785872DE698D40@AM3PR04MB452.eurprd04.prod.outlook.com>
- <20180319092458.GB12302@gondor.apana.org.au>
- <AM3PR04MB4520497CC3D9B2B98B8E63798D40@AM3PR04MB452.eurprd04.prod.outlook.com>
+Subject: Re: [PATCH v5 00/23] crypto: arm64 - play nice with CONFIG_PREEMPT
+Date: Tue, 20 Mar 2018 07:36:32 +0800
+Message-ID: <20180319233631.GB15897@gondor.apana.org.au>
+References: <20180310152208.10369-1-ard.biesheuvel@linaro.org>
+ <20180316155735.GJ7095@gondor.apana.org.au>
+ <CAKv+Gu8jCa7dAoXHan+3zwBt2pZjD22MaCSwiAM-bXHgvVJkmQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Cc: "David S. Miller" <davem@davemloft.net>,
-        Jonathan Corbet <corbet@lwn.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-To: Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Mark Rutland <mark.rutland@arm.com>, linux-rt-users@vger.kernel.org,
+ Peter Zijlstra <peterz@infradead.org>,
+ Catalin Marinas <catalin.marinas@arm.com>,
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ Will Deacon <will.deacon@arm.com>,
+ Russell King - ARM Linux <linux@armlinux.org.uk>,
+ Steven Rostedt <rostedt@goodmis.org>,
+ "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+ <linux-crypto@vger.kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
+ Dave Martin <Dave.Martin@arm.com>,
+ linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 Content-Disposition: inline
-In-Reply-To: <AM3PR04MB4520497CC3D9B2B98B8E63798D40@AM3PR04MB452.eurprd04.prod.outlook.com>
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <CAKv+Gu8jCa7dAoXHan+3zwBt2pZjD22MaCSwiAM-bXHgvVJkmQ@mail.gmail.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Mar 19, 2018 at 11:04:24AM +0000, Horia Geantă wrote:
+On Mon, Mar 19, 2018 at 11:31:24PM +0800, Ard Biesheuvel wrote:
 >
-> The only solution to avoid leaks in this case is to repeatedly DMA map & unmap
-> the buffer.
-> IOW, if one wants to load/save HW state in a buffer after an .update() and to
-> instruct the crypto engine to do this operation, the following steps are involved:
-> -gpp: DMA map the buffer, get its IOVA
-> -gpp: program the crypto engine with IOVA, wait for crypto engine's signal
-> -crypto engine: load HW state from buffer, perform the partial hash, save HW
-> state in buffer, signal gpp
-> -gpp: DMA unmap the buffer
+> Apologies if this wasn't clear, but there are some cross dependencies
+> with the arm64 tree, which receives non-trivial modifications in
+> patches 10 and 11, which are subsequently depended upon by patches 12
+> - 23.
+> 
+> Without acks from them, we should really not be merging this code yet,
+> especially because I noticed a rebase issue in patch #10 (my bad).
+> 
+> Would you mind reverting 10 - 22? I will revisit this asap, and try to
+> get acks for the arm64 patches. If that means waiting for the next
+> cycle, so be it.
 
-What buffer are you talking about here? Is it the hash state?
-
-If it's the hash state and assuming DMA mapping was slow enough
-on your platform, you could solve it by maintaining a fixed set
-of hash states that are rotated through the actual hash requests.
-
-Let's say you allocate n such hash states which are always mapped,
-then if there are less than n hash requests outstanding, you could
-directly use the mapped hash states in the requests.
-
-If there are more than n, then you simply copy in/copy out for each
-hash operation.
-
-The number n limits how many operations can be pending to be
-processed by the hardware.
+Sure it's done now.
 
 Cheers,
 -- 
