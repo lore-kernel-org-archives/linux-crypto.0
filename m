@@ -1,7 +1,7 @@
 From: Antoine Tenart <antoine.tenart@bootlin.com>
-Subject: [PATCH v2 3/9] crypto: inside-secure - fix a typo in a register name
-Date: Mon, 19 Mar 2018 09:21:15 +0100
-Message-ID: <20180319082121.32103-4-antoine.tenart@bootlin.com>
+Subject: [PATCH v2 4/9] crypto: inside-secure - improve the send error path
+Date: Mon, 19 Mar 2018 09:21:16 +0100
+Message-ID: <20180319082121.32103-5-antoine.tenart@bootlin.com>
 References: <20180319082121.32103-1-antoine.tenart@bootlin.com>
 Cc: Antoine Tenart <antoine.tenart@bootlin.com>,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -14,41 +14,46 @@ In-Reply-To: <20180319082121.32103-1-antoine.tenart@bootlin.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This patch fixes a typo in the EIP197_HIA_xDR_WR_CTRL_BUG register name,
-as it should be EIP197_HIA_xDR_WR_CTRL_BUF. This is a cosmetic only
-change.
+This patch improves the send error path as it wasn't handling all error
+cases. A new label is added, and some of the goto are updated to point
+to the right labels, so that the code is more robust to errors.
 
 Signed-off-by: Antoine Tenart <antoine.tenart@bootlin.com>
 ---
- drivers/crypto/inside-secure/safexcel.c | 2 +-
- drivers/crypto/inside-secure/safexcel.h | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ drivers/crypto/inside-secure/safexcel_hash.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/inside-secure/safexcel.c
-index 5fe85b9dad64..7b291068222f 100644
---- a/drivers/crypto/inside-secure/safexcel.c
-+++ b/drivers/crypto/inside-secure/safexcel.c
-@@ -235,7 +235,7 @@ static int safexcel_hw_setup_rdesc_rings(struct safexcel_crypto_priv *priv)
- 		/* Configure DMA tx control */
- 		val = EIP197_HIA_xDR_CFG_WR_CACHE(WR_CACHE_3BITS);
- 		val |= EIP197_HIA_xDR_CFG_RD_CACHE(RD_CACHE_3BITS);
--		val |= EIP197_HIA_xDR_WR_RES_BUF | EIP197_HIA_xDR_WR_CTRL_BUG;
-+		val |= EIP197_HIA_xDR_WR_RES_BUF | EIP197_HIA_xDR_WR_CTRL_BUF;
- 		writel(val,
- 		       EIP197_HIA_RDR(priv, i) + EIP197_HIA_xDR_DMA_CFG);
+diff --git a/drivers/crypto/inside-secure/safexcel_hash.c b/drivers/crypto/inside-secure/safexcel_hash.c
+index bb2be12a8f4a..ef3e0c1c0f2c 100644
+--- a/drivers/crypto/inside-secure/safexcel_hash.c
++++ b/drivers/crypto/inside-secure/safexcel_hash.c
+@@ -279,7 +279,7 @@ static int safexcel_ahash_send_req(struct crypto_async_request *async, int ring,
+ 					   sglen, len, ctx->base.ctxr_dma);
+ 		if (IS_ERR(cdesc)) {
+ 			ret = PTR_ERR(cdesc);
+-			goto cdesc_rollback;
++			goto unmap_sg;
+ 		}
+ 		n_cdesc++;
  
-diff --git a/drivers/crypto/inside-secure/safexcel.h b/drivers/crypto/inside-secure/safexcel.h
-index 2b7bed3cfb75..8c139b98a580 100644
---- a/drivers/crypto/inside-secure/safexcel.h
-+++ b/drivers/crypto/inside-secure/safexcel.h
-@@ -135,7 +135,7 @@
+@@ -303,7 +303,7 @@ static int safexcel_ahash_send_req(struct crypto_async_request *async, int ring,
+ 					 DMA_FROM_DEVICE);
+ 	if (dma_mapping_error(priv->dev, req->result_dma)) {
+ 		ret = -EINVAL;
+-		goto cdesc_rollback;
++		goto unmap_sg;
+ 	}
  
- /* EIP197_HIA_xDR_DMA_CFG */
- #define EIP197_HIA_xDR_WR_RES_BUF		BIT(22)
--#define EIP197_HIA_xDR_WR_CTRL_BUG		BIT(23)
-+#define EIP197_HIA_xDR_WR_CTRL_BUF		BIT(23)
- #define EIP197_HIA_xDR_WR_OWN_BUF		BIT(24)
- #define EIP197_HIA_xDR_CFG_WR_CACHE(n)		(((n) & 0x7) << 25)
- #define EIP197_HIA_xDR_CFG_RD_CACHE(n)		(((n) & 0x7) << 29)
+ 	/* Add a result descriptor */
+@@ -324,6 +324,9 @@ static int safexcel_ahash_send_req(struct crypto_async_request *async, int ring,
+ 	return 0;
+ 
+ unmap_result:
++	dma_unmap_single(priv->dev, req->result_dma, req->state_sz,
++			 DMA_FROM_DEVICE);
++unmap_sg:
+ 	dma_unmap_sg(priv->dev, areq->src, req->nents, DMA_TO_DEVICE);
+ cdesc_rollback:
+ 	for (i = 0; i < n_cdesc; i++)
 -- 
 2.14.3
