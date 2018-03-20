@@ -1,447 +1,71 @@
-From: Benjamin Warnke <4bwarnke@informatik.uni-hamburg.de>
-Subject: [PATCH 2/5 v4] crypto: add zBeWalgo to crypto-api
-Date: Tue, 20 Mar 2018 15:04:27 +0100
-Message-ID: <1B59F77F-1AD8-484A-BA18-255502527323@informatik.uni-hamburg.de>
-Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
-Content-Type: text/plain;
-        charset=us-ascii
-Content-Transfer-Encoding: 8BIT
+From: Philippe Ombredanne <pombredanne@nexb.com>
+Subject: Re: [PATCH 1/5 v4] add compression algorithm zBeWalgo
+Date: Tue, 20 Mar 2018 09:30:12 -0700
+Message-ID: <CAOFm3uH1Nw3x6-T1yTMkoX2tpxiwjnerAXDh-WEpyFNROFwAYw@mail.gmail.com>
+References: <D7FA4547-4FA6-46EC-99D7-F08ACCD3F13D@informatik.uni-hamburg.de>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
 Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        linux-kernel@vger.kernel.org, herbert@gondor.apana.org.au,
-        davem@davemloft.net, minchan@kernel.org, ngupta@vflare.org,
+        LKML <linux-kernel@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>, minchan@kernel.org,
+        ngupta@vflare.org,
         Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>
-To: unlisted-recipients:; (no To-header on input)
+To: Benjamin Warnke <4bwarnke@informatik.uni-hamburg.de>
 Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <D7FA4547-4FA6-46EC-99D7-F08ACCD3F13D@informatik.uni-hamburg.de>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This patch adds zBeWalgo to the crypto api so that zBeWalgo can be used by
-zram.
+Hi Benjamin,
 
-Signed-off-by: Benjamin Warnke <4bwarnke@informatik.uni-hamburg.de>
----
- crypto/Kconfig                |  12 +++
- crypto/Makefile               |   1 +
- crypto/testmgr.c              |  10 +++
- crypto/testmgr.h              | 134 ++++++++++++++++++++++++++++++++
- crypto/zbewalgo.c             | 177 ++++++++++++++++++++++++++++++++++++++++++
- drivers/block/zram/zcomp.c    |   3 +
- drivers/block/zram/zram_drv.h |   4 +-
- 7 files changed, 340 insertions(+), 1 deletion(-)
- create mode 100644 crypto/zbewalgo.c
+On Tue, Mar 20, 2018 at 7:04 AM, Benjamin Warnke
+<4bwarnke@informatik.uni-hamburg.de> wrote:
+> zBeWalgo is a completely new algorithm - Currently it is not published
+> somewhere else right now, googleing it would not show up any results. The
+> following section describes how the algorithm works.
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index b75264b09..3ac0d4ca7 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -1668,6 +1668,18 @@ config CRYPTO_LZ4
- 	help
- 	  This is the LZ4 algorithm.
- 
-+config CRYPTO_ZBEWALGO
-+	tristate "zBeWalgo compression algorithm"
-+	select CRYPTO_ALGAPI
-+	select CRYPTO_ACOMP2
-+	select ZBEWALGO_COMPRESS
-+	help
-+	  This is the zBeWalgo compression algorithm. This algorithm
-+	  accepts only input sizes of at most one page at once.
-+	  To achieve high compression ratios zbewalgo can call multiple
-+	  transformation and compression algorithms in a row to optimize
-+	  the compressed size.
-+
- config CRYPTO_LZ4HC
- 	tristate "LZ4HC compression algorithm"
- 	select CRYPTO_ALGAPI
-diff --git a/crypto/Makefile b/crypto/Makefile
-index cdbc03b35..2a42fb289 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -121,6 +121,7 @@ obj-$(CONFIG_CRYPTO_CRCT10DIF) += crct10dif_common.o crct10dif_generic.o
- obj-$(CONFIG_CRYPTO_AUTHENC) += authenc.o authencesn.o
- obj-$(CONFIG_CRYPTO_LZO) += lzo.o
- obj-$(CONFIG_CRYPTO_LZ4) += lz4.o
-+obj-$(CONFIG_CRYPTO_ZBEWALGO) += zbewalgo.o
- obj-$(CONFIG_CRYPTO_LZ4HC) += lz4hc.o
- obj-$(CONFIG_CRYPTO_842) += 842.o
- obj-$(CONFIG_CRYPTO_RNG2) += rng.o
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index d5e23a142..294075476 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -3566,6 +3566,16 @@ static const struct alg_test_desc alg_test_descs[] = {
- 				.dec = __VECS(tf_xts_dec_tv_template)
- 			}
- 		}
-+	}, {
-+		.alg = "zbewalgo",
-+		.test = alg_test_comp,
-+		.fips_allowed = 1,
-+		.suite = {
-+			.comp = {
-+				.comp = __VECS(zbewalgo_comp_tv_template),
-+				.decomp = __VECS(zbewalgo_decomp_tv_template)
-+			}
-+		}
- 	}, {
- 		.alg = "zlib-deflate",
- 		.test = alg_test_comp,
-diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index 6044f6906..996d8321e 100644
---- a/crypto/testmgr.h
-+++ b/crypto/testmgr.h
-@@ -35133,6 +35133,140 @@ static const struct hash_testvec bfin_crc_tv_template[] = {
- 
- };
- 
-+static const struct comp_testvec zbewalgo_comp_tv_template[] = {
-+	{
-+		.inlen	= 512,
-+		.outlen	= 402,
-+		.input	=
-+			"\x8a\x3a\xf3\xbe\x33\xf9\xab\x3d\xa1\x51\x9f\x7f\xad\xf6\xab\x3d"
-+			"\xad\x29\x8f\x3c\x27\xf4\xab\x3d\x06\x19\xc3\xf5\xa0\xf1\xab\x3d"
-+			"\xfb\x75\x3b\xab\x1a\xef\xab\x3d\xe3\x96\xf8\x5c\x94\xec\xab\x3d"
-+			"\x13\xd2\xfa\x0a\x0e\xea\xab\x3d\xe0\x7d\x42\xb5\x87\xe7\xab\x3d"
-+			"\xa1\xf0\xcf\x5b\x01\xe5\xab\x3d\xad\x80\xa3\xfe\x7a\xe2\xab\x3d"
-+			"\x59\x84\xbd\x9d\xf4\xdf\xab\x3d\xff\x51\x1e\x39\x6e\xdd\xab\x3d"
-+			"\xf5\x3f\xc6\xd0\xe7\xda\xab\x3d\x96\xa4\xb5\x64\x61\xd8\xab\x3d"
-+			"\x3b\xd6\xec\xf4\xda\xd5\xab\x3d\x3b\x2b\x6c\x81\x54\xd3\xab\x3d"
-+			"\xf2\xf9\x33\x0a\xce\xd0\xab\x3d\xbb\x98\x44\x8f\x47\xce\xab\x3d"
-+			"\xed\x5d\x9e\x10\xc1\xcb\xab\x3d\xe7\x9f\x41\x8e\x3a\xc9\xab\x3d"
-+			"\x07\xb5\x2e\x08\xb4\xc6\xab\x3d\xa9\xf3\x65\x7e\x2d\xc4\xab\x3d"
-+			"\x28\xb2\xe7\xf0\xa6\xc1\xab\x3d\xe3\x46\xb4\x5f\x20\xbf\xab\x3d"
-+			"\x38\x08\xcc\xca\x99\xbc\xab\x3d\x85\x4c\x2f\x32\x13\xba\xab\x3d"
-+			"\x2a\x6a\xde\x95\x8c\xb7\xab\x3d\x85\xb7\xd9\xf5\x05\xb5\xab\x3d"
-+			"\xf7\x8a\x21\x52\x7f\xb2\xab\x3d\xe2\x3a\xb6\xaa\xf8\xaf\xab\x3d"
-+			"\xa5\x1d\x98\xff\x71\xad\xab\x3d\xa3\x89\xc7\x50\xeb\xaa\xab\x3d"
-+			"\x3d\xd5\x44\x9e\x64\xa8\xab\x3d\xd6\x56\x10\xe8\xdd\xa5\xab\x3d"
-+			"\xce\x64\x2a\x2e\x57\xa3\xab\x3d\x8d\x55\x93\x70\xd0\xa0\xab\x3d"
-+			"\x76\x7f\x4b\xaf\x49\x9e\xab\x3d\xeb\x38\x53\xea\xc2\x9b\xab\x3d"
-+			"\x53\xd8\xaa\x21\x3c\x99\xab\x3d\x13\xb4\x52\x55\xb5\x96\xab\x3d"
-+			"\x92\x22\x4b\x85\x2e\x94\xab\x3d\x35\x7a\x94\xb1\xa7\x91\xab\x3d"
-+			"\x65\x11\x2f\xda\x20\x8f\xab\x3d\x86\x3e\x1b\xff\x99\x8c\xab\x3d"
-+			"\x02\x58\x59\x20\x13\x8a\xab\x3d\x41\xb4\xe9\x3d\x8c\x87\xab\x3d"
-+			"\xaf\xa9\xcc\x57\x05\x85\xab\x3d\xb5\x8e\x02\x6e\x7e\x82\xab\x3d"
-+			"\xb9\xb9\x8b\x80\xf7\x7f\xab\x3d\x27\x81\x68\x8f\x70\x7d\xab\x3d"
-+			"\x6a\x3b\x99\x9a\xe9\x7a\xab\x3d\xef\x3e\x1e\xa2\x62\x78\xab\x3d"
-+			"\x20\xe2\xf7\xa5\xdb\x75\xab\x3d\x6a\x7b\x26\xa6\x54\x73\xab\x3d"
-+			"\x3b\x61\xaa\xa2\xcd\x70\xab\x3d\xfe\xe9\x83\x9b\x46\x6e\xab\x3d"
-+			"\x22\x6c\xb3\x90\xbf\x6b\xab\x3d\x16\x3e\x39\x82\x38\x69\xab\x3d"
-+			"\x48\xb6\x15\x70\xb1\x66\xab\x3d\x26\x2b\x49\x5a\x2a\x64\xab\x3d"
-+			"\x23\xf3\xd3\x40\xa3\x61\xab\x3d\xae\x64\xb6\x23\x1c\x5f\xab\x3d"
-+			"\x37\xd6\xf0\x02\x95\x5c\xab\x3d\x30\x9e\x83\xde\x0d\x5a\xab\x3d",
-+		.output	=
-+			"\x02\x02\x07\x02\x07\x00\x00\x00\x0f\x00\x02\x8a\xa1\xad\x06\xfb"
-+			"\xe3\x13\xe0\xa1\xad\x59\xff\xf5\x96\x81\x3b\x7f\xf2\xbb\xed\xe7"
-+			"\x07\xa9\x28\xe3\x38\x85\x2a\x85\xf7\xe2\xa5\xa3\x3d\xd6\xce\x8d"
-+			"\x76\xeb\x53\x13\x92\x35\x65\x86\x02\x41\xaf\xb5\xb9\x27\x6a\xef"
-+			"\x20\x6a\x3b\xfe\x22\x16\x48\x26\x23\xae\x37\x30\x3a\x51\x29\x19"
-+			"\x75\x96\xd2\x7d\xf0\x80\x84\x51\x3f\xa4\xd6\x2b\xf9\x98\x5d\x9f"
-+			"\xb5\xf3\xb2\x46\x08\x4c\x6a\xb7\x8a\x3a\x1d\x89\xd5\x56\x64\x55"
-+			"\x7f\x38\xd8\xb4\x22\x7a\x11\x3e\x58\xb4\xa9\x8e\xb9\x81\x3b\x3e"
-+			"\xe2\x7b\x61\xe9\x6c\x3e\xb6\x2b\xf3\x64\xd6\x9e\xf3\x9f\x8f\xc3"
-+			"\x3b\xf8\xfa\x42\xcf\xa3\xbd\x1e\xc6\xb5\xec\x6c\x7f\x33\x44\x9e"
-+			"\x41\x2e\x65\xe7\xb4\xcc\x2f\xde\xd9\x21\xb6\x98\xc7\x44\x10\x2a"
-+			"\x93\x4b\x53\xaa\x52\x4b\x94\x2f\x1b\x59\xe9\xcc\x02\x8b\x68\x99"
-+			"\x1e\xf7\x26\xaa\x83\xb3\x39\x15\x49\xd3\xb6\xf0\x83\xbe\x7f\x3c"
-+			"\xf5\xab\x5c\x0a\xb5\x5b\xfe\x9d\x39\xd0\x64\xf4\x81\x0a\x8f\x10"
-+			"\x8e\x08\x7e\xf0\x5f\xca\x32\x95\xf5\x52\xaa\xff\x50\x9e\xe8\x2e"
-+			"\x70\xaf\xea\x21\x55\x85\xb1\xda\xff\x20\x3d\x57\x6e\x80\x8f\x9a"
-+			"\xa2\xa5\xa6\xa2\x9b\x90\x82\x70\x5a\x40\x23\x02\xde\x33\xad\x27"
-+			"\xa0\x1a\x94\x0e\x87\x01\x7a\xf4\x6e\xe7\x61\xda\x54\x6f\xce\x47"
-+			"\xc1\x3a\xb4\x2d\xa6\x20\x99\x13\x8c\x05\x7f\xf8\x71\xeb\x64\xdd"
-+			"\x57\xd0\x49\xc2\x3c\xb5\x2e\xa7\x20\x99\x13\x8c\x05\x7e\xf7\x70"
-+			"\xe9\x62\xdb\x54\xcd\x46\xbf\x38\xb1\x2a\xa3\x1c\x95\x0d\xf9\xf6"
-+			"\xf4\xf1\xef\xec\xea\xe7\xe5\xe2\xdf\xdd\xda\xd8\xd5\xd3\xd0\xce"
-+			"\xcb\xc9\xc6\xc4\xc1\xbf\xbc\xba\xb7\xb5\xb2\xaf\xad\xaa\xa8\xa5"
-+			"\xa3\xa0\x9e\x9b\x99\x96\x94\x91\x8f\x8c\x8a\x87\x85\x82\x7f\x7d"
-+			"\x7a\x78\x75\x73\x70\x6e\x6b\x69\x66\x64\x61\x5f\x5c\x5a\xbf\xab"
-+			"\xbf\x3d",
-+	},
-+};
-+
-+static const struct comp_testvec zbewalgo_decomp_tv_template[] = {
-+	{
-+		.inlen	= 402,
-+		.outlen	= 512,
-+		.input	=
-+			"\x02\x02\x07\x02\x07\x00\x00\x00\x0f\x00\x02\x8a\xa1\xad\x06\xfb"
-+			"\xe3\x13\xe0\xa1\xad\x59\xff\xf5\x96\x81\x3b\x7f\xf2\xbb\xed\xe7"
-+			"\x07\xa9\x28\xe3\x38\x85\x2a\x85\xf7\xe2\xa5\xa3\x3d\xd6\xce\x8d"
-+			"\x76\xeb\x53\x13\x92\x35\x65\x86\x02\x41\xaf\xb5\xb9\x27\x6a\xef"
-+			"\x20\x6a\x3b\xfe\x22\x16\x48\x26\x23\xae\x37\x30\x3a\x51\x29\x19"
-+			"\x75\x96\xd2\x7d\xf0\x80\x84\x51\x3f\xa4\xd6\x2b\xf9\x98\x5d\x9f"
-+			"\xb5\xf3\xb2\x46\x08\x4c\x6a\xb7\x8a\x3a\x1d\x89\xd5\x56\x64\x55"
-+			"\x7f\x38\xd8\xb4\x22\x7a\x11\x3e\x58\xb4\xa9\x8e\xb9\x81\x3b\x3e"
-+			"\xe2\x7b\x61\xe9\x6c\x3e\xb6\x2b\xf3\x64\xd6\x9e\xf3\x9f\x8f\xc3"
-+			"\x3b\xf8\xfa\x42\xcf\xa3\xbd\x1e\xc6\xb5\xec\x6c\x7f\x33\x44\x9e"
-+			"\x41\x2e\x65\xe7\xb4\xcc\x2f\xde\xd9\x21\xb6\x98\xc7\x44\x10\x2a"
-+			"\x93\x4b\x53\xaa\x52\x4b\x94\x2f\x1b\x59\xe9\xcc\x02\x8b\x68\x99"
-+			"\x1e\xf7\x26\xaa\x83\xb3\x39\x15\x49\xd3\xb6\xf0\x83\xbe\x7f\x3c"
-+			"\xf5\xab\x5c\x0a\xb5\x5b\xfe\x9d\x39\xd0\x64\xf4\x81\x0a\x8f\x10"
-+			"\x8e\x08\x7e\xf0\x5f\xca\x32\x95\xf5\x52\xaa\xff\x50\x9e\xe8\x2e"
-+			"\x70\xaf\xea\x21\x55\x85\xb1\xda\xff\x20\x3d\x57\x6e\x80\x8f\x9a"
-+			"\xa2\xa5\xa6\xa2\x9b\x90\x82\x70\x5a\x40\x23\x02\xde\x33\xad\x27"
-+			"\xa0\x1a\x94\x0e\x87\x01\x7a\xf4\x6e\xe7\x61\xda\x54\x6f\xce\x47"
-+			"\xc1\x3a\xb4\x2d\xa6\x20\x99\x13\x8c\x05\x7f\xf8\x71\xeb\x64\xdd"
-+			"\x57\xd0\x49\xc2\x3c\xb5\x2e\xa7\x20\x99\x13\x8c\x05\x7e\xf7\x70"
-+			"\xe9\x62\xdb\x54\xcd\x46\xbf\x38\xb1\x2a\xa3\x1c\x95\x0d\xf9\xf6"
-+			"\xf4\xf1\xef\xec\xea\xe7\xe5\xe2\xdf\xdd\xda\xd8\xd5\xd3\xd0\xce"
-+			"\xcb\xc9\xc6\xc4\xc1\xbf\xbc\xba\xb7\xb5\xb2\xaf\xad\xaa\xa8\xa5"
-+			"\xa3\xa0\x9e\x9b\x99\x96\x94\x91\x8f\x8c\x8a\x87\x85\x82\x7f\x7d"
-+			"\x7a\x78\x75\x73\x70\x6e\x6b\x69\x66\x64\x61\x5f\x5c\x5a\xbf\xab"
-+			"\xbf\x3d",
-+		.output	=
-+			"\x8a\x3a\xf3\xbe\x33\xf9\xab\x3d\xa1\x51\x9f\x7f\xad\xf6\xab\x3d"
-+			"\xad\x29\x8f\x3c\x27\xf4\xab\x3d\x06\x19\xc3\xf5\xa0\xf1\xab\x3d"
-+			"\xfb\x75\x3b\xab\x1a\xef\xab\x3d\xe3\x96\xf8\x5c\x94\xec\xab\x3d"
-+			"\x13\xd2\xfa\x0a\x0e\xea\xab\x3d\xe0\x7d\x42\xb5\x87\xe7\xab\x3d"
-+			"\xa1\xf0\xcf\x5b\x01\xe5\xab\x3d\xad\x80\xa3\xfe\x7a\xe2\xab\x3d"
-+			"\x59\x84\xbd\x9d\xf4\xdf\xab\x3d\xff\x51\x1e\x39\x6e\xdd\xab\x3d"
-+			"\xf5\x3f\xc6\xd0\xe7\xda\xab\x3d\x96\xa4\xb5\x64\x61\xd8\xab\x3d"
-+			"\x3b\xd6\xec\xf4\xda\xd5\xab\x3d\x3b\x2b\x6c\x81\x54\xd3\xab\x3d"
-+			"\xf2\xf9\x33\x0a\xce\xd0\xab\x3d\xbb\x98\x44\x8f\x47\xce\xab\x3d"
-+			"\xed\x5d\x9e\x10\xc1\xcb\xab\x3d\xe7\x9f\x41\x8e\x3a\xc9\xab\x3d"
-+			"\x07\xb5\x2e\x08\xb4\xc6\xab\x3d\xa9\xf3\x65\x7e\x2d\xc4\xab\x3d"
-+			"\x28\xb2\xe7\xf0\xa6\xc1\xab\x3d\xe3\x46\xb4\x5f\x20\xbf\xab\x3d"
-+			"\x38\x08\xcc\xca\x99\xbc\xab\x3d\x85\x4c\x2f\x32\x13\xba\xab\x3d"
-+			"\x2a\x6a\xde\x95\x8c\xb7\xab\x3d\x85\xb7\xd9\xf5\x05\xb5\xab\x3d"
-+			"\xf7\x8a\x21\x52\x7f\xb2\xab\x3d\xe2\x3a\xb6\xaa\xf8\xaf\xab\x3d"
-+			"\xa5\x1d\x98\xff\x71\xad\xab\x3d\xa3\x89\xc7\x50\xeb\xaa\xab\x3d"
-+			"\x3d\xd5\x44\x9e\x64\xa8\xab\x3d\xd6\x56\x10\xe8\xdd\xa5\xab\x3d"
-+			"\xce\x64\x2a\x2e\x57\xa3\xab\x3d\x8d\x55\x93\x70\xd0\xa0\xab\x3d"
-+			"\x76\x7f\x4b\xaf\x49\x9e\xab\x3d\xeb\x38\x53\xea\xc2\x9b\xab\x3d"
-+			"\x53\xd8\xaa\x21\x3c\x99\xab\x3d\x13\xb4\x52\x55\xb5\x96\xab\x3d"
-+			"\x92\x22\x4b\x85\x2e\x94\xab\x3d\x35\x7a\x94\xb1\xa7\x91\xab\x3d"
-+			"\x65\x11\x2f\xda\x20\x8f\xab\x3d\x86\x3e\x1b\xff\x99\x8c\xab\x3d"
-+			"\x02\x58\x59\x20\x13\x8a\xab\x3d\x41\xb4\xe9\x3d\x8c\x87\xab\x3d"
-+			"\xaf\xa9\xcc\x57\x05\x85\xab\x3d\xb5\x8e\x02\x6e\x7e\x82\xab\x3d"
-+			"\xb9\xb9\x8b\x80\xf7\x7f\xab\x3d\x27\x81\x68\x8f\x70\x7d\xab\x3d"
-+			"\x6a\x3b\x99\x9a\xe9\x7a\xab\x3d\xef\x3e\x1e\xa2\x62\x78\xab\x3d"
-+			"\x20\xe2\xf7\xa5\xdb\x75\xab\x3d\x6a\x7b\x26\xa6\x54\x73\xab\x3d"
-+			"\x3b\x61\xaa\xa2\xcd\x70\xab\x3d\xfe\xe9\x83\x9b\x46\x6e\xab\x3d"
-+			"\x22\x6c\xb3\x90\xbf\x6b\xab\x3d\x16\x3e\x39\x82\x38\x69\xab\x3d"
-+			"\x48\xb6\x15\x70\xb1\x66\xab\x3d\x26\x2b\x49\x5a\x2a\x64\xab\x3d"
-+			"\x23\xf3\xd3\x40\xa3\x61\xab\x3d\xae\x64\xb6\x23\x1c\x5f\xab\x3d"
-+			"\x37\xd6\xf0\x02\x95\x5c\xab\x3d\x30\x9e\x83\xde\x0d\x5a\xab\x3d",
-+	},
-+};
-+
- static const struct comp_testvec lz4_comp_tv_template[] = {
- 	{
- 		.inlen	= 255,
-diff --git a/crypto/zbewalgo.c b/crypto/zbewalgo.c
-new file mode 100644
-index 000000000..be1220ad8
---- /dev/null
-+++ b/crypto/zbewalgo.c
-@@ -0,0 +1,177 @@
-+/*
-+ * Cryptographic API.
-+ *
-+ * Copyright (c) 2018 Benjamin Warnke <4bwarnke@informatik.uni-hamburg.de>
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU General Public License version 2 as published by
-+ * the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful, but WITHOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
-+ * more details.
-+ *
-+ * You should have received a copy of the GNU General Public License along with
-+ * this program.
-+ *
-+ */
-+
-+#include <crypto/internal/scompress.h>
-+#include <linux/crypto.h>
-+#include <linux/delay.h>
-+#include <linux/init.h>
-+#include <linux/module.h>
-+#include <linux/vmalloc.h>
-+#include "linux/zbewalgo.h"
-+
-+struct zbewalgo_ctx {
-+	void *zbewalgo_comp_mem;
-+};
-+
-+static void *zbewalgo_alloc_ctx(struct crypto_scomp *tfm)
-+{
-+	void *ctx;
-+
-+	ctx = vmalloc(zbewalgo_get_wrkmem_size());
-+	if (!ctx)
-+		return ERR_PTR(-ENOMEM);
-+	return ctx;
-+}
-+
-+static int zbewalgo_init(struct crypto_tfm *tfm)
-+{
-+	struct zbewalgo_ctx *ctx = crypto_tfm_ctx(tfm);
-+
-+	ctx->zbewalgo_comp_mem = zbewalgo_alloc_ctx(NULL);
-+	if (IS_ERR(ctx->zbewalgo_comp_mem))
-+		return -ENOMEM;
-+	return 0;
-+}
-+
-+static void zbewalgo_free_ctx(struct crypto_scomp *tfm, void *ctx)
-+{
-+	vfree(ctx);
-+}
-+
-+static void zbewalgo_exit(struct crypto_tfm *tfm)
-+{
-+	struct zbewalgo_ctx *ctx = crypto_tfm_ctx(tfm);
-+
-+	zbewalgo_free_ctx(NULL, ctx->zbewalgo_comp_mem);
-+}
-+
-+static int __zbewalgo_compress_crypto(const u8 *src, unsigned int slen,
-+				      u8 *dst, unsigned int *dlen, void *ctx)
-+{
-+	int out_len;
-+
-+	if (slen > 4096)
-+		return -EINVAL;
-+	out_len = zbewalgo_compress(src, dst, ctx, slen);
-+	if (!out_len)
-+		return -EINVAL;
-+	*dlen = out_len;
-+	return 0;
-+}
-+
-+static int zbewalgo_scompress(struct crypto_scomp *tfm, const u8 *src,
-+			      unsigned int slen, u8 *dst, unsigned int *dlen,
-+			      void *ctx)
-+{
-+	return __zbewalgo_compress_crypto(src, slen, dst, dlen, ctx);
-+}
-+
-+static int zbewalgo_compress_crypto(struct crypto_tfm *tfm, const u8 *src,
-+				    unsigned int slen, u8 *dst,
-+				    unsigned int *dlen)
-+{
-+	struct zbewalgo_ctx *ctx = crypto_tfm_ctx(tfm);
-+
-+	return __zbewalgo_compress_crypto(src, slen, dst, dlen,
-+		ctx->zbewalgo_comp_mem);
-+}
-+
-+static int __zbewalgo_decompress_crypto(const u8 *src, unsigned int slen,
-+					u8 *dst, unsigned int *dlen, void *ctx)
-+{
-+	int out_len;
-+
-+	out_len = zbewalgo_decompress_safe(src, dst, ctx, slen);
-+	if (out_len < 0)
-+		return -EINVAL;
-+	*dlen = out_len;
-+	return 0;
-+}
-+
-+static int zbewalgo_sdecompress(struct crypto_scomp *tfm, const u8 *src,
-+				unsigned int slen, u8 *dst, unsigned int *dlen,
-+				void *ctx)
-+{
-+	return __zbewalgo_decompress_crypto(src, slen, dst, dlen, ctx);
-+}
-+
-+static int zbewalgo_decompress_crypto(struct crypto_tfm *tfm, const u8 *src,
-+				      unsigned int slen, u8 *dst,
-+				      unsigned int *dlen)
-+{
-+	struct zbewalgo_ctx *ctx = crypto_tfm_ctx(tfm);
-+
-+	return __zbewalgo_decompress_crypto(src, slen, dst, dlen,
-+		ctx->zbewalgo_comp_mem);
-+}
-+
-+static struct crypto_alg crypto_alg_zbewalgo = {
-+	.cra_name = "zbewalgo",
-+	.cra_flags = CRYPTO_ALG_TYPE_COMPRESS,
-+	.cra_ctxsize = sizeof(struct zbewalgo_ctx),
-+	.cra_module = THIS_MODULE,
-+	.cra_init = zbewalgo_init,
-+	.cra_exit = zbewalgo_exit,
-+	.cra_u = {
-+		.compress = {
-+			.coa_compress = zbewalgo_compress_crypto,
-+			.coa_decompress = zbewalgo_decompress_crypto
-+		}
-+	}
-+};
-+
-+static struct scomp_alg scomp = {
-+	.alloc_ctx = zbewalgo_alloc_ctx,
-+	 .free_ctx = zbewalgo_free_ctx,
-+	 .compress = zbewalgo_scompress,
-+	 .decompress = zbewalgo_sdecompress,
-+	 .base = {
-+		 .cra_name = "zbewalgo",
-+		 .cra_driver_name = "zbewalgo-scomp",
-+		 .cra_module = THIS_MODULE,
-+	}
-+};
-+
-+static int __init zbewalgo_mod_init(void)
-+{
-+	int ret;
-+
-+	ret = crypto_register_alg(&crypto_alg_zbewalgo);
-+	if (ret)
-+		return ret;
-+	ret = crypto_register_scomp(&scomp);
-+	if (ret) {
-+		crypto_unregister_alg(&crypto_alg_zbewalgo);
-+		return ret;
-+	}
-+	return ret;
-+}
-+
-+static void __exit zbewalgo_mod_fini(void)
-+{
-+	crypto_unregister_alg(&crypto_alg_zbewalgo);
-+	crypto_unregister_scomp(&scomp);
-+}
-+
-+module_init(zbewalgo_mod_init);
-+module_exit(zbewalgo_mod_fini);
-+
-+MODULE_LICENSE("GPL");
-+MODULE_DESCRIPTION("zBeWalgo Compression Algorithm");
-+MODULE_ALIAS_CRYPTO("zbewalgo");
-diff --git a/drivers/block/zram/zcomp.c b/drivers/block/zram/zcomp.c
-index 4ed0a78fd..15b3a0162 100644
---- a/drivers/block/zram/zcomp.c
-+++ b/drivers/block/zram/zcomp.c
-@@ -23,6 +23,9 @@ static const char * const backends[] = {
- #if IS_ENABLED(CONFIG_CRYPTO_LZ4)
- 	"lz4",
- #endif
-+#if IS_ENABLED(CONFIG_CRYPTO_ZBEWALGO)
-+	"zbewalgo",
-+#endif
- #if IS_ENABLED(CONFIG_CRYPTO_LZ4HC)
- 	"lz4hc",
- #endif
-diff --git a/drivers/block/zram/zram_drv.h b/drivers/block/zram/zram_drv.h
-index 31762db86..84dee5383 100644
---- a/drivers/block/zram/zram_drv.h
-+++ b/drivers/block/zram/zram_drv.h
-@@ -27,7 +27,9 @@
-  * Pages that compress to size greater than this are stored
-  * uncompressed in memory.
-  */
--static const size_t max_zpage_size = PAGE_SIZE / 4 * 3;
-+static const size_t max_zpage_size =
-+	3264 /* largest reported size_class by zsmalloc */
-+	- (sizeof(unsigned long)); /* zsmalloc internal overhead */
- 
- /*
-  * NOTE: max_zpage_size must be less than or equal to:
+<snip>
+
+> diff --git a/lib/zbewalgo/zbewalgo.c b/lib/zbewalgo/zbewalgo.c
+> new file mode 100644
+> index 000000000..ef922bc27
+> --- /dev/null
+> +++ b/lib/zbewalgo/zbewalgo.c
+> @@ -0,0 +1,723 @@
+> +/*
+> + * Copyright (c) 2018 Benjamin Warnke <4bwarnke@informatik.uni-hamburg.de>
+> + *
+> + * This program is free software; you can redistribute it and/or modify it
+> + * under the terms of the GNU General Public License version 2 as published by
+> + * the Free Software Foundation.
+> + *
+> + * This program is distributed in the hope that it will be useful, but WITHOUT
+> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+> + * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+> + * more details.
+> + *
+> + * You should have received a copy of the GNU General Public License along with
+> + * this program.
+> + *
+
+Would you mind using SPDX ids [1] instead of this fine boilerplate
+here and throughout your patches?
+
+<snip>
+
+> +MODULE_LICENSE("GPL");
+> +MODULE_DESCRIPTION("zBeWalgo Compression Algorithm");
+
+Here your MODULE_LICENSE does not match your top level license. See
+module.h [2] for a description of values: GPL would mean "GNU Public
+License v2 or later" whereas your top level license (best expressed
+with SPDX) would mean GPL-2.0 and no other version. To avoid
+confusion, you would need to state the same thing in the
+MODULE_LICENSE and your SPDX tags.
+
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/process/license-rules.rst
+[2] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/include/linux/module.h#n175
 -- 
-2.14.1
+Cordially
+Philippe Ombredanne
