@@ -1,90 +1,102 @@
-From: Geert Uytterhoeven <geert-Td1EMuHUCqxL1ZNQvxDV9g@public.gmane.org>
-Subject: Re: [PATCH v2 10/21] lightnvm: Remove depends on HAS_DMA in case of
-	platform dependency
-Date: Tue, 20 Mar 2018 11:09:06 +0100
-Message-ID: <CAMuHMdXZNqO0NDESs9Y3uJs0kmQSXY05ei0xJE9uT9EUixuxAQ@mail.gmail.com>
-References: <1521208314-4783-1-git-send-email-geert@linux-m68k.org>
-	<1521208314-4783-11-git-send-email-geert@linux-m68k.org>
-	<AM5PR04MB3267989AB6A81639F61AB165ECD40@AM5PR04MB3267.eurprd04.prod.outlook.com>
+From: =?iso-8859-2?Q?Horia_Geant=E3?= <horia.geanta@nxp.com>
+Subject: Re: [PATCH v2] crypto: doc - clarify hash callbacks state machine
+Date: Tue, 20 Mar 2018 10:29:45 +0000
+Message-ID: <DBXPR04MB463D8753202F6587C526B1E98AB0@DBXPR04MB463.eurprd04.prod.outlook.com>
+References: <20180305103945.3517-1-horia.geanta@nxp.com>
+ <CGME20180320075741epcas5p3a7c026ba8644e54478955afcb6091023@epcas5p3.samsung.com>
+ <20180320075612.22719-1-horia.geanta@nxp.com>
+ <d036a7ef-d900-4858-b821-05c50b2b739e@partner.samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Ulf Hansson <ulf.hansson-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, Wolfram Sang <wsa-z923LK4zBo2bacvFa/9K2g@public.gmane.org>,
-	"linux-iio-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-iio-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	"linux-fpga-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-fpga-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	"linux-remoteproc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-remoteproc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	"alsa-devel-K7yf7f+aM1XWsZ/bQMPhNw@public.gmane.org" <alsa-devel-K7yf7f+aM1XWsZ/bQMPhNw@public.gmane.org>,
-	Bjorn Andersson <bjorn.andersson-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>,
-	Eric Anholt <eric-WhKQ6XTQaPysTnJN9+BGXg@public.gmane.org>,
-	"netdev-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <netdev-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	"linux-mtd-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org" <linux-mtd-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>,
-	"linux-i2c-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-i2c-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	"linux1394-devel-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org"
-	<linux1394-devel-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org>, Christoph Hellwig <hch-jcswGhMUV9g@public.gmane.org>,
-	Stefan Wahren <stefan.wahren-eS4NqCHxEME@public.gmane.org>,
-	Boris Brezillon <boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>,
-	"James E . J . Bottomley" <jejb-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org>,
-	Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-	"linux-s
-To: Madalin-cristian Bucur <madalin.bucur-3arQi8VN3Tc@public.gmane.org>
-Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-In-Reply-To: <AM5PR04MB3267989AB6A81639F61AB165ECD40-cEGzClBroOnsqXY5KrYE589NdZoXdze2vxpqHgZTriW3zl9H0oFU5g@public.gmane.org>
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
-List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
-Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Content-Type: text/plain; charset="iso-8859-2"
+Content-Transfer-Encoding: quoted-printable
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
+To: Kamil Konieczny <k.konieczny@partner.samsung.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jonathan Corbet <corbet@lwn.net>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi Madalin-cristian,
-
-On Mon, Mar 19, 2018 at 6:27 AM, Madalin-cristian Bucur
-<madalin.bucur-3arQi8VN3Tc@public.gmane.org> wrote:
->> -----Original Message-----
->> From: netdev-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org [mailto:netdev-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org]
->> On Behalf Of Geert Uytterhoeven
->> Remove dependencies on HAS_DMA where a Kconfig symbol depends on
->> another
->> symbol that implies HAS_DMA, and, optionally, on "|| COMPILE_TEST".
->> In most cases this other symbol is an architecture or platform specific
->> symbol, or PCI.
->>
->> Generic symbols and drivers without platform dependencies keep their
->> dependencies on HAS_DMA, to prevent compiling subsystems or drivers that
->> cannot work anyway.
->>
->> This simplifies the dependencies, and allows to improve compile-testing.
->>
->> Notes:
->>   - FSL_FMAN keeps its dependency on HAS_DMA, as it calls set_dma_ops(),
->>     which does not exist if HAS_DMA=n (Do we need a dummy? The use of
->>     set_dma_ops() in this driver is questionable),
->
-> Hi,
->
-> The set_dma_ops() is no longer required in the fsl/fman, I'll send a patch to remove it.
-
-Thank you, looking forward to it!
-
->>   - SND_SOC_LPASS_IPQ806X and SND_SOC_LPASS_PLATFORM loose their
->>     dependency on HAS_DMA, as they are selected from
->>     SND_SOC_APQ8016_SBC.
->>
->> Signed-off-by: Geert Uytterhoeven <geert-Td1EMuHUCqxL1ZNQvxDV9g@public.gmane.org>
->> Reviewed-by: Mark Brown <broonie-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
->> Acked-by: Robin Murphy <robin.murphy-5wv7dgnIgG8@public.gmane.org>
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
--- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert-Td1EMuHUCqxL1ZNQvxDV9g@public.gmane.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+On 3/20/2018 10:50 AM, Kamil Konieczny wrote:=0A=
+> On 20.03.2018 08:56, Horia Geant=E3 wrote:=0A=
+>> Add a note that it is perfectly legal to "abandon" a request object:=0A=
+>> - call .init() and then (as many times) .update()=0A=
+>> - _not_ call any of .final(), .finup() or .export() at any point in=0A=
+>>   future=0A=
+>>=0A=
+>> Link: https://lkml.kernel.org/r/20180222114741.ga27...@gondor.apana.org.=
+au=0A=
+>> Signed-off-by: Horia Geant=E3 <horia.geanta@nxp.com>=0A=
+>> ---=0A=
+>>  Documentation/crypto/devel-algos.rst | 8 ++++++++=0A=
+>>  1 file changed, 8 insertions(+)=0A=
+>>=0A=
+>> diff --git a/Documentation/crypto/devel-algos.rst b/Documentation/crypto=
+/devel-algos.rst=0A=
+>> index 66f50d32dcec..c45c6f400dbd 100644=0A=
+>> --- a/Documentation/crypto/devel-algos.rst=0A=
+>> +++ b/Documentation/crypto/devel-algos.rst=0A=
+>> @@ -236,6 +236,14 @@ when used from another part of the kernel.=0A=
+>>                                 |=0A=
+>>                                 '---------------> HASH2=0A=
+>>  =0A=
+>> +Note that it is perfectly legal to "abandon" a request object:=0A=
+>> +- call .init() and then (as many times) .update()=0A=
+>> +- _not_ call any of .final(), .finup() or .export() at any point in fut=
+ure=0A=
+>> +=0A=
+>> +In other words implementations should mind the resource allocation and =
+clean-up.=0A=
+>> +No resources related to request objects should remain allocated after a=
+ call=0A=
+> -- ^^^^^^^^^^^^=0A=
+>> +to .init() or .update(), since there might be no chance to free them.=
+=0A=
+> =0A=
+> is it for crypto api  users or for drivers ?=0A=
+> =0A=
+For drivers / providers (below crypto API).=0A=
+=0A=
+> the creator of request context is responsible for alloc and destroy,=0A=
+> so why there are no chance of free ?=0A=
+> =0A=
+Hash request object (including request context) is allocated by the user /=
+=0A=
+client by means of ahash_request_alloc(), and later on freed using=0A=
+ahash_request_free().=0A=
+I don't see a problem with this.=0A=
+=0A=
+However, besides the memory allocated for the request context, other resour=
+ces=0A=
+(related to the request) might be needed by the driver.=0A=
+I provided an example of needing to DMA map a buffer (to load/store HW stat=
+e=0A=
+from/to crypto engine), and I am not happy with either solutions:=0A=
+-DMA map & unmap after each .update()=0A=
+-Herbert's proposal to use a convoluted DMA mapping scheme=0A=
+=0A=
+Another example: dynamic memory allocation might be needed beyond what's=0A=
+available in request context, i.e. driver might not have apriori all the=0A=
+information needed to inform the tfm about required memory using=0A=
+crypto_ahash_set_reqsize().=0A=
+=0A=
+This happens due to the semantics of the crypto API, which allows the user =
+to=0A=
+initialize a request object and drop it without getting a result (final or=
+=0A=
+partial hash).=0A=
+I don't see what below use case is good for, maybe just for benchmarking:=
+=0A=
+req =3D ahash_request_alloc();=0A=
+[...]=0A=
+crypto_ahash_init(req);=0A=
+crypto_ahash_update(req);=0A=
+ahash_request_free(req);=0A=
+=0A=
+Horia=0A=
+=0A=
