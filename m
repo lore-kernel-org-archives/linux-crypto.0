@@ -1,63 +1,68 @@
-From: Kamil Konieczny <k.konieczny@partner.samsung.com>
-Subject: Re: [PATCH v2] crypto: doc - clarify hash callbacks state machine
-Date: Tue, 20 Mar 2018 09:50:17 +0100
-Message-ID: <d036a7ef-d900-4858-b821-05c50b2b739e@partner.samsung.com>
-References: <20180305103945.3517-1-horia.geanta@nxp.com>
-        <CGME20180320075741epcas5p3a7c026ba8644e54478955afcb6091023@epcas5p3.samsung.com>
-        <20180320075612.22719-1-horia.geanta@nxp.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Subject: Re: [PATCH v2 00/21] Allow compile-testing NO_DMA (drivers)
+Date: Tue, 20 Mar 2018 10:57:28 +0100
+Message-ID: <CAMuHMdUUKMngcyajm_s==KbhL3ZjMNHVxhNNGkPWkpnePE2rMw@mail.gmail.com>
+References: <1521208314-4783-1-git-send-email-geert@linux-m68k.org>
+ <20180316212317.7d5rri3p25hpmx44@ninjato>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-doc@vger.kernel.org,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
-To: =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jonathan Corbet <corbet@lwn.net>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-reply-to: <20180320075612.22719-1-horia.geanta@nxp.com>
-Content-language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Ulf Hansson <ulf.hansson@linaro.org>, linux-iio@vger.kernel.org,
+ linux-fpga@vger.kernel.org, linux-remoteproc@vger.kernel.org,
+ ALSA Development Mailing List <alsa-devel@alsa-project.org>,
+ Bjorn Andersson <bjorn.andersson@linaro.org>, Eric Anholt <eric@anholt.net>,
+ netdev <netdev@vger.kernel.org>,
+ MTD Maling List <linux-mtd@lists.infradead.org>,
+ Linux I2C <linux-i2c@vger.kernel.org>, linux1394-devel@lists.sourceforge.net,
+ Christoph Hellwig <hch@lst.de>, Marek Szyprowski <m.szyprowski@samsung.com>,
+ Stefan Wahren <stefan.wahren@i2se.com>,
+ Boris Brezillon <boris.brezillon@free-electrons.com>,
+ "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>, scsi <linux-scsi@vger.kernel.org>,
+ Richard Weinberger <richard@nod.at>, Joerg Roedel <joro@8bytes.org>,
+ Jassi Brar <jassisinghbrar@gmail.com>, Marek Vasut <marek.vasut@gmail.com>,
+ linux-seria
+To: Wolfram Sang <wsa@the-dreams.de>
+Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
+In-Reply-To: <20180316212317.7d5rri3p25hpmx44@ninjato>
+List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
+List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
+List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
+List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
+List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
+Errors-To: driverdev-devel-bounces@linuxdriverproject.org
+Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
 List-Id: linux-crypto.vger.kernel.org
 
+Hi Wolfram,
 
+On Fri, Mar 16, 2018 at 10:23 PM, Wolfram Sang <wsa@the-dreams.de> wrote:
+>> To avoid allmodconfig/allyesconfig regressions on NO_DMA=y platforms,
+>> this (drivers) series should be applied after the previous (core)
+>> series (but not many people may notice/care ;-)
+>
+> I still don't get if there is a dependency on the core patches. I.e.
+> shall I apply the subsystem patch now by myself or do you want to push
+> the series after the core patch and need my ack here?
 
-On 20.03.2018 08:56, Horia Geantă wrote:
-> Add a note that it is perfectly legal to "abandon" a request object:
-> - call .init() and then (as many times) .update()
-> - _not_ call any of .final(), .finup() or .export() at any point in
->   future
-> 
-> Link: https://lkml.kernel.org/r/20180222114741.GA27631@gondor.apana.org.au
-> Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
-> ---
->  Documentation/crypto/devel-algos.rst | 8 ++++++++
->  1 file changed, 8 insertions(+)
-> 
-> diff --git a/Documentation/crypto/devel-algos.rst b/Documentation/crypto/devel-algos.rst
-> index 66f50d32dcec..c45c6f400dbd 100644
-> --- a/Documentation/crypto/devel-algos.rst
-> +++ b/Documentation/crypto/devel-algos.rst
-> @@ -236,6 +236,14 @@ when used from another part of the kernel.
->                                 |
->                                 '---------------> HASH2
->  
-> +Note that it is perfectly legal to "abandon" a request object:
-> +- call .init() and then (as many times) .update()
-> +- _not_ call any of .final(), .finup() or .export() at any point in future
-> +
-> +In other words implementations should mind the resource allocation and clean-up.
-> +No resources related to request objects should remain allocated after a call
--- ^^^^^^^^^^^^
-> +to .init() or .update(), since there might be no chance to free them.
+Yes, there is a dependency. Without the core patches, enabling COMPILE_TEST,
+and compile-testing drivers irrelevant on obscure NO_DMA=y platforms will
+cause build failures.
 
-is it for crypto api  users or for drivers ?
+To play it safe, you want to postpone the subsystem patches until the core
+part has landed upstream. I will rebase and resubmit after v4.17-rc1.
 
-the creator of request context is responsible for alloc and destroy,
-so why there are no chance of free ?
+Thanks, and sorry for being unclear.
+
+Gr{oetje,eeting}s,
+
+                        Geert
 
 -- 
-Best regards,
-Kamil Konieczny
-Samsung R&D Institute Poland
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
