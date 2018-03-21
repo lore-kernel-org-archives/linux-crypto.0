@@ -1,44 +1,59 @@
-From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-Subject: [RFC] SHASH_DESC_ON_STACK macro
-Date: Wed, 21 Mar 2018 10:07:05 -0500
-Message-ID: <f662fa16-2cbb-a484-4efb-68bb3b39a792@embeddedor.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+From: Logan Gunthorpe <logang@deltatee.com>
+Subject: [PATCH v13 01/10] iomap: Use correct endian conversion function in mmio_writeXXbe
+Date: Wed, 21 Mar 2018 10:37:36 -0600
+Message-ID: <20180321163745.12286-2-logang@deltatee.com>
+References: <20180321163745.12286-1-logang@deltatee.com>
+Cc: Arnd Bergmann <arnd@arndb.de>,
+        Andy Shevchenko <andy.shevchenko@gmail.com>,
+        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Philippe Ombredanne <pombredanne@nexb.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Kate Stewart <kstewart@linuxfoundation.org>,
+        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
+To: linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
+        linux-ntb@googlegroups.com, linux-crypto@vger.kernel.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Language: en-US
+In-Reply-To: <20180321163745.12286-1-logang@deltatee.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi Herbert,
+The semantics of the iowriteXXbe() functions are to write a
+value in CPU endianess to an IO register that is known by the
+caller to be in Big Endian. The mmio_writeXXbe() macro, which
+is called by iowriteXXbe(), should therefore use cpu_to_beXX()
+instead of beXX_to_cpu().
 
-There is an ongoing effort to remove all VLAs from the code base [1] and 
-while working on that I came across the following macro at 
-include/crypto/hash.h:154:
+Seeing both beXX_to_cpu() and cpu_to_beXX() are both functionally
+implemented as either null operations or swabXX operations there
+was no noticable bug here. But it is confusing for both developers
+and code analysis tools alike.
 
-#define SHASH_DESC_ON_STACK(shash, ctx)                           \
-         char __##shash##_desc[sizeof(struct shash_desc) +         \
-                 crypto_shash_descsize(ctx)] CRYPTO_MINALIGN_ATTR; \
-         struct shash_desc *shash = (struct shash_desc *)__##shash##_desc
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+Cc: Philippe Ombredanne <pombredanne@nexb.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Kate Stewart <kstewart@linuxfoundation.org>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
+---
+ lib/iomap.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-
-Currently, this macro is being used in 46 different places.
-
-I wonder how big can tfm->descsize can get?
-
-Do you think it is feasible to replace the call to crypto_shash_descsize 
-with a constant value and get rid of 46 VLA warnings?
-
-I have sent some patches to replace the use of this macro with dynamic 
-memory allocation instead, but it seems that this is not a suitable 
-solution for all cases due to performance issues.
-
-[1] https://lkml.org/lkml/2018/3/7/621
-
-I'd really appreciate any feedback.
-Thanks
---
-Gustavo
+diff --git a/lib/iomap.c b/lib/iomap.c
+index 541d926da95e..be120c13d6cc 100644
+--- a/lib/iomap.c
++++ b/lib/iomap.c
+@@ -106,8 +106,8 @@ EXPORT_SYMBOL(ioread32be);
+ #endif
+ 
+ #ifndef mmio_write16be
+-#define mmio_write16be(val,port) __raw_writew(be16_to_cpu(val),port)
+-#define mmio_write32be(val,port) __raw_writel(be32_to_cpu(val),port)
++#define mmio_write16be(val,port) __raw_writew(cpu_to_be16(val),port)
++#define mmio_write32be(val,port) __raw_writel(cpu_to_be32(val),port)
+ #endif
+ 
+ void iowrite8(u8 val, void __iomem *addr)
+-- 
+2.11.0
