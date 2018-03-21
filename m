@@ -1,122 +1,440 @@
-From: Mimi Zohar <zohar@linux.vnet.ibm.com>
-Subject: Re: [PATCH v6 05/12] integrity: Introduce
- integrity_keyring_from_id()
-Date: Wed, 21 Mar 2018 18:46:51 -0400
-Message-ID: <1521672411.3848.219.camel@linux.vnet.ibm.com>
-References: <20180316203837.10174-1-bauerman@linux.vnet.ibm.com>
-         <20180316203837.10174-6-bauerman@linux.vnet.ibm.com>
+From: Nick Terrell <terrelln@fb.com>
+Subject: [RESEND PATCH] crypto: Add zstd support
+Date: Wed, 21 Mar 2018 15:49:29 -0700
+Message-ID: <20180321224929.3076350-1-terrelln@fb.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-kernel@vger.kernel.org,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        David Howells <dhowells@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Jessica Yu <jeyu@kernel.org>,
+Content-Type: text/plain
+Cc: Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
+        <kernel-team@fb.com>, Chris Mason <clm@fb.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        "AKASHI, Takahiro" <takahiro.akashi@linaro.org>
-To: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
-        linux-integrity@vger.kernel.org
+        <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        Geliang Tang <geliangtang@gmail.com>
+To: Nick Terrell <terrelln@fb.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180316203837.10174-6-bauerman@linux.vnet.ibm.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Fri, 2018-03-16 at 17:38 -0300, Thiago Jung Bauermann wrote:
-> IMA will need to obtain the keyring used to verify file signatures so that
-> it can verify the module-style signature appended to files.
-> 
-> Signed-off-by: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
+Adds zstd support to crypto and scompress. Only supports the default
+level.
 
-Signed-off-by: Mimi Zohar <zohar@linux.vnet.ibm.com>
+Previously we held off on this patch, since there weren't any users.
+Now zram is ready for zstd support, but depends on CONFIG_CRYPTO_ZSTD,
+which isn't defined until this patch is in. I also see a patch adding
+zstd to pstore [0], which depends on crypto zstd.
 
-> ---
->  security/integrity/digsig.c    | 28 +++++++++++++++++++++-------
->  security/integrity/integrity.h |  6 ++++++
->  2 files changed, 27 insertions(+), 7 deletions(-)
-> 
-> diff --git a/security/integrity/digsig.c b/security/integrity/digsig.c
-> index 6f9e4ce568cd..e641a67b9fc7 100644
-> --- a/security/integrity/digsig.c
-> +++ b/security/integrity/digsig.c
-> @@ -48,11 +48,10 @@ static bool init_keyring __initdata;
->  #define restrict_link_to_ima restrict_link_by_builtin_trusted
->  #endif
-> 
-> -int integrity_digsig_verify(const unsigned int id, const char *sig, int siglen,
-> -			    const char *digest, int digestlen)
-> +struct key *integrity_keyring_from_id(const unsigned int id)
->  {
-> -	if (id >= INTEGRITY_KEYRING_MAX || siglen < 2)
-> -		return -EINVAL;
-> +	if (id >= INTEGRITY_KEYRING_MAX)
-> +		return ERR_PTR(-EINVAL);
-> 
->  	if (!keyring[id]) {
->  		keyring[id] =
-> @@ -61,17 +60,32 @@ int integrity_digsig_verify(const unsigned int id, const char *sig, int siglen,
->  			int err = PTR_ERR(keyring[id]);
->  			pr_err("no %s keyring: %d\n", keyring_name[id], err);
->  			keyring[id] = NULL;
-> -			return err;
-> +			return ERR_PTR(err);
->  		}
->  	}
-> 
-> +	return keyring[id];
-> +}
-> +
-> +int integrity_digsig_verify(const unsigned int id, const char *sig, int siglen,
-> +			    const char *digest, int digestlen)
-> +{
-> +	struct key *keyring;
-> +
-> +	if (siglen < 2)
-> +		return -EINVAL;
-> +
-> +	keyring = integrity_keyring_from_id(id);
-> +	if (IS_ERR(keyring))
-> +		return PTR_ERR(keyring);
-> +
->  	switch (sig[1]) {
->  	case 1:
->  		/* v1 API expect signature without xattr type */
-> -		return digsig_verify(keyring[id], sig + 1, siglen - 1,
-> +		return digsig_verify(keyring, sig + 1, siglen - 1,
->  				     digest, digestlen);
->  	case 2:
-> -		return asymmetric_verify(keyring[id], sig, siglen,
-> +		return asymmetric_verify(keyring, sig, siglen,
->  					 digest, digestlen);
->  	}
-> 
-> diff --git a/security/integrity/integrity.h b/security/integrity/integrity.h
-> index 79799a0d9195..2d245f44ca26 100644
-> --- a/security/integrity/integrity.h
-> +++ b/security/integrity/integrity.h
-> @@ -150,6 +150,7 @@ int integrity_kernel_read(struct file *file, loff_t offset,
-> 
->  #ifdef CONFIG_INTEGRITY_SIGNATURE
-> 
-> +struct key *integrity_keyring_from_id(const unsigned int id);
->  int integrity_digsig_verify(const unsigned int id, const char *sig, int siglen,
->  			    const char *digest, int digestlen);
-> 
-> @@ -157,6 +158,11 @@ int __init integrity_init_keyring(const unsigned int id);
->  int __init integrity_load_x509(const unsigned int id, const char *path);
->  #else
-> 
-> +static inline struct key *integrity_keyring_from_id(const unsigned int id)
-> +{
-> +	return ERR_PTR(-EINVAL);
-> +}
-> +
->  static inline int integrity_digsig_verify(const unsigned int id,
->  					  const char *sig, int siglen,
->  					  const char *digest, int digestlen)
-> 
+[0] lkml.kernel.org/r/9c9416b2dff19f05fb4c35879aaa83d11ff72c92.1521626182.git.geliangtang@gmail.com
+---
+ crypto/Kconfig   |   9 ++
+ crypto/Makefile  |   1 +
+ crypto/testmgr.c |  10 +++
+ crypto/testmgr.h |  71 +++++++++++++++
+ crypto/zstd.c    | 265 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 5 files changed, 356 insertions(+)
+ create mode 100644 crypto/zstd.c
+
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index b75264b..500583c 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -1677,6 +1677,15 @@ config CRYPTO_LZ4HC
+ 	help
+ 	  This is the LZ4 high compression mode algorithm.
+ 
++config CRYPTO_ZSTD
++	tristate "Zstd compression algorithm"
++	select CRYPTO_ALGAPI
++	select CRYPTO_ACOMP2
++	select ZSTD_COMPRESS
++	select ZSTD_DECOMPRESS
++	help
++	  This is the zstd algorithm.
++
+ comment "Random Number Generation"
+ 
+ config CRYPTO_ANSI_CPRNG
+diff --git a/crypto/Makefile b/crypto/Makefile
+index cdbc03b..2900ab1 100644
+--- a/crypto/Makefile
++++ b/crypto/Makefile
+@@ -136,6 +136,7 @@ obj-$(CONFIG_CRYPTO_USER_API_HASH) += algif_hash.o
+ obj-$(CONFIG_CRYPTO_USER_API_SKCIPHER) += algif_skcipher.o
+ obj-$(CONFIG_CRYPTO_USER_API_RNG) += algif_rng.o
+ obj-$(CONFIG_CRYPTO_USER_API_AEAD) += algif_aead.o
++obj-$(CONFIG_CRYPTO_ZSTD) += zstd.o
+ 
+ ecdh_generic-y := ecc.o
+ ecdh_generic-y += ecdh.o
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index d5e23a1..71b2798 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -3576,6 +3576,16 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 				.decomp = __VECS(zlib_deflate_decomp_tv_template)
+ 			}
+ 		}
++	}, {
++		.alg = "zstd",
++		.test = alg_test_comp,
++		.fips_allowed = 1,
++		.suite = {
++			.comp = {
++				.comp = __VECS(zstd_comp_tv_template),
++				.decomp = __VECS(zstd_decomp_tv_template)
++			}
++		}
+ 	}
+ };
+ 
+diff --git a/crypto/testmgr.h b/crypto/testmgr.h
+index 6044f69..9b5b930 100644
+--- a/crypto/testmgr.h
++++ b/crypto/testmgr.h
+@@ -35255,4 +35255,75 @@ static const struct comp_testvec lz4hc_decomp_tv_template[] = {
+ 	},
+ };
+ 
++static const struct comp_testvec zstd_comp_tv_template[] = {
++	{
++		.inlen	= 68,
++		.outlen	= 39,
++		.input	= "The algorithm is zstd. "
++			  "The algorithm is zstd. "
++			  "The algorithm is zstd.",
++		.output	= "\x28\xb5\x2f\xfd\x00\x50\xf5\x00\x00\xb8\x54\x68\x65"
++			  "\x20\x61\x6c\x67\x6f\x72\x69\x74\x68\x6d\x20\x69\x73"
++			  "\x20\x7a\x73\x74\x64\x2e\x20\x01\x00\x55\x73\x36\x01"
++			  ,
++	},
++	{
++		.inlen	= 244,
++		.outlen	= 151,
++		.input	= "zstd, short for Zstandard, is a fast lossless "
++			  "compression algorithm, targeting real-time "
++			  "compression scenarios at zlib-level and better "
++			  "compression ratios. The zstd compression library "
++			  "provides in-memory compression and decompression "
++			  "functions.",
++		.output	= "\x28\xb5\x2f\xfd\x00\x50\x75\x04\x00\x42\x4b\x1e\x17"
++			  "\x90\x81\x31\x00\xf2\x2f\xe4\x36\xc9\xef\x92\x88\x32"
++			  "\xc9\xf2\x24\x94\xd8\x68\x9a\x0f\x00\x0c\xc4\x31\x6f"
++			  "\x0d\x0c\x38\xac\x5c\x48\x03\xcd\x63\x67\xc0\xf3\xad"
++			  "\x4e\x90\xaa\x78\xa0\xa4\xc5\x99\xda\x2f\xb6\x24\x60"
++			  "\xe2\x79\x4b\xaa\xb6\x6b\x85\x0b\xc9\xc6\x04\x66\x86"
++			  "\xe2\xcc\xe2\x25\x3f\x4f\x09\xcd\xb8\x9d\xdb\xc1\x90"
++			  "\xa9\x11\xbc\x35\x44\x69\x2d\x9c\x64\x4f\x13\x31\x64"
++			  "\xcc\xfb\x4d\x95\x93\x86\x7f\x33\x7f\x1a\xef\xe9\x30"
++			  "\xf9\x67\xa1\x94\x0a\x69\x0f\x60\xcd\xc3\xab\x99\xdc"
++			  "\x42\xed\x97\x05\x00\x33\xc3\x15\x95\x3a\x06\xa0\x0e"
++			  "\x20\xa9\x0e\x82\xb9\x43\x45\x01",
++	},
++};
++
++static const struct comp_testvec zstd_decomp_tv_template[] = {
++	{
++		.inlen	= 43,
++		.outlen	= 68,
++		.input	= "\x28\xb5\x2f\xfd\x04\x50\xf5\x00\x00\xb8\x54\x68\x65"
++			  "\x20\x61\x6c\x67\x6f\x72\x69\x74\x68\x6d\x20\x69\x73"
++			  "\x20\x7a\x73\x74\x64\x2e\x20\x01\x00\x55\x73\x36\x01"
++			  "\x6b\xf4\x13\x35",
++		.output	= "The algorithm is zstd. "
++			  "The algorithm is zstd. "
++			  "The algorithm is zstd.",
++	},
++	{
++		.inlen	= 155,
++		.outlen	= 244,
++		.input	= "\x28\xb5\x2f\xfd\x04\x50\x75\x04\x00\x42\x4b\x1e\x17"
++			  "\x90\x81\x31\x00\xf2\x2f\xe4\x36\xc9\xef\x92\x88\x32"
++			  "\xc9\xf2\x24\x94\xd8\x68\x9a\x0f\x00\x0c\xc4\x31\x6f"
++			  "\x0d\x0c\x38\xac\x5c\x48\x03\xcd\x63\x67\xc0\xf3\xad"
++			  "\x4e\x90\xaa\x78\xa0\xa4\xc5\x99\xda\x2f\xb6\x24\x60"
++			  "\xe2\x79\x4b\xaa\xb6\x6b\x85\x0b\xc9\xc6\x04\x66\x86"
++			  "\xe2\xcc\xe2\x25\x3f\x4f\x09\xcd\xb8\x9d\xdb\xc1\x90"
++			  "\xa9\x11\xbc\x35\x44\x69\x2d\x9c\x64\x4f\x13\x31\x64"
++			  "\xcc\xfb\x4d\x95\x93\x86\x7f\x33\x7f\x1a\xef\xe9\x30"
++			  "\xf9\x67\xa1\x94\x0a\x69\x0f\x60\xcd\xc3\xab\x99\xdc"
++			  "\x42\xed\x97\x05\x00\x33\xc3\x15\x95\x3a\x06\xa0\x0e"
++			  "\x20\xa9\x0e\x82\xb9\x43\x45\x01\xaa\x6d\xda\x0d",
++		.output	= "zstd, short for Zstandard, is a fast lossless "
++			  "compression algorithm, targeting real-time "
++			  "compression scenarios at zlib-level and better "
++			  "compression ratios. The zstd compression library "
++			  "provides in-memory compression and decompression "
++			  "functions.",
++	},
++};
+ #endif	/* _CRYPTO_TESTMGR_H */
+diff --git a/crypto/zstd.c b/crypto/zstd.c
+new file mode 100644
+index 0000000..9a76b3e
+--- /dev/null
++++ b/crypto/zstd.c
+@@ -0,0 +1,265 @@
++/*
++ * Cryptographic API.
++ *
++ * Copyright (c) 2017-present, Facebook, Inc.
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License version 2 as published by
++ * the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful, but WITHOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
++ * more details.
++ */
++#include <linux/crypto.h>
++#include <linux/init.h>
++#include <linux/interrupt.h>
++#include <linux/mm.h>
++#include <linux/module.h>
++#include <linux/net.h>
++#include <linux/vmalloc.h>
++#include <linux/zstd.h>
++#include <crypto/internal/scompress.h>
++
++
++#define ZSTD_DEF_LEVEL	3
++
++struct zstd_ctx {
++	ZSTD_CCtx *cctx;
++	ZSTD_DCtx *dctx;
++	void *cwksp;
++	void *dwksp;
++};
++
++static ZSTD_parameters zstd_params(void)
++{
++	return ZSTD_getParams(ZSTD_DEF_LEVEL, 0, 0);
++}
++
++static int zstd_comp_init(struct zstd_ctx *ctx)
++{
++	int ret = 0;
++	const ZSTD_parameters params = zstd_params();
++	const size_t wksp_size = ZSTD_CCtxWorkspaceBound(params.cParams);
++
++	ctx->cwksp = vzalloc(wksp_size);
++	if (!ctx->cwksp) {
++		ret = -ENOMEM;
++		goto out;
++	}
++
++	ctx->cctx = ZSTD_initCCtx(ctx->cwksp, wksp_size);
++	if (!ctx->cctx) {
++		ret = -EINVAL;
++		goto out_free;
++	}
++out:
++	return ret;
++out_free:
++	vfree(ctx->cwksp);
++	goto out;
++}
++
++static int zstd_decomp_init(struct zstd_ctx *ctx)
++{
++	int ret = 0;
++	const size_t wksp_size = ZSTD_DCtxWorkspaceBound();
++
++	ctx->dwksp = vzalloc(wksp_size);
++	if (!ctx->dwksp) {
++		ret = -ENOMEM;
++		goto out;
++	}
++
++	ctx->dctx = ZSTD_initDCtx(ctx->dwksp, wksp_size);
++	if (!ctx->dctx) {
++		ret = -EINVAL;
++		goto out_free;
++	}
++out:
++	return ret;
++out_free:
++	vfree(ctx->dwksp);
++	goto out;
++}
++
++static void zstd_comp_exit(struct zstd_ctx *ctx)
++{
++	vfree(ctx->cwksp);
++	ctx->cwksp = NULL;
++	ctx->cctx = NULL;
++}
++
++static void zstd_decomp_exit(struct zstd_ctx *ctx)
++{
++	vfree(ctx->dwksp);
++	ctx->dwksp = NULL;
++	ctx->dctx = NULL;
++}
++
++static int __zstd_init(void *ctx)
++{
++	int ret;
++
++	ret = zstd_comp_init(ctx);
++	if (ret)
++		return ret;
++	ret = zstd_decomp_init(ctx);
++	if (ret)
++		zstd_comp_exit(ctx);
++	return ret;
++}
++
++static void *zstd_alloc_ctx(struct crypto_scomp *tfm)
++{
++	int ret;
++	struct zstd_ctx *ctx;
++
++	ctx = kzalloc(sizeof(*ctx), GFP_KERNEL);
++	if (!ctx)
++		return ERR_PTR(-ENOMEM);
++
++	ret = __zstd_init(ctx);
++	if (ret) {
++		kfree(ctx);
++		return ERR_PTR(ret);
++	}
++
++	return ctx;
++}
++
++static int zstd_init(struct crypto_tfm *tfm)
++{
++	struct zstd_ctx *ctx = crypto_tfm_ctx(tfm);
++
++	return __zstd_init(ctx);
++}
++
++static void __zstd_exit(void *ctx)
++{
++	zstd_comp_exit(ctx);
++	zstd_decomp_exit(ctx);
++}
++
++static void zstd_free_ctx(struct crypto_scomp *tfm, void *ctx)
++{
++	__zstd_exit(ctx);
++	kzfree(ctx);
++}
++
++static void zstd_exit(struct crypto_tfm *tfm)
++{
++	struct zstd_ctx *ctx = crypto_tfm_ctx(tfm);
++
++	__zstd_exit(ctx);
++}
++
++static int __zstd_compress(const u8 *src, unsigned int slen,
++			   u8 *dst, unsigned int *dlen, void *ctx)
++{
++	size_t out_len;
++	struct zstd_ctx *zctx = ctx;
++	const ZSTD_parameters params = zstd_params();
++
++	out_len = ZSTD_compressCCtx(zctx->cctx, dst, *dlen, src, slen, params);
++	if (ZSTD_isError(out_len))
++		return -EINVAL;
++	*dlen = out_len;
++	return 0;
++}
++
++static int zstd_compress(struct crypto_tfm *tfm, const u8 *src,
++			 unsigned int slen, u8 *dst, unsigned int *dlen)
++{
++	struct zstd_ctx *ctx = crypto_tfm_ctx(tfm);
++
++	return __zstd_compress(src, slen, dst, dlen, ctx);
++}
++
++static int zstd_scompress(struct crypto_scomp *tfm, const u8 *src,
++			  unsigned int slen, u8 *dst, unsigned int *dlen,
++			  void *ctx)
++{
++	return __zstd_compress(src, slen, dst, dlen, ctx);
++}
++
++static int __zstd_decompress(const u8 *src, unsigned int slen,
++			     u8 *dst, unsigned int *dlen, void *ctx)
++{
++	size_t out_len;
++	struct zstd_ctx *zctx = ctx;
++
++	out_len = ZSTD_decompressDCtx(zctx->dctx, dst, *dlen, src, slen);
++	if (ZSTD_isError(out_len))
++		return -EINVAL;
++	*dlen = out_len;
++	return 0;
++}
++
++static int zstd_decompress(struct crypto_tfm *tfm, const u8 *src,
++			   unsigned int slen, u8 *dst, unsigned int *dlen)
++{
++	struct zstd_ctx *ctx = crypto_tfm_ctx(tfm);
++
++	return __zstd_decompress(src, slen, dst, dlen, ctx);
++}
++
++static int zstd_sdecompress(struct crypto_scomp *tfm, const u8 *src,
++			    unsigned int slen, u8 *dst, unsigned int *dlen,
++			    void *ctx)
++{
++	return __zstd_decompress(src, slen, dst, dlen, ctx);
++}
++
++static struct crypto_alg alg = {
++	.cra_name		= "zstd",
++	.cra_flags		= CRYPTO_ALG_TYPE_COMPRESS,
++	.cra_ctxsize		= sizeof(struct zstd_ctx),
++	.cra_module		= THIS_MODULE,
++	.cra_init		= zstd_init,
++	.cra_exit		= zstd_exit,
++	.cra_u			= { .compress = {
++	.coa_compress		= zstd_compress,
++	.coa_decompress		= zstd_decompress } }
++};
++
++static struct scomp_alg scomp = {
++	.alloc_ctx		= zstd_alloc_ctx,
++	.free_ctx		= zstd_free_ctx,
++	.compress		= zstd_scompress,
++	.decompress		= zstd_sdecompress,
++	.base			= {
++		.cra_name	= "zstd",
++		.cra_driver_name = "zstd-scomp",
++		.cra_module	 = THIS_MODULE,
++	}
++};
++
++static int __init zstd_mod_init(void)
++{
++	int ret;
++
++	ret = crypto_register_alg(&alg);
++	if (ret)
++		return ret;
++
++	ret = crypto_register_scomp(&scomp);
++	if (ret)
++		crypto_unregister_alg(&alg);
++
++	return ret;
++}
++
++static void __exit zstd_mod_fini(void)
++{
++	crypto_unregister_alg(&alg);
++	crypto_unregister_scomp(&scomp);
++}
++
++module_init(zstd_mod_init);
++module_exit(zstd_mod_fini);
++
++MODULE_LICENSE("GPL");
++MODULE_DESCRIPTION("Zstd Compression Algorithm");
++MODULE_ALIAS_CRYPTO("zstd");
+-- 
+2.9.5
