@@ -1,69 +1,122 @@
-From: Philippe Ombredanne <pombredanne@nexb.com>
-Subject: Re: [PATCH 1/5 v4] add compression algorithm zBeWalgo
-Date: Wed, 21 Mar 2018 13:57:30 -0700
-Message-ID: <CAOFm3uEpDh1jp1+ODzR=TFH0uq08LL2qjqrMLOe+_jE+4Sw_og@mail.gmail.com>
-References: <D7FA4547-4FA6-46EC-99D7-F08ACCD3F13D@informatik.uni-hamburg.de>
- <CAOFm3uH1Nw3x6-T1yTMkoX2tpxiwjnerAXDh-WEpyFNROFwAYw@mail.gmail.com> <F4F10894-B101-4E46-A39D-7F09DEF2207D@informatik.uni-hamburg.de>
+From: Mimi Zohar <zohar@linux.vnet.ibm.com>
+Subject: Re: [PATCH v6 05/12] integrity: Introduce
+ integrity_keyring_from_id()
+Date: Wed, 21 Mar 2018 18:46:51 -0400
+Message-ID: <1521672411.3848.219.camel@linux.vnet.ibm.com>
+References: <20180316203837.10174-1-bauerman@linux.vnet.ibm.com>
+         <20180316203837.10174-6-bauerman@linux.vnet.ibm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
+Content-Transfer-Encoding: 7bit
+Cc: linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-kernel@vger.kernel.org,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        David Howells <dhowells@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Jessica Yu <jeyu@kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>, minchan@kernel.org,
-        Nitin Gupta <ngupta@vflare.org>,
-        Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>
-To: Benjamin Warnke <4bwarnke@informatik.uni-hamburg.de>
+        "David S. Miller" <davem@davemloft.net>,
+        "AKASHI, Takahiro" <takahiro.akashi@linaro.org>
+To: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
+        linux-integrity@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <F4F10894-B101-4E46-A39D-7F09DEF2207D@informatik.uni-hamburg.de>
+In-Reply-To: <20180316203837.10174-6-bauerman@linux.vnet.ibm.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Benjamin,
+On Fri, 2018-03-16 at 17:38 -0300, Thiago Jung Bauermann wrote:
+> IMA will need to obtain the keyring used to verify file signatures so that
+> it can verify the module-style signature appended to files.
+> 
+> Signed-off-by: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
 
-On Wed, Mar 21, 2018 at 12:32 AM, Benjamin Warnke
-<4bwarnke@informatik.uni-hamburg.de> wrote:
-> Ok, I will use
->
-> /* SPDX-License-Identifier: GPL-2.0 */
-> /*
->  * Copyright (c) 2018 Benjamin Warnke <4bwarnke@informatik.uni-hamburg.de>
-> ...
->
-> at the top of my files instead of that boilerplate text. And
->
-> MODULE_LICENSE("GPL");
->
-> at the bottom of the module-files.
+Signed-off-by: Mimi Zohar <zohar@linux.vnet.ibm.com>
 
-<snip>
->
-> I used the file "crypto/lz4.c" - since it is a compression algorithm too - as an example of how to format the licensing text.
-> Unfortunately there is the same 'error'.
-> I fixed this error in all of my files in all patches.
-
-Actually to be consistent if you want to use GPL-2-0 (and not "or
-later") you should use:
-
-1. at the top, for a c. file:
-// SPDX-License-Identifier: GPL-2.0
-
-or for a .h file:
-/* SPDX-License-Identifier: GPL-2.0 */
-
-The doc explains it all. Including the comment style (a topic that has
-been discussed also on list quite bit: Linus had the final word there)
-
-2. and in your MODULE_LICENSE macro:
-
-MODULE_LICENSE("GPL v2");
-
-.... because a MODULE_LICENSE("GPL"); would mean GPL-2.0+ (e.g. or any
-later version) and this would not match your top level license tag.
-
-I know this may seem confusing, but there is little hope we can change
-the MODULE_LICENSE tags that are used by many external module loaders.
-Comments in module.h explain it all.
-
--- 
-Cordially
-Philippe Ombredanne
+> ---
+>  security/integrity/digsig.c    | 28 +++++++++++++++++++++-------
+>  security/integrity/integrity.h |  6 ++++++
+>  2 files changed, 27 insertions(+), 7 deletions(-)
+> 
+> diff --git a/security/integrity/digsig.c b/security/integrity/digsig.c
+> index 6f9e4ce568cd..e641a67b9fc7 100644
+> --- a/security/integrity/digsig.c
+> +++ b/security/integrity/digsig.c
+> @@ -48,11 +48,10 @@ static bool init_keyring __initdata;
+>  #define restrict_link_to_ima restrict_link_by_builtin_trusted
+>  #endif
+> 
+> -int integrity_digsig_verify(const unsigned int id, const char *sig, int siglen,
+> -			    const char *digest, int digestlen)
+> +struct key *integrity_keyring_from_id(const unsigned int id)
+>  {
+> -	if (id >= INTEGRITY_KEYRING_MAX || siglen < 2)
+> -		return -EINVAL;
+> +	if (id >= INTEGRITY_KEYRING_MAX)
+> +		return ERR_PTR(-EINVAL);
+> 
+>  	if (!keyring[id]) {
+>  		keyring[id] =
+> @@ -61,17 +60,32 @@ int integrity_digsig_verify(const unsigned int id, const char *sig, int siglen,
+>  			int err = PTR_ERR(keyring[id]);
+>  			pr_err("no %s keyring: %d\n", keyring_name[id], err);
+>  			keyring[id] = NULL;
+> -			return err;
+> +			return ERR_PTR(err);
+>  		}
+>  	}
+> 
+> +	return keyring[id];
+> +}
+> +
+> +int integrity_digsig_verify(const unsigned int id, const char *sig, int siglen,
+> +			    const char *digest, int digestlen)
+> +{
+> +	struct key *keyring;
+> +
+> +	if (siglen < 2)
+> +		return -EINVAL;
+> +
+> +	keyring = integrity_keyring_from_id(id);
+> +	if (IS_ERR(keyring))
+> +		return PTR_ERR(keyring);
+> +
+>  	switch (sig[1]) {
+>  	case 1:
+>  		/* v1 API expect signature without xattr type */
+> -		return digsig_verify(keyring[id], sig + 1, siglen - 1,
+> +		return digsig_verify(keyring, sig + 1, siglen - 1,
+>  				     digest, digestlen);
+>  	case 2:
+> -		return asymmetric_verify(keyring[id], sig, siglen,
+> +		return asymmetric_verify(keyring, sig, siglen,
+>  					 digest, digestlen);
+>  	}
+> 
+> diff --git a/security/integrity/integrity.h b/security/integrity/integrity.h
+> index 79799a0d9195..2d245f44ca26 100644
+> --- a/security/integrity/integrity.h
+> +++ b/security/integrity/integrity.h
+> @@ -150,6 +150,7 @@ int integrity_kernel_read(struct file *file, loff_t offset,
+> 
+>  #ifdef CONFIG_INTEGRITY_SIGNATURE
+> 
+> +struct key *integrity_keyring_from_id(const unsigned int id);
+>  int integrity_digsig_verify(const unsigned int id, const char *sig, int siglen,
+>  			    const char *digest, int digestlen);
+> 
+> @@ -157,6 +158,11 @@ int __init integrity_init_keyring(const unsigned int id);
+>  int __init integrity_load_x509(const unsigned int id, const char *path);
+>  #else
+> 
+> +static inline struct key *integrity_keyring_from_id(const unsigned int id)
+> +{
+> +	return ERR_PTR(-EINVAL);
+> +}
+> +
+>  static inline int integrity_digsig_verify(const unsigned int id,
+>  					  const char *sig, int siglen,
+>  					  const char *digest, int digestlen)
+> 
