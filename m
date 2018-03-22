@@ -1,112 +1,111 @@
-From: Christophe Leroy <christophe.leroy@c-s.fr>
-Subject: [PATCH v2] crypto: talitos - fix IPsec cipher in length
-Date: Thu, 22 Mar 2018 10:57:01 +0100 (CET)
-Message-ID: <20180322095701.4563E6F352@po15720vm.idsi0.si.c-s.fr>
+From: Logan Gunthorpe <logang@deltatee.com>
+Subject: [PATCH v14 05/10] powerpc: iomap.c: introduce io{read|write}64_{lo_hi|hi_lo}
+Date: Thu, 22 Mar 2018 11:16:58 -0600
+Message-ID: <20180322171703.4300-6-logang@deltatee.com>
+References: <20180322171703.4300-1-logang@deltatee.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>, horia.geanta@nxp.com
+Cc: Arnd Bergmann <arnd@arndb.de>,
+        Andy Shevchenko <andy.shevchenko@gmail.com>,
+        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>,
+        Michael Ellerman <mpe@ellerman.id.au>
+To: linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
+        linux-ntb@googlegroups.com, linux-crypto@vger.kernel.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20180322171703.4300-1-logang@deltatee.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-For SEC 2.x+, cipher in length must contain only the ciphertext length.
-In case of using hardware ICV checking, the ICV length is provided via
-the "extent" field of the descriptor pointer.
+These functions will be introduced into the generic iomap.c so
+they can deal with PIO accesses in hi-lo/lo-hi variants. Thus,
+the powerpc version of iomap.c will need to provide the same
+functions even though, in this arch, they are identical to the
+regular io{read|write}64 functions.
 
-Cc: <stable@vger.kernel.org> # 4.8+
-Fixes: 549bd8bc5987 ("crypto: talitos - Implement AEAD for SEC1 using HMAC_SNOOP_NO_AFEU")
-Reported-by: Horia Geantă <horia.geanta@nxp.com>
-Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+Tested-by: Horia Geantă <horia.geanta@nxp.com>
+Reviewed-by: Andy Shevchenko <andy.shevchenko@gmail.com>
+Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Cc: Paul Mackerras <paulus@samba.org>
+Cc: Michael Ellerman <mpe@ellerman.id.au>
 ---
- drivers/crypto/talitos.c | 36 ++++++++++++++++++++----------------
- 1 file changed, 20 insertions(+), 16 deletions(-)
+ arch/powerpc/kernel/iomap.c | 40 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 40 insertions(+)
 
-diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
-index 6882fa2f8bad..016ff8c4c305 100644
---- a/drivers/crypto/talitos.c
-+++ b/drivers/crypto/talitos.c
-@@ -1130,10 +1130,10 @@ static int sg_to_link_tbl_offset(struct scatterlist *sg, int sg_count,
- 	return count;
- }
- 
--static int talitos_sg_map(struct device *dev, struct scatterlist *src,
--		   unsigned int len, struct talitos_edesc *edesc,
--		   struct talitos_ptr *ptr,
--		   int sg_count, unsigned int offset, int tbl_off)
-+static int talitos_sg_map_ext(struct device *dev, struct scatterlist *src,
-+			      unsigned int len, struct talitos_edesc *edesc,
-+			      struct talitos_ptr *ptr, int sg_count,
-+			      unsigned int offset, int tbl_off, int elen)
+diff --git a/arch/powerpc/kernel/iomap.c b/arch/powerpc/kernel/iomap.c
+index aab456ed2a00..5ac84efc6ede 100644
+--- a/arch/powerpc/kernel/iomap.c
++++ b/arch/powerpc/kernel/iomap.c
+@@ -45,12 +45,32 @@ u64 ioread64(void __iomem *addr)
  {
- 	struct talitos_private *priv = dev_get_drvdata(dev);
- 	bool is_sec1 = has_ftr_sec1(priv);
-@@ -1142,6 +1142,7 @@ static int talitos_sg_map(struct device *dev, struct scatterlist *src,
- 		to_talitos_ptr(ptr, 0, 0, is_sec1);
- 		return 1;
- 	}
-+	to_talitos_ptr_ext_set(ptr, elen, is_sec1);
- 	if (sg_count == 1) {
- 		to_talitos_ptr(ptr, sg_dma_address(src) + offset, len, is_sec1);
- 		return sg_count;
-@@ -1150,7 +1151,7 @@ static int talitos_sg_map(struct device *dev, struct scatterlist *src,
- 		to_talitos_ptr(ptr, edesc->dma_link_tbl + offset, len, is_sec1);
- 		return sg_count;
- 	}
--	sg_count = sg_to_link_tbl_offset(src, sg_count, offset, len,
-+	sg_count = sg_to_link_tbl_offset(src, sg_count, offset, len + elen,
- 					 &edesc->link_tbl[tbl_off]);
- 	if (sg_count == 1) {
- 		/* Only one segment now, so no link tbl needed*/
-@@ -1164,6 +1165,15 @@ static int talitos_sg_map(struct device *dev, struct scatterlist *src,
- 	return sg_count;
+ 	return readq(addr);
  }
- 
-+static int talitos_sg_map(struct device *dev, struct scatterlist *src,
-+			  unsigned int len, struct talitos_edesc *edesc,
-+			  struct talitos_ptr *ptr, int sg_count,
-+			  unsigned int offset, int tbl_off)
++u64 ioread64_lo_hi(void __iomem *addr)
 +{
-+	return talitos_sg_map_ext(dev, src, len, edesc, ptr, sg_count, offset,
-+				  tbl_off, 0);
++	return readq(addr);
 +}
-+
++u64 ioread64_hi_lo(void __iomem *addr)
++{
++	return readq(addr);
++}
+ u64 ioread64be(void __iomem *addr)
+ {
+ 	return readq_be(addr);
+ }
++u64 ioread64be_lo_hi(void __iomem *addr)
++{
++	return readq_be(addr);
++}
++u64 ioread64be_hi_lo(void __iomem *addr)
++{
++	return readq_be(addr);
++}
+ EXPORT_SYMBOL(ioread64);
++EXPORT_SYMBOL(ioread64_lo_hi);
++EXPORT_SYMBOL(ioread64_hi_lo);
+ EXPORT_SYMBOL(ioread64be);
++EXPORT_SYMBOL(ioread64be_lo_hi);
++EXPORT_SYMBOL(ioread64be_hi_lo);
+ #endif /* __powerpc64__ */
+ 
+ void iowrite8(u8 val, void __iomem *addr)
+@@ -83,12 +103,32 @@ void iowrite64(u64 val, void __iomem *addr)
+ {
+ 	writeq(val, addr);
+ }
++void iowrite64_lo_hi(u64 val, void __iomem *addr)
++{
++	writeq(val, addr);
++}
++void iowrite64_hi_lo(u64 val, void __iomem *addr)
++{
++	writeq(val, addr);
++}
+ void iowrite64be(u64 val, void __iomem *addr)
+ {
+ 	writeq_be(val, addr);
+ }
++void iowrite64be_lo_hi(u64 val, void __iomem *addr)
++{
++	writeq_be(val, addr);
++}
++void iowrite64be_hi_lo(u64 val, void __iomem *addr)
++{
++	writeq_be(val, addr);
++}
+ EXPORT_SYMBOL(iowrite64);
++EXPORT_SYMBOL(iowrite64_lo_hi);
++EXPORT_SYMBOL(iowrite64_hi_lo);
+ EXPORT_SYMBOL(iowrite64be);
++EXPORT_SYMBOL(iowrite64be_lo_hi);
++EXPORT_SYMBOL(iowrite64be_hi_lo);
+ #endif /* __powerpc64__ */
+ 
  /*
-  * fill in and submit ipsec_esp descriptor
-  */
-@@ -1181,7 +1191,7 @@ static int ipsec_esp(struct talitos_edesc *edesc, struct aead_request *areq,
- 	unsigned int ivsize = crypto_aead_ivsize(aead);
- 	int tbl_off = 0;
- 	int sg_count, ret;
--	int sg_link_tbl_len;
-+	int elen = 0;
- 	bool sync_needed = false;
- 	struct talitos_private *priv = dev_get_drvdata(dev);
- 	bool is_sec1 = has_ftr_sec1(priv);
-@@ -1223,17 +1233,11 @@ static int ipsec_esp(struct talitos_edesc *edesc, struct aead_request *areq,
- 	 * extent is bytes of HMAC postpended to ciphertext,
- 	 * typically 12 for ipsec
- 	 */
--	sg_link_tbl_len = cryptlen;
--
--	if (is_ipsec_esp) {
--		to_talitos_ptr_ext_set(&desc->ptr[4], authsize, is_sec1);
--
--		if (desc->hdr & DESC_HDR_MODE1_MDEU_CICV)
--			sg_link_tbl_len += authsize;
--	}
-+	if (is_ipsec_esp && (desc->hdr & DESC_HDR_MODE1_MDEU_CICV))
-+		elen = authsize;
- 
--	ret = talitos_sg_map(dev, areq->src, sg_link_tbl_len, edesc,
--			     &desc->ptr[4], sg_count, areq->assoclen, tbl_off);
-+	ret = talitos_sg_map_ext(dev, areq->src, cryptlen, edesc, &desc->ptr[4],
-+				 sg_count, areq->assoclen, tbl_off, elen);
- 
- 	if (ret > 1) {
- 		tbl_off += ret;
 -- 
-2.13.3
+2.11.0
