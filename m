@@ -1,49 +1,112 @@
-From: Benjamin Warnke <4bwarnke@informatik.uni-hamburg.de>
-Subject: Re: [PATCH 1/5 v4] add compression algorithm zBeWalgo
-Date: Thu, 22 Mar 2018 07:53:08 +0100
-Message-ID: <D63776B2-09B1-428C-99B7-68F4BD9BC7E8@informatik.uni-hamburg.de>
-References: <D7FA4547-4FA6-46EC-99D7-F08ACCD3F13D@informatik.uni-hamburg.de>
- <CAOFm3uH1Nw3x6-T1yTMkoX2tpxiwjnerAXDh-WEpyFNROFwAYw@mail.gmail.com>
- <F4F10894-B101-4E46-A39D-7F09DEF2207D@informatik.uni-hamburg.de>
- <CAOFm3uEpDh1jp1+ODzR=TFH0uq08LL2qjqrMLOe+_jE+4Sw_og@mail.gmail.com>
-Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
-Content-Type: text/plain;
-        charset=us-ascii
-Content-Transfer-Encoding: 8BIT
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>, minchan@kernel.org,
-        Nitin Gupta <ngupta@vflare.org>,
-        Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>
-To: Philippe Ombredanne <pombredanne@nexb.com>
+From: Christophe Leroy <christophe.leroy@c-s.fr>
+Subject: [PATCH v2] crypto: talitos - fix IPsec cipher in length
+Date: Thu, 22 Mar 2018 10:57:01 +0100 (CET)
+Message-ID: <20180322095701.4563E6F352@po15720vm.idsi0.si.c-s.fr>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>, horia.geanta@nxp.com
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAOFm3uEpDh1jp1+ODzR=TFH0uq08LL2qjqrMLOe+_jE+4Sw_og@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi Philippe,
+For SEC 2.x+, cipher in length must contain only the ciphertext length.
+In case of using hardware ICV checking, the ICV length is provided via
+the "extent" field of the descriptor pointer.
 
-> Actually to be consistent if you want to use GPL-2-0 (and not "or
-> later") you should use:
-> 
-> 1. at the top, for a c. file:
-> // SPDX-License-Identifier: GPL-2.0
-> 
-> or for a .h file:
-> /* SPDX-License-Identifier: GPL-2.0 */
-> 
-> The doc explains it all. Including the comment style (a topic that has
-> been discussed also on list quite bit: Linus had the final word there)
-> 
-> 2. and in your MODULE_LICENSE macro:
-> 
-> MODULE_LICENSE("GPL v2");
-> 
-> .... because a MODULE_LICENSE("GPL"); would mean GPL-2.0+ (e.g. or any
-> later version) and this would not match your top level license tag.
+Cc: <stable@vger.kernel.org> # 4.8+
+Fixes: 549bd8bc5987 ("crypto: talitos - Implement AEAD for SEC1 using HMAC_SNOOP_NO_AFEU")
+Reported-by: Horia Geantă <horia.geanta@nxp.com>
+Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
+---
+ drivers/crypto/talitos.c | 36 ++++++++++++++++++++----------------
+ 1 file changed, 20 insertions(+), 16 deletions(-)
 
-Thanks, I have done this correctly in my files, but accidentally written it wrong in my mail.
-
-Cordinally
-Benjamin Warnke
+diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
+index 6882fa2f8bad..016ff8c4c305 100644
+--- a/drivers/crypto/talitos.c
++++ b/drivers/crypto/talitos.c
+@@ -1130,10 +1130,10 @@ static int sg_to_link_tbl_offset(struct scatterlist *sg, int sg_count,
+ 	return count;
+ }
+ 
+-static int talitos_sg_map(struct device *dev, struct scatterlist *src,
+-		   unsigned int len, struct talitos_edesc *edesc,
+-		   struct talitos_ptr *ptr,
+-		   int sg_count, unsigned int offset, int tbl_off)
++static int talitos_sg_map_ext(struct device *dev, struct scatterlist *src,
++			      unsigned int len, struct talitos_edesc *edesc,
++			      struct talitos_ptr *ptr, int sg_count,
++			      unsigned int offset, int tbl_off, int elen)
+ {
+ 	struct talitos_private *priv = dev_get_drvdata(dev);
+ 	bool is_sec1 = has_ftr_sec1(priv);
+@@ -1142,6 +1142,7 @@ static int talitos_sg_map(struct device *dev, struct scatterlist *src,
+ 		to_talitos_ptr(ptr, 0, 0, is_sec1);
+ 		return 1;
+ 	}
++	to_talitos_ptr_ext_set(ptr, elen, is_sec1);
+ 	if (sg_count == 1) {
+ 		to_talitos_ptr(ptr, sg_dma_address(src) + offset, len, is_sec1);
+ 		return sg_count;
+@@ -1150,7 +1151,7 @@ static int talitos_sg_map(struct device *dev, struct scatterlist *src,
+ 		to_talitos_ptr(ptr, edesc->dma_link_tbl + offset, len, is_sec1);
+ 		return sg_count;
+ 	}
+-	sg_count = sg_to_link_tbl_offset(src, sg_count, offset, len,
++	sg_count = sg_to_link_tbl_offset(src, sg_count, offset, len + elen,
+ 					 &edesc->link_tbl[tbl_off]);
+ 	if (sg_count == 1) {
+ 		/* Only one segment now, so no link tbl needed*/
+@@ -1164,6 +1165,15 @@ static int talitos_sg_map(struct device *dev, struct scatterlist *src,
+ 	return sg_count;
+ }
+ 
++static int talitos_sg_map(struct device *dev, struct scatterlist *src,
++			  unsigned int len, struct talitos_edesc *edesc,
++			  struct talitos_ptr *ptr, int sg_count,
++			  unsigned int offset, int tbl_off)
++{
++	return talitos_sg_map_ext(dev, src, len, edesc, ptr, sg_count, offset,
++				  tbl_off, 0);
++}
++
+ /*
+  * fill in and submit ipsec_esp descriptor
+  */
+@@ -1181,7 +1191,7 @@ static int ipsec_esp(struct talitos_edesc *edesc, struct aead_request *areq,
+ 	unsigned int ivsize = crypto_aead_ivsize(aead);
+ 	int tbl_off = 0;
+ 	int sg_count, ret;
+-	int sg_link_tbl_len;
++	int elen = 0;
+ 	bool sync_needed = false;
+ 	struct talitos_private *priv = dev_get_drvdata(dev);
+ 	bool is_sec1 = has_ftr_sec1(priv);
+@@ -1223,17 +1233,11 @@ static int ipsec_esp(struct talitos_edesc *edesc, struct aead_request *areq,
+ 	 * extent is bytes of HMAC postpended to ciphertext,
+ 	 * typically 12 for ipsec
+ 	 */
+-	sg_link_tbl_len = cryptlen;
+-
+-	if (is_ipsec_esp) {
+-		to_talitos_ptr_ext_set(&desc->ptr[4], authsize, is_sec1);
+-
+-		if (desc->hdr & DESC_HDR_MODE1_MDEU_CICV)
+-			sg_link_tbl_len += authsize;
+-	}
++	if (is_ipsec_esp && (desc->hdr & DESC_HDR_MODE1_MDEU_CICV))
++		elen = authsize;
+ 
+-	ret = talitos_sg_map(dev, areq->src, sg_link_tbl_len, edesc,
+-			     &desc->ptr[4], sg_count, areq->assoclen, tbl_off);
++	ret = talitos_sg_map_ext(dev, areq->src, cryptlen, edesc, &desc->ptr[4],
++				 sg_count, areq->assoclen, tbl_off, elen);
+ 
+ 	if (ret > 1) {
+ 		tbl_off += ret;
+-- 
+2.13.3
