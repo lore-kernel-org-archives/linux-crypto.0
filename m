@@ -1,58 +1,71 @@
-From: Mimi Zohar <zohar@linux.vnet.ibm.com>
-Subject: Re: [PATCH v6 07/12] integrity: Select CONFIG_KEYS instead of
- depending on it
-Date: Wed, 21 Mar 2018 19:18:47 -0400
-Message-ID: <1521674327.3848.221.camel@linux.vnet.ibm.com>
-References: <20180316203837.10174-1-bauerman@linux.vnet.ibm.com>
-         <20180316203837.10174-8-bauerman@linux.vnet.ibm.com>
+From: Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>
+Subject: Re: [PATCH 0/1] cover-letter/lz4: Implement lz4 with dynamic offset
+ length.
+Date: Thu, 22 Mar 2018 11:43:26 +0900
+Message-ID: <20180322024326.GC3181@jagdpanzerIV>
+References: <CGME20180321044137epcas5p221e7ee4a0b7464eaa00dad8320f0251d@epcas5p2.samsung.com>
+ <1521607242-3968-1-git-send-email-maninder1.s@samsung.com>
+ <20180321082628.GB2746@jagdpanzerIV>
+ <1663C9A3-7DAC-4A11-894C-C99E07BEDAD2@fb.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-kernel@vger.kernel.org,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        David Howells <dhowells@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Jessica Yu <jeyu@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        "AKASHI, Takahiro" <takahiro.akashi@linaro.org>
-To: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>,
-        linux-integrity@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
+        Maninder Singh <maninder1.s@samsung.com>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "minchan@kernel.org" <minchan@kernel.org>,
+        "ngupta@vflare.org" <ngupta@vflare.org>,
+        Kees Cook <keescook@chromium.org>,
+        "anton@enomsg.org" <anton@enomsg.org>,
+        "ccross@android.com" <ccross@android.com>,
+        "tony.luck@intel.com" <tony.luck@intel.com>,
+        "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+        "colin.king@canonical.com" <colin.king@canonical.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "pankaj.m@samsung.com" <pankaj.m@samsung.com>,
+        "a.sahrawat@samsung.com" <a.sahrawat@sams
+To: Nick Terrell <terrelln@fb.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180316203837.10174-8-bauerman@linux.vnet.ibm.com>
+Content-Disposition: inline
+In-Reply-To: <1663C9A3-7DAC-4A11-894C-C99E07BEDAD2@fb.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Fri, 2018-03-16 at 17:38 -0300, Thiago Jung Bauermann wrote:
-> This avoids a dependency cycle in CONFIG_IMA_APPRAISE_MODSIG (introduced by
-> a later patch in this series): it will select CONFIG_MODULE_SIG_FORMAT
-> which in turn selects CONFIG_KEYS. Kconfig then complains that
-> CONFIG_INTEGRITY_SIGNATURE depends on CONFIG_KEYS.
+On (03/21/18 19:56), Nick Terrell wrote:
+[..]
+> This seems like a reasonable extension to the algorithm, and it looks like
+> LZ4_DYN is about a 5% improvement to compression ratio on your benchmark.
+> The biggest question I have is if it is worthwhile to maintain a separate
+> incompatible variant of LZ4 in the kernel without any upstream for a 5%
+> gain? If we do want to go forward with this, we should perform more
+> benchmarks.
 > 
-> Signed-off-by: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
+> I commented in the patch, but because the `dynOffset` variable isn't a
+> compile time static in LZ4_decompress_generic(), I suspect that the patch
+> causes a regression in decompression speed for both LZ4 and LZ4_DYN. You'll
+> need to re-run the benchmarks to first show that LZ4 before the patch
+> performs the same as LZ4 after the patch. Then re-run the LZ4 vs LZ4_DYN
+> benchmarks.
+> 
+> I would also like to see a benchmark in user-space (with the code), so we
+> can see the performance of LZ4 before and after the patch, as well as LZ4
+> vs LZ4_DYN without anything else going on. I expect the extra branches in
+> the decoding loop to have an impact on speed, and I would like to see how
+> big the impact is without noise. 
 
-Signed-off-by: Mimi Zohar <zohar@linux.vnet.ibm.com>
+Yes, I've been thinking about this. There are more branches now
+("to dyn or not to dyn") in compression/decompression hot path but
+we see less instructions and branches in perf output at the end.
+And my guess is that we have a lot of noise from zram and zsmalloc.
+The data is XXX bytes shorter with dyn enabled, so we use YYY less
+moves and ZZZ less branches while we copy the data to zsmalloc and
+from zsmalloc, and I may be that's the root cause of "performance
+gain" that we see in zram-fio tests. So may be we need to run
+benchmarks against lz4, not zram+lz4.
 
-> ---
->  security/integrity/Kconfig | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/security/integrity/Kconfig b/security/integrity/Kconfig
-> index da9565891738..0d642e0317c7 100644
-> --- a/security/integrity/Kconfig
-> +++ b/security/integrity/Kconfig
-> @@ -17,8 +17,8 @@ if INTEGRITY
-> 
->  config INTEGRITY_SIGNATURE
->  	bool "Digital signature verification using multiple keyrings"
-> -	depends on KEYS
->  	default n
-> +	select KEYS
->  	select SIGNATURE
->  	help
->  	  This option enables digital signature verification support
-> 
+> CC-ing Yann Collet, the author of LZ4
+
+Great, thanks.
+
+	-ss
