@@ -1,18 +1,15 @@
 From: Logan Gunthorpe <logang@deltatee.com>
-Subject: [PATCH v14 05/10] powerpc: iomap.c: introduce io{read|write}64_{lo_hi|hi_lo}
-Date: Thu, 22 Mar 2018 11:16:58 -0600
-Message-ID: <20180322171703.4300-6-logang@deltatee.com>
+Subject: [PATCH v14 01/10] iomap: Use correct endian conversion function in mmio_writeXXbe
+Date: Thu, 22 Mar 2018 11:16:54 -0600
+Message-ID: <20180322171703.4300-2-logang@deltatee.com>
 References: <20180322171703.4300-1-logang@deltatee.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 Cc: Arnd Bergmann <arnd@arndb.de>,
         Andy Shevchenko <andy.shevchenko@gmail.com>,
         =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
         Logan Gunthorpe <logang@deltatee.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        Michael Ellerman <mpe@ellerman.id.au>
+        Philippe Ombredanne <pombredanne@nexb.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Kate Stewart <kstewart@linuxfoundation.org>
 To: linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
         linux-ntb@googlegroups.com, linux-crypto@vger.kernel.org,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>
@@ -21,91 +18,42 @@ In-Reply-To: <20180322171703.4300-1-logang@deltatee.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-These functions will be introduced into the generic iomap.c so
-they can deal with PIO accesses in hi-lo/lo-hi variants. Thus,
-the powerpc version of iomap.c will need to provide the same
-functions even though, in this arch, they are identical to the
-regular io{read|write}64 functions.
+The semantics of the iowriteXXbe() functions are to write a
+value in CPU endianess to an IO register that is known by the
+caller to be in Big Endian. The mmio_writeXXbe() macro, which
+is called by iowriteXXbe(), should therefore use cpu_to_beXX()
+instead of beXX_to_cpu().
+
+Seeing both beXX_to_cpu() and cpu_to_beXX() are both functionally
+implemented as either null operations or swabXX operations there
+was no noticable bug here. But it is confusing for both developers
+and code analysis tools alike.
 
 Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-Tested-by: Horia Geantă <horia.geanta@nxp.com>
+Reviewed-by: Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
 Reviewed-by: Andy Shevchenko <andy.shevchenko@gmail.com>
-Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-Cc: Paul Mackerras <paulus@samba.org>
-Cc: Michael Ellerman <mpe@ellerman.id.au>
+Cc: Philippe Ombredanne <pombredanne@nexb.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Kate Stewart <kstewart@linuxfoundation.org>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 ---
- arch/powerpc/kernel/iomap.c | 40 ++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 40 insertions(+)
+ lib/iomap.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arch/powerpc/kernel/iomap.c b/arch/powerpc/kernel/iomap.c
-index aab456ed2a00..5ac84efc6ede 100644
---- a/arch/powerpc/kernel/iomap.c
-+++ b/arch/powerpc/kernel/iomap.c
-@@ -45,12 +45,32 @@ u64 ioread64(void __iomem *addr)
- {
- 	return readq(addr);
- }
-+u64 ioread64_lo_hi(void __iomem *addr)
-+{
-+	return readq(addr);
-+}
-+u64 ioread64_hi_lo(void __iomem *addr)
-+{
-+	return readq(addr);
-+}
- u64 ioread64be(void __iomem *addr)
- {
- 	return readq_be(addr);
- }
-+u64 ioread64be_lo_hi(void __iomem *addr)
-+{
-+	return readq_be(addr);
-+}
-+u64 ioread64be_hi_lo(void __iomem *addr)
-+{
-+	return readq_be(addr);
-+}
- EXPORT_SYMBOL(ioread64);
-+EXPORT_SYMBOL(ioread64_lo_hi);
-+EXPORT_SYMBOL(ioread64_hi_lo);
- EXPORT_SYMBOL(ioread64be);
-+EXPORT_SYMBOL(ioread64be_lo_hi);
-+EXPORT_SYMBOL(ioread64be_hi_lo);
- #endif /* __powerpc64__ */
+diff --git a/lib/iomap.c b/lib/iomap.c
+index 541d926da95e..be120c13d6cc 100644
+--- a/lib/iomap.c
++++ b/lib/iomap.c
+@@ -106,8 +106,8 @@ EXPORT_SYMBOL(ioread32be);
+ #endif
+ 
+ #ifndef mmio_write16be
+-#define mmio_write16be(val,port) __raw_writew(be16_to_cpu(val),port)
+-#define mmio_write32be(val,port) __raw_writel(be32_to_cpu(val),port)
++#define mmio_write16be(val,port) __raw_writew(cpu_to_be16(val),port)
++#define mmio_write32be(val,port) __raw_writel(cpu_to_be32(val),port)
+ #endif
  
  void iowrite8(u8 val, void __iomem *addr)
-@@ -83,12 +103,32 @@ void iowrite64(u64 val, void __iomem *addr)
- {
- 	writeq(val, addr);
- }
-+void iowrite64_lo_hi(u64 val, void __iomem *addr)
-+{
-+	writeq(val, addr);
-+}
-+void iowrite64_hi_lo(u64 val, void __iomem *addr)
-+{
-+	writeq(val, addr);
-+}
- void iowrite64be(u64 val, void __iomem *addr)
- {
- 	writeq_be(val, addr);
- }
-+void iowrite64be_lo_hi(u64 val, void __iomem *addr)
-+{
-+	writeq_be(val, addr);
-+}
-+void iowrite64be_hi_lo(u64 val, void __iomem *addr)
-+{
-+	writeq_be(val, addr);
-+}
- EXPORT_SYMBOL(iowrite64);
-+EXPORT_SYMBOL(iowrite64_lo_hi);
-+EXPORT_SYMBOL(iowrite64_hi_lo);
- EXPORT_SYMBOL(iowrite64be);
-+EXPORT_SYMBOL(iowrite64be_lo_hi);
-+EXPORT_SYMBOL(iowrite64be_hi_lo);
- #endif /* __powerpc64__ */
- 
- /*
 -- 
 2.11.0
