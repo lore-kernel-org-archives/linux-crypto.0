@@ -1,7 +1,7 @@
 From: Benjamin Warnke <4bwarnke@informatik.uni-hamburg.de>
-Subject: [RFC PATCH v5 2/5] crypto: add zBeWalgo to crypto-api
-Date: Fri, 23 Mar 2018 13:56:47 +0100
-Message-ID: <FE0C89B4-7764-4BAD-BF09-48F49D22D3BD@informatik.uni-hamburg.de>
+Subject: [RFC PATCH v5 0/5] add compression algorithm zBeWalgo
+Date: Fri, 23 Mar 2018 13:56:42 +0100
+Message-ID: <23372483-85EF-45F8-B068-9FE2045B6BBA@informatik.uni-hamburg.de>
 Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
 Content-Type: text/plain;
         charset=us-ascii
@@ -19,420 +19,631 @@ Return-path: <linux-kernel-owner@vger.kernel.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This patch adds zBeWalgo to the crypto api so that zBeWalgo can be used by
-zram.
+This patch series adds a new compression algorithm to the kernel and to
+the crypto api.
+
+Changes since v4:
+- Fix mismatching function-prototypes
+- Fix mismatching license errors
+- Add static to variables and functions where possible
+- Add ULL to long constants
+
+Changes since v3:
+- Split patch into patchset
+- Add Zstd = Zstandard to the list of benchmarked algorithms
+- Added configurable compression levels to crypto-api
+- Added multiple compression levels to the benchmarks below
+- Added unsafe decompressor functions to crypto-api
+- Added flag to mark unstable algorithms to crypto-api
+- Test the code using afl-fuzz -> and fix the code
+- Added 2 new Benchmark datasets
+- checkpatch.pl fixes
+
+Changes since v2:
+- added linux-kernel Mailinglist
+
+Changes since v1:
+- improved documentation
+- improved code style
+- replaced numerous casts with get_unaligned*
+- added tests in crypto/testmgr.h/c
+- added zBeWalgo to the list of algorithms shown by 
+ /sys/block/zram0/comp_algorithm
+
+
+Currently ZRAM uses compression-algorithms from the crypto-api. ZRAM
+compresses each page individually. As a result the compression algorithm is
+forced to use a very small sliding window. None of the available compression
+algorithms is designed to achieve high compression ratios with small inputs.
+
+This patch-set adds a new compression algorithm 'zBeWalgo' to the crypto api.
+This algorithm focusses on increasing the capacity of the compressed
+block-device created by ZRAM. The choice of compression algorithms is always
+a tradeoff between speed and compression ratio.
+
+If faster algorithms like 'lz4' are chosen the compression ratio is often
+lower than the ratio of zBeWalgo as shown in the following benchmarks. Due to
+the lower compression ratio, ZRAM needs to fall back to backing_devices
+mode often. If backing_devices are required, the effective speed of ZRAM is a
+weighted average of de/compression time and writing/reading from the
+backing_device. This should be considered when comparing the speeds in the
+benchmarks.
+
+There are different kinds of backing_devices, each with its own drawbacks.
+1. HDDs: This kind of backing device is very slow. If the compression ratio
+of an algorithm is much lower than the ratio of zBeWalgo, it might be faster
+to use zBewalgo instead.
+2. SSDs: I tested a swap partition on my NVME-SSD. The speed is even higher
+than zram with lz4, but after about 5 Minutes the SSD is blocking all
+read/write requests due to overheating. This is definitly not an option.
+
+
+Benchmarks:
+
+
+To obtain reproducable benchmarks, the datasets were first loaded into a
+userspace-program. Than the data is written directly to a clean
+zram-partition without any filesystem. Between writing and reading 'sync'
+and 'echo 3 > /proc/sys/vm/drop_caches' is called. All time measurements are
+wall clock times, and the benchmarks are using only one cpu-core at a time.
+The new algorithm is compared to all available compression algorithms from
+the crypto-api.
+
+Before loading the datasets to user-space deduplication is applied, since
+none Algorithm has deduplication. Duplicated pages are removed to
+prevent an algorithm to obtain high/low ratios, just because a single page can
+be compressed very well - or not.
+
+All Algorithms marked with '*' are using unsafe decompression.
+
+All Read and Write Speed Measurements are given in MBit/s
+
+zbewalgo' uses per dataset specialized different combinations. These can be
+specified at runtime via /sys/kernel/zbewalgo/combinations.
+
+
+- '/dev/zero' This dataset is used to measure the speed limitations
+for ZRAM. ZRAM filters zero-data internally and does not even call the
+specified compression algorithm.
+
+Algorithm       write    read
+--zram--      2724.08 2828.87
+
+
+- 'ecoham' This dataset is one of the input files for the scientific
+application ECOHAM which runs an ocean simulation. This dataset contains a
+lot of zeros - even after deduplication. Where the data is not zero there are
+arrays of floating point values, adjacent float values are likely to be
+similar to each other, allowing for high compression ratios.
+
+zbewalgo reaches very high compression ratios and is a lot faster than other
+algorithms with similar compression ratios.
+
+Algorithm    ratio    write     read
+--hdd--       1.00   134.70   156.62
+lz4*_10       6.73  1303.12  1547.17
+lz4_10        6.73  1303.12  1574.51
+lzo           6.88  1205.98  1468.09
+lz4*_05       7.00  1291.81  1642.41
+lz4_05        7.00  1291.81  1682.81
+lz4_07        7.13  1250.29  1593.89
+lz4*_07       7.13  1250.29  1677.08
+lz4_06        7.16  1307.62  1666.66
+lz4*_06       7.16  1307.62  1669.42
+lz4_03        7.21  1250.87  1449.48
+lz4*_03       7.21  1250.87  1621.97
+lz4*_04       7.23  1281.62  1645.56
+lz4_04        7.23  1281.62  1666.81
+lz4_02        7.33  1267.54  1523.11
+lz4*_02       7.33  1267.54  1576.54
+lz4_09        7.36  1140.55  1510.01
+lz4*_09       7.36  1140.55  1692.38
+lz4*_01       7.36  1215.40  1575.38
+lz4_01        7.36  1215.40  1676.65
+lz4_08        7.36  1242.73  1544.07
+lz4*_08       7.36  1242.73  1692.92
+lz4hc_01      7.51   235.85  1545.61
+lz4hc*_01     7.51   235.85  1678.00
+lz4hc_02      7.62   226.30  1697.42
+lz4hc*_02     7.62   226.30  1738.79
+lz4hc*_03     7.71   194.64  1711.58
+lz4hc_03      7.71   194.64  1713.59
+lz4hc*_04     7.76   177.17  1642.39
+lz4hc_04      7.76   177.17  1698.36
+deflate_1     7.80    84.71   584.89
+lz4hc*_05     7.81   149.11  1558.43
+lz4hc_05      7.81   149.11  1686.71
+deflate_2     7.82    82.83   599.38
+deflate_3     7.86    84.27   616.05
+lz4hc_06      7.88   106.61  1680.52
+lz4hc*_06     7.88   106.61  1739.78
+zstd_07       7.92   230.34  1016.91
+zstd_05       7.92   252.71  1070.46
+zstd_06       7.93   237.84  1062.11
+lz4hc*_07     7.94    75.22  1751.91
+lz4hc_07      7.94    75.22  1768.98
+zstd_04       7.94   403.21  1080.62
+zstd_03       7.94   411.91  1077.26
+zstd_01       7.94   455.89  1082.54
+zstd_09       7.94   456.81  1079.22
+zstd_08       7.94   459.54  1082.07
+zstd_02       7.94   465.82  1056.67
+zstd_11       7.95   150.15  1070.31
+zstd_10       7.95   169.95  1107.86
+lz4hc_08      7.98    49.53  1611.61
+lz4hc*_08     7.98    49.53  1793.68
+lz4hc_09      7.98    49.62  1629.63
+lz4hc*_09     7.98    49.62  1639.83
+lz4hc*_10     7.99    37.96  1742.65
+lz4hc_10      7.99    37.96  1790.08
+zbewalgo      8.02    38.58   237.92
+zbewalgo*     8.02    38.58   239.10
+842           8.05   169.90   597.01
+zstd_13       8.06   129.78  1131.66
+zstd_12       8.06   135.50  1126.59
+deflate_4     8.16    71.14   546.52
+deflate_5     8.17    70.86   537.05
+zstd_17       8.19    61.46  1061.45
+zstd_14       8.20   124.43  1133.68
+zstd_18       8.21    56.82  1151.25
+zstd_19       8.22    51.51  1161.83
+zstd_20       8.24    44.26  1108.36
+zstd_16       8.25    76.26  1042.82
+zstd_15       8.25    86.65  1181.98
+deflate_6     8.28    66.45   619.62
+deflate_7     8.30    63.83   631.13
+zstd_21       8.41     6.73  1177.38
+zstd_22       8.46     2.23  1188.39
+deflate_9     8.47    44.16   678.43
+deflate_8     8.47    48.00   677.50
+zbewalgo'     8.80   634.68  1247.56
+zbewalgo'*    8.80   634.68  1429.42
+
+
+- 'source-code' This dataset is a tarball of the source-code from a
+linux-kernel.
+
+zBeWalgo is very bad in compressing text based datasets.
+
+
+Algorithm    ratio   write     read
+--hdd--       1.00  134.70   156.62
+lz4_10        1.49  584.41  1200.01
+lz4*_10       1.49  584.41  1251.79
+lz4*_07       1.64  559.05  1160.75
+lz4_07        1.64  559.05  1160.97
+842           1.65   63.66   158.53
+lz4_06        1.71  513.03  1068.18
+lz4*_06       1.71  513.03  1162.68
+lz4_05        1.78  526.31  1136.51
+lz4*_05       1.78  526.31  1144.81
+lz4*_04       1.87  506.63  1106.31
+lz4_04        1.87  506.63  1132.96
+zbewalgo      1.89   27.56    35.04
+zbewalgo*     1.89   27.56    36.20
+zbewalgo'     1.89   46.62    34.75
+zbewalgo'*    1.89   46.62    36.34
+lz4_03        1.98  485.91   984.92
+lz4*_03       1.98  485.91  1125.68
+lz4_02        2.07  454.96  1061.05
+lz4*_02       2.07  454.96  1133.42
+lz4_01        2.17  441.11  1141.52
+lz4*_01       2.17  441.11  1146.26
+lz4*_08       2.17  446.45  1103.61
+lz4_08        2.17  446.45  1163.91
+lz4*_09       2.17  453.21  1071.91
+lz4_09        2.17  453.21  1155.43
+lzo           2.27  430.27   871.87
+lz4hc*_01     2.35  137.71  1089.94
+lz4hc_01      2.35  137.71  1200.45
+lz4hc_02      2.38  139.18  1117.44
+lz4hc*_02     2.38  139.18  1210.58
+lz4hc_03      2.39  127.09  1097.90
+lz4hc*_03     2.39  127.09  1214.22
+lz4hc_10      2.40   96.26  1203.89
+lz4hc*_10     2.40   96.26  1221.94
+lz4hc*_08     2.40   98.80  1191.79
+lz4hc_08      2.40   98.80  1226.59
+lz4hc*_09     2.40  102.36  1213.34
+lz4hc_09      2.40  102.36  1225.45
+lz4hc*_07     2.40  113.81  1217.63
+lz4hc_07      2.40  113.81  1218.49
+lz4hc*_06     2.40  117.32  1214.13
+lz4hc_06      2.40  117.32  1224.51
+lz4hc_05      2.40  122.12  1108.34
+lz4hc*_05     2.40  122.12  1214.97
+lz4hc*_04     2.40  124.91  1093.58
+lz4hc_04      2.40  124.91  1222.05
+zstd_01       2.93  200.01   401.15
+zstd_08       2.93  200.01   414.52
+zstd_09       2.93  200.26   394.83
+zstd_02       3.00  201.12   405.73
+deflate_1     3.01   53.83   240.64
+deflate_2     3.05   52.58   243.31
+deflate_3     3.08   52.07   244.84
+zstd_04       3.10  158.80   365.06
+zstd_03       3.10  169.56   405.92
+zstd_05       3.18  125.00   410.23
+zstd_06       3.20  106.50   404.81
+zstd_07       3.21   99.02   404.23
+zstd_15       3.22   24.95   376.58
+zstd_16       3.22   26.88   416.44
+deflate_4     3.22   45.26   225.56
+zstd_13       3.22   62.53   388.33
+zstd_14       3.22   64.15   391.81
+zstd_12       3.22   66.24   417.67
+zstd_11       3.22   66.44   404.31
+zstd_10       3.22   73.13   401.98
+zstd_17       3.24   14.66   412.00
+zstd_18       3.25   13.37   408.46
+deflate_5     3.26   43.54   252.18
+deflate_7     3.27   39.37   245.63
+deflate_6     3.27   42.51   251.33
+deflate_9     3.28   40.02   253.99
+deflate_8     3.28   40.10   253.98
+zstd_19       3.34   10.36   399.85
+zstd_22       3.35    4.88   353.63
+zstd_21       3.35    6.02   323.33
+zstd_20       3.35    8.34   339.81
+
+
+- 'hpcg' This dataset is a (partial) memory-snapshot of the
+running hpcg-benchmark. At the time of the snapshot, that application
+performed a sparse matrix - vector multiplication.
+
+The compression ratio of zBeWalgo on this dataset is nearly 3 times higher
+than the ratio of any other algorithm regardless of the compression-level
+specified.
+
+Algorithm     ratio    write     read
+--hdd--        1.00   134.70   156.62
+lz4*_10        1.00  1130.73  2131.82
+lz4_10         1.00  1130.73  2181.60
+lz4_06         1.34   625.48  1145.74
+lz4*_06        1.34   625.48  1145.90
+lz4_07         1.57   515.39   895.42
+lz4*_07        1.57   515.39  1062.53
+lz4*_05        1.72   539.40  1030.76
+lz4_05         1.72   539.40  1038.86
+lzo            1.76   475.20   805.41
+lz4_08         1.76   480.35   939.16
+lz4*_08        1.76   480.35  1015.04
+lz4*_03        1.76   488.05   893.13
+lz4_03         1.76   488.05  1013.65
+lz4*_09        1.76   501.49  1032.69
+lz4_09         1.76   501.49  1105.47
+lz4*_01        1.76   501.54  1040.72
+lz4_01         1.76   501.54  1102.22
+lz4*_02        1.76   510.79  1014.78
+lz4_02         1.76   510.79  1080.69
+lz4_04         1.76   516.18  1047.06
+lz4*_04        1.76   516.18  1049.55
+842            2.35   109.68   192.50
+lz4hc_07       2.36   152.57  1265.77
+lz4hc*_07      2.36   152.57  1331.01
+lz4hc*_06      2.36   155.78  1313.85
+lz4hc_06       2.36   155.78  1346.52
+lz4hc*_08      2.36   158.80  1297.16
+lz4hc_08       2.36   158.80  1382.54
+lz4hc*_10      2.36   159.84  1317.81
+lz4hc_10       2.36   159.84  1346.85
+lz4hc*_03      2.36   160.01  1162.91
+lz4hc_03       2.36   160.01  1377.09
+lz4hc*_09      2.36   161.02  1320.87
+lz4hc_09       2.36   161.02  1374.39
+lz4hc*_05      2.36   164.67  1324.40
+lz4hc_05       2.36   164.67  1341.64
+lz4hc*_04      2.36   168.11  1323.19
+lz4hc_04       2.36   168.11  1377.56
+lz4hc_01       2.36   168.40  1231.55
+lz4hc*_01      2.36   168.40  1329.72
+lz4hc*_02      2.36   170.74  1316.54
+lz4hc_02       2.36   170.74  1337.42
+deflate_3      3.52    46.51   336.67
+deflate_2      3.52    62.05   343.03
+deflate_1      3.52    65.68   359.96
+deflate_4      4.01    61.01   432.66
+deflate_8      4.61    41.51   408.29
+deflate_5      4.61    44.09   434.79
+deflate_9      4.61    45.14   417.18
+deflate_7      4.61    45.22   440.27
+deflate_6      4.61    46.01   440.39
+zstd_09        5.95   277.11   542.93
+zstd_08        5.95   277.40   541.27
+zstd_01        5.95   277.41   540.61
+zstd_16        5.97    32.05   465.03
+zstd_15        5.97    39.12   515.07
+zstd_13        5.97    70.90   511.94
+zstd_14        5.97    72.20   522.68
+zstd_11        5.97    74.14   512.18
+zstd_12        5.97    74.27   497.95
+zstd_10        5.97    86.98   519.78
+zstd_07        5.97   135.16   504.07
+zstd_06        5.97   145.49   505.10
+zstd_05        6.02   177.86   510.08
+zstd_04        6.02   205.13   516.29
+zstd_03        6.02   217.82   515.50
+zstd_02        6.02   260.97   484.64
+zstd_18        6.27    12.10   490.72
+zstd_17        6.27    12.33   462.65
+zstd_21        6.70     9.25   391.16
+zstd_20        6.70     9.50   395.38
+zstd_22        6.70     9.74   390.99
+zstd_19        6.70     9.99   450.42
+zbewalgo      16.33    47.17   430.06
+zbewalgo*     16.33    47.17   436.92
+zbewalgo'     16.33   188.86   427.78
+zbewalgo'*    16.33   188.86   437.43
+
+
+- 'partdiff' (8 GiB) Array of double values. Adjacent doubles are similar, but
+not equal. This array is produced by a partial differential equation solver
+using a Jakobi-implementation.
+
+zBewalgo gains higher compression ratios than all other algorithms.
+Some algorithms are even slower than a hdd without any compression at all.
+
+Algorithm    ratio    write     read
+zstd_18       1.00    13.77  2080.06
+zstd_17       1.00    13.80  2075.23
+zstd_16       1.00    28.04  2138.99
+zstd_15       1.00    45.04  2143.32
+zstd_13       1.00    55.72  2128.27
+zstd_14       1.00    56.09  2123.54
+zstd_11       1.00    57.31  2095.04
+zstd_12       1.00    57.53  2134.61
+842           1.00    61.61  2267.89
+zstd_10       1.00    80.40  2081.35
+zstd_07       1.00   120.66  2119.09
+zstd_06       1.00   128.80  2134.02
+zstd_05       1.00   131.25  2133.01
+--hdd--       1.00   134.70   156.62
+lz4hc*_03     1.00   152.82  1982.94
+lz4hc_03      1.00   152.82  2261.55
+lz4hc*_07     1.00   159.43  1990.03
+lz4hc_07      1.00   159.43  2269.05
+lz4hc_10      1.00   166.33  2243.78
+lz4hc*_10     1.00   166.33  2260.63
+lz4hc_09      1.00   167.03  2244.20
+lz4hc*_09     1.00   167.03  2264.72
+lz4hc*_06     1.00   167.17  2245.15
+lz4hc_06      1.00   167.17  2271.88
+lz4hc_08      1.00   167.49  2237.79
+lz4hc*_08     1.00   167.49  2283.98
+lz4hc_02      1.00   167.51  2275.36
+lz4hc*_02     1.00   167.51  2279.72
+lz4hc*_05     1.00   167.52  2248.92
+lz4hc_05      1.00   167.52  2273.99
+lz4hc*_04     1.00   167.71  2268.23
+lz4hc_04      1.00   167.71  2268.78
+lz4hc*_01     1.00   167.91  2268.76
+lz4hc_01      1.00   167.91  2269.16
+zstd_04       1.00   175.84  2241.60
+zstd_03       1.00   176.35  2285.13
+zstd_02       1.00   195.41  2269.51
+zstd_09       1.00   199.47  2271.91
+zstd_01       1.00   199.74  2287.15
+zstd_08       1.00   199.87  2286.27
+lz4_01        1.00  1160.95  2257.78
+lz4*_01       1.00  1160.95  2275.42
+lz4_08        1.00  1164.37  2280.06
+lz4*_08       1.00  1164.37  2280.43
+lz4*_09       1.00  1166.30  2263.05
+lz4_09        1.00  1166.30  2280.54
+lz4*_03       1.00  1174.00  2074.96
+lz4_03        1.00  1174.00  2257.37
+lz4_02        1.00  1212.18  2273.60
+lz4*_02       1.00  1212.18  2285.66
+lz4*_04       1.00  1253.55  2259.60
+lz4_04        1.00  1253.55  2287.15
+lz4_05        1.00  1279.88  2282.47
+lz4*_05       1.00  1279.88  2287.05
+lz4_06        1.00  1292.22  2277.95
+lz4*_06       1.00  1292.22  2284.84
+lz4*_07       1.00  1303.58  2276.10
+lz4_07        1.00  1303.58  2276.99
+lz4*_10       1.00  1304.80  2183.30
+lz4_10        1.00  1304.80  2285.25
+lzo           1.00  1360.88  2281.19
+deflate_7     1.07    33.51   463.73
+deflate_2     1.07    33.99   473.07
+deflate_9     1.07    34.05   473.57
+deflate_6     1.07    34.06   473.69
+deflate_8     1.07    34.12   472.86
+deflate_5     1.07    34.22   468.03
+deflate_4     1.07    34.32   447.33
+deflate_1     1.07    35.45   431.95
+deflate_3     1.07    35.63   472.56
+zstd_22       1.11     9.81   668.64
+zstd_21       1.11    10.71   734.52
+zstd_20       1.11    10.78   714.86
+zstd_19       1.11    12.02   790.71
+zbewalgo      1.29    25.93   225.07
+zbewalgo*     1.29    25.93   226.72
+zbewalgo'*    1.31    23.54    84.29
+zbewalgo'     1.31    23.54    86.08
+
+- 'Isabella CLOUDf01'
+This dataset is an array of floating point values between 0.00000 and 0.00332.
+Detailed Information about this dataset is online available at
+http://www.vets.ucar.edu/vg/isabeldata/readme.html
+
+All algorithms obtain similar compression ratios. The compression ratio of
+zBeWalgo is slightly higher, and the speed is higher too.
+
+Algorithm    ratio    write     read
+--hdd--       1.00   134.70   156.62
+lzo           2.06  1022.09   916.22
+lz4*_10       2.09  1126.03  1533.35
+lz4_10        2.09  1126.03  1569.06
+lz4*_07       2.09  1135.89  1444.21
+lz4_07        2.09  1135.89  1581.96
+lz4*_01       2.10   972.22  1405.21
+lz4_01        2.10   972.22  1579.78
+lz4*_09       2.10   982.39  1429.17
+lz4_09        2.10   982.39  1490.27
+lz4_08        2.10  1006.56  1491.14
+lz4*_08       2.10  1006.56  1558.66
+lz4_02        2.10  1019.82  1366.16
+lz4*_02       2.10  1019.82  1578.79
+lz4_03        2.10  1129.74  1417.33
+lz4*_03       2.10  1129.74  1456.68
+lz4_04        2.10  1131.28  1478.27
+lz4*_04       2.10  1131.28  1517.84
+lz4_06        2.10  1147.78  1424.90
+lz4*_06       2.10  1147.78  1462.47
+lz4*_05       2.10  1172.44  1434.86
+lz4_05        2.10  1172.44  1578.80
+lz4hc*_10     2.11    29.01  1498.01
+lz4hc_10      2.11    29.01  1580.23
+lz4hc*_09     2.11    56.30  1510.26
+lz4hc_09      2.11    56.30  1583.11
+lz4hc_08      2.11    56.39  1426.43
+lz4hc*_08     2.11    56.39  1565.12
+lz4hc_07      2.11   129.27  1540.38
+lz4hc*_07     2.11   129.27  1578.35
+lz4hc*_06     2.11   162.72  1456.27
+lz4hc_06      2.11   162.72  1581.69
+lz4hc*_05     2.11   183.78  1487.71
+lz4hc_05      2.11   183.78  1589.10
+lz4hc*_04     2.11   187.41  1431.35
+lz4hc_04      2.11   187.41  1566.24
+lz4hc*_03     2.11   190.21  1531.98
+lz4hc_03      2.11   190.21  1580.81
+lz4hc*_02     2.11   199.69  1432.00
+lz4hc_02      2.11   199.69  1565.10
+lz4hc_01      2.11   205.87  1540.33
+lz4hc*_01     2.11   205.87  1567.68
+842           2.15    89.89   414.49
+deflate_1     2.29    48.84   352.09
+deflate_2     2.29    49.47   353.77
+deflate_3     2.30    50.00   345.88
+zstd_22       2.31     5.59   658.59
+zstd_21       2.31    14.34   664.02
+zstd_20       2.31    21.22   665.77
+zstd_19       2.31    24.26   587.99
+zstd_17       2.31    26.24   670.14
+zstd_18       2.31    26.47   668.64
+deflate_9     2.31    33.79   345.81
+deflate_8     2.31    34.67   347.96
+deflate_4     2.31    41.46   326.50
+deflate_7     2.31    42.56   346.99
+deflate_6     2.31    43.51   343.56
+deflate_5     2.31    45.83   343.86
+zstd_05       2.31   126.01   571.70
+zstd_04       2.31   178.39   597.26
+zstd_03       2.31   192.04   644.24
+zstd_01       2.31   206.31   563.68
+zstd_08       2.31   207.39   669.05
+zstd_02       2.31   216.98   600.77
+zstd_09       2.31   236.92   667.64
+zstd_16       2.32    41.47   660.06
+zstd_15       2.32    60.37   584.45
+zstd_14       2.32    74.60   673.10
+zstd_12       2.32    75.16   661.96
+zstd_13       2.32    75.22   676.12
+zstd_11       2.32    75.58   636.75
+zstd_10       2.32    95.05   645.07
+zstd_07       2.32   139.52   672.88
+zstd_06       2.32   145.40   670.45
+zbewalgo'*    2.37   337.07   463.32
+zbewalgo'     2.37   337.07   468.96
+zbewalgo*     2.60   101.17   578.35
+zbewalgo      2.60   101.17   586.88
+
+
+- 'Isabella TCf01'
+This dataset is an array of floating point values between -83.00402 and 31.51576.
+Detailed Information about this dataset is online available at
+http://www.vets.ucar.edu/vg/isabeldata/readme.html
+
+zBeWalgo is the only algorithm which can compress this dataset with a noticeable
+compressionratio.
+
+Algorithm    ratio    write     read
+842           1.00    60.09  1956.26
+--hdd--       1.00   134.70   156.62
+lz4hc_01      1.00   154.81  1839.37
+lz4hc*_01     1.00   154.81  2105.53
+lz4hc_10      1.00   157.33  2078.69
+lz4hc*_10     1.00   157.33  2113.14
+lz4hc_09      1.00   158.50  2018.51
+lz4hc*_09     1.00   158.50  2093.65
+lz4hc*_02     1.00   159.54  2104.91
+lz4hc_02      1.00   159.54  2117.34
+lz4hc_03      1.00   161.26  2070.76
+lz4hc*_03     1.00   161.26  2107.27
+lz4hc*_08     1.00   161.34  2100.74
+lz4hc_08      1.00   161.34  2105.26
+lz4hc*_04     1.00   161.95  2080.96
+lz4hc_04      1.00   161.95  2104.00
+lz4hc_05      1.00   162.17  2044.43
+lz4hc*_05     1.00   162.17  2101.74
+lz4hc*_06     1.00   163.61  2087.19
+lz4hc_06      1.00   163.61  2104.61
+lz4hc_07      1.00   164.51  2094.78
+lz4hc*_07     1.00   164.51  2105.53
+lz4_01        1.00  1134.89  2109.70
+lz4*_01       1.00  1134.89  2118.71
+lz4*_08       1.00  1141.96  2104.87
+lz4_08        1.00  1141.96  2118.97
+lz4_09        1.00  1145.55  2087.76
+lz4*_09       1.00  1145.55  2118.85
+lz4_02        1.00  1157.28  2094.33
+lz4*_02       1.00  1157.28  2124.67
+lz4*_03       1.00  1194.18  2106.36
+lz4_03        1.00  1194.18  2119.89
+lz4_04        1.00  1195.09  2117.03
+lz4*_04       1.00  1195.09  2120.23
+lz4*_05       1.00  1225.56  2109.04
+lz4_05        1.00  1225.56  2120.52
+lz4*_06       1.00  1261.67  2109.14
+lz4_06        1.00  1261.67  2121.13
+lz4*_07       1.00  1270.86  1844.63
+lz4_07        1.00  1270.86  2041.08
+lz4_10        1.00  1305.36  2109.22
+lz4*_10       1.00  1305.36  2120.65
+lzo           1.00  1338.61  2109.66
+zstd_17       1.03    13.93  1138.94
+zstd_18       1.03    14.01  1170.78
+zstd_16       1.03    27.12  1073.75
+zstd_15       1.03    43.52  1061.97
+zstd_14       1.03    49.60  1082.98
+zstd_12       1.03    55.03  1042.43
+zstd_13       1.03    55.14  1173.50
+zstd_11       1.03    55.24  1178.05
+zstd_10       1.03    70.01  1173.05
+zstd_07       1.03   118.10  1041.92
+zstd_06       1.03   123.00  1171.59
+zstd_05       1.03   124.61  1165.74
+zstd_01       1.03   166.80  1005.29
+zstd_04       1.03   170.25  1127.75
+zstd_03       1.03   171.40  1172.34
+zstd_02       1.03   174.08  1017.34
+zstd_09       1.03   195.30  1176.82
+zstd_08       1.03   195.98  1175.09
+deflate_9     1.05    30.15   483.55
+deflate_8     1.05    30.45   466.67
+deflate_5     1.05    31.25   480.92
+deflate_4     1.05    31.84   472.81
+deflate_7     1.05    31.84   484.18
+deflate_6     1.05    31.94   481.37
+deflate_2     1.05    33.07   484.09
+deflate_3     1.05    33.11   463.57
+deflate_1     1.05    33.19   469.71
+zstd_22       1.06     8.89   647.75
+zstd_21       1.06    10.70   700.11
+zstd_20       1.06    10.80   723.42
+zstd_19       1.06    12.41   764.24
+zbewalgo*     1.51   146.45   581.43
+zbewalgo      1.51   146.45   592.86
+zbewalgo'*    1.54    38.14   120.96
+zbewalgo'     1.54    38.14   125.81
+
 
 Signed-off-by: Benjamin Warnke <4bwarnke@informatik.uni-hamburg.de>
----
- crypto/Kconfig                |  12 ++++
- crypto/Makefile               |   1 +
- crypto/testmgr.c              |  10 +++
- crypto/testmgr.h              | 134 ++++++++++++++++++++++++++++++++++
- crypto/zbewalgo.c             | 164 ++++++++++++++++++++++++++++++++++++++++++
- drivers/block/zram/zcomp.c    |   3 +
- drivers/block/zram/zram_drv.h |   4 +-
- 7 files changed, 327 insertions(+), 1 deletion(-)
- create mode 100644 crypto/zbewalgo.c
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index b75264b09..3ac0d4ca7 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -1668,6 +1668,18 @@ config CRYPTO_LZ4
- 	help
- 	  This is the LZ4 algorithm.
- 
-+config CRYPTO_ZBEWALGO
-+	tristate "zBeWalgo compression algorithm"
-+	select CRYPTO_ALGAPI
-+	select CRYPTO_ACOMP2
-+	select ZBEWALGO_COMPRESS
-+	help
-+	  This is the zBeWalgo compression algorithm. This algorithm
-+	  accepts only input sizes of at most one page at once.
-+	  To achieve high compression ratios zbewalgo can call multiple
-+	  transformation and compression algorithms in a row to optimize
-+	  the compressed size.
-+
- config CRYPTO_LZ4HC
- 	tristate "LZ4HC compression algorithm"
- 	select CRYPTO_ALGAPI
-diff --git a/crypto/Makefile b/crypto/Makefile
-index cdbc03b35..2a42fb289 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -121,6 +121,7 @@ obj-$(CONFIG_CRYPTO_CRCT10DIF) += crct10dif_common.o crct10dif_generic.o
- obj-$(CONFIG_CRYPTO_AUTHENC) += authenc.o authencesn.o
- obj-$(CONFIG_CRYPTO_LZO) += lzo.o
- obj-$(CONFIG_CRYPTO_LZ4) += lz4.o
-+obj-$(CONFIG_CRYPTO_ZBEWALGO) += zbewalgo.o
- obj-$(CONFIG_CRYPTO_LZ4HC) += lz4hc.o
- obj-$(CONFIG_CRYPTO_842) += 842.o
- obj-$(CONFIG_CRYPTO_RNG2) += rng.o
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index d5e23a142..294075476 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -3566,6 +3566,16 @@ static const struct alg_test_desc alg_test_descs[] = {
- 				.dec = __VECS(tf_xts_dec_tv_template)
- 			}
- 		}
-+	}, {
-+		.alg = "zbewalgo",
-+		.test = alg_test_comp,
-+		.fips_allowed = 1,
-+		.suite = {
-+			.comp = {
-+				.comp = __VECS(zbewalgo_comp_tv_template),
-+				.decomp = __VECS(zbewalgo_decomp_tv_template)
-+			}
-+		}
- 	}, {
- 		.alg = "zlib-deflate",
- 		.test = alg_test_comp,
-diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index 6044f6906..996d8321e 100644
---- a/crypto/testmgr.h
-+++ b/crypto/testmgr.h
-@@ -35133,6 +35133,140 @@ static const struct hash_testvec bfin_crc_tv_template[] = {
- 
- };
- 
-+static const struct comp_testvec zbewalgo_comp_tv_template[] = {
-+	{
-+		.inlen	= 512,
-+		.outlen	= 402,
-+		.input	=
-+			"\x8a\x3a\xf3\xbe\x33\xf9\xab\x3d\xa1\x51\x9f\x7f\xad\xf6\xab\x3d"
-+			"\xad\x29\x8f\x3c\x27\xf4\xab\x3d\x06\x19\xc3\xf5\xa0\xf1\xab\x3d"
-+			"\xfb\x75\x3b\xab\x1a\xef\xab\x3d\xe3\x96\xf8\x5c\x94\xec\xab\x3d"
-+			"\x13\xd2\xfa\x0a\x0e\xea\xab\x3d\xe0\x7d\x42\xb5\x87\xe7\xab\x3d"
-+			"\xa1\xf0\xcf\x5b\x01\xe5\xab\x3d\xad\x80\xa3\xfe\x7a\xe2\xab\x3d"
-+			"\x59\x84\xbd\x9d\xf4\xdf\xab\x3d\xff\x51\x1e\x39\x6e\xdd\xab\x3d"
-+			"\xf5\x3f\xc6\xd0\xe7\xda\xab\x3d\x96\xa4\xb5\x64\x61\xd8\xab\x3d"
-+			"\x3b\xd6\xec\xf4\xda\xd5\xab\x3d\x3b\x2b\x6c\x81\x54\xd3\xab\x3d"
-+			"\xf2\xf9\x33\x0a\xce\xd0\xab\x3d\xbb\x98\x44\x8f\x47\xce\xab\x3d"
-+			"\xed\x5d\x9e\x10\xc1\xcb\xab\x3d\xe7\x9f\x41\x8e\x3a\xc9\xab\x3d"
-+			"\x07\xb5\x2e\x08\xb4\xc6\xab\x3d\xa9\xf3\x65\x7e\x2d\xc4\xab\x3d"
-+			"\x28\xb2\xe7\xf0\xa6\xc1\xab\x3d\xe3\x46\xb4\x5f\x20\xbf\xab\x3d"
-+			"\x38\x08\xcc\xca\x99\xbc\xab\x3d\x85\x4c\x2f\x32\x13\xba\xab\x3d"
-+			"\x2a\x6a\xde\x95\x8c\xb7\xab\x3d\x85\xb7\xd9\xf5\x05\xb5\xab\x3d"
-+			"\xf7\x8a\x21\x52\x7f\xb2\xab\x3d\xe2\x3a\xb6\xaa\xf8\xaf\xab\x3d"
-+			"\xa5\x1d\x98\xff\x71\xad\xab\x3d\xa3\x89\xc7\x50\xeb\xaa\xab\x3d"
-+			"\x3d\xd5\x44\x9e\x64\xa8\xab\x3d\xd6\x56\x10\xe8\xdd\xa5\xab\x3d"
-+			"\xce\x64\x2a\x2e\x57\xa3\xab\x3d\x8d\x55\x93\x70\xd0\xa0\xab\x3d"
-+			"\x76\x7f\x4b\xaf\x49\x9e\xab\x3d\xeb\x38\x53\xea\xc2\x9b\xab\x3d"
-+			"\x53\xd8\xaa\x21\x3c\x99\xab\x3d\x13\xb4\x52\x55\xb5\x96\xab\x3d"
-+			"\x92\x22\x4b\x85\x2e\x94\xab\x3d\x35\x7a\x94\xb1\xa7\x91\xab\x3d"
-+			"\x65\x11\x2f\xda\x20\x8f\xab\x3d\x86\x3e\x1b\xff\x99\x8c\xab\x3d"
-+			"\x02\x58\x59\x20\x13\x8a\xab\x3d\x41\xb4\xe9\x3d\x8c\x87\xab\x3d"
-+			"\xaf\xa9\xcc\x57\x05\x85\xab\x3d\xb5\x8e\x02\x6e\x7e\x82\xab\x3d"
-+			"\xb9\xb9\x8b\x80\xf7\x7f\xab\x3d\x27\x81\x68\x8f\x70\x7d\xab\x3d"
-+			"\x6a\x3b\x99\x9a\xe9\x7a\xab\x3d\xef\x3e\x1e\xa2\x62\x78\xab\x3d"
-+			"\x20\xe2\xf7\xa5\xdb\x75\xab\x3d\x6a\x7b\x26\xa6\x54\x73\xab\x3d"
-+			"\x3b\x61\xaa\xa2\xcd\x70\xab\x3d\xfe\xe9\x83\x9b\x46\x6e\xab\x3d"
-+			"\x22\x6c\xb3\x90\xbf\x6b\xab\x3d\x16\x3e\x39\x82\x38\x69\xab\x3d"
-+			"\x48\xb6\x15\x70\xb1\x66\xab\x3d\x26\x2b\x49\x5a\x2a\x64\xab\x3d"
-+			"\x23\xf3\xd3\x40\xa3\x61\xab\x3d\xae\x64\xb6\x23\x1c\x5f\xab\x3d"
-+			"\x37\xd6\xf0\x02\x95\x5c\xab\x3d\x30\x9e\x83\xde\x0d\x5a\xab\x3d",
-+		.output	=
-+			"\x02\x02\x07\x02\x07\x00\x00\x00\x0f\x00\x02\x8a\xa1\xad\x06\xfb"
-+			"\xe3\x13\xe0\xa1\xad\x59\xff\xf5\x96\x81\x3b\x7f\xf2\xbb\xed\xe7"
-+			"\x07\xa9\x28\xe3\x38\x85\x2a\x85\xf7\xe2\xa5\xa3\x3d\xd6\xce\x8d"
-+			"\x76\xeb\x53\x13\x92\x35\x65\x86\x02\x41\xaf\xb5\xb9\x27\x6a\xef"
-+			"\x20\x6a\x3b\xfe\x22\x16\x48\x26\x23\xae\x37\x30\x3a\x51\x29\x19"
-+			"\x75\x96\xd2\x7d\xf0\x80\x84\x51\x3f\xa4\xd6\x2b\xf9\x98\x5d\x9f"
-+			"\xb5\xf3\xb2\x46\x08\x4c\x6a\xb7\x8a\x3a\x1d\x89\xd5\x56\x64\x55"
-+			"\x7f\x38\xd8\xb4\x22\x7a\x11\x3e\x58\xb4\xa9\x8e\xb9\x81\x3b\x3e"
-+			"\xe2\x7b\x61\xe9\x6c\x3e\xb6\x2b\xf3\x64\xd6\x9e\xf3\x9f\x8f\xc3"
-+			"\x3b\xf8\xfa\x42\xcf\xa3\xbd\x1e\xc6\xb5\xec\x6c\x7f\x33\x44\x9e"
-+			"\x41\x2e\x65\xe7\xb4\xcc\x2f\xde\xd9\x21\xb6\x98\xc7\x44\x10\x2a"
-+			"\x93\x4b\x53\xaa\x52\x4b\x94\x2f\x1b\x59\xe9\xcc\x02\x8b\x68\x99"
-+			"\x1e\xf7\x26\xaa\x83\xb3\x39\x15\x49\xd3\xb6\xf0\x83\xbe\x7f\x3c"
-+			"\xf5\xab\x5c\x0a\xb5\x5b\xfe\x9d\x39\xd0\x64\xf4\x81\x0a\x8f\x10"
-+			"\x8e\x08\x7e\xf0\x5f\xca\x32\x95\xf5\x52\xaa\xff\x50\x9e\xe8\x2e"
-+			"\x70\xaf\xea\x21\x55\x85\xb1\xda\xff\x20\x3d\x57\x6e\x80\x8f\x9a"
-+			"\xa2\xa5\xa6\xa2\x9b\x90\x82\x70\x5a\x40\x23\x02\xde\x33\xad\x27"
-+			"\xa0\x1a\x94\x0e\x87\x01\x7a\xf4\x6e\xe7\x61\xda\x54\x6f\xce\x47"
-+			"\xc1\x3a\xb4\x2d\xa6\x20\x99\x13\x8c\x05\x7f\xf8\x71\xeb\x64\xdd"
-+			"\x57\xd0\x49\xc2\x3c\xb5\x2e\xa7\x20\x99\x13\x8c\x05\x7e\xf7\x70"
-+			"\xe9\x62\xdb\x54\xcd\x46\xbf\x38\xb1\x2a\xa3\x1c\x95\x0d\xf9\xf6"
-+			"\xf4\xf1\xef\xec\xea\xe7\xe5\xe2\xdf\xdd\xda\xd8\xd5\xd3\xd0\xce"
-+			"\xcb\xc9\xc6\xc4\xc1\xbf\xbc\xba\xb7\xb5\xb2\xaf\xad\xaa\xa8\xa5"
-+			"\xa3\xa0\x9e\x9b\x99\x96\x94\x91\x8f\x8c\x8a\x87\x85\x82\x7f\x7d"
-+			"\x7a\x78\x75\x73\x70\x6e\x6b\x69\x66\x64\x61\x5f\x5c\x5a\xbf\xab"
-+			"\xbf\x3d",
-+	},
-+};
-+
-+static const struct comp_testvec zbewalgo_decomp_tv_template[] = {
-+	{
-+		.inlen	= 402,
-+		.outlen	= 512,
-+		.input	=
-+			"\x02\x02\x07\x02\x07\x00\x00\x00\x0f\x00\x02\x8a\xa1\xad\x06\xfb"
-+			"\xe3\x13\xe0\xa1\xad\x59\xff\xf5\x96\x81\x3b\x7f\xf2\xbb\xed\xe7"
-+			"\x07\xa9\x28\xe3\x38\x85\x2a\x85\xf7\xe2\xa5\xa3\x3d\xd6\xce\x8d"
-+			"\x76\xeb\x53\x13\x92\x35\x65\x86\x02\x41\xaf\xb5\xb9\x27\x6a\xef"
-+			"\x20\x6a\x3b\xfe\x22\x16\x48\x26\x23\xae\x37\x30\x3a\x51\x29\x19"
-+			"\x75\x96\xd2\x7d\xf0\x80\x84\x51\x3f\xa4\xd6\x2b\xf9\x98\x5d\x9f"
-+			"\xb5\xf3\xb2\x46\x08\x4c\x6a\xb7\x8a\x3a\x1d\x89\xd5\x56\x64\x55"
-+			"\x7f\x38\xd8\xb4\x22\x7a\x11\x3e\x58\xb4\xa9\x8e\xb9\x81\x3b\x3e"
-+			"\xe2\x7b\x61\xe9\x6c\x3e\xb6\x2b\xf3\x64\xd6\x9e\xf3\x9f\x8f\xc3"
-+			"\x3b\xf8\xfa\x42\xcf\xa3\xbd\x1e\xc6\xb5\xec\x6c\x7f\x33\x44\x9e"
-+			"\x41\x2e\x65\xe7\xb4\xcc\x2f\xde\xd9\x21\xb6\x98\xc7\x44\x10\x2a"
-+			"\x93\x4b\x53\xaa\x52\x4b\x94\x2f\x1b\x59\xe9\xcc\x02\x8b\x68\x99"
-+			"\x1e\xf7\x26\xaa\x83\xb3\x39\x15\x49\xd3\xb6\xf0\x83\xbe\x7f\x3c"
-+			"\xf5\xab\x5c\x0a\xb5\x5b\xfe\x9d\x39\xd0\x64\xf4\x81\x0a\x8f\x10"
-+			"\x8e\x08\x7e\xf0\x5f\xca\x32\x95\xf5\x52\xaa\xff\x50\x9e\xe8\x2e"
-+			"\x70\xaf\xea\x21\x55\x85\xb1\xda\xff\x20\x3d\x57\x6e\x80\x8f\x9a"
-+			"\xa2\xa5\xa6\xa2\x9b\x90\x82\x70\x5a\x40\x23\x02\xde\x33\xad\x27"
-+			"\xa0\x1a\x94\x0e\x87\x01\x7a\xf4\x6e\xe7\x61\xda\x54\x6f\xce\x47"
-+			"\xc1\x3a\xb4\x2d\xa6\x20\x99\x13\x8c\x05\x7f\xf8\x71\xeb\x64\xdd"
-+			"\x57\xd0\x49\xc2\x3c\xb5\x2e\xa7\x20\x99\x13\x8c\x05\x7e\xf7\x70"
-+			"\xe9\x62\xdb\x54\xcd\x46\xbf\x38\xb1\x2a\xa3\x1c\x95\x0d\xf9\xf6"
-+			"\xf4\xf1\xef\xec\xea\xe7\xe5\xe2\xdf\xdd\xda\xd8\xd5\xd3\xd0\xce"
-+			"\xcb\xc9\xc6\xc4\xc1\xbf\xbc\xba\xb7\xb5\xb2\xaf\xad\xaa\xa8\xa5"
-+			"\xa3\xa0\x9e\x9b\x99\x96\x94\x91\x8f\x8c\x8a\x87\x85\x82\x7f\x7d"
-+			"\x7a\x78\x75\x73\x70\x6e\x6b\x69\x66\x64\x61\x5f\x5c\x5a\xbf\xab"
-+			"\xbf\x3d",
-+		.output	=
-+			"\x8a\x3a\xf3\xbe\x33\xf9\xab\x3d\xa1\x51\x9f\x7f\xad\xf6\xab\x3d"
-+			"\xad\x29\x8f\x3c\x27\xf4\xab\x3d\x06\x19\xc3\xf5\xa0\xf1\xab\x3d"
-+			"\xfb\x75\x3b\xab\x1a\xef\xab\x3d\xe3\x96\xf8\x5c\x94\xec\xab\x3d"
-+			"\x13\xd2\xfa\x0a\x0e\xea\xab\x3d\xe0\x7d\x42\xb5\x87\xe7\xab\x3d"
-+			"\xa1\xf0\xcf\x5b\x01\xe5\xab\x3d\xad\x80\xa3\xfe\x7a\xe2\xab\x3d"
-+			"\x59\x84\xbd\x9d\xf4\xdf\xab\x3d\xff\x51\x1e\x39\x6e\xdd\xab\x3d"
-+			"\xf5\x3f\xc6\xd0\xe7\xda\xab\x3d\x96\xa4\xb5\x64\x61\xd8\xab\x3d"
-+			"\x3b\xd6\xec\xf4\xda\xd5\xab\x3d\x3b\x2b\x6c\x81\x54\xd3\xab\x3d"
-+			"\xf2\xf9\x33\x0a\xce\xd0\xab\x3d\xbb\x98\x44\x8f\x47\xce\xab\x3d"
-+			"\xed\x5d\x9e\x10\xc1\xcb\xab\x3d\xe7\x9f\x41\x8e\x3a\xc9\xab\x3d"
-+			"\x07\xb5\x2e\x08\xb4\xc6\xab\x3d\xa9\xf3\x65\x7e\x2d\xc4\xab\x3d"
-+			"\x28\xb2\xe7\xf0\xa6\xc1\xab\x3d\xe3\x46\xb4\x5f\x20\xbf\xab\x3d"
-+			"\x38\x08\xcc\xca\x99\xbc\xab\x3d\x85\x4c\x2f\x32\x13\xba\xab\x3d"
-+			"\x2a\x6a\xde\x95\x8c\xb7\xab\x3d\x85\xb7\xd9\xf5\x05\xb5\xab\x3d"
-+			"\xf7\x8a\x21\x52\x7f\xb2\xab\x3d\xe2\x3a\xb6\xaa\xf8\xaf\xab\x3d"
-+			"\xa5\x1d\x98\xff\x71\xad\xab\x3d\xa3\x89\xc7\x50\xeb\xaa\xab\x3d"
-+			"\x3d\xd5\x44\x9e\x64\xa8\xab\x3d\xd6\x56\x10\xe8\xdd\xa5\xab\x3d"
-+			"\xce\x64\x2a\x2e\x57\xa3\xab\x3d\x8d\x55\x93\x70\xd0\xa0\xab\x3d"
-+			"\x76\x7f\x4b\xaf\x49\x9e\xab\x3d\xeb\x38\x53\xea\xc2\x9b\xab\x3d"
-+			"\x53\xd8\xaa\x21\x3c\x99\xab\x3d\x13\xb4\x52\x55\xb5\x96\xab\x3d"
-+			"\x92\x22\x4b\x85\x2e\x94\xab\x3d\x35\x7a\x94\xb1\xa7\x91\xab\x3d"
-+			"\x65\x11\x2f\xda\x20\x8f\xab\x3d\x86\x3e\x1b\xff\x99\x8c\xab\x3d"
-+			"\x02\x58\x59\x20\x13\x8a\xab\x3d\x41\xb4\xe9\x3d\x8c\x87\xab\x3d"
-+			"\xaf\xa9\xcc\x57\x05\x85\xab\x3d\xb5\x8e\x02\x6e\x7e\x82\xab\x3d"
-+			"\xb9\xb9\x8b\x80\xf7\x7f\xab\x3d\x27\x81\x68\x8f\x70\x7d\xab\x3d"
-+			"\x6a\x3b\x99\x9a\xe9\x7a\xab\x3d\xef\x3e\x1e\xa2\x62\x78\xab\x3d"
-+			"\x20\xe2\xf7\xa5\xdb\x75\xab\x3d\x6a\x7b\x26\xa6\x54\x73\xab\x3d"
-+			"\x3b\x61\xaa\xa2\xcd\x70\xab\x3d\xfe\xe9\x83\x9b\x46\x6e\xab\x3d"
-+			"\x22\x6c\xb3\x90\xbf\x6b\xab\x3d\x16\x3e\x39\x82\x38\x69\xab\x3d"
-+			"\x48\xb6\x15\x70\xb1\x66\xab\x3d\x26\x2b\x49\x5a\x2a\x64\xab\x3d"
-+			"\x23\xf3\xd3\x40\xa3\x61\xab\x3d\xae\x64\xb6\x23\x1c\x5f\xab\x3d"
-+			"\x37\xd6\xf0\x02\x95\x5c\xab\x3d\x30\x9e\x83\xde\x0d\x5a\xab\x3d",
-+	},
-+};
-+
- static const struct comp_testvec lz4_comp_tv_template[] = {
- 	{
- 		.inlen	= 255,
-diff --git a/crypto/zbewalgo.c b/crypto/zbewalgo.c
-new file mode 100644
-index 000000000..044b88117
---- /dev/null
-+++ b/crypto/zbewalgo.c
-@@ -0,0 +1,164 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Copyright (c) 2018 Benjamin Warnke <4bwarnke@informatik.uni-hamburg.de>
-+ */
-+
-+#include <crypto/internal/scompress.h>
-+#include <linux/crypto.h>
-+#include <linux/delay.h>
-+#include <linux/init.h>
-+#include <linux/module.h>
-+#include <linux/vmalloc.h>
-+#include <linux/zbewalgo.h>
-+
-+struct zbewalgo_ctx {
-+	void *zbewalgo_comp_mem;
-+};
-+
-+static void *zbewalgo_alloc_ctx(struct crypto_scomp *tfm)
-+{
-+	void *ctx;
-+
-+	ctx = vmalloc(zbewalgo_get_wrkmem_size());
-+	if (!ctx)
-+		return ERR_PTR(-ENOMEM);
-+	return ctx;
-+}
-+
-+static int zbewalgo_init(struct crypto_tfm *tfm)
-+{
-+	struct zbewalgo_ctx *ctx = crypto_tfm_ctx(tfm);
-+
-+	ctx->zbewalgo_comp_mem = zbewalgo_alloc_ctx(NULL);
-+	if (IS_ERR(ctx->zbewalgo_comp_mem))
-+		return -ENOMEM;
-+	return 0;
-+}
-+
-+static void zbewalgo_free_ctx(struct crypto_scomp *tfm, void *ctx)
-+{
-+	vfree(ctx);
-+}
-+
-+static void zbewalgo_exit(struct crypto_tfm *tfm)
-+{
-+	struct zbewalgo_ctx *ctx = crypto_tfm_ctx(tfm);
-+
-+	zbewalgo_free_ctx(NULL, ctx->zbewalgo_comp_mem);
-+}
-+
-+static int __zbewalgo_compress_crypto(const u8 *src, unsigned int slen,
-+				      u8 *dst, unsigned int *dlen, void *ctx)
-+{
-+	int out_len;
-+
-+	if (slen > 4096)
-+		return -EINVAL;
-+	out_len = zbewalgo_compress(src, dst, ctx, slen);
-+	if (!out_len)
-+		return -EINVAL;
-+	*dlen = out_len;
-+	return 0;
-+}
-+
-+static int zbewalgo_scompress(struct crypto_scomp *tfm, const u8 *src,
-+			      unsigned int slen, u8 *dst, unsigned int *dlen,
-+			      void *ctx)
-+{
-+	return __zbewalgo_compress_crypto(src, slen, dst, dlen, ctx);
-+}
-+
-+static int zbewalgo_compress_crypto(struct crypto_tfm *tfm, const u8 *src,
-+				    unsigned int slen, u8 *dst,
-+				    unsigned int *dlen)
-+{
-+	struct zbewalgo_ctx *ctx = crypto_tfm_ctx(tfm);
-+
-+	return __zbewalgo_compress_crypto(src, slen, dst, dlen,
-+		ctx->zbewalgo_comp_mem);
-+}
-+
-+static int __zbewalgo_decompress_crypto(const u8 *src, unsigned int slen,
-+					u8 *dst, unsigned int *dlen, void *ctx)
-+{
-+	int out_len;
-+
-+	out_len = zbewalgo_decompress_safe(src, dst, ctx, slen);
-+	if (out_len < 0)
-+		return -EINVAL;
-+	*dlen = out_len;
-+	return 0;
-+}
-+
-+static int zbewalgo_sdecompress(struct crypto_scomp *tfm, const u8 *src,
-+				unsigned int slen, u8 *dst, unsigned int *dlen,
-+				void *ctx)
-+{
-+	return __zbewalgo_decompress_crypto(src, slen, dst, dlen, ctx);
-+}
-+
-+static int zbewalgo_decompress_crypto(struct crypto_tfm *tfm, const u8 *src,
-+				      unsigned int slen, u8 *dst,
-+				      unsigned int *dlen)
-+{
-+	struct zbewalgo_ctx *ctx = crypto_tfm_ctx(tfm);
-+
-+	return __zbewalgo_decompress_crypto(src, slen, dst, dlen,
-+		ctx->zbewalgo_comp_mem);
-+}
-+
-+static struct crypto_alg crypto_alg_zbewalgo = {
-+	.cra_name = "zbewalgo",
-+	.cra_flags = CRYPTO_ALG_TYPE_COMPRESS,
-+	.cra_ctxsize = sizeof(struct zbewalgo_ctx),
-+	.cra_module = THIS_MODULE,
-+	.cra_init = zbewalgo_init,
-+	.cra_exit = zbewalgo_exit,
-+	.cra_u = {
-+		.compress = {
-+			.coa_compress = zbewalgo_compress_crypto,
-+			.coa_decompress = zbewalgo_decompress_crypto
-+		}
-+	}
-+};
-+
-+static struct scomp_alg scomp = {
-+	.alloc_ctx = zbewalgo_alloc_ctx,
-+	 .free_ctx = zbewalgo_free_ctx,
-+	 .compress = zbewalgo_scompress,
-+	 .decompress = zbewalgo_sdecompress,
-+	 .base = {
-+		 .cra_name = "zbewalgo",
-+		 .cra_driver_name = "zbewalgo-scomp",
-+		 .cra_module = THIS_MODULE,
-+	}
-+};
-+
-+static int __init zbewalgo_mod_init(void)
-+{
-+	int ret;
-+
-+	ret = crypto_register_alg(&crypto_alg_zbewalgo);
-+	if (ret)
-+		return ret;
-+	ret = crypto_register_scomp(&scomp);
-+	if (ret) {
-+		crypto_unregister_alg(&crypto_alg_zbewalgo);
-+		return ret;
-+	}
-+	return ret;
-+}
-+
-+static void __exit zbewalgo_mod_fini(void)
-+{
-+	crypto_unregister_alg(&crypto_alg_zbewalgo);
-+	crypto_unregister_scomp(&scomp);
-+}
-+
-+module_init(zbewalgo_mod_init);
-+module_exit(zbewalgo_mod_fini);
-+
-+MODULE_AUTHOR("Benjamin Warnke <4bwarnke@informatik.uni-hamburg.de>");
-+MODULE_LICENSE("GPL v2");
-+MODULE_DESCRIPTION("zBeWalgo Compression Algorithm");
-+MODULE_ALIAS_CRYPTO("zbewalgo");
-diff --git a/drivers/block/zram/zcomp.c b/drivers/block/zram/zcomp.c
-index 4ed0a78fd..15b3a0162 100644
---- a/drivers/block/zram/zcomp.c
-+++ b/drivers/block/zram/zcomp.c
-@@ -23,6 +23,9 @@ static const char * const backends[] = {
- #if IS_ENABLED(CONFIG_CRYPTO_LZ4)
- 	"lz4",
- #endif
-+#if IS_ENABLED(CONFIG_CRYPTO_ZBEWALGO)
-+	"zbewalgo",
-+#endif
- #if IS_ENABLED(CONFIG_CRYPTO_LZ4HC)
- 	"lz4hc",
- #endif
-diff --git a/drivers/block/zram/zram_drv.h b/drivers/block/zram/zram_drv.h
-index 31762db86..84dee5383 100644
---- a/drivers/block/zram/zram_drv.h
-+++ b/drivers/block/zram/zram_drv.h
-@@ -27,7 +27,9 @@
-  * Pages that compress to size greater than this are stored
-  * uncompressed in memory.
-  */
--static const size_t max_zpage_size = PAGE_SIZE / 4 * 3;
-+static const size_t max_zpage_size =
-+	3264 /* largest reported size_class by zsmalloc */
-+	- (sizeof(unsigned long)); /* zsmalloc internal overhead */
- 
- /*
-  * NOTE: max_zpage_size must be less than or equal to:
+---
+
 -- 
 2.14.1
