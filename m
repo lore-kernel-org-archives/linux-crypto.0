@@ -1,41 +1,35 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2] crypto: ctr - avoid VLA use
-Date: Fri, 23 Mar 2018 23:36:52 +0800
-Message-ID: <20180323153652.GA1760@gondor.apana.org.au>
-References: <1521112738-13250-1-git-send-email-s.mesoraca16@gmail.com>
+Subject: Re: [PATCH 2/2] crypto: talitos: Delete an error message for a
+ failed memory allocation in talitos_edesc_alloc()
+Date: Fri, 23 Mar 2018 23:58:04 +0800
+Message-ID: <20180323155804.GA2186@gondor.apana.org.au>
+References: <ad256dc9-a064-37f9-fb8e-aea22ba40a2b@users.sourceforge.net>
+ <13bfdc03-1dee-2f1c-da8d-1e452f10c850@users.sourceforge.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel@vger.kernel.org, kernel-hardening@lists.openwall.com,
-        linux-crypto@vger.kernel.org,
+Cc: linux-crypto@vger.kernel.org,
+        Christophe Leroy <christophe.leroy@c-s.fr>,
         "David S. Miller" <davem@davemloft.net>,
-        Kees Cook <keescook@chromium.org>,
-        Eric Biggers <ebiggers3@gmail.com>
-To: Salvatore Mesoraca <s.mesoraca16@gmail.com>
+        LKML <linux-kernel@vger.kernel.org>,
+        kernel-janitors@vger.kernel.org
+To: SF Markus Elfring <elfring@users.sourceforge.net>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1521112738-13250-1-git-send-email-s.mesoraca16@gmail.com>
+In-Reply-To: <13bfdc03-1dee-2f1c-da8d-1e452f10c850@users.sourceforge.net>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Mar 15, 2018 at 12:18:58PM +0100, Salvatore Mesoraca wrote:
->
-> +#define MAX_BLOCKSIZE 16
-> +
-> +#ifdef CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS
-> +#define MAX_ALIGNMASK 15
-> +#else
-> +#define MAX_ALIGNMASK 0
-> +#endif
-> +
+On Mon, Mar 12, 2018 at 02:32:58PM +0100, SF Markus Elfring wrote:
+> From: Markus Elfring <elfring@users.sourceforge.net>
+> Date: Mon, 12 Mar 2018 14:18:23 +0100
+> 
+> Omit an extra message for a memory allocation failure in this function.
+> 
+> This issue was detected by using the Coccinelle software.
+> 
+> Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
 
-Hmm, this won't work.  Just because you have efficient unaligned
-access in general doesn't mean that every implementation can live
-with unaligned access.  In particular, on x86 there are quite a
-few implementations that require alignment or they will fault.
-
-So please just make it 15 unconditionally.
-
-Thanks,
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
