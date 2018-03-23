@@ -1,35 +1,42 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 2/2] crypto: talitos: Delete an error message for a
- failed memory allocation in talitos_edesc_alloc()
-Date: Fri, 23 Mar 2018 23:58:04 +0800
-Message-ID: <20180323155804.GA2186@gondor.apana.org.au>
-References: <ad256dc9-a064-37f9-fb8e-aea22ba40a2b@users.sourceforge.net>
- <13bfdc03-1dee-2f1c-da8d-1e452f10c850@users.sourceforge.net>
+Subject: Re: [PATCH v2 0/2] Keystone2 HW random generator
+Date: Sat, 24 Mar 2018 00:02:05 +0800
+Message-ID: <20180323160205.GD2186@gondor.apana.org.au>
+References: <1520962411-18208-1-git-send-email-vitalya@ti.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org,
-        Christophe Leroy <christophe.leroy@c-s.fr>,
-        "David S. Miller" <davem@davemloft.net>,
-        LKML <linux-kernel@vger.kernel.org>,
-        kernel-janitors@vger.kernel.org
-To: SF Markus Elfring <elfring@users.sourceforge.net>
+Cc: mpm@selenic.com, arnd@arndb.de, gregkh@linuxfoundation.org,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        robh+dt@kernel.org, mark.rutland@arm.com,
+        devicetree@vger.kernel.org, t-kristo@ti.com, m-karicheri2@ti.com
+To: Vitaly Andrianov <vitalya@ti.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <13bfdc03-1dee-2f1c-da8d-1e452f10c850@users.sourceforge.net>
+In-Reply-To: <1520962411-18208-1-git-send-email-vitalya@ti.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Mar 12, 2018 at 02:32:58PM +0100, SF Markus Elfring wrote:
-> From: Markus Elfring <elfring@users.sourceforge.net>
-> Date: Mon, 12 Mar 2018 14:18:23 +0100
+On Tue, Mar 13, 2018 at 01:33:29PM -0400, Vitaly Andrianov wrote:
+> Keyston2 Security Accelerator has a hardware random generator sub-module.
+> This series adds the driver for the sub-module.
 > 
-> Omit an extra message for a memory allocation failure in this function.
+> Changes in v2:
+> - Changed subject prefix in 1/2 patch
+> - renamed dts node 
 > 
-> This issue was detected by using the Coccinelle software.
+> Vitaly Andrianov (2):
+>   dt-bindings: rng: add bindings doc for Keystone SA HWRNG driver
+>   hw_random: keystone2: add hw_random driver
 > 
-> Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+>  .../devicetree/bindings/rng/ks-sa-rng.txt          |  21 ++
+>  drivers/char/hw_random/Kconfig                     |   7 +
+>  drivers/char/hw_random/Makefile                    |   1 +
+>  drivers/char/hw_random/ks-sa-rng.c                 | 257 +++++++++++++++++++++
+>  4 files changed, 286 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/rng/ks-sa-rng.txt
+>  create mode 100644 drivers/char/hw_random/ks-sa-rng.c
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
