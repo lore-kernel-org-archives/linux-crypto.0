@@ -1,38 +1,36 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: arm,arm64 - Fix random regeneration of S_shipped
-Date: Sat, 24 Mar 2018 00:03:27 +0800
-Message-ID: <20180323160327.GA2414@gondor.apana.org.au>
-References: <db77e20709db11b951a28c3303feb63990ef82d7.1520972030.git.leonard.crestez@nxp.com>
+Subject: Re: [PATCH] crypto: cavium: cpt: Replace mdelay with msleep in
+ cpt_device_init
+Date: Sat, 24 Mar 2018 00:04:11 +0800
+Message-ID: <20180323160411.GG2186@gondor.apana.org.au>
+References: <1521384638-23251-1-git-send-email-baijiaju1990@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: ard.biesheuvel@linaro.org, yamada.masahiro@socionext.com,
-        linux@armlinux.org.uk, linux@rasmusvillemoes.dk,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org, stable@vger.kernel.org
-To: Leonard Crestez <leonard.crestez@nxp.com>
+Cc: george.cherian@cavium.com, davem@davemloft.net,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Jia-Ju Bai <baijiaju1990@gmail.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <db77e20709db11b951a28c3303feb63990ef82d7.1520972030.git.leonard.crestez@nxp.com>
+In-Reply-To: <1521384638-23251-1-git-send-email-baijiaju1990@gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Leonard Crestez <leonard.crestez@nxp.com> wrote:
-> The decision to rebuild .S_shipped is made based on the relative
-> timestamps of .S_shipped and .pl files but git makes this essentially
-> random. This means that the perl script might run anyway (usually at
-> most once per checkout), defeating the whole purpose of _shipped.
+On Sun, Mar 18, 2018 at 10:50:38PM +0800, Jia-Ju Bai wrote:
+> cpt_device_init() is never called in atomic context.
 > 
-> Fix by skipping the rule unless explicit make variables are provided:
-> REGENERATE_ARM_CRYPTO or REGENERATE_ARM64_CRYPTO.
+> The call chain ending up at cpt_device_init() is:
+> [1] cpt_device_init() <- cpt_probe()
+> cpt_probe() is only set as ".probe" in pci_driver structure 
+> "cpt_pci_driver".
 > 
-> This can produce nasty occasional build failures downstream, for example
-> for toolchains with broken perl. The solution is minimally intrusive to
-> make it easier to push into stable.
+> Despite never getting called from atomic context, cpt_device_init() calls
+> mdelay(100), i.e. busy wait for 100ms.
+> That is not necessary and can be replaced with msleep to 
+> avoid busy waiting.
 > 
-> Another report on a similar issue here: https://lkml.org/lkml/2018/3/8/1379
+> This is found by a static analysis tool named DCNS written by myself.
 > 
-> Signed-off-by: Leonard Crestez <leonard.crestez@nxp.com>
-> Cc: <stable@vger.kernel.org>
+> Signed-off-by: Jia-Ju Bai <baijiaju1990@gmail.com>
 
 Patch applied.  Thanks.
 -- 
