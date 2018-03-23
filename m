@@ -1,38 +1,42 @@
-From: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-Subject: Re: [PATCH] X.509: unpack RSA signatureValue field from BIT STRING
-Date: Fri, 23 Mar 2018 16:25:27 +0100
-Message-ID: <9264ee5d-e793-22c3-6aad-6bd7b8737dbf@maciej.szmigiero.name>
-References: <88da0c24-385c-64a9-6d56-36696d433bc7@maciej.szmigiero.name>
- <30085.1520437454@warthog.procyon.org.uk>
- <593f6dbe-4ab4-0149-43d9-388cf0fee9f3@maciej.szmigiero.name>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v2] crypto: ctr - avoid VLA use
+Date: Fri, 23 Mar 2018 23:36:52 +0800
+Message-ID: <20180323153652.GA1760@gondor.apana.org.au>
+References: <1521112738-13250-1-git-send-email-s.mesoraca16@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-kernel@vger.kernel.org, kernel-hardening@lists.openwall.com,
+        linux-crypto@vger.kernel.org,
         "David S. Miller" <davem@davemloft.net>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Gary Hook <gary.hook@amd.com>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: David Howells <dhowells@redhat.com>
+        Kees Cook <keescook@chromium.org>,
+        Eric Biggers <ebiggers3@gmail.com>
+To: Salvatore Mesoraca <s.mesoraca16@gmail.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <593f6dbe-4ab4-0149-43d9-388cf0fee9f3@maciej.szmigiero.name>
-Content-Language: en-US
+Content-Disposition: inline
+In-Reply-To: <1521112738-13250-1-git-send-email-s.mesoraca16@gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 07.03.2018 18:56, Maciej S. Szmigiero wrote:
-> On 07.03.2018 16:44, David Howells wrote:
->> Maciej S. Szmigiero <mail@maciej.szmigiero.name> wrote:
->>
->>> +	if (!strcmp(ctx->cert->sig->pkey_algo, "rsa")) {
->>
->> I'm going to change this to '== 0' rather than '!'.
-> 
-> No problem. 
+On Thu, Mar 15, 2018 at 12:18:58PM +0100, Salvatore Mesoraca wrote:
+>
+> +#define MAX_BLOCKSIZE 16
+> +
+> +#ifdef CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS
+> +#define MAX_ALIGNMASK 15
+> +#else
+> +#define MAX_ALIGNMASK 0
+> +#endif
+> +
 
-I cannot find this patch in any tree that I have looked at.
-Are you going to pick it up later or am I not looking at the right
-place?
+Hmm, this won't work.  Just because you have efficient unaligned
+access in general doesn't mean that every implementation can live
+with unaligned access.  In particular, on x86 there are quite a
+few implementations that require alignment or they will fault.
+
+So please just make it 15 unconditionally.
 
 Thanks,
-Maciej
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
