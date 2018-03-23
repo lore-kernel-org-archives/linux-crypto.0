@@ -1,58 +1,63 @@
-From: kbuild test robot <lkp@intel.com>
-Subject: Re: [PATCH 2/5 v4] crypto: add zBeWalgo to crypto-api
-Date: Fri, 23 Mar 2018 17:36:38 +0800
-Message-ID: <201803231728.EQZdGg40%fengguang.wu@intel.com>
-References: <1B59F77F-1AD8-484A-BA18-255502527323@informatik.uni-hamburg.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: kbuild-all@01.org,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        linux-kernel@vger.kernel.org, herbert@gondor.apana.org.au,
-        davem@davemloft.net, minchan@kernel.org, ngupta@vflare.org,
-        Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>
+From: Benjamin Warnke <4bwarnke@informatik.uni-hamburg.de>
+Subject: [RFC PATCH v5 5/5] crypto: add flag for unstable encoding
+Date: Fri, 23 Mar 2018 13:56:55 +0100
+Message-ID: <F324487F-A4C4-4573-A517-1E45AF871770@informatik.uni-hamburg.de>
+Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
+Content-Type: text/plain;
+        charset=us-ascii
+Content-Transfer-Encoding: 8BIT
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>, minchan@kernel.org,
+        Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
+        ngupta@vflare.org, Philippe Ombredanne <pombredanne@nexb.com>,
+        Eric Biggers <ebiggers3@gmail.com>,
+        Stephan Mueller <smueller@chronox.de>
 To: Benjamin Warnke <4bwarnke@informatik.uni-hamburg.de>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1B59F77F-1AD8-484A-BA18-255502527323@informatik.uni-hamburg.de>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi Benjamin,
+The data-format of zBeWalgo, and some other algorithms is unstable. To
+identify such unstable algorithms this patch adds a new flag to the
+crypto-api.
 
-Thank you for the patch! Perhaps something to improve:
-
-[auto build test WARNING on linus/master]
-[also build test WARNING on v4.16-rc6]
-[cannot apply to next-20180322]
-[if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
-
-url:    https://github.com/0day-ci/linux/commits/Benjamin-Warnke/add-compression-algorithm-zBeWalgo/20180323-155925
-reproduce:
-        # apt-get install sparse
-        make ARCH=x86_64 allmodconfig
-        make C=1 CF=-D__CHECK_ENDIAN__
-
-
-sparse warnings: (new ones prefixed by >>)
-
->> lib/zbewalgo/zbewalgo.c:70:12: sparse: symbol 'zbewalgo_stat_combination' was not declared. Should it be static?
->> lib/zbewalgo/zbewalgo.c:71:12: sparse: symbol 'zbewalgo_stat_count' was not declared. Should it be static?
->> lib/zbewalgo/zbewalgo.c:79:9: sparse: symbol 'zbewalgo_combinations' was not declared. Should it be static?
->> lib/zbewalgo/zbewalgo.c:80:4: sparse: symbol 'zbewalgo_combinations_count' was not declared. Should it be static?
->> lib/zbewalgo/zbewalgo.c:92:5: sparse: symbol 'zbewalgo_early_abort_size' was not declared. Should it be static?
->> lib/zbewalgo/zbewalgo.c:97:36: sparse: symbol 'zbewalgo_main_data_ptr' was not declared. Should it be static?
->> lib/zbewalgo/zbewalgo.c:103:9: sparse: symbol 'zbewalgo_base_algorithms' was not declared. Should it be static?
->> lib/zbewalgo/zbewalgo.c:104:4: sparse: symbol 'zbewalgo_base_algorithms_count' was not declared. Should it be static?
---
->> lib/zbewalgo/JBE2.c:46:44: sparse: constant 0xF0F0F0F00F0F0F0F is so big it is unsigned long
->> lib/zbewalgo/JBE2.c:47:42: sparse: constant 0x0F0F0F0F00000000 is so big it is long
-   lib/zbewalgo/JBE2.c:127:40: sparse: constant 0xF0F0F0F00F0F0F0F is so big it is unsigned long
-   lib/zbewalgo/JBE2.c:128:40: sparse: constant 0x0F0F0F0F00000000 is so big it is long
-   lib/zbewalgo/JBE2.c:184:40: sparse: constant 0xF0F0F0F00F0F0F0F is so big it is unsigned long
-   lib/zbewalgo/JBE2.c:185:40: sparse: constant 0x0F0F0F0F00000000 is so big it is long
-
-Please review and possibly fold the followup patch.
-
+Signed-off-by: Benjamin Warnke <4bwarnke@informatik.uni-hamburg.de>
 ---
-0-DAY kernel test infrastructure                Open Source Technology Center
-https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
+ crypto/zbewalgo.c      | 2 +-
+ include/linux/crypto.h | 6 ++++++
+ 2 files changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/crypto/zbewalgo.c b/crypto/zbewalgo.c
+index 9db0d43be..e57b5ced5 100644
+--- a/crypto/zbewalgo.c
++++ b/crypto/zbewalgo.c
+@@ -134,7 +134,7 @@ static int zbewalgo_decompress_crypto_unsafe(struct crypto_tfm *tfm,
+ 
+ static struct crypto_alg crypto_alg_zbewalgo = {
+ 	.cra_name = "zbewalgo",
+-	.cra_flags = CRYPTO_ALG_TYPE_COMPRESS,
++	.cra_flags = CRYPTO_ALG_TYPE_COMPRESS | CRYPTO_ALG_UNSTABLE_ENCODING,
+ 	.cra_ctxsize = sizeof(struct zbewalgo_ctx),
+ 	.cra_module = THIS_MODULE,
+ 	.cra_init = zbewalgo_init,
+diff --git a/include/linux/crypto.h b/include/linux/crypto.h
+index 63420dac0..372893569 100644
+--- a/include/linux/crypto.h
++++ b/include/linux/crypto.h
+@@ -112,6 +112,12 @@
+  */
+ #define CRYPTO_ALG_OPTIONAL_KEY		0x00004000
+ 
++/*
++ * Set if the algorithm is new and it is likely that the encoding may
++ * change in near future
++ */
++#define CRYPTO_ALG_UNSTABLE_ENCODING	0x00008000
++
+ /*
+  * Transform masks and values (for crt_flags).
+  */
+-- 
+2.14.1
