@@ -1,7 +1,7 @@
 From: kbuild test robot <lkp@intel.com>
-Subject: [RFC PATCH] crypto: zbewalgo_stat_combination[] can be static
-Date: Fri, 23 Mar 2018 17:36:39 +0800
-Message-ID: <20180323093639.GA54803@lkp-wsx02>
+Subject: Re: [PATCH 2/5 v4] crypto: add zBeWalgo to crypto-api
+Date: Fri, 23 Mar 2018 17:36:38 +0800
+Message-ID: <201803231728.EQZdGg40%fengguang.wu@intel.com>
 References: <1B59F77F-1AD8-484A-BA18-255502527323@informatik.uni-hamburg.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
@@ -17,60 +17,42 @@ In-Reply-To: <1B59F77F-1AD8-484A-BA18-255502527323@informatik.uni-hamburg.de>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
+Hi Benjamin,
 
-Fixes: 7ba8785b6091 ("crypto: add zBeWalgo to crypto-api")
-Signed-off-by: Fengguang Wu <fengguang.wu@intel.com>
+Thank you for the patch! Perhaps something to improve:
+
+[auto build test WARNING on linus/master]
+[also build test WARNING on v4.16-rc6]
+[cannot apply to next-20180322]
+[if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
+
+url:    https://github.com/0day-ci/linux/commits/Benjamin-Warnke/add-compression-algorithm-zBeWalgo/20180323-155925
+reproduce:
+        # apt-get install sparse
+        make ARCH=x86_64 allmodconfig
+        make C=1 CF=-D__CHECK_ENDIAN__
+
+
+sparse warnings: (new ones prefixed by >>)
+
+>> lib/zbewalgo/zbewalgo.c:70:12: sparse: symbol 'zbewalgo_stat_combination' was not declared. Should it be static?
+>> lib/zbewalgo/zbewalgo.c:71:12: sparse: symbol 'zbewalgo_stat_count' was not declared. Should it be static?
+>> lib/zbewalgo/zbewalgo.c:79:9: sparse: symbol 'zbewalgo_combinations' was not declared. Should it be static?
+>> lib/zbewalgo/zbewalgo.c:80:4: sparse: symbol 'zbewalgo_combinations_count' was not declared. Should it be static?
+>> lib/zbewalgo/zbewalgo.c:92:5: sparse: symbol 'zbewalgo_early_abort_size' was not declared. Should it be static?
+>> lib/zbewalgo/zbewalgo.c:97:36: sparse: symbol 'zbewalgo_main_data_ptr' was not declared. Should it be static?
+>> lib/zbewalgo/zbewalgo.c:103:9: sparse: symbol 'zbewalgo_base_algorithms' was not declared. Should it be static?
+>> lib/zbewalgo/zbewalgo.c:104:4: sparse: symbol 'zbewalgo_base_algorithms_count' was not declared. Should it be static?
+--
+>> lib/zbewalgo/JBE2.c:46:44: sparse: constant 0xF0F0F0F00F0F0F0F is so big it is unsigned long
+>> lib/zbewalgo/JBE2.c:47:42: sparse: constant 0x0F0F0F0F00000000 is so big it is long
+   lib/zbewalgo/JBE2.c:127:40: sparse: constant 0xF0F0F0F00F0F0F0F is so big it is unsigned long
+   lib/zbewalgo/JBE2.c:128:40: sparse: constant 0x0F0F0F0F00000000 is so big it is long
+   lib/zbewalgo/JBE2.c:184:40: sparse: constant 0xF0F0F0F00F0F0F0F is so big it is unsigned long
+   lib/zbewalgo/JBE2.c:185:40: sparse: constant 0x0F0F0F0F00000000 is so big it is long
+
+Please review and possibly fold the followup patch.
+
 ---
- zbewalgo.c |   16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
-
-diff --git a/lib/zbewalgo/zbewalgo.c b/lib/zbewalgo/zbewalgo.c
-index ef922bc2..323dce4 100644
---- a/lib/zbewalgo/zbewalgo.c
-+++ b/lib/zbewalgo/zbewalgo.c
-@@ -67,8 +67,8 @@
- #include "bitshuffle.h"
- #include "huffman.h"
- 
--atomic64_t zbewalgo_stat_combination[256];
--atomic64_t zbewalgo_stat_count[256];
-+static atomic64_t zbewalgo_stat_combination[256];
-+static atomic64_t zbewalgo_stat_count[256];
- 
- unsigned long zbewalgo_max_output_size;
- 
-@@ -76,8 +76,8 @@ unsigned long zbewalgo_max_output_size;
-  * all currently available combination sequences of algorithms
-  */
- struct zbewalgo_combination
--	zbewalgo_combinations[ZBEWALGO_COMBINATION_MAX_ACTIVE];
--u8 zbewalgo_combinations_count;
-+static 	zbewalgo_combinations[ZBEWALGO_COMBINATION_MAX_ACTIVE];
-+static u8 zbewalgo_combinations_count;
- 
- /*
-  * maximum required wrkmem for compression and decompression for each instance
-@@ -89,19 +89,19 @@ static u32 zbewalgo_wrkmem_size;
-  * compression can be aborted if the data is smaller than this threshold to
-  * speed up the algorithm.
-  */
--u16 zbewalgo_early_abort_size;
-+static u16 zbewalgo_early_abort_size;
- 
- /*
-  * each cpu has its own independent compression history to avoid locks
-  */
--struct zbewalgo_main_data __percpu *zbewalgo_main_data_ptr;
-+static struct zbewalgo_main_data __percpu *zbewalgo_main_data_ptr;
- 
- /*
-  * all available algorithms
-  */
- struct zbewalgo_alg
--	zbewalgo_base_algorithms[ZBEWALGO_MAX_BASE_ALGORITHMS];
--u8 zbewalgo_base_algorithms_count;
-+static 	zbewalgo_base_algorithms[ZBEWALGO_MAX_BASE_ALGORITHMS];
-+static u8 zbewalgo_base_algorithms_count;
- 
- /*
-  * returns the required size of wrkmem for compression and decompression
+0-DAY kernel test infrastructure                Open Source Technology Center
+https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
