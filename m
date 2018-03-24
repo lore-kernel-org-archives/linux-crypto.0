@@ -1,48 +1,62 @@
-From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-Subject: [RESEND] SHASH_DESC_ON_STACK macro
-Date: Fri, 23 Mar 2018 14:09:46 -0500
-Message-ID: <bda66faa-f52d-215d-f21b-763593b30f91@embeddedor.com>
-References: <f662fa16-2cbb-a484-4efb-68bb3b39a792@embeddedor.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: "David S. Miller" <davem@davemloft.net>,
+From: Stefan Agner <stefan@agner.ch>
+Subject: [RFC PATCH] crypto: brcm - explicitly cast cipher to hash type
+Date: Sat, 24 Mar 2018 12:02:42 +0100
+Message-ID: <20180324110242.9474-1-stefan@agner.ch>
+Cc: scott.branden@broadcom.com, steven.lin1@broadcom.com,
+        garsilva@embeddedor.com, pravin.shedge4linux@gmail.com,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+        Stefan Agner <stefan@agner.ch>
+To: herbert@gondor.apana.org.au, davem@davemloft.net,
+        raveendra.padasalagi@broadcom.com, clabbe.montjoie@gmail.com
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <f662fa16-2cbb-a484-4efb-68bb3b39a792@embeddedor.com>
-Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
+In the AES cases enum spu_cipher_type and enum hash_type have
+the same values, so the assignment is fine. Explicitly cast
+the enum type conversion.
 
-Hi Herbert,
+This fixes two warnings when building with clang:
+  drivers/crypto/bcm/cipher.c:821:34: warning: implicit conversion from
+      enumeration type 'enum spu_cipher_type' to different enumeration
+      type 'enum hash_type' [-Wenum-conversion]
+                hash_parms.type = cipher_parms.type;
+                                ~ ~~~~~~~~~~~~~^~~~
+  drivers/crypto/bcm/cipher.c:1412:26: warning: implicit conversion from
+      enumeration type 'enum spu_cipher_type' to different enumeration
+      type 'enum hash_type' [-Wenum-conversion]
+                hash_parms.type = ctx->cipher_type;
+                                ~ ~~~~~^~~~~~~~~~~
 
-There is an ongoing effort to remove all VLAs from the code base [1] and 
-while working on that I came across the following macro at 
-include/crypto/hash.h:154:
+Signed-off-by: Stefan Agner <stefan@agner.ch>
+---
+I am not familar with the IP... I would be glad if somebody with
+better insight could have a look whether that patch makes sense.
 
-#define SHASH_DESC_ON_STACK(shash, ctx)                           \
-         char __##shash##_desc[sizeof(struct shash_desc) +         \
-                 crypto_shash_descsize(ctx)] CRYPTO_MINALIGN_ATTR; \
-         struct shash_desc *shash = (struct shash_desc *)__##shash##_desc
+ drivers/crypto/bcm/cipher.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-
-Currently, this macro is being used in 46 different places.
-
-I wonder how big can tfm->descsize can get?
-
-Do you think it is feasible to replace the call to crypto_shash_descsize 
-with a constant value and get rid of 46 VLA warnings?
-
-I have sent some patches to replace the use of this macro with dynamic 
-memory allocation instead, but it seems that this is not a suitable 
-solution for all cases due to performance issues.
-
-[1] https://lkml.org/lkml/2018/3/7/621
-
-I'd really appreciate any feedback.
-Thanks
---
-Gustavo
+diff --git a/drivers/crypto/bcm/cipher.c b/drivers/crypto/bcm/cipher.c
+index 2b75f95bbe1b..309c67c7012f 100644
+--- a/drivers/crypto/bcm/cipher.c
++++ b/drivers/crypto/bcm/cipher.c
+@@ -818,7 +818,7 @@ static int handle_ahash_req(struct iproc_reqctx_s *rctx)
+ 
+ 	/* AES hashing keeps key size in type field, so need to copy it here */
+ 	if (hash_parms.alg == HASH_ALG_AES)
+-		hash_parms.type = cipher_parms.type;
++		hash_parms.type = (enum hash_type)cipher_parms.type;
+ 	else
+ 		hash_parms.type = spu->spu_hash_type(rctx->total_sent);
+ 
+@@ -1409,7 +1409,7 @@ static int handle_aead_req(struct iproc_reqctx_s *rctx)
+ 						rctx->iv_ctr_len);
+ 
+ 	if (ctx->auth.alg == HASH_ALG_AES)
+-		hash_parms.type = ctx->cipher_type;
++		hash_parms.type = (enum hash_type)ctx->cipher_type;
+ 
+ 	/* General case AAD padding (CCM and RFC4543 special cases below) */
+ 	aead_parms.aad_pad_len = spu->spu_gcm_ccm_pad_len(ctx->cipher.mode,
+-- 
+2.16.2
