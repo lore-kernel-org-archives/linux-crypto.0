@@ -1,62 +1,41 @@
-From: Stefan Agner <stefan@agner.ch>
-Subject: [RFC PATCH] crypto: brcm - explicitly cast cipher to hash type
-Date: Sat, 24 Mar 2018 12:02:42 +0100
-Message-ID: <20180324110242.9474-1-stefan@agner.ch>
-Cc: scott.branden@broadcom.com, steven.lin1@broadcom.com,
-        garsilva@embeddedor.com, pravin.shedge4linux@gmail.com,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Stefan Agner <stefan@agner.ch>
-To: herbert@gondor.apana.org.au, davem@davemloft.net,
-        raveendra.padasalagi@broadcom.com, clabbe.montjoie@gmail.com
+From: Salvatore Mesoraca <s.mesoraca16@gmail.com>
+Subject: Re: [PATCH v2] crypto: ctr - avoid VLA use
+Date: Sat, 24 Mar 2018 14:21:53 +0100
+Message-ID: <CAJHCu1K-gFnt2mR6LkP=BH-eB-cHUoPyWWGCgPNe7B1B4no8Sg@mail.gmail.com>
+References: <1521112738-13250-1-git-send-email-s.mesoraca16@gmail.com> <20180323153652.GA1760@gondor.apana.org.au>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Cc: linux-kernel@vger.kernel.org,
+        Kernel Hardening <kernel-hardening@lists.openwall.com>,
+        linux-crypto@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Kees Cook <keescook@chromium.org>,
+        Eric Biggers <ebiggers3@gmail.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20180323153652.GA1760@gondor.apana.org.au>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-In the AES cases enum spu_cipher_type and enum hash_type have
-the same values, so the assignment is fine. Explicitly cast
-the enum type conversion.
+2018-03-23 16:36 GMT+01:00 Herbert Xu <herbert@gondor.apana.org.au>:
+> On Thu, Mar 15, 2018 at 12:18:58PM +0100, Salvatore Mesoraca wrote:
+>>
+>> +#define MAX_BLOCKSIZE 16
+>> +
+>> +#ifdef CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS
+>> +#define MAX_ALIGNMASK 15
+>> +#else
+>> +#define MAX_ALIGNMASK 0
+>> +#endif
+>> +
+>
+> Hmm, this won't work.  Just because you have efficient unaligned
+> access in general doesn't mean that every implementation can live
+> with unaligned access.  In particular, on x86 there are quite a
+> few implementations that require alignment or they will fault.
+>
+> So please just make it 15 unconditionally.
 
-This fixes two warnings when building with clang:
-  drivers/crypto/bcm/cipher.c:821:34: warning: implicit conversion from
-      enumeration type 'enum spu_cipher_type' to different enumeration
-      type 'enum hash_type' [-Wenum-conversion]
-                hash_parms.type = cipher_parms.type;
-                                ~ ~~~~~~~~~~~~~^~~~
-  drivers/crypto/bcm/cipher.c:1412:26: warning: implicit conversion from
-      enumeration type 'enum spu_cipher_type' to different enumeration
-      type 'enum hash_type' [-Wenum-conversion]
-                hash_parms.type = ctx->cipher_type;
-                                ~ ~~~~~^~~~~~~~~~~
+Oh, thank you for pointing it out. I'll fix this in v3.
 
-Signed-off-by: Stefan Agner <stefan@agner.ch>
----
-I am not familar with the IP... I would be glad if somebody with
-better insight could have a look whether that patch makes sense.
-
- drivers/crypto/bcm/cipher.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/crypto/bcm/cipher.c b/drivers/crypto/bcm/cipher.c
-index 2b75f95bbe1b..309c67c7012f 100644
---- a/drivers/crypto/bcm/cipher.c
-+++ b/drivers/crypto/bcm/cipher.c
-@@ -818,7 +818,7 @@ static int handle_ahash_req(struct iproc_reqctx_s *rctx)
- 
- 	/* AES hashing keeps key size in type field, so need to copy it here */
- 	if (hash_parms.alg == HASH_ALG_AES)
--		hash_parms.type = cipher_parms.type;
-+		hash_parms.type = (enum hash_type)cipher_parms.type;
- 	else
- 		hash_parms.type = spu->spu_hash_type(rctx->total_sent);
- 
-@@ -1409,7 +1409,7 @@ static int handle_aead_req(struct iproc_reqctx_s *rctx)
- 						rctx->iv_ctr_len);
- 
- 	if (ctx->auth.alg == HASH_ALG_AES)
--		hash_parms.type = ctx->cipher_type;
-+		hash_parms.type = (enum hash_type)ctx->cipher_type;
- 
- 	/* General case AAD padding (CCM and RFC4543 special cases below) */
- 	aead_parms.aad_pad_len = spu->spu_gcm_ccm_pad_len(ctx->cipher.mode,
--- 
-2.16.2
+Salvatore
