@@ -1,47 +1,43 @@
-From: Logan Gunthorpe <logang@deltatee.com>
-Subject: Re: [PATCH v13 01/10] iomap: Use correct endian conversion function
- in mmio_writeXXbe
-Date: Mon, 26 Mar 2018 14:33:13 -0600
-Message-ID: <6a063b65-668a-ef9c-696e-8c378e6b2640@deltatee.com>
-References: <20180321163745.12286-1-logang@deltatee.com>
- <20180321163745.12286-2-logang@deltatee.com>
- <CAK8P3a25zQDxyaY3iVv+JmSSzs7F6ssGc+HdBkGs54ZfViX+Fg@mail.gmail.com>
- <726eb143-2cca-b221-b569-e193a962e357@deltatee.com>
- <CAK8P3a2HGW=PWBtFL_96rztqa7KUAhuYBHTL3cGKY2VE=Ag1rA@mail.gmail.com>
+From: Kees Cook <keescook@chromium.org>
+Subject: Re: [PATCH v2] crypto/ecc: Remove stack VLA usage
+Date: Mon, 26 Mar 2018 15:38:59 -0700
+Message-ID: <CAGXu5jKJ-05xb8x7A4dZmFQm10z5g9x1LhFbC1nzLT7kdVVbGg@mail.gmail.com>
+References: <20180308215702.GA9902@beast> <20180316155632.GI7095@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-arch <linux-arch@vger.kernel.org>,
-        linux-ntb@googlegroups.com,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Andy Shevchenko <andy.shevchenko@gmail.com>,
-        =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@nxp.com>,
-        Philippe Ombredanne <pombredanne@nexb.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Kate Stewart <kstewart@linuxfoundation.org>,
-        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
-To: Arnd Bergmann <arnd@arndb.de>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAK8P3a2HGW=PWBtFL_96rztqa7KUAhuYBHTL3cGKY2VE=Ag1rA@mail.gmail.com>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Cc: Tudor Ambarus <tudor.ambarus@microchip.com>, "David S. Miller" <davem@davemloft.net>,
+	linux-crypto <linux-crypto@vger.kernel.org>,
+	Kernel Hardening <kernel-hardening@lists.openwall.com>, LKML <linux-kernel@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <kernel-hardening-return-12741-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
+List-Post: <mailto:kernel-hardening@lists.openwall.com>
+List-Help: <mailto:kernel-hardening-help@lists.openwall.com>
+List-Unsubscribe: <mailto:kernel-hardening-unsubscribe@lists.openwall.com>
+List-Subscribe: <mailto:kernel-hardening-subscribe@lists.openwall.com>
+Sender: keescook@google.com
+In-Reply-To: <20180316155632.GI7095@gondor.apana.org.au>
 List-Id: linux-crypto.vger.kernel.org
 
+On Fri, Mar 16, 2018 at 8:56 AM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> On Thu, Mar 08, 2018 at 01:57:02PM -0800, Kees Cook wrote:
+>> On the quest to remove all VLAs from the kernel[1], this switches to
+>> a pair of kmalloc regions instead of using the stack. This also moves
+>> the get_random_bytes() after all allocations (and drops the needless
+>> "nbytes" variable).
+>>
+>> [1] https://lkml.org/lkml/2018/3/7/621
+>>
+>> Signed-off-by: Kees Cook <keescook@chromium.org>
+>
+> Patch applied.  Thanks.
 
+Hi, sorry for the noise on this one: I messed up looking at the ecc
+code (I confused myself into thinking there was only a single instance
+of the problem). The applied patch is both incomplete and inefficient.
+I have a much simpler solution, and I'll send that with a revert...
 
-On 26/03/18 01:50 PM, Arnd Bergmann wrote:
-> I wouldn't expect it to matter: the byte swap is almost always much
-> cheaper compared to the actual bus access for the MMIO, and I
-> would also guess that modern compilers can eliminate the double
-> byte swap on architectures where writel() is an inline function. Most of
-> the important architectures use ARCH_USE_BUILTIN_BSWAP, which
-> guarantees that.
+-Kees
 
-Fair enough. Sometime this week I'll update my patch set to change that.
-
-Thanks,
-
-Logan
+-- 
+Kees Cook
+Pixel Security
