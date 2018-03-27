@@ -1,7 +1,7 @@
 From: Atul Gupta <atul.gupta@chelsio.com>
-Subject: [PATCH v13 net-next 06/12] crypto: chtls - structure and macro for Inline TLS
-Date: Tue, 27 Mar 2018 23:06:35 +0530
-Message-ID: <1522172201-7629-7-git-send-email-atul.gupta@chelsio.com>
+Subject: [PATCH v13 net-next 07/12] crypto: chtls - Program the TLS session Key
+Date: Tue, 27 Mar 2018 23:06:36 +0530
+Message-ID: <1522172201-7629-8-git-send-email-atul.gupta@chelsio.com>
 References: <1522172201-7629-1-git-send-email-atul.gupta@chelsio.com>
 Cc: davejwatson@fb.com, sd@queasysnail.net, sbrivio@redhat.com,
         linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
@@ -14,716 +14,420 @@ In-Reply-To: <1522172201-7629-1-git-send-email-atul.gupta@chelsio.com>
 Sender: netdev-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Define Inline TLS state, connection management info.
-Supporting macros definition.
+Initialize the space reserved for storing the TLS keys,
+get and free the location where key is stored for the TLS
+connection.
+Program the Tx and Rx key as received from user in
+struct tls12_crypto_info_aes_gcm_128 and understood by hardware.
+added socket option TLS_RX
 
 Signed-off-by: Atul Gupta <atul.gupta@chelsio.com>
 Reviewed-by: Sabrina Dubroca <sdubroca@redhat.com>
-Reviewed-by: Michael Werner <werner@chelsio.com>
+Reviewed-by: Stefano Brivio <sbrivio@redhat.com>
 ---
- drivers/crypto/chelsio/chtls/chtls.h    | 483 ++++++++++++++++++++++++++++++++
- drivers/crypto/chelsio/chtls/chtls_cm.h | 203 ++++++++++++++
- 2 files changed, 686 insertions(+)
- create mode 100644 drivers/crypto/chelsio/chtls/chtls.h
- create mode 100644 drivers/crypto/chelsio/chtls/chtls_cm.h
+ drivers/crypto/chelsio/chtls/chtls_hw.c | 394 ++++++++++++++++++++++++++++++++
+ 1 file changed, 394 insertions(+)
+ create mode 100644 drivers/crypto/chelsio/chtls/chtls_hw.c
 
-diff --git a/drivers/crypto/chelsio/chtls/chtls.h b/drivers/crypto/chelsio/chtls/chtls.h
+diff --git a/drivers/crypto/chelsio/chtls/chtls_hw.c b/drivers/crypto/chelsio/chtls/chtls_hw.c
 new file mode 100644
-index 0000000..50576f1
+index 0000000..cad7360
 --- /dev/null
-+++ b/drivers/crypto/chelsio/chtls/chtls.h
-@@ -0,0 +1,483 @@
++++ b/drivers/crypto/chelsio/chtls/chtls_hw.c
+@@ -0,0 +1,394 @@
 +/*
 + * Copyright (c) 2018 Chelsio Communications, Inc.
 + *
 + * This program is free software; you can redistribute it and/or modify
 + * it under the terms of the GNU General Public License version 2 as
 + * published by the Free Software Foundation.
++ *
++ * Written by: Atul Gupta (atul.gupta@chelsio.com)
 + */
 +
-+#ifndef __CHTLS_H__
-+#define __CHTLS_H__
-+
-+#include <crypto/aes.h>
-+#include <crypto/algapi.h>
-+#include <crypto/hash.h>
-+#include <crypto/sha.h>
-+#include <crypto/authenc.h>
-+#include <crypto/ctr.h>
-+#include <crypto/gf128mul.h>
-+#include <crypto/internal/aead.h>
-+#include <crypto/null.h>
-+#include <crypto/internal/skcipher.h>
-+#include <crypto/aead.h>
-+#include <crypto/scatterwalk.h>
-+#include <crypto/internal/hash.h>
++#include <linux/module.h>
++#include <linux/list.h>
++#include <linux/workqueue.h>
++#include <linux/skbuff.h>
++#include <linux/timer.h>
++#include <linux/notifier.h>
++#include <linux/inetdevice.h>
++#include <linux/ip.h>
++#include <linux/tcp.h>
 +#include <linux/tls.h>
 +#include <net/tls.h>
 +
-+#include "t4fw_api.h"
-+#include "t4_msg.h"
-+#include "cxgb4.h"
-+#include "cxgb4_uld.h"
-+#include "l2t.h"
-+#include "chcr_algo.h"
-+#include "chcr_core.h"
-+#include "chcr_crypto.h"
++#include "chtls.h"
++#include "chtls_cm.h"
 +
-+#define MAX_IVS_PAGE			256
-+#define TLS_KEY_CONTEXT_SZ		64
-+#define CIPHER_BLOCK_SIZE		16
-+#define GCM_TAG_SIZE			16
-+#define KEY_ON_MEM_SZ			16
-+#define AEAD_EXPLICIT_DATA_SIZE		8
-+#define TLS_HEADER_LENGTH		5
-+#define SCMD_CIPH_MODE_AES_GCM		2
-+/* Any MFS size should work and come from openssl */
-+#define TLS_MFS				16384
-+
-+#define RSS_HDR sizeof(struct rss_header)
-+#define TLS_WR_CPL_LEN \
-+	(sizeof(struct fw_tlstx_data_wr) + sizeof(struct cpl_tx_tls_sfo))
-+
-+enum {
-+	CHTLS_KEY_CONTEXT_DSGL,
-+	CHTLS_KEY_CONTEXT_IMM,
-+	CHTLS_KEY_CONTEXT_DDR,
-+};
-+
-+enum {
-+	CHTLS_LISTEN_START,
-+	CHTLS_LISTEN_STOP,
-+};
-+
-+/* Flags for return value of CPL message handlers */
-+enum {
-+	CPL_RET_BUF_DONE =    1,   /* buffer processing done */
-+	CPL_RET_BAD_MSG =     2,   /* bad CPL message */
-+	CPL_RET_UNKNOWN_TID = 4    /* unexpected unknown TID */
-+};
-+
-+#define TLS_RCV_ST_READ_HEADER		0xF0
-+#define TLS_RCV_ST_READ_BODY		0xF1
-+#define TLS_RCV_ST_READ_DONE		0xF2
-+#define TLS_RCV_ST_READ_NB		0xF3
-+
-+#define LISTEN_INFO_HASH_SIZE 32
-+#define RSPQ_HASH_BITS 5
-+struct listen_info {
-+	struct listen_info *next;  /* Link to next entry */
-+	struct sock *sk;           /* The listening socket */
-+	unsigned int stid;         /* The server TID */
-+};
-+
-+enum {
-+	T4_LISTEN_START_PENDING,
-+	T4_LISTEN_STARTED
-+};
-+
-+enum csk_flags {
-+	CSK_CALLBACKS_CHKD,	/* socket callbacks have been sanitized */
-+	CSK_ABORT_REQ_RCVD,	/* received one ABORT_REQ_RSS message */
-+	CSK_TX_MORE_DATA,	/* sending ULP data; don't set SHOVE bit */
-+	CSK_TX_WAIT_IDLE,	/* suspend Tx until in-flight data is ACKed */
-+	CSK_ABORT_SHUTDOWN,	/* shouldn't send more abort requests */
-+	CSK_ABORT_RPL_PENDING,	/* expecting an abort reply */
-+	CSK_CLOSE_CON_REQUESTED,/* we've sent a close_conn_req */
-+	CSK_TX_DATA_SENT,	/* sent a TX_DATA WR on this connection */
-+	CSK_TX_FAILOVER,	/* Tx traffic failing over */
-+	CSK_UPDATE_RCV_WND,	/* Need to update rcv window */
-+	CSK_RST_ABORTED,	/* outgoing RST was aborted */
-+	CSK_TLS_HANDSHK,	/* TLS Handshake */
-+	CSK_CONN_INLINE,	/* Connection on HW */
-+};
-+
-+struct listen_ctx {
-+	struct sock *lsk;
-+	struct chtls_dev *cdev;
-+	struct sk_buff_head synq;
-+	u32 state;
-+};
-+
-+struct key_map {
-+	unsigned long *addr;
-+	unsigned int start;
-+	unsigned int available;
-+	unsigned int size;
-+	spinlock_t lock; /* lock for key id request from map */
-+} __packed;
-+
-+struct tls_scmd {
-+	u32 seqno_numivs;
-+	u32 ivgen_hdrlen;
-+};
-+
-+struct chtls_dev {
-+	struct tls_device tlsdev;
-+	struct list_head list;
-+	struct cxgb4_lld_info *lldi;
-+	struct pci_dev *pdev;
-+	struct listen_info *listen_hash_tab[LISTEN_INFO_HASH_SIZE];
-+	spinlock_t listen_lock; /* lock for listen list */
-+	struct net_device **ports;
-+	struct tid_info *tids;
-+	unsigned int pfvf;
-+	const unsigned short *mtus;
-+
-+	struct idr hwtid_idr;
-+	struct idr stid_idr;
-+
-+	spinlock_t idr_lock ____cacheline_aligned_in_smp;
-+
-+	struct net_device *egr_dev[NCHAN * 2];
-+	struct sk_buff *rspq_skb_cache[1 << RSPQ_HASH_BITS];
-+	struct sk_buff *askb;
-+
-+	struct sk_buff_head deferq;
-+	struct work_struct deferq_task;
-+
-+	struct list_head list_node;
-+	struct list_head rcu_node;
-+	struct list_head na_node;
-+	unsigned int send_page_order;
-+	struct key_map kmap;
-+};
-+
-+struct chtls_hws {
-+	struct sk_buff_head sk_recv_queue;
-+	u8 txqid;
-+	u8 ofld;
-+	u16 type;
-+	u16 rstate;
-+	u16 keyrpl;
-+	u16 pldlen;
-+	u16 rcvpld;
-+	u16 compute;
-+	u16 expansion;
-+	u16 keylen;
-+	u16 pdus;
-+	u16 adjustlen;
-+	u16 ivsize;
-+	u16 txleft;
-+	u32 mfs;
-+	s32 txkey;
-+	s32 rxkey;
-+	u32 fcplenmax;
-+	u32 copied_seq;
-+	u64 tx_seq_no;
-+	struct tls_scmd scmd;
-+	struct tls12_crypto_info_aes_gcm_128 crypto_info;
-+};
-+
-+struct chtls_sock {
-+	struct sock *sk;
-+	struct chtls_dev *cdev;
-+	struct l2t_entry *l2t_entry;    /* pointer to the L2T entry */
-+	struct net_device *egress_dev;  /* TX_CHAN for act open retry */
-+
-+	struct sk_buff_head txq;
-+	struct sk_buff *wr_skb_head;
-+	struct sk_buff *wr_skb_tail;
-+	struct sk_buff *ctrl_skb_cache;
-+	struct sk_buff *txdata_skb_cache; /* abort path messages */
-+	struct kref kref;
-+	unsigned long flags;
-+	u32 opt2;
-+	u32 wr_credits;
-+	u32 wr_unacked;
-+	u32 wr_max_credits;
-+	u32 wr_nondata;
-+	u32 hwtid;               /* TCP Control Block ID */
-+	u32 txq_idx;
-+	u32 rss_qid;
-+	u32 tid;
-+	u32 idr;
-+	u32 mss;
-+	u32 ulp_mode;
-+	u32 tx_chan;
-+	u32 rx_chan;
-+	u32 sndbuf;
-+	u32 txplen_max;
-+	u32 mtu_idx;           /* MTU table index */
-+	u32 smac_idx;
-+	u8 port_id;
-+	u8 tos;
-+	u16 resv2;
-+	u32 delack_mode;
-+	u32 delack_seq;
-+
-+	void *passive_reap_next;        /* placeholder for passive */
-+	struct chtls_hws tlshws;
-+	struct synq {
-+		struct sk_buff *next;
-+		struct sk_buff *prev;
-+	} synq;
-+	struct listen_ctx *listen_ctx;
-+};
-+
-+struct tls_hdr {
-+	u8  type;
-+	u16 version;
-+	u16 length;
-+} __packed;
-+
-+struct tlsrx_cmp_hdr {
-+	u8  type;
-+	u16 version;
-+	u16 length;
-+
-+	u64 tls_seq;
-+	u16 reserved1;
-+	u8  res_to_mac_error;
-+} __packed;
-+
-+/* res_to_mac_error fields */
-+#define TLSRX_HDR_PKT_INT_ERROR_S   4
-+#define TLSRX_HDR_PKT_INT_ERROR_M   0x1
-+#define TLSRX_HDR_PKT_INT_ERROR_V(x) \
-+	((x) << TLSRX_HDR_PKT_INT_ERROR_S)
-+#define TLSRX_HDR_PKT_INT_ERROR_G(x) \
-+	(((x) >> TLSRX_HDR_PKT_INT_ERROR_S) & TLSRX_HDR_PKT_INT_ERROR_M)
-+#define TLSRX_HDR_PKT_INT_ERROR_F   TLSRX_HDR_PKT_INT_ERROR_V(1U)
-+
-+#define TLSRX_HDR_PKT_SPP_ERROR_S        3
-+#define TLSRX_HDR_PKT_SPP_ERROR_M        0x1
-+#define TLSRX_HDR_PKT_SPP_ERROR_V(x)     ((x) << TLSRX_HDR_PKT_SPP_ERROR)
-+#define TLSRX_HDR_PKT_SPP_ERROR_G(x)     \
-+	(((x) >> TLSRX_HDR_PKT_SPP_ERROR_S) & TLSRX_HDR_PKT_SPP_ERROR_M)
-+#define TLSRX_HDR_PKT_SPP_ERROR_F        TLSRX_HDR_PKT_SPP_ERROR_V(1U)
-+
-+#define TLSRX_HDR_PKT_CCDX_ERROR_S       2
-+#define TLSRX_HDR_PKT_CCDX_ERROR_M       0x1
-+#define TLSRX_HDR_PKT_CCDX_ERROR_V(x)    ((x) << TLSRX_HDR_PKT_CCDX_ERROR_S)
-+#define TLSRX_HDR_PKT_CCDX_ERROR_G(x)    \
-+	(((x) >> TLSRX_HDR_PKT_CCDX_ERROR_S) & TLSRX_HDR_PKT_CCDX_ERROR_M)
-+#define TLSRX_HDR_PKT_CCDX_ERROR_F       TLSRX_HDR_PKT_CCDX_ERROR_V(1U)
-+
-+#define TLSRX_HDR_PKT_PAD_ERROR_S        1
-+#define TLSRX_HDR_PKT_PAD_ERROR_M        0x1
-+#define TLSRX_HDR_PKT_PAD_ERROR_V(x)     ((x) << TLSRX_HDR_PKT_PAD_ERROR_S)
-+#define TLSRX_HDR_PKT_PAD_ERROR_G(x)     \
-+	(((x) >> TLSRX_HDR_PKT_PAD_ERROR_S) & TLSRX_HDR_PKT_PAD_ERROR_M)
-+#define TLSRX_HDR_PKT_PAD_ERROR_F        TLSRX_HDR_PKT_PAD_ERROR_V(1U)
-+
-+#define TLSRX_HDR_PKT_MAC_ERROR_S        0
-+#define TLSRX_HDR_PKT_MAC_ERROR_M        0x1
-+#define TLSRX_HDR_PKT_MAC_ERROR_V(x)     ((x) << TLSRX_HDR_PKT_MAC_ERROR)
-+#define TLSRX_HDR_PKT_MAC_ERROR_G(x)     \
-+	(((x) >> S_TLSRX_HDR_PKT_MAC_ERROR_S) & TLSRX_HDR_PKT_MAC_ERROR_M)
-+#define TLSRX_HDR_PKT_MAC_ERROR_F        TLSRX_HDR_PKT_MAC_ERROR_V(1U)
-+
-+#define TLSRX_HDR_PKT_ERROR_M           0x1F
-+
-+struct ulp_mem_rw {
-+	__be32 cmd;
-+	__be32 len16;             /* command length */
-+	__be32 dlen;              /* data length in 32-byte units */
-+	__be32 lock_addr;
-+};
-+
-+struct tls_key_wr {
-+	__be32 op_to_compl;
-+	__be32 flowid_len16;
-+	__be32 ftid;
-+	u8   reneg_to_write_rx;
-+	u8   protocol;
-+	__be16 mfs;
-+};
-+
-+struct tls_key_req {
-+	struct tls_key_wr wr;
-+	struct ulp_mem_rw req;
-+	struct ulptx_idata sc_imm;
-+};
-+
-+/*
-+ * This lives in skb->cb and is used to chain WRs in a linked list.
-+ */
-+struct wr_skb_cb {
-+	struct l2t_skb_cb l2t;          /* reserve space for l2t CB */
-+	struct sk_buff *next_wr;        /* next write request */
-+};
-+
-+/* Per-skb backlog handler.  Run when a socket's backlog is processed. */
-+struct blog_skb_cb {
-+	void (*backlog_rcv)(struct sock *sk, struct sk_buff *skb);
-+	struct chtls_dev *cdev;
-+};
-+
-+/*
-+ * Similar to tcp_skb_cb but with ULP elements added to support TLS,
-+ * etc.
-+ */
-+struct ulp_skb_cb {
-+	struct wr_skb_cb wr;		/* reserve space for write request */
-+	u16 flags;			/* TCP-like flags */
-+	u8 psh;
-+	u8 ulp_mode;			/* ULP mode/submode of sk_buff */
-+	u32 seq;			/* TCP sequence number */
-+	union { /* ULP-specific fields */
-+		struct {
-+			u8  type;
-+			u8  ofld;
-+			u8  iv;
-+		} tls;
-+	} ulp;
-+};
-+
-+#define ULP_SKB_CB(skb) ((struct ulp_skb_cb *)&((skb)->cb[0]))
-+#define BLOG_SKB_CB(skb) ((struct blog_skb_cb *)(skb)->cb)
-+
-+/*
-+ * Flags for ulp_skb_cb.flags.
-+ */
-+enum {
-+	ULPCB_FLAG_NEED_HDR  = 1 << 0,	/* packet needs a TX_DATA_WR header */
-+	ULPCB_FLAG_NO_APPEND = 1 << 1,	/* don't grow this skb */
-+	ULPCB_FLAG_BARRIER   = 1 << 2,	/* set TX_WAIT_IDLE after sending */
-+	ULPCB_FLAG_HOLD      = 1 << 3,	/* skb not ready for Tx yet */
-+	ULPCB_FLAG_COMPL     = 1 << 4,	/* request WR completion */
-+	ULPCB_FLAG_URG       = 1 << 5,	/* urgent data */
-+	ULPCB_FLAG_TLS_ND    = 1 << 6, /* payload of zero length */
-+	ULPCB_FLAG_NO_HDR    = 1 << 7, /* not a ofld wr */
-+};
-+
-+/* The ULP mode/submode of an skbuff */
-+#define skb_ulp_mode(skb)  (ULP_SKB_CB(skb)->ulp_mode)
-+#define TCP_PAGE(sk)   (sk->sk_frag.page)
-+#define TCP_OFF(sk)    (sk->sk_frag.offset)
-+
-+static inline struct chtls_dev *to_chtls_dev(struct tls_device *tlsdev)
++static void __set_tcb_field_direct(struct chtls_sock *csk,
++				   struct cpl_set_tcb_field *req, u16 word,
++				   u64 mask, u64 val, u8 cookie, int no_reply)
 +{
-+	return container_of(tlsdev, struct chtls_dev, tlsdev);
++	struct ulptx_idata *sc;
++
++	INIT_TP_WR_CPL(req, CPL_SET_TCB_FIELD, csk->tid);
++	req->wr.wr_mid |= htonl(FW_WR_FLOWID_V(csk->tid));
++	req->reply_ctrl = htons(NO_REPLY_V(no_reply) |
++				QUEUENO_V(csk->rss_qid));
++	req->word_cookie = htons(TCB_WORD_V(word) | TCB_COOKIE_V(cookie));
++	req->mask = cpu_to_be64(mask);
++	req->val = cpu_to_be64(val);
++	sc = (struct ulptx_idata *)(req + 1);
++	sc->cmd_more = htonl(ULPTX_CMD_V(ULP_TX_SC_NOOP));
++	sc->len = htonl(0);
 +}
 +
-+static inline void csk_set_flag(struct chtls_sock *csk,
-+				enum csk_flags flag)
-+{
-+	__set_bit(flag, &csk->flags);
-+}
-+
-+static inline void csk_reset_flag(struct chtls_sock *csk,
-+				  enum csk_flags flag)
-+{
-+	__clear_bit(flag, &csk->flags);
-+}
-+
-+static inline bool csk_conn_inline(const struct chtls_sock *csk)
-+{
-+	return test_bit(CSK_CONN_INLINE, &csk->flags);
-+}
-+
-+static inline int csk_flag(const struct sock *sk, enum csk_flags flag)
++static void __set_tcb_field(struct sock *sk, struct sk_buff *skb, u16 word,
++			    u64 mask, u64 val, u8 cookie, int no_reply)
 +{
 +	struct chtls_sock *csk = rcu_dereference_sk_user_data(sk);
++	struct cpl_set_tcb_field *req;
++	struct ulptx_idata *sc;
++	unsigned int wrlen = roundup(sizeof(*req) + sizeof(*sc), 16);
 +
-+	if (!csk_conn_inline(csk))
-+		return 0;
-+	return test_bit(flag, &csk->flags);
++	req = (struct cpl_set_tcb_field *)__skb_put(skb, wrlen);
++	__set_tcb_field_direct(csk, req, word, mask, val, cookie, no_reply);
++	set_wr_txq(skb, CPL_PRIORITY_CONTROL, csk->port_id);
 +}
 +
-+static inline int csk_flag_nochk(const struct chtls_sock *csk,
-+				 enum csk_flags flag)
-+{
-+	return test_bit(flag, &csk->flags);
-+}
-+
-+static inline void *cplhdr(struct sk_buff *skb)
-+{
-+	return skb->data;
-+}
-+
-+static inline int is_neg_adv(unsigned int status)
-+{
-+	return status == CPL_ERR_RTX_NEG_ADVICE ||
-+	       status == CPL_ERR_KEEPALV_NEG_ADVICE ||
-+	       status == CPL_ERR_PERSIST_NEG_ADVICE;
-+}
-+
-+static inline void process_cpl_msg(void (*fn)(struct sock *, struct sk_buff *),
-+				   struct sock *sk,
-+				   struct sk_buff *skb)
-+{
-+	skb_reset_mac_header(skb);
-+	skb_reset_network_header(skb);
-+	skb_reset_transport_header(skb);
-+
-+	bh_lock_sock(sk);
-+	if (unlikely(sock_owned_by_user(sk))) {
-+		BLOG_SKB_CB(skb)->backlog_rcv = fn;
-+		__sk_add_backlog(sk, skb);
-+	} else {
-+		fn(sk, skb);
-+	}
-+	bh_unlock_sock(sk);
-+}
-+
-+static inline void chtls_sock_free(struct kref *ref)
-+{
-+	struct chtls_sock *csk = container_of(ref, struct chtls_sock,
-+					      kref);
-+	kfree(csk);
-+}
-+
-+static inline void __chtls_sock_put(const char *fn, struct chtls_sock *csk)
-+{
-+	kref_put(&csk->kref, chtls_sock_free);
-+}
-+
-+static inline void __chtls_sock_get(const char *fn,
-+				    struct chtls_sock *csk)
-+{
-+	kref_get(&csk->kref);
-+}
-+
-+static inline void send_or_defer(struct sock *sk, struct tcp_sock *tp,
-+				 struct sk_buff *skb, int through_l2t)
++/*
++ * Send control message to HW, message go as immediate data and packet
++ * is freed immediately.
++ */
++static int chtls_set_tcb_field(struct sock *sk, u16 word, u64 mask, u64 val)
 +{
 +	struct chtls_sock *csk = rcu_dereference_sk_user_data(sk);
++	struct cpl_set_tcb_field *req;
++	struct ulptx_idata *sc;
++	struct sk_buff *skb;
++	int ret;
++	unsigned int wrlen = roundup(sizeof(*req) + sizeof(*sc), 16);
++	unsigned int credits_needed = DIV_ROUND_UP(wrlen, 16);
 +
-+	if (through_l2t) {
-+		/* send through L2T */
-+		cxgb4_l2t_send(csk->egress_dev, skb, csk->l2t_entry);
-+	} else {
-+		/* send directly */
-+		cxgb4_ofld_send(csk->egress_dev, skb);
-+	}
++	skb = alloc_skb(wrlen, GFP_ATOMIC);
++	if (!skb)
++		return -ENOMEM;
++
++	__set_tcb_field(sk, skb, word, mask, val, 0, 1);
++	skb_set_queue_mapping(skb, (csk->txq_idx << 1) | CPL_PRIORITY_DATA);
++	csk->wr_credits -= credits_needed;
++	csk->wr_unacked += credits_needed;
++	enqueue_wr(csk, skb);
++	ret = cxgb4_ofld_send(csk->egress_dev, skb);
++	if (ret < 0)
++		kfree_skb(skb);
++	return ret < 0 ? ret : 0;
 +}
 +
-+typedef int (*chtls_handler_func)(struct chtls_dev *, struct sk_buff *);
-+extern chtls_handler_func chtls_handlers[NUM_CPL_CMDS];
-+void chtls_install_cpl_ops(struct sock *sk);
-+int chtls_init_kmap(struct chtls_dev *cdev, struct cxgb4_lld_info *lldi);
-+void chtls_free_kmap(struct chtls_dev *cdev);
-+void chtls_listen_stop(struct chtls_dev *cdev, struct sock *sk);
-+int chtls_listen_start(struct chtls_dev *cdev, struct sock *sk);
-+void chtls_close(struct sock *sk, long timeout);
-+int chtls_disconnect(struct sock *sk, int flags);
-+void chtls_shutdown(struct sock *sk, int how);
-+void chtls_destroy_sock(struct sock *sk);
-+int chtls_sendmsg(struct sock *sk, struct msghdr *msg, size_t size);
-+int chtls_recvmsg(struct sock *sk, struct msghdr *msg,
-+		  size_t len, int nonblock, int flags, int *addr_len);
-+int chtls_sendpage(struct sock *sk, struct page *page,
-+		   int offset, size_t size, int flags);
-+int send_tx_flowc_wr(struct sock *sk, int compl,
-+		     u32 snd_nxt, u32 rcv_nxt);
-+void chtls_tcp_push(struct sock *sk, int flags);
-+int chtls_push_frames(struct chtls_sock *csk, int comp);
-+int chtls_set_tcb_tflag(struct sock *sk, unsigned int bit_pos, int val);
-+int chtls_setkey(struct chtls_sock *csk, u32 keylen, u32 mode);
-+void skb_entail(struct sock *sk, struct sk_buff *skb, int flags);
-+unsigned int keyid_to_addr(int start_addr, int keyid);
-+void free_tls_keyid(struct sock *sk);
-+#endif
-diff --git a/drivers/crypto/chelsio/chtls/chtls_cm.h b/drivers/crypto/chelsio/chtls/chtls_cm.h
-new file mode 100644
-index 0000000..78eb3af
---- /dev/null
-+++ b/drivers/crypto/chelsio/chtls/chtls_cm.h
-@@ -0,0 +1,203 @@
 +/*
-+ * Copyright (c) 2018 Chelsio Communications, Inc.
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
++ * Set one of the t_flags bits in the TCB.
 + */
-+
-+#ifndef __CHTLS_CM_H__
-+#define __CHTLS_CM_H__
-+
-+/*
-+ * TCB settings
-+ */
-+/* 3:0 */
-+#define TCB_ULP_TYPE_W    0
-+#define TCB_ULP_TYPE_S    0
-+#define TCB_ULP_TYPE_M    0xfULL
-+#define TCB_ULP_TYPE_V(x) ((x) << TCB_ULP_TYPE_S)
-+
-+/* 11:4 */
-+#define TCB_ULP_RAW_W    0
-+#define TCB_ULP_RAW_S    4
-+#define TCB_ULP_RAW_M    0xffULL
-+#define TCB_ULP_RAW_V(x) ((x) << TCB_ULP_RAW_S)
-+
-+#define TF_TLS_KEY_SIZE_S    7
-+#define TF_TLS_KEY_SIZE_V(x) ((x) << TF_TLS_KEY_SIZE_S)
-+
-+#define TF_TLS_CONTROL_S     2
-+#define TF_TLS_CONTROL_V(x) ((x) << TF_TLS_CONTROL_S)
-+
-+#define TF_TLS_ACTIVE_S      1
-+#define TF_TLS_ACTIVE_V(x) ((x) << TF_TLS_ACTIVE_S)
-+
-+#define TF_TLS_ENABLE_S      0
-+#define TF_TLS_ENABLE_V(x) ((x) << TF_TLS_ENABLE_S)
-+
-+#define TF_RX_QUIESCE_S    15
-+#define TF_RX_QUIESCE_V(x) ((x) << TF_RX_QUIESCE_S)
-+
-+/*
-+ * Max receive window supported by HW in bytes.  Only a small part of it can
-+ * be set through option0, the rest needs to be set through RX_DATA_ACK.
-+ */
-+#define MAX_RCV_WND ((1U << 27) - 1)
-+#define MAX_MSS     65536
-+
-+/*
-+ * Min receive window.  We want it to be large enough to accommodate receive
-+ * coalescing, handle jumbo frames, and not trigger sender SWS avoidance.
-+ */
-+#define MIN_RCV_WND (24 * 1024U)
-+#define LOOPBACK(x)     (((x) & htonl(0xff000000)) == htonl(0x7f000000))
-+
-+/* ulp_mem_io + ulptx_idata + payload + padding */
-+#define MAX_IMM_ULPTX_WR_LEN (32 + 8 + 256 + 8)
-+
-+/* for TX: a skb must have a headroom of at least TX_HEADER_LEN bytes */
-+#define TX_HEADER_LEN \
-+	(sizeof(struct fw_ofld_tx_data_wr) + sizeof(struct sge_opaque_hdr))
-+#define TX_TLSHDR_LEN \
-+	(sizeof(struct fw_tlstx_data_wr) + sizeof(struct cpl_tx_tls_sfo) + \
-+	 sizeof(struct sge_opaque_hdr))
-+#define TXDATA_SKB_LEN 128
-+
-+enum {
-+	CPL_TX_TLS_SFO_TYPE_CCS,
-+	CPL_TX_TLS_SFO_TYPE_ALERT,
-+	CPL_TX_TLS_SFO_TYPE_HANDSHAKE,
-+	CPL_TX_TLS_SFO_TYPE_DATA,
-+	CPL_TX_TLS_SFO_TYPE_HEARTBEAT,
-+};
-+
-+enum {
-+	TLS_HDR_TYPE_CCS = 20,
-+	TLS_HDR_TYPE_ALERT,
-+	TLS_HDR_TYPE_HANDSHAKE,
-+	TLS_HDR_TYPE_RECORD,
-+	TLS_HDR_TYPE_HEARTBEAT,
-+};
-+
-+typedef void (*defer_handler_t)(struct chtls_dev *dev, struct sk_buff *skb);
-+extern struct request_sock_ops chtls_rsk_ops;
-+
-+struct deferred_skb_cb {
-+	defer_handler_t handler;
-+	struct chtls_dev *dev;
-+};
-+
-+#define DEFERRED_SKB_CB(skb) ((struct deferred_skb_cb *)(skb)->cb)
-+#define failover_flowc_wr_len offsetof(struct fw_flowc_wr, mnemval[3])
-+#define WR_SKB_CB(skb) ((struct wr_skb_cb *)(skb)->cb)
-+#define ACCEPT_QUEUE(sk) (&inet_csk(sk)->icsk_accept_queue.rskq_accept_head)
-+
-+#define SND_WSCALE(tp) ((tp)->rx_opt.snd_wscale)
-+#define RCV_WSCALE(tp) ((tp)->rx_opt.rcv_wscale)
-+#define USER_MSS(tp) ((tp)->rx_opt.user_mss)
-+#define TS_RECENT_STAMP(tp) ((tp)->rx_opt.ts_recent_stamp)
-+#define WSCALE_OK(tp) ((tp)->rx_opt.wscale_ok)
-+#define TSTAMP_OK(tp) ((tp)->rx_opt.tstamp_ok)
-+#define SACK_OK(tp) ((tp)->rx_opt.sack_ok)
-+#define INC_ORPHAN_COUNT(sk) percpu_counter_inc((sk)->sk_prot->orphan_count)
-+
-+/* TLS SKB */
-+#define skb_ulp_tls_inline(skb)      (ULP_SKB_CB(skb)->ulp.tls.ofld)
-+#define skb_ulp_tls_iv_imm(skb)      (ULP_SKB_CB(skb)->ulp.tls.iv)
-+
-+void chtls_defer_reply(struct sk_buff *skb, struct chtls_dev *dev,
-+		       defer_handler_t handler);
-+
-+/*
-+ * Returns true if the socket is in one of the supplied states.
-+ */
-+static inline unsigned int sk_in_state(const struct sock *sk,
-+				       unsigned int states)
++int chtls_set_tcb_tflag(struct sock *sk, unsigned int bit_pos, int val)
 +{
-+	return states & (1 << sk->sk_state);
++	return chtls_set_tcb_field(sk, 1, 1ULL << bit_pos,
++				   val << bit_pos);
 +}
 +
-+static void chtls_rsk_destructor(struct request_sock *req)
++static int chtls_set_tcb_keyid(struct sock *sk, int keyid)
 +{
-+	/* do nothing */
++	return chtls_set_tcb_field(sk, 31, 0xFFFFFFFFULL, keyid);
 +}
 +
-+static inline void chtls_init_rsk_ops(struct proto *chtls_tcp_prot,
-+				      struct request_sock_ops *chtls_tcp_ops,
-+				      struct proto *tcp_prot, int family)
++static int chtls_set_tcb_seqno(struct sock *sk)
 +{
-+	memset(chtls_tcp_ops, 0, sizeof(*chtls_tcp_ops));
-+	chtls_tcp_ops->family = family;
-+	chtls_tcp_ops->obj_size = sizeof(struct tcp_request_sock);
-+	chtls_tcp_ops->destructor = chtls_rsk_destructor;
-+	chtls_tcp_ops->slab = tcp_prot->rsk_prot->slab;
-+	chtls_tcp_prot->rsk_prot = chtls_tcp_ops;
++	return chtls_set_tcb_field(sk, 28, ~0ULL, 0);
 +}
 +
-+static inline void chtls_reqsk_free(struct request_sock *req)
++static int chtls_set_tcb_quiesce(struct sock *sk, int val)
 +{
-+	if (req->rsk_listener)
-+		sock_put(req->rsk_listener);
-+	kmem_cache_free(req->rsk_ops->slab, req);
++	return chtls_set_tcb_field(sk, 1, (1ULL << TF_RX_QUIESCE_S),
++				   TF_RX_QUIESCE_V(val));
 +}
 +
-+#define DECLARE_TASK_FUNC(task, task_param) \
-+		static void task(struct work_struct *task_param)
-+
-+static inline void sk_wakeup_sleepers(struct sock *sk, bool interruptable)
++/* TLS Key bitmap processing */
++int chtls_init_kmap(struct chtls_dev *cdev, struct cxgb4_lld_info *lldi)
 +{
-+	struct socket_wq *wq;
++	unsigned int num_key_ctx, bsize;
++	int ksize;
 +
-+	rcu_read_lock();
-+	wq = rcu_dereference(sk->sk_wq);
-+	if (skwq_has_sleeper(wq)) {
-+		if (interruptable)
-+			wake_up_interruptible(sk_sleep(sk));
++	num_key_ctx = (lldi->vr->key.size / TLS_KEY_CONTEXT_SZ);
++	bsize = BITS_TO_LONGS(num_key_ctx);
++
++	cdev->kmap.size = num_key_ctx;
++	cdev->kmap.available = bsize;
++	ksize = sizeof(*cdev->kmap.addr) * bsize;
++	cdev->kmap.addr = kvzalloc(ksize, GFP_KERNEL);
++	if (!cdev->kmap.addr)
++		return -ENOMEM;
++
++	cdev->kmap.start = lldi->vr->key.start;
++	spin_lock_init(&cdev->kmap.lock);
++	return 0;
++}
++
++static int get_new_keyid(struct chtls_sock *csk, u32 optname)
++{
++	struct chtls_hws *hws = &csk->tlshws;
++	struct net_device *dev = csk->egress_dev;
++	struct adapter *adap = netdev2adap(dev);
++	struct chtls_dev *cdev = csk->cdev;
++	int keyid;
++
++	spin_lock_bh(&cdev->kmap.lock);
++	keyid = find_first_zero_bit(cdev->kmap.addr, cdev->kmap.size);
++	if (keyid < cdev->kmap.size) {
++		__set_bit(keyid, cdev->kmap.addr);
++		if (optname == TLS_RX)
++			hws->rxkey = keyid;
 +		else
-+			wake_up_all(sk_sleep(sk));
++			hws->txkey = keyid;
++		atomic_inc(&adap->chcr_stats.tls_key);
++	} else {
++		keyid = -1;
 +	}
-+	rcu_read_unlock();
++	spin_unlock_bh(&cdev->kmap.lock);
++	return keyid;
 +}
 +
-+static inline void chtls_set_req_port(struct request_sock *oreq,
-+				      __be16 source, __be16 dest)
++void free_tls_keyid(struct sock *sk)
 +{
-+	inet_rsk(oreq)->ir_rmt_port = source;
-+	inet_rsk(oreq)->ir_num = ntohs(dest);
++	struct chtls_sock *csk = rcu_dereference_sk_user_data(sk);
++	struct net_device *dev = csk->egress_dev;
++	struct adapter *adap = netdev2adap(dev);
++	struct chtls_dev *cdev = csk->cdev;
++	struct chtls_hws *hws = &csk->tlshws;
++
++	if (!cdev->kmap.addr)
++		return;
++
++	spin_lock_bh(&cdev->kmap.lock);
++	if (hws->rxkey >= 0) {
++		__clear_bit(hws->rxkey, cdev->kmap.addr);
++		atomic_dec(&adap->chcr_stats.tls_key);
++		hws->rxkey = -1;
++	}
++	if (hws->txkey >= 0) {
++		__clear_bit(hws->txkey, cdev->kmap.addr);
++		atomic_dec(&adap->chcr_stats.tls_key);
++		hws->txkey = -1;
++	}
++	spin_unlock_bh(&cdev->kmap.lock);
 +}
 +
-+static inline void chtls_set_req_addr(struct request_sock *oreq,
-+				      __be32 local_ip, __be32 peer_ip)
++unsigned int keyid_to_addr(int start_addr, int keyid)
 +{
-+	inet_rsk(oreq)->ir_loc_addr = local_ip;
-+	inet_rsk(oreq)->ir_rmt_addr = peer_ip;
++	return (start_addr + (keyid * TLS_KEY_CONTEXT_SZ)) >> 5;
 +}
 +
-+static inline void chtls_free_skb(struct sock *sk, struct sk_buff *skb)
++static void chtls_rxkey_ivauth(struct _key_ctx *kctx)
 +{
-+	skb_dst_set(skb, NULL);
-+	__skb_unlink(skb, &sk->sk_receive_queue);
-+	__kfree_skb(skb);
++	kctx->iv_to_auth = cpu_to_be64(KEYCTX_TX_WR_IV_V(6ULL) |
++				  KEYCTX_TX_WR_AAD_V(1ULL) |
++				  KEYCTX_TX_WR_AADST_V(5ULL) |
++				  KEYCTX_TX_WR_CIPHER_V(14ULL) |
++				  KEYCTX_TX_WR_CIPHERST_V(0ULL) |
++				  KEYCTX_TX_WR_AUTH_V(14ULL) |
++				  KEYCTX_TX_WR_AUTHST_V(16ULL) |
++				  KEYCTX_TX_WR_AUTHIN_V(16ULL));
 +}
 +
-+static inline void chtls_kfree_skb(struct sock *sk, struct sk_buff *skb)
++static int chtls_key_info(struct chtls_sock *csk,
++			  struct _key_ctx *kctx,
++			  u32 keylen, u32 optname)
 +{
-+	skb_dst_set(skb, NULL);
-+	__skb_unlink(skb, &sk->sk_receive_queue);
++	unsigned char key[CHCR_KEYCTX_CIPHER_KEY_SIZE_256];
++	struct crypto_cipher *cipher;
++	struct tls12_crypto_info_aes_gcm_128 *gcm_ctx =
++		(struct tls12_crypto_info_aes_gcm_128 *)
++		&csk->tlshws.crypto_info;
++	unsigned char ghash_h[AEAD_H_SIZE];
++	int ck_size, key_ctx_size;
++	int ret;
++
++	key_ctx_size = sizeof(struct _key_ctx) +
++		       roundup(keylen, 16) + AEAD_H_SIZE;
++
++	if (keylen == AES_KEYSIZE_128) {
++		ck_size = CHCR_KEYCTX_CIPHER_KEY_SIZE_128;
++	} else if (keylen == AES_KEYSIZE_192) {
++		ck_size = CHCR_KEYCTX_CIPHER_KEY_SIZE_192;
++	} else if (keylen == AES_KEYSIZE_256) {
++		ck_size = CHCR_KEYCTX_CIPHER_KEY_SIZE_256;
++	} else {
++		pr_err("GCM: Invalid key length %d\n", keylen);
++		return -EINVAL;
++	}
++	memcpy(key, gcm_ctx->key, keylen);
++
++	/* Calculate the H = CIPH(K, 0 repeated 16 times).
++	 * It will go in key context
++	 */
++	cipher = crypto_alloc_cipher("aes", 0, 0);
++	if (IS_ERR(cipher)) {
++		ret = -ENOMEM;
++		goto out;
++	}
++
++	ret = crypto_cipher_setkey(cipher, key, keylen);
++	if (ret)
++		goto out1;
++
++	memset(ghash_h, 0, AEAD_H_SIZE);
++	crypto_cipher_encrypt_one(cipher, ghash_h, ghash_h);
++	csk->tlshws.keylen = key_ctx_size;
++
++	/* Copy the Key context */
++	if (optname == TLS_RX) {
++		int key_ctx;
++
++		key_ctx = ((key_ctx_size >> 4) << 3);
++		kctx->ctx_hdr = FILL_KEY_CRX_HDR(ck_size,
++						 CHCR_KEYCTX_MAC_KEY_SIZE_128,
++						 0, 0, key_ctx);
++		chtls_rxkey_ivauth(kctx);
++	} else {
++		kctx->ctx_hdr = FILL_KEY_CTX_HDR(ck_size,
++						 CHCR_KEYCTX_MAC_KEY_SIZE_128,
++						 0, 0, key_ctx_size >> 4);
++	}
++
++	memcpy(kctx->salt, gcm_ctx->salt, TLS_CIPHER_AES_GCM_128_SALT_SIZE);
++	memcpy(kctx->key, gcm_ctx->key, keylen);
++	memcpy(kctx->key + keylen, ghash_h, AEAD_H_SIZE);
++	/* erase key info from driver */
++	memset(gcm_ctx->key, 0, keylen);
++
++out1:
++	crypto_free_cipher(cipher);
++out:
++	return ret;
++}
++
++static void chtls_set_scmd(struct chtls_sock *csk)
++{
++	struct chtls_hws *hws = &csk->tlshws;
++
++	hws->scmd.seqno_numivs =
++		SCMD_SEQ_NO_CTRL_V(3) |
++		SCMD_PROTO_VERSION_V(0) |
++		SCMD_ENC_DEC_CTRL_V(0) |
++		SCMD_CIPH_AUTH_SEQ_CTRL_V(1) |
++		SCMD_CIPH_MODE_V(2) |
++		SCMD_AUTH_MODE_V(4) |
++		SCMD_HMAC_CTRL_V(0) |
++		SCMD_IV_SIZE_V(4) |
++		SCMD_NUM_IVS_V(1);
++
++	hws->scmd.ivgen_hdrlen =
++		SCMD_IV_GEN_CTRL_V(1) |
++		SCMD_KEY_CTX_INLINE_V(0) |
++		SCMD_TLS_FRAG_ENABLE_V(1);
++}
++
++int chtls_setkey(struct chtls_sock *csk, u32 keylen, u32 optname)
++{
++	struct chtls_dev *cdev = csk->cdev;
++	struct sock *sk = csk->sk;
++	struct tls_key_req *kwr;
++	struct _key_ctx *kctx;
++	struct sk_buff *skb;
++	int wrlen, klen, len;
++	int keyid;
++	int kaddr;
++	int ret = 0;
++
++	klen = roundup((keylen + AEAD_H_SIZE) + sizeof(*kctx), 32);
++	wrlen = roundup(sizeof(*kwr), 16);
++	len = klen + wrlen;
++
++	/* Flush out-standing data before new key takes effect */
++	if (optname == TLS_TX) {
++		lock_sock(sk);
++		if (skb_queue_len(&csk->txq))
++			chtls_push_frames(csk, 0);
++		release_sock(sk);
++	}
++
++	skb = alloc_skb(len, GFP_KERNEL);
++	if (!skb)
++		return -ENOMEM;
++
++	keyid = get_new_keyid(csk, optname);
++	if (keyid < 0) {
++		ret = -ENOSPC;
++		goto out_nokey;
++	}
++
++	kaddr = keyid_to_addr(cdev->kmap.start, keyid);
++	kwr = (struct tls_key_req *)__skb_put_zero(skb, len);
++	kwr->wr.op_to_compl =
++		cpu_to_be32(FW_WR_OP_V(FW_ULPTX_WR) | FW_WR_COMPL_F |
++		      FW_WR_ATOMIC_V(1U));
++	kwr->wr.flowid_len16 =
++		cpu_to_be32(FW_WR_LEN16_V(DIV_ROUND_UP(len, 16) |
++			    FW_WR_FLOWID_V(csk->tid)));
++	kwr->wr.protocol = 0;
++	kwr->wr.mfs = htons(TLS_MFS);
++	kwr->wr.reneg_to_write_rx = optname;
++
++	/* ulptx command */
++	kwr->req.cmd = cpu_to_be32(ULPTX_CMD_V(ULP_TX_MEM_WRITE) |
++			    T5_ULP_MEMIO_ORDER_V(1) |
++			    T5_ULP_MEMIO_IMM_V(1));
++	kwr->req.len16 = cpu_to_be32((csk->tid << 8) |
++			      DIV_ROUND_UP(len - sizeof(kwr->wr), 16));
++	kwr->req.dlen = cpu_to_be32(ULP_MEMIO_DATA_LEN_V(klen >> 5));
++	kwr->req.lock_addr = cpu_to_be32(ULP_MEMIO_ADDR_V(kaddr));
++
++	/* sub command */
++	kwr->sc_imm.cmd_more = cpu_to_be32(ULPTX_CMD_V(ULP_TX_SC_IMM));
++	kwr->sc_imm.len = cpu_to_be32(klen);
++
++	/* key info */
++	kctx = (struct _key_ctx *)(kwr + 1);
++	ret = chtls_key_info(csk, kctx, keylen, optname);
++	if (ret)
++		goto out_notcb;
++
++	set_wr_txq(skb, CPL_PRIORITY_DATA, csk->tlshws.txqid);
++	csk->wr_credits -= DIV_ROUND_UP(len, 16);
++	csk->wr_unacked += DIV_ROUND_UP(len, 16);
++	enqueue_wr(csk, skb);
++	cxgb4_ofld_send(csk->egress_dev, skb);
++
++	chtls_set_scmd(csk);
++	/* Clear quiesce for Rx key */
++	if (optname == TLS_RX) {
++		ret = chtls_set_tcb_keyid(sk, keyid);
++		if (ret)
++			goto out_notcb;
++		ret = chtls_set_tcb_field(sk, 0,
++					  TCB_ULP_RAW_V(TCB_ULP_RAW_M),
++					  TCB_ULP_RAW_V((TF_TLS_KEY_SIZE_V(1) |
++					  TF_TLS_CONTROL_V(1) |
++					  TF_TLS_ACTIVE_V(1) |
++					  TF_TLS_ENABLE_V(1))));
++		if (ret)
++			goto out_notcb;
++		ret = chtls_set_tcb_seqno(sk);
++		if (ret)
++			goto out_notcb;
++		ret = chtls_set_tcb_quiesce(sk, 0);
++		if (ret)
++			goto out_notcb;
++		csk->tlshws.rxkey = keyid;
++	} else {
++		csk->tlshws.tx_seq_no = 0;
++		csk->tlshws.txkey = keyid;
++	}
++
++	return ret;
++out_notcb:
++	free_tls_keyid(sk);
++out_nokey:
 +	kfree_skb(skb);
++	return ret;
 +}
-+
-+static inline void enqueue_wr(struct chtls_sock *csk, struct sk_buff *skb)
-+{
-+	WR_SKB_CB(skb)->next_wr = NULL;
-+
-+	skb_get(skb);
-+
-+	if (!csk->wr_skb_head)
-+		csk->wr_skb_head = skb;
-+	else
-+		WR_SKB_CB(csk->wr_skb_tail)->next_wr = skb;
-+	csk->wr_skb_tail = skb;
-+}
-+#endif
 -- 
 1.8.3.1
