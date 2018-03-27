@@ -1,289 +1,517 @@
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: Re: [PATCH 08/10] kbuild: rename *-asn1.[ch] to *.asn.[ch]
-Date: Tue, 27 Mar 2018 15:06:06 +0900
-Message-ID: <CAK7LNAS-v4WwOaYHnWUWLxVNiO5p4caZSTp5JJWf5=uV3BQSuA@mail.gmail.com>
-References: <1521810279-6282-1-git-send-email-yamada.masahiro@socionext.com> <1521810279-6282-8-git-send-email-yamada.masahiro@socionext.com>
+From: Eric Biggers <ebiggers3@gmail.com>
+Subject: Re: [dm-devel] [PATCH 2/2] md: dm-verity: allow parallel processing
+ of bio blocks
+Date: Mon, 26 Mar 2018 23:55:19 -0700
+Message-ID: <20180327065519.GA745@sol.localdomain>
+References: <1522003290-27243-1-git-send-email-yael.chemla@foss.arm.com>
+ <1522003290-27243-2-git-send-email-yael.chemla@foss.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Sam Ravnborg <sam@ravnborg.org>,
-        Michal Marek <michal.lkml@markovi.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
-        Frank Rowand <frank.rowand@sony.com>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        Masahiro Yamada <yamada.masahiro@socionext.com>,
-        linux-crypto@vger.kernel.org
-To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
+        linux-kernel@vger.kernel.org, ofir.drang@gmail.com,
+        Yael Chemla <yael.chemla@arm.com>,
+        linux-crypto@vger.kernel.org, gilad@benyossef.com
+To: Yael Chemla <yael.chemla@foss.arm.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1521810279-6282-8-git-send-email-yamada.masahiro@socionext.com>
+Content-Disposition: inline
+In-Reply-To: <1522003290-27243-2-git-send-email-yael.chemla@foss.arm.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-+CC linux-crypto@vger.kernel.org
+[+Cc linux-crypto]
 
-No functional change, though.
+Hi Yael,
 
-(I fixed up the subject.)
+On Sun, Mar 25, 2018 at 07:41:30PM +0100, Yael Chemla wrote:
+>  Allow parallel processing of bio blocks by moving to async. completion
+>  handling. This allows for better resource utilization of both HW and
+>  software based hash tfm and therefore better performance in many cases,
+>  depending on the specific tfm in use.
+>  
+>  Tested on ARM32 (zynq board) and ARM64 (Juno board).
+>  Time of cat command was measured on a filesystem with various file sizes.
+>  12% performance improvement when HW based hash was used (ccree driver).
+>  SW based hash showed less than 1% improvement.
+>  CPU utilization when HW based hash was used presented 10% less context
+>  switch, 4% less cycles and 7% less instructions. No difference in
+>  CPU utilization noticed with SW based hash.
+>  
+> Signed-off-by: Yael Chemla <yael.chemla@foss.arm.com>
 
+Okay, I definitely would like to see dm-verity better support hardware crypto
+accelerators, but these patches were painful to read.
 
-2018-03-23 22:04 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
-> Our convention is to distinguish file types by suffixes with a period
-> as a separator.
->
-> *-asn1.[ch] is a different pattern from other generated sources such
-> as *.lex.c, *.tab.[ch], *.dtb.S, etc.  More confusing, files with
-> '-asn1.[ch]' are generated files, but '_asn1.[ch]' are checked-in
-> files:
->   net/netfilter/nf_conntrack_h323_asn1.c
->   include/linux/netfilter/nf_conntrack_h323_asn1.h
->   include/linux/sunrpc/gss_asn1.h
->
-> Rename generated files to *.asn1.[ch] for consistency.
->
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+There are lots of smaller bugs, but the high-level problem which you need to
+address first is that on every bio you are always allocating all the extra
+memory to hold a hash request and scatterlist for every data block.  This will
+not only hurt performance when the hashing is done in software (I'm skeptical
+that your performance numbers are representative of that case), but it will also
+fall apart under memory pressure.  We are trying to get low-end Android devices
+to start using dm-verity, and such devices often have only 1 GB or even only 512
+MB of RAM, so memory allocations are at increased risk of failing.  In fact I'm
+pretty sure you didn't do any proper stress testing of these patches, since the
+first thing they do for every bio is try to allocate a physically contiguous
+array that is nearly as long as the full bio data itself (n_blocks *
+sizeof(struct dm_verity_req_data) = n_blocks * 3264, at least on a 64-bit
+platform, mostly due to the 'struct dm_verity_fec_io'), so potentially up to
+about 1 MB; that's going to fail a lot even on systems with gigabytes of RAM...
+
+(You also need to verify that your new code is compatible with the forward error
+correction feature, with the "ignore_zero_blocks" option, and with the new
+"check_at_most_once" option.  From my reading of the code, all of those seemed
+broken; the dm_verity_fec_io structures, for example, weren't even being
+initialized...)
+
+I think you need to take a close look at how dm-crypt handles async crypto
+implementations, since it seems to do it properly without hurting the common
+case where the crypto happens synchronously.  What it does, is it reserves space
+in the per-bio data for a single cipher request.  Then, *only* if the cipher
+implementation actually processes the request asynchronously (as indicated by
+-EINPROGRESS being returned) is a new cipher request allocated dynamically,
+using a mempool (not kmalloc, which is prone to fail).  Note that unlike your
+patches it also properly handles the case where the hardware crypto queue is
+full, as indicated by the cipher implementation returning -EBUSY; in that case,
+dm-crypt waits to start another request until there is space in the queue.
+
+I think it would be possible to adapt dm-crypt's solution to dm-verity.
+
+Thanks,
+
+Eric
+
 > ---
->
->  .gitignore                                  |  2 +-
->  Makefile                                    |  2 +-
->  crypto/Makefile                             | 10 +++++-----
->  crypto/asymmetric_keys/Makefile             | 24 ++++++++++++------------
->  crypto/asymmetric_keys/mscode_parser.c      |  2 +-
->  crypto/asymmetric_keys/pkcs7_parser.c       |  2 +-
->  crypto/asymmetric_keys/x509_cert_parser.c   |  4 ++--
->  crypto/rsa_helper.c                         |  4 ++--
->  net/ipv4/netfilter/Makefile                 |  4 ++--
->  net/ipv4/netfilter/nf_nat_snmp_basic_main.c |  2 +-
->  scripts/Makefile.build                      |  4 ++--
->  scripts/asn1_compiler.c                     |  2 +-
->  12 files changed, 31 insertions(+), 31 deletions(-)
->
-> diff --git a/.gitignore b/.gitignore
-> index a7fef34..1c8189e 100644
-> --- a/.gitignore
-> +++ b/.gitignore
-> @@ -11,7 +11,7 @@
->  #
->  .*
->  *.a
-> -*-asn1.[ch]
-> +*.asn1.[ch]
->  *.bin
->  *.bz2
->  *.c.[012]*.*
-> diff --git a/Makefile b/Makefile
-> index 054f43a..702f154 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -1614,7 +1614,7 @@ clean: $(clean-dirs)
->                 -o -name '*.su'  \
->                 -o -name '.*.d' -o -name '.*.tmp' -o -name '*.mod.c' \
->                 -o -name '*.lex.c' -o -name '*.tab.[ch]' \
-> -               -o -name '*-asn1.[ch]' \
-> +               -o -name '*.asn1.[ch]' \
->                 -o -name '*.symtypes' -o -name 'modules.order' \
->                 -o -name modules.builtin -o -name '.tmp_*.o.*' \
->                 -o -name .cache.mk \
-> diff --git a/crypto/Makefile b/crypto/Makefile
-> index 4eae4da..9be77d0 100644
-> --- a/crypto/Makefile
-> +++ b/crypto/Makefile
-> @@ -35,12 +35,12 @@ dh_generic-y := dh.o
->  dh_generic-y += dh_helper.o
->  obj-$(CONFIG_CRYPTO_DH) += dh_generic.o
->
-> -$(obj)/rsapubkey-asn1.o: $(obj)/rsapubkey-asn1.c $(obj)/rsapubkey-asn1.h
-> -$(obj)/rsaprivkey-asn1.o: $(obj)/rsaprivkey-asn1.c $(obj)/rsaprivkey-asn1.h
-> -$(obj)/rsa_helper.o: $(obj)/rsapubkey-asn1.h $(obj)/rsaprivkey-asn1.h
-> +$(obj)/rsapubkey.asn1.o: $(obj)/rsapubkey.asn1.c $(obj)/rsapubkey.asn1.h
-> +$(obj)/rsaprivkey.asn1.o: $(obj)/rsaprivkey.asn1.c $(obj)/rsaprivkey.asn1.h
-> +$(obj)/rsa_helper.o: $(obj)/rsapubkey.asn1.h $(obj)/rsaprivkey.asn1.h
->
-> -rsa_generic-y := rsapubkey-asn1.o
-> -rsa_generic-y += rsaprivkey-asn1.o
-> +rsa_generic-y := rsapubkey.asn1.o
-> +rsa_generic-y += rsaprivkey.asn1.o
->  rsa_generic-y += rsa.o
->  rsa_generic-y += rsa_helper.o
->  rsa_generic-y += rsa-pkcs1pad.o
-> diff --git a/crypto/asymmetric_keys/Makefile b/crypto/asymmetric_keys/Makefile
-> index bd8ed09..d4b2e1b 100644
-> --- a/crypto/asymmetric_keys/Makefile
-> +++ b/crypto/asymmetric_keys/Makefile
-> @@ -17,30 +17,30 @@ obj-$(CONFIG_ASYMMETRIC_PUBLIC_KEY_SUBTYPE) += public_key.o
->  #
->  obj-$(CONFIG_X509_CERTIFICATE_PARSER) += x509_key_parser.o
->  x509_key_parser-y := \
-> -       x509-asn1.o \
-> -       x509_akid-asn1.o \
-> +       x509.asn1.o \
-> +       x509_akid.asn1.o \
->         x509_cert_parser.o \
->         x509_public_key.o
->
->  $(obj)/x509_cert_parser.o: \
-> -       $(obj)/x509-asn1.h \
-> -       $(obj)/x509_akid-asn1.h
-> +       $(obj)/x509.asn1.h \
-> +       $(obj)/x509_akid.asn1.h
->
-> -$(obj)/x509-asn1.o: $(obj)/x509-asn1.c $(obj)/x509-asn1.h
-> -$(obj)/x509_akid-asn1.o: $(obj)/x509_akid-asn1.c $(obj)/x509_akid-asn1.h
-> +$(obj)/x509.asn1.o: $(obj)/x509.asn1.c $(obj)/x509.asn1.h
-> +$(obj)/x509_akid.asn1.o: $(obj)/x509_akid.asn1.c $(obj)/x509_akid.asn1.h
->
->  #
->  # PKCS#7 message handling
->  #
->  obj-$(CONFIG_PKCS7_MESSAGE_PARSER) += pkcs7_message.o
->  pkcs7_message-y := \
-> -       pkcs7-asn1.o \
-> +       pkcs7.asn1.o \
->         pkcs7_parser.o \
->         pkcs7_trust.o \
->         pkcs7_verify.o
->
-> -$(obj)/pkcs7_parser.o: $(obj)/pkcs7-asn1.h
-> -$(obj)/pkcs7-asn1.o: $(obj)/pkcs7-asn1.c $(obj)/pkcs7-asn1.h
-> +$(obj)/pkcs7_parser.o: $(obj)/pkcs7.asn1.h
-> +$(obj)/pkcs7.asn1.o: $(obj)/pkcs7.asn1.c $(obj)/pkcs7.asn1.h
->
->  #
->  # PKCS#7 parser testing key
-> @@ -57,7 +57,7 @@ obj-$(CONFIG_SIGNED_PE_FILE_VERIFICATION) += verify_signed_pefile.o
->  verify_signed_pefile-y := \
->         verify_pefile.o \
->         mscode_parser.o \
-> -       mscode-asn1.o
-> +       mscode.asn1.o
->
-> -$(obj)/mscode_parser.o: $(obj)/mscode-asn1.h $(obj)/mscode-asn1.h
-> -$(obj)/mscode-asn1.o: $(obj)/mscode-asn1.c $(obj)/mscode-asn1.h
-> +$(obj)/mscode_parser.o: $(obj)/mscode.asn1.h $(obj)/mscode.asn1.h
-> +$(obj)/mscode.asn1.o: $(obj)/mscode.asn1.c $(obj)/mscode.asn1.h
-> diff --git a/crypto/asymmetric_keys/mscode_parser.c b/crypto/asymmetric_keys/mscode_parser.c
-> index 9492e1c..83d2e9b 100644
-> --- a/crypto/asymmetric_keys/mscode_parser.c
-> +++ b/crypto/asymmetric_keys/mscode_parser.c
-> @@ -16,7 +16,7 @@
->  #include <linux/oid_registry.h>
->  #include <crypto/pkcs7.h>
->  #include "verify_pefile.h"
-> -#include "mscode-asn1.h"
-> +#include "mscode.asn1.h"
->
+>  drivers/md/dm-verity-fec.c    |  10 +-
+>  drivers/md/dm-verity-fec.h    |   7 +-
+>  drivers/md/dm-verity-target.c | 215 +++++++++++++++++++++++++++++++-----------
+>  drivers/md/dm-verity.h        |   4 +-
+>  4 files changed, 173 insertions(+), 63 deletions(-)
+> 
+> diff --git a/drivers/md/dm-verity-fec.c b/drivers/md/dm-verity-fec.c
+> index e13f908..bcea307 100644
+> --- a/drivers/md/dm-verity-fec.c
+> +++ b/drivers/md/dm-verity-fec.c
+> @@ -203,13 +203,12 @@ static int fec_is_erasure(struct dm_verity *v, struct dm_verity_io *io,
+>   */
+>  static int fec_read_bufs(struct dm_verity *v, struct dm_verity_io *io,
+>  			 u64 rsb, u64 target, unsigned block_offset,
+> -			 int *neras)
+> +			 int *neras, struct dm_verity_fec_io *fio)
+>  {
+>  	bool is_zero;
+>  	int i, j, target_index = -1;
+>  	struct dm_buffer *buf;
+>  	struct dm_bufio_client *bufio;
+> -	struct dm_verity_fec_io *fio = fec_io(io);
+>  	u64 block, ileaved;
+>  	u8 *bbuf, *rs_block;
+>  	u8 want_digest[v->digest_size];
+> @@ -265,7 +264,7 @@ static int fec_read_bufs(struct dm_verity *v, struct dm_verity_io *io,
+>  
+>  		/* locate erasures if the block is on the data device */
+>  		if (bufio == v->fec->data_bufio &&
+> -		    verity_hash_for_block(v, io, block, want_digest,
+> +		    verity_hash_for_block(v, io, block, want_digest, fio,
+>  					  &is_zero) == 0) {
+>  			/* skip known zero blocks entirely */
+>  			if (is_zero)
+> @@ -374,7 +373,7 @@ static int fec_decode_rsb(struct dm_verity *v, struct dm_verity_io *io,
+>  		fec_init_bufs(v, fio);
+>  
+>  		r = fec_read_bufs(v, io, rsb, offset, pos,
+> -				  use_erasures ? &neras : NULL);
+> +				  use_erasures ? &neras : NULL, fio);
+>  		if (unlikely(r < 0))
+>  			return r;
+>  
+> @@ -419,10 +418,9 @@ static int fec_bv_copy(struct dm_verity *v, struct dm_verity_io *io, u8 *data,
+>   */
+>  int verity_fec_decode(struct dm_verity *v, struct dm_verity_io *io,
+>  		      enum verity_block_type type, sector_t block, u8 *dest,
+> -		      struct bvec_iter *iter)
+> +		      struct bvec_iter *iter, struct dm_verity_fec_io *fio)
+>  {
+>  	int r;
+> -	struct dm_verity_fec_io *fio = fec_io(io);
+>  	u64 offset, res, rsb;
+>  
+>  	if (!verity_fec_is_enabled(v))
+> diff --git a/drivers/md/dm-verity-fec.h b/drivers/md/dm-verity-fec.h
+> index bb31ce8..46c2f47 100644
+> --- a/drivers/md/dm-verity-fec.h
+> +++ b/drivers/md/dm-verity-fec.h
+> @@ -73,7 +73,9 @@ extern bool verity_fec_is_enabled(struct dm_verity *v);
+>  
+>  extern int verity_fec_decode(struct dm_verity *v, struct dm_verity_io *io,
+>  			     enum verity_block_type type, sector_t block,
+> -			     u8 *dest, struct bvec_iter *iter);
+> +			     u8 *dest, struct bvec_iter *iter,
+> +			     struct dm_verity_fec_io *fio);
+> +
+>  
+>  extern unsigned verity_fec_status_table(struct dm_verity *v, unsigned sz,
+>  					char *result, unsigned maxlen);
+> @@ -104,7 +106,8 @@ static inline int verity_fec_decode(struct dm_verity *v,
+>  				    struct dm_verity_io *io,
+>  				    enum verity_block_type type,
+>  				    sector_t block, u8 *dest,
+> -				    struct bvec_iter *iter)
+> +				    struct bvec_iter *iter,
+> +				    struct dm_verity_fec_io *fio)
+>  {
+>  	return -EOPNOTSUPP;
+>  }
+> diff --git a/drivers/md/dm-verity-target.c b/drivers/md/dm-verity-target.c
+> index a281b83..30512ee 100644
+> --- a/drivers/md/dm-verity-target.c
+> +++ b/drivers/md/dm-verity-target.c
+> @@ -38,7 +38,35 @@
+>  /* only two elements in static scatter list: salt and data */
+>  #define SG_FIXED_ITEMS	2
+>  
+> +struct dm_ver_io_data {
+> +	atomic_t expected_reqs;
+> +	atomic_t err;
+> +	int total_reqs;
+> +	struct dm_ver_req_data *reqdata_arr;
+> +	struct dm_verity_io *io;
+> +};
+> +
+> +#define MAX_DIGEST_SIZE 64 /* as big as sha512 digest size */
+> +
+> +struct dm_ver_req_data {
+> +	u8 want_digest[MAX_DIGEST_SIZE];
+> +	u8 real_digest[MAX_DIGEST_SIZE];
+> +	struct dm_verity_fec_io fec_io;
+> +	unsigned int iblock;	// block index in the request
+> +	unsigned int digest_size;
+> +	struct scatterlist *sg;
+> +	struct dm_ver_io_data *iodata;
+> +	/* req field is the last on purpose since it's not fixed in size and
+> +	 *  its size if calucluated using ahash_request_alloc or an addition of
+> +	 *  the required size is done with +crypto_ahash_reqsize(v->tfm)
+> +	 */
+> +	struct ahash_request *req;
+> +};
+> +
+>  static unsigned dm_verity_prefetch_cluster = DM_VERITY_DEFAULT_PREFETCH_SIZE;
+> +static void verity_finish_io(struct dm_verity_io *io, blk_status_t status);
+> +static void verity_release_req(struct dm_ver_io_data *iodata);
+> +
+>  
+>  module_param_named(prefetch_cluster, dm_verity_prefetch_cluster, uint, S_IRUGO | S_IWUSR);
+>  
+> @@ -102,7 +130,7 @@ static sector_t verity_position_at_level(struct dm_verity *v, sector_t block,
+>  
 >  /*
->   * Parse a Microsoft Individual Code Signing blob
-> diff --git a/crypto/asymmetric_keys/pkcs7_parser.c b/crypto/asymmetric_keys/pkcs7_parser.c
-> index a6dcaa6..0f13416 100644
-> --- a/crypto/asymmetric_keys/pkcs7_parser.c
-> +++ b/crypto/asymmetric_keys/pkcs7_parser.c
-> @@ -18,7 +18,7 @@
->  #include <linux/oid_registry.h>
->  #include <crypto/public_key.h>
->  #include "pkcs7_parser.h"
-> -#include "pkcs7-asn1.h"
-> +#include "pkcs7.asn1.h"
->
->  MODULE_DESCRIPTION("PKCS#7 parser");
->  MODULE_AUTHOR("Red Hat, Inc.");
-> diff --git a/crypto/asymmetric_keys/x509_cert_parser.c b/crypto/asymmetric_keys/x509_cert_parser.c
-> index ce2df8c..7d81e6b 100644
-> --- a/crypto/asymmetric_keys/x509_cert_parser.c
-> +++ b/crypto/asymmetric_keys/x509_cert_parser.c
-> @@ -17,8 +17,8 @@
->  #include <linux/oid_registry.h>
->  #include <crypto/public_key.h>
->  #include "x509_parser.h"
-> -#include "x509-asn1.h"
-> -#include "x509_akid-asn1.h"
-> +#include "x509.asn1.h"
-> +#include "x509_akid.asn1.h"
->
->  struct x509_parse_context {
->         struct x509_certificate *cert;          /* Certificate being constructed */
-> diff --git a/crypto/rsa_helper.c b/crypto/rsa_helper.c
-> index cad395d..efc78fe 100644
-> --- a/crypto/rsa_helper.c
-> +++ b/crypto/rsa_helper.c
-> @@ -15,8 +15,8 @@
->  #include <linux/err.h>
->  #include <linux/fips.h>
->  #include <crypto/internal/rsa.h>
-> -#include "rsapubkey-asn1.h"
-> -#include "rsaprivkey-asn1.h"
-> +#include "rsapubkey.asn1.h"
-> +#include "rsaprivkey.asn1.h"
->
->  int rsa_get_n(void *context, size_t hdrlen, unsigned char tag,
->               const void *value, size_t vlen)
-> diff --git a/net/ipv4/netfilter/Makefile b/net/ipv4/netfilter/Makefile
-> index e5f5638..f37efa3 100644
-> --- a/net/ipv4/netfilter/Makefile
-> +++ b/net/ipv4/netfilter/Makefile
-> @@ -28,8 +28,8 @@ obj-$(CONFIG_NF_REJECT_IPV4) += nf_reject_ipv4.o
->  obj-$(CONFIG_NF_NAT_H323) += nf_nat_h323.o
->  obj-$(CONFIG_NF_NAT_PPTP) += nf_nat_pptp.o
->
-> -nf_nat_snmp_basic-y := nf_nat_snmp_basic-asn1.o nf_nat_snmp_basic_main.o
-> -nf_nat_snmp_basic-y : nf_nat_snmp_basic-asn1.h nf_nat_snmp_basic-asn1.c
-> +nf_nat_snmp_basic-y := nf_nat_snmp_basic.asn1.o nf_nat_snmp_basic_main.o
-> +nf_nat_snmp_basic-y : nf_nat_snmp_basic.asn1.h nf_nat_snmp_basic.asn1.c
->  obj-$(CONFIG_NF_NAT_SNMP_BASIC) += nf_nat_snmp_basic.o
->
->  obj-$(CONFIG_NF_NAT_MASQUERADE_IPV4) += nf_nat_masquerade_ipv4.o
-> diff --git a/net/ipv4/netfilter/nf_nat_snmp_basic_main.c b/net/ipv4/netfilter/nf_nat_snmp_basic_main.c
-> index b6e2770..ac110c1 100644
-> --- a/net/ipv4/netfilter/nf_nat_snmp_basic_main.c
-> +++ b/net/ipv4/netfilter/nf_nat_snmp_basic_main.c
-> @@ -54,7 +54,7 @@
->  #include <net/netfilter/nf_conntrack_expect.h>
->  #include <net/netfilter/nf_conntrack_helper.h>
->  #include <linux/netfilter/nf_conntrack_snmp.h>
-> -#include "nf_nat_snmp_basic-asn1.h"
-> +#include "nf_nat_snmp_basic.asn1.h"
->
->  MODULE_LICENSE("GPL");
->  MODULE_AUTHOR("James Morris <jmorris@intercode.com.au>");
-> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-> index 15b3bbb..8c3ca61 100644
-> --- a/scripts/Makefile.build
-> +++ b/scripts/Makefile.build
-> @@ -430,9 +430,9 @@ quiet_cmd_asn1_compiler = ASN.1   $@
->        cmd_asn1_compiler = $(objtree)/scripts/asn1_compiler $< \
->                                 $(subst .h,.c,$@) $(subst .c,.h,$@)
->
-> -.PRECIOUS: $(objtree)/$(obj)/%-asn1.c $(objtree)/$(obj)/%-asn1.h
-> +.PRECIOUS: $(objtree)/$(obj)/%.asn1.c $(objtree)/$(obj)/%.asn1.h
->
-> -$(obj)/%-asn1.c $(obj)/%-asn1.h: $(src)/%.asn1 $(objtree)/scripts/asn1_compiler
-> +$(obj)/%.asn1.c $(obj)/%.asn1.h: $(src)/%.asn1 $(objtree)/scripts/asn1_compiler
->         $(call cmd,asn1_compiler)
->
->  # Build the compiled-in targets
-> diff --git a/scripts/asn1_compiler.c b/scripts/asn1_compiler.c
-> index c1b7ef3..c146020 100644
-> --- a/scripts/asn1_compiler.c
-> +++ b/scripts/asn1_compiler.c
-> @@ -1319,7 +1319,7 @@ static void render(FILE *out, FILE *hdr)
->         fprintf(out, " * ASN.1 parser for %s\n", grammar_name);
->         fprintf(out, " */\n");
->         fprintf(out, "#include <linux/asn1_ber_bytecode.h>\n");
-> -       fprintf(out, "#include \"%s-asn1.h\"\n", grammar_name);
-> +       fprintf(out, "#include \"%s.asn1.h\"\n", grammar_name);
->         fprintf(out, "\n");
->         if (ferror(out)) {
->                 perror(outputname);
-> --
+>   * verity_is_salt_required - check if according to verity version and
+> - * verity salt's size if there's a need to insert a salt.
+> + * verity salt's size there's a need to insert a salt.
+>   * note: salt goes last for 0th version and first for all others
+>   * @where - START_SG - before buffer / END_SG - after buffer
+>   */
+> @@ -247,7 +275,7 @@ static int verity_handle_err(struct dm_verity *v, enum verity_block_type type,
+>   */
+>  static int verity_verify_level(struct dm_verity *v, struct dm_verity_io *io,
+>  			       sector_t block, int level, bool skip_unverified,
+> -			       u8 *want_digest)
+> +			       u8 *want_digest, struct dm_verity_fec_io *fec_io)
+>  {
+>  	struct dm_buffer *buf;
+>  	struct buffer_aux *aux;
+> @@ -281,7 +309,7 @@ static int verity_verify_level(struct dm_verity *v, struct dm_verity_io *io,
+>  			aux->hash_verified = 1;
+>  		else if (verity_fec_decode(v, io,
+>  					   DM_VERITY_BLOCK_TYPE_METADATA,
+> -					   hash_block, data, NULL) == 0)
+> +					   hash_block, data, NULL, fec_io) == 0)
+>  			aux->hash_verified = 1;
+>  		else if (verity_handle_err(v,
+>  					   DM_VERITY_BLOCK_TYPE_METADATA,
+> @@ -305,7 +333,9 @@ static int verity_verify_level(struct dm_verity *v, struct dm_verity_io *io,
+>   * of the hash tree if necessary.
+>   */
+>  int verity_hash_for_block(struct dm_verity *v, struct dm_verity_io *io,
+> -			  sector_t block, u8 *digest, bool *is_zero)
+> +			  sector_t block, u8 *digest,
+> +			  struct dm_verity_fec_io *fec_io,
+> +			  bool *is_zero)
+>  {
+>  	int r = 0, i;
+>  
+> @@ -317,7 +347,7 @@ int verity_hash_for_block(struct dm_verity *v, struct dm_verity_io *io,
+>  		 * function returns 1 and we fall back to whole
+>  		 * chain verification.
+>  		 */
+> -		r = verity_verify_level(v, io, block, 0, true, digest);
+> +		r = verity_verify_level(v, io, block, 0, true, digest, fec_io);
+>  		if (likely(r <= 0))
+>  			goto out;
+>  	}
+> @@ -325,7 +355,7 @@ int verity_hash_for_block(struct dm_verity *v, struct dm_verity_io *io,
+>  	memcpy(digest, v->root_digest, v->digest_size);
+>  
+>  	for (i = v->levels - 1; i >= 0; i--) {
+> -		r = verity_verify_level(v, io, block, i, false, digest);
+> +		r = verity_verify_level(v, io, block, i, false, digest, fec_io);
+>  		if (unlikely(r))
+>  			goto out;
+>  	}
+> @@ -436,39 +466,118 @@ static int verity_bv_zero(struct dm_verity *v, struct dm_verity_io *io,
+>  	return 0;
+>  }
+>  
+> +
+> +static void verity_cb_complete(struct dm_ver_io_data *iodata, int err)
+> +{
+> +	struct dm_verity_io *io = iodata->io;
+> +
+> +	/* save last error occurred */
+> +	if (err)
+> +		atomic_set(&iodata->err, err);
+> +	if (atomic_dec_and_test(&iodata->expected_reqs)) {
+> +		verity_release_req(iodata);
+> +		verity_finish_io(io, errno_to_blk_status(err));
+> +	}
+> +}
+> +
+> +static void __single_block_req_done(struct dm_ver_req_data *req_data,
+> +					int err, struct dm_verity_io *io)
+> +{
+> +	struct dm_verity *v = io->v;
+> +
+> +	if (err == -EINPROGRESS)
+> +		return;
+> +
+> +	WARN_ON((err != 0) || (req_data == NULL) || (req_data->iodata == NULL));
+> +	if ((err != 0) || (req_data == NULL) || (req_data->iodata == NULL))
+> +		goto complete;
+> +
+> +	kfree(req_data->sg);
+> +
+> +	if (likely(memcmp(req_data->real_digest,
+> +			req_data->want_digest, req_data->digest_size) == 0))
+> +		goto complete;
+> +	else if (verity_fec_decode(v, io, DM_VERITY_BLOCK_TYPE_DATA,
+> +			io->block + req_data->iblock, NULL, &io->iter,
+> +			&req_data->fec_io) == 0){
+> +		goto complete;
+> +	} else if (verity_handle_err(v, DM_VERITY_BLOCK_TYPE_DATA,
+> +		req_data->iodata->io->block + req_data->iblock)){
+> +		err = -EIO;
+> +		goto complete;
+> +	}
+> +
+> +complete:
+> +	ahash_request_free(req_data->req);
+> +	verity_cb_complete(req_data->iodata, err);
+> +}
+> +
+> +static void single_block_req_done(struct crypto_async_request *req, int err)
+> +{
+> +	struct dm_ver_req_data *req_data = req->data;
+> +
+> +	__single_block_req_done(req_data, err, req_data->iodata->io);
+> +}
+> +
+> +static void verity_release_req(struct dm_ver_io_data *iodata)
+> +{
+> +	kfree(iodata->reqdata_arr);
+> +	kfree(iodata);
+> +}
+>  /*
+>   * Verify one "dm_verity_io" structure.
+>   */
+> -static int verity_verify_io(struct dm_verity_io *io)
+> +static void verity_verify_io(struct dm_verity_io *io)
+>  {
+>  	bool is_zero;
+>  	struct dm_verity *v = io->v;
+> -	struct bvec_iter start;
+> -	unsigned b;
+> -	struct crypto_wait wait;
+> -	struct scatterlist *sg;
+> -	int r;
+> +	unsigned int b = 0, blocks = 0;
+> +	struct dm_ver_io_data *iodata = NULL;
+> +	struct dm_ver_req_data *reqdata_arr = NULL;
+> +	struct scatterlist *sg = NULL;
+> +	int res;
+> +
+> +	iodata = kmalloc(sizeof(*iodata), GFP_KERNEL);
+> +	reqdata_arr = kmalloc_array(io->n_blocks,
+> +			sizeof(struct dm_ver_req_data), GFP_KERNEL);
+> +	if (unlikely((iodata == NULL) || (reqdata_arr == NULL))) {
+> +		WARN_ON((iodata == NULL) || (reqdata_arr == NULL));
+> +		goto err_memfree;
+> +	}
+> +	atomic_set(&iodata->expected_reqs, io->n_blocks);
+> +	iodata->reqdata_arr = reqdata_arr;
+> +	iodata->io = io;
+> +	iodata->total_reqs = blocks = io->n_blocks;
+> +
+>  
+> -	for (b = 0; b < io->n_blocks; b++) {
+> +	for (b = 0; b < blocks; b++) {
+>  		unsigned int nents;
+>  		unsigned int total_len = 0;
+>  		unsigned int num_of_buffs = 0;
+> -		struct ahash_request *req = verity_io_hash_req(v, io);
+>  
+> -		/* an extra one for the salt buffer */
+> +		reqdata_arr[b].req = ahash_request_alloc(v->tfm, GFP_KERNEL);
+> +
+> +		if (unlikely(reqdata_arr[b].req == NULL))
+> +			goto err_memfree;
+> +		/* +1 for the salt buffer */
+> +		ahash_request_set_tfm(reqdata_arr[b].req, v->tfm);
+>  		num_of_buffs = verity_calc_buffs_for_bv(v, io, io->iter) + 1;
+>  		WARN_ON(num_of_buffs < 1);
+>  
+>  		sg = kmalloc_array(num_of_buffs, sizeof(struct scatterlist),
+>  				     GFP_KERNEL);
+> -		if (!sg)
+> -			return -ENOMEM;
+> +		if (!sg) {
+> +			DMERR("%s kmalloc_array failed", __func__);
+> +			goto err_memfree;
+> +		}
+> +
+>  		sg_init_table(sg, num_of_buffs);
+>  
+> -		r = verity_hash_for_block(v, io, io->block + b,
+> -					  verity_io_want_digest(v, io),
+> -					  &is_zero);
+> -		if (unlikely(r < 0))
+> +		res = verity_hash_for_block(v, io, io->block + b,
+> +					    reqdata_arr[b].want_digest,
+> +					    &reqdata_arr[b].fec_io,
+> +					    &is_zero);
+> +		if (unlikely(res < 0))
+>  			goto err_memfree;
+>  
+>  		if (is_zero) {
+> @@ -476,56 +585,54 @@ static int verity_verify_io(struct dm_verity_io *io)
+>  			 * If we expect a zero block, don't validate, just
+>  			 * return zeros.
+>  			 */
+> -			r = verity_for_bv_block(v, io, &io->iter,
+> +			res = verity_for_bv_block(v, io, &io->iter,
+>  						verity_bv_zero);
+> -			if (unlikely(r < 0))
+> +			if (unlikely(res < 0))
+>  				goto err_memfree;
+> -
+> +			verity_cb_complete(reqdata_arr[b].iodata, res);
+>  			continue;
+>  		}
+>  
+> -		ahash_request_set_tfm(req, v->tfm);
+> -		ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_SLEEP |
+> -					CRYPTO_TFM_REQ_MAY_BACKLOG,
+> -					crypto_req_done, (void *)&wait);
+>  		nents = 0;
+>  		total_len = 0;
+>  		if (verity_is_salt_required(v, START_SG))
+>  			verity_add_salt(v, sg, &nents, &total_len);
+>  
+> -		start = io->iter;
+> -		verity_for_io_block(v, io, &io->iter, sg, &nents, &total_len);
+> +		verity_for_io_block(v, io, &io->iter, sg, &nents,
+> +				&total_len);
+>  		if (verity_is_salt_required(v, END_SG))
+>  			verity_add_salt(v, sg, &nents, &total_len);
+> -		/*
+> -		 * need to mark end of chain, since we might have allocated
+> -		 * more than we actually use
+> +		reqdata_arr[b].iodata = iodata;
+> +		reqdata_arr[b].sg = sg;
+> +		reqdata_arr[b].digest_size = v->digest_size;
+> +		reqdata_arr[b].iblock = b;
+> +		/* need to mark end of chain,
+> +		 * since we might have allocated more than we actually use
+>  		 */
+>  		sg_mark_end(&sg[nents-1]);
+> -		ahash_request_set_crypt(req, sg, verity_io_real_digest(v, io),
+> -				total_len);
+> -		crypto_init_wait(&wait);
+> -		r = crypto_wait_req(crypto_ahash_digest(req), &wait);
+>  
+> -		if (unlikely(r < 0))
+> -			goto err_memfree;
+> -		kfree(sg);
+> -		if (likely(memcmp(verity_io_real_digest(v, io),
+> -				  verity_io_want_digest(v, io), v->digest_size) == 0))
+> -			continue;
+> -		else if (verity_fec_decode(v, io, DM_VERITY_BLOCK_TYPE_DATA,
+> -					   io->block + b, NULL, &start) == 0)
+> -			continue;
+> -		else if (verity_handle_err(v, DM_VERITY_BLOCK_TYPE_DATA,
+> -					   io->block + b))
+> -			return -EIO;
+> -	}
+> +		ahash_request_set_tfm(reqdata_arr[b].req, v->tfm);
+> +		ahash_request_set_callback(reqdata_arr[b].req,
+> +			CRYPTO_TFM_REQ_MAY_SLEEP | CRYPTO_TFM_REQ_MAY_BACKLOG,
+> +			single_block_req_done, (void *)&reqdata_arr[b]);
+>  
+> -	return 0;
+> +		ahash_request_set_crypt(reqdata_arr[b].req, sg,
+> +			reqdata_arr[b].real_digest, total_len);
+> +		res = crypto_ahash_digest(reqdata_arr[b].req);
+> +		/* digest completed already, callback won't be called. */
+> +		if (res == 0)
+> +			__single_block_req_done(&reqdata_arr[b], res, io);
+> +
+> +	}
+> +	return;
+>  
+>  err_memfree:
+> -	kfree(sg);
+> -	return r;
+> +	DMERR("%s: error occurred", __func__);
+> +	/* reduce expected requests by the number of
+> +	 * unsent requests, -1 accounting for the current block
+> +	 */
+> +	atomic_sub(blocks-b-1, &iodata->expected_reqs);
+> +	verity_cb_complete(iodata, -EIO);
+>  }
+>  
+>  /*
+> @@ -548,7 +655,7 @@ static void verity_work(struct work_struct *w)
+>  {
+>  	struct dm_verity_io *io = container_of(w, struct dm_verity_io, work);
+>  
+> -	verity_finish_io(io, errno_to_blk_status(verity_verify_io(io)));
+> +	verity_verify_io(io);
+>  }
+>  
+>  static void verity_end_io(struct bio *bio)
+> diff --git a/drivers/md/dm-verity.h b/drivers/md/dm-verity.h
+> index b675bc0..0e407f6 100644
+> --- a/drivers/md/dm-verity.h
+> +++ b/drivers/md/dm-verity.h
+> @@ -30,6 +30,7 @@ enum verity_block_type {
+>  };
+>  
+>  struct dm_verity_fec;
+> +struct dm_verity_fec_io;
+>  
+>  struct dm_verity {
+>  	struct dm_dev *data_dev;
+> @@ -124,6 +125,7 @@ extern int verity_hash(struct dm_verity *v, struct ahash_request *req,
+>  		       const u8 *data, size_t len, u8 *digest);
+>  
+>  extern int verity_hash_for_block(struct dm_verity *v, struct dm_verity_io *io,
+> -				 sector_t block, u8 *digest, bool *is_zero);
+> +				 sector_t block, u8 *digest,
+> +				 struct dm_verity_fec_io *fio, bool *is_zero);
+>  
+>  #endif /* DM_VERITY_H */
+> -- 
 > 2.7.4
->
+> 
 > --
-> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
--- 
-Best Regards
-Masahiro Yamada
+> dm-devel mailing list
+> dm-devel@redhat.com
+> https://www.redhat.com/mailman/listinfo/dm-devel
