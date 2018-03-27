@@ -1,9 +1,10 @@
 From: Stefano Brivio <sbrivio@redhat.com>
-Subject: Re: [PATCH v13 net-next 09/12] crypto: chtls - Inline TLS record Tx
-Date: Tue, 27 Mar 2018 19:51:16 +0200
-Message-ID: <20180327195116.0ac14f7e@epycfail>
+Subject: Re: [PATCH v13 net-next 07/12] crypto: chtls - Program the TLS
+ session Key
+Date: Tue, 27 Mar 2018 20:16:17 +0200
+Message-ID: <20180327201617.7c573b8d@epycfail>
 References: <1522172201-7629-1-git-send-email-atul.gupta@chelsio.com>
-        <1522172201-7629-10-git-send-email-atul.gupta@chelsio.com>
+        <1522172201-7629-8-git-send-email-atul.gupta@chelsio.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
@@ -15,86 +16,109 @@ Cc: davem@davemloft.net, herbert@gondor.apana.org.au,
         ganeshgr@chelsio.com
 To: Atul Gupta <atul.gupta@chelsio.com>
 Return-path: <netdev-owner@vger.kernel.org>
-In-Reply-To: <1522172201-7629-10-git-send-email-atul.gupta@chelsio.com>
+In-Reply-To: <1522172201-7629-8-git-send-email-atul.gupta@chelsio.com>
 Sender: netdev-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, 27 Mar 2018 23:06:38 +0530
+On Tue, 27 Mar 2018 23:06:36 +0530
 Atul Gupta <atul.gupta@chelsio.com> wrote:
 
-> +static u8 tcp_state_to_flowc_state(u8 state)
+> +static void __set_tcb_field(struct sock *sk, struct sk_buff *skb, u16 word,
+> +			    u64 mask, u64 val, u8 cookie, int no_reply)
 > +{
-> +	u8 ret = FW_FLOWC_MNEM_TCPSTATE_ESTABLISHED;
+> +	struct chtls_sock *csk = rcu_dereference_sk_user_data(sk);
+> +	struct cpl_set_tcb_field *req;
+> +	struct ulptx_idata *sc;
+> +	unsigned int wrlen = roundup(sizeof(*req) + sizeof(*sc), 16);
+
+Please use reverse christmas tree style for variable declarations. If
+needed, do the assignments later on.
+
+> [...]
+>
+> +static int chtls_set_tcb_field(struct sock *sk, u16 word, u64 mask, u64 val)
+> +{
+> +	struct chtls_sock *csk = rcu_dereference_sk_user_data(sk);
+> +	struct cpl_set_tcb_field *req;
+> +	struct ulptx_idata *sc;
+> +	struct sk_buff *skb;
+> +	int ret;
+> +	unsigned int wrlen = roundup(sizeof(*req) + sizeof(*sc), 16);
+> +	unsigned int credits_needed = DIV_ROUND_UP(wrlen, 16);
+
+Same here.
+
+> [...]
+>
+> +static int get_new_keyid(struct chtls_sock *csk, u32 optname)
+> +{
+> +	struct chtls_hws *hws = &csk->tlshws;
+> +	struct net_device *dev = csk->egress_dev;
+> +	struct adapter *adap = netdev2adap(dev);
+> +	struct chtls_dev *cdev = csk->cdev;
+> +	int keyid;
+
+Same here.
+
 > +
-> +	switch (state) {
-> +	case TCP_ESTABLISHED:
-> +		ret = FW_FLOWC_MNEM_TCPSTATE_ESTABLISHED;
-> +		break;
-> +	case TCP_CLOSE_WAIT:
-> +		ret = FW_FLOWC_MNEM_TCPSTATE_CLOSEWAIT;
-> +		break;
-> +	case TCP_FIN_WAIT1:
-> +		ret = FW_FLOWC_MNEM_TCPSTATE_FINWAIT1;
-> +		break;
-> +	case TCP_CLOSING:
-> +		ret = FW_FLOWC_MNEM_TCPSTATE_CLOSING;
-> +		break;
-> +	case TCP_LAST_ACK:
-> +		ret = FW_FLOWC_MNEM_TCPSTATE_LASTACK;
-> +		break;
-> +	case TCP_FIN_WAIT2:
-> +		ret = FW_FLOWC_MNEM_TCPSTATE_FINWAIT2;
-> +		break;
-
-Can't you just return those values right away instead?
-
-> [...]
->
-> +static u64 tlstx_seq_number(struct chtls_hws *hws)
-> +{
-> +	return hws->tx_seq_no++;
-> +}
-
-The name of this function, as I also had commented earlier, is
-misleading, because you are also incrementing the sequence number.
-
-> [...]
->
-> +static void mark_urg(struct tcp_sock *tp, int flags,
-> +		     struct sk_buff *skb)
-> +{
-> +	if (unlikely(flags & MSG_OOB)) {
-> +		tp->snd_up = tp->write_seq;
-> +			ULP_SKB_CB(skb)->flags = ULPCB_FLAG_URG |
-> +						 ULPCB_FLAG_BARRIER |
-> +						 ULPCB_FLAG_NO_APPEND |
-> +						 ULPCB_FLAG_NEED_HDR;
-
-Is this indentation the result of a previous 'if' clause which is now
-gone?
-
-> [...]
->
-> +/*
-> + * Returns true if a TCP socket is corked.
-> + */
-> +static int corked(const struct tcp_sock *tp, int flags)
-> +{
-> +	return (flags & MSG_MORE) | (tp->nonagle & TCP_NAGLE_CORK);
-
-I guess you meant || here. Shouldn't this be a bool?
-
+> +	spin_lock_bh(&cdev->kmap.lock);
+> +	keyid = find_first_zero_bit(cdev->kmap.addr, cdev->kmap.size);
+> +	if (keyid < cdev->kmap.size) {
+> +		__set_bit(keyid, cdev->kmap.addr);
+> +		if (optname == TLS_RX)
+> +			hws->rxkey = keyid;
+> +		else
+> +			hws->txkey = keyid;
+> +		atomic_inc(&adap->chcr_stats.tls_key);
+> +	} else {
+> +		keyid = -1;
+> +	}
+> +	spin_unlock_bh(&cdev->kmap.lock);
+> +	return keyid;
 > +}
 > +
-> +/*
-> + * Returns true if a send should try to push new data.
-> + */
-> +static int send_should_push(struct sock *sk, int flags)
+> +void free_tls_keyid(struct sock *sk)
 > +{
-> +	return should_push(sk) && !corked(tcp_sk(sk), flags);
-> +}
+> +	struct chtls_sock *csk = rcu_dereference_sk_user_data(sk);
+> +	struct net_device *dev = csk->egress_dev;
+> +	struct adapter *adap = netdev2adap(dev);
+> +	struct chtls_dev *cdev = csk->cdev;
+> +	struct chtls_hws *hws = &csk->tlshws;
 
-If it returns true, I guess it should be a bool.
+Same here.
+
+> [...]
+>
+> +static int chtls_key_info(struct chtls_sock *csk,
+> +			  struct _key_ctx *kctx,
+> +			  u32 keylen, u32 optname)
+> +{
+> +	unsigned char key[CHCR_KEYCTX_CIPHER_KEY_SIZE_256];
+> +	struct crypto_cipher *cipher;
+> +	struct tls12_crypto_info_aes_gcm_128 *gcm_ctx =
+> +		(struct tls12_crypto_info_aes_gcm_128 *)
+> +		&csk->tlshws.crypto_info;
+> +	unsigned char ghash_h[AEAD_H_SIZE];
+> +	int ck_size, key_ctx_size;
+> +	int ret;
+
+Same here.
+
+> [...]
+>
+> +int chtls_setkey(struct chtls_sock *csk, u32 keylen, u32 optname)
+> +{
+> +	struct chtls_dev *cdev = csk->cdev;
+> +	struct sock *sk = csk->sk;
+> +	struct tls_key_req *kwr;
+> +	struct _key_ctx *kctx;
+> +	struct sk_buff *skb;
+> +	int wrlen, klen, len;
+> +	int keyid;
+> +	int kaddr;
+> +	int ret = 0;
+
+Same here.
 
 > [...]
 
