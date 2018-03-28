@@ -1,227 +1,63 @@
-From: Varsha Rao <rvarsha016@gmail.com>
-Subject: [PATCH] crypto: cavium: zip: Remove unnecessary parentheses
-Date: Wed, 28 Mar 2018 23:27:36 +0530
-Message-ID: <20180328175736.17360-1-rvarsha016@gmail.com>
-Cc: Varsha Rao <rvarsha016@gmail.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
+From: Eric Biggers <ebiggers@google.com>
+Subject: [PATCH] sunrpc: remove incorrect HMAC request initialization
+Date: Wed, 28 Mar 2018 10:57:22 -0700
+Message-ID: <20180328175722.193355-1-ebiggers@google.com>
+Cc: netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Michael Young <m.a.young@durham.ac.uk>,
+        Eric Biggers <ebiggers@google.com>, stable@vger.kernel.org
+To: Trond Myklebust <trond.myklebust@primarydata.com>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Jeff Layton <jlayton@kernel.org>, linux-nfs@vger.kernel.org
+Return-path: <netdev-owner@vger.kernel.org>
+Sender: netdev-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This patch fixes the clang warning of extraneous parentheses, with the
-following coccinelle script.
+make_checksum_hmac_md5() is allocating an HMAC transform and doing
+crypto API calls in the following order:
 
-@@
-identifier i;
-constant c;
-@@
-(
--((i == c))
-+i == c
-|
--((i <= c))
-+i <= c
-)
+    crypto_ahash_init()
+    crypto_ahash_setkey()
+    crypto_ahash_digest()
 
-Signed-off-by: Varsha Rao <rvarsha016@gmail.com>
+This is wrong because it makes no sense to init() the request before a
+key has been set, given that the initial state depends on the key.  And
+digest() is short for init() + update() + final(), so in this case
+there's no need to explicitly call init() at all.
+
+Before commit 9fa68f620041 ("crypto: hash - prevent using keyed hashes
+without setting key") the extra init() had no real effect, at least for
+the software HMAC implementation.  (There are also hardware drivers that
+implement HMAC-MD5, and it's not immediately obvious how gracefully they
+handle init() before setkey().)  But now the crypto API detects this
+incorrect initialization and returns -ENOKEY.  This is breaking NFS
+mounts in some cases.
+
+Fix it by removing the incorrect call to crypto_ahash_init().
+
+Reported-by: Michael Young <m.a.young@durham.ac.uk>
+Fixes: 9fa68f620041 ("crypto: hash - prevent using keyed hashes without setting key")
+Fixes: fffdaef2eb4a ("gss_krb5: Add support for rc4-hmac encryption")
+Cc: stable@vger.kernel.org
+Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- drivers/crypto/cavium/zip/zip_regs.h | 42 ++++++++++++++++++------------------
- 1 file changed, 21 insertions(+), 21 deletions(-)
+ net/sunrpc/auth_gss/gss_krb5_crypto.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-diff --git a/drivers/crypto/cavium/zip/zip_regs.h b/drivers/crypto/cavium/zip/zip_regs.h
-index d0be682305c1..874e0236c87e 100644
---- a/drivers/crypto/cavium/zip/zip_regs.h
-+++ b/drivers/crypto/cavium/zip/zip_regs.h
-@@ -443,7 +443,7 @@ union zip_corex_bist_status {
+diff --git a/net/sunrpc/auth_gss/gss_krb5_crypto.c b/net/sunrpc/auth_gss/gss_krb5_crypto.c
+index 12649c9fedab..8654494b4d0a 100644
+--- a/net/sunrpc/auth_gss/gss_krb5_crypto.c
++++ b/net/sunrpc/auth_gss/gss_krb5_crypto.c
+@@ -237,9 +237,6 @@ make_checksum_hmac_md5(struct krb5_ctx *kctx, char *header, int hdrlen,
  
- static inline u64 ZIP_COREX_BIST_STATUS(u64 param1)
- {
--	if (((param1 <= 1)))
-+	if (param1 <= 1)
- 		return 0x0520ull + (param1 & 1) * 0x8ull;
- 	pr_err("ZIP_COREX_BIST_STATUS: %llu\n", param1);
- 	return 0;
-@@ -537,7 +537,7 @@ union zip_dbg_corex_inst {
+ 	ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_SLEEP, NULL, NULL);
  
- static inline u64 ZIP_DBG_COREX_INST(u64 param1)
- {
--	if (((param1 <= 1)))
-+	if (param1 <= 1)
- 		return 0x0640ull + (param1 & 1) * 0x8ull;
- 	pr_err("ZIP_DBG_COREX_INST: %llu\n", param1);
- 	return 0;
-@@ -568,7 +568,7 @@ union zip_dbg_corex_sta {
- 
- static inline u64 ZIP_DBG_COREX_STA(u64 param1)
- {
--	if (((param1 <= 1)))
-+	if (param1 <= 1)
- 		return 0x0680ull + (param1 & 1) * 0x8ull;
- 	pr_err("ZIP_DBG_COREX_STA: %llu\n", param1);
- 	return 0;
-@@ -599,7 +599,7 @@ union zip_dbg_quex_sta {
- 
- static inline u64 ZIP_DBG_QUEX_STA(u64 param1)
- {
--	if (((param1 <= 7)))
-+	if (param1 <= 7)
- 		return 0x1800ull + (param1 & 7) * 0x8ull;
- 	pr_err("ZIP_DBG_QUEX_STA: %llu\n", param1);
- 	return 0;
-@@ -817,7 +817,7 @@ union zip_msix_pbax {
- 
- static inline u64 ZIP_MSIX_PBAX(u64 param1)
- {
--	if (((param1 == 0)))
-+	if (param1 == 0)
- 		return 0x0000838000FF0000ull;
- 	pr_err("ZIP_MSIX_PBAX: %llu\n", param1);
- 	return 0;
-@@ -846,7 +846,7 @@ union zip_msix_vecx_addr {
- 
- static inline u64 ZIP_MSIX_VECX_ADDR(u64 param1)
- {
--	if (((param1 <= 17)))
-+	if (param1 <= 17)
- 		return 0x0000838000F00000ull + (param1 & 31) * 0x10ull;
- 	pr_err("ZIP_MSIX_VECX_ADDR: %llu\n", param1);
- 	return 0;
-@@ -875,7 +875,7 @@ union zip_msix_vecx_ctl {
- 
- static inline u64 ZIP_MSIX_VECX_CTL(u64 param1)
- {
--	if (((param1 <= 17)))
-+	if (param1 <= 17)
- 		return 0x0000838000F00008ull + (param1 & 31) * 0x10ull;
- 	pr_err("ZIP_MSIX_VECX_CTL: %llu\n", param1);
- 	return 0;
-@@ -900,7 +900,7 @@ union zip_quex_done {
- 
- static inline u64 ZIP_QUEX_DONE(u64 param1)
- {
--	if (((param1 <= 7)))
-+	if (param1 <= 7)
- 		return 0x2000ull + (param1 & 7) * 0x8ull;
- 	pr_err("ZIP_QUEX_DONE: %llu\n", param1);
- 	return 0;
-@@ -925,7 +925,7 @@ union zip_quex_done_ack {
- 
- static inline u64 ZIP_QUEX_DONE_ACK(u64 param1)
- {
--	if (((param1 <= 7)))
-+	if (param1 <= 7)
- 		return 0x2200ull + (param1 & 7) * 0x8ull;
- 	pr_err("ZIP_QUEX_DONE_ACK: %llu\n", param1);
- 	return 0;
-@@ -950,7 +950,7 @@ union zip_quex_done_ena_w1c {
- 
- static inline u64 ZIP_QUEX_DONE_ENA_W1C(u64 param1)
- {
--	if (((param1 <= 7)))
-+	if (param1 <= 7)
- 		return 0x2600ull + (param1 & 7) * 0x8ull;
- 	pr_err("ZIP_QUEX_DONE_ENA_W1C: %llu\n", param1);
- 	return 0;
-@@ -975,7 +975,7 @@ union zip_quex_done_ena_w1s {
- 
- static inline u64 ZIP_QUEX_DONE_ENA_W1S(u64 param1)
- {
--	if (((param1 <= 7)))
-+	if (param1 <= 7)
- 		return 0x2400ull + (param1 & 7) * 0x8ull;
- 	pr_err("ZIP_QUEX_DONE_ENA_W1S: %llu\n", param1);
- 	return 0;
-@@ -1004,7 +1004,7 @@ union zip_quex_done_wait {
- 
- static inline u64 ZIP_QUEX_DONE_WAIT(u64 param1)
- {
--	if (((param1 <= 7)))
-+	if (param1 <= 7)
- 		return 0x2800ull + (param1 & 7) * 0x8ull;
- 	pr_err("ZIP_QUEX_DONE_WAIT: %llu\n", param1);
- 	return 0;
-@@ -1029,7 +1029,7 @@ union zip_quex_doorbell {
- 
- static inline u64 ZIP_QUEX_DOORBELL(u64 param1)
- {
--	if (((param1 <= 7)))
-+	if (param1 <= 7)
- 		return 0x4000ull + (param1 & 7) * 0x8ull;
- 	pr_err("ZIP_QUEX_DOORBELL: %llu\n", param1);
- 	return 0;
-@@ -1058,7 +1058,7 @@ union zip_quex_err_ena_w1c {
- 
- static inline u64 ZIP_QUEX_ERR_ENA_W1C(u64 param1)
- {
--	if (((param1 <= 7)))
-+	if (param1 <= 7)
- 		return 0x3600ull + (param1 & 7) * 0x8ull;
- 	pr_err("ZIP_QUEX_ERR_ENA_W1C: %llu\n", param1);
- 	return 0;
-@@ -1087,7 +1087,7 @@ union zip_quex_err_ena_w1s {
- 
- static inline u64 ZIP_QUEX_ERR_ENA_W1S(u64 param1)
- {
--	if (((param1 <= 7)))
-+	if (param1 <= 7)
- 		return 0x3400ull + (param1 & 7) * 0x8ull;
- 	pr_err("ZIP_QUEX_ERR_ENA_W1S: %llu\n", param1);
- 	return 0;
-@@ -1120,7 +1120,7 @@ union zip_quex_err_int {
- 
- static inline u64 ZIP_QUEX_ERR_INT(u64 param1)
- {
--	if (((param1 <= 7)))
-+	if (param1 <= 7)
- 		return 0x3000ull + (param1 & 7) * 0x8ull;
- 	pr_err("ZIP_QUEX_ERR_INT: %llu\n", param1);
- 	return 0;
-@@ -1150,7 +1150,7 @@ union zip_quex_err_int_w1s {
- 
- static inline u64 ZIP_QUEX_ERR_INT_W1S(u64 param1)
- {
--	if (((param1 <= 7)))
-+	if (param1 <= 7)
- 		return 0x3200ull + (param1 & 7) * 0x8ull;
- 	pr_err("ZIP_QUEX_ERR_INT_W1S: %llu\n", param1);
- 	return 0;
-@@ -1179,7 +1179,7 @@ union zip_quex_gcfg {
- 
- static inline u64 ZIP_QUEX_GCFG(u64 param1)
- {
--	if (((param1 <= 7)))
-+	if (param1 <= 7)
- 		return 0x1A00ull + (param1 & 7) * 0x8ull;
- 	pr_err("ZIP_QUEX_GCFG: %llu\n", param1);
- 	return 0;
-@@ -1204,7 +1204,7 @@ union zip_quex_map {
- 
- static inline u64 ZIP_QUEX_MAP(u64 param1)
- {
--	if (((param1 <= 7)))
-+	if (param1 <= 7)
- 		return 0x1400ull + (param1 & 7) * 0x8ull;
- 	pr_err("ZIP_QUEX_MAP: %llu\n", param1);
- 	return 0;
-@@ -1236,7 +1236,7 @@ union zip_quex_sbuf_addr {
- 
- static inline u64 ZIP_QUEX_SBUF_ADDR(u64 param1)
- {
--	if (((param1 <= 7)))
-+	if (param1 <= 7)
- 		return 0x1000ull + (param1 & 7) * 0x8ull;
- 	pr_err("ZIP_QUEX_SBUF_ADDR: %llu\n", param1);
- 	return 0;
-@@ -1276,7 +1276,7 @@ union zip_quex_sbuf_ctl {
- 
- static inline u64 ZIP_QUEX_SBUF_CTL(u64 param1)
- {
--	if (((param1 <= 7)))
-+	if (param1 <= 7)
- 		return 0x1200ull + (param1 & 7) * 0x8ull;
- 	pr_err("ZIP_QUEX_SBUF_CTL: %llu\n", param1);
- 	return 0;
+-	err = crypto_ahash_init(req);
+-	if (err)
+-		goto out;
+ 	err = crypto_ahash_setkey(hmac_md5, cksumkey, kctx->gk5e->keylength);
+ 	if (err)
+ 		goto out;
 -- 
-2.14.3
+2.17.0.rc1.321.gba9d0f2565-goog
