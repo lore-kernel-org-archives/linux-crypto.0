@@ -1,11 +1,10 @@
 From: Atul Gupta <atul.gupta@chelsio.com>
-Subject: Re: [PATCH v13 net-next 08/12] crypto : chtls - CPL handler
- definition
-Date: Wed, 28 Mar 2018 09:09:02 +0530
-Message-ID: <79b15c57-bacf-ef25-f1e4-6ddde7e405ec@chelsio.com>
+Subject: Re: [PATCH v13 net-next 01/12] tls: support for Inline tls record
+Date: Wed, 28 Mar 2018 09:58:13 +0530
+Message-ID: <98239186-d43f-a050-61e4-b343bbb2b825@chelsio.com>
 References: <1522172201-7629-1-git-send-email-atul.gupta@chelsio.com>
- <1522172201-7629-9-git-send-email-atul.gupta@chelsio.com>
- <20180327194206.36094fed@epycfail>
+ <1522172201-7629-2-git-send-email-atul.gupta@chelsio.com>
+ <20180327202329.6d0d8896@epycfail>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
@@ -17,28 +16,65 @@ Cc: davem@davemloft.net, herbert@gondor.apana.org.au,
         ganeshgr@chelsio.com
 To: Stefano Brivio <sbrivio@redhat.com>
 Return-path: <netdev-owner@vger.kernel.org>
-In-Reply-To: <20180327194206.36094fed@epycfail>
+In-Reply-To: <20180327202329.6d0d8896@epycfail>
 Content-Language: en-US
 Sender: netdev-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
 
 
-On 3/27/2018 11:12 PM, Stefano Brivio wrote:
-> On Tue, 27 Mar 2018 23:06:37 +0530
+On 3/27/2018 11:53 PM, Stefano Brivio wrote:
+> On Tue, 27 Mar 2018 23:06:30 +0530
 > Atul Gupta <atul.gupta@chelsio.com> wrote:
 >
->> Exchange messages with hardware to program the TLS session
->> CPL handlers for messages received from chip.
+>> +static struct tls_context *create_ctx(struct sock *sk)
+>> +{
+>> +	struct inet_connection_sock *icsk = inet_csk(sk);
+>> +	struct tls_context *ctx;
+>> +
+>> +	/* allocate tls context */
+>> +	ctx = kzalloc(sizeof(*ctx), GFP_KERNEL);
+>> +	if (!ctx)
+>> +		return NULL;
+>> +
+>> +	icsk->icsk_ulp_data = ctx;
+>> +	return ctx;
+>> +}
 >>
->> Signed-off-by: Atul Gupta <atul.gupta@chelsio.com>
->> Signed-off-by: Michael Werner <werner@chelsio.com>
->> Reviewed-by: Sabrina Dubroca <sdubroca@redhat.com>
->> Reviewed-by: Stefano Brivio <sbrivio@redhat.com>
-> No, I haven't.
-Stefano,
-I was not clear on protocol for reviewed-by tag, I want to acknowledge the feedback
-you have provided to code so far. Will remove this.
-Thanks
-Atul
+>> [...]
+>>
+>>  static int tls_init(struct sock *sk)
+>>  {
+>>  	int ip_ver = sk->sk_family == AF_INET6 ? TLSV6 : TLSV4;
+>> -	struct inet_connection_sock *icsk = inet_csk(sk);
+>>  	struct tls_context *ctx;
+>>  	int rc = 0;
+>>  
+>> +	if (tls_hw_prot(sk))
+>> +		goto out;
+>> +
+>>  	/* The TLS ulp is currently supported only for TCP sockets
+>>  	 * in ESTABLISHED state.
+>>  	 * Supporting sockets in LISTEN state will require us
+>> @@ -530,12 +624,11 @@ static int tls_init(struct sock *sk)
+>>  		return -ENOTSUPP;
+>>  
+>>  	/* allocate tls context */
+>> -	ctx = kzalloc(sizeof(*ctx), GFP_KERNEL);
+>> +	ctx = create_ctx(sk);
+>>  	if (!ctx) {
+>>  		rc = -ENOMEM;
+>>  		goto out;
+>>  	}
+>> -	icsk->icsk_ulp_data = ctx;
+> Why are you changing this?
+since create_ctx is called at two place it is assigned in allocating function than duplicate the assignment.
+>
+> This is now equivalent to the original implementation, except that you
+> are "hiding" the assignment of icsk->icsk_ulp_data into a function named
+> "create_ctx".
+>
+> Please also note that you are duplicating the "allocate tls context"
+> comment.
+will remove this comment.
 >
