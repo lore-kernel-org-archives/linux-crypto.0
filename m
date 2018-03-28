@@ -1,90 +1,34 @@
-From: Stefan Agner <stefan@agner.ch>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [RFC PATCH] crypto: brcm - explicitly cast cipher to hash type
-Date: Wed, 28 Mar 2018 17:41:30 +0200
-Message-ID: <a25ba0afb4cdf8f43b64421995196dee@agner.ch>
+Date: Wed, 28 Mar 2018 23:45:05 +0800
+Message-ID: <20180328154505.GA19057@gondor.apana.org.au>
 References: <20180324110242.9474-1-stefan@agner.ch>
  <CAAFb_vrFF6D8DEvnZMDda-qd-jTh3mKt0BgGBJ5eWxydY1LEXA@mail.gmail.com>
+ <a25ba0afb4cdf8f43b64421995196dee@agner.ch>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: "David S. Miller" <davem@davemloft.net>, clabbe.montjoie@gmail.com,
+Content-Type: text/plain; charset=us-ascii
+Cc: Raveendra Padasalagi <raveendra.padasalagi@broadcom.com>,
+        "David S. Miller" <davem@davemloft.net>, clabbe.montjoie@gmail.com,
         Scott Branden <scott.branden@broadcom.com>,
         Steven Lin <steven.lin1@broadcom.com>, garsilva@embeddedor.com,
         pravin.shedge4linux@gmail.com, linux-crypto@vger.kernel.org,
         linux-kernel@vger.kernel.org
-To: Raveendra Padasalagi <raveendra.padasalagi@broadcom.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
+To: Stefan Agner <stefan@agner.ch>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAAFb_vrFF6D8DEvnZMDda-qd-jTh3mKt0BgGBJ5eWxydY1LEXA@mail.gmail.com>
+Content-Disposition: inline
+In-Reply-To: <a25ba0afb4cdf8f43b64421995196dee@agner.ch>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 28.03.2018 08:38, Raveendra Padasalagi wrote:
-> Hi Stefan,
-> 
-> The change looks to be fine.  From the IP point of view its using the
-> same values in case of AES cipher and hash types so explicit casting
-> should be ok.
+On Wed, Mar 28, 2018 at 05:41:30PM +0200, Stefan Agner wrote:
+>
+> Herbert, given that Raveendra agrees to the change, do you want me to
+> send a non-RFC version or can you merge the patch as is?
 
-Can I take that as an Ack?
+There is no need to resend it.
 
-Herbert, given that Raveendra agrees to the change, do you want me to
-send a non-RFC version or can you merge the patch as is?
-
---
-Stefan
-
-
-> 
-> -Raveendra
-> 
-> On Sat, Mar 24, 2018 at 4:32 PM, Stefan Agner <stefan@agner.ch> wrote:
->> In the AES cases enum spu_cipher_type and enum hash_type have
->> the same values, so the assignment is fine. Explicitly cast
->> the enum type conversion.
->>
->> This fixes two warnings when building with clang:
->>   drivers/crypto/bcm/cipher.c:821:34: warning: implicit conversion from
->>       enumeration type 'enum spu_cipher_type' to different enumeration
->>       type 'enum hash_type' [-Wenum-conversion]
->>                 hash_parms.type = cipher_parms.type;
->>                                 ~ ~~~~~~~~~~~~~^~~~
->>   drivers/crypto/bcm/cipher.c:1412:26: warning: implicit conversion from
->>       enumeration type 'enum spu_cipher_type' to different enumeration
->>       type 'enum hash_type' [-Wenum-conversion]
->>                 hash_parms.type = ctx->cipher_type;
->>                                 ~ ~~~~~^~~~~~~~~~~
->>
->> Signed-off-by: Stefan Agner <stefan@agner.ch>
->> ---
->> I am not familar with the IP... I would be glad if somebody with
->> better insight could have a look whether that patch makes sense.
->>
->>  drivers/crypto/bcm/cipher.c | 4 ++--
->>  1 file changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/drivers/crypto/bcm/cipher.c b/drivers/crypto/bcm/cipher.c
->> index 2b75f95bbe1b..309c67c7012f 100644
->> --- a/drivers/crypto/bcm/cipher.c
->> +++ b/drivers/crypto/bcm/cipher.c
->> @@ -818,7 +818,7 @@ static int handle_ahash_req(struct iproc_reqctx_s *rctx)
->>
->>         /* AES hashing keeps key size in type field, so need to copy it here */
->>         if (hash_parms.alg == HASH_ALG_AES)
->> -               hash_parms.type = cipher_parms.type;
->> +               hash_parms.type = (enum hash_type)cipher_parms.type;
->>         else
->>                 hash_parms.type = spu->spu_hash_type(rctx->total_sent);
->>
->> @@ -1409,7 +1409,7 @@ static int handle_aead_req(struct iproc_reqctx_s *rctx)
->>                                                 rctx->iv_ctr_len);
->>
->>         if (ctx->auth.alg == HASH_ALG_AES)
->> -               hash_parms.type = ctx->cipher_type;
->> +               hash_parms.type = (enum hash_type)ctx->cipher_type;
->>
->>         /* General case AAD padding (CCM and RFC4543 special cases below) */
->>         aead_parms.aad_pad_len = spu->spu_gcm_ccm_pad_len(ctx->cipher.mode,
->> --
->> 2.16.2
->>
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
