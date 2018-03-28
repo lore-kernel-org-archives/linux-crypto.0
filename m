@@ -1,77 +1,118 @@
-From: Raveendra Padasalagi <raveendra.padasalagi@broadcom.com>
-Subject: Re: [RFC PATCH] crypto: brcm - explicitly cast cipher to hash type
-Date: Wed, 28 Mar 2018 12:08:24 +0530
-Message-ID: <CAAFb_vrFF6D8DEvnZMDda-qd-jTh3mKt0BgGBJ5eWxydY1LEXA@mail.gmail.com>
-References: <20180324110242.9474-1-stefan@agner.ch>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>, clabbe.montjoie@gmail.com,
-        Scott Branden <scott.branden@broadcom.com>,
-        Steven Lin <steven.lin1@broadcom.com>, garsilva@embeddedor.com,
-        pravin.shedge4linux@gmail.com, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-To: Stefan Agner <stefan@agner.ch>
+From: Jan Glauber <jglauber@cavium.com>
+Subject: [PATCH 1/2] crypto: thunderx_zip: Fix fallout from CONFIG_VMAP_STACK
+Date: Wed, 28 Mar 2018 15:05:56 +0200
+Message-ID: <20180328130557.10560-1-jglauber@cavium.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Mahipal Challa <Mahipal.Challa@cavium.com>,
+        Robert Richter <rrichter@cavium.com>,
+        Jan Glauber <jglauber@cavium.com>,
+        stable <stable@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180324110242.9474-1-stefan@agner.ch>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi Stefan,
+Enabling virtual mapped kernel stacks breaks the thunderx_zip
+driver. On compression or decompression the executing CPU hangs
+in an endless loop. The reason for this is the usage of __pa
+by the driver which does no longer work for an address that is
+not part of the 1:1 mapping.
 
-The change looks to be fine.  From the IP point of view its using the
-same values in case of AES cipher and hash types so explicit casting
-should be ok.
+The zip driver allocates a result struct on the stack and needs
+to tell the hardware the physical address within this struct
+that is used to signal the completion of the request.
 
--Raveendra
+As the hardware gets the wrong address after the broken __pa
+conversion it writes to an arbitrary address. The zip driver then
+waits forever for the completion byte to contain a non-zero value.
 
-On Sat, Mar 24, 2018 at 4:32 PM, Stefan Agner <stefan@agner.ch> wrote:
-> In the AES cases enum spu_cipher_type and enum hash_type have
-> the same values, so the assignment is fine. Explicitly cast
-> the enum type conversion.
->
-> This fixes two warnings when building with clang:
->   drivers/crypto/bcm/cipher.c:821:34: warning: implicit conversion from
->       enumeration type 'enum spu_cipher_type' to different enumeration
->       type 'enum hash_type' [-Wenum-conversion]
->                 hash_parms.type = cipher_parms.type;
->                                 ~ ~~~~~~~~~~~~~^~~~
->   drivers/crypto/bcm/cipher.c:1412:26: warning: implicit conversion from
->       enumeration type 'enum spu_cipher_type' to different enumeration
->       type 'enum hash_type' [-Wenum-conversion]
->                 hash_parms.type = ctx->cipher_type;
->                                 ~ ~~~~~^~~~~~~~~~~
->
-> Signed-off-by: Stefan Agner <stefan@agner.ch>
-> ---
-> I am not familar with the IP... I would be glad if somebody with
-> better insight could have a look whether that patch makes sense.
->
->  drivers/crypto/bcm/cipher.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/drivers/crypto/bcm/cipher.c b/drivers/crypto/bcm/cipher.c
-> index 2b75f95bbe1b..309c67c7012f 100644
-> --- a/drivers/crypto/bcm/cipher.c
-> +++ b/drivers/crypto/bcm/cipher.c
-> @@ -818,7 +818,7 @@ static int handle_ahash_req(struct iproc_reqctx_s *rctx)
->
->         /* AES hashing keeps key size in type field, so need to copy it here */
->         if (hash_parms.alg == HASH_ALG_AES)
-> -               hash_parms.type = cipher_parms.type;
-> +               hash_parms.type = (enum hash_type)cipher_parms.type;
->         else
->                 hash_parms.type = spu->spu_hash_type(rctx->total_sent);
->
-> @@ -1409,7 +1409,7 @@ static int handle_aead_req(struct iproc_reqctx_s *rctx)
->                                                 rctx->iv_ctr_len);
->
->         if (ctx->auth.alg == HASH_ALG_AES)
-> -               hash_parms.type = ctx->cipher_type;
-> +               hash_parms.type = (enum hash_type)ctx->cipher_type;
->
->         /* General case AAD padding (CCM and RFC4543 special cases below) */
->         aead_parms.aad_pad_len = spu->spu_gcm_ccm_pad_len(ctx->cipher.mode,
-> --
-> 2.16.2
->
+Allocating the result struct from 1:1 mapped memory resolves this
+bug.
+
+Signed-off-by: Jan Glauber <jglauber@cavium.com>
+Reviewed-by: Robert Richter <rrichter@cavium.com>
+Cc: stable <stable@vger.kernel.org> # 4.14
+---
+ drivers/crypto/cavium/zip/zip_crypto.c | 22 ++++++++++++++--------
+ 1 file changed, 14 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/crypto/cavium/zip/zip_crypto.c b/drivers/crypto/cavium/zip/zip_crypto.c
+index 8df4d26..2fc9b03 100644
+--- a/drivers/crypto/cavium/zip/zip_crypto.c
++++ b/drivers/crypto/cavium/zip/zip_crypto.c
+@@ -124,7 +124,7 @@ int zip_compress(const u8 *src, unsigned int slen,
+ 		 struct zip_kernel_ctx *zip_ctx)
+ {
+ 	struct zip_operation  *zip_ops   = NULL;
+-	struct zip_state      zip_state;
++	struct zip_state      *zip_state;
+ 	struct zip_device     *zip = NULL;
+ 	int ret;
+ 
+@@ -135,20 +135,23 @@ int zip_compress(const u8 *src, unsigned int slen,
+ 	if (!zip)
+ 		return -ENODEV;
+ 
+-	memset(&zip_state, 0, sizeof(struct zip_state));
++	zip_state = kzalloc(sizeof(*zip_state), GFP_KERNEL);
++	if (!zip_state)
++		return -ENOMEM;
++
+ 	zip_ops = &zip_ctx->zip_comp;
+ 
+ 	zip_ops->input_len  = slen;
+ 	zip_ops->output_len = *dlen;
+ 	memcpy(zip_ops->input, src, slen);
+ 
+-	ret = zip_deflate(zip_ops, &zip_state, zip);
++	ret = zip_deflate(zip_ops, zip_state, zip);
+ 
+ 	if (!ret) {
+ 		*dlen = zip_ops->output_len;
+ 		memcpy(dst, zip_ops->output, *dlen);
+ 	}
+-
++	kfree(zip_state);
+ 	return ret;
+ }
+ 
+@@ -157,7 +160,7 @@ int zip_decompress(const u8 *src, unsigned int slen,
+ 		   struct zip_kernel_ctx *zip_ctx)
+ {
+ 	struct zip_operation  *zip_ops   = NULL;
+-	struct zip_state      zip_state;
++	struct zip_state      *zip_state;
+ 	struct zip_device     *zip = NULL;
+ 	int ret;
+ 
+@@ -168,7 +171,10 @@ int zip_decompress(const u8 *src, unsigned int slen,
+ 	if (!zip)
+ 		return -ENODEV;
+ 
+-	memset(&zip_state, 0, sizeof(struct zip_state));
++	zip_state = kzalloc(sizeof(*zip_state), GFP_KERNEL);
++	if (!zip_state)
++		return -ENOMEM;
++
+ 	zip_ops = &zip_ctx->zip_decomp;
+ 	memcpy(zip_ops->input, src, slen);
+ 
+@@ -179,13 +185,13 @@ int zip_decompress(const u8 *src, unsigned int slen,
+ 	zip_ops->input_len  = slen;
+ 	zip_ops->output_len = *dlen;
+ 
+-	ret = zip_inflate(zip_ops, &zip_state, zip);
++	ret = zip_inflate(zip_ops, zip_state, zip);
+ 
+ 	if (!ret) {
+ 		*dlen = zip_ops->output_len;
+ 		memcpy(dst, zip_ops->output, *dlen);
+ 	}
+-
++	kfree(zip_state);
+ 	return ret;
+ }
+ 
+-- 
+2.7.4
