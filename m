@@ -1,108 +1,55 @@
-From: Jan Glauber <jglauber@cavium.com>
-Subject: [PATCH 2/2] crypto: thunderx_zip: Limit result reading attempts
-Date: Wed, 28 Mar 2018 15:05:57 +0200
-Message-ID: <20180328130557.10560-2-jglauber@cavium.com>
-References: <20180328130557.10560-1-jglauber@cavium.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Mahipal Challa <Mahipal.Challa@cavium.com>,
-        Robert Richter <rrichter@cavium.com>,
-        Jan Glauber <jglauber@cavium.com>,
-        stable <stable@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH] crypto: chelsio: move chcr_ahash_continue declation out of header
+Date: Wed, 28 Mar 2018 16:05:23 +0200
+Message-ID: <20180328140539.2694734-1-arnd@arndb.de>
+Cc: Arnd Bergmann <arnd@arndb.de>,
+        Ganesh Goudar <ganeshgr@chelsio.com>,
+        Atul Gupta <atul.gupta@chelsio.com>,
+        Yeshaswi M R Gowda <yeshaswi@chelsio.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Harsh Jain <harsh@chelsio.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180328130557.10560-1-jglauber@cavium.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-After issuing a request an endless loop was used to read the
-completion state from memory which is asynchronously updated
-by the ZIP coprocessor.
+static function declarations don't belong in a header file, as shown
+by this compiler warning:
 
-Add an upper bound to the retry attempts to prevent a CPU getting stuck
-forever in case of an error. Additionally, add a read memory barrier
-and a small delay between the reading attempts.
+In file included from /git/arm-soc/drivers/crypto/chelsio/chcr_ipsec.c:66:
+drivers/crypto/chelsio/chcr_crypto.h:343:12: error: 'chcr_ahash_continue' declared 'static' but never defined [-Werror=unused-function]
 
-Signed-off-by: Jan Glauber <jglauber@cavium.com>
-Reviewed-by: Robert Richter <rrichter@cavium.com>
-Cc: stable <stable@vger.kernel.org> # 4.14
+This moves the declaration into the file that actually needs it.
+
+Fixes: 5110e65536f3 ("crypto: chelsio -Split Hash requests for large scatter gather list")
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
- drivers/crypto/cavium/zip/common.h      | 22 ++++++++++++++++++++++
- drivers/crypto/cavium/zip/zip_deflate.c |  4 ++--
- drivers/crypto/cavium/zip/zip_inflate.c |  4 ++--
- 3 files changed, 26 insertions(+), 4 deletions(-)
+ drivers/crypto/chelsio/chcr_algo.c   | 1 +
+ drivers/crypto/chelsio/chcr_crypto.h | 1 -
+ 2 files changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/cavium/zip/common.h b/drivers/crypto/cavium/zip/common.h
-index dc451e0..9067451 100644
---- a/drivers/crypto/cavium/zip/common.h
-+++ b/drivers/crypto/cavium/zip/common.h
-@@ -46,8 +46,10 @@
- #ifndef __COMMON_H__
- #define __COMMON_H__
+diff --git a/drivers/crypto/chelsio/chcr_algo.c b/drivers/crypto/chelsio/chcr_algo.c
+index 4617c7acf4da..ebc96f2fae01 100644
+--- a/drivers/crypto/chelsio/chcr_algo.c
++++ b/drivers/crypto/chelsio/chcr_algo.c
+@@ -95,6 +95,7 @@ static u32 round_constant[11] = {
  
-+#include <linux/delay.h>
- #include <linux/init.h>
- #include <linux/interrupt.h>
-+#include <linux/io.h>
- #include <linux/kernel.h>
- #include <linux/module.h>
- #include <linux/pci.h>
-@@ -149,6 +151,26 @@ struct zip_operation {
- 	u32   sizeofzops;
- };
+ static int chcr_handle_cipher_resp(struct ablkcipher_request *req,
+ 				   unsigned char *input, int err);
++static int chcr_ahash_continue(struct ahash_request *req);
  
-+#define ZIP_POLL_DELAY 20 /* microseconds */
-+#define ZIP_POLL_TIMEOUT (msecs_to_jiffies(1000))
-+
-+static inline int zip_poll_result(union zip_zres_s *result)
-+{
-+	u64 end = get_jiffies_64() + ZIP_POLL_TIMEOUT;
-+
-+	while (!result->s.compcode) {
-+		/*
-+		 * Force re-reading of compcode which is updated
-+		 * by the ZIP coprocessor.
-+		 */
-+		rmb();
-+		if (time_after64(get_jiffies_64(), end))
-+			return -ETIMEDOUT;
-+		usleep_range(ZIP_POLL_DELAY / 2, ZIP_POLL_DELAY);
-+	}
-+	return 0;
-+}
-+
- /* error messages */
- #define zip_err(fmt, args...) pr_err("ZIP ERR:%s():%d: " \
- 			      fmt "\n", __func__, __LINE__, ## args)
-diff --git a/drivers/crypto/cavium/zip/zip_deflate.c b/drivers/crypto/cavium/zip/zip_deflate.c
-index 9a944b8..d7133f8 100644
---- a/drivers/crypto/cavium/zip/zip_deflate.c
-+++ b/drivers/crypto/cavium/zip/zip_deflate.c
-@@ -129,8 +129,8 @@ int zip_deflate(struct zip_operation *zip_ops, struct zip_state *s,
- 	/* Stats update for compression requests submitted */
- 	atomic64_inc(&zip_dev->stats.comp_req_submit);
- 
--	while (!result_ptr->s.compcode)
--		continue;
-+	/* Wait for completion or error */
-+	zip_poll_result(result_ptr);
- 
- 	/* Stats update for compression requests completed */
- 	atomic64_inc(&zip_dev->stats.comp_req_complete);
-diff --git a/drivers/crypto/cavium/zip/zip_inflate.c b/drivers/crypto/cavium/zip/zip_inflate.c
-index 50cbdd8..7e0d73e 100644
---- a/drivers/crypto/cavium/zip/zip_inflate.c
-+++ b/drivers/crypto/cavium/zip/zip_inflate.c
-@@ -143,8 +143,8 @@ int zip_inflate(struct zip_operation *zip_ops, struct zip_state *s,
- 	/* Decompression requests submitted stats update */
- 	atomic64_inc(&zip_dev->stats.decomp_req_submit);
- 
--	while (!result_ptr->s.compcode)
--		continue;
-+	/* Wait for completion or error */
-+	zip_poll_result(result_ptr);
- 
- 	/* Decompression requests completed stats update */
- 	atomic64_inc(&zip_dev->stats.decomp_req_complete);
+ static inline  struct chcr_aead_ctx *AEAD_CTX(struct chcr_context *ctx)
+ {
+diff --git a/drivers/crypto/chelsio/chcr_crypto.h b/drivers/crypto/chelsio/chcr_crypto.h
+index 71025ea9c3db..c8e8972af283 100644
+--- a/drivers/crypto/chelsio/chcr_crypto.h
++++ b/drivers/crypto/chelsio/chcr_crypto.h
+@@ -340,5 +340,4 @@ void chcr_add_hash_src_ent(struct ahash_request *req, struct ulptx_sgl *ulptx,
+ 			   struct hash_wr_param *param);
+ int chcr_hash_dma_map(struct device *dev, struct ahash_request *req);
+ void chcr_hash_dma_unmap(struct device *dev, struct ahash_request *req);
+-static int chcr_ahash_continue(struct ahash_request *req);
+ #endif /* __CHCR_CRYPTO_H__ */
 -- 
-2.7.4
+2.9.0
