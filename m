@@ -1,63 +1,38 @@
-From: Eric Biggers <ebiggers@google.com>
-Subject: [PATCH] sunrpc: remove incorrect HMAC request initialization
-Date: Wed, 28 Mar 2018 10:57:22 -0700
-Message-ID: <20180328175722.193355-1-ebiggers@google.com>
-Cc: netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
+From: Joe Perches <joe@perches.com>
+Subject: Re: [PATCH] crypto: cavium: zip: Remove unnecessary parentheses
+Date: Wed, 28 Mar 2018 11:11:16 -0700
+Message-ID: <1522260676.12357.121.camel@perches.com>
+References: <20180328175736.17360-1-rvarsha016@gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="ISO-8859-1"
+Content-Transfer-Encoding: 7bit
+Cc: cocci <cocci@systeme.lip6.fr>
+To: Varsha Rao <rvarsha016@gmail.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Michael Young <m.a.young@durham.ac.uk>,
-        Eric Biggers <ebiggers@google.com>, stable@vger.kernel.org
-To: Trond Myklebust <trond.myklebust@primarydata.com>,
-        Anna Schumaker <anna.schumaker@netapp.com>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Jeff Layton <jlayton@kernel.org>, linux-nfs@vger.kernel.org
-Return-path: <netdev-owner@vger.kernel.org>
-Sender: netdev-owner@vger.kernel.org
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20180328175736.17360-1-rvarsha016@gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-make_checksum_hmac_md5() is allocating an HMAC transform and doing
-crypto API calls in the following order:
+On Wed, 2018-03-28 at 23:27 +0530, Varsha Rao wrote:
+> This patch fixes the clang warning of extraneous parentheses, with the
+> following coccinelle script.
+> 
+> @@
+> identifier i;
+> constant c;
+> @@
+> (
+> -((i == c))
+> +i == c
+> > 
+> 
+> -((i <= c))
+> +i <= c
 
-    crypto_ahash_init()
-    crypto_ahash_setkey()
-    crypto_ahash_digest()
+Why just the "==" and "<=" cases?
+Why not "<", ">" and ">=" too?
 
-This is wrong because it makes no sense to init() the request before a
-key has been set, given that the initial state depends on the key.  And
-digest() is short for init() + update() + final(), so in this case
-there's no need to explicitly call init() at all.
-
-Before commit 9fa68f620041 ("crypto: hash - prevent using keyed hashes
-without setting key") the extra init() had no real effect, at least for
-the software HMAC implementation.  (There are also hardware drivers that
-implement HMAC-MD5, and it's not immediately obvious how gracefully they
-handle init() before setkey().)  But now the crypto API detects this
-incorrect initialization and returns -ENOKEY.  This is breaking NFS
-mounts in some cases.
-
-Fix it by removing the incorrect call to crypto_ahash_init().
-
-Reported-by: Michael Young <m.a.young@durham.ac.uk>
-Fixes: 9fa68f620041 ("crypto: hash - prevent using keyed hashes without setting key")
-Fixes: fffdaef2eb4a ("gss_krb5: Add support for rc4-hmac encryption")
-Cc: stable@vger.kernel.org
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- net/sunrpc/auth_gss/gss_krb5_crypto.c | 3 ---
- 1 file changed, 3 deletions(-)
-
-diff --git a/net/sunrpc/auth_gss/gss_krb5_crypto.c b/net/sunrpc/auth_gss/gss_krb5_crypto.c
-index 12649c9fedab..8654494b4d0a 100644
---- a/net/sunrpc/auth_gss/gss_krb5_crypto.c
-+++ b/net/sunrpc/auth_gss/gss_krb5_crypto.c
-@@ -237,9 +237,6 @@ make_checksum_hmac_md5(struct krb5_ctx *kctx, char *header, int hdrlen,
- 
- 	ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_SLEEP, NULL, NULL);
- 
--	err = crypto_ahash_init(req);
--	if (err)
--		goto out;
- 	err = crypto_ahash_setkey(hmac_md5, cksumkey, kctx->gk5e->keylength);
- 	if (err)
- 		goto out;
--- 
-2.17.0.rc1.321.gba9d0f2565-goog
+Why not expression instead of constant?
