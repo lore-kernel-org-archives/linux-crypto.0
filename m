@@ -1,7 +1,8 @@
 From: Jan Glauber <jglauber@cavium.com>
-Subject: [PATCH 1/2] crypto: thunderx_zip: Fix fallout from CONFIG_VMAP_STACK
-Date: Wed, 28 Mar 2018 15:05:56 +0200
-Message-ID: <20180328130557.10560-1-jglauber@cavium.com>
+Subject: [PATCH 2/2] crypto: thunderx_zip: Limit result reading attempts
+Date: Wed, 28 Mar 2018 15:05:57 +0200
+Message-ID: <20180328130557.10560-2-jglauber@cavium.com>
+References: <20180328130557.10560-1-jglauber@cavium.com>
 Cc: "David S . Miller" <davem@davemloft.net>,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         Mahipal Challa <Mahipal.Challa@cavium.com>,
@@ -10,109 +11,98 @@ Cc: "David S . Miller" <davem@davemloft.net>,
         stable <stable@vger.kernel.org>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20180328130557.10560-1-jglauber@cavium.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Enabling virtual mapped kernel stacks breaks the thunderx_zip
-driver. On compression or decompression the executing CPU hangs
-in an endless loop. The reason for this is the usage of __pa
-by the driver which does no longer work for an address that is
-not part of the 1:1 mapping.
+After issuing a request an endless loop was used to read the
+completion state from memory which is asynchronously updated
+by the ZIP coprocessor.
 
-The zip driver allocates a result struct on the stack and needs
-to tell the hardware the physical address within this struct
-that is used to signal the completion of the request.
-
-As the hardware gets the wrong address after the broken __pa
-conversion it writes to an arbitrary address. The zip driver then
-waits forever for the completion byte to contain a non-zero value.
-
-Allocating the result struct from 1:1 mapped memory resolves this
-bug.
+Add an upper bound to the retry attempts to prevent a CPU getting stuck
+forever in case of an error. Additionally, add a read memory barrier
+and a small delay between the reading attempts.
 
 Signed-off-by: Jan Glauber <jglauber@cavium.com>
 Reviewed-by: Robert Richter <rrichter@cavium.com>
 Cc: stable <stable@vger.kernel.org> # 4.14
 ---
- drivers/crypto/cavium/zip/zip_crypto.c | 22 ++++++++++++++--------
- 1 file changed, 14 insertions(+), 8 deletions(-)
+ drivers/crypto/cavium/zip/common.h      | 22 ++++++++++++++++++++++
+ drivers/crypto/cavium/zip/zip_deflate.c |  4 ++--
+ drivers/crypto/cavium/zip/zip_inflate.c |  4 ++--
+ 3 files changed, 26 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/crypto/cavium/zip/zip_crypto.c b/drivers/crypto/cavium/zip/zip_crypto.c
-index 8df4d26..2fc9b03 100644
---- a/drivers/crypto/cavium/zip/zip_crypto.c
-+++ b/drivers/crypto/cavium/zip/zip_crypto.c
-@@ -124,7 +124,7 @@ int zip_compress(const u8 *src, unsigned int slen,
- 		 struct zip_kernel_ctx *zip_ctx)
- {
- 	struct zip_operation  *zip_ops   = NULL;
--	struct zip_state      zip_state;
-+	struct zip_state      *zip_state;
- 	struct zip_device     *zip = NULL;
- 	int ret;
+diff --git a/drivers/crypto/cavium/zip/common.h b/drivers/crypto/cavium/zip/common.h
+index dc451e0..9067451 100644
+--- a/drivers/crypto/cavium/zip/common.h
++++ b/drivers/crypto/cavium/zip/common.h
+@@ -46,8 +46,10 @@
+ #ifndef __COMMON_H__
+ #define __COMMON_H__
  
-@@ -135,20 +135,23 @@ int zip_compress(const u8 *src, unsigned int slen,
- 	if (!zip)
- 		return -ENODEV;
++#include <linux/delay.h>
+ #include <linux/init.h>
+ #include <linux/interrupt.h>
++#include <linux/io.h>
+ #include <linux/kernel.h>
+ #include <linux/module.h>
+ #include <linux/pci.h>
+@@ -149,6 +151,26 @@ struct zip_operation {
+ 	u32   sizeofzops;
+ };
  
--	memset(&zip_state, 0, sizeof(struct zip_state));
-+	zip_state = kzalloc(sizeof(*zip_state), GFP_KERNEL);
-+	if (!zip_state)
-+		return -ENOMEM;
++#define ZIP_POLL_DELAY 20 /* microseconds */
++#define ZIP_POLL_TIMEOUT (msecs_to_jiffies(1000))
 +
- 	zip_ops = &zip_ctx->zip_comp;
- 
- 	zip_ops->input_len  = slen;
- 	zip_ops->output_len = *dlen;
- 	memcpy(zip_ops->input, src, slen);
- 
--	ret = zip_deflate(zip_ops, &zip_state, zip);
-+	ret = zip_deflate(zip_ops, zip_state, zip);
- 
- 	if (!ret) {
- 		*dlen = zip_ops->output_len;
- 		memcpy(dst, zip_ops->output, *dlen);
- 	}
--
-+	kfree(zip_state);
- 	return ret;
- }
- 
-@@ -157,7 +160,7 @@ int zip_decompress(const u8 *src, unsigned int slen,
- 		   struct zip_kernel_ctx *zip_ctx)
- {
- 	struct zip_operation  *zip_ops   = NULL;
--	struct zip_state      zip_state;
-+	struct zip_state      *zip_state;
- 	struct zip_device     *zip = NULL;
- 	int ret;
- 
-@@ -168,7 +171,10 @@ int zip_decompress(const u8 *src, unsigned int slen,
- 	if (!zip)
- 		return -ENODEV;
- 
--	memset(&zip_state, 0, sizeof(struct zip_state));
-+	zip_state = kzalloc(sizeof(*zip_state), GFP_KERNEL);
-+	if (!zip_state)
-+		return -ENOMEM;
++static inline int zip_poll_result(union zip_zres_s *result)
++{
++	u64 end = get_jiffies_64() + ZIP_POLL_TIMEOUT;
 +
- 	zip_ops = &zip_ctx->zip_decomp;
- 	memcpy(zip_ops->input, src, slen);
++	while (!result->s.compcode) {
++		/*
++		 * Force re-reading of compcode which is updated
++		 * by the ZIP coprocessor.
++		 */
++		rmb();
++		if (time_after64(get_jiffies_64(), end))
++			return -ETIMEDOUT;
++		usleep_range(ZIP_POLL_DELAY / 2, ZIP_POLL_DELAY);
++	}
++	return 0;
++}
++
+ /* error messages */
+ #define zip_err(fmt, args...) pr_err("ZIP ERR:%s():%d: " \
+ 			      fmt "\n", __func__, __LINE__, ## args)
+diff --git a/drivers/crypto/cavium/zip/zip_deflate.c b/drivers/crypto/cavium/zip/zip_deflate.c
+index 9a944b8..d7133f8 100644
+--- a/drivers/crypto/cavium/zip/zip_deflate.c
++++ b/drivers/crypto/cavium/zip/zip_deflate.c
+@@ -129,8 +129,8 @@ int zip_deflate(struct zip_operation *zip_ops, struct zip_state *s,
+ 	/* Stats update for compression requests submitted */
+ 	atomic64_inc(&zip_dev->stats.comp_req_submit);
  
-@@ -179,13 +185,13 @@ int zip_decompress(const u8 *src, unsigned int slen,
- 	zip_ops->input_len  = slen;
- 	zip_ops->output_len = *dlen;
+-	while (!result_ptr->s.compcode)
+-		continue;
++	/* Wait for completion or error */
++	zip_poll_result(result_ptr);
  
--	ret = zip_inflate(zip_ops, &zip_state, zip);
-+	ret = zip_inflate(zip_ops, zip_state, zip);
+ 	/* Stats update for compression requests completed */
+ 	atomic64_inc(&zip_dev->stats.comp_req_complete);
+diff --git a/drivers/crypto/cavium/zip/zip_inflate.c b/drivers/crypto/cavium/zip/zip_inflate.c
+index 50cbdd8..7e0d73e 100644
+--- a/drivers/crypto/cavium/zip/zip_inflate.c
++++ b/drivers/crypto/cavium/zip/zip_inflate.c
+@@ -143,8 +143,8 @@ int zip_inflate(struct zip_operation *zip_ops, struct zip_state *s,
+ 	/* Decompression requests submitted stats update */
+ 	atomic64_inc(&zip_dev->stats.decomp_req_submit);
  
- 	if (!ret) {
- 		*dlen = zip_ops->output_len;
- 		memcpy(dst, zip_ops->output, *dlen);
- 	}
--
-+	kfree(zip_state);
- 	return ret;
- }
+-	while (!result_ptr->s.compcode)
+-		continue;
++	/* Wait for completion or error */
++	zip_poll_result(result_ptr);
  
+ 	/* Decompression requests completed stats update */
+ 	atomic64_inc(&zip_dev->stats.decomp_req_complete);
 -- 
 2.7.4
