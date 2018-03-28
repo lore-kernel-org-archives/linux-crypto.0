@@ -1,55 +1,90 @@
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH] crypto: chelsio: move chcr_ahash_continue declation out of header
-Date: Wed, 28 Mar 2018 16:05:23 +0200
-Message-ID: <20180328140539.2694734-1-arnd@arndb.de>
-Cc: Arnd Bergmann <arnd@arndb.de>,
-        Ganesh Goudar <ganeshgr@chelsio.com>,
-        Atul Gupta <atul.gupta@chelsio.com>,
-        Yeshaswi M R Gowda <yeshaswi@chelsio.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Harsh Jain <harsh@chelsio.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
+From: Stefan Agner <stefan@agner.ch>
+Subject: Re: [RFC PATCH] crypto: brcm - explicitly cast cipher to hash type
+Date: Wed, 28 Mar 2018 17:41:30 +0200
+Message-ID: <a25ba0afb4cdf8f43b64421995196dee@agner.ch>
+References: <20180324110242.9474-1-stefan@agner.ch>
+ <CAAFb_vrFF6D8DEvnZMDda-qd-jTh3mKt0BgGBJ5eWxydY1LEXA@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: "David S. Miller" <davem@davemloft.net>, clabbe.montjoie@gmail.com,
+        Scott Branden <scott.branden@broadcom.com>,
+        Steven Lin <steven.lin1@broadcom.com>, garsilva@embeddedor.com,
+        pravin.shedge4linux@gmail.com, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+To: Raveendra Padasalagi <raveendra.padasalagi@broadcom.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <CAAFb_vrFF6D8DEvnZMDda-qd-jTh3mKt0BgGBJ5eWxydY1LEXA@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-static function declarations don't belong in a header file, as shown
-by this compiler warning:
+On 28.03.2018 08:38, Raveendra Padasalagi wrote:
+> Hi Stefan,
+> 
+> The change looks to be fine.  From the IP point of view its using the
+> same values in case of AES cipher and hash types so explicit casting
+> should be ok.
 
-In file included from /git/arm-soc/drivers/crypto/chelsio/chcr_ipsec.c:66:
-drivers/crypto/chelsio/chcr_crypto.h:343:12: error: 'chcr_ahash_continue' declared 'static' but never defined [-Werror=unused-function]
+Can I take that as an Ack?
 
-This moves the declaration into the file that actually needs it.
+Herbert, given that Raveendra agrees to the change, do you want me to
+send a non-RFC version or can you merge the patch as is?
 
-Fixes: 5110e65536f3 ("crypto: chelsio -Split Hash requests for large scatter gather list")
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- drivers/crypto/chelsio/chcr_algo.c   | 1 +
- drivers/crypto/chelsio/chcr_crypto.h | 1 -
- 2 files changed, 1 insertion(+), 1 deletion(-)
+--
+Stefan
 
-diff --git a/drivers/crypto/chelsio/chcr_algo.c b/drivers/crypto/chelsio/chcr_algo.c
-index 4617c7acf4da..ebc96f2fae01 100644
---- a/drivers/crypto/chelsio/chcr_algo.c
-+++ b/drivers/crypto/chelsio/chcr_algo.c
-@@ -95,6 +95,7 @@ static u32 round_constant[11] = {
- 
- static int chcr_handle_cipher_resp(struct ablkcipher_request *req,
- 				   unsigned char *input, int err);
-+static int chcr_ahash_continue(struct ahash_request *req);
- 
- static inline  struct chcr_aead_ctx *AEAD_CTX(struct chcr_context *ctx)
- {
-diff --git a/drivers/crypto/chelsio/chcr_crypto.h b/drivers/crypto/chelsio/chcr_crypto.h
-index 71025ea9c3db..c8e8972af283 100644
---- a/drivers/crypto/chelsio/chcr_crypto.h
-+++ b/drivers/crypto/chelsio/chcr_crypto.h
-@@ -340,5 +340,4 @@ void chcr_add_hash_src_ent(struct ahash_request *req, struct ulptx_sgl *ulptx,
- 			   struct hash_wr_param *param);
- int chcr_hash_dma_map(struct device *dev, struct ahash_request *req);
- void chcr_hash_dma_unmap(struct device *dev, struct ahash_request *req);
--static int chcr_ahash_continue(struct ahash_request *req);
- #endif /* __CHCR_CRYPTO_H__ */
--- 
-2.9.0
+
+> 
+> -Raveendra
+> 
+> On Sat, Mar 24, 2018 at 4:32 PM, Stefan Agner <stefan@agner.ch> wrote:
+>> In the AES cases enum spu_cipher_type and enum hash_type have
+>> the same values, so the assignment is fine. Explicitly cast
+>> the enum type conversion.
+>>
+>> This fixes two warnings when building with clang:
+>>   drivers/crypto/bcm/cipher.c:821:34: warning: implicit conversion from
+>>       enumeration type 'enum spu_cipher_type' to different enumeration
+>>       type 'enum hash_type' [-Wenum-conversion]
+>>                 hash_parms.type = cipher_parms.type;
+>>                                 ~ ~~~~~~~~~~~~~^~~~
+>>   drivers/crypto/bcm/cipher.c:1412:26: warning: implicit conversion from
+>>       enumeration type 'enum spu_cipher_type' to different enumeration
+>>       type 'enum hash_type' [-Wenum-conversion]
+>>                 hash_parms.type = ctx->cipher_type;
+>>                                 ~ ~~~~~^~~~~~~~~~~
+>>
+>> Signed-off-by: Stefan Agner <stefan@agner.ch>
+>> ---
+>> I am not familar with the IP... I would be glad if somebody with
+>> better insight could have a look whether that patch makes sense.
+>>
+>>  drivers/crypto/bcm/cipher.c | 4 ++--
+>>  1 file changed, 2 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/drivers/crypto/bcm/cipher.c b/drivers/crypto/bcm/cipher.c
+>> index 2b75f95bbe1b..309c67c7012f 100644
+>> --- a/drivers/crypto/bcm/cipher.c
+>> +++ b/drivers/crypto/bcm/cipher.c
+>> @@ -818,7 +818,7 @@ static int handle_ahash_req(struct iproc_reqctx_s *rctx)
+>>
+>>         /* AES hashing keeps key size in type field, so need to copy it here */
+>>         if (hash_parms.alg == HASH_ALG_AES)
+>> -               hash_parms.type = cipher_parms.type;
+>> +               hash_parms.type = (enum hash_type)cipher_parms.type;
+>>         else
+>>                 hash_parms.type = spu->spu_hash_type(rctx->total_sent);
+>>
+>> @@ -1409,7 +1409,7 @@ static int handle_aead_req(struct iproc_reqctx_s *rctx)
+>>                                                 rctx->iv_ctr_len);
+>>
+>>         if (ctx->auth.alg == HASH_ALG_AES)
+>> -               hash_parms.type = ctx->cipher_type;
+>> +               hash_parms.type = (enum hash_type)ctx->cipher_type;
+>>
+>>         /* General case AAD padding (CCM and RFC4543 special cases below) */
+>>         aead_parms.aad_pad_len = spu->spu_gcm_ccm_pad_len(ctx->cipher.mode,
+>> --
+>> 2.16.2
+>>
