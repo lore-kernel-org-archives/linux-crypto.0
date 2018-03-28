@@ -1,34 +1,227 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [RFC PATCH] crypto: brcm - explicitly cast cipher to hash type
-Date: Wed, 28 Mar 2018 23:45:05 +0800
-Message-ID: <20180328154505.GA19057@gondor.apana.org.au>
-References: <20180324110242.9474-1-stefan@agner.ch>
- <CAAFb_vrFF6D8DEvnZMDda-qd-jTh3mKt0BgGBJ5eWxydY1LEXA@mail.gmail.com>
- <a25ba0afb4cdf8f43b64421995196dee@agner.ch>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Raveendra Padasalagi <raveendra.padasalagi@broadcom.com>,
-        "David S. Miller" <davem@davemloft.net>, clabbe.montjoie@gmail.com,
-        Scott Branden <scott.branden@broadcom.com>,
-        Steven Lin <steven.lin1@broadcom.com>, garsilva@embeddedor.com,
-        pravin.shedge4linux@gmail.com, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-To: Stefan Agner <stefan@agner.ch>
+From: Varsha Rao <rvarsha016@gmail.com>
+Subject: [PATCH] crypto: cavium: zip: Remove unnecessary parentheses
+Date: Wed, 28 Mar 2018 23:27:36 +0530
+Message-ID: <20180328175736.17360-1-rvarsha016@gmail.com>
+Cc: Varsha Rao <rvarsha016@gmail.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <a25ba0afb4cdf8f43b64421995196dee@agner.ch>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Mar 28, 2018 at 05:41:30PM +0200, Stefan Agner wrote:
->
-> Herbert, given that Raveendra agrees to the change, do you want me to
-> send a non-RFC version or can you merge the patch as is?
+This patch fixes the clang warning of extraneous parentheses, with the
+following coccinelle script.
 
-There is no need to resend it.
+@@
+identifier i;
+constant c;
+@@
+(
+-((i == c))
++i == c
+|
+-((i <= c))
++i <= c
+)
 
-Thanks,
+Signed-off-by: Varsha Rao <rvarsha016@gmail.com>
+---
+ drivers/crypto/cavium/zip/zip_regs.h | 42 ++++++++++++++++++------------------
+ 1 file changed, 21 insertions(+), 21 deletions(-)
+
+diff --git a/drivers/crypto/cavium/zip/zip_regs.h b/drivers/crypto/cavium/zip/zip_regs.h
+index d0be682305c1..874e0236c87e 100644
+--- a/drivers/crypto/cavium/zip/zip_regs.h
++++ b/drivers/crypto/cavium/zip/zip_regs.h
+@@ -443,7 +443,7 @@ union zip_corex_bist_status {
+ 
+ static inline u64 ZIP_COREX_BIST_STATUS(u64 param1)
+ {
+-	if (((param1 <= 1)))
++	if (param1 <= 1)
+ 		return 0x0520ull + (param1 & 1) * 0x8ull;
+ 	pr_err("ZIP_COREX_BIST_STATUS: %llu\n", param1);
+ 	return 0;
+@@ -537,7 +537,7 @@ union zip_dbg_corex_inst {
+ 
+ static inline u64 ZIP_DBG_COREX_INST(u64 param1)
+ {
+-	if (((param1 <= 1)))
++	if (param1 <= 1)
+ 		return 0x0640ull + (param1 & 1) * 0x8ull;
+ 	pr_err("ZIP_DBG_COREX_INST: %llu\n", param1);
+ 	return 0;
+@@ -568,7 +568,7 @@ union zip_dbg_corex_sta {
+ 
+ static inline u64 ZIP_DBG_COREX_STA(u64 param1)
+ {
+-	if (((param1 <= 1)))
++	if (param1 <= 1)
+ 		return 0x0680ull + (param1 & 1) * 0x8ull;
+ 	pr_err("ZIP_DBG_COREX_STA: %llu\n", param1);
+ 	return 0;
+@@ -599,7 +599,7 @@ union zip_dbg_quex_sta {
+ 
+ static inline u64 ZIP_DBG_QUEX_STA(u64 param1)
+ {
+-	if (((param1 <= 7)))
++	if (param1 <= 7)
+ 		return 0x1800ull + (param1 & 7) * 0x8ull;
+ 	pr_err("ZIP_DBG_QUEX_STA: %llu\n", param1);
+ 	return 0;
+@@ -817,7 +817,7 @@ union zip_msix_pbax {
+ 
+ static inline u64 ZIP_MSIX_PBAX(u64 param1)
+ {
+-	if (((param1 == 0)))
++	if (param1 == 0)
+ 		return 0x0000838000FF0000ull;
+ 	pr_err("ZIP_MSIX_PBAX: %llu\n", param1);
+ 	return 0;
+@@ -846,7 +846,7 @@ union zip_msix_vecx_addr {
+ 
+ static inline u64 ZIP_MSIX_VECX_ADDR(u64 param1)
+ {
+-	if (((param1 <= 17)))
++	if (param1 <= 17)
+ 		return 0x0000838000F00000ull + (param1 & 31) * 0x10ull;
+ 	pr_err("ZIP_MSIX_VECX_ADDR: %llu\n", param1);
+ 	return 0;
+@@ -875,7 +875,7 @@ union zip_msix_vecx_ctl {
+ 
+ static inline u64 ZIP_MSIX_VECX_CTL(u64 param1)
+ {
+-	if (((param1 <= 17)))
++	if (param1 <= 17)
+ 		return 0x0000838000F00008ull + (param1 & 31) * 0x10ull;
+ 	pr_err("ZIP_MSIX_VECX_CTL: %llu\n", param1);
+ 	return 0;
+@@ -900,7 +900,7 @@ union zip_quex_done {
+ 
+ static inline u64 ZIP_QUEX_DONE(u64 param1)
+ {
+-	if (((param1 <= 7)))
++	if (param1 <= 7)
+ 		return 0x2000ull + (param1 & 7) * 0x8ull;
+ 	pr_err("ZIP_QUEX_DONE: %llu\n", param1);
+ 	return 0;
+@@ -925,7 +925,7 @@ union zip_quex_done_ack {
+ 
+ static inline u64 ZIP_QUEX_DONE_ACK(u64 param1)
+ {
+-	if (((param1 <= 7)))
++	if (param1 <= 7)
+ 		return 0x2200ull + (param1 & 7) * 0x8ull;
+ 	pr_err("ZIP_QUEX_DONE_ACK: %llu\n", param1);
+ 	return 0;
+@@ -950,7 +950,7 @@ union zip_quex_done_ena_w1c {
+ 
+ static inline u64 ZIP_QUEX_DONE_ENA_W1C(u64 param1)
+ {
+-	if (((param1 <= 7)))
++	if (param1 <= 7)
+ 		return 0x2600ull + (param1 & 7) * 0x8ull;
+ 	pr_err("ZIP_QUEX_DONE_ENA_W1C: %llu\n", param1);
+ 	return 0;
+@@ -975,7 +975,7 @@ union zip_quex_done_ena_w1s {
+ 
+ static inline u64 ZIP_QUEX_DONE_ENA_W1S(u64 param1)
+ {
+-	if (((param1 <= 7)))
++	if (param1 <= 7)
+ 		return 0x2400ull + (param1 & 7) * 0x8ull;
+ 	pr_err("ZIP_QUEX_DONE_ENA_W1S: %llu\n", param1);
+ 	return 0;
+@@ -1004,7 +1004,7 @@ union zip_quex_done_wait {
+ 
+ static inline u64 ZIP_QUEX_DONE_WAIT(u64 param1)
+ {
+-	if (((param1 <= 7)))
++	if (param1 <= 7)
+ 		return 0x2800ull + (param1 & 7) * 0x8ull;
+ 	pr_err("ZIP_QUEX_DONE_WAIT: %llu\n", param1);
+ 	return 0;
+@@ -1029,7 +1029,7 @@ union zip_quex_doorbell {
+ 
+ static inline u64 ZIP_QUEX_DOORBELL(u64 param1)
+ {
+-	if (((param1 <= 7)))
++	if (param1 <= 7)
+ 		return 0x4000ull + (param1 & 7) * 0x8ull;
+ 	pr_err("ZIP_QUEX_DOORBELL: %llu\n", param1);
+ 	return 0;
+@@ -1058,7 +1058,7 @@ union zip_quex_err_ena_w1c {
+ 
+ static inline u64 ZIP_QUEX_ERR_ENA_W1C(u64 param1)
+ {
+-	if (((param1 <= 7)))
++	if (param1 <= 7)
+ 		return 0x3600ull + (param1 & 7) * 0x8ull;
+ 	pr_err("ZIP_QUEX_ERR_ENA_W1C: %llu\n", param1);
+ 	return 0;
+@@ -1087,7 +1087,7 @@ union zip_quex_err_ena_w1s {
+ 
+ static inline u64 ZIP_QUEX_ERR_ENA_W1S(u64 param1)
+ {
+-	if (((param1 <= 7)))
++	if (param1 <= 7)
+ 		return 0x3400ull + (param1 & 7) * 0x8ull;
+ 	pr_err("ZIP_QUEX_ERR_ENA_W1S: %llu\n", param1);
+ 	return 0;
+@@ -1120,7 +1120,7 @@ union zip_quex_err_int {
+ 
+ static inline u64 ZIP_QUEX_ERR_INT(u64 param1)
+ {
+-	if (((param1 <= 7)))
++	if (param1 <= 7)
+ 		return 0x3000ull + (param1 & 7) * 0x8ull;
+ 	pr_err("ZIP_QUEX_ERR_INT: %llu\n", param1);
+ 	return 0;
+@@ -1150,7 +1150,7 @@ union zip_quex_err_int_w1s {
+ 
+ static inline u64 ZIP_QUEX_ERR_INT_W1S(u64 param1)
+ {
+-	if (((param1 <= 7)))
++	if (param1 <= 7)
+ 		return 0x3200ull + (param1 & 7) * 0x8ull;
+ 	pr_err("ZIP_QUEX_ERR_INT_W1S: %llu\n", param1);
+ 	return 0;
+@@ -1179,7 +1179,7 @@ union zip_quex_gcfg {
+ 
+ static inline u64 ZIP_QUEX_GCFG(u64 param1)
+ {
+-	if (((param1 <= 7)))
++	if (param1 <= 7)
+ 		return 0x1A00ull + (param1 & 7) * 0x8ull;
+ 	pr_err("ZIP_QUEX_GCFG: %llu\n", param1);
+ 	return 0;
+@@ -1204,7 +1204,7 @@ union zip_quex_map {
+ 
+ static inline u64 ZIP_QUEX_MAP(u64 param1)
+ {
+-	if (((param1 <= 7)))
++	if (param1 <= 7)
+ 		return 0x1400ull + (param1 & 7) * 0x8ull;
+ 	pr_err("ZIP_QUEX_MAP: %llu\n", param1);
+ 	return 0;
+@@ -1236,7 +1236,7 @@ union zip_quex_sbuf_addr {
+ 
+ static inline u64 ZIP_QUEX_SBUF_ADDR(u64 param1)
+ {
+-	if (((param1 <= 7)))
++	if (param1 <= 7)
+ 		return 0x1000ull + (param1 & 7) * 0x8ull;
+ 	pr_err("ZIP_QUEX_SBUF_ADDR: %llu\n", param1);
+ 	return 0;
+@@ -1276,7 +1276,7 @@ union zip_quex_sbuf_ctl {
+ 
+ static inline u64 ZIP_QUEX_SBUF_CTL(u64 param1)
+ {
+-	if (((param1 <= 7)))
++	if (param1 <= 7)
+ 		return 0x1200ull + (param1 & 7) * 0x8ull;
+ 	pr_err("ZIP_QUEX_SBUF_CTL: %llu\n", param1);
+ 	return 0;
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.14.3
