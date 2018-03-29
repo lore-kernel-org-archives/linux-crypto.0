@@ -1,70 +1,68 @@
-From: "J . Bruce Fields" <bfields@fieldses.org>
-Subject: Re: [PATCH] sunrpc: remove incorrect HMAC request initialization
-Date: Wed, 28 Mar 2018 17:12:17 -0400
-Message-ID: <20180328211217.GA7111@fieldses.org>
-References: <20180328175722.193355-1-ebiggers@google.com>
+From: Harsh Jain <harsh@chelsio.com>
+Subject: Re: [PATCH] crypto: chelsio: move chcr_ahash_continue declation out
+ of header
+Date: Thu, 29 Mar 2018 17:13:20 +0530
+Message-ID: <865ba49d-b24f-b3b6-1440-54cfa7b4c2e6@chelsio.com>
+References: <20180328140539.2694734-1-arnd@arndb.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Trond Myklebust <trond.myklebust@primarydata.com>,
-        Anna Schumaker <anna.schumaker@netapp.com>,
-        Jeff Layton <jlayton@kernel.org>, linux-nfs@vger.kernel.org,
-        netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Cc: Ganesh Goudar <ganeshgr@chelsio.com>,
+        Atul Gupta <atul.gupta@chelsio.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Arnd Bergmann <arnd@arndb.de>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Michael Young <m.a.young@durham.ac.uk>, stable@vger.kernel.org
-To: Eric Biggers <ebiggers@google.com>
-Return-path: <netdev-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20180328175722.193355-1-ebiggers@google.com>
-Sender: netdev-owner@vger.kernel.org
+        "David S. Miller" <davem@davemloft.net>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20180328140539.2694734-1-arnd@arndb.de>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Applying, thanks!--b.
+Hi,
 
-On Wed, Mar 28, 2018 at 10:57:22AM -0700, Eric Biggers wrote:
-> make_checksum_hmac_md5() is allocating an HMAC transform and doing
-> crypto API calls in the following order:
-> 
->     crypto_ahash_init()
->     crypto_ahash_setkey()
->     crypto_ahash_digest()
-> 
-> This is wrong because it makes no sense to init() the request before a
-> key has been set, given that the initial state depends on the key.  And
-> digest() is short for init() + update() + final(), so in this case
-> there's no need to explicitly call init() at all.
-> 
-> Before commit 9fa68f620041 ("crypto: hash - prevent using keyed hashes
-> without setting key") the extra init() had no real effect, at least for
-> the software HMAC implementation.  (There are also hardware drivers that
-> implement HMAC-MD5, and it's not immediately obvious how gracefully they
-> handle init() before setkey().)  But now the crypto API detects this
-> incorrect initialization and returns -ENOKEY.  This is breaking NFS
-> mounts in some cases.
-> 
-> Fix it by removing the incorrect call to crypto_ahash_init().
-> 
-> Reported-by: Michael Young <m.a.young@durham.ac.uk>
-> Fixes: 9fa68f620041 ("crypto: hash - prevent using keyed hashes without setting key")
-> Fixes: fffdaef2eb4a ("gss_krb5: Add support for rc4-hmac encryption")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
+Fix for that is already submitted in below patch.
+
+https://patchwork.kernel.org/patch/10292333/
+
+Thanks
+
+
+On 28-03-2018 19:35, Arnd Bergmann wrote:
+> static function declarations don't belong in a header file, as shown
+> by this compiler warning:
+>
+> In file included from /git/arm-soc/drivers/crypto/chelsio/chcr_ipsec.c:66:
+> drivers/crypto/chelsio/chcr_crypto.h:343:12: error: 'chcr_ahash_continue' declared 'static' but never defined [-Werror=unused-function]
+>
+> This moves the declaration into the file that actually needs it.
+>
+> Fixes: 5110e65536f3 ("crypto: chelsio -Split Hash requests for large scatter gather list")
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 > ---
->  net/sunrpc/auth_gss/gss_krb5_crypto.c | 3 ---
->  1 file changed, 3 deletions(-)
-> 
-> diff --git a/net/sunrpc/auth_gss/gss_krb5_crypto.c b/net/sunrpc/auth_gss/gss_krb5_crypto.c
-> index 12649c9fedab..8654494b4d0a 100644
-> --- a/net/sunrpc/auth_gss/gss_krb5_crypto.c
-> +++ b/net/sunrpc/auth_gss/gss_krb5_crypto.c
-> @@ -237,9 +237,6 @@ make_checksum_hmac_md5(struct krb5_ctx *kctx, char *header, int hdrlen,
+>  drivers/crypto/chelsio/chcr_algo.c   | 1 +
+>  drivers/crypto/chelsio/chcr_crypto.h | 1 -
+>  2 files changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/drivers/crypto/chelsio/chcr_algo.c b/drivers/crypto/chelsio/chcr_algo.c
+> index 4617c7acf4da..ebc96f2fae01 100644
+> --- a/drivers/crypto/chelsio/chcr_algo.c
+> +++ b/drivers/crypto/chelsio/chcr_algo.c
+> @@ -95,6 +95,7 @@ static u32 round_constant[11] = {
 >  
->  	ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_SLEEP, NULL, NULL);
+>  static int chcr_handle_cipher_resp(struct ablkcipher_request *req,
+>  				   unsigned char *input, int err);
+> +static int chcr_ahash_continue(struct ahash_request *req);
 >  
-> -	err = crypto_ahash_init(req);
-> -	if (err)
-> -		goto out;
->  	err = crypto_ahash_setkey(hmac_md5, cksumkey, kctx->gk5e->keylength);
->  	if (err)
->  		goto out;
-> -- 
-> 2.17.0.rc1.321.gba9d0f2565-goog
+>  static inline  struct chcr_aead_ctx *AEAD_CTX(struct chcr_context *ctx)
+>  {
+> diff --git a/drivers/crypto/chelsio/chcr_crypto.h b/drivers/crypto/chelsio/chcr_crypto.h
+> index 71025ea9c3db..c8e8972af283 100644
+> --- a/drivers/crypto/chelsio/chcr_crypto.h
+> +++ b/drivers/crypto/chelsio/chcr_crypto.h
+> @@ -340,5 +340,4 @@ void chcr_add_hash_src_ent(struct ahash_request *req, struct ulptx_sgl *ulptx,
+>  			   struct hash_wr_param *param);
+>  int chcr_hash_dma_map(struct device *dev, struct ahash_request *req);
+>  void chcr_hash_dma_unmap(struct device *dev, struct ahash_request *req);
+> -static int chcr_ahash_continue(struct ahash_request *req);
+>  #endif /* __CHCR_CRYPTO_H__ */
