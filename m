@@ -1,11 +1,10 @@
 From: Atul Gupta <atul.gupta@chelsio.com>
-Subject: Re: [PATCH v14 net-next 08/12] crypto : chtls - CPL handler
- definition
-Date: Fri, 30 Mar 2018 00:38:06 +0530
-Message-ID: <97a6ce0d-d188-8171-7985-bb31030b1ee8@chelsio.com>
+Subject: Re: [PATCH v14 net-next 09/12] crypto: chtls - Inline TLS record Tx
+Date: Fri, 30 Mar 2018 00:54:09 +0530
+Message-ID: <52183607-b227-dc53-4a94-9408c5a4ecaf@chelsio.com>
 References: <1522339074-4681-1-git-send-email-atul.gupta@chelsio.com>
- <1522339074-4681-9-git-send-email-atul.gupta@chelsio.com>
- <20180329162623.GA9805@bistromath.localdomain>
+ <1522339074-4681-10-git-send-email-atul.gupta@chelsio.com>
+ <20180329162611.GA9517@bistromath.localdomain>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
@@ -17,7 +16,7 @@ Cc: davem@davemloft.net, herbert@gondor.apana.org.au,
         ganeshgr@chelsio.com
 To: Sabrina Dubroca <sd@queasysnail.net>
 Return-path: <netdev-owner@vger.kernel.org>
-In-Reply-To: <20180329162623.GA9805@bistromath.localdomain>
+In-Reply-To: <20180329162611.GA9517@bistromath.localdomain>
 Content-Language: en-US
 Sender: netdev-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
@@ -25,18 +24,46 @@ List-Id: linux-crypto.vger.kernel.org
 
 
 On 3/29/2018 9:56 PM, Sabrina Dubroca wrote:
-> 2018-03-29, 21:27:50 +0530, Atul Gupta wrote:
+> 2018-03-29, 21:27:51 +0530, Atul Gupta wrote:
+>> TLS handler for record transmit.
+>> Create Inline TLS work request and post to FW.
+>> Create Inline TLS record CPLs for hardware
+>>
+>> Signed-off-by: Atul Gupta <atul.gupta@chelsio.com>
+>> Signed-off-by: Michael Werner <werner@chelsio.com>
+>> ---
 > ...
->> +static void chtls_pass_accept_request(struct sock *sk,
->> +				      struct sk_buff *skb)
+>> +int chtls_sendmsg(struct sock *sk, struct msghdr *msg, size_t size)
 >> +{
-> ...
->> +	if (chtls_get_module(newsk))
->> +		goto reject;
->> +	inet_csk_reqsk_queue_added(sk);
->> +	reply_skb->sk = newsk;
->> +	chtls_install_cpl_ops(newsk);
-> Function defined in patch 11, declared in patch 6, and used in patch
-> 8.  Are you actually listening to the comments we've been sending?
-Patch series is broken to make it bisectable, it ensures that existing modules net, cxgb4, chcr compiles fine, since chtls is new module the sequence of patches builds clean by virtue of having Makefile change in the last patch. We have followed a similar approach in the past for new submission of chcr, cxgbit drivers.
+>> +	struct chtls_sock *csk = rcu_dereference_sk_user_data(sk);
+>> +	struct chtls_dev *cdev = csk->cdev;
+>> +	struct tcp_sock *tp = tcp_sk(sk);
+>> +	struct sk_buff *skb;
+>> +	int mss, flags, err;
+>> +	int recordsz = 0;
+>> +	int copied = 0;
+>> +	int hdrlen = 0;
+>> +	long timeo;
+>> +
+>> +	lock_sock(sk);
+>> +	flags = msg->msg_flags;
+>> +	timeo = sock_sndtimeo(sk, flags & MSG_DONTWAIT);
+>> +
+>> +	if (!sk_in_state(sk, TCPF_ESTABLISHED | TCPF_CLOSE_WAIT)) {
+>> +		err = sk_stream_wait_connect(sk, &timeo);
+>> +		if (err)
+>> +			goto out_err;
+>> +	}
+>> +
+>> +	if (sk->sk_prot->sendmsg != chtls_sendmsg) {
+> Can that actually happen? If so, how? AFAICT, this function is only
+> called when sk->sk_prot has been set to be chtls_cpl_prot.
+this is relevant for the tunneling of the active-open path and can be removed for now
 >
+>> +		release_sock(sk);
+>> +		if (sk->sk_prot->sendmsg)
+>> +			return sk->sk_prot->sendmsg(sk, msg, size);
+>> +		else
+>> +			return sk->sk_socket->ops->sendmsg(sk->sk_socket,
+>> +							   msg, size);
+>> +	}
