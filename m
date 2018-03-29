@@ -1,7 +1,7 @@
 From: Atul Gupta <atul.gupta@chelsio.com>
-Subject: [PATCH v14 net-next 04/12] cxgb4: LLD driver changes to support TLS
-Date: Thu, 29 Mar 2018 21:27:46 +0530
-Message-ID: <1522339074-4681-5-git-send-email-atul.gupta@chelsio.com>
+Subject: [PATCH v14 net-next 05/12] crypto: chcr - Inline TLS Key Macros
+Date: Thu, 29 Mar 2018 21:27:47 +0530
+Message-ID: <1522339074-4681-6-git-send-email-atul.gupta@chelsio.com>
 References: <1522339074-4681-1-git-send-email-atul.gupta@chelsio.com>
 Cc: davejwatson@fb.com, sd@queasysnail.net, sbrivio@redhat.com,
         linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
@@ -14,248 +14,149 @@ In-Reply-To: <1522339074-4681-1-git-send-email-atul.gupta@chelsio.com>
 Sender: netdev-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Read the Inline TLS capability from firmware.
-Determine the area reserved for storing the keys
-Dump the Inline TLS tx and rx records count.
+Define macro for programming the TLS Key context
 
 Signed-off-by: Atul Gupta <atul.gupta@chelsio.com>
-Reviewed-by: Michael Werner <werner@chelsio.com>
-Reviewed-by: Casey Leedom <leedom@chelsio.com>
 ---
- drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c |  32 +++++--
- drivers/net/ethernet/chelsio/cxgb4/cxgb4_uld.h  |   7 ++
- drivers/net/ethernet/chelsio/cxgb4/sge.c        | 107 ++++++++++++++++++++++--
- 3 files changed, 131 insertions(+), 15 deletions(-)
+ drivers/crypto/chelsio/chcr_algo.h | 42 +++++++++++++++++++++++++++++
+ drivers/crypto/chelsio/chcr_core.h | 55 +++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 96 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c
-index 57d38f8..8fd52c6 100644
---- a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c
-+++ b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c
-@@ -4548,18 +4548,32 @@ static int adap_init0(struct adapter *adap)
- 		adap->num_ofld_uld += 2;
- 	}
- 	if (caps_cmd.cryptocaps) {
--		/* Should query params here...TODO */
--		params[0] = FW_PARAM_PFVF(NCRYPTO_LOOKASIDE);
--		ret = t4_query_params(adap, adap->mbox, adap->pf, 0, 2,
--				      params, val);
--		if (ret < 0) {
--			if (ret != -EINVAL)
-+		if (ntohs(caps_cmd.cryptocaps) &
-+		    FW_CAPS_CONFIG_CRYPTO_LOOKASIDE) {
-+			params[0] = FW_PARAM_PFVF(NCRYPTO_LOOKASIDE);
-+			ret = t4_query_params(adap, adap->mbox, adap->pf, 0,
-+					      2, params, val);
-+			if (ret < 0) {
-+				if (ret != -EINVAL)
-+					goto bye;
-+			} else {
-+				adap->vres.ncrypto_fc = val[0];
-+			}
-+			adap->num_ofld_uld += 1;
-+		}
-+		if (ntohs(caps_cmd.cryptocaps) &
-+		    FW_CAPS_CONFIG_TLS_INLINE) {
-+			params[0] = FW_PARAM_PFVF(TLS_START);
-+			params[1] = FW_PARAM_PFVF(TLS_END);
-+			ret = t4_query_params(adap, adap->mbox, adap->pf, 0,
-+					      2, params, val);
-+			if (ret < 0)
- 				goto bye;
--		} else {
--			adap->vres.ncrypto_fc = val[0];
-+			adap->vres.key.start = val[0];
-+			adap->vres.key.size = val[1] - val[0] + 1;
-+			adap->num_uld += 1;
- 		}
- 		adap->params.crypto = ntohs(caps_cmd.cryptocaps);
--		adap->num_uld += 1;
- 	}
- #undef FW_PARAM_PFVF
- #undef FW_PARAM_DEV
-diff --git a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_uld.h b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_uld.h
-index b0ca06e..de9ad31 100644
---- a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_uld.h
-+++ b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_uld.h
-@@ -237,6 +237,7 @@ enum cxgb4_uld {
- 	CXGB4_ULD_ISCSI,
- 	CXGB4_ULD_ISCSIT,
- 	CXGB4_ULD_CRYPTO,
-+	CXGB4_ULD_TLS,
- 	CXGB4_ULD_MAX
+diff --git a/drivers/crypto/chelsio/chcr_algo.h b/drivers/crypto/chelsio/chcr_algo.h
+index d1673a5..f263cd4 100644
+--- a/drivers/crypto/chelsio/chcr_algo.h
++++ b/drivers/crypto/chelsio/chcr_algo.h
+@@ -86,6 +86,39 @@
+ 	 KEY_CONTEXT_OPAD_PRESENT_M)
+ #define KEY_CONTEXT_OPAD_PRESENT_F      KEY_CONTEXT_OPAD_PRESENT_V(1U)
+ 
++#define TLS_KEYCTX_RXFLIT_CNT_S 24
++#define TLS_KEYCTX_RXFLIT_CNT_V(x) ((x) << TLS_KEYCTX_RXFLIT_CNT_S)
++
++#define TLS_KEYCTX_RXPROT_VER_S 20
++#define TLS_KEYCTX_RXPROT_VER_M 0xf
++#define TLS_KEYCTX_RXPROT_VER_V(x) ((x) << TLS_KEYCTX_RXPROT_VER_S)
++
++#define TLS_KEYCTX_RXCIPH_MODE_S 16
++#define TLS_KEYCTX_RXCIPH_MODE_M 0xf
++#define TLS_KEYCTX_RXCIPH_MODE_V(x) ((x) << TLS_KEYCTX_RXCIPH_MODE_S)
++
++#define TLS_KEYCTX_RXAUTH_MODE_S 12
++#define TLS_KEYCTX_RXAUTH_MODE_M 0xf
++#define TLS_KEYCTX_RXAUTH_MODE_V(x) ((x) << TLS_KEYCTX_RXAUTH_MODE_S)
++
++#define TLS_KEYCTX_RXCIAU_CTRL_S 11
++#define TLS_KEYCTX_RXCIAU_CTRL_V(x) ((x) << TLS_KEYCTX_RXCIAU_CTRL_S)
++
++#define TLS_KEYCTX_RX_SEQCTR_S 9
++#define TLS_KEYCTX_RX_SEQCTR_M 0x3
++#define TLS_KEYCTX_RX_SEQCTR_V(x) ((x) << TLS_KEYCTX_RX_SEQCTR_S)
++
++#define TLS_KEYCTX_RX_VALID_S 8
++#define TLS_KEYCTX_RX_VALID_V(x) ((x) << TLS_KEYCTX_RX_VALID_S)
++
++#define TLS_KEYCTX_RXCK_SIZE_S 3
++#define TLS_KEYCTX_RXCK_SIZE_M 0x7
++#define TLS_KEYCTX_RXCK_SIZE_V(x) ((x) << TLS_KEYCTX_RXCK_SIZE_S)
++
++#define TLS_KEYCTX_RXMK_SIZE_S 0
++#define TLS_KEYCTX_RXMK_SIZE_M 0x7
++#define TLS_KEYCTX_RXMK_SIZE_V(x) ((x) << TLS_KEYCTX_RXMK_SIZE_S)
++
+ #define CHCR_HASH_MAX_DIGEST_SIZE 64
+ #define CHCR_MAX_SHA_DIGEST_SIZE 64
+ 
+@@ -176,6 +209,15 @@
+ 		      KEY_CONTEXT_SALT_PRESENT_V(1) | \
+ 		      KEY_CONTEXT_CTX_LEN_V((ctx_len)))
+ 
++#define  FILL_KEY_CRX_HDR(ck_size, mk_size, d_ck, opad, ctx_len) \
++		htonl(TLS_KEYCTX_RXMK_SIZE_V(mk_size) | \
++		      TLS_KEYCTX_RXCK_SIZE_V(ck_size) | \
++		      TLS_KEYCTX_RX_VALID_V(1) | \
++		      TLS_KEYCTX_RX_SEQCTR_V(3) | \
++		      TLS_KEYCTX_RXAUTH_MODE_V(4) | \
++		      TLS_KEYCTX_RXCIPH_MODE_V(2) | \
++		      TLS_KEYCTX_RXFLIT_CNT_V((ctx_len)))
++
+ #define FILL_WR_OP_CCTX_SIZE \
+ 		htonl( \
+ 			FW_CRYPTO_LOOKASIDE_WR_OPCODE_V( \
+diff --git a/drivers/crypto/chelsio/chcr_core.h b/drivers/crypto/chelsio/chcr_core.h
+index 3c29ee0..77056a9 100644
+--- a/drivers/crypto/chelsio/chcr_core.h
++++ b/drivers/crypto/chelsio/chcr_core.h
+@@ -65,10 +65,58 @@
+ struct _key_ctx {
+ 	__be32 ctx_hdr;
+ 	u8 salt[MAX_SALT];
+-	__be64 reserverd;
++	__be64 iv_to_auth;
+ 	unsigned char key[0];
  };
  
-@@ -289,6 +290,7 @@ struct cxgb4_virt_res {                      /* virtualized HW resources */
- 	struct cxgb4_range qp;
- 	struct cxgb4_range cq;
- 	struct cxgb4_range ocq;
-+	struct cxgb4_range key;
- 	unsigned int ncrypto_fc;
++#define KEYCTX_TX_WR_IV_S  55
++#define KEYCTX_TX_WR_IV_M  0x1ffULL
++#define KEYCTX_TX_WR_IV_V(x) ((x) << KEYCTX_TX_WR_IV_S)
++#define KEYCTX_TX_WR_IV_G(x) \
++	(((x) >> KEYCTX_TX_WR_IV_S) & KEYCTX_TX_WR_IV_M)
++
++#define KEYCTX_TX_WR_AAD_S 47
++#define KEYCTX_TX_WR_AAD_M 0xffULL
++#define KEYCTX_TX_WR_AAD_V(x) ((x) << KEYCTX_TX_WR_AAD_S)
++#define KEYCTX_TX_WR_AAD_G(x) (((x) >> KEYCTX_TX_WR_AAD_S) & \
++				KEYCTX_TX_WR_AAD_M)
++
++#define KEYCTX_TX_WR_AADST_S 39
++#define KEYCTX_TX_WR_AADST_M 0xffULL
++#define KEYCTX_TX_WR_AADST_V(x) ((x) << KEYCTX_TX_WR_AADST_S)
++#define KEYCTX_TX_WR_AADST_G(x) \
++	(((x) >> KEYCTX_TX_WR_AADST_S) & KEYCTX_TX_WR_AADST_M)
++
++#define KEYCTX_TX_WR_CIPHER_S 30
++#define KEYCTX_TX_WR_CIPHER_M 0x1ffULL
++#define KEYCTX_TX_WR_CIPHER_V(x) ((x) << KEYCTX_TX_WR_CIPHER_S)
++#define KEYCTX_TX_WR_CIPHER_G(x) \
++	(((x) >> KEYCTX_TX_WR_CIPHER_S) & KEYCTX_TX_WR_CIPHER_M)
++
++#define KEYCTX_TX_WR_CIPHERST_S 23
++#define KEYCTX_TX_WR_CIPHERST_M 0x7f
++#define KEYCTX_TX_WR_CIPHERST_V(x) ((x) << KEYCTX_TX_WR_CIPHERST_S)
++#define KEYCTX_TX_WR_CIPHERST_G(x) \
++	(((x) >> KEYCTX_TX_WR_CIPHERST_S) & KEYCTX_TX_WR_CIPHERST_M)
++
++#define KEYCTX_TX_WR_AUTH_S 14
++#define KEYCTX_TX_WR_AUTH_M 0x1ff
++#define KEYCTX_TX_WR_AUTH_V(x) ((x) << KEYCTX_TX_WR_AUTH_S)
++#define KEYCTX_TX_WR_AUTH_G(x) \
++	(((x) >> KEYCTX_TX_WR_AUTH_S) & KEYCTX_TX_WR_AUTH_M)
++
++#define KEYCTX_TX_WR_AUTHST_S 7
++#define KEYCTX_TX_WR_AUTHST_M 0x7f
++#define KEYCTX_TX_WR_AUTHST_V(x) ((x) << KEYCTX_TX_WR_AUTHST_S)
++#define KEYCTX_TX_WR_AUTHST_G(x) \
++	(((x) >> KEYCTX_TX_WR_AUTHST_S) & KEYCTX_TX_WR_AUTHST_M)
++
++#define KEYCTX_TX_WR_AUTHIN_S 0
++#define KEYCTX_TX_WR_AUTHIN_M 0x7f
++#define KEYCTX_TX_WR_AUTHIN_V(x) ((x) << KEYCTX_TX_WR_AUTHIN_S)
++#define KEYCTX_TX_WR_AUTHIN_G(x) \
++	(((x) >> KEYCTX_TX_WR_AUTHIN_S) & KEYCTX_TX_WR_AUTHIN_M)
++
+ struct chcr_wr {
+ 	struct fw_crypto_lookaside_wr wreq;
+ 	struct ulp_txpkt ulptx;
+@@ -90,6 +138,11 @@ struct uld_ctx {
+ 	struct chcr_dev *dev;
  };
  
-@@ -300,6 +302,9 @@ struct chcr_stats_debug {
- 	atomic_t error;
- 	atomic_t fallback;
- 	atomic_t ipsec_cnt;
-+	atomic_t tls_pdu_tx;
-+	atomic_t tls_pdu_rx;
-+	atomic_t tls_key;
- };
- 
- #define OCQ_WIN_OFFSET(pdev, vres) \
-@@ -382,6 +387,8 @@ struct cxgb4_uld_info {
- int cxgb4_register_uld(enum cxgb4_uld type, const struct cxgb4_uld_info *p);
- int cxgb4_unregister_uld(enum cxgb4_uld type);
- int cxgb4_ofld_send(struct net_device *dev, struct sk_buff *skb);
-+int cxgb4_immdata_send(struct net_device *dev, unsigned int idx,
-+		       const void *src, unsigned int len);
- int cxgb4_crypto_send(struct net_device *dev, struct sk_buff *skb);
- unsigned int cxgb4_dbfifo_count(const struct net_device *dev, int lpfifo);
- unsigned int cxgb4_port_chan(const struct net_device *dev);
-diff --git a/drivers/net/ethernet/chelsio/cxgb4/sge.c b/drivers/net/ethernet/chelsio/cxgb4/sge.c
-index 6e310a0..1a28df1 100644
---- a/drivers/net/ethernet/chelsio/cxgb4/sge.c
-+++ b/drivers/net/ethernet/chelsio/cxgb4/sge.c
-@@ -1019,8 +1019,8 @@ inline void cxgb4_ring_tx_db(struct adapter *adap, struct sge_txq *q, int n)
- void cxgb4_inline_tx_skb(const struct sk_buff *skb,
- 			 const struct sge_txq *q, void *pos)
- {
--	u64 *p;
- 	int left = (void *)q->stat - pos;
-+	u64 *p;
- 
- 	if (likely(skb->len <= left)) {
- 		if (likely(!skb->data_len))
-@@ -1735,15 +1735,13 @@ static void txq_stop_maperr(struct sge_uld_txq *q)
- /**
-  *	ofldtxq_stop - stop an offload Tx queue that has become full
-  *	@q: the queue to stop
-- *	@skb: the packet causing the queue to become full
-+ *	@wr: the Work Request causing the queue to become full
-  *
-  *	Stops an offload Tx queue that has become full and modifies the packet
-  *	being written to request a wakeup.
-  */
--static void ofldtxq_stop(struct sge_uld_txq *q, struct sk_buff *skb)
-+static void ofldtxq_stop(struct sge_uld_txq *q, struct fw_wr_hdr *wr)
- {
--	struct fw_wr_hdr *wr = (struct fw_wr_hdr *)skb->data;
--
- 	wr->lo |= htonl(FW_WR_EQUEQ_F | FW_WR_EQUIQ_F);
- 	q->q.stops++;
- 	q->full = 1;
-@@ -1804,7 +1802,7 @@ static void service_ofldq(struct sge_uld_txq *q)
- 		credits = txq_avail(&q->q) - ndesc;
- 		BUG_ON(credits < 0);
- 		if (unlikely(credits < TXQ_STOP_THRES))
--			ofldtxq_stop(q, skb);
-+			ofldtxq_stop(q, (struct fw_wr_hdr *)skb->data);
- 
- 		pos = (u64 *)&q->q.desc[q->q.pidx];
- 		if (is_ofld_imm(skb))
-@@ -2005,6 +2003,103 @@ int cxgb4_ofld_send(struct net_device *dev, struct sk_buff *skb)
- }
- EXPORT_SYMBOL(cxgb4_ofld_send);
- 
-+static void *inline_tx_header(const void *src,
-+			      const struct sge_txq *q,
-+			      void *pos, int length)
-+{
-+	int left = (void *)q->stat - pos;
-+	u64 *p;
++struct sge_opaque_hdr {
++	void *dev;
++	dma_addr_t addr[MAX_SKB_FRAGS + 1];
++};
 +
-+	if (likely(length <= left)) {
-+		memcpy(pos, src, length);
-+		pos += length;
-+	} else {
-+		memcpy(pos, src, left);
-+		memcpy(q->desc, src + left, length - left);
-+		pos = (void *)q->desc + (length - left);
-+	}
-+	/* 0-pad to multiple of 16 */
-+	p = PTR_ALIGN(pos, 8);
-+	if ((uintptr_t)p & 8) {
-+		*p = 0;
-+		return p + 1;
-+	}
-+	return p;
-+}
-+
-+/**
-+ *      ofld_xmit_direct - copy a WR into offload queue
-+ *      @q: the Tx offload queue
-+ *      @src: location of WR
-+ *      @len: WR length
-+ *
-+ *      Copy an immediate WR into an uncontended SGE offload queue.
-+ */
-+static int ofld_xmit_direct(struct sge_uld_txq *q, const void *src,
-+			    unsigned int len)
-+{
-+	unsigned int ndesc;
-+	int credits;
-+	u64 *pos;
-+
-+	/* Use the lower limit as the cut-off */
-+	if (len > MAX_IMM_OFLD_TX_DATA_WR_LEN) {
-+		WARN_ON(1);
-+		return NET_XMIT_DROP;
-+	}
-+
-+	/* Don't return NET_XMIT_CN here as the current
-+	 * implementation doesn't queue the request
-+	 * using an skb when the following conditions not met
-+	 */
-+	if (!spin_trylock(&q->sendq.lock))
-+		return NET_XMIT_DROP;
-+
-+	if (q->full || !skb_queue_empty(&q->sendq) ||
-+	    q->service_ofldq_running) {
-+		spin_unlock(&q->sendq.lock);
-+		return NET_XMIT_DROP;
-+	}
-+	ndesc = flits_to_desc(DIV_ROUND_UP(len, 8));
-+	credits = txq_avail(&q->q) - ndesc;
-+	pos = (u64 *)&q->q.desc[q->q.pidx];
-+
-+	/* ofldtxq_stop modifies WR header in-situ */
-+	inline_tx_header(src, &q->q, pos, len);
-+	if (unlikely(credits < TXQ_STOP_THRES))
-+		ofldtxq_stop(q, (struct fw_wr_hdr *)pos);
-+	txq_advance(&q->q, ndesc);
-+	cxgb4_ring_tx_db(q->adap, &q->q, ndesc);
-+
-+	spin_unlock(&q->sendq.lock);
-+	return NET_XMIT_SUCCESS;
-+}
-+
-+int cxgb4_immdata_send(struct net_device *dev, unsigned int idx,
-+		       const void *src, unsigned int len)
-+{
-+	struct sge_uld_txq_info *txq_info;
-+	struct sge_uld_txq *txq;
-+	struct adapter *adap;
-+	int ret;
-+
-+	adap = netdev2adap(dev);
-+
-+	local_bh_disable();
-+	txq_info = adap->sge.uld_txq_info[CXGB4_TX_OFLD];
-+	if (unlikely(!txq_info)) {
-+		WARN_ON(true);
-+		local_bh_enable();
-+		return NET_XMIT_DROP;
-+	}
-+	txq = &txq_info->uldtxq[idx];
-+
-+	ret = ofld_xmit_direct(txq, src, len);
-+	local_bh_enable();
-+	return net_xmit_eval(ret);
-+}
-+EXPORT_SYMBOL(cxgb4_immdata_send);
-+
- /**
-  *	t4_crypto_send - send crypto packet
-  *	@adap: the adapter
+ struct chcr_ipsec_req {
+ 	struct ulp_txpkt ulptx;
+ 	struct ulptx_idata sc_imm;
 -- 
 1.8.3.1
