@@ -1,68 +1,201 @@
-From: Harsh Jain <harsh@chelsio.com>
-Subject: Re: [PATCH] crypto: chelsio: move chcr_ahash_continue declation out
- of header
-Date: Thu, 29 Mar 2018 17:13:20 +0530
-Message-ID: <865ba49d-b24f-b3b6-1440-54cfa7b4c2e6@chelsio.com>
-References: <20180328140539.2694734-1-arnd@arndb.de>
+From: Maninder Singh <maninder1.s@samsung.com>
+Subject: Re: [PATCH 0/1] cover-letter/lz4: Implement lz4 with dynamic offset
+ length.
+Date: Thu, 29 Mar 2018 15:56:13 +0530
+Message-ID: <20180329102613epcms5p6ffaa80d12115ded8f3c9ef01dd009744@epcms5p6>
+References: <20180329102046epcms5p8ecc9532b03bab4f47cbdbb2507171b86@epcms5p8>
+        <20180323134319epcms5p62e6021aa33c941c46ecdb8b5364b614c@epcms5p6>
+        <1663C9A3-7DAC-4A11-894C-C99E07BEDAD2@fb.com>
+        <1521607242-3968-1-git-send-email-maninder1.s@samsung.com>
+        <20180321082628.GB2746@jagdpanzerIV>
+        <CGME20180321044137epcas5p221e7ee4a0b7464eaa00dad8320f0251d@epcms5p6>
+Reply-To: maninder1.s@samsung.com
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Cc: Ganesh Goudar <ganeshgr@chelsio.com>,
-        Atul Gupta <atul.gupta@chelsio.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Arnd Bergmann <arnd@arndb.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Cc: "davem@davemloft.net" <davem@davemloft.net>,
+        "minchan@kernel.org" <minchan@kernel.org>,
+        "ngupta@vflare.org" <ngupta@vflare.org>,
+        Kees Cook <keescook@chromium.org>,
+        "anton@enomsg.org" <anton@enomsg.org>,
+        "ccross@android.com" <ccross@android.com>,
+        "tony.luck@intel.com" <tony.luck@intel.com>,
+        "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+        "colin.king@canonical.com" <colin.king@canonical.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        PANKAJ MISHRA <pankaj.m@samsung.com>,
+        AMIT SAHRAWAT <a.sahrawat@samsung.com>,
+        Yann Collet <cyan@fb.com>
+To: Vaneet Narang <v.narang@samsung.com>,
+        Nick Terrell <terrelln@fb.com>,
+        Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180328140539.2694734-1-arnd@arndb.de>
-Content-Language: en-US
+In-Reply-To: <20180329102046epcms5p8ecc9532b03bab4f47cbdbb2507171b86@epcms5p8>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi,
 
-Fix for that is already submitted in below patch.
-
-https://patchwork.kernel.org/patch/10292333/
-
-Thanks
-
-
-On 28-03-2018 19:35, Arnd Bergmann wrote:
-> static function declarations don't belong in a header file, as shown
-> by this compiler warning:
->
-> In file included from /git/arm-soc/drivers/crypto/chelsio/chcr_ipsec.c:66:
-> drivers/crypto/chelsio/chcr_crypto.h:343:12: error: 'chcr_ahash_continue' declared 'static' but never defined [-Werror=unused-function]
->
-> This moves the declaration into the file that actually needs it.
->
-> Fixes: 5110e65536f3 ("crypto: chelsio -Split Hash requests for large scatter gather list")
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> ---
->  drivers/crypto/chelsio/chcr_algo.c   | 1 +
->  drivers/crypto/chelsio/chcr_crypto.h | 1 -
->  2 files changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/drivers/crypto/chelsio/chcr_algo.c b/drivers/crypto/chelsio/chcr_algo.c
-> index 4617c7acf4da..ebc96f2fae01 100644
-> --- a/drivers/crypto/chelsio/chcr_algo.c
-> +++ b/drivers/crypto/chelsio/chcr_algo.c
-> @@ -95,6 +95,7 @@ static u32 round_constant[11] = {
->  
->  static int chcr_handle_cipher_resp(struct ablkcipher_request *req,
->  				   unsigned char *input, int err);
-> +static int chcr_ahash_continue(struct ahash_request *req);
->  
->  static inline  struct chcr_aead_ctx *AEAD_CTX(struct chcr_context *ctx)
->  {
-> diff --git a/drivers/crypto/chelsio/chcr_crypto.h b/drivers/crypto/chelsio/chcr_crypto.h
-> index 71025ea9c3db..c8e8972af283 100644
-> --- a/drivers/crypto/chelsio/chcr_crypto.h
-> +++ b/drivers/crypto/chelsio/chcr_crypto.h
-> @@ -340,5 +340,4 @@ void chcr_add_hash_src_ent(struct ahash_request *req, struct ulptx_sgl *ulptx,
->  			   struct hash_wr_param *param);
->  int chcr_hash_dma_map(struct device *dev, struct ahash_request *req);
->  void chcr_hash_dma_unmap(struct device *dev, struct ahash_request *req);
-> -static int chcr_ahash_continue(struct ahash_request *req);
->  #endif /* __CHCR_CRYPTO_H__ */
+Hello=C2=A0Nick/Sergey,=0D=0A=C2=A0=0D=0AAny=C2=A0suggestion=C2=A0or=C2=A0c=
+omments,=C2=A0so=C2=A0that=C2=A0we=C2=A0can=C2=A0change=C2=A0code=C2=A0and=
+=C2=A0resend=C2=A0the=C2=A0patch?=0D=0A=C2=A0=0D=0A>=C2=A0Hi=C2=A0Nick=C2=
+=A0/=C2=A0Sergey,=0D=0A>=C2=A0=0D=0A>=C2=A0=0D=0A>=C2=A0We=C2=A0have=C2=A0c=
+ompared=C2=A0LZ4=C2=A0Dyn=C2=A0with=C2=A0Original=C2=A0LZ4=C2=A0using=C2=A0=
+some=C2=A0samples=C2=A0of=C2=A0realtime=C2=A0application=C2=A0data(4Kb)=0D=
+=0A>=C2=A0compressed/decompressed=C2=A0by=C2=A0ZRAM.=C2=A0For=C2=A0comparis=
+on=C2=A0we=C2=A0have=C2=A0used=C2=A0lzbench=C2=A0(https://github.com/inikep=
+/lzbench)=0D=0A>=C2=A0we=C2=A0have=C2=A0implemented=C2=A0dedicated=C2=A0LZ4=
+=C2=A0Dyn=C2=A0API=C2=A0&=C2=A0kept=C2=A0last=C2=A0literal=C2=A0length=C2=
+=A0as=C2=A06=C2=A0to=C2=A0avoid=C2=A0overhead=C2=A0=0D=0A>=C2=A0of=C2=A0che=
+cks.=C2=A0It=C2=A0seems=C2=A0in=C2=A0average=C2=A0case=C2=A0there=C2=A0is=
+=C2=A0a=C2=A0saving=C2=A0of=C2=A03=7E4%=C2=A0in=C2=A0compression=C2=A0ratio=
+=C2=A0with=C2=A0almost=C2=A0same=C2=A0compression=0D=0A>=C2=A0speed=C2=A0an=
+d=C2=A0minor=C2=A0loss=C2=A0in=C2=A0decompression=C2=A0speed=C2=A0(=7E50MB/=
+s)=C2=A0when=C2=A0compared=C2=A0with=C2=A0LZ4.=0D=0A>=C2=A0=0D=0A>=C2=A0Com=
+parison=C2=A0of=C2=A0Lz4=C2=A0Dyn=C2=A0with=C2=A0LZO1x=C2=A0is=C2=A0also=C2=
+=A0done=C2=A0as=C2=A0LZO1x=C2=A0is=C2=A0default=C2=A0compressor=C2=A0of=C2=
+=A0ZRAM.=0D=0A>=C2=A0=0D=0A>=C2=A0Original=C2=A0LZ4:=0D=0A>=C2=A0sh-3.2=23=
+=C2=A0./lzbench=C2=A0=C2=A0-r=C2=A0=C2=A0-elz4=C2=A0=C2=A0data/=0D=0A>=C2=
+=A0lzbench=C2=A01.7.3=C2=A0(32-bit=C2=A0Linux)=C2=A0=C2=A0=C2=A0Assembled=
+=C2=A0by=C2=A0P.Skibinski=0D=0A>=C2=A0Compressor=C2=A0name=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Compress.=C2=A0Decompress.=C2=A0Comp=
+r.=C2=A0size=C2=A0=C2=A0Ratio=C2=A0Filename=0D=0A>=C2=A0memcpy=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A02205=C2=A0MB/s=C2=A0=C2=A02217=C2=A0MB/s=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A04096=C2=A0100.00=C2=A0data//data_=
+1=0D=0A>=C2=A0lz4=C2=A01.8.0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0216=C2=A0MB/s=C2=
+=A0=C2=A0=C2=A0761=C2=A0MB/s=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A02433=C2=A0=C2=A059.40=C2=A0data//data_1=0D=0A>=C2=A0lz4=C2=A01.8.0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0269=C2=A0MB/s=C2=A0=C2=A0=C2=A0877=C2=A0MB/s=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A01873=C2=A0=C2=A045.73=C2=A0data//dat=
+a_2=0D=0A>=C2=A0lz4=C2=A01.8.0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0238=C2=A0MB/s=C2=
+=A0=C2=A0=C2=A0575=C2=A0MB/s=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A02060=C2=A0=C2=A050.29=C2=A0data//data_3=0D=0A>=C2=A0lz4=C2=A01.8.0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0321=C2=A0MB/s=C2=A0=C2=A01015=C2=A0MB/s=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A01464=C2=A0=C2=A035.74=C2=A0data//data_4=0D=
+=0A>=C2=A0lz4=C2=A01.8.0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0464=C2=A0MB/s=C2=A0=C2=
+=A01090=C2=A0MB/s=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0713=
+=C2=A0=C2=A017.41=C2=A0data//data_5=0D=0A>=C2=A0lz4=C2=A01.8.0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0296=C2=A0MB/s=C2=A0=C2=A0=C2=A0956=C2=A0MB/s=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A01597=C2=A0=C2=A038.99=C2=A0data//data_6=0D=
+=0A>=C2=A0lz4=C2=A01.8.0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0338=C2=A0MB/s=C2=A0=C2=
+=A0=C2=A0994=C2=A0MB/s=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A02238=
+=C2=A0=C2=A054.64=C2=A0data//data_7=0D=0A>=C2=A0lz4=C2=A01.8.0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0705=C2=A0MB/s=C2=A0=C2=A01172=C2=A0MB/s=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0193=C2=A0=C2=A0=C2=A04.71=C2=A0data//data_=
+8=0D=0A>=C2=A0lz4=C2=A01.8.0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0404=C2=A0MB/s=C2=
+=A0=C2=A01150=C2=A0MB/s=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A01097=
+=C2=A0=C2=A026.78=C2=A0data//data_9=0D=0A>=C2=A0lz4=C2=A01.8.0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0216=C2=A0MB/s=C2=A0=C2=A0=C2=A0921=C2=A0MB/s=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A03183=C2=A0=C2=A077.71=C2=A0data//data_10=
+=0D=0A>=C2=A0lz4=C2=A01.8.0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0456=C2=A0MB/s=C2=A0=
+=C2=A01101=C2=A0MB/s=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A01011=C2=
+=A0=C2=A024.68=C2=A0data//data_11=0D=0A>=C2=A0lz4=C2=A01.8.0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0867=C2=A0MB/s=C2=A0=C2=A01202=C2=A0MB/s=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A037=C2=A0=C2=A0=C2=A00.90=C2=A0data//dat=
+a_12=0D=0A>=C2=A0=0D=0A>=C2=A0=0D=0A>=C2=A0LZ4=C2=A0Dynamic=C2=A0Offet:=C2=
+=A0=C2=A0=0D=0A>=C2=A0sh-3.2=23=C2=A0./lzbench=C2=A0=C2=A0-r=C2=A0=C2=A0-el=
+z4_dyn=C2=A0=C2=A0data/=0D=0A>=C2=A0lzbench=C2=A01.7.3=C2=A0(32-bit=C2=A0Li=
+nux)=C2=A0=C2=A0=C2=A0Assembled=C2=A0by=C2=A0P.Skibinski=0D=0A>=C2=A0Compre=
+ssor=C2=A0name=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Compres=
+s.=C2=A0Decompress.=C2=A0Compr.=C2=A0size=C2=A0=C2=A0Ratio=C2=A0Filename=0D=
+=0A>=C2=A0memcpy=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A02203=C2=A0MB/s=C2=
+=A0=C2=A02218=C2=A0MB/s=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A04096=
+=C2=A0100.00=C2=A0data//data_1=0D=0A>=C2=A0lz4=C2=A01.8.0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0218=C2=A0MB/s=C2=A0=C2=A0=C2=A0693=C2=A0MB/s=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A02228=C2=A0=C2=A054.39=C2=A0data//data_1=0D=0A>=
+=C2=A0lz4=C2=A01.8.0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0273=C2=A0MB/s=C2=A0=C2=A0=
+=C2=A0851=C2=A0MB/s=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A01739=C2=
+=A0=C2=A042.46=C2=A0data//data_2=0D=0A>=C2=A0lz4=C2=A01.8.0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0230=C2=A0MB/s=C2=A0=C2=A0=C2=A0526=C2=A0MB/s=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A01800=C2=A0=C2=A043.95=C2=A0data//data_3=0D=0A=
+>=C2=A0lz4=C2=A01.8.0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0321=C2=A0MB/s=C2=A0=C2=A0=
+=C2=A0952=C2=A0MB/s=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A01357=C2=
+=A0=C2=A033.13=C2=A0data//data_4=0D=0A>=C2=A0lz4=C2=A01.8.0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0470=C2=A0MB/s=C2=A0=C2=A01075=C2=A0MB/s=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0664=C2=A0=C2=A016.21=C2=A0data//data_5=0D=0A>=
+=C2=A0lz4=C2=A01.8.0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0303=C2=A0MB/s=C2=A0=C2=A0=
+=C2=A0964=C2=A0MB/s=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A01455=C2=
+=A0=C2=A035.52=C2=A0data//data_6=0D=0A>=C2=A0lz4=C2=A01.8.0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0345=C2=A0MB/s=C2=A0=C2=A0=C2=A0951=C2=A0MB/s=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A02126=C2=A0=C2=A051.90=C2=A0data//data_7=0D=0A=
+>=C2=A0lz4=C2=A01.8.0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0744=C2=A0MB/s=C2=A0=C2=A011=
+63=C2=A0MB/s=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0177=C2=A0=
+=C2=A0=C2=A04.32=C2=A0data//data_8=0D=0A>=C2=A0lz4=C2=A01.8.0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0409=C2=A0MB/s=C2=A0=C2=A01257=C2=A0MB/s=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A01033=C2=A0=C2=A025.22=C2=A0data//data_9=0D=0A>=
+=C2=A0lz4=C2=A01.8.0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0220=C2=A0MB/s=C2=A0=C2=A0=
+=C2=A0857=C2=A0MB/s=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A03049=C2=
+=A0=C2=A074.44=C2=A0data//data_10=0D=0A>=C2=A0lz4=C2=A01.8.0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0464=C2=A0MB/s=C2=A0=C2=A01105=C2=A0MB/s=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0934=C2=A0=C2=A022.80=C2=A0data//data_11=0D=0A=
+>=C2=A0lz4=C2=A01.8.0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0874=C2=A0MB/s=C2=A0=C2=A011=
+94=C2=A0MB/s=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A036=
+=C2=A0=C2=A0=C2=A00.88=C2=A0data//data_12=0D=0A>=C2=A0=0D=0A>=C2=A0=0D=0A>=
+=C2=A0LZ4=C2=A0Dynamic=C2=A0Offset=C2=A0with=C2=A032K=C2=A0data:=0D=0A>=C2=
+=A0sh-3.2=23=C2=A0./lzbench=C2=A0-elz4_dyn=C2=A0data/data32k=0D=0A>=C2=A0lz=
+bench=C2=A01.7.3=C2=A0(32-bit=C2=A0Linux)=C2=A0=C2=A0=C2=A0Assembled=C2=A0b=
+y=C2=A0P.Skibinski=0D=0A>=C2=A0Compressor=C2=A0name=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Compress.=C2=A0Decompress.=C2=A0Compr.=C2=A0s=
+ize=C2=A0=C2=A0Ratio=C2=A0Filename=0D=0A>=C2=A0memcpy=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A05285=C2=A0MB/s=C2=A0=C2=A05283=C2=A0MB/s=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A032768=C2=A0100.00=C2=A0data/data32k=0D=0A>=C2=A0=
+lz4=C2=A01.8.0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0274=C2=A0MB/s=C2=A0=C2=A0=C2=A099=
+5=C2=A0MB/s=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A013435=C2=A0=C2=A041.00=
+=C2=A0data/data32k=0D=0A>=C2=A0done...=C2=A0(cIters=3D1=C2=A0dIters=3D1=C2=
+=A0cTime=3D1.0=C2=A0dTime=3D2.0=C2=A0chunkSize=3D1706MB=C2=A0cSpeed=3D0MB)=
+=0D=0A>=C2=A0=0D=0A>=C2=A0Original=C2=A0LZ4=C2=A0with=C2=A032K=C2=A0data:=
+=0D=0A>=C2=A0sh-3.2=23=C2=A0./lzbench_orig=C2=A0-elz4=C2=A0data/data32k=0D=
+=0A>=C2=A0lzbench=C2=A01.7.3=C2=A0(32-bit=C2=A0Linux)=C2=A0=C2=A0=C2=A0Asse=
+mbled=C2=A0by=C2=A0P.Skibinski=0D=0A>=C2=A0Compressor=C2=A0name=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Compress.=C2=A0Decompress.=C2=A0C=
+ompr.=C2=A0size=C2=A0=C2=A0Ratio=C2=A0Filename=0D=0A>=C2=A0memcpy=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A04918=C2=A0MB/s=C2=A0=C2=A05108=C2=A0MB/s=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A032768=C2=A0100.00=C2=A0data/data32k=
+=0D=0A>=C2=A0lz4=C2=A01.8.0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0276=C2=A0MB/s=C2=A0=
+=C2=A01045=C2=A0MB/s=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A014492=C2=A0=
+=C2=A044.23=C2=A0data/data32k=0D=0A>=C2=A0=0D=0A>=C2=A0LZO1x=C2=A0with=C2=
+=A032K=C2=A0data=C2=A0(Default=C2=A0Compressor=C2=A0for=C2=A0ZRAM):=C2=A0=
+=0D=0A>=C2=A0sh-3.2=23=C2=A0./lzbench=C2=A0-elzo1x,1=C2=A0data/data32k=0D=
+=0A>=C2=A0lzbench=C2=A01.7.3=C2=A0(32-bit=C2=A0Linux)=C2=A0=C2=A0=C2=A0Asse=
+mbled=C2=A0by=C2=A0P.Skibinski=0D=0A>=C2=A0Compressor=C2=A0name=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Compress.=C2=A0Decompress.=C2=A0C=
+ompr.=C2=A0size=C2=A0=C2=A0Ratio=C2=A0Filename=0D=0A>=C2=A0memcpy=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A05273=C2=A0MB/s=C2=A0=C2=A05320=C2=A0MB/s=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A032768=C2=A0100.00=C2=A0data/data32k=
+=0D=0A>=C2=A0lzo1x=C2=A02.09=C2=A0-1=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0283=C2=A0MB/s=C2=A0=C2=A0=C2=A0465=
+=C2=A0MB/s=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A014292=C2=A0=C2=A043.62=
+=C2=A0data/data32k=0D=0A>=C2=A0=0D=0A>=C2=A0Regards,=0D=0A>=C2=A0Vaneet=C2=
+=A0Narang=0D=0A=C2=A0=0D=0AThanks.=0D=0A=C2=A0
