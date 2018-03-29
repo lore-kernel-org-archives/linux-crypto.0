@@ -1,201 +1,62 @@
-From: Maninder Singh <maninder1.s@samsung.com>
-Subject: Re: [PATCH 0/1] cover-letter/lz4: Implement lz4 with dynamic offset
- length.
-Date: Thu, 29 Mar 2018 15:56:13 +0530
-Message-ID: <20180329102613epcms5p6ffaa80d12115ded8f3c9ef01dd009744@epcms5p6>
-References: <20180329102046epcms5p8ecc9532b03bab4f47cbdbb2507171b86@epcms5p8>
-        <20180323134319epcms5p62e6021aa33c941c46ecdb8b5364b614c@epcms5p6>
-        <1663C9A3-7DAC-4A11-894C-C99E07BEDAD2@fb.com>
-        <1521607242-3968-1-git-send-email-maninder1.s@samsung.com>
-        <20180321082628.GB2746@jagdpanzerIV>
-        <CGME20180321044137epcas5p221e7ee4a0b7464eaa00dad8320f0251d@epcms5p6>
-Reply-To: maninder1.s@samsung.com
+From: Varsha Rao <rvarsha016@gmail.com>
+Subject: Re: [PATCH] crypto: cavium: zip: Remove unnecessary parentheses
+Date: Thu, 29 Mar 2018 21:03:45 +0530
+Message-ID: <CAAFX7JTfWdaGra+kWBJt-GXVVO601K03qWnExFKFD_9vxS-03g@mail.gmail.com>
+References: <20180328175736.17360-1-rvarsha016@gmail.com> <1522260676.12357.121.camel@perches.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Cc: "davem@davemloft.net" <davem@davemloft.net>,
-        "minchan@kernel.org" <minchan@kernel.org>,
-        "ngupta@vflare.org" <ngupta@vflare.org>,
-        Kees Cook <keescook@chromium.org>,
-        "anton@enomsg.org" <anton@enomsg.org>,
-        "ccross@android.com" <ccross@android.com>,
-        "tony.luck@intel.com" <tony.luck@intel.com>,
-        "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-        "colin.king@canonical.com" <colin.king@canonical.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        PANKAJ MISHRA <pankaj.m@samsung.com>,
-        AMIT SAHRAWAT <a.sahrawat@samsung.com>,
-        Yann Collet <cyan@fb.com>
-To: Vaneet Narang <v.narang@samsung.com>,
-        Nick Terrell <terrelln@fb.com>,
-        Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset="UTF-8"
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        cocci <cocci@systeme.lip6.fr>
+To: Joe Perches <joe@perches.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180329102046epcms5p8ecc9532b03bab4f47cbdbb2507171b86@epcms5p8>
+In-Reply-To: <1522260676.12357.121.camel@perches.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
+On Wed, Mar 28, 2018 at 11:41 PM, Joe Perches wrote:
+>
+> On Wed, 2018-03-28 at 23:27, Varsha Rao wrote:
+> > This patch fixes the clang warning of extraneous parentheses, with the
+> > following coccinelle script.
+> >
+> > @@
+> > identifier i;
+> > constant c;
+> > @@
+> > (
+> > -((i == c))
+> > +i == c
+> > >
+> >
+> > -((i <= c))
+> > +i <= c
+>
+> Why just the "==" and "<=" cases?
+> Why not "<", ">" and ">=" too?
+>
+> Why not expression instead of constant?
 
-Hello=C2=A0Nick/Sergey,=0D=0A=C2=A0=0D=0AAny=C2=A0suggestion=C2=A0or=C2=A0c=
-omments,=C2=A0so=C2=A0that=C2=A0we=C2=A0can=C2=A0change=C2=A0code=C2=A0and=
-=C2=A0resend=C2=A0the=C2=A0patch?=0D=0A=C2=A0=0D=0A>=C2=A0Hi=C2=A0Nick=C2=
-=A0/=C2=A0Sergey,=0D=0A>=C2=A0=0D=0A>=C2=A0=0D=0A>=C2=A0We=C2=A0have=C2=A0c=
-ompared=C2=A0LZ4=C2=A0Dyn=C2=A0with=C2=A0Original=C2=A0LZ4=C2=A0using=C2=A0=
-some=C2=A0samples=C2=A0of=C2=A0realtime=C2=A0application=C2=A0data(4Kb)=0D=
-=0A>=C2=A0compressed/decompressed=C2=A0by=C2=A0ZRAM.=C2=A0For=C2=A0comparis=
-on=C2=A0we=C2=A0have=C2=A0used=C2=A0lzbench=C2=A0(https://github.com/inikep=
-/lzbench)=0D=0A>=C2=A0we=C2=A0have=C2=A0implemented=C2=A0dedicated=C2=A0LZ4=
-=C2=A0Dyn=C2=A0API=C2=A0&=C2=A0kept=C2=A0last=C2=A0literal=C2=A0length=C2=
-=A0as=C2=A06=C2=A0to=C2=A0avoid=C2=A0overhead=C2=A0=0D=0A>=C2=A0of=C2=A0che=
-cks.=C2=A0It=C2=A0seems=C2=A0in=C2=A0average=C2=A0case=C2=A0there=C2=A0is=
-=C2=A0a=C2=A0saving=C2=A0of=C2=A03=7E4%=C2=A0in=C2=A0compression=C2=A0ratio=
-=C2=A0with=C2=A0almost=C2=A0same=C2=A0compression=0D=0A>=C2=A0speed=C2=A0an=
-d=C2=A0minor=C2=A0loss=C2=A0in=C2=A0decompression=C2=A0speed=C2=A0(=7E50MB/=
-s)=C2=A0when=C2=A0compared=C2=A0with=C2=A0LZ4.=0D=0A>=C2=A0=0D=0A>=C2=A0Com=
-parison=C2=A0of=C2=A0Lz4=C2=A0Dyn=C2=A0with=C2=A0LZO1x=C2=A0is=C2=A0also=C2=
-=A0done=C2=A0as=C2=A0LZO1x=C2=A0is=C2=A0default=C2=A0compressor=C2=A0of=C2=
-=A0ZRAM.=0D=0A>=C2=A0=0D=0A>=C2=A0Original=C2=A0LZ4:=0D=0A>=C2=A0sh-3.2=23=
-=C2=A0./lzbench=C2=A0=C2=A0-r=C2=A0=C2=A0-elz4=C2=A0=C2=A0data/=0D=0A>=C2=
-=A0lzbench=C2=A01.7.3=C2=A0(32-bit=C2=A0Linux)=C2=A0=C2=A0=C2=A0Assembled=
-=C2=A0by=C2=A0P.Skibinski=0D=0A>=C2=A0Compressor=C2=A0name=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Compress.=C2=A0Decompress.=C2=A0Comp=
-r.=C2=A0size=C2=A0=C2=A0Ratio=C2=A0Filename=0D=0A>=C2=A0memcpy=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A02205=C2=A0MB/s=C2=A0=C2=A02217=C2=A0MB/s=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A04096=C2=A0100.00=C2=A0data//data_=
-1=0D=0A>=C2=A0lz4=C2=A01.8.0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0216=C2=A0MB/s=C2=
-=A0=C2=A0=C2=A0761=C2=A0MB/s=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A02433=C2=A0=C2=A059.40=C2=A0data//data_1=0D=0A>=C2=A0lz4=C2=A01.8.0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0269=C2=A0MB/s=C2=A0=C2=A0=C2=A0877=C2=A0MB/s=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A01873=C2=A0=C2=A045.73=C2=A0data//dat=
-a_2=0D=0A>=C2=A0lz4=C2=A01.8.0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0238=C2=A0MB/s=C2=
-=A0=C2=A0=C2=A0575=C2=A0MB/s=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A02060=C2=A0=C2=A050.29=C2=A0data//data_3=0D=0A>=C2=A0lz4=C2=A01.8.0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0321=C2=A0MB/s=C2=A0=C2=A01015=C2=A0MB/s=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A01464=C2=A0=C2=A035.74=C2=A0data//data_4=0D=
-=0A>=C2=A0lz4=C2=A01.8.0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0464=C2=A0MB/s=C2=A0=C2=
-=A01090=C2=A0MB/s=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0713=
-=C2=A0=C2=A017.41=C2=A0data//data_5=0D=0A>=C2=A0lz4=C2=A01.8.0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0296=C2=A0MB/s=C2=A0=C2=A0=C2=A0956=C2=A0MB/s=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A01597=C2=A0=C2=A038.99=C2=A0data//data_6=0D=
-=0A>=C2=A0lz4=C2=A01.8.0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0338=C2=A0MB/s=C2=A0=C2=
-=A0=C2=A0994=C2=A0MB/s=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A02238=
-=C2=A0=C2=A054.64=C2=A0data//data_7=0D=0A>=C2=A0lz4=C2=A01.8.0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0705=C2=A0MB/s=C2=A0=C2=A01172=C2=A0MB/s=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0193=C2=A0=C2=A0=C2=A04.71=C2=A0data//data_=
-8=0D=0A>=C2=A0lz4=C2=A01.8.0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0404=C2=A0MB/s=C2=
-=A0=C2=A01150=C2=A0MB/s=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A01097=
-=C2=A0=C2=A026.78=C2=A0data//data_9=0D=0A>=C2=A0lz4=C2=A01.8.0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0216=C2=A0MB/s=C2=A0=C2=A0=C2=A0921=C2=A0MB/s=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A03183=C2=A0=C2=A077.71=C2=A0data//data_10=
-=0D=0A>=C2=A0lz4=C2=A01.8.0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0456=C2=A0MB/s=C2=A0=
-=C2=A01101=C2=A0MB/s=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A01011=C2=
-=A0=C2=A024.68=C2=A0data//data_11=0D=0A>=C2=A0lz4=C2=A01.8.0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0867=C2=A0MB/s=C2=A0=C2=A01202=C2=A0MB/s=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A037=C2=A0=C2=A0=C2=A00.90=C2=A0data//dat=
-a_12=0D=0A>=C2=A0=0D=0A>=C2=A0=0D=0A>=C2=A0LZ4=C2=A0Dynamic=C2=A0Offet:=C2=
-=A0=C2=A0=0D=0A>=C2=A0sh-3.2=23=C2=A0./lzbench=C2=A0=C2=A0-r=C2=A0=C2=A0-el=
-z4_dyn=C2=A0=C2=A0data/=0D=0A>=C2=A0lzbench=C2=A01.7.3=C2=A0(32-bit=C2=A0Li=
-nux)=C2=A0=C2=A0=C2=A0Assembled=C2=A0by=C2=A0P.Skibinski=0D=0A>=C2=A0Compre=
-ssor=C2=A0name=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Compres=
-s.=C2=A0Decompress.=C2=A0Compr.=C2=A0size=C2=A0=C2=A0Ratio=C2=A0Filename=0D=
-=0A>=C2=A0memcpy=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A02203=C2=A0MB/s=C2=
-=A0=C2=A02218=C2=A0MB/s=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A04096=
-=C2=A0100.00=C2=A0data//data_1=0D=0A>=C2=A0lz4=C2=A01.8.0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0218=C2=A0MB/s=C2=A0=C2=A0=C2=A0693=C2=A0MB/s=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A02228=C2=A0=C2=A054.39=C2=A0data//data_1=0D=0A>=
-=C2=A0lz4=C2=A01.8.0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0273=C2=A0MB/s=C2=A0=C2=A0=
-=C2=A0851=C2=A0MB/s=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A01739=C2=
-=A0=C2=A042.46=C2=A0data//data_2=0D=0A>=C2=A0lz4=C2=A01.8.0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0230=C2=A0MB/s=C2=A0=C2=A0=C2=A0526=C2=A0MB/s=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A01800=C2=A0=C2=A043.95=C2=A0data//data_3=0D=0A=
->=C2=A0lz4=C2=A01.8.0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0321=C2=A0MB/s=C2=A0=C2=A0=
-=C2=A0952=C2=A0MB/s=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A01357=C2=
-=A0=C2=A033.13=C2=A0data//data_4=0D=0A>=C2=A0lz4=C2=A01.8.0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0470=C2=A0MB/s=C2=A0=C2=A01075=C2=A0MB/s=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0664=C2=A0=C2=A016.21=C2=A0data//data_5=0D=0A>=
-=C2=A0lz4=C2=A01.8.0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0303=C2=A0MB/s=C2=A0=C2=A0=
-=C2=A0964=C2=A0MB/s=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A01455=C2=
-=A0=C2=A035.52=C2=A0data//data_6=0D=0A>=C2=A0lz4=C2=A01.8.0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0345=C2=A0MB/s=C2=A0=C2=A0=C2=A0951=C2=A0MB/s=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A02126=C2=A0=C2=A051.90=C2=A0data//data_7=0D=0A=
->=C2=A0lz4=C2=A01.8.0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0744=C2=A0MB/s=C2=A0=C2=A011=
-63=C2=A0MB/s=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0177=C2=A0=
-=C2=A0=C2=A04.32=C2=A0data//data_8=0D=0A>=C2=A0lz4=C2=A01.8.0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0409=C2=A0MB/s=C2=A0=C2=A01257=C2=A0MB/s=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A01033=C2=A0=C2=A025.22=C2=A0data//data_9=0D=0A>=
-=C2=A0lz4=C2=A01.8.0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0220=C2=A0MB/s=C2=A0=C2=A0=
-=C2=A0857=C2=A0MB/s=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A03049=C2=
-=A0=C2=A074.44=C2=A0data//data_10=0D=0A>=C2=A0lz4=C2=A01.8.0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0464=C2=A0MB/s=C2=A0=C2=A01105=C2=A0MB/s=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0934=C2=A0=C2=A022.80=C2=A0data//data_11=0D=0A=
->=C2=A0lz4=C2=A01.8.0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0874=C2=A0MB/s=C2=A0=C2=A011=
-94=C2=A0MB/s=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A036=
-=C2=A0=C2=A0=C2=A00.88=C2=A0data//data_12=0D=0A>=C2=A0=0D=0A>=C2=A0=0D=0A>=
-=C2=A0LZ4=C2=A0Dynamic=C2=A0Offset=C2=A0with=C2=A032K=C2=A0data:=0D=0A>=C2=
-=A0sh-3.2=23=C2=A0./lzbench=C2=A0-elz4_dyn=C2=A0data/data32k=0D=0A>=C2=A0lz=
-bench=C2=A01.7.3=C2=A0(32-bit=C2=A0Linux)=C2=A0=C2=A0=C2=A0Assembled=C2=A0b=
-y=C2=A0P.Skibinski=0D=0A>=C2=A0Compressor=C2=A0name=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Compress.=C2=A0Decompress.=C2=A0Compr.=C2=A0s=
-ize=C2=A0=C2=A0Ratio=C2=A0Filename=0D=0A>=C2=A0memcpy=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A05285=C2=A0MB/s=C2=A0=C2=A05283=C2=A0MB/s=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A032768=C2=A0100.00=C2=A0data/data32k=0D=0A>=C2=A0=
-lz4=C2=A01.8.0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0274=C2=A0MB/s=C2=A0=C2=A0=C2=A099=
-5=C2=A0MB/s=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A013435=C2=A0=C2=A041.00=
-=C2=A0data/data32k=0D=0A>=C2=A0done...=C2=A0(cIters=3D1=C2=A0dIters=3D1=C2=
-=A0cTime=3D1.0=C2=A0dTime=3D2.0=C2=A0chunkSize=3D1706MB=C2=A0cSpeed=3D0MB)=
-=0D=0A>=C2=A0=0D=0A>=C2=A0Original=C2=A0LZ4=C2=A0with=C2=A032K=C2=A0data:=
-=0D=0A>=C2=A0sh-3.2=23=C2=A0./lzbench_orig=C2=A0-elz4=C2=A0data/data32k=0D=
-=0A>=C2=A0lzbench=C2=A01.7.3=C2=A0(32-bit=C2=A0Linux)=C2=A0=C2=A0=C2=A0Asse=
-mbled=C2=A0by=C2=A0P.Skibinski=0D=0A>=C2=A0Compressor=C2=A0name=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Compress.=C2=A0Decompress.=C2=A0C=
-ompr.=C2=A0size=C2=A0=C2=A0Ratio=C2=A0Filename=0D=0A>=C2=A0memcpy=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A04918=C2=A0MB/s=C2=A0=C2=A05108=C2=A0MB/s=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A032768=C2=A0100.00=C2=A0data/data32k=
-=0D=0A>=C2=A0lz4=C2=A01.8.0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0276=C2=A0MB/s=C2=A0=
-=C2=A01045=C2=A0MB/s=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A014492=C2=A0=
-=C2=A044.23=C2=A0data/data32k=0D=0A>=C2=A0=0D=0A>=C2=A0LZO1x=C2=A0with=C2=
-=A032K=C2=A0data=C2=A0(Default=C2=A0Compressor=C2=A0for=C2=A0ZRAM):=C2=A0=
-=0D=0A>=C2=A0sh-3.2=23=C2=A0./lzbench=C2=A0-elzo1x,1=C2=A0data/data32k=0D=
-=0A>=C2=A0lzbench=C2=A01.7.3=C2=A0(32-bit=C2=A0Linux)=C2=A0=C2=A0=C2=A0Asse=
-mbled=C2=A0by=C2=A0P.Skibinski=0D=0A>=C2=A0Compressor=C2=A0name=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Compress.=C2=A0Decompress.=C2=A0C=
-ompr.=C2=A0size=C2=A0=C2=A0Ratio=C2=A0Filename=0D=0A>=C2=A0memcpy=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A05273=C2=A0MB/s=C2=A0=C2=A05320=C2=A0MB/s=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A032768=C2=A0100.00=C2=A0data/data32k=
-=0D=0A>=C2=A0lzo1x=C2=A02.09=C2=A0-1=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0283=C2=A0MB/s=C2=A0=C2=A0=C2=A0465=
-=C2=A0MB/s=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A014292=C2=A0=C2=A043.62=
-=C2=A0data/data32k=0D=0A>=C2=A0=0D=0A>=C2=A0Regards,=0D=0A>=C2=A0Vaneet=C2=
-=A0Narang=0D=0A=C2=A0=0D=0AThanks.=0D=0A=C2=A0
+Initially I had the other cases too and used expression instead of
+constant. But the results included only "==" and "<=" cases with
+constant. Along with one false positive case.
+
+--- a/drivers/crypto/cavium/zip/zip_main.c
++++ b/drivers/crypto/cavium/zip/zip_main.c
+@@ -99,7 +99,7 @@ static struct zip_device *zip_alloc_devi
+  */
+ struct zip_device *zip_get_device(int node)
+ {
+-    if ((node < MAX_ZIP_DEVICES) && (node >= 0))
++    if (node < MAX_ZIP_DEVICES && node >= 0)
+         return zip_dev[node];
+
+     zip_err("ZIP device not found for node id %d\n", node);
+
+I checked if there was any case of extra parentheses around relational
+operators left, but there were none. Hence, in the script I included
+only the cases present in the result.
+
+Thanks,
+Varsha
