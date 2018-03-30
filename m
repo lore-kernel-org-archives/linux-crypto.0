@@ -1,69 +1,49 @@
-From: Atul Gupta <atul.gupta@chelsio.com>
-Subject: Re: [PATCH v14 net-next 09/12] crypto: chtls - Inline TLS record Tx
-Date: Fri, 30 Mar 2018 00:54:09 +0530
-Message-ID: <52183607-b227-dc53-4a94-9408c5a4ecaf@chelsio.com>
-References: <1522339074-4681-1-git-send-email-atul.gupta@chelsio.com>
- <1522339074-4681-10-git-send-email-atul.gupta@chelsio.com>
- <20180329162611.GA9517@bistromath.localdomain>
+From: Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>
+Subject: Re: [PATCH 0/1] cover-letter/lz4: Implement lz4 with dynamic offset
+ length.
+Date: Fri, 30 Mar 2018 14:41:56 +0900
+Message-ID: <20180330054156.GA10282@jagdpanzerIV>
+References: <20180329102046epcms5p8ecc9532b03bab4f47cbdbb2507171b86@epcms5p8>
+ <20180323134319epcms5p62e6021aa33c941c46ecdb8b5364b614c@epcms5p6>
+ <1663C9A3-7DAC-4A11-894C-C99E07BEDAD2@fb.com>
+ <1521607242-3968-1-git-send-email-maninder1.s@samsung.com>
+ <20180321082628.GB2746@jagdpanzerIV>
+ <CGME20180321044137epcas5p221e7ee4a0b7464eaa00dad8320f0251d@epcms5p6>
+ <20180329102613epcms5p6ffaa80d12115ded8f3c9ef01dd009744@epcms5p6>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Cc: davem@davemloft.net, herbert@gondor.apana.org.au,
-        davejwatson@fb.com, sbrivio@redhat.com,
-        linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
-        werner@chelsio.com, leedom@chelsio.com,
-        swise@opengridcomputing.com, indranil@chelsio.com,
-        ganeshgr@chelsio.com
-To: Sabrina Dubroca <sd@queasysnail.net>
-Return-path: <netdev-owner@vger.kernel.org>
-In-Reply-To: <20180329162611.GA9517@bistromath.localdomain>
-Content-Language: en-US
-Sender: netdev-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: Vaneet Narang <v.narang@samsung.com>,
+        Nick Terrell <terrelln@fb.com>,
+        Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "minchan@kernel.org" <minchan@kernel.org>,
+        "ngupta@vflare.org" <ngupta@vflare.org>,
+        Kees Cook <keescook@chromium.org>,
+        "anton@enomsg.org" <anton@enomsg.org>,
+        "ccross@android.com" <ccross@android.com>,
+        "tony.luck@intel.com" <tony.luck@intel.com>,
+        "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+        "colin.king@canonical.com" <colin.king@canonical.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        PANKAJ MISHRA <pankaj.m@samsung.com>,
+        AMIT SAHRAWAT
+To: Maninder Singh <maninder1.s@samsung.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20180329102613epcms5p6ffaa80d12115ded8f3c9ef01dd009744@epcms5p6>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
+On (03/29/18 15:56), Maninder Singh wrote:
+> Hello Nick/Sergey,
+> 
+> Any suggestion or comments, so that we can change code and resend the patch?
 
+Well... there were no replies to
+ https://marc.info/?l=linux-kernel&m=152161450026771&w=2
+and
+ https://marc.info/?l=linux-kernel&m=152161860627974&w=2
 
-On 3/29/2018 9:56 PM, Sabrina Dubroca wrote:
-> 2018-03-29, 21:27:51 +0530, Atul Gupta wrote:
->> TLS handler for record transmit.
->> Create Inline TLS work request and post to FW.
->> Create Inline TLS record CPLs for hardware
->>
->> Signed-off-by: Atul Gupta <atul.gupta@chelsio.com>
->> Signed-off-by: Michael Werner <werner@chelsio.com>
->> ---
-> ...
->> +int chtls_sendmsg(struct sock *sk, struct msghdr *msg, size_t size)
->> +{
->> +	struct chtls_sock *csk = rcu_dereference_sk_user_data(sk);
->> +	struct chtls_dev *cdev = csk->cdev;
->> +	struct tcp_sock *tp = tcp_sk(sk);
->> +	struct sk_buff *skb;
->> +	int mss, flags, err;
->> +	int recordsz = 0;
->> +	int copied = 0;
->> +	int hdrlen = 0;
->> +	long timeo;
->> +
->> +	lock_sock(sk);
->> +	flags = msg->msg_flags;
->> +	timeo = sock_sndtimeo(sk, flags & MSG_DONTWAIT);
->> +
->> +	if (!sk_in_state(sk, TCPF_ESTABLISHED | TCPF_CLOSE_WAIT)) {
->> +		err = sk_stream_wait_connect(sk, &timeo);
->> +		if (err)
->> +			goto out_err;
->> +	}
->> +
->> +	if (sk->sk_prot->sendmsg != chtls_sendmsg) {
-> Can that actually happen? If so, how? AFAICT, this function is only
-> called when sk->sk_prot has been set to be chtls_cpl_prot.
-this is relevant for the tunneling of the active-open path and can be removed for now
->
->> +		release_sock(sk);
->> +		if (sk->sk_prot->sendmsg)
->> +			return sk->sk_prot->sendmsg(sk, msg, size);
->> +		else
->> +			return sk->sk_socket->ops->sendmsg(sk->sk_socket,
->> +							   msg, size);
->> +	}
+	-ss
