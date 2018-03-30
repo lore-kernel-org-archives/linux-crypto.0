@@ -1,80 +1,47 @@
-From: Salvatore Mesoraca <s.mesoraca16@gmail.com>
-Subject: [v3] crypto: ctr - avoid VLA use
-Date: Fri, 30 Mar 2018 10:53:26 +0200
-Message-ID: <1522400006-8859-1-git-send-email-s.mesoraca16@gmail.com>
-Cc: kernel-hardening@lists.openwall.com, linux-crypto@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Kees Cook <keescook@chromium.org>,
-        Salvatore Mesoraca <s.mesoraca16@gmail.com>,
-        Eric Biggers <ebiggers3@gmail.com>
-To: linux-kernel@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
+From: Ganesh Goudar <ganeshgr@chelsio.com>
+Subject: Re: [PATCH v14 net-next 08/12] crypto : chtls - CPL handler
+ definition
+Date: Fri, 30 Mar 2018 21:11:00 +0530
+Message-ID: <20180330154058.GA19496@chelsio.com>
+References: <1522339074-4681-1-git-send-email-atul.gupta@chelsio.com>
+ <1522339074-4681-9-git-send-email-atul.gupta@chelsio.com>
+ <20180329162623.GA9805@bistromath.localdomain>
+ <97a6ce0d-d188-8171-7985-bb31030b1ee8@chelsio.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: Sabrina Dubroca <sd@queasysnail.net>, davem@davemloft.net,
+        herbert@gondor.apana.org.au, davejwatson@fb.com,
+        sbrivio@redhat.com, linux-crypto@vger.kernel.org,
+        netdev@vger.kernel.org, werner@chelsio.com, leedom@chelsio.com,
+        swise@opengridcomputing.com, indranil@chelsio.com, atul@chelsio.com
+To: sd@queasysnail.net
+Return-path: <netdev-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <97a6ce0d-d188-8171-7985-bb31030b1ee8@chelsio.com>
+Sender: netdev-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-All ciphers implemented in Linux have a block size less than or
-equal to 16 bytes and the most demanding hw require 16 bytes
-alignment for the block buffer.
-We avoid 2 VLAs[1] by always allocating 16 bytes with 16 bytes
-alignment, unless the architecture supports efficient unaligned
-accesses.
-We also check the selected cipher at instance creation time, if
-it doesn't comply with these limits, we fail the creation.
+On Friday, March 03/30/18, 2018 at 00:38:06 +0530, Atul Gupta wrote:
+> 
+> 
+> On 3/29/2018 9:56 PM, Sabrina Dubroca wrote:
+> > 2018-03-29, 21:27:50 +0530, Atul Gupta wrote:
+> > ...
+> >> +static void chtls_pass_accept_request(struct sock *sk,
+> >> +				      struct sk_buff *skb)
+> >> +{
+> > ...
+> >> +	if (chtls_get_module(newsk))
+> >> +		goto reject;
+> >> +	inet_csk_reqsk_queue_added(sk);
+> >> +	reply_skb->sk = newsk;
+> >> +	chtls_install_cpl_ops(newsk);
+> > Function defined in patch 11, declared in patch 6, and used in patch
+> > 8.  Are you actually listening to the comments we've been sending?
+> Patch series is broken to make it bisectable, it ensures that existing modules net, cxgb4, chcr compiles fine, since chtls is new module the sequence of patches builds clean by virtue of having Makefile change in the last patch. We have followed a similar approach in the past for new submission of chcr, cxgbit drivers.
+> >
+>
+I hope you are fine with this, we will take care of your other comment in V15
+and submit.
 
-[1] https://lkml.org/lkml/2018/3/7/621
-
-Signed-off-by: Salvatore Mesoraca <s.mesoraca16@gmail.com>
----
- crypto/ctr.c | 15 +++++++++++++--
- 1 file changed, 13 insertions(+), 2 deletions(-)
-
-diff --git a/crypto/ctr.c b/crypto/ctr.c
-index 854d924..49c469d 100644
---- a/crypto/ctr.c
-+++ b/crypto/ctr.c
-@@ -21,6 +21,9 @@
- #include <linux/scatterlist.h>
- #include <linux/slab.h>
- 
-+#define MAX_BLOCKSIZE 16
-+#define MAX_ALIGNMASK 15
-+
- struct crypto_ctr_ctx {
- 	struct crypto_cipher *child;
- };
-@@ -58,7 +61,7 @@ static void crypto_ctr_crypt_final(struct blkcipher_walk *walk,
- 	unsigned int bsize = crypto_cipher_blocksize(tfm);
- 	unsigned long alignmask = crypto_cipher_alignmask(tfm);
- 	u8 *ctrblk = walk->iv;
--	u8 tmp[bsize + alignmask];
-+	u8 tmp[MAX_BLOCKSIZE + MAX_ALIGNMASK];
- 	u8 *keystream = PTR_ALIGN(tmp + 0, alignmask + 1);
- 	u8 *src = walk->src.virt.addr;
- 	u8 *dst = walk->dst.virt.addr;
-@@ -106,7 +109,7 @@ static int crypto_ctr_crypt_inplace(struct blkcipher_walk *walk,
- 	unsigned int nbytes = walk->nbytes;
- 	u8 *ctrblk = walk->iv;
- 	u8 *src = walk->src.virt.addr;
--	u8 tmp[bsize + alignmask];
-+	u8 tmp[MAX_BLOCKSIZE + MAX_ALIGNMASK];
- 	u8 *keystream = PTR_ALIGN(tmp + 0, alignmask + 1);
- 
- 	do {
-@@ -206,6 +209,14 @@ static struct crypto_instance *crypto_ctr_alloc(struct rtattr **tb)
- 	if (alg->cra_blocksize < 4)
- 		goto out_put_alg;
- 
-+	/* Block size must be <= MAX_BLOCKSIZE. */
-+	if (alg->cra_blocksize > MAX_BLOCKSIZE)
-+		goto out_put_alg;
-+
-+	/* Alignmask must be <= MAX_ALIGNMASK. */
-+	if (alg->cra_alignmask > MAX_ALIGNMASK)
-+		goto out_put_alg;
-+
- 	/* If this is false we'd fail the alignment of crypto_inc. */
- 	if (alg->cra_blocksize % 4)
- 		goto out_put_alg;
--- 
-1.9.1
+Thanks
