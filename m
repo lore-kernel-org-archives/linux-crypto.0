@@ -1,49 +1,80 @@
-From: Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>
-Subject: Re: [PATCH 0/1] cover-letter/lz4: Implement lz4 with dynamic offset
- length.
-Date: Fri, 30 Mar 2018 14:41:56 +0900
-Message-ID: <20180330054156.GA10282@jagdpanzerIV>
-References: <20180329102046epcms5p8ecc9532b03bab4f47cbdbb2507171b86@epcms5p8>
- <20180323134319epcms5p62e6021aa33c941c46ecdb8b5364b614c@epcms5p6>
- <1663C9A3-7DAC-4A11-894C-C99E07BEDAD2@fb.com>
- <1521607242-3968-1-git-send-email-maninder1.s@samsung.com>
- <20180321082628.GB2746@jagdpanzerIV>
- <CGME20180321044137epcas5p221e7ee4a0b7464eaa00dad8320f0251d@epcms5p6>
- <20180329102613epcms5p6ffaa80d12115ded8f3c9ef01dd009744@epcms5p6>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Vaneet Narang <v.narang@samsung.com>,
-        Nick Terrell <terrelln@fb.com>,
-        Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "minchan@kernel.org" <minchan@kernel.org>,
-        "ngupta@vflare.org" <ngupta@vflare.org>,
+From: Salvatore Mesoraca <s.mesoraca16@gmail.com>
+Subject: [v3] crypto: ctr - avoid VLA use
+Date: Fri, 30 Mar 2018 10:53:26 +0200
+Message-ID: <1522400006-8859-1-git-send-email-s.mesoraca16@gmail.com>
+Cc: kernel-hardening@lists.openwall.com, linux-crypto@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
         Kees Cook <keescook@chromium.org>,
-        "anton@enomsg.org" <anton@enomsg.org>,
-        "ccross@android.com" <ccross@android.com>,
-        "tony.luck@intel.com" <tony.luck@intel.com>,
-        "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-        "colin.king@canonical.com" <colin.king@canonical.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        PANKAJ MISHRA <pankaj.m@samsung.com>,
-        AMIT SAHRAWAT
-To: Maninder Singh <maninder1.s@samsung.com>
+        Salvatore Mesoraca <s.mesoraca16@gmail.com>,
+        Eric Biggers <ebiggers3@gmail.com>
+To: linux-kernel@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20180329102613epcms5p6ffaa80d12115ded8f3c9ef01dd009744@epcms5p6>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On (03/29/18 15:56), Maninder Singh wrote:
-> Hello Nick/Sergey,
-> 
-> Any suggestion or comments, so that we can change code and resend the patch?
+All ciphers implemented in Linux have a block size less than or
+equal to 16 bytes and the most demanding hw require 16 bytes
+alignment for the block buffer.
+We avoid 2 VLAs[1] by always allocating 16 bytes with 16 bytes
+alignment, unless the architecture supports efficient unaligned
+accesses.
+We also check the selected cipher at instance creation time, if
+it doesn't comply with these limits, we fail the creation.
 
-Well... there were no replies to
- https://marc.info/?l=linux-kernel&m=152161450026771&w=2
-and
- https://marc.info/?l=linux-kernel&m=152161860627974&w=2
+[1] https://lkml.org/lkml/2018/3/7/621
 
-	-ss
+Signed-off-by: Salvatore Mesoraca <s.mesoraca16@gmail.com>
+---
+ crypto/ctr.c | 15 +++++++++++++--
+ 1 file changed, 13 insertions(+), 2 deletions(-)
+
+diff --git a/crypto/ctr.c b/crypto/ctr.c
+index 854d924..49c469d 100644
+--- a/crypto/ctr.c
++++ b/crypto/ctr.c
+@@ -21,6 +21,9 @@
+ #include <linux/scatterlist.h>
+ #include <linux/slab.h>
+ 
++#define MAX_BLOCKSIZE 16
++#define MAX_ALIGNMASK 15
++
+ struct crypto_ctr_ctx {
+ 	struct crypto_cipher *child;
+ };
+@@ -58,7 +61,7 @@ static void crypto_ctr_crypt_final(struct blkcipher_walk *walk,
+ 	unsigned int bsize = crypto_cipher_blocksize(tfm);
+ 	unsigned long alignmask = crypto_cipher_alignmask(tfm);
+ 	u8 *ctrblk = walk->iv;
+-	u8 tmp[bsize + alignmask];
++	u8 tmp[MAX_BLOCKSIZE + MAX_ALIGNMASK];
+ 	u8 *keystream = PTR_ALIGN(tmp + 0, alignmask + 1);
+ 	u8 *src = walk->src.virt.addr;
+ 	u8 *dst = walk->dst.virt.addr;
+@@ -106,7 +109,7 @@ static int crypto_ctr_crypt_inplace(struct blkcipher_walk *walk,
+ 	unsigned int nbytes = walk->nbytes;
+ 	u8 *ctrblk = walk->iv;
+ 	u8 *src = walk->src.virt.addr;
+-	u8 tmp[bsize + alignmask];
++	u8 tmp[MAX_BLOCKSIZE + MAX_ALIGNMASK];
+ 	u8 *keystream = PTR_ALIGN(tmp + 0, alignmask + 1);
+ 
+ 	do {
+@@ -206,6 +209,14 @@ static struct crypto_instance *crypto_ctr_alloc(struct rtattr **tb)
+ 	if (alg->cra_blocksize < 4)
+ 		goto out_put_alg;
+ 
++	/* Block size must be <= MAX_BLOCKSIZE. */
++	if (alg->cra_blocksize > MAX_BLOCKSIZE)
++		goto out_put_alg;
++
++	/* Alignmask must be <= MAX_ALIGNMASK. */
++	if (alg->cra_alignmask > MAX_ALIGNMASK)
++		goto out_put_alg;
++
+ 	/* If this is false we'd fail the alignment of crypto_inc. */
+ 	if (alg->cra_blocksize % 4)
+ 		goto out_put_alg;
+-- 
+1.9.1
