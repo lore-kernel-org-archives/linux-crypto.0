@@ -1,30 +1,40 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2] crypto: talitos - fix IPsec cipher in length
-Date: Sat, 31 Mar 2018 01:42:44 +0800
-Message-ID: <20180330174243.GH28120@gondor.apana.org.au>
-References: <20180322095701.4563E6F352@po15720vm.idsi0.si.c-s.fr>
+Subject: Re: [RFC PATCH] crypto: brcm - explicitly cast cipher to hash type
+Date: Sat, 31 Mar 2018 01:43:35 +0800
+Message-ID: <20180330174335.GJ28120@gondor.apana.org.au>
+References: <20180324110242.9474-1-stefan@agner.ch>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Cc: "David S. Miller" <davem@davemloft.net>, horia.geanta@nxp.com,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org
-To: Christophe Leroy <christophe.leroy@c-s.fr>
+Content-Type: text/plain; charset=us-ascii
+Cc: davem@davemloft.net, raveendra.padasalagi@broadcom.com,
+        clabbe.montjoie@gmail.com, scott.branden@broadcom.com,
+        steven.lin1@broadcom.com, garsilva@embeddedor.com,
+        pravin.shedge4linux@gmail.com, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+To: Stefan Agner <stefan@agner.ch>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20180322095701.4563E6F352@po15720vm.idsi0.si.c-s.fr>
+In-Reply-To: <20180324110242.9474-1-stefan@agner.ch>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Mar 22, 2018 at 10:57:01AM +0100, Christophe Leroy wrote:
-> For SEC 2.x+, cipher in length must contain only the ciphertext length.
-> In case of using hardware ICV checking, the ICV length is provided via
-> the "extent" field of the descriptor pointer.
+On Sat, Mar 24, 2018 at 12:02:42PM +0100, Stefan Agner wrote:
+> In the AES cases enum spu_cipher_type and enum hash_type have
+> the same values, so the assignment is fine. Explicitly cast
+> the enum type conversion.
 > 
-> Cc: <stable@vger.kernel.org> # 4.8+
-> Fixes: 549bd8bc5987 ("crypto: talitos - Implement AEAD for SEC1 using HMAC_SNOOP_NO_AFEU")
-> Reported-by: Horia Geantă <horia.geanta@nxp.com>
-> Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
+> This fixes two warnings when building with clang:
+>   drivers/crypto/bcm/cipher.c:821:34: warning: implicit conversion from
+>       enumeration type 'enum spu_cipher_type' to different enumeration
+>       type 'enum hash_type' [-Wenum-conversion]
+>                 hash_parms.type = cipher_parms.type;
+>                                 ~ ~~~~~~~~~~~~~^~~~
+>   drivers/crypto/bcm/cipher.c:1412:26: warning: implicit conversion from
+>       enumeration type 'enum spu_cipher_type' to different enumeration
+>       type 'enum hash_type' [-Wenum-conversion]
+>                 hash_parms.type = ctx->cipher_type;
+>                                 ~ ~~~~~^~~~~~~~~~~
+> 
+> Signed-off-by: Stefan Agner <stefan@agner.ch>
 
 Patch applied.  Thanks.
 -- 
