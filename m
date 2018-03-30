@@ -1,32 +1,63 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [RESEND PATCH] crypto: Add zstd support
-Date: Sat, 31 Mar 2018 01:14:59 +0800
-Message-ID: <20180330171459.GB27856@gondor.apana.org.au>
-References: <20180321224929.3076350-1-terrelln@fb.com>
- <20180322043230.GD3181@jagdpanzerIV>
+Subject: Re: [PATCH 2/2] crypto: ccree: enable support for hardware keys
+Date: Sat, 31 Mar 2018 01:26:17 +0800
+Message-ID: <20180330172616.GB28120@gondor.apana.org.au>
+References: <1522049540-10042-1-git-send-email-gilad@benyossef.com>
+ <1522049540-10042-3-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Nick Terrell <terrelln@fb.com>, kernel-team@fb.com,
-        Chris Mason <clm@fb.com>, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, Geliang Tang <geliangtang@gmail.com>
-To: Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+        Ofir Drang <ofir.drang@arm.com>, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+To: Gilad Ben-Yossef <gilad@benyossef.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20180322043230.GD3181@jagdpanzerIV>
+In-Reply-To: <1522049540-10042-3-git-send-email-gilad@benyossef.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Mar 22, 2018 at 01:32:30PM +0900, Sergey Senozhatsky wrote:
-> On (03/21/18 15:49), Nick Terrell wrote:
-> > depends on CONFIG_CRYPTO_ZSTD, which isn't defined until this patch is in
+On Mon, Mar 26, 2018 at 08:32:19AM +0100, Gilad Ben-Yossef wrote:
+> Enable CryptoCell support for hardware keys.
 > 
-> Yikes! How come I missed that... :)
+> Hardware keys are regular AES keys loaded into CryptoCell internal memory
+> via firmware, often from secure boot ROM or hardware fuses at boot time.
 > 
-> > [0] lkml.kernel.org/r/9c9416b2dff19f05fb4c35879aaa83d11ff72c92.1521626182.git.geliangtang@gmail.com
+> As such, they can be used for enc/dec purposes like any other key but
+> cannot (read: extremely hard to) be extracted since since they are not
+> available anywhere in RAM during runtime.
 > 
-> Signed-off-by: Nick Terrell <terrelln@fb.com> ?
+> The mechanism has some similarities to s390 secure keys although the keys
+> are not wrapped or sealed, but simply loaded offline. The interface was
+> therefore modeled based on the s390 secure keys support.
+> 
+> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 
-Please resend with sign-off.
+...
+
+>  static const struct cc_alg_template skcipher_algs[] = {
+>  	{
+> +		.name = "xts(haes)",
+> +		.driver_name = "xts-haes-ccree",
+> +		.blocksize = AES_BLOCK_SIZE,
+> +		.template_skcipher = {
+> +			.setkey = cc_cipher_sethkey,
+> +			.encrypt = cc_cipher_encrypt,
+> +			.decrypt = cc_cipher_decrypt,
+> +			.min_keysize = CC_HW_KEY_SIZE,
+> +			.max_keysize = CC_HW_KEY_SIZE,
+> +			.ivsize = AES_BLOCK_SIZE,
+> +			},
+> +		.cipher_mode = DRV_CIPHER_XTS,
+> +		.flow_mode = S_DIN_to_AES,
+> +		.min_hw_rev = CC_HW_REV_630,
+> +	},
+
+How can this possibly pass the self-test?
+
+If we want to add hardware keys we will need to figure out how
+to deal with it in the top-level API first.
+
+Are there other crypto drivers doing this?
 
 Thanks,
 -- 
