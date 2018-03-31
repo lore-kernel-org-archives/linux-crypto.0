@@ -1,247 +1,289 @@
-From: Varsha Rao <rvarsha016@gmail.com>
-Subject: [PATCH v2] crypto: cavium: zip: Remove unnecessary
-	parentheses
-Date: Sat, 31 Mar 2018 15:01:14 +0530
-Message-ID: <20180331093114.5034-1-rvarsha016@gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Varsha Rao <rvarsha016@gmail.com>
-To: Julia Lawall <julia.lawall@lip6.fr>, Joe Perches <joe@perches.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        cocci <cocci@systeme.lip6.fr>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Lukas Bulwahn <lukas.bulwahn@gmail.com>,
-        Nicholas Mc Guire <der.herr@hofr.at>
-Return-path: <cocci-bounces@systeme.lip6.fr>
-List-Unsubscribe: <https://systeme.lip6.fr/mailman/options/cocci>,
- <mailto:cocci-request@systeme.lip6.fr?subject=unsubscribe>
-List-Archive: <https://systeme.lip6.fr/pipermail/cocci>
-List-Post: <mailto:cocci@systeme.lip6.fr>
-List-Help: <mailto:cocci-request@systeme.lip6.fr?subject=help>
-List-Subscribe: <https://systeme.lip6.fr/mailman/listinfo/cocci>,
- <mailto:cocci-request@systeme.lip6.fr?subject=subscribe>
-Sender: cocci-bounces@systeme.lip6.fr
-Errors-To: cocci-bounces@systeme.lip6.fr
+From: Atul Gupta <atul.gupta@chelsio.com>
+Subject: [PATCH v15 net-next 01/12] tls: support for Inline tls record
+Date: Sat, 31 Mar 2018 21:41:52 +0530
+Message-ID: <1522512723-31747-2-git-send-email-atul.gupta@chelsio.com>
+References: <1522512723-31747-1-git-send-email-atul.gupta@chelsio.com>
+Cc: davejwatson@fb.com, sd@queasysnail.net, sbrivio@redhat.com,
+        linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
+        werner@chelsio.com, leedom@chelsio.com,
+        swise@opengridcomputing.com, indranil@chelsio.com,
+        ganeshgr@chelsio.com, atul.gupta@chelsio.com
+To: davem@davemloft.net, herbert@gondor.apana.org.au
+Return-path: <netdev-owner@vger.kernel.org>
+In-Reply-To: <1522512723-31747-1-git-send-email-atul.gupta@chelsio.com>
+Sender: netdev-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This patch fixes the clang warning of extraneous parentheses, with the
-following coccinelle script.
+Facility to register Inline TLS drivers to net/tls. Setup
+TLS_HW_RECORD prot to listen on offload device.
 
-@@
-identifier i;
-constant c;
-expression e;
-@@
-(
-!((e))
-|
--((
-\(i == c\|i != c\|i <= c\|i < c\|i >= c\|i > c\)
--))
-)
+Cases handled
+- Inline TLS device exists, setup prot for TLS_HW_RECORD
+- Atleast one Inline TLS exists, sets TLS_HW_RECORD.
+- If non-inline device establish connection, move to TLS_SW_TX
 
-Signed-off-by: Varsha Rao <rvarsha016@gmail.com>
+Signed-off-by: Atul Gupta <atul.gupta@chelsio.com>
+Reviewed-by: Steve Wise <swise@opengridcomputing.com>
 ---
-Changes in v2:
- - Modified coccinelle script
+ include/net/tls.h  |  32 ++++++++++++++-
+ net/tls/tls_main.c | 114 +++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 2 files changed, 142 insertions(+), 4 deletions(-)
 
- drivers/crypto/cavium/zip/zip_regs.h | 42 ++++++++++++++++++------------------
- 1 file changed, 21 insertions(+), 21 deletions(-)
-
-diff --git a/drivers/crypto/cavium/zip/zip_regs.h b/drivers/crypto/cavium/zip/zip_regs.h
-index d0be682305c1..874e0236c87e 100644
---- a/drivers/crypto/cavium/zip/zip_regs.h
-+++ b/drivers/crypto/cavium/zip/zip_regs.h
-@@ -443,7 +443,7 @@ union zip_corex_bist_status {
+diff --git a/include/net/tls.h b/include/net/tls.h
+index 437a746..3da8e13 100644
+--- a/include/net/tls.h
++++ b/include/net/tls.h
+@@ -56,6 +56,32 @@
+ #define TLS_RECORD_TYPE_DATA		0x17
  
- static inline u64 ZIP_COREX_BIST_STATUS(u64 param1)
- {
--	if (((param1 <= 1)))
-+	if (param1 <= 1)
- 		return 0x0520ull + (param1 & 1) * 0x8ull;
- 	pr_err("ZIP_COREX_BIST_STATUS: %llu\n", param1);
- 	return 0;
-@@ -537,7 +537,7 @@ union zip_dbg_corex_inst {
+ #define TLS_AAD_SPACE_SIZE		13
++#define TLS_DEVICE_NAME_MAX		32
++
++/*
++ * This structure defines the routines for Inline TLS driver.
++ * The following routines are optional and filled with a
++ * null pointer if not defined.
++ *
++ * @name: Its the name of registered Inline tls device
++ * @dev_list: Inline tls device list
++ * int (*feature)(struct tls_device *device);
++ *     Called to return Inline TLS driver capability
++ *
++ * int (*hash)(struct tls_device *device, struct sock *sk);
++ *     This function sets Inline driver for listen and program
++ *     device specific functioanlity as required
++ *
++ * void (*unhash)(struct tls_device *device, struct sock *sk);
++ *     This function cleans listen state set by Inline TLS driver
++ */
++struct tls_device {
++	char name[TLS_DEVICE_NAME_MAX];
++	struct list_head dev_list;
++	int  (*feature)(struct tls_device *device);
++	int  (*hash)(struct tls_device *device, struct sock *sk);
++	void (*unhash)(struct tls_device *device, struct sock *sk);
++};
  
- static inline u64 ZIP_DBG_COREX_INST(u64 param1)
- {
--	if (((param1 <= 1)))
-+	if (param1 <= 1)
- 		return 0x0640ull + (param1 & 1) * 0x8ull;
- 	pr_err("ZIP_DBG_COREX_INST: %llu\n", param1);
- 	return 0;
-@@ -568,7 +568,7 @@ union zip_dbg_corex_sta {
+ struct tls_sw_context {
+ 	struct crypto_aead *aead_send;
+@@ -114,7 +140,7 @@ struct tls_context {
  
- static inline u64 ZIP_DBG_COREX_STA(u64 param1)
- {
--	if (((param1 <= 1)))
-+	if (param1 <= 1)
- 		return 0x0680ull + (param1 & 1) * 0x8ull;
- 	pr_err("ZIP_DBG_COREX_STA: %llu\n", param1);
- 	return 0;
-@@ -599,7 +599,7 @@ union zip_dbg_quex_sta {
+ 	void *priv_ctx;
  
- static inline u64 ZIP_DBG_QUEX_STA(u64 param1)
- {
--	if (((param1 <= 7)))
-+	if (param1 <= 7)
- 		return 0x1800ull + (param1 & 7) * 0x8ull;
- 	pr_err("ZIP_DBG_QUEX_STA: %llu\n", param1);
- 	return 0;
-@@ -817,7 +817,7 @@ union zip_msix_pbax {
+-	u8 conf:2;
++	u8 conf:3;
  
- static inline u64 ZIP_MSIX_PBAX(u64 param1)
- {
--	if (((param1 == 0)))
-+	if (param1 == 0)
- 		return 0x0000838000FF0000ull;
- 	pr_err("ZIP_MSIX_PBAX: %llu\n", param1);
- 	return 0;
-@@ -846,7 +846,7 @@ union zip_msix_vecx_addr {
+ 	struct cipher_context tx;
+ 	struct cipher_context rx;
+@@ -135,6 +161,8 @@ struct tls_context {
+ 	int  (*getsockopt)(struct sock *sk, int level,
+ 			   int optname, char __user *optval,
+ 			   int __user *optlen);
++	int  (*hash)(struct sock *sk);
++	void (*unhash)(struct sock *sk);
+ };
  
- static inline u64 ZIP_MSIX_VECX_ADDR(u64 param1)
- {
--	if (((param1 <= 17)))
-+	if (param1 <= 17)
- 		return 0x0000838000F00000ull + (param1 & 31) * 0x10ull;
- 	pr_err("ZIP_MSIX_VECX_ADDR: %llu\n", param1);
- 	return 0;
-@@ -875,7 +875,7 @@ union zip_msix_vecx_ctl {
+ int wait_on_pending_writer(struct sock *sk, long *timeo);
+@@ -283,5 +311,7 @@ static inline struct tls_offload_context *tls_offload_ctx(
  
- static inline u64 ZIP_MSIX_VECX_CTL(u64 param1)
- {
--	if (((param1 <= 17)))
-+	if (param1 <= 17)
- 		return 0x0000838000F00008ull + (param1 & 31) * 0x10ull;
- 	pr_err("ZIP_MSIX_VECX_CTL: %llu\n", param1);
- 	return 0;
-@@ -900,7 +900,7 @@ union zip_quex_done {
+ int tls_proccess_cmsg(struct sock *sk, struct msghdr *msg,
+ 		      unsigned char *record_type);
++void tls_register_device(struct tls_device *device);
++void tls_unregister_device(struct tls_device *device);
  
- static inline u64 ZIP_QUEX_DONE(u64 param1)
- {
--	if (((param1 <= 7)))
-+	if (param1 <= 7)
- 		return 0x2000ull + (param1 & 7) * 0x8ull;
- 	pr_err("ZIP_QUEX_DONE: %llu\n", param1);
- 	return 0;
-@@ -925,7 +925,7 @@ union zip_quex_done_ack {
+ #endif /* _TLS_OFFLOAD_H */
+diff --git a/net/tls/tls_main.c b/net/tls/tls_main.c
+index 6f5c114..0d37997 100644
+--- a/net/tls/tls_main.c
++++ b/net/tls/tls_main.c
+@@ -38,6 +38,7 @@
+ #include <linux/highmem.h>
+ #include <linux/netdevice.h>
+ #include <linux/sched/signal.h>
++#include <linux/inetdevice.h>
  
- static inline u64 ZIP_QUEX_DONE_ACK(u64 param1)
- {
--	if (((param1 <= 7)))
-+	if (param1 <= 7)
- 		return 0x2200ull + (param1 & 7) * 0x8ull;
- 	pr_err("ZIP_QUEX_DONE_ACK: %llu\n", param1);
- 	return 0;
-@@ -950,7 +950,7 @@ union zip_quex_done_ena_w1c {
+ #include <net/tls.h>
  
- static inline u64 ZIP_QUEX_DONE_ENA_W1C(u64 param1)
- {
--	if (((param1 <= 7)))
-+	if (param1 <= 7)
- 		return 0x2600ull + (param1 & 7) * 0x8ull;
- 	pr_err("ZIP_QUEX_DONE_ENA_W1C: %llu\n", param1);
- 	return 0;
-@@ -975,7 +975,7 @@ union zip_quex_done_ena_w1s {
+@@ -56,11 +57,14 @@ enum {
+ 	TLS_SW_TX,
+ 	TLS_SW_RX,
+ 	TLS_SW_RXTX,
++	TLS_HW_RECORD,
+ 	TLS_NUM_CONFIG,
+ };
  
- static inline u64 ZIP_QUEX_DONE_ENA_W1S(u64 param1)
- {
--	if (((param1 <= 7)))
-+	if (param1 <= 7)
- 		return 0x2400ull + (param1 & 7) * 0x8ull;
- 	pr_err("ZIP_QUEX_DONE_ENA_W1S: %llu\n", param1);
- 	return 0;
-@@ -1004,7 +1004,7 @@ union zip_quex_done_wait {
+ static struct proto *saved_tcpv6_prot;
+ static DEFINE_MUTEX(tcpv6_prot_mutex);
++static LIST_HEAD(device_list);
++static DEFINE_MUTEX(device_mutex);
+ static struct proto tls_prots[TLS_NUM_PROTS][TLS_NUM_CONFIG];
+ static struct proto_ops tls_sw_proto_ops;
  
- static inline u64 ZIP_QUEX_DONE_WAIT(u64 param1)
- {
--	if (((param1 <= 7)))
-+	if (param1 <= 7)
- 		return 0x2800ull + (param1 & 7) * 0x8ull;
- 	pr_err("ZIP_QUEX_DONE_WAIT: %llu\n", param1);
- 	return 0;
-@@ -1029,7 +1029,7 @@ union zip_quex_doorbell {
+@@ -241,8 +245,12 @@ static void tls_sk_proto_close(struct sock *sk, long timeout)
+ 	lock_sock(sk);
+ 	sk_proto_close = ctx->sk_proto_close;
  
- static inline u64 ZIP_QUEX_DOORBELL(u64 param1)
- {
--	if (((param1 <= 7)))
-+	if (param1 <= 7)
- 		return 0x4000ull + (param1 & 7) * 0x8ull;
- 	pr_err("ZIP_QUEX_DOORBELL: %llu\n", param1);
- 	return 0;
-@@ -1058,7 +1058,7 @@ union zip_quex_err_ena_w1c {
++	if (ctx->conf == TLS_HW_RECORD)
++		goto skip_tx_cleanup;
++
+ 	if (ctx->conf == TLS_BASE) {
+ 		kfree(ctx);
++		ctx = NULL;
+ 		goto skip_tx_cleanup;
+ 	}
  
- static inline u64 ZIP_QUEX_ERR_ENA_W1C(u64 param1)
- {
--	if (((param1 <= 7)))
-+	if (param1 <= 7)
- 		return 0x3600ull + (param1 & 7) * 0x8ull;
- 	pr_err("ZIP_QUEX_ERR_ENA_W1C: %llu\n", param1);
- 	return 0;
-@@ -1087,7 +1087,7 @@ union zip_quex_err_ena_w1s {
+@@ -276,6 +284,11 @@ static void tls_sk_proto_close(struct sock *sk, long timeout)
+ skip_tx_cleanup:
+ 	release_sock(sk);
+ 	sk_proto_close(sk, timeout);
++	/* free ctx for TLS_HW_RECORD, used by tcp_set_state
++	 * for sk->sk_prot->unhash [tls_hw_unhash]
++	 */
++	if (ctx && ctx->conf == TLS_HW_RECORD)
++		kfree(ctx);
+ }
  
- static inline u64 ZIP_QUEX_ERR_ENA_W1S(u64 param1)
- {
--	if (((param1 <= 7)))
-+	if (param1 <= 7)
- 		return 0x3400ull + (param1 & 7) * 0x8ull;
- 	pr_err("ZIP_QUEX_ERR_ENA_W1S: %llu\n", param1);
- 	return 0;
-@@ -1120,7 +1120,7 @@ union zip_quex_err_int {
+ static int do_tls_getsockopt_tx(struct sock *sk, char __user *optval,
+@@ -493,6 +506,79 @@ static int tls_setsockopt(struct sock *sk, int level, int optname,
+ 	return do_tls_setsockopt(sk, optname, optval, optlen);
+ }
  
- static inline u64 ZIP_QUEX_ERR_INT(u64 param1)
++static struct tls_context *create_ctx(struct sock *sk)
++{
++	struct inet_connection_sock *icsk = inet_csk(sk);
++	struct tls_context *ctx;
++
++	ctx = kzalloc(sizeof(*ctx), GFP_KERNEL);
++	if (!ctx)
++		return NULL;
++
++	icsk->icsk_ulp_data = ctx;
++	return ctx;
++}
++
++static int tls_hw_prot(struct sock *sk)
++{
++	struct tls_context *ctx;
++	struct tls_device *dev;
++	int rc = 0;
++
++	mutex_lock(&device_mutex);
++	list_for_each_entry(dev, &device_list, dev_list) {
++		if (dev->feature && dev->feature(dev)) {
++			ctx = create_ctx(sk);
++			if (!ctx)
++				goto out;
++
++			ctx->hash = sk->sk_prot->hash;
++			ctx->unhash = sk->sk_prot->unhash;
++			ctx->sk_proto_close = sk->sk_prot->close;
++			ctx->conf = TLS_HW_RECORD;
++			update_sk_prot(sk, ctx);
++			rc = 1;
++			break;
++		}
++	}
++out:
++	mutex_unlock(&device_mutex);
++	return rc;
++}
++
++static void tls_hw_unhash(struct sock *sk)
++{
++	struct tls_context *ctx = tls_get_ctx(sk);
++	struct tls_device *dev;
++
++	mutex_lock(&device_mutex);
++	list_for_each_entry(dev, &device_list, dev_list) {
++		if (dev->unhash)
++			dev->unhash(dev, sk);
++	}
++	mutex_unlock(&device_mutex);
++	ctx->unhash(sk);
++}
++
++static int tls_hw_hash(struct sock *sk)
++{
++	struct tls_context *ctx = tls_get_ctx(sk);
++	struct tls_device *dev;
++	int err;
++
++	err = ctx->hash(sk);
++	mutex_lock(&device_mutex);
++	list_for_each_entry(dev, &device_list, dev_list) {
++		if (dev->hash)
++			err |= dev->hash(dev, sk);
++	}
++	mutex_unlock(&device_mutex);
++
++	if (err)
++		tls_hw_unhash(sk);
++	return err;
++}
++
+ static void build_protos(struct proto *prot, struct proto *base)
  {
--	if (((param1 <= 7)))
-+	if (param1 <= 7)
- 		return 0x3000ull + (param1 & 7) * 0x8ull;
- 	pr_err("ZIP_QUEX_ERR_INT: %llu\n", param1);
- 	return 0;
-@@ -1150,7 +1150,7 @@ union zip_quex_err_int_w1s {
+ 	prot[TLS_BASE] = *base;
+@@ -511,15 +597,22 @@ static void build_protos(struct proto *prot, struct proto *base)
+ 	prot[TLS_SW_RXTX] = prot[TLS_SW_TX];
+ 	prot[TLS_SW_RXTX].recvmsg	= tls_sw_recvmsg;
+ 	prot[TLS_SW_RXTX].close		= tls_sk_proto_close;
++
++	prot[TLS_HW_RECORD] = *base;
++	prot[TLS_HW_RECORD].hash	= tls_hw_hash;
++	prot[TLS_HW_RECORD].unhash	= tls_hw_unhash;
++	prot[TLS_HW_RECORD].close	= tls_sk_proto_close;
+ }
  
- static inline u64 ZIP_QUEX_ERR_INT_W1S(u64 param1)
+ static int tls_init(struct sock *sk)
  {
--	if (((param1 <= 7)))
-+	if (param1 <= 7)
- 		return 0x3200ull + (param1 & 7) * 0x8ull;
- 	pr_err("ZIP_QUEX_ERR_INT_W1S: %llu\n", param1);
- 	return 0;
-@@ -1179,7 +1179,7 @@ union zip_quex_gcfg {
+ 	int ip_ver = sk->sk_family == AF_INET6 ? TLSV6 : TLSV4;
+-	struct inet_connection_sock *icsk = inet_csk(sk);
+ 	struct tls_context *ctx;
+ 	int rc = 0;
  
- static inline u64 ZIP_QUEX_GCFG(u64 param1)
- {
--	if (((param1 <= 7)))
-+	if (param1 <= 7)
- 		return 0x1A00ull + (param1 & 7) * 0x8ull;
- 	pr_err("ZIP_QUEX_GCFG: %llu\n", param1);
- 	return 0;
-@@ -1204,7 +1204,7 @@ union zip_quex_map {
++	if (tls_hw_prot(sk))
++		goto out;
++
+ 	/* The TLS ulp is currently supported only for TCP sockets
+ 	 * in ESTABLISHED state.
+ 	 * Supporting sockets in LISTEN state will require us
+@@ -530,12 +623,11 @@ static int tls_init(struct sock *sk)
+ 		return -ENOTSUPP;
  
- static inline u64 ZIP_QUEX_MAP(u64 param1)
- {
--	if (((param1 <= 7)))
-+	if (param1 <= 7)
- 		return 0x1400ull + (param1 & 7) * 0x8ull;
- 	pr_err("ZIP_QUEX_MAP: %llu\n", param1);
- 	return 0;
-@@ -1236,7 +1236,7 @@ union zip_quex_sbuf_addr {
+ 	/* allocate tls context */
+-	ctx = kzalloc(sizeof(*ctx), GFP_KERNEL);
++	ctx = create_ctx(sk);
+ 	if (!ctx) {
+ 		rc = -ENOMEM;
+ 		goto out;
+ 	}
+-	icsk->icsk_ulp_data = ctx;
+ 	ctx->setsockopt = sk->sk_prot->setsockopt;
+ 	ctx->getsockopt = sk->sk_prot->getsockopt;
+ 	ctx->sk_proto_close = sk->sk_prot->close;
+@@ -557,6 +649,22 @@ static int tls_init(struct sock *sk)
+ 	return rc;
+ }
  
- static inline u64 ZIP_QUEX_SBUF_ADDR(u64 param1)
- {
--	if (((param1 <= 7)))
-+	if (param1 <= 7)
- 		return 0x1000ull + (param1 & 7) * 0x8ull;
- 	pr_err("ZIP_QUEX_SBUF_ADDR: %llu\n", param1);
- 	return 0;
-@@ -1276,7 +1276,7 @@ union zip_quex_sbuf_ctl {
- 
- static inline u64 ZIP_QUEX_SBUF_CTL(u64 param1)
- {
--	if (((param1 <= 7)))
-+	if (param1 <= 7)
- 		return 0x1200ull + (param1 & 7) * 0x8ull;
- 	pr_err("ZIP_QUEX_SBUF_CTL: %llu\n", param1);
- 	return 0;
++void tls_register_device(struct tls_device *device)
++{
++	mutex_lock(&device_mutex);
++	list_add_tail(&device->dev_list, &device_list);
++	mutex_unlock(&device_mutex);
++}
++EXPORT_SYMBOL(tls_register_device);
++
++void tls_unregister_device(struct tls_device *device)
++{
++	mutex_lock(&device_mutex);
++	list_del(&device->dev_list);
++	mutex_unlock(&device_mutex);
++}
++EXPORT_SYMBOL(tls_unregister_device);
++
+ static struct tcp_ulp_ops tcp_tls_ulp_ops __read_mostly = {
+ 	.name			= "tls",
+ 	.uid			= TCP_ULP_TLS,
 -- 
-2.14.3
+1.8.3.1
