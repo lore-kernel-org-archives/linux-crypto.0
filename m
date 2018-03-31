@@ -1,7 +1,7 @@
 From: Atul Gupta <atul.gupta@chelsio.com>
-Subject: [PATCH v15 net-next 07/12] crypto: chtls - Register chtls with net tls
-Date: Sat, 31 Mar 2018 21:41:58 +0530
-Message-ID: <1522512723-31747-8-git-send-email-atul.gupta@chelsio.com>
+Subject: [PATCH v15 net-next 08/12] crypto : chtls - CPL handler definition
+Date: Sat, 31 Mar 2018 21:41:59 +0530
+Message-ID: <1522512723-31747-9-git-send-email-atul.gupta@chelsio.com>
 References: <1522512723-31747-1-git-send-email-atul.gupta@chelsio.com>
 Cc: davejwatson@fb.com, sd@queasysnail.net, sbrivio@redhat.com,
         linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
@@ -14,25 +14,23 @@ In-Reply-To: <1522512723-31747-1-git-send-email-atul.gupta@chelsio.com>
 Sender: netdev-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Register chtls as Inline TLS driver, chtls is ULD to cxgb4.
-Setsockopt to program (tx/rx) keys on chip.
-Support AES GCM of key size 128.
-Support both Inline Rx and Tx.
+Exchange messages with hardware to program the TLS session
+CPL handlers for messages received from chip.
 
 Signed-off-by: Atul Gupta <atul.gupta@chelsio.com>
-Reviewed-by: Casey Leedom <leedom@chelsio.com>
-Reviewed-by: Michael Werner <werner@chelsio.com>
+Signed-off-by: Michael Werner <werner@chelsio.com>
 ---
- drivers/crypto/chelsio/chtls/chtls_main.c | 575 ++++++++++++++++++++++++++++++
- 1 file changed, 575 insertions(+)
- create mode 100644 drivers/crypto/chelsio/chtls/chtls_main.c
+ drivers/crypto/chelsio/chtls/chtls_cm.c | 2126 +++++++++++++++++++++++++++++++
+ net/ipv4/tcp_minisocks.c                |    1 +
+ 2 files changed, 2127 insertions(+)
+ create mode 100644 drivers/crypto/chelsio/chtls/chtls_cm.c
 
-diff --git a/drivers/crypto/chelsio/chtls/chtls_main.c b/drivers/crypto/chelsio/chtls/chtls_main.c
+diff --git a/drivers/crypto/chelsio/chtls/chtls_cm.c b/drivers/crypto/chelsio/chtls/chtls_cm.c
 new file mode 100644
-index 0000000..04b316f
+index 0000000..82a473a
 --- /dev/null
-+++ b/drivers/crypto/chelsio/chtls/chtls_main.c
-@@ -0,0 +1,575 @@
++++ b/drivers/crypto/chelsio/chtls/chtls_cm.c
+@@ -0,0 +1,2126 @@
 +/*
 + * Copyright (c) 2018 Chelsio Communications, Inc.
 + *
@@ -42,571 +40,2134 @@ index 0000000..04b316f
 + *
 + * Written by: Atul Gupta (atul.gupta@chelsio.com)
 + */
-+#include <linux/kernel.h>
++
 +#include <linux/module.h>
++#include <linux/list.h>
++#include <linux/workqueue.h>
 +#include <linux/skbuff.h>
-+#include <linux/socket.h>
-+#include <linux/hash.h>
-+#include <linux/in.h>
-+#include <linux/net.h>
++#include <linux/timer.h>
++#include <linux/notifier.h>
++#include <linux/inetdevice.h>
 +#include <linux/ip.h>
 +#include <linux/tcp.h>
++#include <linux/sched/signal.h>
++#include <linux/kallsyms.h>
++#include <linux/kprobes.h>
++#include <linux/if_vlan.h>
 +#include <net/tcp.h>
-+#include <net/tls.h>
++#include <net/dst.h>
 +
 +#include "chtls.h"
 +#include "chtls_cm.h"
 +
-+#define DRV_NAME "chtls"
-+
 +/*
-+ * chtls device management
-+ * maintains a list of the chtls devices
++ * State transitions and actions for close.  Note that if we are in SYN_SENT
++ * we remain in that state as we cannot control a connection while it's in
++ * SYN_SENT; such connections are allowed to establish and are then aborted.
 + */
-+static LIST_HEAD(cdev_list);
-+static DEFINE_MUTEX(cdev_mutex);
-+static DEFINE_MUTEX(cdev_list_lock);
-+
-+static DEFINE_MUTEX(notify_mutex);
-+static RAW_NOTIFIER_HEAD(listen_notify_list);
-+static struct proto chtls_cpl_prot;
-+struct request_sock_ops chtls_rsk_ops;
-+static uint send_page_order = (14 - PAGE_SHIFT < 0) ? 0 : 14 - PAGE_SHIFT;
-+
-+static void register_listen_notifier(struct notifier_block *nb)
-+{
-+	mutex_lock(&notify_mutex);
-+	raw_notifier_chain_register(&listen_notify_list, nb);
-+	mutex_unlock(&notify_mutex);
-+}
-+
-+static void unregister_listen_notifier(struct notifier_block *nb)
-+{
-+	mutex_lock(&notify_mutex);
-+	raw_notifier_chain_unregister(&listen_notify_list, nb);
-+	mutex_unlock(&notify_mutex);
-+}
-+
-+static int listen_notify_handler(struct notifier_block *this,
-+				 unsigned long event, void *data)
-+{
-+	struct chtls_dev *cdev;
-+	struct sock *sk;
-+	int ret;
-+
-+	sk = data;
-+	ret =  NOTIFY_DONE;
-+
-+	switch (event) {
-+	case CHTLS_LISTEN_START:
-+	case CHTLS_LISTEN_STOP:
-+		mutex_lock(&cdev_list_lock);
-+		list_for_each_entry(cdev, &cdev_list, list) {
-+			if (event == CHTLS_LISTEN_START)
-+				ret = chtls_listen_start(cdev, sk);
-+			else
-+				chtls_listen_stop(cdev, sk);
-+		}
-+		mutex_unlock(&cdev_list_lock);
-+		break;
-+	}
-+	return ret;
-+}
-+
-+static struct notifier_block listen_notifier = {
-+	.notifier_call = listen_notify_handler
++static unsigned char new_state[16] = {
++	/* current state:     new state:      action: */
++	/* (Invalid)       */ TCP_CLOSE,
++	/* TCP_ESTABLISHED */ TCP_FIN_WAIT1 | TCP_ACTION_FIN,
++	/* TCP_SYN_SENT    */ TCP_SYN_SENT,
++	/* TCP_SYN_RECV    */ TCP_FIN_WAIT1 | TCP_ACTION_FIN,
++	/* TCP_FIN_WAIT1   */ TCP_FIN_WAIT1,
++	/* TCP_FIN_WAIT2   */ TCP_FIN_WAIT2,
++	/* TCP_TIME_WAIT   */ TCP_CLOSE,
++	/* TCP_CLOSE       */ TCP_CLOSE,
++	/* TCP_CLOSE_WAIT  */ TCP_LAST_ACK | TCP_ACTION_FIN,
++	/* TCP_LAST_ACK    */ TCP_LAST_ACK,
++	/* TCP_LISTEN      */ TCP_CLOSE,
++	/* TCP_CLOSING     */ TCP_CLOSING,
 +};
 +
-+static int listen_backlog_rcv(struct sock *sk, struct sk_buff *skb)
++static struct chtls_sock *chtls_sock_create(struct chtls_dev *cdev)
 +{
-+	if (likely(skb_transport_header(skb) != skb_network_header(skb)))
-+		return tcp_v4_do_rcv(sk, skb);
++	struct chtls_sock *csk = kzalloc(sizeof(*csk), GFP_ATOMIC);
++
++	if (!csk)
++		return NULL;
++
++	csk->txdata_skb_cache = alloc_skb(TXDATA_SKB_LEN, GFP_ATOMIC);
++	if (!csk->txdata_skb_cache) {
++		kfree(csk);
++		return NULL;
++	}
++
++	kref_init(&csk->kref);
++	csk->cdev = cdev;
++	skb_queue_head_init(&csk->txq);
++	csk->wr_skb_head = NULL;
++	csk->wr_skb_tail = NULL;
++	csk->mss = MAX_MSS;
++	csk->tlshws.ofld = 1;
++	csk->tlshws.txkey = -1;
++	csk->tlshws.rxkey = -1;
++	csk->tlshws.mfs = TLS_MFS;
++	skb_queue_head_init(&csk->tlshws.sk_recv_queue);
++	return csk;
++}
++
++static void chtls_sock_release(struct kref *ref)
++{
++	struct chtls_sock *csk =
++		container_of(ref, struct chtls_sock, kref);
++
++	kfree(csk);
++}
++
++static struct net_device *chtls_ipv4_netdev(struct chtls_dev *cdev,
++					    struct sock *sk)
++{
++	struct net_device *ndev = cdev->ports[0];
++
++	if (likely(!inet_sk(sk)->inet_rcv_saddr))
++		return ndev;
++
++	ndev = ip_dev_find(&init_net, inet_sk(sk)->inet_rcv_saddr);
++	if (!ndev)
++		return NULL;
++
++	if (is_vlan_dev(ndev))
++		return vlan_dev_real_dev(ndev);
++	return ndev;
++}
++
++static void assign_rxopt(struct sock *sk, unsigned int opt)
++{
++	const struct chtls_dev *cdev;
++	struct chtls_sock *csk;
++	struct tcp_sock *tp;
++
++	csk = rcu_dereference_sk_user_data(sk);
++	tp = tcp_sk(sk);
++
++	cdev = csk->cdev;
++	tp->tcp_header_len           = sizeof(struct tcphdr);
++	tp->rx_opt.mss_clamp         = cdev->mtus[TCPOPT_MSS_G(opt)] - 40;
++	tp->mss_cache                = tp->rx_opt.mss_clamp;
++	tp->rx_opt.tstamp_ok         = TCPOPT_TSTAMP_G(opt);
++	tp->rx_opt.snd_wscale        = TCPOPT_SACK_G(opt);
++	tp->rx_opt.wscale_ok         = TCPOPT_WSCALE_OK_G(opt);
++	SND_WSCALE(tp)               = TCPOPT_SND_WSCALE_G(opt);
++	if (!tp->rx_opt.wscale_ok)
++		tp->rx_opt.rcv_wscale = 0;
++	if (tp->rx_opt.tstamp_ok) {
++		tp->tcp_header_len += TCPOLEN_TSTAMP_ALIGNED;
++		tp->rx_opt.mss_clamp -= TCPOLEN_TSTAMP_ALIGNED;
++	} else if (csk->opt2 & TSTAMPS_EN_F) {
++		csk->opt2 &= ~TSTAMPS_EN_F;
++		csk->mtu_idx = TCPOPT_MSS_G(opt);
++	}
++}
++
++static void chtls_purge_receive_queue(struct sock *sk)
++{
++	struct sk_buff *skb;
++
++	while ((skb = __skb_dequeue(&sk->sk_receive_queue)) != NULL) {
++		skb_dst_set(skb, (void *)NULL);
++		kfree_skb(skb);
++	}
++}
++
++static void chtls_purge_write_queue(struct sock *sk)
++{
++	struct chtls_sock *csk = rcu_dereference_sk_user_data(sk);
++	struct sk_buff *skb;
++
++	while ((skb = __skb_dequeue(&csk->txq))) {
++		sk->sk_wmem_queued -= skb->truesize;
++		__kfree_skb(skb);
++	}
++}
++
++static void chtls_purge_recv_queue(struct sock *sk)
++{
++	struct chtls_sock *csk = rcu_dereference_sk_user_data(sk);
++	struct chtls_hws *tlsk = &csk->tlshws;
++	struct sk_buff *skb;
++
++	while ((skb = __skb_dequeue(&tlsk->sk_recv_queue)) != NULL) {
++		skb_dst_set(skb, NULL);
++		kfree_skb(skb);
++	}
++}
++
++static void abort_arp_failure(void *handle, struct sk_buff *skb)
++{
++	struct cpl_abort_req *req = cplhdr(skb);
++	struct chtls_dev *cdev;
++
++	cdev = (struct chtls_dev *)handle;
++	req->cmd = CPL_ABORT_NO_RST;
++	cxgb4_ofld_send(cdev->lldi->ports[0], skb);
++}
++
++static struct sk_buff *alloc_ctrl_skb(struct sk_buff *skb, int len)
++{
++	if (likely(skb && !skb_shared(skb) && !skb_cloned(skb))) {
++		__skb_trim(skb, 0);
++		refcount_add(2, &skb->users);
++	} else {
++		skb = alloc_skb(len, GFP_KERNEL | __GFP_NOFAIL);
++	}
++	return skb;
++}
++
++static void chtls_send_abort(struct sock *sk, int mode, struct sk_buff *skb)
++{
++	struct cpl_abort_req *req;
++	struct chtls_sock *csk;
++	struct tcp_sock *tp;
++
++	csk = rcu_dereference_sk_user_data(sk);
++	tp = tcp_sk(sk);
++
++	if (!skb)
++		skb = alloc_ctrl_skb(csk->txdata_skb_cache, sizeof(*req));
++
++	req = (struct cpl_abort_req *)skb_put(skb, sizeof(*req));
++	INIT_TP_WR_CPL(req, CPL_ABORT_REQ, csk->tid);
++	skb_set_queue_mapping(skb, (csk->txq_idx << 1) | CPL_PRIORITY_DATA);
++	req->rsvd0 = htonl(tp->snd_nxt);
++	req->rsvd1 = !csk_flag_nochk(csk, CSK_TX_DATA_SENT);
++	req->cmd = mode;
++	t4_set_arp_err_handler(skb, csk->cdev, abort_arp_failure);
++	send_or_defer(sk, tp, skb, mode == CPL_ABORT_SEND_RST);
++}
++
++static void chtls_send_reset(struct sock *sk, int mode, struct sk_buff *skb)
++{
++	struct chtls_sock *csk = rcu_dereference_sk_user_data(sk);
++
++	if (unlikely(csk_flag_nochk(csk, CSK_ABORT_SHUTDOWN) ||
++		     !csk->cdev)) {
++		if (sk->sk_state == TCP_SYN_RECV)
++			csk_set_flag(csk, CSK_RST_ABORTED);
++		goto out;
++	}
++
++	if (!csk_flag_nochk(csk, CSK_TX_DATA_SENT)) {
++		struct tcp_sock *tp = tcp_sk(sk);
++
++		if (send_tx_flowc_wr(sk, 0, tp->snd_nxt, tp->rcv_nxt) < 0)
++			WARN_ONCE(1, "send tx flowc error");
++		csk_set_flag(csk, CSK_TX_DATA_SENT);
++	}
++
++	csk_set_flag(csk, CSK_ABORT_RPL_PENDING);
++	chtls_purge_write_queue(sk);
++
++	csk_set_flag(csk, CSK_ABORT_SHUTDOWN);
++	if (sk->sk_state != TCP_SYN_RECV)
++		chtls_send_abort(sk, mode, skb);
++	else
++		goto out;
++
++	return;
++out:
++	if (skb)
++		kfree_skb(skb);
++}
++
++static void release_tcp_port(struct sock *sk)
++{
++	if (inet_csk(sk)->icsk_bind_hash)
++		inet_put_port(sk);
++}
++
++static void tcp_uncork(struct sock *sk)
++{
++	struct tcp_sock *tp = tcp_sk(sk);
++
++	if (tp->nonagle & TCP_NAGLE_CORK) {
++		tp->nonagle &= ~TCP_NAGLE_CORK;
++		chtls_tcp_push(sk, 0);
++	}
++}
++
++static void chtls_close_conn(struct sock *sk)
++{
++	struct cpl_close_con_req *req;
++	struct chtls_sock *csk;
++	struct sk_buff *skb;
++	unsigned int tid;
++	unsigned int len;
++
++	len = roundup(sizeof(struct cpl_close_con_req), 16);
++	csk = rcu_dereference_sk_user_data(sk);
++	tid = csk->tid;
++
++	skb = alloc_skb(len, GFP_KERNEL | __GFP_NOFAIL);
++	req = (struct cpl_close_con_req *)__skb_put(skb, len);
++	memset(req, 0, len);
++	req->wr.wr_hi = htonl(FW_WR_OP_V(FW_TP_WR) |
++			      FW_WR_IMMDLEN_V(sizeof(*req) -
++					      sizeof(req->wr)));
++	req->wr.wr_mid = htonl(FW_WR_LEN16_V(DIV_ROUND_UP(sizeof(*req), 16)) |
++			       FW_WR_FLOWID_V(tid));
++
++	OPCODE_TID(req) = htonl(MK_OPCODE_TID(CPL_CLOSE_CON_REQ, tid));
++
++	tcp_uncork(sk);
++	skb_entail(sk, skb, ULPCB_FLAG_NO_HDR | ULPCB_FLAG_NO_APPEND);
++	if (sk->sk_state != TCP_SYN_SENT)
++		chtls_push_frames(csk, 1);
++}
++
++/*
++ * Perform a state transition during close and return the actions indicated
++ * for the transition.  Do not make this function inline, the main reason
++ * it exists at all is to avoid multiple inlining of tcp_set_state.
++ */
++static int make_close_transition(struct sock *sk)
++{
++	int next = (int)new_state[sk->sk_state];
++
++	tcp_set_state(sk, next & TCP_STATE_MASK);
++	return next & TCP_ACTION_FIN;
++}
++
++void chtls_close(struct sock *sk, long timeout)
++{
++	int data_lost, prev_state;
++	struct chtls_sock *csk;
++
++	csk = rcu_dereference_sk_user_data(sk);
++
++	lock_sock(sk);
++	sk->sk_shutdown |= SHUTDOWN_MASK;
++
++	data_lost = skb_queue_len(&sk->sk_receive_queue);
++	data_lost |= skb_queue_len(&csk->tlshws.sk_recv_queue);
++	chtls_purge_recv_queue(sk);
++	chtls_purge_receive_queue(sk);
++
++	if (sk->sk_state == TCP_CLOSE) {
++		goto wait;
++	} else if (data_lost || sk->sk_state == TCP_SYN_SENT) {
++		chtls_send_reset(sk, CPL_ABORT_SEND_RST, NULL);
++		release_tcp_port(sk);
++		goto unlock;
++	} else if (sock_flag(sk, SOCK_LINGER) && !sk->sk_lingertime) {
++		sk->sk_prot->disconnect(sk, 0);
++	} else if (make_close_transition(sk)) {
++		chtls_close_conn(sk);
++	}
++wait:
++	if (timeout)
++		sk_stream_wait_close(sk, timeout);
++
++unlock:
++	prev_state = sk->sk_state;
++	sock_hold(sk);
++	sock_orphan(sk);
++
++	release_sock(sk);
++
++	local_bh_disable();
++	bh_lock_sock(sk);
++
++	if (prev_state != TCP_CLOSE && sk->sk_state == TCP_CLOSE)
++		goto out;
++
++	if (sk->sk_state == TCP_FIN_WAIT2 && tcp_sk(sk)->linger2 < 0 &&
++	    !csk_flag(sk, CSK_ABORT_SHUTDOWN)) {
++		struct sk_buff *skb;
++
++		skb = alloc_skb(sizeof(struct cpl_abort_req), GFP_ATOMIC);
++		if (skb)
++			chtls_send_reset(sk, CPL_ABORT_SEND_RST, skb);
++	}
++
++	if (sk->sk_state == TCP_CLOSE)
++		inet_csk_destroy_sock(sk);
++
++out:
++	bh_unlock_sock(sk);
++	local_bh_enable();
++	sock_put(sk);
++}
++
++/*
++ * Wait until a socket enters on of the given states.
++ */
++static int wait_for_states(struct sock *sk, unsigned int states)
++{
++	DECLARE_WAITQUEUE(wait, current);
++	struct socket_wq _sk_wq;
++	long current_timeo;
++	int err = 0;
++
++	current_timeo = 200;
++
++	/*
++	 * We want this to work even when there's no associated struct socket.
++	 * In that case we provide a temporary wait_queue_head_t.
++	 */
++	if (!sk->sk_wq) {
++		init_waitqueue_head(&_sk_wq.wait);
++		_sk_wq.fasync_list = NULL;
++		init_rcu_head_on_stack(&_sk_wq.rcu);
++		RCU_INIT_POINTER(sk->sk_wq, &_sk_wq);
++	}
++
++	add_wait_queue(sk_sleep(sk), &wait);
++	while (!sk_in_state(sk, states)) {
++		if (!current_timeo) {
++			err = -EBUSY;
++			break;
++		}
++		if (signal_pending(current)) {
++			err = sock_intr_errno(current_timeo);
++			break;
++		}
++		set_current_state(TASK_UNINTERRUPTIBLE);
++		release_sock(sk);
++		if (!sk_in_state(sk, states))
++			current_timeo = schedule_timeout(current_timeo);
++		__set_current_state(TASK_RUNNING);
++		lock_sock(sk);
++	}
++	remove_wait_queue(sk_sleep(sk), &wait);
++
++	if (rcu_dereference(sk->sk_wq) == &_sk_wq)
++		sk->sk_wq = NULL;
++	return err;
++}
++
++int chtls_disconnect(struct sock *sk, int flags)
++{
++	struct chtls_sock *csk;
++	struct tcp_sock *tp;
++	int err;
++
++	tp = tcp_sk(sk);
++	csk = rcu_dereference_sk_user_data(sk);
++	chtls_purge_recv_queue(sk);
++	chtls_purge_receive_queue(sk);
++	chtls_purge_write_queue(sk);
++
++	if (sk->sk_state != TCP_CLOSE) {
++		sk->sk_err = ECONNRESET;
++		chtls_send_reset(sk, CPL_ABORT_SEND_RST, NULL);
++		err = wait_for_states(sk, TCPF_CLOSE);
++		if (err)
++			return err;
++	}
++	chtls_purge_recv_queue(sk);
++	chtls_purge_receive_queue(sk);
++	tp->max_window = 0xFFFF << (tp->rx_opt.snd_wscale);
++	return tcp_disconnect(sk, flags);
++}
++
++#define SHUTDOWN_ELIGIBLE_STATE (TCPF_ESTABLISHED | \
++				 TCPF_SYN_RECV | TCPF_CLOSE_WAIT)
++void chtls_shutdown(struct sock *sk, int how)
++{
++	if ((how & SEND_SHUTDOWN) &&
++	    sk_in_state(sk, SHUTDOWN_ELIGIBLE_STATE) &&
++	    make_close_transition(sk))
++		chtls_close_conn(sk);
++}
++
++void chtls_destroy_sock(struct sock *sk)
++{
++	struct chtls_sock *csk;
++
++	csk = rcu_dereference_sk_user_data(sk);
++	chtls_purge_recv_queue(sk);
++	csk->ulp_mode = ULP_MODE_NONE;
++	chtls_purge_write_queue(sk);
++	free_tls_keyid(sk);
++	kref_put(&csk->kref, chtls_sock_release);
++	sk->sk_prot = &tcp_prot;
++	sk->sk_prot->destroy(sk);
++}
++
++static void reset_listen_child(struct sock *child)
++{
++	struct chtls_sock *csk = rcu_dereference_sk_user_data(child);
++	struct sk_buff *skb;
++
++	skb = alloc_ctrl_skb(csk->txdata_skb_cache,
++			     sizeof(struct cpl_abort_req));
++
++	chtls_send_reset(child, CPL_ABORT_SEND_RST, skb);
++	sock_orphan(child);
++	INC_ORPHAN_COUNT(child);
++	if (child->sk_state == TCP_CLOSE)
++		inet_csk_destroy_sock(child);
++}
++
++static void chtls_disconnect_acceptq(struct sock *listen_sk)
++{
++	struct request_sock **pprev;
++
++	pprev = ACCEPT_QUEUE(listen_sk);
++	while (*pprev) {
++		struct request_sock *req = *pprev;
++
++		if (req->rsk_ops == &chtls_rsk_ops) {
++			struct sock *child = req->sk;
++
++			*pprev = req->dl_next;
++			sk_acceptq_removed(listen_sk);
++			reqsk_put(req);
++			sock_hold(child);
++			local_bh_disable();
++			bh_lock_sock(child);
++			release_tcp_port(child);
++			reset_listen_child(child);
++			bh_unlock_sock(child);
++			local_bh_enable();
++			sock_put(child);
++		} else {
++			pprev = &req->dl_next;
++		}
++	}
++}
++
++static int listen_hashfn(const struct sock *sk)
++{
++	return ((unsigned long)sk >> 10) & (LISTEN_INFO_HASH_SIZE - 1);
++}
++
++static struct listen_info *listen_hash_add(struct chtls_dev *cdev,
++					   struct sock *sk,
++					   unsigned int stid)
++{
++	struct listen_info *p = kmalloc(sizeof(*p), GFP_KERNEL);
++
++	if (p) {
++		int key = listen_hashfn(sk);
++
++		p->sk = sk;
++		p->stid = stid;
++		spin_lock(&cdev->listen_lock);
++		p->next = cdev->listen_hash_tab[key];
++		cdev->listen_hash_tab[key] = p;
++		spin_unlock(&cdev->listen_lock);
++	}
++	return p;
++}
++
++static int listen_hash_find(struct chtls_dev *cdev,
++			    struct sock *sk)
++{
++	struct listen_info *p;
++	int stid = -1;
++	int key;
++
++	key = listen_hashfn(sk);
++
++	spin_lock(&cdev->listen_lock);
++	for (p = cdev->listen_hash_tab[key]; p; p = p->next)
++		if (p->sk == sk) {
++			stid = p->stid;
++			break;
++		}
++	spin_unlock(&cdev->listen_lock);
++	return stid;
++}
++
++static int listen_hash_del(struct chtls_dev *cdev,
++			   struct sock *sk)
++{
++	struct listen_info *p, **prev;
++	int stid = -1;
++	int key;
++
++	key = listen_hashfn(sk);
++	prev = &cdev->listen_hash_tab[key];
++
++	spin_lock(&cdev->listen_lock);
++	for (p = *prev; p; prev = &p->next, p = p->next)
++		if (p->sk == sk) {
++			stid = p->stid;
++			*prev = p->next;
++			kfree(p);
++			break;
++		}
++	spin_unlock(&cdev->listen_lock);
++	return stid;
++}
++
++static void cleanup_syn_rcv_conn(struct sock *child, struct sock *parent)
++{
++	struct request_sock *req;
++	struct chtls_sock *csk;
++
++	csk = rcu_dereference_sk_user_data(child);
++	req = csk->passive_reap_next;
++
++	reqsk_queue_removed(&inet_csk(parent)->icsk_accept_queue, req);
++	__skb_unlink((struct sk_buff *)&csk->synq, &csk->listen_ctx->synq);
++	chtls_reqsk_free(req);
++	csk->passive_reap_next = NULL;
++}
++
++static void chtls_reset_synq(struct listen_ctx *listen_ctx)
++{
++	struct sock *listen_sk = listen_ctx->lsk;
++
++	while (!skb_queue_empty(&listen_ctx->synq)) {
++		struct chtls_sock *csk =
++			container_of((struct synq *)__skb_dequeue
++				(&listen_ctx->synq), struct chtls_sock, synq);
++		struct sock *child = csk->sk;
++
++		cleanup_syn_rcv_conn(child, listen_sk);
++		sock_hold(child);
++		local_bh_disable();
++		bh_lock_sock(child);
++		release_tcp_port(child);
++		reset_listen_child(child);
++		bh_unlock_sock(child);
++		local_bh_enable();
++		sock_put(child);
++	}
++}
++
++int chtls_listen_start(struct chtls_dev *cdev, struct sock *sk)
++{
++	struct net_device *ndev;
++	struct listen_ctx *ctx;
++	struct adapter *adap;
++	struct port_info *pi;
++	int stid;
++	int ret;
++
++	if (sk->sk_family != PF_INET)
++		return -EAGAIN;
++
++	rcu_read_lock();
++	ndev = chtls_ipv4_netdev(cdev, sk);
++	rcu_read_unlock();
++	if (!ndev)
++		return -EBADF;
++
++	pi = netdev_priv(ndev);
++	adap = pi->adapter;
++	if (!(adap->flags & FULL_INIT_DONE))
++		return -EBADF;
++
++	if (listen_hash_find(cdev, sk) >= 0)   /* already have it */
++		return -EADDRINUSE;
++
++	ctx = kmalloc(sizeof(*ctx), GFP_KERNEL);
++	if (!ctx)
++		return -ENOMEM;
++
++	__module_get(THIS_MODULE);
++	ctx->lsk = sk;
++	ctx->cdev = cdev;
++	ctx->state = T4_LISTEN_START_PENDING;
++	skb_queue_head_init(&ctx->synq);
++
++	stid = cxgb4_alloc_stid(cdev->tids, sk->sk_family, ctx);
++	if (stid < 0)
++		goto free_ctx;
++
++	sock_hold(sk);
++	if (!listen_hash_add(cdev, sk, stid))
++		goto free_stid;
++
++	ret = cxgb4_create_server(ndev, stid,
++				  inet_sk(sk)->inet_rcv_saddr,
++				  inet_sk(sk)->inet_sport, 0,
++				  cdev->lldi->rxq_ids[0]);
++	if (ret > 0)
++		ret = net_xmit_errno(ret);
++	if (ret)
++		goto del_hash;
++	return 0;
++del_hash:
++	listen_hash_del(cdev, sk);
++free_stid:
++	cxgb4_free_stid(cdev->tids, stid, sk->sk_family);
++	sock_put(sk);
++free_ctx:
++	kfree(ctx);
++	module_put(THIS_MODULE);
++	return -EBADF;
++}
++
++void chtls_listen_stop(struct chtls_dev *cdev, struct sock *sk)
++{
++	struct listen_ctx *listen_ctx;
++	int stid;
++
++	stid = listen_hash_del(cdev, sk);
++	if (stid < 0)
++		return;
++
++	listen_ctx = (struct listen_ctx *)lookup_stid(cdev->tids, stid);
++	chtls_reset_synq(listen_ctx);
++
++	cxgb4_remove_server(cdev->lldi->ports[0], stid,
++			    cdev->lldi->rxq_ids[0], 0);
++	chtls_disconnect_acceptq(sk);
++}
++
++static int chtls_pass_open_rpl(struct chtls_dev *cdev, struct sk_buff *skb)
++{
++	struct cpl_pass_open_rpl *rpl = cplhdr(skb) + RSS_HDR;
++	unsigned int stid = GET_TID(rpl);
++	struct listen_ctx *listen_ctx;
++
++	listen_ctx = (struct listen_ctx *)lookup_stid(cdev->tids, stid);
++	if (!listen_ctx)
++		return CPL_RET_BUF_DONE;
++
++	if (listen_ctx->state == T4_LISTEN_START_PENDING) {
++		listen_ctx->state = T4_LISTEN_STARTED;
++		return CPL_RET_BUF_DONE;
++	}
++
++	if (rpl->status != CPL_ERR_NONE) {
++		pr_info("Unexpected PASS_OPEN_RPL status %u for STID %u\n",
++			rpl->status, stid);
++		return CPL_RET_BUF_DONE;
++	}
++	cxgb4_free_stid(cdev->tids, stid, listen_ctx->lsk->sk_family);
++	sock_put(listen_ctx->lsk);
++	kfree(listen_ctx);
++	module_put(THIS_MODULE);
++
++	return 0;
++}
++
++static int chtls_close_listsrv_rpl(struct chtls_dev *cdev, struct sk_buff *skb)
++{
++	struct cpl_close_listsvr_rpl *rpl = cplhdr(skb) + RSS_HDR;
++	struct listen_ctx *listen_ctx;
++	unsigned int stid;
++	void *data;
++
++	stid = GET_TID(rpl);
++	data = lookup_stid(cdev->tids, stid);
++	listen_ctx = (struct listen_ctx *)data;
++
++	if (rpl->status != CPL_ERR_NONE) {
++		pr_info("Unexpected CLOSE_LISTSRV_RPL status %u for STID %u\n",
++			rpl->status, stid);
++		return CPL_RET_BUF_DONE;
++	}
++
++	cxgb4_free_stid(cdev->tids, stid, listen_ctx->lsk->sk_family);
++	sock_put(listen_ctx->lsk);
++	kfree(listen_ctx);
++	module_put(THIS_MODULE);
++
++	return 0;
++}
++
++static void chtls_release_resources(struct sock *sk)
++{
++	struct chtls_sock *csk = rcu_dereference_sk_user_data(sk);
++	struct chtls_dev *cdev = csk->cdev;
++	unsigned int tid = csk->tid;
++	struct tid_info *tids;
++
++	if (!cdev)
++		return;
++
++	tids = cdev->tids;
++	kfree_skb(csk->txdata_skb_cache);
++	csk->txdata_skb_cache = NULL;
++
++	if (csk->l2t_entry) {
++		cxgb4_l2t_release(csk->l2t_entry);
++		csk->l2t_entry = NULL;
++	}
++
++	cxgb4_remove_tid(tids, csk->port_id, tid, sk->sk_family);
++	sock_put(sk);
++}
++
++static void chtls_conn_done(struct sock *sk)
++{
++	if (sock_flag(sk, SOCK_DEAD))
++		chtls_purge_receive_queue(sk);
++	sk_wakeup_sleepers(sk, 0);
++	tcp_done(sk);
++}
++
++static void do_abort_syn_rcv(struct sock *child, struct sock *parent)
++{
++	/*
++	 * If the server is still open we clean up the child connection,
++	 * otherwise the server already did the clean up as it was purging
++	 * its SYN queue and the skb was just sitting in its backlog.
++	 */
++	if (likely(parent->sk_state == TCP_LISTEN)) {
++		cleanup_syn_rcv_conn(child, parent);
++		/* Without the below call to sock_orphan,
++		 * we leak the socket resource with syn_flood test
++		 * as inet_csk_destroy_sock will not be called
++		 * in tcp_done since SOCK_DEAD flag is not set.
++		 * Kernel handles this differently where new socket is
++		 * created only after 3 way handshake is done.
++		 */
++		sock_orphan(child);
++		percpu_counter_inc((child)->sk_prot->orphan_count);
++		chtls_release_resources(child);
++		chtls_conn_done(child);
++	} else {
++		if (csk_flag(child, CSK_RST_ABORTED)) {
++			chtls_release_resources(child);
++			chtls_conn_done(child);
++		}
++	}
++}
++
++static void pass_open_abort(struct sock *child, struct sock *parent,
++			    struct sk_buff *skb)
++{
++	do_abort_syn_rcv(child, parent);
++	kfree_skb(skb);
++}
++
++static void bl_pass_open_abort(struct sock *lsk, struct sk_buff *skb)
++{
++	pass_open_abort(skb->sk, lsk, skb);
++}
++
++static void chtls_pass_open_arp_failure(struct sock *sk,
++					struct sk_buff *skb)
++{
++	const struct request_sock *oreq;
++	struct chtls_sock *csk;
++	struct chtls_dev *cdev;
++	struct sock *parent;
++	void *data;
++
++	csk = rcu_dereference_sk_user_data(sk);
++	cdev = csk->cdev;
++
++	/*
++	 * If the connection is being aborted due to the parent listening
++	 * socket going away there's nothing to do, the ABORT_REQ will close
++	 * the connection.
++	 */
++	if (csk_flag(sk, CSK_ABORT_RPL_PENDING)) {
++		kfree_skb(skb);
++		return;
++	}
++
++	oreq = csk->passive_reap_next;
++	data = lookup_stid(cdev->tids, oreq->ts_recent);
++	parent = ((struct listen_ctx *)data)->lsk;
++
++	bh_lock_sock(parent);
++	if (!sock_owned_by_user(parent)) {
++		pass_open_abort(sk, parent, skb);
++	} else {
++		BLOG_SKB_CB(skb)->backlog_rcv = bl_pass_open_abort;
++		__sk_add_backlog(parent, skb);
++	}
++	bh_unlock_sock(parent);
++}
++
++static void chtls_accept_rpl_arp_failure(void *handle,
++					 struct sk_buff *skb)
++{
++	struct sock *sk = (struct sock *)handle;
++
++	sock_hold(sk);
++	process_cpl_msg(chtls_pass_open_arp_failure, sk, skb);
++	sock_put(sk);
++}
++
++static unsigned int chtls_select_mss(const struct chtls_sock *csk,
++				     unsigned int pmtu,
++				     struct cpl_pass_accept_req *req)
++{
++	struct chtls_dev *cdev;
++	struct dst_entry *dst;
++	unsigned int tcpoptsz;
++	unsigned int iphdrsz;
++	unsigned int mtu_idx;
++	struct tcp_sock *tp;
++	unsigned int mss;
++	struct sock *sk;
++
++	mss = ntohs(req->tcpopt.mss);
++	sk = csk->sk;
++	dst = __sk_dst_get(sk);
++	cdev = csk->cdev;
++	tp = tcp_sk(sk);
++	tcpoptsz = 0;
++
++	iphdrsz = sizeof(struct iphdr) + sizeof(struct tcphdr);
++	if (req->tcpopt.tstamp)
++		tcpoptsz += round_up(TCPOLEN_TIMESTAMP, 4);
++
++	tp->advmss = dst_metric_advmss(dst);
++	if (USER_MSS(tp) && tp->advmss > USER_MSS(tp))
++		tp->advmss = USER_MSS(tp);
++	if (tp->advmss > pmtu - iphdrsz)
++		tp->advmss = pmtu - iphdrsz;
++	if (mss && tp->advmss > mss)
++		tp->advmss = mss;
++
++	tp->advmss = cxgb4_best_aligned_mtu(cdev->lldi->mtus,
++					    iphdrsz + tcpoptsz,
++					    tp->advmss - tcpoptsz,
++					    8, &mtu_idx);
++	tp->advmss -= iphdrsz;
++
++	inet_csk(sk)->icsk_pmtu_cookie = pmtu;
++	return mtu_idx;
++}
++
++static unsigned int select_rcv_wnd(struct chtls_sock *csk)
++{
++	unsigned int rcvwnd;
++	unsigned int wnd;
++	struct sock *sk;
++
++	sk = csk->sk;
++	wnd = tcp_full_space(sk);
++
++	if (wnd < MIN_RCV_WND)
++		wnd = MIN_RCV_WND;
++
++	rcvwnd = MAX_RCV_WND;
++
++	csk_set_flag(csk, CSK_UPDATE_RCV_WND);
++	return min(wnd, rcvwnd);
++}
++
++static unsigned int select_rcv_wscale(int space, int wscale_ok, int win_clamp)
++{
++	int wscale = 0;
++
++	if (space > MAX_RCV_WND)
++		space = MAX_RCV_WND;
++	if (win_clamp && win_clamp < space)
++		space = win_clamp;
++
++	if (wscale_ok) {
++		while (wscale < 14 && (65535 << wscale) < space)
++			wscale++;
++	}
++	return wscale;
++}
++
++static void chtls_pass_accept_rpl(struct sk_buff *skb,
++				  struct cpl_pass_accept_req *req,
++				  unsigned int tid)
++
++{
++	struct cpl_t5_pass_accept_rpl *rpl5;
++	struct cxgb4_lld_info *lldi;
++	const struct tcphdr *tcph;
++	const struct tcp_sock *tp;
++	struct chtls_sock *csk;
++	unsigned int len;
++	struct sock *sk;
++	u32 opt2, hlen;
++	u64 opt0;
++
++	sk = skb->sk;
++	tp = tcp_sk(sk);
++	csk = sk->sk_user_data;
++	csk->tid = tid;
++	lldi = csk->cdev->lldi;
++	len = roundup(sizeof(*rpl5), 16);
++
++	rpl5 = __skb_put_zero(skb, len);
++	INIT_TP_WR(rpl5, tid);
++
++	OPCODE_TID(rpl5) = cpu_to_be32(MK_OPCODE_TID(CPL_PASS_ACCEPT_RPL,
++						     csk->tid));
++	csk->mtu_idx = chtls_select_mss(csk, dst_mtu(__sk_dst_get(sk)),
++					req);
++	opt0 = TCAM_BYPASS_F |
++	       WND_SCALE_V((tp)->rx_opt.rcv_wscale) |
++	       MSS_IDX_V(csk->mtu_idx) |
++	       L2T_IDX_V(csk->l2t_entry->idx) |
++	       NAGLE_V(!(tp->nonagle & TCP_NAGLE_OFF)) |
++	       TX_CHAN_V(csk->tx_chan) |
++	       SMAC_SEL_V(csk->smac_idx) |
++	       DSCP_V(csk->tos >> 2) |
++	       ULP_MODE_V(ULP_MODE_TLS) |
++	       RCV_BUFSIZ_V(min(tp->rcv_wnd >> 10, RCV_BUFSIZ_M));
++
++	opt2 = RX_CHANNEL_V(0) |
++		RSS_QUEUE_VALID_F | RSS_QUEUE_V(csk->rss_qid);
++
++	if (!is_t5(lldi->adapter_type))
++		opt2 |= RX_FC_DISABLE_F;
++	if (req->tcpopt.tstamp)
++		opt2 |= TSTAMPS_EN_F;
++	if (req->tcpopt.sack)
++		opt2 |= SACK_EN_F;
++	hlen = ntohl(req->hdr_len);
++
++	tcph = (struct tcphdr *)((u8 *)(req + 1) +
++			T6_ETH_HDR_LEN_G(hlen) + T6_IP_HDR_LEN_G(hlen));
++	if (tcph->ece && tcph->cwr)
++		opt2 |= CCTRL_ECN_V(1);
++	opt2 |= CONG_CNTRL_V(CONG_ALG_NEWRENO);
++	opt2 |= T5_ISS_F;
++	opt2 |= T5_OPT_2_VALID_F;
++	rpl5->opt0 = cpu_to_be64(opt0);
++	rpl5->opt2 = cpu_to_be32(opt2);
++	rpl5->iss = cpu_to_be32((prandom_u32() & ~7UL) - 1);
++	set_wr_txq(skb, CPL_PRIORITY_SETUP, csk->port_id);
++	t4_set_arp_err_handler(skb, sk, chtls_accept_rpl_arp_failure);
++	cxgb4_l2t_send(csk->egress_dev, skb, csk->l2t_entry);
++}
++
++static void inet_inherit_port(struct inet_hashinfo *hash_info,
++			      struct sock *lsk, struct sock *newsk)
++{
++	local_bh_disable();
++	__inet_inherit_port(lsk, newsk);
++	local_bh_enable();
++}
++
++static int chtls_backlog_rcv(struct sock *sk, struct sk_buff *skb)
++{
++	if (skb->protocol) {
++		kfree_skb(skb);
++		return 0;
++	}
 +	BLOG_SKB_CB(skb)->backlog_rcv(sk, skb);
 +	return 0;
 +}
 +
-+static int chtls_start_listen(struct sock *sk)
++static struct sock *chtls_recv_sock(struct sock *lsk,
++				    struct request_sock *oreq,
++				    void *network_hdr,
++				    const struct cpl_pass_accept_req *req,
++				    struct chtls_dev *cdev)
 +{
-+	int err;
++	const struct tcphdr *tcph;
++	struct inet_sock *newinet;
++	const struct iphdr *iph;
++	struct net_device *ndev;
++	struct chtls_sock *csk;
++	struct dst_entry *dst;
++	struct neighbour *n;
++	struct tcp_sock *tp;
++	struct sock *newsk;
++	u16 port_id;
++	int rxq_idx;
++	int step;
 +
-+	if (sk->sk_protocol != IPPROTO_TCP)
-+		return -EPROTONOSUPPORT;
++	iph = (const struct iphdr *)network_hdr;
++	newsk = tcp_create_openreq_child(lsk, oreq, cdev->askb);
++	if (!newsk)
++		goto free_oreq;
 +
-+	if (sk->sk_family == PF_INET &&
-+	    LOOPBACK(inet_sk(sk)->inet_rcv_saddr))
-+		return -EADDRNOTAVAIL;
++	dst = inet_csk_route_child_sock(lsk, newsk, oreq);
++	if (!dst)
++		goto free_sk;
 +
-+	sk->sk_backlog_rcv = listen_backlog_rcv;
-+	mutex_lock(&notify_mutex);
-+	err = raw_notifier_call_chain(&listen_notify_list,
-+				      CHTLS_LISTEN_START, sk);
-+	mutex_unlock(&notify_mutex);
-+	return err;
-+}
++	tcph = (struct tcphdr *)(iph + 1);
++	n = dst_neigh_lookup(dst, &iph->saddr);
++	if (!n)
++		goto free_sk;
 +
-+static void chtls_stop_listen(struct sock *sk)
-+{
-+	if (sk->sk_protocol != IPPROTO_TCP)
-+		return;
++	ndev = n->dev;
++	if (!ndev)
++		goto free_dst;
++	port_id = cxgb4_port_idx(ndev);
 +
-+	mutex_lock(&notify_mutex);
-+	raw_notifier_call_chain(&listen_notify_list,
-+				CHTLS_LISTEN_STOP, sk);
-+	mutex_unlock(&notify_mutex);
-+}
++	csk = chtls_sock_create(cdev);
++	if (!csk)
++		goto free_dst;
 +
-+static int chtls_inline_feature(struct tls_device *dev)
-+{
-+	struct net_device *netdev;
-+	struct chtls_dev *cdev;
-+	int i;
++	csk->l2t_entry = cxgb4_l2t_get(cdev->lldi->l2t, n, ndev, 0);
++	if (!csk->l2t_entry)
++		goto free_csk;
 +
-+	cdev = to_chtls_dev(dev);
++	newsk->sk_user_data = csk;
++	newsk->sk_backlog_rcv = chtls_backlog_rcv;
 +
-+	for (i = 0; i < cdev->lldi->nports; i++) {
-+		netdev = cdev->ports[i];
-+		if (netdev->features & NETIF_F_HW_TLS_RECORD)
-+			return 1;
-+	}
-+	return 0;
-+}
++	tp = tcp_sk(newsk);
++	newinet = inet_sk(newsk);
 +
-+static int chtls_create_hash(struct tls_device *dev, struct sock *sk)
-+{
-+	if (sk->sk_state == TCP_LISTEN)
-+		return chtls_start_listen(sk);
-+	return 0;
-+}
++	newinet->inet_daddr = iph->saddr;
++	newinet->inet_rcv_saddr = iph->daddr;
++	newinet->inet_saddr = iph->daddr;
 +
-+static void chtls_destroy_hash(struct tls_device *dev, struct sock *sk)
-+{
-+	if (sk->sk_state == TCP_LISTEN)
-+		chtls_stop_listen(sk);
-+}
++	oreq->ts_recent = PASS_OPEN_TID_G(ntohl(req->tos_stid));
++	sk_setup_caps(newsk, dst);
++	csk->sk = newsk;
++	csk->passive_reap_next = oreq;
++	csk->tx_chan = cxgb4_port_chan(ndev);
++	csk->port_id = port_id;
++	csk->egress_dev = ndev;
++	csk->tos = PASS_OPEN_TOS_G(ntohl(req->tos_stid));
++	csk->ulp_mode = ULP_MODE_TLS;
++	step = cdev->lldi->nrxq / cdev->lldi->nchan;
++	csk->rss_qid = cdev->lldi->rxq_ids[port_id * step];
++	rxq_idx = port_id * step;
++	csk->txq_idx = (rxq_idx < cdev->lldi->ntxq) ? rxq_idx :
++			port_id * step;
++	csk->sndbuf = newsk->sk_sndbuf;
++	csk->smac_idx = cxgb4_tp_smt_idx(cdev->lldi->adapter_type,
++					 cxgb4_port_viid(ndev));
++	tp->rcv_wnd = select_rcv_wnd(csk);
++	RCV_WSCALE(tp) = select_rcv_wscale(tcp_full_space(newsk),
++					   WSCALE_OK(tp),
++					   tp->window_clamp);
++	neigh_release(n);
++	inet_inherit_port(&tcp_hashinfo, lsk, newsk);
++	csk_set_flag(csk, CSK_CONN_INLINE);
++	bh_unlock_sock(newsk); /* tcp_create_openreq_child ->sk_clone_lock */
 +
-+static void chtls_register_dev(struct chtls_dev *cdev)
-+{
-+	struct tls_device *tlsdev = &cdev->tlsdev;
-+
-+	strlcpy(tlsdev->name, "chtls", TLS_DEVICE_NAME_MAX);
-+	strlcat(tlsdev->name, cdev->lldi->ports[0]->name,
-+		TLS_DEVICE_NAME_MAX);
-+	tlsdev->feature = chtls_inline_feature;
-+	tlsdev->hash = chtls_create_hash;
-+	tlsdev->unhash = chtls_destroy_hash;
-+	tls_register_device(&cdev->tlsdev);
-+}
-+
-+static void chtls_unregister_dev(struct chtls_dev *cdev)
-+{
-+	tls_unregister_device(&cdev->tlsdev);
-+}
-+
-+static void process_deferq(struct work_struct *task_param)
-+{
-+	struct chtls_dev *cdev = container_of(task_param,
-+				struct chtls_dev, deferq_task);
-+	struct sk_buff *skb;
-+
-+	spin_lock_bh(&cdev->deferq.lock);
-+	while ((skb = __skb_dequeue(&cdev->deferq)) != NULL) {
-+		spin_unlock_bh(&cdev->deferq.lock);
-+		DEFERRED_SKB_CB(skb)->handler(cdev, skb);
-+		spin_lock_bh(&cdev->deferq.lock);
-+	}
-+	spin_unlock_bh(&cdev->deferq.lock);
-+}
-+
-+static int chtls_get_skb(struct chtls_dev *cdev)
-+{
-+	cdev->askb = alloc_skb(sizeof(struct tcphdr), GFP_KERNEL);
-+	if (!cdev->askb)
-+		return -ENOMEM;
-+
-+	skb_put(cdev->askb, sizeof(struct tcphdr));
-+	skb_reset_transport_header(cdev->askb);
-+	memset(cdev->askb->data, 0, cdev->askb->len);
-+	return 0;
-+}
-+
-+static void *chtls_uld_add(const struct cxgb4_lld_info *info)
-+{
-+	struct cxgb4_lld_info *lldi;
-+	struct chtls_dev *cdev;
-+	int i, j;
-+
-+	cdev = kzalloc(sizeof(*cdev) + info->nports *
-+		      (sizeof(struct net_device *)), GFP_KERNEL);
-+	if (!cdev)
-+		goto out;
-+
-+	lldi = kzalloc(sizeof(*lldi), GFP_KERNEL);
-+	if (!lldi)
-+		goto out_lldi;
-+
-+	if (chtls_get_skb(cdev))
-+		goto out_skb;
-+
-+	*lldi = *info;
-+	cdev->lldi = lldi;
-+	cdev->pdev = lldi->pdev;
-+	cdev->tids = lldi->tids;
-+	cdev->ports = (struct net_device **)(cdev + 1);
-+	cdev->ports = lldi->ports;
-+	cdev->mtus = lldi->mtus;
-+	cdev->tids = lldi->tids;
-+	cdev->pfvf = FW_VIID_PFN_G(cxgb4_port_viid(lldi->ports[0]))
-+			<< FW_VIID_PFN_S;
-+
-+	for (i = 0; i < (1 << RSPQ_HASH_BITS); i++) {
-+		unsigned int size = 64 - sizeof(struct rsp_ctrl) - 8;
-+
-+		cdev->rspq_skb_cache[i] = __alloc_skb(size,
-+						      gfp_any(), 0,
-+						      lldi->nodeid);
-+		if (unlikely(!cdev->rspq_skb_cache[i]))
-+			goto out_rspq_skb;
-+	}
-+
-+	idr_init(&cdev->hwtid_idr);
-+	INIT_WORK(&cdev->deferq_task, process_deferq);
-+	spin_lock_init(&cdev->listen_lock);
-+	spin_lock_init(&cdev->idr_lock);
-+	cdev->send_page_order = min_t(uint, get_order(32768),
-+				      send_page_order);
-+
-+	if (lldi->vr->key.size)
-+		if (chtls_init_kmap(cdev, lldi))
-+			goto out_rspq_skb;
-+
-+	mutex_lock(&cdev_mutex);
-+	list_add_tail(&cdev->list, &cdev_list);
-+	mutex_unlock(&cdev_mutex);
-+
-+	return cdev;
-+out_rspq_skb:
-+	for (j = 0; j <= i; j++)
-+		kfree_skb(cdev->rspq_skb_cache[j]);
-+	kfree_skb(cdev->askb);
-+out_skb:
-+	kfree(lldi);
-+out_lldi:
-+	kfree(cdev);
-+out:
++	return newsk;
++free_csk:
++	chtls_sock_release(&csk->kref);
++free_dst:
++	dst_release(dst);
++free_sk:
++	inet_csk_prepare_forced_close(newsk);
++	tcp_done(newsk);
++free_oreq:
++	chtls_reqsk_free(oreq);
 +	return NULL;
 +}
 +
-+static void chtls_free_uld(struct chtls_dev *cdev)
++/*
++ * Populate a TID_RELEASE WR.  The skb must be already propely sized.
++ */
++static  void mk_tid_release(struct sk_buff *skb,
++			    unsigned int chan, unsigned int tid)
 +{
-+	int i;
++	struct cpl_tid_release *req;
++	unsigned int len;
 +
-+	chtls_unregister_dev(cdev);
-+	kvfree(cdev->kmap.addr);
-+	idr_destroy(&cdev->hwtid_idr);
-+	for (i = 0; i < (1 << RSPQ_HASH_BITS); i++)
-+		kfree_skb(cdev->rspq_skb_cache[i]);
-+	kfree(cdev->lldi);
-+	if (cdev->askb)
-+		kfree_skb(cdev->askb);
-+	kfree(cdev);
++	len = roundup(sizeof(struct cpl_tid_release), 16);
++	req = (struct cpl_tid_release *)__skb_put(skb, len);
++	memset(req, 0, len);
++	set_wr_txq(skb, CPL_PRIORITY_SETUP, chan);
++	INIT_TP_WR_CPL(req, CPL_TID_RELEASE, tid);
 +}
 +
-+static void chtls_free_all_uld(void)
++static int chtls_get_module(struct sock *sk)
 +{
-+	struct chtls_dev *cdev, *tmp;
++	struct inet_connection_sock *icsk = inet_csk(sk);
 +
-+	mutex_lock(&cdev_mutex);
-+	list_for_each_entry_safe(cdev, tmp, &cdev_list, list)
-+		chtls_free_uld(cdev);
-+	mutex_unlock(&cdev_mutex);
-+}
++	if (!try_module_get(icsk->icsk_ulp_ops->owner))
++		return -1;
 +
-+static int chtls_uld_state_change(void *handle, enum cxgb4_state new_state)
-+{
-+	struct chtls_dev *cdev = handle;
-+
-+	switch (new_state) {
-+	case CXGB4_STATE_UP:
-+		chtls_register_dev(cdev);
-+		break;
-+	case CXGB4_STATE_DOWN:
-+		break;
-+	case CXGB4_STATE_START_RECOVERY:
-+		break;
-+	case CXGB4_STATE_DETACH:
-+		mutex_lock(&cdev_mutex);
-+		list_del(&cdev->list);
-+		mutex_unlock(&cdev_mutex);
-+		chtls_free_uld(cdev);
-+		break;
-+	default:
-+		break;
-+	}
 +	return 0;
 +}
 +
-+static struct sk_buff *copy_gl_to_skb_pkt(const struct pkt_gl *gl,
-+					  const __be64 *rsp,
-+					  u32 pktshift)
++static void chtls_pass_accept_request(struct sock *sk,
++				      struct sk_buff *skb)
 +{
-+	struct sk_buff *skb;
++	struct cpl_t5_pass_accept_rpl *rpl;
++	struct cpl_pass_accept_req *req;
++	struct listen_ctx *listen_ctx;
++	struct request_sock *oreq;
++	struct sk_buff *reply_skb;
++	struct chtls_sock *csk;
++	struct chtls_dev *cdev;
++	struct tcphdr *tcph;
++	struct sock *newsk;
++	struct ethhdr *eh;
++	struct iphdr *iph;
++	void *network_hdr;
++	unsigned int stid;
++	unsigned int len;
++	unsigned int tid;
 +
-+	/* Allocate space for cpl_pass_accpet_req which will be synthesized by
-+	 * driver. Once driver synthesizes cpl_pass_accpet_req the skb will go
-+	 * through the regular cpl_pass_accept_req processing in TOM.
-+	 */
-+	skb = alloc_skb(gl->tot_len + sizeof(struct cpl_pass_accept_req)
-+			- pktshift, GFP_ATOMIC);
-+	if (unlikely(!skb))
-+		return NULL;
-+	__skb_put(skb, gl->tot_len + sizeof(struct cpl_pass_accept_req)
-+		   - pktshift);
-+	/* For now we will copy  cpl_rx_pkt in the skb */
-+	skb_copy_to_linear_data(skb, rsp, sizeof(struct cpl_rx_pkt));
-+	skb_copy_to_linear_data_offset(skb, sizeof(struct cpl_pass_accept_req)
-+				       , gl->va + pktshift,
-+				       gl->tot_len - pktshift);
++	req = cplhdr(skb) + RSS_HDR;
++	tid = GET_TID(req);
++	cdev = BLOG_SKB_CB(skb)->cdev;
++	newsk = lookup_tid(cdev->tids, tid);
++	stid = PASS_OPEN_TID_G(ntohl(req->tos_stid));
++	if (newsk) {
++		pr_info("tid (%d) already in use\n", tid);
++		return;
++	}
 +
++	len = roundup(sizeof(*rpl), 16);
++	reply_skb = alloc_skb(len, GFP_ATOMIC);
++	if (!reply_skb) {
++		cxgb4_remove_tid(cdev->tids, 0, tid, sk->sk_family);
++		kfree_skb(skb);
++		return;
++	}
++
++	if (sk->sk_state != TCP_LISTEN)
++		goto reject;
++
++	if (inet_csk_reqsk_queue_is_full(sk))
++		goto reject;
++
++	if (sk_acceptq_is_full(sk))
++		goto reject;
++
++	oreq = inet_reqsk_alloc(&chtls_rsk_ops, sk, true);
++	if (!oreq)
++		goto reject;
++
++	oreq->rsk_rcv_wnd = 0;
++	oreq->rsk_window_clamp = 0;
++	oreq->cookie_ts = 0;
++	oreq->mss = 0;
++	oreq->ts_recent = 0;
++
++	eh = (struct ethhdr *)(req + 1);
++	iph = (struct iphdr *)(eh + 1);
++	if (iph->version != 0x4)
++		goto free_oreq;
++
++	network_hdr = (void *)(eh + 1);
++	tcph = (struct tcphdr *)(iph + 1);
++
++	tcp_rsk(oreq)->tfo_listener = false;
++	tcp_rsk(oreq)->rcv_isn = ntohl(tcph->seq);
++	chtls_set_req_port(oreq, tcph->source, tcph->dest);
++	inet_rsk(oreq)->ecn_ok = 0;
++	chtls_set_req_addr(oreq, iph->daddr, iph->saddr);
++	if (req->tcpopt.wsf <= 14) {
++		inet_rsk(oreq)->wscale_ok = 1;
++		inet_rsk(oreq)->snd_wscale = req->tcpopt.wsf;
++	}
++	inet_rsk(oreq)->ir_iif = sk->sk_bound_dev_if;
++
++	newsk = chtls_recv_sock(sk, oreq, network_hdr, req, cdev);
++	if (!newsk)
++		goto reject;
++
++	if (chtls_get_module(newsk))
++		goto reject;
++	inet_csk_reqsk_queue_added(sk);
++	reply_skb->sk = newsk;
++	chtls_install_cpl_ops(newsk);
++	cxgb4_insert_tid(cdev->tids, newsk, tid, newsk->sk_family);
++	csk = rcu_dereference_sk_user_data(newsk);
++	listen_ctx = (struct listen_ctx *)lookup_stid(cdev->tids, stid);
++	csk->listen_ctx = listen_ctx;
++	__skb_queue_tail(&listen_ctx->synq, (struct sk_buff *)&csk->synq);
++	chtls_pass_accept_rpl(reply_skb, req, tid);
++	kfree_skb(skb);
++	return;
++
++free_oreq:
++	chtls_reqsk_free(oreq);
++reject:
++	mk_tid_release(reply_skb, 0, tid);
++	cxgb4_ofld_send(cdev->lldi->ports[0], reply_skb);
++	kfree_skb(skb);
++}
++
++/*
++ * Handle a CPL_PASS_ACCEPT_REQ message.
++ */
++static int chtls_pass_accept_req(struct chtls_dev *cdev, struct sk_buff *skb)
++{
++	struct cpl_pass_accept_req *req = cplhdr(skb) + RSS_HDR;
++	struct listen_ctx *ctx;
++	unsigned int stid;
++	unsigned int tid;
++	struct sock *lsk;
++	void *data;
++
++	stid = PASS_OPEN_TID_G(ntohl(req->tos_stid));
++	tid = GET_TID(req);
++
++	data = lookup_stid(cdev->tids, stid);
++	if (!data)
++		return 1;
++
++	ctx = (struct listen_ctx *)data;
++	lsk = ctx->lsk;
++
++	if (unlikely(tid >= cdev->tids->ntids)) {
++		pr_info("passive open TID %u too large\n", tid);
++		return 1;
++	}
++
++	BLOG_SKB_CB(skb)->cdev = cdev;
++	process_cpl_msg(chtls_pass_accept_request, lsk, skb);
++	return 0;
++}
++
++/*
++ * Completes some final bits of initialization for just established connections
++ * and changes their state to TCP_ESTABLISHED.
++ *
++ * snd_isn here is the ISN after the SYN, i.e., the true ISN + 1.
++ */
++static void make_established(struct sock *sk, u32 snd_isn, unsigned int opt)
++{
++	struct tcp_sock *tp = tcp_sk(sk);
++
++	tp->pushed_seq = snd_isn;
++	tp->write_seq = snd_isn;
++	tp->snd_nxt = snd_isn;
++	tp->snd_una = snd_isn;
++	inet_sk(sk)->inet_id = tp->write_seq ^ jiffies;
++	assign_rxopt(sk, opt);
++
++	if (tp->rcv_wnd > (RCV_BUFSIZ_M << 10))
++		tp->rcv_wup -= tp->rcv_wnd - (RCV_BUFSIZ_M << 10);
++
++	smp_mb();
++	tcp_set_state(sk, TCP_ESTABLISHED);
++}
++
++static void chtls_abort_conn(struct sock *sk, struct sk_buff *skb)
++{
++	struct sk_buff *abort_skb;
++
++	abort_skb = alloc_skb(sizeof(struct cpl_abort_req), GFP_ATOMIC);
++	if (abort_skb)
++		chtls_send_reset(sk, CPL_ABORT_SEND_RST, abort_skb);
++}
++
++static struct sock *reap_list;
++static DEFINE_SPINLOCK(reap_list_lock);
++
++/*
++ * Process the reap list.
++ */
++DECLARE_TASK_FUNC(process_reap_list, task_param)
++{
++	spin_lock_bh(&reap_list_lock);
++	while (reap_list) {
++		struct sock *sk = reap_list;
++		struct chtls_sock *csk = rcu_dereference_sk_user_data(sk);
++
++		reap_list = csk->passive_reap_next;
++		csk->passive_reap_next = NULL;
++		spin_unlock(&reap_list_lock);
++		sock_hold(sk);
++
++		bh_lock_sock(sk);
++		chtls_abort_conn(sk, NULL);
++		sock_orphan(sk);
++		if (sk->sk_state == TCP_CLOSE)
++			inet_csk_destroy_sock(sk);
++		bh_unlock_sock(sk);
++		sock_put(sk);
++		spin_lock(&reap_list_lock);
++	}
++	spin_unlock_bh(&reap_list_lock);
++}
++
++static DECLARE_WORK(reap_task, process_reap_list);
++
++static void add_to_reap_list(struct sock *sk)
++{
++	struct chtls_sock *csk = sk->sk_user_data;
++
++	local_bh_disable();
++	bh_lock_sock(sk);
++	release_tcp_port(sk); /* release the port immediately */
++
++	spin_lock(&reap_list_lock);
++	csk->passive_reap_next = reap_list;
++	reap_list = sk;
++	if (!csk->passive_reap_next)
++		schedule_work(&reap_task);
++	spin_unlock(&reap_list_lock);
++	bh_unlock_sock(sk);
++	local_bh_enable();
++}
++
++static void add_pass_open_to_parent(struct sock *child, struct sock *lsk,
++				    struct chtls_dev *cdev)
++{
++	struct request_sock *oreq;
++	struct chtls_sock *csk;
++
++	if (lsk->sk_state != TCP_LISTEN)
++		return;
++
++	csk = child->sk_user_data;
++	oreq = csk->passive_reap_next;
++	csk->passive_reap_next = NULL;
++
++	reqsk_queue_removed(&inet_csk(lsk)->icsk_accept_queue, oreq);
++	__skb_unlink((struct sk_buff *)&csk->synq, &csk->listen_ctx->synq);
++
++	if (sk_acceptq_is_full(lsk)) {
++		chtls_reqsk_free(oreq);
++		add_to_reap_list(child);
++	} else {
++		refcount_set(&oreq->rsk_refcnt, 1);
++		inet_csk_reqsk_queue_add(lsk, oreq, child);
++		lsk->sk_data_ready(lsk);
++	}
++}
++
++static void bl_add_pass_open_to_parent(struct sock *lsk, struct sk_buff *skb)
++{
++	struct sock *child = skb->sk;
++
++	skb->sk = NULL;
++	add_pass_open_to_parent(child, lsk, BLOG_SKB_CB(skb)->cdev);
++	kfree_skb(skb);
++}
++
++static int chtls_pass_establish(struct chtls_dev *cdev, struct sk_buff *skb)
++{
++	struct cpl_pass_establish *req = cplhdr(skb) + RSS_HDR;
++	struct chtls_sock *csk;
++	struct sock *lsk, *sk;
++	unsigned int hwtid;
++
++	hwtid = GET_TID(req);
++	sk = lookup_tid(cdev->tids, hwtid);
++	if (!sk)
++		return (CPL_RET_UNKNOWN_TID | CPL_RET_BUF_DONE);
++
++	bh_lock_sock(sk);
++	if (unlikely(sock_owned_by_user(sk))) {
++		kfree_skb(skb);
++	} else {
++		unsigned int stid;
++		void *data;
++
++		csk = sk->sk_user_data;
++		csk->wr_max_credits = 64;
++		csk->wr_credits = 64;
++		csk->wr_unacked = 0;
++		make_established(sk, ntohl(req->snd_isn), ntohs(req->tcp_opt));
++		stid = PASS_OPEN_TID_G(ntohl(req->tos_stid));
++		sk->sk_state_change(sk);
++		if (unlikely(sk->sk_socket))
++			sk_wake_async(sk, 0, POLL_OUT);
++
++		data = lookup_stid(cdev->tids, stid);
++		lsk = ((struct listen_ctx *)data)->lsk;
++
++		bh_lock_sock(lsk);
++		if (unlikely(skb_queue_empty(&csk->listen_ctx->synq))) {
++			/* removed from synq */
++			bh_unlock_sock(lsk);
++			kfree_skb(skb);
++			goto unlock;
++		}
++
++		if (likely(!sock_owned_by_user(lsk))) {
++			kfree_skb(skb);
++			add_pass_open_to_parent(sk, lsk, cdev);
++		} else {
++			skb->sk = sk;
++			BLOG_SKB_CB(skb)->cdev = cdev;
++			BLOG_SKB_CB(skb)->backlog_rcv =
++				bl_add_pass_open_to_parent;
++			__sk_add_backlog(lsk, skb);
++		}
++		bh_unlock_sock(lsk);
++	}
++unlock:
++	bh_unlock_sock(sk);
++	return 0;
++}
++
++/*
++ * Handle receipt of an urgent pointer.
++ */
++static void handle_urg_ptr(struct sock *sk, u32 urg_seq)
++{
++	struct tcp_sock *tp = tcp_sk(sk);
++
++	urg_seq--;
++	if (tp->urg_data && !after(urg_seq, tp->urg_seq))
++		return;	/* duplicate pointer */
++
++	sk_send_sigurg(sk);
++	if (tp->urg_seq == tp->copied_seq && tp->urg_data &&
++	    !sock_flag(sk, SOCK_URGINLINE) &&
++	    tp->copied_seq != tp->rcv_nxt) {
++		struct sk_buff *skb = skb_peek(&sk->sk_receive_queue);
++
++		tp->copied_seq++;
++		if (skb && tp->copied_seq - ULP_SKB_CB(skb)->seq >= skb->len)
++			chtls_free_skb(sk, skb);
++	}
++
++	tp->urg_data = TCP_URG_NOTYET;
++	tp->urg_seq = urg_seq;
++}
++
++static void check_sk_callbacks(struct chtls_sock *csk)
++{
++	struct sock *sk = csk->sk;
++
++	if (unlikely(sk->sk_user_data &&
++		     !csk_flag_nochk(csk, CSK_CALLBACKS_CHKD)))
++		csk_set_flag(csk, CSK_CALLBACKS_CHKD);
++}
++
++/*
++ * Handles Rx data that arrives in a state where the socket isn't accepting
++ * new data.
++ */
++static void handle_excess_rx(struct sock *sk, struct sk_buff *skb)
++{
++	if (!csk_flag(sk, CSK_ABORT_SHUTDOWN))
++		chtls_abort_conn(sk, skb);
++
++	kfree_skb(skb);
++}
++
++static void chtls_recv_data(struct sock *sk, struct sk_buff *skb)
++{
++	struct cpl_rx_data *hdr = cplhdr(skb) + RSS_HDR;
++	struct chtls_sock *csk;
++	struct tcp_sock *tp;
++
++	csk = rcu_dereference_sk_user_data(sk);
++	tp = tcp_sk(sk);
++
++	if (unlikely(sk->sk_shutdown & RCV_SHUTDOWN)) {
++		handle_excess_rx(sk, skb);
++		return;
++	}
++
++	ULP_SKB_CB(skb)->seq = ntohl(hdr->seq);
++	ULP_SKB_CB(skb)->psh = hdr->psh;
++	skb_ulp_mode(skb) = ULP_MODE_NONE;
++
++	skb_reset_transport_header(skb);
++	__skb_pull(skb, sizeof(*hdr) + RSS_HDR);
++	if (!skb->data_len)
++		__skb_trim(skb, ntohs(hdr->len));
++
++	if (unlikely(hdr->urg))
++		handle_urg_ptr(sk, tp->rcv_nxt + ntohs(hdr->urg));
++	if (unlikely(tp->urg_data == TCP_URG_NOTYET &&
++		     tp->urg_seq - tp->rcv_nxt < skb->len))
++		tp->urg_data = TCP_URG_VALID |
++			       skb->data[tp->urg_seq - tp->rcv_nxt];
++
++	if (unlikely(hdr->dack_mode != csk->delack_mode)) {
++		csk->delack_mode = hdr->dack_mode;
++		csk->delack_seq = tp->rcv_nxt;
++	}
++
++	tcp_hdr(skb)->fin = 0;
++	tp->rcv_nxt += skb->len;
++
++	__skb_queue_tail(&sk->sk_receive_queue, skb);
++
++	if (!sock_flag(sk, SOCK_DEAD)) {
++		check_sk_callbacks(csk);
++		sk->sk_data_ready(sk);
++	}
++}
++
++static int chtls_rx_data(struct chtls_dev *cdev, struct sk_buff *skb)
++{
++	struct cpl_rx_data *req = cplhdr(skb) + RSS_HDR;
++	unsigned int hwtid = GET_TID(req);
++	struct sock *sk;
++
++	sk = lookup_tid(cdev->tids, hwtid);
++	skb_dst_set(skb, NULL);
++	process_cpl_msg(chtls_recv_data, sk, skb);
++	return 0;
++}
++
++static void chtls_recv_pdu(struct sock *sk, struct sk_buff *skb)
++{
++	struct cpl_tls_data *hdr = cplhdr(skb);
++	struct chtls_sock *csk;
++	struct chtls_hws *tlsk;
++	struct tcp_sock *tp;
++
++	csk = rcu_dereference_sk_user_data(sk);
++	tlsk = &csk->tlshws;
++	tp = tcp_sk(sk);
++
++	if (unlikely(sk->sk_shutdown & RCV_SHUTDOWN)) {
++		handle_excess_rx(sk, skb);
++		return;
++	}
++
++	ULP_SKB_CB(skb)->seq = ntohl(hdr->seq);
++	ULP_SKB_CB(skb)->flags = 0;
++	skb_ulp_mode(skb) = ULP_MODE_TLS;
++
++	skb_reset_transport_header(skb);
++	__skb_pull(skb, sizeof(*hdr));
++	if (!skb->data_len)
++		__skb_trim(skb,
++			   CPL_TLS_DATA_LENGTH_G(ntohl(hdr->length_pkd)));
++
++	if (unlikely(tp->urg_data == TCP_URG_NOTYET && tp->urg_seq -
++		     tp->rcv_nxt < skb->len))
++		tp->urg_data = TCP_URG_VALID |
++			       skb->data[tp->urg_seq - tp->rcv_nxt];
++
++	tcp_hdr(skb)->fin = 0;
++	tlsk->pldlen = CPL_TLS_DATA_LENGTH_G(ntohl(hdr->length_pkd));
++	__skb_queue_tail(&tlsk->sk_recv_queue, skb);
++}
++
++static int chtls_rx_pdu(struct chtls_dev *cdev, struct sk_buff *skb)
++{
++	struct cpl_tls_data *req = cplhdr(skb);
++	unsigned int hwtid = GET_TID(req);
++	struct sock *sk;
++
++	sk = lookup_tid(cdev->tids, hwtid);
++	skb_dst_set(skb, NULL);
++	process_cpl_msg(chtls_recv_pdu, sk, skb);
++	return 0;
++}
++
++static void chtls_set_hdrlen(struct sk_buff *skb, unsigned int nlen)
++{
++	struct tlsrx_cmp_hdr *tls_cmp_hdr = cplhdr(skb);
++
++	skb->hdr_len = ntohs((__force __be16)tls_cmp_hdr->length);
++	tls_cmp_hdr->length = ntohs((__force __be16)nlen);
++}
++
++static void chtls_rx_hdr(struct sock *sk, struct sk_buff *skb)
++{
++	struct cpl_rx_tls_cmp *cmp_cpl = cplhdr(skb);
++	struct sk_buff *skb_rec;
++	struct chtls_sock *csk;
++	struct chtls_hws *tlsk;
++	struct tcp_sock *tp;
++
++	csk = rcu_dereference_sk_user_data(sk);
++	tlsk = &csk->tlshws;
++	tp = tcp_sk(sk);
++
++	ULP_SKB_CB(skb)->seq = ntohl(cmp_cpl->seq);
++	ULP_SKB_CB(skb)->flags = 0;
++
++	skb_reset_transport_header(skb);
++	__skb_pull(skb, sizeof(*cmp_cpl));
++	if (!skb->data_len)
++		__skb_trim(skb, CPL_RX_TLS_CMP_LENGTH_G
++				(ntohl(cmp_cpl->pdulength_length)));
++
++	tp->rcv_nxt +=
++		CPL_RX_TLS_CMP_PDULENGTH_G(ntohl(cmp_cpl->pdulength_length));
++
++	skb_rec = __skb_dequeue(&tlsk->sk_recv_queue);
++	if (!skb_rec) {
++		ULP_SKB_CB(skb)->flags |= ULPCB_FLAG_TLS_ND;
++		__skb_queue_tail(&sk->sk_receive_queue, skb);
++	} else {
++		chtls_set_hdrlen(skb, tlsk->pldlen);
++		tlsk->pldlen = 0;
++		__skb_queue_tail(&sk->sk_receive_queue, skb);
++		__skb_queue_tail(&sk->sk_receive_queue, skb_rec);
++	}
++
++	if (!sock_flag(sk, SOCK_DEAD)) {
++		check_sk_callbacks(csk);
++		sk->sk_data_ready(sk);
++	}
++}
++
++static int chtls_rx_cmp(struct chtls_dev *cdev, struct sk_buff *skb)
++{
++	struct cpl_rx_tls_cmp *req = cplhdr(skb);
++	unsigned int hwtid = GET_TID(req);
++	struct sock *sk;
++
++	sk = lookup_tid(cdev->tids, hwtid);
++	skb_dst_set(skb, NULL);
++	process_cpl_msg(chtls_rx_hdr, sk, skb);
++
++	return 0;
++}
++
++static void chtls_timewait(struct sock *sk)
++{
++	struct tcp_sock *tp = tcp_sk(sk);
++
++	tp->rcv_nxt++;
++	tp->rx_opt.ts_recent_stamp = get_seconds();
++	tp->srtt_us = 0;
++	tcp_time_wait(sk, TCP_TIME_WAIT, 0);
++}
++
++static void chtls_peer_close(struct sock *sk, struct sk_buff *skb)
++{
++	struct chtls_sock *csk = rcu_dereference_sk_user_data(sk);
++
++	sk->sk_shutdown |= RCV_SHUTDOWN;
++	sock_set_flag(sk, SOCK_DONE);
++
++	switch (sk->sk_state) {
++	case TCP_SYN_RECV:
++	case TCP_ESTABLISHED:
++		tcp_set_state(sk, TCP_CLOSE_WAIT);
++		break;
++	case TCP_FIN_WAIT1:
++		tcp_set_state(sk, TCP_CLOSING);
++		break;
++	case TCP_FIN_WAIT2:
++		chtls_release_resources(sk);
++		if (csk_flag_nochk(csk, CSK_ABORT_RPL_PENDING))
++			chtls_conn_done(sk);
++		else
++			chtls_timewait(sk);
++		break;
++	default:
++		pr_info("cpl_peer_close in bad state %d\n", sk->sk_state);
++	}
++
++	if (!sock_flag(sk, SOCK_DEAD)) {
++		sk->sk_state_change(sk);
++		/* Do not send POLL_HUP for half duplex close. */
++
++		if ((sk->sk_shutdown & SEND_SHUTDOWN) ||
++		    sk->sk_state == TCP_CLOSE)
++			sk_wake_async(sk, SOCK_WAKE_WAITD, POLL_HUP);
++		else
++			sk_wake_async(sk, SOCK_WAKE_WAITD, POLL_IN);
++	}
++}
++
++static void chtls_close_con_rpl(struct sock *sk, struct sk_buff *skb)
++{
++	struct cpl_close_con_rpl *rpl = cplhdr(skb) + RSS_HDR;
++	struct chtls_sock *csk;
++	struct tcp_sock *tp;
++
++	csk = rcu_dereference_sk_user_data(sk);
++	tp = tcp_sk(sk);
++
++	tp->snd_una = ntohl(rpl->snd_nxt) - 1;  /* exclude FIN */
++
++	switch (sk->sk_state) {
++	case TCP_CLOSING:
++		chtls_release_resources(sk);
++		if (csk_flag_nochk(csk, CSK_ABORT_RPL_PENDING))
++			chtls_conn_done(sk);
++		else
++			chtls_timewait(sk);
++		break;
++	case TCP_LAST_ACK:
++		chtls_release_resources(sk);
++		chtls_conn_done(sk);
++		break;
++	case TCP_FIN_WAIT1:
++		tcp_set_state(sk, TCP_FIN_WAIT2);
++		sk->sk_shutdown |= SEND_SHUTDOWN;
++
++		if (!sock_flag(sk, SOCK_DEAD))
++			sk->sk_state_change(sk);
++		else if (tcp_sk(sk)->linger2 < 0 &&
++			 !csk_flag_nochk(csk, CSK_ABORT_SHUTDOWN))
++			chtls_abort_conn(sk, skb);
++		break;
++	default:
++		pr_info("close_con_rpl in bad state %d\n", sk->sk_state);
++	}
++	kfree_skb(skb);
++}
++
++static struct sk_buff *get_cpl_skb(struct sk_buff *skb,
++				   size_t len, gfp_t gfp)
++{
++	if (likely(!skb_is_nonlinear(skb) && !skb_cloned(skb))) {
++		WARN_ONCE(skb->len < len, "skb alloc error");
++		__skb_trim(skb, len);
++		skb_get(skb);
++	} else {
++		skb = alloc_skb(len, gfp);
++		if (skb)
++			__skb_put(skb, len);
++	}
 +	return skb;
 +}
 +
-+static int chtls_recv_packet(struct chtls_dev *cdev,
-+			     const struct pkt_gl *gl, const __be64 *rsp)
++static void set_abort_rpl_wr(struct sk_buff *skb, unsigned int tid,
++			     int cmd)
 +{
-+	unsigned int opcode = *(u8 *)rsp;
-+	struct sk_buff *skb;
-+	int ret;
++	struct cpl_abort_rpl *rpl = cplhdr(skb);
 +
-+	skb = copy_gl_to_skb_pkt(gl, rsp, cdev->lldi->sge_pktshift);
-+	if (!skb)
-+		return -ENOMEM;
-+
-+	ret = chtls_handlers[opcode](cdev, skb);
-+	if (ret & CPL_RET_BUF_DONE)
-+		kfree_skb(skb);
-+
-+	return 0;
++	INIT_TP_WR_CPL(rpl, CPL_ABORT_RPL, tid);
++	rpl->cmd = cmd;
 +}
 +
-+static int chtls_recv_rsp(struct chtls_dev *cdev, const __be64 *rsp)
++static void send_defer_abort_rpl(struct chtls_dev *cdev, struct sk_buff *skb)
 +{
-+	unsigned long rspq_bin;
-+	unsigned int opcode;
-+	struct sk_buff *skb;
-+	unsigned int len;
-+	int ret;
++	struct cpl_abort_req_rss *req = cplhdr(skb);
++	struct sk_buff *reply_skb;
 +
-+	len = 64 - sizeof(struct rsp_ctrl) - 8;
-+	opcode = *(u8 *)rsp;
-+
-+	rspq_bin = hash_ptr((void *)rsp, RSPQ_HASH_BITS);
-+	skb = cdev->rspq_skb_cache[rspq_bin];
-+	if (skb && !skb_is_nonlinear(skb) &&
-+	    !skb_shared(skb) && !skb_cloned(skb)) {
-+		refcount_inc(&skb->users);
-+		if (refcount_read(&skb->users) == 2) {
-+			__skb_trim(skb, 0);
-+			if (skb_tailroom(skb) >= len)
-+				goto copy_out;
-+		}
-+		refcount_dec(&skb->users);
-+	}
-+	skb = alloc_skb(len, GFP_ATOMIC);
-+	if (unlikely(!skb))
-+		return -ENOMEM;
-+
-+copy_out:
-+	__skb_put(skb, len);
-+	skb_copy_to_linear_data(skb, rsp, len);
-+	skb_reset_network_header(skb);
-+	skb_reset_transport_header(skb);
-+	ret = chtls_handlers[opcode](cdev, skb);
-+
-+	if (ret & CPL_RET_BUF_DONE)
-+		kfree_skb(skb);
-+	return 0;
++	reply_skb = alloc_skb(sizeof(struct cpl_abort_rpl),
++			      GFP_KERNEL | __GFP_NOFAIL);
++	__skb_put(reply_skb, sizeof(struct cpl_abort_rpl));
++	set_abort_rpl_wr(reply_skb, GET_TID(req),
++			 (req->status & CPL_ABORT_NO_RST));
++	set_wr_txq(reply_skb, CPL_PRIORITY_DATA, req->status >> 1);
++	cxgb4_ofld_send(cdev->lldi->ports[0], reply_skb);
++	kfree_skb(skb);
 +}
 +
-+static void chtls_recv(struct chtls_dev *cdev,
-+		       struct sk_buff **skbs, const __be64 *rsp)
++static void send_abort_rpl(struct sock *sk, struct sk_buff *skb,
++			   struct chtls_dev *cdev, int status, int queue)
 +{
-+	struct sk_buff *skb = *skbs;
-+	unsigned int opcode;
-+	int ret;
-+
-+	opcode = *(u8 *)rsp;
-+
-+	__skb_push(skb, sizeof(struct rss_header));
-+	skb_copy_to_linear_data(skb, rsp, sizeof(struct rss_header));
-+
-+	ret = chtls_handlers[opcode](cdev, skb);
-+	if (ret & CPL_RET_BUF_DONE)
-+		kfree_skb(skb);
-+}
-+
-+static int chtls_uld_rx_handler(void *handle, const __be64 *rsp,
-+				const struct pkt_gl *gl)
-+{
-+	struct chtls_dev *cdev = handle;
-+	unsigned int opcode;
-+	struct sk_buff *skb;
-+
-+	opcode = *(u8 *)rsp;
-+
-+	if (unlikely(opcode == CPL_RX_PKT)) {
-+		if (chtls_recv_packet(cdev, gl, rsp) < 0)
-+			goto nomem;
-+		return 0;
-+	}
-+
-+	if (!gl)
-+		return chtls_recv_rsp(cdev, rsp);
-+
-+#define RX_PULL_LEN 128
-+	skb = cxgb4_pktgl_to_skb(gl, RX_PULL_LEN, RX_PULL_LEN);
-+	if (unlikely(!skb))
-+		goto nomem;
-+	chtls_recv(cdev, &skb, rsp);
-+	return 0;
-+
-+nomem:
-+	return -ENOMEM;
-+}
-+
-+static int do_chtls_getsockopt(struct sock *sk, char __user *optval,
-+			       int __user *optlen)
-+{
-+	struct tls_crypto_info crypto_info;
-+
-+	crypto_info.version = TLS_1_2_VERSION;
-+	if (copy_to_user(optval, &crypto_info, sizeof(struct tls_crypto_info)))
-+		return -EFAULT;
-+	return 0;
-+}
-+
-+static int chtls_getsockopt(struct sock *sk, int level, int optname,
-+			    char __user *optval, int __user *optlen)
-+{
-+	struct tls_context *ctx = tls_get_ctx(sk);
-+
-+	if (level != SOL_TLS)
-+		return ctx->getsockopt(sk, level, optname, optval, optlen);
-+
-+	return do_chtls_getsockopt(sk, optval, optlen);
-+}
-+
-+static int do_chtls_setsockopt(struct sock *sk, int optname,
-+			       char __user *optval, unsigned int optlen)
-+{
-+	struct tls_crypto_info *crypto_info, tmp_crypto_info;
++	struct cpl_abort_req_rss *req = cplhdr(skb);
++	struct sk_buff *reply_skb;
 +	struct chtls_sock *csk;
-+	int keylen;
-+	int rc = 0;
 +
 +	csk = rcu_dereference_sk_user_data(sk);
 +
-+	if (!optval || optlen < sizeof(*crypto_info)) {
-+		rc = -EINVAL;
-+		goto out;
++	reply_skb = alloc_skb(sizeof(struct cpl_abort_rpl),
++			      GFP_KERNEL);
++
++	if (!reply_skb) {
++		req->status = (queue << 1);
++		send_defer_abort_rpl(cdev, skb);
++		return;
 +	}
 +
-+	rc = copy_from_user(&tmp_crypto_info, optval, sizeof(*crypto_info));
-+	if (rc) {
-+		rc = -EFAULT;
-+		goto out;
-+	}
++	set_abort_rpl_wr(reply_skb, GET_TID(req), status);
++	kfree_skb(skb);
 +
-+	/* check version */
-+	if (tmp_crypto_info.version != TLS_1_2_VERSION) {
-+		rc = -ENOTSUPP;
-+		goto out;
-+	}
++	set_wr_txq(reply_skb, CPL_PRIORITY_DATA, queue);
++	if (csk_conn_inline(csk)) {
++		struct l2t_entry *e = csk->l2t_entry;
 +
-+	crypto_info = (struct tls_crypto_info *)&csk->tlshws.crypto_info;
-+
-+	switch (tmp_crypto_info.cipher_type) {
-+	case TLS_CIPHER_AES_GCM_128: {
-+		rc = copy_from_user(crypto_info, optval,
-+				    sizeof(struct
-+					   tls12_crypto_info_aes_gcm_128));
-+
-+		if (rc) {
-+			rc = -EFAULT;
-+			goto out;
++		if (e && sk->sk_state != TCP_SYN_RECV) {
++			cxgb4_l2t_send(csk->egress_dev, reply_skb, e);
++			return;
 +		}
-+
-+		keylen = TLS_CIPHER_AES_GCM_128_KEY_SIZE;
-+		rc = chtls_setkey(csk, keylen, optname);
-+		break;
 +	}
-+	default:
-+		rc = -EINVAL;
-+		goto out;
++	cxgb4_ofld_send(cdev->lldi->ports[0], reply_skb);
++}
++
++/*
++ * Add an skb to the deferred skb queue for processing from process context.
++ */
++static void t4_defer_reply(struct sk_buff *skb, struct chtls_dev *cdev,
++			   defer_handler_t handler)
++{
++	DEFERRED_SKB_CB(skb)->handler = handler;
++	spin_lock_bh(&cdev->deferq.lock);
++	__skb_queue_tail(&cdev->deferq, skb);
++	if (skb_queue_len(&cdev->deferq) == 1)
++		schedule_work(&cdev->deferq_task);
++	spin_unlock_bh(&cdev->deferq.lock);
++}
++
++static void chtls_send_abort_rpl(struct sock *sk, struct sk_buff *skb,
++				 struct chtls_dev *cdev,
++				 int status, int queue)
++{
++	struct cpl_abort_req_rss *req = cplhdr(skb) + RSS_HDR;
++	struct sk_buff *reply_skb;
++	struct chtls_sock *csk;
++	unsigned int tid;
++
++	csk = rcu_dereference_sk_user_data(sk);
++	tid = GET_TID(req);
++
++	reply_skb = get_cpl_skb(skb, sizeof(struct cpl_abort_rpl), gfp_any());
++	if (!reply_skb) {
++		req->status = (queue << 1) | status;
++		t4_defer_reply(skb, cdev, send_defer_abort_rpl);
++		return;
 +	}
-+out:
-+	return rc;
++
++	set_abort_rpl_wr(reply_skb, tid, status);
++	set_wr_txq(reply_skb, CPL_PRIORITY_DATA, queue);
++	if (csk_conn_inline(csk)) {
++		struct l2t_entry *e = csk->l2t_entry;
++
++		if (e && sk->sk_state != TCP_SYN_RECV) {
++			cxgb4_l2t_send(csk->egress_dev, reply_skb, e);
++			return;
++		}
++	}
++	cxgb4_ofld_send(cdev->lldi->ports[0], reply_skb);
++	kfree_skb(skb);
 +}
 +
-+static int chtls_setsockopt(struct sock *sk, int level, int optname,
-+			    char __user *optval, unsigned int optlen)
++/*
++ * This is run from a listener's backlog to abort a child connection in
++ * SYN_RCV state (i.e., one on the listener's SYN queue).
++ */
++static void bl_abort_syn_rcv(struct sock *lsk, struct sk_buff *skb)
 +{
-+	struct tls_context *ctx = tls_get_ctx(sk);
++	struct chtls_sock *csk;
++	struct sock *child;
++	int queue;
 +
-+	if (level != SOL_TLS)
-+		return ctx->setsockopt(sk, level, optname, optval, optlen);
++	child = skb->sk;
++	csk = rcu_dereference_sk_user_data(child);
++	queue = csk->txq_idx;
 +
-+	return do_chtls_setsockopt(sk, optname, optval, optlen);
++	skb->sk	= NULL;
++	do_abort_syn_rcv(child, lsk);
++	send_abort_rpl(child, skb, BLOG_SKB_CB(skb)->cdev,
++		       CPL_ABORT_NO_RST, queue);
 +}
 +
-+static struct cxgb4_uld_info chtls_uld_info = {
-+	.name = DRV_NAME,
-+	.nrxq = MAX_ULD_QSETS,
-+	.ntxq = MAX_ULD_QSETS,
-+	.rxq_size = 1024,
-+	.add = chtls_uld_add,
-+	.state_change = chtls_uld_state_change,
-+	.rx_handler = chtls_uld_rx_handler,
-+};
-+
-+void chtls_install_cpl_ops(struct sock *sk)
++static int abort_syn_rcv(struct sock *sk, struct sk_buff *skb)
 +{
-+	sk->sk_prot = &chtls_cpl_prot;
-+}
++	const struct request_sock *oreq;
++	struct listen_ctx *listen_ctx;
++	struct chtls_sock *csk;
++	struct chtls_dev *cdev;
++	struct sock *psk;
++	void *ctx;
 +
-+static void __init chtls_init_ulp_ops(void)
-+{
-+	chtls_cpl_prot			= tcp_prot;
-+	chtls_init_rsk_ops(&chtls_cpl_prot, &chtls_rsk_ops,
-+			   &tcp_prot, PF_INET);
-+	chtls_cpl_prot.close		= chtls_close;
-+	chtls_cpl_prot.disconnect	= chtls_disconnect;
-+	chtls_cpl_prot.destroy		= chtls_destroy_sock;
-+	chtls_cpl_prot.shutdown		= chtls_shutdown;
-+	chtls_cpl_prot.setsockopt	= chtls_setsockopt;
-+	chtls_cpl_prot.getsockopt	= chtls_getsockopt;
-+}
++	csk = sk->sk_user_data;
++	oreq = csk->passive_reap_next;
++	cdev = csk->cdev;
 +
-+static int __init chtls_register(void)
-+{
-+	chtls_init_ulp_ops();
-+	register_listen_notifier(&listen_notifier);
-+	cxgb4_register_uld(CXGB4_ULD_TLS, &chtls_uld_info);
++	if (!oreq)
++		return -1;
++
++	ctx = lookup_stid(cdev->tids, oreq->ts_recent);
++	if (!ctx)
++		return -1;
++
++	listen_ctx = (struct listen_ctx *)ctx;
++	psk = listen_ctx->lsk;
++
++	bh_lock_sock(psk);
++	if (!sock_owned_by_user(psk)) {
++		int queue = csk->txq_idx;
++
++		do_abort_syn_rcv(sk, psk);
++		send_abort_rpl(sk, skb, cdev, CPL_ABORT_NO_RST, queue);
++	} else {
++		skb->sk = sk;
++		BLOG_SKB_CB(skb)->backlog_rcv = bl_abort_syn_rcv;
++		__sk_add_backlog(psk, skb);
++	}
++	bh_unlock_sock(psk);
 +	return 0;
 +}
 +
-+static void __exit chtls_unregister(void)
++static void chtls_abort_req_rss(struct sock *sk, struct sk_buff *skb)
 +{
-+	unregister_listen_notifier(&listen_notifier);
-+	chtls_free_all_uld();
-+	cxgb4_unregister_uld(CXGB4_ULD_TLS);
++	const struct cpl_abort_req_rss *req = cplhdr(skb) + RSS_HDR;
++	struct chtls_sock *csk = sk->sk_user_data;
++	int rst_status = CPL_ABORT_NO_RST;
++	int queue = csk->txq_idx;
++
++	if (is_neg_adv(req->status)) {
++		if (sk->sk_state == TCP_SYN_RECV)
++			chtls_set_tcb_tflag(sk, 0, 0);
++
++		kfree_skb(skb);
++		return;
++	}
++
++	csk_reset_flag(csk, CSK_ABORT_REQ_RCVD);
++
++	if (!csk_flag_nochk(csk, CSK_ABORT_SHUTDOWN) &&
++	    !csk_flag_nochk(csk, CSK_TX_DATA_SENT)) {
++		struct tcp_sock *tp = tcp_sk(sk);
++
++		if (send_tx_flowc_wr(sk, 0, tp->snd_nxt, tp->rcv_nxt) < 0)
++			WARN_ONCE(1, "send_tx_flowc error");
++		csk_set_flag(csk, CSK_TX_DATA_SENT);
++	}
++
++	csk_set_flag(csk, CSK_ABORT_SHUTDOWN);
++
++	if (!csk_flag_nochk(csk, CSK_ABORT_RPL_PENDING)) {
++		sk->sk_err = ETIMEDOUT;
++
++		if (!sock_flag(sk, SOCK_DEAD))
++			sk->sk_error_report(sk);
++
++		if (sk->sk_state == TCP_SYN_RECV && !abort_syn_rcv(sk, skb))
++			return;
++
++		chtls_release_resources(sk);
++		chtls_conn_done(sk);
++	}
++
++	chtls_send_abort_rpl(sk, skb, csk->cdev, rst_status, queue);
 +}
 +
-+module_init(chtls_register);
-+module_exit(chtls_unregister);
++static void chtls_abort_rpl_rss(struct sock *sk, struct sk_buff *skb)
++{
++	struct cpl_abort_rpl_rss *rpl = cplhdr(skb) + RSS_HDR;
++	struct chtls_sock *csk;
++	struct chtls_dev *cdev;
 +
-+MODULE_DESCRIPTION("Chelsio TLS Inline driver");
-+MODULE_LICENSE("GPL");
-+MODULE_AUTHOR("Chelsio Communications");
-+MODULE_VERSION(DRV_VERSION);
++	csk = rcu_dereference_sk_user_data(sk);
++	cdev = csk->cdev;
++
++	if (csk_flag_nochk(csk, CSK_ABORT_RPL_PENDING)) {
++		csk_reset_flag(csk, CSK_ABORT_RPL_PENDING);
++		if (!csk_flag_nochk(csk, CSK_ABORT_REQ_RCVD)) {
++			if (sk->sk_state == TCP_SYN_SENT) {
++				cxgb4_remove_tid(cdev->tids,
++						 csk->port_id,
++						 GET_TID(rpl),
++						 sk->sk_family);
++				sock_put(sk);
++			}
++			chtls_release_resources(sk);
++			chtls_conn_done(sk);
++		}
++	}
++	kfree_skb(skb);
++}
++
++static int chtls_conn_cpl(struct chtls_dev *cdev, struct sk_buff *skb)
++{
++	struct cpl_peer_close *req = cplhdr(skb) + RSS_HDR;
++	void (*fn)(struct sock *sk, struct sk_buff *skb);
++	unsigned int hwtid = GET_TID(req);
++	struct sock *sk;
++	u8 opcode;
++
++	opcode = ((const struct rss_header *)cplhdr(skb))->opcode;
++
++	sk = lookup_tid(cdev->tids, hwtid);
++	if (!sk)
++		goto rel_skb;
++
++	switch (opcode) {
++	case CPL_PEER_CLOSE:
++		fn = chtls_peer_close;
++		break;
++	case CPL_CLOSE_CON_RPL:
++		fn = chtls_close_con_rpl;
++		break;
++	case CPL_ABORT_REQ_RSS:
++		fn = chtls_abort_req_rss;
++		break;
++	case CPL_ABORT_RPL_RSS:
++		fn = chtls_abort_rpl_rss;
++		break;
++	default:
++		goto rel_skb;
++	}
++
++	process_cpl_msg(fn, sk, skb);
++	return 0;
++
++rel_skb:
++	kfree_skb(skb);
++	return 0;
++}
++
++static struct sk_buff *dequeue_wr(struct sock *sk)
++{
++	struct chtls_sock *csk = rcu_dereference_sk_user_data(sk);
++	struct sk_buff *skb = csk->wr_skb_head;
++
++	if (likely(skb)) {
++	/* Don't bother clearing the tail */
++		csk->wr_skb_head = WR_SKB_CB(skb)->next_wr;
++		WR_SKB_CB(skb)->next_wr = NULL;
++	}
++	return skb;
++}
++
++static void chtls_rx_ack(struct sock *sk, struct sk_buff *skb)
++{
++	struct cpl_fw4_ack *hdr = cplhdr(skb) + RSS_HDR;
++	struct chtls_sock *csk = sk->sk_user_data;
++	struct tcp_sock *tp = tcp_sk(sk);
++	u32 credits = hdr->credits;
++	u32 snd_una;
++
++	snd_una = ntohl(hdr->snd_una);
++	csk->wr_credits += credits;
++
++	if (csk->wr_unacked > csk->wr_max_credits - csk->wr_credits)
++		csk->wr_unacked = csk->wr_max_credits - csk->wr_credits;
++
++	while (credits) {
++		struct sk_buff *pskb = csk->wr_skb_head;
++		u32 csum;
++
++		if (unlikely(!pskb)) {
++			if (csk->wr_nondata)
++				csk->wr_nondata -= credits;
++			break;
++		}
++		csum = (__force u32)pskb->csum;
++		if (unlikely(credits < csum)) {
++			pskb->csum = (__force __wsum)(csum - credits);
++			break;
++		}
++		dequeue_wr(sk);
++		credits -= csum;
++		kfree_skb(pskb);
++	}
++	if (hdr->seq_vld & CPL_FW4_ACK_FLAGS_SEQVAL) {
++		if (unlikely(before(snd_una, tp->snd_una))) {
++			kfree_skb(skb);
++			return;
++		}
++
++		if (tp->snd_una != snd_una) {
++			tp->snd_una = snd_una;
++			tp->rcv_tstamp = tcp_time_stamp(tp);
++			if (tp->snd_una == tp->snd_nxt &&
++			    !csk_flag_nochk(csk, CSK_TX_FAILOVER))
++				csk_reset_flag(csk, CSK_TX_WAIT_IDLE);
++		}
++	}
++
++	if (hdr->seq_vld & CPL_FW4_ACK_FLAGS_CH) {
++		unsigned int fclen16 = roundup(failover_flowc_wr_len, 16);
++
++		csk->wr_credits -= fclen16;
++		csk_reset_flag(csk, CSK_TX_WAIT_IDLE);
++		csk_reset_flag(csk, CSK_TX_FAILOVER);
++	}
++	if (skb_queue_len(&csk->txq) && chtls_push_frames(csk, 0))
++		sk->sk_write_space(sk);
++
++	kfree_skb(skb);
++}
++
++static int chtls_wr_ack(struct chtls_dev *cdev, struct sk_buff *skb)
++{
++	struct cpl_fw4_ack *rpl = cplhdr(skb) + RSS_HDR;
++	unsigned int hwtid = GET_TID(rpl);
++	struct sock *sk;
++
++	sk = lookup_tid(cdev->tids, hwtid);
++	process_cpl_msg(chtls_rx_ack, sk, skb);
++
++	return 0;
++}
++
++chtls_handler_func chtls_handlers[NUM_CPL_CMDS] = {
++	[CPL_PASS_OPEN_RPL]     = chtls_pass_open_rpl,
++	[CPL_CLOSE_LISTSRV_RPL] = chtls_close_listsrv_rpl,
++	[CPL_PASS_ACCEPT_REQ]   = chtls_pass_accept_req,
++	[CPL_PASS_ESTABLISH]    = chtls_pass_establish,
++	[CPL_RX_DATA]           = chtls_rx_data,
++	[CPL_TLS_DATA]          = chtls_rx_pdu,
++	[CPL_RX_TLS_CMP]        = chtls_rx_cmp,
++	[CPL_PEER_CLOSE]        = chtls_conn_cpl,
++	[CPL_CLOSE_CON_RPL]     = chtls_conn_cpl,
++	[CPL_ABORT_REQ_RSS]     = chtls_conn_cpl,
++	[CPL_ABORT_RPL_RSS]     = chtls_conn_cpl,
++	[CPL_FW4_ACK]           = chtls_wr_ack,
++};
+diff --git a/net/ipv4/tcp_minisocks.c b/net/ipv4/tcp_minisocks.c
+index e7e3643..57b5468 100644
+--- a/net/ipv4/tcp_minisocks.c
++++ b/net/ipv4/tcp_minisocks.c
+@@ -332,6 +332,7 @@ void tcp_time_wait(struct sock *sk, int state, int timeo)
+ 	tcp_update_metrics(sk);
+ 	tcp_done(sk);
+ }
++EXPORT_SYMBOL(tcp_time_wait);
+ 
+ void tcp_twsk_destructor(struct sock *sk)
+ {
 -- 
 1.8.3.1
