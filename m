@@ -1,7 +1,7 @@
 From: Atul Gupta <atul.gupta@chelsio.com>
-Subject: [PATCH v15 net-next 10/12] crypto: chtls - Inline TLS record Rx
-Date: Sat, 31 Mar 2018 21:42:01 +0530
-Message-ID: <1522512723-31747-11-git-send-email-atul.gupta@chelsio.com>
+Subject: [PATCH v15 net-next 11/12] crypto: chtls - Program the TLS session Key
+Date: Sat, 31 Mar 2018 21:42:02 +0530
+Message-ID: <1522512723-31747-12-git-send-email-atul.gupta@chelsio.com>
 References: <1522512723-31747-1-git-send-email-atul.gupta@chelsio.com>
 Cc: davejwatson@fb.com, sd@queasysnail.net, sbrivio@redhat.com,
         linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
@@ -14,654 +14,436 @@ In-Reply-To: <1522512723-31747-1-git-send-email-atul.gupta@chelsio.com>
 Sender: netdev-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-handler for record receive. plain text copied to user
-buffer
+Initialize the space reserved for storing the TLS keys,
+get and free the location where key is stored for the TLS
+connection.
+Program the Tx and Rx key as received from user in
+struct tls12_crypto_info_aes_gcm_128 and understood by hardware.
+added socket option TLS_RX
 
 Signed-off-by: Atul Gupta <atul.gupta@chelsio.com>
-Signed-off-by: Michael Werner <werner@chelsio.com>
 ---
- drivers/crypto/chelsio/chtls/chtls_io.c   | 602 +++++++++++++++++++++++++++++-
- drivers/crypto/chelsio/chtls/chtls_main.c |   1 +
- 2 files changed, 602 insertions(+), 1 deletion(-)
+ drivers/crypto/chelsio/chtls/chtls_hw.c | 412 ++++++++++++++++++++++++++++++++
+ 1 file changed, 412 insertions(+)
+ create mode 100644 drivers/crypto/chelsio/chtls/chtls_hw.c
 
-diff --git a/drivers/crypto/chelsio/chtls/chtls_io.c b/drivers/crypto/chelsio/chtls/chtls_io.c
-index 6974d3e..5a75be4 100644
---- a/drivers/crypto/chelsio/chtls/chtls_io.c
-+++ b/drivers/crypto/chelsio/chtls/chtls_io.c
-@@ -30,6 +30,11 @@ static bool is_tls_tx(struct chtls_sock *csk)
- 	return csk->tlshws.txkey >= 0;
- }
- 
-+static bool is_tls_rx(struct chtls_sock *csk)
-+{
-+	return csk->tlshws.rxkey >= 0;
-+}
-+
- static int data_sgl_len(const struct sk_buff *skb)
- {
- 	unsigned int cnt;
-@@ -106,10 +111,12 @@ static int send_flowc_wr(struct sock *sk, struct fw_flowc_wr *flowc,
- {
- 	struct chtls_sock *csk = rcu_dereference_sk_user_data(sk);
- 	struct tcp_sock *tp = tcp_sk(sk);
--	int flowclen16 = flowclen / 16;
- 	struct sk_buff *skb;
-+	int flowclen16;
- 	int ret;
- 
-+	flowclen16 = flowclen / 16;
-+
- 	if (csk_flag(sk, CSK_TX_DATA_SENT)) {
- 		skb = create_flowc_wr_skb(sk, flowc, flowclen);
- 		if (!skb)
-@@ -1220,3 +1227,596 @@ int chtls_sendpage(struct sock *sk, struct page *page,
- 	copied = sk_stream_error(sk, flags, err);
- 	goto done;
- }
-+
-+static void chtls_select_window(struct sock *sk)
-+{
-+	struct chtls_sock *csk = rcu_dereference_sk_user_data(sk);
-+	struct tcp_sock *tp = tcp_sk(sk);
-+	unsigned int wnd = tp->rcv_wnd;
-+
-+	wnd = max_t(unsigned int, wnd, tcp_full_space(sk));
-+	wnd = max_t(unsigned int, MIN_RCV_WND, wnd);
-+
-+	if (wnd > MAX_RCV_WND)
-+		wnd = MAX_RCV_WND;
-+
+diff --git a/drivers/crypto/chelsio/chtls/chtls_hw.c b/drivers/crypto/chelsio/chtls/chtls_hw.c
+new file mode 100644
+index 0000000..54a13aa9
+--- /dev/null
++++ b/drivers/crypto/chelsio/chtls/chtls_hw.c
+@@ -0,0 +1,412 @@
 +/*
-+ * Check if we need to grow the receive window in response to an increase in
-+ * the socket's receive buffer size.  Some applications increase the buffer
-+ * size dynamically and rely on the window to grow accordingly.
++ * Copyright (c) 2018 Chelsio Communications, Inc.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ *
++ * Written by: Atul Gupta (atul.gupta@chelsio.com)
 + */
 +
-+	if (wnd > tp->rcv_wnd) {
-+		tp->rcv_wup -= wnd - tp->rcv_wnd;
-+		tp->rcv_wnd = wnd;
-+		/* Mark the receive window as updated */
-+		csk_reset_flag(csk, CSK_UPDATE_RCV_WND);
-+	}
++#include <linux/module.h>
++#include <linux/list.h>
++#include <linux/workqueue.h>
++#include <linux/skbuff.h>
++#include <linux/timer.h>
++#include <linux/notifier.h>
++#include <linux/inetdevice.h>
++#include <linux/ip.h>
++#include <linux/tcp.h>
++#include <linux/tls.h>
++#include <net/tls.h>
++
++#include "chtls.h"
++#include "chtls_cm.h"
++
++static void __set_tcb_field_direct(struct chtls_sock *csk,
++				   struct cpl_set_tcb_field *req, u16 word,
++				   u64 mask, u64 val, u8 cookie, int no_reply)
++{
++	struct ulptx_idata *sc;
++
++	INIT_TP_WR_CPL(req, CPL_SET_TCB_FIELD, csk->tid);
++	req->wr.wr_mid |= htonl(FW_WR_FLOWID_V(csk->tid));
++	req->reply_ctrl = htons(NO_REPLY_V(no_reply) |
++				QUEUENO_V(csk->rss_qid));
++	req->word_cookie = htons(TCB_WORD_V(word) | TCB_COOKIE_V(cookie));
++	req->mask = cpu_to_be64(mask);
++	req->val = cpu_to_be64(val);
++	sc = (struct ulptx_idata *)(req + 1);
++	sc->cmd_more = htonl(ULPTX_CMD_V(ULP_TX_SC_NOOP));
++	sc->len = htonl(0);
++}
++
++static void __set_tcb_field(struct sock *sk, struct sk_buff *skb, u16 word,
++			    u64 mask, u64 val, u8 cookie, int no_reply)
++{
++	struct cpl_set_tcb_field *req;
++	struct chtls_sock *csk;
++	struct ulptx_idata *sc;
++	unsigned int wrlen;
++
++	wrlen = roundup(sizeof(*req) + sizeof(*sc), 16);
++	csk = rcu_dereference_sk_user_data(sk);
++
++	req = (struct cpl_set_tcb_field *)__skb_put(skb, wrlen);
++	__set_tcb_field_direct(csk, req, word, mask, val, cookie, no_reply);
++	set_wr_txq(skb, CPL_PRIORITY_CONTROL, csk->port_id);
 +}
 +
 +/*
-+ * Send RX credits through an RX_DATA_ACK CPL message.  We are permitted
-+ * to return without sending the message in case we cannot allocate
-+ * an sk_buff.  Returns the number of credits sent.
++ * Send control message to HW, message go as immediate data and packet
++ * is freed immediately.
 + */
-+static u32 send_rx_credits(struct chtls_sock *csk, u32 credits)
++static int chtls_set_tcb_field(struct sock *sk, u16 word, u64 mask, u64 val)
 +{
-+	struct cpl_rx_data_ack *req;
++	struct cpl_set_tcb_field *req;
++	unsigned int credits_needed;
++	struct chtls_sock *csk;
++	struct ulptx_idata *sc;
 +	struct sk_buff *skb;
++	unsigned int wrlen;
++	int ret;
 +
-+	skb = alloc_skb(sizeof(*req), GFP_ATOMIC);
++	wrlen = roundup(sizeof(*req) + sizeof(*sc), 16);
++
++	skb = alloc_skb(wrlen, GFP_ATOMIC);
 +	if (!skb)
-+		return 0;
-+	__skb_put(skb, sizeof(*req));
-+	req = (struct cpl_rx_data_ack *)skb->head;
++		return -ENOMEM;
 +
-+	set_wr_txq(skb, CPL_PRIORITY_ACK, csk->port_id);
-+	INIT_TP_WR(req, csk->tid);
-+	OPCODE_TID(req) = cpu_to_be32(MK_OPCODE_TID(CPL_RX_DATA_ACK,
-+						    csk->tid));
-+	req->credit_dack = cpu_to_be32(RX_CREDITS_V(credits) |
-+				       RX_FORCE_ACK_F);
-+	cxgb4_ofld_send(csk->cdev->ports[csk->port_id], skb);
-+	return credits;
++	credits_needed = DIV_ROUND_UP(wrlen, 16);
++	csk = rcu_dereference_sk_user_data(sk);
++
++	__set_tcb_field(sk, skb, word, mask, val, 0, 1);
++	skb_set_queue_mapping(skb, (csk->txq_idx << 1) | CPL_PRIORITY_DATA);
++	csk->wr_credits -= credits_needed;
++	csk->wr_unacked += credits_needed;
++	enqueue_wr(csk, skb);
++	ret = cxgb4_ofld_send(csk->egress_dev, skb);
++	if (ret < 0)
++		kfree_skb(skb);
++	return ret < 0 ? ret : 0;
 +}
 +
-+#define CREDIT_RETURN_STATE (TCPF_ESTABLISHED | \
-+			     TCPF_FIN_WAIT1 | \
-+			     TCPF_FIN_WAIT2)
-+
 +/*
-+ * Called after some received data has been read.  It returns RX credits
-+ * to the HW for the amount of data processed.
++ * Set one of the t_flags bits in the TCB.
 + */
-+static void chtls_cleanup_rbuf(struct sock *sk, int copied)
++int chtls_set_tcb_tflag(struct sock *sk, unsigned int bit_pos, int val)
 +{
-+	struct chtls_sock *csk = rcu_dereference_sk_user_data(sk);
-+	struct tcp_sock *tp;
-+	int must_send;
-+	u32 credits;
-+	u32 thres;
-+
-+	thres = 15 * 1024;
-+
-+	if (!sk_in_state(sk, CREDIT_RETURN_STATE))
-+		return;
-+
-+	chtls_select_window(sk);
-+	tp = tcp_sk(sk);
-+	credits = tp->copied_seq - tp->rcv_wup;
-+	if (unlikely(!credits))
-+		return;
-+
-+/*
-+ * For coalescing to work effectively ensure the receive window has
-+ * at least 16KB left.
-+ */
-+	must_send = credits + 16384 >= tp->rcv_wnd;
-+
-+	if (must_send || credits >= thres)
-+		tp->rcv_wup += send_rx_credits(csk, credits);
++	return chtls_set_tcb_field(sk, 1, 1ULL << bit_pos,
++				   val << bit_pos);
 +}
 +
-+static int chtls_pt_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
-+			    int nonblock, int flags, int *addr_len)
++static int chtls_set_tcb_keyid(struct sock *sk, int keyid)
++{
++	return chtls_set_tcb_field(sk, 31, 0xFFFFFFFFULL, keyid);
++}
++
++static int chtls_set_tcb_seqno(struct sock *sk)
++{
++	return chtls_set_tcb_field(sk, 28, ~0ULL, 0);
++}
++
++static int chtls_set_tcb_quiesce(struct sock *sk, int val)
++{
++	return chtls_set_tcb_field(sk, 1, (1ULL << TF_RX_QUIESCE_S),
++				   TF_RX_QUIESCE_V(val));
++}
++
++/* TLS Key bitmap processing */
++int chtls_init_kmap(struct chtls_dev *cdev, struct cxgb4_lld_info *lldi)
++{
++	unsigned int num_key_ctx, bsize;
++	int ksize;
++
++	num_key_ctx = (lldi->vr->key.size / TLS_KEY_CONTEXT_SZ);
++	bsize = BITS_TO_LONGS(num_key_ctx);
++
++	cdev->kmap.size = num_key_ctx;
++	cdev->kmap.available = bsize;
++	ksize = sizeof(*cdev->kmap.addr) * bsize;
++	cdev->kmap.addr = kvzalloc(ksize, GFP_KERNEL);
++	if (!cdev->kmap.addr)
++		return -ENOMEM;
++
++	cdev->kmap.start = lldi->vr->key.start;
++	spin_lock_init(&cdev->kmap.lock);
++	return 0;
++}
++
++static int get_new_keyid(struct chtls_sock *csk, u32 optname)
++{
++	struct net_device *dev = csk->egress_dev;
++	struct chtls_dev *cdev = csk->cdev;
++	struct chtls_hws *hws;
++	struct adapter *adap;
++	int keyid;
++
++	adap = netdev2adap(dev);
++	hws = &csk->tlshws;
++
++	spin_lock_bh(&cdev->kmap.lock);
++	keyid = find_first_zero_bit(cdev->kmap.addr, cdev->kmap.size);
++	if (keyid < cdev->kmap.size) {
++		__set_bit(keyid, cdev->kmap.addr);
++		if (optname == TLS_RX)
++			hws->rxkey = keyid;
++		else
++			hws->txkey = keyid;
++		atomic_inc(&adap->chcr_stats.tls_key);
++	} else {
++		keyid = -1;
++	}
++	spin_unlock_bh(&cdev->kmap.lock);
++	return keyid;
++}
++
++void free_tls_keyid(struct sock *sk)
 +{
 +	struct chtls_sock *csk = rcu_dereference_sk_user_data(sk);
 +	struct net_device *dev = csk->egress_dev;
-+	struct chtls_hws *hws = &csk->tlshws;
-+	struct tcp_sock *tp = tcp_sk(sk);
++	struct chtls_dev *cdev = csk->cdev;
++	struct chtls_hws *hws;
 +	struct adapter *adap;
-+	unsigned long avail;
-+	int buffers_freed;
-+	int copied = 0;
-+	int request;
-+	int target;
-+	long timeo;
++
++	if (!cdev->kmap.addr)
++		return;
 +
 +	adap = netdev2adap(dev);
-+	buffers_freed = 0;
-+
-+	timeo = sock_rcvtimeo(sk, nonblock);
-+	target = sock_rcvlowat(sk, flags & MSG_WAITALL, len);
-+	request = len;
-+
-+	if (unlikely(csk_flag(sk, CSK_UPDATE_RCV_WND)))
-+		chtls_cleanup_rbuf(sk, copied);
-+
-+	do {
-+		struct sk_buff *skb;
-+		u32 offset = 0;
-+
-+		if (unlikely(tp->urg_data &&
-+			     tp->urg_seq == tp->copied_seq)) {
-+			if (copied)
-+				break;
-+			if (signal_pending(current)) {
-+				copied = timeo ? sock_intr_errno(timeo) :
-+					-EAGAIN;
-+				break;
-+			}
-+		}
-+		skb = skb_peek(&sk->sk_receive_queue);
-+		if (skb)
-+			goto found_ok_skb;
-+		if (csk->wr_credits &&
-+		    skb_queue_len(&csk->txq) &&
-+		    chtls_push_frames(csk, csk->wr_credits ==
-+				      csk->wr_max_credits))
-+			sk->sk_write_space(sk);
-+
-+		if (copied >= target && !sk->sk_backlog.tail)
-+			break;
-+
-+		if (copied) {
-+			if (sk->sk_err || sk->sk_state == TCP_CLOSE ||
-+			    (sk->sk_shutdown & RCV_SHUTDOWN) ||
-+			    signal_pending(current))
-+				break;
-+
-+			if (!timeo)
-+				break;
-+		} else {
-+			if (sock_flag(sk, SOCK_DONE))
-+				break;
-+			if (sk->sk_err) {
-+				copied = sock_error(sk);
-+				break;
-+			}
-+			if (sk->sk_shutdown & RCV_SHUTDOWN)
-+				break;
-+			if (sk->sk_state == TCP_CLOSE) {
-+				copied = -ENOTCONN;
-+				break;
-+			}
-+			if (!timeo) {
-+				copied = -EAGAIN;
-+				break;
-+			}
-+			if (signal_pending(current)) {
-+				copied = sock_intr_errno(timeo);
-+				break;
-+			}
-+		}
-+		if (sk->sk_backlog.tail) {
-+			release_sock(sk);
-+			lock_sock(sk);
-+			chtls_cleanup_rbuf(sk, copied);
-+			continue;
-+		}
-+
-+		if (copied >= target)
-+			break;
-+		chtls_cleanup_rbuf(sk, copied);
-+		sk_wait_data(sk, &timeo, NULL);
-+			continue;
-+found_ok_skb:
-+		if (!skb->len) {
-+			skb_dst_set(skb, NULL);
-+			__skb_unlink(skb, &sk->sk_receive_queue);
-+			kfree_skb(skb);
-+
-+			if (!copied && !timeo) {
-+				copied = -EAGAIN;
-+				break;
-+			}
-+
-+			if (copied < target) {
-+				release_sock(sk);
-+				lock_sock(sk);
-+				continue;
-+			}
-+			break;
-+		}
-+		offset = hws->copied_seq;
-+		avail = skb->len - offset;
-+		if (len < avail)
-+			avail = len;
-+
-+		if (unlikely(tp->urg_data)) {
-+			u32 urg_offset = tp->urg_seq - tp->copied_seq;
-+
-+			if (urg_offset < avail) {
-+				if (urg_offset) {
-+					avail = urg_offset;
-+				} else if (!sock_flag(sk, SOCK_URGINLINE)) {
-+					/* First byte is urgent, skip */
-+					tp->copied_seq++;
-+					offset++;
-+					avail--;
-+					if (!avail)
-+						goto skip_copy;
-+				}
-+			}
-+		}
-+		if (hws->rstate == TLS_RCV_ST_READ_BODY) {
-+			if (skb_copy_datagram_msg(skb, offset,
-+						  msg, avail)) {
-+				if (!copied) {
-+					copied = -EFAULT;
-+					break;
-+				}
-+			}
-+		} else {
-+			struct tlsrx_cmp_hdr *tls_hdr_pkt =
-+				(struct tlsrx_cmp_hdr *)skb->data;
-+
-+			if ((tls_hdr_pkt->res_to_mac_error &
-+			    TLSRX_HDR_PKT_ERROR_M))
-+				tls_hdr_pkt->type = 0x7F;
-+
-+			/* CMP pld len is for recv seq */
-+			hws->rcvpld = skb->hdr_len;
-+			if (skb_copy_datagram_msg(skb, offset, msg, avail)) {
-+				if (!copied) {
-+					copied = -EFAULT;
-+					break;
-+				}
-+			}
-+		}
-+		copied += avail;
-+		len -= avail;
-+		hws->copied_seq += avail;
-+skip_copy:
-+		if (tp->urg_data && after(tp->copied_seq, tp->urg_seq))
-+			tp->urg_data = 0;
-+
-+		if (hws->rstate == TLS_RCV_ST_READ_BODY &&
-+		    (avail + offset) >= skb->len) {
-+			if (likely(skb))
-+				chtls_free_skb(sk, skb);
-+			buffers_freed++;
-+			hws->rstate = TLS_RCV_ST_READ_HEADER;
-+			atomic_inc(&adap->chcr_stats.tls_pdu_rx);
-+			tp->copied_seq += hws->rcvpld;
-+			hws->copied_seq = 0;
-+			if (copied >= target &&
-+			    !skb_peek(&sk->sk_receive_queue))
-+				break;
-+		} else {
-+			if (likely(skb)) {
-+				if (ULP_SKB_CB(skb)->flags &
-+				    ULPCB_FLAG_TLS_ND)
-+					hws->rstate =
-+						TLS_RCV_ST_READ_HEADER;
-+				else
-+					hws->rstate =
-+						TLS_RCV_ST_READ_BODY;
-+				chtls_free_skb(sk, skb);
-+			}
-+			buffers_freed++;
-+			tp->copied_seq += avail;
-+			hws->copied_seq = 0;
-+		}
-+	} while (len > 0);
-+
-+	if (buffers_freed)
-+		chtls_cleanup_rbuf(sk, copied);
-+	release_sock(sk);
-+	return copied;
-+}
-+
-+/*
-+ * Peek at data in a socket's receive buffer.
-+ */
-+static int peekmsg(struct sock *sk, struct msghdr *msg,
-+		   size_t len, int nonblock, int flags)
-+{
-+	struct tcp_sock *tp = tcp_sk(sk);
-+	u32 peek_seq, offset;
-+	struct sk_buff *skb;
-+	int copied = 0;
-+	size_t avail;          /* amount of available data in current skb */
-+	long timeo;
-+
-+	lock_sock(sk);
-+	timeo = sock_rcvtimeo(sk, nonblock);
-+	peek_seq = tp->copied_seq;
-+
-+	do {
-+		if (unlikely(tp->urg_data && tp->urg_seq == peek_seq)) {
-+			if (copied)
-+				break;
-+			if (signal_pending(current)) {
-+				copied = timeo ? sock_intr_errno(timeo) :
-+				-EAGAIN;
-+				break;
-+			}
-+		}
-+
-+		skb_queue_walk(&sk->sk_receive_queue, skb) {
-+			offset = peek_seq - ULP_SKB_CB(skb)->seq;
-+			if (offset < skb->len)
-+				goto found_ok_skb;
-+		}
-+
-+		/* empty receive queue */
-+		if (copied)
-+			break;
-+		if (sock_flag(sk, SOCK_DONE))
-+			break;
-+		if (sk->sk_err) {
-+			copied = sock_error(sk);
-+			break;
-+		}
-+		if (sk->sk_shutdown & RCV_SHUTDOWN)
-+			break;
-+		if (sk->sk_state == TCP_CLOSE) {
-+			copied = -ENOTCONN;
-+			break;
-+		}
-+		if (!timeo) {
-+			copied = -EAGAIN;
-+			break;
-+		}
-+		if (signal_pending(current)) {
-+			copied = sock_intr_errno(timeo);
-+			break;
-+		}
-+
-+		if (sk->sk_backlog.tail) {
-+			/* Do not sleep, just process backlog. */
-+			release_sock(sk);
-+			lock_sock(sk);
-+		} else {
-+			sk_wait_data(sk, &timeo, NULL);
-+		}
-+
-+		if (unlikely(peek_seq != tp->copied_seq)) {
-+			if (net_ratelimit())
-+				pr_info("TCP(%s:%d), race in MSG_PEEK.\n",
-+					current->comm, current->pid);
-+			peek_seq = tp->copied_seq;
-+		}
-+		continue;
-+
-+found_ok_skb:
-+		avail = skb->len - offset;
-+		if (len < avail)
-+			avail = len;
-+		/*
-+		 * Do we have urgent data here?  We need to skip over the
-+		 * urgent byte.
-+		 */
-+		if (unlikely(tp->urg_data)) {
-+			u32 urg_offset = tp->urg_seq - peek_seq;
-+
-+			if (urg_offset < avail) {
-+				/*
-+				 * The amount of data we are preparing to copy
-+				 * contains urgent data.
-+				 */
-+				if (!urg_offset) { /* First byte is urgent */
-+					if (!sock_flag(sk, SOCK_URGINLINE)) {
-+						peek_seq++;
-+						offset++;
-+						avail--;
-+					}
-+					if (!avail)
-+						continue;
-+				} else {
-+					/* stop short of the urgent data */
-+					avail = urg_offset;
-+				}
-+			}
-+		}
-+
-+		/*
-+		 * If MSG_TRUNC is specified the data is discarded.
-+		 */
-+		if (likely(!(flags & MSG_TRUNC)))
-+			if (skb_copy_datagram_msg(skb, offset, msg, len)) {
-+				if (!copied) {
-+					copied = -EFAULT;
-+					break;
-+				}
-+			}
-+		peek_seq += avail;
-+		copied += avail;
-+		len -= avail;
-+	} while (len > 0);
-+
-+	release_sock(sk);
-+	return copied;
-+}
-+
-+int chtls_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
-+		  int nonblock, int flags, int *addr_len)
-+{
-+	struct tcp_sock *tp = tcp_sk(sk);
-+	struct chtls_sock *csk;
-+	struct chtls_hws *hws;
-+	unsigned long avail;    /* amount of available data in current skb */
-+	int buffers_freed;
-+	int copied = 0;
-+	int request;
-+	long timeo;
-+	int target;             /* Read at least this many bytes */
-+
-+	buffers_freed = 0;
-+
-+	if (unlikely(flags & MSG_OOB))
-+		return tcp_prot.recvmsg(sk, msg, len, nonblock, flags,
-+					addr_len);
-+
-+	if (unlikely(flags & MSG_PEEK))
-+		return peekmsg(sk, msg, len, nonblock, flags);
-+
-+	if (sk_can_busy_loop(sk) &&
-+	    skb_queue_empty(&sk->sk_receive_queue) &&
-+	    sk->sk_state == TCP_ESTABLISHED)
-+		sk_busy_loop(sk, nonblock);
-+
-+	lock_sock(sk);
-+	csk = rcu_dereference_sk_user_data(sk);
 +	hws = &csk->tlshws;
 +
-+	if (is_tls_rx(csk))
-+		return chtls_pt_recvmsg(sk, msg, len, nonblock,
-+					flags, addr_len);
-+
-+	timeo = sock_rcvtimeo(sk, nonblock);
-+	target = sock_rcvlowat(sk, flags & MSG_WAITALL, len);
-+	request = len;
-+
-+	if (unlikely(csk_flag(sk, CSK_UPDATE_RCV_WND)))
-+		chtls_cleanup_rbuf(sk, copied);
-+
-+	do {
-+		struct sk_buff *skb;
-+		u32 offset;
-+
-+		if (unlikely(tp->urg_data && tp->urg_seq == tp->copied_seq)) {
-+			if (copied)
-+				break;
-+			if (signal_pending(current)) {
-+				copied = timeo ? sock_intr_errno(timeo) :
-+					-EAGAIN;
-+				break;
-+			}
-+		}
-+
-+		skb = skb_peek(&sk->sk_receive_queue);
-+		if (skb)
-+			goto found_ok_skb;
-+
-+		if (csk->wr_credits &&
-+		    skb_queue_len(&csk->txq) &&
-+		    chtls_push_frames(csk, csk->wr_credits ==
-+				      csk->wr_max_credits))
-+			sk->sk_write_space(sk);
-+
-+		if (copied >= target && !sk->sk_backlog.tail)
-+			break;
-+
-+		if (copied) {
-+			if (sk->sk_err || sk->sk_state == TCP_CLOSE ||
-+			    (sk->sk_shutdown & RCV_SHUTDOWN) ||
-+			    signal_pending(current))
-+				break;
-+		} else {
-+			if (sock_flag(sk, SOCK_DONE))
-+				break;
-+			if (sk->sk_err) {
-+				copied = sock_error(sk);
-+				break;
-+			}
-+			if (sk->sk_shutdown & RCV_SHUTDOWN)
-+				break;
-+			if (sk->sk_state == TCP_CLOSE) {
-+				copied = -ENOTCONN;
-+				break;
-+			}
-+			if (!timeo) {
-+				copied = -EAGAIN;
-+				break;
-+			}
-+			if (signal_pending(current)) {
-+				copied = sock_intr_errno(timeo);
-+				break;
-+			}
-+		}
-+
-+		if (sk->sk_backlog.tail) {
-+			release_sock(sk);
-+			lock_sock(sk);
-+			chtls_cleanup_rbuf(sk, copied);
-+			continue;
-+		}
-+
-+		if (copied >= target)
-+			break;
-+		chtls_cleanup_rbuf(sk, copied);
-+		sk_wait_data(sk, &timeo, NULL);
-+		continue;
-+
-+found_ok_skb:
-+		if (!skb->len) {
-+			chtls_kfree_skb(sk, skb);
-+			if (!copied && !timeo) {
-+				copied = -EAGAIN;
-+				break;
-+			}
-+
-+			if (copied < target)
-+				continue;
-+
-+			break;
-+		}
-+
-+		offset = tp->copied_seq - ULP_SKB_CB(skb)->seq;
-+		avail = skb->len - offset;
-+		if (len < avail)
-+			avail = len;
-+
-+		if (unlikely(tp->urg_data)) {
-+			u32 urg_offset = tp->urg_seq - tp->copied_seq;
-+
-+			if (urg_offset < avail) {
-+				if (urg_offset) {
-+					avail = urg_offset;
-+				} else if (!sock_flag(sk, SOCK_URGINLINE)) {
-+					tp->copied_seq++;
-+					offset++;
-+					avail--;
-+					if (!avail)
-+						goto skip_copy;
-+				}
-+			}
-+		}
-+
-+		if (likely(!(flags & MSG_TRUNC))) {
-+			if (skb_copy_datagram_msg(skb, offset,
-+						  msg, avail)) {
-+				if (!copied) {
-+					copied = -EFAULT;
-+					break;
-+				}
-+			}
-+		}
-+
-+		tp->copied_seq += avail;
-+		copied += avail;
-+		len -= avail;
-+
-+skip_copy:
-+		if (tp->urg_data && after(tp->copied_seq, tp->urg_seq))
-+			tp->urg_data = 0;
-+
-+		if (avail + offset >= skb->len) {
-+			if (likely(skb))
-+				chtls_free_skb(sk, skb);
-+			buffers_freed++;
-+
-+			if  (copied >= target &&
-+			     !skb_peek(&sk->sk_receive_queue))
-+				break;
-+		}
-+	} while (len > 0);
-+
-+	if (buffers_freed)
-+		chtls_cleanup_rbuf(sk, copied);
-+
-+	release_sock(sk);
-+	return copied;
++	spin_lock_bh(&cdev->kmap.lock);
++	if (hws->rxkey >= 0) {
++		__clear_bit(hws->rxkey, cdev->kmap.addr);
++		atomic_dec(&adap->chcr_stats.tls_key);
++		hws->rxkey = -1;
++	}
++	if (hws->txkey >= 0) {
++		__clear_bit(hws->txkey, cdev->kmap.addr);
++		atomic_dec(&adap->chcr_stats.tls_key);
++		hws->txkey = -1;
++	}
++	spin_unlock_bh(&cdev->kmap.lock);
 +}
-diff --git a/drivers/crypto/chelsio/chtls/chtls_main.c b/drivers/crypto/chelsio/chtls/chtls_main.c
-index e5e543a..007c45c 100644
---- a/drivers/crypto/chelsio/chtls/chtls_main.c
-+++ b/drivers/crypto/chelsio/chtls/chtls_main.c
-@@ -549,6 +549,7 @@ static void __init chtls_init_ulp_ops(void)
- 	chtls_cpl_prot.shutdown		= chtls_shutdown;
- 	chtls_cpl_prot.sendmsg		= chtls_sendmsg;
- 	chtls_cpl_prot.sendpage		= chtls_sendpage;
-+	chtls_cpl_prot.recvmsg		= chtls_recvmsg;
- 	chtls_cpl_prot.setsockopt	= chtls_setsockopt;
- 	chtls_cpl_prot.getsockopt	= chtls_getsockopt;
- }
++
++unsigned int keyid_to_addr(int start_addr, int keyid)
++{
++	return (start_addr + (keyid * TLS_KEY_CONTEXT_SZ)) >> 5;
++}
++
++static void chtls_rxkey_ivauth(struct _key_ctx *kctx)
++{
++	kctx->iv_to_auth = cpu_to_be64(KEYCTX_TX_WR_IV_V(6ULL) |
++				  KEYCTX_TX_WR_AAD_V(1ULL) |
++				  KEYCTX_TX_WR_AADST_V(5ULL) |
++				  KEYCTX_TX_WR_CIPHER_V(14ULL) |
++				  KEYCTX_TX_WR_CIPHERST_V(0ULL) |
++				  KEYCTX_TX_WR_AUTH_V(14ULL) |
++				  KEYCTX_TX_WR_AUTHST_V(16ULL) |
++				  KEYCTX_TX_WR_AUTHIN_V(16ULL));
++}
++
++static int chtls_key_info(struct chtls_sock *csk,
++			  struct _key_ctx *kctx,
++			  u32 keylen, u32 optname)
++{
++	unsigned char key[CHCR_KEYCTX_CIPHER_KEY_SIZE_256];
++	struct tls12_crypto_info_aes_gcm_128 *gcm_ctx;
++	unsigned char ghash_h[AEAD_H_SIZE];
++	struct crypto_cipher *cipher;
++	int ck_size, key_ctx_size;
++	int ret;
++
++	gcm_ctx = (struct tls12_crypto_info_aes_gcm_128 *)
++		  &csk->tlshws.crypto_info;
++
++	key_ctx_size = sizeof(struct _key_ctx) +
++		       roundup(keylen, 16) + AEAD_H_SIZE;
++
++	if (keylen == AES_KEYSIZE_128) {
++		ck_size = CHCR_KEYCTX_CIPHER_KEY_SIZE_128;
++	} else if (keylen == AES_KEYSIZE_192) {
++		ck_size = CHCR_KEYCTX_CIPHER_KEY_SIZE_192;
++	} else if (keylen == AES_KEYSIZE_256) {
++		ck_size = CHCR_KEYCTX_CIPHER_KEY_SIZE_256;
++	} else {
++		pr_err("GCM: Invalid key length %d\n", keylen);
++		return -EINVAL;
++	}
++	memcpy(key, gcm_ctx->key, keylen);
++
++	/* Calculate the H = CIPH(K, 0 repeated 16 times).
++	 * It will go in key context
++	 */
++	cipher = crypto_alloc_cipher("aes", 0, 0);
++	if (IS_ERR(cipher)) {
++		ret = -ENOMEM;
++		goto out;
++	}
++
++	ret = crypto_cipher_setkey(cipher, key, keylen);
++	if (ret)
++		goto out1;
++
++	memset(ghash_h, 0, AEAD_H_SIZE);
++	crypto_cipher_encrypt_one(cipher, ghash_h, ghash_h);
++	csk->tlshws.keylen = key_ctx_size;
++
++	/* Copy the Key context */
++	if (optname == TLS_RX) {
++		int key_ctx;
++
++		key_ctx = ((key_ctx_size >> 4) << 3);
++		kctx->ctx_hdr = FILL_KEY_CRX_HDR(ck_size,
++						 CHCR_KEYCTX_MAC_KEY_SIZE_128,
++						 0, 0, key_ctx);
++		chtls_rxkey_ivauth(kctx);
++	} else {
++		kctx->ctx_hdr = FILL_KEY_CTX_HDR(ck_size,
++						 CHCR_KEYCTX_MAC_KEY_SIZE_128,
++						 0, 0, key_ctx_size >> 4);
++	}
++
++	memcpy(kctx->salt, gcm_ctx->salt, TLS_CIPHER_AES_GCM_128_SALT_SIZE);
++	memcpy(kctx->key, gcm_ctx->key, keylen);
++	memcpy(kctx->key + keylen, ghash_h, AEAD_H_SIZE);
++	/* erase key info from driver */
++	memset(gcm_ctx->key, 0, keylen);
++
++out1:
++	crypto_free_cipher(cipher);
++out:
++	return ret;
++}
++
++static void chtls_set_scmd(struct chtls_sock *csk)
++{
++	struct chtls_hws *hws = &csk->tlshws;
++
++	hws->scmd.seqno_numivs =
++		SCMD_SEQ_NO_CTRL_V(3) |
++		SCMD_PROTO_VERSION_V(0) |
++		SCMD_ENC_DEC_CTRL_V(0) |
++		SCMD_CIPH_AUTH_SEQ_CTRL_V(1) |
++		SCMD_CIPH_MODE_V(2) |
++		SCMD_AUTH_MODE_V(4) |
++		SCMD_HMAC_CTRL_V(0) |
++		SCMD_IV_SIZE_V(4) |
++		SCMD_NUM_IVS_V(1);
++
++	hws->scmd.ivgen_hdrlen =
++		SCMD_IV_GEN_CTRL_V(1) |
++		SCMD_KEY_CTX_INLINE_V(0) |
++		SCMD_TLS_FRAG_ENABLE_V(1);
++}
++
++int chtls_setkey(struct chtls_sock *csk, u32 keylen, u32 optname)
++{
++	struct tls_key_req *kwr;
++	struct chtls_dev *cdev;
++	struct _key_ctx *kctx;
++	int wrlen, klen, len;
++	struct sk_buff *skb;
++	struct sock *sk;
++	int keyid;
++	int kaddr;
++	int ret;
++
++	cdev = csk->cdev;
++	sk = csk->sk;
++
++	klen = roundup((keylen + AEAD_H_SIZE) + sizeof(*kctx), 32);
++	wrlen = roundup(sizeof(*kwr), 16);
++	len = klen + wrlen;
++
++	/* Flush out-standing data before new key takes effect */
++	if (optname == TLS_TX) {
++		lock_sock(sk);
++		if (skb_queue_len(&csk->txq))
++			chtls_push_frames(csk, 0);
++		release_sock(sk);
++	}
++
++	skb = alloc_skb(len, GFP_KERNEL);
++	if (!skb)
++		return -ENOMEM;
++
++	keyid = get_new_keyid(csk, optname);
++	if (keyid < 0) {
++		ret = -ENOSPC;
++		goto out_nokey;
++	}
++
++	kaddr = keyid_to_addr(cdev->kmap.start, keyid);
++	kwr = (struct tls_key_req *)__skb_put_zero(skb, len);
++	kwr->wr.op_to_compl =
++		cpu_to_be32(FW_WR_OP_V(FW_ULPTX_WR) | FW_WR_COMPL_F |
++		      FW_WR_ATOMIC_V(1U));
++	kwr->wr.flowid_len16 =
++		cpu_to_be32(FW_WR_LEN16_V(DIV_ROUND_UP(len, 16) |
++			    FW_WR_FLOWID_V(csk->tid)));
++	kwr->wr.protocol = 0;
++	kwr->wr.mfs = htons(TLS_MFS);
++	kwr->wr.reneg_to_write_rx = optname;
++
++	/* ulptx command */
++	kwr->req.cmd = cpu_to_be32(ULPTX_CMD_V(ULP_TX_MEM_WRITE) |
++			    T5_ULP_MEMIO_ORDER_V(1) |
++			    T5_ULP_MEMIO_IMM_V(1));
++	kwr->req.len16 = cpu_to_be32((csk->tid << 8) |
++			      DIV_ROUND_UP(len - sizeof(kwr->wr), 16));
++	kwr->req.dlen = cpu_to_be32(ULP_MEMIO_DATA_LEN_V(klen >> 5));
++	kwr->req.lock_addr = cpu_to_be32(ULP_MEMIO_ADDR_V(kaddr));
++
++	/* sub command */
++	kwr->sc_imm.cmd_more = cpu_to_be32(ULPTX_CMD_V(ULP_TX_SC_IMM));
++	kwr->sc_imm.len = cpu_to_be32(klen);
++
++	/* key info */
++	kctx = (struct _key_ctx *)(kwr + 1);
++	ret = chtls_key_info(csk, kctx, keylen, optname);
++	if (ret)
++		goto out_notcb;
++
++	set_wr_txq(skb, CPL_PRIORITY_DATA, csk->tlshws.txqid);
++	csk->wr_credits -= DIV_ROUND_UP(len, 16);
++	csk->wr_unacked += DIV_ROUND_UP(len, 16);
++	enqueue_wr(csk, skb);
++	cxgb4_ofld_send(csk->egress_dev, skb);
++
++	chtls_set_scmd(csk);
++	/* Clear quiesce for Rx key */
++	if (optname == TLS_RX) {
++		ret = chtls_set_tcb_keyid(sk, keyid);
++		if (ret)
++			goto out_notcb;
++		ret = chtls_set_tcb_field(sk, 0,
++					  TCB_ULP_RAW_V(TCB_ULP_RAW_M),
++					  TCB_ULP_RAW_V((TF_TLS_KEY_SIZE_V(1) |
++					  TF_TLS_CONTROL_V(1) |
++					  TF_TLS_ACTIVE_V(1) |
++					  TF_TLS_ENABLE_V(1))));
++		if (ret)
++			goto out_notcb;
++		ret = chtls_set_tcb_seqno(sk);
++		if (ret)
++			goto out_notcb;
++		ret = chtls_set_tcb_quiesce(sk, 0);
++		if (ret)
++			goto out_notcb;
++		csk->tlshws.rxkey = keyid;
++	} else {
++		csk->tlshws.tx_seq_no = 0;
++		csk->tlshws.txkey = keyid;
++	}
++
++	return ret;
++out_notcb:
++	free_tls_keyid(sk);
++out_nokey:
++	kfree_skb(skb);
++	return ret;
++}
 -- 
 1.8.3.1
