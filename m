@@ -1,8 +1,7 @@
 From: Atul Gupta <atul.gupta@chelsio.com>
-Subject: [PATCH v15 net-next 05/12] crypto: chcr - Inline TLS Key Macros
-Date: Sat, 31 Mar 2018 21:41:56 +0530
-Message-ID: <1522512723-31747-6-git-send-email-atul.gupta@chelsio.com>
-References: <1522512723-31747-1-git-send-email-atul.gupta@chelsio.com>
+Subject: [PATCH v15 net-next 00/12] Chelsio Inline TLS
+Date: Sat, 31 Mar 2018 21:41:51 +0530
+Message-ID: <1522512723-31747-1-git-send-email-atul.gupta@chelsio.com>
 Cc: davejwatson@fb.com, sd@queasysnail.net, sbrivio@redhat.com,
         linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
         werner@chelsio.com, leedom@chelsio.com,
@@ -10,153 +9,192 @@ Cc: davejwatson@fb.com, sd@queasysnail.net, sbrivio@redhat.com,
         ganeshgr@chelsio.com, atul.gupta@chelsio.com
 To: davem@davemloft.net, herbert@gondor.apana.org.au
 Return-path: <netdev-owner@vger.kernel.org>
-In-Reply-To: <1522512723-31747-1-git-send-email-atul.gupta@chelsio.com>
 Sender: netdev-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Define macro for programming the TLS Key context
+Thanks everyone for reviewing the series.
+Dave, this should apply clean on net-next tree and I think it is ready
+ to merge.
 
-Signed-off-by: Atul Gupta <atul.gupta@chelsio.com>
----
- drivers/crypto/chelsio/chcr_algo.h | 42 +++++++++++++++++++++++++++++
- drivers/crypto/chelsio/chcr_core.h | 55 +++++++++++++++++++++++++++++++++++++-
- 2 files changed, 96 insertions(+), 1 deletion(-)
+Series for Chelsio Inline TLS driver (chtls)
 
-diff --git a/drivers/crypto/chelsio/chcr_algo.h b/drivers/crypto/chelsio/chcr_algo.h
-index d1673a5..f263cd4 100644
---- a/drivers/crypto/chelsio/chcr_algo.h
-+++ b/drivers/crypto/chelsio/chcr_algo.h
-@@ -86,6 +86,39 @@
- 	 KEY_CONTEXT_OPAD_PRESENT_M)
- #define KEY_CONTEXT_OPAD_PRESENT_F      KEY_CONTEXT_OPAD_PRESENT_V(1U)
- 
-+#define TLS_KEYCTX_RXFLIT_CNT_S 24
-+#define TLS_KEYCTX_RXFLIT_CNT_V(x) ((x) << TLS_KEYCTX_RXFLIT_CNT_S)
-+
-+#define TLS_KEYCTX_RXPROT_VER_S 20
-+#define TLS_KEYCTX_RXPROT_VER_M 0xf
-+#define TLS_KEYCTX_RXPROT_VER_V(x) ((x) << TLS_KEYCTX_RXPROT_VER_S)
-+
-+#define TLS_KEYCTX_RXCIPH_MODE_S 16
-+#define TLS_KEYCTX_RXCIPH_MODE_M 0xf
-+#define TLS_KEYCTX_RXCIPH_MODE_V(x) ((x) << TLS_KEYCTX_RXCIPH_MODE_S)
-+
-+#define TLS_KEYCTX_RXAUTH_MODE_S 12
-+#define TLS_KEYCTX_RXAUTH_MODE_M 0xf
-+#define TLS_KEYCTX_RXAUTH_MODE_V(x) ((x) << TLS_KEYCTX_RXAUTH_MODE_S)
-+
-+#define TLS_KEYCTX_RXCIAU_CTRL_S 11
-+#define TLS_KEYCTX_RXCIAU_CTRL_V(x) ((x) << TLS_KEYCTX_RXCIAU_CTRL_S)
-+
-+#define TLS_KEYCTX_RX_SEQCTR_S 9
-+#define TLS_KEYCTX_RX_SEQCTR_M 0x3
-+#define TLS_KEYCTX_RX_SEQCTR_V(x) ((x) << TLS_KEYCTX_RX_SEQCTR_S)
-+
-+#define TLS_KEYCTX_RX_VALID_S 8
-+#define TLS_KEYCTX_RX_VALID_V(x) ((x) << TLS_KEYCTX_RX_VALID_S)
-+
-+#define TLS_KEYCTX_RXCK_SIZE_S 3
-+#define TLS_KEYCTX_RXCK_SIZE_M 0x7
-+#define TLS_KEYCTX_RXCK_SIZE_V(x) ((x) << TLS_KEYCTX_RXCK_SIZE_S)
-+
-+#define TLS_KEYCTX_RXMK_SIZE_S 0
-+#define TLS_KEYCTX_RXMK_SIZE_M 0x7
-+#define TLS_KEYCTX_RXMK_SIZE_V(x) ((x) << TLS_KEYCTX_RXMK_SIZE_S)
-+
- #define CHCR_HASH_MAX_DIGEST_SIZE 64
- #define CHCR_MAX_SHA_DIGEST_SIZE 64
- 
-@@ -176,6 +209,15 @@
- 		      KEY_CONTEXT_SALT_PRESENT_V(1) | \
- 		      KEY_CONTEXT_CTX_LEN_V((ctx_len)))
- 
-+#define  FILL_KEY_CRX_HDR(ck_size, mk_size, d_ck, opad, ctx_len) \
-+		htonl(TLS_KEYCTX_RXMK_SIZE_V(mk_size) | \
-+		      TLS_KEYCTX_RXCK_SIZE_V(ck_size) | \
-+		      TLS_KEYCTX_RX_VALID_V(1) | \
-+		      TLS_KEYCTX_RX_SEQCTR_V(3) | \
-+		      TLS_KEYCTX_RXAUTH_MODE_V(4) | \
-+		      TLS_KEYCTX_RXCIPH_MODE_V(2) | \
-+		      TLS_KEYCTX_RXFLIT_CNT_V((ctx_len)))
-+
- #define FILL_WR_OP_CCTX_SIZE \
- 		htonl( \
- 			FW_CRYPTO_LOOKASIDE_WR_OPCODE_V( \
-diff --git a/drivers/crypto/chelsio/chcr_core.h b/drivers/crypto/chelsio/chcr_core.h
-index 3c29ee0..77056a9 100644
---- a/drivers/crypto/chelsio/chcr_core.h
-+++ b/drivers/crypto/chelsio/chcr_core.h
-@@ -65,10 +65,58 @@
- struct _key_ctx {
- 	__be32 ctx_hdr;
- 	u8 salt[MAX_SALT];
--	__be64 reserverd;
-+	__be64 iv_to_auth;
- 	unsigned char key[0];
- };
- 
-+#define KEYCTX_TX_WR_IV_S  55
-+#define KEYCTX_TX_WR_IV_M  0x1ffULL
-+#define KEYCTX_TX_WR_IV_V(x) ((x) << KEYCTX_TX_WR_IV_S)
-+#define KEYCTX_TX_WR_IV_G(x) \
-+	(((x) >> KEYCTX_TX_WR_IV_S) & KEYCTX_TX_WR_IV_M)
-+
-+#define KEYCTX_TX_WR_AAD_S 47
-+#define KEYCTX_TX_WR_AAD_M 0xffULL
-+#define KEYCTX_TX_WR_AAD_V(x) ((x) << KEYCTX_TX_WR_AAD_S)
-+#define KEYCTX_TX_WR_AAD_G(x) (((x) >> KEYCTX_TX_WR_AAD_S) & \
-+				KEYCTX_TX_WR_AAD_M)
-+
-+#define KEYCTX_TX_WR_AADST_S 39
-+#define KEYCTX_TX_WR_AADST_M 0xffULL
-+#define KEYCTX_TX_WR_AADST_V(x) ((x) << KEYCTX_TX_WR_AADST_S)
-+#define KEYCTX_TX_WR_AADST_G(x) \
-+	(((x) >> KEYCTX_TX_WR_AADST_S) & KEYCTX_TX_WR_AADST_M)
-+
-+#define KEYCTX_TX_WR_CIPHER_S 30
-+#define KEYCTX_TX_WR_CIPHER_M 0x1ffULL
-+#define KEYCTX_TX_WR_CIPHER_V(x) ((x) << KEYCTX_TX_WR_CIPHER_S)
-+#define KEYCTX_TX_WR_CIPHER_G(x) \
-+	(((x) >> KEYCTX_TX_WR_CIPHER_S) & KEYCTX_TX_WR_CIPHER_M)
-+
-+#define KEYCTX_TX_WR_CIPHERST_S 23
-+#define KEYCTX_TX_WR_CIPHERST_M 0x7f
-+#define KEYCTX_TX_WR_CIPHERST_V(x) ((x) << KEYCTX_TX_WR_CIPHERST_S)
-+#define KEYCTX_TX_WR_CIPHERST_G(x) \
-+	(((x) >> KEYCTX_TX_WR_CIPHERST_S) & KEYCTX_TX_WR_CIPHERST_M)
-+
-+#define KEYCTX_TX_WR_AUTH_S 14
-+#define KEYCTX_TX_WR_AUTH_M 0x1ff
-+#define KEYCTX_TX_WR_AUTH_V(x) ((x) << KEYCTX_TX_WR_AUTH_S)
-+#define KEYCTX_TX_WR_AUTH_G(x) \
-+	(((x) >> KEYCTX_TX_WR_AUTH_S) & KEYCTX_TX_WR_AUTH_M)
-+
-+#define KEYCTX_TX_WR_AUTHST_S 7
-+#define KEYCTX_TX_WR_AUTHST_M 0x7f
-+#define KEYCTX_TX_WR_AUTHST_V(x) ((x) << KEYCTX_TX_WR_AUTHST_S)
-+#define KEYCTX_TX_WR_AUTHST_G(x) \
-+	(((x) >> KEYCTX_TX_WR_AUTHST_S) & KEYCTX_TX_WR_AUTHST_M)
-+
-+#define KEYCTX_TX_WR_AUTHIN_S 0
-+#define KEYCTX_TX_WR_AUTHIN_M 0x7f
-+#define KEYCTX_TX_WR_AUTHIN_V(x) ((x) << KEYCTX_TX_WR_AUTHIN_S)
-+#define KEYCTX_TX_WR_AUTHIN_G(x) \
-+	(((x) >> KEYCTX_TX_WR_AUTHIN_S) & KEYCTX_TX_WR_AUTHIN_M)
-+
- struct chcr_wr {
- 	struct fw_crypto_lookaside_wr wreq;
- 	struct ulp_txpkt ulptx;
-@@ -90,6 +138,11 @@ struct uld_ctx {
- 	struct chcr_dev *dev;
- };
- 
-+struct sge_opaque_hdr {
-+	void *dev;
-+	dma_addr_t addr[MAX_SKB_FRAGS + 1];
-+};
-+
- struct chcr_ipsec_req {
- 	struct ulp_txpkt ulptx;
- 	struct ulptx_idata sc_imm;
+Use tls ULP infrastructure to register chtls as Inline TLS driver.
+Chtls use TCP Sockets to Tx/Rx TLS records.
+TCP sk_proto APIs are enhanced to offload TLS record.
+
+T6 adapter provides the following features:
+        -TLS record offload, TLS header, encrypt, digest and transmit
+        -TLS record receive and decrypt
+        -TLS keys store
+        -TCP/IP engine
+        -TLS engine
+        -GCM crypto engine [support CBC also]
+
+TLS provides security at the transport layer. It uses TCP to provide
+reliable end-to-end transport of application data.
+It relies on TCP for any retransmission.
+TLS session comprises of three parts:
+a. TCP/IP connection
+b. TLS handshake
+c. Record layer processing
+
+TLS handshake state machine is executed in host (refer standard
+implementation eg. OpenSSL).  Setsockopt [SOL_TCP, TCP_ULP]
+initialize TCP proto-ops for Chelsio inline tls support.
+setsockopt(sock, SOL_TCP, TCP_ULP, "tls", sizeof("tls"));
+
+Tx and Rx Keys are decided during handshake and programmed on
+the chip after CCS is exchanged.
+struct tls12_crypto_info_aes_gcm_128 crypto_info
+setsockopt(sock, SOL_TLS, TLS_TX, &crypto_info, sizeof(crypto_info))
+Finish is the first encrypted/decrypted message tx/rx inline.
+
+On the Tx path TLS engine receive plain text from openssl, insert IV,
+fetches the tx key, create cipher text records and generate MAC.
+
+TLS header is added to cipher text and forward to TCP/IP engine for
+transport layer processing and transmission on wire.
+TX PATH:
+Apps--openssl--chtls---TLS engine---encrypt/auth---TCP/IP engine---wire
+
+On the Rx side, data received is PDU aligned at record boundaries.
+TLS processes only the complete record. If rx key is programmed on
+CCS receive, data is decrypted and plain text is posted to host.
+RX PATH:
+Wire--cipher-text--TCP/IP engine [PDU align]---TLS engine---
+decrypt/auth---plain-text--chtls--openssl--application
+
+v15: indent fix in mark_urg
+     -removed unwanted checks in sendmsg, sendpage, recvmsg,
+      close, disconnect,shutdown, destroy sock [Sabrina]
+     - removed unused chtls_free_kmap [chtls.h]
+     - rebase to top of net-next
+
+v14: -Reverse christmas tree style for variable declarations for
+     various functions in chtls_hw.c, chtls_io.c [Stefano Brivio]
+     - replaced break with return in tcp_state_to_flowc_state
+       [Stefano Brivio]
+     - renamed tlstx_seq_number to tlstx_incr_seqnum [Stefano Brivio]
+     - use bool for corked, should_push and send_should_push
+       [Stefano Brivio]
+     - removed "Reviewed-by" tag for Stefano, Sabrina, Dave Watson
+
+v13: handle clean ctx free for HW_RECORD in tls_sk_proto_close
+    -removed SOCK_INLINE [chtls.h], using csk_conn_inline instead
+     in send_abort_rpl,chtls_send_abort_rpl,chtls_sendmsg,chtls_sendpage
+    -removed sk_no_receive [chtls_io.c] replaced with sk_shutdown &
+     RCV_SHUTDOWN in chtls_pt_recvmsg, peekmsg and chtls_recvmsg
+    -cleaned chtls_expansion_size [Stefano Brivio]
+    - u8 conf:3 in tls_sw_context to add TLS_HW_RECORD
+    -removed is_tls_skb, using tls_skb_inline [Stefano Brivio]
+    -reverse christmas tree formatting in chtls_io.c, chtls_cm.c
+     [Stefano Brivio]
+    -fixed build warning reported by kbuild robot
+    -retained ctx conf enum in chtls_main vs earlier versions, tls_prots
+     not used in chtls.
+    -cleanup [removed syn_sent, base_prot, added synq] [Michael Werner]
+    - passing struct fw_wr_hdr * to ofldtxq_stop [Casey]
+    - rebased on top of the current net-next
+
+v12: patch against net-next
+    -fixed build error [reported by Julia]
+    -replace set_queue with skb_set_queue_mapping [Sabrina]
+    -copyright year correction [chtls]
+
+v11: formatting and cleanup, few function rename and error
+     handling [Stefano Brivio]
+     - ctx freed later for TLS_HW_RECORD
+     - split tx and rx in different patch
+
+v10: fixed following based on the review comments of Sabrina Dubroca
+     -docs header added for struct tls_device [tls.h]
+     -changed TLS_FULL_HW to TLS_HW_RECORD
+     -similary using tls-hw-record instead of tls-inline for
+     ethtool feature config
+     -added more description to patch sets
+     -replaced kmalloc/vmalloc/kfree with kvzalloc/kvfree
+     -reordered the patch sequence
+     -formatted entire patch for func return values
+
+v9: corrected __u8 and similar usage
+    -create_ctx to alloc tls_context
+    -tls_hw_prot before sk !establish check
+
+v8: tls_main.c cleanup comment [Dave Watson]
+
+v7: func name change, use sk->sk_prot where required
+
+v6: modify prot only for FULL_HW
+   -corrected commit message for patch 11
+
+v5: set TLS_FULL_HW for registered inline tls drivers
+   -set TLS_FULL_HW prot for offload connection else move
+    to TLS_SW_TX
+   -Case handled for interface with same IP [Dave Miller]
+   -Removed Specific IP and INADDR_ANY handling [v4]
+
+v4: removed chtls ULP type, retained tls ULP
+   -registered chtls with net tls
+   -defined struct tls_device to register the Inline drivers
+   -ethtool interface tls-inline to enable Inline TLS for interface
+   -prot update to support inline TLS
+
+v3: fixed the kbuild test issues
+   -made few funtions static
+   -initialized few variables
+
+v2: fixed the following based on the review comments of Stephan Mueller,
+    Stefano Brivio and Hannes Frederic
+    -Added more details in cover letter
+    -Fixed indentation and formating issues
+    -Using aes instead of aes-generic
+    -memset key info after programing the key on chip
+    -reordered the patch sequence
+
+Atul Gupta (12):
+  tls: support for Inline tls record
+  ethtool: enable Inline TLS in HW
+  cxgb4: Inline TLS FW Interface
+  cxgb4: LLD driver changes to support TLS
+  crypto: chcr - Inline TLS Key Macros
+  crypto: chtls - structure and macro for Inline TLS
+  crypto: chtls - Register chtls with net tls
+  crypto : chtls - CPL handler definition
+  crypto: chtls - Inline TLS record Tx
+  crypto: chtls - Inline TLS record Rx
+  crypto: chtls - Program the TLS session Key
+  crypto: chtls - Makefile Kconfig
+
+ drivers/crypto/chelsio/Kconfig                  |   11 +
+ drivers/crypto/chelsio/Makefile                 |    1 +
+ drivers/crypto/chelsio/chcr_algo.h              |   42 +
+ drivers/crypto/chelsio/chcr_core.h              |   55 +-
+ drivers/crypto/chelsio/chtls/Makefile           |    4 +
+ drivers/crypto/chelsio/chtls/chtls.h            |  482 +++++
+ drivers/crypto/chelsio/chtls/chtls_cm.c         | 2126 +++++++++++++++++++++++
+ drivers/crypto/chelsio/chtls/chtls_cm.h         |  203 +++
+ drivers/crypto/chelsio/chtls/chtls_hw.c         |  412 +++++
+ drivers/crypto/chelsio/chtls/chtls_io.c         | 1822 +++++++++++++++++++
+ drivers/crypto/chelsio/chtls/chtls_main.c       |  578 ++++++
+ drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c |   32 +-
+ drivers/net/ethernet/chelsio/cxgb4/cxgb4_uld.h  |    7 +
+ drivers/net/ethernet/chelsio/cxgb4/sge.c        |  107 +-
+ drivers/net/ethernet/chelsio/cxgb4/t4_msg.h     |  122 +-
+ drivers/net/ethernet/chelsio/cxgb4/t4_regs.h    |    2 +
+ drivers/net/ethernet/chelsio/cxgb4/t4fw_api.h   |  165 +-
+ include/linux/netdev_features.h                 |    2 +
+ include/net/tls.h                               |   32 +-
+ net/core/ethtool.c                              |    1 +
+ net/ipv4/tcp_minisocks.c                        |    1 +
+ net/tls/tls_main.c                              |  114 +-
+ 22 files changed, 6295 insertions(+), 26 deletions(-)
+ create mode 100644 drivers/crypto/chelsio/chtls/Makefile
+ create mode 100644 drivers/crypto/chelsio/chtls/chtls.h
+ create mode 100644 drivers/crypto/chelsio/chtls/chtls_cm.c
+ create mode 100644 drivers/crypto/chelsio/chtls/chtls_cm.h
+ create mode 100644 drivers/crypto/chelsio/chtls/chtls_hw.c
+ create mode 100644 drivers/crypto/chelsio/chtls/chtls_io.c
+ create mode 100644 drivers/crypto/chelsio/chtls/chtls_main.c
+
 -- 
 1.8.3.1
