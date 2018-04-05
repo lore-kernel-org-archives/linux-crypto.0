@@ -1,60 +1,62 @@
-From: Logan Gunthorpe <logang@deltatee.com>
-Subject: Re: [PATCH v15 0/9] Add io{read|write}64 to io-64-atomic headers
-Date: Wed, 4 Apr 2018 09:54:41 -0600
-Message-ID: <515f5c92-ac02-6e09-830e-46ea4d462652@deltatee.com>
-References: <20180327230834.5931-1-logang@deltatee.com>
- <87r2nvmf3b.fsf@concordia.ellerman.id.au>
+From: Rob Herring <robherring2-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH v2 00/21] Allow compile-testing NO_DMA (drivers)
+Date: Wed, 4 Apr 2018 19:32:53 -0500
+Message-ID: <CAL_JsqJMppYaz31Gg8BH2OaAxs56dnjZ4y+nzBBp-Tt2odaqCw@mail.gmail.com>
+References: <1521208314-4783-1-git-send-email-geert@linux-m68k.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Cc: Arnd Bergmann <arnd@arndb.de>,
-        Andy Shevchenko <andy.shevchenko@gmail.com>,
-        =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@nxp.com>
-To: Michael Ellerman <mpe@ellerman.id.au>,
-        linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
-        linux-ntb@googlegroups.com, linux-crypto@vger.kernel.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        akpm@linux-foundation.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <87r2nvmf3b.fsf@concordia.ellerman.id.au>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
+Cc: Ulf Hansson <ulf.hansson-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, Wolfram Sang <wsa-z923LK4zBo2bacvFa/9K2g@public.gmane.org>,
+	linux-iio-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fpga-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	"open list:REMOTE PROCESSOR \(REMOTEPROC\) SUBSYSTEM"
+	<linux-remoteproc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Linux-ALSA <alsa-devel-K7yf7f+aM1XWsZ/bQMPhNw@public.gmane.org>,
+	Bjorn Andersson <bjorn.andersson-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>,
+	Eric Anholt <eric-WhKQ6XTQaPysTnJN9+BGXg@public.gmane.org>, netdev <netdev-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	linux-mtd-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, Linux I2C <linux-i2c-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	linux1394-devel-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org, Christoph Hellwig <hch-jcswGhMUV9g@public.gmane.org>,
+	Stefan Wahren <stefan.wahren-eS4NqCHxEME@public.gmane.org>,
+	Boris Brezillon <boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>,
+	"James E . J . Bottomley" <jejb-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org>,
+	Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+	linux-scsi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Richard Weinberger <richard-/L3Ra7n9ekc@public.gmane.org>,
+	Jassi Brar <jassisinghbrar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, Marek Vasut <marek.vasut-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	"open list:SERIAL DRIVERS" <linux-serial@
+To: Geert Uytterhoeven <geert-Td1EMuHUCqxL1ZNQvxDV9g@public.gmane.org>
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+In-Reply-To: <1521208314-4783-1-git-send-email-geert-Td1EMuHUCqxL1ZNQvxDV9g@public.gmane.org>
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 4/4/2018 4:38 AM, Michael Ellerman wrote:
-> What's the plan for getting it merged? Seems we don't have one?
+On Fri, Mar 16, 2018 at 8:51 AM, Geert Uytterhoeven
+<geert-Td1EMuHUCqxL1ZNQvxDV9g@public.gmane.org> wrote:
+>         Hi all,
+>
+> If NO_DMA=y, get_dma_ops() returns a reference to the non-existing
+> symbol bad_dma_ops, thus causing a link failure if it is ever used.
+>
+> The intention of this is twofold:
+>   1. To catch users of the DMA API on systems that do no support the DMA
+>      mapping API,
+>   2. To avoid building drivers that cannot work on such systems anyway.
+>
+> However, the disadvantage is that we have to keep on adding dependencies
+> on HAS_DMA all over the place.
+>
+> Thanks to the COMPILE_TEST symbol, lots of drivers now depend on one or
+> more platform dependencies (that imply HAS_DMA) || COMPILE_TEST, thus
+> already covering intention #2.  Having to add an explicit dependency on
+> HAS_DMA here is cumbersome, and hinders compile-testing.
 
-Yeah, so far there is no plan. I'm not really sure who's attention I 
-need to get or how to get it.
+The same can be said for CONFIG_IOMEM and CONFIG_OF. Any plans to
+remove those too? CONFIG_IOMEM is mostly just a !CONFIG_UM option.
 
-> Given it touches two arches and generic stuff and drivers and crypto,
-> it's a bit of a mess to merge. It's not really something I want to merge
-> via the powerpc tree.
-
-Understood.
-
-> Is there any way to split it? I couldn't immediately see what the hard
-> dependencies were between the patches.
-
-Yes, a couple of patches have already been taken by their maintainers 
-over the last few cycles.
-
-> eg. It looks like I could take the two powerpc patches on their own for
-> 4.17, and then the rest could go via other trees?
-
-Yup! If you can take the powerpc patches I can keep trying to get the 
-rest in. They are largely independent and shouldn't really change 
-anything without the following patches.
-
-> Is patch 1 stand alone?
-
-Essentially, yes, but patch 5 depends on it seeing it's changing the 
-same area and is trying to avoid creating the same kbuild warnings that 
-patch 1 suppresses.
-
-> The other option is to ask Andrew Morton to take it, as he often carries
-> these cross-tree type series.
-
-Thanks for the tip! I'll copy him when I repost it after the merge window.
-
-Logan
+Rob
