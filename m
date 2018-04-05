@@ -1,134 +1,48 @@
-From: Jan Glauber <jan.glauber@caviumnetworks.com>
-Subject: Re: [PATCH 1/2] crypto: thunderx_zip: Fix fallout from
- CONFIG_VMAP_STACK
-Date: Thu, 5 Apr 2018 10:40:18 +0200
-Message-ID: <20180405084018.GB24281@hc>
-References: <20180328130557.10560-1-jglauber@cavium.com>
+From: Colin King <colin.king@canonical.com>
+Subject: [PATCH][next] crypto: chtls: don't leak information from the stack to userspace
+Date: Thu,  5 Apr 2018 17:44:03 +0100
+Message-ID: <20180405164403.4412-1-colin.king@canonical.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "David S . Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Mahipal Challa <Mahipal.Challa@cavium.com>,
-        Robert Richter <rrichter@cavium.com>,
-        stable <stable@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Cc: kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Harsh Jain <harsh@chelsio.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Michael Werner <werner@chelsio.com>,
+        Atul Gupta <atul.gupta@chelsio.com>,
+        Casey Leedom <leedom@chelsio.com>, linux-crypto@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20180328130557.10560-1-jglauber@cavium.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Mar 28, 2018 at 03:05:56PM +0200, Jan Glauber wrote:
-> Enabling virtual mapped kernel stacks breaks the thunderx_zip
-> driver. On compression or decompression the executing CPU hangs
-> in an endless loop. The reason for this is the usage of __pa
-> by the driver which does no longer work for an address that is
-> not part of the 1:1 mapping.
-> 
-> The zip driver allocates a result struct on the stack and needs
-> to tell the hardware the physical address within this struct
-> that is used to signal the completion of the request.
-> 
-> As the hardware gets the wrong address after the broken __pa
-> conversion it writes to an arbitrary address. The zip driver then
-> waits forever for the completion byte to contain a non-zero value.
-> 
-> Allocating the result struct from 1:1 mapped memory resolves this
-> bug.
+From: Colin Ian King <colin.king@canonical.com>
 
-Hi Herbert,
+The structure crypto_info contains fields that are not initialized and
+only .version is set.  The copy_to_user call is hence leaking information
+from the stack to userspace which must be avoided. Fix this by zero'ing
+all the unused fields.
 
-Just realized that we might sleep in this path, so GFP_KERNEL wont
-work here. Same with usleep in the second patch.
+Detected by CoverityScan, CID#1467421 ("Uninitialized scalar variable")
 
-I'll respin the patches.
+Fixes: a08943947873 ("crypto: chtls - Register chtls with net tls")
+Signed-off-by: Colin Ian King <colin.king@canonical.com>
+---
+ drivers/crypto/chelsio/chtls/chtls_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
---Jan
-
-
-> Signed-off-by: Jan Glauber <jglauber@cavium.com>
-> Reviewed-by: Robert Richter <rrichter@cavium.com>
-> Cc: stable <stable@vger.kernel.org> # 4.14
-> ---
->  drivers/crypto/cavium/zip/zip_crypto.c | 22 ++++++++++++++--------
->  1 file changed, 14 insertions(+), 8 deletions(-)
-> 
-> diff --git a/drivers/crypto/cavium/zip/zip_crypto.c b/drivers/crypto/cavium/zip/zip_crypto.c
-> index 8df4d26..2fc9b03 100644
-> --- a/drivers/crypto/cavium/zip/zip_crypto.c
-> +++ b/drivers/crypto/cavium/zip/zip_crypto.c
-> @@ -124,7 +124,7 @@ int zip_compress(const u8 *src, unsigned int slen,
->                  struct zip_kernel_ctx *zip_ctx)
->  {
->         struct zip_operation  *zip_ops   = NULL;
-> -       struct zip_state      zip_state;
-> +       struct zip_state      *zip_state;
->         struct zip_device     *zip = NULL;
->         int ret;
-> 
-> @@ -135,20 +135,23 @@ int zip_compress(const u8 *src, unsigned int slen,
->         if (!zip)
->                 return -ENODEV;
-> 
-> -       memset(&zip_state, 0, sizeof(struct zip_state));
-> +       zip_state = kzalloc(sizeof(*zip_state), GFP_KERNEL);
-> +       if (!zip_state)
-> +               return -ENOMEM;
-> +
->         zip_ops = &zip_ctx->zip_comp;
-> 
->         zip_ops->input_len  = slen;
->         zip_ops->output_len = *dlen;
->         memcpy(zip_ops->input, src, slen);
-> 
-> -       ret = zip_deflate(zip_ops, &zip_state, zip);
-> +       ret = zip_deflate(zip_ops, zip_state, zip);
-> 
->         if (!ret) {
->                 *dlen = zip_ops->output_len;
->                 memcpy(dst, zip_ops->output, *dlen);
->         }
-> -
-> +       kfree(zip_state);
->         return ret;
->  }
-> 
-> @@ -157,7 +160,7 @@ int zip_decompress(const u8 *src, unsigned int slen,
->                    struct zip_kernel_ctx *zip_ctx)
->  {
->         struct zip_operation  *zip_ops   = NULL;
-> -       struct zip_state      zip_state;
-> +       struct zip_state      *zip_state;
->         struct zip_device     *zip = NULL;
->         int ret;
-> 
-> @@ -168,7 +171,10 @@ int zip_decompress(const u8 *src, unsigned int slen,
->         if (!zip)
->                 return -ENODEV;
-> 
-> -       memset(&zip_state, 0, sizeof(struct zip_state));
-> +       zip_state = kzalloc(sizeof(*zip_state), GFP_KERNEL);
-> +       if (!zip_state)
-> +               return -ENOMEM;
-> +
->         zip_ops = &zip_ctx->zip_decomp;
->         memcpy(zip_ops->input, src, slen);
-> 
-> @@ -179,13 +185,13 @@ int zip_decompress(const u8 *src, unsigned int slen,
->         zip_ops->input_len  = slen;
->         zip_ops->output_len = *dlen;
-> 
-> -       ret = zip_inflate(zip_ops, &zip_state, zip);
-> +       ret = zip_inflate(zip_ops, zip_state, zip);
-> 
->         if (!ret) {
->                 *dlen = zip_ops->output_len;
->                 memcpy(dst, zip_ops->output, *dlen);
->         }
-> -
-> +       kfree(zip_state);
->         return ret;
->  }
-> 
-> --
-> 2.7.4
+diff --git a/drivers/crypto/chelsio/chtls/chtls_main.c b/drivers/crypto/chelsio/chtls/chtls_main.c
+index 007c45c38fc7..69f3756eb980 100644
+--- a/drivers/crypto/chelsio/chtls/chtls_main.c
++++ b/drivers/crypto/chelsio/chtls/chtls_main.c
+@@ -441,7 +441,7 @@ static int chtls_uld_rx_handler(void *handle, const __be64 *rsp,
+ static int do_chtls_getsockopt(struct sock *sk, char __user *optval,
+ 			       int __user *optlen)
+ {
+-	struct tls_crypto_info crypto_info;
++	struct tls_crypto_info crypto_info = { 0 };
+ 
+ 	crypto_info.version = TLS_1_2_VERSION;
+ 	if (copy_to_user(optval, &crypto_info, sizeof(struct tls_crypto_info)))
+-- 
+2.15.1
