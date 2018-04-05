@@ -1,50 +1,134 @@
-From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-Subject: Re: [RESEND] SHASH_DESC_ON_STACK macro
-Date: Thu, 5 Apr 2018 03:26:54 -0500
-Message-ID: <296706fc-9578-1ca5-ac7f-9b0a5e863114@embeddedor.com>
-References: <f662fa16-2cbb-a484-4efb-68bb3b39a792@embeddedor.com>
- <bda66faa-f52d-215d-f21b-763593b30f91@embeddedor.com>
- <20180327100709.GA12961@gondor.apana.org.au>
+From: Jan Glauber <jan.glauber@caviumnetworks.com>
+Subject: Re: [PATCH 1/2] crypto: thunderx_zip: Fix fallout from
+ CONFIG_VMAP_STACK
+Date: Thu, 5 Apr 2018 10:40:18 +0200
+Message-ID: <20180405084018.GB24281@hc>
+References: <20180328130557.10560-1-jglauber@cavium.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: "David S . Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Mahipal Challa <Mahipal.Challa@cavium.com>,
+        Robert Richter <rrichter@cavium.com>,
+        stable <stable@vger.kernel.org>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180327100709.GA12961@gondor.apana.org.au>
-Content-Language: en-US
+Content-Disposition: inline
+In-Reply-To: <20180328130557.10560-1-jglauber@cavium.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
+On Wed, Mar 28, 2018 at 03:05:56PM +0200, Jan Glauber wrote:
+> Enabling virtual mapped kernel stacks breaks the thunderx_zip
+> driver. On compression or decompression the executing CPU hangs
+> in an endless loop. The reason for this is the usage of __pa
+> by the driver which does no longer work for an address that is
+> not part of the 1:1 mapping.
+> 
+> The zip driver allocates a result struct on the stack and needs
+> to tell the hardware the physical address within this struct
+> that is used to signal the completion of the request.
+> 
+> As the hardware gets the wrong address after the broken __pa
+> conversion it writes to an arbitrary address. The zip driver then
+> waits forever for the completion byte to contain a non-zero value.
+> 
+> Allocating the result struct from 1:1 mapped memory resolves this
+> bug.
+
 Hi Herbert,
 
-On 03/27/2018 05:07 AM, Herbert Xu wrote:
-> On Fri, Mar 23, 2018 at 02:09:46PM -0500, Gustavo A. R. Silva wrote:
->>
->> Hi Herbert,
->>
->> There is an ongoing effort to remove all VLAs from the code base [1] and
->> while working on that I came across the following macro at
->> include/crypto/hash.h:154:
->>
->> #define SHASH_DESC_ON_STACK(shash, ctx)                           \
->>          char __##shash##_desc[sizeof(struct shash_desc) +         \
->>                  crypto_shash_descsize(ctx)] CRYPTO_MINALIGN_ATTR; \
->>          struct shash_desc *shash = (struct shash_desc *)__##shash##_desc
->>
->>
->> Currently, this macro is being used in 46 different places.
->>
->> I wonder how big can tfm->descsize can get?
+Just realized that we might sleep in this path, so GFP_KERNEL wont
+work here. Same with usleep in the second patch.
+
+I'll respin the patches.
+
+--Jan
+
+
+> Signed-off-by: Jan Glauber <jglauber@cavium.com>
+> Reviewed-by: Robert Richter <rrichter@cavium.com>
+> Cc: stable <stable@vger.kernel.org> # 4.14
+> ---
+>  drivers/crypto/cavium/zip/zip_crypto.c | 22 ++++++++++++++--------
+>  1 file changed, 14 insertions(+), 8 deletions(-)
 > 
-> descsize is capped at PAGE_SIZE / 8.
+> diff --git a/drivers/crypto/cavium/zip/zip_crypto.c b/drivers/crypto/cavium/zip/zip_crypto.c
+> index 8df4d26..2fc9b03 100644
+> --- a/drivers/crypto/cavium/zip/zip_crypto.c
+> +++ b/drivers/crypto/cavium/zip/zip_crypto.c
+> @@ -124,7 +124,7 @@ int zip_compress(const u8 *src, unsigned int slen,
+>                  struct zip_kernel_ctx *zip_ctx)
+>  {
+>         struct zip_operation  *zip_ops   = NULL;
+> -       struct zip_state      zip_state;
+> +       struct zip_state      *zip_state;
+>         struct zip_device     *zip = NULL;
+>         int ret;
 > 
-
-Sorry for the late response. It seems I lost track of this email somehow.
-
-OK. So based on your response I will propose a patch for this.
-
-Thanks!
---
-Gustavo
+> @@ -135,20 +135,23 @@ int zip_compress(const u8 *src, unsigned int slen,
+>         if (!zip)
+>                 return -ENODEV;
+> 
+> -       memset(&zip_state, 0, sizeof(struct zip_state));
+> +       zip_state = kzalloc(sizeof(*zip_state), GFP_KERNEL);
+> +       if (!zip_state)
+> +               return -ENOMEM;
+> +
+>         zip_ops = &zip_ctx->zip_comp;
+> 
+>         zip_ops->input_len  = slen;
+>         zip_ops->output_len = *dlen;
+>         memcpy(zip_ops->input, src, slen);
+> 
+> -       ret = zip_deflate(zip_ops, &zip_state, zip);
+> +       ret = zip_deflate(zip_ops, zip_state, zip);
+> 
+>         if (!ret) {
+>                 *dlen = zip_ops->output_len;
+>                 memcpy(dst, zip_ops->output, *dlen);
+>         }
+> -
+> +       kfree(zip_state);
+>         return ret;
+>  }
+> 
+> @@ -157,7 +160,7 @@ int zip_decompress(const u8 *src, unsigned int slen,
+>                    struct zip_kernel_ctx *zip_ctx)
+>  {
+>         struct zip_operation  *zip_ops   = NULL;
+> -       struct zip_state      zip_state;
+> +       struct zip_state      *zip_state;
+>         struct zip_device     *zip = NULL;
+>         int ret;
+> 
+> @@ -168,7 +171,10 @@ int zip_decompress(const u8 *src, unsigned int slen,
+>         if (!zip)
+>                 return -ENODEV;
+> 
+> -       memset(&zip_state, 0, sizeof(struct zip_state));
+> +       zip_state = kzalloc(sizeof(*zip_state), GFP_KERNEL);
+> +       if (!zip_state)
+> +               return -ENOMEM;
+> +
+>         zip_ops = &zip_ctx->zip_decomp;
+>         memcpy(zip_ops->input, src, slen);
+> 
+> @@ -179,13 +185,13 @@ int zip_decompress(const u8 *src, unsigned int slen,
+>         zip_ops->input_len  = slen;
+>         zip_ops->output_len = *dlen;
+> 
+> -       ret = zip_inflate(zip_ops, &zip_state, zip);
+> +       ret = zip_inflate(zip_ops, zip_state, zip);
+> 
+>         if (!ret) {
+>                 *dlen = zip_ops->output_len;
+>                 memcpy(dst, zip_ops->output, *dlen);
+>         }
+> -
+> +       kfree(zip_state);
+>         return ret;
+>  }
+> 
+> --
+> 2.7.4
