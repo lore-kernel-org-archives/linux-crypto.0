@@ -1,7 +1,7 @@
 From: Colin King <colin.king@canonical.com>
-Subject: [PATCH][next] crypto: chtls: don't leak information from the stack to userspace
-Date: Thu,  5 Apr 2018 17:44:03 +0100
-Message-ID: <20180405164403.4412-1-colin.king@canonical.com>
+Subject: [PATCH][next] crypto: chtls: remove redundant assignment to cdev->ports
+Date: Fri,  6 Apr 2018 17:58:47 +0100
+Message-ID: <20180406165847.29310-1-colin.king@canonical.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
@@ -9,40 +9,36 @@ Cc: kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
 To: Harsh Jain <harsh@chelsio.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S . Miller" <davem@davemloft.net>,
-        Michael Werner <werner@chelsio.com>,
         Atul Gupta <atul.gupta@chelsio.com>,
-        Casey Leedom <leedom@chelsio.com>, linux-crypto@vger.kernel.org
+        Michael Werner <werner@chelsio.com>,
+        linux-crypto@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
 From: Colin Ian King <colin.king@canonical.com>
 
-The structure crypto_info contains fields that are not initialized and
-only .version is set.  The copy_to_user call is hence leaking information
-from the stack to userspace which must be avoided. Fix this by zero'ing
-all the unused fields.
+There is a double assignment to cdev->ports, the first is redundant
+as it is over-written so remove it.
 
-Detected by CoverityScan, CID#1467421 ("Uninitialized scalar variable")
+Detected by CoverityScan, CID#1467432 ("Unused value")
 
-Fixes: a08943947873 ("crypto: chtls - Register chtls with net tls")
 Signed-off-by: Colin Ian King <colin.king@canonical.com>
 ---
- drivers/crypto/chelsio/chtls/chtls_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/crypto/chelsio/chtls/chtls_main.c | 1 -
+ 1 file changed, 1 deletion(-)
 
 diff --git a/drivers/crypto/chelsio/chtls/chtls_main.c b/drivers/crypto/chelsio/chtls/chtls_main.c
-index 007c45c38fc7..69f3756eb980 100644
+index 007c45c38fc7..984a53f19f8b 100644
 --- a/drivers/crypto/chelsio/chtls/chtls_main.c
 +++ b/drivers/crypto/chelsio/chtls/chtls_main.c
-@@ -441,7 +441,7 @@ static int chtls_uld_rx_handler(void *handle, const __be64 *rsp,
- static int do_chtls_getsockopt(struct sock *sk, char __user *optval,
- 			       int __user *optlen)
- {
--	struct tls_crypto_info crypto_info;
-+	struct tls_crypto_info crypto_info = { 0 };
- 
- 	crypto_info.version = TLS_1_2_VERSION;
- 	if (copy_to_user(optval, &crypto_info, sizeof(struct tls_crypto_info)))
+@@ -216,7 +216,6 @@ static void *chtls_uld_add(const struct cxgb4_lld_info *info)
+ 	cdev->lldi = lldi;
+ 	cdev->pdev = lldi->pdev;
+ 	cdev->tids = lldi->tids;
+-	cdev->ports = (struct net_device **)(cdev + 1);
+ 	cdev->ports = lldi->ports;
+ 	cdev->mtus = lldi->mtus;
+ 	cdev->tids = lldi->tids;
 -- 
 2.15.1
