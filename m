@@ -1,7 +1,7 @@
 From: Salvatore Mesoraca <s.mesoraca16@gmail.com>
-Subject: [PATCH 6/6] crypto: cfb - avoid VLA use
-Date: Sat,  7 Apr 2018 20:38:23 +0200
-Message-ID: <1523126303-23205-7-git-send-email-s.mesoraca16@gmail.com>
+Subject: [PATCH 5/6] crypto: cts - avoid VLA use
+Date: Sat,  7 Apr 2018 20:38:22 +0200
+Message-ID: <1523126303-23205-6-git-send-email-s.mesoraca16@gmail.com>
 References: <1523126303-23205-1-git-send-email-s.mesoraca16@gmail.com>
 Cc: kernel-hardening@lists.openwall.com, linux-crypto@vger.kernel.org,
         "David S. Miller" <davem@davemloft.net>,
@@ -16,8 +16,7 @@ In-Reply-To: <1523126303-23205-1-git-send-email-s.mesoraca16@gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-We avoid 3 VLAs[1] by always allocating MAX_BLOCKSIZE bytes or,
-when needed for alignement, MAX_BLOCKSIZE + MAX_ALIGNMASK bytes.
+We avoid 2 VLAs[1] by always allocating MAX_BLOCKSIZE*2 bytes.
 We also check the selected cipher at instance creation time, if
 it doesn't comply with these limits, the creation will fail.
 
@@ -25,62 +24,48 @@ it doesn't comply with these limits, the creation will fail.
 
 Signed-off-by: Salvatore Mesoraca <s.mesoraca16@gmail.com>
 ---
- crypto/cfb.c | 14 ++++++++++----
- 1 file changed, 10 insertions(+), 4 deletions(-)
+ crypto/cts.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/crypto/cfb.c b/crypto/cfb.c
-index 94ee39b..f500816 100644
---- a/crypto/cfb.c
-+++ b/crypto/cfb.c
-@@ -28,6 +28,7 @@
+diff --git a/crypto/cts.c b/crypto/cts.c
+index 4773c18..12e6bd3 100644
+--- a/crypto/cts.c
++++ b/crypto/cts.c
+@@ -50,6 +50,7 @@
+ #include <crypto/scatterwalk.h>
  #include <linux/slab.h>
- #include <linux/string.h>
- #include <linux/types.h>
+ #include <linux/compiler.h>
 +#include "internal.h"
  
- struct crypto_cfb_ctx {
- 	struct crypto_cipher *child;
-@@ -53,9 +54,8 @@ static void crypto_cfb_encrypt_one(struct crypto_skcipher *tfm,
- static void crypto_cfb_final(struct skcipher_walk *walk,
- 			     struct crypto_skcipher *tfm)
- {
--	const unsigned int bsize = crypto_cfb_bsize(tfm);
- 	const unsigned long alignmask = crypto_skcipher_alignmask(tfm);
--	u8 tmp[bsize + alignmask];
-+	u8 tmp[MAX_BLOCKSIZE + MAX_ALIGNMASK];
- 	u8 *stream = PTR_ALIGN(tmp + 0, alignmask + 1);
- 	u8 *src = walk->src.virt.addr;
- 	u8 *dst = walk->dst.virt.addr;
-@@ -94,7 +94,7 @@ static int crypto_cfb_encrypt_inplace(struct skcipher_walk *walk,
- 	unsigned int nbytes = walk->nbytes;
- 	u8 *src = walk->src.virt.addr;
- 	u8 *iv = walk->iv;
--	u8 tmp[bsize];
-+	u8 tmp[MAX_BLOCKSIZE];
- 
- 	do {
- 		crypto_cfb_encrypt_one(tfm, iv, tmp);
-@@ -164,7 +164,7 @@ static int crypto_cfb_decrypt_inplace(struct skcipher_walk *walk,
- 	unsigned int nbytes = walk->nbytes;
- 	u8 *src = walk->src.virt.addr;
- 	u8 *iv = walk->iv;
--	u8 tmp[bsize];
-+	u8 tmp[MAX_BLOCKSIZE];
- 
- 	do {
- 		crypto_cfb_encrypt_one(tfm, iv, tmp);
-@@ -295,6 +295,12 @@ static int crypto_cfb_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	if (err)
+ struct crypto_cts_ctx {
+ 	struct crypto_skcipher *child;
+@@ -104,7 +105,7 @@ static int cts_cbc_encrypt(struct skcipher_request *req)
+ 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+ 	struct skcipher_request *subreq = &rctx->subreq;
+ 	int bsize = crypto_skcipher_blocksize(tfm);
+-	u8 d[bsize * 2] __aligned(__alignof__(u32));
++	u8 d[MAX_BLOCKSIZE * 2] __aligned(__alignof__(u32));
+ 	struct scatterlist *sg;
+ 	unsigned int offset;
+ 	int lastn;
+@@ -183,7 +184,7 @@ static int cts_cbc_decrypt(struct skcipher_request *req)
+ 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+ 	struct skcipher_request *subreq = &rctx->subreq;
+ 	int bsize = crypto_skcipher_blocksize(tfm);
+-	u8 d[bsize * 2] __aligned(__alignof__(u32));
++	u8 d[MAX_BLOCKSIZE * 2] __aligned(__alignof__(u32));
+ 	struct scatterlist *sg;
+ 	unsigned int offset;
+ 	u8 *space;
+@@ -359,6 +360,9 @@ static int crypto_cts_create(struct crypto_template *tmpl, struct rtattr **tb)
+ 	if (crypto_skcipher_alg_ivsize(alg) != alg->base.cra_blocksize)
  		goto err_drop_spawn;
  
-+	err = -EINVAL;
-+	if (alg->cra_blocksize > MAX_BLOCKSIZE)
-+		goto err_drop_spawn;
-+	if (alg->cra_alignmask > MAX_ALIGNMASK)
++	if (alg->base.cra_blocksize > MAX_BLOCKSIZE)
 +		goto err_drop_spawn;
 +
- 	inst->alg.base.cra_priority = alg->cra_priority;
- 	/* we're a stream cipher independend of the crypto cra_blocksize */
- 	inst->alg.base.cra_blocksize = 1;
+ 	if (strncmp(alg->base.cra_name, "cbc(", 4))
+ 		goto err_drop_spawn;
+ 
 -- 
 1.9.1
