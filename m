@@ -1,7 +1,7 @@
 From: Salvatore Mesoraca <s.mesoraca16@gmail.com>
-Subject: [PATCH 3/6] crypto: api - avoid VLA use
-Date: Sat,  7 Apr 2018 20:38:20 +0200
-Message-ID: <1523126303-23205-4-git-send-email-s.mesoraca16@gmail.com>
+Subject: [PATCH 2/6] crypto: ctr - avoid VLA use
+Date: Sat,  7 Apr 2018 20:38:19 +0200
+Message-ID: <1523126303-23205-3-git-send-email-s.mesoraca16@gmail.com>
 References: <1523126303-23205-1-git-send-email-s.mesoraca16@gmail.com>
 Cc: kernel-hardening@lists.openwall.com, linux-crypto@vger.kernel.org,
         "David S. Miller" <davem@davemloft.net>,
@@ -16,46 +16,62 @@ In-Reply-To: <1523126303-23205-1-git-send-email-s.mesoraca16@gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-We avoid a VLA[1] by always allocating MAX_BLOCKSIZE +
+We avoid 2 VLAs[1] by always allocating MAX_BLOCKSIZE +
 MAX_ALIGNMASK bytes.
-We also check the selected cipher at initialization time, if
-it doesn't comply with these limits, the initialization will
-fail.
+We also check the selected cipher at instance creation time, if
+it doesn't comply with these limits, the creation will fail.
 
 [1] http://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
 
 Signed-off-by: Salvatore Mesoraca <s.mesoraca16@gmail.com>
 ---
- crypto/cipher.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ crypto/ctr.c | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
 
-diff --git a/crypto/cipher.c b/crypto/cipher.c
-index 94fa355..9cedf23 100644
---- a/crypto/cipher.c
-+++ b/crypto/cipher.c
-@@ -67,7 +67,7 @@ static void cipher_crypt_unaligned(void (*fn)(struct crypto_tfm *, u8 *,
- {
- 	unsigned long alignmask = crypto_tfm_alg_alignmask(tfm);
- 	unsigned int size = crypto_tfm_alg_blocksize(tfm);
--	u8 buffer[size + alignmask];
-+	u8 buffer[MAX_BLOCKSIZE + MAX_ALIGNMASK];
- 	u8 *tmp = (u8 *)ALIGN((unsigned long)buffer, alignmask + 1);
+diff --git a/crypto/ctr.c b/crypto/ctr.c
+index 854d924..ce62552 100644
+--- a/crypto/ctr.c
++++ b/crypto/ctr.c
+@@ -20,6 +20,7 @@
+ #include <linux/random.h>
+ #include <linux/scatterlist.h>
+ #include <linux/slab.h>
++#include "internal.h"
  
- 	memcpy(tmp, src, size);
-@@ -105,9 +105,14 @@ static void cipher_decrypt_unaligned(struct crypto_tfm *tfm,
+ struct crypto_ctr_ctx {
+ 	struct crypto_cipher *child;
+@@ -58,7 +59,7 @@ static void crypto_ctr_crypt_final(struct blkcipher_walk *walk,
+ 	unsigned int bsize = crypto_cipher_blocksize(tfm);
+ 	unsigned long alignmask = crypto_cipher_alignmask(tfm);
+ 	u8 *ctrblk = walk->iv;
+-	u8 tmp[bsize + alignmask];
++	u8 tmp[MAX_BLOCKSIZE + MAX_ALIGNMASK];
+ 	u8 *keystream = PTR_ALIGN(tmp + 0, alignmask + 1);
+ 	u8 *src = walk->src.virt.addr;
+ 	u8 *dst = walk->dst.virt.addr;
+@@ -106,7 +107,7 @@ static int crypto_ctr_crypt_inplace(struct blkcipher_walk *walk,
+ 	unsigned int nbytes = walk->nbytes;
+ 	u8 *ctrblk = walk->iv;
+ 	u8 *src = walk->src.virt.addr;
+-	u8 tmp[bsize + alignmask];
++	u8 tmp[MAX_BLOCKSIZE + MAX_ALIGNMASK];
+ 	u8 *keystream = PTR_ALIGN(tmp + 0, alignmask + 1);
  
- int crypto_init_cipher_ops(struct crypto_tfm *tfm)
- {
-+	const unsigned long alignmask = crypto_tfm_alg_alignmask(tfm);
-+	const unsigned int size = crypto_tfm_alg_blocksize(tfm);
- 	struct cipher_tfm *ops = &tfm->crt_cipher;
- 	struct cipher_alg *cipher = &tfm->__crt_alg->cra_cipher;
+ 	do {
+@@ -206,6 +207,14 @@ static struct crypto_instance *crypto_ctr_alloc(struct rtattr **tb)
+ 	if (alg->cra_blocksize < 4)
+ 		goto out_put_alg;
  
-+	if (size > MAX_BLOCKSIZE || alignmask > MAX_ALIGNMASK)
-+		return -EINVAL;
++	/* Block size must be <= MAX_BLOCKSIZE. */
++	if (alg->cra_blocksize > MAX_BLOCKSIZE)
++		goto out_put_alg;
 +
- 	ops->cit_setkey = setkey;
- 	ops->cit_encrypt_one = crypto_tfm_alg_alignmask(tfm) ?
- 		cipher_encrypt_unaligned : cipher->cia_encrypt;
++	/* Alignmask must be <= MAX_ALIGNMASK. */
++	if (alg->cra_alignmask > MAX_ALIGNMASK)
++		goto out_put_alg;
++
+ 	/* If this is false we'd fail the alignment of crypto_inc. */
+ 	if (alg->cra_blocksize % 4)
+ 		goto out_put_alg;
 -- 
 1.9.1
