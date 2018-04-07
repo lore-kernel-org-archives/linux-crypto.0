@@ -1,7 +1,8 @@
 From: Salvatore Mesoraca <s.mesoraca16@gmail.com>
-Subject: [PATCH 0/6] Remove several VLAs in the crypto subsystem
-Date: Sat,  7 Apr 2018 20:38:17 +0200
-Message-ID: <1523126303-23205-1-git-send-email-s.mesoraca16@gmail.com>
+Subject: [PATCH 3/6] crypto: api - avoid VLA use
+Date: Sat,  7 Apr 2018 20:38:20 +0200
+Message-ID: <1523126303-23205-4-git-send-email-s.mesoraca16@gmail.com>
+References: <1523126303-23205-1-git-send-email-s.mesoraca16@gmail.com>
 Cc: kernel-hardening@lists.openwall.com, linux-crypto@vger.kernel.org,
         "David S. Miller" <davem@davemloft.net>,
         Herbert Xu <herbert@gondor.apana.org.au>,
@@ -11,33 +12,50 @@ Cc: kernel-hardening@lists.openwall.com, linux-crypto@vger.kernel.org,
         Laura Abbott <labbott@redhat.com>
 To: linux-kernel@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1523126303-23205-1-git-send-email-s.mesoraca16@gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-As suggested by Laura Abbott[2], I'm resending my patch with
-MAX_BLOCKSIZE and MAX_ALIGNMASK defined in an header, so they
-can be used in other places.
-I take this opportuinuty to deal with some other VLAs not
-handled in the old patch.
+We avoid a VLA[1] by always allocating MAX_BLOCKSIZE +
+MAX_ALIGNMASK bytes.
+We also check the selected cipher at initialization time, if
+it doesn't comply with these limits, the initialization will
+fail.
 
 [1] http://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
-[2] http://lkml.kernel.org/r/4e536889-439a-49e6-dd95-2d4286913202@redhat.com
 
-Salvatore Mesoraca (6):
-  crypto: api - laying macros for statically allocated buffers
-  crypto: ctr - avoid VLA use
-  crypto: api - avoid VLA use
-  crypto: pcbc - avoid VLA use
-  crypto: cts - avoid VLA use
-  crypto: cfb - avoid VLA use
+Signed-off-by: Salvatore Mesoraca <s.mesoraca16@gmail.com>
+---
+ crypto/cipher.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
- crypto/cfb.c      | 14 ++++++++++----
- crypto/cipher.c   |  7 ++++++-
- crypto/ctr.c      | 13 +++++++++++--
- crypto/cts.c      |  8 ++++++--
- crypto/internal.h |  8 ++++++++
- crypto/pcbc.c     |  9 +++++++--
- 6 files changed, 48 insertions(+), 11 deletions(-)
-
+diff --git a/crypto/cipher.c b/crypto/cipher.c
+index 94fa355..9cedf23 100644
+--- a/crypto/cipher.c
++++ b/crypto/cipher.c
+@@ -67,7 +67,7 @@ static void cipher_crypt_unaligned(void (*fn)(struct crypto_tfm *, u8 *,
+ {
+ 	unsigned long alignmask = crypto_tfm_alg_alignmask(tfm);
+ 	unsigned int size = crypto_tfm_alg_blocksize(tfm);
+-	u8 buffer[size + alignmask];
++	u8 buffer[MAX_BLOCKSIZE + MAX_ALIGNMASK];
+ 	u8 *tmp = (u8 *)ALIGN((unsigned long)buffer, alignmask + 1);
+ 
+ 	memcpy(tmp, src, size);
+@@ -105,9 +105,14 @@ static void cipher_decrypt_unaligned(struct crypto_tfm *tfm,
+ 
+ int crypto_init_cipher_ops(struct crypto_tfm *tfm)
+ {
++	const unsigned long alignmask = crypto_tfm_alg_alignmask(tfm);
++	const unsigned int size = crypto_tfm_alg_blocksize(tfm);
+ 	struct cipher_tfm *ops = &tfm->crt_cipher;
+ 	struct cipher_alg *cipher = &tfm->__crt_alg->cra_cipher;
+ 
++	if (size > MAX_BLOCKSIZE || alignmask > MAX_ALIGNMASK)
++		return -EINVAL;
++
+ 	ops->cit_setkey = setkey;
+ 	ops->cit_encrypt_one = crypto_tfm_alg_alignmask(tfm) ?
+ 		cipher_encrypt_unaligned : cipher->cia_encrypt;
 -- 
 1.9.1
