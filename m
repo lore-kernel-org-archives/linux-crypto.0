@@ -1,44 +1,43 @@
-From: Colin King <colin.king@canonical.com>
-Subject: [PATCH][next] crypto: chtls: remove redundant assignment to cdev->ports
-Date: Fri,  6 Apr 2018 17:58:47 +0100
-Message-ID: <20180406165847.29310-1-colin.king@canonical.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Cc: kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Harsh Jain <harsh@chelsio.com>,
+From: Salvatore Mesoraca <s.mesoraca16@gmail.com>
+Subject: [PATCH 0/6] Remove several VLAs in the crypto subsystem
+Date: Sat,  7 Apr 2018 20:38:17 +0200
+Message-ID: <1523126303-23205-1-git-send-email-s.mesoraca16@gmail.com>
+Cc: kernel-hardening@lists.openwall.com, linux-crypto@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Atul Gupta <atul.gupta@chelsio.com>,
-        Michael Werner <werner@chelsio.com>,
-        linux-crypto@vger.kernel.org
+        Kees Cook <keescook@chromium.org>,
+        Salvatore Mesoraca <s.mesoraca16@gmail.com>,
+        Eric Biggers <ebiggers3@gmail.com>,
+        Laura Abbott <labbott@redhat.com>
+To: linux-kernel@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-From: Colin Ian King <colin.king@canonical.com>
+As suggested by Laura Abbott[2], I'm resending my patch with
+MAX_BLOCKSIZE and MAX_ALIGNMASK defined in an header, so they
+can be used in other places.
+I take this opportuinuty to deal with some other VLAs not
+handled in the old patch.
 
-There is a double assignment to cdev->ports, the first is redundant
-as it is over-written so remove it.
+[1] http://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
+[2] http://lkml.kernel.org/r/4e536889-439a-49e6-dd95-2d4286913202@redhat.com
 
-Detected by CoverityScan, CID#1467432 ("Unused value")
+Salvatore Mesoraca (6):
+  crypto: api - laying macros for statically allocated buffers
+  crypto: ctr - avoid VLA use
+  crypto: api - avoid VLA use
+  crypto: pcbc - avoid VLA use
+  crypto: cts - avoid VLA use
+  crypto: cfb - avoid VLA use
 
-Signed-off-by: Colin Ian King <colin.king@canonical.com>
----
- drivers/crypto/chelsio/chtls/chtls_main.c | 1 -
- 1 file changed, 1 deletion(-)
+ crypto/cfb.c      | 14 ++++++++++----
+ crypto/cipher.c   |  7 ++++++-
+ crypto/ctr.c      | 13 +++++++++++--
+ crypto/cts.c      |  8 ++++++--
+ crypto/internal.h |  8 ++++++++
+ crypto/pcbc.c     |  9 +++++++--
+ 6 files changed, 48 insertions(+), 11 deletions(-)
 
-diff --git a/drivers/crypto/chelsio/chtls/chtls_main.c b/drivers/crypto/chelsio/chtls/chtls_main.c
-index 007c45c38fc7..984a53f19f8b 100644
---- a/drivers/crypto/chelsio/chtls/chtls_main.c
-+++ b/drivers/crypto/chelsio/chtls/chtls_main.c
-@@ -216,7 +216,6 @@ static void *chtls_uld_add(const struct cxgb4_lld_info *info)
- 	cdev->lldi = lldi;
- 	cdev->pdev = lldi->pdev;
- 	cdev->tids = lldi->tids;
--	cdev->ports = (struct net_device **)(cdev + 1);
- 	cdev->ports = lldi->ports;
- 	cdev->mtus = lldi->mtus;
- 	cdev->tids = lldi->tids;
 -- 
-2.15.1
+1.9.1
