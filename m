@@ -1,11 +1,11 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 2/6] crypto: ctr - avoid VLA use
-Date: Sun, 8 Apr 2018 17:18:23 +0800
-Message-ID: <20180408091823.4m6xw477ly6yfnzt@gondor.apana.org.au>
+Subject: Re: [PATCH 3/6] crypto: api - avoid VLA use
+Date: Sun, 8 Apr 2018 17:22:19 +0800
+Message-ID: <20180408092219.s24ymooq7afu43c2@gondor.apana.org.au>
 References: <1523126303-23205-1-git-send-email-s.mesoraca16@gmail.com>
- <1523126303-23205-3-git-send-email-s.mesoraca16@gmail.com>
- <20180408031935.GC25197@gondor.apana.org.au>
- <CAJHCu1LQuvcxsfTYddN5o3=pMzj6mtnBKvTG9O378pv3w_Q24Q@mail.gmail.com>
+ <1523126303-23205-4-git-send-email-s.mesoraca16@gmail.com>
+ <20180408031619.GB25197@gondor.apana.org.au>
+ <CAJHCu1LiPkDzL8rQMDdope=di+TZxz6gXuMKFQi_YpkSNquJ_g@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: linux-kernel@vger.kernel.org,
@@ -18,18 +18,36 @@ Cc: linux-kernel@vger.kernel.org,
 To: Salvatore Mesoraca <s.mesoraca16@gmail.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <CAJHCu1LQuvcxsfTYddN5o3=pMzj6mtnBKvTG9O378pv3w_Q24Q@mail.gmail.com>
+In-Reply-To: <CAJHCu1LiPkDzL8rQMDdope=di+TZxz6gXuMKFQi_YpkSNquJ_g@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Sun, Apr 08, 2018 at 10:58:48AM +0200, Salvatore Mesoraca wrote:
+On Sun, Apr 08, 2018 at 11:07:12AM +0200, Salvatore Mesoraca wrote:
 >
-> Fair enough.
-> After removing the individual checks the modification to the single files
-> will be just a couple of lines, is it OK for you if I collapse all of them in
-> just a single commit?
+> > This check should be done when the algorithm is registered.  Perhaps
+> > crypto_check_alg.
+> 
+> Please correct me if I'm wrong:
+> isn't crypto_check_alg invoked also during hashing algorithm registration?
+> In this patch-set I'm dealing only with ciphers, because the maximum
+> block size (16)
+> is relatively small and it's also the most common block size with
+> ciphers (maybe I should
+> have explicitly referenced ciphers in the macro names, my bad).
+> I don't think that it would be OK to use a similar approach for hashes
+> too, because some
+> of them have block size >= 1024 bytes.
 
-Sure.
+Yes we want to make it for ciphers only even if we move it to
+crypto_check_alg.
+
+For a legacy type like cipher cou can do it by
+
+	if (!alg->cra_type && (alg->cra_flags & CRYPTO_ALG_TYPE_MASK) ==
+			      CRYPTO_ALG_TYPE_CIPHER)
+		do_cipher_specific_check();
+
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
