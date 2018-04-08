@@ -1,44 +1,116 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 2/6] crypto: ctr - avoid VLA use
-Date: Sun, 8 Apr 2018 11:19:35 +0800
-Message-ID: <20180408031935.GC25197@gondor.apana.org.au>
-References: <1523126303-23205-1-git-send-email-s.mesoraca16@gmail.com>
- <1523126303-23205-3-git-send-email-s.mesoraca16@gmail.com>
+From: syzbot <syzbot+9c251bdd09f83b92ba95@syzkaller.appspotmail.com>
+Subject: KMSAN: uninit-value in af_alg_free_areq_sgls
+Date: Sun, 08 Apr 2018 00:07:01 -0700
+Message-ID: <00000000000092ad87056950ef9e@google.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel@vger.kernel.org, kernel-hardening@lists.openwall.com,
-        linux-crypto@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Kees Cook <keescook@chromium.org>,
-        Eric Biggers <ebiggers3@gmail.com>,
-        Laura Abbott <labbott@redhat.com>
-To: Salvatore Mesoraca <s.mesoraca16@gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+To: davem@davemloft.net, herbert@gondor.apana.org.au,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1523126303-23205-3-git-send-email-s.mesoraca16@gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Sat, Apr 07, 2018 at 08:38:19PM +0200, Salvatore Mesoraca wrote:
->
-> @@ -206,6 +207,14 @@ static struct crypto_instance *crypto_ctr_alloc(struct rtattr **tb)
->  	if (alg->cra_blocksize < 4)
->  		goto out_put_alg;
->  
-> +	/* Block size must be <= MAX_BLOCKSIZE. */
-> +	if (alg->cra_blocksize > MAX_BLOCKSIZE)
-> +		goto out_put_alg;
-> +
-> +	/* Alignmask must be <= MAX_ALIGNMASK. */
-> +	if (alg->cra_alignmask > MAX_ALIGNMASK)
-> +		goto out_put_alg;
-> +
+Hello,
 
-Since you're also adding a check to cipher algorithms in general,
-none of these individual checks are needed anymore.
+syzbot hit the following crash on  
+https://github.com/google/kmsan.git/master commit
+e2ab7e8abba47a2f2698216258e5d8727ae58717 (Fri Apr 6 16:24:31 2018 +0000)
+kmsan: temporarily disable visitAsmInstruction() to help syzbot
+syzbot dashboard link:  
+https://syzkaller.appspot.com/bug?extid=9c251bdd09f83b92ba95
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+So far this crash happened 11 times on  
+https://github.com/google/kmsan.git/master.
+C reproducer: https://syzkaller.appspot.com/x/repro.c?id=5551473324720128
+syzkaller reproducer:  
+https://syzkaller.appspot.com/x/repro.syz?id=4782073151750144
+Raw console output:  
+https://syzkaller.appspot.com/x/log.txt?id=5003160619843584
+Kernel config:  
+https://syzkaller.appspot.com/x/.config?id=6627248707860932248
+compiler: clang version 7.0.0 (trunk 329391)
+
+IMPORTANT: if you fix the bug, please add the following tag to the commit:
+Reported-by: syzbot+9c251bdd09f83b92ba95@syzkaller.appspotmail.com
+It will help syzbot understand when the bug is fixed. See footer for  
+details.
+If you forward the report, please keep this part and the footer.
+
+==================================================================
+BUG: KMSAN: uninit-value in atomic_sub arch/x86/include/asm/atomic.h:65  
+[inline]
+BUG: KMSAN: uninit-value in af_alg_free_areq_sgls+0x5ff/0xb20  
+crypto/af_alg.c:669
+CPU: 1 PID: 3568 Comm: syzkaller909997 Not tainted 4.16.0+ #82
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS  
+Google 01/01/2011
+Call Trace:
+  __dump_stack lib/dump_stack.c:17 [inline]
+  dump_stack+0x185/0x1d0 lib/dump_stack.c:53
+  kmsan_report+0x142/0x240 mm/kmsan/kmsan.c:1067
+  __msan_warning_32+0x6c/0xb0 mm/kmsan/kmsan_instr.c:676
+  atomic_sub arch/x86/include/asm/atomic.h:65 [inline]
+  af_alg_free_areq_sgls+0x5ff/0xb20 crypto/af_alg.c:669
+  af_alg_free_resources+0x66/0xf0 crypto/af_alg.c:1033
+  _aead_recvmsg crypto/algif_aead.c:321 [inline]
+  aead_recvmsg+0x9a4/0x2960 crypto/algif_aead.c:334
+  aead_recvmsg_nokey+0x129/0x160 crypto/algif_aead.c:452
+  sock_recvmsg_nosec net/socket.c:803 [inline]
+  sock_recvmsg+0x1d0/0x230 net/socket.c:810
+  ___sys_recvmsg+0x3fb/0x810 net/socket.c:2205
+  __sys_recvmsg net/socket.c:2250 [inline]
+  SYSC_recvmsg+0x298/0x3c0 net/socket.c:2262
+  SyS_recvmsg+0x54/0x80 net/socket.c:2257
+  do_syscall_64+0x309/0x430 arch/x86/entry/common.c:287
+  entry_SYSCALL_64_after_hwframe+0x3d/0xa2
+RIP: 0033:0x43ff29
+RSP: 002b:00007ffd9919c808 EFLAGS: 00000207 ORIG_RAX: 000000000000002f
+RAX: ffffffffffffffda RBX: 00000000004002c8 RCX: 000000000043ff29
+RDX: 0000000000000000 RSI: 0000000020000040 RDI: 0000000000000004
+RBP: 00000000006ca018 R08: 00000000004002c8 R09: 00000000004002c8
+R10: 00000000004002c8 R11: 0000000000000207 R12: 0000000000401850
+R13: 00000000004018e0 R14: 0000000000000000 R15: 0000000000000000
+
+Uninit was created at:
+  kmsan_save_stack_with_flags mm/kmsan/kmsan.c:278 [inline]
+  kmsan_internal_poison_shadow+0xb8/0x1b0 mm/kmsan/kmsan.c:188
+  kmsan_kmalloc+0x94/0x100 mm/kmsan/kmsan.c:314
+  __kmalloc+0x23c/0x350 mm/slub.c:3791
+  kmalloc include/linux/slab.h:517 [inline]
+  sock_kmalloc+0x14e/0x270 net/core/sock.c:1986
+  af_alg_get_rsgl+0x427/0xe10 crypto/af_alg.c:1149
+  _aead_recvmsg crypto/algif_aead.c:163 [inline]
+  aead_recvmsg+0x953/0x2960 crypto/algif_aead.c:334
+  aead_recvmsg_nokey+0x129/0x160 crypto/algif_aead.c:452
+  sock_recvmsg_nosec net/socket.c:803 [inline]
+  sock_recvmsg+0x1d0/0x230 net/socket.c:810
+  ___sys_recvmsg+0x3fb/0x810 net/socket.c:2205
+  __sys_recvmsg net/socket.c:2250 [inline]
+  SYSC_recvmsg+0x298/0x3c0 net/socket.c:2262
+  SyS_recvmsg+0x54/0x80 net/socket.c:2257
+  do_syscall_64+0x309/0x430 arch/x86/entry/common.c:287
+  entry_SYSCALL_64_after_hwframe+0x3d/0xa2
+==================================================================
+
+
+---
+This bug is generated by a dumb bot. It may contain errors.
+See https://goo.gl/tpsmEJ for details.
+Direct all questions to syzkaller@googlegroups.com.
+
+syzbot will keep track of this bug report.
+If you forgot to add the Reported-by tag, once the fix for this bug is  
+merged
+into any tree, please reply to this email with:
+#syz fix: exact-commit-title
+If you want to test a patch for this bug, please reply with:
+#syz test: git://repo/address.git branch
+and provide the patch inline or as an attachment.
+To mark this as a duplicate of another syzbot report, please reply with:
+#syz dup: exact-subject-of-another-report
+If it's a one-off invalid bug report, please reply with:
+#syz invalid
+Note: if the crash happens again, it will cause creation of a new bug  
+report.
+Note: all commands must start from beginning of the line in the email body.
