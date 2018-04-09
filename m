@@ -1,74 +1,133 @@
-From: Salvatore Mesoraca <s.mesoraca16@gmail.com>
-Subject: Re: [PATCH v2 0/2] crypto: removing various VLAs
-Date: Mon, 9 Apr 2018 18:38:18 +0200
-Message-ID: <CAJHCu1+YynzroRkfZC9ki0b=RwiDOoOJB0S97uUVWSxLgac74A@mail.gmail.com>
-References: <1523282087-22128-1-git-send-email-s.mesoraca16@gmail.com> <ca31b95a8b8e4dab90c5ea2eb6e6477f@AcuMS.aculab.com>
+From: James Morris <jmorris@namei.org>
+Subject: [ANNOUNCE] Linux Security Summit North America 2018 - CFP
+Date: Tue, 10 Apr 2018 09:14:19 +1000 (AEST)
+Message-ID: <alpine.LRH.2.21.1804100911160.11121@namei.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kernel-hardening@lists.openwall.com"
-        <kernel-hardening@lists.openwall.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Kees Cook <keescook@chromium.org>,
-        Eric Biggers <ebiggers3@gmail.com>,
-        Laura Abbott <labbott@redhat.com>
-To: David Laight <David.Laight@aculab.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <ca31b95a8b8e4dab90c5ea2eb6e6477f@AcuMS.aculab.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: multipart/mixed; BOUNDARY="1665246916-1034505349-1523315591=:11121"
+Cc: lwn@lwn.net, fedora-selinux-list@redhat.com, selinux@tycho.nsa.gov,
+        Linux Security Summit Program Committee <lss-pc@lists.linuxfoundation.org>,
+        linux-crypto@vger.kernel.org, Audit-ML <linux-audit@redhat.com>,
+        gentoo-hardened@gentoo.org, keyrings@linux-nfs.org,
+        tpmdd-devel@lists.sourceforge.net, kernel-hardening@lists.openwall.com
+To: linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org
+Return-path: <kernel-hardening-return-12943-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
+List-Post: <mailto:kernel-hardening@lists.openwall.com>
+List-Help: <mailto:kernel-hardening-help@lists.openwall.com>
+List-Unsubscribe: <mailto:kernel-hardening-unsubscribe@lists.openwall.com>
+List-Subscribe: <mailto:kernel-hardening-subscribe@lists.openwall.com>
+Content-ID: <alpine.LRH.2.21.1804100913240.11121@namei.org>
 List-Id: linux-crypto.vger.kernel.org
 
-2018-04-09 16:35 GMT+02:00 David Laight <David.Laight@aculab.com>:
-> From: Salvatore Mesoraca
->> Sent: 09 April 2018 14:55
->>
->> v2:
->>       As suggested by Herbert Xu, the blocksize and alignmask checks
->>       have been moved to crypto_check_alg.
->>       So, now, all the other separate checks are not necessary.
->>       Also, the defines have been moved to include/crypto/algapi.h.
->>
->> v1:
->>       As suggested by Laura Abbott[1], I'm resending my patch with
->>       MAX_BLOCKSIZE and MAX_ALIGNMASK defined in an header, so they
->>       can be used in other places.
->>       I took this opportunity to deal with some other VLAs not
->>       handled in the old patch.
->
-> If the constants are visible they need better names.
-> Maybe CRYPTO_MAX_xxx.
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-You are right, in fact I renamed them, but forget to write about this
-in the change log.
-The new names look like MAX_CIPHER_*.
+--1665246916-1034505349-1523315591=:11121
+Content-Type: text/plain; CHARSET=ISO-8859-7
+Content-Transfer-Encoding: 8BIT
+Content-ID: <alpine.LRH.2.21.1804100913241.11121@namei.org>
 
-> You can also do much better than allocating MAX_BLOCKSIZE + MAX_ALIGNMASK
-> bytes by requesting 'long' aligned on-stack memory.
-> The easiest way is to define a union like:
->
-> union crypto_tmp {
->         u8 buf[CRYPTO_MAX_TMP_BUF];
->         long buf_align;
-> };
->
-> Then in each function:
->
->         union tmp crypto_tmp;
->         u8 *keystream = PTR_ALIGN(tmp.buf, alignmask + 1);
->
-> I think CRYPTO_MAX_TMP_BUF needs to be MAX_BLOCKSIZE + MAX_ALIGNMASK - sizeof (long).
+==============================================================================
+		   ANNOUNCEMENT AND CALL FOR PARTICIPATION
 
-Yeah, that would be nice, it might save us 4-8 bytes on the stack.
-But I was thinking, wouldn't it be even better to do something like:
+		   LINUX SECURITY SUMMIT NORTH AMERICA 2018
+                             
+			         27-28 August
+			       VANCOUVER, CANADA
+==============================================================================
 
-u8 buf[CRYPTO_MAX_TMP_BUF] __aligned(__alignof__(long));
-u8 *keystream = PTR_ALIGN(buf, alignmask + 1);
 
-In this case __aligned should work, if I'm not missing some other
-subtle GCC caveat.
+DESCRIPTION
 
-Thank you,
+  The Linux Security Summit (LSS) is a technical forum for collaboration
+  between Linux developers, researchers, and end users. Its primary aim is to
+  foster community efforts in analyzing and solving Linux security challenges.
 
-Salvatore
+  LSS will be held this year as two separate events, one in North America
+  (LSS-NA), and one in Europe (LSS-EU), to facilitate broader participation in
+  Linux Security development. Note that this CFP is for LSS-NA; a separate CFP
+  will be announced for LSS-EU in May. We encourage everyone to attend both
+  events.
+
+  The program committee currently seeks proposals for:
+
+    * Refereed Presentations:
+      45 minutes in length.
+
+    * Panel Discussion Topics:
+      45 minutes in length.
+
+    * Short Topics:
+      30 minutes in total, including at least 10 minutes discussion.
+
+    * BoF Sessions.
+
+  Topic areas include, but are not limited to:
+
+    * Kernel self-protection
+    * Access control
+    * Cryptography and key management
+    * Integrity control
+    * Hardware Security
+    * Iot and embedded security
+    * Virtualization and containers
+    * System-specific system hardening
+    * Case studies
+    * Security tools
+    * Security UX
+    * Emerging technologies, threats & techniques 
+
+  Proposals should be submitted via:
+    https://events.linuxfoundation.org/events/linux-security-summit-north-america-2018/program/cfp/
+
+
+DATES
+
+  * CFP Close: June 3, 2018
+  * CFP Notifications: June 11, 2018
+  * Schedule Announced: June 25, 2018
+  * Event: August 27-28, 2018
+
+
+WHO SHOULD ATTEND
+
+  We're seeking a diverse range of attendees, and welcome participation by
+  people involved in Linux security development, operations, and research.
+
+  The LSS is a unique global event which provides the opportunity to present
+  and discuss your work or research with key Linux security community members
+  and maintainers. It¢s also useful for those who wish to keep up with the
+  latest in Linux security development, and to provide input to the
+  development process.
+
+
+WEB SITE
+
+  https://events.linuxfoundation.org/events/linux-security-summit-north-america-2018/
+
+
+TWITTER
+
+  For event updates and announcements, follow:
+
+    https://twitter.com/LinuxSecSummit
+  
+
+PROGRAM COMMITTEE
+
+  The program committee for LSS 2018 is:
+
+    * James Morris, Microsoft
+    * Serge Hallyn, Cisco
+    * Paul Moore, Red Hat
+    * Stephen Smalley, NSA
+    * Elena Reshetova, Intel
+    * John Johansen, Canonical
+    * Kees Cook, Google
+    * Casey Schaufler, Intel
+    * Mimi Zohar, IBM
+    * David A. Wheeler, Institute for Defense Analyses
+
+  The program committee may be contacted as a group via email:
+    lss-pc () lists.linuxfoundation.org
+
+--1665246916-1034505349-1523315591=:11121--
