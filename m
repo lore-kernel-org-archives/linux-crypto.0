@@ -1,120 +1,74 @@
-From: Jan Glauber <jglauber@cavium.com>
-Subject: [PATCH v2 1/5] crypto: thunderx_zip: Fix fallout from CONFIG_VMAP_STACK
-Date: Mon,  9 Apr 2018 17:45:50 +0200
-Message-ID: <20180409154554.7578-2-jglauber@cavium.com>
-References: <20180409154554.7578-1-jglauber@cavium.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Mahipal Challa <Mahipal.Challa@cavium.com>,
-        Robert Richter <rrichter@cavium.com>,
-        Jan Glauber <jglauber@cavium.com>,
-        stable <stable@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+From: Salvatore Mesoraca <s.mesoraca16@gmail.com>
+Subject: Re: [PATCH v2 0/2] crypto: removing various VLAs
+Date: Mon, 9 Apr 2018 18:38:18 +0200
+Message-ID: <CAJHCu1+YynzroRkfZC9ki0b=RwiDOoOJB0S97uUVWSxLgac74A@mail.gmail.com>
+References: <1523282087-22128-1-git-send-email-s.mesoraca16@gmail.com> <ca31b95a8b8e4dab90c5ea2eb6e6477f@AcuMS.aculab.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kernel-hardening@lists.openwall.com"
+        <kernel-hardening@lists.openwall.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Kees Cook <keescook@chromium.org>,
+        Eric Biggers <ebiggers3@gmail.com>,
+        Laura Abbott <labbott@redhat.com>
+To: David Laight <David.Laight@aculab.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180409154554.7578-1-jglauber@cavium.com>
+In-Reply-To: <ca31b95a8b8e4dab90c5ea2eb6e6477f@AcuMS.aculab.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Enabling virtual mapped kernel stacks breaks the thunderx_zip
-driver. On compression or decompression the executing CPU hangs
-in an endless loop. The reason for this is the usage of __pa
-by the driver which does no longer work for an address that is
-not part of the 1:1 mapping.
+2018-04-09 16:35 GMT+02:00 David Laight <David.Laight@aculab.com>:
+> From: Salvatore Mesoraca
+>> Sent: 09 April 2018 14:55
+>>
+>> v2:
+>>       As suggested by Herbert Xu, the blocksize and alignmask checks
+>>       have been moved to crypto_check_alg.
+>>       So, now, all the other separate checks are not necessary.
+>>       Also, the defines have been moved to include/crypto/algapi.h.
+>>
+>> v1:
+>>       As suggested by Laura Abbott[1], I'm resending my patch with
+>>       MAX_BLOCKSIZE and MAX_ALIGNMASK defined in an header, so they
+>>       can be used in other places.
+>>       I took this opportunity to deal with some other VLAs not
+>>       handled in the old patch.
+>
+> If the constants are visible they need better names.
+> Maybe CRYPTO_MAX_xxx.
 
-The zip driver allocates a result struct on the stack and needs
-to tell the hardware the physical address within this struct
-that is used to signal the completion of the request.
+You are right, in fact I renamed them, but forget to write about this
+in the change log.
+The new names look like MAX_CIPHER_*.
 
-As the hardware gets the wrong address after the broken __pa
-conversion it writes to an arbitrary address. The zip driver then
-waits forever for the completion byte to contain a non-zero value.
+> You can also do much better than allocating MAX_BLOCKSIZE + MAX_ALIGNMASK
+> bytes by requesting 'long' aligned on-stack memory.
+> The easiest way is to define a union like:
+>
+> union crypto_tmp {
+>         u8 buf[CRYPTO_MAX_TMP_BUF];
+>         long buf_align;
+> };
+>
+> Then in each function:
+>
+>         union tmp crypto_tmp;
+>         u8 *keystream = PTR_ALIGN(tmp.buf, alignmask + 1);
+>
+> I think CRYPTO_MAX_TMP_BUF needs to be MAX_BLOCKSIZE + MAX_ALIGNMASK - sizeof (long).
 
-Allocating the result struct from 1:1 mapped memory resolves this
-bug.
+Yeah, that would be nice, it might save us 4-8 bytes on the stack.
+But I was thinking, wouldn't it be even better to do something like:
 
-Signed-off-by: Jan Glauber <jglauber@cavium.com>
-Reviewed-by: Robert Richter <rrichter@cavium.com>
-Cc: stable <stable@vger.kernel.org> # 4.14
----
- drivers/crypto/cavium/zip/zip_crypto.c | 22 ++++++++++++++--------
- 1 file changed, 14 insertions(+), 8 deletions(-)
+u8 buf[CRYPTO_MAX_TMP_BUF] __aligned(__alignof__(long));
+u8 *keystream = PTR_ALIGN(buf, alignmask + 1);
 
-diff --git a/drivers/crypto/cavium/zip/zip_crypto.c b/drivers/crypto/cavium/zip/zip_crypto.c
-index 8df4d26cf9d4..b92b6e7e100f 100644
---- a/drivers/crypto/cavium/zip/zip_crypto.c
-+++ b/drivers/crypto/cavium/zip/zip_crypto.c
-@@ -124,7 +124,7 @@ int zip_compress(const u8 *src, unsigned int slen,
- 		 struct zip_kernel_ctx *zip_ctx)
- {
- 	struct zip_operation  *zip_ops   = NULL;
--	struct zip_state      zip_state;
-+	struct zip_state      *zip_state;
- 	struct zip_device     *zip = NULL;
- 	int ret;
- 
-@@ -135,20 +135,23 @@ int zip_compress(const u8 *src, unsigned int slen,
- 	if (!zip)
- 		return -ENODEV;
- 
--	memset(&zip_state, 0, sizeof(struct zip_state));
-+	zip_state = kzalloc(sizeof(*zip_state), GFP_ATOMIC);
-+	if (!zip_state)
-+		return -ENOMEM;
-+
- 	zip_ops = &zip_ctx->zip_comp;
- 
- 	zip_ops->input_len  = slen;
- 	zip_ops->output_len = *dlen;
- 	memcpy(zip_ops->input, src, slen);
- 
--	ret = zip_deflate(zip_ops, &zip_state, zip);
-+	ret = zip_deflate(zip_ops, zip_state, zip);
- 
- 	if (!ret) {
- 		*dlen = zip_ops->output_len;
- 		memcpy(dst, zip_ops->output, *dlen);
- 	}
--
-+	kfree(zip_state);
- 	return ret;
- }
- 
-@@ -157,7 +160,7 @@ int zip_decompress(const u8 *src, unsigned int slen,
- 		   struct zip_kernel_ctx *zip_ctx)
- {
- 	struct zip_operation  *zip_ops   = NULL;
--	struct zip_state      zip_state;
-+	struct zip_state      *zip_state;
- 	struct zip_device     *zip = NULL;
- 	int ret;
- 
-@@ -168,7 +171,10 @@ int zip_decompress(const u8 *src, unsigned int slen,
- 	if (!zip)
- 		return -ENODEV;
- 
--	memset(&zip_state, 0, sizeof(struct zip_state));
-+	zip_state = kzalloc(sizeof(*zip_state), GFP_ATOMIC);
-+	if (!zip_state)
-+		return -ENOMEM;
-+
- 	zip_ops = &zip_ctx->zip_decomp;
- 	memcpy(zip_ops->input, src, slen);
- 
-@@ -179,13 +185,13 @@ int zip_decompress(const u8 *src, unsigned int slen,
- 	zip_ops->input_len  = slen;
- 	zip_ops->output_len = *dlen;
- 
--	ret = zip_inflate(zip_ops, &zip_state, zip);
-+	ret = zip_inflate(zip_ops, zip_state, zip);
- 
- 	if (!ret) {
- 		*dlen = zip_ops->output_len;
- 		memcpy(dst, zip_ops->output, *dlen);
- 	}
--
-+	kfree(zip_state);
- 	return ret;
- }
- 
--- 
-2.16.2
+In this case __aligned should work, if I'm not missing some other
+subtle GCC caveat.
+
+Thank you,
+
+Salvatore
