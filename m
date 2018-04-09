@@ -1,7 +1,7 @@
 From: Salvatore Mesoraca <s.mesoraca16@gmail.com>
-Subject: [PATCH 5/6] crypto: cts - avoid VLA use
-Date: Mon,  9 Apr 2018 15:54:03 +0200
-Message-ID: <1523282044-22075-6-git-send-email-s.mesoraca16@gmail.com>
+Subject: [PATCH 2/6] crypto: ctr - avoid VLA use
+Date: Mon,  9 Apr 2018 15:54:00 +0200
+Message-ID: <1523282044-22075-3-git-send-email-s.mesoraca16@gmail.com>
 References: <1523282044-22075-1-git-send-email-s.mesoraca16@gmail.com>
 Cc: kernel-hardening@lists.openwall.com, linux-crypto@vger.kernel.org,
         "David S. Miller" <davem@davemloft.net>,
@@ -16,7 +16,8 @@ In-Reply-To: <1523282044-22075-1-git-send-email-s.mesoraca16@gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-We avoid 2 VLAs[1] by always allocating MAX_BLOCKSIZE*2 bytes.
+We avoid 2 VLAs[1] by always allocating MAX_BLOCKSIZE +
+MAX_ALIGNMASK bytes.
 We also check the selected cipher at instance creation time, if
 it doesn't comply with these limits, the creation will fail.
 
@@ -24,48 +25,53 @@ it doesn't comply with these limits, the creation will fail.
 
 Signed-off-by: Salvatore Mesoraca <s.mesoraca16@gmail.com>
 ---
- crypto/cts.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ crypto/ctr.c | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
 
-diff --git a/crypto/cts.c b/crypto/cts.c
-index 4773c18..12e6bd3 100644
---- a/crypto/cts.c
-+++ b/crypto/cts.c
-@@ -50,6 +50,7 @@
- #include <crypto/scatterwalk.h>
+diff --git a/crypto/ctr.c b/crypto/ctr.c
+index 854d924..ce62552 100644
+--- a/crypto/ctr.c
++++ b/crypto/ctr.c
+@@ -20,6 +20,7 @@
+ #include <linux/random.h>
+ #include <linux/scatterlist.h>
  #include <linux/slab.h>
- #include <linux/compiler.h>
 +#include "internal.h"
  
- struct crypto_cts_ctx {
- 	struct crypto_skcipher *child;
-@@ -104,7 +105,7 @@ static int cts_cbc_encrypt(struct skcipher_request *req)
- 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
- 	struct skcipher_request *subreq = &rctx->subreq;
- 	int bsize = crypto_skcipher_blocksize(tfm);
--	u8 d[bsize * 2] __aligned(__alignof__(u32));
-+	u8 d[MAX_BLOCKSIZE * 2] __aligned(__alignof__(u32));
- 	struct scatterlist *sg;
- 	unsigned int offset;
- 	int lastn;
-@@ -183,7 +184,7 @@ static int cts_cbc_decrypt(struct skcipher_request *req)
- 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
- 	struct skcipher_request *subreq = &rctx->subreq;
- 	int bsize = crypto_skcipher_blocksize(tfm);
--	u8 d[bsize * 2] __aligned(__alignof__(u32));
-+	u8 d[MAX_BLOCKSIZE * 2] __aligned(__alignof__(u32));
- 	struct scatterlist *sg;
- 	unsigned int offset;
- 	u8 *space;
-@@ -359,6 +360,9 @@ static int crypto_cts_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	if (crypto_skcipher_alg_ivsize(alg) != alg->base.cra_blocksize)
- 		goto err_drop_spawn;
+ struct crypto_ctr_ctx {
+ 	struct crypto_cipher *child;
+@@ -58,7 +59,7 @@ static void crypto_ctr_crypt_final(struct blkcipher_walk *walk,
+ 	unsigned int bsize = crypto_cipher_blocksize(tfm);
+ 	unsigned long alignmask = crypto_cipher_alignmask(tfm);
+ 	u8 *ctrblk = walk->iv;
+-	u8 tmp[bsize + alignmask];
++	u8 tmp[MAX_BLOCKSIZE + MAX_ALIGNMASK];
+ 	u8 *keystream = PTR_ALIGN(tmp + 0, alignmask + 1);
+ 	u8 *src = walk->src.virt.addr;
+ 	u8 *dst = walk->dst.virt.addr;
+@@ -106,7 +107,7 @@ static int crypto_ctr_crypt_inplace(struct blkcipher_walk *walk,
+ 	unsigned int nbytes = walk->nbytes;
+ 	u8 *ctrblk = walk->iv;
+ 	u8 *src = walk->src.virt.addr;
+-	u8 tmp[bsize + alignmask];
++	u8 tmp[MAX_BLOCKSIZE + MAX_ALIGNMASK];
+ 	u8 *keystream = PTR_ALIGN(tmp + 0, alignmask + 1);
  
-+	if (alg->base.cra_blocksize > MAX_BLOCKSIZE)
-+		goto err_drop_spawn;
+ 	do {
+@@ -206,6 +207,14 @@ static struct crypto_instance *crypto_ctr_alloc(struct rtattr **tb)
+ 	if (alg->cra_blocksize < 4)
+ 		goto out_put_alg;
+ 
++	/* Block size must be <= MAX_BLOCKSIZE. */
++	if (alg->cra_blocksize > MAX_BLOCKSIZE)
++		goto out_put_alg;
 +
- 	if (strncmp(alg->base.cra_name, "cbc(", 4))
- 		goto err_drop_spawn;
- 
++	/* Alignmask must be <= MAX_ALIGNMASK. */
++	if (alg->cra_alignmask > MAX_ALIGNMASK)
++		goto out_put_alg;
++
+ 	/* If this is false we'd fail the alignment of crypto_inc. */
+ 	if (alg->cra_blocksize % 4)
+ 		goto out_put_alg;
 -- 
 1.9.1
