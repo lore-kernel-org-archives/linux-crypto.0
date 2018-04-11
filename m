@@ -1,12 +1,13 @@
 From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: Re: [PATCH] crypto: DRBG - guard uninstantion by lock
-Date: Wed, 11 Apr 2018 16:26:18 +0200
-Message-ID: <2186798.qrgUIDAn9S@positron.chronox.de>
-References: <001a114467482dbc4b05692df8f9@google.com> <2704286.80iLvC0rRL@tauon.chronox.de> <CACT4Y+bRmYMt3WuVHE7e624KgRUTXQWa36wn-pr_gm2STq80bQ@mail.gmail.com>
+Subject: [PATCH] crypto: drbg - set freed buffers to NULL
+Date: Wed, 11 Apr 2018 16:31:01 +0200
+Message-ID: <20316956.hJt0ZTxKTH@positron.chronox.de>
+References: <001a114467482dbc4b05692df8f9@google.com> <CACT4Y+bRmYMt3WuVHE7e624KgRUTXQWa36wn-pr_gm2STq80bQ@mail.gmail.com> <2186798.qrgUIDAn9S@positron.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
-Cc: "Theodore Y. Ts'o" <tytso@mit.edu>,
+Cc: Dmitry Vyukov <dvyukov@google.com>,
+        "Theodore Y. Ts'o" <tytso@mit.edu>,
         Matthew Wilcox <willy@infradead.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         David Miller <davem@davemloft.net>,
@@ -16,21 +17,13 @@ Cc: "Theodore Y. Ts'o" <tytso@mit.edu>,
         LKML <linux-kernel@vger.kernel.org>,
         syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
         Al Viro <viro@zeniv.linux.org.uk>
-To: Dmitry Vyukov <dvyukov@google.com>
+To: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CACT4Y+bRmYMt3WuVHE7e624KgRUTXQWa36wn-pr_gm2STq80bQ@mail.gmail.com>
+In-Reply-To: <2186798.qrgUIDAn9S@positron.chronox.de>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi Dimitry,
-
-This fix prevents the kernel from crashing when injecting the fault. 
-Stack traces are yet shown but I guess that is expected every time
-a fault is injected.
-
-As to why KASAN did not notice this one, I am not sure. Maybe it is
-because I use two buffer pointers to point to (almost) the same memory
-(one that is aligned and one pointing to the complete buffer)?
+Sorry, this time with the proper subject line.
 
 ---8<---
 
