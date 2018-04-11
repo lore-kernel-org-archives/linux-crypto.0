@@ -1,61 +1,94 @@
-From: David Laight <David.Laight@ACULAB.COM>
-Subject: RE: [PATCH v2 0/2] crypto: removing various VLAs
-Date: Wed, 11 Apr 2018 16:20:42 +0000
-Message-ID: <43fc1586cc5247df860e592f37b170a3@AcuMS.aculab.com>
-References: <1523282087-22128-1-git-send-email-s.mesoraca16@gmail.com>
- <ca31b95a8b8e4dab90c5ea2eb6e6477f@AcuMS.aculab.com>
- <CAJHCu1+YynzroRkfZC9ki0b=RwiDOoOJB0S97uUVWSxLgac74A@mail.gmail.com>
+From: Dmitry Vyukov <dvyukov@google.com>
+Subject: Re: [PATCH] crypto: DRBG - guard uninstantion by lock
+Date: Wed, 11 Apr 2018 19:09:53 +0200
+Message-ID: <CACT4Y+ZxumagMiZTFwzX2e_tdd4U862BzgzHVDsiOACbMXEh_A@mail.gmail.com>
+References: <001a114467482dbc4b05692df8f9@google.com> <2704286.80iLvC0rRL@tauon.chronox.de>
+ <CACT4Y+bRmYMt3WuVHE7e624KgRUTXQWa36wn-pr_gm2STq80bQ@mail.gmail.com> <2186798.qrgUIDAn9S@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kernel-hardening@lists.openwall.com"
-        <kernel-hardening@lists.openwall.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Cc: "Theodore Y. Ts'o" <tytso@mit.edu>,
+        Matthew Wilcox <willy@infradead.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "Kees Cook" <keescook@chromium.org>,
-        Eric Biggers <ebiggers3@gmail.com>,
-        "Laura Abbott" <labbott@redhat.com>
-To: 'Salvatore Mesoraca' <s.mesoraca16@gmail.com>
+        David Miller <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, Eric Biggers <ebiggers3@gmail.com>,
+        syzbot <syzbot+75397ee3df5c70164154@syzkaller.appspotmail.com>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
+        Al Viro <viro@zeniv.linux.org.uk>
+To: =?UTF-8?Q?Stephan_M=C3=BCller?= <smueller@chronox.de>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAJHCu1+YynzroRkfZC9ki0b=RwiDOoOJB0S97uUVWSxLgac74A@mail.gmail.com>
-Content-Language: en-US
+In-Reply-To: <2186798.qrgUIDAn9S@positron.chronox.de>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-RnJvbTogU2FsdmF0b3JlIE1lc29yYWNhDQo+IFNlbnQ6IDA5IEFwcmlsIDIwMTggMTc6MzgNCi4u
-Lg0KPiA+IFlvdSBjYW4gYWxzbyBkbyBtdWNoIGJldHRlciB0aGFuIGFsbG9jYXRpbmcgTUFYX0JM
-T0NLU0laRSArIE1BWF9BTElHTk1BU0sNCj4gPiBieXRlcyBieSByZXF1ZXN0aW5nICdsb25nJyBh
-bGlnbmVkIG9uLXN0YWNrIG1lbW9yeS4NCj4gPiBUaGUgZWFzaWVzdCB3YXkgaXMgdG8gZGVmaW5l
-IGEgdW5pb24gbGlrZToNCj4gPg0KPiA+IHVuaW9uIGNyeXB0b190bXAgew0KPiA+ICAgICAgICAg
-dTggYnVmW0NSWVBUT19NQVhfVE1QX0JVRl07DQo+ID4gICAgICAgICBsb25nIGJ1Zl9hbGlnbjsN
-Cj4gPiB9Ow0KPiA+DQo+ID4gVGhlbiBpbiBlYWNoIGZ1bmN0aW9uOg0KPiA+DQo+ID4gICAgICAg
-ICB1bmlvbiB0bXAgY3J5cHRvX3RtcDsNCj4gPiAgICAgICAgIHU4ICprZXlzdHJlYW0gPSBQVFJf
-QUxJR04odG1wLmJ1ZiwgYWxpZ25tYXNrICsgMSk7DQo+ID4NCj4gPiBJIHRoaW5rIENSWVBUT19N
-QVhfVE1QX0JVRiBuZWVkcyB0byBiZSBNQVhfQkxPQ0tTSVpFICsgTUFYX0FMSUdOTUFTSyAtIHNp
-emVvZiAobG9uZykuDQo+IA0KPiBZZWFoLCB0aGF0IHdvdWxkIGJlIG5pY2UsIGl0IG1pZ2h0IHNh
-dmUgdXMgNC04IGJ5dGVzIG9uIHRoZSBzdGFjay4NCj4gQnV0IEkgd2FzIHRoaW5raW5nLCB3b3Vs
-ZG4ndCBpdCBiZSBldmVuIGJldHRlciB0byBkbyBzb21ldGhpbmcgbGlrZToNCj4gDQo+IHU4IGJ1
-ZltDUllQVE9fTUFYX1RNUF9CVUZdIF9fYWxpZ25lZChfX2FsaWdub2ZfXyhsb25nKSk7DQo+IHU4
-ICprZXlzdHJlYW0gPSBQVFJfQUxJR04oYnVmLCBhbGlnbm1hc2sgKyAxKTsNCj4gDQo+IEluIHRo
-aXMgY2FzZSBfX2FsaWduZWQgc2hvdWxkIHdvcmssIGlmIEknbSBub3QgbWlzc2luZyBzb21lIG90
-aGVyDQo+IHN1YnRsZSBHQ0MgY2F2ZWF0Lg0KDQpUaGlua2luZyBmdXJ0aGVyLCB0aGVyZSBpcyBu
-byBwb2ludCBhbGlnbmluZyB0aGUgYnVmZmVyIHRvIGxlc3MgdGhhbg0KdGhlIG1heGltdW0gYWxp
-Z25tZW50IGFsbG93ZWQgLSBpdCBqdXN0IGFkZHMgY29kZS4NCg0KU28geW91IGVuZCB1cCB3aXRo
-Og0KI2RlZmluZSBNQVhfU1RBQ0tfQUxJR04gX19hbGlnbm9mX18obG9uZykgIC8qIExhcmdlc3Qg
-dHlwZSB0aGUgY29tcGlsZXIgY2FuIGFsaWduIG9uIHN0YWNrICovDQojZGVmaW5lIENSWVBUT19N
-QVhfVE1QX0JVRiAoTUFYX0JMT0NLU0laRSArIE1BWF9BTElHTk1BU0sgKyAxIC0gTUFYX1NUQUNL
-X0FMSUdOKQ0KdTggYnVmW0NSWVBUT19NQVhfVE1QX0JVRl0gX19hbGlnbmVkKE1BWF9TVEFDS19B
-TElHTik7DQp1OCAqa2V5c3RyZWFtID0gUFRSX0FMSUdOKGJ1ZiwgTUFYX0FMSUdOTUFTSyArIDEp
-Ow0KDQpUaGUgbGFzdCB0d28gbGluZXMgY291bGQgYmUgcHV0IGludG8gYSAjZGVmaW5lIG9mIHRo
-ZWlyIG93biBzbyB0aGF0IHRoZSAnY2FsbCBzaXRlcycNCmRvbid0IG5lZWQgdG8ga25vdyB0aGUg
-Z29yeSBkZXRhaWxzIG9mIGhvdyB0aGUgYnVmZmVyIGlzIGRlZmluZWQuDQoNCkluIHByaW5jaXBs
-ZSB5b3UgY291bGQganVzdCBoYXZlOg0KdTgga2V5c3RyZWFtW01BWF9CTE9DS1NJWkVdIF9fYWxp
-Z25lZChNQVhfQUxJR05NQVNLICsgMSk7DQoNCkJ1dCB0aGF0IHdpbGwgZ28gd3JvbmcgaWYgdGhl
-IHN0YWNrIGFsaWdubWVudCBoYXMgZ29uZSB3cm9uZyBzb21ld2hlcmUNCmFuZCBnZW5lcmF0ZXMg
-YSBkb3VibGUgc3RhY2sgZnJhbWUgaWYgdGhlIHJlcXVlc3RlZCBhbGlnbm1lbnQgaXMgbGFyZ2Vy
-DQp0aGFuIHRoZSBleHBlY3RlZCBzdGFjayBhbGlnbm1lbnQuDQoNCklJUkMgdGhlcmUgaXMgYSBn
-Y2MgY29tbWFuZCBsaW5lIG9wdGlvbiB0byBlbmZvcmNlIHN0YWNrIGFsaWdubWVudCBvbg0Kc29t
-ZS9hbGwgZnVuY3Rpb24gZW50cnkgcHJvbG9ndWVzLiBUaGUgZ29yeSBkZXRhaWxzIGFyZSBoZWxk
-IGluIHNvbWUNCm9sZCBicmFpbiBjZWxscyBzb21ld2hlcmUuDQoNCglEYXZpZA0KDQo=
+On Wed, Apr 11, 2018 at 4:26 PM, Stephan M=C3=BCller <smueller@chronox.de> =
+wrote:
+> Hi Dimitry,
+>
+> This fix prevents the kernel from crashing when injecting the fault.
+
+Good!
+
+> Stack traces are yet shown but I guess that is expected every time
+> a fault is injected.
+
+Yes, nothing to fix here.
+
+> As to why KASAN did not notice this one, I am not sure. Maybe it is
+> because I use two buffer pointers to point to (almost) the same memory
+> (one that is aligned and one pointing to the complete buffer)?
+
+After looking at the fix, I figured out what happened with KASAN.
+Filed https://bugzilla.kernel.org/show_bug.cgi?id=3D199359. In short,
+tricky interplay between kzfree, ksize and double-free detection.
+If KASAN worked as intended it would give a nice "double-free in this
+stack for object allocated in this stack and previously freed in this
+stack", which would probably make debugging much simpler.
+
+
+> ---8<---
+>
+> During freeing of the internal buffers used by the DRBG, set the pointer
+> to NULL. It is possible that the context with the freed buffers is
+> reused. In case of an error during initialization where the pointers
+> do not yet point to allocated memory, the NULL value prevents a double
+> free.
+>
+> Signed-off-by: Stephan Mueller <smueller@chronox.de>
+> Reported-by: syzbot+75397ee3df5c70164154@syzkaller.appspotmail.com
+> ---
+>  crypto/drbg.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>
+> diff --git a/crypto/drbg.c b/crypto/drbg.c
+> index 4faa2781c964..466a112a4446 100644
+> --- a/crypto/drbg.c
+> +++ b/crypto/drbg.c
+> @@ -1134,8 +1134,10 @@ static inline void drbg_dealloc_state(struct drbg_=
+state *drbg)
+>         if (!drbg)
+>                 return;
+>         kzfree(drbg->Vbuf);
+> +       drbg->Vbuf =3D NULL;
+>         drbg->V =3D NULL;
+>         kzfree(drbg->Cbuf);
+> +       drbg->Cbuf =3D NULL;
+>         drbg->C =3D NULL;
+>         kzfree(drbg->scratchpadbuf);
+>         drbg->scratchpadbuf =3D NULL;
+> --
+> 2.14.3
+>
+>
+>
+>
+> --
+> You received this message because you are subscribed to the Google Groups=
+ "syzkaller-bugs" group.
+> To unsubscribe from this group and stop receiving emails from it, send an=
+ email to syzkaller-bugs+unsubscribe@googlegroups.com.
+> To view this discussion on the web visit https://groups.google.com/d/msgi=
+d/syzkaller-bugs/2186798.qrgUIDAn9S%40positron.chronox.de.
+> For more options, visit https://groups.google.com/d/optout.
