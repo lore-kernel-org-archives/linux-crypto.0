@@ -1,82 +1,41 @@
-From: Theodore Ts'o <tytso@mit.edu>
-Subject: [PATCH 1/5] random: fix crng_ready() test
-Date: Thu, 12 Apr 2018 21:30:42 -0400
-Message-ID: <20180413013046.404-1-tytso@mit.edu>
-Cc: Linux Kernel Developers List <linux-kernel@vger.kernel.org>,
-        Theodore Ts'o <tytso@mit.edu>, stable@kernel.org
-To: linux-crypto@vger.kernel.org
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: [PATCH 1/5] random: fix crng_ready() test
+Date: Fri, 13 Apr 2018 07:38:30 +0200
+Message-ID: <1699469.KmO53oa8XU@tauon.chronox.de>
+References: <20180413013046.404-1-tytso@mit.edu>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: linux-crypto@vger.kernel.org,
+        Linux Kernel Developers List <linux-kernel@vger.kernel.org>,
+        stable@kernel.org
+To: Theodore Ts'o <tytso@mit.edu>
 Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20180413013046.404-1-tytso@mit.edu>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-The crng_init variable has three states:
+Am Freitag, 13. April 2018, 03:30:42 CEST schrieb Theodore Ts'o:
 
-0: The CRNG is not initialized at all
-1: The CRNG has a small amount of entropy, hopefully good enough for
-   early-boot, non-cryptographical use cases
-2: The CRNG is fully initialized and we are sure it is safe for
-   cryptographic use cases.
+Hi Theodore,
 
-The crng_ready() function should only return true once we are in the
-last state.
+> The crng_init variable has three states:
+> 
+> 0: The CRNG is not initialized at all
+> 1: The CRNG has a small amount of entropy, hopefully good enough for
+>    early-boot, non-cryptographical use cases
+> 2: The CRNG is fully initialized and we are sure it is safe for
+>    cryptographic use cases.
+> 
+> The crng_ready() function should only return true once we are in the
+> last state.
+> 
+Do I see that correctly that getrandom(2) will now unblock after the 
+input_pool has obtained 128 bits of entropy? Similarly for 
+get_random_bytes_wait.
 
-Reported-by: Jann Horn <jannh@google.com>
-Fixes: e192be9d9a30 ("random: replace non-blocking pool...")
-Cc: stable@kernel.org # 4.8+
-Signed-off-by: Theodore Ts'o <tytso@mit.edu>
-Reviewed-by: Jann Horn <jannh@google.com>
----
- drivers/char/random.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+As this seems to be the only real use case for crng_ready (apart from 
+logging), what is the purpose of crng_init == 1?
 
-diff --git a/drivers/char/random.c b/drivers/char/random.c
-index e027e7fa1472..c8ec1e70abde 100644
---- a/drivers/char/random.c
-+++ b/drivers/char/random.c
-@@ -427,7 +427,7 @@ struct crng_state primary_crng = {
-  * its value (from 0->1->2).
-  */
- static int crng_init = 0;
--#define crng_ready() (likely(crng_init > 0))
-+#define crng_ready() (likely(crng_init > 1))
- static int crng_init_cnt = 0;
- #define CRNG_INIT_CNT_THRESH (2*CHACHA20_KEY_SIZE)
- static void _extract_crng(struct crng_state *crng,
-@@ -794,7 +794,7 @@ static int crng_fast_load(const char *cp, size_t len)
- 
- 	if (!spin_trylock_irqsave(&primary_crng.lock, flags))
- 		return 0;
--	if (crng_ready()) {
-+	if (crng_init != 0) {
- 		spin_unlock_irqrestore(&primary_crng.lock, flags);
- 		return 0;
- 	}
-@@ -856,7 +856,7 @@ static void _extract_crng(struct crng_state *crng,
- {
- 	unsigned long v, flags;
- 
--	if (crng_init > 1 &&
-+	if (crng_ready() &&
- 	    time_after(jiffies, crng->init_time + CRNG_RESEED_INTERVAL))
- 		crng_reseed(crng, crng == &primary_crng ? &input_pool : NULL);
- 	spin_lock_irqsave(&crng->lock, flags);
-@@ -1139,7 +1139,7 @@ void add_interrupt_randomness(int irq, int irq_flags)
- 	fast_mix(fast_pool);
- 	add_interrupt_bench(cycles);
- 
--	if (!crng_ready()) {
-+	if (unlikely(crng_init == 0)) {
- 		if ((fast_pool->count >= 64) &&
- 		    crng_fast_load((char *) fast_pool->pool,
- 				   sizeof(fast_pool->pool))) {
-@@ -2212,7 +2212,7 @@ void add_hwgenerator_randomness(const char *buffer, size_t count,
- {
- 	struct entropy_store *poolp = &input_pool;
- 
--	if (!crng_ready()) {
-+	if (unlikely(crng_init == 0)) {
- 		crng_fast_load(buffer, count);
- 		return;
- 	}
--- 
-2.16.1.72.g5be1f00a9a
+Ciao
+Stephan
