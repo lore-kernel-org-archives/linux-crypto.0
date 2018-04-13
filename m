@@ -1,59 +1,46 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: [PATCH] crypto: drbg - set freed buffers to NULL
-Date: Thu, 12 Apr 2018 08:40:55 +0200
-Message-ID: <2295196.9WStPcntd3@positron.chronox.de>
-References: <001a114467482dbc4b05692df8f9@google.com> <2186798.qrgUIDAn9S@positron.chronox.de> <20316956.hJt0ZTxKTH@positron.chronox.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Dmitry Vyukov <dvyukov@google.com>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>,
-        Matthew Wilcox <willy@infradead.org>,
-        David Miller <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, Eric Biggers <ebiggers3@gmail.com>,
-        syzbot <syzbot+75397ee3df5c70164154@syzkaller.appspotmail.com>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
-        Al Viro <viro@zeniv.linux.org.uk>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+From: Theodore Ts'o <tytso@mit.edu>
+Subject: [PATCH 4/5] random: crng_reseed() should lock the crng instance that it is modifying
+Date: Thu, 12 Apr 2018 21:30:45 -0400
+Message-ID: <20180413013046.404-4-tytso@mit.edu>
+References: <20180413013046.404-1-tytso@mit.edu>
+Cc: Linux Kernel Developers List <linux-kernel@vger.kernel.org>,
+        Theodore Ts'o <tytso@mit.edu>, stable@kernel.org
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20316956.hJt0ZTxKTH@positron.chronox.de>
+In-Reply-To: <20180413013046.404-1-tytso@mit.edu>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Add the Fixes, CC stable tags.
-
----8<---
-
-During freeing of the internal buffers used by the DRBG, set the pointer
-to NULL. It is possible that the context with the freed buffers is
-reused. In case of an error during initialization where the pointers
-do not yet point to allocated memory, the NULL value prevents a double
-free.
-
-Cc: stable@vger.kernel.org
-Fixes: 3cfc3b9721123 ("crypto: drbg - use aligned buffers")
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
-Reported-by: syzbot+75397ee3df5c70164154@syzkaller.appspotmail.com
+Reported-by: Jann Horn <jannh@google.com>
+Fixes: 1e7f583af67b ("random: make /dev/urandom scalable for silly...")
+Cc: stable@kernel.org # 4.8+
+Signed-off-by: Theodore Ts'o <tytso@mit.edu>
+Reviewed-by: Jann Horn <jannh@google.com>
 ---
- crypto/drbg.c | 2 ++
- 1 file changed, 2 insertions(+)
+ drivers/char/random.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/crypto/drbg.c b/crypto/drbg.c
-index 4faa2781c964..466a112a4446 100644
---- a/crypto/drbg.c
-+++ b/crypto/drbg.c
-@@ -1134,8 +1134,10 @@ static inline void drbg_dealloc_state(struct drbg_state *drbg)
- 	if (!drbg)
- 		return;
- 	kzfree(drbg->Vbuf);
-+	drbg->Vbuf = NULL;
- 	drbg->V = NULL;
- 	kzfree(drbg->Cbuf);
-+	drbg->Cbuf = NULL;
- 	drbg->C = NULL;
- 	kzfree(drbg->scratchpadbuf);
- 	drbg->scratchpadbuf = NULL;
+diff --git a/drivers/char/random.c b/drivers/char/random.c
+index 681ee0c0de24..6e7fa13b1a89 100644
+--- a/drivers/char/random.c
++++ b/drivers/char/random.c
+@@ -906,7 +906,7 @@ static void crng_reseed(struct crng_state *crng, struct entropy_store *r)
+ 		_crng_backtrack_protect(&primary_crng, buf.block,
+ 					CHACHA20_KEY_SIZE);
+ 	}
+-	spin_lock_irqsave(&primary_crng.lock, flags);
++	spin_lock_irqsave(&crng->lock, flags);
+ 	for (i = 0; i < 8; i++) {
+ 		unsigned long	rv;
+ 		if (!arch_get_random_seed_long(&rv) &&
+@@ -916,7 +916,7 @@ static void crng_reseed(struct crng_state *crng, struct entropy_store *r)
+ 	}
+ 	memzero_explicit(&buf, sizeof(buf));
+ 	crng->init_time = jiffies;
+-	spin_unlock_irqrestore(&primary_crng.lock, flags);
++	spin_unlock_irqrestore(&crng->lock, flags);
+ 	if (crng == &primary_crng && crng_init < 2) {
+ 		invalidate_batched_entropy();
+ 		numa_crng_init();
 -- 
-2.14.3
+2.16.1.72.g5be1f00a9a
