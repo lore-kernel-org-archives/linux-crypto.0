@@ -1,7 +1,7 @@
 From: Theodore Ts'o <tytso@mit.edu>
-Subject: [PATCH 5/5] random: add new ioctl RNDRESEEDCRNG
-Date: Thu, 12 Apr 2018 21:30:46 -0400
-Message-ID: <20180413013046.404-5-tytso@mit.edu>
+Subject: [PATCH 2/5] random: use a different mixing algorithm for add_device_randomness()
+Date: Thu, 12 Apr 2018 21:30:43 -0400
+Message-ID: <20180413013046.404-2-tytso@mit.edu>
 References: <20180413013046.404-1-tytso@mit.edu>
 Cc: Linux Kernel Developers List <linux-kernel@vger.kernel.org>,
         Theodore Ts'o <tytso@mit.edu>, stable@kernel.org
@@ -11,73 +11,109 @@ In-Reply-To: <20180413013046.404-1-tytso@mit.edu>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Add a new ioctl which forces the the crng to be reseeded.
+add_device_randomness() use of crng_fast_load() was highly
+problematic.  Some callers of add_device_randomness() can pass in a
+large amount of static information.  This would immediately promote
+the crng_init state from 0 to 1, without really doing much to
+initialize the primary_crng's internal state with something even
+vaguely unpredictable.
 
+Since we don't have the speed constraints of add_interrupt_randomness(),
+we can do a better job mixing in the what unpredictability a device
+driver or architecture maintainer might see fit to give us, and do it
+in a way which does not bump the crng_init_cnt variable.
+
+Also, since add_device_randomness() doesn't bump any entropy
+accounting in crng_init state 0, mix the device randomness into the
+input_pool entropy pool as well.
+
+Reported-by: Jann Horn <jannh@google.com>
+Fixes: ee7998c50c26 ("random: do not ignore early device randomness")
+Cc: stable@kernel.org # 4.13+
 Signed-off-by: Theodore Ts'o <tytso@mit.edu>
-Cc: stable@kernel.org
 ---
- drivers/char/random.c       | 13 ++++++++++++-
- include/uapi/linux/random.h |  3 +++
- 2 files changed, 15 insertions(+), 1 deletion(-)
+ drivers/char/random.c | 55 +++++++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 51 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/char/random.c b/drivers/char/random.c
-index 6e7fa13b1a89..c552431587a7 100644
+index c8ec1e70abde..2154a5fe4c81 100644
 --- a/drivers/char/random.c
 +++ b/drivers/char/random.c
-@@ -429,6 +429,7 @@ struct crng_state primary_crng = {
- static int crng_init = 0;
- #define crng_ready() (likely(crng_init > 1))
- static int crng_init_cnt = 0;
-+static unsigned long crng_global_init_time = 0;
- #define CRNG_INIT_CNT_THRESH (2*CHACHA20_KEY_SIZE)
- static void _extract_crng(struct crng_state *crng,
- 			  __u32 out[CHACHA20_BLOCK_WORDS]);
-@@ -933,7 +934,8 @@ static void _extract_crng(struct crng_state *crng,
- 	unsigned long v, flags;
- 
- 	if (crng_ready() &&
--	    time_after(jiffies, crng->init_time + CRNG_RESEED_INTERVAL))
-+	    (time_after(crng_global_init_time, crng->init_time) ||
-+	     time_after(jiffies, crng->init_time + CRNG_RESEED_INTERVAL)))
- 		crng_reseed(crng, crng == &primary_crng ? &input_pool : NULL);
- 	spin_lock_irqsave(&crng->lock, flags);
- 	if (arch_get_random_long(&v))
-@@ -1757,6 +1759,7 @@ static int rand_initialize(void)
- 	init_std_data(&input_pool);
- 	init_std_data(&blocking_pool);
- 	crng_initialize(&primary_crng);
-+	crng_global_init_time = jiffies;
- 	return 0;
+@@ -787,6 +787,10 @@ static void crng_initialize(struct crng_state *crng)
+ 	crng->init_time = jiffies - CRNG_RESEED_INTERVAL - 1;
  }
- early_initcall(rand_initialize);
-@@ -1930,6 +1933,14 @@ static long random_ioctl(struct file *f, unsigned int cmd, unsigned long arg)
- 		input_pool.entropy_count = 0;
- 		blocking_pool.entropy_count = 0;
- 		return 0;
-+	case RNDRESEEDCRNG:
-+		if (!capable(CAP_SYS_ADMIN))
-+			return -EPERM;
-+		if (crng_init < 2)
-+			return -ENODATA;
-+		crng_reseed(&primary_crng, NULL);
-+		crng_global_init_time = jiffies - 1;
-+		return 0;
- 	default:
- 		return -EINVAL;
- 	}
-diff --git a/include/uapi/linux/random.h b/include/uapi/linux/random.h
-index c34f4490d025..26ee91300e3e 100644
---- a/include/uapi/linux/random.h
-+++ b/include/uapi/linux/random.h
-@@ -35,6 +35,9 @@
- /* Clear the entropy pool and associated counters.  (Superuser only.) */
- #define RNDCLEARPOOL	_IO( 'R', 0x06 )
  
-+/* Reseed CRNG.  (Superuser only.) */
-+#define RNDRESEEDCRNG	_IO( 'R', 0x07 )
++/*
++ * crng_fast_load() can be called by code in the interrupt service
++ * path.  So we can't afford to dilly-dally.
++ */
+ static int crng_fast_load(const char *cp, size_t len)
+ {
+ 	unsigned long flags;
+@@ -813,6 +817,51 @@ static int crng_fast_load(const char *cp, size_t len)
+ 	return 1;
+ }
+ 
++/*
++ * crng_slow_load() is called by add_device_randomness, which has two
++ * attributes.  (1) We can't trust the buffer passed to it is
++ * guaranteed to be unpredictable (so it might not have any entropy at
++ * all), and (2) it doesn't have the performance constraints of
++ * crng_fast_load().
++ *
++ * So we do something more comprehensive which is guaranteed to touch
++ * all of the primary_crng's state, and which uses a LFSR with a
++ * period of 255 as part of the mixing algorithm.  Finally, we do
++ * *not* advance crng_init_cnt since buffer we may get may be something
++ * like a fixed DMI table (for example), which might very well be
++ * unique to the machine, but is otherwise unvarying.
++ */
++static int crng_slow_load(const char *cp, size_t len)
++{
++	unsigned long		flags;
++	static unsigned char	lfsr = 1;
++	unsigned char		tmp;
++	unsigned		i, max = CHACHA20_KEY_SIZE;
++	const char *		src_buf = cp;
++	char *			dest_buf = (char *) &primary_crng.state[4];
 +
- struct rand_pool_info {
- 	int	entropy_count;
- 	int	buf_size;
++	if (!spin_trylock_irqsave(&primary_crng.lock, flags))
++		return 0;
++	if (crng_init != 0) {
++		spin_unlock_irqrestore(&primary_crng.lock, flags);
++		return 0;
++	}
++	if (len > max)
++		max = len;
++
++	for (i = 0; i < max ; i++) {
++		tmp = lfsr;
++		lfsr >>= 1;
++		if (tmp & 1)
++			lfsr ^= 0xE1;
++		tmp = dest_buf[i % CHACHA20_KEY_SIZE];
++		dest_buf[i % CHACHA20_KEY_SIZE] ^= src_buf[i % len] ^ lfsr;
++		lfsr += (tmp << 3) | (tmp >> 5);
++	}
++	spin_unlock_irqrestore(&primary_crng.lock, flags);
++	return 1;
++}
++
+ static void crng_reseed(struct crng_state *crng, struct entropy_store *r)
+ {
+ 	unsigned long	flags;
+@@ -981,10 +1030,8 @@ void add_device_randomness(const void *buf, unsigned int size)
+ 	unsigned long time = random_get_entropy() ^ jiffies;
+ 	unsigned long flags;
+ 
+-	if (!crng_ready()) {
+-		crng_fast_load(buf, size);
+-		return;
+-	}
++	if (!crng_ready())
++		crng_slow_load(buf, size);
+ 
+ 	trace_add_device_randomness(size, _RET_IP_);
+ 	spin_lock_irqsave(&input_pool.lock, flags);
 -- 
 2.16.1.72.g5be1f00a9a
