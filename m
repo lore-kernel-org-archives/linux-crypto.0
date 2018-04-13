@@ -1,41 +1,40 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH 1/5] random: fix crng_ready() test
-Date: Fri, 13 Apr 2018 07:38:30 +0200
-Message-ID: <1699469.KmO53oa8XU@tauon.chronox.de>
-References: <20180413013046.404-1-tytso@mit.edu>
+From: David Wang <davidwang@zhaoxin.com>
+Subject: [PATCH] hwrng: via-rng - support new Centaur CPU
+Date: Fri, 13 Apr 2018 15:03:03 +0800
+Message-ID: <1523602983-3418-1-git-send-email-davidwang@zhaoxin.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org,
-        Linux Kernel Developers List <linux-kernel@vger.kernel.org>,
-        stable@kernel.org
-To: Theodore Ts'o <tytso@mit.edu>
+Content-Type: text/plain
+Cc: <brucechang@via-alliance.com>, <cooperyan@zhaoxin.com>,
+        <qiyuanwang@zhaoxin.com>, <benjaminpan@viatech.com>,
+        <lukelin@viacpu.com>, <timguo@zhaoxin.com>,
+        David Wang <davidwang@zhaoxin.com>
+To: <mpm@selenic.com>, <herbert@gondor.apana.org.au>, <arnd@arndb.de>,
+        <grehkg@linuxfoundation.org>, <linux-kernel@vger.kernel.org>,
+        <linux-crypto@vger.kernel.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180413013046.404-1-tytso@mit.edu>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Am Freitag, 13. April 2018, 03:30:42 CEST schrieb Theodore Ts'o:
+New Centaur CPU(Family > 6) supprt Random Number Generator, but can't
+support MSR_VIA_RNG. Just like VIA Nano.
 
-Hi Theodore,
+Signed-off-by: David Wang <davidwang@zhaoxin.com>
+---
+ drivers/char/hw_random/via-rng.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> The crng_init variable has three states:
-> 
-> 0: The CRNG is not initialized at all
-> 1: The CRNG has a small amount of entropy, hopefully good enough for
->    early-boot, non-cryptographical use cases
-> 2: The CRNG is fully initialized and we are sure it is safe for
->    cryptographic use cases.
-> 
-> The crng_ready() function should only return true once we are in the
-> last state.
-> 
-Do I see that correctly that getrandom(2) will now unblock after the 
-input_pool has obtained 128 bits of entropy? Similarly for 
-get_random_bytes_wait.
-
-As this seems to be the only real use case for crng_ready (apart from 
-logging), what is the purpose of crng_init == 1?
-
-Ciao
-Stephan
+diff --git a/drivers/char/hw_random/via-rng.c b/drivers/char/hw_random/via-rng.c
+index d1f5bb5..d9448b1 100644
+--- a/drivers/char/hw_random/via-rng.c
++++ b/drivers/char/hw_random/via-rng.c
+@@ -135,7 +135,7 @@ static int via_rng_init(struct hwrng *rng)
+ 	 * is always enabled if CPUID rng_en is set.  There is no
+ 	 * RNG configuration like it used to be the case in this
+ 	 * register */
+-	if ((c->x86 == 6) && (c->x86_model >= 0x0f)) {
++	if (((c->x86 == 6) && (c->x86_model >= 0x0f))  || (c->x86 > 6)){
+ 		if (!boot_cpu_has(X86_FEATURE_XSTORE_EN)) {
+ 			pr_err(PFX "can't enable hardware RNG "
+ 				"if XSTORE is not enabled\n");
+-- 
+1.9.1
