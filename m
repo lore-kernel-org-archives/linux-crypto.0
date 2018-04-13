@@ -1,7 +1,7 @@
 From: Theodore Ts'o <tytso@mit.edu>
-Subject: [PATCH 3/5] random: set up the NUMA crng instances after the CRNG is fully initialized
-Date: Thu, 12 Apr 2018 21:30:44 -0400
-Message-ID: <20180413013046.404-3-tytso@mit.edu>
+Subject: [PATCH 5/5] random: add new ioctl RNDRESEEDCRNG
+Date: Thu, 12 Apr 2018 21:30:46 -0400
+Message-ID: <20180413013046.404-5-tytso@mit.edu>
 References: <20180413013046.404-1-tytso@mit.edu>
 Cc: Linux Kernel Developers List <linux-kernel@vger.kernel.org>,
         Theodore Ts'o <tytso@mit.edu>, stable@kernel.org
@@ -11,93 +11,73 @@ In-Reply-To: <20180413013046.404-1-tytso@mit.edu>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Until the primary_crng is fully initialized, don't initialize the NUMA
-crng nodes.  Otherwise users of /dev/urandom on NUMA systems before
-the CRNG is fully initialized can get very bad quality randomness.  Of
-course everyone should move to getrandom(2) where this won't be an
-issue, but there's a lot of legacy code out there.
+Add a new ioctl which forces the the crng to be reseeded.
 
-Reported-by: Jann Horn <jannh@google.com>
-Fixes: 1e7f583af67b ("random: make /dev/urandom scalable for silly...")
-Cc: stable@kernel.org # 4.8+
 Signed-off-by: Theodore Ts'o <tytso@mit.edu>
+Cc: stable@kernel.org
 ---
- drivers/char/random.c | 46 +++++++++++++++++++++++++++-------------------
- 1 file changed, 27 insertions(+), 19 deletions(-)
+ drivers/char/random.c       | 13 ++++++++++++-
+ include/uapi/linux/random.h |  3 +++
+ 2 files changed, 15 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/char/random.c b/drivers/char/random.c
-index 2154a5fe4c81..681ee0c0de24 100644
+index 6e7fa13b1a89..c552431587a7 100644
 --- a/drivers/char/random.c
 +++ b/drivers/char/random.c
-@@ -787,6 +787,32 @@ static void crng_initialize(struct crng_state *crng)
- 	crng->init_time = jiffies - CRNG_RESEED_INTERVAL - 1;
- }
+@@ -429,6 +429,7 @@ struct crng_state primary_crng = {
+ static int crng_init = 0;
+ #define crng_ready() (likely(crng_init > 1))
+ static int crng_init_cnt = 0;
++static unsigned long crng_global_init_time = 0;
+ #define CRNG_INIT_CNT_THRESH (2*CHACHA20_KEY_SIZE)
+ static void _extract_crng(struct crng_state *crng,
+ 			  __u32 out[CHACHA20_BLOCK_WORDS]);
+@@ -933,7 +934,8 @@ static void _extract_crng(struct crng_state *crng,
+ 	unsigned long v, flags;
  
-+#ifdef CONFIG_NUMA
-+static void numa_crng_init(void)
-+{
-+	int i;
-+	struct crng_state *crng;
-+	struct crng_state **pool;
-+
-+	pool = kcalloc(nr_node_ids, sizeof(*pool), GFP_KERNEL|__GFP_NOFAIL);
-+	for_each_online_node(i) {
-+		crng = kmalloc_node(sizeof(struct crng_state),
-+				    GFP_KERNEL | __GFP_NOFAIL, i);
-+		spin_lock_init(&crng->lock);
-+		crng_initialize(crng);
-+		pool[i] = crng;
-+	}
-+	mb();
-+	if (cmpxchg(&crng_node_pool, NULL, pool)) {
-+		for_each_node(i)
-+			kfree(pool[i]);
-+		kfree(pool);
-+	}
-+}
-+#else
-+static int numa_crng_init(void) {}
-+#endif
-+
- /*
-  * crng_fast_load() can be called by code in the interrupt service
-  * path.  So we can't afford to dilly-dally.
-@@ -893,6 +919,7 @@ static void crng_reseed(struct crng_state *crng, struct entropy_store *r)
- 	spin_unlock_irqrestore(&primary_crng.lock, flags);
- 	if (crng == &primary_crng && crng_init < 2) {
- 		invalidate_batched_entropy();
-+		numa_crng_init();
- 		crng_init = 2;
- 		process_random_ready_list();
- 		wake_up_interruptible(&crng_init_wait);
-@@ -1727,28 +1754,9 @@ static void init_std_data(struct entropy_store *r)
-  */
- static int rand_initialize(void)
- {
--#ifdef CONFIG_NUMA
--	int i;
--	struct crng_state *crng;
--	struct crng_state **pool;
--#endif
--
+ 	if (crng_ready() &&
+-	    time_after(jiffies, crng->init_time + CRNG_RESEED_INTERVAL))
++	    (time_after(crng_global_init_time, crng->init_time) ||
++	     time_after(jiffies, crng->init_time + CRNG_RESEED_INTERVAL)))
+ 		crng_reseed(crng, crng == &primary_crng ? &input_pool : NULL);
+ 	spin_lock_irqsave(&crng->lock, flags);
+ 	if (arch_get_random_long(&v))
+@@ -1757,6 +1759,7 @@ static int rand_initialize(void)
  	init_std_data(&input_pool);
  	init_std_data(&blocking_pool);
  	crng_initialize(&primary_crng);
--
--#ifdef CONFIG_NUMA
--	pool = kcalloc(nr_node_ids, sizeof(*pool), GFP_KERNEL|__GFP_NOFAIL);
--	for_each_online_node(i) {
--		crng = kmalloc_node(sizeof(struct crng_state),
--				    GFP_KERNEL | __GFP_NOFAIL, i);
--		spin_lock_init(&crng->lock);
--		crng_initialize(crng);
--		pool[i] = crng;
--	}
--	mb();
--	crng_node_pool = pool;
--#endif
++	crng_global_init_time = jiffies;
  	return 0;
  }
  early_initcall(rand_initialize);
+@@ -1930,6 +1933,14 @@ static long random_ioctl(struct file *f, unsigned int cmd, unsigned long arg)
+ 		input_pool.entropy_count = 0;
+ 		blocking_pool.entropy_count = 0;
+ 		return 0;
++	case RNDRESEEDCRNG:
++		if (!capable(CAP_SYS_ADMIN))
++			return -EPERM;
++		if (crng_init < 2)
++			return -ENODATA;
++		crng_reseed(&primary_crng, NULL);
++		crng_global_init_time = jiffies - 1;
++		return 0;
+ 	default:
+ 		return -EINVAL;
+ 	}
+diff --git a/include/uapi/linux/random.h b/include/uapi/linux/random.h
+index c34f4490d025..26ee91300e3e 100644
+--- a/include/uapi/linux/random.h
++++ b/include/uapi/linux/random.h
+@@ -35,6 +35,9 @@
+ /* Clear the entropy pool and associated counters.  (Superuser only.) */
+ #define RNDCLEARPOOL	_IO( 'R', 0x06 )
+ 
++/* Reseed CRNG.  (Superuser only.) */
++#define RNDRESEEDCRNG	_IO( 'R', 0x07 )
++
+ struct rand_pool_info {
+ 	int	entropy_count;
+ 	int	buf_size;
 -- 
 2.16.1.72.g5be1f00a9a
