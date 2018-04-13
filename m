@@ -1,417 +1,93 @@
-From: Benjamin Warnke <4bwarnke@informatik.uni-hamburg.de>
-Subject: [PATCH v7 2/5] crypto: add zBeWalgo to crypto-api
-Date: Fri, 13 Apr 2018 17:48:37 +0200
-Message-ID: <20180413154840.5901-3-4bwarnke@informatik.uni-hamburg.de>
-References: <20180413154840.5901-1-4bwarnke@informatik.uni-hamburg.de>
-Cc: Benjamin Warnke <4bwarnke@informatik.uni-hamburg.de>
-To: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        minchan@kernel.org, sergey.senozhatsky.work@gmail.com,
-        ngupta@vflare.org, pombredanne@nexb.com, ebiggers3@gmail.com,
-        smueller@chronox.de
+From: "Theodore Y. Ts'o" <tytso@mit.edu>
+Subject: Re: [PATCH 1/5] random: fix crng_ready() test
+Date: Fri, 13 Apr 2018 13:00:37 -0400
+Message-ID: <20180413170037.GA28721@thunk.org>
+References: <20180413013046.404-1-tytso@mit.edu>
+ <1699469.KmO53oa8XU@tauon.chronox.de>
+ <20180413125313.GA2633@thunk.org>
+ <4393662.RPWnPK42dp@tauon.chronox.de>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org,
+        Linux Kernel Developers List <linux-kernel@vger.kernel.org>
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180413154840.5901-1-4bwarnke@informatik.uni-hamburg.de>
+Content-Disposition: inline
+In-Reply-To: <4393662.RPWnPK42dp@tauon.chronox.de>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This patch adds zBeWalgo to the crypto api so that zBeWalgo can be used by
-zram.
+On Fri, Apr 13, 2018 at 03:05:01PM +0200, Stephan Mueller wrote:
+> 
+> What I would like to point out that more and more folks change to 
+> getrandom(2). As this call will now unblock much later in the boot cycle, 
+> these systems see a significant departure from the current system behavior.
+> 
+> E.g. an sshd using getrandom(2) would be ready shortly after the boot finishes 
+> as of now. Now it can be a matter minutes before it responds. Thus, is such 
+> change in the kernel behavior something for stable?
 
-Signed-off-by: Benjamin Warnke <4bwarnke@informatik.uni-hamburg.de>
----
- crypto/Kconfig             |  12 ++++
- crypto/Makefile            |   1 +
- crypto/testmgr.c           |  10 +++
- crypto/testmgr.h           | 134 ++++++++++++++++++++++++++++++++++++
- crypto/zbewalgo.c          | 164 +++++++++++++++++++++++++++++++++++++++++++++
- drivers/block/zram/zcomp.c |   3 +
- 6 files changed, 324 insertions(+)
- create mode 100644 crypto/zbewalgo.c
+It will have some change on the kernel behavior, but not as much as
+you might think.  That's because in older kernels, we were *already*
+blocking until crng_init > 2 --- if the getrandom(2) call happened
+while crng_init was in state 0.
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 76e8c88c..749457a6 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -1686,6 +1686,18 @@ config CRYPTO_LZ4
- 	help
- 	  This is the LZ4 algorithm.
- 
-+config CRYPTO_ZBEWALGO
-+	tristate "zBeWalgo compression algorithm"
-+	select CRYPTO_ALGAPI
-+	select CRYPTO_ACOMP2
-+	select ZBEWALGO_COMPRESS
-+	help
-+	  This is the zBeWalgo compression algorithm. This algorithm
-+	  accepts only input sizes of at most one page at once.
-+	  To achieve high compression ratios zbewalgo can call multiple
-+	  transformation and compression algorithms in a row to optimize
-+	  the compressed size.
-+
- config CRYPTO_LZ4HC
- 	tristate "LZ4HC compression algorithm"
- 	select CRYPTO_ALGAPI
-diff --git a/crypto/Makefile b/crypto/Makefile
-index 4fc69fe9..493cbd65 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -124,6 +124,7 @@ obj-$(CONFIG_CRYPTO_CRCT10DIF) += crct10dif_common.o crct10dif_generic.o
- obj-$(CONFIG_CRYPTO_AUTHENC) += authenc.o authencesn.o
- obj-$(CONFIG_CRYPTO_LZO) += lzo.o
- obj-$(CONFIG_CRYPTO_LZ4) += lz4.o
-+obj-$(CONFIG_CRYPTO_ZBEWALGO) += zbewalgo.o
- obj-$(CONFIG_CRYPTO_LZ4HC) += lz4hc.o
- obj-$(CONFIG_CRYPTO_842) += 842.o
- obj-$(CONFIG_CRYPTO_RNG2) += rng.o
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index af4a01c5..53fd43d1 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -3611,6 +3611,16 @@ static const struct alg_test_desc alg_test_descs[] = {
- 				.dec = __VECS(tf_xts_dec_tv_template)
- 			}
- 		}
-+	}, {
-+		.alg = "zbewalgo",
-+		.test = alg_test_comp,
-+		.fips_allowed = 1,
-+		.suite = {
-+			.comp = {
-+				.comp = __VECS(zbewalgo_comp_tv_template),
-+				.decomp = __VECS(zbewalgo_decomp_tv_template)
-+			}
-+		}
- 	}, {
- 		.alg = "zlib-deflate",
- 		.test = alg_test_comp,
-diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index 004c0a0f..960bfbcf 100644
---- a/crypto/testmgr.h
-+++ b/crypto/testmgr.h
-@@ -37009,6 +37009,140 @@ static const struct hash_testvec bfin_crc_tv_template[] = {
- 
- };
- 
-+static const struct comp_testvec zbewalgo_comp_tv_template[] = {
-+	{
-+		.inlen	= 512,
-+		.outlen	= 402,
-+		.input	=
-+			"\x8a\x3a\xf3\xbe\x33\xf9\xab\x3d\xa1\x51\x9f\x7f\xad\xf6\xab\x3d"
-+			"\xad\x29\x8f\x3c\x27\xf4\xab\x3d\x06\x19\xc3\xf5\xa0\xf1\xab\x3d"
-+			"\xfb\x75\x3b\xab\x1a\xef\xab\x3d\xe3\x96\xf8\x5c\x94\xec\xab\x3d"
-+			"\x13\xd2\xfa\x0a\x0e\xea\xab\x3d\xe0\x7d\x42\xb5\x87\xe7\xab\x3d"
-+			"\xa1\xf0\xcf\x5b\x01\xe5\xab\x3d\xad\x80\xa3\xfe\x7a\xe2\xab\x3d"
-+			"\x59\x84\xbd\x9d\xf4\xdf\xab\x3d\xff\x51\x1e\x39\x6e\xdd\xab\x3d"
-+			"\xf5\x3f\xc6\xd0\xe7\xda\xab\x3d\x96\xa4\xb5\x64\x61\xd8\xab\x3d"
-+			"\x3b\xd6\xec\xf4\xda\xd5\xab\x3d\x3b\x2b\x6c\x81\x54\xd3\xab\x3d"
-+			"\xf2\xf9\x33\x0a\xce\xd0\xab\x3d\xbb\x98\x44\x8f\x47\xce\xab\x3d"
-+			"\xed\x5d\x9e\x10\xc1\xcb\xab\x3d\xe7\x9f\x41\x8e\x3a\xc9\xab\x3d"
-+			"\x07\xb5\x2e\x08\xb4\xc6\xab\x3d\xa9\xf3\x65\x7e\x2d\xc4\xab\x3d"
-+			"\x28\xb2\xe7\xf0\xa6\xc1\xab\x3d\xe3\x46\xb4\x5f\x20\xbf\xab\x3d"
-+			"\x38\x08\xcc\xca\x99\xbc\xab\x3d\x85\x4c\x2f\x32\x13\xba\xab\x3d"
-+			"\x2a\x6a\xde\x95\x8c\xb7\xab\x3d\x85\xb7\xd9\xf5\x05\xb5\xab\x3d"
-+			"\xf7\x8a\x21\x52\x7f\xb2\xab\x3d\xe2\x3a\xb6\xaa\xf8\xaf\xab\x3d"
-+			"\xa5\x1d\x98\xff\x71\xad\xab\x3d\xa3\x89\xc7\x50\xeb\xaa\xab\x3d"
-+			"\x3d\xd5\x44\x9e\x64\xa8\xab\x3d\xd6\x56\x10\xe8\xdd\xa5\xab\x3d"
-+			"\xce\x64\x2a\x2e\x57\xa3\xab\x3d\x8d\x55\x93\x70\xd0\xa0\xab\x3d"
-+			"\x76\x7f\x4b\xaf\x49\x9e\xab\x3d\xeb\x38\x53\xea\xc2\x9b\xab\x3d"
-+			"\x53\xd8\xaa\x21\x3c\x99\xab\x3d\x13\xb4\x52\x55\xb5\x96\xab\x3d"
-+			"\x92\x22\x4b\x85\x2e\x94\xab\x3d\x35\x7a\x94\xb1\xa7\x91\xab\x3d"
-+			"\x65\x11\x2f\xda\x20\x8f\xab\x3d\x86\x3e\x1b\xff\x99\x8c\xab\x3d"
-+			"\x02\x58\x59\x20\x13\x8a\xab\x3d\x41\xb4\xe9\x3d\x8c\x87\xab\x3d"
-+			"\xaf\xa9\xcc\x57\x05\x85\xab\x3d\xb5\x8e\x02\x6e\x7e\x82\xab\x3d"
-+			"\xb9\xb9\x8b\x80\xf7\x7f\xab\x3d\x27\x81\x68\x8f\x70\x7d\xab\x3d"
-+			"\x6a\x3b\x99\x9a\xe9\x7a\xab\x3d\xef\x3e\x1e\xa2\x62\x78\xab\x3d"
-+			"\x20\xe2\xf7\xa5\xdb\x75\xab\x3d\x6a\x7b\x26\xa6\x54\x73\xab\x3d"
-+			"\x3b\x61\xaa\xa2\xcd\x70\xab\x3d\xfe\xe9\x83\x9b\x46\x6e\xab\x3d"
-+			"\x22\x6c\xb3\x90\xbf\x6b\xab\x3d\x16\x3e\x39\x82\x38\x69\xab\x3d"
-+			"\x48\xb6\x15\x70\xb1\x66\xab\x3d\x26\x2b\x49\x5a\x2a\x64\xab\x3d"
-+			"\x23\xf3\xd3\x40\xa3\x61\xab\x3d\xae\x64\xb6\x23\x1c\x5f\xab\x3d"
-+			"\x37\xd6\xf0\x02\x95\x5c\xab\x3d\x30\x9e\x83\xde\x0d\x5a\xab\x3d",
-+		.output	=
-+			"\x02\x02\x07\x02\x07\x00\x00\x00\x0f\x00\x02\x8a\xa1\xad\x06\xfb"
-+			"\xe3\x13\xe0\xa1\xad\x59\xff\xf5\x96\x81\x3b\x7f\xf2\xbb\xed\xe7"
-+			"\x07\xa9\x28\xe3\x38\x85\x2a\x85\xf7\xe2\xa5\xa3\x3d\xd6\xce\x8d"
-+			"\x76\xeb\x53\x13\x92\x35\x65\x86\x02\x41\xaf\xb5\xb9\x27\x6a\xef"
-+			"\x20\x6a\x3b\xfe\x22\x16\x48\x26\x23\xae\x37\x30\x3a\x51\x29\x19"
-+			"\x75\x96\xd2\x7d\xf0\x80\x84\x51\x3f\xa4\xd6\x2b\xf9\x98\x5d\x9f"
-+			"\xb5\xf3\xb2\x46\x08\x4c\x6a\xb7\x8a\x3a\x1d\x89\xd5\x56\x64\x55"
-+			"\x7f\x38\xd8\xb4\x22\x7a\x11\x3e\x58\xb4\xa9\x8e\xb9\x81\x3b\x3e"
-+			"\xe2\x7b\x61\xe9\x6c\x3e\xb6\x2b\xf3\x64\xd6\x9e\xf3\x9f\x8f\xc3"
-+			"\x3b\xf8\xfa\x42\xcf\xa3\xbd\x1e\xc6\xb5\xec\x6c\x7f\x33\x44\x9e"
-+			"\x41\x2e\x65\xe7\xb4\xcc\x2f\xde\xd9\x21\xb6\x98\xc7\x44\x10\x2a"
-+			"\x93\x4b\x53\xaa\x52\x4b\x94\x2f\x1b\x59\xe9\xcc\x02\x8b\x68\x99"
-+			"\x1e\xf7\x26\xaa\x83\xb3\x39\x15\x49\xd3\xb6\xf0\x83\xbe\x7f\x3c"
-+			"\xf5\xab\x5c\x0a\xb5\x5b\xfe\x9d\x39\xd0\x64\xf4\x81\x0a\x8f\x10"
-+			"\x8e\x08\x7e\xf0\x5f\xca\x32\x95\xf5\x52\xaa\xff\x50\x9e\xe8\x2e"
-+			"\x70\xaf\xea\x21\x55\x85\xb1\xda\xff\x20\x3d\x57\x6e\x80\x8f\x9a"
-+			"\xa2\xa5\xa6\xa2\x9b\x90\x82\x70\x5a\x40\x23\x02\xde\x33\xad\x27"
-+			"\xa0\x1a\x94\x0e\x87\x01\x7a\xf4\x6e\xe7\x61\xda\x54\x6f\xce\x47"
-+			"\xc1\x3a\xb4\x2d\xa6\x20\x99\x13\x8c\x05\x7f\xf8\x71\xeb\x64\xdd"
-+			"\x57\xd0\x49\xc2\x3c\xb5\x2e\xa7\x20\x99\x13\x8c\x05\x7e\xf7\x70"
-+			"\xe9\x62\xdb\x54\xcd\x46\xbf\x38\xb1\x2a\xa3\x1c\x95\x0d\xf9\xf6"
-+			"\xf4\xf1\xef\xec\xea\xe7\xe5\xe2\xdf\xdd\xda\xd8\xd5\xd3\xd0\xce"
-+			"\xcb\xc9\xc6\xc4\xc1\xbf\xbc\xba\xb7\xb5\xb2\xaf\xad\xaa\xa8\xa5"
-+			"\xa3\xa0\x9e\x9b\x99\x96\x94\x91\x8f\x8c\x8a\x87\x85\x82\x7f\x7d"
-+			"\x7a\x78\x75\x73\x70\x6e\x6b\x69\x66\x64\x61\x5f\x5c\x5a\xbf\xab"
-+			"\xbf\x3d",
-+	},
-+};
-+
-+static const struct comp_testvec zbewalgo_decomp_tv_template[] = {
-+	{
-+		.inlen	= 402,
-+		.outlen	= 512,
-+		.input	=
-+			"\x02\x02\x07\x02\x07\x00\x00\x00\x0f\x00\x02\x8a\xa1\xad\x06\xfb"
-+			"\xe3\x13\xe0\xa1\xad\x59\xff\xf5\x96\x81\x3b\x7f\xf2\xbb\xed\xe7"
-+			"\x07\xa9\x28\xe3\x38\x85\x2a\x85\xf7\xe2\xa5\xa3\x3d\xd6\xce\x8d"
-+			"\x76\xeb\x53\x13\x92\x35\x65\x86\x02\x41\xaf\xb5\xb9\x27\x6a\xef"
-+			"\x20\x6a\x3b\xfe\x22\x16\x48\x26\x23\xae\x37\x30\x3a\x51\x29\x19"
-+			"\x75\x96\xd2\x7d\xf0\x80\x84\x51\x3f\xa4\xd6\x2b\xf9\x98\x5d\x9f"
-+			"\xb5\xf3\xb2\x46\x08\x4c\x6a\xb7\x8a\x3a\x1d\x89\xd5\x56\x64\x55"
-+			"\x7f\x38\xd8\xb4\x22\x7a\x11\x3e\x58\xb4\xa9\x8e\xb9\x81\x3b\x3e"
-+			"\xe2\x7b\x61\xe9\x6c\x3e\xb6\x2b\xf3\x64\xd6\x9e\xf3\x9f\x8f\xc3"
-+			"\x3b\xf8\xfa\x42\xcf\xa3\xbd\x1e\xc6\xb5\xec\x6c\x7f\x33\x44\x9e"
-+			"\x41\x2e\x65\xe7\xb4\xcc\x2f\xde\xd9\x21\xb6\x98\xc7\x44\x10\x2a"
-+			"\x93\x4b\x53\xaa\x52\x4b\x94\x2f\x1b\x59\xe9\xcc\x02\x8b\x68\x99"
-+			"\x1e\xf7\x26\xaa\x83\xb3\x39\x15\x49\xd3\xb6\xf0\x83\xbe\x7f\x3c"
-+			"\xf5\xab\x5c\x0a\xb5\x5b\xfe\x9d\x39\xd0\x64\xf4\x81\x0a\x8f\x10"
-+			"\x8e\x08\x7e\xf0\x5f\xca\x32\x95\xf5\x52\xaa\xff\x50\x9e\xe8\x2e"
-+			"\x70\xaf\xea\x21\x55\x85\xb1\xda\xff\x20\x3d\x57\x6e\x80\x8f\x9a"
-+			"\xa2\xa5\xa6\xa2\x9b\x90\x82\x70\x5a\x40\x23\x02\xde\x33\xad\x27"
-+			"\xa0\x1a\x94\x0e\x87\x01\x7a\xf4\x6e\xe7\x61\xda\x54\x6f\xce\x47"
-+			"\xc1\x3a\xb4\x2d\xa6\x20\x99\x13\x8c\x05\x7f\xf8\x71\xeb\x64\xdd"
-+			"\x57\xd0\x49\xc2\x3c\xb5\x2e\xa7\x20\x99\x13\x8c\x05\x7e\xf7\x70"
-+			"\xe9\x62\xdb\x54\xcd\x46\xbf\x38\xb1\x2a\xa3\x1c\x95\x0d\xf9\xf6"
-+			"\xf4\xf1\xef\xec\xea\xe7\xe5\xe2\xdf\xdd\xda\xd8\xd5\xd3\xd0\xce"
-+			"\xcb\xc9\xc6\xc4\xc1\xbf\xbc\xba\xb7\xb5\xb2\xaf\xad\xaa\xa8\xa5"
-+			"\xa3\xa0\x9e\x9b\x99\x96\x94\x91\x8f\x8c\x8a\x87\x85\x82\x7f\x7d"
-+			"\x7a\x78\x75\x73\x70\x6e\x6b\x69\x66\x64\x61\x5f\x5c\x5a\xbf\xab"
-+			"\xbf\x3d",
-+		.output	=
-+			"\x8a\x3a\xf3\xbe\x33\xf9\xab\x3d\xa1\x51\x9f\x7f\xad\xf6\xab\x3d"
-+			"\xad\x29\x8f\x3c\x27\xf4\xab\x3d\x06\x19\xc3\xf5\xa0\xf1\xab\x3d"
-+			"\xfb\x75\x3b\xab\x1a\xef\xab\x3d\xe3\x96\xf8\x5c\x94\xec\xab\x3d"
-+			"\x13\xd2\xfa\x0a\x0e\xea\xab\x3d\xe0\x7d\x42\xb5\x87\xe7\xab\x3d"
-+			"\xa1\xf0\xcf\x5b\x01\xe5\xab\x3d\xad\x80\xa3\xfe\x7a\xe2\xab\x3d"
-+			"\x59\x84\xbd\x9d\xf4\xdf\xab\x3d\xff\x51\x1e\x39\x6e\xdd\xab\x3d"
-+			"\xf5\x3f\xc6\xd0\xe7\xda\xab\x3d\x96\xa4\xb5\x64\x61\xd8\xab\x3d"
-+			"\x3b\xd6\xec\xf4\xda\xd5\xab\x3d\x3b\x2b\x6c\x81\x54\xd3\xab\x3d"
-+			"\xf2\xf9\x33\x0a\xce\xd0\xab\x3d\xbb\x98\x44\x8f\x47\xce\xab\x3d"
-+			"\xed\x5d\x9e\x10\xc1\xcb\xab\x3d\xe7\x9f\x41\x8e\x3a\xc9\xab\x3d"
-+			"\x07\xb5\x2e\x08\xb4\xc6\xab\x3d\xa9\xf3\x65\x7e\x2d\xc4\xab\x3d"
-+			"\x28\xb2\xe7\xf0\xa6\xc1\xab\x3d\xe3\x46\xb4\x5f\x20\xbf\xab\x3d"
-+			"\x38\x08\xcc\xca\x99\xbc\xab\x3d\x85\x4c\x2f\x32\x13\xba\xab\x3d"
-+			"\x2a\x6a\xde\x95\x8c\xb7\xab\x3d\x85\xb7\xd9\xf5\x05\xb5\xab\x3d"
-+			"\xf7\x8a\x21\x52\x7f\xb2\xab\x3d\xe2\x3a\xb6\xaa\xf8\xaf\xab\x3d"
-+			"\xa5\x1d\x98\xff\x71\xad\xab\x3d\xa3\x89\xc7\x50\xeb\xaa\xab\x3d"
-+			"\x3d\xd5\x44\x9e\x64\xa8\xab\x3d\xd6\x56\x10\xe8\xdd\xa5\xab\x3d"
-+			"\xce\x64\x2a\x2e\x57\xa3\xab\x3d\x8d\x55\x93\x70\xd0\xa0\xab\x3d"
-+			"\x76\x7f\x4b\xaf\x49\x9e\xab\x3d\xeb\x38\x53\xea\xc2\x9b\xab\x3d"
-+			"\x53\xd8\xaa\x21\x3c\x99\xab\x3d\x13\xb4\x52\x55\xb5\x96\xab\x3d"
-+			"\x92\x22\x4b\x85\x2e\x94\xab\x3d\x35\x7a\x94\xb1\xa7\x91\xab\x3d"
-+			"\x65\x11\x2f\xda\x20\x8f\xab\x3d\x86\x3e\x1b\xff\x99\x8c\xab\x3d"
-+			"\x02\x58\x59\x20\x13\x8a\xab\x3d\x41\xb4\xe9\x3d\x8c\x87\xab\x3d"
-+			"\xaf\xa9\xcc\x57\x05\x85\xab\x3d\xb5\x8e\x02\x6e\x7e\x82\xab\x3d"
-+			"\xb9\xb9\x8b\x80\xf7\x7f\xab\x3d\x27\x81\x68\x8f\x70\x7d\xab\x3d"
-+			"\x6a\x3b\x99\x9a\xe9\x7a\xab\x3d\xef\x3e\x1e\xa2\x62\x78\xab\x3d"
-+			"\x20\xe2\xf7\xa5\xdb\x75\xab\x3d\x6a\x7b\x26\xa6\x54\x73\xab\x3d"
-+			"\x3b\x61\xaa\xa2\xcd\x70\xab\x3d\xfe\xe9\x83\x9b\x46\x6e\xab\x3d"
-+			"\x22\x6c\xb3\x90\xbf\x6b\xab\x3d\x16\x3e\x39\x82\x38\x69\xab\x3d"
-+			"\x48\xb6\x15\x70\xb1\x66\xab\x3d\x26\x2b\x49\x5a\x2a\x64\xab\x3d"
-+			"\x23\xf3\xd3\x40\xa3\x61\xab\x3d\xae\x64\xb6\x23\x1c\x5f\xab\x3d"
-+			"\x37\xd6\xf0\x02\x95\x5c\xab\x3d\x30\x9e\x83\xde\x0d\x5a\xab\x3d",
-+	},
-+};
-+
- static const struct comp_testvec lz4_comp_tv_template[] = {
- 	{
- 		.inlen	= 255,
-diff --git a/crypto/zbewalgo.c b/crypto/zbewalgo.c
-new file mode 100644
-index 00000000..044b8811
---- /dev/null
-+++ b/crypto/zbewalgo.c
-@@ -0,0 +1,164 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Copyright (c) 2018 Benjamin Warnke <4bwarnke@informatik.uni-hamburg.de>
-+ */
-+
-+#include <crypto/internal/scompress.h>
-+#include <linux/crypto.h>
-+#include <linux/delay.h>
-+#include <linux/init.h>
-+#include <linux/module.h>
-+#include <linux/vmalloc.h>
-+#include <linux/zbewalgo.h>
-+
-+struct zbewalgo_ctx {
-+	void *zbewalgo_comp_mem;
-+};
-+
-+static void *zbewalgo_alloc_ctx(struct crypto_scomp *tfm)
-+{
-+	void *ctx;
-+
-+	ctx = vmalloc(zbewalgo_get_wrkmem_size());
-+	if (!ctx)
-+		return ERR_PTR(-ENOMEM);
-+	return ctx;
-+}
-+
-+static int zbewalgo_init(struct crypto_tfm *tfm)
-+{
-+	struct zbewalgo_ctx *ctx = crypto_tfm_ctx(tfm);
-+
-+	ctx->zbewalgo_comp_mem = zbewalgo_alloc_ctx(NULL);
-+	if (IS_ERR(ctx->zbewalgo_comp_mem))
-+		return -ENOMEM;
-+	return 0;
-+}
-+
-+static void zbewalgo_free_ctx(struct crypto_scomp *tfm, void *ctx)
-+{
-+	vfree(ctx);
-+}
-+
-+static void zbewalgo_exit(struct crypto_tfm *tfm)
-+{
-+	struct zbewalgo_ctx *ctx = crypto_tfm_ctx(tfm);
-+
-+	zbewalgo_free_ctx(NULL, ctx->zbewalgo_comp_mem);
-+}
-+
-+static int __zbewalgo_compress_crypto(const u8 *src, unsigned int slen,
-+				      u8 *dst, unsigned int *dlen, void *ctx)
-+{
-+	int out_len;
-+
-+	if (slen > 4096)
-+		return -EINVAL;
-+	out_len = zbewalgo_compress(src, dst, ctx, slen);
-+	if (!out_len)
-+		return -EINVAL;
-+	*dlen = out_len;
-+	return 0;
-+}
-+
-+static int zbewalgo_scompress(struct crypto_scomp *tfm, const u8 *src,
-+			      unsigned int slen, u8 *dst, unsigned int *dlen,
-+			      void *ctx)
-+{
-+	return __zbewalgo_compress_crypto(src, slen, dst, dlen, ctx);
-+}
-+
-+static int zbewalgo_compress_crypto(struct crypto_tfm *tfm, const u8 *src,
-+				    unsigned int slen, u8 *dst,
-+				    unsigned int *dlen)
-+{
-+	struct zbewalgo_ctx *ctx = crypto_tfm_ctx(tfm);
-+
-+	return __zbewalgo_compress_crypto(src, slen, dst, dlen,
-+		ctx->zbewalgo_comp_mem);
-+}
-+
-+static int __zbewalgo_decompress_crypto(const u8 *src, unsigned int slen,
-+					u8 *dst, unsigned int *dlen, void *ctx)
-+{
-+	int out_len;
-+
-+	out_len = zbewalgo_decompress_safe(src, dst, ctx, slen);
-+	if (out_len < 0)
-+		return -EINVAL;
-+	*dlen = out_len;
-+	return 0;
-+}
-+
-+static int zbewalgo_sdecompress(struct crypto_scomp *tfm, const u8 *src,
-+				unsigned int slen, u8 *dst, unsigned int *dlen,
-+				void *ctx)
-+{
-+	return __zbewalgo_decompress_crypto(src, slen, dst, dlen, ctx);
-+}
-+
-+static int zbewalgo_decompress_crypto(struct crypto_tfm *tfm, const u8 *src,
-+				      unsigned int slen, u8 *dst,
-+				      unsigned int *dlen)
-+{
-+	struct zbewalgo_ctx *ctx = crypto_tfm_ctx(tfm);
-+
-+	return __zbewalgo_decompress_crypto(src, slen, dst, dlen,
-+		ctx->zbewalgo_comp_mem);
-+}
-+
-+static struct crypto_alg crypto_alg_zbewalgo = {
-+	.cra_name = "zbewalgo",
-+	.cra_flags = CRYPTO_ALG_TYPE_COMPRESS,
-+	.cra_ctxsize = sizeof(struct zbewalgo_ctx),
-+	.cra_module = THIS_MODULE,
-+	.cra_init = zbewalgo_init,
-+	.cra_exit = zbewalgo_exit,
-+	.cra_u = {
-+		.compress = {
-+			.coa_compress = zbewalgo_compress_crypto,
-+			.coa_decompress = zbewalgo_decompress_crypto
-+		}
-+	}
-+};
-+
-+static struct scomp_alg scomp = {
-+	.alloc_ctx = zbewalgo_alloc_ctx,
-+	 .free_ctx = zbewalgo_free_ctx,
-+	 .compress = zbewalgo_scompress,
-+	 .decompress = zbewalgo_sdecompress,
-+	 .base = {
-+		 .cra_name = "zbewalgo",
-+		 .cra_driver_name = "zbewalgo-scomp",
-+		 .cra_module = THIS_MODULE,
-+	}
-+};
-+
-+static int __init zbewalgo_mod_init(void)
-+{
-+	int ret;
-+
-+	ret = crypto_register_alg(&crypto_alg_zbewalgo);
-+	if (ret)
-+		return ret;
-+	ret = crypto_register_scomp(&scomp);
-+	if (ret) {
-+		crypto_unregister_alg(&crypto_alg_zbewalgo);
-+		return ret;
-+	}
-+	return ret;
-+}
-+
-+static void __exit zbewalgo_mod_fini(void)
-+{
-+	crypto_unregister_alg(&crypto_alg_zbewalgo);
-+	crypto_unregister_scomp(&scomp);
-+}
-+
-+module_init(zbewalgo_mod_init);
-+module_exit(zbewalgo_mod_fini);
-+
-+MODULE_AUTHOR("Benjamin Warnke <4bwarnke@informatik.uni-hamburg.de>");
-+MODULE_LICENSE("GPL v2");
-+MODULE_DESCRIPTION("zBeWalgo Compression Algorithm");
-+MODULE_ALIAS_CRYPTO("zbewalgo");
-diff --git a/drivers/block/zram/zcomp.c b/drivers/block/zram/zcomp.c
-index 4ed0a78f..15b3a016 100644
---- a/drivers/block/zram/zcomp.c
-+++ b/drivers/block/zram/zcomp.c
-@@ -23,6 +23,9 @@ static const char * const backends[] = {
- #if IS_ENABLED(CONFIG_CRYPTO_LZ4)
- 	"lz4",
- #endif
-+#if IS_ENABLED(CONFIG_CRYPTO_ZBEWALGO)
-+	"zbewalgo",
-+#endif
- #if IS_ENABLED(CONFIG_CRYPTO_LZ4HC)
- 	"lz4hc",
- #endif
--- 
-2.14.1
+Even before this patch series, we didn't wake up a process blocked on
+crng_init_wait until crng_init state 2 is reached:
+
+static void crng_reseed(struct crng_state *crng, struct entropy_store *r)
+{
+	...
+	if (crng == &primary_crng && crng_init < 2) {
+		invalidate_batched_entropy();
+		crng_init = 2;
+		process_random_ready_list();
+		wake_up_interruptible(&crng_init_wait);
+		pr_notice("random: crng init done\n");
+	}
+}
+
+This is the reason why there are reports like this: "Boot delayed for
+about 90 seconds until 'random: crng init done'"[1]
+
+[1] https://bugs.launchpad.net/ubuntu/+source/linux/+bug/1685794
+
+
+So we have the problem already.  There will be more cases of this
+after this patch series is applied, true.  But what we have already is
+an inconsistent state where if you call getrandom(2) while the kernel
+is in crng_init state 0, you will block until crng_init state 2, but
+if you are in crng_init state 1, you will assume the CRNG is fully
+initialized.
+
+Given the documentation of how getrandom(2) works what its documented
+guarantees are, I think it does justify making its behavior both more
+consistent with itself, and more consistent what the security
+guarantees we have promised people.
+
+I was a little worried that on VM's this could end up causing things
+to block for a long time, but an experiment on a GCE VM shows that
+isn't a problem:
+
+[    0.000000] Linux version 4.16.0-rc3-ext4-00009-gf6b302ebca85 (tytso@cwcc) (gcc version 7.3.0 (Debian 7.3.0-15)) #16 SMP Thu Apr 12 16:57:17 EDT 2018
+[    1.282220] random: fast init done
+[    3.987092] random: crng init done
+[    4.376787] EXT4-fs (sda1): re-mounted. Opts: (null)
+
+There are some desktops where the "crng_init done" report doesn't
+happen until 45-90 seconds into the boot.  I don't think I've seen
+reports where it takes _minutes_ however.  Can you give me some
+examples of such cases?
+
+					- Ted
+
+P.S.  Of course, in a VM environment, if the host supports virtio-rng,
+the boot delay problem is completely not an issue.  You just have to
+enable virtio-rng in the guest kernel, which I believe is already the
+case for most distro kernels.
+
+BTW, for KVM, it's fairly simple to set it the host-side support for
+virtio-rng.  Just add to the kvm command-line options:
+
+    -object rng-random,filename=/dev/urandom,id=rng0 \
+	-device virtio-rng-pci,rng=rng0
