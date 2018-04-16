@@ -1,8 +1,8 @@
-From: Yann Collet <cyan@fb.com>
+From: Eric Biggers <ebiggers3@gmail.com>
 Subject: Re: [PATCH 0/1] cover-letter/lz4: Implement lz4 with dynamic offset
  length.
-Date: Mon, 16 Apr 2018 19:34:29 +0000
-Message-ID: <74EB06AE-E1CA-4B06-9935-596DCFAC951C@fb.com>
+Date: Mon, 16 Apr 2018 13:01:18 -0700
+Message-ID: <20180416200118.GA10051@gmail.com>
 References: <20180329102613epcms5p6ffaa80d12115ded8f3c9ef01dd009744@epcms5p6>
  <20180329102046epcms5p8ecc9532b03bab4f47cbdbb2507171b86@epcms5p8>
  <20180323134319epcms5p62e6021aa33c941c46ecdb8b5364b614c@epcms5p6>
@@ -11,10 +11,16 @@ References: <20180329102613epcms5p6ffaa80d12115ded8f3c9ef01dd009744@epcms5p6>
  <20180321082628.GB2746@jagdpanzerIV>
  <CGME20180321044137epcas5p221e7ee4a0b7464eaa00dad8320f0251d@epcms5p4>
  <20180416102138epcms5p429e04b68b94dcf80cd84f7008467ed68@epcms5p4>
+ <74EB06AE-E1CA-4B06-9935-596DCFAC951C@fb.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: "davem@davemloft.net" <davem@davemloft.net>,
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Cc: "maninder1.s@samsung.com" <maninder1.s@samsung.com>,
+        Vaneet Narang <v.narang@samsung.com>,
+        Nick Terrell <terrelln@fb.com>,
+        Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "davem@davemloft.net" <davem@davemloft.net>,
         "minchan@kernel.org" <minchan@kernel.org>,
         "ngupta@vflare.org" <ngupta@vflare.org>,
         Kees Cook <keescook@chromium.org>,
@@ -25,130 +31,86 @@ Cc: "davem@davemloft.net" <davem@davemloft.net>,
         "colin.king@canonical.com" <colin.king@canonical.com>,
         "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        PANKAJ MISHRA <pankaj.m@samsung.com>,
-        "AMIT SAHRAWAT" <a.sahrawat@samsung.com>,
-        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>
-To: "maninder1.s@samsung.com" <maninder1.s@samsung.com>,
-        Vaneet Narang <v.narang@samsung.com>,
-        Nick Terrell <terrelln@fb.com>,
-        Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>
+To: Yann Collet <cyan@fb.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180416102138epcms5p429e04b68b94dcf80cd84f7008467ed68@epcms5p4>
-Content-Language: en-US
-Content-ID: <6CCA283B630AC94DAD39499E415F0E9B@namprd15.prod.outlook.com>
+Content-Disposition: inline
+In-Reply-To: <74EB06AE-E1CA-4B06-9935-596DCFAC951C@fb.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-SGkgU2luZ2gNCg0KSSBkb24ndCBoYXZlIGFueSBzdHJvbmcgb3BpbmlvbiBvbiB0aGlzIHRvcGlj
-Lg0KDQpZb3UgbWFkZSB5b3VyIGNhc2UgY2xlYXI6IA0KeW91ciB2YXJpYW50IHRyYWRlcyBhIGxp
-dHRsZSBiaXQgb2Ygc3BlZWQgZm9yIGEgbGl0dGxlIGJpdCBtb3JlIGNvbXByZXNzaW9uIHJhdGlv
-Lg0KSW4gdGhlIGNvbnRleHQgb2YgenJhbSwgaXQgbWFrZXMgc2Vuc2UsIGFuZCBJIHdvdWxkIGV4
-cGVjdCBpdCB0byB3b3JrLCBhcyBhZHZlcnRpc2VkIGluIHlvdXIgYmVuY2htYXJrIHJlc3VsdHMu
-DQooZGlzY2xhaW1lcjogSSBoYXZlbid0IHJlcHJvZHVjZWQgdGhlc2UgcmVzdWx0cywganVzdCwg
-dGhleSBsb29rIHJlYXNvbmFibGUgdG8gbWUsIEkgaGF2ZSBubyByZWFzb24gdG8gZG91YnQgdGhl
-bSkuDQoNClNvLCB0aGUgaXNzdWUgaXMgbGVzcyBhYm91dCBwZXJmb3JtYW5jZSwgdGhhbiBhYm91
-dCBjb2RlIGNvbXBsZXhpdHkuDQoNCkFzIG1lbnRpb25lZCwgdGhpcyBpcyBhbiBpbmNvbXBhdGli
-bGUgdmFyaWFudC4NClNvLCBpdCByZXF1aXJlcyBpdHMgb3duIGVudHJ5IHBvaW50LCBhbmQgcHJl
-ZmVyYWJseSBpdHMgb3duIGNvZGUgcGF0aA0KKGV2ZW4gaWYgaXQncyBoZWF2aWx5IGR1cGxpY2F0
-ZWQsDQptaXhpbmcgaXQgd2l0aCByZWd1bGFyIGx6NCBzb3VyY2UgY29kZSwgYXMgcHJvcG9zZWQg
-aW4gdGhlIHBhdGNoLCB3aWxsIGJlIGJhZCBmb3IgbWFpbnRlbmFuY2UsIA0KYW5kIGNhbiBuZWdh
-dGl2ZWx5IGltcGFjdCByZWd1bGFyIGx6NCB1c2FnZSwgb3V0c2lkZSBvZiB6cmFtKS4NCg0KU28g
-dGhhdCdzIGJhc2ljYWxseSB0aGUgImNvc3QiIG9mIGFkZGluZyB0aGlzIG9wdGlvbi4NCg0KSXMg
-aXQgd29ydGggaXQ/DQpXZWxsLCB0aGlzIGlzIGNvbXBsZXRlbHkgb3V0c2lkZSBvZiBteSByZXNw
-b25zaWJpbGl0eSBhcmVhLCBzbyBJIHJlYWxseSBjYW4ndCB0ZWxsLg0KWW91J2xsIGhhdmUgdG8g
-Y29udmluY2UgcGVvcGxlIGluIGNoYXJnZSB0aGF0IHRoZSBnYWlucyBhcmUgd29ydGggdGhlaXIg
-Y29tcGxleGl0eSwNCnNpbmNlIF90aGV5XyB3aWxsIGluaGVyaXQgdGhlIGR1dHkgdG8ga2VlcCB0
-aGUgc3lzdGVtIHdvcmtpbmcgdGhyb3VnaCBpdHMgZnV0dXJlIGV2b2x1dGlvbnMuDQpBdCBhIG1p
-bmltdW0sIHlvdSBhcmUgdGFyZ2V0aW5nIG1haW50YWluZXJzIG9mIHpyYW0gYW5kIHRoZSBjcnlw
-dG8gaW50ZXJmYWNlLg0KRm9yIHRoaXMgdG9waWMsIHRoZXkgYXJlIHRoZSByaWdodCBwZW9wbGUg
-dG8gdGFsayB0by4NCg0KDQrvu79PbiA0LzE2LzE4LCAwNDowOSwgIk1hbmluZGVyIFNpbmdoIiA8
-bWFuaW5kZXIxLnNAc2Ftc3VuZy5jb20+IHdyb3RlOg0KDQogICAgDQogICAgIEhlbGxvIE5pY2sv
-IFlhbm4sDQogICAgDQogICAgQW55IGlucHV0cyByZWdhcmRpbmcgTFo0IGR5biByZXN1bHRzICYg
-bHo0IGR5biBhcHByb2FjaC4NCiAgICANCiAgICA+SGVsbG8gTmljay9TZXJnZXksDQogICAgPiAN
-CiAgICA+QW55IHN1Z2dlc3Rpb24gb3IgY29tbWVudHMsIHNvIHRoYXQgd2UgY2FuIGNoYW5nZSBj
-b2RlIGFuZCByZXNlbmQgdGhlIHBhdGNoPw0KICAgID4gDQogICAgPj4gSGkgTmljayAvIFNlcmdl
-eSwNCiAgICA+PiANCiAgICA+PiANCiAgICA+PiBXZSBoYXZlIGNvbXBhcmVkIExaNCBEeW4gd2l0
-aCBPcmlnaW5hbCBMWjQgdXNpbmcgc29tZSBzYW1wbGVzIG9mIHJlYWx0aW1lIGFwcGxpY2F0aW9u
-IGRhdGEoNEtiKQ0KICAgID4+IGNvbXByZXNzZWQvZGVjb21wcmVzc2VkIGJ5IFpSQU0uIEZvciBj
-b21wYXJpc29uIHdlIGhhdmUgdXNlZCBsemJlbmNoIChodHRwczovL2dpdGh1Yi5jb20vaW5pa2Vw
-L2x6YmVuY2gpDQogICAgPj4gd2UgaGF2ZSBpbXBsZW1lbnRlZCBkZWRpY2F0ZWQgTFo0IER5biBB
-UEkgJiBrZXB0IGxhc3QgbGl0ZXJhbCBsZW5ndGggYXMgNiB0byBhdm9pZCBvdmVyaGVhZCANCiAg
-ICA+PiBvZiBjaGVja3MuIEl0IHNlZW1zIGluIGF2ZXJhZ2UgY2FzZSB0aGVyZSBpcyBhIHNhdmlu
-ZyBvZiAzfjQlIGluIGNvbXByZXNzaW9uIHJhdGlvIHdpdGggYWxtb3N0IHNhbWUgY29tcHJlc3Np
-b24NCiAgICA+PiBzcGVlZCBhbmQgbWlub3IgbG9zcyBpbiBkZWNvbXByZXNzaW9uIHNwZWVkICh+
-NTBNQi9zKSB3aGVuIGNvbXBhcmVkIHdpdGggTFo0Lg0KICAgID4+IA0KICAgID4+IENvbXBhcmlz
-b24gb2YgTHo0IER5biB3aXRoIExaTzF4IGlzIGFsc28gZG9uZSBhcyBMWk8xeCBpcyBkZWZhdWx0
-IGNvbXByZXNzb3Igb2YgWlJBTS4NCiAgICA+PiANCiAgICA+PiBPcmlnaW5hbCBMWjQ6DQogICAg
-Pj4gc2gtMy4yIyAuL2x6YmVuY2ggIC1yICAtZWx6NCAgZGF0YS8NCiAgICA+PiBsemJlbmNoIDEu
-Ny4zICgzMi1iaXQgTGludXgpICAgQXNzZW1ibGVkIGJ5IFAuU2tpYmluc2tpDQogICAgPj4gQ29t
-cHJlc3NvciBuYW1lICAgICAgICAgQ29tcHJlc3MuIERlY29tcHJlc3MuIENvbXByLiBzaXplICBS
-YXRpbyBGaWxlbmFtZQ0KICAgID4+IG1lbWNweSAgICAgICAgICAgICAgICAgICAyMjA1IE1CL3Mg
-IDIyMTcgTUIvcyAgICAgICAgNDA5NiAxMDAuMDAgZGF0YS8vZGF0YV8xDQogICAgPj4gbHo0IDEu
-OC4wICAgICAgICAgICAgICAgICAyMTYgTUIvcyAgIDc2MSBNQi9zICAgICAgICAyNDMzICA1OS40
-MCBkYXRhLy9kYXRhXzENCiAgICA+PiBsejQgMS44LjAgICAgICAgICAgICAgICAgIDI2OSBNQi9z
-ICAgODc3IE1CL3MgICAgICAgIDE4NzMgIDQ1LjczIGRhdGEvL2RhdGFfMg0KICAgID4+IGx6NCAx
-LjguMCAgICAgICAgICAgICAgICAgMjM4IE1CL3MgICA1NzUgTUIvcyAgICAgICAgMjA2MCAgNTAu
-MjkgZGF0YS8vZGF0YV8zDQogICAgPj4gbHo0IDEuOC4wICAgICAgICAgICAgICAgICAzMjEgTUIv
-cyAgMTAxNSBNQi9zICAgICAgICAxNDY0ICAzNS43NCBkYXRhLy9kYXRhXzQNCiAgICA+PiBsejQg
-MS44LjAgICAgICAgICAgICAgICAgIDQ2NCBNQi9zICAxMDkwIE1CL3MgICAgICAgICA3MTMgIDE3
-LjQxIGRhdGEvL2RhdGFfNQ0KICAgID4+IGx6NCAxLjguMCAgICAgICAgICAgICAgICAgMjk2IE1C
-L3MgICA5NTYgTUIvcyAgICAgICAgMTU5NyAgMzguOTkgZGF0YS8vZGF0YV82DQogICAgPj4gbHo0
-IDEuOC4wICAgICAgICAgICAgICAgICAzMzggTUIvcyAgIDk5NCBNQi9zICAgICAgICAyMjM4ICA1
-NC42NCBkYXRhLy9kYXRhXzcNCiAgICA+PiBsejQgMS44LjAgICAgICAgICAgICAgICAgIDcwNSBN
-Qi9zICAxMTcyIE1CL3MgICAgICAgICAxOTMgICA0LjcxIGRhdGEvL2RhdGFfOA0KICAgID4+IGx6
-NCAxLjguMCAgICAgICAgICAgICAgICAgNDA0IE1CL3MgIDExNTAgTUIvcyAgICAgICAgMTA5NyAg
-MjYuNzggZGF0YS8vZGF0YV85DQogICAgPj4gbHo0IDEuOC4wICAgICAgICAgICAgICAgICAyMTYg
-TUIvcyAgIDkyMSBNQi9zICAgICAgICAzMTgzICA3Ny43MSBkYXRhLy9kYXRhXzEwDQogICAgPj4g
-bHo0IDEuOC4wICAgICAgICAgICAgICAgICA0NTYgTUIvcyAgMTEwMSBNQi9zICAgICAgICAxMDEx
-ICAyNC42OCBkYXRhLy9kYXRhXzExDQogICAgPj4gbHo0IDEuOC4wICAgICAgICAgICAgICAgICA4
-NjcgTUIvcyAgMTIwMiBNQi9zICAgICAgICAgIDM3ICAgMC45MCBkYXRhLy9kYXRhXzEyDQogICAg
-Pj4gDQogICAgPj4gDQogICAgPj4gTFo0IER5bmFtaWMgT2ZmZXQ6ICANCiAgICA+PiBzaC0zLjIj
-IC4vbHpiZW5jaCAgLXIgIC1lbHo0X2R5biAgZGF0YS8NCiAgICA+PiBsemJlbmNoIDEuNy4zICgz
-Mi1iaXQgTGludXgpICAgQXNzZW1ibGVkIGJ5IFAuU2tpYmluc2tpDQogICAgPj4gQ29tcHJlc3Nv
-ciBuYW1lICAgICAgICAgQ29tcHJlc3MuIERlY29tcHJlc3MuIENvbXByLiBzaXplICBSYXRpbyBG
-aWxlbmFtZQ0KICAgID4+IG1lbWNweSAgICAgICAgICAgICAgICAgICAyMjAzIE1CL3MgIDIyMTgg
-TUIvcyAgICAgICAgNDA5NiAxMDAuMDAgZGF0YS8vZGF0YV8xDQogICAgPj4gbHo0IDEuOC4wICAg
-ICAgICAgICAgICAgICAyMTggTUIvcyAgIDY5MyBNQi9zICAgICAgICAyMjI4ICA1NC4zOSBkYXRh
-Ly9kYXRhXzENCiAgICA+PiBsejQgMS44LjAgICAgICAgICAgICAgICAgIDI3MyBNQi9zICAgODUx
-IE1CL3MgICAgICAgIDE3MzkgIDQyLjQ2IGRhdGEvL2RhdGFfMg0KICAgID4+IGx6NCAxLjguMCAg
-ICAgICAgICAgICAgICAgMjMwIE1CL3MgICA1MjYgTUIvcyAgICAgICAgMTgwMCAgNDMuOTUgZGF0
-YS8vZGF0YV8zDQogICAgPj4gbHo0IDEuOC4wICAgICAgICAgICAgICAgICAzMjEgTUIvcyAgIDk1
-MiBNQi9zICAgICAgICAxMzU3ICAzMy4xMyBkYXRhLy9kYXRhXzQNCiAgICA+PiBsejQgMS44LjAg
-ICAgICAgICAgICAgICAgIDQ3MCBNQi9zICAxMDc1IE1CL3MgICAgICAgICA2NjQgIDE2LjIxIGRh
-dGEvL2RhdGFfNQ0KICAgID4+IGx6NCAxLjguMCAgICAgICAgICAgICAgICAgMzAzIE1CL3MgICA5
-NjQgTUIvcyAgICAgICAgMTQ1NSAgMzUuNTIgZGF0YS8vZGF0YV82DQogICAgPj4gbHo0IDEuOC4w
-ICAgICAgICAgICAgICAgICAzNDUgTUIvcyAgIDk1MSBNQi9zICAgICAgICAyMTI2ICA1MS45MCBk
-YXRhLy9kYXRhXzcNCiAgICA+PiBsejQgMS44LjAgICAgICAgICAgICAgICAgIDc0NCBNQi9zICAx
-MTYzIE1CL3MgICAgICAgICAxNzcgICA0LjMyIGRhdGEvL2RhdGFfOA0KICAgID4+IGx6NCAxLjgu
-MCAgICAgICAgICAgICAgICAgNDA5IE1CL3MgIDEyNTcgTUIvcyAgICAgICAgMTAzMyAgMjUuMjIg
-ZGF0YS8vZGF0YV85DQogICAgPj4gbHo0IDEuOC4wICAgICAgICAgICAgICAgICAyMjAgTUIvcyAg
-IDg1NyBNQi9zICAgICAgICAzMDQ5ICA3NC40NCBkYXRhLy9kYXRhXzEwDQogICAgPj4gbHo0IDEu
-OC4wICAgICAgICAgICAgICAgICA0NjQgTUIvcyAgMTEwNSBNQi9zICAgICAgICAgOTM0ICAyMi44
-MCBkYXRhLy9kYXRhXzExDQogICAgPj4gbHo0IDEuOC4wICAgICAgICAgICAgICAgICA4NzQgTUIv
-cyAgMTE5NCBNQi9zICAgICAgICAgIDM2ICAgMC44OCBkYXRhLy9kYXRhXzEyDQogICAgPj4gDQog
-ICAgPj4gDQogICAgPj4gTFo0IER5bmFtaWMgT2Zmc2V0IHdpdGggMzJLIGRhdGE6DQogICAgPj4g
-c2gtMy4yIyAuL2x6YmVuY2ggLWVsejRfZHluIGRhdGEvZGF0YTMyaw0KICAgID4+IGx6YmVuY2gg
-MS43LjMgKDMyLWJpdCBMaW51eCkgICBBc3NlbWJsZWQgYnkgUC5Ta2liaW5za2kNCiAgICA+PiBD
-b21wcmVzc29yIG5hbWUgICAgICAgICBDb21wcmVzcy4gRGVjb21wcmVzcy4gQ29tcHIuIHNpemUg
-IFJhdGlvIEZpbGVuYW1lDQogICAgPj4gbWVtY3B5ICAgICAgICAgICAgICAgICAgIDUyODUgTUIv
-cyAgNTI4MyBNQi9zICAgICAgIDMyNzY4IDEwMC4wMCBkYXRhL2RhdGEzMmsNCiAgICA+PiBsejQg
-MS44LjAgICAgICAgICAgICAgICAgIDI3NCBNQi9zICAgOTk1IE1CL3MgICAgICAgMTM0MzUgIDQx
-LjAwIGRhdGEvZGF0YTMyaw0KICAgID4+IGRvbmUuLi4gKGNJdGVycz0xIGRJdGVycz0xIGNUaW1l
-PTEuMCBkVGltZT0yLjAgY2h1bmtTaXplPTE3MDZNQiBjU3BlZWQ9ME1CKQ0KICAgID4+IA0KICAg
-ID4+IE9yaWdpbmFsIExaNCB3aXRoIDMySyBkYXRhOg0KICAgID4+IHNoLTMuMiMgLi9semJlbmNo
-X29yaWcgLWVsejQgZGF0YS9kYXRhMzJrDQogICAgPj4gbHpiZW5jaCAxLjcuMyAoMzItYml0IExp
-bnV4KSAgIEFzc2VtYmxlZCBieSBQLlNraWJpbnNraQ0KICAgID4+IENvbXByZXNzb3IgbmFtZSAg
-ICAgICAgIENvbXByZXNzLiBEZWNvbXByZXNzLiBDb21wci4gc2l6ZSAgUmF0aW8gRmlsZW5hbWUN
-CiAgICA+PiBtZW1jcHkgICAgICAgICAgICAgICAgICAgNDkxOCBNQi9zICA1MTA4IE1CL3MgICAg
-ICAgMzI3NjggMTAwLjAwIGRhdGEvZGF0YTMyaw0KICAgID4+IGx6NCAxLjguMCAgICAgICAgICAg
-ICAgICAgMjc2IE1CL3MgIDEwNDUgTUIvcyAgICAgICAxNDQ5MiAgNDQuMjMgZGF0YS9kYXRhMzJr
-DQogICAgPj4gDQogICAgPj4gTFpPMXggd2l0aCAzMksgZGF0YSAoRGVmYXVsdCBDb21wcmVzc29y
-IGZvciBaUkFNKTogDQogICAgPj4gc2gtMy4yIyAuL2x6YmVuY2ggLWVsem8xeCwxIGRhdGEvZGF0
-YTMyaw0KICAgID4+IGx6YmVuY2ggMS43LjMgKDMyLWJpdCBMaW51eCkgICBBc3NlbWJsZWQgYnkg
-UC5Ta2liaW5za2kNCiAgICA+PiBDb21wcmVzc29yIG5hbWUgICAgICAgICBDb21wcmVzcy4gRGVj
-b21wcmVzcy4gQ29tcHIuIHNpemUgIFJhdGlvIEZpbGVuYW1lDQogICAgPj4gbWVtY3B5ICAgICAg
-ICAgICAgICAgICAgIDUyNzMgTUIvcyAgNTMyMCBNQi9zICAgICAgIDMyNzY4IDEwMC4wMCBkYXRh
-L2RhdGEzMmsNCiAgICA+PiBsem8xeCAyLjA5IC0xICAgICAgICAgICAgIDI4MyBNQi9zICAgNDY1
-IE1CL3MgICAgICAgMTQyOTIgIDQzLjYyIGRhdGEvZGF0YTMyaw0KICAgIA0KICAgIA0KICAgIFRo
-YW5rcywNCiAgICBNYW5pbmRlciBTaW5naA0KICAgICANCiAgICANCg0K
+On Mon, Apr 16, 2018 at 07:34:29PM +0000, Yann Collet wrote:
+> Hi Singh
+> 
+> I don't have any strong opinion on this topic.
+> 
+> You made your case clear: 
+> your variant trades a little bit of speed for a little bit more compression ratio.
+> In the context of zram, it makes sense, and I would expect it to work, as advertised in your benchmark results.
+> (disclaimer: I haven't reproduced these results, just, they look reasonable to me, I have no reason to doubt them).
+> 
+> So, the issue is less about performance, than about code complexity.
+> 
+> As mentioned, this is an incompatible variant.
+> So, it requires its own entry point, and preferably its own code path
+> (even if it's heavily duplicated,
+> mixing it with regular lz4 source code, as proposed in the patch, will be bad for maintenance, 
+> and can negatively impact regular lz4 usage, outside of zram).
+> 
+> So that's basically the "cost" of adding this option.
+> 
+> Is it worth it?
+> Well, this is completely outside of my responsibility area, so I really can't tell.
+> You'll have to convince people in charge that the gains are worth their complexity,
+> since _they_ will inherit the duty to keep the system working through its future evolutions.
+> At a minimum, you are targeting maintainers of zram and the crypto interface.
+> For this topic, they are the right people to talk to.
+> 
+> 
+> ﻿On 4/16/18, 04:09, "Maninder Singh" <maninder1.s@samsung.com> wrote:
+> 
+>     
+>      Hello Nick/ Yann,
+>     
+>     Any inputs regarding LZ4 dyn results & lz4 dyn approach.
+>     
+>     >Hello Nick/Sergey,
+>     > 
+>     >Any suggestion or comments, so that we can change code and resend the patch?
+>     > 
+>     >> Hi Nick / Sergey,
+>     >> 
+>     >> 
+>     >> We have compared LZ4 Dyn with Original LZ4 using some samples of realtime application data(4Kb)
+>     >> compressed/decompressed by ZRAM. For comparison we have used lzbench (https://github.com/inikep/lzbench)
+>     >> we have implemented dedicated LZ4 Dyn API & kept last literal length as 6 to avoid overhead 
+>     >> of checks. It seems in average case there is a saving of 3~4% in compression ratio with almost same compression
+>     >> speed and minor loss in decompression speed (~50MB/s) when compared with LZ4.
+>     >> 
+>     >> Comparison of Lz4 Dyn with LZO1x is also done as LZO1x is default compressor of ZRAM.
+>     >> 
+
+Unfortunately the track record of maintaining compression code in the Linux
+kernel is not great.  zlib for example was forked from v1.2.3, which was
+released in 2005, and hasn't been updated since besides some random drive-by
+patches which have made it diverge even further from upstream.  There have even
+been bugs assigned CVE numbers in upstream zlib, and I don't think anyone has
+looked at whether the Linux kernel version has those bugs or not.
+
+The story with LZ4 is a bit better as someone updated it to v1.7.3 last year.
+But, it took a lot of rounds of review in which I had to point out some subtle
+regressions like the hash table size being accidentally changed, and things not
+being inlined that should be.  And of course now that version is outdated
+already.
+
+We also have LZO and Zstandard in the kernel to maintain too, as well as XZ
+decompression.
+
+And very problematically, *none* of these compression algorithms have a
+maintainer listed in the MAINTAINERS file.
+
+So in my opinion, as a prerequisite for this change, someone would need to
+volunteer to actually maintain LZ4 in the kernel.
+
+Thanks,
+
+Eric
