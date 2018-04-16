@@ -1,281 +1,154 @@
-From: Kees Cook <keescook@chromium.org>
-Subject: Re: [PATCH v2] crypto/ecc: Actually remove stack VLA usage
-Date: Mon, 16 Apr 2018 09:04:56 -0700
-Message-ID: <CAGXu5j+n6Gp_pBz6uvSNg3C=W=9TLaNonF-YS0SEz7oqbXef_g@mail.gmail.com>
-References: <20180330165544.GA13206@beast>
+From: Yann Collet <cyan@fb.com>
+Subject: Re: [PATCH 0/1] cover-letter/lz4: Implement lz4 with dynamic offset
+ length.
+Date: Mon, 16 Apr 2018 19:34:29 +0000
+Message-ID: <74EB06AE-E1CA-4B06-9935-596DCFAC951C@fb.com>
+References: <20180329102613epcms5p6ffaa80d12115ded8f3c9ef01dd009744@epcms5p6>
+ <20180329102046epcms5p8ecc9532b03bab4f47cbdbb2507171b86@epcms5p8>
+ <20180323134319epcms5p62e6021aa33c941c46ecdb8b5364b614c@epcms5p6>
+ <1663C9A3-7DAC-4A11-894C-C99E07BEDAD2@fb.com>
+ <1521607242-3968-1-git-send-email-maninder1.s@samsung.com>
+ <20180321082628.GB2746@jagdpanzerIV>
+ <CGME20180321044137epcas5p221e7ee4a0b7464eaa00dad8320f0251d@epcms5p4>
+ <20180416102138epcms5p429e04b68b94dcf80cd84f7008467ed68@epcms5p4>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: linux-crypto <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: "davem@davemloft.net" <davem@davemloft.net>,
+        "minchan@kernel.org" <minchan@kernel.org>,
+        "ngupta@vflare.org" <ngupta@vflare.org>,
+        Kees Cook <keescook@chromium.org>,
+        "anton@enomsg.org" <anton@enomsg.org>,
+        "ccross@android.com" <ccross@android.com>,
+        "tony.luck@intel.com" <tony.luck@intel.com>,
+        "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+        "colin.king@canonical.com" <colin.king@canonical.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        PANKAJ MISHRA <pankaj.m@samsung.com>,
+        "AMIT SAHRAWAT" <a.sahrawat@samsung.com>,
+        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>
+To: "maninder1.s@samsung.com" <maninder1.s@samsung.com>,
+        Vaneet Narang <v.narang@samsung.com>,
+        Nick Terrell <terrelln@fb.com>,
+        Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180330165544.GA13206@beast>
+In-Reply-To: <20180416102138epcms5p429e04b68b94dcf80cd84f7008467ed68@epcms5p4>
+Content-Language: en-US
+Content-ID: <6CCA283B630AC94DAD39499E415F0E9B@namprd15.prod.outlook.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Mar 30, 2018 at 9:55 AM, Kees Cook <keescook@chromium.org> wrote:
-> On the quest to remove all VLAs from the kernel[1], this avoids VLAs
-> by just using the maximum allocation size (4 bytes) for stack arrays.
-> All the VLAs in ecc were either 3 or 4 bytes (or a multiple), so just
-> make it 4 bytes all the time. Initialization routines are adjusted to
-> check that ndigits does not end up larger than the arrays.
->
-> This includes a removal of the earlier attempt at this fix from
-> commit a963834b4742 ("crypto/ecc: Remove stack VLA usage")
->
-> [1] https://lkml.org/lkml/2018/3/7/621
->
-> Signed-off-by: Kees Cook <keescook@chromium.org>
-
-Friendly ping. Please apply to fix a963834b4742 ("crypto/ecc: Remove
-stack VLA usage").
-
-Thanks!
-
--Kees
-
-> ---
-> v2:
-> - Squash revert (herbert)
-> ---
->  crypto/ecc.c  | 66 +++++++++++++++++++++++++----------------------------------
->  crypto/ecc.h  |  4 +++-
->  crypto/ecdh.c |  4 ++--
->  3 files changed, 33 insertions(+), 41 deletions(-)
->
-> diff --git a/crypto/ecc.c b/crypto/ecc.c
-> index 9c066b5ac12d..815541309a95 100644
-> --- a/crypto/ecc.c
-> +++ b/crypto/ecc.c
-> @@ -515,7 +515,7 @@ static void vli_mmod_fast_256(u64 *result, const u64 *product,
->  static bool vli_mmod_fast(u64 *result, u64 *product,
->                           const u64 *curve_prime, unsigned int ndigits)
->  {
-> -       u64 tmp[2 * ndigits];
-> +       u64 tmp[2 * ECC_MAX_DIGITS];
->
->         switch (ndigits) {
->         case 3:
-> @@ -536,7 +536,7 @@ static bool vli_mmod_fast(u64 *result, u64 *product,
->  static void vli_mod_mult_fast(u64 *result, const u64 *left, const u64 *right,
->                               const u64 *curve_prime, unsigned int ndigits)
->  {
-> -       u64 product[2 * ndigits];
-> +       u64 product[2 * ECC_MAX_DIGITS];
->
->         vli_mult(product, left, right, ndigits);
->         vli_mmod_fast(result, product, curve_prime, ndigits);
-> @@ -546,7 +546,7 @@ static void vli_mod_mult_fast(u64 *result, const u64 *left, const u64 *right,
->  static void vli_mod_square_fast(u64 *result, const u64 *left,
->                                 const u64 *curve_prime, unsigned int ndigits)
->  {
-> -       u64 product[2 * ndigits];
-> +       u64 product[2 * ECC_MAX_DIGITS];
->
->         vli_square(product, left, ndigits);
->         vli_mmod_fast(result, product, curve_prime, ndigits);
-> @@ -560,8 +560,8 @@ static void vli_mod_square_fast(u64 *result, const u64 *left,
->  static void vli_mod_inv(u64 *result, const u64 *input, const u64 *mod,
->                         unsigned int ndigits)
->  {
-> -       u64 a[ndigits], b[ndigits];
-> -       u64 u[ndigits], v[ndigits];
-> +       u64 a[ECC_MAX_DIGITS], b[ECC_MAX_DIGITS];
-> +       u64 u[ECC_MAX_DIGITS], v[ECC_MAX_DIGITS];
->         u64 carry;
->         int cmp_result;
->
-> @@ -649,8 +649,8 @@ static void ecc_point_double_jacobian(u64 *x1, u64 *y1, u64 *z1,
->                                       u64 *curve_prime, unsigned int ndigits)
->  {
->         /* t1 = x, t2 = y, t3 = z */
-> -       u64 t4[ndigits];
-> -       u64 t5[ndigits];
-> +       u64 t4[ECC_MAX_DIGITS];
-> +       u64 t5[ECC_MAX_DIGITS];
->
->         if (vli_is_zero(z1, ndigits))
->                 return;
-> @@ -711,7 +711,7 @@ static void ecc_point_double_jacobian(u64 *x1, u64 *y1, u64 *z1,
->  static void apply_z(u64 *x1, u64 *y1, u64 *z, u64 *curve_prime,
->                     unsigned int ndigits)
->  {
-> -       u64 t1[ndigits];
-> +       u64 t1[ECC_MAX_DIGITS];
->
->         vli_mod_square_fast(t1, z, curve_prime, ndigits);    /* z^2 */
->         vli_mod_mult_fast(x1, x1, t1, curve_prime, ndigits); /* x1 * z^2 */
-> @@ -724,7 +724,7 @@ static void xycz_initial_double(u64 *x1, u64 *y1, u64 *x2, u64 *y2,
->                                 u64 *p_initial_z, u64 *curve_prime,
->                                 unsigned int ndigits)
->  {
-> -       u64 z[ndigits];
-> +       u64 z[ECC_MAX_DIGITS];
->
->         vli_set(x2, x1, ndigits);
->         vli_set(y2, y1, ndigits);
-> @@ -750,7 +750,7 @@ static void xycz_add(u64 *x1, u64 *y1, u64 *x2, u64 *y2, u64 *curve_prime,
->                      unsigned int ndigits)
->  {
->         /* t1 = X1, t2 = Y1, t3 = X2, t4 = Y2 */
-> -       u64 t5[ndigits];
-> +       u64 t5[ECC_MAX_DIGITS];
->
->         /* t5 = x2 - x1 */
->         vli_mod_sub(t5, x2, x1, curve_prime, ndigits);
-> @@ -791,9 +791,9 @@ static void xycz_add_c(u64 *x1, u64 *y1, u64 *x2, u64 *y2, u64 *curve_prime,
->                        unsigned int ndigits)
->  {
->         /* t1 = X1, t2 = Y1, t3 = X2, t4 = Y2 */
-> -       u64 t5[ndigits];
-> -       u64 t6[ndigits];
-> -       u64 t7[ndigits];
-> +       u64 t5[ECC_MAX_DIGITS];
-> +       u64 t6[ECC_MAX_DIGITS];
-> +       u64 t7[ECC_MAX_DIGITS];
->
->         /* t5 = x2 - x1 */
->         vli_mod_sub(t5, x2, x1, curve_prime, ndigits);
-> @@ -846,9 +846,9 @@ static void ecc_point_mult(struct ecc_point *result,
->                            unsigned int ndigits)
->  {
->         /* R0 and R1 */
-> -       u64 rx[2][ndigits];
-> -       u64 ry[2][ndigits];
-> -       u64 z[ndigits];
-> +       u64 rx[2][ECC_MAX_DIGITS];
-> +       u64 ry[2][ECC_MAX_DIGITS];
-> +       u64 z[ECC_MAX_DIGITS];
->         int i, nb;
->         int num_bits = vli_num_bits(scalar, ndigits);
->
-> @@ -943,13 +943,13 @@ int ecc_is_key_valid(unsigned int curve_id, unsigned int ndigits,
->  int ecc_gen_privkey(unsigned int curve_id, unsigned int ndigits, u64 *privkey)
->  {
->         const struct ecc_curve *curve = ecc_get_curve(curve_id);
-> -       u64 priv[ndigits];
-> +       u64 priv[ECC_MAX_DIGITS];
->         unsigned int nbytes = ndigits << ECC_DIGITS_TO_BYTES_SHIFT;
->         unsigned int nbits = vli_num_bits(curve->n, ndigits);
->         int err;
->
->         /* Check that N is included in Table 1 of FIPS 186-4, section 6.1.1 */
-> -       if (nbits < 160)
-> +       if (nbits < 160 || ndigits > ARRAY_SIZE(priv))
->                 return -EINVAL;
->
->         /*
-> @@ -988,10 +988,10 @@ int ecc_make_pub_key(unsigned int curve_id, unsigned int ndigits,
->  {
->         int ret = 0;
->         struct ecc_point *pk;
-> -       u64 priv[ndigits];
-> +       u64 priv[ECC_MAX_DIGITS];
->         const struct ecc_curve *curve = ecc_get_curve(curve_id);
->
-> -       if (!private_key || !curve) {
-> +       if (!private_key || !curve || ndigits > ARRAY_SIZE(priv)) {
->                 ret = -EINVAL;
->                 goto out;
->         }
-> @@ -1025,30 +1025,25 @@ int crypto_ecdh_shared_secret(unsigned int curve_id, unsigned int ndigits,
->  {
->         int ret = 0;
->         struct ecc_point *product, *pk;
-> -       u64 *priv, *rand_z;
-> +       u64 priv[ECC_MAX_DIGITS];
-> +       u64 rand_z[ECC_MAX_DIGITS];
-> +       unsigned int nbytes;
->         const struct ecc_curve *curve = ecc_get_curve(curve_id);
->
-> -       if (!private_key || !public_key || !curve) {
-> +       if (!private_key || !public_key || !curve ||
-> +           ndigits > ARRAY_SIZE(priv) || ndigits > ARRAY_SIZE(rand_z)) {
->                 ret = -EINVAL;
->                 goto out;
->         }
->
-> -       priv = kmalloc_array(ndigits, sizeof(*priv), GFP_KERNEL);
-> -       if (!priv) {
-> -               ret = -ENOMEM;
-> -               goto out;
-> -       }
-> +       nbytes = ndigits << ECC_DIGITS_TO_BYTES_SHIFT;
->
-> -       rand_z = kmalloc_array(ndigits, sizeof(*rand_z), GFP_KERNEL);
-> -       if (!rand_z) {
-> -               ret = -ENOMEM;
-> -               goto kfree_out;
-> -       }
-> +       get_random_bytes(rand_z, nbytes);
->
->         pk = ecc_alloc_point(ndigits);
->         if (!pk) {
->                 ret = -ENOMEM;
-> -               goto kfree_out;
-> +               goto out;
->         }
->
->         product = ecc_alloc_point(ndigits);
-> @@ -1057,8 +1052,6 @@ int crypto_ecdh_shared_secret(unsigned int curve_id, unsigned int ndigits,
->                 goto err_alloc_product;
->         }
->
-> -       get_random_bytes(rand_z, ndigits << ECC_DIGITS_TO_BYTES_SHIFT);
-> -
->         ecc_swap_digits(public_key, pk->x, ndigits);
->         ecc_swap_digits(&public_key[ndigits], pk->y, ndigits);
->         ecc_swap_digits(private_key, priv, ndigits);
-> @@ -1073,9 +1066,6 @@ int crypto_ecdh_shared_secret(unsigned int curve_id, unsigned int ndigits,
->         ecc_free_point(product);
->  err_alloc_product:
->         ecc_free_point(pk);
-> -kfree_out:
-> -       kzfree(priv);
-> -       kzfree(rand_z);
->  out:
->         return ret;
->  }
-> diff --git a/crypto/ecc.h b/crypto/ecc.h
-> index e4fd4492c765..f75a86baa3bd 100644
-> --- a/crypto/ecc.h
-> +++ b/crypto/ecc.h
-> @@ -26,7 +26,9 @@
->  #ifndef _CRYPTO_ECC_H
->  #define _CRYPTO_ECC_H
->
-> -#define ECC_MAX_DIGITS 4 /* 256 */
-> +#define ECC_CURVE_NIST_P192_DIGITS  3
-> +#define ECC_CURVE_NIST_P256_DIGITS  4
-> +#define ECC_MAX_DIGITS              ECC_CURVE_NIST_P256_DIGITS
->
->  #define ECC_DIGITS_TO_BYTES_SHIFT 3
->
-> diff --git a/crypto/ecdh.c b/crypto/ecdh.c
-> index 3aca0933ec44..3f91ef13c8c6 100644
-> --- a/crypto/ecdh.c
-> +++ b/crypto/ecdh.c
-> @@ -30,8 +30,8 @@ static inline struct ecdh_ctx *ecdh_get_ctx(struct crypto_kpp *tfm)
->  static unsigned int ecdh_supported_curve(unsigned int curve_id)
->  {
->         switch (curve_id) {
-> -       case ECC_CURVE_NIST_P192: return 3;
-> -       case ECC_CURVE_NIST_P256: return 4;
-> +       case ECC_CURVE_NIST_P192: return ECC_CURVE_NIST_P192_DIGITS;
-> +       case ECC_CURVE_NIST_P256: return ECC_CURVE_NIST_P256_DIGITS;
->         default: return 0;
->         }
->  }
-> --
-> 2.7.4
->
->
-> --
-> Kees Cook
-> Pixel Security
-
-
-
--- 
-Kees Cook
-Pixel Security
+SGkgU2luZ2gNCg0KSSBkb24ndCBoYXZlIGFueSBzdHJvbmcgb3BpbmlvbiBvbiB0aGlzIHRvcGlj
+Lg0KDQpZb3UgbWFkZSB5b3VyIGNhc2UgY2xlYXI6IA0KeW91ciB2YXJpYW50IHRyYWRlcyBhIGxp
+dHRsZSBiaXQgb2Ygc3BlZWQgZm9yIGEgbGl0dGxlIGJpdCBtb3JlIGNvbXByZXNzaW9uIHJhdGlv
+Lg0KSW4gdGhlIGNvbnRleHQgb2YgenJhbSwgaXQgbWFrZXMgc2Vuc2UsIGFuZCBJIHdvdWxkIGV4
+cGVjdCBpdCB0byB3b3JrLCBhcyBhZHZlcnRpc2VkIGluIHlvdXIgYmVuY2htYXJrIHJlc3VsdHMu
+DQooZGlzY2xhaW1lcjogSSBoYXZlbid0IHJlcHJvZHVjZWQgdGhlc2UgcmVzdWx0cywganVzdCwg
+dGhleSBsb29rIHJlYXNvbmFibGUgdG8gbWUsIEkgaGF2ZSBubyByZWFzb24gdG8gZG91YnQgdGhl
+bSkuDQoNClNvLCB0aGUgaXNzdWUgaXMgbGVzcyBhYm91dCBwZXJmb3JtYW5jZSwgdGhhbiBhYm91
+dCBjb2RlIGNvbXBsZXhpdHkuDQoNCkFzIG1lbnRpb25lZCwgdGhpcyBpcyBhbiBpbmNvbXBhdGli
+bGUgdmFyaWFudC4NClNvLCBpdCByZXF1aXJlcyBpdHMgb3duIGVudHJ5IHBvaW50LCBhbmQgcHJl
+ZmVyYWJseSBpdHMgb3duIGNvZGUgcGF0aA0KKGV2ZW4gaWYgaXQncyBoZWF2aWx5IGR1cGxpY2F0
+ZWQsDQptaXhpbmcgaXQgd2l0aCByZWd1bGFyIGx6NCBzb3VyY2UgY29kZSwgYXMgcHJvcG9zZWQg
+aW4gdGhlIHBhdGNoLCB3aWxsIGJlIGJhZCBmb3IgbWFpbnRlbmFuY2UsIA0KYW5kIGNhbiBuZWdh
+dGl2ZWx5IGltcGFjdCByZWd1bGFyIGx6NCB1c2FnZSwgb3V0c2lkZSBvZiB6cmFtKS4NCg0KU28g
+dGhhdCdzIGJhc2ljYWxseSB0aGUgImNvc3QiIG9mIGFkZGluZyB0aGlzIG9wdGlvbi4NCg0KSXMg
+aXQgd29ydGggaXQ/DQpXZWxsLCB0aGlzIGlzIGNvbXBsZXRlbHkgb3V0c2lkZSBvZiBteSByZXNw
+b25zaWJpbGl0eSBhcmVhLCBzbyBJIHJlYWxseSBjYW4ndCB0ZWxsLg0KWW91J2xsIGhhdmUgdG8g
+Y29udmluY2UgcGVvcGxlIGluIGNoYXJnZSB0aGF0IHRoZSBnYWlucyBhcmUgd29ydGggdGhlaXIg
+Y29tcGxleGl0eSwNCnNpbmNlIF90aGV5XyB3aWxsIGluaGVyaXQgdGhlIGR1dHkgdG8ga2VlcCB0
+aGUgc3lzdGVtIHdvcmtpbmcgdGhyb3VnaCBpdHMgZnV0dXJlIGV2b2x1dGlvbnMuDQpBdCBhIG1p
+bmltdW0sIHlvdSBhcmUgdGFyZ2V0aW5nIG1haW50YWluZXJzIG9mIHpyYW0gYW5kIHRoZSBjcnlw
+dG8gaW50ZXJmYWNlLg0KRm9yIHRoaXMgdG9waWMsIHRoZXkgYXJlIHRoZSByaWdodCBwZW9wbGUg
+dG8gdGFsayB0by4NCg0KDQrvu79PbiA0LzE2LzE4LCAwNDowOSwgIk1hbmluZGVyIFNpbmdoIiA8
+bWFuaW5kZXIxLnNAc2Ftc3VuZy5jb20+IHdyb3RlOg0KDQogICAgDQogICAgIEhlbGxvIE5pY2sv
+IFlhbm4sDQogICAgDQogICAgQW55IGlucHV0cyByZWdhcmRpbmcgTFo0IGR5biByZXN1bHRzICYg
+bHo0IGR5biBhcHByb2FjaC4NCiAgICANCiAgICA+SGVsbG8gTmljay9TZXJnZXksDQogICAgPiAN
+CiAgICA+QW55IHN1Z2dlc3Rpb24gb3IgY29tbWVudHMsIHNvIHRoYXQgd2UgY2FuIGNoYW5nZSBj
+b2RlIGFuZCByZXNlbmQgdGhlIHBhdGNoPw0KICAgID4gDQogICAgPj4gSGkgTmljayAvIFNlcmdl
+eSwNCiAgICA+PiANCiAgICA+PiANCiAgICA+PiBXZSBoYXZlIGNvbXBhcmVkIExaNCBEeW4gd2l0
+aCBPcmlnaW5hbCBMWjQgdXNpbmcgc29tZSBzYW1wbGVzIG9mIHJlYWx0aW1lIGFwcGxpY2F0aW9u
+IGRhdGEoNEtiKQ0KICAgID4+IGNvbXByZXNzZWQvZGVjb21wcmVzc2VkIGJ5IFpSQU0uIEZvciBj
+b21wYXJpc29uIHdlIGhhdmUgdXNlZCBsemJlbmNoIChodHRwczovL2dpdGh1Yi5jb20vaW5pa2Vw
+L2x6YmVuY2gpDQogICAgPj4gd2UgaGF2ZSBpbXBsZW1lbnRlZCBkZWRpY2F0ZWQgTFo0IER5biBB
+UEkgJiBrZXB0IGxhc3QgbGl0ZXJhbCBsZW5ndGggYXMgNiB0byBhdm9pZCBvdmVyaGVhZCANCiAg
+ICA+PiBvZiBjaGVja3MuIEl0IHNlZW1zIGluIGF2ZXJhZ2UgY2FzZSB0aGVyZSBpcyBhIHNhdmlu
+ZyBvZiAzfjQlIGluIGNvbXByZXNzaW9uIHJhdGlvIHdpdGggYWxtb3N0IHNhbWUgY29tcHJlc3Np
+b24NCiAgICA+PiBzcGVlZCBhbmQgbWlub3IgbG9zcyBpbiBkZWNvbXByZXNzaW9uIHNwZWVkICh+
+NTBNQi9zKSB3aGVuIGNvbXBhcmVkIHdpdGggTFo0Lg0KICAgID4+IA0KICAgID4+IENvbXBhcmlz
+b24gb2YgTHo0IER5biB3aXRoIExaTzF4IGlzIGFsc28gZG9uZSBhcyBMWk8xeCBpcyBkZWZhdWx0
+IGNvbXByZXNzb3Igb2YgWlJBTS4NCiAgICA+PiANCiAgICA+PiBPcmlnaW5hbCBMWjQ6DQogICAg
+Pj4gc2gtMy4yIyAuL2x6YmVuY2ggIC1yICAtZWx6NCAgZGF0YS8NCiAgICA+PiBsemJlbmNoIDEu
+Ny4zICgzMi1iaXQgTGludXgpICAgQXNzZW1ibGVkIGJ5IFAuU2tpYmluc2tpDQogICAgPj4gQ29t
+cHJlc3NvciBuYW1lICAgICAgICAgQ29tcHJlc3MuIERlY29tcHJlc3MuIENvbXByLiBzaXplICBS
+YXRpbyBGaWxlbmFtZQ0KICAgID4+IG1lbWNweSAgICAgICAgICAgICAgICAgICAyMjA1IE1CL3Mg
+IDIyMTcgTUIvcyAgICAgICAgNDA5NiAxMDAuMDAgZGF0YS8vZGF0YV8xDQogICAgPj4gbHo0IDEu
+OC4wICAgICAgICAgICAgICAgICAyMTYgTUIvcyAgIDc2MSBNQi9zICAgICAgICAyNDMzICA1OS40
+MCBkYXRhLy9kYXRhXzENCiAgICA+PiBsejQgMS44LjAgICAgICAgICAgICAgICAgIDI2OSBNQi9z
+ICAgODc3IE1CL3MgICAgICAgIDE4NzMgIDQ1LjczIGRhdGEvL2RhdGFfMg0KICAgID4+IGx6NCAx
+LjguMCAgICAgICAgICAgICAgICAgMjM4IE1CL3MgICA1NzUgTUIvcyAgICAgICAgMjA2MCAgNTAu
+MjkgZGF0YS8vZGF0YV8zDQogICAgPj4gbHo0IDEuOC4wICAgICAgICAgICAgICAgICAzMjEgTUIv
+cyAgMTAxNSBNQi9zICAgICAgICAxNDY0ICAzNS43NCBkYXRhLy9kYXRhXzQNCiAgICA+PiBsejQg
+MS44LjAgICAgICAgICAgICAgICAgIDQ2NCBNQi9zICAxMDkwIE1CL3MgICAgICAgICA3MTMgIDE3
+LjQxIGRhdGEvL2RhdGFfNQ0KICAgID4+IGx6NCAxLjguMCAgICAgICAgICAgICAgICAgMjk2IE1C
+L3MgICA5NTYgTUIvcyAgICAgICAgMTU5NyAgMzguOTkgZGF0YS8vZGF0YV82DQogICAgPj4gbHo0
+IDEuOC4wICAgICAgICAgICAgICAgICAzMzggTUIvcyAgIDk5NCBNQi9zICAgICAgICAyMjM4ICA1
+NC42NCBkYXRhLy9kYXRhXzcNCiAgICA+PiBsejQgMS44LjAgICAgICAgICAgICAgICAgIDcwNSBN
+Qi9zICAxMTcyIE1CL3MgICAgICAgICAxOTMgICA0LjcxIGRhdGEvL2RhdGFfOA0KICAgID4+IGx6
+NCAxLjguMCAgICAgICAgICAgICAgICAgNDA0IE1CL3MgIDExNTAgTUIvcyAgICAgICAgMTA5NyAg
+MjYuNzggZGF0YS8vZGF0YV85DQogICAgPj4gbHo0IDEuOC4wICAgICAgICAgICAgICAgICAyMTYg
+TUIvcyAgIDkyMSBNQi9zICAgICAgICAzMTgzICA3Ny43MSBkYXRhLy9kYXRhXzEwDQogICAgPj4g
+bHo0IDEuOC4wICAgICAgICAgICAgICAgICA0NTYgTUIvcyAgMTEwMSBNQi9zICAgICAgICAxMDEx
+ICAyNC42OCBkYXRhLy9kYXRhXzExDQogICAgPj4gbHo0IDEuOC4wICAgICAgICAgICAgICAgICA4
+NjcgTUIvcyAgMTIwMiBNQi9zICAgICAgICAgIDM3ICAgMC45MCBkYXRhLy9kYXRhXzEyDQogICAg
+Pj4gDQogICAgPj4gDQogICAgPj4gTFo0IER5bmFtaWMgT2ZmZXQ6ICANCiAgICA+PiBzaC0zLjIj
+IC4vbHpiZW5jaCAgLXIgIC1lbHo0X2R5biAgZGF0YS8NCiAgICA+PiBsemJlbmNoIDEuNy4zICgz
+Mi1iaXQgTGludXgpICAgQXNzZW1ibGVkIGJ5IFAuU2tpYmluc2tpDQogICAgPj4gQ29tcHJlc3Nv
+ciBuYW1lICAgICAgICAgQ29tcHJlc3MuIERlY29tcHJlc3MuIENvbXByLiBzaXplICBSYXRpbyBG
+aWxlbmFtZQ0KICAgID4+IG1lbWNweSAgICAgICAgICAgICAgICAgICAyMjAzIE1CL3MgIDIyMTgg
+TUIvcyAgICAgICAgNDA5NiAxMDAuMDAgZGF0YS8vZGF0YV8xDQogICAgPj4gbHo0IDEuOC4wICAg
+ICAgICAgICAgICAgICAyMTggTUIvcyAgIDY5MyBNQi9zICAgICAgICAyMjI4ICA1NC4zOSBkYXRh
+Ly9kYXRhXzENCiAgICA+PiBsejQgMS44LjAgICAgICAgICAgICAgICAgIDI3MyBNQi9zICAgODUx
+IE1CL3MgICAgICAgIDE3MzkgIDQyLjQ2IGRhdGEvL2RhdGFfMg0KICAgID4+IGx6NCAxLjguMCAg
+ICAgICAgICAgICAgICAgMjMwIE1CL3MgICA1MjYgTUIvcyAgICAgICAgMTgwMCAgNDMuOTUgZGF0
+YS8vZGF0YV8zDQogICAgPj4gbHo0IDEuOC4wICAgICAgICAgICAgICAgICAzMjEgTUIvcyAgIDk1
+MiBNQi9zICAgICAgICAxMzU3ICAzMy4xMyBkYXRhLy9kYXRhXzQNCiAgICA+PiBsejQgMS44LjAg
+ICAgICAgICAgICAgICAgIDQ3MCBNQi9zICAxMDc1IE1CL3MgICAgICAgICA2NjQgIDE2LjIxIGRh
+dGEvL2RhdGFfNQ0KICAgID4+IGx6NCAxLjguMCAgICAgICAgICAgICAgICAgMzAzIE1CL3MgICA5
+NjQgTUIvcyAgICAgICAgMTQ1NSAgMzUuNTIgZGF0YS8vZGF0YV82DQogICAgPj4gbHo0IDEuOC4w
+ICAgICAgICAgICAgICAgICAzNDUgTUIvcyAgIDk1MSBNQi9zICAgICAgICAyMTI2ICA1MS45MCBk
+YXRhLy9kYXRhXzcNCiAgICA+PiBsejQgMS44LjAgICAgICAgICAgICAgICAgIDc0NCBNQi9zICAx
+MTYzIE1CL3MgICAgICAgICAxNzcgICA0LjMyIGRhdGEvL2RhdGFfOA0KICAgID4+IGx6NCAxLjgu
+MCAgICAgICAgICAgICAgICAgNDA5IE1CL3MgIDEyNTcgTUIvcyAgICAgICAgMTAzMyAgMjUuMjIg
+ZGF0YS8vZGF0YV85DQogICAgPj4gbHo0IDEuOC4wICAgICAgICAgICAgICAgICAyMjAgTUIvcyAg
+IDg1NyBNQi9zICAgICAgICAzMDQ5ICA3NC40NCBkYXRhLy9kYXRhXzEwDQogICAgPj4gbHo0IDEu
+OC4wICAgICAgICAgICAgICAgICA0NjQgTUIvcyAgMTEwNSBNQi9zICAgICAgICAgOTM0ICAyMi44
+MCBkYXRhLy9kYXRhXzExDQogICAgPj4gbHo0IDEuOC4wICAgICAgICAgICAgICAgICA4NzQgTUIv
+cyAgMTE5NCBNQi9zICAgICAgICAgIDM2ICAgMC44OCBkYXRhLy9kYXRhXzEyDQogICAgPj4gDQog
+ICAgPj4gDQogICAgPj4gTFo0IER5bmFtaWMgT2Zmc2V0IHdpdGggMzJLIGRhdGE6DQogICAgPj4g
+c2gtMy4yIyAuL2x6YmVuY2ggLWVsejRfZHluIGRhdGEvZGF0YTMyaw0KICAgID4+IGx6YmVuY2gg
+MS43LjMgKDMyLWJpdCBMaW51eCkgICBBc3NlbWJsZWQgYnkgUC5Ta2liaW5za2kNCiAgICA+PiBD
+b21wcmVzc29yIG5hbWUgICAgICAgICBDb21wcmVzcy4gRGVjb21wcmVzcy4gQ29tcHIuIHNpemUg
+IFJhdGlvIEZpbGVuYW1lDQogICAgPj4gbWVtY3B5ICAgICAgICAgICAgICAgICAgIDUyODUgTUIv
+cyAgNTI4MyBNQi9zICAgICAgIDMyNzY4IDEwMC4wMCBkYXRhL2RhdGEzMmsNCiAgICA+PiBsejQg
+MS44LjAgICAgICAgICAgICAgICAgIDI3NCBNQi9zICAgOTk1IE1CL3MgICAgICAgMTM0MzUgIDQx
+LjAwIGRhdGEvZGF0YTMyaw0KICAgID4+IGRvbmUuLi4gKGNJdGVycz0xIGRJdGVycz0xIGNUaW1l
+PTEuMCBkVGltZT0yLjAgY2h1bmtTaXplPTE3MDZNQiBjU3BlZWQ9ME1CKQ0KICAgID4+IA0KICAg
+ID4+IE9yaWdpbmFsIExaNCB3aXRoIDMySyBkYXRhOg0KICAgID4+IHNoLTMuMiMgLi9semJlbmNo
+X29yaWcgLWVsejQgZGF0YS9kYXRhMzJrDQogICAgPj4gbHpiZW5jaCAxLjcuMyAoMzItYml0IExp
+bnV4KSAgIEFzc2VtYmxlZCBieSBQLlNraWJpbnNraQ0KICAgID4+IENvbXByZXNzb3IgbmFtZSAg
+ICAgICAgIENvbXByZXNzLiBEZWNvbXByZXNzLiBDb21wci4gc2l6ZSAgUmF0aW8gRmlsZW5hbWUN
+CiAgICA+PiBtZW1jcHkgICAgICAgICAgICAgICAgICAgNDkxOCBNQi9zICA1MTA4IE1CL3MgICAg
+ICAgMzI3NjggMTAwLjAwIGRhdGEvZGF0YTMyaw0KICAgID4+IGx6NCAxLjguMCAgICAgICAgICAg
+ICAgICAgMjc2IE1CL3MgIDEwNDUgTUIvcyAgICAgICAxNDQ5MiAgNDQuMjMgZGF0YS9kYXRhMzJr
+DQogICAgPj4gDQogICAgPj4gTFpPMXggd2l0aCAzMksgZGF0YSAoRGVmYXVsdCBDb21wcmVzc29y
+IGZvciBaUkFNKTogDQogICAgPj4gc2gtMy4yIyAuL2x6YmVuY2ggLWVsem8xeCwxIGRhdGEvZGF0
+YTMyaw0KICAgID4+IGx6YmVuY2ggMS43LjMgKDMyLWJpdCBMaW51eCkgICBBc3NlbWJsZWQgYnkg
+UC5Ta2liaW5za2kNCiAgICA+PiBDb21wcmVzc29yIG5hbWUgICAgICAgICBDb21wcmVzcy4gRGVj
+b21wcmVzcy4gQ29tcHIuIHNpemUgIFJhdGlvIEZpbGVuYW1lDQogICAgPj4gbWVtY3B5ICAgICAg
+ICAgICAgICAgICAgIDUyNzMgTUIvcyAgNTMyMCBNQi9zICAgICAgIDMyNzY4IDEwMC4wMCBkYXRh
+L2RhdGEzMmsNCiAgICA+PiBsem8xeCAyLjA5IC0xICAgICAgICAgICAgIDI4MyBNQi9zICAgNDY1
+IE1CL3MgICAgICAgMTQyOTIgIDQzLjYyIGRhdGEvZGF0YTMyaw0KICAgIA0KICAgIA0KICAgIFRo
+YW5rcywNCiAgICBNYW5pbmRlciBTaW5naA0KICAgICANCiAgICANCg0K
