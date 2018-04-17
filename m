@@ -1,7 +1,9 @@
 From: Geert Uytterhoeven <geert-Td1EMuHUCqxL1ZNQvxDV9g@public.gmane.org>
-Subject: [PATCH v3 00/20] Allow compile-testing NO_DMA (drivers)
-Date: Tue, 17 Apr 2018 19:49:00 +0200
-Message-ID: <1523987360-18760-1-git-send-email-geert@linux-m68k.org>
+Subject: [PATCH v3 02/20] ata: Remove depends on HAS_DMA in case of platform
+	dependency
+Date: Tue, 17 Apr 2018 19:49:02 +0200
+Message-ID: <1523987360-18760-3-git-send-email-geert@linux-m68k.org>
+References: <1523987360-18760-1-git-send-email-geert@linux-m68k.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
@@ -34,6 +36,7 @@ To: Christoph Hellwig <hch-jcswGhMUV9g@public.gmane.org>,
 	David Woodhouse <dwmw2-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
 	Br
 Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+In-Reply-To: <1523987360-18760-1-git-send-email-geert-Td1EMuHUCqxL1ZNQvxDV9g@public.gmane.org>
 List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
 	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
 List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
@@ -45,130 +48,51 @@ Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.o
 Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-        Hi all,
+Remove dependencies on HAS_DMA where a Kconfig symbol depends on another
+symbol that implies HAS_DMA, and, optionally, on "|| COMPILE_TEST".
+In most cases this other symbol is an architecture or platform specific
+symbol, or PCI.
 
-As of v4.17-rc1, patch series "[PATCH v2 0/5] Allow compile-testing
-NO_DMA (core)" (https://lkml.org/lkml/2018/3/16/435) has been included
-upstream, and drivers using the DMA API can be compile-tested on
-platforms selecting NO_DMA.
+Generic symbols and drivers without platform dependencies keep their
+dependencies on HAS_DMA, to prevent compiling subsystems or drivers that
+cannot work anyway.
 
-This follow-up patch series removes dependencies on HAS_DMA for symbols
-that already have platform dependencies implying HAS_DMA, which increases
-compile-coverage.
+This simplifies the dependencies, and allows to improve compile-testing.
 
-Please apply to your tree if appropriate.
+Signed-off-by: Geert Uytterhoeven <geert-Td1EMuHUCqxL1ZNQvxDV9g@public.gmane.org>
+Reviewed-by: Mark Brown <broonie-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+Acked-by: Robin Murphy <robin.murphy-5wv7dgnIgG8@public.gmane.org>
+---
+v3:
+  - Rebase to v4.17-rc1,
 
-Changes compared to v2:
-  - Add Acked-by,
-  - Rebased to v4.17-rc1, dropping applied patch for scsi/hisi_sas,
-  - Handle new VIDEO_RENESAS_CEU symbol,
-  - Drop obsolete note about FSL_FMAN.
-
-Changes compared to v1:
+v2:
   - Add Reviewed-by, Acked-by,
-  - Drop dependency of SND_SOC_LPASS_IPQ806X on HAS_DMA,
-  - Drop dependency of VIDEOBUF{,2}_DMA_{CONTIG,SG} on HAS_DMA,
-  - Drop new dependencies of VIDEO_IPU3_CIO2, DVB_C8SECTPFE, and
-    MTD_NAND_MARVELL on HAS_DMA,
-  - Split in per-subsystem patches,
-  - Split-off the core part in a separate series.
+  - Drop RFC state,
+  - Split per subsystem.
+---
+ drivers/ata/Kconfig | 2 --
+ 1 file changed, 2 deletions(-)
 
-This series is against v4.17-rc1. It can also be found at
-https://git.kernel.org/pub/scm/linux/kernel/git/geert/linux-m68k.git/log/?h=no-dma-compile-testing-v3
-
-It has been compile-tested with allmodconfig and allyesconfig for
-m68k/sun3, and has received attention from the kbuild test robot.
-
-Thanks for applying!
-
-Geert Uytterhoeven (20):
-  ASoC: Remove depends on HAS_DMA in case of platform dependency
-  ata: Remove depends on HAS_DMA in case of platform dependency
-  crypto: Remove depends on HAS_DMA in case of platform dependency
-  fbdev: Remove depends on HAS_DMA in case of platform dependency
-  firewire: Remove depends on HAS_DMA in case of platform dependency
-  fpga: Remove depends on HAS_DMA in case of platform dependency
-  i2c: Remove depends on HAS_DMA in case of platform dependency
-  iio: adc: Remove depends on HAS_DMA in case of platform dependency
-  iommu: Remove depends on HAS_DMA in case of platform dependency
-  lightnvm: Remove depends on HAS_DMA in case of platform dependency
-  mailbox: Remove depends on HAS_DMA in case of platform dependency
-  media: Remove depends on HAS_DMA in case of platform dependency
-  mmc: Remove depends on HAS_DMA in case of platform dependency
-  mtd: Remove depends on HAS_DMA in case of platform dependency
-  net: Remove depends on HAS_DMA in case of platform dependency
-  remoteproc: Remove depends on HAS_DMA in case of platform dependency
-  serial: Remove depends on HAS_DMA in case of platform dependency
-  spi: Remove depends on HAS_DMA in case of platform dependency
-  staging: vc04_services: Remove depends on HAS_DMA in case of platform
-    dependency
-  usb: Remove depends on HAS_DMA in case of platform dependency
-
- drivers/ata/Kconfig                             |  2 --
- drivers/crypto/Kconfig                          | 14 +++------
- drivers/firewire/Kconfig                        |  1 -
- drivers/fpga/Kconfig                            |  1 -
- drivers/i2c/busses/Kconfig                      |  3 --
- drivers/iio/adc/Kconfig                         |  2 --
- drivers/iommu/Kconfig                           |  5 ++-
- drivers/lightnvm/Kconfig                        |  2 +-
- drivers/mailbox/Kconfig                         |  2 --
- drivers/media/common/videobuf2/Kconfig          |  2 --
- drivers/media/pci/dt3155/Kconfig                |  1 -
- drivers/media/pci/intel/ipu3/Kconfig            |  1 -
- drivers/media/pci/solo6x10/Kconfig              |  1 -
- drivers/media/pci/sta2x11/Kconfig               |  1 -
- drivers/media/pci/tw5864/Kconfig                |  1 -
- drivers/media/pci/tw686x/Kconfig                |  1 -
- drivers/media/platform/Kconfig                  | 42 +++++++++----------------
- drivers/media/platform/am437x/Kconfig           |  2 +-
- drivers/media/platform/atmel/Kconfig            |  4 +--
- drivers/media/platform/davinci/Kconfig          |  6 ----
- drivers/media/platform/marvell-ccic/Kconfig     |  3 +-
- drivers/media/platform/rcar-vin/Kconfig         |  2 +-
- drivers/media/platform/soc_camera/Kconfig       |  3 +-
- drivers/media/platform/sti/c8sectpfe/Kconfig    |  2 +-
- drivers/media/v4l2-core/Kconfig                 |  2 --
- drivers/mmc/host/Kconfig                        | 10 ++----
- drivers/mtd/nand/raw/Kconfig                    |  8 ++---
- drivers/mtd/spi-nor/Kconfig                     |  2 +-
- drivers/net/ethernet/amd/Kconfig                |  2 +-
- drivers/net/ethernet/apm/xgene-v2/Kconfig       |  1 -
- drivers/net/ethernet/apm/xgene/Kconfig          |  1 -
- drivers/net/ethernet/arc/Kconfig                |  6 ++--
- drivers/net/ethernet/broadcom/Kconfig           |  2 --
- drivers/net/ethernet/calxeda/Kconfig            |  2 +-
- drivers/net/ethernet/hisilicon/Kconfig          |  2 +-
- drivers/net/ethernet/marvell/Kconfig            |  8 ++---
- drivers/net/ethernet/mellanox/mlxsw/Kconfig     |  2 +-
- drivers/net/ethernet/renesas/Kconfig            |  2 --
- drivers/net/wireless/broadcom/brcm80211/Kconfig |  1 -
- drivers/net/wireless/quantenna/qtnfmac/Kconfig  |  2 +-
- drivers/remoteproc/Kconfig                      |  1 -
- drivers/spi/Kconfig                             | 12 ++-----
- drivers/staging/media/davinci_vpfe/Kconfig      |  1 -
- drivers/staging/media/omap4iss/Kconfig          |  1 -
- drivers/staging/vc04_services/Kconfig           |  1 -
- drivers/tty/serial/Kconfig                      |  4 ---
- drivers/usb/gadget/udc/Kconfig                  |  4 +--
- drivers/usb/mtu3/Kconfig                        |  2 +-
- drivers/video/fbdev/Kconfig                     |  3 +-
- sound/soc/bcm/Kconfig                           |  3 +-
- sound/soc/kirkwood/Kconfig                      |  1 -
- sound/soc/pxa/Kconfig                           |  1 -
- sound/soc/qcom/Kconfig                          |  7 ++---
- 53 files changed, 56 insertions(+), 142 deletions(-)
-
+diff --git a/drivers/ata/Kconfig b/drivers/ata/Kconfig
+index 2b16e7c8fff35764..39b181d6bd0d8cf2 100644
+--- a/drivers/ata/Kconfig
++++ b/drivers/ata/Kconfig
+@@ -398,7 +398,6 @@ config SATA_DWC_VDEBUG
+ 
+ config SATA_HIGHBANK
+ 	tristate "Calxeda Highbank SATA support"
+-	depends on HAS_DMA
+ 	depends on ARCH_HIGHBANK || COMPILE_TEST
+ 	help
+ 	  This option enables support for the Calxeda Highbank SoC's
+@@ -408,7 +407,6 @@ config SATA_HIGHBANK
+ 
+ config SATA_MV
+ 	tristate "Marvell SATA support"
+-	depends on HAS_DMA
+ 	depends on PCI || ARCH_DOVE || ARCH_MV78XX0 || \
+ 		   ARCH_MVEBU || ARCH_ORION5X || COMPILE_TEST
+ 	select GENERIC_PHY
 -- 
 2.7.4
-
-Gr{oetje,eeting}s,
-
-						Geert
-
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert-Td1EMuHUCqxL1ZNQvxDV9g@public.gmane.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-							    -- Linus Torvalds
