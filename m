@@ -1,8 +1,8 @@
 From: Geert Uytterhoeven <geert@linux-m68k.org>
-Subject: [PATCH v3 03/20] crypto: Remove depends on HAS_DMA in case of
- platform dependency
-Date: Tue, 17 Apr 2018 19:49:03 +0200
-Message-ID: <1523987360-18760-4-git-send-email-geert@linux-m68k.org>
+Subject: [PATCH v3 09/20] iommu: Remove depends on HAS_DMA in case of platform
+ dependency
+Date: Tue, 17 Apr 2018 19:49:09 +0200
+Message-ID: <1523987360-18760-10-git-send-email-geert@linux-m68k.org>
 References: <1523987360-18760-1-git-send-email-geert@linux-m68k.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -61,7 +61,7 @@ This simplifies the dependencies, and allows to improve compile-testing.
 Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
 Reviewed-by: Mark Brown <broonie@kernel.org>
 Acked-by: Robin Murphy <robin.murphy@arm.com>
-Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+Acked-by: Joerg Roedel <jroedel@suse.de>
 ---
 v3:
   - Add Acked-by,
@@ -72,96 +72,38 @@ v2:
   - Drop RFC state,
   - Split per subsystem.
 ---
- drivers/crypto/Kconfig | 14 ++++----------
- 1 file changed, 4 insertions(+), 10 deletions(-)
+ drivers/iommu/Kconfig | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-index d1ea1a07cecbb36c..3dbc47528667b77c 100644
---- a/drivers/crypto/Kconfig
-+++ b/drivers/crypto/Kconfig
-@@ -419,7 +419,7 @@ config CRYPTO_DEV_EXYNOS_RNG
- config CRYPTO_DEV_S5P
- 	tristate "Support for Samsung S5PV210/Exynos crypto accelerator"
- 	depends on ARCH_S5PV210 || ARCH_EXYNOS || COMPILE_TEST
--	depends on HAS_IOMEM && HAS_DMA
-+	depends on HAS_IOMEM
- 	select CRYPTO_AES
- 	select CRYPTO_BLKCIPHER
+diff --git a/drivers/iommu/Kconfig b/drivers/iommu/Kconfig
+index df171cb8582296b9..c76157e57f6ba4ba 100644
+--- a/drivers/iommu/Kconfig
++++ b/drivers/iommu/Kconfig
+@@ -23,7 +23,7 @@ config IOMMU_IO_PGTABLE
+ config IOMMU_IO_PGTABLE_LPAE
+ 	bool "ARMv7/v8 Long Descriptor Format"
+ 	select IOMMU_IO_PGTABLE
+-	depends on HAS_DMA && (ARM || ARM64 || (COMPILE_TEST && !GENERIC_ATOMIC64))
++	depends on ARM || ARM64 || (COMPILE_TEST && !GENERIC_ATOMIC64)
  	help
-@@ -466,7 +466,6 @@ endif # if CRYPTO_DEV_UX500
- 
- config CRYPTO_DEV_ATMEL_AUTHENC
- 	tristate "Support for Atmel IPSEC/SSL hw accelerator"
--	depends on HAS_DMA
- 	depends on ARCH_AT91 || COMPILE_TEST
- 	select CRYPTO_AUTHENC
- 	select CRYPTO_DEV_ATMEL_AES
-@@ -479,7 +478,6 @@ config CRYPTO_DEV_ATMEL_AUTHENC
- 
- config CRYPTO_DEV_ATMEL_AES
- 	tristate "Support for Atmel AES hw accelerator"
--	depends on HAS_DMA
- 	depends on ARCH_AT91 || COMPILE_TEST
- 	select CRYPTO_AES
- 	select CRYPTO_AEAD
-@@ -494,7 +492,6 @@ config CRYPTO_DEV_ATMEL_AES
- 
- config CRYPTO_DEV_ATMEL_TDES
- 	tristate "Support for Atmel DES/TDES hw accelerator"
--	depends on HAS_DMA
- 	depends on ARCH_AT91 || COMPILE_TEST
- 	select CRYPTO_DES
- 	select CRYPTO_BLKCIPHER
-@@ -508,7 +505,6 @@ config CRYPTO_DEV_ATMEL_TDES
- 
- config CRYPTO_DEV_ATMEL_SHA
- 	tristate "Support for Atmel SHA hw accelerator"
--	depends on HAS_DMA
- 	depends on ARCH_AT91 || COMPILE_TEST
- 	select CRYPTO_HASH
+ 	  Enable support for the ARM long descriptor pagetable format.
+ 	  This allocator supports 4K/2M/1G, 16K/32M and 64K/512M page
+@@ -42,7 +42,7 @@ config IOMMU_IO_PGTABLE_LPAE_SELFTEST
+ config IOMMU_IO_PGTABLE_ARMV7S
+ 	bool "ARMv7/v8 Short Descriptor Format"
+ 	select IOMMU_IO_PGTABLE
+-	depends on HAS_DMA && (ARM || ARM64 || COMPILE_TEST)
++	depends on ARM || ARM64 || COMPILE_TEST
  	help
-@@ -574,7 +570,8 @@ config CRYPTO_DEV_CAVIUM_ZIP
- 
- config CRYPTO_DEV_QCE
- 	tristate "Qualcomm crypto engine accelerator"
--	depends on (ARCH_QCOM || COMPILE_TEST) && HAS_DMA && HAS_IOMEM
-+	depends on ARCH_QCOM || COMPILE_TEST
-+	depends on HAS_IOMEM
- 	select CRYPTO_AES
- 	select CRYPTO_DES
- 	select CRYPTO_ECB
-@@ -598,7 +595,6 @@ source "drivers/crypto/vmx/Kconfig"
- config CRYPTO_DEV_IMGTEC_HASH
- 	tristate "Imagination Technologies hardware hash accelerator"
- 	depends on MIPS || COMPILE_TEST
+ 	  Enable support for the ARM Short-descriptor pagetable format.
+ 	  This supports 32-bit virtual and physical addresses mapped using
+@@ -376,7 +376,6 @@ config QCOM_IOMMU
+ 	# Note: iommu drivers cannot (yet?) be built as modules
+ 	bool "Qualcomm IOMMU Support"
+ 	depends on ARCH_QCOM || (COMPILE_TEST && !GENERIC_ATOMIC64)
 -	depends on HAS_DMA
- 	select CRYPTO_MD5
- 	select CRYPTO_SHA1
- 	select CRYPTO_SHA256
-@@ -650,7 +646,6 @@ config CRYPTO_DEV_ROCKCHIP
- 
- config CRYPTO_DEV_MEDIATEK
- 	tristate "MediaTek's EIP97 Cryptographic Engine driver"
--	depends on HAS_DMA
- 	depends on (ARM && ARCH_MEDIATEK) || COMPILE_TEST
- 	select CRYPTO_AES
- 	select CRYPTO_AEAD
-@@ -688,7 +683,7 @@ source "drivers/crypto/stm32/Kconfig"
- 
- config CRYPTO_DEV_SAFEXCEL
- 	tristate "Inside Secure's SafeXcel cryptographic engine driver"
--	depends on HAS_DMA && OF
-+	depends on OF
- 	depends on (ARM64 && ARCH_MVEBU) || (COMPILE_TEST && 64BIT)
- 	select CRYPTO_AES
- 	select CRYPTO_BLKCIPHER
-@@ -706,7 +701,6 @@ config CRYPTO_DEV_SAFEXCEL
- config CRYPTO_DEV_ARTPEC6
- 	tristate "Support for Axis ARTPEC-6/7 hardware crypto acceleration."
- 	depends on ARM && (ARCH_ARTPEC || COMPILE_TEST)
--	depends on HAS_DMA
- 	depends on OF
- 	select CRYPTO_AEAD
- 	select CRYPTO_AES
+ 	select IOMMU_API
+ 	select IOMMU_IO_PGTABLE_LPAE
+ 	select ARM_DMA_USE_IOMMU
 -- 
 2.7.4
