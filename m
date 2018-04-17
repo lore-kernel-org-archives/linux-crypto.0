@@ -1,8 +1,8 @@
 From: Geert Uytterhoeven <geert-Td1EMuHUCqxL1ZNQvxDV9g@public.gmane.org>
-Subject: [PATCH v3 19/20] staging: vc04_services: Remove depends on HAS_DMA in
-	case of platform dependency
-Date: Tue, 17 Apr 2018 19:49:19 +0200
-Message-ID: <1523987360-18760-20-git-send-email-geert@linux-m68k.org>
+Subject: [PATCH v3 13/20] mmc: Remove depends on HAS_DMA in case of platform
+	dependency
+Date: Tue, 17 Apr 2018 19:49:13 +0200
+Message-ID: <1523987360-18760-14-git-send-email-geert@linux-m68k.org>
 References: <1523987360-18760-1-git-send-email-geert@linux-m68k.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -62,7 +62,7 @@ This simplifies the dependencies, and allows to improve compile-testing.
 Signed-off-by: Geert Uytterhoeven <geert-Td1EMuHUCqxL1ZNQvxDV9g@public.gmane.org>
 Reviewed-by: Mark Brown <broonie-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
 Acked-by: Robin Murphy <robin.murphy-5wv7dgnIgG8@public.gmane.org>
-Acked-by: Greg Kroah-Hartman <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>
+Acked-by: Ulf Hansson <ulf.hansson-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
 ---
 v3:
   - Add Acked-by,
@@ -73,19 +73,78 @@ v2:
   - Drop RFC state,
   - Split per subsystem.
 ---
- drivers/staging/vc04_services/Kconfig | 1 -
- 1 file changed, 1 deletion(-)
+ drivers/mmc/host/Kconfig | 10 ++--------
+ 1 file changed, 2 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/staging/vc04_services/Kconfig b/drivers/staging/vc04_services/Kconfig
-index f5aaf7d629f0fae9..98064ce2c2b47c7f 100644
---- a/drivers/staging/vc04_services/Kconfig
-+++ b/drivers/staging/vc04_services/Kconfig
-@@ -1,6 +1,5 @@
- menuconfig BCM_VIDEOCORE
- 	tristate "Broadcom VideoCore support"
+diff --git a/drivers/mmc/host/Kconfig b/drivers/mmc/host/Kconfig
+index 9589f9c9046f14b1..3978d0418958bf6b 100644
+--- a/drivers/mmc/host/Kconfig
++++ b/drivers/mmc/host/Kconfig
+@@ -358,7 +358,6 @@ config MMC_MESON_MX_SDIO
+ 	tristate "Amlogic Meson6/Meson8/Meson8b SD/MMC Host Controller support"
+ 	depends on ARCH_MESON || COMPILE_TEST
+ 	depends on COMMON_CLK
 -	depends on HAS_DMA
  	depends on OF
- 	depends on RASPBERRYPI_FIRMWARE || (COMPILE_TEST && !RASPBERRYPI_FIRMWARE)
- 	default y
+ 	help
+ 	  This selects support for the SD/MMC Host Controller on
+@@ -401,7 +400,6 @@ config MMC_OMAP
+ 
+ config MMC_OMAP_HS
+ 	tristate "TI OMAP High Speed Multimedia Card Interface support"
+-	depends on HAS_DMA
+ 	depends on ARCH_OMAP2PLUS || ARCH_KEYSTONE || COMPILE_TEST
+ 	help
+ 	  This selects the TI OMAP High Speed Multimedia card Interface.
+@@ -511,7 +509,6 @@ config MMC_DAVINCI
+ 
+ config MMC_GOLDFISH
+ 	tristate "goldfish qemu Multimedia Card Interface support"
+-	depends on HAS_DMA
+ 	depends on GOLDFISH || COMPILE_TEST
+ 	help
+ 	  This selects the Goldfish Multimedia card Interface emulation
+@@ -605,7 +602,7 @@ config MMC_SDHI
+ 
+ config MMC_SDHI_SYS_DMAC
+ 	tristate "DMA for SDHI SD/SDIO controllers using SYS-DMAC"
+-	depends on MMC_SDHI && HAS_DMA
++	depends on MMC_SDHI
+ 	default MMC_SDHI if (SUPERH || ARM)
+ 	help
+ 	  This provides DMA support for SDHI SD/SDIO controllers
+@@ -615,7 +612,7 @@ config MMC_SDHI_SYS_DMAC
+ config MMC_SDHI_INTERNAL_DMAC
+ 	tristate "DMA for SDHI SD/SDIO controllers using on-chip bus mastering"
+ 	depends on ARM64 || COMPILE_TEST
+-	depends on MMC_SDHI && HAS_DMA
++	depends on MMC_SDHI
+ 	default MMC_SDHI if ARM64
+ 	help
+ 	  This provides DMA support for SDHI SD/SDIO controllers
+@@ -669,7 +666,6 @@ config MMC_CAVIUM_THUNDERX
+ 
+ config MMC_DW
+ 	tristate "Synopsys DesignWare Memory Card Interface"
+-	depends on HAS_DMA
+ 	depends on ARC || ARM || ARM64 || MIPS || COMPILE_TEST
+ 	help
+ 	  This selects support for the Synopsys DesignWare Mobile Storage IP
+@@ -748,7 +744,6 @@ config MMC_DW_ZX
+ 
+ config MMC_SH_MMCIF
+ 	tristate "SuperH Internal MMCIF support"
+-	depends on HAS_DMA
+ 	depends on SUPERH || ARCH_RENESAS || COMPILE_TEST
+ 	help
+ 	  This selects the MMC Host Interface controller (MMCIF) found in various
+@@ -868,7 +863,6 @@ config MMC_TOSHIBA_PCI
+ config MMC_BCM2835
+ 	tristate "Broadcom BCM2835 SDHOST MMC Controller support"
+ 	depends on ARCH_BCM2835 || COMPILE_TEST
+-	depends on HAS_DMA
+ 	help
+ 	  This selects the BCM2835 SDHOST MMC controller. If you have
+ 	  a BCM2835 platform with SD or MMC devices, say Y or M here.
 -- 
 2.7.4
