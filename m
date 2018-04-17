@@ -1,8 +1,8 @@
 From: Geert Uytterhoeven <geert-Td1EMuHUCqxL1ZNQvxDV9g@public.gmane.org>
-Subject: [PATCH v3 14/20] mtd: Remove depends on HAS_DMA in case of platform
+Subject: [PATCH v3 07/20] i2c: Remove depends on HAS_DMA in case of platform
 	dependency
-Date: Tue, 17 Apr 2018 19:49:14 +0200
-Message-ID: <1523987360-18760-15-git-send-email-geert@linux-m68k.org>
+Date: Tue, 17 Apr 2018 19:49:07 +0200
+Message-ID: <1523987360-18760-8-git-send-email-geert@linux-m68k.org>
 References: <1523987360-18760-1-git-send-email-geert@linux-m68k.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -69,79 +69,38 @@ v3:
 v2:
   - Add Reviewed-by, Acked-by,
   - Drop RFC state,
-  - Drop new dependency of MTD_NAND_MARVELL on HAS_DMA,
   - Split per subsystem.
 ---
- drivers/mtd/nand/raw/Kconfig | 8 ++------
- drivers/mtd/spi-nor/Kconfig  | 2 +-
- 2 files changed, 3 insertions(+), 7 deletions(-)
+ drivers/i2c/busses/Kconfig | 3 ---
+ 1 file changed, 3 deletions(-)
 
-diff --git a/drivers/mtd/nand/raw/Kconfig b/drivers/mtd/nand/raw/Kconfig
-index 19a2b283fbbe627e..6871ff0fd300bb81 100644
---- a/drivers/mtd/nand/raw/Kconfig
-+++ b/drivers/mtd/nand/raw/Kconfig
-@@ -46,7 +46,7 @@ config MTD_NAND_DENALI
- config MTD_NAND_DENALI_PCI
-         tristate "Support Denali NAND controller on Intel Moorestown"
- 	select MTD_NAND_DENALI
--	depends on HAS_DMA && PCI
-+	depends on PCI
-         help
-           Enable the driver for NAND flash on Intel Moorestown, using the
-           Denali NAND controller core.
-@@ -152,7 +152,6 @@ config MTD_NAND_S3C2410_CLKSTOP
- config MTD_NAND_TANGO
- 	tristate "NAND Flash support for Tango chips"
- 	depends on ARCH_TANGO || COMPILE_TEST
--	depends on HAS_DMA
- 	help
- 	  Enables the NAND Flash controller on Tango chips.
- 
-@@ -285,7 +284,7 @@ config MTD_NAND_MARVELL
- 	tristate "NAND controller support on Marvell boards"
- 	depends on PXA3xx || ARCH_MMP || PLAT_ORION || ARCH_MVEBU || \
- 		   COMPILE_TEST
--	depends on HAS_IOMEM && HAS_DMA
-+	depends on HAS_IOMEM
- 	help
- 	  This enables the NAND flash controller driver for Marvell boards,
- 	  including:
-@@ -447,7 +446,6 @@ config MTD_NAND_SH_FLCTL
- 	tristate "Support for NAND on Renesas SuperH FLCTL"
- 	depends on SUPERH || COMPILE_TEST
- 	depends on HAS_IOMEM
--	depends on HAS_DMA
- 	help
- 	  Several Renesas SuperH CPU has FLCTL. This option enables support
- 	  for NAND Flash using FLCTL.
-@@ -515,7 +513,6 @@ config MTD_NAND_SUNXI
- config MTD_NAND_HISI504
- 	tristate "Support for NAND controller on Hisilicon SoC Hip04"
- 	depends on ARCH_HISI || COMPILE_TEST
--	depends on HAS_DMA
- 	help
- 	  Enables support for NAND controller on Hisilicon SoC Hip04.
- 
-@@ -529,7 +526,6 @@ config MTD_NAND_QCOM
- config MTD_NAND_MTK
- 	tristate "Support for NAND controller on MTK SoCs"
+diff --git a/drivers/i2c/busses/Kconfig b/drivers/i2c/busses/Kconfig
+index c4865b08d7fb9e3b..8d21b9825d71764d 100644
+--- a/drivers/i2c/busses/Kconfig
++++ b/drivers/i2c/busses/Kconfig
+@@ -707,7 +707,6 @@ config I2C_MPC
+ config I2C_MT65XX
+ 	tristate "MediaTek I2C adapter"
  	depends on ARCH_MEDIATEK || COMPILE_TEST
 -	depends on HAS_DMA
  	help
- 	  Enables support for NAND controller on MTK SoCs.
- 	  This controller is found on mt27xx, mt81xx, mt65xx SoCs.
-diff --git a/drivers/mtd/spi-nor/Kconfig b/drivers/mtd/spi-nor/Kconfig
-index 89da88e591215db1..c493b8230a38c059 100644
---- a/drivers/mtd/spi-nor/Kconfig
-+++ b/drivers/mtd/spi-nor/Kconfig
-@@ -71,7 +71,7 @@ config SPI_FSL_QUADSPI
- config SPI_HISI_SFC
- 	tristate "Hisilicon SPI-NOR Flash Controller(SFC)"
- 	depends on ARCH_HISI || COMPILE_TEST
--	depends on HAS_IOMEM && HAS_DMA
-+	depends on HAS_IOMEM
- 	help
- 	  This enables support for hisilicon SPI-NOR flash controller.
+ 	  This selects the MediaTek(R) Integrated Inter Circuit bus driver
+ 	  for MT65xx and MT81xx.
+@@ -885,7 +884,6 @@ config I2C_SH7760
  
+ config I2C_SH_MOBILE
+ 	tristate "SuperH Mobile I2C Controller"
+-	depends on HAS_DMA
+ 	depends on ARCH_SHMOBILE || ARCH_RENESAS || COMPILE_TEST
+ 	help
+ 	  If you say yes to this option, support will be included for the
+@@ -1098,7 +1096,6 @@ config I2C_XLP9XX
+ 
+ config I2C_RCAR
+ 	tristate "Renesas R-Car I2C Controller"
+-	depends on HAS_DMA
+ 	depends on ARCH_RENESAS || COMPILE_TEST
+ 	select I2C_SLAVE
+ 	help
 -- 
 2.7.4
