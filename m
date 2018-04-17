@@ -1,54 +1,76 @@
-From: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-Subject: Re: [PATCH v2] X.509: unpack RSA signatureValue field from BIT STRING
-Date: Tue, 17 Apr 2018 17:11:54 +0200
-Message-ID: <7497a6f6-b9fc-a249-a6c8-42ff2723aa4a@maciej.szmigiero.name>
-References: <CGME20180417134032epcas3p21dbb2d3a6d8650cd64e147d2ce89e6ea@epcas3p2.samsung.com>
- <6f5cdb8a-809e-6651-0e32-711d415a8b38@maciej.szmigiero.name>
- <f29df54e-48e1-12e0-f2d2-fd8353cc445f@partner.samsung.com>
+From: Geert Uytterhoeven <geert-Td1EMuHUCqxL1ZNQvxDV9g@public.gmane.org>
+Subject: Re: [PATCH v2 00/21] Allow compile-testing NO_DMA (drivers)
+Date: Tue, 17 Apr 2018 19:48:01 +0200
+Message-ID: <CAMuHMdUrLW7gdsUfKQ5FHBHh1t5ecYBSy-6ZKxPSJoP6TQzXvw@mail.gmail.com>
+References: <1521208314-4783-1-git-send-email-geert@linux-m68k.org>
+	<CAL_JsqJMppYaz31Gg8BH2OaAxs56dnjZ4y+nzBBp-Tt2odaqCw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-2
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Cc: David Howells <dhowells@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Gary Hook <gary.hook@amd.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>, keyrings@vger.kernel.org,
-        linux-security-module@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Kamil Konieczny <k.konieczny@partner.samsung.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <f29df54e-48e1-12e0-f2d2-fd8353cc445f@partner.samsung.com>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
+Cc: Ulf Hansson <ulf.hansson-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, Wolfram Sang <wsa-z923LK4zBo2bacvFa/9K2g@public.gmane.org>,
+	linux-iio-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fpga-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	"open list:REMOTE PROCESSOR \(REMOTEPROC\) SUBSYSTEM"
+	<linux-remoteproc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Linux-ALSA <alsa-devel-K7yf7f+aM1XWsZ/bQMPhNw@public.gmane.org>,
+	Bjorn Andersson <bjorn.andersson-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>,
+	Eric Anholt <eric-WhKQ6XTQaPysTnJN9+BGXg@public.gmane.org>, netdev <netdev-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	MTD Maling List <linux-mtd-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>,
+	Linux I2C <linux-i2c-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	linux1394-devel-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org, Christoph Hellwig <hch-jcswGhMUV9g@public.gmane.org>,
+	Stefan Wahren <stefan.wahren-eS4NqCHxEME@public.gmane.org>,
+	Boris Brezillon <boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>,
+	"James E . J . Bottomley" <jejb-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org>,
+	Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+	scsi <linux-scsi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, Richard Weinberger <richard-/L3Ra7n9ekc@public.gmane.org>,
+	Jassi Brar <jassisinghbrar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, Marek Vasut <marek.vasut-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	"open list:SERI
+To: Rob Herring <robherring2-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+In-Reply-To: <CAL_JsqJMppYaz31Gg8BH2OaAxs56dnjZ4y+nzBBp-Tt2odaqCw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 17.04.2018 17:07, Kamil Konieczny wrote:
-> 
-> 
-> On 17.04.2018 15:39, Maciej S. Szmigiero wrote:
->> The signatureValue field of a X.509 certificate is encoded as a BIT STRING.
->> For RSA signatures this BIT STRING is of so-called primitive subtype, which
->> contains a u8 prefix indicating a count of unused bits in the encoding.
->>
->> We have to strip this prefix from signature data, just as we already do for
->> key data in x509_extract_key_data() function.
->>
->> This wasn't noticed earlier because this prefix byte is zero for RSA key
->> sizes divisible by 8. Since BIT STRING is a big-endian encoding adding zero
->> prefixes has no bearing on its value.
->>
->> The signature length, however was incorrect, which is a problem for RSA
->> implementations that need it to be exactly correct (like AMD CCP).
->>
->> Signed-off-by: Maciej S. Szmigiero <mail@maciej.szmigiero.name>
-> 
-> your e-mail address looks incorrect
-> 
-> [...]
-> 
+Hi Rob,
 
-What's wrong with it?
+On Thu, Apr 5, 2018 at 2:32 AM, Rob Herring <robherring2-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+> On Fri, Mar 16, 2018 at 8:51 AM, Geert Uytterhoeven
+> <geert-Td1EMuHUCqxL1ZNQvxDV9g@public.gmane.org> wrote:
+>> If NO_DMA=y, get_dma_ops() returns a reference to the non-existing
+>> symbol bad_dma_ops, thus causing a link failure if it is ever used.
+>>
+>> The intention of this is twofold:
+>>   1. To catch users of the DMA API on systems that do no support the DMA
+>>      mapping API,
+>>   2. To avoid building drivers that cannot work on such systems anyway.
+>>
+>> However, the disadvantage is that we have to keep on adding dependencies
+>> on HAS_DMA all over the place.
+>>
+>> Thanks to the COMPILE_TEST symbol, lots of drivers now depend on one or
+>> more platform dependencies (that imply HAS_DMA) || COMPILE_TEST, thus
+>> already covering intention #2.  Having to add an explicit dependency on
+>> HAS_DMA here is cumbersome, and hinders compile-testing.
+>
+> The same can be said for CONFIG_IOMEM and CONFIG_OF. Any plans to
+> remove those too? CONFIG_IOMEM is mostly just a !CONFIG_UM option.
 
-Maciej
+Perhaps, if time permits...
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+-- 
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert-Td1EMuHUCqxL1ZNQvxDV9g@public.gmane.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
