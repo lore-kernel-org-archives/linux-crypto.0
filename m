@@ -1,8 +1,8 @@
 From: Geert Uytterhoeven <geert-Td1EMuHUCqxL1ZNQvxDV9g@public.gmane.org>
-Subject: [PATCH v3 13/20] mmc: Remove depends on HAS_DMA in case of platform
-	dependency
-Date: Tue, 17 Apr 2018 19:49:13 +0200
-Message-ID: <1523987360-18760-14-git-send-email-geert@linux-m68k.org>
+Subject: [PATCH v3 17/20] serial: Remove depends on HAS_DMA in case of
+	platform dependency
+Date: Tue, 17 Apr 2018 19:49:17 +0200
+Message-ID: <1523987360-18760-18-git-send-email-geert@linux-m68k.org>
 References: <1523987360-18760-1-git-send-email-geert@linux-m68k.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -62,7 +62,7 @@ This simplifies the dependencies, and allows to improve compile-testing.
 Signed-off-by: Geert Uytterhoeven <geert-Td1EMuHUCqxL1ZNQvxDV9g@public.gmane.org>
 Reviewed-by: Mark Brown <broonie-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
 Acked-by: Robin Murphy <robin.murphy-5wv7dgnIgG8@public.gmane.org>
-Acked-by: Ulf Hansson <ulf.hansson-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+Acked-by: Greg Kroah-Hartman <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>
 ---
 v3:
   - Add Acked-by,
@@ -73,78 +73,44 @@ v2:
   - Drop RFC state,
   - Split per subsystem.
 ---
- drivers/mmc/host/Kconfig | 10 ++--------
- 1 file changed, 2 insertions(+), 8 deletions(-)
+ drivers/tty/serial/Kconfig | 4 ----
+ 1 file changed, 4 deletions(-)
 
-diff --git a/drivers/mmc/host/Kconfig b/drivers/mmc/host/Kconfig
-index 9589f9c9046f14b1..3978d0418958bf6b 100644
---- a/drivers/mmc/host/Kconfig
-+++ b/drivers/mmc/host/Kconfig
-@@ -358,7 +358,6 @@ config MMC_MESON_MX_SDIO
- 	tristate "Amlogic Meson6/Meson8/Meson8b SD/MMC Host Controller support"
- 	depends on ARCH_MESON || COMPILE_TEST
- 	depends on COMMON_CLK
--	depends on HAS_DMA
- 	depends on OF
- 	help
- 	  This selects support for the SD/MMC Host Controller on
-@@ -401,7 +400,6 @@ config MMC_OMAP
+diff --git a/drivers/tty/serial/Kconfig b/drivers/tty/serial/Kconfig
+index 0f058df0b0701fe2..25b8c0a8a50397d6 100644
+--- a/drivers/tty/serial/Kconfig
++++ b/drivers/tty/serial/Kconfig
+@@ -115,7 +115,6 @@ config SERIAL_SB1250_DUART_CONSOLE
  
- config MMC_OMAP_HS
- 	tristate "TI OMAP High Speed Multimedia Card Interface support"
+ config SERIAL_ATMEL
+ 	bool "AT91 on-chip serial port support"
 -	depends on HAS_DMA
- 	depends on ARCH_OMAP2PLUS || ARCH_KEYSTONE || COMPILE_TEST
- 	help
- 	  This selects the TI OMAP High Speed Multimedia card Interface.
-@@ -511,7 +509,6 @@ config MMC_DAVINCI
+ 	depends on ARCH_AT91 || COMPILE_TEST
+ 	select SERIAL_CORE
+ 	select SERIAL_MCTRL_GPIO if GPIOLIB
+@@ -500,7 +499,6 @@ config SERIAL_SA1100_CONSOLE
  
- config MMC_GOLDFISH
- 	tristate "goldfish qemu Multimedia Card Interface support"
+ config SERIAL_IMX
+ 	tristate "IMX serial port support"
 -	depends on HAS_DMA
- 	depends on GOLDFISH || COMPILE_TEST
- 	help
- 	  This selects the Goldfish Multimedia card Interface emulation
-@@ -605,7 +602,7 @@ config MMC_SDHI
+ 	depends on ARCH_MXC || COMPILE_TEST
+ 	select SERIAL_CORE
+ 	select RATIONAL
+@@ -1262,7 +1260,6 @@ config SERIAL_PCH_UART_CONSOLE
  
- config MMC_SDHI_SYS_DMAC
- 	tristate "DMA for SDHI SD/SDIO controllers using SYS-DMAC"
--	depends on MMC_SDHI && HAS_DMA
-+	depends on MMC_SDHI
- 	default MMC_SDHI if (SUPERH || ARM)
- 	help
- 	  This provides DMA support for SDHI SD/SDIO controllers
-@@ -615,7 +612,7 @@ config MMC_SDHI_SYS_DMAC
- config MMC_SDHI_INTERNAL_DMAC
- 	tristate "DMA for SDHI SD/SDIO controllers using on-chip bus mastering"
- 	depends on ARM64 || COMPILE_TEST
--	depends on MMC_SDHI && HAS_DMA
-+	depends on MMC_SDHI
- 	default MMC_SDHI if ARM64
- 	help
- 	  This provides DMA support for SDHI SD/SDIO controllers
-@@ -669,7 +666,6 @@ config MMC_CAVIUM_THUNDERX
- 
- config MMC_DW
- 	tristate "Synopsys DesignWare Memory Card Interface"
+ config SERIAL_MXS_AUART
+ 	tristate "MXS AUART support"
 -	depends on HAS_DMA
- 	depends on ARC || ARM || ARM64 || MIPS || COMPILE_TEST
- 	help
- 	  This selects support for the Synopsys DesignWare Mobile Storage IP
-@@ -748,7 +744,6 @@ config MMC_DW_ZX
- 
- config MMC_SH_MMCIF
- 	tristate "SuperH Internal MMCIF support"
+ 	depends on ARCH_MXS || MACH_ASM9260 || COMPILE_TEST
+ 	select SERIAL_CORE
+ 	select SERIAL_MCTRL_GPIO if GPIOLIB
+@@ -1473,7 +1470,6 @@ config SERIAL_SPRD_CONSOLE
+ config SERIAL_STM32
+ 	tristate "STMicroelectronics STM32 serial port support"
+ 	select SERIAL_CORE
 -	depends on HAS_DMA
- 	depends on SUPERH || ARCH_RENESAS || COMPILE_TEST
+ 	depends on ARCH_STM32 || COMPILE_TEST
  	help
- 	  This selects the MMC Host Interface controller (MMCIF) found in various
-@@ -868,7 +863,6 @@ config MMC_TOSHIBA_PCI
- config MMC_BCM2835
- 	tristate "Broadcom BCM2835 SDHOST MMC Controller support"
- 	depends on ARCH_BCM2835 || COMPILE_TEST
--	depends on HAS_DMA
- 	help
- 	  This selects the BCM2835 SDHOST MMC controller. If you have
- 	  a BCM2835 platform with SD or MMC devices, say Y or M here.
+ 	  This driver is for the on-chip Serial Controller on
 -- 
 2.7.4
