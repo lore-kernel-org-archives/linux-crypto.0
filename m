@@ -1,8 +1,8 @@
 From: Geert Uytterhoeven <geert-Td1EMuHUCqxL1ZNQvxDV9g@public.gmane.org>
-Subject: [PATCH v3 02/20] ata: Remove depends on HAS_DMA in case of platform
-	dependency
-Date: Tue, 17 Apr 2018 19:49:02 +0200
-Message-ID: <1523987360-18760-3-git-send-email-geert@linux-m68k.org>
+Subject: [PATCH v3 16/20] remoteproc: Remove depends on HAS_DMA in case of
+	platform dependency
+Date: Tue, 17 Apr 2018 19:49:16 +0200
+Message-ID: <1523987360-18760-17-git-send-email-geert@linux-m68k.org>
 References: <1523987360-18760-1-git-send-email-geert@linux-m68k.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -62,8 +62,10 @@ This simplifies the dependencies, and allows to improve compile-testing.
 Signed-off-by: Geert Uytterhoeven <geert-Td1EMuHUCqxL1ZNQvxDV9g@public.gmane.org>
 Reviewed-by: Mark Brown <broonie-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
 Acked-by: Robin Murphy <robin.murphy-5wv7dgnIgG8@public.gmane.org>
+Acked-by: Bjorn Andersson <bjorn.andersson-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
 ---
 v3:
+  - Add Acked-by,
   - Rebase to v4.17-rc1,
 
 v2:
@@ -71,28 +73,20 @@ v2:
   - Drop RFC state,
   - Split per subsystem.
 ---
- drivers/ata/Kconfig | 2 --
- 1 file changed, 2 deletions(-)
+ drivers/remoteproc/Kconfig | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/drivers/ata/Kconfig b/drivers/ata/Kconfig
-index 2b16e7c8fff35764..39b181d6bd0d8cf2 100644
---- a/drivers/ata/Kconfig
-+++ b/drivers/ata/Kconfig
-@@ -398,7 +398,6 @@ config SATA_DWC_VDEBUG
+diff --git a/drivers/remoteproc/Kconfig b/drivers/remoteproc/Kconfig
+index 027274008b086d6f..cd1c168fd18898dc 100644
+--- a/drivers/remoteproc/Kconfig
++++ b/drivers/remoteproc/Kconfig
+@@ -24,7 +24,6 @@ config IMX_REMOTEPROC
  
- config SATA_HIGHBANK
- 	tristate "Calxeda Highbank SATA support"
+ config OMAP_REMOTEPROC
+ 	tristate "OMAP remoteproc support"
 -	depends on HAS_DMA
- 	depends on ARCH_HIGHBANK || COMPILE_TEST
- 	help
- 	  This option enables support for the Calxeda Highbank SoC's
-@@ -408,7 +407,6 @@ config SATA_HIGHBANK
- 
- config SATA_MV
- 	tristate "Marvell SATA support"
--	depends on HAS_DMA
- 	depends on PCI || ARCH_DOVE || ARCH_MV78XX0 || \
- 		   ARCH_MVEBU || ARCH_ORION5X || COMPILE_TEST
- 	select GENERIC_PHY
+ 	depends on ARCH_OMAP4 || SOC_OMAP5
+ 	depends on OMAP_IOMMU
+ 	select MAILBOX
 -- 
 2.7.4
