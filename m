@@ -1,8 +1,8 @@
 From: Geert Uytterhoeven <geert-Td1EMuHUCqxL1ZNQvxDV9g@public.gmane.org>
-Subject: [PATCH v3 05/20] firewire: Remove depends on HAS_DMA in case of
-	platform dependency
-Date: Tue, 17 Apr 2018 19:49:05 +0200
-Message-ID: <1523987360-18760-6-git-send-email-geert@linux-m68k.org>
+Subject: [PATCH v3 19/20] staging: vc04_services: Remove depends on HAS_DMA in
+	case of platform dependency
+Date: Tue, 17 Apr 2018 19:49:19 +0200
+Message-ID: <1523987360-18760-20-git-send-email-geert@linux-m68k.org>
 References: <1523987360-18760-1-git-send-email-geert@linux-m68k.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -62,8 +62,10 @@ This simplifies the dependencies, and allows to improve compile-testing.
 Signed-off-by: Geert Uytterhoeven <geert-Td1EMuHUCqxL1ZNQvxDV9g@public.gmane.org>
 Reviewed-by: Mark Brown <broonie-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
 Acked-by: Robin Murphy <robin.murphy-5wv7dgnIgG8@public.gmane.org>
+Acked-by: Greg Kroah-Hartman <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>
 ---
 v3:
+  - Add Acked-by,
   - Rebase to v4.17-rc1,
 
 v2:
@@ -71,18 +73,19 @@ v2:
   - Drop RFC state,
   - Split per subsystem.
 ---
- drivers/firewire/Kconfig | 1 -
+ drivers/staging/vc04_services/Kconfig | 1 -
  1 file changed, 1 deletion(-)
 
-diff --git a/drivers/firewire/Kconfig b/drivers/firewire/Kconfig
-index 145974f9662b63e6..4199849e37585181 100644
---- a/drivers/firewire/Kconfig
-+++ b/drivers/firewire/Kconfig
-@@ -1,5 +1,4 @@
- menu "IEEE 1394 (FireWire) support"
+diff --git a/drivers/staging/vc04_services/Kconfig b/drivers/staging/vc04_services/Kconfig
+index f5aaf7d629f0fae9..98064ce2c2b47c7f 100644
+--- a/drivers/staging/vc04_services/Kconfig
++++ b/drivers/staging/vc04_services/Kconfig
+@@ -1,6 +1,5 @@
+ menuconfig BCM_VIDEOCORE
+ 	tristate "Broadcom VideoCore support"
 -	depends on HAS_DMA
- 	depends on PCI || COMPILE_TEST
- 	# firewire-core does not depend on PCI but is
- 	# not useful without PCI controller driver
+ 	depends on OF
+ 	depends on RASPBERRYPI_FIRMWARE || (COMPILE_TEST && !RASPBERRYPI_FIRMWARE)
+ 	default y
 -- 
 2.7.4
