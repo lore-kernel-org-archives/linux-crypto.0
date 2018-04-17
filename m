@@ -1,76 +1,99 @@
-From: Geert Uytterhoeven <geert-Td1EMuHUCqxL1ZNQvxDV9g@public.gmane.org>
-Subject: Re: [PATCH v2 00/21] Allow compile-testing NO_DMA (drivers)
-Date: Tue, 17 Apr 2018 19:48:01 +0200
-Message-ID: <CAMuHMdUrLW7gdsUfKQ5FHBHh1t5ecYBSy-6ZKxPSJoP6TQzXvw@mail.gmail.com>
-References: <1521208314-4783-1-git-send-email-geert@linux-m68k.org>
-	<CAL_JsqJMppYaz31Gg8BH2OaAxs56dnjZ4y+nzBBp-Tt2odaqCw@mail.gmail.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Subject: [PATCH v3 08/20] iio: adc: Remove depends on HAS_DMA in case of
+ platform dependency
+Date: Tue, 17 Apr 2018 19:49:08 +0200
+Message-ID: <1523987360-18760-9-git-send-email-geert@linux-m68k.org>
+References: <1523987360-18760-1-git-send-email-geert@linux-m68k.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Cc: Ulf Hansson <ulf.hansson-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, Wolfram Sang <wsa-z923LK4zBo2bacvFa/9K2g@public.gmane.org>,
-	linux-iio-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fpga-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	"open list:REMOTE PROCESSOR \(REMOTEPROC\) SUBSYSTEM"
-	<linux-remoteproc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Linux-ALSA <alsa-devel-K7yf7f+aM1XWsZ/bQMPhNw@public.gmane.org>,
-	Bjorn Andersson <bjorn.andersson-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>,
-	Eric Anholt <eric-WhKQ6XTQaPysTnJN9+BGXg@public.gmane.org>, netdev <netdev-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	MTD Maling List <linux-mtd-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>,
-	Linux I2C <linux-i2c-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	linux1394-devel-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org, Christoph Hellwig <hch-jcswGhMUV9g@public.gmane.org>,
-	Stefan Wahren <stefan.wahren-eS4NqCHxEME@public.gmane.org>,
-	Boris Brezillon <boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>,
-	"James E . J . Bottomley" <jejb-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org>,
-	Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-	scsi <linux-scsi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, Richard Weinberger <richard-/L3Ra7n9ekc@public.gmane.org>,
-	Jassi Brar <jassisinghbrar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, Marek Vasut <marek.vasut-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	"open list:SERI
-To: Rob Herring <robherring2-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-In-Reply-To: <CAL_JsqJMppYaz31Gg8BH2OaAxs56dnjZ4y+nzBBp-Tt2odaqCw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
-List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
-Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Cc: devel@driverdev.osuosl.org, alsa-devel@alsa-project.org,
+ linux-media@vger.kernel.org, linux-iio@vger.kernel.org, netdev@vger.kernel.org,
+ linux-fpga@vger.kernel.org, linux-usb@vger.kernel.org,
+ linux-mmc@vger.kernel.org, linux-fbdev@vger.kernel.org,
+ linux-spi@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-ide@vger.kernel.org, iommu@lists.linux-foundation.org,
+ linux-mtd@lists.infradead.org, linux-crypto@vger.kernel.org,
+ linux-serial@vger.kernel.org, Geert Uytterhoeven <geert@linux-m68k.org>,
+ linux-remoteproc@vger.kernel.org, linux1394-devel@lists.sourceforge.net,
+ linux-kernel@vger.kernel.org, linux-i2c@vger.kernel.org
+To: Christoph Hellwig <hch@lst.de>,
+ Marek Szyprowski <m.szyprowski@samsung.com>,
+ Robin Murphy <robin.murphy@arm.com>, Felipe Balbi <balbi@kernel.org>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Andrew Morton <akpm@linux-foundation.org>, Mark Brown <broonie@kernel.org>,
+ Liam Girdwood <lgirdwood@gmail.com>, Tejun Heo <tj@kernel.org>,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ "David S . Miller" <davem@davemloft.net>,
+ Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+ Stefan Richter <stefanr@s5r6.in-berlin.de>, Alan Tull <atull@kernel.org>,
+ Moritz Fischer <mdf@kernel.org>, Wolfram Sang <wsa@the-dreams.de>,
+ Jonathan Cameron <jic23@kernel.org>, Joerg Roedel <joro@8bytes.org>,
+ Matias Bjorling <mb@lightnvm.io>, Jassi Brar <jassisinghbrar@gmail.com>,
+ Mauro Carvalho Chehab <mchehab@kernel.org>,
+ Ulf Hansson <ulf.hansson@linaro.org>,
+ David Woodhouse <dwmw2@infradead.org>,
+ Br
+Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
+In-Reply-To: <1523987360-18760-1-git-send-email-geert@linux-m68k.org>
+List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
+List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
+List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
+List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
+List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
+Errors-To: driverdev-devel-bounces@linuxdriverproject.org
+Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
 List-Id: linux-crypto.vger.kernel.org
 
-Hi Rob,
+Remove dependencies on HAS_DMA where a Kconfig symbol depends on another
+symbol that implies HAS_DMA, and, optionally, on "|| COMPILE_TEST".
+In most cases this other symbol is an architecture or platform specific
+symbol, or PCI.
 
-On Thu, Apr 5, 2018 at 2:32 AM, Rob Herring <robherring2-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> On Fri, Mar 16, 2018 at 8:51 AM, Geert Uytterhoeven
-> <geert-Td1EMuHUCqxL1ZNQvxDV9g@public.gmane.org> wrote:
->> If NO_DMA=y, get_dma_ops() returns a reference to the non-existing
->> symbol bad_dma_ops, thus causing a link failure if it is ever used.
->>
->> The intention of this is twofold:
->>   1. To catch users of the DMA API on systems that do no support the DMA
->>      mapping API,
->>   2. To avoid building drivers that cannot work on such systems anyway.
->>
->> However, the disadvantage is that we have to keep on adding dependencies
->> on HAS_DMA all over the place.
->>
->> Thanks to the COMPILE_TEST symbol, lots of drivers now depend on one or
->> more platform dependencies (that imply HAS_DMA) || COMPILE_TEST, thus
->> already covering intention #2.  Having to add an explicit dependency on
->> HAS_DMA here is cumbersome, and hinders compile-testing.
->
-> The same can be said for CONFIG_IOMEM and CONFIG_OF. Any plans to
-> remove those too? CONFIG_IOMEM is mostly just a !CONFIG_UM option.
+Generic symbols and drivers without platform dependencies keep their
+dependencies on HAS_DMA, to prevent compiling subsystems or drivers that
+cannot work anyway.
 
-Perhaps, if time permits...
+This simplifies the dependencies, and allows to improve compile-testing.
 
-Gr{oetje,eeting}s,
+Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
+Reviewed-by: Mark Brown <broonie@kernel.org>
+Acked-by: Robin Murphy <robin.murphy@arm.com>
+Acked-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+---
+v3:
+  - Add Acked-by,
+  - Rebase to v4.17-rc1,
 
-                        Geert
+v2:
+  - Add Reviewed-by, Acked-by,
+  - Drop RFC state,
+  - Split per subsystem.
+---
+ drivers/iio/adc/Kconfig | 2 --
+ 1 file changed, 2 deletions(-)
 
+diff --git a/drivers/iio/adc/Kconfig b/drivers/iio/adc/Kconfig
+index 15606f237480dacb..88bbcd0e98632273 100644
+--- a/drivers/iio/adc/Kconfig
++++ b/drivers/iio/adc/Kconfig
+@@ -157,7 +157,6 @@ config AT91_SAMA5D2_ADC
+ 	tristate "Atmel AT91 SAMA5D2 ADC"
+ 	depends on ARCH_AT91 || COMPILE_TEST
+ 	depends on HAS_IOMEM
+-	depends on HAS_DMA
+ 	select IIO_TRIGGERED_BUFFER
+ 	help
+ 	  Say yes here to build support for Atmel SAMA5D2 ADC which is
+@@ -646,7 +645,6 @@ config SD_ADC_MODULATOR
+ config STM32_ADC_CORE
+ 	tristate "STMicroelectronics STM32 adc core"
+ 	depends on ARCH_STM32 || COMPILE_TEST
+-	depends on HAS_DMA
+ 	depends on OF
+ 	depends on REGULATOR
+ 	select IIO_BUFFER
 -- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert-Td1EMuHUCqxL1ZNQvxDV9g@public.gmane.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+2.7.4
