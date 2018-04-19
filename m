@@ -1,116 +1,81 @@
-From: Kalle Valo <kvalo@codeaurora.org>
-Subject: Re: [PATCH v3 15/20] net: Remove depends on HAS_DMA in case of
- platform dependency
-Date: Thu, 19 Apr 2018 19:41:15 +0300
-Message-ID: <87wox3i1xw.fsf@kamboji.qca.qualcomm.com>
-References: <1523987360-18760-1-git-send-email-geert@linux-m68k.org>
- <1523987360-18760-16-git-send-email-geert@linux-m68k.org>
+From: Dmitry Vyukov <dvyukov@google.com>
+Subject: Re: WARNING: kernel stack frame pointer has bad value
+Date: Thu, 19 Apr 2018 19:28:52 +0200
+Message-ID: <CACT4Y+ZX0mkUx4bKJGH2+TDmL0JSbgLCYhZX2nNqkeyBEx3bXQ@mail.gmail.com>
+References: <0000000000004ccb0e056a359f77@google.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Ulf Hansson <ulf.hansson@linaro.org>, Wolfram Sang <wsa@the-dreams.de>,
- linux-iio@vger.kernel.org, linux-wireless@vger.kernel.org,
- linux-fpga@vger.kernel.org, linux-remoteproc@vger.kernel.org,
- alsa-devel@alsa-project.org, Bjorn Andersson <bjorn.andersson@linaro.org>,
- Eric Anholt <eric@anholt.net>, netdev@vger.kernel.org,
- linux-mtd@lists.infradead.org, linux-i2c@vger.kernel.org,
- linux1394-devel@lists.sourceforge.net, Christoph Hellwig <hch@lst.de>,
- Marek Szyprowski <m.szyprowski@samsung.com>,
- Stefan Wahren <stefan.wahren@i2se.com>,
- Boris Brezillon <boris.brezillon@free-electrons.com>,
- Herbert Xu <herbert@gondor.apana.org.au>, Richard Weinberger <richard@nod.at>,
- Joerg Roedel <joro@8bytes.org>, Jassi Brar <jassisinghbrar@gmail.com>,
- Marek Vasut <marek.vasut@gmail.com>, linux-serial@vger.kernel.org,
- Matias Bjorling <mb@lightnvm.io>, David Woodhouse <dwmw2@infradead.org>,
- l
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
-In-Reply-To: <1523987360-18760-16-git-send-email-geert@linux-m68k.org> (Geert
- Uytterhoeven's message of "Tue, 17 Apr 2018 19:49:15 +0200")
-List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
-List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
-List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
-List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
-List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
-Errors-To: driverdev-devel-bounces@linuxdriverproject.org
-Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
+Content-Type: text/plain; charset="UTF-8"
+Cc: LKML <linux-kernel@vger.kernel.org>,
+        syzkaller-bugs <syzkaller-bugs@googlegroups.com>
+To: syzbot <syzbot+37035ccfa9a0a017ffcf@syzkaller.appspotmail.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        David Miller <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, Eric Biggers <ebiggers3@gmail.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <0000000000004ccb0e056a359f77@google.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-(adding linux-wireless)
+On Thu, Apr 19, 2018 at 5:57 PM, syzbot
+<syzbot+37035ccfa9a0a017ffcf@syzkaller.appspotmail.com> wrote:
+> Hello,
+>
+> syzbot hit the following crash on upstream commit
+> 48023102b7078a6674516b1fe0d639669336049d (Fri Apr 13 23:55:41 2018 +0000)
+> Merge branch 'overlayfs-linus' of
+> git://git.kernel.org/pub/scm/linux/kernel/git/mszeredi/vfs
+> syzbot dashboard link:
+> https://syzkaller.appspot.com/bug?extid=37035ccfa9a0a017ffcf
+>
+> So far this crash happened 141 times on net-next, upstream.
+> C reproducer: https://syzkaller.appspot.com/x/repro.c?id=5871698234572800
+> syzkaller reproducer:
+> https://syzkaller.appspot.com/x/repro.syz?id=5086177975599104
+> Raw console output:
+> https://syzkaller.appspot.com/x/log.txt?id=5110926181138432
+> Kernel config:
+> https://syzkaller.appspot.com/x/.config?id=-8852471259444315113
+> compiler: gcc (GCC) 8.0.1 20180413 (experimental)
 
-Geert Uytterhoeven <geert@linux-m68k.org> writes:
+This seems to be related to keccakf_rndc, please see the "Raw console
+output" link.
++crypto maintainers
 
-> Remove dependencies on HAS_DMA where a Kconfig symbol depends on another
-> symbol that implies HAS_DMA, and, optionally, on "|| COMPILE_TEST".
-> In most cases this other symbol is an architecture or platform specific
-> symbol, or PCI.
+> IMPORTANT: if you fix the bug, please add the following tag to the commit:
+> Reported-by: syzbot+37035ccfa9a0a017ffcf@syzkaller.appspotmail.com
+> It will help syzbot understand when the bug is fixed. See footer for
+> details.
+> If you forward the report, please keep this part and the footer.
 >
-> Generic symbols and drivers without platform dependencies keep their
-> dependencies on HAS_DMA, to prevent compiling subsystems or drivers that
-> cannot work anyway.
+> 00000000ed8ccbe7: 0000000000440169 (0x440169)
+> 00000000469f2a79: 0000000000000033 (0x33)
+> 000000004636639d: 0000000000000246 (0x246)
+> 00000000aa65aef8: 00007ffead676158 (0x7ffead676158)
+> 00000000e3ef297c: 000000000000002b (0x2b)
+> WARNING: kernel stack frame pointer at 000000004832711f in
+> syzkaller561281:4479 has bad value 000000006b4f8502
+> WARNING: kernel stack regs at 0000000089e11b3b in syzkaller561281:4479 has
+> bad 'bp' value 00000000f19a2a3b
+> random: crng init done
 >
-> This simplifies the dependencies, and allows to improve compile-testing.
 >
-> Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
-> Reviewed-by: Mark Brown <broonie@kernel.org>
-> Acked-by: Robin Murphy <robin.murphy@arm.com>
 > ---
-> v3:
->   - Rebase to v4.17-rc1,
->   - Drop obsolete note about FSL_FMAN,
+> This bug is generated by a dumb bot. It may contain errors.
+> See https://goo.gl/tpsmEJ for details.
+> Direct all questions to syzkaller@googlegroups.com.
 >
-> v2:
->   - Add Reviewed-by, Acked-by,
->   - Drop RFC state,
->   - Split per subsystem.
-> ---
->  drivers/net/ethernet/amd/Kconfig                | 2 +-
->  drivers/net/ethernet/apm/xgene-v2/Kconfig       | 1 -
->  drivers/net/ethernet/apm/xgene/Kconfig          | 1 -
->  drivers/net/ethernet/arc/Kconfig                | 6 ++++--
->  drivers/net/ethernet/broadcom/Kconfig           | 2 --
->  drivers/net/ethernet/calxeda/Kconfig            | 2 +-
->  drivers/net/ethernet/hisilicon/Kconfig          | 2 +-
->  drivers/net/ethernet/marvell/Kconfig            | 8 +++-----
->  drivers/net/ethernet/mellanox/mlxsw/Kconfig     | 2 +-
->  drivers/net/ethernet/renesas/Kconfig            | 2 --
->  drivers/net/wireless/broadcom/brcm80211/Kconfig | 1 -
->  drivers/net/wireless/quantenna/qtnfmac/Kconfig  | 2 +-
->  12 files changed, 12 insertions(+), 19 deletions(-)
-
-For wireless:
-
-Acked-by: Kalle Valo <kvalo@codeaurora.org>
-
-Leaving the hunks for linux-wireless list to see:
-
-> diff --git a/drivers/net/wireless/broadcom/brcm80211/Kconfig b/drivers/net/wireless/broadcom/brcm80211/Kconfig
-> index 9d99eb42d9176f0f..6acba67bca07abd7 100644
-> --- a/drivers/net/wireless/broadcom/brcm80211/Kconfig
-> +++ b/drivers/net/wireless/broadcom/brcm80211/Kconfig
-> @@ -60,7 +60,6 @@ config BRCMFMAC_PCIE
->  	bool "PCIE bus interface support for FullMAC driver"
->  	depends on BRCMFMAC
->  	depends on PCI
-> -	depends on HAS_DMA
->  	select BRCMFMAC_PROTO_MSGBUF
->  	select FW_LOADER
->  	---help---
-> diff --git a/drivers/net/wireless/quantenna/qtnfmac/Kconfig b/drivers/net/wireless/quantenna/qtnfmac/Kconfig
-> index 025fa6018550895a..8d1492a90bd135c0 100644
-> --- a/drivers/net/wireless/quantenna/qtnfmac/Kconfig
-> +++ b/drivers/net/wireless/quantenna/qtnfmac/Kconfig
-> @@ -7,7 +7,7 @@ config QTNFMAC
->  config QTNFMAC_PEARL_PCIE
->  	tristate "Quantenna QSR10g PCIe support"
->  	default n
-> -	depends on HAS_DMA && PCI && CFG80211
-> +	depends on PCI && CFG80211
->  	select QTNFMAC
->  	select FW_LOADER
->  	select CRC32
-
--- 
-Kalle Valo
+> syzbot will keep track of this bug report.
+> If you forgot to add the Reported-by tag, once the fix for this bug is
+> merged
+> into any tree, please reply to this email with:
+> #syz fix: exact-commit-title
+> If you want to test a patch for this bug, please reply with:
+> #syz test: git://repo/address.git branch
+> and provide the patch inline or as an attachment.
+> To mark this as a duplicate of another syzbot report, please reply with:
+> #syz dup: exact-subject-of-another-report
+> If it's a one-off invalid bug report, please reply with:
+> #syz invalid
+> Note: if the crash happens again, it will cause creation of a new bug
+> report.
+> Note: all commands must start from beginning of the line in the email body.
