@@ -1,73 +1,53 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 2/2] crypto: ccree: enable support for hardware keys
-Date: Thu, 19 Apr 2018 11:35:09 +0800
-Message-ID: <20180419033509.dbzetnt4bv7lj7cb@gondor.apana.org.au>
-References: <1522049540-10042-1-git-send-email-gilad@benyossef.com>
- <1522049540-10042-3-git-send-email-gilad@benyossef.com>
- <20180330172616.GB28120@gondor.apana.org.au>
- <CAOtvUMd6MMyQBHU4E=5DKXndhZw90=K1V1apD0uRRaMLyp-0Ag@mail.gmail.com>
- <20180403101905.GA4245@gondor.apana.org.au>
- <CAOtvUMdCBky5Ay1WOSjNZYm=4O63bBaT_mV589xPXJdZ=EPOHg@mail.gmail.com>
+Subject: Re: [PATCH] crypto: testmgr: Allow different compression results
+Date: Thu, 19 Apr 2018 11:42:11 +0800
+Message-ID: <20180419034210.nsmzuf3f6lmn7suc@gondor.apana.org.au>
+References: <20180411182832.27761-1-jglauber@cavium.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-        Ofir Drang <ofir.drang@arm.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux kernel mailing list <linux-kernel@vger.kernel.org>
-To: Gilad Ben-Yossef <gilad@benyossef.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Mahipal Challa <mchalla@cavium.com>,
+        Balakrishna Bhamidipati <bbhamidipati@cavium.com>
+To: Jan Glauber <jglauber@cavium.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <CAOtvUMdCBky5Ay1WOSjNZYm=4O63bBaT_mV589xPXJdZ=EPOHg@mail.gmail.com>
+In-Reply-To: <20180411182832.27761-1-jglauber@cavium.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Apr 09, 2018 at 11:42:31AM +0300, Gilad Ben-Yossef wrote:
+On Wed, Apr 11, 2018 at 08:28:32PM +0200, Jan Glauber wrote:
 >
-> Please look again. The stub version of cc_is_hw_key() doing that is being
-> replaced in this patch.
+> @@ -1362,7 +1373,17 @@ static int test_comp(struct crypto_comp *tfm,
+>  			goto out;
+>  		}
+>  
+> -		if (dlen != ctemplate[i].outlen) {
+> +		ilen = dlen;
+> +		dlen = COMP_BUF_SIZE;
+> +		ret = crypto_comp_decompress(tfm, output,
+> +					     ilen, decomp_output, &dlen);
+> +		if (ret) {
+> +			pr_err("alg: comp: compression failed: decompress: on test %d for %s failed: ret=%d\n",
+> +			       i + 1, algo, -ret);
+> +			goto out;
+> +		}
+> +
+> +		if (dlen != ctemplate[i].inlen) {
+>  			printk(KERN_ERR "alg: comp: Compression test %d "
+>  			       "failed for %s: output len = %d\n", i + 1, algo,
+>  			       dlen);
 
-The point is that the existing mechanism was unused before and this
-is new code.  So you can't really point to the stubbed-out function
-as a precedent.
- 
-> The s390 key and the cryptocell keys are not the same:
-> 
-> Their is, I believe, is an AES key encrypted by some internal key/algorithm.
-> 
-> The cryptocell "key" is a token, which is internally comprised of one
-> or two indexes, referencing slots in the internal memory in the
-> hardware, and a key size, that describe the size of the key.
-> 
-> I thought it would be confusing to use "paes" to describe both, since
-> they are not interchangeable.
-> You would not be able to feed an paes key that works with the s390
-> version to cryptocell and vice verse and get it work.
+Your patch is fine as it is.
 
-Thanks for the info.
+But I just thought I'd mention that if anyone wants to we should
+really change this to use a different tfm, e.g., always use the
+generic algorithm to perform the decompression.  This way if there
+were multiple implementations we can at least test them against
+the generic one.
 
-> Having said, if you prefer to have "paes" simply designate
-> "implementation specific token for an AES key" I'm perfectly fine with
-> that.
-
-Well by definition none of these hardware keys will be compatible
-with each other so I don't really see the point of using individual
-algorithm names such as paes or haes.  This would make sense only if
-they were somehow compatible with each other.
-
-So instead of using algorithm names, you really want refer to the
-specific driver name, which means that they can all use the same
-algorithm name.
-
-> > As to your patch specifically, there is one issue where you're
-> > directly dereferencing the key as a struct.  This is a no-no because
-> > the key may have come from user-space.  You must treat it as a
-> > binary blob.  The s390 code seems to do this correctly.
-> 
-> As noted above, the haes "key" is really a token encoding 3 different
-> pieces of information:
-
-My point is that you should not just cast it but instead do a
-copy to properly aligned kernel memory.
+Otherwise you could end up with a buggy implementation that works
+against itself but still generates incorrect output.
 
 Cheers,
 -- 
