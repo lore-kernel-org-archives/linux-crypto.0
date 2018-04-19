@@ -1,235 +1,116 @@
-From: Varsha Rao <rvarsha016@gmail.com>
-Subject: [RESEND PATCH v2] crypto: cavium: zip: Remove unnecessary parentheses
-Date: Thu, 19 Apr 2018 21:19:43 +0530
-Message-ID: <20180419154943.21983-1-rvarsha016@gmail.com>
-Cc: Varsha Rao <rvarsha016@gmail.com>
-To: Julia Lawall <julia.lawall@lip6.fr>, Joe Perches <joe@perches.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        cocci <cocci@systeme.lip6.fr>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Lukas Bulwahn <lukas.bulwahn@gmail.com>,
-        Nicholas Mc Guire <der.herr@hofr.at>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
+From: Kalle Valo <kvalo@codeaurora.org>
+Subject: Re: [PATCH v3 15/20] net: Remove depends on HAS_DMA in case of
+ platform dependency
+Date: Thu, 19 Apr 2018 19:41:15 +0300
+Message-ID: <87wox3i1xw.fsf@kamboji.qca.qualcomm.com>
+References: <1523987360-18760-1-git-send-email-geert@linux-m68k.org>
+ <1523987360-18760-16-git-send-email-geert@linux-m68k.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Ulf Hansson <ulf.hansson@linaro.org>, Wolfram Sang <wsa@the-dreams.de>,
+ linux-iio@vger.kernel.org, linux-wireless@vger.kernel.org,
+ linux-fpga@vger.kernel.org, linux-remoteproc@vger.kernel.org,
+ alsa-devel@alsa-project.org, Bjorn Andersson <bjorn.andersson@linaro.org>,
+ Eric Anholt <eric@anholt.net>, netdev@vger.kernel.org,
+ linux-mtd@lists.infradead.org, linux-i2c@vger.kernel.org,
+ linux1394-devel@lists.sourceforge.net, Christoph Hellwig <hch@lst.de>,
+ Marek Szyprowski <m.szyprowski@samsung.com>,
+ Stefan Wahren <stefan.wahren@i2se.com>,
+ Boris Brezillon <boris.brezillon@free-electrons.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>, Richard Weinberger <richard@nod.at>,
+ Joerg Roedel <joro@8bytes.org>, Jassi Brar <jassisinghbrar@gmail.com>,
+ Marek Vasut <marek.vasut@gmail.com>, linux-serial@vger.kernel.org,
+ Matias Bjorling <mb@lightnvm.io>, David Woodhouse <dwmw2@infradead.org>,
+ l
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
+In-Reply-To: <1523987360-18760-16-git-send-email-geert@linux-m68k.org> (Geert
+ Uytterhoeven's message of "Tue, 17 Apr 2018 19:49:15 +0200")
+List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
+List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
+List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
+List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
+List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
+Errors-To: driverdev-devel-bounces@linuxdriverproject.org
+Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
 List-Id: linux-crypto.vger.kernel.org
 
-This patch fixes the clang warning of extraneous parentheses, with the
-following coccinelle script.
+(adding linux-wireless)
 
-@@
-identifier i;
-constant c;
-expression e;
-@@
-(
-!((e))
-|
--((
-\(i == c\|i != c\|i <= c\|i < c\|i >= c\|i > c\)
--))
-)
+Geert Uytterhoeven <geert@linux-m68k.org> writes:
 
-Signed-off-by: Varsha Rao <rvarsha016@gmail.com>
----
-Changes in v2:
- - Modified coccinelle script
+> Remove dependencies on HAS_DMA where a Kconfig symbol depends on another
+> symbol that implies HAS_DMA, and, optionally, on "|| COMPILE_TEST".
+> In most cases this other symbol is an architecture or platform specific
+> symbol, or PCI.
+>
+> Generic symbols and drivers without platform dependencies keep their
+> dependencies on HAS_DMA, to prevent compiling subsystems or drivers that
+> cannot work anyway.
+>
+> This simplifies the dependencies, and allows to improve compile-testing.
+>
+> Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
+> Reviewed-by: Mark Brown <broonie@kernel.org>
+> Acked-by: Robin Murphy <robin.murphy@arm.com>
+> ---
+> v3:
+>   - Rebase to v4.17-rc1,
+>   - Drop obsolete note about FSL_FMAN,
+>
+> v2:
+>   - Add Reviewed-by, Acked-by,
+>   - Drop RFC state,
+>   - Split per subsystem.
+> ---
+>  drivers/net/ethernet/amd/Kconfig                | 2 +-
+>  drivers/net/ethernet/apm/xgene-v2/Kconfig       | 1 -
+>  drivers/net/ethernet/apm/xgene/Kconfig          | 1 -
+>  drivers/net/ethernet/arc/Kconfig                | 6 ++++--
+>  drivers/net/ethernet/broadcom/Kconfig           | 2 --
+>  drivers/net/ethernet/calxeda/Kconfig            | 2 +-
+>  drivers/net/ethernet/hisilicon/Kconfig          | 2 +-
+>  drivers/net/ethernet/marvell/Kconfig            | 8 +++-----
+>  drivers/net/ethernet/mellanox/mlxsw/Kconfig     | 2 +-
+>  drivers/net/ethernet/renesas/Kconfig            | 2 --
+>  drivers/net/wireless/broadcom/brcm80211/Kconfig | 1 -
+>  drivers/net/wireless/quantenna/qtnfmac/Kconfig  | 2 +-
+>  12 files changed, 12 insertions(+), 19 deletions(-)
 
- drivers/crypto/cavium/zip/zip_regs.h | 42 ++++++++++++++++++------------------
- 1 file changed, 21 insertions(+), 21 deletions(-)
+For wireless:
 
-diff --git a/drivers/crypto/cavium/zip/zip_regs.h b/drivers/crypto/cavium/zip/zip_regs.h
-index d0be682305c1..874e0236c87e 100644
---- a/drivers/crypto/cavium/zip/zip_regs.h
-+++ b/drivers/crypto/cavium/zip/zip_regs.h
-@@ -443,7 +443,7 @@ union zip_corex_bist_status {
- 
- static inline u64 ZIP_COREX_BIST_STATUS(u64 param1)
- {
--	if (((param1 <= 1)))
-+	if (param1 <= 1)
- 		return 0x0520ull + (param1 & 1) * 0x8ull;
- 	pr_err("ZIP_COREX_BIST_STATUS: %llu\n", param1);
- 	return 0;
-@@ -537,7 +537,7 @@ union zip_dbg_corex_inst {
- 
- static inline u64 ZIP_DBG_COREX_INST(u64 param1)
- {
--	if (((param1 <= 1)))
-+	if (param1 <= 1)
- 		return 0x0640ull + (param1 & 1) * 0x8ull;
- 	pr_err("ZIP_DBG_COREX_INST: %llu\n", param1);
- 	return 0;
-@@ -568,7 +568,7 @@ union zip_dbg_corex_sta {
- 
- static inline u64 ZIP_DBG_COREX_STA(u64 param1)
- {
--	if (((param1 <= 1)))
-+	if (param1 <= 1)
- 		return 0x0680ull + (param1 & 1) * 0x8ull;
- 	pr_err("ZIP_DBG_COREX_STA: %llu\n", param1);
- 	return 0;
-@@ -599,7 +599,7 @@ union zip_dbg_quex_sta {
- 
- static inline u64 ZIP_DBG_QUEX_STA(u64 param1)
- {
--	if (((param1 <= 7)))
-+	if (param1 <= 7)
- 		return 0x1800ull + (param1 & 7) * 0x8ull;
- 	pr_err("ZIP_DBG_QUEX_STA: %llu\n", param1);
- 	return 0;
-@@ -817,7 +817,7 @@ union zip_msix_pbax {
- 
- static inline u64 ZIP_MSIX_PBAX(u64 param1)
- {
--	if (((param1 == 0)))
-+	if (param1 == 0)
- 		return 0x0000838000FF0000ull;
- 	pr_err("ZIP_MSIX_PBAX: %llu\n", param1);
- 	return 0;
-@@ -846,7 +846,7 @@ union zip_msix_vecx_addr {
- 
- static inline u64 ZIP_MSIX_VECX_ADDR(u64 param1)
- {
--	if (((param1 <= 17)))
-+	if (param1 <= 17)
- 		return 0x0000838000F00000ull + (param1 & 31) * 0x10ull;
- 	pr_err("ZIP_MSIX_VECX_ADDR: %llu\n", param1);
- 	return 0;
-@@ -875,7 +875,7 @@ union zip_msix_vecx_ctl {
- 
- static inline u64 ZIP_MSIX_VECX_CTL(u64 param1)
- {
--	if (((param1 <= 17)))
-+	if (param1 <= 17)
- 		return 0x0000838000F00008ull + (param1 & 31) * 0x10ull;
- 	pr_err("ZIP_MSIX_VECX_CTL: %llu\n", param1);
- 	return 0;
-@@ -900,7 +900,7 @@ union zip_quex_done {
- 
- static inline u64 ZIP_QUEX_DONE(u64 param1)
- {
--	if (((param1 <= 7)))
-+	if (param1 <= 7)
- 		return 0x2000ull + (param1 & 7) * 0x8ull;
- 	pr_err("ZIP_QUEX_DONE: %llu\n", param1);
- 	return 0;
-@@ -925,7 +925,7 @@ union zip_quex_done_ack {
- 
- static inline u64 ZIP_QUEX_DONE_ACK(u64 param1)
- {
--	if (((param1 <= 7)))
-+	if (param1 <= 7)
- 		return 0x2200ull + (param1 & 7) * 0x8ull;
- 	pr_err("ZIP_QUEX_DONE_ACK: %llu\n", param1);
- 	return 0;
-@@ -950,7 +950,7 @@ union zip_quex_done_ena_w1c {
- 
- static inline u64 ZIP_QUEX_DONE_ENA_W1C(u64 param1)
- {
--	if (((param1 <= 7)))
-+	if (param1 <= 7)
- 		return 0x2600ull + (param1 & 7) * 0x8ull;
- 	pr_err("ZIP_QUEX_DONE_ENA_W1C: %llu\n", param1);
- 	return 0;
-@@ -975,7 +975,7 @@ union zip_quex_done_ena_w1s {
- 
- static inline u64 ZIP_QUEX_DONE_ENA_W1S(u64 param1)
- {
--	if (((param1 <= 7)))
-+	if (param1 <= 7)
- 		return 0x2400ull + (param1 & 7) * 0x8ull;
- 	pr_err("ZIP_QUEX_DONE_ENA_W1S: %llu\n", param1);
- 	return 0;
-@@ -1004,7 +1004,7 @@ union zip_quex_done_wait {
- 
- static inline u64 ZIP_QUEX_DONE_WAIT(u64 param1)
- {
--	if (((param1 <= 7)))
-+	if (param1 <= 7)
- 		return 0x2800ull + (param1 & 7) * 0x8ull;
- 	pr_err("ZIP_QUEX_DONE_WAIT: %llu\n", param1);
- 	return 0;
-@@ -1029,7 +1029,7 @@ union zip_quex_doorbell {
- 
- static inline u64 ZIP_QUEX_DOORBELL(u64 param1)
- {
--	if (((param1 <= 7)))
-+	if (param1 <= 7)
- 		return 0x4000ull + (param1 & 7) * 0x8ull;
- 	pr_err("ZIP_QUEX_DOORBELL: %llu\n", param1);
- 	return 0;
-@@ -1058,7 +1058,7 @@ union zip_quex_err_ena_w1c {
- 
- static inline u64 ZIP_QUEX_ERR_ENA_W1C(u64 param1)
- {
--	if (((param1 <= 7)))
-+	if (param1 <= 7)
- 		return 0x3600ull + (param1 & 7) * 0x8ull;
- 	pr_err("ZIP_QUEX_ERR_ENA_W1C: %llu\n", param1);
- 	return 0;
-@@ -1087,7 +1087,7 @@ union zip_quex_err_ena_w1s {
- 
- static inline u64 ZIP_QUEX_ERR_ENA_W1S(u64 param1)
- {
--	if (((param1 <= 7)))
-+	if (param1 <= 7)
- 		return 0x3400ull + (param1 & 7) * 0x8ull;
- 	pr_err("ZIP_QUEX_ERR_ENA_W1S: %llu\n", param1);
- 	return 0;
-@@ -1120,7 +1120,7 @@ union zip_quex_err_int {
- 
- static inline u64 ZIP_QUEX_ERR_INT(u64 param1)
- {
--	if (((param1 <= 7)))
-+	if (param1 <= 7)
- 		return 0x3000ull + (param1 & 7) * 0x8ull;
- 	pr_err("ZIP_QUEX_ERR_INT: %llu\n", param1);
- 	return 0;
-@@ -1150,7 +1150,7 @@ union zip_quex_err_int_w1s {
- 
- static inline u64 ZIP_QUEX_ERR_INT_W1S(u64 param1)
- {
--	if (((param1 <= 7)))
-+	if (param1 <= 7)
- 		return 0x3200ull + (param1 & 7) * 0x8ull;
- 	pr_err("ZIP_QUEX_ERR_INT_W1S: %llu\n", param1);
- 	return 0;
-@@ -1179,7 +1179,7 @@ union zip_quex_gcfg {
- 
- static inline u64 ZIP_QUEX_GCFG(u64 param1)
- {
--	if (((param1 <= 7)))
-+	if (param1 <= 7)
- 		return 0x1A00ull + (param1 & 7) * 0x8ull;
- 	pr_err("ZIP_QUEX_GCFG: %llu\n", param1);
- 	return 0;
-@@ -1204,7 +1204,7 @@ union zip_quex_map {
- 
- static inline u64 ZIP_QUEX_MAP(u64 param1)
- {
--	if (((param1 <= 7)))
-+	if (param1 <= 7)
- 		return 0x1400ull + (param1 & 7) * 0x8ull;
- 	pr_err("ZIP_QUEX_MAP: %llu\n", param1);
- 	return 0;
-@@ -1236,7 +1236,7 @@ union zip_quex_sbuf_addr {
- 
- static inline u64 ZIP_QUEX_SBUF_ADDR(u64 param1)
- {
--	if (((param1 <= 7)))
-+	if (param1 <= 7)
- 		return 0x1000ull + (param1 & 7) * 0x8ull;
- 	pr_err("ZIP_QUEX_SBUF_ADDR: %llu\n", param1);
- 	return 0;
-@@ -1276,7 +1276,7 @@ union zip_quex_sbuf_ctl {
- 
- static inline u64 ZIP_QUEX_SBUF_CTL(u64 param1)
- {
--	if (((param1 <= 7)))
-+	if (param1 <= 7)
- 		return 0x1200ull + (param1 & 7) * 0x8ull;
- 	pr_err("ZIP_QUEX_SBUF_CTL: %llu\n", param1);
- 	return 0;
+Acked-by: Kalle Valo <kvalo@codeaurora.org>
+
+Leaving the hunks for linux-wireless list to see:
+
+> diff --git a/drivers/net/wireless/broadcom/brcm80211/Kconfig b/drivers/net/wireless/broadcom/brcm80211/Kconfig
+> index 9d99eb42d9176f0f..6acba67bca07abd7 100644
+> --- a/drivers/net/wireless/broadcom/brcm80211/Kconfig
+> +++ b/drivers/net/wireless/broadcom/brcm80211/Kconfig
+> @@ -60,7 +60,6 @@ config BRCMFMAC_PCIE
+>  	bool "PCIE bus interface support for FullMAC driver"
+>  	depends on BRCMFMAC
+>  	depends on PCI
+> -	depends on HAS_DMA
+>  	select BRCMFMAC_PROTO_MSGBUF
+>  	select FW_LOADER
+>  	---help---
+> diff --git a/drivers/net/wireless/quantenna/qtnfmac/Kconfig b/drivers/net/wireless/quantenna/qtnfmac/Kconfig
+> index 025fa6018550895a..8d1492a90bd135c0 100644
+> --- a/drivers/net/wireless/quantenna/qtnfmac/Kconfig
+> +++ b/drivers/net/wireless/quantenna/qtnfmac/Kconfig
+> @@ -7,7 +7,7 @@ config QTNFMAC
+>  config QTNFMAC_PEARL_PCIE
+>  	tristate "Quantenna QSR10g PCIe support"
+>  	default n
+> -	depends on HAS_DMA && PCI && CFG80211
+> +	depends on PCI && CFG80211
+>  	select QTNFMAC
+>  	select FW_LOADER
+>  	select CRC32
+
 -- 
-2.14.3
+Kalle Valo
