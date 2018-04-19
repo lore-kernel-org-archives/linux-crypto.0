@@ -1,243 +1,266 @@
-From: Wolfram Sang <wsa+renesas-jBu1N2QxHDJrcw3mvpCnnVaTQe2KTcn/@public.gmane.org>
+From: Wolfram Sang <wsa+renesas@sang-engineering.com>
 Subject: [PATCH 00/61] tree-wide: simplify getting .drvdata
 Date: Thu, 19 Apr 2018 16:05:30 +0200
-Message-ID: <20180419140641.27926-1-wsa+renesas__25986.5125212402$1524147688$gmane$org@sang-engineering.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: linux-ide-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, alsa-devel-K7yf7f+aM1XWsZ/bQMPhNw@public.gmane.org,
- linux-iio-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, kernel-janitors-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
- linux-fbdev-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, dri-devel-PD4FTy7X32lNgt0PjOBp9y5qC8QIuHrW@public.gmane.org,
- platform-driver-x86-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
- Wolfram Sang <wsa+renesas-jBu1N2QxHDJrcw3mvpCnnVaTQe2KTcn/@public.gmane.org>, linux-mtd-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
- linux-clk-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, ac100-oU9gvf+ajcQ97yFScArB1dHuzzzSOjJt@public.gmane.org,
- devel-gWbeCf7V1WCQmaza687I9mD2FQJk+8+b@public.gmane.org, linux-samsung-soc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
- linux-rockchip-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-serial-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
- linux-input-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-media-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
- linux-pwm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-watchdog-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
- linux-pm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-arm-msm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
- acpi4asus-user-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org, greybus-dev-cunTk1MwBs8s++Sfvej+rw@public.gmane.org,
- linux-mediatek-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-tegra-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
- linux-omap-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-soc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
- linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linu
-To: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Return-path: <freedreno-bounces-PD4FTy7X32lNgt0PjOBp9y5qC8QIuHrW@public.gmane.org>
-List-Unsubscribe: <https://lists.freedesktop.org/mailman/options/freedreno>,
- <mailto:freedreno-request-PD4FTy7X32lNgt0PjOBp9y5qC8QIuHrW@public.gmane.org?subject=unsubscribe>
-List-Archive: <https://lists.freedesktop.org/archives/freedreno>
-List-Post: <mailto:freedreno-PD4FTy7X32lNgt0PjOBp9y5qC8QIuHrW@public.gmane.org>
-List-Help: <mailto:freedreno-request-PD4FTy7X32lNgt0PjOBp9y5qC8QIuHrW@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.freedesktop.org/mailman/listinfo/freedreno>,
- <mailto:freedreno-request-PD4FTy7X32lNgt0PjOBp9y5qC8QIuHrW@public.gmane.org?subject=subscribe>
-Errors-To: freedreno-bounces-PD4FTy7X32lNgt0PjOBp9y5qC8QIuHrW@public.gmane.org
-Sender: "Freedreno" <freedreno-bounces-PD4FTy7X32lNgt0PjOBp9y5qC8QIuHrW@public.gmane.org>
+Message-ID: <20180419140641.27926-1-wsa+renesas__39554.8478620642$1524147784$gmane$org@sang-engineering.com>
+Cc: linux-renesas-soc@vger.kernel.org, kernel-janitors@vger.kernel.org,
+        Wolfram Sang <wsa+renesas@sang-engineering.com>,
+        ac100@lists.launchpad.net, acpi4asus-user@lists.sourceforge.net,
+        alsa-devel@alsa-project.org, devel@driverdev.osuosl.org,
+        dmaengine@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        freedreno@lists.freedesktop.org, greybus-dev@lists.linaro.org,
+        iommu@lists.linux-foundation.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-arm-msm@vger.kernel.org, linux-clk@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-fbdev@vger.kernel.org,
+        linux-gpio@vger.kernel.org, linux-ide@vger.kernel.org,
+        linux-iio@vger.kernel.org, linux-input@vger.kernel.org,
+        linux-mediatek@lists.infradead.org, linux-media@vger.kernel.org,
+        linux-mmc@vger.kernel.org, linux-mtd@lists.infradead.org,
+To: linux-kernel@vger.kernel.org
+Return-path: <netdev-owner@vger.kernel.org>
+Sender: netdev-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-SSBnb3QgdGlyZWQgb2YgZml4aW5nIHRoaXMgaW4gUmVuZXNhcyBkcml2ZXJzIG1hbnVhbGx5LCBz
-byBJIHRvb2sgdGhlIGJpZwpoYW1tZXIuIFJlbW92ZSB0aGlzIGN1bWJlcnNvbWUgY29kZSBwYXR0
-ZXJuIHdoaWNoIGdvdCBjb3B5LXBhc3RlZCB0b28gbXVjaAphbHJlYWR5OgoKLQlzdHJ1Y3QgcGxh
-dGZvcm1fZGV2aWNlICpwZGV2ID0gdG9fcGxhdGZvcm1fZGV2aWNlKGRldik7Ci0Jc3RydWN0IGVw
-OTN4eF9rZXlwYWQgKmtleXBhZCA9IHBsYXRmb3JtX2dldF9kcnZkYXRhKHBkZXYpOworCXN0cnVj
-dCBlcDkzeHhfa2V5cGFkICprZXlwYWQgPSBkZXZfZ2V0X2RydmRhdGEoZGV2KTsKCkkgc2VuZCB0
-aGlzIG91dCBhcyBvbmUgcGF0Y2ggcGVyIGRpcmVjdG9yeSBwZXIgc3Vic3lzdGVtLiBJIHRoaW5r
-IHRoZXkgc2hvdWxkCmJlIGFwcGxpZWQgaW5kaXZpZHVhbGx5LiBJZiB5b3UgcHJlZmVyIGEgYnJv
-a2VuIG91dCBzZXJpZXMgcGVyIHN1YnN5c3RlbSwgSSBjYW4KcHJvdmlkZSB0aGlzIGFzIHdlbGwu
-IEp1c3QgbWFpbCBtZS4KCkEgYnJhbmNoICh0ZXN0ZWQgYnkgYnVpbGRib3Q7IG9ubHkgd2l0aCBh
-bGwgY29tbWl0cyBzcXVhc2hlZCBpbnRvIG9uZSBjb21taXQKYmVmb3JlKSBjYW4gYmUgZm91bmQg
-aGVyZToKCmdpdDovL2dpdC5rZXJuZWwub3JnL3B1Yi9zY20vbGludXgva2VybmVsL2dpdC93c2Ev
-bGludXguZ2l0IGNvY2NpbmVsbGUvZ2V0X2RydmRhdGEKCk9wZW4gZm9yIG90aGVyIGNvbW1lbnRz
-LCBzdWdnZXN0aW9ucywgdG9vLCBvZiBjb3Vyc2UuCgpIZXJlIGlzIHRoZSBjb2NjaS1zY3JpcHQg
-SSBjcmVhdGVkIChhZnRlciA8bj4gaXRlcmF0aW9ucyBieSBtYW51YWxseSBjaGVja2luZwpzYW1w
-bGVzKToKCkBACnN0cnVjdCBkZXZpY2UqIGQ7CmlkZW50aWZpZXIgcGRldjsKZXhwcmVzc2lvbiAq
-cHRyOwpAQAooCi0Jc3RydWN0IHBsYXRmb3JtX2RldmljZSAqcGRldiA9IHRvX3BsYXRmb3JtX2Rl
-dmljZShkKTsKfAotCXN0cnVjdCBwbGF0Zm9ybV9kZXZpY2UgKnBkZXY7CgkuLi4KLQlwZGV2ID0g
-dG9fcGxhdGZvcm1fZGV2aWNlKGQpOwopCgk8Li4uIHdoZW4gIT0gcGRldgotCSZwZGV2LT5kZXYK
-KwlkCgkuLi4+CgoJcHRyID0KLQlwbGF0Zm9ybV9nZXRfZHJ2ZGF0YShwZGV2KQorCWRldl9nZXRf
-ZHJ2ZGF0YShkKQoKCTwuLi4gd2hlbiAhPSBwZGV2Ci0JJnBkZXYtPmRldgorCWQKCS4uLj4KCktp
-bmQgcmVnYXJkcywKCiAgIFdvbGZyYW0KCgpXb2xmcmFtIFNhbmcgKDYxKToKICBBUk06IHBsYXQt
-c2Ftc3VuZzogc2ltcGxpZnkgZ2V0dGluZyAuZHJ2ZGF0YQogIGF0YTogc2ltcGxpZnkgZ2V0dGlu
-ZyAuZHJ2ZGF0YQogIGF1eGRpc3BsYXk6IHNpbXBsaWZ5IGdldHRpbmcgLmRydmRhdGEKICBidXM6
-IHNpbXBsaWZ5IGdldHRpbmcgLmRydmRhdGEKICBjbGs6IHNhbXN1bmc6IHNpbXBsaWZ5IGdldHRp
-bmcgLmRydmRhdGEKICBjcnlwdG86IHNpbXBsaWZ5IGdldHRpbmcgLmRydmRhdGEKICBkbWE6IHNp
-bXBsaWZ5IGdldHRpbmcgLmRydmRhdGEKICBkbWFlbmdpbmU6IGR3OiBzaW1wbGlmeSBnZXR0aW5n
-IC5kcnZkYXRhCiAgZG1hZW5naW5lOiBxY29tOiBzaW1wbGlmeSBnZXR0aW5nIC5kcnZkYXRhCiAg
-Z3Bpbzogc2ltcGxpZnkgZ2V0dGluZyAuZHJ2ZGF0YQogIGdwdTogZHJtOiBtc206IHNpbXBsaWZ5
-IGdldHRpbmcgLmRydmRhdGEKICBncHU6IGRybTogbXNtOiBhZHJlbm86IHNpbXBsaWZ5IGdldHRp
-bmcgLmRydmRhdGEKICBncHU6IGRybTogbXNtOiBkaXNwOiBtZHA1OiBzaW1wbGlmeSBnZXR0aW5n
-IC5kcnZkYXRhCiAgZ3B1OiBkcm06IG1zbTogZHNpOiBzaW1wbGlmeSBnZXR0aW5nIC5kcnZkYXRh
-CiAgZ3B1OiBkcm06IG9tYXBkcm06IGRpc3BsYXlzOiBzaW1wbGlmeSBnZXR0aW5nIC5kcnZkYXRh
-CiAgZ3B1OiBkcm06IHZjNDogc2ltcGxpZnkgZ2V0dGluZyAuZHJ2ZGF0YQogIGhpZDogc2ltcGxp
-ZnkgZ2V0dGluZyAuZHJ2ZGF0YQogIGlpbzogY29tbW9uOiBjcm9zX2VjX3NlbnNvcnM6IHNpbXBs
-aWZ5IGdldHRpbmcgLmRydmRhdGEKICBpaW86IGNvbW1vbjogaGlkLXNlbnNvcnM6IHNpbXBsaWZ5
-IGdldHRpbmcgLmRydmRhdGEKICBpbnB1dDoga2V5Ym9hcmQ6IHNpbXBsaWZ5IGdldHRpbmcgLmRy
-dmRhdGEKICBpbnB1dDogbWlzYzogc2ltcGxpZnkgZ2V0dGluZyAuZHJ2ZGF0YQogIGlucHV0OiBt
-b3VzZTogc2ltcGxpZnkgZ2V0dGluZyAuZHJ2ZGF0YQogIGlucHV0OiB0b3VjaHNjcmVlbjogc2lt
-cGxpZnkgZ2V0dGluZyAuZHJ2ZGF0YQogIGlvbW11OiBzaW1wbGlmeSBnZXR0aW5nIC5kcnZkYXRh
-CiAgbWVkaWE6IHBsYXRmb3JtOiBhbTQzN3g6IHNpbXBsaWZ5IGdldHRpbmcgLmRydmRhdGEKICBt
-ZWRpYTogcGxhdGZvcm06IGV4eW5vczQtaXM6IHNpbXBsaWZ5IGdldHRpbmcgLmRydmRhdGEKICBt
-ZWRpYTogcGxhdGZvcm06IHM1cC1tZmM6IHNpbXBsaWZ5IGdldHRpbmcgLmRydmRhdGEKICBtbWM6
-IGhvc3Q6IHNpbXBsaWZ5IGdldHRpbmcgLmRydmRhdGEKICBtdGQ6IGRldmljZXM6IHNpbXBsaWZ5
-IGdldHRpbmcgLmRydmRhdGEKICBtdGQ6IG5hbmQ6IG9uZW5hbmQ6IHNpbXBsaWZ5IGdldHRpbmcg
-LmRydmRhdGEKICBuZXQ6IGRzYTogc2ltcGxpZnkgZ2V0dGluZyAuZHJ2ZGF0YQogIG5ldDogZXRo
-ZXJuZXQ6IGNhZGVuY2U6IHNpbXBsaWZ5IGdldHRpbmcgLmRydmRhdGEKICBuZXQ6IGV0aGVybmV0
-OiBkYXZpY29tOiBzaW1wbGlmeSBnZXR0aW5nIC5kcnZkYXRhCiAgbmV0OiBldGhlcm5ldDogc21z
-Yzogc2ltcGxpZnkgZ2V0dGluZyAuZHJ2ZGF0YQogIG5ldDogZXRoZXJuZXQ6IHRpOiBzaW1wbGlm
-eSBnZXR0aW5nIC5kcnZkYXRhCiAgbmV0OiBldGhlcm5ldDogd2l6bmV0OiBzaW1wbGlmeSBnZXR0
-aW5nIC5kcnZkYXRhCiAgcGVyZjogc2ltcGxpZnkgZ2V0dGluZyAuZHJ2ZGF0YQogIHBpbmN0cmw6
-IHNpbXBsaWZ5IGdldHRpbmcgLmRydmRhdGEKICBwaW5jdHJsOiBpbnRlbDogc2ltcGxpZnkgZ2V0
-dGluZyAuZHJ2ZGF0YQogIHBsYXRmb3JtOiB4ODY6IHNpbXBsaWZ5IGdldHRpbmcgLmRydmRhdGEK
-ICBwb3dlcjogc3VwcGx5OiBzaW1wbGlmeSBnZXR0aW5nIC5kcnZkYXRhCiAgcHRwOiBzaW1wbGlm
-eSBnZXR0aW5nIC5kcnZkYXRhCiAgcHdtOiBzaW1wbGlmeSBnZXR0aW5nIC5kcnZkYXRhCiAgcnRj
-OiBzaW1wbGlmeSBnZXR0aW5nIC5kcnZkYXRhCiAgc2xpbWJ1czogc2ltcGxpZnkgZ2V0dGluZyAu
-ZHJ2ZGF0YQogIHNwaTogc2ltcGxpZnkgZ2V0dGluZyAuZHJ2ZGF0YQogIHN0YWdpbmc6IGdyZXli
-dXM6IHNpbXBsaWZ5IGdldHRpbmcgLmRydmRhdGEKICBzdGFnaW5nOiBpaW86IGFkYzogc2ltcGxp
-ZnkgZ2V0dGluZyAuZHJ2ZGF0YQogIHN0YWdpbmc6IG52ZWM6IHNpbXBsaWZ5IGdldHRpbmcgLmRy
-dmRhdGEKICB0aGVybWFsOiBzaW1wbGlmeSBnZXR0aW5nIC5kcnZkYXRhCiAgdGhlcm1hbDogaW50
-MzQweF90aGVybWFsOiBzaW1wbGlmeSBnZXR0aW5nIC5kcnZkYXRhCiAgdGhlcm1hbDogc3Q6IHNp
-bXBsaWZ5IGdldHRpbmcgLmRydmRhdGEKICB0dHk6IHNlcmlhbDogc2ltcGxpZnkgZ2V0dGluZyAu
-ZHJ2ZGF0YQogIHVpbzogc2ltcGxpZnkgZ2V0dGluZyAuZHJ2ZGF0YQogIHVzYjogbXR1Mzogc2lt
-cGxpZnkgZ2V0dGluZyAuZHJ2ZGF0YQogIHVzYjogcGh5OiBzaW1wbGlmeSBnZXR0aW5nIC5kcnZk
-YXRhCiAgdmlkZW86IGZiZGV2OiBzaW1wbGlmeSBnZXR0aW5nIC5kcnZkYXRhCiAgdmlkZW86IGZi
-ZGV2OiBvbWFwMjogb21hcGZiOiBkaXNwbGF5czogc2ltcGxpZnkgZ2V0dGluZyAuZHJ2ZGF0YQog
-IHdhdGNoZG9nOiBzaW1wbGlmeSBnZXR0aW5nIC5kcnZkYXRhCiAgbmV0OiBkc2E6IHNpbXBsaWZ5
-IGdldHRpbmcgLmRydmRhdGEKICBBU29DOiBhdG1lbDogc2ltcGxpZnkgZ2V0dGluZyAuZHJ2ZGF0
-YQoKIGFyY2gvYXJtL3BsYXQtc2Ftc3VuZy9hZGMuYyAgICAgICAgICAgICAgICAgICAgICAgIHwg
-IDMgKy0KIGRyaXZlcnMvYXRhL3BhdGFfc2Ftc3VuZ19jZi5jICAgICAgICAgICAgICAgICAgICAg
-IHwgIDggKystLS0KIGRyaXZlcnMvYXV4ZGlzcGxheS9hcm0tY2hhcmxjZC5jICAgICAgICAgICAg
-ICAgICAgIHwgIDYgKystLQogZHJpdmVycy9idXMvYnJjbXN0Yl9naXNiLmMgICAgICAgICAgICAg
-ICAgICAgICAgICAgfCAxMiArKystLS0tCiBkcml2ZXJzL2Nsay9zYW1zdW5nL2Nsay1zM2MyNDEw
-LWRjbGsuYyAgICAgICAgICAgICB8ICA2ICsrLS0KIGRyaXZlcnMvY3J5cHRvL2V4eW5vcy1ybmcu
-YyAgICAgICAgICAgICAgICAgICAgICAgIHwgIDYgKystLQogZHJpdmVycy9jcnlwdG8vcGljb3hj
-ZWxsX2NyeXB0by5jICAgICAgICAgICAgICAgICAgfCAgNiArKy0tCiBkcml2ZXJzL2RtYS9hdF9o
-ZG1hYy5jICAgICAgICAgICAgICAgICAgICAgICAgICAgICB8ICA5ICsrLS0tCiBkcml2ZXJzL2Rt
-YS9hdF94ZG1hYy5jICAgICAgICAgICAgICAgICAgICAgICAgICAgICB8ICA5ICsrLS0tCiBkcml2
-ZXJzL2RtYS9kdy9wbGF0Zm9ybS5jICAgICAgICAgICAgICAgICAgICAgICAgICB8ICA2ICsrLS0K
-IGRyaXZlcnMvZG1hL2ZzbGRtYS5jICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDYg
-KystLQogZHJpdmVycy9kbWEvaWRtYTY0LmMgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-fCAgNiArKy0tCiBkcml2ZXJzL2RtYS9xY29tL2hpZG1hLmMgICAgICAgICAgICAgICAgICAgICAg
-ICAgICB8ICAzICstCiBkcml2ZXJzL2RtYS9xY29tL2hpZG1hX21nbXRfc3lzLmMgICAgICAgICAg
-ICAgICAgICB8ICA2ICsrLS0KIGRyaXZlcnMvZG1hL3N0ZV9kbWE0MC5jICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgIHwgMTIgKysrLS0tLQogZHJpdmVycy9kbWEvdHh4OWRtYWMuYyAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgfCAgOCArKy0tLQogZHJpdmVycy9ncGlvL2dwaW8tZHdhcGIu
-YyAgICAgICAgICAgICAgICAgICAgICAgICAgfCAgNiArKy0tCiBkcml2ZXJzL2dwaW8vZ3Bpby1s
-eW54cG9pbnQuYyAgICAgICAgICAgICAgICAgICAgICB8ICAzICstCiBkcml2ZXJzL2dwaW8vZ3Bp
-by1vbWFwLmMgICAgICAgICAgICAgICAgICAgICAgICAgICB8IDEyICsrKy0tLS0KIGRyaXZlcnMv
-Z3Bpby9ncGlvLXRlZ3JhLmMgICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDYgKystLQogZHJp
-dmVycy9ncGlvL2dwaW8tenlucS5jICAgICAgICAgICAgICAgICAgICAgICAgICAgfCAgNiArKy0t
-CiBkcml2ZXJzL2dwdS9kcm0vbXNtL2FkcmVuby9hZHJlbm9fZGV2aWNlLmMgICAgICAgICB8ICA2
-ICsrLS0KIGRyaXZlcnMvZ3B1L2RybS9tc20vZGlzcC9tZHA1L21kcDVfa21zLmMgICAgICAgICAg
-IHwgIDYgKystLQogZHJpdmVycy9ncHUvZHJtL21zbS9kc2kvZHNpX2hvc3QuYyAgICAgICAgICAg
-ICAgICAgfCAgNiArKy0tCiBkcml2ZXJzL2dwdS9kcm0vbXNtL21zbV9kcnYuYyAgICAgICAgICAg
-ICAgICAgICAgICB8ICAzICstCiBkcml2ZXJzL2dwdS9kcm0vb21hcGRybS9kaXNwbGF5cy9wYW5l
-bC1kc2ktY20uYyAgICB8IDE4ICsrKystLS0tLS0KIGRyaXZlcnMvZ3B1L2RybS92YzQvdmM0X2Ry
-di5jICAgICAgICAgICAgICAgICAgICAgIHwgIDMgKy0KIGRyaXZlcnMvaGlkL2hpZC1zZW5zb3It
-Y3VzdG9tLmMgICAgICAgICAgICAgICAgICAgIHwgMTIgKysrLS0tLQogLi4uL2NvbW1vbi9jcm9z
-X2VjX3NlbnNvcnMvY3Jvc19lY19zZW5zb3JzX2NvcmUuYyAgfCAgNiArKy0tCiAuLi4vaWlvL2Nv
-bW1vbi9oaWQtc2Vuc29ycy9oaWQtc2Vuc29yLXRyaWdnZXIuYyAgICB8ICA5ICsrLS0tCiBkcml2
-ZXJzL2lucHV0L2tleWJvYXJkL2VwOTN4eF9rZXlwYWQuYyAgICAgICAgICAgICB8IDEwICsrKy0t
-LQogZHJpdmVycy9pbnB1dC9rZXlib2FyZC9pbXhfa2V5cGFkLmMgICAgICAgICAgICAgICAgfCAx
-MCArKystLS0KIGRyaXZlcnMvaW5wdXQva2V5Ym9hcmQvbHBjMzJ4eC1rZXlzLmMgICAgICAgICAg
-ICAgIHwgIDYgKystLQogZHJpdmVycy9pbnB1dC9rZXlib2FyZC9tYXRyaXhfa2V5cGFkLmMgICAg
-ICAgICAgICAgfCAxMCArKystLS0KIGRyaXZlcnMvaW5wdXQva2V5Ym9hcmQvb21hcDQta2V5cGFk
-LmMgICAgICAgICAgICAgIHwgMTAgKysrLS0tCiBkcml2ZXJzL2lucHV0L2tleWJvYXJkL3BtaWM4
-eHh4LWtleXBhZC5jICAgICAgICAgICB8ICA2ICsrLS0KIGRyaXZlcnMvaW5wdXQva2V5Ym9hcmQv
-cHhhMjd4X2tleXBhZC5jICAgICAgICAgICAgIHwgMTAgKysrLS0tCiBkcml2ZXJzL2lucHV0L2tl
-eWJvYXJkL3NhbXN1bmcta2V5cGFkLmMgICAgICAgICAgICB8IDEyICsrKy0tLS0KIGRyaXZlcnMv
-aW5wdXQva2V5Ym9hcmQvc252c19wd3JrZXkuYyAgICAgICAgICAgICAgIHwgMTAgKysrLS0tCiBk
-cml2ZXJzL2lucHV0L2tleWJvYXJkL3NwZWFyLWtleWJvYXJkLmMgICAgICAgICAgICB8IDEwICsr
-Ky0tLQogZHJpdmVycy9pbnB1dC9rZXlib2FyZC9zdC1rZXlzY2FuLmMgICAgICAgICAgICAgICAg
-fCAgNiArKy0tCiBkcml2ZXJzL2lucHV0L2tleWJvYXJkL3RlZ3JhLWtiYy5jICAgICAgICAgICAg
-ICAgICB8IDEwICsrKy0tLQogZHJpdmVycy9pbnB1dC9taXNjL21heDc3NjkzLWhhcHRpYy5jICAg
-ICAgICAgICAgICAgfCAgNiArKy0tCiBkcml2ZXJzL2lucHV0L21pc2MvbWF4ODk5N19oYXB0aWMu
-YyAgICAgICAgICAgICAgICB8ICAzICstCiBkcml2ZXJzL2lucHV0L21pc2MvcGFsbWFzLXB3cmJ1
-dHRvbi5jICAgICAgICAgICAgICB8ICA2ICsrLS0KIGRyaXZlcnMvaW5wdXQvbWlzYy9yZWd1bGF0
-b3ItaGFwdGljLmMgICAgICAgICAgICAgIHwgIDYgKystLQogZHJpdmVycy9pbnB1dC9taXNjL3R3
-bDQwMzAtdmlicmEuYyAgICAgICAgICAgICAgICAgfCAgMyArLQogZHJpdmVycy9pbnB1dC9taXNj
-L3R3bDYwNDAtdmlicmEuYyAgICAgICAgICAgICAgICAgfCAgMyArLQogZHJpdmVycy9pbnB1dC9t
-b3VzZS9uYXZwb2ludC5jICAgICAgICAgICAgICAgICAgICAgfCAgNiArKy0tCiBkcml2ZXJzL2lu
-cHV0L3RvdWNoc2NyZWVuL2lteDZ1bF90c2MuYyAgICAgICAgICAgICB8ICA2ICsrLS0KIGRyaXZl
-cnMvaW9tbXUvcWNvbV9pb21tdS5jICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDYgKystLQog
-ZHJpdmVycy9tZWRpYS9wbGF0Zm9ybS9hbTQzN3gvYW00Mzd4LXZwZmUuYyAgICAgICAgfCAgNiAr
-Ky0tCiBkcml2ZXJzL21lZGlhL3BsYXRmb3JtL2V4eW5vczQtaXMvbWVkaWEtZGV2LmMgICAgICB8
-ICA2ICsrLS0KIGRyaXZlcnMvbWVkaWEvcGxhdGZvcm0vZXh5bm9zNC1pcy9taXBpLWNzaXMuYyAg
-ICAgIHwgIDYgKystLQogZHJpdmVycy9tZWRpYS9wbGF0Zm9ybS9zNXAtbWZjL3M1cF9tZmMuYyAg
-ICAgICAgICAgfCAgNiArKy0tCiBkcml2ZXJzL21tYy9ob3N0L2RhdmluY2lfbW1jLmMgICAgICAg
-ICAgICAgICAgICAgICB8ICA2ICsrLS0KIGRyaXZlcnMvbW1jL2hvc3Qvc2RoY2ktb2YtYXJhc2Fu
-LmMgICAgICAgICAgICAgICAgIHwgIDYgKystLQogZHJpdmVycy9tbWMvaG9zdC93bXQtc2RtbWMu
-YyAgICAgICAgICAgICAgICAgICAgICAgfCAgNiArKy0tCiBkcml2ZXJzL210ZC9kZXZpY2VzL2Rv
-Y2czLmMgICAgICAgICAgICAgICAgICAgICAgICB8ICAzICstCiBkcml2ZXJzL210ZC9uYW5kL29u
-ZW5hbmQvc2Ftc3VuZy5jICAgICAgICAgICAgICAgICB8ICA2ICsrLS0KIGRyaXZlcnMvbmV0L2Rz
-YS9iY21fc2YyLmMgICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDYgKystLQogZHJpdmVycy9u
-ZXQvZHNhL3FjYThrLmMgICAgICAgICAgICAgICAgICAgICAgICAgICAgfCAgNiArKy0tCiBkcml2
-ZXJzL25ldC9ldGhlcm5ldC9jYWRlbmNlL21hY2JfbWFpbi5jICAgICAgICAgICB8ICA2ICsrLS0K
-IGRyaXZlcnMvbmV0L2V0aGVybmV0L2Rhdmljb20vZG05MDAwLmMgICAgICAgICAgICAgIHwgIDYg
-KystLQogZHJpdmVycy9uZXQvZXRoZXJuZXQvc21zYy9zbWM5MXguYyAgICAgICAgICAgICAgICAg
-fCAgMyArLQogZHJpdmVycy9uZXQvZXRoZXJuZXQvdGkvY3Bzdy5jICAgICAgICAgICAgICAgICAg
-ICAgfCAgNiArKy0tCiBkcml2ZXJzL25ldC9ldGhlcm5ldC90aS9kYXZpbmNpX2VtYWMuYyAgICAg
-ICAgICAgICB8ICA2ICsrLS0KIGRyaXZlcnMvbmV0L2V0aGVybmV0L3dpem5ldC93NTMwMC5jICAg
-ICAgICAgICAgICAgIHwgIDYgKystLQogZHJpdmVycy9wZXJmL2FybV9zcGVfcG11LmMgICAgICAg
-ICAgICAgICAgICAgICAgICAgfCAgNiArKy0tCiBkcml2ZXJzL3BpbmN0cmwvaW50ZWwvcGluY3Ry
-bC1iYXl0cmFpbC5jICAgICAgICAgICB8ICA2ICsrLS0KIGRyaXZlcnMvcGluY3RybC9pbnRlbC9w
-aW5jdHJsLWNoZXJyeXZpZXcuYyAgICAgICAgIHwgIDYgKystLQogZHJpdmVycy9waW5jdHJsL2lu
-dGVsL3BpbmN0cmwtaW50ZWwuYyAgICAgICAgICAgICAgfCAgNiArKy0tCiBkcml2ZXJzL3BpbmN0
-cmwvcGluY3RybC1hbWQuYyAgICAgICAgICAgICAgICAgICAgICB8ICA2ICsrLS0KIGRyaXZlcnMv
-cGluY3RybC9waW5jdHJsLWF0OTEtcGlvNC5jICAgICAgICAgICAgICAgIHwgIDYgKystLQogZHJp
-dmVycy9wbGF0Zm9ybS94ODYvYXN1cy1sYXB0b3AuYyAgICAgICAgICAgICAgICAgfCAgMyArLQog
-ZHJpdmVycy9wbGF0Zm9ybS94ODYvYXN1cy13bWkuYyAgICAgICAgICAgICAgICAgICAgfCAgMyAr
-LQogZHJpdmVycy9wbGF0Zm9ybS94ODYvc2Ftc3VuZy1sYXB0b3AuYyAgICAgICAgICAgICAgfCAg
-MyArLQogZHJpdmVycy9wb3dlci9zdXBwbHkvZ3Bpby1jaGFyZ2VyLmMgICAgICAgICAgICAgICAg
-fCAgMyArLQogZHJpdmVycy9wdHAvcHRwX2R0ZS5jICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgfCAgNiArKy0tCiBkcml2ZXJzL3B3bS9wd20tYXRtZWwtdGNiLmMgICAgICAgICAgICAgICAg
-ICAgICAgICB8ICA2ICsrLS0KIGRyaXZlcnMvcHdtL3B3bS1yY2FyLmMgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgIHwgIDMgKy0KIGRyaXZlcnMvcnRjL3J0Yy1icTQ4MDIuYyAgICAgICAgICAg
-ICAgICAgICAgICAgICAgIHwgIDYgKystLQogZHJpdmVycy9ydGMvcnRjLWRzMTIxNi5jICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgfCAgNiArKy0tCiBkcml2ZXJzL3J0Yy9ydGMtZHMxNTExLmMg
-ICAgICAgICAgICAgICAgICAgICAgICAgICB8ICA5ICsrLS0tCiBkcml2ZXJzL3J0Yy9ydGMtZHMx
-NTUzLmMgICAgICAgICAgICAgICAgICAgICAgICAgICB8IDE1ICsrKy0tLS0tCiBkcml2ZXJzL3J0
-Yy9ydGMtZHMxNjg1LmMgICAgICAgICAgICAgICAgICAgICAgICAgICB8IDIxICsrKystLS0tLS0t
-CiBkcml2ZXJzL3J0Yy9ydGMtZHMxNzQyLmMgICAgICAgICAgICAgICAgICAgICAgICAgICB8ICA2
-ICsrLS0KIGRyaXZlcnMvcnRjL3J0Yy1scGMzMnh4LmMgICAgICAgICAgICAgICAgICAgICAgICAg
-IHwgMTYgKysrKy0tLS0tCiBkcml2ZXJzL3J0Yy9ydGMtbTQ4dDU5LmMgICAgICAgICAgICAgICAg
-ICAgICAgICAgICB8IDQxICsrKysrKysrKy0tLS0tLS0tLS0tLS0KIGRyaXZlcnMvcnRjL3J0Yy1t
-di5jICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDMgKy0KIGRyaXZlcnMvcnRjL3J0
-Yy1teGMuYyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgMjEgKysrKy0tLS0tLS0KIGRy
-aXZlcnMvcnRjL3J0Yy1wY2FwLmMgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgMTUgKysr
-LS0tLS0KIGRyaXZlcnMvcnRjL3J0Yy1zaC5jICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-IHwgMTUgKysrLS0tLS0KIGRyaXZlcnMvcnRjL3J0Yy1zdGsxN3RhOC5jICAgICAgICAgICAgICAg
-ICAgICAgICAgIHwgMTUgKysrLS0tLS0KIGRyaXZlcnMvcnRjL3J0Yy10ZXN0LmMgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgIHwgIDMgKy0KIGRyaXZlcnMvcnRjL3J0Yy16eW5xbXAuYyAgICAg
-ICAgICAgICAgICAgICAgICAgICAgIHwgMTAgKysrLS0tCiBkcml2ZXJzL3NsaW1idXMvcWNvbS1j
-dHJsLmMgICAgICAgICAgICAgICAgICAgICAgICB8ICA2ICsrLS0KIGRyaXZlcnMvc3BpL3NwaS1j
-YWRlbmNlLmMgICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDYgKystLQogZHJpdmVycy9zcGkv
-c3BpLXp5bnFtcC1ncXNwaS5jICAgICAgICAgICAgICAgICAgICAgfCAgNiArKy0tCiBkcml2ZXJz
-L3N0YWdpbmcvZ3JleWJ1cy9hcmNoZS1wbGF0Zm9ybS5jICAgICAgICAgICB8ICAzICstCiBkcml2
-ZXJzL3N0YWdpbmcvaWlvL2FkYy9hZDc2MDZfcGFyLmMgICAgICAgICAgICAgICB8ICA2ICsrLS0K
-IGRyaXZlcnMvc3RhZ2luZy9udmVjL252ZWMuYyAgICAgICAgICAgICAgICAgICAgICAgIHwgIDYg
-KystLQogZHJpdmVycy90aGVybWFsL2ludDM0MHhfdGhlcm1hbC9pbnQzNDAwX3RoZXJtYWwuYyAg
-fCAgOSArKy0tLQogZHJpdmVycy90aGVybWFsL3JvY2tjaGlwX3RoZXJtYWwuYyAgICAgICAgICAg
-ICAgICAgfCAgOCArKy0tLQogZHJpdmVycy90aGVybWFsL3NwZWFyX3RoZXJtYWwuYyAgICAgICAg
-ICAgICAgICAgICAgfCAgOCArKy0tLQogZHJpdmVycy90aGVybWFsL3N0L3N0X3RoZXJtYWwuYyAg
-ICAgICAgICAgICAgICAgICAgfCAgNiArKy0tCiBkcml2ZXJzL3RoZXJtYWwvengyOTY3X3RoZXJt
-YWwuYyAgICAgICAgICAgICAgICAgICB8ICA2ICsrLS0KIGRyaXZlcnMvdHR5L3NlcmlhbC9pbXgu
-YyAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgMTggKysrKy0tLS0tLQogZHJpdmVycy90dHkv
-c2VyaWFsL3Fjb21fZ2VuaV9zZXJpYWwuYyAgICAgICAgICAgICAgfCAgNiArKy0tCiBkcml2ZXJz
-L3R0eS9zZXJpYWwvc3QtYXNjLmMgICAgICAgICAgICAgICAgICAgICAgICB8ICA2ICsrLS0KIGRy
-aXZlcnMvdHR5L3NlcmlhbC94aWxpbnhfdWFydHBzLmMgICAgICAgICAgICAgICAgIHwgIDYgKyst
-LQogZHJpdmVycy91aW8vdWlvX2ZzbF9lbGJjX2dwY20uYyAgICAgICAgICAgICAgICAgICAgfCAg
-NiArKy0tCiBkcml2ZXJzL3VzYi9tdHUzL210dTNfcGxhdC5jICAgICAgICAgICAgICAgICAgICAg
-ICB8ICA2ICsrLS0KIGRyaXZlcnMvdXNiL3BoeS9waHktYW0zMzV4LmMgICAgICAgICAgICAgICAg
-ICAgICAgIHwgIDYgKystLQogZHJpdmVycy92aWRlby9mYmRldi9hdW9fazE5MHguYyAgICAgICAg
-ICAgICAgICAgICAgfCAxMiArKystLS0tCiAuLi4vZmJkZXYvb21hcDIvb21hcGZiL2Rpc3BsYXlz
-L3BhbmVsLWRzaS1jbS5jICAgICB8IDE4ICsrKystLS0tLS0KIGRyaXZlcnMvdmlkZW8vZmJkZXYv
-c2hfbW9iaWxlX2xjZGNmYi5jICAgICAgICAgICAgIHwgIDYgKystLQogZHJpdmVycy92aWRlby9m
-YmRldi9zaF9tb2JpbGVfbWVyYW0uYyAgICAgICAgICAgICAgfCAgNiArKy0tCiBkcml2ZXJzL3dh
-dGNoZG9nL2NhZGVuY2Vfd2R0LmMgICAgICAgICAgICAgICAgICAgICB8ICA2ICsrLS0KIGRyaXZl
-cnMvd2F0Y2hkb2cvb2ZfeGlsaW54X3dkdC5jICAgICAgICAgICAgICAgICAgIHwgIDYgKystLQog
-ZHJpdmVycy93YXRjaGRvZy93ZGF0X3dkdC5jICAgICAgICAgICAgICAgICAgICAgICAgfCAgNiAr
-Ky0tCiBuZXQvZHNhL2xlZ2FjeS5jICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB8
-ICA2ICsrLS0KIHNvdW5kL3NvYy9hdG1lbC9hdG1lbF9zc2NfZGFpLmMgICAgICAgICAgICAgICAg
-ICAgIHwgIDYgKystLQogMTIzIGZpbGVzIGNoYW5nZWQsIDMxOSBpbnNlcnRpb25zKCspLCA2MDcg
-ZGVsZXRpb25zKC0pCgotLSAKMi4xMS4wCgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fXwpGcmVlZHJlbm8gbWFpbGluZyBsaXN0CkZyZWVkcmVub0BsaXN0cy5m
-cmVlZGVza3RvcC5vcmcKaHR0cHM6Ly9saXN0cy5mcmVlZGVza3RvcC5vcmcvbWFpbG1hbi9saXN0
-aW5mby9mcmVlZHJlbm8K
+I got tired of fixing this in Renesas drivers manually, so I took the big
+hammer. Remove this cumbersome code pattern which got copy-pasted too much
+already:
+
+-	struct platform_device *pdev = to_platform_device(dev);
+-	struct ep93xx_keypad *keypad = platform_get_drvdata(pdev);
++	struct ep93xx_keypad *keypad = dev_get_drvdata(dev);
+
+I send this out as one patch per directory per subsystem. I think they should
+be applied individually. If you prefer a broken out series per subsystem, I can
+provide this as well. Just mail me.
+
+A branch (tested by buildbot; only with all commits squashed into one commit
+before) can be found here:
+
+git://git.kernel.org/pub/scm/linux/kernel/git/wsa/linux.git coccinelle/get_drvdata
+
+Open for other comments, suggestions, too, of course.
+
+Here is the cocci-script I created (after <n> iterations by manually checking
+samples):
+
+@@
+struct device* d;
+identifier pdev;
+expression *ptr;
+@@
+(
+-	struct platform_device *pdev = to_platform_device(d);
+|
+-	struct platform_device *pdev;
+	...
+-	pdev = to_platform_device(d);
+)
+	<... when != pdev
+-	&pdev->dev
++	d
+	...>
+
+	ptr =
+-	platform_get_drvdata(pdev)
++	dev_get_drvdata(d)
+
+	<... when != pdev
+-	&pdev->dev
++	d
+	...>
+
+Kind regards,
+
+   Wolfram
+
+
+Wolfram Sang (61):
+  ARM: plat-samsung: simplify getting .drvdata
+  ata: simplify getting .drvdata
+  auxdisplay: simplify getting .drvdata
+  bus: simplify getting .drvdata
+  clk: samsung: simplify getting .drvdata
+  crypto: simplify getting .drvdata
+  dma: simplify getting .drvdata
+  dmaengine: dw: simplify getting .drvdata
+  dmaengine: qcom: simplify getting .drvdata
+  gpio: simplify getting .drvdata
+  gpu: drm: msm: simplify getting .drvdata
+  gpu: drm: msm: adreno: simplify getting .drvdata
+  gpu: drm: msm: disp: mdp5: simplify getting .drvdata
+  gpu: drm: msm: dsi: simplify getting .drvdata
+  gpu: drm: omapdrm: displays: simplify getting .drvdata
+  gpu: drm: vc4: simplify getting .drvdata
+  hid: simplify getting .drvdata
+  iio: common: cros_ec_sensors: simplify getting .drvdata
+  iio: common: hid-sensors: simplify getting .drvdata
+  input: keyboard: simplify getting .drvdata
+  input: misc: simplify getting .drvdata
+  input: mouse: simplify getting .drvdata
+  input: touchscreen: simplify getting .drvdata
+  iommu: simplify getting .drvdata
+  media: platform: am437x: simplify getting .drvdata
+  media: platform: exynos4-is: simplify getting .drvdata
+  media: platform: s5p-mfc: simplify getting .drvdata
+  mmc: host: simplify getting .drvdata
+  mtd: devices: simplify getting .drvdata
+  mtd: nand: onenand: simplify getting .drvdata
+  net: dsa: simplify getting .drvdata
+  net: ethernet: cadence: simplify getting .drvdata
+  net: ethernet: davicom: simplify getting .drvdata
+  net: ethernet: smsc: simplify getting .drvdata
+  net: ethernet: ti: simplify getting .drvdata
+  net: ethernet: wiznet: simplify getting .drvdata
+  perf: simplify getting .drvdata
+  pinctrl: simplify getting .drvdata
+  pinctrl: intel: simplify getting .drvdata
+  platform: x86: simplify getting .drvdata
+  power: supply: simplify getting .drvdata
+  ptp: simplify getting .drvdata
+  pwm: simplify getting .drvdata
+  rtc: simplify getting .drvdata
+  slimbus: simplify getting .drvdata
+  spi: simplify getting .drvdata
+  staging: greybus: simplify getting .drvdata
+  staging: iio: adc: simplify getting .drvdata
+  staging: nvec: simplify getting .drvdata
+  thermal: simplify getting .drvdata
+  thermal: int340x_thermal: simplify getting .drvdata
+  thermal: st: simplify getting .drvdata
+  tty: serial: simplify getting .drvdata
+  uio: simplify getting .drvdata
+  usb: mtu3: simplify getting .drvdata
+  usb: phy: simplify getting .drvdata
+  video: fbdev: simplify getting .drvdata
+  video: fbdev: omap2: omapfb: displays: simplify getting .drvdata
+  watchdog: simplify getting .drvdata
+  net: dsa: simplify getting .drvdata
+  ASoC: atmel: simplify getting .drvdata
+
+ arch/arm/plat-samsung/adc.c                        |  3 +-
+ drivers/ata/pata_samsung_cf.c                      |  8 ++---
+ drivers/auxdisplay/arm-charlcd.c                   |  6 ++--
+ drivers/bus/brcmstb_gisb.c                         | 12 +++----
+ drivers/clk/samsung/clk-s3c2410-dclk.c             |  6 ++--
+ drivers/crypto/exynos-rng.c                        |  6 ++--
+ drivers/crypto/picoxcell_crypto.c                  |  6 ++--
+ drivers/dma/at_hdmac.c                             |  9 ++---
+ drivers/dma/at_xdmac.c                             |  9 ++---
+ drivers/dma/dw/platform.c                          |  6 ++--
+ drivers/dma/fsldma.c                               |  6 ++--
+ drivers/dma/idma64.c                               |  6 ++--
+ drivers/dma/qcom/hidma.c                           |  3 +-
+ drivers/dma/qcom/hidma_mgmt_sys.c                  |  6 ++--
+ drivers/dma/ste_dma40.c                            | 12 +++----
+ drivers/dma/txx9dmac.c                             |  8 ++---
+ drivers/gpio/gpio-dwapb.c                          |  6 ++--
+ drivers/gpio/gpio-lynxpoint.c                      |  3 +-
+ drivers/gpio/gpio-omap.c                           | 12 +++----
+ drivers/gpio/gpio-tegra.c                          |  6 ++--
+ drivers/gpio/gpio-zynq.c                           |  6 ++--
+ drivers/gpu/drm/msm/adreno/adreno_device.c         |  6 ++--
+ drivers/gpu/drm/msm/disp/mdp5/mdp5_kms.c           |  6 ++--
+ drivers/gpu/drm/msm/dsi/dsi_host.c                 |  6 ++--
+ drivers/gpu/drm/msm/msm_drv.c                      |  3 +-
+ drivers/gpu/drm/omapdrm/displays/panel-dsi-cm.c    | 18 ++++------
+ drivers/gpu/drm/vc4/vc4_drv.c                      |  3 +-
+ drivers/hid/hid-sensor-custom.c                    | 12 +++----
+ .../common/cros_ec_sensors/cros_ec_sensors_core.c  |  6 ++--
+ .../iio/common/hid-sensors/hid-sensor-trigger.c    |  9 ++---
+ drivers/input/keyboard/ep93xx_keypad.c             | 10 +++---
+ drivers/input/keyboard/imx_keypad.c                | 10 +++---
+ drivers/input/keyboard/lpc32xx-keys.c              |  6 ++--
+ drivers/input/keyboard/matrix_keypad.c             | 10 +++---
+ drivers/input/keyboard/omap4-keypad.c              | 10 +++---
+ drivers/input/keyboard/pmic8xxx-keypad.c           |  6 ++--
+ drivers/input/keyboard/pxa27x_keypad.c             | 10 +++---
+ drivers/input/keyboard/samsung-keypad.c            | 12 +++----
+ drivers/input/keyboard/snvs_pwrkey.c               | 10 +++---
+ drivers/input/keyboard/spear-keyboard.c            | 10 +++---
+ drivers/input/keyboard/st-keyscan.c                |  6 ++--
+ drivers/input/keyboard/tegra-kbc.c                 | 10 +++---
+ drivers/input/misc/max77693-haptic.c               |  6 ++--
+ drivers/input/misc/max8997_haptic.c                |  3 +-
+ drivers/input/misc/palmas-pwrbutton.c              |  6 ++--
+ drivers/input/misc/regulator-haptic.c              |  6 ++--
+ drivers/input/misc/twl4030-vibra.c                 |  3 +-
+ drivers/input/misc/twl6040-vibra.c                 |  3 +-
+ drivers/input/mouse/navpoint.c                     |  6 ++--
+ drivers/input/touchscreen/imx6ul_tsc.c             |  6 ++--
+ drivers/iommu/qcom_iommu.c                         |  6 ++--
+ drivers/media/platform/am437x/am437x-vpfe.c        |  6 ++--
+ drivers/media/platform/exynos4-is/media-dev.c      |  6 ++--
+ drivers/media/platform/exynos4-is/mipi-csis.c      |  6 ++--
+ drivers/media/platform/s5p-mfc/s5p_mfc.c           |  6 ++--
+ drivers/mmc/host/davinci_mmc.c                     |  6 ++--
+ drivers/mmc/host/sdhci-of-arasan.c                 |  6 ++--
+ drivers/mmc/host/wmt-sdmmc.c                       |  6 ++--
+ drivers/mtd/devices/docg3.c                        |  3 +-
+ drivers/mtd/nand/onenand/samsung.c                 |  6 ++--
+ drivers/net/dsa/bcm_sf2.c                          |  6 ++--
+ drivers/net/dsa/qca8k.c                            |  6 ++--
+ drivers/net/ethernet/cadence/macb_main.c           |  6 ++--
+ drivers/net/ethernet/davicom/dm9000.c              |  6 ++--
+ drivers/net/ethernet/smsc/smc91x.c                 |  3 +-
+ drivers/net/ethernet/ti/cpsw.c                     |  6 ++--
+ drivers/net/ethernet/ti/davinci_emac.c             |  6 ++--
+ drivers/net/ethernet/wiznet/w5300.c                |  6 ++--
+ drivers/perf/arm_spe_pmu.c                         |  6 ++--
+ drivers/pinctrl/intel/pinctrl-baytrail.c           |  6 ++--
+ drivers/pinctrl/intel/pinctrl-cherryview.c         |  6 ++--
+ drivers/pinctrl/intel/pinctrl-intel.c              |  6 ++--
+ drivers/pinctrl/pinctrl-amd.c                      |  6 ++--
+ drivers/pinctrl/pinctrl-at91-pio4.c                |  6 ++--
+ drivers/platform/x86/asus-laptop.c                 |  3 +-
+ drivers/platform/x86/asus-wmi.c                    |  3 +-
+ drivers/platform/x86/samsung-laptop.c              |  3 +-
+ drivers/power/supply/gpio-charger.c                |  3 +-
+ drivers/ptp/ptp_dte.c                              |  6 ++--
+ drivers/pwm/pwm-atmel-tcb.c                        |  6 ++--
+ drivers/pwm/pwm-rcar.c                             |  3 +-
+ drivers/rtc/rtc-bq4802.c                           |  6 ++--
+ drivers/rtc/rtc-ds1216.c                           |  6 ++--
+ drivers/rtc/rtc-ds1511.c                           |  9 ++---
+ drivers/rtc/rtc-ds1553.c                           | 15 +++-----
+ drivers/rtc/rtc-ds1685.c                           | 21 ++++-------
+ drivers/rtc/rtc-ds1742.c                           |  6 ++--
+ drivers/rtc/rtc-lpc32xx.c                          | 16 ++++-----
+ drivers/rtc/rtc-m48t59.c                           | 41 +++++++++-------------
+ drivers/rtc/rtc-mv.c                               |  3 +-
+ drivers/rtc/rtc-mxc.c                              | 21 ++++-------
+ drivers/rtc/rtc-pcap.c                             | 15 +++-----
+ drivers/rtc/rtc-sh.c                               | 15 +++-----
+ drivers/rtc/rtc-stk17ta8.c                         | 15 +++-----
+ drivers/rtc/rtc-test.c                             |  3 +-
+ drivers/rtc/rtc-zynqmp.c                           | 10 +++---
+ drivers/slimbus/qcom-ctrl.c                        |  6 ++--
+ drivers/spi/spi-cadence.c                          |  6 ++--
+ drivers/spi/spi-zynqmp-gqspi.c                     |  6 ++--
+ drivers/staging/greybus/arche-platform.c           |  3 +-
+ drivers/staging/iio/adc/ad7606_par.c               |  6 ++--
+ drivers/staging/nvec/nvec.c                        |  6 ++--
+ drivers/thermal/int340x_thermal/int3400_thermal.c  |  9 ++---
+ drivers/thermal/rockchip_thermal.c                 |  8 ++---
+ drivers/thermal/spear_thermal.c                    |  8 ++---
+ drivers/thermal/st/st_thermal.c                    |  6 ++--
+ drivers/thermal/zx2967_thermal.c                   |  6 ++--
+ drivers/tty/serial/imx.c                           | 18 ++++------
+ drivers/tty/serial/qcom_geni_serial.c              |  6 ++--
+ drivers/tty/serial/st-asc.c                        |  6 ++--
+ drivers/tty/serial/xilinx_uartps.c                 |  6 ++--
+ drivers/uio/uio_fsl_elbc_gpcm.c                    |  6 ++--
+ drivers/usb/mtu3/mtu3_plat.c                       |  6 ++--
+ drivers/usb/phy/phy-am335x.c                       |  6 ++--
+ drivers/video/fbdev/auo_k190x.c                    | 12 +++----
+ .../fbdev/omap2/omapfb/displays/panel-dsi-cm.c     | 18 ++++------
+ drivers/video/fbdev/sh_mobile_lcdcfb.c             |  6 ++--
+ drivers/video/fbdev/sh_mobile_meram.c              |  6 ++--
+ drivers/watchdog/cadence_wdt.c                     |  6 ++--
+ drivers/watchdog/of_xilinx_wdt.c                   |  6 ++--
+ drivers/watchdog/wdat_wdt.c                        |  6 ++--
+ net/dsa/legacy.c                                   |  6 ++--
+ sound/soc/atmel/atmel_ssc_dai.c                    |  6 ++--
+ 123 files changed, 319 insertions(+), 607 deletions(-)
+
+-- 
+2.11.0
