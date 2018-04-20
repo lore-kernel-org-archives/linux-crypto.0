@@ -1,33 +1,32 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [RESEND PATCH] crypto: Add zstd support
-Date: Sat, 21 Apr 2018 00:50:33 +0800
-Message-ID: <20180420165032.ufqzoefyvnym75s3@gondor.apana.org.au>
-References: <20180330191453.3535287-1-terrelln@fb.com>
+Subject: Re: [PATCH] crypto : chtls_cm - Fix potential NULL pointer
+ dereferences
+Date: Sat, 21 Apr 2018 00:51:07 +0800
+Message-ID: <20180420165107.5opcf5tk2nbhxova@gondor.apana.org.au>
+References: <20180403200912.GA25976@embeddedor.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
-        kernel-team@fb.com, Chris Mason <clm@fb.com>,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        Geliang Tang <geliangtang@gmail.com>
-To: Nick Terrell <terrelln@fb.com>
+Cc: Atul Gupta <atul.gupta@chelsio.com>,
+        Harsh Jain <harsh@chelsio.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20180330191453.3535287-1-terrelln@fb.com>
+In-Reply-To: <20180403200912.GA25976@embeddedor.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Mar 30, 2018 at 12:14:53PM -0700, Nick Terrell wrote:
-> Adds zstd support to crypto and scompress. Only supports the default
-> level.
+On Tue, Apr 03, 2018 at 03:09:12PM -0500, Gustavo A. R. Silva wrote:
+> Add null checks on lookup_tid() return value in order to prevent
+> null pointer dereferences.
 > 
-> Previously we held off on this patch, since there weren't any users.
-> Now zram is ready for zstd support, but depends on CONFIG_CRYPTO_ZSTD,
-> which isn't defined until this patch is in. I also see a patch adding
-> zstd to pstore [0], which depends on crypto zstd.
-> 
-> [0] lkml.kernel.org/r/9c9416b2dff19f05fb4c35879aaa83d11ff72c92.1521626182.git.geliangtang@gmail.com
-> 
-> Signed-off-by: Nick Terrell <terrelln@fb.com>
+> Addresses-Coverity-ID: 1467422 ("Dereference null return value")
+> Addresses-Coverity-ID: 1467443 ("Dereference null return value")
+> Addresses-Coverity-ID: 1467445 ("Dereference null return value")
+> Addresses-Coverity-ID: 1467449 ("Dereference null return value")
+> Fixes: cc35c88ae4db ("crypto : chtls - CPL handler definition")
+> Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
 
 Patch applied.  Thanks.
 -- 
