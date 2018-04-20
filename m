@@ -1,31 +1,33 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2] crypto/ecc: Actually remove stack VLA usage
-Date: Sat, 21 Apr 2018 00:50:18 +0800
-Message-ID: <20180420165017.eqnez3jprvwawgsy@gondor.apana.org.au>
-References: <20180330165544.GA13206@beast>
+Subject: Re: [RESEND PATCH] crypto: Add zstd support
+Date: Sat, 21 Apr 2018 00:50:33 +0800
+Message-ID: <20180420165032.ufqzoefyvnym75s3@gondor.apana.org.au>
+References: <20180330191453.3535287-1-terrelln@fb.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Kees Cook <keescook@chromium.org>
+Cc: Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
+        kernel-team@fb.com, Chris Mason <clm@fb.com>,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        Geliang Tang <geliangtang@gmail.com>
+To: Nick Terrell <terrelln@fb.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20180330165544.GA13206@beast>
+In-Reply-To: <20180330191453.3535287-1-terrelln@fb.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Mar 30, 2018 at 09:55:44AM -0700, Kees Cook wrote:
-> On the quest to remove all VLAs from the kernel[1], this avoids VLAs
-> by just using the maximum allocation size (4 bytes) for stack arrays.
-> All the VLAs in ecc were either 3 or 4 bytes (or a multiple), so just
-> make it 4 bytes all the time. Initialization routines are adjusted to
-> check that ndigits does not end up larger than the arrays.
+On Fri, Mar 30, 2018 at 12:14:53PM -0700, Nick Terrell wrote:
+> Adds zstd support to crypto and scompress. Only supports the default
+> level.
 > 
-> This includes a removal of the earlier attempt at this fix from
-> commit a963834b4742 ("crypto/ecc: Remove stack VLA usage")
+> Previously we held off on this patch, since there weren't any users.
+> Now zram is ready for zstd support, but depends on CONFIG_CRYPTO_ZSTD,
+> which isn't defined until this patch is in. I also see a patch adding
+> zstd to pstore [0], which depends on crypto zstd.
 > 
-> [1] https://lkml.org/lkml/2018/3/7/621
+> [0] lkml.kernel.org/r/9c9416b2dff19f05fb4c35879aaa83d11ff72c92.1521626182.git.geliangtang@gmail.com
 > 
-> Signed-off-by: Kees Cook <keescook@chromium.org>
+> Signed-off-by: Nick Terrell <terrelln@fb.com>
 
 Patch applied.  Thanks.
 -- 
