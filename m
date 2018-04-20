@@ -1,271 +1,136 @@
 From: Logan Gunthorpe <logang@deltatee.com>
-Subject: [PATCH v16 3/7] iomap: introduce io{read|write}64_{lo_hi|hi_lo}
-Date: Fri, 20 Apr 2018 12:23:59 -0600
-Message-ID: <20180420182403.9691-4-logang@deltatee.com>
-References: <20180420182403.9691-1-logang@deltatee.com>
+Subject: [PATCH v16 0/7] Add io{read|write}64 to io-64-atomic headers
+Date: Fri, 20 Apr 2018 12:23:56 -0600
+Message-ID: <20180420182403.9691-1-logang@deltatee.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Cc: Arnd Bergmann <arnd@arndb.de>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Andy Shevchenko <andy.shevchenko@gmail.com>,
         =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Suresh Warrier <warrier@linux.vnet.ibm.com>,
-        Nicholas Piggin <npiggin@gmail.com>
+        Logan Gunthorpe <logang@deltatee.com>
 To: linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
         linux-ntb@googlegroups.com, linux-crypto@vger.kernel.org,
         Andrew Morton <akpm@linux-foundation.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180420182403.9691-1-logang@deltatee.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-In order to provide non-atomic functions for io{read|write}64 that will
-use readq and writeq when appropriate. We define a number of variants
-of these functions in the generic iomap that will do non-atomic
-operations on pio but atomic operations on mmio.
+This is v14 of my cleanup series to push a number of instances of people
+defining their own io{read|write}64 functions into common headers seing
+they don't exist in non-64bit systems. This series adds inline functions to the
+io-64-nonatomic headers and then cleans up the drivers that defined their
+own copies.
 
-These functions are only defined if readq and writeq are defined. If
-they are not, then the wrappers that always use non-atomic operations
-from include/linux/io-64-nonatomic*.h will be used.
+This cleanup was originally requested by Greg after he reviewed my
+Switchtec NTB code.
 
-Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-Reviewed-by: Andy Shevchenko <andy.shevchenko@gmail.com>
-Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-Cc: Paul Mackerras <paulus@samba.org>
-Cc: Michael Ellerman <mpe@ellerman.id.au>
-Cc: Arnd Bergmann <arnd@arndb.de>
-Cc: Suresh Warrier <warrier@linux.vnet.ibm.com>
-Cc: Nicholas Piggin <npiggin@gmail.com>
----
- arch/powerpc/include/asm/io.h |   2 +
- include/asm-generic/iomap.h   |  26 +++++++--
- lib/iomap.c                   | 132 ++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 154 insertions(+), 6 deletions(-)
+@Andrew, can you please consider merging this series as it has a
+number of cross-tree pieces? It has been around for a number of
+cycles, has had some reviews, and a few small pieces of it have been
+accepted through various other trees.
 
-diff --git a/arch/powerpc/include/asm/io.h b/arch/powerpc/include/asm/io.h
-index af074923d598..4cc420cfaa78 100644
---- a/arch/powerpc/include/asm/io.h
-+++ b/arch/powerpc/include/asm/io.h
-@@ -788,8 +788,10 @@ extern void __iounmap_at(void *ea, unsigned long size);
- 
- #define mmio_read16be(addr)		readw_be(addr)
- #define mmio_read32be(addr)		readl_be(addr)
-+#define mmio_read64be(addr)		readq_be(addr)
- #define mmio_write16be(val, addr)	writew_be(val, addr)
- #define mmio_write32be(val, addr)	writel_be(val, addr)
-+#define mmio_write64be(val, addr)	writeq_be(val, addr)
- #define mmio_insb(addr, dst, count)	readsb(addr, dst, count)
- #define mmio_insw(addr, dst, count)	readsw(addr, dst, count)
- #define mmio_insl(addr, dst, count)	readsl(addr, dst, count)
-diff --git a/include/asm-generic/iomap.h b/include/asm-generic/iomap.h
-index 5b63b94ef6b5..5a4af0199b32 100644
---- a/include/asm-generic/iomap.h
-+++ b/include/asm-generic/iomap.h
-@@ -31,9 +31,16 @@ extern unsigned int ioread16(void __iomem *);
- extern unsigned int ioread16be(void __iomem *);
- extern unsigned int ioread32(void __iomem *);
- extern unsigned int ioread32be(void __iomem *);
--#ifdef CONFIG_64BIT
--extern u64 ioread64(void __iomem *);
--extern u64 ioread64be(void __iomem *);
-+
-+#ifdef readq
-+#define ioread64_lo_hi ioread64_lo_hi
-+#define ioread64_hi_lo ioread64_hi_lo
-+#define ioread64be_lo_hi ioread64be_lo_hi
-+#define ioread64be_hi_lo ioread64be_hi_lo
-+extern u64 ioread64_lo_hi(void __iomem *addr);
-+extern u64 ioread64_hi_lo(void __iomem *addr);
-+extern u64 ioread64be_lo_hi(void __iomem *addr);
-+extern u64 ioread64be_hi_lo(void __iomem *addr);
- #endif
- 
- extern void iowrite8(u8, void __iomem *);
-@@ -41,9 +48,16 @@ extern void iowrite16(u16, void __iomem *);
- extern void iowrite16be(u16, void __iomem *);
- extern void iowrite32(u32, void __iomem *);
- extern void iowrite32be(u32, void __iomem *);
--#ifdef CONFIG_64BIT
--extern void iowrite64(u64, void __iomem *);
--extern void iowrite64be(u64, void __iomem *);
-+
-+#ifdef writeq
-+#define iowrite64_lo_hi iowrite64_lo_hi
-+#define iowrite64_hi_lo iowrite64_hi_lo
-+#define iowrite64be_lo_hi iowrite64be_lo_hi
-+#define iowrite64be_hi_lo iowrite64be_hi_lo
-+extern void iowrite64_lo_hi(u64 val, void __iomem *addr);
-+extern void iowrite64_hi_lo(u64 val, void __iomem *addr);
-+extern void iowrite64be_lo_hi(u64 val, void __iomem *addr);
-+extern void iowrite64be_hi_lo(u64 val, void __iomem *addr);
- #endif
- 
- /*
-diff --git a/lib/iomap.c b/lib/iomap.c
-index 2c293b22569f..e909ab71e995 100644
---- a/lib/iomap.c
-+++ b/lib/iomap.c
-@@ -67,6 +67,7 @@ static void bad_io_access(unsigned long port, const char *access)
- #ifndef mmio_read16be
- #define mmio_read16be(addr) swab16(readw(addr))
- #define mmio_read32be(addr) swab32(readl(addr))
-+#define mmio_read64be(addr) swab64(readq(addr))
- #endif
- 
- unsigned int ioread8(void __iomem *addr)
-@@ -100,6 +101,80 @@ EXPORT_SYMBOL(ioread16be);
- EXPORT_SYMBOL(ioread32);
- EXPORT_SYMBOL(ioread32be);
- 
-+#ifdef readq
-+static u64 pio_read64_lo_hi(unsigned long port)
-+{
-+	u64 lo, hi;
-+
-+	lo = inl(port);
-+	hi = inl(port + sizeof(u32));
-+
-+	return lo | (hi << 32);
-+}
-+
-+static u64 pio_read64_hi_lo(unsigned long port)
-+{
-+	u64 lo, hi;
-+
-+	hi = inl(port + sizeof(u32));
-+	lo = inl(port);
-+
-+	return lo | (hi << 32);
-+}
-+
-+static u64 pio_read64be_lo_hi(unsigned long port)
-+{
-+	u64 lo, hi;
-+
-+	lo = pio_read32be(port + sizeof(u32));
-+	hi = pio_read32be(port);
-+
-+	return lo | (hi << 32);
-+}
-+
-+static u64 pio_read64be_hi_lo(unsigned long port)
-+{
-+	u64 lo, hi;
-+
-+	hi = pio_read32be(port);
-+	lo = pio_read32be(port + sizeof(u32));
-+
-+	return lo | (hi << 32);
-+}
-+
-+u64 ioread64_lo_hi(void __iomem *addr)
-+{
-+	IO_COND(addr, return pio_read64_lo_hi(port), return readq(addr));
-+	return 0xffffffffffffffffULL;
-+}
-+
-+u64 ioread64_hi_lo(void __iomem *addr)
-+{
-+	IO_COND(addr, return pio_read64_hi_lo(port), return readq(addr));
-+	return 0xffffffffffffffffULL;
-+}
-+
-+u64 ioread64be_lo_hi(void __iomem *addr)
-+{
-+	IO_COND(addr, return pio_read64be_lo_hi(port),
-+		return mmio_read64be(addr));
-+	return 0xffffffffffffffffULL;
-+}
-+
-+u64 ioread64be_hi_lo(void __iomem *addr)
-+{
-+	IO_COND(addr, return pio_read64be_hi_lo(port),
-+		return mmio_read64be(addr));
-+	return 0xffffffffffffffffULL;
-+}
-+
-+EXPORT_SYMBOL(ioread64_lo_hi);
-+EXPORT_SYMBOL(ioread64_hi_lo);
-+EXPORT_SYMBOL(ioread64be_lo_hi);
-+EXPORT_SYMBOL(ioread64be_hi_lo);
-+
-+#endif /* readq */
-+
- #ifndef pio_write16be
- #define pio_write16be(val,port) outw(swab16(val),port)
- #define pio_write32be(val,port) outl(swab32(val),port)
-@@ -108,6 +183,7 @@ EXPORT_SYMBOL(ioread32be);
- #ifndef mmio_write16be
- #define mmio_write16be(val,port) writew(swab16(val),port)
- #define mmio_write32be(val,port) writel(swab32(val),port)
-+#define mmio_write64be(val,port) writeq(swab64(val),port)
- #endif
- 
- void iowrite8(u8 val, void __iomem *addr)
-@@ -136,6 +212,62 @@ EXPORT_SYMBOL(iowrite16be);
- EXPORT_SYMBOL(iowrite32);
- EXPORT_SYMBOL(iowrite32be);
- 
-+#ifdef writeq
-+static void pio_write64_lo_hi(u64 val, unsigned long port)
-+{
-+	outl(val, port);
-+	outl(val >> 32, port + sizeof(u32));
-+}
-+
-+static void pio_write64_hi_lo(u64 val, unsigned long port)
-+{
-+	outl(val >> 32, port + sizeof(u32));
-+	outl(val, port);
-+}
-+
-+static void pio_write64be_lo_hi(u64 val, unsigned long port)
-+{
-+	pio_write32be(val, port + sizeof(u32));
-+	pio_write32be(val >> 32, port);
-+}
-+
-+static void pio_write64be_hi_lo(u64 val, unsigned long port)
-+{
-+	pio_write32be(val >> 32, port);
-+	pio_write32be(val, port + sizeof(u32));
-+}
-+
-+void iowrite64_lo_hi(u64 val, void __iomem *addr)
-+{
-+	IO_COND(addr, pio_write64_lo_hi(val, port),
-+		writeq(val, addr));
-+}
-+
-+void iowrite64_hi_lo(u64 val, void __iomem *addr)
-+{
-+	IO_COND(addr, pio_write64_hi_lo(val, port),
-+		writeq(val, addr));
-+}
-+
-+void iowrite64be_lo_hi(u64 val, void __iomem *addr)
-+{
-+	IO_COND(addr, pio_write64be_lo_hi(val, port),
-+		mmio_write64be(val, addr));
-+}
-+
-+void iowrite64be_hi_lo(u64 val, void __iomem *addr)
-+{
-+	IO_COND(addr, pio_write64be_hi_lo(val, port),
-+		mmio_write64be(val, addr));
-+}
-+
-+EXPORT_SYMBOL(iowrite64_lo_hi);
-+EXPORT_SYMBOL(iowrite64_hi_lo);
-+EXPORT_SYMBOL(iowrite64be_lo_hi);
-+EXPORT_SYMBOL(iowrite64be_hi_lo);
-+
-+#endif /* readq */
-+
- /*
-  * These are the "repeat MMIO read/write" functions.
-  * Note the "__raw" accesses, since we don't want to
--- 
+Thanks,
+
+Logan
+
+--
+
+Changes since v15:
+- Rebased onto v4.17-rc1, dropping the powerpc patches which were
+  picked up by Michael
+
+Changes since v14:
+- Rebased onto v4.16-rc7
+- Replace the first two patches so that instead of correcting the
+  endianness annotations we change to using writeX() and readX() with
+  swabX() calls. This makes the big-endian functions more symmetric
+  with the little-endian versions (with respect to barriers that are
+  not included in the raw functions). As a side effect, it also fixes
+  the kbuild warnings that the first two patches tried to address.
+
+Changes since v13:
+- Changed the subject of patch 0001 to correct a nit pointed out by Luc
+
+Changes since v12:
+- Rebased onto v4.16-rc6
+- Split patch 0001 into two and reworked the commit log as requested
+  by Luc Van Oostenryck
+
+Changes since v11:
+- Rebased onto v4.16-rc5
+- Added a patch (0001) to fix some old and new sparse warnings
+  that the kbuild robot warned about this cycle. The latest version
+  of sparse was required to reproduce these.
+- Added a patch (0002) to add io{read|write}64 to parisc which the kbuild
+  robot also found errors for this cycle
+
+Changes since v10:
+- Rebased onto v4.16-rc4, this droped the drm/tilcdc patch which was
+  picked up by that tree and is already in 4.16.
+
+Changes since v9:
+- Rebased onto v4.15-rc6
+- Fixed a couple of issues in the new version of the CAAM patch as
+  pointed out by Horia
+
+Changes since v8:
+- Rebased onto v4.15-rc2, as a result rewrote patch 7 seeing someone did
+  some similar cleanup in that area.
+- Added a patch to clean up the Switchtec NTB driver which landed in
+  v4.15-rc1
+
+Changes since v7:
+- Fix minor nits from Andy Shevchenko
+- Rebased onto v4.14-rc1
+
+Changes since v6:
+ ** none **
+
+Changes since v5:
+- Added a fix to the tilcdc driver to ensure it doesn't use the
+  non-atomic operation. (This includes adding io{read|write}64[be]_is_nonatomic
+  defines).
+
+Changes since v4:
+- Add functions so the powerpc implementation of iomap.c compiles. (As
+  noticed by Horia)
+
+Changes since v3:
+
+- I noticed powerpc didn't use the appropriate functions seeing
+  readq/writeq were not defined when iomap.h was included. Thus I've
+  included a patch to adjust this
+- Fixed some mistakes with a couple of the defines in io-64-nonatomic*
+  headers
+- Fixed a typo noticed by Horia.
+
+(earlier versions were drastically different)
+
+--
+
+Logan Gunthorpe (7):
+  iomap: Use non-raw io functions for io{read|write}XXbe
+  parisc: iomap: introduce io{read|write}64
+  iomap: introduce io{read|write}64_{lo_hi|hi_lo}
+  io-64-nonatomic: add io{read|write}64[be]{_lo_hi|_hi_lo} macros
+  ntb: ntb_hw_intel: use io-64-nonatomic instead of in-driver hacks
+  crypto: caam: cleanup CONFIG_64BIT ifdefs when using io{read|write}64
+  ntb: ntb_hw_switchtec: Cleanup 64bit IO defines to use the common
+    header
+
+ arch/parisc/include/asm/io.h           |   9 +++
+ arch/parisc/lib/iomap.c                |  64 +++++++++++++++
+ arch/powerpc/include/asm/io.h          |   2 +
+ drivers/crypto/caam/regs.h             |  30 +------
+ drivers/ntb/hw/intel/ntb_hw_intel.c    |  30 +------
+ drivers/ntb/hw/mscc/ntb_hw_switchtec.c |  36 +--------
+ include/asm-generic/iomap.h            |  26 ++++--
+ include/linux/io-64-nonatomic-hi-lo.h  |  64 +++++++++++++++
+ include/linux/io-64-nonatomic-lo-hi.h  |  64 +++++++++++++++
+ lib/iomap.c                            | 140 ++++++++++++++++++++++++++++++++-
+ 10 files changed, 367 insertions(+), 98 deletions(-)
+
+--
 2.11.0
