@@ -1,35 +1,54 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH][next] crypto: chtls: remove redundant assignment to
- cdev->ports
-Date: Sat, 21 Apr 2018 00:51:27 +0800
-Message-ID: <20180420165127.5lpk4covlw2zkzdn@gondor.apana.org.au>
-References: <20180406165847.29310-1-colin.king@canonical.com>
+Subject: Re: [PATCH v2 0/2] crypto: removing various VLAs
+Date: Sat, 21 Apr 2018 00:51:43 +0800
+Message-ID: <20180420165143.mwcxwkf6j7ddckdt@gondor.apana.org.au>
+References: <1523282087-22128-1-git-send-email-s.mesoraca16@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Harsh Jain <harsh@chelsio.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Atul Gupta <atul.gupta@chelsio.com>,
-        Michael Werner <werner@chelsio.com>,
-        linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-To: Colin King <colin.king@canonical.com>
+Cc: linux-kernel@vger.kernel.org, kernel-hardening@lists.openwall.com,
+        linux-crypto@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Kees Cook <keescook@chromium.org>,
+        Eric Biggers <ebiggers3@gmail.com>,
+        Laura Abbott <labbott@redhat.com>
+To: Salvatore Mesoraca <s.mesoraca16@gmail.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20180406165847.29310-1-colin.king@canonical.com>
+In-Reply-To: <1523282087-22128-1-git-send-email-s.mesoraca16@gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Apr 06, 2018 at 05:58:47PM +0100, Colin King wrote:
-> From: Colin Ian King <colin.king@canonical.com>
+On Mon, Apr 09, 2018 at 03:54:45PM +0200, Salvatore Mesoraca wrote:
+> v2:
+> 	As suggested by Herbert Xu, the blocksize and alignmask checks
+> 	have been moved to crypto_check_alg.
+> 	So, now, all the other separate checks are not necessary.
+> 	Also, the defines have been moved to include/crypto/algapi.h.
 > 
-> There is a double assignment to cdev->ports, the first is redundant
-> as it is over-written so remove it.
+> v1:
+> 	As suggested by Laura Abbott[1], I'm resending my patch with
+> 	MAX_BLOCKSIZE and MAX_ALIGNMASK defined in an header, so they
+> 	can be used in other places.
+> 	I took this opportunity to deal with some other VLAs not
+> 	handled in the old patch.
 > 
-> Detected by CoverityScan, CID#1467432 ("Unused value")
+> [1] http://lkml.kernel.org/r/4e536889-439a-49e6-dd95-2d4286913202@redhat.com
 > 
-> Signed-off-by: Colin Ian King <colin.king@canonical.com>
+> Salvatore Mesoraca (2):
+>   crypto: api - laying defines and checks for statically allocated
+>     buffers
+>   crypto: remove several VLAs
+> 
+>  crypto/algapi.c         | 10 ++++++++++
+>  crypto/cfb.c            |  7 +++----
+>  crypto/cipher.c         |  3 ++-
+>  crypto/ctr.c            |  4 ++--
+>  crypto/cts.c            |  5 +++--
+>  crypto/pcbc.c           |  5 +++--
+>  include/crypto/algapi.h |  8 ++++++++
+>  7 files changed, 31 insertions(+), 11 deletions(-)
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
