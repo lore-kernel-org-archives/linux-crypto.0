@@ -1,52 +1,40 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2 0/2] crypto: removing various VLAs
-Date: Sat, 21 Apr 2018 00:51:43 +0800
-Message-ID: <20180420165143.mwcxwkf6j7ddckdt@gondor.apana.org.au>
-References: <1523282087-22128-1-git-send-email-s.mesoraca16@gmail.com>
+Subject: Re: [PATCH v2 0/5] ThunderX ZIP driver bug fixes
+Date: Sat, 21 Apr 2018 00:51:57 +0800
+Message-ID: <20180420165157.zvrb5bjvszftmzs6@gondor.apana.org.au>
+References: <20180409154554.7578-1-jglauber@cavium.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel@vger.kernel.org, kernel-hardening@lists.openwall.com,
-        linux-crypto@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Kees Cook <keescook@chromium.org>,
-        Eric Biggers <ebiggers3@gmail.com>,
-        Laura Abbott <labbott@redhat.com>
-To: Salvatore Mesoraca <s.mesoraca16@gmail.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Mahipal Challa <Mahipal.Challa@cavium.com>,
+        Robert Richter <rrichter@cavium.com>
+To: Jan Glauber <jglauber@cavium.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1523282087-22128-1-git-send-email-s.mesoraca16@gmail.com>
+In-Reply-To: <20180409154554.7578-1-jglauber@cavium.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Apr 09, 2018 at 03:54:45PM +0200, Salvatore Mesoraca wrote:
-> v2:
-> 	As suggested by Herbert Xu, the blocksize and alignmask checks
-> 	have been moved to crypto_check_alg.
-> 	So, now, all the other separate checks are not necessary.
-> 	Also, the defines have been moved to include/crypto/algapi.h.
+On Mon, Apr 09, 2018 at 05:45:49PM +0200, Jan Glauber wrote:
+> Some bug fixes for this driver after it stopped working with virtual mapped
+> stacks. I think the first two patches qualify for stable.
 > 
-> v1:
-> 	As suggested by Laura Abbott[1], I'm resending my patch with
-> 	MAX_BLOCKSIZE and MAX_ALIGNMASK defined in an header, so they
-> 	can be used in other places.
-> 	I took this opportunity to deal with some other VLAs not
-> 	handled in the old patch.
+> Jan Glauber (5):
+>   crypto: thunderx_zip: Fix fallout from CONFIG_VMAP_STACK
+>   crypto: thunderx_zip: Limit result reading attempts
+>   crypto: thunderx_zip: Prevent division by zero
+>   crypto: thunderx_zip: Fix statistics pending request value
+>   crypto: thunderx_zip: Fix smp_processor_id() warnings
 > 
-> [1] http://lkml.kernel.org/r/4e536889-439a-49e6-dd95-2d4286913202@redhat.com
-> 
-> Salvatore Mesoraca (2):
->   crypto: api - laying defines and checks for statically allocated
->     buffers
->   crypto: remove several VLAs
-> 
->  crypto/algapi.c         | 10 ++++++++++
->  crypto/cfb.c            |  7 +++----
->  crypto/cipher.c         |  3 ++-
->  crypto/ctr.c            |  4 ++--
->  crypto/cts.c            |  5 +++--
->  crypto/pcbc.c           |  5 +++--
->  include/crypto/algapi.h |  8 ++++++++
->  7 files changed, 31 insertions(+), 11 deletions(-)
+>  drivers/crypto/cavium/zip/common.h      | 21 +++++++++++++++++++++
+>  drivers/crypto/cavium/zip/zip_crypto.c  | 22 ++++++++++++++--------
+>  drivers/crypto/cavium/zip/zip_deflate.c |  4 ++--
+>  drivers/crypto/cavium/zip/zip_device.c  |  4 ++--
+>  drivers/crypto/cavium/zip/zip_inflate.c |  4 ++--
+>  drivers/crypto/cavium/zip/zip_main.c    | 24 +++++++++++-------------
+>  drivers/crypto/cavium/zip/zip_main.h    |  1 -
+>  7 files changed, 52 insertions(+), 28 deletions(-)
 
 All applied.  Thanks.
 -- 
