@@ -1,197 +1,117 @@
-From: Logan Gunthorpe <logang@deltatee.com>
-Subject: [PATCH v16 2/7] parisc: iomap: introduce io{read|write}64
-Date: Fri, 20 Apr 2018 12:23:58 -0600
-Message-ID: <20180420182403.9691-3-logang@deltatee.com>
-References: <20180420182403.9691-1-logang@deltatee.com>
-Cc: Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Andy Shevchenko <andy.shevchenko@gmail.com>,
-        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        "James E.J. Bottomley" <jejb@parisc-linux.org>,
-        Helge Deller <deller@gmx.de>,
-        Philippe Ombredanne <pombredanne@nexb.com>,
-        Kate Stewart <kstewart@linuxfoundation.org>,
-        Thomas Gleixner <tglx@linutronix.de>
-To: linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
-        linux-ntb@googlegroups.com, linux-crypto@vger.kernel.org,
-        Andrew Morton <akpm@linux-foundation.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180420182403.9691-1-logang@deltatee.com>
-Sender: linux-kernel-owner@vger.kernel.org
+From: Haren Myneni <haren@linux.vnet.ibm.com>
+Subject: [PATCH] crypto/nx: Initialize 842 high and normal RxFIFO control
+ registers
+Date: Sat, 21 Apr 2018 04:19:32 -0700
+Message-ID: <1524309572.7186.18.camel@hbabu-laptop>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org
+To: mpe@ellerman.id.au, herbert@gondor.apana.org.au
+Return-path: <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
+List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev/>
+List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
+List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
+List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
+Errors-To: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
+Sender: "Linuxppc-dev"
+ <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
 List-Id: linux-crypto.vger.kernel.org
 
-Add support for io{read|write}64() functions in parisc architecture.
-These are pretty straightforward copies of similar functions which
-make use of readq and writeq.
 
-Also, indicate that the lo_hi and hi_lo variants of these functions
-are not provided by this architecture.
+NX increments readOffset by FIFO size in receive FIFO control register
+when CRB is read. But the index in RxFIFO has to match with the
+corresponding entry in FIFO maintained by VAS in kernel. Otherwise NX
+may be processing incorrect CRBs and can cause CRB timeout.
+    
+VAS FIFO offset is 0 when the receive window is opened during
+initialization. When the module is reloaded, readOffset in FIFO control
+register may not match with VAS entry. So nx_coproc_init OPAL call is
+executed once for each NX instance. This call resets readOffset and
+queued values in FIFO control register for both high and normal FIFOs.
+    
+Signed-off-by: Haren Myneni <haren@us.ibm.com>
 
-Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-Reviewed-by: Andy Shevchenko <andy.shevchenko@gmail.com>
-Cc: "James E.J. Bottomley" <jejb@parisc-linux.org>
-Cc: Helge Deller <deller@gmx.de>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Philippe Ombredanne <pombredanne@nexb.com>
-Cc: Kate Stewart <kstewart@linuxfoundation.org>
-Cc: Thomas Gleixner <tglx@linutronix.de>
----
- arch/parisc/include/asm/io.h |  9 +++++++
- arch/parisc/lib/iomap.c      | 64 ++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 73 insertions(+)
-
-diff --git a/arch/parisc/include/asm/io.h b/arch/parisc/include/asm/io.h
-index afe493b23d04..30a8315d5c07 100644
---- a/arch/parisc/include/asm/io.h
-+++ b/arch/parisc/include/asm/io.h
-@@ -311,6 +311,15 @@ extern void outsl (unsigned long port, const void *src, unsigned long count);
-  * value for either 32 or 64 bit mode */
- #define F_EXTEND(x) ((unsigned long)((x) | (0xffffffff00000000ULL)))
+diff --git a/arch/powerpc/include/asm/opal-api.h b/arch/powerpc/include/asm/opal-api.h
+index d886a5b..ff61e4b 100644
+--- a/arch/powerpc/include/asm/opal-api.h
++++ b/arch/powerpc/include/asm/opal-api.h
+@@ -206,7 +206,8 @@
+ #define OPAL_NPU_TL_SET				161
+ #define OPAL_PCI_GET_PBCQ_TUNNEL_BAR		164
+ #define OPAL_PCI_SET_PBCQ_TUNNEL_BAR		165
+-#define OPAL_LAST				165
++#define	OPAL_NX_COPROC_INIT			167
++#define OPAL_LAST				167
  
-+#define ioread64 ioread64
-+#define ioread64be ioread64be
-+#define iowrite64 iowrite64
-+#define iowrite64be iowrite64be
-+extern u64 ioread64(void __iomem *addr);
-+extern u64 ioread64be(void __iomem *addr);
-+extern void iowrite64(u64 val, void __iomem *addr);
-+extern void iowrite64be(u64 val, void __iomem *addr);
-+
- #include <asm-generic/iomap.h>
+ /* Device tree flags */
  
- /*
-diff --git a/arch/parisc/lib/iomap.c b/arch/parisc/lib/iomap.c
-index 4b19e6e64fb7..0195aec657e2 100644
---- a/arch/parisc/lib/iomap.c
-+++ b/arch/parisc/lib/iomap.c
-@@ -48,11 +48,15 @@ struct iomap_ops {
- 	unsigned int (*read16be)(void __iomem *);
- 	unsigned int (*read32)(void __iomem *);
- 	unsigned int (*read32be)(void __iomem *);
-+	u64 (*read64)(void __iomem *);
-+	u64 (*read64be)(void __iomem *);
- 	void (*write8)(u8, void __iomem *);
- 	void (*write16)(u16, void __iomem *);
- 	void (*write16be)(u16, void __iomem *);
- 	void (*write32)(u32, void __iomem *);
- 	void (*write32be)(u32, void __iomem *);
-+	void (*write64)(u64, void __iomem *);
-+	void (*write64be)(u64, void __iomem *);
- 	void (*read8r)(void __iomem *, void *, unsigned long);
- 	void (*read16r)(void __iomem *, void *, unsigned long);
- 	void (*read32r)(void __iomem *, void *, unsigned long);
-@@ -171,6 +175,16 @@ static unsigned int iomem_read32be(void __iomem *addr)
- 	return __raw_readl(addr);
- }
+diff --git a/arch/powerpc/include/asm/opal.h b/arch/powerpc/include/asm/opal.h
+index 7159e1a..d79eb82 100644
+--- a/arch/powerpc/include/asm/opal.h
++++ b/arch/powerpc/include/asm/opal.h
+@@ -288,6 +288,7 @@ int64_t opal_imc_counters_init(uint32_t type, uint64_t address,
+ int opal_get_power_shift_ratio(u32 handle, int token, u32 *psr);
+ int opal_set_power_shift_ratio(u32 handle, int token, u32 psr);
+ int opal_sensor_group_clear(u32 group_hndl, int token);
++int opal_nx_coproc_init(uint32_t chip_id, uint32_t ct);
  
-+static u64 iomem_read64(void __iomem *addr)
-+{
-+	return readq(addr);
-+}
-+
-+static u64 iomem_read64be(void __iomem *addr)
-+{
-+	return __raw_readq(addr);
-+}
-+
- static void iomem_write8(u8 datum, void __iomem *addr)
- {
- 	writeb(datum, addr);
-@@ -196,6 +210,16 @@ static void iomem_write32be(u32 datum, void __iomem *addr)
- 	__raw_writel(datum, addr);
- }
+ s64 opal_signal_system_reset(s32 cpu);
  
-+static void iomem_write64(u64 datum, void __iomem *addr)
-+{
-+	writel(datum, addr);
-+}
-+
-+static void iomem_write64be(u64 datum, void __iomem *addr)
-+{
-+	__raw_writel(datum, addr);
-+}
-+
- static void iomem_read8r(void __iomem *addr, void *dst, unsigned long count)
- {
- 	while (count--) {
-@@ -250,11 +274,15 @@ static const struct iomap_ops iomem_ops = {
- 	.read16be = iomem_read16be,
- 	.read32 = iomem_read32,
- 	.read32be = iomem_read32be,
-+	.read64 = iomem_read64,
-+	.read64be = iomem_read64be,
- 	.write8 = iomem_write8,
- 	.write16 = iomem_write16,
- 	.write16be = iomem_write16be,
- 	.write32 = iomem_write32,
- 	.write32be = iomem_write32be,
-+	.write64 = iomem_write64,
-+	.write64be = iomem_write64be,
- 	.read8r = iomem_read8r,
- 	.read16r = iomem_read16r,
- 	.read32r = iomem_read32r,
-@@ -304,6 +332,20 @@ unsigned int ioread32be(void __iomem *addr)
- 	return *((u32 *)addr);
- }
+diff --git a/arch/powerpc/platforms/powernv/opal-wrappers.S b/arch/powerpc/platforms/powernv/opal-wrappers.S
+index 3da30c2..c7541a9 100644
+--- a/arch/powerpc/platforms/powernv/opal-wrappers.S
++++ b/arch/powerpc/platforms/powernv/opal-wrappers.S
+@@ -325,3 +325,4 @@ OPAL_CALL(opal_npu_spa_clear_cache,		OPAL_NPU_SPA_CLEAR_CACHE);
+ OPAL_CALL(opal_npu_tl_set,			OPAL_NPU_TL_SET);
+ OPAL_CALL(opal_pci_get_pbcq_tunnel_bar,		OPAL_PCI_GET_PBCQ_TUNNEL_BAR);
+ OPAL_CALL(opal_pci_set_pbcq_tunnel_bar,		OPAL_PCI_SET_PBCQ_TUNNEL_BAR);
++OPAL_CALL(opal_nx_coproc_init,			OPAL_NX_COPROC_INIT);
+diff --git a/arch/powerpc/platforms/powernv/opal.c b/arch/powerpc/platforms/powernv/opal.c
+index 48fbb41..5e13908 100644
+--- a/arch/powerpc/platforms/powernv/opal.c
++++ b/arch/powerpc/platforms/powernv/opal.c
+@@ -1035,3 +1035,5 @@ void powernv_set_nmmu_ptcr(unsigned long ptcr)
+ EXPORT_SYMBOL_GPL(opal_int_set_mfrr);
+ EXPORT_SYMBOL_GPL(opal_int_eoi);
+ EXPORT_SYMBOL_GPL(opal_error_code);
++/* Export the below symbol for NX compression */
++EXPORT_SYMBOL(opal_nx_coproc_init);
+diff --git a/drivers/crypto/nx/nx-842-powernv.c b/drivers/crypto/nx/nx-842-powernv.c
+index 1e87637..6dffeb7 100644
+--- a/drivers/crypto/nx/nx-842-powernv.c
++++ b/drivers/crypto/nx/nx-842-powernv.c
+@@ -24,6 +24,8 @@
+ #include <asm/icswx.h>
+ #include <asm/vas.h>
+ #include <asm/reg.h>
++#include <asm/opal-api.h>
++#include <asm/opal.h>
  
-+u64 ioread64(void __iomem *addr)
-+{
-+	if (unlikely(INDIRECT_ADDR(addr)))
-+		return iomap_ops[ADDR_TO_REGION(addr)]->read64(addr);
-+	return le64_to_cpup((u64 *)addr);
-+}
-+
-+u64 ioread64be(void __iomem *addr)
-+{
-+	if (unlikely(INDIRECT_ADDR(addr)))
-+		return iomap_ops[ADDR_TO_REGION(addr)]->read64be(addr);
-+	return *((u64 *)addr);
-+}
-+
- void iowrite8(u8 datum, void __iomem *addr)
- {
- 	if (unlikely(INDIRECT_ADDR(addr))) {
-@@ -349,6 +391,24 @@ void iowrite32be(u32 datum, void __iomem *addr)
- 	}
- }
+ MODULE_LICENSE("GPL");
+ MODULE_AUTHOR("Dan Streetman <ddstreet@ieee.org>");
+@@ -803,9 +805,19 @@ static int __init vas_cfg_coproc_info(struct device_node *dn, int chip_id,
+ 	if (!coproc)
+ 		return -ENOMEM;
  
-+void iowrite64(u64 datum, void __iomem *addr)
-+{
-+	if (unlikely(INDIRECT_ADDR(addr))) {
-+		iomap_ops[ADDR_TO_REGION(addr)]->write64(datum, addr);
-+	} else {
-+		*((u64 *)addr) = cpu_to_le64(datum);
-+	}
-+}
+-	if (!strcmp(priority, "High"))
++	if (!strcmp(priority, "High")) {
++		/*
++		 * skiboot exports coproceeor type such as 842 or gzip in
++		 * pid device tree property.
++		 * Initialize each NX instance for both high and normal
++		 * priority FIFOs.
++		 */
++		ret = opal_nx_coproc_init(chip_id, pid);
++		if (ret)
++			goto err_out;
 +
-+void iowrite64be(u64 datum, void __iomem *addr)
-+{
-+	if (unlikely(INDIRECT_ADDR(addr))) {
-+		iomap_ops[ADDR_TO_REGION(addr)]->write64be(datum, addr);
-+	} else {
-+		*((u64 *)addr) = datum;
-+	}
-+}
-+
- /* Repeating interfaces */
- 
- void ioread8_rep(void __iomem *addr, void *dst, unsigned long count)
-@@ -449,11 +509,15 @@ EXPORT_SYMBOL(ioread16);
- EXPORT_SYMBOL(ioread16be);
- EXPORT_SYMBOL(ioread32);
- EXPORT_SYMBOL(ioread32be);
-+EXPORT_SYMBOL(ioread64);
-+EXPORT_SYMBOL(ioread64be);
- EXPORT_SYMBOL(iowrite8);
- EXPORT_SYMBOL(iowrite16);
- EXPORT_SYMBOL(iowrite16be);
- EXPORT_SYMBOL(iowrite32);
- EXPORT_SYMBOL(iowrite32be);
-+EXPORT_SYMBOL(iowrite64);
-+EXPORT_SYMBOL(iowrite64be);
- EXPORT_SYMBOL(ioread8_rep);
- EXPORT_SYMBOL(ioread16_rep);
- EXPORT_SYMBOL(ioread32_rep);
--- 
-2.11.0
+ 		coproc->ct = VAS_COP_TYPE_842_HIPRI;
+-	else if (!strcmp(priority, "Normal"))
++	} else if (!strcmp(priority, "Normal"))
+ 		coproc->ct = VAS_COP_TYPE_842;
+ 	else {
+ 		pr_err("Invalid RxFIFO priority value\n");
