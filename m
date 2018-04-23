@@ -1,7 +1,8 @@
 From: Lionel Debieve <lionel.debieve@st.com>
-Subject: [PATCH 0/2] Fix stm32-rng for default state and suspend
-Date: Mon, 23 Apr 2018 17:04:24 +0200
-Message-ID: <20180423150426.22198-1-lionel.debieve@st.com>
+Subject: [PATCH 1/2] hwrng: stm32 - define default state for rng driver
+Date: Mon, 23 Apr 2018 17:04:25 +0200
+Message-ID: <20180423150426.22198-2-lionel.debieve@st.com>
+References: <20180423150426.22198-1-lionel.debieve@st.com>
 Mime-Version: 1.0
 Content-Type: text/plain
 Cc: Benjamin Gaignard <benjamin.gaignard@st.com>,
@@ -17,21 +18,29 @@ To: Matt Mackall <mpm@selenic.com>,
         <linux-arm-kernel@lists.infradead.org>,
         <linux-kernel@vger.kernel.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20180423150426.22198-1-lionel.debieve@st.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This series are fixing the default build state for stm32-rng that
-activate the driver with arm multi_v7_defconfig.
-Second patch is fixing the power suspend/resume behavior which was
-not working.
+Define default state for stm32_rng driver. It will
+be default selected with multi_v7_defconfig
 
-Lionel Debieve (2):
-  hwrng: stm32 - define default state for rng driver
-  hwrng: stm32-rng: Fix pm_suspend issue
+Signed-off-by: Lionel Debieve <lionel.debieve@st.com>
+---
+ drivers/char/hw_random/Kconfig | 1 +
+ 1 file changed, 1 insertion(+)
 
- drivers/char/hw_random/Kconfig     | 1 +
- drivers/char/hw_random/stm32-rng.c | 9 +++++++--
- 2 files changed, 8 insertions(+), 2 deletions(-)
-
+diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
+index d53541e96bee..c34b257d852d 100644
+--- a/drivers/char/hw_random/Kconfig
++++ b/drivers/char/hw_random/Kconfig
+@@ -347,6 +347,7 @@ config HW_RANDOM_STM32
+ 	tristate "STMicroelectronics STM32 random number generator"
+ 	depends on HW_RANDOM && (ARCH_STM32 || COMPILE_TEST)
+ 	depends on HAS_IOMEM
++	default HW_RANDOM
+ 	help
+ 	  This driver provides kernel-side support for the Random Number
+ 	  Generator hardware found on STM32 microcontrollers.
 -- 
 2.15.1
