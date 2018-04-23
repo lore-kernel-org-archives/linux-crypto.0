@@ -1,56 +1,72 @@
-From: Lionel Debieve <lionel.debieve@st.com>
-Subject: [PATCH 2/2] hwrng: stm32-rng - fix pm_suspend issue
-Date: Mon, 23 Apr 2018 17:04:26 +0200
-Message-ID: <20180423150426.22198-3-lionel.debieve@st.com>
-References: <20180423150426.22198-1-lionel.debieve@st.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Subject: Re: [PATCH] crypto: ccree: limit build to plausible archs
+Date: Mon, 23 Apr 2018 19:53:43 +0200
+Message-ID: <CAMuHMdXZ0vL7Rxg4+CsP1u_Eb95Nj+qHnrahYPhAewmcrxN9HQ@mail.gmail.com>
+References: <1524484097-8315-1-git-send-email-gilad@benyossef.com>
+ <CAMuHMdXNAkCVpyGyQMKRMRGuXyjOHAGgvHT4QGkuYdZetOr-9Q@mail.gmail.com> <CAOtvUMd41+5DzHRbViyNZkiL92BYh2YaREvhiAH0UPnPYCzB+w@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: Benjamin Gaignard <benjamin.gaignard@st.com>,
-        Ludovic Barre <ludovic.barre@st.com>
-To: Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@st.com>,
-        Rob Herring <rob.herring@linaro.org>,
-        <linux-crypto@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Ofir Drang <ofir.drang@arm.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Gilad Ben-Yossef <gilad@benyossef.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180423150426.22198-1-lionel.debieve@st.com>
+In-Reply-To: <CAOtvUMd41+5DzHRbViyNZkiL92BYh2YaREvhiAH0UPnPYCzB+w@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-When suspend is called after pm_runtime_suspend,
-same callback is used and access to rng register is
-freezing system. By calling the pm_runtime_force_suspend,
-it first checks that runtime has been already done.
+Hi Gilad,
 
-Signed-off-by: Lionel Debieve <lionel.debieve@st.com>
----
- drivers/char/hw_random/stm32-rng.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+On Mon, Apr 23, 2018 at 3:22 PM, Gilad Ben-Yossef <gilad@benyossef.com> wrote:
+> On Mon, Apr 23, 2018 at 3:13 PM, Geert Uytterhoeven
+> <geert@linux-m68k.org> wrote:
+>> On Mon, Apr 23, 2018 at 1:48 PM, Gilad Ben-Yossef <gilad@benyossef.com> wrote:
+>>> Limit option to compile ccree to plausible architectures.
+>>
+>> Thanks for your patch!
+>>
+>>> Suggested-by: Geert Uytterhoeven <geert@linux-m68k.org>
+>>> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+>>> ---
+>>>  drivers/crypto/Kconfig | 1 +
+>>>  1 file changed, 1 insertion(+)
+>>>
+>>> diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+>>> index d1ea1a0..7302785 100644
+>>> --- a/drivers/crypto/Kconfig
+>>> +++ b/drivers/crypto/Kconfig
+>>> @@ -726,6 +726,7 @@ config CRYPTO_DEV_ARTPEC6
+>>>  config CRYPTO_DEV_CCREE
+>>>         tristate "Support for ARM TrustZone CryptoCell family of security processors"
+>>>         depends on CRYPTO && CRYPTO_HW && OF && HAS_DMA
+>>> +       depends on (XTENSA || X86 || UNICORE32 || SUPERH || RISCV || PPC32 || OPENRISC || NIOS2 || NDS32 || MIPS || MICROBLAZE || HEXAGON || H8300 || ARM || ARM64 || ARC || COMPILE_TEST)
+>>
+>> That list looks a bit excessive to me...
+>
+> I'm sorry, but as an Arm employee I'm not in liberty to identify which
+> customer licensed or might license CryptoCell for which platform, now
+> or in the future.
+>
+> I'm sure you understand.
 
-diff --git a/drivers/char/hw_random/stm32-rng.c b/drivers/char/hw_random/stm32-rng.c
-index 0d2328da3b76..042860d97b15 100644
---- a/drivers/char/hw_random/stm32-rng.c
-+++ b/drivers/char/hw_random/stm32-rng.c
-@@ -187,8 +187,13 @@ static int stm32_rng_runtime_resume(struct device *dev)
- }
- #endif
- 
--static UNIVERSAL_DEV_PM_OPS(stm32_rng_pm_ops, stm32_rng_runtime_suspend,
--			    stm32_rng_runtime_resume, NULL);
-+static const struct dev_pm_ops stm32_rng_pm_ops = {
-+	SET_RUNTIME_PM_OPS(stm32_rng_runtime_suspend,
-+			   stm32_rng_runtime_resume, NULL)
-+	SET_SYSTEM_SLEEP_PM_OPS(pm_runtime_force_suspend,
-+				pm_runtime_force_resume)
-+};
-+
- 
- static const struct of_device_id stm32_rng_match[] = {
- 	{
+IC, a clever marketing scheme to make everyone think that everybody else
+is already a licensee ;-)
+
+What about using "depends on <list> || COMPILE_TEST", with <list> the
+platforms for which the DTS (incl. "arm,cryptocell-*") will be submitted
+for v4.18? The list can easily be extended when needed.
+
+Thanks!
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
 -- 
-2.15.1
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
