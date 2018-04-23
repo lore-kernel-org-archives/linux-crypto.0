@@ -1,80 +1,92 @@
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Subject: Re: [PATCH/RFC] crypto: Add platform dependencies for CRYPTO_DEV_CCREE
-Date: Mon, 23 Apr 2018 10:11:14 +0200
-Message-ID: <CAMuHMdUXEAKXyskCkUTkRDj9w-_8+ohCh71=v+9d27wg_G9syg@mail.gmail.com>
-References: <1523988865-26848-1-git-send-email-geert@linux-m68k.org>
- <CAOtvUMeJLXxB3v2wr8EQFKxXpMo3Oi64Ac8aGA5vLDo37dQWjw@mail.gmail.com>
- <CAMuHMdUh4MxSoVb5x_FjTgCzrK0Pb_EV-G8npZB6m24d+UJ4Wg@mail.gmail.com> <CAOtvUMd-_w1r6c3_AswuVPDNTjzVOPso1yyYx+ke77HMRhYkRQ@mail.gmail.com>
+From: Dmitry Vyukov <dvyukov@google.com>
+Subject: Re: WARNING: kernel stack regs at (ptrval) in syzkaller has bad 'bp'
+ value (ptrval)
+Date: Mon, 23 Apr 2018 12:59:30 +0200
+Message-ID: <CACT4Y+Zmx647NnNVV0=9OOt8jWQt8VKfYuLCSU_fnbOvkN09MA@mail.gmail.com>
+References: <000000000000af09f3056a813d2d@google.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux kernel mailing list <linux-kernel@vger.kernel.org>
-To: Gilad Ben-Yossef <gilad@benyossef.com>
+Cc: LKML <linux-kernel@vger.kernel.org>,
+        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        David Miller <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, Eric Biggers <ebiggers3@gmail.com>
+To: syzbot <syzbot+e073e4740cfbb3ae200b@syzkaller.appspotmail.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAOtvUMd-_w1r6c3_AswuVPDNTjzVOPso1yyYx+ke77HMRhYkRQ@mail.gmail.com>
+In-Reply-To: <000000000000af09f3056a813d2d@google.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi Gilad,
-
-On Mon, Apr 23, 2018 at 9:45 AM, Gilad Ben-Yossef <gilad@benyossef.com> wrote:
-> On Wed, Apr 18, 2018 at 10:47 AM, Geert Uytterhoeven
-> <geert@linux-m68k.org> wrote:
->> On Wed, Apr 18, 2018 at 6:32 AM, Gilad Ben-Yossef <gilad@benyossef.com> wrote:
->>> On Tue, Apr 17, 2018 at 9:14 PM, Geert Uytterhoeven
->>> <geert@linux-m68k.org> wrote:
->>>> The ARM TrustZone CryptoCell is found on ARM SoCs only.  Hence make it
->>>> depend on ARM or ARM64, unless compile-testing.
->>>
->>> Actually it is not. Despite what the name suggest, CryptoCell is
->>> designed by Arm but is
->>> not in fact limited to Arm cores. I think the only requirement is
->>> ability to provide an AMBA bus
->>> interface. Kudos to our marketing department to make that so clear and
->>> so on... :-)
->>
->> Good to know, I couldn't find any users of the compatible value in DT sources,
->> so I had to guess... and missed ;-)
+On Mon, Apr 23, 2018 at 12:10 PM, syzbot
+<syzbot+e073e4740cfbb3ae200b@syzkaller.appspotmail.com> wrote:
+> Hello,
 >
-> Yes, the original driver that went through staging was for CC 712,
-> which so new it doesn't yet
-> have a commercially available silicon yet :-)
+> syzbot hit the following crash on upstream commit
+> 5ec83b22a2dd13180762c89698e4e2c2881a423c (Sun Apr 22 19:13:04 2018 +0000)
+> Merge tag '4.17-rc1-SMB3-CIFS' of git://git.samba.org/sfrench/cifs-2.6
+> syzbot dashboard link:
+> https://syzkaller.appspot.com/bug?extid=e073e4740cfbb3ae200b
 >
-> I've added the older 710 and 613 support just recently and will be
-> working with CC hardware implementors
-> to add the relevant DT bindings for their respective SoCs
+> C reproducer: https://syzkaller.appspot.com/x/repro.c?id=6509307940044800
+> syzkaller reproducer:
+> https://syzkaller.appspot.com/x/repro.syz?id=6027105183727616
+> Raw console output:
+> https://syzkaller.appspot.com/x/log.txt?id=4763013630394368
+> Kernel config:
+> https://syzkaller.appspot.com/x/.config?id=1808800213120130118
+> compiler: gcc (GCC) 8.0.1 20180413 (experimental)
+
+There are 2 similar bugs reported:
+
+https://syzkaller.appspot.com/bug?id=4fcc07e4e85fc6c1d5472fcc8ab5a35db01972dc
+https://syzkaller.appspot.com/bug?id=bed7a7acabe08fe69a89a4225572911a32598651
+
+They all seem to point to crypto/SHA3/K512_4.
++crypto maintainers
+
+> IMPORTANT: if you fix the bug, please add the following tag to the commit:
+> Reported-by: syzbot+e073e4740cfbb3ae200b@syzkaller.appspotmail.com
+> It will help syzbot understand when the bug is fixed. See footer for
+> details.
+> If you forward the report, please keep this part and the footer.
 >
->> Do you have a good suggestion for a platform dependency?
->> Based on the above, I'd say "depends on ARM_AMBA || COMPILE_TEST",
->> but (currently) ARM_AMBA is selected on ARM or ARM64 only?
+>         (ptrval): 0000000000445649 (0x445649)
+>         (ptrval): 0000000000000033 (0x33)
+>         (ptrval): 0000000000000216 (0x216)
+>         (ptrval): 00007f155536eda8 (0x7f155536eda8)
+>         (ptrval): 000000000000002b (0x2b)
+> WARNING: kernel stack regs at         (ptrval) in syzkaller547737:4493 has
+> bad 'bp' value         (ptrval)
+> WARNING: kernel stack frame pointer at         (ptrval) in
+> syzkaller547737:4496 has bad value         (ptrval)
 >
-> So AMBA *as a system bus* is not strictly needed AFAIK in the sense
-> that you just need
-> an AMBA to whatever bus interface, so not all system implementing this
-> actually define ARM_AMBA.
-
-IC.
-
-> It's actually safer for me to rule out certain architectures rather
-> than point to which are used.
-> I'd say ruling out s390, um, alpha, ia64 and m68k is a safe bet.
 >
-> Do you want to send a patch or shall I?
-
-Please send a patch, thanks!
-
-(I don't want to be the one adding more negative architecture dependencies ;-)
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
--- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+> ---
+> This bug is generated by a dumb bot. It may contain errors.
+> See https://goo.gl/tpsmEJ for details.
+> Direct all questions to syzkaller@googlegroups.com.
+>
+> syzbot will keep track of this bug report.
+> If you forgot to add the Reported-by tag, once the fix for this bug is
+> merged
+> into any tree, please reply to this email with:
+> #syz fix: exact-commit-title
+> If you want to test a patch for this bug, please reply with:
+> #syz test: git://repo/address.git branch
+> and provide the patch inline or as an attachment.
+> To mark this as a duplicate of another syzbot report, please reply with:
+> #syz dup: exact-subject-of-another-report
+> If it's a one-off invalid bug report, please reply with:
+> #syz invalid
+> Note: if the crash happens again, it will cause creation of a new bug
+> report.
+> Note: all commands must start from beginning of the line in the email body.
+>
+> --
+> You received this message because you are subscribed to the Google Groups
+> "syzkaller-bugs" group.
+> To unsubscribe from this group and stop receiving emails from it, send an
+> email to syzkaller-bugs+unsubscribe@googlegroups.com.
+> To view this discussion on the web visit
+> https://groups.google.com/d/msgid/syzkaller-bugs/000000000000af09f3056a813d2d%40google.com.
+> For more options, visit https://groups.google.com/d/optout.
