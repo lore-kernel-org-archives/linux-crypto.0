@@ -1,49 +1,36 @@
-From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: Re: [PATCH] crypto: ccree: limit build to plausible archs
-Date: Tue, 24 Apr 2018 16:44:28 +0300
-Message-ID: <CAOtvUMc5-UC1im7TYt7AtRJMJY=+_mRNmugWPNL_R_twLf7CQA@mail.gmail.com>
-References: <1524484097-8315-1-git-send-email-gilad@benyossef.com>
- <CAMuHMdXNAkCVpyGyQMKRMRGuXyjOHAGgvHT4QGkuYdZetOr-9Q@mail.gmail.com>
- <CAOtvUMd41+5DzHRbViyNZkiL92BYh2YaREvhiAH0UPnPYCzB+w@mail.gmail.com>
- <CAMuHMdXZ0vL7Rxg4+CsP1u_Eb95Nj+qHnrahYPhAewmcrxN9HQ@mail.gmail.com>
- <CAOtvUMe=iOeWAUwDQ-3yy=Ogg0_=4iEwV32ATEn6SrLPEojNGQ@mail.gmail.com> <CAMuHMdWQAss+_fjrj5BGcstojR0Up9-danH3UxC5PWOLkKrpXQ@mail.gmail.com>
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: Re: [PATCH v2 0/5] crypto: Speck support
+Date: Tue, 24 Apr 2018 18:11:26 +0200
+Message-ID: <CAHmME9oA4j=iGrrBYME92JfUsyi5r42PnAvzWiuXzGCRXMnXtA@mail.gmail.com>
+References: <20180212235209.117393-1-ebiggers@google.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Ofir Drang <ofir.drang@arm.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAMuHMdWQAss+_fjrj5BGcstojR0Up9-danH3UxC5PWOLkKrpXQ@mail.gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Jeffrey Walton <noloader@gmail.com>, Greg Kaiser <gkaiser@google.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+ Michael Halcrow <mhalcrow@google.com>, Patrik Torstensson <totte@google.com>,
+ Alex Cope <alexcope@google.com>, Paul Lawrence <paullawrence@google.com>,
+ linux-fscrypt@vger.kernel.org,
+ Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ linux-arm-kernel@lists.infradead.org, Paul Crowley <paulcrowley@google.com>
+To: Eric Biggers <ebiggers@google.com>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <20180212235209.117393-1-ebiggers@google.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Apr 24, 2018 at 11:52 AM, Geert Uytterhoeven
-<geert@linux-m68k.org> wrote:
+Can we please not Speck?
 
->
-> My underlying idea is not to cut down build time for test code (that's what
-> we have COMPILE_TEST for), but to enhance usability for users and distros,
-> who need to know if it makes sense to enable an option.
+It was just rejected by the ISO/IEC.
 
-OK, considering the driver Kconfig depends on OF I think we're OK here
-with regard to usability and distros.
-
->
-> IMHO the extensive list of possible architectures is not really an
-> improvement. So either a dependency on COMPILE_TEST, or no dependency
-> at all makes the most sense to me.
-
-Fair enough. Herbert, please drop the  patch than.
-
-Thanks!
-Gilad
--- 
-Gilad Ben-Yossef
-Chief Coffee Drinker
-
-"If you take a class in large-scale robotics, can you end up in a
-situation where the homework eats your dog?"
- -- Jean-Baptiste Queru
+https://twitter.com/TomerAshur/status/988659711091228673
