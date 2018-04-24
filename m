@@ -1,57 +1,84 @@
-From: Eric Biggers <ebiggers@google.com>
-Subject: Re: [PATCH] crypto: remove Speck
-Date: Tue, 24 Apr 2018 11:24:29 -0700
-Message-ID: <20180424182429.GB174675@google.com>
-References: <20180424161826.31211-1-Jason@zx2c4.com>
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: Re: [PATCH v2 0/5] crypto: Speck support
+Date: Tue, 24 Apr 2018 22:58:35 +0200
+Message-ID: <CAHmME9qG+nPmj5c7hU4+STUsmWmwSBsKe-0mOLEXH+hJ1z4z=g@mail.gmail.com>
+References: <20180212235209.117393-1-ebiggers@google.com>
+ <CAHmME9oA4j=iGrrBYME92JfUsyi5r42PnAvzWiuXzGCRXMnXtA@mail.gmail.com>
+ <20180424181623.GA174675@google.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-fscrypt@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20180424161826.31211-1-Jason@zx2c4.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Jeffrey Walton <noloader@gmail.com>, Greg Kaiser <gkaiser@google.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+ Michael Halcrow <mhalcrow@google.com>, tashur@esat.kuleuven.be,
+ Patrik Torstensson <totte@google.com>, Alex Cope <alexcope@google.com>,
+ Paul Lawrence <paullawrence@google.com>, linux-fscrypt@vger.kernel.org,
+ Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ linux-arm-kernel@lists.infradead.org, Paul Crowley <paulcrowley@google.com>
+To: Eric Biggers <ebiggers@google.com>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <20180424181623.GA174675@google.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi Jason,
+Hi Eric,
 
-On Tue, Apr 24, 2018 at 06:18:26PM +0200, Jason A. Donenfeld wrote:
-> This NSA-designed cipher was rejected for inclusion in international
-> standards by ISO/IEC. Before anyone actually starts using it by
-> accident, let's just not ship it at all.
-> 
-> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
-> ---
->  arch/arm/crypto/Kconfig             |    6 -
->  arch/arm/crypto/Makefile            |    2 -
->  arch/arm/crypto/speck-neon-core.S   |  432 --------
->  arch/arm/crypto/speck-neon-glue.c   |  288 ------
->  arch/arm64/crypto/Kconfig           |    6 -
->  arch/arm64/crypto/Makefile          |    3 -
->  arch/arm64/crypto/speck-neon-core.S |  352 -------
->  arch/arm64/crypto/speck-neon-glue.c |  282 -----
->  arch/s390/defconfig                 |    1 -
->  crypto/Kconfig                      |   14 -
->  crypto/Makefile                     |    1 -
->  crypto/speck.c                      |  307 ------
->  crypto/testmgr.c                    |   36 -
->  crypto/testmgr.h                    | 1486 ---------------------------
->  include/crypto/speck.h              |   62 --
->  15 files changed, 3278 deletions(-)
->  delete mode 100644 arch/arm/crypto/speck-neon-core.S
->  delete mode 100644 arch/arm/crypto/speck-neon-glue.c
->  delete mode 100644 arch/arm64/crypto/speck-neon-core.S
->  delete mode 100644 arch/arm64/crypto/speck-neon-glue.c
->  delete mode 100644 crypto/speck.c
->  delete mode 100644 include/crypto/speck.h
-> 
+On Tue, Apr 24, 2018 at 8:16 PM, Eric Biggers <ebiggers@google.com> wrote:
+> So, what do you propose replacing it with?
 
-Please see my response on the other thread ("[PATCH v2 0/5] crypto: Speck support"):
+Something more cryptographically justifiable.
 
-https://marc.info/?l=linux-crypto-vger&m=152459378914647
+> outside crypto review, vs. the many cryptanalysis papers on Speck.  (In that
+> respect the controversy about Speck has actually become an advantage, as it has
+> received much more cryptanalysis than other lightweight block ciphers.)
 
-Thanks,
+That's the thing that worries me, actually. Many of the design
+decisions behind Speck haven't been justified.
 
-- Eric
+> The reason we chose Speck had nothing to do with the proposed ISO standard or
+> any sociopolitical factors, but rather because it was the only algorithm we
+> could find that met the performance and security requirements.
+
+> Note that Linux
+> doesn't bow down to any particular standards organization, and it offers
+> algorithms that were specified in various places, even some with no more than a
+> publication by the author.  In fact, support for SM4 was just added too, which
+> is a Chinese government standard.  Are you going to send a patch to remove that
+> too, or is it just NSA designed algorithms that are not okay?
+
+No need to be belittling; I have much less tinfoil strapped around my
+head than perhaps you think. I'm not blindly opposed to
+government-designed algorithms. Take SHA2, for example -- built by the
+NSA.
+
+But I do care quite a bit about using ciphers that have acceptance of
+the academic community and a large body of literature documenting its
+design decisions and analyzing it. Some of the best symmetric
+cryptographers in academia have expressed reservations about it, and
+it was just rejected from a major standard's body. Linux, of course,
+is free to disagree -- or "bow down" as you oddly put it -- but I'd
+make sure you've got a pretty large bucket of justifications for that
+disagreement.
+
+> (in fact, you'd
+> probably have a different opinion of it if the authors had simply worked
+> somewhere else and published the exact same algorithm);
+
+Again, no need to patronize. I don't actually have a bias like that.
+
+> But I hope you can understand that all *technical* indicators are that Speck is
+> secure enough
+
+That's the thing I'm worried about.
+
+Jason
