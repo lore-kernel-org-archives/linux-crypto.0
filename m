@@ -1,7 +1,9 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH 0/2] crypto: implement SM4 for arm64 using special instructions
-Date: Wed, 25 Apr 2018 14:20:44 +0200
-Message-ID: <20180425122046.12695-1-ard.biesheuvel@linaro.org>
+Subject: [PATCH 1/2] crypto: sm4 - export encrypt/decrypt routines to other
+ drivers
+Date: Wed, 25 Apr 2018 14:20:45 +0200
+Message-ID: <20180425122046.12695-2-ard.biesheuvel@linaro.org>
+References: <20180425122046.12695-1-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
@@ -10,6 +12,7 @@ Cc: gilad@benyossef.com, herbert@gondor.apana.org.au,
  Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <20180425122046.12695-1-ard.biesheuvel@linaro.org>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -21,29 +24,69 @@ Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-Patch #1 makes some preparatory changes so the C routines can be used as
-a fallback by other drivers.
+In preparation of adding support for the SIMD based arm64 implementation
+of arm64, which requires a fallback to non-SIMD code when invoked in
+certain contexts, expose the generic SM4 encrypt and decrypt routines
+to other drivers.
 
-Patch #2 implements the SM4 core cipher using the special instructions
-introduced as an optional extension by revision 8.2 of the ARM architecture.
+Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+---
+ crypto/sm4_generic.c | 10 ++++++----
+ include/crypto/sm4.h |  3 +++
+ 2 files changed, 9 insertions(+), 4 deletions(-)
 
-Note that this does not implement cipher+chaining mode combinations as we
-do for AES. This can be added later if desiresd.
-
-Ard Biesheuvel (2):
-  crypto: sm4 - export encrypt/decrypt routines to other drivers
-  crypto: arm64 - add support for SM4 encryption using special
-    instructions
-
- arch/arm64/crypto/Kconfig       |  6 ++
- arch/arm64/crypto/Makefile      |  3 +
- arch/arm64/crypto/sm4-ce-core.S | 36 ++++++++++
- arch/arm64/crypto/sm4-ce-glue.c | 73 ++++++++++++++++++++
- crypto/sm4_generic.c            | 10 +--
- include/crypto/sm4.h            |  3 +
- 6 files changed, 127 insertions(+), 4 deletions(-)
- create mode 100644 arch/arm64/crypto/sm4-ce-core.S
- create mode 100644 arch/arm64/crypto/sm4-ce-glue.c
-
+diff --git a/crypto/sm4_generic.c b/crypto/sm4_generic.c
+index f537a2766c55..c18eebfd5edd 100644
+--- a/crypto/sm4_generic.c
++++ b/crypto/sm4_generic.c
+@@ -190,21 +190,23 @@ static void sm4_do_crypt(const u32 *rk, u32 *out, const u32 *in)
+ 
+ /* encrypt a block of text */
+ 
+-static void sm4_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
++void crypto_sm4_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
+ {
+ 	const struct crypto_sm4_ctx *ctx = crypto_tfm_ctx(tfm);
+ 
+ 	sm4_do_crypt(ctx->rkey_enc, (u32 *)out, (u32 *)in);
+ }
++EXPORT_SYMBOL_GPL(crypto_sm4_encrypt);
+ 
+ /* decrypt a block of text */
+ 
+-static void sm4_decrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
++void crypto_sm4_decrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
+ {
+ 	const struct crypto_sm4_ctx *ctx = crypto_tfm_ctx(tfm);
+ 
+ 	sm4_do_crypt(ctx->rkey_dec, (u32 *)out, (u32 *)in);
+ }
++EXPORT_SYMBOL_GPL(crypto_sm4_decrypt);
+ 
+ static struct crypto_alg sm4_alg = {
+ 	.cra_name		=	"sm4",
+@@ -219,8 +221,8 @@ static struct crypto_alg sm4_alg = {
+ 			.cia_min_keysize	=	SM4_KEY_SIZE,
+ 			.cia_max_keysize	=	SM4_KEY_SIZE,
+ 			.cia_setkey		=	crypto_sm4_set_key,
+-			.cia_encrypt		=	sm4_encrypt,
+-			.cia_decrypt		=	sm4_decrypt
++			.cia_encrypt		=	crypto_sm4_encrypt,
++			.cia_decrypt		=	crypto_sm4_decrypt
+ 		}
+ 	}
+ };
+diff --git a/include/crypto/sm4.h b/include/crypto/sm4.h
+index b64e64d20b28..7afd730d16ff 100644
+--- a/include/crypto/sm4.h
++++ b/include/crypto/sm4.h
+@@ -25,4 +25,7 @@ int crypto_sm4_set_key(struct crypto_tfm *tfm, const u8 *in_key,
+ int crypto_sm4_expand_key(struct crypto_sm4_ctx *ctx, const u8 *in_key,
+ 			  unsigned int key_len);
+ 
++void crypto_sm4_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in);
++void crypto_sm4_decrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in);
++
+ #endif
 -- 
 2.17.0
