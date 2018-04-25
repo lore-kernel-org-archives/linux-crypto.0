@@ -1,147 +1,76 @@
-From: Eric Biggers <ebiggers@google.com>
-Subject: Re: [PATCH v2 0/5] crypto: Speck support
-Date: Tue, 24 Apr 2018 15:47:34 -0700
-Message-ID: <20180424224734.GA109345@google.com>
-References: <20180212235209.117393-1-ebiggers@google.com>
- <CAHmME9oA4j=iGrrBYME92JfUsyi5r42PnAvzWiuXzGCRXMnXtA@mail.gmail.com>
- <20180424181623.GA174675@google.com>
- <CAHmME9qG+nPmj5c7hU4+STUsmWmwSBsKe-0mOLEXH+hJ1z4z=g@mail.gmail.com>
+From: "Dey, Megha" <megha.dey@intel.com>
+Subject: RE: [PATCH V8 1/5] crypto: Multi-buffer encryption infrastructure
+ support
+Date: Wed, 25 Apr 2018 01:14:26 +0000
+Message-ID: <C440BA31B54DCD4AAC682D2365C8FEE738C270FC@ORSMSX111.amr.corp.intel.com>
+References: <1515542948-24041-1-git-send-email-megha.dey@linux.intel.com>
+ <1515542948-24041-2-git-send-email-megha.dey@linux.intel.com>
+ <20180118113905.GA19904@gondor.apana.org.au>
+ <1516322661.2526.3.camel@megha-Z97X-UD7-TH>
+ <20180316145351.GA6231@gondor.apana.org.au>
+ <C440BA31B54DCD4AAC682D2365C8FEE738C13267@ORSMSX111.amr.corp.intel.com>
+ <20180418110115.v2w3o5yfv4u3gc4r@gondor.apana.org.au>
+ <C440BA31B54DCD4AAC682D2365C8FEE738C13DDE@ORSMSX111.amr.corp.intel.com>
+ <20180419032525.6csodbz6lrksyudd@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Jeffrey Walton <noloader@gmail.com>, Greg Kaiser <gkaiser@google.com>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- Ard Biesheuvel <ard.biesheuvel@linaro.org>,
- Michael Halcrow <mhalcrow@google.com>, tashur@esat.kuleuven.be,
- Patrik Torstensson <totte@google.com>, Alex Cope <alexcope@google.com>,
- Paul Lawrence <paullawrence@google.com>, linux-fscrypt@vger.kernel.org,
- Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- linux-arm-kernel@lists.infradead.org, Paul Crowley <paulcrowley@google.com>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-Content-Disposition: inline
-In-Reply-To: <CAHmME9qG+nPmj5c7hU4+STUsmWmwSBsKe-0mOLEXH+hJ1z4z=g@mail.gmail.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+Content-Transfer-Encoding: 8BIT
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "davem@davemloft.net" <davem@davemloft.net>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20180419032525.6csodbz6lrksyudd@gondor.apana.org.au>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi Jason,
 
-On Tue, Apr 24, 2018 at 10:58:35PM +0200, Jason A. Donenfeld wrote:
-> Hi Eric,
-> 
-> On Tue, Apr 24, 2018 at 8:16 PM, Eric Biggers <ebiggers@google.com> wrote:
-> > So, what do you propose replacing it with?
-> 
-> Something more cryptographically justifiable.
-> 
 
-It's easy to say that, but do you have an actual suggestion?  As I mentioned,
-for disk encryption without AES instructions the main alternatives we've
-considered are ChaCha20 with reused nonces, an unpublished wide-block mode based
-on ChaCha20 and Poly1305 (with no external cryptanalysis yet, and probably
-actually using ChaCha8 or ChaCha12 to meet performance requirements), or the
-status quo of no encryption at all.
-
-It *might* be possible to add per-block metadata support to f2fs, in which it
-could be used with ChaCha20 in fscrypt.  But if feasible at all it would be
-quite difficult (requiring some significant filesystem surgery, and disabling
-conflicting filesystem features that allow data to be updated in-place) and
-would not cover dm-crypt, nor ext4.
-
-Note also that many other lightweight block ciphers are designed for hardware
-and perform poorly in software, e.g. PRESENT is even slower than AES.  Thus
-there really weren't many options.
-
-Any concrete suggestions are greatly appreciated!
-
-> > outside crypto review, vs. the many cryptanalysis papers on Speck.  (In that
-> > respect the controversy about Speck has actually become an advantage, as it has
-> > received much more cryptanalysis than other lightweight block ciphers.)
-> 
-> That's the thing that worries me, actually. Many of the design
-> decisions behind Speck haven't been justified.
-> 
-
-Originally that was true, but later there were significant clarifications
-released, e.g. the paper "Notes on the design and analysis of Simon and Speck"
-(https://eprint.iacr.org/2017/560.pdf).  In fact, from what I can see, many
-competing lightweight block ciphers don't have as much design justification
-available as Speck.  Daniel Bernstein's papers are excellent, but unfortunately
-he has only designed a stream cipher, not a block cipher or another algorithm
-that is applicable for disk encryption.
-
-> > The reason we chose Speck had nothing to do with the proposed ISO standard or
-> > any sociopolitical factors, but rather because it was the only algorithm we
-> > could find that met the performance and security requirements.
-> 
-> > Note that Linux
-> > doesn't bow down to any particular standards organization, and it offers
-> > algorithms that were specified in various places, even some with no more than a
-> > publication by the author.  In fact, support for SM4 was just added too, which
-> > is a Chinese government standard.  Are you going to send a patch to remove that
-> > too, or is it just NSA designed algorithms that are not okay?
-> 
-> No need to be belittling; I have much less tinfoil strapped around my
-> head than perhaps you think. I'm not blindly opposed to
-> government-designed algorithms. Take SHA2, for example -- built by the
-> NSA.
-> 
-> But I do care quite a bit about using ciphers that have acceptance of
-> the academic community and a large body of literature documenting its
-> design decisions and analyzing it. Some of the best symmetric
-> cryptographers in academia have expressed reservations about it, and
-> it was just rejected from a major standard's body. Linux, of course,
-> is free to disagree -- or "bow down" as you oddly put it -- but I'd
-> make sure you've got a pretty large bucket of justifications for that
-> disagreement.
-> 
-
-There have actually been many papers analyzing Speck.  As with other ciphers,
-reduced-round variants have been successfully attacked, while the full variants
-have held up.  This is expected.  It's true that some other ciphers such as
-ChaCha20 have a higher security margin, which has resulted in some criticism of
-Speck.  But the correct security margin is always debatable, and in a
-performance-oriented cipher it's desirable to not have an excessive number of
-rounds.  In fact it was even looking like ChaCha20 was not going to be fast
-enough on some CPUs, so if we went the ChaCha route we may have actually have
-had to use ChaCha12 or ChaCha8 instead.
-
-Also, some papers present results for just the weakest variants of Speck
-(Speck32 and Speck48) while omitting the strongest (Speck128, the one that's
-planned to be offered for Android), presumably because the authors weren't able
-to attack it as successfully.  I think that's causing some confusion.
-
-I don't see how the ISO standarization process means much for crypto algorithms.
-It seems very political, and actually it seems that people involved were pretty
-clear that Speck was rejected primarily for political reasons.  Interestingly,
-ChaCha20 is not an ISO standard either.  Does that mean ChaCha20 shouldn't be
-used?
-
-In any case, given that the status quo on low-end Android devices is no
-encryption, it would be great to start having them be encrypted.  It would be a
-shame if pushback for non-technical reasons prevents that from happening.
-
-> > (in fact, you'd
-> > probably have a different opinion of it if the authors had simply worked
-> > somewhere else and published the exact same algorithm);
-> 
-> Again, no need to patronize. I don't actually have a bias like that.
-> 
-> > But I hope you can understand that all *technical* indicators are that Speck is
-> > secure enough
-> 
-> That's the thing I'm worried about.
+>-----Original Message-----
+>From: Herbert Xu [mailto:herbert@gondor.apana.org.au]
+>Sent: Wednesday, April 18, 2018 8:25 PM
+>To: Dey, Megha <megha.dey@intel.com>
+>Cc: linux-kernel@vger.kernel.org; linux-crypto@vger.kernel.org;
+>davem@davemloft.net
+>Subject: Re: [PATCH V8 1/5] crypto: Multi-buffer encryption infrastructure
+>support
 >
+>On Thu, Apr 19, 2018 at 12:54:16AM +0000, Dey, Megha wrote:
+>>
+>> Yeah I think I misunderstood. I think what you mean is to remove mcryptd.c
+>completely and avoid the extra layer of indirection to call the underlying
+>algorithm, instead call it directly, correct?
+>>
+>> So currently we have 3 algorithms registered for every multibuffer algorithm:
+>> name         : __sha1-mb
+>> driver       : mcryptd(__intel_sha1-mb)
+>>
+>> name         : sha1
+>> driver       : sha1_mb
+>>
+>> name         : __sha1-mb
+>> driver       : __intel_sha1-mb
+>>
+>> If we remove mcryptd, then we will have just the 2?
+>
+>It should be down to just one, i.e., the current inner algorithm.
+>It's doing all the scheduling work already so I don't really see why it needs the
+>wrappers around it.
 
-Thanks,
+Hi Herbert,
 
-- Eric
+Is there any existing implementation of async crypto algorithm that uses the above approach? The ones I could find are either sync, have an outer and inner algorithm or use cryptd.
+
+I tried removing the mcryptd layer and the outer algorithm and some plumbing to pass the correct structures, but see crashes.(obviously some errors in the plumbing)
+
+I am not sure if we remove mcryptd, how would we queue work, flush partially completed jobs or call completions (currently done by mcryptd) if we simply call the inner algorithm.
+
+Are you suggesting these are not required at all? I am not sure how to move forward.
+
+>
+>Cheers,
+>--
+>Email: Herbert Xu <herbert@gondor.apana.org.au> Home Page:
+>http://gondor.apana.org.au/~herbert/
+>PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
