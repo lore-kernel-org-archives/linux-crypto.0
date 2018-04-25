@@ -1,19 +1,16 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+From: Gilad Ben-Yossef <gilad@benyossef.com>
 Subject: Re: [PATCH 1/2] crypto: sm4 - export encrypt/decrypt routines to
  other drivers
-Date: Wed, 25 Apr 2018 14:23:47 +0200
-Message-ID: <CAKv+Gu-Kff7+8ON4aBDm-oU45b2Qk3nho1cVQhnfpca7SUD_mA@mail.gmail.com>
+Date: Wed, 25 Apr 2018 15:47:56 +0300
+Message-ID: <CAOtvUMdsncpGCpwibcnfPP2G+EMxDg630SdhvGTE+K2qiZkKLA@mail.gmail.com>
 References: <20180425122046.12695-1-ard.biesheuvel@linaro.org>
  <20180425122046.12695-2-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Cc: Gilad Ben-Yossef <gilad@benyossef.com>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
- Ard Biesheuvel <ard.biesheuvel@linaro.org>
-To: "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
- <linux-crypto@vger.kernel.org>
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+ linux-arm-kernel@lists.infradead.org, Herbert Xu <herbert@gondor.apana.org.au>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 In-Reply-To: <20180425122046.12695-2-ard.biesheuvel@linaro.org>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
@@ -27,17 +24,17 @@ Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 25 April 2018 at 14:20, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
+On Wed, Apr 25, 2018 at 3:20 PM, Ard Biesheuvel
+<ard.biesheuvel@linaro.org> wrote:
 > In preparation of adding support for the SIMD based arm64 implementation
-> of arm64,
-
-SM4 ^^^
-
-> which requires a fallback to non-SIMD code when invoked in
+> of arm64, which requires a fallback to non-SIMD code when invoked in
 > certain contexts, expose the generic SM4 encrypt and decrypt routines
 > to other drivers.
 >
 > Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+
+Acked-by: Gilad Ben-Yossef <gilad@benyossef.com>
+
 > ---
 >  crypto/sm4_generic.c | 10 ++++++----
 >  include/crypto/sm4.h |  3 +++
@@ -99,3 +96,13 @@ SM4 ^^^
 > --
 > 2.17.0
 >
+
+
+
+-- 
+Gilad Ben-Yossef
+Chief Coffee Drinker
+
+"If you take a class in large-scale robotics, can you end up in a
+situation where the homework eats your dog?"
+ -- Jean-Baptiste Queru
