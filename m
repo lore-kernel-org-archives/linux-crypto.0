@@ -1,76 +1,50 @@
-From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: Re: [PATCH v2 1/2] crypto: ccree: enable support for hardware keys
-Date: Thu, 26 Apr 2018 10:05:06 +0300
-Message-ID: <CAOtvUMd-Fkva9RGqRu0HkDjGLfuw9vtvPxQ0r6SBtinOZ=Q1_w@mail.gmail.com>
-References: <1524468316-6606-1-git-send-email-gilad@benyossef.com>
- <1524468316-6606-2-git-send-email-gilad@benyossef.com> <0caa0d1d-eb05-c5a1-9958-2285bb11db8c@microchip.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH V8 1/5] crypto: Multi-buffer encryption infrastructure
+ support
+Date: Thu, 26 Apr 2018 17:44:45 +0800
+Message-ID: <20180426094445.4jiwondmtbenepo2@gondor.apana.org.au>
+References: <1515542948-24041-1-git-send-email-megha.dey@linux.intel.com>
+ <1515542948-24041-2-git-send-email-megha.dey@linux.intel.com>
+ <20180118113905.GA19904@gondor.apana.org.au>
+ <1516322661.2526.3.camel@megha-Z97X-UD7-TH>
+ <20180316145351.GA6231@gondor.apana.org.au>
+ <C440BA31B54DCD4AAC682D2365C8FEE738C13267@ORSMSX111.amr.corp.intel.com>
+ <20180418110115.v2w3o5yfv4u3gc4r@gondor.apana.org.au>
+ <C440BA31B54DCD4AAC682D2365C8FEE738C13DDE@ORSMSX111.amr.corp.intel.com>
+ <20180419032525.6csodbz6lrksyudd@gondor.apana.org.au>
+ <C440BA31B54DCD4AAC682D2365C8FEE738C270FC@ORSMSX111.amr.corp.intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Ofir Drang <ofir.drang@arm.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux kernel mailing list <linux-kernel@vger.kernel.org>
-To: Tudor Ambarus <tudor.ambarus@microchip.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "davem@davemloft.net" <davem@davemloft.net>
+To: "Dey, Megha" <megha.dey@intel.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <0caa0d1d-eb05-c5a1-9958-2285bb11db8c@microchip.com>
+Content-Disposition: inline
+In-Reply-To: <C440BA31B54DCD4AAC682D2365C8FEE738C270FC@ORSMSX111.amr.corp.intel.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Apr 25, 2018 at 6:47 PM, Tudor Ambarus
-<tudor.ambarus@microchip.com> wrote:
-> Hi, Gilad,
->
-> On 04/23/2018 10:25 AM, Gilad Ben-Yossef wrote:
->>
->> Enable CryptoCell support for hardware keys.
->>
->> Hardware keys are regular AES keys loaded into CryptoCell internal memory
->> via firmware, often from secure boot ROM or hardware fuses at boot time.
->>
->> As such, they can be used for enc/dec purposes like any other key but
->> cannot (read: extremely hard to) be extracted since since they are not
->> available anywhere in RAM during runtime.
->>
->> The mechanism has some similarities to s390 secure keys although the keys
->> are not wrapped or sealed, but simply loaded offline. The interface was
->> therefore modeled based on the s390 secure keys support.
->
->
-> I'm interested in hardware keys, ecc508 supports them too. In your
-> proposal you expect that the user will provide a specific key token that
-> is meaningful only for the ccree driver. If another driver that supports
-> "cbc(paes)" shows up, you will force the user to select a specific
-> driver implementation and to know what kind of key token to provide.
-> Shouldn't we have a common API that can address other drivers too?
+On Wed, Apr 25, 2018 at 01:14:26AM +0000, Dey, Megha wrote:
+> 
+> Is there any existing implementation of async crypto algorithm that uses the above approach? The ones I could find are either sync, have an outer and inner algorithm or use cryptd.
+> 
+> I tried removing the mcryptd layer and the outer algorithm and some plumbing to pass the correct structures, but see crashes.(obviously some errors in the plumbing)
 
-The v1 of the patch gave a unique name ("haes") to the CryptoCell HW
-key format, since the information in the key for CryptoCell and the
-s390 is very different (in short: cryptocell uses key size + slot
-index, s390 provide an key encrypted by a HW known key).
-Herbert expressed the sentiment that since the user needs to be aware
-of the specific format of the token for each device anyway, she must
-be aware of which tfm provider is being used anyway, so must be using
-the device specific name.
-Hence, I change the name to use "paes" just like the s390.
+OK, you can't just remove it because the inner algorithm requires
+kernel_fpu_begin/kernel_fpu_end.  So we do need two layers but I
+don't think we need cryptd or mcryptd.
 
-It's pretty obvious that the s390 and CryptoCell HW/protected keys
-don't have anything in common and are not interchangeable.
-I would say that if the ecc508 tokens are yet a third format, we
-should follow the same example and just leave it as "paes" and let the
-user specify an exact device name.
+The existing simd wrapper should work just fine on the inner
+algorithm, provided that we add hash support to it.
 
-However, if we can find a common token format for ecc508 with either
-CryptoCell or the s390 (probably less likely), maybe its worth using a
-common name for those and a different for the outlier?
+> I am not sure if we remove mcryptd, how would we queue work, flush partially completed jobs or call completions (currently done by mcryptd) if we simply call the inner algorithm.
 
-Gilad
+I don't think mcryptd is providing any real facility to the flushing
+apart from a helper.  That same helper can live anywhere.
 
-
+Cheers,
 -- 
-Gilad Ben-Yossef
-Chief Coffee Drinker
-
-"If you take a class in large-scale robotics, can you end up in a
-situation where the homework eats your dog?"
- -- Jean-Baptiste Queru
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
