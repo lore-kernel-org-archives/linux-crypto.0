@@ -1,40 +1,53 @@
-From: Colin King <colin.king@canonical.com>
-Subject: [PATCH] crypto: ghash-clmulni: fix spelling mistake: "acclerated" -> "accelerated"
-Date: Fri, 27 Apr 2018 19:08:05 +0100
-Message-ID: <20180427180805.15536-1-colin.king@canonical.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Crypto Fixes for 4.17
+Date: Sat, 28 Apr 2018 16:05:17 +0800
+Message-ID: <20180428080517.haxgpvqrwgotakyo@gondor.apana.org.au>
+References: <20161119102748.GA4277@gondor.apana.org.au>
+ <20161213132414.GA7898@gondor.apana.org.au>
+ <20170223125141.GA17400@gondor.apana.org.au>
+ <20170714141855.GA29426@gondor.apana.org.au>
+ <20170922084401.GA15541@gondor.apana.org.au>
+ <20171128230929.GA17783@gondor.apana.org.au>
+ <20171222064931.GA27068@gondor.apana.org.au>
+ <20180105073808.GA14405@gondor.apana.org.au>
+ <20180212031702.GA26153@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Cc: kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H . Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
-        linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20180212031702.GA26153@gondor.apana.org.au>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-From: Colin Ian King <colin.king@canonical.com>
+Hi Linus: 
 
-Trivial fix to spelling mistake in module description text
+This push fixes the following issues:
 
-Signed-off-by: Colin Ian King <colin.king@canonical.com>
----
- arch/x86/crypto/ghash-clmulni-intel_glue.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+- Crypto API regression that may cause sporadic alloc failures.
+- Double-free bug in drbg.
 
-diff --git a/arch/x86/crypto/ghash-clmulni-intel_glue.c b/arch/x86/crypto/ghash-clmulni-intel_glue.c
-index 0420bab19efb..2ddbe3a1868b 100644
---- a/arch/x86/crypto/ghash-clmulni-intel_glue.c
-+++ b/arch/x86/crypto/ghash-clmulni-intel_glue.c
-@@ -364,5 +364,5 @@ module_exit(ghash_pclmulqdqni_mod_exit);
- 
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("GHASH Message Digest Algorithm, "
--		   "acclerated by PCLMULQDQ-NI");
-+		   "accelerated by PCLMULQDQ-NI");
- MODULE_ALIAS_CRYPTO("ghash");
+
+Please pull from
+
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
+
+
+Eric Biggers (1):
+      crypto: api - fix finding algorithm currently being tested
+
+Stephan Mueller (1):
+      crypto: drbg - set freed buffers to NULL
+
+ crypto/api.c  |   11 ++++++++---
+ crypto/drbg.c |    2 ++
+ 2 files changed, 10 insertions(+), 3 deletions(-)
+
+Thanks,
 -- 
-2.17.0
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
