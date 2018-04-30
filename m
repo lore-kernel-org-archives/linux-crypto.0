@@ -1,8 +1,8 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH resend 02/10] crypto: arm64/sha2-ce - yield NEON after every
+Subject: [PATCH resend 01/10] crypto: arm64/sha1-ce - yield NEON after every
  block of input
-Date: Mon, 30 Apr 2018 18:18:22 +0200
-Message-ID: <20180430161830.14892-3-ard.biesheuvel@linaro.org>
+Date: Mon, 30 Apr 2018 18:18:21 +0200
+Message-ID: <20180430161830.14892-2-ard.biesheuvel@linaro.org>
 References: <20180430161830.14892-1-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -30,17 +30,17 @@ yielding the NEON after every block of input.
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- arch/arm64/crypto/sha2-ce-core.S | 37 ++++++++++++++------
- 1 file changed, 26 insertions(+), 11 deletions(-)
+ arch/arm64/crypto/sha1-ce-core.S | 42 ++++++++++++++------
+ 1 file changed, 29 insertions(+), 13 deletions(-)
 
-diff --git a/arch/arm64/crypto/sha2-ce-core.S b/arch/arm64/crypto/sha2-ce-core.S
-index 4c3c89b812ce..cd8b36412469 100644
---- a/arch/arm64/crypto/sha2-ce-core.S
-+++ b/arch/arm64/crypto/sha2-ce-core.S
-@@ -79,30 +79,36 @@
+diff --git a/arch/arm64/crypto/sha1-ce-core.S b/arch/arm64/crypto/sha1-ce-core.S
+index 46049850727d..78eb35fb5056 100644
+--- a/arch/arm64/crypto/sha1-ce-core.S
++++ b/arch/arm64/crypto/sha1-ce-core.S
+@@ -69,30 +69,36 @@
+ 	 *			  int blocks)
  	 */
- 	.text
- ENTRY(sha2_ce_transform)
+ ENTRY(sha1_ce_transform)
 +	frame_push	3
 +
 +	mov		x19, x0
@@ -48,47 +48,49 @@ index 4c3c89b812ce..cd8b36412469 100644
 +	mov		x21, x2
 +
  	/* load round constants */
--	adr_l		x8, .Lsha2_rcon
-+0:	adr_l		x8, .Lsha2_rcon
- 	ld1		{ v0.4s- v3.4s}, [x8], #64
- 	ld1		{ v4.4s- v7.4s}, [x8], #64
- 	ld1		{ v8.4s-v11.4s}, [x8], #64
- 	ld1		{v12.4s-v15.4s}, [x8]
+-	loadrc		k0.4s, 0x5a827999, w6
++0:	loadrc		k0.4s, 0x5a827999, w6
+ 	loadrc		k1.4s, 0x6ed9eba1, w6
+ 	loadrc		k2.4s, 0x8f1bbcdc, w6
+ 	loadrc		k3.4s, 0xca62c1d6, w6
  
  	/* load state */
--	ld1		{dgav.4s, dgbv.4s}, [x0]
-+	ld1		{dgav.4s, dgbv.4s}, [x19]
+-	ld1		{dgav.4s}, [x0]
+-	ldr		dgb, [x0, #16]
++	ld1		{dgav.4s}, [x19]
++	ldr		dgb, [x19, #16]
  
- 	/* load sha256_ce_state::finalize */
- 	ldr_l		w4, sha256_ce_offsetof_finalize, x4
+ 	/* load sha1_ce_state::finalize */
+ 	ldr_l		w4, sha1_ce_offsetof_finalize, x4
 -	ldr		w4, [x0, x4]
 +	ldr		w4, [x19, x4]
  
  	/* load input */
--0:	ld1		{v16.4s-v19.4s}, [x1], #64
+-0:	ld1		{v8.4s-v11.4s}, [x1], #64
 -	sub		w2, w2, #1
-+1:	ld1		{v16.4s-v19.4s}, [x20], #64
++1:	ld1		{v8.4s-v11.4s}, [x20], #64
 +	sub		w21, w21, #1
  
- CPU_LE(	rev32		v16.16b, v16.16b	)
- CPU_LE(	rev32		v17.16b, v17.16b	)
- CPU_LE(	rev32		v18.16b, v18.16b	)
- CPU_LE(	rev32		v19.16b, v19.16b	)
+ CPU_LE(	rev32		v8.16b, v8.16b		)
+ CPU_LE(	rev32		v9.16b, v9.16b		)
+ CPU_LE(	rev32		v10.16b, v10.16b	)
+ CPU_LE(	rev32		v11.16b, v11.16b	)
  
--1:	add		t0.4s, v16.4s, v0.4s
-+2:	add		t0.4s, v16.4s, v0.4s
+-1:	add		t0.4s, v8.4s, k0.4s
++2:	add		t0.4s, v8.4s, k0.4s
  	mov		dg0v.16b, dgav.16b
- 	mov		dg1v.16b, dgbv.16b
  
-@@ -131,16 +137,24 @@ CPU_LE(	rev32		v19.16b, v19.16b	)
- 	add		dgbv.4s, dgbv.4s, dg1v.4s
+ 	add_update	c, ev, k0,  8,  9, 10, 11, dgb
+@@ -123,16 +129,25 @@ CPU_LE(	rev32		v11.16b, v11.16b	)
+ 	add		dgbv.2s, dgbv.2s, dg1v.2s
+ 	add		dgav.4s, dgav.4s, dg0v.4s
  
- 	/* handled all input blocks? */
 -	cbnz		w2, 0b
 +	cbz		w21, 3f
 +
 +	if_will_cond_yield_neon
-+	st1		{dgav.4s, dgbv.4s}, [x19]
++	st1		{dgav.4s}, [x19]
++	str		dgb, [x19, #16]
 +	do_cond_yield_neon
 +	b		0b
 +	endif_yield_neon
@@ -102,24 +104,26 @@ index 4c3c89b812ce..cd8b36412469 100644
  	 */
 -	cbz		x4, 3f
 +3:	cbz		x4, 4f
- 	ldr_l		w4, sha256_ce_offsetof_count, x4
+ 	ldr_l		w4, sha1_ce_offsetof_count, x4
 -	ldr		x4, [x0, x4]
 +	ldr		x4, [x19, x4]
- 	movi		v17.2d, #0
+ 	movi		v9.2d, #0
  	mov		x8, #0x80000000
- 	movi		v18.2d, #0
-@@ -149,9 +163,10 @@ CPU_LE(	rev32		v19.16b, v19.16b	)
+ 	movi		v10.2d, #0
+@@ -141,10 +156,11 @@ CPU_LE(	rev32		v11.16b, v11.16b	)
  	mov		x4, #0
- 	mov		v19.d[0], xzr
- 	mov		v19.d[1], x7
+ 	mov		v11.d[0], xzr
+ 	mov		v11.d[1], x7
 -	b		1b
 +	b		2b
  
  	/* store new state */
--3:	st1		{dgav.4s, dgbv.4s}, [x0]
-+4:	st1		{dgav.4s, dgbv.4s}, [x19]
+-3:	st1		{dgav.4s}, [x0]
+-	str		dgb, [x0, #16]
++4:	st1		{dgav.4s}, [x19]
++	str		dgb, [x19, #16]
 +	frame_pop
  	ret
- ENDPROC(sha2_ce_transform)
+ ENDPROC(sha1_ce_transform)
 -- 
 2.17.0
