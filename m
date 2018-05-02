@@ -1,7 +1,8 @@
 From: Antoine Tenart <antoine.tenart@bootlin.com>
-Subject: [PATCH 00/10] crypto: inside-secure - AEAD support
-Date: Wed,  2 May 2018 11:57:15 +0200
-Message-ID: <20180502095725.31935-1-antoine.tenart@bootlin.com>
+Subject: [PATCH 05/10] crypto: inside-secure - make the key and context size computation dynamic
+Date: Wed,  2 May 2018 11:57:20 +0200
+Message-ID: <20180502095725.31935-6-antoine.tenart@bootlin.com>
+References: <20180502095725.31935-1-antoine.tenart@bootlin.com>
 Cc: Antoine Tenart <antoine.tenart@bootlin.com>,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         thomas.petazzoni@bootlin.com, maxime.chevallier@bootlin.com,
@@ -9,41 +10,40 @@ Cc: Antoine Tenart <antoine.tenart@bootlin.com>,
         nadavh@marvell.com, oferh@marvell.com, igall@marvell.com
 To: herbert@gondor.apana.org.au, davem@davemloft.net
 Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20180502095725.31935-1-antoine.tenart@bootlin.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi all,
+This patches makes the key and context size computation dynamic when
+using memzero_explicit() on these two arrays. This is safer, cleaner and
+will help future modifications of the driver when these two parameters
+sizes will changes (the context size will be bigger when using AEAD
+algorithms).
 
-This series brings AEAD algorithms to the Inside Secure SafeXcel driver.
-The first 7 commits rework the driver to allow the future AEAD addition,
-and then 3 commits add AEAD functions and 3 algorithms.
+Signed-off-by: Antoine Tenart <antoine.tenart@bootlin.com>
+---
+ drivers/crypto/inside-secure/safexcel_cipher.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-This is based on top of v4.17-rc3.
-
-Thanks!
-Antoine
-
-Antoine Tenart (10):
-  crypto: aead - allow to allocate AEAD requests on the stack
-  crypto: inside-secure - rework cipher functions for future AEAD
-    support
-  crypto: inside-secure - rework the alg type settings in the context
-  crypto: inside-secure - make the context control size dynamic
-  crypto: inside-secure - make the key and context size computation
-    dynamic
-  crypto: inside-secure - fix the hash then encrypt/decrypt types
-  crypto: inside-secure - improve error reporting
-  crypto: inside-secure - authenc(hmac(sha256),cbc(aes)) support
-  crypto: inside-secure - authenc(hmac(sha224),cbc(aes)) support
-  crypto: inside-secure - authenc(hmac(sha1),cbc(aes)) support
-
- drivers/crypto/Kconfig                        |   1 +
- drivers/crypto/inside-secure/safexcel.c       |  32 +
- drivers/crypto/inside-secure/safexcel.h       |  33 +-
- .../crypto/inside-secure/safexcel_cipher.c    | 642 ++++++++++++++----
- drivers/crypto/inside-secure/safexcel_hash.c  |  21 +-
- include/crypto/aead.h                         |   5 +
- 6 files changed, 593 insertions(+), 141 deletions(-)
-
+diff --git a/drivers/crypto/inside-secure/safexcel_cipher.c b/drivers/crypto/inside-secure/safexcel_cipher.c
+index 7c801aace04b..a658f8f14002 100644
+--- a/drivers/crypto/inside-secure/safexcel_cipher.c
++++ b/drivers/crypto/inside-secure/safexcel_cipher.c
+@@ -554,13 +554,13 @@ static int safexcel_cipher_cra_exit(struct crypto_tfm *tfm)
+ {
+ 	struct safexcel_cipher_ctx *ctx = crypto_tfm_ctx(tfm);
+ 
+-	memzero_explicit(ctx->key, 8 * sizeof(u32));
++	memzero_explicit(ctx->key, sizeof(ctx->key));
+ 
+ 	/* context not allocated, skip invalidation */
+ 	if (!ctx->base.ctxr)
+ 		return -ENOMEM;
+ 
+-	memzero_explicit(ctx->base.ctxr->data, 8 * sizeof(u32));
++	memzero_explicit(ctx->base.ctxr->data, sizeof(ctx->base.ctxr->data));
+ 	return 0;
+ }
+ 
 -- 
 2.17.0
