@@ -1,7 +1,7 @@
 From: Antoine Tenart <antoine.tenart@bootlin.com>
-Subject: [PATCH 09/10] crypto: inside-secure - authenc(hmac(sha224),cbc(aes)) support
-Date: Wed,  2 May 2018 11:57:24 +0200
-Message-ID: <20180502095725.31935-10-antoine.tenart@bootlin.com>
+Subject: [PATCH 04/10] crypto: inside-secure - make the context control size dynamic
+Date: Wed,  2 May 2018 11:57:19 +0200
+Message-ID: <20180502095725.31935-5-antoine.tenart@bootlin.com>
 References: <20180502095725.31935-1-antoine.tenart@bootlin.com>
 Cc: Antoine Tenart <antoine.tenart@bootlin.com>,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -14,105 +14,42 @@ In-Reply-To: <20180502095725.31935-1-antoine.tenart@bootlin.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This patch adds the authenc(hmac(sha224),cbc(aes)) AEAD algorithm
-support to the Inside Secure SafeXcel driver.
+This patch makes the context control size computation dynamic, not to
+rely on hardcoded values. This is better for the future, and will help
+adding the AEAD support.
 
 Signed-off-by: Antoine Tenart <antoine.tenart@bootlin.com>
 ---
- drivers/crypto/inside-secure/safexcel.c       |  1 +
- drivers/crypto/inside-secure/safexcel.h       |  1 +
- .../crypto/inside-secure/safexcel_cipher.c    | 50 ++++++++++++++++++-
- 3 files changed, 50 insertions(+), 2 deletions(-)
+ drivers/crypto/inside-secure/safexcel_cipher.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/inside-secure/safexcel.c
-index 8c963ef0953a..0f061c3757e9 100644
---- a/drivers/crypto/inside-secure/safexcel.c
-+++ b/drivers/crypto/inside-secure/safexcel.c
-@@ -793,6 +793,7 @@ static struct safexcel_alg_template *safexcel_algs[] = {
- 	&safexcel_alg_hmac_sha1,
- 	&safexcel_alg_hmac_sha224,
- 	&safexcel_alg_hmac_sha256,
-+	&safexcel_alg_authenc_hmac_sha224_cbc_aes,
- 	&safexcel_alg_authenc_hmac_sha256_cbc_aes,
- };
- 
-diff --git a/drivers/crypto/inside-secure/safexcel.h b/drivers/crypto/inside-secure/safexcel.h
-index de078da876ae..4637f7b00c1d 100644
---- a/drivers/crypto/inside-secure/safexcel.h
-+++ b/drivers/crypto/inside-secure/safexcel.h
-@@ -657,6 +657,7 @@ extern struct safexcel_alg_template safexcel_alg_sha256;
- extern struct safexcel_alg_template safexcel_alg_hmac_sha1;
- extern struct safexcel_alg_template safexcel_alg_hmac_sha224;
- extern struct safexcel_alg_template safexcel_alg_hmac_sha256;
-+extern struct safexcel_alg_template safexcel_alg_authenc_hmac_sha224_cbc_aes;
- extern struct safexcel_alg_template safexcel_alg_authenc_hmac_sha256_cbc_aes;
- 
- #endif
 diff --git a/drivers/crypto/inside-secure/safexcel_cipher.c b/drivers/crypto/inside-secure/safexcel_cipher.c
-index a4b69cbe999a..207026fe997c 100644
+index 4977039f3d33..7c801aace04b 100644
 --- a/drivers/crypto/inside-secure/safexcel_cipher.c
 +++ b/drivers/crypto/inside-secure/safexcel_cipher.c
-@@ -184,9 +184,21 @@ static int safexcel_aead_aes_setkey(struct crypto_aead *ctfm, const u8 *key,
- 		ctx->base.needs_inv = true;
+@@ -118,21 +118,20 @@ static int safexcel_context_control(struct safexcel_cipher_ctx *ctx,
+ 	switch (ctx->key_len) {
+ 	case AES_KEYSIZE_128:
+ 		cdesc->control_data.control0 |= CONTEXT_CONTROL_CRYPTO_ALG_AES128;
+-		ctrl_size = 4;
+ 		break;
+ 	case AES_KEYSIZE_192:
+ 		cdesc->control_data.control0 |= CONTEXT_CONTROL_CRYPTO_ALG_AES192;
+-		ctrl_size = 6;
+ 		break;
+ 	case AES_KEYSIZE_256:
+ 		cdesc->control_data.control0 |= CONTEXT_CONTROL_CRYPTO_ALG_AES256;
+-		ctrl_size = 8;
+ 		break;
+ 	default:
+ 		dev_err(priv->dev, "aes keysize not supported: %u\n",
+ 			ctx->key_len);
+ 		return -EINVAL;
+ 	}
++
++	ctrl_size = ctx->key_len / sizeof(u32);
+ 	cdesc->control_data.control0 |= CONTEXT_CONTROL_SIZE(ctrl_size);
  
- 	/* Auth key */
--	if (safexcel_hmac_setkey("safexcel-sha256", keys.authkey,
--				 keys.authkeylen, &istate, &ostate))
-+	switch (ctx->alg) {
-+	case CONTEXT_CONTROL_CRYPTO_ALG_SHA224:
-+		if (safexcel_hmac_setkey("safexcel-sha224", keys.authkey,
-+					 keys.authkeylen, &istate, &ostate))
-+			goto badkey;
-+		break;
-+	case CONTEXT_CONTROL_CRYPTO_ALG_SHA256:
-+		if (safexcel_hmac_setkey("safexcel-sha256", keys.authkey,
-+					 keys.authkeylen, &istate, &ostate))
-+			goto badkey;
-+		break;
-+	default:
-+		dev_err(priv->dev, "aead: unsupported hash algorithm\n");
- 		goto badkey;
-+	}
- 
- 	crypto_aead_set_flags(ctfm, crypto_aead_get_flags(ctfm) &
- 				    CRYPTO_TFM_RES_MASK);
-@@ -937,3 +949,37 @@ struct safexcel_alg_template safexcel_alg_authenc_hmac_sha256_cbc_aes = {
- 		},
- 	},
- };
-+
-+static int safexcel_aead_sha224_cra_init(struct crypto_tfm *tfm)
-+{
-+	struct safexcel_cipher_ctx *ctx = crypto_tfm_ctx(tfm);
-+
-+	safexcel_aead_cra_init(tfm);
-+	ctx->alg = CONTEXT_CONTROL_CRYPTO_ALG_SHA224;
-+	ctx->state_sz = SHA256_DIGEST_SIZE;
-+	return 0;
-+}
-+
-+struct safexcel_alg_template safexcel_alg_authenc_hmac_sha224_cbc_aes = {
-+	.type = SAFEXCEL_ALG_TYPE_AEAD,
-+	.alg.aead = {
-+		.setkey = safexcel_aead_aes_setkey,
-+		.encrypt = safexcel_aead_encrypt,
-+		.decrypt = safexcel_aead_decrypt,
-+		.ivsize = AES_BLOCK_SIZE,
-+		.maxauthsize = SHA224_DIGEST_SIZE,
-+		.base = {
-+			.cra_name = "authenc(hmac(sha224),cbc(aes))",
-+			.cra_driver_name = "safexcel-authenc-hmac-sha224-cbc-aes",
-+			.cra_priority = 300,
-+			.cra_flags = CRYPTO_ALG_TYPE_AEAD | CRYPTO_ALG_ASYNC |
-+				     CRYPTO_ALG_KERN_DRIVER_ONLY,
-+			.cra_blocksize = AES_BLOCK_SIZE,
-+			.cra_ctxsize = sizeof(struct safexcel_cipher_ctx),
-+			.cra_alignmask = 0,
-+			.cra_init = safexcel_aead_sha224_cra_init,
-+			.cra_exit = safexcel_aead_cra_exit,
-+			.cra_module = THIS_MODULE,
-+		},
-+	},
-+};
+ 	return 0;
 -- 
 2.17.0
