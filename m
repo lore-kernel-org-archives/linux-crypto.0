@@ -1,56 +1,57 @@
-From: David Laight <David.Laight@ACULAB.COM>
-Subject: RE: [PATCH 01/10] crypto: aead - allow to allocate AEAD requests on
- the stack
-Date: Wed, 2 May 2018 14:55:19 +0000
-Message-ID: <02ad9eb93c494314a85db69886cf787a@AcuMS.aculab.com>
-References: <20180502095725.31935-1-antoine.tenart@bootlin.com>
- <20180502095725.31935-2-antoine.tenart@bootlin.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Subject: Re: [PATCH 1/5] random: fix crng_ready() test
+Date: Wed, 2 May 2018 18:18:13 +0200
+Message-ID: <CAMuHMdWxU=gtLTDY-W0YCMD6eE4gSnjhFo5CRTqwq_Q=yH-zZA@mail.gmail.com>
+References: <20180413013046.404-1-tytso@mit.edu>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "thomas.petazzoni@bootlin.com" <thomas.petazzoni@bootlin.com>,
-        "maxime.chevallier@bootlin.com" <maxime.chevallier@bootlin.com>,
-        "gregory.clement@bootlin.com" <gregory.clement@bootlin.com>,
-        "miquel.raynal@bootlin.com" <miquel.raynal@bootlin.com>,
-        "nadavh@marvell.com" <nadavh@marvell.com>,
-        "oferh@marvell.com" <oferh@marvell.com>,
-        "igall@marvell.com" <igall@marvell.com>
-To: 'Antoine Tenart' <antoine.tenart@bootlin.com>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>
+Content-Type: text/plain; charset="UTF-8"
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux Kernel Developers List <linux-kernel@vger.kernel.org>,
+        stable <stable@kernel.org>,
+        Linux-Renesas <linux-renesas-soc@vger.kernel.org>
+To: "Theodore Ts'o" <tytso@mit.edu>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180502095725.31935-2-antoine.tenart@bootlin.com>
-Content-Language: en-US
+In-Reply-To: <20180413013046.404-1-tytso@mit.edu>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-From: Antoine Tenart
-> Sent: 02 May 2018 10:57
-> Adds the AEAD_REQUEST_ON_STACK primitive to allow allocating AEAD
-> requests on the stack, as it can already be done with various other
-> crypto algorithms within the kernel.
-> 
-> Signed-off-by: Antoine Tenart <antoine.tenart@bootlin.com>
-> ---
->  include/crypto/aead.h | 5 +++++
->  1 file changed, 5 insertions(+)
-> 
-> diff --git a/include/crypto/aead.h b/include/crypto/aead.h
-> index 1e26f790b03f..b67064786546 100644
-> --- a/include/crypto/aead.h
-> +++ b/include/crypto/aead.h
-> @@ -151,6 +151,11 @@ struct aead_alg {
->  	struct crypto_alg base;
->  };
-> 
-> +#define AEAD_REQUEST_ON_STACK(name, tfm) \
-> +	char __##name##_desc[sizeof(struct aead_request) + \
-> +		crypto_aead_reqsize(tfm)] CRYPTO_MINALIGN_ATTR; \
-> +	struct aead_request *name = (void *)__##name##_desc
-> +
+Hi Ted,
 
-This looks stunningly like a VLA.
+On Fri, Apr 13, 2018 at 3:30 AM, Theodore Ts'o <tytso@mit.edu> wrote:
+> The crng_init variable has three states:
+>
+> 0: The CRNG is not initialized at all
+> 1: The CRNG has a small amount of entropy, hopefully good enough for
+>    early-boot, non-cryptographical use cases
+> 2: The CRNG is fully initialized and we are sure it is safe for
+>    cryptographic use cases.
+>
+> The crng_ready() function should only return true once we are in the
+> last state.
+>
+> Reported-by: Jann Horn <jannh@google.com>
+> Fixes: e192be9d9a30 ("random: replace non-blocking pool...")
+> Cc: stable@kernel.org # 4.8+
+> Signed-off-by: Theodore Ts'o <tytso@mit.edu>
+> Reviewed-by: Jann Horn <jannh@google.com>
 
-	David
+Since commit 43838a23a05fbd13 ("random: fix crng_ready() test"),
+all (few) remaining users of %p are printing too early, leading to "(ptrval)"
+strings instead of actual hashed pointer values.
+
+Sample timings on two platforms (arm / arm64) booting with lots of
+debug ingo:
+
+[   28.521158] random: crng init done
+[   17.792705] random: crng init done
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+-- 
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
