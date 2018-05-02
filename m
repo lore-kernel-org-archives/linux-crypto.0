@@ -1,7 +1,7 @@
 From: Antoine Tenart <antoine.tenart@bootlin.com>
-Subject: [PATCH 07/10] crypto: inside-secure - improve error reporting
-Date: Wed,  2 May 2018 11:57:22 +0200
-Message-ID: <20180502095725.31935-8-antoine.tenart@bootlin.com>
+Subject: [PATCH 03/10] crypto: inside-secure - rework the alg type settings in the context
+Date: Wed,  2 May 2018 11:57:18 +0200
+Message-ID: <20180502095725.31935-4-antoine.tenart@bootlin.com>
 References: <20180502095725.31935-1-antoine.tenart@bootlin.com>
 Cc: Antoine Tenart <antoine.tenart@bootlin.com>,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -14,99 +14,39 @@ In-Reply-To: <20180502095725.31935-1-antoine.tenart@bootlin.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This patch improves the error reporting from the Inside Secure driver to
-the upper layers and crypto consumers. All errors reported by the engine
-aren't fatal, and some may be genuine.
+This patches reworks the way the algorithm type is set in the context,
+by using the fact that the decryption algorithms are just a combination
+of the algorithm encryption type and CONTEXT_CONTROL_TYPE_NULL_IN.
+
+This will help having simpler code when adding the AEAD support, to
+avoid ending up with an endless switch case block.
 
 Signed-off-by: Antoine Tenart <antoine.tenart@bootlin.com>
 ---
- drivers/crypto/inside-secure/safexcel.c       | 21 +++++++++++++++++++
- drivers/crypto/inside-secure/safexcel.h       |  2 ++
- .../crypto/inside-secure/safexcel_cipher.c    |  8 ++-----
- drivers/crypto/inside-secure/safexcel_hash.c  |  7 ++-----
- 4 files changed, 27 insertions(+), 11 deletions(-)
+ drivers/crypto/inside-secure/safexcel_cipher.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/inside-secure/safexcel.c
-index d4a81be0d7d2..87e6d1a63886 100644
---- a/drivers/crypto/inside-secure/safexcel.c
-+++ b/drivers/crypto/inside-secure/safexcel.c
-@@ -537,6 +537,27 @@ void safexcel_dequeue(struct safexcel_crypto_priv *priv, int ring)
- 	       EIP197_HIA_CDR(priv, ring) + EIP197_HIA_xDR_PREP_COUNT);
- }
- 
-+inline int safexcel_rdesc_check_errors(struct safexcel_crypto_priv *priv,
-+				       struct safexcel_result_desc *rdesc)
-+{
-+	if (likely(!rdesc->result_data.error_code))
-+		return 0;
-+
-+	if (rdesc->result_data.error_code & 0x407f) {
-+		/* Fatal error (bits 0-7, 14) */
-+		dev_err(priv->dev,
-+			"cipher: result: result descriptor error (%d)\n",
-+			rdesc->result_data.error_code);
-+		return -EIO;
-+	} else if (rdesc->result_data.error_code == BIT(9)) {
-+		/* Authentication failed */
-+		return -EBADMSG;
-+	}
-+
-+	/* All other non-fatal errors */
-+	return -EINVAL;
-+}
-+
- void safexcel_complete(struct safexcel_crypto_priv *priv, int ring)
- {
- 	struct safexcel_command_desc *cdesc;
-diff --git a/drivers/crypto/inside-secure/safexcel.h b/drivers/crypto/inside-secure/safexcel.h
-index ac2fae340299..5fdf28f304f2 100644
---- a/drivers/crypto/inside-secure/safexcel.h
-+++ b/drivers/crypto/inside-secure/safexcel.h
-@@ -601,6 +601,8 @@ struct safexcel_inv_result {
- };
- 
- void safexcel_dequeue(struct safexcel_crypto_priv *priv, int ring);
-+int safexcel_rdesc_check_errors(struct safexcel_crypto_priv *priv,
-+				struct safexcel_result_desc *rdesc);
- void safexcel_complete(struct safexcel_crypto_priv *priv, int ring);
- int safexcel_invalidate_cache(struct crypto_async_request *async,
- 			      struct safexcel_crypto_priv *priv,
 diff --git a/drivers/crypto/inside-secure/safexcel_cipher.c b/drivers/crypto/inside-secure/safexcel_cipher.c
-index a658f8f14002..ad67891e7b08 100644
+index a5e904a404d7..4977039f3d33 100644
 --- a/drivers/crypto/inside-secure/safexcel_cipher.c
 +++ b/drivers/crypto/inside-secure/safexcel_cipher.c
-@@ -160,12 +160,8 @@ static int safexcel_handle_req_result(struct safexcel_crypto_priv *priv, int rin
- 			break;
- 		}
+@@ -104,10 +104,13 @@ static int safexcel_context_control(struct safexcel_cipher_ctx *ctx,
+ 	struct safexcel_crypto_priv *priv = ctx->priv;
+ 	int ctrl_size;
  
--		if (rdesc->result_data.error_code) {
--			dev_err(priv->dev,
--				"cipher: result: result descriptor error (%d)\n",
--				rdesc->result_data.error_code);
--			*ret = -EIO;
--		}
-+		if (likely(!*ret))
-+			*ret = safexcel_rdesc_check_errors(priv, rdesc);
+-	if (sreq->direction == SAFEXCEL_ENCRYPT)
+-		cdesc->control_data.control0 |= CONTEXT_CONTROL_TYPE_CRYPTO_OUT;
+-	else
+-		cdesc->control_data.control0 |= CONTEXT_CONTROL_TYPE_CRYPTO_IN;
++	cdesc->control_data.control0 |= CONTEXT_CONTROL_TYPE_CRYPTO_OUT;
++
++	/* The decryption control type is a combination of the encryption type
++	 * and CONTEXT_CONTROL_TYPE_NULL_IN, for all types.
++	 */
++	if (sreq->direction == SAFEXCEL_DECRYPT)
++		cdesc->control_data.control0 |= CONTEXT_CONTROL_TYPE_NULL_IN;
  
- 		ndesc++;
- 	} while (!rdesc->last_seg);
-diff --git a/drivers/crypto/inside-secure/safexcel_hash.c b/drivers/crypto/inside-secure/safexcel_hash.c
-index 317b9e480312..6b29e4bdd6ab 100644
---- a/drivers/crypto/inside-secure/safexcel_hash.c
-+++ b/drivers/crypto/inside-secure/safexcel_hash.c
-@@ -146,11 +146,8 @@ static int safexcel_handle_req_result(struct safexcel_crypto_priv *priv, int rin
- 		dev_err(priv->dev,
- 			"hash: result: could not retrieve the result descriptor\n");
- 		*ret = PTR_ERR(rdesc);
--	} else if (rdesc->result_data.error_code) {
--		dev_err(priv->dev,
--			"hash: result: result descriptor error (%d)\n",
--			rdesc->result_data.error_code);
--		*ret = -EINVAL;
-+	} else {
-+		*ret = safexcel_rdesc_check_errors(priv, rdesc);
- 	}
- 
- 	safexcel_complete(priv, ring);
+ 	cdesc->control_data.control0 |= CONTEXT_CONTROL_KEY_EN;
+ 	cdesc->control_data.control1 |= ctx->mode;
 -- 
 2.17.0
