@@ -1,8 +1,7 @@
 From: Antoine Tenart <antoine.tenart@bootlin.com>
-Subject: [PATCH 01/10] crypto: aead - allow to allocate AEAD requests on the stack
-Date: Wed,  2 May 2018 11:57:16 +0200
-Message-ID: <20180502095725.31935-2-antoine.tenart@bootlin.com>
-References: <20180502095725.31935-1-antoine.tenart@bootlin.com>
+Subject: [PATCH 00/10] crypto: inside-secure - AEAD support
+Date: Wed,  2 May 2018 11:57:15 +0200
+Message-ID: <20180502095725.31935-1-antoine.tenart@bootlin.com>
 Cc: Antoine Tenart <antoine.tenart@bootlin.com>,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         thomas.petazzoni@bootlin.com, maxime.chevallier@bootlin.com,
@@ -10,34 +9,41 @@ Cc: Antoine Tenart <antoine.tenart@bootlin.com>,
         nadavh@marvell.com, oferh@marvell.com, igall@marvell.com
 To: herbert@gondor.apana.org.au, davem@davemloft.net
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180502095725.31935-1-antoine.tenart@bootlin.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Adds the AEAD_REQUEST_ON_STACK primitive to allow allocating AEAD
-requests on the stack, as it can already be done with various other
-crypto algorithms within the kernel.
+Hi all,
 
-Signed-off-by: Antoine Tenart <antoine.tenart@bootlin.com>
----
- include/crypto/aead.h | 5 +++++
- 1 file changed, 5 insertions(+)
+This series brings AEAD algorithms to the Inside Secure SafeXcel driver.
+The first 7 commits rework the driver to allow the future AEAD addition,
+and then 3 commits add AEAD functions and 3 algorithms.
 
-diff --git a/include/crypto/aead.h b/include/crypto/aead.h
-index 1e26f790b03f..b67064786546 100644
---- a/include/crypto/aead.h
-+++ b/include/crypto/aead.h
-@@ -151,6 +151,11 @@ struct aead_alg {
- 	struct crypto_alg base;
- };
- 
-+#define AEAD_REQUEST_ON_STACK(name, tfm) \
-+	char __##name##_desc[sizeof(struct aead_request) + \
-+		crypto_aead_reqsize(tfm)] CRYPTO_MINALIGN_ATTR; \
-+	struct aead_request *name = (void *)__##name##_desc
-+
- struct crypto_aead {
- 	unsigned int authsize;
- 	unsigned int reqsize;
+This is based on top of v4.17-rc3.
+
+Thanks!
+Antoine
+
+Antoine Tenart (10):
+  crypto: aead - allow to allocate AEAD requests on the stack
+  crypto: inside-secure - rework cipher functions for future AEAD
+    support
+  crypto: inside-secure - rework the alg type settings in the context
+  crypto: inside-secure - make the context control size dynamic
+  crypto: inside-secure - make the key and context size computation
+    dynamic
+  crypto: inside-secure - fix the hash then encrypt/decrypt types
+  crypto: inside-secure - improve error reporting
+  crypto: inside-secure - authenc(hmac(sha256),cbc(aes)) support
+  crypto: inside-secure - authenc(hmac(sha224),cbc(aes)) support
+  crypto: inside-secure - authenc(hmac(sha1),cbc(aes)) support
+
+ drivers/crypto/Kconfig                        |   1 +
+ drivers/crypto/inside-secure/safexcel.c       |  32 +
+ drivers/crypto/inside-secure/safexcel.h       |  33 +-
+ .../crypto/inside-secure/safexcel_cipher.c    | 642 ++++++++++++++----
+ drivers/crypto/inside-secure/safexcel_hash.c  |  21 +-
+ include/crypto/aead.h                         |   5 +
+ 6 files changed, 593 insertions(+), 141 deletions(-)
+
 -- 
 2.17.0
