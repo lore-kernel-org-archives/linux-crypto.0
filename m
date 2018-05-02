@@ -1,7 +1,8 @@
 From: Janakarajan Natarajan <Janakarajan.Natarajan@amd.com>
-Subject: [PATCH 1/2] Add DOWNLOAD_FIRMWARE SEV command
-Date: Wed,  2 May 2018 15:54:08 -0500
-Message-ID: <a5a123a10172efc267d6d018094f643d373f3bb4.1525290220.git.Janakarajan.Natarajan@amd.com>
+Subject: [PATCH 2/2] Add GET_ID SEV command
+Date: Wed,  2 May 2018 15:54:09 -0500
+Message-ID: <db130e762c9752700688c2c073b994af560fe6f7.1525290220.git.Janakarajan.Natarajan@amd.com>
+References: <a5a123a10172efc267d6d018094f643d373f3bb4.1525290220.git.Janakarajan.Natarajan@amd.com>
 Mime-Version: 1.0
 Content-Type: text/plain
 Cc: Tom Lendacky <thomas.lendacky@amd.com>,
@@ -14,218 +15,152 @@ Cc: Tom Lendacky <thomas.lendacky@amd.com>,
         Janakarajan Natarajan <Janakarajan.Natarajan@amd.com>
 To: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <a5a123a10172efc267d6d018094f643d373f3bb4.1525290220.git.Janakarajan.Natarajan@amd.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-The DOWNLOAD_FIRMWARE command, added as of SEV API v0.15, allows the OS
-to install SEV firmware newer than the currently active SEV firmware.
+The GET_ID command, added as of SEV API v0.16, allows the SEV firmware
+to be queried about a unique CPU ID. This unique ID can then be used
+to obtain the public certificate containing the Chip Endorsement Key
+(CEK) public key signed by the AMD SEV Signing Key (ASK).
 
-For the new SEV firmware to be applied it must:
-* Pass the validation test performed by the existing firmware.
-* Be of the same build or a newer build compared to the existing firmware.
-
-For more information please refer to "Section 5.11 DOWNLOAD_FIRMWARE" of
+For more information please refer to "Section 5.12 GET_ID" of
 https://support.amd.com/TechDocs/55766_SEV-KM%20API_Specification.pdf
 
 Signed-off-by: Janakarajan Natarajan <Janakarajan.Natarajan@amd.com>
 ---
- drivers/crypto/ccp/psp-dev.c | 96 +++++++++++++++++++++++++++++++++++++++-----
- drivers/crypto/ccp/psp-dev.h |  4 ++
- include/linux/psp-sev.h      | 12 ++++++
- 3 files changed, 102 insertions(+), 10 deletions(-)
+ drivers/crypto/ccp/psp-dev.c | 44 ++++++++++++++++++++++++++++++++++++++++++++
+ include/linux/psp-sev.h      | 11 +++++++++++
+ include/uapi/linux/psp-sev.h | 12 ++++++++++++
+ 3 files changed, 67 insertions(+)
 
 diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
-index d95ec52..1c78a2e 100644
+index 1c78a2e..d33a763 100644
 --- a/drivers/crypto/ccp/psp-dev.c
 +++ b/drivers/crypto/ccp/psp-dev.c
-@@ -22,11 +22,17 @@
- #include <linux/delay.h>
- #include <linux/hw_random.h>
- #include <linux/ccp.h>
-+#include <linux/firmware.h>
- 
- #include "sp-dev.h"
- #include "psp-dev.h"
- 
-+#define SEV_VERSION_CHECK(_maj, _min)			\
-+		((psp_master->api_major) >= _maj &&	\
-+		 (psp_master->api_minor) >= _min)
-+
- #define DEVICE_NAME	"sev"
-+#define SEV_FW_FILE	"amd-sev.fw"
- 
- static DEFINE_MUTEX(sev_cmd_mutex);
- static struct sev_misc_dev *misc_dev;
-@@ -112,6 +118,7 @@ static int sev_cmd_buffer_len(int cmd)
- 	case SEV_CMD_RECEIVE_UPDATE_DATA:	return sizeof(struct sev_data_receive_update_data);
+@@ -119,6 +119,7 @@ static int sev_cmd_buffer_len(int cmd)
  	case SEV_CMD_RECEIVE_UPDATE_VMSA:	return sizeof(struct sev_data_receive_update_vmsa);
  	case SEV_CMD_LAUNCH_UPDATE_SECRET:	return sizeof(struct sev_data_launch_secret);
-+	case SEV_CMD_DOWNLOAD_FIRMWARE:		return sizeof(struct sev_data_download_firmware);
+ 	case SEV_CMD_DOWNLOAD_FIRMWARE:		return sizeof(struct sev_data_download_firmware);
++	case SEV_CMD_GET_ID:			return sizeof(struct sev_data_get_id);
  	default:				return 0;
  	}
  
-@@ -378,6 +385,77 @@ void *psp_copy_user_blob(u64 __user uaddr, u32 len)
+@@ -508,6 +509,46 @@ static int sev_ioctl_do_pek_import(struct sev_issue_cmd *argp)
+ 	return ret;
  }
- EXPORT_SYMBOL_GPL(psp_copy_user_blob);
  
-+static int get_sev_api_version(void)
++static int sev_ioctl_do_get_id(struct sev_issue_cmd *argp)
 +{
-+	struct sev_user_data_status *status;
-+	int error, ret;
++	struct sev_data_get_id *data;
++	u64 data_size, user_size;
++	void *id_blob, *mem;
++	int ret;
 +
-+	status = &psp_master->status_cmd_buf;
-+	ret = sev_platform_status(status, &error);
-+	if (ret) {
-+		dev_err(psp_master->dev,
-+			"SEV: failed to get status. Error: %#x\n", error);
-+		return 1;
++	/* SEV GET_ID available from SEV API v0.16 and up */
++	if (!SEV_VERSION_CHECK(0, 16))
++		return -ENOTSUPP;
++
++	/* SEV FW expects the buffer it fills with the ID to be
++	 * 8-byte aligned. Memory allocated should be enough to
++	 * hold data structure + alignment padding + memory
++	 * where SEV FW writes the ID.
++	 */
++	data_size = ALIGN(sizeof(struct sev_data_get_id), 8);
++	user_size = sizeof(struct sev_user_data_get_id);
++
++	mem = kzalloc(data_size + user_size, GFP_KERNEL);
++	if (!mem)
++		return -ENOMEM;
++
++	data = mem;
++	id_blob = mem + data_size;
++
++	data->address = __psp_pa(id_blob);
++	data->len = user_size;
++
++	ret = __sev_do_cmd_locked(SEV_CMD_GET_ID, data, &argp->error);
++	if (!ret) {
++		if (copy_to_user((void __user *)argp->data, id_blob, data->len))
++			ret = -EFAULT;
 +	}
 +
-+	psp_master->api_major = status->api_major;
-+	psp_master->api_minor = status->api_minor;
-+	psp_master->build = status->build;
++	kfree(mem);
 +
-+	return 0;
++	return ret;
 +}
 +
-+/* Don't fail if SEV FW couldn't be updated. Continue with existing SEV FW */
-+static void sev_update_firmware(struct device *dev)
-+{
-+	struct sev_data_download_firmware *data;
-+	const struct firmware *firmware;
-+	int ret, error, order;
-+	struct page *p;
-+	u64 data_size;
-+
-+	ret = request_firmware(&firmware, SEV_FW_FILE, dev);
-+	if (ret < 0)
-+		return;
-+
-+	/*
-+	 * SEV FW expects the physical address given to it to be 32
-+	 * byte aligned. Memory allocated has structure placed at the
-+	 * beginning followed by the firmware being passed to the SEV
-+	 * FW. Allocate enough memory for data structure + alignment
-+	 * padding + SEV FW.
-+	 */
-+	data_size = ALIGN(sizeof(struct sev_data_download_firmware), 32);
-+
-+	order = get_order(firmware->size + data_size);
-+	p = alloc_pages(GFP_KERNEL, order);
-+	if (!p)
-+		goto fw_err;
-+
-+	/*
-+	 * Copy firmware data to a kernel allocated contiguous
-+	 * memory region.
-+	 */
-+	data = page_address(p);
-+	memcpy(page_address(p) + data_size, firmware->data, firmware->size);
-+
-+	data->address = __psp_pa(page_address(p) + data_size);
-+	data->len = firmware->size;
-+
-+	ret = sev_do_cmd(SEV_CMD_DOWNLOAD_FIRMWARE, data, &error);
-+	if (ret) {
-+		dev_dbg(dev, "Failed to update SEV firmware: %#x\n", error);
-+	} else {
-+		dev_info(dev, "SEV firmware update successful\n");
-+		get_sev_api_version();
-+	}
-+
-+	__free_pages(p, order);
-+
-+fw_err:
-+	release_firmware(firmware);
-+}
-+
- static int sev_ioctl_do_pek_import(struct sev_issue_cmd *argp)
+ static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp)
  {
- 	struct sev_user_data_pek_cert_import input;
-@@ -750,7 +828,6 @@ EXPORT_SYMBOL_GPL(sev_issue_cmd_external_user);
- 
- void psp_pci_init(void)
- {
--	struct sev_user_data_status *status;
- 	struct sp_device *sp;
- 	int error, rc;
- 
-@@ -760,6 +837,12 @@ void psp_pci_init(void)
- 
- 	psp_master = sp->psp_data;
- 
-+	if (get_sev_api_version())
-+		goto err;
-+
-+	if (SEV_VERSION_CHECK(0, 15))
-+		sev_update_firmware(psp_master->dev);
-+
- 	/* Initialize the platform */
- 	rc = sev_platform_init(&error);
- 	if (rc) {
-@@ -767,16 +850,9 @@ void psp_pci_init(void)
- 		goto err;
- 	}
- 
--	/* Display SEV firmware version */
--	status = &psp_master->status_cmd_buf;
--	rc = sev_platform_status(status, &error);
--	if (rc) {
--		dev_err(sp->dev, "SEV: failed to get status error %#x\n", error);
--		goto err;
--	}
-+	dev_info(sp->dev, "SEV API:%d.%d build:%d\n", psp_master->api_major,
-+		 psp_master->api_minor, psp_master->build);
- 
--	dev_info(sp->dev, "SEV API:%d.%d build:%d\n", status->api_major,
--		 status->api_minor, status->build);
- 	return;
- 
- err:
-diff --git a/drivers/crypto/ccp/psp-dev.h b/drivers/crypto/ccp/psp-dev.h
-index c81f0b1..c7e9098a 100644
---- a/drivers/crypto/ccp/psp-dev.h
-+++ b/drivers/crypto/ccp/psp-dev.h
-@@ -78,6 +78,10 @@ struct psp_device {
- 	struct sev_misc_dev *sev_misc;
- 	struct sev_user_data_status status_cmd_buf;
- 	struct sev_data_init init_cmd_buf;
-+
-+	u8 api_major;
-+	u8 api_minor;
-+	u8 build;
- };
- 
- #endif /* __PSP_DEV_H */
+ 	struct sev_user_data_pdh_cert_export input;
+@@ -645,6 +686,9 @@ static long sev_ioctl(struct file *file, unsigned int ioctl, unsigned long arg)
+ 	case SEV_PDH_CERT_EXPORT:
+ 		ret = sev_ioctl_do_pdh_export(&input);
+ 		break;
++	case SEV_GET_ID:
++		ret = sev_ioctl_do_get_id(&input);
++		break;
+ 	default:
+ 		ret = -EINVAL;
+ 		goto out;
 diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
-index 93addfa..1d24962 100644
+index 1d24962..827c601 100644
 --- a/include/linux/psp-sev.h
 +++ b/include/linux/psp-sev.h
-@@ -54,6 +54,7 @@ enum sev_cmd {
- 	SEV_CMD_PDH_CERT_EXPORT		= 0x008,
+@@ -55,6 +55,7 @@ enum sev_cmd {
  	SEV_CMD_PDH_GEN			= 0x009,
  	SEV_CMD_DF_FLUSH		= 0x00A,
-+	SEV_CMD_DOWNLOAD_FIRMWARE	= 0x00B,
+ 	SEV_CMD_DOWNLOAD_FIRMWARE	= 0x00B,
++	SEV_CMD_GET_ID			= 0x00C,
  
  	/* Guest commands */
  	SEV_CMD_DECOMMISSION		= 0x020,
-@@ -130,6 +131,17 @@ struct sev_data_pek_cert_import {
+@@ -142,6 +143,16 @@ struct sev_data_download_firmware {
  } __packed;
  
  /**
-+ * struct sev_data_download_firmware - DOWNLOAD_FIRMWARE command parameters
++ * struct sev_data_get_id - GET_ID command parameters
 + *
-+ * @address: physical address of firmware image
-+ * @len: len of the firmware image
++ * @address: physical address of region to place unique CPU ID(s)
++ * @len: len of the region
 + */
-+struct sev_data_download_firmware {
++struct sev_data_get_id {
 +	u64 address;				/* In */
-+	u32 len;				/* In */
++	u32 len;				/* In/Out */
 +} __packed;
-+
 +/**
   * struct sev_data_pdh_cert_export - PDH_CERT_EXPORT command parameters
   *
   * @pdh_address: PDH certificate address
+diff --git a/include/uapi/linux/psp-sev.h b/include/uapi/linux/psp-sev.h
+index 9008f31..ac8c60b 100644
+--- a/include/uapi/linux/psp-sev.h
++++ b/include/uapi/linux/psp-sev.h
+@@ -30,6 +30,7 @@ enum {
+ 	SEV_PDH_GEN,
+ 	SEV_PDH_CERT_EXPORT,
+ 	SEV_PEK_CERT_IMPORT,
++	SEV_GET_ID,
+ 
+ 	SEV_MAX,
+ };
+@@ -124,6 +125,17 @@ struct sev_user_data_pdh_cert_export {
+ } __packed;
+ 
+ /**
++ * struct sev_user_data_get_id - GET_ID command parameters
++ *
++ * @socket1: Buffer to pass unique ID of first socket
++ * @socket2: Buffer to pass unique ID of second socket
++ */
++struct sev_user_data_get_id {
++	__u8 socket1[64];			/* Out */
++	__u8 socket2[64];			/* Out */
++} __packed;
++
++/**
+  * struct sev_issue_cmd - SEV ioctl parameters
+  *
+  * @cmd: SEV commands to execute
 -- 
 2.7.4
