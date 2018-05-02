@@ -1,57 +1,231 @@
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Subject: Re: [PATCH 1/5] random: fix crng_ready() test
-Date: Wed, 2 May 2018 18:18:13 +0200
-Message-ID: <CAMuHMdWxU=gtLTDY-W0YCMD6eE4gSnjhFo5CRTqwq_Q=yH-zZA@mail.gmail.com>
-References: <20180413013046.404-1-tytso@mit.edu>
+From: Janakarajan Natarajan <Janakarajan.Natarajan@amd.com>
+Subject: [PATCH 1/2] Add DOWNLOAD_FIRMWARE SEV command
+Date: Wed,  2 May 2018 15:54:08 -0500
+Message-ID: <a5a123a10172efc267d6d018094f643d373f3bb4.1525290220.git.Janakarajan.Natarajan@amd.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux Kernel Developers List <linux-kernel@vger.kernel.org>,
-        stable <stable@kernel.org>,
-        Linux-Renesas <linux-renesas-soc@vger.kernel.org>
-To: "Theodore Ts'o" <tytso@mit.edu>
+Content-Type: text/plain
+Cc: Tom Lendacky <thomas.lendacky@amd.com>,
+        Gary Hook <gary.hook@amd.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Borislav Petkov <bp@suse.de>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Janakarajan Natarajan <Janakarajan.Natarajan@amd.com>
+To: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180413013046.404-1-tytso@mit.edu>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi Ted,
+The DOWNLOAD_FIRMWARE command, added as of SEV API v0.15, allows the OS
+to install SEV firmware newer than the currently active SEV firmware.
 
-On Fri, Apr 13, 2018 at 3:30 AM, Theodore Ts'o <tytso@mit.edu> wrote:
-> The crng_init variable has three states:
->
-> 0: The CRNG is not initialized at all
-> 1: The CRNG has a small amount of entropy, hopefully good enough for
->    early-boot, non-cryptographical use cases
-> 2: The CRNG is fully initialized and we are sure it is safe for
->    cryptographic use cases.
->
-> The crng_ready() function should only return true once we are in the
-> last state.
->
-> Reported-by: Jann Horn <jannh@google.com>
-> Fixes: e192be9d9a30 ("random: replace non-blocking pool...")
-> Cc: stable@kernel.org # 4.8+
-> Signed-off-by: Theodore Ts'o <tytso@mit.edu>
-> Reviewed-by: Jann Horn <jannh@google.com>
+For the new SEV firmware to be applied it must:
+* Pass the validation test performed by the existing firmware.
+* Be of the same build or a newer build compared to the existing firmware.
 
-Since commit 43838a23a05fbd13 ("random: fix crng_ready() test"),
-all (few) remaining users of %p are printing too early, leading to "(ptrval)"
-strings instead of actual hashed pointer values.
+For more information please refer to "Section 5.11 DOWNLOAD_FIRMWARE" of
+https://support.amd.com/TechDocs/55766_SEV-KM%20API_Specification.pdf
 
-Sample timings on two platforms (arm / arm64) booting with lots of
-debug ingo:
+Signed-off-by: Janakarajan Natarajan <Janakarajan.Natarajan@amd.com>
+---
+ drivers/crypto/ccp/psp-dev.c | 96 +++++++++++++++++++++++++++++++++++++++-----
+ drivers/crypto/ccp/psp-dev.h |  4 ++
+ include/linux/psp-sev.h      | 12 ++++++
+ 3 files changed, 102 insertions(+), 10 deletions(-)
 
-[   28.521158] random: crng init done
-[   17.792705] random: crng init done
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
+diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
+index d95ec52..1c78a2e 100644
+--- a/drivers/crypto/ccp/psp-dev.c
++++ b/drivers/crypto/ccp/psp-dev.c
+@@ -22,11 +22,17 @@
+ #include <linux/delay.h>
+ #include <linux/hw_random.h>
+ #include <linux/ccp.h>
++#include <linux/firmware.h>
+ 
+ #include "sp-dev.h"
+ #include "psp-dev.h"
+ 
++#define SEV_VERSION_CHECK(_maj, _min)			\
++		((psp_master->api_major) >= _maj &&	\
++		 (psp_master->api_minor) >= _min)
++
+ #define DEVICE_NAME	"sev"
++#define SEV_FW_FILE	"amd-sev.fw"
+ 
+ static DEFINE_MUTEX(sev_cmd_mutex);
+ static struct sev_misc_dev *misc_dev;
+@@ -112,6 +118,7 @@ static int sev_cmd_buffer_len(int cmd)
+ 	case SEV_CMD_RECEIVE_UPDATE_DATA:	return sizeof(struct sev_data_receive_update_data);
+ 	case SEV_CMD_RECEIVE_UPDATE_VMSA:	return sizeof(struct sev_data_receive_update_vmsa);
+ 	case SEV_CMD_LAUNCH_UPDATE_SECRET:	return sizeof(struct sev_data_launch_secret);
++	case SEV_CMD_DOWNLOAD_FIRMWARE:		return sizeof(struct sev_data_download_firmware);
+ 	default:				return 0;
+ 	}
+ 
+@@ -378,6 +385,77 @@ void *psp_copy_user_blob(u64 __user uaddr, u32 len)
+ }
+ EXPORT_SYMBOL_GPL(psp_copy_user_blob);
+ 
++static int get_sev_api_version(void)
++{
++	struct sev_user_data_status *status;
++	int error, ret;
++
++	status = &psp_master->status_cmd_buf;
++	ret = sev_platform_status(status, &error);
++	if (ret) {
++		dev_err(psp_master->dev,
++			"SEV: failed to get status. Error: %#x\n", error);
++		return 1;
++	}
++
++	psp_master->api_major = status->api_major;
++	psp_master->api_minor = status->api_minor;
++	psp_master->build = status->build;
++
++	return 0;
++}
++
++/* Don't fail if SEV FW couldn't be updated. Continue with existing SEV FW */
++static void sev_update_firmware(struct device *dev)
++{
++	struct sev_data_download_firmware *data;
++	const struct firmware *firmware;
++	int ret, error, order;
++	struct page *p;
++	u64 data_size;
++
++	ret = request_firmware(&firmware, SEV_FW_FILE, dev);
++	if (ret < 0)
++		return;
++
++	/*
++	 * SEV FW expects the physical address given to it to be 32
++	 * byte aligned. Memory allocated has structure placed at the
++	 * beginning followed by the firmware being passed to the SEV
++	 * FW. Allocate enough memory for data structure + alignment
++	 * padding + SEV FW.
++	 */
++	data_size = ALIGN(sizeof(struct sev_data_download_firmware), 32);
++
++	order = get_order(firmware->size + data_size);
++	p = alloc_pages(GFP_KERNEL, order);
++	if (!p)
++		goto fw_err;
++
++	/*
++	 * Copy firmware data to a kernel allocated contiguous
++	 * memory region.
++	 */
++	data = page_address(p);
++	memcpy(page_address(p) + data_size, firmware->data, firmware->size);
++
++	data->address = __psp_pa(page_address(p) + data_size);
++	data->len = firmware->size;
++
++	ret = sev_do_cmd(SEV_CMD_DOWNLOAD_FIRMWARE, data, &error);
++	if (ret) {
++		dev_dbg(dev, "Failed to update SEV firmware: %#x\n", error);
++	} else {
++		dev_info(dev, "SEV firmware update successful\n");
++		get_sev_api_version();
++	}
++
++	__free_pages(p, order);
++
++fw_err:
++	release_firmware(firmware);
++}
++
+ static int sev_ioctl_do_pek_import(struct sev_issue_cmd *argp)
+ {
+ 	struct sev_user_data_pek_cert_import input;
+@@ -750,7 +828,6 @@ EXPORT_SYMBOL_GPL(sev_issue_cmd_external_user);
+ 
+ void psp_pci_init(void)
+ {
+-	struct sev_user_data_status *status;
+ 	struct sp_device *sp;
+ 	int error, rc;
+ 
+@@ -760,6 +837,12 @@ void psp_pci_init(void)
+ 
+ 	psp_master = sp->psp_data;
+ 
++	if (get_sev_api_version())
++		goto err;
++
++	if (SEV_VERSION_CHECK(0, 15))
++		sev_update_firmware(psp_master->dev);
++
+ 	/* Initialize the platform */
+ 	rc = sev_platform_init(&error);
+ 	if (rc) {
+@@ -767,16 +850,9 @@ void psp_pci_init(void)
+ 		goto err;
+ 	}
+ 
+-	/* Display SEV firmware version */
+-	status = &psp_master->status_cmd_buf;
+-	rc = sev_platform_status(status, &error);
+-	if (rc) {
+-		dev_err(sp->dev, "SEV: failed to get status error %#x\n", error);
+-		goto err;
+-	}
++	dev_info(sp->dev, "SEV API:%d.%d build:%d\n", psp_master->api_major,
++		 psp_master->api_minor, psp_master->build);
+ 
+-	dev_info(sp->dev, "SEV API:%d.%d build:%d\n", status->api_major,
+-		 status->api_minor, status->build);
+ 	return;
+ 
+ err:
+diff --git a/drivers/crypto/ccp/psp-dev.h b/drivers/crypto/ccp/psp-dev.h
+index c81f0b1..c7e9098a 100644
+--- a/drivers/crypto/ccp/psp-dev.h
++++ b/drivers/crypto/ccp/psp-dev.h
+@@ -78,6 +78,10 @@ struct psp_device {
+ 	struct sev_misc_dev *sev_misc;
+ 	struct sev_user_data_status status_cmd_buf;
+ 	struct sev_data_init init_cmd_buf;
++
++	u8 api_major;
++	u8 api_minor;
++	u8 build;
+ };
+ 
+ #endif /* __PSP_DEV_H */
+diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
+index 93addfa..1d24962 100644
+--- a/include/linux/psp-sev.h
++++ b/include/linux/psp-sev.h
+@@ -54,6 +54,7 @@ enum sev_cmd {
+ 	SEV_CMD_PDH_CERT_EXPORT		= 0x008,
+ 	SEV_CMD_PDH_GEN			= 0x009,
+ 	SEV_CMD_DF_FLUSH		= 0x00A,
++	SEV_CMD_DOWNLOAD_FIRMWARE	= 0x00B,
+ 
+ 	/* Guest commands */
+ 	SEV_CMD_DECOMMISSION		= 0x020,
+@@ -130,6 +131,17 @@ struct sev_data_pek_cert_import {
+ } __packed;
+ 
+ /**
++ * struct sev_data_download_firmware - DOWNLOAD_FIRMWARE command parameters
++ *
++ * @address: physical address of firmware image
++ * @len: len of the firmware image
++ */
++struct sev_data_download_firmware {
++	u64 address;				/* In */
++	u32 len;				/* In */
++} __packed;
++
++/**
+  * struct sev_data_pdh_cert_export - PDH_CERT_EXPORT command parameters
+  *
+  * @pdh_address: PDH certificate address
 -- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+2.7.4
