@@ -1,59 +1,122 @@
-From: Joerg Roedel <joro-zLv9SwRftAIdnm+yROfE0A@public.gmane.org>
-Subject: Re: [PATCH v3 09/20] iommu: Remove depends on HAS_DMA in case of
-	platform dependency
-Date: Thu, 3 May 2018 15:02:44 +0200
-Message-ID: <20180503130244.ifal7n4tyxvekjnj@8bytes.org>
-References: <1523987360-18760-1-git-send-email-geert@linux-m68k.org>
-	<1523987360-18760-10-git-send-email-geert@linux-m68k.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Ulf Hansson <ulf.hansson-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, Wolfram Sang <wsa-z923LK4zBo2bacvFa/9K2g@public.gmane.org>,
-	linux-iio-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fpga-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-remoteproc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, alsa-devel-K7yf7f+aM1XWsZ/bQMPhNw@public.gmane.org,
-	Bjorn Andersson <bjorn.andersson-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>,
-	Eric Anholt <eric-WhKQ6XTQaPysTnJN9+BGXg@public.gmane.org>, netdev-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-mtd-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-i2c-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux1394-devel-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org, Christoph Hellwig <hch-jcswGhMUV9g@public.gmane.org>,
-	Stefan Wahren <stefan.wahren-eS4NqCHxEME@public.gmane.org>,
-	Boris Brezillon <boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>,
-	Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-	Richard Weinberger <richard-/L3Ra7n9ekc@public.gmane.org>, Jassi Brar <jassisinghbrar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	Marek Vasut <marek.vasut-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	linux-serial-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Matias Bjorling <mb-VR7NuqX4VJ8tq7phqP6ubQ@public.gmane.org>,
-	linux-media-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Ohad Ben-Cohen <ohad-Ix1uc/W3ht7QT0dZR+AlfA@public.gmane.org>,
-	devel-gWbeCf7V1WCQmaza687I9mD2FQJk+8+b@public.gmane.org, Alan Tull <atull-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
-	Bartlomiej Zolnierkiewicz <
-To: Geert Uytterhoeven <geert-Td1EMuHUCqxL1ZNQvxDV9g@public.gmane.org>
-Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <1523987360-18760-10-git-send-email-geert-Td1EMuHUCqxL1ZNQvxDV9g@public.gmane.org>
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
-List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
-Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+From: Kyle Spiers <ksspiers@google.com>
+Subject: [PATCH] async_pq: Remove VLA usage
+Date: Thu,  3 May 2018 15:57:16 -0700
+Message-ID: <20180503225716.154235-1-ksspiers@google.com>
+Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
+        keescook@chromium.org, vinod.koul@intel.com, ray.jui@broadcom.com,
+        anup.patel@broadcom.com, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Kyle Spiers <ksspiers@google.com>
+To: dan.j.williams@intel.com
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Apr 17, 2018 at 07:49:09PM +0200, Geert Uytterhoeven wrote:
-> Remove dependencies on HAS_DMA where a Kconfig symbol depends on another
-> symbol that implies HAS_DMA, and, optionally, on "|| COMPILE_TEST".
-> In most cases this other symbol is an architecture or platform specific
-> symbol, or PCI.
-> 
-> Generic symbols and drivers without platform dependencies keep their
-> dependencies on HAS_DMA, to prevent compiling subsystems or drivers that
-> cannot work anyway.
-> 
-> This simplifies the dependencies, and allows to improve compile-testing.
-> 
-> Signed-off-by: Geert Uytterhoeven <geert-Td1EMuHUCqxL1ZNQvxDV9g@public.gmane.org>
-> Reviewed-by: Mark Brown <broonie-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
-> Acked-by: Robin Murphy <robin.murphy-5wv7dgnIgG8@public.gmane.org>
-> Acked-by: Joerg Roedel <jroedel-l3A5Bk7waGM@public.gmane.org>
+In the quest to remove VLAs from the kernel[1], this moves the
+allocation of coefs and blocks from the stack to being kmalloc()ed.
 
-Applied, thanks.
+[1] https://lkml.org/lkml/2018/3/7/621
+
+Signed-off-by: Kyle Spiers <ksspiers@google.com>
+---
+ crypto/async_tx/async_pq.c  | 18 ++++++++++++++----
+ crypto/async_tx/raid6test.c |  8 +++++++-
+ 2 files changed, 21 insertions(+), 5 deletions(-)
+
+diff --git a/crypto/async_tx/async_pq.c b/crypto/async_tx/async_pq.c
+index 56bd612927ab..af1912313a23 100644
+--- a/crypto/async_tx/async_pq.c
++++ b/crypto/async_tx/async_pq.c
+@@ -194,9 +194,9 @@ async_gen_syndrome(struct page **blocks, unsigned int offset, int disks,
+ 	    (src_cnt <= dma_maxpq(device, 0) ||
+ 	     dma_maxpq(device, DMA_PREP_CONTINUE) > 0) &&
+ 	    is_dma_pq_aligned(device, offset, 0, len)) {
+-		struct dma_async_tx_descriptor *tx;
++		struct dma_async_tx_descriptor *tx = NULL;
+ 		enum dma_ctrl_flags dma_flags = 0;
+-		unsigned char coefs[src_cnt];
++		unsigned char *coefs;
+ 		int i, j;
+ 
+ 		/* run the p+q asynchronously */
+@@ -207,6 +207,9 @@ async_gen_syndrome(struct page **blocks, unsigned int offset, int disks,
+ 		 * sources and update the coefficients accordingly
+ 		 */
+ 		unmap->len = len;
++		coefs = kmalloc_array(src_cnt, sizeof(*coefs), GFP_KERNEL);
++		if (!coefs)
++			goto out;
+ 		for (i = 0, j = 0; i < src_cnt; i++) {
+ 			if (blocks[i] == NULL)
+ 				continue;
+@@ -240,7 +243,9 @@ async_gen_syndrome(struct page **blocks, unsigned int offset, int disks,
+ 		}
+ 
+ 		tx = do_async_gen_syndrome(chan, coefs, j, unmap, dma_flags, submit);
++out:
+ 		dmaengine_unmap_put(unmap);
++		kfree(coefs);
+ 		return tx;
+ 	}
+ 
+@@ -298,8 +303,8 @@ async_syndrome_val(struct page **blocks, unsigned int offset, int disks,
+ {
+ 	struct dma_chan *chan = pq_val_chan(submit, blocks, disks, len);
+ 	struct dma_device *device = chan ? chan->device : NULL;
+-	struct dma_async_tx_descriptor *tx;
+-	unsigned char coefs[disks-2];
++	struct dma_async_tx_descriptor *tx = NULL;
++	unsigned char *coefs = NULL;
+ 	enum dma_ctrl_flags dma_flags = submit->cb_fn ? DMA_PREP_INTERRUPT : 0;
+ 	struct dmaengine_unmap_data *unmap = NULL;
+ 
+@@ -318,6 +323,9 @@ async_syndrome_val(struct page **blocks, unsigned int offset, int disks,
+ 			 __func__, disks, len);
+ 
+ 		unmap->len = len;
++		coefs = kmalloc_array(disks - 2, sizeof(*coefs), GFP_KERNEL);
++		if (!coefs)
++			goto out;
+ 		for (i = 0; i < disks-2; i++)
+ 			if (likely(blocks[i])) {
+ 				unmap->addr[j] = dma_map_page(dev, blocks[i],
+@@ -423,6 +431,8 @@ async_syndrome_val(struct page **blocks, unsigned int offset, int disks,
+ 		async_tx_sync_epilog(submit);
+ 		tx = NULL;
+ 	}
++out:
++	kfree(coefs);
+ 	dmaengine_unmap_put(unmap);
+ 
+ 	return tx;
+diff --git a/crypto/async_tx/raid6test.c b/crypto/async_tx/raid6test.c
+index dad95f45b88f..ea036b531ef2 100644
+--- a/crypto/async_tx/raid6test.c
++++ b/crypto/async_tx/raid6test.c
+@@ -81,11 +81,16 @@ static void raid6_dual_recov(int disks, size_t bytes, int faila, int failb, stru
+ 			init_async_submit(&submit, 0, NULL, NULL, NULL, addr_conv);
+ 			tx = async_gen_syndrome(ptrs, 0, disks, bytes, &submit);
+ 		} else {
+-			struct page *blocks[disks];
++			struct page **blocks;
+ 			struct page *dest;
+ 			int count = 0;
+ 			int i;
+ 
++			blocks = kmalloc_array(disks, sizeof(*blocks),
++							GFP_KERNEL);
++			if (!blocks)
++				return;
++
+ 			/* data+Q failure.  Reconstruct data from P,
+ 			 * then rebuild syndrome
+ 			 */
+@@ -101,6 +106,7 @@ static void raid6_dual_recov(int disks, size_t bytes, int faila, int failb, stru
+ 
+ 			init_async_submit(&submit, 0, tx, NULL, NULL, addr_conv);
+ 			tx = async_gen_syndrome(ptrs, 0, disks, bytes, &submit);
++			kfree(blocks);
+ 		}
+ 	} else {
+ 		if (failb == disks-2) {
+-- 
+2.17.0.441.gb46fe60e1d-goog
