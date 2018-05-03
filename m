@@ -1,166 +1,127 @@
-From: Janakarajan Natarajan <Janakarajan.Natarajan@amd.com>
-Subject: [PATCH 2/2] Add GET_ID SEV command
-Date: Wed,  2 May 2018 15:54:09 -0500
-Message-ID: <db130e762c9752700688c2c073b994af560fe6f7.1525290220.git.Janakarajan.Natarajan@amd.com>
-References: <a5a123a10172efc267d6d018094f643d373f3bb4.1525290220.git.Janakarajan.Natarajan@amd.com>
+From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
+Subject: [PATCH 4.9.y, 4.14.y] crypto: talitos - fix IPsec cipher in length
+Date: Thu,  3 May 2018 12:05:13 +0300
+Message-ID: <20180503090513.7412-1-horia.geanta@nxp.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: Tom Lendacky <thomas.lendacky@amd.com>,
-        Gary Hook <gary.hook@amd.com>,
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Cc: Christophe Leroy <christophe.leroy@c-s.fr>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Borislav Petkov <bp@suse.de>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Janakarajan Natarajan <Janakarajan.Natarajan@amd.com>
-To: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <a5a123a10172efc267d6d018094f643d373f3bb4.1525290220.git.Janakarajan.Natarajan@amd.com>
-Sender: linux-kernel-owner@vger.kernel.org
+        linux-crypto@vger.kernel.org
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        stable@vger.kernel.org
+Return-path: <stable-owner@vger.kernel.org>
+Sender: stable-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-The GET_ID command, added as of SEV API v0.16, allows the SEV firmware
-to be queried about a unique CPU ID. This unique ID can then be used
-to obtain the public certificate containing the Chip Endorsement Key
-(CEK) public key signed by the AMD SEV Signing Key (ASK).
+commit 2b1227301a8e4729409694e323b72c064c47cb6b upstream.
 
-For more information please refer to "Section 5.12 GET_ID" of
-https://support.amd.com/TechDocs/55766_SEV-KM%20API_Specification.pdf
+For SEC 2.x+, cipher in length must contain only the ciphertext length.
+In case of using hardware ICV checking, the ICV length is provided via
+the "extent" field of the descriptor pointer.
 
-Signed-off-by: Janakarajan Natarajan <Janakarajan.Natarajan@amd.com>
+Cc: <stable@vger.kernel.org> # 4.8+
+Fixes: 549bd8bc5987 ("crypto: talitos - Implement AEAD for SEC1 using HMAC_SNOOP_NO_AFEU")
+Reported-by: Horia Geantă <horia.geanta@nxp.com>
+Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
+Tested-by: Horia Geantă <horia.geanta@nxp.com>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+[backported to 4.9.y, 4.14.y]
+Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
 ---
- drivers/crypto/ccp/psp-dev.c | 44 ++++++++++++++++++++++++++++++++++++++++++++
- include/linux/psp-sev.h      | 11 +++++++++++
- include/uapi/linux/psp-sev.h | 12 ++++++++++++
- 3 files changed, 67 insertions(+)
+The upstream fix has already been applied "as is" on 4.15.y.
+Submitting this backport since it failed to apply on 4.9.y and 4.14.y.
 
-diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
-index 1c78a2e..d33a763 100644
---- a/drivers/crypto/ccp/psp-dev.c
-+++ b/drivers/crypto/ccp/psp-dev.c
-@@ -119,6 +119,7 @@ static int sev_cmd_buffer_len(int cmd)
- 	case SEV_CMD_RECEIVE_UPDATE_VMSA:	return sizeof(struct sev_data_receive_update_vmsa);
- 	case SEV_CMD_LAUNCH_UPDATE_SECRET:	return sizeof(struct sev_data_launch_secret);
- 	case SEV_CMD_DOWNLOAD_FIRMWARE:		return sizeof(struct sev_data_download_firmware);
-+	case SEV_CMD_GET_ID:			return sizeof(struct sev_data_get_id);
- 	default:				return 0;
- 	}
- 
-@@ -508,6 +509,46 @@ static int sev_ioctl_do_pek_import(struct sev_issue_cmd *argp)
- 	return ret;
+ drivers/crypto/talitos.c | 41 +++++++++++++++++++++--------------------
+ 1 file changed, 21 insertions(+), 20 deletions(-)
+
+diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
+index 42c060c7ae15..7c71722be395 100644
+--- a/drivers/crypto/talitos.c
++++ b/drivers/crypto/talitos.c
+@@ -1116,10 +1116,10 @@ static int sg_to_link_tbl_offset(struct scatterlist *sg, int sg_count,
+ 	return count;
  }
  
-+static int sev_ioctl_do_get_id(struct sev_issue_cmd *argp)
+-int talitos_sg_map(struct device *dev, struct scatterlist *src,
+-		   unsigned int len, struct talitos_edesc *edesc,
+-		   struct talitos_ptr *ptr,
+-		   int sg_count, unsigned int offset, int tbl_off)
++static int talitos_sg_map_ext(struct device *dev, struct scatterlist *src,
++			      unsigned int len, struct talitos_edesc *edesc,
++			      struct talitos_ptr *ptr, int sg_count,
++			      unsigned int offset, int tbl_off, int elen)
+ {
+ 	struct talitos_private *priv = dev_get_drvdata(dev);
+ 	bool is_sec1 = has_ftr_sec1(priv);
+@@ -1130,7 +1130,7 @@ int talitos_sg_map(struct device *dev, struct scatterlist *src,
+ 	}
+ 
+ 	to_talitos_ptr_len(ptr, len, is_sec1);
+-	to_talitos_ptr_ext_set(ptr, 0, is_sec1);
++	to_talitos_ptr_ext_set(ptr, elen, is_sec1);
+ 
+ 	if (sg_count == 1) {
+ 		to_talitos_ptr(ptr, sg_dma_address(src) + offset, is_sec1);
+@@ -1140,7 +1140,7 @@ int talitos_sg_map(struct device *dev, struct scatterlist *src,
+ 		to_talitos_ptr(ptr, edesc->dma_link_tbl + offset, is_sec1);
+ 		return sg_count;
+ 	}
+-	sg_count = sg_to_link_tbl_offset(src, sg_count, offset, len,
++	sg_count = sg_to_link_tbl_offset(src, sg_count, offset, len + elen,
+ 					 &edesc->link_tbl[tbl_off]);
+ 	if (sg_count == 1) {
+ 		/* Only one segment now, so no link tbl needed*/
+@@ -1154,6 +1154,15 @@ int talitos_sg_map(struct device *dev, struct scatterlist *src,
+ 	return sg_count;
+ }
+ 
++static int talitos_sg_map(struct device *dev, struct scatterlist *src,
++			  unsigned int len, struct talitos_edesc *edesc,
++			  struct talitos_ptr *ptr, int sg_count,
++			  unsigned int offset, int tbl_off)
 +{
-+	struct sev_data_get_id *data;
-+	u64 data_size, user_size;
-+	void *id_blob, *mem;
-+	int ret;
-+
-+	/* SEV GET_ID available from SEV API v0.16 and up */
-+	if (!SEV_VERSION_CHECK(0, 16))
-+		return -ENOTSUPP;
-+
-+	/* SEV FW expects the buffer it fills with the ID to be
-+	 * 8-byte aligned. Memory allocated should be enough to
-+	 * hold data structure + alignment padding + memory
-+	 * where SEV FW writes the ID.
-+	 */
-+	data_size = ALIGN(sizeof(struct sev_data_get_id), 8);
-+	user_size = sizeof(struct sev_user_data_get_id);
-+
-+	mem = kzalloc(data_size + user_size, GFP_KERNEL);
-+	if (!mem)
-+		return -ENOMEM;
-+
-+	data = mem;
-+	id_blob = mem + data_size;
-+
-+	data->address = __psp_pa(id_blob);
-+	data->len = user_size;
-+
-+	ret = __sev_do_cmd_locked(SEV_CMD_GET_ID, data, &argp->error);
-+	if (!ret) {
-+		if (copy_to_user((void __user *)argp->data, id_blob, data->len))
-+			ret = -EFAULT;
-+	}
-+
-+	kfree(mem);
-+
-+	return ret;
++	return talitos_sg_map_ext(dev, src, len, edesc, ptr, sg_count, offset,
++				  tbl_off, 0);
 +}
 +
- static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp)
- {
- 	struct sev_user_data_pdh_cert_export input;
-@@ -645,6 +686,9 @@ static long sev_ioctl(struct file *file, unsigned int ioctl, unsigned long arg)
- 	case SEV_PDH_CERT_EXPORT:
- 		ret = sev_ioctl_do_pdh_export(&input);
- 		break;
-+	case SEV_GET_ID:
-+		ret = sev_ioctl_do_get_id(&input);
-+		break;
- 	default:
- 		ret = -EINVAL;
- 		goto out;
-diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
-index 1d24962..827c601 100644
---- a/include/linux/psp-sev.h
-+++ b/include/linux/psp-sev.h
-@@ -55,6 +55,7 @@ enum sev_cmd {
- 	SEV_CMD_PDH_GEN			= 0x009,
- 	SEV_CMD_DF_FLUSH		= 0x00A,
- 	SEV_CMD_DOWNLOAD_FIRMWARE	= 0x00B,
-+	SEV_CMD_GET_ID			= 0x00C,
+ /*
+  * fill in and submit ipsec_esp descriptor
+  */
+@@ -1171,7 +1180,7 @@ static int ipsec_esp(struct talitos_edesc *edesc, struct aead_request *areq,
+ 	unsigned int ivsize = crypto_aead_ivsize(aead);
+ 	int tbl_off = 0;
+ 	int sg_count, ret;
+-	int sg_link_tbl_len;
++	int elen = 0;
+ 	bool sync_needed = false;
+ 	struct talitos_private *priv = dev_get_drvdata(dev);
+ 	bool is_sec1 = has_ftr_sec1(priv);
+@@ -1225,20 +1234,12 @@ static int ipsec_esp(struct talitos_edesc *edesc, struct aead_request *areq,
+ 	 * extent is bytes of HMAC postpended to ciphertext,
+ 	 * typically 12 for ipsec
+ 	 */
+-	to_talitos_ptr_len(&desc->ptr[4], cryptlen, is_sec1);
+-	to_talitos_ptr_ext_set(&desc->ptr[4], 0, is_sec1);
+-
+-	sg_link_tbl_len = cryptlen;
+-
+-	if (desc->hdr & DESC_HDR_TYPE_IPSEC_ESP) {
+-		to_talitos_ptr_ext_set(&desc->ptr[4], authsize, is_sec1);
+-
+-		if (edesc->desc.hdr & DESC_HDR_MODE1_MDEU_CICV)
+-			sg_link_tbl_len += authsize;
+-	}
++	if ((desc->hdr & DESC_HDR_TYPE_IPSEC_ESP) &&
++	    (desc->hdr & DESC_HDR_MODE1_MDEU_CICV))
++		elen = authsize;
  
- 	/* Guest commands */
- 	SEV_CMD_DECOMMISSION		= 0x020,
-@@ -142,6 +143,16 @@ struct sev_data_download_firmware {
- } __packed;
+-	ret = talitos_sg_map(dev, areq->src, sg_link_tbl_len, edesc,
+-			     &desc->ptr[4], sg_count, areq->assoclen, tbl_off);
++	ret = talitos_sg_map_ext(dev, areq->src, cryptlen, edesc, &desc->ptr[4],
++				 sg_count, areq->assoclen, tbl_off, elen);
  
- /**
-+ * struct sev_data_get_id - GET_ID command parameters
-+ *
-+ * @address: physical address of region to place unique CPU ID(s)
-+ * @len: len of the region
-+ */
-+struct sev_data_get_id {
-+	u64 address;				/* In */
-+	u32 len;				/* In/Out */
-+} __packed;
-+/**
-  * struct sev_data_pdh_cert_export - PDH_CERT_EXPORT command parameters
-  *
-  * @pdh_address: PDH certificate address
-diff --git a/include/uapi/linux/psp-sev.h b/include/uapi/linux/psp-sev.h
-index 9008f31..ac8c60b 100644
---- a/include/uapi/linux/psp-sev.h
-+++ b/include/uapi/linux/psp-sev.h
-@@ -30,6 +30,7 @@ enum {
- 	SEV_PDH_GEN,
- 	SEV_PDH_CERT_EXPORT,
- 	SEV_PEK_CERT_IMPORT,
-+	SEV_GET_ID,
- 
- 	SEV_MAX,
- };
-@@ -124,6 +125,17 @@ struct sev_user_data_pdh_cert_export {
- } __packed;
- 
- /**
-+ * struct sev_user_data_get_id - GET_ID command parameters
-+ *
-+ * @socket1: Buffer to pass unique ID of first socket
-+ * @socket2: Buffer to pass unique ID of second socket
-+ */
-+struct sev_user_data_get_id {
-+	__u8 socket1[64];			/* Out */
-+	__u8 socket2[64];			/* Out */
-+} __packed;
-+
-+/**
-  * struct sev_issue_cmd - SEV ioctl parameters
-  *
-  * @cmd: SEV commands to execute
+ 	if (ret > 1) {
+ 		tbl_off += ret;
 -- 
-2.7.4
+2.16.2
