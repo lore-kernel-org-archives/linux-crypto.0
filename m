@@ -1,29 +1,34 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: tcrypt: Remove VLA usage
-Date: Sat, 5 May 2018 15:17:24 +0800
-Message-ID: <20180505071724.ts3zndtzp62hprng@gondor.apana.org.au>
-References: <20180427025728.GA38607@beast>
+Subject: Re: [PATCH] crypto: caam - fix size of RSA prime factor q
+Date: Sat, 5 May 2018 15:17:39 +0800
+Message-ID: <20180505071739.v7l46xlvj5lkg7hj@gondor.apana.org.au>
+References: <AM4PR08MB28197AB3772FC2932C58EBFC9C8E0@AM4PR08MB2819.eurprd08.prod.outlook.com>
+ <20180427084011.26234-1-horia.geanta@nxp.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Gilad Ben-Yossef <gilad@benyossef.com>,
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Cc: David Binderman <dcb314@hotmail.com>,
+        Radu Alexe <radu.alexe@nxp.com>,
+        Tudor Ambarus <tudor.ambarus@microchip.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Kees Cook <keescook@chromium.org>
+To: Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20180427025728.GA38607@beast>
+In-Reply-To: <20180427084011.26234-1-horia.geanta@nxp.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Apr 26, 2018 at 07:57:28PM -0700, Kees Cook wrote:
-> In the quest to remove all stack VLA usage from the kernel[1], this
-> allocates the return code buffers before starting jiffie timers, rather
-> than using stack space for the array. Additionally cleans up some exit
-> paths and make sure that the num_mb module_param() is used only once
-> per execution to avoid possible races in the value changing.
+On Fri, Apr 27, 2018 at 11:40:11AM +0300, Horia Geantă wrote:
+> Fix a typo where size of RSA prime factor q is using the size of
+> prime factor p.
 > 
-> [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
-> 
-> Signed-off-by: Kees Cook <keescook@chromium.org>
+> Cc: <stable@vger.kernel.org> # 4.13+
+> Fixes: 52e26d77b8b3 ("crypto: caam - add support for RSA key form 2")
+> Fixes: 4a651b122adb ("crypto: caam - add support for RSA key form 3")
+> Reported-by: David Binderman <dcb314@hotmail.com>
+> Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
 
 Patch applied.  Thanks.
 -- 
