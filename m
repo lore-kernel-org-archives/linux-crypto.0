@@ -1,52 +1,41 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 01/10] crypto: aead - allow to allocate AEAD requests on
- the stack
-Date: Sat, 5 May 2018 14:18:55 +0800
-Message-ID: <20180505061855.trmz34gsjfyi5xop@gondor.apana.org.au>
-References: <20180502095725.31935-1-antoine.tenart@bootlin.com>
- <20180502095725.31935-2-antoine.tenart@bootlin.com>
- <02ad9eb93c494314a85db69886cf787a@AcuMS.aculab.com>
- <20180503122330.GB3324@kwain>
- <20180503230006.oq6vycplwsomfprw@gondor.apana.org.au>
- <20180504071841.GG3324@kwain>
+Subject: Re: [PATCH v2 0/2] cleanup and hardware keys
+Date: Sat, 5 May 2018 15:16:38 +0800
+Message-ID: <20180505071638.qi34i47lodltuyge@gondor.apana.org.au>
+References: <1524468316-6606-1-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: David Laight <David.Laight@aculab.com>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "thomas.petazzoni@bootlin.com" <thomas.petazzoni@bootlin.com>,
-        "maxime.chevallier@bootlin.com" <maxime.chevallier@bootlin.com>,
-        "gregory.clement@bootlin.com" <gregory.clement@bootlin.com>,
-        "miquel.raynal@bootlin.com" <miquel.raynal@bootlin.com>,
-        "nadavh@marvell.com" <nadavh@marvell.com>,
-        "oferh@marvell.com" <oferh@marvell.com>,
-        "igall@marvell.com" <igall@marvell.com>
-To: 'Antoine Tenart' <antoine.tenart@bootlin.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+        Ofir Drang <ofir.drang@arm.com>, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+To: Gilad Ben-Yossef <gilad@benyossef.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20180504071841.GG3324@kwain>
+In-Reply-To: <1524468316-6606-1-git-send-email-gilad@benyossef.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Fri, May 04, 2018 at 09:18:41AM +0200, 'Antoine Tenart' wrote:
->
-> In this driver we need to perform in certain cases an invalidation,
-> which is done thanks to invalidation requests. To do this we create
-> dummy requests, using SKCIPHER_REQUEST_ON_STACK and
-> AHASH_REQUEST_ON_STACK for ciphers and hashes. So when adding the AEAD
-> algs support, in patch 8/10, AEAD_REQUEST_ON_STACK is used for the same
-> reason.
+On Mon, Apr 23, 2018 at 08:25:13AM +0100, Gilad Ben-Yossef wrote:
+> Small cleanup and add support for CryptoCell hardware keys.
 > 
-> Should we allocate this in a different way?
+> Changes from v1:
+> - The cleanup patch is new, as Herbert took the previous one :-)
+> - Hardware key API uses the "paes" designator to indicate a protected key,
+>   same as s390, as per Herbert preference
+> - Avoid direct casting and reference of key material, as pointed out by
+>   Herbert
+> 
+> Gilad Ben-Yossef (2):
+>   crypto: ccree: enable support for hardware keys
+>   crypto: ccree: use proper printk format
+> 
+>  crypto/testmgr.c                 |  43 +++++
+>  drivers/crypto/ccree/cc_cipher.c | 350 ++++++++++++++++++++++++++++++++++-----
+>  drivers/crypto/ccree/cc_cipher.h |  30 +---
+>  drivers/crypto/ccree/cc_driver.c |   2 +-
+>  4 files changed, 362 insertions(+), 63 deletions(-)
 
-These are not uses intended for the ON_STACK macros.  They were
-only ever meant for existing users of the synchonous crypto API.
-
-I would suggest either allocating a new request on the spot or if
-that is not convenient, pre-allocating it in the cra_init function.
-
-Cheers,
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
