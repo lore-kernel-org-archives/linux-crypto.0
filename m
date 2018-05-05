@@ -1,66 +1,67 @@
-From: 'Antoine Tenart' <antoine.tenart@bootlin.com>
-Subject: Re: [PATCH 01/10] crypto: aead - allow to allocate AEAD requests on
- the stack
-Date: Sat, 5 May 2018 19:17:34 +0200
-Message-ID: <20180505171734.GA2655@kwain>
-References: <20180502095725.31935-1-antoine.tenart@bootlin.com>
- <20180502095725.31935-2-antoine.tenart@bootlin.com>
- <02ad9eb93c494314a85db69886cf787a@AcuMS.aculab.com>
- <20180503122330.GB3324@kwain>
- <20180503230006.oq6vycplwsomfprw@gondor.apana.org.au>
- <20180504071841.GG3324@kwain>
- <20180505061855.trmz34gsjfyi5xop@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-Cc: 'Antoine Tenart' <antoine.tenart@bootlin.com>,
-        David Laight <David.Laight@aculab.com>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "thomas.petazzoni@bootlin.com" <thomas.petazzoni@bootlin.com>,
-        "maxime.chevallier@bootlin.com" <maxime.chevallier@bootlin.com>,
-        "gregory.clement@bootlin.com" <gregory.clement@bootlin.com>,
-        "miquel.raynal@bootlin.com" <miquel.raynal@bootlin.com>,
-        "nadavh@marvell.com" <nadavh@marvell.com>,
-        "oferh@marvell.com" <oferh@marvell.com>,
-        "igall@marvell.com" <igall@marvell.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+From: Wenwen Wang <wang6495@umn.edu>
+Subject: [PATCH] crypto: chtls - fix a missing-check bug
+Date: Sat,  5 May 2018 13:53:48 -0500
+Message-ID: <1525546431-12535-1-git-send-email-wang6495@umn.edu>
+Cc: Kangjie Lu <kjlu@umn.edu>, Harsh Jain <harsh@chelsio.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Atul Gupta <atul.gupta@chelsio.com>,
+        Michael Werner <werner@chelsio.com>,
+        Casey Leedom <leedom@chelsio.com>,
+        linux-crypto@vger.kernel.org (open list:CXGB4 CRYPTO DRIVER (chcr)),
+        linux-kernel@vger.kernel.org (open list)
+To: Wenwen Wang <wang6495@umn.edu>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20180505061855.trmz34gsjfyi5xop@gondor.apana.org.au>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi Herbert,
+In do_chtls_setsockopt(), the tls crypto info is first copied from the
+poiner 'optval' in userspace and saved to 'tmp_crypto_info'. Then the
+'version' of the crypto info is checked. If the version is not as expected,
+i.e., TLS_1_2_VERSION, error code -ENOTSUPP is returned to indicate that
+the provided crypto info is not supported yet. Then, the 'cipher_type'
+field of the 'tmp_crypto_info' is also checked to see if it is
+TLS_CIPHER_AES_GCM_128. If it is, the whole struct of
+tls12_crypto_info_aes_gcm_128 is copied from the pointer 'optval' and then
+the function chtls_setkey() is invoked to set the key.
 
-On Sat, May 05, 2018 at 02:18:55PM +0800, Herbert Xu wrote:
-> On Fri, May 04, 2018 at 09:18:41AM +0200, 'Antoine Tenart' wrote:
-> >
-> > In this driver we need to perform in certain cases an invalidation,
-> > which is done thanks to invalidation requests. To do this we create
-> > dummy requests, using SKCIPHER_REQUEST_ON_STACK and
-> > AHASH_REQUEST_ON_STACK for ciphers and hashes. So when adding the AEAD
-> > algs support, in patch 8/10, AEAD_REQUEST_ON_STACK is used for the same
-> > reason.
-> > 
-> > Should we allocate this in a different way?
-> 
-> These are not uses intended for the ON_STACK macros.  They were
-> only ever meant for existing users of the synchonous crypto API.
+Given that the 'optval' pointer resides in userspace, a malicious userspace
+process can race to change the data pointed by 'optval' between the two
+copies. For example, a user can provide a crypto info with TLS_1_2_VERSION
+and TLS_CIPHER_AES_GCM_128. After the first copy, the user can modify the
+'version' and the 'cipher_type' fields to any versions and/or cipher types
+that are not allowed. This way, the user can bypass the checks, inject
+bad data to the kernel, cause chtls_setkey() to set a wrong key or other
+issues.
 
-OK, I see.
+This patch reuses the data copied in the first try so as to ensure these
+checks will not be bypassed.
 
-> I would suggest either allocating a new request on the spot or if
-> that is not convenient, pre-allocating it in the cra_init function.
+Signed-off-by: Wenwen Wang <wang6495@umn.edu>
+---
+ drivers/crypto/chelsio/chtls/chtls_main.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
 
-Or we could have similar macros in the driver: we wouldn't have VLAs
-since it would be driver specific.
-
-Thanks!
-Antoine
-
+diff --git a/drivers/crypto/chelsio/chtls/chtls_main.c b/drivers/crypto/chelsio/chtls/chtls_main.c
+index 007c45c..859958a 100644
+--- a/drivers/crypto/chelsio/chtls/chtls_main.c
++++ b/drivers/crypto/chelsio/chtls/chtls_main.c
+@@ -491,9 +491,13 @@ static int do_chtls_setsockopt(struct sock *sk, int optname,
+ 
+ 	switch (tmp_crypto_info.cipher_type) {
+ 	case TLS_CIPHER_AES_GCM_128: {
+-		rc = copy_from_user(crypto_info, optval,
+-				    sizeof(struct
+-					   tls12_crypto_info_aes_gcm_128));
++		/* Obtain version and type from previous copy */
++		crypto_info[0] = tmp_crypto_info;
++		/* Now copy the following data */
++		rc = copy_from_user(crypto_info + sizeof(*crypto_info),
++				optval + sizeof(*crypto_info),
++				sizeof(struct tls12_crypto_info_aes_gcm_128)
++				- sizeof(*crypto_info));
+ 
+ 		if (rc) {
+ 			rc = -EFAULT;
 -- 
-Antoine Ténart, Bootlin (formerly Free Electrons)
-Embedded Linux and Kernel engineering
-https://bootlin.com
+2.7.4
