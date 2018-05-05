@@ -1,114 +1,66 @@
-From: Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
-Subject: Re: [PATCH v3 12/20] media: Remove depends on HAS_DMA in case of
- platform dependency
-Date: Sat, 5 May 2018 09:47:43 -0300
-Message-ID: <20180505094743.4d201ba0@vento.lan>
-References: <1523987360-18760-1-git-send-email-geert@linux-m68k.org>
- <1523987360-18760-13-git-send-email-geert@linux-m68k.org>
+From: 'Antoine Tenart' <antoine.tenart@bootlin.com>
+Subject: Re: [PATCH 01/10] crypto: aead - allow to allocate AEAD requests on
+ the stack
+Date: Sat, 5 May 2018 19:17:34 +0200
+Message-ID: <20180505171734.GA2655@kwain>
+References: <20180502095725.31935-1-antoine.tenart@bootlin.com>
+ <20180502095725.31935-2-antoine.tenart@bootlin.com>
+ <02ad9eb93c494314a85db69886cf787a@AcuMS.aculab.com>
+ <20180503122330.GB3324@kwain>
+ <20180503230006.oq6vycplwsomfprw@gondor.apana.org.au>
+ <20180504071841.GG3324@kwain>
+ <20180505061855.trmz34gsjfyi5xop@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Ulf Hansson <ulf.hansson@linaro.org>, Wolfram Sang <wsa@the-dreams.de>,
- linux-iio@vger.kernel.org, linux-fpga@vger.kernel.org,
- linux-remoteproc@vger.kernel.org, alsa-devel@alsa-project.org,
- Bjorn Andersson <bjorn.andersson@linaro.org>, Eric Anholt <eric@anholt.net>,
- netdev@vger.kernel.org, linux-mtd@lists.infradead.org,
- linux-i2c@vger.kernel.org, linux1394-devel@lists.sourceforge.net,
- Christoph Hellwig <hch@lst.de>, Marek Szyprowski <m.szyprowski@samsung.com>,
- Stefan Wahren <stefan.wahren@i2se.com>,
- Boris Brezillon <boris.brezillon@free-electrons.com>,
- Herbert Xu <herbert@gondor.apana.org.au>, Richard Weinberger <richard@nod.at>,
- Joerg Roedel <joro@8bytes.org>, Jassi Brar <jassisinghbrar@gmail.com>,
- Marek Vasut <marek.vasut@gmail.com>, linux-serial@vger.kernel.org,
- Matias Bjorling <mb@lightnvm.io>, David Woodhouse <dwmw2@infradead.org>,
- linux-media@vger.kernel.org, Ohad
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
-In-Reply-To: <1523987360-18760-13-git-send-email-geert@linux-m68k.org>
-List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
-List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
-List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
-List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
-List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
-Errors-To: driverdev-devel-bounces@linuxdriverproject.org
-Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+Cc: 'Antoine Tenart' <antoine.tenart@bootlin.com>,
+        David Laight <David.Laight@aculab.com>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "thomas.petazzoni@bootlin.com" <thomas.petazzoni@bootlin.com>,
+        "maxime.chevallier@bootlin.com" <maxime.chevallier@bootlin.com>,
+        "gregory.clement@bootlin.com" <gregory.clement@bootlin.com>,
+        "miquel.raynal@bootlin.com" <miquel.raynal@bootlin.com>,
+        "nadavh@marvell.com" <nadavh@marvell.com>,
+        "oferh@marvell.com" <oferh@marvell.com>,
+        "igall@marvell.com" <igall@marvell.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20180505061855.trmz34gsjfyi5xop@gondor.apana.org.au>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi Geert,
+Hi Herbert,
 
-Em Tue, 17 Apr 2018 19:49:12 +0200
-Geert Uytterhoeven <geert@linux-m68k.org> escreveu:
-
-> Remove dependencies on HAS_DMA where a Kconfig symbol depends on another
-> symbol that implies HAS_DMA, and, optionally, on "|| COMPILE_TEST".
-
-Applying a patch like that is hard, as there are lots of churn at
-the code. That's against latest media upstream:
-
-checking file drivers/media/pci/intel/ipu3/Kconfig
-Hunk #1 FAILED at 4.
-1 out of 1 hunk FAILED
-checking file drivers/media/pci/solo6x10/Kconfig
-checking file drivers/media/pci/sta2x11/Kconfig
-Hunk #1 FAILED at 1.
-1 out of 1 hunk FAILED
-checking file drivers/media/pci/tw5864/Kconfig
-checking file drivers/media/pci/tw686x/Kconfig
-checking file drivers/media/platform/Kconfig
-Hunk #2 FAILED at 63.
-Hunk #3 succeeded at 81 (offset 1 line).
-Hunk #4 succeeded at 91 (offset 1 line).
-Hunk #5 succeeded at 101 (offset 1 line).
-Hunk #6 succeeded at 111 (offset 1 line).
-Hunk #7 succeeded at 124 (offset 1 line).
-Hunk #8 succeeded at 142 (offset 1 line).
-Hunk #9 succeeded at 169 (offset 1 line).
-Hunk #10 succeeded at 186 (offset 1 line).
-Hunk #11 succeeded at 197 (offset 1 line).
-Hunk #12 succeeded at 213 (offset 1 line).
-Hunk #13 succeeded at 227 (offset 1 line).
-Hunk #14 succeeded at 254 (offset 1 line).
-Hunk #15 succeeded at 265 (offset 1 line).
-Hunk #16 succeeded at 275 (offset 1 line).
-Hunk #17 succeeded at 284 (offset 1 line).
-Hunk #18 succeeded at 295 (offset 1 line).
-Hunk #19 succeeded at 303 (offset 1 line).
-Hunk #20 succeeded at 312 (offset 1 line).
-Hunk #21 succeeded at 338 (offset 1 line).
-Hunk #22 succeeded at 383 (offset 1 line).
-Hunk #23 succeeded at 397 (offset 1 line).
-Hunk #24 succeeded at 422 (offset 1 line).
-Hunk #25 succeeded at 435 (offset 1 line).
-Hunk #26 succeeded at 452 (offset 1 line).
-Hunk #27 succeeded at 470 (offset 1 line).
-Hunk #28 succeeded at 612 (offset 1 line).
-1 out of 28 hunks FAILED
-
-> In most cases this other symbol is an architecture or platform specific
-> symbol, or PCI.
+On Sat, May 05, 2018 at 02:18:55PM +0800, Herbert Xu wrote:
+> On Fri, May 04, 2018 at 09:18:41AM +0200, 'Antoine Tenart' wrote:
+> >
+> > In this driver we need to perform in certain cases an invalidation,
+> > which is done thanks to invalidation requests. To do this we create
+> > dummy requests, using SKCIPHER_REQUEST_ON_STACK and
+> > AHASH_REQUEST_ON_STACK for ciphers and hashes. So when adding the AEAD
+> > algs support, in patch 8/10, AEAD_REQUEST_ON_STACK is used for the same
+> > reason.
+> > 
+> > Should we allocate this in a different way?
 > 
-> Generic symbols and drivers without platform dependencies keep their
-> dependencies on HAS_DMA, to prevent compiling subsystems or drivers that
-> cannot work anyway.
+> These are not uses intended for the ON_STACK macros.  They were
+> only ever meant for existing users of the synchonous crypto API.
 
-Actually, depends on HAS_DMA was introduced on media because builds
-were failing otherwise. We started adding it before the addition 
-of COMPILE_TEST.
+OK, I see.
 
-Can we just remove all HAS_DMA Kconfig dependencies as a hole from the
-entire media subsystem, with something like:
+> I would suggest either allocating a new request on the spot or if
+> that is not convenient, pre-allocating it in the cra_init function.
 
-	$ for i in $(find drivers/media -name Kconfig) $(find drivers/staging/media -name Kconfig); do sed '/depends on HAS_DMA/d;s/ && HAS_DMA//g' -i $i; done
+Or we could have similar macros in the driver: we wouldn't have VLAs
+since it would be driver specific.
 
-Or would it cause build issues?
+Thanks!
+Antoine
 
-Regards,
-Mauro
-
-
-
-
-Thanks,
-Mauro
+-- 
+Antoine Ténart, Bootlin (formerly Free Electrons)
+Embedded Linux and Kernel engineering
+https://bootlin.com
