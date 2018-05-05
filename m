@@ -1,131 +1,114 @@
-From: Kyle Spiers <ksspiers@google.com>
-Subject: [PATCH v2] async_pq: Remove VLA usage
-Date: Sat,  5 May 2018 00:58:54 -0700
-Message-ID: <20180505075854.192237-1-ksspiers@google.com>
-Cc: davem@davemloft.net, keescook@chromium.org, vinod.koul@intel.com,
-        ray.jui@broadcom.com, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Kyle Spiers <ksspiers@google.com>
-To: dan.j.williams@intel.com
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
+From: Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
+Subject: Re: [PATCH v3 12/20] media: Remove depends on HAS_DMA in case of
+ platform dependency
+Date: Sat, 5 May 2018 09:47:43 -0300
+Message-ID: <20180505094743.4d201ba0@vento.lan>
+References: <1523987360-18760-1-git-send-email-geert@linux-m68k.org>
+ <1523987360-18760-13-git-send-email-geert@linux-m68k.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Ulf Hansson <ulf.hansson@linaro.org>, Wolfram Sang <wsa@the-dreams.de>,
+ linux-iio@vger.kernel.org, linux-fpga@vger.kernel.org,
+ linux-remoteproc@vger.kernel.org, alsa-devel@alsa-project.org,
+ Bjorn Andersson <bjorn.andersson@linaro.org>, Eric Anholt <eric@anholt.net>,
+ netdev@vger.kernel.org, linux-mtd@lists.infradead.org,
+ linux-i2c@vger.kernel.org, linux1394-devel@lists.sourceforge.net,
+ Christoph Hellwig <hch@lst.de>, Marek Szyprowski <m.szyprowski@samsung.com>,
+ Stefan Wahren <stefan.wahren@i2se.com>,
+ Boris Brezillon <boris.brezillon@free-electrons.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>, Richard Weinberger <richard@nod.at>,
+ Joerg Roedel <joro@8bytes.org>, Jassi Brar <jassisinghbrar@gmail.com>,
+ Marek Vasut <marek.vasut@gmail.com>, linux-serial@vger.kernel.org,
+ Matias Bjorling <mb@lightnvm.io>, David Woodhouse <dwmw2@infradead.org>,
+ linux-media@vger.kernel.org, Ohad
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
+In-Reply-To: <1523987360-18760-13-git-send-email-geert@linux-m68k.org>
+List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
+List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
+List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
+List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
+List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
+Errors-To: driverdev-devel-bounces@linuxdriverproject.org
+Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
 List-Id: linux-crypto.vger.kernel.org
 
-In the quest to remove VLAs from the kernel[1], this moves the
-allocation of coefs and blocks from the stack to being kmalloc()ed.
+Hi Geert,
 
-[1] https://lkml.org/lkml/2018/3/7/621
+Em Tue, 17 Apr 2018 19:49:12 +0200
+Geert Uytterhoeven <geert@linux-m68k.org> escreveu:
 
-Signed-off-by: Kyle Spiers <ksspiers@google.com>
----
-Forgot to add slab.h
----
- crypto/async_tx/async_pq.c  | 18 ++++++++++++++----
- crypto/async_tx/raid6test.c |  9 ++++++++-
- 2 files changed, 22 insertions(+), 5 deletions(-)
+> Remove dependencies on HAS_DMA where a Kconfig symbol depends on another
+> symbol that implies HAS_DMA, and, optionally, on "|| COMPILE_TEST".
 
-diff --git a/crypto/async_tx/async_pq.c b/crypto/async_tx/async_pq.c
-index 56bd612927ab..af1912313a23 100644
---- a/crypto/async_tx/async_pq.c
-+++ b/crypto/async_tx/async_pq.c
-@@ -194,9 +194,9 @@ async_gen_syndrome(struct page **blocks, unsigned int offset, int disks,
- 	    (src_cnt <= dma_maxpq(device, 0) ||
- 	     dma_maxpq(device, DMA_PREP_CONTINUE) > 0) &&
- 	    is_dma_pq_aligned(device, offset, 0, len)) {
--		struct dma_async_tx_descriptor *tx;
-+		struct dma_async_tx_descriptor *tx = NULL;
- 		enum dma_ctrl_flags dma_flags = 0;
--		unsigned char coefs[src_cnt];
-+		unsigned char *coefs;
- 		int i, j;
- 
- 		/* run the p+q asynchronously */
-@@ -207,6 +207,9 @@ async_gen_syndrome(struct page **blocks, unsigned int offset, int disks,
- 		 * sources and update the coefficients accordingly
- 		 */
- 		unmap->len = len;
-+		coefs = kmalloc_array(src_cnt, sizeof(*coefs), GFP_KERNEL);
-+		if (!coefs)
-+			goto out;
- 		for (i = 0, j = 0; i < src_cnt; i++) {
- 			if (blocks[i] == NULL)
- 				continue;
-@@ -240,7 +243,9 @@ async_gen_syndrome(struct page **blocks, unsigned int offset, int disks,
- 		}
- 
- 		tx = do_async_gen_syndrome(chan, coefs, j, unmap, dma_flags, submit);
-+out:
- 		dmaengine_unmap_put(unmap);
-+		kfree(coefs);
- 		return tx;
- 	}
- 
-@@ -298,8 +303,8 @@ async_syndrome_val(struct page **blocks, unsigned int offset, int disks,
- {
- 	struct dma_chan *chan = pq_val_chan(submit, blocks, disks, len);
- 	struct dma_device *device = chan ? chan->device : NULL;
--	struct dma_async_tx_descriptor *tx;
--	unsigned char coefs[disks-2];
-+	struct dma_async_tx_descriptor *tx = NULL;
-+	unsigned char *coefs = NULL;
- 	enum dma_ctrl_flags dma_flags = submit->cb_fn ? DMA_PREP_INTERRUPT : 0;
- 	struct dmaengine_unmap_data *unmap = NULL;
- 
-@@ -318,6 +323,9 @@ async_syndrome_val(struct page **blocks, unsigned int offset, int disks,
- 			 __func__, disks, len);
- 
- 		unmap->len = len;
-+		coefs = kmalloc_array(disks - 2, sizeof(*coefs), GFP_KERNEL);
-+		if (!coefs)
-+			goto out;
- 		for (i = 0; i < disks-2; i++)
- 			if (likely(blocks[i])) {
- 				unmap->addr[j] = dma_map_page(dev, blocks[i],
-@@ -423,6 +431,8 @@ async_syndrome_val(struct page **blocks, unsigned int offset, int disks,
- 		async_tx_sync_epilog(submit);
- 		tx = NULL;
- 	}
-+out:
-+	kfree(coefs);
- 	dmaengine_unmap_put(unmap);
- 
- 	return tx;
-diff --git a/crypto/async_tx/raid6test.c b/crypto/async_tx/raid6test.c
-index dad95f45b88f..4237a5ae8f42 100644
---- a/crypto/async_tx/raid6test.c
-+++ b/crypto/async_tx/raid6test.c
-@@ -24,6 +24,7 @@
- #include <linux/mm.h>
- #include <linux/random.h>
- #include <linux/module.h>
-+#include <linux/slab.h>
- 
- #undef pr
- #define pr(fmt, args...) pr_info("raid6test: " fmt, ##args)
-@@ -81,11 +82,16 @@ static void raid6_dual_recov(int disks, size_t bytes, int faila, int failb, stru
- 			init_async_submit(&submit, 0, NULL, NULL, NULL, addr_conv);
- 			tx = async_gen_syndrome(ptrs, 0, disks, bytes, &submit);
- 		} else {
--			struct page *blocks[disks];
-+			struct page **blocks;
- 			struct page *dest;
- 			int count = 0;
- 			int i;
- 
-+			blocks = kmalloc_array(disks, sizeof(*blocks),
-+							GFP_KERNEL);
-+			if (!blocks)
-+				return;
-+
- 			/* data+Q failure.  Reconstruct data from P,
- 			 * then rebuild syndrome
- 			 */
-@@ -101,6 +107,7 @@ static void raid6_dual_recov(int disks, size_t bytes, int faila, int failb, stru
- 
- 			init_async_submit(&submit, 0, tx, NULL, NULL, addr_conv);
- 			tx = async_gen_syndrome(ptrs, 0, disks, bytes, &submit);
-+			kfree(blocks);
- 		}
- 	} else {
- 		if (failb == disks-2) {
--- 
-2.17.0.441.gb46fe60e1d-goog
+Applying a patch like that is hard, as there are lots of churn at
+the code. That's against latest media upstream:
+
+checking file drivers/media/pci/intel/ipu3/Kconfig
+Hunk #1 FAILED at 4.
+1 out of 1 hunk FAILED
+checking file drivers/media/pci/solo6x10/Kconfig
+checking file drivers/media/pci/sta2x11/Kconfig
+Hunk #1 FAILED at 1.
+1 out of 1 hunk FAILED
+checking file drivers/media/pci/tw5864/Kconfig
+checking file drivers/media/pci/tw686x/Kconfig
+checking file drivers/media/platform/Kconfig
+Hunk #2 FAILED at 63.
+Hunk #3 succeeded at 81 (offset 1 line).
+Hunk #4 succeeded at 91 (offset 1 line).
+Hunk #5 succeeded at 101 (offset 1 line).
+Hunk #6 succeeded at 111 (offset 1 line).
+Hunk #7 succeeded at 124 (offset 1 line).
+Hunk #8 succeeded at 142 (offset 1 line).
+Hunk #9 succeeded at 169 (offset 1 line).
+Hunk #10 succeeded at 186 (offset 1 line).
+Hunk #11 succeeded at 197 (offset 1 line).
+Hunk #12 succeeded at 213 (offset 1 line).
+Hunk #13 succeeded at 227 (offset 1 line).
+Hunk #14 succeeded at 254 (offset 1 line).
+Hunk #15 succeeded at 265 (offset 1 line).
+Hunk #16 succeeded at 275 (offset 1 line).
+Hunk #17 succeeded at 284 (offset 1 line).
+Hunk #18 succeeded at 295 (offset 1 line).
+Hunk #19 succeeded at 303 (offset 1 line).
+Hunk #20 succeeded at 312 (offset 1 line).
+Hunk #21 succeeded at 338 (offset 1 line).
+Hunk #22 succeeded at 383 (offset 1 line).
+Hunk #23 succeeded at 397 (offset 1 line).
+Hunk #24 succeeded at 422 (offset 1 line).
+Hunk #25 succeeded at 435 (offset 1 line).
+Hunk #26 succeeded at 452 (offset 1 line).
+Hunk #27 succeeded at 470 (offset 1 line).
+Hunk #28 succeeded at 612 (offset 1 line).
+1 out of 28 hunks FAILED
+
+> In most cases this other symbol is an architecture or platform specific
+> symbol, or PCI.
+> 
+> Generic symbols and drivers without platform dependencies keep their
+> dependencies on HAS_DMA, to prevent compiling subsystems or drivers that
+> cannot work anyway.
+
+Actually, depends on HAS_DMA was introduced on media because builds
+were failing otherwise. We started adding it before the addition 
+of COMPILE_TEST.
+
+Can we just remove all HAS_DMA Kconfig dependencies as a hole from the
+entire media subsystem, with something like:
+
+	$ for i in $(find drivers/media -name Kconfig) $(find drivers/staging/media -name Kconfig); do sed '/depends on HAS_DMA/d;s/ && HAS_DMA//g' -i $i; done
+
+Or would it cause build issues?
+
+Regards,
+Mauro
+
+
+
+
+Thanks,
+Mauro
