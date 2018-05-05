@@ -1,41 +1,31 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/2] Fix stm32-rng for default state and suspend
-Date: Sat, 5 May 2018 15:16:51 +0800
-Message-ID: <20180505071651.qmroqj3ys3pve2x7@gondor.apana.org.au>
-References: <20180423150426.22198-1-lionel.debieve@st.com>
+Subject: Re: [PATCH] crypto: tcrypt: Remove VLA usage
+Date: Sat, 5 May 2018 15:17:24 +0800
+Message-ID: <20180505071724.ts3zndtzp62hprng@gondor.apana.org.au>
+References: <20180427025728.GA38607@beast>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Matt Mackall <mpm@selenic.com>, Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@st.com>,
-        Rob Herring <rob.herring@linaro.org>,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org,
-        Benjamin Gaignard <benjamin.gaignard@st.com>,
-        Ludovic Barre <ludovic.barre@st.com>
-To: Lionel Debieve <lionel.debieve@st.com>
+Cc: Gilad Ben-Yossef <gilad@benyossef.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Kees Cook <keescook@chromium.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20180423150426.22198-1-lionel.debieve@st.com>
+In-Reply-To: <20180427025728.GA38607@beast>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Apr 23, 2018 at 05:04:24PM +0200, Lionel Debieve wrote:
-> This series are fixing the default build state for stm32-rng that
-> activate the driver with arm multi_v7_defconfig.
-> Second patch is fixing the power suspend/resume behavior which was
-> not working.
+On Thu, Apr 26, 2018 at 07:57:28PM -0700, Kees Cook wrote:
+> In the quest to remove all stack VLA usage from the kernel[1], this
+> allocates the return code buffers before starting jiffie timers, rather
+> than using stack space for the array. Additionally cleans up some exit
+> paths and make sure that the num_mb module_param() is used only once
+> per execution to avoid possible races in the value changing.
 > 
-> Lionel Debieve (2):
->   hwrng: stm32 - define default state for rng driver
->   hwrng: stm32-rng: Fix pm_suspend issue
+> [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
 > 
->  drivers/char/hw_random/Kconfig     | 1 +
->  drivers/char/hw_random/stm32-rng.c | 9 +++++++--
->  2 files changed, 8 insertions(+), 2 deletions(-)
+> Signed-off-by: Kees Cook <keescook@chromium.org>
 
-All applied.  Thanks.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
