@@ -1,62 +1,94 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH V8 1/5] crypto: Multi-buffer encryption infrastructure
- support
-Date: Mon, 7 May 2018 17:35:11 +0800
-Message-ID: <20180507093511.jscgnk436e3ba4un@gondor.apana.org.au>
-References: <20180118113905.GA19904@gondor.apana.org.au>
- <1516322661.2526.3.camel@megha-Z97X-UD7-TH>
- <20180316145351.GA6231@gondor.apana.org.au>
- <C440BA31B54DCD4AAC682D2365C8FEE738C13267@ORSMSX111.amr.corp.intel.com>
- <20180418110115.v2w3o5yfv4u3gc4r@gondor.apana.org.au>
- <C440BA31B54DCD4AAC682D2365C8FEE738C13DDE@ORSMSX111.amr.corp.intel.com>
- <20180419032525.6csodbz6lrksyudd@gondor.apana.org.au>
- <C440BA31B54DCD4AAC682D2365C8FEE738C270FC@ORSMSX111.amr.corp.intel.com>
- <20180426094445.4jiwondmtbenepo2@gondor.apana.org.au>
- <C440BA31B54DCD4AAC682D2365C8FEE738C4291E@ORSMSX111.amr.corp.intel.com>
+From: Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
+Subject: [PATCH 00/18] Fix some build warnings/errors with Sphinx
+Date: Mon,  7 May 2018 06:35:36 -0300
+Message-ID: <cover.1525684985.git.mchehab+samsung@kernel.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "davem@davemloft.net" <davem@davemloft.net>
-To: "Dey, Megha" <megha.dey@intel.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <C440BA31B54DCD4AAC682D2365C8FEE738C4291E@ORSMSX111.amr.corp.intel.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: linux-fbdev@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
+ linux-iio@vger.kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ linux-pm@vger.kernel.org, linux-wireless@vger.kernel.org,
+ linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ Mauro Carvalho Chehab <mchehab@infradead.org>,
+ "Luis R. Rodriguez" <mcgrof@kernel.org>, linux-mtd@lists.infradead.org,
+ linux-crypto@vger.kernel.org,
+ Mauro Carvalho Chehab <mchehab+samsung@kernel.org>, linux-can@vger.kernel.org
+To: Linux Doc Mailing List <linux-doc@vger.kernel.org>
+Return-path: <dri-devel-bounces@lists.freedesktop.org>
+List-Unsubscribe: <https://lists.freedesktop.org/mailman/options/dri-devel>,
+ <mailto:dri-devel-request@lists.freedesktop.org?subject=unsubscribe>
+List-Archive: <https://lists.freedesktop.org/archives/dri-devel>
+List-Post: <mailto:dri-devel@lists.freedesktop.org>
+List-Help: <mailto:dri-devel-request@lists.freedesktop.org?subject=help>
+List-Subscribe: <https://lists.freedesktop.org/mailman/listinfo/dri-devel>,
+ <mailto:dri-devel-request@lists.freedesktop.org?subject=subscribe>
+Errors-To: dri-devel-bounces@lists.freedesktop.org
+Sender: "dri-devel" <dri-devel-bounces@lists.freedesktop.org>
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, May 01, 2018 at 10:39:15PM +0000, Dey, Megha wrote:
->
-> crypto/simd.c provides a simd_skcipher_create_compat. I have used the same template to introduce simd_ahash_create_compat
-> which would wrap around the inner hash algorithm.
-> 
-> Hence we would still register 2 algs, outer and inner.
-
-Right.
-
-> Currently we have outer_alg -> mcryptd alg -> inner_alg
-> 
-> Mcryptd is mainly providing the following:
-> 1. Ensuring the lanes(8 in case of AVX2) are full before dispatching to the lower inner algorithm. This is obviously why we would expect better performance for multi-buffer as opposed to the present single-buffer algorithms.
-> 2. If there no new incoming jobs, issue a flush.
-> 3. A glue layer which sends the correct pointers and completions.
-> 
-> If we get rid of mcryptd, these functions needs to be done by someone. Since all multi-buffer algorithms would require this tasks, where do you suggest these helpers live, if not the current mcryptd.c?
-
-That's the issue.  I don't think mcryptd is doing any of these
-claimed functions except for hosting the flush helper which could
-really live anywhere.
-
-All these functions are actually being carried out in the inner
-algorithm already.
-
-> I am not sure if you are suggesting that we need to get rid of the mcryptd work queue itself. In that case, we would need to execute in the context of the job requesting the crypto transformation.
-
-Which is fine as long as you can disable the FPU.  If not the simd
-wrapper will defer the job to kthread context as required.
-
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+SSBkZWNpZGVkIHRvIGdpdmUgYSB0cnkgd2l0aCBTcGhpbnggbGFzdCBzdGFibGUgdmVyc2lvbgoo
+MS4xNy40KSwgYW5kIG5vdGljZWQgc2V2ZXJhbCBpc3N1ZXMuIFRoZSB3b3JzZSBvbmUgd2FzCndp
+dGggdGhlIG5ldHdvcmtpbmcgYm9vazogYSBub24tc3RhbmRhcmQgZm9vdG5vdGUgdGhlcmUKd2l0
+aCBbKl0gaW5zdGVhZCBvZiBhIG51bWJlciBjYXVzZXMgaXQgdG8gYnJlYWsgUERGIGJ1aWxkaW5n
+LgoKU28sIEkgdG9vayBzb21lIHNwYXJlIHRpbWUgdG8gYWRkcmVzcyBzb21lIHdhcm5pbmdzIGFs
+bCBvdmVyCnRoZSB0cmVlLCBhbmQgbW92ZWQgYSBmZXcgdGV4dCBkb2N1bWVudHMgdG8gYSBib29r
+LiBJIHdpdGgKSSBoYWQgbW9yZSB0aW1lIHRvIG1vdmUgdGhlIG90aGVyIG9uZXMgYW5kIHRvIHNv
+bHZlIG90aGVyCndhcm5pbmdzLgoKTWF1cm8gQ2FydmFsaG8gQ2hlaGFiICgxOCk6CiAgZG9jczog
+Y2FuLnJzdDogZml4IGEgZm9vdG5vdGUgcmVmZXJlbmNlCiAgZG9jczogZml4IGxvY2F0aW9uIG9m
+IHJlcXVlc3RfZmlybXdhcmUgJiBmcmllbmRzCiAgZG9jczogKi9pbmRleC5yc3Q6IEFkZCBuZXdl
+ciBkb2N1bWVudHMgdG8gdGhlaXIgcmVzcGVjdGl2ZSBpbmRleC5yc3QKICBkb2NzOiBhZG1pbi1n
+dWlkZTogYWRkIGJjYWNoZSBkb2N1bWVudGF0aW9uCiAgZG9jczogY29yZS1hcGk6IGFkZCBjYWNo
+ZXRsYiBkb2N1bWVudGF0aW9uCiAgZG9jczogY29yZS1hcGk6IGFkZCBjZ3JvdXAtdjIgZG9jdW1l
+bnRhdGlvbgogIGRvY3M6IGNvcmUtYXBpOiBhZGQgY2lyY3VsYXItYnVmZmVycyBkb2N1bWVudGF0
+aW9uCiAgZG9jczogZHJpdmVyLWFwaTogYWRkIGNsayBkb2N1bWVudGF0aW9uCiAgbmV0OiBtYWM4
+MDIxMS5oOiBmaXggYSBiYWQgY29tbWVudCBsaW5lCiAgcmN1OiByY3VwZGF0ZS5oOiBnZXQgcmlk
+IG9mIFNwaGlueCB3YXJuaW5ncyBhdCByY3VfcG9pbnRlcl9oYW5kb2ZmKCkKICBkb2NzOiBjcnlw
+dG9fZW5naW5lLnJzdDogRml4IHR3byBwYXJzZSB3YXJuaW5ncwogIHRpbWU6IHRpbWVyLmM6IGFk
+anVzdCBhIGtlcm5lbC1kb2MgY29tbWVudAogIHdhaXQ6IHdhaXQuaDogR2V0IHJpZCBvZiBhIGtl
+cm5lbC1kb2MvU3BoaW54IHdhcm5pbmdzCiAgZmJkZXY6IG1vZGVkYi5jOiBmaXggYSBrZXJuZWwt
+ZG9jIG1hcmt1cAogIGlpbzogaWlvLmg6IHVzZSBuZXN0ZWQgc3RydWN0IHN1cHBvcnQgb24ga2Vy
+bmVsLWRvYyBtYXJrdXAKICBtdGQ6IHJhd25hbmQuaDogdXNlIG5lc3RlZCB1bmlvbiBrZXJuZWwt
+ZG9jIG1hcmt1cHMKICBkb2NzOiB1aW8taG93dG8ucnN0OiB1c2UgYSBjb2RlIGJsb2NrIHRvIHNv
+bHZlIGEgd2FybmluZwogIHcxOiB3MV9pby5jOiBmaXggYSBrZXJuZWwtZG9jIHdhcm5pbmcKCiBE
+b2N1bWVudGF0aW9uLzAwLUlOREVYICAgICAgICAgICAgICAgICAgICAgICAgfCAxMCAtLS0tLS0t
+CiAuLi4ve2JjYWNoZS50eHQgPT4gYWRtaW4tZ3VpZGUvYmNhY2hlLnJzdH0gICAgfCAgMAogLi4u
+L2Nncm91cC12Mi5yc3R9ICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDAKIERvY3VtZW50
+YXRpb24vYWRtaW4tZ3VpZGUvaW5kZXgucnN0ICAgICAgICAgICB8ICAyICsrCiAuLi4vYWRtaW4t
+Z3VpZGUva2VybmVsLXBhcmFtZXRlcnMudHh0ICAgICAgICAgfCAgMiArLQogLi4uL3tjYWNoZXRs
+Yi50eHQgPT4gY29yZS1hcGkvY2FjaGV0bGIucnN0fSAgIHwgIDAKIC4uLi9jaXJjdWxhci1idWZm
+ZXJzLnJzdH0gICAgICAgICAgICAgICAgICAgICB8ICAwCiBEb2N1bWVudGF0aW9uL2NvcmUtYXBp
+L2luZGV4LnJzdCAgICAgICAgICAgICAgfCAgMiArKwogRG9jdW1lbnRhdGlvbi9jcnlwdG8vY3J5
+cHRvX2VuZ2luZS5yc3QgICAgICAgIHwgIDggKysrLS0tCiBEb2N1bWVudGF0aW9uL2NyeXB0by9p
+bmRleC5yc3QgICAgICAgICAgICAgICAgfCAgMSArCiBEb2N1bWVudGF0aW9uL2RlbGxfcmJ1LnR4
+dCAgICAgICAgICAgICAgICAgICAgfCAgNCArLS0KIERvY3VtZW50YXRpb24ve2Nsay50eHQgPT4g
+ZHJpdmVyLWFwaS9jbGsucnN0fSB8ICAwCiAuLi4vZmlybXdhcmUvZmFsbGJhY2stbWVjaGFuaXNt
+cy5yc3QgICAgICAgICAgfCAgMiArLQogLi4uL2RyaXZlci1hcGkvZmlybXdhcmUvcmVxdWVzdF9m
+aXJtd2FyZS5yc3QgIHwgMTcgKysrKysrKy0tLS0tCiBEb2N1bWVudGF0aW9uL2RyaXZlci1hcGkv
+aW5kZXgucnN0ICAgICAgICAgICAgfCAgMiArKwogRG9jdW1lbnRhdGlvbi9kcml2ZXItYXBpL2lu
+ZnJhc3RydWN0dXJlLnJzdCAgIHwgIDIgKy0KIERvY3VtZW50YXRpb24vZHJpdmVyLWFwaS91aW8t
+aG93dG8ucnN0ICAgICAgICB8ICAzICsrLQogRG9jdW1lbnRhdGlvbi9tZW1vcnktYmFycmllcnMu
+dHh0ICAgICAgICAgICAgIHwgIDQgKy0tCiBEb2N1bWVudGF0aW9uL25ldHdvcmtpbmcvY2FuLnJz
+dCAgICAgICAgICAgICAgfCAgNCArLS0KIC4uLi9wb3dlci9zdXNwZW5kLWFuZC1jcHVob3RwbHVn
+LnR4dCAgICAgICAgICB8ICAyICstCiBEb2N1bWVudGF0aW9uL3Byb2Nlc3MvaW5kZXgucnN0ICAg
+ICAgICAgICAgICAgfCAgMSArCiBEb2N1bWVudGF0aW9uL3NlY3VyaXR5L2luZGV4LnJzdCAgICAg
+ICAgICAgICAgfCAgMiArKwogLi4uL3RyYW5zbGF0aW9ucy9rb19LUi9tZW1vcnktYmFycmllcnMu
+dHh0ICAgIHwgIDQgKy0tCiBkcml2ZXJzL3ZpZGVvL2ZiZGV2L2NvcmUvbW9kZWRiLmMgICAgICAg
+ICAgICAgfCAyMiArKysrKysrKy0tLS0tLS0tCiBkcml2ZXJzL3cxL3cxX2lvLmMgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgfCAgMSArCiBpbmNsdWRlL2xpbnV4L2lpby9paW8uaCAgICAgICAg
+ICAgICAgICAgICAgICAgfCAyNCArKysrKysrKy0tLS0tLS0tLQogaW5jbHVkZS9saW51eC9tdGQv
+cmF3bmFuZC5oICAgICAgICAgICAgICAgICAgIHwgMjYgKysrKysrKysrKysrKy0tLS0tLQogaW5j
+bHVkZS9saW51eC9yY3VwZGF0ZS5oICAgICAgICAgICAgICAgICAgICAgIHwgIDUgKystLQogaW5j
+bHVkZS9saW51eC93YWl0LmggICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDIgKy0KIGluY2x1
+ZGUvbmV0L21hYzgwMjExLmggICAgICAgICAgICAgICAgICAgICAgICB8ICAyICstCiBrZXJuZWwv
+dGltZS90aW1lci5jICAgICAgICAgICAgICAgICAgICAgICAgICAgfCAxNCArKysrKy0tLS0tCiAz
+MSBmaWxlcyBjaGFuZ2VkLCA5MyBpbnNlcnRpb25zKCspLCA3NSBkZWxldGlvbnMoLSkKIHJlbmFt
+ZSBEb2N1bWVudGF0aW9uL3tiY2FjaGUudHh0ID0+IGFkbWluLWd1aWRlL2JjYWNoZS5yc3R9ICgx
+MDAlKQogcmVuYW1lIERvY3VtZW50YXRpb24ve2Nncm91cC12Mi50eHQgPT4gYWRtaW4tZ3VpZGUv
+Y2dyb3VwLXYyLnJzdH0gKDEwMCUpCiByZW5hbWUgRG9jdW1lbnRhdGlvbi97Y2FjaGV0bGIudHh0
+ID0+IGNvcmUtYXBpL2NhY2hldGxiLnJzdH0gKDEwMCUpCiByZW5hbWUgRG9jdW1lbnRhdGlvbi97
+Y2lyY3VsYXItYnVmZmVycy50eHQgPT4gY29yZS1hcGkvY2lyY3VsYXItYnVmZmVycy5yc3R9ICgx
+MDAlKQogcmVuYW1lIERvY3VtZW50YXRpb24ve2Nsay50eHQgPT4gZHJpdmVyLWFwaS9jbGsucnN0
+fSAoMTAwJSkKCi0tIAoyLjE3LjAKCgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fXwpkcmktZGV2ZWwgbWFpbGluZyBsaXN0CmRyaS1kZXZlbEBsaXN0cy5mcmVl
+ZGVza3RvcC5vcmcKaHR0cHM6Ly9saXN0cy5mcmVlZGVza3RvcC5vcmcvbWFpbG1hbi9saXN0aW5m
+by9kcmktZGV2ZWwK
