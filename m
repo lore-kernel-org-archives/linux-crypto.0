@@ -1,105 +1,62 @@
-From: Geert Uytterhoeven <geert-Td1EMuHUCqxL1ZNQvxDV9g@public.gmane.org>
-Subject: Re: [PATCH v3 12/20] media: Remove depends on HAS_DMA in case of
-	platform dependency
-Date: Mon, 7 May 2018 09:21:47 +0200
-Message-ID: <CAMuHMdXp8u9O7Yt3W+WxuOOadYOM+_28DLOMfktwgy_WqML_0A@mail.gmail.com>
-References: <1523987360-18760-1-git-send-email-geert@linux-m68k.org>
-	<1523987360-18760-13-git-send-email-geert@linux-m68k.org>
-	<20180505094743.4d201ba0@vento.lan>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH V8 1/5] crypto: Multi-buffer encryption infrastructure
+ support
+Date: Mon, 7 May 2018 17:35:11 +0800
+Message-ID: <20180507093511.jscgnk436e3ba4un@gondor.apana.org.au>
+References: <20180118113905.GA19904@gondor.apana.org.au>
+ <1516322661.2526.3.camel@megha-Z97X-UD7-TH>
+ <20180316145351.GA6231@gondor.apana.org.au>
+ <C440BA31B54DCD4AAC682D2365C8FEE738C13267@ORSMSX111.amr.corp.intel.com>
+ <20180418110115.v2w3o5yfv4u3gc4r@gondor.apana.org.au>
+ <C440BA31B54DCD4AAC682D2365C8FEE738C13DDE@ORSMSX111.amr.corp.intel.com>
+ <20180419032525.6csodbz6lrksyudd@gondor.apana.org.au>
+ <C440BA31B54DCD4AAC682D2365C8FEE738C270FC@ORSMSX111.amr.corp.intel.com>
+ <20180426094445.4jiwondmtbenepo2@gondor.apana.org.au>
+ <C440BA31B54DCD4AAC682D2365C8FEE738C4291E@ORSMSX111.amr.corp.intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Ulf Hansson <ulf.hansson-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, Wolfram Sang <wsa-z923LK4zBo2bacvFa/9K2g@public.gmane.org>,
-	linux-iio-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fpga-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	"open list:REMOTE PROCESSOR \(REMOTEPROC\) SUBSYSTEM"
-	<linux-remoteproc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	ALSA Development Mailing List <alsa-devel-K7yf7f+aM1XWsZ/bQMPhNw@public.gmane.org>,
-	Bjorn Andersson <bjorn.andersson-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>,
-	Eric Anholt <eric-WhKQ6XTQaPysTnJN9+BGXg@public.gmane.org>, netdev <netdev-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	MTD Maling List <linux-mtd-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>,
-	Linux I2C <linux-i2c-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	linux1394-devel-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org, Christoph Hellwig <hch-jcswGhMUV9g@public.gmane.org>,
-	Stefan Wahren <stefan.wahren-eS4NqCHxEME@public.gmane.org>,
-	Boris Brezillon <boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>,
-	Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-	Richard Weinberger <richard-/L3Ra7n9ekc@public.gmane.org>, Jassi Brar <jassisinghbrar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	Marek Vasut <marek.vasut-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	"open list:SERIAL DRIVERS" <linux-serial-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Matias Bjorling <mb@light
-To: Mauro Carvalho Chehab <mchehab+samsung-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
-Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-In-Reply-To: <20180505094743.4d201ba0-ch4gOOMV7nf/PtFMR13I2A@public.gmane.org>
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
-List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
-Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Content-Type: text/plain; charset=us-ascii
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "davem@davemloft.net" <davem@davemloft.net>
+To: "Dey, Megha" <megha.dey@intel.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <C440BA31B54DCD4AAC682D2365C8FEE738C4291E@ORSMSX111.amr.corp.intel.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi Mauro,
-
-On Sat, May 5, 2018 at 2:47 PM, Mauro Carvalho Chehab
-<mchehab+samsung-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org> wrote:
-> Em Tue, 17 Apr 2018 19:49:12 +0200
-> Geert Uytterhoeven <geert-Td1EMuHUCqxL1ZNQvxDV9g@public.gmane.org> escreveu:
+On Tue, May 01, 2018 at 10:39:15PM +0000, Dey, Megha wrote:
 >
->> Remove dependencies on HAS_DMA where a Kconfig symbol depends on another
->> symbol that implies HAS_DMA, and, optionally, on "|| COMPILE_TEST".
->
-> Applying a patch like that is hard, as there are lots of churn at
-> the code. That's against latest media upstream:
+> crypto/simd.c provides a simd_skcipher_create_compat. I have used the same template to introduce simd_ahash_create_compat
+> which would wrap around the inner hash algorithm.
+> 
+> Hence we would still register 2 algs, outer and inner.
 
-[...]
+Right.
 
-I can rebase. What's your preferred target? media-next?
+> Currently we have outer_alg -> mcryptd alg -> inner_alg
+> 
+> Mcryptd is mainly providing the following:
+> 1. Ensuring the lanes(8 in case of AVX2) are full before dispatching to the lower inner algorithm. This is obviously why we would expect better performance for multi-buffer as opposed to the present single-buffer algorithms.
+> 2. If there no new incoming jobs, issue a flush.
+> 3. A glue layer which sends the correct pointers and completions.
+> 
+> If we get rid of mcryptd, these functions needs to be done by someone. Since all multi-buffer algorithms would require this tasks, where do you suggest these helpers live, if not the current mcryptd.c?
 
->> In most cases this other symbol is an architecture or platform specific
->> symbol, or PCI.
->>
->> Generic symbols and drivers without platform dependencies keep their
->> dependencies on HAS_DMA, to prevent compiling subsystems or drivers that
->> cannot work anyway.
->
-> Actually, depends on HAS_DMA was introduced on media because builds
-> were failing otherwise. We started adding it before the addition
-> of COMPILE_TEST.
+That's the issue.  I don't think mcryptd is doing any of these
+claimed functions except for hosting the flush helper which could
+really live anywhere.
 
-Indeed. Before the 5 commits below, a missing dependency on HAS_DMA
-would cause the build to fail for NO_DMA platforms.
+All these functions are actually being carried out in the inner
+algorithm already.
 
-    f29ab49b5388b2f8 dma-mapping: Convert NO_DMA get_dma_ops() into a real dummy
-    ab642e952f80c66c dma-coherent: Add NO_DMA dummies for managed DMA API
-    c1ce6c2beea38171 mm: Add NO_DMA dummies for DMA pool API
-    bff739b6559e2fce scsi: Add NO_DMA dummies for SCSI DMA mapping API
-    1f674e16f9ce6eb2 usb: gadget: Add NO_DMA dummies for DMA mapping API
+> I am not sure if you are suggesting that we need to get rid of the mcryptd work queue itself. In that case, we would need to execute in the context of the job requesting the crypto transformation.
 
-> Can we just remove all HAS_DMA Kconfig dependencies as a hole from the
-> entire media subsystem, with something like:
->
->         $ for i in $(find drivers/media -name Kconfig) $(find drivers/staging/media -name Kconfig); do sed '/depends on HAS_DMA/d;s/ && HAS_DMA//g' -i $i; done
->
-> Or would it cause build issues?
+Which is fine as long as you can disable the FPU.  If not the simd
+wrapper will defer the job to kthread context as required.
 
-It should not cause build issues, but it would enable lots of drivers that
-need DMA platform support on platforms where they wouldn't work, making the
-life of distro configurators harder.
-
-That's why my series removes HAS_DMA only for symbols that have a platform
-dependency.
-
-Thanks!
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
+Cheers,
 -- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert-Td1EMuHUCqxL1ZNQvxDV9g@public.gmane.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
