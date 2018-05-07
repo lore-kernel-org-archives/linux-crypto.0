@@ -1,67 +1,105 @@
-From: Wenwen Wang <wang6495@umn.edu>
-Subject: [PATCH] crypto: chtls - fix a missing-check bug
-Date: Sat,  5 May 2018 13:53:48 -0500
-Message-ID: <1525546431-12535-1-git-send-email-wang6495@umn.edu>
-Cc: Kangjie Lu <kjlu@umn.edu>, Harsh Jain <harsh@chelsio.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Atul Gupta <atul.gupta@chelsio.com>,
-        Michael Werner <werner@chelsio.com>,
-        Casey Leedom <leedom@chelsio.com>,
-        linux-crypto@vger.kernel.org (open list:CXGB4 CRYPTO DRIVER (chcr)),
-        linux-kernel@vger.kernel.org (open list)
-To: Wenwen Wang <wang6495@umn.edu>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
+From: Geert Uytterhoeven <geert-Td1EMuHUCqxL1ZNQvxDV9g@public.gmane.org>
+Subject: Re: [PATCH v3 12/20] media: Remove depends on HAS_DMA in case of
+	platform dependency
+Date: Mon, 7 May 2018 09:21:47 +0200
+Message-ID: <CAMuHMdXp8u9O7Yt3W+WxuOOadYOM+_28DLOMfktwgy_WqML_0A@mail.gmail.com>
+References: <1523987360-18760-1-git-send-email-geert@linux-m68k.org>
+	<1523987360-18760-13-git-send-email-geert@linux-m68k.org>
+	<20180505094743.4d201ba0@vento.lan>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Ulf Hansson <ulf.hansson-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, Wolfram Sang <wsa-z923LK4zBo2bacvFa/9K2g@public.gmane.org>,
+	linux-iio-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fpga-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	"open list:REMOTE PROCESSOR \(REMOTEPROC\) SUBSYSTEM"
+	<linux-remoteproc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	ALSA Development Mailing List <alsa-devel-K7yf7f+aM1XWsZ/bQMPhNw@public.gmane.org>,
+	Bjorn Andersson <bjorn.andersson-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>,
+	Eric Anholt <eric-WhKQ6XTQaPysTnJN9+BGXg@public.gmane.org>, netdev <netdev-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	MTD Maling List <linux-mtd-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>,
+	Linux I2C <linux-i2c-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	linux1394-devel-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org, Christoph Hellwig <hch-jcswGhMUV9g@public.gmane.org>,
+	Stefan Wahren <stefan.wahren-eS4NqCHxEME@public.gmane.org>,
+	Boris Brezillon <boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>,
+	Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+	Richard Weinberger <richard-/L3Ra7n9ekc@public.gmane.org>, Jassi Brar <jassisinghbrar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	Marek Vasut <marek.vasut-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	"open list:SERIAL DRIVERS" <linux-serial-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Matias Bjorling <mb@light
+To: Mauro Carvalho Chehab <mchehab+samsung-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+In-Reply-To: <20180505094743.4d201ba0-ch4gOOMV7nf/PtFMR13I2A@public.gmane.org>
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-In do_chtls_setsockopt(), the tls crypto info is first copied from the
-poiner 'optval' in userspace and saved to 'tmp_crypto_info'. Then the
-'version' of the crypto info is checked. If the version is not as expected,
-i.e., TLS_1_2_VERSION, error code -ENOTSUPP is returned to indicate that
-the provided crypto info is not supported yet. Then, the 'cipher_type'
-field of the 'tmp_crypto_info' is also checked to see if it is
-TLS_CIPHER_AES_GCM_128. If it is, the whole struct of
-tls12_crypto_info_aes_gcm_128 is copied from the pointer 'optval' and then
-the function chtls_setkey() is invoked to set the key.
+Hi Mauro,
 
-Given that the 'optval' pointer resides in userspace, a malicious userspace
-process can race to change the data pointed by 'optval' between the two
-copies. For example, a user can provide a crypto info with TLS_1_2_VERSION
-and TLS_CIPHER_AES_GCM_128. After the first copy, the user can modify the
-'version' and the 'cipher_type' fields to any versions and/or cipher types
-that are not allowed. This way, the user can bypass the checks, inject
-bad data to the kernel, cause chtls_setkey() to set a wrong key or other
-issues.
+On Sat, May 5, 2018 at 2:47 PM, Mauro Carvalho Chehab
+<mchehab+samsung-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org> wrote:
+> Em Tue, 17 Apr 2018 19:49:12 +0200
+> Geert Uytterhoeven <geert-Td1EMuHUCqxL1ZNQvxDV9g@public.gmane.org> escreveu:
+>
+>> Remove dependencies on HAS_DMA where a Kconfig symbol depends on another
+>> symbol that implies HAS_DMA, and, optionally, on "|| COMPILE_TEST".
+>
+> Applying a patch like that is hard, as there are lots of churn at
+> the code. That's against latest media upstream:
 
-This patch reuses the data copied in the first try so as to ensure these
-checks will not be bypassed.
+[...]
 
-Signed-off-by: Wenwen Wang <wang6495@umn.edu>
----
- drivers/crypto/chelsio/chtls/chtls_main.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+I can rebase. What's your preferred target? media-next?
 
-diff --git a/drivers/crypto/chelsio/chtls/chtls_main.c b/drivers/crypto/chelsio/chtls/chtls_main.c
-index 007c45c..859958a 100644
---- a/drivers/crypto/chelsio/chtls/chtls_main.c
-+++ b/drivers/crypto/chelsio/chtls/chtls_main.c
-@@ -491,9 +491,13 @@ static int do_chtls_setsockopt(struct sock *sk, int optname,
- 
- 	switch (tmp_crypto_info.cipher_type) {
- 	case TLS_CIPHER_AES_GCM_128: {
--		rc = copy_from_user(crypto_info, optval,
--				    sizeof(struct
--					   tls12_crypto_info_aes_gcm_128));
-+		/* Obtain version and type from previous copy */
-+		crypto_info[0] = tmp_crypto_info;
-+		/* Now copy the following data */
-+		rc = copy_from_user(crypto_info + sizeof(*crypto_info),
-+				optval + sizeof(*crypto_info),
-+				sizeof(struct tls12_crypto_info_aes_gcm_128)
-+				- sizeof(*crypto_info));
- 
- 		if (rc) {
- 			rc = -EFAULT;
+>> In most cases this other symbol is an architecture or platform specific
+>> symbol, or PCI.
+>>
+>> Generic symbols and drivers without platform dependencies keep their
+>> dependencies on HAS_DMA, to prevent compiling subsystems or drivers that
+>> cannot work anyway.
+>
+> Actually, depends on HAS_DMA was introduced on media because builds
+> were failing otherwise. We started adding it before the addition
+> of COMPILE_TEST.
+
+Indeed. Before the 5 commits below, a missing dependency on HAS_DMA
+would cause the build to fail for NO_DMA platforms.
+
+    f29ab49b5388b2f8 dma-mapping: Convert NO_DMA get_dma_ops() into a real dummy
+    ab642e952f80c66c dma-coherent: Add NO_DMA dummies for managed DMA API
+    c1ce6c2beea38171 mm: Add NO_DMA dummies for DMA pool API
+    bff739b6559e2fce scsi: Add NO_DMA dummies for SCSI DMA mapping API
+    1f674e16f9ce6eb2 usb: gadget: Add NO_DMA dummies for DMA mapping API
+
+> Can we just remove all HAS_DMA Kconfig dependencies as a hole from the
+> entire media subsystem, with something like:
+>
+>         $ for i in $(find drivers/media -name Kconfig) $(find drivers/staging/media -name Kconfig); do sed '/depends on HAS_DMA/d;s/ && HAS_DMA//g' -i $i; done
+>
+> Or would it cause build issues?
+
+It should not cause build issues, but it would enable lots of drivers that
+need DMA platform support on platforms where they wouldn't work, making the
+life of distro configurators harder.
+
+That's why my series removes HAS_DMA only for symbols that have a platform
+dependency.
+
+Thanks!
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
 -- 
-2.7.4
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert-Td1EMuHUCqxL1ZNQvxDV9g@public.gmane.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
