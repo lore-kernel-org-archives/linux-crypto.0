@@ -1,14 +1,19 @@
 From: Logan Gunthorpe <logang@deltatee.com>
-Subject: [PATCH v17 7/7] ntb: ntb_hw_switchtec: Cleanup 64bit IO defines to use the common header
-Date: Mon,  7 May 2018 14:36:05 -0600
-Message-ID: <20180507203605.15865-8-logang@deltatee.com>
+Subject: [PATCH v17 6/7] crypto: caam: cleanup CONFIG_64BIT ifdefs when using io{read|write}64
+Date: Mon,  7 May 2018 14:36:04 -0600
+Message-ID: <20180507203605.15865-7-logang@deltatee.com>
 References: <20180507203605.15865-1-logang@deltatee.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Cc: Arnd Bergmann <arnd@arndb.de>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Andy Shevchenko <andy.shevchenko@gmail.com>,
         =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
         Logan Gunthorpe <logang@deltatee.com>,
-        Jon Mason <jdmason@kudzu.us>
+        Dan Douglass <dan.douglass@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
 To: linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
         linux-ntb@googlegroups.com, linux-crypto@vger.kernel.org,
         Andrew Morton <akpm@linux-foundation.org>
@@ -17,75 +22,87 @@ In-Reply-To: <20180507203605.15865-1-logang@deltatee.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Clean up the ifdefs which conditionally defined the io{read|write}64
-functions in favour of the new common io-64-nonatomic-lo-hi header.
+Clean up the extra ifdefs which defined the wr_reg64 and rd_reg64
+functions in non-64bit cases in favour of the new common
+io-64-nonatomic-lo-hi header.
 
-Per a nit from Andy Shevchenko, the include list is also made
-alphabetical.
+To be consistent with CAAM engine HW spec: in case of 64-bit registers,
+irrespective of device endianness, the lower address should be read from
+/ written to first, followed by the upper address. Indeed the I/O
+accessors in CAAM driver currently don't follow the spec, however this
+is a good opportunity to fix the code.
 
 Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+Reviewed-by: Horia Geantă <horia.geanta@nxp.com>
 Reviewed-by: Andy Shevchenko <andy.shevchenko@gmail.com>
-Cc: Jon Mason <jdmason@kudzu.us>
+Cc: Dan Douglass <dan.douglass@nxp.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>
 ---
- drivers/ntb/hw/mscc/ntb_hw_switchtec.c | 36 ++++------------------------------
- 1 file changed, 4 insertions(+), 32 deletions(-)
+ drivers/crypto/caam/regs.h | 30 +++---------------------------
+ 1 file changed, 3 insertions(+), 27 deletions(-)
 
-diff --git a/drivers/ntb/hw/mscc/ntb_hw_switchtec.c b/drivers/ntb/hw/mscc/ntb_hw_switchtec.c
-index f624ae27eabe..f403da24b833 100644
---- a/drivers/ntb/hw/mscc/ntb_hw_switchtec.c
-+++ b/drivers/ntb/hw/mscc/ntb_hw_switchtec.c
-@@ -13,12 +13,13 @@
-  *
-  */
+diff --git a/drivers/crypto/caam/regs.h b/drivers/crypto/caam/regs.h
+index fee363865d88..f887b371040f 100644
+--- a/drivers/crypto/caam/regs.h
++++ b/drivers/crypto/caam/regs.h
+@@ -10,7 +10,7 @@
  
--#include <linux/switchtec.h>
--#include <linux/module.h>
-+#include <linux/interrupt.h>
+ #include <linux/types.h>
+ #include <linux/bitops.h>
+-#include <linux/io.h>
 +#include <linux/io-64-nonatomic-lo-hi.h>
- #include <linux/delay.h>
- #include <linux/kthread.h>
--#include <linux/interrupt.h>
-+#include <linux/module.h>
- #include <linux/ntb.h>
-+#include <linux/switchtec.h>
  
- MODULE_DESCRIPTION("Microsemi Switchtec(tm) NTB Driver");
- MODULE_VERSION("0.1");
-@@ -35,35 +36,6 @@ module_param(use_lut_mws, bool, 0644);
- MODULE_PARM_DESC(use_lut_mws,
- 		 "Enable the use of the LUT based memory windows");
+ /*
+  * Architecture-specific register access methods
+@@ -136,10 +136,9 @@ static inline void clrsetbits_32(void __iomem *reg, u32 clear, u32 set)
+  *    base + 0x0000 : least-significant 32 bits
+  *    base + 0x0004 : most-significant 32 bits
+  */
+-#ifdef CONFIG_64BIT
+ static inline void wr_reg64(void __iomem *reg, u64 data)
+ {
+-	if (caam_little_end)
++	if (!caam_imx && caam_little_end)
+ 		iowrite64(data, reg);
+ 	else
+ 		iowrite64be(data, reg);
+@@ -147,35 +146,12 @@ static inline void wr_reg64(void __iomem *reg, u64 data)
  
--#ifndef ioread64
--#ifdef readq
--#define ioread64 readq
--#else
--#define ioread64 _ioread64
--static inline u64 _ioread64(void __iomem *mmio)
+ static inline u64 rd_reg64(void __iomem *reg)
+ {
+-	if (caam_little_end)
++	if (!caam_imx && caam_little_end)
+ 		return ioread64(reg);
+ 	else
+ 		return ioread64be(reg);
+ }
+ 
+-#else /* CONFIG_64BIT */
+-static inline void wr_reg64(void __iomem *reg, u64 data)
 -{
--	u64 low, high;
--
--	low = ioread32(mmio);
--	high = ioread32(mmio + sizeof(u32));
--	return low | (high << 32);
+-	if (!caam_imx && caam_little_end) {
+-		wr_reg32((u32 __iomem *)(reg) + 1, data >> 32);
+-		wr_reg32((u32 __iomem *)(reg), data);
+-	} else {
+-		wr_reg32((u32 __iomem *)(reg), data >> 32);
+-		wr_reg32((u32 __iomem *)(reg) + 1, data);
+-	}
 -}
--#endif
--#endif
 -
--#ifndef iowrite64
--#ifdef writeq
--#define iowrite64 writeq
--#else
--#define iowrite64 _iowrite64
--static inline void _iowrite64(u64 val, void __iomem *mmio)
+-static inline u64 rd_reg64(void __iomem *reg)
 -{
--	iowrite32(val, mmio);
--	iowrite32(val >> 32, mmio + sizeof(u32));
--}
--#endif
--#endif
+-	if (!caam_imx && caam_little_end)
+-		return ((u64)rd_reg32((u32 __iomem *)(reg) + 1) << 32 |
+-			(u64)rd_reg32((u32 __iomem *)(reg)));
 -
- #define SWITCHTEC_NTB_MAGIC 0x45CC0001
- #define MAX_MWS     128
- 
+-	return ((u64)rd_reg32((u32 __iomem *)(reg)) << 32 |
+-		(u64)rd_reg32((u32 __iomem *)(reg) + 1));
+-}
+-#endif /* CONFIG_64BIT  */
+-
+ static inline u64 cpu_to_caam_dma64(dma_addr_t value)
+ {
+ 	if (caam_imx)
 -- 
 2.11.0
