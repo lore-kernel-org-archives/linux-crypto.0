@@ -1,50 +1,166 @@
-From: Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
-Subject: [PATCH v2 03/11] docs: crypto_engine.rst: Fix two parse warnings
-Date: Wed,  9 May 2018 10:18:46 -0300
-Message-ID: <46ee2dca402578bb628dc8b8dac873b34451e0d1.1525870886.git.mchehab+samsung@kernel.org>
-References: <cover.1525870886.git.mchehab+samsung@kernel.org>
-Cc: Mauro Carvalho Chehab <mchehab+samsung@kernel.org>,
-        Mauro Carvalho Chehab <mchehab@infradead.org>,
-        linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
+From: Janakarajan Natarajan <Janakarajan.Natarajan@amd.com>
+Subject: [PATCH RESEND 2/2] Add GET_ID SEV command
+Date: Wed,  9 May 2018 11:18:28 -0500
+Message-ID: <8a10f3890c47d60a998aec2513fee6ad0c27dff5.1525881878.git.Janakarajan.Natarajan@amd.com>
+References: <8adf44db473ccda6ca626ecdaa058d524af189b7.1525881878.git.Janakarajan.Natarajan@amd.com>
+Mime-Version: 1.0
+Content-Type: text/plain
+Cc: Tom Lendacky <thomas.lendacky@amd.com>,
+        Gary Hook <gary.hook@amd.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org
-To: Linux Doc Mailing List <linux-doc@vger.kernel.org>
+        "David S . Miller" <davem@davemloft.net>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Borislav Petkov <bp@suse.de>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Janakarajan Natarajan <Janakarajan.Natarajan@amd.com>
+To: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <cover.1525870886.git.mchehab+samsung@kernel.org>
-In-Reply-To: <cover.1525870886.git.mchehab+samsung@kernel.org>
-References: <cover.1525870886.git.mchehab+samsung@kernel.org>
+In-Reply-To: <8adf44db473ccda6ca626ecdaa058d524af189b7.1525881878.git.Janakarajan.Natarajan@amd.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-./Documentation/crypto/crypto_engine.rst:13: WARNING: Unexpected indentation.
-./Documentation/crypto/crypto_engine.rst:15: WARNING: Block quote ends without a blank line; unexpected unindent.
+The GET_ID command, added as of SEV API v0.16, allows the SEV firmware
+to be queried about a unique CPU ID. This unique ID can then be used
+to obtain the public certificate containing the Chip Endorsement Key
+(CEK) public key signed by the AMD SEV Signing Key (ASK).
 
-Signed-off-by: Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
+For more information please refer to "Section 5.12 GET_ID" of
+https://support.amd.com/TechDocs/55766_SEV-KM%20API_Specification.pdf
+
+Signed-off-by: Janakarajan Natarajan <Janakarajan.Natarajan@amd.com>
 ---
- Documentation/crypto/crypto_engine.rst | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+ drivers/crypto/ccp/psp-dev.c | 44 ++++++++++++++++++++++++++++++++++++++++++++
+ include/linux/psp-sev.h      | 11 +++++++++++
+ include/uapi/linux/psp-sev.h | 12 ++++++++++++
+ 3 files changed, 67 insertions(+)
 
-diff --git a/Documentation/crypto/crypto_engine.rst b/Documentation/crypto/crypto_engine.rst
-index 8272ac92a14f..1d56221dfe35 100644
---- a/Documentation/crypto/crypto_engine.rst
-+++ b/Documentation/crypto/crypto_engine.rst
-@@ -8,11 +8,13 @@ The crypto engine API (CE), is a crypto queue manager.
+diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
+index 1c78a2e..d33a763 100644
+--- a/drivers/crypto/ccp/psp-dev.c
++++ b/drivers/crypto/ccp/psp-dev.c
+@@ -119,6 +119,7 @@ static int sev_cmd_buffer_len(int cmd)
+ 	case SEV_CMD_RECEIVE_UPDATE_VMSA:	return sizeof(struct sev_data_receive_update_vmsa);
+ 	case SEV_CMD_LAUNCH_UPDATE_SECRET:	return sizeof(struct sev_data_launch_secret);
+ 	case SEV_CMD_DOWNLOAD_FIRMWARE:		return sizeof(struct sev_data_download_firmware);
++	case SEV_CMD_GET_ID:			return sizeof(struct sev_data_get_id);
+ 	default:				return 0;
+ 	}
  
- Requirement
- -----------
--You have to put at start of your tfm_ctx the struct crypto_engine_ctx
--struct your_tfm_ctx {
-+You have to put at start of your tfm_ctx the struct crypto_engine_ctx::
+@@ -508,6 +509,46 @@ static int sev_ioctl_do_pek_import(struct sev_issue_cmd *argp)
+ 	return ret;
+ }
+ 
++static int sev_ioctl_do_get_id(struct sev_issue_cmd *argp)
++{
++	struct sev_data_get_id *data;
++	u64 data_size, user_size;
++	void *id_blob, *mem;
++	int ret;
 +
-+  struct your_tfm_ctx {
-         struct crypto_engine_ctx enginectx;
-         ...
--};
-+  };
++	/* SEV GET_ID available from SEV API v0.16 and up */
++	if (!SEV_VERSION_CHECK(0, 16))
++		return -ENOTSUPP;
 +
- Why: Since CE manage only crypto_async_request, it cannot know the underlying
- request_type and so have access only on the TFM.
- So using container_of for accessing __ctx is impossible.
++	/* SEV FW expects the buffer it fills with the ID to be
++	 * 8-byte aligned. Memory allocated should be enough to
++	 * hold data structure + alignment padding + memory
++	 * where SEV FW writes the ID.
++	 */
++	data_size = ALIGN(sizeof(struct sev_data_get_id), 8);
++	user_size = sizeof(struct sev_user_data_get_id);
++
++	mem = kzalloc(data_size + user_size, GFP_KERNEL);
++	if (!mem)
++		return -ENOMEM;
++
++	data = mem;
++	id_blob = mem + data_size;
++
++	data->address = __psp_pa(id_blob);
++	data->len = user_size;
++
++	ret = __sev_do_cmd_locked(SEV_CMD_GET_ID, data, &argp->error);
++	if (!ret) {
++		if (copy_to_user((void __user *)argp->data, id_blob, data->len))
++			ret = -EFAULT;
++	}
++
++	kfree(mem);
++
++	return ret;
++}
++
+ static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp)
+ {
+ 	struct sev_user_data_pdh_cert_export input;
+@@ -645,6 +686,9 @@ static long sev_ioctl(struct file *file, unsigned int ioctl, unsigned long arg)
+ 	case SEV_PDH_CERT_EXPORT:
+ 		ret = sev_ioctl_do_pdh_export(&input);
+ 		break;
++	case SEV_GET_ID:
++		ret = sev_ioctl_do_get_id(&input);
++		break;
+ 	default:
+ 		ret = -EINVAL;
+ 		goto out;
+diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
+index 1d24962..827c601 100644
+--- a/include/linux/psp-sev.h
++++ b/include/linux/psp-sev.h
+@@ -55,6 +55,7 @@ enum sev_cmd {
+ 	SEV_CMD_PDH_GEN			= 0x009,
+ 	SEV_CMD_DF_FLUSH		= 0x00A,
+ 	SEV_CMD_DOWNLOAD_FIRMWARE	= 0x00B,
++	SEV_CMD_GET_ID			= 0x00C,
+ 
+ 	/* Guest commands */
+ 	SEV_CMD_DECOMMISSION		= 0x020,
+@@ -142,6 +143,16 @@ struct sev_data_download_firmware {
+ } __packed;
+ 
+ /**
++ * struct sev_data_get_id - GET_ID command parameters
++ *
++ * @address: physical address of region to place unique CPU ID(s)
++ * @len: len of the region
++ */
++struct sev_data_get_id {
++	u64 address;				/* In */
++	u32 len;				/* In/Out */
++} __packed;
++/**
+  * struct sev_data_pdh_cert_export - PDH_CERT_EXPORT command parameters
+  *
+  * @pdh_address: PDH certificate address
+diff --git a/include/uapi/linux/psp-sev.h b/include/uapi/linux/psp-sev.h
+index 9008f31..ac8c60b 100644
+--- a/include/uapi/linux/psp-sev.h
++++ b/include/uapi/linux/psp-sev.h
+@@ -30,6 +30,7 @@ enum {
+ 	SEV_PDH_GEN,
+ 	SEV_PDH_CERT_EXPORT,
+ 	SEV_PEK_CERT_IMPORT,
++	SEV_GET_ID,
+ 
+ 	SEV_MAX,
+ };
+@@ -124,6 +125,17 @@ struct sev_user_data_pdh_cert_export {
+ } __packed;
+ 
+ /**
++ * struct sev_user_data_get_id - GET_ID command parameters
++ *
++ * @socket1: Buffer to pass unique ID of first socket
++ * @socket2: Buffer to pass unique ID of second socket
++ */
++struct sev_user_data_get_id {
++	__u8 socket1[64];			/* Out */
++	__u8 socket2[64];			/* Out */
++} __packed;
++
++/**
+  * struct sev_issue_cmd - SEV ioctl parameters
+  *
+  * @cmd: SEV commands to execute
 -- 
-2.17.0
+2.7.4
