@@ -1,113 +1,64 @@
-From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH] crypto: reorder paes test lexicographically
-Date: Fri, 11 May 2018 09:04:06 +0100
-Message-ID: <1526025847-13134-1-git-send-email-gilad@benyossef.com>
-Cc: Ofir Drang <ofir.drang@arm.com>,
-        linux-next <linux-next@vger.kernel.org>,
-        Stephen Rothwell <sfr@canb.auug.org.au>,
-        sachinp <sachinp@linux.vnet.ibm.com>,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Abdul Haleem <abdhalee@linux.vnet.ibm.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH resend 00/10] crypto: arm64 - play nice with CONFIG_PREEMPT
+Date: Sat, 12 May 2018 00:18:34 +0800
+Message-ID: <20180511161833.57h7lwc4krl5cwuo@gondor.apana.org.au>
+References: <20180430161830.14892-1-ard.biesheuvel@linaro.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: will.deacon@arm.com, linux-crypto@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, dave.martin@arm.com
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Disposition: inline
+In-Reply-To: <20180430161830.14892-1-ard.biesheuvel@linaro.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-Due to a snafu "paes" testmgr tests were not ordered
-lexicographically, which led to boot time warnings.
-Reorder the tests as needed.
+On Mon, Apr 30, 2018 at 06:18:20PM +0200, Ard Biesheuvel wrote:
+> Hello Herbert,
+> 
+> These are the patches that depend on the arm64/assembler.h patches that
+> inadvertently got pulled into the cryptodev tree and reverted shortly
+> after. Those have now been merged into Linus's tree, and so the
+> remaining changes can be applied as well. Please apply.
+> 
+> Ard Biesheuvel (10):
+>   crypto: arm64/sha1-ce - yield NEON after every block of input
+>   crypto: arm64/sha2-ce - yield NEON after every block of input
+>   crypto: arm64/aes-ccm - yield NEON after every block of input
+>   crypto: arm64/aes-blk - yield NEON after every block of input
+>   crypto: arm64/aes-bs - yield NEON after every block of input
+>   crypto: arm64/aes-ghash - yield NEON after every block of input
+>   crypto: arm64/crc32-ce - yield NEON after every block of input
+>   crypto: arm64/crct10dif-ce - yield NEON after every block of input
+>   crypto: arm64/sha3-ce - yield NEON after every block of input
+>   crypto: arm64/sha512-ce - yield NEON after every block of input
+> 
+>  arch/arm64/crypto/aes-ce-ccm-core.S   | 150 +++++----
+>  arch/arm64/crypto/aes-ce.S            |  15 +-
+>  arch/arm64/crypto/aes-modes.S         | 331 ++++++++++++--------
+>  arch/arm64/crypto/aes-neonbs-core.S   | 305 ++++++++++--------
+>  arch/arm64/crypto/crc32-ce-core.S     |  40 ++-
+>  arch/arm64/crypto/crct10dif-ce-core.S |  32 +-
+>  arch/arm64/crypto/ghash-ce-core.S     | 113 +++++--
+>  arch/arm64/crypto/ghash-ce-glue.c     |  28 +-
+>  arch/arm64/crypto/sha1-ce-core.S      |  42 ++-
+>  arch/arm64/crypto/sha2-ce-core.S      |  37 ++-
+>  arch/arm64/crypto/sha3-ce-core.S      |  77 +++--
+>  arch/arm64/crypto/sha512-ce-core.S    |  27 +-
+>  12 files changed, 762 insertions(+), 435 deletions(-)
 
-Fixes: a794d8d ("crypto: ccree - enable support for hardware keys")
-Reported-by: Abdul Haleem <abdhalee@linux.vnet.ibm.com>
-Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
----
- crypto/testmgr.c | 44 ++++++++++++++++++++++----------------------
- 1 file changed, 22 insertions(+), 22 deletions(-)
-
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index c31da0f..b1b8ebb 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -3012,13 +3012,6 @@ static const struct alg_test_desc alg_test_descs[] = {
- 			}
- 		}
- 	}, {
--		/* Same as ecb(aes) except the key is stored in
--		 * hardware secure memory which we reference by index
--		 */
--		.alg = "ecb(paes)",
--		.test = alg_test_null,
--		.fips_allowed = 1,
--	}, {
- 		.alg = "ecb(khazad)",
- 		.test = alg_test_skcipher,
- 		.suite = {
-@@ -3028,6 +3021,13 @@ static const struct alg_test_desc alg_test_descs[] = {
- 			}
- 		}
- 	}, {
-+		/* Same as ecb(aes) except the key is stored in
-+		 * hardware secure memory which we reference by index
-+		 */
-+		.alg = "ecb(paes)",
-+		.test = alg_test_null,
-+		.fips_allowed = 1,
-+	}, {
- 		.alg = "ecb(seed)",
- 		.test = alg_test_skcipher,
- 		.suite = {
-@@ -3610,21 +3610,6 @@ static const struct alg_test_desc alg_test_descs[] = {
- 			}
- 		}
- 	}, {
--		/* Same as xts(aes) except the key is stored in
--		 * hardware secure memory which we reference by index
--		 */
--		.alg = "xts(paes)",
--		.test = alg_test_null,
--		.fips_allowed = 1,
--	}, {
--		.alg = "xts4096(paes)",
--		.test = alg_test_null,
--		.fips_allowed = 1,
--	}, {
--		.alg = "xts512(paes)",
--		.test = alg_test_null,
--		.fips_allowed = 1,
--	}, {
- 		.alg = "xts(camellia)",
- 		.test = alg_test_skcipher,
- 		.suite = {
-@@ -3643,6 +3628,13 @@ static const struct alg_test_desc alg_test_descs[] = {
- 			}
- 		}
- 	}, {
-+		/* Same as xts(aes) except the key is stored in
-+		 * hardware secure memory which we reference by index
-+		 */
-+		.alg = "xts(paes)",
-+		.test = alg_test_null,
-+		.fips_allowed = 1,
-+	}, {
- 		.alg = "xts(serpent)",
- 		.test = alg_test_skcipher,
- 		.suite = {
-@@ -3679,6 +3671,14 @@ static const struct alg_test_desc alg_test_descs[] = {
- 			}
- 		}
- 	}, {
-+		.alg = "xts4096(paes)",
-+		.test = alg_test_null,
-+		.fips_allowed = 1,
-+	}, {
-+		.alg = "xts512(paes)",
-+		.test = alg_test_null,
-+		.fips_allowed = 1,
-+	}, {
- 		.alg = "zlib-deflate",
- 		.test = alg_test_comp,
- 		.fips_allowed = 1,
+All applied.  Thanks.
 -- 
-2.7.4
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
