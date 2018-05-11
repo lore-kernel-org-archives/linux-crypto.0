@@ -1,63 +1,70 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH resend 00/10] crypto: arm64 - play nice with CONFIG_PREEMPT
-Date: Sat, 12 May 2018 00:18:34 +0800
-Message-ID: <20180511161833.57h7lwc4krl5cwuo@gondor.apana.org.au>
-References: <20180430161830.14892-1-ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH 1/2] crypto: vmx - Remove overly verbose printk from AES
+ init routines
+Date: Sat, 12 May 2018 00:19:13 +0800
+Message-ID: <20180511161913.nr7woksn2jejipzm@gondor.apana.org.au>
+References: <20180503122930.17448-1-mpe@ellerman.id.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: will.deacon@arm.com, linux-crypto@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, dave.martin@arm.com
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, linuxppc-dev@ozlabs.org,
+        linux-kernel@vger.kernel.org, mhcerri@linux.vnet.ibm.com,
+        pfsmorigo@linux.vnet.ibm.com
+To: Michael Ellerman <mpe@ellerman.id.au>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20180430161830.14892-1-ard.biesheuvel@linaro.org>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+In-Reply-To: <20180503122930.17448-1-mpe@ellerman.id.au>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Apr 30, 2018 at 06:18:20PM +0200, Ard Biesheuvel wrote:
-> Hello Herbert,
+On Thu, May 03, 2018 at 10:29:29PM +1000, Michael Ellerman wrote:
+> In the vmx AES init routines we do a printk(KERN_INFO ...) to report
+> the fallback implementation we're using.
 > 
-> These are the patches that depend on the arm64/assembler.h patches that
-> inadvertently got pulled into the cryptodev tree and reverted shortly
-> after. Those have now been merged into Linus's tree, and so the
-> remaining changes can be applied as well. Please apply.
+> However with a slow console this can significantly affect the speed of
+> crypto operations. Using 'cryptsetup benchmark' the removal of the
+> printk() leads to a ~5x speedup for aes-cbc decryption.
 > 
-> Ard Biesheuvel (10):
->   crypto: arm64/sha1-ce - yield NEON after every block of input
->   crypto: arm64/sha2-ce - yield NEON after every block of input
->   crypto: arm64/aes-ccm - yield NEON after every block of input
->   crypto: arm64/aes-blk - yield NEON after every block of input
->   crypto: arm64/aes-bs - yield NEON after every block of input
->   crypto: arm64/aes-ghash - yield NEON after every block of input
->   crypto: arm64/crc32-ce - yield NEON after every block of input
->   crypto: arm64/crct10dif-ce - yield NEON after every block of input
->   crypto: arm64/sha3-ce - yield NEON after every block of input
->   crypto: arm64/sha512-ce - yield NEON after every block of input
+> So remove them.
 > 
->  arch/arm64/crypto/aes-ce-ccm-core.S   | 150 +++++----
->  arch/arm64/crypto/aes-ce.S            |  15 +-
->  arch/arm64/crypto/aes-modes.S         | 331 ++++++++++++--------
->  arch/arm64/crypto/aes-neonbs-core.S   | 305 ++++++++++--------
->  arch/arm64/crypto/crc32-ce-core.S     |  40 ++-
->  arch/arm64/crypto/crct10dif-ce-core.S |  32 +-
->  arch/arm64/crypto/ghash-ce-core.S     | 113 +++++--
->  arch/arm64/crypto/ghash-ce-glue.c     |  28 +-
->  arch/arm64/crypto/sha1-ce-core.S      |  42 ++-
->  arch/arm64/crypto/sha2-ce-core.S      |  37 ++-
->  arch/arm64/crypto/sha3-ce-core.S      |  77 +++--
->  arch/arm64/crypto/sha512-ce-core.S    |  27 +-
->  12 files changed, 762 insertions(+), 435 deletions(-)
+> Fixes: 8676590a1593 ("crypto: vmx - Adding AES routines for VMX module")
+> Fixes: 8c755ace357c ("crypto: vmx - Adding CBC routines for VMX module")
+> Fixes: 4f7f60d312b3 ("crypto: vmx - Adding CTR routines for VMX module")
+> Fixes: cc333cd68dfa ("crypto: vmx - Adding GHASH routines for VMX module")
+> Cc: stable@vger.kernel.org # v4.1+
+> Signed-off-by: Michael Ellerman <mpe@ellerman.id.au>
+> ---
+>  drivers/crypto/vmx/aes.c     | 2 --
+>  drivers/crypto/vmx/aes_cbc.c | 3 ---
+>  drivers/crypto/vmx/aes_ctr.c | 2 --
+>  drivers/crypto/vmx/ghash.c   | 2 --
+>  4 files changed, 9 deletions(-)
 
-All applied.  Thanks.
+Patch applied.  Thanks.
+
+> If this is the wrong fix please let me know, I'm not a crypto expert.
+> 
+> What we see is 'cryptsetup benchmark' causing thousands of these printks() to
+> happen. The call trace is something like:
+> 
+> [c000001e47867a60] [c0000000009cf6b4] p8_aes_cbc_init+0x74/0xf0
+> [c000001e47867ae0] [c000000000551a80] __crypto_alloc_tfm+0x1d0/0x2c0
+> [c000001e47867b20] [c00000000055aea4] crypto_skcipher_init_tfm+0x124/0x280
+> [c000001e47867b60] [c00000000055138c] crypto_create_tfm+0x9c/0x1a0
+> [c000001e47867ba0] [c000000000552220] crypto_alloc_tfm+0xa0/0x140
+> [c000001e47867c00] [c00000000055b168] crypto_alloc_skcipher+0x48/0x70
+> [c000001e47867c40] [c00000000057af28] skcipher_bind+0x38/0x50
+> [c000001e47867c80] [c00000000057a07c] alg_bind+0xbc/0x220
+> [c000001e47867d10] [c000000000a016a0] __sys_bind+0x90/0x100
+> [c000001e47867df0] [c000000000a01750] sys_bind+0x40/0x60
+> [c000001e47867e30] [c00000000000b320] system_call+0x58/0x6c
+> 
+> 
+> Is it normal for init to be called on every system call?
+
+This is the tfm init function, so yes it is called every time
+you allocate a tfm.
+
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
