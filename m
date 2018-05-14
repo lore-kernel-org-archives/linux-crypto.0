@@ -1,128 +1,107 @@
-From: Masami Hiramatsu <mhiramat@kernel.org>
-Subject: Re: [PATCH v2 09/11] docs: Fix some broken references
-Date: Mon, 14 May 2018 22:31:26 +0900
-Message-ID: <20180514223126.8d738475fbb53fba9ff199d9@kernel.org>
-References: <cover.1525870886.git.mchehab+samsung@kernel.org>
- <e959f23d6f6905ee606fadfda13e2bb37deed017.1525870886.git.mchehab+samsung@kernel.org>
+From: Josh Poimboeuf <jpoimboe@redhat.com>
+Subject: Re: WARNING: kernel stack regs has bad 'bp' value (3)
+Date: Mon, 14 May 2018 08:47:15 -0500
+Message-ID: <20180514134715.vz656l5qp3z7zwsy@treble>
+References: <001a11449aa2faf11805643af581@google.com>
+ <CACT4Y+YOmbZGdBbFpmjRJXABGe1tD=F+3na77DwoPCEaROADyw@mail.gmail.com>
+ <20180202221829.tdiji2332t7orcxj@gmail.com>
+ <CACT4Y+afpDQ7A3caRmskML06h8Q6+NkVAn6HtV93ExPec-g2pA@mail.gmail.com>
+ <CAKv+Gu_Lh1TroS4BJJp4PQNYbqZ8KR=6Z5hHX2+UiBfxC=sxQA@mail.gmail.com>
+ <CACT4Y+awLWP3o0opx5CbAYpD4HpwVpQhPA-dDHmxAzJMs8_orQ@mail.gmail.com>
+ <CAKv+Gu_Kigt9ouktBjFacFHbburot2i=-_m88-o4-XhtmhozVA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
- Will Deacon <will.deacon@arm.com>, dri-devel@lists.freedesktop.org,
- Jaroslav Kysela <perex@perex.cz>, Eric Paris <eparis@parisplace.org>,
- linux-clk@vger.kernel.org, James Morris <jmorris@namei.org>,
- Alan Stern <stern@rowland.harvard.edu>, xen-devel@lists.xenproject.org,
- Boqun Feng <boqun.feng@gmail.com>, Nicholas Piggin <npiggin@gmail.com>,
- Thomas Gleixner <tglx@linutronix.de>, Antoine Jacquet <royale@zerezo.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>, linux-usb@vger.kernel.org,
- linux-kernel@vger.kernel.org, Li Zefan <lizefan@huawei.com>,
- linux-crypto@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>,
- alsa-devel@alsa-project.org,
- Linux Doc Mailing List <linux-doc@vger.kernel.org>,
- David Airlie <airlied@linux.ie>, Max Filippov <jcmvbkbc@gmail.com>,
- Harry Wei <harryxiyou@gmail.com>, selinux@tycho.nsa.gov,
- Paul Moore
-To: Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
-Return-path: <dri-devel-bounces@lists.freedesktop.org>
-In-Reply-To: <e959f23d6f6905ee606fadfda13e2bb37deed017.1525870886.git.mchehab+samsung@kernel.org>
-List-Unsubscribe: <https://lists.freedesktop.org/mailman/options/dri-devel>,
- <mailto:dri-devel-request@lists.freedesktop.org?subject=unsubscribe>
-List-Archive: <https://lists.freedesktop.org/archives/dri-devel>
-List-Post: <mailto:dri-devel@lists.freedesktop.org>
-List-Help: <mailto:dri-devel-request@lists.freedesktop.org?subject=help>
-List-Subscribe: <https://lists.freedesktop.org/mailman/listinfo/dri-devel>,
- <mailto:dri-devel-request@lists.freedesktop.org?subject=subscribe>
-Errors-To: dri-devel-bounces@lists.freedesktop.org
-Sender: "dri-devel" <dri-devel-bounces@lists.freedesktop.org>
+Content-Type: text/plain; charset=utf-8
+Cc: Dmitry Vyukov <dvyukov@google.com>, Arnd Bergmann <arnd@arndb.de>,
+        Eric Biggers <ebiggers3@gmail.com>,
+        syzbot <syzbot+ffa3a158337bbc01ff09@syzkaller.appspotmail.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        David Miller <davem@davemloft.net>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        syzkaller-bugs <syzkaller-bugs@googlegroups.com>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <CAKv+Gu_Kigt9ouktBjFacFHbburot2i=-_m88-o4-XhtmhozVA@mail.gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-T24gV2VkLCAgOSBNYXkgMjAxOCAxMDoxODo1MiAtMDMwMApNYXVybyBDYXJ2YWxobyBDaGVoYWIg
-PG1jaGVoYWIrc2Ftc3VuZ0BrZXJuZWwub3JnPiB3cm90ZToKCj4gQXMgd2UgbW92ZSBzdHVmZiBh
-cm91bmQsIHNvbWUgZG9jIHJlZmVyZW5jZXMgYXJlIGJyb2tlbi4gRml4IHNvbWUgb2YKPiB0aGVt
-IHZpYSB0aGlzIHNjcmlwdDoKPiAJLi9zY3JpcHRzL2RvY3VtZW50YXRpb24tZmlsZS1yZWYtY2hl
-Y2sgLS1maXgtcnN0Cj4gCj4gTWFudWFsbHkgY2hlY2tlZCBpZiB0aGUgcHJvZHVjZWQgcmVzdWx0
-IGlzIHZhbGlkLCByZW1vdmluZyBhIGZldwo+IGZhbHNlLXBvc2l0aXZlcy4KClRoZSBwYXJ0IG9m
-IGtwcm9iZXMgYW5kIHRyYWNlX2twcm9iZSBjaGFuZ2VzIGxvb2sgZ29vZCB0byBtZSA6KQoKQWNr
-ZWQtYnk6IE1hc2FtaSBIaXJhbWF0c3UgPG1oaXJhbWF0QGtlcm5lbC5vcmc+CgpUaGFuayB5b3Us
-Cgo+IAo+IFNpZ25lZC1vZmYtYnk6IE1hdXJvIENhcnZhbGhvIENoZWhhYiA8bWNoZWhhYitzYW1z
-dW5nQGtlcm5lbC5vcmc+Cj4gLS0tCj4gIC4uLi9hZG1pbi1ndWlkZS9rZXJuZWwtcGFyYW1ldGVy
-cy50eHQgICAgICAgICB8ICA0ICsrLS0KPiAgLi4uL2JpbmRpbmdzL2lucHV0L3JvdGFyeS1lbmNv
-ZGVyLnR4dCAgICAgICAgIHwgIDIgKy0KPiAgRG9jdW1lbnRhdGlvbi9kcml2ZXItYXBpL2dwaW8v
-Y29uc3VtZXIucnN0ICAgIHwgIDIgKy0KPiAgRG9jdW1lbnRhdGlvbi9rcHJvYmVzLnR4dCAgICAg
-ICAgICAgICAgICAgICAgIHwgIDQgKystLQo+ICBEb2N1bWVudGF0aW9uL3RyYWNlL2NvcmVzaWdo
-dC50eHQgICAgICAgICAgICAgfCAgMiArLQo+ICBEb2N1bWVudGF0aW9uL3RyYWNlL2V2ZW50cy5y
-c3QgICAgICAgICAgICAgICAgfCAgMiArLQo+ICBEb2N1bWVudGF0aW9uL3RyYWNlL2Z0cmFjZS11
-c2VzLnJzdCAgICAgICAgICAgfCAgMiArLQo+ICBEb2N1bWVudGF0aW9uL3RyYWNlL2hpc3RvZ3Jh
-bS50eHQgICAgICAgICAgICAgfCAgMiArLQo+ICBEb2N1bWVudGF0aW9uL3RyYWNlL2ludGVsX3Ro
-LnJzdCAgICAgICAgICAgICAgfCAgMiArLQo+ICBEb2N1bWVudGF0aW9uL3RyYWNlL3RyYWNlcG9p
-bnQtYW5hbHlzaXMucnN0ICAgfCAgNiArKystLS0KPiAgRG9jdW1lbnRhdGlvbi90cmFuc2xhdGlv
-bnMvamFfSlAvaG93dG8ucnN0ICAgIHwgIDQgKystLQo+ICAuLi4vdHJhbnNsYXRpb25zL3poX0NO
-L21hZ2ljLW51bWJlci50eHQgICAgICAgfCAgNCArKy0tCj4gIC4uLi96aF9DTi92aWRlbzRsaW51
-eC9vbWFwM2lzcC50eHQgICAgICAgICAgICB8ICA0ICsrLS0KPiAgTUFJTlRBSU5FUlMgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgMjAgKysrKysrKysrLS0tLS0tLS0tLQo+ICBh
-cmNoL0tjb25maWcgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgfCAgMiArLQo+ICBh
-cmNoL2FybS9pbmNsdWRlL2FzbS9jYWNoZWZsdXNoLmggICAgICAgICAgICAgfCAgMiArLQo+ICBh
-cmNoL2FybTY0L2luY2x1ZGUvYXNtL2NhY2hlZmx1c2guaCAgICAgICAgICAgfCAgMiArLQo+ICBh
-cmNoL21pY3JvYmxhemUvaW5jbHVkZS9hc20vY2FjaGVmbHVzaC5oICAgICAgfCAgMiArLQo+ICBh
-cmNoL3VtL0tjb25maWcudW0gICAgICAgICAgICAgICAgICAgICAgICAgICAgfCAgMiArLQo+ICBh
-cmNoL3VuaWNvcmUzMi9pbmNsdWRlL2FzbS9jYWNoZWZsdXNoLmggICAgICAgfCAgMiArLQo+ICBh
-cmNoL3g4Ni9lbnRyeS92c3lzY2FsbC92c3lzY2FsbF82NC5jICAgICAgICAgfCAgMiArLQo+ICBh
-cmNoL3h0ZW5zYS9pbmNsdWRlL2FzbS9jYWNoZWZsdXNoLmggICAgICAgICAgfCAgNCArKy0tCj4g
-IGJsb2NrL0tjb25maWcgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB8ICAyICstCj4g
-IGNlcnRzL0tjb25maWcgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB8ICAyICstCj4g
-IGNyeXB0by9hc3ltbWV0cmljX2tleXMvYXN5bW1ldHJpY190eXBlLmMgICAgICB8ICAyICstCj4g
-IGNyeXB0by9hc3ltbWV0cmljX2tleXMvc2lnbmF0dXJlLmMgICAgICAgICAgICB8ICAyICstCj4g
-IGRyaXZlcnMvY2hhci9LY29uZmlnICAgICAgICAgICAgICAgICAgICAgICAgICB8ICAyICstCj4g
-IGRyaXZlcnMvY2xrL2Nsay5jICAgICAgICAgICAgICAgICAgICAgICAgICAgICB8ICA0ICsrLS0K
-PiAgZHJpdmVycy9jbGsvaW5nZW5pYy9jZ3UuaCAgICAgICAgICAgICAgICAgICAgIHwgIDIgKy0K
-PiAgZHJpdmVycy9ncHUvdmdhL0tjb25maWcgICAgICAgICAgICAgICAgICAgICAgIHwgIDIgKy0K
-PiAgZHJpdmVycy9ncHUvdmdhL3ZnYWFyYi5jICAgICAgICAgICAgICAgICAgICAgIHwgIDIgKy0K
-PiAgZHJpdmVycy9pbnB1dC9qb3lzdGljay9LY29uZmlnICAgICAgICAgICAgICAgIHwgMTAgKysr
-KystLS0tLQo+ICBkcml2ZXJzL2lucHV0L2pveXN0aWNrL2lmb3JjZS9LY29uZmlnICAgICAgICAg
-fCAgMiArLQo+ICBkcml2ZXJzL2lucHV0L2pveXN0aWNrL3dhbGtlcmEwNzAxLmMgICAgICAgICAg
-fCAgMiArLQo+ICBkcml2ZXJzL2lucHV0L21pc2MvS2NvbmZpZyAgICAgICAgICAgICAgICAgICAg
-fCAgNCArKy0tCj4gIGRyaXZlcnMvaW5wdXQvbWlzYy9yb3RhcnlfZW5jb2Rlci5jICAgICAgICAg
-ICB8ICAyICstCj4gIGRyaXZlcnMvaW5wdXQvbW91c2UvS2NvbmZpZyAgICAgICAgICAgICAgICAg
-ICB8ICA2ICsrKy0tLQo+ICBkcml2ZXJzL2lucHV0L21vdXNlL2FscHMuYyAgICAgICAgICAgICAg
-ICAgICAgfCAgMiArLQo+ICBkcml2ZXJzL2lucHV0L3RvdWNoc2NyZWVuL3dtOTd4eC1jb3JlLmMg
-ICAgICAgfCAgMiArLQo+ICBkcml2ZXJzL2xpZ2h0bnZtL3BibGstcmIuYyAgICAgICAgICAgICAg
-ICAgICAgfCAgMiArLQo+ICBkcml2ZXJzL21kL2JjYWNoZS9LY29uZmlnICAgICAgICAgICAgICAg
-ICAgICAgfCAgMiArLQo+ICBkcml2ZXJzL21kL2JjYWNoZS9idHJlZS5jICAgICAgICAgICAgICAg
-ICAgICAgfCAgMiArLQo+ICBkcml2ZXJzL21kL2JjYWNoZS9leHRlbnRzLmMgICAgICAgICAgICAg
-ICAgICAgfCAgMiArLQo+ICBkcml2ZXJzL21lZGlhL2R2Yi1jb3JlL2R2Yl9yaW5nYnVmZmVyLmMg
-ICAgICAgfCAgMiArLQo+ICBkcml2ZXJzL21lZGlhL3BjaS9tZXllL0tjb25maWcgICAgICAgICAg
-ICAgICAgfCAgMiArLQo+ICBkcml2ZXJzL21lZGlhL3BsYXRmb3JtL3B4YV9jYW1lcmEuYyAgICAg
-ICAgICAgfCAgNCArKy0tCj4gIC4uLi9zb2NfY2FtZXJhL3NoX21vYmlsZV9jZXVfY2FtZXJhLmMg
-ICAgICAgICB8ICAyICstCj4gIGRyaXZlcnMvbWVkaWEvcmFkaW8vS2NvbmZpZyAgICAgICAgICAg
-ICAgICAgICB8ICAyICstCj4gIGRyaXZlcnMvbWVkaWEvcmFkaW8vc2k0NzB4L0tjb25maWcgICAg
-ICAgICAgICB8ICAyICstCj4gIGRyaXZlcnMvbWVkaWEvdXNiL2R2Yi11c2ItdjIvbG1lZG0wNC5j
-ICAgICAgICB8ICAyICstCj4gIGRyaXZlcnMvbWVkaWEvdXNiL3pyMzY0eHgvS2NvbmZpZyAgICAg
-ICAgICAgICB8ICAyICstCj4gIGRyaXZlcnMvcGFycG9ydC9LY29uZmlnICAgICAgICAgICAgICAg
-ICAgICAgICB8ICA2ICsrKy0tLQo+ICBkcml2ZXJzL3N0YWdpbmcvbWVkaWEvYmNtMjA0OC9UT0RP
-ICAgICAgICAgICAgfCAgMiArLQo+ICBpbmNsdWRlL2tleXMvYXN5bW1ldHJpYy1zdWJ0eXBlLmgg
-ICAgICAgICAgICAgfCAgMiArLQo+ICBpbmNsdWRlL2tleXMvYXN5bW1ldHJpYy10eXBlLmggICAg
-ICAgICAgICAgICAgfCAgMiArLQo+ICBpbmNsdWRlL2xpbnV4L2Fzc29jX2FycmF5LmggICAgICAg
-ICAgICAgICAgICAgfCAgMiArLQo+ICBpbmNsdWRlL2xpbnV4L2Fzc29jX2FycmF5X3ByaXYuaCAg
-ICAgICAgICAgICAgfCAgMiArLQo+ICBpbmNsdWRlL2xpbnV4L2NpcmNfYnVmLmggICAgICAgICAg
-ICAgICAgICAgICAgfCAgMiArLQo+ICBpbmNsdWRlL2xpbnV4L2Z0cmFjZS5oICAgICAgICAgICAg
-ICAgICAgICAgICAgfCAgMiArLQo+ICBpbmNsdWRlL2xpbnV4L3JjdWxpc3RfbnVsbHMuaCAgICAg
-ICAgICAgICAgICAgfCAgMiArLQo+ICBpbmNsdWRlL3VhcGkvbGludXgvcHJjdGwuaCAgICAgICAg
-ICAgICAgICAgICAgfCAgMiArLQo+ICBpbmNsdWRlL3hlbi9pbnRlcmZhY2UvaW8va2JkaWYuaCAg
-ICAgICAgICAgICAgfCAgMiArLQo+ICBrZXJuZWwvY2dyb3VwL2NwdXNldC5jICAgICAgICAgICAg
-ICAgICAgICAgICAgfCAgMiArLQo+ICBrZXJuZWwvdHJhY2UvS2NvbmZpZyAgICAgICAgICAgICAg
-ICAgICAgICAgICAgfCAxNiArKysrKysrLS0tLS0tLS0KPiAgbGliL0tjb25maWcgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDIgKy0KPiAgc2VjdXJpdHkvc2VsaW51eC9ob29r
-cy5jICAgICAgICAgICAgICAgICAgICAgIHwgIDIgKy0KPiAgc291bmQvY29yZS9LY29uZmlnICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDQgKystLQo+ICBzb3VuZC9kcml2ZXJzL0tjb25m
-aWcgICAgICAgICAgICAgICAgICAgICAgICAgfCAgNCArKy0tCj4gIHNvdW5kL3BjaS9LY29uZmln
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICB8IDEwICsrKysrLS0tLS0KPiAgdG9vbHMvaW5j
-bHVkZS91YXBpL2xpbnV4L3ByY3RsLmggICAgICAgICAgICAgIHwgIDIgKy0KPiAgdG9vbHMvbGli
-L2FwaS9mcy9mcy5jICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDIgKy0KPiAgdG9vbHMvbWVt
-b3J5LW1vZGVsL1JFQURNRSAgICAgICAgICAgICAgICAgICAgIHwgMTAgKysrKystLS0tLQo+ICB0
-b29scy9wZXJmL3V0aWwvYnBmLXByb2xvZ3VlLmMgICAgICAgICAgICAgICAgfCAgMiArLQo+ICAu
-Li4vY29uZmlnL2N1c3RvbS10aW1lbGluZS1mdW5jdGlvbnMuY2ZnICAgICAgfCAgNCArKy0tCj4g
-IDc0IGZpbGVzIGNoYW5nZWQsIDEyMCBpbnNlcnRpb25zKCspLCAxMjAgZGVsZXRpb25zKC0pCj4g
-CgoKLS0gCk1hc2FtaSBIaXJhbWF0c3UgPG1oaXJhbWF0QGtlcm5lbC5vcmc+Cl9fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmRyaS1kZXZlbCBtYWlsaW5nIGxp
-c3QKZHJpLWRldmVsQGxpc3RzLmZyZWVkZXNrdG9wLm9yZwpodHRwczovL2xpc3RzLmZyZWVkZXNr
-dG9wLm9yZy9tYWlsbWFuL2xpc3RpbmZvL2RyaS1kZXZlbAo=
+On Sat, May 12, 2018 at 12:11:17PM +0200, Ard Biesheuvel wrote:
+> On 12 May 2018 at 11:50, Dmitry Vyukov <dvyukov@google.com> wrote:
+> > On Sat, May 12, 2018 at 11:09 AM, Ard Biesheuvel
+> > <ard.biesheuvel@linaro.org> wrote:
+> >> (+ Arnd)
+> >>
+> >> On 12 May 2018 at 10:43, Dmitry Vyukov <dvyukov@google.com> wrote:
+> >>> On Fri, Feb 2, 2018 at 11:18 PM, Eric Biggers <ebiggers3@gmail.com> wrote:
+> >>>> On Fri, Feb 02, 2018 at 02:57:32PM +0100, Dmitry Vyukov wrote:
+> >>>>> On Fri, Feb 2, 2018 at 2:48 PM, syzbot
+> >>>>> <syzbot+ffa3a158337bbc01ff09@syzkaller.appspotmail.com> wrote:
+> >>>>> > Hello,
+> >>>>> >
+> >>>>> > syzbot hit the following crash on upstream commit
+> >>>>> > 7109a04eae81c41ed529da9f3c48c3655ccea741 (Thu Feb 1 17:37:30 2018 +0000)
+> >>>>> > Merge git://git.kernel.org/pub/scm/linux/kernel/git/davem/ide
+> >>>>> >
+> >>>>> > So far this crash happened 4 times on net-next, upstream.
+> >>>>> > C reproducer is attached.
+> >>>>> > syzkaller reproducer is attached.
+> >>>>> > Raw console output is attached.
+> >>>>> > compiler: gcc (GCC) 7.1.1 20170620
+> >>>>> > .config is attached.
+> >>>>>
+> >>>>>
+> >>>>> From suspicious frames I see salsa20_asm_crypt there, so +crypto maintainers.
+> >>>>>
+> >>>>
+> >>>> Looks like the x86 implementations of Salsa20 (both i586 and x86_64) need to be
+> >>>> updated to not use %ebp/%rbp.
+> >>>
+> >>> Ard,
+> >>>
+> >>> This was bisected as introduced by:
+> >>>
+> >>> commit 83dee2ce1ae791c3dc0c9d4d3a8d42cb109613f6
+> >>> Author: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> >>> Date:   Fri Jan 19 12:04:34 2018 +0000
+> >>>
+> >>>     crypto: sha3-generic - rewrite KECCAK transform to help the
+> >>> compiler optimize
+> >>>
+> >>> https://gist.githubusercontent.com/dvyukov/47f93f5a0679170dddf93bc019b42f6d/raw/65beac8ddd30003bbd4e9729236dc8572094abf7/gistfile1.txt
+> >>
+> >> Ouch.
+> >>
+> >> I'm not an expert in x86 assembly. Could someone please check the
+> >> generated code to see what's going on? The C code changes are not that
+> >> intricate, they basically unroll a loop, replacing accesses to
+> >> 'array[indirect_index[i]]' with 'array[constant]'.
+> >>
+> >> As mentioned in the commit log, the speedup is more than significant
+> >> for architectures with lots of GPRs so I'd prefer fixing the patch
+> >> over reverting it (if there is anything wrong with the code in the
+> >> first place)
+> >
+> > I suspect the problem is with __attribute__((__optimize__("O3"))). It
+> > makes compiler use rbp register, which must not be used.
+> 
+> IIRC, the additional speedup from adding that was significant but not
+> huge. Given that we don't use O3 anywhere else, I guess we should just
+> remove it.
+> 
+> Could you please check whether that makes the issue go away?
+> 
+> If so,
+> 
+> Acked-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> 
+> for any patch that removes the O3 attribute override from keccakf()
+
+The issue only affects CONFIG_FRAME_POINTER (which is no longer the
+default on x86-64), so maybe -O3 could only be enabled for
+CONFIG_FRAME_POINTER=n, in which case you'd still get the speedup with
+the default ORC unwinder.
+
+-- 
+Josh
