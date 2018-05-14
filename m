@@ -1,46 +1,128 @@
-From: Antoine Tenart <antoine.tenart@bootlin.com>
-Subject: [PATCH v2 06/10] crypto: inside-secure - fix the hash then encrypt/decrypt types
-Date: Mon, 14 May 2018 15:11:00 +0200
-Message-ID: <20180514131104.25552-7-antoine.tenart@bootlin.com>
-References: <20180514131104.25552-1-antoine.tenart@bootlin.com>
-Cc: Antoine Tenart <antoine.tenart@bootlin.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        thomas.petazzoni@bootlin.com, maxime.chevallier@bootlin.com,
-        gregory.clement@bootlin.com, miquel.raynal@bootlin.com,
-        nadavh@marvell.com, oferh@marvell.com, igall@marvell.com
-To: herbert@gondor.apana.org.au, davem@davemloft.net
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180514131104.25552-1-antoine.tenart@bootlin.com>
-Sender: linux-kernel-owner@vger.kernel.org
+From: Masami Hiramatsu <mhiramat@kernel.org>
+Subject: Re: [PATCH v2 09/11] docs: Fix some broken references
+Date: Mon, 14 May 2018 22:31:26 +0900
+Message-ID: <20180514223126.8d738475fbb53fba9ff199d9@kernel.org>
+References: <cover.1525870886.git.mchehab+samsung@kernel.org>
+ <e959f23d6f6905ee606fadfda13e2bb37deed017.1525870886.git.mchehab+samsung@kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+ Will Deacon <will.deacon@arm.com>, dri-devel@lists.freedesktop.org,
+ Jaroslav Kysela <perex@perex.cz>, Eric Paris <eparis@parisplace.org>,
+ linux-clk@vger.kernel.org, James Morris <jmorris@namei.org>,
+ Alan Stern <stern@rowland.harvard.edu>, xen-devel@lists.xenproject.org,
+ Boqun Feng <boqun.feng@gmail.com>, Nicholas Piggin <npiggin@gmail.com>,
+ Thomas Gleixner <tglx@linutronix.de>, Antoine Jacquet <royale@zerezo.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, linux-usb@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Li Zefan <lizefan@huawei.com>,
+ linux-crypto@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>,
+ alsa-devel@alsa-project.org,
+ Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+ David Airlie <airlied@linux.ie>, Max Filippov <jcmvbkbc@gmail.com>,
+ Harry Wei <harryxiyou@gmail.com>, selinux@tycho.nsa.gov,
+ Paul Moore
+To: Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
+Return-path: <dri-devel-bounces@lists.freedesktop.org>
+In-Reply-To: <e959f23d6f6905ee606fadfda13e2bb37deed017.1525870886.git.mchehab+samsung@kernel.org>
+List-Unsubscribe: <https://lists.freedesktop.org/mailman/options/dri-devel>,
+ <mailto:dri-devel-request@lists.freedesktop.org?subject=unsubscribe>
+List-Archive: <https://lists.freedesktop.org/archives/dri-devel>
+List-Post: <mailto:dri-devel@lists.freedesktop.org>
+List-Help: <mailto:dri-devel-request@lists.freedesktop.org?subject=help>
+List-Subscribe: <https://lists.freedesktop.org/mailman/listinfo/dri-devel>,
+ <mailto:dri-devel-request@lists.freedesktop.org?subject=subscribe>
+Errors-To: dri-devel-bounces@lists.freedesktop.org
+Sender: "dri-devel" <dri-devel-bounces@lists.freedesktop.org>
 List-Id: linux-crypto.vger.kernel.org
 
-This commit fixes the CONTEXT_CONTROL_TYPE_HASH_ENCRYPT_OUT and
-CONTEXT_CONTROL_TYPE_HASH_DECRYPT_OUT types by assigning the right
-value, and by renaming CONTEXT_CONTROL_TYPE_HASH_DECRYPT_OUT to
-CONTEXT_CONTROL_TYPE_HASH_DECRYPT_IN.
-
-This is not submitted as a fix for older kernel versions as these two
-defines weren't used back then.
-
-Signed-off-by: Antoine Tenart <antoine.tenart@bootlin.com>
----
- drivers/crypto/inside-secure/safexcel.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/crypto/inside-secure/safexcel.h b/drivers/crypto/inside-secure/safexcel.h
-index afdd099b2c1a..eec75dfcdad7 100644
---- a/drivers/crypto/inside-secure/safexcel.h
-+++ b/drivers/crypto/inside-secure/safexcel.h
-@@ -295,8 +295,8 @@ struct safexcel_context_record {
- #define CONTEXT_CONTROL_TYPE_CRYPTO_IN		0x5
- #define CONTEXT_CONTROL_TYPE_ENCRYPT_HASH_OUT	0x6
- #define CONTEXT_CONTROL_TYPE_DECRYPT_HASH_IN	0x7
--#define CONTEXT_CONTROL_TYPE_HASH_ENCRYPT_OUT	0x14
--#define CONTEXT_CONTROL_TYPE_HASH_DECRYPT_OUT	0x15
-+#define CONTEXT_CONTROL_TYPE_HASH_ENCRYPT_OUT	0xe
-+#define CONTEXT_CONTROL_TYPE_HASH_DECRYPT_IN	0xf
- #define CONTEXT_CONTROL_RESTART_HASH		BIT(4)
- #define CONTEXT_CONTROL_NO_FINISH_HASH		BIT(5)
- #define CONTEXT_CONTROL_SIZE(n)			((n) << 8)
--- 
-2.17.0
+T24gV2VkLCAgOSBNYXkgMjAxOCAxMDoxODo1MiAtMDMwMApNYXVybyBDYXJ2YWxobyBDaGVoYWIg
+PG1jaGVoYWIrc2Ftc3VuZ0BrZXJuZWwub3JnPiB3cm90ZToKCj4gQXMgd2UgbW92ZSBzdHVmZiBh
+cm91bmQsIHNvbWUgZG9jIHJlZmVyZW5jZXMgYXJlIGJyb2tlbi4gRml4IHNvbWUgb2YKPiB0aGVt
+IHZpYSB0aGlzIHNjcmlwdDoKPiAJLi9zY3JpcHRzL2RvY3VtZW50YXRpb24tZmlsZS1yZWYtY2hl
+Y2sgLS1maXgtcnN0Cj4gCj4gTWFudWFsbHkgY2hlY2tlZCBpZiB0aGUgcHJvZHVjZWQgcmVzdWx0
+IGlzIHZhbGlkLCByZW1vdmluZyBhIGZldwo+IGZhbHNlLXBvc2l0aXZlcy4KClRoZSBwYXJ0IG9m
+IGtwcm9iZXMgYW5kIHRyYWNlX2twcm9iZSBjaGFuZ2VzIGxvb2sgZ29vZCB0byBtZSA6KQoKQWNr
+ZWQtYnk6IE1hc2FtaSBIaXJhbWF0c3UgPG1oaXJhbWF0QGtlcm5lbC5vcmc+CgpUaGFuayB5b3Us
+Cgo+IAo+IFNpZ25lZC1vZmYtYnk6IE1hdXJvIENhcnZhbGhvIENoZWhhYiA8bWNoZWhhYitzYW1z
+dW5nQGtlcm5lbC5vcmc+Cj4gLS0tCj4gIC4uLi9hZG1pbi1ndWlkZS9rZXJuZWwtcGFyYW1ldGVy
+cy50eHQgICAgICAgICB8ICA0ICsrLS0KPiAgLi4uL2JpbmRpbmdzL2lucHV0L3JvdGFyeS1lbmNv
+ZGVyLnR4dCAgICAgICAgIHwgIDIgKy0KPiAgRG9jdW1lbnRhdGlvbi9kcml2ZXItYXBpL2dwaW8v
+Y29uc3VtZXIucnN0ICAgIHwgIDIgKy0KPiAgRG9jdW1lbnRhdGlvbi9rcHJvYmVzLnR4dCAgICAg
+ICAgICAgICAgICAgICAgIHwgIDQgKystLQo+ICBEb2N1bWVudGF0aW9uL3RyYWNlL2NvcmVzaWdo
+dC50eHQgICAgICAgICAgICAgfCAgMiArLQo+ICBEb2N1bWVudGF0aW9uL3RyYWNlL2V2ZW50cy5y
+c3QgICAgICAgICAgICAgICAgfCAgMiArLQo+ICBEb2N1bWVudGF0aW9uL3RyYWNlL2Z0cmFjZS11
+c2VzLnJzdCAgICAgICAgICAgfCAgMiArLQo+ICBEb2N1bWVudGF0aW9uL3RyYWNlL2hpc3RvZ3Jh
+bS50eHQgICAgICAgICAgICAgfCAgMiArLQo+ICBEb2N1bWVudGF0aW9uL3RyYWNlL2ludGVsX3Ro
+LnJzdCAgICAgICAgICAgICAgfCAgMiArLQo+ICBEb2N1bWVudGF0aW9uL3RyYWNlL3RyYWNlcG9p
+bnQtYW5hbHlzaXMucnN0ICAgfCAgNiArKystLS0KPiAgRG9jdW1lbnRhdGlvbi90cmFuc2xhdGlv
+bnMvamFfSlAvaG93dG8ucnN0ICAgIHwgIDQgKystLQo+ICAuLi4vdHJhbnNsYXRpb25zL3poX0NO
+L21hZ2ljLW51bWJlci50eHQgICAgICAgfCAgNCArKy0tCj4gIC4uLi96aF9DTi92aWRlbzRsaW51
+eC9vbWFwM2lzcC50eHQgICAgICAgICAgICB8ICA0ICsrLS0KPiAgTUFJTlRBSU5FUlMgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgMjAgKysrKysrKysrLS0tLS0tLS0tLQo+ICBh
+cmNoL0tjb25maWcgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgfCAgMiArLQo+ICBh
+cmNoL2FybS9pbmNsdWRlL2FzbS9jYWNoZWZsdXNoLmggICAgICAgICAgICAgfCAgMiArLQo+ICBh
+cmNoL2FybTY0L2luY2x1ZGUvYXNtL2NhY2hlZmx1c2guaCAgICAgICAgICAgfCAgMiArLQo+ICBh
+cmNoL21pY3JvYmxhemUvaW5jbHVkZS9hc20vY2FjaGVmbHVzaC5oICAgICAgfCAgMiArLQo+ICBh
+cmNoL3VtL0tjb25maWcudW0gICAgICAgICAgICAgICAgICAgICAgICAgICAgfCAgMiArLQo+ICBh
+cmNoL3VuaWNvcmUzMi9pbmNsdWRlL2FzbS9jYWNoZWZsdXNoLmggICAgICAgfCAgMiArLQo+ICBh
+cmNoL3g4Ni9lbnRyeS92c3lzY2FsbC92c3lzY2FsbF82NC5jICAgICAgICAgfCAgMiArLQo+ICBh
+cmNoL3h0ZW5zYS9pbmNsdWRlL2FzbS9jYWNoZWZsdXNoLmggICAgICAgICAgfCAgNCArKy0tCj4g
+IGJsb2NrL0tjb25maWcgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB8ICAyICstCj4g
+IGNlcnRzL0tjb25maWcgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB8ICAyICstCj4g
+IGNyeXB0by9hc3ltbWV0cmljX2tleXMvYXN5bW1ldHJpY190eXBlLmMgICAgICB8ICAyICstCj4g
+IGNyeXB0by9hc3ltbWV0cmljX2tleXMvc2lnbmF0dXJlLmMgICAgICAgICAgICB8ICAyICstCj4g
+IGRyaXZlcnMvY2hhci9LY29uZmlnICAgICAgICAgICAgICAgICAgICAgICAgICB8ICAyICstCj4g
+IGRyaXZlcnMvY2xrL2Nsay5jICAgICAgICAgICAgICAgICAgICAgICAgICAgICB8ICA0ICsrLS0K
+PiAgZHJpdmVycy9jbGsvaW5nZW5pYy9jZ3UuaCAgICAgICAgICAgICAgICAgICAgIHwgIDIgKy0K
+PiAgZHJpdmVycy9ncHUvdmdhL0tjb25maWcgICAgICAgICAgICAgICAgICAgICAgIHwgIDIgKy0K
+PiAgZHJpdmVycy9ncHUvdmdhL3ZnYWFyYi5jICAgICAgICAgICAgICAgICAgICAgIHwgIDIgKy0K
+PiAgZHJpdmVycy9pbnB1dC9qb3lzdGljay9LY29uZmlnICAgICAgICAgICAgICAgIHwgMTAgKysr
+KystLS0tLQo+ICBkcml2ZXJzL2lucHV0L2pveXN0aWNrL2lmb3JjZS9LY29uZmlnICAgICAgICAg
+fCAgMiArLQo+ICBkcml2ZXJzL2lucHV0L2pveXN0aWNrL3dhbGtlcmEwNzAxLmMgICAgICAgICAg
+fCAgMiArLQo+ICBkcml2ZXJzL2lucHV0L21pc2MvS2NvbmZpZyAgICAgICAgICAgICAgICAgICAg
+fCAgNCArKy0tCj4gIGRyaXZlcnMvaW5wdXQvbWlzYy9yb3RhcnlfZW5jb2Rlci5jICAgICAgICAg
+ICB8ICAyICstCj4gIGRyaXZlcnMvaW5wdXQvbW91c2UvS2NvbmZpZyAgICAgICAgICAgICAgICAg
+ICB8ICA2ICsrKy0tLQo+ICBkcml2ZXJzL2lucHV0L21vdXNlL2FscHMuYyAgICAgICAgICAgICAg
+ICAgICAgfCAgMiArLQo+ICBkcml2ZXJzL2lucHV0L3RvdWNoc2NyZWVuL3dtOTd4eC1jb3JlLmMg
+ICAgICAgfCAgMiArLQo+ICBkcml2ZXJzL2xpZ2h0bnZtL3BibGstcmIuYyAgICAgICAgICAgICAg
+ICAgICAgfCAgMiArLQo+ICBkcml2ZXJzL21kL2JjYWNoZS9LY29uZmlnICAgICAgICAgICAgICAg
+ICAgICAgfCAgMiArLQo+ICBkcml2ZXJzL21kL2JjYWNoZS9idHJlZS5jICAgICAgICAgICAgICAg
+ICAgICAgfCAgMiArLQo+ICBkcml2ZXJzL21kL2JjYWNoZS9leHRlbnRzLmMgICAgICAgICAgICAg
+ICAgICAgfCAgMiArLQo+ICBkcml2ZXJzL21lZGlhL2R2Yi1jb3JlL2R2Yl9yaW5nYnVmZmVyLmMg
+ICAgICAgfCAgMiArLQo+ICBkcml2ZXJzL21lZGlhL3BjaS9tZXllL0tjb25maWcgICAgICAgICAg
+ICAgICAgfCAgMiArLQo+ICBkcml2ZXJzL21lZGlhL3BsYXRmb3JtL3B4YV9jYW1lcmEuYyAgICAg
+ICAgICAgfCAgNCArKy0tCj4gIC4uLi9zb2NfY2FtZXJhL3NoX21vYmlsZV9jZXVfY2FtZXJhLmMg
+ICAgICAgICB8ICAyICstCj4gIGRyaXZlcnMvbWVkaWEvcmFkaW8vS2NvbmZpZyAgICAgICAgICAg
+ICAgICAgICB8ICAyICstCj4gIGRyaXZlcnMvbWVkaWEvcmFkaW8vc2k0NzB4L0tjb25maWcgICAg
+ICAgICAgICB8ICAyICstCj4gIGRyaXZlcnMvbWVkaWEvdXNiL2R2Yi11c2ItdjIvbG1lZG0wNC5j
+ICAgICAgICB8ICAyICstCj4gIGRyaXZlcnMvbWVkaWEvdXNiL3pyMzY0eHgvS2NvbmZpZyAgICAg
+ICAgICAgICB8ICAyICstCj4gIGRyaXZlcnMvcGFycG9ydC9LY29uZmlnICAgICAgICAgICAgICAg
+ICAgICAgICB8ICA2ICsrKy0tLQo+ICBkcml2ZXJzL3N0YWdpbmcvbWVkaWEvYmNtMjA0OC9UT0RP
+ICAgICAgICAgICAgfCAgMiArLQo+ICBpbmNsdWRlL2tleXMvYXN5bW1ldHJpYy1zdWJ0eXBlLmgg
+ICAgICAgICAgICAgfCAgMiArLQo+ICBpbmNsdWRlL2tleXMvYXN5bW1ldHJpYy10eXBlLmggICAg
+ICAgICAgICAgICAgfCAgMiArLQo+ICBpbmNsdWRlL2xpbnV4L2Fzc29jX2FycmF5LmggICAgICAg
+ICAgICAgICAgICAgfCAgMiArLQo+ICBpbmNsdWRlL2xpbnV4L2Fzc29jX2FycmF5X3ByaXYuaCAg
+ICAgICAgICAgICAgfCAgMiArLQo+ICBpbmNsdWRlL2xpbnV4L2NpcmNfYnVmLmggICAgICAgICAg
+ICAgICAgICAgICAgfCAgMiArLQo+ICBpbmNsdWRlL2xpbnV4L2Z0cmFjZS5oICAgICAgICAgICAg
+ICAgICAgICAgICAgfCAgMiArLQo+ICBpbmNsdWRlL2xpbnV4L3JjdWxpc3RfbnVsbHMuaCAgICAg
+ICAgICAgICAgICAgfCAgMiArLQo+ICBpbmNsdWRlL3VhcGkvbGludXgvcHJjdGwuaCAgICAgICAg
+ICAgICAgICAgICAgfCAgMiArLQo+ICBpbmNsdWRlL3hlbi9pbnRlcmZhY2UvaW8va2JkaWYuaCAg
+ICAgICAgICAgICAgfCAgMiArLQo+ICBrZXJuZWwvY2dyb3VwL2NwdXNldC5jICAgICAgICAgICAg
+ICAgICAgICAgICAgfCAgMiArLQo+ICBrZXJuZWwvdHJhY2UvS2NvbmZpZyAgICAgICAgICAgICAg
+ICAgICAgICAgICAgfCAxNiArKysrKysrLS0tLS0tLS0KPiAgbGliL0tjb25maWcgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDIgKy0KPiAgc2VjdXJpdHkvc2VsaW51eC9ob29r
+cy5jICAgICAgICAgICAgICAgICAgICAgIHwgIDIgKy0KPiAgc291bmQvY29yZS9LY29uZmlnICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDQgKystLQo+ICBzb3VuZC9kcml2ZXJzL0tjb25m
+aWcgICAgICAgICAgICAgICAgICAgICAgICAgfCAgNCArKy0tCj4gIHNvdW5kL3BjaS9LY29uZmln
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICB8IDEwICsrKysrLS0tLS0KPiAgdG9vbHMvaW5j
+bHVkZS91YXBpL2xpbnV4L3ByY3RsLmggICAgICAgICAgICAgIHwgIDIgKy0KPiAgdG9vbHMvbGli
+L2FwaS9mcy9mcy5jICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDIgKy0KPiAgdG9vbHMvbWVt
+b3J5LW1vZGVsL1JFQURNRSAgICAgICAgICAgICAgICAgICAgIHwgMTAgKysrKystLS0tLQo+ICB0
+b29scy9wZXJmL3V0aWwvYnBmLXByb2xvZ3VlLmMgICAgICAgICAgICAgICAgfCAgMiArLQo+ICAu
+Li4vY29uZmlnL2N1c3RvbS10aW1lbGluZS1mdW5jdGlvbnMuY2ZnICAgICAgfCAgNCArKy0tCj4g
+IDc0IGZpbGVzIGNoYW5nZWQsIDEyMCBpbnNlcnRpb25zKCspLCAxMjAgZGVsZXRpb25zKC0pCj4g
+CgoKLS0gCk1hc2FtaSBIaXJhbWF0c3UgPG1oaXJhbWF0QGtlcm5lbC5vcmc+Cl9fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmRyaS1kZXZlbCBtYWlsaW5nIGxp
+c3QKZHJpLWRldmVsQGxpc3RzLmZyZWVkZXNrdG9wLm9yZwpodHRwczovL2xpc3RzLmZyZWVkZXNr
+dG9wLm9yZy9tYWlsbWFuL2xpc3RpbmZvL2RyaS1kZXZlbAo=
