@@ -1,7 +1,7 @@
 From: Antoine Tenart <antoine.tenart@bootlin.com>
-Subject: [PATCH v2 01/10] crypto: inside-secure - remove VLAs
-Date: Mon, 14 May 2018 15:10:55 +0200
-Message-ID: <20180514131104.25552-2-antoine.tenart@bootlin.com>
+Subject: [PATCH v2 10/10] crypto: inside-secure - authenc(hmac(sha1),cbc(aes)) support
+Date: Mon, 14 May 2018 15:11:04 +0200
+Message-ID: <20180514131104.25552-11-antoine.tenart@bootlin.com>
 References: <20180514131104.25552-1-antoine.tenart@bootlin.com>
 Cc: Antoine Tenart <antoine.tenart@bootlin.com>,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -14,64 +14,96 @@ In-Reply-To: <20180514131104.25552-1-antoine.tenart@bootlin.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This patch removes the use of VLAs to allocate requests on the stack, by
-removing both SKCIPHER_REQUEST_ON_STACK and AHASH_REQUEST_ON_STACK. As
-we still need to allocate requests on the stack to ease the creation of
-invalidation requests a new, non-VLA, definition is used:
-EIP197_REQUEST_ON_STACK.
+This patch adds the authenc(hmac(sha1),cbc(aes)) AEAD algorithm
+support to the Inside Secure SafeXcel driver.
 
 Signed-off-by: Antoine Tenart <antoine.tenart@bootlin.com>
 ---
- drivers/crypto/inside-secure/safexcel.h        | 9 +++++++++
- drivers/crypto/inside-secure/safexcel_cipher.c | 2 +-
- drivers/crypto/inside-secure/safexcel_hash.c   | 2 +-
- 3 files changed, 11 insertions(+), 2 deletions(-)
+ drivers/crypto/inside-secure/safexcel.c       |  1 +
+ drivers/crypto/inside-secure/safexcel.h       |  1 +
+ .../crypto/inside-secure/safexcel_cipher.c    | 39 +++++++++++++++++++
+ 3 files changed, 41 insertions(+)
 
+diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/inside-secure/safexcel.c
+index 0f061c3757e9..46ab2d0eb3fd 100644
+--- a/drivers/crypto/inside-secure/safexcel.c
++++ b/drivers/crypto/inside-secure/safexcel.c
+@@ -793,6 +793,7 @@ static struct safexcel_alg_template *safexcel_algs[] = {
+ 	&safexcel_alg_hmac_sha1,
+ 	&safexcel_alg_hmac_sha224,
+ 	&safexcel_alg_hmac_sha256,
++	&safexcel_alg_authenc_hmac_sha1_cbc_aes,
+ 	&safexcel_alg_authenc_hmac_sha224_cbc_aes,
+ 	&safexcel_alg_authenc_hmac_sha256_cbc_aes,
+ };
 diff --git a/drivers/crypto/inside-secure/safexcel.h b/drivers/crypto/inside-secure/safexcel.h
-index b470a849721f..afdd099b2c1a 100644
+index c2e953f60447..8b3ee9b59f53 100644
 --- a/drivers/crypto/inside-secure/safexcel.h
 +++ b/drivers/crypto/inside-secure/safexcel.h
-@@ -28,6 +28,15 @@
- #define EIP197_GFP_FLAGS(base)	((base).flags & CRYPTO_TFM_REQ_MAY_SLEEP ? \
- 				 GFP_KERNEL : GFP_ATOMIC)
+@@ -668,6 +668,7 @@ extern struct safexcel_alg_template safexcel_alg_sha256;
+ extern struct safexcel_alg_template safexcel_alg_hmac_sha1;
+ extern struct safexcel_alg_template safexcel_alg_hmac_sha224;
+ extern struct safexcel_alg_template safexcel_alg_hmac_sha256;
++extern struct safexcel_alg_template safexcel_alg_authenc_hmac_sha1_cbc_aes;
+ extern struct safexcel_alg_template safexcel_alg_authenc_hmac_sha224_cbc_aes;
+ extern struct safexcel_alg_template safexcel_alg_authenc_hmac_sha256_cbc_aes;
  
-+/* Custom on-stack requests (for invalidation) */
-+#define EIP197_SKCIPHER_REQ_SIZE	sizeof(struct skcipher_request) + \
-+					sizeof(struct safexcel_cipher_req)
-+#define EIP197_AHASH_REQ_SIZE		sizeof(struct ahash_request) + \
-+					sizeof(struct safexcel_ahash_req)
-+#define EIP197_REQUEST_ON_STACK(name, type, size) \
-+	char __##name##_desc[size] CRYPTO_MINALIGN_ATTR; \
-+	struct type##_request *name = (void *)__##name##_desc
-+
- /* Register base offsets */
- #define EIP197_HIA_AIC(priv)		((priv)->base + (priv)->offsets.hia_aic)
- #define EIP197_HIA_AIC_G(priv)		((priv)->base + (priv)->offsets.hia_aic_g)
 diff --git a/drivers/crypto/inside-secure/safexcel_cipher.c b/drivers/crypto/inside-secure/safexcel_cipher.c
-index bafb60505fab..9a51da28fb62 100644
+index 9250fb205cf2..6bb60fda2043 100644
 --- a/drivers/crypto/inside-secure/safexcel_cipher.c
 +++ b/drivers/crypto/inside-secure/safexcel_cipher.c
-@@ -433,7 +433,7 @@ static int safexcel_cipher_exit_inv(struct crypto_tfm *tfm)
+@@ -185,6 +185,11 @@ static int safexcel_aead_aes_setkey(struct crypto_aead *ctfm, const u8 *key,
+ 
+ 	/* Auth key */
+ 	switch (ctx->alg) {
++	case CONTEXT_CONTROL_CRYPTO_ALG_SHA1:
++		if (safexcel_hmac_setkey("safexcel-sha1", keys.authkey,
++					 keys.authkeylen, &istate, &ostate))
++			goto badkey;
++		break;
+ 	case CONTEXT_CONTROL_CRYPTO_ALG_SHA224:
+ 		if (safexcel_hmac_setkey("safexcel-sha224", keys.authkey,
+ 					 keys.authkeylen, &istate, &ostate))
+@@ -916,6 +921,40 @@ static int safexcel_aead_cra_init(struct crypto_tfm *tfm)
+ 	return 0;
+ }
+ 
++static int safexcel_aead_sha1_cra_init(struct crypto_tfm *tfm)
++{
++	struct safexcel_cipher_ctx *ctx = crypto_tfm_ctx(tfm);
++
++	safexcel_aead_cra_init(tfm);
++	ctx->alg = CONTEXT_CONTROL_CRYPTO_ALG_SHA1;
++	ctx->state_sz = SHA1_DIGEST_SIZE;
++	return 0;
++}
++
++struct safexcel_alg_template safexcel_alg_authenc_hmac_sha1_cbc_aes = {
++	.type = SAFEXCEL_ALG_TYPE_AEAD,
++	.alg.aead = {
++		.setkey = safexcel_aead_aes_setkey,
++		.encrypt = safexcel_aead_encrypt,
++		.decrypt = safexcel_aead_decrypt,
++		.ivsize = AES_BLOCK_SIZE,
++		.maxauthsize = SHA1_DIGEST_SIZE,
++		.base = {
++			.cra_name = "authenc(hmac(sha1),cbc(aes))",
++			.cra_driver_name = "safexcel-authenc-hmac-sha1-cbc-aes",
++			.cra_priority = 300,
++			.cra_flags = CRYPTO_ALG_TYPE_AEAD | CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_KERN_DRIVER_ONLY,
++			.cra_blocksize = AES_BLOCK_SIZE,
++			.cra_ctxsize = sizeof(struct safexcel_cipher_ctx),
++			.cra_alignmask = 0,
++			.cra_init = safexcel_aead_sha1_cra_init,
++			.cra_exit = safexcel_aead_cra_exit,
++			.cra_module = THIS_MODULE,
++		},
++	},
++};
++
+ static int safexcel_aead_sha256_cra_init(struct crypto_tfm *tfm)
  {
  	struct safexcel_cipher_ctx *ctx = crypto_tfm_ctx(tfm);
- 	struct safexcel_crypto_priv *priv = ctx->priv;
--	SKCIPHER_REQUEST_ON_STACK(req, __crypto_skcipher_cast(tfm));
-+	EIP197_REQUEST_ON_STACK(req, skcipher, EIP197_SKCIPHER_REQ_SIZE);
- 	struct safexcel_cipher_req *sreq = skcipher_request_ctx(req);
- 	struct safexcel_inv_result result = {};
- 	int ring = ctx->base.ring;
-diff --git a/drivers/crypto/inside-secure/safexcel_hash.c b/drivers/crypto/inside-secure/safexcel_hash.c
-index 317b9e480312..00d2cad0ff1c 100644
---- a/drivers/crypto/inside-secure/safexcel_hash.c
-+++ b/drivers/crypto/inside-secure/safexcel_hash.c
-@@ -480,7 +480,7 @@ static int safexcel_ahash_exit_inv(struct crypto_tfm *tfm)
- {
- 	struct safexcel_ahash_ctx *ctx = crypto_tfm_ctx(tfm);
- 	struct safexcel_crypto_priv *priv = ctx->priv;
--	AHASH_REQUEST_ON_STACK(req, __crypto_ahash_cast(tfm));
-+	EIP197_REQUEST_ON_STACK(req, ahash, EIP197_AHASH_REQ_SIZE);
- 	struct safexcel_ahash_req *rctx = ahash_request_ctx(req);
- 	struct safexcel_inv_result result = {};
- 	int ring = ctx->base.ring;
 -- 
 2.17.0
