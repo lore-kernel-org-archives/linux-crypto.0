@@ -1,48 +1,184 @@
 From: Atul Gupta <atul.gupta@chelsio.com>
-Subject: [PATCH 1/5] crypto:chtls: key len correction
-Date: Mon, 14 May 2018 16:30:55 +0530
-Message-ID: <1526295659-29839-2-git-send-email-atul.gupta@chelsio.com>
-References: <1526295659-29839-1-git-send-email-atul.gupta@chelsio.com>
-Cc: gustavo@embeddedor.com, dan.carpenter@oracle.com,
-        netdev@vger.kernel.org, davem@davemloft.net, atul.gupta@chelsio.com
+Subject: [PATCH] crypto: chtls: generic handling of data and hdr
+Date: Mon, 14 May 2018 16:41:38 +0530
+Message-ID: <1526296298-30183-1-git-send-email-atul.gupta@chelsio.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net,
+        atul.gupta@chelsio.com, Harsh Jain <harsh@chelsio.com>
 To: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
 Return-path: <netdev-owner@vger.kernel.org>
-In-Reply-To: <1526295659-29839-1-git-send-email-atul.gupta@chelsio.com>
 Sender: netdev-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-corrected the key length to copy 128b key. Removed 192b and 256b
-key as user input supports key of size 128b in gcm_ctx
+removed redundant check and made TLS PDU and header recv
+handling common as received from HW.
+Ensure that only tls header is read in cpl_rx_tls_cmp
+read-ahead and skb is freed when entire data is processed.
 
-Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
 Signed-off-by: Atul Gupta <atul.gupta@chelsio.com>
+Signed-off-by: Harsh Jain <harsh@chelsio.com>
 ---
- drivers/crypto/chelsio/chtls/chtls_hw.c | 6 +-----
- 1 file changed, 1 insertion(+), 5 deletions(-)
+ drivers/crypto/chelsio/chtls/chtls.h    | 10 ++----
+ drivers/crypto/chelsio/chtls/chtls_cm.c | 12 +++++---
+ drivers/crypto/chelsio/chtls/chtls_io.c | 54 ++++++++-------------------------
+ 3 files changed, 23 insertions(+), 53 deletions(-)
 
-diff --git a/drivers/crypto/chelsio/chtls/chtls_hw.c b/drivers/crypto/chelsio/chtls/chtls_hw.c
-index 54a13aa9..55d5014 100644
---- a/drivers/crypto/chelsio/chtls/chtls_hw.c
-+++ b/drivers/crypto/chelsio/chtls/chtls_hw.c
-@@ -213,7 +213,7 @@ static int chtls_key_info(struct chtls_sock *csk,
- 			  struct _key_ctx *kctx,
- 			  u32 keylen, u32 optname)
- {
--	unsigned char key[CHCR_KEYCTX_CIPHER_KEY_SIZE_256];
-+	unsigned char key[AES_KEYSIZE_128];
- 	struct tls12_crypto_info_aes_gcm_128 *gcm_ctx;
- 	unsigned char ghash_h[AEAD_H_SIZE];
- 	struct crypto_cipher *cipher;
-@@ -228,10 +228,6 @@ static int chtls_key_info(struct chtls_sock *csk,
+diff --git a/drivers/crypto/chelsio/chtls/chtls.h b/drivers/crypto/chelsio/chtls/chtls.h
+index 778c194..a53a0e6 100644
+--- a/drivers/crypto/chelsio/chtls/chtls.h
++++ b/drivers/crypto/chelsio/chtls/chtls.h
+@@ -67,11 +67,6 @@ enum {
+ 	CPL_RET_UNKNOWN_TID = 4    /* unexpected unknown TID */
+ };
  
- 	if (keylen == AES_KEYSIZE_128) {
- 		ck_size = CHCR_KEYCTX_CIPHER_KEY_SIZE_128;
--	} else if (keylen == AES_KEYSIZE_192) {
--		ck_size = CHCR_KEYCTX_CIPHER_KEY_SIZE_192;
--	} else if (keylen == AES_KEYSIZE_256) {
--		ck_size = CHCR_KEYCTX_CIPHER_KEY_SIZE_256;
+-#define TLS_RCV_ST_READ_HEADER		0xF0
+-#define TLS_RCV_ST_READ_BODY		0xF1
+-#define TLS_RCV_ST_READ_DONE		0xF2
+-#define TLS_RCV_ST_READ_NB		0xF3
+-
+ #define LISTEN_INFO_HASH_SIZE 32
+ #define RSPQ_HASH_BITS 5
+ struct listen_info {
+@@ -279,6 +274,7 @@ struct tlsrx_cmp_hdr {
+ #define TLSRX_HDR_PKT_MAC_ERROR_F        TLSRX_HDR_PKT_MAC_ERROR_V(1U)
+ 
+ #define TLSRX_HDR_PKT_ERROR_M           0x1F
++#define CONTENT_TYPE_ERROR		0x7F
+ 
+ struct ulp_mem_rw {
+ 	__be32 cmd;
+@@ -348,8 +344,8 @@ enum {
+ 	ULPCB_FLAG_HOLD      = 1 << 3,	/* skb not ready for Tx yet */
+ 	ULPCB_FLAG_COMPL     = 1 << 4,	/* request WR completion */
+ 	ULPCB_FLAG_URG       = 1 << 5,	/* urgent data */
+-	ULPCB_FLAG_TLS_ND    = 1 << 6, /* payload of zero length */
+-	ULPCB_FLAG_NO_HDR    = 1 << 7, /* not a ofld wr */
++	ULPCB_FLAG_TLS_HDR   = 1 << 6,  /* payload with tls hdr */
++	ULPCB_FLAG_NO_HDR    = 1 << 7,  /* not a ofld wr */
+ };
+ 
+ /* The ULP mode/submode of an skbuff */
+diff --git a/drivers/crypto/chelsio/chtls/chtls_cm.c b/drivers/crypto/chelsio/chtls/chtls_cm.c
+index 23c43b8..2bb6f03 100644
+--- a/drivers/crypto/chelsio/chtls/chtls_cm.c
++++ b/drivers/crypto/chelsio/chtls/chtls_cm.c
+@@ -1608,12 +1608,14 @@ static void chtls_set_hdrlen(struct sk_buff *skb, unsigned int nlen)
+ 
+ static void chtls_rx_hdr(struct sock *sk, struct sk_buff *skb)
+ {
+-	struct cpl_rx_tls_cmp *cmp_cpl = cplhdr(skb);
++	struct tlsrx_cmp_hdr *tls_hdr_pkt;
++	struct cpl_rx_tls_cmp *cmp_cpl;
+ 	struct sk_buff *skb_rec;
+ 	struct chtls_sock *csk;
+ 	struct chtls_hws *tlsk;
+ 	struct tcp_sock *tp;
+ 
++	cmp_cpl = cplhdr(skb);
+ 	csk = rcu_dereference_sk_user_data(sk);
+ 	tlsk = &csk->tlshws;
+ 	tp = tcp_sk(sk);
+@@ -1623,16 +1625,18 @@ static void chtls_rx_hdr(struct sock *sk, struct sk_buff *skb)
+ 
+ 	skb_reset_transport_header(skb);
+ 	__skb_pull(skb, sizeof(*cmp_cpl));
++	tls_hdr_pkt = (struct tlsrx_cmp_hdr *)skb->data;
++	if (tls_hdr_pkt->res_to_mac_error & TLSRX_HDR_PKT_ERROR_M)
++		tls_hdr_pkt->type = CONTENT_TYPE_ERROR;
+ 	if (!skb->data_len)
+-		__skb_trim(skb, CPL_RX_TLS_CMP_LENGTH_G
+-				(ntohl(cmp_cpl->pdulength_length)));
++		__skb_trim(skb, TLS_HEADER_LENGTH);
+ 
+ 	tp->rcv_nxt +=
+ 		CPL_RX_TLS_CMP_PDULENGTH_G(ntohl(cmp_cpl->pdulength_length));
+ 
++	ULP_SKB_CB(skb)->flags |= ULPCB_FLAG_TLS_HDR;
+ 	skb_rec = __skb_dequeue(&tlsk->sk_recv_queue);
+ 	if (!skb_rec) {
+-		ULP_SKB_CB(skb)->flags |= ULPCB_FLAG_TLS_ND;
+ 		__skb_queue_tail(&sk->sk_receive_queue, skb);
  	} else {
- 		pr_err("GCM: Invalid key length %d\n", keylen);
- 		return -EINVAL;
+ 		chtls_set_hdrlen(skb, tlsk->pldlen);
+diff --git a/drivers/crypto/chelsio/chtls/chtls_io.c b/drivers/crypto/chelsio/chtls/chtls_io.c
+index 0d2e7e7..9dbdea0 100644
+--- a/drivers/crypto/chelsio/chtls/chtls_io.c
++++ b/drivers/crypto/chelsio/chtls/chtls_io.c
+@@ -1533,31 +1533,13 @@ static int chtls_pt_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
+ 				}
+ 			}
+ 		}
+-		if (hws->rstate == TLS_RCV_ST_READ_BODY) {
+-			if (skb_copy_datagram_msg(skb, offset,
+-						  msg, avail)) {
+-				if (!copied) {
+-					copied = -EFAULT;
+-					break;
+-				}
+-			}
+-		} else {
+-			struct tlsrx_cmp_hdr *tls_hdr_pkt =
+-				(struct tlsrx_cmp_hdr *)skb->data;
+-
+-			if ((tls_hdr_pkt->res_to_mac_error &
+-			    TLSRX_HDR_PKT_ERROR_M))
+-				tls_hdr_pkt->type = 0x7F;
+-
+-			/* CMP pld len is for recv seq */
+-			hws->rcvpld = skb->hdr_len;
+-			if (skb_copy_datagram_msg(skb, offset, msg, avail)) {
+-				if (!copied) {
+-					copied = -EFAULT;
+-					break;
+-				}
++		if (skb_copy_datagram_msg(skb, offset, msg, avail)) {
++			if (!copied) {
++				copied = -EFAULT;
++				break;
+ 			}
+ 		}
++
+ 		copied += avail;
+ 		len -= avail;
+ 		hws->copied_seq += avail;
+@@ -1565,32 +1547,20 @@ static int chtls_pt_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
+ 		if (tp->urg_data && after(tp->copied_seq, tp->urg_seq))
+ 			tp->urg_data = 0;
+ 
+-		if (hws->rstate == TLS_RCV_ST_READ_BODY &&
+-		    (avail + offset) >= skb->len) {
++		if ((avail + offset) >= skb->len) {
+ 			if (likely(skb))
+ 				chtls_free_skb(sk, skb);
+ 			buffers_freed++;
+-			hws->rstate = TLS_RCV_ST_READ_HEADER;
+-			atomic_inc(&adap->chcr_stats.tls_pdu_rx);
+-			tp->copied_seq += hws->rcvpld;
++			if (ULP_SKB_CB(skb)->flags & ULPCB_FLAG_TLS_HDR) {
++				tp->copied_seq += skb->len;
++				hws->rcvpld = skb->hdr_len;
++			} else {
++				tp->copied_seq += hws->rcvpld;
++			}
+ 			hws->copied_seq = 0;
+ 			if (copied >= target &&
+ 			    !skb_peek(&sk->sk_receive_queue))
+ 				break;
+-		} else {
+-			if (likely(skb)) {
+-				if (ULP_SKB_CB(skb)->flags &
+-				    ULPCB_FLAG_TLS_ND)
+-					hws->rstate =
+-						TLS_RCV_ST_READ_HEADER;
+-				else
+-					hws->rstate =
+-						TLS_RCV_ST_READ_BODY;
+-				chtls_free_skb(sk, skb);
+-			}
+-			buffers_freed++;
+-			tp->copied_seq += avail;
+-			hws->copied_seq = 0;
+ 		}
+ 	} while (len > 0);
+ 
 -- 
 1.8.3.1
