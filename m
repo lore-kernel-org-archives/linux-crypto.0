@@ -1,7 +1,7 @@
 From: Antoine Tenart <antoine.tenart@bootlin.com>
-Subject: [PATCH v2 05/10] crypto: inside-secure - make the key and context size computation dynamic
-Date: Mon, 14 May 2018 15:10:59 +0200
-Message-ID: <20180514131104.25552-6-antoine.tenart@bootlin.com>
+Subject: [PATCH v2 06/10] crypto: inside-secure - fix the hash then encrypt/decrypt types
+Date: Mon, 14 May 2018 15:11:00 +0200
+Message-ID: <20180514131104.25552-7-antoine.tenart@bootlin.com>
 References: <20180514131104.25552-1-antoine.tenart@bootlin.com>
 Cc: Antoine Tenart <antoine.tenart@bootlin.com>,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -14,36 +14,33 @@ In-Reply-To: <20180514131104.25552-1-antoine.tenart@bootlin.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This patches makes the key and context size computation dynamic when
-using memzero_explicit() on these two arrays. This is safer, cleaner and
-will help future modifications of the driver when these two parameters
-sizes will changes (the context size will be bigger when using AEAD
-algorithms).
+This commit fixes the CONTEXT_CONTROL_TYPE_HASH_ENCRYPT_OUT and
+CONTEXT_CONTROL_TYPE_HASH_DECRYPT_OUT types by assigning the right
+value, and by renaming CONTEXT_CONTROL_TYPE_HASH_DECRYPT_OUT to
+CONTEXT_CONTROL_TYPE_HASH_DECRYPT_IN.
+
+This is not submitted as a fix for older kernel versions as these two
+defines weren't used back then.
 
 Signed-off-by: Antoine Tenart <antoine.tenart@bootlin.com>
 ---
- drivers/crypto/inside-secure/safexcel_cipher.c | 4 ++--
+ drivers/crypto/inside-secure/safexcel.h | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/inside-secure/safexcel_cipher.c b/drivers/crypto/inside-secure/safexcel_cipher.c
-index 26f6e05726ea..1f4787ea2725 100644
---- a/drivers/crypto/inside-secure/safexcel_cipher.c
-+++ b/drivers/crypto/inside-secure/safexcel_cipher.c
-@@ -554,13 +554,13 @@ static int safexcel_cipher_cra_exit(struct crypto_tfm *tfm)
- {
- 	struct safexcel_cipher_ctx *ctx = crypto_tfm_ctx(tfm);
- 
--	memzero_explicit(ctx->key, 8 * sizeof(u32));
-+	memzero_explicit(ctx->key, sizeof(ctx->key));
- 
- 	/* context not allocated, skip invalidation */
- 	if (!ctx->base.ctxr)
- 		return -ENOMEM;
- 
--	memzero_explicit(ctx->base.ctxr->data, 8 * sizeof(u32));
-+	memzero_explicit(ctx->base.ctxr->data, sizeof(ctx->base.ctxr->data));
- 	return 0;
- }
- 
+diff --git a/drivers/crypto/inside-secure/safexcel.h b/drivers/crypto/inside-secure/safexcel.h
+index afdd099b2c1a..eec75dfcdad7 100644
+--- a/drivers/crypto/inside-secure/safexcel.h
++++ b/drivers/crypto/inside-secure/safexcel.h
+@@ -295,8 +295,8 @@ struct safexcel_context_record {
+ #define CONTEXT_CONTROL_TYPE_CRYPTO_IN		0x5
+ #define CONTEXT_CONTROL_TYPE_ENCRYPT_HASH_OUT	0x6
+ #define CONTEXT_CONTROL_TYPE_DECRYPT_HASH_IN	0x7
+-#define CONTEXT_CONTROL_TYPE_HASH_ENCRYPT_OUT	0x14
+-#define CONTEXT_CONTROL_TYPE_HASH_DECRYPT_OUT	0x15
++#define CONTEXT_CONTROL_TYPE_HASH_ENCRYPT_OUT	0xe
++#define CONTEXT_CONTROL_TYPE_HASH_DECRYPT_IN	0xf
+ #define CONTEXT_CONTROL_RESTART_HASH		BIT(4)
+ #define CONTEXT_CONTROL_NO_FINISH_HASH		BIT(5)
+ #define CONTEXT_CONTROL_SIZE(n)			((n) << 8)
 -- 
 2.17.0
