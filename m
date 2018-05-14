@@ -1,7 +1,7 @@
 From: Antoine Tenart <antoine.tenart@bootlin.com>
-Subject: [PATCH v2 07/10] crypto: inside-secure - improve error reporting
-Date: Mon, 14 May 2018 15:11:01 +0200
-Message-ID: <20180514131104.25552-8-antoine.tenart@bootlin.com>
+Subject: [PATCH v2 01/10] crypto: inside-secure - remove VLAs
+Date: Mon, 14 May 2018 15:10:55 +0200
+Message-ID: <20180514131104.25552-2-antoine.tenart@bootlin.com>
 References: <20180514131104.25552-1-antoine.tenart@bootlin.com>
 Cc: Antoine Tenart <antoine.tenart@bootlin.com>,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -14,99 +14,64 @@ In-Reply-To: <20180514131104.25552-1-antoine.tenart@bootlin.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This patch improves the error reporting from the Inside Secure driver to
-the upper layers and crypto consumers. All errors reported by the engine
-aren't fatal, and some may be genuine.
+This patch removes the use of VLAs to allocate requests on the stack, by
+removing both SKCIPHER_REQUEST_ON_STACK and AHASH_REQUEST_ON_STACK. As
+we still need to allocate requests on the stack to ease the creation of
+invalidation requests a new, non-VLA, definition is used:
+EIP197_REQUEST_ON_STACK.
 
 Signed-off-by: Antoine Tenart <antoine.tenart@bootlin.com>
 ---
- drivers/crypto/inside-secure/safexcel.c       | 21 +++++++++++++++++++
- drivers/crypto/inside-secure/safexcel.h       |  2 ++
- .../crypto/inside-secure/safexcel_cipher.c    |  8 ++-----
- drivers/crypto/inside-secure/safexcel_hash.c  |  7 ++-----
- 4 files changed, 27 insertions(+), 11 deletions(-)
+ drivers/crypto/inside-secure/safexcel.h        | 9 +++++++++
+ drivers/crypto/inside-secure/safexcel_cipher.c | 2 +-
+ drivers/crypto/inside-secure/safexcel_hash.c   | 2 +-
+ 3 files changed, 11 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/inside-secure/safexcel.c
-index d4a81be0d7d2..87e6d1a63886 100644
---- a/drivers/crypto/inside-secure/safexcel.c
-+++ b/drivers/crypto/inside-secure/safexcel.c
-@@ -537,6 +537,27 @@ void safexcel_dequeue(struct safexcel_crypto_priv *priv, int ring)
- 	       EIP197_HIA_CDR(priv, ring) + EIP197_HIA_xDR_PREP_COUNT);
- }
- 
-+inline int safexcel_rdesc_check_errors(struct safexcel_crypto_priv *priv,
-+				       struct safexcel_result_desc *rdesc)
-+{
-+	if (likely(!rdesc->result_data.error_code))
-+		return 0;
-+
-+	if (rdesc->result_data.error_code & 0x407f) {
-+		/* Fatal error (bits 0-7, 14) */
-+		dev_err(priv->dev,
-+			"cipher: result: result descriptor error (%d)\n",
-+			rdesc->result_data.error_code);
-+		return -EIO;
-+	} else if (rdesc->result_data.error_code == BIT(9)) {
-+		/* Authentication failed */
-+		return -EBADMSG;
-+	}
-+
-+	/* All other non-fatal errors */
-+	return -EINVAL;
-+}
-+
- void safexcel_complete(struct safexcel_crypto_priv *priv, int ring)
- {
- 	struct safexcel_command_desc *cdesc;
 diff --git a/drivers/crypto/inside-secure/safexcel.h b/drivers/crypto/inside-secure/safexcel.h
-index eec75dfcdad7..dce02bf92dff 100644
+index b470a849721f..afdd099b2c1a 100644
 --- a/drivers/crypto/inside-secure/safexcel.h
 +++ b/drivers/crypto/inside-secure/safexcel.h
-@@ -610,6 +610,8 @@ struct safexcel_inv_result {
- };
+@@ -28,6 +28,15 @@
+ #define EIP197_GFP_FLAGS(base)	((base).flags & CRYPTO_TFM_REQ_MAY_SLEEP ? \
+ 				 GFP_KERNEL : GFP_ATOMIC)
  
- void safexcel_dequeue(struct safexcel_crypto_priv *priv, int ring);
-+int safexcel_rdesc_check_errors(struct safexcel_crypto_priv *priv,
-+				struct safexcel_result_desc *rdesc);
- void safexcel_complete(struct safexcel_crypto_priv *priv, int ring);
- int safexcel_invalidate_cache(struct crypto_async_request *async,
- 			      struct safexcel_crypto_priv *priv,
++/* Custom on-stack requests (for invalidation) */
++#define EIP197_SKCIPHER_REQ_SIZE	sizeof(struct skcipher_request) + \
++					sizeof(struct safexcel_cipher_req)
++#define EIP197_AHASH_REQ_SIZE		sizeof(struct ahash_request) + \
++					sizeof(struct safexcel_ahash_req)
++#define EIP197_REQUEST_ON_STACK(name, type, size) \
++	char __##name##_desc[size] CRYPTO_MINALIGN_ATTR; \
++	struct type##_request *name = (void *)__##name##_desc
++
+ /* Register base offsets */
+ #define EIP197_HIA_AIC(priv)		((priv)->base + (priv)->offsets.hia_aic)
+ #define EIP197_HIA_AIC_G(priv)		((priv)->base + (priv)->offsets.hia_aic_g)
 diff --git a/drivers/crypto/inside-secure/safexcel_cipher.c b/drivers/crypto/inside-secure/safexcel_cipher.c
-index 1f4787ea2725..2452fce64fb7 100644
+index bafb60505fab..9a51da28fb62 100644
 --- a/drivers/crypto/inside-secure/safexcel_cipher.c
 +++ b/drivers/crypto/inside-secure/safexcel_cipher.c
-@@ -160,12 +160,8 @@ static int safexcel_handle_req_result(struct safexcel_crypto_priv *priv, int rin
- 			break;
- 		}
- 
--		if (rdesc->result_data.error_code) {
--			dev_err(priv->dev,
--				"cipher: result: result descriptor error (%d)\n",
--				rdesc->result_data.error_code);
--			*ret = -EIO;
--		}
-+		if (likely(!*ret))
-+			*ret = safexcel_rdesc_check_errors(priv, rdesc);
- 
- 		ndesc++;
- 	} while (!rdesc->last_seg);
+@@ -433,7 +433,7 @@ static int safexcel_cipher_exit_inv(struct crypto_tfm *tfm)
+ {
+ 	struct safexcel_cipher_ctx *ctx = crypto_tfm_ctx(tfm);
+ 	struct safexcel_crypto_priv *priv = ctx->priv;
+-	SKCIPHER_REQUEST_ON_STACK(req, __crypto_skcipher_cast(tfm));
++	EIP197_REQUEST_ON_STACK(req, skcipher, EIP197_SKCIPHER_REQ_SIZE);
+ 	struct safexcel_cipher_req *sreq = skcipher_request_ctx(req);
+ 	struct safexcel_inv_result result = {};
+ 	int ring = ctx->base.ring;
 diff --git a/drivers/crypto/inside-secure/safexcel_hash.c b/drivers/crypto/inside-secure/safexcel_hash.c
-index 00d2cad0ff1c..6cbd879e8fb5 100644
+index 317b9e480312..00d2cad0ff1c 100644
 --- a/drivers/crypto/inside-secure/safexcel_hash.c
 +++ b/drivers/crypto/inside-secure/safexcel_hash.c
-@@ -146,11 +146,8 @@ static int safexcel_handle_req_result(struct safexcel_crypto_priv *priv, int rin
- 		dev_err(priv->dev,
- 			"hash: result: could not retrieve the result descriptor\n");
- 		*ret = PTR_ERR(rdesc);
--	} else if (rdesc->result_data.error_code) {
--		dev_err(priv->dev,
--			"hash: result: result descriptor error (%d)\n",
--			rdesc->result_data.error_code);
--		*ret = -EINVAL;
-+	} else {
-+		*ret = safexcel_rdesc_check_errors(priv, rdesc);
- 	}
- 
- 	safexcel_complete(priv, ring);
+@@ -480,7 +480,7 @@ static int safexcel_ahash_exit_inv(struct crypto_tfm *tfm)
+ {
+ 	struct safexcel_ahash_ctx *ctx = crypto_tfm_ctx(tfm);
+ 	struct safexcel_crypto_priv *priv = ctx->priv;
+-	AHASH_REQUEST_ON_STACK(req, __crypto_ahash_cast(tfm));
++	EIP197_REQUEST_ON_STACK(req, ahash, EIP197_AHASH_REQ_SIZE);
+ 	struct safexcel_ahash_req *rctx = ahash_request_ctx(req);
+ 	struct safexcel_inv_result result = {};
+ 	int ring = ctx->base.ring;
 -- 
 2.17.0
