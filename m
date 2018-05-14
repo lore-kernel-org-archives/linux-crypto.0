@@ -1,184 +1,72 @@
-From: Atul Gupta <atul.gupta@chelsio.com>
-Subject: [PATCH] crypto: chtls: generic handling of data and hdr
-Date: Mon, 14 May 2018 16:41:38 +0530
-Message-ID: <1526296298-30183-1-git-send-email-atul.gupta@chelsio.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net,
-        atul.gupta@chelsio.com, Harsh Jain <harsh@chelsio.com>
-To: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
-Return-path: <netdev-owner@vger.kernel.org>
-Sender: netdev-owner@vger.kernel.org
+From: Michael Ellerman <mpe@ellerman.id.au>
+Subject: Re: [PATCH 1/2] crypto: vmx - Remove overly verbose printk from AES init routines
+Date: Mon, 14 May 2018 21:18:35 +1000
+Message-ID: <87po1ypjsk.fsf@concordia.ellerman.id.au>
+References: <20180503122930.17448-1-mpe@ellerman.id.au> <20180511161913.nr7woksn2jejipzm@gondor.apana.org.au>
+Mime-Version: 1.0
+Content-Type: text/plain
+Cc: linux-crypto@vger.kernel.org, linuxppc-dev@ozlabs.org,
+        linux-kernel@vger.kernel.org, mhcerri@linux.vnet.ibm.com,
+        pfsmorigo@linux.vnet.ibm.com
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20180511161913.nr7woksn2jejipzm@gondor.apana.org.au>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-removed redundant check and made TLS PDU and header recv
-handling common as received from HW.
-Ensure that only tls header is read in cpl_rx_tls_cmp
-read-ahead and skb is freed when entire data is processed.
+Herbert Xu <herbert@gondor.apana.org.au> writes:
 
-Signed-off-by: Atul Gupta <atul.gupta@chelsio.com>
-Signed-off-by: Harsh Jain <harsh@chelsio.com>
----
- drivers/crypto/chelsio/chtls/chtls.h    | 10 ++----
- drivers/crypto/chelsio/chtls/chtls_cm.c | 12 +++++---
- drivers/crypto/chelsio/chtls/chtls_io.c | 54 ++++++++-------------------------
- 3 files changed, 23 insertions(+), 53 deletions(-)
+> On Thu, May 03, 2018 at 10:29:29PM +1000, Michael Ellerman wrote:
+>> In the vmx AES init routines we do a printk(KERN_INFO ...) to report
+>> the fallback implementation we're using.
+>> 
+>> However with a slow console this can significantly affect the speed of
+>> crypto operations. Using 'cryptsetup benchmark' the removal of the
+>> printk() leads to a ~5x speedup for aes-cbc decryption.
+>> 
+>> So remove them.
+>> 
+>> Fixes: 8676590a1593 ("crypto: vmx - Adding AES routines for VMX module")
+>> Fixes: 8c755ace357c ("crypto: vmx - Adding CBC routines for VMX module")
+>> Fixes: 4f7f60d312b3 ("crypto: vmx - Adding CTR routines for VMX module")
+>> Fixes: cc333cd68dfa ("crypto: vmx - Adding GHASH routines for VMX module")
+>> Cc: stable@vger.kernel.org # v4.1+
+>> Signed-off-by: Michael Ellerman <mpe@ellerman.id.au>
+>> ---
+>>  drivers/crypto/vmx/aes.c     | 2 --
+>>  drivers/crypto/vmx/aes_cbc.c | 3 ---
+>>  drivers/crypto/vmx/aes_ctr.c | 2 --
+>>  drivers/crypto/vmx/ghash.c   | 2 --
+>>  4 files changed, 9 deletions(-)
+>
+> Patch applied.  Thanks.
 
-diff --git a/drivers/crypto/chelsio/chtls/chtls.h b/drivers/crypto/chelsio/chtls/chtls.h
-index 778c194..a53a0e6 100644
---- a/drivers/crypto/chelsio/chtls/chtls.h
-+++ b/drivers/crypto/chelsio/chtls/chtls.h
-@@ -67,11 +67,6 @@ enum {
- 	CPL_RET_UNKNOWN_TID = 4    /* unexpected unknown TID */
- };
- 
--#define TLS_RCV_ST_READ_HEADER		0xF0
--#define TLS_RCV_ST_READ_BODY		0xF1
--#define TLS_RCV_ST_READ_DONE		0xF2
--#define TLS_RCV_ST_READ_NB		0xF3
--
- #define LISTEN_INFO_HASH_SIZE 32
- #define RSPQ_HASH_BITS 5
- struct listen_info {
-@@ -279,6 +274,7 @@ struct tlsrx_cmp_hdr {
- #define TLSRX_HDR_PKT_MAC_ERROR_F        TLSRX_HDR_PKT_MAC_ERROR_V(1U)
- 
- #define TLSRX_HDR_PKT_ERROR_M           0x1F
-+#define CONTENT_TYPE_ERROR		0x7F
- 
- struct ulp_mem_rw {
- 	__be32 cmd;
-@@ -348,8 +344,8 @@ enum {
- 	ULPCB_FLAG_HOLD      = 1 << 3,	/* skb not ready for Tx yet */
- 	ULPCB_FLAG_COMPL     = 1 << 4,	/* request WR completion */
- 	ULPCB_FLAG_URG       = 1 << 5,	/* urgent data */
--	ULPCB_FLAG_TLS_ND    = 1 << 6, /* payload of zero length */
--	ULPCB_FLAG_NO_HDR    = 1 << 7, /* not a ofld wr */
-+	ULPCB_FLAG_TLS_HDR   = 1 << 6,  /* payload with tls hdr */
-+	ULPCB_FLAG_NO_HDR    = 1 << 7,  /* not a ofld wr */
- };
- 
- /* The ULP mode/submode of an skbuff */
-diff --git a/drivers/crypto/chelsio/chtls/chtls_cm.c b/drivers/crypto/chelsio/chtls/chtls_cm.c
-index 23c43b8..2bb6f03 100644
---- a/drivers/crypto/chelsio/chtls/chtls_cm.c
-+++ b/drivers/crypto/chelsio/chtls/chtls_cm.c
-@@ -1608,12 +1608,14 @@ static void chtls_set_hdrlen(struct sk_buff *skb, unsigned int nlen)
- 
- static void chtls_rx_hdr(struct sock *sk, struct sk_buff *skb)
- {
--	struct cpl_rx_tls_cmp *cmp_cpl = cplhdr(skb);
-+	struct tlsrx_cmp_hdr *tls_hdr_pkt;
-+	struct cpl_rx_tls_cmp *cmp_cpl;
- 	struct sk_buff *skb_rec;
- 	struct chtls_sock *csk;
- 	struct chtls_hws *tlsk;
- 	struct tcp_sock *tp;
- 
-+	cmp_cpl = cplhdr(skb);
- 	csk = rcu_dereference_sk_user_data(sk);
- 	tlsk = &csk->tlshws;
- 	tp = tcp_sk(sk);
-@@ -1623,16 +1625,18 @@ static void chtls_rx_hdr(struct sock *sk, struct sk_buff *skb)
- 
- 	skb_reset_transport_header(skb);
- 	__skb_pull(skb, sizeof(*cmp_cpl));
-+	tls_hdr_pkt = (struct tlsrx_cmp_hdr *)skb->data;
-+	if (tls_hdr_pkt->res_to_mac_error & TLSRX_HDR_PKT_ERROR_M)
-+		tls_hdr_pkt->type = CONTENT_TYPE_ERROR;
- 	if (!skb->data_len)
--		__skb_trim(skb, CPL_RX_TLS_CMP_LENGTH_G
--				(ntohl(cmp_cpl->pdulength_length)));
-+		__skb_trim(skb, TLS_HEADER_LENGTH);
- 
- 	tp->rcv_nxt +=
- 		CPL_RX_TLS_CMP_PDULENGTH_G(ntohl(cmp_cpl->pdulength_length));
- 
-+	ULP_SKB_CB(skb)->flags |= ULPCB_FLAG_TLS_HDR;
- 	skb_rec = __skb_dequeue(&tlsk->sk_recv_queue);
- 	if (!skb_rec) {
--		ULP_SKB_CB(skb)->flags |= ULPCB_FLAG_TLS_ND;
- 		__skb_queue_tail(&sk->sk_receive_queue, skb);
- 	} else {
- 		chtls_set_hdrlen(skb, tlsk->pldlen);
-diff --git a/drivers/crypto/chelsio/chtls/chtls_io.c b/drivers/crypto/chelsio/chtls/chtls_io.c
-index 0d2e7e7..9dbdea0 100644
---- a/drivers/crypto/chelsio/chtls/chtls_io.c
-+++ b/drivers/crypto/chelsio/chtls/chtls_io.c
-@@ -1533,31 +1533,13 @@ static int chtls_pt_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
- 				}
- 			}
- 		}
--		if (hws->rstate == TLS_RCV_ST_READ_BODY) {
--			if (skb_copy_datagram_msg(skb, offset,
--						  msg, avail)) {
--				if (!copied) {
--					copied = -EFAULT;
--					break;
--				}
--			}
--		} else {
--			struct tlsrx_cmp_hdr *tls_hdr_pkt =
--				(struct tlsrx_cmp_hdr *)skb->data;
--
--			if ((tls_hdr_pkt->res_to_mac_error &
--			    TLSRX_HDR_PKT_ERROR_M))
--				tls_hdr_pkt->type = 0x7F;
--
--			/* CMP pld len is for recv seq */
--			hws->rcvpld = skb->hdr_len;
--			if (skb_copy_datagram_msg(skb, offset, msg, avail)) {
--				if (!copied) {
--					copied = -EFAULT;
--					break;
--				}
-+		if (skb_copy_datagram_msg(skb, offset, msg, avail)) {
-+			if (!copied) {
-+				copied = -EFAULT;
-+				break;
- 			}
- 		}
-+
- 		copied += avail;
- 		len -= avail;
- 		hws->copied_seq += avail;
-@@ -1565,32 +1547,20 @@ static int chtls_pt_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
- 		if (tp->urg_data && after(tp->copied_seq, tp->urg_seq))
- 			tp->urg_data = 0;
- 
--		if (hws->rstate == TLS_RCV_ST_READ_BODY &&
--		    (avail + offset) >= skb->len) {
-+		if ((avail + offset) >= skb->len) {
- 			if (likely(skb))
- 				chtls_free_skb(sk, skb);
- 			buffers_freed++;
--			hws->rstate = TLS_RCV_ST_READ_HEADER;
--			atomic_inc(&adap->chcr_stats.tls_pdu_rx);
--			tp->copied_seq += hws->rcvpld;
-+			if (ULP_SKB_CB(skb)->flags & ULPCB_FLAG_TLS_HDR) {
-+				tp->copied_seq += skb->len;
-+				hws->rcvpld = skb->hdr_len;
-+			} else {
-+				tp->copied_seq += hws->rcvpld;
-+			}
- 			hws->copied_seq = 0;
- 			if (copied >= target &&
- 			    !skb_peek(&sk->sk_receive_queue))
- 				break;
--		} else {
--			if (likely(skb)) {
--				if (ULP_SKB_CB(skb)->flags &
--				    ULPCB_FLAG_TLS_ND)
--					hws->rstate =
--						TLS_RCV_ST_READ_HEADER;
--				else
--					hws->rstate =
--						TLS_RCV_ST_READ_BODY;
--				chtls_free_skb(sk, skb);
--			}
--			buffers_freed++;
--			tp->copied_seq += avail;
--			hws->copied_seq = 0;
- 		}
- 	} while (len > 0);
- 
--- 
-1.8.3.1
+Thanks.
+
+>> If this is the wrong fix please let me know, I'm not a crypto expert.
+>> 
+>> What we see is 'cryptsetup benchmark' causing thousands of these printks() to
+>> happen. The call trace is something like:
+>> 
+>> [c000001e47867a60] [c0000000009cf6b4] p8_aes_cbc_init+0x74/0xf0
+>> [c000001e47867ae0] [c000000000551a80] __crypto_alloc_tfm+0x1d0/0x2c0
+>> [c000001e47867b20] [c00000000055aea4] crypto_skcipher_init_tfm+0x124/0x280
+>> [c000001e47867b60] [c00000000055138c] crypto_create_tfm+0x9c/0x1a0
+>> [c000001e47867ba0] [c000000000552220] crypto_alloc_tfm+0xa0/0x140
+>> [c000001e47867c00] [c00000000055b168] crypto_alloc_skcipher+0x48/0x70
+>> [c000001e47867c40] [c00000000057af28] skcipher_bind+0x38/0x50
+>> [c000001e47867c80] [c00000000057a07c] alg_bind+0xbc/0x220
+>> [c000001e47867d10] [c000000000a016a0] __sys_bind+0x90/0x100
+>> [c000001e47867df0] [c000000000a01750] sys_bind+0x40/0x60
+>> [c000001e47867e30] [c00000000000b320] system_call+0x58/0x6c
+>> 
+>> 
+>> Is it normal for init to be called on every system call?
+>
+> This is the tfm init function, so yes it is called every time
+> you allocate a tfm.
+
+OK thanks. So we just shouldn't be printk'ing in there in the non-error
+path, good to know.
+
+cheers
