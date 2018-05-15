@@ -1,133 +1,68 @@
-From: Abdul Haleem <abdhalee@linux.vnet.ibm.com>
-Subject: Re: [PATCH] crypto: reorder paes test lexicographically
-Date: Tue, 15 May 2018 19:23:04 +0530
-Message-ID: <1526392384.19317.3.camel@abdul>
-References: <1526025847-13134-1-git-send-email-gilad@benyossef.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Subject: Re: [PATCH 2/3] clk: renesas: r8a7795: Add ccree clock
+Date: Tue, 15 May 2018 16:47:12 +0200
+Message-ID: <CAMuHMdXWPwW_p=D56BhNF274m+JLe+mbD2fqQu8-we-uMW4b8Q@mail.gmail.com>
+References: <1526387370-17142-1-git-send-email-gilad@benyossef.com> <1526387370-17142-3-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+Cc: Simon Horman <horms@verge.net.au>,
+        Magnus Damm <magnus.damm@gmail.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will.deacon@arm.com>,
+        Geert Uytterhoeven <geert+renesas@glider.be>,
+        Michael Turquette <mturquette@baylibre.com>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        sachinp <sachinp@linux.vnet.ibm.com>,
-        Stephen Rothwell <sfr@canb.auug.org.au>,
-        linux-kernel@vger.kernel.org,
-        linux-next <linux-next@vger.kernel.org>,
-        linux-crypto@vger.kernel.org,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        Ofir Drang <ofir.drang@arm.com>
+        Ofir Drang <ofir.drang@arm.com>,
+        Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
+        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS"
+        <devicetree@vger.kernel.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-clk <linux-clk@vger.kernel.org>,
+        L
 To: Gilad Ben-Yossef <gilad@benyossef.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1526025847-13134-1-git-send-email-gilad@benyossef.com>
+In-Reply-To: <1526387370-17142-3-git-send-email-gilad@benyossef.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Fri, 2018-05-11 at 09:04 +0100, Gilad Ben-Yossef wrote:
-> Due to a snafu "paes" testmgr tests were not ordered
-> lexicographically, which led to boot time warnings.
-> Reorder the tests as needed.
-> 
-> Fixes: a794d8d ("crypto: ccree - enable support for hardware keys")
-> Reported-by: Abdul Haleem <abdhalee@linux.vnet.ibm.com>
+Hi Gilad,
+
+On Tue, May 15, 2018 at 2:29 PM, Gilad Ben-Yossef <gilad@benyossef.com> wrote:
+> This patch adds the clock used by the CryptoCell 630p instance in the SoC.
+>
 > Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
-> ---
->  crypto/testmgr.c | 44 ++++++++++++++++++++++----------------------
->  1 file changed, 22 insertions(+), 22 deletions(-)
-> 
-> diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-> index c31da0f..b1b8ebb 100644
-> --- a/crypto/testmgr.c
-> +++ b/crypto/testmgr.c
-> @@ -3012,13 +3012,6 @@ static const struct alg_test_desc alg_test_descs[] = {
->  			}
->  		}
->  	}, {
-> -		/* Same as ecb(aes) except the key is stored in
-> -		 * hardware secure memory which we reference by index
-> -		 */
-> -		.alg = "ecb(paes)",
-> -		.test = alg_test_null,
-> -		.fips_allowed = 1,
-> -	}, {
->  		.alg = "ecb(khazad)",
->  		.test = alg_test_skcipher,
->  		.suite = {
-> @@ -3028,6 +3021,13 @@ static const struct alg_test_desc alg_test_descs[] = {
->  			}
->  		}
->  	}, {
-> +		/* Same as ecb(aes) except the key is stored in
-> +		 * hardware secure memory which we reference by index
-> +		 */
-> +		.alg = "ecb(paes)",
-> +		.test = alg_test_null,
-> +		.fips_allowed = 1,
-> +	}, {
->  		.alg = "ecb(seed)",
->  		.test = alg_test_skcipher,
->  		.suite = {
-> @@ -3610,21 +3610,6 @@ static const struct alg_test_desc alg_test_descs[] = {
->  			}
->  		}
->  	}, {
-> -		/* Same as xts(aes) except the key is stored in
-> -		 * hardware secure memory which we reference by index
-> -		 */
-> -		.alg = "xts(paes)",
-> -		.test = alg_test_null,
-> -		.fips_allowed = 1,
-> -	}, {
-> -		.alg = "xts4096(paes)",
-> -		.test = alg_test_null,
-> -		.fips_allowed = 1,
-> -	}, {
-> -		.alg = "xts512(paes)",
-> -		.test = alg_test_null,
-> -		.fips_allowed = 1,
-> -	}, {
->  		.alg = "xts(camellia)",
->  		.test = alg_test_skcipher,
->  		.suite = {
-> @@ -3643,6 +3628,13 @@ static const struct alg_test_desc alg_test_descs[] = {
->  			}
->  		}
->  	}, {
-> +		/* Same as xts(aes) except the key is stored in
-> +		 * hardware secure memory which we reference by index
-> +		 */
-> +		.alg = "xts(paes)",
-> +		.test = alg_test_null,
-> +		.fips_allowed = 1,
-> +	}, {
->  		.alg = "xts(serpent)",
->  		.test = alg_test_skcipher,
->  		.suite = {
-> @@ -3679,6 +3671,14 @@ static const struct alg_test_desc alg_test_descs[] = {
->  			}
->  		}
->  	}, {
-> +		.alg = "xts4096(paes)",
-> +		.test = alg_test_null,
-> +		.fips_allowed = 1,
-> +	}, {
-> +		.alg = "xts512(paes)",
-> +		.test = alg_test_null,
-> +		.fips_allowed = 1,
-> +	}, {
->  		.alg = "zlib-deflate",
->  		.test = alg_test_comp,
->  		.fips_allowed = 1,
 
+Thanks for your patch!
 
-Gilad, 
+> --- a/drivers/clk/renesas/r8a7795-cpg-mssr.c
+> +++ b/drivers/clk/renesas/r8a7795-cpg-mssr.c
+> @@ -132,6 +132,7 @@ static struct mssr_mod_clk r8a7795_mod_clks[] __initdata = {
+>         DEF_MOD("sys-dmac2",             217,   R8A7795_CLK_S0D3),
+>         DEF_MOD("sys-dmac1",             218,   R8A7795_CLK_S0D3),
+>         DEF_MOD("sys-dmac0",             219,   R8A7795_CLK_S0D3),
+> +       DEF_MOD("ccree",                 229,   R8A7795_CLK_S3D2),
 
-The given patch fixes the boot warnings.
+I don't know if "ccree" is the proper name for this clock, as there
+may be multiple
+instances.
+I also can't verify the parent clock.
 
-Tested-by: Abdul Haleem <abdhalee@linux.vnet.ibm.com>
+>         DEF_MOD("cmt3",                  300,   R8A7795_CLK_R),
+>         DEF_MOD("cmt2",                  301,   R8A7795_CLK_R),
+>         DEF_MOD("cmt1",                  302,   R8A7795_CLK_R),
 
-Thanks for the fix.
+Gr{oetje,eeting}s,
+
+                        Geert
 
 -- 
-Regard's
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
 
-Abdul Haleem
-IBM Linux Technology Centre
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
