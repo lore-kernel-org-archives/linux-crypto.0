@@ -1,51 +1,69 @@
-From: Stephen Boyd <sboyd@kernel.org>
-Subject: Re: [PATCH v2 09/11] docs: Fix some broken references
-Date: Tue, 15 May 2018 13:26:04 -0700
-Message-ID: <152641596420.237094.12177504626636253047@swboyd.mtv.corp.google.com>
-References: <cover.1525870886.git.mchehab+samsung@kernel.org>
- <e959f23d6f6905ee606fadfda13e2bb37deed017.1525870886.git.mchehab+samsung@kernel.org>
+From: Simon Horman <horms@verge.net.au>
+Subject: Re: [PATCH 3/3] arm64: dts: renesas: r8a7795: add ccree binding
+Date: Wed, 16 May 2018 09:43:34 +0200
+Message-ID: <20180516074333.i2672u435ymwffk3@verge.net.au>
+References: <1526387370-17142-1-git-send-email-gilad@benyossef.com>
+ <1526387370-17142-4-git-send-email-gilad@benyossef.com>
+ <CAMuHMdWzeNqsho1V6ezZb81T3_HcRzrtuQpmGXsjtFgt9BtZDQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
- Will Deacon <will.deacon@arm.com>, dri-devel@lists.freedesktop.org,
- Jaroslav Kysela <perex@perex.cz>, Eric Paris <eparis@parisplace.org>,
- Mauro Carvalho Chehab <mchehab+samsung@kernel.org>, linux-clk@vger.kernel.org,
- James Morris <jmorris@namei.org>, Alan Stern <stern@rowland.harvard.edu>,
- xen-devel@lists.xenproject.org, Boqun Feng <boqun.feng@gmail.com>,
- Nicholas Piggin <npiggin@gmail.com>, Thomas Gleixner <tglx@linutronix.de>,
- Antoine Jacquet <royale@zerezo.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>, linux-usb@vger.kernel.org,
- linux-kernel@vger.kernel.org, Li Zefan <lizefan@huawei.com>,
- linux-crypto@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>,
- alsa-devel@alsa-project.org, David Airlie <airlied@linux.ie>,
- Max Filippov <jcmvbkbc@gmail.com>, Harry Wei <harryxiyou@gmail.com>,
- selinux@tycho.nsa.gov, Paul Moore <
-To: Linux Doc Mailing List <linux-doc@vger.kernel.org>,
- Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
-Return-path: <dri-devel-bounces@lists.freedesktop.org>
-In-Reply-To: <e959f23d6f6905ee606fadfda13e2bb37deed017.1525870886.git.mchehab+samsung@kernel.org>
-List-Unsubscribe: <https://lists.freedesktop.org/mailman/options/dri-devel>,
- <mailto:dri-devel-request@lists.freedesktop.org?subject=unsubscribe>
-List-Archive: <https://lists.freedesktop.org/archives/dri-devel>
-List-Post: <mailto:dri-devel@lists.freedesktop.org>
-List-Help: <mailto:dri-devel-request@lists.freedesktop.org?subject=help>
-List-Subscribe: <https://lists.freedesktop.org/mailman/listinfo/dri-devel>,
- <mailto:dri-devel-request@lists.freedesktop.org?subject=subscribe>
-Errors-To: dri-devel-bounces@lists.freedesktop.org
-Sender: "dri-devel" <dri-devel-bounces@lists.freedesktop.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: Gilad Ben-Yossef <gilad@benyossef.com>,
+        Magnus Damm <magnus.damm@gmail.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will.deacon@arm.com>,
+        Geert Uytterhoeven <geert+renesas@glider.be>,
+        Michael Turquette <mturquette@baylibre.com>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Ofir Drang <ofir.drang@arm.com>,
+        Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
+        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS"
+        <devicetree@vger.kernel.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-clk <linux-clk@vger.kernel.org>,
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <CAMuHMdWzeNqsho1V6ezZb81T3_HcRzrtuQpmGXsjtFgt9BtZDQ@mail.gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-UXVvdGluZyBNYXVybyBDYXJ2YWxobyBDaGVoYWIgKDIwMTgtMDUtMDkgMDY6MTg6NTIpCj4gQXMg
-d2UgbW92ZSBzdHVmZiBhcm91bmQsIHNvbWUgZG9jIHJlZmVyZW5jZXMgYXJlIGJyb2tlbi4gRml4
-IHNvbWUgb2YKPiB0aGVtIHZpYSB0aGlzIHNjcmlwdDoKPiAgICAgICAgIC4vc2NyaXB0cy9kb2N1
-bWVudGF0aW9uLWZpbGUtcmVmLWNoZWNrIC0tZml4LXJzdAo+IAo+IE1hbnVhbGx5IGNoZWNrZWQg
-aWYgdGhlIHByb2R1Y2VkIHJlc3VsdCBpcyB2YWxpZCwgcmVtb3ZpbmcgYSBmZXcKPiBmYWxzZS1w
-b3NpdGl2ZXMuCj4gCj4gU2lnbmVkLW9mZi1ieTogTWF1cm8gQ2FydmFsaG8gQ2hlaGFiIDxtY2hl
-aGFiK3NhbXN1bmdAa2VybmVsLm9yZz4KPiAtLS0KCj4gIGRyaXZlcnMvY2xrL2Nsay5jICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICB8ICA0ICsrLS0KPiAgZHJpdmVycy9jbGsvaW5nZW5pYy9j
-Z3UuaCAgICAgICAgICAgICAgICAgICAgIHwgIDIgKy0KCkFja2VkLWJ5OiBTdGVwaGVuIEJveWQg
-PHNib3lkQGtlcm5lbC5vcmc+Cl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fCmRyaS1kZXZlbCBtYWlsaW5nIGxpc3QKZHJpLWRldmVsQGxpc3RzLmZyZWVkZXNr
-dG9wLm9yZwpodHRwczovL2xpc3RzLmZyZWVkZXNrdG9wLm9yZy9tYWlsbWFuL2xpc3RpbmZvL2Ry
-aS1kZXZlbAo=
+On Tue, May 15, 2018 at 04:50:44PM +0200, Geert Uytterhoeven wrote:
+> Hi Gilad,
+> 
+> On Tue, May 15, 2018 at 2:29 PM, Gilad Ben-Yossef <gilad@benyossef.com> wrote:
+> > Add bindings for CryptoCell instance in the SoC.
+> >
+> > Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+> 
+> Thanks for your patch!
+> 
+> > --- a/arch/arm64/boot/dts/renesas/r8a7795.dtsi
+> > +++ b/arch/arm64/boot/dts/renesas/r8a7795.dtsi
+> > @@ -528,6 +528,14 @@
+> >                         status = "disabled";
+> >                 };
+> >
+> > +               arm_cc630p: crypto@e6601000 {
+> > +                       compatible = "arm,cryptocell-630p-ree";
+> > +                       interrupts = <GIC_SPI 71 IRQ_TYPE_LEVEL_HIGH>;
+> > +                       #interrupt-cells = <2>;
+> 
+> I believe the #interrupt-cells property is not needed.
+> 
+> > +                       reg = <0x0 0xe6601000 0 0x1000>;
+> > +                       clocks = <&cpg CPG_MOD 229>;
+> > +               };
+> 
+> The rest looks good, but I cannot verify the register block.
+> 
+> > +
+> >                 i2c3: i2c@e66d0000 {
+> >                         #address-cells = <1>;
+> >                         #size-cells = <0>;
+
+Thanks, I have applied this after dropping the #interrupt-cells property.
