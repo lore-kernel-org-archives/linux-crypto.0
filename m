@@ -1,56 +1,96 @@
-From: Mathieu Poirier <mathieu.poirier@linaro.org>
-Subject: Re: [PATCH v2 09/11] docs: Fix some broken references
-Date: Wed, 16 May 2018 09:12:56 -0600
-Message-ID: <CANLsYkwXUGJ-DM4M48SXuy+31r6sC7_Q3fc9Rgue6wFdeMQv6g@mail.gmail.com>
-References: <cover.1525870886.git.mchehab+samsung@kernel.org>
- <e959f23d6f6905ee606fadfda13e2bb37deed017.1525870886.git.mchehab+samsung@kernel.org>
+From: "Srivatsa S. Bhat" <srivatsa@csail.mit.edu>
+Subject: Re: [PATCH 1/5] random: fix crng_ready() test
+Date: Wed, 16 May 2018 17:07:08 -0700
+Message-ID: <6bb4d4cb-aafa-7440-0dc3-40faf647ec89@csail.mit.edu>
+References: <20180413013046.404-1-tytso@mit.edu>
+ <1699469.KmO53oa8XU@tauon.chronox.de> <20180413125313.GA2633@thunk.org>
+ <4393662.RPWnPK42dp@tauon.chronox.de> <20180413170037.GA28721@thunk.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
- Linus Walleij <linus.walleij@linaro.org>, Will Deacon <will.deacon@arm.com>,
- dri-devel@lists.freedesktop.org, Jaroslav Kysela <perex@perex.cz>,
- Eric Paris <eparis@parisplace.org>, linux-clk@vger.kernel.org,
- James Morris <jmorris@namei.org>, Alan Stern <stern@rowland.harvard.edu>,
- xen-devel@lists.xenproject.org, Boqun Feng <boqun.feng@gmail.com>,
- Nicholas Piggin <npiggin@gmail.com>, Sean Paul <seanpaul@chromium.org>,
- Thomas Gleixner <tglx@linutronix.de>, Antoine Jacquet <royale@zerezo.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>, linux-usb@vger.kernel.org,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Li Zefan <lizefan@huawei.com>, linux-crypto@vger.kernel.org,
- Mark Rutland <mark.rutland@arm.com>, alsa-devel@alsa-project.org,
- Linux Doc Mailing List <linux-doc@vger.kernel.org>,
- David Airlie <airlied@linux.ie>,
-To: Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
-Return-path: <xen-devel-bounces@lists.xenproject.org>
-In-Reply-To: <e959f23d6f6905ee606fadfda13e2bb37deed017.1525870886.git.mchehab+samsung@kernel.org>
-List-Unsubscribe: <https://lists.xenproject.org/mailman/options/xen-devel>,
- <mailto:xen-devel-request@lists.xenproject.org?subject=unsubscribe>
-List-Post: <mailto:xen-devel@lists.xenproject.org>
-List-Help: <mailto:xen-devel-request@lists.xenproject.org?subject=help>
-List-Subscribe: <https://lists.xenproject.org/mailman/listinfo/xen-devel>,
- <mailto:xen-devel-request@lists.xenproject.org?subject=subscribe>
-Errors-To: xen-devel-bounces@lists.xenproject.org
-Sender: "Xen-devel" <xen-devel-bounces@lists.xenproject.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+To: "Theodore Y. Ts'o" <tytso@mit.edu>,
+        Stephan Mueller <smueller@chronox.de>,
+        linux-crypto@vger.kernel.org,
+        Linux Kernel Developers List <linux-kernel@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20180413170037.GA28721@thunk.org>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-T24gOSBNYXkgMjAxOCBhdCAwNzoxOCwgTWF1cm8gQ2FydmFsaG8gQ2hlaGFiCjxtY2hlaGFiK3Nh
-bXN1bmdAa2VybmVsLm9yZz4gd3JvdGU6Cj4gQXMgd2UgbW92ZSBzdHVmZiBhcm91bmQsIHNvbWUg
-ZG9jIHJlZmVyZW5jZXMgYXJlIGJyb2tlbi4gRml4IHNvbWUgb2YKPiB0aGVtIHZpYSB0aGlzIHNj
-cmlwdDoKPiAgICAgICAgIC4vc2NyaXB0cy9kb2N1bWVudGF0aW9uLWZpbGUtcmVmLWNoZWNrIC0t
-Zml4LXJzdAo+Cj4gTWFudWFsbHkgY2hlY2tlZCBpZiB0aGUgcHJvZHVjZWQgcmVzdWx0IGlzIHZh
-bGlkLCByZW1vdmluZyBhIGZldwo+IGZhbHNlLXBvc2l0aXZlcy4KPgo+IFNpZ25lZC1vZmYtYnk6
-IE1hdXJvIENhcnZhbGhvIENoZWhhYiA8bWNoZWhhYitzYW1zdW5nQGtlcm5lbC5vcmc+Cj4gLS0t
-Cgo+Cj4gZGlmZiAtLWdpdCBhL0RvY3VtZW50YXRpb24vdHJhY2UvY29yZXNpZ2h0LnR4dCBiL0Rv
-Y3VtZW50YXRpb24vdHJhY2UvY29yZXNpZ2h0LnR4dAo+IGluZGV4IDFkNzRhZDAyMDJiNi4uZWZi
-YzgzMjE0NmU3IDEwMDY0NAo+IC0tLSBhL0RvY3VtZW50YXRpb24vdHJhY2UvY29yZXNpZ2h0LnR4
-dAo+ICsrKyBiL0RvY3VtZW50YXRpb24vdHJhY2UvY29yZXNpZ2h0LnR4dAo+IEBAIC00MjYsNSAr
-NDI2LDUgQEAgcm9vdEBnZW5lcmljYXJtdjg6fiMKPiAgRGV0YWlscyBvbiBob3cgdG8gdXNlIHRo
-ZSBnZW5lcmljIFNUTSBBUEkgY2FuIGJlIGZvdW5kIGhlcmUgWzJdLgo+Cj4gIFsxXS4gRG9jdW1l
-bnRhdGlvbi9BQkkvdGVzdGluZy9zeXNmcy1idXMtY29yZXNpZ2h0LWRldmljZXMtc3RtCj4gLVsy
-XS4gRG9jdW1lbnRhdGlvbi90cmFjZS9zdG0udHh0Cj4gK1syXS4gRG9jdW1lbnRhdGlvbi90cmFj
-ZS9zdG0ucnN0Cj4gIFszXS4gaHR0cHM6Ly9naXRodWIuY29tL0xpbmFyby9wZXJmLW9wZW5jc2QK
-CkFja2VkLWJ5OiBNYXRoaWV1IFBvaXJpZXIgPG1hdGhpZXUucG9pcmllckBsaW5hcm8ub3JnPgoK
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KWGVuLWRldmVs
-IG1haWxpbmcgbGlzdApYZW4tZGV2ZWxAbGlzdHMueGVucHJvamVjdC5vcmcKaHR0cHM6Ly9saXN0
-cy54ZW5wcm9qZWN0Lm9yZy9tYWlsbWFuL2xpc3RpbmZvL3hlbi1kZXZlbA==
+On 4/13/18 10:00 AM, Theodore Y. Ts'o wrote:
+> On Fri, Apr 13, 2018 at 03:05:01PM +0200, Stephan Mueller wrote:
+>>
+>> What I would like to point out that more and more folks change to 
+>> getrandom(2). As this call will now unblock much later in the boot cycle, 
+>> these systems see a significant departure from the current system behavior.
+>>
+>> E.g. an sshd using getrandom(2) would be ready shortly after the boot finishes 
+>> as of now. Now it can be a matter minutes before it responds. Thus, is such 
+>> change in the kernel behavior something for stable?
+
+[...]
+
+> I was a little worried that on VM's this could end up causing things
+> to block for a long time, but an experiment on a GCE VM shows that
+> isn't a problem:
+> 
+> [    0.000000] Linux version 4.16.0-rc3-ext4-00009-gf6b302ebca85 (tytso@cwcc) (gcc version 7.3.0 (Debian 7.3.0-15)) #16 SMP Thu Apr 12 16:57:17 EDT 2018
+> [    1.282220] random: fast init done
+> [    3.987092] random: crng init done
+> [    4.376787] EXT4-fs (sda1): re-mounted. Opts: (null)
+> 
+> There are some desktops where the "crng_init done" report doesn't
+> happen until 45-90 seconds into the boot.  I don't think I've seen
+> reports where it takes _minutes_ however.  Can you give me some
+> examples of such cases?
+
+On a Photon OS VM running on VMware ESXi, this patch causes a boot speed
+regression of 5 minutes :-( [ The VM doesn't have haveged or rng-tools
+(rngd) installed. ]
+
+[    1.420246] EXT4-fs (sda2): re-mounted. Opts: barrier,noacl,data=ordered
+[    1.469722] tsc: Refined TSC clocksource calibration: 1900.002 MHz
+[    1.470707] clocksource: tsc: mask: 0xffffffffffffffff max_cycles: 0x36c65c1a9e1, max_idle_ns: 881590695311 ns
+[    1.474249] clocksource: Switched to clocksource tsc
+[    1.584427] systemd-journald[216]: Received request to flush runtime journal from PID 1
+[  346.620718] random: crng init done
+
+Interestingly, the boot delay is exacerbated on VMs with large amounts
+of RAM. For example, the delay is not so noticeable (< 30 seconds) on a
+VM with 2GB memory, but goes up to 5 minutes on an 8GB VM.
+
+Also, cloud-init-local.service seems to be the one blocking for entropy
+here. systemd-analyze critical-chain shows:
+
+The time after the unit is active or started is printed after the "@" character.
+The time the unit takes to start is printed after the "+" character.
+
+multi-user.target @6min 1.283s
+└─vmtoolsd.service @6min 1.282s
+  └─cloud-final.service @6min 366ms +914ms
+    └─cloud-config.service @5min 59.174s +1.190s
+      └─cloud-config.target @5min 59.172s
+        └─cloud-init.service @5min 47.423s +11.744s
+          └─systemd-networkd-wait-online.service @5min 45.999s +1.420s
+            └─systemd-networkd.service @5min 45.975s +21ms
+              └─network-pre.target @5min 45.973s
+                └─cloud-init-local.service @241ms +5min 45.687s
+                  └─systemd-remount-fs.service @222ms +13ms
+                    └─systemd-fsck-root.service @193ms +26ms
+                      └─systemd-journald.socket @188ms
+                        └─-.mount @151ms
+                          └─system.slice @161ms
+                            └─-.slice @151ms
+
+It would be great if this CVE can be fixed somehow without causing boot speed
+to spike from ~20 seconds to 5 minutes, as that makes the system pretty much
+unusable. I can workaround this by installing haveged, but ideally an in-kernel
+fix would be better. If you need any other info about my setup or if you have
+a patch that I can test, please let me know!
+
+Thank you very much!
+
+Regards,
+Srivatsa
+VMware Photon OS
