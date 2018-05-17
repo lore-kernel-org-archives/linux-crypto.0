@@ -1,12 +1,13 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: Re: [PATCH 2/3] clk: renesas: r8a7795: Add ccree clock
-Date: Thu, 17 May 2018 11:00:10 +0300
-Message-ID: <CAOtvUMf0pnX1+MOz0KkB5LxqL5HTmLRYjVZTUrAx-eCvm26+LA@mail.gmail.com>
+Subject: Re: [PATCH 3/3] arm64: dts: renesas: r8a7795: add ccree binding
+Date: Thu, 17 May 2018 11:01:57 +0300
+Message-ID: <CAOtvUMfFjokOLCg6aHNQESJ_q4Jiok3izrPtae5wR+cND=XL6g@mail.gmail.com>
 References: <1526387370-17142-1-git-send-email-gilad@benyossef.com>
- <1526387370-17142-3-git-send-email-gilad@benyossef.com> <CAMuHMdXWPwW_p=D56BhNF274m+JLe+mbD2fqQu8-we-uMW4b8Q@mail.gmail.com>
+ <1526387370-17142-4-git-send-email-gilad@benyossef.com> <CAMuHMdWzeNqsho1V6ezZb81T3_HcRzrtuQpmGXsjtFgt9BtZDQ@mail.gmail.com>
+ <20180516074333.i2672u435ymwffk3@verge.net.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Cc: Simon Horman <horms@verge.net.au>,
+Cc: Geert Uytterhoeven <geert@linux-m68k.org>,
         Magnus Damm <magnus.damm@gmail.com>,
         Rob Herring <robh+dt@kernel.org>,
         Mark Rutland <mark.rutland@arm.com>,
@@ -24,59 +25,56 @@ Cc: Simon Horman <horms@verge.net.au>,
         Linux ARM <linux-arm-kernel@lists.infradead.org>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         linux-clk <linux-clk@vger.kernel.org>,
-        L
-To: Geert Uytterhoeven <geert@linux-m68k.org>
+To: Simon Horman <horms@verge.net.au>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAMuHMdXWPwW_p=D56BhNF274m+JLe+mbD2fqQu8-we-uMW4b8Q@mail.gmail.com>
+In-Reply-To: <20180516074333.i2672u435ymwffk3@verge.net.au>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, May 15, 2018 at 5:47 PM, Geert Uytterhoeven
-<geert@linux-m68k.org> wrote:
-> Hi Gilad,
->
-> On Tue, May 15, 2018 at 2:29 PM, Gilad Ben-Yossef <gilad@benyossef.com> wrote:
->> This patch adds the clock used by the CryptoCell 630p instance in the SoC.
+On Wed, May 16, 2018 at 10:43 AM, Simon Horman <horms@verge.net.au> wrote:
+> On Tue, May 15, 2018 at 04:50:44PM +0200, Geert Uytterhoeven wrote:
+>> Hi Gilad,
 >>
->> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+>> On Tue, May 15, 2018 at 2:29 PM, Gilad Ben-Yossef <gilad@benyossef.com> wrote:
+>> > Add bindings for CryptoCell instance in the SoC.
+>> >
+>> > Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+>>
+>> Thanks for your patch!
+>>
+>> > --- a/arch/arm64/boot/dts/renesas/r8a7795.dtsi
+>> > +++ b/arch/arm64/boot/dts/renesas/r8a7795.dtsi
+>> > @@ -528,6 +528,14 @@
+>> >                         status = "disabled";
+>> >                 };
+>> >
+>> > +               arm_cc630p: crypto@e6601000 {
+>> > +                       compatible = "arm,cryptocell-630p-ree";
+>> > +                       interrupts = <GIC_SPI 71 IRQ_TYPE_LEVEL_HIGH>;
+>> > +                       #interrupt-cells = <2>;
+>>
+>> I believe the #interrupt-cells property is not needed.
+>>
+>> > +                       reg = <0x0 0xe6601000 0 0x1000>;
+>> > +                       clocks = <&cpg CPG_MOD 229>;
+>> > +               };
+>>
+>> The rest looks good, but I cannot verify the register block.
+>>
+>> > +
+>> >                 i2c3: i2c@e66d0000 {
+>> >                         #address-cells = <1>;
+>> >                         #size-cells = <0>;
 >
-> Thanks for your patch!
->
->> --- a/drivers/clk/renesas/r8a7795-cpg-mssr.c
->> +++ b/drivers/clk/renesas/r8a7795-cpg-mssr.c
->> @@ -132,6 +132,7 @@ static struct mssr_mod_clk r8a7795_mod_clks[] __initdata = {
->>         DEF_MOD("sys-dmac2",             217,   R8A7795_CLK_S0D3),
->>         DEF_MOD("sys-dmac1",             218,   R8A7795_CLK_S0D3),
->>         DEF_MOD("sys-dmac0",             219,   R8A7795_CLK_S0D3),
->> +       DEF_MOD("ccree",                 229,   R8A7795_CLK_S3D2),
->
-> I don't know if "ccree" is the proper name for this clock, as there
-> may be multiple
-> instances.
+> Thanks, I have applied this after dropping the #interrupt-cells property.
 
-I'd be happy to rename it to anything else. Suggestions?
+Thanks you!
 
-> I also can't verify the parent clock.
+Alas, it will not work without the clk patch (the previous one in the
+series) so they need to be
+taken or dropped together.
 
-I'm afraid I can't really help. This is based on code snippet from
-Renesas. I verified it works but
-I am not an expert on the clock settings :-(
-
->
->>         DEF_MOD("cmt3",                  300,   R8A7795_CLK_R),
->>         DEF_MOD("cmt2",                  301,   R8A7795_CLK_R),
->>         DEF_MOD("cmt1",                  302,   R8A7795_CLK_R),
->
-> Gr{oetje,eeting}s,
->
->                         Geert
->
-> --
-> Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
->
-> In personal conversations with technical people, I call myself a hacker. But
-> when I'm talking to journalists I just say "programmer" or something like that.
->                                 -- Linus Torvalds
+Gilad
 
 
 
