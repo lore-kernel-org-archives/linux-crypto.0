@@ -1,110 +1,78 @@
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Subject: Re: [PATCH 3/3] arm64: dts: renesas: r8a7795: add ccree binding
-Date: Thu, 17 May 2018 15:49:52 +0200
-Message-ID: <CAMuHMdVZF1chOm7D2r+pqRwHXpQNaDhO8q-p2riWPujFsjvZRA@mail.gmail.com>
-References: <1526387370-17142-1-git-send-email-gilad@benyossef.com>
- <1526387370-17142-4-git-send-email-gilad@benyossef.com> <CAMuHMdWzeNqsho1V6ezZb81T3_HcRzrtuQpmGXsjtFgt9BtZDQ@mail.gmail.com>
- <20180516074333.i2672u435ymwffk3@verge.net.au> <CAOtvUMfFjokOLCg6aHNQESJ_q4Jiok3izrPtae5wR+cND=XL6g@mail.gmail.com>
- <CAMuHMdVM55S7+PdnKusX-qkTxioc=0kQ6EGSbwv+kbLk5RCUYw@mail.gmail.com>
- <CAOtvUMdVNX_vBRofpc5rNiVL-a1NvWMDyWSOaXKYPkm57wkR_A@mail.gmail.com>
- <CAMuHMdX5quhZzaPkcrtB4CuHWeaKsyF1SustjB9V0SWw_SzXVg@mail.gmail.com> <CAOtvUMee+cn+=bEuB5iBiU9yeSsCiDPDwej8Uw-_3wVP4fagpA@mail.gmail.com>
+From: "Theodore Y. Ts'o" <tytso@mit.edu>
+Subject: Re: [PATCH 1/5] random: fix crng_ready() test
+Date: Thu, 17 May 2018 16:53:27 -0400
+Message-ID: <20180517205327.GB15263@thunk.org>
+References: <20180413013046.404-1-tytso@mit.edu>
+ <1699469.KmO53oa8XU@tauon.chronox.de>
+ <20180413125313.GA2633@thunk.org>
+ <4393662.RPWnPK42dp@tauon.chronox.de>
+ <20180413170037.GA28721@thunk.org>
+ <6bb4d4cb-aafa-7440-0dc3-40faf647ec89@csail.mit.edu>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Simon Horman <horms@verge.net.au>,
-        Magnus Damm <magnus.damm@gmail.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will.deacon@arm.com>,
-        Geert Uytterhoeven <geert+renesas@glider.be>,
-        Michael Turquette <mturquette@baylibre.com>,
-        Stephen Boyd <sboyd@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Ofir Drang <ofir.drang@arm.com>,
-        Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
-        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS"
-        <devicetree@vger.kernel.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-clk <linux-clk@vger.kernel.org>,
-        L
-To: Gilad Ben-Yossef <gilad@benyossef.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: Stephan Mueller <smueller@chronox.de>,
+        linux-crypto@vger.kernel.org,
+        Linux Kernel Developers List <linux-kernel@vger.kernel.org>,
+        rostedt@goodmis.org
+To: "Srivatsa S. Bhat" <srivatsa@csail.mit.edu>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAOtvUMee+cn+=bEuB5iBiU9yeSsCiDPDwej8Uw-_3wVP4fagpA@mail.gmail.com>
+Content-Disposition: inline
+In-Reply-To: <6bb4d4cb-aafa-7440-0dc3-40faf647ec89@csail.mit.edu>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi Gilad,
+On Wed, May 16, 2018 at 05:07:08PM -0700, Srivatsa S. Bhat wrote:
+> 
+> On a Photon OS VM running on VMware ESXi, this patch causes a boot speed
+> regression of 5 minutes :-( [ The VM doesn't have haveged or rng-tools
+> (rngd) installed. ]
+> 
+> [    1.420246] EXT4-fs (sda2): re-mounted. Opts: barrier,noacl,data=ordered
+> [    1.469722] tsc: Refined TSC clocksource calibration: 1900.002 MHz
+> [    1.470707] clocksource: tsc: mask: 0xffffffffffffffff max_cycles: 0x36c65c1a9e1, max_idle_ns: 881590695311 ns
+> [    1.474249] clocksource: Switched to clocksource tsc
+> [    1.584427] systemd-journald[216]: Received request to flush runtime journal from PID 1
+> [  346.620718] random: crng init done
+> 
+> Interestingly, the boot delay is exacerbated on VMs with large amounts
+> of RAM. For example, the delay is not so noticeable (< 30 seconds) on a
+> VM with 2GB memory, but goes up to 5 minutes on an 8GB VM.
+> 
+> Also, cloud-init-local.service seems to be the one blocking for entropy
+> here.
 
-On Thu, May 17, 2018 at 3:41 PM, Gilad Ben-Yossef <gilad@benyossef.com> wrote:
-> On Thu, May 17, 2018 at 4:35 PM, Geert Uytterhoeven
-> <geert@linux-m68k.org> wrote:
->> On Thu, May 17, 2018 at 3:09 PM, Gilad Ben-Yossef <gilad@benyossef.com> wrote:
->>> On Thu, May 17, 2018 at 1:16 PM, Geert Uytterhoeven
->>> <geert@linux-m68k.org> wrote:
->>>> However, even with your clock patch, the signature checking fails for me,
->>>> on both R-Car H3 ES1.0 and ES2.0.
->>>> Does this need changes to the ARM Trusted Firmware, to allow Linux to
->>>> access the public SCEG module?
->>>
->>> Well, this is actually something different. If you look you will
->>> notice that my patch was part of a 3 part patch series,
->>> the first of which disabled this test.
->>
->> Sorry, I had completely forgotten about the first patch from the series.
->> With that applied, it continues:
->>
->>         ccree e6601000.crypto: ARM CryptoCell 630P Driver: HW version
->> 0x00000000, Driver version 4.0
->>         ccree e6601000.crypto: Cache params previous: 0x00000777
->>         ccree e6601000.crypto: Cache params current: 0x00000000
->> (expect: 0x00000000)
->>         alg: No test for cts1(cbc(aes)) (cts1-cbc-aes-ccree)
->>         alg: No test for authenc(xcbc(aes),cbc(aes))
->> (authenc-xcbc-aes-cbc-aes-ccree)
->>         alg: No test for authenc(xcbc(aes),rfc3686(ctr(aes)))
->> (authenc-xcbc-aes-rfc3686-ctr-aes-ccree)
->>         ccree e6601000.crypto: ARM ccree device initialized
->>
->> Is HW version 0x00000000 expected?
->
-> It's related to the problem with reading the wrong register I've
-> mentioned before.
+So the first thing I'd ask you to investigate is what the heck
+cloud-init-local.service is doing, and why it really needs
+cryptographic grade random numbers?
 
-OK.
+> It would be great if this CVE can be fixed somehow without causing boot speed
+> to spuike from ~20 seconds to 5 minutes, as that makes the system pretty much
+> unusable. I can workaround this by installing haveged, but ideally an in-kernel
+> fix would be better. If you need any other info about my setup or if you have
+> a patch that I can test, please let me know!
 
->>> If you take all the 3 patches, it will work.
->>
->> is there an easy way to test proper operation?
->
-> The lines of the form "  alg: No test for cts1(cbc(aes))
-> (cts1-cbc-aes-ccree)" indicates
-> you have the Crypto API testmgr enable (or rather not disabled would
-> be more accurate) so every
-> cryptographic algorithm except those specified in these messages was
-> tested with test
-> vectors from crypto/testmgr.c upon registration. If you don't seen
-> failure warnings, it works.
+So the question is why is strong random numbers needed by
+cloud-init-local, and how much do you trust either haveged and/or
+RDRAND (which is what you will be depending upon if you install
+rng-tools).  If you believe that Intel and/or the NSA hasn't
+backdoored RDRAND[1], or you believe that because Intel processor's
+internal cache architecture isn't publically documented, and it's
+Soooooooo complicated that no one can figure it out (which is what you
+will be depending upon if you if you choose haveged), be my guest.  I
+personally consider the latter to be "security via obscu7rity", but
+others have different opinions.
 
-OK.
+[1] As an aside, read the best paper from the 37th IEEE Symposium on
+Security and Privacy and weep:
 
-> You can also check /proc/crypto for all the algorithm with ccree
-> listed as their driver and check
-> that their test passed.
+https://www.computerworld.com/article/3079417/security/researchers-built-devious-undetectable-hardware-level-backdoor-in-computer-chips.html
 
-OK, in that case everything works as expected, on both R-Car H3 ES1.0 and
-ES2.0.
+If it turns out that the security if your VM is critically dependent
+on what cloud-init-local.service is doing, and you don't like making
+those assumptions, then you may need to ask VMWare ESXi to make
+virtio-rng available to guest OS's, and then make Photon OS depend on
+a secure RNG available to the host OS.
 
-Thanks!
+Best regards,
 
-Gr{oetje,eeting}s,
-
-                        Geert
-
--- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+						- Ted
