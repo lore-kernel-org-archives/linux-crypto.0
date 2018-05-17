@@ -1,79 +1,43 @@
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Subject: Re: [PATCH 3/3] arm64: dts: renesas: r8a7795: add ccree binding
-Date: Thu, 17 May 2018 15:17:42 +0200
-Message-ID: <CAMuHMdUd9A_JG4zvFTtJtKEJF4NFs11vWdG+vCnFAtoqYS0Yog@mail.gmail.com>
-References: <1526387370-17142-1-git-send-email-gilad@benyossef.com>
- <1526387370-17142-4-git-send-email-gilad@benyossef.com> <CAMuHMdWzeNqsho1V6ezZb81T3_HcRzrtuQpmGXsjtFgt9BtZDQ@mail.gmail.com>
- <20180516074333.i2672u435ymwffk3@verge.net.au> <CAOtvUMfFjokOLCg6aHNQESJ_q4Jiok3izrPtae5wR+cND=XL6g@mail.gmail.com>
- <CAMuHMdVM55S7+PdnKusX-qkTxioc=0kQ6EGSbwv+kbLk5RCUYw@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Simon Horman <horms@verge.net.au>,
-        Magnus Damm <magnus.damm@gmail.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will.deacon@arm.com>,
-        Geert Uytterhoeven <geert+renesas@glider.be>,
-        Michael Turquette <mturquette@baylibre.com>,
-        Stephen Boyd <sboyd@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Ofir Drang <ofir.drang@arm.com>,
-        Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
-        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS"
-        <devicetree@vger.kernel.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-clk <linux-clk@vger.kernel.org>,
-        L
-To: Gilad Ben-Yossef <gilad@benyossef.com>
+From: Antoine Tenart <antoine.tenart@bootlin.com>
+Subject: [PATCH] crypto: inside-secure - do not use memset on MMIO
+Date: Thu, 17 May 2018 15:22:14 +0200
+Message-ID: <20180517132214.23528-1-antoine.tenart@bootlin.com>
+Cc: Antoine Tenart <antoine.tenart@bootlin.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        thomas.petazzoni@bootlin.com, maxime.chevallier@bootlin.com,
+        gregory.clement@bootlin.com, miquel.raynal@bootlin.com,
+        nadavh@marvell.com, oferh@marvell.com, igall@marvell.com
+To: herbert@gondor.apana.org.au, davem@davemloft.net
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAMuHMdVM55S7+PdnKusX-qkTxioc=0kQ6EGSbwv+kbLk5RCUYw@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, May 17, 2018 at 12:16 PM, Geert Uytterhoeven
-<geert@linux-m68k.org> wrote:
-> On Thu, May 17, 2018 at 10:01 AM, Gilad Ben-Yossef <gilad@benyossef.com> wrote:
->> On Wed, May 16, 2018 at 10:43 AM, Simon Horman <horms@verge.net.au> wrote:
->>> On Tue, May 15, 2018 at 04:50:44PM +0200, Geert Uytterhoeven wrote:
->>>> On Tue, May 15, 2018 at 2:29 PM, Gilad Ben-Yossef <gilad@benyossef.com> wrote:
->>>> > Add bindings for CryptoCell instance in the SoC.
->>>> >
->>>> > Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
->>>>
->>>> Thanks for your patch!
->>>>
->>>> > --- a/arch/arm64/boot/dts/renesas/r8a7795.dtsi
->>>> > +++ b/arch/arm64/boot/dts/renesas/r8a7795.dtsi
->>>> > @@ -528,6 +528,14 @@
->>>> >                         status = "disabled";
->>>> >                 };
->>>> >
->>>> > +               arm_cc630p: crypto@e6601000 {
->>>> > +                       compatible = "arm,cryptocell-630p-ree";
->>>> > +                       interrupts = <GIC_SPI 71 IRQ_TYPE_LEVEL_HIGH>;
->>>> > +                       #interrupt-cells = <2>;
->>>>
->>>> I believe the #interrupt-cells property is not needed.
->>>>
->>>> > +                       reg = <0x0 0xe6601000 0 0x1000>;
->>>> > +                       clocks = <&cpg CPG_MOD 229>;
->
-> Missing "power-domains = <&sysc R8A7795_PD_ALWAYS_ON>;", as
-> the Secure Engine is part of the CPG/MSSR clock domain (see below [*]).
+This patch fixes the Inside Secure driver which uses a memtset() call to
+set an MMIO area from the cryptographic engine to 0. This is wrong as
+memset() isn't guaranteed to work on MMIO for many reasons. This led to
+kernel paging request panics in certain cases. Use memset_io() instead.
 
-And missing "resets = <&cpg 229>;", as the module is tied to the CPG/MSSR
-reset controller.
+Fixes: 1b44c5a60c13 ("crypto: inside-secure - add SafeXcel EIP197 crypto engine driver")
+Reported-by: Ofer Heifetz <oferh@marvell.com>
+Signed-off-by: Antoine Tenart <antoine.tenart@bootlin.com>
+---
+ drivers/crypto/inside-secure/safexcel.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Gr{oetje,eeting}s,
-
-                        Geert
-
+diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/inside-secure/safexcel.c
+index 46ab2d0eb3fd..4e86f864a952 100644
+--- a/drivers/crypto/inside-secure/safexcel.c
++++ b/drivers/crypto/inside-secure/safexcel.c
+@@ -153,8 +153,8 @@ static int eip197_load_firmwares(struct safexcel_crypto_priv *priv)
+ 	       EIP197_PE_ICE_SCRATCH_CTRL_CHANGE_ACCESS;
+ 	writel(val, EIP197_PE(priv) + EIP197_PE_ICE_SCRATCH_CTRL);
+ 
+-	memset(EIP197_PE(priv) + EIP197_PE_ICE_SCRATCH_RAM, 0,
+-	       EIP197_NUM_OF_SCRATCH_BLOCKS * sizeof(u32));
++	memset_io(EIP197_PE(priv) + EIP197_PE_ICE_SCRATCH_RAM, 0,
++		  EIP197_NUM_OF_SCRATCH_BLOCKS * sizeof(u32));
+ 
+ 	eip197_write_firmware(priv, fw[FW_IFPP], EIP197_PE_ICE_FPP_CTRL,
+ 			      EIP197_PE_ICE_RAM_CTRL_FPP_PROG_EN);
 -- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+2.17.0
