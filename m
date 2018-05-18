@@ -1,50 +1,65 @@
-From: "Theodore Y. Ts'o" <tytso@mit.edu>
-Subject: Re: [PATCH 1/5] random: fix crng_ready() test
-Date: Thu, 17 May 2018 16:56:55 -0400
-Message-ID: <20180517205655.GC15263@thunk.org>
-References: <20180413013046.404-1-tytso@mit.edu>
- <1699469.KmO53oa8XU@tauon.chronox.de>
- <20180413125313.GA2633@thunk.org>
- <4393662.RPWnPK42dp@tauon.chronox.de>
- <20180413170037.GA28721@thunk.org>
- <84e0c16c-2b48-69e5-4ca4-2ca3bce15dc9@c-s.fr>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Subject: cryptomgr_test / drbg_ctr: BUG: sleeping function called from invalid context
+Date: Fri, 18 May 2018 10:36:04 +0200
+Message-ID: <CAMuHMdW_4gvQYhCxcXR+sa6dhwAshyJnhXhc36=VC=hWKB-7Jw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Stephan Mueller <smueller@chronox.de>,
-        linux-crypto@vger.kernel.org,
-        Linux Kernel Developers List <linux-kernel@vger.kernel.org>
-To: Christophe LEROY <christophe.leroy@c-s.fr>
+Content-Type: text/plain; charset="UTF-8"
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        Stephan Mueller <smueller@chronox.de>,
+        "David S. Miller" <davem@davemloft.net>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <84e0c16c-2b48-69e5-4ca4-2ca3bce15dc9@c-s.fr>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, May 17, 2018 at 08:01:04AM +0200, Christophe LEROY wrote:
-> 
-> On a powerpc embedded board which has an mpc8xx processor running at 133Mhz,
-> I now get the startup done in more than 7 minutes instead of 30 seconds.
-> This is due to the webserver blocking on read on /dev/random until we get
-> 'random: crng init done':
-> 
-> [    0.000000] Linux version 4.17.0-rc4-00415-gd2f75d40072d (root@localhost)
-> (gcc version 5.4.0 (GCC)) #203 PREEMPT Wed May 16 16:32:02 CEST 2018
-> [    0.295453] random: get_random_u32 called from
-> bucket_table_alloc+0x84/0x1bc with crng_init=0
-> [    1.030472] device: 'random': device_add
-> [    1.031279] device: 'urandom': device_add
-> [    1.420069] device: 'hw_random': device_add
-> [    2.156853] random: fast init done
-> [  462.007776] random: crng init done
-> 
-> This has become really critical, is there anything that can be done ?
+Hi,
 
-Figure out why the webserver needs to read /dev/random and is it for a
-security critical purpose?
+After enabling CONFIG_CRYPTO_DRBG_CTR, I start seeing during kernel boot:
 
-A kernel patch which makes the kernel do a "lalalalala I'm secure"
-when it really isn't secure is a simple "solution", but would it
-really make you happy?
+BUG: sleeping function called from invalid context at
+include/crypto/algapi.h:416
+in_atomic(): 1, irqs_disabled(): 0, pid: 203, name: cryptomgr_test
+1 lock held by cryptomgr_test/203:
+ #0:         (ptrval) (&drbg->drbg_mutex){+.+.}, at: drbg_kcapi_seed+0x128/0x4bc
+CPU: 3 PID: 203 Comm: cryptomgr_test Not tainted
+4.17.0-rc5-salvator-x-00509-g0ad2b9f404d6a668-dirty #1742
+Hardware name: Renesas Salvator-X 2nd version board based on r8a7795 ES2.0+ (DT)
+Call trace:
+ dump_backtrace+0x0/0x140
+ show_stack+0x14/0x1c
+ dump_stack+0xb4/0xf0
+ ___might_sleep+0x1fc/0x218
+ skcipher_walk_done+0x2c8/0x38c
+ ctr_encrypt+0x84/0x110
+ simd_skcipher_encrypt+0xa4/0xb0
+ drbg_kcapi_sym_ctr+0xb4/0x178
+ drbg_ctr_update+0x17c/0x2c4
+ drbg_seed+0x20c/0x26c
+ drbg_kcapi_seed+0x458/0x4bc
+ crypto_rng_reset+0x84/0xa8
+ alg_test_drbg+0x12c/0x324
+ alg_test.part.7+0x264/0x2bc
+ alg_test+0x44/0x58
+ cryptomgr_test+0x28/0x48
+ kthread+0x11c/0x124
+ ret_from_fork+0x10/0x18
 
+I tried following the code path, but couldn't find where it went wrong.
 
-						- Ted
+mutex_lock(&drbg->drbg_mutex) is called from drbg_instantiate(), which is
+inlined by the compiler into drbg_kcapi_seed().
+
+Do you have a clue?
+Thanks!
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+-- 
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
