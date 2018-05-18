@@ -1,31 +1,33 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: nx: fix spelling mistake: "seqeunce" ->
- "sequence"
-Date: Sat, 19 May 2018 02:20:51 +0800
-Message-ID: <20180518182051.dsil4emgxugtnydp@gondor.apana.org.au>
-References: <20180509091636.13589-1-colin.king@canonical.com>
+Subject: Re: [PATCH] crypto: reorder paes test lexicographically
+Date: Sat, 19 May 2018 02:21:15 +0800
+Message-ID: <20180518182114.aqrkeoypuh2wlucy@gondor.apana.org.au>
+References: <1526025847-13134-1-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Haren Myneni <haren@us.ibm.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Colin King <colin.king@canonical.com>
+Cc: Abdul Haleem <abdhalee@linux.vnet.ibm.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Ofir Drang <ofir.drang@arm.com>,
+        linux-next <linux-next@vger.kernel.org>,
+        Stephen Rothwell <sfr@canb.auug.org.au>,
+        sachinp <sachinp@linux.vnet.ibm.com>,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Gilad Ben-Yossef <gilad@benyossef.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20180509091636.13589-1-colin.king@canonical.com>
+In-Reply-To: <1526025847-13134-1-git-send-email-gilad@benyossef.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, May 09, 2018 at 10:16:36AM +0100, Colin King wrote:
-> From: Colin Ian King <colin.king@canonical.com>
+On Fri, May 11, 2018 at 09:04:06AM +0100, Gilad Ben-Yossef wrote:
+> Due to a snafu "paes" testmgr tests were not ordered
+> lexicographically, which led to boot time warnings.
+> Reorder the tests as needed.
 > 
-> Trivial fix to spelling mistake in CSB_ERR error message text
-> 
-> Signed-off-by: Colin Ian King <colin.king@canonical.com>
+> Fixes: a794d8d ("crypto: ccree - enable support for hardware keys")
+> Reported-by: Abdul Haleem <abdhalee@linux.vnet.ibm.com>
+> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 
 Patch applied.  Thanks.
 -- 
