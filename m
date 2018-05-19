@@ -1,67 +1,69 @@
-From: Wenwen Wang <wang6495@umn.edu>
-Subject: [PATCH] crypto: chtls - fix a missing-check bug
-Date: Fri, 18 May 2018 14:55:35 -0500
-Message-ID: <1526673338-486-1-git-send-email-wang6495@umn.edu>
-Cc: Kangjie Lu <kjlu@umn.edu>, Harsh Jain <harsh@chelsio.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Atul Gupta <atul.gupta@chelsio.com>,
-        Michael Werner <werner@chelsio.com>,
-        Casey Leedom <leedom@chelsio.com>,
-        linux-crypto@vger.kernel.org (open list:CXGB4 CRYPTO DRIVER (chcr)),
-        linux-kernel@vger.kernel.org (open list)
-To: Wenwen Wang <wang6495@umn.edu>
+From: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+Subject: [PATCH v2][RESEND] X.509: unpack RSA signatureValue field from BIT
+ STRING
+Date: Sat, 19 May 2018 14:23:54 +0200
+Message-ID: <04f372f3-bc26-c629-2269-0e5d258f9d8f@maciej.szmigiero.name>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-2
+Content-Transfer-Encoding: 7bit
+Cc: "David S. Miller" <davem@davemloft.net>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Gary Hook <gary.hook@amd.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>, keyrings@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: David Howells <dhowells@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-In do_chtls_setsockopt(), the tls crypto info is first copied from the
-poiner 'optval' in userspace and saved to 'tmp_crypto_info'. Then the
-'version' of the crypto info is checked. If the version is not as expected,
-i.e., TLS_1_2_VERSION, error code -ENOTSUPP is returned to indicate that
-the provided crypto info is not supported yet. Then, the 'cipher_type'
-field of the 'tmp_crypto_info' is also checked to see if it is
-TLS_CIPHER_AES_GCM_128. If it is, the whole struct of
-tls12_crypto_info_aes_gcm_128 is copied from the pointer 'optval' and then
-the function chtls_setkey() is invoked to set the key.
+The signatureValue field of a X.509 certificate is encoded as a BIT STRING.
+For RSA signatures this BIT STRING is of so-called primitive subtype, which
+contains a u8 prefix indicating a count of unused bits in the encoding.
 
-Given that the 'optval' pointer resides in userspace, a malicious userspace
-process can race to change the data pointed by 'optval' between the two
-copies. For example, a user can provide a crypto info with TLS_1_2_VERSION
-and TLS_CIPHER_AES_GCM_128. After the first copy, the user can modify the
-'version' and the 'cipher_type' fields to any versions and/or cipher types
-that are not allowed. This way, the user can bypass the checks, inject
-bad data to the kernel, cause chtls_setkey() to set a wrong key or other
-issues.
+We have to strip this prefix from signature data, just as we already do for
+key data in x509_extract_key_data() function.
 
-This patch reuses the data copied in the first try so as to ensure these
-checks will not be bypassed.
+This wasn't noticed earlier because this prefix byte is zero for RSA key
+sizes divisible by 8. Since BIT STRING is a big-endian encoding adding zero
+prefixes has no bearing on its value.
 
-Signed-off-by: Wenwen Wang <wang6495@umn.edu>
+The signature length, however was incorrect, which is a problem for RSA
+implementations that need it to be exactly correct (like AMD CCP).
+
+Signed-off-by: Maciej S. Szmigiero <mail@maciej.szmigiero.name>
+Fixes: c26fd69fa009 ("X.509: Add a crypto key parser for binary (DER) X.509 certificates")
+Cc: stable@vger.kernel.org
 ---
- drivers/crypto/chelsio/chtls/chtls_main.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+This is a resend of a patch that was previously submitted in one series
+with CCP driver changes since this particular patch should go through
+the security (rather than crypto) tree.
 
-diff --git a/drivers/crypto/chelsio/chtls/chtls_main.c b/drivers/crypto/chelsio/chtls/chtls_main.c
-index 007c45c..39aab05 100644
---- a/drivers/crypto/chelsio/chtls/chtls_main.c
-+++ b/drivers/crypto/chelsio/chtls/chtls_main.c
-@@ -491,9 +491,13 @@ static int do_chtls_setsockopt(struct sock *sk, int optname,
+Changes from v1: Change '!' to '== 0'.
+
+ crypto/asymmetric_keys/x509_cert_parser.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/crypto/asymmetric_keys/x509_cert_parser.c b/crypto/asymmetric_keys/x509_cert_parser.c
+index 7d81e6bb461a..b6cabac4b62b 100644
+--- a/crypto/asymmetric_keys/x509_cert_parser.c
++++ b/crypto/asymmetric_keys/x509_cert_parser.c
+@@ -249,6 +249,15 @@ int x509_note_signature(void *context, size_t hdrlen,
+ 		return -EINVAL;
+ 	}
  
- 	switch (tmp_crypto_info.cipher_type) {
- 	case TLS_CIPHER_AES_GCM_128: {
--		rc = copy_from_user(crypto_info, optval,
--				    sizeof(struct
--					   tls12_crypto_info_aes_gcm_128));
-+		/* Obtain version and type from previous copy */
-+		crypto_info[0] = tmp_crypto_info;
-+		/* Now copy the following data */
-+		rc = copy_from_user((char *)crypto_info + sizeof(*crypto_info),
-+				optval + sizeof(*crypto_info),
-+				sizeof(struct tls12_crypto_info_aes_gcm_128)
-+				- sizeof(*crypto_info));
- 
- 		if (rc) {
- 			rc = -EFAULT;
--- 
-2.7.4
++	if (strcmp(ctx->cert->sig->pkey_algo, "rsa") == 0) {
++		/* Discard the BIT STRING metadata */
++		if (vlen < 1 || *(const u8 *)value != 0)
++			return -EBADMSG;
++
++		value++;
++		vlen--;
++	}
++
+ 	ctx->cert->raw_sig = value;
+ 	ctx->cert->raw_sig_size = vlen;
+ 	return 0;
