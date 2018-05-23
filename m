@@ -1,7 +1,7 @@
 From: Thiago Jung Bauermann <bauerman@linux.ibm.com>
-Subject: [PATCH v7 12/14] ima: Add new "d-sig" template field
-Date: Tue, 22 May 2018 21:12:51 -0300
-Message-ID: <20180523001253.15247-13-bauerman@linux.ibm.com>
+Subject: [PATCH v7 14/14] ima: Store the measurement again when appraising a modsig
+Date: Tue, 22 May 2018 21:12:53 -0300
+Message-ID: <20180523001253.15247-15-bauerman@linux.ibm.com>
 References: <20180523001253.15247-1-bauerman@linux.ibm.com>
 Cc: linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
         linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
@@ -23,173 +23,271 @@ In-Reply-To: <20180523001253.15247-1-bauerman@linux.ibm.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Define new "d-sig" template field which holds the digest that is expected
-to match the one contained in the modsig.
+If the IMA template contains the 'sig' field, then the modsig should be
+added to the measurement list when the file is appraised, and that is what
+normally happens.
+
+But If a measurement rule caused a file containing a modsig to be measured
+before a different rule causes it to be appraised, the resulting
+measurement entry will not contain the modsig because it is only fetched
+during appraisal. When the appraisal rule triggers, it won't store a new
+measurement containing the modsig because the file was already measured.
+
+We need to detect that situation and store an additional measurement with
+the modsig. This is done by defining the appraise subaction flag
+IMA_READ_MEASURE and testing for it in process_measurement().
 
 Suggested-by: Mimi Zohar <zohar@linux.vnet.ibm.com>
 Signed-off-by: Thiago Jung Bauermann <bauerman@linux.ibm.com>
 ---
- Documentation/security/IMA-templates.rst  |  5 +++++
- security/integrity/ima/ima.h              |  9 +++++++++
- security/integrity/ima/ima_modsig.c       | 23 ++++++++++++++++++++++
- security/integrity/ima/ima_template.c     |  4 +++-
- security/integrity/ima/ima_template_lib.c | 32 ++++++++++++++++++++++++++++++-
- security/integrity/ima/ima_template_lib.h |  2 ++
- 6 files changed, 73 insertions(+), 2 deletions(-)
+ security/integrity/ima/ima.h          |  1 +
+ security/integrity/ima/ima_api.c      |  8 ++++-
+ security/integrity/ima/ima_main.c     | 16 +++++++++-
+ security/integrity/ima/ima_policy.c   | 59 ++++++++++++++++++++++++++++++++---
+ security/integrity/ima/ima_template.c | 27 ++++++++++++++++
+ security/integrity/integrity.h        |  9 ++++--
+ 6 files changed, 110 insertions(+), 10 deletions(-)
 
-diff --git a/Documentation/security/IMA-templates.rst b/Documentation/security/IMA-templates.rst
-index 2cd0e273cc9a..f2a0f4225857 100644
---- a/Documentation/security/IMA-templates.rst
-+++ b/Documentation/security/IMA-templates.rst
-@@ -68,6 +68,11 @@ descriptors by adding their identifier to the format string
-  - 'd-ng': the digest of the event, calculated with an arbitrary hash
-    algorithm (field format: [<hash algo>:]digest, where the digest
-    prefix is shown only if the hash algorithm is not SHA1 or MD5);
-+ - 'd-sig': the digest of the event for files that have an appended modsig. This
-+   field is calculated without including the modsig and thus will differ from
-+   the total digest of the file, but it is what should match the digest
-+   contained in the modsig (if it doesn't, the signature is invalid). It is
-+   shown in the same format as 'd-ng';
-  - 'n-ng': the name of the event, without size limitations;
-  - 'sig': the file signature.
- 
 diff --git a/security/integrity/ima/ima.h b/security/integrity/ima/ima.h
-index 0fa8d89c8bd4..4ed7b0610842 100644
+index 33120c10a173..081e2b87cf9d 100644
 --- a/security/integrity/ima/ima.h
 +++ b/security/integrity/ima/ima.h
-@@ -312,6 +312,8 @@ bool ima_hook_supports_modsig(enum ima_hooks func);
- int ima_read_modsig(enum ima_hooks func, const void *buf, loff_t buf_len,
- 		    struct evm_ima_xattr_data **xattr_value,
- 		    int *xattr_len);
-+int ima_get_modsig_hash(struct evm_ima_xattr_data *hdr, enum hash_algo *algo,
-+			const u8 **hash, u8 *len);
- int ima_modsig_verify(const unsigned int keyring_id,
- 		      struct evm_ima_xattr_data *hdr);
- void ima_free_xattr_data(struct evm_ima_xattr_data *hdr);
-@@ -329,6 +331,13 @@ static inline int ima_read_modsig(enum ima_hooks func, const void *buf,
- 	return -EOPNOTSUPP;
- }
+@@ -147,6 +147,7 @@ int ima_init_crypto(void);
+ void ima_putc(struct seq_file *m, void *data, int datalen);
+ void ima_print_digest(struct seq_file *m, u8 *digest, u32 size);
+ struct ima_template_desc *ima_template_desc_current(void);
++bool ima_current_template_has_sig(void);
+ int ima_restore_measurement_entry(struct ima_template_entry *entry);
+ int ima_restore_measurement_list(loff_t bufsize, void *buf);
+ int ima_measurements_show(struct seq_file *m, void *v);
+diff --git a/security/integrity/ima/ima_api.c b/security/integrity/ima/ima_api.c
+index bf88236b7a0b..73f6d4df66a7 100644
+--- a/security/integrity/ima/ima_api.c
++++ b/security/integrity/ima/ima_api.c
+@@ -288,7 +288,13 @@ void ima_store_measurement(struct integrity_iint_cache *iint,
+ 					    xattr_len, NULL};
+ 	int violation = 0;
  
-+static inline int ima_get_modsig_hash(struct evm_ima_xattr_data *hdr,
-+				      enum hash_algo *algo, const u8 **hash,
-+				      u8 *len)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
- static inline int ima_modsig_verify(const unsigned int keyring_id,
- 				    struct evm_ima_xattr_data *hdr)
- {
-diff --git a/security/integrity/ima/ima_modsig.c b/security/integrity/ima/ima_modsig.c
-index aa6b91c3745b..0a8b9216cfa5 100644
---- a/security/integrity/ima/ima_modsig.c
-+++ b/security/integrity/ima/ima_modsig.c
-@@ -144,6 +144,29 @@ int ima_read_modsig(enum ima_hooks func, const void *buf, loff_t buf_len,
- 	return rc;
- }
+-	if (iint->measured_pcrs & (0x1 << pcr))
++	/*
++	 * We still need to store the measurement in the case of MODSIG because
++	 * we only have its contents to put in the list at the time of
++	 * appraisal. See comment in store_measurement_again() for more details.
++	 */
++	if (iint->measured_pcrs & (0x1 << pcr) &&
++	    (!xattr_value || xattr_value->type != IMA_MODSIG))
+ 		return;
  
-+int ima_get_modsig_hash(struct evm_ima_xattr_data *hdr, enum hash_algo *algo,
-+			const u8 **hash, u8 *len)
-+{
-+	struct modsig_hdr *modsig = (typeof(modsig)) hdr;
-+	const struct public_key_signature *pks;
-+	int i;
-+
-+	if (!hdr || hdr->type != IMA_MODSIG)
-+		return -EINVAL;
-+
-+	pks = pkcs7_get_message_sig(modsig->pkcs7_msg);
-+	if (!pks)
-+		return -EBADMSG;
-+
-+	for (i = 0; i < HASH_ALGO__LAST; i++)
-+		if (!strcmp(hash_algo_name[i], pks->hash_algo))
-+			break;
-+
-+	*algo = i;
-+
-+	return pkcs7_get_digest(modsig->pkcs7_msg, hash, len);
-+}
-+
- int ima_modsig_verify(const unsigned int keyring_id,
- 		      struct evm_ima_xattr_data *hdr)
- {
-diff --git a/security/integrity/ima/ima_template.c b/security/integrity/ima/ima_template.c
-index 30db39b23804..36fc32f538b5 100644
---- a/security/integrity/ima/ima_template.c
-+++ b/security/integrity/ima/ima_template.c
-@@ -43,8 +43,10 @@ static struct ima_template_field supported_fields[] = {
- 	 .field_show = ima_show_template_string},
- 	{.field_id = "sig", .field_init = ima_eventsig_init,
- 	 .field_show = ima_show_template_sig},
-+	{.field_id = "d-sig", .field_init = ima_eventdigest_sig_init,
-+	 .field_show = ima_show_template_digest_ng},
- };
--#define MAX_TEMPLATE_NAME_LEN 15
-+#define MAX_TEMPLATE_NAME_LEN 24
- 
- static struct ima_template_desc *ima_template;
- static struct ima_template_desc *lookup_template_desc(const char *name);
-diff --git a/security/integrity/ima/ima_template_lib.c b/security/integrity/ima/ima_template_lib.c
-index 300912914b17..36d175816894 100644
---- a/security/integrity/ima/ima_template_lib.c
-+++ b/security/integrity/ima/ima_template_lib.c
-@@ -222,7 +222,8 @@ int ima_parse_buf(void *bufstartp, void *bufendp, void **bufcurp,
- 	return 0;
- }
- 
--static int ima_eventdigest_init_common(u8 *digest, u32 digestsize, u8 hash_algo,
-+static int ima_eventdigest_init_common(const u8 *digest, u32 digestsize,
-+				       u8 hash_algo,
- 				       struct ima_field_data *field_data)
- {
- 	/*
-@@ -325,6 +326,35 @@ int ima_eventdigest_ng_init(struct ima_event_data *event_data,
- 					   hash_algo, field_data);
+ 	result = ima_alloc_init_template(&event_data, &entry);
+diff --git a/security/integrity/ima/ima_main.c b/security/integrity/ima/ima_main.c
+index 9d32ce6c3df3..90e336a2b5c4 100644
+--- a/security/integrity/ima/ima_main.c
++++ b/security/integrity/ima/ima_main.c
+@@ -169,6 +169,20 @@ void ima_file_free(struct file *file)
+ 	ima_check_last_writer(iint, inode, file);
  }
  
 +/*
-+ * This function writes the digest of the file which is expected to match the
-+ * digest contained in the file's embedded signature.
++ * A file measurement might already exist in the measurement list. Based on
++ * policy, include an additional file measurement containing the appended
++ * signature and file hash, without the appended signature (i.e., the 'd-sig'
++ * field).
 + */
-+int ima_eventdigest_sig_init(struct ima_event_data *event_data,
-+			     struct ima_field_data *field_data)
++static bool store_measurement_again(struct integrity_iint_cache *iint,
++				    struct evm_ima_xattr_data *xattr_value)
 +{
-+	struct evm_ima_xattr_data *xattr_value = event_data->xattr_value;
-+	enum hash_algo hash_algo = HASH_ALGO_SHA1;
-+	const u8 *cur_digest = NULL;
-+	u8 cur_digestsize = 0;
-+	int ret;
-+
-+	if (!xattr_value || xattr_value->type != IMA_MODSIG)
-+		return 0;
-+
-+	if (event_data->violation)	/* recording a violation. */
-+		goto out;
-+
-+	ret = ima_get_modsig_hash(xattr_value, &hash_algo, &cur_digest,
-+				  &cur_digestsize);
-+	if (ret)
-+		return ret;
-+
-+ out:
-+	return ima_eventdigest_init_common(cur_digest, cur_digestsize,
-+					   hash_algo, field_data);
++	return iint->flags & IMA_READ_MEASURE && xattr_value &&
++		xattr_value->type == IMA_MODSIG &&
++		ima_current_template_has_sig();
 +}
 +
- static int ima_eventname_init_common(struct ima_event_data *event_data,
- 				     struct ima_field_data *field_data,
- 				     bool size_limit)
-diff --git a/security/integrity/ima/ima_template_lib.h b/security/integrity/ima/ima_template_lib.h
-index 6a3d8b831deb..3cd353e83f73 100644
---- a/security/integrity/ima/ima_template_lib.h
-+++ b/security/integrity/ima/ima_template_lib.h
-@@ -38,6 +38,8 @@ int ima_eventname_init(struct ima_event_data *event_data,
- 		       struct ima_field_data *field_data);
- int ima_eventdigest_ng_init(struct ima_event_data *event_data,
- 			    struct ima_field_data *field_data);
-+int ima_eventdigest_sig_init(struct ima_event_data *event_data,
-+			     struct ima_field_data *field_data);
- int ima_eventname_ng_init(struct ima_event_data *event_data,
- 			  struct ima_field_data *field_data);
- int ima_eventsig_init(struct ima_event_data *event_data,
+ static int process_measurement(struct file *file, const struct cred *cred,
+ 			       u32 secid, char *buf, loff_t size, int mask,
+ 			       enum ima_hooks func, int opened)
+@@ -302,7 +316,7 @@ static int process_measurement(struct file *file, const struct cred *cred,
+ 	if (!pathbuf)	/* ima_rdwr_violation possibly pre-fetched */
+ 		pathname = ima_d_path(&file->f_path, &pathbuf, filename);
+ 
+-	if (action & IMA_MEASURE)
++	if (action & IMA_MEASURE || store_measurement_again(iint, xattr_value))
+ 		ima_store_measurement(iint, file, pathname,
+ 				      xattr_value, xattr_len, pcr);
+ 	if (rc == 0 && (action & IMA_APPRAISE_SUBMASK)) {
+diff --git a/security/integrity/ima/ima_policy.c b/security/integrity/ima/ima_policy.c
+index 66d0d3bcf1b2..5ad5ced3b352 100644
+--- a/security/integrity/ima/ima_policy.c
++++ b/security/integrity/ima/ima_policy.c
+@@ -10,6 +10,9 @@
+  *	- initialize default measure policy rules
+  *
+  */
++
++#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
++
+ #include <linux/module.h>
+ #include <linux/list.h>
+ #include <linux/fs.h>
+@@ -341,7 +344,8 @@ static bool ima_match_rules(struct ima_rule_entry *rule, struct inode *inode,
+  * In addition to knowing that we need to appraise the file in general,
+  * we need to differentiate between calling hooks, for hook specific rules.
+  */
+-static int get_subaction(struct ima_rule_entry *rule, enum ima_hooks func)
++static int get_appraise_subaction(struct ima_rule_entry *rule,
++				  enum ima_hooks func)
+ {
+ 	if (!(rule->flags & IMA_FUNC))
+ 		return IMA_FILE_APPRAISE;
+@@ -362,6 +366,15 @@ static int get_subaction(struct ima_rule_entry *rule, enum ima_hooks func)
+ 	}
+ }
+ 
++static int get_measure_subaction(struct ima_rule_entry *rule,
++				 enum ima_hooks func)
++{
++	if (rule->flags & IMA_FUNC && ima_hook_supports_modsig(func))
++		return IMA_READ_MEASURE;
++	else
++		return 0;
++}
++
+ /**
+  * ima_match_policy - decision based on LSM and other conditions
+  * @inode: pointer to an inode for which the policy decision is being made
+@@ -398,11 +411,12 @@ int ima_match_policy(struct inode *inode, const struct cred *cred, u32 secid,
+ 
+ 		action |= entry->action & IMA_DO_MASK;
+ 		if (entry->action & IMA_APPRAISE) {
+-			action |= get_subaction(entry, func);
++			action |= get_appraise_subaction(entry, func);
+ 			action &= ~IMA_HASH;
+ 			if (ima_fail_unverifiable_sigs)
+ 				action |= IMA_FAIL_UNVERIFIABLE_SIGS;
+-		}
++		} else if (entry->action & IMA_MEASURE)
++			action |= get_measure_subaction(entry, func);
+ 
+ 		if (entry->action & IMA_DO_MASK)
+ 			actmask &= ~(entry->action | entry->action << 1);
+@@ -642,6 +656,40 @@ static void ima_log_string(struct audit_buffer *ab, char *key, char *value)
+ 	ima_log_string_op(ab, key, value, NULL);
+ }
+ 
++/*
++ * To validate the appended signature included in the measurement list requires
++ * the file hash, without the appended signature (i.e., the 'd-sig' field).
++ * Therefore, notify the user if they have the 'sig' field but not the 'd-sig'
++ * field in the template.
++ */
++static void check_current_template_modsig(void)
++{
++#define MSG "template with 'sig' field also needs 'd-sig' field when modsig is allowed\n"
++	struct ima_template_desc *template;
++	bool has_sig, has_dsig;
++	static bool checked;
++	int i;
++
++	/* We only need to notify the user once. */
++	if (checked)
++		return;
++
++	has_sig = has_dsig = false;
++	template = ima_template_desc_current();
++	for (i = 0; i < template->num_fields; i++) {
++		if (!strcmp(template->fields[i]->field_id, "sig"))
++			has_sig = true;
++		else if (!strcmp(template->fields[i]->field_id, "d-sig"))
++			has_dsig = true;
++	}
++
++	if (has_sig && !has_dsig)
++		pr_notice(MSG);
++
++	checked = true;
++#undef MSG
++}
++
+ static int ima_parse_rule(char *rule, struct ima_rule_entry *entry)
+ {
+ 	struct audit_buffer *ab;
+@@ -920,10 +968,11 @@ static int ima_parse_rule(char *rule, struct ima_rule_entry *entry)
+ 			if ((strcmp(args[0].from, "imasig")) == 0)
+ 				entry->flags |= IMA_DIGSIG_REQUIRED;
+ 			else if (ima_hook_supports_modsig(entry->func) &&
+-				 strcmp(args[0].from, "imasig|modsig") == 0)
++				 strcmp(args[0].from, "imasig|modsig") == 0) {
+ 				entry->flags |= IMA_DIGSIG_REQUIRED
+ 						| IMA_MODSIG_ALLOWED;
+-			else
++				check_current_template_modsig();
++			} else
+ 				result = -EINVAL;
+ 			break;
+ 		case Opt_permit_directio:
+diff --git a/security/integrity/ima/ima_template.c b/security/integrity/ima/ima_template.c
+index 36fc32f538b5..967c287dcdfb 100644
+--- a/security/integrity/ima/ima_template.c
++++ b/security/integrity/ima/ima_template.c
+@@ -230,6 +230,33 @@ struct ima_template_desc *ima_template_desc_current(void)
+ 	return ima_template;
+ }
+ 
++/*
++ * Tells whether the current template has fields which reference a file's
++ * signature.
++ */
++bool ima_current_template_has_sig(void)
++{
++	static int ima_template_has_sig = -1;
++
++	if (ima_template_has_sig < 0) {
++		struct ima_template_desc *template;
++		int i;
++
++		template = ima_template_desc_current();
++		for (i = 0; i < template->num_fields; i++)
++			if (!strcmp(template->fields[i]->field_id, "sig") ||
++			    !strcmp(template->fields[i]->field_id, "d-sig")) {
++				ima_template_has_sig = 1;
++				break;
++			}
++
++		if (ima_template_has_sig < 0)
++			ima_template_has_sig = 0;
++	}
++
++	return ima_template_has_sig;
++}
++
+ int __init ima_init_template(void)
+ {
+ 	struct ima_template_desc *template = ima_template_desc_current();
+diff --git a/security/integrity/integrity.h b/security/integrity/integrity.h
+index b38339c02541..a85b83519fc8 100644
+--- a/security/integrity/integrity.h
++++ b/security/integrity/integrity.h
+@@ -38,12 +38,13 @@
+ #define IMA_MODSIG_ALLOWED	0x20000000
+ 
+ #define IMA_DO_MASK		(IMA_MEASURE | IMA_APPRAISE | IMA_AUDIT | \
+-				 IMA_HASH | IMA_APPRAISE_SUBMASK)
++				 IMA_HASH | IMA_APPRAISE_SUBMASK | \
++				 IMA_READ_MEASURE)
+ #define IMA_DONE_MASK		(IMA_MEASURED | IMA_APPRAISED | IMA_AUDITED | \
+ 				 IMA_HASHED | IMA_COLLECTED | \
+-				 IMA_APPRAISED_SUBMASK)
++				 IMA_APPRAISED_SUBMASK | IMA_READ_MEASURED)
+ 
+-/* iint subaction appraise cache flags */
++/* iint subaction appraise and measure cache flags */
+ #define IMA_FILE_APPRAISE	0x00001000
+ #define IMA_FILE_APPRAISED	0x00002000
+ #define IMA_MMAP_APPRAISE	0x00004000
+@@ -54,6 +55,8 @@
+ #define IMA_READ_APPRAISED	0x00080000
+ #define IMA_CREDS_APPRAISE	0x00100000
+ #define IMA_CREDS_APPRAISED	0x00200000
++#define IMA_READ_MEASURE	0x00400000
++#define IMA_READ_MEASURED	0x00800000
+ #define IMA_APPRAISE_SUBMASK	(IMA_FILE_APPRAISE | IMA_MMAP_APPRAISE | \
+ 				 IMA_BPRM_APPRAISE | IMA_READ_APPRAISE | \
+ 				 IMA_CREDS_APPRAISE)
