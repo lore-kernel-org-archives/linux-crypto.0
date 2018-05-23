@@ -1,7 +1,7 @@
 From: Thiago Jung Bauermann <bauerman@linux.ibm.com>
-Subject: [PATCH v7 05/14] integrity: Introduce integrity_keyring_from_id()
-Date: Tue, 22 May 2018 21:12:44 -0300
-Message-ID: <20180523001253.15247-6-bauerman@linux.ibm.com>
+Subject: [PATCH v7 06/14] integrity: Introduce asymmetric_sig_has_known_key()
+Date: Tue, 22 May 2018 21:12:45 -0300
+Message-ID: <20180523001253.15247-7-bauerman@linux.ibm.com>
 References: <20180523001253.15247-1-bauerman@linux.ibm.com>
 Cc: linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
         linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
@@ -23,92 +23,114 @@ In-Reply-To: <20180523001253.15247-1-bauerman@linux.ibm.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-IMA will need to obtain the keyring used to verify file signatures so that
-it can verify the module-style signature appended to files.
+IMA will only look for a modsig if the xattr sig references a key which is
+not in the expected kernel keyring. To that end, introduce
+asymmetric_sig_has_known_key().
+
+The logic of extracting the key used in the xattr sig is factored out from
+asymmetric_verify() so that it can be used by the new function.
 
 Signed-off-by: Thiago Jung Bauermann <bauerman@linux.ibm.com>
 Signed-off-by: Mimi Zohar <zohar@linux.vnet.ibm.com>
 ---
- security/integrity/digsig.c    | 28 +++++++++++++++++++++-------
- security/integrity/integrity.h |  6 ++++++
- 2 files changed, 27 insertions(+), 7 deletions(-)
+ security/integrity/digsig_asymmetric.c | 44 +++++++++++++++++++++++++---------
+ security/integrity/integrity.h         |  8 +++++++
+ 2 files changed, 41 insertions(+), 11 deletions(-)
 
-diff --git a/security/integrity/digsig.c b/security/integrity/digsig.c
-index 9bb0a7f2863e..2a60151af0c5 100644
---- a/security/integrity/digsig.c
-+++ b/security/integrity/digsig.c
-@@ -49,11 +49,10 @@ static bool init_keyring __initdata;
- #define restrict_link_to_ima restrict_link_by_builtin_trusted
- #endif
+diff --git a/security/integrity/digsig_asymmetric.c b/security/integrity/digsig_asymmetric.c
+index ab6a029062a1..241647970c19 100644
+--- a/security/integrity/digsig_asymmetric.c
++++ b/security/integrity/digsig_asymmetric.c
+@@ -79,26 +79,48 @@ static struct key *request_asymmetric_key(struct key *keyring, uint32_t keyid)
+ 	return key;
+ }
  
--int integrity_digsig_verify(const unsigned int id, const char *sig, int siglen,
--			    const char *digest, int digestlen)
-+struct key *integrity_keyring_from_id(const unsigned int id)
+-int asymmetric_verify(struct key *keyring, const char *sig,
+-		      int siglen, const char *data, int datalen)
++static struct key *asymmetric_key_from_sig(struct key *keyring, const char *sig,
++					   int siglen)
  {
--	if (id >= INTEGRITY_KEYRING_MAX || siglen < 2)
--		return -EINVAL;
-+	if (id >= INTEGRITY_KEYRING_MAX)
-+		return ERR_PTR(-EINVAL);
+-	struct public_key_signature pks;
+-	struct signature_v2_hdr *hdr = (struct signature_v2_hdr *)sig;
+-	struct key *key;
+-	int ret = -ENOMEM;
++	const struct signature_v2_hdr *hdr = (struct signature_v2_hdr *) sig;
  
- 	if (!keyring[id]) {
- 		keyring[id] =
-@@ -62,17 +61,32 @@ int integrity_digsig_verify(const unsigned int id, const char *sig, int siglen,
- 			int err = PTR_ERR(keyring[id]);
- 			pr_err("no %s keyring: %d\n", keyring_name[id], err);
- 			keyring[id] = NULL;
--			return err;
-+			return ERR_PTR(err);
- 		}
- 	}
+ 	if (siglen <= sizeof(*hdr))
+-		return -EBADMSG;
++		return ERR_PTR(-EBADMSG);
  
-+	return keyring[id];
+ 	siglen -= sizeof(*hdr);
+ 
+ 	if (siglen != be16_to_cpu(hdr->sig_size))
+-		return -EBADMSG;
++		return ERR_PTR(-EBADMSG);
+ 
+ 	if (hdr->hash_algo >= HASH_ALGO__LAST)
+-		return -ENOPKG;
++		return ERR_PTR(-ENOPKG);
++
++	return request_asymmetric_key(keyring, be32_to_cpu(hdr->keyid));
 +}
 +
-+int integrity_digsig_verify(const unsigned int id, const char *sig, int siglen,
-+			    const char *digest, int digestlen)
++bool asymmetric_sig_has_known_key(struct key *keyring, const char *sig,
++				  int siglen)
 +{
-+	struct key *keyring;
++	struct key *key;
 +
-+	if (siglen < 2)
-+		return -EINVAL;
++	key = asymmetric_key_from_sig(keyring, sig, siglen);
++	if (IS_ERR_OR_NULL(key))
++		return false;
 +
-+	keyring = integrity_keyring_from_id(id);
-+	if (IS_ERR(keyring))
-+		return PTR_ERR(keyring);
++	key_put(key);
 +
- 	switch (sig[1]) {
- 	case 1:
- 		/* v1 API expect signature without xattr type */
--		return digsig_verify(keyring[id], sig + 1, siglen - 1,
-+		return digsig_verify(keyring, sig + 1, siglen - 1,
- 				     digest, digestlen);
- 	case 2:
--		return asymmetric_verify(keyring[id], sig, siglen,
-+		return asymmetric_verify(keyring, sig, siglen,
- 					 digest, digestlen);
- 	}
++	return true;
++}
++
++int asymmetric_verify(struct key *keyring, const char *sig,
++		      int siglen, const char *data, int datalen)
++{
++	struct public_key_signature pks;
++	struct signature_v2_hdr *hdr = (struct signature_v2_hdr *)sig;
++	struct key *key;
++	int ret = -ENOMEM;
  
+-	key = request_asymmetric_key(keyring, be32_to_cpu(hdr->keyid));
++	key = asymmetric_key_from_sig(keyring, sig, siglen);
+ 	if (IS_ERR(key))
+ 		return PTR_ERR(key);
+ 
+@@ -109,7 +131,7 @@ int asymmetric_verify(struct key *keyring, const char *sig,
+ 	pks.digest = (u8 *)data;
+ 	pks.digest_size = datalen;
+ 	pks.s = hdr->sig;
+-	pks.s_size = siglen;
++	pks.s_size = siglen - sizeof(*hdr);
+ 	ret = verify_signature(key, &pks);
+ 	key_put(key);
+ 	pr_debug("%s() = %d\n", __func__, ret);
 diff --git a/security/integrity/integrity.h b/security/integrity/integrity.h
-index 714fe2e135c7..d4f676906442 100644
+index d4f676906442..7f80c3e44d51 100644
 --- a/security/integrity/integrity.h
 +++ b/security/integrity/integrity.h
-@@ -152,6 +152,7 @@ extern struct dentry *integrity_dir;
- 
- #ifdef CONFIG_INTEGRITY_SIGNATURE
- 
-+struct key *integrity_keyring_from_id(const unsigned int id);
- int integrity_digsig_verify(const unsigned int id, const char *sig, int siglen,
- 			    const char *digest, int digestlen);
- 
-@@ -159,6 +160,11 @@ int __init integrity_init_keyring(const unsigned int id);
- int __init integrity_load_x509(const unsigned int id, const char *path);
+@@ -181,12 +181,20 @@ static inline int integrity_init_keyring(const unsigned int id)
+ #ifdef CONFIG_INTEGRITY_ASYMMETRIC_KEYS
+ int asymmetric_verify(struct key *keyring, const char *sig,
+ 		      int siglen, const char *data, int datalen);
++bool asymmetric_sig_has_known_key(struct key *keyring, const char *sig,
++				  int siglen);
  #else
- 
-+static inline struct key *integrity_keyring_from_id(const unsigned int id)
-+{
-+	return ERR_PTR(-EINVAL);
-+}
+ static inline int asymmetric_verify(struct key *keyring, const char *sig,
+ 				    int siglen, const char *data, int datalen)
+ {
+ 	return -EOPNOTSUPP;
+ }
 +
- static inline int integrity_digsig_verify(const unsigned int id,
- 					  const char *sig, int siglen,
- 					  const char *digest, int digestlen)
++static inline bool asymmetric_sig_has_known_key(struct key *keyring,
++						const char *sig, int siglen)
++{
++	return false;
++}
+ #endif
+ 
+ #ifdef CONFIG_IMA_LOAD_X509
