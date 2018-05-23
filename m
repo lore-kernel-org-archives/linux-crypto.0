@@ -1,271 +1,217 @@
-From: Thiago Jung Bauermann <bauerman@linux.ibm.com>
-Subject: [PATCH v7 01/14] MODSIGN: Export module signature definitions
-Date: Tue, 22 May 2018 21:12:40 -0300
-Message-ID: <20180523001253.15247-2-bauerman@linux.ibm.com>
-References: <20180523001253.15247-1-bauerman@linux.ibm.com>
-Cc: linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-kernel@vger.kernel.org,
-        Mimi Zohar <zohar@linux.vnet.ibm.com>,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        David Howells <dhowells@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Jessica Yu <jeyu@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        "AKASHI, Takahiro" <takahiro.akashi@linaro.org>,
-        Thiago Jung Bauermann <bauerman@linux.ibm.com>
-To: linux-integrity@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180523001253.15247-1-bauerman@linux.ibm.com>
-Sender: linux-kernel-owner@vger.kernel.org
+From: Thomas Garnier via Virtualization
+	<virtualization@lists.linux-foundation.org>
+Subject: [PATCH v3 00/27] x86: PIE support and option to extend KASLR
+	randomization
+Date: Wed, 23 May 2018 12:53:54 -0700
+Message-ID: <20180523195421.180248-1-thgarnie@google.com>
+Reply-To: Thomas Garnier <thgarnie@google.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: linux-arch@vger.kernel.org, kvm@vger.kernel.org, linux-pm@vger.kernel.org,
+	x86@kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	virtualization@lists.linux-foundation.org,
+	linux-sparse@vger.kernel.org, linux-crypto@vger.kernel.org,
+	kernel-hardening@lists.openwall.com, xen-devel@lists.xenproject.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S . Miller" <davem@davemloft.net>,
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+	"H . Peter Anvin" <hpa@zytor.com>, Peter Zijlstra <peterz@infradead.org>,
+	Josh Poimboeuf <jpoimboe@redhat.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Thomas Garnier <thgarnie@google.com>,
+	Philippe Ombredanne <pombredanne@nexb.com>,
+	Kate Stewart <kstewart@linuxfoundation.org>,
+	Arnaldo Carvalho de Melo <acme@redhat.com>, Yonghong Song <yhs@fb.com>,
+	Andrey Ryabinin <aryabinin@virtuozzo.com>,
+	Kees Cook <keescook@chromium.org>, Tom Lendacky <thomas.lendacky@amd.com>,
+	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+	Andy Lutomirski <luto@kernel.org>,
+	Dominik Brodowski <linux@dominikbrodowski.net>,
+	Borislav Petkov <bp@alien8.de>, Borislav Petkov <bp@suse.de>,
+	"Rafael J . Wysocki" <rjw@rjwysocki.net>, Len
+Return-path: <virtualization-bounces@lists.linux-foundation.org>
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/virtualization>,
+	<mailto:virtualization-request@lists.linux-foundation.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/virtualization/>
+List-Post: <mailto:virtualization@lists.linux-foundation.org>
+List-Help: <mailto:virtualization-request@lists.linux-foundation.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/virtualization>,
+	<mailto:virtualization-request@lists.linux-foundation.org?subject=subscribe>
+Sender: virtualization-bounces@lists.linux-foundation.org
+Errors-To: virtualization-bounces@lists.linux-foundation.org
 List-Id: linux-crypto.vger.kernel.org
 
-IMA will use the module_signature format for append signatures, so export
-the relevant definitions and factor out the code which verifies that the
-appended signature trailer is valid.
+Changes:
+ - patch v3:
+   - Update on message to describe longer term PIE goal.
+   - Minor change on ftrace if condition.
+   - Changed code using xchgq.
+ - patch v2:
+   - Adapt patch to work post KPTI and compiler changes
+   - Redo all performance testing with latest configs and compilers
+   - Simplify mov macro on PIE (MOVABS now)
+   - Reduce GOT footprint
+ - patch v1:
+   - Simplify ftrace implementation.
+   - Use gcc mstack-protector-guard-reg=%gs with PIE when possible.
+ - rfc v3:
+   - Use --emit-relocs instead of -pie to reduce dynamic relocation space on
+     mapped memory. It also simplifies the relocation process.
+   - Move the start the module section next to the kernel. Remove the need for
+     -mcmodel=large on modules. Extends module space from 1 to 2G maximum.
+   - Support for XEN PVH as 32-bit relocations can be ignored with
+     --emit-relocs.
+   - Support for GOT relocations previously done automatically with -pie.
+   - Remove need for dynamic PLT in modules.
+   - Support dymamic GOT for modules.
+ - rfc v2:
+   - Add support for global stack cookie while compiler default to fs without
+     mcmodel=kernel
+   - Change patch 7 to correctly jump out of the identity mapping on kexec load
+     preserve.
 
-Also, create a CONFIG_MODULE_SIG_FORMAT option so that IMA can select it
-and be able to use validate_module_sig() without having to depend on
-CONFIG_MODULE_SIG.
+These patches make the changes necessary to build the kernel as Position
+Independent Executable (PIE) on x86_64. A PIE kernel can be relocated below
+the top 2G of the virtual address space. It allows to optionally extend the
+KASLR randomization range from 1G to 3G. The chosen range is the one currently
+available, future changes will allow the kernel module to have a wider
+randomization range.
 
-Signed-off-by: Thiago Jung Bauermann <bauerman@linux.ibm.com>
-Reviewed-by: Mimi Zohar <zohar@linux.vnet.ibm.com>
-Cc: Jessica Yu <jeyu@kernel.org>
----
- include/linux/module.h           |  3 --
- include/linux/module_signature.h | 44 +++++++++++++++++++++++
- init/Kconfig                     |  6 +++-
- kernel/Makefile                  |  2 +-
- kernel/module.c                  |  1 +
- kernel/module_signing.c          | 77 ++++++++++++++++++----------------------
- 6 files changed, 85 insertions(+), 48 deletions(-)
+Thanks a lot to Ard Biesheuvel & Kees Cook on their feedback on compiler
+changes, PIE support and KASLR in general. Thanks to Roland McGrath on his
+feedback for using -pie versus --emit-relocs and details on compiler code
+generation.
 
-diff --git a/include/linux/module.h b/include/linux/module.h
-index d44df9b2c131..275cbc2579eb 100644
---- a/include/linux/module.h
-+++ b/include/linux/module.h
-@@ -24,9 +24,6 @@
- #include <linux/percpu.h>
- #include <asm/module.h>
- 
--/* In stripped ARM and x86-64 modules, ~ is surprisingly rare. */
--#define MODULE_SIG_STRING "~Module signature appended~\n"
--
- /* Not Yet Implemented */
- #define MODULE_SUPPORTED_DEVICE(name)
- 
-diff --git a/include/linux/module_signature.h b/include/linux/module_signature.h
-new file mode 100644
-index 000000000000..890135437b6b
---- /dev/null
-+++ b/include/linux/module_signature.h
-@@ -0,0 +1,44 @@
-+/* SPDX-License-Identifier: GPL-2.0+ */
-+/*
-+ * Module signature handling.
-+ *
-+ * Copyright (C) 2012 Red Hat, Inc. All Rights Reserved.
-+ * Written by David Howells (dhowells@redhat.com)
-+ */
-+
-+#ifndef _LINUX_MODULE_SIGNATURE_H
-+#define _LINUX_MODULE_SIGNATURE_H
-+
-+/* In stripped ARM and x86-64 modules, ~ is surprisingly rare. */
-+#define MODULE_SIG_STRING "~Module signature appended~\n"
-+
-+enum pkey_id_type {
-+	PKEY_ID_PGP,		/* OpenPGP generated key ID */
-+	PKEY_ID_X509,		/* X.509 arbitrary subjectKeyIdentifier */
-+	PKEY_ID_PKCS7,		/* Signature in PKCS#7 message */
-+};
-+
-+/*
-+ * Module signature information block.
-+ *
-+ * The constituents of the signature section are, in order:
-+ *
-+ *	- Signer's name
-+ *	- Key identifier
-+ *	- Signature data
-+ *	- Information block
-+ */
-+struct module_signature {
-+	u8	algo;		/* Public-key crypto algorithm [0] */
-+	u8	hash;		/* Digest algorithm [0] */
-+	u8	id_type;	/* Key identifier type [PKEY_ID_PKCS7] */
-+	u8	signer_len;	/* Length of signer's name [0] */
-+	u8	key_id_len;	/* Length of key identifier [0] */
-+	u8	__pad[3];
-+	__be32	sig_len;	/* Length of signature data */
-+};
-+
-+int validate_module_sig(const struct module_signature *ms, size_t file_len);
-+int mod_verify_sig(const void *mod, unsigned long *_modlen);
-+
-+#endif /* _LINUX_MODULE_SIGNATURE_H */
-diff --git a/init/Kconfig b/init/Kconfig
-index f013afc74b11..b2e8a635fa7b 100644
---- a/init/Kconfig
-+++ b/init/Kconfig
-@@ -1759,7 +1759,7 @@ config MODULE_SRCVERSION_ALL
- config MODULE_SIG
- 	bool "Module signature verification"
- 	depends on MODULES
--	select SYSTEM_DATA_VERIFICATION
-+	select MODULE_SIG_FORMAT
- 	help
- 	  Check modules for valid signatures upon load: the signature
- 	  is simply appended to the module. For more information see
-@@ -1774,6 +1774,10 @@ config MODULE_SIG
- 	  debuginfo strip done by some packagers (such as rpmbuild) and
- 	  inclusion into an initramfs that wants the module size reduced.
- 
-+config MODULE_SIG_FORMAT
-+	def_bool n
-+	select SYSTEM_DATA_VERIFICATION
-+
- config MODULE_SIG_FORCE
- 	bool "Require modules to be validly signed"
- 	depends on MODULE_SIG
-diff --git a/kernel/Makefile b/kernel/Makefile
-index f85ae5dfa474..a4c7a7a0cce7 100644
---- a/kernel/Makefile
-+++ b/kernel/Makefile
-@@ -58,7 +58,7 @@ obj-y += up.o
- endif
- obj-$(CONFIG_UID16) += uid16.o
- obj-$(CONFIG_MODULES) += module.o
--obj-$(CONFIG_MODULE_SIG) += module_signing.o
-+obj-$(CONFIG_MODULE_SIG_FORMAT) += module_signing.o
- obj-$(CONFIG_KALLSYMS) += kallsyms.o
- obj-$(CONFIG_BSD_PROCESS_ACCT) += acct.o
- obj-$(CONFIG_CRASH_CORE) += crash_core.o
-diff --git a/kernel/module.c b/kernel/module.c
-index ce8066b88178..7c6928f2c540 100644
---- a/kernel/module.c
-+++ b/kernel/module.c
-@@ -19,6 +19,7 @@
- #include <linux/export.h>
- #include <linux/extable.h>
- #include <linux/moduleloader.h>
-+#include <linux/module_signature.h>
- #include <linux/trace_events.h>
- #include <linux/init.h>
- #include <linux/kallsyms.h>
-diff --git a/kernel/module_signing.c b/kernel/module_signing.c
-index 937c844bee4a..a7c2c461c598 100644
---- a/kernel/module_signing.c
-+++ b/kernel/module_signing.c
-@@ -11,36 +11,41 @@
- 
- #include <linux/kernel.h>
- #include <linux/errno.h>
-+#include <linux/module_signature.h>
- #include <linux/string.h>
- #include <linux/verification.h>
- #include <crypto/public_key.h>
- #include "module-internal.h"
- 
--enum pkey_id_type {
--	PKEY_ID_PGP,		/* OpenPGP generated key ID */
--	PKEY_ID_X509,		/* X.509 arbitrary subjectKeyIdentifier */
--	PKEY_ID_PKCS7,		/* Signature in PKCS#7 message */
--};
--
--/*
-- * Module signature information block.
-+/**
-+ * validate_module_sig - validate that the given signature is sane
-  *
-- * The constituents of the signature section are, in order:
-- *
-- *	- Signer's name
-- *	- Key identifier
-- *	- Signature data
-- *	- Information block
-+ * @ms:		Signature to validate.
-+ * @file_len:	Size of the file to which @ms is appended.
-  */
--struct module_signature {
--	u8	algo;		/* Public-key crypto algorithm [0] */
--	u8	hash;		/* Digest algorithm [0] */
--	u8	id_type;	/* Key identifier type [PKEY_ID_PKCS7] */
--	u8	signer_len;	/* Length of signer's name [0] */
--	u8	key_id_len;	/* Length of key identifier [0] */
--	u8	__pad[3];
--	__be32	sig_len;	/* Length of signature data */
--};
-+int validate_module_sig(const struct module_signature *ms, size_t file_len)
-+{
-+	if (be32_to_cpu(ms->sig_len) >= file_len - sizeof(*ms))
-+		return -EBADMSG;
-+
-+	if (ms->id_type != PKEY_ID_PKCS7) {
-+		pr_err("Module is not signed with expected PKCS#7 message\n");
-+		return -ENOPKG;
-+	}
-+
-+	if (ms->algo != 0 ||
-+	    ms->hash != 0 ||
-+	    ms->signer_len != 0 ||
-+	    ms->key_id_len != 0 ||
-+	    ms->__pad[0] != 0 ||
-+	    ms->__pad[1] != 0 ||
-+	    ms->__pad[2] != 0) {
-+		pr_err("PKCS#7 signature info has unexpected non-zero params\n");
-+		return -EBADMSG;
-+	}
-+
-+	return 0;
-+}
- 
- /*
-  * Verify the signature on a module.
-@@ -49,6 +54,7 @@ int mod_verify_sig(const void *mod, unsigned long *_modlen)
- {
- 	struct module_signature ms;
- 	size_t modlen = *_modlen, sig_len;
-+	int ret;
- 
- 	pr_devel("==>%s(,%zu)\n", __func__, modlen);
- 
-@@ -56,30 +62,15 @@ int mod_verify_sig(const void *mod, unsigned long *_modlen)
- 		return -EBADMSG;
- 
- 	memcpy(&ms, mod + (modlen - sizeof(ms)), sizeof(ms));
--	modlen -= sizeof(ms);
-+
-+	ret = validate_module_sig(&ms, modlen);
-+	if (ret)
-+		return ret;
- 
- 	sig_len = be32_to_cpu(ms.sig_len);
--	if (sig_len >= modlen)
--		return -EBADMSG;
--	modlen -= sig_len;
-+	modlen -= sig_len + sizeof(ms);
- 	*_modlen = modlen;
- 
--	if (ms.id_type != PKEY_ID_PKCS7) {
--		pr_err("Module is not signed with expected PKCS#7 message\n");
--		return -ENOPKG;
--	}
--
--	if (ms.algo != 0 ||
--	    ms.hash != 0 ||
--	    ms.signer_len != 0 ||
--	    ms.key_id_len != 0 ||
--	    ms.__pad[0] != 0 ||
--	    ms.__pad[1] != 0 ||
--	    ms.__pad[2] != 0) {
--		pr_err("PKCS#7 signature info has unexpected non-zero params\n");
--		return -EBADMSG;
--	}
--
- 	return verify_pkcs7_signature(mod, modlen, mod + modlen, sig_len,
- 				      NULL, VERIFYING_MODULE_SIGNATURE,
- 				      NULL, NULL);
+The patches:
+ - 1-3, 5-13, 18-19: Change in assembly code to be PIE compliant.
+ - 4: Add a new _ASM_MOVABS macro to fetch a symbol address generically.
+ - 14: Adapt percpu design to work correctly when PIE is enabled.
+ - 15: Provide an option to default visibility to hidden except for key symbols.
+       It removes errors between compilation units.
+ - 16: Add PROVIDE_HIDDEN replacement on the linker script for weak symbols to
+       reduce GOT footprint.
+ - 17: Adapt relocation tool to handle PIE binary correctly.
+ - 20: Add support for global cookie.
+ - 21: Support ftrace with PIE (used on Ubuntu config).
+ - 22: Add option to move the module section just after the kernel.
+ - 23: Adapt module loading to support PIE with dynamic GOT.
+ - 24: Make the GOT read-only.
+ - 25: Add the CONFIG_X86_PIE option (off by default).
+ - 26: Adapt relocation tool to generate a 64-bit relocation table.
+ - 27: Add the CONFIG_RANDOMIZE_BASE_LARGE option to increase relocation range
+       from 1G to 3G (off by default).
+
+Performance/Size impact:
+
+Size of vmlinux (Default configuration):
+ File size:
+ - PIE disabled: +0.18%
+ - PIE enabled: -1.977% (less relocations)
+ .text section:
+ - PIE disabled: same
+ - PIE enabled: same
+
+Size of vmlinux (Ubuntu configuration):
+ File size:
+ - PIE disabled: +0.21%
+ - PIE enabled: +10%
+ .text section:
+ - PIE disabled: same
+ - PIE enabled: +0.001%
+
+The size increase is mainly due to not having access to the 32-bit signed
+relocation that can be used with mcmodel=kernel. A small part is due to reduced
+optimization for PIE code. This bug [1] was opened with gcc to provide a better
+code generation for kernel PIE.
+
+Hackbench (50% and 1600% on thread/process for pipe/sockets):
+ - PIE disabled: no significant change (avg -/+ 0.5% on latest test).
+ - PIE enabled: between -1% to +1% in average (default and Ubuntu config).
+
+Kernbench (average of 10 Half and Optimal runs):
+ Elapsed Time:
+ - PIE disabled: no significant change (avg -0.5%)
+ - PIE enabled: average -0.5% to +0.5%
+ System Time:
+ - PIE disabled: no significant change (avg -0.1%)
+ - PIE enabled: average -0.4% to +0.4%.
+
+[1] https://gcc.gnu.org/bugzilla/show_bug.cgi?id=82303
+
+diffstat:
+ Documentation/x86/x86_64/mm.txt              |    3 
+ arch/x86/Kconfig                             |   45 ++++++
+ arch/x86/Makefile                            |   58 ++++++++
+ arch/x86/boot/boot.h                         |    2 
+ arch/x86/boot/compressed/Makefile            |    5 
+ arch/x86/boot/compressed/misc.c              |   10 +
+ arch/x86/crypto/aes-x86_64-asm_64.S          |   45 ++++--
+ arch/x86/crypto/aesni-intel_asm.S            |    8 -
+ arch/x86/crypto/aesni-intel_avx-x86_64.S     |    6 
+ arch/x86/crypto/camellia-aesni-avx-asm_64.S  |   42 +++---
+ arch/x86/crypto/camellia-aesni-avx2-asm_64.S |   44 +++---
+ arch/x86/crypto/camellia-x86_64-asm_64.S     |    8 -
+ arch/x86/crypto/cast5-avx-x86_64-asm_64.S    |   50 ++++---
+ arch/x86/crypto/cast6-avx-x86_64-asm_64.S    |   44 +++---
+ arch/x86/crypto/des3_ede-asm_64.S            |   96 +++++++++-----
+ arch/x86/crypto/ghash-clmulni-intel_asm.S    |    4 
+ arch/x86/crypto/glue_helper-asm-avx.S        |    4 
+ arch/x86/crypto/glue_helper-asm-avx2.S       |    6 
+ arch/x86/crypto/sha256-avx2-asm.S            |   23 ++-
+ arch/x86/entry/calling.h                     |    2 
+ arch/x86/entry/entry_32.S                    |    3 
+ arch/x86/entry/entry_64.S                    |   25 ++-
+ arch/x86/include/asm/asm.h                   |    1 
+ arch/x86/include/asm/bug.h                   |    2 
+ arch/x86/include/asm/ftrace.h                |    6 
+ arch/x86/include/asm/jump_label.h            |    8 -
+ arch/x86/include/asm/kvm_host.h              |    8 -
+ arch/x86/include/asm/module.h                |   11 +
+ arch/x86/include/asm/page_64_types.h         |    9 +
+ arch/x86/include/asm/paravirt_types.h        |   12 +
+ arch/x86/include/asm/percpu.h                |   25 ++-
+ arch/x86/include/asm/pgtable_64_types.h      |    6 
+ arch/x86/include/asm/pm-trace.h              |    2 
+ arch/x86/include/asm/processor.h             |   16 +-
+ arch/x86/include/asm/sections.h              |    8 +
+ arch/x86/include/asm/setup.h                 |    2 
+ arch/x86/include/asm/stackprotector.h        |   19 ++
+ arch/x86/kernel/Makefile                     |    6 
+ arch/x86/kernel/acpi/wakeup_64.S             |   31 ++--
+ arch/x86/kernel/asm-offsets.c                |    3 
+ arch/x86/kernel/asm-offsets_32.c             |    3 
+ arch/x86/kernel/asm-offsets_64.c             |    3 
+ arch/x86/kernel/cpu/common.c                 |    3 
+ arch/x86/kernel/cpu/microcode/core.c         |    4 
+ arch/x86/kernel/ftrace.c                     |   42 +++++-
+ arch/x86/kernel/head64.c                     |   23 ++-
+ arch/x86/kernel/head_32.S                    |    3 
+ arch/x86/kernel/head_64.S                    |   41 +++++-
+ arch/x86/kernel/kvm.c                        |    6 
+ arch/x86/kernel/module.c                     |  181 ++++++++++++++++++++++++++-
+ arch/x86/kernel/module.lds                   |    3 
+ arch/x86/kernel/process.c                    |    5 
+ arch/x86/kernel/relocate_kernel_64.S         |   16 +-
+ arch/x86/kernel/setup_percpu.c               |    5 
+ arch/x86/kernel/vmlinux.lds.S                |   13 +
+ arch/x86/kvm/svm.c                           |    4 
+ arch/x86/lib/cmpxchg16b_emu.S                |    8 -
+ arch/x86/mm/dump_pagetables.c                |    3 
+ arch/x86/power/hibernate_asm_64.S            |    4 
+ arch/x86/tools/relocs.c                      |  169 +++++++++++++++++++++++--
+ arch/x86/tools/relocs.h                      |    4 
+ arch/x86/tools/relocs_common.c               |   15 +-
+ arch/x86/xen/xen-asm.S                       |   12 -
+ arch/x86/xen/xen-head.S                      |   11 -
+ arch/x86/xen/xen-pvh.S                       |   13 +
+ drivers/base/firmware_loader/main.c          |    4 
+ include/asm-generic/sections.h               |    6 
+ include/asm-generic/vmlinux.lds.h            |   12 +
+ include/linux/compiler.h                     |    7 +
+ init/Kconfig                                 |   16 ++
+ kernel/kallsyms.c                            |   16 +-
+ kernel/trace/trace.h                         |    4 
+ lib/dynamic_debug.c                          |    4 
+ scripts/link-vmlinux.sh                      |   14 ++
+ 74 files changed, 1070 insertions(+), 315 deletions(-)
