@@ -1,155 +1,85 @@
-From: Thomas Garnier <thgarnie@google.com>
-Subject: [PATCH v3 26/27] x86/relocs: Add option to generate
- 64-bit relocations
-Date: Wed, 23 May 2018 12:54:20 -0700
-Message-ID: <20180523195421.180248-27-thgarnie@google.com>
+From: Randy Dunlap <rdunlap@infradead.org>
+Subject: Re: [PATCH v3 16/27] compiler: Option to add PROVIDE_HIDDEN
+ replacement for weak symbols
+Date: Wed, 23 May 2018 14:16:11 -0700
+Message-ID: <92748474-8044-4b55-7529-c982342855ab@infradead.org>
 References: <20180523195421.180248-1-thgarnie@google.com>
+ <20180523195421.180248-17-thgarnie@google.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: linux-arch@vger.kernel.org, kvm@vger.kernel.org, linux-pm@vger.kernel.org,
- x86@kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- virtualization@lists.linux-foundation.org, linux-sparse@vger.kernel.org,
- linux-crypto@vger.kernel.org, kernel-hardening@lists.openwall.com,
- xen-devel@lists.xenproject.org
-To: Herbert Xu <herbert@gondor.apana.org.au>,
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Cc: x86@kernel.org, linux-crypto@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-pm@vger.kernel.org,
+ virtualization@lists.linux-foundation.org, xen-devel@lists.xenproject.org,
+ linux-arch@vger.kernel.org, linux-sparse@vger.kernel.org,
+ kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+ kernel-hardening@lists.openwall.com
+To: Thomas Garnier <thgarnie@google.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>,
  "David S . Miller" <davem@davemloft.net>,
  Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
  "H . Peter Anvin" <hpa@zytor.com>, Peter Zijlstra <peterz@infradead.org>,
  Josh Poimboeuf <jpoimboe@redhat.com>,
  Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Thomas Garnier <thgarnie@google.com>,
  Philippe Ombredanne <pombredanne@nexb.com>,
  Kate Stewart <kstewart@linuxfoundation.org>,
  Arnaldo Carvalho de Melo <acme@redhat.com>, Yonghong Song <yhs@fb.com>,
- Andrey Ryabinin <aryabinin@virtuozzo.com>,
- Kees Cook <keescook@chromium.org>, Tom Lendacky <thomas.lendacky@amd.com>,
+ Andrey Ryabinin <aryabinin@virtuozzo.com>, Kees Cook
+ <keescook@chromium.org>, Tom Lendacky <thomas.lendacky@amd.com>,
  "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
  Andy Lutomirski <luto@kernel.org>,
  Dominik Brodowski <linux@dominikbrodowski.net>,
  Borislav Petkov <bp@alien8.de>, Borislav Petkov <bp@suse.de>,
  "Rafael J . Wysocki" <rjw@rjwysocki.net>, Len
-Return-path: <xen-devel-bounces@lists.xenproject.org>
-In-Reply-To: <20180523195421.180248-1-thgarnie@google.com>
-List-Unsubscribe: <https://lists.xenproject.org/mailman/options/xen-devel>,
- <mailto:xen-devel-request@lists.xenproject.org?subject=unsubscribe>
-List-Post: <mailto:xen-devel@lists.xenproject.org>
-List-Help: <mailto:xen-devel-request@lists.xenproject.org?subject=help>
-List-Subscribe: <https://lists.xenproject.org/mailman/listinfo/xen-devel>,
- <mailto:xen-devel-request@lists.xenproject.org?subject=subscribe>
-Errors-To: xen-devel-bounces@lists.xenproject.org
-Sender: "Xen-devel" <xen-devel-bounces@lists.xenproject.org>
+Return-path: <kernel-hardening-return-13375-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
+List-Post: <mailto:kernel-hardening@lists.openwall.com>
+List-Help: <mailto:kernel-hardening-help@lists.openwall.com>
+List-Unsubscribe: <mailto:kernel-hardening-unsubscribe@lists.openwall.com>
+List-Subscribe: <mailto:kernel-hardening-subscribe@lists.openwall.com>
+In-Reply-To: <20180523195421.180248-17-thgarnie@google.com>
+Content-Language: en-US
 List-Id: linux-crypto.vger.kernel.org
 
-VGhlIHg4NiByZWxvY2F0aW9uIHRvb2wgZ2VuZXJhdGVzIGEgbGlzdCBvZiAzMi1iaXQgc2lnbmVk
-IGludGVnZXJzLiBUaGVyZQp3YXMgbm8gbmVlZCB0byB1c2UgNjQtYml0IGludGVnZXJzIGJlY2F1
-c2UgYWxsIGFkZHJlc3NlcyB3aGVyZSBhYm92ZSB0aGUgMkcKdG9wIG9mIHRoZSBtZW1vcnkuCgpU
-aGlzIGNoYW5nZSBhZGQgYSBsYXJnZS1yZWxvYyBvcHRpb24gdG8gZ2VuZXJhdGUgNjQtYml0IHVu
-c2lnbmVkIGludGVnZXJzLgpJdCBjYW4gYmUgdXNlZCB3aGVuIHRoZSBrZXJuZWwgcGxhbiB0byBn
-byBiZWxvdyB0aGUgdG9wIDJHIGFuZCAzMi1iaXQKaW50ZWdlcnMgYXJlIG5vdCBlbm91Z2guCgpT
-aWduZWQtb2ZmLWJ5OiBUaG9tYXMgR2FybmllciA8dGhnYXJuaWVAZ29vZ2xlLmNvbT4KLS0tCiBh
-cmNoL3g4Ni90b29scy9yZWxvY3MuYyAgICAgICAgfCA2MCArKysrKysrKysrKysrKysrKysrKysr
-KysrKystLS0tLS0tCiBhcmNoL3g4Ni90b29scy9yZWxvY3MuaCAgICAgICAgfCAgNCArLS0KIGFy
-Y2gveDg2L3Rvb2xzL3JlbG9jc19jb21tb24uYyB8IDE1ICsrKysrKy0tLQogMyBmaWxlcyBjaGFu
-Z2VkLCA2MCBpbnNlcnRpb25zKCspLCAxOSBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9hcmNo
-L3g4Ni90b29scy9yZWxvY3MuYyBiL2FyY2gveDg2L3Rvb2xzL3JlbG9jcy5jCmluZGV4IDI5Mjgz
-YWQzOTUwZi4uYTI5Y2NjY2VhYWM2IDEwMDY0NAotLS0gYS9hcmNoL3g4Ni90b29scy9yZWxvY3Mu
-YworKysgYi9hcmNoL3g4Ni90b29scy9yZWxvY3MuYwpAQCAtMTMsOCArMTMsMTQgQEAKIAogc3Rh
-dGljIEVsZl9FaGRyIGVoZHI7CiAKKyNpZiBFTEZfQklUUyA9PSA2NAordHlwZWRlZiB1aW50NjRf
-dCByZWxfb2ZmX3Q7CisjZWxzZQordHlwZWRlZiB1aW50MzJfdCByZWxfb2ZmX3Q7CisjZW5kaWYK
-Kwogc3RydWN0IHJlbG9jcyB7Ci0JdWludDMyX3QJKm9mZnNldDsKKwlyZWxfb2ZmX3QJKm9mZnNl
-dDsKIAl1bnNpZ25lZCBsb25nCWNvdW50OwogCXVuc2lnbmVkIGxvbmcJc2l6ZTsKIH07CkBAIC02
-ODUsNyArNjkxLDcgQEAgc3RhdGljIHZvaWQgcHJpbnRfYWJzb2x1dGVfcmVsb2NzKHZvaWQpCiAJ
-CXByaW50ZigiXG4iKTsKIH0KIAotc3RhdGljIHZvaWQgYWRkX3JlbG9jKHN0cnVjdCByZWxvY3Mg
-KnIsIHVpbnQzMl90IG9mZnNldCkKK3N0YXRpYyB2b2lkIGFkZF9yZWxvYyhzdHJ1Y3QgcmVsb2Nz
-ICpyLCByZWxfb2ZmX3Qgb2Zmc2V0KQogewogCWlmIChyLT5jb3VudCA9PSByLT5zaXplKSB7CiAJ
-CXVuc2lnbmVkIGxvbmcgbmV3c2l6ZSA9IHItPnNpemUgKyA1MDAwMDsKQEAgLTEwNjEsMjYgKzEw
-NjcsNDggQEAgc3RhdGljIHZvaWQgc29ydF9yZWxvY3Moc3RydWN0IHJlbG9jcyAqcikKIAlxc29y
-dChyLT5vZmZzZXQsIHItPmNvdW50LCBzaXplb2Yoci0+b2Zmc2V0WzBdKSwgY21wX3JlbG9jcyk7
-CiB9CiAKLXN0YXRpYyBpbnQgd3JpdGUzMih1aW50MzJfdCB2LCBGSUxFICpmKQorc3RhdGljIGlu
-dCB3cml0ZTMyKHJlbF9vZmZfdCByZWwsIEZJTEUgKmYpCiB7Ci0JdW5zaWduZWQgY2hhciBidWZb
-NF07CisJdW5zaWduZWQgY2hhciBidWZbc2l6ZW9mKHVpbnQzMl90KV07CisJdWludDMyX3QgdiA9
-ICh1aW50MzJfdClyZWw7CiAKIAlwdXRfdW5hbGlnbmVkX2xlMzIodiwgYnVmKTsKLQlyZXR1cm4g
-ZndyaXRlKGJ1ZiwgMSwgNCwgZikgPT0gNCA/IDAgOiAtMTsKKwlyZXR1cm4gZndyaXRlKGJ1Ziwg
-MSwgc2l6ZW9mKGJ1ZiksIGYpID09IHNpemVvZihidWYpID8gMCA6IC0xOwogfQogCi1zdGF0aWMg
-aW50IHdyaXRlMzJfYXNfdGV4dCh1aW50MzJfdCB2LCBGSUxFICpmKQorc3RhdGljIGludCB3cml0
-ZTMyX2FzX3RleHQocmVsX29mZl90IHJlbCwgRklMRSAqZikKIHsKKwl1aW50MzJfdCB2ID0gKHVp
-bnQzMl90KXJlbDsKIAlyZXR1cm4gZnByaW50ZihmLCAiXHQubG9uZyAweCUwOCJQUkl4MzIiXG4i
-LCB2KSA+IDAgPyAwIDogLTE7CiB9CiAKLXN0YXRpYyB2b2lkIGVtaXRfcmVsb2NzKGludCBhc190
-ZXh0LCBpbnQgdXNlX3JlYWxfbW9kZSkKK3N0YXRpYyBpbnQgd3JpdGU2NChyZWxfb2ZmX3QgcmVs
-LCBGSUxFICpmKQoreworCXVuc2lnbmVkIGNoYXIgYnVmW3NpemVvZih1aW50NjRfdCldOworCXVp
-bnQ2NF90IHYgPSAodWludDY0X3QpcmVsOworCisJcHV0X3VuYWxpZ25lZF9sZTY0KHYsIGJ1Zik7
-CisJcmV0dXJuIGZ3cml0ZShidWYsIDEsIHNpemVvZihidWYpLCBmKSA9PSBzaXplb2YoYnVmKSA/
-IDAgOiAtMTsKK30KKworc3RhdGljIGludCB3cml0ZTY0X2FzX3RleHQocmVsX29mZl90IHJlbCwg
-RklMRSAqZikKK3sKKwl1aW50NjRfdCB2ID0gKHVpbnQ2NF90KXJlbDsKKwlyZXR1cm4gZnByaW50
-ZihmLCAiXHQucXVhZCAweCUwMTYiUFJJeDY0IlxuIiwgdikgPiAwID8gMCA6IC0xOworfQorCitz
-dGF0aWMgdm9pZCBlbWl0X3JlbG9jcyhpbnQgYXNfdGV4dCwgaW50IHVzZV9yZWFsX21vZGUsIGlu
-dCB1c2VfbGFyZ2VfcmVsb2MpCiB7CiAJaW50IGk7Ci0JaW50ICgqd3JpdGVfcmVsb2MpKHVpbnQz
-Ml90LCBGSUxFICopID0gd3JpdGUzMjsKKwlpbnQgKCp3cml0ZV9yZWxvYykocmVsX29mZl90LCBG
-SUxFICopOwogCWludCAoKmRvX3JlbG9jKShzdHJ1Y3Qgc2VjdGlvbiAqc2VjLCBFbGZfUmVsICpy
-ZWwsIEVsZl9TeW0gKnN5bSwKIAkJCWNvbnN0IGNoYXIgKnN5bW5hbWUpOwogCisJaWYgKHVzZV9s
-YXJnZV9yZWxvYykKKwkJd3JpdGVfcmVsb2MgPSB3cml0ZTY0OworCWVsc2UKKwkJd3JpdGVfcmVs
-b2MgPSB3cml0ZTMyOworCiAjaWYgRUxGX0JJVFMgPT0gNjQKIAlpZiAoIXVzZV9yZWFsX21vZGUp
-CiAJCWRvX3JlbG9jID0gZG9fcmVsb2M2NDsKQEAgLTEwOTEsNiArMTExOSw5IEBAIHN0YXRpYyB2
-b2lkIGVtaXRfcmVsb2NzKGludCBhc190ZXh0LCBpbnQgdXNlX3JlYWxfbW9kZSkKIAkJZG9fcmVs
-b2MgPSBkb19yZWxvYzMyOwogCWVsc2UKIAkJZG9fcmVsb2MgPSBkb19yZWxvY19yZWFsOworCisJ
-LyogTGFyZ2UgcmVsb2NhdGlvbnMgb25seSBmb3IgNjQtYml0ICovCisJdXNlX2xhcmdlX3JlbG9j
-ID0gMDsKICNlbmRpZgogCiAJLyogQ29sbGVjdCB1cCB0aGUgcmVsb2NhdGlvbnMgKi8KQEAgLTEx
-MTQsOCArMTE0NSwxMyBAQCBzdGF0aWMgdm9pZCBlbWl0X3JlbG9jcyhpbnQgYXNfdGV4dCwgaW50
-IHVzZV9yZWFsX21vZGUpCiAJCSAqIGdhcyB3aWxsIGxpa2UuCiAJCSAqLwogCQlwcmludGYoIi5z
-ZWN0aW9uIFwiLmRhdGEucmVsb2NcIixcImFcIlxuIik7Ci0JCXByaW50ZigiLmJhbGlnbiA0XG4i
-KTsKLQkJd3JpdGVfcmVsb2MgPSB3cml0ZTMyX2FzX3RleHQ7CisJCWlmICh1c2VfbGFyZ2VfcmVs
-b2MpIHsKKwkJCXByaW50ZigiLmJhbGlnbiA4XG4iKTsKKwkJCXdyaXRlX3JlbG9jID0gd3JpdGU2
-NF9hc190ZXh0OworCQl9IGVsc2UgeworCQkJcHJpbnRmKCIuYmFsaWduIDRcbiIpOworCQkJd3Jp
-dGVfcmVsb2MgPSB3cml0ZTMyX2FzX3RleHQ7CisJCX0KIAl9CiAKIAlpZiAodXNlX3JlYWxfbW9k
-ZSkgewpAQCAtMTE4Myw3ICsxMjE5LDcgQEAgc3RhdGljIHZvaWQgcHJpbnRfcmVsb2NfaW5mbyh2
-b2lkKQogCiB2b2lkIHByb2Nlc3MoRklMRSAqZnAsIGludCB1c2VfcmVhbF9tb2RlLCBpbnQgYXNf
-dGV4dCwKIAkgICAgIGludCBzaG93X2Fic29sdXRlX3N5bXMsIGludCBzaG93X2Fic29sdXRlX3Jl
-bG9jcywKLQkgICAgIGludCBzaG93X3JlbG9jX2luZm8pCisJICAgICBpbnQgc2hvd19yZWxvY19p
-bmZvLCBpbnQgdXNlX2xhcmdlX3JlbG9jKQogewogCXJlZ2V4X2luaXQodXNlX3JlYWxfbW9kZSk7
-CiAJcmVhZF9laGRyKGZwKTsKQEAgLTEyMDYsNSArMTI0Miw1IEBAIHZvaWQgcHJvY2VzcyhGSUxF
-ICpmcCwgaW50IHVzZV9yZWFsX21vZGUsIGludCBhc190ZXh0LAogCQlwcmludF9yZWxvY19pbmZv
-KCk7CiAJCXJldHVybjsKIAl9Ci0JZW1pdF9yZWxvY3MoYXNfdGV4dCwgdXNlX3JlYWxfbW9kZSk7
-CisJZW1pdF9yZWxvY3MoYXNfdGV4dCwgdXNlX3JlYWxfbW9kZSwgdXNlX2xhcmdlX3JlbG9jKTsK
-IH0KZGlmZiAtLWdpdCBhL2FyY2gveDg2L3Rvb2xzL3JlbG9jcy5oIGIvYXJjaC94ODYvdG9vbHMv
-cmVsb2NzLmgKaW5kZXggNDNjODNjMGZkMjJjLi4zZDQwMWRhNTlkZjcgMTAwNjQ0Ci0tLSBhL2Fy
-Y2gveDg2L3Rvb2xzL3JlbG9jcy5oCisrKyBiL2FyY2gveDg2L3Rvb2xzL3JlbG9jcy5oCkBAIC0z
-MSw4ICszMSw4IEBAIGVudW0gc3ltdHlwZSB7CiAKIHZvaWQgcHJvY2Vzc18zMihGSUxFICpmcCwg
-aW50IHVzZV9yZWFsX21vZGUsIGludCBhc190ZXh0LAogCQlpbnQgc2hvd19hYnNvbHV0ZV9zeW1z
-LCBpbnQgc2hvd19hYnNvbHV0ZV9yZWxvY3MsCi0JCWludCBzaG93X3JlbG9jX2luZm8pOworCQlp
-bnQgc2hvd19yZWxvY19pbmZvLCBpbnQgdXNlX2xhcmdlX3JlbG9jKTsKIHZvaWQgcHJvY2Vzc182
-NChGSUxFICpmcCwgaW50IHVzZV9yZWFsX21vZGUsIGludCBhc190ZXh0LAogCQlpbnQgc2hvd19h
-YnNvbHV0ZV9zeW1zLCBpbnQgc2hvd19hYnNvbHV0ZV9yZWxvY3MsCi0JCWludCBzaG93X3JlbG9j
-X2luZm8pOworCQlpbnQgc2hvd19yZWxvY19pbmZvLCBpbnQgdXNlX2xhcmdlX3JlbG9jKTsKICNl
-bmRpZiAvKiBSRUxPQ1NfSCAqLwpkaWZmIC0tZ2l0IGEvYXJjaC94ODYvdG9vbHMvcmVsb2NzX2Nv
-bW1vbi5jIGIvYXJjaC94ODYvdG9vbHMvcmVsb2NzX2NvbW1vbi5jCmluZGV4IDY2MzQzNTJhMjBi
-Yy4uMTFmNDlhZGYxYzA2IDEwMDY0NAotLS0gYS9hcmNoL3g4Ni90b29scy9yZWxvY3NfY29tbW9u
-LmMKKysrIGIvYXJjaC94ODYvdG9vbHMvcmVsb2NzX2NvbW1vbi5jCkBAIC0xMiwxNCArMTIsMTQg
-QEAgdm9pZCBkaWUoY2hhciAqZm10LCAuLi4pCiAKIHN0YXRpYyB2b2lkIHVzYWdlKHZvaWQpCiB7
-Ci0JZGllKCJyZWxvY3MgWy0tYWJzLXN5bXN8LS1hYnMtcmVsb2NzfC0tcmVsb2MtaW5mb3wtLXRl
-eHR8LS1yZWFsbW9kZV0iIFwKLQkgICAgIiB2bWxpbnV4XG4iKTsKKwlkaWUoInJlbG9jcyBbLS1h
-YnMtc3ltc3wtLWFicy1yZWxvY3N8LS1yZWxvYy1pbmZvfC0tdGV4dHwtLXJlYWxtb2RlfCIgXAor
-CSAgICAiLS1sYXJnZS1yZWxvY10gIHZtbGludXhcbiIpOwogfQogCiBpbnQgbWFpbihpbnQgYXJn
-YywgY2hhciAqKmFyZ3YpCiB7CiAJaW50IHNob3dfYWJzb2x1dGVfc3ltcywgc2hvd19hYnNvbHV0
-ZV9yZWxvY3MsIHNob3dfcmVsb2NfaW5mbzsKLQlpbnQgYXNfdGV4dCwgdXNlX3JlYWxfbW9kZTsK
-KwlpbnQgYXNfdGV4dCwgdXNlX3JlYWxfbW9kZSwgdXNlX2xhcmdlX3JlbG9jOwogCWNvbnN0IGNo
-YXIgKmZuYW1lOwogCUZJTEUgKmZwOwogCWludCBpOwpAQCAtMzAsNiArMzAsNyBAQCBpbnQgbWFp
-bihpbnQgYXJnYywgY2hhciAqKmFyZ3YpCiAJc2hvd19yZWxvY19pbmZvID0gMDsKIAlhc190ZXh0
-ID0gMDsKIAl1c2VfcmVhbF9tb2RlID0gMDsKKwl1c2VfbGFyZ2VfcmVsb2MgPSAwOwogCWZuYW1l
-ID0gTlVMTDsKIAlmb3IgKGkgPSAxOyBpIDwgYXJnYzsgaSsrKSB7CiAJCWNoYXIgKmFyZyA9IGFy
-Z3ZbaV07CkBAIC01NCw2ICs1NSwxMCBAQCBpbnQgbWFpbihpbnQgYXJnYywgY2hhciAqKmFyZ3Yp
-CiAJCQkJdXNlX3JlYWxfbW9kZSA9IDE7CiAJCQkJY29udGludWU7CiAJCQl9CisJCQlpZiAoc3Ry
-Y21wKGFyZywgIi0tbGFyZ2UtcmVsb2MiKSA9PSAwKSB7CisJCQkJdXNlX2xhcmdlX3JlbG9jID0g
-MTsKKwkJCQljb250aW51ZTsKKwkJCX0KIAkJfQogCQllbHNlIGlmICghZm5hbWUpIHsKIAkJCWZu
-YW1lID0gYXJnOwpAQCAtNzUsMTEgKzgwLDExIEBAIGludCBtYWluKGludCBhcmdjLCBjaGFyICoq
-YXJndikKIAlpZiAoZV9pZGVudFtFSV9DTEFTU10gPT0gRUxGQ0xBU1M2NCkKIAkJcHJvY2Vzc182
-NChmcCwgdXNlX3JlYWxfbW9kZSwgYXNfdGV4dCwKIAkJCSAgIHNob3dfYWJzb2x1dGVfc3ltcywg
-c2hvd19hYnNvbHV0ZV9yZWxvY3MsCi0JCQkgICBzaG93X3JlbG9jX2luZm8pOworCQkJICAgc2hv
-d19yZWxvY19pbmZvLCB1c2VfbGFyZ2VfcmVsb2MpOwogCWVsc2UKIAkJcHJvY2Vzc18zMihmcCwg
-dXNlX3JlYWxfbW9kZSwgYXNfdGV4dCwKIAkJCSAgIHNob3dfYWJzb2x1dGVfc3ltcywgc2hvd19h
-YnNvbHV0ZV9yZWxvY3MsCi0JCQkgICBzaG93X3JlbG9jX2luZm8pOworCQkJICAgc2hvd19yZWxv
-Y19pbmZvLCB1c2VfbGFyZ2VfcmVsb2MpOwogCWZjbG9zZShmcCk7CiAJcmV0dXJuIDA7CiB9Ci0t
-IAoyLjE3LjAuNDQxLmdiNDZmZTYwZTFkLWdvb2cKCgpfX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fXwpYZW4tZGV2ZWwgbWFpbGluZyBsaXN0Clhlbi1kZXZlbEBs
-aXN0cy54ZW5wcm9qZWN0Lm9yZwpodHRwczovL2xpc3RzLnhlbnByb2plY3Qub3JnL21haWxtYW4v
-bGlzdGluZm8veGVuLWRldmVs
+On 05/23/2018 12:54 PM, Thomas Garnier wrote:
+> Provide an option to have a PROVIDE_HIDDEN (linker script) entry for
+> each weak symbol. This option solve an error in x86_64 where the linker
+
+                                solves
+
+> optimizes pie generate code to be non-pie because --emit-relocs was used
+
+                generated
+
+> instead of -pie (to reduce dynamic relocations).
+> 
+> Signed-off-by: Thomas Garnier <thgarnie@google.com>
+> ---
+>  init/Kconfig            |  7 +++++++
+>  scripts/link-vmlinux.sh | 14 ++++++++++++++
+>  2 files changed, 21 insertions(+)
+> 
+> diff --git a/init/Kconfig b/init/Kconfig
+> index 0fc3a58d9f2f..2866cca86b4a 100644
+> --- a/init/Kconfig
+> +++ b/init/Kconfig
+> @@ -1954,6 +1954,13 @@ config ASN1
+>  	  inform it as to what tags are to be expected in a stream and what
+>  	  functions to call on what tags.
+>  
+> +config WEAK_PROVIDE_HIDDEN
+> +	bool
+> +	help
+> +	  Generate linker script PROVIDE_HIDDEN entries for all weak symbols. It
+> +	  allows to prevent non-pie code being replaced by the linker if the
+
+	                    non-PIE
+
+> +	  emit-relocs option is used instead of pie (useful for x86_64 pie).
+
+	                                        PIE                    PIE).
+
+> +
+
+
+-- 
+~Randy
