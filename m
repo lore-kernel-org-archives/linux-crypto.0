@@ -1,278 +1,220 @@
-From: "Natarajan, Janakarajan" <jnataraj@amd.com>
-Subject: Re: [PATCH RESEND 1/2] Add DOWNLOAD_FIRMWARE SEV command
-Date: Tue, 22 May 2018 09:11:46 -0500
-Message-ID: <a9419c51-17fb-55c7-317d-4bd809253e26@amd.com>
-References: <8adf44db473ccda6ca626ecdaa058d524af189b7.1525881878.git.Janakarajan.Natarajan@amd.com>
- <20180510172813.GD15817@pd.tnic>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Gary Hook <gary.hook@amd.com>,
+From: Thiago Jung Bauermann <bauerman@linux.ibm.com>
+Subject: [PATCH v7 00/14] Appended signatures support for IMA appraisal
+Date: Tue, 22 May 2018 21:12:39 -0300
+Message-ID: <20180523001253.15247-1-bauerman@linux.ibm.com>
+Cc: linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-kernel@vger.kernel.org,
+        Mimi Zohar <zohar@linux.vnet.ibm.com>,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        David Howells <dhowells@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Jessica Yu <jeyu@kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-To: Borislav Petkov <bp@suse.de>,
-        Janakarajan Natarajan <Janakarajan.Natarajan@amd.com>
+        "David S. Miller" <davem@davemloft.net>,
+        "AKASHI, Takahiro" <takahiro.akashi@linaro.org>,
+        Thiago Jung Bauermann <bauerman@linux.ibm.com>
+To: linux-integrity@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180510172813.GD15817@pd.tnic>
-Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 5/10/2018 12:28 PM, Borislav Petkov wrote:
-> Use a prefix for the subject pls:
->
-> Subject: [PATCH RESEND 1/2] crypto: ccp: Add DOWNLOAD_FIRMWARE SEV command
->
-> or
->
-> Subject: [PATCH RESEND 1/2] crypto/ccp: Add DOWNLOAD_FIRMWARE SEV command
->
-> or so.
+Hello,
 
-Okay.
+The main difference in this version is the addition of the last patch, which
+ensures that there will always be a measurement entry containing the appended
+modsig if one was used to appraise the file. The patch description and comments
+in the code should explain in which circumstances the patch proved necessary.
 
+Apart from that, there was some small cleaning up of the code, and merging and
+splitting of patches. The changelog below has the details.
 
->
-> On Wed, May 09, 2018 at 11:18:27AM -0500, Janakarajan Natarajan wrote:
->> The DOWNLOAD_FIRMWARE command, added as of SEV API v0.15, allows the OS
->> to install SEV firmware newer than the currently active SEV firmware.
->>
->> For the new SEV firmware to be applied it must:
->> * Pass the validation test performed by the existing firmware.
->> * Be of the same build or a newer build compared to the existing firmware.
->>
->> For more information please refer to "Section 5.11 DOWNLOAD_FIRMWARE" of
->> https://support.amd.com/TechDocs/55766_SEV-KM%20API_Specification.pdf
->>
->> Signed-off-by: Janakarajan Natarajan <Janakarajan.Natarajan@amd.com>
->> ---
->>   drivers/crypto/ccp/psp-dev.c | 96 +++++++++++++++++++++++++++++++++++++++-----
->>   drivers/crypto/ccp/psp-dev.h |  4 ++
->>   include/linux/psp-sev.h      | 12 ++++++
->>   3 files changed, 102 insertions(+), 10 deletions(-)
->>
->> diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
->> index d95ec52..1c78a2e 100644
->> --- a/drivers/crypto/ccp/psp-dev.c
->> +++ b/drivers/crypto/ccp/psp-dev.c
->> @@ -22,11 +22,17 @@
->>   #include <linux/delay.h>
->>   #include <linux/hw_random.h>
->>   #include <linux/ccp.h>
->> +#include <linux/firmware.h>
->>   
->>   #include "sp-dev.h"
->>   #include "psp-dev.h"
->>   
->> +#define SEV_VERSION_CHECK(_maj, _min)			\
->> +		((psp_master->api_major) >= _maj &&	\
->> +		 (psp_master->api_minor) >= _min)
->> +
->>   #define DEVICE_NAME	"sev"
->> +#define SEV_FW_FILE	"amd-sev.fw"
-> Can we put this firmware in an amd folder like
->
-> 	amd/sev.fw
->
-> or so, like we to with the microcode?
+These patches apply on top of today's linux-integrity/next-integrity.
 
-Yes. I can do that.
+Original cover letter:
 
+On the OpenPOWER platform, secure boot and trusted boot are being
+implemented using IMA for taking measurements and verifying signatures.
+Since the kernel image on Power servers is an ELF binary, kernels are
+signed using the scripts/sign-file tool and thus use the same signature
+format as signed kernel modules.
 
->
-> /lib/firmware/amd-ucode/
-> ├── microcode_amd.bin
-> ├── microcode_amd.bin.asc
-> ├── microcode_amd_fam15h.bin
-> ├── microcode_amd_fam15h.bin.asc
-> ├── microcode_amd_fam16h.bin
-> └── microcode_amd_fam16h.bin.asc
->
-> It is tidier this way in the fw directory.
->
->>   static DEFINE_MUTEX(sev_cmd_mutex);
->>   static struct sev_misc_dev *misc_dev;
->> @@ -112,6 +118,7 @@ static int sev_cmd_buffer_len(int cmd)
->>   	case SEV_CMD_RECEIVE_UPDATE_DATA:	return sizeof(struct sev_data_receive_update_data);
->>   	case SEV_CMD_RECEIVE_UPDATE_VMSA:	return sizeof(struct sev_data_receive_update_vmsa);
->>   	case SEV_CMD_LAUNCH_UPDATE_SECRET:	return sizeof(struct sev_data_launch_secret);
->> +	case SEV_CMD_DOWNLOAD_FIRMWARE:		return sizeof(struct sev_data_download_firmware);
->>   	default:				return 0;
->>   	}
->>   
->> @@ -378,6 +385,77 @@ void *psp_copy_user_blob(u64 __user uaddr, u32 len)
->>   }
->>   EXPORT_SYMBOL_GPL(psp_copy_user_blob);
->>   
->> +static int get_sev_api_version(void)
-> sev_get_api_version()
->
-> like the rest.
->
->> +{
->> +	struct sev_user_data_status *status;
->> +	int error, ret;
->> +
->> +	status = &psp_master->status_cmd_buf;
->> +	ret = sev_platform_status(status, &error);
->> +	if (ret) {
->> +		dev_err(psp_master->dev,
->> +			"SEV: failed to get status. Error: %#x\n", error);
->> +		return 1;
->> +	}
->> +
->> +	psp_master->api_major = status->api_major;
->> +	psp_master->api_minor = status->api_minor;
->> +	psp_master->build = status->build;
->> +
->> +	return 0;
->> +}
->> +
->> +/* Don't fail if SEV FW couldn't be updated. Continue with existing SEV FW */
->> +static void sev_update_firmware(struct device *dev)
->> +{
->> +	struct sev_data_download_firmware *data;
->> +	const struct firmware *firmware;
->> +	int ret, error, order;
->> +	struct page *p;
->> +	u64 data_size;
->> +
->> +	ret = request_firmware(&firmware, SEV_FW_FILE, dev);
->> +	if (ret < 0)
->> +		return;
->> +
->> +	/*
->> +	 * SEV FW expects the physical address given to it to be 32
->> +	 * byte aligned. Memory allocated has structure placed at the
->> +	 * beginning followed by the firmware being passed to the SEV
->> +	 * FW. Allocate enough memory for data structure + alignment
->> +	 * padding + SEV FW.
->> +	 */
->> +	data_size = ALIGN(sizeof(struct sev_data_download_firmware), 32);
->> +
->> +	order = get_order(firmware->size + data_size);
->> +	p = alloc_pages(GFP_KERNEL, order);
->> +	if (!p)
->> +		goto fw_err;
->> +
->> +	/*
->> +	 * Copy firmware data to a kernel allocated contiguous
->> +	 * memory region.
->> +	 */
->> +	data = page_address(p);
->> +	memcpy(page_address(p) + data_size, firmware->data, firmware->size);
->> +
->> +	data->address = __psp_pa(page_address(p) + data_size);
->> +	data->len = firmware->size;
->> +
->> +	ret = sev_do_cmd(SEV_CMD_DOWNLOAD_FIRMWARE, data, &error);
->> +	if (ret) {
->> +		dev_dbg(dev, "Failed to update SEV firmware: %#x\n", error);
->> +	} else {
->> +		dev_info(dev, "SEV firmware update successful\n");
->> +		get_sev_api_version();
-> Call that function in the caller of sev_update_firmware() and in its
-> success path. For that, make sev_update_firmware() return success/error
-> value.
->
->> +	}
->> +
->> +	__free_pages(p, order);
->> +
->> +fw_err:
->> +	release_firmware(firmware);
->> +}
->> +
->>   static int sev_ioctl_do_pek_import(struct sev_issue_cmd *argp)
->>   {
->>   	struct sev_user_data_pek_cert_import input;
->> @@ -750,7 +828,6 @@ EXPORT_SYMBOL_GPL(sev_issue_cmd_external_user);
->>   
->>   void psp_pci_init(void)
->>   {
->> -	struct sev_user_data_status *status;
->>   	struct sp_device *sp;
->>   	int error, rc;
->>   
->> @@ -760,6 +837,12 @@ void psp_pci_init(void)
->>   
->>   	psp_master = sp->psp_data;
->>   
->> +	if (get_sev_api_version())
->> +		goto err;
->> +
->> +	if (SEV_VERSION_CHECK(0, 15))
-> That macro could use a readability improvement. This way it doesn't tell
-> me what the check is doing. Is it checking whether the version should be
-> 0.15 or should it be bigger than 0.15 or what...?
->
-> I have to go look at its definition.
->
->> +		sev_update_firmware(psp_master->dev);
-> I wonder if we should try to load a new fw *every* time we init the
-> driver. I guess so... can't think of something speaking against it right
-> now...
->
->> +
->>   	/* Initialize the platform */
->>   	rc = sev_platform_init(&error);
->>   	if (rc) {
->> @@ -767,16 +850,9 @@ void psp_pci_init(void)
->>   		goto err;
->>   	}
->>   
->> -	/* Display SEV firmware version */
->> -	status = &psp_master->status_cmd_buf;
->> -	rc = sev_platform_status(status, &error);
->> -	if (rc) {
->> -		dev_err(sp->dev, "SEV: failed to get status error %#x\n", error);
->> -		goto err;
->> -	}
->> +	dev_info(sp->dev, "SEV API:%d.%d build:%d\n", psp_master->api_major,
->> +		 psp_master->api_minor, psp_master->build);
->>   
->> -	dev_info(sp->dev, "SEV API:%d.%d build:%d\n", status->api_major,
->> -		 status->api_minor, status->build);
->>   	return;
->>   
->>   err:
-> But, before we do further games with this, I'm able to trigger the
-> following link error with the attached config. So pls sort that out
-> first. The idea is that the user should not be able to create a failing
-> config.
+This patch series adds support in IMA for verifying those signatures.
+It adds flexibility to OpenPOWER secure boot, because it allows it to boot
+kernels with the signature appended to them as well as kernels where the
+signature is stored in the IMA extended attribute.
 
-I have submitted a bugfix for this in the KVM tree.
+Changes since v6:
 
-I can send out a v2 of this patchset with the required changes.
+- Patch "PKCS#7: Introduce pkcs7_get_message_sig() and verify_pkcs7_message_sig()"
+  - Retitled to "PKCS#7: Refactor verify_pkcs7_signature() and
+    add pkcs7_get_message_sig()"
+  - Reworded description to clarify why the refactoring is needed.
+    The code is unchanged. (Suggested by Mimi Zohar)
+  - Added Mimi Zohar's Reviewed-by.
 
-Thanks,
-Janak
+- Patch "PKCS#7: Introduce pkcs7_get_digest()"
+  - Added Mimi Zohar's Reviewed-by.
 
->
-> arch/x86/kvm/svm.o: In function `__sev_issue_cmd':
-> /home/boris/kernel/linux/arch/x86/kvm/svm.c:6256: undefined reference to `sev_issue_cmd_external_user'
-> arch/x86/kvm/svm.o: In function `sev_unbind_asid':
-> /home/boris/kernel/linux/arch/x86/kvm/svm.c:1740: undefined reference to `sev_guest_deactivate'
-> /home/boris/kernel/linux/arch/x86/kvm/svm.c:1743: undefined reference to `sev_guest_df_flush'
-> /home/boris/kernel/linux/arch/x86/kvm/svm.c:1752: undefined reference to `sev_guest_decommission'
-> arch/x86/kvm/svm.o: In function `sev_guest_init':
-> /home/boris/kernel/linux/arch/x86/kvm/svm.c:6207: undefined reference to `sev_platform_init'
-> arch/x86/kvm/svm.o: In function `sev_launch_start':
-> /home/boris/kernel/linux/arch/x86/kvm/svm.c:6302: undefined reference to `psp_copy_user_blob'
-> /home/boris/kernel/linux/arch/x86/kvm/svm.c:6290: undefined reference to `psp_copy_user_blob'
-> arch/x86/kvm/svm.o: In function `sev_bind_asid':
-> /home/boris/kernel/linux/arch/x86/kvm/svm.c:6230: undefined reference to `sev_guest_df_flush'
-> /home/boris/kernel/linux/arch/x86/kvm/svm.c:6241: undefined reference to `sev_guest_activate'
-> arch/x86/kvm/svm.o: In function `sev_launch_secret':
-> /home/boris/kernel/linux/arch/x86/kvm/svm.c:6833: undefined reference to `psp_copy_user_blob'
-> /home/boris/kernel/linux/arch/x86/kvm/svm.c:6842: undefined reference to `psp_copy_user_blob'
-> arch/x86/kvm/svm.o: In function `sev_hardware_setup':
-> /home/boris/kernel/linux/arch/x86/kvm/svm.c:1237: undefined reference to `sev_platform_status'
-> make: *** [vmlinux] Error 1
->
-> Thx.
->
+- Patch "integrity: Introduce integrity_keyring_from_id"
+  - Added Mimi Zohar's Signed-off-by.
+
+- Patch "integrity: Introduce asymmetric_sig_has_known_key()"
+  - Added Mimi Zohar's Signed-off-by.
+
+- Patch "integrity: Select CONFIG_KEYS instead of depending on it"
+  - Added Mimi Zohar's Signed-off-by.
+
+- Patch "ima: Introduce is_ima_sig()"
+  - Renamed function to is_signed() (suggested by Mimi Zohar).
+
+- Patch "ima: Add functions to read and verify a modsig signature"
+  - Changed stubs for the !CONFIG_IMA_APPRAISE_MODSIG to return -EOPNOTSUPP
+    instead of -ENOTSUPP, since the latter isn't defined in uapi headers.
+  - Moved functions to the patches which use them and dropped this patch
+    (suggested by Mimi Zohar).
+
+- Patch "ima: Implement support for module-style appended signatures"
+  - Prevent reading and writing of IMA_MODSIG xattr in ima_read_xattr()
+    and ima_inode_setxattr().
+  - Simplify code in process_measurement() which decides whether to try
+    reading a modsig (suggested by Mimi Zohar).
+  - Moved some functions from patch "ima: Add functions to read and verify
+    a modsig signature" into this patch.
+
+- Patch "ima: Add new "d-sig" template field"
+  - New patch containing code from patch "ima: Write modsig to the measurement list"
+    (Suggested by Mimi Zohar).
+
+- Patch "ima: Write modsig to the measurement list"
+  - Moved some functions from patch "ima: Add functions to read and verify
+    a modsig signature" into this patch.
+  - Moved code related to d-sig support to new patch.
+
+- Patch "ima: Write modsig to the measurement list"
+  - New patch.
+
+Changes since v5:
+- Patch "ima: Remove some superfluous parentheses"
+  - Dropped.
+
+- Patch "evm, ima: Remove superfluous parentheses"
+  - Dropped.
+
+- Patch "evm, ima: Remove more superfluous parentheses"
+  - Dropped.
+
+- Patch "ima: Don't pass xattr value to EVM xattr verification."
+  - Dropped.
+
+- Patch "ima: Store measurement after appraisal"
+  - Dropped.
+
+- Patch "MODSIGN: Export module signature definitions"
+  - Reduced changes to the code that was moved into validate_module_sig()
+    to the minimum necessary (suggested by Mimi Zohar).
+  - Added SPDX license identifier.
+
+- Patch "PKCS#7: Introduce pkcs7_get_message_sig() and verify_pkcs7_message_sig()"
+  - In the hypothetical case that there's more than one sinfo, changed
+    pkcs7_get_message_sig() to return NULL instead of the first sinfo's sig.
+  - Dropped Mimi's Reviewed-by because of the code change above.
+
+- Patch "PKCS#7: Introduce pkcs7_get_digest()"
+  - New patch.
+
+- Patch "integrity: Introduce integrity_keyring_from_id"
+  - Add stub in case CONFIG_INTEGRITY_SIGNATURE isn't set.
+
+- Patch "integrity: Introduce asymmetric_sig_has_known_key()"
+  - New patch.
+
+- Patch "ima: Introduce is_ima_sig"
+  - New patch, with code from "ima: Improvements in ima_appraise_measurement"
+
+- Patch "ima: Add modsig appraise_type option for module-style appended signatures"
+  - Changed appraise_type to accept "imasig|modsig" instead of
+    "modsig|imasig" to reflect the fact that now IMA only looks for
+    the modsig after failing to find a suitable imasig stored in the xattr.
+  - Added SPDX license identifier.
+
+- Patch "ima: Add functions to read and verify a modsig signature"
+  - Changed ima_read_modsig() to abort loading the modsig if it uses a key
+    which isn't known to IMA.
+  - Changed ima_get_modsig_hash() to use pkcs7_get_digest().
+
+- Patch "ima: Implement support for module-style appended signatures"
+  - Added ima_xattr_sig_known_key() auxiliary function.
+  - Call ima_read_modsig() directly from process_measurement() instead of
+    from ima_appraise_measurement(), and only if there's no xattr signature
+    or if the xattr signature uses a key which isn't known to IMA.
+  - hash_algo in process_measurement() is always obtained from the xattr
+    signature, never from the modsig.
+  - Changes to ima_appraise_measurement() are a lot simpler now, and don't
+    involve going back to the main switch statement a second time.
+  - Pass xattr_value to evm_verifyxattr() unless xattr_value is a modsig.
+
+- Patch "ima: Write modsig to the measurement list"
+  - Since now we determine whether we'll use an xattr sig or a modsig
+    at the time they are read, there's no need to store a measurement
+    again in the modsig case. Thus, this patch doesn't need to change
+    ima_store_measurement() nor process_measurement() anymore.
+  - Define new "d-sig" template field which holds the digest that is
+    expected to match the one contained in the modsig.
+  - Moved addition of ima_modsig_serialize_data() to patch "ima: Add
+    functions to read and verify a modsig signature".
+  - Increase MAX_TEMPLATE_NAME_LEN to 24.
+
+Thiago Jung Bauermann (14):
+  MODSIGN: Export module signature definitions
+  PKCS#7: Refactor verify_pkcs7_signature() and add
+    pkcs7_get_message_sig()
+  PKCS#7: Introduce pkcs7_get_digest()
+  integrity: Introduce struct evm_xattr
+  integrity: Introduce integrity_keyring_from_id()
+  integrity: Introduce asymmetric_sig_has_known_key()
+  integrity: Select CONFIG_KEYS instead of depending on it
+  ima: Introduce is_signed()
+  ima: Export func_tokens
+  ima: Add modsig appraise_type option for module-style appended
+    signatures
+  ima: Implement support for module-style appended signatures
+  ima: Add new "d-sig" template field
+  ima: Write modsig to the measurement list
+  ima: Store the measurement again when appraising a modsig
+
+ Documentation/ABI/testing/ima_policy      |   6 +-
+ Documentation/security/IMA-templates.rst  |   5 +
+ certs/system_keyring.c                    |  61 ++++++---
+ crypto/asymmetric_keys/pkcs7_parser.c     |  16 +++
+ crypto/asymmetric_keys/pkcs7_verify.c     |  25 ++++
+ include/crypto/pkcs7.h                    |   5 +
+ include/linux/module.h                    |   3 -
+ include/linux/module_signature.h          |  44 +++++++
+ include/linux/verification.h              |  10 ++
+ init/Kconfig                              |   6 +-
+ kernel/Makefile                           |   2 +-
+ kernel/module.c                           |   1 +
+ kernel/module_signing.c                   |  77 +++++------
+ security/integrity/Kconfig                |   2 +-
+ security/integrity/digsig.c               |  28 +++-
+ security/integrity/digsig_asymmetric.c    |  44 +++++--
+ security/integrity/evm/evm_crypto.c       |   4 +-
+ security/integrity/evm/evm_main.c         |  10 +-
+ security/integrity/ima/Kconfig            |  13 ++
+ security/integrity/ima/Makefile           |   1 +
+ security/integrity/ima/ima.h              |  67 ++++++++++
+ security/integrity/ima/ima_api.c          |   8 +-
+ security/integrity/ima/ima_appraise.c     |  78 +++++++++--
+ security/integrity/ima/ima_main.c         |  33 ++++-
+ security/integrity/ima/ima_modsig.c       | 212 ++++++++++++++++++++++++++++++
+ security/integrity/ima/ima_policy.c       |  81 ++++++++++--
+ security/integrity/ima/ima_template.c     |  31 ++++-
+ security/integrity/ima/ima_template_lib.c |  49 ++++++-
+ security/integrity/ima/ima_template_lib.h |   2 +
+ security/integrity/integrity.h            |  30 ++++-
+ 30 files changed, 825 insertions(+), 129 deletions(-)
+ create mode 100644 include/linux/module_signature.h
+ create mode 100644 security/integrity/ima/ima_modsig.c
