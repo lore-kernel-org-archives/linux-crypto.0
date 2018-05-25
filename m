@@ -1,7 +1,8 @@
 From: Janakarajan Natarajan <Janakarajan.Natarajan@amd.com>
-Subject: [PATCHv2 0/2] Add new SEV commands
-Date: Fri, 25 May 2018 15:23:28 -0500
-Message-ID: <cover.1527274269.git.Janakarajan.Natarajan@amd.com>
+Subject: [PATCHv2 2/2] crypto: ccp: Add GET_ID SEV command
+Date: Fri, 25 May 2018 15:23:30 -0500
+Message-ID: <00cb51b73bb427d9df36bcbb17ed85c1802d98c6.1527274270.git.Janakarajan.Natarajan@amd.com>
+References: <cover.1527274269.git.Janakarajan.Natarajan@amd.com>
 Mime-Version: 1.0
 Content-Type: text/plain
 Cc: Tom Lendacky <thomas.lendacky@amd.com>,
@@ -14,32 +15,152 @@ Cc: Tom Lendacky <thomas.lendacky@amd.com>,
         Janakarajan Natarajan <Janakarajan.Natarajan@amd.com>
 To: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <cover.1527274269.git.Janakarajan.Natarajan@amd.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This patchset adds two new SEV commands, introduced in SEV API v0.15
-and v0.16 respectively.
+The GET_ID command, added as of SEV API v0.16, allows the SEV firmware
+to be queried about a unique CPU ID. This unique ID can then be used
+to obtain the public certificate containing the Chip Endorsement Key
+(CEK) public key signed by the AMD SEV Signing Key (ASK).
 
-* DOWNLOAD_FIRMWARE allows the SEV firmware to be updated if a blob newer
-  than or similar to the exisiting build is available.
+For more information please refer to "Section 5.12 GET_ID" of
+https://support.amd.com/TechDocs/55766_SEV-KM%20API_Specification.pdf
 
-* GET_ID allows to query for a unique ID that can be used to retrieve the
-  Chip Endorsment Key (CEK) public key signed by the AMD SEV Signing Key
-  (ASK). 
+Signed-off-by: Janakarajan Natarajan <Janakarajan.Natarajan@amd.com>
+---
+ drivers/crypto/ccp/psp-dev.c | 44 ++++++++++++++++++++++++++++++++++++++++++++
+ include/linux/psp-sev.h      | 11 +++++++++++
+ include/uapi/linux/psp-sev.h | 12 ++++++++++++
+ 3 files changed, 67 insertions(+)
 
-v1->v2:
-* Added cover letter.
-* Misc changes based on Boris' feedback.
-
-Janakarajan Natarajan (2):
-  crypto: ccp: Add DOWNLOAD_FIRMWARE SEV command
-  crypto: ccp: Add GET_ID SEV command
-
- drivers/crypto/ccp/psp-dev.c | 143 ++++++++++++++++++++++++++++++++++++++++---
- drivers/crypto/ccp/psp-dev.h |   4 ++
- include/linux/psp-sev.h      |  23 +++++++
- include/uapi/linux/psp-sev.h |  12 ++++
- 4 files changed, 172 insertions(+), 10 deletions(-)
-
+diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
+index 12838b4..ff478d8 100644
+--- a/drivers/crypto/ccp/psp-dev.c
++++ b/drivers/crypto/ccp/psp-dev.c
+@@ -119,6 +119,7 @@ static int sev_cmd_buffer_len(int cmd)
+ 	case SEV_CMD_RECEIVE_UPDATE_VMSA:	return sizeof(struct sev_data_receive_update_vmsa);
+ 	case SEV_CMD_LAUNCH_UPDATE_SECRET:	return sizeof(struct sev_data_launch_secret);
+ 	case SEV_CMD_DOWNLOAD_FIRMWARE:		return sizeof(struct sev_data_download_firmware);
++	case SEV_CMD_GET_ID:			return sizeof(struct sev_data_get_id);
+ 	default:				return 0;
+ 	}
+ 
+@@ -510,6 +511,46 @@ static int sev_ioctl_do_pek_import(struct sev_issue_cmd *argp)
+ 	return ret;
+ }
+ 
++static int sev_ioctl_do_get_id(struct sev_issue_cmd *argp)
++{
++	struct sev_data_get_id *data;
++	u64 data_size, user_size;
++	void *id_blob, *mem;
++	int ret;
++
++	/* SEV GET_ID available from SEV API v0.16 and up */
++	if (!SEV_VERSION_GREATER_OR_EQUAL(0, 16))
++		return -ENOTSUPP;
++
++	/* SEV FW expects the buffer it fills with the ID to be
++	 * 8-byte aligned. Memory allocated should be enough to
++	 * hold data structure + alignment padding + memory
++	 * where SEV FW writes the ID.
++	 */
++	data_size = ALIGN(sizeof(struct sev_data_get_id), 8);
++	user_size = sizeof(struct sev_user_data_get_id);
++
++	mem = kzalloc(data_size + user_size, GFP_KERNEL);
++	if (!mem)
++		return -ENOMEM;
++
++	data = mem;
++	id_blob = mem + data_size;
++
++	data->address = __psp_pa(id_blob);
++	data->len = user_size;
++
++	ret = __sev_do_cmd_locked(SEV_CMD_GET_ID, data, &argp->error);
++	if (!ret) {
++		if (copy_to_user((void __user *)argp->data, id_blob, data->len))
++			ret = -EFAULT;
++	}
++
++	kfree(mem);
++
++	return ret;
++}
++
+ static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp)
+ {
+ 	struct sev_user_data_pdh_cert_export input;
+@@ -647,6 +688,9 @@ static long sev_ioctl(struct file *file, unsigned int ioctl, unsigned long arg)
+ 	case SEV_PDH_CERT_EXPORT:
+ 		ret = sev_ioctl_do_pdh_export(&input);
+ 		break;
++	case SEV_GET_ID:
++		ret = sev_ioctl_do_get_id(&input);
++		break;
+ 	default:
+ 		ret = -EINVAL;
+ 		goto out;
+diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
+index 1d24962..827c601 100644
+--- a/include/linux/psp-sev.h
++++ b/include/linux/psp-sev.h
+@@ -55,6 +55,7 @@ enum sev_cmd {
+ 	SEV_CMD_PDH_GEN			= 0x009,
+ 	SEV_CMD_DF_FLUSH		= 0x00A,
+ 	SEV_CMD_DOWNLOAD_FIRMWARE	= 0x00B,
++	SEV_CMD_GET_ID			= 0x00C,
+ 
+ 	/* Guest commands */
+ 	SEV_CMD_DECOMMISSION		= 0x020,
+@@ -142,6 +143,16 @@ struct sev_data_download_firmware {
+ } __packed;
+ 
+ /**
++ * struct sev_data_get_id - GET_ID command parameters
++ *
++ * @address: physical address of region to place unique CPU ID(s)
++ * @len: len of the region
++ */
++struct sev_data_get_id {
++	u64 address;				/* In */
++	u32 len;				/* In/Out */
++} __packed;
++/**
+  * struct sev_data_pdh_cert_export - PDH_CERT_EXPORT command parameters
+  *
+  * @pdh_address: PDH certificate address
+diff --git a/include/uapi/linux/psp-sev.h b/include/uapi/linux/psp-sev.h
+index 9008f31..ac8c60b 100644
+--- a/include/uapi/linux/psp-sev.h
++++ b/include/uapi/linux/psp-sev.h
+@@ -30,6 +30,7 @@ enum {
+ 	SEV_PDH_GEN,
+ 	SEV_PDH_CERT_EXPORT,
+ 	SEV_PEK_CERT_IMPORT,
++	SEV_GET_ID,
+ 
+ 	SEV_MAX,
+ };
+@@ -124,6 +125,17 @@ struct sev_user_data_pdh_cert_export {
+ } __packed;
+ 
+ /**
++ * struct sev_user_data_get_id - GET_ID command parameters
++ *
++ * @socket1: Buffer to pass unique ID of first socket
++ * @socket2: Buffer to pass unique ID of second socket
++ */
++struct sev_user_data_get_id {
++	__u8 socket1[64];			/* Out */
++	__u8 socket2[64];			/* Out */
++} __packed;
++
++/**
+  * struct sev_issue_cmd - SEV ioctl parameters
+  *
+  * @cmd: SEV commands to execute
 -- 
 2.7.4
