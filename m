@@ -1,37 +1,33 @@
-From: Thomas Garnier via Virtualization
-	<virtualization@lists.linux-foundation.org>
-Subject: Re: [PATCH v3 21/27] x86/ftrace: Adapt function tracing for PIE
-	support
-Date: Thu, 24 May 2018 13:41:27 -0700
-Message-ID: <CAJcbSZGQmQM7PuER0kEqt3aG9O-8vh-g1EA2jnkVsJPx-Htvrw@mail.gmail.com>
+From: Pavel Machek <pavel@ucw.cz>
+Subject: Re: [PATCH v3 11/27] x86/power/64: Adapt assembly for PIE support
+Date: Fri, 25 May 2018 11:10:24 +0200
+Message-ID: <20180525091024.GA9666@amd>
 References: <20180523195421.180248-1-thgarnie@google.com>
-	<20180523195421.180248-22-thgarnie@google.com>
-	<20180524114024.pa67zjipy5qcg4tm@pathway.suse.cz>
-	<20180524161622.4202319f@gandalf.local.home>
-Reply-To: Thomas Garnier <thgarnie@google.com>
+	<20180523195421.180248-12-thgarnie@google.com>
+	<20180524110341.GB20225@amd>
+	<CAJcbSZEnRhFDvYCG4ORH71LrcH2bAzOU5yF-oa9KkLpKo5UuSQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/mixed; boundary="===============4881854000865580682=="
 Cc: Kate Stewart <kstewart@linuxfoundation.org>,
 	Nicolas Pitre <nicolas.pitre@linaro.org>,
 	the arch/x86 maintainers <x86@kernel.org>,
 	Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
-	Len Brown <len.brown@intel.com>, Tom Lendacky <thomas.lendacky@amd.com>,
+	Petr Mladek <pmladek@suse.com>, Len Brown <len.brown@intel.com>,
 	Peter Zijlstra <peterz@infradead.org>,
 	Yonghong Song <yhs@fb.com>, Christopher Li <sparse@chrisli.org>,
 	Dave Hansen <dave.hansen@linux.intel.com>,
 	Dominik Brodowski <linux@dominikbrodowski.net>,
 	LKML <linux-kernel@vger.kernel.org>,
 	Masahiro Yamada <yamada.masahiro@socionext.com>,
-	Jan Beulich <JBeulich@suse.com>, Pavel Machek <pavel@ucw.cz>,
-	"H . Peter Anvin" <hpa@zytor.com>,
+	Jan Beulich <JBeulich@suse.com>, "H . Peter Anvin" <hpa@zytor.com>,
 	Kernel Hardening <kernel-hardening@lists.openwall.com>,
 	Christoph Lameter <cl@linux.com>, Alok Kataria <akataria@vmware.com>,
 	Linux Doc Mailing List <linux-doc@vger.kernel.org>,
-	linux-arch <linux-arch@vger.kernel.org>, Jonathan Corbet <corbet@
-To: Steven Rostedt <rostedt@goodmis.org>
+	linux-arch <linux-arch@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Herbert Xu <herbert@gondor.
+To: Thomas Garnier <thgarnie@google.com>
 Return-path: <virtualization-bounces@lists.linux-foundation.org>
-In-Reply-To: <20180524161622.4202319f@gandalf.local.home>
+In-Reply-To: <CAJcbSZEnRhFDvYCG4ORH71LrcH2bAzOU5yF-oa9KkLpKo5UuSQ@mail.gmail.com>
 List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/virtualization>,
 	<mailto:virtualization-request@lists.linux-foundation.org?subject=unsubscribe>
 List-Archive: <http://lists.linuxfoundation.org/pipermail/virtualization/>
@@ -43,121 +39,76 @@ Sender: virtualization-bounces@lists.linux-foundation.org
 Errors-To: virtualization-bounces@lists.linux-foundation.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, May 24, 2018 at 1:16 PM Steven Rostedt <rostedt@goodmis.org> wrote:
 
-> On Thu, 24 May 2018 13:40:24 +0200
-> Petr Mladek <pmladek@suse.com> wrote:
+--===============4881854000865580682==
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="UlVJffcvxoiEqYs2"
+Content-Disposition: inline
 
-> > On Wed 2018-05-23 12:54:15, Thomas Garnier wrote:
-> > > When using -fPIE/PIC with function tracing, the compiler generates a
-> > > call through the GOT (call *__fentry__@GOTPCREL). This instruction
-> > > takes 6 bytes instead of 5 on the usual relative call.
+
+--UlVJffcvxoiEqYs2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Thu 2018-05-24 09:37:20, Thomas Garnier wrote:
+> On Thu, May 24, 2018 at 4:04 AM Pavel Machek <pavel@ucw.cz> wrote:
+>=20
+> > On Wed 2018-05-23 12:54:05, Thomas Garnier wrote:
+> > > Change the assembly code to use only relative references of symbols f=
+or
+> the
+> > > kernel to be PIE compatible.
 > > >
-> > > If PIE is enabled, replace the 6th byte of the GOT call by a 1-byte
-nop
-> > > so ftrace can handle the previous 5-bytes as before.
-> > >
-> > > Position Independent Executable (PIE) support will allow to extended
+> > > Position Independent Executable (PIE) support will allow to extended =
 the
 > > > KASLR randomization range below the -2G memory limit.
 > > >
 > > > Signed-off-by: Thomas Garnier <thgarnie@google.com>
-> > > ---
-> > >  arch/x86/include/asm/ftrace.h   |  6 +++--
-> > >  arch/x86/include/asm/sections.h |  4 ++++
-> > >  arch/x86/kernel/ftrace.c        | 42
-+++++++++++++++++++++++++++++++--
-> > >  3 files changed, 48 insertions(+), 4 deletions(-)
-> > >
-> > > diff --git a/arch/x86/include/asm/ftrace.h
-b/arch/x86/include/asm/ftrace.h
-> > > index c18ed65287d5..8f2decce38d8 100644
-> > > --- a/arch/x86/include/asm/ftrace.h
-> > > +++ b/arch/x86/include/asm/ftrace.h
-> > > @@ -25,9 +25,11 @@ extern void __fentry__(void);
-> > >  static inline unsigned long ftrace_call_adjust(unsigned long addr)
-> > >  {
-> > >     /*
-> > > -    * addr is the address of the mcount call instruction.
-> > > -    * recordmcount does the necessary offset calculation.
-> > > +    * addr is the address of the mcount call instruction. PIE has
-always a
-> > > +    * byte added to the start of the function.
-> > >      */
-> > > +   if (IS_ENABLED(CONFIG_X86_PIE))
-> > > +           addr -= 1;
-> >
-> > This seems to modify the address even for modules that are _not_
-compiled with
-> > PIE, see below.
+>=20
+> > Again, was this tested?
+>=20
+> Hibernation was tested as much as I can with qemu and my dedicated
+>machine.
 
-> Can one load a module not compiled for PIE in a kernel with PIE?
+Ok, good.
 
-> >
-> > >     return addr;
-> > >  }
-> > >
-> > > diff --git a/arch/x86/kernel/ftrace.c b/arch/x86/kernel/ftrace.c
-> > > index 01ebcb6f263e..73b3c30cb7a3 100644
-> > > --- a/arch/x86/kernel/ftrace.c
-> > > +++ b/arch/x86/kernel/ftrace.c
-> > > @@ -135,6 +135,44 @@ ftrace_modify_code_direct(unsigned long ip,
-unsigned const char *old_code,
-> > >     return 0;
-> > >  }
-> > >
-> > > +/* Bytes before call GOT offset */
-> > > +const unsigned char got_call_preinsn[] = { 0xff, 0x15 };
-> > > +
-> > > +static int
-> > > +ftrace_modify_initial_code(unsigned long ip, unsigned const char
-*old_code,
-> > > +                      unsigned const char *new_code)
-> > > +{
-> > > +   unsigned char replaced[MCOUNT_INSN_SIZE + 1];
-> > > +
-> > > +   ftrace_expected = old_code;
-> > > +
-> > > +   /*
-> > > +    * If PIE is not enabled or no GOT call was found, default to the
-> > > +    * original approach to code modification.
-> > > +    */
-> > > +   if (!IS_ENABLED(CONFIG_X86_PIE) ||
-> > > +       probe_kernel_read(replaced, (void *)ip, sizeof(replaced)) ||
-> > > +       memcmp(replaced, got_call_preinsn, sizeof(got_call_preinsn)))
-> > > +           return ftrace_modify_code_direct(ip, old_code, new_code);
-> >
-> > And this looks like an attempt to handle modules compiled without
-> > PIE. Does it works with the right ip in that case?
+Acked-by: Pavel Machek <pavel@ucw.cz>
 
-> I'm guessing the || is for the "or no GOT call was found", but it
-> doesn't explain why no GOT would be found.
+> Any specific test you think I should use?
 
-Yes, maybe I could have made it work by using text_ip_addr earlier.
+Hibernation working should be good enough test for this.
 
+Thanks,
+								Pavel
 
-> >
-> > I wonder if a better solution would be to update
-> > scripts/recordmcount.c to store the incremented location into the
-module.
+--=20
+(english) http://www.livejournal.com/~pavelmachek
+(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blo=
+g.html
 
-I will look into it.
+--UlVJffcvxoiEqYs2
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
 
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
 
-> If recordmcount.c can handle this, then I think that's the preferred
-> approach. Thanks!
+iEYEARECAAYFAlsH0wAACgkQMOfwapXb+vJiPACbB1beNmXz4oS4/mXx8V6gi+hn
+3BMAmwQL+v/Mq6QFOs5pWL0flhKjfSRY
+=e7mZ
+-----END PGP SIGNATURE-----
 
-> -- Steve
+--UlVJffcvxoiEqYs2--
 
-> >
-> > IMPORTANT: I have only vague picture about how this all works. It is
-> > possible that I am completely wrong. The code might be correct,
-> > especially if you tested this situation.
-> >
-> > Best Regards,
-> > Petr
+--===============4881854000865580682==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-
-
--- 
-Thomas
+_______________________________________________
+Virtualization mailing list
+Virtualization@lists.linux-foundation.org
+https://lists.linuxfoundation.org/mailman/listinfo/virtualization
+--===============4881854000865580682==--
