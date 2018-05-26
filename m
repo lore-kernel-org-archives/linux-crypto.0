@@ -1,29 +1,60 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: chtls: generic handling of data and hdr
-Date: Sun, 27 May 2018 00:25:40 +0800
-Message-ID: <20180526162540.wxudu5nsnstzenn6@gondor.apana.org.au>
-References: <1526296298-30183-1-git-send-email-atul.gupta@chelsio.com>
+Subject: Re: [PATCH v2 00/10] crypto: inside-secure - AEAD support
+Date: Sun, 27 May 2018 00:26:03 +0800
+Message-ID: <20180526162603.a64gtx3sxjwjadf7@gondor.apana.org.au>
+References: <20180514131104.25552-1-antoine.tenart@bootlin.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
-        davem@davemloft.net, Harsh Jain <harsh@chelsio.com>
-To: Atul Gupta <atul.gupta@chelsio.com>
-Return-path: <netdev-owner@vger.kernel.org>
+Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
+        maxime.chevallier@bootlin.com, gregory.clement@bootlin.com,
+        miquel.raynal@bootlin.com, nadavh@marvell.com, oferh@marvell.com,
+        igall@marvell.com
+To: Antoine Tenart <antoine.tenart@bootlin.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1526296298-30183-1-git-send-email-atul.gupta@chelsio.com>
-Sender: netdev-owner@vger.kernel.org
+In-Reply-To: <20180514131104.25552-1-antoine.tenart@bootlin.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, May 14, 2018 at 04:41:38PM +0530, Atul Gupta wrote:
-> removed redundant check and made TLS PDU and header recv
-> handling common as received from HW.
-> Ensure that only tls header is read in cpl_rx_tls_cmp
-> read-ahead and skb is freed when entire data is processed.
+On Mon, May 14, 2018 at 03:10:54PM +0200, Antoine Tenart wrote:
+> This series brings AEAD algorithms to the Inside Secure SafeXcel driver.
+> The first 7 commits rework the driver to allow the future AEAD addition,
+> and then 3 commits add AEAD functions and 3 algorithms.
 > 
-> Signed-off-by: Atul Gupta <atul.gupta@chelsio.com>
-> Signed-off-by: Harsh Jain <harsh@chelsio.com>
+> This is based on top of v4.17-rc5.
+> 
+> Thanks!
+> Antoine
+> 
+> Since v1:
+>   - Reworked the driver to remove VLA's and added a custom on-stack
+>     request definition in the driver, to be used in the invalidation
+>     process. (Patch 1/10 was replaced, patch 8/10 was reworked).
+>   - Rebased on top of v4.17-rc5 (was -rc3).
+> 
+> Antoine Tenart (10):
+>   crypto: inside-secure - remove VLAs
+>   crypto: inside-secure - rework cipher functions for future AEAD
+>     support
+>   crypto: inside-secure - rework the alg type settings in the context
+>   crypto: inside-secure - make the context control size dynamic
+>   crypto: inside-secure - make the key and context size computation
+>     dynamic
+>   crypto: inside-secure - fix the hash then encrypt/decrypt types
+>   crypto: inside-secure - improve error reporting
+>   crypto: inside-secure - authenc(hmac(sha256),cbc(aes)) support
+>   crypto: inside-secure - authenc(hmac(sha224),cbc(aes)) support
+>   crypto: inside-secure - authenc(hmac(sha1),cbc(aes)) support
+> 
+>  drivers/crypto/Kconfig                        |   1 +
+>  drivers/crypto/inside-secure/safexcel.c       |  32 +
+>  drivers/crypto/inside-secure/safexcel.h       |  44 +-
+>  .../crypto/inside-secure/safexcel_cipher.c    | 642 ++++++++++++++----
+>  drivers/crypto/inside-secure/safexcel_hash.c  |  23 +-
+>  5 files changed, 600 insertions(+), 142 deletions(-)
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
