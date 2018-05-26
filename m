@@ -1,236 +1,68 @@
-From: Janakarajan Natarajan <Janakarajan.Natarajan@amd.com>
-Subject: [PATCHv2 1/2] crypto: ccp: Add DOWNLOAD_FIRMWARE SEV command
-Date: Fri, 25 May 2018 15:23:29 -0500
-Message-ID: <79f471aa1d0720e3ed5c60878122a3fe25dcc801.1527274270.git.Janakarajan.Natarajan@amd.com>
-References: <cover.1527274269.git.Janakarajan.Natarajan@amd.com>
+From: Eric Biggers <ebiggers3@gmail.com>
+Subject: Re: WARNING: kernel stack regs has bad 'bp' value (3)
+Date: Sat, 26 May 2018 00:22:03 -0700
+Message-ID: <20180526072203.GA724@sol.localdomain>
+References: <001a11449aa2faf11805643af581@google.com>
+ <CACT4Y+YOmbZGdBbFpmjRJXABGe1tD=F+3na77DwoPCEaROADyw@mail.gmail.com>
+ <20180202221829.tdiji2332t7orcxj@gmail.com>
+ <CACT4Y+afpDQ7A3caRmskML06h8Q6+NkVAn6HtV93ExPec-g2pA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: Tom Lendacky <thomas.lendacky@amd.com>,
-        Gary Hook <gary.hook@amd.com>,
+Content-Type: text/plain; charset=us-ascii
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        syzbot <syzbot+ffa3a158337bbc01ff09@syzkaller.appspotmail.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Borislav Petkov <bp@suse.de>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Janakarajan Natarajan <Janakarajan.Natarajan@amd.com>
-To: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+        David Miller <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        syzkaller-bugs <syzkaller-bugs@googlegroups.com>
+To: Dmitry Vyukov <dvyukov@google.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <cover.1527274269.git.Janakarajan.Natarajan@amd.com>
+Content-Disposition: inline
+In-Reply-To: <CACT4Y+afpDQ7A3caRmskML06h8Q6+NkVAn6HtV93ExPec-g2pA@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-The DOWNLOAD_FIRMWARE command, added as of SEV API v0.15, allows the OS
-to install SEV firmware newer than the currently active SEV firmware.
+On Sat, May 12, 2018 at 10:43:08AM +0200, Dmitry Vyukov wrote:
+> On Fri, Feb 2, 2018 at 11:18 PM, Eric Biggers <ebiggers3@gmail.com> wrote:
+> > On Fri, Feb 02, 2018 at 02:57:32PM +0100, Dmitry Vyukov wrote:
+> >> On Fri, Feb 2, 2018 at 2:48 PM, syzbot
+> >> <syzbot+ffa3a158337bbc01ff09@syzkaller.appspotmail.com> wrote:
+> >> > Hello,
+> >> >
+> >> > syzbot hit the following crash on upstream commit
+> >> > 7109a04eae81c41ed529da9f3c48c3655ccea741 (Thu Feb 1 17:37:30 2018 +0000)
+> >> > Merge git://git.kernel.org/pub/scm/linux/kernel/git/davem/ide
+> >> >
+> >> > So far this crash happened 4 times on net-next, upstream.
+> >> > C reproducer is attached.
+> >> > syzkaller reproducer is attached.
+> >> > Raw console output is attached.
+> >> > compiler: gcc (GCC) 7.1.1 20170620
+> >> > .config is attached.
+> >>
+> >>
+> >> From suspicious frames I see salsa20_asm_crypt there, so +crypto maintainers.
+> >>
+> >
+> > Looks like the x86 implementations of Salsa20 (both i586 and x86_64) need to be
+> > updated to not use %ebp/%rbp.
+> 
+> Ard,
+> 
+> This was bisected as introduced by:
+> 
+> commit 83dee2ce1ae791c3dc0c9d4d3a8d42cb109613f6
+> Author: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> Date:   Fri Jan 19 12:04:34 2018 +0000
+> 
+>     crypto: sha3-generic - rewrite KECCAK transform to help the
+> compiler optimize
+> 
+> https://gist.githubusercontent.com/dvyukov/47f93f5a0679170dddf93bc019b42f6d/raw/65beac8ddd30003bbd4e9729236dc8572094abf7/gistfile1.txt
 
-For the new SEV firmware to be applied it must:
-* Pass the validation test performed by the existing firmware.
-* Be of the same build or a newer build compared to the existing firmware.
+Note that syzbot's original C reproducer (from Feb 1) for this actually
+triggered the warning through salsa20-asm, which I've just proposed to "fix" by
+https://patchwork.kernel.org/patch/10428863/.  sha3-generic is apparently
+another instance of the same bug, where the %rbp register is used for data.
 
-For more information please refer to "Section 5.11 DOWNLOAD_FIRMWARE" of
-https://support.amd.com/TechDocs/55766_SEV-KM%20API_Specification.pdf
-
-Signed-off-by: Janakarajan Natarajan <Janakarajan.Natarajan@amd.com>
----
- drivers/crypto/ccp/psp-dev.c | 99 +++++++++++++++++++++++++++++++++++++++-----
- drivers/crypto/ccp/psp-dev.h |  4 ++
- include/linux/psp-sev.h      | 12 ++++++
- 3 files changed, 105 insertions(+), 10 deletions(-)
-
-diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
-index d95ec52..12838b4 100644
---- a/drivers/crypto/ccp/psp-dev.c
-+++ b/drivers/crypto/ccp/psp-dev.c
-@@ -22,11 +22,17 @@
- #include <linux/delay.h>
- #include <linux/hw_random.h>
- #include <linux/ccp.h>
-+#include <linux/firmware.h>
- 
- #include "sp-dev.h"
- #include "psp-dev.h"
- 
-+#define SEV_VERSION_GREATER_OR_EQUAL(_maj, _min)	\
-+		((psp_master->api_major) >= _maj &&	\
-+		 (psp_master->api_minor) >= _min)
-+
- #define DEVICE_NAME	"sev"
-+#define SEV_FW_FILE	"amd/sev.fw"
- 
- static DEFINE_MUTEX(sev_cmd_mutex);
- static struct sev_misc_dev *misc_dev;
-@@ -112,6 +118,7 @@ static int sev_cmd_buffer_len(int cmd)
- 	case SEV_CMD_RECEIVE_UPDATE_DATA:	return sizeof(struct sev_data_receive_update_data);
- 	case SEV_CMD_RECEIVE_UPDATE_VMSA:	return sizeof(struct sev_data_receive_update_vmsa);
- 	case SEV_CMD_LAUNCH_UPDATE_SECRET:	return sizeof(struct sev_data_launch_secret);
-+	case SEV_CMD_DOWNLOAD_FIRMWARE:		return sizeof(struct sev_data_download_firmware);
- 	default:				return 0;
- 	}
- 
-@@ -378,6 +385,79 @@ void *psp_copy_user_blob(u64 __user uaddr, u32 len)
- }
- EXPORT_SYMBOL_GPL(psp_copy_user_blob);
- 
-+static int sev_get_api_version(void)
-+{
-+	struct sev_user_data_status *status;
-+	int error, ret;
-+
-+	status = &psp_master->status_cmd_buf;
-+	ret = sev_platform_status(status, &error);
-+	if (ret) {
-+		dev_err(psp_master->dev,
-+			"SEV: failed to get status. Error: %#x\n", error);
-+		return 1;
-+	}
-+
-+	psp_master->api_major = status->api_major;
-+	psp_master->api_minor = status->api_minor;
-+	psp_master->build = status->build;
-+
-+	return 0;
-+}
-+
-+/* Don't fail if SEV FW couldn't be updated. Continue with existing SEV FW */
-+static int sev_update_firmware(struct device *dev)
-+{
-+	struct sev_data_download_firmware *data;
-+	const struct firmware *firmware;
-+	int ret, error, order;
-+	struct page *p;
-+	u64 data_size;
-+
-+	ret = request_firmware(&firmware, SEV_FW_FILE, dev);
-+	if (ret < 0)
-+		return -1;
-+
-+	/*
-+	 * SEV FW expects the physical address given to it to be 32
-+	 * byte aligned. Memory allocated has structure placed at the
-+	 * beginning followed by the firmware being passed to the SEV
-+	 * FW. Allocate enough memory for data structure + alignment
-+	 * padding + SEV FW.
-+	 */
-+	data_size = ALIGN(sizeof(struct sev_data_download_firmware), 32);
-+
-+	order = get_order(firmware->size + data_size);
-+	p = alloc_pages(GFP_KERNEL, order);
-+	if (!p) {
-+		ret = -1;
-+		goto fw_err;
-+	}
-+
-+	/*
-+	 * Copy firmware data to a kernel allocated contiguous
-+	 * memory region.
-+	 */
-+	data = page_address(p);
-+	memcpy(page_address(p) + data_size, firmware->data, firmware->size);
-+
-+	data->address = __psp_pa(page_address(p) + data_size);
-+	data->len = firmware->size;
-+
-+	ret = sev_do_cmd(SEV_CMD_DOWNLOAD_FIRMWARE, data, &error);
-+	if (ret)
-+		dev_dbg(dev, "Failed to update SEV firmware: %#x\n", error);
-+	else
-+		dev_info(dev, "SEV firmware update successful\n");
-+
-+	__free_pages(p, order);
-+
-+fw_err:
-+	release_firmware(firmware);
-+
-+	return ret;
-+}
-+
- static int sev_ioctl_do_pek_import(struct sev_issue_cmd *argp)
- {
- 	struct sev_user_data_pek_cert_import input;
-@@ -750,7 +830,6 @@ EXPORT_SYMBOL_GPL(sev_issue_cmd_external_user);
- 
- void psp_pci_init(void)
- {
--	struct sev_user_data_status *status;
- 	struct sp_device *sp;
- 	int error, rc;
- 
-@@ -760,6 +839,13 @@ void psp_pci_init(void)
- 
- 	psp_master = sp->psp_data;
- 
-+	if (sev_get_api_version())
-+		goto err;
-+
-+	if (SEV_VERSION_GREATER_OR_EQUAL(0, 15) &&
-+	    sev_update_firmware(psp_master->dev) == 0)
-+		sev_get_api_version();
-+
- 	/* Initialize the platform */
- 	rc = sev_platform_init(&error);
- 	if (rc) {
-@@ -767,16 +853,9 @@ void psp_pci_init(void)
- 		goto err;
- 	}
- 
--	/* Display SEV firmware version */
--	status = &psp_master->status_cmd_buf;
--	rc = sev_platform_status(status, &error);
--	if (rc) {
--		dev_err(sp->dev, "SEV: failed to get status error %#x\n", error);
--		goto err;
--	}
-+	dev_info(sp->dev, "SEV API:%d.%d build:%d\n", psp_master->api_major,
-+		 psp_master->api_minor, psp_master->build);
- 
--	dev_info(sp->dev, "SEV API:%d.%d build:%d\n", status->api_major,
--		 status->api_minor, status->build);
- 	return;
- 
- err:
-diff --git a/drivers/crypto/ccp/psp-dev.h b/drivers/crypto/ccp/psp-dev.h
-index c81f0b1..c7e9098a 100644
---- a/drivers/crypto/ccp/psp-dev.h
-+++ b/drivers/crypto/ccp/psp-dev.h
-@@ -78,6 +78,10 @@ struct psp_device {
- 	struct sev_misc_dev *sev_misc;
- 	struct sev_user_data_status status_cmd_buf;
- 	struct sev_data_init init_cmd_buf;
-+
-+	u8 api_major;
-+	u8 api_minor;
-+	u8 build;
- };
- 
- #endif /* __PSP_DEV_H */
-diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
-index 93addfa..1d24962 100644
---- a/include/linux/psp-sev.h
-+++ b/include/linux/psp-sev.h
-@@ -54,6 +54,7 @@ enum sev_cmd {
- 	SEV_CMD_PDH_CERT_EXPORT		= 0x008,
- 	SEV_CMD_PDH_GEN			= 0x009,
- 	SEV_CMD_DF_FLUSH		= 0x00A,
-+	SEV_CMD_DOWNLOAD_FIRMWARE	= 0x00B,
- 
- 	/* Guest commands */
- 	SEV_CMD_DECOMMISSION		= 0x020,
-@@ -130,6 +131,17 @@ struct sev_data_pek_cert_import {
- } __packed;
- 
- /**
-+ * struct sev_data_download_firmware - DOWNLOAD_FIRMWARE command parameters
-+ *
-+ * @address: physical address of firmware image
-+ * @len: len of the firmware image
-+ */
-+struct sev_data_download_firmware {
-+	u64 address;				/* In */
-+	u32 len;				/* In */
-+} __packed;
-+
-+/**
-  * struct sev_data_pdh_cert_export - PDH_CERT_EXPORT command parameters
-  *
-  * @pdh_address: PDH certificate address
--- 
-2.7.4
+Eric
