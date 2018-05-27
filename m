@@ -1,48 +1,37 @@
 From: Atul Gupta <atul.gupta@chelsio.com>
-Subject: [PATCH v2 1/5] crypto:chtls: key len correction
-Date: Sun, 27 May 2018 21:15:18 +0530
-Message-ID: <1527435922-6727-2-git-send-email-atul.gupta@chelsio.com>
-References: <1527435922-6727-1-git-send-email-atul.gupta@chelsio.com>
+Subject: [PATCH v2 0/5] build warnings cleanup
+Date: Sun, 27 May 2018 21:15:17 +0530
+Message-ID: <1527435922-6727-1-git-send-email-atul.gupta@chelsio.com>
 Cc: gustavo@embeddedor.com, dan.carpenter@oracle.com,
         netdev@vger.kernel.org, davem@davemloft.net, atul.gupta@chelsio.com
 To: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
 Return-path: <netdev-owner@vger.kernel.org>
-In-Reply-To: <1527435922-6727-1-git-send-email-atul.gupta@chelsio.com>
 Sender: netdev-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-corrected the key length to copy 128b key. Removed 192b and 256b
-key as user input supports key of size 128b in gcm_ctx
+Build warnings cleanup reported for
+- using only 128b key
+- wait for buffer in sendmsg/sendpage
+- check for null before using skb
+- free rspq_skb_cache in error path
+- indentation
 
-Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
-Signed-off-by: Atul Gupta <atul.gupta@chelsio.com>
----
- drivers/crypto/chelsio/chtls/chtls_hw.c | 6 +-----
- 1 file changed, 1 insertion(+), 5 deletions(-)
+v2:
+  Added bug report description for 0002
+  Incorported comments from Dan Carpenter
 
-diff --git a/drivers/crypto/chelsio/chtls/chtls_hw.c b/drivers/crypto/chelsio/chtls/chtls_hw.c
-index 54a13aa9..55d5014 100644
---- a/drivers/crypto/chelsio/chtls/chtls_hw.c
-+++ b/drivers/crypto/chelsio/chtls/chtls_hw.c
-@@ -213,7 +213,7 @@ static int chtls_key_info(struct chtls_sock *csk,
- 			  struct _key_ctx *kctx,
- 			  u32 keylen, u32 optname)
- {
--	unsigned char key[CHCR_KEYCTX_CIPHER_KEY_SIZE_256];
-+	unsigned char key[AES_KEYSIZE_128];
- 	struct tls12_crypto_info_aes_gcm_128 *gcm_ctx;
- 	unsigned char ghash_h[AEAD_H_SIZE];
- 	struct crypto_cipher *cipher;
-@@ -228,10 +228,6 @@ static int chtls_key_info(struct chtls_sock *csk,
- 
- 	if (keylen == AES_KEYSIZE_128) {
- 		ck_size = CHCR_KEYCTX_CIPHER_KEY_SIZE_128;
--	} else if (keylen == AES_KEYSIZE_192) {
--		ck_size = CHCR_KEYCTX_CIPHER_KEY_SIZE_192;
--	} else if (keylen == AES_KEYSIZE_256) {
--		ck_size = CHCR_KEYCTX_CIPHER_KEY_SIZE_256;
- 	} else {
- 		pr_err("GCM: Invalid key length %d\n", keylen);
- 		return -EINVAL;
+Atul Gupta (5):
+  crypto:chtls: key len correction
+  crypto: chtls: wait for memory sendmsg, sendpage
+  crypto: chtls: dereference null variable
+  crypto: chtls: kbuild warnings
+  crypto: chtls: free beyond end rspq_skb_cache
+
+ drivers/crypto/chelsio/chtls/chtls.h      |   1 +
+ drivers/crypto/chelsio/chtls/chtls_hw.c   |   6 +-
+ drivers/crypto/chelsio/chtls/chtls_io.c   | 104 +++++++++++++++++++++++++++---
+ drivers/crypto/chelsio/chtls/chtls_main.c |   3 +-
+ 4 files changed, 98 insertions(+), 16 deletions(-)
+
 -- 
 1.8.3.1
