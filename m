@@ -1,65 +1,56 @@
-From: Antoine Tenart <antoine.tenart@bootlin.com>
-Subject: [PATCH] crypto: inside-secure - increase minimum transfer size
-Date: Mon, 28 May 2018 11:03:27 +0200
-Message-ID: <20180528090327.16844-1-antoine.tenart@bootlin.com>
-Cc: Ofer Heifetz <oferh@marvell.com>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
-        maxime.chevallier@bootlin.com, gregory.clement@bootlin.com,
-        miquel.raynal@bootlin.com, nadavh@marvell.com, igall@marvell.com,
-        Antoine Tenart <antoine.tenart@bootlin.com>
-To: herbert@gondor.apana.org.au, davem@davemloft.net
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH] crypto: morus - Hide Kconfig option for glue code
+Date: Mon, 28 May 2018 17:47:45 +0200
+Message-ID: <20180528154806.2621106-1-arnd@arndb.de>
+Cc: Arnd Bergmann <arnd@arndb.de>,
+        Ondrej Mosnacek <omosnacek@gmail.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-From: Ofer Heifetz <oferh@marvell.com>
+Enabling the glue drivers for morus640 and/or morus1280 leads to a build failure
+on all non-x86 architectures:
 
-The token size was increased for AEAD support. Occasional authentication
-fails arise since the result descriptor overflows. This is because the
-token size and the engine minimal thresholds must be in sync.
+crypto/morus1280_glue.c:24:10: fatal error: asm/fpu/api.h: No such file or directory
+scripts/Makefile.build:311: recipe for target 'crypto/morus1280_glue.o' failed
+crypto/morus640_glue.c:24:10: fatal error: asm/fpu/api.h: No such file or directory
+scripts/Makefile.build:311: recipe for target 'crypto/morus640_glue.o' failed
 
-Signed-off-by: Ofer Heifetz <oferh@marvell.com>
-Signed-off-by: Antoine Tenart <antoine.tenart@bootlin.com>
+There really is no reason to enable these unless we also have a real
+driver using the glue, so the Kconfig option can be hidden and remain
+selected by the x86 specific SIMD drivers or any others getting added
+in the future.
+
+Fixes: 56e8e57fc3a7 ("crypto: morus - Add common SIMD glue code for MORUS")
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
+ crypto/Kconfig | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Hi Herbert,
-
-This patch fixes/improves the AEAD support in the SafeXcel driver. As
-the AEAD support (which introduces the issue) was only merge a few days
-ago, this patch is not flagged as being a fix.
-
-Thanks!
-Antoine
-
- drivers/crypto/inside-secure/safexcel.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/inside-secure/safexcel.c
-index 4e86f864a952..8691f6369a13 100644
---- a/drivers/crypto/inside-secure/safexcel.c
-+++ b/drivers/crypto/inside-secure/safexcel.c
-@@ -296,8 +296,8 @@ static int safexcel_hw_init(struct safexcel_crypto_priv *priv)
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 75f5efde9aa3..e11c59d26ac5 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -341,7 +341,7 @@ config CRYPTO_MORUS640
+ 	  Support for the MORUS-640 dedicated AEAD algorithm.
  
- 	/* DMA transfer size to use */
- 	val = EIP197_HIA_DFE_CFG_DIS_DEBUG;
--	val |= EIP197_HIA_DxE_CFG_MIN_DATA_SIZE(5) | EIP197_HIA_DxE_CFG_MAX_DATA_SIZE(9);
--	val |= EIP197_HIA_DxE_CFG_MIN_CTRL_SIZE(5) | EIP197_HIA_DxE_CFG_MAX_CTRL_SIZE(7);
-+	val |= EIP197_HIA_DxE_CFG_MIN_DATA_SIZE(6) | EIP197_HIA_DxE_CFG_MAX_DATA_SIZE(9);
-+	val |= EIP197_HIA_DxE_CFG_MIN_CTRL_SIZE(6) | EIP197_HIA_DxE_CFG_MAX_CTRL_SIZE(7);
- 	val |= EIP197_HIA_DxE_CFG_DATA_CACHE_CTRL(RD_CACHE_3BITS);
- 	val |= EIP197_HIA_DxE_CFG_CTRL_CACHE_CTRL(RD_CACHE_3BITS);
- 	writel(val, EIP197_HIA_DFE(priv) + EIP197_HIA_DFE_CFG);
-@@ -306,9 +306,9 @@ static int safexcel_hw_init(struct safexcel_crypto_priv *priv)
- 	writel(0, EIP197_HIA_DFE_THR(priv) + EIP197_HIA_DFE_THR_CTRL);
+ config CRYPTO_MORUS640_GLUE
+-	tristate "MORUS-640 AEAD algorithm (glue for SIMD optimizations)"
++	tristate
+ 	select CRYPTO_AEAD
+ 	select CRYPTO_CRYPTD
+ 	help
+@@ -363,7 +363,7 @@ config CRYPTO_MORUS1280
+ 	  Support for the MORUS-1280 dedicated AEAD algorithm.
  
- 	/* Configure the procesing engine thresholds */
--	writel(EIP197_PE_IN_xBUF_THRES_MIN(5) | EIP197_PE_IN_xBUF_THRES_MAX(9),
-+	writel(EIP197_PE_IN_xBUF_THRES_MIN(6) | EIP197_PE_IN_xBUF_THRES_MAX(9),
- 	       EIP197_PE(priv) + EIP197_PE_IN_DBUF_THRES);
--	writel(EIP197_PE_IN_xBUF_THRES_MIN(5) | EIP197_PE_IN_xBUF_THRES_MAX(7),
-+	writel(EIP197_PE_IN_xBUF_THRES_MIN(6) | EIP197_PE_IN_xBUF_THRES_MAX(7),
- 	       EIP197_PE(priv) + EIP197_PE_IN_TBUF_THRES);
- 
- 	if (priv->version == EIP197) {
+ config CRYPTO_MORUS1280_GLUE
+-	tristate "MORUS-1280 AEAD algorithm (glue for SIMD optimizations)"
++	tristate
+ 	select CRYPTO_AEAD
+ 	select CRYPTO_CRYPTD
+ 	help
 -- 
-2.17.0
+2.9.0
