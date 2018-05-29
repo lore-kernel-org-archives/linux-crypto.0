@@ -1,7 +1,7 @@
 From: Antoine Tenart <antoine.tenart@bootlin.com>
-Subject: [PATCH 07/10] crypto: sha512_generic - add a sha384 0-length pre-computed hash
-Date: Tue, 29 May 2018 14:13:49 +0200
-Message-ID: <20180529121352.19490-8-antoine.tenart@bootlin.com>
+Subject: [PATCH 08/10] crypto: inside-secure - sha384 support
+Date: Tue, 29 May 2018 14:13:50 +0200
+Message-ID: <20180529121352.19490-9-antoine.tenart@bootlin.com>
 References: <20180529121352.19490-1-antoine.tenart@bootlin.com>
 Cc: Antoine Tenart <antoine.tenart@bootlin.com>,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -14,49 +14,140 @@ In-Reply-To: <20180529121352.19490-1-antoine.tenart@bootlin.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This patch adds the sha384 pre-computed 0-length hash so that device
-drivers can use it when an hardware engine does not support computing a
-hash from a 0 length input.
+This patch adds the sha384 algorithm support to the Inside Secure
+SafeXcel driver.
 
 Signed-off-by: Antoine Tenart <antoine.tenart@bootlin.com>
 ---
- crypto/sha512_generic.c | 10 ++++++++++
- include/crypto/sha.h    |  2 ++
- 2 files changed, 12 insertions(+)
+ drivers/crypto/inside-secure/safexcel.c      |  1 +
+ drivers/crypto/inside-secure/safexcel.h      |  1 +
+ drivers/crypto/inside-secure/safexcel_hash.c | 76 +++++++++++++++++++-
+ 3 files changed, 77 insertions(+), 1 deletion(-)
 
-diff --git a/crypto/sha512_generic.c b/crypto/sha512_generic.c
-index 439723d9273e..0b805d03b5e5 100644
---- a/crypto/sha512_generic.c
-+++ b/crypto/sha512_generic.c
-@@ -23,6 +23,16 @@
- #include <asm/byteorder.h>
- #include <asm/unaligned.h>
+diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/inside-secure/safexcel.c
+index dcb39d0d82bb..b02451e0bbb6 100644
+--- a/drivers/crypto/inside-secure/safexcel.c
++++ b/drivers/crypto/inside-secure/safexcel.c
+@@ -790,6 +790,7 @@ static struct safexcel_alg_template *safexcel_algs[] = {
+ 	&safexcel_alg_sha1,
+ 	&safexcel_alg_sha224,
+ 	&safexcel_alg_sha256,
++	&safexcel_alg_sha384,
+ 	&safexcel_alg_sha512,
+ 	&safexcel_alg_hmac_sha1,
+ 	&safexcel_alg_hmac_sha224,
+diff --git a/drivers/crypto/inside-secure/safexcel.h b/drivers/crypto/inside-secure/safexcel.h
+index 9e24cab279d2..57abf75e8b66 100644
+--- a/drivers/crypto/inside-secure/safexcel.h
++++ b/drivers/crypto/inside-secure/safexcel.h
+@@ -672,6 +672,7 @@ extern struct safexcel_alg_template safexcel_alg_cbc_aes;
+ extern struct safexcel_alg_template safexcel_alg_sha1;
+ extern struct safexcel_alg_template safexcel_alg_sha224;
+ extern struct safexcel_alg_template safexcel_alg_sha256;
++extern struct safexcel_alg_template safexcel_alg_sha384;
+ extern struct safexcel_alg_template safexcel_alg_sha512;
+ extern struct safexcel_alg_template safexcel_alg_hmac_sha1;
+ extern struct safexcel_alg_template safexcel_alg_hmac_sha224;
+diff --git a/drivers/crypto/inside-secure/safexcel_hash.c b/drivers/crypto/inside-secure/safexcel_hash.c
+index 54f9e4da7db6..daa37fa7077f 100644
+--- a/drivers/crypto/inside-secure/safexcel_hash.c
++++ b/drivers/crypto/inside-secure/safexcel_hash.c
+@@ -96,7 +96,8 @@ static void safexcel_context_control(struct safexcel_ahash_ctx *ctx,
+ 			else if (ctx->alg == CONTEXT_CONTROL_CRYPTO_ALG_SHA224 ||
+ 				 ctx->alg == CONTEXT_CONTROL_CRYPTO_ALG_SHA256)
+ 				cdesc->control_data.control0 |= CONTEXT_CONTROL_SIZE(9);
+-			else if (ctx->alg == CONTEXT_CONTROL_CRYPTO_ALG_SHA512)
++			else if (ctx->alg == CONTEXT_CONTROL_CRYPTO_ALG_SHA384 ||
++				 ctx->alg == CONTEXT_CONTROL_CRYPTO_ALG_SHA512)
+ 				cdesc->control_data.control0 |= CONTEXT_CONTROL_SIZE(17);
  
-+const u8 sha384_zero_message_hash[SHA384_DIGEST_SIZE] = {
-+	0x38, 0xb0, 0x60, 0xa7, 0x51, 0xac, 0x96, 0x38,
-+	0x4c, 0xd9, 0x32, 0x7e, 0xb1, 0xb1, 0xe3, 0x6a,
-+	0x21, 0xfd, 0xb7, 0x11, 0x14, 0xbe, 0x07, 0x43,
-+	0x4c, 0x0c, 0xc7, 0xbf, 0x63, 0xf6, 0xe1, 0xda,
-+	0x27, 0x4e, 0xde, 0xbf, 0xe7, 0x6f, 0x65, 0xfb,
-+	0xd5, 0x1a, 0xd2, 0xf1, 0x48, 0x98, 0xb9, 0x5b
+ 			cdesc->control_data.control1 |= CONTEXT_CONTROL_DIGEST_CNT;
+@@ -660,6 +661,9 @@ static int safexcel_ahash_final(struct ahash_request *areq)
+ 		else if (ctx->alg == CONTEXT_CONTROL_CRYPTO_ALG_SHA256)
+ 			memcpy(areq->result, sha256_zero_message_hash,
+ 			       SHA256_DIGEST_SIZE);
++		else if (ctx->alg == CONTEXT_CONTROL_CRYPTO_ALG_SHA384)
++			memcpy(areq->result, sha384_zero_message_hash,
++			       SHA384_DIGEST_SIZE);
+ 		else if (ctx->alg == CONTEXT_CONTROL_CRYPTO_ALG_SHA512)
+ 			memcpy(areq->result, sha512_zero_message_hash,
+ 			       SHA512_DIGEST_SIZE);
+@@ -1359,6 +1363,76 @@ struct safexcel_alg_template safexcel_alg_sha512 = {
+ 	},
+ };
+ 
++static int safexcel_sha384_init(struct ahash_request *areq)
++{
++	struct safexcel_ahash_ctx *ctx = crypto_ahash_ctx(crypto_ahash_reqtfm(areq));
++	struct safexcel_ahash_req *req = ahash_request_ctx(areq);
++
++	memset(req, 0, sizeof(*req));
++
++	req->state[0] = lower_32_bits(SHA384_H0);
++	req->state[1] = upper_32_bits(SHA384_H0);
++	req->state[2] = lower_32_bits(SHA384_H1);
++	req->state[3] = upper_32_bits(SHA384_H1);
++	req->state[4] = lower_32_bits(SHA384_H2);
++	req->state[5] = upper_32_bits(SHA384_H2);
++	req->state[6] = lower_32_bits(SHA384_H3);
++	req->state[7] = upper_32_bits(SHA384_H3);
++	req->state[8] = lower_32_bits(SHA384_H4);
++	req->state[9] = upper_32_bits(SHA384_H4);
++	req->state[10] = lower_32_bits(SHA384_H5);
++	req->state[11] = upper_32_bits(SHA384_H5);
++	req->state[12] = lower_32_bits(SHA384_H6);
++	req->state[13] = upper_32_bits(SHA384_H6);
++	req->state[14] = lower_32_bits(SHA384_H7);
++	req->state[15] = upper_32_bits(SHA384_H7);
++
++	ctx->alg = CONTEXT_CONTROL_CRYPTO_ALG_SHA384;
++	req->digest = CONTEXT_CONTROL_DIGEST_PRECOMPUTED;
++	req->state_sz = SHA512_DIGEST_SIZE;
++
++	return 0;
++}
++
++static int safexcel_sha384_digest(struct ahash_request *areq)
++{
++	int ret = safexcel_sha384_init(areq);
++
++	if (ret)
++		return ret;
++
++	return safexcel_ahash_finup(areq);
++}
++
++struct safexcel_alg_template safexcel_alg_sha384 = {
++	.type = SAFEXCEL_ALG_TYPE_AHASH,
++	.alg.ahash = {
++		.init = safexcel_sha384_init,
++		.update = safexcel_ahash_update,
++		.final = safexcel_ahash_final,
++		.finup = safexcel_ahash_finup,
++		.digest = safexcel_sha384_digest,
++		.export = safexcel_ahash_export,
++		.import = safexcel_ahash_import,
++		.halg = {
++			.digestsize = SHA384_DIGEST_SIZE,
++			.statesize = sizeof(struct safexcel_ahash_export_state),
++			.base = {
++				.cra_name = "sha384",
++				.cra_driver_name = "safexcel-sha384",
++				.cra_priority = 300,
++				.cra_flags = CRYPTO_ALG_ASYNC |
++					     CRYPTO_ALG_KERN_DRIVER_ONLY,
++				.cra_blocksize = SHA384_BLOCK_SIZE,
++				.cra_ctxsize = sizeof(struct safexcel_ahash_ctx),
++				.cra_init = safexcel_ahash_cra_init,
++				.cra_exit = safexcel_ahash_cra_exit,
++				.cra_module = THIS_MODULE,
++			},
++		},
++	},
 +};
-+EXPORT_SYMBOL_GPL(sha384_zero_message_hash);
 +
- const u8 sha512_zero_message_hash[SHA512_DIGEST_SIZE] = {
- 	0xcf, 0x83, 0xe1, 0x35, 0x7e, 0xef, 0xb8, 0xbd,
- 	0xf1, 0x54, 0x28, 0x50, 0xd6, 0x6d, 0x80, 0x07,
-diff --git a/include/crypto/sha.h b/include/crypto/sha.h
-index 799f071b93df..8a46202b1857 100644
---- a/include/crypto/sha.h
-+++ b/include/crypto/sha.h
-@@ -71,6 +71,8 @@ extern const u8 sha224_zero_message_hash[SHA224_DIGEST_SIZE];
- 
- extern const u8 sha256_zero_message_hash[SHA256_DIGEST_SIZE];
- 
-+extern const u8 sha384_zero_message_hash[SHA384_DIGEST_SIZE];
-+
- extern const u8 sha512_zero_message_hash[SHA512_DIGEST_SIZE];
- 
- struct sha1_state {
+ static int safexcel_hmac_sha512_setkey(struct crypto_ahash *tfm, const u8 *key,
+ 				       unsigned int keylen)
+ {
 -- 
 2.17.0
