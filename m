@@ -1,7 +1,7 @@
 From: Antoine Tenart <antoine.tenart@bootlin.com>
-Subject: [PATCH 01/10] crypto: inside-secure - use the error handler for invalidation requests
-Date: Tue, 29 May 2018 14:13:43 +0200
-Message-ID: <20180529121352.19490-2-antoine.tenart@bootlin.com>
+Subject: [PATCH 05/10] crypto: inside-secure - hmac(sha512) support
+Date: Tue, 29 May 2018 14:13:47 +0200
+Message-ID: <20180529121352.19490-6-antoine.tenart@bootlin.com>
 References: <20180529121352.19490-1-antoine.tenart@bootlin.com>
 Cc: Antoine Tenart <antoine.tenart@bootlin.com>,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -14,52 +14,123 @@ In-Reply-To: <20180529121352.19490-1-antoine.tenart@bootlin.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This patch reworks the way invalidation request handlers handle the
-result descriptor errors, to use the common error handling function.
-This improves the drivers in terms of readability and maintainability.
+This patch adds the hmac(sha512) algorithm support to the Inside Secure
+SafeXcel driver.
 
-Suggested-by: Ofer Heifetz <oferh@marvell.com>
 Signed-off-by: Antoine Tenart <antoine.tenart@bootlin.com>
 ---
- drivers/crypto/inside-secure/safexcel_cipher.c | 7 ++-----
- drivers/crypto/inside-secure/safexcel_hash.c   | 7 ++-----
- 2 files changed, 4 insertions(+), 10 deletions(-)
+ drivers/crypto/inside-secure/safexcel.c      |  1 +
+ drivers/crypto/inside-secure/safexcel.h      |  3 +-
+ drivers/crypto/inside-secure/safexcel_hash.c | 60 +++++++++++++++++++-
+ 3 files changed, 61 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/crypto/inside-secure/safexcel_cipher.c b/drivers/crypto/inside-secure/safexcel_cipher.c
-index 6bb60fda2043..5bc0afc8e63a 100644
---- a/drivers/crypto/inside-secure/safexcel_cipher.c
-+++ b/drivers/crypto/inside-secure/safexcel_cipher.c
-@@ -491,11 +491,8 @@ static int safexcel_handle_inv_result(struct safexcel_crypto_priv *priv,
- 			break;
- 		}
+diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/inside-secure/safexcel.c
+index 126def0b4450..b3c5f3c8e208 100644
+--- a/drivers/crypto/inside-secure/safexcel.c
++++ b/drivers/crypto/inside-secure/safexcel.c
+@@ -794,6 +794,7 @@ static struct safexcel_alg_template *safexcel_algs[] = {
+ 	&safexcel_alg_hmac_sha1,
+ 	&safexcel_alg_hmac_sha224,
+ 	&safexcel_alg_hmac_sha256,
++	&safexcel_alg_hmac_sha512,
+ 	&safexcel_alg_authenc_hmac_sha1_cbc_aes,
+ 	&safexcel_alg_authenc_hmac_sha224_cbc_aes,
+ 	&safexcel_alg_authenc_hmac_sha256_cbc_aes,
+diff --git a/drivers/crypto/inside-secure/safexcel.h b/drivers/crypto/inside-secure/safexcel.h
+index 0438e058844c..5885844a9994 100644
+--- a/drivers/crypto/inside-secure/safexcel.h
++++ b/drivers/crypto/inside-secure/safexcel.h
+@@ -287,7 +287,7 @@ struct safexcel_context_record {
+ 	u32 control0;
+ 	u32 control1;
  
--		if (rdesc->result_data.error_code) {
--			dev_err(priv->dev, "cipher: invalidate: result descriptor error (%d)\n",
--				rdesc->result_data.error_code);
--			*ret = -EIO;
--		}
-+		if (likely(!*ret))
-+			*ret = safexcel_rdesc_check_errors(priv, rdesc);
+-	__le32 data[24];
++	__le32 data[40];
+ } __packed;
  
- 		ndesc++;
- 	} while (!rdesc->last_seg);
+ /* control0 */
+@@ -676,6 +676,7 @@ extern struct safexcel_alg_template safexcel_alg_sha512;
+ extern struct safexcel_alg_template safexcel_alg_hmac_sha1;
+ extern struct safexcel_alg_template safexcel_alg_hmac_sha224;
+ extern struct safexcel_alg_template safexcel_alg_hmac_sha256;
++extern struct safexcel_alg_template safexcel_alg_hmac_sha512;
+ extern struct safexcel_alg_template safexcel_alg_authenc_hmac_sha1_cbc_aes;
+ extern struct safexcel_alg_template safexcel_alg_authenc_hmac_sha224_cbc_aes;
+ extern struct safexcel_alg_template safexcel_alg_authenc_hmac_sha256_cbc_aes;
 diff --git a/drivers/crypto/inside-secure/safexcel_hash.c b/drivers/crypto/inside-secure/safexcel_hash.c
-index d138d6b8fec5..8eef95f82e11 100644
+index f5d206030591..54f9e4da7db6 100644
 --- a/drivers/crypto/inside-secure/safexcel_hash.c
 +++ b/drivers/crypto/inside-secure/safexcel_hash.c
-@@ -369,11 +369,8 @@ static int safexcel_handle_inv_result(struct safexcel_crypto_priv *priv,
- 		dev_err(priv->dev,
- 			"hash: invalidate: could not retrieve the result descriptor\n");
- 		*ret = PTR_ERR(rdesc);
--	} else if (rdesc->result_data.error_code) {
--		dev_err(priv->dev,
--			"hash: invalidate: result descriptor error (%d)\n",
--			rdesc->result_data.error_code);
--		*ret = -EINVAL;
-+	} else {
-+		*ret = safexcel_rdesc_check_errors(priv, rdesc);
- 	}
+@@ -22,8 +22,8 @@ struct safexcel_ahash_ctx {
  
- 	safexcel_complete(priv, ring);
+ 	u32 alg;
+ 
+-	u32 ipad[SHA256_DIGEST_SIZE / sizeof(u32)];
+-	u32 opad[SHA256_DIGEST_SIZE / sizeof(u32)];
++	u32 ipad[SHA512_DIGEST_SIZE / sizeof(u32)];
++	u32 opad[SHA512_DIGEST_SIZE / sizeof(u32)];
+ };
+ 
+ struct safexcel_ahash_req {
+@@ -1358,3 +1358,59 @@ struct safexcel_alg_template safexcel_alg_sha512 = {
+ 		},
+ 	},
+ };
++
++static int safexcel_hmac_sha512_setkey(struct crypto_ahash *tfm, const u8 *key,
++				       unsigned int keylen)
++{
++	return safexcel_hmac_alg_setkey(tfm, key, keylen, "safexcel-sha512",
++					SHA512_DIGEST_SIZE);
++}
++
++static int safexcel_hmac_sha512_init(struct ahash_request *areq)
++{
++	struct safexcel_ahash_req *req = ahash_request_ctx(areq);
++
++	safexcel_sha512_init(areq);
++	req->digest = CONTEXT_CONTROL_DIGEST_HMAC;
++	return 0;
++}
++
++static int safexcel_hmac_sha512_digest(struct ahash_request *areq)
++{
++	int ret = safexcel_hmac_sha512_init(areq);
++
++	if (ret)
++		return ret;
++
++	return safexcel_ahash_finup(areq);
++}
++
++struct safexcel_alg_template safexcel_alg_hmac_sha512 = {
++	.type = SAFEXCEL_ALG_TYPE_AHASH,
++	.alg.ahash = {
++		.init = safexcel_hmac_sha512_init,
++		.update = safexcel_ahash_update,
++		.final = safexcel_ahash_final,
++		.finup = safexcel_ahash_finup,
++		.digest = safexcel_hmac_sha512_digest,
++		.setkey = safexcel_hmac_sha512_setkey,
++		.export = safexcel_ahash_export,
++		.import = safexcel_ahash_import,
++		.halg = {
++			.digestsize = SHA512_DIGEST_SIZE,
++			.statesize = sizeof(struct safexcel_ahash_export_state),
++			.base = {
++				.cra_name = "hmac(sha512)",
++				.cra_driver_name = "safexcel-hmac-sha512",
++				.cra_priority = 300,
++				.cra_flags = CRYPTO_ALG_ASYNC |
++					     CRYPTO_ALG_KERN_DRIVER_ONLY,
++				.cra_blocksize = SHA512_BLOCK_SIZE,
++				.cra_ctxsize = sizeof(struct safexcel_ahash_ctx),
++				.cra_init = safexcel_ahash_cra_init,
++				.cra_exit = safexcel_ahash_cra_exit,
++				.cra_module = THIS_MODULE,
++			},
++		},
++	},
++};
 -- 
 2.17.0
