@@ -1,7 +1,7 @@
 From: Antoine Tenart <antoine.tenart@bootlin.com>
-Subject: [PATCH 09/10] crypto: inside-secure - hmac(sha384) support
-Date: Tue, 29 May 2018 14:13:51 +0200
-Message-ID: <20180529121352.19490-10-antoine.tenart@bootlin.com>
+Subject: [PATCH 02/10] crypto: inside-secure - improve the counter computation
+Date: Tue, 29 May 2018 14:13:44 +0200
+Message-ID: <20180529121352.19490-3-antoine.tenart@bootlin.com>
 References: <20180529121352.19490-1-antoine.tenart@bootlin.com>
 Cc: Antoine Tenart <antoine.tenart@bootlin.com>,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -14,103 +14,84 @@ In-Reply-To: <20180529121352.19490-1-antoine.tenart@bootlin.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This patch adds the hmac(sha384) algorithm support to the Inside Secure
-SafeXcel driver.
+A counter is given to the engine when finishing hash computation. It
+currently uses the blocksize while it counts the number of 64 bytes
+blocks given to the engine. This works well for all algorithms so far,
+as SHA1, SHA224 and SHA256 all have a blocksize of 64 bytes, but others
+algorithms such as SHA512 wouldn't work.
 
 Signed-off-by: Antoine Tenart <antoine.tenart@bootlin.com>
 ---
- drivers/crypto/inside-secure/safexcel.c      |  1 +
- drivers/crypto/inside-secure/safexcel.h      |  1 +
- drivers/crypto/inside-secure/safexcel_hash.c | 56 ++++++++++++++++++++
- 3 files changed, 58 insertions(+)
+ drivers/crypto/inside-secure/safexcel.h      |  5 +++++
+ drivers/crypto/inside-secure/safexcel_hash.c | 12 +++++-------
+ 2 files changed, 10 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/inside-secure/safexcel.c
-index b02451e0bbb6..5ef8ba7ae29c 100644
---- a/drivers/crypto/inside-secure/safexcel.c
-+++ b/drivers/crypto/inside-secure/safexcel.c
-@@ -795,6 +795,7 @@ static struct safexcel_alg_template *safexcel_algs[] = {
- 	&safexcel_alg_hmac_sha1,
- 	&safexcel_alg_hmac_sha224,
- 	&safexcel_alg_hmac_sha256,
-+	&safexcel_alg_hmac_sha384,
- 	&safexcel_alg_hmac_sha512,
- 	&safexcel_alg_authenc_hmac_sha1_cbc_aes,
- 	&safexcel_alg_authenc_hmac_sha224_cbc_aes,
 diff --git a/drivers/crypto/inside-secure/safexcel.h b/drivers/crypto/inside-secure/safexcel.h
-index 57abf75e8b66..e002f963ff5a 100644
+index 8b3ee9b59f53..d2adedc23e9a 100644
 --- a/drivers/crypto/inside-secure/safexcel.h
 +++ b/drivers/crypto/inside-secure/safexcel.h
-@@ -677,6 +677,7 @@ extern struct safexcel_alg_template safexcel_alg_sha512;
- extern struct safexcel_alg_template safexcel_alg_hmac_sha1;
- extern struct safexcel_alg_template safexcel_alg_hmac_sha224;
- extern struct safexcel_alg_template safexcel_alg_hmac_sha256;
-+extern struct safexcel_alg_template safexcel_alg_hmac_sha384;
- extern struct safexcel_alg_template safexcel_alg_hmac_sha512;
- extern struct safexcel_alg_template safexcel_alg_authenc_hmac_sha1_cbc_aes;
- extern struct safexcel_alg_template safexcel_alg_authenc_hmac_sha224_cbc_aes;
+@@ -327,6 +327,11 @@ struct safexcel_context_record {
+ #define CONTEXT_CONTROL_COUNTER_MODE		BIT(10)
+ #define CONTEXT_CONTROL_HASH_STORE		BIT(19)
+ 
++/* The hash counter given to the engine in the context has a granularity of
++ * 64 bits.
++ */
++#define EIP197_COUNTER_BLOCK_SIZE		64
++
+ /* EIP197_CS_RAM_CTRL */
+ #define EIP197_TRC_ENABLE_0			BIT(4)
+ #define EIP197_TRC_ENABLE_1			BIT(5)
 diff --git a/drivers/crypto/inside-secure/safexcel_hash.c b/drivers/crypto/inside-secure/safexcel_hash.c
-index daa37fa7077f..d7c09cbcb37a 100644
+index 8eef95f82e11..83418f7501b5 100644
 --- a/drivers/crypto/inside-secure/safexcel_hash.c
 +++ b/drivers/crypto/inside-secure/safexcel_hash.c
-@@ -1488,3 +1488,59 @@ struct safexcel_alg_template safexcel_alg_hmac_sha512 = {
- 		},
- 	},
- };
-+
-+static int safexcel_hmac_sha384_setkey(struct crypto_ahash *tfm, const u8 *key,
-+				       unsigned int keylen)
-+{
-+	return safexcel_hmac_alg_setkey(tfm, key, keylen, "safexcel-sha384",
-+					SHA512_DIGEST_SIZE);
-+}
-+
-+static int safexcel_hmac_sha384_init(struct ahash_request *areq)
-+{
-+	struct safexcel_ahash_req *req = ahash_request_ctx(areq);
-+
-+	safexcel_sha384_init(areq);
-+	req->digest = CONTEXT_CONTROL_DIGEST_HMAC;
-+	return 0;
-+}
-+
-+static int safexcel_hmac_sha384_digest(struct ahash_request *areq)
-+{
-+	int ret = safexcel_hmac_sha384_init(areq);
-+
-+	if (ret)
-+		return ret;
-+
-+	return safexcel_ahash_finup(areq);
-+}
-+
-+struct safexcel_alg_template safexcel_alg_hmac_sha384 = {
-+	.type = SAFEXCEL_ALG_TYPE_AHASH,
-+	.alg.ahash = {
-+		.init = safexcel_hmac_sha384_init,
-+		.update = safexcel_ahash_update,
-+		.final = safexcel_ahash_final,
-+		.finup = safexcel_ahash_finup,
-+		.digest = safexcel_hmac_sha384_digest,
-+		.setkey = safexcel_hmac_sha384_setkey,
-+		.export = safexcel_ahash_export,
-+		.import = safexcel_ahash_import,
-+		.halg = {
-+			.digestsize = SHA384_DIGEST_SIZE,
-+			.statesize = sizeof(struct safexcel_ahash_export_state),
-+			.base = {
-+				.cra_name = "hmac(sha384)",
-+				.cra_driver_name = "safexcel-hmac-sha384",
-+				.cra_priority = 300,
-+				.cra_flags = CRYPTO_ALG_ASYNC |
-+					     CRYPTO_ALG_KERN_DRIVER_ONLY,
-+				.cra_blocksize = SHA384_BLOCK_SIZE,
-+				.cra_ctxsize = sizeof(struct safexcel_ahash_ctx),
-+				.cra_init = safexcel_ahash_cra_init,
-+				.cra_exit = safexcel_ahash_cra_exit,
-+				.cra_module = THIS_MODULE,
-+			},
-+		},
-+	},
-+};
+@@ -72,8 +72,7 @@ static void safexcel_hash_token(struct safexcel_command_desc *cdesc,
+ static void safexcel_context_control(struct safexcel_ahash_ctx *ctx,
+ 				     struct safexcel_ahash_req *req,
+ 				     struct safexcel_command_desc *cdesc,
+-				     unsigned int digestsize,
+-				     unsigned int blocksize)
++				     unsigned int digestsize)
+ {
+ 	int i;
+ 
+@@ -107,7 +106,8 @@ static void safexcel_context_control(struct safexcel_ahash_ctx *ctx,
+ 				ctx->base.ctxr->data[i] = cpu_to_le32(req->state[i]);
+ 
+ 			if (req->finish)
+-				ctx->base.ctxr->data[i] = cpu_to_le32(req->processed / blocksize);
++				ctx->base.ctxr->data[i] =
++					cpu_to_le32(req->processed / EIP197_COUNTER_BLOCK_SIZE);
+ 		}
+ 	} else if (req->digest == CONTEXT_CONTROL_DIGEST_HMAC) {
+ 		cdesc->control_data.control0 |= CONTEXT_CONTROL_SIZE(2 * req->state_sz / sizeof(u32));
+@@ -282,8 +282,7 @@ static int safexcel_ahash_send_req(struct crypto_async_request *async, int ring,
+ 
+ send_command:
+ 	/* Setup the context options */
+-	safexcel_context_control(ctx, req, first_cdesc, req->state_sz,
+-				 crypto_ahash_blocksize(ahash));
++	safexcel_context_control(ctx, req, first_cdesc, req->state_sz);
+ 
+ 	/* Add the token */
+ 	safexcel_hash_token(first_cdesc, len, req->state_sz);
+@@ -335,7 +334,6 @@ static inline bool safexcel_ahash_needs_inv_get(struct ahash_request *areq)
+ {
+ 	struct safexcel_ahash_ctx *ctx = crypto_ahash_ctx(crypto_ahash_reqtfm(areq));
+ 	struct safexcel_ahash_req *req = ahash_request_ctx(areq);
+-	struct crypto_ahash *ahash = crypto_ahash_reqtfm(areq);
+ 	unsigned int state_w_sz = req->state_sz / sizeof(u32);
+ 	int i;
+ 
+@@ -344,7 +342,7 @@ static inline bool safexcel_ahash_needs_inv_get(struct ahash_request *areq)
+ 			return true;
+ 
+ 	if (ctx->base.ctxr->data[state_w_sz] !=
+-	    cpu_to_le32(req->processed / crypto_ahash_blocksize(ahash)))
++	    cpu_to_le32(req->processed / EIP197_COUNTER_BLOCK_SIZE))
+ 		return true;
+ 
+ 	return false;
 -- 
 2.17.0
