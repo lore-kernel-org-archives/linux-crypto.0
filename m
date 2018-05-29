@@ -1,7 +1,7 @@
 From: Antoine Tenart <antoine.tenart@bootlin.com>
-Subject: [PATCH 10/10] crypto: inside-secure - authenc(hmac(sha384),cbc(aes)) support
-Date: Tue, 29 May 2018 14:13:52 +0200
-Message-ID: <20180529121352.19490-11-antoine.tenart@bootlin.com>
+Subject: [PATCH 01/10] crypto: inside-secure - use the error handler for invalidation requests
+Date: Tue, 29 May 2018 14:13:43 +0200
+Message-ID: <20180529121352.19490-2-antoine.tenart@bootlin.com>
 References: <20180529121352.19490-1-antoine.tenart@bootlin.com>
 Cc: Antoine Tenart <antoine.tenart@bootlin.com>,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -14,93 +14,52 @@ In-Reply-To: <20180529121352.19490-1-antoine.tenart@bootlin.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This patch adds the authenc(hmac(sha384),cbc(aes)) algorithm support to
-the Inside Secure SafeXcel driver.
+This patch reworks the way invalidation request handlers handle the
+result descriptor errors, to use the common error handling function.
+This improves the drivers in terms of readability and maintainability.
 
+Suggested-by: Ofer Heifetz <oferh@marvell.com>
 Signed-off-by: Antoine Tenart <antoine.tenart@bootlin.com>
 ---
- drivers/crypto/inside-secure/safexcel.c       |  1 +
- drivers/crypto/inside-secure/safexcel.h       |  1 +
- .../crypto/inside-secure/safexcel_cipher.c    | 39 +++++++++++++++++++
- 3 files changed, 41 insertions(+)
+ drivers/crypto/inside-secure/safexcel_cipher.c | 7 ++-----
+ drivers/crypto/inside-secure/safexcel_hash.c   | 7 ++-----
+ 2 files changed, 4 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/inside-secure/safexcel.c
-index 5ef8ba7ae29c..c39d2d7c9917 100644
---- a/drivers/crypto/inside-secure/safexcel.c
-+++ b/drivers/crypto/inside-secure/safexcel.c
-@@ -800,6 +800,7 @@ static struct safexcel_alg_template *safexcel_algs[] = {
- 	&safexcel_alg_authenc_hmac_sha1_cbc_aes,
- 	&safexcel_alg_authenc_hmac_sha224_cbc_aes,
- 	&safexcel_alg_authenc_hmac_sha256_cbc_aes,
-+	&safexcel_alg_authenc_hmac_sha384_cbc_aes,
- 	&safexcel_alg_authenc_hmac_sha512_cbc_aes,
- };
- 
-diff --git a/drivers/crypto/inside-secure/safexcel.h b/drivers/crypto/inside-secure/safexcel.h
-index e002f963ff5a..5d6b3b705d0c 100644
---- a/drivers/crypto/inside-secure/safexcel.h
-+++ b/drivers/crypto/inside-secure/safexcel.h
-@@ -682,6 +682,7 @@ extern struct safexcel_alg_template safexcel_alg_hmac_sha512;
- extern struct safexcel_alg_template safexcel_alg_authenc_hmac_sha1_cbc_aes;
- extern struct safexcel_alg_template safexcel_alg_authenc_hmac_sha224_cbc_aes;
- extern struct safexcel_alg_template safexcel_alg_authenc_hmac_sha256_cbc_aes;
-+extern struct safexcel_alg_template safexcel_alg_authenc_hmac_sha384_cbc_aes;
- extern struct safexcel_alg_template safexcel_alg_authenc_hmac_sha512_cbc_aes;
- 
- #endif
 diff --git a/drivers/crypto/inside-secure/safexcel_cipher.c b/drivers/crypto/inside-secure/safexcel_cipher.c
-index 560c1e54ce9d..ca4bc2d28d2a 100644
+index 6bb60fda2043..5bc0afc8e63a 100644
 --- a/drivers/crypto/inside-secure/safexcel_cipher.c
 +++ b/drivers/crypto/inside-secure/safexcel_cipher.c
-@@ -200,6 +200,11 @@ static int safexcel_aead_aes_setkey(struct crypto_aead *ctfm, const u8 *key,
- 					 keys.authkeylen, &istate, &ostate))
- 			goto badkey;
- 		break;
-+	case CONTEXT_CONTROL_CRYPTO_ALG_SHA384:
-+		if (safexcel_hmac_setkey("safexcel-sha384", keys.authkey,
-+					 keys.authkeylen, &istate, &ostate))
-+			goto badkey;
-+		break;
- 	case CONTEXT_CONTROL_CRYPTO_ALG_SHA512:
- 		if (safexcel_hmac_setkey("safexcel-sha512", keys.authkey,
- 					 keys.authkeylen, &istate, &ostate))
-@@ -1058,3 +1063,37 @@ struct safexcel_alg_template safexcel_alg_authenc_hmac_sha512_cbc_aes = {
- 		},
- 	},
- };
-+
-+static int safexcel_aead_sha384_cra_init(struct crypto_tfm *tfm)
-+{
-+	struct safexcel_cipher_ctx *ctx = crypto_tfm_ctx(tfm);
-+
-+	safexcel_aead_cra_init(tfm);
-+	ctx->alg = CONTEXT_CONTROL_CRYPTO_ALG_SHA384;
-+	ctx->state_sz = SHA512_DIGEST_SIZE;
-+	return 0;
-+}
-+
-+struct safexcel_alg_template safexcel_alg_authenc_hmac_sha384_cbc_aes = {
-+	.type = SAFEXCEL_ALG_TYPE_AEAD,
-+	.alg.aead = {
-+		.setkey = safexcel_aead_aes_setkey,
-+		.encrypt = safexcel_aead_encrypt,
-+		.decrypt = safexcel_aead_decrypt,
-+		.ivsize = AES_BLOCK_SIZE,
-+		.maxauthsize = SHA384_DIGEST_SIZE,
-+		.base = {
-+			.cra_name = "authenc(hmac(sha384),cbc(aes))",
-+			.cra_driver_name = "safexcel-authenc-hmac-sha384-cbc-aes",
-+			.cra_priority = 300,
-+			.cra_flags = CRYPTO_ALG_TYPE_AEAD | CRYPTO_ALG_ASYNC |
-+				     CRYPTO_ALG_KERN_DRIVER_ONLY,
-+			.cra_blocksize = AES_BLOCK_SIZE,
-+			.cra_ctxsize = sizeof(struct safexcel_cipher_ctx),
-+			.cra_alignmask = 0,
-+			.cra_init = safexcel_aead_sha384_cra_init,
-+			.cra_exit = safexcel_aead_cra_exit,
-+			.cra_module = THIS_MODULE,
-+		},
-+	},
-+};
+@@ -491,11 +491,8 @@ static int safexcel_handle_inv_result(struct safexcel_crypto_priv *priv,
+ 			break;
+ 		}
+ 
+-		if (rdesc->result_data.error_code) {
+-			dev_err(priv->dev, "cipher: invalidate: result descriptor error (%d)\n",
+-				rdesc->result_data.error_code);
+-			*ret = -EIO;
+-		}
++		if (likely(!*ret))
++			*ret = safexcel_rdesc_check_errors(priv, rdesc);
+ 
+ 		ndesc++;
+ 	} while (!rdesc->last_seg);
+diff --git a/drivers/crypto/inside-secure/safexcel_hash.c b/drivers/crypto/inside-secure/safexcel_hash.c
+index d138d6b8fec5..8eef95f82e11 100644
+--- a/drivers/crypto/inside-secure/safexcel_hash.c
++++ b/drivers/crypto/inside-secure/safexcel_hash.c
+@@ -369,11 +369,8 @@ static int safexcel_handle_inv_result(struct safexcel_crypto_priv *priv,
+ 		dev_err(priv->dev,
+ 			"hash: invalidate: could not retrieve the result descriptor\n");
+ 		*ret = PTR_ERR(rdesc);
+-	} else if (rdesc->result_data.error_code) {
+-		dev_err(priv->dev,
+-			"hash: invalidate: result descriptor error (%d)\n",
+-			rdesc->result_data.error_code);
+-		*ret = -EINVAL;
++	} else {
++		*ret = safexcel_rdesc_check_errors(priv, rdesc);
+ 	}
+ 
+ 	safexcel_complete(priv, ring);
 -- 
 2.17.0
