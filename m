@@ -1,9 +1,9 @@
 From: Simon Horman <horms@verge.net.au>
-Subject: Re: [PATCH v2 3/5] crypto: ccree: silence debug prints
-Date: Tue, 29 May 2018 17:13:45 +0100
-Message-ID: <20180529161345.rhx73mixbnxrfzum@verge.net.au>
+Subject: Re: [PATCH v2 5/5] arm64: dts: renesas: r8a7795: add ccree binding
+Date: Tue, 29 May 2018 17:19:36 +0100
+Message-ID: <20180529161936.prhp4oikzamr6u3n@verge.net.au>
 References: <1527171551-21979-1-git-send-email-gilad@benyossef.com>
- <1527171551-21979-4-git-send-email-gilad@benyossef.com>
+ <1527171551-21979-6-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: Magnus Damm <magnus.damm@gmail.com>,
@@ -23,14 +23,43 @@ Cc: Magnus Damm <magnus.damm@gmail.com>,
 To: Gilad Ben-Yossef <gilad@benyossef.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1527171551-21979-4-git-send-email-gilad@benyossef.com>
+In-Reply-To: <1527171551-21979-6-git-send-email-gilad@benyossef.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, May 24, 2018 at 03:19:08PM +0100, Gilad Ben-Yossef wrote:
-> The cache parameter register configuration was being too verbose.
-> Use dev_dbg() to only provide the information if needed.
+On Thu, May 24, 2018 at 03:19:10PM +0100, Gilad Ben-Yossef wrote:
+> Add bindings for CryptoCell instance in the SoC.
 > 
 > Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 
-Reviewed-by: Simon Horman <horms+renesas@verge.net.au>
+In so far as I can review the details of this (which is not much) this
+looks fine to me. I am, however, a little unclear in when it should be
+accepted.
+
+> ---
+>  arch/arm64/boot/dts/renesas/r8a7795.dtsi | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+> 
+> diff --git a/arch/arm64/boot/dts/renesas/r8a7795.dtsi b/arch/arm64/boot/dts/renesas/r8a7795.dtsi
+> index d842940..3ac75db 100644
+> --- a/arch/arm64/boot/dts/renesas/r8a7795.dtsi
+> +++ b/arch/arm64/boot/dts/renesas/r8a7795.dtsi
+> @@ -528,6 +528,15 @@
+>  			status = "disabled";
+>  		};
+>  
+> +		arm_cc630p: crypto@e6601000 {
+> +			compatible = "arm,cryptocell-630p-ree";
+> +			interrupts = <GIC_SPI 71 IRQ_TYPE_LEVEL_HIGH>;
+> +			reg = <0x0 0xe6601000 0 0x1000>;
+> +			clocks = <&cpg CPG_MOD 229>;
+> +			resets = <&cpg 229>;
+> +			power-domains = <&sysc R8A7795_PD_ALWAYS_ON>;
+> +		};
+> +
+>  		i2c3: i2c@e66d0000 {
+>  			#address-cells = <1>;
+>  			#size-cells = <0>;
+> -- 
+> 2.7.4
+> 
