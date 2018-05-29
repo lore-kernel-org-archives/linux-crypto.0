@@ -1,78 +1,80 @@
-From: Thomas Garnier <thgarnie@google.com>
-Subject: Re: [PATCH v3 09/27] x86/acpi: Adapt assembly for PIE support
-Date: Tue, 29 May 2018 08:55:34 -0700
-Message-ID: <CAJcbSZHuR8AJVU2mENi9KD7j=dWL4PqEUUgUc880X7Nizvkjbg@mail.gmail.com>
-References: <20180523195421.180248-1-thgarnie@google.com> <20180523195421.180248-10-thgarnie@google.com>
- <20180524110306.GA20225@amd> <CAJcbSZFJ84+VC5xDQZGHctupdqwmMBgqzLzFRqCTBpi5t-2Gvw@mail.gmail.com>
- <20180525091447.GC9666@amd> <CAJcbSZH17D01Stk4vRKKzjW6dxvK8x+S9sWL6vUopSP9=-x7Nw@mail.gmail.com>
- <20180529123114.GB21399@amd>
+From: Eric Biggers <ebiggers3@gmail.com>
+Subject: Re: [PATCH] crypto: blkcipher: prefer strlcpy to strncpy
+Date: Tue, 29 May 2018 09:34:00 -0700
+Message-ID: <20180529163400.GA166256@gmail.com>
+References: <1527572683-26098-1-git-send-email-nick.desaulniers@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, "David S . Miller" <davem@davemloft.net>,
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H . Peter Anvin" <hpa@zytor.com>,
-	Peter Zijlstra <peterz@infradead.org>, Josh Poimboeuf <jpoimboe@redhat.com>,
-	Greg KH <gregkh@linuxfoundation.org>, Philippe Ombredanne <pombredanne@nexb.com>,
-	Kate Stewart <kstewart@linuxfoundation.org>, Arnaldo Carvalho de Melo <acme@redhat.com>,
-	Yonghong Song <yhs@fb.com>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Kees Cook <keescook@chromium.org>,
-	Tom Lendacky <thomas.lendacky@amd.com>,
-	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>, Andy Lutomirski <luto@kernel.org>,
-	Dominik Brodowski <linux@dominikbrodowski.net>, Borislav Petkov <bp@alien8.de>, Borislav Petkov <bp@suse.de>,
-	"Rafael J. Wysocki" <rjw@rjwysocki.net>, Len Brown <len.brown@intel.com>, Juergen Gross <jgros
-To: Pavel Machek <pavel@ucw.cz>
-Return-path: <kernel-hardening-return-13428-glkh-kernel-hardening=m.gmane.org@lists.openwall.com>
-List-Post: <mailto:kernel-hardening@lists.openwall.com>
-List-Help: <mailto:kernel-hardening-help@lists.openwall.com>
-List-Unsubscribe: <mailto:kernel-hardening-unsubscribe@lists.openwall.com>
-List-Subscribe: <mailto:kernel-hardening-subscribe@lists.openwall.com>
-In-Reply-To: <20180529123114.GB21399@amd>
+Content-Type: text/plain; charset=us-ascii
+Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Nick Desaulniers <nick.desaulniers@gmail.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1527572683-26098-1-git-send-email-nick.desaulniers@gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, May 29, 2018 at 5:31 AM Pavel Machek <pavel@ucw.cz> wrote:
+On Mon, May 28, 2018 at 10:44:43PM -0700, Nick Desaulniers wrote:
+> Fixes stringop-truncation warnings from gcc-8.
+> 
+> Signed-off-by: Nick Desaulniers <nick.desaulniers@gmail.com>
+> ---
+>  crypto/ablkcipher.c | 8 ++++----
+>  crypto/blkcipher.c  | 4 ++--
+>  2 files changed, 6 insertions(+), 6 deletions(-)
+> 
+> diff --git a/crypto/ablkcipher.c b/crypto/ablkcipher.c
+> index d880a48..e38867f 100644
+> --- a/crypto/ablkcipher.c
+> +++ b/crypto/ablkcipher.c
+> @@ -370,8 +370,8 @@ static int crypto_ablkcipher_report(struct sk_buff *skb, struct crypto_alg *alg)
+>  {
+>  	struct crypto_report_blkcipher rblkcipher;
+>  
+> -	strncpy(rblkcipher.type, "ablkcipher", sizeof(rblkcipher.type));
+> -	strncpy(rblkcipher.geniv, alg->cra_ablkcipher.geniv ?: "<default>",
+> +	strlcpy(rblkcipher.type, "ablkcipher", sizeof(rblkcipher.type));
+> +	strlcpy(rblkcipher.geniv, alg->cra_ablkcipher.geniv ?: "<default>",
+>  		sizeof(rblkcipher.geniv));
+>  
+>  	rblkcipher.blocksize = alg->cra_blocksize;
+> @@ -444,8 +444,8 @@ static int crypto_givcipher_report(struct sk_buff *skb, struct crypto_alg *alg)
+>  {
+>  	struct crypto_report_blkcipher rblkcipher;
+>  
+> -	strncpy(rblkcipher.type, "givcipher", sizeof(rblkcipher.type));
+> -	strncpy(rblkcipher.geniv, alg->cra_ablkcipher.geniv ?: "<built-in>",
+> +	strlcpy(rblkcipher.type, "givcipher", sizeof(rblkcipher.type));
+> +	strlcpy(rblkcipher.geniv, alg->cra_ablkcipher.geniv ?: "<built-in>",
+>  		sizeof(rblkcipher.geniv));
+>  
+>  	rblkcipher.blocksize = alg->cra_blocksize;
+> diff --git a/crypto/blkcipher.c b/crypto/blkcipher.c
+> index 01c0d4a..ee88e48 100644
+> --- a/crypto/blkcipher.c
+> +++ b/crypto/blkcipher.c
+> @@ -509,8 +509,8 @@ static int crypto_blkcipher_report(struct sk_buff *skb, struct crypto_alg *alg)
+>  {
+>  	struct crypto_report_blkcipher rblkcipher;
+>  
+> -	strncpy(rblkcipher.type, "blkcipher", sizeof(rblkcipher.type));
+> -	strncpy(rblkcipher.geniv, alg->cra_blkcipher.geniv ?: "<default>",
+> +	strlcpy(rblkcipher.type, "blkcipher", sizeof(rblkcipher.type));
+> +	strlcpy(rblkcipher.geniv, alg->cra_blkcipher.geniv ?: "<default>",
+>  		sizeof(rblkcipher.geniv));
+>  
+>  	rblkcipher.blocksize = alg->cra_blocksize;
+> -- 
+> 2.7.4
+> 
 
-> On Fri 2018-05-25 10:00:04, Thomas Garnier wrote:
-> > On Fri, May 25, 2018 at 2:14 AM Pavel Machek <pavel@ucw.cz> wrote:
-> >
-> > > On Thu 2018-05-24 09:35:42, Thomas Garnier wrote:
-> > > > On Thu, May 24, 2018 at 4:03 AM Pavel Machek <pavel@ucw.cz> wrote:
-> > > >
-> > > > > On Wed 2018-05-23 12:54:03, Thomas Garnier wrote:
-> > > > > > Change the assembly code to use only relative references of
-symbols
-> > for
-> > > > the
-> > > > > > kernel to be PIE compatible.
-> > > > > >
-> > > > > > Position Independent Executable (PIE) support will allow to
-> > extended the
-> > > > > > KASLR randomization range below the -2G memory limit.
-> > > >
-> > > > > What testing did this get?
-> > > >
-> > > > Tested boot, hibernation and performance on qemu and dedicated
-machine.
-> >
-> > > Well, this is suspend, not hibernation code.
-> >
-> > > So "sudo pm-suspend" or "echo mem > /sys/power/state" would be good
-> > > way to test this.
-> >
-> > Thanks, it worked. I added this to the testsuite I use for KASLR.
+Hi Nick, this patch is wrong.  The 'struct crypto_report_blkcipher' is being
+copied to userspace via netlink, so all bytes of it must be initialized.
+strncpy() does this but strlcpy() does not.
 
-> Thanks!
+I noticed that you're sending out some other patches replacing strncpy() with
+strlcpy() too.  Can you please double check them for this same bug?
 
-> You can add my Acked-by:.
+Thanks,
 
-Will do. Thanks for the review.
-
-
->                                                                  Pavel
-
-> --
-> (english) http://www.livejournal.com/~pavelmachek
-> (cesky, pictures)
-http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
-
-
-
--- 
-Thomas
+- Eric
