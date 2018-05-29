@@ -1,7 +1,8 @@
 From: Antoine Tenart <antoine.tenart@bootlin.com>
-Subject: [PATCH 00/10] crypto: inside-secure - sha512/384 support
-Date: Tue, 29 May 2018 14:13:42 +0200
-Message-ID: <20180529121352.19490-1-antoine.tenart@bootlin.com>
+Subject: [PATCH 06/10] crypto: inside-secure - authenc(hmac(sha512),cbc(aes)) support
+Date: Tue, 29 May 2018 14:13:48 +0200
+Message-ID: <20180529121352.19490-7-antoine.tenart@bootlin.com>
+References: <20180529121352.19490-1-antoine.tenart@bootlin.com>
 Cc: Antoine Tenart <antoine.tenart@bootlin.com>,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         thomas.petazzoni@bootlin.com, maxime.chevallier@bootlin.com,
@@ -9,41 +10,107 @@ Cc: Antoine Tenart <antoine.tenart@bootlin.com>,
         nadavh@marvell.com, oferh@marvell.com, igall@marvell.com
 To: herbert@gondor.apana.org.au, davem@davemloft.net
 Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20180529121352.19490-1-antoine.tenart@bootlin.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hello Herbert,
+This patch adds the authenc(hmac(sha512),cbc(aes)) algorithm support to
+the Inside Secure SafeXcel driver.
 
-This series adds support for the SHA512 and SHA384 algorithms in the
-Inside Secure SafeXcel driver. Variants of those two algorithms are also
-added as well (hmac, and AEAD).
+Signed-off-by: Antoine Tenart <antoine.tenart@bootlin.com>
+---
+ drivers/crypto/inside-secure/safexcel.c       |  1 +
+ drivers/crypto/inside-secure/safexcel.h       |  1 +
+ .../crypto/inside-secure/safexcel_cipher.c    | 43 ++++++++++++++++++-
+ 3 files changed, 43 insertions(+), 2 deletions(-)
 
-Before doing so a few patches rework the driver to prepare for the new
-algorithms additions.
-
-Thanks!
-Antoine
-
-Antoine Tenart (10):
-  crypto: inside-secure - use the error handler for invalidation
-    requests
-  crypto: inside-secure - improve the counter computation
-  crypto: sha512_generic - add a sha512 0-length pre-computed hash
-  crypto: inside-secure - sha512 support
-  crypto: inside-secure - hmac(sha512) support
-  crypto: inside-secure - authenc(hmac(sha512),cbc(aes)) support
-  crypto: sha512_generic - add a sha384 0-length pre-computed hash
-  crypto: inside-secure - sha384 support
-  crypto: inside-secure - hmac(sha384) support
-  crypto: inside-secure - authenc(hmac(sha384),cbc(aes)) support
-
- crypto/sha512_generic.c                       |  22 +
- drivers/crypto/inside-secure/safexcel.c       |   6 +
- drivers/crypto/inside-secure/safexcel.h       |  23 +-
- .../crypto/inside-secure/safexcel_cipher.c    |  89 +++-
- drivers/crypto/inside-secure/safexcel_hash.c  | 381 ++++++++++++++++--
- include/crypto/sha.h                          |   4 +
- 6 files changed, 469 insertions(+), 56 deletions(-)
-
+diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/inside-secure/safexcel.c
+index b3c5f3c8e208..dcb39d0d82bb 100644
+--- a/drivers/crypto/inside-secure/safexcel.c
++++ b/drivers/crypto/inside-secure/safexcel.c
+@@ -798,6 +798,7 @@ static struct safexcel_alg_template *safexcel_algs[] = {
+ 	&safexcel_alg_authenc_hmac_sha1_cbc_aes,
+ 	&safexcel_alg_authenc_hmac_sha224_cbc_aes,
+ 	&safexcel_alg_authenc_hmac_sha256_cbc_aes,
++	&safexcel_alg_authenc_hmac_sha512_cbc_aes,
+ };
+ 
+ static int safexcel_register_algorithms(struct safexcel_crypto_priv *priv)
+diff --git a/drivers/crypto/inside-secure/safexcel.h b/drivers/crypto/inside-secure/safexcel.h
+index 5885844a9994..9e24cab279d2 100644
+--- a/drivers/crypto/inside-secure/safexcel.h
++++ b/drivers/crypto/inside-secure/safexcel.h
+@@ -680,5 +680,6 @@ extern struct safexcel_alg_template safexcel_alg_hmac_sha512;
+ extern struct safexcel_alg_template safexcel_alg_authenc_hmac_sha1_cbc_aes;
+ extern struct safexcel_alg_template safexcel_alg_authenc_hmac_sha224_cbc_aes;
+ extern struct safexcel_alg_template safexcel_alg_authenc_hmac_sha256_cbc_aes;
++extern struct safexcel_alg_template safexcel_alg_authenc_hmac_sha512_cbc_aes;
+ 
+ #endif
+diff --git a/drivers/crypto/inside-secure/safexcel_cipher.c b/drivers/crypto/inside-secure/safexcel_cipher.c
+index 5bc0afc8e63a..560c1e54ce9d 100644
+--- a/drivers/crypto/inside-secure/safexcel_cipher.c
++++ b/drivers/crypto/inside-secure/safexcel_cipher.c
+@@ -40,8 +40,8 @@ struct safexcel_cipher_ctx {
+ 	/* All the below is AEAD specific */
+ 	u32 alg;
+ 	u32 state_sz;
+-	u32 ipad[SHA256_DIGEST_SIZE / sizeof(u32)];
+-	u32 opad[SHA256_DIGEST_SIZE / sizeof(u32)];
++	u32 ipad[SHA512_DIGEST_SIZE / sizeof(u32)];
++	u32 opad[SHA512_DIGEST_SIZE / sizeof(u32)];
+ };
+ 
+ struct safexcel_cipher_req {
+@@ -200,6 +200,11 @@ static int safexcel_aead_aes_setkey(struct crypto_aead *ctfm, const u8 *key,
+ 					 keys.authkeylen, &istate, &ostate))
+ 			goto badkey;
+ 		break;
++	case CONTEXT_CONTROL_CRYPTO_ALG_SHA512:
++		if (safexcel_hmac_setkey("safexcel-sha512", keys.authkey,
++					 keys.authkeylen, &istate, &ostate))
++			goto badkey;
++		break;
+ 	default:
+ 		dev_err(priv->dev, "aead: unsupported hash algorithm\n");
+ 		goto badkey;
+@@ -1019,3 +1024,37 @@ struct safexcel_alg_template safexcel_alg_authenc_hmac_sha224_cbc_aes = {
+ 		},
+ 	},
+ };
++
++static int safexcel_aead_sha512_cra_init(struct crypto_tfm *tfm)
++{
++	struct safexcel_cipher_ctx *ctx = crypto_tfm_ctx(tfm);
++
++	safexcel_aead_cra_init(tfm);
++	ctx->alg = CONTEXT_CONTROL_CRYPTO_ALG_SHA512;
++	ctx->state_sz = SHA512_DIGEST_SIZE;
++	return 0;
++}
++
++struct safexcel_alg_template safexcel_alg_authenc_hmac_sha512_cbc_aes = {
++	.type = SAFEXCEL_ALG_TYPE_AEAD,
++	.alg.aead = {
++		.setkey = safexcel_aead_aes_setkey,
++		.encrypt = safexcel_aead_encrypt,
++		.decrypt = safexcel_aead_decrypt,
++		.ivsize = AES_BLOCK_SIZE,
++		.maxauthsize = SHA512_DIGEST_SIZE,
++		.base = {
++			.cra_name = "authenc(hmac(sha512),cbc(aes))",
++			.cra_driver_name = "safexcel-authenc-hmac-sha512-cbc-aes",
++			.cra_priority = 300,
++			.cra_flags = CRYPTO_ALG_TYPE_AEAD | CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_KERN_DRIVER_ONLY,
++			.cra_blocksize = AES_BLOCK_SIZE,
++			.cra_ctxsize = sizeof(struct safexcel_cipher_ctx),
++			.cra_alignmask = 0,
++			.cra_init = safexcel_aead_sha512_cra_init,
++			.cra_exit = safexcel_aead_cra_exit,
++			.cra_module = THIS_MODULE,
++		},
++	},
++};
 -- 
 2.17.0
