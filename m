@@ -1,97 +1,120 @@
-From: Antoine Tenart <antoine.tenart@bootlin.com>
-Subject: [PATCH 02/10] crypto: inside-secure - improve the counter computation
-Date: Tue, 29 May 2018 14:13:44 +0200
-Message-ID: <20180529121352.19490-3-antoine.tenart@bootlin.com>
-References: <20180529121352.19490-1-antoine.tenart@bootlin.com>
-Cc: Antoine Tenart <antoine.tenart@bootlin.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        thomas.petazzoni@bootlin.com, maxime.chevallier@bootlin.com,
-        gregory.clement@bootlin.com, miquel.raynal@bootlin.com,
-        nadavh@marvell.com, oferh@marvell.com, igall@marvell.com
-To: herbert@gondor.apana.org.au, davem@davemloft.net
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180529121352.19490-1-antoine.tenart@bootlin.com>
-Sender: linux-kernel-owner@vger.kernel.org
+From: Pavel Machek <pavel@ucw.cz>
+Subject: Re: [PATCH v3 09/27] x86/acpi: Adapt assembly for PIE support
+Date: Tue, 29 May 2018 14:31:14 +0200
+Message-ID: <20180529123114.GB21399@amd>
+References: <20180523195421.180248-1-thgarnie@google.com>
+	<20180523195421.180248-10-thgarnie@google.com>
+	<20180524110306.GA20225@amd>
+	<CAJcbSZFJ84+VC5xDQZGHctupdqwmMBgqzLzFRqCTBpi5t-2Gvw@mail.gmail.com>
+	<20180525091447.GC9666@amd>
+	<CAJcbSZH17D01Stk4vRKKzjW6dxvK8x+S9sWL6vUopSP9=-x7Nw@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: multipart/mixed; boundary="===============3574584313153394462=="
+Cc: Kate Stewart <kstewart@linuxfoundation.org>,
+	Nicolas Pitre <nicolas.pitre@linaro.org>,
+	the arch/x86 maintainers <x86@kernel.org>,
+	Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
+	Petr Mladek <pmladek@suse.com>, Len Brown <len.brown@intel.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Yonghong Song <yhs@fb.com>, Christopher Li <sparse@chrisli.org>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Dominik Brodowski <linux@dominikbrodowski.net>,
+	LKML <linux-kernel@vger.kernel.org>,
+	Masahiro Yamada <yamada.masahiro@socionext.com>,
+	Jan Beulich <JBeulich@suse.com>, "H . Peter Anvin" <hpa@zytor.com>,
+	Kernel Hardening <kernel-hardening@lists.openwall.com>,
+	Christoph Lameter <cl@linux.com>, Alok Kataria <akataria@vmware.com>,
+	Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+	linux-arch <linux-arch@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Herbert Xu <herbert@gondor.
+To: Thomas Garnier <thgarnie@google.com>
+Return-path: <virtualization-bounces@lists.linux-foundation.org>
+In-Reply-To: <CAJcbSZH17D01Stk4vRKKzjW6dxvK8x+S9sWL6vUopSP9=-x7Nw@mail.gmail.com>
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/virtualization>,
+	<mailto:virtualization-request@lists.linux-foundation.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/virtualization/>
+List-Post: <mailto:virtualization@lists.linux-foundation.org>
+List-Help: <mailto:virtualization-request@lists.linux-foundation.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/virtualization>,
+	<mailto:virtualization-request@lists.linux-foundation.org?subject=subscribe>
+Sender: virtualization-bounces@lists.linux-foundation.org
+Errors-To: virtualization-bounces@lists.linux-foundation.org
 List-Id: linux-crypto.vger.kernel.org
 
-A counter is given to the engine when finishing hash computation. It
-currently uses the blocksize while it counts the number of 64 bytes
-blocks given to the engine. This works well for all algorithms so far,
-as SHA1, SHA224 and SHA256 all have a blocksize of 64 bytes, but others
-algorithms such as SHA512 wouldn't work.
 
-Signed-off-by: Antoine Tenart <antoine.tenart@bootlin.com>
----
- drivers/crypto/inside-secure/safexcel.h      |  5 +++++
- drivers/crypto/inside-secure/safexcel_hash.c | 12 +++++-------
- 2 files changed, 10 insertions(+), 7 deletions(-)
+--===============3574584313153394462==
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="IrhDeMKUP4DT/M7F"
+Content-Disposition: inline
 
-diff --git a/drivers/crypto/inside-secure/safexcel.h b/drivers/crypto/inside-secure/safexcel.h
-index 8b3ee9b59f53..d2adedc23e9a 100644
---- a/drivers/crypto/inside-secure/safexcel.h
-+++ b/drivers/crypto/inside-secure/safexcel.h
-@@ -327,6 +327,11 @@ struct safexcel_context_record {
- #define CONTEXT_CONTROL_COUNTER_MODE		BIT(10)
- #define CONTEXT_CONTROL_HASH_STORE		BIT(19)
- 
-+/* The hash counter given to the engine in the context has a granularity of
-+ * 64 bits.
-+ */
-+#define EIP197_COUNTER_BLOCK_SIZE		64
-+
- /* EIP197_CS_RAM_CTRL */
- #define EIP197_TRC_ENABLE_0			BIT(4)
- #define EIP197_TRC_ENABLE_1			BIT(5)
-diff --git a/drivers/crypto/inside-secure/safexcel_hash.c b/drivers/crypto/inside-secure/safexcel_hash.c
-index 8eef95f82e11..83418f7501b5 100644
---- a/drivers/crypto/inside-secure/safexcel_hash.c
-+++ b/drivers/crypto/inside-secure/safexcel_hash.c
-@@ -72,8 +72,7 @@ static void safexcel_hash_token(struct safexcel_command_desc *cdesc,
- static void safexcel_context_control(struct safexcel_ahash_ctx *ctx,
- 				     struct safexcel_ahash_req *req,
- 				     struct safexcel_command_desc *cdesc,
--				     unsigned int digestsize,
--				     unsigned int blocksize)
-+				     unsigned int digestsize)
- {
- 	int i;
- 
-@@ -107,7 +106,8 @@ static void safexcel_context_control(struct safexcel_ahash_ctx *ctx,
- 				ctx->base.ctxr->data[i] = cpu_to_le32(req->state[i]);
- 
- 			if (req->finish)
--				ctx->base.ctxr->data[i] = cpu_to_le32(req->processed / blocksize);
-+				ctx->base.ctxr->data[i] =
-+					cpu_to_le32(req->processed / EIP197_COUNTER_BLOCK_SIZE);
- 		}
- 	} else if (req->digest == CONTEXT_CONTROL_DIGEST_HMAC) {
- 		cdesc->control_data.control0 |= CONTEXT_CONTROL_SIZE(2 * req->state_sz / sizeof(u32));
-@@ -282,8 +282,7 @@ static int safexcel_ahash_send_req(struct crypto_async_request *async, int ring,
- 
- send_command:
- 	/* Setup the context options */
--	safexcel_context_control(ctx, req, first_cdesc, req->state_sz,
--				 crypto_ahash_blocksize(ahash));
-+	safexcel_context_control(ctx, req, first_cdesc, req->state_sz);
- 
- 	/* Add the token */
- 	safexcel_hash_token(first_cdesc, len, req->state_sz);
-@@ -335,7 +334,6 @@ static inline bool safexcel_ahash_needs_inv_get(struct ahash_request *areq)
- {
- 	struct safexcel_ahash_ctx *ctx = crypto_ahash_ctx(crypto_ahash_reqtfm(areq));
- 	struct safexcel_ahash_req *req = ahash_request_ctx(areq);
--	struct crypto_ahash *ahash = crypto_ahash_reqtfm(areq);
- 	unsigned int state_w_sz = req->state_sz / sizeof(u32);
- 	int i;
- 
-@@ -344,7 +342,7 @@ static inline bool safexcel_ahash_needs_inv_get(struct ahash_request *areq)
- 			return true;
- 
- 	if (ctx->base.ctxr->data[state_w_sz] !=
--	    cpu_to_le32(req->processed / crypto_ahash_blocksize(ahash)))
-+	    cpu_to_le32(req->processed / EIP197_COUNTER_BLOCK_SIZE))
- 		return true;
- 
- 	return false;
--- 
-2.17.0
+
+--IrhDeMKUP4DT/M7F
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Fri 2018-05-25 10:00:04, Thomas Garnier wrote:
+> On Fri, May 25, 2018 at 2:14 AM Pavel Machek <pavel@ucw.cz> wrote:
+>=20
+> > On Thu 2018-05-24 09:35:42, Thomas Garnier wrote:
+> > > On Thu, May 24, 2018 at 4:03 AM Pavel Machek <pavel@ucw.cz> wrote:
+> > >
+> > > > On Wed 2018-05-23 12:54:03, Thomas Garnier wrote:
+> > > > > Change the assembly code to use only relative references of symbo=
+ls
+> for
+> > > the
+> > > > > kernel to be PIE compatible.
+> > > > >
+> > > > > Position Independent Executable (PIE) support will allow to
+> extended the
+> > > > > KASLR randomization range below the -2G memory limit.
+> > >
+> > > > What testing did this get?
+> > >
+> > > Tested boot, hibernation and performance on qemu and dedicated machin=
+e.
+>=20
+> > Well, this is suspend, not hibernation code.
+>=20
+> > So "sudo pm-suspend" or "echo mem > /sys/power/state" would be good
+> > way to test this.
+>=20
+> Thanks, it worked. I added this to the testsuite I use for KASLR.
+
+Thanks!
+
+You can add my Acked-by:.
+
+								Pavel
+							=09
+--=20
+(english) http://www.livejournal.com/~pavelmachek
+(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blo=
+g.html
+
+--IrhDeMKUP4DT/M7F
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlsNSBIACgkQMOfwapXb+vJcmwCfVtj/DQE+VyxRZUU8UjiQVdHr
+BO8AoIc6OVRZyFmsEwBtGucDDnQJI4fU
+=APXA
+-----END PGP SIGNATURE-----
+
+--IrhDeMKUP4DT/M7F--
+
+--===============3574584313153394462==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+Virtualization mailing list
+Virtualization@lists.linux-foundation.org
+https://lists.linuxfoundation.org/mailman/listinfo/virtualization
+--===============3574584313153394462==--
