@@ -1,59 +1,47 @@
-From: Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCHv2 0/2] Add new SEV commands
-Date: Wed, 30 May 2018 08:43:21 -0500
-Message-ID: <47120fa2-cdda-dc6e-d0cd-2f8803cc7982@amd.com>
-References: <cover.1527274269.git.Janakarajan.Natarajan@amd.com>
- <69cd82ba-d60d-d3f8-37ee-ef4cd769f611@redhat.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Crypto Fixes for 4.17
+Date: Thu, 31 May 2018 00:17:04 +0800
+Message-ID: <20180530161704.2v5zcfn5wt4hsbxc@gondor.apana.org.au>
+References: <20161119102748.GA4277@gondor.apana.org.au>
+ <20161213132414.GA7898@gondor.apana.org.au>
+ <20170223125141.GA17400@gondor.apana.org.au>
+ <20170714141855.GA29426@gondor.apana.org.au>
+ <20170922084401.GA15541@gondor.apana.org.au>
+ <20171128230929.GA17783@gondor.apana.org.au>
+ <20171222064931.GA27068@gondor.apana.org.au>
+ <20180105073808.GA14405@gondor.apana.org.au>
+ <20180212031702.GA26153@gondor.apana.org.au>
+ <20180428080517.haxgpvqrwgotakyo@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: brijesh.singh@amd.com, Tom Lendacky <thomas.lendacky@amd.com>,
-        Gary Hook <gary.hook@amd.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Borislav Petkov <bp@suse.de>
-To: Paolo Bonzini <pbonzini@redhat.com>,
-        Janakarajan Natarajan <Janakarajan.Natarajan@amd.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <69cd82ba-d60d-d3f8-37ee-ef4cd769f611@redhat.com>
-Content-Language: en-US
+Content-Disposition: inline
+In-Reply-To: <20180428080517.haxgpvqrwgotakyo@gondor.apana.org.au>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
+Hi Linus: 
+
+This push fixes a potential kernel panic in the inside-secure driver.
 
 
-On 05/29/2018 01:46 PM, Paolo Bonzini wrote:
-> On 25/05/2018 22:23, Janakarajan Natarajan wrote:
->> This patchset adds two new SEV commands, introduced in SEV API v0.15
->> and v0.16 respectively.
->>
->> * DOWNLOAD_FIRMWARE allows the SEV firmware to be updated if a blob newer
->>    than or similar to the exisiting build is available.
->>
->> * GET_ID allows to query for a unique ID that can be used to retrieve the
->>    Chip Endorsment Key (CEK) public key signed by the AMD SEV Signing Key
->>    (ASK).
->>
->> v1->v2:
->> * Added cover letter.
->> * Misc changes based on Boris' feedback.
->>
->> Janakarajan Natarajan (2):
->>    crypto: ccp: Add DOWNLOAD_FIRMWARE SEV command
->>    crypto: ccp: Add GET_ID SEV command
->>
->>   drivers/crypto/ccp/psp-dev.c | 143 ++++++++++++++++++++++++++++++++++++++++---
->>   drivers/crypto/ccp/psp-dev.h |   4 ++
->>   include/linux/psp-sev.h      |  23 +++++++
->>   include/uapi/linux/psp-sev.h |  12 ++++
->>   4 files changed, 172 insertions(+), 10 deletions(-)
->>
-> 
-> This is not going through the KVM tree, is it?
+Please pull from
+
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
 
 
-This series will go through linux-crypto.
+Antoine Tenart (1):
+      crypto: inside-secure - do not use memset on MMIO
 
-Thanks
-Brijesh
+ drivers/crypto/inside-secure/safexcel.c |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
