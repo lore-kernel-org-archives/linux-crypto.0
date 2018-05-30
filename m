@@ -1,46 +1,46 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2 0/5] crypto: ccree: cleanup, fixes and R-Car enabling
-Date: Thu, 31 May 2018 00:28:04 +0800
-Message-ID: <20180530162804.zp4n22nprqmigywz@gondor.apana.org.au>
-References: <1527171551-21979-1-git-send-email-gilad@benyossef.com>
+Subject: Re: [PATCH v2 0/5] build warnings cleanup
+Date: Thu, 31 May 2018 00:28:43 +0800
+Message-ID: <20180530162843.urnovifr6hkg52zz@gondor.apana.org.au>
+References: <1527435922-6727-1-git-send-email-atul.gupta@chelsio.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Simon Horman <horms@verge.net.au>,
-        Magnus Damm <magnus.damm@gmail.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will.deacon@arm.com>,
-        Geert Uytterhoeven <geert+renesas@glider.be>,
-        Michael Turquette <mturquette@baylibre.com>,
-        Stephen Boyd <sboyd@kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Ofir Drang <ofir.drang@arm.com>,
-        linux-renesas-soc@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-clk@vger.kernel.org, linux-crypto@vger.kernel.org
-To: Gilad Ben-Yossef <gilad@benyossef.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Cc: linux-crypto@vger.kernel.org, gustavo@embeddedor.com,
+        dan.carpenter@oracle.com, netdev@vger.kernel.org,
+        davem@davemloft.net
+To: Atul Gupta <atul.gupta@chelsio.com>
+Return-path: <netdev-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1527171551-21979-1-git-send-email-gilad@benyossef.com>
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <1527435922-6727-1-git-send-email-atul.gupta@chelsio.com>
+Sender: netdev-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, May 24, 2018 at 03:19:05PM +0100, Gilad Ben-Yossef wrote:
-> The patch set enables the use of CryptoCell found in some Renesas R-Car
-> Salvator-X boards and fixes some driver issues uncovered that prevented
-> to work properly.
+On Sun, May 27, 2018 at 09:15:17PM +0530, Atul Gupta wrote:
+> Build warnings cleanup reported for
+> - using only 128b key
+> - wait for buffer in sendmsg/sendpage
+> - check for null before using skb
+> - free rspq_skb_cache in error path
+> - indentation
 > 
-> Changes from v1:
-> - Properly fix the bug that caused us to read a bad signature register
->   rather than dropping the check
-> - Proper DT fields as indicated by Geert Uytterhoeven.
-> - Better clock enabling as suggested by Geert Uytterhoeven.
+> v2:
+>   Added bug report description for 0002
+>   Incorported comments from Dan Carpenter
 > 
-> Note! the last two patches in the set depend on the
-> "clk: renesas: r8a7795: Add CR clock" patch from Geert Uytterhoeven.
+> Atul Gupta (5):
+>   crypto:chtls: key len correction
+>   crypto: chtls: wait for memory sendmsg, sendpage
+>   crypto: chtls: dereference null variable
+>   crypto: chtls: kbuild warnings
+>   crypto: chtls: free beyond end rspq_skb_cache
+> 
+>  drivers/crypto/chelsio/chtls/chtls.h      |   1 +
+>  drivers/crypto/chelsio/chtls/chtls_hw.c   |   6 +-
+>  drivers/crypto/chelsio/chtls/chtls_io.c   | 104 +++++++++++++++++++++++++++---
+>  drivers/crypto/chelsio/chtls/chtls_main.c |   3 +-
+>  4 files changed, 98 insertions(+), 16 deletions(-)
 
-Patches 1-3 applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
