@@ -1,39 +1,59 @@
-From: Colin King <colin.king@canonical.com>
-Subject: [PATCH][next] crypto: aegis: fix indentation of a statement
-Date: Wed, 30 May 2018 11:50:05 +0100
-Message-ID: <20180530105005.13116-1-colin.king@canonical.com>
+From: Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: [PATCHv2 0/2] Add new SEV commands
+Date: Wed, 30 May 2018 08:43:21 -0500
+Message-ID: <47120fa2-cdda-dc6e-d0cd-2f8803cc7982@amd.com>
+References: <cover.1527274269.git.Janakarajan.Natarajan@amd.com>
+ <69cd82ba-d60d-d3f8-37ee-ef4cd769f611@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Cc: kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>,
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: brijesh.singh@amd.com, Tom Lendacky <thomas.lendacky@amd.com>,
+        Gary Hook <gary.hook@amd.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
         "David S . Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org
+        Borislav Petkov <bp@suse.de>
+To: Paolo Bonzini <pbonzini@redhat.com>,
+        Janakarajan Natarajan <Janakarajan.Natarajan@amd.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <69cd82ba-d60d-d3f8-37ee-ef4cd769f611@redhat.com>
+Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-From: Colin Ian King <colin.king@canonical.com>
 
-Trival fix to correct the indentation of a single statement
 
-Signed-off-by: Colin Ian King <colin.king@canonical.com>
----
- crypto/aegis128l.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On 05/29/2018 01:46 PM, Paolo Bonzini wrote:
+> On 25/05/2018 22:23, Janakarajan Natarajan wrote:
+>> This patchset adds two new SEV commands, introduced in SEV API v0.15
+>> and v0.16 respectively.
+>>
+>> * DOWNLOAD_FIRMWARE allows the SEV firmware to be updated if a blob newer
+>>    than or similar to the exisiting build is available.
+>>
+>> * GET_ID allows to query for a unique ID that can be used to retrieve the
+>>    Chip Endorsment Key (CEK) public key signed by the AMD SEV Signing Key
+>>    (ASK).
+>>
+>> v1->v2:
+>> * Added cover letter.
+>> * Misc changes based on Boris' feedback.
+>>
+>> Janakarajan Natarajan (2):
+>>    crypto: ccp: Add DOWNLOAD_FIRMWARE SEV command
+>>    crypto: ccp: Add GET_ID SEV command
+>>
+>>   drivers/crypto/ccp/psp-dev.c | 143 ++++++++++++++++++++++++++++++++++++++++---
+>>   drivers/crypto/ccp/psp-dev.h |   4 ++
+>>   include/linux/psp-sev.h      |  23 +++++++
+>>   include/uapi/linux/psp-sev.h |  12 ++++
+>>   4 files changed, 172 insertions(+), 10 deletions(-)
+>>
+> 
+> This is not going through the KVM tree, is it?
 
-diff --git a/crypto/aegis128l.c b/crypto/aegis128l.c
-index 0cc1a7525c85..64dc2654b863 100644
---- a/crypto/aegis128l.c
-+++ b/crypto/aegis128l.c
-@@ -121,7 +121,7 @@ static void crypto_aegis128l_ad(struct aegis_state *state,
- 				(const union aegis_chunk *)src;
- 
- 		while (size >= AEGIS128L_CHUNK_SIZE) {
--                    crypto_aegis128l_update_a(state, src_chunk);
-+			crypto_aegis128l_update_a(state, src_chunk);
- 
- 			size -= AEGIS128L_CHUNK_SIZE;
- 			src_chunk += 1;
--- 
-2.17.0
+
+This series will go through linux-crypto.
+
+Thanks
+Brijesh
