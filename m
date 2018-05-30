@@ -1,67 +1,84 @@
-From: Dan Williams <dan.j.williams@intel.com>
-Subject: Re: [PATCH v2] async_pq: Remove VLA usage
-Date: Tue, 29 May 2018 15:40:50 -0700
-Message-ID: <CAPcyv4jrUwXFrF7aB-bKqfZ=17T5ie27KEO0JYWD=ETAqOqA4g@mail.gmail.com>
-References: <20180505075854.192237-1-ksspiers@google.com> <CAPcyv4i__AQmCxM1rVBrLqXreMxQ5u9uRHRyJ=XZjDELxxJTzw@mail.gmail.com>
+From: Nick Desaulniers <nick.desaulniers@gmail.com>
+Subject: Re: [PATCH] crypto: blkcipher: prefer strlcpy to strncpy
+Date: Tue, 29 May 2018 19:03:29 -0700
+Message-ID: <CAH7mPvgp9Rs28zXsucdMSn27g=dvVJ+H_djK_nibsZtBKP7uuw@mail.gmail.com>
+References: <1527572683-26098-1-git-send-email-nick.desaulniers@gmail.com> <20180529163400.GA166256@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Cc: David Miller <davem@davemloft.net>,
-        Kees Cook <keescook@chromium.org>, ray.jui@broadcom.com,
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, davem@davemloft.net,
         linux-crypto@vger.kernel.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-raid <linux-raid@vger.kernel.org>, vkoul@kernel.org
-To: Kyle Spiers <ksspiers@google.com>
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Eric Biggers <ebiggers3@gmail.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAPcyv4i__AQmCxM1rVBrLqXreMxQ5u9uRHRyJ=XZjDELxxJTzw@mail.gmail.com>
+In-Reply-To: <20180529163400.GA166256@gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-[ add Vinod's korg address ]
+On Tue, May 29, 2018 at 9:34 AM, Eric Biggers <ebiggers3@gmail.com> wrote:
+> On Mon, May 28, 2018 at 10:44:43PM -0700, Nick Desaulniers wrote:
+>> Fixes stringop-truncation warnings from gcc-8.
+>>
+>> Signed-off-by: Nick Desaulniers <nick.desaulniers@gmail.com>
+>> ---
+>>  crypto/ablkcipher.c | 8 ++++----
+>>  crypto/blkcipher.c  | 4 ++--
+>>  2 files changed, 6 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/crypto/ablkcipher.c b/crypto/ablkcipher.c
+>> index d880a48..e38867f 100644
+>> --- a/crypto/ablkcipher.c
+>> +++ b/crypto/ablkcipher.c
+>> @@ -370,8 +370,8 @@ static int crypto_ablkcipher_report(struct sk_buff *skb, struct crypto_alg *alg)
+>>  {
+>>       struct crypto_report_blkcipher rblkcipher;
+>>
+>> -     strncpy(rblkcipher.type, "ablkcipher", sizeof(rblkcipher.type));
+>> -     strncpy(rblkcipher.geniv, alg->cra_ablkcipher.geniv ?: "<default>",
+>> +     strlcpy(rblkcipher.type, "ablkcipher", sizeof(rblkcipher.type));
+>> +     strlcpy(rblkcipher.geniv, alg->cra_ablkcipher.geniv ?: "<default>",
+>>               sizeof(rblkcipher.geniv));
+>>
+>>       rblkcipher.blocksize = alg->cra_blocksize;
+>> @@ -444,8 +444,8 @@ static int crypto_givcipher_report(struct sk_buff *skb, struct crypto_alg *alg)
+>>  {
+>>       struct crypto_report_blkcipher rblkcipher;
+>>
+>> -     strncpy(rblkcipher.type, "givcipher", sizeof(rblkcipher.type));
+>> -     strncpy(rblkcipher.geniv, alg->cra_ablkcipher.geniv ?: "<built-in>",
+>> +     strlcpy(rblkcipher.type, "givcipher", sizeof(rblkcipher.type));
+>> +     strlcpy(rblkcipher.geniv, alg->cra_ablkcipher.geniv ?: "<built-in>",
+>>               sizeof(rblkcipher.geniv));
+>>
+>>       rblkcipher.blocksize = alg->cra_blocksize;
+>> diff --git a/crypto/blkcipher.c b/crypto/blkcipher.c
+>> index 01c0d4a..ee88e48 100644
+>> --- a/crypto/blkcipher.c
+>> +++ b/crypto/blkcipher.c
+>> @@ -509,8 +509,8 @@ static int crypto_blkcipher_report(struct sk_buff *skb, struct crypto_alg *alg)
+>>  {
+>>       struct crypto_report_blkcipher rblkcipher;
+>>
+>> -     strncpy(rblkcipher.type, "blkcipher", sizeof(rblkcipher.type));
+>> -     strncpy(rblkcipher.geniv, alg->cra_blkcipher.geniv ?: "<default>",
+>> +     strlcpy(rblkcipher.type, "blkcipher", sizeof(rblkcipher.type));
+>> +     strlcpy(rblkcipher.geniv, alg->cra_blkcipher.geniv ?: "<default>",
+>>               sizeof(rblkcipher.geniv));
+>>
+>>       rblkcipher.blocksize = alg->cra_blocksize;
+>> --
+>> 2.7.4
+>>
+>
+> Hi Nick, this patch is wrong.  The 'struct crypto_report_blkcipher' is being
+> copied to userspace via netlink, so all bytes of it must be initialized.
+> strncpy() does this but strlcpy() does not.
+>
+> I noticed that you're sending out some other patches replacing strncpy() with
+> strlcpy() too.  Can you please double check them for this same bug?
+>
+> Thanks,
+>
+> - Eric
 
-On Tue, May 29, 2018 at 3:37 PM, Dan Williams <dan.j.williams@intel.com> wrote:
-> [ adding linux-raid ]
->
-> Apologies for the delay, the recent ping from Kees made me take a closer look.
->
-> On Sat, May 5, 2018 at 12:58 AM, Kyle Spiers <ksspiers@google.com> wrote:
->> In the quest to remove VLAs from the kernel[1], this moves the
->> allocation of coefs and blocks from the stack to being kmalloc()ed.
->>
->> [1] https://lkml.org/lkml/2018/3/7/621
->>
->> Signed-off-by: Kyle Spiers <ksspiers@google.com>
->> ---
->> Forgot to add slab.h
->> ---
->>  crypto/async_tx/async_pq.c  | 18 ++++++++++++++----
->>  crypto/async_tx/raid6test.c |  9 ++++++++-
->>  2 files changed, 22 insertions(+), 5 deletions(-)
->>
->> diff --git a/crypto/async_tx/async_pq.c b/crypto/async_tx/async_pq.c
->> index 56bd612927ab..af1912313a23 100644
->> --- a/crypto/async_tx/async_pq.c
->> +++ b/crypto/async_tx/async_pq.c
->> @@ -194,9 +194,9 @@ async_gen_syndrome(struct page **blocks, unsigned int offset, int disks,
->>             (src_cnt <= dma_maxpq(device, 0) ||
->>              dma_maxpq(device, DMA_PREP_CONTINUE) > 0) &&
->>             is_dma_pq_aligned(device, offset, 0, len)) {
->> -               struct dma_async_tx_descriptor *tx;
->> +               struct dma_async_tx_descriptor *tx = NULL;
->>                 enum dma_ctrl_flags dma_flags = 0;
->> -               unsigned char coefs[src_cnt];
->> +               unsigned char *coefs;
->>                 int i, j;
->>
->>                 /* run the p+q asynchronously */
->> @@ -207,6 +207,9 @@ async_gen_syndrome(struct page **blocks, unsigned int offset, int disks,
->>                  * sources and update the coefficients accordingly
->>                  */
->>                 unmap->len = len;
->> +               coefs = kmalloc_array(src_cnt, sizeof(*coefs), GFP_KERNEL);
->
-> At a minimum this needs to be GFP_NOIO since raid may be in the
-> page-reclaim path.
->
-> However, I think it may be better to allocate this with the rest of
-> the stripe resources and pass it in as a scratch buffer. See the usage
-> / implementation of scribble_alloc() in drivers/md/raid5.c.
+
+Thanks for pointing out this subtlety, I've retracted the other patches.
