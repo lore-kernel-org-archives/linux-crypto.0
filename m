@@ -1,47 +1,54 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2 0/5] build warnings cleanup
-Date: Thu, 31 May 2018 00:28:43 +0800
-Message-ID: <20180530162843.urnovifr6hkg52zz@gondor.apana.org.au>
-References: <1527435922-6727-1-git-send-email-atul.gupta@chelsio.com>
+From: Gary R Hook <gary.hook@amd.com>
+Subject: Re: [PATCHv2 0/2] Add new SEV commands
+Date: Wed, 30 May 2018 13:44:12 -0500
+Message-ID: <79caff3c-1002-9fea-1ab6-954062435633@amd.com>
+References: <cover.1527274269.git.Janakarajan.Natarajan@amd.com>
+ <20180530162819.4xbwb3jbbx5dey24@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, gustavo@embeddedor.com,
-        dan.carpenter@oracle.com, netdev@vger.kernel.org,
-        davem@davemloft.net
-To: Atul Gupta <atul.gupta@chelsio.com>
-Return-path: <netdev-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1527435922-6727-1-git-send-email-atul.gupta@chelsio.com>
-Sender: netdev-owner@vger.kernel.org
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Borislav Petkov <bp@suse.de>,
+        Paolo Bonzini <pbonzini@redhat.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        Janakarajan Natarajan <Janakarajan.Natarajan@amd.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20180530162819.4xbwb3jbbx5dey24@gondor.apana.org.au>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Sun, May 27, 2018 at 09:15:17PM +0530, Atul Gupta wrote:
-> Build warnings cleanup reported for
-> - using only 128b key
-> - wait for buffer in sendmsg/sendpage
-> - check for null before using skb
-> - free rspq_skb_cache in error path
-> - indentation
+On 05/30/2018 11:28 AM, Herbert Xu wrote:
+> On Fri, May 25, 2018 at 03:23:28PM -0500, Janakarajan Natarajan wrote:
+>> This patchset adds two new SEV commands, introduced in SEV API v0.15
+>> and v0.16 respectively.
+>>
+>> * DOWNLOAD_FIRMWARE allows the SEV firmware to be updated if a blob newer
+>>    than or similar to the exisiting build is available.
+>>
+>> * GET_ID allows to query for a unique ID that can be used to retrieve the
+>>    Chip Endorsment Key (CEK) public key signed by the AMD SEV Signing Key
+>>    (ASK).
+>>
+>> v1->v2:
+>> * Added cover letter.
+>> * Misc changes based on Boris' feedback.
+>>
+>> Janakarajan Natarajan (2):
+>>    crypto: ccp: Add DOWNLOAD_FIRMWARE SEV command
+>>    crypto: ccp: Add GET_ID SEV command
+>>
+>>   drivers/crypto/ccp/psp-dev.c | 143 ++++++++++++++++++++++++++++++++++++++++---
+>>   drivers/crypto/ccp/psp-dev.h |   4 ++
+>>   include/linux/psp-sev.h      |  23 +++++++
+>>   include/uapi/linux/psp-sev.h |  12 ++++
+>>   4 files changed, 172 insertions(+), 10 deletions(-)
 > 
-> v2:
->   Added bug report description for 0002
->   Incorported comments from Dan Carpenter
+> All applied.  Thanks.
 > 
-> Atul Gupta (5):
->   crypto:chtls: key len correction
->   crypto: chtls: wait for memory sendmsg, sendpage
->   crypto: chtls: dereference null variable
->   crypto: chtls: kbuild warnings
->   crypto: chtls: free beyond end rspq_skb_cache
-> 
->  drivers/crypto/chelsio/chtls/chtls.h      |   1 +
->  drivers/crypto/chelsio/chtls/chtls_hw.c   |   6 +-
->  drivers/crypto/chelsio/chtls/chtls_io.c   | 104 +++++++++++++++++++++++++++---
->  drivers/crypto/chelsio/chtls/chtls_main.c |   3 +-
->  4 files changed, 98 insertions(+), 16 deletions(-)
 
-All applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+
+Huh. Without a Reviewed-by or an Acked-by?
