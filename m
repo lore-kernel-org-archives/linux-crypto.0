@@ -1,54 +1,84 @@
-From: Gary R Hook <gary.hook@amd.com>
-Subject: Re: [PATCHv2 0/2] Add new SEV commands
-Date: Wed, 30 May 2018 13:44:12 -0500
-Message-ID: <79caff3c-1002-9fea-1ab6-954062435633@amd.com>
-References: <cover.1527274269.git.Janakarajan.Natarajan@amd.com>
- <20180530162819.4xbwb3jbbx5dey24@gondor.apana.org.au>
+From: Kees Cook <keescook@chromium.org>
+Subject: Re: [PATCH v2] async_pq: Remove VLA usage
+Date: Wed, 30 May 2018 14:33:20 -0700
+Message-ID: <CAGXu5jL5hzArDhKJzG+jd7wQVJfXGPT1tUys-FzNOS6MTE-jFA@mail.gmail.com>
+References: <20180505075854.192237-1-ksspiers@google.com> <CAPcyv4i__AQmCxM1rVBrLqXreMxQ5u9uRHRyJ=XZjDELxxJTzw@mail.gmail.com>
+ <CAPcyv4jrUwXFrF7aB-bKqfZ=17T5ie27KEO0JYWD=ETAqOqA4g@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Borislav Petkov <bp@suse.de>,
-        Paolo Bonzini <pbonzini@redhat.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        Janakarajan Natarajan <Janakarajan.Natarajan@amd.com>
+Content-Type: text/plain; charset="UTF-8"
+Cc: Kyle Spiers <ksspiers@google.com>,
+        David Miller <davem@davemloft.net>, ray.jui@broadcom.com,
+        linux-crypto <linux-crypto@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-raid <linux-raid@vger.kernel.org>, vkoul@kernel.org
+To: Dan Williams <dan.j.williams@intel.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180530162819.4xbwb3jbbx5dey24@gondor.apana.org.au>
-Content-Language: en-US
+In-Reply-To: <CAPcyv4jrUwXFrF7aB-bKqfZ=17T5ie27KEO0JYWD=ETAqOqA4g@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 05/30/2018 11:28 AM, Herbert Xu wrote:
-> On Fri, May 25, 2018 at 03:23:28PM -0500, Janakarajan Natarajan wrote:
->> This patchset adds two new SEV commands, introduced in SEV API v0.15
->> and v0.16 respectively.
+On Tue, May 29, 2018 at 3:40 PM, Dan Williams <dan.j.williams@intel.com> wrote:
+> [ add Vinod's korg address ]
+>
+> On Tue, May 29, 2018 at 3:37 PM, Dan Williams <dan.j.williams@intel.com> wrote:
+>> [ adding linux-raid ]
 >>
->> * DOWNLOAD_FIRMWARE allows the SEV firmware to be updated if a blob newer
->>    than or similar to the exisiting build is available.
+>> Apologies for the delay, the recent ping from Kees made me take a closer look.
 >>
->> * GET_ID allows to query for a unique ID that can be used to retrieve the
->>    Chip Endorsment Key (CEK) public key signed by the AMD SEV Signing Key
->>    (ASK).
+>> On Sat, May 5, 2018 at 12:58 AM, Kyle Spiers <ksspiers@google.com> wrote:
+>>> In the quest to remove VLAs from the kernel[1], this moves the
+>>> allocation of coefs and blocks from the stack to being kmalloc()ed.
+>>>
+>>> [1] https://lkml.org/lkml/2018/3/7/621
+>>>
+>>> Signed-off-by: Kyle Spiers <ksspiers@google.com>
+>>> ---
+>>> Forgot to add slab.h
+>>> ---
+>>>  crypto/async_tx/async_pq.c  | 18 ++++++++++++++----
+>>>  crypto/async_tx/raid6test.c |  9 ++++++++-
+>>>  2 files changed, 22 insertions(+), 5 deletions(-)
+>>>
+>>> diff --git a/crypto/async_tx/async_pq.c b/crypto/async_tx/async_pq.c
+>>> index 56bd612927ab..af1912313a23 100644
+>>> --- a/crypto/async_tx/async_pq.c
+>>> +++ b/crypto/async_tx/async_pq.c
+>>> @@ -194,9 +194,9 @@ async_gen_syndrome(struct page **blocks, unsigned int offset, int disks,
+>>>             (src_cnt <= dma_maxpq(device, 0) ||
+>>>              dma_maxpq(device, DMA_PREP_CONTINUE) > 0) &&
+>>>             is_dma_pq_aligned(device, offset, 0, len)) {
+>>> -               struct dma_async_tx_descriptor *tx;
+>>> +               struct dma_async_tx_descriptor *tx = NULL;
+>>>                 enum dma_ctrl_flags dma_flags = 0;
+>>> -               unsigned char coefs[src_cnt];
+>>> +               unsigned char *coefs;
+>> At a minimum this needs to be GFP_NOIO since raid may be in the
+>> page-reclaim path.
 >>
->> v1->v2:
->> * Added cover letter.
->> * Misc changes based on Boris' feedback.
->>
->> Janakarajan Natarajan (2):
->>    crypto: ccp: Add DOWNLOAD_FIRMWARE SEV command
->>    crypto: ccp: Add GET_ID SEV command
->>
->>   drivers/crypto/ccp/psp-dev.c | 143 ++++++++++++++++++++++++++++++++++++++++---
->>   drivers/crypto/ccp/psp-dev.h |   4 ++
->>   include/linux/psp-sev.h      |  23 +++++++
->>   include/uapi/linux/psp-sev.h |  12 ++++
->>   4 files changed, 172 insertions(+), 10 deletions(-)
-> 
-> All applied.  Thanks.
-> 
+>> However, I think it may be better to allocate this with the rest of
+>> the stripe resources and pass it in as a scratch buffer. See the usage
+>> / implementation of scribble_alloc() in drivers/md/raid5.c.
 
+Given this:
 
-Huh. Without a Reviewed-by or an Acked-by?
+        int src_cnt = disks - 2;
+...
+        BUG_ON(disks > 255 || ...)
+
+what about just making something like:
+
+#define MAX_DISKS 255
+...
+        int src_cnt = disks - 2;
+...
+        BUG_ON(disks > MAX_DISKS || ...)
+...
+                 unsigned char coefs[MAX_DISKS];
+
+?
+
+-Kees
+
+-- 
+Kees Cook
+Pixel Security
