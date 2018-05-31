@@ -1,9 +1,9 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: Re: [PATCH v2 1/5] crypto: ccree: correct host regs offset
-Date: Thu, 31 May 2018 14:51:22 +0300
-Message-ID: <CAOtvUMfoyuaGac29WUYqvfRr1S7Fof3FgMZo_3K7EaozqbeT6Q@mail.gmail.com>
+Subject: Re: [PATCH v2 5/5] arm64: dts: renesas: r8a7795: add ccree binding
+Date: Thu, 31 May 2018 14:55:06 +0300
+Message-ID: <CAOtvUMeBCH+23c3FDWncMwPPe5N=7yjRKzhyLmFXrYazgGbcJw@mail.gmail.com>
 References: <1527171551-21979-1-git-send-email-gilad@benyossef.com>
- <1527171551-21979-2-git-send-email-gilad@benyossef.com> <20180529161248.fphjnceozoyxqy7v@verge.net.au>
+ <1527171551-21979-6-git-send-email-gilad@benyossef.com> <20180529161936.prhp4oikzamr6u3n@verge.net.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Cc: Magnus Damm <magnus.damm@gmail.com>,
@@ -16,49 +16,35 @@ Cc: Magnus Damm <magnus.damm@gmail.com>,
         Stephen Boyd <sboyd@kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        Ofir Drang <ofir.drang@arm.com>, stable@vger.kernel.org,
+        Ofir Drang <ofir.drang@arm.com>,
         Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
         "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS"
         <devicetree@vger.kernel.org>,
         Linux ARM <linux-arm-kernel@lists.infradead.org>,
         Linux kernel mailing list <linux-kernel@vger.kernel.org>,
         linux-clk <linux-clk@vger.kernel.org>,
-        Linux Crypto Mailing
+        Linux Crypto Mailing List <linux-crypto@vger
 To: Simon Horman <horms@verge.net.au>
-Return-path: <stable-owner@vger.kernel.org>
-In-Reply-To: <20180529161248.fphjnceozoyxqy7v@verge.net.au>
-Sender: stable-owner@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20180529161936.prhp4oikzamr6u3n@verge.net.au>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, May 29, 2018 at 7:12 PM, Simon Horman <horms@verge.net.au> wrote:
-> On Thu, May 24, 2018 at 03:19:06PM +0100, Gilad Ben-Yossef wrote:
->> The product signature and HW revision register have different offset on the
->> older HW revisions.
->> This fixes the problem of the driver failing sanity check on silicon
->> despite working on the FPGA emulation systems.
+On Tue, May 29, 2018 at 7:19 PM, Simon Horman <horms@verge.net.au> wrote:
+> On Thu, May 24, 2018 at 03:19:10PM +0100, Gilad Ben-Yossef wrote:
+>> Add bindings for CryptoCell instance in the SoC.
 >>
->> Fixes: 27b3b22dd98c ("crypto: ccree - add support for older HW revs")
->
-> Did the above introduce a regression that is fixed by this patch
-> or did it add a feature that only works with this patch?
->
-
-Sort of in between - the first patch made more devices work but
-unreliability (it will sometime work, sometime doesn't).
-This one make it work reliably.
-
-> In the case of the latter I would drop the Fixes tag,
-> but I don't feel strongly about it.
->
->> Cc: stable@vger.kernel.org
 >> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 >
-> Minor not below not withstanding,
->
-> Reviewed-by: Simon Horman <horms+renesas@verge.net.au>
+> In so far as I can review the details of this (which is not much) this
+> looks fine to me. I am, however, a little unclear in when it should be
+> accepted.
 
-Thank you for the review and help :-)
+Since Herbert Xu ACKed the driver changes, I would say the only gating
+commit is Geert's CR clock patch.
+If that one is in, than I would say this one should go in as well.
 
+Thanks,
 Gilad
 
 -- 
