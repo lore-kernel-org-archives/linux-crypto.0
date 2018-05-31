@@ -1,56 +1,65 @@
-From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: Re: [PATCH v2 5/5] arm64: dts: renesas: r8a7795: add ccree binding
-Date: Thu, 31 May 2018 14:55:06 +0300
-Message-ID: <CAOtvUMeBCH+23c3FDWncMwPPe5N=7yjRKzhyLmFXrYazgGbcJw@mail.gmail.com>
-References: <1527171551-21979-1-git-send-email-gilad@benyossef.com>
- <1527171551-21979-6-git-send-email-gilad@benyossef.com> <20180529161936.prhp4oikzamr6u3n@verge.net.au>
+From: Gary R Hook <ghook@amd.com>
+Subject: Re: [PATCHv2 0/2] Add new SEV commands
+Date: Thu, 31 May 2018 07:43:13 -0500
+Message-ID: <8210dfee-3370-743a-6e9e-96df0ceadf11@amd.com>
+References: <cover.1527274269.git.Janakarajan.Natarajan@amd.com>
+ <20180530162819.4xbwb3jbbx5dey24@gondor.apana.org.au>
+ <79caff3c-1002-9fea-1ab6-954062435633@amd.com>
+ <20180531064534.ldi2ysuhh2omex5d@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Magnus Damm <magnus.damm@gmail.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will.deacon@arm.com>,
-        Geert Uytterhoeven <geert+renesas@glider.be>,
-        Michael Turquette <mturquette@baylibre.com>,
-        Stephen Boyd <sboyd@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Ofir Drang <ofir.drang@arm.com>,
-        Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
-        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS"
-        <devicetree@vger.kernel.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Linux kernel mailing list <linux-kernel@vger.kernel.org>,
-        linux-clk <linux-clk@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger
-To: Simon Horman <horms@verge.net.au>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: Janakarajan Natarajan <Janakarajan.Natarajan@amd.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Borislav Petkov <bp@suse.de>,
+        Paolo Bonzini <pbonzini@redhat.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        Gary R Hook <gary.hook@amd.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180529161936.prhp4oikzamr6u3n@verge.net.au>
+In-Reply-To: <20180531064534.ldi2ysuhh2omex5d@gondor.apana.org.au>
+Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, May 29, 2018 at 7:19 PM, Simon Horman <horms@verge.net.au> wrote:
-> On Thu, May 24, 2018 at 03:19:10PM +0100, Gilad Ben-Yossef wrote:
->> Add bindings for CryptoCell instance in the SoC.
+On 05/31/2018 01:45 AM, Herbert Xu wrote:
+> On Wed, May 30, 2018 at 01:44:12PM -0500, Gary R Hook wrote:
+>> On 05/30/2018 11:28 AM, Herbert Xu wrote:
+>>> On Fri, May 25, 2018 at 03:23:28PM -0500, Janakarajan Natarajan wrote:
+>>>> This patchset adds two new SEV commands, introduced in SEV API v0.15
+>>>> and v0.16 respectively.
+>>>>
+>>>> * DOWNLOAD_FIRMWARE allows the SEV firmware to be updated if a blob newer
+>>>>     than or similar to the exisiting build is available.
+>>>>
+>>>> * GET_ID allows to query for a unique ID that can be used to retrieve the
+>>>>     Chip Endorsment Key (CEK) public key signed by the AMD SEV Signing Key
+>>>>     (ASK).
+>>>>
+>>>> v1->v2:
+>>>> * Added cover letter.
+>>>> * Misc changes based on Boris' feedback.
+>>>>
+>>>> Janakarajan Natarajan (2):
+>>>>     crypto: ccp: Add DOWNLOAD_FIRMWARE SEV command
+>>>>     crypto: ccp: Add GET_ID SEV command
+>>>>
+>>>>    drivers/crypto/ccp/psp-dev.c | 143 ++++++++++++++++++++++++++++++++++++++++---
+>>>>    drivers/crypto/ccp/psp-dev.h |   4 ++
+>>>>    include/linux/psp-sev.h      |  23 +++++++
+>>>>    include/uapi/linux/psp-sev.h |  12 ++++
+>>>>    4 files changed, 172 insertions(+), 10 deletions(-)
+>>>
+>>> All applied.  Thanks.
 >>
->> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
->
-> In so far as I can review the details of this (which is not much) this
-> looks fine to me. I am, however, a little unclear in when it should be
-> accepted.
+>> Huh. Without a Reviewed-by or an Acked-by?
+> 
+> These patches have been out there for weeks.  If you were going
+> to object you should have done so by now.
 
-Since Herbert Xu ACKed the driver changes, I would say the only gating
-commit is Geert's CR clock patch.
-If that one is in, than I would say this one should go in as well.
+Oh, yes, agreed. This was a question about protocol, not the patches 
+themselves. But if you're happy, I'm happy.
 
-Thanks,
-Gilad
-
--- 
-Gilad Ben-Yossef
-Chief Coffee Drinker
-
-"If you take a class in large-scale robotics, can you end up in a
-situation where the homework eats your dog?"
- -- Jean-Baptiste Queru
+Thanks.
