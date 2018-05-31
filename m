@@ -1,62 +1,70 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCHv2 0/2] Add new SEV commands
-Date: Thu, 31 May 2018 14:45:34 +0800
-Message-ID: <20180531064534.ldi2ysuhh2omex5d@gondor.apana.org.au>
-References: <cover.1527274269.git.Janakarajan.Natarajan@amd.com>
- <20180530162819.4xbwb3jbbx5dey24@gondor.apana.org.au>
- <79caff3c-1002-9fea-1ab6-954062435633@amd.com>
+From: Gilad Ben-Yossef <gilad@benyossef.com>
+Subject: Re: [PATCH v2 1/5] crypto: ccree: correct host regs offset
+Date: Thu, 31 May 2018 14:51:22 +0300
+Message-ID: <CAOtvUMfoyuaGac29WUYqvfRr1S7Fof3FgMZo_3K7EaozqbeT6Q@mail.gmail.com>
+References: <1527171551-21979-1-git-send-email-gilad@benyossef.com>
+ <1527171551-21979-2-git-send-email-gilad@benyossef.com> <20180529161248.fphjnceozoyxqy7v@verge.net.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Janakarajan Natarajan <Janakarajan.Natarajan@amd.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Borislav Petkov <bp@suse.de>,
-        Paolo Bonzini <pbonzini@redhat.com>
-To: Gary R Hook <gary.hook@amd.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <79caff3c-1002-9fea-1ab6-954062435633@amd.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Cc: Magnus Damm <magnus.damm@gmail.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will.deacon@arm.com>,
+        Geert Uytterhoeven <geert+renesas@glider.be>,
+        Michael Turquette <mturquette@baylibre.com>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Ofir Drang <ofir.drang@arm.com>, stable@vger.kernel.org,
+        Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
+        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS"
+        <devicetree@vger.kernel.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Linux kernel mailing list <linux-kernel@vger.kernel.org>,
+        linux-clk <linux-clk@vger.kernel.org>,
+        Linux Crypto Mailing
+To: Simon Horman <horms@verge.net.au>
+Return-path: <stable-owner@vger.kernel.org>
+In-Reply-To: <20180529161248.fphjnceozoyxqy7v@verge.net.au>
+Sender: stable-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, May 30, 2018 at 01:44:12PM -0500, Gary R Hook wrote:
-> On 05/30/2018 11:28 AM, Herbert Xu wrote:
-> > On Fri, May 25, 2018 at 03:23:28PM -0500, Janakarajan Natarajan wrote:
-> > > This patchset adds two new SEV commands, introduced in SEV API v0.15
-> > > and v0.16 respectively.
-> > > 
-> > > * DOWNLOAD_FIRMWARE allows the SEV firmware to be updated if a blob newer
-> > >    than or similar to the exisiting build is available.
-> > > 
-> > > * GET_ID allows to query for a unique ID that can be used to retrieve the
-> > >    Chip Endorsment Key (CEK) public key signed by the AMD SEV Signing Key
-> > >    (ASK).
-> > > 
-> > > v1->v2:
-> > > * Added cover letter.
-> > > * Misc changes based on Boris' feedback.
-> > > 
-> > > Janakarajan Natarajan (2):
-> > >    crypto: ccp: Add DOWNLOAD_FIRMWARE SEV command
-> > >    crypto: ccp: Add GET_ID SEV command
-> > > 
-> > >   drivers/crypto/ccp/psp-dev.c | 143 ++++++++++++++++++++++++++++++++++++++++---
-> > >   drivers/crypto/ccp/psp-dev.h |   4 ++
-> > >   include/linux/psp-sev.h      |  23 +++++++
-> > >   include/uapi/linux/psp-sev.h |  12 ++++
-> > >   4 files changed, 172 insertions(+), 10 deletions(-)
-> > 
-> > All applied.  Thanks.
-> 
-> Huh. Without a Reviewed-by or an Acked-by?
+On Tue, May 29, 2018 at 7:12 PM, Simon Horman <horms@verge.net.au> wrote:
+> On Thu, May 24, 2018 at 03:19:06PM +0100, Gilad Ben-Yossef wrote:
+>> The product signature and HW revision register have different offset on the
+>> older HW revisions.
+>> This fixes the problem of the driver failing sanity check on silicon
+>> despite working on the FPGA emulation systems.
+>>
+>> Fixes: 27b3b22dd98c ("crypto: ccree - add support for older HW revs")
+>
+> Did the above introduce a regression that is fixed by this patch
+> or did it add a feature that only works with this patch?
+>
 
-These patches have been out there for weeks.  If you were going
-to object you should have done so by now.
+Sort of in between - the first patch made more devices work but
+unreliability (it will sometime work, sometime doesn't).
+This one make it work reliably.
 
-Cheers,
+> In the case of the latter I would drop the Fixes tag,
+> but I don't feel strongly about it.
+>
+>> Cc: stable@vger.kernel.org
+>> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+>
+> Minor not below not withstanding,
+>
+> Reviewed-by: Simon Horman <horms+renesas@verge.net.au>
+
+Thank you for the review and help :-)
+
+Gilad
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Gilad Ben-Yossef
+Chief Coffee Drinker
+
+"If you take a class in large-scale robotics, can you end up in a
+situation where the homework eats your dog?"
+ -- Jean-Baptiste Queru
