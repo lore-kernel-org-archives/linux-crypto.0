@@ -1,268 +1,374 @@
-From: Ladvine D Almeida <Ladvine.DAlmeida@synopsys.com>
-Subject: Re: [dm-devel] [PATCH] md: dm-crypt: Add Inline Encryption support
- for dmcrypt
-Date: Mon, 4 Jun 2018 13:15:35 +0000
-Message-ID: <BD7FB879CC136E419544C8E2AE7B9C3020C315@IN01WEMBXA.internal.synopsys.com>
-References: <e9120efc-1e25-79c8-6132-9062dd030539@synopsys.com>
- <7a510610-9133-39aa-6841-3925c532f3c0@gmail.com>
- <BD7FB879CC136E419544C8E2AE7B9C3020BB94@IN01WEMBXA.internal.synopsys.com>
- <20180601144625.GA8111@zzz.localdomain>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Crypto Update for 4.18
+Date: Tue, 5 Jun 2018 01:15:52 +0800
+Message-ID: <20180604171552.lctgpei4y4xzogoo@gondor.apana.org.au>
+References: <20161119102748.GA4277@gondor.apana.org.au>
+ <20161213132414.GA7898@gondor.apana.org.au>
+ <20170223125141.GA17400@gondor.apana.org.au>
+ <20170904101225.GA12613@gondor.apana.org.au>
+ <20171113074346.GA20245@gondor.apana.org.au>
+ <20180129145012.GA12805@gondor.apana.org.au>
+ <20180404152752.GA11822@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-Cc: Milan Broz <gmazyland@gmail.com>, Alasdair Kergon <agk@redhat.com>,
-        "Mike Snitzer" <snitzer@redhat.com>,
-        Joao Pinto <Joao.Pinto@synopsys.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        device-mapper development <dm-devel@redhat.com>,
-        Manjunath M Bettegowda <Manjunath.MB@synopsys.com>,
-        Tejas Joglekar <Tejas.Joglekar@synopsys.com>,
-        Prabu Thangamuthu <Prabu.T@synopsys.com>,
-        "tytso@mit.edu" <tytso@mit.edu>,
-        "jaegeuk@kernel.org" <jaegeuk@kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-To: Eric Biggers <ebiggers3@gmail.com>,
-        Ladvine D Almeida <Ladvine.DAlmeida@synopsys.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Language: en-US
+Content-Disposition: inline
+In-Reply-To: <20180404152752.GA11822@gondor.apana.org.au>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Friday 01 June 2018 03:46 PM, Eric Biggers wrote:=0A=
-> Hi Ladvine,=0A=
->=0A=
-> On Wed, May 30, 2018 at 02:52:07PM +0000, Ladvine D Almeida wrote:=0A=
->> On Monday 28 May 2018 05:33 PM, Milan Broz wrote:=0A=
->>> On 05/28/2018 03:01 PM, Ladvine D Almeida wrote:=0A=
->>>> This patch adds new option=0A=
->>>>     -- perform_inline_encrypt=0A=
->>>> that set the option inside dmcrypt to use inline encryption for=0A=
->>>> the configured mapping. I want to introduce inline encryption support=
-=0A=
->>>> in the UFS Host Controller driver. The usage of the same for accomplis=
-hing=0A=
->>>> the Full Disk Encryption is done by the following changes in the=0A=
->>>> dmcrypt subsystem:=0A=
->>>>     - New function crypt_inline_encrypt_submit() is added to the=0A=
->>>> dmcrypt which associate the crypto context to the bios which=0A=
->>>> are submitted by the subsystem.=0A=
->>>>     - Successful configuration for the inline encryption will result i=
-n=0A=
->>>> the crypto transformation job being bypassed in the dmcrypt layer and =
-the=0A=
->>>> actual encryption happens inline to the block device.=0A=
->>> I am not sure this is a good idea. Dm-crypt should never ever forward=
-=0A=
->>> plaintext sector to underlying device.=0A=
->>>=0A=
->>> And you do not even check that your hw is available in the underlying d=
-evice!=0A=
->>>=0A=
->>> If you want to use dm-crypt, write a crypto API driver for your crypto =
-hw that defines=0A=
->>> specific cipher and let dm-crypt use this cipher (no patches needed in =
-this case!)=0A=
->> Thanks for sharing your review.=0A=
->> I am sharing the links for the patches which are related to inline encry=
-ption below:=0A=
->> https://urldefense.proofpoint.com/v2/url?u=3Dhttps-3A__lkml.org_lkml_201=
-8_5_28_1153&d=3DDwIBAg&c=3DDPL6_X_6JkXFx7AXWqB0tg&r=3Dz00zRD9ARrwHpe-XSl1Ot=
-Up1uNKGYoXI1G2DhOaDDBI&m=3DqwfogRmPFyDoEzG0-jvbwxKzFR6CEey4rqhZlWnAyGg&s=3D=
-McNQrXeM_-QGjnBJCyJklJ7cBXfcGHLy-JcMFHMq1z0&e=3D=0A=
->> https://urldefense.proofpoint.com/v2/url?u=3Dhttps-3A__lkml.org_lkml_201=
-8_5_28_1196&d=3DDwIBAg&c=3DDPL6_X_6JkXFx7AXWqB0tg&r=3Dz00zRD9ARrwHpe-XSl1Ot=
-Up1uNKGYoXI1G2DhOaDDBI&m=3DqwfogRmPFyDoEzG0-jvbwxKzFR6CEey4rqhZlWnAyGg&s=3D=
-t11MogIToXI_6PCllWgf1C16-dSOqNqMIv_T2EK4INw&e=3D=0A=
->> https://urldefense.proofpoint.com/v2/url?u=3Dhttps-3A__lkml.org_lkml_201=
-8_5_28_1158&d=3DDwIBAg&c=3DDPL6_X_6JkXFx7AXWqB0tg&r=3Dz00zRD9ARrwHpe-XSl1Ot=
-Up1uNKGYoXI1G2DhOaDDBI&m=3DqwfogRmPFyDoEzG0-jvbwxKzFR6CEey4rqhZlWnAyGg&s=3D=
-28i-jGwv-oAAIrSLGhoPppWb8XY1m32JYPsssF-LvdU&e=3D=0A=
->> https://urldefense.proofpoint.com/v2/url?u=3Dhttps-3A__lkml.org_lkml_201=
-8_5_28_1173&d=3DDwIBAg&c=3DDPL6_X_6JkXFx7AXWqB0tg&r=3Dz00zRD9ARrwHpe-XSl1Ot=
-Up1uNKGYoXI1G2DhOaDDBI&m=3DqwfogRmPFyDoEzG0-jvbwxKzFR6CEey4rqhZlWnAyGg&s=3D=
-1KRdmOB67zrJQDYGEAUBvdxBtYI6cPrueQ1PH6Io8g0&e=3D=0A=
->> https://urldefense.proofpoint.com/v2/url?u=3Dhttps-3A__lkml.org_lkml_201=
-8_5_28_1178&d=3DDwIBAg&c=3DDPL6_X_6JkXFx7AXWqB0tg&r=3Dz00zRD9ARrwHpe-XSl1Ot=
-Up1uNKGYoXI1G2DhOaDDBI&m=3DqwfogRmPFyDoEzG0-jvbwxKzFR6CEey4rqhZlWnAyGg&s=3D=
-l4PRVW9Oo0QObWye_98AuxGSS3hLhdN5uMKCW-bJZkE&e=3D=0A=
->>=0A=
->> we have crypto API implementation for the hardware for  XTS algorithm, w=
-hich will get registered when=0A=
->> the XTS algorithm capability of the inline encryption engine inside UFS =
-Host Controller get detected by the UFS HC=0A=
->> driver. dm-crypt will be using this registered cipher.=0A=
->>  dm-crypt patch is unavoidable because the encrypt/decrypt function cann=
-ot perform the transformation=0A=
->> when inline encryption engine is involved. Also, it demands forwarding t=
-he plaintext sectors to the underlying=0A=
->> block device driver and  the crypto transformation happens internally in=
- controller when data transfer happens.=0A=
->>=0A=
-> I appreciate that you're working on this, but can you please send the ful=
-l=0A=
-> series to the relevant mailing lists, so that everyone has the needed con=
-text?=0A=
-> Single random patches for this are basically impossible to review.  OFC t=
-hat=0A=
-> also means including a cover letter that explains the overall problem and=
- your=0A=
-> solution.  In the Cc list I also recommend including the ext4 maintainer=
-=0A=
-> Theodore Ts'o <tytso@mit.edu>, who led a discussion at LSFMM 2017 about t=
-his=0A=
-> topic (https://urldefense.proofpoint.com/v2/url?u=3Dhttps-3A__lwn.net_Art=
-icles_717754_&d=3DDwIBAg&c=3DDPL6_X_6JkXFx7AXWqB0tg&r=3Dz00zRD9ARrwHpe-XSl1=
-OtUp1uNKGYoXI1G2DhOaDDBI&m=3DqwfogRmPFyDoEzG0-jvbwxKzFR6CEey4rqhZlWnAyGg&s=
-=3Dx52JiuXr2DWZDm9hObhTwe-He-2waTLXmz9E1Tmz7Y0&e=3D), and the f2fs maintain=
-er Jaegeuk Kim=0A=
-> <jaegeuk@kernel.org> who has had to deal with this stuff in an Android de=
-vice=0A=
-> kernel, but for another vendor's inline encryption hardware.=0A=
-=0A=
-Eric, Thanks for your suggestions. I will add the relevant persons in the c=
-c list.=0A=
-=0A=
-The patches were generated in the below manner:=0A=
-For block level changes:=0A=
-https://patchwork.kernel.org/patch/10432255/=0A=
-=0A=
-For dmcrypt changes for Full Disk Encryption support:=0A=
-https://lkml.org/lkml/2018/5/28/1027=0A=
-=0A=
-UFS Host Controller driver changes, patch-series for Inline Encryption supp=
-ort:=0A=
-https://lkml.org/lkml/2018/5/28/1187 -- cover letter=0A=
-https://lkml.org/lkml/2018/5/28/1153=0A=
-https://lkml.org/lkml/2018/5/28/1196=0A=
-https://lkml.org/lkml/2018/5/28/1158=0A=
-https://lkml.org/lkml/2018/5/28/1173=0A=
-https://lkml.org/lkml/2018/5/28/1178=0A=
-=0A=
-=0A=
->   I assume your=0A=
-> solution will work for other vendors too?  I think inline encryption is p=
-art of=0A=
-> the latest UFS specificaton now, so the latest hardware does it in a=0A=
-> "standardized" way and doesn't require ad-hoc vendor-specific stuff --- r=
-ight?=0A=
-=0A=
-Yes, correct. Implementation is done referring to Universal Flash Storage H=
-ost Controller Interface(UFSHCI)=0A=
-document Version 3.0. ** There is no vendor-specific implementation**.=0A=
-> And do you have any plans for inline encryption support with fscrypt (ext=
-4/f2fs=0A=
-> encryption, a.k.a. what Android calls "File-Based Encryption")?  We need =
-a=0A=
-> design for inline encryption in the upstream kernel that is sufficiently =
-general=0A=
-> to work for all these vendors and use cases, not just specific ones.=0A=
-=0A=
-Support for the File Based Encryption requires modifications in the fs/cryp=
-to in the=0A=
-similar line as modifications in dmcrypt. But, one challenging thing could =
-be algorithm=0A=
-implementation is agnostic about the block device with which it is used.=0A=
-Registered algorithm can be used by filesystem with block device that doesn=
-'t have inline encryption=0A=
-capability. How to identify the same and do a fallback in this case?=0A=
-=0A=
->=0A=
-> Just at a quick glance, you also seem to be abusing the crypto API by exp=
-osing=0A=
-> inline encryption capabilities as a skcipher_alg.  With inline encryption=
- by=0A=
-> definition you can't actually do encryption outside of a block device req=
-uest;=0A=
-> as a result, your patch has to use a fallback algorithm to do the actual=
-=0A=
-> encryption for the skcipher_alg, which makes no sense.  So it is not at a=
-ll=0A=
-> clear to me that you should use the crypto API at all, as opposed to havi=
-ng it=0A=
-> be purely a block layer thing.  (Please also Cc linux-crypto if you are d=
-oing=0A=
-> significant work related to the crypto API.)=0A=
-=0A=
-The idea behind registering this way is to support fallback incase the hard=
-ware=0A=
-misses the capability. eg:- when the inline encryption engine cannot perfor=
-m=0A=
-transformation using 384bits key for XTS algorithm, it could be accomplishe=
-d now=0A=
-using a fallback.=0A=
-The normal flow for the inline encryption will not make use of the encrypt/=
-decrypt=0A=
-functions:=0A=
-    - It use setkey function to identify the key configuration index(when t=
-he hardware=0A=
-        support multiple key slots) and to program the key.=0A=
-    - the dm-crypt layer bypasses calling the encrypt/decrypt function and =
-passes reference=0A=
-       to the crypto information in each bio that is submitted by it.=0A=
-The intention behind implementation as crypto API is to stick to LKCF so th=
-at existing utilities=0A=
-can be used.=0A=
-=0A=
-=0A=
->=0A=
->>> If I read the patch correctly, you do not check any parameters for=0A=
->>> compatibility with your hw support (cipher, mode, IV algorithm, key len=
-gth, sector size ...)=0A=
->> I am registering an algorithm with cipher mode, IV size, block size, sup=
-ported key size etc. for use by dm-crypt=0A=
->> as per the hardware capability of inline encryption engine.=0A=
->> If any other cipher mode, etc is used during the setup stage, DM-Crypt w=
-ill work as normal.=0A=
->>=0A=
->>> It seems like if the "perform_inline_encrypt" option is present, you ju=
-st submit=0A=
->>> the whole bio to your code with new INLINE_ENCRYPTION bit set.=0A=
->> when the optional argument "perform_inline_encrypt" is set, we are not u=
-nconditionally sending the bio=0A=
->> to the block devices. The steps are explained below:=0A=
->> 1. user invokes the dm-setup command with the registered cipher "xts" an=
-d with the optional argument=0A=
->> "perform_inline_encrypt".=0A=
->> 2. dm-setup invokes the setkey function of the newly introduced algorith=
-m, which finds the available key slots=0A=
->> to be programmed(UFS Host controller Inline Encryption engine has multip=
-le keyslots), program the key slot,=0A=
->> and return the key slot index as return value of the set key function.=
-=0A=
->> 3. When read/write operation happens, crypt_map() function in dm-crypt v=
-alidates whether there is associated=0A=
->> key configuration index for the request. The Bio will be submitted direc=
-tly in this case only with the associated=0A=
->> crypto context.=0A=
->> 4. Block device driver, eg. UFS host controller driver will create the T=
-ransfer requests as per this crypto context and=0A=
->> encryption happens inside the controller.=0A=
->>=0A=
->>> What happens, if the cipher in table is different from what your hw is =
-doing?=0A=
->> In this case, the dm-crypt will work as previous. This is because the se=
-tkey returns 0.=0A=
->> whenever there is key configuration index associated, setkey returns ind=
-ex value(greater than 0). The bios are submitted=0A=
->> with that information to underlying block device drivers.=0A=
->> Also, care is taken to ensure that fallback will happen incase hardware =
-lacks the support of any key lengths.=0A=
->>=0A=
->> Appreciate your suggestions/feedback. We are trying to bring modificatio=
-ns into the subsystem to support controllers with=0A=
->> inline encryption capabilities and tried our best to take care of any vu=
-lnerabilities or risks associated to same.=0A=
->> Inline encryption engines got huge advantage over the accelerators/softw=
-are algorithms that it removes overhead associated=0A=
->> to current implementation like performing transformation on 512 byte chu=
-nks, allocation of scatterlists etc.=0A=
-> Thanks,=0A=
->=0A=
-> Eric=0A=
->=0A=
-=0A=
-Best Regards,=0A=
-=0A=
-Ladvine=0A=
-=0A=
+Hi Linus: 
+
+Here is the crypto update for 4.18:
+
+API:
+
+- Decryption test vectors are now automatically generated from
+  encryption test vectors.
+
+Algorithms:
+
+- Fix unaligned access issues in crc32/crc32c.
+- Add zstd compression algorithm.
+- Add AEGIS.
+- Add MORUS.
+
+Drivers:
+
+- Add accelerated AEGIS/MORUS on x86.
+- Add accelerated SM4 on arm64.
+- Removed x86 assembly salsa implementation as it is slower than C.
+- Add authenc(hmac(sha*), cbc(aes)) support in inside-secure.
+- Add ctr(aes) support in crypto4xx.
+- Add hardware key support in ccree.
+- Add support for new Centaur CPU in via-rng.
+
+
+Please pull from
+
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
+
+
+Adam Langley (1):
+      crypto: clarify licensing of OpenSSL asm code
+
+Antoine Tenart (10):
+      crypto: inside-secure - remove VLAs
+      crypto: inside-secure - rework cipher functions for future AEAD support
+      crypto: inside-secure - rework the alg type settings in the context
+      crypto: inside-secure - make the context control size dynamic
+      crypto: inside-secure - make the key and context size computation dynamic
+      crypto: inside-secure - fix the hash then encrypt/decrypt types
+      crypto: inside-secure - improve error reporting
+      crypto: inside-secure - authenc(hmac(sha256), cbc(aes)) support
+      crypto: inside-secure - authenc(hmac(sha224), cbc(aes)) support
+      crypto: inside-secure - authenc(hmac(sha1), cbc(aes)) support
+
+Ard Biesheuvel (12):
+      crypto: sm4 - export encrypt/decrypt routines to other drivers
+      crypto: arm64 - add support for SM4 encryption using special instructions
+      crypto: arm64/sha1-ce - yield NEON after every block of input
+      crypto: arm64/sha2-ce - yield NEON after every block of input
+      crypto: arm64/aes-ccm - yield NEON after every block of input
+      crypto: arm64/aes-blk - yield NEON after every block of input
+      crypto: arm64/aes-bs - yield NEON after every block of input
+      crypto: arm64/aes-ghash - yield NEON after every block of input
+      crypto: arm64/crc32-ce - yield NEON after every block of input
+      crypto: arm64/crct10dif-ce - yield NEON after every block of input
+      crypto: arm64/sha3-ce - yield NEON after every block of input
+      crypto: arm64/sha512-ce - yield NEON after every block of input
+
+Atul Gupta (7):
+      crypto: chelsio - request to HW should wrap
+      crypto: chtls - generic handling of data and hdr
+      crypto: chtls - key len correction
+      crypto: chtls - wait for memory sendmsg, sendpage
+      crypto: chtls - dereference null variable
+      crypto: chtls - kbuild warnings
+      crypto: chtls - free beyond end rspq_skb_cache
+
+Bin Liu (1):
+      crypto: omap-sham - fix memleak
+
+Christian Lamparter (7):
+      crypto: crypto4xx - performance optimizations
+      crypto: crypto4xx - convert to skcipher
+      crypto: crypto4xx - avoid VLA use
+      crypto: crypto4xx - add aes-ctr support
+      crypto: crypto4xx - properly set IV after de- and encrypt
+      crypto: crypto4xx - extend aead fallback checks
+      crypto: crypto4xx - put temporary dst sg into request ctx
+
+Colin Ian King (5):
+      crypto: chelsio - don't leak information from the stack to userspace
+      crypto: chelsio - remove redundant assignment to cdev->ports
+      crypto: ghash-clmulni - fix spelling mistake: "acclerated" -> "accelerated"
+      hwrng: n2 - fix spelling mistake: "restesting" -> "retesting"
+      crypto: nx - fix spelling mistake: "seqeunce" -> "sequence"
+
+Conor McLoughlin (1):
+      crypto: qat - Add MODULE_FIRMWARE for all qat drivers
+
+Eric Biggers (13):
+      crypto: crc32-generic - use unaligned access macros when needed
+      crypto: crc32c-generic - remove cra_alignmask
+      crypto: crc32-generic - remove __crc32_le()
+      crypto: testmgr - remove bfin_crc "hmac(crc32)" test vectors
+      crypto: testmgr - fix testing OPTIONAL_KEY hash algorithms
+      crypto: testmgr - add more unkeyed crc32 and crc32c test vectors
+      crypto: testmgr - add extra ecb(des) encryption test vectors
+      crypto: testmgr - make an cbc(des) encryption test vector chunked
+      crypto: testmgr - add extra ecb(tnepres) encryption test vectors
+      crypto: testmgr - add extra kw(aes) encryption test vector
+      crypto: testmgr - eliminate redundant decryption test vectors
+      crypto: x86/salsa20 - remove x86 salsa20 implementations
+      crypto: salsa20 - Revert "crypto: salsa20 - export generic helpers"
+
+Fabio Estevam (4):
+      crypto: caam - staticize caam_get_era()
+      crypto: caam - allow retrieving 'era' from register
+      crypto: rsa - Remove unneeded error assignment
+      crypto: caam: - Use kmemdup() function
+
+Geert Uytterhoeven (1):
+      crypto: drivers - Remove depends on HAS_DMA in case of platform dependency
+
+Gilad Ben-Yossef (6):
+      crypto: ccree - enable support for hardware keys
+      crypto: ccree - use proper printk format
+      crypto: testmgr - reorder paes test lexicographically
+      crypto: ccree - correct host regs offset
+      crypto: ccree - better clock handling
+      crypto: ccree - silence debug prints
+
+Gustavo A. R. Silva (1):
+      crypto: chelsio - Fix potential NULL pointer dereferences
+
+Harsh Jain (3):
+      crypto: chelsio - Return -ENOSPC for transient busy indication.
+      crypt: chelsio - Send IV as Immediate for cipher algo
+      crypto: chelsio - Remove separate buffer used for DMA map B0 block in CCM
+
+Horia Geantă (8):
+      crypto: caam - fix DMA mapping dir for generated IV
+      crypto: caam - fix IV DMA mapping and updating
+      crypto: caam/qi - fix IV DMA mapping and updating
+      crypto: caam - strip input zeros from RSA input buffer
+      crypto: caam - fix size of RSA prime factor q
+      crypto: caam - fix MC firmware detection
+      crypto: caam - fix rfc4543 descriptors
+      crypto: caam/qi - fix warning in init_cgr()
+
+Jan Glauber (5):
+      crypto: cavium - Fix fallout from CONFIG_VMAP_STACK
+      crypto: cavium - Limit result reading attempts
+      crypto: cavium - Prevent division by zero
+      crypto: cavium - Fix statistics pending request value
+      crypto: cavium - Fix smp_processor_id() warnings
+
+Janakarajan Natarajan (2):
+      crypto: ccp - Add DOWNLOAD_FIRMWARE SEV command
+      crypto: ccp - Add GET_ID SEV command
+
+Kees Cook (2):
+      crypto: ecc - Actually remove stack VLA usage
+      crypto: tcrypt - Remove VLA usage
+
+Mahipal Challa (1):
+      crypto: testmgr - Allow different compression results
+
+Michael Ellerman (2):
+      crypto: vmx - Remove overly verbose printk from AES init routines
+      crypto: vmx - Remove overly verbose printk from AES XTS init
+
+Nick Terrell (1):
+      crypto: zstd - Add zstd support
+
+Ondrej Mosnacek (9):
+      crypto: aegis - Add generic AEGIS AEAD implementations
+      crypto: testmgr - Add test vectors for AEGIS
+      crypto: x86 - Add optimized AEGIS implementations
+      crypto: morus - Add generic MORUS AEAD implementations
+      crypto: testmgr - Add test vectors for MORUS
+      crypto: morus - Add common SIMD glue code for MORUS
+      crypto: x86 - Add optimized MORUS implementations
+      crypto: x86/aegis256 - Fix wrong key buffer size
+      crypto: morus - Mark MORUS SIMD glue as x86-specific
+
+Salvatore Mesoraca (2):
+      crypto: api - laying defines and checks for statically allocated buffers
+      crypto: remove several VLAs
+
+Tudor-Dan Ambarus (2):
+      crypto: authenc - don't leak pointers to authenc keys
+      crypto: authencesn - don't leak pointers to authenc keys
+
+Varsha Rao (1):
+      crypto: cavium - Remove unnecessary parentheses
+
+Wenwen Wang (1):
+      crypto: chtls - fix a missing-check bug
+
+Wolfram Sang (1):
+      crypto: drivers - simplify getting .drvdata
+
+davidwang (1):
+      hwrng: via - support new Centaur CPU
+
+lionel.debieve@st.com (2):
+      hwrng: stm32 - define default state for rng driver
+      hwrng: stm32 - fix pm_suspend issue
+
+ arch/arm/crypto/sha1-armv4-large.S             |   10 +
+ arch/arm/crypto/sha256-armv4.pl                |   11 +-
+ arch/arm/crypto/sha256-core.S_shipped          |   11 +-
+ arch/arm/crypto/sha512-armv4.pl                |   11 +-
+ arch/arm/crypto/sha512-core.S_shipped          |   11 +-
+ arch/arm64/crypto/Kconfig                      |    6 +
+ arch/arm64/crypto/Makefile                     |    3 +
+ arch/arm64/crypto/aes-ce-ccm-core.S            |  150 +-
+ arch/arm64/crypto/aes-ce.S                     |   15 +-
+ arch/arm64/crypto/aes-modes.S                  |  331 +-
+ arch/arm64/crypto/aes-neonbs-core.S            |  305 +-
+ arch/arm64/crypto/crc32-ce-core.S              |   40 +-
+ arch/arm64/crypto/crct10dif-ce-core.S          |   32 +-
+ arch/arm64/crypto/ghash-ce-core.S              |  113 +-
+ arch/arm64/crypto/ghash-ce-glue.c              |   28 +-
+ arch/arm64/crypto/sha1-ce-core.S               |   42 +-
+ arch/arm64/crypto/sha2-ce-core.S               |   37 +-
+ arch/arm64/crypto/sha256-core.S_shipped        |   12 +-
+ arch/arm64/crypto/sha3-ce-core.S               |   77 +-
+ arch/arm64/crypto/sha512-armv8.pl              |   12 +-
+ arch/arm64/crypto/sha512-ce-core.S             |   27 +-
+ arch/arm64/crypto/sha512-core.S_shipped        |   12 +-
+ arch/arm64/crypto/sm4-ce-core.S                |   36 +
+ arch/arm64/crypto/sm4-ce-glue.c                |   73 +
+ arch/x86/crypto/Makefile                       |   25 +-
+ arch/x86/crypto/aegis128-aesni-asm.S           |  749 +
+ arch/x86/crypto/aegis128-aesni-glue.c          |  407 +
+ arch/x86/crypto/aegis128l-aesni-asm.S          |  825 +
+ arch/x86/crypto/aegis128l-aesni-glue.c         |  407 +
+ arch/x86/crypto/aegis256-aesni-asm.S           |  702 +
+ arch/x86/crypto/aegis256-aesni-glue.c          |  407 +
+ arch/x86/crypto/ghash-clmulni-intel_glue.c     |    2 +-
+ arch/x86/crypto/morus1280-avx2-asm.S           |  621 +
+ arch/x86/crypto/morus1280-avx2-glue.c          |   68 +
+ arch/x86/crypto/morus1280-sse2-asm.S           |  895 +
+ arch/x86/crypto/morus1280-sse2-glue.c          |   68 +
+ arch/x86/crypto/morus1280_glue.c               |  302 +
+ arch/x86/crypto/morus640-sse2-asm.S            |  614 +
+ arch/x86/crypto/morus640-sse2-glue.c           |   68 +
+ arch/x86/crypto/morus640_glue.c                |  298 +
+ arch/x86/crypto/salsa20-i586-asm_32.S          |  938 -
+ arch/x86/crypto/salsa20-x86_64-asm_64.S        |  805 -
+ arch/x86/crypto/salsa20_glue.c                 |   91 -
+ crypto/Kconfig                                 |  138 +-
+ crypto/Makefile                                |    6 +
+ crypto/aegis.h                                 |   80 +
+ crypto/aegis128.c                              |  463 +
+ crypto/aegis128l.c                             |  527 +
+ crypto/aegis256.c                              |  478 +
+ crypto/algapi.c                                |   10 +
+ crypto/authenc.c                               |    1 +
+ crypto/authencesn.c                            |    1 +
+ crypto/cfb.c                                   |    7 +-
+ crypto/cipher.c                                |    3 +-
+ crypto/crc32_generic.c                         |   15 +-
+ crypto/crc32c_generic.c                        |    8 +-
+ crypto/ctr.c                                   |    4 +-
+ crypto/cts.c                                   |    5 +-
+ crypto/ecc.c                                   |   66 +-
+ crypto/ecc.h                                   |    4 +-
+ crypto/ecdh.c                                  |    4 +-
+ crypto/morus1280.c                             |  549 +
+ crypto/morus640.c                              |  544 +
+ crypto/pcbc.c                                  |    5 +-
+ crypto/rsa.c                                   |    1 -
+ crypto/salsa20_generic.c                       |   20 +-
+ crypto/sm4_generic.c                           |   10 +-
+ crypto/tcrypt.c                                |  122 +-
+ crypto/testmgr.c                               |  613 +-
+ crypto/testmgr.h                               |47127 +++++++++++-------------
+ crypto/zstd.c                                  |  265 +
+ drivers/char/hw_random/Kconfig                 |    1 +
+ drivers/char/hw_random/n2-drv.c                |    2 +-
+ drivers/char/hw_random/stm32-rng.c             |    9 +-
+ drivers/char/hw_random/via-rng.c               |    2 +-
+ drivers/crypto/Kconfig                         |   16 +-
+ drivers/crypto/amcc/crypto4xx_alg.c            |  231 +-
+ drivers/crypto/amcc/crypto4xx_core.c           |  317 +-
+ drivers/crypto/amcc/crypto4xx_core.h           |   35 +-
+ drivers/crypto/caam/caamalg.c                  |  231 +-
+ drivers/crypto/caam/caamalg_desc.c             |    4 +-
+ drivers/crypto/caam/caamalg_qi.c               |  227 +-
+ drivers/crypto/caam/caampkc.c                  |   71 +-
+ drivers/crypto/caam/caampkc.h                  |    8 +
+ drivers/crypto/caam/ctrl.c                     |   78 +-
+ drivers/crypto/caam/ctrl.h                     |    2 -
+ drivers/crypto/caam/intern.h                   |    1 +
+ drivers/crypto/caam/qi.c                       |    5 +-
+ drivers/crypto/caam/regs.h                     |    6 +
+ drivers/crypto/cavium/zip/common.h             |   21 +
+ drivers/crypto/cavium/zip/zip_crypto.c         |   22 +-
+ drivers/crypto/cavium/zip/zip_deflate.c        |    4 +-
+ drivers/crypto/cavium/zip/zip_device.c         |    4 +-
+ drivers/crypto/cavium/zip/zip_inflate.c        |    4 +-
+ drivers/crypto/cavium/zip/zip_main.c           |   24 +-
+ drivers/crypto/cavium/zip/zip_main.h           |    1 -
+ drivers/crypto/cavium/zip/zip_regs.h           |   42 +-
+ drivers/crypto/ccp/psp-dev.c                   |  143 +-
+ drivers/crypto/ccp/psp-dev.h                   |    4 +
+ drivers/crypto/ccree/cc_cipher.c               |  350 +-
+ drivers/crypto/ccree/cc_cipher.h               |   30 +-
+ drivers/crypto/ccree/cc_debugfs.c              |    7 +-
+ drivers/crypto/ccree/cc_driver.c               |   36 +-
+ drivers/crypto/ccree/cc_driver.h               |    2 +
+ drivers/crypto/ccree/cc_host_regs.h            |    6 +-
+ drivers/crypto/chelsio/chcr_algo.c             |  303 +-
+ drivers/crypto/chelsio/chcr_algo.h             |    3 +-
+ drivers/crypto/chelsio/chcr_core.h             |    2 +-
+ drivers/crypto/chelsio/chcr_crypto.h           |   15 +-
+ drivers/crypto/chelsio/chcr_ipsec.c            |   35 +-
+ drivers/crypto/chelsio/chtls/chtls.h           |   11 +-
+ drivers/crypto/chelsio/chtls/chtls_cm.c        |   28 +-
+ drivers/crypto/chelsio/chtls/chtls_hw.c        |    6 +-
+ drivers/crypto/chelsio/chtls/chtls_io.c        |  158 +-
+ drivers/crypto/chelsio/chtls/chtls_main.c      |   16 +-
+ drivers/crypto/exynos-rng.c                    |    6 +-
+ drivers/crypto/inside-secure/safexcel.c        |   32 +
+ drivers/crypto/inside-secure/safexcel.h        |   44 +-
+ drivers/crypto/inside-secure/safexcel_cipher.c |  642 +-
+ drivers/crypto/inside-secure/safexcel_hash.c   |   23 +-
+ drivers/crypto/nx/nx-842-powernv.c             |    2 +-
+ drivers/crypto/omap-sham.c                     |    2 +-
+ drivers/crypto/picoxcell_crypto.c              |    6 +-
+ drivers/crypto/qat/qat_c3xxx/adf_drv.c         |    2 +
+ drivers/crypto/qat/qat_c62x/adf_drv.c          |    2 +
+ drivers/crypto/qat/qat_dh895xcc/adf_drv.c      |    1 +
+ drivers/crypto/vmx/aes.c                       |    2 -
+ drivers/crypto/vmx/aes_cbc.c                   |    3 -
+ drivers/crypto/vmx/aes_ctr.c                   |    2 -
+ drivers/crypto/vmx/aes_xts.c                   |    2 -
+ drivers/crypto/vmx/aesp8-ppc.pl                |   49 +-
+ drivers/crypto/vmx/ghash.c                     |    2 -
+ drivers/crypto/vmx/ghashp8-ppc.pl              |    9 +
+ include/crypto/algapi.h                        |    8 +
+ include/crypto/morus1280_glue.h                |  137 +
+ include/crypto/morus640_glue.h                 |  137 +
+ include/crypto/morus_common.h                  |   23 +
+ include/crypto/salsa20.h                       |   27 -
+ include/crypto/sm4.h                           |    3 +
+ include/linux/psp-sev.h                        |   23 +
+ include/uapi/linux/psp-sev.h                   |   12 +
+ 141 files changed, 34902 insertions(+), 29595 deletions(-)
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
