@@ -1,41 +1,83 @@
-From: Christoph Hellwig <hch@infradead.org>
-Subject: Re: [PATCH] md: dm-crypt: Add Inline Encryption support for dmcrypt
-Date: Wed, 6 Jun 2018 06:15:15 -0700
-Message-ID: <20180606131515.GB12737@infradead.org>
-References: <e9120efc-1e25-79c8-6132-9062dd030539@synopsys.com>
- <7a510610-9133-39aa-6841-3925c532f3c0@gmail.com>
- <BD7FB879CC136E419544C8E2AE7B9C3020BB94@IN01WEMBXA.internal.synopsys.com>
- <20180601081642.GA25973@infradead.org>
- <BD7FB879CC136E419544C8E2AE7B9C3020C5D6@IN01WEMBXA.internal.synopsys.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Christoph Hellwig <hch@infradead.org>,
-        Milan Broz <gmazyland@gmail.com>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Manjunath M Bettegowda <Manjunath.MB@synopsys.com>,
-        Prabu Thangamuthu <Prabu.T@synopsys.com>,
-        Tejas Joglekar <Tejas.Joglekar@synopsys.com>,
-        device-mapper development <dm-devel@redhat.com>,
-        Joao Pinto <Joao.Pinto@synopsys.com>,
-        "tytso@mit.edu" <tytso@mit.edu>,
-        "jaegeuk@kernel.org" <jaegeuk@kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-To: Ladvine D Almeida <Ladvine.DAlmeida@synopsys.com>
+From: Gilad Ben-Yossef <gilad@benyossef.com>
+Subject: [PATCH] crypto: ccree: fix iv copying for small buffers
+Date: Thu,  7 Jun 2018 09:58:47 +0100
+Message-ID: <1528361927-4172-1-git-send-email-gilad@benyossef.com>
+Cc: Ofir Drang <ofir.drang@arm.com>, stable@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <BD7FB879CC136E419544C8E2AE7B9C3020C5D6@IN01WEMBXA.internal.synopsys.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Jun 06, 2018 at 10:04:14AM +0000, Ladvine D Almeida wrote:
-> The idea is to make use of the existing utilities like dmsetup to configure the keys, mapping etc.
+We are copying our last cipher block into the request for use as IV as
+required by the Crypto API but we failed to handle correctly the case the
+buffer we are working on is smaller than a block. Fix it by calculating
+how much we need to copy based on buffer size.
 
-So fix the utilities to support your encryption instead of implementing
-kernel-level shim code.
+CC: stable@vger.kernel.org
+Fixes: 63ee04c8b491 ("crypto: ccree - add skcipher support")
+Reported by: Hadar Gat <hadar.gat@arm.com>
+Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+---
+ drivers/crypto/ccree/cc_cipher.c | 30 ++++++++++++++++++++++++------
+ 1 file changed, 24 insertions(+), 6 deletions(-)
 
-> TCG Opal/Opalite is FDE solution. right?
-
-Doesn't have to the full disk, although that is the typical use case.
+diff --git a/drivers/crypto/ccree/cc_cipher.c b/drivers/crypto/ccree/cc_cipher.c
+index d2810c1..a07547f 100644
+--- a/drivers/crypto/ccree/cc_cipher.c
++++ b/drivers/crypto/ccree/cc_cipher.c
+@@ -616,9 +616,18 @@ static void cc_cipher_complete(struct device *dev, void *cc_req, int err)
+ 		memcpy(req->iv, req_ctx->backup_info, ivsize);
+ 		kzfree(req_ctx->backup_info);
+ 	} else if (!err) {
+-		scatterwalk_map_and_copy(req->iv, req->dst,
+-					 (req->cryptlen - ivsize),
+-					 ivsize, 0);
++		unsigned int len;
++
++		if (req->cryptlen > ivsize) {
++			len = req->cryptlen - ivsize;
++		} else {
++			memset(req->iv, 0, ivsize);
++			len = 0;
++			ivsize = req->cryptlen;
++
++		}
++
++		scatterwalk_map_and_copy(req->iv, req->dst, len, ivsize, 0);
+ 	}
+ 
+ 	skcipher_request_complete(req, err);
+@@ -755,17 +764,26 @@ static int cc_cipher_decrypt(struct skcipher_request *req)
+ 	struct cipher_req_ctx *req_ctx = skcipher_request_ctx(req);
+ 	unsigned int ivsize = crypto_skcipher_ivsize(sk_tfm);
+ 	gfp_t flags = cc_gfp_flags(&req->base);
++	unsigned int len;
+ 
+ 	/*
+ 	 * Allocate and save the last IV sized bytes of the source, which will
+ 	 * be lost in case of in-place decryption and might be needed for CTS.
+ 	 */
+-	req_ctx->backup_info = kmalloc(ivsize, flags);
++	req_ctx->backup_info = kzalloc(ivsize, flags);
+ 	if (!req_ctx->backup_info)
+ 		return -ENOMEM;
+ 
+-	scatterwalk_map_and_copy(req_ctx->backup_info, req->src,
+-				 (req->cryptlen - ivsize), ivsize, 0);
++
++	if (req->cryptlen > ivsize) {
++		len = req->cryptlen - ivsize;
++	} else {
++		len = 0;
++		ivsize = req->cryptlen;
++	}
++
++	scatterwalk_map_and_copy(req_ctx->backup_info, req->src, len, ivsize,
++				 0);
+ 	req_ctx->is_giv = false;
+ 
+ 	return cc_cipher_process(req, DRV_CRYPTO_DIRECTION_DECRYPT);
+-- 
+2.7.4
