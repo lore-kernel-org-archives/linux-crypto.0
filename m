@@ -1,121 +1,145 @@
-From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: Re: [PATCH] crypto: ccree: fix iv copying for small buffers
-Date: Thu, 7 Jun 2018 12:02:04 +0300
-Message-ID: <CAOtvUMcJfJDjnMoithRQ4ife09VC+G-w+__jV-JLwh7M=s7JNQ@mail.gmail.com>
-References: <1528361927-4172-1-git-send-email-gilad@benyossef.com>
+From: syzbot <syzbot+29d17b7898b41ee120a5@syzkaller.appspotmail.com>
+Subject: KASAN: slab-out-of-bounds Write in sha256_finup
+Date: Thu, 07 Jun 2018 06:07:02 -0700
+Message-ID: <0000000000009913f4056e0cf508@google.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Ofir Drang <ofir.drang@arm.com>, stable@vger.kernel.org,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux kernel mailing list <linux-kernel@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>, hadar.gat@arm.com
-Return-path: <stable-owner@vger.kernel.org>
-In-Reply-To: <1528361927-4172-1-git-send-email-gilad@benyossef.com>
-Sender: stable-owner@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+To: davem@davemloft.net, herbert@gondor.apana.org.au, hpa@zytor.com,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        mingo@redhat.com, syzkaller-bugs@googlegroups.com,
+        tglx@linutronix.de, x86@kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi,
+Hello,
 
-On Thu, Jun 7, 2018 at 11:58 AM, Gilad Ben-Yossef <gilad@benyossef.com> wrote:
-> We are copying our last cipher block into the request for use as IV as
-> required by the Crypto API but we failed to handle correctly the case the
-> buffer we are working on is smaller than a block. Fix it by calculating
-> how much we need to copy based on buffer size.
->
+syzbot found the following crash on:
 
-I'd be really happy to get a review on this patch - not so much what
-it is doing but
-rather the rational behind it - how is a tfm provider supposed to
-handle copying the
-last block of ciphertext into the request structure if the ciphertext
-size is less than a
-block?
+HEAD commit:    1c8c5a9d38f6 Merge git://git.kernel.org/pub/scm/linux/kern..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=11289b9f800000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=2e1a31e8576e013a
+dashboard link: https://syzkaller.appspot.com/bug?extid=29d17b7898b41ee120a5
+compiler:       gcc (GCC) 8.0.1 20180413 (experimental)
+syzkaller repro:https://syzkaller.appspot.com/x/repro.syz?x=146fbb9f800000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=119de79f800000
 
-I opted for simply copying whatever ciphertext was available and
-zeroing the rest
-but frankly I'm not sure this is the right thing.
+IMPORTANT: if you fix the bug, please add the following tag to the commit:
+Reported-by: syzbot+29d17b7898b41ee120a5@syzkaller.appspotmail.com
 
-Any feedback is apreciated.
+random: sshd: uninitialized urandom read (32 bytes read)
+random: sshd: uninitialized urandom read (32 bytes read)
+random: sshd: uninitialized urandom read (32 bytes read)
+random: sshd: uninitialized urandom read (32 bytes read)
+==================================================================
+BUG: KASAN: slab-out-of-bounds in put_unaligned_be32  
+include/linux/unaligned/access_ok.h:60 [inline]
+BUG: KASAN: slab-out-of-bounds in sha256_base_finish  
+include/crypto/sha256_base.h:124 [inline]
+BUG: KASAN: slab-out-of-bounds in sha256_finup+0x4bf/0x540  
+arch/x86/crypto/sha256_ssse3_glue.c:80
+Write of size 4 at addr ffff8801b39b2ca0 by task syz-executor364/4468
 
-Thanks!
-Gilad
+CPU: 0 PID: 4468 Comm: syz-executor364 Not tainted 4.17.0+ #88
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS  
+Google 01/01/2011
+Call Trace:
+  __dump_stack lib/dump_stack.c:77 [inline]
+  dump_stack+0x1b9/0x294 lib/dump_stack.c:113
+  print_address_description+0x6c/0x20b mm/kasan/report.c:256
+  kasan_report_error mm/kasan/report.c:354 [inline]
+  kasan_report.cold.7+0x242/0x2fe mm/kasan/report.c:412
+  __asan_report_store4_noabort+0x17/0x20 mm/kasan/report.c:437
+  put_unaligned_be32 include/linux/unaligned/access_ok.h:60 [inline]
+  sha256_base_finish include/crypto/sha256_base.h:124 [inline]
+  sha256_finup+0x4bf/0x540 arch/x86/crypto/sha256_ssse3_glue.c:80
+  sha256_avx_finup arch/x86/crypto/sha256_ssse3_glue.c:161 [inline]
+  sha256_avx_final+0x28/0x30 arch/x86/crypto/sha256_ssse3_glue.c:166
+  crypto_shash_final+0x104/0x260 crypto/shash.c:152
+  kdf_ctr security/keys/dh.c:186 [inline]
+  keyctl_dh_compute_kdf security/keys/dh.c:217 [inline]
+  __keyctl_dh_compute+0x1184/0x1bc0 security/keys/dh.c:389
+  keyctl_dh_compute+0xb9/0x100 security/keys/dh.c:425
+  __do_sys_keyctl security/keys/keyctl.c:1741 [inline]
+  __se_sys_keyctl security/keys/keyctl.c:1637 [inline]
+  __x64_sys_keyctl+0x12a/0x3b0 security/keys/keyctl.c:1637
+  do_syscall_64+0x1b1/0x800 arch/x86/entry/common.c:287
+  entry_SYSCALL_64_after_hwframe+0x49/0xbe
+RIP: 0033:0x440019
+Code: 18 89 d0 c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 00 48 89 f8 48 89 f7  
+48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff  
+ff 0f 83 6b 45 00 00 c3 66 2e 0f 1f 84 00 00 00 00
+RSP: 002b:00007ffcb5a0db48 EFLAGS: 00000217 ORIG_RAX: 00000000000000fa
+RAX: ffffffffffffffda RBX: 00000000004002c8 RCX: 0000000000440019
+RDX: 0000000020a53ffb RSI: 0000000020000100 RDI: 0000000000000017
+RBP: 00000000006ca018 R08: 0000000020c61fc8 R09: 00000000004002c8
+R10: 0000000000000005 R11: 0000000000000217 R12: 0000000000401940
+R13: 00000000004019d0 R14: 0000000000000000 R15: 0000000000000000
+
+Allocated by task 4468:
+  save_stack+0x43/0xd0 mm/kasan/kasan.c:448
+  set_track mm/kasan/kasan.c:460 [inline]
+  kasan_kmalloc+0xc4/0xe0 mm/kasan/kasan.c:553
+  __do_kmalloc mm/slab.c:3718 [inline]
+  __kmalloc+0x14e/0x760 mm/slab.c:3727
+  kmalloc include/linux/slab.h:518 [inline]
+  keyctl_dh_compute_kdf security/keys/dh.c:211 [inline]
+  __keyctl_dh_compute+0xfe9/0x1bc0 security/keys/dh.c:389
+  keyctl_dh_compute+0xb9/0x100 security/keys/dh.c:425
+  __do_sys_keyctl security/keys/keyctl.c:1741 [inline]
+  __se_sys_keyctl security/keys/keyctl.c:1637 [inline]
+  __x64_sys_keyctl+0x12a/0x3b0 security/keys/keyctl.c:1637
+  do_syscall_64+0x1b1/0x800 arch/x86/entry/common.c:287
+  entry_SYSCALL_64_after_hwframe+0x49/0xbe
+
+Freed by task 2842:
+  save_stack+0x43/0xd0 mm/kasan/kasan.c:448
+  set_track mm/kasan/kasan.c:460 [inline]
+  __kasan_slab_free+0x11a/0x170 mm/kasan/kasan.c:521
+  kasan_slab_free+0xe/0x10 mm/kasan/kasan.c:528
+  __cache_free mm/slab.c:3498 [inline]
+  kfree+0xd9/0x260 mm/slab.c:3813
+  single_release+0x8f/0xb0 fs/seq_file.c:609
+  __fput+0x353/0x890 fs/file_table.c:209
+  ____fput+0x15/0x20 fs/file_table.c:243
+  task_work_run+0x1e4/0x290 kernel/task_work.c:113
+  tracehook_notify_resume include/linux/tracehook.h:192 [inline]
+  exit_to_usermode_loop+0x2bd/0x310 arch/x86/entry/common.c:166
+  prepare_exit_to_usermode arch/x86/entry/common.c:196 [inline]
+  syscall_return_slowpath arch/x86/entry/common.c:265 [inline]
+  do_syscall_64+0x6ac/0x800 arch/x86/entry/common.c:290
+  entry_SYSCALL_64_after_hwframe+0x49/0xbe
+
+The buggy address belongs to the object at ffff8801b39b2c80
+  which belongs to the cache kmalloc-32 of size 32
+The buggy address is located 0 bytes to the right of
+  32-byte region [ffff8801b39b2c80, ffff8801b39b2ca0)
+The buggy address belongs to the page:
+page:ffffea0006ce6c80 count:1 mapcount:0 mapping:ffff8801b39b2000  
+index:0xffff8801b39b2fc1
+flags: 0x2fffc0000000100(slab)
+raw: 02fffc0000000100 ffff8801b39b2000 ffff8801b39b2fc1 0000000100000039
+raw: ffffea00075c03a0 ffffea000764c620 ffff8801da8001c0 0000000000000000
+page dumped because: kasan: bad access detected
+
+Memory state around the buggy address:
+  ffff8801b39b2b80: fb fb fb fb fc fc fc fc fb fb fb fb fc fc fc fc
+  ffff8801b39b2c00: fb fb fb fb fc fc fc fc fb fb fb fb fc fc fc fc
+> ffff8801b39b2c80: 00 00 00 00 fc fc fc fc fb fb fb fb fc fc fc fc
+                                ^
+  ffff8801b39b2d00: fb fb fb fb fc fc fc fc fb fb fb fb fc fc fc fc
+  ffff8801b39b2d80: fb fb fb fb fc fc fc fc fb fb fb fb fc fc fc fc
+==================================================================
 
 
-> CC: stable@vger.kernel.org
-> Fixes: 63ee04c8b491 ("crypto: ccree - add skcipher support")
-> Reported by: Hadar Gat <hadar.gat@arm.com>
-> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
-> ---
->  drivers/crypto/ccree/cc_cipher.c | 30 ++++++++++++++++++++++++------
->  1 file changed, 24 insertions(+), 6 deletions(-)
->
-> diff --git a/drivers/crypto/ccree/cc_cipher.c b/drivers/crypto/ccree/cc_cipher.c
-> index d2810c1..a07547f 100644
-> --- a/drivers/crypto/ccree/cc_cipher.c
-> +++ b/drivers/crypto/ccree/cc_cipher.c
-> @@ -616,9 +616,18 @@ static void cc_cipher_complete(struct device *dev, void *cc_req, int err)
->                 memcpy(req->iv, req_ctx->backup_info, ivsize);
->                 kzfree(req_ctx->backup_info);
->         } else if (!err) {
-> -               scatterwalk_map_and_copy(req->iv, req->dst,
-> -                                        (req->cryptlen - ivsize),
-> -                                        ivsize, 0);
-> +               unsigned int len;
-> +
-> +               if (req->cryptlen > ivsize) {
-> +                       len = req->cryptlen - ivsize;
-> +               } else {
-> +                       memset(req->iv, 0, ivsize);
-> +                       len = 0;
-> +                       ivsize = req->cryptlen;
-> +
-> +               }
-> +
-> +               scatterwalk_map_and_copy(req->iv, req->dst, len, ivsize, 0);
->         }
->
->         skcipher_request_complete(req, err);
-> @@ -755,17 +764,26 @@ static int cc_cipher_decrypt(struct skcipher_request *req)
->         struct cipher_req_ctx *req_ctx = skcipher_request_ctx(req);
->         unsigned int ivsize = crypto_skcipher_ivsize(sk_tfm);
->         gfp_t flags = cc_gfp_flags(&req->base);
-> +       unsigned int len;
->
->         /*
->          * Allocate and save the last IV sized bytes of the source, which will
->          * be lost in case of in-place decryption and might be needed for CTS.
->          */
-> -       req_ctx->backup_info = kmalloc(ivsize, flags);
-> +       req_ctx->backup_info = kzalloc(ivsize, flags);
->         if (!req_ctx->backup_info)
->                 return -ENOMEM;
->
-> -       scatterwalk_map_and_copy(req_ctx->backup_info, req->src,
-> -                                (req->cryptlen - ivsize), ivsize, 0);
-> +
-> +       if (req->cryptlen > ivsize) {
-> +               len = req->cryptlen - ivsize;
-> +       } else {
-> +               len = 0;
-> +               ivsize = req->cryptlen;
-> +       }
-> +
-> +       scatterwalk_map_and_copy(req_ctx->backup_info, req->src, len, ivsize,
-> +                                0);
->         req_ctx->is_giv = false;
->
->         return cc_cipher_process(req, DRV_CRYPTO_DIRECTION_DECRYPT);
-> --
-> 2.7.4
->
+---
+This bug is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-
-
--- 
-Gilad Ben-Yossef
-Chief Coffee Drinker
-
-"If you take a class in large-scale robotics, can you end up in a
-situation where the homework eats your dog?"
- -- Jean-Baptiste Queru
+syzbot will keep track of this bug report. See:
+https://goo.gl/tpsmEJ#bug-status-tracking for how to communicate with  
+syzbot.
+syzbot can test patches for this bug, for details see:
+https://goo.gl/tpsmEJ#testing-patches
