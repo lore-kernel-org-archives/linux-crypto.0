@@ -1,45 +1,72 @@
-From: Tycho Andersen <tycho@tycho.ws>
-Subject: Re: [PATCH] dh key: fix rounding up KDF output length
-Date: Thu, 7 Jun 2018 14:28:31 -0600
-Message-ID: <20180607202831.GG9999@cisco>
-References: <0000000000009c221d056e0cf53a@google.com>
- <20180607191201.97080-1-ebiggers3@gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: David Howells <dhowells@redhat.com>,
-        James Morris <jmorris@namei.org>, keyrings@vger.kernel.org,
-        linux-security-module@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com, Kees Cook <keescook@chromium.org>,
-        Stephan Mueller <smueller@chronox.de>,
-        Eric Biggers <ebiggers@google.com>
-To: Eric Biggers <ebiggers3@gmail.com>
+From: Jia He <hejianet@gmail.com>
+Subject: [PATCH] crypto: arm64/aes-blk - fix and move skcipher_walk_done out of  kernel_neon_begin,_end
+Date: Fri,  8 Jun 2018 15:05:02 +0800
+Message-ID: <1528441502-26425-1-git-send-email-hejianet@gmail.com>
+Cc: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org, Jia He <hejianet@gmail.com>,
+        jia.he@hxt-semitech.com
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will.deacon@arm.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20180607191201.97080-1-ebiggers3@gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Jun 07, 2018 at 12:12:01PM -0700, Eric Biggers wrote:
-> From: Eric Biggers <ebiggers@google.com>
-> 
-> Commit 383203eff718 ("dh key: get rid of stack allocated array") changed
-> kdf_ctr() to assume that the length of key material to derive is a
-> multiple of the digest size.  The length was supposed to be rounded up
-> accordingly.  However, the round_up() macro was used which only gives
-> the correct result on power-of-2 arguments, whereas not all hash
-> algorithms have power-of-2 digest sizes.  In some cases this resulted in
-> a write past the end of the 'outbuf' buffer.
-> 
-> Fix it by switching to roundup(), which works for non-power-of-2 inputs.
-> 
-> Reported-by: syzbot+486f97f892efeb2075a3@syzkaller.appspotmail.com
-> Reported-by: syzbot+29d17b7898b41ee120a5@syzkaller.appspotmail.com
-> Reported-by: syzbot+8a608baf8751184ec727@syzkaller.appspotmail.com
-> Reported-by: syzbot+d04e58bd384f1fe0b112@syzkaller.appspotmail.com
-> Fixes: 383203eff718 ("dh key: get rid of stack allocated array")
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
+In a arm64 server(QDF2400),I met a similar might-sleep warning as [1]:
+[    7.019116] BUG: sleeping function called from invalid context at
+./include/crypto/algapi.h:416
+[    7.027863] in_atomic(): 1, irqs_disabled(): 0, pid: 410, name:
+cryptomgr_test
+[    7.035106] 1 lock held by cryptomgr_test/410:
+[    7.039549]  #0:         (ptrval) (&drbg->drbg_mutex){+.+.}, at:
+drbg_instantiate+0x34/0x398
+[    7.048038] CPU: 9 PID: 410 Comm: cryptomgr_test Not tainted
+4.17.0-rc6+ #27
+[    7.068228]  dump_backtrace+0x0/0x1c0
+[    7.071890]  show_stack+0x24/0x30
+[    7.075208]  dump_stack+0xb0/0xec
+[    7.078523]  ___might_sleep+0x160/0x238
+[    7.082360]  skcipher_walk_done+0x118/0x2c8
+[    7.086545]  ctr_encrypt+0x98/0x130
+[    7.090035]  simd_skcipher_encrypt+0x68/0xc0
+[    7.094304]  drbg_kcapi_sym_ctr+0xd4/0x1f8
+[    7.098400]  drbg_ctr_update+0x98/0x330
+[    7.102236]  drbg_seed+0x1b8/0x2f0
+[    7.105637]  drbg_instantiate+0x2ac/0x398
+[    7.109646]  drbg_kcapi_seed+0xbc/0x188
+[    7.113482]  crypto_rng_reset+0x4c/0xb0
+[    7.117319]  alg_test_drbg+0xec/0x330
+[    7.120981]  alg_test.part.6+0x1c8/0x3c8
+[    7.124903]  alg_test+0x58/0xa0
+[    7.128044]  cryptomgr_test+0x50/0x58
+[    7.131708]  kthread+0x134/0x138
+[    7.134936]  ret_from_fork+0x10/0x1c
 
-Arg, thanks.
+Seems there is a bug in Ard Biesheuvel's commit.
+Fixes: 683381747270 ("crypto: arm64/aes-blk - move kernel mode neon
+en/disable into loop")
 
-Acked-by: Tycho Andersen <tycho@tycho.ws>
+[1] https://www.spinics.net/lists/linux-crypto/msg33103.html
+
+Signed-off-by: jia.he@hxt-semitech.com
+---
+ arch/arm64/crypto/aes-glue.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm64/crypto/aes-glue.c b/arch/arm64/crypto/aes-glue.c
+index 253188f..e3e5095 100644
+--- a/arch/arm64/crypto/aes-glue.c
++++ b/arch/arm64/crypto/aes-glue.c
+@@ -223,8 +223,8 @@ static int ctr_encrypt(struct skcipher_request *req)
+ 		kernel_neon_begin();
+ 		aes_ctr_encrypt(walk.dst.virt.addr, walk.src.virt.addr,
+ 				(u8 *)ctx->key_enc, rounds, blocks, walk.iv);
+-		err = skcipher_walk_done(&walk, walk.nbytes % AES_BLOCK_SIZE);
+ 		kernel_neon_end();
++		err = skcipher_walk_done(&walk, walk.nbytes % AES_BLOCK_SIZE);
+ 	}
+ 	if (walk.nbytes) {
+ 		u8 __aligned(8) tail[AES_BLOCK_SIZE];
+-- 
+1.8.3.1
