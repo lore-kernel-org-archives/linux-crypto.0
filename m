@@ -1,27 +1,27 @@
-From: Jia He <hejianet@gmail.com>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Subject: Re: [PATCH] crypto: arm64/aes-blk - fix and move skcipher_walk_done
- out of kernel_neon_begin,_end
-Date: Fri, 8 Jun 2018 15:16:58 +0800
-Message-ID: <ed457db3-2e3b-3f2d-7302-df6d70432e58@gmail.com>
+ out of kernel_neon_begin, _end
+Date: Fri, 8 Jun 2018 09:27:34 +0200
+Message-ID: <CAKv+Gu-pjaMX2jNDgnf7yEsTaLk5YTpbgt4tSxaDT0VRJCJTpQ@mail.gmail.com>
 References: <1528441502-26425-1-git-send-email-hejianet@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org, jia.he@hxt-semitech.com
-To: Herbert Xu <herbert@gondor.apana.org.au>,
+Content-Type: text/plain; charset="UTF-8"
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
         Catalin Marinas <catalin.marinas@arm.com>,
         Will Deacon <will.deacon@arm.com>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>
+        Jia He <jia.he@hxt-semitech.com>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Jia He <hejianet@gmail.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1528441502-26425-1-git-send-email-hejianet@gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-[+ Ard Biesheuvel]
-
-On 6/8/2018 3:05 PM, Jia He Wrote:
+On 8 June 2018 at 09:05, Jia He <hejianet@gmail.com> wrote:
 > In a arm64 server(QDF2400),I met a similar might-sleep warning as [1]:
 > [    7.019116] BUG: sleeping function called from invalid context at
 > ./include/crypto/algapi.h:416
@@ -51,34 +51,45 @@ On 6/8/2018 3:05 PM, Jia He Wrote:
 > [    7.128044]  cryptomgr_test+0x50/0x58
 > [    7.131708]  kthread+0x134/0x138
 > [    7.134936]  ret_from_fork+0x10/0x1c
-> 
+>
 > Seems there is a bug in Ard Biesheuvel's commit.
 > Fixes: 683381747270 ("crypto: arm64/aes-blk - move kernel mode neon
 > en/disable into loop")
-> 
+>
 > [1] https://www.spinics.net/lists/linux-crypto/msg33103.html
-> 
+>
 > Signed-off-by: jia.he@hxt-semitech.com
+
+Yes, that is a bug. My bad.
+
+Acked-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+
+Please tag for stable (v4.17)
+
+
 > ---
 >  arch/arm64/crypto/aes-glue.c | 2 +-
 >  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
+>
 > diff --git a/arch/arm64/crypto/aes-glue.c b/arch/arm64/crypto/aes-glue.c
 > index 253188f..e3e5095 100644
 > --- a/arch/arm64/crypto/aes-glue.c
 > +++ b/arch/arm64/crypto/aes-glue.c
 > @@ -223,8 +223,8 @@ static int ctr_encrypt(struct skcipher_request *req)
->  		kernel_neon_begin();
->  		aes_ctr_encrypt(walk.dst.virt.addr, walk.src.virt.addr,
->  				(u8 *)ctx->key_enc, rounds, blocks, walk.iv);
-> -		err = skcipher_walk_done(&walk, walk.nbytes % AES_BLOCK_SIZE);
->  		kernel_neon_end();
-> +		err = skcipher_walk_done(&walk, walk.nbytes % AES_BLOCK_SIZE);
->  	}
->  	if (walk.nbytes) {
->  		u8 __aligned(8) tail[AES_BLOCK_SIZE];
-> 
-
--- 
-Cheers,
-Jia
+>                 kernel_neon_begin();
+>                 aes_ctr_encrypt(walk.dst.virt.addr, walk.src.virt.addr,
+>                                 (u8 *)ctx->key_enc, rounds, blocks, walk.iv);
+> -               err = skcipher_walk_done(&walk, walk.nbytes % AES_BLOCK_SIZE);
+>                 kernel_neon_end();
+> +               err = skcipher_walk_done(&walk, walk.nbytes % AES_BLOCK_SIZE);
+>         }
+>         if (walk.nbytes) {
+>                 u8 __aligned(8) tail[AES_BLOCK_SIZE];
+> --
+> 1.8.3.1
+>
+>
+> _______________________________________________
+> linux-arm-kernel mailing list
+> linux-arm-kernel@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
