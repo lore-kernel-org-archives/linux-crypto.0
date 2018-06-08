@@ -1,74 +1,34 @@
-From: Dmitry Vyukov <dvyukov@google.com>
-Subject: Re: WARNING: kernel stack regs has bad 'bp' value (3)
-Date: Fri, 8 Jun 2018 11:54:45 +0200
-Message-ID: <CACT4Y+Zh8eWPLTrVyOufeXd6LMcUdQr8Q07OWWGTTgwOYT6Gvg@mail.gmail.com>
-References: <001a11449aa2faf11805643af581@google.com> <CACT4Y+YOmbZGdBbFpmjRJXABGe1tD=F+3na77DwoPCEaROADyw@mail.gmail.com>
- <20180202221829.tdiji2332t7orcxj@gmail.com> <CACT4Y+afpDQ7A3caRmskML06h8Q6+NkVAn6HtV93ExPec-g2pA@mail.gmail.com>
- <20180526072203.GA724@sol.localdomain>
+From: David Howells <dhowells@redhat.com>
+Subject: Re: [PATCH] dh key: fix rounding up KDF output length
+Date: Fri, 08 Jun 2018 16:37:58 +0100
+Message-ID: <17595.1528472278@warthog.procyon.org.uk>
+References: <20180607191201.97080-1-ebiggers3@gmail.com> <0000000000009c221d056e0cf53a@google.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        syzbot <syzbot+ffa3a158337bbc01ff09@syzkaller.appspotmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        David Miller <davem@davemloft.net>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Josh Poimboeuf <jpoimboe@redhat.com>,
-        syzkaller-bugs <syzkaller-bugs@googlegroups.com>
+Content-Type: text/plain; charset="us-ascii"
+Cc: dhowells@redhat.com, James Morris <jmorris@namei.org>,
+        keyrings@vger.kernel.org, linux-security-module@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com, Tycho Andersen <tycho@tycho.ws>,
+        Kees Cook <keescook@chromium.org>,
+        Stephan Mueller <smueller@chronox.de>,
+        Eric Biggers <ebiggers@google.com>
 To: Eric Biggers <ebiggers3@gmail.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180526072203.GA724@sol.localdomain>
+In-Reply-To: <20180607191201.97080-1-ebiggers3@gmail.com>
+Content-ID: <17594.1528472278.1@warthog.procyon.org.uk>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Sat, May 26, 2018 at 9:22 AM, Eric Biggers <ebiggers3@gmail.com> wrote:
-> On Sat, May 12, 2018 at 10:43:08AM +0200, Dmitry Vyukov wrote:
->> On Fri, Feb 2, 2018 at 11:18 PM, Eric Biggers <ebiggers3@gmail.com> wrote:
->> > On Fri, Feb 02, 2018 at 02:57:32PM +0100, Dmitry Vyukov wrote:
->> >> On Fri, Feb 2, 2018 at 2:48 PM, syzbot
->> >> <syzbot+ffa3a158337bbc01ff09@syzkaller.appspotmail.com> wrote:
->> >> > Hello,
->> >> >
->> >> > syzbot hit the following crash on upstream commit
->> >> > 7109a04eae81c41ed529da9f3c48c3655ccea741 (Thu Feb 1 17:37:30 2018 +0000)
->> >> > Merge git://git.kernel.org/pub/scm/linux/kernel/git/davem/ide
->> >> >
->> >> > So far this crash happened 4 times on net-next, upstream.
->> >> > C reproducer is attached.
->> >> > syzkaller reproducer is attached.
->> >> > Raw console output is attached.
->> >> > compiler: gcc (GCC) 7.1.1 20170620
->> >> > .config is attached.
->> >>
->> >>
->> >> From suspicious frames I see salsa20_asm_crypt there, so +crypto maintainers.
->> >>
->> >
->> > Looks like the x86 implementations of Salsa20 (both i586 and x86_64) need to be
->> > updated to not use %ebp/%rbp.
->>
->> Ard,
->>
->> This was bisected as introduced by:
->>
->> commit 83dee2ce1ae791c3dc0c9d4d3a8d42cb109613f6
->> Author: Ard Biesheuvel <ard.biesheuvel@linaro.org>
->> Date:   Fri Jan 19 12:04:34 2018 +0000
->>
->>     crypto: sha3-generic - rewrite KECCAK transform to help the
->> compiler optimize
->>
->> https://gist.githubusercontent.com/dvyukov/47f93f5a0679170dddf93bc019b42f6d/raw/65beac8ddd30003bbd4e9729236dc8572094abf7/gistfile1.txt
->
-> Note that syzbot's original C reproducer (from Feb 1) for this actually
-> triggered the warning through salsa20-asm, which I've just proposed to "fix" by
-> https://patchwork.kernel.org/patch/10428863/.  sha3-generic is apparently
-> another instance of the same bug, where the %rbp register is used for data.
+Eric Biggers <ebiggers3@gmail.com> wrote:
 
+> Commit 383203eff718 ("dh key: get rid of stack allocated array") changed
+> kdf_ctr() to assume that the length of key material to derive is a
+> multiple of the digest size.  The length was supposed to be rounded up
+> accordingly.  However, the round_up() macro was used which only gives
+> the correct result on power-of-2 arguments, whereas not all hash
+> algorithms have power-of-2 digest sizes.  In some cases this resulted in
+> a write past the end of the 'outbuf' buffer.
+> 
+> Fix it by switching to roundup(), which works for non-power-of-2 inputs.
 
-Mailed "crypto: don't optimize keccakf()" to fix this.
-
-Amusingly __optimize("O3") always lead to degraded performance as gcc does not
-inline across different optimizations levels, so keccakf() wasn't inlined
-into its callers and keccakf_round() wasn't inlined into keccakf().
+Applied.
