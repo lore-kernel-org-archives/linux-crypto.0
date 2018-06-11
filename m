@@ -1,82 +1,86 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: WARNING: kernel stack regs has bad 'bp' value (3)
-Date: Mon, 11 Jun 2018 10:13:42 +0200
-Message-ID: <CAKv+Gu-RXe3baYUWw1dvBJdD7MBuB6Zg6rN5rVYyotcQgTvmdg@mail.gmail.com>
-References: <001a11449aa2faf11805643af581@google.com> <CACT4Y+YOmbZGdBbFpmjRJXABGe1tD=F+3na77DwoPCEaROADyw@mail.gmail.com>
- <20180202221829.tdiji2332t7orcxj@gmail.com> <CACT4Y+afpDQ7A3caRmskML06h8Q6+NkVAn6HtV93ExPec-g2pA@mail.gmail.com>
- <20180526072203.GA724@sol.localdomain> <CACT4Y+Zh8eWPLTrVyOufeXd6LMcUdQr8Q07OWWGTTgwOYT6Gvg@mail.gmail.com>
+From: Tudor Ambarus <tudor.ambarus@microchip.com>
+Subject: Re: [PATCH 2/9] crypto: atmel-ecc: Silently ignore missing clock
+ frequency
+Date: Mon, 11 Jun 2018 12:46:23 +0300
+Message-ID: <e33b8860-2ff4-da8f-8500-ad24ab6c1e4e@microchip.com>
+References: <20180605134950.6605-1-linus.walleij@linaro.org>
+ <20180605134950.6605-2-linus.walleij@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Eric Biggers <ebiggers3@gmail.com>,
-        syzbot <syzbot+ffa3a158337bbc01ff09@syzkaller.appspotmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        David Miller <davem@davemloft.net>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Josh Poimboeuf <jpoimboe@redhat.com>,
-        syzkaller-bugs <syzkaller-bugs@googlegroups.com>
-To: Dmitry Vyukov <dvyukov@google.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CACT4Y+Zh8eWPLTrVyOufeXd6LMcUdQr8Q07OWWGTTgwOYT6Gvg@mail.gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Transfer-Encoding: 7bit
+Cc: linux-i2c@vger.kernel.org, linux-crypto@vger.kernel.org,
+ linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+ Herbert Xu <herbert@gondor.apana.org.au>
+To: Linus Walleij <linus.walleij@linaro.org>, <wsa@the-dreams.de>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <20180605134950.6605-2-linus.walleij@linaro.org>
+Content-Language: en-US
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 8 June 2018 at 11:54, Dmitry Vyukov <dvyukov@google.com> wrote:
-> On Sat, May 26, 2018 at 9:22 AM, Eric Biggers <ebiggers3@gmail.com> wrote:
->> On Sat, May 12, 2018 at 10:43:08AM +0200, Dmitry Vyukov wrote:
->>> On Fri, Feb 2, 2018 at 11:18 PM, Eric Biggers <ebiggers3@gmail.com> wrote:
->>> > On Fri, Feb 02, 2018 at 02:57:32PM +0100, Dmitry Vyukov wrote:
->>> >> On Fri, Feb 2, 2018 at 2:48 PM, syzbot
->>> >> <syzbot+ffa3a158337bbc01ff09@syzkaller.appspotmail.com> wrote:
->>> >> > Hello,
->>> >> >
->>> >> > syzbot hit the following crash on upstream commit
->>> >> > 7109a04eae81c41ed529da9f3c48c3655ccea741 (Thu Feb 1 17:37:30 2018 +0000)
->>> >> > Merge git://git.kernel.org/pub/scm/linux/kernel/git/davem/ide
->>> >> >
->>> >> > So far this crash happened 4 times on net-next, upstream.
->>> >> > C reproducer is attached.
->>> >> > syzkaller reproducer is attached.
->>> >> > Raw console output is attached.
->>> >> > compiler: gcc (GCC) 7.1.1 20170620
->>> >> > .config is attached.
->>> >>
->>> >>
->>> >> From suspicious frames I see salsa20_asm_crypt there, so +crypto maintainers.
->>> >>
->>> >
->>> > Looks like the x86 implementations of Salsa20 (both i586 and x86_64) need to be
->>> > updated to not use %ebp/%rbp.
->>>
->>> Ard,
->>>
->>> This was bisected as introduced by:
->>>
->>> commit 83dee2ce1ae791c3dc0c9d4d3a8d42cb109613f6
->>> Author: Ard Biesheuvel <ard.biesheuvel@linaro.org>
->>> Date:   Fri Jan 19 12:04:34 2018 +0000
->>>
->>>     crypto: sha3-generic - rewrite KECCAK transform to help the
->>> compiler optimize
->>>
->>> https://gist.githubusercontent.com/dvyukov/47f93f5a0679170dddf93bc019b42f6d/raw/65beac8ddd30003bbd4e9729236dc8572094abf7/gistfile1.txt
->>
->> Note that syzbot's original C reproducer (from Feb 1) for this actually
->> triggered the warning through salsa20-asm, which I've just proposed to "fix" by
->> https://patchwork.kernel.org/patch/10428863/.  sha3-generic is apparently
->> another instance of the same bug, where the %rbp register is used for data.
->
->
-> Mailed "crypto: don't optimize keccakf()" to fix this.
->
-> Amusingly __optimize("O3") always lead to degraded performance as gcc does not
-> inline across different optimizations levels, so keccakf() wasn't inlined
-> into its callers and keccakf_round() wasn't inlined into keccakf().
+Hi, Linus, Wolfram,
 
-That does not make sense. The -O3 definitely made the code run
-slightly faster on AArch64, but I don't remember the exact numbers or
-the compiler version.
+On 06/05/2018 04:49 PM, Linus Walleij wrote:
+> The Atmel ECC driver contains a check for the I2C bus clock
+> frequency, so as to check that the I2C adapter in use
+> satisfies the device specs.
+> 
+> If the device is connected to a device tree node that does not
+> contain a clock frequency setting, such as an I2C mux or gate,
+> this blocks the probe. Make the probe continue silently if
+> no clock frequency can be found, assuming all is safe.
 
-In any case, it wasn't an improvement worth obsessing about compared
-to the 14x speedup I got on A53 from rewriting the code itself.
+I don't think it's safe. We use bus_clk_rate to compute the ecc508's
+wake token. If you can't wake the device, it will ignore all your
+commands.
+
+My proposal was to introduce a bus_freq_hz member in the i2c_adapter
+structure (https://patchwork.kernel.org/patch/10307637/), but I haven't
+received feedback yet, Wolfram?
+
+I would say first to check the bus_freq_hz from adapter (if it will be
+accepted) else to look into dt and, in the last case, if nowhere
+provided, to block the probe.
+
+Thanks,
+ta
+
+> 
+> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+> ---
+>   drivers/crypto/atmel-ecc.c | 11 +++++------
+>   1 file changed, 5 insertions(+), 6 deletions(-)
+> 
+> diff --git a/drivers/crypto/atmel-ecc.c b/drivers/crypto/atmel-ecc.c
+> index e66f18a0ddd0..145ab3a39a56 100644
+> --- a/drivers/crypto/atmel-ecc.c
+> +++ b/drivers/crypto/atmel-ecc.c
+> @@ -657,14 +657,13 @@ static int atmel_ecc_probe(struct i2c_client *client,
+>   		return -ENODEV;
+>   	}
+>   
+> +	/*
+> +	 * Silently assume all is fine if there is no
+> +	 * "clock-frequency" property.
+> +	 */
+>   	ret = of_property_read_u32(client->adapter->dev.of_node,
+>   				   "clock-frequency", &bus_clk_rate);
+> -	if (ret) {
+> -		dev_err(dev, "of: failed to read clock-frequency property\n");
+> -		return ret;
+> -	}
+> -
+> -	if (bus_clk_rate > 1000000L) {
+> +	if (!ret && (bus_clk_rate > 1000000L)) {
+>   		dev_err(dev, "%d exceeds maximum supported clock frequency (1MHz)\n",
+>   			bus_clk_rate);
+>   		return -EINVAL;
+> 
