@@ -1,39 +1,41 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: ccree: fix iv copying for small buffers
-Date: Wed, 13 Jun 2018 14:30:31 +0800
-Message-ID: <20180613063030.bsrq3xmufcw4zi52@gondor.apana.org.au>
-References: <1528361927-4172-1-git-send-email-gilad@benyossef.com>
- <CAOtvUMcJfJDjnMoithRQ4ife09VC+G-w+__jV-JLwh7M=s7JNQ@mail.gmail.com>
+From: Haren Myneni <haren@linux.vnet.ibm.com>
+Subject: [PATCH V3 1/2] powerpc/powernv: Export opal_check_token symbol
+Date: Wed, 13 Jun 2018 00:28:57 -0700
+Message-ID: <1528874937.14408.2.camel@hbabu-laptop>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>, hadar.gat@arm.com,
-        Ofir Drang <ofir.drang@arm.com>, stable@vger.kernel.org,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux kernel mailing list <linux-kernel@vger.kernel.org>
-To: Gilad Ben-Yossef <gilad@benyossef.com>
-Return-path: <stable-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <CAOtvUMcJfJDjnMoithRQ4ife09VC+G-w+__jV-JLwh7M=s7JNQ@mail.gmail.com>
-Sender: stable-owner@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: linuxppc-dev@lists.ozlabs.org, herbert@gondor.apana.org.au,
+ stewart@linux.ibm.com, linux-crypto@vger.kernel.org
+To: mpe@ellerman.id.au
+Return-path: <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
+List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev/>
+List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
+List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
+List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
+Errors-To: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
+Sender: "Linuxppc-dev"
+ <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Jun 07, 2018 at 12:02:04PM +0300, Gilad Ben-Yossef wrote:
->
-> I'd be really happy to get a review on this patch - not so much what
-> it is doing but
-> rather the rational behind it - how is a tfm provider supposed to
-> handle copying the
-> last block of ciphertext into the request structure if the ciphertext
-> size is less than a
-> block?
 
-Which algorithm is this? In general we disallow requests which
-are not a multiple of a block for block ciphers.  Obviously this
-doesn't apply to stream ciphers such as ctr(aes), but in that case
-it doesn't really matter as you cannot chain such a request.
+Export opal_check_token symbol for modules to check the availability
+of OPAL calls before using them.
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Signed-off-by: Haren Myneni <haren@us.ibm.com>
+
+diff --git a/arch/powerpc/platforms/powernv/opal.c b/arch/powerpc/platforms/powernv/opal.c
+index 48fbb41..838b79b 100644
+--- a/arch/powerpc/platforms/powernv/opal.c
++++ b/arch/powerpc/platforms/powernv/opal.c
+@@ -923,6 +923,7 @@ void opal_shutdown(void)
+ EXPORT_SYMBOL_GPL(opal_flash_write);
+ EXPORT_SYMBOL_GPL(opal_flash_erase);
+ EXPORT_SYMBOL_GPL(opal_prd_msg);
++EXPORT_SYMBOL_GPL(opal_check_token);
+ 
+ /* Convert a region of vmalloc memory to an opal sg list */
+ struct opal_sg_list *opal_vmalloc_to_sg_list(void *vmalloc_addr,
