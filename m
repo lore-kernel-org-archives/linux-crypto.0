@@ -1,157 +1,104 @@
-From: Wirz <spam-rxbgZ4vWfLhdz0/ABlLGQA@public.gmane.org>
-Subject: Re: b43 crashes on rmmod (bcm4331)
-Date: Wed, 13 Jun 2018 16:07:02 +0300
-Message-ID: <6b84a788-e11f-91db-309c-4ff79fdcad66@lukas-wirz.de>
-References: <75e4b424-4c75-5abd-1ef0-c2537d329b10@lukas-wirz.de>
- <d9896c10-87bb-8362-f302-8b1888c3421c@lukas-wirz.de>
- <20180609171159.59b5209c@wiggum>
- <6a78c68e-1062-5ad8-876c-f7d4c49ea492@lukas-wirz.de>
- <20180609220130.3ceb834f@wiggum>
- <e72be8db-77ba-408c-c5e5-351d722e09e8@lukas-wirz.de>
- <20180611224634.28ccd288@wiggum>
- <7d564b8b-2b71-73f6-3ae7-ede0187a4151@lukas-wirz.de>
- <20180613122751.2fe89737@wiggum>
- <538cd7b7-8d63-1795-7bfc-69231d2bf3c0@lukas-wirz.de>
- <20180613130905.420695e7@wiggum> <20180613140148.1b57a566@wiggum>
+From: syzbot <syzbot+d82643ba80bf6937cd44@syzkaller.appspotmail.com>
+Subject: KASAN: use-after-free Read in crypto_morus640_decrypt_chunk
+Date: Wed, 13 Jun 2018 06:22:02 -0700
+Message-ID: <00000000000040ef1a056e85de5e@google.com>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
- protocol="application/pgp-signature";
- boundary="77YjpeHHDd3wxb83I6cHBbeZrwp96vD0L"
-Cc: linux-wireless <linux-wireless-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        b43-dev-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, Matt Mackall <mpm-VDJrAJ4Gl5ZBDgjK7y7TUQ@public.gmane.org>,
-        Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-        linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: =?UTF-8?Q?Michael_B=c3=bcsch?= <m@bues.ch>
-Return-path: <linux-wireless-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20180613140148.1b57a566@wiggum>
-Sender: linux-wireless-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+To: davem@davemloft.net, herbert@gondor.apana.org.au,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---77YjpeHHDd3wxb83I6cHBbeZrwp96vD0L
-Content-Type: multipart/mixed; boundary="7bqoPWCYmEXEXUbYW8Xyz7QgmVNP09Ajq";
- protected-headers="v1"
-From: Wirz <spam-rxbgZ4vWfLhdz0/ABlLGQA@public.gmane.org>
-To: =?UTF-8?Q?Michael_B=c3=bcsch?= <m@bues.ch>
-Cc: linux-wireless <linux-wireless-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
- b43-dev-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, Matt Mackall <mpm-VDJrAJ4Gl5ZBDgjK7y7TUQ@public.gmane.org>,
- Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Message-ID: <6b84a788-e11f-91db-309c-4ff79fdcad66-rxbgZ4vWfLhdz0/ABlLGQA@public.gmane.org>
-Subject: Re: b43 crashes on rmmod (bcm4331)
-References: <75e4b424-4c75-5abd-1ef0-c2537d329b10-rxbgZ4vWfLhdz0/ABlLGQA@public.gmane.org>
- <d9896c10-87bb-8362-f302-8b1888c3421c-rxbgZ4vWfLhdz0/ABlLGQA@public.gmane.org>
- <20180609171159.59b5209c@wiggum>
- <6a78c68e-1062-5ad8-876c-f7d4c49ea492-rxbgZ4vWfLhdz0/ABlLGQA@public.gmane.org>
- <20180609220130.3ceb834f@wiggum>
- <e72be8db-77ba-408c-c5e5-351d722e09e8-rxbgZ4vWfLhdz0/ABlLGQA@public.gmane.org>
- <20180611224634.28ccd288@wiggum>
- <7d564b8b-2b71-73f6-3ae7-ede0187a4151-rxbgZ4vWfLhdz0/ABlLGQA@public.gmane.org>
- <20180613122751.2fe89737@wiggum>
- <538cd7b7-8d63-1795-7bfc-69231d2bf3c0-rxbgZ4vWfLhdz0/ABlLGQA@public.gmane.org>
- <20180613130905.420695e7@wiggum> <20180613140148.1b57a566@wiggum>
-In-Reply-To: <20180613140148.1b57a566@wiggum>
+Hello,
 
---7bqoPWCYmEXEXUbYW8Xyz7QgmVNP09Ajq
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: quoted-printable
+syzbot found the following crash on:
 
+HEAD commit:    f0dc7f9c6dd9 Merge git://git.kernel.org/pub/scm/linux/kern..
+git tree:       net-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=12286eaf800000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=fa9c20c48788d1c1
+dashboard link: https://syzkaller.appspot.com/bug?extid=d82643ba80bf6937cd44
+compiler:       gcc (GCC) 8.0.1 20180413 (experimental)
 
->>>> CONFIG_B43_HWRNG completely switches off hwrng support in b43.
->>>> I don't see how a change in hwrng core could still lead to a crash i=
-n
->>>> b43 with this option switched off.
->>>>
->>>> What do you mean by "manually in the .config"?   =20
->>>
->>> What I meant is, that I have outcommented the line 'CONFIG_B43_HWRNG=3D=
-y'
->>> in .config.
->>>  =20
->>>> Can you try to properly switch off the setting with make menuconfig =
-and
->>>> then recompile everything from scratch (make clean)?   =20
->>>
->>> I was intending to do that before, but I cannot find the option for
->>> that.  Searching for b43_hwrng in menuconfig only shows the dependenc=
-ies
->>> of that option, and the Kconfig file where it is defined, but not the=
+Unfortunately, I don't have any reproducer for this crash yet.
 
->>> path in menuconfig.  Do I indirectly set CONFIG_B43_HWRNG through the=
+IMPORTANT: if you fix the bug, please add the following tag to the commit:
+Reported-by: syzbot+d82643ba80bf6937cd44@syzkaller.appspotmail.com
 
->>> parameters it depends on?  I'm sorry, but this is obviously above my
->>> level of expertise ... =20
->>
->> Whoops, sorry. You are right. This is an automatic config option.
->> That also means your manual editing of .config would be overridden.
->>
->> You can edit drivers/net/wireless/broadcom/b43/Kconfig
->> go to the section config B43_HWRNG
->> and change 'default y' to 'default n'
->>
->> That should disable it.
->=20
->=20
->=20
-> Could you please also try the attached patch?
-> There seems to be a problem in hwrng core in that it does not disable
-> the current RNG, if the new RNG fails to initialize.
-> I don't know if that's the problem here, though.
+netlink: 20 bytes leftover after parsing attributes in process  
+`syz-executor0'.
+netlink: 20 bytes leftover after parsing attributes in process  
+`syz-executor0'.
+==================================================================
+BUG: KASAN: use-after-free in crypto_morus640_load_a crypto/morus640.c:111  
+[inline]
+BUG: KASAN: use-after-free in crypto_morus640_decrypt_chunk+0xcf8/0xd20  
+crypto/morus640.c:278
+Read of size 4 at addr ffff8801bfc84003 by task syz-executor4/11106
 
-Ok. Do I apply your patch to the first version that fails for me, and
-revert my change to Kconfig?
+CPU: 1 PID: 11106 Comm: syz-executor4 Not tainted 4.17.0+ #84
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS  
+Google 01/01/2011
+Call Trace:
+  __dump_stack lib/dump_stack.c:77 [inline]
+  dump_stack+0x1b9/0x294 lib/dump_stack.c:113
+  print_address_description+0x6c/0x20b mm/kasan/report.c:256
+  kasan_report_error mm/kasan/report.c:354 [inline]
+  kasan_report.cold.7+0x242/0x2fe mm/kasan/report.c:412
+  __asan_report_load4_noabort+0x14/0x20 mm/kasan/report.c:432
+  crypto_morus640_load_a crypto/morus640.c:111 [inline]
+  crypto_morus640_decrypt_chunk+0xcf8/0xd20 crypto/morus640.c:278
+  crypto_morus640_process_crypt.isra.12+0x153/0x230 crypto/morus640.c:376
+  crypto_morus640_crypt+0x42e/0x9f0 crypto/morus640.c:442
+  crypto_morus640_decrypt+0x23e/0x3d0 crypto/morus640.c:485
+  crypto_aead_decrypt include/crypto/aead.h:370 [inline]
+  _aead_recvmsg crypto/algif_aead.c:315 [inline]
+  aead_recvmsg+0x13cc/0x1ba0 crypto/algif_aead.c:334
+  sock_recvmsg_nosec net/socket.c:818 [inline]
+  sock_recvmsg+0xd0/0x110 net/socket.c:825
+  ___sys_recvmsg+0x2b6/0x680 net/socket.c:2323
+  __sys_recvmsg+0x112/0x260 net/socket.c:2372
+  __do_sys_recvmsg net/socket.c:2382 [inline]
+  __se_sys_recvmsg net/socket.c:2379 [inline]
+  __x64_sys_recvmsg+0x78/0xb0 net/socket.c:2379
+  do_syscall_64+0x1b1/0x800 arch/x86/entry/common.c:290
+  entry_SYSCALL_64_after_hwframe+0x49/0xbe
+RIP: 0033:0x455b29
+Code: 1d ba fb ff c3 66 2e 0f 1f 84 00 00 00 00 00 66 90 48 89 f8 48 89 f7  
+48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff  
+ff 0f 83 eb b9 fb ff c3 66 2e 0f 1f 84 00 00 00 00
+RSP: 002b:00007f76ce020c68 EFLAGS: 00000246 ORIG_RAX: 000000000000002f
+RAX: ffffffffffffffda RBX: 00007f76ce0216d4 RCX: 0000000000455b29
+RDX: 0000000000000000 RSI: 0000000020002840 RDI: 0000000000000016
+RBP: 000000000072bf50 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 00000000ffffffff
+R13: 00000000004c084a R14: 00000000004cffe8 R15: 0000000000000001
 
-At the moment the test without B43_HWRNG compiles, I will test that later=
-=2E
+The buggy address belongs to the page:
+page:ffffea0006ff2100 count:0 mapcount:-128 mapping:0000000000000000  
+index:0x1
+flags: 0x2fffc0000000000()
+raw: 02fffc0000000000 ffffea0006ff9308 ffffea0006ff2208 0000000000000000
+raw: 0000000000000001 0000000000000002 00000000ffffff7f 0000000000000000
+page dumped because: kasan: bad access detected
 
-
-> diff --git a/drivers/char/hw_random/core.c
-> b/drivers/char/hw_random/core.c index 91bb98c42a1c..aaf9e5afaad4 100644=
-
-> --- a/drivers/char/hw_random/core.c
-> +++ b/drivers/char/hw_random/core.c
-> @@ -516,11 +516,18 @@ EXPORT_SYMBOL_GPL(hwrng_register);
-> =20
->  void hwrng_unregister(struct hwrng *rng)
->  {
-> +	int err;
-> +
->  	mutex_lock(&rng_mutex);
-> =20
->  	list_del(&rng->list);
-> -	if (current_rng =3D=3D rng)
-> -		enable_best_rng();
-> +	if (current_rng =3D=3D rng) {
-> +		err =3D enable_best_rng();
-> +		if (err) {
-> +			drop_current_rng();
-> +			cur_rng_set_by_user =3D 0;
-> +		}
-> +	}
-> =20
->  	if (list_empty(&rng_list)) {
->  		mutex_unlock(&rng_mutex);
->=20
->=20
->=20
+Memory state around the buggy address:
+  ffff8801bfc83f00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  ffff8801bfc83f80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+> ffff8801bfc84000: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+                    ^
+  ffff8801bfc84080: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+  ffff8801bfc84100: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+==================================================================
 
 
---=20
-Do not believe the naysayers who say it cannot be done.
+---
+This bug is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-
---7bqoPWCYmEXEXUbYW8Xyz7QgmVNP09Ajq--
-
---77YjpeHHDd3wxb83I6cHBbeZrwp96vD0L
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iF0EARECAB0WIQQfsLWbEt//FEFwBMDWbaSYbwIjLQUCWyEW9gAKCRDWbaSYbwIj
-LeuFAJ9PGfbpQLElXqhcHE8B3Au8OGRIJQCfboPpx+Ft2Vbgbmzged1PX8ftE6A=
-=Mu/Z
------END PGP SIGNATURE-----
-
---77YjpeHHDd3wxb83I6cHBbeZrwp96vD0L--
+syzbot will keep track of this bug report. See:
+https://goo.gl/tpsmEJ#bug-status-tracking for how to communicate with  
+syzbot.
