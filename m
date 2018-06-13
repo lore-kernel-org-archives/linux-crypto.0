@@ -1,145 +1,166 @@
-From: syzbot <syzbot+1fafa9c4cf42df33f716@syzkaller.appspotmail.com>
-Subject: Re: KASAN: slab-out-of-bounds Read in crypto_morus640_decrypt_chunk
-Date: Wed, 13 Jun 2018 04:32:01 -0700
-Message-ID: <000000000000d85140056e845443@google.com>
-References: <0000000000005abb37056e840d40@google.com>
+From: Michael =?UTF-8?B?QsO8c2No?= <m@bues.ch>
+Subject: Re: b43 crashes on rmmod (bcm4331)
+Date: Wed, 13 Jun 2018 14:01:48 +0200
+Message-ID: <20180613140148.1b57a566@wiggum>
+References: <75e4b424-4c75-5abd-1ef0-c2537d329b10@lukas-wirz.de>
+ <d9896c10-87bb-8362-f302-8b1888c3421c@lukas-wirz.de>
+ <20180609171159.59b5209c@wiggum>
+ <6a78c68e-1062-5ad8-876c-f7d4c49ea492@lukas-wirz.de>
+ <20180609220130.3ceb834f@wiggum>
+ <e72be8db-77ba-408c-c5e5-351d722e09e8@lukas-wirz.de>
+ <20180611224634.28ccd288@wiggum>
+ <7d564b8b-2b71-73f6-3ae7-ede0187a4151@lukas-wirz.de>
+ <20180613122751.2fe89737@wiggum>
+ <538cd7b7-8d63-1795-7bfc-69231d2bf3c0@lukas-wirz.de>
+ <20180613130905.420695e7@wiggum>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
-To: davem@davemloft.net, herbert@gondor.apana.org.au,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <0000000000005abb37056e840d40@google.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: multipart/signed; micalg=pgp-sha512;
+ boundary="Sig_/8WVnbKlrdBO.JQW.sj5ulir"; protocol="application/pgp-signature"
+Cc: linux-wireless <linux-wireless-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        b43-dev-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, Matt Mackall <mpm-VDJrAJ4Gl5ZBDgjK7y7TUQ@public.gmane.org>,
+        Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+        linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Wirz <spam-rxbgZ4vWfLhdz0/ABlLGQA@public.gmane.org>
+Return-path: <linux-wireless-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20180613130905.420695e7@wiggum>
+Sender: linux-wireless-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-syzbot has found a reproducer for the following crash on:
+--Sig_/8WVnbKlrdBO.JQW.sj5ulir
+Content-Type: multipart/mixed; boundary="MP_/K3lxBUniP9O/V1zAbtPGBkL"
 
-HEAD commit:    f0dc7f9c6dd9 Merge git://git.kernel.org/pub/scm/linux/kern..
-git tree:       net-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=16685c1f800000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=fa9c20c48788d1c1
-dashboard link: https://syzkaller.appspot.com/bug?extid=1fafa9c4cf42df33f716
-compiler:       gcc (GCC) 8.0.1 20180413 (experimental)
-syzkaller repro:https://syzkaller.appspot.com/x/repro.syz?x=1122e4cf800000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1794783f800000
+--MP_/K3lxBUniP9O/V1zAbtPGBkL
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-IMPORTANT: if you fix the bug, please add the following tag to the commit:
-Reported-by: syzbot+1fafa9c4cf42df33f716@syzkaller.appspotmail.com
+On Wed, 13 Jun 2018 13:09:05 +0200
+Michael B=C3=BCsch <m@bues.ch> wrote:
 
-random: sshd: uninitialized urandom read (32 bytes read)
-random: sshd: uninitialized urandom read (32 bytes read)
-random: sshd: uninitialized urandom read (32 bytes read)
-random: sshd: uninitialized urandom read (32 bytes read)
-==================================================================
-BUG: KASAN: slab-out-of-bounds in crypto_morus640_load_a  
-crypto/morus640.c:111 [inline]
-BUG: KASAN: slab-out-of-bounds in crypto_morus640_decrypt_chunk+0xcf8/0xd20  
-crypto/morus640.c:278
-Read of size 4 at addr ffff8801d76dc848 by task syz-executor575/4437
+> On Wed, 13 Jun 2018 14:01:53 +0300
+> Wirz <spam-rxbgZ4vWfLhdz0/ABlLGQA@public.gmane.org> wrote:
+>=20
+> > > CONFIG_B43_HWRNG completely switches off hwrng support in b43.
+> > > I don't see how a change in hwrng core could still lead to a crash in
+> > > b43 with this option switched off.
+> > >=20
+> > > What do you mean by "manually in the .config"?   =20
+> >=20
+> > What I meant is, that I have outcommented the line 'CONFIG_B43_HWRNG=3D=
+y'
+> > in .config.
+> >  =20
+> > > Can you try to properly switch off the setting with make menuconfig a=
+nd
+> > > then recompile everything from scratch (make clean)?   =20
+> >=20
+> > I was intending to do that before, but I cannot find the option for
+> > that.  Searching for b43_hwrng in menuconfig only shows the dependencies
+> > of that option, and the Kconfig file where it is defined, but not the
+> > path in menuconfig.  Do I indirectly set CONFIG_B43_HWRNG through the
+> > parameters it depends on?  I'm sorry, but this is obviously above my
+> > level of expertise ... =20
+>=20
+> Whoops, sorry. You are right. This is an automatic config option.
+> That also means your manual editing of .config would be overridden.
+>=20
+> You can edit drivers/net/wireless/broadcom/b43/Kconfig
+> go to the section config B43_HWRNG
+> and change 'default y' to 'default n'
+>=20
+> That should disable it.
 
-CPU: 1 PID: 4437 Comm: syz-executor575 Not tainted 4.17.0+ #84
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS  
-Google 01/01/2011
-Call Trace:
-  __dump_stack lib/dump_stack.c:77 [inline]
-  dump_stack+0x1b9/0x294 lib/dump_stack.c:113
-  print_address_description+0x6c/0x20b mm/kasan/report.c:256
-  kasan_report_error mm/kasan/report.c:354 [inline]
-  kasan_report.cold.7+0x242/0x2fe mm/kasan/report.c:412
-  __asan_report_load4_noabort+0x14/0x20 mm/kasan/report.c:432
-  crypto_morus640_load_a crypto/morus640.c:111 [inline]
-  crypto_morus640_decrypt_chunk+0xcf8/0xd20 crypto/morus640.c:278
-  crypto_morus640_process_crypt.isra.12+0x153/0x230 crypto/morus640.c:376
-  crypto_morus640_crypt+0x42e/0x9f0 crypto/morus640.c:442
-  crypto_morus640_decrypt+0x23e/0x3d0 crypto/morus640.c:485
-  crypto_aead_decrypt include/crypto/aead.h:370 [inline]
-  _aead_recvmsg crypto/algif_aead.c:315 [inline]
-  aead_recvmsg+0x13cc/0x1ba0 crypto/algif_aead.c:334
-  sock_recvmsg_nosec net/socket.c:818 [inline]
-  sock_recvmsg+0xd0/0x110 net/socket.c:825
-  ___sys_recvmsg+0x2b6/0x680 net/socket.c:2323
-  __sys_recvmsg+0x112/0x260 net/socket.c:2372
-  __do_sys_recvmsg net/socket.c:2382 [inline]
-  __se_sys_recvmsg net/socket.c:2379 [inline]
-  __x64_sys_recvmsg+0x78/0xb0 net/socket.c:2379
-  do_syscall_64+0x1b1/0x800 arch/x86/entry/common.c:290
-  entry_SYSCALL_64_after_hwframe+0x49/0xbe
-RIP: 0033:0x43fef9
-Code: 18 89 d0 c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 00 48 89 f8 48 89 f7  
-48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff  
-ff 0f 83 6b 45 00 00 c3 66 2e 0f 1f 84 00 00 00 00
-RSP: 002b:00007ffd6c88d3b8 EFLAGS: 00000207 ORIG_RAX: 000000000000002f
-RAX: ffffffffffffffda RBX: 00000000004002c8 RCX: 000000000043fef9
-RDX: 0000000000000000 RSI: 0000000020002840 RDI: 0000000000000004
-RBP: 00000000006ca018 R08: 00000000004002c8 R09: 00000000004002c8
-R10: 00000000004002c8 R11: 0000000000000207 R12: 0000000000401820
-R13: 00000000004018b0 R14: 0000000000000000 R15: 0000000000000000
 
-Allocated by task 4437:
-  save_stack+0x43/0xd0 mm/kasan/kasan.c:448
-  set_track mm/kasan/kasan.c:460 [inline]
-  kasan_kmalloc+0xc4/0xe0 mm/kasan/kasan.c:553
-  __do_kmalloc mm/slab.c:3718 [inline]
-  __kmalloc+0x14e/0x760 mm/slab.c:3727
-  kmalloc include/linux/slab.h:518 [inline]
-  kzalloc include/linux/slab.h:706 [inline]
-  skcipher_next_slow crypto/skcipher.c:253 [inline]
-  skcipher_walk_next+0x750/0x1850 crypto/skcipher.c:357
-  skcipher_walk_first+0x151/0x410 crypto/skcipher.c:442
-  skcipher_walk_aead_common+0x7f8/0xbc0 crypto/skcipher.c:539
-  skcipher_walk_aead_decrypt+0xc7/0x100 crypto/skcipher.c:572
-  crypto_morus640_process_crypt.isra.12+0x9c/0x230 crypto/morus640.c:370
-  crypto_morus640_crypt+0x42e/0x9f0 crypto/morus640.c:442
-  crypto_morus640_decrypt+0x23e/0x3d0 crypto/morus640.c:485
-  crypto_aead_decrypt include/crypto/aead.h:370 [inline]
-  _aead_recvmsg crypto/algif_aead.c:315 [inline]
-  aead_recvmsg+0x13cc/0x1ba0 crypto/algif_aead.c:334
-  sock_recvmsg_nosec net/socket.c:818 [inline]
-  sock_recvmsg+0xd0/0x110 net/socket.c:825
-  ___sys_recvmsg+0x2b6/0x680 net/socket.c:2323
-  __sys_recvmsg+0x112/0x260 net/socket.c:2372
-  __do_sys_recvmsg net/socket.c:2382 [inline]
-  __se_sys_recvmsg net/socket.c:2379 [inline]
-  __x64_sys_recvmsg+0x78/0xb0 net/socket.c:2379
-  do_syscall_64+0x1b1/0x800 arch/x86/entry/common.c:290
-  entry_SYSCALL_64_after_hwframe+0x49/0xbe
 
-Freed by task 2800:
-  save_stack+0x43/0xd0 mm/kasan/kasan.c:448
-  set_track mm/kasan/kasan.c:460 [inline]
-  __kasan_slab_free+0x11a/0x170 mm/kasan/kasan.c:521
-  kasan_slab_free+0xe/0x10 mm/kasan/kasan.c:528
-  __cache_free mm/slab.c:3498 [inline]
-  kfree+0xd9/0x260 mm/slab.c:3813
-  single_release+0x8f/0xb0 fs/seq_file.c:609
-  __fput+0x353/0x890 fs/file_table.c:209
-  ____fput+0x15/0x20 fs/file_table.c:243
-  task_work_run+0x1e4/0x290 kernel/task_work.c:113
-  tracehook_notify_resume include/linux/tracehook.h:192 [inline]
-  exit_to_usermode_loop+0x302/0x360 arch/x86/entry/common.c:166
-  prepare_exit_to_usermode arch/x86/entry/common.c:197 [inline]
-  syscall_return_slowpath arch/x86/entry/common.c:268 [inline]
-  do_syscall_64+0x6ac/0x800 arch/x86/entry/common.c:293
-  entry_SYSCALL_64_after_hwframe+0x49/0xbe
+Could you please also try the attached patch?
+There seems to be a problem in hwrng core in that it does not disable
+the current RNG, if the new RNG fails to initialize.
+I don't know if that's the problem here, though.
 
-The buggy address belongs to the object at ffff8801d76dc840
-  which belongs to the cache kmalloc-32 of size 32
-The buggy address is located 8 bytes inside of
-  32-byte region [ffff8801d76dc840, ffff8801d76dc860)
-The buggy address belongs to the page:
-page:ffffea00075db700 count:1 mapcount:0 mapping:ffff8801da8001c0  
-index:0xffff8801d76dcfc1
-flags: 0x2fffc0000000100(slab)
-raw: 02fffc0000000100 ffff8801da801238 ffffea00075dcdc8 ffff8801da8001c0
-raw: ffff8801d76dcfc1 ffff8801d76dc000 000000010000003b 0000000000000000
-page dumped because: kasan: bad access detected
 
-Memory state around the buggy address:
-  ffff8801d76dc700: fb fb fb fb fc fc fc fc 00 00 fc fc fc fc fc fc
-  ffff8801d76dc780: fb fb fb fb fc fc fc fc 00 00 fc fc fc fc fc fc
-> ffff8801d76dc800: 00 00 00 00 fc fc fc fc 00 fc fc fc fc fc fc fc
-                                               ^
-  ffff8801d76dc880: fb fb fb fb fc fc fc fc fb fb fb fb fc fc fc fc
-  ffff8801d76dc900: fb fb fb fb fc fc fc fc fb fb fb fb fc fc fc fc
-==================================================================
+diff --git a/drivers/char/hw_random/core.c
+b/drivers/char/hw_random/core.c index 91bb98c42a1c..aaf9e5afaad4 100644
+--- a/drivers/char/hw_random/core.c
++++ b/drivers/char/hw_random/core.c
+@@ -516,11 +516,18 @@ EXPORT_SYMBOL_GPL(hwrng_register);
+=20
+ void hwrng_unregister(struct hwrng *rng)
+ {
++	int err;
++
+ 	mutex_lock(&rng_mutex);
+=20
+ 	list_del(&rng->list);
+-	if (current_rng =3D=3D rng)
+-		enable_best_rng();
++	if (current_rng =3D=3D rng) {
++		err =3D enable_best_rng();
++		if (err) {
++			drop_current_rng();
++			cur_rng_set_by_user =3D 0;
++		}
++	}
+=20
+ 	if (list_empty(&rng_list)) {
+ 		mutex_unlock(&rng_mutex);
+
+
+
+--=20
+Michael
+
+--MP_/K3lxBUniP9O/V1zAbtPGBkL
+Content-Type: text/x-patch
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: attachment; filename=rng_new_init_fail.patch
+
+diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
+index 91bb98c42a1c..aaf9e5afaad4 100644
+--- a/drivers/char/hw_random/core.c
++++ b/drivers/char/hw_random/core.c
+@@ -516,11 +516,18 @@ EXPORT_SYMBOL_GPL(hwrng_register);
+=20
+ void hwrng_unregister(struct hwrng *rng)
+ {
++	int err;
++
+ 	mutex_lock(&rng_mutex);
+=20
+ 	list_del(&rng->list);
+-	if (current_rng =3D=3D rng)
+-		enable_best_rng();
++	if (current_rng =3D=3D rng) {
++		err =3D enable_best_rng();
++		if (err) {
++			drop_current_rng();
++			cur_rng_set_by_user =3D 0;
++		}
++	}
+=20
+ 	if (list_empty(&rng_list)) {
+ 		mutex_unlock(&rng_mutex);
+
+--MP_/K3lxBUniP9O/V1zAbtPGBkL--
+
+--Sig_/8WVnbKlrdBO.JQW.sj5ulir
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEihRzkKVZOnT2ipsS9TK+HZCNiw4FAlshB6wACgkQ9TK+HZCN
+iw6vsA//TxxjHcXvxm09mYcPvojdmPW466FdEAqyyWXC2IjtCT02eXzkUWPjVPv1
+LXBxno8sq7QZwd5Lx+ubcY6mrCmUvdkLdAI+msxXuy6CdSRccfWjflW+7R3fYF4W
+hYDrpA9i7JooVt2ITZrWRxKImWK4AjyGFGJDLB/X3aQS82ioVkx3iIC4O4RSCQN/
++MsbxAsi54KWD00lHcbQQeUFdOYdk3Q2EM/a2EmWw6GAfqba15Yb46sp1/lMo+Fr
+eP+w8ECQrS1ywIqRRyquQXO+06ItTPqYOPGyA6ruLlkdTK4Nw7sQYiNmvtPS0PM5
+l26Ae86zKNYKkrpO/tqnRIrrTr2gLO91cQvbIqbsJY+BadzEXDZrMVULecBYqsce
+cbjRpn9Eb4frLGIrR2fBggakUONl4AzWBKA1VjAy29jzoSrpUSZ7wEy/FLQBnSI9
+qQptFl47me5iq0w/72YZAz7H7BIzqiAY3QlMs+yzORsq1C6j1So0MioMfcK8WrgQ
+eJ164PCHHFB0hnx0TLW8IJFFqRM0wFFveBJZ9gOSjGbOQ1prMfGGw0Ly1B2bi36E
+64kMgdAtotMVfZZQ5Lp7CorrwbAhO9+h4pN4q5YSS3F+0QZtpCocaRS1SefVnv6I
+vjHiMpy8Csj/Sxeq48n9ftUNKYMgvy9E3hsfgvgfunEDvRn+DY8=
+=vlRj
+-----END PGP SIGNATURE-----
+
+--Sig_/8WVnbKlrdBO.JQW.sj5ulir--
