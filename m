@@ -1,129 +1,82 @@
-From: Wirz <spam-rxbgZ4vWfLhdz0/ABlLGQA@public.gmane.org>
-Subject: Re: b43 crashes on rmmod (bcm4331)
-Date: Thu, 14 Jun 2018 22:18:52 +0300
-Message-ID: <c0f833ab-d727-6d56-c252-58a209e1c459@lukas-wirz.de>
-References: <75e4b424-4c75-5abd-1ef0-c2537d329b10@lukas-wirz.de>
- <d9896c10-87bb-8362-f302-8b1888c3421c@lukas-wirz.de>
- <20180609171159.59b5209c@wiggum>
- <6a78c68e-1062-5ad8-876c-f7d4c49ea492@lukas-wirz.de>
- <20180609220130.3ceb834f@wiggum>
- <e72be8db-77ba-408c-c5e5-351d722e09e8@lukas-wirz.de>
- <20180611224634.28ccd288@wiggum>
- <7d564b8b-2b71-73f6-3ae7-ede0187a4151@lukas-wirz.de>
- <20180613122751.2fe89737@wiggum>
- <538cd7b7-8d63-1795-7bfc-69231d2bf3c0@lukas-wirz.de>
- <20180613130905.420695e7@wiggum> <20180613140148.1b57a566@wiggum>
- <6b84a788-e11f-91db-309c-4ff79fdcad66@lukas-wirz.de>
- <20180613152812.5596b460@wiggum>
- <6bef30e0-9405-2ddd-d1eb-612b4d4e3382@lukas-wirz.de>
- <20180614182636.1b92d7df@wiggum>
+From: Corentin Labbe <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [PATCH] crypto: sun4i-ss: prevent deadlock on emulated hardware
+Date: Thu, 14 Jun 2018 21:36:59 +0200
+Message-ID: <20180614193659.29261-1-clabbe.montjoie@gmail.com>
+Reply-To: clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
- protocol="application/pgp-signature";
- boundary="oFafDZpxYbiMwKH6asEt3J9VeWxSNUk9g"
-Cc: linux-wireless <linux-wireless-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        b43-dev-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, Matt Mackall <mpm-VDJrAJ4Gl5ZBDgjK7y7TUQ@public.gmane.org>,
-        Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-        linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: =?UTF-8?Q?Michael_B=c3=bcsch?= <m@bues.ch>
-Return-path: <linux-wireless-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20180614182636.1b92d7df@wiggum>
-Sender: linux-wireless-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain; charset="UTF-8"
+Cc: linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
+	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org,
+	Corentin Labbe <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org,
+	herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org,
+	maxime.ripard-LDxbnhwyfcJBDgjK7y7TUQ@public.gmane.org,
+	wens-jdAy2FN1RRM@public.gmane.org
+Return-path: <linux-sunxi+bncBD7YLCN32UNBB44IRPMQKGQEC2CFKCA-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+Sender: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
+List-Post: <https://groups.google.com/group/linux-sunxi/post>, <mailto:linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Help: <https://groups.google.com/support/>, <mailto:linux-sunxi+help-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Archive: <https://groups.google.com/group/linux-sunxi
+List-Subscribe: <https://groups.google.com/group/linux-sunxi/subscribe>, <mailto:linux-sunxi+subscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Unsubscribe: <mailto:googlegroups-manage+1076902468213+unsubscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>,
+ <https://groups.google.com/group/linux-sunxi/subscribe>
 List-Id: linux-crypto.vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---oFafDZpxYbiMwKH6asEt3J9VeWxSNUk9g
-Content-Type: multipart/mixed; boundary="601FGFCQ9tt6OIg7TAJHXoK0ArE1U8fCC";
- protected-headers="v1"
-From: Wirz <spam-rxbgZ4vWfLhdz0/ABlLGQA@public.gmane.org>
-To: =?UTF-8?Q?Michael_B=c3=bcsch?= <m@bues.ch>
-Cc: linux-wireless <linux-wireless-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
- b43-dev-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, Matt Mackall <mpm-VDJrAJ4Gl5ZBDgjK7y7TUQ@public.gmane.org>,
- Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Message-ID: <c0f833ab-d727-6d56-c252-58a209e1c459-rxbgZ4vWfLhdz0/ABlLGQA@public.gmane.org>
-Subject: Re: b43 crashes on rmmod (bcm4331)
-References: <75e4b424-4c75-5abd-1ef0-c2537d329b10-rxbgZ4vWfLhdz0/ABlLGQA@public.gmane.org>
- <d9896c10-87bb-8362-f302-8b1888c3421c-rxbgZ4vWfLhdz0/ABlLGQA@public.gmane.org>
- <20180609171159.59b5209c@wiggum>
- <6a78c68e-1062-5ad8-876c-f7d4c49ea492-rxbgZ4vWfLhdz0/ABlLGQA@public.gmane.org>
- <20180609220130.3ceb834f@wiggum>
- <e72be8db-77ba-408c-c5e5-351d722e09e8-rxbgZ4vWfLhdz0/ABlLGQA@public.gmane.org>
- <20180611224634.28ccd288@wiggum>
- <7d564b8b-2b71-73f6-3ae7-ede0187a4151-rxbgZ4vWfLhdz0/ABlLGQA@public.gmane.org>
- <20180613122751.2fe89737@wiggum>
- <538cd7b7-8d63-1795-7bfc-69231d2bf3c0-rxbgZ4vWfLhdz0/ABlLGQA@public.gmane.org>
- <20180613130905.420695e7@wiggum> <20180613140148.1b57a566@wiggum>
- <6b84a788-e11f-91db-309c-4ff79fdcad66-rxbgZ4vWfLhdz0/ABlLGQA@public.gmane.org>
- <20180613152812.5596b460@wiggum>
- <6bef30e0-9405-2ddd-d1eb-612b4d4e3382-rxbgZ4vWfLhdz0/ABlLGQA@public.gmane.org>
- <20180614182636.1b92d7df@wiggum>
-In-Reply-To: <20180614182636.1b92d7df@wiggum>
+Running a qemu emulated cubieboard with sun4i-ss driver enabled led to a never
+ending boot.
+This is due to sun4i-ss deadlocked and taking all cpu in an infinite loop.
+Since the crypto hardware is not implemented, all registers are read as 0.
+So sun4i-ss will never progress in any operations. (TX_CNT being always 0)
 
---601FGFCQ9tt6OIg7TAJHXoK0ArE1U8fCC
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: quoted-printable
+The first idea is to add a "TX_CNT always zero timeout" but this made cipher/hash loops
+more complex and prevent a case that never happen on real hardware.
 
-On 14/06/18 19:26, Michael B=C3=BCsch wrote:
-> On Thu, 14 Jun 2018 12:47:19 +0300
-> Wirz <spam-rxbgZ4vWfLhdz0/ABlLGQA@public.gmane.org> wrote:
->=20
->>>>>> You can edit drivers/net/wireless/broadcom/b43/Kconfig
->>>>>> go to the section config B43_HWRNG
->>>>>> and change 'default y' to 'default n'
->>>>>>
->>>>>> That should disable it.   =20
->>>>>
->>>>>
->>>>>
->>>>> Could you please also try the attached patch?
->>>>> There seems to be a problem in hwrng core in that it does not disab=
-le
->>>>> the current RNG, if the new RNG fails to initialize.
->>>>> I don't know if that's the problem here, though.   =20
->>>>
->>>> Ok. Do I apply your patch to the first version that fails for me, an=
-d
->>>> revert my change to Kconfig? =20
->>>
->>>
->>> Yes, please test the patch with a version that would otherwise fail.
->>> You can use 4.16 or the latest kernel for that. I created it with lat=
-est
->>> linus' version. =20
->>
->> I tested both suggested cases.  When I disable B43_HWRNG by editing
->> Kconfig, 'rmmod b43' succeeds in the first version where it previously=
+The best way to fix is to check at probe time if we run on a virtual
+machine with hardware emulated but non-implemented and prevent
+sun4i-ss to be loaded in that case.
+Letting sun4i-ss to load is useless anyway since all crypto algorithm will be
+disabled since they will fail crypto selftests.
 
->> failed.  When I apply your patch on top of an unmodified 4.16 it also
->> succeeds.
->=20
->=20
-> Thank you _very_ much for testing.
->=20
-> I will submit this patch to the hw_random maintainers.
+Tested-on: qemu-cubieboard
+Tested-on: cubieboard2
 
-Great, thank you!  I look forward to using a current kernel again.
+Signed-off-by: Corentin Labbe <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+---
+ drivers/crypto/sunxi-ss/sun4i-ss-core.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-cheers, lukas
-
-
---=20
-Do not believe the naysayers who say it cannot be done.
-
-
---601FGFCQ9tt6OIg7TAJHXoK0ArE1U8fCC--
-
---oFafDZpxYbiMwKH6asEt3J9VeWxSNUk9g
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iF0EARECAB0WIQQfsLWbEt//FEFwBMDWbaSYbwIjLQUCWyK/ogAKCRDWbaSYbwIj
-LZ0VAJ9RFjKriOp++NU0rgLzJ0ZW03ZSHwCeP/uiUUWaOXX1WhjotWXsmOMMmDw=
-=hrLf
------END PGP SIGNATURE-----
-
---oFafDZpxYbiMwKH6asEt3J9VeWxSNUk9g--
+diff --git a/drivers/crypto/sunxi-ss/sun4i-ss-core.c b/drivers/crypto/sunxi-ss/sun4i-ss-core.c
+index a81d89b3b7d8..a178e80adcf3 100644
+--- a/drivers/crypto/sunxi-ss/sun4i-ss-core.c
++++ b/drivers/crypto/sunxi-ss/sun4i-ss-core.c
+@@ -341,9 +341,18 @@ static int sun4i_ss_probe(struct platform_device *pdev)
+ 	 * I expect to be a sort of Security System Revision number.
+ 	 * Since the A80 seems to have an other version of SS
+ 	 * this info could be useful
++	 * Detect virtual machine with non-implemented hardware
++	 * (qemu-cubieboard) by checking the register value after a write to it.
++	 * On non-implemented hardware, all registers are read as 0.
++	 * On real hardware we should have a value > 0.
+ 	 */
+ 	writel(SS_ENABLED, ss->base + SS_CTL);
+ 	v = readl(ss->base + SS_CTL);
++	if (!v) {
++		dev_err(&pdev->dev, "Qemu with non-implemented SS detected.\n");
++		err = -ENODEV;
++		goto error_rst;
++	}
+ 	v >>= 16;
+ 	v &= 0x07;
+ 	dev_info(&pdev->dev, "Die ID %d\n", v);
+@@ -398,6 +407,7 @@ static int sun4i_ss_probe(struct platform_device *pdev)
+ 			break;
+ 		}
+ 	}
++error_rst:
+ 	if (ss->reset)
+ 		reset_control_assert(ss->reset);
+ error_clk:
+-- 
+2.16.4
