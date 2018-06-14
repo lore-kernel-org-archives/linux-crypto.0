@@ -1,89 +1,112 @@
-From: syzbot <syzbot+d82643ba80bf6937cd44@syzkaller.appspotmail.com>
-Subject: Re: KASAN: use-after-free Read in crypto_morus640_decrypt_chunk
-Date: Wed, 13 Jun 2018 06:37:01 -0700
-Message-ID: <000000000000e30245056e861322@google.com>
-References: <00000000000040ef1a056e85de5e@google.com>
+From: Wirz <spam-rxbgZ4vWfLhdz0/ABlLGQA@public.gmane.org>
+Subject: Re: b43 crashes on rmmod (bcm4331)
+Date: Thu, 14 Jun 2018 12:47:19 +0300
+Message-ID: <6bef30e0-9405-2ddd-d1eb-612b4d4e3382@lukas-wirz.de>
+References: <75e4b424-4c75-5abd-1ef0-c2537d329b10@lukas-wirz.de>
+ <d9896c10-87bb-8362-f302-8b1888c3421c@lukas-wirz.de>
+ <20180609171159.59b5209c@wiggum>
+ <6a78c68e-1062-5ad8-876c-f7d4c49ea492@lukas-wirz.de>
+ <20180609220130.3ceb834f@wiggum>
+ <e72be8db-77ba-408c-c5e5-351d722e09e8@lukas-wirz.de>
+ <20180611224634.28ccd288@wiggum>
+ <7d564b8b-2b71-73f6-3ae7-ede0187a4151@lukas-wirz.de>
+ <20180613122751.2fe89737@wiggum>
+ <538cd7b7-8d63-1795-7bfc-69231d2bf3c0@lukas-wirz.de>
+ <20180613130905.420695e7@wiggum> <20180613140148.1b57a566@wiggum>
+ <6b84a788-e11f-91db-309c-4ff79fdcad66@lukas-wirz.de>
+ <20180613152812.5596b460@wiggum>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
-To: davem@davemloft.net, herbert@gondor.apana.org.au,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <00000000000040ef1a056e85de5e@google.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: multipart/signed; micalg=pgp-sha1;
+ protocol="application/pgp-signature";
+ boundary="OBDhBlZUsPROum0mA6nbvX4xLQmLEDnxB"
+Cc: linux-wireless <linux-wireless-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        b43-dev-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, Matt Mackall <mpm-VDJrAJ4Gl5ZBDgjK7y7TUQ@public.gmane.org>,
+        Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+        linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: =?UTF-8?Q?Michael_B=c3=bcsch?= <m@bues.ch>
+Return-path: <linux-wireless-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20180613152812.5596b460@wiggum>
+Sender: linux-wireless-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-syzbot has found a reproducer for the following crash on:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--OBDhBlZUsPROum0mA6nbvX4xLQmLEDnxB
+Content-Type: multipart/mixed; boundary="WTbq9za79umExicsbC73n8BmhRPupzKMe";
+ protected-headers="v1"
+From: Wirz <spam-rxbgZ4vWfLhdz0/ABlLGQA@public.gmane.org>
+To: =?UTF-8?Q?Michael_B=c3=bcsch?= <m@bues.ch>
+Cc: linux-wireless <linux-wireless-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+ b43-dev-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, Matt Mackall <mpm-VDJrAJ4Gl5ZBDgjK7y7TUQ@public.gmane.org>,
+ Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Message-ID: <6bef30e0-9405-2ddd-d1eb-612b4d4e3382-rxbgZ4vWfLhdz0/ABlLGQA@public.gmane.org>
+Subject: Re: b43 crashes on rmmod (bcm4331)
+References: <75e4b424-4c75-5abd-1ef0-c2537d329b10-rxbgZ4vWfLhdz0/ABlLGQA@public.gmane.org>
+ <d9896c10-87bb-8362-f302-8b1888c3421c-rxbgZ4vWfLhdz0/ABlLGQA@public.gmane.org>
+ <20180609171159.59b5209c@wiggum>
+ <6a78c68e-1062-5ad8-876c-f7d4c49ea492-rxbgZ4vWfLhdz0/ABlLGQA@public.gmane.org>
+ <20180609220130.3ceb834f@wiggum>
+ <e72be8db-77ba-408c-c5e5-351d722e09e8-rxbgZ4vWfLhdz0/ABlLGQA@public.gmane.org>
+ <20180611224634.28ccd288@wiggum>
+ <7d564b8b-2b71-73f6-3ae7-ede0187a4151-rxbgZ4vWfLhdz0/ABlLGQA@public.gmane.org>
+ <20180613122751.2fe89737@wiggum>
+ <538cd7b7-8d63-1795-7bfc-69231d2bf3c0-rxbgZ4vWfLhdz0/ABlLGQA@public.gmane.org>
+ <20180613130905.420695e7@wiggum> <20180613140148.1b57a566@wiggum>
+ <6b84a788-e11f-91db-309c-4ff79fdcad66-rxbgZ4vWfLhdz0/ABlLGQA@public.gmane.org>
+ <20180613152812.5596b460@wiggum>
+In-Reply-To: <20180613152812.5596b460@wiggum>
 
-HEAD commit:    f0dc7f9c6dd9 Merge git://git.kernel.org/pub/scm/linux/kern..
-git tree:       net-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=109f9037800000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=fa9c20c48788d1c1
-dashboard link: https://syzkaller.appspot.com/bug?extid=d82643ba80bf6937cd44
-compiler:       gcc (GCC) 8.0.1 20180413 (experimental)
-syzkaller repro:https://syzkaller.appspot.com/x/repro.syz?x=1799185f800000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1241e1bf800000
+--WTbq9za79umExicsbC73n8BmhRPupzKMe
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: quoted-printable
 
-IMPORTANT: if you fix the bug, please add the following tag to the commit:
-Reported-by: syzbot+d82643ba80bf6937cd44@syzkaller.appspotmail.com
 
-==================================================================
-BUG: KASAN: use-after-free in crypto_morus640_load_a crypto/morus640.c:111  
-[inline]
-BUG: KASAN: use-after-free in crypto_morus640_decrypt_chunk+0xcf8/0xd20  
-crypto/morus640.c:278
-Read of size 4 at addr ffff8801c0fc6003 by task syz-executor042/4573
+>>>> You can edit drivers/net/wireless/broadcom/b43/Kconfig
+>>>> go to the section config B43_HWRNG
+>>>> and change 'default y' to 'default n'
+>>>>
+>>>> That should disable it. =20
+>>>
+>>>
+>>>
+>>> Could you please also try the attached patch?
+>>> There seems to be a problem in hwrng core in that it does not disable=
 
-CPU: 1 PID: 4573 Comm: syz-executor042 Not tainted 4.17.0+ #84
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS  
-Google 01/01/2011
-Call Trace:
-  __dump_stack lib/dump_stack.c:77 [inline]
-  dump_stack+0x1b9/0x294 lib/dump_stack.c:113
-  print_address_description+0x6c/0x20b mm/kasan/report.c:256
-  kasan_report_error mm/kasan/report.c:354 [inline]
-  kasan_report.cold.7+0x242/0x2fe mm/kasan/report.c:412
-  __asan_report_load4_noabort+0x14/0x20 mm/kasan/report.c:432
-  crypto_morus640_load_a crypto/morus640.c:111 [inline]
-  crypto_morus640_decrypt_chunk+0xcf8/0xd20 crypto/morus640.c:278
-  crypto_morus640_process_crypt.isra.12+0x153/0x230 crypto/morus640.c:376
-  crypto_morus640_crypt+0x42e/0x9f0 crypto/morus640.c:442
-  crypto_morus640_decrypt+0x23e/0x3d0 crypto/morus640.c:485
-  crypto_aead_decrypt include/crypto/aead.h:370 [inline]
-  _aead_recvmsg crypto/algif_aead.c:315 [inline]
-  aead_recvmsg+0x13cc/0x1ba0 crypto/algif_aead.c:334
-  sock_recvmsg_nosec net/socket.c:818 [inline]
-  sock_recvmsg+0xd0/0x110 net/socket.c:825
-  ___sys_recvmsg+0x2b6/0x680 net/socket.c:2323
-  __sys_recvmsg+0x112/0x260 net/socket.c:2372
-  __do_sys_recvmsg net/socket.c:2382 [inline]
-  __se_sys_recvmsg net/socket.c:2379 [inline]
-  __x64_sys_recvmsg+0x78/0xb0 net/socket.c:2379
-  do_syscall_64+0x1b1/0x800 arch/x86/entry/common.c:290
-  entry_SYSCALL_64_after_hwframe+0x49/0xbe
-RIP: 0033:0x445b19
-Code: e8 5c e7 ff ff 48 83 c4 18 c3 0f 1f 80 00 00 00 00 48 89 f8 48 89 f7  
-48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff  
-ff 0f 83 db 51 00 00 c3 66 2e 0f 1f 84 00 00 00 00
-RSP: 002b:00007f0fc4fccda8 EFLAGS: 00000297 ORIG_RAX: 000000000000002f
-RAX: ffffffffffffffda RBX: 00000000006dac9c RCX: 0000000000445b19
-RDX: 0000000000000000 RSI: 0000000020002840 RDI: 0000000000000011
-RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000297 R12: 00000000006dac98
-R13: 558bdd1ccff55d26 R14: f09319918a28f2b7 R15: 0000000000000001
+>>> the current RNG, if the new RNG fails to initialize.
+>>> I don't know if that's the problem here, though. =20
+>>
+>> Ok. Do I apply your patch to the first version that fails for me, and
+>> revert my change to Kconfig?
+>=20
+>=20
+> Yes, please test the patch with a version that would otherwise fail.
+> You can use 4.16 or the latest kernel for that. I created it with lates=
+t
+> linus' version.
 
-The buggy address belongs to the page:
-page:ffffea000703f180 count:0 mapcount:0 mapping:0000000000000000 index:0x1
-flags: 0x2fffc0000000000()
-raw: 02fffc0000000000 ffffea0007208788 ffffea0007026148 0000000000000000
-raw: 0000000000000038 0000000000000000 0000000200000000 ffff8801d9a42c80
-page dumped because: kasan: bad access detected
+I tested both suggested cases.  When I disable B43_HWRNG by editing
+Kconfig, 'rmmod b43' succeeds in the first version where it previously
+failed.  When I apply your patch on top of an unmodified 4.16 it also
+succeeds.
 
-Memory state around the buggy address:
-  ffff8801c0fc5f00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  ffff8801c0fc5f80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> ffff8801c0fc6000: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
-                    ^
-  ffff8801c0fc6080: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  ffff8801c0fc6100: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-==================================================================
+cheers, lukas
+
+--=20
+Do not believe the naysayers who say it cannot be done.
+
+
+--WTbq9za79umExicsbC73n8BmhRPupzKMe--
+
+--OBDhBlZUsPROum0mA6nbvX4xLQmLEDnxB
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iF0EARECAB0WIQQfsLWbEt//FEFwBMDWbaSYbwIjLQUCWyI5sQAKCRDWbaSYbwIj
+LQfwAJ9uz/BJ752FoL6Q/lS21C6ATbb5bQCfdmUM3fScet/kSyLC84wso4fzEXc=
+=5OLH
+-----END PGP SIGNATURE-----
+
+--OBDhBlZUsPROum0mA6nbvX4xLQmLEDnxB--
