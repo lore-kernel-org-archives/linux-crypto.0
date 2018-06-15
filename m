@@ -1,106 +1,174 @@
-From: Maxime Ripard <maxime.ripard-LDxbnhwyfcJBDgjK7y7TUQ@public.gmane.org>
-Subject: Re: [PATCH] crypto: sun4i-ss: prevent deadlock on
- emulated hardware
-Date: Fri, 15 Jun 2018 11:04:12 +0200
-Message-ID: <20180615090412.xgw35ga5cvc6w3h3@flea>
-References: <20180614193659.29261-1-clabbe.montjoie@gmail.com>
- <20180615075754.b3ivyagjsomiafwk@flea>
- <20180615081554.GA3047@Red>
-Reply-To: maxime.ripard-LDxbnhwyfcJBDgjK7y7TUQ@public.gmane.org
+From: Coly Li <colyli@suse.de>
+Subject: Re: [PATCH v3 05/27] docs: Fix some broken references
+Date: Fri, 15 Jun 2018 17:05:40 +0800
+Message-ID: <4448f906-39d8-ac44-c116-cd702c4a9096@suse.de>
+References: <cover.1528990947.git.mchehab+samsung@kernel.org>
+ <29adfe49571ad1395871a4f72154f45ef361297f.1528990947.git.mchehab+samsung@kernel.org>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="2mo5zrs2piu4jjwq"
-Cc: davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org, herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org, wens-jdAy2FN1RRM@public.gmane.org,
-	linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
-To: Corentin Labbe <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Return-path: <linux-sunxi+bncBDSJBYGBRIMBBF4CR3MQKGQEP5TVBGI-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-Sender: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
-Content-Disposition: inline
-In-Reply-To: <20180615081554.GA3047@Red>
-List-Post: <https://groups.google.com/group/linux-sunxi/post>, <mailto:linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-List-Help: <https://groups.google.com/support/>, <mailto:linux-sunxi+help-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-List-Archive: <https://groups.google.com/group/linux-sunxi
-List-Subscribe: <https://groups.google.com/group/linux-sunxi/subscribe>, <mailto:linux-sunxi+subscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-List-Unsubscribe: <mailto:googlegroups-manage+1076902468213+unsubscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>,
- <https://groups.google.com/group/linux-sunxi/subscribe>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: alsa-devel@alsa-project.org, linux-xtensa@linux-xtensa.org,
+ dri-devel@lists.freedesktop.org, keyrings@vger.kernel.org,
+ selinux@tycho.nsa.gov, linux-clk@vger.kernel.org, devel@driverdev.osuosl.org,
+ Jonathan Corbet <corbet@lwn.net>, x86@kernel.org, linux-input@vger.kernel.org,
+ xen-devel@lists.xenproject.org, devicetree@vger.kernel.org,
+ user-mode-linux-devel@lists.sourceforge.net,
+ Mauro Carvalho Chehab <mchehab@infradead.org>, linux-block@vger.kernel.org,
+ linux-gpio@vger.kernel.org, linux-bcache@vger.kernel.org,
+ user-mode-linux-user@lists.sourceforge.net, cgroups@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, patches@opensource.cirrus.com,
+ linux-usb@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-security-module@vger.kernel.org, linux-crypto@vger.kernel.org,
+ linux-kernel@zh-kernel.org
+To: Mauro Carvalho Chehab <mchehab+samsung@kernel.org>,
+ Linux Doc Mailing List <linux-doc@vger.kernel.org>
+Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
+In-Reply-To: <29adfe49571ad1395871a4f72154f45ef361297f.1528990947.git.mchehab+samsung@kernel.org>
+Content-Language: en-US
+List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
+List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
+List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
+List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
+List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
+Errors-To: driverdev-devel-bounces@linuxdriverproject.org
+Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
 List-Id: linux-crypto.vger.kernel.org
 
-
---2mo5zrs2piu4jjwq
-Content-Type: text/plain; charset="UTF-8"
-Content-Disposition: inline
-
-On Fri, Jun 15, 2018 at 10:15:54AM +0200, Corentin Labbe wrote:
-> On Fri, Jun 15, 2018 at 09:57:54AM +0200, Maxime Ripard wrote:
-> > On Thu, Jun 14, 2018 at 09:36:59PM +0200, Corentin Labbe wrote:
-> > > Running a qemu emulated cubieboard with sun4i-ss driver enabled led to a never
-> > > ending boot.
-> > > This is due to sun4i-ss deadlocked and taking all cpu in an infinite loop.
-> > > Since the crypto hardware is not implemented, all registers are read as 0.
-> > > So sun4i-ss will never progress in any operations. (TX_CNT being always 0)
-> > > 
-> > > The first idea is to add a "TX_CNT always zero timeout" but this made cipher/hash loops
-> > > more complex and prevent a case that never happen on real hardware.
-> > > 
-> > > The best way to fix is to check at probe time if we run on a virtual
-> > > machine with hardware emulated but non-implemented and prevent
-> > > sun4i-ss to be loaded in that case.
-> > > Letting sun4i-ss to load is useless anyway since all crypto algorithm will be
-> > > disabled since they will fail crypto selftests.
-> > > 
-> > > Tested-on: qemu-cubieboard
-> > > Tested-on: cubieboard2
-> > > 
-> > > Signed-off-by: Corentin Labbe <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> > > ---
-> > >  drivers/crypto/sunxi-ss/sun4i-ss-core.c | 10 ++++++++++
-> > >  1 file changed, 10 insertions(+)
-> > > 
-> > > diff --git a/drivers/crypto/sunxi-ss/sun4i-ss-core.c b/drivers/crypto/sunxi-ss/sun4i-ss-core.c
-> > > index a81d89b3b7d8..a178e80adcf3 100644
-> > > --- a/drivers/crypto/sunxi-ss/sun4i-ss-core.c
-> > > +++ b/drivers/crypto/sunxi-ss/sun4i-ss-core.c
-> > > @@ -341,9 +341,18 @@ static int sun4i_ss_probe(struct platform_device *pdev)
-> > >  	 * I expect to be a sort of Security System Revision number.
-> > >  	 * Since the A80 seems to have an other version of SS
-> > >  	 * this info could be useful
-> > > +	 * Detect virtual machine with non-implemented hardware
-> > > +	 * (qemu-cubieboard) by checking the register value after a write to it.
-> > > +	 * On non-implemented hardware, all registers are read as 0.
-> > > +	 * On real hardware we should have a value > 0.
-> > >  	 */
-> > >  	writel(SS_ENABLED, ss->base + SS_CTL);
-> > >  	v = readl(ss->base + SS_CTL);
-> > > +	if (!v) {
-> > > +		dev_err(&pdev->dev, "Qemu with non-implemented SS detected.\n");
-> > > +		err = -ENODEV;
-> > > +		goto error_rst;
-> > > +	}
-> > 
-> > This is wrong way to tackle the issue. There's multiple reason why
-> > this could happen (for example the device not being clocked, or
-> > maintained in reset). There's nothing specific about qemu here, and
-> > the fundamental issue isn't that the device isn't functional in qemu,
-> > it's that qemu lies about which hardware it can emulate in the DT it
-> > passes to the kernel.
-> > 
-> > There's no way this can scale, alone from the fact that qemu should
-> > patch the DT according to what it can do. Not trying to chase after
-> > each and every device that is broken in qemu.
-> > 
-> > NAK.
-> > 
+On 2018/6/15 12:08 AM, Mauro Carvalho Chehab wrote:
+> As we move stuff around, some doc references are broken. Fix some of
+> them via this script:
+> 	./scripts/documentation-file-ref-check --fix
 > 
-> My fix detect also when the device is badly clocked.
+> Manually checked if the produced result is valid, removing a few
+> false-positives.
+> 
+> Acked-by: Takashi Iwai <tiwai@suse.de>
+> Acked-by: Masami Hiramatsu <mhiramat@kernel.org>
+> Acked-by: Stephen Boyd <sboyd@kernel.org>
+> Acked-by: Charles Keepax <ckeepax@opensource.wolfsonmicro.com>
+> Acked-by: Mathieu Poirier <mathieu.poirier@linaro.org>
+> Signed-off-by: Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
+> ---
+>  .../admin-guide/kernel-parameters.txt         |  4 ++--
+>  .../bindings/input/rotary-encoder.txt         |  2 +-
+>  Documentation/driver-api/gpio/consumer.rst    |  2 +-
+>  Documentation/kprobes.txt                     |  4 ++--
+>  Documentation/trace/coresight.txt             |  2 +-
+>  Documentation/trace/ftrace-uses.rst           |  2 +-
+>  Documentation/trace/histogram.txt             |  2 +-
+>  Documentation/trace/intel_th.rst              |  2 +-
+>  Documentation/trace/tracepoint-analysis.rst   |  6 +++---
+>  Documentation/translations/ja_JP/howto.rst    |  4 ++--
+>  .../translations/zh_CN/magic-number.txt       |  4 ++--
+>  .../zh_CN/video4linux/omap3isp.txt            |  4 ++--
+>  MAINTAINERS                                   | 20 +++++++++----------
+>  arch/Kconfig                                  |  2 +-
+>  arch/arm/include/asm/cacheflush.h             |  2 +-
+>  arch/arm64/include/asm/cacheflush.h           |  2 +-
+>  arch/microblaze/include/asm/cacheflush.h      |  2 +-
+>  arch/um/Kconfig.um                            |  2 +-
+>  arch/unicore32/include/asm/cacheflush.h       |  2 +-
+>  arch/x86/entry/vsyscall/vsyscall_64.c         |  2 +-
+>  arch/xtensa/include/asm/cacheflush.h          |  4 ++--
+>  block/Kconfig                                 |  2 +-
+>  certs/Kconfig                                 |  2 +-
+>  crypto/asymmetric_keys/asymmetric_type.c      |  2 +-
+>  crypto/asymmetric_keys/signature.c            |  2 +-
+>  drivers/char/Kconfig                          |  2 +-
+>  drivers/clk/clk.c                             |  4 ++--
+>  drivers/clk/ingenic/cgu.h                     |  2 +-
+>  drivers/gpu/vga/Kconfig                       |  2 +-
+>  drivers/gpu/vga/vgaarb.c                      |  2 +-
+>  drivers/input/joystick/Kconfig                | 10 +++++-----
+>  drivers/input/joystick/walkera0701.c          |  2 +-
+>  drivers/input/misc/Kconfig                    |  4 ++--
+>  drivers/input/misc/rotary_encoder.c           |  2 +-
+>  drivers/input/mouse/Kconfig                   |  6 +++---
+>  drivers/input/mouse/alps.c                    |  2 +-
+>  drivers/input/touchscreen/wm97xx-core.c       |  2 +-
+>  drivers/lightnvm/pblk-rb.c                    |  2 +-
+>  drivers/md/bcache/Kconfig                     |  2 +-
+>  drivers/md/bcache/btree.c                     |  2 +-
+>  drivers/md/bcache/extents.c                   |  2 +-
+>  drivers/media/dvb-core/dvb_ringbuffer.c       |  2 +-
+>  drivers/media/pci/meye/Kconfig                |  2 +-
+>  drivers/media/platform/pxa_camera.c           |  4 ++--
+>  .../soc_camera/sh_mobile_ceu_camera.c         |  2 +-
+>  drivers/media/radio/Kconfig                   |  2 +-
+>  drivers/media/radio/si470x/Kconfig            |  2 +-
+>  drivers/media/usb/dvb-usb-v2/lmedm04.c        |  2 +-
+>  drivers/media/usb/zr364xx/Kconfig             |  2 +-
+>  drivers/parport/Kconfig                       |  6 +++---
+>  drivers/staging/media/bcm2048/TODO            |  2 +-
+>  include/keys/asymmetric-subtype.h             |  2 +-
+>  include/keys/asymmetric-type.h                |  2 +-
+>  include/linux/assoc_array.h                   |  2 +-
+>  include/linux/assoc_array_priv.h              |  2 +-
+>  include/linux/circ_buf.h                      |  2 +-
+>  include/linux/ftrace.h                        |  2 +-
+>  include/linux/rculist_nulls.h                 |  2 +-
+>  include/uapi/linux/prctl.h                    |  2 +-
+>  include/xen/interface/io/kbdif.h              |  2 +-
+>  kernel/cgroup/cpuset.c                        |  2 +-
+>  kernel/trace/Kconfig                          | 16 +++++++--------
+>  lib/Kconfig                                   |  2 +-
+>  security/selinux/hooks.c                      |  2 +-
+>  sound/core/Kconfig                            |  4 ++--
+>  sound/drivers/Kconfig                         |  4 ++--
+>  sound/pci/Kconfig                             | 10 +++++-----
+>  tools/include/uapi/linux/prctl.h              |  2 +-
+>  tools/lib/api/fs/fs.c                         |  2 +-
+>  tools/perf/util/bpf-prologue.c                |  2 +-
+>  .../config/custom-timeline-functions.cfg      |  4 ++--
+>  71 files changed, 113 insertions(+), 113 deletions(-)
 
-In which case, the proper fix is to enable the clock, not throw the
-kernel's arm up in the air.
+[snip]
+> diff --git a/drivers/md/bcache/Kconfig b/drivers/md/bcache/Kconfig
+> index 4d200883c505..17bf109c58e9 100644
+> --- a/drivers/md/bcache/Kconfig
+> +++ b/drivers/md/bcache/Kconfig
+> @@ -5,7 +5,7 @@ config BCACHE
+>  	Allows a block device to be used as cache for other devices; uses
+>  	a btree for indexing and the layout is optimized for SSDs.
+>  
+> -	See Documentation/bcache.txt for details.
+> +	See Documentation/admin-guide/bcache.rst for details.
+>  
+>  config BCACHE_DEBUG
+>  	bool "Bcache debugging"
+> diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
+> index 2a0968c04e21..547c9eedc2f4 100644
+> --- a/drivers/md/bcache/btree.c
+> +++ b/drivers/md/bcache/btree.c
+> @@ -18,7 +18,7 @@
+>   * as keys are inserted we only sort the pages that have not yet been written.
+>   * When garbage collection is run, we resort the entire node.
+>   *
+> - * All configuration is done via sysfs; see Documentation/bcache.txt.
+> + * All configuration is done via sysfs; see Documentation/admin-guide/bcache.rst.
+>   */
+>  
+>  #include "bcache.h"
+> diff --git a/drivers/md/bcache/extents.c b/drivers/md/bcache/extents.c
+> index c334e6666461..1d096742eb41 100644
+> --- a/drivers/md/bcache/extents.c
+> +++ b/drivers/md/bcache/extents.c
+> @@ -18,7 +18,7 @@
+>   * as keys are inserted we only sort the pages that have not yet been written.
+>   * When garbage collection is run, we resort the entire node.
+>   *
+> - * All configuration is done via sysfs; see Documentation/bcache.txt.
+> + * All configuration is done via sysfs; see Documentation/admin-guide/bcache.rst.
+>   */
+>  
+>  #include "bcache.h"
 
-Maxime
+For the bcache part, it is good to me.
 
--- 
-Maxime Ripard, Bootlin (formerly Free Electrons)
-Embedded Linux and Kernel engineering
-https://bootlin.com
---2mo5zrs2piu4jjwq--
+Reviewed-by: Coly Li <colyli@suse.de>
+
+Thanks for the fix.
+
+Coly Li
