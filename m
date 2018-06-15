@@ -1,45 +1,51 @@
-From: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Subject: Re: [PATCH] hw_random: Always drop the RNG in hwrng_unregister()
-Date: Fri, 15 Jun 2018 23:15:03 +0800
-Message-ID: <20180615151503.ryml5ixzv66stwge@gondor.apana.org.au>
-References: <20180614200811.76401d95@wiggum>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-Cc: mpm-VDJrAJ4Gl5ZBDgjK7y7TUQ@public.gmane.org, spam-rxbgZ4vWfLhdz0/ABlLGQA@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        b43-dev-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-wireless-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-        prasannatsmkumar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, freude-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org
-To: Michael =?iso-8859-1?Q?B=FCsch?= <m@bues.ch>
-Return-path: <linux-wireless-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <20180614200811.76401d95@wiggum>
-Sender: linux-wireless-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
+Subject: [PATCH v4 02/26] docs: crypto_engine.rst: Fix two parse warnings
+Date: Fri, 15 Jun 2018 13:30:30 -0300
+Message-ID: <e79f7c861804da70702067a00e8f36a46203cf22.1529079119.git.mchehab+samsung@kernel.org>
+References: <cover.1529079119.git.mchehab+samsung@kernel.org>
+Cc: Mauro Carvalho Chehab <mchehab+samsung@kernel.org>,
+        Mauro Carvalho Chehab <mchehab@infradead.org>,
+        linux-kernel@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org
+To: Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <cover.1529079119.git.mchehab+samsung@kernel.org>
+In-Reply-To: <cover.1529079119.git.mchehab+samsung@kernel.org>
+References: <cover.1529079119.git.mchehab+samsung@kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Michael Büsch <m@bues.ch> wrote:
-> [-- text/plain, encoding quoted-printable, charset: UTF-8, 57 lines --]
-> 
-> enable_best_rng() is used in hwrng_unregister() to switch away from the
-> currently active RNG, if that is the one currently being removed.
-> However enable_best_rng() might fail, if the next RNG's init routine
-> fails. In that case enable_best_rng() will return an error code and
-> the currently active RNG will remain active.
-> After unregistering this might lead to crashes due to use-after-free.
-> 
-> Fix this by dropping the currently active RNG, if enable_best_rng()
-> failed. This will result in no RNG to be active, if the next-best
-> one failed to initialize.
-> 
-> This problem was introduced by 142a27f0a731ddcf467546960a5585970ca98e21
-> 
-> 
-> Reported-by: Wirz <spam-rxbgZ4vWfLhdz0/ABlLGQA@public.gmane.org>
-> Tested-by: Wirz <spam-rxbgZ4vWfLhdz0/ABlLGQA@public.gmane.org>
-> Signed-off-by: Michael Büsch <m@bues.ch>
-> Cc: stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+./Documentation/crypto/crypto_engine.rst:13: WARNING: Unexpected indentation.
+./Documentation/crypto/crypto_engine.rst:15: WARNING: Block quote ends without a blank line; unexpected unindent.
 
-Patch applied.  Thanks.
+Signed-off-by: Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
+---
+ Documentation/crypto/crypto_engine.rst | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/Documentation/crypto/crypto_engine.rst b/Documentation/crypto/crypto_engine.rst
+index 8272ac92a14f..1d56221dfe35 100644
+--- a/Documentation/crypto/crypto_engine.rst
++++ b/Documentation/crypto/crypto_engine.rst
+@@ -8,11 +8,13 @@ The crypto engine API (CE), is a crypto queue manager.
+ 
+ Requirement
+ -----------
+-You have to put at start of your tfm_ctx the struct crypto_engine_ctx
+-struct your_tfm_ctx {
++You have to put at start of your tfm_ctx the struct crypto_engine_ctx::
++
++  struct your_tfm_ctx {
+         struct crypto_engine_ctx enginectx;
+         ...
+-};
++  };
++
+ Why: Since CE manage only crypto_async_request, it cannot know the underlying
+ request_type and so have access only on the TFM.
+ So using container_of for accessing __ctx is impossible.
 -- 
-Email: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.17.1
