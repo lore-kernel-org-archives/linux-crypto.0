@@ -1,74 +1,45 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2] crypto: arm64/aes-blk - fix and move
- skcipher_walk_done out of kernel_neon_begin,_end
-Date: Fri, 15 Jun 2018 23:14:03 +0800
-Message-ID: <20180615151403.cdvalbmdrt7gnodk@gondor.apana.org.au>
-References: <1528443704-26850-1-git-send-email-hejianet@gmail.com>
+From: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Subject: Re: [PATCH] hw_random: Always drop the RNG in hwrng_unregister()
+Date: Fri, 15 Jun 2018 23:15:03 +0800
+Message-ID: <20180615151503.ryml5ixzv66stwge@gondor.apana.org.au>
+References: <20180614200811.76401d95@wiggum>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: ard.biesheuvel@linaro.org, catalin.marinas@arm.com, will.deacon@arm.com,
- linux-kernel@vger.kernel.org, stable@vger.kernel.org, jia.he@hxt-semitech.com,
- linux-crypto@vger.kernel.org, hejianet@gmail.com, davem@davemloft.net,
- linux-arm-kernel@lists.infradead.org
-To: Jia He <hejianet@gmail.com>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+Cc: mpm-VDJrAJ4Gl5ZBDgjK7y7TUQ@public.gmane.org, spam-rxbgZ4vWfLhdz0/ABlLGQA@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        b43-dev-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-wireless-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        prasannatsmkumar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, freude-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org
+To: Michael =?iso-8859-1?Q?B=FCsch?= <m@bues.ch>
+Return-path: <linux-wireless-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Content-Disposition: inline
-In-Reply-To: <1528443704-26850-1-git-send-email-hejianet@gmail.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+In-Reply-To: <20180614200811.76401d95@wiggum>
+Sender: linux-wireless-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-Jia He <hejianet@gmail.com> wrote:
-> In a arm64 server(QDF2400),I met a similar might-sleep warning as [1]:
-> [    7.019116] BUG: sleeping function called from invalid context at
-> ./include/crypto/algapi.h:416
-> [    7.027863] in_atomic(): 1, irqs_disabled(): 0, pid: 410, name:
-> cryptomgr_test
-> [    7.035106] 1 lock held by cryptomgr_test/410:
-> [    7.039549]  #0:         (ptrval) (&drbg->drbg_mutex){+.+.}, at:
-> drbg_instantiate+0x34/0x398
-> [    7.048038] CPU: 9 PID: 410 Comm: cryptomgr_test Not tainted
-> 4.17.0-rc6+ #27
-> [    7.068228]  dump_backtrace+0x0/0x1c0
-> [    7.071890]  show_stack+0x24/0x30
-> [    7.075208]  dump_stack+0xb0/0xec
-> [    7.078523]  ___might_sleep+0x160/0x238
-> [    7.082360]  skcipher_walk_done+0x118/0x2c8
-> [    7.086545]  ctr_encrypt+0x98/0x130
-> [    7.090035]  simd_skcipher_encrypt+0x68/0xc0
-> [    7.094304]  drbg_kcapi_sym_ctr+0xd4/0x1f8
-> [    7.098400]  drbg_ctr_update+0x98/0x330
-> [    7.102236]  drbg_seed+0x1b8/0x2f0
-> [    7.105637]  drbg_instantiate+0x2ac/0x398
-> [    7.109646]  drbg_kcapi_seed+0xbc/0x188
-> [    7.113482]  crypto_rng_reset+0x4c/0xb0
-> [    7.117319]  alg_test_drbg+0xec/0x330
-> [    7.120981]  alg_test.part.6+0x1c8/0x3c8
-> [    7.124903]  alg_test+0x58/0xa0
-> [    7.128044]  cryptomgr_test+0x50/0x58
-> [    7.131708]  kthread+0x134/0x138
-> [    7.134936]  ret_from_fork+0x10/0x1c
+Michael Büsch <m@bues.ch> wrote:
+> [-- text/plain, encoding quoted-printable, charset: UTF-8, 57 lines --]
 > 
-> Seems there is a bug in Ard Biesheuvel's commit.
-> Fixes: 683381747270 ("crypto: arm64/aes-blk - move kernel mode neon
-> en/disable into loop")
+> enable_best_rng() is used in hwrng_unregister() to switch away from the
+> currently active RNG, if that is the one currently being removed.
+> However enable_best_rng() might fail, if the next RNG's init routine
+> fails. In that case enable_best_rng() will return an error code and
+> the currently active RNG will remain active.
+> After unregistering this might lead to crashes due to use-after-free.
 > 
-> [1] https://www.spinics.net/lists/linux-crypto/msg33103.html
+> Fix this by dropping the currently active RNG, if enable_best_rng()
+> failed. This will result in no RNG to be active, if the next-best
+> one failed to initialize.
 > 
-> Signed-off-by: jia.he@hxt-semitech.com
-> Acked-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> Cc: <stable@vger.kernel.org> # 4.17
+> This problem was introduced by 142a27f0a731ddcf467546960a5585970ca98e21
+> 
+> 
+> Reported-by: Wirz <spam-rxbgZ4vWfLhdz0/ABlLGQA@public.gmane.org>
+> Tested-by: Wirz <spam-rxbgZ4vWfLhdz0/ABlLGQA@public.gmane.org>
+> Signed-off-by: Michael Büsch <m@bues.ch>
+> Cc: stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 
 Patch applied.  Thanks.
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
+Email: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
 Home Page: http://gondor.apana.org.au/~herbert/
 PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
