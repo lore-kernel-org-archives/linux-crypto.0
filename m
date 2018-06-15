@@ -1,96 +1,82 @@
-From: Maxime Ripard <maxime.ripard-LDxbnhwyfcJBDgjK7y7TUQ@public.gmane.org>
-Subject: Re: [PATCH] crypto: sun4i-ss: prevent deadlock on
- emulated hardware
-Date: Fri, 15 Jun 2018 09:57:54 +0200
-Message-ID: <20180615075754.b3ivyagjsomiafwk@flea>
-References: <20180614193659.29261-1-clabbe.montjoie@gmail.com>
-Reply-To: maxime.ripard-LDxbnhwyfcJBDgjK7y7TUQ@public.gmane.org
+From: Harald Freudenberger <freude-tEXmvtCZX7AybS5Ee8rs3A@public.gmane.org>
+Subject: Re: [PATCH] hw_random: Always drop the RNG in hwrng_unregister()
+Date: Fri, 15 Jun 2018 10:08:12 +0200
+Message-ID: <8f1f5be1-979c-7601-1419-907b1980d974@linux.ibm.com>
+References: <20180614200811.76401d95@wiggum>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="d3bc5bjiueqxbttr"
-Cc: davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org, herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org, wens-jdAy2FN1RRM@public.gmane.org,
-	linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
-To: Corentin Labbe <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Return-path: <linux-sunxi+bncBDSJBYGBRIMBBA7DRXMQKGQE6G7YX7I-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-Sender: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
-Content-Disposition: inline
-In-Reply-To: <20180614193659.29261-1-clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-List-Post: <https://groups.google.com/group/linux-sunxi/post>, <mailto:linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-List-Help: <https://groups.google.com/support/>, <mailto:linux-sunxi+help-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-List-Archive: <https://groups.google.com/group/linux-sunxi
-List-Subscribe: <https://groups.google.com/group/linux-sunxi/subscribe>, <mailto:linux-sunxi+subscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-List-Unsubscribe: <mailto:googlegroups-manage+1076902468213+unsubscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>,
- <https://groups.google.com/group/linux-sunxi/subscribe>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Cc: Wirz <spam-rxbgZ4vWfLhdz0/ABlLGQA@public.gmane.org>, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+        b43-dev-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
+        linux-wireless <linux-wireless-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        PrasannaKumar Muralidharan <prasannatsmkumar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+        Harald Freudenberger <freude-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org>
+To: =?UTF-8?Q?Michael_B=c3=bcsch?= <m@bues.ch>,
+        Matt Mackall <mpm-VDJrAJ4Gl5ZBDgjK7y7TUQ@public.gmane.org>,
+        Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Return-path: <linux-wireless-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20180614200811.76401d95@wiggum>
+Content-Language: en-US
+Sender: linux-wireless-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-
---d3bc5bjiueqxbttr
-Content-Type: text/plain; charset="UTF-8"
-Content-Disposition: inline
-
-On Thu, Jun 14, 2018 at 09:36:59PM +0200, Corentin Labbe wrote:
-> Running a qemu emulated cubieboard with sun4i-ss driver enabled led to a never
-> ending boot.
-> This is due to sun4i-ss deadlocked and taking all cpu in an infinite loop.
-> Since the crypto hardware is not implemented, all registers are read as 0.
-> So sun4i-ss will never progress in any operations. (TX_CNT being always 0)
-> 
-> The first idea is to add a "TX_CNT always zero timeout" but this made cipher/hash loops
-> more complex and prevent a case that never happen on real hardware.
-> 
-> The best way to fix is to check at probe time if we run on a virtual
-> machine with hardware emulated but non-implemented and prevent
-> sun4i-ss to be loaded in that case.
-> Letting sun4i-ss to load is useless anyway since all crypto algorithm will be
-> disabled since they will fail crypto selftests.
-> 
-> Tested-on: qemu-cubieboard
-> Tested-on: cubieboard2
-> 
-> Signed-off-by: Corentin Labbe <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+On 14.06.2018 20:08, Michael Büsch wrote:
+> enable_best_rng() is used in hwrng_unregister() to switch away from the
+> currently active RNG, if that is the one currently being removed.
+> However enable_best_rng() might fail, if the next RNG's init routine
+> fails. In that case enable_best_rng() will return an error code and
+> the currently active RNG will remain active.
+> After unregistering this might lead to crashes due to use-after-free.
+>
+> Fix this by dropping the currently active RNG, if enable_best_rng()
+> failed. This will result in no RNG to be active, if the next-best
+> one failed to initialize.
+>
+> This problem was introduced by 142a27f0a731ddcf467546960a5585970ca98e21
+>
+>
+> Reported-by: Wirz <spam-rxbgZ4vWfLhdz0/ABlLGQA@public.gmane.org>
+> Tested-by: Wirz <spam-rxbgZ4vWfLhdz0/ABlLGQA@public.gmane.org>
+> Signed-off-by: Michael Büsch <m@bues.ch>
+> Cc: stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+>
 > ---
->  drivers/crypto/sunxi-ss/sun4i-ss-core.c | 10 ++++++++++
->  1 file changed, 10 insertions(+)
-> 
-> diff --git a/drivers/crypto/sunxi-ss/sun4i-ss-core.c b/drivers/crypto/sunxi-ss/sun4i-ss-core.c
-> index a81d89b3b7d8..a178e80adcf3 100644
-> --- a/drivers/crypto/sunxi-ss/sun4i-ss-core.c
-> +++ b/drivers/crypto/sunxi-ss/sun4i-ss-core.c
-> @@ -341,9 +341,18 @@ static int sun4i_ss_probe(struct platform_device *pdev)
->  	 * I expect to be a sort of Security System Revision number.
->  	 * Since the A80 seems to have an other version of SS
->  	 * this info could be useful
-> +	 * Detect virtual machine with non-implemented hardware
-> +	 * (qemu-cubieboard) by checking the register value after a write to it.
-> +	 * On non-implemented hardware, all registers are read as 0.
-> +	 * On real hardware we should have a value > 0.
->  	 */
->  	writel(SS_ENABLED, ss->base + SS_CTL);
->  	v = readl(ss->base + SS_CTL);
-> +	if (!v) {
-> +		dev_err(&pdev->dev, "Qemu with non-implemented SS detected.\n");
-> +		err = -ENODEV;
-> +		goto error_rst;
+>
+> See this discussion for a crash in b43's hwrng caused by this problem:
+> https://www.spinics.net/lists/linux-wireless/msg173089.html
+>
+>
+>
+> diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
+> index 91bb98c42a1c..aaf9e5afaad4 100644
+> --- a/drivers/char/hw_random/core.c
+> +++ b/drivers/char/hw_random/core.c
+> @@ -516,11 +516,18 @@ EXPORT_SYMBOL_GPL(hwrng_register);
+>  
+>  void hwrng_unregister(struct hwrng *rng)
+>  {
+> +	int err;
+> +
+>  	mutex_lock(&rng_mutex);
+>  
+>  	list_del(&rng->list);
+> -	if (current_rng == rng)
+> -		enable_best_rng();
+> +	if (current_rng == rng) {
+> +		err = enable_best_rng();
+> +		if (err) {
+> +			drop_current_rng();
+> +			cur_rng_set_by_user = 0;
+> +		}
 > +	}
+>  
+>  	if (list_empty(&rng_list)) {
+>  		mutex_unlock(&rng_mutex);
+>
+>
+>
+Yes, if the hw_init() of the newly chosen rng fails, enable_best_rng() comes
+back with an error and did not drop the current rng. The patch handles
+this case. I did not test it, but the code looks fine.
 
-This is wrong way to tackle the issue. There's multiple reason why
-this could happen (for example the device not being clocked, or
-maintained in reset). There's nothing specific about qemu here, and
-the fundamental issue isn't that the device isn't functional in qemu,
-it's that qemu lies about which hardware it can emulate in the DT it
-passes to the kernel.
-
-There's no way this can scale, alone from the fact that qemu should
-patch the DT according to what it can do. Not trying to chase after
-each and every device that is broken in qemu.
-
-NAK.
-
-Maxime
-
--- 
-Maxime Ripard, Bootlin (formerly Free Electrons)
-Embedded Linux and Kernel engineering
-https://bootlin.com
---d3bc5bjiueqxbttr--
+reviewed-by Harald Freudenberger <freude-tEXmvtCZX7AybS5Ee8rs3A@public.gmane.org>
