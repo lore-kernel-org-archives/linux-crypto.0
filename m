@@ -1,98 +1,37 @@
-From: Bjorn Andersson <bjorn.andersson@linaro.org>
-Subject: Re: [PATCH 3/3] hwrng: msm - Add support for prng v2
-Date: Mon, 18 Jun 2018 11:21:23 -0700
-Message-ID: <20180618182123.GT14924@minitux>
-References: <20180618141259.23141-1-vkoul@kernel.org>
- <20180618141259.23141-4-vkoul@kernel.org>
+From: Matt Corallo <linux@bluematt.me>
+Subject: crypto-vmx fails to load fallbacks (missing dep?)
+Date: Mon, 18 Jun 2018 15:28:07 -0400
+Message-ID: <d98b4a54-e580-0b79-7094-e953c7134667@bluematt.me>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-arm-msm@vger.kernel.org, Vinod Koul <vkoul@kernel.org>
-To: Vinod Koul <vinod.koul@linaro.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20180618141259.23141-4-vkoul@kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Cc: "Leonidas S. Barbosa" <leosilva@linux.vnet.ibm.com>,
+ Paulo Flabiano Smorigo <pfsmorigo@linux.vnet.ibm.com>,
+ debian-kernel@lists.debian.org
+To: linux-crypto@vger.kernel.org
+Return-path: <bounce-debian-kernel=glddk-debian-kernel=m.gmane.org@lists.debian.org>
+Content-Language: en-US
+Resent-Message-ID: <ocXnz64oG0B.A._bG._0AKbB@bendel>
+List-URL: <https://lists.debian.org/debian-kernel/>
+List-Post: <mailto:debian-kernel@lists.debian.org>
+List-Help: <mailto:debian-kernel-request@lists.debian.org?subject=help>
+List-Subscribe: <mailto:debian-kernel-request@lists.debian.org?subject=subscribe>
+List-Unsubscribe: <mailto:debian-kernel-request@lists.debian.org?subject=unsubscribe>
+List-Archive: https://lists.debian.org/msgid-search/d98b4a54-e580-0b79-7094-e953c7134667@bluematt.me
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon 18 Jun 07:12 PDT 2018, Vinod Koul wrote:
+If crypto-vmx gets built-in (which the latest debian kernel configs in
+git do, at least when you build them against 4.17.2) but you don't
+build-in ghash/cbc/ctr/etc, you end up with dmesg lines like:
 
-> Qcom 8996 and later chips support prng v2 where we need to only
-> implement .read callback for hwrng.
-> 
+[    3.704126] Failed to allocate transformation for 'cbc(aes)': -2
+[    3.704172] alg: skcipher: Failed to load transform for p8_aes_cbc: -2
+[    3.706542] Failed to allocate transformation for 'ctr(aes)': -2
+[    3.706605] alg: skcipher: Failed to load transform for p8_aes_ctr: -2
+[    3.714095] Failed to allocate transformation for 'ghash-generic': -2
+[    3.714162] alg: hash: Failed to load transform for p8_ghash: -2
 
-The hardware still needs initialization, so I think you should expand
-this to mention that the initialization is moved to secure world and
-that's the reason why we only implement read.
-
-The question is what happens in projects with other security models.
-
-> Add a new table for v2 which supports this and get version required for
-> driver data.
-> 
-> Signed-off-by: Vinod Koul <vkoul@kernel.org>
-> ---
->  drivers/char/hw_random/msm-rng.c | 13 ++++++++++++-
->  1 file changed, 12 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/char/hw_random/msm-rng.c b/drivers/char/hw_random/msm-rng.c
-> index 7644474035e5..3f509072a6c6 100644
-> --- a/drivers/char/hw_random/msm-rng.c
-> +++ b/drivers/char/hw_random/msm-rng.c
-> @@ -17,6 +17,7 @@
->  #include <linux/io.h>
->  #include <linux/module.h>
->  #include <linux/of.h>
-> +#include <linux/of_device.h>
->  #include <linux/platform_device.h>
->  
->  /* Device specific register offsets */
-> @@ -132,10 +133,16 @@ static struct hwrng msm_rng = {
->  	.read = msm_rng_read,
->  };
->  
-> +static struct hwrng msm_rng_v2 = {
-> +	.name = KBUILD_MODNAME,
-> +	.read = msm_rng_read,
-> +};
-> +
->  static int msm_rng_probe(struct platform_device *pdev)
->  {
->  	struct resource *res;
->  	struct msm_rng *rng;
-> +	unsigned int version;
->  	int ret;
->  
->  	rng = devm_kzalloc(&pdev->dev, sizeof(*rng), GFP_KERNEL);
-> @@ -154,6 +161,9 @@ static int msm_rng_probe(struct platform_device *pdev)
->  		return PTR_ERR(rng->clk);
->  
->  	rng->hwrng = &msm_rng;
-> +	version = (unsigned long)of_device_get_match_data(&pdev->dev);
-
-If this is "version" then please make it 1 or 2, if you agree with
-Stephen's suggestion of omitting the initialization of init I think this
-would be better as 0/1 and the variable named "skip_init".
-
-> +	if (version)
-> +		rng->hwrng = &msm_rng_v2;
->  
->  	rng->hwrng->priv = (unsigned long)rng;
->  	ret = devm_hwrng_register(&pdev->dev, rng->hwrng);
-> @@ -166,7 +176,8 @@ static int msm_rng_probe(struct platform_device *pdev)
->  }
->  
->  static const struct of_device_id msm_rng_of_match[] = {
-> -	{ .compatible = "qcom,prng", },
-> +	{ .compatible = "qcom,prng", .data = (void *)0},
-> +	{ .compatible = "qcom,prng-v2", .data = (void *)1},
->  	{}
->  };
->  MODULE_DEVICE_TABLE(of, msm_rng_of_match);
-
-Regards,
-Bjorn
+(which I assume are a failure to load the fallback driver) and as a
+result are never able to use aes-cbc/aes-ctr/ghash as crypto_alg_lookup
+will fail the crypto_is_larval check and return ELIBBAD. When they're
+all built-in everything seems to work fine.
