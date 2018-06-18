@@ -1,35 +1,98 @@
-From: Eric Biggers <ebiggers3@gmail.com>
-Subject: Re: [PATCH] crypto: skcipher: remove static declaration of export
- function
-Date: Mon, 18 Jun 2018 10:28:03 -0700
-Message-ID: <20180618172803.GA8022@gmail.com>
-References: <20180617174959.29864-1-efremov@linux.com>
+From: Bjorn Andersson <bjorn.andersson@linaro.org>
+Subject: Re: [PATCH 3/3] hwrng: msm - Add support for prng v2
+Date: Mon, 18 Jun 2018 11:21:23 -0700
+Message-ID: <20180618182123.GT14924@minitux>
+References: <20180618141259.23141-1-vkoul@kernel.org>
+ <20180618141259.23141-4-vkoul@kernel.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        ldv-project@linuxtesting.org
-To: efremov@linux.com
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-arm-msm@vger.kernel.org, Vinod Koul <vkoul@kernel.org>
+To: Vinod Koul <vinod.koul@linaro.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20180617174959.29864-1-efremov@linux.com>
+In-Reply-To: <20180618141259.23141-4-vkoul@kernel.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Sun, Jun 17, 2018 at 08:49:59PM +0300, efremov@linux.com wrote:
-> The function skcipher_walk_next declared as static and marked as
-> EXPORT_SYMBOL. It's a bit confusing since export symbol means that
-> we want others to use this function. The area of visibility for such
-> function is its .c file and all other modules. Other *.c files of the
-> same module can't use it, despite all other modules can. Relying on
-> that such behavior was not the original intention, the patch just
-> removes the static keyword.
-> 
-> Found by Linux Driver Verification project (linuxtesting.org).
-> 
-> Signed-off-by: Denis Efremov <efremov@linux.com>
+On Mon 18 Jun 07:12 PDT 2018, Vinod Koul wrote:
 
-Why not remove the EXPORT_SYMBOL instead?  It has no users outside the file.
+> Qcom 8996 and later chips support prng v2 where we need to only
+> implement .read callback for hwrng.
+> 
 
-- Eric
+The hardware still needs initialization, so I think you should expand
+this to mention that the initialization is moved to secure world and
+that's the reason why we only implement read.
+
+The question is what happens in projects with other security models.
+
+> Add a new table for v2 which supports this and get version required for
+> driver data.
+> 
+> Signed-off-by: Vinod Koul <vkoul@kernel.org>
+> ---
+>  drivers/char/hw_random/msm-rng.c | 13 ++++++++++++-
+>  1 file changed, 12 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/char/hw_random/msm-rng.c b/drivers/char/hw_random/msm-rng.c
+> index 7644474035e5..3f509072a6c6 100644
+> --- a/drivers/char/hw_random/msm-rng.c
+> +++ b/drivers/char/hw_random/msm-rng.c
+> @@ -17,6 +17,7 @@
+>  #include <linux/io.h>
+>  #include <linux/module.h>
+>  #include <linux/of.h>
+> +#include <linux/of_device.h>
+>  #include <linux/platform_device.h>
+>  
+>  /* Device specific register offsets */
+> @@ -132,10 +133,16 @@ static struct hwrng msm_rng = {
+>  	.read = msm_rng_read,
+>  };
+>  
+> +static struct hwrng msm_rng_v2 = {
+> +	.name = KBUILD_MODNAME,
+> +	.read = msm_rng_read,
+> +};
+> +
+>  static int msm_rng_probe(struct platform_device *pdev)
+>  {
+>  	struct resource *res;
+>  	struct msm_rng *rng;
+> +	unsigned int version;
+>  	int ret;
+>  
+>  	rng = devm_kzalloc(&pdev->dev, sizeof(*rng), GFP_KERNEL);
+> @@ -154,6 +161,9 @@ static int msm_rng_probe(struct platform_device *pdev)
+>  		return PTR_ERR(rng->clk);
+>  
+>  	rng->hwrng = &msm_rng;
+> +	version = (unsigned long)of_device_get_match_data(&pdev->dev);
+
+If this is "version" then please make it 1 or 2, if you agree with
+Stephen's suggestion of omitting the initialization of init I think this
+would be better as 0/1 and the variable named "skip_init".
+
+> +	if (version)
+> +		rng->hwrng = &msm_rng_v2;
+>  
+>  	rng->hwrng->priv = (unsigned long)rng;
+>  	ret = devm_hwrng_register(&pdev->dev, rng->hwrng);
+> @@ -166,7 +176,8 @@ static int msm_rng_probe(struct platform_device *pdev)
+>  }
+>  
+>  static const struct of_device_id msm_rng_of_match[] = {
+> -	{ .compatible = "qcom,prng", },
+> +	{ .compatible = "qcom,prng", .data = (void *)0},
+> +	{ .compatible = "qcom,prng-v2", .data = (void *)1},
+>  	{}
+>  };
+>  MODULE_DEVICE_TABLE(of, msm_rng_of_match);
+
+Regards,
+Bjorn
