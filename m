@@ -1,79 +1,53 @@
-From: Stefan Agner <stefan@agner.ch>
-Subject: Re: [PATCH] crypto: arm/speck - fix building in Thumb2 mode
-Date: Tue, 19 Jun 2018 10:34:58 +0200
-Message-ID: <22f66c7360083b26850a6065a5624e1e@agner.ch>
-References: <20180618223323.130072-1-ebiggers@google.com>
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [PATCH net-next 3/3] tcp: use monotonic timestamps for PAWS
+Date: Tue, 19 Jun 2018 11:23:45 +0200
+Message-ID: <CAK8P3a2Z+H7r=dWqYmKbJ2mAMZEdvT6GdKjSMbweabqBwOZYEg@mail.gmail.com>
+References: <20180618152242.1566661-1-arnd@arndb.de> <20180618152242.1566661-3-arnd@arndb.de>
+ <67ebb94d-c73f-6c9f-493b-00c86f595120@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>, linux-crypto@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, Herbert Xu <herbert@gondor.apana.org.au>
-To: Eric Biggers <ebiggers@google.com>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <20180618223323.130072-1-ebiggers@google.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Cc: Harsh Jain <harsh@chelsio.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
+        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+        Atul Gupta <atul.gupta@chelsio.com>,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+        y2038 Mailman List <y2038@lists.linaro.org>,
+        Michael Werner <werner@chelsio.com>,
+        Neal Cardwell <ncardwell@google.com>,
+        Yuchung Cheng <ycheng@google.com>,
+        Soheil Hassas Yeganeh <soheil@google.com>,
+        Florian Westphal <fw@strlen.de>,
+        Christoph Paasch <cpaasch@apple.com>,
+        Lawrence Brakmo <brakmo@fb.com>,
+        Ursula Braun <ubraun@linux.vnet.ibm.com>,
+        Priyaranjan Jha <priyarjha@google.com>,
+        Alexei Starovoitov <ast@kernel.org>,
+        D
+To: Eric Dumazet <eric.dumazet@gmail.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <67ebb94d-c73f-6c9f-493b-00c86f595120@gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 19.06.2018 00:33, Eric Biggers wrote:
-> Building the kernel with CONFIG_THUMB2_KERNEL=y and
-> CONFIG_CRYPTO_SPECK_NEON set fails with the following errors:
-> 
->     arch/arm/crypto/speck-neon-core.S: Assembler messages:
-> 
->     arch/arm/crypto/speck-neon-core.S:419: Error: r13 not allowed here
-> -- `bic sp,#0xf'
->     arch/arm/crypto/speck-neon-core.S:423: Error: r13 not allowed here
-> -- `bic sp,#0xf'
->     arch/arm/crypto/speck-neon-core.S:427: Error: r13 not allowed here
-> -- `bic sp,#0xf'
->     arch/arm/crypto/speck-neon-core.S:431: Error: r13 not allowed here
-> -- `bic sp,#0xf'
-> 
-> The problem is that the 'bic' instruction can't operate on the 'sp'
-> register in Thumb2 mode.  Fix it by using a temporary register.  This
-> isn't in the main loop, so the performance difference is negligible.
-> This also matches what aes-neonbs-core.S does.
-> 
-> Reported-by: Stefan Agner <stefan@agner.ch>
-> Fixes: ede9622162fa ("crypto: arm/speck - add NEON-accelerated
-> implementation of Speck-XTS")
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
-> ---
->  arch/arm/crypto/speck-neon-core.S | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/arm/crypto/speck-neon-core.S
-> b/arch/arm/crypto/speck-neon-core.S
-> index 3c1e203e53b9..57caa742016e 100644
-> --- a/arch/arm/crypto/speck-neon-core.S
-> +++ b/arch/arm/crypto/speck-neon-core.S
-> @@ -272,9 +272,11 @@
->  	 * Allocate stack space to store 128 bytes worth of tweaks.  For
->  	 * performance, this space is aligned to a 16-byte boundary so that we
->  	 * can use the load/store instructions that declare 16-byte alignment.
-> +	 * For Thumb2 compatibility, don't do the 'bic' directly on 'sp'.
->  	 */
-> -	sub		sp, #128
-> -	bic		sp, #0xf
-> +	sub		r12, sp, #128
-> +	bic		r12, #0xf
-> +	mov		sp, r12
+On Mon, Jun 18, 2018 at 5:59 PM, Eric Dumazet <eric.dumazet@gmail.com> wrote:
+> On 06/18/2018 08:22 AM, Arnd Bergmann wrote:
+>
+> Please use the time_after32(), since ktime_get_seconds() is time64_t while ts_recent_stamp is int.
+>
+> Same remark for tcp_twsk_unique()
+>
+> Lets clean up this stuff, thanks !
 
-Looks good to me and compiles fine here. Thanks!
+Sure, no problem. Note that as ktime_get_seconds() uses CLOCK_MONOTONIC, it is
+guaranteed to return a number that fits into a positive 32-bit number
+(for about 136
+years after boot to be precise). Most users of time_after() or
+time_after32() are for
+jiffies values that do overflow regularly, but it doesn't hurt to use
+time_after32()
+here for illustration.
 
-Reviewed-by: Stefan Agner <stefan@agner.ch>
-
---
-Stefan
-
->  
->  .if \n == 64
->  	// Load first tweak
+        Arnd
