@@ -1,49 +1,49 @@
-From: Farhan Ali <alifm@linux.ibm.com>
-Subject: Re: [PATCH v2 0/2] Detect & register virtio-crypto algos only if it
- can be supported by backend
-Date: Tue, 19 Jun 2018 10:57:54 -0400
-Message-ID: <4301ac2e-a8f5-7432-cdd9-f39d30a9fb5e@linux.ibm.com>
-References: <cover.1528921468.git.alifm@linux.ibm.com>
- <44ccc5db-e1d4-27b7-8942-c77f467f422e@linux.ibm.com>
- <0c5d7e42-e6c5-6aa2-8c1b-487c8cc9eb21@de.ibm.com>
- <20180619143230.zjemmhhz7embs2li@gondor.apana.org.au>
+From: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
+Subject: Re: [PATCH v11 00/13] Intel SGX1 support
+Date: Tue, 19 Jun 2018 17:59:43 +0300
+Message-ID: <20180619145943.GC8034@linux.intel.com>
+References: <20180608171216.26521-1-jarkko.sakkinen@linux.intel.com>
+ <20180612105011.GA26931@amd>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, mst@redhat.com,
-        qemu-devel@nongnu.org, arei.gonglei@huawei.com,
-        longpeng2@huawei.com, pasic@linux.ibm.com, frankja@linux.ibm.com,
-        Jason Wang <jasowang@redhat.com>, linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        Christian Borntraeger <borntraeger@de.ibm.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: x86@kernel.org, platform-driver-x86@vger.kernel.org,
+        dave.hansen@intel.com, sean.j.christopherson@intel.com,
+        nhorman@redhat.com, npmccallum@redhat.com,
+        Alexei Starovoitov <ast@kernel.org>,
+        Andi Kleen <ak@linux.intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        Borislav Petkov <bp@suse.de>,
+        "David S. Miller" <davem@davemloft.net>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@kernel.org>,
+        "open list:INTEL SGX" <intel-sgx-kernel-dev@lists.01.org>,
+        Janakarajan Natarajan <Janakarajan.Natarajan@amd.com>,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        "open list:KERNEL VIRTUAL M
+To: Pavel Machek <pavel@ucw.cz>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180619143230.zjemmhhz7embs2li@gondor.apana.org.au>
-Content-Language: en-US
+Content-Disposition: inline
+In-Reply-To: <20180612105011.GA26931@amd>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-
-
-On 06/19/2018 10:32 AM, Herbert Xu wrote:
-> On Tue, Jun 19, 2018 at 04:08:05PM +0200, Christian Borntraeger wrote:
->> On 06/19/2018 03:26 PM, Farhan Ali wrote:
->>> A polite ping :)
->>>
->>> If no one has any more comments/feedback then I would like to how to merge these patches to the mainline kernel tree.
->>
->> I think it should go via Michael Tsirkin or Jason Wang (Adding Jason).
->> Also adding Herbert Xu as FYI.
->>
->>
->> I have not looked into the details of the patch, but I like the idea.
->> Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+On Tue, Jun 12, 2018 at 12:50:12PM +0200, Pavel Machek wrote:
+> On Fri 2018-06-08 19:09:35, Jarkko Sakkinen wrote:
+> > Intel(R) SGX is a set of CPU instructions that can be used by applications
+> > to set aside private regions of code and data. The code outside the enclave
+> > is disallowed to access the memory inside the enclave by the CPU access
+> > control.  In a way you can think that SGX provides inverted sandbox. It
+> > protects the application from a malicious host.
 > 
-> Please post crypto patches to linux-crypto.
+> Do you intend to allow non-root applications to use SGX?
 > 
-> Thanks,
+> What are non-evil uses for SGX?
 > 
+> ...because it is quite useful for some kinds of evil:
 
-I have cc'ed linux-crypto folks. Sorry I missed them
+The default permissions for the device are 600.
 
-Thanks
-Farhan
+/Jarkko
