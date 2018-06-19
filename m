@@ -1,45 +1,41 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: ccree: fix iv copying for small buffers
-Date: Tue, 19 Jun 2018 22:27:13 +0800
-Message-ID: <20180619142713.dzipyarpb23a7qne@gondor.apana.org.au>
-References: <1528361927-4172-1-git-send-email-gilad@benyossef.com>
- <CAOtvUMcJfJDjnMoithRQ4ife09VC+G-w+__jV-JLwh7M=s7JNQ@mail.gmail.com>
- <20180613063030.bsrq3xmufcw4zi52@gondor.apana.org.au>
- <CAOtvUMdtafGwXJFD0Tm1tx1q+TxRsB4nwEKxumE7=--_PMCZrQ@mail.gmail.com>
+Subject: Re: [PATCH] crypto: skcipher: remove static declaration of export
+ function
+Date: Tue, 19 Jun 2018 22:27:28 +0800
+Message-ID: <20180619142727.7kvtuimjufvdacqn@gondor.apana.org.au>
+References: <20180617174959.29864-1-efremov@linux.com>
+ <20180618172803.GA8022@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>, hadar.gat@arm.com,
-        Ofir Drang <ofir.drang@arm.com>, stable@vger.kernel.org,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux kernel mailing list <linux-kernel@vger.kernel.org>
-To: Gilad Ben-Yossef <gilad@benyossef.com>
+Cc: efremov@linux.com, "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        ldv-project@linuxtesting.org
+To: Eric Biggers <ebiggers3@gmail.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <CAOtvUMdtafGwXJFD0Tm1tx1q+TxRsB4nwEKxumE7=--_PMCZrQ@mail.gmail.com>
+In-Reply-To: <20180618172803.GA8022@gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Sun, Jun 17, 2018 at 01:06:42PM +0300, Gilad Ben-Yossef wrote:
->
-> It was ctr(aes). I wrongly assumed that we are supposed to unconditionally
-> copy
-> the cipher-text block post operation and let the caller do with it what it
-> wants and so the
-> code now does that for all cipher operations unconditionally.
+On Mon, Jun 18, 2018 at 10:28:03AM -0700, Eric Biggers wrote:
+> On Sun, Jun 17, 2018 at 08:49:59PM +0300, efremov@linux.com wrote:
+> > The function skcipher_walk_next declared as static and marked as
+> > EXPORT_SYMBOL. It's a bit confusing since export symbol means that
+> > we want others to use this function. The area of visibility for such
+> > function is its .c file and all other modules. Other *.c files of the
+> > same module can't use it, despite all other modules can. Relying on
+> > that such behavior was not the original intention, the patch just
+> > removes the static keyword.
+> > 
+> > Found by Linux Driver Verification project (linuxtesting.org).
+> > 
+> > Signed-off-by: Denis Efremov <efremov@linux.com>
+> 
+> Why not remove the EXPORT_SYMBOL instead?  It has no users outside the file.
 
-For CTR it doesn't matter whether the last block is less than a
-block, you should still increment the counter.
+I agree.
 
-> So what is a good description of what we are supposed to provide in that
-> field post operation?
-> The next IV? but as you stated, that is not necessarily useful for all
-> ciphers.
-
-When in doubt, please refer to the generic implementation.  If
-that is still unclear or if it seems wrong, please post to the
-list.
-
-Cheers,
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
