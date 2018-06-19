@@ -1,39 +1,36 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: skcipher: remove static declaration of export
- function
-Date: Tue, 19 Jun 2018 22:27:28 +0800
-Message-ID: <20180619142727.7kvtuimjufvdacqn@gondor.apana.org.au>
-References: <20180617174959.29864-1-efremov@linux.com>
- <20180618172803.GA8022@gmail.com>
+Subject: Re: [PATCH 3/3] hwrng: msm - Add support for prng v2
+Date: Tue, 19 Jun 2018 22:28:53 +0800
+Message-ID: <20180619142853.wgi5easw4zv6ttrb@gondor.apana.org.au>
+References: <20180618141259.23141-1-vkoul@kernel.org>
+ <20180618141259.23141-4-vkoul@kernel.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: efremov@linux.com, "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        ldv-project@linuxtesting.org
-To: Eric Biggers <ebiggers3@gmail.com>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Matt Mackall <mpm@selenic.com>, Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-arm-msm@vger.kernel.org, Vinod Koul <vkoul@kernel.org>
+To: Vinod Koul <vinod.koul@linaro.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20180618172803.GA8022@gmail.com>
+In-Reply-To: <20180618141259.23141-4-vkoul@kernel.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Jun 18, 2018 at 10:28:03AM -0700, Eric Biggers wrote:
-> On Sun, Jun 17, 2018 at 08:49:59PM +0300, efremov@linux.com wrote:
-> > The function skcipher_walk_next declared as static and marked as
-> > EXPORT_SYMBOL. It's a bit confusing since export symbol means that
-> > we want others to use this function. The area of visibility for such
-> > function is its .c file and all other modules. Other *.c files of the
-> > same module can't use it, despite all other modules can. Relying on
-> > that such behavior was not the original intention, the patch just
-> > removes the static keyword.
-> > 
-> > Found by Linux Driver Verification project (linuxtesting.org).
-> > 
-> > Signed-off-by: Denis Efremov <efremov@linux.com>
+On Mon, Jun 18, 2018 at 07:42:59PM +0530, Vinod Koul wrote:
+> Qcom 8996 and later chips support prng v2 where we need to only
+> implement .read callback for hwrng.
 > 
-> Why not remove the EXPORT_SYMBOL instead?  It has no users outside the file.
+> Add a new table for v2 which supports this and get version required for
+> driver data.
+> 
+> Signed-off-by: Vinod Koul <vkoul@kernel.org>
 
-I agree.
+Is this really a pseudo-RNG? If so it needs to be moved over to
+the algif_rng interface.
+
+hwrng is for true hardware RNGs only, because it may be directly
+fed into /dev/random.
 
 Thanks,
 -- 
