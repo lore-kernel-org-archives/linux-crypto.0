@@ -1,44 +1,34 @@
-From: efremov@linux.com
-Subject: [PATCH v2] crypto: skcipher: remove the exporting of skcipher_walk_next
-Date: Tue, 19 Jun 2018 23:23:57 +0300
-Message-ID: <20180619202357.10805-1-efremov@linux.com>
-References: <20180617174959.29864-1-efremov@linux.com>
-Cc: Eric Biggers <ebiggers3@gmail.com>,
+From: Peter Zijlstra <peterz@infradead.org>
+Subject: Re: [PATCH v11 00/13] Intel SGX1 support
+Date: Tue, 19 Jun 2018 22:36:49 +0200
+Message-ID: <20180619203649.GI2476@hirez.programming.kicks-ass.net>
+References: <20180608171216.26521-1-jarkko.sakkinen@linux.intel.com>
+ <20180612105011.GA26931@amd>
+ <20180619145943.GC8034@linux.intel.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: Pavel Machek <pavel@ucw.cz>, x86@kernel.org,
+        platform-driver-x86@vger.kernel.org, dave.hansen@intel.com,
+        sean.j.christopherson@intel.com, nhorman@redhat.com,
+        npmccallum@redhat.com, Alexei Starovoitov <ast@kernel.org>,
+        Andi Kleen <ak@linux.intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        Borislav Petkov <bp@suse.de>,
         "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        ldv-project@linuxtesting.org, Denis Efremov <efremov@linux.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+        David Woodhouse <dwmw@amazon.co.uk>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@kernel.org>,
+        "open list:INTEL SGX" <intel-sgx-kernel-dev@lists.01.org>,
+        Janakarajan Natarajan <Janakarajan.Natarajan@amd.com>,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+To: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180617174959.29864-1-efremov@linux.com>
+Content-Disposition: inline
+In-Reply-To: <20180619145943.GC8034@linux.intel.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-The function skcipher_walk_next declared as static and marked as
-EXPORT_SYMBOL_GPL. It's a bit confusing for internal function to be
-exported. The area of visibility for such function is its .c file
-and all other modules. Other *.c files of the same module can't use it,
-despite all other modules can. Relying on the fact that this is the
-internal function and it's not a crucial part of the API, the patch
-just removes the EXPORT_SYMBOL_GPL marking of skcipher_walk_next.
 
-Found by Linux Driver Verification project (linuxtesting.org).
-
-Signed-off-by: Denis Efremov <efremov@linux.com>
----
- crypto/skcipher.c | 1 -
- 1 file changed, 1 deletion(-)
-
-diff --git a/crypto/skcipher.c b/crypto/skcipher.c
-index 0fe2a2923ad0..7d6a49fe3047 100644
---- a/crypto/skcipher.c
-+++ b/crypto/skcipher.c
-@@ -387,7 +387,6 @@ static int skcipher_walk_next(struct skcipher_walk *walk)
- 	}
- 	return err;
- }
--EXPORT_SYMBOL_GPL(skcipher_walk_next);
- 
- static int skcipher_copy_iv(struct skcipher_walk *walk)
- {
--- 
-2.17.1
+*sigh*, could you not cross-post with closed/moderated lists, that's rude.
