@@ -1,7 +1,8 @@
 From: Kees Cook <keescook@chromium.org>
-Subject: [PATCH 04/11] dm verity fec: Remove VLA usage
-Date: Wed, 20 Jun 2018 12:04:01 -0700
-Message-ID: <20180620190408.45104-5-keescook@chromium.org>
+Subject: [PATCH 10/11] crypto: ahash: Remove VLA usage for
+	AHASH_REQUEST_ON_STACK
+Date: Wed, 20 Jun 2018 12:04:07 -0700
+Message-ID: <20180620190408.45104-11-keescook@chromium.org>
 References: <20180620190408.45104-1-keescook@chromium.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -29,37 +30,46 @@ Sender: dm-devel-bounces@redhat.com
 Errors-To: dm-devel-bounces@redhat.com
 List-Id: linux-crypto.vger.kernel.org
 
-In the quest to remove all stack VLA usage from the kernel[1], this
-uses the newly defined max digest size macro. Also adds a sanity-check
-at use-time.
+In the quest to remove all stack VLA usage from the kernel[1], this caps
+the ahash request size similar to the other limits and adds a sanity
+check at registration.
 
 [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
 
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- drivers/md/dm-verity-fec.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ include/crypto/hash.h          | 3 ++-
+ include/crypto/internal/hash.h | 1 +
+ 2 files changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/md/dm-verity-fec.c b/drivers/md/dm-verity-fec.c
-index 684af08d0747..0dfcc52835bc 100644
---- a/drivers/md/dm-verity-fec.c
-+++ b/drivers/md/dm-verity-fec.c
-@@ -212,12 +212,15 @@ static int fec_read_bufs(struct dm_verity *v, struct dm_verity_io *io,
- 	struct dm_verity_fec_io *fio = fec_io(io);
- 	u64 block, ileaved;
- 	u8 *bbuf, *rs_block;
--	u8 want_digest[v->digest_size];
-+	u8 want_digest[AHASH_MAX_DIGESTSIZE];
- 	unsigned n, k;
+diff --git a/include/crypto/hash.h b/include/crypto/hash.h
+index b9df568dc98e..7d62309baf0b 100644
+--- a/include/crypto/hash.h
++++ b/include/crypto/hash.h
+@@ -66,10 +66,11 @@ struct ahash_request {
  
- 	if (neras)
- 		*neras = 0;
+ #define AHASH_MAX_DIGESTSIZE	(PAGE_SIZE / 8)
+ #define AHASH_MAX_STATESIZE	(PAGE_SIZE / 8)
++#define AHASH_MAX_REQSIZE	(PAGE_SIZE / 8)
  
-+	if (WARN_ON(v->digest_size < sizeof(want_digest)))
-+		return -EINVAL;
-+
- 	/*
- 	 * read each of the rsn data blocks that are part of the RS block, and
- 	 * interleave contents to available bufs
+ #define AHASH_REQUEST_ON_STACK(name, ahash) \
+ 	char __##name##_desc[sizeof(struct ahash_request) + \
+-		crypto_ahash_reqsize(ahash)] CRYPTO_MINALIGN_ATTR; \
++		AHASH_MAX_REQSIZE] CRYPTO_MINALIGN_ATTR; \
+ 	struct ahash_request *name = (void *)__##name##_desc
+ 
+ /**
+diff --git a/include/crypto/internal/hash.h b/include/crypto/internal/hash.h
+index a0b0ad9d585e..d96ae5f52125 100644
+--- a/include/crypto/internal/hash.h
++++ b/include/crypto/internal/hash.h
+@@ -142,6 +142,7 @@ static inline struct ahash_alg *__crypto_ahash_alg(struct crypto_alg *alg)
+ static inline void crypto_ahash_set_reqsize(struct crypto_ahash *tfm,
+ 					    unsigned int reqsize)
+ {
++	BUG_ON(reqsize > AHASH_MAX_REQSIZE);
+ 	tfm->reqsize = reqsize;
+ }
+ 
 -- 
 2.17.1
