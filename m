@@ -1,7 +1,8 @@
 From: Kees Cook <keescook@chromium.org>
-Subject: [PATCH 00/11] crypto: Remove VLA usage
-Date: Wed, 20 Jun 2018 12:03:57 -0700
-Message-ID: <20180620190408.45104-1-keescook@chromium.org>
+Subject: [PATCH 07/11] crypto: xcbc: Remove VLA usage
+Date: Wed, 20 Jun 2018 12:04:04 -0700
+Message-ID: <20180620190408.45104-8-keescook@chromium.org>
+References: <20180620190408.45104-1-keescook@chromium.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
@@ -16,6 +17,7 @@ Cc: Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
 	Rabin Vincent <rabinv@axis.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <dm-devel-bounces@redhat.com>
+In-Reply-To: <20180620190408.45104-1-keescook@chromium.org>
 List-Unsubscribe: <https://www.redhat.com/mailman/options/dm-devel>,
 	<mailto:dm-devel-request@redhat.com?subject=unsubscribe>
 List-Archive: <https://www.redhat.com/archives/dm-devel>
@@ -27,61 +29,31 @@ Sender: dm-devel-bounces@redhat.com
 Errors-To: dm-devel-bounces@redhat.com
 List-Id: linux-crypto.vger.kernel.org
 
-Hi,
-
-This is nearly the last of the VLA removals[1], but it's one of the
-largest because crypto gets used in lots of places. After looking
-through code, usage, reading the threads Gustavo started, and comparing
-the use-cases to the other VLA removals that have landed in the kernel,
-I think this series is likely the best way forward to shut the door on
-VLAs forever.
-
-As background, the crypto stack usage is for callers to do an immediate
-bit of work that doesn't allocate new memory. This means that other VLA
-removal techniques (like just using kmalloc) aren't workable, and the
-next common technique is needed: examination of maximum stack usage and
-the addition of sanity checks. This series does that, and in several
-cases, these maximums were already implicit in the code.
-
-This series is intended to land via the crypto tree, though it touches
-dm as well, since there are dependent patches (new crypto #defines
-being used).
-
-Thanks!
-
--Kees
+In the quest to remove all stack VLA usage from the kernel[1], this uses
+the maximum blocksize and adds a sanity check.
 
 [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
 
-Kees Cook (11):
-  crypto: shash: Remove VLA usage
-  dm integrity: Remove VLA usage
-  crypto: ahash: Remove VLA usage
-  dm verity fec: Remove VLA usage
-  crypto alg: Introduce max blocksize and alignmask
-  crypto: cbc: Remove VLA usage
-  crypto: xcbc: Remove VLA usage
-  crypto: qat: Remove VLA usage
-  crypto: shash: Remove VLA usage in unaligned hashing
-  crypto: ahash: Remove VLA usage for AHASH_REQUEST_ON_STACK
-  crypto: skcipher: Remove VLA usage for SKCIPHER_REQUEST_ON_STACK
+Signed-off-by: Kees Cook <keescook@chromium.org>
+---
+ crypto/xcbc.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
- crypto/ahash.c                           |  4 ++--
- crypto/algapi.c                          |  5 ++++-
- crypto/algif_hash.c                      |  2 +-
- crypto/shash.c                           | 27 ++++++++++++------------
- crypto/xcbc.c                            |  5 ++++-
- drivers/crypto/qat/qat_common/Makefile   |  2 ++
- drivers/crypto/qat/qat_common/qat_algs.c |  8 +++++--
- drivers/md/dm-integrity.c                | 23 ++++++++++++++------
- drivers/md/dm-verity-fec.c               |  5 ++++-
- include/crypto/cbc.h                     |  2 +-
- include/crypto/hash.h                    | 12 +++++++++--
- include/crypto/internal/hash.h           |  1 +
- include/crypto/internal/skcipher.h       |  1 +
- include/crypto/skcipher.h                |  4 +++-
- include/linux/crypto.h                   |  4 ++++
- 15 files changed, 73 insertions(+), 32 deletions(-)
-
+diff --git a/crypto/xcbc.c b/crypto/xcbc.c
+index 25c75af50d3f..016481b1f3ba 100644
+--- a/crypto/xcbc.c
++++ b/crypto/xcbc.c
+@@ -65,7 +65,10 @@ static int crypto_xcbc_digest_setkey(struct crypto_shash *parent,
+ 	int bs = crypto_shash_blocksize(parent);
+ 	u8 *consts = PTR_ALIGN(&ctx->ctx[0], alignmask + 1);
+ 	int err = 0;
+-	u8 key1[bs];
++	u8 key1[CRYPTO_ALG_MAX_BLOCKSIZE];
++
++	if (WARN_ON(bs > sizeof(key1)))
++		return -EINVAL;
+ 
+ 	if ((err = crypto_cipher_setkey(ctx->child, inkey, keylen)))
+ 		return err;
 -- 
 2.17.1
