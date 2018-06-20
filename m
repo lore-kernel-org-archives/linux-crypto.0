@@ -1,38 +1,81 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH] crypto: testmgr: add test vectors for skein
-Date: Wed, 20 Jun 2018 20:26:34 +0200
-Message-ID: <1602937.V4TYxMrJ9m@tauon.chronox.de>
-References: <20180620105714.18359-1-j.m.torrespalma@gmail.com> <20180620175638.GB76265@gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Juan Manuel Torres Palma <j.m.torrespalma@gmail.com>,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        davem@davemloft.net, herbert@gondor.apana.org.au
-To: Eric Biggers <ebiggers3@gmail.com>
+From: Kees Cook <keescook@chromium.org>
+Subject: [PATCH 03/11] crypto: ahash: Remove VLA usage
+Date: Wed, 20 Jun 2018 12:04:00 -0700
+Message-ID: <20180620190408.45104-4-keescook@chromium.org>
+References: <20180620190408.45104-1-keescook@chromium.org>
+Cc: Kees Cook <keescook@chromium.org>,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+        Alasdair Kergon <agk@redhat.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Eric Biggers <ebiggers@google.com>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Lars Persson <larper@axis.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Rabin Vincent <rabinv@axis.com>,
+        Tim Chen <tim.c.chen@linux.intel.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, qat-linux@intel.com,
+        dm-devel@redhat.com, linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180620175638.GB76265@gmail.com>
+In-Reply-To: <20180620190408.45104-1-keescook@chromium.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Am Mittwoch, 20. Juni 2018, 19:56:38 CEST schrieb Eric Biggers:
+In the quest to remove all stack VLA usage from the kernel[1], this
+introduces max size macros for ahash, as already done for shash, and
+adjust the crypto user to max state size.
 
-Hi Eric,
+[1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
 
-> > +		.alg = "skein1024",
-> > +		.test = alg_test_hash,
-> > +		.fips_allowed = 1,
-> 
-> Are you sure Skein should be on the "FIPS allowed" list?  I'm not
-> particularly familiar with FIPS, but my understanding is that the
-> fips_allowed flag is only supposed to be set on specific "approved"
-> algorithms.  So if you're unsure, it shouldn't be set.
+Signed-off-by: Kees Cook <keescook@chromium.org>
+---
+ crypto/ahash.c        | 4 ++--
+ crypto/algif_hash.c   | 2 +-
+ include/crypto/hash.h | 3 +++
+ 3 files changed, 6 insertions(+), 3 deletions(-)
 
-Skein is definitely not allowed in FIPS mode. Please drop that flag.
-> 
-> Eric
-
-
-
-Ciao
-Stephan
+diff --git a/crypto/ahash.c b/crypto/ahash.c
+index a64c143165b1..6435bdbe42fd 100644
+--- a/crypto/ahash.c
++++ b/crypto/ahash.c
+@@ -550,8 +550,8 @@ static int ahash_prepare_alg(struct ahash_alg *alg)
+ {
+ 	struct crypto_alg *base = &alg->halg.base;
+ 
+-	if (alg->halg.digestsize > PAGE_SIZE / 8 ||
+-	    alg->halg.statesize > PAGE_SIZE / 8 ||
++	if (alg->halg.digestsize > AHASH_MAX_DIGESTSIZE ||
++	    alg->halg.statesize > AHASH_MAX_STATESIZE ||
+ 	    alg->halg.statesize == 0)
+ 		return -EINVAL;
+ 
+diff --git a/crypto/algif_hash.c b/crypto/algif_hash.c
+index bfcf595fd8f9..8974ee8ebead 100644
+--- a/crypto/algif_hash.c
++++ b/crypto/algif_hash.c
+@@ -239,7 +239,7 @@ static int hash_accept(struct socket *sock, struct socket *newsock, int flags,
+ 	struct alg_sock *ask = alg_sk(sk);
+ 	struct hash_ctx *ctx = ask->private;
+ 	struct ahash_request *req = &ctx->req;
+-	char state[crypto_ahash_statesize(crypto_ahash_reqtfm(req)) ? : 1];
++	char state[AHASH_MAX_STATESIZE];
+ 	struct sock *sk2;
+ 	struct alg_sock *ask2;
+ 	struct hash_ctx *ctx2;
+diff --git a/include/crypto/hash.h b/include/crypto/hash.h
+index 308aad8bf523..b9df568dc98e 100644
+--- a/include/crypto/hash.h
++++ b/include/crypto/hash.h
+@@ -64,6 +64,9 @@ struct ahash_request {
+ 	void *__ctx[] CRYPTO_MINALIGN_ATTR;
+ };
+ 
++#define AHASH_MAX_DIGESTSIZE	(PAGE_SIZE / 8)
++#define AHASH_MAX_STATESIZE	(PAGE_SIZE / 8)
++
+ #define AHASH_REQUEST_ON_STACK(name, ahash) \
+ 	char __##name##_desc[sizeof(struct ahash_request) + \
+ 		crypto_ahash_reqsize(ahash)] CRYPTO_MINALIGN_ATTR; \
+-- 
+2.17.1
