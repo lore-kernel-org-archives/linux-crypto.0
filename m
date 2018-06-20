@@ -1,50 +1,44 @@
-From: Eric Dumazet <eric.dumazet@gmail.com>
-Subject: Re: [PATCH] [net-next, v2] tcp: use monotonic timestamps for PAWS
-Date: Tue, 19 Jun 2018 16:38:11 -0700
-Message-ID: <e3552cdb-a22c-5577-42a0-0f695e42e784@gmail.com>
-References: <20180619123724.2535981-1-arnd@arndb.de>
+From: Vinod <vkoul@kernel.org>
+Subject: Re: [PATCH 3/3] hwrng: msm - Add support for prng v2
+Date: Wed, 20 Jun 2018 11:02:04 +0530
+Message-ID: <20180620053204.GG13316@vkoul-mobl>
+References: <20180618141259.23141-1-vkoul@kernel.org>
+ <20180618141259.23141-4-vkoul@kernel.org>
+ <20180619142853.wgi5easw4zv6ttrb@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Cc: y2038@lists.linaro.org, Harsh Jain <harsh@chelsio.com>,
-        Atul Gupta <atul.gupta@chelsio.com>,
-        Michael Werner <werner@chelsio.com>,
-        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
-        Yuchung Cheng <ycheng@google.com>,
-        Neal Cardwell <ncardwell@google.com>,
-        Soheil Hassas Yeganeh <soheil@google.com>,
-        Florian Westphal <fw@strlen.de>,
-        Christoph Paasch <cpaasch@apple.com>,
-        Lawrence Brakmo <brakmo@fb.com>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-To: Arnd Bergmann <arnd@arndb.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Matt Mackall <mpm@selenic.com>, Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-arm-msm@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180619123724.2535981-1-arnd@arndb.de>
-Content-Language: en-US
+Content-Disposition: inline
+In-Reply-To: <20180619142853.wgi5easw4zv6ttrb@gondor.apana.org.au>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-
-
-On 06/19/2018 05:36 AM, Arnd Bergmann wrote:
-> Using get_seconds() for timestamps is deprecated since it can lead
-> to overflows on 32-bit systems. While the interface generally doesn't
-> overflow until year 2106, the specific implementation of the TCP PAWS
-> algorithm breaks in 2038 when the intermediate signed 32-bit timestamps
-> overflow.
+On 19-06-18, 22:28, Herbert Xu wrote:
+> On Mon, Jun 18, 2018 at 07:42:59PM +0530, Vinod Koul wrote:
+> > Qcom 8996 and later chips support prng v2 where we need to only
+> > implement .read callback for hwrng.
+> > 
+> > Add a new table for v2 which supports this and get version required for
+> > driver data.
+> > 
+> > Signed-off-by: Vinod Koul <vkoul@kernel.org>
 > 
+> Is this really a pseudo-RNG? If so it needs to be moved over to
+> the algif_rng interface.
 > 
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> ---
-> v2: use time_before32()/time_after32() everywhere as suggested
->     Eric Dumazet
+> hwrng is for true hardware RNGs only, because it may be directly
+> fed into /dev/random.
 
+I am trying to find how how much random output this hardware generates.
 
-Thanks a lot Arnd.
+Meanwhile, can you please point out examples/Documentation for algif_rng
+and if any test tools for this?
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
+Thanks
+-- 
+~Vinod
