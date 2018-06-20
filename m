@@ -1,7 +1,8 @@
 From: Kees Cook <keescook@chromium.org>
-Subject: [PATCH 06/11] crypto: cbc: Remove VLA usage
-Date: Wed, 20 Jun 2018 12:04:03 -0700
-Message-ID: <20180620190408.45104-7-keescook@chromium.org>
+Subject: [PATCH 05/11] crypto alg: Introduce max blocksize and
+	alignmask
+Date: Wed, 20 Jun 2018 12:04:02 -0700
+Message-ID: <20180620190408.45104-6-keescook@chromium.org>
 References: <20180620190408.45104-1-keescook@chromium.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -30,27 +31,48 @@ Errors-To: dm-devel-bounces@redhat.com
 List-Id: linux-crypto.vger.kernel.org
 
 In the quest to remove all stack VLA usage from the kernel[1], this
-uses the upper bounds on blocksize.
+exposes the existing upper bound on crypto block sizes for VLA removal,
+and introduces a new check for alignmask (current maximum in the kernel
+is 63 from manual inspection of all cra_alignmask settings).
 
 [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
 
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- include/crypto/cbc.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ crypto/algapi.c        | 5 ++++-
+ include/linux/crypto.h | 4 ++++
+ 2 files changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/include/crypto/cbc.h b/include/crypto/cbc.h
-index f5b8bfc22e6d..260096bcf99b 100644
---- a/include/crypto/cbc.h
-+++ b/include/crypto/cbc.h
-@@ -113,7 +113,7 @@ static inline int crypto_cbc_decrypt_inplace(
- 	unsigned int bsize = crypto_skcipher_blocksize(tfm);
- 	unsigned int nbytes = walk->nbytes;
- 	u8 *src = walk->src.virt.addr;
--	u8 last_iv[bsize];
-+	u8 last_iv[CRYPTO_ALG_MAX_BLOCKSIZE];
+diff --git a/crypto/algapi.c b/crypto/algapi.c
+index c0755cf4f53f..760a412b059c 100644
+--- a/crypto/algapi.c
++++ b/crypto/algapi.c
+@@ -57,7 +57,10 @@ static int crypto_check_alg(struct crypto_alg *alg)
+ 	if (alg->cra_alignmask & (alg->cra_alignmask + 1))
+ 		return -EINVAL;
  
- 	/* Start of the last block. */
- 	src += nbytes - (nbytes & (bsize - 1)) - bsize;
+-	if (alg->cra_blocksize > PAGE_SIZE / 8)
++	if (alg->cra_blocksize > CRYPTO_ALG_MAX_BLOCKSIZE)
++		return -EINVAL;
++
++	if (alg->cra_alignmask > CRYPTO_ALG_MAX_ALIGNMASK)
+ 		return -EINVAL;
+ 
+ 	if (!alg->cra_type && (alg->cra_flags & CRYPTO_ALG_TYPE_MASK) ==
+diff --git a/include/linux/crypto.h b/include/linux/crypto.h
+index 6eb06101089f..e76ffcbd5aa6 100644
+--- a/include/linux/crypto.h
++++ b/include/linux/crypto.h
+@@ -134,6 +134,10 @@
+  */
+ #define CRYPTO_MAX_ALG_NAME		128
+ 
++/* Maximum values for registered algorithms. */
++#define CRYPTO_ALG_MAX_BLOCKSIZE    (PAGE_SIZE / 8)
++#define CRYPTO_ALG_MAX_ALIGNMASK    63
++
+ /*
+  * The macro CRYPTO_MINALIGN_ATTR (along with the void * type in the actual
+  * declaration) is used to ensure that the crypto_tfm context structure is
 -- 
 2.17.1
