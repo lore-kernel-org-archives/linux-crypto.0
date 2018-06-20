@@ -1,56 +1,49 @@
-From: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
-Subject: Re: [PATCH 3/3] hwrng: msm - Add support for prng v2
-Date: Wed, 20 Jun 2018 23:15:12 +0530
-Message-ID: <CANc+2y5-7S_1bvMYs54X3MqCkcsha3iNe1BGa-pG=_xH5xYn1Q@mail.gmail.com>
-References: <20180618141259.23141-1-vkoul@kernel.org> <20180618141259.23141-4-vkoul@kernel.org>
- <20180619142853.wgi5easw4zv6ttrb@gondor.apana.org.au> <20180620053204.GG13316@vkoul-mobl>
+From: Eric Biggers <ebiggers3@gmail.com>
+Subject: Re: [PATCH] crypto: testmgr: add test vectors for skein
+Date: Wed, 20 Jun 2018 10:56:38 -0700
+Message-ID: <20180620175638.GB76265@gmail.com>
+References: <20180620105714.18359-1-j.m.torrespalma@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        Matt Mackall <mpm@selenic.com>, Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-arm-msm@vger.kernel.org
-To: Vinod <vkoul@kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        davem@davemloft.net, herbert@gondor.apana.org.au
+To: Juan Manuel Torres Palma <j.m.torrespalma@gmail.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180620053204.GG13316@vkoul-mobl>
+Content-Disposition: inline
+In-Reply-To: <20180620105714.18359-1-j.m.torrespalma@gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi Vinod,
+Hi Juan,
 
-On 20 June 2018 at 11:02, Vinod <vkoul@kernel.org> wrote:
-> On 19-06-18, 22:28, Herbert Xu wrote:
->> On Mon, Jun 18, 2018 at 07:42:59PM +0530, Vinod Koul wrote:
->> > Qcom 8996 and later chips support prng v2 where we need to only
->> > implement .read callback for hwrng.
->> >
->> > Add a new table for v2 which supports this and get version required for
->> > driver data.
->> >
->> > Signed-off-by: Vinod Koul <vkoul@kernel.org>
->>
->> Is this really a pseudo-RNG? If so it needs to be moved over to
->> the algif_rng interface.
->>
->> hwrng is for true hardware RNGs only, because it may be directly
->> fed into /dev/random.
->
-> I am trying to find how how much random output this hardware generates.
->
-> Meanwhile, can you please point out examples/Documentation for algif_rng
-> and if any test tools for this?
+On Wed, Jun 20, 2018 at 07:57:14PM +0900, Juan Manuel Torres Palma wrote:
+> Adds test vectors specified in skein v1.3
+> specification. The main code is still in staging
+> directory, but this is required to eventually be
+> moved to the crypto directory.
+> 
+> Signed-off-by: Juan Manuel Torres Palma <j.m.torrespalma@gmail.com>
+> ---
+>  crypto/testmgr.c |  21 ++++++
+>  crypto/testmgr.h | 203 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 224 insertions(+)
+> 
+> diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+> index 11e45352fd0b..9fa08cbc8852 100644
+> --- a/crypto/testmgr.c
+> +++ b/crypto/testmgr.c
+> @@ -3453,6 +3453,27 @@ static const struct alg_test_desc alg_test_descs[] = {
+>  		.suite = {
+>  			.hash = __VECS(sha512_tv_template)
+>  		}
+> +	}, {
+> +		.alg = "skein1024",
+> +		.test = alg_test_hash,
+> +		.fips_allowed = 1,
 
-As Herbert suggested exynos rng is a good example. It was wrongly
-using hwrng framework then switched to using crypto framework.
+Are you sure Skein should be on the "FIPS allowed" list?  I'm not particularly
+familiar with FIPS, but my understanding is that the fips_allowed flag is only
+supposed to be set on specific "approved" algorithms.  So if you're unsure, it
+shouldn't be set.
 
-I have a patch for msm rng using crypto framework, only compile tested
-though. You can find the patch at
-https://pastebin.ubuntu.com/p/44r6BJgBkN/. I am having a hard time
-sending patches via git send-email form a gmail account so I have put
-it in pastebin. Feel free to use it if that is useful.
-
-Regards,
-PrasannaKumar
+Eric
