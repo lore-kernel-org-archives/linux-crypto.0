@@ -1,8 +1,7 @@
 From: Kees Cook <keescook@chromium.org>
-Subject: [PATCH 05/11] crypto alg: Introduce max blocksize and
-	alignmask
-Date: Wed, 20 Jun 2018 12:04:02 -0700
-Message-ID: <20180620190408.45104-6-keescook@chromium.org>
+Subject: [PATCH 01/11] crypto: shash: Remove VLA usage
+Date: Wed, 20 Jun 2018 12:03:58 -0700
+Message-ID: <20180620190408.45104-2-keescook@chromium.org>
 References: <20180620190408.45104-1-keescook@chromium.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -31,48 +30,53 @@ Errors-To: dm-devel-bounces@redhat.com
 List-Id: linux-crypto.vger.kernel.org
 
 In the quest to remove all stack VLA usage from the kernel[1], this
-exposes the existing upper bound on crypto block sizes for VLA removal,
-and introduces a new check for alignmask (current maximum in the kernel
-is 63 from manual inspection of all cra_alignmask settings).
+removes the VLAs in SHASH_DESC_ON_STACK (via crypto_shash_descsize())
+by using the maximum allowable size (which is now more clearly captured
+in a macro). Similar limits are turned into macros as well.
 
 [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
 
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- crypto/algapi.c        | 5 ++++-
- include/linux/crypto.h | 4 ++++
- 2 files changed, 8 insertions(+), 1 deletion(-)
+ crypto/shash.c        | 6 +++---
+ include/crypto/hash.h | 6 +++++-
+ 2 files changed, 8 insertions(+), 4 deletions(-)
 
-diff --git a/crypto/algapi.c b/crypto/algapi.c
-index c0755cf4f53f..760a412b059c 100644
---- a/crypto/algapi.c
-+++ b/crypto/algapi.c
-@@ -57,7 +57,10 @@ static int crypto_check_alg(struct crypto_alg *alg)
- 	if (alg->cra_alignmask & (alg->cra_alignmask + 1))
+diff --git a/crypto/shash.c b/crypto/shash.c
+index 5d732c6bb4b2..ab6902c6dae7 100644
+--- a/crypto/shash.c
++++ b/crypto/shash.c
+@@ -458,9 +458,9 @@ static int shash_prepare_alg(struct shash_alg *alg)
+ {
+ 	struct crypto_alg *base = &alg->base;
+ 
+-	if (alg->digestsize > PAGE_SIZE / 8 ||
+-	    alg->descsize > PAGE_SIZE / 8 ||
+-	    alg->statesize > PAGE_SIZE / 8)
++	if (alg->digestsize > SHASH_MAX_DIGESTSIZE ||
++	    alg->descsize > SHASH_MAX_DESCSIZE ||
++	    alg->statesize > SHASH_MAX_STATESIZE)
  		return -EINVAL;
  
--	if (alg->cra_blocksize > PAGE_SIZE / 8)
-+	if (alg->cra_blocksize > CRYPTO_ALG_MAX_BLOCKSIZE)
-+		return -EINVAL;
-+
-+	if (alg->cra_alignmask > CRYPTO_ALG_MAX_ALIGNMASK)
- 		return -EINVAL;
+ 	base->cra_type = &crypto_shash_type;
+diff --git a/include/crypto/hash.h b/include/crypto/hash.h
+index 76e432cab75d..308aad8bf523 100644
+--- a/include/crypto/hash.h
++++ b/include/crypto/hash.h
+@@ -151,9 +151,13 @@ struct shash_desc {
+ 	void *__ctx[] CRYPTO_MINALIGN_ATTR;
+ };
  
- 	if (!alg->cra_type && (alg->cra_flags & CRYPTO_ALG_TYPE_MASK) ==
-diff --git a/include/linux/crypto.h b/include/linux/crypto.h
-index 6eb06101089f..e76ffcbd5aa6 100644
---- a/include/linux/crypto.h
-+++ b/include/linux/crypto.h
-@@ -134,6 +134,10 @@
-  */
- #define CRYPTO_MAX_ALG_NAME		128
- 
-+/* Maximum values for registered algorithms. */
-+#define CRYPTO_ALG_MAX_BLOCKSIZE    (PAGE_SIZE / 8)
-+#define CRYPTO_ALG_MAX_ALIGNMASK    63
++#define SHASH_MAX_DIGESTSIZE    (PAGE_SIZE / 8)
++#define SHASH_MAX_DESCSIZE      (PAGE_SIZE / 8)
++#define SHASH_MAX_STATESIZE     (PAGE_SIZE / 8)
 +
- /*
-  * The macro CRYPTO_MINALIGN_ATTR (along with the void * type in the actual
-  * declaration) is used to ensure that the crypto_tfm context structure is
+ #define SHASH_DESC_ON_STACK(shash, ctx)				  \
+ 	char __##shash##_desc[sizeof(struct shash_desc) +	  \
+-		crypto_shash_descsize(ctx)] CRYPTO_MINALIGN_ATTR; \
++		SHASH_MAX_DESCSIZE] CRYPTO_MINALIGN_ATTR; \
+ 	struct shash_desc *shash = (struct shash_desc *)__##shash##_desc
+ 
+ /**
 -- 
 2.17.1
