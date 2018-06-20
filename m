@@ -1,8 +1,8 @@
 From: Kees Cook <keescook@chromium.org>
-Subject: [PATCH 09/11] crypto: shash: Remove VLA usage in
-	unaligned hashing
-Date: Wed, 20 Jun 2018 12:04:06 -0700
-Message-ID: <20180620190408.45104-10-keescook@chromium.org>
+Subject: [PATCH 11/11] crypto: skcipher: Remove VLA usage for
+	SKCIPHER_REQUEST_ON_STACK
+Date: Wed, 20 Jun 2018 12:04:08 -0700
+Message-ID: <20180620190408.45104-12-keescook@chromium.org>
 References: <20180620190408.45104-1-keescook@chromium.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -30,69 +30,46 @@ Sender: dm-devel-bounces@redhat.com
 Errors-To: dm-devel-bounces@redhat.com
 List-Id: linux-crypto.vger.kernel.org
 
-In the quest to remove all stack VLA usage from the kernel[1], this uses
-the newly defined max alignment to perform unaligned hashing to avoid
-VLAs, and drops the helper function while adding sanity checks on the
-resulting buffer sizes.
+In the quest to remove all stack VLA usage from the kernel[1], this
+caps the skcipher request size similar to other limits and adds a sanity
+check at registration.
 
 [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
 
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- crypto/shash.c | 21 ++++++++++-----------
- 1 file changed, 10 insertions(+), 11 deletions(-)
+ include/crypto/internal/skcipher.h | 1 +
+ include/crypto/skcipher.h          | 4 +++-
+ 2 files changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/crypto/shash.c b/crypto/shash.c
-index ab6902c6dae7..1bb58209330a 100644
---- a/crypto/shash.c
-+++ b/crypto/shash.c
-@@ -73,13 +73,6 @@ int crypto_shash_setkey(struct crypto_shash *tfm, const u8 *key,
- }
- EXPORT_SYMBOL_GPL(crypto_shash_setkey);
- 
--static inline unsigned int shash_align_buffer_size(unsigned len,
--						   unsigned long mask)
--{
--	typedef u8 __aligned_largest u8_aligned;
--	return len + (mask & ~(__alignof__(u8_aligned) - 1));
--}
--
- static int shash_update_unaligned(struct shash_desc *desc, const u8 *data,
- 				  unsigned int len)
+diff --git a/include/crypto/internal/skcipher.h b/include/crypto/internal/skcipher.h
+index e42f7063f245..5035482cbe68 100644
+--- a/include/crypto/internal/skcipher.h
++++ b/include/crypto/internal/skcipher.h
+@@ -130,6 +130,7 @@ static inline struct crypto_skcipher *crypto_spawn_skcipher(
+ static inline void crypto_skcipher_set_reqsize(
+ 	struct crypto_skcipher *skcipher, unsigned int reqsize)
  {
-@@ -88,11 +81,14 @@ static int shash_update_unaligned(struct shash_desc *desc, const u8 *data,
- 	unsigned long alignmask = crypto_shash_alignmask(tfm);
- 	unsigned int unaligned_len = alignmask + 1 -
- 				     ((unsigned long)data & alignmask);
--	u8 ubuf[shash_align_buffer_size(unaligned_len, alignmask)]
--		__aligned_largest;
-+	u8 ubuf[CRYPTO_ALG_MAX_ALIGNMASK]
-+		__aligned(CRYPTO_ALG_MAX_ALIGNMASK + 1);
- 	u8 *buf = PTR_ALIGN(&ubuf[0], alignmask + 1);
- 	int err;
++	BUG_ON(reqsize > SKCIPHER_MAX_REQSIZE);
+ 	skcipher->reqsize = reqsize;
+ }
  
-+	if (WARN_ON(buf + unaligned_len > ubuf + sizeof(ubuf)))
-+		return -EINVAL;
+diff --git a/include/crypto/skcipher.h b/include/crypto/skcipher.h
+index 2f327f090c3e..25294d0089b2 100644
+--- a/include/crypto/skcipher.h
++++ b/include/crypto/skcipher.h
+@@ -139,9 +139,11 @@ struct skcipher_alg {
+ 	struct crypto_alg base;
+ };
+ 
++#define SKCIPHER_MAX_REQSIZE	(PAGE_SIZE / 8)
 +
- 	if (unaligned_len > len)
- 		unaligned_len = len;
+ #define SKCIPHER_REQUEST_ON_STACK(name, tfm) \
+ 	char __##name##_desc[sizeof(struct skcipher_request) + \
+-		crypto_skcipher_reqsize(tfm)] CRYPTO_MINALIGN_ATTR; \
++		SKCIPHER_MAX_REQSIZE] CRYPTO_MINALIGN_ATTR; \
+ 	struct skcipher_request *name = (void *)__##name##_desc
  
-@@ -124,11 +120,14 @@ static int shash_final_unaligned(struct shash_desc *desc, u8 *out)
- 	unsigned long alignmask = crypto_shash_alignmask(tfm);
- 	struct shash_alg *shash = crypto_shash_alg(tfm);
- 	unsigned int ds = crypto_shash_digestsize(tfm);
--	u8 ubuf[shash_align_buffer_size(ds, alignmask)]
--		__aligned_largest;
-+	u8 ubuf[SHASH_MAX_DIGESTSIZE]
-+		__aligned(CRYPTO_ALG_MAX_ALIGNMASK + 1);
- 	u8 *buf = PTR_ALIGN(&ubuf[0], alignmask + 1);
- 	int err;
- 
-+	if (WARN_ON(buf + ds > ubuf + sizeof(ubuf)))
-+		return -EINVAL;
-+
- 	err = shash->final(desc, buf);
- 	if (err)
- 		goto out;
+ /**
 -- 
 2.17.1
