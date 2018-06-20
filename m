@@ -1,9 +1,10 @@
 From: Eric Biggers <ebiggers3@gmail.com>
-Subject: Re: [dm-devel] [PATCH 04/11] dm verity fec: Remove VLA usage
-Date: Wed, 20 Jun 2018 16:33:42 -0700
-Message-ID: <20180620233342.GB111712@gmail.com>
+Subject: Re: [dm-devel] [PATCH 05/11] crypto alg: Introduce max blocksize and
+ alignmask
+Date: Wed, 20 Jun 2018 16:40:31 -0700
+Message-ID: <20180620234031.GC111712@gmail.com>
 References: <20180620190408.45104-1-keescook@chromium.org>
- <20180620190408.45104-5-keescook@chromium.org>
+ <20180620190408.45104-6-keescook@chromium.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: Herbert Xu <herbert@gondor.apana.org.au>,
@@ -22,41 +23,54 @@ Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 To: Kees Cook <keescook@chromium.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20180620190408.45104-5-keescook@chromium.org>
+In-Reply-To: <20180620190408.45104-6-keescook@chromium.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Jun 20, 2018 at 12:04:01PM -0700, Kees Cook wrote:
+On Wed, Jun 20, 2018 at 12:04:02PM -0700, Kees Cook wrote:
 > In the quest to remove all stack VLA usage from the kernel[1], this
-> uses the newly defined max digest size macro. Also adds a sanity-check
-> at use-time.
+> exposes the existing upper bound on crypto block sizes for VLA removal,
+> and introduces a new check for alignmask (current maximum in the kernel
+> is 63 from manual inspection of all cra_alignmask settings).
 > 
 > [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
 > 
 > Signed-off-by: Kees Cook <keescook@chromium.org>
 > ---
->  drivers/md/dm-verity-fec.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
+>  crypto/algapi.c        | 5 ++++-
+>  include/linux/crypto.h | 4 ++++
+>  2 files changed, 8 insertions(+), 1 deletion(-)
 > 
-> diff --git a/drivers/md/dm-verity-fec.c b/drivers/md/dm-verity-fec.c
-> index 684af08d0747..0dfcc52835bc 100644
-> --- a/drivers/md/dm-verity-fec.c
-> +++ b/drivers/md/dm-verity-fec.c
-> @@ -212,12 +212,15 @@ static int fec_read_bufs(struct dm_verity *v, struct dm_verity_io *io,
->  	struct dm_verity_fec_io *fio = fec_io(io);
->  	u64 block, ileaved;
->  	u8 *bbuf, *rs_block;
-> -	u8 want_digest[v->digest_size];
-> +	u8 want_digest[AHASH_MAX_DIGESTSIZE];
->  	unsigned n, k;
+> diff --git a/crypto/algapi.c b/crypto/algapi.c
+> index c0755cf4f53f..760a412b059c 100644
+> --- a/crypto/algapi.c
+> +++ b/crypto/algapi.c
+> @@ -57,7 +57,10 @@ static int crypto_check_alg(struct crypto_alg *alg)
+>  	if (alg->cra_alignmask & (alg->cra_alignmask + 1))
+>  		return -EINVAL;
 >  
->  	if (neras)
->  		*neras = 0;
->  
-> +	if (WARN_ON(v->digest_size < sizeof(want_digest)))
+> -	if (alg->cra_blocksize > PAGE_SIZE / 8)
+> +	if (alg->cra_blocksize > CRYPTO_ALG_MAX_BLOCKSIZE)
 > +		return -EINVAL;
 > +
+> +	if (alg->cra_alignmask > CRYPTO_ALG_MAX_ALIGNMASK)
+>  		return -EINVAL;
+>  
+>  	if (!alg->cra_type && (alg->cra_flags & CRYPTO_ALG_TYPE_MASK) ==
+> diff --git a/include/linux/crypto.h b/include/linux/crypto.h
+> index 6eb06101089f..e76ffcbd5aa6 100644
+> --- a/include/linux/crypto.h
+> +++ b/include/linux/crypto.h
+> @@ -134,6 +134,10 @@
+>   */
+>  #define CRYPTO_MAX_ALG_NAME		128
+>  
+> +/* Maximum values for registered algorithms. */
+> +#define CRYPTO_ALG_MAX_BLOCKSIZE    (PAGE_SIZE / 8)
+> +#define CRYPTO_ALG_MAX_ALIGNMASK    63
+> +
 
-This is backwards; it should be 'v->digest_size > sizeof(want_digest)'.
+How do these differ from MAX_CIPHER_BLOCKSIZE and MAX_CIPHER_ALIGNMASK, and why
+are they declared in different places?
 
 - Eric
