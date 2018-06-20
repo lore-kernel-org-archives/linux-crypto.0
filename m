@@ -1,8 +1,7 @@
 From: Kees Cook <keescook@chromium.org>
-Subject: [PATCH 10/11] crypto: ahash: Remove VLA usage for
-	AHASH_REQUEST_ON_STACK
-Date: Wed, 20 Jun 2018 12:04:07 -0700
-Message-ID: <20180620190408.45104-11-keescook@chromium.org>
+Subject: [PATCH 06/11] crypto: cbc: Remove VLA usage
+Date: Wed, 20 Jun 2018 12:04:03 -0700
+Message-ID: <20180620190408.45104-7-keescook@chromium.org>
 References: <20180620190408.45104-1-keescook@chromium.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -30,46 +29,28 @@ Sender: dm-devel-bounces@redhat.com
 Errors-To: dm-devel-bounces@redhat.com
 List-Id: linux-crypto.vger.kernel.org
 
-In the quest to remove all stack VLA usage from the kernel[1], this caps
-the ahash request size similar to the other limits and adds a sanity
-check at registration.
+In the quest to remove all stack VLA usage from the kernel[1], this
+uses the upper bounds on blocksize.
 
 [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
 
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- include/crypto/hash.h          | 3 ++-
- include/crypto/internal/hash.h | 1 +
- 2 files changed, 3 insertions(+), 1 deletion(-)
+ include/crypto/cbc.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/crypto/hash.h b/include/crypto/hash.h
-index b9df568dc98e..7d62309baf0b 100644
---- a/include/crypto/hash.h
-+++ b/include/crypto/hash.h
-@@ -66,10 +66,11 @@ struct ahash_request {
+diff --git a/include/crypto/cbc.h b/include/crypto/cbc.h
+index f5b8bfc22e6d..260096bcf99b 100644
+--- a/include/crypto/cbc.h
++++ b/include/crypto/cbc.h
+@@ -113,7 +113,7 @@ static inline int crypto_cbc_decrypt_inplace(
+ 	unsigned int bsize = crypto_skcipher_blocksize(tfm);
+ 	unsigned int nbytes = walk->nbytes;
+ 	u8 *src = walk->src.virt.addr;
+-	u8 last_iv[bsize];
++	u8 last_iv[CRYPTO_ALG_MAX_BLOCKSIZE];
  
- #define AHASH_MAX_DIGESTSIZE	(PAGE_SIZE / 8)
- #define AHASH_MAX_STATESIZE	(PAGE_SIZE / 8)
-+#define AHASH_MAX_REQSIZE	(PAGE_SIZE / 8)
- 
- #define AHASH_REQUEST_ON_STACK(name, ahash) \
- 	char __##name##_desc[sizeof(struct ahash_request) + \
--		crypto_ahash_reqsize(ahash)] CRYPTO_MINALIGN_ATTR; \
-+		AHASH_MAX_REQSIZE] CRYPTO_MINALIGN_ATTR; \
- 	struct ahash_request *name = (void *)__##name##_desc
- 
- /**
-diff --git a/include/crypto/internal/hash.h b/include/crypto/internal/hash.h
-index a0b0ad9d585e..d96ae5f52125 100644
---- a/include/crypto/internal/hash.h
-+++ b/include/crypto/internal/hash.h
-@@ -142,6 +142,7 @@ static inline struct ahash_alg *__crypto_ahash_alg(struct crypto_alg *alg)
- static inline void crypto_ahash_set_reqsize(struct crypto_ahash *tfm,
- 					    unsigned int reqsize)
- {
-+	BUG_ON(reqsize > AHASH_MAX_REQSIZE);
- 	tfm->reqsize = reqsize;
- }
- 
+ 	/* Start of the last block. */
+ 	src += nbytes - (nbytes & (bsize - 1)) - bsize;
 -- 
 2.17.1
