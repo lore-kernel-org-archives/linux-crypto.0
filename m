@@ -1,60 +1,54 @@
-From: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-Subject: Re: [PATCH v2][RESEND] X.509: unpack RSA signatureValue field from
- BIT STRING
-Date: Wed, 20 Jun 2018 14:24:54 +0200
-Message-ID: <9a9bfd23-d7be-7f16-925e-5fe00cbfba9f@maciej.szmigiero.name>
-References: <04f372f3-bc26-c629-2269-0e5d258f9d8f@maciej.szmigiero.name>
- <80e95323-eb7f-6af3-ad05-f174c69fb948@maciej.szmigiero.name>
+From: Vinod <vkoul@kernel.org>
+Subject: Re: [PATCH v2 2/2] hwrng: msm - Add support for prng v2
+Date: Wed, 20 Jun 2018 19:07:25 +0530
+Message-ID: <20180620133725.GB27187@vkoul-mobl>
+References: <20180619095430.26358-1-vkoul@kernel.org>
+ <20180619095430.26358-3-vkoul@kernel.org>
+ <152947431955.16708.15247307054260887941@swboyd.mtv.corp.google.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7BIT
-Cc: "David S. Miller" <davem@davemloft.net>,
-        james.morris@microsoft.com, "Serge E. Hallyn" <serge@hallyn.com>,
-        keyrings@vger.kernel.org, linux-security-module@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: David Howells <dhowells@redhat.com>,
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Matt Mackall <mpm@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Gary Hook <gary.hook@amd.com>
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-arm-msm@vger.kernel.org
+To: Stephen Boyd <swboyd@chromium.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <80e95323-eb7f-6af3-ad05-f174c69fb948@maciej.szmigiero.name>
-Content-Language: en-US
+Content-Disposition: inline
+In-Reply-To: <152947431955.16708.15247307054260887941@swboyd.mtv.corp.google.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 02.06.2018 21:12, Maciej S. Szmigiero wrote:
-> On 19.05.2018 14:23, Maciej S. Szmigiero wrote:
->> The signatureValue field of a X.509 certificate is encoded as a BIT STRING.
->> For RSA signatures this BIT STRING is of so-called primitive subtype, which
->> contains a u8 prefix indicating a count of unused bits in the encoding.
->>
->> We have to strip this prefix from signature data, just as we already do for
->> key data in x509_extract_key_data() function.
->>
->> This wasn't noticed earlier because this prefix byte is zero for RSA key
->> sizes divisible by 8. Since BIT STRING is a big-endian encoding adding zero
->> prefixes has no bearing on its value.
->>
->> The signature length, however was incorrect, which is a problem for RSA
->> implementations that need it to be exactly correct (like AMD CCP).
+On 19-06-18, 22:58, Stephen Boyd wrote:
+> Quoting Vinod Koul (2018-06-19 02:54:30)
+> > Qcom 8996 and later chips support prng v2 which requires to
+> > implement only .read callback for hwrng.
+> > 
+> > This version of chip has multiple Execution Environments (EE) and
+> > secure world is typically responsible for configuring the prng.
 > 
-> Any progress here?
-> This simple patch has already been submitted 3 times in last 3+ months...
-> 
+> Sometimes secure world is not configuring the rng though. I prefer we
+> have a DT flag for this to indicate if secure world has configured it or
+> not and then skip the init logic when the bool property is present in
+> DT. Then the DT property can be set on firmwares that are making things
+> blow up when we try to read the 'configured' register. I'd also file a
+> bug to qcom to tell them to unlock that config register for reads so
+> that things can work simpler, but who knows how that will work out.
 
-A friendly ping here.
+I dont feel that would be required. See below..
 
-@AMD people:
-Without this patch, in-kernel X.509 certificate verification is broken
-on AMD CCP RSA implementation.
+> It really sounds like the hardware isn't actually different, just the
+> firmware has decided to be more strict about making reads fail now.
 
-For example, loading wireless regulatory database gives the following
-errors:
-> [   21.310361] cfg80211: Problem loading in-kernel X.509 certificate (-22)
-> [   21.351717] cfg80211: loaded regulatory.db is malformed or signature is missing/invalid
+So in this case base hw block seems similar but consists of multiple
+Execution Environment (EEs) and all of these contain only data
+registers. Only secure environment has configuration. Each one has its
+own register space.
 
-Kernel modules signature verification probably has similar problem, too.
+In a case where we dont have secure world, we can point to secure
+environment with v1 ops, so driver shall configure and run.
 
-That's why it would be nice if you could ack this patch, please.
-
-Maciej
+Thanks
+-- 
+~Vinod
