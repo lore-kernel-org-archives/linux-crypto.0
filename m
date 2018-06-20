@@ -1,34 +1,38 @@
-From: Eric Biggers <ebiggers3@gmail.com>
+From: Stephan Mueller <smueller@chronox.de>
 Subject: Re: [PATCH] crypto: testmgr: add test vectors for skein
-Date: Wed, 20 Jun 2018 11:10:51 -0700
-Message-ID: <20180620181051.GC76265@gmail.com>
-References: <20180620105714.18359-1-j.m.torrespalma@gmail.com>
+Date: Wed, 20 Jun 2018 20:26:34 +0200
+Message-ID: <1602937.V4TYxMrJ9m@tauon.chronox.de>
+References: <20180620105714.18359-1-j.m.torrespalma@gmail.com> <20180620175638.GB76265@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: Juan Manuel Torres Palma <j.m.torrespalma@gmail.com>,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
         davem@davemloft.net, herbert@gondor.apana.org.au
-To: Juan Manuel Torres Palma <j.m.torrespalma@gmail.com>
+To: Eric Biggers <ebiggers3@gmail.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20180620105714.18359-1-j.m.torrespalma@gmail.com>
+In-Reply-To: <20180620175638.GB76265@gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Jun 20, 2018 at 07:57:14PM +0900, Juan Manuel Torres Palma wrote:
-> Adds test vectors specified in skein v1.3
-> specification. The main code is still in staging
-> directory, but this is required to eventually be
-> moved to the crypto directory.
+Am Mittwoch, 20. Juni 2018, 19:56:38 CEST schrieb Eric Biggers:
 
-Also, can you describe the users of Skein in the kernel?  If there are no users,
-there's no need to move it out of staging, or even have it in the kernel at all
-anymore.  I say that as someone who has had to volunteer to fix critical bugs
-found by fuzzing in crypto algorithms for which it's unclear why they are in the
-kernel at all, as there are no apparent users.
+Hi Eric,
 
-By the way, syzbot [1] doesn't have CONFIG_CRYPTO_SKEIN enabled, so the Skein
-algorithms aren't being fuzzed currently.
+> > +		.alg = "skein1024",
+> > +		.test = alg_test_hash,
+> > +		.fips_allowed = 1,
+> 
+> Are you sure Skein should be on the "FIPS allowed" list?  I'm not
+> particularly familiar with FIPS, but my understanding is that the
+> fips_allowed flag is only supposed to be set on specific "approved"
+> algorithms.  So if you're unsure, it shouldn't be set.
 
-[1] https://github.com/google/syzkaller/blob/master/docs/syzbot.md
+Skein is definitely not allowed in FIPS mode. Please drop that flag.
+> 
+> Eric
 
-- Eric
+
+
+Ciao
+Stephan
