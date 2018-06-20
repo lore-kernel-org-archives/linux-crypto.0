@@ -1,44 +1,40 @@
-From: Vinod <vkoul@kernel.org>
-Subject: Re: [PATCH 3/3] hwrng: msm - Add support for prng v2
-Date: Wed, 20 Jun 2018 11:02:04 +0530
-Message-ID: <20180620053204.GG13316@vkoul-mobl>
-References: <20180618141259.23141-1-vkoul@kernel.org>
- <20180618141259.23141-4-vkoul@kernel.org>
- <20180619142853.wgi5easw4zv6ttrb@gondor.apana.org.au>
+From: Stephen Boyd <swboyd@chromium.org>
+Subject: Re: [PATCH v2 2/2] hwrng: msm - Add support for prng v2
+Date: Tue, 19 Jun 2018 22:58:39 -0700
+Message-ID: <152947431955.16708.15247307054260887941@swboyd.mtv.corp.google.com>
+References: <20180619095430.26358-1-vkoul@kernel.org>
+ <20180619095430.26358-3-vkoul@kernel.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Matt Mackall <mpm@selenic.com>, Arnd Bergmann <arnd@arndb.de>,
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Cc: Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Arnd Bergmann <arnd@arndb.de>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-arm-msm@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+        linux-arm-msm@vger.kernel.org, vinod.koul@linaro.org,
+        Vinod Koul <vkoul@kernel.org>
+To: Vinod Koul <vinod.koul@linaro.org>, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20180619142853.wgi5easw4zv6ttrb@gondor.apana.org.au>
+In-Reply-To: <20180619095430.26358-3-vkoul@kernel.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 19-06-18, 22:28, Herbert Xu wrote:
-> On Mon, Jun 18, 2018 at 07:42:59PM +0530, Vinod Koul wrote:
-> > Qcom 8996 and later chips support prng v2 where we need to only
-> > implement .read callback for hwrng.
-> > 
-> > Add a new table for v2 which supports this and get version required for
-> > driver data.
-> > 
-> > Signed-off-by: Vinod Koul <vkoul@kernel.org>
-> 
-> Is this really a pseudo-RNG? If so it needs to be moved over to
-> the algif_rng interface.
-> 
-> hwrng is for true hardware RNGs only, because it may be directly
-> fed into /dev/random.
+Quoting Vinod Koul (2018-06-19 02:54:30)
+> Qcom 8996 and later chips support prng v2 which requires to
+> implement only .read callback for hwrng.
+> =
 
-I am trying to find how how much random output this hardware generates.
+> This version of chip has multiple Execution Environments (EE) and
+> secure world is typically responsible for configuring the prng.
 
-Meanwhile, can you please point out examples/Documentation for algif_rng
-and if any test tools for this?
+Sometimes secure world is not configuring the rng though. I prefer we
+have a DT flag for this to indicate if secure world has configured it or
+not and then skip the init logic when the bool property is present in
+DT. Then the DT property can be set on firmwares that are making things
+blow up when we try to read the 'configured' register. I'd also file a
+bug to qcom to tell them to unlock that config register for reads so
+that things can work simpler, but who knows how that will work out.
 
-Thanks
--- 
-~Vinod
+It really sounds like the hardware isn't actually different, just the
+firmware has decided to be more strict about making reads fail now.
