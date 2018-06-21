@@ -1,80 +1,48 @@
-From: "Dey, Megha" <megha.dey@intel.com>
-Subject: RE: [PATCH V8 1/5] crypto: Multi-buffer encryption infrastructure
- support
-Date: Thu, 21 Jun 2018 01:05:44 +0000
-Message-ID: <C440BA31B54DCD4AAC682D2365C8FEE738CBA3ED@ORSMSX111.amr.corp.intel.com>
-References: <20180316145351.GA6231@gondor.apana.org.au>
- <C440BA31B54DCD4AAC682D2365C8FEE738C13267@ORSMSX111.amr.corp.intel.com>
- <20180418110115.v2w3o5yfv4u3gc4r@gondor.apana.org.au>
- <C440BA31B54DCD4AAC682D2365C8FEE738C13DDE@ORSMSX111.amr.corp.intel.com>
- <20180419032525.6csodbz6lrksyudd@gondor.apana.org.au>
- <C440BA31B54DCD4AAC682D2365C8FEE738C270FC@ORSMSX111.amr.corp.intel.com>
- <20180426094445.4jiwondmtbenepo2@gondor.apana.org.au>
- <C440BA31B54DCD4AAC682D2365C8FEE738C4291E@ORSMSX111.amr.corp.intel.com>
- <20180507093511.jscgnk436e3ba4un@gondor.apana.org.au>
- <C440BA31B54DCD4AAC682D2365C8FEE738C60300@ORSMSX111.amr.corp.intel.com>
- <20180511044530.n6ht3mpvg22hqny5@gondor.apana.org.au>
+From: James Morris <jmorris@namei.org>
+Subject: Re: [PATCH v2][RESEND] X.509: unpack RSA signatureValue field from
+ BIT STRING
+Date: Thu, 21 Jun 2018 11:44:29 +1000 (AEST)
+Message-ID: <alpine.LRH.2.21.1806211144140.30225@namei.org>
+References: <04f372f3-bc26-c629-2269-0e5d258f9d8f@maciej.szmigiero.name> <80e95323-eb7f-6af3-ad05-f174c69fb948@maciej.szmigiero.name> <9a9bfd23-d7be-7f16-925e-5fe00cbfba9f@maciej.szmigiero.name> <20180620143807.fo7c5endwd5yy24r@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "davem@davemloft.net" <davem@davemloft.net>
+Content-Type: text/plain; charset=US-ASCII
+Cc: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>,
+        David Howells <dhowells@redhat.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Gary Hook <gary.hook@amd.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        james.morris@microsoft.com, "Serge E. Hallyn" <serge@hallyn.com>,
+        keyrings@vger.kernel.org, linux-security-module@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Language: en-US
+In-Reply-To: <20180620143807.fo7c5endwd5yy24r@gondor.apana.org.au>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
+On Wed, 20 Jun 2018, Herbert Xu wrote:
 
+> On Wed, Jun 20, 2018 at 02:24:54PM +0200, Maciej S. Szmigiero wrote:
+> > 
+> > A friendly ping here.
+> > 
+> > @AMD people:
+> > Without this patch, in-kernel X.509 certificate verification is broken
+> > on AMD CCP RSA implementation.
+> > 
+> > For example, loading wireless regulatory database gives the following
+> > errors:
+> > > [   21.310361] cfg80211: Problem loading in-kernel X.509 certificate (-22)
+> > > [   21.351717] cfg80211: loaded regulatory.db is malformed or signature is missing/invalid
+> > 
+> > Kernel modules signature verification probably has similar problem, too.
+> > 
+> > That's why it would be nice if you could ack this patch, please.
+> 
+> David/James, is there an issue with the patch?
 
->-----Original Message-----
->From: Dey, Megha
->Sent: Friday, May 11, 2018 6:22 PM
->To: Herbert Xu <herbert@gondor.apana.org.au>
->Cc: linux-kernel@vger.kernel.org; linux-crypto@vger.kernel.org;
->davem@davemloft.net
->Subject: RE: [PATCH V8 1/5] crypto: Multi-buffer encryption infrastructure
->support
->
->
->
->>-----Original Message-----
->>From: Herbert Xu [mailto:herbert@gondor.apana.org.au]
->>Sent: Thursday, May 10, 2018 9:46 PM
->>To: Dey, Megha <megha.dey@intel.com>
->>Cc: linux-kernel@vger.kernel.org; linux-crypto@vger.kernel.org;
->>davem@davemloft.net
->>Subject: Re: [PATCH V8 1/5] crypto: Multi-buffer encryption
->>infrastructure support
->>
->>On Fri, May 11, 2018 at 01:24:42AM +0000, Dey, Megha wrote:
->>>
->>> Are you suggesting that the SIMD wrapper, will do what is currently
->>> being
->>done by the ' mcryptd_queue_worker ' function (assuming FPU is not
->>disabled) i.e dispatching the job to the inner algorithm?
->>>
->>> I have got rid of the mcryptd layer( have an inner layer, outer SIMD
->>> layer,
->>handled the pointers and completions accordingly), but still facing
->>some issues after removing the per cpu mcryptd_cpu_queue.
->>
->>Why don't you post what you've got and we can work it out together?
->
->Hi Herbert,
->
->Sure, I will post an RFC patch. (crypto: Remove mcryptd).
+Not from my POV.
 
-Hi Herbert,
-
-I had posted an RFC patch about a month back (2018/05/11). Could you please have a look?
-
-[RFC] crypto: Remove mcryptd
->
->>
->>Thanks,
->>--
->>Email: Herbert Xu <herbert@gondor.apana.org.au> Home Page:
->>http://gondor.apana.org.au/~herbert/
->>PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+-- 
+James Morris
+<jmorris@namei.org>
