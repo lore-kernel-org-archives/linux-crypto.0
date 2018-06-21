@@ -1,107 +1,123 @@
-From: Eric Biggers <ebiggers3@gmail.com>
-Subject: Re: [PATCH 09/11] crypto: shash: Remove VLA usage in unaligned
- hashing
-Date: Wed, 20 Jun 2018 16:57:21 -0700
-Message-ID: <20180620235721.GF111712@gmail.com>
-References: <20180620190408.45104-1-keescook@chromium.org>
- <20180620190408.45104-10-keescook@chromium.org>
+From: Kees Cook <keescook@chromium.org>
+Subject: Re: [dm-devel] [PATCH 05/11] crypto alg: Introduce max blocksize and alignmask
+Date: Wed, 20 Jun 2018 17:04:08 -0700
+Message-ID: <CAGXu5j++uGCnAOiQd=JM139B6g7oUGTquhgniX-Fwsj8qofU9w@mail.gmail.com>
+References: <20180620190408.45104-1-keescook@chromium.org> <20180620190408.45104-6-keescook@chromium.org>
+ <20180620234031.GC111712@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="UTF-8"
 Cc: Herbert Xu <herbert@gondor.apana.org.au>,
         Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
         Arnd Bergmann <arnd@arndb.de>,
         Eric Biggers <ebiggers@google.com>,
         Mike Snitzer <snitzer@redhat.com>,
         "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
-        qat-linux@intel.com, linux-kernel@vger.kernel.org,
-        dm-devel@redhat.com, linux-crypto@vger.kernel.org,
+        qat-linux@intel.com, LKML <linux-kernel@vger.kernel.org>,
+        dm-devel@redhat.com, linux-crypto <linux-crypto@vger.kernel.org>,
         Lars Persson <larper@axis.com>,
         Tim Chen <tim.c.chen@linux.intel.com>,
         "David S. Miller" <davem@davemloft.net>,
         Alasdair Kergon <agk@redhat.com>,
         Rabin Vincent <rabinv@axis.com>
-To: Kees Cook <keescook@chromium.org>
+To: Eric Biggers <ebiggers3@gmail.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20180620190408.45104-10-keescook@chromium.org>
+In-Reply-To: <20180620234031.GC111712@gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Jun 20, 2018 at 12:04:06PM -0700, Kees Cook wrote:
-> In the quest to remove all stack VLA usage from the kernel[1], this uses
-> the newly defined max alignment to perform unaligned hashing to avoid
-> VLAs, and drops the helper function while adding sanity checks on the
-> resulting buffer sizes.
-> 
-> [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
-> 
-> Signed-off-by: Kees Cook <keescook@chromium.org>
-> ---
->  crypto/shash.c | 21 ++++++++++-----------
->  1 file changed, 10 insertions(+), 11 deletions(-)
-> 
-> diff --git a/crypto/shash.c b/crypto/shash.c
-> index ab6902c6dae7..1bb58209330a 100644
-> --- a/crypto/shash.c
-> +++ b/crypto/shash.c
-> @@ -73,13 +73,6 @@ int crypto_shash_setkey(struct crypto_shash *tfm, const u8 *key,
->  }
->  EXPORT_SYMBOL_GPL(crypto_shash_setkey);
->  
-> -static inline unsigned int shash_align_buffer_size(unsigned len,
-> -						   unsigned long mask)
-> -{
-> -	typedef u8 __aligned_largest u8_aligned;
-> -	return len + (mask & ~(__alignof__(u8_aligned) - 1));
-> -}
-> -
->  static int shash_update_unaligned(struct shash_desc *desc, const u8 *data,
->  				  unsigned int len)
->  {
-> @@ -88,11 +81,14 @@ static int shash_update_unaligned(struct shash_desc *desc, const u8 *data,
->  	unsigned long alignmask = crypto_shash_alignmask(tfm);
->  	unsigned int unaligned_len = alignmask + 1 -
->  				     ((unsigned long)data & alignmask);
-> -	u8 ubuf[shash_align_buffer_size(unaligned_len, alignmask)]
-> -		__aligned_largest;
-> +	u8 ubuf[CRYPTO_ALG_MAX_ALIGNMASK]
-> +		__aligned(CRYPTO_ALG_MAX_ALIGNMASK + 1);
->  	u8 *buf = PTR_ALIGN(&ubuf[0], alignmask + 1);
->  	int err;
+On Wed, Jun 20, 2018 at 4:40 PM, Eric Biggers <ebiggers3@gmail.com> wrote:
+> On Wed, Jun 20, 2018 at 12:04:02PM -0700, Kees Cook wrote:
+>> In the quest to remove all stack VLA usage from the kernel[1], this
+>> exposes the existing upper bound on crypto block sizes for VLA removal,
+>> and introduces a new check for alignmask (current maximum in the kernel
+>> is 63 from manual inspection of all cra_alignmask settings).
+>>
+>> [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
+>>
+>> Signed-off-by: Kees Cook <keescook@chromium.org>
+>> ---
+>>  crypto/algapi.c        | 5 ++++-
+>>  include/linux/crypto.h | 4 ++++
+>>  2 files changed, 8 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/crypto/algapi.c b/crypto/algapi.c
+>> index c0755cf4f53f..760a412b059c 100644
+>> --- a/crypto/algapi.c
+>> +++ b/crypto/algapi.c
+>> @@ -57,7 +57,10 @@ static int crypto_check_alg(struct crypto_alg *alg)
+>>       if (alg->cra_alignmask & (alg->cra_alignmask + 1))
+>>               return -EINVAL;
+>>
+>> -     if (alg->cra_blocksize > PAGE_SIZE / 8)
+>> +     if (alg->cra_blocksize > CRYPTO_ALG_MAX_BLOCKSIZE)
+>> +             return -EINVAL;
+>> +
+>> +     if (alg->cra_alignmask > CRYPTO_ALG_MAX_ALIGNMASK)
+>>               return -EINVAL;
+>>
+>>       if (!alg->cra_type && (alg->cra_flags & CRYPTO_ALG_TYPE_MASK) ==
+>> diff --git a/include/linux/crypto.h b/include/linux/crypto.h
+>> index 6eb06101089f..e76ffcbd5aa6 100644
+>> --- a/include/linux/crypto.h
+>> +++ b/include/linux/crypto.h
+>> @@ -134,6 +134,10 @@
+>>   */
+>>  #define CRYPTO_MAX_ALG_NAME          128
+>>
+>> +/* Maximum values for registered algorithms. */
+>> +#define CRYPTO_ALG_MAX_BLOCKSIZE    (PAGE_SIZE / 8)
+>> +#define CRYPTO_ALG_MAX_ALIGNMASK    63
+>> +
+>
+> How do these differ from MAX_CIPHER_BLOCKSIZE and MAX_CIPHER_ALIGNMASK, and why
+> are they declared in different places?
 
-Are you sure that __attribute__((aligned(64))) works correctly on stack
-variables on all architectures?
+This is what I get for staring at crypto code for so long. I entirely
+missed these checks... even though they're 8 line away:
 
-And if it is expected to work, then why is the buffer still aligned by hand on
-the very next line?
+        if (!alg->cra_type && (alg->cra_flags & CRYPTO_ALG_TYPE_MASK) ==
+                               CRYPTO_ALG_TYPE_CIPHER) {
+                if (alg->cra_alignmask > MAX_CIPHER_ALIGNMASK)
+                        return -EINVAL;
 
->  
-> +	if (WARN_ON(buf + unaligned_len > ubuf + sizeof(ubuf)))
-> +		return -EINVAL;
-> +
->  	if (unaligned_len > len)
->  		unaligned_len = len;
->  
-> @@ -124,11 +120,14 @@ static int shash_final_unaligned(struct shash_desc *desc, u8 *out)
->  	unsigned long alignmask = crypto_shash_alignmask(tfm);
->  	struct shash_alg *shash = crypto_shash_alg(tfm);
->  	unsigned int ds = crypto_shash_digestsize(tfm);
-> -	u8 ubuf[shash_align_buffer_size(ds, alignmask)]
-> -		__aligned_largest;
-> +	u8 ubuf[SHASH_MAX_DIGESTSIZE]
-> +		__aligned(CRYPTO_ALG_MAX_ALIGNMASK + 1);
->  	u8 *buf = PTR_ALIGN(&ubuf[0], alignmask + 1);
->  	int err;
+                if (alg->cra_blocksize > MAX_CIPHER_BLOCKSIZE)
+                        return -EINVAL;
+        }
 
-Same questions here.
+However, this is only checking CRYPTO_ALG_TYPE_CIPHER, and
+cra_blocksize can be used for all kinds of things.
 
->  
-> +	if (WARN_ON(buf + ds > ubuf + sizeof(ubuf)))
-> +		return -EINVAL;
-> +
->  	err = shash->final(desc, buf);
->  	if (err)
->  		goto out;
-> -- 
+include/crypto/algapi.h:#define MAX_CIPHER_ALIGNMASK            15
+...
+drivers/crypto/mxs-dcp.c:                       .cra_flags
+ = CRYPTO_ALG_ASYNC,
+drivers/crypto/mxs-dcp.c:                       .cra_alignmask          = 63,
 
-- Eric
+Is this one broken? It has no CRYPTO_ALG_TYPE_... ?
+
+For my CRYPTO_ALG_MAX_BLOCKSIZE, there is:
+
+crypto/xcbc.c:  u8 key1[CRYPTO_ALG_MAX_BLOCKSIZE];
+drivers/crypto/qat/qat_common/qat_algs.c:       char
+ipad[CRYPTO_ALG_MAX_BLOCKSIZE];
+drivers/crypto/qat/qat_common/qat_algs.c:       char
+opad[CRYPTO_ALG_MAX_BLOCKSIZE];
+
+It looks like both xcbc and qat are used with shash, so that needs a
+separate max blocksize.
+
+For my CRYPTO_ALG_MAX_ALIGNMASK, there is:
+
+crypto/shash.c: u8 ubuf[CRYPTO_ALG_MAX_ALIGNMASK]
+crypto/shash.c:         __aligned(CRYPTO_ALG_MAX_ALIGNMASK + 1);
+crypto/shash.c:         __aligned(CRYPTO_ALG_MAX_ALIGNMASK + 1);
+
+which is also shash.
+
+How should I rename these and best apply the registration-time sanity checks?
+
+-Kees
+
+-- 
+Kees Cook
+Pixel Security
