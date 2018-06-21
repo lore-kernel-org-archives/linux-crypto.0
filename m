@@ -1,68 +1,91 @@
-From: Vinod <vkoul@kernel.org>
-Subject: Re: [PATCH 3/3] hwrng: msm - Add support for prng v2
-Date: Thu, 21 Jun 2018 09:47:51 +0530
-Message-ID: <20180621041751.GC27187@vkoul-mobl>
-References: <20180618141259.23141-1-vkoul@kernel.org>
- <20180618141259.23141-4-vkoul@kernel.org>
- <20180619142853.wgi5easw4zv6ttrb@gondor.apana.org.au>
- <20180620053204.GG13316@vkoul-mobl>
- <CANc+2y5-7S_1bvMYs54X3MqCkcsha3iNe1BGa-pG=_xH5xYn1Q@mail.gmail.com>
+From: Gilad Ben-Yossef <gilad@benyossef.com>
+Subject: Re: [PATCH v2 0/5] crypto: ccree: cleanup, fixes and R-Car enabling
+Date: Thu, 21 Jun 2018 08:00:57 +0300
+Message-ID: <CAOtvUMfgUFT3+8kwVpACU6tXBX1TrzB-1uiHg7X=KXN-Utv0mg@mail.gmail.com>
+References: <1527171551-21979-1-git-send-email-gilad@benyossef.com>
+ <CAMuHMdVXrppnFEBmR3xhwNu3i0N3mVE1+FJRjEcWBYpHHbsAsw@mail.gmail.com>
+ <CAOtvUMc8D9DQFC6vZ+GnaVBg5uFVrQmOrnSQKz7ZPHGh4BCsZg@mail.gmail.com> <20180620085145.7bxfbu7bi45sftnk@verge.net.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        Matt Mackall <mpm@selenic.com>, Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-arm-msm@vger.kernel.org
-To: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Cc: Geert Uytterhoeven <geert@linux-m68k.org>,
+        Magnus Damm <magnus.damm@gmail.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will.deacon@arm.com>,
+        Geert Uytterhoeven <geert+renesas@glider.be>,
+        Michael Turquette <mturquette@baylibre.com>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS"
+        <devicetree@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        linux-clk <linux-clk@vger.kernel.org>,
+        Linux ARM <linux-arm-kerne
+To: Simon Horman <horms@verge.net.au>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <CANc+2y5-7S_1bvMYs54X3MqCkcsha3iNe1BGa-pG=_xH5xYn1Q@mail.gmail.com>
+In-Reply-To: <20180620085145.7bxfbu7bi45sftnk@verge.net.au>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi PrasannaKumar,
+On Wed, Jun 20, 2018 at 11:51 AM, Simon Horman <horms@verge.net.au> wrote:
+> On Tue, Jun 19, 2018 at 04:57:15PM +0300, Gilad Ben-Yossef wrote:
+>> On Tue, Jun 19, 2018 at 3:58 PM, Geert Uytterhoeven
+>> <geert@linux-m68k.org> wrote:
+>> > Hi Gilad,
+>> >
+>> > On Thu, May 24, 2018 at 4:19 PM Gilad Ben-Yossef <gilad@benyossef.com>=
+ wrote:
+>> >> The patch set enables the use of CryptoCell found in some Renesas R-C=
+ar
+>> >> Salvator-X boards and fixes some driver issues uncovered that prevent=
+ed
+>> >> to work properly.
+>> >
+>> > With DEBUG enabled on R-Car H3, I see lots of
+>> >
+>> >     ccree e6601000.crypto: IRR includes unknown cause bits (0x00000098=
+)
+>> >     ccree e6601000.crypto: IRR includes unknown cause bits (0x000000C0=
+)
+>> >     ccree e6601000.crypto: IRR includes unknown cause bits (0x000000D0=
+)
+>> >     ccree e6601000.crypto: IRR includes unknown cause bits (0x000000D8=
+)
+>> >     ccree e6601000.crypto: IRR includes unknown cause bits (0x000000E0=
+)
+>> >     ccree e6601000.crypto: IRR includes unknown cause bits (0x000000F0=
+)
+>> >     ccree e6601000.crypto: IRR includes unknown cause bits (0x000000F8=
+)
+>> >
+>> > during boot. Is that expected?
+>>
+>> Yes. The condition itself it is reporting is not necessarily bad. It
+>> means that driver
+>> did not act on certain HW notification during interrupts and that's
+>> OK, we don't act on all of them
+>> depending on configuration - e.g. if you have CONFIG_FIPS enabled and
+>> an active TEE module or not.
+>>
+>> I can rate_limit the message if it bothers you but other than that it
+>> is a harmless debug print.
+>
+> Rate limiting sounds like an excellent idea to me.
 
-On 20-06-18, 23:15, PrasannaKumar Muralidharan wrote:
-> Hi Vinod,
-> 
-> On 20 June 2018 at 11:02, Vinod <vkoul@kernel.org> wrote:
-> > On 19-06-18, 22:28, Herbert Xu wrote:
-> >> On Mon, Jun 18, 2018 at 07:42:59PM +0530, Vinod Koul wrote:
-> >> > Qcom 8996 and later chips support prng v2 where we need to only
-> >> > implement .read callback for hwrng.
-> >> >
-> >> > Add a new table for v2 which supports this and get version required for
-> >> > driver data.
-> >> >
-> >> > Signed-off-by: Vinod Koul <vkoul@kernel.org>
-> >>
-> >> Is this really a pseudo-RNG? If so it needs to be moved over to
-> >> the algif_rng interface.
-> >>
-> >> hwrng is for true hardware RNGs only, because it may be directly
-> >> fed into /dev/random.
-> >
-> > I am trying to find how how much random output this hardware generates.
-> >
-> > Meanwhile, can you please point out examples/Documentation for algif_rng
-> > and if any test tools for this?
-> 
-> As Herbert suggested exynos rng is a good example. It was wrongly
-> using hwrng framework then switched to using crypto framework.
-> 
-> I have a patch for msm rng using crypto framework, only compile tested
-> though. You can find the patch at
-> https://pastebin.ubuntu.com/p/44r6BJgBkN/. I am having a hard time
-> sending patches via git send-email form a gmail account so I have put
-> it in pastebin. Feel free to use it if that is useful.
+Will do.
 
-Ah, I already started based on msm downstream implementation (they had
-one using crypto APIs too). Ideally you should have posted it and tested
-it.
+Thanks!
+Gilad
 
-Thanks
--- 
-~Vinod
+
+
+--=20
+Gilad Ben-Yossef
+Chief Coffee Drinker
+
+values of =CE=B2 will give rise to dom!
