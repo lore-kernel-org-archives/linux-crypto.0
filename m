@@ -1,69 +1,70 @@
-From: Ingo Molnar <mingo@kernel.org>
-Subject: Re: [PATCH v11 00/13] Intel SGX1 support
-Date: Thu, 21 Jun 2018 14:55:11 +0200
-Message-ID: <20180621125511.GA4287@gmail.com>
-References: <20180608171216.26521-1-jarkko.sakkinen@linux.intel.com>
+From: Gilad Ben-Yossef <gilad@benyossef.com>
+Subject: Re: [PATCH] crypto: ccree: fix iv copying for small buffers
+Date: Thu, 21 Jun 2018 16:35:44 +0300
+Message-ID: <CAOtvUMcChKswKBCOkN7DGvK3DcotJBh0y=-Xi8232uYK26-xQA@mail.gmail.com>
+References: <1528361927-4172-1-git-send-email-gilad@benyossef.com>
+ <CAOtvUMcJfJDjnMoithRQ4ife09VC+G-w+__jV-JLwh7M=s7JNQ@mail.gmail.com>
+ <20180613063030.bsrq3xmufcw4zi52@gondor.apana.org.au> <CAOtvUMdtafGwXJFD0Tm1tx1q+TxRsB4nwEKxumE7=--_PMCZrQ@mail.gmail.com>
+ <20180619142713.dzipyarpb23a7qne@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: x86@kernel.org, platform-driver-x86@vger.kernel.org,
-        dave.hansen@intel.com, sean.j.christopherson@intel.com,
-        nhorman@redhat.com, npmccallum@redhat.com,
-        Alexei Starovoitov <ast@kernel.org>,
-        Andi Kleen <ak@linux.intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Andy Lutomirski <luto@kernel.org>,
-        Borislav Petkov <bp@suse.de>,
-        "David S. Miller" <davem@davemloft.net>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "open list:INTEL SGX" <intel-sgx-kernel-dev@lists.01.org>,
-        Janakarajan Natarajan <Janakarajan.Natarajan@amd.com>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        "open list:KERNEL VIRTUAL MACHINE FOR X86 (KVM/x86)"
-To: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20180608171216.26521-1-jarkko.sakkinen@linux.intel.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Cc: "David S. Miller" <davem@davemloft.net>,
+        Hadar Gat <hadar.gat@arm.com>, Ofir Drang <ofir.drang@arm.com>,
+        stable@vger.kernel.org,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux kernel mailing list <linux-kernel@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <stable-owner@vger.kernel.org>
+In-Reply-To: <20180619142713.dzipyarpb23a7qne@gondor.apana.org.au>
+Sender: stable-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
+On Tue, Jun 19, 2018 at 5:27 PM, Herbert Xu <herbert@gondor.apana.org.au> w=
+rote:
+> On Sun, Jun 17, 2018 at 01:06:42PM +0300, Gilad Ben-Yossef wrote:
+>>
+>> It was ctr(aes). I wrongly assumed that we are supposed to unconditional=
+ly
+>> copy
+>> the cipher-text block post operation and let the caller do with it what =
+it
+>> wants and so the
+>> code now does that for all cipher operations unconditionally.
+>
+> For CTR it doesn't matter whether the last block is less than a
+> block, you should still increment the counter.
 
-* Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com> wrote:
+OK. got it. Although I am not sure how does one use this to continue
+encryption if the plaintext was not block aligned.
+>
 
->  create mode 100644 drivers/platform/x86/intel_sgx/Kconfig
->  create mode 100644 drivers/platform/x86/intel_sgx/Makefile
->  create mode 100644 drivers/platform/x86/intel_sgx/le/Makefile
->  create mode 100644 drivers/platform/x86/intel_sgx/le/enclave/Makefile
->  create mode 120000 drivers/platform/x86/intel_sgx/le/enclave/aesni-intel_asm.S
->  create mode 100644 drivers/platform/x86/intel_sgx/le/enclave/cmac_mode.c
->  create mode 100644 drivers/platform/x86/intel_sgx/le/enclave/cmac_mode.h
->  create mode 100644 drivers/platform/x86/intel_sgx/le/enclave/encl_bootstrap.S
->  create mode 100644 drivers/platform/x86/intel_sgx/le/enclave/main.c
->  create mode 100644 drivers/platform/x86/intel_sgx/le/enclave/main.h
->  create mode 100644 drivers/platform/x86/intel_sgx/le/enclave/sgx_le.lds
->  create mode 100644 drivers/platform/x86/intel_sgx/le/enclave/sgxsign.c
->  create mode 120000 drivers/platform/x86/intel_sgx/le/enclave/string.c
->  create mode 100644 drivers/platform/x86/intel_sgx/le/entry.S
->  create mode 100644 drivers/platform/x86/intel_sgx/le/include/sgx_asm.h
->  create mode 100644 drivers/platform/x86/intel_sgx/le/main.c
->  create mode 100644 drivers/platform/x86/intel_sgx/le/main.h
->  create mode 100644 drivers/platform/x86/intel_sgx/le/sgx_le_piggy.S
->  create mode 100644 drivers/platform/x86/intel_sgx/le/string.c
->  create mode 100644 drivers/platform/x86/intel_sgx/sgx.h
->  create mode 100644 drivers/platform/x86/intel_sgx/sgx_encl.c
->  create mode 100644 drivers/platform/x86/intel_sgx/sgx_encl_page.c
->  create mode 100644 drivers/platform/x86/intel_sgx/sgx_fault.c
->  create mode 100644 drivers/platform/x86/intel_sgx/sgx_ioctl.c
->  create mode 100644 drivers/platform/x86/intel_sgx/sgx_le.c
->  create mode 100644 drivers/platform/x86/intel_sgx/sgx_le_proxy_piggy.S
->  create mode 100644 drivers/platform/x86/intel_sgx/sgx_main.c
->  create mode 100644 drivers/platform/x86/intel_sgx/sgx_vma.c
+>> So what is a good description of what we are supposed to provide in that
+>> field post operation?
+>> The next IV? but as you stated, that is not necessarily useful for all
+>> ciphers.
+>
+> When in doubt, please refer to the generic implementation.  If
+> that is still unclear or if it seems wrong, please post to the
+> list.
 
-Just some quick feedback: these are core kernel functionality and should be in 
-arch/x86/, not in drivers/platform/.
 
-Thanks,
+Got it.
 
-	Ingo
+So as a sanity check  if I understood correctly I need to:
+- Increment counter in IV for CTS
+- Copy last ciphertext block for CFB and CBC to output IV (partial
+blocks not allowed)
+
+What about OFB? unless I've missed something there is no generic
+implementation... ?
+
+
+Thanks again,
+Gilad
+
+--=20
+Gilad Ben-Yossef
+Chief Coffee Drinker
+
+values of =CE=B2 will give rise to dom!
