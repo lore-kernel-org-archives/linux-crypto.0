@@ -1,60 +1,68 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2][RESEND] X.509: unpack RSA signatureValue field from
- BIT STRING
-Date: Thu, 21 Jun 2018 10:32:28 +0800
-Message-ID: <20180621023228.wy3ly6yy7wdq3k3n@gondor.apana.org.au>
-References: <04f372f3-bc26-c629-2269-0e5d258f9d8f@maciej.szmigiero.name>
- <80e95323-eb7f-6af3-ad05-f174c69fb948@maciej.szmigiero.name>
- <9a9bfd23-d7be-7f16-925e-5fe00cbfba9f@maciej.szmigiero.name>
- <20180620143807.fo7c5endwd5yy24r@gondor.apana.org.au>
- <alpine.LRH.2.21.1806211144140.30225@namei.org>
+From: Vinod <vkoul@kernel.org>
+Subject: Re: [PATCH 3/3] hwrng: msm - Add support for prng v2
+Date: Thu, 21 Jun 2018 09:47:51 +0530
+Message-ID: <20180621041751.GC27187@vkoul-mobl>
+References: <20180618141259.23141-1-vkoul@kernel.org>
+ <20180618141259.23141-4-vkoul@kernel.org>
+ <20180619142853.wgi5easw4zv6ttrb@gondor.apana.org.au>
+ <20180620053204.GG13316@vkoul-mobl>
+ <CANc+2y5-7S_1bvMYs54X3MqCkcsha3iNe1BGa-pG=_xH5xYn1Q@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>,
-        David Howells <dhowells@redhat.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Gary Hook <gary.hook@amd.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        james.morris@microsoft.com, "Serge E. Hallyn" <serge@hallyn.com>,
-        keyrings@vger.kernel.org, linux-security-module@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: James Morris <jmorris@namei.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        Matt Mackall <mpm@selenic.com>, Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-arm-msm@vger.kernel.org
+To: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <alpine.LRH.2.21.1806211144140.30225@namei.org>
+In-Reply-To: <CANc+2y5-7S_1bvMYs54X3MqCkcsha3iNe1BGa-pG=_xH5xYn1Q@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Jun 21, 2018 at 11:44:29AM +1000, James Morris wrote:
-> On Wed, 20 Jun 2018, Herbert Xu wrote:
+Hi PrasannaKumar,
+
+On 20-06-18, 23:15, PrasannaKumar Muralidharan wrote:
+> Hi Vinod,
 > 
-> > On Wed, Jun 20, 2018 at 02:24:54PM +0200, Maciej S. Szmigiero wrote:
-> > > 
-> > > A friendly ping here.
-> > > 
-> > > @AMD people:
-> > > Without this patch, in-kernel X.509 certificate verification is broken
-> > > on AMD CCP RSA implementation.
-> > > 
-> > > For example, loading wireless regulatory database gives the following
-> > > errors:
-> > > > [   21.310361] cfg80211: Problem loading in-kernel X.509 certificate (-22)
-> > > > [   21.351717] cfg80211: loaded regulatory.db is malformed or signature is missing/invalid
-> > > 
-> > > Kernel modules signature verification probably has similar problem, too.
-> > > 
-> > > That's why it would be nice if you could ack this patch, please.
-> > 
-> > David/James, is there an issue with the patch?
+> On 20 June 2018 at 11:02, Vinod <vkoul@kernel.org> wrote:
+> > On 19-06-18, 22:28, Herbert Xu wrote:
+> >> On Mon, Jun 18, 2018 at 07:42:59PM +0530, Vinod Koul wrote:
+> >> > Qcom 8996 and later chips support prng v2 where we need to only
+> >> > implement .read callback for hwrng.
+> >> >
+> >> > Add a new table for v2 which supports this and get version required for
+> >> > driver data.
+> >> >
+> >> > Signed-off-by: Vinod Koul <vkoul@kernel.org>
+> >>
+> >> Is this really a pseudo-RNG? If so it needs to be moved over to
+> >> the algif_rng interface.
+> >>
+> >> hwrng is for true hardware RNGs only, because it may be directly
+> >> fed into /dev/random.
+> >
+> > I am trying to find how how much random output this hardware generates.
+> >
+> > Meanwhile, can you please point out examples/Documentation for algif_rng
+> > and if any test tools for this?
 > 
-> Not from my POV.
+> As Herbert suggested exynos rng is a good example. It was wrongly
+> using hwrng framework then switched to using crypto framework.
+> 
+> I have a patch for msm rng using crypto framework, only compile tested
+> though. You can find the patch at
+> https://pastebin.ubuntu.com/p/44r6BJgBkN/. I am having a hard time
+> sending patches via git send-email form a gmail account so I have put
+> it in pastebin. Feel free to use it if that is useful.
 
-Hi James:
+Ah, I already started based on msm downstream implementation (they had
+one using crypto APIs too). Ideally you should have posted it and tested
+it.
 
-I presume you will pick this up then?
-
-Thanks,
+Thanks
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+~Vinod
