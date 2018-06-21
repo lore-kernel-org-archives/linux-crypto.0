@@ -1,38 +1,38 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 3/3] hwrng: msm - Add support for prng v2
-Date: Thu, 21 Jun 2018 19:53:12 +0800
-Message-ID: <20180621115312.rfmbitrhqi44wu5w@gondor.apana.org.au>
-References: <20180618141259.23141-1-vkoul@kernel.org>
- <20180618141259.23141-4-vkoul@kernel.org>
- <20180619142853.wgi5easw4zv6ttrb@gondor.apana.org.au>
- <966e9cd4-70a3-8d54-df0f-16df3df45fb5@linaro.org>
- <20180621101506.rnklbtapvfdev4xb@gondor.apana.org.au>
- <e39deb02-8fa4-84ac-b33e-d692402189a1@linaro.org>
+From: Gilad Ben-Yossef <gilad@benyossef.com>
+Subject: Re: [PATCH] crypto: ccree: fix finup
+Date: Thu, 21 Jun 2018 15:25:50 +0300
+Message-ID: <CAOtvUMc0j+5+uYZH9=kwV=Ptx_df=qSRceGsuouf-FuV7Mkw0w@mail.gmail.com>
+References: <1529581652-31294-1-git-send-email-hadar.gat@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Vinod Koul <vinod.koul@linaro.org>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Matt Mackall <mpm@selenic.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-arm-msm@vger.kernel.org, Vinod Koul <vkoul@kernel.org>
-To: Stanimir Varbanov <stanimir.varbanov@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux kernel mailing list <linux-kernel@vger.kernel.org>,
+        Ofir Drang <ofir.drang@arm.com>,
+        Gilad Ben-Yossef <gilad.BenYossef@arm.com>,
+        stable@vger.kernel.org
+To: Hadar Gat <hadar.gat@arm.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <e39deb02-8fa4-84ac-b33e-d692402189a1@linaro.org>
+In-Reply-To: <1529581652-31294-1-git-send-email-hadar.gat@arm.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Jun 21, 2018 at 02:27:10PM +0300, Stanimir Varbanov wrote:
+On Thu, Jun 21, 2018 at 2:47 PM, Hadar Gat <hadar.gat@arm.com> wrote:
+> finup() operation was incorrect, padding was missing.
+> Fix by setting the ccree HW to enable padding.
 >
-> OK, I just wanted to say that it is _not_ PRNG and the register names
-> gives us wrong impression.
+> Signed-off-by: Hadar Gat <hadar.gat@arm.com>
+> Cc: stable@vger.kernel.org
 
-So does it generate one bit of output for each bit of hardware-
-generated entropy like /dev/random? Or does it use a hardware-
-generated seed to power a PRNG?
+Acked-by: Gilad Ben-Yossef <gilad@benyossef.com>
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Gilad
+
+
+--=20
+Gilad Ben-Yossef
+Chief Coffee Drinker
+
+values of =CE=B2 will give rise to dom!
