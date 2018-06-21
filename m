@@ -1,37 +1,46 @@
-From: James Morris <jmorris@namei.org>
-Subject: Re: [PATCH v2][RESEND] X.509: unpack RSA signatureValue field from
- BIT STRING
-Date: Thu, 21 Jun 2018 16:45:31 +1000 (AEST)
-Message-ID: <alpine.LRH.2.21.1806211644440.10889@namei.org>
-References: <04f372f3-bc26-c629-2269-0e5d258f9d8f@maciej.szmigiero.name> <80e95323-eb7f-6af3-ad05-f174c69fb948@maciej.szmigiero.name> <9a9bfd23-d7be-7f16-925e-5fe00cbfba9f@maciej.szmigiero.name> <20180620143807.fo7c5endwd5yy24r@gondor.apana.org.au>
- <alpine.LRH.2.21.1806211144140.30225@namei.org> <20180621023228.wy3ly6yy7wdq3k3n@gondor.apana.org.au>
+From: Stanimir Varbanov <stanimir.varbanov@linaro.org>
+Subject: Re: [PATCH 3/3] hwrng: msm - Add support for prng v2
+Date: Thu, 21 Jun 2018 12:56:34 +0300
+Message-ID: <966e9cd4-70a3-8d54-df0f-16df3df45fb5@linaro.org>
+References: <20180618141259.23141-1-vkoul@kernel.org>
+ <20180618141259.23141-4-vkoul@kernel.org>
+ <20180619142853.wgi5easw4zv6ttrb@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Cc: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>,
-        David Howells <dhowells@redhat.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Gary Hook <gary.hook@amd.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        james.morris@microsoft.com, "Serge E. Hallyn" <serge@hallyn.com>,
-        keyrings@vger.kernel.org, linux-security-module@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Matt Mackall <mpm@selenic.com>, Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-arm-msm@vger.kernel.org, Vinod Koul <vkoul@kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        Vinod Koul <vinod.koul@linaro.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180621023228.wy3ly6yy7wdq3k3n@gondor.apana.org.au>
+In-Reply-To: <20180619142853.wgi5easw4zv6ttrb@gondor.apana.org.au>
+Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, 21 Jun 2018, Herbert Xu wrote:
+Hi Herbert,
 
-> Hi James:
+On 06/19/2018 05:28 PM, Herbert Xu wrote:
+> On Mon, Jun 18, 2018 at 07:42:59PM +0530, Vinod Koul wrote:
+>> Qcom 8996 and later chips support prng v2 where we need to only
+>> implement .read callback for hwrng.
+>>
+>> Add a new table for v2 which supports this and get version required for
+>> driver data.
+>>
+>> Signed-off-by: Vinod Koul <vkoul@kernel.org>
 > 
-> I presume you will pick this up then?
+> Is this really a pseudo-RNG? If so it needs to be moved over to
+> the algif_rng interface.
 
-I will -- not sure why David hasn't merged it into his tree.
+Despite the register name (PRNG_ registers prefix) the IP is using FIPS
+approved algorithm and we can claim that this is true hardware entropy
+generator.
 
-Can I add your acked or reviewed by?
-
+I don't think that we need to move to algif_rng.
 
 -- 
-James Morris
-<jmorris@namei.org>
+regards,
+Stan
