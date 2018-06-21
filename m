@@ -1,115 +1,71 @@
-From: Timur Tabi <timur@codeaurora.org>
-Subject: [PATCH 2/2] hwrng: msm: add ACPI support
-Date: Thu, 21 Jun 2018 10:17:56 -0500
-Message-ID: <1529594276-12210-2-git-send-email-timur@codeaurora.org>
-References: <1529594276-12210-1-git-send-email-timur@codeaurora.org>
+From: Kees Cook <keescook@chromium.org>
+Subject: Re: [PATCH 04/11] dm verity fec: Remove VLA usage
+Date: Thu, 21 Jun 2018 13:19:42 -0700
+Message-ID: <CAGXu5j+nMXYL6F7A218yfu+AqroqcdMU-J3ibozaK=Nzza0Y8Q@mail.gmail.com>
+References: <20180620190408.45104-1-keescook@chromium.org> <20180620190408.45104-5-keescook@chromium.org>
+ <20180621023054.5jx5s3jzap3soe6e@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: timur@codeaurora.org
-To: linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
- vinod.koul@linaro.org, Matt Mackall <mpm@selenic.com>, swboyd@chromium.org,
- linux-arm-msm@vger.kernel.org, timur@kernel.org
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <1529594276-12210-1-git-send-email-timur@codeaurora.org>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Cc: "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+        Alasdair Kergon <agk@redhat.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Eric Biggers <ebiggers@google.com>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Lars Persson <larper@axis.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Rabin Vincent <rabinv@axis.com>,
+        Tim Chen <tim.c.chen@linux.intel.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto <linux-crypto@vger.kernel.org>, qat-linux@intel.com,
+        dm-devel@redhat.com, LKML <linux-kernel@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20180621023054.5jx5s3jzap3soe6e@gondor.apana.org.au>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Add support for probing on ACPI systems, with ACPI HID QCOM8160.
+On Wed, Jun 20, 2018 at 7:30 PM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> On Wed, Jun 20, 2018 at 12:04:01PM -0700, Kees Cook wrote:
+>> In the quest to remove all stack VLA usage from the kernel[1], this
+>> uses the newly defined max digest size macro. Also adds a sanity-check
+>> at use-time.
+>>
+>> [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
+>>
+>> Signed-off-by: Kees Cook <keescook@chromium.org>
+>> ---
+>>  drivers/md/dm-verity-fec.c | 5 ++++-
+>>  1 file changed, 4 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/md/dm-verity-fec.c b/drivers/md/dm-verity-fec.c
+>> index 684af08d0747..0dfcc52835bc 100644
+>> --- a/drivers/md/dm-verity-fec.c
+>> +++ b/drivers/md/dm-verity-fec.c
+>> @@ -212,12 +212,15 @@ static int fec_read_bufs(struct dm_verity *v, struct dm_verity_io *io,
+>>       struct dm_verity_fec_io *fio = fec_io(io);
+>>       u64 block, ileaved;
+>>       u8 *bbuf, *rs_block;
+>> -     u8 want_digest[v->digest_size];
+>> +     u8 want_digest[AHASH_MAX_DIGESTSIZE];
+>>       unsigned n, k;
+>>
+>>       if (neras)
+>>               *neras = 0;
+>>
+>> +     if (WARN_ON(v->digest_size < sizeof(want_digest)))
+>> +             return -EINVAL;
+>
+> How about verifying digest_size in the ahash API when algorithms
+> are registered?
 
-On ACPI systems, clocks are always enabled, the PRNG should
-already be enabled, and the register region is read-only.
-The driver only verifies that the hardware is already
-enabled never tries to disable or configure it.
+That happens already in ahash_prepare_alg() (and see the tweak in
+patch 3 "crypto: ahash: Remove VLA usage"), but I wanted to keep these
+run-time checks to avoid any problems in the future of things change.
+As it's marked as "unlikely" internal to WARN_ON, this shouldn't have
+a performance impact.
 
-Signed-off-by: Timur Tabi <timur@codeaurora.org>
----
- drivers/char/hw_random/msm-rng.c | 40 ++++++++++++++++++++++++++++++++++------
- 1 file changed, 34 insertions(+), 6 deletions(-)
+-Kees
 
-diff --git a/drivers/char/hw_random/msm-rng.c b/drivers/char/hw_random/msm-rng.c
-index 44580588b938..f34713d23d77 100644
---- a/drivers/char/hw_random/msm-rng.c
-+++ b/drivers/char/hw_random/msm-rng.c
-@@ -20,6 +20,7 @@
- #include <linux/of.h>
- #include <linux/platform_device.h>
- #include <linux/spinlock.h>
-+#include <linux/acpi.h>
- 
- /* Device specific register offsets */
- #define PRNG_DATA_OUT		0x0000
-@@ -186,16 +187,32 @@ static int msm_rng_probe(struct platform_device *pdev)
- 	if (IS_ERR(rng->base))
- 		return PTR_ERR(rng->base);
- 
--	rng->clk = devm_clk_get(&pdev->dev, "core");
--	if (IS_ERR(rng->clk))
--		return PTR_ERR(rng->clk);
--
- 	rng->hwrng.name = KBUILD_MODNAME;
--	rng->hwrng.init = msm_rng_init;
--	rng->hwrng.cleanup = msm_rng_cleanup;
- 	rng->hwrng.read = msm_rng_read;
- 	spin_lock_init(&rng->lock);
- 
-+	/*
-+	 * ACPI systems have v2 hardware. The clocks are always enabled,
-+	 * the PRNG register space is read-only, and the PRNG should
-+	 * already be enabled.
-+	 */
-+	if (has_acpi_companion(&pdev->dev)) {
-+		u32 val;
-+
-+		val = readl(rng->base + PRNG_CONFIG);
-+		if (!(val & PRNG_CONFIG_HW_ENABLE)) {
-+			dev_err(&pdev->dev, "device is not enabled\n");
-+			return -ENODEV;
-+		}
-+	} else {
-+		rng->clk = devm_clk_get(&pdev->dev, "core");
-+		if (IS_ERR(rng->clk))
-+			return PTR_ERR(rng->clk);
-+
-+		rng->hwrng.init = msm_rng_init;
-+		rng->hwrng.cleanup = msm_rng_cleanup;
-+	}
-+
- 	ret = devm_hwrng_register(&pdev->dev, &rng->hwrng);
- 	if (ret) {
- 		dev_err(&pdev->dev, "failed to register hwrng\n");
-@@ -211,11 +228,22 @@ static int msm_rng_probe(struct platform_device *pdev)
- };
- MODULE_DEVICE_TABLE(of, msm_rng_of_match);
- 
-+#if IS_ENABLED(CONFIG_ACPI)
-+static const struct acpi_device_id msm_rng_acpi_match[] = {
-+	{
-+		.id = "QCOM8160",	/* v2 PRNG */
-+	},
-+	{}
-+};
-+MODULE_DEVICE_TABLE(acpi, msm_rng_acpi_match);
-+#endif
-+
- static struct platform_driver msm_rng_driver = {
- 	.probe = msm_rng_probe,
- 	.driver = {
- 		.name = KBUILD_MODNAME,
- 		.of_match_table = of_match_ptr(msm_rng_of_match),
-+		.acpi_match_table = ACPI_PTR(msm_rng_acpi_match),
- 	}
- };
- module_platform_driver(msm_rng_driver);
 -- 
-Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm
-Technologies, Inc.  Qualcomm Technologies, Inc. is a member of the
-Code Aurora Forum, a Linux Foundation Collaborative Project.
+Kees Cook
+Pixel Security
