@@ -1,77 +1,80 @@
-From: Eric Biggers <ebiggers3@gmail.com>
-Subject: Re: [dm-devel] [PATCH 07/11] crypto: xcbc: Remove VLA usage
-Date: Wed, 20 Jun 2018 17:47:15 -0700
-Message-ID: <20180621004715.GI111712@gmail.com>
-References: <20180620190408.45104-1-keescook@chromium.org>
- <20180620190408.45104-8-keescook@chromium.org>
- <20180620234623.GE111712@gmail.com>
- <CAGXu5jJ30eGUoik5+fWgdSHcO7NrAi87LXWWA5=RX6zwK0ueVg@mail.gmail.com>
+From: "Dey, Megha" <megha.dey@intel.com>
+Subject: RE: [PATCH V8 1/5] crypto: Multi-buffer encryption infrastructure
+ support
+Date: Thu, 21 Jun 2018 01:05:44 +0000
+Message-ID: <C440BA31B54DCD4AAC682D2365C8FEE738CBA3ED@ORSMSX111.amr.corp.intel.com>
+References: <20180316145351.GA6231@gondor.apana.org.au>
+ <C440BA31B54DCD4AAC682D2365C8FEE738C13267@ORSMSX111.amr.corp.intel.com>
+ <20180418110115.v2w3o5yfv4u3gc4r@gondor.apana.org.au>
+ <C440BA31B54DCD4AAC682D2365C8FEE738C13DDE@ORSMSX111.amr.corp.intel.com>
+ <20180419032525.6csodbz6lrksyudd@gondor.apana.org.au>
+ <C440BA31B54DCD4AAC682D2365C8FEE738C270FC@ORSMSX111.amr.corp.intel.com>
+ <20180426094445.4jiwondmtbenepo2@gondor.apana.org.au>
+ <C440BA31B54DCD4AAC682D2365C8FEE738C4291E@ORSMSX111.amr.corp.intel.com>
+ <20180507093511.jscgnk436e3ba4un@gondor.apana.org.au>
+ <C440BA31B54DCD4AAC682D2365C8FEE738C60300@ORSMSX111.amr.corp.intel.com>
+ <20180511044530.n6ht3mpvg22hqny5@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Eric Biggers <ebiggers@google.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
-        qat-linux@intel.com, LKML <linux-kernel@vger.kernel.org>,
-        dm-devel@redhat.com, linux-crypto <linux-crypto@vger.kernel.org>,
-        Lars Persson <larper@axis.com>,
-        Tim Chen <tim.c.chen@linux.intel.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Alasdair Kergon <agk@redhat.com>,
-        Rabin Vincent <rabinv@axis.com>
-To: Kees Cook <keescook@chromium.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "davem@davemloft.net" <davem@davemloft.net>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <CAGXu5jJ30eGUoik5+fWgdSHcO7NrAi87LXWWA5=RX6zwK0ueVg@mail.gmail.com>
+Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Jun 20, 2018 at 05:10:04PM -0700, Kees Cook wrote:
-> On Wed, Jun 20, 2018 at 4:46 PM, Eric Biggers <ebiggers3@gmail.com> wrote:
-> > On Wed, Jun 20, 2018 at 12:04:04PM -0700, Kees Cook wrote:
-> >> In the quest to remove all stack VLA usage from the kernel[1], this uses
-> >> the maximum blocksize and adds a sanity check.
-> >>
-> >> [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
-> >>
-> >> Signed-off-by: Kees Cook <keescook@chromium.org>
-> >> ---
-> >>  crypto/xcbc.c | 5 ++++-
-> >>  1 file changed, 4 insertions(+), 1 deletion(-)
-> >>
-> >> diff --git a/crypto/xcbc.c b/crypto/xcbc.c
-> >> index 25c75af50d3f..016481b1f3ba 100644
-> >> --- a/crypto/xcbc.c
-> >> +++ b/crypto/xcbc.c
-> >> @@ -65,7 +65,10 @@ static int crypto_xcbc_digest_setkey(struct crypto_shash *parent,
-> >>       int bs = crypto_shash_blocksize(parent);
-> >>       u8 *consts = PTR_ALIGN(&ctx->ctx[0], alignmask + 1);
-> >>       int err = 0;
-> >> -     u8 key1[bs];
-> >> +     u8 key1[CRYPTO_ALG_MAX_BLOCKSIZE];
-> >> +
-> >> +     if (WARN_ON(bs > sizeof(key1)))
-> >> +             return -EINVAL;
-> >
-> > Similarly, why not MAX_CIPHER_BLOCKSIZE?
-> >
-> > Also, xcbc_create() only allows a 16-byte block size, and you made the API
-> > enforce the maximum for algorithms anyway.  So I think the extra check here
-> > isn't very worthwhile.
-> 
-> Is the "parent" argument in crypto_xcbc_digest_setkey() always going
-> to be the "alg" from xcbc_create()? I couldn't convince myself that
-> was true. If it is, then yes, this VLA can trivially made to be 16,
-> but it seemed like they were separate instances...
 
-Yes, it's guaranteed to be an instance of "xcbc" which was created by
-xcbc_create(), so it will have 'cra_blocksize == 16'.
 
-So until someone actually tests and enables support in the "xcbc" template for
-other block sizes (if the XCBC specification allows them), it would also be fine
-to just '#define XCBC_BLOCK_SIZE 16' at the top of the file and use that
-everywhere that references the block size.
+>-----Original Message-----
+>From: Dey, Megha
+>Sent: Friday, May 11, 2018 6:22 PM
+>To: Herbert Xu <herbert@gondor.apana.org.au>
+>Cc: linux-kernel@vger.kernel.org; linux-crypto@vger.kernel.org;
+>davem@davemloft.net
+>Subject: RE: [PATCH V8 1/5] crypto: Multi-buffer encryption infrastructure
+>support
+>
+>
+>
+>>-----Original Message-----
+>>From: Herbert Xu [mailto:herbert@gondor.apana.org.au]
+>>Sent: Thursday, May 10, 2018 9:46 PM
+>>To: Dey, Megha <megha.dey@intel.com>
+>>Cc: linux-kernel@vger.kernel.org; linux-crypto@vger.kernel.org;
+>>davem@davemloft.net
+>>Subject: Re: [PATCH V8 1/5] crypto: Multi-buffer encryption
+>>infrastructure support
+>>
+>>On Fri, May 11, 2018 at 01:24:42AM +0000, Dey, Megha wrote:
+>>>
+>>> Are you suggesting that the SIMD wrapper, will do what is currently
+>>> being
+>>done by the ' mcryptd_queue_worker ' function (assuming FPU is not
+>>disabled) i.e dispatching the job to the inner algorithm?
+>>>
+>>> I have got rid of the mcryptd layer( have an inner layer, outer SIMD
+>>> layer,
+>>handled the pointers and completions accordingly), but still facing
+>>some issues after removing the per cpu mcryptd_cpu_queue.
+>>
+>>Why don't you post what you've got and we can work it out together?
+>
+>Hi Herbert,
+>
+>Sure, I will post an RFC patch. (crypto: Remove mcryptd).
 
-Eric
+Hi Herbert,
+
+I had posted an RFC patch about a month back (2018/05/11). Could you please have a look?
+
+[RFC] crypto: Remove mcryptd
+>
+>>
+>>Thanks,
+>>--
+>>Email: Herbert Xu <herbert@gondor.apana.org.au> Home Page:
+>>http://gondor.apana.org.au/~herbert/
+>>PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
