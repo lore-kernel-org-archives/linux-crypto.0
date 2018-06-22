@@ -1,53 +1,68 @@
 From: Stanimir Varbanov <stanimir.varbanov@linaro.org>
-Subject: Re: [PATCH 3/3] hwrng: msm - Add support for prng v2
-Date: Fri, 22 Jun 2018 18:33:40 +0300
-Message-ID: <015f1c8d-553c-3d54-c7c6-34bbb4fcd1a0@linaro.org>
-References: <20180618141259.23141-1-vkoul@kernel.org>
- <20180618141259.23141-4-vkoul@kernel.org>
- <20180619142853.wgi5easw4zv6ttrb@gondor.apana.org.au>
- <966e9cd4-70a3-8d54-df0f-16df3df45fb5@linaro.org>
- <20180621101506.rnklbtapvfdev4xb@gondor.apana.org.au>
- <e39deb02-8fa4-84ac-b33e-d692402189a1@linaro.org>
- <20180621115312.rfmbitrhqi44wu5w@gondor.apana.org.au>
- <6782b1c0-ea94-b07c-2fae-3fe3223bb22a@linaro.org>
- <20180622143829.rd2ys6ci7q3aupst@gondor.apana.org.au>
+Subject: Re: [PATCH 1/2] hwrng: msm: add a spinlock and support for blocking
+ reads
+Date: Fri, 22 Jun 2018 18:38:35 +0300
+Message-ID: <acc7e9d3-8a81-ff15-27c7-78ec7c17f6cc@linaro.org>
+References: <1529594276-12210-1-git-send-email-timur@codeaurora.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Cc: Vinod Koul <vinod.koul@linaro.org>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Matt Mackall <mpm@selenic.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-arm-msm@vger.kernel.org, Vinod Koul <vkoul@kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180622143829.rd2ys6ci7q3aupst@gondor.apana.org.au>
+To: Timur Tabi <timur@codeaurora.org>, linux-arm-kernel@lists.infradead.org,
+ linux-crypto@vger.kernel.org, vinod.koul@linaro.org,
+ Matt Mackall <mpm@selenic.com>, swboyd@chromium.org,
+ linux-arm-msm@vger.kernel.org, timur@kernel.org
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <1529594276-12210-1-git-send-email-timur@codeaurora.org>
 Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
 Hi,
 
-On 06/22/2018 05:38 PM, Herbert Xu wrote:
-> On Fri, Jun 22, 2018 at 11:27:59AM +0300, Stanimir Varbanov wrote:
->> Hi Herbert,
->>
->> On 06/21/2018 02:53 PM, Herbert Xu wrote:
->>> On Thu, Jun 21, 2018 at 02:27:10PM +0300, Stanimir Varbanov wrote:
->>>>
->>>> OK, I just wanted to say that it is _not_ PRNG and the register names
->>>> gives us wrong impression.
->>>
->>> So does it generate one bit of output for each bit of hardware-
->>> generated entropy like /dev/random? Or does it use a hardware-
->>> generated seed to power a PRNG?
->>
->> I believe it is the second one. Isn't the second one SP 800-90A?
+On 06/21/2018 06:17 PM, Timur Tabi wrote:
+> The hwrng.read callback includes a boolean parameter called 'wait'
+> which indicates whether the function should block and wait for
+> more data.
 > 
-> In that case it should switch over to algif_rng.
+> When 'wait' is true, the driver spins on the DATA_AVAIL bit or until
+> a reasonable timeout.  The timeout can occur if there is a heavy load
+> on reading the PRNG.
+> 
+> The same code also needs a spinlock to protect against race conditions.
+> 
+> If multiple cores hammer on the PRNG, it's possible for a race
+> condition to occur between reading the status register and
+> reading the data register.  Add a spinlock to protect against
+> that.
 
-OK, what about the rest drivers in drivers/char/hw_random? Are they all
-true RNG?
+Before entering into the read function we already hold a mutex which
+serializes data reading so I cannot imagine how below sequence could
+happen. Can you explain how to reproduce this race?
+
+> 
+> 1. Core 1 reads status register, shows data is available.
+> 2. Core 2 also reads status register, same result
+> 3. Core 2 reads data register, depleting all entropy
+> 4. Core 1 reads data register, which returns 0
+> 
+> Signed-off-by: Timur Tabi <timur@codeaurora.org>
+> ---
+>  drivers/char/hw_random/msm-rng.c | 57 +++++++++++++++++++++++++++++++++++-----
+>  1 file changed, 50 insertions(+), 7 deletions(-)
+> 
+> diff --git a/drivers/char/hw_random/msm-rng.c b/drivers/char/hw_random/msm-rng.c
+> index 841fee845ec9..44580588b938 100644
+> --- a/drivers/char/hw_random/msm-rng.c
+> +++ b/drivers/char/hw_random/msm-rng.c
+> @@ -15,9 +15,11 @@
 
 -- 
 regards,
