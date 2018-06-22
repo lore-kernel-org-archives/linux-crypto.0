@@ -1,52 +1,53 @@
-From: Vinod <vkoul@kernel.org>
-Subject: Re: [PATCH v2 0/2] hwrng: Add support for qcpm v2 hwrng
-Date: Fri, 22 Jun 2018 09:57:47 +0530
-Message-ID: <20180622042747.GH27187@vkoul-mobl>
-References: <20180619095430.26358-1-vkoul@kernel.org>
- <CAOZdJXUgYpLT=xMos4wKxMOTOZb8rV8is48YjGB8_9okZsuvhQ@mail.gmail.com>
+From: Timur Tabi <timur@codeaurora.org>
+Subject: Re: [PATCH 1/2] hwrng: msm: add a spinlock and support for blocking
+ reads
+Date: Thu, 21 Jun 2018 23:28:06 -0500
+Message-ID: <484f9b0e-3316-9f76-8036-187575cfe139@codeaurora.org>
+References: <1529594276-12210-1-git-send-email-timur@codeaurora.org>
+ <20180622041712.GE27187@vkoul-mobl>
+ <efc93d58-4671-2c51-75d4-a19759ab0f0c@codeaurora.org>
+ <20180622042407.GG27187@vkoul-mobl>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, lkml <linux-kernel@vger.kernel.org>,
-        Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-arm-msm@vger.kernel.org, Stephen Boyd <swboyd@chromium.org>
-To: Timur Tabi <timur@codeaurora.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <CAOZdJXUgYpLT=xMos4wKxMOTOZb8rV8is48YjGB8_9okZsuvhQ@mail.gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Transfer-Encoding: 7bit
+Cc: timur@kernel.org, linux-arm-msm@vger.kernel.org, swboyd@chromium.org,
+ linux-crypto@vger.kernel.org, Matt Mackall <mpm@selenic.com>,
+ linux-arm-kernel@lists.infradead.org
+To: Vinod <vkoul@kernel.org>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <20180622042407.GG27187@vkoul-mobl>
+Content-Language: en-US
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 21-06-18, 10:17, Timur Tabi wrote:
-> On Tue, Jun 19, 2018 at 4:54 AM, Vinod Koul <vinod.koul@linaro.org> wrote:
-> > This series adds support for newer version of hwrng as found in
-> > Qualcomm SoCs. To do that add new v2 compatible string and driver_data
-> > values for v2.
-> 
-> It's amazing you're sending this now, because I also have a PRNG
-> patchset that I'm sending out today that adds support for v2 chips on
-> an ACPI platform.
-> 
-> I'll send my patches as-is, and we'll just have to work to resolve the
-> merge conflicts.
+On 6/21/18 11:24 PM, Vinod wrote:
+> On 21-06-18, 23:18, Timur Tabi wrote:
+>> On 6/21/18 11:17 PM, Vinod wrote:
+>>> this should be a separate patch
+>> What exactly should be a separate patch?  This part?
+>>
+>> -	rng->hwrng.name = KBUILD_MODNAME,
+>> -	rng->hwrng.init = msm_rng_init,
+>> -	rng->hwrng.cleanup = msm_rng_cleanup,
+>> -	rng->hwrng.read = msm_rng_read,
+>> +	rng->hwrng.name = KBUILD_MODNAME;
+>> +	rng->hwrng.init = msm_rng_init;
+>> +	rng->hwrng.cleanup = msm_rng_cleanup;
+>> +	rng->hwrng.read = msm_rng_read;
+> yes
 
-I have checked the series.
-
-I am not sure I follow that this is v2 and you read CONFIG register.
-Apart from that other changes look mostly okay with few nitpicks :)
-
-But there is a bigger concern raised by Herbert on this not being a true
-RNG and thus should be moved to crypto/
-
-I have the changes ready for that, I will test them later today and
-share with you, ACPI addition should be easy on that driver
-
-> I will probably need you to test my patches as my last day at Qualcomm
-> is the 26th.
-
-Sad to hear that and good luck in your new adventure
+II consider this to be a minor clean-up that's not worthy of its own 
+patch, but I can make this its own patch if you really want.
 
 -- 
-~Vinod
+Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm
+Technologies, Inc.  Qualcomm Technologies, Inc. is a member of the
+Code Aurora Forum, a Linux Foundation Collaborative Project.
