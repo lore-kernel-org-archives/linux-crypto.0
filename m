@@ -1,38 +1,44 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: ccree: fix iv copying for small buffers
-Date: Fri, 22 Jun 2018 14:53:41 +0800
-Message-ID: <20180622065341.yparmvx5tspj3zvy@gondor.apana.org.au>
-References: <1528361927-4172-1-git-send-email-gilad@benyossef.com>
- <CAOtvUMcJfJDjnMoithRQ4ife09VC+G-w+__jV-JLwh7M=s7JNQ@mail.gmail.com>
- <20180613063030.bsrq3xmufcw4zi52@gondor.apana.org.au>
- <CAOtvUMdtafGwXJFD0Tm1tx1q+TxRsB4nwEKxumE7=--_PMCZrQ@mail.gmail.com>
- <20180619142713.dzipyarpb23a7qne@gondor.apana.org.au>
- <CAOtvUMcChKswKBCOkN7DGvK3DcotJBh0y=-Xi8232uYK26-xQA@mail.gmail.com>
+From: Stanimir Varbanov <stanimir.varbanov@linaro.org>
+Subject: Re: [PATCH 3/3] hwrng: msm - Add support for prng v2
+Date: Fri, 22 Jun 2018 11:27:59 +0300
+Message-ID: <6782b1c0-ea94-b07c-2fae-3fe3223bb22a@linaro.org>
+References: <20180618141259.23141-1-vkoul@kernel.org>
+ <20180618141259.23141-4-vkoul@kernel.org>
+ <20180619142853.wgi5easw4zv6ttrb@gondor.apana.org.au>
+ <966e9cd4-70a3-8d54-df0f-16df3df45fb5@linaro.org>
+ <20180621101506.rnklbtapvfdev4xb@gondor.apana.org.au>
+ <e39deb02-8fa4-84ac-b33e-d692402189a1@linaro.org>
+ <20180621115312.rfmbitrhqi44wu5w@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-        Hadar Gat <hadar.gat@arm.com>, Ofir Drang <ofir.drang@arm.com>,
-        stable@vger.kernel.org,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux kernel mailing list <linux-kernel@vger.kernel.org>
-To: Gilad Ben-Yossef <gilad@benyossef.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Cc: Vinod Koul <vinod.koul@linaro.org>, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Matt Mackall <mpm@selenic.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-arm-msm@vger.kernel.org, Vinod Koul <vkoul@kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        Stanimir Varbanov <stanimir.varbanov@linaro.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <CAOtvUMcChKswKBCOkN7DGvK3DcotJBh0y=-Xi8232uYK26-xQA@mail.gmail.com>
+In-Reply-To: <20180621115312.rfmbitrhqi44wu5w@gondor.apana.org.au>
+Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Jun 21, 2018 at 04:35:44PM +0300, Gilad Ben-Yossef wrote:
+Hi Herbert,
+
+On 06/21/2018 02:53 PM, Herbert Xu wrote:
+> On Thu, Jun 21, 2018 at 02:27:10PM +0300, Stanimir Varbanov wrote:
+>>
+>> OK, I just wanted to say that it is _not_ PRNG and the register names
+>> gives us wrong impression.
 > 
-> What about OFB? unless I've missed something there is no generic
-> implementation... ?
+> So does it generate one bit of output for each bit of hardware-
+> generated entropy like /dev/random? Or does it use a hardware-
+> generated seed to power a PRNG?
 
-In general we shouldn't add hardware drivers for algorithms that
-do not have a generic implementation.  Sometimes they slip through
-though.
+I believe it is the second one. Isn't the second one SP 800-90A?
 
-Cheers,
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+regards,
+Stan
