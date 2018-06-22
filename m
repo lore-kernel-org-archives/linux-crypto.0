@@ -1,71 +1,67 @@
-From: Kees Cook <keescook@chromium.org>
-Subject: Re: [PATCH 04/11] dm verity fec: Remove VLA usage
-Date: Thu, 21 Jun 2018 13:19:42 -0700
-Message-ID: <CAGXu5j+nMXYL6F7A218yfu+AqroqcdMU-J3ibozaK=Nzza0Y8Q@mail.gmail.com>
-References: <20180620190408.45104-1-keescook@chromium.org> <20180620190408.45104-5-keescook@chromium.org>
- <20180621023054.5jx5s3jzap3soe6e@gondor.apana.org.au>
+From: Stephen Boyd <swboyd@chromium.org>
+Subject: Re: [PATCH v2 2/2] hwrng: msm - Add support for prng v2
+Date: Thu, 21 Jun 2018 18:22:06 -0700
+Message-ID: <152963052624.16708.17133633012075809772@swboyd.mtv.corp.google.com>
+References: <20180619095430.26358-1-vkoul@kernel.org>
+ <20180619095430.26358-3-vkoul@kernel.org>
+ <152947431955.16708.15247307054260887941@swboyd.mtv.corp.google.com>
+ <20180620133725.GB27187@vkoul-mobl>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
-        Alasdair Kergon <agk@redhat.com>,
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
         Arnd Bergmann <arnd@arndb.de>,
-        Eric Biggers <ebiggers@google.com>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Lars Persson <larper@axis.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Rabin Vincent <rabinv@axis.com>,
-        Tim Chen <tim.c.chen@linux.intel.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto <linux-crypto@vger.kernel.org>, qat-linux@intel.com,
-        dm-devel@redhat.com, LKML <linux-kernel@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-arm-msm@vger.kernel.org
+To: Vinod <vkoul@kernel.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180621023054.5jx5s3jzap3soe6e@gondor.apana.org.au>
+In-Reply-To: <20180620133725.GB27187@vkoul-mobl>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Jun 20, 2018 at 7:30 PM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> On Wed, Jun 20, 2018 at 12:04:01PM -0700, Kees Cook wrote:
->> In the quest to remove all stack VLA usage from the kernel[1], this
->> uses the newly defined max digest size macro. Also adds a sanity-check
->> at use-time.
->>
->> [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
->>
->> Signed-off-by: Kees Cook <keescook@chromium.org>
->> ---
->>  drivers/md/dm-verity-fec.c | 5 ++++-
->>  1 file changed, 4 insertions(+), 1 deletion(-)
->>
->> diff --git a/drivers/md/dm-verity-fec.c b/drivers/md/dm-verity-fec.c
->> index 684af08d0747..0dfcc52835bc 100644
->> --- a/drivers/md/dm-verity-fec.c
->> +++ b/drivers/md/dm-verity-fec.c
->> @@ -212,12 +212,15 @@ static int fec_read_bufs(struct dm_verity *v, struct dm_verity_io *io,
->>       struct dm_verity_fec_io *fio = fec_io(io);
->>       u64 block, ileaved;
->>       u8 *bbuf, *rs_block;
->> -     u8 want_digest[v->digest_size];
->> +     u8 want_digest[AHASH_MAX_DIGESTSIZE];
->>       unsigned n, k;
->>
->>       if (neras)
->>               *neras = 0;
->>
->> +     if (WARN_ON(v->digest_size < sizeof(want_digest)))
->> +             return -EINVAL;
->
-> How about verifying digest_size in the ahash API when algorithms
-> are registered?
+Quoting Vinod (2018-06-20 06:37:25)
+> On 19-06-18, 22:58, Stephen Boyd wrote:
+> > Quoting Vinod Koul (2018-06-19 02:54:30)
+> > > Qcom 8996 and later chips support prng v2 which requires to
+> > > implement only .read callback for hwrng.
+> > > =
 
-That happens already in ahash_prepare_alg() (and see the tweak in
-patch 3 "crypto: ahash: Remove VLA usage"), but I wanted to keep these
-run-time checks to avoid any problems in the future of things change.
-As it's marked as "unlikely" internal to WARN_ON, this shouldn't have
-a performance impact.
+> > > This version of chip has multiple Execution Environments (EE) and
+> > > secure world is typically responsible for configuring the prng.
+> > =
 
--Kees
+> > Sometimes secure world is not configuring the rng though. I prefer we
+> > have a DT flag for this to indicate if secure world has configured it or
+> > not and then skip the init logic when the bool property is present in
+> > DT. Then the DT property can be set on firmwares that are making things
+> > blow up when we try to read the 'configured' register. I'd also file a
+> > bug to qcom to tell them to unlock that config register for reads so
+> > that things can work simpler, but who knows how that will work out.
+> =
 
--- 
-Kees Cook
-Pixel Security
+> I dont feel that would be required. See below..
+> =
+
+> > It really sounds like the hardware isn't actually different, just the
+> > firmware has decided to be more strict about making reads fail now.
+> =
+
+> So in this case base hw block seems similar but consists of multiple
+> Execution Environment (EEs) and all of these contain only data
+> registers. Only secure environment has configuration. Each one has its
+> own register space.
+> =
+
+> In a case where we dont have secure world, we can point to secure
+> environment with v1 ops, so driver shall configure and run.
+
+Are you saying that there are multiple "frames" that each EE can read
+from? And then only one of those frames is the "real" one that can also
+configure the hardware to actually give us random data?
+
+That sounds like it would work, but then the compatible string should
+probably be more like qcom,prng-ee-frame or something like that to
+indicate that this is a window into the real hardware, instead of
+tacking on a -v2 and making everyone think it's new hardware.
