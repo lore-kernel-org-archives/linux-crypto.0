@@ -1,79 +1,55 @@
-From: Logan Gunthorpe <logang@deltatee.com>
-Subject: [PATCH v18 5/7] ntb: ntb_hw_intel: use io-64-nonatomic instead of in-driver hacks
-Date: Fri, 22 Jun 2018 13:47:50 -0600
-Message-ID: <20180622194752.11221-6-logang@deltatee.com>
-References: <20180622194752.11221-1-logang@deltatee.com>
-Cc: Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Andy Shevchenko <andy.shevchenko@gmail.com>,
-        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
-        Logan Gunthorpe <logang@deltatee.com>
-To: linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
-        linux-ntb@googlegroups.com, linux-crypto@vger.kernel.org,
-        Andrew Morton <akpm@linux-foundation.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180622194752.11221-1-logang@deltatee.com>
-Sender: linux-kernel-owner@vger.kernel.org
+From: Timur Tabi <timur@codeaurora.org>
+Subject: Re: [PATCH 1/2] hwrng: msm: add a spinlock and support for blocking
+ reads
+Date: Fri, 22 Jun 2018 16:17:24 -0500
+Message-ID: <2ad6d37c-66eb-c173-95bc-f838d03e6741@codeaurora.org>
+References: <1529594276-12210-1-git-send-email-timur@codeaurora.org>
+ <acc7e9d3-8a81-ff15-27c7-78ec7c17f6cc@linaro.org>
+ <6d655b97-418e-bacf-7e88-b9179cdc6fd1@codeaurora.org>
+ <152968991381.16708.522979730327886581@swboyd.mtv.corp.google.com>
+ <4bc0afe1-0189-88c0-40aa-23a312325635@codeaurora.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="utf-8"; Format="flowed"
+Content-Transfer-Encoding: base64
+To: Stephen Boyd <swboyd@chromium.org>, Matt Mackall <mpm@selenic.com>,
+ Stanimir Varbanov <stanimir.varbanov@linaro.org>,
+ linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+ linux-crypto@vger.kernel.org, timur@kernel.org, vinod.koul@linaro.org
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <4bc0afe1-0189-88c0-40aa-23a312325635@codeaurora.org>
+Content-Language: en-US
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-Now that ioread64 and iowrite64 are available in io-64-nonatomic,
-we can remove the hack at the top of ntb_hw_intel.c and replace it
-with an include.
-
-Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-Reviewed-by: Andy Shevchenko <andy.shevchenko@gmail.com>
-Acked-by: Dave Jiang <dave.jiang@intel.com>
-Acked-by: Allen Hubbe <Allen.Hubbe@dell.com>
-Acked-by: Jon Mason <jdmason@kudzu.us>
----
- drivers/ntb/hw/intel/ntb_hw_intel.h | 30 +-----------------------------
- 1 file changed, 1 insertion(+), 29 deletions(-)
-
-diff --git a/drivers/ntb/hw/intel/ntb_hw_intel.h b/drivers/ntb/hw/intel/ntb_hw_intel.h
-index c49ff8970ce3..e071e28bca3f 100644
---- a/drivers/ntb/hw/intel/ntb_hw_intel.h
-+++ b/drivers/ntb/hw/intel/ntb_hw_intel.h
-@@ -53,6 +53,7 @@
- 
- #include <linux/ntb.h>
- #include <linux/pci.h>
-+#include <linux/io-64-nonatomic-lo-hi.h>
- 
- /* PCI device IDs */
- #define PCI_DEVICE_ID_INTEL_NTB_B2B_JSF	0x3725
-@@ -218,33 +219,4 @@ static inline int pdev_is_gen3(struct pci_dev *pdev)
- 	return 0;
- }
- 
--#ifndef ioread64
--#ifdef readq
--#define ioread64 readq
--#else
--#define ioread64 _ioread64
--static inline u64 _ioread64(void __iomem *mmio)
--{
--	u64 low, high;
--
--	low = ioread32(mmio);
--	high = ioread32(mmio + sizeof(u32));
--	return low | (high << 32);
--}
--#endif
--#endif
--
--#ifndef iowrite64
--#ifdef writeq
--#define iowrite64 writeq
--#else
--#define iowrite64 _iowrite64
--static inline void _iowrite64(u64 val, void __iomem *mmio)
--{
--	iowrite32(val, mmio);
--	iowrite32(val >> 32, mmio + sizeof(u32));
--}
--#endif
--#endif
--
- #endif
--- 
-2.11.0
+T24gMDYvMjIvMjAxOCAwMTowMyBQTSwgVGltdXIgVGFiaSB3cm90ZToKPiAKPj4gUGVyaGFwcyBp
+dCdzIGJlY2F1c2UgeW91IGltcGxlbWVudGVkIHRoZSAnd2FpdCcgZnVuY3Rpb25hbGl0eSBpbiB0
+aGlzCj4+IGRyaXZlcj8gQmVmb3JlIHRoZSBwYXRjaCB0aGVyZSB3YXNuJ3QgYW55IHNvcnQgb2Yg
+d2FpdCBjaGVjayBzbyB3ZSB3b3VsZAo+PiBiYWlsIG91dCBpZiB0aGVyZSB3YXNuJ3QgYW55IGRh
+dGEgZXZlbiBpZiB0aGUgY2FsbGVyIHJlcXVlc3RlZCB0aGF0IHdlCj4+IHdhaXQgZm9yIHJhbmRv
+bW5lc3MgdG8gYmUgYXZhaWxhYmxlLgo+IAo+IE5vLCBteSB0ZXN0cyBzaG93ZWQgdGhlIHJhY2Ug
+Y29uZGl0aW9uIChvciBhdCBsZWFzdCBzb21ldGhpbmcgdGhhdCBsb29rcyAKPiBsaWtlIGEgcmFj
+ZSBjb25kaXRpb24pIGV2ZW4gd2l0aG91dCB0aGUgJ3dhaXQnIGZlYXR1cmUuwqAgSSBhZGRlZCBz
+dXBwb3J0IAo+IGZvciAnd2FpdCcgb25seSByZWNlbnRseSwgYnV0IEkndmUgYmVlbiB3b3JraW5n
+IHdpdGggdGhlIGNyeXB0byBwZW9wbGUgCj4gZm9yIGEgbW9udGggb24gZXZlcnl0aGluZyBlbHNl
+LgoKTG9va3MgbGlrZSBJIHdhcyB3cm9uZy4KCkkgY3JlYXRlZCBzb21lIG5ldyB0ZXN0cyB0byBy
+ZXByb2R1Y2UgdGhlIHByb2JsZW0sIGJ1dCBJIGNhbid0IHJlcHJvZHVjZSAKaXQgYW55IG1vcmUu
+ICBJIGNhbiBvbmx5IGFzc3VtZSB0aGF0IHdoYXQgSSBzYXcgYXMgYSByYWNlIGNvbmRpdGlvbiBi
+YWNrIAp0aGVuIHdhcyBzb21ldGhpbmcgZWxzZSBlbnRpcmVseS4KClNvIGFsbCBvZiB0aGUgc3Bp
+bmxvY2sgY29kZSBuZWVkcyB0byBnby4gIEl0IGxvb2tzIGxpa2UgYXQgdGhpcyBwb2ludCwgCmlm
+IFZpbm9kIGNhbiBhZGQgc3VwcG9ydCBmb3IgUUNPTTgxNjAgdG8gaGlzIHBhdGNoZXMsIHRoZSBv
+bmx5IHRoaW5nIEkgCmNhbiBjb250cmlidXRlIGlzIHN1cHBvcnQgZm9yICd3YWl0Jy4KCi0tIApR
+dWFsY29tbSBEYXRhY2VudGVyIFRlY2hub2xvZ2llcywgSW5jLiBhcyBhbiBhZmZpbGlhdGUgb2Yg
+UXVhbGNvbW0KVGVjaG5vbG9naWVzLCBJbmMuICBRdWFsY29tbSBUZWNobm9sb2dpZXMsIEluYy4g
+aXMgYSBtZW1iZXIgb2YgdGhlCkNvZGUgQXVyb3JhIEZvcnVtLCBhIExpbnV4IEZvdW5kYXRpb24g
+Q29sbGFib3JhdGl2ZSBQcm9qZWN0LgoKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX18KbGludXgtYXJtLWtlcm5lbCBtYWlsaW5nIGxpc3QKbGludXgtYXJtLWtl
+cm5lbEBsaXN0cy5pbmZyYWRlYWQub3JnCmh0dHA6Ly9saXN0cy5pbmZyYWRlYWQub3JnL21haWxt
+YW4vbGlzdGluZm8vbGludXgtYXJtLWtlcm5lbAo=
