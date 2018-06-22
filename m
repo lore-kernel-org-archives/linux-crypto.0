@@ -1,35 +1,54 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: cavium: make structure algs static
-Date: Fri, 22 Jun 2018 23:22:38 +0800
-Message-ID: <20180622152238.5zw77nwffqyj7a4j@gondor.apana.org.au>
-References: <20180601131227.1340-1-colin.king@canonical.com>
+From: Stanimir Varbanov <stanimir.varbanov@linaro.org>
+Subject: Re: [PATCH 3/3] hwrng: msm - Add support for prng v2
+Date: Fri, 22 Jun 2018 18:33:40 +0300
+Message-ID: <015f1c8d-553c-3d54-c7c6-34bbb4fcd1a0@linaro.org>
+References: <20180618141259.23141-1-vkoul@kernel.org>
+ <20180618141259.23141-4-vkoul@kernel.org>
+ <20180619142853.wgi5easw4zv6ttrb@gondor.apana.org.au>
+ <966e9cd4-70a3-8d54-df0f-16df3df45fb5@linaro.org>
+ <20180621101506.rnklbtapvfdev4xb@gondor.apana.org.au>
+ <e39deb02-8fa4-84ac-b33e-d692402189a1@linaro.org>
+ <20180621115312.rfmbitrhqi44wu5w@gondor.apana.org.au>
+ <6782b1c0-ea94-b07c-2fae-3fe3223bb22a@linaro.org>
+ <20180622143829.rd2ys6ci7q3aupst@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: George Cherian <george.cherian@cavium.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-To: Colin King <colin.king@canonical.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Cc: Vinod Koul <vinod.koul@linaro.org>, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Matt Mackall <mpm@selenic.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-arm-msm@vger.kernel.org, Vinod Koul <vkoul@kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20180601131227.1340-1-colin.king@canonical.com>
+In-Reply-To: <20180622143829.rd2ys6ci7q3aupst@gondor.apana.org.au>
+Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Jun 01, 2018 at 02:12:27PM +0100, Colin King wrote:
-> From: Colin Ian King <colin.king@canonical.com>
-> 
-> The structure algs is local to the source and does not need to be in
-> global scope, so make it static.
-> 
-> Cleans up sparse warning:
-> drivers/crypto/cavium/cpt/cptvf_algs.c:354:19: warning: symbol 'algs'
-> was not declared. Should it be static?
-> 
-> Signed-off-by: Colin Ian King <colin.king@canonical.com>
+Hi,
 
-Patch applied.  Thanks.
+On 06/22/2018 05:38 PM, Herbert Xu wrote:
+> On Fri, Jun 22, 2018 at 11:27:59AM +0300, Stanimir Varbanov wrote:
+>> Hi Herbert,
+>>
+>> On 06/21/2018 02:53 PM, Herbert Xu wrote:
+>>> On Thu, Jun 21, 2018 at 02:27:10PM +0300, Stanimir Varbanov wrote:
+>>>>
+>>>> OK, I just wanted to say that it is _not_ PRNG and the register names
+>>>> gives us wrong impression.
+>>>
+>>> So does it generate one bit of output for each bit of hardware-
+>>> generated entropy like /dev/random? Or does it use a hardware-
+>>> generated seed to power a PRNG?
+>>
+>> I believe it is the second one. Isn't the second one SP 800-90A?
+> 
+> In that case it should switch over to algif_rng.
+
+OK, what about the rest drivers in drivers/char/hw_random? Are they all
+true RNG?
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+regards,
+Stan
