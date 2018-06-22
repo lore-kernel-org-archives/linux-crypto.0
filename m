@@ -1,44 +1,105 @@
-From: Stanimir Varbanov <stanimir.varbanov@linaro.org>
-Subject: Re: [PATCH 3/3] hwrng: msm - Add support for prng v2
-Date: Fri, 22 Jun 2018 11:27:59 +0300
-Message-ID: <6782b1c0-ea94-b07c-2fae-3fe3223bb22a@linaro.org>
-References: <20180618141259.23141-1-vkoul@kernel.org>
- <20180618141259.23141-4-vkoul@kernel.org>
- <20180619142853.wgi5easw4zv6ttrb@gondor.apana.org.au>
- <966e9cd4-70a3-8d54-df0f-16df3df45fb5@linaro.org>
- <20180621101506.rnklbtapvfdev4xb@gondor.apana.org.au>
- <e39deb02-8fa4-84ac-b33e-d692402189a1@linaro.org>
- <20180621115312.rfmbitrhqi44wu5w@gondor.apana.org.au>
+From: Timur Tabi <timur@codeaurora.org>
+Subject: Re: [PATCH 1/2] hwrng: msm: add a spinlock and support for blocking
+ reads
+Date: Fri, 22 Jun 2018 08:11:07 -0500
+Message-ID: <33df2915-ae2e-3cbd-fa84-b3d83bcc82b6@codeaurora.org>
+References: <1529594276-12210-1-git-send-email-timur@codeaurora.org>
+ <152964579304.16708.2651020848216712299@swboyd.mtv.corp.google.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Content-Transfer-Encoding: 7bit
-Cc: Vinod Koul <vinod.koul@linaro.org>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Matt Mackall <mpm@selenic.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-arm-msm@vger.kernel.org, Vinod Koul <vkoul@kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        Stanimir Varbanov <stanimir.varbanov@linaro.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180621115312.rfmbitrhqi44wu5w@gondor.apana.org.au>
+To: Stephen Boyd <swboyd@chromium.org>, Matt Mackall <mpm@selenic.com>,
+ linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+ linux-crypto@vger.kernel.org, timur@kernel.org, vinod.koul@linaro.org
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <152964579304.16708.2651020848216712299@swboyd.mtv.corp.google.com>
 Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi Herbert,
+On 6/22/18 12:36 AM, Stephen Boyd wrote:
+> Quoting Timur Tabi (2018-06-21 08:17:55)
+>> @@ -96,11 +110,39 @@ static int msm_rng_read(struct hwrng *hwrng, void *data, size_t max, bool wait)
+>>   
+>>          /* read random data from hardware */
+>>          do {
+>> -               val = readl_relaxed(rng->base + PRNG_STATUS);
+>> -               if (!(val & PRNG_STATUS_DATA_AVAIL))
+>> -                       break;
+>> +               spin_lock(&rng->lock);
+>> +
+>> +               /*
+>> +                * First check the status bit.  If 'wait' is true, then wait
+>> +                * up to TIMEOUT microseconds for data to be available.
+>> +                */
+>> +               if (wait) {
+>> +                       int ret;
+> Please don't do local variables like this. Put them at the top of the
+> function.
 
-On 06/21/2018 02:53 PM, Herbert Xu wrote:
-> On Thu, Jun 21, 2018 at 02:27:10PM +0300, Stanimir Varbanov wrote:
->>
->> OK, I just wanted to say that it is _not_ PRNG and the register names
->> gives us wrong impression.
+Ok.
+
 > 
-> So does it generate one bit of output for each bit of hardware-
-> generated entropy like /dev/random? Or does it use a hardware-
-> generated seed to power a PRNG?
+>> +
+>> +                       ret = readl_poll_timeout_atomic(rng->base + PRNG_STATUS,
+>> +                               val, val & PRNG_STATUS_DATA_AVAIL, 0, TIMEOUT);
+>> +                       if (ret) {
+>> +                               /* Timed out */
+>> +                               spin_unlock(&rng->lock);
+>> +                               break;
+>> +                       }
+>> +               } else {
+>> +                       val = readl_relaxed(rng->base + PRNG_STATUS);
+>> +                       if (!(val & PRNG_STATUS_DATA_AVAIL)) {
+>> +                               spin_unlock(&rng->lock);
+>> +                               break;
+>> +                       }
+>> +               }
+>>   
+>>                  val = readl_relaxed(rng->base + PRNG_DATA_OUT);
+>> +               spin_unlock(&rng->lock);
+> Maybe this should be written as:
+> 
+> 		spin_lock()
+> 		if (wait) {
+> 			has_data = readl_poll_timeout_atomic(...) == 0;
+> 		} else {
+> 			val = readl_relaxed(rng->base + PRNG_STATUS);
+> 			has_data = val & PRNG_STATUS_DATA_AVAIL;
+> 		}
+> 
+> 		if (has_data)
+> 			val = readl_relaxed(rng->base + PRNG_DATA_OUT);
+> 		spin_unlock();
+> 
+> 		if (!has_data)
+> 			break;
 
-I believe it is the second one. Isn't the second one SP 800-90A?
+That would work, but I don't really see this as better, just different.
+
+>> +               /*
+>> +                * Zero is technically a valid random number, but it's also
+>> +                * the value returned if the PRNG is not enabled properly.
+>> +                * To avoid accidentally returning all zeros, treat it as
+>> +                * invalid and just return what we've already read.
+>> +                */
+>>                  if (!val)
+>>                          break;
+> Is this a related change? Looks like a nice comment that isn't related
+> to locking.
+
+It's slightly related in that the locking is needed to reduce the number 
+of times we read zero from the DATA_OUT register.
 
 -- 
-regards,
-Stan
+Qualcomm Datacenter Technologies, Inc. as an affiliate of Qualcomm
+Technologies, Inc.  Qualcomm Technologies, Inc. is a member of the
+Code Aurora Forum, a Linux Foundation Collaborative Project.
