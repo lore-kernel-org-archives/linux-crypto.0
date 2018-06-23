@@ -1,53 +1,43 @@
-From: Stafford Horne <shorne@gmail.com>
-Subject: [RFC PATCH 2/2] kobject: Fix -Wstringop-truncation warning
-Date: Sat, 23 Jun 2018 11:07:53 +0900
-Message-ID: <20180623020753.27266-3-shorne@gmail.com>
-References: <20180623020753.27266-1-shorne@gmail.com>
+From: Max Filippov <jcmvbkbc@gmail.com>
+Subject: Re: [RFC PATCH 1/2] crypto: Fix -Wstringop-truncation warnings
+Date: Fri, 22 Jun 2018 19:22:20 -0700
+Message-ID: <CAMo8BfLZi5NBr-rjGd8y88t8o=e9q-Mra05GJbH5OtUvXZhZgw@mail.gmail.com>
+References: <20180623020753.27266-1-shorne@gmail.com> <20180623020753.27266-2-shorne@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Cc: Greg KH <gregkh@linuxfoundation.org>, arnd@arndb.de,
-        linux-crypto@vger.kernel.org, Stafford Horne <shorne@gmail.com>
-To: LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Cc: LKML <linux-kernel@vger.kernel.org>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Arnd Bergmann <arnd@arndb.de>, linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+To: Stafford Horne <shorne@gmail.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180623020753.27266-1-shorne@gmail.com>
+In-Reply-To: <20180623020753.27266-2-shorne@gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-When compiling with GCC 9.0.0 I am seeing the following warning:
+On Fri, Jun 22, 2018 at 7:07 PM, Stafford Horne <shorne@gmail.com> wrote:
+> As of GCC 9.0.0 the build is reporting warnings like:
+>
+>     crypto/ablkcipher.c: In function =E2=80=98crypto_ablkcipher_report=E2=
+=80=99:
+>     crypto/ablkcipher.c:374:2: warning: =E2=80=98strncpy=E2=80=99 specifi=
+ed bound 64 equals destination size [-Wstringop-truncation]
+>       strncpy(rblkcipher.geniv, alg->cra_ablkcipher.geniv ?: "<default>",
+>       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>        sizeof(rblkcipher.geniv));
+>        ~~~~~~~~~~~~~~~~~~~~~~~~~
+>
+> This means the strnycpy might create a non null terminated string.  Fix t=
+his by
+> limiting the size of the string copy to include the null terminator.
 
-    In function ‘fill_kobj_path’,
-	inlined from ‘kobject_get_path’ at lib/kobject.c:155:2:
-    lib/kobject.c:128:3: warning: ‘strncpy’ output truncated before terminating nul copying as many bytes from a string as its length [-Wstringop-truncation]
-       strncpy(path + length, kobject_name(parent), cur);
-       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    lib/kobject.c: In function ‘kobject_get_path’:
-    lib/kobject.c:125:13: note: length computed here
-       int cur = strlen(kobject_name(parent));
-		 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+That could work if the destination buffer was zero-initialized,
+but it's allocated on stack and is not initialized.
+Replacing strncpy with strlcpy without changing its arguments
+should do the right thing.
 
-This is pointing out a bug that the strncpy limit is the source string not the
-destination buffer remaining length.  Fix it.
-
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Arnd Bergmann <arnd@arndb.de>
-Signed-off-by: Stafford Horne <shorne@gmail.com>
----
- lib/kobject.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/lib/kobject.c b/lib/kobject.c
-index 18989b5b3b56..15338e5a96f2 100644
---- a/lib/kobject.c
-+++ b/lib/kobject.c
-@@ -125,7 +125,7 @@ static void fill_kobj_path(struct kobject *kobj, char *path, int length)
- 		int cur = strlen(kobject_name(parent));
- 		/* back up enough to print this name with '/' */
- 		length -= cur;
--		strncpy(path + length, kobject_name(parent), cur);
-+		strncpy(path + length, kobject_name(parent), length);
- 		*(path + --length) = '/';
- 	}
- 
--- 
-2.17.0
+--=20
+Thanks.
+-- Max
