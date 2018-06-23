@@ -1,67 +1,136 @@
-From: Stafford Horne <shorne@gmail.com>
-Subject: Re: [RFC PATCH 1/2] crypto: Fix -Wstringop-truncation warnings
-Date: Sat, 23 Jun 2018 15:46:48 +0900
-Message-ID: <20180623064648.GH24595@lianli.shorne-pla.net>
-References: <20180623020753.27266-1-shorne@gmail.com>
- <20180623020753.27266-2-shorne@gmail.com>
- <20180623024149.GB880@sol.localdomain>
- <20180623025256.GG24595@lianli.shorne-pla.net>
+From: Borislav Petkov <bp@alien8.de>
+Subject: [PATCH] x86/crypto: Add missing RETs
+Date: Sat, 23 Jun 2018 12:36:22 +0200
+Message-ID: <20180623103622.GA2760@zn.tnic>
+References: <20180507213755.GA32406@avx2>
+ <tip-51bad67ffbce0aaa44579f84ef5d05597054ec6a@git.kernel.org>
+ <1529235613.4572.7.camel@gmx.de>
+ <20180617120012.GB16877@zn.tnic>
+ <1529242717.4472.3.camel@gmx.de>
+ <1529244178.4674.1.camel@gmx.de>
+ <20180617194747.GA21160@zn.tnic>
+ <1529289279.31745.3.camel@gmx.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: LKML <linux-kernel@vger.kernel.org>,
-        Greg KH <gregkh@linuxfoundation.org>, arnd@arndb.de,
-        linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Nick Desaulniers <nick.desaulniers@gmail.com>
-To: Eric Biggers <ebiggers3@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Cc: Mike Galbraith <efault@gmx.de>,
+        Alexey Dobriyan <adobriyan@gmail.com>,
+        torvalds@linux-foundation.org, tglx@linutronix.de,
+        mingo@kernel.org, jpoimboe@redhat.com, luto@kernel.org,
+        peterz@infradead.org, brgerst@gmail.com, hpa@zytor.com,
+        linux-kernel@vger.kernel.org, dvlasenk@redhat.com,
+        h.peter.anvin@intel.com,
+        linux-tip-commits <linux-tip-commits@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20180623025256.GG24595@lianli.shorne-pla.net>
+In-Reply-To: <1529289279.31745.3.camel@gmx.de>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Sat, Jun 23, 2018 at 11:52:56AM +0900, Stafford Horne wrote:
-> On Fri, Jun 22, 2018 at 07:41:49PM -0700, Eric Biggers wrote:
-> > On Sat, Jun 23, 2018 at 11:07:52AM +0900, Stafford Horne wrote:
-> > > As of GCC 9.0.0 the build is reporting warnings like:
-> > > 
-[...]
-> > >  	strncpy(rblkcipher.type, "blkcipher", sizeof(rblkcipher.type));
-> > >  	strncpy(rblkcipher.geniv, alg->cra_blkcipher.geniv ?: "<default>",
-> > > -		sizeof(rblkcipher.geniv));
-> > > +		sizeof(rblkcipher.geniv) - 1);
-> > >  
-> > >  	rblkcipher.blocksize = alg->cra_blocksize;
-> > >  	rblkcipher.min_keysize = alg->cra_blkcipher.min_keysize;
-> > 
-> > Your "fix" introduces an information disclosure bug, as it results in
-> > uninitialized memory being copied to userspace.  This same broken patch was sent
-> > by someone else too.
-> > 
-> > Maybe it would be best to just memset() the crypto_report_* structs to 0 after
-> > declaration and then replace the strncpy()'s with strscpy()'s, even if just to
-> > stop people from sending broken "fixes".  Do you want to do that?
-> 
-> Right, I didnt realize that we were using strncpy to also init the whole buffer.
-> 
-> I will do as suggest, and respin.
+Lemme send a proper patch now...
 
-Hi Eric,
+---
+From: Borislav Petkov <bp@suse.de>
+Date: Sun, 17 Jun 2018 13:57:42 +0200
+Subject: [PATCH] x86/crypto: Add missing RETs
 
-I thought about this a bit, doing memset() and strscpy() seemed fine, but the
-below also would work, be a bit faster and stop gcc form complaining.  What do
-you think?
+Add explicit RETs to the tail calls of AEGIS and MORUS crypto algorithms
+otherwise they run into INT3 padding due to
 
-@@ -512,6 +512,7 @@ static int crypto_blkcipher_report(struct sk_buff *skb, struct crypto_alg *alg)
-        strncpy(rblkcipher.type, "blkcipher", sizeof(rblkcipher.type));
-        strncpy(rblkcipher.geniv, alg->cra_blkcipher.geniv ?: "<default>",
-                sizeof(rblkcipher.geniv));
-+       rblkcipher.geniv[sizeof(rblkcipher.geniv) - 1] = '\0';
+  51bad67ffbce ("x86/asm: Pad assembly functions with INT3 instructions")
 
-        rblkcipher.blocksize = alg->cra_blocksize;
-        rblkcipher.min_keysize = alg->cra_blkcipher.min_keysize;
+leading to spurious debug exceptions.
 
-Let me know what you think.
+Mike Galbraith <efault@gmx.de> took care of all the remaining callsites.
 
--Stafford
+Signed-off-by: Borislav Petkov <bp@suse.de>
+---
+ arch/x86/crypto/aegis128-aesni-asm.S  | 1 +
+ arch/x86/crypto/aegis128l-aesni-asm.S | 1 +
+ arch/x86/crypto/aegis256-aesni-asm.S  | 1 +
+ arch/x86/crypto/morus1280-avx2-asm.S  | 1 +
+ arch/x86/crypto/morus1280-sse2-asm.S  | 1 +
+ arch/x86/crypto/morus640-sse2-asm.S   | 1 +
+ 6 files changed, 6 insertions(+)
+
+diff --git a/arch/x86/crypto/aegis128-aesni-asm.S b/arch/x86/crypto/aegis128-aesni-asm.S
+index 9254e0b6cc06..717bf0776421 100644
+--- a/arch/x86/crypto/aegis128-aesni-asm.S
++++ b/arch/x86/crypto/aegis128-aesni-asm.S
+@@ -535,6 +535,7 @@ ENTRY(crypto_aegis128_aesni_enc_tail)
+ 	movdqu STATE3, 0x40(STATEP)
+ 
+ 	FRAME_END
++	ret
+ ENDPROC(crypto_aegis128_aesni_enc_tail)
+ 
+ .macro decrypt_block a s0 s1 s2 s3 s4 i
+diff --git a/arch/x86/crypto/aegis128l-aesni-asm.S b/arch/x86/crypto/aegis128l-aesni-asm.S
+index 9263c344f2c7..4eda2b8db9e1 100644
+--- a/arch/x86/crypto/aegis128l-aesni-asm.S
++++ b/arch/x86/crypto/aegis128l-aesni-asm.S
+@@ -645,6 +645,7 @@ ENTRY(crypto_aegis128l_aesni_enc_tail)
+ 	state_store0
+ 
+ 	FRAME_END
++	ret
+ ENDPROC(crypto_aegis128l_aesni_enc_tail)
+ 
+ /*
+diff --git a/arch/x86/crypto/aegis256-aesni-asm.S b/arch/x86/crypto/aegis256-aesni-asm.S
+index 1d977d515bf9..32aae8397268 100644
+--- a/arch/x86/crypto/aegis256-aesni-asm.S
++++ b/arch/x86/crypto/aegis256-aesni-asm.S
+@@ -543,6 +543,7 @@ ENTRY(crypto_aegis256_aesni_enc_tail)
+ 	state_store0
+ 
+ 	FRAME_END
++	ret
+ ENDPROC(crypto_aegis256_aesni_enc_tail)
+ 
+ /*
+diff --git a/arch/x86/crypto/morus1280-avx2-asm.S b/arch/x86/crypto/morus1280-avx2-asm.S
+index 37d422e77931..07653d4582a6 100644
+--- a/arch/x86/crypto/morus1280-avx2-asm.S
++++ b/arch/x86/crypto/morus1280-avx2-asm.S
+@@ -453,6 +453,7 @@ ENTRY(crypto_morus1280_avx2_enc_tail)
+ 	vmovdqu STATE4, (4 * 32)(%rdi)
+ 
+ 	FRAME_END
++	ret
+ ENDPROC(crypto_morus1280_avx2_enc_tail)
+ 
+ /*
+diff --git a/arch/x86/crypto/morus1280-sse2-asm.S b/arch/x86/crypto/morus1280-sse2-asm.S
+index 1fe637c7be9d..bd1aa1b60869 100644
+--- a/arch/x86/crypto/morus1280-sse2-asm.S
++++ b/arch/x86/crypto/morus1280-sse2-asm.S
+@@ -652,6 +652,7 @@ ENTRY(crypto_morus1280_sse2_enc_tail)
+ 	movdqu STATE4_HI, (9 * 16)(%rdi)
+ 
+ 	FRAME_END
++	ret
+ ENDPROC(crypto_morus1280_sse2_enc_tail)
+ 
+ /*
+diff --git a/arch/x86/crypto/morus640-sse2-asm.S b/arch/x86/crypto/morus640-sse2-asm.S
+index 71c72a0a0862..efa02816d921 100644
+--- a/arch/x86/crypto/morus640-sse2-asm.S
++++ b/arch/x86/crypto/morus640-sse2-asm.S
+@@ -437,6 +437,7 @@ ENTRY(crypto_morus640_sse2_enc_tail)
+ 	movdqu STATE4, (4 * 16)(%rdi)
+ 
+ 	FRAME_END
++	ret
+ ENDPROC(crypto_morus640_sse2_enc_tail)
+ 
+ /*
+-- 
+2.17.0.582.gccdcbd54c
+
+-- 
+Regards/Gruss,
+    Boris.
+
+Good mailing practices for 400: avoid top-posting and trim the reply.
