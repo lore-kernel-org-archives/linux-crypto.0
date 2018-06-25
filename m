@@ -1,91 +1,72 @@
-From: Christophe LEROY <christophe.leroy@c-s.fr>
-Subject: Re: [PATCH v2 1/2] crypto: Fix -Wstringop-truncation warnings
-Date: Mon, 25 Jun 2018 14:59:58 +0200
-Message-ID: <2588342c-50da-a75b-3e51-32e3d931644c@c-s.fr>
-References: <20180625124538.21051-1-shorne@gmail.com>
- <20180625124538.21051-2-shorne@gmail.com>
+From: Josh Poimboeuf <jpoimboe@redhat.com>
+Subject: Re: [PATCH] x86/crypto: Add missing RETs
+Date: Mon, 25 Jun 2018 08:19:32 -0500
+Message-ID: <20180625131932.sge43esxdb5ejoxg@treble>
+References: <1529235613.4572.7.camel@gmx.de>
+ <20180617120012.GB16877@zn.tnic>
+ <1529242717.4472.3.camel@gmx.de>
+ <1529244178.4674.1.camel@gmx.de>
+ <20180617194747.GA21160@zn.tnic>
+ <1529289279.31745.3.camel@gmx.de>
+ <20180623103622.GA2760@zn.tnic>
+ <20180624071105.GA29407@gmail.com>
+ <20180624104449.GA20159@avx2>
+ <20180625072438.GA19063@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Cc: Greg KH <gregkh@linuxfoundation.org>, arnd@arndb.de,
-        Eric Biggers <ebiggers3@gmail.com>,
-        linux-crypto@vger.kernel.org, Max Filippov <jcmvbkbc@gmail.com>,
-        Nick Desaulniers <nick.desaulniers@gmail.com>,
+Content-Type: text/plain; charset=utf-8
+Cc: Alexey Dobriyan <adobriyan@gmail.com>,
+        Borislav Petkov <bp@alien8.de>, linux-crypto@vger.kernel.org,
+        Mike Galbraith <efault@gmx.de>, torvalds@linux-foundation.org,
+        tglx@linutronix.de, luto@kernel.org, peterz@infradead.org,
+        brgerst@gmail.com, hpa@zytor.com, linux-kernel@vger.kernel.org,
+        dvlasenk@redhat.com, h.peter.anvin@intel.com,
+        linux-tip-commits <linux-tip-commits@vger.kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-To: Stafford Horne <shorne@gmail.com>,
-        LKML <linux-kernel@vger.kernel.org>
+        Peter Zijlstra <a.p.zijlstra@chello.nl>
+To: Ingo Molnar <mingo@kernel.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180625124538.21051-2-shorne@gmail.com>
-Content-Language: fr
+Content-Disposition: inline
+In-Reply-To: <20180625072438.GA19063@gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-
-
-Le 25/06/2018 à 14:45, Stafford Horne a écrit :
-> As of GCC 9.0.0 the build is reporting warnings like:
+On Mon, Jun 25, 2018 at 09:24:38AM +0200, Ingo Molnar wrote:
 > 
->      crypto/ablkcipher.c: In function ‘crypto_ablkcipher_report’:
->      crypto/ablkcipher.c:374:2: warning: ‘strncpy’ specified bound 64 equals destination size [-Wstringop-truncation]
->        strncpy(rblkcipher.geniv, alg->cra_ablkcipher.geniv ?: "<default>",
->        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->         sizeof(rblkcipher.geniv));
->         ~~~~~~~~~~~~~~~~~~~~~~~~~
+> * Alexey Dobriyan <adobriyan@gmail.com> wrote:
 > 
-> This means the strnycpy might create a non null terminated string.  Fix this by
-> explicitly performing '\0' termination.
+> > On Sun, Jun 24, 2018 at 09:11:05AM +0200, Ingo Molnar wrote:
+> > > > Add explicit RETs to the tail calls of AEGIS and MORUS crypto algorithms
+> > > > otherwise they run into INT3 padding due to
+> > > > 
+> > > >   51bad67ffbce ("x86/asm: Pad assembly functions with INT3 instructions")
+> > > > 
+> > > > leading to spurious debug exceptions.
+> > > > 
+> > > > Mike Galbraith <efault@gmx.de> took care of all the remaining callsites.
+> > > 
+> > > Note that 51bad67ffbce has been zapped because it caused too many problems like 
+> > > this, but the explicit RETs make sense nevertheless.
+> > 
+> > So commit which found real bug(s) was zapped.
+> > 
+> > OK
 > 
-> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Cc: Arnd Bergmann <arnd@arndb.de>
-> Cc: Max Filippov <jcmvbkbc@gmail.com>
-> Cc: Eric Biggers <ebiggers3@gmail.com>
-> Cc: Nick Desaulniers <nick.desaulniers@gmail.com>
-> Signed-off-by: Stafford Horne <shorne@gmail.com>
-> ---
->   crypto/ablkcipher.c | 2 ++
->   crypto/blkcipher.c  | 1 +
->   2 files changed, 3 insertions(+)
+> No, what happened is that the commit was first moved into WIP.x86/debug showing 
+> its work-in-progress status, because it was incomplete and caused bugs:
 > 
-> diff --git a/crypto/ablkcipher.c b/crypto/ablkcipher.c
-> index d880a4897159..1edb5000d783 100644
-> --- a/crypto/ablkcipher.c
-> +++ b/crypto/ablkcipher.c
-> @@ -373,6 +373,7 @@ static int crypto_ablkcipher_report(struct sk_buff *skb, struct crypto_alg *alg)
->   	strncpy(rblkcipher.type, "ablkcipher", sizeof(rblkcipher.type));
->   	strncpy(rblkcipher.geniv, alg->cra_ablkcipher.geniv ?: "<default>",
->   		sizeof(rblkcipher.geniv));
-
-Is it worth copying something we are going to discard at the following 
-line ? Shouldn't you limit the copy to      sizeof(rblkcipher.geniv) - 1   ?
-
-> +	rblkcipher.geniv[sizeof(rblkcipher.geniv) - 1] = '\0';
->   
->   	rblkcipher.blocksize = alg->cra_blocksize;
->   	rblkcipher.min_keysize = alg->cra_ablkcipher.min_keysize;
-> @@ -447,6 +448,7 @@ static int crypto_givcipher_report(struct sk_buff *skb, struct crypto_alg *alg)
->   	strncpy(rblkcipher.type, "givcipher", sizeof(rblkcipher.type));
->   	strncpy(rblkcipher.geniv, alg->cra_ablkcipher.geniv ?: "<built-in>",
->   		sizeof(rblkcipher.geniv));
-
-Same comment here.
-
-Christophe
-
-> +	rblkcipher.geniv[sizeof(rblkcipher.geniv) - 1] = '\0';
->   
->   	rblkcipher.blocksize = alg->cra_blocksize;
->   	rblkcipher.min_keysize = alg->cra_ablkcipher.min_keysize;
-> diff --git a/crypto/blkcipher.c b/crypto/blkcipher.c
-> index 01c0d4aa2563..dd4dcab3766a 100644
-> --- a/crypto/blkcipher.c
-> +++ b/crypto/blkcipher.c
-> @@ -512,6 +512,7 @@ static int crypto_blkcipher_report(struct sk_buff *skb, struct crypto_alg *alg)
->   	strncpy(rblkcipher.type, "blkcipher", sizeof(rblkcipher.type));
->   	strncpy(rblkcipher.geniv, alg->cra_blkcipher.geniv ?: "<default>",
->   		sizeof(rblkcipher.geniv));
-> +	rblkcipher.geniv[sizeof(rblkcipher.geniv) - 1] = '\0';
->   
->   	rblkcipher.blocksize = alg->cra_blocksize;
->   	rblkcipher.min_keysize = alg->cra_blkcipher.min_keysize;
+>    https://lore.kernel.org/lkml/20180518073644.GA8593@gmail.com/T/#u
 > 
+> ... and finally, after weeks of inaction I zapped it because I didn't see progress 
+> and you didn't answer my question.
+> 
+> If a fixed patch with updated tooling to detect these crashes before they occur on 
+> live systems is submitted we'll reconsider - it didn't get NAK-ed, it's just 
+> incomplete in the current form.
+
+Hm, what happened to the objtool patch to detect these at build time?
+Did it not work?
+
+  https://lore.kernel.org/lkml/20180517134934.eog2fgoby5azq5a7@treble
+
+-- 
+Josh
