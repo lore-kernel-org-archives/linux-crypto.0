@@ -1,39 +1,31 @@
 From: Kees Cook <keescook@chromium.org>
-Subject: [PATCH v2 03/11] crypto: shash: Remove VLA usage
-Date: Mon, 25 Jun 2018 14:10:18 -0700
-Message-ID: <20180625211026.15819-4-keescook@chromium.org>
+Subject: [PATCH v2 01/11] crypto: xcbc: Remove VLA usage
+Date: Mon, 25 Jun 2018 14:10:16 -0700
+Message-ID: <20180625211026.15819-2-keescook@chromium.org>
 References: <20180625211026.15819-1-keescook@chromium.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-	Kees Cook <keescook@chromium.org>, Arnd Bergmann <arnd@arndb.de>,
-	"Gustavo A. R. Silva" <gustavo@embeddedor.com>,
-	Mike Snitzer <snitzer@redhat.com>,
-	Eric Biggers <ebiggers@google.com>, qat-linux@intel.com,
-	linux-kernel@vger.kernel.org, dm-devel@redhat.com,
-	linux-crypto@vger.kernel.org, Lars Persson <larper@axis.com>,
-	Tim Chen <tim.c.chen@linux.intel.com>,
-	"David S. Miller" <davem@davemloft.net>, Alasdair Kergon <agk@redhat.com>,
-	Rabin Vincent <rabinv@axis.com>
+Cc: Kees Cook <keescook@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Eric Biggers <ebiggers@google.com>,
+        Alasdair Kergon <agk@redhat.com>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Lars Persson <larper@axis.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Rabin Vincent <rabinv@axis.com>,
+        Tim Chen <tim.c.chen@linux.intel.com>, qat-linux@intel.com,
+        dm-devel@redhat.com, linux-kernel@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <dm-devel-bounces@redhat.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <20180625211026.15819-1-keescook@chromium.org>
-List-Unsubscribe: <https://www.redhat.com/mailman/options/dm-devel>,
-	<mailto:dm-devel-request@redhat.com?subject=unsubscribe>
-List-Archive: <https://www.redhat.com/archives/dm-devel>
-List-Post: <mailto:dm-devel@redhat.com>
-List-Help: <mailto:dm-devel-request@redhat.com?subject=help>
-List-Subscribe: <https://www.redhat.com/mailman/listinfo/dm-devel>,
-	<mailto:dm-devel-request@redhat.com?subject=subscribe>
-Sender: dm-devel-bounces@redhat.com
-Errors-To: dm-devel-bounces@redhat.com
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-In the quest to remove all stack VLA usage from the kernel[1], this
-removes the VLAs in SHASH_DESC_ON_STACK (via crypto_shash_descsize())
-by using the maximum allowable size (which is now more clearly captured
-in a macro). Similar limits are turned into macros as well.
+In the quest to remove all stack VLA usage from the kernel[1], this uses
+the maximum blocksize and adds a sanity check. For xcbc, the blocksize
+must always be 16, so use that, since it's already being enforced during
+instantiation.
 
 [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
 
@@ -42,45 +34,42 @@ Cc: "David S. Miller" <davem@davemloft.net>
 Cc: linux-crypto@vger.kernel.org
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- crypto/shash.c        | 6 +++---
- include/crypto/hash.h | 6 +++++-
- 2 files changed, 8 insertions(+), 4 deletions(-)
+ crypto/xcbc.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/crypto/shash.c b/crypto/shash.c
-index 5d732c6bb4b2..ab6902c6dae7 100644
---- a/crypto/shash.c
-+++ b/crypto/shash.c
-@@ -458,9 +458,9 @@ static int shash_prepare_alg(struct shash_alg *alg)
- {
- 	struct crypto_alg *base = &alg->base;
- 
--	if (alg->digestsize > PAGE_SIZE / 8 ||
--	    alg->descsize > PAGE_SIZE / 8 ||
--	    alg->statesize > PAGE_SIZE / 8)
-+	if (alg->digestsize > SHASH_MAX_DIGESTSIZE ||
-+	    alg->descsize > SHASH_MAX_DESCSIZE ||
-+	    alg->statesize > SHASH_MAX_STATESIZE)
- 		return -EINVAL;
- 
- 	base->cra_type = &crypto_shash_type;
-diff --git a/include/crypto/hash.h b/include/crypto/hash.h
-index 76e432cab75d..804e87a9510e 100644
---- a/include/crypto/hash.h
-+++ b/include/crypto/hash.h
-@@ -151,9 +151,13 @@ struct shash_desc {
- 	void *__ctx[] CRYPTO_MINALIGN_ATTR;
+diff --git a/crypto/xcbc.c b/crypto/xcbc.c
+index 25c75af50d3f..7aa03beed795 100644
+--- a/crypto/xcbc.c
++++ b/crypto/xcbc.c
+@@ -57,6 +57,8 @@ struct xcbc_desc_ctx {
+ 	u8 ctx[];
  };
  
-+#define SHASH_MAX_DIGESTSIZE    512
-+#define SHASH_MAX_DESCSIZE      512
-+#define SHASH_MAX_STATESIZE     512
++#define XCBC_BLOCKSIZE	16
 +
- #define SHASH_DESC_ON_STACK(shash, ctx)				  \
- 	char __##shash##_desc[sizeof(struct shash_desc) +	  \
--		crypto_shash_descsize(ctx)] CRYPTO_MINALIGN_ATTR; \
-+		SHASH_MAX_DESCSIZE] CRYPTO_MINALIGN_ATTR; \
- 	struct shash_desc *shash = (struct shash_desc *)__##shash##_desc
+ static int crypto_xcbc_digest_setkey(struct crypto_shash *parent,
+ 				     const u8 *inkey, unsigned int keylen)
+ {
+@@ -65,7 +67,10 @@ static int crypto_xcbc_digest_setkey(struct crypto_shash *parent,
+ 	int bs = crypto_shash_blocksize(parent);
+ 	u8 *consts = PTR_ALIGN(&ctx->ctx[0], alignmask + 1);
+ 	int err = 0;
+-	u8 key1[bs];
++	u8 key1[XCBC_BLOCKSIZE];
++
++	if (WARN_ON(bs > sizeof(key1)))
++		return -EINVAL;
  
- /**
+ 	if ((err = crypto_cipher_setkey(ctx->child, inkey, keylen)))
+ 		return err;
+@@ -212,7 +217,7 @@ static int xcbc_create(struct crypto_template *tmpl, struct rtattr **tb)
+ 		return PTR_ERR(alg);
+ 
+ 	switch(alg->cra_blocksize) {
+-	case 16:
++	case XCBC_BLOCKSIZE:
+ 		break;
+ 	default:
+ 		goto out_put_alg;
 -- 
 2.17.1
