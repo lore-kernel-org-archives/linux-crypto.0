@@ -1,67 +1,46 @@
-From: Ingo Molnar <mingo@kernel.org>
-Subject: Re: [PATCH] x86/crypto: Add missing RETs
-Date: Mon, 25 Jun 2018 09:24:38 +0200
-Message-ID: <20180625072438.GA19063@gmail.com>
-References: <tip-51bad67ffbce0aaa44579f84ef5d05597054ec6a@git.kernel.org>
- <1529235613.4572.7.camel@gmx.de>
- <20180617120012.GB16877@zn.tnic>
- <1529242717.4472.3.camel@gmx.de>
- <1529244178.4674.1.camel@gmx.de>
- <20180617194747.GA21160@zn.tnic>
- <1529289279.31745.3.camel@gmx.de>
- <20180623103622.GA2760@zn.tnic>
- <20180624071105.GA29407@gmail.com>
- <20180624104449.GA20159@avx2>
+From: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
+Subject: Re: [PATCH v11 00/13] Intel SGX1 support
+Date: Mon, 25 Jun 2018 12:44:04 +0300
+Message-ID: <0a639f45119451143be8d8cf9c7f0041d8436b47.camel@linux.intel.com>
+References: <20180608171216.26521-1-jarkko.sakkinen@linux.intel.com>
+         <20180621125511.GA4287@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Borislav Petkov <bp@alien8.de>, linux-crypto@vger.kernel.org,
-        Mike Galbraith <efault@gmx.de>, torvalds@linux-foundation.org,
-        tglx@linutronix.de, jpoimboe@redhat.com, luto@kernel.org,
-        peterz@infradead.org, brgerst@gmail.com, hpa@zytor.com,
-        linux-kernel@vger.kernel.org, dvlasenk@redhat.com,
-        h.peter.anvin@intel.com,
-        linux-tip-commits <linux-tip-commits@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Peter Zijlstra <a.p.zijlstra@chello.nl>
-To: Alexey Dobriyan <adobriyan@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: x86@kernel.org, platform-driver-x86@vger.kernel.org,
+        dave.hansen@intel.com, sean.j.christopherson@intel.com,
+        nhorman@redhat.com, npmccallum@redhat.com,
+        Alexei Starovoitov <ast@kernel.org>,
+        Andi Kleen <ak@linux.intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        Borislav Petkov <bp@suse.de>,
+        "David S. Miller" <davem@davemloft.net>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "open list:INTEL SGX" <intel-sgx-kernel-dev@lists.01.org>,
+        Janakarajan Natarajan <Janakarajan.Natarajan@amd.com>,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        "open list:KERNEL VIRTUAL MACHINE FOR X86 (KVM/x86)"
+To: Ingo Molnar <mingo@kernel.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20180624104449.GA20159@avx2>
+In-Reply-To: <20180621125511.GA4287@gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
+On Thu, 2018-06-21 at 14:55 +0200, Ingo Molnar wrote:
+> Just some quick feedback: these are core kernel functionality and should be
+> in 
+> arch/x86/, not in drivers/platform/.
 
-* Alexey Dobriyan <adobriyan@gmail.com> wrote:
+We have in core what is used by both KVM and the driver right now (EPC
+management, SGX detection and some other bits). The driver uses this
+functionality to launch enclaves.
 
-> On Sun, Jun 24, 2018 at 09:11:05AM +0200, Ingo Molnar wrote:
-> > > Add explicit RETs to the tail calls of AEGIS and MORUS crypto algorithms
-> > > otherwise they run into INT3 padding due to
-> > > 
-> > >   51bad67ffbce ("x86/asm: Pad assembly functions with INT3 instructions")
-> > > 
-> > > leading to spurious debug exceptions.
-> > > 
-> > > Mike Galbraith <efault@gmx.de> took care of all the remaining callsites.
-> > 
-> > Note that 51bad67ffbce has been zapped because it caused too many problems like 
-> > this, but the explicit RETs make sense nevertheless.
+> Thanks,
 > 
-> So commit which found real bug(s) was zapped.
-> 
-> OK
+> 	Ingo
 
-No, what happened is that the commit was first moved into WIP.x86/debug showing 
-its work-in-progress status, because it was incomplete and caused bugs:
-
-   https://lore.kernel.org/lkml/20180518073644.GA8593@gmail.com/T/#u
-
-... and finally, after weeks of inaction I zapped it because I didn't see progress 
-and you didn't answer my question.
-
-If a fixed patch with updated tooling to detect these crashes before they occur on 
-live systems is submitted we'll reconsider - it didn't get NAK-ed, it's just 
-incomplete in the current form.
-
-Thanks,
-
-	Ingo
+/Jarkko
