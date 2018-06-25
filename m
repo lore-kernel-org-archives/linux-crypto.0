@@ -1,46 +1,49 @@
-From: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
-Subject: Re: [PATCH v11 00/13] Intel SGX1 support
-Date: Mon, 25 Jun 2018 12:44:04 +0300
-Message-ID: <0a639f45119451143be8d8cf9c7f0041d8436b47.camel@linux.intel.com>
-References: <20180608171216.26521-1-jarkko.sakkinen@linux.intel.com>
-         <20180621125511.GA4287@gmail.com>
+From: Stafford Horne <shorne@gmail.com>
+Subject: [PATCH v2 0/2] Fix GCC -Wstringop-truncation warnings
+Date: Mon, 25 Jun 2018 21:45:36 +0900
+Message-ID: <20180625124538.21051-1-shorne@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: x86@kernel.org, platform-driver-x86@vger.kernel.org,
-        dave.hansen@intel.com, sean.j.christopherson@intel.com,
-        nhorman@redhat.com, npmccallum@redhat.com,
-        Alexei Starovoitov <ast@kernel.org>,
-        Andi Kleen <ak@linux.intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Andy Lutomirski <luto@kernel.org>,
-        Borislav Petkov <bp@suse.de>,
-        "David S. Miller" <davem@davemloft.net>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "open list:INTEL SGX" <intel-sgx-kernel-dev@lists.01.org>,
-        Janakarajan Natarajan <Janakarajan.Natarajan@amd.com>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        "open list:KERNEL VIRTUAL MACHINE FOR X86 (KVM/x86)"
-To: Ingo Molnar <mingo@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Cc: Greg KH <gregkh@linuxfoundation.org>, arnd@arndb.de,
+        Eric Biggers <ebiggers3@gmail.com>,
+        linux-crypto@vger.kernel.org, Stafford Horne <shorne@gmail.com>
+To: LKML <linux-kernel@vger.kernel.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180621125511.GA4287@gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, 2018-06-21 at 14:55 +0200, Ingo Molnar wrote:
-> Just some quick feedback: these are core kernel functionality and should be
-> in 
-> arch/x86/, not in drivers/platform/.
+Hello,
 
-We have in core what is used by both KVM and the driver right now (EPC
-management, SGX detection and some other bits). The driver uses this
-functionality to launch enclaves.
+When compiling OpenRISC kernels with our new toolchain based on GCC 9.0.0 I am
+seeing various -Wstringop-truncation warnings.  There might be more as I am not
+compiling all drivers/modules yet, if someone thinks thats helpful let me know.
 
-> Thanks,
-> 
-> 	Ingo
+I discussed this with Greg KH at the OSS Summit Japan 2018 and it seems no
+one has pointed these out yet, so here are the patches...  Actually, the crypto
+issue was reported before, but the patch was discarded as it introduced a data
+leakage bug pointed out by Erix.
 
-/Jarkko
+As for merging, I think the maintainers should pick these up separately.  Let me
+know if you want something else.
+
+
+Changes since v1:
+
+ - Fix paper-bag bug in kobject patch, using memcpy() now
+ - Fix data leakage issue crypto patch pointed out by Eric Biggers
+
+-Stafford
+
+
+Stafford Horne (2):
+  crypto: Fix -Wstringop-truncation warnings
+  kobject: Fix -Wstringop-truncation warning
+
+ crypto/ablkcipher.c | 2 ++
+ crypto/blkcipher.c  | 1 +
+ lib/kobject.c       | 2 +-
+ 3 files changed, 4 insertions(+), 1 deletion(-)
+
+-- 
+2.17.0
