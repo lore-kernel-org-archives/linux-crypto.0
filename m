@@ -1,86 +1,101 @@
-From: Christophe LEROY <christophe.leroy@c-s.fr>
-Subject: Re: [PATCH v2 2/2] kobject: Fix -Wstringop-truncation warning
-Date: Mon, 25 Jun 2018 15:32:35 +0200
-Message-ID: <d962dac0-ed9c-6894-09df-ad5f6c00c8f1@c-s.fr>
+From: Stafford Horne <shorne@gmail.com>
+Subject: Re: [PATCH v2 1/2] crypto: Fix -Wstringop-truncation warnings
+Date: Mon, 25 Jun 2018 22:40:21 +0900
+Message-ID: <20180625134021.GJ24595@lianli.shorne-pla.net>
 References: <20180625124538.21051-1-shorne@gmail.com>
- <20180625124538.21051-3-shorne@gmail.com>
- <c89dd856-3637-b235-f134-e15621eab2c6@c-s.fr>
- <20180625132445.GI24595@lianli.shorne-pla.net>
+ <20180625124538.21051-2-shorne@gmail.com>
+ <2588342c-50da-a75b-3e51-32e3d931644c@c-s.fr>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
 Cc: LKML <linux-kernel@vger.kernel.org>,
         Greg KH <gregkh@linuxfoundation.org>, arnd@arndb.de,
         Eric Biggers <ebiggers3@gmail.com>,
-        linux-crypto@vger.kernel.org
-To: Stafford Horne <shorne@gmail.com>
+        linux-crypto@vger.kernel.org, Max Filippov <jcmvbkbc@gmail.com>,
+        Nick Desaulniers <nick.desaulniers@gmail.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+To: Christophe LEROY <christophe.leroy@c-s.fr>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180625132445.GI24595@lianli.shorne-pla.net>
-Content-Language: fr
+Content-Disposition: inline
+In-Reply-To: <2588342c-50da-a75b-3e51-32e3d931644c@c-s.fr>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-
-
-Le 25/06/2018 à 15:24, Stafford Horne a écrit :
-> On Mon, Jun 25, 2018 at 02:57:13PM +0200, Christophe LEROY wrote:
->>
->>
->> Le 25/06/2018 à 14:45, Stafford Horne a écrit :
->>> When compiling with GCC 9.0.0 I am seeing the following warning:
->>>
->>>       In function ‘fill_kobj_path’,
->>> 	inlined from ‘kobject_get_path’ at lib/kobject.c:155:2:
->>>       lib/kobject.c:128:3: warning: ‘strncpy’ output truncated before terminating nul copying as many bytes from a string as its length [-Wstringop-truncation]
->>>          strncpy(path + length, kobject_name(parent), cur);
->>>          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->>>       lib/kobject.c: In function ‘kobject_get_path’:
->>>       lib/kobject.c:125:13: note: length computed here
->>>          int cur = strlen(kobject_name(parent));
->>> 		 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
->>>
->>> This is not really an issue since the buffer we are writing to is
->>> pre-zero'd and we have already allocated the buffer based on the
->>> calculated strlen size and accounted for the terminating '\0'.
->>> Just use memcpy() instead.
->>
->> If we are already sure the destination is big enough, why not just do a
->> strcpy() and drop the 'cur = strlen()' ?
+On Mon, Jun 25, 2018 at 02:59:58PM +0200, Christophe LEROY wrote:
 > 
-> Hi Christophe,
 > 
-> Here were are writing multiple strings into a buffer from back to front.  We are
-> copying exactly strlen() bytes at a time to avoid the nul terminator being
-> copied into the buffer.
+> Le 25/06/2018 à 14:45, Stafford Horne a écrit :
+> > As of GCC 9.0.0 the build is reporting warnings like:
+> > 
+> >      crypto/ablkcipher.c: In function ‘crypto_ablkcipher_report’:
+> >      crypto/ablkcipher.c:374:2: warning: ‘strncpy’ specified bound 64 equals destination size [-Wstringop-truncation]
+> >        strncpy(rblkcipher.geniv, alg->cra_ablkcipher.geniv ?: "<default>",
+> >        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> >         sizeof(rblkcipher.geniv));
+> >         ~~~~~~~~~~~~~~~~~~~~~~~~~
+> > 
+> > This means the strnycpy might create a non null terminated string.  Fix this by
+> > explicitly performing '\0' termination.
+> > 
+> > Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> > Cc: Arnd Bergmann <arnd@arndb.de>
+> > Cc: Max Filippov <jcmvbkbc@gmail.com>
+> > Cc: Eric Biggers <ebiggers3@gmail.com>
+> > Cc: Nick Desaulniers <nick.desaulniers@gmail.com>
+> > Signed-off-by: Stafford Horne <shorne@gmail.com>
+> > ---
+> >   crypto/ablkcipher.c | 2 ++
+> >   crypto/blkcipher.c  | 1 +
+> >   2 files changed, 3 insertions(+)
+> > 
+> > diff --git a/crypto/ablkcipher.c b/crypto/ablkcipher.c
+> > index d880a4897159..1edb5000d783 100644
+> > --- a/crypto/ablkcipher.c
+> > +++ b/crypto/ablkcipher.c
+> > @@ -373,6 +373,7 @@ static int crypto_ablkcipher_report(struct sk_buff *skb, struct crypto_alg *alg)
+> >   	strncpy(rblkcipher.type, "ablkcipher", sizeof(rblkcipher.type));
+> >   	strncpy(rblkcipher.geniv, alg->cra_ablkcipher.geniv ?: "<default>",
+> >   		sizeof(rblkcipher.geniv));
 > 
-> I don't doubt we could use strcpy() but I was trying to keep the change small.
+> Is it worth copying something we are going to discard at the following line
+> ? Shouldn't you limit the copy to      sizeof(rblkcipher.geniv) - 1   ?
 
-Ok, fair enough.
+Hi,
 
-Reviewed-by: Christophe Leroy <christophe.leroy@c-s.fr>
+I thought about that, I just did it like this as I thought it might be easier to
+read and I noticed a few other areas in the kernel that did this way.  After a
+closer look I can see we have both patterns, perhaps we need a mcro/helper.
 
+I don't mind either way, I can fix, if the crypto maintainers want to adjust the
+patch that would work too.
+
+-Stafford
+
+> > +	rblkcipher.geniv[sizeof(rblkcipher.geniv) - 1] = '\0';
+> >   	rblkcipher.blocksize = alg->cra_blocksize;
+> >   	rblkcipher.min_keysize = alg->cra_ablkcipher.min_keysize;
+> > @@ -447,6 +448,7 @@ static int crypto_givcipher_report(struct sk_buff *skb, struct crypto_alg *alg)
+> >   	strncpy(rblkcipher.type, "givcipher", sizeof(rblkcipher.type));
+> >   	strncpy(rblkcipher.geniv, alg->cra_ablkcipher.geniv ?: "<built-in>",
+> >   		sizeof(rblkcipher.geniv));
 > 
-> -Stafford
+> Same comment here.
 > 
->>>
->>> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
->>> Cc: Arnd Bergmann <arnd@arndb.de>
->>> Cc: Eric Biggers <ebiggers3@gmail.com>
->>> Signed-off-by: Stafford Horne <shorne@gmail.com>
->>> ---
->>>    lib/kobject.c | 2 +-
->>>    1 file changed, 1 insertion(+), 1 deletion(-)
->>>
->>> diff --git a/lib/kobject.c b/lib/kobject.c
->>> index 18989b5b3b56..e876957743c8 100644
->>> --- a/lib/kobject.c
->>> +++ b/lib/kobject.c
->>> @@ -125,7 +125,7 @@ static void fill_kobj_path(struct kobject *kobj, char *path, int length)
->>>    		int cur = strlen(kobject_name(parent));
->>>    		/* back up enough to print this name with '/' */
->>>    		length -= cur;
->>> -		strncpy(path + length, kobject_name(parent), cur);
->>> +		memcpy(path + length, kobject_name(parent), cur);
->>>    		*(path + --length) = '/';
->>>    	}
->>>
+> Christophe
+> 
+> > +	rblkcipher.geniv[sizeof(rblkcipher.geniv) - 1] = '\0';
+> >   	rblkcipher.blocksize = alg->cra_blocksize;
+> >   	rblkcipher.min_keysize = alg->cra_ablkcipher.min_keysize;
+> > diff --git a/crypto/blkcipher.c b/crypto/blkcipher.c
+> > index 01c0d4aa2563..dd4dcab3766a 100644
+> > --- a/crypto/blkcipher.c
+> > +++ b/crypto/blkcipher.c
+> > @@ -512,6 +512,7 @@ static int crypto_blkcipher_report(struct sk_buff *skb, struct crypto_alg *alg)
+> >   	strncpy(rblkcipher.type, "blkcipher", sizeof(rblkcipher.type));
+> >   	strncpy(rblkcipher.geniv, alg->cra_blkcipher.geniv ?: "<default>",
+> >   		sizeof(rblkcipher.geniv));
+> > +	rblkcipher.geniv[sizeof(rblkcipher.geniv) - 1] = '\0';
+> >   	rblkcipher.blocksize = alg->cra_blocksize;
+> >   	rblkcipher.min_keysize = alg->cra_blkcipher.min_keysize;
+> > 
