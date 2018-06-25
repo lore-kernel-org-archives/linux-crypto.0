@@ -1,72 +1,77 @@
-From: Josh Poimboeuf <jpoimboe@redhat.com>
-Subject: Re: [PATCH] x86/crypto: Add missing RETs
-Date: Mon, 25 Jun 2018 08:19:32 -0500
-Message-ID: <20180625131932.sge43esxdb5ejoxg@treble>
-References: <1529235613.4572.7.camel@gmx.de>
- <20180617120012.GB16877@zn.tnic>
- <1529242717.4472.3.camel@gmx.de>
- <1529244178.4674.1.camel@gmx.de>
- <20180617194747.GA21160@zn.tnic>
- <1529289279.31745.3.camel@gmx.de>
- <20180623103622.GA2760@zn.tnic>
- <20180624071105.GA29407@gmail.com>
- <20180624104449.GA20159@avx2>
- <20180625072438.GA19063@gmail.com>
+From: Stafford Horne <shorne@gmail.com>
+Subject: Re: [PATCH v2 2/2] kobject: Fix -Wstringop-truncation warning
+Date: Mon, 25 Jun 2018 22:24:45 +0900
+Message-ID: <20180625132445.GI24595@lianli.shorne-pla.net>
+References: <20180625124538.21051-1-shorne@gmail.com>
+ <20180625124538.21051-3-shorne@gmail.com>
+ <c89dd856-3637-b235-f134-e15621eab2c6@c-s.fr>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Cc: Alexey Dobriyan <adobriyan@gmail.com>,
-        Borislav Petkov <bp@alien8.de>, linux-crypto@vger.kernel.org,
-        Mike Galbraith <efault@gmx.de>, torvalds@linux-foundation.org,
-        tglx@linutronix.de, luto@kernel.org, peterz@infradead.org,
-        brgerst@gmail.com, hpa@zytor.com, linux-kernel@vger.kernel.org,
-        dvlasenk@redhat.com, h.peter.anvin@intel.com,
-        linux-tip-commits <linux-tip-commits@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Peter Zijlstra <a.p.zijlstra@chello.nl>
-To: Ingo Molnar <mingo@kernel.org>
+Content-Transfer-Encoding: 8bit
+Cc: LKML <linux-kernel@vger.kernel.org>,
+        Greg KH <gregkh@linuxfoundation.org>, arnd@arndb.de,
+        Eric Biggers <ebiggers3@gmail.com>,
+        linux-crypto@vger.kernel.org
+To: Christophe LEROY <christophe.leroy@c-s.fr>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20180625072438.GA19063@gmail.com>
+In-Reply-To: <c89dd856-3637-b235-f134-e15621eab2c6@c-s.fr>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Jun 25, 2018 at 09:24:38AM +0200, Ingo Molnar wrote:
+On Mon, Jun 25, 2018 at 02:57:13PM +0200, Christophe LEROY wrote:
 > 
-> * Alexey Dobriyan <adobriyan@gmail.com> wrote:
 > 
-> > On Sun, Jun 24, 2018 at 09:11:05AM +0200, Ingo Molnar wrote:
-> > > > Add explicit RETs to the tail calls of AEGIS and MORUS crypto algorithms
-> > > > otherwise they run into INT3 padding due to
-> > > > 
-> > > >   51bad67ffbce ("x86/asm: Pad assembly functions with INT3 instructions")
-> > > > 
-> > > > leading to spurious debug exceptions.
-> > > > 
-> > > > Mike Galbraith <efault@gmx.de> took care of all the remaining callsites.
-> > > 
-> > > Note that 51bad67ffbce has been zapped because it caused too many problems like 
-> > > this, but the explicit RETs make sense nevertheless.
+> Le 25/06/2018 à 14:45, Stafford Horne a écrit :
+> > When compiling with GCC 9.0.0 I am seeing the following warning:
 > > 
-> > So commit which found real bug(s) was zapped.
+> >      In function ‘fill_kobj_path’,
+> > 	inlined from ‘kobject_get_path’ at lib/kobject.c:155:2:
+> >      lib/kobject.c:128:3: warning: ‘strncpy’ output truncated before terminating nul copying as many bytes from a string as its length [-Wstringop-truncation]
+> >         strncpy(path + length, kobject_name(parent), cur);
+> >         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> >      lib/kobject.c: In function ‘kobject_get_path’:
+> >      lib/kobject.c:125:13: note: length computed here
+> >         int cur = strlen(kobject_name(parent));
+> > 		 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
 > > 
-> > OK
+> > This is not really an issue since the buffer we are writing to is
+> > pre-zero'd and we have already allocated the buffer based on the
+> > calculated strlen size and accounted for the terminating '\0'.
+> > Just use memcpy() instead.
 > 
-> No, what happened is that the commit was first moved into WIP.x86/debug showing 
-> its work-in-progress status, because it was incomplete and caused bugs:
-> 
->    https://lore.kernel.org/lkml/20180518073644.GA8593@gmail.com/T/#u
-> 
-> ... and finally, after weeks of inaction I zapped it because I didn't see progress 
-> and you didn't answer my question.
-> 
-> If a fixed patch with updated tooling to detect these crashes before they occur on 
-> live systems is submitted we'll reconsider - it didn't get NAK-ed, it's just 
-> incomplete in the current form.
+> If we are already sure the destination is big enough, why not just do a
+> strcpy() and drop the 'cur = strlen()' ?
 
-Hm, what happened to the objtool patch to detect these at build time?
-Did it not work?
+Hi Christophe,
 
-  https://lore.kernel.org/lkml/20180517134934.eog2fgoby5azq5a7@treble
+Here were are writing multiple strings into a buffer from back to front.  We are
+copying exactly strlen() bytes at a time to avoid the nul terminator being
+copied into the buffer.
 
--- 
-Josh
+I don't doubt we could use strcpy() but I was trying to keep the change small.
+
+-Stafford
+
+> > 
+> > Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> > Cc: Arnd Bergmann <arnd@arndb.de>
+> > Cc: Eric Biggers <ebiggers3@gmail.com>
+> > Signed-off-by: Stafford Horne <shorne@gmail.com>
+> > ---
+> >   lib/kobject.c | 2 +-
+> >   1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/lib/kobject.c b/lib/kobject.c
+> > index 18989b5b3b56..e876957743c8 100644
+> > --- a/lib/kobject.c
+> > +++ b/lib/kobject.c
+> > @@ -125,7 +125,7 @@ static void fill_kobj_path(struct kobject *kobj, char *path, int length)
+> >   		int cur = strlen(kobject_name(parent));
+> >   		/* back up enough to print this name with '/' */
+> >   		length -= cur;
+> > -		strncpy(path + length, kobject_name(parent), cur);
+> > +		memcpy(path + length, kobject_name(parent), cur);
+> >   		*(path + --length) = '/';
+> >   	}
+> > 
