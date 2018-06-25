@@ -1,7 +1,7 @@
 From: Kees Cook <keescook@chromium.org>
-Subject: [PATCH v2 02/11] crypto: cbc: Remove VLA usage
-Date: Mon, 25 Jun 2018 14:10:17 -0700
-Message-ID: <20180625211026.15819-3-keescook@chromium.org>
+Subject: [PATCH v2 03/11] crypto: shash: Remove VLA usage
+Date: Mon, 25 Jun 2018 14:10:18 -0700
+Message-ID: <20180625211026.15819-4-keescook@chromium.org>
 References: <20180625211026.15819-1-keescook@chromium.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -31,8 +31,9 @@ Errors-To: dm-devel-bounces@redhat.com
 List-Id: linux-crypto.vger.kernel.org
 
 In the quest to remove all stack VLA usage from the kernel[1], this
-uses the upper bounds on blocksize. Since this is always a cipher
-blocksize, use the existing cipher max blocksize.
+removes the VLAs in SHASH_DESC_ON_STACK (via crypto_shash_descsize())
+by using the maximum allowable size (which is now more clearly captured
+in a macro). Similar limits are turned into macros as well.
 
 [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
 
@@ -41,23 +42,45 @@ Cc: "David S. Miller" <davem@davemloft.net>
 Cc: linux-crypto@vger.kernel.org
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- include/crypto/cbc.h | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ crypto/shash.c        | 6 +++---
+ include/crypto/hash.h | 6 +++++-
+ 2 files changed, 8 insertions(+), 4 deletions(-)
 
-diff --git a/include/crypto/cbc.h b/include/crypto/cbc.h
-index f5b8bfc22e6d..47db0aac2ab9 100644
---- a/include/crypto/cbc.h
-+++ b/include/crypto/cbc.h
-@@ -113,7 +113,9 @@ static inline int crypto_cbc_decrypt_inplace(
- 	unsigned int bsize = crypto_skcipher_blocksize(tfm);
- 	unsigned int nbytes = walk->nbytes;
- 	u8 *src = walk->src.virt.addr;
--	u8 last_iv[bsize];
-+	u8 last_iv[MAX_CIPHER_BLOCKSIZE];
-+
-+	BUG_ON(bsize > sizeof(last_iv));
+diff --git a/crypto/shash.c b/crypto/shash.c
+index 5d732c6bb4b2..ab6902c6dae7 100644
+--- a/crypto/shash.c
++++ b/crypto/shash.c
+@@ -458,9 +458,9 @@ static int shash_prepare_alg(struct shash_alg *alg)
+ {
+ 	struct crypto_alg *base = &alg->base;
  
- 	/* Start of the last block. */
- 	src += nbytes - (nbytes & (bsize - 1)) - bsize;
+-	if (alg->digestsize > PAGE_SIZE / 8 ||
+-	    alg->descsize > PAGE_SIZE / 8 ||
+-	    alg->statesize > PAGE_SIZE / 8)
++	if (alg->digestsize > SHASH_MAX_DIGESTSIZE ||
++	    alg->descsize > SHASH_MAX_DESCSIZE ||
++	    alg->statesize > SHASH_MAX_STATESIZE)
+ 		return -EINVAL;
+ 
+ 	base->cra_type = &crypto_shash_type;
+diff --git a/include/crypto/hash.h b/include/crypto/hash.h
+index 76e432cab75d..804e87a9510e 100644
+--- a/include/crypto/hash.h
++++ b/include/crypto/hash.h
+@@ -151,9 +151,13 @@ struct shash_desc {
+ 	void *__ctx[] CRYPTO_MINALIGN_ATTR;
+ };
+ 
++#define SHASH_MAX_DIGESTSIZE    512
++#define SHASH_MAX_DESCSIZE      512
++#define SHASH_MAX_STATESIZE     512
++
+ #define SHASH_DESC_ON_STACK(shash, ctx)				  \
+ 	char __##shash##_desc[sizeof(struct shash_desc) +	  \
+-		crypto_shash_descsize(ctx)] CRYPTO_MINALIGN_ATTR; \
++		SHASH_MAX_DESCSIZE] CRYPTO_MINALIGN_ATTR; \
+ 	struct shash_desc *shash = (struct shash_desc *)__##shash##_desc
+ 
+ /**
 -- 
 2.17.1
