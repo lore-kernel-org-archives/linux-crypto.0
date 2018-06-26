@@ -1,58 +1,51 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2 11/11] crypto: skcipher: Remove VLA usage for
- SKCIPHER_REQUEST_ON_STACK
-Date: Tue, 26 Jun 2018 17:20:41 +0800
-Message-ID: <20180626092041.mxfg4lxcvxfivzc2@gondor.apana.org.au>
-References: <20180625211026.15819-1-keescook@chromium.org>
- <20180625211026.15819-12-keescook@chromium.org>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Subject: Re: cryptomgr_test / drbg_ctr: BUG: sleeping function called from
+ invalid context
+Date: Tue, 26 Jun 2018 12:33:48 +0200
+Message-ID: <CAMuHMdXfn6YuG9imLKd5nEdxhT4gWu-V8bn1LRt+M3bESaUAkA@mail.gmail.com>
+References: <CAMuHMdW_4gvQYhCxcXR+sa6dhwAshyJnhXhc36=VC=hWKB-7Jw@mail.gmail.com>
+ <14009987.cibGRJrWdm@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org,
-        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Eric Biggers <ebiggers@google.com>,
-        Alasdair Kergon <agk@redhat.com>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Lars Persson <larper@axis.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Rabin Vincent <rabinv@axis.com>,
-        Tim Chen <tim.c.chen@linux.intel.com>, qat-linux@intel.com,
-        dm-devel@redhat.com, linux-kernel@vger.kernel.org
-To: Kees Cook <keescook@chromium.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20180625211026.15819-12-keescook@chromium.org>
+In-Reply-To: <14009987.cibGRJrWdm@positron.chronox.de>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Jun 25, 2018 at 02:10:26PM -0700, Kees Cook wrote:
-> In the quest to remove all stack VLA usage from the kernel[1], this
-> caps the skcipher request size similar to other limits and adds a
-> sanity check at registration. In a manual review of the callers of
-> crypto_skcipher_set_reqsize(), the largest was 384:
-> 
-> 4	sun4i_cipher_req_ctx
-> 6	safexcel_cipher_req
-> 8	cryptd_skcipher_request_ctx
-> 80	cipher_req_ctx
-> 80	skcipher_request
-> 96	crypto_rfc3686_req_ctx
-> 104	nitrox_kcrypt_request
-> 144	mv_cesa_skcipher_std_req
-> 384	rctx
-> 
-> [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
-> 
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: linux-crypto@vger.kernel.org
-> Signed-off-by: Kees Cook <keescook@chromium.org>
+Hi Stephan,
 
-This has the same issue as the ahash reqsize patch.
+On Sun, May 20, 2018 at 9:54 PM Stephan Müller <smueller@chronox.de> wrote:
+> Am Freitag, 18. Mai 2018, 10:36:04 CEST schrieb Geert Uytterhoeven:
+> > I tried following the code path, but couldn't find where it went wrong.
+> >
+> > mutex_lock(&drbg->drbg_mutex) is called from drbg_instantiate(), which is
+> > inlined by the compiler into drbg_kcapi_seed().
+> >
+> > Do you have a clue?
+>
+> It is the first time I hear from such an issue. Yes, the DRBG should not be
+> called in atomic context. But I do not see where we have an atomic context
+> (either a spin_lock or in an interrupt handler) when we are executing the test
+> manager.
+>
+> I will keep looking.
 
-Cheers,
+Issue is gone. I assume due to commit 6e88f01206edab0e ("crypto: arm64/aes-blk
+- fix and move skcipher_walk_done out of kernel_neon_begin, _end").
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
