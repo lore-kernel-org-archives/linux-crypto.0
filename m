@@ -1,7 +1,7 @@
 From: Lionel Debieve <lionel.debieve@st.com>
-Subject: [PATCH 2/3] crypto: stm32/hash - Add power management support
-Date: Tue, 26 Jun 2018 14:52:45 +0200
-Message-ID: <1530017566-14779-3-git-send-email-lionel.debieve@st.com>
+Subject: [PATCH 3/3] crypto: stm32/crc - Add power management support
+Date: Tue, 26 Jun 2018 14:52:46 +0200
+Message-ID: <1530017566-14779-4-git-send-email-lionel.debieve@st.com>
 References: <1530017566-14779-1-git-send-email-lionel.debieve@st.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -20,170 +20,135 @@ In-Reply-To: <1530017566-14779-1-git-send-email-lionel.debieve@st.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Adding pm and pm_runtime support to STM32 HASH.
+Adding pm and pm_runtime support to STM32 CRC.
 
 Signed-off-by: Lionel Debieve <lionel.debieve@st.com>
 ---
- drivers/crypto/stm32/stm32-hash.c | 71 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 71 insertions(+)
+ drivers/crypto/stm32/stm32_crc32.c | 62 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 62 insertions(+)
 
-diff --git a/drivers/crypto/stm32/stm32-hash.c b/drivers/crypto/stm32/stm32-hash.c
-index cdc96f1..d1d7233 100644
---- a/drivers/crypto/stm32/stm32-hash.c
-+++ b/drivers/crypto/stm32/stm32-hash.c
-@@ -31,6 +31,7 @@
+diff --git a/drivers/crypto/stm32/stm32_crc32.c b/drivers/crypto/stm32/stm32_crc32.c
+index 8f09b84..04ba5e1 100644
+--- a/drivers/crypto/stm32/stm32_crc32.c
++++ b/drivers/crypto/stm32/stm32_crc32.c
+@@ -8,6 +8,7 @@
+ #include <linux/clk.h>
  #include <linux/module.h>
- #include <linux/of_device.h>
  #include <linux/platform_device.h>
 +#include <linux/pm_runtime.h>
- #include <linux/reset.h>
  
- #include <crypto/engine.h>
-@@ -121,6 +122,8 @@ enum stm32_hash_data_format {
- #define HASH_QUEUE_LENGTH		16
- #define HASH_DMA_THRESHOLD		50
+ #include <crypto/internal/hash.h>
  
-+#define HASH_AUTOSUSPEND_DELAY		50
+@@ -32,6 +33,8 @@
+ #define POLY_CRC32              0xEDB88320
+ #define POLY_CRC32C             0x82F63B78
+ 
++#define CRC_AUTOSUSPEND_DELAY	50
 +
- struct stm32_hash_ctx {
- 	struct crypto_engine_ctx enginectx;
- 	struct stm32_hash_dev	*hdev;
-@@ -814,12 +817,17 @@ static void stm32_hash_finish_req(struct ahash_request *req, int err)
- 		rctx->flags |= HASH_FLAGS_ERRORS;
+ struct stm32_crc {
+ 	struct list_head list;
+ 	struct device    *dev;
+@@ -106,6 +109,8 @@ static int stm32_crc_init(struct shash_desc *desc)
  	}
+ 	spin_unlock_bh(&crc_list.lock);
  
-+	pm_runtime_mark_last_busy(hdev->dev);
-+	pm_runtime_put_autosuspend(hdev->dev);
++	pm_runtime_get_sync(ctx->crc->dev);
 +
- 	crypto_finalize_hash_request(hdev->engine, req, err);
+ 	/* Reset, set key, poly and configure in bit reverse mode */
+ 	writel_relaxed(bitrev32(mctx->key), ctx->crc->regs + CRC_INIT);
+ 	writel_relaxed(bitrev32(mctx->poly), ctx->crc->regs + CRC_POL);
+@@ -115,6 +120,9 @@ static int stm32_crc_init(struct shash_desc *desc)
+ 	ctx->partial = readl_relaxed(ctx->crc->regs + CRC_DR);
+ 	ctx->crc->nb_pending_bytes = 0;
+ 
++	pm_runtime_mark_last_busy(ctx->crc->dev);
++	pm_runtime_put_autosuspend(ctx->crc->dev);
++
+ 	return 0;
  }
  
- static int stm32_hash_hw_init(struct stm32_hash_dev *hdev,
- 			      struct stm32_hash_request_ctx *rctx)
- {
-+	pm_runtime_get_sync(hdev->dev);
-+
- 	if (!(HASH_FLAGS_INIT & hdev->flags)) {
- 		stm32_hash_write(hdev, HASH_CR, HASH_CR_INIT);
- 		stm32_hash_write(hdev, HASH_STR, 0);
-@@ -967,6 +975,8 @@ static int stm32_hash_export(struct ahash_request *req, void *out)
- 	u32 *preg;
+@@ -126,6 +134,8 @@ static int stm32_crc_update(struct shash_desc *desc, const u8 *d8,
+ 	u32 *d32;
  	unsigned int i;
  
-+	pm_runtime_get_sync(hdev->dev);
++	pm_runtime_get_sync(crc->dev);
 +
- 	while (!(stm32_hash_read(hdev, HASH_SR) & HASH_SR_DATA_INPUT_READY))
- 		cpu_relax();
+ 	if (unlikely(crc->nb_pending_bytes)) {
+ 		while (crc->nb_pending_bytes != sizeof(u32) && length) {
+ 			/* Fill in pending data */
+@@ -149,6 +159,9 @@ static int stm32_crc_update(struct shash_desc *desc, const u8 *d8,
+ 	/* Store partial result */
+ 	ctx->partial = readl_relaxed(crc->regs + CRC_DR);
  
-@@ -982,6 +992,9 @@ static int stm32_hash_export(struct ahash_request *req, void *out)
- 	for (i = 0; i < HASH_CSR_REGISTER_NUMBER; i++)
- 		*preg++ = stm32_hash_read(hdev, HASH_CSR(i));
- 
-+	pm_runtime_mark_last_busy(hdev->dev);
-+	pm_runtime_put_autosuspend(hdev->dev);
++	pm_runtime_mark_last_busy(crc->dev);
++	pm_runtime_put_autosuspend(crc->dev);
 +
- 	memcpy(out, rctx, sizeof(*rctx));
- 
- 	return 0;
-@@ -1000,6 +1013,8 @@ static int stm32_hash_import(struct ahash_request *req, const void *in)
- 
- 	preg = rctx->hw_context;
- 
-+	pm_runtime_get_sync(hdev->dev);
-+
- 	stm32_hash_write(hdev, HASH_IMR, *preg++);
- 	stm32_hash_write(hdev, HASH_STR, *preg++);
- 	stm32_hash_write(hdev, HASH_CR, *preg);
-@@ -1009,6 +1024,9 @@ static int stm32_hash_import(struct ahash_request *req, const void *in)
- 	for (i = 0; i < HASH_CSR_REGISTER_NUMBER; i++)
- 		stm32_hash_write(hdev, HASH_CSR(i), *preg++);
- 
-+	pm_runtime_mark_last_busy(hdev->dev);
-+	pm_runtime_put_autosuspend(hdev->dev);
-+
- 	kfree(rctx->hw_context);
- 
- 	return 0;
-@@ -1482,6 +1500,13 @@ static int stm32_hash_probe(struct platform_device *pdev)
+ 	/* Check for pending data (non 32 bits) */
+ 	length &= 3;
+ 	if (likely(!length))
+@@ -272,6 +285,13 @@ static int stm32_crc_probe(struct platform_device *pdev)
  		return ret;
  	}
  
-+	pm_runtime_set_autosuspend_delay(dev, HASH_AUTOSUSPEND_DELAY);
++	pm_runtime_set_autosuspend_delay(dev, CRC_AUTOSUSPEND_DELAY);
 +	pm_runtime_use_autosuspend(dev);
 +
 +	pm_runtime_get_noresume(dev);
 +	pm_runtime_set_active(dev);
 +	pm_runtime_enable(dev);
 +
- 	hdev->rst = devm_reset_control_get(&pdev->dev, NULL);
- 	if (!IS_ERR(hdev->rst)) {
- 		reset_control_assert(hdev->rst);
-@@ -1522,6 +1547,8 @@ static int stm32_hash_probe(struct platform_device *pdev)
- 	dev_info(dev, "Init HASH done HW ver %x DMA mode %u\n",
- 		 stm32_hash_read(hdev, HASH_VER), hdev->dma_mode);
+ 	platform_set_drvdata(pdev, crc);
+ 
+ 	spin_lock(&crc_list.lock);
+@@ -287,12 +307,18 @@ static int stm32_crc_probe(struct platform_device *pdev)
+ 
+ 	dev_info(dev, "Initialized\n");
  
 +	pm_runtime_put_sync(dev);
 +
  	return 0;
+ }
  
- err_algs:
-@@ -1535,6 +1562,9 @@ static int stm32_hash_probe(struct platform_device *pdev)
- 	if (hdev->dma_lch)
- 		dma_release_channel(hdev->dma_lch);
- 
-+	pm_runtime_disable(dev);
-+	pm_runtime_put_noidle(dev);
-+
- 	clk_disable_unprepare(hdev->clk);
- 
- 	return ret;
-@@ -1543,11 +1573,16 @@ static int stm32_hash_probe(struct platform_device *pdev)
- static int stm32_hash_remove(struct platform_device *pdev)
+ static int stm32_crc_remove(struct platform_device *pdev)
  {
- 	static struct stm32_hash_dev *hdev;
-+	int ret;
- 
- 	hdev = platform_get_drvdata(pdev);
- 	if (!hdev)
- 		return -ENODEV;
- 
-+	ret = pm_runtime_get_sync(hdev->dev);
+ 	struct stm32_crc *crc = platform_get_drvdata(pdev);
++	int ret = pm_runtime_get_sync(crc->dev);
++
 +	if (ret < 0)
 +		return ret;
-+
- 	stm32_hash_unregister_algs(hdev);
  
- 	crypto_engine_exit(hdev->engine);
-@@ -1559,16 +1594,52 @@ static int stm32_hash_remove(struct platform_device *pdev)
- 	if (hdev->dma_lch)
- 		dma_release_channel(hdev->dma_lch);
+ 	spin_lock(&crc_list.lock);
+ 	list_del(&crc->list);
+@@ -300,11 +326,46 @@ static int stm32_crc_remove(struct platform_device *pdev)
  
-+	pm_runtime_disable(hdev->dev);
-+	pm_runtime_put_noidle(hdev->dev);
+ 	crypto_unregister_shashes(algs, ARRAY_SIZE(algs));
+ 
++	pm_runtime_disable(crc->dev);
++	pm_runtime_put_noidle(crc->dev);
 +
- 	clk_disable_unprepare(hdev->clk);
+ 	clk_disable_unprepare(crc->clk);
  
  	return 0;
  }
  
 +#ifdef CONFIG_PM
-+static int stm32_hash_runtime_suspend(struct device *dev)
++static int stm32_crc_runtime_suspend(struct device *dev)
 +{
-+	struct stm32_hash_dev *hdev = dev_get_drvdata(dev);
++	struct stm32_crc *crc = dev_get_drvdata(dev);
 +
-+	clk_disable_unprepare(hdev->clk);
++	clk_disable_unprepare(crc->clk);
 +
 +	return 0;
 +}
 +
-+static int stm32_hash_runtime_resume(struct device *dev)
++static int stm32_crc_runtime_resume(struct device *dev)
 +{
-+	struct stm32_hash_dev *hdev = dev_get_drvdata(dev);
++	struct stm32_crc *crc = dev_get_drvdata(dev);
 +	int ret;
 +
-+	ret = clk_prepare_enable(hdev->clk);
++	ret = clk_prepare_enable(crc->clk);
 +	if (ret) {
-+		dev_err(hdev->dev, "Failed to prepare_enable clock\n");
++		dev_err(crc->dev, "Failed to prepare_enable clock\n");
 +		return ret;
 +	}
 +
@@ -191,21 +156,23 @@ index cdc96f1..d1d7233 100644
 +}
 +#endif
 +
-+static const struct dev_pm_ops stm32_hash_pm_ops = {
++static const struct dev_pm_ops stm32_crc_pm_ops = {
 +	SET_SYSTEM_SLEEP_PM_OPS(pm_runtime_force_suspend,
 +				pm_runtime_force_resume)
-+	SET_RUNTIME_PM_OPS(stm32_hash_runtime_suspend,
-+			   stm32_hash_runtime_resume, NULL)
++	SET_RUNTIME_PM_OPS(stm32_crc_runtime_suspend,
++			   stm32_crc_runtime_resume, NULL)
 +};
 +
- static struct platform_driver stm32_hash_driver = {
- 	.probe		= stm32_hash_probe,
- 	.remove		= stm32_hash_remove,
- 	.driver		= {
- 		.name	= "stm32-hash",
-+		.pm = &stm32_hash_pm_ops,
- 		.of_match_table	= stm32_hash_of_match,
- 	}
+ static const struct of_device_id stm32_dt_ids[] = {
+ 	{ .compatible = "st,stm32f7-crc", },
+ 	{},
+@@ -316,6 +377,7 @@ static struct platform_driver stm32_crc_driver = {
+ 	.remove = stm32_crc_remove,
+ 	.driver = {
+ 		.name           = DRIVER_NAME,
++		.pm		= &stm32_crc_pm_ops,
+ 		.of_match_table = stm32_dt_ids,
+ 	},
  };
 -- 
 2.7.4
