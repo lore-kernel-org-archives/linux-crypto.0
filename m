@@ -1,57 +1,70 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH 3/3] hwrng: msm - Add support for prng v2
-Date: Wed, 27 Jun 2018 09:51:48 +0200
-Message-ID: <3762582.fWXRAqm3bE@tauon.chronox.de>
-References: <20180619142853.wgi5easw4zv6ttrb@gondor.apana.org.au> <170012246.0U45yCEtus@tauon.chronox.de> <20180627070144.GG22377@vkoul-mobl>
+From: Farhan Ali <alifm@linux.ibm.com>
+Subject: Re: [PATCH v3 0/2] Detect & register virtio-crypto algos only if it
+ can be supported by backend
+Date: Wed, 27 Jun 2018 09:22:04 -0400
+Message-ID: <92d562ad-9533-48c4-53b7-d7dd8e383a79@linux.ibm.com>
+References: <cover.1529422492.git.alifm@linux.ibm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        Stanimir Varbanov <stanimir.varbanov@linaro.org>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Matt Mackall <mpm@selenic.com>, Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-arm-msm@vger.kernel.org
-To: Vinod <vkoul@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: qemu-devel@nongnu.org, herbert@gondor.apana.org.au,
+        borntraeger@de.ibm.com, arei.gonglei@huawei.com,
+        longpeng2@huawei.com, pasic@linux.ibm.com, frankja@linux.ibm.com,
+        jasowang@redhat.com, mst@redhat.com,
+        Farhan Ali <alifm@linux.ibm.com>
+To: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180627070144.GG22377@vkoul-mobl>
+In-Reply-To: <cover.1529422492.git.alifm@linux.ibm.com>
+Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Am Mittwoch, 27. Juni 2018, 09:01:44 CEST schrieb Vinod:
 
-Hi Vinod,
+Polite ping :)
 
-> > > Currently am doing bunch of initialization in .probe (platform driver)
-> > > and I think recommendation would be to move that to .cra_init, which
-> > > seem
-> > > plausible but I don't have pdev to read hw_resource etc.. so would still
-> > > need to get that.
-> > 
-> > It seems that your allocation during probe relates to the hardware
-> > resource
-> > where you only have one in the system. Thus, doing the allocation here
-> > makes sense. And, you do not want to perform probe or such resource
-> > allocation once per crypto API RNG instance allocation. As said, there
-> > can be multiple or even they can be allocated and deallocated frequently.
-> > This in particular applies if your driver's "stdrng" has the highest prio
-> > which means that it will be allocated and deallocated frequently.
+Would like to know how to merge these patches in the mainline kernel.
+
+Thanks
+Farhan
+
+On 06/19/2018 11:41 AM, Farhan Ali wrote:
+> Hi,
 > 
-> Right, that is how I visualized it.
+> Currently the Linux virtio-crypto driver registers the crypto
+> algorithm without verifying if the backend actually supports the
+> algorithm.
 > 
-> Is there a way where we can tweak the register API to pass hw_resource
-> pointer and get that back? Would that work with the security model in
-> crypto.
-
-I would not see an easy way for that. The core register API of the kernel 
-crypto API would need to be changed.
+> This kernel patch series adds support for registering algorithm
+> with Linux crypto layer, only if the algorithm is supported by
+> the backend device. This also makes the driver more compliant with
+> the virtio-crypto spec [1].
 > 
-> I do not like globals and somehow don't feel that we should do it that
-> way
-
-Granted, I concur here.
-
-
-
-Ciao
-Stephan
+> I would appreciate any feedback or comments on this.
+> 
+> Thank you
+> Farhan
+> 
+> Reference
+> ---------
+> [1] Virtio crypto spec proposal https://lists.gnu.org/archive/html/qemu-devel/2017-12/msg00816.html
+> 
+> ChangeLog
+> ---------
+> v2 -> v3
+>      - Add Christian Borntrager's acks for the patches.
+> 
+> v1 -> v2
+>     - Modify comment as suggested by Arei (patch 1)
+>     - Modify error message as suggested by Arei (patch 2)
+> 
+> Farhan Ali (2):
+>    crypto/virtio-crypto: Read crypto services and algorithm masks
+>    crypto/virtio-crypto: Register an algo only if it's supported
+> 
+>   drivers/crypto/virtio/virtio_crypto_algs.c   | 112 ++++++++++++++++++---------
+>   drivers/crypto/virtio/virtio_crypto_common.h |  25 +++++-
+>   drivers/crypto/virtio/virtio_crypto_core.c   |  29 +++++++
+>   drivers/crypto/virtio/virtio_crypto_mgr.c    |  81 +++++++++++++++++--
+>   4 files changed, 202 insertions(+), 45 deletions(-)
+> 
