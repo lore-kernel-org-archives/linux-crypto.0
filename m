@@ -1,198 +1,69 @@
 From: Antoine Tenart <antoine.tenart@bootlin.com>
-Subject: [PATCH 06/14] crypto: inside-secure - dynamic ring configuration allocation
-Date: Thu, 28 Jun 2018 17:15:36 +0200
-Message-ID: <20180628151544.22134-7-antoine.tenart@bootlin.com>
-References: <20180628151544.22134-1-antoine.tenart@bootlin.com>
-Cc: Ofer Heifetz <oferh@marvell.com>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
-        maxime.chevallier@bootlin.com, miquel.raynal@bootlin.com,
-        nadavh@marvell.com, igall@marvell.com,
-        Antoine Tenart <antoine.tenart@bootlin.com>
+Subject: [PATCH 00/14] crypto: inside-secure - EIP197d support
+Date: Thu, 28 Jun 2018 17:15:30 +0200
+Message-ID: <20180628151544.22134-1-antoine.tenart@bootlin.com>
+Cc: Antoine Tenart <antoine.tenart@bootlin.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        thomas.petazzoni@bootlin.com, maxime.chevallier@bootlin.com,
+        miquel.raynal@bootlin.com, nadavh@marvell.com, oferh@marvell.com,
+        igall@marvell.com
 To: herbert@gondor.apana.org.au, davem@davemloft.net,
         gregory.clement@bootlin.com, andrew@lunn.ch, jason@lakedaemon.net,
         sebastian.hesselbarth@gmail.com
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180628151544.22134-1-antoine.tenart@bootlin.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-From: Ofer Heifetz <oferh@marvell.com>
+Hi all,
 
-The Inside Secure SafeXcel driver currently uses 4 rings, but the
-eip197d engines has 8 of them. This patch updates the driver so that
-rings are allocated dynamically based on the number of available rings
-supported by a given engine.
+This series introduces the EIP197d engine support to the Inside Secure
+SafeXcel cryptographic engine driver.
 
-Signed-off-by: Ofer Heifetz <oferh@marvell.com>
-Signed-off-by: Antoine Tenart <antoine.tenart@bootlin.com>
----
- drivers/crypto/inside-secure/safexcel.c      |  7 ++
- drivers/crypto/inside-secure/safexcel.h      | 68 ++++++++++----------
- drivers/crypto/inside-secure/safexcel_ring.c | 10 +--
- 3 files changed, 47 insertions(+), 38 deletions(-)
+In order to support this new engine, the driver has to be reworked in
+some ways:
+- The firmwares are specific to a given version of an EIP engine: they
+  must be stored in a version specific folder.
+- The compatibles have to be reworked, to denote the exact version of
+  the engine being used. Note that we kept the backward compatibility.
+- Not all algorithms are supported by all versions of the EIP engine.
 
-diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/inside-secure/safexcel.c
-index 579e7ae2cb14..baf8320d9c84 100644
---- a/drivers/crypto/inside-secure/safexcel.c
-+++ b/drivers/crypto/inside-secure/safexcel.c
-@@ -981,6 +981,13 @@ static int safexcel_probe(struct platform_device *pdev)
- 
- 	safexcel_configure(priv);
- 
-+	priv->ring = devm_kzalloc(dev, priv->config.rings * sizeof(*priv->ring),
-+				  GFP_KERNEL);
-+	if (!priv->ring) {
-+		ret = -ENOMEM;
-+		goto err_reg_clk;
-+	}
-+
- 	for (i = 0; i < priv->config.rings; i++) {
- 		char irq_name[6] = {0}; /* "ringX\0" */
- 		char wq_name[9] = {0}; /* "wq_ringX\0" */
-diff --git a/drivers/crypto/inside-secure/safexcel.h b/drivers/crypto/inside-secure/safexcel.h
-index f62111eba30d..f370f055fd80 100644
---- a/drivers/crypto/inside-secure/safexcel.h
-+++ b/drivers/crypto/inside-secure/safexcel.h
-@@ -487,7 +487,7 @@ enum eip197_fw {
- 	FW_NB
- };
- 
--struct safexcel_ring {
-+struct safexcel_desc_ring {
- 	void *base;
- 	void *base_end;
- 	dma_addr_t base_dma;
-@@ -528,6 +528,35 @@ struct safexcel_work_data {
- 	int ring;
- };
- 
-+struct safexcel_ring {
-+	spinlock_t lock;
-+	spinlock_t egress_lock;
-+
-+	struct list_head list;
-+	struct workqueue_struct *workqueue;
-+	struct safexcel_work_data work_data;
-+
-+	/* command/result rings */
-+	struct safexcel_desc_ring cdr;
-+	struct safexcel_desc_ring rdr;
-+
-+	/* queue */
-+	struct crypto_queue queue;
-+	spinlock_t queue_lock;
-+
-+	/* Number of requests in the engine. */
-+	int requests;
-+
-+	/* The ring is currently handling at least one request */
-+	bool busy;
-+
-+	/* Store for current requests when bailing out of the dequeueing
-+	 * function when no enough resources are available.
-+	 */
-+	struct crypto_async_request *req;
-+	struct crypto_async_request *backlog;
-+};
-+
- enum safexcel_eip_version {
- 	EIP97IES = BIT(0),
- 	EIP197B  = BIT(1),
-@@ -566,34 +595,7 @@ struct safexcel_crypto_priv {
- 
- 	atomic_t ring_used;
- 
--	struct {
--		spinlock_t lock;
--		spinlock_t egress_lock;
--
--		struct list_head list;
--		struct workqueue_struct *workqueue;
--		struct safexcel_work_data work_data;
--
--		/* command/result rings */
--		struct safexcel_ring cdr;
--		struct safexcel_ring rdr;
--
--		/* queue */
--		struct crypto_queue queue;
--		spinlock_t queue_lock;
--
--		/* Number of requests in the engine. */
--		int requests;
--
--		/* The ring is currently handling at least one request */
--		bool busy;
--
--		/* Store for current requests when bailing out of the dequeueing
--		 * function when no enough resources are available.
--		 */
--		struct crypto_async_request *req;
--		struct crypto_async_request *backlog;
--	} ring[EIP197_MAX_RINGS];
-+	struct safexcel_ring *ring;
- };
- 
- struct safexcel_context {
-@@ -651,13 +653,13 @@ int safexcel_invalidate_cache(struct crypto_async_request *async,
- 			      dma_addr_t ctxr_dma, int ring,
- 			      struct safexcel_request *request);
- int safexcel_init_ring_descriptors(struct safexcel_crypto_priv *priv,
--				   struct safexcel_ring *cdr,
--				   struct safexcel_ring *rdr);
-+				   struct safexcel_desc_ring *cdr,
-+				   struct safexcel_desc_ring *rdr);
- int safexcel_select_ring(struct safexcel_crypto_priv *priv);
- void *safexcel_ring_next_rptr(struct safexcel_crypto_priv *priv,
--			      struct safexcel_ring *ring);
-+			      struct safexcel_desc_ring *ring);
- void safexcel_ring_rollback_wptr(struct safexcel_crypto_priv *priv,
--				 struct safexcel_ring *ring);
-+				 struct safexcel_desc_ring *ring);
- struct safexcel_command_desc *safexcel_add_cdesc(struct safexcel_crypto_priv *priv,
- 						 int ring_id,
- 						 bool first, bool last,
-diff --git a/drivers/crypto/inside-secure/safexcel_ring.c b/drivers/crypto/inside-secure/safexcel_ring.c
-index c9d2a8716b5b..cfd843b834f1 100644
---- a/drivers/crypto/inside-secure/safexcel_ring.c
-+++ b/drivers/crypto/inside-secure/safexcel_ring.c
-@@ -14,8 +14,8 @@
- #include "safexcel.h"
- 
- int safexcel_init_ring_descriptors(struct safexcel_crypto_priv *priv,
--				   struct safexcel_ring *cdr,
--				   struct safexcel_ring *rdr)
-+				   struct safexcel_desc_ring *cdr,
-+				   struct safexcel_desc_ring *rdr)
- {
- 	cdr->offset = sizeof(u32) * priv->config.cd_offset;
- 	cdr->base = dmam_alloc_coherent(priv->dev,
-@@ -46,7 +46,7 @@ inline int safexcel_select_ring(struct safexcel_crypto_priv *priv)
- }
- 
- static void *safexcel_ring_next_wptr(struct safexcel_crypto_priv *priv,
--				     struct safexcel_ring *ring)
-+				     struct safexcel_desc_ring *ring)
- {
- 	void *ptr = ring->write;
- 
-@@ -62,7 +62,7 @@ static void *safexcel_ring_next_wptr(struct safexcel_crypto_priv *priv,
- }
- 
- void *safexcel_ring_next_rptr(struct safexcel_crypto_priv *priv,
--			      struct safexcel_ring *ring)
-+			      struct safexcel_desc_ring *ring)
- {
- 	void *ptr = ring->read;
- 
-@@ -78,7 +78,7 @@ void *safexcel_ring_next_rptr(struct safexcel_crypto_priv *priv,
- }
- 
- void safexcel_ring_rollback_wptr(struct safexcel_crypto_priv *priv,
--				 struct safexcel_ring *ring)
-+				 struct safexcel_desc_ring *ring)
- {
- 	if (!ring->nr)
- 		return;
+Some improvements were also made to the driver, to fully embrace the
+capabilities of this new EIP197d engine, and to improve the existing
+support.
+
+Please note the DT patches (13/14 and 14/14) should go through the mvebu
+tree.
+
+Thanks!
+Antoine
+
+Antoine Tenart (9):
+  crypto: inside-secure - move the firmware to a better location
+  crypto: inside-secure - use precise compatibles
+  Documentation/bindings: crypto: inside-secure: update the compatibles
+  crypto: inside-secure - filter out the algorithms by engine
+  crypto: inside-secure - add an invalidation flag
+  crypto: inside-secure - eip197d support
+  Documentation/bindings: crypto: inside-secure: eip197d support
+  arm64: dts: marvell: armada-cp110: update the crypto engine compatible
+  arm64: dts: marvell: armada-37xx: update the crypto engine compatible
+
+Ofer Heifetz (5):
+  crypto: inside-secure - dynamic ring configuration allocation
+  crypto: inside-secure - add multiple processing engine support
+  crypto: inside-secure - adjust the TRC configuration for EIP197D
+  crypto: inside-secure - reset CDR and RDR rings on module removal
+  crypto: inside-secure - set tx_max_cmd_queue to 32
+
+ .../crypto/inside-secure-safexcel.txt         |  15 +-
+ arch/arm64/boot/dts/marvell/armada-37xx.dtsi  |   2 +-
+ arch/arm64/boot/dts/marvell/armada-cp110.dtsi |   2 +-
+ drivers/crypto/inside-secure/safexcel.c       | 363 ++++++++++++------
+ drivers/crypto/inside-secure/safexcel.h       | 136 ++++---
+ .../crypto/inside-secure/safexcel_cipher.c    |  23 +-
+ drivers/crypto/inside-secure/safexcel_hash.c  |  18 +-
+ drivers/crypto/inside-secure/safexcel_ring.c  |  10 +-
+ 8 files changed, 370 insertions(+), 199 deletions(-)
+
 -- 
 2.17.1
