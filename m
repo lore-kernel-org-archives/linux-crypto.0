@@ -1,338 +1,48 @@
 From: Antoine Tenart <antoine.tenart@bootlin.com>
-Subject: [PATCH 08/14] crypto: inside-secure - eip197d support
-Date: Thu, 28 Jun 2018 17:15:38 +0200
-Message-ID: <20180628151544.22134-9-antoine.tenart@bootlin.com>
-References: <20180628151544.22134-1-antoine.tenart@bootlin.com>
+Subject: [PATCH 0/5] crypto: inside-secure - support more algorithms
+Date: Thu, 28 Jun 2018 17:21:52 +0200
+Message-ID: <20180628152157.23769-1-antoine.tenart@bootlin.com>
 Cc: Antoine Tenart <antoine.tenart@bootlin.com>,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         thomas.petazzoni@bootlin.com, maxime.chevallier@bootlin.com,
-        miquel.raynal@bootlin.com, nadavh@marvell.com, oferh@marvell.com,
-        igall@marvell.com
-To: herbert@gondor.apana.org.au, davem@davemloft.net,
-        gregory.clement@bootlin.com, andrew@lunn.ch, jason@lakedaemon.net,
-        sebastian.hesselbarth@gmail.com
+        gregory.clement@bootlin.com, miquel.raynal@bootlin.com,
+        nadavh@marvell.com, oferh@marvell.com, igall@marvell.com
+To: herbert@gondor.apana.org.au, davem@davemloft.net
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180628151544.22134-1-antoine.tenart@bootlin.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This patch adds support for the eip197d engine to the Inside Secure
-SafeXcel cryptographic driver. This new engine is similar to the eip197b
-and reuse most of its code.
+Hi all,
 
-Signed-off-by: Antoine Tenart <antoine.tenart@bootlin.com>
----
- drivers/crypto/inside-secure/safexcel.c       | 46 +++++++++++++++----
- drivers/crypto/inside-secure/safexcel.h       |  1 +
- .../crypto/inside-secure/safexcel_cipher.c    | 14 +++---
- drivers/crypto/inside-secure/safexcel_hash.c  | 20 ++++----
- 4 files changed, 54 insertions(+), 27 deletions(-)
+This series adds support for more algorithms in the Inside Secure
+SafeXcel cryptographic engine driver. Those new algorithms are:
+- MD5 (and its hmac).
+- DES (ECB and CBC).
+- 3DES (ECB and CBC).
 
-diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/inside-secure/safexcel.c
-index eefa6221533b..4ad1bfd77359 100644
---- a/drivers/crypto/inside-secure/safexcel.c
-+++ b/drivers/crypto/inside-secure/safexcel.c
-@@ -132,15 +132,32 @@ static int eip197_load_firmwares(struct safexcel_crypto_priv *priv)
- {
- 	const char *fw_name[] = {"ifpp.bin", "ipue.bin"};
- 	const struct firmware *fw[FW_NB];
--	char fw_path[31];
-+	char fw_path[31], *dir = NULL;
- 	int i, j, ret = 0, pe;
- 	u32 val;
- 
-+	switch (priv->version) {
-+	case EIP197B:
-+		dir = "eip197b";
-+		break;
-+	case EIP197D:
-+		dir = "eip197d";
-+		break;
-+	default:
-+		/* No firmware is required */
-+		return 0;
-+	}
-+
- 	for (i = 0; i < FW_NB; i++) {
--		snprintf(fw_path, 31, "inside-secure/eip197b/%s", fw_name[i]);
-+		snprintf(fw_path, 31, "inside-secure/%s/%s", dir, fw_name[i]);
- 		ret = request_firmware(&fw[i], fw_path, priv->dev);
- 		if (ret) {
--			/* Fallback to the old firmware location. */
-+			if (priv->version != EIP197B)
-+				goto release_fw;
-+
-+			/* Fallback to the old firmware location for the
-+			 * EIP197b.
-+			 */
- 			ret = request_firmware(&fw[i], fw_name[i], priv->dev);
- 			if (ret) {
- 				dev_err(priv->dev,
-@@ -300,7 +317,7 @@ static int safexcel_hw_init(struct safexcel_crypto_priv *priv)
- 		writel(EIP197_DxE_THR_CTRL_RESET_PE,
- 		       EIP197_HIA_DFE_THR(priv) + EIP197_HIA_DFE_THR_CTRL(pe));
- 
--		if (priv->version == EIP197B) {
-+		if (priv->version == EIP197B || priv->version == EIP197D) {
- 			/* Reset HIA input interface arbiter */
- 			writel(EIP197_HIA_RA_PE_CTRL_RESET,
- 			       EIP197_HIA_AIC(priv) + EIP197_HIA_RA_PE_CTRL(pe));
-@@ -327,7 +344,7 @@ static int safexcel_hw_init(struct safexcel_crypto_priv *priv)
- 		       EIP197_PE_IN_xBUF_THRES_MAX(7),
- 		       EIP197_PE(priv) + EIP197_PE_IN_TBUF_THRES(pe));
- 
--		if (priv->version == EIP197B) {
-+		if (priv->version == EIP197B || priv->version == EIP197D) {
- 			/* enable HIA input interface arbiter and rings */
- 			writel(EIP197_HIA_RA_PE_CTRL_EN |
- 			       GENMASK(priv->config.rings - 1, 0),
-@@ -354,7 +371,7 @@ static int safexcel_hw_init(struct safexcel_crypto_priv *priv)
- 		/* FIXME: instability issues can occur for EIP97 but disabling it impact
- 		 * performances.
- 		 */
--		if (priv->version == EIP197B)
-+		if (priv->version == EIP197B || priv->version == EIP197D)
- 			val |= EIP197_HIA_DSE_CFG_EN_SINGLE_WR;
- 		writel(val, EIP197_HIA_DSE(priv) + EIP197_HIA_DSE_CFG(pe));
- 
-@@ -440,7 +457,7 @@ static int safexcel_hw_init(struct safexcel_crypto_priv *priv)
- 	/* Clear any HIA interrupt */
- 	writel(GENMASK(30, 20), EIP197_HIA_AIC_G(priv) + EIP197_HIA_AIC_G_ACK);
- 
--	if (priv->version == EIP197B) {
-+	if (priv->version == EIP197B || priv->version == EIP197D) {
- 		eip197_trc_cache_init(priv);
- 
- 		ret = eip197_load_firmwares(priv);
-@@ -890,6 +907,7 @@ static void safexcel_configure(struct safexcel_crypto_priv *priv)
- 	/* Read number of PEs from the engine */
- 	switch (priv->version) {
- 	case EIP197B:
-+	case EIP197D:
- 		mask = EIP197_N_PES_MASK;
- 		break;
- 	default:
-@@ -914,7 +932,9 @@ static void safexcel_init_register_offsets(struct safexcel_crypto_priv *priv)
- {
- 	struct safexcel_register_offsets *offsets = &priv->offsets;
- 
--	if (priv->version == EIP197B) {
-+	switch (priv->version) {
-+	case EIP197B:
-+	case EIP197D:
- 		offsets->hia_aic	= EIP197_HIA_AIC_BASE;
- 		offsets->hia_aic_g	= EIP197_HIA_AIC_G_BASE;
- 		offsets->hia_aic_r	= EIP197_HIA_AIC_R_BASE;
-@@ -925,7 +945,8 @@ static void safexcel_init_register_offsets(struct safexcel_crypto_priv *priv)
- 		offsets->hia_dse_thr	= EIP197_HIA_DSE_THR_BASE;
- 		offsets->hia_gen_cfg	= EIP197_HIA_GEN_CFG_BASE;
- 		offsets->pe		= EIP197_PE_BASE;
--	} else {
-+		break;
-+	case EIP97IES:
- 		offsets->hia_aic	= EIP97_HIA_AIC_BASE;
- 		offsets->hia_aic_g	= EIP97_HIA_AIC_G_BASE;
- 		offsets->hia_aic_r	= EIP97_HIA_AIC_R_BASE;
-@@ -936,6 +957,7 @@ static void safexcel_init_register_offsets(struct safexcel_crypto_priv *priv)
- 		offsets->hia_dse_thr	= EIP97_HIA_DSE_THR_BASE;
- 		offsets->hia_gen_cfg	= EIP97_HIA_GEN_CFG_BASE;
- 		offsets->pe		= EIP97_PE_BASE;
-+		break;
- 	}
- }
- 
-@@ -953,7 +975,7 @@ static int safexcel_probe(struct platform_device *pdev)
- 	priv->dev = dev;
- 	priv->version = (enum safexcel_eip_version)of_device_get_match_data(dev);
- 
--	if (priv->version == EIP197B)
-+	if (priv->version == EIP197B || priv->version == EIP197D)
- 		priv->flags |= EIP197_TRC_CACHE;
- 
- 	safexcel_init_register_offsets(priv);
-@@ -1115,6 +1137,10 @@ static const struct of_device_id safexcel_of_match_table[] = {
- 		.compatible = "inside-secure,safexcel-eip197b",
- 		.data = (void *)EIP197B,
- 	},
-+	{
-+		.compatible = "inside-secure,safexcel-eip197d",
-+		.data = (void *)EIP197D,
-+	},
- 	{
- 		/* Deprecated. Kept for backward compatibility. */
- 		.compatible = "inside-secure,safexcel-eip97",
-diff --git a/drivers/crypto/inside-secure/safexcel.h b/drivers/crypto/inside-secure/safexcel.h
-index 4b7445b1af22..46c72306ca9f 100644
---- a/drivers/crypto/inside-secure/safexcel.h
-+++ b/drivers/crypto/inside-secure/safexcel.h
-@@ -566,6 +566,7 @@ struct safexcel_ring {
- enum safexcel_eip_version {
- 	EIP97IES = BIT(0),
- 	EIP197B  = BIT(1),
-+	EIP197D  = BIT(2),
- };
- 
- struct safexcel_register_offsets {
-diff --git a/drivers/crypto/inside-secure/safexcel_cipher.c b/drivers/crypto/inside-secure/safexcel_cipher.c
-index 566c97223d67..7dbe991be83c 100644
---- a/drivers/crypto/inside-secure/safexcel_cipher.c
-+++ b/drivers/crypto/inside-secure/safexcel_cipher.c
-@@ -835,7 +835,7 @@ static void safexcel_aead_cra_exit(struct crypto_tfm *tfm)
- 
- struct safexcel_alg_template safexcel_alg_ecb_aes = {
- 	.type = SAFEXCEL_ALG_TYPE_SKCIPHER,
--	.engines = EIP97IES | EIP197B,
-+	.engines = EIP97IES | EIP197B | EIP197D,
- 	.alg.skcipher = {
- 		.setkey = safexcel_skcipher_aes_setkey,
- 		.encrypt = safexcel_ecb_aes_encrypt,
-@@ -872,7 +872,7 @@ static int safexcel_cbc_aes_decrypt(struct skcipher_request *req)
- 
- struct safexcel_alg_template safexcel_alg_cbc_aes = {
- 	.type = SAFEXCEL_ALG_TYPE_SKCIPHER,
--	.engines = EIP97IES | EIP197B,
-+	.engines = EIP97IES | EIP197B | EIP197D,
- 	.alg.skcipher = {
- 		.setkey = safexcel_skcipher_aes_setkey,
- 		.encrypt = safexcel_cbc_aes_encrypt,
-@@ -942,7 +942,7 @@ static int safexcel_aead_sha1_cra_init(struct crypto_tfm *tfm)
- 
- struct safexcel_alg_template safexcel_alg_authenc_hmac_sha1_cbc_aes = {
- 	.type = SAFEXCEL_ALG_TYPE_AEAD,
--	.engines = EIP97IES | EIP197B,
-+	.engines = EIP97IES | EIP197B | EIP197D,
- 	.alg.aead = {
- 		.setkey = safexcel_aead_aes_setkey,
- 		.encrypt = safexcel_aead_encrypt,
-@@ -977,7 +977,7 @@ static int safexcel_aead_sha256_cra_init(struct crypto_tfm *tfm)
- 
- struct safexcel_alg_template safexcel_alg_authenc_hmac_sha256_cbc_aes = {
- 	.type = SAFEXCEL_ALG_TYPE_AEAD,
--	.engines = EIP97IES | EIP197B,
-+	.engines = EIP97IES | EIP197B | EIP197D,
- 	.alg.aead = {
- 		.setkey = safexcel_aead_aes_setkey,
- 		.encrypt = safexcel_aead_encrypt,
-@@ -1012,7 +1012,7 @@ static int safexcel_aead_sha224_cra_init(struct crypto_tfm *tfm)
- 
- struct safexcel_alg_template safexcel_alg_authenc_hmac_sha224_cbc_aes = {
- 	.type = SAFEXCEL_ALG_TYPE_AEAD,
--	.engines = EIP97IES | EIP197B,
-+	.engines = EIP97IES | EIP197B | EIP197D,
- 	.alg.aead = {
- 		.setkey = safexcel_aead_aes_setkey,
- 		.encrypt = safexcel_aead_encrypt,
-@@ -1047,7 +1047,7 @@ static int safexcel_aead_sha512_cra_init(struct crypto_tfm *tfm)
- 
- struct safexcel_alg_template safexcel_alg_authenc_hmac_sha512_cbc_aes = {
- 	.type = SAFEXCEL_ALG_TYPE_AEAD,
--	.engines = EIP97IES | EIP197B,
-+	.engines = EIP97IES | EIP197B | EIP197D,
- 	.alg.aead = {
- 		.setkey = safexcel_aead_aes_setkey,
- 		.encrypt = safexcel_aead_encrypt,
-@@ -1082,7 +1082,7 @@ static int safexcel_aead_sha384_cra_init(struct crypto_tfm *tfm)
- 
- struct safexcel_alg_template safexcel_alg_authenc_hmac_sha384_cbc_aes = {
- 	.type = SAFEXCEL_ALG_TYPE_AEAD,
--	.engines = EIP97IES | EIP197B,
-+	.engines = EIP97IES | EIP197B | EIP197D,
- 	.alg.aead = {
- 		.setkey = safexcel_aead_aes_setkey,
- 		.encrypt = safexcel_aead_encrypt,
-diff --git a/drivers/crypto/inside-secure/safexcel_hash.c b/drivers/crypto/inside-secure/safexcel_hash.c
-index 94841df4b6bd..c266398647bc 100644
---- a/drivers/crypto/inside-secure/safexcel_hash.c
-+++ b/drivers/crypto/inside-secure/safexcel_hash.c
-@@ -796,7 +796,7 @@ static void safexcel_ahash_cra_exit(struct crypto_tfm *tfm)
- 
- struct safexcel_alg_template safexcel_alg_sha1 = {
- 	.type = SAFEXCEL_ALG_TYPE_AHASH,
--	.engines = EIP97IES | EIP197B,
-+	.engines = EIP97IES | EIP197B | EIP197D,
- 	.alg.ahash = {
- 		.init = safexcel_sha1_init,
- 		.update = safexcel_ahash_update,
-@@ -1030,7 +1030,7 @@ static int safexcel_hmac_sha1_setkey(struct crypto_ahash *tfm, const u8 *key,
- 
- struct safexcel_alg_template safexcel_alg_hmac_sha1 = {
- 	.type = SAFEXCEL_ALG_TYPE_AHASH,
--	.engines = EIP97IES | EIP197B,
-+	.engines = EIP97IES | EIP197B | EIP197D,
- 	.alg.ahash = {
- 		.init = safexcel_hmac_sha1_init,
- 		.update = safexcel_ahash_update,
-@@ -1094,7 +1094,7 @@ static int safexcel_sha256_digest(struct ahash_request *areq)
- 
- struct safexcel_alg_template safexcel_alg_sha256 = {
- 	.type = SAFEXCEL_ALG_TYPE_AHASH,
--	.engines = EIP97IES | EIP197B,
-+	.engines = EIP97IES | EIP197B | EIP197D,
- 	.alg.ahash = {
- 		.init = safexcel_sha256_init,
- 		.update = safexcel_ahash_update,
-@@ -1157,7 +1157,7 @@ static int safexcel_sha224_digest(struct ahash_request *areq)
- 
- struct safexcel_alg_template safexcel_alg_sha224 = {
- 	.type = SAFEXCEL_ALG_TYPE_AHASH,
--	.engines = EIP97IES | EIP197B,
-+	.engines = EIP97IES | EIP197B | EIP197D,
- 	.alg.ahash = {
- 		.init = safexcel_sha224_init,
- 		.update = safexcel_ahash_update,
-@@ -1213,7 +1213,7 @@ static int safexcel_hmac_sha224_digest(struct ahash_request *areq)
- 
- struct safexcel_alg_template safexcel_alg_hmac_sha224 = {
- 	.type = SAFEXCEL_ALG_TYPE_AHASH,
--	.engines = EIP97IES | EIP197B,
-+	.engines = EIP97IES | EIP197B | EIP197D,
- 	.alg.ahash = {
- 		.init = safexcel_hmac_sha224_init,
- 		.update = safexcel_ahash_update,
-@@ -1270,7 +1270,7 @@ static int safexcel_hmac_sha256_digest(struct ahash_request *areq)
- 
- struct safexcel_alg_template safexcel_alg_hmac_sha256 = {
- 	.type = SAFEXCEL_ALG_TYPE_AHASH,
--	.engines = EIP97IES | EIP197B,
-+	.engines = EIP97IES | EIP197B | EIP197D,
- 	.alg.ahash = {
- 		.init = safexcel_hmac_sha256_init,
- 		.update = safexcel_ahash_update,
-@@ -1342,7 +1342,7 @@ static int safexcel_sha512_digest(struct ahash_request *areq)
- 
- struct safexcel_alg_template safexcel_alg_sha512 = {
- 	.type = SAFEXCEL_ALG_TYPE_AHASH,
--	.engines = EIP97IES | EIP197B,
-+	.engines = EIP97IES | EIP197B | EIP197D,
- 	.alg.ahash = {
- 		.init = safexcel_sha512_init,
- 		.update = safexcel_ahash_update,
-@@ -1413,7 +1413,7 @@ static int safexcel_sha384_digest(struct ahash_request *areq)
- 
- struct safexcel_alg_template safexcel_alg_sha384 = {
- 	.type = SAFEXCEL_ALG_TYPE_AHASH,
--	.engines = EIP97IES | EIP197B,
-+	.engines = EIP97IES | EIP197B | EIP197D,
- 	.alg.ahash = {
- 		.init = safexcel_sha384_init,
- 		.update = safexcel_ahash_update,
-@@ -1469,7 +1469,7 @@ static int safexcel_hmac_sha512_digest(struct ahash_request *areq)
- 
- struct safexcel_alg_template safexcel_alg_hmac_sha512 = {
- 	.type = SAFEXCEL_ALG_TYPE_AHASH,
--	.engines = EIP97IES | EIP197B,
-+	.engines = EIP97IES | EIP197B | EIP197D,
- 	.alg.ahash = {
- 		.init = safexcel_hmac_sha512_init,
- 		.update = safexcel_ahash_update,
-@@ -1526,7 +1526,7 @@ static int safexcel_hmac_sha384_digest(struct ahash_request *areq)
- 
- struct safexcel_alg_template safexcel_alg_hmac_sha384 = {
- 	.type = SAFEXCEL_ALG_TYPE_AHASH,
--	.engines = EIP97IES | EIP197B,
-+	.engines = EIP97IES | EIP197B | EIP197D,
- 	.alg.ahash = {
- 		.init = safexcel_hmac_sha384_init,
- 		.update = safexcel_ahash_update,
+The last patch was made on top of the algorithm additions, to enhance
+the driver's performances.
+
+This series should be applied on top of another one:
+https://lkml.org/lkml/2018/6/28/516
+
+Thanks!
+Antoine
+
+Ofer Heifetz (5):
+  crypto: inside-secure - md5 support
+  crypto: inside-secure - hmac(md5) support
+  crypto: inside-secure - ecb(des) and cbc(des) support
+  crypto: inside-secure - ecb(des3_ede) and cbc(des3_ede) support
+  crypto: inside-secure - remove request list to improve performance
+
+ drivers/crypto/Kconfig                        |   2 +
+ drivers/crypto/inside-secure/safexcel.c       | 100 ++---
+ drivers/crypto/inside-secure/safexcel.h       |  41 +-
+ .../crypto/inside-secure/safexcel_cipher.c    | 369 ++++++++++++++----
+ drivers/crypto/inside-secure/safexcel_hash.c  | 157 ++++++--
+ drivers/crypto/inside-secure/safexcel_ring.c  |  48 ++-
+ 6 files changed, 553 insertions(+), 164 deletions(-)
+
 -- 
 2.17.1
