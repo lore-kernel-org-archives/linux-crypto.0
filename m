@@ -1,13 +1,13 @@
 From: Antoine Tenart <antoine.tenart@bootlin.com>
-Subject: [PATCH 02/14] crypto: inside-secure - use precise compatibles
-Date: Thu, 28 Jun 2018 17:15:32 +0200
-Message-ID: <20180628151544.22134-3-antoine.tenart@bootlin.com>
+Subject: [PATCH 07/14] crypto: inside-secure - add multiple processing engine support
+Date: Thu, 28 Jun 2018 17:15:37 +0200
+Message-ID: <20180628151544.22134-8-antoine.tenart@bootlin.com>
 References: <20180628151544.22134-1-antoine.tenart@bootlin.com>
-Cc: Antoine Tenart <antoine.tenart@bootlin.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        thomas.petazzoni@bootlin.com, maxime.chevallier@bootlin.com,
-        miquel.raynal@bootlin.com, nadavh@marvell.com, oferh@marvell.com,
-        igall@marvell.com
+Cc: Ofer Heifetz <oferh@marvell.com>, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
+        maxime.chevallier@bootlin.com, miquel.raynal@bootlin.com,
+        nadavh@marvell.com, igall@marvell.com,
+        Antoine Tenart <antoine.tenart@bootlin.com>
 To: herbert@gondor.apana.org.au, davem@davemloft.net,
         gregory.clement@bootlin.com, andrew@lunn.ch, jason@lakedaemon.net,
         sebastian.hesselbarth@gmail.com
@@ -16,228 +16,396 @@ In-Reply-To: <20180628151544.22134-1-antoine.tenart@bootlin.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-At first we used two compatibles in the SafeXcel driver, named after the
-engine revision: eip97 and eip197. However this family of engines has
-more precise versions and in fact we're supporting the eip97ies and
-eip197b. More versions will be supported in the future, such as the
-eip197d, and we'll need to differentiate them.
+From: Ofer Heifetz <oferh@marvell.com>
 
-This patch fixes the compatibles used in the driver, to now use precise
-ones. The two historical compatibles are kept for backward
-compatibility.
+So far a single processing engine (PE) was configured and used in the
+Inside Secure SafeXcel cryptographic engine driver. Some versions have
+more than a single PE. This patch rework the driver's initialization to
+take this into account and to allow configuring more than one PE.
 
+Signed-off-by: Ofer Heifetz <oferh@marvell.com>
+[Antoine: some reworks and commit message.]
 Signed-off-by: Antoine Tenart <antoine.tenart@bootlin.com>
 ---
- drivers/crypto/inside-secure/safexcel.c       | 24 +++++++++++++------
- drivers/crypto/inside-secure/safexcel.h       |  4 ++--
- .../crypto/inside-secure/safexcel_cipher.c    | 16 ++++++-------
- drivers/crypto/inside-secure/safexcel_hash.c  |  8 +++----
- 4 files changed, 31 insertions(+), 21 deletions(-)
+ drivers/crypto/inside-secure/safexcel.c | 224 +++++++++++++-----------
+ drivers/crypto/inside-secure/safexcel.h |  44 +++--
+ 2 files changed, 150 insertions(+), 118 deletions(-)
 
 diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/inside-secure/safexcel.c
-index a04d39231aaf..c28ab137d721 100644
+index baf8320d9c84..eefa6221533b 100644
 --- a/drivers/crypto/inside-secure/safexcel.c
 +++ b/drivers/crypto/inside-secure/safexcel.c
-@@ -294,7 +294,7 @@ static int safexcel_hw_init(struct safexcel_crypto_priv *priv)
- 	writel(EIP197_DxE_THR_CTRL_RESET_PE,
- 	       EIP197_HIA_DFE_THR(priv) + EIP197_HIA_DFE_THR_CTRL);
+@@ -98,7 +98,7 @@ static void eip197_trc_cache_init(struct safexcel_crypto_priv *priv)
+ }
  
--	if (priv->version == EIP197) {
-+	if (priv->version == EIP197B) {
- 		/* Reset HIA input interface arbiter */
- 		writel(EIP197_HIA_RA_PE_CTRL_RESET,
- 		       EIP197_HIA_AIC(priv) + EIP197_HIA_RA_PE_CTRL);
-@@ -317,7 +317,7 @@ static int safexcel_hw_init(struct safexcel_crypto_priv *priv)
- 	writel(EIP197_PE_IN_xBUF_THRES_MIN(6) | EIP197_PE_IN_xBUF_THRES_MAX(7),
- 	       EIP197_PE(priv) + EIP197_PE_IN_TBUF_THRES);
- 
--	if (priv->version == EIP197) {
-+	if (priv->version == EIP197B) {
- 		/* enable HIA input interface arbiter and rings */
- 		writel(EIP197_HIA_RA_PE_CTRL_EN |
- 		       GENMASK(priv->config.rings - 1, 0),
-@@ -343,7 +343,7 @@ static int safexcel_hw_init(struct safexcel_crypto_priv *priv)
- 	/* FIXME: instability issues can occur for EIP97 but disabling it impact
- 	 * performances.
- 	 */
--	if (priv->version == EIP197)
-+	if (priv->version == EIP197B)
- 		val |= EIP197_HIA_DSE_CFG_EN_SINGLE_WR;
- 	writel(val, EIP197_HIA_DSE(priv) + EIP197_HIA_DSE_CFG);
- 
-@@ -425,7 +425,7 @@ static int safexcel_hw_init(struct safexcel_crypto_priv *priv)
- 	/* Clear any HIA interrupt */
- 	writel(GENMASK(30, 20), EIP197_HIA_AIC_G(priv) + EIP197_HIA_AIC_G_ACK);
- 
--	if (priv->version == EIP197) {
-+	if (priv->version == EIP197B) {
- 		eip197_trc_cache_init(priv);
- 
- 		ret = eip197_load_firmwares(priv);
-@@ -879,7 +879,7 @@ static void safexcel_init_register_offsets(struct safexcel_crypto_priv *priv)
+ static void eip197_write_firmware(struct safexcel_crypto_priv *priv,
+-				  const struct firmware *fw, u32 ctrl,
++				  const struct firmware *fw, int pe, u32 ctrl,
+ 				  u32 prog_en)
  {
- 	struct safexcel_register_offsets *offsets = &priv->offsets;
+ 	const u32 *data = (const u32 *)fw->data;
+@@ -112,7 +112,7 @@ static void eip197_write_firmware(struct safexcel_crypto_priv *priv,
+ 	       EIP197_PE(priv) + ctrl);
  
--	if (priv->version == EIP197) {
-+	if (priv->version == EIP197B) {
- 		offsets->hia_aic	= EIP197_HIA_AIC_BASE;
- 		offsets->hia_aic_g	= EIP197_HIA_AIC_G_BASE;
- 		offsets->hia_aic_r	= EIP197_HIA_AIC_R_BASE;
-@@ -1063,12 +1063,22 @@ static int safexcel_remove(struct platform_device *pdev)
+ 	/* Enable access to the program memory */
+-	writel(prog_en, EIP197_PE(priv) + EIP197_PE_ICE_RAM_CTRL);
++	writel(prog_en, EIP197_PE(priv) + EIP197_PE_ICE_RAM_CTRL(pe));
  
- static const struct of_device_id safexcel_of_match_table[] = {
- 	{
-+		.compatible = "inside-secure,safexcel-eip97ies",
-+		.data = (void *)EIP97IES,
-+	},
-+	{
-+		.compatible = "inside-secure,safexcel-eip197b",
-+		.data = (void *)EIP197B,
-+	},
-+	{
-+		/* Deprecated. Kept for backward compatibility. */
- 		.compatible = "inside-secure,safexcel-eip97",
--		.data = (void *)EIP97,
-+		.data = (void *)EIP97IES,
- 	},
- 	{
-+		/* Deprecated. Kept for backward compatibility. */
- 		.compatible = "inside-secure,safexcel-eip197",
--		.data = (void *)EIP197,
-+		.data = (void *)EIP197B,
- 	},
- 	{},
- };
-diff --git a/drivers/crypto/inside-secure/safexcel.h b/drivers/crypto/inside-secure/safexcel.h
-index 5d6b3b705d0c..6e6bdad6a6f5 100644
---- a/drivers/crypto/inside-secure/safexcel.h
-+++ b/drivers/crypto/inside-secure/safexcel.h
-@@ -529,8 +529,8 @@ struct safexcel_work_data {
- };
+ 	/* Write the firmware */
+ 	for (i = 0; i < fw->size / sizeof(u32); i++)
+@@ -120,7 +120,7 @@ static void eip197_write_firmware(struct safexcel_crypto_priv *priv,
+ 		       priv->base + EIP197_CLASSIFICATION_RAMS + i * sizeof(u32));
  
- enum safexcel_eip_version {
--	EIP97,
--	EIP197,
-+	EIP97IES,
-+	EIP197B,
- };
+ 	/* Disable access to the program memory */
+-	writel(0, EIP197_PE(priv) + EIP197_PE_ICE_RAM_CTRL);
++	writel(0, EIP197_PE(priv) + EIP197_PE_ICE_RAM_CTRL(pe));
  
- struct safexcel_register_offsets {
-diff --git a/drivers/crypto/inside-secure/safexcel_cipher.c b/drivers/crypto/inside-secure/safexcel_cipher.c
-index ca4bc2d28d2a..845546129d09 100644
---- a/drivers/crypto/inside-secure/safexcel_cipher.c
-+++ b/drivers/crypto/inside-secure/safexcel_cipher.c
-@@ -145,7 +145,7 @@ static int safexcel_skcipher_aes_setkey(struct crypto_skcipher *ctfm,
- 		return ret;
+ 	/* Release engine from reset */
+ 	val = readl(EIP197_PE(priv) + ctrl);
+@@ -133,7 +133,7 @@ static int eip197_load_firmwares(struct safexcel_crypto_priv *priv)
+ 	const char *fw_name[] = {"ifpp.bin", "ipue.bin"};
+ 	const struct firmware *fw[FW_NB];
+ 	char fw_path[31];
+-	int i, j, ret = 0;
++	int i, j, ret = 0, pe;
+ 	u32 val;
+ 
+ 	for (i = 0; i < FW_NB; i++) {
+@@ -151,22 +151,26 @@ static int eip197_load_firmwares(struct safexcel_crypto_priv *priv)
+ 		}
  	}
  
--	if (priv->version == EIP197 && ctx->base.ctxr_dma) {
-+	if (priv->version == EIP197B && ctx->base.ctxr_dma) {
- 		for (i = 0; i < len / sizeof(u32); i++) {
- 			if (ctx->key[i] != cpu_to_le32(aes.key_enc[i])) {
- 				ctx->base.needs_inv = true;
-@@ -179,7 +179,7 @@ static int safexcel_aead_aes_setkey(struct crypto_aead *ctfm, const u8 *key,
- 		goto badkey;
+-	/* Clear the scratchpad memory */
+-	val = readl(EIP197_PE(priv) + EIP197_PE_ICE_SCRATCH_CTRL);
+-	val |= EIP197_PE_ICE_SCRATCH_CTRL_CHANGE_TIMER |
+-	       EIP197_PE_ICE_SCRATCH_CTRL_TIMER_EN |
+-	       EIP197_PE_ICE_SCRATCH_CTRL_SCRATCH_ACCESS |
+-	       EIP197_PE_ICE_SCRATCH_CTRL_CHANGE_ACCESS;
+-	writel(val, EIP197_PE(priv) + EIP197_PE_ICE_SCRATCH_CTRL);
+-
+-	memset_io(EIP197_PE(priv) + EIP197_PE_ICE_SCRATCH_RAM, 0,
+-		  EIP197_NUM_OF_SCRATCH_BLOCKS * sizeof(u32));
+-
+-	eip197_write_firmware(priv, fw[FW_IFPP], EIP197_PE_ICE_FPP_CTRL,
+-			      EIP197_PE_ICE_RAM_CTRL_FPP_PROG_EN);
+-
+-	eip197_write_firmware(priv, fw[FW_IPUE], EIP197_PE_ICE_PUE_CTRL,
+-			      EIP197_PE_ICE_RAM_CTRL_PUE_PROG_EN);
++	for (pe = 0; pe < priv->config.pes; pe++) {
++		/* Clear the scratchpad memory */
++		val = readl(EIP197_PE(priv) + EIP197_PE_ICE_SCRATCH_CTRL(pe));
++		val |= EIP197_PE_ICE_SCRATCH_CTRL_CHANGE_TIMER |
++		       EIP197_PE_ICE_SCRATCH_CTRL_TIMER_EN |
++		       EIP197_PE_ICE_SCRATCH_CTRL_SCRATCH_ACCESS |
++		       EIP197_PE_ICE_SCRATCH_CTRL_CHANGE_ACCESS;
++		writel(val, EIP197_PE(priv) + EIP197_PE_ICE_SCRATCH_CTRL(pe));
++
++		memset_io(EIP197_PE(priv) + EIP197_PE_ICE_SCRATCH_RAM(pe), 0,
++			  EIP197_NUM_OF_SCRATCH_BLOCKS * sizeof(u32));
++
++		eip197_write_firmware(priv, fw[FW_IFPP], pe,
++				      EIP197_PE_ICE_FPP_CTRL(pe),
++				      EIP197_PE_ICE_RAM_CTRL_FPP_PROG_EN);
++
++		eip197_write_firmware(priv, fw[FW_IPUE], pe,
++				      EIP197_PE_ICE_PUE_CTRL(pe),
++				      EIP197_PE_ICE_RAM_CTRL_PUE_PROG_EN);
++	}
  
- 	/* Encryption key */
--	if (priv->version == EIP197 && ctx->base.ctxr_dma &&
-+	if (priv->version == EIP197B && ctx->base.ctxr_dma &&
- 	    memcmp(ctx->key, keys.enckey, keys.enckeylen))
- 		ctx->base.needs_inv = true;
+ release_fw:
+ 	for (j = 0; j < i; j++)
+@@ -262,7 +266,7 @@ static int safexcel_hw_setup_rdesc_rings(struct safexcel_crypto_priv *priv)
+ static int safexcel_hw_init(struct safexcel_crypto_priv *priv)
+ {
+ 	u32 version, val;
+-	int i, ret;
++	int i, ret, pe;
  
-@@ -218,7 +218,7 @@ static int safexcel_aead_aes_setkey(struct crypto_aead *ctfm, const u8 *key,
- 	crypto_aead_set_flags(ctfm, crypto_aead_get_flags(ctfm) &
- 				    CRYPTO_TFM_RES_MASK);
+ 	/* Determine endianess and configure byte swap */
+ 	version = readl(EIP197_HIA_AIC(priv) + EIP197_HIA_VERSION);
+@@ -288,83 +292,92 @@ static int safexcel_hw_init(struct safexcel_crypto_priv *priv)
+ 	/* Clear any pending interrupt */
+ 	writel(GENMASK(31, 0), EIP197_HIA_AIC_G(priv) + EIP197_HIA_AIC_G_ACK);
  
--	if (priv->version == EIP197 && ctx->base.ctxr_dma &&
-+	if (priv->version == EIP197B && ctx->base.ctxr_dma &&
- 	    (memcmp(ctx->ipad, istate.state, ctx->state_sz) ||
- 	     memcmp(ctx->opad, ostate.state, ctx->state_sz)))
- 		ctx->base.needs_inv = true;
-@@ -612,7 +612,7 @@ static int safexcel_skcipher_send(struct crypto_async_request *async, int ring,
- 	struct safexcel_crypto_priv *priv = ctx->priv;
- 	int ret;
+-	/* Data Fetch Engine configuration */
+-
+-	/* Reset all DFE threads */
+-	writel(EIP197_DxE_THR_CTRL_RESET_PE,
+-	       EIP197_HIA_DFE_THR(priv) + EIP197_HIA_DFE_THR_CTRL);
+-
+-	if (priv->version == EIP197B) {
+-		/* Reset HIA input interface arbiter */
+-		writel(EIP197_HIA_RA_PE_CTRL_RESET,
+-		       EIP197_HIA_AIC(priv) + EIP197_HIA_RA_PE_CTRL);
+-	}
++	/* Processing Engine configuration */
++	for (pe = 0; pe < priv->config.pes; pe++) {
++		/* Data Fetch Engine configuration */
  
--	BUG_ON(priv->version == EIP97 && sreq->needs_inv);
-+	BUG_ON(priv->version == EIP97IES && sreq->needs_inv);
+-	/* DMA transfer size to use */
+-	val = EIP197_HIA_DFE_CFG_DIS_DEBUG;
+-	val |= EIP197_HIA_DxE_CFG_MIN_DATA_SIZE(6) | EIP197_HIA_DxE_CFG_MAX_DATA_SIZE(9);
+-	val |= EIP197_HIA_DxE_CFG_MIN_CTRL_SIZE(6) | EIP197_HIA_DxE_CFG_MAX_CTRL_SIZE(7);
+-	val |= EIP197_HIA_DxE_CFG_DATA_CACHE_CTRL(RD_CACHE_3BITS);
+-	val |= EIP197_HIA_DxE_CFG_CTRL_CACHE_CTRL(RD_CACHE_3BITS);
+-	writel(val, EIP197_HIA_DFE(priv) + EIP197_HIA_DFE_CFG);
++		/* Reset all DFE threads */
++		writel(EIP197_DxE_THR_CTRL_RESET_PE,
++		       EIP197_HIA_DFE_THR(priv) + EIP197_HIA_DFE_THR_CTRL(pe));
  
- 	if (sreq->needs_inv)
- 		ret = safexcel_cipher_send_inv(async, ring, request, commands,
-@@ -635,7 +635,7 @@ static int safexcel_aead_send(struct crypto_async_request *async, int ring,
- 	struct safexcel_crypto_priv *priv = ctx->priv;
- 	int ret;
+-	/* Leave the DFE threads reset state */
+-	writel(0, EIP197_HIA_DFE_THR(priv) + EIP197_HIA_DFE_THR_CTRL);
++		if (priv->version == EIP197B) {
++			/* Reset HIA input interface arbiter */
++			writel(EIP197_HIA_RA_PE_CTRL_RESET,
++			       EIP197_HIA_AIC(priv) + EIP197_HIA_RA_PE_CTRL(pe));
++		}
  
--	BUG_ON(priv->version == EIP97 && sreq->needs_inv);
-+	BUG_ON(priv->version == EIP97IES && sreq->needs_inv);
+-	/* Configure the procesing engine thresholds */
+-	writel(EIP197_PE_IN_xBUF_THRES_MIN(6) | EIP197_PE_IN_xBUF_THRES_MAX(9),
+-	       EIP197_PE(priv) + EIP197_PE_IN_DBUF_THRES);
+-	writel(EIP197_PE_IN_xBUF_THRES_MIN(6) | EIP197_PE_IN_xBUF_THRES_MAX(7),
+-	       EIP197_PE(priv) + EIP197_PE_IN_TBUF_THRES);
++		/* DMA transfer size to use */
++		val = EIP197_HIA_DFE_CFG_DIS_DEBUG;
++		val |= EIP197_HIA_DxE_CFG_MIN_DATA_SIZE(6) |
++		       EIP197_HIA_DxE_CFG_MAX_DATA_SIZE(9);
++		val |= EIP197_HIA_DxE_CFG_MIN_CTRL_SIZE(6) |
++		       EIP197_HIA_DxE_CFG_MAX_CTRL_SIZE(7);
++		val |= EIP197_HIA_DxE_CFG_DATA_CACHE_CTRL(RD_CACHE_3BITS);
++		val |= EIP197_HIA_DxE_CFG_CTRL_CACHE_CTRL(RD_CACHE_3BITS);
++		writel(val, EIP197_HIA_DFE(priv) + EIP197_HIA_DFE_CFG(pe));
++
++		/* Leave the DFE threads reset state */
++		writel(0, EIP197_HIA_DFE_THR(priv) + EIP197_HIA_DFE_THR_CTRL(pe));
++
++		/* Configure the processing engine thresholds */
++		writel(EIP197_PE_IN_xBUF_THRES_MIN(6) |
++		       EIP197_PE_IN_xBUF_THRES_MAX(9),
++		       EIP197_PE(priv) + EIP197_PE_IN_DBUF_THRES(pe));
++		writel(EIP197_PE_IN_xBUF_THRES_MIN(6) |
++		       EIP197_PE_IN_xBUF_THRES_MAX(7),
++		       EIP197_PE(priv) + EIP197_PE_IN_TBUF_THRES(pe));
++
++		if (priv->version == EIP197B) {
++			/* enable HIA input interface arbiter and rings */
++			writel(EIP197_HIA_RA_PE_CTRL_EN |
++			       GENMASK(priv->config.rings - 1, 0),
++			       EIP197_HIA_AIC(priv) + EIP197_HIA_RA_PE_CTRL(pe));
++		}
  
- 	if (sreq->needs_inv)
- 		ret = safexcel_cipher_send_inv(async, ring, request, commands,
-@@ -725,7 +725,7 @@ static int safexcel_aes(struct crypto_async_request *base,
- 	ctx->mode = mode;
+-	if (priv->version == EIP197B) {
+-		/* enable HIA input interface arbiter and rings */
+-		writel(EIP197_HIA_RA_PE_CTRL_EN |
+-		       GENMASK(priv->config.rings - 1, 0),
+-		       EIP197_HIA_AIC(priv) + EIP197_HIA_RA_PE_CTRL);
++		/* Data Store Engine configuration */
++
++		/* Reset all DSE threads */
++		writel(EIP197_DxE_THR_CTRL_RESET_PE,
++		       EIP197_HIA_DSE_THR(priv) + EIP197_HIA_DSE_THR_CTRL(pe));
++
++		/* Wait for all DSE threads to complete */
++		while ((readl(EIP197_HIA_DSE_THR(priv) + EIP197_HIA_DSE_THR_STAT(pe)) &
++			GENMASK(15, 12)) != GENMASK(15, 12))
++			;
++
++		/* DMA transfer size to use */
++		val = EIP197_HIA_DSE_CFG_DIS_DEBUG;
++		val |= EIP197_HIA_DxE_CFG_MIN_DATA_SIZE(7) |
++		       EIP197_HIA_DxE_CFG_MAX_DATA_SIZE(8);
++		val |= EIP197_HIA_DxE_CFG_DATA_CACHE_CTRL(WR_CACHE_3BITS);
++		val |= EIP197_HIA_DSE_CFG_ALWAYS_BUFFERABLE;
++		/* FIXME: instability issues can occur for EIP97 but disabling it impact
++		 * performances.
++		 */
++		if (priv->version == EIP197B)
++			val |= EIP197_HIA_DSE_CFG_EN_SINGLE_WR;
++		writel(val, EIP197_HIA_DSE(priv) + EIP197_HIA_DSE_CFG(pe));
++
++		/* Leave the DSE threads reset state */
++		writel(0, EIP197_HIA_DSE_THR(priv) + EIP197_HIA_DSE_THR_CTRL(pe));
++
++		/* Configure the procesing engine thresholds */
++		writel(EIP197_PE_OUT_DBUF_THRES_MIN(7) |
++		       EIP197_PE_OUT_DBUF_THRES_MAX(8),
++		       EIP197_PE(priv) + EIP197_PE_OUT_DBUF_THRES(pe));
++
++		/* Processing Engine configuration */
++
++		/* H/W capabilities selection */
++		val = EIP197_FUNCTION_RSVD;
++		val |= EIP197_PROTOCOL_ENCRYPT_ONLY | EIP197_PROTOCOL_HASH_ONLY;
++		val |= EIP197_PROTOCOL_ENCRYPT_HASH | EIP197_PROTOCOL_HASH_DECRYPT;
++		val |= EIP197_ALG_AES_ECB | EIP197_ALG_AES_CBC;
++		val |= EIP197_ALG_SHA1 | EIP197_ALG_HMAC_SHA1;
++		val |= EIP197_ALG_SHA2 | EIP197_ALG_HMAC_SHA2;
++		writel(val, EIP197_PE(priv) + EIP197_PE_EIP96_FUNCTION_EN(pe));
+ 	}
  
- 	if (ctx->base.ctxr) {
--		if (priv->version == EIP197 && ctx->base.needs_inv) {
-+		if (priv->version == EIP197B && ctx->base.needs_inv) {
- 			sreq->needs_inv = true;
- 			ctx->base.needs_inv = false;
- 		}
-@@ -802,7 +802,7 @@ static void safexcel_skcipher_cra_exit(struct crypto_tfm *tfm)
- 	if (safexcel_cipher_cra_exit(tfm))
- 		return;
+-	/* Data Store Engine configuration */
+-
+-	/* Reset all DSE threads */
+-	writel(EIP197_DxE_THR_CTRL_RESET_PE,
+-	       EIP197_HIA_DSE_THR(priv) + EIP197_HIA_DSE_THR_CTRL);
+-
+-	/* Wait for all DSE threads to complete */
+-	while ((readl(EIP197_HIA_DSE_THR(priv) + EIP197_HIA_DSE_THR_STAT) &
+-		GENMASK(15, 12)) != GENMASK(15, 12))
+-		;
+-
+-	/* DMA transfer size to use */
+-	val = EIP197_HIA_DSE_CFG_DIS_DEBUG;
+-	val |= EIP197_HIA_DxE_CFG_MIN_DATA_SIZE(7) | EIP197_HIA_DxE_CFG_MAX_DATA_SIZE(8);
+-	val |= EIP197_HIA_DxE_CFG_DATA_CACHE_CTRL(WR_CACHE_3BITS);
+-	val |= EIP197_HIA_DSE_CFG_ALWAYS_BUFFERABLE;
+-	/* FIXME: instability issues can occur for EIP97 but disabling it impact
+-	 * performances.
+-	 */
+-	if (priv->version == EIP197B)
+-		val |= EIP197_HIA_DSE_CFG_EN_SINGLE_WR;
+-	writel(val, EIP197_HIA_DSE(priv) + EIP197_HIA_DSE_CFG);
+-
+-	/* Leave the DSE threads reset state */
+-	writel(0, EIP197_HIA_DSE_THR(priv) + EIP197_HIA_DSE_THR_CTRL);
+-
+-	/* Configure the procesing engine thresholds */
+-	writel(EIP197_PE_OUT_DBUF_THRES_MIN(7) | EIP197_PE_OUT_DBUF_THRES_MAX(8),
+-	       EIP197_PE(priv) + EIP197_PE_OUT_DBUF_THRES);
+-
+-	/* Processing Engine configuration */
+-
+-	/* H/W capabilities selection */
+-	val = EIP197_FUNCTION_RSVD;
+-	val |= EIP197_PROTOCOL_ENCRYPT_ONLY | EIP197_PROTOCOL_HASH_ONLY;
+-	val |= EIP197_PROTOCOL_ENCRYPT_HASH | EIP197_PROTOCOL_HASH_DECRYPT;
+-	val |= EIP197_ALG_AES_ECB | EIP197_ALG_AES_CBC;
+-	val |= EIP197_ALG_SHA1 | EIP197_ALG_HMAC_SHA1;
+-	val |= EIP197_ALG_SHA2 | EIP197_ALG_HMAC_SHA2;
+-	writel(val, EIP197_PE(priv) + EIP197_PE_EIP96_FUNCTION_EN);
+-
+ 	/* Command Descriptor Rings prepare */
+ 	for (i = 0; i < priv->config.rings; i++) {
+ 		/* Clear interrupts for this ring */
+@@ -414,13 +427,15 @@ static int safexcel_hw_init(struct safexcel_crypto_priv *priv)
+ 		       EIP197_HIA_RDR(priv, i) + EIP197_HIA_xDR_RING_SIZE);
+ 	}
  
--	if (priv->version == EIP197) {
-+	if (priv->version == EIP197B) {
- 		ret = safexcel_skcipher_exit_inv(tfm);
- 		if (ret)
- 			dev_warn(priv->dev, "skcipher: invalidation error %d\n",
-@@ -822,7 +822,7 @@ static void safexcel_aead_cra_exit(struct crypto_tfm *tfm)
- 	if (safexcel_cipher_cra_exit(tfm))
- 		return;
+-	/* Enable command descriptor rings */
+-	writel(EIP197_DxE_THR_CTRL_EN | GENMASK(priv->config.rings - 1, 0),
+-	       EIP197_HIA_DFE_THR(priv) + EIP197_HIA_DFE_THR_CTRL);
++	for (pe = 0; pe < priv->config.pes; pe++) {
++		/* Enable command descriptor rings */
++		writel(EIP197_DxE_THR_CTRL_EN | GENMASK(priv->config.rings - 1, 0),
++		       EIP197_HIA_DFE_THR(priv) + EIP197_HIA_DFE_THR_CTRL(pe));
  
--	if (priv->version == EIP197) {
-+	if (priv->version == EIP197B) {
- 		ret = safexcel_aead_exit_inv(tfm);
- 		if (ret)
- 			dev_warn(priv->dev, "aead: invalidation error %d\n",
-diff --git a/drivers/crypto/inside-secure/safexcel_hash.c b/drivers/crypto/inside-secure/safexcel_hash.c
-index 188ba0734337..dc7239945dc0 100644
---- a/drivers/crypto/inside-secure/safexcel_hash.c
-+++ b/drivers/crypto/inside-secure/safexcel_hash.c
-@@ -442,7 +442,7 @@ static int safexcel_handle_result(struct safexcel_crypto_priv *priv, int ring,
- 	struct safexcel_ahash_req *req = ahash_request_ctx(areq);
- 	int err;
+-	/* Enable result descriptor rings */
+-	writel(EIP197_DxE_THR_CTRL_EN | GENMASK(priv->config.rings - 1, 0),
+-	       EIP197_HIA_DSE_THR(priv) + EIP197_HIA_DSE_THR_CTRL);
++		/* Enable result descriptor rings */
++		writel(EIP197_DxE_THR_CTRL_EN | GENMASK(priv->config.rings - 1, 0),
++		       EIP197_HIA_DSE_THR(priv) + EIP197_HIA_DSE_THR_CTRL(pe));
++	}
  
--	BUG_ON(priv->version == EIP97 && req->needs_inv);
-+	BUG_ON(priv->version == EIP97IES && req->needs_inv);
+ 	/* Clear any HIA interrupt */
+ 	writel(GENMASK(30, 20), EIP197_HIA_AIC_G(priv) + EIP197_HIA_AIC_G_ACK);
+@@ -868,9 +883,20 @@ static void safexcel_unregister_algorithms(struct safexcel_crypto_priv *priv)
  
- 	if (req->needs_inv) {
- 		req->needs_inv = false;
-@@ -575,7 +575,7 @@ static int safexcel_ahash_enqueue(struct ahash_request *areq)
- 	req->needs_inv = false;
+ static void safexcel_configure(struct safexcel_crypto_priv *priv)
+ {
+-	u32 val, mask;
++	u32 val, mask = 0;
  
- 	if (ctx->base.ctxr) {
--		if (priv->version == EIP197 && !ctx->base.needs_inv &&
-+		if (priv->version == EIP197B && !ctx->base.needs_inv &&
- 		    (req->processed[0] || req->processed[1]) &&
- 		    req->digest == CONTEXT_CONTROL_DIGEST_PRECOMPUTED)
- 			/* We're still setting needs_inv here, even though it is
-@@ -784,7 +784,7 @@ static void safexcel_ahash_cra_exit(struct crypto_tfm *tfm)
- 	if (!ctx->base.ctxr)
- 		return;
+ 	val = readl(EIP197_HIA_AIC_G(priv) + EIP197_HIA_OPTIONS);
++
++	/* Read number of PEs from the engine */
++	switch (priv->version) {
++	case EIP197B:
++		mask = EIP197_N_PES_MASK;
++		break;
++	default:
++		mask = EIP97_N_PES_MASK;
++	}
++	priv->config.pes = (val >> EIP197_N_PES_OFFSET) & mask;
++
+ 	val = (val & GENMASK(27, 25)) >> 25;
+ 	mask = BIT(val) - 1;
  
--	if (priv->version == EIP197) {
-+	if (priv->version == EIP197B) {
- 		ret = safexcel_ahash_exit_inv(tfm);
- 		if (ret)
- 			dev_warn(priv->dev, "hash: invalidation error %d\n", ret);
-@@ -1004,7 +1004,7 @@ static int safexcel_hmac_alg_setkey(struct crypto_ahash *tfm, const u8 *key,
- 	if (ret)
- 		return ret;
+diff --git a/drivers/crypto/inside-secure/safexcel.h b/drivers/crypto/inside-secure/safexcel.h
+index f370f055fd80..4b7445b1af22 100644
+--- a/drivers/crypto/inside-secure/safexcel.h
++++ b/drivers/crypto/inside-secure/safexcel.h
+@@ -95,13 +95,13 @@
+ #define EIP197_HIA_xDR_STAT			0x003c
  
--	if (priv->version == EIP197 && ctx->base.ctxr) {
-+	if (priv->version == EIP197B && ctx->base.ctxr) {
- 		for (i = 0; i < state_sz / sizeof(u32); i++) {
- 			if (ctx->ipad[i] != le32_to_cpu(istate.state[i]) ||
- 			    ctx->opad[i] != le32_to_cpu(ostate.state[i])) {
+ /* register offsets */
+-#define EIP197_HIA_DFE_CFG			0x0000
+-#define EIP197_HIA_DFE_THR_CTRL			0x0000
+-#define EIP197_HIA_DFE_THR_STAT			0x0004
+-#define EIP197_HIA_DSE_CFG			0x0000
+-#define EIP197_HIA_DSE_THR_CTRL			0x0000
+-#define EIP197_HIA_DSE_THR_STAT			0x0004
+-#define EIP197_HIA_RA_PE_CTRL			0x0010
++#define EIP197_HIA_DFE_CFG(n)			(0x0000 + (128 * (n)))
++#define EIP197_HIA_DFE_THR_CTRL(n)		(0x0000 + (128 * (n)))
++#define EIP197_HIA_DFE_THR_STAT(n)		(0x0004 + (128 * (n)))
++#define EIP197_HIA_DSE_CFG(n)			(0x0000 + (128 * (n)))
++#define EIP197_HIA_DSE_THR_CTRL(n)		(0x0000 + (128 * (n)))
++#define EIP197_HIA_DSE_THR_STAT(n)		(0x0004 + (128 * (n)))
++#define EIP197_HIA_RA_PE_CTRL(n)		(0x0010 + (8   * (n)))
+ #define EIP197_HIA_RA_PE_STAT			0x0014
+ #define EIP197_HIA_AIC_R_OFF(r)			((r) * 0x1000)
+ #define EIP197_HIA_AIC_R_ENABLE_CTRL(r)		(0xe008 - EIP197_HIA_AIC_R_OFF(r))
+@@ -114,18 +114,18 @@
+ #define EIP197_HIA_MST_CTRL			0xfff4
+ #define EIP197_HIA_OPTIONS			0xfff8
+ #define EIP197_HIA_VERSION			0xfffc
+-#define EIP197_PE_IN_DBUF_THRES			0x0000
+-#define EIP197_PE_IN_TBUF_THRES			0x0100
+-#define EIP197_PE_ICE_SCRATCH_RAM		0x0800
+-#define EIP197_PE_ICE_PUE_CTRL			0x0c80
+-#define EIP197_PE_ICE_SCRATCH_CTRL		0x0d04
+-#define EIP197_PE_ICE_FPP_CTRL			0x0d80
+-#define EIP197_PE_ICE_RAM_CTRL			0x0ff0
+-#define EIP197_PE_EIP96_FUNCTION_EN		0x1004
+-#define EIP197_PE_EIP96_CONTEXT_CTRL		0x1008
+-#define EIP197_PE_EIP96_CONTEXT_STAT		0x100c
+-#define EIP197_PE_OUT_DBUF_THRES		0x1c00
+-#define EIP197_PE_OUT_TBUF_THRES		0x1d00
++#define EIP197_PE_IN_DBUF_THRES(n)		(0x0000 + (0x2000 * (n)))
++#define EIP197_PE_IN_TBUF_THRES(n)		(0x0100 + (0x2000 * (n)))
++#define EIP197_PE_ICE_SCRATCH_RAM(n)		(0x0800 + (0x2000 * (n)))
++#define EIP197_PE_ICE_PUE_CTRL(n)		(0x0c80 + (0x2000 * (n)))
++#define EIP197_PE_ICE_SCRATCH_CTRL(n)		(0x0d04 + (0x2000 * (n)))
++#define EIP197_PE_ICE_FPP_CTRL(n)		(0x0d80 + (0x2000 * (n)))
++#define EIP197_PE_ICE_RAM_CTRL(n)		(0x0ff0 + (0x2000 * (n)))
++#define EIP197_PE_EIP96_FUNCTION_EN(n)		(0x1004 + (0x2000 * (n)))
++#define EIP197_PE_EIP96_CONTEXT_CTRL(n)		(0x1008 + (0x2000 * (n)))
++#define EIP197_PE_EIP96_CONTEXT_STAT(n)		(0x100c + (0x2000 * (n)))
++#define EIP197_PE_OUT_DBUF_THRES(n)		(0x1c00 + (0x2000 * (n)))
++#define EIP197_PE_OUT_TBUF_THRES(n)		(0x1d00 + (0x2000 * (n)))
+ #define EIP197_MST_CTRL				0xfff4
+ 
+ /* EIP197-specific registers, no indirection */
+@@ -184,6 +184,11 @@
+ #define EIP197_HIA_RA_PE_CTRL_RESET		BIT(31)
+ #define EIP197_HIA_RA_PE_CTRL_EN		BIT(30)
+ 
++/* EIP197_HIA_OPTIONS */
++#define EIP197_N_PES_OFFSET			4
++#define EIP197_N_PES_MASK			GENMASK(4, 0)
++#define EIP97_N_PES_MASK			GENMASK(2, 0)
++
+ /* EIP197_HIA_AIC_R_ENABLE_CTRL */
+ #define EIP197_CDR_IRQ(n)			BIT((n) * 2)
+ #define EIP197_RDR_IRQ(n)			BIT((n) * 2 + 1)
+@@ -513,6 +518,7 @@ struct safexcel_request {
+ };
+ 
+ struct safexcel_config {
++	u32 pes;
+ 	u32 rings;
+ 
+ 	u32 cd_size;
 -- 
 2.17.1
