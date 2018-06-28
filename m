@@ -1,7 +1,7 @@
 From: Antoine Tenart <antoine.tenart@bootlin.com>
-Subject: [PATCH 09/14] Documentation/bindings: crypto: inside-secure: eip197d support
-Date: Thu, 28 Jun 2018 17:15:39 +0200
-Message-ID: <20180628151544.22134-10-antoine.tenart@bootlin.com>
+Subject: [PATCH 14/14] arm64: dts: marvell: armada-37xx: update the crypto engine compatible
+Date: Thu, 28 Jun 2018 17:15:44 +0200
+Message-ID: <20180628151544.22134-15-antoine.tenart@bootlin.com>
 References: <20180628151544.22134-1-antoine.tenart@bootlin.com>
 Cc: Antoine Tenart <antoine.tenart@bootlin.com>,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -16,28 +16,28 @@ In-Reply-To: <20180628151544.22134-1-antoine.tenart@bootlin.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This patch documents the new compatible used for the eip197d engine, as
-this new engine is now supported by the Inside Secure SafeXcel
-cryptographic driver.
+New compatibles are now supported by the Inside Secure SafeXcel driver.
+As they are more specific than the old ones, they should be used
+whenever possible. This patch updates the Marvell Armada 37xx device
+tree accordingly.
 
 Signed-off-by: Antoine Tenart <antoine.tenart@bootlin.com>
 ---
- .../devicetree/bindings/crypto/inside-secure-safexcel.txt      | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ arch/arm64/boot/dts/marvell/armada-37xx.dtsi | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/Documentation/devicetree/bindings/crypto/inside-secure-safexcel.txt b/Documentation/devicetree/bindings/crypto/inside-secure-safexcel.txt
-index dc8678db52fa..3bbf144c9988 100644
---- a/Documentation/devicetree/bindings/crypto/inside-secure-safexcel.txt
-+++ b/Documentation/devicetree/bindings/crypto/inside-secure-safexcel.txt
-@@ -1,7 +1,8 @@
- Inside Secure SafeXcel cryptographic engine
+diff --git a/arch/arm64/boot/dts/marvell/armada-37xx.dtsi b/arch/arm64/boot/dts/marvell/armada-37xx.dtsi
+index 3353252d78a0..2d68614aa66c 100644
+--- a/arch/arm64/boot/dts/marvell/armada-37xx.dtsi
++++ b/arch/arm64/boot/dts/marvell/armada-37xx.dtsi
+@@ -287,7 +287,7 @@
+ 			};
  
- Required properties:
--- compatible: Should be "inside-secure,safexcel-eip197b" or
-+- compatible: Should be "inside-secure,safexcel-eip197b",
-+	      "inside-secure,safexcel-eip197d" or
-               "inside-secure,safexcel-eip97ies".
- - reg: Base physical address of the engine and length of memory mapped region.
- - interrupts: Interrupt numbers for the rings and engine.
+ 			crypto: crypto@90000 {
+-				compatible = "inside-secure,safexcel-eip97";
++				compatible = "inside-secure,safexcel-eip97ies";
+ 				reg = <0x90000 0x20000>;
+ 				interrupts = <GIC_SPI 19 IRQ_TYPE_LEVEL_HIGH>,
+ 					     <GIC_SPI 20 IRQ_TYPE_LEVEL_HIGH>,
 -- 
 2.17.1
