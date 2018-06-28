@@ -1,7 +1,7 @@
-From: kbuild test robot <fengguang.wu@intel.com>
-Subject: [RFC PATCH] crypto: ccree: cc_update_ctr() can be static
-Date: Thu, 28 Jun 2018 19:42:37 +0800
-Message-ID: <20180628114237.GA119685@athens>
+From: kbuild test robot <lkp@intel.com>
+Subject: Re: [PATCH 3/4] crypto: ccree: fix iv handling
+Date: Thu, 28 Jun 2018 19:42:36 +0800
+Message-ID: <201806281901.KbE00xRE%fengguang.wu@intel.com>
 References: <1530171175-31960-4-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
@@ -17,23 +17,29 @@ In-Reply-To: <1530171175-31960-4-git-send-email-gilad@benyossef.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
+Hi Gilad,
 
-Fixes: 27646566a1a0 ("crypto: ccree: fix iv handling")
-Signed-off-by: kbuild test robot <fengguang.wu@intel.com>
+I love your patch! Perhaps something to improve:
+
+[auto build test WARNING on cryptodev/master]
+[also build test WARNING on v4.18-rc2 next-20180628]
+[if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
+
+url:    https://github.com/0day-ci/linux/commits/Gilad-Ben-Yossef/crypto-ccree-fix-finup/20180628-162032
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
+reproduce:
+        # apt-get install sparse
+        make ARCH=x86_64 allmodconfig
+        make C=1 CF=-D__CHECK_ENDIAN__
+
+
+sparse warnings: (new ones prefixed by >>)
+
+   drivers/crypto/ccree/cc_cipher.c:369:17: sparse: Variable length array is used.
+>> drivers/crypto/ccree/cc_cipher.c:599:6: sparse: symbol 'cc_update_ctr' was not declared. Should it be static?
+
+Please review and possibly fold the followup patch.
+
 ---
- cc_cipher.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/crypto/ccree/cc_cipher.c b/drivers/crypto/ccree/cc_cipher.c
-index 3af44a5..958ced3 100644
---- a/drivers/crypto/ccree/cc_cipher.c
-+++ b/drivers/crypto/ccree/cc_cipher.c
-@@ -596,7 +596,7 @@ static void cc_setup_cipher_data(struct crypto_tfm *tfm,
- /*
-  * Update a CTR-AES 128 bit counter
-  */
--void cc_update_ctr(u8 *ctr, unsigned int increment)
-+static void cc_update_ctr(u8 *ctr, unsigned int increment)
- {
- 	if (IS_ENABLED(CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS) ||
- 	    IS_ALIGNED((unsigned long)ctr, 8)) {
+0-DAY kernel test infrastructure                Open Source Technology Center
+https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
