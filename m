@@ -1,54 +1,34 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: Re: [PATCH] crypto: ccree: fix finup
-Date: Thu, 28 Jun 2018 10:06:19 +0300
-Message-ID: <CAOtvUMeO3XuFUZvauc_z+bkSqnO9bJdK77oeDJ4CpTVSAiK3wg@mail.gmail.com>
-References: <1529581652-31294-1-git-send-email-hadar.gat@arm.com> <CAOtvUMc0j+5+uYZH9=kwV=Ptx_df=qSRceGsuouf-FuV7Mkw0w@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux kernel mailing list <linux-kernel@vger.kernel.org>,
-        Ofir Drang <ofir.drang@arm.com>,
-        Gilad Ben-Yossef <gilad.BenYossef@arm.com>,
-        stable@vger.kernel.org
-To: Hadar Gat <hadar.gat@arm.com>
-Return-path: <stable-owner@vger.kernel.org>
-In-Reply-To: <CAOtvUMc0j+5+uYZH9=kwV=Ptx_df=qSRceGsuouf-FuV7Mkw0w@mail.gmail.com>
-Sender: stable-owner@vger.kernel.org
+Subject: [PATCH 0/4] crypto: fixes and cleanups
+Date: Thu, 28 Jun 2018 08:32:50 +0100
+Message-ID: <1530171175-31960-1-git-send-email-gilad@benyossef.com>
+Cc: Ofir Drang <ofir.drang@arm.com>, Hadar Gat <hadar.gat@arm.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi Herbert,
+The patch set fixes ccree IV handling and finuo() operation (provided
+by Hadar Gat) along a code cleanup.
 
+Since our finup() method was obviously broken but was not detected
+by testmgr, I've added finup() test to testmgr to catch it next
+time it happened
 
-On Thu, Jun 21, 2018 at 3:25 PM, Gilad Ben-Yossef <gilad@benyossef.com> wro=
-te:
-> On Thu, Jun 21, 2018 at 2:47 PM, Hadar Gat <hadar.gat@arm.com> wrote:
->> finup() operation was incorrect, padding was missing.
->> Fix by setting the ccree HW to enable padding.
->>
->> Signed-off-by: Hadar Gat <hadar.gat@arm.com>
->> Cc: stable@vger.kernel.org
->
-> Acked-by: Gilad Ben-Yossef <gilad@benyossef.com>
->
-> Gilad
->
+Gilad Ben-Yossef (3):
+  crypto: testmgr: add hash finup tests
+  crypto: ccree: fix iv handling
+  crypto: ccree: remove dead legacy code
 
-I took a 2nd look at this with Hadar and we realized we can write this
-in a way that allows
-for more code sharing. Please drop this patch. I'll be sending a revised ve=
-rsion
-in a second.
+Hadar Gat (1):
+  crypto: ccree: fix finup
 
-Thanks!
-Gilad
+ crypto/testmgr.c                 |  55 +++++++++++++++---
+ drivers/crypto/ccree/cc_cipher.c | 117 ++++++++++++++++++++++++++++-----------
+ drivers/crypto/ccree/cc_hash.c   |  81 ++++++---------------------
+ 3 files changed, 146 insertions(+), 107 deletions(-)
 
-
-
---=20
-Gilad Ben-Yossef
-Chief Coffee Drinker
-
-values of =CE=B2 will give rise to dom!
+-- 
+2.7.4
