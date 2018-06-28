@@ -1,129 +1,198 @@
 From: Antoine Tenart <antoine.tenart@bootlin.com>
-Subject: [PATCH 2/5] crypto: inside-secure - hmac(md5) support
-Date: Thu, 28 Jun 2018 17:21:54 +0200
-Message-ID: <20180628152157.23769-3-antoine.tenart@bootlin.com>
-References: <20180628152157.23769-1-antoine.tenart@bootlin.com>
+Subject: [PATCH 06/14] crypto: inside-secure - dynamic ring configuration allocation
+Date: Thu, 28 Jun 2018 17:15:36 +0200
+Message-ID: <20180628151544.22134-7-antoine.tenart@bootlin.com>
+References: <20180628151544.22134-1-antoine.tenart@bootlin.com>
 Cc: Ofer Heifetz <oferh@marvell.com>, linux-crypto@vger.kernel.org,
         linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
-        maxime.chevallier@bootlin.com, gregory.clement@bootlin.com,
-        miquel.raynal@bootlin.com, nadavh@marvell.com, igall@marvell.com,
+        maxime.chevallier@bootlin.com, miquel.raynal@bootlin.com,
+        nadavh@marvell.com, igall@marvell.com,
         Antoine Tenart <antoine.tenart@bootlin.com>
-To: herbert@gondor.apana.org.au, davem@davemloft.net
+To: herbert@gondor.apana.org.au, davem@davemloft.net,
+        gregory.clement@bootlin.com, andrew@lunn.ch, jason@lakedaemon.net,
+        sebastian.hesselbarth@gmail.com
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180628152157.23769-1-antoine.tenart@bootlin.com>
+In-Reply-To: <20180628151544.22134-1-antoine.tenart@bootlin.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
 From: Ofer Heifetz <oferh@marvell.com>
 
-This patch adds support for the hmac(md5) algorithm in the Inside Secure
-SafeXcel cryptographic engine driver.
+The Inside Secure SafeXcel driver currently uses 4 rings, but the
+eip197d engines has 8 of them. This patch updates the driver so that
+rings are allocated dynamically based on the number of available rings
+supported by a given engine.
 
 Signed-off-by: Ofer Heifetz <oferh@marvell.com>
 Signed-off-by: Antoine Tenart <antoine.tenart@bootlin.com>
 ---
- drivers/crypto/inside-secure/safexcel.c      |  3 +-
- drivers/crypto/inside-secure/safexcel.h      |  1 +
- drivers/crypto/inside-secure/safexcel_hash.c | 57 ++++++++++++++++++++
- 3 files changed, 60 insertions(+), 1 deletion(-)
+ drivers/crypto/inside-secure/safexcel.c      |  7 ++
+ drivers/crypto/inside-secure/safexcel.h      | 68 ++++++++++----------
+ drivers/crypto/inside-secure/safexcel_ring.c | 10 +--
+ 3 files changed, 47 insertions(+), 38 deletions(-)
 
 diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/inside-secure/safexcel.c
-index 54f5d2c131a9..ea8070c33743 100644
+index 579e7ae2cb14..baf8320d9c84 100644
 --- a/drivers/crypto/inside-secure/safexcel.c
 +++ b/drivers/crypto/inside-secure/safexcel.c
-@@ -406,7 +406,7 @@ static int safexcel_hw_init(struct safexcel_crypto_priv *priv)
- 		val |= EIP197_PROTOCOL_ENCRYPT_ONLY | EIP197_PROTOCOL_HASH_ONLY;
- 		val |= EIP197_PROTOCOL_ENCRYPT_HASH | EIP197_PROTOCOL_HASH_DECRYPT;
- 		val |= EIP197_ALG_AES_ECB | EIP197_ALG_AES_CBC;
--		val |= EIP197_ALG_MD5;
-+		val |= EIP197_ALG_MD5 | EIP197_ALG_HMAC_MD5;
- 		val |= EIP197_ALG_SHA1 | EIP197_ALG_HMAC_SHA1;
- 		val |= EIP197_ALG_SHA2 | EIP197_ALG_HMAC_SHA2;
- 		writel(val, EIP197_PE(priv) + EIP197_PE_EIP96_FUNCTION_EN(pe));
-@@ -848,6 +848,7 @@ static struct safexcel_alg_template *safexcel_algs[] = {
- 	&safexcel_alg_sha256,
- 	&safexcel_alg_sha384,
- 	&safexcel_alg_sha512,
-+	&safexcel_alg_hmac_md5,
- 	&safexcel_alg_hmac_sha1,
- 	&safexcel_alg_hmac_sha224,
- 	&safexcel_alg_hmac_sha256,
+@@ -981,6 +981,13 @@ static int safexcel_probe(struct platform_device *pdev)
+ 
+ 	safexcel_configure(priv);
+ 
++	priv->ring = devm_kzalloc(dev, priv->config.rings * sizeof(*priv->ring),
++				  GFP_KERNEL);
++	if (!priv->ring) {
++		ret = -ENOMEM;
++		goto err_reg_clk;
++	}
++
+ 	for (i = 0; i < priv->config.rings; i++) {
+ 		char irq_name[6] = {0}; /* "ringX\0" */
+ 		char wq_name[9] = {0}; /* "wq_ringX\0" */
 diff --git a/drivers/crypto/inside-secure/safexcel.h b/drivers/crypto/inside-secure/safexcel.h
-index fcd26ae70166..19610b03bceb 100644
+index f62111eba30d..f370f055fd80 100644
 --- a/drivers/crypto/inside-secure/safexcel.h
 +++ b/drivers/crypto/inside-secure/safexcel.h
-@@ -698,6 +698,7 @@ extern struct safexcel_alg_template safexcel_alg_sha224;
- extern struct safexcel_alg_template safexcel_alg_sha256;
- extern struct safexcel_alg_template safexcel_alg_sha384;
- extern struct safexcel_alg_template safexcel_alg_sha512;
-+extern struct safexcel_alg_template safexcel_alg_hmac_md5;
- extern struct safexcel_alg_template safexcel_alg_hmac_sha1;
- extern struct safexcel_alg_template safexcel_alg_hmac_sha224;
- extern struct safexcel_alg_template safexcel_alg_hmac_sha256;
-diff --git a/drivers/crypto/inside-secure/safexcel_hash.c b/drivers/crypto/inside-secure/safexcel_hash.c
-index 4fec8fe07044..46aac55c0b31 100644
---- a/drivers/crypto/inside-secure/safexcel_hash.c
-+++ b/drivers/crypto/inside-secure/safexcel_hash.c
-@@ -1619,3 +1619,60 @@ struct safexcel_alg_template safexcel_alg_md5 = {
- 		},
- 	},
+@@ -487,7 +487,7 @@ enum eip197_fw {
+ 	FW_NB
  };
+ 
+-struct safexcel_ring {
++struct safexcel_desc_ring {
+ 	void *base;
+ 	void *base_end;
+ 	dma_addr_t base_dma;
+@@ -528,6 +528,35 @@ struct safexcel_work_data {
+ 	int ring;
+ };
+ 
++struct safexcel_ring {
++	spinlock_t lock;
++	spinlock_t egress_lock;
 +
-+static int safexcel_hmac_md5_init(struct ahash_request *areq)
-+{
-+	struct safexcel_ahash_req *req = ahash_request_ctx(areq);
++	struct list_head list;
++	struct workqueue_struct *workqueue;
++	struct safexcel_work_data work_data;
 +
-+	safexcel_md5_init(areq);
-+	req->digest = CONTEXT_CONTROL_DIGEST_HMAC;
-+	return 0;
-+}
++	/* command/result rings */
++	struct safexcel_desc_ring cdr;
++	struct safexcel_desc_ring rdr;
 +
-+static int safexcel_hmac_md5_setkey(struct crypto_ahash *tfm, const u8 *key,
-+				     unsigned int keylen)
-+{
-+	return safexcel_hmac_alg_setkey(tfm, key, keylen, "safexcel-md5",
-+					MD5_DIGEST_SIZE);
-+}
++	/* queue */
++	struct crypto_queue queue;
++	spinlock_t queue_lock;
 +
-+static int safexcel_hmac_md5_digest(struct ahash_request *areq)
-+{
-+	int ret = safexcel_hmac_md5_init(areq);
++	/* Number of requests in the engine. */
++	int requests;
 +
-+	if (ret)
-+		return ret;
++	/* The ring is currently handling at least one request */
++	bool busy;
 +
-+	return safexcel_ahash_finup(areq);
-+}
-+
-+struct safexcel_alg_template safexcel_alg_hmac_md5 = {
-+	.type = SAFEXCEL_ALG_TYPE_AHASH,
-+	.engines = EIP97IES | EIP197B | EIP197D,
-+	.alg.ahash = {
-+		.init = safexcel_hmac_md5_init,
-+		.update = safexcel_ahash_update,
-+		.final = safexcel_ahash_final,
-+		.finup = safexcel_ahash_finup,
-+		.digest = safexcel_hmac_md5_digest,
-+		.setkey = safexcel_hmac_md5_setkey,
-+		.export = safexcel_ahash_export,
-+		.import = safexcel_ahash_import,
-+		.halg = {
-+			.digestsize = MD5_DIGEST_SIZE,
-+			.statesize = sizeof(struct safexcel_ahash_export_state),
-+			.base = {
-+				.cra_name = "hmac(md5)",
-+				.cra_driver_name = "safexcel-hmac-md5",
-+				.cra_priority = 300,
-+				.cra_flags = CRYPTO_ALG_ASYNC |
-+					     CRYPTO_ALG_KERN_DRIVER_ONLY,
-+				.cra_blocksize = MD5_HMAC_BLOCK_SIZE,
-+				.cra_ctxsize = sizeof(struct safexcel_ahash_ctx),
-+				.cra_init = safexcel_ahash_cra_init,
-+				.cra_exit = safexcel_ahash_cra_exit,
-+				.cra_module = THIS_MODULE,
-+			},
-+		},
-+	},
++	/* Store for current requests when bailing out of the dequeueing
++	 * function when no enough resources are available.
++	 */
++	struct crypto_async_request *req;
++	struct crypto_async_request *backlog;
 +};
++
+ enum safexcel_eip_version {
+ 	EIP97IES = BIT(0),
+ 	EIP197B  = BIT(1),
+@@ -566,34 +595,7 @@ struct safexcel_crypto_priv {
+ 
+ 	atomic_t ring_used;
+ 
+-	struct {
+-		spinlock_t lock;
+-		spinlock_t egress_lock;
+-
+-		struct list_head list;
+-		struct workqueue_struct *workqueue;
+-		struct safexcel_work_data work_data;
+-
+-		/* command/result rings */
+-		struct safexcel_ring cdr;
+-		struct safexcel_ring rdr;
+-
+-		/* queue */
+-		struct crypto_queue queue;
+-		spinlock_t queue_lock;
+-
+-		/* Number of requests in the engine. */
+-		int requests;
+-
+-		/* The ring is currently handling at least one request */
+-		bool busy;
+-
+-		/* Store for current requests when bailing out of the dequeueing
+-		 * function when no enough resources are available.
+-		 */
+-		struct crypto_async_request *req;
+-		struct crypto_async_request *backlog;
+-	} ring[EIP197_MAX_RINGS];
++	struct safexcel_ring *ring;
+ };
+ 
+ struct safexcel_context {
+@@ -651,13 +653,13 @@ int safexcel_invalidate_cache(struct crypto_async_request *async,
+ 			      dma_addr_t ctxr_dma, int ring,
+ 			      struct safexcel_request *request);
+ int safexcel_init_ring_descriptors(struct safexcel_crypto_priv *priv,
+-				   struct safexcel_ring *cdr,
+-				   struct safexcel_ring *rdr);
++				   struct safexcel_desc_ring *cdr,
++				   struct safexcel_desc_ring *rdr);
+ int safexcel_select_ring(struct safexcel_crypto_priv *priv);
+ void *safexcel_ring_next_rptr(struct safexcel_crypto_priv *priv,
+-			      struct safexcel_ring *ring);
++			      struct safexcel_desc_ring *ring);
+ void safexcel_ring_rollback_wptr(struct safexcel_crypto_priv *priv,
+-				 struct safexcel_ring *ring);
++				 struct safexcel_desc_ring *ring);
+ struct safexcel_command_desc *safexcel_add_cdesc(struct safexcel_crypto_priv *priv,
+ 						 int ring_id,
+ 						 bool first, bool last,
+diff --git a/drivers/crypto/inside-secure/safexcel_ring.c b/drivers/crypto/inside-secure/safexcel_ring.c
+index c9d2a8716b5b..cfd843b834f1 100644
+--- a/drivers/crypto/inside-secure/safexcel_ring.c
++++ b/drivers/crypto/inside-secure/safexcel_ring.c
+@@ -14,8 +14,8 @@
+ #include "safexcel.h"
+ 
+ int safexcel_init_ring_descriptors(struct safexcel_crypto_priv *priv,
+-				   struct safexcel_ring *cdr,
+-				   struct safexcel_ring *rdr)
++				   struct safexcel_desc_ring *cdr,
++				   struct safexcel_desc_ring *rdr)
+ {
+ 	cdr->offset = sizeof(u32) * priv->config.cd_offset;
+ 	cdr->base = dmam_alloc_coherent(priv->dev,
+@@ -46,7 +46,7 @@ inline int safexcel_select_ring(struct safexcel_crypto_priv *priv)
+ }
+ 
+ static void *safexcel_ring_next_wptr(struct safexcel_crypto_priv *priv,
+-				     struct safexcel_ring *ring)
++				     struct safexcel_desc_ring *ring)
+ {
+ 	void *ptr = ring->write;
+ 
+@@ -62,7 +62,7 @@ static void *safexcel_ring_next_wptr(struct safexcel_crypto_priv *priv,
+ }
+ 
+ void *safexcel_ring_next_rptr(struct safexcel_crypto_priv *priv,
+-			      struct safexcel_ring *ring)
++			      struct safexcel_desc_ring *ring)
+ {
+ 	void *ptr = ring->read;
+ 
+@@ -78,7 +78,7 @@ void *safexcel_ring_next_rptr(struct safexcel_crypto_priv *priv,
+ }
+ 
+ void safexcel_ring_rollback_wptr(struct safexcel_crypto_priv *priv,
+-				 struct safexcel_ring *ring)
++				 struct safexcel_desc_ring *ring)
+ {
+ 	if (!ring->nr)
+ 		return;
 -- 
 2.17.1
