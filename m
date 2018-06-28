@@ -1,152 +1,72 @@
-From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH 2/4] crypto: testmgr: add hash finup tests
-Date: Thu, 28 Jun 2018 08:32:52 +0100
-Message-ID: <1530171175-31960-3-git-send-email-gilad@benyossef.com>
-References: <1530171175-31960-1-git-send-email-gilad@benyossef.com>
-Cc: Ofir Drang <ofir.drang@arm.com>, Hadar Gat <hadar.gat@arm.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1530171175-31960-1-git-send-email-gilad@benyossef.com>
-Sender: linux-kernel-owner@vger.kernel.org
+From: Linus Walleij <linus.walleij@linaro.org>
+Subject: Re: [PATCH 2/9] crypto: atmel-ecc: Silently ignore missing clock
+ frequency
+Date: Thu, 28 Jun 2018 10:47:12 +0200
+Message-ID: <CACRpkdYDABDgYe=FOsQK9=p-mB3Qr8wVb=hbbEgzo_qUCbutPQ@mail.gmail.com>
+References: <20180605134950.6605-1-linus.walleij@linaro.org>
+ <20180605134950.6605-2-linus.walleij@linaro.org>
+ <e33b8860-2ff4-da8f-8500-ad24ab6c1e4e@microchip.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: linux-i2c@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
+ linux-crypto@vger.kernel.org, Linux ARM <linux-arm-kernel@lists.infradead.org>,
+ Wolfram Sang <wsa@the-dreams.de>
+To: Tudor Ambarus <tudor.ambarus@microchip.com>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <e33b8860-2ff4-da8f-8500-ad24ab6c1e4e@microchip.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-The testmgr hash tests were testing init, digest, update and final
-methods but not the finup method. Add a test for this one too.
+On Mon, Jun 11, 2018 at 11:46 AM Tudor Ambarus
+<tudor.ambarus@microchip.com> wrote:
+> On 06/05/2018 04:49 PM, Linus Walleij wrote:
+> > The Atmel ECC driver contains a check for the I2C bus clock
+> > frequency, so as to check that the I2C adapter in use
+> > satisfies the device specs.
+> >
+> > If the device is connected to a device tree node that does not
+> > contain a clock frequency setting, such as an I2C mux or gate,
+> > this blocks the probe. Make the probe continue silently if
+> > no clock frequency can be found, assuming all is safe.
+>
+> I don't think it's safe. We use bus_clk_rate to compute the ecc508's
+> wake token. If you can't wake the device, it will ignore all your
+> commands.
 
-While doing this, make sure we only run the partial tests once with
-the digest tests and skip them with the final and finup tests since
-they are the same.
+I see. I wonder why it works so well for me then?
+Could we just print a warning and continue?
+The general advice for the kernel is not to bail out if
+hardware is not optimally configured, but continue with
+a warning that maybe not everything is all right.
 
-Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
----
- crypto/testmgr.c | 55 ++++++++++++++++++++++++++++++++++++++++++++++---------
- 1 file changed, 46 insertions(+), 9 deletions(-)
+> My proposal was to introduce a bus_freq_hz member in the i2c_adapter
+> structure (https://patchwork.kernel.org/patch/10307637/), but I haven't
+> received feedback yet, Wolfram?
+>
+> I would say first to check the bus_freq_hz from adapter (if it will be
+> accepted) else to look into dt and, in the last case, if nowhere
+> provided, to block the probe.
 
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 11e4535..ca475f6 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -259,9 +259,15 @@ static int ahash_partial_update(struct ahash_request **preq,
- 	return ret;
- }
- 
-+enum hash_test {
-+	HASH_TEST_DIGEST,
-+	HASH_TEST_FINAL,
-+	HASH_TEST_FINUP
-+};
-+
- static int __test_hash(struct crypto_ahash *tfm,
- 		       const struct hash_testvec *template, unsigned int tcount,
--		       bool use_digest, const int align_offset)
-+		       enum hash_test test_type, const int align_offset)
- {
- 	const char *algo = crypto_tfm_alg_driver_name(crypto_ahash_tfm(tfm));
- 	size_t digest_size = crypto_ahash_digestsize(tfm);
-@@ -332,14 +338,17 @@ static int __test_hash(struct crypto_ahash *tfm,
- 		}
- 
- 		ahash_request_set_crypt(req, sg, result, template[i].psize);
--		if (use_digest) {
-+		switch (test_type) {
-+		case HASH_TEST_DIGEST:
- 			ret = crypto_wait_req(crypto_ahash_digest(req), &wait);
- 			if (ret) {
- 				pr_err("alg: hash: digest failed on test %d "
- 				       "for %s: ret=%d\n", j, algo, -ret);
- 				goto out;
- 			}
--		} else {
-+			break;
-+
-+		case HASH_TEST_FINAL:
- 			memset(result, 1, digest_size);
- 			ret = crypto_wait_req(crypto_ahash_init(req), &wait);
- 			if (ret) {
-@@ -371,6 +380,29 @@ static int __test_hash(struct crypto_ahash *tfm,
- 				       "for %s: ret=%d\n", j, algo, -ret);
- 				goto out;
- 			}
-+			break;
-+
-+		case HASH_TEST_FINUP:
-+			memset(result, 1, digest_size);
-+			ret = crypto_wait_req(crypto_ahash_init(req), &wait);
-+			if (ret) {
-+				pr_err("alg: hash: init failed on test %d "
-+				       "for %s: ret=%d\n", j, algo, -ret);
-+				goto out;
-+			}
-+			ret = ahash_guard_result(result, 1, digest_size);
-+			if (ret) {
-+				pr_err("alg: hash: init failed on test %d "
-+				       "for %s: used req->result\n", j, algo);
-+				goto out;
-+			}
-+			ret = crypto_wait_req(crypto_ahash_finup(req), &wait);
-+			if (ret) {
-+				pr_err("alg: hash: final failed on test %d "
-+				       "for %s: ret=%d\n", j, algo, -ret);
-+				goto out;
-+			}
-+			break;
- 		}
- 
- 		if (memcmp(result, template[i].digest,
-@@ -383,6 +415,9 @@ static int __test_hash(struct crypto_ahash *tfm,
- 		}
- 	}
- 
-+	if (test_type)
-+		goto out;
-+
- 	j = 0;
- 	for (i = 0; i < tcount; i++) {
- 		/* alignment tests are only done with continuous buffers */
-@@ -540,24 +575,24 @@ static int __test_hash(struct crypto_ahash *tfm,
- 
- static int test_hash(struct crypto_ahash *tfm,
- 		     const struct hash_testvec *template,
--		     unsigned int tcount, bool use_digest)
-+		     unsigned int tcount, enum hash_test test_type)
- {
- 	unsigned int alignmask;
- 	int ret;
- 
--	ret = __test_hash(tfm, template, tcount, use_digest, 0);
-+	ret = __test_hash(tfm, template, tcount, test_type, 0);
- 	if (ret)
- 		return ret;
- 
- 	/* test unaligned buffers, check with one byte offset */
--	ret = __test_hash(tfm, template, tcount, use_digest, 1);
-+	ret = __test_hash(tfm, template, tcount, test_type, 1);
- 	if (ret)
- 		return ret;
- 
- 	alignmask = crypto_tfm_alg_alignmask(&tfm->base);
- 	if (alignmask) {
- 		/* Check if alignment mask for tfm is correctly set. */
--		ret = __test_hash(tfm, template, tcount, use_digest,
-+		ret = __test_hash(tfm, template, tcount, test_type,
- 				  alignmask + 1);
- 		if (ret)
- 			return ret;
-@@ -1803,9 +1838,11 @@ static int __alg_test_hash(const struct hash_testvec *template,
- 		return PTR_ERR(tfm);
- 	}
- 
--	err = test_hash(tfm, template, tcount, true);
-+	err = test_hash(tfm, template, tcount, HASH_TEST_DIGEST);
-+	if (!err)
-+		err = test_hash(tfm, template, tcount, HASH_TEST_FINAL);
- 	if (!err)
--		err = test_hash(tfm, template, tcount, false);
-+		err = test_hash(tfm, template, tcount, HASH_TEST_FINUP);
- 	crypto_free_ahash(tfm);
- 	return err;
- }
--- 
-2.7.4
+So blocking the probe because we are not 100% sure the hardware
+will work is against established practice: the established practice
+is to be liberal with letting probe() continue, but emit a warning.
+
+In my case that is good because it makes the hardware probe
+and work without any visible problems.
+
+I *can* try to traverse the device tree upwards from the mux node
+to find the parent I2C controller and its "clock-frequency"
+property. I felt that was hackish, but if you prefer the hack I
+can try to use that.
+
+Yours,
+Linus Walleij
