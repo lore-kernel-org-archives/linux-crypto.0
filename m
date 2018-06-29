@@ -1,7 +1,7 @@
 From: Kees Cook <keescook@chromium.org>
-Subject: [PATCH v3 4/9] dm integrity: Remove VLA usage
-Date: Thu, 28 Jun 2018 17:28:38 -0700
-Message-ID: <20180629002843.31095-5-keescook@chromium.org>
+Subject: [PATCH v3 7/9] crypto alg: Introduce generic max blocksize and alignmask
+Date: Thu, 28 Jun 2018 17:28:41 -0700
+Message-ID: <20180629002843.31095-8-keescook@chromium.org>
 References: <20180629002843.31095-1-keescook@chromium.org>
 Cc: Kees Cook <keescook@chromium.org>,
         "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
@@ -22,86 +22,58 @@ In-Reply-To: <20180629002843.31095-1-keescook@chromium.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-In the quest to remove all stack VLA usage from the kernel[1], this uses
-the new SHASH_MAX_DIGESTSIZE from the crypto layer to allocate the upper
-bounds on stack usage.
+In the quest to remove all stack VLA usage from the kernel[1], this
+exposes a new general upper bound on crypto blocksize and alignmask
+(higher than for the existing cipher limits) for VLA removal,
+and introduces new checks.
+
+At present, the highest cra_alignmask in the kernel is 63. The highest
+cra_blocksize is 144 (SHA3_224_BLOCK_SIZE, 18 8-byte words). For the
+new blocksize limit, I went with 160 (20 8-byte words).
 
 [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
 
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- drivers/md/dm-integrity.c | 23 +++++++++++++++++------
- 1 file changed, 17 insertions(+), 6 deletions(-)
+ crypto/algapi.c         | 7 ++++++-
+ include/crypto/algapi.h | 4 +++-
+ 2 files changed, 9 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/md/dm-integrity.c b/drivers/md/dm-integrity.c
-index 86438b2f10dd..85e8ce1625a2 100644
---- a/drivers/md/dm-integrity.c
-+++ b/drivers/md/dm-integrity.c
-@@ -521,7 +521,12 @@ static void section_mac(struct dm_integrity_c *ic, unsigned section, __u8 result
- 		}
- 		memset(result + size, 0, JOURNAL_MAC_SIZE - size);
- 	} else {
--		__u8 digest[size];
-+		__u8 digest[SHASH_MAX_DIGESTSIZE];
+diff --git a/crypto/algapi.c b/crypto/algapi.c
+index c0755cf4f53f..496fc51bf215 100644
+--- a/crypto/algapi.c
++++ b/crypto/algapi.c
+@@ -57,9 +57,14 @@ static int crypto_check_alg(struct crypto_alg *alg)
+ 	if (alg->cra_alignmask & (alg->cra_alignmask + 1))
+ 		return -EINVAL;
+ 
+-	if (alg->cra_blocksize > PAGE_SIZE / 8)
++	/* General maximums for all algs. */
++	if (alg->cra_alignmask > MAX_ALGAPI_ALIGNMASK)
+ 		return -EINVAL;
+ 
++	if (alg->cra_blocksize > MAX_ALGAPI_BLOCKSIZE)
++		return -EINVAL;
 +
-+		if (WARN_ON(size > sizeof(digest))) {
-+			dm_integrity_io_error(ic, "digest_size", -EINVAL);
-+			goto err;
-+		}
- 		r = crypto_shash_final(desc, digest);
- 		if (unlikely(r)) {
- 			dm_integrity_io_error(ic, "crypto_shash_final", r);
-@@ -1244,7 +1249,7 @@ static void integrity_metadata(struct work_struct *w)
- 		struct bio *bio = dm_bio_from_per_bio_data(dio, sizeof(struct dm_integrity_io));
- 		char *checksums;
- 		unsigned extra_space = unlikely(digest_size > ic->tag_size) ? digest_size - ic->tag_size : 0;
--		char checksums_onstack[ic->tag_size + extra_space];
-+		char checksums_onstack[SHASH_MAX_DIGESTSIZE];
- 		unsigned sectors_to_process = dio->range.n_sectors;
- 		sector_t sector = dio->range.logical_sector;
++	/* Lower maximums for specific alg types. */
+ 	if (!alg->cra_type && (alg->cra_flags & CRYPTO_ALG_TYPE_MASK) ==
+ 			       CRYPTO_ALG_TYPE_CIPHER) {
+ 		if (alg->cra_alignmask > MAX_CIPHER_ALIGNMASK)
+diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
+index bd5e8ccf1687..21371ac8f355 100644
+--- a/include/crypto/algapi.h
++++ b/include/crypto/algapi.h
+@@ -20,8 +20,10 @@
+ /*
+  * Maximum values for blocksize and alignmask, used to allocate
+  * static buffers that are big enough for any combination of
+- * ciphers and architectures.
++ * algs and architectures. Ciphers have a lower maximum size.
+  */
++#define MAX_ALGAPI_BLOCKSIZE		160
++#define MAX_ALGAPI_ALIGNMASK		63
+ #define MAX_CIPHER_BLOCKSIZE		16
+ #define MAX_CIPHER_ALIGNMASK		15
  
-@@ -1253,8 +1258,14 @@ static void integrity_metadata(struct work_struct *w)
- 
- 		checksums = kmalloc((PAGE_SIZE >> SECTOR_SHIFT >> ic->sb->log2_sectors_per_block) * ic->tag_size + extra_space,
- 				    GFP_NOIO | __GFP_NORETRY | __GFP_NOWARN);
--		if (!checksums)
-+		if (!checksums) {
- 			checksums = checksums_onstack;
-+			if (WARN_ON(extra_space &&
-+				    digest_size > sizeof(checksums_onstack))) {
-+				r = -EINVAL;
-+				goto error;
-+			}
-+		}
- 
- 		__bio_for_each_segment(bv, bio, iter, dio->orig_bi_iter) {
- 			unsigned pos;
-@@ -1466,7 +1477,7 @@ static bool __journal_read_write(struct dm_integrity_io *dio, struct bio *bio,
- 				} while (++s < ic->sectors_per_block);
- #ifdef INTERNAL_VERIFY
- 				if (ic->internal_hash) {
--					char checksums_onstack[max(crypto_shash_digestsize(ic->internal_hash), ic->tag_size)];
-+					char checksums_onstack[max(SHASH_MAX_DIGESTSIZE, MAX_TAG_SIZE)];
- 
- 					integrity_sector_checksum(ic, logical_sector, mem + bv.bv_offset, checksums_onstack);
- 					if (unlikely(memcmp(checksums_onstack, journal_entry_tag(ic, je), ic->tag_size))) {
-@@ -1516,7 +1527,7 @@ static bool __journal_read_write(struct dm_integrity_io *dio, struct bio *bio,
- 				if (ic->internal_hash) {
- 					unsigned digest_size = crypto_shash_digestsize(ic->internal_hash);
- 					if (unlikely(digest_size > ic->tag_size)) {
--						char checksums_onstack[digest_size];
-+						char checksums_onstack[SHASH_MAX_DIGESTSIZE];
- 						integrity_sector_checksum(ic, logical_sector, (char *)js, checksums_onstack);
- 						memcpy(journal_entry_tag(ic, je), checksums_onstack, ic->tag_size);
- 					} else
-@@ -1937,7 +1948,7 @@ static void do_journal_write(struct dm_integrity_c *ic, unsigned write_start,
- 				    unlikely(from_replay) &&
- #endif
- 				    ic->internal_hash) {
--					char test_tag[max(crypto_shash_digestsize(ic->internal_hash), ic->tag_size)];
-+					char test_tag[max_t(size_t, SHASH_MAX_DIGESTSIZE, MAX_TAG_SIZE)];
- 
- 					integrity_sector_checksum(ic, sec + ((l - j) << ic->sb->log2_sectors_per_block),
- 								  (char *)access_journal_data(ic, i, l), test_tag);
 -- 
 2.17.1
