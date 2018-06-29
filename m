@@ -1,87 +1,74 @@
-From: Kees Cook <keescook@chromium.org>
-Subject: [PATCH v3 0/9] Crypto: Remove VLA usage (part 1)
-Date: Thu, 28 Jun 2018 17:28:34 -0700
-Message-ID: <20180629002843.31095-1-keescook@chromium.org>
-Cc: Kees Cook <keescook@chromium.org>,
-        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Eric Biggers <ebiggers@google.com>,
-        Alasdair Kergon <agk@redhat.com>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Lars Persson <larper@axis.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Rabin Vincent <rabinv@axis.com>,
-        Tim Chen <tim.c.chen@linux.intel.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, qat-linux@intel.com,
-        dm-devel@redhat.com, linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+From: Vinod <vkoul@kernel.org>
+Subject: Re: [PATCH 3/3] hwrng: msm - Add support for prng v2
+Date: Fri, 29 Jun 2018 14:07:32 +0530
+Message-ID: <20180629083732.GB22377@vkoul-mobl>
+References: <20180618141259.23141-1-vkoul@kernel.org>
+ <20180618141259.23141-4-vkoul@kernel.org>
+ <20180619142853.wgi5easw4zv6ttrb@gondor.apana.org.au>
+ <966e9cd4-70a3-8d54-df0f-16df3df45fb5@linaro.org>
+ <20180621101506.rnklbtapvfdev4xb@gondor.apana.org.au>
+ <e39deb02-8fa4-84ac-b33e-d692402189a1@linaro.org>
+ <20180621115312.rfmbitrhqi44wu5w@gondor.apana.org.au>
+ <CAOZdJXVO-0JDvX4OdJMNCmY_BXrEenXpoWBf=Ww5uFBtXKN86A@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: Stanimir Varbanov <stanimir.varbanov@linaro.org>,
+        linux-crypto@vger.kernel.org, lkml <linux-kernel@vger.kernel.org>,
+        Matt Mackall <mpm@selenic.com>, Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-arm-msm@vger.kernel.org
+To: Timur Tabi <timur@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <CAOZdJXVO-0JDvX4OdJMNCmY_BXrEenXpoWBf=Ww5uFBtXKN86A@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-v3:
-- drop *_REQUEST_ON_STACK patches. The rest of this series is pretty
-  straight-forward, and I'd like to get them tested in -next while
-  we continue to chip away at the *_REQUEST_ON_STACK VLA removal patches
-  separately. "Part 2" will continue with those.
+On 28-06-18, 17:04, Timur Tabi wrote:
+> On Thu, Jun 21, 2018 at 6:53 AM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> > On Thu, Jun 21, 2018 at 02:27:10PM +0300, Stanimir Varbanov wrote:
+> 
+> > So does it generate one bit of output for each bit of hardware-
+> > generated entropy like /dev/random? Or does it use a hardware-
+> > generated seed to power a PRNG?
+> 
+> I have some information to answer this question, although I'm not sure
+> I can give a strict "yes/no" answer.
+> 
+> There are a couple relevant documents:
+> 
+> https://www.qualcomm.com/news/onq/2014/11/07/cryptographic-module-snapdragon-805-fips-140-2-certified
+> https://csrc.nist.gov/CSRC/media/projects/cryptographic-module-validation-program/documents/security-policies/140sp2944.pdf
+> 
+> I also got response from a Qualcomm employee:
+> 
+> "The Qualcomm random number generator used in Snapdragon chips
+> consists of an entropy source coupled with the HASH-DRBG deterministic
+> random bit generator from NIST Special Publication 800-90A, using
+> SHA-256 as the hash function.
+> 
+> The entropy source is based on sampled ring oscillators.  Four ring
+> oscillators are used to provide high assurance of adequate entropy.
+> The entropy from the ring oscillators is conditioned using the
+> 'derivation function' specified by NIST Special Publication 800-90A.
+> The conditioned entropy is essentially perfect fully entropic data.
+> It is used both to seed and to periodically reseed the DRGB."
+> 
+> My understanding is that the PRNG is a real entropy source with some
+> logic used to normalize the values.  To quote: "No RNG uses data
+> directly from the entropy source; bits in the output are likely
+> correlated and unlikely to occur with 50% probability. The entropy
+> post-processing is designed to turn dirty data in clean data."
+> 
+> Based on the above, it seems to me that the Qualcomm PRNG qualifies as
+> a real hardware RNG and porting to algif_rng is not the correct path.
 
-v2:
-- use 512 instead of PAGE_SIZE / 8 to avoid bloat on large-page archs.
-- swtich xcbc to "16" max universally.
-- fix typo in bounds check for dm buffer size.
-- examine actual reqsizes for skcipher and ahash instead of guessing.
-- improve names and comments for alg maxes
+I think Stan did bring this point earlier that PRNG is compliant to
+FIPS-140-2. So it can be used by rng clients for various purposes but
+should not be fed to dev/random as the hw_random does.
 
-
-This is nearly the last of the VLA removals[1], but it's one of the
-largest because crypto gets used in lots of places. After looking
-through code, usage, reading the threads Gustavo started, and comparing
-the use-cases to the other VLA removals that have landed in the kernel,
-I think this series is likely the best way forward to shut the door on
-VLAs forever.
-
-As background, the crypto stack usage is for callers to do an immediate
-bit of work that doesn't allocate new memory. This means that other VLA
-removal techniques (like just using kmalloc) aren't workable, and the
-next common technique is needed: examination of maximum stack usage and
-the addition of sanity checks. This series does that, and in several
-cases, these maximums were already implicit in the code.
-
-This series is intended to land via the crypto tree, though it touches
-dm as well, since there are dependent patches (new crypto #defines
-being used).
-
-Thanks!
-
--Kees
-
-[1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
-
-Kees Cook (9):
-  crypto: xcbc: Remove VLA usage
-  crypto: cbc: Remove VLA usage
-  crypto: shash: Remove VLA usage
-  dm integrity: Remove VLA usage
-  crypto: ahash: Remove VLA usage
-  dm verity fec: Remove VLA usage
-  crypto alg: Introduce generic max blocksize and alignmask
-  crypto: qat: Remove VLA usage
-  crypto: shash: Remove VLA usage in unaligned hashing
-
- crypto/ahash.c                           |  4 ++--
- crypto/algapi.c                          |  7 ++++++-
- crypto/algif_hash.c                      |  2 +-
- crypto/shash.c                           | 25 +++++++++++-------------
- crypto/xcbc.c                            |  9 +++++++--
- drivers/crypto/qat/qat_common/qat_algs.c |  8 ++++++--
- drivers/md/dm-integrity.c                | 23 ++++++++++++++++------
- drivers/md/dm-verity-fec.c               |  5 ++++-
- include/crypto/algapi.h                  |  4 +++-
- include/crypto/cbc.h                     |  4 +++-
- include/crypto/hash.h                    |  9 ++++++++-
- include/linux/compiler-gcc.h             |  1 -
- 12 files changed, 68 insertions(+), 33 deletions(-)
+Herbert, can you please confirm..
 
 -- 
-2.17.1
+~Vinod
