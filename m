@@ -1,79 +1,87 @@
 From: Kees Cook <keescook@chromium.org>
-Subject: [PATCH v3 1/9] crypto: xcbc: Remove VLA usage
-Date: Thu, 28 Jun 2018 17:28:35 -0700
-Message-ID: <20180629002843.31095-2-keescook@chromium.org>
-References: <20180629002843.31095-1-keescook@chromium.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-	Kees Cook <keescook@chromium.org>, Arnd Bergmann <arnd@arndb.de>,
-	Eric Biggers <ebiggers@google.com>, Mike Snitzer <snitzer@redhat.com>,
-	"Gustavo A. R. Silva" <gustavo@embeddedor.com>,
-	qat-linux@intel.com, linux-kernel@vger.kernel.org,
-	dm-devel@redhat.com, linux-crypto@vger.kernel.org,
-	Lars Persson <larper@axis.com>, Tim Chen <tim.c.chen@linux.intel.com>,
-	"David S. Miller" <davem@davemloft.net>, Alasdair Kergon <agk@redhat.com>,
-	Rabin Vincent <rabinv@axis.com>
+Subject: [PATCH v3 0/9] Crypto: Remove VLA usage (part 1)
+Date: Thu, 28 Jun 2018 17:28:34 -0700
+Message-ID: <20180629002843.31095-1-keescook@chromium.org>
+Cc: Kees Cook <keescook@chromium.org>,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Eric Biggers <ebiggers@google.com>,
+        Alasdair Kergon <agk@redhat.com>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Lars Persson <larper@axis.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Rabin Vincent <rabinv@axis.com>,
+        Tim Chen <tim.c.chen@linux.intel.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, qat-linux@intel.com,
+        dm-devel@redhat.com, linux-kernel@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <dm-devel-bounces@redhat.com>
-In-Reply-To: <20180629002843.31095-1-keescook@chromium.org>
-List-Unsubscribe: <https://www.redhat.com/mailman/options/dm-devel>,
-	<mailto:dm-devel-request@redhat.com?subject=unsubscribe>
-List-Archive: <https://www.redhat.com/archives/dm-devel>
-List-Post: <mailto:dm-devel@redhat.com>
-List-Help: <mailto:dm-devel-request@redhat.com?subject=help>
-List-Subscribe: <https://www.redhat.com/mailman/listinfo/dm-devel>,
-	<mailto:dm-devel-request@redhat.com?subject=subscribe>
-Sender: dm-devel-bounces@redhat.com
-Errors-To: dm-devel-bounces@redhat.com
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-In the quest to remove all stack VLA usage from the kernel[1], this uses
-the maximum blocksize and adds a sanity check. For xcbc, the blocksize
-must always be 16, so use that, since it's already being enforced during
-instantiation.
+v3:
+- drop *_REQUEST_ON_STACK patches. The rest of this series is pretty
+  straight-forward, and I'd like to get them tested in -next while
+  we continue to chip away at the *_REQUEST_ON_STACK VLA removal patches
+  separately. "Part 2" will continue with those.
+
+v2:
+- use 512 instead of PAGE_SIZE / 8 to avoid bloat on large-page archs.
+- swtich xcbc to "16" max universally.
+- fix typo in bounds check for dm buffer size.
+- examine actual reqsizes for skcipher and ahash instead of guessing.
+- improve names and comments for alg maxes
+
+
+This is nearly the last of the VLA removals[1], but it's one of the
+largest because crypto gets used in lots of places. After looking
+through code, usage, reading the threads Gustavo started, and comparing
+the use-cases to the other VLA removals that have landed in the kernel,
+I think this series is likely the best way forward to shut the door on
+VLAs forever.
+
+As background, the crypto stack usage is for callers to do an immediate
+bit of work that doesn't allocate new memory. This means that other VLA
+removal techniques (like just using kmalloc) aren't workable, and the
+next common technique is needed: examination of maximum stack usage and
+the addition of sanity checks. This series does that, and in several
+cases, these maximums were already implicit in the code.
+
+This series is intended to land via the crypto tree, though it touches
+dm as well, since there are dependent patches (new crypto #defines
+being used).
+
+Thanks!
+
+-Kees
 
 [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
 
-Signed-off-by: Kees Cook <keescook@chromium.org>
----
- crypto/xcbc.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+Kees Cook (9):
+  crypto: xcbc: Remove VLA usage
+  crypto: cbc: Remove VLA usage
+  crypto: shash: Remove VLA usage
+  dm integrity: Remove VLA usage
+  crypto: ahash: Remove VLA usage
+  dm verity fec: Remove VLA usage
+  crypto alg: Introduce generic max blocksize and alignmask
+  crypto: qat: Remove VLA usage
+  crypto: shash: Remove VLA usage in unaligned hashing
 
-diff --git a/crypto/xcbc.c b/crypto/xcbc.c
-index 25c75af50d3f..7aa03beed795 100644
---- a/crypto/xcbc.c
-+++ b/crypto/xcbc.c
-@@ -57,6 +57,8 @@ struct xcbc_desc_ctx {
- 	u8 ctx[];
- };
- 
-+#define XCBC_BLOCKSIZE	16
-+
- static int crypto_xcbc_digest_setkey(struct crypto_shash *parent,
- 				     const u8 *inkey, unsigned int keylen)
- {
-@@ -65,7 +67,10 @@ static int crypto_xcbc_digest_setkey(struct crypto_shash *parent,
- 	int bs = crypto_shash_blocksize(parent);
- 	u8 *consts = PTR_ALIGN(&ctx->ctx[0], alignmask + 1);
- 	int err = 0;
--	u8 key1[bs];
-+	u8 key1[XCBC_BLOCKSIZE];
-+
-+	if (WARN_ON(bs > sizeof(key1)))
-+		return -EINVAL;
- 
- 	if ((err = crypto_cipher_setkey(ctx->child, inkey, keylen)))
- 		return err;
-@@ -212,7 +217,7 @@ static int xcbc_create(struct crypto_template *tmpl, struct rtattr **tb)
- 		return PTR_ERR(alg);
- 
- 	switch(alg->cra_blocksize) {
--	case 16:
-+	case XCBC_BLOCKSIZE:
- 		break;
- 	default:
- 		goto out_put_alg;
+ crypto/ahash.c                           |  4 ++--
+ crypto/algapi.c                          |  7 ++++++-
+ crypto/algif_hash.c                      |  2 +-
+ crypto/shash.c                           | 25 +++++++++++-------------
+ crypto/xcbc.c                            |  9 +++++++--
+ drivers/crypto/qat/qat_common/qat_algs.c |  8 ++++++--
+ drivers/md/dm-integrity.c                | 23 ++++++++++++++++------
+ drivers/md/dm-verity-fec.c               |  5 ++++-
+ include/crypto/algapi.h                  |  4 +++-
+ include/crypto/cbc.h                     |  4 +++-
+ include/crypto/hash.h                    |  9 ++++++++-
+ include/linux/compiler-gcc.h             |  1 -
+ 12 files changed, 68 insertions(+), 33 deletions(-)
+
 -- 
 2.17.1
