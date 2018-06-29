@@ -1,7 +1,7 @@
 From: Kees Cook <keescook@chromium.org>
-Subject: [PATCH v3 9/9] crypto: shash: Remove VLA usage in unaligned hashing
-Date: Thu, 28 Jun 2018 17:28:43 -0700
-Message-ID: <20180629002843.31095-10-keescook@chromium.org>
+Subject: [PATCH v3 4/9] dm integrity: Remove VLA usage
+Date: Thu, 28 Jun 2018 17:28:38 -0700
+Message-ID: <20180629002843.31095-5-keescook@chromium.org>
 References: <20180629002843.31095-1-keescook@chromium.org>
 Cc: Kees Cook <keescook@chromium.org>,
         "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
@@ -23,80 +23,85 @@ Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
 In the quest to remove all stack VLA usage from the kernel[1], this uses
-the newly defined max alignment to perform unaligned hashing to avoid
-VLAs, and drops the helper function while adding sanity checks on the
-resulting buffer sizes. Additionally, the __aligned_largest macro is
-removed since this helper was the only user.
+the new SHASH_MAX_DIGESTSIZE from the crypto layer to allocate the upper
+bounds on stack usage.
 
 [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
 
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- crypto/shash.c               | 19 ++++++++-----------
- include/linux/compiler-gcc.h |  1 -
- 2 files changed, 8 insertions(+), 12 deletions(-)
+ drivers/md/dm-integrity.c | 23 +++++++++++++++++------
+ 1 file changed, 17 insertions(+), 6 deletions(-)
 
-diff --git a/crypto/shash.c b/crypto/shash.c
-index ab6902c6dae7..8081c5e03770 100644
---- a/crypto/shash.c
-+++ b/crypto/shash.c
-@@ -73,13 +73,6 @@ int crypto_shash_setkey(struct crypto_shash *tfm, const u8 *key,
- }
- EXPORT_SYMBOL_GPL(crypto_shash_setkey);
- 
--static inline unsigned int shash_align_buffer_size(unsigned len,
--						   unsigned long mask)
--{
--	typedef u8 __aligned_largest u8_aligned;
--	return len + (mask & ~(__alignof__(u8_aligned) - 1));
--}
--
- static int shash_update_unaligned(struct shash_desc *desc, const u8 *data,
- 				  unsigned int len)
- {
-@@ -88,11 +81,13 @@ static int shash_update_unaligned(struct shash_desc *desc, const u8 *data,
- 	unsigned long alignmask = crypto_shash_alignmask(tfm);
- 	unsigned int unaligned_len = alignmask + 1 -
- 				     ((unsigned long)data & alignmask);
--	u8 ubuf[shash_align_buffer_size(unaligned_len, alignmask)]
--		__aligned_largest;
-+	u8 ubuf[MAX_ALGAPI_ALIGNMASK + 1];
- 	u8 *buf = PTR_ALIGN(&ubuf[0], alignmask + 1);
- 	int err;
- 
-+	if (WARN_ON(buf + unaligned_len > ubuf + sizeof(ubuf)))
-+		return -EINVAL;
+diff --git a/drivers/md/dm-integrity.c b/drivers/md/dm-integrity.c
+index 86438b2f10dd..85e8ce1625a2 100644
+--- a/drivers/md/dm-integrity.c
++++ b/drivers/md/dm-integrity.c
+@@ -521,7 +521,12 @@ static void section_mac(struct dm_integrity_c *ic, unsigned section, __u8 result
+ 		}
+ 		memset(result + size, 0, JOURNAL_MAC_SIZE - size);
+ 	} else {
+-		__u8 digest[size];
++		__u8 digest[SHASH_MAX_DIGESTSIZE];
 +
- 	if (unaligned_len > len)
- 		unaligned_len = len;
++		if (WARN_ON(size > sizeof(digest))) {
++			dm_integrity_io_error(ic, "digest_size", -EINVAL);
++			goto err;
++		}
+ 		r = crypto_shash_final(desc, digest);
+ 		if (unlikely(r)) {
+ 			dm_integrity_io_error(ic, "crypto_shash_final", r);
+@@ -1244,7 +1249,7 @@ static void integrity_metadata(struct work_struct *w)
+ 		struct bio *bio = dm_bio_from_per_bio_data(dio, sizeof(struct dm_integrity_io));
+ 		char *checksums;
+ 		unsigned extra_space = unlikely(digest_size > ic->tag_size) ? digest_size - ic->tag_size : 0;
+-		char checksums_onstack[ic->tag_size + extra_space];
++		char checksums_onstack[SHASH_MAX_DIGESTSIZE];
+ 		unsigned sectors_to_process = dio->range.n_sectors;
+ 		sector_t sector = dio->range.logical_sector;
  
-@@ -124,11 +119,13 @@ static int shash_final_unaligned(struct shash_desc *desc, u8 *out)
- 	unsigned long alignmask = crypto_shash_alignmask(tfm);
- 	struct shash_alg *shash = crypto_shash_alg(tfm);
- 	unsigned int ds = crypto_shash_digestsize(tfm);
--	u8 ubuf[shash_align_buffer_size(ds, alignmask)]
--		__aligned_largest;
-+	u8 ubuf[SHASH_MAX_DIGESTSIZE];
- 	u8 *buf = PTR_ALIGN(&ubuf[0], alignmask + 1);
- 	int err;
+@@ -1253,8 +1258,14 @@ static void integrity_metadata(struct work_struct *w)
  
-+	if (WARN_ON(buf + ds > ubuf + sizeof(ubuf)))
-+		return -EINVAL;
-+
- 	err = shash->final(desc, buf);
- 	if (err)
- 		goto out;
-diff --git a/include/linux/compiler-gcc.h b/include/linux/compiler-gcc.h
-index f1a7492a5cc8..1f1cdef36a82 100644
---- a/include/linux/compiler-gcc.h
-+++ b/include/linux/compiler-gcc.h
-@@ -125,7 +125,6 @@
-  */
- #define __pure			__attribute__((pure))
- #define __aligned(x)		__attribute__((aligned(x)))
--#define __aligned_largest	__attribute__((aligned))
- #define __printf(a, b)		__attribute__((format(printf, a, b)))
- #define __scanf(a, b)		__attribute__((format(scanf, a, b)))
- #define __attribute_const__	__attribute__((__const__))
+ 		checksums = kmalloc((PAGE_SIZE >> SECTOR_SHIFT >> ic->sb->log2_sectors_per_block) * ic->tag_size + extra_space,
+ 				    GFP_NOIO | __GFP_NORETRY | __GFP_NOWARN);
+-		if (!checksums)
++		if (!checksums) {
+ 			checksums = checksums_onstack;
++			if (WARN_ON(extra_space &&
++				    digest_size > sizeof(checksums_onstack))) {
++				r = -EINVAL;
++				goto error;
++			}
++		}
+ 
+ 		__bio_for_each_segment(bv, bio, iter, dio->orig_bi_iter) {
+ 			unsigned pos;
+@@ -1466,7 +1477,7 @@ static bool __journal_read_write(struct dm_integrity_io *dio, struct bio *bio,
+ 				} while (++s < ic->sectors_per_block);
+ #ifdef INTERNAL_VERIFY
+ 				if (ic->internal_hash) {
+-					char checksums_onstack[max(crypto_shash_digestsize(ic->internal_hash), ic->tag_size)];
++					char checksums_onstack[max(SHASH_MAX_DIGESTSIZE, MAX_TAG_SIZE)];
+ 
+ 					integrity_sector_checksum(ic, logical_sector, mem + bv.bv_offset, checksums_onstack);
+ 					if (unlikely(memcmp(checksums_onstack, journal_entry_tag(ic, je), ic->tag_size))) {
+@@ -1516,7 +1527,7 @@ static bool __journal_read_write(struct dm_integrity_io *dio, struct bio *bio,
+ 				if (ic->internal_hash) {
+ 					unsigned digest_size = crypto_shash_digestsize(ic->internal_hash);
+ 					if (unlikely(digest_size > ic->tag_size)) {
+-						char checksums_onstack[digest_size];
++						char checksums_onstack[SHASH_MAX_DIGESTSIZE];
+ 						integrity_sector_checksum(ic, logical_sector, (char *)js, checksums_onstack);
+ 						memcpy(journal_entry_tag(ic, je), checksums_onstack, ic->tag_size);
+ 					} else
+@@ -1937,7 +1948,7 @@ static void do_journal_write(struct dm_integrity_c *ic, unsigned write_start,
+ 				    unlikely(from_replay) &&
+ #endif
+ 				    ic->internal_hash) {
+-					char test_tag[max(crypto_shash_digestsize(ic->internal_hash), ic->tag_size)];
++					char test_tag[max_t(size_t, SHASH_MAX_DIGESTSIZE, MAX_TAG_SIZE)];
+ 
+ 					integrity_sector_checksum(ic, sec + ((l - j) << ic->sb->log2_sectors_per_block),
+ 								  (char *)access_journal_data(ic, i, l), test_tag);
 -- 
 2.17.1
