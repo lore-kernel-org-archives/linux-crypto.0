@@ -1,7 +1,7 @@
 From: Kees Cook <keescook@chromium.org>
-Subject: [PATCH v3 3/9] crypto: shash: Remove VLA usage
-Date: Thu, 28 Jun 2018 17:28:37 -0700
-Message-ID: <20180629002843.31095-4-keescook@chromium.org>
+Subject: [PATCH v3 8/9] crypto: qat: Remove VLA usage
+Date: Thu, 28 Jun 2018 17:28:42 -0700
+Message-ID: <20180629002843.31095-9-keescook@chromium.org>
 References: <20180629002843.31095-1-keescook@chromium.org>
 Cc: Kees Cook <keescook@chromium.org>,
         "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
@@ -22,54 +22,41 @@ In-Reply-To: <20180629002843.31095-1-keescook@chromium.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-In the quest to remove all stack VLA usage from the kernel[1], this
-removes the VLAs in SHASH_DESC_ON_STACK (via crypto_shash_descsize())
-by using the maximum allowable size (which is now more clearly captured
-in a macro). Similar limits are turned into macros as well.
+In the quest to remove all stack VLA usage from the kernel[1], this uses
+the new upper bound for the stack buffer. Also adds a sanity check.
 
 [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
 
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- crypto/shash.c        | 6 +++---
- include/crypto/hash.h | 6 +++++-
- 2 files changed, 8 insertions(+), 4 deletions(-)
+ drivers/crypto/qat/qat_common/qat_algs.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/crypto/shash.c b/crypto/shash.c
-index 5d732c6bb4b2..ab6902c6dae7 100644
---- a/crypto/shash.c
-+++ b/crypto/shash.c
-@@ -458,9 +458,9 @@ static int shash_prepare_alg(struct shash_alg *alg)
- {
- 	struct crypto_alg *base = &alg->base;
+diff --git a/drivers/crypto/qat/qat_common/qat_algs.c b/drivers/crypto/qat/qat_common/qat_algs.c
+index 1138e41d6805..a28edf7b792f 100644
+--- a/drivers/crypto/qat/qat_common/qat_algs.c
++++ b/drivers/crypto/qat/qat_common/qat_algs.c
+@@ -153,8 +153,8 @@ static int qat_alg_do_precomputes(struct icp_qat_hw_auth_algo_blk *hash,
+ 	struct sha512_state sha512;
+ 	int block_size = crypto_shash_blocksize(ctx->hash_tfm);
+ 	int digest_size = crypto_shash_digestsize(ctx->hash_tfm);
+-	char ipad[block_size];
+-	char opad[block_size];
++	char ipad[MAX_ALGAPI_BLOCKSIZE];
++	char opad[MAX_ALGAPI_BLOCKSIZE];
+ 	__be32 *hash_state_out;
+ 	__be64 *hash512_state_out;
+ 	int i, offset;
+@@ -164,6 +164,10 @@ static int qat_alg_do_precomputes(struct icp_qat_hw_auth_algo_blk *hash,
+ 	shash->tfm = ctx->hash_tfm;
+ 	shash->flags = 0x0;
  
--	if (alg->digestsize > PAGE_SIZE / 8 ||
--	    alg->descsize > PAGE_SIZE / 8 ||
--	    alg->statesize > PAGE_SIZE / 8)
-+	if (alg->digestsize > SHASH_MAX_DIGESTSIZE ||
-+	    alg->descsize > SHASH_MAX_DESCSIZE ||
-+	    alg->statesize > SHASH_MAX_STATESIZE)
- 		return -EINVAL;
- 
- 	base->cra_type = &crypto_shash_type;
-diff --git a/include/crypto/hash.h b/include/crypto/hash.h
-index 76e432cab75d..804e87a9510e 100644
---- a/include/crypto/hash.h
-+++ b/include/crypto/hash.h
-@@ -151,9 +151,13 @@ struct shash_desc {
- 	void *__ctx[] CRYPTO_MINALIGN_ATTR;
- };
- 
-+#define SHASH_MAX_DIGESTSIZE    512
-+#define SHASH_MAX_DESCSIZE      512
-+#define SHASH_MAX_STATESIZE     512
++	if (WARN_ON(block_size > sizeof(ipad) ||
++		    sizeof(ipad) != sizeof(opad)))
++		return -EINVAL;
 +
- #define SHASH_DESC_ON_STACK(shash, ctx)				  \
- 	char __##shash##_desc[sizeof(struct shash_desc) +	  \
--		crypto_shash_descsize(ctx)] CRYPTO_MINALIGN_ATTR; \
-+		SHASH_MAX_DESCSIZE] CRYPTO_MINALIGN_ATTR; \
- 	struct shash_desc *shash = (struct shash_desc *)__##shash##_desc
- 
- /**
+ 	if (auth_keylen > block_size) {
+ 		int ret = crypto_shash_digest(shash, auth_key,
+ 					      auth_keylen, ipad);
 -- 
 2.17.1
