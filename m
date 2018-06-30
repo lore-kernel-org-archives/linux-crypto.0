@@ -1,79 +1,123 @@
-From: Kees Cook <keescook@chromium.org>
-Subject: Re: [PATCH v3 4/9] dm integrity: Remove VLA usage
-Date: Fri, 29 Jun 2018 14:56:37 -0700
-Message-ID: <CAGXu5j+MLs-Jj7VCcpKS8Yo6MFAf=Nyf3jYsCbBoXnhtEvn4+g@mail.gmail.com>
-References: <20180629002843.31095-1-keescook@chromium.org> <20180629002843.31095-5-keescook@chromium.org>
- <CAK8P3a3F2y8B3a5zhYyG2KSMmSx5L3J3C_0sV-Csa0zPOzYJhA@mail.gmail.com>
+From: Eric Biggers <ebiggers3@gmail.com>
+Subject: Re: [dm-devel] [PATCH v3 9/9] crypto: shash: Remove VLA usage in
+ unaligned hashing
+Date: Sat, 30 Jun 2018 00:03:01 -0700
+Message-ID: <20180630070301.GA1706@sol.localdomain>
+References: <20180629002843.31095-1-keescook@chromium.org>
+ <20180629002843.31095-10-keescook@chromium.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
 Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
-        Eric Biggers <ebiggers@google.com>,
-        Alasdair Kergon <agk@redhat.com>,
         Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Lars Persson <larper@axis.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Eric Biggers <ebiggers@google.com>,
         Mike Snitzer <snitzer@redhat.com>,
-        Rabin Vincent <rabinv@axis.com>,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+        qat-linux@intel.com, linux-kernel@vger.kernel.org,
+        dm-devel@redhat.com, linux-crypto@vger.kernel.org,
+        Lars Persson <larper@axis.com>,
         Tim Chen <tim.c.chen@linux.intel.com>,
         "David S. Miller" <davem@davemloft.net>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>, qat-linux@intel.com,
-        dm-devel@redhat.com,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
+        Alasdair Kergon <agk@redhat.com>,
+        Rabin Vincent <rabinv@axis.com>
+To: Kees Cook <keescook@chromium.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAK8P3a3F2y8B3a5zhYyG2KSMmSx5L3J3C_0sV-Csa0zPOzYJhA@mail.gmail.com>
+Content-Disposition: inline
+In-Reply-To: <20180629002843.31095-10-keescook@chromium.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Jun 29, 2018 at 1:43 PM, Arnd Bergmann <arnd@arndb.de> wrote:
-> On Fri, Jun 29, 2018 at 2:28 AM, Kees Cook <keescook@chromium.org> wrote:
->
->> diff --git a/drivers/md/dm-integrity.c b/drivers/md/dm-integrity.c
->> index 86438b2f10dd..85e8ce1625a2 100644
->> --- a/drivers/md/dm-integrity.c
->> +++ b/drivers/md/dm-integrity.c
->> @@ -521,7 +521,12 @@ static void section_mac(struct dm_integrity_c *ic, unsigned section, __u8 result
->>                 }
->>                 memset(result + size, 0, JOURNAL_MAC_SIZE - size);
->>         } else {
->> -               __u8 digest[size];
->> +               __u8 digest[SHASH_MAX_DIGESTSIZE];
->> +
->> +               if (WARN_ON(size > sizeof(digest))) {
->> +                       dm_integrity_io_error(ic, "digest_size", -EINVAL);
->> +                       goto err;
->> +               }
->
-> I'm still slightly worried that some patches like this one could make
-> things worse and lead to an actual stack overflow.
+On Thu, Jun 28, 2018 at 05:28:43PM -0700, Kees Cook wrote:
+> In the quest to remove all stack VLA usage from the kernel[1], this uses
+> the newly defined max alignment to perform unaligned hashing to avoid
+> VLAs, and drops the helper function while adding sanity checks on the
+> resulting buffer sizes. Additionally, the __aligned_largest macro is
+> removed since this helper was the only user.
+> 
+> [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
+> 
+> Signed-off-by: Kees Cook <keescook@chromium.org>
+> ---
+>  crypto/shash.c               | 19 ++++++++-----------
+>  include/linux/compiler-gcc.h |  1 -
+>  2 files changed, 8 insertions(+), 12 deletions(-)
+> 
+> diff --git a/crypto/shash.c b/crypto/shash.c
+> index ab6902c6dae7..8081c5e03770 100644
+> --- a/crypto/shash.c
+> +++ b/crypto/shash.c
+> @@ -73,13 +73,6 @@ int crypto_shash_setkey(struct crypto_shash *tfm, const u8 *key,
+>  }
+>  EXPORT_SYMBOL_GPL(crypto_shash_setkey);
+>  
+> -static inline unsigned int shash_align_buffer_size(unsigned len,
+> -						   unsigned long mask)
+> -{
+> -	typedef u8 __aligned_largest u8_aligned;
+> -	return len + (mask & ~(__alignof__(u8_aligned) - 1));
+> -}
+> -
+>  static int shash_update_unaligned(struct shash_desc *desc, const u8 *data,
+>  				  unsigned int len)
+>  {
+> @@ -88,11 +81,13 @@ static int shash_update_unaligned(struct shash_desc *desc, const u8 *data,
+>  	unsigned long alignmask = crypto_shash_alignmask(tfm);
+>  	unsigned int unaligned_len = alignmask + 1 -
+>  				     ((unsigned long)data & alignmask);
+> -	u8 ubuf[shash_align_buffer_size(unaligned_len, alignmask)]
+> -		__aligned_largest;
+> +	u8 ubuf[MAX_ALGAPI_ALIGNMASK + 1];
+>  	u8 *buf = PTR_ALIGN(&ubuf[0], alignmask + 1);
+>  	int err;
+>  
+> +	if (WARN_ON(buf + unaligned_len > ubuf + sizeof(ubuf)))
+> +		return -EINVAL;
+> +
 
-As in stack exhaustion? Yeah, this has been a concern of mine for the
-crypto stuff because some combinations get BIG. My thinking has been
-mainly that it means ALL cases will lead to a bad state instead of
-only corner cases, which makes it easier to find and fix.
+How is 'ubuf' guaranteed to be large enough?  You removed the __aligned
+attribute, so 'ubuf' can have any alignment.  So the aligned pointer 'buf' may
+be as high as '&ubuf[alignmask]'.  Then, up to 'alignmask' bytes of data will be
+copied into 'buf'... resulting in up to '2 * alignmask' bytes needed in 'ubuf'.
+But you've only guaranteed 'alignmask + 1' bytes.
 
-> You define SHASH_MAX_DIGESTSIZE
-> as '512', which is still quite a lot to put on the kernel stack. The
-> function also
-> uses SHASH_DESC_ON_STACK(), so now you have two copies. Then you
-> could call shash_final_unaligned(), which seems to put a third copy on
-> the stack,
-> so replacing each one with a fixed-size buffer adds quite a bit of bloat.
->
-> Is there actually a digest that can be used in dm-integrity with more than 64
-> byte output (matching JOURNAL_MAC_SIZE) here?
+>  	if (unaligned_len > len)
+>  		unaligned_len = len;
+>  
+> @@ -124,11 +119,13 @@ static int shash_final_unaligned(struct shash_desc *desc, u8 *out)
+>  	unsigned long alignmask = crypto_shash_alignmask(tfm);
+>  	struct shash_alg *shash = crypto_shash_alg(tfm);
+>  	unsigned int ds = crypto_shash_digestsize(tfm);
+> -	u8 ubuf[shash_align_buffer_size(ds, alignmask)]
+> -		__aligned_largest;
+> +	u8 ubuf[SHASH_MAX_DIGESTSIZE];
+>  	u8 *buf = PTR_ALIGN(&ubuf[0], alignmask + 1);
+>  	int err;
+>  
+> +	if (WARN_ON(buf + ds > ubuf + sizeof(ubuf)))
+> +		return -EINVAL;
+> +
 
-This conversion was following the existing check (PAGE_SIZE / 8), and
-not via an analysis of alg.digestsize users. Let me double-check. For
-predefined stuff, it looks like the largest is:
+Similar problem here.  Wouldn't 'ubuf' need to be of size 'alignmask + ds'?
 
-SKEIN1024_DIGEST_BIT_SIZE/8 == 128
-
-I can drop this from 512 down to 128...
-
--Kees
-
--- 
-Kees Cook
-Pixel Security
+>  	err = shash->final(desc, buf);
+>  	if (err)
+>  		goto out;
+> diff --git a/include/linux/compiler-gcc.h b/include/linux/compiler-gcc.h
+> index f1a7492a5cc8..1f1cdef36a82 100644
+> --- a/include/linux/compiler-gcc.h
+> +++ b/include/linux/compiler-gcc.h
+> @@ -125,7 +125,6 @@
+>   */
+>  #define __pure			__attribute__((pure))
+>  #define __aligned(x)		__attribute__((aligned(x)))
+> -#define __aligned_largest	__attribute__((aligned))
+>  #define __printf(a, b)		__attribute__((format(printf, a, b)))
+>  #define __scanf(a, b)		__attribute__((format(scanf, a, b)))
+>  #define __attribute_const__	__attribute__((__const__))
+> -- 
+> 2.17.1
+> 
+> --
+> dm-devel mailing list
+> dm-devel@redhat.com
+> https://www.redhat.com/mailman/listinfo/dm-devel
