@@ -1,123 +1,84 @@
-From: Eric Biggers <ebiggers3@gmail.com>
-Subject: Re: [dm-devel] [PATCH v3 9/9] crypto: shash: Remove VLA usage in
- unaligned hashing
-Date: Sat, 30 Jun 2018 00:03:01 -0700
-Message-ID: <20180630070301.GA1706@sol.localdomain>
-References: <20180629002843.31095-1-keescook@chromium.org>
- <20180629002843.31095-10-keescook@chromium.org>
+From: Colin King <colin.king@canonical.com>
+Subject: [PATCH] crypto: zip: make several functions static
+Date: Sat, 30 Jun 2018 12:30:49 +0100
+Message-ID: <20180630113049.4402-1-colin.king@canonical.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Eric Biggers <ebiggers@google.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
-        qat-linux@intel.com, linux-kernel@vger.kernel.org,
-        dm-devel@redhat.com, linux-crypto@vger.kernel.org,
-        Lars Persson <larper@axis.com>,
-        Tim Chen <tim.c.chen@linux.intel.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Alasdair Kergon <agk@redhat.com>,
-        Rabin Vincent <rabinv@axis.com>
-To: Kees Cook <keescook@chromium.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Cc: kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Jan Glauber <jglauber@cavium.com>,
+        Robert Richter <rrichter@cavium.com>,
+        linux-crypto@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20180629002843.31095-10-keescook@chromium.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Jun 28, 2018 at 05:28:43PM -0700, Kees Cook wrote:
-> In the quest to remove all stack VLA usage from the kernel[1], this uses
-> the newly defined max alignment to perform unaligned hashing to avoid
-> VLAs, and drops the helper function while adding sanity checks on the
-> resulting buffer sizes. Additionally, the __aligned_largest macro is
-> removed since this helper was the only user.
-> 
-> [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
-> 
-> Signed-off-by: Kees Cook <keescook@chromium.org>
-> ---
->  crypto/shash.c               | 19 ++++++++-----------
->  include/linux/compiler-gcc.h |  1 -
->  2 files changed, 8 insertions(+), 12 deletions(-)
-> 
-> diff --git a/crypto/shash.c b/crypto/shash.c
-> index ab6902c6dae7..8081c5e03770 100644
-> --- a/crypto/shash.c
-> +++ b/crypto/shash.c
-> @@ -73,13 +73,6 @@ int crypto_shash_setkey(struct crypto_shash *tfm, const u8 *key,
->  }
->  EXPORT_SYMBOL_GPL(crypto_shash_setkey);
->  
-> -static inline unsigned int shash_align_buffer_size(unsigned len,
-> -						   unsigned long mask)
-> -{
-> -	typedef u8 __aligned_largest u8_aligned;
-> -	return len + (mask & ~(__alignof__(u8_aligned) - 1));
-> -}
-> -
->  static int shash_update_unaligned(struct shash_desc *desc, const u8 *data,
->  				  unsigned int len)
->  {
-> @@ -88,11 +81,13 @@ static int shash_update_unaligned(struct shash_desc *desc, const u8 *data,
->  	unsigned long alignmask = crypto_shash_alignmask(tfm);
->  	unsigned int unaligned_len = alignmask + 1 -
->  				     ((unsigned long)data & alignmask);
-> -	u8 ubuf[shash_align_buffer_size(unaligned_len, alignmask)]
-> -		__aligned_largest;
-> +	u8 ubuf[MAX_ALGAPI_ALIGNMASK + 1];
->  	u8 *buf = PTR_ALIGN(&ubuf[0], alignmask + 1);
->  	int err;
->  
-> +	if (WARN_ON(buf + unaligned_len > ubuf + sizeof(ubuf)))
-> +		return -EINVAL;
-> +
+From: Colin Ian King <colin.king@canonical.com>
 
-How is 'ubuf' guaranteed to be large enough?  You removed the __aligned
-attribute, so 'ubuf' can have any alignment.  So the aligned pointer 'buf' may
-be as high as '&ubuf[alignmask]'.  Then, up to 'alignmask' bytes of data will be
-copied into 'buf'... resulting in up to '2 * alignmask' bytes needed in 'ubuf'.
-But you've only guaranteed 'alignmask + 1' bytes.
+The functions zip_ctx_exit, zip_compress, zip_decompress and zip_ctx_init
+are local to the source and do not need to be in global scope, so make
+them static.
 
->  	if (unaligned_len > len)
->  		unaligned_len = len;
->  
-> @@ -124,11 +119,13 @@ static int shash_final_unaligned(struct shash_desc *desc, u8 *out)
->  	unsigned long alignmask = crypto_shash_alignmask(tfm);
->  	struct shash_alg *shash = crypto_shash_alg(tfm);
->  	unsigned int ds = crypto_shash_digestsize(tfm);
-> -	u8 ubuf[shash_align_buffer_size(ds, alignmask)]
-> -		__aligned_largest;
-> +	u8 ubuf[SHASH_MAX_DIGESTSIZE];
->  	u8 *buf = PTR_ALIGN(&ubuf[0], alignmask + 1);
->  	int err;
->  
-> +	if (WARN_ON(buf + ds > ubuf + sizeof(ubuf)))
-> +		return -EINVAL;
-> +
+Cleans up sparse warnings:
+symbol 'zip_ctx_exit' was not declared. Should it be static?
+symbol 'zip_compress' was not declared. Should it be static?
+symbol 'zip_decompress' was not declared. Should it be static?
+symbol 'zip_ctx_init' was not declared. Should it be static?
 
-Similar problem here.  Wouldn't 'ubuf' need to be of size 'alignmask + ds'?
+Signed-off-by: Colin Ian King <colin.king@canonical.com>
+---
+ drivers/crypto/cavium/zip/zip_crypto.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
->  	err = shash->final(desc, buf);
->  	if (err)
->  		goto out;
-> diff --git a/include/linux/compiler-gcc.h b/include/linux/compiler-gcc.h
-> index f1a7492a5cc8..1f1cdef36a82 100644
-> --- a/include/linux/compiler-gcc.h
-> +++ b/include/linux/compiler-gcc.h
-> @@ -125,7 +125,6 @@
->   */
->  #define __pure			__attribute__((pure))
->  #define __aligned(x)		__attribute__((aligned(x)))
-> -#define __aligned_largest	__attribute__((aligned))
->  #define __printf(a, b)		__attribute__((format(printf, a, b)))
->  #define __scanf(a, b)		__attribute__((format(scanf, a, b)))
->  #define __attribute_const__	__attribute__((__const__))
-> -- 
-> 2.17.1
-> 
-> --
-> dm-devel mailing list
-> dm-devel@redhat.com
-> https://www.redhat.com/mailman/listinfo/dm-devel
+diff --git a/drivers/crypto/cavium/zip/zip_crypto.c b/drivers/crypto/cavium/zip/zip_crypto.c
+index b92b6e7e100f..f9e99a15d2a0 100644
+--- a/drivers/crypto/cavium/zip/zip_crypto.c
++++ b/drivers/crypto/cavium/zip/zip_crypto.c
+@@ -69,7 +69,7 @@ static void zip_static_init_zip_ops(struct zip_operation *zip_ops,
+ 	zip_ops->csum	      = 1; /* Adler checksum desired */
+ }
+ 
+-int zip_ctx_init(struct zip_kernel_ctx *zip_ctx, int lzs_flag)
++static int zip_ctx_init(struct zip_kernel_ctx *zip_ctx, int lzs_flag)
+ {
+ 	struct zip_operation  *comp_ctx   = &zip_ctx->zip_comp;
+ 	struct zip_operation  *decomp_ctx = &zip_ctx->zip_decomp;
+@@ -107,7 +107,7 @@ int zip_ctx_init(struct zip_kernel_ctx *zip_ctx, int lzs_flag)
+ 	return -ENOMEM;
+ }
+ 
+-void zip_ctx_exit(struct zip_kernel_ctx *zip_ctx)
++static void zip_ctx_exit(struct zip_kernel_ctx *zip_ctx)
+ {
+ 	struct zip_operation  *comp_ctx   = &zip_ctx->zip_comp;
+ 	struct zip_operation  *dec_ctx = &zip_ctx->zip_decomp;
+@@ -119,9 +119,9 @@ void zip_ctx_exit(struct zip_kernel_ctx *zip_ctx)
+ 	zip_data_buf_free(dec_ctx->output, MAX_OUTPUT_BUFFER_SIZE);
+ }
+ 
+-int zip_compress(const u8 *src, unsigned int slen,
+-		 u8 *dst, unsigned int *dlen,
+-		 struct zip_kernel_ctx *zip_ctx)
++static int zip_compress(const u8 *src, unsigned int slen,
++			u8 *dst, unsigned int *dlen,
++			struct zip_kernel_ctx *zip_ctx)
+ {
+ 	struct zip_operation  *zip_ops   = NULL;
+ 	struct zip_state      *zip_state;
+@@ -155,9 +155,9 @@ int zip_compress(const u8 *src, unsigned int slen,
+ 	return ret;
+ }
+ 
+-int zip_decompress(const u8 *src, unsigned int slen,
+-		   u8 *dst, unsigned int *dlen,
+-		   struct zip_kernel_ctx *zip_ctx)
++static int zip_decompress(const u8 *src, unsigned int slen,
++			  u8 *dst, unsigned int *dlen,
++			  struct zip_kernel_ctx *zip_ctx)
+ {
+ 	struct zip_operation  *zip_ops   = NULL;
+ 	struct zip_state      *zip_state;
+-- 
+2.17.1
