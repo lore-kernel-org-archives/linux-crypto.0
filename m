@@ -1,84 +1,37 @@
-From: Colin King <colin.king@canonical.com>
-Subject: [PATCH] crypto: zip: make several functions static
-Date: Sat, 30 Jun 2018 12:30:49 +0100
-Message-ID: <20180630113049.4402-1-colin.king@canonical.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Cc: kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Jan Glauber <jglauber@cavium.com>,
-        Robert Richter <rrichter@cavium.com>,
-        linux-crypto@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
+From: Eric Biggers <ebiggers3@gmail.com>
+Subject: [PATCH net] ipv6: sr: fix passing wrong flags to crypto_alloc_shash()
+Date: Sat, 30 Jun 2018 15:26:56 -0700
+Message-ID: <20180630222656.333-1-ebiggers3@gmail.com>
+Cc: David Lebrun <david.lebrun@uclouvain.be>,
+        linux-crypto@vger.kernel.org, Eric Biggers <ebiggers@google.com>
+To: netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>
+Return-path: <netdev-owner@vger.kernel.org>
+Sender: netdev-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-From: Colin Ian King <colin.king@canonical.com>
+From: Eric Biggers <ebiggers@google.com>
 
-The functions zip_ctx_exit, zip_compress, zip_decompress and zip_ctx_init
-are local to the source and do not need to be in global scope, so make
-them static.
+The 'mask' argument to crypto_alloc_shash() uses the CRYPTO_ALG_* flags,
+not 'gfp_t'.  So don't pass GFP_KERNEL to it.
 
-Cleans up sparse warnings:
-symbol 'zip_ctx_exit' was not declared. Should it be static?
-symbol 'zip_compress' was not declared. Should it be static?
-symbol 'zip_decompress' was not declared. Should it be static?
-symbol 'zip_ctx_init' was not declared. Should it be static?
-
-Signed-off-by: Colin Ian King <colin.king@canonical.com>
+Fixes: bf355b8d2c30 ("ipv6: sr: add core files for SR HMAC support")
+Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- drivers/crypto/cavium/zip/zip_crypto.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+ net/ipv6/seg6_hmac.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/cavium/zip/zip_crypto.c b/drivers/crypto/cavium/zip/zip_crypto.c
-index b92b6e7e100f..f9e99a15d2a0 100644
---- a/drivers/crypto/cavium/zip/zip_crypto.c
-+++ b/drivers/crypto/cavium/zip/zip_crypto.c
-@@ -69,7 +69,7 @@ static void zip_static_init_zip_ops(struct zip_operation *zip_ops,
- 	zip_ops->csum	      = 1; /* Adler checksum desired */
- }
+diff --git a/net/ipv6/seg6_hmac.c b/net/ipv6/seg6_hmac.c
+index 33fb35cbfac13..558fe8cc6d438 100644
+--- a/net/ipv6/seg6_hmac.c
++++ b/net/ipv6/seg6_hmac.c
+@@ -373,7 +373,7 @@ static int seg6_hmac_init_algo(void)
+ 			return -ENOMEM;
  
--int zip_ctx_init(struct zip_kernel_ctx *zip_ctx, int lzs_flag)
-+static int zip_ctx_init(struct zip_kernel_ctx *zip_ctx, int lzs_flag)
- {
- 	struct zip_operation  *comp_ctx   = &zip_ctx->zip_comp;
- 	struct zip_operation  *decomp_ctx = &zip_ctx->zip_decomp;
-@@ -107,7 +107,7 @@ int zip_ctx_init(struct zip_kernel_ctx *zip_ctx, int lzs_flag)
- 	return -ENOMEM;
- }
- 
--void zip_ctx_exit(struct zip_kernel_ctx *zip_ctx)
-+static void zip_ctx_exit(struct zip_kernel_ctx *zip_ctx)
- {
- 	struct zip_operation  *comp_ctx   = &zip_ctx->zip_comp;
- 	struct zip_operation  *dec_ctx = &zip_ctx->zip_decomp;
-@@ -119,9 +119,9 @@ void zip_ctx_exit(struct zip_kernel_ctx *zip_ctx)
- 	zip_data_buf_free(dec_ctx->output, MAX_OUTPUT_BUFFER_SIZE);
- }
- 
--int zip_compress(const u8 *src, unsigned int slen,
--		 u8 *dst, unsigned int *dlen,
--		 struct zip_kernel_ctx *zip_ctx)
-+static int zip_compress(const u8 *src, unsigned int slen,
-+			u8 *dst, unsigned int *dlen,
-+			struct zip_kernel_ctx *zip_ctx)
- {
- 	struct zip_operation  *zip_ops   = NULL;
- 	struct zip_state      *zip_state;
-@@ -155,9 +155,9 @@ int zip_compress(const u8 *src, unsigned int slen,
- 	return ret;
- }
- 
--int zip_decompress(const u8 *src, unsigned int slen,
--		   u8 *dst, unsigned int *dlen,
--		   struct zip_kernel_ctx *zip_ctx)
-+static int zip_decompress(const u8 *src, unsigned int slen,
-+			  u8 *dst, unsigned int *dlen,
-+			  struct zip_kernel_ctx *zip_ctx)
- {
- 	struct zip_operation  *zip_ops   = NULL;
- 	struct zip_state      *zip_state;
+ 		for_each_possible_cpu(cpu) {
+-			tfm = crypto_alloc_shash(algo->name, 0, GFP_KERNEL);
++			tfm = crypto_alloc_shash(algo->name, 0, 0);
+ 			if (IS_ERR(tfm))
+ 				return PTR_ERR(tfm);
+ 			p_tfm = per_cpu_ptr(algo->tfms, cpu);
 -- 
-2.17.1
+2.18.0
