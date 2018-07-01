@@ -1,63 +1,37 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v3 0/2] Detect & register virtio-crypto algos only if it
- can be supported by backend
-Date: Sun, 1 Jul 2018 21:18:55 +0800
-Message-ID: <20180701131855.5sjnvyvhiq7ktzg3@gondor.apana.org.au>
-References: <cover.1529422492.git.alifm@linux.ibm.com>
+Subject: Re: [PATCH v2] crypto: skcipher: remove the exporting of
+ skcipher_walk_next
+Date: Sun, 1 Jul 2018 21:19:08 +0800
+Message-ID: <20180701131908.jl5kg6gosrvkmc4p@gondor.apana.org.au>
+References: <20180617174959.29864-1-efremov@linux.com>
+ <20180619202357.10805-1-efremov@linux.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, qemu-devel@nongnu.org, borntraeger@de.ibm.com,
-        arei.gonglei@huawei.com, longpeng2@huawei.com, pasic@linux.ibm.com,
-        frankja@linux.ibm.com, jasowang@redhat.com, mst@redhat.com
-To: Farhan Ali <alifm@linux.ibm.com>
+Cc: Eric Biggers <ebiggers3@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        ldv-project@linuxtesting.org
+To: efremov@linux.com
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <cover.1529422492.git.alifm@linux.ibm.com>
+In-Reply-To: <20180619202357.10805-1-efremov@linux.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Jun 19, 2018 at 11:41:32AM -0400, Farhan Ali wrote:
-> Hi,
+On Tue, Jun 19, 2018 at 11:23:57PM +0300, efremov@linux.com wrote:
+> The function skcipher_walk_next declared as static and marked as
+> EXPORT_SYMBOL_GPL. It's a bit confusing for internal function to be
+> exported. The area of visibility for such function is its .c file
+> and all other modules. Other *.c files of the same module can't use it,
+> despite all other modules can. Relying on the fact that this is the
+> internal function and it's not a crucial part of the API, the patch
+> just removes the EXPORT_SYMBOL_GPL marking of skcipher_walk_next.
 > 
-> Currently the Linux virtio-crypto driver registers the crypto
-> algorithm without verifying if the backend actually supports the
-> algorithm.
+> Found by Linux Driver Verification project (linuxtesting.org).
 > 
-> This kernel patch series adds support for registering algorithm
-> with Linux crypto layer, only if the algorithm is supported by
-> the backend device. This also makes the driver more compliant with
-> the virtio-crypto spec [1].
-> 
-> I would appreciate any feedback or comments on this.
-> 
-> Thank you
-> Farhan
-> 
-> Reference
-> ---------
-> [1] Virtio crypto spec proposal https://lists.gnu.org/archive/html/qemu-devel/2017-12/msg00816.html
-> 
-> ChangeLog
-> ---------
-> v2 -> v3
->     - Add Christian Borntrager's acks for the patches.
-> 
-> v1 -> v2
->    - Modify comment as suggested by Arei (patch 1)
->    - Modify error message as suggested by Arei (patch 2)
-> 
-> Farhan Ali (2):
->   crypto/virtio-crypto: Read crypto services and algorithm masks
->   crypto/virtio-crypto: Register an algo only if it's supported
-> 
->  drivers/crypto/virtio/virtio_crypto_algs.c   | 112 ++++++++++++++++++---------
->  drivers/crypto/virtio/virtio_crypto_common.h |  25 +++++-
->  drivers/crypto/virtio/virtio_crypto_core.c   |  29 +++++++
->  drivers/crypto/virtio/virtio_crypto_mgr.c    |  81 +++++++++++++++++--
->  4 files changed, 202 insertions(+), 45 deletions(-)
+> Signed-off-by: Denis Efremov <efremov@linux.com>
 
-All applied.  Thanks.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
