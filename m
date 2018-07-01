@@ -1,48 +1,42 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v3 4/9] dm integrity: Remove VLA usage
-Date: Sun, 1 Jul 2018 14:29:14 +0800
-Message-ID: <20180701062914.nihtpl5ekf7nytat@gondor.apana.org.au>
-References: <20180629002843.31095-1-keescook@chromium.org>
- <20180629002843.31095-5-keescook@chromium.org>
- <CAK8P3a3F2y8B3a5zhYyG2KSMmSx5L3J3C_0sV-Csa0zPOzYJhA@mail.gmail.com>
- <CAGXu5j+MLs-Jj7VCcpKS8Yo6MFAf=Nyf3jYsCbBoXnhtEvn4+g@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Arnd Bergmann <arnd@arndb.de>,
-        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
-        Eric Biggers <ebiggers@google.com>,
-        Alasdair Kergon <agk@redhat.com>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Lars Persson <larper@axis.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Rabin Vincent <rabinv@axis.com>,
-        Tim Chen <tim.c.chen@linux.intel.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>, qat-linux@intel.com,
-        dm-devel@redhat.com,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Kees Cook <keescook@chromium.org>
+From: Gilad Ben-Yossef <gilad@benyossef.com>
+Subject: [PATCH v2 0/6] crypto: fixes and cleanups
+Date: Sun,  1 Jul 2018 08:02:33 +0100
+Message-ID: <1530428560-4440-1-git-send-email-gilad@benyossef.com>
+Cc: Ofir Drang <ofir.drang@arm.com>, Hadar Gat <hadar.gat@arm.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <CAGXu5j+MLs-Jj7VCcpKS8Yo6MFAf=Nyf3jYsCbBoXnhtEvn4+g@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Jun 29, 2018 at 02:56:37PM -0700, Kees Cook wrote:
->
-> This conversion was following the existing check (PAGE_SIZE / 8), and
-> not via an analysis of alg.digestsize users. Let me double-check. For
-> predefined stuff, it looks like the largest is:
-> 
-> SKEIN1024_DIGEST_BIT_SIZE/8 == 128
+The patch set fixes ccree IV handling, finup() operation (provided           
+by Hadar Gat) and CTS-AES mode of operation along a code cleanup.                                             
+                                                                                
+Since our finup() method was obviously broken but was not detected              
+by testmgr, I've added finup() test to testmgr to catch it next                 
+time it happened.
 
-This should be removed.  We shouldn't allow generic or new crypto
-algorithms in staging.
+Changes from v1:
+- Add missing "static" qualifier reported by kbuild bot
+- Add CTS-AES fix and some more cleanups
 
-Thanks,
+
+Gilad Ben-Yossef (5):
+  crypto: testmgr: add hash finup tests
+  crypto: ccree: fix iv handling
+  crypto: ccree: remove dead legacy code
+  crypto: ccree: use CBC-CS3 CTS mode
+  crypto: ccree: rate limit debug print
+
+Hadar Gat (1):
+  crypto: ccree: fix finup
+
+ crypto/testmgr.c                 |  55 +++++++++++++---
+ drivers/crypto/ccree/cc_cipher.c | 137 +++++++++++++++++++++++++--------------
+ drivers/crypto/ccree/cc_driver.c |   4 +-
+ drivers/crypto/ccree/cc_hash.c   |  81 +++++------------------
+ 4 files changed, 153 insertions(+), 124 deletions(-)
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.7.4
