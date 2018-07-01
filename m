@@ -1,51 +1,41 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2 11/11] crypto: skcipher: Remove VLA usage
- for SKCIPHER_REQUEST_ON_STACK
-Date: Sun, 1 Jul 2018 14:24:19 +0800
-Message-ID: <20180701062419.3opt7mnljf76hi4k@gondor.apana.org.au>
-References: <20180625211026.15819-1-keescook@chromium.org>
-	<20180625211026.15819-12-keescook@chromium.org>
-	<20180626092041.mxfg4lxcvxfivzc2@gondor.apana.org.au>
-	<CAGXu5jKYb-0NNvOcN79hzqU7O6vCFhMTBDGBL8Knuoc-YHamPg@mail.gmail.com>
-	<20180627143622.ntksjxsymo4yw6dz@gondor.apana.org.au>
-	<CAGXu5jJ2Z=YP+fNsvy+6a_BpC1ibZf6tOzZuPHk=Qx1qNVvOZw@mail.gmail.com>
-	<20180627222749.xa5333caq5vaa7st@gondor.apana.org.au>
-	<CAGXu5jKas=OyJPsrMthxjEykG=FkHDW84dO4bKGpj-50JjUYwQ@mail.gmail.com>
+Subject: Re: [PATCH 3/3] hwrng: msm - Add support for prng v2
+Date: Sun, 1 Jul 2018 14:27:34 +0800
+Message-ID: <20180701062734.s6ldsbhi42hnn6x6@gondor.apana.org.au>
+References: <20180618141259.23141-1-vkoul@kernel.org>
+ <20180618141259.23141-4-vkoul@kernel.org>
+ <20180619142853.wgi5easw4zv6ttrb@gondor.apana.org.au>
+ <966e9cd4-70a3-8d54-df0f-16df3df45fb5@linaro.org>
+ <20180621101506.rnklbtapvfdev4xb@gondor.apana.org.au>
+ <e39deb02-8fa4-84ac-b33e-d692402189a1@linaro.org>
+ <20180621115312.rfmbitrhqi44wu5w@gondor.apana.org.au>
+ <CAOZdJXVO-0JDvX4OdJMNCmY_BXrEenXpoWBf=Ww5uFBtXKN86A@mail.gmail.com>
+ <20180629083732.GB22377@vkoul-mobl>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-	Mike Snitzer <snitzer@redhat.com>, Arnd Bergmann <arnd@arndb.de>,
-	"Gustavo A. R. Silva" <gustavo@embeddedor.com>,
-	Eric Biggers <ebiggers@google.com>, qat-linux@intel.com,
-	LKML <linux-kernel@vger.kernel.org>, dm-devel@redhat.com,
-	linux-crypto <linux-crypto@vger.kernel.org>,
-	Lars Persson <larper@axis.com>, Tim Chen <tim.c.chen@linux.intel.com>,
-	"David S. Miller" <davem@davemloft.net>, Alasdair Kergon <agk@redhat.com>,
-	Rabin Vincent <rabinv@axis.com>
-To: Kees Cook <keescook@chromium.org>
-Return-path: <dm-devel-bounces@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: Timur Tabi <timur@kernel.org>,
+        Stanimir Varbanov <stanimir.varbanov@linaro.org>,
+        linux-crypto@vger.kernel.org, lkml <linux-kernel@vger.kernel.org>,
+        Matt Mackall <mpm@selenic.com>, Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-arm-msm@vger.kernel.org
+To: Vinod <vkoul@kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <CAGXu5jKas=OyJPsrMthxjEykG=FkHDW84dO4bKGpj-50JjUYwQ@mail.gmail.com>
-List-Unsubscribe: <https://www.redhat.com/mailman/options/dm-devel>,
-	<mailto:dm-devel-request@redhat.com?subject=unsubscribe>
-List-Archive: <https://www.redhat.com/archives/dm-devel>
-List-Post: <mailto:dm-devel@redhat.com>
-List-Help: <mailto:dm-devel-request@redhat.com?subject=help>
-List-Subscribe: <https://www.redhat.com/mailman/listinfo/dm-devel>,
-	<mailto:dm-devel-request@redhat.com?subject=subscribe>
-Sender: dm-devel-bounces@redhat.com
-Errors-To: dm-devel-bounces@redhat.com
+In-Reply-To: <20180629083732.GB22377@vkoul-mobl>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Jun 27, 2018 at 05:10:05PM -0700, Kees Cook wrote:
+On Fri, Jun 29, 2018 at 02:07:32PM +0530, Vinod wrote:
 >
-> In both cases here, what is "cipher"? i.e. what ciphers could lrw be
-> wrapping, and what ciphers could cts be wrapping, so that I can
-> examine the blocksizes, etc?
+> I think Stan did bring this point earlier that PRNG is compliant to
+> FIPS-140-2. So it can be used by rng clients for various purposes but
+> should not be fed to dev/random as the hw_random does.
+> 
+> Herbert, can you please confirm..
 
-A cipher is a simple cipher like aes that operates on a single
-block.
+Yes this is a PRNG.  A hardware RNG should return 1 bit of entropy
+per bit of output.
 
 Cheers,
 -- 
