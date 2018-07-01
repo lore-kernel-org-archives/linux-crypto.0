@@ -1,50 +1,63 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: arm/speck - fix building in Thumb2 mode
-Date: Sun, 1 Jul 2018 21:18:39 +0800
-Message-ID: <20180701131839.kpbwifrfgdf36p4p@gondor.apana.org.au>
-References: <20180618223323.130072-1-ebiggers@google.com>
+Subject: Re: [PATCH v3 0/2] Detect & register virtio-crypto algos only if it
+ can be supported by backend
+Date: Sun, 1 Jul 2018 21:18:55 +0800
+Message-ID: <20180701131855.5sjnvyvhiq7ktzg3@gondor.apana.org.au>
+References: <cover.1529422492.git.alifm@linux.ibm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Stefan Agner <stefan@agner.ch>, linux-crypto@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org,
- Ard Biesheuvel <ard.biesheuvel@linaro.org>
-To: Eric Biggers <ebiggers@google.com>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, qemu-devel@nongnu.org, borntraeger@de.ibm.com,
+        arei.gonglei@huawei.com, longpeng2@huawei.com, pasic@linux.ibm.com,
+        frankja@linux.ibm.com, jasowang@redhat.com, mst@redhat.com
+To: Farhan Ali <alifm@linux.ibm.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20180618223323.130072-1-ebiggers@google.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+In-Reply-To: <cover.1529422492.git.alifm@linux.ibm.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Jun 18, 2018 at 03:33:23PM -0700, Eric Biggers wrote:
-> Building the kernel with CONFIG_THUMB2_KERNEL=y and
-> CONFIG_CRYPTO_SPECK_NEON set fails with the following errors:
+On Tue, Jun 19, 2018 at 11:41:32AM -0400, Farhan Ali wrote:
+> Hi,
 > 
->     arch/arm/crypto/speck-neon-core.S: Assembler messages:
+> Currently the Linux virtio-crypto driver registers the crypto
+> algorithm without verifying if the backend actually supports the
+> algorithm.
 > 
->     arch/arm/crypto/speck-neon-core.S:419: Error: r13 not allowed here -- `bic sp,#0xf'
->     arch/arm/crypto/speck-neon-core.S:423: Error: r13 not allowed here -- `bic sp,#0xf'
->     arch/arm/crypto/speck-neon-core.S:427: Error: r13 not allowed here -- `bic sp,#0xf'
->     arch/arm/crypto/speck-neon-core.S:431: Error: r13 not allowed here -- `bic sp,#0xf'
+> This kernel patch series adds support for registering algorithm
+> with Linux crypto layer, only if the algorithm is supported by
+> the backend device. This also makes the driver more compliant with
+> the virtio-crypto spec [1].
 > 
-> The problem is that the 'bic' instruction can't operate on the 'sp'
-> register in Thumb2 mode.  Fix it by using a temporary register.  This
-> isn't in the main loop, so the performance difference is negligible.
-> This also matches what aes-neonbs-core.S does.
+> I would appreciate any feedback or comments on this.
 > 
-> Reported-by: Stefan Agner <stefan@agner.ch>
-> Fixes: ede9622162fa ("crypto: arm/speck - add NEON-accelerated implementation of Speck-XTS")
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> Thank you
+> Farhan
+> 
+> Reference
+> ---------
+> [1] Virtio crypto spec proposal https://lists.gnu.org/archive/html/qemu-devel/2017-12/msg00816.html
+> 
+> ChangeLog
+> ---------
+> v2 -> v3
+>     - Add Christian Borntrager's acks for the patches.
+> 
+> v1 -> v2
+>    - Modify comment as suggested by Arei (patch 1)
+>    - Modify error message as suggested by Arei (patch 2)
+> 
+> Farhan Ali (2):
+>   crypto/virtio-crypto: Read crypto services and algorithm masks
+>   crypto/virtio-crypto: Register an algo only if it's supported
+> 
+>  drivers/crypto/virtio/virtio_crypto_algs.c   | 112 ++++++++++++++++++---------
+>  drivers/crypto/virtio/virtio_crypto_common.h |  25 +++++-
+>  drivers/crypto/virtio/virtio_crypto_core.c   |  29 +++++++
+>  drivers/crypto/virtio/virtio_crypto_mgr.c    |  81 +++++++++++++++++--
+>  4 files changed, 202 insertions(+), 45 deletions(-)
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
