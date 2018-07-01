@@ -1,37 +1,54 @@
-From: Eric Biggers <ebiggers3@gmail.com>
-Subject: [PATCH net] ipv6: sr: fix passing wrong flags to crypto_alloc_shash()
-Date: Sat, 30 Jun 2018 15:26:56 -0700
-Message-ID: <20180630222656.333-1-ebiggers3@gmail.com>
-Cc: David Lebrun <david.lebrun@uclouvain.be>,
-        linux-crypto@vger.kernel.org, Eric Biggers <ebiggers@google.com>
-To: netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>
-Return-path: <netdev-owner@vger.kernel.org>
-Sender: netdev-owner@vger.kernel.org
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v2 11/11] crypto: skcipher: Remove VLA usage
+ for SKCIPHER_REQUEST_ON_STACK
+Date: Sun, 1 Jul 2018 14:24:19 +0800
+Message-ID: <20180701062419.3opt7mnljf76hi4k@gondor.apana.org.au>
+References: <20180625211026.15819-1-keescook@chromium.org>
+	<20180625211026.15819-12-keescook@chromium.org>
+	<20180626092041.mxfg4lxcvxfivzc2@gondor.apana.org.au>
+	<CAGXu5jKYb-0NNvOcN79hzqU7O6vCFhMTBDGBL8Knuoc-YHamPg@mail.gmail.com>
+	<20180627143622.ntksjxsymo4yw6dz@gondor.apana.org.au>
+	<CAGXu5jJ2Z=YP+fNsvy+6a_BpC1ibZf6tOzZuPHk=Qx1qNVvOZw@mail.gmail.com>
+	<20180627222749.xa5333caq5vaa7st@gondor.apana.org.au>
+	<CAGXu5jKas=OyJPsrMthxjEykG=FkHDW84dO4bKGpj-50JjUYwQ@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+	Mike Snitzer <snitzer@redhat.com>, Arnd Bergmann <arnd@arndb.de>,
+	"Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+	Eric Biggers <ebiggers@google.com>, qat-linux@intel.com,
+	LKML <linux-kernel@vger.kernel.org>, dm-devel@redhat.com,
+	linux-crypto <linux-crypto@vger.kernel.org>,
+	Lars Persson <larper@axis.com>, Tim Chen <tim.c.chen@linux.intel.com>,
+	"David S. Miller" <davem@davemloft.net>, Alasdair Kergon <agk@redhat.com>,
+	Rabin Vincent <rabinv@axis.com>
+To: Kees Cook <keescook@chromium.org>
+Return-path: <dm-devel-bounces@redhat.com>
+Content-Disposition: inline
+In-Reply-To: <CAGXu5jKas=OyJPsrMthxjEykG=FkHDW84dO4bKGpj-50JjUYwQ@mail.gmail.com>
+List-Unsubscribe: <https://www.redhat.com/mailman/options/dm-devel>,
+	<mailto:dm-devel-request@redhat.com?subject=unsubscribe>
+List-Archive: <https://www.redhat.com/archives/dm-devel>
+List-Post: <mailto:dm-devel@redhat.com>
+List-Help: <mailto:dm-devel-request@redhat.com?subject=help>
+List-Subscribe: <https://www.redhat.com/mailman/listinfo/dm-devel>,
+	<mailto:dm-devel-request@redhat.com?subject=subscribe>
+Sender: dm-devel-bounces@redhat.com
+Errors-To: dm-devel-bounces@redhat.com
 List-Id: linux-crypto.vger.kernel.org
 
-From: Eric Biggers <ebiggers@google.com>
+On Wed, Jun 27, 2018 at 05:10:05PM -0700, Kees Cook wrote:
+>
+> In both cases here, what is "cipher"? i.e. what ciphers could lrw be
+> wrapping, and what ciphers could cts be wrapping, so that I can
+> examine the blocksizes, etc?
 
-The 'mask' argument to crypto_alloc_shash() uses the CRYPTO_ALG_* flags,
-not 'gfp_t'.  So don't pass GFP_KERNEL to it.
+A cipher is a simple cipher like aes that operates on a single
+block.
 
-Fixes: bf355b8d2c30 ("ipv6: sr: add core files for SR HMAC support")
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- net/ipv6/seg6_hmac.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/net/ipv6/seg6_hmac.c b/net/ipv6/seg6_hmac.c
-index 33fb35cbfac13..558fe8cc6d438 100644
---- a/net/ipv6/seg6_hmac.c
-+++ b/net/ipv6/seg6_hmac.c
-@@ -373,7 +373,7 @@ static int seg6_hmac_init_algo(void)
- 			return -ENOMEM;
- 
- 		for_each_possible_cpu(cpu) {
--			tfm = crypto_alloc_shash(algo->name, 0, GFP_KERNEL);
-+			tfm = crypto_alloc_shash(algo->name, 0, 0);
- 			if (IS_ERR(tfm))
- 				return PTR_ERR(tfm);
- 			p_tfm = per_cpu_ptr(algo->tfms, cpu);
+Cheers,
 -- 
-2.18.0
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
