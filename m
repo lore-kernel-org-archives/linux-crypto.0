@@ -1,152 +1,174 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH v2 2/6] crypto: testmgr: add hash finup tests
-Date: Sun,  1 Jul 2018 08:02:35 +0100
-Message-ID: <1530428560-4440-3-git-send-email-gilad@benyossef.com>
+Subject: [PATCH v2 3/6] crypto: ccree: fix iv handling
+Date: Sun,  1 Jul 2018 08:02:36 +0100
+Message-ID: <1530428560-4440-4-git-send-email-gilad@benyossef.com>
 References: <1530428560-4440-1-git-send-email-gilad@benyossef.com>
 Cc: Ofir Drang <ofir.drang@arm.com>, Hadar Gat <hadar.gat@arm.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+        stable@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <stable-owner@vger.kernel.org>
 In-Reply-To: <1530428560-4440-1-git-send-email-gilad@benyossef.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Sender: stable-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-The testmgr hash tests were testing init, digest, update and final
-methods but not the finup method. Add a test for this one too.
+We were copying our last cipher block into the request for use as IV for
+all modes of operations. Fix this by discerning the behaviour based on
+the mode of operation used: copy ciphertext for CBC, update counter for
+CTR.
 
-While doing this, make sure we only run the partial tests once with
-the digest tests and skip them with the final and finup tests since
-they are the same.
-
+CC: stable@vger.kernel.org
+Fixes: 63ee04c8b491 ("crypto: ccree - add skcipher support")
+Reported by: Hadar Gat <hadar.gat@arm.com>
 Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 ---
- crypto/testmgr.c | 55 ++++++++++++++++++++++++++++++++++++++++++++++---------
- 1 file changed, 46 insertions(+), 9 deletions(-)
+ drivers/crypto/ccree/cc_cipher.c | 111 +++++++++++++++++++++++++++++----------
+ 1 file changed, 84 insertions(+), 27 deletions(-)
 
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 11e4535..ca475f6 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -259,9 +259,15 @@ static int ahash_partial_update(struct ahash_request **preq,
- 	return ret;
+diff --git a/drivers/crypto/ccree/cc_cipher.c b/drivers/crypto/ccree/cc_cipher.c
+index d2810c1..958ced3 100644
+--- a/drivers/crypto/ccree/cc_cipher.c
++++ b/drivers/crypto/ccree/cc_cipher.c
+@@ -593,34 +593,82 @@ static void cc_setup_cipher_data(struct crypto_tfm *tfm,
+ 	}
  }
  
-+enum hash_test {
-+	HASH_TEST_DIGEST,
-+	HASH_TEST_FINAL,
-+	HASH_TEST_FINUP
-+};
++/*
++ * Update a CTR-AES 128 bit counter
++ */
++static void cc_update_ctr(u8 *ctr, unsigned int increment)
++{
++	if (IS_ENABLED(CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS) ||
++	    IS_ALIGNED((unsigned long)ctr, 8)) {
 +
- static int __test_hash(struct crypto_ahash *tfm,
- 		       const struct hash_testvec *template, unsigned int tcount,
--		       bool use_digest, const int align_offset)
-+		       enum hash_test test_type, const int align_offset)
++		__be64 *high_be = (__be64 *)ctr;
++		__be64 *low_be = high_be + 1;
++		u64 orig_low = __be64_to_cpu(*low_be);
++		u64 new_low = orig_low + (u64)increment;
++
++		*low_be = __cpu_to_be64(new_low);
++
++		if (new_low < orig_low)
++			*high_be = __cpu_to_be64(__be64_to_cpu(*high_be) + 1);
++	} else {
++		u8 *pos = (ctr + AES_BLOCK_SIZE);
++		u8 val;
++		unsigned int size;
++
++		for (; increment; increment--)
++			for (size = AES_BLOCK_SIZE; size; size--) {
++				val = *--pos + 1;
++				*pos = val;
++				if (val)
++					break;
++			}
++	}
++}
++
+ static void cc_cipher_complete(struct device *dev, void *cc_req, int err)
  {
- 	const char *algo = crypto_tfm_alg_driver_name(crypto_ahash_tfm(tfm));
- 	size_t digest_size = crypto_ahash_digestsize(tfm);
-@@ -332,14 +338,17 @@ static int __test_hash(struct crypto_ahash *tfm,
- 		}
+ 	struct skcipher_request *req = (struct skcipher_request *)cc_req;
+ 	struct scatterlist *dst = req->dst;
+ 	struct scatterlist *src = req->src;
+ 	struct cipher_req_ctx *req_ctx = skcipher_request_ctx(req);
+-	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+-	unsigned int ivsize = crypto_skcipher_ivsize(tfm);
++	struct crypto_skcipher *sk_tfm = crypto_skcipher_reqtfm(req);
++	struct crypto_tfm *tfm = crypto_skcipher_tfm(sk_tfm);
++	struct cc_cipher_ctx *ctx_p = crypto_tfm_ctx(tfm);
++	unsigned int ivsize = crypto_skcipher_ivsize(sk_tfm);
++	unsigned int len;
  
- 		ahash_request_set_crypt(req, sg, result, template[i].psize);
--		if (use_digest) {
-+		switch (test_type) {
-+		case HASH_TEST_DIGEST:
- 			ret = crypto_wait_req(crypto_ahash_digest(req), &wait);
- 			if (ret) {
- 				pr_err("alg: hash: digest failed on test %d "
- 				       "for %s: ret=%d\n", j, algo, -ret);
- 				goto out;
- 			}
--		} else {
-+			break;
-+
-+		case HASH_TEST_FINAL:
- 			memset(result, 1, digest_size);
- 			ret = crypto_wait_req(crypto_ahash_init(req), &wait);
- 			if (ret) {
-@@ -371,6 +380,29 @@ static int __test_hash(struct crypto_ahash *tfm,
- 				       "for %s: ret=%d\n", j, algo, -ret);
- 				goto out;
- 			}
-+			break;
-+
-+		case HASH_TEST_FINUP:
-+			memset(result, 1, digest_size);
-+			ret = crypto_wait_req(crypto_ahash_init(req), &wait);
-+			if (ret) {
-+				pr_err("alg: hash: init failed on test %d "
-+				       "for %s: ret=%d\n", j, algo, -ret);
-+				goto out;
-+			}
-+			ret = ahash_guard_result(result, 1, digest_size);
-+			if (ret) {
-+				pr_err("alg: hash: init failed on test %d "
-+				       "for %s: used req->result\n", j, algo);
-+				goto out;
-+			}
-+			ret = crypto_wait_req(crypto_ahash_finup(req), &wait);
-+			if (ret) {
-+				pr_err("alg: hash: final failed on test %d "
-+				       "for %s: ret=%d\n", j, algo, -ret);
-+				goto out;
-+			}
-+			break;
- 		}
+-	cc_unmap_cipher_request(dev, req_ctx, ivsize, src, dst);
+-	kzfree(req_ctx->iv);
++	switch (ctx_p->cipher_mode) {
++	case DRV_CIPHER_CBC:
++		/*
++		 * The crypto API expects us to set the req->iv to the last
++		 * ciphertext block. For encrypt, simply copy from the result.
++		 * For decrypt, we must copy from a saved buffer since this
++		 * could be an in-place decryption operation and the src is
++		 * lost by this point.
++		 */
++		if (req_ctx->gen_ctx.op_type == DRV_CRYPTO_DIRECTION_DECRYPT)  {
++			memcpy(req->iv, req_ctx->backup_info, ivsize);
++			kzfree(req_ctx->backup_info);
++		} else if (!err) {
++			len = req->cryptlen - ivsize;
++			scatterwalk_map_and_copy(req->iv, req->dst, len,
++						 ivsize, 0);
++		}
++		break;
  
- 		if (memcmp(result, template[i].digest,
-@@ -383,6 +415,9 @@ static int __test_hash(struct crypto_ahash *tfm,
- 		}
+-	/*
+-	 * The crypto API expects us to set the req->iv to the last
+-	 * ciphertext block. For encrypt, simply copy from the result.
+-	 * For decrypt, we must copy from a saved buffer since this
+-	 * could be an in-place decryption operation and the src is
+-	 * lost by this point.
+-	 */
+-	if (req_ctx->gen_ctx.op_type == DRV_CRYPTO_DIRECTION_DECRYPT)  {
+-		memcpy(req->iv, req_ctx->backup_info, ivsize);
+-		kzfree(req_ctx->backup_info);
+-	} else if (!err) {
+-		scatterwalk_map_and_copy(req->iv, req->dst,
+-					 (req->cryptlen - ivsize),
+-					 ivsize, 0);
++	case DRV_CIPHER_CTR:
++		/* Compute the counter of the last block */
++		len = ALIGN(req->cryptlen, AES_BLOCK_SIZE) / AES_BLOCK_SIZE;
++		cc_update_ctr((u8 *)req->iv, len);
++		break;
++
++	default:
++		break;
  	}
  
-+	if (test_type)
-+		goto out;
++	cc_unmap_cipher_request(dev, req_ctx, ivsize, src, dst);
++	kzfree(req_ctx->iv);
 +
- 	j = 0;
- 	for (i = 0; i < tcount; i++) {
- 		/* alignment tests are only done with continuous buffers */
-@@ -540,24 +575,24 @@ static int __test_hash(struct crypto_ahash *tfm,
- 
- static int test_hash(struct crypto_ahash *tfm,
- 		     const struct hash_testvec *template,
--		     unsigned int tcount, bool use_digest)
-+		     unsigned int tcount, enum hash_test test_type)
- {
- 	unsigned int alignmask;
- 	int ret;
- 
--	ret = __test_hash(tfm, template, tcount, use_digest, 0);
-+	ret = __test_hash(tfm, template, tcount, test_type, 0);
- 	if (ret)
- 		return ret;
- 
- 	/* test unaligned buffers, check with one byte offset */
--	ret = __test_hash(tfm, template, tcount, use_digest, 1);
-+	ret = __test_hash(tfm, template, tcount, test_type, 1);
- 	if (ret)
- 		return ret;
- 
- 	alignmask = crypto_tfm_alg_alignmask(&tfm->base);
- 	if (alignmask) {
- 		/* Check if alignment mask for tfm is correctly set. */
--		ret = __test_hash(tfm, template, tcount, use_digest,
-+		ret = __test_hash(tfm, template, tcount, test_type,
- 				  alignmask + 1);
- 		if (ret)
- 			return ret;
-@@ -1803,9 +1838,11 @@ static int __alg_test_hash(const struct hash_testvec *template,
- 		return PTR_ERR(tfm);
- 	}
- 
--	err = test_hash(tfm, template, tcount, true);
-+	err = test_hash(tfm, template, tcount, HASH_TEST_DIGEST);
-+	if (!err)
-+		err = test_hash(tfm, template, tcount, HASH_TEST_FINAL);
- 	if (!err)
--		err = test_hash(tfm, template, tcount, false);
-+		err = test_hash(tfm, template, tcount, HASH_TEST_FINUP);
- 	crypto_free_ahash(tfm);
- 	return err;
+ 	skcipher_request_complete(req, err);
  }
+ 
+@@ -752,20 +800,29 @@ static int cc_cipher_encrypt(struct skcipher_request *req)
+ static int cc_cipher_decrypt(struct skcipher_request *req)
+ {
+ 	struct crypto_skcipher *sk_tfm = crypto_skcipher_reqtfm(req);
++	struct crypto_tfm *tfm = crypto_skcipher_tfm(sk_tfm);
++	struct cc_cipher_ctx *ctx_p = crypto_tfm_ctx(tfm);
+ 	struct cipher_req_ctx *req_ctx = skcipher_request_ctx(req);
+ 	unsigned int ivsize = crypto_skcipher_ivsize(sk_tfm);
+ 	gfp_t flags = cc_gfp_flags(&req->base);
++	unsigned int len;
+ 
+-	/*
+-	 * Allocate and save the last IV sized bytes of the source, which will
+-	 * be lost in case of in-place decryption and might be needed for CTS.
+-	 */
+-	req_ctx->backup_info = kmalloc(ivsize, flags);
+-	if (!req_ctx->backup_info)
+-		return -ENOMEM;
++	if (ctx_p->cipher_mode == DRV_CIPHER_CBC) {
++
++		/* Allocate and save the last IV sized bytes of the source,
++		 * which will be lost in case of in-place decryption.
++		 */
++		req_ctx->backup_info = kzalloc(ivsize, flags);
++		if (!req_ctx->backup_info)
++			return -ENOMEM;
++
++		len = req->cryptlen - ivsize;
++		scatterwalk_map_and_copy(req_ctx->backup_info, req->src, len,
++					 ivsize, 0);
++	} else {
++		req_ctx->backup_info = NULL;
++	}
+ 
+-	scatterwalk_map_and_copy(req_ctx->backup_info, req->src,
+-				 (req->cryptlen - ivsize), ivsize, 0);
+ 	req_ctx->is_giv = false;
+ 
+ 	return cc_cipher_process(req, DRV_CRYPTO_DIRECTION_DECRYPT);
 -- 
 2.7.4
