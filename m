@@ -1,89 +1,11588 @@
-From: Eric Biggers <ebiggers3@gmail.com>
-Subject: Re: [dm-devel] [PATCH v3 9/9] crypto: shash: Remove VLA usage in
- unaligned hashing
-Date: Sun, 1 Jul 2018 10:20:58 -0700
-Message-ID: <20180701172058.GA26715@sol.localdomain>
-References: <20180629002843.31095-1-keescook@chromium.org>
- <20180629002843.31095-10-keescook@chromium.org>
- <20180630070301.GA1706@sol.localdomain>
- <CAGXu5jJ9eqETPdrvUZrV9bhnNQA6LwBuk+V5MeQrAS_M=_VX+Q@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+From: Jason Cooper <jason@lakedaemon.net>
+Subject: [PATCH] staging/skein: Remove Skein and Threefish code
+Date: Sun,  1 Jul 2018 14:48:14 -0400
+Message-ID: <20180701184814.24211-1-jason@lakedaemon.net>
+References: <20180701163204.GE26205@io.lakedaemon.net>
 Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Eric Biggers <ebiggers@google.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
-        qat-linux@intel.com, LKML <linux-kernel@vger.kernel.org>,
-        dm-devel@redhat.com, linux-crypto <linux-crypto@vger.kernel.org>,
-        Lars Persson <larper@axis.com>,
-        Tim Chen <tim.c.chen@linux.intel.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Alasdair Kergon <agk@redhat.com>,
-        Rabin Vincent <rabinv@axis.com>
-To: Kees Cook <keescook@chromium.org>
+        Juan Manuel Torres Palma <j.m.torrespalma@gmail.com>,
+        Eric Biggers <ebiggers3@gmail.com>,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        davem@davemloft.net, driverdev-devel@linuxdriverproject.org,
+        Jason Cooper <jason@lakedaemon.net>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <CAGXu5jJ9eqETPdrvUZrV9bhnNQA6LwBuk+V5MeQrAS_M=_VX+Q@mail.gmail.com>
+In-Reply-To: <20180701163204.GE26205@io.lakedaemon.net>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Sun, Jul 01, 2018 at 10:04:59AM -0700, Kees Cook wrote:
-> On Sat, Jun 30, 2018 at 12:03 AM, Eric Biggers <ebiggers3@gmail.com> wrote:
-> > On Thu, Jun 28, 2018 at 05:28:43PM -0700, Kees Cook wrote:
-> >> @@ -88,11 +81,13 @@ static int shash_update_unaligned(struct shash_desc *desc, const u8 *data,
-> >>       unsigned long alignmask = crypto_shash_alignmask(tfm);
-> >>       unsigned int unaligned_len = alignmask + 1 -
-> >>                                    ((unsigned long)data & alignmask);
-> >> -     u8 ubuf[shash_align_buffer_size(unaligned_len, alignmask)]
-> >> -             __aligned_largest;
-> >> +     u8 ubuf[MAX_ALGAPI_ALIGNMASK + 1];
-> >>       u8 *buf = PTR_ALIGN(&ubuf[0], alignmask + 1);
-> >>       int err;
-> >>
-> >> +     if (WARN_ON(buf + unaligned_len > ubuf + sizeof(ubuf)))
-> >> +             return -EINVAL;
-> >> +
-> >
-> > How is 'ubuf' guaranteed to be large enough?  You removed the __aligned
-> > attribute, so 'ubuf' can have any alignment.  So the aligned pointer 'buf' may
-> > be as high as '&ubuf[alignmask]'.  Then, up to 'alignmask' bytes of data will be
-> > copied into 'buf'... resulting in up to '2 * alignmask' bytes needed in 'ubuf'.
-> > But you've only guaranteed 'alignmask + 1' bytes.
-> 
-> Hm, good point. Adding __aligned(MAX_ALGAPI_ALIGNMASK + 1) looks to
-> fix this, yes?
-> 
-> Also, if __aligned() is used here, can't PTR_ALIGN() be dropped? (I
-> think you pointed this out earlier.)
+It's been four years since this was added.  In the interim, skein has
+not seen any mainstream adoption.  Same with the threefish block cipher
+upon which it's based.
 
-Sure, I'm just not sure whether __aligned() with such a large alignment is
-guaranteed to work on stack variables on all architectures.  See e.g.
-https://patchwork.kernel.org/patch/9507697/.
+In the discussion over which hash algorithm will replace SHA1 in git,
+it's not one of the contenders.
 
-> 
-> Also, is "unaligned_len" being calculated correctly? Let's say
-> alignmask is 63. If data is binary ...111111, then unaligned_len will
-> be 64 - 63 == 1, which is fine: we copy 1 byte out, bump the address
-> by 1, and we're happily aligned to ...000000. If data is ...000000,
-> then unaligned_len will be 64. But it should be 0. Shouldn't this be:
-> 
-> unsigned int unaligned_len;
-> 
-> unaligned_len = (unsigned long)data & alignmask;
-> if (unaligned_len)
->     unaligned_len = alignmask + 1 - unaligned_len;
-> 
-> And then ubuf only needs to be MAX_ALGAPI_ALIGNMASK, without the +1?
+There's absolutely no reason to think that there is anything wrong with
+Skein or Threefish.  The only reason for this removal is a lack of
+adoption.
 
-shash_update_unaligned() is only called when 'data & alignmask'.
-Similarly with shash_final_unaligned().
+If a real user comes forward, I'd be happy to assist with integrating
+this code into mainline.
 
-Though, calculating 'unaligned_len' could be simplified to
+Signed-off-by: Jason Cooper <jason@lakedaemon.net>
+---
+ drivers/staging/Kconfig                 |    2 -
+ drivers/staging/Makefile                |    1 -
+ drivers/staging/skein/Kconfig           |   16 -
+ drivers/staging/skein/Makefile          |   11 -
+ drivers/staging/skein/TODO              |    8 -
+ drivers/staging/skein/skein_api.c       |  231 -
+ drivers/staging/skein/skein_api.h       |  230 -
+ drivers/staging/skein/skein_base.c      |  870 ----
+ drivers/staging/skein/skein_base.h      |  336 --
+ drivers/staging/skein/skein_block.c     |  469 --
+ drivers/staging/skein/skein_block.h     |  347 --
+ drivers/staging/skein/skein_generic.c   |  214 -
+ drivers/staging/skein/skein_iv.h        |  187 -
+ drivers/staging/skein/threefish_api.c   |   78 -
+ drivers/staging/skein/threefish_api.h   |  171 -
+ drivers/staging/skein/threefish_block.c | 8244 -------------------------------
+ 16 files changed, 11415 deletions(-)
+ delete mode 100644 drivers/staging/skein/Kconfig
+ delete mode 100644 drivers/staging/skein/Makefile
+ delete mode 100644 drivers/staging/skein/TODO
+ delete mode 100644 drivers/staging/skein/skein_api.c
+ delete mode 100644 drivers/staging/skein/skein_api.h
+ delete mode 100644 drivers/staging/skein/skein_base.c
+ delete mode 100644 drivers/staging/skein/skein_base.h
+ delete mode 100644 drivers/staging/skein/skein_block.c
+ delete mode 100644 drivers/staging/skein/skein_block.h
+ delete mode 100644 drivers/staging/skein/skein_generic.c
+ delete mode 100644 drivers/staging/skein/skein_iv.h
+ delete mode 100644 drivers/staging/skein/threefish_api.c
+ delete mode 100644 drivers/staging/skein/threefish_api.h
+ delete mode 100644 drivers/staging/skein/threefish_block.c
 
-	unsigned int unaligned_len = -(unsigned long)data & alignmask;
-
-which works either way.
-
-- Eric
+diff --git a/drivers/staging/Kconfig b/drivers/staging/Kconfig
+index 75a480497d22..5b96f972135a 100644
+--- a/drivers/staging/Kconfig
++++ b/drivers/staging/Kconfig
+@@ -84,8 +84,6 @@ source "drivers/staging/dgnc/Kconfig"
+ 
+ source "drivers/staging/gs_fpgaboot/Kconfig"
+ 
+-source "drivers/staging/skein/Kconfig"
+-
+ source "drivers/staging/unisys/Kconfig"
+ 
+ source "drivers/staging/clocking-wizard/Kconfig"
+diff --git a/drivers/staging/Makefile b/drivers/staging/Makefile
+index e84959a8a684..5d3740320577 100644
+--- a/drivers/staging/Makefile
++++ b/drivers/staging/Makefile
+@@ -33,7 +33,6 @@ obj-$(CONFIG_GOLDFISH)		+= goldfish/
+ obj-$(CONFIG_DGNC)			+= dgnc/
+ obj-$(CONFIG_MTD_SPINAND_MT29F)	+= mt29f_spinand/
+ obj-$(CONFIG_GS_FPGABOOT)	+= gs_fpgaboot/
+-obj-$(CONFIG_CRYPTO_SKEIN)	+= skein/
+ obj-$(CONFIG_UNISYSSPAR)	+= unisys/
+ obj-$(CONFIG_COMMON_CLK_XLNX_CLKWZRD)	+= clocking-wizard/
+ obj-$(CONFIG_FB_TFT)		+= fbtft/
+diff --git a/drivers/staging/skein/Kconfig b/drivers/staging/skein/Kconfig
+deleted file mode 100644
+index 012a8233376e..000000000000
+--- a/drivers/staging/skein/Kconfig
++++ /dev/null
+@@ -1,16 +0,0 @@
+-config CRYPTO_SKEIN
+-	tristate "Skein digest algorithm"
+-	depends on (X86 || UML_X86) && 64BIT && CRYPTO
+-	select CRYPTO_HASH
+-	select CRYPTO_ALGAPI
+-	help
+-	  Skein secure hash algorithm is one of 5 finalists from the NIST SHA3
+-	  competition.
+-
+-	  Skein is optimized for modern, 64bit processors and is highly
+-	  customizable.  See:
+-
+-	  http://www.skein-hash.info/sites/default/files/skein1.3.pdf
+-
+-	  for more information. This module also contains the threefish block
+-	  cipher algorithm.
+diff --git a/drivers/staging/skein/Makefile b/drivers/staging/skein/Makefile
+deleted file mode 100644
+index 86b7966d694e..000000000000
+--- a/drivers/staging/skein/Makefile
++++ /dev/null
+@@ -1,11 +0,0 @@
+-# SPDX-License-Identifier: GPL-2.0
+-#
+-# Makefile for the skein secure hash algorithm
+-#
+-obj-$(CONFIG_CRYPTO_SKEIN) += skein.o
+-skein-y := skein_base.o \
+-	   skein_api.o \
+-	   skein_block.o \
+-	   threefish_block.o \
+-	   threefish_api.o \
+-	   skein_generic.o
+diff --git a/drivers/staging/skein/TODO b/drivers/staging/skein/TODO
+deleted file mode 100644
+index cd3508dd9089..000000000000
+--- a/drivers/staging/skein/TODO
++++ /dev/null
+@@ -1,8 +0,0 @@
+-skein/threefish TODO
+-
+- - move macros into appropriate header files
+- - add / pass test vectors
+- - module support
+-
+-Please send patches to Jason Cooper <jason@lakedaemon.net> in addition to the
+-staging tree mailinglist.
+diff --git a/drivers/staging/skein/skein_api.c b/drivers/staging/skein/skein_api.c
+deleted file mode 100644
+index c6526b6fbfb4..000000000000
+--- a/drivers/staging/skein/skein_api.c
++++ /dev/null
+@@ -1,231 +0,0 @@
+-/*
+- * Copyright (c) 2010 Werner Dittmann
+- *
+- * Permission is hereby granted, free of charge, to any person
+- * obtaining a copy of this software and associated documentation
+- * files (the "Software"), to deal in the Software without
+- * restriction, including without limitation the rights to use,
+- * copy, modify, merge, publish, distribute, sublicense, and/or sell
+- * copies of the Software, and to permit persons to whom the
+- * Software is furnished to do so, subject to the following
+- * conditions:
+- *
+- * The above copyright notice and this permission notice shall be
+- * included in all copies or substantial portions of the Software.
+- *
+- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+- * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+- * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+- * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+- * OTHER DEALINGS IN THE SOFTWARE.
+- */
+-
+-#include <linux/string.h>
+-#include "skein_api.h"
+-
+-int skein_ctx_prepare(struct skein_ctx *ctx, enum skein_size size)
+-{
+-	skein_assert_ret(ctx && size, SKEIN_FAIL);
+-
+-	memset(ctx, 0, sizeof(struct skein_ctx));
+-	ctx->skein_size = size;
+-
+-	return SKEIN_SUCCESS;
+-}
+-
+-int skein_init(struct skein_ctx *ctx, size_t hash_bit_len)
+-{
+-	int ret = SKEIN_FAIL;
+-	size_t x_len = 0;
+-	u64 *x = NULL;
+-	u64 tree_info = SKEIN_CFG_TREE_INFO_SEQUENTIAL;
+-
+-	skein_assert_ret(ctx, SKEIN_FAIL);
+-	/*
+-	 * The following two lines rely of the fact that the real Skein
+-	 * contexts are a union in out context and thus have tha maximum
+-	 * memory available.  The beauty of C :-) .
+-	 */
+-	x = ctx->m.s256.x;
+-	x_len = ctx->skein_size / 8;
+-	/*
+-	 * If size is the same and hash bit length is zero then reuse
+-	 * the save chaining variables.
+-	 */
+-	switch (ctx->skein_size) {
+-	case SKEIN_256:
+-		ret = skein_256_init_ext(&ctx->m.s256, hash_bit_len,
+-					 tree_info, NULL, 0);
+-		break;
+-	case SKEIN_512:
+-		ret = skein_512_init_ext(&ctx->m.s512, hash_bit_len,
+-					 tree_info, NULL, 0);
+-		break;
+-	case SKEIN_1024:
+-		ret = skein_1024_init_ext(&ctx->m.s1024, hash_bit_len,
+-					  tree_info, NULL, 0);
+-		break;
+-	}
+-
+-	if (ret == SKEIN_SUCCESS) {
+-		/*
+-		 * Save chaining variables for this combination of size and
+-		 * hash_bit_len
+-		 */
+-		memcpy(ctx->x_save, x, x_len);
+-	}
+-	return ret;
+-}
+-
+-int skein_mac_init(struct skein_ctx *ctx, const u8 *key, size_t key_len,
+-		   size_t hash_bit_len)
+-{
+-	int ret = SKEIN_FAIL;
+-	u64 *x = NULL;
+-	size_t x_len = 0;
+-	u64 tree_info = SKEIN_CFG_TREE_INFO_SEQUENTIAL;
+-
+-	skein_assert_ret(ctx, SKEIN_FAIL);
+-
+-	x = ctx->m.s256.x;
+-	x_len = ctx->skein_size / 8;
+-
+-	skein_assert_ret(hash_bit_len, SKEIN_BAD_HASHLEN);
+-
+-	switch (ctx->skein_size) {
+-	case SKEIN_256:
+-		ret = skein_256_init_ext(&ctx->m.s256, hash_bit_len,
+-					 tree_info, key, key_len);
+-
+-		break;
+-	case SKEIN_512:
+-		ret = skein_512_init_ext(&ctx->m.s512, hash_bit_len,
+-					 tree_info, key, key_len);
+-		break;
+-	case SKEIN_1024:
+-		ret = skein_1024_init_ext(&ctx->m.s1024, hash_bit_len,
+-					  tree_info, key, key_len);
+-
+-		break;
+-	}
+-	if (ret == SKEIN_SUCCESS) {
+-		/*
+-		 * Save chaining variables for this combination of key,
+-		 * key_len, hash_bit_len
+-		 */
+-		memcpy(ctx->x_save, x, x_len);
+-	}
+-	return ret;
+-}
+-
+-void skein_reset(struct skein_ctx *ctx)
+-{
+-	size_t x_len = 0;
+-	u64 *x;
+-
+-	/*
+-	 * The following two lines rely of the fact that the real Skein
+-	 * contexts are a union in out context and thus have tha maximum
+-	 * memory available.  The beautiy of C :-) .
+-	 */
+-	x = ctx->m.s256.x;
+-	x_len = ctx->skein_size / 8;
+-	/* Restore the chaing variable, reset byte counter */
+-	memcpy(x, ctx->x_save, x_len);
+-
+-	/* Setup context to process the message */
+-	skein_start_new_type(&ctx->m, MSG);
+-}
+-
+-int skein_update(struct skein_ctx *ctx, const u8 *msg,
+-		 size_t msg_byte_cnt)
+-{
+-	int ret = SKEIN_FAIL;
+-
+-	skein_assert_ret(ctx, SKEIN_FAIL);
+-
+-	switch (ctx->skein_size) {
+-	case SKEIN_256:
+-		ret = skein_256_update(&ctx->m.s256, msg, msg_byte_cnt);
+-		break;
+-	case SKEIN_512:
+-		ret = skein_512_update(&ctx->m.s512, msg, msg_byte_cnt);
+-		break;
+-	case SKEIN_1024:
+-		ret = skein_1024_update(&ctx->m.s1024, msg, msg_byte_cnt);
+-		break;
+-	}
+-	return ret;
+-}
+-
+-int skein_update_bits(struct skein_ctx *ctx, const u8 *msg,
+-		      size_t msg_bit_cnt)
+-{
+-	/*
+-	 * I've used the bit pad implementation from skein_test.c (see NIST CD)
+-	 * and modified it to use the convenience functions and added some
+-	 * pointer arithmetic.
+-	 */
+-	size_t length;
+-	u8 mask;
+-	u8 *up;
+-
+-	/*
+-	 * only the final Update() call is allowed do partial bytes, else
+-	 * assert an error
+-	 */
+-	skein_assert_ret((ctx->m.h.T[1] & SKEIN_T1_FLAG_BIT_PAD) == 0 ||
+-			 msg_bit_cnt == 0, SKEIN_FAIL);
+-
+-	/* if number of bits is a multiple of bytes - that's easy */
+-	if ((msg_bit_cnt & 0x7) == 0)
+-		return skein_update(ctx, msg, msg_bit_cnt >> 3);
+-
+-	skein_update(ctx, msg, (msg_bit_cnt >> 3) + 1);
+-
+-	/*
+-	 * The next line rely on the fact that the real Skein contexts
+-	 * are a union in our context. After the addition the pointer points to
+-	 * Skein's real partial block buffer.
+-	 * If this layout ever changes we have to adapt this as well.
+-	 */
+-	up = (u8 *)ctx->m.s256.x + ctx->skein_size / 8;
+-
+-	/* set tweak flag for the skein_final call */
+-	skein_set_bit_pad_flag(ctx->m.h);
+-
+-	/* now "pad" the final partial byte the way NIST likes */
+-	/* get the b_cnt value (same location for all block sizes) */
+-	length = ctx->m.h.b_cnt;
+-	/* internal sanity check: there IS a partial byte in the buffer! */
+-	skein_assert(length != 0);
+-	/* partial byte bit mask */
+-	mask = (u8)(1u << (7 - (msg_bit_cnt & 7)));
+-	/* apply bit padding on final byte (in the buffer) */
+-	up[length - 1]  = (up[length - 1] & (0 - mask)) | mask;
+-
+-	return SKEIN_SUCCESS;
+-}
+-
+-int skein_final(struct skein_ctx *ctx, u8 *hash)
+-{
+-	int ret = SKEIN_FAIL;
+-
+-	skein_assert_ret(ctx, SKEIN_FAIL);
+-
+-	switch (ctx->skein_size) {
+-	case SKEIN_256:
+-		ret = skein_256_final(&ctx->m.s256, hash);
+-		break;
+-	case SKEIN_512:
+-		ret = skein_512_final(&ctx->m.s512, hash);
+-		break;
+-	case SKEIN_1024:
+-		ret = skein_1024_final(&ctx->m.s1024, hash);
+-		break;
+-	}
+-	return ret;
+-}
+diff --git a/drivers/staging/skein/skein_api.h b/drivers/staging/skein/skein_api.h
+deleted file mode 100644
+index 5df7905825da..000000000000
+--- a/drivers/staging/skein/skein_api.h
++++ /dev/null
+@@ -1,230 +0,0 @@
+-/**
+- * Copyright (c) 2010 Werner Dittmann
+- *
+- * Permission is hereby granted, free of charge, to any person
+- * obtaining a copy of this software and associated documentation
+- * files (the "Software"), to deal in the Software without
+- * restriction, including without limitation the rights to use,
+- * copy, modify, merge, publish, distribute, sublicense, and/or sell
+- * copies of the Software, and to permit persons to whom the
+- * Software is furnished to do so, subject to the following
+- * conditions:
+- *
+- * The above copyright notice and this permission notice shall be
+- * included in all copies or substantial portions of the Software.
+- *
+- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+- * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+- * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+- * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+- * OTHER DEALINGS IN THE SOFTWARE.
+-
+- */
+-
+-#ifndef SKEINAPI_H
+-#define SKEINAPI_H
+-
+-/**
+- * @file skein_api.h
+- * @brief A Skein API and its functions.
+- * @{
+- *
+- * This API and the functions that implement this API simplify the usage
+- * of Skein. The design and the way to use the functions follow the openSSL
+- * design but at the same time take care of some Skein specific behaviour
+- * and possibilities.
+- *
+- * The functions enable applications to create a normal Skein hashes and
+- * message authentication codes (MAC).
+- *
+- * Using these functions is simple and straight forward:
+- *
+- * @code
+- *
+- * #include "skein_api.h"
+- *
+- * ...
+- * struct skein_ctx ctx;             // a Skein hash or MAC context
+- *
+- * // prepare context, here for a Skein with a state size of 512 bits.
+- * skein_ctx_prepare(&ctx, SKEIN_512);
+- *
+- * // Initialize the context to set the requested hash length in bits
+- * // here request a output hash size of 31 bits (Skein supports variable
+- * // output sizes even very strange sizes)
+- * skein_init(&ctx, 31);
+- *
+- * // Now update Skein with any number of message bits. A function that
+- * // takes a number of bytes is also available.
+- * skein_update_bits(&ctx, message, msg_length);
+- *
+- * // Now get the result of the Skein hash. The output buffer must be
+- * // large enough to hold the request number of output bits. The application
+- * // may now extract the bits.
+- * skein_final(&ctx, result);
+- * ...
+- * @endcode
+- *
+- * An application may use @c skein_reset to reset a Skein context and use
+- * it for creation of another hash with the same Skein state size and output
+- * bit length. In this case the API implementation restores some internal
+- * internal state data and saves a full Skein initialization round.
+- *
+- * To create a MAC the application just uses @c skein_mac_init instead of
+- * @c skein_init. All other functions calls remain the same.
+- *
+- */
+-
+-#include <linux/types.h>
+-#include "skein_base.h"
+-
+-/**
+- * Which Skein size to use
+- */
+-enum skein_size {
+-	SKEIN_256 = 256,     /*!< Skein with 256 bit state */
+-	SKEIN_512 = 512,     /*!< Skein with 512 bit state */
+-	SKEIN_1024 = 1024    /*!< Skein with 1024 bit state */
+-};
+-
+-/**
+- * Context for Skein.
+- *
+- * This structure was setup with some know-how of the internal
+- * Skein structures, in particular ordering of header and size dependent
+- * variables. If Skein implementation changes this, then adapt these
+- * structures as well.
+- */
+-struct skein_ctx {
+-	u64 skein_size;
+-	u64 x_save[SKEIN_MAX_STATE_WORDS];   /* save area for state variables */
+-	union {
+-		struct skein_ctx_hdr h;
+-		struct skein_256_ctx s256;
+-		struct skein_512_ctx s512;
+-		struct skein_1024_ctx s1024;
+-	} m;
+-};
+-
+-/**
+- * Prepare a Skein context.
+- *
+- * An application must call this function before it can use the Skein
+- * context. The functions clears memory and initializes size dependent
+- * variables.
+- *
+- * @param ctx
+- *     Pointer to a Skein context.
+- * @param size
+- *     Which Skein size to use.
+- * @return
+- *     SKEIN_SUCCESS of SKEIN_FAIL
+- */
+-int skein_ctx_prepare(struct skein_ctx *ctx, enum skein_size size);
+-
+-/**
+- * Initialize a Skein context.
+- *
+- * Initializes the context with this data and saves the resulting Skein
+- * state variables for further use.
+- *
+- * @param ctx
+- *     Pointer to a Skein context.
+- * @param hash_bit_len
+- *     Number of MAC hash bits to compute
+- * @return
+- *     SKEIN_SUCCESS of SKEIN_FAIL
+- * @see skein_reset
+- */
+-int skein_init(struct skein_ctx *ctx, size_t hash_bit_len);
+-
+-/**
+- * Resets a Skein context for further use.
+- *
+- * Restores the saved chaining variables to reset the Skein context.
+- * Thus applications can reuse the same setup to  process several
+- * messages. This saves a complete Skein initialization cycle.
+- *
+- * @param ctx
+- *     Pointer to a pre-initialized Skein MAC context
+- */
+-void skein_reset(struct skein_ctx *ctx);
+-
+-/**
+- * Initializes a Skein context for MAC usage.
+- *
+- * Initializes the context with this data and saves the resulting Skein
+- * state variables for further use.
+- *
+- * Applications call the normal Skein functions to update the MAC and
+- * get the final result.
+- *
+- * @param ctx
+- *     Pointer to an empty or preinitialized Skein MAC context
+- * @param key
+- *     Pointer to key bytes or NULL
+- * @param key_len
+- *     Length of the key in bytes or zero
+- * @param hash_bit_len
+- *     Number of MAC hash bits to compute
+- * @return
+- *     SKEIN_SUCCESS of SKEIN_FAIL
+- */
+-int skein_mac_init(struct skein_ctx *ctx, const u8 *key, size_t key_len,
+-		   size_t hash_bit_len);
+-
+-/**
+- * Update Skein with the next part of the message.
+- *
+- * @param ctx
+- *     Pointer to initialized Skein context
+- * @param msg
+- *     Pointer to the message.
+- * @param msg_byte_cnt
+- *     Length of the message in @b bytes
+- * @return
+- *     Success or error code.
+- */
+-int skein_update(struct skein_ctx *ctx, const u8 *msg,
+-		 size_t msg_byte_cnt);
+-
+-/**
+- * Update the hash with a message bit string.
+- *
+- * Skein can handle data not only as bytes but also as bit strings of
+- * arbitrary length (up to its maximum design size).
+- *
+- * @param ctx
+- *     Pointer to initialized Skein context
+- * @param msg
+- *     Pointer to the message.
+- * @param msg_bit_cnt
+- *     Length of the message in @b bits.
+- */
+-int skein_update_bits(struct skein_ctx *ctx, const u8 *msg,
+-		      size_t msg_bit_cnt);
+-
+-/**
+- * Finalize Skein and return the hash.
+- *
+- * Before an application can reuse a Skein setup the application must
+- * reset the Skein context.
+- *
+- * @param ctx
+- *     Pointer to initialized Skein context
+- * @param hash
+- *     Pointer to buffer that receives the hash. The buffer must be large
+- *     enough to store @c hash_bit_len bits.
+- * @return
+- *     Success or error code.
+- * @see skein_reset
+- */
+-int skein_final(struct skein_ctx *ctx, u8 *hash);
+-
+-/**
+- * @}
+- */
+-#endif
+diff --git a/drivers/staging/skein/skein_base.c b/drivers/staging/skein/skein_base.c
+deleted file mode 100644
+index 8db858a11875..000000000000
+--- a/drivers/staging/skein/skein_base.c
++++ /dev/null
+@@ -1,870 +0,0 @@
+-/***********************************************************************
+- **
+- ** Implementation of the Skein hash function.
+- **
+- ** Source code author: Doug Whiting, 2008.
+- **
+- ** This algorithm and source code is released to the public domain.
+- **
+- ************************************************************************/
+-
+-#include <linux/string.h>       /* get the memcpy/memset functions */
+-#include <linux/export.h>
+-#include "skein_base.h" /* get the Skein API definitions   */
+-#include "skein_iv.h"    /* get precomputed IVs */
+-#include "skein_block.h"
+-
+-/*****************************************************************/
+-/*     256-bit Skein                                             */
+-/*****************************************************************/
+-
+-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+-/* init the context for a straight hashing operation  */
+-int skein_256_init(struct skein_256_ctx *ctx, size_t hash_bit_len)
+-{
+-	union {
+-		u8 b[SKEIN_256_STATE_BYTES];
+-		u64 w[SKEIN_256_STATE_WORDS];
+-	} cfg;                              /* config block */
+-
+-	skein_assert_ret(hash_bit_len > 0, SKEIN_BAD_HASHLEN);
+-	ctx->h.hash_bit_len = hash_bit_len;         /* output hash bit count */
+-
+-	switch (hash_bit_len) { /* use pre-computed values, where available */
+-	case  256:
+-		memcpy(ctx->x, SKEIN_256_IV_256, sizeof(ctx->x));
+-		break;
+-	case  224:
+-		memcpy(ctx->x, SKEIN_256_IV_224, sizeof(ctx->x));
+-		break;
+-	case  160:
+-		memcpy(ctx->x, SKEIN_256_IV_160, sizeof(ctx->x));
+-		break;
+-	case  128:
+-		memcpy(ctx->x, SKEIN_256_IV_128, sizeof(ctx->x));
+-		break;
+-	default:
+-		/* here if there is no precomputed IV value available */
+-		/*
+-		 * build/process the config block, type == CONFIG (could be
+-		 * precomputed)
+-		 */
+-		/* set tweaks: T0=0; T1=CFG | FINAL */
+-		skein_start_new_type(ctx, CFG_FINAL);
+-
+-		/* set the schema, version */
+-		cfg.w[0] = skein_swap64(SKEIN_SCHEMA_VER);
+-		/* hash result length in bits */
+-		cfg.w[1] = skein_swap64(hash_bit_len);
+-		cfg.w[2] = skein_swap64(SKEIN_CFG_TREE_INFO_SEQUENTIAL);
+-		/* zero pad config block */
+-		memset(&cfg.w[3], 0, sizeof(cfg) - 3 * sizeof(cfg.w[0]));
+-
+-		/* compute the initial chaining values from config block */
+-		/* zero the chaining variables */
+-		memset(ctx->x, 0, sizeof(ctx->x));
+-		skein_256_process_block(ctx, cfg.b, 1, SKEIN_CFG_STR_LEN);
+-		break;
+-	}
+-	/* The chaining vars ctx->x are now initialized for hash_bit_len. */
+-	/* Set up to process the data message portion of the hash (default) */
+-	skein_start_new_type(ctx, MSG);              /* T0=0, T1= MSG type */
+-
+-	return SKEIN_SUCCESS;
+-}
+-
+-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+-/* init the context for a MAC and/or tree hash operation */
+-/*
+- * [identical to skein_256_init() when key_bytes == 0 && \
+- *	tree_info == SKEIN_CFG_TREE_INFO_SEQUENTIAL]
+- */
+-int skein_256_init_ext(struct skein_256_ctx *ctx, size_t hash_bit_len,
+-		       u64 tree_info, const u8 *key, size_t key_bytes)
+-{
+-	union {
+-		u8  b[SKEIN_256_STATE_BYTES];
+-		u64 w[SKEIN_256_STATE_WORDS];
+-	} cfg; /* config block */
+-
+-	skein_assert_ret(hash_bit_len > 0, SKEIN_BAD_HASHLEN);
+-	skein_assert_ret(key_bytes == 0 || key, SKEIN_FAIL);
+-
+-	/* compute the initial chaining values ctx->x[], based on key */
+-	if (key_bytes == 0) { /* is there a key? */
+-		/* no key: use all zeroes as key for config block */
+-		memset(ctx->x, 0, sizeof(ctx->x));
+-	} else { /* here to pre-process a key */
+-		skein_assert(sizeof(cfg.b) >= sizeof(ctx->x));
+-		/* do a mini-Init right here */
+-		/* set output hash bit count = state size */
+-		ctx->h.hash_bit_len = 8 * sizeof(ctx->x);
+-		/* set tweaks: T0 = 0; T1 = KEY type */
+-		skein_start_new_type(ctx, KEY);
+-		/* zero the initial chaining variables */
+-		memset(ctx->x, 0, sizeof(ctx->x));
+-		/* hash the key */
+-		skein_256_update(ctx, key, key_bytes);
+-		/* put result into cfg.b[] */
+-		skein_256_final_pad(ctx, cfg.b);
+-		/* copy over into ctx->x[] */
+-		memcpy(ctx->x, cfg.b, sizeof(cfg.b));
+-	}
+-	/*
+-	 * build/process the config block, type == CONFIG (could be
+-	 * precomputed for each key)
+-	 */
+-	/* output hash bit count */
+-	ctx->h.hash_bit_len = hash_bit_len;
+-	skein_start_new_type(ctx, CFG_FINAL);
+-
+-	/* pre-pad cfg.w[] with zeroes */
+-	memset(&cfg.w, 0, sizeof(cfg.w));
+-	cfg.w[0] = skein_swap64(SKEIN_SCHEMA_VER);
+-	/* hash result length in bits */
+-	cfg.w[1] = skein_swap64(hash_bit_len);
+-	/* tree hash config info (or SKEIN_CFG_TREE_INFO_SEQUENTIAL) */
+-	cfg.w[2] = skein_swap64(tree_info);
+-
+-	/* compute the initial chaining values from config block */
+-	skein_256_process_block(ctx, cfg.b, 1, SKEIN_CFG_STR_LEN);
+-
+-	/* The chaining vars ctx->x are now initialized */
+-	/* Set up to process the data message portion of the hash (default) */
+-	skein_start_new_type(ctx, MSG);
+-
+-	return SKEIN_SUCCESS;
+-}
+-
+-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+-/* process the input bytes */
+-int skein_256_update(struct skein_256_ctx *ctx, const u8 *msg,
+-		     size_t msg_byte_cnt)
+-{
+-	size_t n;
+-
+-	/* catch uninitialized context */
+-	skein_assert_ret(ctx->h.b_cnt <= SKEIN_256_BLOCK_BYTES, SKEIN_FAIL);
+-
+-	/* process full blocks, if any */
+-	if (msg_byte_cnt + ctx->h.b_cnt > SKEIN_256_BLOCK_BYTES) {
+-		/* finish up any buffered message data */
+-		if (ctx->h.b_cnt) {
+-			/* # bytes free in buffer b[] */
+-			n = SKEIN_256_BLOCK_BYTES - ctx->h.b_cnt;
+-			if (n) {
+-				/* check on our logic here */
+-				skein_assert(n < msg_byte_cnt);
+-				memcpy(&ctx->b[ctx->h.b_cnt], msg, n);
+-				msg_byte_cnt  -= n;
+-				msg         += n;
+-				ctx->h.b_cnt += n;
+-			}
+-			skein_assert(ctx->h.b_cnt == SKEIN_256_BLOCK_BYTES);
+-			skein_256_process_block(ctx, ctx->b, 1,
+-						SKEIN_256_BLOCK_BYTES);
+-			ctx->h.b_cnt = 0;
+-		}
+-		/*
+-		 * now process any remaining full blocks, directly from input
+-		 * message data
+-		 */
+-		if (msg_byte_cnt > SKEIN_256_BLOCK_BYTES) {
+-			/* number of full blocks to process */
+-			n = (msg_byte_cnt - 1) / SKEIN_256_BLOCK_BYTES;
+-			skein_256_process_block(ctx, msg, n,
+-						SKEIN_256_BLOCK_BYTES);
+-			msg_byte_cnt -= n * SKEIN_256_BLOCK_BYTES;
+-			msg        += n * SKEIN_256_BLOCK_BYTES;
+-		}
+-		skein_assert(ctx->h.b_cnt == 0);
+-	}
+-
+-	/* copy any remaining source message data bytes into b[] */
+-	if (msg_byte_cnt) {
+-		skein_assert(msg_byte_cnt + ctx->h.b_cnt <=
+-			     SKEIN_256_BLOCK_BYTES);
+-		memcpy(&ctx->b[ctx->h.b_cnt], msg, msg_byte_cnt);
+-		ctx->h.b_cnt += msg_byte_cnt;
+-	}
+-
+-	return SKEIN_SUCCESS;
+-}
+-
+-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+-/* finalize the hash computation and output the result */
+-int skein_256_final(struct skein_256_ctx *ctx, u8 *hash_val)
+-{
+-	size_t i, n, byte_cnt;
+-	u64 x[SKEIN_256_STATE_WORDS];
+-	/* catch uninitialized context */
+-	skein_assert_ret(ctx->h.b_cnt <= SKEIN_256_BLOCK_BYTES, SKEIN_FAIL);
+-
+-	/* tag as the final block */
+-	ctx->h.tweak[1] |= SKEIN_T1_FLAG_FINAL;
+-	/* zero pad b[] if necessary */
+-	if (ctx->h.b_cnt < SKEIN_256_BLOCK_BYTES)
+-		memset(&ctx->b[ctx->h.b_cnt], 0,
+-		       SKEIN_256_BLOCK_BYTES - ctx->h.b_cnt);
+-
+-	/* process the final block */
+-	skein_256_process_block(ctx, ctx->b, 1, ctx->h.b_cnt);
+-
+-	/* now output the result */
+-	/* total number of output bytes */
+-	byte_cnt = (ctx->h.hash_bit_len + 7) >> 3;
+-
+-	/* run Threefish in "counter mode" to generate output */
+-	/* zero out b[], so it can hold the counter */
+-	memset(ctx->b, 0, sizeof(ctx->b));
+-	/* keep a local copy of counter mode "key" */
+-	memcpy(x, ctx->x, sizeof(x));
+-	for (i = 0; i * SKEIN_256_BLOCK_BYTES < byte_cnt; i++) {
+-		/* build the counter block */
+-		((u64 *)ctx->b)[0] = skein_swap64((u64)i);
+-		skein_start_new_type(ctx, OUT_FINAL);
+-		/* run "counter mode" */
+-		skein_256_process_block(ctx, ctx->b, 1, sizeof(u64));
+-		/* number of output bytes left to go */
+-		n = byte_cnt - i * SKEIN_256_BLOCK_BYTES;
+-		if (n >= SKEIN_256_BLOCK_BYTES)
+-			n  = SKEIN_256_BLOCK_BYTES;
+-		/* "output" the ctr mode bytes */
+-		skein_put64_lsb_first(hash_val + (i * SKEIN_256_BLOCK_BYTES),
+-				      ctx->x, n);
+-		/* restore the counter mode key for next time */
+-		memcpy(ctx->x, x, sizeof(x));
+-	}
+-	return SKEIN_SUCCESS;
+-}
+-
+-/*****************************************************************/
+-/*     512-bit Skein                                             */
+-/*****************************************************************/
+-
+-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+-/* init the context for a straight hashing operation  */
+-int skein_512_init(struct skein_512_ctx *ctx, size_t hash_bit_len)
+-{
+-	union {
+-		u8 b[SKEIN_512_STATE_BYTES];
+-		u64 w[SKEIN_512_STATE_WORDS];
+-	} cfg;                              /* config block */
+-
+-	skein_assert_ret(hash_bit_len > 0, SKEIN_BAD_HASHLEN);
+-	ctx->h.hash_bit_len = hash_bit_len;         /* output hash bit count */
+-
+-	switch (hash_bit_len) { /* use pre-computed values, where available */
+-	case  512:
+-		memcpy(ctx->x, SKEIN_512_IV_512, sizeof(ctx->x));
+-		break;
+-	case  384:
+-		memcpy(ctx->x, SKEIN_512_IV_384, sizeof(ctx->x));
+-		break;
+-	case  256:
+-		memcpy(ctx->x, SKEIN_512_IV_256, sizeof(ctx->x));
+-		break;
+-	case  224:
+-		memcpy(ctx->x, SKEIN_512_IV_224, sizeof(ctx->x));
+-		break;
+-	default:
+-		/* here if there is no precomputed IV value available */
+-		/*
+-		 * build/process the config block, type == CONFIG (could be
+-		 * precomputed)
+-		 */
+-		/* set tweaks: T0=0; T1=CFG | FINAL */
+-		skein_start_new_type(ctx, CFG_FINAL);
+-
+-		/* set the schema, version */
+-		cfg.w[0] = skein_swap64(SKEIN_SCHEMA_VER);
+-		/* hash result length in bits */
+-		cfg.w[1] = skein_swap64(hash_bit_len);
+-		cfg.w[2] = skein_swap64(SKEIN_CFG_TREE_INFO_SEQUENTIAL);
+-		/* zero pad config block */
+-		memset(&cfg.w[3], 0, sizeof(cfg) - 3 * sizeof(cfg.w[0]));
+-
+-		/* compute the initial chaining values from config block */
+-		/* zero the chaining variables */
+-		memset(ctx->x, 0, sizeof(ctx->x));
+-		skein_512_process_block(ctx, cfg.b, 1, SKEIN_CFG_STR_LEN);
+-		break;
+-	}
+-
+-	/*
+-	 * The chaining vars ctx->x are now initialized for the given
+-	 * hash_bit_len.
+-	 */
+-	/* Set up to process the data message portion of the hash (default) */
+-	skein_start_new_type(ctx, MSG);              /* T0=0, T1= MSG type */
+-
+-	return SKEIN_SUCCESS;
+-}
+-
+-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+-/* init the context for a MAC and/or tree hash operation */
+-/*
+- * [identical to skein_512_init() when key_bytes == 0 && \
+- *	tree_info == SKEIN_CFG_TREE_INFO_SEQUENTIAL]
+- */
+-int skein_512_init_ext(struct skein_512_ctx *ctx, size_t hash_bit_len,
+-		       u64 tree_info, const u8 *key, size_t key_bytes)
+-{
+-	union {
+-		u8 b[SKEIN_512_STATE_BYTES];
+-		u64 w[SKEIN_512_STATE_WORDS];
+-	} cfg;                              /* config block */
+-
+-	skein_assert_ret(hash_bit_len > 0, SKEIN_BAD_HASHLEN);
+-	skein_assert_ret(key_bytes == 0 || key, SKEIN_FAIL);
+-
+-	/* compute the initial chaining values ctx->x[], based on key */
+-	if (key_bytes == 0) { /* is there a key? */
+-		/* no key: use all zeroes as key for config block */
+-		memset(ctx->x, 0, sizeof(ctx->x));
+-	} else { /* here to pre-process a key */
+-		skein_assert(sizeof(cfg.b) >= sizeof(ctx->x));
+-		/* do a mini-Init right here */
+-		/* set output hash bit count = state size */
+-		ctx->h.hash_bit_len = 8 * sizeof(ctx->x);
+-		/* set tweaks: T0 = 0; T1 = KEY type */
+-		skein_start_new_type(ctx, KEY);
+-		/* zero the initial chaining variables */
+-		memset(ctx->x, 0, sizeof(ctx->x));
+-		/* hash the key */
+-		skein_512_update(ctx, key, key_bytes);
+-		/* put result into cfg.b[] */
+-		skein_512_final_pad(ctx, cfg.b);
+-		/* copy over into ctx->x[] */
+-		memcpy(ctx->x, cfg.b, sizeof(cfg.b));
+-	}
+-	/*
+-	 * build/process the config block, type == CONFIG (could be
+-	 * precomputed for each key)
+-	 */
+-	ctx->h.hash_bit_len = hash_bit_len;          /* output hash bit count */
+-	skein_start_new_type(ctx, CFG_FINAL);
+-
+-	/* pre-pad cfg.w[] with zeroes */
+-	memset(&cfg.w, 0, sizeof(cfg.w));
+-	cfg.w[0] = skein_swap64(SKEIN_SCHEMA_VER);
+-	/* hash result length in bits */
+-	cfg.w[1] = skein_swap64(hash_bit_len);
+-	/* tree hash config info (or SKEIN_CFG_TREE_INFO_SEQUENTIAL) */
+-	cfg.w[2] = skein_swap64(tree_info);
+-
+-	/* compute the initial chaining values from config block */
+-	skein_512_process_block(ctx, cfg.b, 1, SKEIN_CFG_STR_LEN);
+-
+-	/* The chaining vars ctx->x are now initialized */
+-	/* Set up to process the data message portion of the hash (default) */
+-	skein_start_new_type(ctx, MSG);
+-
+-	return SKEIN_SUCCESS;
+-}
+-
+-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+-/* process the input bytes */
+-int skein_512_update(struct skein_512_ctx *ctx, const u8 *msg,
+-		     size_t msg_byte_cnt)
+-{
+-	size_t n;
+-
+-	/* catch uninitialized context */
+-	skein_assert_ret(ctx->h.b_cnt <= SKEIN_512_BLOCK_BYTES, SKEIN_FAIL);
+-
+-	/* process full blocks, if any */
+-	if (msg_byte_cnt + ctx->h.b_cnt > SKEIN_512_BLOCK_BYTES) {
+-		/* finish up any buffered message data */
+-		if (ctx->h.b_cnt) {
+-			/* # bytes free in buffer b[] */
+-			n = SKEIN_512_BLOCK_BYTES - ctx->h.b_cnt;
+-			if (n) {
+-				/* check on our logic here */
+-				skein_assert(n < msg_byte_cnt);
+-				memcpy(&ctx->b[ctx->h.b_cnt], msg, n);
+-				msg_byte_cnt  -= n;
+-				msg         += n;
+-				ctx->h.b_cnt += n;
+-			}
+-			skein_assert(ctx->h.b_cnt == SKEIN_512_BLOCK_BYTES);
+-			skein_512_process_block(ctx, ctx->b, 1,
+-						SKEIN_512_BLOCK_BYTES);
+-			ctx->h.b_cnt = 0;
+-		}
+-		/*
+-		 * now process any remaining full blocks, directly from input
+-		 * message data
+-		 */
+-		if (msg_byte_cnt > SKEIN_512_BLOCK_BYTES) {
+-			/* number of full blocks to process */
+-			n = (msg_byte_cnt - 1) / SKEIN_512_BLOCK_BYTES;
+-			skein_512_process_block(ctx, msg, n,
+-						SKEIN_512_BLOCK_BYTES);
+-			msg_byte_cnt -= n * SKEIN_512_BLOCK_BYTES;
+-			msg        += n * SKEIN_512_BLOCK_BYTES;
+-		}
+-		skein_assert(ctx->h.b_cnt == 0);
+-	}
+-
+-	/* copy any remaining source message data bytes into b[] */
+-	if (msg_byte_cnt) {
+-		skein_assert(msg_byte_cnt + ctx->h.b_cnt <=
+-			     SKEIN_512_BLOCK_BYTES);
+-		memcpy(&ctx->b[ctx->h.b_cnt], msg, msg_byte_cnt);
+-		ctx->h.b_cnt += msg_byte_cnt;
+-	}
+-
+-	return SKEIN_SUCCESS;
+-}
+-
+-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+-/* finalize the hash computation and output the result */
+-int skein_512_final(struct skein_512_ctx *ctx, u8 *hash_val)
+-{
+-	size_t i, n, byte_cnt;
+-	u64 x[SKEIN_512_STATE_WORDS];
+-	/* catch uninitialized context */
+-	skein_assert_ret(ctx->h.b_cnt <= SKEIN_512_BLOCK_BYTES, SKEIN_FAIL);
+-
+-	/* tag as the final block */
+-	ctx->h.tweak[1] |= SKEIN_T1_FLAG_FINAL;
+-	/* zero pad b[] if necessary */
+-	if (ctx->h.b_cnt < SKEIN_512_BLOCK_BYTES)
+-		memset(&ctx->b[ctx->h.b_cnt], 0,
+-		       SKEIN_512_BLOCK_BYTES - ctx->h.b_cnt);
+-
+-	/* process the final block */
+-	skein_512_process_block(ctx, ctx->b, 1, ctx->h.b_cnt);
+-
+-	/* now output the result */
+-	/* total number of output bytes */
+-	byte_cnt = (ctx->h.hash_bit_len + 7) >> 3;
+-
+-	/* run Threefish in "counter mode" to generate output */
+-	/* zero out b[], so it can hold the counter */
+-	memset(ctx->b, 0, sizeof(ctx->b));
+-	/* keep a local copy of counter mode "key" */
+-	memcpy(x, ctx->x, sizeof(x));
+-	for (i = 0; i * SKEIN_512_BLOCK_BYTES < byte_cnt; i++) {
+-		/* build the counter block */
+-		((u64 *)ctx->b)[0] = skein_swap64((u64)i);
+-		skein_start_new_type(ctx, OUT_FINAL);
+-		/* run "counter mode" */
+-		skein_512_process_block(ctx, ctx->b, 1, sizeof(u64));
+-		/* number of output bytes left to go */
+-		n = byte_cnt - i * SKEIN_512_BLOCK_BYTES;
+-		if (n >= SKEIN_512_BLOCK_BYTES)
+-			n  = SKEIN_512_BLOCK_BYTES;
+-		/* "output" the ctr mode bytes */
+-		skein_put64_lsb_first(hash_val + (i * SKEIN_512_BLOCK_BYTES),
+-				      ctx->x, n);
+-		/* restore the counter mode key for next time */
+-		memcpy(ctx->x, x, sizeof(x));
+-	}
+-	return SKEIN_SUCCESS;
+-}
+-
+-/*****************************************************************/
+-/*    1024-bit Skein                                             */
+-/*****************************************************************/
+-
+-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+-/* init the context for a straight hashing operation  */
+-int skein_1024_init(struct skein_1024_ctx *ctx, size_t hash_bit_len)
+-{
+-	union {
+-		u8 b[SKEIN_1024_STATE_BYTES];
+-		u64 w[SKEIN_1024_STATE_WORDS];
+-	} cfg;                              /* config block */
+-
+-	skein_assert_ret(hash_bit_len > 0, SKEIN_BAD_HASHLEN);
+-	ctx->h.hash_bit_len = hash_bit_len;         /* output hash bit count */
+-
+-	switch (hash_bit_len) { /* use pre-computed values, where available */
+-	case  512:
+-		memcpy(ctx->x, SKEIN_1024_IV_512, sizeof(ctx->x));
+-		break;
+-	case  384:
+-		memcpy(ctx->x, SKEIN_1024_IV_384, sizeof(ctx->x));
+-		break;
+-	case 1024:
+-		memcpy(ctx->x, SKEIN_1024_IV_1024, sizeof(ctx->x));
+-		break;
+-	default:
+-		/* here if there is no precomputed IV value available */
+-		/*
+-		 * build/process the config block, type == CONFIG
+-		 * (could be precomputed)
+-		 */
+-		/* set tweaks: T0=0; T1=CFG | FINAL */
+-		skein_start_new_type(ctx, CFG_FINAL);
+-
+-		/* set the schema, version */
+-		cfg.w[0] = skein_swap64(SKEIN_SCHEMA_VER);
+-		/* hash result length in bits */
+-		cfg.w[1] = skein_swap64(hash_bit_len);
+-		cfg.w[2] = skein_swap64(SKEIN_CFG_TREE_INFO_SEQUENTIAL);
+-		/* zero pad config block */
+-		memset(&cfg.w[3], 0, sizeof(cfg) - 3 * sizeof(cfg.w[0]));
+-
+-		/* compute the initial chaining values from config block */
+-		/* zero the chaining variables */
+-		memset(ctx->x, 0, sizeof(ctx->x));
+-		skein_1024_process_block(ctx, cfg.b, 1, SKEIN_CFG_STR_LEN);
+-		break;
+-	}
+-
+-	/* The chaining vars ctx->x are now initialized for the hash_bit_len. */
+-	/* Set up to process the data message portion of the hash (default) */
+-	skein_start_new_type(ctx, MSG);              /* T0=0, T1= MSG type */
+-
+-	return SKEIN_SUCCESS;
+-}
+-
+-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+-/* init the context for a MAC and/or tree hash operation */
+-/*
+- * [identical to skein_1024_init() when key_bytes == 0 && \
+- *	tree_info == SKEIN_CFG_TREE_INFO_SEQUENTIAL]
+- */
+-int skein_1024_init_ext(struct skein_1024_ctx *ctx, size_t hash_bit_len,
+-			u64 tree_info, const u8 *key, size_t key_bytes)
+-{
+-	union {
+-		u8 b[SKEIN_1024_STATE_BYTES];
+-		u64 w[SKEIN_1024_STATE_WORDS];
+-	} cfg;                              /* config block */
+-
+-	skein_assert_ret(hash_bit_len > 0, SKEIN_BAD_HASHLEN);
+-	skein_assert_ret(key_bytes == 0 || key, SKEIN_FAIL);
+-
+-	/* compute the initial chaining values ctx->x[], based on key */
+-	if (key_bytes == 0) { /* is there a key? */
+-		/* no key: use all zeroes as key for config block */
+-		memset(ctx->x, 0, sizeof(ctx->x));
+-	} else { /* here to pre-process a key */
+-		skein_assert(sizeof(cfg.b) >= sizeof(ctx->x));
+-		/* do a mini-Init right here */
+-		/* set output hash bit count = state size */
+-		ctx->h.hash_bit_len = 8 * sizeof(ctx->x);
+-		/* set tweaks: T0 = 0; T1 = KEY type */
+-		skein_start_new_type(ctx, KEY);
+-		/* zero the initial chaining variables */
+-		memset(ctx->x, 0, sizeof(ctx->x));
+-		/* hash the key */
+-		skein_1024_update(ctx, key, key_bytes);
+-		/* put result into cfg.b[] */
+-		skein_1024_final_pad(ctx, cfg.b);
+-		/* copy over into ctx->x[] */
+-		memcpy(ctx->x, cfg.b, sizeof(cfg.b));
+-	}
+-	/*
+-	 * build/process the config block, type == CONFIG (could be
+-	 * precomputed for each key)
+-	 */
+-	/* output hash bit count */
+-	ctx->h.hash_bit_len = hash_bit_len;
+-	skein_start_new_type(ctx, CFG_FINAL);
+-
+-	/* pre-pad cfg.w[] with zeroes */
+-	memset(&cfg.w, 0, sizeof(cfg.w));
+-	cfg.w[0] = skein_swap64(SKEIN_SCHEMA_VER);
+-	/* hash result length in bits */
+-	cfg.w[1] = skein_swap64(hash_bit_len);
+-	/* tree hash config info (or SKEIN_CFG_TREE_INFO_SEQUENTIAL) */
+-	cfg.w[2] = skein_swap64(tree_info);
+-
+-	/* compute the initial chaining values from config block */
+-	skein_1024_process_block(ctx, cfg.b, 1, SKEIN_CFG_STR_LEN);
+-
+-	/* The chaining vars ctx->x are now initialized */
+-	/* Set up to process the data message portion of the hash (default) */
+-	skein_start_new_type(ctx, MSG);
+-
+-	return SKEIN_SUCCESS;
+-}
+-
+-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+-/* process the input bytes */
+-int skein_1024_update(struct skein_1024_ctx *ctx, const u8 *msg,
+-		      size_t msg_byte_cnt)
+-{
+-	size_t n;
+-
+-	/* catch uninitialized context */
+-	skein_assert_ret(ctx->h.b_cnt <= SKEIN_1024_BLOCK_BYTES, SKEIN_FAIL);
+-
+-	/* process full blocks, if any */
+-	if (msg_byte_cnt + ctx->h.b_cnt > SKEIN_1024_BLOCK_BYTES) {
+-		/* finish up any buffered message data */
+-		if (ctx->h.b_cnt) {
+-			/* # bytes free in buffer b[] */
+-			n = SKEIN_1024_BLOCK_BYTES - ctx->h.b_cnt;
+-			if (n) {
+-				/* check on our logic here */
+-				skein_assert(n < msg_byte_cnt);
+-				memcpy(&ctx->b[ctx->h.b_cnt], msg, n);
+-				msg_byte_cnt  -= n;
+-				msg         += n;
+-				ctx->h.b_cnt += n;
+-			}
+-			skein_assert(ctx->h.b_cnt == SKEIN_1024_BLOCK_BYTES);
+-			skein_1024_process_block(ctx, ctx->b, 1,
+-						 SKEIN_1024_BLOCK_BYTES);
+-			ctx->h.b_cnt = 0;
+-		}
+-		/*
+-		 * now process any remaining full blocks, directly from input
+-		 * message data
+-		 */
+-		if (msg_byte_cnt > SKEIN_1024_BLOCK_BYTES) {
+-			/* number of full blocks to process */
+-			n = (msg_byte_cnt - 1) / SKEIN_1024_BLOCK_BYTES;
+-			skein_1024_process_block(ctx, msg, n,
+-						 SKEIN_1024_BLOCK_BYTES);
+-			msg_byte_cnt -= n * SKEIN_1024_BLOCK_BYTES;
+-			msg        += n * SKEIN_1024_BLOCK_BYTES;
+-		}
+-		skein_assert(ctx->h.b_cnt == 0);
+-	}
+-
+-	/* copy any remaining source message data bytes into b[] */
+-	if (msg_byte_cnt) {
+-		skein_assert(msg_byte_cnt + ctx->h.b_cnt <=
+-			     SKEIN_1024_BLOCK_BYTES);
+-		memcpy(&ctx->b[ctx->h.b_cnt], msg, msg_byte_cnt);
+-		ctx->h.b_cnt += msg_byte_cnt;
+-	}
+-
+-	return SKEIN_SUCCESS;
+-}
+-
+-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+-/* finalize the hash computation and output the result */
+-int skein_1024_final(struct skein_1024_ctx *ctx, u8 *hash_val)
+-{
+-	size_t i, n, byte_cnt;
+-	u64 x[SKEIN_1024_STATE_WORDS];
+-	/* catch uninitialized context */
+-	skein_assert_ret(ctx->h.b_cnt <= SKEIN_1024_BLOCK_BYTES, SKEIN_FAIL);
+-
+-	/* tag as the final block */
+-	ctx->h.tweak[1] |= SKEIN_T1_FLAG_FINAL;
+-	/* zero pad b[] if necessary */
+-	if (ctx->h.b_cnt < SKEIN_1024_BLOCK_BYTES)
+-		memset(&ctx->b[ctx->h.b_cnt], 0,
+-		       SKEIN_1024_BLOCK_BYTES - ctx->h.b_cnt);
+-
+-	/* process the final block */
+-	skein_1024_process_block(ctx, ctx->b, 1, ctx->h.b_cnt);
+-
+-	/* now output the result */
+-	/* total number of output bytes */
+-	byte_cnt = (ctx->h.hash_bit_len + 7) >> 3;
+-
+-	/* run Threefish in "counter mode" to generate output */
+-	/* zero out b[], so it can hold the counter */
+-	memset(ctx->b, 0, sizeof(ctx->b));
+-	/* keep a local copy of counter mode "key" */
+-	memcpy(x, ctx->x, sizeof(x));
+-	for (i = 0; i * SKEIN_1024_BLOCK_BYTES < byte_cnt; i++) {
+-		/* build the counter block */
+-		((u64 *)ctx->b)[0] = skein_swap64((u64)i);
+-		skein_start_new_type(ctx, OUT_FINAL);
+-		/* run "counter mode" */
+-		skein_1024_process_block(ctx, ctx->b, 1, sizeof(u64));
+-		/* number of output bytes left to go */
+-		n = byte_cnt - i * SKEIN_1024_BLOCK_BYTES;
+-		if (n >= SKEIN_1024_BLOCK_BYTES)
+-			n  = SKEIN_1024_BLOCK_BYTES;
+-		/* "output" the ctr mode bytes */
+-		skein_put64_lsb_first(hash_val + (i * SKEIN_1024_BLOCK_BYTES),
+-				      ctx->x, n);
+-		/* restore the counter mode key for next time */
+-		memcpy(ctx->x, x, sizeof(x));
+-	}
+-	return SKEIN_SUCCESS;
+-}
+-
+-/**************** Functions to support MAC/tree hashing ***************/
+-/*   (this code is identical for Optimized and Reference versions)    */
+-
+-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+-/* finalize the hash computation and output the block, no OUTPUT stage */
+-int skein_256_final_pad(struct skein_256_ctx *ctx, u8 *hash_val)
+-{
+-	/* catch uninitialized context */
+-	skein_assert_ret(ctx->h.b_cnt <= SKEIN_256_BLOCK_BYTES, SKEIN_FAIL);
+-
+-	/* tag as the final block */
+-	ctx->h.tweak[1] |= SKEIN_T1_FLAG_FINAL;
+-	/* zero pad b[] if necessary */
+-	if (ctx->h.b_cnt < SKEIN_256_BLOCK_BYTES)
+-		memset(&ctx->b[ctx->h.b_cnt], 0,
+-		       SKEIN_256_BLOCK_BYTES - ctx->h.b_cnt);
+-	/* process the final block */
+-	skein_256_process_block(ctx, ctx->b, 1, ctx->h.b_cnt);
+-
+-	/* "output" the state bytes */
+-	skein_put64_lsb_first(hash_val, ctx->x, SKEIN_256_BLOCK_BYTES);
+-
+-	return SKEIN_SUCCESS;
+-}
+-
+-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+-/* finalize the hash computation and output the block, no OUTPUT stage */
+-int skein_512_final_pad(struct skein_512_ctx *ctx, u8 *hash_val)
+-{
+-	/* catch uninitialized context */
+-	skein_assert_ret(ctx->h.b_cnt <= SKEIN_512_BLOCK_BYTES, SKEIN_FAIL);
+-
+-	/* tag as the final block */
+-	ctx->h.tweak[1] |= SKEIN_T1_FLAG_FINAL;
+-	/* zero pad b[] if necessary */
+-	if (ctx->h.b_cnt < SKEIN_512_BLOCK_BYTES)
+-		memset(&ctx->b[ctx->h.b_cnt], 0,
+-		       SKEIN_512_BLOCK_BYTES - ctx->h.b_cnt);
+-	/* process the final block */
+-	skein_512_process_block(ctx, ctx->b, 1, ctx->h.b_cnt);
+-
+-	/* "output" the state bytes */
+-	skein_put64_lsb_first(hash_val, ctx->x, SKEIN_512_BLOCK_BYTES);
+-
+-	return SKEIN_SUCCESS;
+-}
+-
+-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+-/* finalize the hash computation and output the block, no OUTPUT stage */
+-int skein_1024_final_pad(struct skein_1024_ctx *ctx, u8 *hash_val)
+-{
+-	/* catch uninitialized context */
+-	skein_assert_ret(ctx->h.b_cnt <= SKEIN_1024_BLOCK_BYTES, SKEIN_FAIL);
+-
+-	/* tag as the final block */
+-	ctx->h.tweak[1] |= SKEIN_T1_FLAG_FINAL;
+-	/* zero pad b[] if necessary */
+-	if (ctx->h.b_cnt < SKEIN_1024_BLOCK_BYTES)
+-		memset(&ctx->b[ctx->h.b_cnt], 0,
+-		       SKEIN_1024_BLOCK_BYTES - ctx->h.b_cnt);
+-	/* process the final block */
+-	skein_1024_process_block(ctx, ctx->b, 1, ctx->h.b_cnt);
+-
+-	/* "output" the state bytes */
+-	skein_put64_lsb_first(hash_val, ctx->x, SKEIN_1024_BLOCK_BYTES);
+-
+-	return SKEIN_SUCCESS;
+-}
+-
+-#if SKEIN_TREE_HASH
+-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+-/* just do the OUTPUT stage                                       */
+-int skein_256_output(struct skein_256_ctx *ctx, u8 *hash_val)
+-{
+-	size_t i, n, byte_cnt;
+-	u64 x[SKEIN_256_STATE_WORDS];
+-	/* catch uninitialized context */
+-	skein_assert_ret(ctx->h.b_cnt <= SKEIN_256_BLOCK_BYTES, SKEIN_FAIL);
+-
+-	/* now output the result */
+-	/* total number of output bytes */
+-	byte_cnt = (ctx->h.hash_bit_len + 7) >> 3;
+-
+-	/* run Threefish in "counter mode" to generate output */
+-	/* zero out b[], so it can hold the counter */
+-	memset(ctx->b, 0, sizeof(ctx->b));
+-	/* keep a local copy of counter mode "key" */
+-	memcpy(x, ctx->x, sizeof(x));
+-	for (i = 0; i * SKEIN_256_BLOCK_BYTES < byte_cnt; i++) {
+-		/* build the counter block */
+-		((u64 *)ctx->b)[0] = skein_swap64((u64)i);
+-		skein_start_new_type(ctx, OUT_FINAL);
+-		/* run "counter mode" */
+-		skein_256_process_block(ctx, ctx->b, 1, sizeof(u64));
+-		/* number of output bytes left to go */
+-		n = byte_cnt - i * SKEIN_256_BLOCK_BYTES;
+-		if (n >= SKEIN_256_BLOCK_BYTES)
+-			n  = SKEIN_256_BLOCK_BYTES;
+-		/* "output" the ctr mode bytes */
+-		skein_put64_lsb_first(hash_val + (i * SKEIN_256_BLOCK_BYTES),
+-				      ctx->x, n);
+-		/* restore the counter mode key for next time */
+-		memcpy(ctx->x, x, sizeof(x));
+-	}
+-	return SKEIN_SUCCESS;
+-}
+-
+-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+-/* just do the OUTPUT stage                                       */
+-int skein_512_output(struct skein_512_ctx *ctx, u8 *hash_val)
+-{
+-	size_t i, n, byte_cnt;
+-	u64 x[SKEIN_512_STATE_WORDS];
+-	/* catch uninitialized context */
+-	skein_assert_ret(ctx->h.b_cnt <= SKEIN_512_BLOCK_BYTES, SKEIN_FAIL);
+-
+-	/* now output the result */
+-	/* total number of output bytes */
+-	byte_cnt = (ctx->h.hash_bit_len + 7) >> 3;
+-
+-	/* run Threefish in "counter mode" to generate output */
+-	/* zero out b[], so it can hold the counter */
+-	memset(ctx->b, 0, sizeof(ctx->b));
+-	/* keep a local copy of counter mode "key" */
+-	memcpy(x, ctx->x, sizeof(x));
+-	for (i = 0; i * SKEIN_512_BLOCK_BYTES < byte_cnt; i++) {
+-		/* build the counter block */
+-		((u64 *)ctx->b)[0] = skein_swap64((u64)i);
+-		skein_start_new_type(ctx, OUT_FINAL);
+-		/* run "counter mode" */
+-		skein_512_process_block(ctx, ctx->b, 1, sizeof(u64));
+-		/* number of output bytes left to go */
+-		n = byte_cnt - i * SKEIN_512_BLOCK_BYTES;
+-		if (n >= SKEIN_512_BLOCK_BYTES)
+-			n  = SKEIN_512_BLOCK_BYTES;
+-		/* "output" the ctr mode bytes */
+-		skein_put64_lsb_first(hash_val + (i * SKEIN_512_BLOCK_BYTES),
+-				      ctx->x, n);
+-		/* restore the counter mode key for next time */
+-		memcpy(ctx->x, x, sizeof(x));
+-	}
+-	return SKEIN_SUCCESS;
+-}
+-
+-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+-/* just do the OUTPUT stage                                       */
+-int skein_1024_output(struct skein_1024_ctx *ctx, u8 *hash_val)
+-{
+-	size_t i, n, byte_cnt;
+-	u64 x[SKEIN_1024_STATE_WORDS];
+-	/* catch uninitialized context */
+-	skein_assert_ret(ctx->h.b_cnt <= SKEIN_1024_BLOCK_BYTES, SKEIN_FAIL);
+-
+-	/* now output the result */
+-	/* total number of output bytes */
+-	byte_cnt = (ctx->h.hash_bit_len + 7) >> 3;
+-
+-	/* run Threefish in "counter mode" to generate output */
+-	/* zero out b[], so it can hold the counter */
+-	memset(ctx->b, 0, sizeof(ctx->b));
+-	/* keep a local copy of counter mode "key" */
+-	memcpy(x, ctx->x, sizeof(x));
+-	for (i = 0; i * SKEIN_1024_BLOCK_BYTES < byte_cnt; i++) {
+-		/* build the counter block */
+-		((u64 *)ctx->b)[0] = skein_swap64((u64)i);
+-		skein_start_new_type(ctx, OUT_FINAL);
+-		/* run "counter mode" */
+-		skein_1024_process_block(ctx, ctx->b, 1, sizeof(u64));
+-		/* number of output bytes left to go */
+-		n = byte_cnt - i * SKEIN_1024_BLOCK_BYTES;
+-		if (n >= SKEIN_1024_BLOCK_BYTES)
+-			n  = SKEIN_1024_BLOCK_BYTES;
+-		/* "output" the ctr mode bytes */
+-		skein_put64_lsb_first(hash_val + (i * SKEIN_1024_BLOCK_BYTES),
+-				      ctx->x, n);
+-		/* restore the counter mode key for next time */
+-		memcpy(ctx->x, x, sizeof(x));
+-	}
+-	return SKEIN_SUCCESS;
+-}
+-#endif
+diff --git a/drivers/staging/skein/skein_base.h b/drivers/staging/skein/skein_base.h
+deleted file mode 100644
+index cd794c1bc1bb..000000000000
+--- a/drivers/staging/skein/skein_base.h
++++ /dev/null
+@@ -1,336 +0,0 @@
+-#ifndef _SKEIN_H_
+-#define _SKEIN_H_     1
+-/*
+- **************************************************************************
+- *
+- * Interface declarations and internal definitions for Skein hashing.
+- *
+- * Source code author: Doug Whiting, 2008.
+- *
+- * This algorithm and source code is released to the public domain.
+- *
+- **************************************************************************
+- *
+- * The following compile-time switches may be defined to control some
+- * tradeoffs between speed, code size, error checking, and security.
+- *
+- * The "default" note explains what happens when the switch is not defined.
+- *
+- *  SKEIN_ERR_CHECK        -- how error checking is handled inside Skein
+- *                            code. If not defined, most error checking
+- *                            is disabled (for performance). Otherwise,
+- *                            the switch value is interpreted as:
+- *                                0: use assert()      to flag errors
+- *                                1: return SKEIN_FAIL to flag errors
+- *
+- **************************************************************************
+- */
+-
+-/*Skein digest sizes for crypto api*/
+-#define SKEIN256_DIGEST_BIT_SIZE 256
+-#define SKEIN512_DIGEST_BIT_SIZE 512
+-#define SKEIN1024_DIGEST_BIT_SIZE 1024
+-
+-/* below two prototype assume we are handed aligned data */
+-#define skein_put64_lsb_first(dst08, src64, b_cnt) memcpy(dst08, src64, b_cnt)
+-#define skein_get64_lsb_first(dst64, src08, w_cnt) \
+-		memcpy(dst64, src08, 8 * (w_cnt))
+-#define skein_swap64(w64)  (w64)
+-
+-enum {
+-	SKEIN_SUCCESS         =      0, /* return codes from Skein calls */
+-	SKEIN_FAIL            =      1,
+-	SKEIN_BAD_HASHLEN     =      2
+-};
+-
+-#define  SKEIN_MODIFIER_WORDS   2 /* number of modifier (tweak) words */
+-
+-#define  SKEIN_256_STATE_WORDS  4
+-#define  SKEIN_512_STATE_WORDS  8
+-#define  SKEIN_1024_STATE_WORDS 16
+-#define  SKEIN_MAX_STATE_WORDS	16
+-
+-#define  SKEIN_256_STATE_BYTES  (8 * SKEIN_256_STATE_WORDS)
+-#define  SKEIN_512_STATE_BYTES  (8 * SKEIN_512_STATE_WORDS)
+-#define  SKEIN_1024_STATE_BYTES (8 * SKEIN_1024_STATE_WORDS)
+-
+-#define  SKEIN_256_STATE_BITS   (64 * SKEIN_256_STATE_WORDS)
+-#define  SKEIN_512_STATE_BITS   (64 * SKEIN_512_STATE_WORDS)
+-#define  SKEIN_1024_STATE_BITS  (64 * SKEIN_1024_STATE_WORDS)
+-
+-#define  SKEIN_256_BLOCK_BYTES  (8 * SKEIN_256_STATE_WORDS)
+-#define  SKEIN_512_BLOCK_BYTES  (8 * SKEIN_512_STATE_WORDS)
+-#define  SKEIN_1024_BLOCK_BYTES (8 * SKEIN_1024_STATE_WORDS)
+-
+-struct skein_ctx_hdr {
+-	size_t hash_bit_len;		/* size of hash result, in bits */
+-	size_t b_cnt;			/* current byte count in buffer b[] */
+-	u64 tweak[SKEIN_MODIFIER_WORDS]; /* tweak[0]=byte cnt, tweak[1]=flags */
+-};
+-
+-struct skein_256_ctx { /* 256-bit Skein hash context structure */
+-	struct skein_ctx_hdr h;		/* common header context variables */
+-	u64 x[SKEIN_256_STATE_WORDS];	/* chaining variables */
+-	u8 b[SKEIN_256_BLOCK_BYTES];	/* partial block buf (8-byte aligned) */
+-};
+-
+-struct skein_512_ctx { /* 512-bit Skein hash context structure */
+-	struct skein_ctx_hdr h;		/* common header context variables */
+-	u64 x[SKEIN_512_STATE_WORDS];	/* chaining variables */
+-	u8 b[SKEIN_512_BLOCK_BYTES];	/* partial block buf (8-byte aligned) */
+-};
+-
+-struct skein_1024_ctx { /* 1024-bit Skein hash context structure */
+-	struct skein_ctx_hdr h;		/* common header context variables */
+-	u64 x[SKEIN_1024_STATE_WORDS];	/* chaining variables */
+-	u8 b[SKEIN_1024_BLOCK_BYTES];	/* partial block buf (8-byte aligned) */
+-};
+-
+-/* Skein APIs for (incremental) "straight hashing" */
+-int skein_256_init(struct skein_256_ctx *ctx, size_t hash_bit_len);
+-int skein_512_init(struct skein_512_ctx *ctx, size_t hash_bit_len);
+-int skein_1024_init(struct skein_1024_ctx *ctx, size_t hash_bit_len);
+-
+-int skein_256_update(struct skein_256_ctx *ctx, const u8 *msg,
+-		     size_t msg_byte_cnt);
+-int skein_512_update(struct skein_512_ctx *ctx, const u8 *msg,
+-		     size_t msg_byte_cnt);
+-int skein_1024_update(struct skein_1024_ctx *ctx, const u8 *msg,
+-		      size_t msg_byte_cnt);
+-
+-int skein_256_final(struct skein_256_ctx *ctx, u8 *hash_val);
+-int skein_512_final(struct skein_512_ctx *ctx, u8 *hash_val);
+-int skein_1024_final(struct skein_1024_ctx *ctx, u8 *hash_val);
+-
+-/*
+- *   Skein APIs for "extended" initialization: MAC keys, tree hashing.
+- *   After an init_ext() call, just use update/final calls as with init().
+- *
+- *   Notes: Same parameters as _init() calls, plus tree_info/key/key_bytes.
+- *          When key_bytes == 0 and tree_info == SKEIN_SEQUENTIAL,
+- *              the results of init_ext() are identical to calling init().
+- *          The function init() may be called once to "precompute" the IV for
+- *              a given hash_bit_len value, then by saving a copy of the context
+- *              the IV computation may be avoided in later calls.
+- *          Similarly, the function init_ext() may be called once per MAC key
+- *              to precompute the MAC IV, then a copy of the context saved and
+- *              reused for each new MAC computation.
+- */
+-int skein_256_init_ext(struct skein_256_ctx *ctx, size_t hash_bit_len,
+-		       u64 tree_info, const u8 *key, size_t key_bytes);
+-int skein_512_init_ext(struct skein_512_ctx *ctx, size_t hash_bit_len,
+-		       u64 tree_info, const u8 *key, size_t key_bytes);
+-int skein_1024_init_ext(struct skein_1024_ctx *ctx, size_t hash_bit_len,
+-			u64 tree_info, const u8 *key, size_t key_bytes);
+-
+-/*
+- *   Skein APIs for MAC and tree hash:
+- *      final_pad:  pad, do final block, but no OUTPUT type
+- *      output:     do just the output stage
+- */
+-int skein_256_final_pad(struct skein_256_ctx *ctx, u8 *hash_val);
+-int skein_512_final_pad(struct skein_512_ctx *ctx, u8 *hash_val);
+-int skein_1024_final_pad(struct skein_1024_ctx *ctx, u8 *hash_val);
+-
+-#ifndef SKEIN_TREE_HASH
+-#define SKEIN_TREE_HASH (1)
+-#endif
+-#if  SKEIN_TREE_HASH
+-int skein_256_output(struct skein_256_ctx *ctx, u8 *hash_val);
+-int skein_512_output(struct skein_512_ctx *ctx, u8 *hash_val);
+-int skein_1024_output(struct skein_1024_ctx *ctx, u8 *hash_val);
+-#endif
+-
+-/*
+- *****************************************************************
+- * "Internal" Skein definitions
+- *    -- not needed for sequential hashing API, but will be
+- *           helpful for other uses of Skein (e.g., tree hash mode).
+- *    -- included here so that they can be shared between
+- *           reference and optimized code.
+- *****************************************************************
+- */
+-
+-/* tweak word tweak[1]: bit field starting positions */
+-#define SKEIN_T1_BIT(BIT)       ((BIT) - 64)      /* second word  */
+-
+-#define SKEIN_T1_POS_TREE_LVL   SKEIN_T1_BIT(112) /* 112..118 hash tree level */
+-#define SKEIN_T1_POS_BIT_PAD    SKEIN_T1_BIT(119) /* 119 part. final in byte */
+-#define SKEIN_T1_POS_BLK_TYPE   SKEIN_T1_BIT(120) /* 120..125 type field `*/
+-#define SKEIN_T1_POS_FIRST      SKEIN_T1_BIT(126) /* 126      first blk flag */
+-#define SKEIN_T1_POS_FINAL      SKEIN_T1_BIT(127) /* 127      final blk flag */
+-
+-/* tweak word tweak[1]: flag bit definition(s) */
+-#define SKEIN_T1_FLAG_FIRST     (((u64)1) << SKEIN_T1_POS_FIRST)
+-#define SKEIN_T1_FLAG_FINAL     (((u64)1) << SKEIN_T1_POS_FINAL)
+-#define SKEIN_T1_FLAG_BIT_PAD   (((u64)1) << SKEIN_T1_POS_BIT_PAD)
+-
+-/* tweak word tweak[1]: tree level bit field mask */
+-#define SKEIN_T1_TREE_LVL_MASK  (((u64)0x7F) << SKEIN_T1_POS_TREE_LVL)
+-#define SKEIN_T1_TREE_LEVEL(n)  (((u64)(n))  << SKEIN_T1_POS_TREE_LVL)
+-
+-/* tweak word tweak[1]: block type field */
+-#define SKEIN_BLK_TYPE_KEY       (0) /* key, for MAC and KDF */
+-#define SKEIN_BLK_TYPE_CFG       (4) /* configuration block */
+-#define SKEIN_BLK_TYPE_PERS      (8) /* personalization string */
+-#define SKEIN_BLK_TYPE_PK       (12) /* pubkey (for digital sigs) */
+-#define SKEIN_BLK_TYPE_KDF      (16) /* key identifier for KDF */
+-#define SKEIN_BLK_TYPE_NONCE    (20) /* nonce for PRNG */
+-#define SKEIN_BLK_TYPE_MSG      (48) /* message processing */
+-#define SKEIN_BLK_TYPE_OUT      (63) /* output stage */
+-#define SKEIN_BLK_TYPE_MASK     (63) /* bit field mask */
+-
+-#define SKEIN_T1_BLK_TYPE(T)   (((u64)(SKEIN_BLK_TYPE_##T)) << \
+-					SKEIN_T1_POS_BLK_TYPE)
+-#define SKEIN_T1_BLK_TYPE_KEY   SKEIN_T1_BLK_TYPE(KEY)  /* for MAC and KDF */
+-#define SKEIN_T1_BLK_TYPE_CFG   SKEIN_T1_BLK_TYPE(CFG)  /* config block */
+-#define SKEIN_T1_BLK_TYPE_PERS  SKEIN_T1_BLK_TYPE(PERS) /* personalization */
+-#define SKEIN_T1_BLK_TYPE_PK    SKEIN_T1_BLK_TYPE(PK)   /* pubkey (for sigs) */
+-#define SKEIN_T1_BLK_TYPE_KDF   SKEIN_T1_BLK_TYPE(KDF)  /* key ident for KDF */
+-#define SKEIN_T1_BLK_TYPE_NONCE SKEIN_T1_BLK_TYPE(NONCE)/* nonce for PRNG */
+-#define SKEIN_T1_BLK_TYPE_MSG   SKEIN_T1_BLK_TYPE(MSG)  /* message processing */
+-#define SKEIN_T1_BLK_TYPE_OUT   SKEIN_T1_BLK_TYPE(OUT)  /* output stage */
+-#define SKEIN_T1_BLK_TYPE_MASK  SKEIN_T1_BLK_TYPE(MASK) /* field bit mask */
+-
+-#define SKEIN_T1_BLK_TYPE_CFG_FINAL    (SKEIN_T1_BLK_TYPE_CFG | \
+-					SKEIN_T1_FLAG_FINAL)
+-#define SKEIN_T1_BLK_TYPE_OUT_FINAL    (SKEIN_T1_BLK_TYPE_OUT | \
+-					SKEIN_T1_FLAG_FINAL)
+-
+-#define SKEIN_VERSION           (1)
+-
+-#ifndef SKEIN_ID_STRING_LE      /* allow compile-time personalization */
+-#define SKEIN_ID_STRING_LE      (0x33414853) /* "SHA3" (little-endian)*/
+-#endif
+-
+-#define SKEIN_MK_64(hi32, lo32)  ((lo32) + (((u64)(hi32)) << 32))
+-#define SKEIN_SCHEMA_VER        SKEIN_MK_64(SKEIN_VERSION, SKEIN_ID_STRING_LE)
+-#define SKEIN_KS_PARITY         SKEIN_MK_64(0x1BD11BDA, 0xA9FC1A22)
+-
+-#define SKEIN_CFG_STR_LEN       (4 * 8)
+-
+-/* bit field definitions in config block tree_info word */
+-#define SKEIN_CFG_TREE_LEAF_SIZE_POS  (0)
+-#define SKEIN_CFG_TREE_NODE_SIZE_POS  (8)
+-#define SKEIN_CFG_TREE_MAX_LEVEL_POS  (16)
+-
+-#define SKEIN_CFG_TREE_LEAF_SIZE_MSK (((u64)0xFF) << \
+-					SKEIN_CFG_TREE_LEAF_SIZE_POS)
+-#define SKEIN_CFG_TREE_NODE_SIZE_MSK (((u64)0xFF) << \
+-					SKEIN_CFG_TREE_NODE_SIZE_POS)
+-#define SKEIN_CFG_TREE_MAX_LEVEL_MSK (((u64)0xFF) << \
+-					SKEIN_CFG_TREE_MAX_LEVEL_POS)
+-
+-#define SKEIN_CFG_TREE_INFO(leaf, node, max_lvl)                   \
+-	((((u64)(leaf))   << SKEIN_CFG_TREE_LEAF_SIZE_POS) |    \
+-	 (((u64)(node))   << SKEIN_CFG_TREE_NODE_SIZE_POS) |    \
+-	 (((u64)(max_lvl)) << SKEIN_CFG_TREE_MAX_LEVEL_POS))
+-
+-/* use as tree_info in InitExt() call for sequential processing */
+-#define SKEIN_CFG_TREE_INFO_SEQUENTIAL SKEIN_CFG_TREE_INFO(0, 0, 0)
+-
+-/*
+- *   Skein macros for getting/setting tweak words, etc.
+- *   These are useful for partial input bytes, hash tree init/update, etc.
+- */
+-#define skein_get_tweak(ctx_ptr, TWK_NUM)          ((ctx_ptr)->h.tweak[TWK_NUM])
+-#define skein_set_tweak(ctx_ptr, TWK_NUM, t_val) { \
+-		(ctx_ptr)->h.tweak[TWK_NUM] = (t_val); \
+-	}
+-
+-#define skein_get_T0(ctx_ptr)     skein_get_tweak(ctx_ptr, 0)
+-#define skein_get_T1(ctx_ptr)     skein_get_tweak(ctx_ptr, 1)
+-#define skein_set_T0(ctx_ptr, T0) skein_set_tweak(ctx_ptr, 0, T0)
+-#define skein_set_T1(ctx_ptr, T1) skein_set_tweak(ctx_ptr, 1, T1)
+-
+-/* set both tweak words at once */
+-#define skein_set_T0_T1(ctx_ptr, T0, T1)           \
+-	{                                          \
+-	skein_set_T0(ctx_ptr, (T0));               \
+-	skein_set_T1(ctx_ptr, (T1));               \
+-	}
+-
+-#define skein_set_type(ctx_ptr, BLK_TYPE)         \
+-	skein_set_T1(ctx_ptr, SKEIN_T1_BLK_TYPE_##BLK_TYPE)
+-
+-/*
+- * setup for starting with a new type:
+- * h.tweak[0]=0; h.tweak[1] = NEW_TYPE; h.b_cnt=0;
+- */
+-#define skein_start_new_type(ctx_ptr, BLK_TYPE) { \
+-		skein_set_T0_T1(ctx_ptr, 0, SKEIN_T1_FLAG_FIRST | \
+-				SKEIN_T1_BLK_TYPE_##BLK_TYPE); \
+-		(ctx_ptr)->h.b_cnt = 0; \
+-	}
+-
+-#define skein_clear_first_flag(hdr) { \
+-		(hdr).tweak[1] &= ~SKEIN_T1_FLAG_FIRST; \
+-	}
+-#define skein_set_bit_pad_flag(hdr) { \
+-		(hdr).tweak[1] |=  SKEIN_T1_FLAG_BIT_PAD; \
+-	}
+-
+-#define skein_set_tree_level(hdr, height) { \
+-		(hdr).tweak[1] |= SKEIN_T1_TREE_LEVEL(height); \
+-	}
+-
+-/* ignore all asserts, for performance */
+-#define skein_assert_ret(x, ret_code)
+-#define skein_assert(x)
+-
+-/*
+- *****************************************************************
+- * Skein block function constants (shared across Ref and Opt code)
+- *****************************************************************
+- */
+-enum {
+-	    /* SKEIN_256 round rotation constants */
+-	R_256_0_0 = 14, R_256_0_1 = 16,
+-	R_256_1_0 = 52, R_256_1_1 = 57,
+-	R_256_2_0 = 23, R_256_2_1 = 40,
+-	R_256_3_0 =  5, R_256_3_1 = 37,
+-	R_256_4_0 = 25, R_256_4_1 = 33,
+-	R_256_5_0 = 46, R_256_5_1 = 12,
+-	R_256_6_0 = 58, R_256_6_1 = 22,
+-	R_256_7_0 = 32, R_256_7_1 = 32,
+-
+-	    /* SKEIN_512 round rotation constants */
+-	R_512_0_0 = 46, R_512_0_1 = 36, R_512_0_2 = 19, R_512_0_3 = 37,
+-	R_512_1_0 = 33, R_512_1_1 = 27, R_512_1_2 = 14, R_512_1_3 = 42,
+-	R_512_2_0 = 17, R_512_2_1 = 49, R_512_2_2 = 36, R_512_2_3 = 39,
+-	R_512_3_0 = 44, R_512_3_1 =  9, R_512_3_2 = 54, R_512_3_3 = 56,
+-	R_512_4_0 = 39, R_512_4_1 = 30, R_512_4_2 = 34, R_512_4_3 = 24,
+-	R_512_5_0 = 13, R_512_5_1 = 50, R_512_5_2 = 10, R_512_5_3 = 17,
+-	R_512_6_0 = 25, R_512_6_1 = 29, R_512_6_2 = 39, R_512_6_3 = 43,
+-	R_512_7_0 =  8, R_512_7_1 = 35, R_512_7_2 = 56, R_512_7_3 = 22,
+-
+-	    /* SKEIN_1024 round rotation constants */
+-	R1024_0_0 = 24, R1024_0_1 = 13, R1024_0_2 =  8, R1024_0_3 = 47,
+-	R1024_0_4 =  8, R1024_0_5 = 17, R1024_0_6 = 22, R1024_0_7 = 37,
+-	R1024_1_0 = 38, R1024_1_1 = 19, R1024_1_2 = 10, R1024_1_3 = 55,
+-	R1024_1_4 = 49, R1024_1_5 = 18, R1024_1_6 = 23, R1024_1_7 = 52,
+-	R1024_2_0 = 33, R1024_2_1 =  4, R1024_2_2 = 51, R1024_2_3 = 13,
+-	R1024_2_4 = 34, R1024_2_5 = 41, R1024_2_6 = 59, R1024_2_7 = 17,
+-	R1024_3_0 =  5, R1024_3_1 = 20, R1024_3_2 = 48, R1024_3_3 = 41,
+-	R1024_3_4 = 47, R1024_3_5 = 28, R1024_3_6 = 16, R1024_3_7 = 25,
+-	R1024_4_0 = 41, R1024_4_1 =  9, R1024_4_2 = 37, R1024_4_3 = 31,
+-	R1024_4_4 = 12, R1024_4_5 = 47, R1024_4_6 = 44, R1024_4_7 = 30,
+-	R1024_5_0 = 16, R1024_5_1 = 34, R1024_5_2 = 56, R1024_5_3 = 51,
+-	R1024_5_4 =  4, R1024_5_5 = 53, R1024_5_6 = 42, R1024_5_7 = 41,
+-	R1024_6_0 = 31, R1024_6_1 = 44, R1024_6_2 = 47, R1024_6_3 = 46,
+-	R1024_6_4 = 19, R1024_6_5 = 42, R1024_6_6 = 44, R1024_6_7 = 25,
+-	R1024_7_0 =  9, R1024_7_1 = 48, R1024_7_2 = 35, R1024_7_3 = 52,
+-	R1024_7_4 = 23, R1024_7_5 = 31, R1024_7_6 = 37, R1024_7_7 = 20
+-};
+-
+-#ifndef SKEIN_ROUNDS
+-#define SKEIN_256_ROUNDS_TOTAL (72)	/* # rounds for diff block sizes */
+-#define SKEIN_512_ROUNDS_TOTAL (72)
+-#define SKEIN_1024_ROUNDS_TOTAL (80)
+-#else			/* allow command-line define in range 8*(5..14)   */
+-#define SKEIN_256_ROUNDS_TOTAL  (8 * ((((SKEIN_ROUNDS / 100) + 5) % 10) + 5))
+-#define SKEIN_512_ROUNDS_TOTAL  (8 * ((((SKEIN_ROUNDS / 10)  + 5) % 10) + 5))
+-#define SKEIN_1024_ROUNDS_TOTAL (8 * ((((SKEIN_ROUNDS)       + 5) % 10) + 5))
+-#endif
+-
+-#endif  /* ifndef _SKEIN_H_ */
+diff --git a/drivers/staging/skein/skein_block.c b/drivers/staging/skein/skein_block.c
+deleted file mode 100644
+index 3bc25e149034..000000000000
+--- a/drivers/staging/skein/skein_block.c
++++ /dev/null
+@@ -1,469 +0,0 @@
+-/*
+- ***********************************************************************
+- *
+- * Implementation of the Skein block functions.
+- *
+- * Source code author: Doug Whiting, 2008.
+- *
+- * This algorithm and source code is released to the public domain.
+- *
+- * Compile-time switches:
+- *
+- *  SKEIN_USE_ASM  -- set bits (256/512/1024) to select which
+- *                    versions use ASM code for block processing
+- *                    [default: use C for all block sizes]
+- *
+- ***********************************************************************
+- */
+-
+-#include <linux/string.h>
+-#include <linux/bitops.h>
+-#include "skein_base.h"
+-#include "skein_block.h"
+-
+-/*****************************  SKEIN_256 ******************************/
+-#if !(SKEIN_USE_ASM & 256)
+-void skein_256_process_block(struct skein_256_ctx *ctx, const u8 *blk_ptr,
+-			     size_t blk_cnt, size_t byte_cnt_add)
+-{ /* do it in C */
+-	enum {
+-		WCNT = SKEIN_256_STATE_WORDS
+-	};
+-	size_t r;
+-#if SKEIN_UNROLL_256
+-	/* key schedule: chaining vars + tweak + "rot"*/
+-	u64  kw[WCNT + 4 + (RCNT * 2)];
+-#else
+-	/* key schedule words : chaining vars + tweak */
+-	u64  kw[WCNT + 4];
+-#endif
+-	u64  X0, X1, X2, X3; /* local copy of context vars, for speed */
+-	u64  w[WCNT]; /* local copy of input block */
+-#ifdef SKEIN_DEBUG
+-	const u64 *X_ptr[4]; /* use for debugging (help cc put Xn in regs) */
+-
+-	X_ptr[0] = &X0;
+-	X_ptr[1] = &X1;
+-	X_ptr[2] = &X2;
+-	X_ptr[3] = &X3;
+-#endif
+-	skein_assert(blk_cnt != 0); /* never call with blk_cnt == 0! */
+-	ts[0] = ctx->h.tweak[0];
+-	ts[1] = ctx->h.tweak[1];
+-	do  {
+-		/*
+-		 * this implementation only supports 2**64 input bytes
+-		 * (no carry out here)
+-		 */
+-		ts[0] += byte_cnt_add; /* update processed length */
+-
+-		/* precompute the key schedule for this block */
+-		ks[0] = ctx->x[0];
+-		ks[1] = ctx->x[1];
+-		ks[2] = ctx->x[2];
+-		ks[3] = ctx->x[3];
+-		ks[4] = ks[0] ^ ks[1] ^ ks[2] ^ ks[3] ^ SKEIN_KS_PARITY;
+-
+-		ts[2] = ts[0] ^ ts[1];
+-
+-		/* get input block in little-endian format */
+-		skein_get64_lsb_first(w, blk_ptr, WCNT);
+-		debug_save_tweak(ctx);
+-
+-		/* do the first full key injection */
+-		X0 = w[0] + ks[0];
+-		X1 = w[1] + ks[1] + ts[0];
+-		X2 = w[2] + ks[2] + ts[1];
+-		X3 = w[3] + ks[3];
+-
+-		blk_ptr += SKEIN_256_BLOCK_BYTES;
+-
+-		/* run the rounds */
+-		for (r = 1;
+-			r < (SKEIN_UNROLL_256 ? 2 * RCNT : 2);
+-			r += (SKEIN_UNROLL_256 ? 2 * SKEIN_UNROLL_256 : 1)) {
+-			R256_8_ROUNDS(0);
+-#if   R256_UNROLL_R(1)
+-			R256_8_ROUNDS(1);
+-#endif
+-#if   R256_UNROLL_R(2)
+-			R256_8_ROUNDS(2);
+-#endif
+-#if   R256_UNROLL_R(3)
+-			R256_8_ROUNDS(3);
+-#endif
+-#if   R256_UNROLL_R(4)
+-			R256_8_ROUNDS(4);
+-#endif
+-#if   R256_UNROLL_R(5)
+-			R256_8_ROUNDS(5);
+-#endif
+-#if   R256_UNROLL_R(6)
+-			R256_8_ROUNDS(6);
+-#endif
+-#if   R256_UNROLL_R(7)
+-			R256_8_ROUNDS(7);
+-#endif
+-#if   R256_UNROLL_R(8)
+-			R256_8_ROUNDS(8);
+-#endif
+-#if   R256_UNROLL_R(9)
+-			R256_8_ROUNDS(9);
+-#endif
+-#if   R256_UNROLL_R(10)
+-			R256_8_ROUNDS(10);
+-#endif
+-#if   R256_UNROLL_R(11)
+-			R256_8_ROUNDS(11);
+-#endif
+-#if   R256_UNROLL_R(12)
+-			R256_8_ROUNDS(12);
+-#endif
+-#if   R256_UNROLL_R(13)
+-			R256_8_ROUNDS(13);
+-#endif
+-#if   R256_UNROLL_R(14)
+-			R256_8_ROUNDS(14);
+-#endif
+-		}
+-		/* do the final "feedforward" xor, update context chaining */
+-		ctx->x[0] = X0 ^ w[0];
+-		ctx->x[1] = X1 ^ w[1];
+-		ctx->x[2] = X2 ^ w[2];
+-		ctx->x[3] = X3 ^ w[3];
+-
+-		ts[1] &= ~SKEIN_T1_FLAG_FIRST;
+-	} while (--blk_cnt);
+-	ctx->h.tweak[0] = ts[0];
+-	ctx->h.tweak[1] = ts[1];
+-}
+-
+-#if defined(SKEIN_CODE_SIZE) || defined(SKEIN_PERF)
+-size_t skein_256_process_block_code_size(void)
+-{
+-	return ((u8 *)skein_256_process_block_code_size) -
+-		((u8 *)skein_256_process_block);
+-}
+-
+-unsigned int skein_256_unroll_cnt(void)
+-{
+-	return SKEIN_UNROLL_256;
+-}
+-#endif
+-#endif
+-
+-/*****************************  SKEIN_512 ******************************/
+-#if !(SKEIN_USE_ASM & 512)
+-void skein_512_process_block(struct skein_512_ctx *ctx, const u8 *blk_ptr,
+-			     size_t blk_cnt, size_t byte_cnt_add)
+-{ /* do it in C */
+-	enum {
+-		WCNT = SKEIN_512_STATE_WORDS
+-	};
+-	size_t  r;
+-#if SKEIN_UNROLL_512
+-	/* key sched: chaining vars + tweak + "rot"*/
+-	u64  kw[WCNT + 4 + RCNT * 2];
+-#else
+-	/* key schedule words : chaining vars + tweak */
+-	u64  kw[WCNT + 4];
+-#endif
+-	u64  X0, X1, X2, X3, X4, X5, X6, X7; /* local copies, for speed */
+-	u64  w[WCNT]; /* local copy of input block */
+-#ifdef SKEIN_DEBUG
+-	const u64 *X_ptr[8]; /* use for debugging (help cc put Xn in regs) */
+-
+-	X_ptr[0] = &X0;
+-	X_ptr[1] = &X1;
+-	X_ptr[2] = &X2;
+-	X_ptr[3] = &X3;
+-	X_ptr[4] = &X4;
+-	X_ptr[5] = &X5;
+-	X_ptr[6] = &X6;
+-	X_ptr[7] = &X7;
+-#endif
+-
+-	skein_assert(blk_cnt != 0); /* never call with blk_cnt == 0! */
+-	ts[0] = ctx->h.tweak[0];
+-	ts[1] = ctx->h.tweak[1];
+-	do  {
+-		/*
+-		 * this implementation only supports 2**64 input bytes
+-		 * (no carry out here)
+-		 */
+-		ts[0] += byte_cnt_add; /* update processed length */
+-
+-		/* precompute the key schedule for this block */
+-		ks[0] = ctx->x[0];
+-		ks[1] = ctx->x[1];
+-		ks[2] = ctx->x[2];
+-		ks[3] = ctx->x[3];
+-		ks[4] = ctx->x[4];
+-		ks[5] = ctx->x[5];
+-		ks[6] = ctx->x[6];
+-		ks[7] = ctx->x[7];
+-		ks[8] = ks[0] ^ ks[1] ^ ks[2] ^ ks[3] ^
+-			ks[4] ^ ks[5] ^ ks[6] ^ ks[7] ^ SKEIN_KS_PARITY;
+-
+-		ts[2] = ts[0] ^ ts[1];
+-
+-		/* get input block in little-endian format */
+-		skein_get64_lsb_first(w, blk_ptr, WCNT);
+-		debug_save_tweak(ctx);
+-
+-		/* do the first full key injection */
+-		X0 = w[0] + ks[0];
+-		X1 = w[1] + ks[1];
+-		X2 = w[2] + ks[2];
+-		X3 = w[3] + ks[3];
+-		X4 = w[4] + ks[4];
+-		X5 = w[5] + ks[5] + ts[0];
+-		X6 = w[6] + ks[6] + ts[1];
+-		X7 = w[7] + ks[7];
+-
+-		blk_ptr += SKEIN_512_BLOCK_BYTES;
+-
+-		/* run the rounds */
+-		for (r = 1;
+-			r < (SKEIN_UNROLL_512 ? 2 * RCNT : 2);
+-			r += (SKEIN_UNROLL_512 ? 2 * SKEIN_UNROLL_512 : 1)) {
+-			R512_8_ROUNDS(0);
+-
+-#if   R512_UNROLL_R(1)
+-			R512_8_ROUNDS(1);
+-#endif
+-#if   R512_UNROLL_R(2)
+-			R512_8_ROUNDS(2);
+-#endif
+-#if   R512_UNROLL_R(3)
+-			R512_8_ROUNDS(3);
+-#endif
+-#if   R512_UNROLL_R(4)
+-			R512_8_ROUNDS(4);
+-#endif
+-#if   R512_UNROLL_R(5)
+-			R512_8_ROUNDS(5);
+-#endif
+-#if   R512_UNROLL_R(6)
+-			R512_8_ROUNDS(6);
+-#endif
+-#if   R512_UNROLL_R(7)
+-			R512_8_ROUNDS(7);
+-#endif
+-#if   R512_UNROLL_R(8)
+-			R512_8_ROUNDS(8);
+-#endif
+-#if   R512_UNROLL_R(9)
+-			R512_8_ROUNDS(9);
+-#endif
+-#if   R512_UNROLL_R(10)
+-			R512_8_ROUNDS(10);
+-#endif
+-#if   R512_UNROLL_R(11)
+-			R512_8_ROUNDS(11);
+-#endif
+-#if   R512_UNROLL_R(12)
+-			R512_8_ROUNDS(12);
+-#endif
+-#if   R512_UNROLL_R(13)
+-			R512_8_ROUNDS(13);
+-#endif
+-#if   R512_UNROLL_R(14)
+-			R512_8_ROUNDS(14);
+-#endif
+-		}
+-
+-		/* do the final "feedforward" xor, update context chaining */
+-		ctx->x[0] = X0 ^ w[0];
+-		ctx->x[1] = X1 ^ w[1];
+-		ctx->x[2] = X2 ^ w[2];
+-		ctx->x[3] = X3 ^ w[3];
+-		ctx->x[4] = X4 ^ w[4];
+-		ctx->x[5] = X5 ^ w[5];
+-		ctx->x[6] = X6 ^ w[6];
+-		ctx->x[7] = X7 ^ w[7];
+-
+-		ts[1] &= ~SKEIN_T1_FLAG_FIRST;
+-	} while (--blk_cnt);
+-	ctx->h.tweak[0] = ts[0];
+-	ctx->h.tweak[1] = ts[1];
+-}
+-
+-#if defined(SKEIN_CODE_SIZE) || defined(SKEIN_PERF)
+-size_t skein_512_process_block_code_size(void)
+-{
+-	return ((u8 *)skein_512_process_block_code_size) -
+-		((u8 *)skein_512_process_block);
+-}
+-
+-unsigned int skein_512_unroll_cnt(void)
+-{
+-	return SKEIN_UNROLL_512;
+-}
+-#endif
+-#endif
+-
+-/*****************************  SKEIN_1024 ******************************/
+-#if !(SKEIN_USE_ASM & 1024)
+-void skein_1024_process_block(struct skein_1024_ctx *ctx, const u8 *blk_ptr,
+-			      size_t blk_cnt, size_t byte_cnt_add)
+-{ /* do it in C, always looping (unrolled is bigger AND slower!) */
+-	enum {
+-		WCNT = SKEIN_1024_STATE_WORDS
+-	};
+-	size_t  r;
+-#if (SKEIN_UNROLL_1024 != 0)
+-	/* key sched: chaining vars + tweak + "rot" */
+-	u64  kw[WCNT + 4 + (RCNT * 2)];
+-#else
+-	/* key schedule words : chaining vars + tweak */
+-	u64  kw[WCNT + 4];
+-#endif
+-
+-	/* local copy of vars, for speed */
+-	u64  X00, X01, X02, X03, X04, X05, X06, X07,
+-	     X08, X09, X10, X11, X12, X13, X14, X15;
+-	u64  w[WCNT]; /* local copy of input block */
+-
+-	skein_assert(blk_cnt != 0); /* never call with blk_cnt == 0! */
+-	ts[0] = ctx->h.tweak[0];
+-	ts[1] = ctx->h.tweak[1];
+-	do  {
+-		/*
+-		 * this implementation only supports 2**64 input bytes
+-		 * (no carry out here)
+-		 */
+-		ts[0] += byte_cnt_add; /* update processed length */
+-
+-		/* precompute the key schedule for this block */
+-		ks[0]  = ctx->x[0];
+-		ks[1]  = ctx->x[1];
+-		ks[2]  = ctx->x[2];
+-		ks[3]  = ctx->x[3];
+-		ks[4]  = ctx->x[4];
+-		ks[5]  = ctx->x[5];
+-		ks[6]  = ctx->x[6];
+-		ks[7]  = ctx->x[7];
+-		ks[8]  = ctx->x[8];
+-		ks[9]  = ctx->x[9];
+-		ks[10] = ctx->x[10];
+-		ks[11] = ctx->x[11];
+-		ks[12] = ctx->x[12];
+-		ks[13] = ctx->x[13];
+-		ks[14] = ctx->x[14];
+-		ks[15] = ctx->x[15];
+-		ks[16] =  ks[0] ^ ks[1] ^ ks[2] ^ ks[3] ^
+-			  ks[4] ^ ks[5] ^ ks[6] ^ ks[7] ^
+-			  ks[8] ^ ks[9] ^ ks[10] ^ ks[11] ^
+-			  ks[12] ^ ks[13] ^ ks[14] ^ ks[15] ^ SKEIN_KS_PARITY;
+-
+-		ts[2] = ts[0] ^ ts[1];
+-
+-		/* get input block in little-endian format */
+-		skein_get64_lsb_first(w, blk_ptr, WCNT);
+-		debug_save_tweak(ctx);
+-
+-		/* do the first full key injection */
+-		X00 = w[0] + ks[0];
+-		X01 = w[1] + ks[1];
+-		X02 = w[2] + ks[2];
+-		X03 = w[3] + ks[3];
+-		X04 = w[4] + ks[4];
+-		X05 = w[5] + ks[5];
+-		X06 = w[6] + ks[6];
+-		X07 = w[7] + ks[7];
+-		X08 = w[8] + ks[8];
+-		X09 = w[9] + ks[9];
+-		X10 = w[10] + ks[10];
+-		X11 = w[11] + ks[11];
+-		X12 = w[12] + ks[12];
+-		X13 = w[13] + ks[13] + ts[0];
+-		X14 = w[14] + ks[14] + ts[1];
+-		X15 = w[15] + ks[15];
+-
+-		for (r = 1;
+-			r < (SKEIN_UNROLL_1024 ? 2 * RCNT : 2);
+-			r += (SKEIN_UNROLL_1024 ? 2 * SKEIN_UNROLL_1024 : 1)) {
+-			R1024_8_ROUNDS(0);
+-#if   R1024_UNROLL_R(1)
+-			R1024_8_ROUNDS(1);
+-#endif
+-#if   R1024_UNROLL_R(2)
+-			R1024_8_ROUNDS(2);
+-#endif
+-#if   R1024_UNROLL_R(3)
+-			R1024_8_ROUNDS(3);
+-#endif
+-#if   R1024_UNROLL_R(4)
+-			R1024_8_ROUNDS(4);
+-#endif
+-#if   R1024_UNROLL_R(5)
+-			R1024_8_ROUNDS(5);
+-#endif
+-#if   R1024_UNROLL_R(6)
+-			R1024_8_ROUNDS(6);
+-#endif
+-#if   R1024_UNROLL_R(7)
+-			R1024_8_ROUNDS(7);
+-#endif
+-#if   R1024_UNROLL_R(8)
+-			R1024_8_ROUNDS(8);
+-#endif
+-#if   R1024_UNROLL_R(9)
+-			R1024_8_ROUNDS(9);
+-#endif
+-#if   R1024_UNROLL_R(10)
+-			R1024_8_ROUNDS(10);
+-#endif
+-#if   R1024_UNROLL_R(11)
+-			R1024_8_ROUNDS(11);
+-#endif
+-#if   R1024_UNROLL_R(12)
+-			R1024_8_ROUNDS(12);
+-#endif
+-#if   R1024_UNROLL_R(13)
+-			R1024_8_ROUNDS(13);
+-#endif
+-#if   R1024_UNROLL_R(14)
+-			R1024_8_ROUNDS(14);
+-#endif
+-		}
+-		/* do the final "feedforward" xor, update context chaining */
+-
+-		ctx->x[0] = X00 ^ w[0];
+-		ctx->x[1] = X01 ^ w[1];
+-		ctx->x[2] = X02 ^ w[2];
+-		ctx->x[3] = X03 ^ w[3];
+-		ctx->x[4] = X04 ^ w[4];
+-		ctx->x[5] = X05 ^ w[5];
+-		ctx->x[6] = X06 ^ w[6];
+-		ctx->x[7] = X07 ^ w[7];
+-		ctx->x[8] = X08 ^ w[8];
+-		ctx->x[9] = X09 ^ w[9];
+-		ctx->x[10] = X10 ^ w[10];
+-		ctx->x[11] = X11 ^ w[11];
+-		ctx->x[12] = X12 ^ w[12];
+-		ctx->x[13] = X13 ^ w[13];
+-		ctx->x[14] = X14 ^ w[14];
+-		ctx->x[15] = X15 ^ w[15];
+-
+-		ts[1] &= ~SKEIN_T1_FLAG_FIRST;
+-		blk_ptr += SKEIN_1024_BLOCK_BYTES;
+-	} while (--blk_cnt);
+-	ctx->h.tweak[0] = ts[0];
+-	ctx->h.tweak[1] = ts[1];
+-}
+-
+-#if defined(SKEIN_CODE_SIZE) || defined(SKEIN_PERF)
+-size_t skein_1024_process_block_code_size(void)
+-{
+-	return ((u8 *)skein_1024_process_block_code_size) -
+-		((u8 *)skein_1024_process_block);
+-}
+-
+-unsigned int skein_1024_unroll_cnt(void)
+-{
+-	return SKEIN_UNROLL_1024;
+-}
+-#endif
+-#endif
+diff --git a/drivers/staging/skein/skein_block.h b/drivers/staging/skein/skein_block.h
+deleted file mode 100644
+index b3bb3d24273b..000000000000
+--- a/drivers/staging/skein/skein_block.h
++++ /dev/null
+@@ -1,347 +0,0 @@
+-/*
+- ***********************************************************************
+- *
+- * Implementation of the Skein hash function.
+- *
+- * Source code author: Doug Whiting, 2008.
+- *
+- * This algorithm and source code is released to the public domain.
+- *
+- ***********************************************************************
+- */
+-#ifndef _SKEIN_BLOCK_H_
+-#define _SKEIN_BLOCK_H_
+-
+-#include "skein_base.h" /* get the Skein API definitions   */
+-
+-#ifndef SKEIN_USE_ASM
+-#define SKEIN_USE_ASM   (0) /* default is all C code (no ASM) */
+-#endif
+-
+-#ifndef SKEIN_LOOP
+-#define SKEIN_LOOP 001 /* default: unroll 256 and 512, but not 1024 */
+-#endif
+-
+-#define BLK_BITS        (WCNT * 64) /* some useful definitions for code here */
+-#define KW_TWK_BASE     (0)
+-#define KW_KEY_BASE     (3)
+-#define ks              (kw + KW_KEY_BASE)
+-#define ts              (kw + KW_TWK_BASE)
+-
+-#ifdef SKEIN_DEBUG
+-#define debug_save_tweak(ctx)       \
+-{                                   \
+-	ctx->h.tweak[0] = ts[0];    \
+-	ctx->h.tweak[1] = ts[1];    \
+-}
+-#else
+-#define debug_save_tweak(ctx)
+-#endif
+-
+-#if !(SKEIN_USE_ASM & 256)
+-#undef  RCNT
+-#define RCNT (SKEIN_256_ROUNDS_TOTAL / 8)
+-#ifdef SKEIN_LOOP /* configure how much to unroll the loop */
+-#define SKEIN_UNROLL_256 (((SKEIN_LOOP) / 100) % 10)
+-#else
+-#define SKEIN_UNROLL_256 (0)
+-#endif
+-
+-#if SKEIN_UNROLL_256
+-#if (RCNT % SKEIN_UNROLL_256)
+-#error "Invalid SKEIN_UNROLL_256" /* sanity check on unroll count */
+-#endif
+-#endif
+-#define ROUND256(p0, p1, p2, p3, ROT, r_num)         \
+-	do {                                         \
+-		X##p0 += X##p1;                      \
+-		X##p1 = rol64(X##p1, ROT##_0);       \
+-		X##p1 ^= X##p0;                      \
+-		X##p2 += X##p3;                      \
+-		X##p3 = rol64(X##p3, ROT##_1);       \
+-		X##p3 ^= X##p2;                      \
+-	} while (0)
+-
+-#if SKEIN_UNROLL_256 == 0
+-#define R256(p0, p1, p2, p3, ROT, r_num) /* fully unrolled */ \
+-	ROUND256(p0, p1, p2, p3, ROT, r_num)
+-
+-#define I256(R)                                                         \
+-	do {                                                            \
+-		/* inject the key schedule value */                     \
+-		X0   += ks[((R) + 1) % 5];                              \
+-		X1   += ks[((R) + 2) % 5] + ts[((R) + 1) % 3];          \
+-		X2   += ks[((R) + 3) % 5] + ts[((R) + 2) % 3];          \
+-		X3   += ks[((R) + 4) % 5] + (R) + 1;                    \
+-	} while (0)
+-#else
+-/* looping version */
+-#define R256(p0, p1, p2, p3, ROT, r_num) ROUND256(p0, p1, p2, p3, ROT, r_num)
+-
+-#define I256(R)                                         \
+-	do {                                            \
+-		/* inject the key schedule value */     \
+-		X0 += ks[r + (R) + 0];                  \
+-		X1 += ks[r + (R) + 1] + ts[r + (R) + 0];\
+-		X2 += ks[r + (R) + 2] + ts[r + (R) + 1];\
+-		X3 += ks[r + (R) + 3] + r + (R);        \
+-		/* rotate key schedule */               \
+-		ks[r + (R) + 4] = ks[r + (R) - 1];      \
+-		ts[r + (R) + 2] = ts[r + (R) - 1];      \
+-	} while (0)
+-#endif
+-#define R256_8_ROUNDS(R)                                \
+-	do {                                            \
+-		R256(0, 1, 2, 3, R_256_0, 8 * (R) + 1); \
+-		R256(0, 3, 2, 1, R_256_1, 8 * (R) + 2); \
+-		R256(0, 1, 2, 3, R_256_2, 8 * (R) + 3); \
+-		R256(0, 3, 2, 1, R_256_3, 8 * (R) + 4); \
+-		I256(2 * (R));                          \
+-		R256(0, 1, 2, 3, R_256_4, 8 * (R) + 5); \
+-		R256(0, 3, 2, 1, R_256_5, 8 * (R) + 6); \
+-		R256(0, 1, 2, 3, R_256_6, 8 * (R) + 7); \
+-		R256(0, 3, 2, 1, R_256_7, 8 * (R) + 8); \
+-		I256(2 * (R) + 1);                      \
+-	} while (0)
+-
+-#define R256_UNROLL_R(NN)                     \
+-	((SKEIN_UNROLL_256 == 0 &&            \
+-	SKEIN_256_ROUNDS_TOTAL / 8 > (NN)) || \
+-	(SKEIN_UNROLL_256 > (NN)))
+-
+-#if  (SKEIN_UNROLL_256 > 14)
+-#error  "need more unrolling in skein_256_process_block"
+-#endif
+-#endif
+-
+-#if !(SKEIN_USE_ASM & 512)
+-#undef  RCNT
+-#define RCNT  (SKEIN_512_ROUNDS_TOTAL / 8)
+-
+-#ifdef SKEIN_LOOP /* configure how much to unroll the loop */
+-#define SKEIN_UNROLL_512 (((SKEIN_LOOP) / 10) % 10)
+-#else
+-#define SKEIN_UNROLL_512 (0)
+-#endif
+-
+-#if SKEIN_UNROLL_512
+-#if (RCNT % SKEIN_UNROLL_512)
+-#error "Invalid SKEIN_UNROLL_512" /* sanity check on unroll count */
+-#endif
+-#endif
+-#define ROUND512(p0, p1, p2, p3, p4, p5, p6, p7, ROT, r_num)    \
+-	do {                                                    \
+-		X##p0 += X##p1;                                 \
+-		X##p1 = rol64(X##p1, ROT##_0);                  \
+-		X##p1 ^= X##p0;                                 \
+-		X##p2 += X##p3;                                 \
+-		X##p3 = rol64(X##p3, ROT##_1);                  \
+-		X##p3 ^= X##p2;                                 \
+-		X##p4 += X##p5;                                 \
+-		X##p5 = rol64(X##p5, ROT##_2);                  \
+-		X##p5 ^= X##p4;                                 \
+-		X##p6 += X##p7;                                 \
+-		X##p7 = rol64(X##p7, ROT##_3);			\
+-		X##p7 ^= X##p6;                                 \
+-	} while (0)
+-
+-#if SKEIN_UNROLL_512 == 0
+-#define R512(p0, p1, p2, p3, p4, p5, p6, p7, ROT, r_num) /* unrolled */ \
+-	ROUND512(p0, p1, p2, p3, p4, p5, p6, p7, ROT, r_num)
+-
+-#define I512(R)                                                         \
+-	do {                                                            \
+-		/* inject the key schedule value */                     \
+-		X0   += ks[((R) + 1) % 9];                              \
+-		X1   += ks[((R) + 2) % 9];                              \
+-		X2   += ks[((R) + 3) % 9];                              \
+-		X3   += ks[((R) + 4) % 9];                              \
+-		X4   += ks[((R) + 5) % 9];                              \
+-		X5   += ks[((R) + 6) % 9] + ts[((R) + 1) % 3];          \
+-		X6   += ks[((R) + 7) % 9] + ts[((R) + 2) % 3];          \
+-		X7   += ks[((R) + 8) % 9] + (R) + 1;                    \
+-	} while (0)
+-
+-#else /* looping version */
+-#define R512(p0, p1, p2, p3, p4, p5, p6, p7, ROT, r_num)                 \
+-	ROUND512(p0, p1, p2, p3, p4, p5, p6, p7, ROT, r_num)             \
+-
+-#define I512(R)                                                         \
+-	do {                                                            \
+-		/* inject the key schedule value */                     \
+-		X0   += ks[r + (R) + 0];                                \
+-		X1   += ks[r + (R) + 1];                                \
+-		X2   += ks[r + (R) + 2];                                \
+-		X3   += ks[r + (R) + 3];                                \
+-		X4   += ks[r + (R) + 4];                                \
+-		X5   += ks[r + (R) + 5] + ts[r + (R) + 0];              \
+-		X6   += ks[r + (R) + 6] + ts[r + (R) + 1];              \
+-		X7   += ks[r + (R) + 7] + r + (R);                      \
+-		/* rotate key schedule */                               \
+-		ks[r + (R) + 8] = ks[r + (R) - 1];                      \
+-		ts[r + (R) + 2] = ts[r + (R) - 1];                      \
+-	} while (0)
+-#endif /* end of looped code definitions */
+-#define R512_8_ROUNDS(R)  /* do 8 full rounds */                        \
+-	do {                                                            \
+-		R512(0, 1, 2, 3, 4, 5, 6, 7, R_512_0, 8 * (R) + 1);     \
+-		R512(2, 1, 4, 7, 6, 5, 0, 3, R_512_1, 8 * (R) + 2);     \
+-		R512(4, 1, 6, 3, 0, 5, 2, 7, R_512_2, 8 * (R) + 3);     \
+-		R512(6, 1, 0, 7, 2, 5, 4, 3, R_512_3, 8 * (R) + 4);     \
+-		I512(2 * (R));                                          \
+-		R512(0, 1, 2, 3, 4, 5, 6, 7, R_512_4, 8 * (R) + 5);     \
+-		R512(2, 1, 4, 7, 6, 5, 0, 3, R_512_5, 8 * (R) + 6);     \
+-		R512(4, 1, 6, 3, 0, 5, 2, 7, R_512_6, 8 * (R) + 7);     \
+-		R512(6, 1, 0, 7, 2, 5, 4, 3, R_512_7, 8 * (R) + 8);     \
+-		I512(2 * (R) + 1); /* and key injection */              \
+-	} while (0)
+-#define R512_UNROLL_R(NN)                             \
+-		((SKEIN_UNROLL_512 == 0 &&            \
+-		SKEIN_512_ROUNDS_TOTAL / 8 > (NN)) || \
+-		(SKEIN_UNROLL_512 > (NN)))
+-
+-#if  (SKEIN_UNROLL_512 > 14)
+-#error  "need more unrolling in skein_512_process_block"
+-#endif
+-#endif
+-
+-#if !(SKEIN_USE_ASM & 1024)
+-#undef  RCNT
+-#define RCNT  (SKEIN_1024_ROUNDS_TOTAL / 8)
+-#ifdef SKEIN_LOOP /* configure how much to unroll the loop */
+-#define SKEIN_UNROLL_1024 ((SKEIN_LOOP) % 10)
+-#else
+-#define SKEIN_UNROLL_1024 (0)
+-#endif
+-
+-#if (SKEIN_UNROLL_1024 != 0)
+-#if (RCNT % SKEIN_UNROLL_1024)
+-#error "Invalid SKEIN_UNROLL_1024" /* sanity check on unroll count */
+-#endif
+-#endif
+-#define ROUND1024(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, pA, pB, pC, pD, pE, \
+-		  pF, ROT, r_num)                                             \
+-	do {                                                                  \
+-		X##p0 += X##p1;                                               \
+-		X##p1 = rol64(X##p1, ROT##_0);                                \
+-		X##p1 ^= X##p0;                                               \
+-		X##p2 += X##p3;                                               \
+-		X##p3 = rol64(X##p3, ROT##_1);                                \
+-		X##p3 ^= X##p2;                                               \
+-		X##p4 += X##p5;                                               \
+-		X##p5 = rol64(X##p5, ROT##_2);                                \
+-		X##p5 ^= X##p4;                                               \
+-		X##p6 += X##p7;                                               \
+-		X##p7 = rol64(X##p7, ROT##_3);                                \
+-		X##p7 ^= X##p6;                                               \
+-		X##p8 += X##p9;                                               \
+-		X##p9 = rol64(X##p9, ROT##_4);                                \
+-		X##p9 ^= X##p8;                                               \
+-		X##pA += X##pB;                                               \
+-		X##pB = rol64(X##pB, ROT##_5);                                \
+-		X##pB ^= X##pA;                                               \
+-		X##pC += X##pD;                                               \
+-		X##pD = rol64(X##pD, ROT##_6);                                \
+-		X##pD ^= X##pC;                                               \
+-		X##pE += X##pF;                                               \
+-		X##pF = rol64(X##pF, ROT##_7);                                \
+-		X##pF ^= X##pE;                                               \
+-	} while (0)
+-
+-#if SKEIN_UNROLL_1024 == 0
+-#define R1024(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, pA, pB, pC, pD, pE, pF, \
+-	      ROT, rn)                                                        \
+-	ROUND1024(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, pA, pB, pC, pD, pE, \
+-		  pF, ROT, rn)                                                \
+-
+-#define I1024(R)                                                \
+-	do {                                                    \
+-		/* inject the key schedule value */             \
+-		X00 += ks[((R) + 1) % 17];                      \
+-		X01 += ks[((R) + 2) % 17];                      \
+-		X02 += ks[((R) + 3) % 17];                      \
+-		X03 += ks[((R) + 4) % 17];                      \
+-		X04 += ks[((R) + 5) % 17];                      \
+-		X05 += ks[((R) + 6) % 17];                      \
+-		X06 += ks[((R) + 7) % 17];                      \
+-		X07 += ks[((R) + 8) % 17];                      \
+-		X08 += ks[((R) + 9) % 17];                      \
+-		X09 += ks[((R) + 10) % 17];                     \
+-		X10 += ks[((R) + 11) % 17];                     \
+-		X11 += ks[((R) + 12) % 17];                     \
+-		X12 += ks[((R) + 13) % 17];                     \
+-		X13 += ks[((R) + 14) % 17] + ts[((R) + 1) % 3]; \
+-		X14 += ks[((R) + 15) % 17] + ts[((R) + 2) % 3]; \
+-		X15 += ks[((R) + 16) % 17] + (R) + 1;           \
+-	} while (0)
+-#else /* looping version */
+-#define R1024(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, pA, pB, pC, pD, pE, pF, \
+-	      ROT, rn)                                                        \
+-	ROUND1024(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, pA, pB, pC, pD, pE, \
+-		  pF, ROT, rn)                                                \
+-
+-#define I1024(R)                                                        \
+-	do {                                                            \
+-		/* inject the key schedule value */                     \
+-		X00 += ks[r + (R) + 0];                                 \
+-		X01 += ks[r + (R) + 1];                                 \
+-		X02 += ks[r + (R) + 2];                                 \
+-		X03 += ks[r + (R) + 3];                                 \
+-		X04 += ks[r + (R) + 4];                                 \
+-		X05 += ks[r + (R) + 5];                                 \
+-		X06 += ks[r + (R) + 6];                                 \
+-		X07 += ks[r + (R) + 7];                                 \
+-		X08 += ks[r + (R) + 8];                                 \
+-		X09 += ks[r + (R) + 9];                                 \
+-		X10 += ks[r + (R) + 10];                                \
+-		X11 += ks[r + (R) + 11];                                \
+-		X12 += ks[r + (R) + 12];                                \
+-		X13 += ks[r + (R) + 13] + ts[r + (R) + 0];              \
+-		X14 += ks[r + (R) + 14] + ts[r + (R) + 1];              \
+-		X15 += ks[r + (R) + 15] + r + (R);                      \
+-		/* rotate key schedule */                               \
+-		ks[r + (R) + 16] = ks[r + (R) - 1];                     \
+-		ts[r + (R) + 2] = ts[r + (R) - 1];                      \
+-	} while (0)
+-
+-#endif
+-#define R1024_8_ROUNDS(R)                                                 \
+-	do {                                                              \
+-		R1024(00, 01, 02, 03, 04, 05, 06, 07, 08, 09, 10, 11, 12, \
+-		      13, 14, 15, R1024_0, 8 * (R) + 1);                  \
+-		R1024(00, 09, 02, 13, 06, 11, 04, 15, 10, 07, 12, 03, 14, \
+-		      05, 08, 01, R1024_1, 8 * (R) + 2);                  \
+-		R1024(00, 07, 02, 05, 04, 03, 06, 01, 12, 15, 14, 13, 08, \
+-		      11, 10, 09, R1024_2, 8 * (R) + 3);                  \
+-		R1024(00, 15, 02, 11, 06, 13, 04, 09, 14, 01, 08, 05, 10, \
+-		      03, 12, 07, R1024_3, 8 * (R) + 4);                  \
+-		I1024(2 * (R));                                           \
+-		R1024(00, 01, 02, 03, 04, 05, 06, 07, 08, 09, 10, 11, 12, \
+-		      13, 14, 15, R1024_4, 8 * (R) + 5);                  \
+-		R1024(00, 09, 02, 13, 06, 11, 04, 15, 10, 07, 12, 03, 14, \
+-		      05, 08, 01, R1024_5, 8 * (R) + 6);                  \
+-		R1024(00, 07, 02, 05, 04, 03, 06, 01, 12, 15, 14, 13, 08, \
+-		      11, 10, 09, R1024_6, 8 * (R) + 7);                  \
+-		R1024(00, 15, 02, 11, 06, 13, 04, 09, 14, 01, 08, 05, 10, \
+-		      03, 12, 07, R1024_7, 8 * (R) + 8);                  \
+-		I1024(2 * (R) + 1);                                       \
+-	} while (0)
+-
+-#define R1024_UNROLL_R(NN)                              \
+-		((SKEIN_UNROLL_1024 == 0 &&             \
+-		SKEIN_1024_ROUNDS_TOTAL / 8 > (NN)) ||  \
+-		(SKEIN_UNROLL_1024 > (NN)))
+-
+-#if  (SKEIN_UNROLL_1024 > 14)
+-#error  "need more unrolling in Skein_1024_Process_Block"
+-#endif
+-#endif
+-
+-void skein_256_process_block(struct skein_256_ctx *ctx, const u8 *blk_ptr,
+-			     size_t blk_cnt, size_t byte_cnt_add);
+-void skein_512_process_block(struct skein_512_ctx *ctx, const u8 *blk_ptr,
+-			     size_t blk_cnt, size_t byte_cnt_add);
+-void skein_1024_process_block(struct skein_1024_ctx *ctx, const u8 *blk_ptr,
+-			      size_t blk_cnt, size_t byte_cnt_add);
+-
+-#endif
+diff --git a/drivers/staging/skein/skein_generic.c b/drivers/staging/skein/skein_generic.c
+deleted file mode 100644
+index 11f5e530a75f..000000000000
+--- a/drivers/staging/skein/skein_generic.c
++++ /dev/null
+@@ -1,214 +0,0 @@
+-/*
+- * Cryptographic API.
+- *
+- * Skein256 Hash Algorithm.
+- *
+- * Derived from cryptoapi implementation, adapted for in-place
+- * scatterlist interface.
+- *
+- * Copyright (c) Eric Rost <eric.rost@mybabylon.net>
+- *
+- * This program is free software; you can redistribute it and/or modify it
+- * under the terms of the GNU General Public License as published by the Free
+- * Software Foundation; either version 2 of the License, or (at your option)
+- * any later version.
+- *
+- */
+-#include <linux/types.h>
+-#include <linux/init.h>
+-#include <linux/module.h>
+-#include <crypto/internal/hash.h>
+-#include "skein_base.h"
+-
+-static int skein256_init(struct shash_desc *desc)
+-{
+-	return skein_256_init((struct skein_256_ctx *)shash_desc_ctx(desc),
+-			SKEIN256_DIGEST_BIT_SIZE);
+-}
+-
+-static int skein256_update(struct shash_desc *desc, const u8 *data,
+-			   unsigned int len)
+-{
+-	return skein_256_update((struct skein_256_ctx *)shash_desc_ctx(desc),
+-				data, len);
+-}
+-
+-static int skein256_final(struct shash_desc *desc, u8 *out)
+-{
+-	return skein_256_final((struct skein_256_ctx *)shash_desc_ctx(desc),
+-				out);
+-}
+-
+-static int skein256_export(struct shash_desc *desc, void *out)
+-{
+-	struct skein_256_ctx *sctx = shash_desc_ctx(desc);
+-
+-	memcpy(out, sctx, sizeof(*sctx));
+-	return 0;
+-}
+-
+-static int skein256_import(struct shash_desc *desc, const void *in)
+-{
+-	struct skein_256_ctx *sctx = shash_desc_ctx(desc);
+-
+-	memcpy(sctx, in, sizeof(*sctx));
+-	return 0;
+-}
+-
+-static int skein512_init(struct shash_desc *desc)
+-{
+-	return skein_512_init((struct skein_512_ctx *)shash_desc_ctx(desc),
+-				SKEIN512_DIGEST_BIT_SIZE);
+-}
+-
+-static int skein512_update(struct shash_desc *desc, const u8 *data,
+-			   unsigned int len)
+-{
+-	return skein_512_update((struct skein_512_ctx *)shash_desc_ctx(desc),
+-				data, len);
+-}
+-
+-static int skein512_final(struct shash_desc *desc, u8 *out)
+-{
+-	return skein_512_final((struct skein_512_ctx *)shash_desc_ctx(desc),
+-				out);
+-}
+-
+-static int skein512_export(struct shash_desc *desc, void *out)
+-{
+-	struct skein_512_ctx *sctx = shash_desc_ctx(desc);
+-
+-	memcpy(out, sctx, sizeof(*sctx));
+-	return 0;
+-}
+-
+-static int skein512_import(struct shash_desc *desc, const void *in)
+-{
+-	struct skein_512_ctx *sctx = shash_desc_ctx(desc);
+-
+-	memcpy(sctx, in, sizeof(*sctx));
+-	return 0;
+-}
+-
+-static int skein1024_init(struct shash_desc *desc)
+-{
+-	return skein_1024_init((struct skein_1024_ctx *)shash_desc_ctx(desc),
+-				SKEIN1024_DIGEST_BIT_SIZE);
+-}
+-
+-static int skein1024_update(struct shash_desc *desc, const u8 *data,
+-			    unsigned int len)
+-{
+-	return skein_1024_update((struct skein_1024_ctx *)shash_desc_ctx(desc),
+-				data, len);
+-}
+-
+-static int skein1024_final(struct shash_desc *desc, u8 *out)
+-{
+-	return skein_1024_final((struct skein_1024_ctx *)shash_desc_ctx(desc),
+-			out);
+-}
+-
+-static int skein1024_export(struct shash_desc *desc, void *out)
+-{
+-	struct skein_1024_ctx *sctx = shash_desc_ctx(desc);
+-
+-	memcpy(out, sctx, sizeof(*sctx));
+-	return 0;
+-}
+-
+-static int skein1024_import(struct shash_desc *desc, const void *in)
+-{
+-	struct skein_1024_ctx *sctx = shash_desc_ctx(desc);
+-
+-	memcpy(sctx, in, sizeof(*sctx));
+-	return 0;
+-}
+-
+-static struct shash_alg alg256 = {
+-	.digestsize	=	(SKEIN256_DIGEST_BIT_SIZE / 8),
+-	.init		=	skein256_init,
+-	.update		=	skein256_update,
+-	.final		=	skein256_final,
+-	.export		=	skein256_export,
+-	.import		=	skein256_import,
+-	.descsize	=	sizeof(struct skein_256_ctx),
+-	.statesize	=	sizeof(struct skein_256_ctx),
+-	.base		=	{
+-		.cra_name		=	"skein256",
+-		.cra_driver_name	=	"skein",
+-		.cra_flags		=	CRYPTO_ALG_TYPE_SHASH,
+-		.cra_blocksize		=	SKEIN_256_BLOCK_BYTES,
+-		.cra_module		=	THIS_MODULE,
+-	}
+-};
+-
+-static struct shash_alg alg512 = {
+-	.digestsize	=	(SKEIN512_DIGEST_BIT_SIZE / 8),
+-	.init		=	skein512_init,
+-	.update		=	skein512_update,
+-	.final		=	skein512_final,
+-	.export		=	skein512_export,
+-	.import		=	skein512_import,
+-	.descsize	=	sizeof(struct skein_512_ctx),
+-	.statesize	=	sizeof(struct skein_512_ctx),
+-	.base		=	{
+-		.cra_name		=	"skein512",
+-		.cra_driver_name	=	"skein",
+-		.cra_flags		=	CRYPTO_ALG_TYPE_SHASH,
+-		.cra_blocksize		=	SKEIN_512_BLOCK_BYTES,
+-		.cra_module		=	THIS_MODULE,
+-	}
+-};
+-
+-static struct shash_alg alg1024 = {
+-	.digestsize	=	(SKEIN1024_DIGEST_BIT_SIZE / 8),
+-	.init		=	skein1024_init,
+-	.update		=	skein1024_update,
+-	.final		=	skein1024_final,
+-	.export		=	skein1024_export,
+-	.import		=	skein1024_import,
+-	.descsize	=	sizeof(struct skein_1024_ctx),
+-	.statesize	=	sizeof(struct skein_1024_ctx),
+-	.base		=	{
+-		.cra_name		=	"skein1024",
+-		.cra_driver_name	=	"skein",
+-		.cra_flags		=	CRYPTO_ALG_TYPE_SHASH,
+-		.cra_blocksize		=	SKEIN_1024_BLOCK_BYTES,
+-		.cra_module		=	THIS_MODULE,
+-	}
+-};
+-
+-static int __init skein_generic_init(void)
+-{
+-	if (crypto_register_shash(&alg256))
+-		goto out;
+-	if (crypto_register_shash(&alg512))
+-		goto unreg256;
+-	if (crypto_register_shash(&alg1024))
+-		goto unreg512;
+-
+-	return 0;
+-
+-unreg512:
+-	crypto_unregister_shash(&alg512);
+-unreg256:
+-	crypto_unregister_shash(&alg256);
+-out:
+-	return -1;
+-}
+-
+-static void __exit skein_generic_fini(void)
+-{
+-	crypto_unregister_shash(&alg256);
+-	crypto_unregister_shash(&alg512);
+-	crypto_unregister_shash(&alg1024);
+-}
+-
+-module_init(skein_generic_init);
+-module_exit(skein_generic_fini);
+-
+-MODULE_LICENSE("GPL");
+-MODULE_DESCRIPTION("Skein Hash Algorithm");
+-
+-MODULE_ALIAS("skein");
+diff --git a/drivers/staging/skein/skein_iv.h b/drivers/staging/skein/skein_iv.h
+deleted file mode 100644
+index 916f029da726..000000000000
+--- a/drivers/staging/skein/skein_iv.h
++++ /dev/null
+@@ -1,187 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0 */
+-#ifndef _SKEIN_IV_H_
+-#define _SKEIN_IV_H_
+-
+-#include "skein_base.h"    /* get Skein macros and types */
+-
+-/*
+- **************** Pre-computed Skein IVs *******************
+- *
+- * NOTE: these values are not "magic" constants, but
+- * are generated using the Threefish block function.
+- * They are pre-computed here only for speed; i.e., to
+- * avoid the need for a Threefish call during Init().
+- *
+- * The IV for any fixed hash length may be pre-computed.
+- * Only the most common values are included here.
+- *
+- ***********************************************************
+- */
+-
+-#define MK_64 SKEIN_MK_64
+-
+-/* blkSize =  256 bits. hashSize =  128 bits */
+-static const u64 SKEIN_256_IV_128[] = {
+-	MK_64(0xE1111906, 0x964D7260),
+-	MK_64(0x883DAAA7, 0x7C8D811C),
+-	MK_64(0x10080DF4, 0x91960F7A),
+-	MK_64(0xCCF7DDE5, 0xB45BC1C2)
+-};
+-
+-/* blkSize =  256 bits. hashSize =  160 bits */
+-static const u64 SKEIN_256_IV_160[] = {
+-	MK_64(0x14202314, 0x72825E98),
+-	MK_64(0x2AC4E9A2, 0x5A77E590),
+-	MK_64(0xD47A5856, 0x8838D63E),
+-	MK_64(0x2DD2E496, 0x8586AB7D)
+-};
+-
+-/* blkSize =  256 bits. hashSize =  224 bits */
+-static const u64 SKEIN_256_IV_224[] = {
+-	MK_64(0xC6098A8C, 0x9AE5EA0B),
+-	MK_64(0x876D5686, 0x08C5191C),
+-	MK_64(0x99CB88D7, 0xD7F53884),
+-	MK_64(0x384BDDB1, 0xAEDDB5DE)
+-};
+-
+-/* blkSize =  256 bits. hashSize =  256 bits */
+-static const u64 SKEIN_256_IV_256[] = {
+-	MK_64(0xFC9DA860, 0xD048B449),
+-	MK_64(0x2FCA6647, 0x9FA7D833),
+-	MK_64(0xB33BC389, 0x6656840F),
+-	MK_64(0x6A54E920, 0xFDE8DA69)
+-};
+-
+-/* blkSize =  512 bits. hashSize =  128 bits */
+-static const u64 SKEIN_512_IV_128[] = {
+-	MK_64(0xA8BC7BF3, 0x6FBF9F52),
+-	MK_64(0x1E9872CE, 0xBD1AF0AA),
+-	MK_64(0x309B1790, 0xB32190D3),
+-	MK_64(0xBCFBB854, 0x3F94805C),
+-	MK_64(0x0DA61BCD, 0x6E31B11B),
+-	MK_64(0x1A18EBEA, 0xD46A32E3),
+-	MK_64(0xA2CC5B18, 0xCE84AA82),
+-	MK_64(0x6982AB28, 0x9D46982D)
+-};
+-
+-/* blkSize =  512 bits. hashSize =  160 bits */
+-static const u64 SKEIN_512_IV_160[] = {
+-	MK_64(0x28B81A2A, 0xE013BD91),
+-	MK_64(0xC2F11668, 0xB5BDF78F),
+-	MK_64(0x1760D8F3, 0xF6A56F12),
+-	MK_64(0x4FB74758, 0x8239904F),
+-	MK_64(0x21EDE07F, 0x7EAF5056),
+-	MK_64(0xD908922E, 0x63ED70B8),
+-	MK_64(0xB8EC76FF, 0xECCB52FA),
+-	MK_64(0x01A47BB8, 0xA3F27A6E)
+-};
+-
+-/* blkSize =  512 bits. hashSize =  224 bits */
+-static const u64 SKEIN_512_IV_224[] = {
+-	MK_64(0xCCD06162, 0x48677224),
+-	MK_64(0xCBA65CF3, 0xA92339EF),
+-	MK_64(0x8CCD69D6, 0x52FF4B64),
+-	MK_64(0x398AED7B, 0x3AB890B4),
+-	MK_64(0x0F59D1B1, 0x457D2BD0),
+-	MK_64(0x6776FE65, 0x75D4EB3D),
+-	MK_64(0x99FBC70E, 0x997413E9),
+-	MK_64(0x9E2CFCCF, 0xE1C41EF7)
+-};
+-
+-/* blkSize =  512 bits. hashSize =  256 bits */
+-static const u64 SKEIN_512_IV_256[] = {
+-	MK_64(0xCCD044A1, 0x2FDB3E13),
+-	MK_64(0xE8359030, 0x1A79A9EB),
+-	MK_64(0x55AEA061, 0x4F816E6F),
+-	MK_64(0x2A2767A4, 0xAE9B94DB),
+-	MK_64(0xEC06025E, 0x74DD7683),
+-	MK_64(0xE7A436CD, 0xC4746251),
+-	MK_64(0xC36FBAF9, 0x393AD185),
+-	MK_64(0x3EEDBA18, 0x33EDFC13)
+-};
+-
+-/* blkSize =  512 bits. hashSize =  384 bits */
+-static const u64 SKEIN_512_IV_384[] = {
+-	MK_64(0xA3F6C6BF, 0x3A75EF5F),
+-	MK_64(0xB0FEF9CC, 0xFD84FAA4),
+-	MK_64(0x9D77DD66, 0x3D770CFE),
+-	MK_64(0xD798CBF3, 0xB468FDDA),
+-	MK_64(0x1BC4A666, 0x8A0E4465),
+-	MK_64(0x7ED7D434, 0xE5807407),
+-	MK_64(0x548FC1AC, 0xD4EC44D6),
+-	MK_64(0x266E1754, 0x6AA18FF8)
+-};
+-
+-/* blkSize =  512 bits. hashSize =  512 bits */
+-static const u64 SKEIN_512_IV_512[] = {
+-	MK_64(0x4903ADFF, 0x749C51CE),
+-	MK_64(0x0D95DE39, 0x9746DF03),
+-	MK_64(0x8FD19341, 0x27C79BCE),
+-	MK_64(0x9A255629, 0xFF352CB1),
+-	MK_64(0x5DB62599, 0xDF6CA7B0),
+-	MK_64(0xEABE394C, 0xA9D5C3F4),
+-	MK_64(0x991112C7, 0x1A75B523),
+-	MK_64(0xAE18A40B, 0x660FCC33)
+-};
+-
+-/* blkSize = 1024 bits. hashSize =  384 bits */
+-static const u64 SKEIN_1024_IV_384[] = {
+-	MK_64(0x5102B6B8, 0xC1894A35),
+-	MK_64(0xFEEBC9E3, 0xFE8AF11A),
+-	MK_64(0x0C807F06, 0xE32BED71),
+-	MK_64(0x60C13A52, 0xB41A91F6),
+-	MK_64(0x9716D35D, 0xD4917C38),
+-	MK_64(0xE780DF12, 0x6FD31D3A),
+-	MK_64(0x797846B6, 0xC898303A),
+-	MK_64(0xB172C2A8, 0xB3572A3B),
+-	MK_64(0xC9BC8203, 0xA6104A6C),
+-	MK_64(0x65909338, 0xD75624F4),
+-	MK_64(0x94BCC568, 0x4B3F81A0),
+-	MK_64(0x3EBBF51E, 0x10ECFD46),
+-	MK_64(0x2DF50F0B, 0xEEB08542),
+-	MK_64(0x3B5A6530, 0x0DBC6516),
+-	MK_64(0x484B9CD2, 0x167BBCE1),
+-	MK_64(0x2D136947, 0xD4CBAFEA)
+-};
+-
+-/* blkSize = 1024 bits. hashSize =  512 bits */
+-static const u64 SKEIN_1024_IV_512[] = {
+-	MK_64(0xCAEC0E5D, 0x7C1B1B18),
+-	MK_64(0xA01B0E04, 0x5F03E802),
+-	MK_64(0x33840451, 0xED912885),
+-	MK_64(0x374AFB04, 0xEAEC2E1C),
+-	MK_64(0xDF25A0E2, 0x813581F7),
+-	MK_64(0xE4004093, 0x8B12F9D2),
+-	MK_64(0xA662D539, 0xC2ED39B6),
+-	MK_64(0xFA8B85CF, 0x45D8C75A),
+-	MK_64(0x8316ED8E, 0x29EDE796),
+-	MK_64(0x053289C0, 0x2E9F91B8),
+-	MK_64(0xC3F8EF1D, 0x6D518B73),
+-	MK_64(0xBDCEC3C4, 0xD5EF332E),
+-	MK_64(0x549A7E52, 0x22974487),
+-	MK_64(0x67070872, 0x5B749816),
+-	MK_64(0xB9CD28FB, 0xF0581BD1),
+-	MK_64(0x0E2940B8, 0x15804974)
+-};
+-
+-/* blkSize = 1024 bits. hashSize = 1024 bits */
+-static const u64 SKEIN_1024_IV_1024[] = {
+-	MK_64(0xD593DA07, 0x41E72355),
+-	MK_64(0x15B5E511, 0xAC73E00C),
+-	MK_64(0x5180E5AE, 0xBAF2C4F0),
+-	MK_64(0x03BD41D3, 0xFCBCAFAF),
+-	MK_64(0x1CAEC6FD, 0x1983A898),
+-	MK_64(0x6E510B8B, 0xCDD0589F),
+-	MK_64(0x77E2BDFD, 0xC6394ADA),
+-	MK_64(0xC11E1DB5, 0x24DCB0A3),
+-	MK_64(0xD6D14AF9, 0xC6329AB5),
+-	MK_64(0x6A9B0BFC, 0x6EB67E0D),
+-	MK_64(0x9243C60D, 0xCCFF1332),
+-	MK_64(0x1A1F1DDE, 0x743F02D4),
+-	MK_64(0x0996753C, 0x10ED0BB8),
+-	MK_64(0x6572DD22, 0xF2B4969A),
+-	MK_64(0x61FD3062, 0xD00A579A),
+-	MK_64(0x1DE0536E, 0x8682E539)
+-};
+-
+-#endif /* _SKEIN_IV_H_ */
+diff --git a/drivers/staging/skein/threefish_api.c b/drivers/staging/skein/threefish_api.c
+deleted file mode 100644
+index e69cefa6b16a..000000000000
+--- a/drivers/staging/skein/threefish_api.c
++++ /dev/null
+@@ -1,78 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0
+-#include <linux/string.h>
+-#include "threefish_api.h"
+-
+-void threefish_set_key(struct threefish_key *key_ctx,
+-		       enum threefish_size state_size,
+-		       u64 *key_data, u64 *tweak)
+-{
+-	int key_words = state_size / 64;
+-	int i;
+-	u64 parity = KEY_SCHEDULE_CONST;
+-
+-	key_ctx->tweak[0] = tweak[0];
+-	key_ctx->tweak[1] = tweak[1];
+-	key_ctx->tweak[2] = tweak[0] ^ tweak[1];
+-
+-	for (i = 0; i < key_words; i++) {
+-		key_ctx->key[i] = key_data[i];
+-		parity ^= key_data[i];
+-	}
+-	key_ctx->key[i] = parity;
+-	key_ctx->state_size = state_size;
+-}
+-
+-void threefish_encrypt_block_bytes(struct threefish_key *key_ctx, u8 *in,
+-				   u8 *out)
+-{
+-	u64 plain[SKEIN_MAX_STATE_WORDS];        /* max number of words*/
+-	u64 cipher[SKEIN_MAX_STATE_WORDS];
+-
+-	skein_get64_lsb_first(plain, in, key_ctx->state_size / 64);
+-	threefish_encrypt_block_words(key_ctx, plain, cipher);
+-	skein_put64_lsb_first(out, cipher, key_ctx->state_size / 8);
+-}
+-
+-void threefish_encrypt_block_words(struct threefish_key *key_ctx, u64 *in,
+-				   u64 *out)
+-{
+-	switch (key_ctx->state_size) {
+-	case THREEFISH_256:
+-		threefish_encrypt_256(key_ctx, in, out);
+-		break;
+-	case THREEFISH_512:
+-		threefish_encrypt_512(key_ctx, in, out);
+-		break;
+-	case THREEFISH_1024:
+-		threefish_encrypt_1024(key_ctx, in, out);
+-		break;
+-	}
+-}
+-
+-void threefish_decrypt_block_bytes(struct threefish_key *key_ctx, u8 *in,
+-				   u8 *out)
+-{
+-	u64 plain[SKEIN_MAX_STATE_WORDS];        /* max number of words*/
+-	u64 cipher[SKEIN_MAX_STATE_WORDS];
+-
+-	skein_get64_lsb_first(cipher, in, key_ctx->state_size / 64);
+-	threefish_decrypt_block_words(key_ctx, cipher, plain);
+-	skein_put64_lsb_first(out, plain, key_ctx->state_size / 8);
+-}
+-
+-void threefish_decrypt_block_words(struct threefish_key *key_ctx, u64 *in,
+-				   u64 *out)
+-{
+-	switch (key_ctx->state_size) {
+-	case THREEFISH_256:
+-		threefish_decrypt_256(key_ctx, in, out);
+-		break;
+-	case THREEFISH_512:
+-		threefish_decrypt_512(key_ctx, in, out);
+-		break;
+-	case THREEFISH_1024:
+-		threefish_decrypt_1024(key_ctx, in, out);
+-		break;
+-	}
+-}
+-
+diff --git a/drivers/staging/skein/threefish_api.h b/drivers/staging/skein/threefish_api.h
+deleted file mode 100644
+index 21539c3cc7a0..000000000000
+--- a/drivers/staging/skein/threefish_api.h
++++ /dev/null
+@@ -1,171 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0 */
+-
+-#ifndef THREEFISHAPI_H
+-#define THREEFISHAPI_H
+-
+-/**
+- * @file threefish_api.h
+- * @brief A Threefish cipher API and its functions.
+- * @{
+- *
+- * This API and the functions that implement this API simplify the usage
+- * of the Threefish cipher. The design and the way to use the functions
+- * follow the openSSL design but at the same time take care of some Threefish
+- * specific behaviour and possibilities.
+- *
+- * These are the low level functions that deal with Threefish blocks only.
+- * Implementations for cipher modes such as ECB, CFB, or CBC may use these
+- * functions.
+- *
+-@code
+-	// Threefish cipher context data
+-	struct threefish_key key_ctx;
+-
+-	// Initialize the context
+-	threefish_set_key(&key_ctx, THREEFISH_512, key, tweak);
+-
+-	// Encrypt
+-	threefish_encrypt_block_bytes(&key_ctx, input, cipher);
+-@endcode
+- */
+-
+-#include <linux/types.h>
+-#include "skein_base.h"
+-
+-#define KEY_SCHEDULE_CONST 0x1BD11BDAA9FC1A22L
+-
+-/**
+- * Which Threefish size to use
+- */
+-enum threefish_size {
+-	THREEFISH_256 = 256,     /*!< Skein with 256 bit state */
+-	THREEFISH_512 = 512,     /*!< Skein with 512 bit state */
+-	THREEFISH_1024 = 1024    /*!< Skein with 1024 bit state */
+-};
+-
+-/**
+- * Context for Threefish key and tweak words.
+- *
+- * This structure was setup with some know-how of the internal
+- * Skein structures, in particular ordering of header and size dependent
+- * variables. If Skein implementation changes this, the adapt these
+- * structures as well.
+- */
+-struct threefish_key {
+-	u64 state_size;
+-	u64 key[SKEIN_MAX_STATE_WORDS + 1];   /* max number of key words*/
+-	u64 tweak[3];
+-};
+-
+-/**
+- * Set Threefish key and tweak data.
+- *
+- * This function sets the key and tweak data for the Threefish cipher of
+- * the given size. The key data must have the same length (number of bits)
+- * as the state size
+- *
+- * @param key_ctx
+- *     Pointer to a Threefish key structure.
+- * @param size
+- *     Which Skein size to use.
+- * @param key_data
+- *     Pointer to the key words (word has 64 bits).
+- * @param tweak
+- *     Pointer to the two tweak words (word has 64 bits).
+- */
+-void threefish_set_key(struct threefish_key *key_ctx,
+-		       enum threefish_size state_size,
+-		       u64 *key_data, u64 *tweak);
+-
+-/**
+- * Encrypt Threefish block (bytes).
+- *
+- * The buffer must have at least the same length (number of bits) as the
+- * state size for this key. The function uses the first @c state_size bits
+- * of the input buffer, encrypts them and stores the result in the output
+- * buffer.
+- *
+- * @param key_ctx
+- *     Pointer to a Threefish key structure.
+- * @param in
+- *     Poionter to plaintext data buffer.
+- * @param out
+- *     Pointer to cipher buffer.
+- */
+-void threefish_encrypt_block_bytes(struct threefish_key *key_ctx, u8 *in,
+-				   u8 *out);
+-
+-/**
+- * Encrypt Threefish block (words).
+- *
+- * The buffer must have at least the same length (number of bits) as the
+- * state size for this key. The function uses the first @c state_size bits
+- * of the input buffer, encrypts them and stores the result in the output
+- * buffer.
+- *
+- * The wordsize ist set to 64 bits.
+- *
+- * @param key_ctx
+- *     Pointer to a Threefish key structure.
+- * @param in
+- *     Poionter to plaintext data buffer.
+- * @param out
+- *     Pointer to cipher buffer.
+- */
+-void threefish_encrypt_block_words(struct threefish_key *key_ctx, u64 *in,
+-				   u64 *out);
+-
+-/**
+- * Decrypt Threefish block (bytes).
+- *
+- * The buffer must have at least the same length (number of bits) as the
+- * state size for this key. The function uses the first @c state_size bits
+- * of the input buffer, decrypts them and stores the result in the output
+- * buffer
+- *
+- * @param key_ctx
+- *     Pointer to a Threefish key structure.
+- * @param in
+- *     Poionter to cipher data buffer.
+- * @param out
+- *     Pointer to plaintext buffer.
+- */
+-void threefish_decrypt_block_bytes(struct threefish_key *key_ctx, u8 *in,
+-				   u8 *out);
+-
+-/**
+- * Decrypt Threefish block (words).
+- *
+- * The buffer must have at least the same length (number of bits) as the
+- * state size for this key. The function uses the first @c state_size bits
+- * of the input buffer, encrypts them and stores the result in the output
+- * buffer.
+- *
+- * The wordsize ist set to 64 bits.
+- *
+- * @param key_ctx
+- *     Pointer to a Threefish key structure.
+- * @param in
+- *     Poionter to cipher data buffer.
+- * @param out
+- *     Pointer to plaintext buffer.
+- */
+-void threefish_decrypt_block_words(struct threefish_key *key_ctx, u64 *in,
+-				   u64 *out);
+-
+-void threefish_encrypt_256(struct threefish_key *key_ctx, u64 *input,
+-			   u64 *output);
+-void threefish_encrypt_512(struct threefish_key *key_ctx, u64 *input,
+-			   u64 *output);
+-void threefish_encrypt_1024(struct threefish_key *key_ctx, u64 *input,
+-			    u64 *output);
+-void threefish_decrypt_256(struct threefish_key *key_ctx, u64 *input,
+-			   u64 *output);
+-void threefish_decrypt_512(struct threefish_key *key_ctx, u64 *input,
+-			   u64 *output);
+-void threefish_decrypt_1024(struct threefish_key *key_ctx, u64 *input,
+-			    u64 *output);
+-/**
+- * @}
+- */
+-#endif
+diff --git a/drivers/staging/skein/threefish_block.c b/drivers/staging/skein/threefish_block.c
+deleted file mode 100644
+index 87f055890544..000000000000
+--- a/drivers/staging/skein/threefish_block.c
++++ /dev/null
+@@ -1,8244 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0
+-#include <linux/bitops.h>
+-#include "threefish_api.h"
+-
+-void threefish_encrypt_256(struct threefish_key *key_ctx, u64 *input,
+-			   u64 *output)
+-{
+-	u64 b0 = input[0], b1 = input[1],
+-	    b2 = input[2], b3 = input[3];
+-	u64 k0 = key_ctx->key[0], k1 = key_ctx->key[1],
+-	    k2 = key_ctx->key[2], k3 = key_ctx->key[3],
+-	    k4 = key_ctx->key[4];
+-	u64 t0 = key_ctx->tweak[0], t1 = key_ctx->tweak[1],
+-	    t2 = key_ctx->tweak[2];
+-
+-	b1 += k1 + t0;
+-	b0 += b1 + k0;
+-	b1 = rol64(b1, 14) ^ b0;
+-
+-	b3 += k3;
+-	b2 += b3 + k2 + t1;
+-	b3 = rol64(b3, 16) ^ b2;
+-
+-	b0 += b3;
+-	b3 = rol64(b3, 52) ^ b0;
+-
+-	b2 += b1;
+-	b1 = rol64(b1, 57) ^ b2;
+-
+-	b0 += b1;
+-	b1 = rol64(b1, 23) ^ b0;
+-
+-	b2 += b3;
+-	b3 = rol64(b3, 40) ^ b2;
+-
+-	b0 += b3;
+-	b3 = rol64(b3, 5) ^ b0;
+-
+-	b2 += b1;
+-	b1 = rol64(b1, 37) ^ b2;
+-
+-	b1 += k2 + t1;
+-	b0 += b1 + k1;
+-	b1 = rol64(b1, 25) ^ b0;
+-
+-	b3 += k4 + 1;
+-	b2 += b3 + k3 + t2;
+-	b3 = rol64(b3, 33) ^ b2;
+-
+-	b0 += b3;
+-	b3 = rol64(b3, 46) ^ b0;
+-
+-	b2 += b1;
+-	b1 = rol64(b1, 12) ^ b2;
+-
+-	b0 += b1;
+-	b1 = rol64(b1, 58) ^ b0;
+-
+-	b2 += b3;
+-	b3 = rol64(b3, 22) ^ b2;
+-
+-	b0 += b3;
+-	b3 = rol64(b3, 32) ^ b0;
+-
+-	b2 += b1;
+-	b1 = rol64(b1, 32) ^ b2;
+-
+-	b1 += k3 + t2;
+-	b0 += b1 + k2;
+-	b1 = rol64(b1, 14) ^ b0;
+-
+-	b3 += k0 + 2;
+-	b2 += b3 + k4 + t0;
+-	b3 = rol64(b3, 16) ^ b2;
+-
+-	b0 += b3;
+-	b3 = rol64(b3, 52) ^ b0;
+-
+-	b2 += b1;
+-	b1 = rol64(b1, 57) ^ b2;
+-
+-	b0 += b1;
+-	b1 = rol64(b1, 23) ^ b0;
+-
+-	b2 += b3;
+-	b3 = rol64(b3, 40) ^ b2;
+-
+-	b0 += b3;
+-	b3 = rol64(b3, 5) ^ b0;
+-
+-	b2 += b1;
+-	b1 = rol64(b1, 37) ^ b2;
+-
+-	b1 += k4 + t0;
+-	b0 += b1 + k3;
+-	b1 = rol64(b1, 25) ^ b0;
+-
+-	b3 += k1 + 3;
+-	b2 += b3 + k0 + t1;
+-	b3 = rol64(b3, 33) ^ b2;
+-
+-	b0 += b3;
+-	b3 = rol64(b3, 46) ^ b0;
+-
+-	b2 += b1;
+-	b1 = rol64(b1, 12) ^ b2;
+-
+-	b0 += b1;
+-	b1 = rol64(b1, 58) ^ b0;
+-
+-	b2 += b3;
+-	b3 = rol64(b3, 22) ^ b2;
+-
+-	b0 += b3;
+-	b3 = rol64(b3, 32) ^ b0;
+-
+-	b2 += b1;
+-	b1 = rol64(b1, 32) ^ b2;
+-
+-	b1 += k0 + t1;
+-	b0 += b1 + k4;
+-	b1 = rol64(b1, 14) ^ b0;
+-
+-	b3 += k2 + 4;
+-	b2 += b3 + k1 + t2;
+-	b3 = rol64(b3, 16) ^ b2;
+-
+-	b0 += b3;
+-	b3 = rol64(b3, 52) ^ b0;
+-
+-	b2 += b1;
+-	b1 = rol64(b1, 57) ^ b2;
+-
+-	b0 += b1;
+-	b1 = rol64(b1, 23) ^ b0;
+-
+-	b2 += b3;
+-	b3 = rol64(b3, 40) ^ b2;
+-
+-	b0 += b3;
+-	b3 = rol64(b3, 5) ^ b0;
+-
+-	b2 += b1;
+-	b1 = rol64(b1, 37) ^ b2;
+-
+-	b1 += k1 + t2;
+-	b0 += b1 + k0;
+-	b1 = rol64(b1, 25) ^ b0;
+-
+-	b3 += k3 + 5;
+-	b2 += b3 + k2 + t0;
+-	b3 = rol64(b3, 33) ^ b2;
+-
+-	b0 += b3;
+-	b3 = rol64(b3, 46) ^ b0;
+-
+-	b2 += b1;
+-	b1 = rol64(b1, 12) ^ b2;
+-
+-	b0 += b1;
+-	b1 = rol64(b1, 58) ^ b0;
+-
+-	b2 += b3;
+-	b3 = rol64(b3, 22) ^ b2;
+-
+-	b0 += b3;
+-	b3 = rol64(b3, 32) ^ b0;
+-
+-	b2 += b1;
+-	b1 = rol64(b1, 32) ^ b2;
+-
+-	b1 += k2 + t0;
+-	b0 += b1 + k1;
+-	b1 = rol64(b1, 14) ^ b0;
+-
+-	b3 += k4 + 6;
+-	b2 += b3 + k3 + t1;
+-	b3 = rol64(b3, 16) ^ b2;
+-
+-	b0 += b3;
+-	b3 = rol64(b3, 52) ^ b0;
+-
+-	b2 += b1;
+-	b1 = rol64(b1, 57) ^ b2;
+-
+-	b0 += b1;
+-	b1 = rol64(b1, 23) ^ b0;
+-
+-	b2 += b3;
+-	b3 = rol64(b3, 40) ^ b2;
+-
+-	b0 += b3;
+-	b3 = rol64(b3, 5) ^ b0;
+-
+-	b2 += b1;
+-	b1 = rol64(b1, 37) ^ b2;
+-
+-	b1 += k3 + t1;
+-	b0 += b1 + k2;
+-	b1 = rol64(b1, 25) ^ b0;
+-
+-	b3 += k0 + 7;
+-	b2 += b3 + k4 + t2;
+-	b3 = rol64(b3, 33) ^ b2;
+-
+-	b0 += b3;
+-	b3 = rol64(b3, 46) ^ b0;
+-
+-	b2 += b1;
+-	b1 = rol64(b1, 12) ^ b2;
+-
+-	b0 += b1;
+-	b1 = rol64(b1, 58) ^ b0;
+-
+-	b2 += b3;
+-	b3 = rol64(b3, 22) ^ b2;
+-
+-	b0 += b3;
+-	b3 = rol64(b3, 32) ^ b0;
+-
+-	b2 += b1;
+-	b1 = rol64(b1, 32) ^ b2;
+-
+-	b1 += k4 + t2;
+-	b0 += b1 + k3;
+-	b1 = rol64(b1, 14) ^ b0;
+-
+-	b3 += k1 + 8;
+-	b2 += b3 + k0 + t0;
+-	b3 = rol64(b3, 16) ^ b2;
+-
+-	b0 += b3;
+-	b3 = rol64(b3, 52) ^ b0;
+-
+-	b2 += b1;
+-	b1 = rol64(b1, 57) ^ b2;
+-
+-	b0 += b1;
+-	b1 = rol64(b1, 23) ^ b0;
+-
+-	b2 += b3;
+-	b3 = rol64(b3, 40) ^ b2;
+-
+-	b0 += b3;
+-	b3 = rol64(b3, 5) ^ b0;
+-
+-	b2 += b1;
+-	b1 = rol64(b1, 37) ^ b2;
+-
+-	b1 += k0 + t0;
+-	b0 += b1 + k4;
+-	b1 = rol64(b1, 25) ^ b0;
+-
+-	b3 += k2 + 9;
+-	b2 += b3 + k1 + t1;
+-	b3 = rol64(b3, 33) ^ b2;
+-
+-	b0 += b3;
+-	b3 = rol64(b3, 46) ^ b0;
+-
+-	b2 += b1;
+-	b1 = rol64(b1, 12) ^ b2;
+-
+-	b0 += b1;
+-	b1 = rol64(b1, 58) ^ b0;
+-
+-	b2 += b3;
+-	b3 = rol64(b3, 22) ^ b2;
+-
+-	b0 += b3;
+-	b3 = rol64(b3, 32) ^ b0;
+-
+-	b2 += b1;
+-	b1 = rol64(b1, 32) ^ b2;
+-
+-	b1 += k1 + t1;
+-	b0 += b1 + k0;
+-	b1 = rol64(b1, 14) ^ b0;
+-
+-	b3 += k3 + 10;
+-	b2 += b3 + k2 + t2;
+-	b3 = rol64(b3, 16) ^ b2;
+-
+-	b0 += b3;
+-	b3 = rol64(b3, 52) ^ b0;
+-
+-	b2 += b1;
+-	b1 = rol64(b1, 57) ^ b2;
+-
+-	b0 += b1;
+-	b1 = rol64(b1, 23) ^ b0;
+-
+-	b2 += b3;
+-	b3 = rol64(b3, 40) ^ b2;
+-
+-	b0 += b3;
+-	b3 = rol64(b3, 5) ^ b0;
+-
+-	b2 += b1;
+-	b1 = rol64(b1, 37) ^ b2;
+-
+-	b1 += k2 + t2;
+-	b0 += b1 + k1;
+-	b1 = rol64(b1, 25) ^ b0;
+-
+-	b3 += k4 + 11;
+-	b2 += b3 + k3 + t0;
+-	b3 = rol64(b3, 33) ^ b2;
+-
+-	b0 += b3;
+-	b3 = rol64(b3, 46) ^ b0;
+-
+-	b2 += b1;
+-	b1 = rol64(b1, 12) ^ b2;
+-
+-	b0 += b1;
+-	b1 = rol64(b1, 58) ^ b0;
+-
+-	b2 += b3;
+-	b3 = rol64(b3, 22) ^ b2;
+-
+-	b0 += b3;
+-	b3 = rol64(b3, 32) ^ b0;
+-
+-	b2 += b1;
+-	b1 = rol64(b1, 32) ^ b2;
+-
+-	b1 += k3 + t0;
+-	b0 += b1 + k2;
+-	b1 = rol64(b1, 14) ^ b0;
+-
+-	b3 += k0 + 12;
+-	b2 += b3 + k4 + t1;
+-	b3 = rol64(b3, 16) ^ b2;
+-
+-	b0 += b3;
+-	b3 = rol64(b3, 52) ^ b0;
+-
+-	b2 += b1;
+-	b1 = rol64(b1, 57) ^ b2;
+-
+-	b0 += b1;
+-	b1 = rol64(b1, 23) ^ b0;
+-
+-	b2 += b3;
+-	b3 = rol64(b3, 40) ^ b2;
+-
+-	b0 += b3;
+-	b3 = rol64(b3, 5) ^ b0;
+-
+-	b2 += b1;
+-	b1 = rol64(b1, 37) ^ b2;
+-
+-	b1 += k4 + t1;
+-	b0 += b1 + k3;
+-	b1 = rol64(b1, 25) ^ b0;
+-
+-	b3 += k1 + 13;
+-	b2 += b3 + k0 + t2;
+-	b3 = rol64(b3, 33) ^ b2;
+-
+-	b0 += b3;
+-	b3 = rol64(b3, 46) ^ b0;
+-
+-	b2 += b1;
+-	b1 = rol64(b1, 12) ^ b2;
+-
+-	b0 += b1;
+-	b1 = rol64(b1, 58) ^ b0;
+-
+-	b2 += b3;
+-	b3 = rol64(b3, 22) ^ b2;
+-
+-	b0 += b3;
+-	b3 = rol64(b3, 32) ^ b0;
+-
+-	b2 += b1;
+-	b1 = rol64(b1, 32) ^ b2;
+-
+-	b1 += k0 + t2;
+-	b0 += b1 + k4;
+-	b1 = rol64(b1, 14) ^ b0;
+-
+-	b3 += k2 + 14;
+-	b2 += b3 + k1 + t0;
+-	b3 = rol64(b3, 16) ^ b2;
+-
+-	b0 += b3;
+-	b3 = rol64(b3, 52) ^ b0;
+-
+-	b2 += b1;
+-	b1 = rol64(b1, 57) ^ b2;
+-
+-	b0 += b1;
+-	b1 = rol64(b1, 23) ^ b0;
+-
+-	b2 += b3;
+-	b3 = rol64(b3, 40) ^ b2;
+-
+-	b0 += b3;
+-	b3 = rol64(b3, 5) ^ b0;
+-
+-	b2 += b1;
+-	b1 = rol64(b1, 37) ^ b2;
+-
+-	b1 += k1 + t0;
+-	b0 += b1 + k0;
+-	b1 = rol64(b1, 25) ^ b0;
+-
+-	b3 += k3 + 15;
+-	b2 += b3 + k2 + t1;
+-	b3 = rol64(b3, 33) ^ b2;
+-
+-	b0 += b3;
+-	b3 = rol64(b3, 46) ^ b0;
+-
+-	b2 += b1;
+-	b1 = rol64(b1, 12) ^ b2;
+-
+-	b0 += b1;
+-	b1 = rol64(b1, 58) ^ b0;
+-
+-	b2 += b3;
+-	b3 = rol64(b3, 22) ^ b2;
+-
+-	b0 += b3;
+-	b3 = rol64(b3, 32) ^ b0;
+-
+-	b2 += b1;
+-	b1 = rol64(b1, 32) ^ b2;
+-
+-	b1 += k2 + t1;
+-	b0 += b1 + k1;
+-	b1 = rol64(b1, 14) ^ b0;
+-
+-	b3 += k4 + 16;
+-	b2 += b3 + k3 + t2;
+-	b3 = rol64(b3, 16) ^ b2;
+-
+-	b0 += b3;
+-	b3 = rol64(b3, 52) ^ b0;
+-
+-	b2 += b1;
+-	b1 = rol64(b1, 57) ^ b2;
+-
+-	b0 += b1;
+-	b1 = rol64(b1, 23) ^ b0;
+-
+-	b2 += b3;
+-	b3 = rol64(b3, 40) ^ b2;
+-
+-	b0 += b3;
+-	b3 = rol64(b3, 5) ^ b0;
+-
+-	b2 += b1;
+-	b1 = rol64(b1, 37) ^ b2;
+-
+-	b1 += k3 + t2;
+-	b0 += b1 + k2;
+-	b1 = rol64(b1, 25) ^ b0;
+-
+-	b3 += k0 + 17;
+-	b2 += b3 + k4 + t0;
+-	b3 = rol64(b3, 33) ^ b2;
+-
+-	b0 += b3;
+-	b3 = rol64(b3, 46) ^ b0;
+-
+-	b2 += b1;
+-	b1 = rol64(b1, 12) ^ b2;
+-
+-	b0 += b1;
+-	b1 = rol64(b1, 58) ^ b0;
+-
+-	b2 += b3;
+-	b3 = rol64(b3, 22) ^ b2;
+-
+-	b0 += b3;
+-	b3 = rol64(b3, 32) ^ b0;
+-
+-	b2 += b1;
+-	b1 = rol64(b1, 32) ^ b2;
+-
+-	output[0] = b0 + k3;
+-	output[1] = b1 + k4 + t0;
+-	output[2] = b2 + k0 + t1;
+-	output[3] = b3 + k1 + 18;
+-}
+-
+-void threefish_decrypt_256(struct threefish_key *key_ctx, u64 *input,
+-			   u64 *output)
+-{
+-	u64 b0 = input[0], b1 = input[1],
+-	    b2 = input[2], b3 = input[3];
+-	u64 k0 = key_ctx->key[0], k1 = key_ctx->key[1],
+-	    k2 = key_ctx->key[2], k3 = key_ctx->key[3],
+-	    k4 = key_ctx->key[4];
+-	u64 t0 = key_ctx->tweak[0], t1 = key_ctx->tweak[1],
+-	    t2 = key_ctx->tweak[2];
+-
+-	u64 tmp;
+-
+-	b0 -= k3;
+-	b1 -= k4 + t0;
+-	b2 -= k0 + t1;
+-	b3 -= k1 + 18;
+-	tmp = b3 ^ b0;
+-	b3 = ror64(tmp, 32);
+-	b0 -= b3;
+-
+-	tmp = b1 ^ b2;
+-	b1 = ror64(tmp, 32);
+-	b2 -= b1;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 58);
+-	b0 -= b1;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 22);
+-	b2 -= b3;
+-
+-	tmp = b3 ^ b0;
+-	b3 = ror64(tmp, 46);
+-	b0 -= b3;
+-
+-	tmp = b1 ^ b2;
+-	b1 = ror64(tmp, 12);
+-	b2 -= b1;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 25);
+-	b0 -= b1 + k2;
+-	b1 -= k3 + t2;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 33);
+-	b2 -= b3 + k4 + t0;
+-	b3 -= k0 + 17;
+-
+-	tmp = b3 ^ b0;
+-	b3 = ror64(tmp, 5);
+-	b0 -= b3;
+-
+-	tmp = b1 ^ b2;
+-	b1 = ror64(tmp, 37);
+-	b2 -= b1;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 23);
+-	b0 -= b1;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 40);
+-	b2 -= b3;
+-
+-	tmp = b3 ^ b0;
+-	b3 = ror64(tmp, 52);
+-	b0 -= b3;
+-
+-	tmp = b1 ^ b2;
+-	b1 = ror64(tmp, 57);
+-	b2 -= b1;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 14);
+-	b0 -= b1 + k1;
+-	b1 -= k2 + t1;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 16);
+-	b2 -= b3 + k3 + t2;
+-	b3 -= k4 + 16;
+-
+-	tmp = b3 ^ b0;
+-	b3 = ror64(tmp, 32);
+-	b0 -= b3;
+-
+-	tmp = b1 ^ b2;
+-	b1 = ror64(tmp, 32);
+-	b2 -= b1;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 58);
+-	b0 -= b1;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 22);
+-	b2 -= b3;
+-
+-	tmp = b3 ^ b0;
+-	b3 = ror64(tmp, 46);
+-	b0 -= b3;
+-
+-	tmp = b1 ^ b2;
+-	b1 = ror64(tmp, 12);
+-	b2 -= b1;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 25);
+-	b0 -= b1 + k0;
+-	b1 -= k1 + t0;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 33);
+-	b2 -= b3 + k2 + t1;
+-	b3 -= k3 + 15;
+-
+-	tmp = b3 ^ b0;
+-	b3 = ror64(tmp, 5);
+-	b0 -= b3;
+-
+-	tmp = b1 ^ b2;
+-	b1 = ror64(tmp, 37);
+-	b2 -= b1;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 23);
+-	b0 -= b1;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 40);
+-	b2 -= b3;
+-
+-	tmp = b3 ^ b0;
+-	b3 = ror64(tmp, 52);
+-	b0 -= b3;
+-
+-	tmp = b1 ^ b2;
+-	b1 = ror64(tmp, 57);
+-	b2 -= b1;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 14);
+-	b0 -= b1 + k4;
+-	b1 -= k0 + t2;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 16);
+-	b2 -= b3 + k1 + t0;
+-	b3 -= k2 + 14;
+-
+-	tmp = b3 ^ b0;
+-	b3 = ror64(tmp, 32);
+-	b0 -= b3;
+-
+-	tmp = b1 ^ b2;
+-	b1 = ror64(tmp, 32);
+-	b2 -= b1;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 58);
+-	b0 -= b1;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 22);
+-	b2 -= b3;
+-
+-	tmp = b3 ^ b0;
+-	b3 = ror64(tmp, 46);
+-	b0 -= b3;
+-
+-	tmp = b1 ^ b2;
+-	b1 = ror64(tmp, 12);
+-	b2 -= b1;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 25);
+-	b0 -= b1 + k3;
+-	b1 -= k4 + t1;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 33);
+-	b2 -= b3 + k0 + t2;
+-	b3 -= k1 + 13;
+-
+-	tmp = b3 ^ b0;
+-	b3 = ror64(tmp, 5);
+-	b0 -= b3;
+-
+-	tmp = b1 ^ b2;
+-	b1 = ror64(tmp, 37);
+-	b2 -= b1;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 23);
+-	b0 -= b1;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 40);
+-	b2 -= b3;
+-
+-	tmp = b3 ^ b0;
+-	b3 = ror64(tmp, 52);
+-	b0 -= b3;
+-
+-	tmp = b1 ^ b2;
+-	b1 = ror64(tmp, 57);
+-	b2 -= b1;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 14);
+-	b0 -= b1 + k2;
+-	b1 -= k3 + t0;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 16);
+-	b2 -= b3 + k4 + t1;
+-	b3 -= k0 + 12;
+-
+-	tmp = b3 ^ b0;
+-	b3 = ror64(tmp, 32);
+-	b0 -= b3;
+-
+-	tmp = b1 ^ b2;
+-	b1 = ror64(tmp, 32);
+-	b2 -= b1;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 58);
+-	b0 -= b1;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 22);
+-	b2 -= b3;
+-
+-	tmp = b3 ^ b0;
+-	b3 = ror64(tmp, 46);
+-	b0 -= b3;
+-
+-	tmp = b1 ^ b2;
+-	b1 = ror64(tmp, 12);
+-	b2 -= b1;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 25);
+-	b0 -= b1 + k1;
+-	b1 -= k2 + t2;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 33);
+-	b2 -= b3 + k3 + t0;
+-	b3 -= k4 + 11;
+-
+-	tmp = b3 ^ b0;
+-	b3 = ror64(tmp, 5);
+-	b0 -= b3;
+-
+-	tmp = b1 ^ b2;
+-	b1 = ror64(tmp, 37);
+-	b2 -= b1;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 23);
+-	b0 -= b1;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 40);
+-	b2 -= b3;
+-
+-	tmp = b3 ^ b0;
+-	b3 = ror64(tmp, 52);
+-	b0 -= b3;
+-
+-	tmp = b1 ^ b2;
+-	b1 = ror64(tmp, 57);
+-	b2 -= b1;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 14);
+-	b0 -= b1 + k0;
+-	b1 -= k1 + t1;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 16);
+-	b2 -= b3 + k2 + t2;
+-	b3 -= k3 + 10;
+-
+-	tmp = b3 ^ b0;
+-	b3 = ror64(tmp, 32);
+-	b0 -= b3;
+-
+-	tmp = b1 ^ b2;
+-	b1 = ror64(tmp, 32);
+-	b2 -= b1;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 58);
+-	b0 -= b1;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 22);
+-	b2 -= b3;
+-
+-	tmp = b3 ^ b0;
+-	b3 = ror64(tmp, 46);
+-	b0 -= b3;
+-
+-	tmp = b1 ^ b2;
+-	b1 = ror64(tmp, 12);
+-	b2 -= b1;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 25);
+-	b0 -= b1 + k4;
+-	b1 -= k0 + t0;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 33);
+-	b2 -= b3 + k1 + t1;
+-	b3 -= k2 + 9;
+-
+-	tmp = b3 ^ b0;
+-	b3 = ror64(tmp, 5);
+-	b0 -= b3;
+-
+-	tmp = b1 ^ b2;
+-	b1 = ror64(tmp, 37);
+-	b2 -= b1;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 23);
+-	b0 -= b1;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 40);
+-	b2 -= b3;
+-
+-	tmp = b3 ^ b0;
+-	b3 = ror64(tmp, 52);
+-	b0 -= b3;
+-
+-	tmp = b1 ^ b2;
+-	b1 = ror64(tmp, 57);
+-	b2 -= b1;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 14);
+-	b0 -= b1 + k3;
+-	b1 -= k4 + t2;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 16);
+-	b2 -= b3 + k0 + t0;
+-	b3 -= k1 + 8;
+-
+-	tmp = b3 ^ b0;
+-	b3 = ror64(tmp, 32);
+-	b0 -= b3;
+-
+-	tmp = b1 ^ b2;
+-	b1 = ror64(tmp, 32);
+-	b2 -= b1;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 58);
+-	b0 -= b1;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 22);
+-	b2 -= b3;
+-
+-	tmp = b3 ^ b0;
+-	b3 = ror64(tmp, 46);
+-	b0 -= b3;
+-
+-	tmp = b1 ^ b2;
+-	b1 = ror64(tmp, 12);
+-	b2 -= b1;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 25);
+-	b0 -= b1 + k2;
+-	b1 -= k3 + t1;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 33);
+-	b2 -= b3 + k4 + t2;
+-	b3 -= k0 + 7;
+-
+-	tmp = b3 ^ b0;
+-	b3 = ror64(tmp, 5);
+-	b0 -= b3;
+-
+-	tmp = b1 ^ b2;
+-	b1 = ror64(tmp, 37);
+-	b2 -= b1;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 23);
+-	b0 -= b1;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 40);
+-	b2 -= b3;
+-
+-	tmp = b3 ^ b0;
+-	b3 = ror64(tmp, 52);
+-	b0 -= b3;
+-
+-	tmp = b1 ^ b2;
+-	b1 = ror64(tmp, 57);
+-	b2 -= b1;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 14);
+-	b0 -= b1 + k1;
+-	b1 -= k2 + t0;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 16);
+-	b2 -= b3 + k3 + t1;
+-	b3 -= k4 + 6;
+-
+-	tmp = b3 ^ b0;
+-	b3 = ror64(tmp, 32);
+-	b0 -= b3;
+-
+-	tmp = b1 ^ b2;
+-	b1 = ror64(tmp, 32);
+-	b2 -= b1;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 58);
+-	b0 -= b1;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 22);
+-	b2 -= b3;
+-
+-	tmp = b3 ^ b0;
+-	b3 = ror64(tmp, 46);
+-	b0 -= b3;
+-
+-	tmp = b1 ^ b2;
+-	b1 = ror64(tmp, 12);
+-	b2 -= b1;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 25);
+-	b0 -= b1 + k0;
+-	b1 -= k1 + t2;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 33);
+-	b2 -= b3 + k2 + t0;
+-	b3 -= k3 + 5;
+-
+-	tmp = b3 ^ b0;
+-	b3 = ror64(tmp, 5);
+-	b0 -= b3;
+-
+-	tmp = b1 ^ b2;
+-	b1 = ror64(tmp, 37);
+-	b2 -= b1;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 23);
+-	b0 -= b1;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 40);
+-	b2 -= b3;
+-
+-	tmp = b3 ^ b0;
+-	b3 = ror64(tmp, 52);
+-	b0 -= b3;
+-
+-	tmp = b1 ^ b2;
+-	b1 = ror64(tmp, 57);
+-	b2 -= b1;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 14);
+-	b0 -= b1 + k4;
+-	b1 -= k0 + t1;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 16);
+-	b2 -= b3 + k1 + t2;
+-	b3 -= k2 + 4;
+-
+-	tmp = b3 ^ b0;
+-	b3 = ror64(tmp, 32);
+-	b0 -= b3;
+-
+-	tmp = b1 ^ b2;
+-	b1 = ror64(tmp, 32);
+-	b2 -= b1;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 58);
+-	b0 -= b1;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 22);
+-	b2 -= b3;
+-
+-	tmp = b3 ^ b0;
+-	b3 = ror64(tmp, 46);
+-	b0 -= b3;
+-
+-	tmp = b1 ^ b2;
+-	b1 = ror64(tmp, 12);
+-	b2 -= b1;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 25);
+-	b0 -= b1 + k3;
+-	b1 -= k4 + t0;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 33);
+-	b2 -= b3 + k0 + t1;
+-	b3 -= k1 + 3;
+-
+-	tmp = b3 ^ b0;
+-	b3 = ror64(tmp, 5);
+-	b0 -= b3;
+-
+-	tmp = b1 ^ b2;
+-	b1 = ror64(tmp, 37);
+-	b2 -= b1;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 23);
+-	b0 -= b1;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 40);
+-	b2 -= b3;
+-
+-	tmp = b3 ^ b0;
+-	b3 = ror64(tmp, 52);
+-	b0 -= b3;
+-
+-	tmp = b1 ^ b2;
+-	b1 = ror64(tmp, 57);
+-	b2 -= b1;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 14);
+-	b0 -= b1 + k2;
+-	b1 -= k3 + t2;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 16);
+-	b2 -= b3 + k4 + t0;
+-	b3 -= k0 + 2;
+-
+-	tmp = b3 ^ b0;
+-	b3 = ror64(tmp, 32);
+-	b0 -= b3;
+-
+-	tmp = b1 ^ b2;
+-	b1 = ror64(tmp, 32);
+-	b2 -= b1;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 58);
+-	b0 -= b1;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 22);
+-	b2 -= b3;
+-
+-	tmp = b3 ^ b0;
+-	b3 = ror64(tmp, 46);
+-	b0 -= b3;
+-
+-	tmp = b1 ^ b2;
+-	b1 = ror64(tmp, 12);
+-	b2 -= b1;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 25);
+-	b0 -= b1 + k1;
+-	b1 -= k2 + t1;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 33);
+-	b2 -= b3 + k3 + t2;
+-	b3 -= k4 + 1;
+-
+-	tmp = b3 ^ b0;
+-	b3 = ror64(tmp, 5);
+-	b0 -= b3;
+-
+-	tmp = b1 ^ b2;
+-	b1 = ror64(tmp, 37);
+-	b2 -= b1;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 23);
+-	b0 -= b1;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 40);
+-	b2 -= b3;
+-
+-	tmp = b3 ^ b0;
+-	b3 = ror64(tmp, 52);
+-	b0 -= b3;
+-
+-	tmp = b1 ^ b2;
+-	b1 = ror64(tmp, 57);
+-	b2 -= b1;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 14);
+-	b0 -= b1 + k0;
+-	b1 -= k1 + t0;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 16);
+-	b2 -= b3 + k2 + t1;
+-	b3 -= k3;
+-
+-	output[0] = b0;
+-	output[1] = b1;
+-	output[2] = b2;
+-	output[3] = b3;
+-}
+-
+-void threefish_encrypt_512(struct threefish_key *key_ctx, u64 *input,
+-			   u64 *output)
+-{
+-	u64 b0 = input[0], b1 = input[1],
+-	    b2 = input[2], b3 = input[3],
+-	    b4 = input[4], b5 = input[5],
+-	    b6 = input[6], b7 = input[7];
+-	u64 k0 = key_ctx->key[0], k1 = key_ctx->key[1],
+-	    k2 = key_ctx->key[2], k3 = key_ctx->key[3],
+-	    k4 = key_ctx->key[4], k5 = key_ctx->key[5],
+-	    k6 = key_ctx->key[6], k7 = key_ctx->key[7],
+-	    k8 = key_ctx->key[8];
+-	u64 t0 = key_ctx->tweak[0], t1 = key_ctx->tweak[1],
+-	    t2 = key_ctx->tweak[2];
+-
+-	b1 += k1;
+-	b0 += b1 + k0;
+-	b1 = rol64(b1, 46) ^ b0;
+-
+-	b3 += k3;
+-	b2 += b3 + k2;
+-	b3 = rol64(b3, 36) ^ b2;
+-
+-	b5 += k5 + t0;
+-	b4 += b5 + k4;
+-	b5 = rol64(b5, 19) ^ b4;
+-
+-	b7 += k7;
+-	b6 += b7 + k6 + t1;
+-	b7 = rol64(b7, 37) ^ b6;
+-
+-	b2 += b1;
+-	b1 = rol64(b1, 33) ^ b2;
+-
+-	b4 += b7;
+-	b7 = rol64(b7, 27) ^ b4;
+-
+-	b6 += b5;
+-	b5 = rol64(b5, 14) ^ b6;
+-
+-	b0 += b3;
+-	b3 = rol64(b3, 42) ^ b0;
+-
+-	b4 += b1;
+-	b1 = rol64(b1, 17) ^ b4;
+-
+-	b6 += b3;
+-	b3 = rol64(b3, 49) ^ b6;
+-
+-	b0 += b5;
+-	b5 = rol64(b5, 36) ^ b0;
+-
+-	b2 += b7;
+-	b7 = rol64(b7, 39) ^ b2;
+-
+-	b6 += b1;
+-	b1 = rol64(b1, 44) ^ b6;
+-
+-	b0 += b7;
+-	b7 = rol64(b7, 9) ^ b0;
+-
+-	b2 += b5;
+-	b5 = rol64(b5, 54) ^ b2;
+-
+-	b4 += b3;
+-	b3 = rol64(b3, 56) ^ b4;
+-
+-	b1 += k2;
+-	b0 += b1 + k1;
+-	b1 = rol64(b1, 39) ^ b0;
+-
+-	b3 += k4;
+-	b2 += b3 + k3;
+-	b3 = rol64(b3, 30) ^ b2;
+-
+-	b5 += k6 + t1;
+-	b4 += b5 + k5;
+-	b5 = rol64(b5, 34) ^ b4;
+-
+-	b7 += k8 + 1;
+-	b6 += b7 + k7 + t2;
+-	b7 = rol64(b7, 24) ^ b6;
+-
+-	b2 += b1;
+-	b1 = rol64(b1, 13) ^ b2;
+-
+-	b4 += b7;
+-	b7 = rol64(b7, 50) ^ b4;
+-
+-	b6 += b5;
+-	b5 = rol64(b5, 10) ^ b6;
+-
+-	b0 += b3;
+-	b3 = rol64(b3, 17) ^ b0;
+-
+-	b4 += b1;
+-	b1 = rol64(b1, 25) ^ b4;
+-
+-	b6 += b3;
+-	b3 = rol64(b3, 29) ^ b6;
+-
+-	b0 += b5;
+-	b5 = rol64(b5, 39) ^ b0;
+-
+-	b2 += b7;
+-	b7 = rol64(b7, 43) ^ b2;
+-
+-	b6 += b1;
+-	b1 = rol64(b1, 8) ^ b6;
+-
+-	b0 += b7;
+-	b7 = rol64(b7, 35) ^ b0;
+-
+-	b2 += b5;
+-	b5 = rol64(b5, 56) ^ b2;
+-
+-	b4 += b3;
+-	b3 = rol64(b3, 22) ^ b4;
+-
+-	b1 += k3;
+-	b0 += b1 + k2;
+-	b1 = rol64(b1, 46) ^ b0;
+-
+-	b3 += k5;
+-	b2 += b3 + k4;
+-	b3 = rol64(b3, 36) ^ b2;
+-
+-	b5 += k7 + t2;
+-	b4 += b5 + k6;
+-	b5 = rol64(b5, 19) ^ b4;
+-
+-	b7 += k0 + 2;
+-	b6 += b7 + k8 + t0;
+-	b7 = rol64(b7, 37) ^ b6;
+-
+-	b2 += b1;
+-	b1 = rol64(b1, 33) ^ b2;
+-
+-	b4 += b7;
+-	b7 = rol64(b7, 27) ^ b4;
+-
+-	b6 += b5;
+-	b5 = rol64(b5, 14) ^ b6;
+-
+-	b0 += b3;
+-	b3 = rol64(b3, 42) ^ b0;
+-
+-	b4 += b1;
+-	b1 = rol64(b1, 17) ^ b4;
+-
+-	b6 += b3;
+-	b3 = rol64(b3, 49) ^ b6;
+-
+-	b0 += b5;
+-	b5 = rol64(b5, 36) ^ b0;
+-
+-	b2 += b7;
+-	b7 = rol64(b7, 39) ^ b2;
+-
+-	b6 += b1;
+-	b1 = rol64(b1, 44) ^ b6;
+-
+-	b0 += b7;
+-	b7 = rol64(b7, 9) ^ b0;
+-
+-	b2 += b5;
+-	b5 = rol64(b5, 54) ^ b2;
+-
+-	b4 += b3;
+-	b3 = rol64(b3, 56) ^ b4;
+-
+-	b1 += k4;
+-	b0 += b1 + k3;
+-	b1 = rol64(b1, 39) ^ b0;
+-
+-	b3 += k6;
+-	b2 += b3 + k5;
+-	b3 = rol64(b3, 30) ^ b2;
+-
+-	b5 += k8 + t0;
+-	b4 += b5 + k7;
+-	b5 = rol64(b5, 34) ^ b4;
+-
+-	b7 += k1 + 3;
+-	b6 += b7 + k0 + t1;
+-	b7 = rol64(b7, 24) ^ b6;
+-
+-	b2 += b1;
+-	b1 = rol64(b1, 13) ^ b2;
+-
+-	b4 += b7;
+-	b7 = rol64(b7, 50) ^ b4;
+-
+-	b6 += b5;
+-	b5 = rol64(b5, 10) ^ b6;
+-
+-	b0 += b3;
+-	b3 = rol64(b3, 17) ^ b0;
+-
+-	b4 += b1;
+-	b1 = rol64(b1, 25) ^ b4;
+-
+-	b6 += b3;
+-	b3 = rol64(b3, 29) ^ b6;
+-
+-	b0 += b5;
+-	b5 = rol64(b5, 39) ^ b0;
+-
+-	b2 += b7;
+-	b7 = rol64(b7, 43) ^ b2;
+-
+-	b6 += b1;
+-	b1 = rol64(b1, 8) ^ b6;
+-
+-	b0 += b7;
+-	b7 = rol64(b7, 35) ^ b0;
+-
+-	b2 += b5;
+-	b5 = rol64(b5, 56) ^ b2;
+-
+-	b4 += b3;
+-	b3 = rol64(b3, 22) ^ b4;
+-
+-	b1 += k5;
+-	b0 += b1 + k4;
+-	b1 = rol64(b1, 46) ^ b0;
+-
+-	b3 += k7;
+-	b2 += b3 + k6;
+-	b3 = rol64(b3, 36) ^ b2;
+-
+-	b5 += k0 + t1;
+-	b4 += b5 + k8;
+-	b5 = rol64(b5, 19) ^ b4;
+-
+-	b7 += k2 + 4;
+-	b6 += b7 + k1 + t2;
+-	b7 = rol64(b7, 37) ^ b6;
+-
+-	b2 += b1;
+-	b1 = rol64(b1, 33) ^ b2;
+-
+-	b4 += b7;
+-	b7 = rol64(b7, 27) ^ b4;
+-
+-	b6 += b5;
+-	b5 = rol64(b5, 14) ^ b6;
+-
+-	b0 += b3;
+-	b3 = rol64(b3, 42) ^ b0;
+-
+-	b4 += b1;
+-	b1 = rol64(b1, 17) ^ b4;
+-
+-	b6 += b3;
+-	b3 = rol64(b3, 49) ^ b6;
+-
+-	b0 += b5;
+-	b5 = rol64(b5, 36) ^ b0;
+-
+-	b2 += b7;
+-	b7 = rol64(b7, 39) ^ b2;
+-
+-	b6 += b1;
+-	b1 = rol64(b1, 44) ^ b6;
+-
+-	b0 += b7;
+-	b7 = rol64(b7, 9) ^ b0;
+-
+-	b2 += b5;
+-	b5 = rol64(b5, 54) ^ b2;
+-
+-	b4 += b3;
+-	b3 = rol64(b3, 56) ^ b4;
+-
+-	b1 += k6;
+-	b0 += b1 + k5;
+-	b1 = rol64(b1, 39) ^ b0;
+-
+-	b3 += k8;
+-	b2 += b3 + k7;
+-	b3 = rol64(b3, 30) ^ b2;
+-
+-	b5 += k1 + t2;
+-	b4 += b5 + k0;
+-	b5 = rol64(b5, 34) ^ b4;
+-
+-	b7 += k3 + 5;
+-	b6 += b7 + k2 + t0;
+-	b7 = rol64(b7, 24) ^ b6;
+-
+-	b2 += b1;
+-	b1 = rol64(b1, 13) ^ b2;
+-
+-	b4 += b7;
+-	b7 = rol64(b7, 50) ^ b4;
+-
+-	b6 += b5;
+-	b5 = rol64(b5, 10) ^ b6;
+-
+-	b0 += b3;
+-	b3 = rol64(b3, 17) ^ b0;
+-
+-	b4 += b1;
+-	b1 = rol64(b1, 25) ^ b4;
+-
+-	b6 += b3;
+-	b3 = rol64(b3, 29) ^ b6;
+-
+-	b0 += b5;
+-	b5 = rol64(b5, 39) ^ b0;
+-
+-	b2 += b7;
+-	b7 = rol64(b7, 43) ^ b2;
+-
+-	b6 += b1;
+-	b1 = rol64(b1, 8) ^ b6;
+-
+-	b0 += b7;
+-	b7 = rol64(b7, 35) ^ b0;
+-
+-	b2 += b5;
+-	b5 = rol64(b5, 56) ^ b2;
+-
+-	b4 += b3;
+-	b3 = rol64(b3, 22) ^ b4;
+-
+-	b1 += k7;
+-	b0 += b1 + k6;
+-	b1 = rol64(b1, 46) ^ b0;
+-
+-	b3 += k0;
+-	b2 += b3 + k8;
+-	b3 = rol64(b3, 36) ^ b2;
+-
+-	b5 += k2 + t0;
+-	b4 += b5 + k1;
+-	b5 = rol64(b5, 19) ^ b4;
+-
+-	b7 += k4 + 6;
+-	b6 += b7 + k3 + t1;
+-	b7 = rol64(b7, 37) ^ b6;
+-
+-	b2 += b1;
+-	b1 = rol64(b1, 33) ^ b2;
+-
+-	b4 += b7;
+-	b7 = rol64(b7, 27) ^ b4;
+-
+-	b6 += b5;
+-	b5 = rol64(b5, 14) ^ b6;
+-
+-	b0 += b3;
+-	b3 = rol64(b3, 42) ^ b0;
+-
+-	b4 += b1;
+-	b1 = rol64(b1, 17) ^ b4;
+-
+-	b6 += b3;
+-	b3 = rol64(b3, 49) ^ b6;
+-
+-	b0 += b5;
+-	b5 = rol64(b5, 36) ^ b0;
+-
+-	b2 += b7;
+-	b7 = rol64(b7, 39) ^ b2;
+-
+-	b6 += b1;
+-	b1 = rol64(b1, 44) ^ b6;
+-
+-	b0 += b7;
+-	b7 = rol64(b7, 9) ^ b0;
+-
+-	b2 += b5;
+-	b5 = rol64(b5, 54) ^ b2;
+-
+-	b4 += b3;
+-	b3 = rol64(b3, 56) ^ b4;
+-
+-	b1 += k8;
+-	b0 += b1 + k7;
+-	b1 = rol64(b1, 39) ^ b0;
+-
+-	b3 += k1;
+-	b2 += b3 + k0;
+-	b3 = rol64(b3, 30) ^ b2;
+-
+-	b5 += k3 + t1;
+-	b4 += b5 + k2;
+-	b5 = rol64(b5, 34) ^ b4;
+-
+-	b7 += k5 + 7;
+-	b6 += b7 + k4 + t2;
+-	b7 = rol64(b7, 24) ^ b6;
+-
+-	b2 += b1;
+-	b1 = rol64(b1, 13) ^ b2;
+-
+-	b4 += b7;
+-	b7 = rol64(b7, 50) ^ b4;
+-
+-	b6 += b5;
+-	b5 = rol64(b5, 10) ^ b6;
+-
+-	b0 += b3;
+-	b3 = rol64(b3, 17) ^ b0;
+-
+-	b4 += b1;
+-	b1 = rol64(b1, 25) ^ b4;
+-
+-	b6 += b3;
+-	b3 = rol64(b3, 29) ^ b6;
+-
+-	b0 += b5;
+-	b5 = rol64(b5, 39) ^ b0;
+-
+-	b2 += b7;
+-	b7 = rol64(b7, 43) ^ b2;
+-
+-	b6 += b1;
+-	b1 = rol64(b1, 8) ^ b6;
+-
+-	b0 += b7;
+-	b7 = rol64(b7, 35) ^ b0;
+-
+-	b2 += b5;
+-	b5 = rol64(b5, 56) ^ b2;
+-
+-	b4 += b3;
+-	b3 = rol64(b3, 22) ^ b4;
+-
+-	b1 += k0;
+-	b0 += b1 + k8;
+-	b1 = rol64(b1, 46) ^ b0;
+-
+-	b3 += k2;
+-	b2 += b3 + k1;
+-	b3 = rol64(b3, 36) ^ b2;
+-
+-	b5 += k4 + t2;
+-	b4 += b5 + k3;
+-	b5 = rol64(b5, 19) ^ b4;
+-
+-	b7 += k6 + 8;
+-	b6 += b7 + k5 + t0;
+-	b7 = rol64(b7, 37) ^ b6;
+-
+-	b2 += b1;
+-	b1 = rol64(b1, 33) ^ b2;
+-
+-	b4 += b7;
+-	b7 = rol64(b7, 27) ^ b4;
+-
+-	b6 += b5;
+-	b5 = rol64(b5, 14) ^ b6;
+-
+-	b0 += b3;
+-	b3 = rol64(b3, 42) ^ b0;
+-
+-	b4 += b1;
+-	b1 = rol64(b1, 17) ^ b4;
+-
+-	b6 += b3;
+-	b3 = rol64(b3, 49) ^ b6;
+-
+-	b0 += b5;
+-	b5 = rol64(b5, 36) ^ b0;
+-
+-	b2 += b7;
+-	b7 = rol64(b7, 39) ^ b2;
+-
+-	b6 += b1;
+-	b1 = rol64(b1, 44) ^ b6;
+-
+-	b0 += b7;
+-	b7 = rol64(b7, 9) ^ b0;
+-
+-	b2 += b5;
+-	b5 = rol64(b5, 54) ^ b2;
+-
+-	b4 += b3;
+-	b3 = rol64(b3, 56) ^ b4;
+-
+-	b1 += k1;
+-	b0 += b1 + k0;
+-	b1 = rol64(b1, 39) ^ b0;
+-
+-	b3 += k3;
+-	b2 += b3 + k2;
+-	b3 = rol64(b3, 30) ^ b2;
+-
+-	b5 += k5 + t0;
+-	b4 += b5 + k4;
+-	b5 = rol64(b5, 34) ^ b4;
+-
+-	b7 += k7 + 9;
+-	b6 += b7 + k6 + t1;
+-	b7 = rol64(b7, 24) ^ b6;
+-
+-	b2 += b1;
+-	b1 = rol64(b1, 13) ^ b2;
+-
+-	b4 += b7;
+-	b7 = rol64(b7, 50) ^ b4;
+-
+-	b6 += b5;
+-	b5 = rol64(b5, 10) ^ b6;
+-
+-	b0 += b3;
+-	b3 = rol64(b3, 17) ^ b0;
+-
+-	b4 += b1;
+-	b1 = rol64(b1, 25) ^ b4;
+-
+-	b6 += b3;
+-	b3 = rol64(b3, 29) ^ b6;
+-
+-	b0 += b5;
+-	b5 = rol64(b5, 39) ^ b0;
+-
+-	b2 += b7;
+-	b7 = rol64(b7, 43) ^ b2;
+-
+-	b6 += b1;
+-	b1 = rol64(b1, 8) ^ b6;
+-
+-	b0 += b7;
+-	b7 = rol64(b7, 35) ^ b0;
+-
+-	b2 += b5;
+-	b5 = rol64(b5, 56) ^ b2;
+-
+-	b4 += b3;
+-	b3 = rol64(b3, 22) ^ b4;
+-
+-	b1 += k2;
+-	b0 += b1 + k1;
+-	b1 = rol64(b1, 46) ^ b0;
+-
+-	b3 += k4;
+-	b2 += b3 + k3;
+-	b3 = rol64(b3, 36) ^ b2;
+-
+-	b5 += k6 + t1;
+-	b4 += b5 + k5;
+-	b5 = rol64(b5, 19) ^ b4;
+-
+-	b7 += k8 + 10;
+-	b6 += b7 + k7 + t2;
+-	b7 = rol64(b7, 37) ^ b6;
+-
+-	b2 += b1;
+-	b1 = rol64(b1, 33) ^ b2;
+-
+-	b4 += b7;
+-	b7 = rol64(b7, 27) ^ b4;
+-
+-	b6 += b5;
+-	b5 = rol64(b5, 14) ^ b6;
+-
+-	b0 += b3;
+-	b3 = rol64(b3, 42) ^ b0;
+-
+-	b4 += b1;
+-	b1 = rol64(b1, 17) ^ b4;
+-
+-	b6 += b3;
+-	b3 = rol64(b3, 49) ^ b6;
+-
+-	b0 += b5;
+-	b5 = rol64(b5, 36) ^ b0;
+-
+-	b2 += b7;
+-	b7 = rol64(b7, 39) ^ b2;
+-
+-	b6 += b1;
+-	b1 = rol64(b1, 44) ^ b6;
+-
+-	b0 += b7;
+-	b7 = rol64(b7, 9) ^ b0;
+-
+-	b2 += b5;
+-	b5 = rol64(b5, 54) ^ b2;
+-
+-	b4 += b3;
+-	b3 = rol64(b3, 56) ^ b4;
+-
+-	b1 += k3;
+-	b0 += b1 + k2;
+-	b1 = rol64(b1, 39) ^ b0;
+-
+-	b3 += k5;
+-	b2 += b3 + k4;
+-	b3 = rol64(b3, 30) ^ b2;
+-
+-	b5 += k7 + t2;
+-	b4 += b5 + k6;
+-	b5 = rol64(b5, 34) ^ b4;
+-
+-	b7 += k0 + 11;
+-	b6 += b7 + k8 + t0;
+-	b7 = rol64(b7, 24) ^ b6;
+-
+-	b2 += b1;
+-	b1 = rol64(b1, 13) ^ b2;
+-
+-	b4 += b7;
+-	b7 = rol64(b7, 50) ^ b4;
+-
+-	b6 += b5;
+-	b5 = rol64(b5, 10) ^ b6;
+-
+-	b0 += b3;
+-	b3 = rol64(b3, 17) ^ b0;
+-
+-	b4 += b1;
+-	b1 = rol64(b1, 25) ^ b4;
+-
+-	b6 += b3;
+-	b3 = rol64(b3, 29) ^ b6;
+-
+-	b0 += b5;
+-	b5 = rol64(b5, 39) ^ b0;
+-
+-	b2 += b7;
+-	b7 = rol64(b7, 43) ^ b2;
+-
+-	b6 += b1;
+-	b1 = rol64(b1, 8) ^ b6;
+-
+-	b0 += b7;
+-	b7 = rol64(b7, 35) ^ b0;
+-
+-	b2 += b5;
+-	b5 = rol64(b5, 56) ^ b2;
+-
+-	b4 += b3;
+-	b3 = rol64(b3, 22) ^ b4;
+-
+-	b1 += k4;
+-	b0 += b1 + k3;
+-	b1 = rol64(b1, 46) ^ b0;
+-
+-	b3 += k6;
+-	b2 += b3 + k5;
+-	b3 = rol64(b3, 36) ^ b2;
+-
+-	b5 += k8 + t0;
+-	b4 += b5 + k7;
+-	b5 = rol64(b5, 19) ^ b4;
+-
+-	b7 += k1 + 12;
+-	b6 += b7 + k0 + t1;
+-	b7 = rol64(b7, 37) ^ b6;
+-
+-	b2 += b1;
+-	b1 = rol64(b1, 33) ^ b2;
+-
+-	b4 += b7;
+-	b7 = rol64(b7, 27) ^ b4;
+-
+-	b6 += b5;
+-	b5 = rol64(b5, 14) ^ b6;
+-
+-	b0 += b3;
+-	b3 = rol64(b3, 42) ^ b0;
+-
+-	b4 += b1;
+-	b1 = rol64(b1, 17) ^ b4;
+-
+-	b6 += b3;
+-	b3 = rol64(b3, 49) ^ b6;
+-
+-	b0 += b5;
+-	b5 = rol64(b5, 36) ^ b0;
+-
+-	b2 += b7;
+-	b7 = rol64(b7, 39) ^ b2;
+-
+-	b6 += b1;
+-	b1 = rol64(b1, 44) ^ b6;
+-
+-	b0 += b7;
+-	b7 = rol64(b7, 9) ^ b0;
+-
+-	b2 += b5;
+-	b5 = rol64(b5, 54) ^ b2;
+-
+-	b4 += b3;
+-	b3 = rol64(b3, 56) ^ b4;
+-
+-	b1 += k5;
+-	b0 += b1 + k4;
+-	b1 = rol64(b1, 39) ^ b0;
+-
+-	b3 += k7;
+-	b2 += b3 + k6;
+-	b3 = rol64(b3, 30) ^ b2;
+-
+-	b5 += k0 + t1;
+-	b4 += b5 + k8;
+-	b5 = rol64(b5, 34) ^ b4;
+-
+-	b7 += k2 + 13;
+-	b6 += b7 + k1 + t2;
+-	b7 = rol64(b7, 24) ^ b6;
+-
+-	b2 += b1;
+-	b1 = rol64(b1, 13) ^ b2;
+-
+-	b4 += b7;
+-	b7 = rol64(b7, 50) ^ b4;
+-
+-	b6 += b5;
+-	b5 = rol64(b5, 10) ^ b6;
+-
+-	b0 += b3;
+-	b3 = rol64(b3, 17) ^ b0;
+-
+-	b4 += b1;
+-	b1 = rol64(b1, 25) ^ b4;
+-
+-	b6 += b3;
+-	b3 = rol64(b3, 29) ^ b6;
+-
+-	b0 += b5;
+-	b5 = rol64(b5, 39) ^ b0;
+-
+-	b2 += b7;
+-	b7 = rol64(b7, 43) ^ b2;
+-
+-	b6 += b1;
+-	b1 = rol64(b1, 8) ^ b6;
+-
+-	b0 += b7;
+-	b7 = rol64(b7, 35) ^ b0;
+-
+-	b2 += b5;
+-	b5 = rol64(b5, 56) ^ b2;
+-
+-	b4 += b3;
+-	b3 = rol64(b3, 22) ^ b4;
+-
+-	b1 += k6;
+-	b0 += b1 + k5;
+-	b1 = rol64(b1, 46) ^ b0;
+-
+-	b3 += k8;
+-	b2 += b3 + k7;
+-	b3 = rol64(b3, 36) ^ b2;
+-
+-	b5 += k1 + t2;
+-	b4 += b5 + k0;
+-	b5 = rol64(b5, 19) ^ b4;
+-
+-	b7 += k3 + 14;
+-	b6 += b7 + k2 + t0;
+-	b7 = rol64(b7, 37) ^ b6;
+-
+-	b2 += b1;
+-	b1 = rol64(b1, 33) ^ b2;
+-
+-	b4 += b7;
+-	b7 = rol64(b7, 27) ^ b4;
+-
+-	b6 += b5;
+-	b5 = rol64(b5, 14) ^ b6;
+-
+-	b0 += b3;
+-	b3 = rol64(b3, 42) ^ b0;
+-
+-	b4 += b1;
+-	b1 = rol64(b1, 17) ^ b4;
+-
+-	b6 += b3;
+-	b3 = rol64(b3, 49) ^ b6;
+-
+-	b0 += b5;
+-	b5 = rol64(b5, 36) ^ b0;
+-
+-	b2 += b7;
+-	b7 = rol64(b7, 39) ^ b2;
+-
+-	b6 += b1;
+-	b1 = rol64(b1, 44) ^ b6;
+-
+-	b0 += b7;
+-	b7 = rol64(b7, 9) ^ b0;
+-
+-	b2 += b5;
+-	b5 = rol64(b5, 54) ^ b2;
+-
+-	b4 += b3;
+-	b3 = rol64(b3, 56) ^ b4;
+-
+-	b1 += k7;
+-	b0 += b1 + k6;
+-	b1 = rol64(b1, 39) ^ b0;
+-
+-	b3 += k0;
+-	b2 += b3 + k8;
+-	b3 = rol64(b3, 30) ^ b2;
+-
+-	b5 += k2 + t0;
+-	b4 += b5 + k1;
+-	b5 = rol64(b5, 34) ^ b4;
+-
+-	b7 += k4 + 15;
+-	b6 += b7 + k3 + t1;
+-	b7 = rol64(b7, 24) ^ b6;
+-
+-	b2 += b1;
+-	b1 = rol64(b1, 13) ^ b2;
+-
+-	b4 += b7;
+-	b7 = rol64(b7, 50) ^ b4;
+-
+-	b6 += b5;
+-	b5 = rol64(b5, 10) ^ b6;
+-
+-	b0 += b3;
+-	b3 = rol64(b3, 17) ^ b0;
+-
+-	b4 += b1;
+-	b1 = rol64(b1, 25) ^ b4;
+-
+-	b6 += b3;
+-	b3 = rol64(b3, 29) ^ b6;
+-
+-	b0 += b5;
+-	b5 = rol64(b5, 39) ^ b0;
+-
+-	b2 += b7;
+-	b7 = rol64(b7, 43) ^ b2;
+-
+-	b6 += b1;
+-	b1 = rol64(b1, 8) ^ b6;
+-
+-	b0 += b7;
+-	b7 = rol64(b7, 35) ^ b0;
+-
+-	b2 += b5;
+-	b5 = rol64(b5, 56) ^ b2;
+-
+-	b4 += b3;
+-	b3 = rol64(b3, 22) ^ b4;
+-
+-	b1 += k8;
+-	b0 += b1 + k7;
+-	b1 = rol64(b1, 46) ^ b0;
+-
+-	b3 += k1;
+-	b2 += b3 + k0;
+-	b3 = rol64(b3, 36) ^ b2;
+-
+-	b5 += k3 + t1;
+-	b4 += b5 + k2;
+-	b5 = rol64(b5, 19) ^ b4;
+-
+-	b7 += k5 + 16;
+-	b6 += b7 + k4 + t2;
+-	b7 = rol64(b7, 37) ^ b6;
+-
+-	b2 += b1;
+-	b1 = rol64(b1, 33) ^ b2;
+-
+-	b4 += b7;
+-	b7 = rol64(b7, 27) ^ b4;
+-
+-	b6 += b5;
+-	b5 = rol64(b5, 14) ^ b6;
+-
+-	b0 += b3;
+-	b3 = rol64(b3, 42) ^ b0;
+-
+-	b4 += b1;
+-	b1 = rol64(b1, 17) ^ b4;
+-
+-	b6 += b3;
+-	b3 = rol64(b3, 49) ^ b6;
+-
+-	b0 += b5;
+-	b5 = rol64(b5, 36) ^ b0;
+-
+-	b2 += b7;
+-	b7 = rol64(b7, 39) ^ b2;
+-
+-	b6 += b1;
+-	b1 = rol64(b1, 44) ^ b6;
+-
+-	b0 += b7;
+-	b7 = rol64(b7, 9) ^ b0;
+-
+-	b2 += b5;
+-	b5 = rol64(b5, 54) ^ b2;
+-
+-	b4 += b3;
+-	b3 = rol64(b3, 56) ^ b4;
+-
+-	b1 += k0;
+-	b0 += b1 + k8;
+-	b1 = rol64(b1, 39) ^ b0;
+-
+-	b3 += k2;
+-	b2 += b3 + k1;
+-	b3 = rol64(b3, 30) ^ b2;
+-
+-	b5 += k4 + t2;
+-	b4 += b5 + k3;
+-	b5 = rol64(b5, 34) ^ b4;
+-
+-	b7 += k6 + 17;
+-	b6 += b7 + k5 + t0;
+-	b7 = rol64(b7, 24) ^ b6;
+-
+-	b2 += b1;
+-	b1 = rol64(b1, 13) ^ b2;
+-
+-	b4 += b7;
+-	b7 = rol64(b7, 50) ^ b4;
+-
+-	b6 += b5;
+-	b5 = rol64(b5, 10) ^ b6;
+-
+-	b0 += b3;
+-	b3 = rol64(b3, 17) ^ b0;
+-
+-	b4 += b1;
+-	b1 = rol64(b1, 25) ^ b4;
+-
+-	b6 += b3;
+-	b3 = rol64(b3, 29) ^ b6;
+-
+-	b0 += b5;
+-	b5 = rol64(b5, 39) ^ b0;
+-
+-	b2 += b7;
+-	b7 = rol64(b7, 43) ^ b2;
+-
+-	b6 += b1;
+-	b1 = rol64(b1, 8) ^ b6;
+-
+-	b0 += b7;
+-	b7 = rol64(b7, 35) ^ b0;
+-
+-	b2 += b5;
+-	b5 = rol64(b5, 56) ^ b2;
+-
+-	b4 += b3;
+-	b3 = rol64(b3, 22) ^ b4;
+-
+-	output[0] = b0 + k0;
+-	output[1] = b1 + k1;
+-	output[2] = b2 + k2;
+-	output[3] = b3 + k3;
+-	output[4] = b4 + k4;
+-	output[5] = b5 + k5 + t0;
+-	output[6] = b6 + k6 + t1;
+-	output[7] = b7 + k7 + 18;
+-}
+-
+-void threefish_decrypt_512(struct threefish_key *key_ctx, u64 *input,
+-			   u64 *output)
+-{
+-	u64 b0 = input[0], b1 = input[1],
+-	    b2 = input[2], b3 = input[3],
+-	    b4 = input[4], b5 = input[5],
+-	    b6 = input[6], b7 = input[7];
+-	u64 k0 = key_ctx->key[0], k1 = key_ctx->key[1],
+-	    k2 = key_ctx->key[2], k3 = key_ctx->key[3],
+-	    k4 = key_ctx->key[4], k5 = key_ctx->key[5],
+-	    k6 = key_ctx->key[6], k7 = key_ctx->key[7],
+-	    k8 = key_ctx->key[8];
+-	u64 t0 = key_ctx->tweak[0], t1 = key_ctx->tweak[1],
+-	    t2 = key_ctx->tweak[2];
+-
+-	u64 tmp;
+-
+-	b0 -= k0;
+-	b1 -= k1;
+-	b2 -= k2;
+-	b3 -= k3;
+-	b4 -= k4;
+-	b5 -= k5 + t0;
+-	b6 -= k6 + t1;
+-	b7 -= k7 + 18;
+-
+-	tmp = b3 ^ b4;
+-	b3 = ror64(tmp, 22);
+-	b4 -= b3;
+-
+-	tmp = b5 ^ b2;
+-	b5 = ror64(tmp, 56);
+-	b2 -= b5;
+-
+-	tmp = b7 ^ b0;
+-	b7 = ror64(tmp, 35);
+-	b0 -= b7;
+-
+-	tmp = b1 ^ b6;
+-	b1 = ror64(tmp, 8);
+-	b6 -= b1;
+-
+-	tmp = b7 ^ b2;
+-	b7 = ror64(tmp, 43);
+-	b2 -= b7;
+-
+-	tmp = b5 ^ b0;
+-	b5 = ror64(tmp, 39);
+-	b0 -= b5;
+-
+-	tmp = b3 ^ b6;
+-	b3 = ror64(tmp, 29);
+-	b6 -= b3;
+-
+-	tmp = b1 ^ b4;
+-	b1 = ror64(tmp, 25);
+-	b4 -= b1;
+-
+-	tmp = b3 ^ b0;
+-	b3 = ror64(tmp, 17);
+-	b0 -= b3;
+-
+-	tmp = b5 ^ b6;
+-	b5 = ror64(tmp, 10);
+-	b6 -= b5;
+-
+-	tmp = b7 ^ b4;
+-	b7 = ror64(tmp, 50);
+-	b4 -= b7;
+-
+-	tmp = b1 ^ b2;
+-	b1 = ror64(tmp, 13);
+-	b2 -= b1;
+-
+-	tmp = b7 ^ b6;
+-	b7 = ror64(tmp, 24);
+-	b6 -= b7 + k5 + t0;
+-	b7 -= k6 + 17;
+-
+-	tmp = b5 ^ b4;
+-	b5 = ror64(tmp, 34);
+-	b4 -= b5 + k3;
+-	b5 -= k4 + t2;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 30);
+-	b2 -= b3 + k1;
+-	b3 -= k2;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 39);
+-	b0 -= b1 + k8;
+-	b1 -= k0;
+-
+-	tmp = b3 ^ b4;
+-	b3 = ror64(tmp, 56);
+-	b4 -= b3;
+-
+-	tmp = b5 ^ b2;
+-	b5 = ror64(tmp, 54);
+-	b2 -= b5;
+-
+-	tmp = b7 ^ b0;
+-	b7 = ror64(tmp, 9);
+-	b0 -= b7;
+-
+-	tmp = b1 ^ b6;
+-	b1 = ror64(tmp, 44);
+-	b6 -= b1;
+-
+-	tmp = b7 ^ b2;
+-	b7 = ror64(tmp, 39);
+-	b2 -= b7;
+-
+-	tmp = b5 ^ b0;
+-	b5 = ror64(tmp, 36);
+-	b0 -= b5;
+-
+-	tmp = b3 ^ b6;
+-	b3 = ror64(tmp, 49);
+-	b6 -= b3;
+-
+-	tmp = b1 ^ b4;
+-	b1 = ror64(tmp, 17);
+-	b4 -= b1;
+-
+-	tmp = b3 ^ b0;
+-	b3 = ror64(tmp, 42);
+-	b0 -= b3;
+-
+-	tmp = b5 ^ b6;
+-	b5 = ror64(tmp, 14);
+-	b6 -= b5;
+-
+-	tmp = b7 ^ b4;
+-	b7 = ror64(tmp, 27);
+-	b4 -= b7;
+-
+-	tmp = b1 ^ b2;
+-	b1 = ror64(tmp, 33);
+-	b2 -= b1;
+-
+-	tmp = b7 ^ b6;
+-	b7 = ror64(tmp, 37);
+-	b6 -= b7 + k4 + t2;
+-	b7 -= k5 + 16;
+-
+-	tmp = b5 ^ b4;
+-	b5 = ror64(tmp, 19);
+-	b4 -= b5 + k2;
+-	b5 -= k3 + t1;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 36);
+-	b2 -= b3 + k0;
+-	b3 -= k1;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 46);
+-	b0 -= b1 + k7;
+-	b1 -= k8;
+-
+-	tmp = b3 ^ b4;
+-	b3 = ror64(tmp, 22);
+-	b4 -= b3;
+-
+-	tmp = b5 ^ b2;
+-	b5 = ror64(tmp, 56);
+-	b2 -= b5;
+-
+-	tmp = b7 ^ b0;
+-	b7 = ror64(tmp, 35);
+-	b0 -= b7;
+-
+-	tmp = b1 ^ b6;
+-	b1 = ror64(tmp, 8);
+-	b6 -= b1;
+-
+-	tmp = b7 ^ b2;
+-	b7 = ror64(tmp, 43);
+-	b2 -= b7;
+-
+-	tmp = b5 ^ b0;
+-	b5 = ror64(tmp, 39);
+-	b0 -= b5;
+-
+-	tmp = b3 ^ b6;
+-	b3 = ror64(tmp, 29);
+-	b6 -= b3;
+-
+-	tmp = b1 ^ b4;
+-	b1 = ror64(tmp, 25);
+-	b4 -= b1;
+-
+-	tmp = b3 ^ b0;
+-	b3 = ror64(tmp, 17);
+-	b0 -= b3;
+-
+-	tmp = b5 ^ b6;
+-	b5 = ror64(tmp, 10);
+-	b6 -= b5;
+-
+-	tmp = b7 ^ b4;
+-	b7 = ror64(tmp, 50);
+-	b4 -= b7;
+-
+-	tmp = b1 ^ b2;
+-	b1 = ror64(tmp, 13);
+-	b2 -= b1;
+-
+-	tmp = b7 ^ b6;
+-	b7 = ror64(tmp, 24);
+-	b6 -= b7 + k3 + t1;
+-	b7 -= k4 + 15;
+-
+-	tmp = b5 ^ b4;
+-	b5 = ror64(tmp, 34);
+-	b4 -= b5 + k1;
+-	b5 -= k2 + t0;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 30);
+-	b2 -= b3 + k8;
+-	b3 -= k0;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 39);
+-	b0 -= b1 + k6;
+-	b1 -= k7;
+-
+-	tmp = b3 ^ b4;
+-	b3 = ror64(tmp, 56);
+-	b4 -= b3;
+-
+-	tmp = b5 ^ b2;
+-	b5 = ror64(tmp, 54);
+-	b2 -= b5;
+-
+-	tmp = b7 ^ b0;
+-	b7 = ror64(tmp, 9);
+-	b0 -= b7;
+-
+-	tmp = b1 ^ b6;
+-	b1 = ror64(tmp, 44);
+-	b6 -= b1;
+-
+-	tmp = b7 ^ b2;
+-	b7 = ror64(tmp, 39);
+-	b2 -= b7;
+-
+-	tmp = b5 ^ b0;
+-	b5 = ror64(tmp, 36);
+-	b0 -= b5;
+-
+-	tmp = b3 ^ b6;
+-	b3 = ror64(tmp, 49);
+-	b6 -= b3;
+-
+-	tmp = b1 ^ b4;
+-	b1 = ror64(tmp, 17);
+-	b4 -= b1;
+-
+-	tmp = b3 ^ b0;
+-	b3 = ror64(tmp, 42);
+-	b0 -= b3;
+-
+-	tmp = b5 ^ b6;
+-	b5 = ror64(tmp, 14);
+-	b6 -= b5;
+-
+-	tmp = b7 ^ b4;
+-	b7 = ror64(tmp, 27);
+-	b4 -= b7;
+-
+-	tmp = b1 ^ b2;
+-	b1 = ror64(tmp, 33);
+-	b2 -= b1;
+-
+-	tmp = b7 ^ b6;
+-	b7 = ror64(tmp, 37);
+-	b6 -= b7 + k2 + t0;
+-	b7 -= k3 + 14;
+-
+-	tmp = b5 ^ b4;
+-	b5 = ror64(tmp, 19);
+-	b4 -= b5 + k0;
+-	b5 -= k1 + t2;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 36);
+-	b2 -= b3 + k7;
+-	b3 -= k8;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 46);
+-	b0 -= b1 + k5;
+-	b1 -= k6;
+-
+-	tmp = b3 ^ b4;
+-	b3 = ror64(tmp, 22);
+-	b4 -= b3;
+-
+-	tmp = b5 ^ b2;
+-	b5 = ror64(tmp, 56);
+-	b2 -= b5;
+-
+-	tmp = b7 ^ b0;
+-	b7 = ror64(tmp, 35);
+-	b0 -= b7;
+-
+-	tmp = b1 ^ b6;
+-	b1 = ror64(tmp, 8);
+-	b6 -= b1;
+-
+-	tmp = b7 ^ b2;
+-	b7 = ror64(tmp, 43);
+-	b2 -= b7;
+-
+-	tmp = b5 ^ b0;
+-	b5 = ror64(tmp, 39);
+-	b0 -= b5;
+-
+-	tmp = b3 ^ b6;
+-	b3 = ror64(tmp, 29);
+-	b6 -= b3;
+-
+-	tmp = b1 ^ b4;
+-	b1 = ror64(tmp, 25);
+-	b4 -= b1;
+-
+-	tmp = b3 ^ b0;
+-	b3 = ror64(tmp, 17);
+-	b0 -= b3;
+-
+-	tmp = b5 ^ b6;
+-	b5 = ror64(tmp, 10);
+-	b6 -= b5;
+-
+-	tmp = b7 ^ b4;
+-	b7 = ror64(tmp, 50);
+-	b4 -= b7;
+-
+-	tmp = b1 ^ b2;
+-	b1 = ror64(tmp, 13);
+-	b2 -= b1;
+-
+-	tmp = b7 ^ b6;
+-	b7 = ror64(tmp, 24);
+-	b6 -= b7 + k1 + t2;
+-	b7 -= k2 + 13;
+-
+-	tmp = b5 ^ b4;
+-	b5 = ror64(tmp, 34);
+-	b4 -= b5 + k8;
+-	b5 -= k0 + t1;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 30);
+-	b2 -= b3 + k6;
+-	b3 -= k7;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 39);
+-	b0 -= b1 + k4;
+-	b1 -= k5;
+-
+-	tmp = b3 ^ b4;
+-	b3 = ror64(tmp, 56);
+-	b4 -= b3;
+-
+-	tmp = b5 ^ b2;
+-	b5 = ror64(tmp, 54);
+-	b2 -= b5;
+-
+-	tmp = b7 ^ b0;
+-	b7 = ror64(tmp, 9);
+-	b0 -= b7;
+-
+-	tmp = b1 ^ b6;
+-	b1 = ror64(tmp, 44);
+-	b6 -= b1;
+-
+-	tmp = b7 ^ b2;
+-	b7 = ror64(tmp, 39);
+-	b2 -= b7;
+-
+-	tmp = b5 ^ b0;
+-	b5 = ror64(tmp, 36);
+-	b0 -= b5;
+-
+-	tmp = b3 ^ b6;
+-	b3 = ror64(tmp, 49);
+-	b6 -= b3;
+-
+-	tmp = b1 ^ b4;
+-	b1 = ror64(tmp, 17);
+-	b4 -= b1;
+-
+-	tmp = b3 ^ b0;
+-	b3 = ror64(tmp, 42);
+-	b0 -= b3;
+-
+-	tmp = b5 ^ b6;
+-	b5 = ror64(tmp, 14);
+-	b6 -= b5;
+-
+-	tmp = b7 ^ b4;
+-	b7 = ror64(tmp, 27);
+-	b4 -= b7;
+-
+-	tmp = b1 ^ b2;
+-	b1 = ror64(tmp, 33);
+-	b2 -= b1;
+-
+-	tmp = b7 ^ b6;
+-	b7 = ror64(tmp, 37);
+-	b6 -= b7 + k0 + t1;
+-	b7 -= k1 + 12;
+-
+-	tmp = b5 ^ b4;
+-	b5 = ror64(tmp, 19);
+-	b4 -= b5 + k7;
+-	b5 -= k8 + t0;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 36);
+-	b2 -= b3 + k5;
+-	b3 -= k6;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 46);
+-	b0 -= b1 + k3;
+-	b1 -= k4;
+-
+-	tmp = b3 ^ b4;
+-	b3 = ror64(tmp, 22);
+-	b4 -= b3;
+-
+-	tmp = b5 ^ b2;
+-	b5 = ror64(tmp, 56);
+-	b2 -= b5;
+-
+-	tmp = b7 ^ b0;
+-	b7 = ror64(tmp, 35);
+-	b0 -= b7;
+-
+-	tmp = b1 ^ b6;
+-	b1 = ror64(tmp, 8);
+-	b6 -= b1;
+-
+-	tmp = b7 ^ b2;
+-	b7 = ror64(tmp, 43);
+-	b2 -= b7;
+-
+-	tmp = b5 ^ b0;
+-	b5 = ror64(tmp, 39);
+-	b0 -= b5;
+-
+-	tmp = b3 ^ b6;
+-	b3 = ror64(tmp, 29);
+-	b6 -= b3;
+-
+-	tmp = b1 ^ b4;
+-	b1 = ror64(tmp, 25);
+-	b4 -= b1;
+-
+-	tmp = b3 ^ b0;
+-	b3 = ror64(tmp, 17);
+-	b0 -= b3;
+-
+-	tmp = b5 ^ b6;
+-	b5 = ror64(tmp, 10);
+-	b6 -= b5;
+-
+-	tmp = b7 ^ b4;
+-	b7 = ror64(tmp, 50);
+-	b4 -= b7;
+-
+-	tmp = b1 ^ b2;
+-	b1 = ror64(tmp, 13);
+-	b2 -= b1;
+-
+-	tmp = b7 ^ b6;
+-	b7 = ror64(tmp, 24);
+-	b6 -= b7 + k8 + t0;
+-	b7 -= k0 + 11;
+-
+-	tmp = b5 ^ b4;
+-	b5 = ror64(tmp, 34);
+-	b4 -= b5 + k6;
+-	b5 -= k7 + t2;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 30);
+-	b2 -= b3 + k4;
+-	b3 -= k5;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 39);
+-	b0 -= b1 + k2;
+-	b1 -= k3;
+-
+-	tmp = b3 ^ b4;
+-	b3 = ror64(tmp, 56);
+-	b4 -= b3;
+-
+-	tmp = b5 ^ b2;
+-	b5 = ror64(tmp, 54);
+-	b2 -= b5;
+-
+-	tmp = b7 ^ b0;
+-	b7 = ror64(tmp, 9);
+-	b0 -= b7;
+-
+-	tmp = b1 ^ b6;
+-	b1 = ror64(tmp, 44);
+-	b6 -= b1;
+-
+-	tmp = b7 ^ b2;
+-	b7 = ror64(tmp, 39);
+-	b2 -= b7;
+-
+-	tmp = b5 ^ b0;
+-	b5 = ror64(tmp, 36);
+-	b0 -= b5;
+-
+-	tmp = b3 ^ b6;
+-	b3 = ror64(tmp, 49);
+-	b6 -= b3;
+-
+-	tmp = b1 ^ b4;
+-	b1 = ror64(tmp, 17);
+-	b4 -= b1;
+-
+-	tmp = b3 ^ b0;
+-	b3 = ror64(tmp, 42);
+-	b0 -= b3;
+-
+-	tmp = b5 ^ b6;
+-	b5 = ror64(tmp, 14);
+-	b6 -= b5;
+-
+-	tmp = b7 ^ b4;
+-	b7 = ror64(tmp, 27);
+-	b4 -= b7;
+-
+-	tmp = b1 ^ b2;
+-	b1 = ror64(tmp, 33);
+-	b2 -= b1;
+-
+-	tmp = b7 ^ b6;
+-	b7 = ror64(tmp, 37);
+-	b6 -= b7 + k7 + t2;
+-	b7 -= k8 + 10;
+-
+-	tmp = b5 ^ b4;
+-	b5 = ror64(tmp, 19);
+-	b4 -= b5 + k5;
+-	b5 -= k6 + t1;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 36);
+-	b2 -= b3 + k3;
+-	b3 -= k4;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 46);
+-	b0 -= b1 + k1;
+-	b1 -= k2;
+-
+-	tmp = b3 ^ b4;
+-	b3 = ror64(tmp, 22);
+-	b4 -= b3;
+-
+-	tmp = b5 ^ b2;
+-	b5 = ror64(tmp, 56);
+-	b2 -= b5;
+-
+-	tmp = b7 ^ b0;
+-	b7 = ror64(tmp, 35);
+-	b0 -= b7;
+-
+-	tmp = b1 ^ b6;
+-	b1 = ror64(tmp, 8);
+-	b6 -= b1;
+-
+-	tmp = b7 ^ b2;
+-	b7 = ror64(tmp, 43);
+-	b2 -= b7;
+-
+-	tmp = b5 ^ b0;
+-	b5 = ror64(tmp, 39);
+-	b0 -= b5;
+-
+-	tmp = b3 ^ b6;
+-	b3 = ror64(tmp, 29);
+-	b6 -= b3;
+-
+-	tmp = b1 ^ b4;
+-	b1 = ror64(tmp, 25);
+-	b4 -= b1;
+-
+-	tmp = b3 ^ b0;
+-	b3 = ror64(tmp, 17);
+-	b0 -= b3;
+-
+-	tmp = b5 ^ b6;
+-	b5 = ror64(tmp, 10);
+-	b6 -= b5;
+-
+-	tmp = b7 ^ b4;
+-	b7 = ror64(tmp, 50);
+-	b4 -= b7;
+-
+-	tmp = b1 ^ b2;
+-	b1 = ror64(tmp, 13);
+-	b2 -= b1;
+-
+-	tmp = b7 ^ b6;
+-	b7 = ror64(tmp, 24);
+-	b6 -= b7 + k6 + t1;
+-	b7 -= k7 + 9;
+-
+-	tmp = b5 ^ b4;
+-	b5 = ror64(tmp, 34);
+-	b4 -= b5 + k4;
+-	b5 -= k5 + t0;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 30);
+-	b2 -= b3 + k2;
+-	b3 -= k3;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 39);
+-	b0 -= b1 + k0;
+-	b1 -= k1;
+-
+-	tmp = b3 ^ b4;
+-	b3 = ror64(tmp, 56);
+-	b4 -= b3;
+-
+-	tmp = b5 ^ b2;
+-	b5 = ror64(tmp, 54);
+-	b2 -= b5;
+-
+-	tmp = b7 ^ b0;
+-	b7 = ror64(tmp, 9);
+-	b0 -= b7;
+-
+-	tmp = b1 ^ b6;
+-	b1 = ror64(tmp, 44);
+-	b6 -= b1;
+-
+-	tmp = b7 ^ b2;
+-	b7 = ror64(tmp, 39);
+-	b2 -= b7;
+-
+-	tmp = b5 ^ b0;
+-	b5 = ror64(tmp, 36);
+-	b0 -= b5;
+-
+-	tmp = b3 ^ b6;
+-	b3 = ror64(tmp, 49);
+-	b6 -= b3;
+-
+-	tmp = b1 ^ b4;
+-	b1 = ror64(tmp, 17);
+-	b4 -= b1;
+-
+-	tmp = b3 ^ b0;
+-	b3 = ror64(tmp, 42);
+-	b0 -= b3;
+-
+-	tmp = b5 ^ b6;
+-	b5 = ror64(tmp, 14);
+-	b6 -= b5;
+-
+-	tmp = b7 ^ b4;
+-	b7 = ror64(tmp, 27);
+-	b4 -= b7;
+-
+-	tmp = b1 ^ b2;
+-	b1 = ror64(tmp, 33);
+-	b2 -= b1;
+-
+-	tmp = b7 ^ b6;
+-	b7 = ror64(tmp, 37);
+-	b6 -= b7 + k5 + t0;
+-	b7 -= k6 + 8;
+-
+-	tmp = b5 ^ b4;
+-	b5 = ror64(tmp, 19);
+-	b4 -= b5 + k3;
+-	b5 -= k4 + t2;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 36);
+-	b2 -= b3 + k1;
+-	b3 -= k2;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 46);
+-	b0 -= b1 + k8;
+-	b1 -= k0;
+-
+-	tmp = b3 ^ b4;
+-	b3 = ror64(tmp, 22);
+-	b4 -= b3;
+-
+-	tmp = b5 ^ b2;
+-	b5 = ror64(tmp, 56);
+-	b2 -= b5;
+-
+-	tmp = b7 ^ b0;
+-	b7 = ror64(tmp, 35);
+-	b0 -= b7;
+-
+-	tmp = b1 ^ b6;
+-	b1 = ror64(tmp, 8);
+-	b6 -= b1;
+-
+-	tmp = b7 ^ b2;
+-	b7 = ror64(tmp, 43);
+-	b2 -= b7;
+-
+-	tmp = b5 ^ b0;
+-	b5 = ror64(tmp, 39);
+-	b0 -= b5;
+-
+-	tmp = b3 ^ b6;
+-	b3 = ror64(tmp, 29);
+-	b6 -= b3;
+-
+-	tmp = b1 ^ b4;
+-	b1 = ror64(tmp, 25);
+-	b4 -= b1;
+-
+-	tmp = b3 ^ b0;
+-	b3 = ror64(tmp, 17);
+-	b0 -= b3;
+-
+-	tmp = b5 ^ b6;
+-	b5 = ror64(tmp, 10);
+-	b6 -= b5;
+-
+-	tmp = b7 ^ b4;
+-	b7 = ror64(tmp, 50);
+-	b4 -= b7;
+-
+-	tmp = b1 ^ b2;
+-	b1 = ror64(tmp, 13);
+-	b2 -= b1;
+-
+-	tmp = b7 ^ b6;
+-	b7 = ror64(tmp, 24);
+-	b6 -= b7 + k4 + t2;
+-	b7 -= k5 + 7;
+-
+-	tmp = b5 ^ b4;
+-	b5 = ror64(tmp, 34);
+-	b4 -= b5 + k2;
+-	b5 -= k3 + t1;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 30);
+-	b2 -= b3 + k0;
+-	b3 -= k1;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 39);
+-	b0 -= b1 + k7;
+-	b1 -= k8;
+-
+-	tmp = b3 ^ b4;
+-	b3 = ror64(tmp, 56);
+-	b4 -= b3;
+-
+-	tmp = b5 ^ b2;
+-	b5 = ror64(tmp, 54);
+-	b2 -= b5;
+-
+-	tmp = b7 ^ b0;
+-	b7 = ror64(tmp, 9);
+-	b0 -= b7;
+-
+-	tmp = b1 ^ b6;
+-	b1 = ror64(tmp, 44);
+-	b6 -= b1;
+-
+-	tmp = b7 ^ b2;
+-	b7 = ror64(tmp, 39);
+-	b2 -= b7;
+-
+-	tmp = b5 ^ b0;
+-	b5 = ror64(tmp, 36);
+-	b0 -= b5;
+-
+-	tmp = b3 ^ b6;
+-	b3 = ror64(tmp, 49);
+-	b6 -= b3;
+-
+-	tmp = b1 ^ b4;
+-	b1 = ror64(tmp, 17);
+-	b4 -= b1;
+-
+-	tmp = b3 ^ b0;
+-	b3 = ror64(tmp, 42);
+-	b0 -= b3;
+-
+-	tmp = b5 ^ b6;
+-	b5 = ror64(tmp, 14);
+-	b6 -= b5;
+-
+-	tmp = b7 ^ b4;
+-	b7 = ror64(tmp, 27);
+-	b4 -= b7;
+-
+-	tmp = b1 ^ b2;
+-	b1 = ror64(tmp, 33);
+-	b2 -= b1;
+-
+-	tmp = b7 ^ b6;
+-	b7 = ror64(tmp, 37);
+-	b6 -= b7 + k3 + t1;
+-	b7 -= k4 + 6;
+-
+-	tmp = b5 ^ b4;
+-	b5 = ror64(tmp, 19);
+-	b4 -= b5 + k1;
+-	b5 -= k2 + t0;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 36);
+-	b2 -= b3 + k8;
+-	b3 -= k0;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 46);
+-	b0 -= b1 + k6;
+-	b1 -= k7;
+-
+-	tmp = b3 ^ b4;
+-	b3 = ror64(tmp, 22);
+-	b4 -= b3;
+-
+-	tmp = b5 ^ b2;
+-	b5 = ror64(tmp, 56);
+-	b2 -= b5;
+-
+-	tmp = b7 ^ b0;
+-	b7 = ror64(tmp, 35);
+-	b0 -= b7;
+-
+-	tmp = b1 ^ b6;
+-	b1 = ror64(tmp, 8);
+-	b6 -= b1;
+-
+-	tmp = b7 ^ b2;
+-	b7 = ror64(tmp, 43);
+-	b2 -= b7;
+-
+-	tmp = b5 ^ b0;
+-	b5 = ror64(tmp, 39);
+-	b0 -= b5;
+-
+-	tmp = b3 ^ b6;
+-	b3 = ror64(tmp, 29);
+-	b6 -= b3;
+-
+-	tmp = b1 ^ b4;
+-	b1 = ror64(tmp, 25);
+-	b4 -= b1;
+-
+-	tmp = b3 ^ b0;
+-	b3 = ror64(tmp, 17);
+-	b0 -= b3;
+-
+-	tmp = b5 ^ b6;
+-	b5 = ror64(tmp, 10);
+-	b6 -= b5;
+-
+-	tmp = b7 ^ b4;
+-	b7 = ror64(tmp, 50);
+-	b4 -= b7;
+-
+-	tmp = b1 ^ b2;
+-	b1 = ror64(tmp, 13);
+-	b2 -= b1;
+-
+-	tmp = b7 ^ b6;
+-	b7 = ror64(tmp, 24);
+-	b6 -= b7 + k2 + t0;
+-	b7 -= k3 + 5;
+-
+-	tmp = b5 ^ b4;
+-	b5 = ror64(tmp, 34);
+-	b4 -= b5 + k0;
+-	b5 -= k1 + t2;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 30);
+-	b2 -= b3 + k7;
+-	b3 -= k8;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 39);
+-	b0 -= b1 + k5;
+-	b1 -= k6;
+-
+-	tmp = b3 ^ b4;
+-	b3 = ror64(tmp, 56);
+-	b4 -= b3;
+-
+-	tmp = b5 ^ b2;
+-	b5 = ror64(tmp, 54);
+-	b2 -= b5;
+-
+-	tmp = b7 ^ b0;
+-	b7 = ror64(tmp, 9);
+-	b0 -= b7;
+-
+-	tmp = b1 ^ b6;
+-	b1 = ror64(tmp, 44);
+-	b6 -= b1;
+-
+-	tmp = b7 ^ b2;
+-	b7 = ror64(tmp, 39);
+-	b2 -= b7;
+-
+-	tmp = b5 ^ b0;
+-	b5 = ror64(tmp, 36);
+-	b0 -= b5;
+-
+-	tmp = b3 ^ b6;
+-	b3 = ror64(tmp, 49);
+-	b6 -= b3;
+-
+-	tmp = b1 ^ b4;
+-	b1 = ror64(tmp, 17);
+-	b4 -= b1;
+-
+-	tmp = b3 ^ b0;
+-	b3 = ror64(tmp, 42);
+-	b0 -= b3;
+-
+-	tmp = b5 ^ b6;
+-	b5 = ror64(tmp, 14);
+-	b6 -= b5;
+-
+-	tmp = b7 ^ b4;
+-	b7 = ror64(tmp, 27);
+-	b4 -= b7;
+-
+-	tmp = b1 ^ b2;
+-	b1 = ror64(tmp, 33);
+-	b2 -= b1;
+-
+-	tmp = b7 ^ b6;
+-	b7 = ror64(tmp, 37);
+-	b6 -= b7 + k1 + t2;
+-	b7 -= k2 + 4;
+-
+-	tmp = b5 ^ b4;
+-	b5 = ror64(tmp, 19);
+-	b4 -= b5 + k8;
+-	b5 -= k0 + t1;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 36);
+-	b2 -= b3 + k6;
+-	b3 -= k7;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 46);
+-	b0 -= b1 + k4;
+-	b1 -= k5;
+-
+-	tmp = b3 ^ b4;
+-	b3 = ror64(tmp, 22);
+-	b4 -= b3;
+-
+-	tmp = b5 ^ b2;
+-	b5 = ror64(tmp, 56);
+-	b2 -= b5;
+-
+-	tmp = b7 ^ b0;
+-	b7 = ror64(tmp, 35);
+-	b0 -= b7;
+-
+-	tmp = b1 ^ b6;
+-	b1 = ror64(tmp, 8);
+-	b6 -= b1;
+-
+-	tmp = b7 ^ b2;
+-	b7 = ror64(tmp, 43);
+-	b2 -= b7;
+-
+-	tmp = b5 ^ b0;
+-	b5 = ror64(tmp, 39);
+-	b0 -= b5;
+-
+-	tmp = b3 ^ b6;
+-	b3 = ror64(tmp, 29);
+-	b6 -= b3;
+-
+-	tmp = b1 ^ b4;
+-	b1 = ror64(tmp, 25);
+-	b4 -= b1;
+-
+-	tmp = b3 ^ b0;
+-	b3 = ror64(tmp, 17);
+-	b0 -= b3;
+-
+-	tmp = b5 ^ b6;
+-	b5 = ror64(tmp, 10);
+-	b6 -= b5;
+-
+-	tmp = b7 ^ b4;
+-	b7 = ror64(tmp, 50);
+-	b4 -= b7;
+-
+-	tmp = b1 ^ b2;
+-	b1 = ror64(tmp, 13);
+-	b2 -= b1;
+-
+-	tmp = b7 ^ b6;
+-	b7 = ror64(tmp, 24);
+-	b6 -= b7 + k0 + t1;
+-	b7 -= k1 + 3;
+-
+-	tmp = b5 ^ b4;
+-	b5 = ror64(tmp, 34);
+-	b4 -= b5 + k7;
+-	b5 -= k8 + t0;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 30);
+-	b2 -= b3 + k5;
+-	b3 -= k6;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 39);
+-	b0 -= b1 + k3;
+-	b1 -= k4;
+-
+-	tmp = b3 ^ b4;
+-	b3 = ror64(tmp, 56);
+-	b4 -= b3;
+-
+-	tmp = b5 ^ b2;
+-	b5 = ror64(tmp, 54);
+-	b2 -= b5;
+-
+-	tmp = b7 ^ b0;
+-	b7 = ror64(tmp, 9);
+-	b0 -= b7;
+-
+-	tmp = b1 ^ b6;
+-	b1 = ror64(tmp, 44);
+-	b6 -= b1;
+-
+-	tmp = b7 ^ b2;
+-	b7 = ror64(tmp, 39);
+-	b2 -= b7;
+-
+-	tmp = b5 ^ b0;
+-	b5 = ror64(tmp, 36);
+-	b0 -= b5;
+-
+-	tmp = b3 ^ b6;
+-	b3 = ror64(tmp, 49);
+-	b6 -= b3;
+-
+-	tmp = b1 ^ b4;
+-	b1 = ror64(tmp, 17);
+-	b4 -= b1;
+-
+-	tmp = b3 ^ b0;
+-	b3 = ror64(tmp, 42);
+-	b0 -= b3;
+-
+-	tmp = b5 ^ b6;
+-	b5 = ror64(tmp, 14);
+-	b6 -= b5;
+-
+-	tmp = b7 ^ b4;
+-	b7 = ror64(tmp, 27);
+-	b4 -= b7;
+-
+-	tmp = b1 ^ b2;
+-	b1 = ror64(tmp, 33);
+-	b2 -= b1;
+-
+-	tmp = b7 ^ b6;
+-	b7 = ror64(tmp, 37);
+-	b6 -= b7 + k8 + t0;
+-	b7 -= k0 + 2;
+-
+-	tmp = b5 ^ b4;
+-	b5 = ror64(tmp, 19);
+-	b4 -= b5 + k6;
+-	b5 -= k7 + t2;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 36);
+-	b2 -= b3 + k4;
+-	b3 -= k5;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 46);
+-	b0 -= b1 + k2;
+-	b1 -= k3;
+-
+-	tmp = b3 ^ b4;
+-	b3 = ror64(tmp, 22);
+-	b4 -= b3;
+-
+-	tmp = b5 ^ b2;
+-	b5 = ror64(tmp, 56);
+-	b2 -= b5;
+-
+-	tmp = b7 ^ b0;
+-	b7 = ror64(tmp, 35);
+-	b0 -= b7;
+-
+-	tmp = b1 ^ b6;
+-	b1 = ror64(tmp, 8);
+-	b6 -= b1;
+-
+-	tmp = b7 ^ b2;
+-	b7 = ror64(tmp, 43);
+-	b2 -= b7;
+-
+-	tmp = b5 ^ b0;
+-	b5 = ror64(tmp, 39);
+-	b0 -= b5;
+-
+-	tmp = b3 ^ b6;
+-	b3 = ror64(tmp, 29);
+-	b6 -= b3;
+-
+-	tmp = b1 ^ b4;
+-	b1 = ror64(tmp, 25);
+-	b4 -= b1;
+-
+-	tmp = b3 ^ b0;
+-	b3 = ror64(tmp, 17);
+-	b0 -= b3;
+-
+-	tmp = b5 ^ b6;
+-	b5 = ror64(tmp, 10);
+-	b6 -= b5;
+-
+-	tmp = b7 ^ b4;
+-	b7 = ror64(tmp, 50);
+-	b4 -= b7;
+-
+-	tmp = b1 ^ b2;
+-	b1 = ror64(tmp, 13);
+-	b2 -= b1;
+-
+-	tmp = b7 ^ b6;
+-	b7 = ror64(tmp, 24);
+-	b6 -= b7 + k7 + t2;
+-	b7 -= k8 + 1;
+-
+-	tmp = b5 ^ b4;
+-	b5 = ror64(tmp, 34);
+-	b4 -= b5 + k5;
+-	b5 -= k6 + t1;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 30);
+-	b2 -= b3 + k3;
+-	b3 -= k4;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 39);
+-	b0 -= b1 + k1;
+-	b1 -= k2;
+-
+-	tmp = b3 ^ b4;
+-	b3 = ror64(tmp, 56);
+-	b4 -= b3;
+-
+-	tmp = b5 ^ b2;
+-	b5 = ror64(tmp, 54);
+-	b2 -= b5;
+-
+-	tmp = b7 ^ b0;
+-	b7 = ror64(tmp, 9);
+-	b0 -= b7;
+-
+-	tmp = b1 ^ b6;
+-	b1 = ror64(tmp, 44);
+-	b6 -= b1;
+-
+-	tmp = b7 ^ b2;
+-	b7 = ror64(tmp, 39);
+-	b2 -= b7;
+-
+-	tmp = b5 ^ b0;
+-	b5 = ror64(tmp, 36);
+-	b0 -= b5;
+-
+-	tmp = b3 ^ b6;
+-	b3 = ror64(tmp, 49);
+-	b6 -= b3;
+-
+-	tmp = b1 ^ b4;
+-	b1 = ror64(tmp, 17);
+-	b4 -= b1;
+-
+-	tmp = b3 ^ b0;
+-	b3 = ror64(tmp, 42);
+-	b0 -= b3;
+-
+-	tmp = b5 ^ b6;
+-	b5 = ror64(tmp, 14);
+-	b6 -= b5;
+-
+-	tmp = b7 ^ b4;
+-	b7 = ror64(tmp, 27);
+-	b4 -= b7;
+-
+-	tmp = b1 ^ b2;
+-	b1 = ror64(tmp, 33);
+-	b2 -= b1;
+-
+-	tmp = b7 ^ b6;
+-	b7 = ror64(tmp, 37);
+-	b6 -= b7 + k6 + t1;
+-	b7 -= k7;
+-
+-	tmp = b5 ^ b4;
+-	b5 = ror64(tmp, 19);
+-	b4 -= b5 + k4;
+-	b5 -= k5 + t0;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 36);
+-	b2 -= b3 + k2;
+-	b3 -= k3;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 46);
+-	b0 -= b1 + k0;
+-	b1 -= k1;
+-
+-	output[0] = b0;
+-	output[1] = b1;
+-	output[2] = b2;
+-	output[3] = b3;
+-
+-	output[7] = b7;
+-	output[6] = b6;
+-	output[5] = b5;
+-	output[4] = b4;
+-}
+-
+-void threefish_encrypt_1024(struct threefish_key *key_ctx, u64 *input,
+-			    u64 *output)
+-{
+-	u64 b0 = input[0], b1 = input[1],
+-	    b2 = input[2], b3 = input[3],
+-	    b4 = input[4], b5 = input[5],
+-	    b6 = input[6], b7 = input[7],
+-	    b8 = input[8], b9 = input[9],
+-	    b10 = input[10], b11 = input[11],
+-	    b12 = input[12], b13 = input[13],
+-	    b14 = input[14], b15 = input[15];
+-	u64 k0 = key_ctx->key[0], k1 = key_ctx->key[1],
+-	    k2 = key_ctx->key[2], k3 = key_ctx->key[3],
+-	    k4 = key_ctx->key[4], k5 = key_ctx->key[5],
+-	    k6 = key_ctx->key[6], k7 = key_ctx->key[7],
+-	    k8 = key_ctx->key[8], k9 = key_ctx->key[9],
+-	    k10 = key_ctx->key[10], k11 = key_ctx->key[11],
+-	    k12 = key_ctx->key[12], k13 = key_ctx->key[13],
+-	    k14 = key_ctx->key[14], k15 = key_ctx->key[15],
+-	    k16 = key_ctx->key[16];
+-	u64 t0 = key_ctx->tweak[0], t1 = key_ctx->tweak[1],
+-	    t2 = key_ctx->tweak[2];
+-
+-	b1 += k1;
+-	b0 += b1 + k0;
+-	b1 = rol64(b1, 24) ^ b0;
+-
+-	b3 += k3;
+-	b2 += b3 + k2;
+-	b3 = rol64(b3, 13) ^ b2;
+-
+-	b5 += k5;
+-	b4 += b5 + k4;
+-	b5 = rol64(b5, 8) ^ b4;
+-
+-	b7 += k7;
+-	b6 += b7 + k6;
+-	b7 = rol64(b7, 47) ^ b6;
+-
+-	b9 += k9;
+-	b8 += b9 + k8;
+-	b9 = rol64(b9, 8) ^ b8;
+-
+-	b11 += k11;
+-	b10 += b11 + k10;
+-	b11 = rol64(b11, 17) ^ b10;
+-
+-	b13 += k13 + t0;
+-	b12 += b13 + k12;
+-	b13 = rol64(b13, 22) ^ b12;
+-
+-	b15 += k15;
+-	b14 += b15 + k14 + t1;
+-	b15 = rol64(b15, 37) ^ b14;
+-
+-	b0 += b9;
+-	b9 = rol64(b9, 38) ^ b0;
+-
+-	b2 += b13;
+-	b13 = rol64(b13, 19) ^ b2;
+-
+-	b6 += b11;
+-	b11 = rol64(b11, 10) ^ b6;
+-
+-	b4 += b15;
+-	b15 = rol64(b15, 55) ^ b4;
+-
+-	b10 += b7;
+-	b7 = rol64(b7, 49) ^ b10;
+-
+-	b12 += b3;
+-	b3 = rol64(b3, 18) ^ b12;
+-
+-	b14 += b5;
+-	b5 = rol64(b5, 23) ^ b14;
+-
+-	b8 += b1;
+-	b1 = rol64(b1, 52) ^ b8;
+-
+-	b0 += b7;
+-	b7 = rol64(b7, 33) ^ b0;
+-
+-	b2 += b5;
+-	b5 = rol64(b5, 4) ^ b2;
+-
+-	b4 += b3;
+-	b3 = rol64(b3, 51) ^ b4;
+-
+-	b6 += b1;
+-	b1 = rol64(b1, 13) ^ b6;
+-
+-	b12 += b15;
+-	b15 = rol64(b15, 34) ^ b12;
+-
+-	b14 += b13;
+-	b13 = rol64(b13, 41) ^ b14;
+-
+-	b8 += b11;
+-	b11 = rol64(b11, 59) ^ b8;
+-
+-	b10 += b9;
+-	b9 = rol64(b9, 17) ^ b10;
+-
+-	b0 += b15;
+-	b15 = rol64(b15, 5) ^ b0;
+-
+-	b2 += b11;
+-	b11 = rol64(b11, 20) ^ b2;
+-
+-	b6 += b13;
+-	b13 = rol64(b13, 48) ^ b6;
+-
+-	b4 += b9;
+-	b9 = rol64(b9, 41) ^ b4;
+-
+-	b14 += b1;
+-	b1 = rol64(b1, 47) ^ b14;
+-
+-	b8 += b5;
+-	b5 = rol64(b5, 28) ^ b8;
+-
+-	b10 += b3;
+-	b3 = rol64(b3, 16) ^ b10;
+-
+-	b12 += b7;
+-	b7 = rol64(b7, 25) ^ b12;
+-
+-	b1 += k2;
+-	b0 += b1 + k1;
+-	b1 = rol64(b1, 41) ^ b0;
+-
+-	b3 += k4;
+-	b2 += b3 + k3;
+-	b3 = rol64(b3, 9) ^ b2;
+-
+-	b5 += k6;
+-	b4 += b5 + k5;
+-	b5 = rol64(b5, 37) ^ b4;
+-
+-	b7 += k8;
+-	b6 += b7 + k7;
+-	b7 = rol64(b7, 31) ^ b6;
+-
+-	b9 += k10;
+-	b8 += b9 + k9;
+-	b9 = rol64(b9, 12) ^ b8;
+-
+-	b11 += k12;
+-	b10 += b11 + k11;
+-	b11 = rol64(b11, 47) ^ b10;
+-
+-	b13 += k14 + t1;
+-	b12 += b13 + k13;
+-	b13 = rol64(b13, 44) ^ b12;
+-
+-	b15 += k16 + 1;
+-	b14 += b15 + k15 + t2;
+-	b15 = rol64(b15, 30) ^ b14;
+-
+-	b0 += b9;
+-	b9 = rol64(b9, 16) ^ b0;
+-
+-	b2 += b13;
+-	b13 = rol64(b13, 34) ^ b2;
+-
+-	b6 += b11;
+-	b11 = rol64(b11, 56) ^ b6;
+-
+-	b4 += b15;
+-	b15 = rol64(b15, 51) ^ b4;
+-
+-	b10 += b7;
+-	b7 = rol64(b7, 4) ^ b10;
+-
+-	b12 += b3;
+-	b3 = rol64(b3, 53) ^ b12;
+-
+-	b14 += b5;
+-	b5 = rol64(b5, 42) ^ b14;
+-
+-	b8 += b1;
+-	b1 = rol64(b1, 41) ^ b8;
+-
+-	b0 += b7;
+-	b7 = rol64(b7, 31) ^ b0;
+-
+-	b2 += b5;
+-	b5 = rol64(b5, 44) ^ b2;
+-
+-	b4 += b3;
+-	b3 = rol64(b3, 47) ^ b4;
+-
+-	b6 += b1;
+-	b1 = rol64(b1, 46) ^ b6;
+-
+-	b12 += b15;
+-	b15 = rol64(b15, 19) ^ b12;
+-
+-	b14 += b13;
+-	b13 = rol64(b13, 42) ^ b14;
+-
+-	b8 += b11;
+-	b11 = rol64(b11, 44) ^ b8;
+-
+-	b10 += b9;
+-	b9 = rol64(b9, 25) ^ b10;
+-
+-	b0 += b15;
+-	b15 = rol64(b15, 9) ^ b0;
+-
+-	b2 += b11;
+-	b11 = rol64(b11, 48) ^ b2;
+-
+-	b6 += b13;
+-	b13 = rol64(b13, 35) ^ b6;
+-
+-	b4 += b9;
+-	b9 = rol64(b9, 52) ^ b4;
+-
+-	b14 += b1;
+-	b1 = rol64(b1, 23) ^ b14;
+-
+-	b8 += b5;
+-	b5 = rol64(b5, 31) ^ b8;
+-
+-	b10 += b3;
+-	b3 = rol64(b3, 37) ^ b10;
+-
+-	b12 += b7;
+-	b7 = rol64(b7, 20) ^ b12;
+-
+-	b1 += k3;
+-	b0 += b1 + k2;
+-	b1 = rol64(b1, 24) ^ b0;
+-
+-	b3 += k5;
+-	b2 += b3 + k4;
+-	b3 = rol64(b3, 13) ^ b2;
+-
+-	b5 += k7;
+-	b4 += b5 + k6;
+-	b5 = rol64(b5, 8) ^ b4;
+-
+-	b7 += k9;
+-	b6 += b7 + k8;
+-	b7 = rol64(b7, 47) ^ b6;
+-
+-	b9 += k11;
+-	b8 += b9 + k10;
+-	b9 = rol64(b9, 8) ^ b8;
+-
+-	b11 += k13;
+-	b10 += b11 + k12;
+-	b11 = rol64(b11, 17) ^ b10;
+-
+-	b13 += k15 + t2;
+-	b12 += b13 + k14;
+-	b13 = rol64(b13, 22) ^ b12;
+-
+-	b15 += k0 + 2;
+-	b14 += b15 + k16 + t0;
+-	b15 = rol64(b15, 37) ^ b14;
+-
+-	b0 += b9;
+-	b9 = rol64(b9, 38) ^ b0;
+-
+-	b2 += b13;
+-	b13 = rol64(b13, 19) ^ b2;
+-
+-	b6 += b11;
+-	b11 = rol64(b11, 10) ^ b6;
+-
+-	b4 += b15;
+-	b15 = rol64(b15, 55) ^ b4;
+-
+-	b10 += b7;
+-	b7 = rol64(b7, 49) ^ b10;
+-
+-	b12 += b3;
+-	b3 = rol64(b3, 18) ^ b12;
+-
+-	b14 += b5;
+-	b5 = rol64(b5, 23) ^ b14;
+-
+-	b8 += b1;
+-	b1 = rol64(b1, 52) ^ b8;
+-
+-	b0 += b7;
+-	b7 = rol64(b7, 33) ^ b0;
+-
+-	b2 += b5;
+-	b5 = rol64(b5, 4) ^ b2;
+-
+-	b4 += b3;
+-	b3 = rol64(b3, 51) ^ b4;
+-
+-	b6 += b1;
+-	b1 = rol64(b1, 13) ^ b6;
+-
+-	b12 += b15;
+-	b15 = rol64(b15, 34) ^ b12;
+-
+-	b14 += b13;
+-	b13 = rol64(b13, 41) ^ b14;
+-
+-	b8 += b11;
+-	b11 = rol64(b11, 59) ^ b8;
+-
+-	b10 += b9;
+-	b9 = rol64(b9, 17) ^ b10;
+-
+-	b0 += b15;
+-	b15 = rol64(b15, 5) ^ b0;
+-
+-	b2 += b11;
+-	b11 = rol64(b11, 20) ^ b2;
+-
+-	b6 += b13;
+-	b13 = rol64(b13, 48) ^ b6;
+-
+-	b4 += b9;
+-	b9 = rol64(b9, 41) ^ b4;
+-
+-	b14 += b1;
+-	b1 = rol64(b1, 47) ^ b14;
+-
+-	b8 += b5;
+-	b5 = rol64(b5, 28) ^ b8;
+-
+-	b10 += b3;
+-	b3 = rol64(b3, 16) ^ b10;
+-
+-	b12 += b7;
+-	b7 = rol64(b7, 25) ^ b12;
+-
+-	b1 += k4;
+-	b0 += b1 + k3;
+-	b1 = rol64(b1, 41) ^ b0;
+-
+-	b3 += k6;
+-	b2 += b3 + k5;
+-	b3 = rol64(b3, 9) ^ b2;
+-
+-	b5 += k8;
+-	b4 += b5 + k7;
+-	b5 = rol64(b5, 37) ^ b4;
+-
+-	b7 += k10;
+-	b6 += b7 + k9;
+-	b7 = rol64(b7, 31) ^ b6;
+-
+-	b9 += k12;
+-	b8 += b9 + k11;
+-	b9 = rol64(b9, 12) ^ b8;
+-
+-	b11 += k14;
+-	b10 += b11 + k13;
+-	b11 = rol64(b11, 47) ^ b10;
+-
+-	b13 += k16 + t0;
+-	b12 += b13 + k15;
+-	b13 = rol64(b13, 44) ^ b12;
+-
+-	b15 += k1 + 3;
+-	b14 += b15 + k0 + t1;
+-	b15 = rol64(b15, 30) ^ b14;
+-
+-	b0 += b9;
+-	b9 = rol64(b9, 16) ^ b0;
+-
+-	b2 += b13;
+-	b13 = rol64(b13, 34) ^ b2;
+-
+-	b6 += b11;
+-	b11 = rol64(b11, 56) ^ b6;
+-
+-	b4 += b15;
+-	b15 = rol64(b15, 51) ^ b4;
+-
+-	b10 += b7;
+-	b7 = rol64(b7, 4) ^ b10;
+-
+-	b12 += b3;
+-	b3 = rol64(b3, 53) ^ b12;
+-
+-	b14 += b5;
+-	b5 = rol64(b5, 42) ^ b14;
+-
+-	b8 += b1;
+-	b1 = rol64(b1, 41) ^ b8;
+-
+-	b0 += b7;
+-	b7 = rol64(b7, 31) ^ b0;
+-
+-	b2 += b5;
+-	b5 = rol64(b5, 44) ^ b2;
+-
+-	b4 += b3;
+-	b3 = rol64(b3, 47) ^ b4;
+-
+-	b6 += b1;
+-	b1 = rol64(b1, 46) ^ b6;
+-
+-	b12 += b15;
+-	b15 = rol64(b15, 19) ^ b12;
+-
+-	b14 += b13;
+-	b13 = rol64(b13, 42) ^ b14;
+-
+-	b8 += b11;
+-	b11 = rol64(b11, 44) ^ b8;
+-
+-	b10 += b9;
+-	b9 = rol64(b9, 25) ^ b10;
+-
+-	b0 += b15;
+-	b15 = rol64(b15, 9) ^ b0;
+-
+-	b2 += b11;
+-	b11 = rol64(b11, 48) ^ b2;
+-
+-	b6 += b13;
+-	b13 = rol64(b13, 35) ^ b6;
+-
+-	b4 += b9;
+-	b9 = rol64(b9, 52) ^ b4;
+-
+-	b14 += b1;
+-	b1 = rol64(b1, 23) ^ b14;
+-
+-	b8 += b5;
+-	b5 = rol64(b5, 31) ^ b8;
+-
+-	b10 += b3;
+-	b3 = rol64(b3, 37) ^ b10;
+-
+-	b12 += b7;
+-	b7 = rol64(b7, 20) ^ b12;
+-
+-	b1 += k5;
+-	b0 += b1 + k4;
+-	b1 = rol64(b1, 24) ^ b0;
+-
+-	b3 += k7;
+-	b2 += b3 + k6;
+-	b3 = rol64(b3, 13) ^ b2;
+-
+-	b5 += k9;
+-	b4 += b5 + k8;
+-	b5 = rol64(b5, 8) ^ b4;
+-
+-	b7 += k11;
+-	b6 += b7 + k10;
+-	b7 = rol64(b7, 47) ^ b6;
+-
+-	b9 += k13;
+-	b8 += b9 + k12;
+-	b9 = rol64(b9, 8) ^ b8;
+-
+-	b11 += k15;
+-	b10 += b11 + k14;
+-	b11 = rol64(b11, 17) ^ b10;
+-
+-	b13 += k0 + t1;
+-	b12 += b13 + k16;
+-	b13 = rol64(b13, 22) ^ b12;
+-
+-	b15 += k2 + 4;
+-	b14 += b15 + k1 + t2;
+-	b15 = rol64(b15, 37) ^ b14;
+-
+-	b0 += b9;
+-	b9 = rol64(b9, 38) ^ b0;
+-
+-	b2 += b13;
+-	b13 = rol64(b13, 19) ^ b2;
+-
+-	b6 += b11;
+-	b11 = rol64(b11, 10) ^ b6;
+-
+-	b4 += b15;
+-	b15 = rol64(b15, 55) ^ b4;
+-
+-	b10 += b7;
+-	b7 = rol64(b7, 49) ^ b10;
+-
+-	b12 += b3;
+-	b3 = rol64(b3, 18) ^ b12;
+-
+-	b14 += b5;
+-	b5 = rol64(b5, 23) ^ b14;
+-
+-	b8 += b1;
+-	b1 = rol64(b1, 52) ^ b8;
+-
+-	b0 += b7;
+-	b7 = rol64(b7, 33) ^ b0;
+-
+-	b2 += b5;
+-	b5 = rol64(b5, 4) ^ b2;
+-
+-	b4 += b3;
+-	b3 = rol64(b3, 51) ^ b4;
+-
+-	b6 += b1;
+-	b1 = rol64(b1, 13) ^ b6;
+-
+-	b12 += b15;
+-	b15 = rol64(b15, 34) ^ b12;
+-
+-	b14 += b13;
+-	b13 = rol64(b13, 41) ^ b14;
+-
+-	b8 += b11;
+-	b11 = rol64(b11, 59) ^ b8;
+-
+-	b10 += b9;
+-	b9 = rol64(b9, 17) ^ b10;
+-
+-	b0 += b15;
+-	b15 = rol64(b15, 5) ^ b0;
+-
+-	b2 += b11;
+-	b11 = rol64(b11, 20) ^ b2;
+-
+-	b6 += b13;
+-	b13 = rol64(b13, 48) ^ b6;
+-
+-	b4 += b9;
+-	b9 = rol64(b9, 41) ^ b4;
+-
+-	b14 += b1;
+-	b1 = rol64(b1, 47) ^ b14;
+-
+-	b8 += b5;
+-	b5 = rol64(b5, 28) ^ b8;
+-
+-	b10 += b3;
+-	b3 = rol64(b3, 16) ^ b10;
+-
+-	b12 += b7;
+-	b7 = rol64(b7, 25) ^ b12;
+-
+-	b1 += k6;
+-	b0 += b1 + k5;
+-	b1 = rol64(b1, 41) ^ b0;
+-
+-	b3 += k8;
+-	b2 += b3 + k7;
+-	b3 = rol64(b3, 9) ^ b2;
+-
+-	b5 += k10;
+-	b4 += b5 + k9;
+-	b5 = rol64(b5, 37) ^ b4;
+-
+-	b7 += k12;
+-	b6 += b7 + k11;
+-	b7 = rol64(b7, 31) ^ b6;
+-
+-	b9 += k14;
+-	b8 += b9 + k13;
+-	b9 = rol64(b9, 12) ^ b8;
+-
+-	b11 += k16;
+-	b10 += b11 + k15;
+-	b11 = rol64(b11, 47) ^ b10;
+-
+-	b13 += k1 + t2;
+-	b12 += b13 + k0;
+-	b13 = rol64(b13, 44) ^ b12;
+-
+-	b15 += k3 + 5;
+-	b14 += b15 + k2 + t0;
+-	b15 = rol64(b15, 30) ^ b14;
+-
+-	b0 += b9;
+-	b9 = rol64(b9, 16) ^ b0;
+-
+-	b2 += b13;
+-	b13 = rol64(b13, 34) ^ b2;
+-
+-	b6 += b11;
+-	b11 = rol64(b11, 56) ^ b6;
+-
+-	b4 += b15;
+-	b15 = rol64(b15, 51) ^ b4;
+-
+-	b10 += b7;
+-	b7 = rol64(b7, 4) ^ b10;
+-
+-	b12 += b3;
+-	b3 = rol64(b3, 53) ^ b12;
+-
+-	b14 += b5;
+-	b5 = rol64(b5, 42) ^ b14;
+-
+-	b8 += b1;
+-	b1 = rol64(b1, 41) ^ b8;
+-
+-	b0 += b7;
+-	b7 = rol64(b7, 31) ^ b0;
+-
+-	b2 += b5;
+-	b5 = rol64(b5, 44) ^ b2;
+-
+-	b4 += b3;
+-	b3 = rol64(b3, 47) ^ b4;
+-
+-	b6 += b1;
+-	b1 = rol64(b1, 46) ^ b6;
+-
+-	b12 += b15;
+-	b15 = rol64(b15, 19) ^ b12;
+-
+-	b14 += b13;
+-	b13 = rol64(b13, 42) ^ b14;
+-
+-	b8 += b11;
+-	b11 = rol64(b11, 44) ^ b8;
+-
+-	b10 += b9;
+-	b9 = rol64(b9, 25) ^ b10;
+-
+-	b0 += b15;
+-	b15 = rol64(b15, 9) ^ b0;
+-
+-	b2 += b11;
+-	b11 = rol64(b11, 48) ^ b2;
+-
+-	b6 += b13;
+-	b13 = rol64(b13, 35) ^ b6;
+-
+-	b4 += b9;
+-	b9 = rol64(b9, 52) ^ b4;
+-
+-	b14 += b1;
+-	b1 = rol64(b1, 23) ^ b14;
+-
+-	b8 += b5;
+-	b5 = rol64(b5, 31) ^ b8;
+-
+-	b10 += b3;
+-	b3 = rol64(b3, 37) ^ b10;
+-
+-	b12 += b7;
+-	b7 = rol64(b7, 20) ^ b12;
+-
+-	b1 += k7;
+-	b0 += b1 + k6;
+-	b1 = rol64(b1, 24) ^ b0;
+-
+-	b3 += k9;
+-	b2 += b3 + k8;
+-	b3 = rol64(b3, 13) ^ b2;
+-
+-	b5 += k11;
+-	b4 += b5 + k10;
+-	b5 = rol64(b5, 8) ^ b4;
+-
+-	b7 += k13;
+-	b6 += b7 + k12;
+-	b7 = rol64(b7, 47) ^ b6;
+-
+-	b9 += k15;
+-	b8 += b9 + k14;
+-	b9 = rol64(b9, 8) ^ b8;
+-
+-	b11 += k0;
+-	b10 += b11 + k16;
+-	b11 = rol64(b11, 17) ^ b10;
+-
+-	b13 += k2 + t0;
+-	b12 += b13 + k1;
+-	b13 = rol64(b13, 22) ^ b12;
+-
+-	b15 += k4 + 6;
+-	b14 += b15 + k3 + t1;
+-	b15 = rol64(b15, 37) ^ b14;
+-
+-	b0 += b9;
+-	b9 = rol64(b9, 38) ^ b0;
+-
+-	b2 += b13;
+-	b13 = rol64(b13, 19) ^ b2;
+-
+-	b6 += b11;
+-	b11 = rol64(b11, 10) ^ b6;
+-
+-	b4 += b15;
+-	b15 = rol64(b15, 55) ^ b4;
+-
+-	b10 += b7;
+-	b7 = rol64(b7, 49) ^ b10;
+-
+-	b12 += b3;
+-	b3 = rol64(b3, 18) ^ b12;
+-
+-	b14 += b5;
+-	b5 = rol64(b5, 23) ^ b14;
+-
+-	b8 += b1;
+-	b1 = rol64(b1, 52) ^ b8;
+-
+-	b0 += b7;
+-	b7 = rol64(b7, 33) ^ b0;
+-
+-	b2 += b5;
+-	b5 = rol64(b5, 4) ^ b2;
+-
+-	b4 += b3;
+-	b3 = rol64(b3, 51) ^ b4;
+-
+-	b6 += b1;
+-	b1 = rol64(b1, 13) ^ b6;
+-
+-	b12 += b15;
+-	b15 = rol64(b15, 34) ^ b12;
+-
+-	b14 += b13;
+-	b13 = rol64(b13, 41) ^ b14;
+-
+-	b8 += b11;
+-	b11 = rol64(b11, 59) ^ b8;
+-
+-	b10 += b9;
+-	b9 = rol64(b9, 17) ^ b10;
+-
+-	b0 += b15;
+-	b15 = rol64(b15, 5) ^ b0;
+-
+-	b2 += b11;
+-	b11 = rol64(b11, 20) ^ b2;
+-
+-	b6 += b13;
+-	b13 = rol64(b13, 48) ^ b6;
+-
+-	b4 += b9;
+-	b9 = rol64(b9, 41) ^ b4;
+-
+-	b14 += b1;
+-	b1 = rol64(b1, 47) ^ b14;
+-
+-	b8 += b5;
+-	b5 = rol64(b5, 28) ^ b8;
+-
+-	b10 += b3;
+-	b3 = rol64(b3, 16) ^ b10;
+-
+-	b12 += b7;
+-	b7 = rol64(b7, 25) ^ b12;
+-
+-	b1 += k8;
+-	b0 += b1 + k7;
+-	b1 = rol64(b1, 41) ^ b0;
+-
+-	b3 += k10;
+-	b2 += b3 + k9;
+-	b3 = rol64(b3, 9) ^ b2;
+-
+-	b5 += k12;
+-	b4 += b5 + k11;
+-	b5 = rol64(b5, 37) ^ b4;
+-
+-	b7 += k14;
+-	b6 += b7 + k13;
+-	b7 = rol64(b7, 31) ^ b6;
+-
+-	b9 += k16;
+-	b8 += b9 + k15;
+-	b9 = rol64(b9, 12) ^ b8;
+-
+-	b11 += k1;
+-	b10 += b11 + k0;
+-	b11 = rol64(b11, 47) ^ b10;
+-
+-	b13 += k3 + t1;
+-	b12 += b13 + k2;
+-	b13 = rol64(b13, 44) ^ b12;
+-
+-	b15 += k5 + 7;
+-	b14 += b15 + k4 + t2;
+-	b15 = rol64(b15, 30) ^ b14;
+-
+-	b0 += b9;
+-	b9 = rol64(b9, 16) ^ b0;
+-
+-	b2 += b13;
+-	b13 = rol64(b13, 34) ^ b2;
+-
+-	b6 += b11;
+-	b11 = rol64(b11, 56) ^ b6;
+-
+-	b4 += b15;
+-	b15 = rol64(b15, 51) ^ b4;
+-
+-	b10 += b7;
+-	b7 = rol64(b7, 4) ^ b10;
+-
+-	b12 += b3;
+-	b3 = rol64(b3, 53) ^ b12;
+-
+-	b14 += b5;
+-	b5 = rol64(b5, 42) ^ b14;
+-
+-	b8 += b1;
+-	b1 = rol64(b1, 41) ^ b8;
+-
+-	b0 += b7;
+-	b7 = rol64(b7, 31) ^ b0;
+-
+-	b2 += b5;
+-	b5 = rol64(b5, 44) ^ b2;
+-
+-	b4 += b3;
+-	b3 = rol64(b3, 47) ^ b4;
+-
+-	b6 += b1;
+-	b1 = rol64(b1, 46) ^ b6;
+-
+-	b12 += b15;
+-	b15 = rol64(b15, 19) ^ b12;
+-
+-	b14 += b13;
+-	b13 = rol64(b13, 42) ^ b14;
+-
+-	b8 += b11;
+-	b11 = rol64(b11, 44) ^ b8;
+-
+-	b10 += b9;
+-	b9 = rol64(b9, 25) ^ b10;
+-
+-	b0 += b15;
+-	b15 = rol64(b15, 9) ^ b0;
+-
+-	b2 += b11;
+-	b11 = rol64(b11, 48) ^ b2;
+-
+-	b6 += b13;
+-	b13 = rol64(b13, 35) ^ b6;
+-
+-	b4 += b9;
+-	b9 = rol64(b9, 52) ^ b4;
+-
+-	b14 += b1;
+-	b1 = rol64(b1, 23) ^ b14;
+-
+-	b8 += b5;
+-	b5 = rol64(b5, 31) ^ b8;
+-
+-	b10 += b3;
+-	b3 = rol64(b3, 37) ^ b10;
+-
+-	b12 += b7;
+-	b7 = rol64(b7, 20) ^ b12;
+-
+-	b1 += k9;
+-	b0 += b1 + k8;
+-	b1 = rol64(b1, 24) ^ b0;
+-
+-	b3 += k11;
+-	b2 += b3 + k10;
+-	b3 = rol64(b3, 13) ^ b2;
+-
+-	b5 += k13;
+-	b4 += b5 + k12;
+-	b5 = rol64(b5, 8) ^ b4;
+-
+-	b7 += k15;
+-	b6 += b7 + k14;
+-	b7 = rol64(b7, 47) ^ b6;
+-
+-	b9 += k0;
+-	b8 += b9 + k16;
+-	b9 = rol64(b9, 8) ^ b8;
+-
+-	b11 += k2;
+-	b10 += b11 + k1;
+-	b11 = rol64(b11, 17) ^ b10;
+-
+-	b13 += k4 + t2;
+-	b12 += b13 + k3;
+-	b13 = rol64(b13, 22) ^ b12;
+-
+-	b15 += k6 + 8;
+-	b14 += b15 + k5 + t0;
+-	b15 = rol64(b15, 37) ^ b14;
+-
+-	b0 += b9;
+-	b9 = rol64(b9, 38) ^ b0;
+-
+-	b2 += b13;
+-	b13 = rol64(b13, 19) ^ b2;
+-
+-	b6 += b11;
+-	b11 = rol64(b11, 10) ^ b6;
+-
+-	b4 += b15;
+-	b15 = rol64(b15, 55) ^ b4;
+-
+-	b10 += b7;
+-	b7 = rol64(b7, 49) ^ b10;
+-
+-	b12 += b3;
+-	b3 = rol64(b3, 18) ^ b12;
+-
+-	b14 += b5;
+-	b5 = rol64(b5, 23) ^ b14;
+-
+-	b8 += b1;
+-	b1 = rol64(b1, 52) ^ b8;
+-
+-	b0 += b7;
+-	b7 = rol64(b7, 33) ^ b0;
+-
+-	b2 += b5;
+-	b5 = rol64(b5, 4) ^ b2;
+-
+-	b4 += b3;
+-	b3 = rol64(b3, 51) ^ b4;
+-
+-	b6 += b1;
+-	b1 = rol64(b1, 13) ^ b6;
+-
+-	b12 += b15;
+-	b15 = rol64(b15, 34) ^ b12;
+-
+-	b14 += b13;
+-	b13 = rol64(b13, 41) ^ b14;
+-
+-	b8 += b11;
+-	b11 = rol64(b11, 59) ^ b8;
+-
+-	b10 += b9;
+-	b9 = rol64(b9, 17) ^ b10;
+-
+-	b0 += b15;
+-	b15 = rol64(b15, 5) ^ b0;
+-
+-	b2 += b11;
+-	b11 = rol64(b11, 20) ^ b2;
+-
+-	b6 += b13;
+-	b13 = rol64(b13, 48) ^ b6;
+-
+-	b4 += b9;
+-	b9 = rol64(b9, 41) ^ b4;
+-
+-	b14 += b1;
+-	b1 = rol64(b1, 47) ^ b14;
+-
+-	b8 += b5;
+-	b5 = rol64(b5, 28) ^ b8;
+-
+-	b10 += b3;
+-	b3 = rol64(b3, 16) ^ b10;
+-
+-	b12 += b7;
+-	b7 = rol64(b7, 25) ^ b12;
+-
+-	b1 += k10;
+-	b0 += b1 + k9;
+-	b1 = rol64(b1, 41) ^ b0;
+-
+-	b3 += k12;
+-	b2 += b3 + k11;
+-	b3 = rol64(b3, 9) ^ b2;
+-
+-	b5 += k14;
+-	b4 += b5 + k13;
+-	b5 = rol64(b5, 37) ^ b4;
+-
+-	b7 += k16;
+-	b6 += b7 + k15;
+-	b7 = rol64(b7, 31) ^ b6;
+-
+-	b9 += k1;
+-	b8 += b9 + k0;
+-	b9 = rol64(b9, 12) ^ b8;
+-
+-	b11 += k3;
+-	b10 += b11 + k2;
+-	b11 = rol64(b11, 47) ^ b10;
+-
+-	b13 += k5 + t0;
+-	b12 += b13 + k4;
+-	b13 = rol64(b13, 44) ^ b12;
+-
+-	b15 += k7 + 9;
+-	b14 += b15 + k6 + t1;
+-	b15 = rol64(b15, 30) ^ b14;
+-
+-	b0 += b9;
+-	b9 = rol64(b9, 16) ^ b0;
+-
+-	b2 += b13;
+-	b13 = rol64(b13, 34) ^ b2;
+-
+-	b6 += b11;
+-	b11 = rol64(b11, 56) ^ b6;
+-
+-	b4 += b15;
+-	b15 = rol64(b15, 51) ^ b4;
+-
+-	b10 += b7;
+-	b7 = rol64(b7, 4) ^ b10;
+-
+-	b12 += b3;
+-	b3 = rol64(b3, 53) ^ b12;
+-
+-	b14 += b5;
+-	b5 = rol64(b5, 42) ^ b14;
+-
+-	b8 += b1;
+-	b1 = rol64(b1, 41) ^ b8;
+-
+-	b0 += b7;
+-	b7 = rol64(b7, 31) ^ b0;
+-
+-	b2 += b5;
+-	b5 = rol64(b5, 44) ^ b2;
+-
+-	b4 += b3;
+-	b3 = rol64(b3, 47) ^ b4;
+-
+-	b6 += b1;
+-	b1 = rol64(b1, 46) ^ b6;
+-
+-	b12 += b15;
+-	b15 = rol64(b15, 19) ^ b12;
+-
+-	b14 += b13;
+-	b13 = rol64(b13, 42) ^ b14;
+-
+-	b8 += b11;
+-	b11 = rol64(b11, 44) ^ b8;
+-
+-	b10 += b9;
+-	b9 = rol64(b9, 25) ^ b10;
+-
+-	b0 += b15;
+-	b15 = rol64(b15, 9) ^ b0;
+-
+-	b2 += b11;
+-	b11 = rol64(b11, 48) ^ b2;
+-
+-	b6 += b13;
+-	b13 = rol64(b13, 35) ^ b6;
+-
+-	b4 += b9;
+-	b9 = rol64(b9, 52) ^ b4;
+-
+-	b14 += b1;
+-	b1 = rol64(b1, 23) ^ b14;
+-
+-	b8 += b5;
+-	b5 = rol64(b5, 31) ^ b8;
+-
+-	b10 += b3;
+-	b3 = rol64(b3, 37) ^ b10;
+-
+-	b12 += b7;
+-	b7 = rol64(b7, 20) ^ b12;
+-
+-	b1 += k11;
+-	b0 += b1 + k10;
+-	b1 = rol64(b1, 24) ^ b0;
+-
+-	b3 += k13;
+-	b2 += b3 + k12;
+-	b3 = rol64(b3, 13) ^ b2;
+-
+-	b5 += k15;
+-	b4 += b5 + k14;
+-	b5 = rol64(b5, 8) ^ b4;
+-
+-	b7 += k0;
+-	b6 += b7 + k16;
+-	b7 = rol64(b7, 47) ^ b6;
+-
+-	b9 += k2;
+-	b8 += b9 + k1;
+-	b9 = rol64(b9, 8) ^ b8;
+-
+-	b11 += k4;
+-	b10 += b11 + k3;
+-	b11 = rol64(b11, 17) ^ b10;
+-
+-	b13 += k6 + t1;
+-	b12 += b13 + k5;
+-	b13 = rol64(b13, 22) ^ b12;
+-
+-	b15 += k8 + 10;
+-	b14 += b15 + k7 + t2;
+-	b15 = rol64(b15, 37) ^ b14;
+-
+-	b0 += b9;
+-	b9 = rol64(b9, 38) ^ b0;
+-
+-	b2 += b13;
+-	b13 = rol64(b13, 19) ^ b2;
+-
+-	b6 += b11;
+-	b11 = rol64(b11, 10) ^ b6;
+-
+-	b4 += b15;
+-	b15 = rol64(b15, 55) ^ b4;
+-
+-	b10 += b7;
+-	b7 = rol64(b7, 49) ^ b10;
+-
+-	b12 += b3;
+-	b3 = rol64(b3, 18) ^ b12;
+-
+-	b14 += b5;
+-	b5 = rol64(b5, 23) ^ b14;
+-
+-	b8 += b1;
+-	b1 = rol64(b1, 52) ^ b8;
+-
+-	b0 += b7;
+-	b7 = rol64(b7, 33) ^ b0;
+-
+-	b2 += b5;
+-	b5 = rol64(b5, 4) ^ b2;
+-
+-	b4 += b3;
+-	b3 = rol64(b3, 51) ^ b4;
+-
+-	b6 += b1;
+-	b1 = rol64(b1, 13) ^ b6;
+-
+-	b12 += b15;
+-	b15 = rol64(b15, 34) ^ b12;
+-
+-	b14 += b13;
+-	b13 = rol64(b13, 41) ^ b14;
+-
+-	b8 += b11;
+-	b11 = rol64(b11, 59) ^ b8;
+-
+-	b10 += b9;
+-	b9 = rol64(b9, 17) ^ b10;
+-
+-	b0 += b15;
+-	b15 = rol64(b15, 5) ^ b0;
+-
+-	b2 += b11;
+-	b11 = rol64(b11, 20) ^ b2;
+-
+-	b6 += b13;
+-	b13 = rol64(b13, 48) ^ b6;
+-
+-	b4 += b9;
+-	b9 = rol64(b9, 41) ^ b4;
+-
+-	b14 += b1;
+-	b1 = rol64(b1, 47) ^ b14;
+-
+-	b8 += b5;
+-	b5 = rol64(b5, 28) ^ b8;
+-
+-	b10 += b3;
+-	b3 = rol64(b3, 16) ^ b10;
+-
+-	b12 += b7;
+-	b7 = rol64(b7, 25) ^ b12;
+-
+-	b1 += k12;
+-	b0 += b1 + k11;
+-	b1 = rol64(b1, 41) ^ b0;
+-
+-	b3 += k14;
+-	b2 += b3 + k13;
+-	b3 = rol64(b3, 9) ^ b2;
+-
+-	b5 += k16;
+-	b4 += b5 + k15;
+-	b5 = rol64(b5, 37) ^ b4;
+-
+-	b7 += k1;
+-	b6 += b7 + k0;
+-	b7 = rol64(b7, 31) ^ b6;
+-
+-	b9 += k3;
+-	b8 += b9 + k2;
+-	b9 = rol64(b9, 12) ^ b8;
+-
+-	b11 += k5;
+-	b10 += b11 + k4;
+-	b11 = rol64(b11, 47) ^ b10;
+-
+-	b13 += k7 + t2;
+-	b12 += b13 + k6;
+-	b13 = rol64(b13, 44) ^ b12;
+-
+-	b15 += k9 + 11;
+-	b14 += b15 + k8 + t0;
+-	b15 = rol64(b15, 30) ^ b14;
+-
+-	b0 += b9;
+-	b9 = rol64(b9, 16) ^ b0;
+-
+-	b2 += b13;
+-	b13 = rol64(b13, 34) ^ b2;
+-
+-	b6 += b11;
+-	b11 = rol64(b11, 56) ^ b6;
+-
+-	b4 += b15;
+-	b15 = rol64(b15, 51) ^ b4;
+-
+-	b10 += b7;
+-	b7 = rol64(b7, 4) ^ b10;
+-
+-	b12 += b3;
+-	b3 = rol64(b3, 53) ^ b12;
+-
+-	b14 += b5;
+-	b5 = rol64(b5, 42) ^ b14;
+-
+-	b8 += b1;
+-	b1 = rol64(b1, 41) ^ b8;
+-
+-	b0 += b7;
+-	b7 = rol64(b7, 31) ^ b0;
+-
+-	b2 += b5;
+-	b5 = rol64(b5, 44) ^ b2;
+-
+-	b4 += b3;
+-	b3 = rol64(b3, 47) ^ b4;
+-
+-	b6 += b1;
+-	b1 = rol64(b1, 46) ^ b6;
+-
+-	b12 += b15;
+-	b15 = rol64(b15, 19) ^ b12;
+-
+-	b14 += b13;
+-	b13 = rol64(b13, 42) ^ b14;
+-
+-	b8 += b11;
+-	b11 = rol64(b11, 44) ^ b8;
+-
+-	b10 += b9;
+-	b9 = rol64(b9, 25) ^ b10;
+-
+-	b0 += b15;
+-	b15 = rol64(b15, 9) ^ b0;
+-
+-	b2 += b11;
+-	b11 = rol64(b11, 48) ^ b2;
+-
+-	b6 += b13;
+-	b13 = rol64(b13, 35) ^ b6;
+-
+-	b4 += b9;
+-	b9 = rol64(b9, 52) ^ b4;
+-
+-	b14 += b1;
+-	b1 = rol64(b1, 23) ^ b14;
+-
+-	b8 += b5;
+-	b5 = rol64(b5, 31) ^ b8;
+-
+-	b10 += b3;
+-	b3 = rol64(b3, 37) ^ b10;
+-
+-	b12 += b7;
+-	b7 = rol64(b7, 20) ^ b12;
+-
+-	b1 += k13;
+-	b0 += b1 + k12;
+-	b1 = rol64(b1, 24) ^ b0;
+-
+-	b3 += k15;
+-	b2 += b3 + k14;
+-	b3 = rol64(b3, 13) ^ b2;
+-
+-	b5 += k0;
+-	b4 += b5 + k16;
+-	b5 = rol64(b5, 8) ^ b4;
+-
+-	b7 += k2;
+-	b6 += b7 + k1;
+-	b7 = rol64(b7, 47) ^ b6;
+-
+-	b9 += k4;
+-	b8 += b9 + k3;
+-	b9 = rol64(b9, 8) ^ b8;
+-
+-	b11 += k6;
+-	b10 += b11 + k5;
+-	b11 = rol64(b11, 17) ^ b10;
+-
+-	b13 += k8 + t0;
+-	b12 += b13 + k7;
+-	b13 = rol64(b13, 22) ^ b12;
+-
+-	b15 += k10 + 12;
+-	b14 += b15 + k9 + t1;
+-	b15 = rol64(b15, 37) ^ b14;
+-
+-	b0 += b9;
+-	b9 = rol64(b9, 38) ^ b0;
+-
+-	b2 += b13;
+-	b13 = rol64(b13, 19) ^ b2;
+-
+-	b6 += b11;
+-	b11 = rol64(b11, 10) ^ b6;
+-
+-	b4 += b15;
+-	b15 = rol64(b15, 55) ^ b4;
+-
+-	b10 += b7;
+-	b7 = rol64(b7, 49) ^ b10;
+-
+-	b12 += b3;
+-	b3 = rol64(b3, 18) ^ b12;
+-
+-	b14 += b5;
+-	b5 = rol64(b5, 23) ^ b14;
+-
+-	b8 += b1;
+-	b1 = rol64(b1, 52) ^ b8;
+-
+-	b0 += b7;
+-	b7 = rol64(b7, 33) ^ b0;
+-
+-	b2 += b5;
+-	b5 = rol64(b5, 4) ^ b2;
+-
+-	b4 += b3;
+-	b3 = rol64(b3, 51) ^ b4;
+-
+-	b6 += b1;
+-	b1 = rol64(b1, 13) ^ b6;
+-
+-	b12 += b15;
+-	b15 = rol64(b15, 34) ^ b12;
+-
+-	b14 += b13;
+-	b13 = rol64(b13, 41) ^ b14;
+-
+-	b8 += b11;
+-	b11 = rol64(b11, 59) ^ b8;
+-
+-	b10 += b9;
+-	b9 = rol64(b9, 17) ^ b10;
+-
+-	b0 += b15;
+-	b15 = rol64(b15, 5) ^ b0;
+-
+-	b2 += b11;
+-	b11 = rol64(b11, 20) ^ b2;
+-
+-	b6 += b13;
+-	b13 = rol64(b13, 48) ^ b6;
+-
+-	b4 += b9;
+-	b9 = rol64(b9, 41) ^ b4;
+-
+-	b14 += b1;
+-	b1 = rol64(b1, 47) ^ b14;
+-
+-	b8 += b5;
+-	b5 = rol64(b5, 28) ^ b8;
+-
+-	b10 += b3;
+-	b3 = rol64(b3, 16) ^ b10;
+-
+-	b12 += b7;
+-	b7 = rol64(b7, 25) ^ b12;
+-
+-	b1 += k14;
+-	b0 += b1 + k13;
+-	b1 = rol64(b1, 41) ^ b0;
+-
+-	b3 += k16;
+-	b2 += b3 + k15;
+-	b3 = rol64(b3, 9) ^ b2;
+-
+-	b5 += k1;
+-	b4 += b5 + k0;
+-	b5 = rol64(b5, 37) ^ b4;
+-
+-	b7 += k3;
+-	b6 += b7 + k2;
+-	b7 = rol64(b7, 31) ^ b6;
+-
+-	b9 += k5;
+-	b8 += b9 + k4;
+-	b9 = rol64(b9, 12) ^ b8;
+-
+-	b11 += k7;
+-	b10 += b11 + k6;
+-	b11 = rol64(b11, 47) ^ b10;
+-
+-	b13 += k9 + t1;
+-	b12 += b13 + k8;
+-	b13 = rol64(b13, 44) ^ b12;
+-
+-	b15 += k11 + 13;
+-	b14 += b15 + k10 + t2;
+-	b15 = rol64(b15, 30) ^ b14;
+-
+-	b0 += b9;
+-	b9 = rol64(b9, 16) ^ b0;
+-
+-	b2 += b13;
+-	b13 = rol64(b13, 34) ^ b2;
+-
+-	b6 += b11;
+-	b11 = rol64(b11, 56) ^ b6;
+-
+-	b4 += b15;
+-	b15 = rol64(b15, 51) ^ b4;
+-
+-	b10 += b7;
+-	b7 = rol64(b7, 4) ^ b10;
+-
+-	b12 += b3;
+-	b3 = rol64(b3, 53) ^ b12;
+-
+-	b14 += b5;
+-	b5 = rol64(b5, 42) ^ b14;
+-
+-	b8 += b1;
+-	b1 = rol64(b1, 41) ^ b8;
+-
+-	b0 += b7;
+-	b7 = rol64(b7, 31) ^ b0;
+-
+-	b2 += b5;
+-	b5 = rol64(b5, 44) ^ b2;
+-
+-	b4 += b3;
+-	b3 = rol64(b3, 47) ^ b4;
+-
+-	b6 += b1;
+-	b1 = rol64(b1, 46) ^ b6;
+-
+-	b12 += b15;
+-	b15 = rol64(b15, 19) ^ b12;
+-
+-	b14 += b13;
+-	b13 = rol64(b13, 42) ^ b14;
+-
+-	b8 += b11;
+-	b11 = rol64(b11, 44) ^ b8;
+-
+-	b10 += b9;
+-	b9 = rol64(b9, 25) ^ b10;
+-
+-	b0 += b15;
+-	b15 = rol64(b15, 9) ^ b0;
+-
+-	b2 += b11;
+-	b11 = rol64(b11, 48) ^ b2;
+-
+-	b6 += b13;
+-	b13 = rol64(b13, 35) ^ b6;
+-
+-	b4 += b9;
+-	b9 = rol64(b9, 52) ^ b4;
+-
+-	b14 += b1;
+-	b1 = rol64(b1, 23) ^ b14;
+-
+-	b8 += b5;
+-	b5 = rol64(b5, 31) ^ b8;
+-
+-	b10 += b3;
+-	b3 = rol64(b3, 37) ^ b10;
+-
+-	b12 += b7;
+-	b7 = rol64(b7, 20) ^ b12;
+-
+-	b1 += k15;
+-	b0 += b1 + k14;
+-	b1 = rol64(b1, 24) ^ b0;
+-
+-	b3 += k0;
+-	b2 += b3 + k16;
+-	b3 = rol64(b3, 13) ^ b2;
+-
+-	b5 += k2;
+-	b4 += b5 + k1;
+-	b5 = rol64(b5, 8) ^ b4;
+-
+-	b7 += k4;
+-	b6 += b7 + k3;
+-	b7 = rol64(b7, 47) ^ b6;
+-
+-	b9 += k6;
+-	b8 += b9 + k5;
+-	b9 = rol64(b9, 8) ^ b8;
+-
+-	b11 += k8;
+-	b10 += b11 + k7;
+-	b11 = rol64(b11, 17) ^ b10;
+-
+-	b13 += k10 + t2;
+-	b12 += b13 + k9;
+-	b13 = rol64(b13, 22) ^ b12;
+-
+-	b15 += k12 + 14;
+-	b14 += b15 + k11 + t0;
+-	b15 = rol64(b15, 37) ^ b14;
+-
+-	b0 += b9;
+-	b9 = rol64(b9, 38) ^ b0;
+-
+-	b2 += b13;
+-	b13 = rol64(b13, 19) ^ b2;
+-
+-	b6 += b11;
+-	b11 = rol64(b11, 10) ^ b6;
+-
+-	b4 += b15;
+-	b15 = rol64(b15, 55) ^ b4;
+-
+-	b10 += b7;
+-	b7 = rol64(b7, 49) ^ b10;
+-
+-	b12 += b3;
+-	b3 = rol64(b3, 18) ^ b12;
+-
+-	b14 += b5;
+-	b5 = rol64(b5, 23) ^ b14;
+-
+-	b8 += b1;
+-	b1 = rol64(b1, 52) ^ b8;
+-
+-	b0 += b7;
+-	b7 = rol64(b7, 33) ^ b0;
+-
+-	b2 += b5;
+-	b5 = rol64(b5, 4) ^ b2;
+-
+-	b4 += b3;
+-	b3 = rol64(b3, 51) ^ b4;
+-
+-	b6 += b1;
+-	b1 = rol64(b1, 13) ^ b6;
+-
+-	b12 += b15;
+-	b15 = rol64(b15, 34) ^ b12;
+-
+-	b14 += b13;
+-	b13 = rol64(b13, 41) ^ b14;
+-
+-	b8 += b11;
+-	b11 = rol64(b11, 59) ^ b8;
+-
+-	b10 += b9;
+-	b9 = rol64(b9, 17) ^ b10;
+-
+-	b0 += b15;
+-	b15 = rol64(b15, 5) ^ b0;
+-
+-	b2 += b11;
+-	b11 = rol64(b11, 20) ^ b2;
+-
+-	b6 += b13;
+-	b13 = rol64(b13, 48) ^ b6;
+-
+-	b4 += b9;
+-	b9 = rol64(b9, 41) ^ b4;
+-
+-	b14 += b1;
+-	b1 = rol64(b1, 47) ^ b14;
+-
+-	b8 += b5;
+-	b5 = rol64(b5, 28) ^ b8;
+-
+-	b10 += b3;
+-	b3 = rol64(b3, 16) ^ b10;
+-
+-	b12 += b7;
+-	b7 = rol64(b7, 25) ^ b12;
+-
+-	b1 += k16;
+-	b0 += b1 + k15;
+-	b1 = rol64(b1, 41) ^ b0;
+-
+-	b3 += k1;
+-	b2 += b3 + k0;
+-	b3 = rol64(b3, 9) ^ b2;
+-
+-	b5 += k3;
+-	b4 += b5 + k2;
+-	b5 = rol64(b5, 37) ^ b4;
+-
+-	b7 += k5;
+-	b6 += b7 + k4;
+-	b7 = rol64(b7, 31) ^ b6;
+-
+-	b9 += k7;
+-	b8 += b9 + k6;
+-	b9 = rol64(b9, 12) ^ b8;
+-
+-	b11 += k9;
+-	b10 += b11 + k8;
+-	b11 = rol64(b11, 47) ^ b10;
+-
+-	b13 += k11 + t0;
+-	b12 += b13 + k10;
+-	b13 = rol64(b13, 44) ^ b12;
+-
+-	b15 += k13 + 15;
+-	b14 += b15 + k12 + t1;
+-	b15 = rol64(b15, 30) ^ b14;
+-
+-	b0 += b9;
+-	b9 = rol64(b9, 16) ^ b0;
+-
+-	b2 += b13;
+-	b13 = rol64(b13, 34) ^ b2;
+-
+-	b6 += b11;
+-	b11 = rol64(b11, 56) ^ b6;
+-
+-	b4 += b15;
+-	b15 = rol64(b15, 51) ^ b4;
+-
+-	b10 += b7;
+-	b7 = rol64(b7, 4) ^ b10;
+-
+-	b12 += b3;
+-	b3 = rol64(b3, 53) ^ b12;
+-
+-	b14 += b5;
+-	b5 = rol64(b5, 42) ^ b14;
+-
+-	b8 += b1;
+-	b1 = rol64(b1, 41) ^ b8;
+-
+-	b0 += b7;
+-	b7 = rol64(b7, 31) ^ b0;
+-
+-	b2 += b5;
+-	b5 = rol64(b5, 44) ^ b2;
+-
+-	b4 += b3;
+-	b3 = rol64(b3, 47) ^ b4;
+-
+-	b6 += b1;
+-	b1 = rol64(b1, 46) ^ b6;
+-
+-	b12 += b15;
+-	b15 = rol64(b15, 19) ^ b12;
+-
+-	b14 += b13;
+-	b13 = rol64(b13, 42) ^ b14;
+-
+-	b8 += b11;
+-	b11 = rol64(b11, 44) ^ b8;
+-
+-	b10 += b9;
+-	b9 = rol64(b9, 25) ^ b10;
+-
+-	b0 += b15;
+-	b15 = rol64(b15, 9) ^ b0;
+-
+-	b2 += b11;
+-	b11 = rol64(b11, 48) ^ b2;
+-
+-	b6 += b13;
+-	b13 = rol64(b13, 35) ^ b6;
+-
+-	b4 += b9;
+-	b9 = rol64(b9, 52) ^ b4;
+-
+-	b14 += b1;
+-	b1 = rol64(b1, 23) ^ b14;
+-
+-	b8 += b5;
+-	b5 = rol64(b5, 31) ^ b8;
+-
+-	b10 += b3;
+-	b3 = rol64(b3, 37) ^ b10;
+-
+-	b12 += b7;
+-	b7 = rol64(b7, 20) ^ b12;
+-
+-	b1 += k0;
+-	b0 += b1 + k16;
+-	b1 = rol64(b1, 24) ^ b0;
+-
+-	b3 += k2;
+-	b2 += b3 + k1;
+-	b3 = rol64(b3, 13) ^ b2;
+-
+-	b5 += k4;
+-	b4 += b5 + k3;
+-	b5 = rol64(b5, 8) ^ b4;
+-
+-	b7 += k6;
+-	b6 += b7 + k5;
+-	b7 = rol64(b7, 47) ^ b6;
+-
+-	b9 += k8;
+-	b8 += b9 + k7;
+-	b9 = rol64(b9, 8) ^ b8;
+-
+-	b11 += k10;
+-	b10 += b11 + k9;
+-	b11 = rol64(b11, 17) ^ b10;
+-
+-	b13 += k12 + t1;
+-	b12 += b13 + k11;
+-	b13 = rol64(b13, 22) ^ b12;
+-
+-	b15 += k14 + 16;
+-	b14 += b15 + k13 + t2;
+-	b15 = rol64(b15, 37) ^ b14;
+-
+-	b0 += b9;
+-	b9 = rol64(b9, 38) ^ b0;
+-
+-	b2 += b13;
+-	b13 = rol64(b13, 19) ^ b2;
+-
+-	b6 += b11;
+-	b11 = rol64(b11, 10) ^ b6;
+-
+-	b4 += b15;
+-	b15 = rol64(b15, 55) ^ b4;
+-
+-	b10 += b7;
+-	b7 = rol64(b7, 49) ^ b10;
+-
+-	b12 += b3;
+-	b3 = rol64(b3, 18) ^ b12;
+-
+-	b14 += b5;
+-	b5 = rol64(b5, 23) ^ b14;
+-
+-	b8 += b1;
+-	b1 = rol64(b1, 52) ^ b8;
+-
+-	b0 += b7;
+-	b7 = rol64(b7, 33) ^ b0;
+-
+-	b2 += b5;
+-	b5 = rol64(b5, 4) ^ b2;
+-
+-	b4 += b3;
+-	b3 = rol64(b3, 51) ^ b4;
+-
+-	b6 += b1;
+-	b1 = rol64(b1, 13) ^ b6;
+-
+-	b12 += b15;
+-	b15 = rol64(b15, 34) ^ b12;
+-
+-	b14 += b13;
+-	b13 = rol64(b13, 41) ^ b14;
+-
+-	b8 += b11;
+-	b11 = rol64(b11, 59) ^ b8;
+-
+-	b10 += b9;
+-	b9 = rol64(b9, 17) ^ b10;
+-
+-	b0 += b15;
+-	b15 = rol64(b15, 5) ^ b0;
+-
+-	b2 += b11;
+-	b11 = rol64(b11, 20) ^ b2;
+-
+-	b6 += b13;
+-	b13 = rol64(b13, 48) ^ b6;
+-
+-	b4 += b9;
+-	b9 = rol64(b9, 41) ^ b4;
+-
+-	b14 += b1;
+-	b1 = rol64(b1, 47) ^ b14;
+-
+-	b8 += b5;
+-	b5 = rol64(b5, 28) ^ b8;
+-
+-	b10 += b3;
+-	b3 = rol64(b3, 16) ^ b10;
+-
+-	b12 += b7;
+-	b7 = rol64(b7, 25) ^ b12;
+-
+-	b1 += k1;
+-	b0 += b1 + k0;
+-	b1 = rol64(b1, 41) ^ b0;
+-
+-	b3 += k3;
+-	b2 += b3 + k2;
+-	b3 = rol64(b3, 9) ^ b2;
+-
+-	b5 += k5;
+-	b4 += b5 + k4;
+-	b5 = rol64(b5, 37) ^ b4;
+-
+-	b7 += k7;
+-	b6 += b7 + k6;
+-	b7 = rol64(b7, 31) ^ b6;
+-
+-	b9 += k9;
+-	b8 += b9 + k8;
+-	b9 = rol64(b9, 12) ^ b8;
+-
+-	b11 += k11;
+-	b10 += b11 + k10;
+-	b11 = rol64(b11, 47) ^ b10;
+-
+-	b13 += k13 + t2;
+-	b12 += b13 + k12;
+-	b13 = rol64(b13, 44) ^ b12;
+-
+-	b15 += k15 + 17;
+-	b14 += b15 + k14 + t0;
+-	b15 = rol64(b15, 30) ^ b14;
+-
+-	b0 += b9;
+-	b9 = rol64(b9, 16) ^ b0;
+-
+-	b2 += b13;
+-	b13 = rol64(b13, 34) ^ b2;
+-
+-	b6 += b11;
+-	b11 = rol64(b11, 56) ^ b6;
+-
+-	b4 += b15;
+-	b15 = rol64(b15, 51) ^ b4;
+-
+-	b10 += b7;
+-	b7 = rol64(b7, 4) ^ b10;
+-
+-	b12 += b3;
+-	b3 = rol64(b3, 53) ^ b12;
+-
+-	b14 += b5;
+-	b5 = rol64(b5, 42) ^ b14;
+-
+-	b8 += b1;
+-	b1 = rol64(b1, 41) ^ b8;
+-
+-	b0 += b7;
+-	b7 = rol64(b7, 31) ^ b0;
+-
+-	b2 += b5;
+-	b5 = rol64(b5, 44) ^ b2;
+-
+-	b4 += b3;
+-	b3 = rol64(b3, 47) ^ b4;
+-
+-	b6 += b1;
+-	b1 = rol64(b1, 46) ^ b6;
+-
+-	b12 += b15;
+-	b15 = rol64(b15, 19) ^ b12;
+-
+-	b14 += b13;
+-	b13 = rol64(b13, 42) ^ b14;
+-
+-	b8 += b11;
+-	b11 = rol64(b11, 44) ^ b8;
+-
+-	b10 += b9;
+-	b9 = rol64(b9, 25) ^ b10;
+-
+-	b0 += b15;
+-	b15 = rol64(b15, 9) ^ b0;
+-
+-	b2 += b11;
+-	b11 = rol64(b11, 48) ^ b2;
+-
+-	b6 += b13;
+-	b13 = rol64(b13, 35) ^ b6;
+-
+-	b4 += b9;
+-	b9 = rol64(b9, 52) ^ b4;
+-
+-	b14 += b1;
+-	b1 = rol64(b1, 23) ^ b14;
+-
+-	b8 += b5;
+-	b5 = rol64(b5, 31) ^ b8;
+-
+-	b10 += b3;
+-	b3 = rol64(b3, 37) ^ b10;
+-
+-	b12 += b7;
+-	b7 = rol64(b7, 20) ^ b12;
+-
+-	b1 += k2;
+-	b0 += b1 + k1;
+-	b1 = rol64(b1, 24) ^ b0;
+-
+-	b3 += k4;
+-	b2 += b3 + k3;
+-	b3 = rol64(b3, 13) ^ b2;
+-
+-	b5 += k6;
+-	b4 += b5 + k5;
+-	b5 = rol64(b5, 8) ^ b4;
+-
+-	b7 += k8;
+-	b6 += b7 + k7;
+-	b7 = rol64(b7, 47) ^ b6;
+-
+-	b9 += k10;
+-	b8 += b9 + k9;
+-	b9 = rol64(b9, 8) ^ b8;
+-
+-	b11 += k12;
+-	b10 += b11 + k11;
+-	b11 = rol64(b11, 17) ^ b10;
+-
+-	b13 += k14 + t0;
+-	b12 += b13 + k13;
+-	b13 = rol64(b13, 22) ^ b12;
+-
+-	b15 += k16 + 18;
+-	b14 += b15 + k15 + t1;
+-	b15 = rol64(b15, 37) ^ b14;
+-
+-	b0 += b9;
+-	b9 = rol64(b9, 38) ^ b0;
+-
+-	b2 += b13;
+-	b13 = rol64(b13, 19) ^ b2;
+-
+-	b6 += b11;
+-	b11 = rol64(b11, 10) ^ b6;
+-
+-	b4 += b15;
+-	b15 = rol64(b15, 55) ^ b4;
+-
+-	b10 += b7;
+-	b7 = rol64(b7, 49) ^ b10;
+-
+-	b12 += b3;
+-	b3 = rol64(b3, 18) ^ b12;
+-
+-	b14 += b5;
+-	b5 = rol64(b5, 23) ^ b14;
+-
+-	b8 += b1;
+-	b1 = rol64(b1, 52) ^ b8;
+-
+-	b0 += b7;
+-	b7 = rol64(b7, 33) ^ b0;
+-
+-	b2 += b5;
+-	b5 = rol64(b5, 4) ^ b2;
+-
+-	b4 += b3;
+-	b3 = rol64(b3, 51) ^ b4;
+-
+-	b6 += b1;
+-	b1 = rol64(b1, 13) ^ b6;
+-
+-	b12 += b15;
+-	b15 = rol64(b15, 34) ^ b12;
+-
+-	b14 += b13;
+-	b13 = rol64(b13, 41) ^ b14;
+-
+-	b8 += b11;
+-	b11 = rol64(b11, 59) ^ b8;
+-
+-	b10 += b9;
+-	b9 = rol64(b9, 17) ^ b10;
+-
+-	b0 += b15;
+-	b15 = rol64(b15, 5) ^ b0;
+-
+-	b2 += b11;
+-	b11 = rol64(b11, 20) ^ b2;
+-
+-	b6 += b13;
+-	b13 = rol64(b13, 48) ^ b6;
+-
+-	b4 += b9;
+-	b9 = rol64(b9, 41) ^ b4;
+-
+-	b14 += b1;
+-	b1 = rol64(b1, 47) ^ b14;
+-
+-	b8 += b5;
+-	b5 = rol64(b5, 28) ^ b8;
+-
+-	b10 += b3;
+-	b3 = rol64(b3, 16) ^ b10;
+-
+-	b12 += b7;
+-	b7 = rol64(b7, 25) ^ b12;
+-
+-	b1 += k3;
+-	b0 += b1 + k2;
+-	b1 = rol64(b1, 41) ^ b0;
+-
+-	b3 += k5;
+-	b2 += b3 + k4;
+-	b3 = rol64(b3, 9) ^ b2;
+-
+-	b5 += k7;
+-	b4 += b5 + k6;
+-	b5 = rol64(b5, 37) ^ b4;
+-
+-	b7 += k9;
+-	b6 += b7 + k8;
+-	b7 = rol64(b7, 31) ^ b6;
+-
+-	b9 += k11;
+-	b8 += b9 + k10;
+-	b9 = rol64(b9, 12) ^ b8;
+-
+-	b11 += k13;
+-	b10 += b11 + k12;
+-	b11 = rol64(b11, 47) ^ b10;
+-
+-	b13 += k15 + t1;
+-	b12 += b13 + k14;
+-	b13 = rol64(b13, 44) ^ b12;
+-
+-	b15 += k0 + 19;
+-	b14 += b15 + k16 + t2;
+-	b15 = rol64(b15, 30) ^ b14;
+-
+-	b0 += b9;
+-	b9 = rol64(b9, 16) ^ b0;
+-
+-	b2 += b13;
+-	b13 = rol64(b13, 34) ^ b2;
+-
+-	b6 += b11;
+-	b11 = rol64(b11, 56) ^ b6;
+-
+-	b4 += b15;
+-	b15 = rol64(b15, 51) ^ b4;
+-
+-	b10 += b7;
+-	b7 = rol64(b7, 4) ^ b10;
+-
+-	b12 += b3;
+-	b3 = rol64(b3, 53) ^ b12;
+-
+-	b14 += b5;
+-	b5 = rol64(b5, 42) ^ b14;
+-
+-	b8 += b1;
+-	b1 = rol64(b1, 41) ^ b8;
+-
+-	b0 += b7;
+-	b7 = rol64(b7, 31) ^ b0;
+-
+-	b2 += b5;
+-	b5 = rol64(b5, 44) ^ b2;
+-
+-	b4 += b3;
+-	b3 = rol64(b3, 47) ^ b4;
+-
+-	b6 += b1;
+-	b1 = rol64(b1, 46) ^ b6;
+-
+-	b12 += b15;
+-	b15 = rol64(b15, 19) ^ b12;
+-
+-	b14 += b13;
+-	b13 = rol64(b13, 42) ^ b14;
+-
+-	b8 += b11;
+-	b11 = rol64(b11, 44) ^ b8;
+-
+-	b10 += b9;
+-	b9 = rol64(b9, 25) ^ b10;
+-
+-	b0 += b15;
+-	b15 = rol64(b15, 9) ^ b0;
+-
+-	b2 += b11;
+-	b11 = rol64(b11, 48) ^ b2;
+-
+-	b6 += b13;
+-	b13 = rol64(b13, 35) ^ b6;
+-
+-	b4 += b9;
+-	b9 = rol64(b9, 52) ^ b4;
+-
+-	b14 += b1;
+-	b1 = rol64(b1, 23) ^ b14;
+-
+-	b8 += b5;
+-	b5 = rol64(b5, 31) ^ b8;
+-
+-	b10 += b3;
+-	b3 = rol64(b3, 37) ^ b10;
+-
+-	b12 += b7;
+-	b7 = rol64(b7, 20) ^ b12;
+-
+-	output[0] = b0 + k3;
+-	output[1] = b1 + k4;
+-	output[2] = b2 + k5;
+-	output[3] = b3 + k6;
+-	output[4] = b4 + k7;
+-	output[5] = b5 + k8;
+-	output[6] = b6 + k9;
+-	output[7] = b7 + k10;
+-	output[8] = b8 + k11;
+-	output[9] = b9 + k12;
+-	output[10] = b10 + k13;
+-	output[11] = b11 + k14;
+-	output[12] = b12 + k15;
+-	output[13] = b13 + k16 + t2;
+-	output[14] = b14 + k0 + t0;
+-	output[15] = b15 + k1 + 20;
+-}
+-
+-void threefish_decrypt_1024(struct threefish_key *key_ctx, u64 *input,
+-			    u64 *output)
+-{
+-	u64 b0 = input[0], b1 = input[1],
+-	    b2 = input[2], b3 = input[3],
+-	    b4 = input[4], b5 = input[5],
+-	    b6 = input[6], b7 = input[7],
+-	    b8 = input[8], b9 = input[9],
+-	    b10 = input[10], b11 = input[11],
+-	    b12 = input[12], b13 = input[13],
+-	    b14 = input[14], b15 = input[15];
+-	u64 k0 = key_ctx->key[0], k1 = key_ctx->key[1],
+-	    k2 = key_ctx->key[2], k3 = key_ctx->key[3],
+-	    k4 = key_ctx->key[4], k5 = key_ctx->key[5],
+-	    k6 = key_ctx->key[6], k7 = key_ctx->key[7],
+-	    k8 = key_ctx->key[8], k9 = key_ctx->key[9],
+-	    k10 = key_ctx->key[10], k11 = key_ctx->key[11],
+-	    k12 = key_ctx->key[12], k13 = key_ctx->key[13],
+-	    k14 = key_ctx->key[14], k15 = key_ctx->key[15],
+-	    k16 = key_ctx->key[16];
+-	u64 t0 = key_ctx->tweak[0], t1 = key_ctx->tweak[1],
+-	    t2 = key_ctx->tweak[2];
+-	u64 tmp;
+-
+-	b0 -= k3;
+-	b1 -= k4;
+-	b2 -= k5;
+-	b3 -= k6;
+-	b4 -= k7;
+-	b5 -= k8;
+-	b6 -= k9;
+-	b7 -= k10;
+-	b8 -= k11;
+-	b9 -= k12;
+-	b10 -= k13;
+-	b11 -= k14;
+-	b12 -= k15;
+-	b13 -= k16 + t2;
+-	b14 -= k0 + t0;
+-	b15 -= k1 + 20;
+-	tmp = b7 ^ b12;
+-	b7 = ror64(tmp, 20);
+-	b12 -= b7;
+-
+-	tmp = b3 ^ b10;
+-	b3 = ror64(tmp, 37);
+-	b10 -= b3;
+-
+-	tmp = b5 ^ b8;
+-	b5 = ror64(tmp, 31);
+-	b8 -= b5;
+-
+-	tmp = b1 ^ b14;
+-	b1 = ror64(tmp, 23);
+-	b14 -= b1;
+-
+-	tmp = b9 ^ b4;
+-	b9 = ror64(tmp, 52);
+-	b4 -= b9;
+-
+-	tmp = b13 ^ b6;
+-	b13 = ror64(tmp, 35);
+-	b6 -= b13;
+-
+-	tmp = b11 ^ b2;
+-	b11 = ror64(tmp, 48);
+-	b2 -= b11;
+-
+-	tmp = b15 ^ b0;
+-	b15 = ror64(tmp, 9);
+-	b0 -= b15;
+-
+-	tmp = b9 ^ b10;
+-	b9 = ror64(tmp, 25);
+-	b10 -= b9;
+-
+-	tmp = b11 ^ b8;
+-	b11 = ror64(tmp, 44);
+-	b8 -= b11;
+-
+-	tmp = b13 ^ b14;
+-	b13 = ror64(tmp, 42);
+-	b14 -= b13;
+-
+-	tmp = b15 ^ b12;
+-	b15 = ror64(tmp, 19);
+-	b12 -= b15;
+-
+-	tmp = b1 ^ b6;
+-	b1 = ror64(tmp, 46);
+-	b6 -= b1;
+-
+-	tmp = b3 ^ b4;
+-	b3 = ror64(tmp, 47);
+-	b4 -= b3;
+-
+-	tmp = b5 ^ b2;
+-	b5 = ror64(tmp, 44);
+-	b2 -= b5;
+-
+-	tmp = b7 ^ b0;
+-	b7 = ror64(tmp, 31);
+-	b0 -= b7;
+-
+-	tmp = b1 ^ b8;
+-	b1 = ror64(tmp, 41);
+-	b8 -= b1;
+-
+-	tmp = b5 ^ b14;
+-	b5 = ror64(tmp, 42);
+-	b14 -= b5;
+-
+-	tmp = b3 ^ b12;
+-	b3 = ror64(tmp, 53);
+-	b12 -= b3;
+-
+-	tmp = b7 ^ b10;
+-	b7 = ror64(tmp, 4);
+-	b10 -= b7;
+-
+-	tmp = b15 ^ b4;
+-	b15 = ror64(tmp, 51);
+-	b4 -= b15;
+-
+-	tmp = b11 ^ b6;
+-	b11 = ror64(tmp, 56);
+-	b6 -= b11;
+-
+-	tmp = b13 ^ b2;
+-	b13 = ror64(tmp, 34);
+-	b2 -= b13;
+-
+-	tmp = b9 ^ b0;
+-	b9 = ror64(tmp, 16);
+-	b0 -= b9;
+-
+-	tmp = b15 ^ b14;
+-	b15 = ror64(tmp, 30);
+-	b14 -= b15 + k16 + t2;
+-	b15 -= k0 + 19;
+-
+-	tmp = b13 ^ b12;
+-	b13 = ror64(tmp, 44);
+-	b12 -= b13 + k14;
+-	b13 -= k15 + t1;
+-
+-	tmp = b11 ^ b10;
+-	b11 = ror64(tmp, 47);
+-	b10 -= b11 + k12;
+-	b11 -= k13;
+-
+-	tmp = b9 ^ b8;
+-	b9 = ror64(tmp, 12);
+-	b8 -= b9 + k10;
+-	b9 -= k11;
+-
+-	tmp = b7 ^ b6;
+-	b7 = ror64(tmp, 31);
+-	b6 -= b7 + k8;
+-	b7 -= k9;
+-
+-	tmp = b5 ^ b4;
+-	b5 = ror64(tmp, 37);
+-	b4 -= b5 + k6;
+-	b5 -= k7;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 9);
+-	b2 -= b3 + k4;
+-	b3 -= k5;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 41);
+-	b0 -= b1 + k2;
+-	b1 -= k3;
+-
+-	tmp = b7 ^ b12;
+-	b7 = ror64(tmp, 25);
+-	b12 -= b7;
+-
+-	tmp = b3 ^ b10;
+-	b3 = ror64(tmp, 16);
+-	b10 -= b3;
+-
+-	tmp = b5 ^ b8;
+-	b5 = ror64(tmp, 28);
+-	b8 -= b5;
+-
+-	tmp = b1 ^ b14;
+-	b1 = ror64(tmp, 47);
+-	b14 -= b1;
+-
+-	tmp = b9 ^ b4;
+-	b9 = ror64(tmp, 41);
+-	b4 -= b9;
+-
+-	tmp = b13 ^ b6;
+-	b13 = ror64(tmp, 48);
+-	b6 -= b13;
+-
+-	tmp = b11 ^ b2;
+-	b11 = ror64(tmp, 20);
+-	b2 -= b11;
+-
+-	tmp = b15 ^ b0;
+-	b15 = ror64(tmp, 5);
+-	b0 -= b15;
+-
+-	tmp = b9 ^ b10;
+-	b9 = ror64(tmp, 17);
+-	b10 -= b9;
+-
+-	tmp = b11 ^ b8;
+-	b11 = ror64(tmp, 59);
+-	b8 -= b11;
+-
+-	tmp = b13 ^ b14;
+-	b13 = ror64(tmp, 41);
+-	b14 -= b13;
+-
+-	tmp = b15 ^ b12;
+-	b15 = ror64(tmp, 34);
+-	b12 -= b15;
+-
+-	tmp = b1 ^ b6;
+-	b1 = ror64(tmp, 13);
+-	b6 -= b1;
+-
+-	tmp = b3 ^ b4;
+-	b3 = ror64(tmp, 51);
+-	b4 -= b3;
+-
+-	tmp = b5 ^ b2;
+-	b5 = ror64(tmp, 4);
+-	b2 -= b5;
+-
+-	tmp = b7 ^ b0;
+-	b7 = ror64(tmp, 33);
+-	b0 -= b7;
+-
+-	tmp = b1 ^ b8;
+-	b1 = ror64(tmp, 52);
+-	b8 -= b1;
+-
+-	tmp = b5 ^ b14;
+-	b5 = ror64(tmp, 23);
+-	b14 -= b5;
+-
+-	tmp = b3 ^ b12;
+-	b3 = ror64(tmp, 18);
+-	b12 -= b3;
+-
+-	tmp = b7 ^ b10;
+-	b7 = ror64(tmp, 49);
+-	b10 -= b7;
+-
+-	tmp = b15 ^ b4;
+-	b15 = ror64(tmp, 55);
+-	b4 -= b15;
+-
+-	tmp = b11 ^ b6;
+-	b11 = ror64(tmp, 10);
+-	b6 -= b11;
+-
+-	tmp = b13 ^ b2;
+-	b13 = ror64(tmp, 19);
+-	b2 -= b13;
+-
+-	tmp = b9 ^ b0;
+-	b9 = ror64(tmp, 38);
+-	b0 -= b9;
+-
+-	tmp = b15 ^ b14;
+-	b15 = ror64(tmp, 37);
+-	b14 -= b15 + k15 + t1;
+-	b15 -= k16 + 18;
+-
+-	tmp = b13 ^ b12;
+-	b13 = ror64(tmp, 22);
+-	b12 -= b13 + k13;
+-	b13 -= k14 + t0;
+-
+-	tmp = b11 ^ b10;
+-	b11 = ror64(tmp, 17);
+-	b10 -= b11 + k11;
+-	b11 -= k12;
+-
+-	tmp = b9 ^ b8;
+-	b9 = ror64(tmp, 8);
+-	b8 -= b9 + k9;
+-	b9 -= k10;
+-
+-	tmp = b7 ^ b6;
+-	b7 = ror64(tmp, 47);
+-	b6 -= b7 + k7;
+-	b7 -= k8;
+-
+-	tmp = b5 ^ b4;
+-	b5 = ror64(tmp, 8);
+-	b4 -= b5 + k5;
+-	b5 -= k6;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 13);
+-	b2 -= b3 + k3;
+-	b3 -= k4;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 24);
+-	b0 -= b1 + k1;
+-	b1 -= k2;
+-
+-	tmp = b7 ^ b12;
+-	b7 = ror64(tmp, 20);
+-	b12 -= b7;
+-
+-	tmp = b3 ^ b10;
+-	b3 = ror64(tmp, 37);
+-	b10 -= b3;
+-
+-	tmp = b5 ^ b8;
+-	b5 = ror64(tmp, 31);
+-	b8 -= b5;
+-
+-	tmp = b1 ^ b14;
+-	b1 = ror64(tmp, 23);
+-	b14 -= b1;
+-
+-	tmp = b9 ^ b4;
+-	b9 = ror64(tmp, 52);
+-	b4 -= b9;
+-
+-	tmp = b13 ^ b6;
+-	b13 = ror64(tmp, 35);
+-	b6 -= b13;
+-
+-	tmp = b11 ^ b2;
+-	b11 = ror64(tmp, 48);
+-	b2 -= b11;
+-
+-	tmp = b15 ^ b0;
+-	b15 = ror64(tmp, 9);
+-	b0 -= b15;
+-
+-	tmp = b9 ^ b10;
+-	b9 = ror64(tmp, 25);
+-	b10 -= b9;
+-
+-	tmp = b11 ^ b8;
+-	b11 = ror64(tmp, 44);
+-	b8 -= b11;
+-
+-	tmp = b13 ^ b14;
+-	b13 = ror64(tmp, 42);
+-	b14 -= b13;
+-
+-	tmp = b15 ^ b12;
+-	b15 = ror64(tmp, 19);
+-	b12 -= b15;
+-
+-	tmp = b1 ^ b6;
+-	b1 = ror64(tmp, 46);
+-	b6 -= b1;
+-
+-	tmp = b3 ^ b4;
+-	b3 = ror64(tmp, 47);
+-	b4 -= b3;
+-
+-	tmp = b5 ^ b2;
+-	b5 = ror64(tmp, 44);
+-	b2 -= b5;
+-
+-	tmp = b7 ^ b0;
+-	b7 = ror64(tmp, 31);
+-	b0 -= b7;
+-
+-	tmp = b1 ^ b8;
+-	b1 = ror64(tmp, 41);
+-	b8 -= b1;
+-
+-	tmp = b5 ^ b14;
+-	b5 = ror64(tmp, 42);
+-	b14 -= b5;
+-
+-	tmp = b3 ^ b12;
+-	b3 = ror64(tmp, 53);
+-	b12 -= b3;
+-
+-	tmp = b7 ^ b10;
+-	b7 = ror64(tmp, 4);
+-	b10 -= b7;
+-
+-	tmp = b15 ^ b4;
+-	b15 = ror64(tmp, 51);
+-	b4 -= b15;
+-
+-	tmp = b11 ^ b6;
+-	b11 = ror64(tmp, 56);
+-	b6 -= b11;
+-
+-	tmp = b13 ^ b2;
+-	b13 = ror64(tmp, 34);
+-	b2 -= b13;
+-
+-	tmp = b9 ^ b0;
+-	b9 = ror64(tmp, 16);
+-	b0 -= b9;
+-
+-	tmp = b15 ^ b14;
+-	b15 = ror64(tmp, 30);
+-	b14 -= b15 + k14 + t0;
+-	b15 -= k15 + 17;
+-
+-	tmp = b13 ^ b12;
+-	b13 = ror64(tmp, 44);
+-	b12 -= b13 + k12;
+-	b13 -= k13 + t2;
+-
+-	tmp = b11 ^ b10;
+-	b11 = ror64(tmp, 47);
+-	b10 -= b11 + k10;
+-	b11 -= k11;
+-
+-	tmp = b9 ^ b8;
+-	b9 = ror64(tmp, 12);
+-	b8 -= b9 + k8;
+-	b9 -= k9;
+-
+-	tmp = b7 ^ b6;
+-	b7 = ror64(tmp, 31);
+-	b6 -= b7 + k6;
+-	b7 -= k7;
+-
+-	tmp = b5 ^ b4;
+-	b5 = ror64(tmp, 37);
+-	b4 -= b5 + k4;
+-	b5 -= k5;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 9);
+-	b2 -= b3 + k2;
+-	b3 -= k3;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 41);
+-	b0 -= b1 + k0;
+-	b1 -= k1;
+-
+-	tmp = b7 ^ b12;
+-	b7 = ror64(tmp, 25);
+-	b12 -= b7;
+-
+-	tmp = b3 ^ b10;
+-	b3 = ror64(tmp, 16);
+-	b10 -= b3;
+-
+-	tmp = b5 ^ b8;
+-	b5 = ror64(tmp, 28);
+-	b8 -= b5;
+-
+-	tmp = b1 ^ b14;
+-	b1 = ror64(tmp, 47);
+-	b14 -= b1;
+-
+-	tmp = b9 ^ b4;
+-	b9 = ror64(tmp, 41);
+-	b4 -= b9;
+-
+-	tmp = b13 ^ b6;
+-	b13 = ror64(tmp, 48);
+-	b6 -= b13;
+-
+-	tmp = b11 ^ b2;
+-	b11 = ror64(tmp, 20);
+-	b2 -= b11;
+-
+-	tmp = b15 ^ b0;
+-	b15 = ror64(tmp, 5);
+-	b0 -= b15;
+-
+-	tmp = b9 ^ b10;
+-	b9 = ror64(tmp, 17);
+-	b10 -= b9;
+-
+-	tmp = b11 ^ b8;
+-	b11 = ror64(tmp, 59);
+-	b8 -= b11;
+-
+-	tmp = b13 ^ b14;
+-	b13 = ror64(tmp, 41);
+-	b14 -= b13;
+-
+-	tmp = b15 ^ b12;
+-	b15 = ror64(tmp, 34);
+-	b12 -= b15;
+-
+-	tmp = b1 ^ b6;
+-	b1 = ror64(tmp, 13);
+-	b6 -= b1;
+-
+-	tmp = b3 ^ b4;
+-	b3 = ror64(tmp, 51);
+-	b4 -= b3;
+-
+-	tmp = b5 ^ b2;
+-	b5 = ror64(tmp, 4);
+-	b2 -= b5;
+-
+-	tmp = b7 ^ b0;
+-	b7 = ror64(tmp, 33);
+-	b0 -= b7;
+-
+-	tmp = b1 ^ b8;
+-	b1 = ror64(tmp, 52);
+-	b8 -= b1;
+-
+-	tmp = b5 ^ b14;
+-	b5 = ror64(tmp, 23);
+-	b14 -= b5;
+-
+-	tmp = b3 ^ b12;
+-	b3 = ror64(tmp, 18);
+-	b12 -= b3;
+-
+-	tmp = b7 ^ b10;
+-	b7 = ror64(tmp, 49);
+-	b10 -= b7;
+-
+-	tmp = b15 ^ b4;
+-	b15 = ror64(tmp, 55);
+-	b4 -= b15;
+-
+-	tmp = b11 ^ b6;
+-	b11 = ror64(tmp, 10);
+-	b6 -= b11;
+-
+-	tmp = b13 ^ b2;
+-	b13 = ror64(tmp, 19);
+-	b2 -= b13;
+-
+-	tmp = b9 ^ b0;
+-	b9 = ror64(tmp, 38);
+-	b0 -= b9;
+-
+-	tmp = b15 ^ b14;
+-	b15 = ror64(tmp, 37);
+-	b14 -= b15 + k13 + t2;
+-	b15 -= k14 + 16;
+-
+-	tmp = b13 ^ b12;
+-	b13 = ror64(tmp, 22);
+-	b12 -= b13 + k11;
+-	b13 -= k12 + t1;
+-
+-	tmp = b11 ^ b10;
+-	b11 = ror64(tmp, 17);
+-	b10 -= b11 + k9;
+-	b11 -= k10;
+-
+-	tmp = b9 ^ b8;
+-	b9 = ror64(tmp, 8);
+-	b8 -= b9 + k7;
+-	b9 -= k8;
+-
+-	tmp = b7 ^ b6;
+-	b7 = ror64(tmp, 47);
+-	b6 -= b7 + k5;
+-	b7 -= k6;
+-
+-	tmp = b5 ^ b4;
+-	b5 = ror64(tmp, 8);
+-	b4 -= b5 + k3;
+-	b5 -= k4;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 13);
+-	b2 -= b3 + k1;
+-	b3 -= k2;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 24);
+-	b0 -= b1 + k16;
+-	b1 -= k0;
+-
+-	tmp = b7 ^ b12;
+-	b7 = ror64(tmp, 20);
+-	b12 -= b7;
+-
+-	tmp = b3 ^ b10;
+-	b3 = ror64(tmp, 37);
+-	b10 -= b3;
+-
+-	tmp = b5 ^ b8;
+-	b5 = ror64(tmp, 31);
+-	b8 -= b5;
+-
+-	tmp = b1 ^ b14;
+-	b1 = ror64(tmp, 23);
+-	b14 -= b1;
+-
+-	tmp = b9 ^ b4;
+-	b9 = ror64(tmp, 52);
+-	b4 -= b9;
+-
+-	tmp = b13 ^ b6;
+-	b13 = ror64(tmp, 35);
+-	b6 -= b13;
+-
+-	tmp = b11 ^ b2;
+-	b11 = ror64(tmp, 48);
+-	b2 -= b11;
+-
+-	tmp = b15 ^ b0;
+-	b15 = ror64(tmp, 9);
+-	b0 -= b15;
+-
+-	tmp = b9 ^ b10;
+-	b9 = ror64(tmp, 25);
+-	b10 -= b9;
+-
+-	tmp = b11 ^ b8;
+-	b11 = ror64(tmp, 44);
+-	b8 -= b11;
+-
+-	tmp = b13 ^ b14;
+-	b13 = ror64(tmp, 42);
+-	b14 -= b13;
+-
+-	tmp = b15 ^ b12;
+-	b15 = ror64(tmp, 19);
+-	b12 -= b15;
+-
+-	tmp = b1 ^ b6;
+-	b1 = ror64(tmp, 46);
+-	b6 -= b1;
+-
+-	tmp = b3 ^ b4;
+-	b3 = ror64(tmp, 47);
+-	b4 -= b3;
+-
+-	tmp = b5 ^ b2;
+-	b5 = ror64(tmp, 44);
+-	b2 -= b5;
+-
+-	tmp = b7 ^ b0;
+-	b7 = ror64(tmp, 31);
+-	b0 -= b7;
+-
+-	tmp = b1 ^ b8;
+-	b1 = ror64(tmp, 41);
+-	b8 -= b1;
+-
+-	tmp = b5 ^ b14;
+-	b5 = ror64(tmp, 42);
+-	b14 -= b5;
+-
+-	tmp = b3 ^ b12;
+-	b3 = ror64(tmp, 53);
+-	b12 -= b3;
+-
+-	tmp = b7 ^ b10;
+-	b7 = ror64(tmp, 4);
+-	b10 -= b7;
+-
+-	tmp = b15 ^ b4;
+-	b15 = ror64(tmp, 51);
+-	b4 -= b15;
+-
+-	tmp = b11 ^ b6;
+-	b11 = ror64(tmp, 56);
+-	b6 -= b11;
+-
+-	tmp = b13 ^ b2;
+-	b13 = ror64(tmp, 34);
+-	b2 -= b13;
+-
+-	tmp = b9 ^ b0;
+-	b9 = ror64(tmp, 16);
+-	b0 -= b9;
+-
+-	tmp = b15 ^ b14;
+-	b15 = ror64(tmp, 30);
+-	b14 -= b15 + k12 + t1;
+-	b15 -= k13 + 15;
+-
+-	tmp = b13 ^ b12;
+-	b13 = ror64(tmp, 44);
+-	b12 -= b13 + k10;
+-	b13 -= k11 + t0;
+-
+-	tmp = b11 ^ b10;
+-	b11 = ror64(tmp, 47);
+-	b10 -= b11 + k8;
+-	b11 -= k9;
+-
+-	tmp = b9 ^ b8;
+-	b9 = ror64(tmp, 12);
+-	b8 -= b9 + k6;
+-	b9 -= k7;
+-
+-	tmp = b7 ^ b6;
+-	b7 = ror64(tmp, 31);
+-	b6 -= b7 + k4;
+-	b7 -= k5;
+-
+-	tmp = b5 ^ b4;
+-	b5 = ror64(tmp, 37);
+-	b4 -= b5 + k2;
+-	b5 -= k3;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 9);
+-	b2 -= b3 + k0;
+-	b3 -= k1;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 41);
+-	b0 -= b1 + k15;
+-	b1 -= k16;
+-
+-	tmp = b7 ^ b12;
+-	b7 = ror64(tmp, 25);
+-	b12 -= b7;
+-
+-	tmp = b3 ^ b10;
+-	b3 = ror64(tmp, 16);
+-	b10 -= b3;
+-
+-	tmp = b5 ^ b8;
+-	b5 = ror64(tmp, 28);
+-	b8 -= b5;
+-
+-	tmp = b1 ^ b14;
+-	b1 = ror64(tmp, 47);
+-	b14 -= b1;
+-
+-	tmp = b9 ^ b4;
+-	b9 = ror64(tmp, 41);
+-	b4 -= b9;
+-
+-	tmp = b13 ^ b6;
+-	b13 = ror64(tmp, 48);
+-	b6 -= b13;
+-
+-	tmp = b11 ^ b2;
+-	b11 = ror64(tmp, 20);
+-	b2 -= b11;
+-
+-	tmp = b15 ^ b0;
+-	b15 = ror64(tmp, 5);
+-	b0 -= b15;
+-
+-	tmp = b9 ^ b10;
+-	b9 = ror64(tmp, 17);
+-	b10 -= b9;
+-
+-	tmp = b11 ^ b8;
+-	b11 = ror64(tmp, 59);
+-	b8 -= b11;
+-
+-	tmp = b13 ^ b14;
+-	b13 = ror64(tmp, 41);
+-	b14 -= b13;
+-
+-	tmp = b15 ^ b12;
+-	b15 = ror64(tmp, 34);
+-	b12 -= b15;
+-
+-	tmp = b1 ^ b6;
+-	b1 = ror64(tmp, 13);
+-	b6 -= b1;
+-
+-	tmp = b3 ^ b4;
+-	b3 = ror64(tmp, 51);
+-	b4 -= b3;
+-
+-	tmp = b5 ^ b2;
+-	b5 = ror64(tmp, 4);
+-	b2 -= b5;
+-
+-	tmp = b7 ^ b0;
+-	b7 = ror64(tmp, 33);
+-	b0 -= b7;
+-
+-	tmp = b1 ^ b8;
+-	b1 = ror64(tmp, 52);
+-	b8 -= b1;
+-
+-	tmp = b5 ^ b14;
+-	b5 = ror64(tmp, 23);
+-	b14 -= b5;
+-
+-	tmp = b3 ^ b12;
+-	b3 = ror64(tmp, 18);
+-	b12 -= b3;
+-
+-	tmp = b7 ^ b10;
+-	b7 = ror64(tmp, 49);
+-	b10 -= b7;
+-
+-	tmp = b15 ^ b4;
+-	b15 = ror64(tmp, 55);
+-	b4 -= b15;
+-
+-	tmp = b11 ^ b6;
+-	b11 = ror64(tmp, 10);
+-	b6 -= b11;
+-
+-	tmp = b13 ^ b2;
+-	b13 = ror64(tmp, 19);
+-	b2 -= b13;
+-
+-	tmp = b9 ^ b0;
+-	b9 = ror64(tmp, 38);
+-	b0 -= b9;
+-
+-	tmp = b15 ^ b14;
+-	b15 = ror64(tmp, 37);
+-	b14 -= b15 + k11 + t0;
+-	b15 -= k12 + 14;
+-
+-	tmp = b13 ^ b12;
+-	b13 = ror64(tmp, 22);
+-	b12 -= b13 + k9;
+-	b13 -= k10 + t2;
+-
+-	tmp = b11 ^ b10;
+-	b11 = ror64(tmp, 17);
+-	b10 -= b11 + k7;
+-	b11 -= k8;
+-
+-	tmp = b9 ^ b8;
+-	b9 = ror64(tmp, 8);
+-	b8 -= b9 + k5;
+-	b9 -= k6;
+-
+-	tmp = b7 ^ b6;
+-	b7 = ror64(tmp, 47);
+-	b6 -= b7 + k3;
+-	b7 -= k4;
+-
+-	tmp = b5 ^ b4;
+-	b5 = ror64(tmp, 8);
+-	b4 -= b5 + k1;
+-	b5 -= k2;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 13);
+-	b2 -= b3 + k16;
+-	b3 -= k0;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 24);
+-	b0 -= b1 + k14;
+-	b1 -= k15;
+-
+-	tmp = b7 ^ b12;
+-	b7 = ror64(tmp, 20);
+-	b12 -= b7;
+-
+-	tmp = b3 ^ b10;
+-	b3 = ror64(tmp, 37);
+-	b10 -= b3;
+-
+-	tmp = b5 ^ b8;
+-	b5 = ror64(tmp, 31);
+-	b8 -= b5;
+-
+-	tmp = b1 ^ b14;
+-	b1 = ror64(tmp, 23);
+-	b14 -= b1;
+-
+-	tmp = b9 ^ b4;
+-	b9 = ror64(tmp, 52);
+-	b4 -= b9;
+-
+-	tmp = b13 ^ b6;
+-	b13 = ror64(tmp, 35);
+-	b6 -= b13;
+-
+-	tmp = b11 ^ b2;
+-	b11 = ror64(tmp, 48);
+-	b2 -= b11;
+-
+-	tmp = b15 ^ b0;
+-	b15 = ror64(tmp, 9);
+-	b0 -= b15;
+-
+-	tmp = b9 ^ b10;
+-	b9 = ror64(tmp, 25);
+-	b10 -= b9;
+-
+-	tmp = b11 ^ b8;
+-	b11 = ror64(tmp, 44);
+-	b8 -= b11;
+-
+-	tmp = b13 ^ b14;
+-	b13 = ror64(tmp, 42);
+-	b14 -= b13;
+-
+-	tmp = b15 ^ b12;
+-	b15 = ror64(tmp, 19);
+-	b12 -= b15;
+-
+-	tmp = b1 ^ b6;
+-	b1 = ror64(tmp, 46);
+-	b6 -= b1;
+-
+-	tmp = b3 ^ b4;
+-	b3 = ror64(tmp, 47);
+-	b4 -= b3;
+-
+-	tmp = b5 ^ b2;
+-	b5 = ror64(tmp, 44);
+-	b2 -= b5;
+-
+-	tmp = b7 ^ b0;
+-	b7 = ror64(tmp, 31);
+-	b0 -= b7;
+-
+-	tmp = b1 ^ b8;
+-	b1 = ror64(tmp, 41);
+-	b8 -= b1;
+-
+-	tmp = b5 ^ b14;
+-	b5 = ror64(tmp, 42);
+-	b14 -= b5;
+-
+-	tmp = b3 ^ b12;
+-	b3 = ror64(tmp, 53);
+-	b12 -= b3;
+-
+-	tmp = b7 ^ b10;
+-	b7 = ror64(tmp, 4);
+-	b10 -= b7;
+-
+-	tmp = b15 ^ b4;
+-	b15 = ror64(tmp, 51);
+-	b4 -= b15;
+-
+-	tmp = b11 ^ b6;
+-	b11 = ror64(tmp, 56);
+-	b6 -= b11;
+-
+-	tmp = b13 ^ b2;
+-	b13 = ror64(tmp, 34);
+-	b2 -= b13;
+-
+-	tmp = b9 ^ b0;
+-	b9 = ror64(tmp, 16);
+-	b0 -= b9;
+-
+-	tmp = b15 ^ b14;
+-	b15 = ror64(tmp, 30);
+-	b14 -= b15 + k10 + t2;
+-	b15 -= k11 + 13;
+-
+-	tmp = b13 ^ b12;
+-	b13 = ror64(tmp, 44);
+-	b12 -= b13 + k8;
+-	b13 -= k9 + t1;
+-
+-	tmp = b11 ^ b10;
+-	b11 = ror64(tmp, 47);
+-	b10 -= b11 + k6;
+-	b11 -= k7;
+-
+-	tmp = b9 ^ b8;
+-	b9 = ror64(tmp, 12);
+-	b8 -= b9 + k4;
+-	b9 -= k5;
+-
+-	tmp = b7 ^ b6;
+-	b7 = ror64(tmp, 31);
+-	b6 -= b7 + k2;
+-	b7 -= k3;
+-
+-	tmp = b5 ^ b4;
+-	b5 = ror64(tmp, 37);
+-	b4 -= b5 + k0;
+-	b5 -= k1;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 9);
+-	b2 -= b3 + k15;
+-	b3 -= k16;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 41);
+-	b0 -= b1 + k13;
+-	b1 -= k14;
+-
+-	tmp = b7 ^ b12;
+-	b7 = ror64(tmp, 25);
+-	b12 -= b7;
+-
+-	tmp = b3 ^ b10;
+-	b3 = ror64(tmp, 16);
+-	b10 -= b3;
+-
+-	tmp = b5 ^ b8;
+-	b5 = ror64(tmp, 28);
+-	b8 -= b5;
+-
+-	tmp = b1 ^ b14;
+-	b1 = ror64(tmp, 47);
+-	b14 -= b1;
+-
+-	tmp = b9 ^ b4;
+-	b9 = ror64(tmp, 41);
+-	b4 -= b9;
+-
+-	tmp = b13 ^ b6;
+-	b13 = ror64(tmp, 48);
+-	b6 -= b13;
+-
+-	tmp = b11 ^ b2;
+-	b11 = ror64(tmp, 20);
+-	b2 -= b11;
+-
+-	tmp = b15 ^ b0;
+-	b15 = ror64(tmp, 5);
+-	b0 -= b15;
+-
+-	tmp = b9 ^ b10;
+-	b9 = ror64(tmp, 17);
+-	b10 -= b9;
+-
+-	tmp = b11 ^ b8;
+-	b11 = ror64(tmp, 59);
+-	b8 -= b11;
+-
+-	tmp = b13 ^ b14;
+-	b13 = ror64(tmp, 41);
+-	b14 -= b13;
+-
+-	tmp = b15 ^ b12;
+-	b15 = ror64(tmp, 34);
+-	b12 -= b15;
+-
+-	tmp = b1 ^ b6;
+-	b1 = ror64(tmp, 13);
+-	b6 -= b1;
+-
+-	tmp = b3 ^ b4;
+-	b3 = ror64(tmp, 51);
+-	b4 -= b3;
+-
+-	tmp = b5 ^ b2;
+-	b5 = ror64(tmp, 4);
+-	b2 -= b5;
+-
+-	tmp = b7 ^ b0;
+-	b7 = ror64(tmp, 33);
+-	b0 -= b7;
+-
+-	tmp = b1 ^ b8;
+-	b1 = ror64(tmp, 52);
+-	b8 -= b1;
+-
+-	tmp = b5 ^ b14;
+-	b5 = ror64(tmp, 23);
+-	b14 -= b5;
+-
+-	tmp = b3 ^ b12;
+-	b3 = ror64(tmp, 18);
+-	b12 -= b3;
+-
+-	tmp = b7 ^ b10;
+-	b7 = ror64(tmp, 49);
+-	b10 -= b7;
+-
+-	tmp = b15 ^ b4;
+-	b15 = ror64(tmp, 55);
+-	b4 -= b15;
+-
+-	tmp = b11 ^ b6;
+-	b11 = ror64(tmp, 10);
+-	b6 -= b11;
+-
+-	tmp = b13 ^ b2;
+-	b13 = ror64(tmp, 19);
+-	b2 -= b13;
+-
+-	tmp = b9 ^ b0;
+-	b9 = ror64(tmp, 38);
+-	b0 -= b9;
+-
+-	tmp = b15 ^ b14;
+-	b15 = ror64(tmp, 37);
+-	b14 -= b15 + k9 + t1;
+-	b15 -= k10 + 12;
+-
+-	tmp = b13 ^ b12;
+-	b13 = ror64(tmp, 22);
+-	b12 -= b13 + k7;
+-	b13 -= k8 + t0;
+-
+-	tmp = b11 ^ b10;
+-	b11 = ror64(tmp, 17);
+-	b10 -= b11 + k5;
+-	b11 -= k6;
+-
+-	tmp = b9 ^ b8;
+-	b9 = ror64(tmp, 8);
+-	b8 -= b9 + k3;
+-	b9 -= k4;
+-
+-	tmp = b7 ^ b6;
+-	b7 = ror64(tmp, 47);
+-	b6 -= b7 + k1;
+-	b7 -= k2;
+-
+-	tmp = b5 ^ b4;
+-	b5 = ror64(tmp, 8);
+-	b4 -= b5 + k16;
+-	b5 -= k0;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 13);
+-	b2 -= b3 + k14;
+-	b3 -= k15;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 24);
+-	b0 -= b1 + k12;
+-	b1 -= k13;
+-
+-	tmp = b7 ^ b12;
+-	b7 = ror64(tmp, 20);
+-	b12 -= b7;
+-
+-	tmp = b3 ^ b10;
+-	b3 = ror64(tmp, 37);
+-	b10 -= b3;
+-
+-	tmp = b5 ^ b8;
+-	b5 = ror64(tmp, 31);
+-	b8 -= b5;
+-
+-	tmp = b1 ^ b14;
+-	b1 = ror64(tmp, 23);
+-	b14 -= b1;
+-
+-	tmp = b9 ^ b4;
+-	b9 = ror64(tmp, 52);
+-	b4 -= b9;
+-
+-	tmp = b13 ^ b6;
+-	b13 = ror64(tmp, 35);
+-	b6 -= b13;
+-
+-	tmp = b11 ^ b2;
+-	b11 = ror64(tmp, 48);
+-	b2 -= b11;
+-
+-	tmp = b15 ^ b0;
+-	b15 = ror64(tmp, 9);
+-	b0 -= b15;
+-
+-	tmp = b9 ^ b10;
+-	b9 = ror64(tmp, 25);
+-	b10 -= b9;
+-
+-	tmp = b11 ^ b8;
+-	b11 = ror64(tmp, 44);
+-	b8 -= b11;
+-
+-	tmp = b13 ^ b14;
+-	b13 = ror64(tmp, 42);
+-	b14 -= b13;
+-
+-	tmp = b15 ^ b12;
+-	b15 = ror64(tmp, 19);
+-	b12 -= b15;
+-
+-	tmp = b1 ^ b6;
+-	b1 = ror64(tmp, 46);
+-	b6 -= b1;
+-
+-	tmp = b3 ^ b4;
+-	b3 = ror64(tmp, 47);
+-	b4 -= b3;
+-
+-	tmp = b5 ^ b2;
+-	b5 = ror64(tmp, 44);
+-	b2 -= b5;
+-
+-	tmp = b7 ^ b0;
+-	b7 = ror64(tmp, 31);
+-	b0 -= b7;
+-
+-	tmp = b1 ^ b8;
+-	b1 = ror64(tmp, 41);
+-	b8 -= b1;
+-
+-	tmp = b5 ^ b14;
+-	b5 = ror64(tmp, 42);
+-	b14 -= b5;
+-
+-	tmp = b3 ^ b12;
+-	b3 = ror64(tmp, 53);
+-	b12 -= b3;
+-
+-	tmp = b7 ^ b10;
+-	b7 = ror64(tmp, 4);
+-	b10 -= b7;
+-
+-	tmp = b15 ^ b4;
+-	b15 = ror64(tmp, 51);
+-	b4 -= b15;
+-
+-	tmp = b11 ^ b6;
+-	b11 = ror64(tmp, 56);
+-	b6 -= b11;
+-
+-	tmp = b13 ^ b2;
+-	b13 = ror64(tmp, 34);
+-	b2 -= b13;
+-
+-	tmp = b9 ^ b0;
+-	b9 = ror64(tmp, 16);
+-	b0 -= b9;
+-
+-	tmp = b15 ^ b14;
+-	b15 = ror64(tmp, 30);
+-	b14 -= b15 + k8 + t0;
+-	b15 -= k9 + 11;
+-
+-	tmp = b13 ^ b12;
+-	b13 = ror64(tmp, 44);
+-	b12 -= b13 + k6;
+-	b13 -= k7 + t2;
+-
+-	tmp = b11 ^ b10;
+-	b11 = ror64(tmp, 47);
+-	b10 -= b11 + k4;
+-	b11 -= k5;
+-
+-	tmp = b9 ^ b8;
+-	b9 = ror64(tmp, 12);
+-	b8 -= b9 + k2;
+-	b9 -= k3;
+-
+-	tmp = b7 ^ b6;
+-	b7 = ror64(tmp, 31);
+-	b6 -= b7 + k0;
+-	b7 -= k1;
+-
+-	tmp = b5 ^ b4;
+-	b5 = ror64(tmp, 37);
+-	b4 -= b5 + k15;
+-	b5 -= k16;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 9);
+-	b2 -= b3 + k13;
+-	b3 -= k14;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 41);
+-	b0 -= b1 + k11;
+-	b1 -= k12;
+-
+-	tmp = b7 ^ b12;
+-	b7 = ror64(tmp, 25);
+-	b12 -= b7;
+-
+-	tmp = b3 ^ b10;
+-	b3 = ror64(tmp, 16);
+-	b10 -= b3;
+-
+-	tmp = b5 ^ b8;
+-	b5 = ror64(tmp, 28);
+-	b8 -= b5;
+-
+-	tmp = b1 ^ b14;
+-	b1 = ror64(tmp, 47);
+-	b14 -= b1;
+-
+-	tmp = b9 ^ b4;
+-	b9 = ror64(tmp, 41);
+-	b4 -= b9;
+-
+-	tmp = b13 ^ b6;
+-	b13 = ror64(tmp, 48);
+-	b6 -= b13;
+-
+-	tmp = b11 ^ b2;
+-	b11 = ror64(tmp, 20);
+-	b2 -= b11;
+-
+-	tmp = b15 ^ b0;
+-	b15 = ror64(tmp, 5);
+-	b0 -= b15;
+-
+-	tmp = b9 ^ b10;
+-	b9 = ror64(tmp, 17);
+-	b10 -= b9;
+-
+-	tmp = b11 ^ b8;
+-	b11 = ror64(tmp, 59);
+-	b8 -= b11;
+-
+-	tmp = b13 ^ b14;
+-	b13 = ror64(tmp, 41);
+-	b14 -= b13;
+-
+-	tmp = b15 ^ b12;
+-	b15 = ror64(tmp, 34);
+-	b12 -= b15;
+-
+-	tmp = b1 ^ b6;
+-	b1 = ror64(tmp, 13);
+-	b6 -= b1;
+-
+-	tmp = b3 ^ b4;
+-	b3 = ror64(tmp, 51);
+-	b4 -= b3;
+-
+-	tmp = b5 ^ b2;
+-	b5 = ror64(tmp, 4);
+-	b2 -= b5;
+-
+-	tmp = b7 ^ b0;
+-	b7 = ror64(tmp, 33);
+-	b0 -= b7;
+-
+-	tmp = b1 ^ b8;
+-	b1 = ror64(tmp, 52);
+-	b8 -= b1;
+-
+-	tmp = b5 ^ b14;
+-	b5 = ror64(tmp, 23);
+-	b14 -= b5;
+-
+-	tmp = b3 ^ b12;
+-	b3 = ror64(tmp, 18);
+-	b12 -= b3;
+-
+-	tmp = b7 ^ b10;
+-	b7 = ror64(tmp, 49);
+-	b10 -= b7;
+-
+-	tmp = b15 ^ b4;
+-	b15 = ror64(tmp, 55);
+-	b4 -= b15;
+-
+-	tmp = b11 ^ b6;
+-	b11 = ror64(tmp, 10);
+-	b6 -= b11;
+-
+-	tmp = b13 ^ b2;
+-	b13 = ror64(tmp, 19);
+-	b2 -= b13;
+-
+-	tmp = b9 ^ b0;
+-	b9 = ror64(tmp, 38);
+-	b0 -= b9;
+-
+-	tmp = b15 ^ b14;
+-	b15 = ror64(tmp, 37);
+-	b14 -= b15 + k7 + t2;
+-	b15 -= k8 + 10;
+-
+-	tmp = b13 ^ b12;
+-	b13 = ror64(tmp, 22);
+-	b12 -= b13 + k5;
+-	b13 -= k6 + t1;
+-
+-	tmp = b11 ^ b10;
+-	b11 = ror64(tmp, 17);
+-	b10 -= b11 + k3;
+-	b11 -= k4;
+-
+-	tmp = b9 ^ b8;
+-	b9 = ror64(tmp, 8);
+-	b8 -= b9 + k1;
+-	b9 -= k2;
+-
+-	tmp = b7 ^ b6;
+-	b7 = ror64(tmp, 47);
+-	b6 -= b7 + k16;
+-	b7 -= k0;
+-
+-	tmp = b5 ^ b4;
+-	b5 = ror64(tmp, 8);
+-	b4 -= b5 + k14;
+-	b5 -= k15;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 13);
+-	b2 -= b3 + k12;
+-	b3 -= k13;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 24);
+-	b0 -= b1 + k10;
+-	b1 -= k11;
+-
+-	tmp = b7 ^ b12;
+-	b7 = ror64(tmp, 20);
+-	b12 -= b7;
+-
+-	tmp = b3 ^ b10;
+-	b3 = ror64(tmp, 37);
+-	b10 -= b3;
+-
+-	tmp = b5 ^ b8;
+-	b5 = ror64(tmp, 31);
+-	b8 -= b5;
+-
+-	tmp = b1 ^ b14;
+-	b1 = ror64(tmp, 23);
+-	b14 -= b1;
+-
+-	tmp = b9 ^ b4;
+-	b9 = ror64(tmp, 52);
+-	b4 -= b9;
+-
+-	tmp = b13 ^ b6;
+-	b13 = ror64(tmp, 35);
+-	b6 -= b13;
+-
+-	tmp = b11 ^ b2;
+-	b11 = ror64(tmp, 48);
+-	b2 -= b11;
+-
+-	tmp = b15 ^ b0;
+-	b15 = ror64(tmp, 9);
+-	b0 -= b15;
+-
+-	tmp = b9 ^ b10;
+-	b9 = ror64(tmp, 25);
+-	b10 -= b9;
+-
+-	tmp = b11 ^ b8;
+-	b11 = ror64(tmp, 44);
+-	b8 -= b11;
+-
+-	tmp = b13 ^ b14;
+-	b13 = ror64(tmp, 42);
+-	b14 -= b13;
+-
+-	tmp = b15 ^ b12;
+-	b15 = ror64(tmp, 19);
+-	b12 -= b15;
+-
+-	tmp = b1 ^ b6;
+-	b1 = ror64(tmp, 46);
+-	b6 -= b1;
+-
+-	tmp = b3 ^ b4;
+-	b3 = ror64(tmp, 47);
+-	b4 -= b3;
+-
+-	tmp = b5 ^ b2;
+-	b5 = ror64(tmp, 44);
+-	b2 -= b5;
+-
+-	tmp = b7 ^ b0;
+-	b7 = ror64(tmp, 31);
+-	b0 -= b7;
+-
+-	tmp = b1 ^ b8;
+-	b1 = ror64(tmp, 41);
+-	b8 -= b1;
+-
+-	tmp = b5 ^ b14;
+-	b5 = ror64(tmp, 42);
+-	b14 -= b5;
+-
+-	tmp = b3 ^ b12;
+-	b3 = ror64(tmp, 53);
+-	b12 -= b3;
+-
+-	tmp = b7 ^ b10;
+-	b7 = ror64(tmp, 4);
+-	b10 -= b7;
+-
+-	tmp = b15 ^ b4;
+-	b15 = ror64(tmp, 51);
+-	b4 -= b15;
+-
+-	tmp = b11 ^ b6;
+-	b11 = ror64(tmp, 56);
+-	b6 -= b11;
+-
+-	tmp = b13 ^ b2;
+-	b13 = ror64(tmp, 34);
+-	b2 -= b13;
+-
+-	tmp = b9 ^ b0;
+-	b9 = ror64(tmp, 16);
+-	b0 -= b9;
+-
+-	tmp = b15 ^ b14;
+-	b15 = ror64(tmp, 30);
+-	b14 -= b15 + k6 + t1;
+-	b15 -= k7 + 9;
+-
+-	tmp = b13 ^ b12;
+-	b13 = ror64(tmp, 44);
+-	b12 -= b13 + k4;
+-	b13 -= k5 + t0;
+-
+-	tmp = b11 ^ b10;
+-	b11 = ror64(tmp, 47);
+-	b10 -= b11 + k2;
+-	b11 -= k3;
+-
+-	tmp = b9 ^ b8;
+-	b9 = ror64(tmp, 12);
+-	b8 -= b9 + k0;
+-	b9 -= k1;
+-
+-	tmp = b7 ^ b6;
+-	b7 = ror64(tmp, 31);
+-	b6 -= b7 + k15;
+-	b7 -= k16;
+-
+-	tmp = b5 ^ b4;
+-	b5 = ror64(tmp, 37);
+-	b4 -= b5 + k13;
+-	b5 -= k14;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 9);
+-	b2 -= b3 + k11;
+-	b3 -= k12;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 41);
+-	b0 -= b1 + k9;
+-	b1 -= k10;
+-
+-	tmp = b7 ^ b12;
+-	b7 = ror64(tmp, 25);
+-	b12 -= b7;
+-
+-	tmp = b3 ^ b10;
+-	b3 = ror64(tmp, 16);
+-	b10 -= b3;
+-
+-	tmp = b5 ^ b8;
+-	b5 = ror64(tmp, 28);
+-	b8 -= b5;
+-
+-	tmp = b1 ^ b14;
+-	b1 = ror64(tmp, 47);
+-	b14 -= b1;
+-
+-	tmp = b9 ^ b4;
+-	b9 = ror64(tmp, 41);
+-	b4 -= b9;
+-
+-	tmp = b13 ^ b6;
+-	b13 = ror64(tmp, 48);
+-	b6 -= b13;
+-
+-	tmp = b11 ^ b2;
+-	b11 = ror64(tmp, 20);
+-	b2 -= b11;
+-
+-	tmp = b15 ^ b0;
+-	b15 = ror64(tmp, 5);
+-	b0 -= b15;
+-
+-	tmp = b9 ^ b10;
+-	b9 = ror64(tmp, 17);
+-	b10 -= b9;
+-
+-	tmp = b11 ^ b8;
+-	b11 = ror64(tmp, 59);
+-	b8 -= b11;
+-
+-	tmp = b13 ^ b14;
+-	b13 = ror64(tmp, 41);
+-	b14 -= b13;
+-
+-	tmp = b15 ^ b12;
+-	b15 = ror64(tmp, 34);
+-	b12 -= b15;
+-
+-	tmp = b1 ^ b6;
+-	b1 = ror64(tmp, 13);
+-	b6 -= b1;
+-
+-	tmp = b3 ^ b4;
+-	b3 = ror64(tmp, 51);
+-	b4 -= b3;
+-
+-	tmp = b5 ^ b2;
+-	b5 = ror64(tmp, 4);
+-	b2 -= b5;
+-
+-	tmp = b7 ^ b0;
+-	b7 = ror64(tmp, 33);
+-	b0 -= b7;
+-
+-	tmp = b1 ^ b8;
+-	b1 = ror64(tmp, 52);
+-	b8 -= b1;
+-
+-	tmp = b5 ^ b14;
+-	b5 = ror64(tmp, 23);
+-	b14 -= b5;
+-
+-	tmp = b3 ^ b12;
+-	b3 = ror64(tmp, 18);
+-	b12 -= b3;
+-
+-	tmp = b7 ^ b10;
+-	b7 = ror64(tmp, 49);
+-	b10 -= b7;
+-
+-	tmp = b15 ^ b4;
+-	b15 = ror64(tmp, 55);
+-	b4 -= b15;
+-
+-	tmp = b11 ^ b6;
+-	b11 = ror64(tmp, 10);
+-	b6 -= b11;
+-
+-	tmp = b13 ^ b2;
+-	b13 = ror64(tmp, 19);
+-	b2 -= b13;
+-
+-	tmp = b9 ^ b0;
+-	b9 = ror64(tmp, 38);
+-	b0 -= b9;
+-
+-	tmp = b15 ^ b14;
+-	b15 = ror64(tmp, 37);
+-	b14 -= b15 + k5 + t0;
+-	b15 -= k6 + 8;
+-
+-	tmp = b13 ^ b12;
+-	b13 = ror64(tmp, 22);
+-	b12 -= b13 + k3;
+-	b13 -= k4 + t2;
+-
+-	tmp = b11 ^ b10;
+-	b11 = ror64(tmp, 17);
+-	b10 -= b11 + k1;
+-	b11 -= k2;
+-
+-	tmp = b9 ^ b8;
+-	b9 = ror64(tmp, 8);
+-	b8 -= b9 + k16;
+-	b9 -= k0;
+-
+-	tmp = b7 ^ b6;
+-	b7 = ror64(tmp, 47);
+-	b6 -= b7 + k14;
+-	b7 -= k15;
+-
+-	tmp = b5 ^ b4;
+-	b5 = ror64(tmp, 8);
+-	b4 -= b5 + k12;
+-	b5 -= k13;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 13);
+-	b2 -= b3 + k10;
+-	b3 -= k11;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 24);
+-	b0 -= b1 + k8;
+-	b1 -= k9;
+-
+-	tmp = b7 ^ b12;
+-	b7 = ror64(tmp, 20);
+-	b12 -= b7;
+-
+-	tmp = b3 ^ b10;
+-	b3 = ror64(tmp, 37);
+-	b10 -= b3;
+-
+-	tmp = b5 ^ b8;
+-	b5 = ror64(tmp, 31);
+-	b8 -= b5;
+-
+-	tmp = b1 ^ b14;
+-	b1 = ror64(tmp, 23);
+-	b14 -= b1;
+-
+-	tmp = b9 ^ b4;
+-	b9 = ror64(tmp, 52);
+-	b4 -= b9;
+-
+-	tmp = b13 ^ b6;
+-	b13 = ror64(tmp, 35);
+-	b6 -= b13;
+-
+-	tmp = b11 ^ b2;
+-	b11 = ror64(tmp, 48);
+-	b2 -= b11;
+-
+-	tmp = b15 ^ b0;
+-	b15 = ror64(tmp, 9);
+-	b0 -= b15;
+-
+-	tmp = b9 ^ b10;
+-	b9 = ror64(tmp, 25);
+-	b10 -= b9;
+-
+-	tmp = b11 ^ b8;
+-	b11 = ror64(tmp, 44);
+-	b8 -= b11;
+-
+-	tmp = b13 ^ b14;
+-	b13 = ror64(tmp, 42);
+-	b14 -= b13;
+-
+-	tmp = b15 ^ b12;
+-	b15 = ror64(tmp, 19);
+-	b12 -= b15;
+-
+-	tmp = b1 ^ b6;
+-	b1 = ror64(tmp, 46);
+-	b6 -= b1;
+-
+-	tmp = b3 ^ b4;
+-	b3 = ror64(tmp, 47);
+-	b4 -= b3;
+-
+-	tmp = b5 ^ b2;
+-	b5 = ror64(tmp, 44);
+-	b2 -= b5;
+-
+-	tmp = b7 ^ b0;
+-	b7 = ror64(tmp, 31);
+-	b0 -= b7;
+-
+-	tmp = b1 ^ b8;
+-	b1 = ror64(tmp, 41);
+-	b8 -= b1;
+-
+-	tmp = b5 ^ b14;
+-	b5 = ror64(tmp, 42);
+-	b14 -= b5;
+-
+-	tmp = b3 ^ b12;
+-	b3 = ror64(tmp, 53);
+-	b12 -= b3;
+-
+-	tmp = b7 ^ b10;
+-	b7 = ror64(tmp, 4);
+-	b10 -= b7;
+-
+-	tmp = b15 ^ b4;
+-	b15 = ror64(tmp, 51);
+-	b4 -= b15;
+-
+-	tmp = b11 ^ b6;
+-	b11 = ror64(tmp, 56);
+-	b6 -= b11;
+-
+-	tmp = b13 ^ b2;
+-	b13 = ror64(tmp, 34);
+-	b2 -= b13;
+-
+-	tmp = b9 ^ b0;
+-	b9 = ror64(tmp, 16);
+-	b0 -= b9;
+-
+-	tmp = b15 ^ b14;
+-	b15 = ror64(tmp, 30);
+-	b14 -= b15 + k4 + t2;
+-	b15 -= k5 + 7;
+-
+-	tmp = b13 ^ b12;
+-	b13 = ror64(tmp, 44);
+-	b12 -= b13 + k2;
+-	b13 -= k3 + t1;
+-
+-	tmp = b11 ^ b10;
+-	b11 = ror64(tmp, 47);
+-	b10 -= b11 + k0;
+-	b11 -= k1;
+-
+-	tmp = b9 ^ b8;
+-	b9 = ror64(tmp, 12);
+-	b8 -= b9 + k15;
+-	b9 -= k16;
+-
+-	tmp = b7 ^ b6;
+-	b7 = ror64(tmp, 31);
+-	b6 -= b7 + k13;
+-	b7 -= k14;
+-
+-	tmp = b5 ^ b4;
+-	b5 = ror64(tmp, 37);
+-	b4 -= b5 + k11;
+-	b5 -= k12;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 9);
+-	b2 -= b3 + k9;
+-	b3 -= k10;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 41);
+-	b0 -= b1 + k7;
+-	b1 -= k8;
+-
+-	tmp = b7 ^ b12;
+-	b7 = ror64(tmp, 25);
+-	b12 -= b7;
+-
+-	tmp = b3 ^ b10;
+-	b3 = ror64(tmp, 16);
+-	b10 -= b3;
+-
+-	tmp = b5 ^ b8;
+-	b5 = ror64(tmp, 28);
+-	b8 -= b5;
+-
+-	tmp = b1 ^ b14;
+-	b1 = ror64(tmp, 47);
+-	b14 -= b1;
+-
+-	tmp = b9 ^ b4;
+-	b9 = ror64(tmp, 41);
+-	b4 -= b9;
+-
+-	tmp = b13 ^ b6;
+-	b13 = ror64(tmp, 48);
+-	b6 -= b13;
+-
+-	tmp = b11 ^ b2;
+-	b11 = ror64(tmp, 20);
+-	b2 -= b11;
+-
+-	tmp = b15 ^ b0;
+-	b15 = ror64(tmp, 5);
+-	b0 -= b15;
+-
+-	tmp = b9 ^ b10;
+-	b9 = ror64(tmp, 17);
+-	b10 -= b9;
+-
+-	tmp = b11 ^ b8;
+-	b11 = ror64(tmp, 59);
+-	b8 -= b11;
+-
+-	tmp = b13 ^ b14;
+-	b13 = ror64(tmp, 41);
+-	b14 -= b13;
+-
+-	tmp = b15 ^ b12;
+-	b15 = ror64(tmp, 34);
+-	b12 -= b15;
+-
+-	tmp = b1 ^ b6;
+-	b1 = ror64(tmp, 13);
+-	b6 -= b1;
+-
+-	tmp = b3 ^ b4;
+-	b3 = ror64(tmp, 51);
+-	b4 -= b3;
+-
+-	tmp = b5 ^ b2;
+-	b5 = ror64(tmp, 4);
+-	b2 -= b5;
+-
+-	tmp = b7 ^ b0;
+-	b7 = ror64(tmp, 33);
+-	b0 -= b7;
+-
+-	tmp = b1 ^ b8;
+-	b1 = ror64(tmp, 52);
+-	b8 -= b1;
+-
+-	tmp = b5 ^ b14;
+-	b5 = ror64(tmp, 23);
+-	b14 -= b5;
+-
+-	tmp = b3 ^ b12;
+-	b3 = ror64(tmp, 18);
+-	b12 -= b3;
+-
+-	tmp = b7 ^ b10;
+-	b7 = ror64(tmp, 49);
+-	b10 -= b7;
+-
+-	tmp = b15 ^ b4;
+-	b15 = ror64(tmp, 55);
+-	b4 -= b15;
+-
+-	tmp = b11 ^ b6;
+-	b11 = ror64(tmp, 10);
+-	b6 -= b11;
+-
+-	tmp = b13 ^ b2;
+-	b13 = ror64(tmp, 19);
+-	b2 -= b13;
+-
+-	tmp = b9 ^ b0;
+-	b9 = ror64(tmp, 38);
+-	b0 -= b9;
+-
+-	tmp = b15 ^ b14;
+-	b15 = ror64(tmp, 37);
+-	b14 -= b15 + k3 + t1;
+-	b15 -= k4 + 6;
+-
+-	tmp = b13 ^ b12;
+-	b13 = ror64(tmp, 22);
+-	b12 -= b13 + k1;
+-	b13 -= k2 + t0;
+-
+-	tmp = b11 ^ b10;
+-	b11 = ror64(tmp, 17);
+-	b10 -= b11 + k16;
+-	b11 -= k0;
+-
+-	tmp = b9 ^ b8;
+-	b9 = ror64(tmp, 8);
+-	b8 -= b9 + k14;
+-	b9 -= k15;
+-
+-	tmp = b7 ^ b6;
+-	b7 = ror64(tmp, 47);
+-	b6 -= b7 + k12;
+-	b7 -= k13;
+-
+-	tmp = b5 ^ b4;
+-	b5 = ror64(tmp, 8);
+-	b4 -= b5 + k10;
+-	b5 -= k11;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 13);
+-	b2 -= b3 + k8;
+-	b3 -= k9;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 24);
+-	b0 -= b1 + k6;
+-	b1 -= k7;
+-
+-	tmp = b7 ^ b12;
+-	b7 = ror64(tmp, 20);
+-	b12 -= b7;
+-
+-	tmp = b3 ^ b10;
+-	b3 = ror64(tmp, 37);
+-	b10 -= b3;
+-
+-	tmp = b5 ^ b8;
+-	b5 = ror64(tmp, 31);
+-	b8 -= b5;
+-
+-	tmp = b1 ^ b14;
+-	b1 = ror64(tmp, 23);
+-	b14 -= b1;
+-
+-	tmp = b9 ^ b4;
+-	b9 = ror64(tmp, 52);
+-	b4 -= b9;
+-
+-	tmp = b13 ^ b6;
+-	b13 = ror64(tmp, 35);
+-	b6 -= b13;
+-
+-	tmp = b11 ^ b2;
+-	b11 = ror64(tmp, 48);
+-	b2 -= b11;
+-
+-	tmp = b15 ^ b0;
+-	b15 = ror64(tmp, 9);
+-	b0 -= b15;
+-
+-	tmp = b9 ^ b10;
+-	b9 = ror64(tmp, 25);
+-	b10 -= b9;
+-
+-	tmp = b11 ^ b8;
+-	b11 = ror64(tmp, 44);
+-	b8 -= b11;
+-
+-	tmp = b13 ^ b14;
+-	b13 = ror64(tmp, 42);
+-	b14 -= b13;
+-
+-	tmp = b15 ^ b12;
+-	b15 = ror64(tmp, 19);
+-	b12 -= b15;
+-
+-	tmp = b1 ^ b6;
+-	b1 = ror64(tmp, 46);
+-	b6 -= b1;
+-
+-	tmp = b3 ^ b4;
+-	b3 = ror64(tmp, 47);
+-	b4 -= b3;
+-
+-	tmp = b5 ^ b2;
+-	b5 = ror64(tmp, 44);
+-	b2 -= b5;
+-
+-	tmp = b7 ^ b0;
+-	b7 = ror64(tmp, 31);
+-	b0 -= b7;
+-
+-	tmp = b1 ^ b8;
+-	b1 = ror64(tmp, 41);
+-	b8 -= b1;
+-
+-	tmp = b5 ^ b14;
+-	b5 = ror64(tmp, 42);
+-	b14 -= b5;
+-
+-	tmp = b3 ^ b12;
+-	b3 = ror64(tmp, 53);
+-	b12 -= b3;
+-
+-	tmp = b7 ^ b10;
+-	b7 = ror64(tmp, 4);
+-	b10 -= b7;
+-
+-	tmp = b15 ^ b4;
+-	b15 = ror64(tmp, 51);
+-	b4 -= b15;
+-
+-	tmp = b11 ^ b6;
+-	b11 = ror64(tmp, 56);
+-	b6 -= b11;
+-
+-	tmp = b13 ^ b2;
+-	b13 = ror64(tmp, 34);
+-	b2 -= b13;
+-
+-	tmp = b9 ^ b0;
+-	b9 = ror64(tmp, 16);
+-	b0 -= b9;
+-
+-	tmp = b15 ^ b14;
+-	b15 = ror64(tmp, 30);
+-	b14 -= b15 + k2 + t0;
+-	b15 -= k3 + 5;
+-
+-	tmp = b13 ^ b12;
+-	b13 = ror64(tmp, 44);
+-	b12 -= b13 + k0;
+-	b13 -= k1 + t2;
+-
+-	tmp = b11 ^ b10;
+-	b11 = ror64(tmp, 47);
+-	b10 -= b11 + k15;
+-	b11 -= k16;
+-
+-	tmp = b9 ^ b8;
+-	b9 = ror64(tmp, 12);
+-	b8 -= b9 + k13;
+-	b9 -= k14;
+-
+-	tmp = b7 ^ b6;
+-	b7 = ror64(tmp, 31);
+-	b6 -= b7 + k11;
+-	b7 -= k12;
+-
+-	tmp = b5 ^ b4;
+-	b5 = ror64(tmp, 37);
+-	b4 -= b5 + k9;
+-	b5 -= k10;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 9);
+-	b2 -= b3 + k7;
+-	b3 -= k8;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 41);
+-	b0 -= b1 + k5;
+-	b1 -= k6;
+-
+-	tmp = b7 ^ b12;
+-	b7 = ror64(tmp, 25);
+-	b12 -= b7;
+-
+-	tmp = b3 ^ b10;
+-	b3 = ror64(tmp, 16);
+-	b10 -= b3;
+-
+-	tmp = b5 ^ b8;
+-	b5 = ror64(tmp, 28);
+-	b8 -= b5;
+-
+-	tmp = b1 ^ b14;
+-	b1 = ror64(tmp, 47);
+-	b14 -= b1;
+-
+-	tmp = b9 ^ b4;
+-	b9 = ror64(tmp, 41);
+-	b4 -= b9;
+-
+-	tmp = b13 ^ b6;
+-	b13 = ror64(tmp, 48);
+-	b6 -= b13;
+-
+-	tmp = b11 ^ b2;
+-	b11 = ror64(tmp, 20);
+-	b2 -= b11;
+-
+-	tmp = b15 ^ b0;
+-	b15 = ror64(tmp, 5);
+-	b0 -= b15;
+-
+-	tmp = b9 ^ b10;
+-	b9 = ror64(tmp, 17);
+-	b10 -= b9;
+-
+-	tmp = b11 ^ b8;
+-	b11 = ror64(tmp, 59);
+-	b8 -= b11;
+-
+-	tmp = b13 ^ b14;
+-	b13 = ror64(tmp, 41);
+-	b14 -= b13;
+-
+-	tmp = b15 ^ b12;
+-	b15 = ror64(tmp, 34);
+-	b12 -= b15;
+-
+-	tmp = b1 ^ b6;
+-	b1 = ror64(tmp, 13);
+-	b6 -= b1;
+-
+-	tmp = b3 ^ b4;
+-	b3 = ror64(tmp, 51);
+-	b4 -= b3;
+-
+-	tmp = b5 ^ b2;
+-	b5 = ror64(tmp, 4);
+-	b2 -= b5;
+-
+-	tmp = b7 ^ b0;
+-	b7 = ror64(tmp, 33);
+-	b0 -= b7;
+-
+-	tmp = b1 ^ b8;
+-	b1 = ror64(tmp, 52);
+-	b8 -= b1;
+-
+-	tmp = b5 ^ b14;
+-	b5 = ror64(tmp, 23);
+-	b14 -= b5;
+-
+-	tmp = b3 ^ b12;
+-	b3 = ror64(tmp, 18);
+-	b12 -= b3;
+-
+-	tmp = b7 ^ b10;
+-	b7 = ror64(tmp, 49);
+-	b10 -= b7;
+-
+-	tmp = b15 ^ b4;
+-	b15 = ror64(tmp, 55);
+-	b4 -= b15;
+-
+-	tmp = b11 ^ b6;
+-	b11 = ror64(tmp, 10);
+-	b6 -= b11;
+-
+-	tmp = b13 ^ b2;
+-	b13 = ror64(tmp, 19);
+-	b2 -= b13;
+-
+-	tmp = b9 ^ b0;
+-	b9 = ror64(tmp, 38);
+-	b0 -= b9;
+-
+-	tmp = b15 ^ b14;
+-	b15 = ror64(tmp, 37);
+-	b14 -= b15 + k1 + t2;
+-	b15 -= k2 + 4;
+-
+-	tmp = b13 ^ b12;
+-	b13 = ror64(tmp, 22);
+-	b12 -= b13 + k16;
+-	b13 -= k0 + t1;
+-
+-	tmp = b11 ^ b10;
+-	b11 = ror64(tmp, 17);
+-	b10 -= b11 + k14;
+-	b11 -= k15;
+-
+-	tmp = b9 ^ b8;
+-	b9 = ror64(tmp, 8);
+-	b8 -= b9 + k12;
+-	b9 -= k13;
+-
+-	tmp = b7 ^ b6;
+-	b7 = ror64(tmp, 47);
+-	b6 -= b7 + k10;
+-	b7 -= k11;
+-
+-	tmp = b5 ^ b4;
+-	b5 = ror64(tmp, 8);
+-	b4 -= b5 + k8;
+-	b5 -= k9;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 13);
+-	b2 -= b3 + k6;
+-	b3 -= k7;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 24);
+-	b0 -= b1 + k4;
+-	b1 -= k5;
+-
+-	tmp = b7 ^ b12;
+-	b7 = ror64(tmp, 20);
+-	b12 -= b7;
+-
+-	tmp = b3 ^ b10;
+-	b3 = ror64(tmp, 37);
+-	b10 -= b3;
+-
+-	tmp = b5 ^ b8;
+-	b5 = ror64(tmp, 31);
+-	b8 -= b5;
+-
+-	tmp = b1 ^ b14;
+-	b1 = ror64(tmp, 23);
+-	b14 -= b1;
+-
+-	tmp = b9 ^ b4;
+-	b9 = ror64(tmp, 52);
+-	b4 -= b9;
+-
+-	tmp = b13 ^ b6;
+-	b13 = ror64(tmp, 35);
+-	b6 -= b13;
+-
+-	tmp = b11 ^ b2;
+-	b11 = ror64(tmp, 48);
+-	b2 -= b11;
+-
+-	tmp = b15 ^ b0;
+-	b15 = ror64(tmp, 9);
+-	b0 -= b15;
+-
+-	tmp = b9 ^ b10;
+-	b9 = ror64(tmp, 25);
+-	b10 -= b9;
+-
+-	tmp = b11 ^ b8;
+-	b11 = ror64(tmp, 44);
+-	b8 -= b11;
+-
+-	tmp = b13 ^ b14;
+-	b13 = ror64(tmp, 42);
+-	b14 -= b13;
+-
+-	tmp = b15 ^ b12;
+-	b15 = ror64(tmp, 19);
+-	b12 -= b15;
+-
+-	tmp = b1 ^ b6;
+-	b1 = ror64(tmp, 46);
+-	b6 -= b1;
+-
+-	tmp = b3 ^ b4;
+-	b3 = ror64(tmp, 47);
+-	b4 -= b3;
+-
+-	tmp = b5 ^ b2;
+-	b5 = ror64(tmp, 44);
+-	b2 -= b5;
+-
+-	tmp = b7 ^ b0;
+-	b7 = ror64(tmp, 31);
+-	b0 -= b7;
+-
+-	tmp = b1 ^ b8;
+-	b1 = ror64(tmp, 41);
+-	b8 -= b1;
+-
+-	tmp = b5 ^ b14;
+-	b5 = ror64(tmp, 42);
+-	b14 -= b5;
+-
+-	tmp = b3 ^ b12;
+-	b3 = ror64(tmp, 53);
+-	b12 -= b3;
+-
+-	tmp = b7 ^ b10;
+-	b7 = ror64(tmp, 4);
+-	b10 -= b7;
+-
+-	tmp = b15 ^ b4;
+-	b15 = ror64(tmp, 51);
+-	b4 -= b15;
+-
+-	tmp = b11 ^ b6;
+-	b11 = ror64(tmp, 56);
+-	b6 -= b11;
+-
+-	tmp = b13 ^ b2;
+-	b13 = ror64(tmp, 34);
+-	b2 -= b13;
+-
+-	tmp = b9 ^ b0;
+-	b9 = ror64(tmp, 16);
+-	b0 -= b9;
+-
+-	tmp = b15 ^ b14;
+-	b15 = ror64(tmp, 30);
+-	b14 -= b15 + k0 + t1;
+-	b15 -= k1 + 3;
+-
+-	tmp = b13 ^ b12;
+-	b13 = ror64(tmp, 44);
+-	b12 -= b13 + k15;
+-	b13 -= k16 + t0;
+-
+-	tmp = b11 ^ b10;
+-	b11 = ror64(tmp, 47);
+-	b10 -= b11 + k13;
+-	b11 -= k14;
+-
+-	tmp = b9 ^ b8;
+-	b9 = ror64(tmp, 12);
+-	b8 -= b9 + k11;
+-	b9 -= k12;
+-
+-	tmp = b7 ^ b6;
+-	b7 = ror64(tmp, 31);
+-	b6 -= b7 + k9;
+-	b7 -= k10;
+-
+-	tmp = b5 ^ b4;
+-	b5 = ror64(tmp, 37);
+-	b4 -= b5 + k7;
+-	b5 -= k8;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 9);
+-	b2 -= b3 + k5;
+-	b3 -= k6;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 41);
+-	b0 -= b1 + k3;
+-	b1 -= k4;
+-
+-	tmp = b7 ^ b12;
+-	b7 = ror64(tmp, 25);
+-	b12 -= b7;
+-
+-	tmp = b3 ^ b10;
+-	b3 = ror64(tmp, 16);
+-	b10 -= b3;
+-
+-	tmp = b5 ^ b8;
+-	b5 = ror64(tmp, 28);
+-	b8 -= b5;
+-
+-	tmp = b1 ^ b14;
+-	b1 = ror64(tmp, 47);
+-	b14 -= b1;
+-
+-	tmp = b9 ^ b4;
+-	b9 = ror64(tmp, 41);
+-	b4 -= b9;
+-
+-	tmp = b13 ^ b6;
+-	b13 = ror64(tmp, 48);
+-	b6 -= b13;
+-
+-	tmp = b11 ^ b2;
+-	b11 = ror64(tmp, 20);
+-	b2 -= b11;
+-
+-	tmp = b15 ^ b0;
+-	b15 = ror64(tmp, 5);
+-	b0 -= b15;
+-
+-	tmp = b9 ^ b10;
+-	b9 = ror64(tmp, 17);
+-	b10 -= b9;
+-
+-	tmp = b11 ^ b8;
+-	b11 = ror64(tmp, 59);
+-	b8 -= b11;
+-
+-	tmp = b13 ^ b14;
+-	b13 = ror64(tmp, 41);
+-	b14 -= b13;
+-
+-	tmp = b15 ^ b12;
+-	b15 = ror64(tmp, 34);
+-	b12 -= b15;
+-
+-	tmp = b1 ^ b6;
+-	b1 = ror64(tmp, 13);
+-	b6 -= b1;
+-
+-	tmp = b3 ^ b4;
+-	b3 = ror64(tmp, 51);
+-	b4 -= b3;
+-
+-	tmp = b5 ^ b2;
+-	b5 = ror64(tmp, 4);
+-	b2 -= b5;
+-
+-	tmp = b7 ^ b0;
+-	b7 = ror64(tmp, 33);
+-	b0 -= b7;
+-
+-	tmp = b1 ^ b8;
+-	b1 = ror64(tmp, 52);
+-	b8 -= b1;
+-
+-	tmp = b5 ^ b14;
+-	b5 = ror64(tmp, 23);
+-	b14 -= b5;
+-
+-	tmp = b3 ^ b12;
+-	b3 = ror64(tmp, 18);
+-	b12 -= b3;
+-
+-	tmp = b7 ^ b10;
+-	b7 = ror64(tmp, 49);
+-	b10 -= b7;
+-
+-	tmp = b15 ^ b4;
+-	b15 = ror64(tmp, 55);
+-	b4 -= b15;
+-
+-	tmp = b11 ^ b6;
+-	b11 = ror64(tmp, 10);
+-	b6 -= b11;
+-
+-	tmp = b13 ^ b2;
+-	b13 = ror64(tmp, 19);
+-	b2 -= b13;
+-
+-	tmp = b9 ^ b0;
+-	b9 = ror64(tmp, 38);
+-	b0 -= b9;
+-
+-	tmp = b15 ^ b14;
+-	b15 = ror64(tmp, 37);
+-	b14 -= b15 + k16 + t0;
+-	b15 -= k0 + 2;
+-
+-	tmp = b13 ^ b12;
+-	b13 = ror64(tmp, 22);
+-	b12 -= b13 + k14;
+-	b13 -= k15 + t2;
+-
+-	tmp = b11 ^ b10;
+-	b11 = ror64(tmp, 17);
+-	b10 -= b11 + k12;
+-	b11 -= k13;
+-
+-	tmp = b9 ^ b8;
+-	b9 = ror64(tmp, 8);
+-	b8 -= b9 + k10;
+-	b9 -= k11;
+-
+-	tmp = b7 ^ b6;
+-	b7 = ror64(tmp, 47);
+-	b6 -= b7 + k8;
+-	b7 -= k9;
+-
+-	tmp = b5 ^ b4;
+-	b5 = ror64(tmp, 8);
+-	b4 -= b5 + k6;
+-	b5 -= k7;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 13);
+-	b2 -= b3 + k4;
+-	b3 -= k5;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 24);
+-	b0 -= b1 + k2;
+-	b1 -= k3;
+-
+-	tmp = b7 ^ b12;
+-	b7 = ror64(tmp, 20);
+-	b12 -= b7;
+-
+-	tmp = b3 ^ b10;
+-	b3 = ror64(tmp, 37);
+-	b10 -= b3;
+-
+-	tmp = b5 ^ b8;
+-	b5 = ror64(tmp, 31);
+-	b8 -= b5;
+-
+-	tmp = b1 ^ b14;
+-	b1 = ror64(tmp, 23);
+-	b14 -= b1;
+-
+-	tmp = b9 ^ b4;
+-	b9 = ror64(tmp, 52);
+-	b4 -= b9;
+-
+-	tmp = b13 ^ b6;
+-	b13 = ror64(tmp, 35);
+-	b6 -= b13;
+-
+-	tmp = b11 ^ b2;
+-	b11 = ror64(tmp, 48);
+-	b2 -= b11;
+-
+-	tmp = b15 ^ b0;
+-	b15 = ror64(tmp, 9);
+-	b0 -= b15;
+-
+-	tmp = b9 ^ b10;
+-	b9 = ror64(tmp, 25);
+-	b10 -= b9;
+-
+-	tmp = b11 ^ b8;
+-	b11 = ror64(tmp, 44);
+-	b8 -= b11;
+-
+-	tmp = b13 ^ b14;
+-	b13 = ror64(tmp, 42);
+-	b14 -= b13;
+-
+-	tmp = b15 ^ b12;
+-	b15 = ror64(tmp, 19);
+-	b12 -= b15;
+-
+-	tmp = b1 ^ b6;
+-	b1 = ror64(tmp, 46);
+-	b6 -= b1;
+-
+-	tmp = b3 ^ b4;
+-	b3 = ror64(tmp, 47);
+-	b4 -= b3;
+-
+-	tmp = b5 ^ b2;
+-	b5 = ror64(tmp, 44);
+-	b2 -= b5;
+-
+-	tmp = b7 ^ b0;
+-	b7 = ror64(tmp, 31);
+-	b0 -= b7;
+-
+-	tmp = b1 ^ b8;
+-	b1 = ror64(tmp, 41);
+-	b8 -= b1;
+-
+-	tmp = b5 ^ b14;
+-	b5 = ror64(tmp, 42);
+-	b14 -= b5;
+-
+-	tmp = b3 ^ b12;
+-	b3 = ror64(tmp, 53);
+-	b12 -= b3;
+-
+-	tmp = b7 ^ b10;
+-	b7 = ror64(tmp, 4);
+-	b10 -= b7;
+-
+-	tmp = b15 ^ b4;
+-	b15 = ror64(tmp, 51);
+-	b4 -= b15;
+-
+-	tmp = b11 ^ b6;
+-	b11 = ror64(tmp, 56);
+-	b6 -= b11;
+-
+-	tmp = b13 ^ b2;
+-	b13 = ror64(tmp, 34);
+-	b2 -= b13;
+-
+-	tmp = b9 ^ b0;
+-	b9 = ror64(tmp, 16);
+-	b0 -= b9;
+-
+-	tmp = b15 ^ b14;
+-	b15 = ror64(tmp, 30);
+-	b14 -= b15 + k15 + t2;
+-	b15 -= k16 + 1;
+-
+-	tmp = b13 ^ b12;
+-	b13 = ror64(tmp, 44);
+-	b12 -= b13 + k13;
+-	b13 -= k14 + t1;
+-
+-	tmp = b11 ^ b10;
+-	b11 = ror64(tmp, 47);
+-	b10 -= b11 + k11;
+-	b11 -= k12;
+-
+-	tmp = b9 ^ b8;
+-	b9 = ror64(tmp, 12);
+-	b8 -= b9 + k9;
+-	b9 -= k10;
+-
+-	tmp = b7 ^ b6;
+-	b7 = ror64(tmp, 31);
+-	b6 -= b7 + k7;
+-	b7 -= k8;
+-
+-	tmp = b5 ^ b4;
+-	b5 = ror64(tmp, 37);
+-	b4 -= b5 + k5;
+-	b5 -= k6;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 9);
+-	b2 -= b3 + k3;
+-	b3 -= k4;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 41);
+-	b0 -= b1 + k1;
+-	b1 -= k2;
+-
+-	tmp = b7 ^ b12;
+-	b7 = ror64(tmp, 25);
+-	b12 -= b7;
+-
+-	tmp = b3 ^ b10;
+-	b3 = ror64(tmp, 16);
+-	b10 -= b3;
+-
+-	tmp = b5 ^ b8;
+-	b5 = ror64(tmp, 28);
+-	b8 -= b5;
+-
+-	tmp = b1 ^ b14;
+-	b1 = ror64(tmp, 47);
+-	b14 -= b1;
+-
+-	tmp = b9 ^ b4;
+-	b9 = ror64(tmp, 41);
+-	b4 -= b9;
+-
+-	tmp = b13 ^ b6;
+-	b13 = ror64(tmp, 48);
+-	b6 -= b13;
+-
+-	tmp = b11 ^ b2;
+-	b11 = ror64(tmp, 20);
+-	b2 -= b11;
+-
+-	tmp = b15 ^ b0;
+-	b15 = ror64(tmp, 5);
+-	b0 -= b15;
+-
+-	tmp = b9 ^ b10;
+-	b9 = ror64(tmp, 17);
+-	b10 -= b9;
+-
+-	tmp = b11 ^ b8;
+-	b11 = ror64(tmp, 59);
+-	b8 -= b11;
+-
+-	tmp = b13 ^ b14;
+-	b13 = ror64(tmp, 41);
+-	b14 -= b13;
+-
+-	tmp = b15 ^ b12;
+-	b15 = ror64(tmp, 34);
+-	b12 -= b15;
+-
+-	tmp = b1 ^ b6;
+-	b1 = ror64(tmp, 13);
+-	b6 -= b1;
+-
+-	tmp = b3 ^ b4;
+-	b3 = ror64(tmp, 51);
+-	b4 -= b3;
+-
+-	tmp = b5 ^ b2;
+-	b5 = ror64(tmp, 4);
+-	b2 -= b5;
+-
+-	tmp = b7 ^ b0;
+-	b7 = ror64(tmp, 33);
+-	b0 -= b7;
+-
+-	tmp = b1 ^ b8;
+-	b1 = ror64(tmp, 52);
+-	b8 -= b1;
+-
+-	tmp = b5 ^ b14;
+-	b5 = ror64(tmp, 23);
+-	b14 -= b5;
+-
+-	tmp = b3 ^ b12;
+-	b3 = ror64(tmp, 18);
+-	b12 -= b3;
+-
+-	tmp = b7 ^ b10;
+-	b7 = ror64(tmp, 49);
+-	b10 -= b7;
+-
+-	tmp = b15 ^ b4;
+-	b15 = ror64(tmp, 55);
+-	b4 -= b15;
+-
+-	tmp = b11 ^ b6;
+-	b11 = ror64(tmp, 10);
+-	b6 -= b11;
+-
+-	tmp = b13 ^ b2;
+-	b13 = ror64(tmp, 19);
+-	b2 -= b13;
+-
+-	tmp = b9 ^ b0;
+-	b9 = ror64(tmp, 38);
+-	b0 -= b9;
+-
+-	tmp = b15 ^ b14;
+-	b15 = ror64(tmp, 37);
+-	b14 -= b15 + k14 + t1;
+-	b15 -= k15;
+-
+-	tmp = b13 ^ b12;
+-	b13 = ror64(tmp, 22);
+-	b12 -= b13 + k12;
+-	b13 -= k13 + t0;
+-
+-	tmp = b11 ^ b10;
+-	b11 = ror64(tmp, 17);
+-	b10 -= b11 + k10;
+-	b11 -= k11;
+-
+-	tmp = b9 ^ b8;
+-	b9 = ror64(tmp, 8);
+-	b8 -= b9 + k8;
+-	b9 -= k9;
+-
+-	tmp = b7 ^ b6;
+-	b7 = ror64(tmp, 47);
+-	b6 -= b7 + k6;
+-	b7 -= k7;
+-
+-	tmp = b5 ^ b4;
+-	b5 = ror64(tmp, 8);
+-	b4 -= b5 + k4;
+-	b5 -= k5;
+-
+-	tmp = b3 ^ b2;
+-	b3 = ror64(tmp, 13);
+-	b2 -= b3 + k2;
+-	b3 -= k3;
+-
+-	tmp = b1 ^ b0;
+-	b1 = ror64(tmp, 24);
+-	b0 -= b1 + k0;
+-	b1 -= k1;
+-
+-	output[15] = b15;
+-	output[14] = b14;
+-	output[13] = b13;
+-	output[12] = b12;
+-	output[11] = b11;
+-	output[10] = b10;
+-	output[9] = b9;
+-	output[8] = b8;
+-	output[7] = b7;
+-	output[6] = b6;
+-	output[5] = b5;
+-	output[4] = b4;
+-	output[3] = b3;
+-	output[2] = b2;
+-	output[1] = b1;
+-	output[0] = b0;
+-}
+-- 
+2.16.4
