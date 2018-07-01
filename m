@@ -1,174 +1,40 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH v2 3/6] crypto: ccree: fix iv handling
-Date: Sun,  1 Jul 2018 08:02:36 +0100
-Message-ID: <1530428560-4440-4-git-send-email-gilad@benyossef.com>
+Subject: [PATCH v2 4/6] crypto: ccree: remove dead legacy code
+Date: Sun,  1 Jul 2018 08:02:37 +0100
+Message-ID: <1530428560-4440-5-git-send-email-gilad@benyossef.com>
 References: <1530428560-4440-1-git-send-email-gilad@benyossef.com>
 Cc: Ofir Drang <ofir.drang@arm.com>, Hadar Gat <hadar.gat@arm.com>,
-        stable@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>
-Return-path: <stable-owner@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1530428560-4440-1-git-send-email-gilad@benyossef.com>
-Sender: stable-owner@vger.kernel.org
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-We were copying our last cipher block into the request for use as IV for
-all modes of operations. Fix this by discerning the behaviour based on
-the mode of operation used: copy ciphertext for CBC, update counter for
-CTR.
+Remove legacy code no longer used by anything.
 
-CC: stable@vger.kernel.org
-Fixes: 63ee04c8b491 ("crypto: ccree - add skcipher support")
-Reported by: Hadar Gat <hadar.gat@arm.com>
 Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 ---
- drivers/crypto/ccree/cc_cipher.c | 111 +++++++++++++++++++++++++++++----------
- 1 file changed, 84 insertions(+), 27 deletions(-)
+ drivers/crypto/ccree/cc_cipher.c | 6 ------
+ 1 file changed, 6 deletions(-)
 
 diff --git a/drivers/crypto/ccree/cc_cipher.c b/drivers/crypto/ccree/cc_cipher.c
-index d2810c1..958ced3 100644
+index 958ced3..5d12372 100644
 --- a/drivers/crypto/ccree/cc_cipher.c
 +++ b/drivers/crypto/ccree/cc_cipher.c
-@@ -593,34 +593,82 @@ static void cc_setup_cipher_data(struct crypto_tfm *tfm,
- 	}
- }
+@@ -730,12 +730,6 @@ static int cc_cipher_process(struct skcipher_request *req,
+ 	cc_req.user_cb = (void *)cc_cipher_complete;
+ 	cc_req.user_arg = (void *)req;
  
-+/*
-+ * Update a CTR-AES 128 bit counter
-+ */
-+static void cc_update_ctr(u8 *ctr, unsigned int increment)
-+{
-+	if (IS_ENABLED(CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS) ||
-+	    IS_ALIGNED((unsigned long)ctr, 8)) {
-+
-+		__be64 *high_be = (__be64 *)ctr;
-+		__be64 *low_be = high_be + 1;
-+		u64 orig_low = __be64_to_cpu(*low_be);
-+		u64 new_low = orig_low + (u64)increment;
-+
-+		*low_be = __cpu_to_be64(new_low);
-+
-+		if (new_low < orig_low)
-+			*high_be = __cpu_to_be64(__be64_to_cpu(*high_be) + 1);
-+	} else {
-+		u8 *pos = (ctr + AES_BLOCK_SIZE);
-+		u8 val;
-+		unsigned int size;
-+
-+		for (; increment; increment--)
-+			for (size = AES_BLOCK_SIZE; size; size--) {
-+				val = *--pos + 1;
-+				*pos = val;
-+				if (val)
-+					break;
-+			}
-+	}
-+}
-+
- static void cc_cipher_complete(struct device *dev, void *cc_req, int err)
- {
- 	struct skcipher_request *req = (struct skcipher_request *)cc_req;
- 	struct scatterlist *dst = req->dst;
- 	struct scatterlist *src = req->src;
- 	struct cipher_req_ctx *req_ctx = skcipher_request_ctx(req);
--	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
--	unsigned int ivsize = crypto_skcipher_ivsize(tfm);
-+	struct crypto_skcipher *sk_tfm = crypto_skcipher_reqtfm(req);
-+	struct crypto_tfm *tfm = crypto_skcipher_tfm(sk_tfm);
-+	struct cc_cipher_ctx *ctx_p = crypto_tfm_ctx(tfm);
-+	unsigned int ivsize = crypto_skcipher_ivsize(sk_tfm);
-+	unsigned int len;
+-#ifdef ENABLE_CYCLE_COUNT
+-	cc_req.op_type = (direction == DRV_CRYPTO_DIRECTION_DECRYPT) ?
+-		STAT_OP_TYPE_DECODE : STAT_OP_TYPE_ENCODE;
+-
+-#endif
+-
+ 	/* Setup request context */
+ 	req_ctx->gen_ctx.op_type = direction;
  
--	cc_unmap_cipher_request(dev, req_ctx, ivsize, src, dst);
--	kzfree(req_ctx->iv);
-+	switch (ctx_p->cipher_mode) {
-+	case DRV_CIPHER_CBC:
-+		/*
-+		 * The crypto API expects us to set the req->iv to the last
-+		 * ciphertext block. For encrypt, simply copy from the result.
-+		 * For decrypt, we must copy from a saved buffer since this
-+		 * could be an in-place decryption operation and the src is
-+		 * lost by this point.
-+		 */
-+		if (req_ctx->gen_ctx.op_type == DRV_CRYPTO_DIRECTION_DECRYPT)  {
-+			memcpy(req->iv, req_ctx->backup_info, ivsize);
-+			kzfree(req_ctx->backup_info);
-+		} else if (!err) {
-+			len = req->cryptlen - ivsize;
-+			scatterwalk_map_and_copy(req->iv, req->dst, len,
-+						 ivsize, 0);
-+		}
-+		break;
- 
--	/*
--	 * The crypto API expects us to set the req->iv to the last
--	 * ciphertext block. For encrypt, simply copy from the result.
--	 * For decrypt, we must copy from a saved buffer since this
--	 * could be an in-place decryption operation and the src is
--	 * lost by this point.
--	 */
--	if (req_ctx->gen_ctx.op_type == DRV_CRYPTO_DIRECTION_DECRYPT)  {
--		memcpy(req->iv, req_ctx->backup_info, ivsize);
--		kzfree(req_ctx->backup_info);
--	} else if (!err) {
--		scatterwalk_map_and_copy(req->iv, req->dst,
--					 (req->cryptlen - ivsize),
--					 ivsize, 0);
-+	case DRV_CIPHER_CTR:
-+		/* Compute the counter of the last block */
-+		len = ALIGN(req->cryptlen, AES_BLOCK_SIZE) / AES_BLOCK_SIZE;
-+		cc_update_ctr((u8 *)req->iv, len);
-+		break;
-+
-+	default:
-+		break;
- 	}
- 
-+	cc_unmap_cipher_request(dev, req_ctx, ivsize, src, dst);
-+	kzfree(req_ctx->iv);
-+
- 	skcipher_request_complete(req, err);
- }
- 
-@@ -752,20 +800,29 @@ static int cc_cipher_encrypt(struct skcipher_request *req)
- static int cc_cipher_decrypt(struct skcipher_request *req)
- {
- 	struct crypto_skcipher *sk_tfm = crypto_skcipher_reqtfm(req);
-+	struct crypto_tfm *tfm = crypto_skcipher_tfm(sk_tfm);
-+	struct cc_cipher_ctx *ctx_p = crypto_tfm_ctx(tfm);
- 	struct cipher_req_ctx *req_ctx = skcipher_request_ctx(req);
- 	unsigned int ivsize = crypto_skcipher_ivsize(sk_tfm);
- 	gfp_t flags = cc_gfp_flags(&req->base);
-+	unsigned int len;
- 
--	/*
--	 * Allocate and save the last IV sized bytes of the source, which will
--	 * be lost in case of in-place decryption and might be needed for CTS.
--	 */
--	req_ctx->backup_info = kmalloc(ivsize, flags);
--	if (!req_ctx->backup_info)
--		return -ENOMEM;
-+	if (ctx_p->cipher_mode == DRV_CIPHER_CBC) {
-+
-+		/* Allocate and save the last IV sized bytes of the source,
-+		 * which will be lost in case of in-place decryption.
-+		 */
-+		req_ctx->backup_info = kzalloc(ivsize, flags);
-+		if (!req_ctx->backup_info)
-+			return -ENOMEM;
-+
-+		len = req->cryptlen - ivsize;
-+		scatterwalk_map_and_copy(req_ctx->backup_info, req->src, len,
-+					 ivsize, 0);
-+	} else {
-+		req_ctx->backup_info = NULL;
-+	}
- 
--	scatterwalk_map_and_copy(req_ctx->backup_info, req->src,
--				 (req->cryptlen - ivsize), ivsize, 0);
- 	req_ctx->is_giv = false;
- 
- 	return cc_cipher_process(req, DRV_CRYPTO_DIRECTION_DECRYPT);
 -- 
 2.7.4
