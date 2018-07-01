@@ -1,35 +1,51 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2] crypto: skcipher: remove the exporting of
- skcipher_walk_next
-Date: Sun, 1 Jul 2018 21:19:08 +0800
-Message-ID: <20180701131908.jl5kg6gosrvkmc4p@gondor.apana.org.au>
-References: <20180617174959.29864-1-efremov@linux.com>
- <20180619202357.10805-1-efremov@linux.com>
+Subject: Re: [PATCH] x86/crypto: Add missing RETs
+Date: Sun, 1 Jul 2018 21:19:41 +0800
+Message-ID: <20180701131941.2dqkzg7az25qpc6b@gondor.apana.org.au>
+References: <20180507213755.GA32406@avx2>
+ <tip-51bad67ffbce0aaa44579f84ef5d05597054ec6a@git.kernel.org>
+ <1529235613.4572.7.camel@gmx.de>
+ <20180617120012.GB16877@zn.tnic>
+ <1529242717.4472.3.camel@gmx.de>
+ <1529244178.4674.1.camel@gmx.de>
+ <20180617194747.GA21160@zn.tnic>
+ <1529289279.31745.3.camel@gmx.de>
+ <20180623103622.GA2760@zn.tnic>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Eric Biggers <ebiggers3@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        ldv-project@linuxtesting.org
-To: efremov@linux.com
+Cc: linux-crypto@vger.kernel.org, Mike Galbraith <efault@gmx.de>,
+        Alexey Dobriyan <adobriyan@gmail.com>,
+        torvalds@linux-foundation.org, tglx@linutronix.de,
+        mingo@kernel.org, jpoimboe@redhat.com, luto@kernel.org,
+        peterz@infradead.org, brgerst@gmail.com, hpa@zytor.com,
+        linux-kernel@vger.kernel.org, dvlasenk@redhat.com,
+        h.peter.anvin@intel.com,
+        linux-tip-commits <linux-tip-commits@vger.kernel.org>
+To: Borislav Petkov <bp@alien8.de>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20180619202357.10805-1-efremov@linux.com>
+In-Reply-To: <20180623103622.GA2760@zn.tnic>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Jun 19, 2018 at 11:23:57PM +0300, efremov@linux.com wrote:
-> The function skcipher_walk_next declared as static and marked as
-> EXPORT_SYMBOL_GPL. It's a bit confusing for internal function to be
-> exported. The area of visibility for such function is its .c file
-> and all other modules. Other *.c files of the same module can't use it,
-> despite all other modules can. Relying on the fact that this is the
-> internal function and it's not a crucial part of the API, the patch
-> just removes the EXPORT_SYMBOL_GPL marking of skcipher_walk_next.
+On Sat, Jun 23, 2018 at 12:36:22PM +0200, Borislav Petkov wrote:
+> Lemme send a proper patch now...
 > 
-> Found by Linux Driver Verification project (linuxtesting.org).
+> ---
+> From: Borislav Petkov <bp@suse.de>
+> Date: Sun, 17 Jun 2018 13:57:42 +0200
+> Subject: [PATCH] x86/crypto: Add missing RETs
 > 
-> Signed-off-by: Denis Efremov <efremov@linux.com>
+> Add explicit RETs to the tail calls of AEGIS and MORUS crypto algorithms
+> otherwise they run into INT3 padding due to
+> 
+>   51bad67ffbce ("x86/asm: Pad assembly functions with INT3 instructions")
+> 
+> leading to spurious debug exceptions.
+> 
+> Mike Galbraith <efault@gmx.de> took care of all the remaining callsites.
+> 
+> Signed-off-by: Borislav Petkov <bp@suse.de>
 
 Patch applied.  Thanks.
 -- 
