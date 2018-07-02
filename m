@@ -1,29 +1,62 @@
-From: David Miller <davem@davemloft.net>
-Subject: Re: [PATCH net] ipv6: sr: fix passing wrong flags to
- crypto_alloc_shash()
-Date: Mon, 02 Jul 2018 20:37:15 +0900 (KST)
-Message-ID: <20180702.203715.1217460369860711031.davem@davemloft.net>
-References: <20180630222656.333-1-ebiggers3@gmail.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Subject: Re: [PATCH v2 6/6] crypto: ccree: rate limit debug print
+Date: Mon, 2 Jul 2018 14:58:59 +0200
+Message-ID: <CAMuHMdW7Sock8Z=L7w58u9-q-gWvkz=VfK-QZDUXPgEw4+NBzA@mail.gmail.com>
+References: <1530428560-4440-1-git-send-email-gilad@benyossef.com> <1530428560-4440-7-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-Cc: netdev@vger.kernel.org, david.lebrun@uclouvain.be,
-        linux-crypto@vger.kernel.org, ebiggers@google.com
-To: ebiggers3@gmail.com
-Return-path: <netdev-owner@vger.kernel.org>
-In-Reply-To: <20180630222656.333-1-ebiggers3@gmail.com>
-Sender: netdev-owner@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Ofir Drang <ofir.drang@arm.com>, hadar.gat@arm.com,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Gilad Ben-Yossef <gilad@benyossef.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1530428560-4440-7-git-send-email-gilad@benyossef.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-From: Eric Biggers <ebiggers3@gmail.com>
-Date: Sat, 30 Jun 2018 15:26:56 -0700
+Hi Gilad,
 
-> From: Eric Biggers <ebiggers@google.com>
-> 
-> The 'mask' argument to crypto_alloc_shash() uses the CRYPTO_ALG_* flags,
-> not 'gfp_t'.  So don't pass GFP_KERNEL to it.
-> 
-> Fixes: bf355b8d2c30 ("ipv6: sr: add core files for SR HMAC support")
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
+On Sun, Jul 1, 2018 at 9:05 AM Gilad Ben-Yossef <gilad@benyossef.com> wrote:
+> A debug print about register status post interrupt can happen
+> quite often. Rate limit it to avoid cluttering the log.
+>
+> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+> Reported-by: Geert Uytterhoeven <geert@linux-m68k.org>
 
-Oops, applied and queued up for -stable, thanks!
+Thanks for your patch!
+
+> --- a/drivers/crypto/ccree/cc_driver.c
+> +++ b/drivers/crypto/ccree/cc_driver.c
+> @@ -131,8 +131,8 @@ static irqreturn_t cc_isr(int irq, void *dev_id)
+>         }
+>
+>         if (irr) {
+> -               dev_dbg(dev, "IRR includes unknown cause bits (0x%08X)\n",
+> -                       irr);
+> +               dev_dbg_ratelimited(dev, "IRR includes unknown cause bits (0x%08X)\n",
+> +                                   irr);
+>                 /* Just warning */
+>         }
+
+    cc_isr: 932 callbacks suppressed
+
+Tested-by: Geert Uytterhoeven <geert+renesas@glider.be>
+
+Note that it still printed 1410 lines like:
+
+    ccree e6601000.crypto: Got IRR=0x008000D8 (actual value may differ)
+
+but perhaps you do intend to see these during debugging?
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+-- 
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
