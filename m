@@ -1,34 +1,40 @@
-From: Vinod Koul <vkoul@kernel.org>
-Subject: [PATCH v3 2/6] dt-bindings: crypto: Move prng binding to crypto
-Date: Tue,  3 Jul 2018 11:34:30 +0530
-Message-ID: <20180703060434.19293-3-vkoul@kernel.org>
-References: <20180703060434.19293-1-vkoul@kernel.org>
-Cc: Bjorn Andersson <bjorn.andersson@linaro.org>,
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: [PATCH v3 3/6] crypto: Add Qcom prng driver
+Date: Tue, 03 Jul 2018 15:28:04 +0200
+Message-ID: <2990655.vKmMgW600W@tauon.chronox.de>
+References: <20180703060434.19293-1-vkoul@kernel.org> <20180703060434.19293-4-vkoul@kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
         Matt Mackall <mpm@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Arnd Bergmann <arnd@arndb.de>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         linux-arm-msm@vger.kernel.org, Stephen Boyd <swboyd@chromium.org>,
-        Timur Tabi <timur@codeaurora.org>,
-        Vinod Koul <vkoul@kernel.org>
-To: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+        Timur Tabi <timur@codeaurora.org>
+To: Vinod Koul <vkoul@kernel.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180703060434.19293-1-vkoul@kernel.org>
+In-Reply-To: <20180703060434.19293-4-vkoul@kernel.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Now that we are adding new driver for prng in crypto, move the
-binding as well.
+Am Dienstag, 3. Juli 2018, 08:04:31 CEST schrieb Vinod Koul:
 
-Signed-off-by: Vinod Koul <vkoul@kernel.org>
----
- Documentation/devicetree/bindings/{rng => crypto}/qcom,prng.txt | 0
- 1 file changed, 0 insertions(+), 0 deletions(-)
- rename Documentation/devicetree/bindings/{rng => crypto}/qcom,prng.txt (100%)
+Hi Vinod,
 
-diff --git a/Documentation/devicetree/bindings/rng/qcom,prng.txt b/Documentation/devicetree/bindings/crypto/qcom,prng.txt
-similarity index 100%
-rename from Documentation/devicetree/bindings/rng/qcom,prng.txt
-rename to Documentation/devicetree/bindings/crypto/qcom,prng.txt
--- 
-2.14.4
+> +static int qcom_rng_read(struct qcom_rng *rng, void *data, size_t max)
+> +{
+> +	size_t currsize = 0;
+> +	u32 *retdata = data;
+
+How can you be sure that this cast is appropriate? I.e. how is it guaranteed 
+that data is 4-byte aligned?
+
+Also, the data variable in qcom_rng_generate is a u8 -- shouldn't this type be 
+used instead of a void?
+
+
+Ciao
+Stephan
