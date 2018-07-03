@@ -1,52 +1,61 @@
-From: Fabio Estevam <festevam@gmail.com>
+From: Logan Gunthorpe <logang@deltatee.com>
 Subject: Re: [PATCH v18 6/7] crypto: caam: cleanup CONFIG_64BIT ifdefs when
  using io{read|write}64
-Date: Tue, 3 Jul 2018 14:44:47 -0300
-Message-ID: <CAOMZO5DpOG5G750gYXdVJWwwtOi4BF0wSBxfuVPdFJqnJonD7Q@mail.gmail.com>
-References: <20180622194752.11221-1-logang@deltatee.com> <20180622194752.11221-7-logang@deltatee.com>
- <CAOMZO5DpwPsidKQ9wfe8mNTgdOpkdHHgqHMa4yQBx9uRrfFmww@mail.gmail.com> <CAHp75VcCNsx2sHcYG2aNiw354exTvO=NUOS9P_BTmcM3siAepg@mail.gmail.com>
+Date: Tue, 3 Jul 2018 12:01:32 -0600
+Message-ID: <13ea3f97-4a33-3a24-1b7e-b819be73d867@deltatee.com>
+References: <20180622194752.11221-1-logang@deltatee.com>
+ <20180622194752.11221-7-logang@deltatee.com>
+ <CAOMZO5DpwPsidKQ9wfe8mNTgdOpkdHHgqHMa4yQBx9uRrfFmww@mail.gmail.com>
+ <CAHp75VcCNsx2sHcYG2aNiw354exTvO=NUOS9P_BTmcM3siAepg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Logan Gunthorpe <logang@deltatee.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Cc: Andrew Morton <akpm@linux-foundation.org>,
         linux-kernel <linux-kernel@vger.kernel.org>,
         Linux-Arch <linux-arch@vger.kernel.org>,
         linux-ntb@googlegroups.com,
         "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
         <linux-crypto@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        =?UTF-8?Q?Horia_Geant=C4=83?= <horia.geanta@nxp.com>,
+        =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@nxp.com>,
         Dan Douglass <dan.douglass@nxp.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>
-To: Andy Shevchenko <andy.shevchenko@gmail.com>
+To: Andy Shevchenko <andy.shevchenko@gmail.com>,
+        Fabio Estevam <festevam@gmail.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <CAHp75VcCNsx2sHcYG2aNiw354exTvO=NUOS9P_BTmcM3siAepg@mail.gmail.com>
+Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi Andy,
 
-On Tue, Jul 3, 2018 at 2:36 PM, Andy Shevchenko
-<andy.shevchenko@gmail.com> wrote:
 
+On 03/07/18 11:36 AM, Andy Shevchenko wrote:
+>> This is now in linux-next as commit 46e4bf08f6388 and it breaks
+>> booting imx6 (32-bit ARM):
+> 
+> 
+>> Any ideas on how to fix this issue?
+> 
 > Oops, first of all the header should be hi-lo instead of lo-hi.
 > Does it fix it?
+> 
+> Otherwise I didn't (briefly) see what can be the issue.
 
-I tried as you suggested:
+I had to dig to find this: but Horia had said[1] that the HW was
+specified to use lo-hi and I think we ended up changing to that for this
+commit based on his feedback. This is also mentioned in the commit message.
 
---- a/drivers/crypto/caam/regs.h
-+++ b/drivers/crypto/caam/regs.h
-@@ -10,7 +10,7 @@
+Besides that, it looks like we are hitting an undefined instruction. So
+my best guess is that we are somehow now calling a proper 64bit read
+when we should be calling two 32-bit reads.
 
- #include <linux/types.h>
- #include <linux/bitops.h>
--#include <linux/io-64-nonatomic-lo-hi.h>
-+#include <linux/io-64-nonatomic-hi-lo.h>
+Fabio, can you send your configuration?
 
- /*
-  * Architecture-specific register access method
+Thanks,
 
-but it still crashes the kernel.
+Logan
 
-Thanks
+[1]
+http://lkml.kernel.org/r/VI1PR0401MB259145C2DFDB5E4084EA5DFC98D20@VI1PR0401MB2591.eurprd04.prod.outlook.com
