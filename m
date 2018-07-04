@@ -1,10 +1,11 @@
 From: Vinod <vkoul@kernel.org>
-Subject: Re: [PATCH v3 6/6] crypto: qcom: Add ACPI support
-Date: Wed, 4 Jul 2018 09:43:10 +0530
-Message-ID: <20180704041310.GV22377@vkoul-mobl>
+Subject: Re: [PATCH v3 3/6] crypto: Add Qcom prng driver
+Date: Wed, 4 Jul 2018 11:40:35 +0530
+Message-ID: <20180704061035.GY22377@vkoul-mobl>
 References: <20180703060434.19293-1-vkoul@kernel.org>
- <20180703060434.19293-7-vkoul@kernel.org>
- <28000d33-5321-76af-7985-94a564a75336@codeaurora.org>
+ <20180703060434.19293-4-vkoul@kernel.org>
+ <2990655.vKmMgW600W@tauon.chronox.de>
+ <20180704041059.GT22377@vkoul-mobl>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -15,33 +16,41 @@ Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         linux-arm-msm@vger.kernel.org, Stephen Boyd <swboyd@chromium.org>,
         Timur Tabi <timur@codeaurora.org>
-To: Jeffrey Hugo <jhugo@codeaurora.org>
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <28000d33-5321-76af-7985-94a564a75336@codeaurora.org>
+In-Reply-To: <20180704041059.GT22377@vkoul-mobl>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 03-07-18, 11:08, Jeffrey Hugo wrote:
-> On 7/3/2018 12:04 AM, Vinod Koul wrote:
-
-> > +#if IS_ENABLED(CONFIG_ACPI)
-> > +static const struct acpi_device_id qcom_rng_acpi_match[] = {
-> > +	{
-> > +		.id = "QCOM8160",
-> > +	},
-> > +	{}
-> > +};
-> > +MODULE_DEVICE_TABLE(acpi, msm_rng_acpi_match);
+On 04-07-18, 09:40, Vinod wrote:
+> Hi Stephan,
 > 
-> qcom_rng_acpi_match?
-> Looks like a copy/paste issue.  This causes a build failure for me.
-> I'm trying to see if it works otherwise...
+> On 03-07-18, 15:28, Stephan Mueller wrote:
+> > Am Dienstag, 3. Juli 2018, 08:04:31 CEST schrieb Vinod Koul:
+> > > +static int qcom_rng_read(struct qcom_rng *rng, void *data, size_t max)
+> > > +{
+> > > +	size_t currsize = 0;
+> > > +	u32 *retdata = data;
+> > 
+> > How can you be sure that this cast is appropriate? I.e. how is it guaranteed 
+> > that data is 4-byte aligned?
+> 
+> While reading we check the alignment:
+> 
+>                /* make sure we stay on 32bit boundary */
+>                if ((max - currsize) < WORD_SZ)
+>                        break;
+> 
+> > Also, the data variable in qcom_rng_generate is a u8 -- shouldn't this type be 
+> > used instead of a void?
+> 
+> That does make sense to me. IIRC the read is for a byte. I will check
+> this and update it
 
-Ah sorry about that, I though I had fixed it, looks like I missed to
-fold the fix.
-
-Did it work for you?
+Okay so I rechecked this, the hardware gives 32 bits of random data. I
+am thinking of splitting the word and updating by each byte. That way
+trailing zero can also be avoided which is the case now
 
 -- 
 ~Vinod
