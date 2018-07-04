@@ -1,10 +1,10 @@
 From: Vinod <vkoul@kernel.org>
-Subject: Re: [PATCH v3 3/6] crypto: Add Qcom prng driver
-Date: Wed, 4 Jul 2018 09:40:59 +0530
-Message-ID: <20180704041059.GT22377@vkoul-mobl>
+Subject: Re: [PATCH v3 6/6] crypto: qcom: Add ACPI support
+Date: Wed, 4 Jul 2018 09:41:54 +0530
+Message-ID: <20180704041154.GU22377@vkoul-mobl>
 References: <20180703060434.19293-1-vkoul@kernel.org>
- <20180703060434.19293-4-vkoul@kernel.org>
- <2990655.vKmMgW600W@tauon.chronox.de>
+ <20180703060434.19293-7-vkoul@kernel.org>
+ <0d523023-52e8-4154-2e5d-69d54458caa0@kernel.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -14,38 +14,49 @@ Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         Arnd Bergmann <arnd@arndb.de>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         linux-arm-msm@vger.kernel.org, Stephen Boyd <swboyd@chromium.org>,
-        Timur Tabi <timur@codeaurora.org>
-To: Stephan Mueller <smueller@chronox.de>
+        Jeffrey Hugo <jhugo@codeaurora.org>
+To: Timur Tabi <timur@kernel.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <2990655.vKmMgW600W@tauon.chronox.de>
+In-Reply-To: <0d523023-52e8-4154-2e5d-69d54458caa0@kernel.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi Stephan,
-
-On 03-07-18, 15:28, Stephan Mueller wrote:
-> Am Dienstag, 3. Juli 2018, 08:04:31 CEST schrieb Vinod Koul:
-> > +static int qcom_rng_read(struct qcom_rng *rng, void *data, size_t max)
-> > +{
-> > +	size_t currsize = 0;
-> > +	u32 *retdata = data;
+On 03-07-18, 09:10, Timur Tabi wrote:
+> On 7/3/18 1:04 AM, Vinod Koul wrote:
+> > Add support for probing on ACPI systems, with ACPI HID QCOM8160.
+> > 
+> > On ACPI systems, clocks are always enabled, the PRNG should
+> > already be enabled, and the register region is read-only.
+> > The driver only verifies that the hardware is already
+> > enabled never tries to disable or configure it.
+> > 
+> > Signed-off-by: Timur Tabi<timur@codeaurora.org>
+> > [port to crypto API]
+> > Signed-off-by: Vinod Koul<vkoul@kernel.org>
 > 
-> How can you be sure that this cast is appropriate? I.e. how is it guaranteed 
-> that data is 4-byte aligned?
+> I've asked a colleague who still works at Qualcomm to test this code on
+> silicon.  It looks okay, but I just want to be sure.
+> 
+> > +	/*
+> > +	 * ACPI systems have v2 hardware. The clocks are always enabled,
+> > +	 * the PRNG register space is read-only and the PRNG should
+> > +	 * already be enabled.
+> > +	 */
+> > +	if (has_acpi_companion(&pdev->dev)) {
+> > +		val = readl(rng->base + PRNG_CONFIG);
+> > +		if (!(val & PRNG_CONFIG_HW_ENABLE)) {
+> > +			dev_err(&pdev->dev, "device is not enabled\n");
+> > +			return -ENODEV;
+> > +		}
+> 
+> I'm having second thoughts about this PRNG_CONFIG_HW_ENABLE check.  The PRNG
+> on the QDF2400 is the same as the one on the 8996, so it should have the
+> same register interface.  Currently, the ACPI table points to a full PRNG
+> register block, but I'm beginning to believe that it should instead point to
+> a "reduced" block that doesn't have a PRNG_CONFIG register.
 
-While reading we check the alignment:
+That was my doubt too. I will go ahead and make it skip this then...
 
-               /* make sure we stay on 32bit boundary */
-               if ((max - currsize) < WORD_SZ)
-                       break;
-
-> Also, the data variable in qcom_rng_generate is a u8 -- shouldn't this type be 
-> used instead of a void?
-
-That does make sense to me. IIRC the read is for a byte. I will check
-this and update it
-
-Thanks for the quick review
 -- 
 ~Vinod
