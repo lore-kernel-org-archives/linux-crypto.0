@@ -1,67 +1,50 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH v3 3/6] crypto: Add Qcom prng driver
-Date: Wed, 04 Jul 2018 08:16:25 +0200
-Message-ID: <2060153.p9Cf2LoRhr@tauon.chronox.de>
-References: <20180703060434.19293-1-vkoul@kernel.org> <20180704041059.GT22377@vkoul-mobl> <20180704061035.GY22377@vkoul-mobl>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
+From: Vinod Koul <vkoul@kernel.org>
+Subject: [PATCH v4 0/6] crypto: Add Qcom PRNG support
+Date: Wed,  4 Jul 2018 17:14:21 +0530
+Message-ID: <20180704114427.29953-1-vkoul@kernel.org>
+Cc: Bjorn Andersson <bjorn.andersson@linaro.org>,
         Matt Mackall <mpm@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Arnd Bergmann <arnd@arndb.de>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         linux-arm-msm@vger.kernel.org, Stephen Boyd <swboyd@chromium.org>,
-        Timur Tabi <timur@codeaurora.org>
-To: Vinod <vkoul@kernel.org>
+        Timur Tabi <timur@codeaurora.org>,
+        Vinod Koul <vkoul@kernel.org>
+To: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180704061035.GY22377@vkoul-mobl>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Am Mittwoch, 4. Juli 2018, 08:10:35 CEST schrieb Vinod:
+This series removes the hwrng qcom driver and replaces it with crypto qcom
+driver and then adds support for Execution Environment (EE) found in v2
+version of the hardware and ACPI support for these
 
-Hi Vinod,
+Changes in v4:
+ - Use memcpy for data copy
+ - Fix trailing bytes copy
+ - Fix ACPI ID table name
 
-> On 04-07-18, 09:40, Vinod wrote:
-> > Hi Stephan,
-> > 
-> > On 03-07-18, 15:28, Stephan Mueller wrote:
-> > > Am Dienstag, 3. Juli 2018, 08:04:31 CEST schrieb Vinod Koul:
-> > > > +static int qcom_rng_read(struct qcom_rng *rng, void *data, size_t
-> > > > max)
-> > > > +{
-> > > > +	size_t currsize = 0;
-> > > > +	u32 *retdata = data;
-> > > 
-> > > How can you be sure that this cast is appropriate? I.e. how is it
-> > > guaranteed that data is 4-byte aligned?
-> > 
-> > While reading we check the alignment:
-> >                /* make sure we stay on 32bit boundary */
-> >                if ((max - currsize) < WORD_SZ)
-> >                
-> >                        break;
+Timur Tabi (1):
+  crypto: qcom: Add ACPI support
 
-I am not sure I follow your argument.
+Vinod Koul (5):
+  hwrng: remove msm hw_random driver
+  dt-bindings: crypto: Move prng binding to crypto
+  crypto: Add Qcom prng driver
+  dt-bindings: crypto: Add new compatible qcom,prng-ee
+  crypto: qcom: Add support for prng-ee
 
-You cast a void (or u8 pointer into u32:
+ .../bindings/{rng => crypto}/qcom,prng.txt         |   4 +-
+ drivers/char/hw_random/Kconfig                     |  13 --
+ drivers/char/hw_random/Makefile                    |   1 -
+ drivers/char/hw_random/msm-rng.c                   | 183 ----------------
+ drivers/crypto/Kconfig                             |  11 +
+ drivers/crypto/Makefile                            |   1 +
+ drivers/crypto/qcom-rng.c                          | 237 +++++++++++++++++++++
+ 7 files changed, 252 insertions(+), 198 deletions(-)
+ rename Documentation/devicetree/bindings/{rng => crypto}/qcom,prng.txt (73%)
+ delete mode 100644 drivers/char/hw_random/msm-rng.c
+ create mode 100644 drivers/crypto/qcom-rng.c
 
-+       u32 *retdata = data;
-
-You use it:
-
-+       *retdata++ = val;
-
-Followed by your check.
-
-What I mean is that the initial cast and then the subsequent write operation 
-is only guaranteed to work if the initial pointer is alighed on a 4 byte 
-boundary. However, since it is an u8 pointer, it is not guaranteed to be 
-aligned.
-
-So, I guess you want to use memcpy (at least if it is not aligned).
-
-Ciao
-Stephan
+-- 
+2.14.4
