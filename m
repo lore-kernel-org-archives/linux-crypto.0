@@ -1,110 +1,282 @@
-From: Horia Geanta <horia.geanta@nxp.com>
-Subject: Re: [PATCH v18 6/7] crypto: caam: cleanup CONFIG_64BIT ifdefs when
- using io{read|write}64
-Date: Wed, 4 Jul 2018 11:45:44 +0000
-Message-ID: <VI1PR0402MB3485F76DD56D221EB256B4F698410@VI1PR0402MB3485.eurprd04.prod.outlook.com>
-References: <20180622194752.11221-1-logang@deltatee.com>
- <20180622194752.11221-7-logang@deltatee.com>
- <CAOMZO5DpwPsidKQ9wfe8mNTgdOpkdHHgqHMa4yQBx9uRrfFmww@mail.gmail.com>
- <CAHp75VcCNsx2sHcYG2aNiw354exTvO=NUOS9P_BTmcM3siAepg@mail.gmail.com>
- <13ea3f97-4a33-3a24-1b7e-b819be73d867@deltatee.com>
- <CAOMZO5CfUfNZd0kG=VVnH4BjP+XMpGh3bPCUrTwi_4w6YEGX7g@mail.gmail.com>
- <CAHp75VcDudrwV4kRnVR+vtddFhxHsU672YqOJgPPchuLvPV3nA@mail.gmail.com>
- <CAOMZO5A4bsu9dXCPb4QeSbnnLi=pr1=WYWn8p2AfU3rEG=RWXg@mail.gmail.com>
- <6e5224b9-343f-990c-19bd-fe37c6fbdc9b@deltatee.com>
- <CAOMZO5CJ_iG=p_+xL=Q_Rv3F5vtGggsgatar4XVTL+UFVnHBTA@mail.gmail.com>
- <7ddda181-6337-32cc-7a0d-43fc6a7ba78b@deltatee.com>
- <CAHp75VcN=pUkFK6=_7yErMRGNS3WsgBhkWMSwP0Cw_ZmGR=RJg@mail.gmail.com>
- <991b2298-bb3f-dad3-c93b-b43ee5f372de@deltatee.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Linux-Arch <linux-arch@vger.kernel.org>,
-        "linux-ntb@googlegroups.com" <linux-ntb@googlegroups.com>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Dan Douglass <dan.douglass@nxp.com>,
+From: Vinod Koul <vkoul@kernel.org>
+Subject: [PATCH v4 3/6] crypto: Add Qcom prng driver
+Date: Wed,  4 Jul 2018 17:14:24 +0530
+Message-ID: <20180704114427.29953-4-vkoul@kernel.org>
+References: <20180704114427.29953-1-vkoul@kernel.org>
+Cc: Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Matt Mackall <mpm@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-To: Logan Gunthorpe <logang@deltatee.com>,
-        Andy Shevchenko <andy.shevchenko@gmail.com>,
-        Fabio Estevam <festevam@gmail.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-arm-msm@vger.kernel.org, Stephen Boyd <swboyd@chromium.org>,
+        Timur Tabi <timur@codeaurora.org>,
+        Vinod Koul <vkoul@kernel.org>
+To: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Language: en-US
+In-Reply-To: <20180704114427.29953-1-vkoul@kernel.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 7/4/2018 2:58 AM, Logan Gunthorpe wrote:=0A=
-> =0A=
-> =0A=
-> On 03/07/18 04:21 PM, Andy Shevchenko wrote:=0A=
->> It is an explicit call to BUG().=0A=
->> That's why we see wrong instruction trap.=0A=
-> =0A=
-> Ok, I think I see the problem... the code is rather confusing:=0A=
-> =0A=
-> Prior to the patch, IOs were BE depending on caam_little_end but if=0A=
-> caam_imx was set, then it wrote two LE writes with the high one first.=0A=
-> After the patch, it writes two BE writes with the high one first.=0A=
-> =0A=
-I think there are two separate issues here:=0A=
-=0A=
-1. Semantics of operations in io-64-nonatomic-lo-hi.h, io-64-nonatomic-hi-l=
-o.h=0A=
-=0A=
-Logan, you mentioned the following (which unfortunately I somehow missed):=
-=0A=
-https://lore.kernel.org/lkml/c3f2e061-5ed1-5c74-b955-3d2bfb0da074@deltatee.=
-com=0A=
-The lo_hi/hi_lo functions seem to always refer to the data being written=0A=
-or read not to the address operated on.=0A=
-=0A=
-OTOH, initial commit that added asm-generic/io-64-nonatomic-lo-hi.h and=0A=
-asm-generic/io-64-nonatomic-hi-lo.h mentions:=0A=
-797a796a13df6 ("asm-generic: architecture independent readq/writeq for 32bi=
-t=0A=
-environment")=0A=
-- <asm-generic/io-64-nonatomic-lo-hi.h> provides non-atomic readq/ writeq w=
-ith=0A=
-the order of lower address -> higher address=0A=
-- <asm-generic/io-64-nonatomic-hi-lo.h> provides non-atomic readq/ writeq w=
-ith=0A=
-reversed order=0A=
-=0A=
-I think we should keep the initial semantics when adding support for=0A=
-io{read|write}64, i.e. "lo" and "hi" to refer to address and not to value.=
-=0A=
-=0A=
-Actually this is the semantics intended for the CAAM patch, see the note at=
- the=0A=
-end of the commit message that refers to addresses, not values:=0A=
-To be consistent with CAAM engine HW spec: in case of 64-bit registers,=0A=
-irrespective of device endianness, the lower address should be read from=0A=
-/ written to first, followed by the upper address.=0A=
-=0A=
-=0A=
-2. CAAM driver I/O accessors for i.MX case=0A=
-=0A=
-CAAM block in some i.MX parts has broken endianness for 64b registers.=0A=
-For e.g. for i.MX6S/SL/D/Q even though CAAM is little endian, BARs for I/O =
-rings=0A=
-have to be programmed as:=0A=
-I/O Ring BAR+0: unused=0A=
-I/O Ring BAR+4: IOVA (32-bit little endian)=0A=
-when the proper layout (for a 64b register) would have been to program IOVA=
- at=0A=
-BAR+0.=0A=
-=0A=
-This explains why I/O accessors in CAAM driver handle things differently in=
- case=0A=
-caam_imx=3Dtrue.=0A=
-=0A=
-Since this quirk cannot be accommodated in generic fashion, code dealing wi=
-th=0A=
-caam_imx has to stay.=0A=
-=0A=
-Horia=0A=
+This ports the Qcom prng from older hw_random driver.
+
+No change of functionality and move from hw_random to crypto
+APIs is done.
+
+Signed-off-by: Vinod Koul <vkoul@kernel.org>
+---
+ drivers/crypto/Kconfig    |  11 +++
+ drivers/crypto/Makefile   |   1 +
+ drivers/crypto/qcom-rng.c | 208 ++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 220 insertions(+)
+ create mode 100644 drivers/crypto/qcom-rng.c
+
+diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+index 43cccf6aff61..b8d9e71e550a 100644
+--- a/drivers/crypto/Kconfig
++++ b/drivers/crypto/Kconfig
+@@ -585,6 +585,17 @@ config CRYPTO_DEV_QCE
+ 	  hardware. To compile this driver as a module, choose M here. The
+ 	  module will be called qcrypto.
+ 
++config CRYPTO_DEV_QCOM_RNG
++	tristate "Qualcomm Randon Number Generator Driver"
++	depends on ARCH_QCOM || COMPILE_TEST
++	select CRYPTO_RNG
++	help
++	  This driver provides support for the Random Number
++	  Generator hardware found on Qualcomm SoCs.
++
++	  To compile this driver as a module, choose M here. the
++          module will be called qcom-rng. If unsure, say N.
++
+ config CRYPTO_DEV_VMX
+ 	bool "Support for VMX cryptographic acceleration instructions"
+ 	depends on PPC64 && VSX
+diff --git a/drivers/crypto/Makefile b/drivers/crypto/Makefile
+index 7ae87b4f6c8d..3602875c4f80 100644
+--- a/drivers/crypto/Makefile
++++ b/drivers/crypto/Makefile
+@@ -33,6 +33,7 @@ obj-$(CONFIG_CRYPTO_DEV_PICOXCELL) += picoxcell_crypto.o
+ obj-$(CONFIG_CRYPTO_DEV_PPC4XX) += amcc/
+ obj-$(CONFIG_CRYPTO_DEV_QAT) += qat/
+ obj-$(CONFIG_CRYPTO_DEV_QCE) += qce/
++obj-$(CONFIG_CRYPTO_DEV_QCOM_RNG) += qcom-rng.o
+ obj-$(CONFIG_CRYPTO_DEV_ROCKCHIP) += rockchip/
+ obj-$(CONFIG_CRYPTO_DEV_S5P) += s5p-sss.o
+ obj-$(CONFIG_CRYPTO_DEV_SAHARA) += sahara.o
+diff --git a/drivers/crypto/qcom-rng.c b/drivers/crypto/qcom-rng.c
+new file mode 100644
+index 000000000000..53e1d276e05e
+--- /dev/null
++++ b/drivers/crypto/qcom-rng.c
+@@ -0,0 +1,208 @@
++// SPDX-License-Identifier: GPL-2.0
++// Copyright (c) 2017-18 Linaro Limited
++//
++// Based on msm-rng.c and downstream driver
++
++#include <crypto/internal/rng.h>
++#include <linux/clk.h>
++#include <linux/crypto.h>
++#include <linux/module.h>
++#include <linux/of_device.h>
++#include <linux/platform_device.h>
++
++/* Device specific register offsets */
++#define PRNG_DATA_OUT		0x0000
++#define PRNG_STATUS		0x0004
++#define PRNG_LFSR_CFG		0x0100
++#define PRNG_CONFIG		0x0104
++
++/* Device specific register masks and config values */
++#define PRNG_LFSR_CFG_MASK	0x0000ffff
++#define PRNG_LFSR_CFG_CLOCKS	0x0000dddd
++#define PRNG_CONFIG_HW_ENABLE	BIT(1)
++#define PRNG_STATUS_DATA_AVAIL	BIT(0)
++
++#define WORD_SZ			4
++
++struct qcom_rng {
++	struct mutex lock;
++	void __iomem *base;
++	struct clk *clk;
++};
++
++struct qcom_rng_ctx {
++	struct qcom_rng *rng;
++};
++
++static struct qcom_rng *qcom_rng_dev;
++
++static int qcom_rng_read(struct qcom_rng *rng, u8 *data, unsigned int max)
++{
++	unsigned int currsize = 0;
++	u32 val;
++
++	/* read random data from hardware */
++	do {
++		val = readl_relaxed(rng->base + PRNG_STATUS);
++		if (!(val & PRNG_STATUS_DATA_AVAIL))
++			break;
++
++		val = readl_relaxed(rng->base + PRNG_DATA_OUT);
++		if (!val)
++			break;
++
++		if ((max - currsize) >= WORD_SZ) {
++			memcpy(data, &val, WORD_SZ);
++			data += WORD_SZ;
++			currsize += WORD_SZ;
++		} else {
++			/* copy only remaining bytes */
++			memcpy(data, &val, max - currsize);
++			break;
++		}
++	} while (currsize < max);
++
++	return currsize;
++}
++
++static int qcom_rng_generate(struct crypto_rng *tfm,
++			     const u8 *src, unsigned int slen,
++			     u8 *dstn, unsigned int dlen)
++{
++	struct qcom_rng_ctx *ctx = crypto_rng_ctx(tfm);
++	struct qcom_rng *rng = ctx->rng;
++	int ret;
++
++	ret = clk_prepare_enable(rng->clk);
++	if (ret)
++		return ret;
++
++	mutex_lock(&rng->lock);
++
++	ret = qcom_rng_read(rng, dstn, dlen);
++
++	mutex_unlock(&rng->lock);
++	clk_disable_unprepare(rng->clk);
++
++	return 0;
++}
++
++static int qcom_rng_seed(struct crypto_rng *tfm, const u8 *seed,
++			 unsigned int slen)
++{
++	return 0;
++}
++
++static int qcom_rng_enable(struct qcom_rng *rng)
++{
++	u32 val;
++	int ret;
++
++	ret = clk_prepare_enable(rng->clk);
++	if (ret)
++		return ret;
++
++	/* Enable PRNG only if it is not already enabled */
++	val = readl_relaxed(rng->base + PRNG_CONFIG);
++	if (val & PRNG_CONFIG_HW_ENABLE)
++		goto already_enabled;
++
++	val = readl_relaxed(rng->base + PRNG_LFSR_CFG);
++	val &= ~PRNG_LFSR_CFG_MASK;
++	val |= PRNG_LFSR_CFG_CLOCKS;
++	writel(val, rng->base + PRNG_LFSR_CFG);
++
++	val = readl_relaxed(rng->base + PRNG_CONFIG);
++	val |= PRNG_CONFIG_HW_ENABLE;
++	writel(val, rng->base + PRNG_CONFIG);
++
++already_enabled:
++	clk_disable_unprepare(rng->clk);
++
++	return 0;
++}
++
++static int qcom_rng_init(struct crypto_tfm *tfm)
++{
++	struct qcom_rng_ctx *ctx = crypto_tfm_ctx(tfm);
++
++	ctx->rng = qcom_rng_dev;
++
++	return qcom_rng_enable(ctx->rng);
++}
++
++static struct rng_alg qcom_rng_alg = {
++	.generate	= qcom_rng_generate,
++	.seed		= qcom_rng_seed,
++	.seedsize	= 0,
++	.base		= {
++		.cra_name		= "stdrng",
++		.cra_driver_name	= "qcom-rng",
++		.cra_flags		= CRYPTO_ALG_TYPE_RNG,
++		.cra_priority		= 300,
++		.cra_ctxsize		= sizeof(struct qcom_rng_ctx),
++		.cra_module		= THIS_MODULE,
++		.cra_init		= qcom_rng_init,
++	}
++};
++
++static int qcom_rng_probe(struct platform_device *pdev)
++{
++	struct resource *res;
++	struct qcom_rng *rng;
++	int ret;
++
++	rng = devm_kzalloc(&pdev->dev, sizeof(*rng), GFP_KERNEL);
++	if (!rng)
++		return -ENOMEM;
++
++	platform_set_drvdata(pdev, rng);
++	mutex_init(&rng->lock);
++
++	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
++	rng->base = devm_ioremap_resource(&pdev->dev, res);
++	if (IS_ERR(rng->base))
++		return PTR_ERR(rng->base);
++
++	rng->clk = devm_clk_get(&pdev->dev, "core");
++	if (IS_ERR(rng->clk))
++		return PTR_ERR(rng->clk);
++
++	qcom_rng_dev = rng;
++	ret = crypto_register_rng(&qcom_rng_alg);
++	if (ret) {
++		dev_err(&pdev->dev, "Register crypto rng failed: %d\n", ret);
++		qcom_rng_dev = NULL;
++	}
++
++	return ret;
++}
++
++static int qcom_rng_remove(struct platform_device *pdev)
++{
++	crypto_unregister_rng(&qcom_rng_alg);
++
++	qcom_rng_dev = NULL;
++
++	return 0;
++}
++
++static const struct of_device_id qcom_rng_of_match[] = {
++	{ .compatible = "qcom,prng" },
++	{}
++};
++MODULE_DEVICE_TABLE(of, qcom_rng_of_match);
++
++static struct platform_driver qcom_rng_driver = {
++	.probe = qcom_rng_probe,
++	.remove =  qcom_rng_remove,
++	.driver = {
++		.name = KBUILD_MODNAME,
++		.of_match_table = of_match_ptr(qcom_rng_of_match),
++	}
++};
++module_platform_driver(qcom_rng_driver);
++
++MODULE_ALIAS("platform:" KBUILD_MODNAME);
++MODULE_DESCRIPTION("Qualcomm random number generator driver");
++MODULE_LICENSE("GPL v2");
+-- 
+2.14.4
