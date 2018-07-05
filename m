@@ -1,58 +1,55 @@
-From: Vinod <vkoul@kernel.org>
-Subject: Re: [PATCH v4 6/6] crypto: qcom: Add ACPI support
-Date: Thu, 5 Jul 2018 11:37:33 +0530
-Message-ID: <20180705060733.GH22377@vkoul-mobl>
-References: <20180704114427.29953-1-vkoul@kernel.org>
- <20180704114427.29953-7-vkoul@kernel.org>
- <b06a0327-bbfe-5f7c-c0e1-43227ce089ae@kernel.org>
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Subject: Re: [PATCH] AF_ALG: register completely initialized request in list
+Date: Thu, 05 Jul 2018 09:49:41 +0200
+Message-ID: <3179058.YavDkrnvkQ@positron.chronox.de>
+References: <00000000000092ad87056950ef9e@google.com> <3223691.KS9TZr8pPl@tauon.chronox.de> <20180704233757.GK725@sol.localdomain>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Matt Mackall <mpm@selenic.com>,
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: Dmitry Vyukov <dvyukov@google.com>,
+        syzbot <syzbot+9c251bdd09f83b92ba95@syzkaller.appspotmail.com>,
+        David Miller <davem@davemloft.net>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-arm-msm@vger.kernel.org, Stephen Boyd <swboyd@chromium.org>,
-        Timur Tabi <timur@codeaurora.org>
-To: Timur Tabi <timur@kernel.org>
+        linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+        syzkaller-bugs@googlegroups.com
+To: Eric Biggers <ebiggers3@gmail.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <b06a0327-bbfe-5f7c-c0e1-43227ce089ae@kernel.org>
+In-Reply-To: <20180704233757.GK725@sol.localdomain>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 04-07-18, 09:46, Timur Tabi wrote:
-> On 7/4/18 6:44 AM, Vinod Koul wrote:
-> > +	if (has_acpi_companion(&pdev->dev)) {
-> > +		rng->skip_init = 1;
-> > +	} else {
-> > +		rng->clk = devm_clk_get(&pdev->dev, "core");
-> > +		if (IS_ERR(rng->clk))
-> > +			return PTR_ERR(rng->clk);
-> > +
-> > +		rng->skip_init =
-> > +			(unsigned long)of_device_get_match_data(&pdev->dev);
-> > +	}
+Am Donnerstag, 5. Juli 2018, 01:37:57 CEST schrieb Eric Biggers:
+
+Hi Eric,
+
+> On Mon, Apr 09, 2018 at 09:54:12AM +0200, Stephan Mueller wrote:
+> > Am Montag, 9. April 2018, 09:51:13 CEST schrieb Dmitry Vyukov:
+> > 
+> > Hi Dmitry,
+> > 
+> > > You can ask syzbot to test by replying to its report email with a test
+> > > command, see:
+> > > https://github.com/google/syzkaller/blob/master/docs/syzbot.md#communica
+> > > tion -with-syzbot
+> > > 
+> > > Note that all testing of KMSAN bugs needs to go to KMSAN tree, for
+> > > details
+> > > see:
+> > > https://github.com/google/syzkaller/blob/master/docs/syzbot.md#kmsan-bug
+> > > s
+> > 
+> > Thank you. I will resend the patch later today with the proper tags.
+> > 
+> > Ciao
+> > Stephan
 > 
-> There is a device_get_match_data() function, if you want to be consistent
-> between ACPI and DT.
+> Hi Stephan, it seems you never sent your patch out.
 
-Yes we can add driver data in ACPI ID as well so code can be:
+Thank you for pointing this one out. At the time, I was searching for how I 
+can refer to the syzbot KMSAN branch that was used to produce the bug report. 
+I only see guidance on how to point to the Linux kernel tree.
 
-        if (!has_acpi_companion(&pdev->dev)) {
-                rng->clk = devm_clk_get(&pdev->dev, "core");
-                if (IS_ERR(rng->clk))
-                        return PTR_ERR(rng->clk);
-        }
-        rng->skip_init = device_get_match_data(&pdev->dev);
+Do you have a hint how to point to a different syzbot tree?
 
-Looks much neater.
-
-I will wait for feedback on other patches before updating this.
-
-Meanwhile any word from testing on ACPI systems?
-
-Thanks
--- 
-~Vinod
+Ciao
+Stephan
