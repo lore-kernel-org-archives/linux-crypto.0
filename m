@@ -1,52 +1,58 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: [PATCH v2] AF_ALG: Initialize sg_num_bytes in error code path
-Date: Thu, 05 Jul 2018 17:58:15 +0200
-Message-ID: <3579823.yyIR4au8HA@positron.chronox.de>
-References: <00000000000092ad87056950ef9e@google.com>
+From: syzbot <syzbot+9c251bdd09f83b92ba95@syzkaller.appspotmail.com>
+Subject: Re: KMSAN: uninit-value in af_alg_free_areq_sgls
+Date: Thu, 05 Jul 2018 10:02:01 -0700
+Message-ID: <000000000000846e9e0570438176@google.com>
+References: <3579823.yyIR4au8HA@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: davem@davemloft.net, herbert@gondor.apana.org.au,
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+To: davem@davemloft.net, herbert@gondor.apana.org.au,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com
-To: syzbot <syzbot+9c251bdd09f83b92ba95@syzkaller.appspotmail.com>
+        smueller@chronox.de, syzkaller-bugs@googlegroups.com
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <00000000000092ad87056950ef9e@google.com>
+In-Reply-To: <3579823.yyIR4au8HA@positron.chronox.de>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Changes v2:
-* Addition of syz testing line
+Hello,
 
----8<---
+syzbot tried to test the proposed patch but build/boot failed:
 
-The RX SGL in processing is already registered with the RX SGL tracking
-list to support proper cleanup. The cleanup code path uses the
-sg_num_bytes variable which must therefore be always initialized, even
-in the error code path.
+failed to checkout kernel repo https://github.com/google/kmsan.git/---:  
+failed to run /usr/bin/git [git fetch https://github.com/google/kmsan.git  
+---]: exit status 129
+error: unknown option `-'
+usage: git fetch [<options>] [<repository> [<refspec>...]]
+    or: git fetch [<options>] <group>
+    or: git fetch --multiple [<options>] [(<repository> | <group>)...]
+    or: git fetch --all [<options>]
 
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
-Reported-by: syzbot+9c251bdd09f83b92ba95@syzkaller.appspotmail.com
-#syz test: https://github.com/google/kmsan.git
----
- crypto/af_alg.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+     -v, --verbose         be more verbose
+     -q, --quiet           be more quiet
+     --all                 fetch from all remotes
+     -a, --append          append to .git/FETCH_HEAD instead of overwriting
+     --upload-pack <path>  path to upload pack on remote end
+     -f, --force           force overwrite of local branch
+     -m, --multiple        fetch from multiple remotes
+     -t, --tags            fetch all tags and associated objects
+     -n                    do not fetch all tags (--no-tags)
+     -p, --prune           prune remote-tracking branches no longer on remote
+     --recurse-submodules[=<on-demand>]
+                           control recursive fetching of submodules
+     --dry-run             dry run
+     -k, --keep            keep downloaded pack
+     -u, --update-head-ok  allow updating of HEAD ref
+     --progress            force progress reporting
+     --depth <depth>       deepen history of shallow clone
+     --unshallow           convert to a complete repository
+     --update-shallow      accept refs that update .git/shallow
+     --refmap <refmap>     specify fetch refmap
 
-diff --git a/crypto/af_alg.c b/crypto/af_alg.c
-index 49fa8582138b..bd6795ff406a 100644
---- a/crypto/af_alg.c
-+++ b/crypto/af_alg.c
-@@ -1148,8 +1148,10 @@ int af_alg_get_rsgl(struct sock *sk, struct msghdr *msg, int flags,
- 
- 		/* make one iovec available as scatterlist */
- 		err = af_alg_make_sg(&rsgl->sgl, &msg->msg_iter, seglen);
--		if (err < 0)
-+		if (err < 0) {
-+			rsgl->sg_num_bytes = 0;
- 			return err;
-+		}
- 
- 		/* chain the new scatterlist with previous one */
- 		if (areq->last_rsgl)
--- 
-2.17.1
+
+
+
+Tested on:
+
+commit:         [unknown]
+git tree:       https://github.com/google/kmsan.git/---
+compiler:       clang version 7.0.0 (trunk 334104)
+patch:          https://syzkaller.appspot.com/x/patch.diff?x=1207511c400000
