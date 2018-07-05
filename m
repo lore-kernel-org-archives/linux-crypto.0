@@ -1,55 +1,70 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: Re: [PATCH] AF_ALG: register completely initialized request in list
-Date: Thu, 05 Jul 2018 09:49:41 +0200
-Message-ID: <3179058.YavDkrnvkQ@positron.chronox.de>
-References: <00000000000092ad87056950ef9e@google.com> <3223691.KS9TZr8pPl@tauon.chronox.de> <20180704233757.GK725@sol.localdomain>
+From: Ingo Molnar <mingo@kernel.org>
+Subject: Re: [PATCH] x86/crypto: Add missing RETs
+Date: Thu, 5 Jul 2018 09:58:15 +0200
+Message-ID: <20180705075815.GA20903@gmail.com>
+References: <1529244178.4674.1.camel@gmx.de>
+ <20180617194747.GA21160@zn.tnic>
+ <1529289279.31745.3.camel@gmx.de>
+ <20180623103622.GA2760@zn.tnic>
+ <20180624071105.GA29407@gmail.com>
+ <20180624104449.GA20159@avx2>
+ <20180625072438.GA19063@gmail.com>
+ <20180625131932.sge43esxdb5ejoxg@treble>
+ <20180626064930.GB25879@gmail.com>
+ <20180626123154.unjji5glpokedwal@treble>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Dmitry Vyukov <dvyukov@google.com>,
-        syzbot <syzbot+9c251bdd09f83b92ba95@syzkaller.appspotmail.com>,
-        David Miller <davem@davemloft.net>,
+Content-Type: text/plain; charset=us-ascii
+Cc: Alexey Dobriyan <adobriyan@gmail.com>,
+        Borislav Petkov <bp@alien8.de>, linux-crypto@vger.kernel.org,
+        Mike Galbraith <efault@gmx.de>, torvalds@linux-foundation.org,
+        tglx@linutronix.de, luto@kernel.org, peterz@infradead.org,
+        brgerst@gmail.com, hpa@zytor.com, linux-kernel@vger.kernel.org,
+        dvlasenk@redhat.com, h.peter.anvin@intel.com,
+        linux-tip-commits <linux-tip-commits@vger.kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-        syzkaller-bugs@googlegroups.com
-To: Eric Biggers <ebiggers3@gmail.com>
+        Peter Zijlstra <a.p.zijlstra@chello.nl>
+To: Josh Poimboeuf <jpoimboe@redhat.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180704233757.GK725@sol.localdomain>
+Content-Disposition: inline
+In-Reply-To: <20180626123154.unjji5glpokedwal@treble>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Am Donnerstag, 5. Juli 2018, 01:37:57 CEST schrieb Eric Biggers:
 
-Hi Eric,
+* Josh Poimboeuf <jpoimboe@redhat.com> wrote:
 
-> On Mon, Apr 09, 2018 at 09:54:12AM +0200, Stephan Mueller wrote:
-> > Am Montag, 9. April 2018, 09:51:13 CEST schrieb Dmitry Vyukov:
-> > 
-> > Hi Dmitry,
-> > 
-> > > You can ask syzbot to test by replying to its report email with a test
-> > > command, see:
-> > > https://github.com/google/syzkaller/blob/master/docs/syzbot.md#communica
-> > > tion -with-syzbot
-> > > 
-> > > Note that all testing of KMSAN bugs needs to go to KMSAN tree, for
-> > > details
-> > > see:
-> > > https://github.com/google/syzkaller/blob/master/docs/syzbot.md#kmsan-bug
-> > > s
-> > 
-> > Thank you. I will resend the patch later today with the proper tags.
-> > 
-> > Ciao
-> > Stephan
+> > So that's still incomplete in that doesn't analyze the 32-bit build yet, right?
 > 
-> Hi Stephan, it seems you never sent your patch out.
+> We could do INT3s on 64-bit and NOPs on 32-bit.
+> 
+> Or, possibly even better, we could just keep NOPs everywhere and instead
+> make objtool smart enough to detect function fallthroughs.  That should
+> be pretty easy, actually.  It already does it for C files.
+> 
+> Something like the below should work, though it's still got a few
+> issues:
+> 
+>   a) objtool is currently disabled for crypto code because it doesn't
+>      yet understand crypto stack re-alignments (which really needs
+>      fixing anyway); and
+> 
+>   b) it complains about the blank xen hypercalls falling through.  Those
+>      aren't actual functions anyway, so we should probably annotate
+>      those somehow so that objtool ignores them anyway.
+> 
+> I'm a bit swamped at the moment but I can fix those once I get a little
+> more bandwidth.  I at least verified that this patch caught the crypto
+> missing RETs.
 
-Thank you for pointing this one out. At the time, I was searching for how I 
-can refer to the syzbot KMSAN branch that was used to produce the bug report. 
-I only see guidance on how to point to the Linux kernel tree.
+Great, I'd be perfectly fine with such an approach.
 
-Do you have a hint how to point to a different syzbot tree?
+Also, if we have that then we could re-apply Alexey's patch and switch to INT3 
+(only on 64-bit kernels) without any trouble, because objtool should detect any 
+execution flow bugs before the INT3 could trigger, right?
 
-Ciao
-Stephan
+I.e. any INT3 fault would show a combination of *both* an objtool bug and a 
+probable code flow bug - which I suspect would warrant crashing the box ...
+
+Thanks,
+
+	Ingo
