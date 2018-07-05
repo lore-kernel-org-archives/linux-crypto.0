@@ -1,45 +1,52 @@
-From: Eric Biggers <ebiggers3@gmail.com>
-Subject: Re: [PATCH] AF_ALG: register completely initialized request in list
-Date: Wed, 4 Jul 2018 16:37:57 -0700
-Message-ID: <20180704233757.GK725@sol.localdomain>
-References: <00000000000092ad87056950ef9e@google.com>
- <3337259.MW9pfDCdka@positron.chronox.de>
- <CACT4Y+bGDOi-+vVs=-eD=wHaUbFz2ZVO13yF8hq4cU4dkGXorg@mail.gmail.com>
- <3223691.KS9TZr8pPl@tauon.chronox.de>
+From: Vinod <vkoul@kernel.org>
+Subject: Re: [PATCH v3 3/6] crypto: Add Qcom prng driver
+Date: Thu, 5 Jul 2018 11:31:14 +0530
+Message-ID: <20180705060114.GG22377@vkoul-mobl>
+References: <20180703060434.19293-1-vkoul@kernel.org>
+ <20180703060434.19293-4-vkoul@kernel.org>
+ <19909549.EUeuX9KOs7@tauon.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Dmitry Vyukov <dvyukov@google.com>,
-        syzbot <syzbot+9c251bdd09f83b92ba95@syzkaller.appspotmail.com>,
-        David Miller <davem@davemloft.net>,
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Matt Mackall <mpm@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-        syzkaller-bugs@googlegroups.com
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-arm-msm@vger.kernel.org, Stephen Boyd <swboyd@chromium.org>,
+        Timur Tabi <timur@codeaurora.org>
 To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <3223691.KS9TZr8pPl@tauon.chronox.de>
+In-Reply-To: <19909549.EUeuX9KOs7@tauon.chronox.de>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Apr 09, 2018 at 09:54:12AM +0200, Stephan Mueller wrote:
-> Am Montag, 9. April 2018, 09:51:13 CEST schrieb Dmitry Vyukov:
-> 
-> Hi Dmitry,
-> 
-> > You can ask syzbot to test by replying to its report email with a test
-> > command, see:
-> > https://github.com/google/syzkaller/blob/master/docs/syzbot.md#communication
-> > -with-syzbot
-> > 
-> > Note that all testing of KMSAN bugs needs to go to KMSAN tree, for details
-> > see:
-> > https://github.com/google/syzkaller/blob/master/docs/syzbot.md#kmsan-bugs
-> 
-> Thank you. I will resend the patch later today with the proper tags.
-> 
-> Ciao
-> Stephan
+Hi Stephan,
 
-Hi Stephan, it seems you never sent your patch out.
+On 04-07-18, 18:02, Stephan Mueller wrote:
+> Am Dienstag, 3. Juli 2018, 08:04:31 CEST schrieb Vinod Koul:
+> > +static int qcom_rng_seed(struct crypto_rng *tfm, const u8 *seed,
+> > +			 unsigned int slen)
+> > +{
+> > +	return 0;
+> > +}
+> 
+> One more question: is it not possible to mix in data into the DRNG? I thought 
+> it would be possible with the Qualcomm DRBG.
+> 
+> Note, I am asking because of my /dev/random drop-in-replacement 
+> implementation, any RNG from the kernel crypto API can be configured to be 
+> used as an output DRNG. Though, this will only work if the DRNG also accepts 
+> seed from the software noise sources.
 
-- Eric
+The v1 hardware supports seeding but the register is Read Only for SW and
+only trusted zone (firmware) can write.
+
+v2 hardware slice does not have seeding. v2 seeding is not accessible to
+SW.
+
+So in short, it is not available for us to use :(
+
+-- 
+~Vinod
