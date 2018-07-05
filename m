@@ -1,57 +1,52 @@
-From: Jeffrey Hugo <jhugo@codeaurora.org>
-Subject: Re: [PATCH v3 6/6] crypto: qcom: Add ACPI support
-Date: Thu, 5 Jul 2018 08:26:49 -0600
-Message-ID: <6d8ee620-80d5-b529-1256-0624b1fbd98d@codeaurora.org>
-References: <20180703060434.19293-1-vkoul@kernel.org>
- <20180703060434.19293-7-vkoul@kernel.org>
- <28000d33-5321-76af-7985-94a564a75336@codeaurora.org>
- <20180704041310.GV22377@vkoul-mobl>
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Subject: [PATCH v2] AF_ALG: Initialize sg_num_bytes in error code path
+Date: Thu, 05 Jul 2018 17:58:15 +0200
+Message-ID: <3579823.yyIR4au8HA@positron.chronox.de>
+References: <00000000000092ad87056950ef9e@google.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-arm-msm@vger.kernel.org, Stephen Boyd <swboyd@chromium.org>,
-        Timur Tabi <timur@codeaurora.org>
-To: Vinod <vkoul@kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: davem@davemloft.net, herbert@gondor.apana.org.au,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com
+To: syzbot <syzbot+9c251bdd09f83b92ba95@syzkaller.appspotmail.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180704041310.GV22377@vkoul-mobl>
-Content-Language: en-US
+In-Reply-To: <00000000000092ad87056950ef9e@google.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 7/3/2018 10:13 PM, Vinod wrote:
-> On 03-07-18, 11:08, Jeffrey Hugo wrote:
->> On 7/3/2018 12:04 AM, Vinod Koul wrote:
-> 
->>> +#if IS_ENABLED(CONFIG_ACPI)
->>> +static const struct acpi_device_id qcom_rng_acpi_match[] = {
->>> +	{
->>> +		.id = "QCOM8160",
->>> +	},
->>> +	{}
->>> +};
->>> +MODULE_DEVICE_TABLE(acpi, msm_rng_acpi_match);
->>
->> qcom_rng_acpi_match?
->> Looks like a copy/paste issue.  This causes a build failure for me.
->> I'm trying to see if it works otherwise...
-> 
-> Ah sorry about that, I though I had fixed it, looks like I missed to
-> fold the fix.
-> 
-> Did it work for you?
-> 
-It seems to work.  Driver compiles, and loads.  Still working on the 
-verification.
+Changes v2:
+* Addition of syz testing line
 
+---8<---
+
+The RX SGL in processing is already registered with the RX SGL tracking
+list to support proper cleanup. The cleanup code path uses the
+sg_num_bytes variable which must therefore be always initialized, even
+in the error code path.
+
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+Reported-by: syzbot+9c251bdd09f83b92ba95@syzkaller.appspotmail.com
+#syz test: https://github.com/google/kmsan.git
+---
+ crypto/af_alg.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/crypto/af_alg.c b/crypto/af_alg.c
+index 49fa8582138b..bd6795ff406a 100644
+--- a/crypto/af_alg.c
++++ b/crypto/af_alg.c
+@@ -1148,8 +1148,10 @@ int af_alg_get_rsgl(struct sock *sk, struct msghdr *msg, int flags,
+ 
+ 		/* make one iovec available as scatterlist */
+ 		err = af_alg_make_sg(&rsgl->sgl, &msg->msg_iter, seglen);
+-		if (err < 0)
++		if (err < 0) {
++			rsgl->sg_num_bytes = 0;
+ 			return err;
++		}
+ 
+ 		/* chain the new scatterlist with previous one */
+ 		if (areq->last_rsgl)
 -- 
-Jeffrey Hugo
-Qualcomm Datacenter Technologies as an affiliate of Qualcomm 
-Technologies, Inc.
-Qualcomm Technologies, Inc. is a member of the
-Code Aurora Forum, a Linux Foundation Collaborative Project.
+2.17.1
