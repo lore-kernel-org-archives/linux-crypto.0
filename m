@@ -1,84 +1,31 @@
-From: Dmitry Vyukov <dvyukov@google.com>
-Subject: Re: [PATCH] AF_ALG: register completely initialized request in list
-Date: Thu, 5 Jul 2018 10:43:10 +0200
-Message-ID: <CACT4Y+bcB3xBwh9K+USZb=DGKkFSBPqtuMy9Lf0gFC7Hf+HYDw@mail.gmail.com>
-References: <00000000000092ad87056950ef9e@google.com> <3223691.KS9TZr8pPl@tauon.chronox.de>
- <20180704233757.GK725@sol.localdomain> <3179058.YavDkrnvkQ@positron.chronox.de>
+From: Timur Tabi <timur@kernel.org>
+Subject: Re: [PATCH v4 6/6] crypto: qcom: Add ACPI support
+Date: Thu, 5 Jul 2018 07:23:00 -0500
+Message-ID: <d59553c0-5b7c-87cc-76a6-ef70016ee6be@kernel.org>
+References: <20180704114427.29953-1-vkoul@kernel.org>
+ <20180704114427.29953-7-vkoul@kernel.org>
+ <b06a0327-bbfe-5f7c-c0e1-43227ce089ae@kernel.org>
+ <20180705060733.GH22377@vkoul-mobl>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Cc: Eric Biggers <ebiggers3@gmail.com>,
-        syzbot <syzbot+9c251bdd09f83b92ba95@syzkaller.appspotmail.com>,
-        David Miller <davem@davemloft.net>,
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Matt Mackall <mpm@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        syzkaller-bugs <syzkaller-bugs@googlegroups.com>
-To: =?UTF-8?Q?Stephan_M=C3=BCller?= <smueller@chronox.de>
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-arm-msm@vger.kernel.org, Stephen Boyd <swboyd@chromium.org>,
+        Timur Tabi <timur@codeaurora.org>
+To: Vinod <vkoul@kernel.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <3179058.YavDkrnvkQ@positron.chronox.de>
+In-Reply-To: <20180705060733.GH22377@vkoul-mobl>
+Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Jul 5, 2018 at 9:49 AM, Stephan M=C3=BCller <smueller@chronox.de> w=
-rote:
-> Am Donnerstag, 5. Juli 2018, 01:37:57 CEST schrieb Eric Biggers:
->
-> Hi Eric,
->
->> On Mon, Apr 09, 2018 at 09:54:12AM +0200, Stephan Mueller wrote:
->> > Am Montag, 9. April 2018, 09:51:13 CEST schrieb Dmitry Vyukov:
->> >
->> > Hi Dmitry,
->> >
->> > > You can ask syzbot to test by replying to its report email with a te=
-st
->> > > command, see:
->> > > https://github.com/google/syzkaller/blob/master/docs/syzbot.md#commu=
-nica
->> > > tion -with-syzbot
->> > >
->> > > Note that all testing of KMSAN bugs needs to go to KMSAN tree, for
->> > > details
->> > > see:
->> > > https://github.com/google/syzkaller/blob/master/docs/syzbot.md#kmsan=
--bug
->> > > s
->> >
->> > Thank you. I will resend the patch later today with the proper tags.
->> >
->> > Ciao
->> > Stephan
->>
->> Hi Stephan, it seems you never sent your patch out.
->
-> Thank you for pointing this one out. At the time, I was searching for how=
- I
-> can refer to the syzbot KMSAN branch that was used to produce the bug rep=
-ort.
-> I only see guidance on how to point to the Linux kernel tree.
->
-> Do you have a hint how to point to a different syzbot tree?
+On 7/5/18 1:07 AM, Vinod wrote:
+> Meanwhile any word from testing on ACPI systems?
 
-Hi Stephan,
-
-The general info about patch testing is here:
-
-https://github.com/google/syzkaller/blob/master/docs/syzbot.md#testing-patc=
-hes
-
-Some additional KMSAN-specific info is at the bottom of the page:
-
-https://github.com/google/syzkaller/blob/master/docs/syzbot.md#kmsan-bugs
-
-In sort, you issue test command against
-https://github.com/google/kmsan.git master and attach the patch.
-The git tree/branch are also referenced in the syzbot report:
-https://groups.google.com/forum/#!msg/syzkaller-bugs/nCuxVFfvc0I/zE1-hC3lCA=
-AJ
-
-Where did you see instructions mentioning Linus tree? I don't see we
-ever refer to that tree in the instructions.
-
-Thanks
+Jeff Hugo is handling that for me.  Since it's a whole new API, he's had 
+to start over.
