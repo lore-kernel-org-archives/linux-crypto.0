@@ -1,51 +1,59 @@
-From: Ingo Molnar <mingo@kernel.org>
-Subject: Re: [PATCH] x86/crypto: Add missing RETs
-Date: Fri, 6 Jul 2018 16:57:35 +0200
-Message-ID: <20180706145735.GA7100@gmail.com>
-References: <1529289279.31745.3.camel@gmx.de>
- <20180623103622.GA2760@zn.tnic>
- <20180624071105.GA29407@gmail.com>
- <20180624104449.GA20159@avx2>
- <20180625072438.GA19063@gmail.com>
- <20180625131932.sge43esxdb5ejoxg@treble>
- <20180626064930.GB25879@gmail.com>
- <20180626123154.unjji5glpokedwal@treble>
- <20180705075815.GA20903@gmail.com>
- <20180706140643.u2vau63nncg23hmi@treble>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: KMSAN: uninit-value in af_alg_free_areq_sgls
+Date: Fri, 06 Jul 2018 18:27:07 +0200
+Message-ID: <2936767.s7CfvshsC6@tauon.chronox.de>
+References: <1616306.R4SzcgHSdy@positron.chronox.de> <000000000000363e2e0570502d42@google.com> <CACT4Y+Yv8M93-N3J1U6r1X=Oy2SaKQpJU1S6iJeFC8bJMnjuKg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Alexey Dobriyan <adobriyan@gmail.com>,
-        Borislav Petkov <bp@alien8.de>, linux-crypto@vger.kernel.org,
-        Mike Galbraith <efault@gmx.de>, torvalds@linux-foundation.org,
-        tglx@linutronix.de, luto@kernel.org, peterz@infradead.org,
-        brgerst@gmail.com, hpa@zytor.com, linux-kernel@vger.kernel.org,
-        dvlasenk@redhat.com, h.peter.anvin@intel.com,
-        linux-tip-commits <linux-tip-commits@vger.kernel.org>,
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: syzbot <syzbot+9c251bdd09f83b92ba95@syzkaller.appspotmail.com>,
+        David Miller <davem@davemloft.net>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Peter Zijlstra <a.p.zijlstra@chello.nl>
-To: Josh Poimboeuf <jpoimboe@redhat.com>
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        syzkaller-bugs <syzkaller-bugs@googlegroups.com>
+To: Dmitry Vyukov <dvyukov@google.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20180706140643.u2vau63nncg23hmi@treble>
+In-Reply-To: <CACT4Y+Yv8M93-N3J1U6r1X=Oy2SaKQpJU1S6iJeFC8bJMnjuKg@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
+Am Freitag, 6. Juli 2018, 10:19:07 CEST schrieb Dmitry Vyukov:
 
-* Josh Poimboeuf <jpoimboe@redhat.com> wrote:
+Hi Dmitry,
 
-> > Great, I'd be perfectly fine with such an approach.
-> > 
-> > Also, if we have that then we could re-apply Alexey's patch and switch to INT3 
-> > (only on 64-bit kernels) without any trouble, because objtool should detect any 
-> > execution flow bugs before the INT3 could trigger, right?
-> > 
-> > I.e. any INT3 fault would show a combination of *both* an objtool bug and a 
-> > probable code flow bug - which I suspect would warrant crashing the box ...
+> On Fri, Jul 6, 2018 at 10:09 AM, syzbot
 > 
-> Sounds good to me.  I can take Alexey's patch and submit a 64-bit
-> version of it, along with the relevant objtool changes (though it may
-> still be a few weeks before I get the chance).
+> <syzbot+9c251bdd09f83b92ba95@syzkaller.appspotmail.com> wrote:
+> > Hello,
+> > 
+> > syzbot tried to test the proposed patch but build/boot failed:
+> > 
+> > lost connection to test machine
+> 
+> Looking into this.
 
-Sounds good to me, thanks!
+syzkaller reported the following which implies that the patch seems to fix the 
+issue.
 
-	Ingo
+
+syzbot has tested the proposed patch and the reproducer did not trigger  
+crash:
+
+Reported-and-tested-by:  
+syzbot+9c251bdd09f83b92ba95@syzkaller.appspotmail.com
+
+Tested on:
+
+commit:         a00de5aa4da3 kmsan: delete some dead code
+git tree:       https://github.com/google/kmsan.git/master
+kernel config:  https://syzkaller.appspot.com/x/.config?x=b11f4cfb262ee607
+compiler:       clang version 7.0.0 (trunk 334104)
+patch:          https://syzkaller.appspot.com/x/patch.diff?x=13194968400000
+
+Note: testing is done by a robot and is best-effort only.
+
+
+Ciao
+Stephan
