@@ -1,59 +1,41 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: KMSAN: uninit-value in af_alg_free_areq_sgls
-Date: Fri, 06 Jul 2018 18:27:07 +0200
-Message-ID: <2936767.s7CfvshsC6@tauon.chronox.de>
-References: <1616306.R4SzcgHSdy@positron.chronox.de> <000000000000363e2e0570502d42@google.com> <CACT4Y+Yv8M93-N3J1U6r1X=Oy2SaKQpJU1S6iJeFC8bJMnjuKg@mail.gmail.com>
+From: Eric Biggers <ebiggers3@gmail.com>
+Subject: Re: [PATCH v3] AF_ALG: Initialize sg_num_bytes in error code path
+Date: Fri, 6 Jul 2018 14:57:51 -0700
+Message-ID: <20180706215751.GB109361@gmail.com>
+References: <00000000000092ad87056950ef9e@google.com>
+ <1616306.R4SzcgHSdy@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 Cc: syzbot <syzbot+9c251bdd09f83b92ba95@syzkaller.appspotmail.com>,
-        David Miller <davem@davemloft.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        syzkaller-bugs <syzkaller-bugs@googlegroups.com>
-To: Dmitry Vyukov <dvyukov@google.com>
+        davem@davemloft.net, herbert@gondor.apana.org.au,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com
+To: Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CACT4Y+Yv8M93-N3J1U6r1X=Oy2SaKQpJU1S6iJeFC8bJMnjuKg@mail.gmail.com>
+Content-Disposition: inline
+In-Reply-To: <1616306.R4SzcgHSdy@positron.chronox.de>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Am Freitag, 6. Juli 2018, 10:19:07 CEST schrieb Dmitry Vyukov:
-
-Hi Dmitry,
-
-> On Fri, Jul 6, 2018 at 10:09 AM, syzbot
+On Fri, Jul 06, 2018 at 09:50:55AM +0200, Stephan Müller wrote:
+> Changes v3:
+> * Fix syz testing line
 > 
-> <syzbot+9c251bdd09f83b92ba95@syzkaller.appspotmail.com> wrote:
-> > Hello,
-> > 
-> > syzbot tried to test the proposed patch but build/boot failed:
-> > 
-> > lost connection to test machine
+> Changes v2:
+> * Addition of syz testing line
 > 
-> Looking into this.
+> ---8<---
+> 
+> The RX SGL in processing is already registered with the RX SGL tracking
+> list to support proper cleanup. The cleanup code path uses the
+> sg_num_bytes variable which must therefore be always initialized, even
+> in the error code path.
+> 
+> Signed-off-by: Stephan Mueller <smueller@chronox.de>
+> Reported-by: syzbot+9c251bdd09f83b92ba95@syzkaller.appspotmail.com
+> #syz test: https://github.com/google/kmsan.git master
 
-syzkaller reported the following which implies that the patch seems to fix the 
-issue.
+Can you add Fixes: and Cc: stable?
 
-
-syzbot has tested the proposed patch and the reproducer did not trigger  
-crash:
-
-Reported-and-tested-by:  
-syzbot+9c251bdd09f83b92ba95@syzkaller.appspotmail.com
-
-Tested on:
-
-commit:         a00de5aa4da3 kmsan: delete some dead code
-git tree:       https://github.com/google/kmsan.git/master
-kernel config:  https://syzkaller.appspot.com/x/.config?x=b11f4cfb262ee607
-compiler:       clang version 7.0.0 (trunk 334104)
-patch:          https://syzkaller.appspot.com/x/patch.diff?x=13194968400000
-
-Note: testing is done by a robot and is best-effort only.
-
-
-Ciao
-Stephan
+- Eric
