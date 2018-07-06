@@ -1,61 +1,107 @@
-From: syzbot <syzbot+9c251bdd09f83b92ba95@syzkaller.appspotmail.com>
+From: Dmitry Vyukov <dvyukov@google.com>
 Subject: Re: KMSAN: uninit-value in af_alg_free_areq_sgls
-Date: Fri, 06 Jul 2018 01:09:01 -0700
-Message-ID: <000000000000363e2e0570502d42@google.com>
-References: <1616306.R4SzcgHSdy@positron.chronox.de>
+Date: Fri, 6 Jul 2018 10:19:07 +0200
+Message-ID: <CACT4Y+Yv8M93-N3J1U6r1X=Oy2SaKQpJU1S6iJeFC8bJMnjuKg@mail.gmail.com>
+References: <1616306.R4SzcgHSdy@positron.chronox.de> <000000000000363e2e0570502d42@google.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
-Content-Transfer-Encoding: base64
-To: davem@davemloft.net, herbert@gondor.apana.org.au,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        smueller@chronox.de, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+Cc: David Miller <davem@davemloft.net>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Stephan Mueller <smueller@chronox.de>,
+        syzkaller-bugs <syzkaller-bugs@googlegroups.com>
+To: syzbot <syzbot+9c251bdd09f83b92ba95@syzkaller.appspotmail.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1616306.R4SzcgHSdy@positron.chronox.de>
+In-Reply-To: <000000000000363e2e0570502d42@google.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-SGVsbG8sDQoNCnN5emJvdCB0cmllZCB0byB0ZXN0IHRoZSBwcm9wb3NlZCBwYXRjaCBidXQgYnVp
-bGQvYm9vdCBmYWlsZWQ6DQoNCmxvc3QgY29ubmVjdGlvbiB0byB0ZXN0IG1hY2hpbmUNCg0KDQoN
-ClsuLi4uXSBTdGFydGluZyBlbmhhbmNlZCBzeXNsb2dkOiByc3lzbG9nZBtbPzI1bBtbPzFjGzcb
-WzFHWxtbMzJtIG9rICANChtbMzk7NDltGzgbWz8yNWgbWz8wYy4NClsuLi4uXSBTdGFydGluZyBw
-ZXJpb2RpYyBjb21tYW5kIHNjaGVkdWxlcjogY3JvbhtbPzI1bBtbPzFjGzcbWzFHWxtbMzJtIG9r
-ICANChtbMzk7NDltGzgbWz8yNWgbWz8wYy4NClsuLi4uXSBTdGFydGluZyBPcGVuQlNEIFNlY3Vy
-ZSBTaGVsbCBzZXJ2ZXI6IHNzaGRbICAgMjEuNzA5MjgwXSByYW5kb206ICANCnNzaGQ6IHVuaW5p
-dGlhbGl6ZWQgdXJhbmRvbSByZWFkICgzMiBieXRlcyByZWFkKQ0KG1s/MjVsG1s/MWMbNxtbMUdb
-G1szMm0gb2sgG1szOTs0OW0bOBtbPzI1aBtbPzBjLg0KDQpEZWJpYW4gR05VL0xpbnV4IDcgc3l6
-a2FsbGVyIHR0eVMwDQoNCnN5emthbGxlciBsb2dpbjogWyAgIDI2LjIyOTExM10gcmFuZG9tOiBz
-c2hkOiB1bmluaXRpYWxpemVkIHVyYW5kb20gcmVhZCAgDQooMzIgYnl0ZXMgcmVhZCkNClsgICAy
-Ni41MzI4NDNdIHJhbmRvbTogc3NoZDogdW5pbml0aWFsaXplZCB1cmFuZG9tIHJlYWQgKDMyIGJ5
-dGVzIHJlYWQpDQpbICAgMjcuNzg3Mjc3XSByYW5kb206IHNzaGQ6IHVuaW5pdGlhbGl6ZWQgdXJh
-bmRvbSByZWFkICgzMiBieXRlcyByZWFkKQ0KV2FybmluZzogUGVybWFuZW50bHkgYWRkZWQgJzEw
-LjEyOC4wLjInIChFQ0RTQSkgdG8gdGhlIGxpc3Qgb2Yga25vd24gaG9zdHMuDQpbICAgMzMuMjk5
-MzY4XSByYW5kb206IHNzaGQ6IHVuaW5pdGlhbGl6ZWQgdXJhbmRvbSByZWFkICgzMiBieXRlcyBy
-ZWFkKQ0KZmxhZyBwcm92aWRlZCBidXQgbm90IGRlZmluZWQ6IC1vcw0KVXNhZ2Ugb2YgLi9zeXot
-ZnV6emVyOg0KICAgLWFib3J0X3NpZ25hbCBpbnQNCiAgICAgCWluaXRpYWwgc2lnbmFsIHRvIHNl
-bmQgdG8gZXhlY3V0b3IgaW4gZXJyb3IgY29uZGl0aW9uczsgdXBncmFkZXMgdG8gIA0KU0lHS0lM
-TCBpZiBleGVjdXRvciBkb2VzIG5vdCBleGl0DQogICAtYXJjaCBzdHJpbmcNCiAgICAgCXRhcmdl
-dCBhcmNoIChkZWZhdWx0ICJhbWQ2NCIpDQogICAtYnVmZmVyX3NpemUgdWludA0KICAgICAJaW50
-ZXJuYWwgYnVmZmVyIHNpemUgKGluIGJ5dGVzKSBmb3IgZXhlY3V0b3Igb3V0cHV0DQogICAtY29s
-bGlkZQ0KICAgICAJY29sbGlkZSBzeXNjYWxscyB0byBwcm92b2tlIGRhdGEgcmFjZXMgKGRlZmF1
-bHQgdHJ1ZSkNCiAgIC1jb3Zlcg0KICAgICAJY29sbGVjdCBmZWVkYmFjayBzaWduYWxzIChjb3Zl
-cmFnZSkNCiAgIC1kZWJ1Zw0KICAgICAJZGVidWcgb3V0cHV0IGZyb20gZXhlY3V0b3INCiAgIC1l
-eGVjdXRvciBzdHJpbmcNCiAgICAgCXBhdGggdG8gZXhlY3V0b3IgYmluYXJ5IChkZWZhdWx0ICIu
-L3N5ei1leGVjdXRvciIpDQogICAtaXBjIHN0cmluZw0KICAgICAJaXBjIHNjaGVtZSAocGlwZS9z
-aG1lbSkNCiAgIC1sZWFrDQogICAgIAlkZXRlY3QgbWVtb3J5IGxlYWtzDQogICAtbWFuYWdlciBz
-dHJpbmcNCiAgICAgCW1hbmFnZXIgcnBjIGFkZHJlc3MNCiAgIC1uYW1lIHN0cmluZw0KICAgICAJ
-dW5pcXVlIG5hbWUgZm9yIG1hbmFnZXIgKGRlZmF1bHQgInRlc3QiKQ0KICAgLW91dHB1dCBzdHJp
-bmcNCiAgICAgCXdyaXRlIHByb2dyYW1zIHRvIG5vbmUvc3Rkb3V0L2RtZXNnL2ZpbGUgKGRlZmF1
-bHQgInN0ZG91dCIpDQogICAtcHByb2Ygc3RyaW5nDQogICAgIAlhZGRyZXNzIHRvIHNlcnZlIHBw
-cm9mIHByb2ZpbGVzDQogICAtcHJvY3MgaW50DQogICAgIAludW1iZXIgb2YgcGFyYWxsZWwgdGVz
-dCBwcm9jZXNzZXMgKGRlZmF1bHQgMSkNCiAgIC1zYW5kYm94IHN0cmluZw0KICAgICAJc2FuZGJv
-eCBmb3IgZnV6emluZyAobm9uZS9zZXR1aWQvbmFtZXNwYWNlKSAoZGVmYXVsdCAibm9uZSIpDQog
-ICAtdGVzdA0KICAgICAJZW5hYmxlIGltYWdlIHRlc3RpbmcgbW9kZQ0KICAgLXRocmVhZGVkDQog
-ICAgIAl1c2UgdGhyZWFkZWQgbW9kZSBpbiBleGVjdXRvciAoZGVmYXVsdCB0cnVlKQ0KICAgLXRp
-bWVvdXQgZHVyYXRpb24NCiAgICAgCWV4ZWN1dGlvbiB0aW1lb3V0DQogICAtdiBpbnQNCiAgICAg
-CXZlcmJvc2l0eQ0KDQoNCg0KVGVzdGVkIG9uOg0KDQpjb21taXQ6ICAgICAgICAgOWM5ZGY5ZjI3
-NWYwIGttc2FuOiByZW1vdmUga21zYW5fdGhyZWFkc19yZWFkeQ0KZ2l0IHRyZWU6ICAgICAgIGh0
-dHBzOi8vZ2l0aHViLmNvbS9nb29nbGUva21zYW4uZ2l0L21hc3Rlcg0Ka2VybmVsIGNvbmZpZzog
-IGh0dHBzOi8vc3l6a2FsbGVyLmFwcHNwb3QuY29tL3gvLmNvbmZpZz94PWIxMWY0Y2ZiMjYyZWU2
-MDcNCmNvbXBpbGVyOiAgICAgICBjbGFuZyB2ZXJzaW9uIDcuMC4wICh0cnVuayAzMzQxMDQpDQpw
-YXRjaDogICAgICAgICAgaHR0cHM6Ly9zeXprYWxsZXIuYXBwc3BvdC5jb20veC9wYXRjaC5kaWZm
-P3g9MTZhNWFmODQ0MDAwMDANCg0K
+On Fri, Jul 6, 2018 at 10:09 AM, syzbot
+<syzbot+9c251bdd09f83b92ba95@syzkaller.appspotmail.com> wrote:
+> Hello,
+>
+> syzbot tried to test the proposed patch but build/boot failed:
+>
+> lost connection to test machine
+
+Looking into this.
+
+> [....] Starting enhanced syslogd: rsyslogd [?25l [?1c 7 [1G[ [32m ok [39;49m
+> 8 [?25h [?0c.
+> [....] Starting periodic command scheduler: cron [?25l [?1c 7 [1G[ [32m ok
+> [39;49m 8 [?25h [?0c.
+> [....] Starting OpenBSD Secure Shell server: sshd[   21.709280] random:
+> sshd: uninitialized urandom read (32 bytes read)
+> [?25l [?1c 7 [1G[ [32m ok  [39;49m 8 [?25h [?0c.
+>
+> Debian GNU/Linux 7 syzkaller ttyS0
+>
+> syzkaller login: [   26.229113] random: sshd: uninitialized urandom read (32
+> bytes read)
+> [   26.532843] random: sshd: uninitialized urandom read (32 bytes read)
+> [   27.787277] random: sshd: uninitialized urandom read (32 bytes read)
+> Warning: Permanently added '10.128.0.2' (ECDSA) to the list of known hosts.
+> [   33.299368] random: sshd: uninitialized urandom read (32 bytes read)
+> flag provided but not defined: -os
+> Usage of ./syz-fuzzer:
+>   -abort_signal int
+>         initial signal to send to executor in error conditions; upgrades to
+> SIGKILL if executor does not exit
+>   -arch string
+>         target arch (default "amd64")
+>   -buffer_size uint
+>         internal buffer size (in bytes) for executor output
+>   -collide
+>         collide syscalls to provoke data races (default true)
+>   -cover
+>         collect feedback signals (coverage)
+>   -debug
+>         debug output from executor
+>   -executor string
+>         path to executor binary (default "./syz-executor")
+>   -ipc string
+>         ipc scheme (pipe/shmem)
+>   -leak
+>         detect memory leaks
+>   -manager string
+>         manager rpc address
+>   -name string
+>         unique name for manager (default "test")
+>   -output string
+>         write programs to none/stdout/dmesg/file (default "stdout")
+>   -pprof string
+>         address to serve pprof profiles
+>   -procs int
+>         number of parallel test processes (default 1)
+>   -sandbox string
+>         sandbox for fuzzing (none/setuid/namespace) (default "none")
+>   -test
+>         enable image testing mode
+>   -threaded
+>         use threaded mode in executor (default true)
+>   -timeout duration
+>         execution timeout
+>   -v int
+>         verbosity
+>
+>
+>
+> Tested on:
+>
+> commit:         9c9df9f275f0 kmsan: remove kmsan_threads_ready
+> git tree:       https://github.com/google/kmsan.git/master
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=b11f4cfb262ee607
+> compiler:       clang version 7.0.0 (trunk 334104)
+> patch:          https://syzkaller.appspot.com/x/patch.diff?x=16a5af84400000
+>
+> --
+> You received this message because you are subscribed to the Google Groups
+> "syzkaller-bugs" group.
+> To unsubscribe from this group and stop receiving emails from it, send an
+> email to syzkaller-bugs+unsubscribe@googlegroups.com.
+> To view this discussion on the web visit
+> https://groups.google.com/d/msgid/syzkaller-bugs/000000000000363e2e0570502d42%40google.com.
+>
+> For more options, visit https://groups.google.com/d/optout.
