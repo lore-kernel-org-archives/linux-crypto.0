@@ -1,41 +1,43 @@
-From: Eric Biggers <ebiggers3@gmail.com>
-Subject: Re: [PATCH v3] AF_ALG: Initialize sg_num_bytes in error code path
-Date: Fri, 6 Jul 2018 14:57:51 -0700
-Message-ID: <20180706215751.GB109361@gmail.com>
-References: <00000000000092ad87056950ef9e@google.com>
- <1616306.R4SzcgHSdy@positron.chronox.de>
+From: Timur Tabi <timur@kernel.org>
+Subject: Re: [PATCH v4 6/6] crypto: qcom: Add ACPI support
+Date: Sat, 7 Jul 2018 13:05:36 -0500
+Message-ID: <38f34817-ff86-06b7-4aab-a009c353a6db@kernel.org>
+References: <20180704114427.29953-1-vkoul@kernel.org>
+ <20180704114427.29953-7-vkoul@kernel.org>
+ <b06a0327-bbfe-5f7c-c0e1-43227ce089ae@kernel.org>
+ <20180705060733.GH22377@vkoul-mobl>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-Cc: syzbot <syzbot+9c251bdd09f83b92ba95@syzkaller.appspotmail.com>,
-        davem@davemloft.net, herbert@gondor.apana.org.au,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com
-To: Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-arm-msm@vger.kernel.org, Stephen Boyd <swboyd@chromium.org>,
+        Jeffrey Hugo <jhugo@codeaurora.org>
+To: Vinod <vkoul@kernel.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1616306.R4SzcgHSdy@positron.chronox.de>
+In-Reply-To: <20180705060733.GH22377@vkoul-mobl>
+Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Jul 06, 2018 at 09:50:55AM +0200, Stephan Müller wrote:
-> Changes v3:
-> * Fix syz testing line
+On 7/5/18 1:07 AM, Vinod wrote:
+> Yes we can add driver data in ACPI ID as well so code can be:
 > 
-> Changes v2:
-> * Addition of syz testing line
+>          if (!has_acpi_companion(&pdev->dev)) {
+>                  rng->clk = devm_clk_get(&pdev->dev, "core");
+>                  if (IS_ERR(rng->clk))
+>                          return PTR_ERR(rng->clk);
+>          }
+>          rng->skip_init = device_get_match_data(&pdev->dev);
 > 
-> ---8<---
-> 
-> The RX SGL in processing is already registered with the RX SGL tracking
-> list to support proper cleanup. The cleanup code path uses the
-> sg_num_bytes variable which must therefore be always initialized, even
-> in the error code path.
-> 
-> Signed-off-by: Stephan Mueller <smueller@chronox.de>
-> Reported-by: syzbot+9c251bdd09f83b92ba95@syzkaller.appspotmail.com
-> #syz test: https://github.com/google/kmsan.git master
+> Looks much neater.
 
-Can you add Fixes: and Cc: stable?
+Yeah, I like it.
 
-- Eric
+> I will wait for feedback on other patches before updating this.
+
+Jeff said it works, so I guess v5 will be good to go.
