@@ -1,61 +1,32 @@
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Subject: [PATCH v4] AF_ALG: Initialize sg_num_bytes in error code path
-Date: Sat, 07 Jul 2018 20:41:47 +0200
-Message-ID: <1612449.5GibSviISC@positron.chronox.de>
-References: <00000000000092ad87056950ef9e@google.com>
+From: syzbot <syzbot+9c251bdd09f83b92ba95@syzkaller.appspotmail.com>
+Subject: Re: KMSAN: uninit-value in af_alg_free_areq_sgls
+Date: Sat, 07 Jul 2018 12:01:02 -0700
+Message-ID: <000000000000d7542605706d66a3@google.com>
+References: <1612449.5GibSviISC@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: davem@davemloft.net, herbert@gondor.apana.org.au,
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+To: davem@davemloft.net, herbert@gondor.apana.org.au,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com
-To: syzbot <syzbot+9c251bdd09f83b92ba95@syzkaller.appspotmail.com>
+        smueller@chronox.de, syzkaller-bugs@googlegroups.com
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <00000000000092ad87056950ef9e@google.com>
+In-Reply-To: <1612449.5GibSviISC@positron.chronox.de>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Changes v4:
-* Add Fixes and CC line
+Hello,
 
-Changes v3:
-* Fix syz testing line
+syzbot has tested the proposed patch and the reproducer did not trigger  
+crash:
 
-Changes v2:
-* Addition of syz testing line
+Reported-and-tested-by:  
+syzbot+9c251bdd09f83b92ba95@syzkaller.appspotmail.com
 
----8<---
+Tested on:
 
-The RX SGL in processing is already registered with the RX SGL tracking
-list to support proper cleanup. The cleanup code path uses the
-sg_num_bytes variable which must therefore be always initialized, even
-in the error code path.
+commit:         a00de5aa4da3 kmsan: delete some dead code
+git tree:       https://github.com/google/kmsan.git/master
+kernel config:  https://syzkaller.appspot.com/x/.config?x=b11f4cfb262ee607
+compiler:       clang version 7.0.0 (trunk 334104)
+patch:          https://syzkaller.appspot.com/x/patch.diff?x=17a9badc400000
 
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
-Reported-by: syzbot+9c251bdd09f83b92ba95@syzkaller.appspotmail.com
-#syz test: https://github.com/google/kmsan.git master
-CC: <stable@vger.kernel.org> #4.14
-Fixes: e870456d8e7c ("crypto: algif_skcipher - overhaul memory management")
-Fixes: d887c52d6ae4 ("crypto: algif_aead - overhaul memory management")
----
- crypto/af_alg.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/crypto/af_alg.c b/crypto/af_alg.c
-index 49fa8582138b..bd6795ff406a 100644
---- a/crypto/af_alg.c
-+++ b/crypto/af_alg.c
-@@ -1148,8 +1148,10 @@ int af_alg_get_rsgl(struct sock *sk, struct msghdr *msg, int flags,
- 
- 		/* make one iovec available as scatterlist */
- 		err = af_alg_make_sg(&rsgl->sgl, &msg->msg_iter, seglen);
--		if (err < 0)
-+		if (err < 0) {
-+			rsgl->sg_num_bytes = 0;
- 			return err;
-+		}
- 
- 		/* chain the new scatterlist with previous one */
- 		if (areq->last_rsgl)
--- 
-2.17.1
+Note: testing is done by a robot and is best-effort only.
