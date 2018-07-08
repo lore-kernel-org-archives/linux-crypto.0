@@ -1,46 +1,40 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2 1/2] crypto: Fix -Wstringop-truncation warnings
-Date: Mon, 9 Jul 2018 00:43:44 +0800
-Message-ID: <20180708164344.3lpe6q7m2yjeqcdl@gondor.apana.org.au>
-References: <20180625124538.21051-1-shorne@gmail.com>
- <20180625124538.21051-2-shorne@gmail.com>
+Subject: Re: [PATCH 0/3] crypto: stm32 - Add power mamagement support
+Date: Mon, 9 Jul 2018 00:43:59 +0800
+Message-ID: <20180708164358.qfgj5maijnetucj7@gondor.apana.org.au>
+References: <1530017566-14779-1-git-send-email-lionel.debieve@st.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Cc: LKML <linux-kernel@vger.kernel.org>,
-        Greg KH <gregkh@linuxfoundation.org>, arnd@arndb.de,
-        Eric Biggers <ebiggers3@gmail.com>,
-        linux-crypto@vger.kernel.org, Max Filippov <jcmvbkbc@gmail.com>,
-        Nick Desaulniers <nick.desaulniers@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>
-To: Stafford Horne <shorne@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: "David S . Miller" <davem@davemloft.net>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@st.com>,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org,
+        Benjamin Gaignard <benjamin.gaignard@st.com>,
+        Fabien Dessenne <fabien.dessenne@st.com>,
+        Ludovic Barre <ludovic.barre@st.com>
+To: Lionel Debieve <lionel.debieve@st.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20180625124538.21051-2-shorne@gmail.com>
+In-Reply-To: <1530017566-14779-1-git-send-email-lionel.debieve@st.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Jun 25, 2018 at 09:45:37PM +0900, Stafford Horne wrote:
-> As of GCC 9.0.0 the build is reporting warnings like:
+On Tue, Jun 26, 2018 at 02:52:43PM +0200, Lionel Debieve wrote:
+> This set of patches add pm and pm_runtime feature to stm32 crypto
+> drivers.
 > 
->     crypto/ablkcipher.c: In function ‘crypto_ablkcipher_report’:
->     crypto/ablkcipher.c:374:2: warning: ‘strncpy’ specified bound 64 equals destination size [-Wstringop-truncation]
->       strncpy(rblkcipher.geniv, alg->cra_ablkcipher.geniv ?: "<default>",
->       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->        sizeof(rblkcipher.geniv));
->        ~~~~~~~~~~~~~~~~~~~~~~~~~
+> Lionel Debieve (3):
+>   crypto: stm32/cryp - Add power management support
+>   crypto: stm32/hash - Add power management support
+>   crypto: stm32/crc - Add power management support
 > 
-> This means the strnycpy might create a non null terminated string.  Fix this by
-> explicitly performing '\0' termination.
-> 
-> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Cc: Arnd Bergmann <arnd@arndb.de>
-> Cc: Max Filippov <jcmvbkbc@gmail.com>
-> Cc: Eric Biggers <ebiggers3@gmail.com>
-> Cc: Nick Desaulniers <nick.desaulniers@gmail.com>
-> Signed-off-by: Stafford Horne <shorne@gmail.com>
+>  drivers/crypto/stm32/stm32-cryp.c  | 62 +++++++++++++++++++++++++++++++++
+>  drivers/crypto/stm32/stm32-hash.c  | 71 ++++++++++++++++++++++++++++++++++++++
+>  drivers/crypto/stm32/stm32_crc32.c | 62 +++++++++++++++++++++++++++++++++
+>  3 files changed, 195 insertions(+)
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
