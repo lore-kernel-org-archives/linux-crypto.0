@@ -1,54 +1,48 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/5] crypto: inside-secure - support more algorithms
-Date: Mon, 9 Jul 2018 00:44:57 +0800
-Message-ID: <20180708164456.xuykt4v4ebod7cor@gondor.apana.org.au>
-References: <20180628152157.23769-1-antoine.tenart@bootlin.com>
+Subject: Re: [PATCH v2 0/6] crypto: fixes and cleanups
+Date: Mon, 9 Jul 2018 00:46:34 +0800
+Message-ID: <20180708164634.x5uubnls2arlrqsv@gondor.apana.org.au>
+References: <1530428560-4440-1-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
-        maxime.chevallier@bootlin.com, gregory.clement@bootlin.com,
-        miquel.raynal@bootlin.com, nadavh@marvell.com, oferh@marvell.com,
-        igall@marvell.com
-To: Antoine Tenart <antoine.tenart@bootlin.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+        Ofir Drang <ofir.drang@arm.com>, Hadar Gat <hadar.gat@arm.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Gilad Ben-Yossef <gilad@benyossef.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20180628152157.23769-1-antoine.tenart@bootlin.com>
+In-Reply-To: <1530428560-4440-1-git-send-email-gilad@benyossef.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Jun 28, 2018 at 05:21:52PM +0200, Antoine Tenart wrote:
-> Hi all,
+On Sun, Jul 01, 2018 at 08:02:33AM +0100, Gilad Ben-Yossef wrote:
+> The patch set fixes ccree IV handling, finup() operation (provided           
+> by Hadar Gat) and CTS-AES mode of operation along a code cleanup.                                             
+>                                                                                 
+> Since our finup() method was obviously broken but was not detected              
+> by testmgr, I've added finup() test to testmgr to catch it next                 
+> time it happened.
 > 
-> This series adds support for more algorithms in the Inside Secure
-> SafeXcel cryptographic engine driver. Those new algorithms are:
-> - MD5 (and its hmac).
-> - DES (ECB and CBC).
-> - 3DES (ECB and CBC).
+> Changes from v1:
+> - Add missing "static" qualifier reported by kbuild bot
+> - Add CTS-AES fix and some more cleanups
 > 
-> The last patch was made on top of the algorithm additions, to enhance
-> the driver's performances.
 > 
-> This series should be applied on top of another one:
-> https://lkml.org/lkml/2018/6/28/516
+> Gilad Ben-Yossef (5):
+>   crypto: testmgr: add hash finup tests
+>   crypto: ccree: fix iv handling
+>   crypto: ccree: remove dead legacy code
+>   crypto: ccree: use CBC-CS3 CTS mode
+>   crypto: ccree: rate limit debug print
 > 
-> Thanks!
-> Antoine
+> Hadar Gat (1):
+>   crypto: ccree: fix finup
 > 
-> Ofer Heifetz (5):
->   crypto: inside-secure - md5 support
->   crypto: inside-secure - hmac(md5) support
->   crypto: inside-secure - ecb(des) and cbc(des) support
->   crypto: inside-secure - ecb(des3_ede) and cbc(des3_ede) support
->   crypto: inside-secure - remove request list to improve performance
-> 
->  drivers/crypto/Kconfig                        |   2 +
->  drivers/crypto/inside-secure/safexcel.c       | 100 ++---
->  drivers/crypto/inside-secure/safexcel.h       |  41 +-
->  .../crypto/inside-secure/safexcel_cipher.c    | 369 ++++++++++++++----
->  drivers/crypto/inside-secure/safexcel_hash.c  | 157 ++++++--
->  drivers/crypto/inside-secure/safexcel_ring.c  |  48 ++-
->  6 files changed, 553 insertions(+), 164 deletions(-)
+>  crypto/testmgr.c                 |  55 +++++++++++++---
+>  drivers/crypto/ccree/cc_cipher.c | 137 +++++++++++++++++++++++++--------------
+>  drivers/crypto/ccree/cc_driver.c |   4 +-
+>  drivers/crypto/ccree/cc_hash.c   |  81 +++++------------------
+>  4 files changed, 153 insertions(+), 124 deletions(-)
 
 All applied.  Thanks.
 -- 
