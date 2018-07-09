@@ -1,60 +1,35 @@
-From: Jeffrey Hugo <jhugo@codeaurora.org>
-Subject: Re: [PATCH v4 6/6] crypto: qcom: Add ACPI support
-Date: Mon, 9 Jul 2018 08:52:21 -0600
-Message-ID: <e031959c-80cb-575b-8b6a-fc3b2119733b@codeaurora.org>
-References: <20180704114427.29953-1-vkoul@kernel.org>
- <20180704114427.29953-7-vkoul@kernel.org>
- <b06a0327-bbfe-5f7c-c0e1-43227ce089ae@kernel.org>
- <20180705060733.GH22377@vkoul-mobl>
- <38f34817-ff86-06b7-4aab-a009c353a6db@kernel.org>
- <20180709060157.GZ22377@vkoul-mobl>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Subject: Re: Crypto Fixes for 4.18
+Date: Mon, 9 Jul 2018 08:52:49 -0700
+Message-ID: <CA+55aFwVw8iXwy+U4uQTqKZM+VPcPEe+aqJR4cw-zSBLkvQe8w@mail.gmail.com>
+References: <20161213132414.GA7898@gondor.apana.org.au> <20170223125141.GA17400@gondor.apana.org.au>
+ <20170714141855.GA29426@gondor.apana.org.au> <20170922084401.GA15541@gondor.apana.org.au>
+ <20171128230929.GA17783@gondor.apana.org.au> <20171222064931.GA27068@gondor.apana.org.au>
+ <20180105073808.GA14405@gondor.apana.org.au> <20180212031702.GA26153@gondor.apana.org.au>
+ <20180428080517.haxgpvqrwgotakyo@gondor.apana.org.au> <20180622145403.6ltjip7che227fuo@gondor.apana.org.au>
+ <20180708162035.zunfeflnq5hgwq6n@gondor.apana.org.au> <CA+55aFwe3HrgMBUhyHC7kAOCvp31S4kpAqDSFQ+BQY6r=WBiiA@mail.gmail.com>
+ <CAAUqJDsHzgGZTpYCAxAy=b3P0bq7dGrw6St68SkwjqwHpusN+A@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-arm-msm@vger.kernel.org, Stephen Boyd <swboyd@chromium.org>
-To: Vinod <vkoul@kernel.org>, Timur Tabi <timur@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        David Miller <davem@davemloft.net>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Milan Broz <gmazyland@gmail.com>
+To: omosnacek+linux-crypto@gmail.com
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180709060157.GZ22377@vkoul-mobl>
-Content-Language: en-US
+In-Reply-To: <CAAUqJDsHzgGZTpYCAxAy=b3P0bq7dGrw6St68SkwjqwHpusN+A@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 7/9/2018 12:01 AM, Vinod wrote:
-> On 07-07-18, 13:05, Timur Tabi wrote:
->> On 7/5/18 1:07 AM, Vinod wrote:
->>> Yes we can add driver data in ACPI ID as well so code can be:
->>>
->>>           if (!has_acpi_companion(&pdev->dev)) {
->>>                   rng->clk = devm_clk_get(&pdev->dev, "core");
->>>                   if (IS_ERR(rng->clk))
->>>                           return PTR_ERR(rng->clk);
->>>           }
->>>           rng->skip_init = device_get_match_data(&pdev->dev);
->>>
->>> Looks much neater.
->>
->> Yeah, I like it.
->>
->>> I will wait for feedback on other patches before updating this.
->>
->> Jeff said it works, so I guess v5 will be good to go.
-> 
-> Yes posting that right now. It would be great if you folks can test
-> again on ACPI systems
-> 
-> Thanks
-> 
-I might need a day, but I'll get to it.
+On Mon, Jul 9, 2018 at 2:47 AM Ondrej Mosn=C3=A1=C4=8Dek
+<omosnacek+linux-crypto@gmail.com> wrote:
+>
+> In conclusion, the bug remained undiscovered not because of lack of
+> testing, but because by sheer luck it was "working" anyway...
 
--- 
-Jeffrey Hugo
-Qualcomm Datacenter Technologies as an affiliate of Qualcomm 
-Technologies, Inc.
-Qualcomm Technologies, Inc. is a member of the
-Code Aurora Forum, a Linux Foundation Collaborative Project.
+Thanks for checking this out. That makes me a lot happier about this
+whole thing.
+
+                  Linus
