@@ -1,35 +1,51 @@
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Subject: Re: Crypto Fixes for 4.18
-Date: Sun, 8 Jul 2018 11:31:16 -0700
-Message-ID: <CA+55aFwe3HrgMBUhyHC7kAOCvp31S4kpAqDSFQ+BQY6r=WBiiA@mail.gmail.com>
-References: <20161213132414.GA7898@gondor.apana.org.au> <20170223125141.GA17400@gondor.apana.org.au>
- <20170714141855.GA29426@gondor.apana.org.au> <20170922084401.GA15541@gondor.apana.org.au>
- <20171128230929.GA17783@gondor.apana.org.au> <20171222064931.GA27068@gondor.apana.org.au>
- <20180105073808.GA14405@gondor.apana.org.au> <20180212031702.GA26153@gondor.apana.org.au>
- <20180428080517.haxgpvqrwgotakyo@gondor.apana.org.au> <20180622145403.6ltjip7che227fuo@gondor.apana.org.au>
- <20180708162035.zunfeflnq5hgwq6n@gondor.apana.org.au>
+From: Vinod <vkoul@kernel.org>
+Subject: Re: [PATCH v4 6/6] crypto: qcom: Add ACPI support
+Date: Mon, 9 Jul 2018 11:31:57 +0530
+Message-ID: <20180709060157.GZ22377@vkoul-mobl>
+References: <20180704114427.29953-1-vkoul@kernel.org>
+ <20180704114427.29953-7-vkoul@kernel.org>
+ <b06a0327-bbfe-5f7c-c0e1-43227ce089ae@kernel.org>
+ <20180705060733.GH22377@vkoul-mobl>
+ <38f34817-ff86-06b7-4aab-a009c353a6db@kernel.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: David Miller <davem@davemloft.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-arm-msm@vger.kernel.org, Stephen Boyd <swboyd@chromium.org>,
+        Jeffrey Hugo <jhugo@codeaurora.org>
+To: Timur Tabi <timur@kernel.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180708162035.zunfeflnq5hgwq6n@gondor.apana.org.au>
+Content-Disposition: inline
+In-Reply-To: <38f34817-ff86-06b7-4aab-a009c353a6db@kernel.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Sun, Jul 8, 2018 at 9:20 AM Herbert Xu <herbert@gondor.apana.org.au> wrote:
->
-> - Add missing RETs in x86 aegis/morus.
+On 07-07-18, 13:05, Timur Tabi wrote:
+> On 7/5/18 1:07 AM, Vinod wrote:
+> > Yes we can add driver data in ACPI ID as well so code can be:
+> > 
+> >          if (!has_acpi_companion(&pdev->dev)) {
+> >                  rng->clk = devm_clk_get(&pdev->dev, "core");
+> >                  if (IS_ERR(rng->clk))
+> >                          return PTR_ERR(rng->clk);
+> >          }
+> >          rng->skip_init = device_get_match_data(&pdev->dev);
+> > 
+> > Looks much neater.
+> 
+> Yeah, I like it.
+> 
+> > I will wait for feedback on other patches before updating this.
+> 
+> Jeff said it works, so I guess v5 will be good to go.
 
-Side note - I queried earlier during the discussion about this: how
-was this code taken despite having clearly never tested on _anything_?
+Yes posting that right now. It would be great if you folks can test
+again on ACPI systems
 
-That's a serious question. Code that simply has never had any testing
-AT ALL should not have gotten in.
-
-The use of 'int3' in padding showed the issue, but I don't believe the
-code could possibly have worked with the nops and fallthroughs.
-
-               Linus
+Thanks
+-- 
+~Vinod
