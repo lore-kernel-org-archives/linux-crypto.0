@@ -1,138 +1,60 @@
-From: syzbot <syzbot+6d38d558c25b53b8f4ed@syzkaller.appspotmail.com>
-Subject: KASAN: slab-out-of-bounds Write in crypto_dh_encode_key
-Date: Mon, 09 Jul 2018 04:49:02 -0700
-Message-ID: <0000000000008faf3f05708f99c0@google.com>
+From: Jeffrey Hugo <jhugo@codeaurora.org>
+Subject: Re: [PATCH v4 6/6] crypto: qcom: Add ACPI support
+Date: Mon, 9 Jul 2018 08:52:21 -0600
+Message-ID: <e031959c-80cb-575b-8b6a-fc3b2119733b@codeaurora.org>
+References: <20180704114427.29953-1-vkoul@kernel.org>
+ <20180704114427.29953-7-vkoul@kernel.org>
+ <b06a0327-bbfe-5f7c-c0e1-43227ce089ae@kernel.org>
+ <20180705060733.GH22377@vkoul-mobl>
+ <38f34817-ff86-06b7-4aab-a009c353a6db@kernel.org>
+ <20180709060157.GZ22377@vkoul-mobl>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
-To: davem@davemloft.net, herbert@gondor.apana.org.au,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-arm-msm@vger.kernel.org, Stephen Boyd <swboyd@chromium.org>
+To: Vinod <vkoul@kernel.org>, Timur Tabi <timur@kernel.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20180709060157.GZ22377@vkoul-mobl>
+Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hello,
+On 7/9/2018 12:01 AM, Vinod wrote:
+> On 07-07-18, 13:05, Timur Tabi wrote:
+>> On 7/5/18 1:07 AM, Vinod wrote:
+>>> Yes we can add driver data in ACPI ID as well so code can be:
+>>>
+>>>           if (!has_acpi_companion(&pdev->dev)) {
+>>>                   rng->clk = devm_clk_get(&pdev->dev, "core");
+>>>                   if (IS_ERR(rng->clk))
+>>>                           return PTR_ERR(rng->clk);
+>>>           }
+>>>           rng->skip_init = device_get_match_data(&pdev->dev);
+>>>
+>>> Looks much neater.
+>>
+>> Yeah, I like it.
+>>
+>>> I will wait for feedback on other patches before updating this.
+>>
+>> Jeff said it works, so I guess v5 will be good to go.
+> 
+> Yes posting that right now. It would be great if you folks can test
+> again on ACPI systems
+> 
+> Thanks
+> 
+I might need a day, but I'll get to it.
 
-syzbot found the following crash on:
-
-HEAD commit:    d00d6d9a339d Add linux-next specific files for 20180709
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=10d146dc400000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=94fe2b586beccacd
-dashboard link: https://syzkaller.appspot.com/bug?extid=6d38d558c25b53b8f4ed
-compiler:       gcc (GCC) 8.0.1 20180413 (experimental)
-syzkaller repro:https://syzkaller.appspot.com/x/repro.syz?x=16af4f48400000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=14f562e0400000
-
-IMPORTANT: if you fix the bug, please add the following tag to the commit:
-Reported-by: syzbot+6d38d558c25b53b8f4ed@syzkaller.appspotmail.com
-
-random: sshd: uninitialized urandom read (32 bytes read)
-random: sshd: uninitialized urandom read (32 bytes read)
-random: sshd: uninitialized urandom read (32 bytes read)
-random: sshd: uninitialized urandom read (32 bytes read)
-==================================================================
-BUG: KASAN: slab-out-of-bounds in memcpy include/linux/string.h:345 [inline]
-BUG: KASAN: slab-out-of-bounds in dh_pack_data crypto/dh_helper.c:21  
-[inline]
-BUG: KASAN: slab-out-of-bounds in crypto_dh_encode_key+0x80e/0x830  
-crypto/dh_helper.c:60
-Write of size 4 at addr ffff8801adbd6f10 by task syz-executor186/4466
-
-CPU: 0 PID: 4466 Comm: syz-executor186 Not tainted  
-4.18.0-rc3-next-20180709+ #2
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS  
-Google 01/01/2011
-Call Trace:
-  __dump_stack lib/dump_stack.c:77 [inline]
-  dump_stack+0x1c9/0x2b4 lib/dump_stack.c:113
-  print_address_description+0x6c/0x20b mm/kasan/report.c:256
-  kasan_report_error mm/kasan/report.c:354 [inline]
-  kasan_report.cold.7+0x242/0x30d mm/kasan/report.c:412
-  __asan_report_store_n_noabort+0x12/0x14 mm/kasan/report.c:449
-  memcpy include/linux/string.h:345 [inline]
-  dh_pack_data crypto/dh_helper.c:21 [inline]
-  crypto_dh_encode_key+0x80e/0x830 crypto/dh_helper.c:60
-  __keyctl_dh_compute+0x707/0x1c00 security/keys/dh.c:316
-  keyctl_dh_compute+0xc5/0x11f security/keys/dh.c:427
-  __do_sys_keyctl security/keys/keyctl.c:1741 [inline]
-  __se_sys_keyctl security/keys/keyctl.c:1637 [inline]
-  __x64_sys_keyctl+0x12a/0x3b0 security/keys/keyctl.c:1637
-  do_syscall_64+0x1b9/0x820 arch/x86/entry/common.c:290
-  entry_SYSCALL_64_after_hwframe+0x49/0xbe
-RIP: 0033:0x4403b9
-Code: 18 89 d0 c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 00 48 89 f8 48 89 f7  
-48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff  
-ff 0f 83 fb 13 fc ff c3 66 2e 0f 1f 84 00 00 00 00
-RSP: 002b:00007ffcf524af58 EFLAGS: 00000213 ORIG_RAX: 00000000000000fa
-RAX: ffffffffffffffda RBX: 00000000004002c8 RCX: 00000000004403b9
-RDX: 0000000020000540 RSI: 00000000200006c0 RDI: 0000000000000017
-RBP: 00000000006ca018 R08: 0000000020c61fc8 R09: 00000000004002c8
-R10: 0000000000000005 R11: 0000000000000213 R12: 0000000000401c40
-R13: 0000000000401cd0 R14: 0000000000000000 R15: 0000000000000000
-
-Allocated by task 4466:
-  save_stack+0x43/0xd0 mm/kasan/kasan.c:448
-  set_track mm/kasan/kasan.c:460 [inline]
-  kasan_kmalloc+0xc4/0xe0 mm/kasan/kasan.c:553
-  __do_kmalloc mm/slab.c:3718 [inline]
-  __kmalloc+0x14e/0x760 mm/slab.c:3727
-  kmalloc include/linux/slab.h:518 [inline]
-  __keyctl_dh_compute+0x6e1/0x1c00 security/keys/dh.c:311
-  keyctl_dh_compute+0xc5/0x11f security/keys/dh.c:427
-  __do_sys_keyctl security/keys/keyctl.c:1741 [inline]
-  __se_sys_keyctl security/keys/keyctl.c:1637 [inline]
-  __x64_sys_keyctl+0x12a/0x3b0 security/keys/keyctl.c:1637
-  do_syscall_64+0x1b9/0x820 arch/x86/entry/common.c:290
-  entry_SYSCALL_64_after_hwframe+0x49/0xbe
-
-Freed by task 2899:
-  save_stack+0x43/0xd0 mm/kasan/kasan.c:448
-  set_track mm/kasan/kasan.c:460 [inline]
-  __kasan_slab_free+0x11a/0x170 mm/kasan/kasan.c:521
-  kasan_slab_free+0xe/0x10 mm/kasan/kasan.c:528
-  __cache_free mm/slab.c:3498 [inline]
-  kfree+0xd9/0x260 mm/slab.c:3813
-  single_release+0x8f/0xb0 fs/seq_file.c:596
-  __fput+0x35d/0x930 fs/file_table.c:215
-  ____fput+0x15/0x20 fs/file_table.c:251
-  task_work_run+0x1ec/0x2a0 kernel/task_work.c:113
-  tracehook_notify_resume include/linux/tracehook.h:192 [inline]
-  exit_to_usermode_loop+0x313/0x370 arch/x86/entry/common.c:166
-  prepare_exit_to_usermode arch/x86/entry/common.c:197 [inline]
-  syscall_return_slowpath arch/x86/entry/common.c:268 [inline]
-  do_syscall_64+0x6be/0x820 arch/x86/entry/common.c:293
-  entry_SYSCALL_64_after_hwframe+0x49/0xbe
-
-The buggy address belongs to the object at ffff8801adbd6f00
-  which belongs to the cache kmalloc-32 of size 32
-The buggy address is located 16 bytes inside of
-  32-byte region [ffff8801adbd6f00, ffff8801adbd6f20)
-The buggy address belongs to the page:
-page:ffffea0006b6f580 count:1 mapcount:0 mapping:ffff8801da8001c0  
-index:0xffff8801adbd6fc1
-flags: 0x2fffc0000000100(slab)
-raw: 02fffc0000000100 ffffea00075c0288 ffffea00075c0388 ffff8801da8001c0
-raw: ffff8801adbd6fc1 ffff8801adbd6000 000000010000003e 0000000000000000
-page dumped because: kasan: bad access detected
-
-Memory state around the buggy address:
-  ffff8801adbd6e00: fb fb fb fb fc fc fc fc fb fb fb fb fc fc fc fc
-  ffff8801adbd6e80: fb fb fb fb fc fc fc fc fb fb fb fb fc fc fc fc
-> ffff8801adbd6f00: 00 00 03 fc fc fc fc fc 01 fc fc fc fc fc fc fc
-                          ^
-  ffff8801adbd6f80: 01 fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
-  ffff8801adbd7000: fc fc fc fc fc fc fc fc fb fb fb fb fb fb fb fb
-==================================================================
-
-
----
-This bug is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this bug report. See:
-https://goo.gl/tpsmEJ#bug-status-tracking for how to communicate with  
-syzbot.
-syzbot can test patches for this bug, for details see:
-https://goo.gl/tpsmEJ#testing-patches
+-- 
+Jeffrey Hugo
+Qualcomm Datacenter Technologies as an affiliate of Qualcomm 
+Technologies, Inc.
+Qualcomm Technologies, Inc. is a member of the
+Code Aurora Forum, a Linux Foundation Collaborative Project.
