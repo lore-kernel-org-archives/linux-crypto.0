@@ -1,51 +1,53 @@
-From: Vinod <vkoul@kernel.org>
-Subject: Re: [PATCH v4 6/6] crypto: qcom: Add ACPI support
-Date: Mon, 9 Jul 2018 11:31:57 +0530
-Message-ID: <20180709060157.GZ22377@vkoul-mobl>
-References: <20180704114427.29953-1-vkoul@kernel.org>
- <20180704114427.29953-7-vkoul@kernel.org>
- <b06a0327-bbfe-5f7c-c0e1-43227ce089ae@kernel.org>
- <20180705060733.GH22377@vkoul-mobl>
- <38f34817-ff86-06b7-4aab-a009c353a6db@kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
+From: Vinod Koul <vkoul@kernel.org>
+Subject: [PATCH v5 0/6] crypto: Add Qcom PRNG support
+Date: Mon,  9 Jul 2018 11:49:19 +0530
+Message-ID: <20180709061925.20276-1-vkoul@kernel.org>
+Cc: Bjorn Andersson <bjorn.andersson@linaro.org>,
         Matt Mackall <mpm@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-arm-msm@vger.kernel.org, Stephen Boyd <swboyd@chromium.org>,
-        Jeffrey Hugo <jhugo@codeaurora.org>
-To: Timur Tabi <timur@kernel.org>
+        Arnd Bergmann <arnd@arndb.de>, linux-arm-msm@vger.kernel.org,
+        Stephen Boyd <swboyd@chromium.org>,
+        Timur Tabi <timur@codeaurora.org>,
+        Jeffrey Hugo <jhugo@codeaurora.org>,
+        Vinod Koul <vkoul@kernel.org>
+To: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <38f34817-ff86-06b7-4aab-a009c353a6db@kernel.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 07-07-18, 13:05, Timur Tabi wrote:
-> On 7/5/18 1:07 AM, Vinod wrote:
-> > Yes we can add driver data in ACPI ID as well so code can be:
-> > 
-> >          if (!has_acpi_companion(&pdev->dev)) {
-> >                  rng->clk = devm_clk_get(&pdev->dev, "core");
-> >                  if (IS_ERR(rng->clk))
-> >                          return PTR_ERR(rng->clk);
-> >          }
-> >          rng->skip_init = device_get_match_data(&pdev->dev);
-> > 
-> > Looks much neater.
-> 
-> Yeah, I like it.
-> 
-> > I will wait for feedback on other patches before updating this.
-> 
-> Jeff said it works, so I guess v5 will be good to go.
+This series removes the hwrng qcom driver and replaces it with crypto qcom
+driver and then adds support for Execution Environment (EE) found in v2
+version of the hardware and ACPI support for these
 
-Yes posting that right now. It would be great if you folks can test
-again on ACPI systems
+Changes in v5:
+ - Update ACPI check and use generic driver data API
 
-Thanks
+Changes in v4:
+ - Use memcpy for data copy
+ - Fix trailing bytes copy
+ - Fix ACPI ID table name
+
+Timur Tabi (1):
+  crypto: qcom: Add ACPI support
+
+Vinod Koul (5):
+  hwrng: remove msm hw_random driver
+  dt-bindings: crypto: Move prng binding to crypto
+  crypto: Add Qcom prng driver
+  dt-bindings: crypto: Add new compatible qcom,prng-ee
+  crypto: qcom: Add support for prng-ee
+
+ .../bindings/{rng => crypto}/qcom,prng.txt         |   4 +-
+ drivers/char/hw_random/Kconfig                     |  13 --
+ drivers/char/hw_random/Makefile                    |   1 -
+ drivers/char/hw_random/msm-rng.c                   | 183 ----------------
+ drivers/crypto/Kconfig                             |  11 +
+ drivers/crypto/Makefile                            |   1 +
+ drivers/crypto/qcom-rng.c                          | 229 +++++++++++++++++++++
+ 7 files changed, 244 insertions(+), 198 deletions(-)
+ rename Documentation/devicetree/bindings/{rng => crypto}/qcom,prng.txt (73%)
+ delete mode 100644 drivers/char/hw_random/msm-rng.c
+ create mode 100644 drivers/crypto/qcom-rng.c
+
 -- 
-~Vinod
+2.14.4
