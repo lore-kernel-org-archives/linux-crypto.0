@@ -1,7 +1,7 @@
 From: Kees Cook <keescook@chromium.org>
-Subject: [PATCH v4 06/14] dm verity fec: Remove VLA usage
-Date: Wed, 11 Jul 2018 13:36:11 -0700
-Message-ID: <20180711203619.1020-7-keescook@chromium.org>
+Subject: [PATCH v4 10/14] kbuild: Introduce FRAME_WARN_BUMP_FLAG
+Date: Wed, 11 Jul 2018 13:36:15 -0700
+Message-ID: <20180711203619.1020-11-keescook@chromium.org>
 References: <20180711203619.1020-1-keescook@chromium.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -30,37 +30,33 @@ Sender: dm-devel-bounces@redhat.com
 Errors-To: dm-devel-bounces@redhat.com
 List-Id: linux-crypto.vger.kernel.org
 
-In the quest to remove all stack VLA usage from the kernel[1], this
-uses the newly defined max digest size macro. Also adds a sanity-check
-at use-time.
-
-[1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
+When building with CONFIG_FRAME_WARN, it is sometimes useful to
+give certain compilation units small additional headroom. This is
+normally useful when VLA removal exposes a large stack allocation,
+especially with FRAME_WARN at 1024 or smaller. This adds 20%.
 
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- drivers/md/dm-verity-fec.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ Makefile | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/drivers/md/dm-verity-fec.c b/drivers/md/dm-verity-fec.c
-index 684af08d0747..fe5cfd1a5fa5 100644
---- a/drivers/md/dm-verity-fec.c
-+++ b/drivers/md/dm-verity-fec.c
-@@ -212,12 +212,15 @@ static int fec_read_bufs(struct dm_verity *v, struct dm_verity_io *io,
- 	struct dm_verity_fec_io *fio = fec_io(io);
- 	u64 block, ileaved;
- 	u8 *bbuf, *rs_block;
--	u8 want_digest[v->digest_size];
-+	u8 want_digest[AHASH_MAX_DIGESTSIZE];
- 	unsigned n, k;
+diff --git a/Makefile b/Makefile
+index c9132594860b..06fe93edd052 100644
+--- a/Makefile
++++ b/Makefile
+@@ -684,7 +684,13 @@ endif
  
- 	if (neras)
- 		*neras = 0;
+ ifneq ($(CONFIG_FRAME_WARN),0)
+ KBUILD_CFLAGS += $(call cc-option,-Wframe-larger-than=${CONFIG_FRAME_WARN})
++# Small code (mostly exposed by VLA removal) needs some additional
++# headroom, especially for a FRAME_WARN of 1024. This adds 20% which
++# can be used by the CFLAG_FRAME_WARN_BUMP option.
++FRAME_WARN_BUMP_SIZE := $(shell expr $(CONFIG_FRAME_WARN) / 5 + $(CONFIG_FRAME_WARN))
++FRAME_WARN_BUMP_FLAG := $(call cc-option,-Wframe-larger-than=$(FRAME_WARN_BUMP_SIZE))
+ endif
++export FRAME_WARN_BUMP_FLAG
  
-+	if (WARN_ON(v->digest_size > sizeof(want_digest)))
-+		return -EINVAL;
-+
- 	/*
- 	 * read each of the rsn data blocks that are part of the RS block, and
- 	 * interleave contents to available bufs
+ stackp-flags-$(CONFIG_CC_HAS_STACKPROTECTOR_NONE) := -fno-stack-protector
+ stackp-flags-$(CONFIG_STACKPROTECTOR)             := -fstack-protector
 -- 
 2.17.1
