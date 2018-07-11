@@ -1,7 +1,8 @@
 From: Kees Cook <keescook@chromium.org>
-Subject: [PATCH v4 10/14] kbuild: Introduce FRAME_WARN_BUMP_FLAG
-Date: Wed, 11 Jul 2018 13:36:15 -0700
-Message-ID: <20180711203619.1020-11-keescook@chromium.org>
+Subject: [PATCH v4 07/14] crypto alg: Introduce generic max
+	blocksize and alignmask
+Date: Wed, 11 Jul 2018 13:36:12 -0700
+Message-ID: <20180711203619.1020-8-keescook@chromium.org>
 References: <20180711203619.1020-1-keescook@chromium.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -30,33 +31,58 @@ Sender: dm-devel-bounces@redhat.com
 Errors-To: dm-devel-bounces@redhat.com
 List-Id: linux-crypto.vger.kernel.org
 
-When building with CONFIG_FRAME_WARN, it is sometimes useful to
-give certain compilation units small additional headroom. This is
-normally useful when VLA removal exposes a large stack allocation,
-especially with FRAME_WARN at 1024 or smaller. This adds 20%.
+In the quest to remove all stack VLA usage from the kernel[1], this
+exposes a new general upper bound on crypto blocksize and alignmask
+(higher than for the existing cipher limits) for VLA removal,
+and introduces new checks.
+
+At present, the highest cra_alignmask in the kernel is 63. The highest
+cra_blocksize is 144 (SHA3_224_BLOCK_SIZE, 18 8-byte words). For the
+new blocksize limit, I went with 160 (20 8-byte words).
+
+[1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
 
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- Makefile | 6 ++++++
- 1 file changed, 6 insertions(+)
+ crypto/algapi.c         | 7 ++++++-
+ include/crypto/algapi.h | 4 +++-
+ 2 files changed, 9 insertions(+), 2 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index c9132594860b..06fe93edd052 100644
---- a/Makefile
-+++ b/Makefile
-@@ -684,7 +684,13 @@ endif
+diff --git a/crypto/algapi.c b/crypto/algapi.c
+index c0755cf4f53f..496fc51bf215 100644
+--- a/crypto/algapi.c
++++ b/crypto/algapi.c
+@@ -57,9 +57,14 @@ static int crypto_check_alg(struct crypto_alg *alg)
+ 	if (alg->cra_alignmask & (alg->cra_alignmask + 1))
+ 		return -EINVAL;
  
- ifneq ($(CONFIG_FRAME_WARN),0)
- KBUILD_CFLAGS += $(call cc-option,-Wframe-larger-than=${CONFIG_FRAME_WARN})
-+# Small code (mostly exposed by VLA removal) needs some additional
-+# headroom, especially for a FRAME_WARN of 1024. This adds 20% which
-+# can be used by the CFLAG_FRAME_WARN_BUMP option.
-+FRAME_WARN_BUMP_SIZE := $(shell expr $(CONFIG_FRAME_WARN) / 5 + $(CONFIG_FRAME_WARN))
-+FRAME_WARN_BUMP_FLAG := $(call cc-option,-Wframe-larger-than=$(FRAME_WARN_BUMP_SIZE))
- endif
-+export FRAME_WARN_BUMP_FLAG
+-	if (alg->cra_blocksize > PAGE_SIZE / 8)
++	/* General maximums for all algs. */
++	if (alg->cra_alignmask > MAX_ALGAPI_ALIGNMASK)
+ 		return -EINVAL;
  
- stackp-flags-$(CONFIG_CC_HAS_STACKPROTECTOR_NONE) := -fno-stack-protector
- stackp-flags-$(CONFIG_STACKPROTECTOR)             := -fstack-protector
++	if (alg->cra_blocksize > MAX_ALGAPI_BLOCKSIZE)
++		return -EINVAL;
++
++	/* Lower maximums for specific alg types. */
+ 	if (!alg->cra_type && (alg->cra_flags & CRYPTO_ALG_TYPE_MASK) ==
+ 			       CRYPTO_ALG_TYPE_CIPHER) {
+ 		if (alg->cra_alignmask > MAX_CIPHER_ALIGNMASK)
+diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
+index bd5e8ccf1687..21371ac8f355 100644
+--- a/include/crypto/algapi.h
++++ b/include/crypto/algapi.h
+@@ -20,8 +20,10 @@
+ /*
+  * Maximum values for blocksize and alignmask, used to allocate
+  * static buffers that are big enough for any combination of
+- * ciphers and architectures.
++ * algs and architectures. Ciphers have a lower maximum size.
+  */
++#define MAX_ALGAPI_BLOCKSIZE		160
++#define MAX_ALGAPI_ALIGNMASK		63
+ #define MAX_CIPHER_BLOCKSIZE		16
+ #define MAX_CIPHER_ALIGNMASK		15
+ 
 -- 
 2.17.1
