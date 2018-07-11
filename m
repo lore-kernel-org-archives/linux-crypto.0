@@ -1,7 +1,7 @@
 From: Kees Cook <keescook@chromium.org>
-Subject: [PATCH v4 14/14] crypto: skcipher: Remove VLA usage for SKCIPHER_REQUEST_ON_STACK
-Date: Wed, 11 Jul 2018 13:36:19 -0700
-Message-ID: <20180711203619.1020-15-keescook@chromium.org>
+Subject: [PATCH v4 13/14] rxrpc: Prepare to remove VLA usage for SKCIPHER_REQUEST_ON_STACK
+Date: Wed, 11 Jul 2018 13:36:18 -0700
+Message-ID: <20180711203619.1020-14-keescook@chromium.org>
 References: <20180711203619.1020-1-keescook@chromium.org>
 Cc: Kees Cook <keescook@chromium.org>,
         "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
@@ -23,52 +23,29 @@ In-Reply-To: <20180711203619.1020-1-keescook@chromium.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-In the quest to remove all stack VLA usage from the kernel[1], this
-caps the skcipher request size similar to other limits and adds a sanity
-check at registration. Looking at instrumented tcrypt output, the largest
-is for lrw:
+Two uses of SKCIPHER_REQUEST_ON_STACK() will trigger FRAME_WARN warnings
+(when less than 2048) once the VLA is no longer hidden from the check:
 
-	crypt: testing lrw(aes)
-	crypto_skcipher_set_reqsize: 8
-	crypto_skcipher_set_reqsize: 88
-	crypto_skcipher_set_reqsize: 472
+net/rxrpc/rxkad.c:398:1: warning: the frame size of 1152 bytes is larger than 1024 bytes [-Wframe-larger-than=]
+net/rxrpc/rxkad.c:242:1: warning: the frame size of 1152 bytes is larger than 1024 bytes [-Wframe-larger-than=]
 
-[1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
+This bumps the affected objects by 20% to silence the warnings while
+still providing coverage is anything grows even more.
 
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- include/crypto/internal/skcipher.h | 1 +
- include/crypto/skcipher.h          | 4 +++-
- 2 files changed, 4 insertions(+), 1 deletion(-)
+ net/rxrpc/Makefile | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/include/crypto/internal/skcipher.h b/include/crypto/internal/skcipher.h
-index e42f7063f245..5035482cbe68 100644
---- a/include/crypto/internal/skcipher.h
-+++ b/include/crypto/internal/skcipher.h
-@@ -130,6 +130,7 @@ static inline struct crypto_skcipher *crypto_spawn_skcipher(
- static inline void crypto_skcipher_set_reqsize(
- 	struct crypto_skcipher *skcipher, unsigned int reqsize)
- {
-+	BUG_ON(reqsize > SKCIPHER_MAX_REQSIZE);
- 	skcipher->reqsize = reqsize;
- }
+diff --git a/net/rxrpc/Makefile b/net/rxrpc/Makefile
+index 6ffb7e9887ce..53e1177129e6 100644
+--- a/net/rxrpc/Makefile
++++ b/net/rxrpc/Makefile
+@@ -32,4 +32,5 @@ rxrpc-y := \
  
-diff --git a/include/crypto/skcipher.h b/include/crypto/skcipher.h
-index 2f327f090c3e..c48e194438cf 100644
---- a/include/crypto/skcipher.h
-+++ b/include/crypto/skcipher.h
-@@ -139,9 +139,11 @@ struct skcipher_alg {
- 	struct crypto_alg base;
- };
- 
-+#define SKCIPHER_MAX_REQSIZE	472
-+
- #define SKCIPHER_REQUEST_ON_STACK(name, tfm) \
- 	char __##name##_desc[sizeof(struct skcipher_request) + \
--		crypto_skcipher_reqsize(tfm)] CRYPTO_MINALIGN_ATTR; \
-+		SKCIPHER_MAX_REQSIZE] CRYPTO_MINALIGN_ATTR; \
- 	struct skcipher_request *name = (void *)__##name##_desc
- 
- /**
+ rxrpc-$(CONFIG_PROC_FS) += proc.o
+ rxrpc-$(CONFIG_RXKAD) += rxkad.o
++CFLAGS_rxkad.o += $(FRAME_WARN_BUMP_FLAG)
+ rxrpc-$(CONFIG_SYSCTL) += sysctl.o
 -- 
 2.17.1
