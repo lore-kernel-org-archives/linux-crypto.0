@@ -1,88 +1,63 @@
 From: Kees Cook <keescook@chromium.org>
-Subject: [PATCH v4 07/14] crypto alg: Introduce generic max
-	blocksize and alignmask
-Date: Wed, 11 Jul 2018 13:36:12 -0700
-Message-ID: <20180711203619.1020-8-keescook@chromium.org>
+Subject: [PATCH v4 08/14] crypto: qat: Remove VLA usage
+Date: Wed, 11 Jul 2018 13:36:13 -0700
+Message-ID: <20180711203619.1020-9-keescook@chromium.org>
 References: <20180711203619.1020-1-keescook@chromium.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-	Kees Cook <keescook@chromium.org>, Arnd Bergmann <arnd@arndb.de>,
-	Eric Biggers <ebiggers@google.com>, Mike Snitzer <snitzer@redhat.com>,
-	"Gustavo A. R. Silva" <gustavo@embeddedor.com>,
-	qat-linux@intel.com, linux-kernel@vger.kernel.org,
-	Masahiro Yamada <yamada.masahiro@socionext.com>,
-	dm-devel@redhat.com, linux-crypto@vger.kernel.org,
-	Lars Persson <larper@axis.com>, Tim Chen <tim.c.chen@linux.intel.com>,
-	"David S. Miller" <davem@davemloft.net>, Alasdair Kergon <agk@redhat.com>,
-	Rabin Vincent <rabinv@axis.com>
+Cc: Kees Cook <keescook@chromium.org>,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Eric Biggers <ebiggers@google.com>,
+        Alasdair Kergon <agk@redhat.com>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Lars Persson <larper@axis.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Rabin Vincent <rabinv@axis.com>,
+        Tim Chen <tim.c.chen@linux.intel.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Masahiro Yamada <yamada.masahiro@socionext.com>,
+        linux-crypto@vger.kernel.org, qat-linux@intel.com,
+        dm-devel@redhat.com, linux-kernel@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <dm-devel-bounces@redhat.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <20180711203619.1020-1-keescook@chromium.org>
-List-Unsubscribe: <https://www.redhat.com/mailman/options/dm-devel>,
-	<mailto:dm-devel-request@redhat.com?subject=unsubscribe>
-List-Archive: <https://www.redhat.com/archives/dm-devel>
-List-Post: <mailto:dm-devel@redhat.com>
-List-Help: <mailto:dm-devel-request@redhat.com?subject=help>
-List-Subscribe: <https://www.redhat.com/mailman/listinfo/dm-devel>,
-	<mailto:dm-devel-request@redhat.com?subject=subscribe>
-Sender: dm-devel-bounces@redhat.com
-Errors-To: dm-devel-bounces@redhat.com
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-In the quest to remove all stack VLA usage from the kernel[1], this
-exposes a new general upper bound on crypto blocksize and alignmask
-(higher than for the existing cipher limits) for VLA removal,
-and introduces new checks.
-
-At present, the highest cra_alignmask in the kernel is 63. The highest
-cra_blocksize is 144 (SHA3_224_BLOCK_SIZE, 18 8-byte words). For the
-new blocksize limit, I went with 160 (20 8-byte words).
+In the quest to remove all stack VLA usage from the kernel[1], this uses
+the new upper bound for the stack buffer. Also adds a sanity check.
 
 [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
 
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- crypto/algapi.c         | 7 ++++++-
- include/crypto/algapi.h | 4 +++-
- 2 files changed, 9 insertions(+), 2 deletions(-)
+ drivers/crypto/qat/qat_common/qat_algs.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/crypto/algapi.c b/crypto/algapi.c
-index c0755cf4f53f..496fc51bf215 100644
---- a/crypto/algapi.c
-+++ b/crypto/algapi.c
-@@ -57,9 +57,14 @@ static int crypto_check_alg(struct crypto_alg *alg)
- 	if (alg->cra_alignmask & (alg->cra_alignmask + 1))
- 		return -EINVAL;
+diff --git a/drivers/crypto/qat/qat_common/qat_algs.c b/drivers/crypto/qat/qat_common/qat_algs.c
+index 1138e41d6805..a28edf7b792f 100644
+--- a/drivers/crypto/qat/qat_common/qat_algs.c
++++ b/drivers/crypto/qat/qat_common/qat_algs.c
+@@ -153,8 +153,8 @@ static int qat_alg_do_precomputes(struct icp_qat_hw_auth_algo_blk *hash,
+ 	struct sha512_state sha512;
+ 	int block_size = crypto_shash_blocksize(ctx->hash_tfm);
+ 	int digest_size = crypto_shash_digestsize(ctx->hash_tfm);
+-	char ipad[block_size];
+-	char opad[block_size];
++	char ipad[MAX_ALGAPI_BLOCKSIZE];
++	char opad[MAX_ALGAPI_BLOCKSIZE];
+ 	__be32 *hash_state_out;
+ 	__be64 *hash512_state_out;
+ 	int i, offset;
+@@ -164,6 +164,10 @@ static int qat_alg_do_precomputes(struct icp_qat_hw_auth_algo_blk *hash,
+ 	shash->tfm = ctx->hash_tfm;
+ 	shash->flags = 0x0;
  
--	if (alg->cra_blocksize > PAGE_SIZE / 8)
-+	/* General maximums for all algs. */
-+	if (alg->cra_alignmask > MAX_ALGAPI_ALIGNMASK)
- 		return -EINVAL;
- 
-+	if (alg->cra_blocksize > MAX_ALGAPI_BLOCKSIZE)
++	if (WARN_ON(block_size > sizeof(ipad) ||
++		    sizeof(ipad) != sizeof(opad)))
 +		return -EINVAL;
 +
-+	/* Lower maximums for specific alg types. */
- 	if (!alg->cra_type && (alg->cra_flags & CRYPTO_ALG_TYPE_MASK) ==
- 			       CRYPTO_ALG_TYPE_CIPHER) {
- 		if (alg->cra_alignmask > MAX_CIPHER_ALIGNMASK)
-diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
-index bd5e8ccf1687..21371ac8f355 100644
---- a/include/crypto/algapi.h
-+++ b/include/crypto/algapi.h
-@@ -20,8 +20,10 @@
- /*
-  * Maximum values for blocksize and alignmask, used to allocate
-  * static buffers that are big enough for any combination of
-- * ciphers and architectures.
-+ * algs and architectures. Ciphers have a lower maximum size.
-  */
-+#define MAX_ALGAPI_BLOCKSIZE		160
-+#define MAX_ALGAPI_ALIGNMASK		63
- #define MAX_CIPHER_BLOCKSIZE		16
- #define MAX_CIPHER_ALIGNMASK		15
- 
+ 	if (auth_keylen > block_size) {
+ 		int ret = crypto_shash_digest(shash, auth_key,
+ 					      auth_keylen, ipad);
 -- 
 2.17.1
