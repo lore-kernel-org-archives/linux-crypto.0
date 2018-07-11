@@ -1,7 +1,7 @@
 From: Kees Cook <keescook@chromium.org>
-Subject: [PATCH v4 12/14] crypto: ahash: Remove VLA usage for AHASH_REQUEST_ON_STACK
-Date: Wed, 11 Jul 2018 13:36:17 -0700
-Message-ID: <20180711203619.1020-13-keescook@chromium.org>
+Subject: [PATCH v4 09/14] crypto: shash: Remove VLA usage in unaligned hashing
+Date: Wed, 11 Jul 2018 13:36:14 -0700
+Message-ID: <20180711203619.1020-10-keescook@chromium.org>
 References: <20180711203619.1020-1-keescook@chromium.org>
 Cc: Kees Cook <keescook@chromium.org>,
         "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
@@ -23,52 +23,89 @@ In-Reply-To: <20180711203619.1020-1-keescook@chromium.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-In the quest to remove all stack VLA usage from the kernel[1], this caps
-the ahash request size similar to the other limits and adds a sanity
-check at registration. Unfortunately, these reqsizes can be very large.
-Looking at instrumented tcrypt output, the largest is for sha512:
-
-	crypt: testing sha512
-	crypto_ahash_set_reqsize: 528
-	crypto_ahash_set_reqsize: 728
-	crypto_ahash_set_reqsize: 808
+In the quest to remove all stack VLA usage from the kernel[1], this uses
+the newly defined max alignment to perform unaligned hashing to avoid
+VLAs, and drops the helper function while adding sanity checks on the
+resulting buffer sizes. Additionally, the __aligned_largest macro is
+removed since this helper was the only user.
 
 [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
 
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- include/crypto/hash.h          | 3 ++-
- include/crypto/internal/hash.h | 1 +
- 2 files changed, 3 insertions(+), 1 deletion(-)
+ crypto/shash.c               | 27 ++++++++++++++++-----------
+ include/linux/compiler-gcc.h |  1 -
+ 2 files changed, 16 insertions(+), 12 deletions(-)
 
-diff --git a/include/crypto/hash.h b/include/crypto/hash.h
-index 4fcd0e2368cd..9290120536cd 100644
---- a/include/crypto/hash.h
-+++ b/include/crypto/hash.h
-@@ -66,10 +66,11 @@ struct ahash_request {
- 
- #define AHASH_MAX_DIGESTSIZE	512
- #define AHASH_MAX_STATESIZE	512
-+#define AHASH_MAX_REQSIZE	808
- 
- #define AHASH_REQUEST_ON_STACK(name, ahash) \
- 	char __##name##_desc[sizeof(struct ahash_request) + \
--		crypto_ahash_reqsize(ahash)] CRYPTO_MINALIGN_ATTR; \
-+		AHASH_MAX_REQSIZE] CRYPTO_MINALIGN_ATTR; \
- 	struct ahash_request *name = (void *)__##name##_desc
- 
- /**
-diff --git a/include/crypto/internal/hash.h b/include/crypto/internal/hash.h
-index a0b0ad9d585e..d96ae5f52125 100644
---- a/include/crypto/internal/hash.h
-+++ b/include/crypto/internal/hash.h
-@@ -142,6 +142,7 @@ static inline struct ahash_alg *__crypto_ahash_alg(struct crypto_alg *alg)
- static inline void crypto_ahash_set_reqsize(struct crypto_ahash *tfm,
- 					    unsigned int reqsize)
- {
-+	BUG_ON(reqsize > AHASH_MAX_REQSIZE);
- 	tfm->reqsize = reqsize;
+diff --git a/crypto/shash.c b/crypto/shash.c
+index ab6902c6dae7..8d4746b14dd5 100644
+--- a/crypto/shash.c
++++ b/crypto/shash.c
+@@ -73,13 +73,6 @@ int crypto_shash_setkey(struct crypto_shash *tfm, const u8 *key,
  }
+ EXPORT_SYMBOL_GPL(crypto_shash_setkey);
  
+-static inline unsigned int shash_align_buffer_size(unsigned len,
+-						   unsigned long mask)
+-{
+-	typedef u8 __aligned_largest u8_aligned;
+-	return len + (mask & ~(__alignof__(u8_aligned) - 1));
+-}
+-
+ static int shash_update_unaligned(struct shash_desc *desc, const u8 *data,
+ 				  unsigned int len)
+ {
+@@ -88,11 +81,17 @@ static int shash_update_unaligned(struct shash_desc *desc, const u8 *data,
+ 	unsigned long alignmask = crypto_shash_alignmask(tfm);
+ 	unsigned int unaligned_len = alignmask + 1 -
+ 				     ((unsigned long)data & alignmask);
+-	u8 ubuf[shash_align_buffer_size(unaligned_len, alignmask)]
+-		__aligned_largest;
++	/*
++	 * We cannot count on __aligned() working for large values:
++	 * https://patchwork.kernel.org/patch/9507697/
++	 */
++	u8 ubuf[MAX_ALGAPI_ALIGNMASK * 2];
+ 	u8 *buf = PTR_ALIGN(&ubuf[0], alignmask + 1);
+ 	int err;
+ 
++	if (WARN_ON(buf + unaligned_len > ubuf + sizeof(ubuf)))
++		return -EINVAL;
++
+ 	if (unaligned_len > len)
+ 		unaligned_len = len;
+ 
+@@ -124,11 +123,17 @@ static int shash_final_unaligned(struct shash_desc *desc, u8 *out)
+ 	unsigned long alignmask = crypto_shash_alignmask(tfm);
+ 	struct shash_alg *shash = crypto_shash_alg(tfm);
+ 	unsigned int ds = crypto_shash_digestsize(tfm);
+-	u8 ubuf[shash_align_buffer_size(ds, alignmask)]
+-		__aligned_largest;
++	/*
++	 * We cannot count on __aligned() working for large values:
++	 * https://patchwork.kernel.org/patch/9507697/
++	 */
++	u8 ubuf[MAX_ALGAPI_ALIGNMASK + SHASH_MAX_DIGESTSIZE];
+ 	u8 *buf = PTR_ALIGN(&ubuf[0], alignmask + 1);
+ 	int err;
+ 
++	if (WARN_ON(buf + ds > ubuf + sizeof(ubuf)))
++		return -EINVAL;
++
+ 	err = shash->final(desc, buf);
+ 	if (err)
+ 		goto out;
+diff --git a/include/linux/compiler-gcc.h b/include/linux/compiler-gcc.h
+index f1a7492a5cc8..1f1cdef36a82 100644
+--- a/include/linux/compiler-gcc.h
++++ b/include/linux/compiler-gcc.h
+@@ -125,7 +125,6 @@
+  */
+ #define __pure			__attribute__((pure))
+ #define __aligned(x)		__attribute__((aligned(x)))
+-#define __aligned_largest	__attribute__((aligned))
+ #define __printf(a, b)		__attribute__((format(printf, a, b)))
+ #define __scanf(a, b)		__attribute__((format(scanf, a, b)))
+ #define __attribute_const__	__attribute__((__const__))
 -- 
 2.17.1
