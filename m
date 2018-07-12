@@ -1,378 +1,49 @@
-From: Daniel Sangorrin <daniel.sangorrin@toshiba.co.jp>
-Subject: [PATCH v3 4.9] x86/fpu: Remove use_eager_fpu()
-Date: Thu, 12 Jul 2018 09:16:34 +0900
-Message-ID: <1531354594-2236-2-git-send-email-daniel.sangorrin@toshiba.co.jp>
-References: <1531354594-2236-1-git-send-email-daniel.sangorrin@toshiba.co.jp>
-Content-Transfer-Encoding: 7bit
-Cc: Andy Lutomirski <luto@kernel.org>, Rik van Riel <riel@redhat.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Brian Gerst <brgerst@gmail.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Denys Vlasenko <dvlasenk@redhat.com>,
-        Fenghua Yu <fenghua.yu@intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Josh Poimboeuf <jpoimboe@redhat.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Oleg Nesterov <oleg@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Quentin Casasnovas <quentin.casasnovas@oracle.com>,
-        Thomas Gleixner <tglx@linutronix.de>, pbonzini@redhat.com,
-        Ingo Molnar <mingo@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [PATCH v4 13/14] rxrpc: Prepare to remove VLA usage for SKCIPHER_REQUEST_ON_STACK
+Date: Thu, 12 Jul 2018 17:11:09 +0200
+Message-ID: <CAK8P3a1k+cy9wAVNQMWE4tdA4aV8tiu6K3haLc+kMPt0iiUQ9Q@mail.gmail.com>
+References: <20180711203619.1020-1-keescook@chromium.org> <20180711203619.1020-14-keescook@chromium.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+        Eric Biggers <ebiggers@google.com>,
+        Alasdair Kergon <agk@redhat.com>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Lars Persson <larper@axis.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Rabin Vincent <rabinv@axis.com>,
+        Tim Chen <tim.c.chen@linux.intel.com>,
         "David S. Miller" <davem@davemloft.net>,
-        Ingo Molnar <mingo@redhat.com>, x86@kernel.org,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkr
-To: stable@vger.kernel.org
+        Masahiro Yamada <yamada.masahiro@socionext.com>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>, qat-linux@intel.com,
+        dm-devel@redhat.com,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        David Howells <dhowells@redhat.com>
+To: Kees Cook <keescook@chromium.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1531354594-2236-1-git-send-email-daniel.sangorrin@toshiba.co.jp>
+In-Reply-To: <20180711203619.1020-14-keescook@chromium.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-From: Andy Lutomirski <luto@kernel.org>
+On Wed, Jul 11, 2018 at 10:36 PM, Kees Cook <keescook@chromium.org> wrote:
+> Two uses of SKCIPHER_REQUEST_ON_STACK() will trigger FRAME_WARN warnings
+> (when less than 2048) once the VLA is no longer hidden from the check:
+>
+> net/rxrpc/rxkad.c:398:1: warning: the frame size of 1152 bytes is larger than 1024 bytes [-Wframe-larger-than=]
+> net/rxrpc/rxkad.c:242:1: warning: the frame size of 1152 bytes is larger than 1024 bytes [-Wframe-larger-than=]
+>
+> This bumps the affected objects by 20% to silence the warnings while
+> still providing coverage is anything grows even more.
+>
+> Signed-off-by: Kees Cook <keescook@chromium.org>
 
-commit c592b57347069abfc0dcad3b3a302cf882602597 upstream
+(adding David Howells to cc)
 
-This removes all the obvious code paths that depend on lazy FPU mode.
-It shouldn't change the generated code at all.
+I don't think these are in a fast path, it should be possible to just use
+skcipher_alloc_req() instead of SKCIPHER_REQUEST_ON_STACK() here.
+>From what I can tell, neither of the two are called in atomic context, so
+you should be able to use a GFP_KERNEL allocation.
 
-Signed-off-by: Andy Lutomirski <luto@kernel.org>
-Signed-off-by: Rik van Riel <riel@redhat.com>
-Cc: Borislav Petkov <bp@alien8.de>
-Cc: Brian Gerst <brgerst@gmail.com>
-Cc: Dave Hansen <dave.hansen@linux.intel.com>
-Cc: Denys Vlasenko <dvlasenk@redhat.com>
-Cc: Fenghua Yu <fenghua.yu@intel.com>
-Cc: H. Peter Anvin <hpa@zytor.com>
-Cc: Josh Poimboeuf <jpoimboe@redhat.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Oleg Nesterov <oleg@redhat.com>
-Cc: Peter Zijlstra <peterz@infradead.org>
-Cc: Quentin Casasnovas <quentin.casasnovas@oracle.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: pbonzini@redhat.com
-Link: http://lkml.kernel.org/r/1475627678-20788-5-git-send-email-riel@redhat.com
-Signed-off-by: Ingo Molnar <mingo@kernel.org>
-Signed-off-by: Daniel Sangorrin <daniel.sangorrin@toshiba.co.jp>
----
- arch/x86/crypto/crc32c-intel_glue.c | 17 ++++-------------
- arch/x86/include/asm/fpu/internal.h | 34 +---------------------------------
- arch/x86/kernel/fpu/core.c          | 36 ++++--------------------------------
- arch/x86/kernel/fpu/signal.c        |  8 +++-----
- arch/x86/kernel/fpu/xstate.c        |  9 ---------
- arch/x86/kvm/cpuid.c                |  4 +---
- arch/x86/kvm/x86.c                  | 10 ----------
- 7 files changed, 13 insertions(+), 105 deletions(-)
-
-diff --git a/arch/x86/crypto/crc32c-intel_glue.c b/arch/x86/crypto/crc32c-intel_glue.c
-index dd19584..5773e11 100644
---- a/arch/x86/crypto/crc32c-intel_glue.c
-+++ b/arch/x86/crypto/crc32c-intel_glue.c
-@@ -48,21 +48,13 @@
- #ifdef CONFIG_X86_64
- /*
-  * use carryless multiply version of crc32c when buffer
-- * size is >= 512 (when eager fpu is enabled) or
-- * >= 1024 (when eager fpu is disabled) to account
-+ * size is >= 512 to account
-  * for fpu state save/restore overhead.
-  */
--#define CRC32C_PCL_BREAKEVEN_EAGERFPU	512
--#define CRC32C_PCL_BREAKEVEN_NOEAGERFPU	1024
-+#define CRC32C_PCL_BREAKEVEN	512
- 
- asmlinkage unsigned int crc_pcl(const u8 *buffer, int len,
- 				unsigned int crc_init);
--static int crc32c_pcl_breakeven = CRC32C_PCL_BREAKEVEN_EAGERFPU;
--#define set_pcl_breakeven_point()					\
--do {									\
--	if (!use_eager_fpu())						\
--		crc32c_pcl_breakeven = CRC32C_PCL_BREAKEVEN_NOEAGERFPU;	\
--} while (0)
- #endif /* CONFIG_X86_64 */
- 
- static u32 crc32c_intel_le_hw_byte(u32 crc, unsigned char const *data, size_t length)
-@@ -185,7 +177,7 @@ static int crc32c_pcl_intel_update(struct shash_desc *desc, const u8 *data,
- 	 * use faster PCL version if datasize is large enough to
- 	 * overcome kernel fpu state save/restore overhead
- 	 */
--	if (len >= crc32c_pcl_breakeven && irq_fpu_usable()) {
-+	if (len >= CRC32C_PCL_BREAKEVEN && irq_fpu_usable()) {
- 		kernel_fpu_begin();
- 		*crcp = crc_pcl(data, len, *crcp);
- 		kernel_fpu_end();
-@@ -197,7 +189,7 @@ static int crc32c_pcl_intel_update(struct shash_desc *desc, const u8 *data,
- static int __crc32c_pcl_intel_finup(u32 *crcp, const u8 *data, unsigned int len,
- 				u8 *out)
- {
--	if (len >= crc32c_pcl_breakeven && irq_fpu_usable()) {
-+	if (len >= CRC32C_PCL_BREAKEVEN && irq_fpu_usable()) {
- 		kernel_fpu_begin();
- 		*(__le32 *)out = ~cpu_to_le32(crc_pcl(data, len, *crcp));
- 		kernel_fpu_end();
-@@ -257,7 +249,6 @@ static int __init crc32c_intel_mod_init(void)
- 		alg.update = crc32c_pcl_intel_update;
- 		alg.finup = crc32c_pcl_intel_finup;
- 		alg.digest = crc32c_pcl_intel_digest;
--		set_pcl_breakeven_point();
- 	}
- #endif
- 	return crypto_register_shash(&alg);
-diff --git a/arch/x86/include/asm/fpu/internal.h b/arch/x86/include/asm/fpu/internal.h
-index 8852e3a..7801d32 100644
---- a/arch/x86/include/asm/fpu/internal.h
-+++ b/arch/x86/include/asm/fpu/internal.h
-@@ -60,11 +60,6 @@ extern u64 fpu__get_supported_xfeatures_mask(void);
- /*
-  * FPU related CPU feature flag helper routines:
-  */
--static __always_inline __pure bool use_eager_fpu(void)
--{
--	return true;
--}
--
- static __always_inline __pure bool use_xsaveopt(void)
- {
- 	return static_cpu_has(X86_FEATURE_XSAVEOPT);
-@@ -501,24 +496,6 @@ static inline int fpu_want_lazy_restore(struct fpu *fpu, unsigned int cpu)
- }
- 
- 
--/*
-- * Wrap lazy FPU TS handling in a 'hw fpregs activation/deactivation'
-- * idiom, which is then paired with the sw-flag (fpregs_active) later on:
-- */
--
--static inline void __fpregs_activate_hw(void)
--{
--	if (!use_eager_fpu())
--		clts();
--}
--
--static inline void __fpregs_deactivate_hw(void)
--{
--	if (!use_eager_fpu())
--		stts();
--}
--
--/* Must be paired with an 'stts' (fpregs_deactivate_hw()) after! */
- static inline void __fpregs_deactivate(struct fpu *fpu)
- {
- 	WARN_ON_FPU(!fpu->fpregs_active);
-@@ -528,7 +505,6 @@ static inline void __fpregs_deactivate(struct fpu *fpu)
- 	trace_x86_fpu_regs_deactivated(fpu);
- }
- 
--/* Must be paired with a 'clts' (fpregs_activate_hw()) before! */
- static inline void __fpregs_activate(struct fpu *fpu)
- {
- 	WARN_ON_FPU(fpu->fpregs_active);
-@@ -554,22 +530,17 @@ static inline int fpregs_active(void)
- }
- 
- /*
-- * Encapsulate the CR0.TS handling together with the
-- * software flag.
-- *
-  * These generally need preemption protection to work,
-  * do try to avoid using these on their own.
-  */
- static inline void fpregs_activate(struct fpu *fpu)
- {
--	__fpregs_activate_hw();
- 	__fpregs_activate(fpu);
- }
- 
- static inline void fpregs_deactivate(struct fpu *fpu)
- {
- 	__fpregs_deactivate(fpu);
--	__fpregs_deactivate_hw();
- }
- 
- /*
-@@ -596,8 +567,7 @@ switch_fpu_prepare(struct fpu *old_fpu, struct fpu *new_fpu, int cpu)
- 	 * or if the past 5 consecutive context-switches used math.
- 	 */
- 	fpu.preload = static_cpu_has(X86_FEATURE_FPU) &&
--		      new_fpu->fpstate_active &&
--		      (use_eager_fpu() || new_fpu->counter > 5);
-+		      new_fpu->fpstate_active;
- 
- 	if (old_fpu->fpregs_active) {
- 		if (!copy_fpregs_to_fpstate(old_fpu))
-@@ -615,8 +585,6 @@ switch_fpu_prepare(struct fpu *old_fpu, struct fpu *new_fpu, int cpu)
- 			__fpregs_activate(new_fpu);
- 			trace_x86_fpu_regs_activated(new_fpu);
- 			prefetch(&new_fpu->state);
--		} else {
--			__fpregs_deactivate_hw();
- 		}
- 	} else {
- 		old_fpu->counter = 0;
-diff --git a/arch/x86/kernel/fpu/core.c b/arch/x86/kernel/fpu/core.c
-index 96d80df..2dc1927 100644
---- a/arch/x86/kernel/fpu/core.c
-+++ b/arch/x86/kernel/fpu/core.c
-@@ -58,27 +58,9 @@ static bool kernel_fpu_disabled(void)
- 	return this_cpu_read(in_kernel_fpu);
- }
- 
--/*
-- * Were we in an interrupt that interrupted kernel mode?
-- *
-- * On others, we can do a kernel_fpu_begin/end() pair *ONLY* if that
-- * pair does nothing at all: the thread must not have fpu (so
-- * that we don't try to save the FPU state), and TS must
-- * be set (so that the clts/stts pair does nothing that is
-- * visible in the interrupted kernel thread).
-- *
-- * Except for the eagerfpu case when we return true; in the likely case
-- * the thread has FPU but we are not going to set/clear TS.
-- */
- static bool interrupted_kernel_fpu_idle(void)
- {
--	if (kernel_fpu_disabled())
--		return false;
--
--	if (use_eager_fpu())
--		return true;
--
--	return !current->thread.fpu.fpregs_active && (read_cr0() & X86_CR0_TS);
-+	return !kernel_fpu_disabled();
- }
- 
- /*
-@@ -126,7 +108,6 @@ void __kernel_fpu_begin(void)
- 		copy_fpregs_to_fpstate(fpu);
- 	} else {
- 		this_cpu_write(fpu_fpregs_owner_ctx, NULL);
--		__fpregs_activate_hw();
- 	}
- }
- EXPORT_SYMBOL(__kernel_fpu_begin);
-@@ -137,8 +118,6 @@ void __kernel_fpu_end(void)
- 
- 	if (fpu->fpregs_active)
- 		copy_kernel_to_fpregs(&fpu->state);
--	else
--		__fpregs_deactivate_hw();
- 
- 	kernel_fpu_enable();
- }
-@@ -200,10 +179,7 @@ void fpu__save(struct fpu *fpu)
- 	trace_x86_fpu_before_save(fpu);
- 	if (fpu->fpregs_active) {
- 		if (!copy_fpregs_to_fpstate(fpu)) {
--			if (use_eager_fpu())
--				copy_kernel_to_fpregs(&fpu->state);
--			else
--				fpregs_deactivate(fpu);
-+			copy_kernel_to_fpregs(&fpu->state);
- 		}
- 	}
- 	trace_x86_fpu_after_save(fpu);
-@@ -261,8 +237,7 @@ int fpu__copy(struct fpu *dst_fpu, struct fpu *src_fpu)
- 	 * Don't let 'init optimized' areas of the XSAVE area
- 	 * leak into the child task:
- 	 */
--	if (use_eager_fpu())
--		memset(&dst_fpu->state.xsave, 0, fpu_kernel_xstate_size);
-+	memset(&dst_fpu->state.xsave, 0, fpu_kernel_xstate_size);
- 
- 	/*
- 	 * Save current FPU registers directly into the child
-@@ -284,10 +259,7 @@ int fpu__copy(struct fpu *dst_fpu, struct fpu *src_fpu)
- 		memcpy(&src_fpu->state, &dst_fpu->state,
- 		       fpu_kernel_xstate_size);
- 
--		if (use_eager_fpu())
--			copy_kernel_to_fpregs(&src_fpu->state);
--		else
--			fpregs_deactivate(src_fpu);
-+		copy_kernel_to_fpregs(&src_fpu->state);
- 	}
- 	preempt_enable();
- 
-diff --git a/arch/x86/kernel/fpu/signal.c b/arch/x86/kernel/fpu/signal.c
-index 3ec0d2d..3a93186 100644
---- a/arch/x86/kernel/fpu/signal.c
-+++ b/arch/x86/kernel/fpu/signal.c
-@@ -344,11 +344,9 @@ static int __fpu__restore_sig(void __user *buf, void __user *buf_fx, int size)
- 		}
- 
- 		fpu->fpstate_active = 1;
--		if (use_eager_fpu()) {
--			preempt_disable();
--			fpu__restore(fpu);
--			preempt_enable();
--		}
-+		preempt_disable();
-+		fpu__restore(fpu);
-+		preempt_enable();
- 
- 		return err;
- 	} else {
-diff --git a/arch/x86/kernel/fpu/xstate.c b/arch/x86/kernel/fpu/xstate.c
-index abfbb61b..e9d7f46 100644
---- a/arch/x86/kernel/fpu/xstate.c
-+++ b/arch/x86/kernel/fpu/xstate.c
-@@ -890,15 +890,6 @@ int arch_set_user_pkey_access(struct task_struct *tsk, int pkey,
- 	 */
- 	if (!boot_cpu_has(X86_FEATURE_OSPKE))
- 		return -EINVAL;
--	/*
--	 * For most XSAVE components, this would be an arduous task:
--	 * brining fpstate up to date with fpregs, updating fpstate,
--	 * then re-populating fpregs.  But, for components that are
--	 * never lazily managed, we can just access the fpregs
--	 * directly.  PKRU is never managed lazily, so we can just
--	 * manipulate it directly.  Make sure it stays that way.
--	 */
--	WARN_ON_ONCE(!use_eager_fpu());
- 
- 	/* Set the bits we need in PKRU:  */
- 	if (init_val & PKEY_DISABLE_ACCESS)
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 7e5119c..c17d389 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -16,7 +16,6 @@
- #include <linux/export.h>
- #include <linux/vmalloc.h>
- #include <linux/uaccess.h>
--#include <asm/fpu/internal.h> /* For use_eager_fpu.  Ugh! */
- #include <asm/user.h>
- #include <asm/fpu/xstate.h>
- #include "cpuid.h"
-@@ -114,8 +113,7 @@ int kvm_update_cpuid(struct kvm_vcpu *vcpu)
- 	if (best && (best->eax & (F(XSAVES) | F(XSAVEC))))
- 		best->ebx = xstate_required_size(vcpu->arch.xcr0, true);
- 
--	if (use_eager_fpu())
--		kvm_x86_ops->fpu_activate(vcpu);
-+	kvm_x86_ops->fpu_activate(vcpu);
- 
- 	/*
- 	 * The existing code assumes virtual address is 48-bit in the canonical
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 5ca23af..0754dae 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -7513,16 +7513,6 @@ void kvm_put_guest_fpu(struct kvm_vcpu *vcpu)
- 	copy_fpregs_to_fpstate(&vcpu->arch.guest_fpu);
- 	__kernel_fpu_end();
- 	++vcpu->stat.fpu_reload;
--	/*
--	 * If using eager FPU mode, or if the guest is a frequent user
--	 * of the FPU, just leave the FPU active for next time.
--	 * Every 255 times fpu_counter rolls over to 0; a guest that uses
--	 * the FPU in bursts will revert to loading it on demand.
--	 */
--	if (!use_eager_fpu()) {
--		if (++vcpu->fpu_counter < 5)
--			kvm_make_request(KVM_REQ_DEACTIVATE_FPU, vcpu);
--	}
- 	trace_kvm_fpu(0);
- }
- 
--- 
-2.1.4
+      Arnd
