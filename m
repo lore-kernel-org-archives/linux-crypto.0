@@ -1,54 +1,41 @@
-From: David Miller <davem@davemloft.net>
-Subject: Re: [PATCH] [RESEND, net-next, v2] tcp: use monotonic timestamps
- for PAWS
-Date: Thu, 12 Jul 2018 14:50:53 -0700 (PDT)
-Message-ID: <20180712.145053.375746969660293612.davem@davemloft.net>
-References: <20180711101757.3929777-1-arnd@arndb.de>
+From: David Howells <dhowells@redhat.com>
+Subject: Re: [PATCH v4 13/14] rxrpc: Prepare to remove VLA usage for SKCIPHER_REQUEST_ON_STACK
+Date: Thu, 12 Jul 2018 23:05:20 +0100
+Message-ID: <20099.1531433120@warthog.procyon.org.uk>
+References: <CAK8P3a1k+cy9wAVNQMWE4tdA4aV8tiu6K3haLc+kMPt0iiUQ9Q@mail.gmail.com> <20180711203619.1020-1-keescook@chromium.org> <20180711203619.1020-14-keescook@chromium.org>
 Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-Cc: edumazet@google.com, kuznet@ms2.inr.ac.ru, yoshfuji@linux-ipv6.org,
-        harsh@chelsio.com, herbert@gondor.apana.org.au,
-        atul.gupta@chelsio.com, gustavo@embeddedor.com, werner@chelsio.com,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org
-To: arnd@arndb.de
+Content-Type: text/plain; charset="us-ascii"
+Cc: dhowells@redhat.com, Kees Cook <keescook@chromium.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+        Eric Biggers <ebiggers@google.com>,
+        Alasdair Kergon <agk@redhat.com>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Lars Persson <larper@axis.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Rabin Vincent <rabinv@axis.com>,
+        Tim Chen <tim.c.chen@linux.intel.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Masahiro Yamada <yamada.masahiro@socionext.com>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>, qat-linux@intel.com,
+        dm-devel@redhat.com,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Arnd Bergmann <arnd@arndb.de>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180711101757.3929777-1-arnd@arndb.de>
+In-Reply-To: <CAK8P3a1k+cy9wAVNQMWE4tdA4aV8tiu6K3haLc+kMPt0iiUQ9Q@mail.gmail.com>
+Content-ID: <20098.1531433120.1@warthog.procyon.org.uk>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-From: Arnd Bergmann <arnd@arndb.de>
-Date: Wed, 11 Jul 2018 12:16:12 +0200
+Arnd Bergmann <arnd@arndb.de> wrote:
 
-> Using get_seconds() for timestamps is deprecated since it can lead
-> to overflows on 32-bit systems. While the interface generally doesn't
-> overflow until year 2106, the specific implementation of the TCP PAWS
-> algorithm breaks in 2038 when the intermediate signed 32-bit timestamps
-> overflow.
-> 
-> A related problem is that the local timestamps in CLOCK_REALTIME form
-> lead to unexpected behavior when settimeofday is called to set the system
-> clock backwards or forwards by more than 24 days.
-> 
-> While the first problem could be solved by using an overflow-safe method
-> of comparing the timestamps, a nicer solution is to use a monotonic
-> clocksource with ktime_get_seconds() that simply doesn't overflow (at
-> least not until 136 years after boot) and that doesn't change during
-> settimeofday().
-> 
-> To make 32-bit and 64-bit architectures behave the same way here, and
-> also save a few bytes in the tcp_options_received structure, I'm changing
-> the type to a 32-bit integer, which is now safe on all architectures.
-> 
-> Finally, the ts_recent_stamp field also (confusingly) gets used to store
-> a jiffies value in tcp_synq_overflow()/tcp_synq_no_recent_overflow().
-> This is currently safe, but changing the type to 32-bit requires
-> some small changes there to keep it working.
-> 
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> ---
-> v2: use time_before32()/time_after32() everywhere as suggested
->     Eric Dumazet in https://lore.kernel.org/lkml/67ebb94d-c73f-6c9f-493b-00c86f595120@gmail.com/
+> From what I can tell, neither of the two are called in atomic context, so
+> you should be able to use a GFP_KERNEL allocation.
 
-Applied.
+You need to be careful doing that since the allocation might happen in the AFS
+writeback path.  I use GFP_NOIO or GFP_NOFS in rxkad.c and skb_cow_data() uses
+GFP_ATOMIC - though we should have single ownership of the packet at this
+point.
+
+David
