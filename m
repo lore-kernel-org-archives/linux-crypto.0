@@ -1,32 +1,45 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: chtls - use 64-bit arithmetic instead of 32-bit
-Date: Fri, 13 Jul 2018 18:33:31 +0800
-Message-ID: <20180713103331.5574mnd4ecjson7n@gondor.apana.org.au>
-References: <20180704163720.GA16912@embeddedor.com>
+Subject: Re: [PATCH v4] AF_ALG: Initialize sg_num_bytes in error code path
+Date: Fri, 13 Jul 2018 18:34:10 +0800
+Message-ID: <20180713103410.5ox6imgi75w47kpv@gondor.apana.org.au>
+References: <00000000000092ad87056950ef9e@google.com>
+ <1612449.5GibSviISC@positron.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Harsh Jain <harsh@chelsio.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+Cc: syzbot <syzbot+9c251bdd09f83b92ba95@syzkaller.appspotmail.com>,
+        davem@davemloft.net, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
+To: Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20180704163720.GA16912@embeddedor.com>
+In-Reply-To: <1612449.5GibSviISC@positron.chronox.de>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Jul 04, 2018 at 11:37:20AM -0500, Gustavo A. R. Silva wrote:
-> Cast *val* to u64 in order to give the compiler complete
-> information about the proper arithmetic to use.
+On Sat, Jul 07, 2018 at 08:41:47PM +0200, Stephan Müller wrote:
+> Changes v4:
+> * Add Fixes and CC line
 > 
-> Notice that such variable is used in a context that expects an
-> expression of type u64 (64 bits, unsigned) and the following
-> expression is currently being evaluated using 32-bit arithmetic:
+> Changes v3:
+> * Fix syz testing line
 > 
-> val << bit_pos
+> Changes v2:
+> * Addition of syz testing line
 > 
-> Addresses-Coverity-ID: 1467425 ("Unintentional integer overflow")
-> Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
+> ---8<---
+> 
+> The RX SGL in processing is already registered with the RX SGL tracking
+> list to support proper cleanup. The cleanup code path uses the
+> sg_num_bytes variable which must therefore be always initialized, even
+> in the error code path.
+> 
+> Signed-off-by: Stephan Mueller <smueller@chronox.de>
+> Reported-by: syzbot+9c251bdd09f83b92ba95@syzkaller.appspotmail.com
+> #syz test: https://github.com/google/kmsan.git master
+> CC: <stable@vger.kernel.org> #4.14
+> Fixes: e870456d8e7c ("crypto: algif_skcipher - overhaul memory management")
+> Fixes: d887c52d6ae4 ("crypto: algif_aead - overhaul memory management")
 
 Patch applied.  Thanks.
 -- 
