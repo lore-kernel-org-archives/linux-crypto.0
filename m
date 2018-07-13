@@ -1,16 +1,15 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v4 11/14] treewide: Prepare to remove VLA usage for
- AHASH_REQUEST_ON_STACK
-Date: Fri, 13 Jul 2018 14:22:04 +0800
-Message-ID: <20180713062204.2o7gz5xri374nii6@gondor.apana.org.au>
-References: <20180711203619.1020-1-keescook@chromium.org>
- <20180711203619.1020-12-keescook@chromium.org>
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [PATCH v4 11/14] treewide: Prepare to remove VLA usage for AHASH_REQUEST_ON_STACK
+Date: Fri, 13 Jul 2018 12:14:16 +0200
+Message-ID: <CAK8P3a3nk4-EewKTXcLENTb86r1+bJz_WrkJoJt+D1uTwcpxPA@mail.gmail.com>
+References: <20180711203619.1020-1-keescook@chromium.org> <20180711203619.1020-12-keescook@chromium.org>
  <CAK8P3a3356dbruUfS_+fj9f+X-0jbNE8WMe5sWhJmuRY9Nvcbg@mail.gmail.com>
- <20180713004038.lwibdesz7ohhoind@gondor.apana.org.au>
- <CAGXu5jJOZ3u1BTf8U20wErphfjKzaGK+m1sdhA89LqVP3MDYZA@mail.gmail.com>
+ <20180713004038.lwibdesz7ohhoind@gondor.apana.org.au> <CAGXu5jLYmC7U=bucFZCLsSXNX=T4WhCccR6hx9dwROYF+ZMt0Q@mail.gmail.com>
+ <20180713034406.zwu2pkp3f2onybxs@gondor.apana.org.au> <CAGXu5jLR0zJ6b9axJuG_uvttNShNcN3rhQKGVjW37qPd9saY-Q@mail.gmail.com>
+ <20180713052029.cfo24bsr5swtbdja@gondor.apana.org.au> <CAGXu5jLG4gE44z9cXL3-D1bjbZB1RgTnTsb3PWhU7B3NdRrwVg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Arnd Bergmann <arnd@arndb.de>,
+Content-Type: text/plain; charset="UTF-8"
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
         "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
         Eric Biggers <ebiggers@google.com>,
         Alasdair Kergon <agk@redhat.com>,
@@ -27,23 +26,49 @@ Cc: Arnd Bergmann <arnd@arndb.de>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 To: Kees Cook <keescook@chromium.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <CAGXu5jJOZ3u1BTf8U20wErphfjKzaGK+m1sdhA89LqVP3MDYZA@mail.gmail.com>
+In-Reply-To: <CAGXu5jLG4gE44z9cXL3-D1bjbZB1RgTnTsb3PWhU7B3NdRrwVg@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Jul 12, 2018 at 11:16:28PM -0700, Kees Cook wrote:
+On Fri, Jul 13, 2018 at 8:00 AM, Kees Cook <keescook@chromium.org> wrote:
+> On Thu, Jul 12, 2018 at 10:20 PM, Herbert Xu
+> <herbert@gondor.apana.org.au> wrote:
+>> On Thu, Jul 12, 2018 at 10:17:29PM -0700, Kees Cook wrote:
+>>> What is the correct value to use for AHASH_REQUEST_ON_STACK?
+>>
+>> As I said to arrive at a fixed value you should examine all sync
+>> ahash algorithms (e.g., all shash ones plus ahash ones marked as
+>> sync if there are any).
 >
-> Is this correct? It seems like you did the bulk of
-> AHASH_REQUEST_ON_STACK conversions in 2016. Can shash grow an sg
-> interface?
+> The "value" for the ahash I understand: it has a request size
+> (tfm->reqsize, as set by crypto_ahash_set_reqsize()) what should be
+> used to measure the shash value? (And how does this relate to the
+> value returned by crypto_ahash_reqsize()?) The closest clue I can find
+> is this:
+>
+> crypto_init_shash_ops_async() does:
+>         crt->reqsize = sizeof(struct shash_desc) + crypto_shash_descsize(shash);
+>
+> and that gets called from crypto_ahash_init_tfm(), so if it starts
+> with the above reqsize and adds to it with a call to
+> crypto_ahash_set_reqsize() later, we'll have that maximum?
+>
+> So, do I want to calculate this answer as:
+>
+> sizeof(struct shash_desc) + max(shash descsize) + max(ahash-sync reqsize) ?
+> 16 + 360 + 0
 
-shash does not need to grow an sg interface.  All users of
-AHASH_REQUEST_ON_STACK set the CRYPTO_ALG_ASYNC flag to zero
-when allocating the tfm.
+I arrived at the same number, looking at all the sizes in shash,
+The largest I found are sha3_state (360 bytes) and s390_sha_ctx
+(336 bytes), everything else is way smaller.
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> It's 0 above because if I look at all the callers of
+> crypto_ahash_set_reqsize() that do wrapping, all are ASYNC.
+>
+> So, should this really just be 376? Where is best to validate this
+> size, as it seems checking in crypto_ahash_set_reqsize() is
+> inappropriate?
+
+How about crypto_init_shash_ops_async()?
+
+      Arnd
