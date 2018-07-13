@@ -1,14 +1,12 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v4 11/14] treewide: Prepare to remove VLA usage for
- AHASH_REQUEST_ON_STACK
-Date: Fri, 13 Jul 2018 08:40:38 +0800
-Message-ID: <20180713004038.lwibdesz7ohhoind@gondor.apana.org.au>
-References: <20180711203619.1020-1-keescook@chromium.org>
- <20180711203619.1020-12-keescook@chromium.org>
- <CAK8P3a3356dbruUfS_+fj9f+X-0jbNE8WMe5sWhJmuRY9Nvcbg@mail.gmail.com>
+From: Kees Cook <keescook@chromium.org>
+Subject: Re: [PATCH v4 11/14] treewide: Prepare to remove VLA usage for AHASH_REQUEST_ON_STACK
+Date: Thu, 12 Jul 2018 20:33:24 -0700
+Message-ID: <CAGXu5jLYmC7U=bucFZCLsSXNX=T4WhCccR6hx9dwROYF+ZMt0Q@mail.gmail.com>
+References: <20180711203619.1020-1-keescook@chromium.org> <20180711203619.1020-12-keescook@chromium.org>
+ <CAK8P3a3356dbruUfS_+fj9f+X-0jbNE8WMe5sWhJmuRY9Nvcbg@mail.gmail.com> <20180713004038.lwibdesz7ohhoind@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Kees Cook <keescook@chromium.org>,
+Content-Type: text/plain; charset="UTF-8"
+Cc: Arnd Bergmann <arnd@arndb.de>,
         "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
         Eric Biggers <ebiggers@google.com>,
         Alasdair Kergon <agk@redhat.com>,
@@ -23,23 +21,26 @@ Cc: Kees Cook <keescook@chromium.org>,
         <linux-crypto@vger.kernel.org>, qat-linux@intel.com,
         dm-devel@redhat.com,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <CAK8P3a3356dbruUfS_+fj9f+X-0jbNE8WMe5sWhJmuRY9Nvcbg@mail.gmail.com>
+In-Reply-To: <20180713004038.lwibdesz7ohhoind@gondor.apana.org.au>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Jul 12, 2018 at 06:02:26PM +0200, Arnd Bergmann wrote:
+On Thu, Jul 12, 2018 at 5:40 PM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> On Thu, Jul 12, 2018 at 06:02:26PM +0200, Arnd Bergmann wrote:
+>>
+>> Looking through some of the drivers, I found this interesting one:
 >
-> Looking through some of the drivers, I found this interesting one:
+> As I said before these patches are fundamentally broken.  Users
+> of AHASH_REQUEST_ON_STACK can only use sync algorithm providers
+> and therefore drivers are irrelevant.
 
-As I said before these patches are fundamentally broken.  Users
-of AHASH_REQUEST_ON_STACK can only use sync algorithm providers
-and therefore drivers are irrelevant.
+I don't understand what this means. Can you give an example of what
+you want to see happen that will accomplish the VLA removals?
 
-Cheers,
+-Kees
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Kees Cook
+Pixel Security
