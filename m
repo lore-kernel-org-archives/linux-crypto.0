@@ -1,29 +1,34 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: Fix Kconfig typo
-Date: Fri, 13 Jul 2018 18:33:08 +0800
-Message-ID: <20180713103308.yiy2hw2gblma3bqf@gondor.apana.org.au>
-References: <HKXPR04MB1766B902E75B2EE0698B9F37A0430@HKXPR04MB1766.apcprd04.prod.outlook.com>
+Subject: Re: [PATCH] crypto: chtls - use 64-bit arithmetic instead of 32-bit
+Date: Fri, 13 Jul 2018 18:33:31 +0800
+Message-ID: <20180713103331.5574mnd4ecjson7n@gondor.apana.org.au>
+References: <20180704163720.GA16912@embeddedor.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "davem@davemloft.net" <davem@davemloft.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-To: Huang nut <minhaco@hotmail.com>
+Cc: Harsh Jain <harsh@chelsio.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <HKXPR04MB1766B902E75B2EE0698B9F37A0430@HKXPR04MB1766.apcprd04.prod.outlook.com>
+In-Reply-To: <20180704163720.GA16912@embeddedor.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Jul 02, 2018 at 05:04:49AM +0000, Huang nut wrote:
-> Only find crc32-pclmul and crct10dif-pclmul.
+On Wed, Jul 04, 2018 at 11:37:20AM -0500, Gustavo A. R. Silva wrote:
+> Cast *val* to u64 in order to give the compiler complete
+> information about the proper arithmetic to use.
 > 
-> Signed-off-by: haco <minhaco@hotmail.com>
+> Notice that such variable is used in a context that expects an
+> expression of type u64 (64 bits, unsigned) and the following
+> expression is currently being evaluated using 32-bit arithmetic:
+> 
+> val << bit_pos
+> 
+> Addresses-Coverity-ID: 1467425 ("Unintentional integer overflow")
+> Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
 
-Your patch didn't make it to patchwork, possibly because it didn't
-make it to linux-crypto.  Could you please resend?
-
-Thanks,
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
