@@ -1,12 +1,14 @@
-From: David Howells <dhowells@redhat.com>
-Subject: Re: [PATCH v4 13/14] rxrpc: Prepare to remove VLA usage for SKCIPHER_REQUEST_ON_STACK
-Date: Thu, 12 Jul 2018 23:05:20 +0100
-Message-ID: <20099.1531433120@warthog.procyon.org.uk>
-References: <CAK8P3a1k+cy9wAVNQMWE4tdA4aV8tiu6K3haLc+kMPt0iiUQ9Q@mail.gmail.com> <20180711203619.1020-1-keescook@chromium.org> <20180711203619.1020-14-keescook@chromium.org>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v4 11/14] treewide: Prepare to remove VLA usage for
+ AHASH_REQUEST_ON_STACK
+Date: Fri, 13 Jul 2018 08:40:38 +0800
+Message-ID: <20180713004038.lwibdesz7ohhoind@gondor.apana.org.au>
+References: <20180711203619.1020-1-keescook@chromium.org>
+ <20180711203619.1020-12-keescook@chromium.org>
+ <CAK8P3a3356dbruUfS_+fj9f+X-0jbNE8WMe5sWhJmuRY9Nvcbg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Cc: dhowells@redhat.com, Kees Cook <keescook@chromium.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
+Content-Type: text/plain; charset=us-ascii
+Cc: Kees Cook <keescook@chromium.org>,
         "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
         Eric Biggers <ebiggers@google.com>,
         Alasdair Kergon <agk@redhat.com>,
@@ -23,19 +25,21 @@ Cc: dhowells@redhat.com, Kees Cook <keescook@chromium.org>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 To: Arnd Bergmann <arnd@arndb.de>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAK8P3a1k+cy9wAVNQMWE4tdA4aV8tiu6K3haLc+kMPt0iiUQ9Q@mail.gmail.com>
-Content-ID: <20098.1531433120.1@warthog.procyon.org.uk>
+Content-Disposition: inline
+In-Reply-To: <CAK8P3a3356dbruUfS_+fj9f+X-0jbNE8WMe5sWhJmuRY9Nvcbg@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Arnd Bergmann <arnd@arndb.de> wrote:
+On Thu, Jul 12, 2018 at 06:02:26PM +0200, Arnd Bergmann wrote:
+>
+> Looking through some of the drivers, I found this interesting one:
 
-> From what I can tell, neither of the two are called in atomic context, so
-> you should be able to use a GFP_KERNEL allocation.
+As I said before these patches are fundamentally broken.  Users
+of AHASH_REQUEST_ON_STACK can only use sync algorithm providers
+and therefore drivers are irrelevant.
 
-You need to be careful doing that since the allocation might happen in the AFS
-writeback path.  I use GFP_NOIO or GFP_NOFS in rxkad.c and skb_cow_data() uses
-GFP_ATOMIC - though we should have single ownership of the packet at this
-point.
-
-David
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
