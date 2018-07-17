@@ -1,81 +1,84 @@
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Subject: [PATCH 6/6] lib: Use existing define with polynomial
-Date: Tue, 17 Jul 2018 18:05:41 +0200
-Message-ID: <20180717160541.3843-7-krzk@kernel.org>
-References: <20180717160541.3843-1-krzk@kernel.org>
-Cc: Krzysztof Kozlowski <krzk@kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@st.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Siva Reddy Kallam <siva.kallam@broadcom.com>,
-        Prashant Sreedharan <prashant@broadcom.com>,
-        Michael Chan <mchan@broadcom.com>,
-        Fugang Duan <fugang.duan@nxp.com>,
-        Pantelis Antoniou <pantelis.antoniou@gmail.com>,
-        Vitaly Bordug <vbordug@ru.mvista.com>,
-        Jose Abreu <Jose.Abreu@synopsys.com>,
-        Larry Finger <Larry.Finger@lwfinger.net>,
-        Florian Schilhabel <florian.c.schilhabel@googlemail.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-arm-kern
+From: Eric Biggers <ebiggers3@gmail.com>
+Subject: Re: [dm-devel] [PATCH v5 05/11] crypto: ahash: Remove VLA usage
+Date: Tue, 17 Jul 2018 09:39:36 -0700
+Message-ID: <20180717163936.GB75957@gmail.com>
+References: <20180717042150.37761-1-keescook@chromium.org>
+ <20180717042150.37761-6-keescook@chromium.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Eric Biggers <ebiggers@google.com>, qat-linux@intel.com,
+        linux-kernel@vger.kernel.org, dm-devel@redhat.com,
+        linux-crypto@vger.kernel.org, Lars Persson <larper@axis.com>,
+        Tim Chen <tim.c.chen@linux.intel.com>,
+        Alasdair Kergon <agk@redhat.com>,
+        Rabin Vincent <rabinv@axis.com>
+To: Kees Cook <keescook@chromium.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180717160541.3843-1-krzk@kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20180717042150.37761-6-keescook@chromium.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Do not define again the polynomial but use header with existing define.
+On Mon, Jul 16, 2018 at 09:21:44PM -0700, Kees Cook wrote:
+> In the quest to remove all stack VLA usage from the kernel[1], this
+> introduces max size macros for ahash, as already done for shash, and
+> adjust the crypto user to max state size.
+> 
+> [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
+> 
+> Signed-off-by: Kees Cook <keescook@chromium.org>
+> ---
+>  crypto/ahash.c        | 4 ++--
+>  crypto/algif_hash.c   | 2 +-
+>  include/crypto/hash.h | 3 +++
+>  3 files changed, 6 insertions(+), 3 deletions(-)
+> 
+> diff --git a/crypto/ahash.c b/crypto/ahash.c
+> index a64c143165b1..6435bdbe42fd 100644
+> --- a/crypto/ahash.c
+> +++ b/crypto/ahash.c
+> @@ -550,8 +550,8 @@ static int ahash_prepare_alg(struct ahash_alg *alg)
+>  {
+>  	struct crypto_alg *base = &alg->halg.base;
+>  
+> -	if (alg->halg.digestsize > PAGE_SIZE / 8 ||
+> -	    alg->halg.statesize > PAGE_SIZE / 8 ||
+> +	if (alg->halg.digestsize > AHASH_MAX_DIGESTSIZE ||
+> +	    alg->halg.statesize > AHASH_MAX_STATESIZE ||
+>  	    alg->halg.statesize == 0)
+>  		return -EINVAL;
+>  
+> diff --git a/crypto/algif_hash.c b/crypto/algif_hash.c
+> index bfcf595fd8f9..8974ee8ebead 100644
+> --- a/crypto/algif_hash.c
+> +++ b/crypto/algif_hash.c
+> @@ -239,7 +239,7 @@ static int hash_accept(struct socket *sock, struct socket *newsock, int flags,
+>  	struct alg_sock *ask = alg_sk(sk);
+>  	struct hash_ctx *ctx = ask->private;
+>  	struct ahash_request *req = &ctx->req;
+> -	char state[crypto_ahash_statesize(crypto_ahash_reqtfm(req)) ? : 1];
+> +	char state[AHASH_MAX_STATESIZE];
+>  	struct sock *sk2;
+>  	struct alg_sock *ask2;
+>  	struct hash_ctx *ctx2;
+> diff --git a/include/crypto/hash.h b/include/crypto/hash.h
+> index ae14cc0e0cdb..4fcd0e2368cd 100644
+> --- a/include/crypto/hash.h
+> +++ b/include/crypto/hash.h
+> @@ -64,6 +64,9 @@ struct ahash_request {
+>  	void *__ctx[] CRYPTO_MINALIGN_ATTR;
+>  };
+>  
+> +#define AHASH_MAX_DIGESTSIZE	512
+> +#define AHASH_MAX_STATESIZE	512
+> +
 
-Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
----
- lib/decompress_bunzip2.c | 3 ++-
- lib/xz/xz_crc32.c        | 3 ++-
- 2 files changed, 4 insertions(+), 2 deletions(-)
+Why is AHASH_MAX_DIGESTSIZE (512) so much larger than SHASH_MAX_DIGESTSIZE (64)?
+I would have expected them to be the same.
 
-diff --git a/lib/decompress_bunzip2.c b/lib/decompress_bunzip2.c
-index 0234361b24b8..7c4932eed748 100644
---- a/lib/decompress_bunzip2.c
-+++ b/lib/decompress_bunzip2.c
-@@ -51,6 +51,7 @@
- #endif /* STATIC */
- 
- #include <linux/decompress/mm.h>
-+#include <linux/crc32poly.h>
- 
- #ifndef INT_MAX
- #define INT_MAX 0x7fffffff
-@@ -654,7 +655,7 @@ static int INIT start_bunzip(struct bunzip_data **bdp, void *inbuf, long len,
- 	for (i = 0; i < 256; i++) {
- 		c = i << 24;
- 		for (j = 8; j; j--)
--			c = c&0x80000000 ? (c << 1)^0x04c11db7 : (c << 1);
-+			c = c&0x80000000 ? (c << 1)^(CRC32_POLY_BE) : (c << 1);
- 		bd->crc32Table[i] = c;
- 	}
- 
-diff --git a/lib/xz/xz_crc32.c b/lib/xz/xz_crc32.c
-index 34532d14fd4c..25a5d87e2e4c 100644
---- a/lib/xz/xz_crc32.c
-+++ b/lib/xz/xz_crc32.c
-@@ -15,6 +15,7 @@
-  * but they are bigger and use more memory for the lookup table.
-  */
- 
-+#include <linux/crc32poly.h>
- #include "xz_private.h"
- 
- /*
-@@ -29,7 +30,7 @@ STATIC_RW_DATA uint32_t xz_crc32_table[256];
- 
- XZ_EXTERN void xz_crc32_init(void)
- {
--	const uint32_t poly = 0xEDB88320;
-+	const uint32_t poly = CRC32_POLY_LE;
- 
- 	uint32_t i;
- 	uint32_t j;
--- 
-2.14.1
+- Eric
