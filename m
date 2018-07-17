@@ -1,71 +1,82 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v5 01/11] crypto: xcbc: Remove VLA usage
-Date: Tue, 17 Jul 2018 14:35:01 +0800
-Message-ID: <20180717063501.exqa54plsfjl4s73@gondor.apana.org.au>
-References: <20180717042150.37761-1-keescook@chromium.org>
- <20180717042150.37761-2-keescook@chromium.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Arnd Bergmann <arnd@arndb.de>, Eric Biggers <ebiggers@google.com>,
-        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
-        Alasdair Kergon <agk@redhat.com>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Lars Persson <larper@axis.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Rabin Vincent <rabinv@axis.com>,
-        Tim Chen <tim.c.chen@linux.intel.com>,
-        linux-crypto@vger.kernel.org, qat-linux@intel.com,
-        dm-devel@redhat.com, linux-kernel@vger.kernel.org
-To: Kees Cook <keescook@chromium.org>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Subject: [PATCH 0/6] lib/crc32: treewide: Use existing define with polynomial
+Date: Tue, 17 Jul 2018 18:05:35 +0200
+Message-ID: <20180717160541.3843-1-krzk@kernel.org>
+Cc: Krzysztof Kozlowski <krzk@kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@st.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Siva Reddy Kallam <siva.kallam@broadcom.com>,
+        Prashant Sreedharan <prashant@broadcom.com>,
+        Michael Chan <mchan@broadcom.com>,
+        Fugang Duan <fugang.duan@nxp.com>,
+        Pantelis Antoniou <pantelis.antoniou@gmail.com>,
+        Vitaly Bordug <vbordug@ru.mvista.com>,
+        Jose Abreu <Jose.Abreu@synopsys.com>,
+        Larry Finger <Larry.Finger@lwfinger.net>,
+        Florian Schilhabel <florian.c.schilhabel@googlemail.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-arm-kern
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20180717042150.37761-2-keescook@chromium.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Jul 16, 2018 at 09:21:40PM -0700, Kees Cook wrote:
-> In the quest to remove all stack VLA usage from the kernel[1], this uses
-> the maximum blocksize and adds a sanity check. For xcbc, the blocksize
-> must always be 16, so use that, since it's already being enforced during
-> instantiation.
-> 
-> [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
-> 
-> Signed-off-by: Kees Cook <keescook@chromium.org>
-> ---
->  crypto/xcbc.c | 9 +++++++--
->  1 file changed, 7 insertions(+), 2 deletions(-)
-> 
-> diff --git a/crypto/xcbc.c b/crypto/xcbc.c
-> index 25c75af50d3f..7aa03beed795 100644
-> --- a/crypto/xcbc.c
-> +++ b/crypto/xcbc.c
-> @@ -57,6 +57,8 @@ struct xcbc_desc_ctx {
->  	u8 ctx[];
->  };
->  
-> +#define XCBC_BLOCKSIZE	16
-> +
->  static int crypto_xcbc_digest_setkey(struct crypto_shash *parent,
->  				     const u8 *inkey, unsigned int keylen)
->  {
-> @@ -65,7 +67,10 @@ static int crypto_xcbc_digest_setkey(struct crypto_shash *parent,
->  	int bs = crypto_shash_blocksize(parent);
->  	u8 *consts = PTR_ALIGN(&ctx->ctx[0], alignmask + 1);
->  	int err = 0;
-> -	u8 key1[bs];
-> +	u8 key1[XCBC_BLOCKSIZE];
-> +
-> +	if (WARN_ON(bs > sizeof(key1)))
-> +		return -EINVAL;
+Hi,
 
-Please remove this.  You already checked it in xcbc_create.
+Kernel defines same polynomial for CRC-32 in few places.
+This is unnecessary duplication of the same value. Also this might
+be error-prone for future code - every driver will define the
+polynomial again.
 
-In fact, you should just make bs XCBC_BLOCKSIZE unconditinoally
-in this function.
+This is an attempt to unify definition of polynomial.  Few obvious
+hard-coded locations are fixed with define.
 
-Cheers,
+All series depend on each 1/6 and 2/6.
+
+This could be merged in two different merge windows (1st lib/crc and then
+the rest) or taken through one tree.
+
+It would be nice to get some testing. Only generic lib/crc, bunzip, xz_crc32
+and Freescale's Ethernet driver were tested on HW.  Rest got just different
+builds.
+
+Best regards,
+Krzysztof
+
+
+
+
+Krzysztof Kozlowski (6):
+  lib/crc: Move polynomial definition to separate header
+  lib/crc: Use consistent naming for CRC-32 polynomials
+  crypto: stm32_crc32 - Use existing define with polynomial
+  net: ethernet: Use existing define with polynomial
+  staging: rtl: Use existing define with polynomial
+  lib: Use existing define with polynomial
+
+ drivers/crypto/stm32/stm32_crc32.c               | 11 ++++-------
+ drivers/net/ethernet/amd/xgbe/xgbe-dev.c         |  4 ++--
+ drivers/net/ethernet/apple/bmac.c                |  8 ++------
+ drivers/net/ethernet/broadcom/tg3.c              |  3 ++-
+ drivers/net/ethernet/freescale/fec_main.c        |  4 ++--
+ drivers/net/ethernet/freescale/fs_enet/fec.h     |  3 ---
+ drivers/net/ethernet/freescale/fs_enet/mac-fec.c |  3 ++-
+ drivers/net/ethernet/micrel/ks8851_mll.c         |  3 ++-
+ drivers/net/ethernet/synopsys/dwc-xlgmac-hw.c    |  4 ++--
+ drivers/staging/rtl8712/rtl871x_security.c       |  5 ++---
+ drivers/staging/rtl8723bs/core/rtw_security.c    |  5 ++---
+ include/linux/crc32poly.h                        | 20 ++++++++++++++++++++
+ lib/crc32.c                                      | 11 ++++++-----
+ lib/crc32defs.h                                  | 14 --------------
+ lib/decompress_bunzip2.c                         |  3 ++-
+ lib/gen_crc32table.c                             |  5 +++--
+ lib/xz/xz_crc32.c                                |  3 ++-
+ 17 files changed, 55 insertions(+), 54 deletions(-)
+ create mode 100644 include/linux/crc32poly.h
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.14.1
