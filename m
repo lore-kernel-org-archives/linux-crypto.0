@@ -1,43 +1,57 @@
-From: Kees Cook <keescook@chromium.org>
-Subject: Re: [dm-devel] [PATCH v5 10/11] crypto: ahash: Remove VLA usage for AHASH_REQUEST_ON_STACK
-Date: Tue, 17 Jul 2018 13:11:52 -0700
-Message-ID: <CAGXu5j+uUUKjDb3_W=PvLG+mG+_ozTRuK5PMAewKEVnomnc2yA@mail.gmail.com>
-References: <20180717042150.37761-1-keescook@chromium.org> <20180717042150.37761-11-keescook@chromium.org>
- <20180717164358.GC75957@gmail.com>
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [PATCH v4 11/14] treewide: Prepare to remove VLA usage for AHASH_REQUEST_ON_STACK
+Date: Tue, 17 Jul 2018 22:59:00 +0200
+Message-ID: <CAK8P3a3Dh+g=v++BMCtmmiOSnVu4CEUgss0U7BZS_K45aTddqg@mail.gmail.com>
+References: <20180711203619.1020-1-keescook@chromium.org> <20180711203619.1020-12-keescook@chromium.org>
+ <CAK8P3a3356dbruUfS_+fj9f+X-0jbNE8WMe5sWhJmuRY9Nvcbg@mail.gmail.com>
+ <20180713004038.lwibdesz7ohhoind@gondor.apana.org.au> <CAGXu5jLYmC7U=bucFZCLsSXNX=T4WhCccR6hx9dwROYF+ZMt0Q@mail.gmail.com>
+ <20180713034406.zwu2pkp3f2onybxs@gondor.apana.org.au> <CAGXu5jLR0zJ6b9axJuG_uvttNShNcN3rhQKGVjW37qPd9saY-Q@mail.gmail.com>
+ <20180713052029.cfo24bsr5swtbdja@gondor.apana.org.au> <CAGXu5jLG4gE44z9cXL3-D1bjbZB1RgTnTsb3PWhU7B3NdRrwVg@mail.gmail.com>
+ <CAK8P3a3nk4-EewKTXcLENTb86r1+bJz_WrkJoJt+D1uTwcpxPA@mail.gmail.com> <CAGXu5j+Q_jc_f9VybyoJqmV7_Q-3hqnC-pOubfNsi7uyAROVrQ@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Arnd Bergmann <arnd@arndb.de>,
         "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Eric Biggers <ebiggers@google.com>, qat-linux@intel.com,
-        LKML <linux-kernel@vger.kernel.org>, dm-devel@redhat.com,
-        linux-crypto <linux-crypto@vger.kernel.org>,
-        Lars Persson <larper@axis.com>,
-        Tim Chen <tim.c.chen@linux.intel.com>,
+        Eric Biggers <ebiggers@google.com>,
         Alasdair Kergon <agk@redhat.com>,
-        Rabin Vincent <rabinv@axis.com>
-To: Eric Biggers <ebiggers3@gmail.com>
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Lars Persson <larper@axis.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Rabin Vincent <rabinv@axis.com>,
+        Tim Chen <tim.c.chen@linux.intel.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Masahiro Yamada <yamada.masahiro@socionext.com>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>, qat-linux@intel.com,
+        dm-devel@redhat.com,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: Kees Cook <keescook@chromium.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180717164358.GC75957@gmail.com>
+In-Reply-To: <CAGXu5j+Q_jc_f9VybyoJqmV7_Q-3hqnC-pOubfNsi7uyAROVrQ@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Jul 17, 2018 at 9:43 AM, Eric Biggers <ebiggers3@gmail.com> wrote:
-> On Mon, Jul 16, 2018 at 09:21:49PM -0700, Kees Cook wrote:
->> +     reqsize = sizeof(struct shash_desc) + crypto_shash_descsize(shash);
->> +     if (WARN_ON(reqsize > AHASH_MAX_REQSIZE)) {
->> +             crypto_mod_put(calg);
->> +             return -EINVAL;
->> +     }
+On Sun, Jul 15, 2018 at 6:28 AM, Kees Cook <keescook@chromium.org> wrote:
 >
-> 'crypto_free_shash(shash);' instead of 'crypto_mod_put(calg);'
+> After my ahash to shash conversions, only ccm is left as an ahash
+> user, since it actually uses sg. But with the hard-coded value reduced
+> to 376, this doesn't trip the frame warnings any more. :)
+>
+> I'll send an updated series soon.
 
-Oops! Yes, thanks; I have fixed it now in the next version.
+Maybe we should get rid of that one as well then and remove
+AHASH_REQUEST_ON_STACK()?
 
--Kees
+I see that Ard (now on Cc) added this usage only recently. Looking
+at the code some more, I also find that the descsize is probably
+much smaller than 376 for all possible cases   of "cbcmac(*)",
+either alg->cra_blocksize plus a few bytes or sizeof(mac_desc_ctx)
+(i.e. 20) for arch/arm64/crypto/aes-glue.c.
 
--- 
-Kees Cook
-Pixel Security
+Walking the sglist here means open-coding a shash_ahash_update()
+implementation in crypto_ccm_auth(), that that doesn't seem to
+add much complexity over what it already has to do to chain
+the sglist today.
+
+      Arnd
