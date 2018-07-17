@@ -1,79 +1,77 @@
-From: Logan Gunthorpe <logang@deltatee.com>
-Subject: [PATCH v19 5/6] ntb: ntb_hw_intel: use io-64-nonatomic instead of in-driver hacks
-Date: Mon, 16 Jul 2018 11:33:22 -0600
-Message-ID: <20180716173323.2058-6-logang@deltatee.com>
-References: <20180716173323.2058-1-logang@deltatee.com>
-Cc: Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Andy Shevchenko <andy.shevchenko@gmail.com>,
-        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
-        Logan Gunthorpe <logang@deltatee.com>
-To: linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
-        linux-ntb@googlegroups.com, linux-crypto@vger.kernel.org,
-        Andrew Morton <akpm@linux-foundation.org>
+From: Kees Cook <keescook@chromium.org>
+Subject: [PATCH v5 03/11] crypto: shash: Remove VLA usage
+Date: Mon, 16 Jul 2018 21:21:42 -0700
+Message-ID: <20180717042150.37761-4-keescook@chromium.org>
+References: <20180717042150.37761-1-keescook@chromium.org>
+Cc: Kees Cook <keescook@chromium.org>, Arnd Bergmann <arnd@arndb.de>,
+        Eric Biggers <ebiggers@google.com>,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+        Alasdair Kergon <agk@redhat.com>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Lars Persson <larper@axis.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Rabin Vincent <rabinv@axis.com>,
+        Tim Chen <tim.c.chen@linux.intel.com>,
+        linux-crypto@vger.kernel.org, qat-linux@intel.com,
+        dm-devel@redhat.com, linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180716173323.2058-1-logang@deltatee.com>
+In-Reply-To: <20180717042150.37761-1-keescook@chromium.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Now that ioread64 and iowrite64 are available in io-64-nonatomic,
-we can remove the hack at the top of ntb_hw_intel.c and replace it
-with an include.
+In the quest to remove all stack VLA usage from the kernel[1], this
+removes the VLAs in SHASH_DESC_ON_STACK (via crypto_shash_descsize())
+by using the maximum allowable size (which is now more clearly captured
+in a macro). Similar limits are turned into macros as well.
 
-Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-Reviewed-by: Andy Shevchenko <andy.shevchenko@gmail.com>
-Acked-by: Dave Jiang <dave.jiang@intel.com>
-Acked-by: Allen Hubbe <Allen.Hubbe@dell.com>
-Acked-by: Jon Mason <jdmason@kudzu.us>
+A review of existing sizes shows that SHA512_DIGEST_SIZE (64) is the
+largest digest size and that sizeof(struct sha3_state) (360) is the
+largest descriptor size. The corresponding maximums are reduced.
+
+[1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
+
+Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- drivers/ntb/hw/intel/ntb_hw_intel.h | 30 +-----------------------------
- 1 file changed, 1 insertion(+), 29 deletions(-)
+ crypto/shash.c        | 6 +++---
+ include/crypto/hash.h | 6 +++++-
+ 2 files changed, 8 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/ntb/hw/intel/ntb_hw_intel.h b/drivers/ntb/hw/intel/ntb_hw_intel.h
-index c49ff8970ce3..e071e28bca3f 100644
---- a/drivers/ntb/hw/intel/ntb_hw_intel.h
-+++ b/drivers/ntb/hw/intel/ntb_hw_intel.h
-@@ -53,6 +53,7 @@
+diff --git a/crypto/shash.c b/crypto/shash.c
+index 5d732c6bb4b2..ab6902c6dae7 100644
+--- a/crypto/shash.c
++++ b/crypto/shash.c
+@@ -458,9 +458,9 @@ static int shash_prepare_alg(struct shash_alg *alg)
+ {
+ 	struct crypto_alg *base = &alg->base;
  
- #include <linux/ntb.h>
- #include <linux/pci.h>
-+#include <linux/io-64-nonatomic-lo-hi.h>
+-	if (alg->digestsize > PAGE_SIZE / 8 ||
+-	    alg->descsize > PAGE_SIZE / 8 ||
+-	    alg->statesize > PAGE_SIZE / 8)
++	if (alg->digestsize > SHASH_MAX_DIGESTSIZE ||
++	    alg->descsize > SHASH_MAX_DESCSIZE ||
++	    alg->statesize > SHASH_MAX_STATESIZE)
+ 		return -EINVAL;
  
- /* PCI device IDs */
- #define PCI_DEVICE_ID_INTEL_NTB_B2B_JSF	0x3725
-@@ -218,33 +219,4 @@ static inline int pdev_is_gen3(struct pci_dev *pdev)
- 	return 0;
- }
+ 	base->cra_type = &crypto_shash_type;
+diff --git a/include/crypto/hash.h b/include/crypto/hash.h
+index 76e432cab75d..ae14cc0e0cdb 100644
+--- a/include/crypto/hash.h
++++ b/include/crypto/hash.h
+@@ -151,9 +151,13 @@ struct shash_desc {
+ 	void *__ctx[] CRYPTO_MINALIGN_ATTR;
+ };
  
--#ifndef ioread64
--#ifdef readq
--#define ioread64 readq
--#else
--#define ioread64 _ioread64
--static inline u64 _ioread64(void __iomem *mmio)
--{
--	u64 low, high;
--
--	low = ioread32(mmio);
--	high = ioread32(mmio + sizeof(u32));
--	return low | (high << 32);
--}
--#endif
--#endif
--
--#ifndef iowrite64
--#ifdef writeq
--#define iowrite64 writeq
--#else
--#define iowrite64 _iowrite64
--static inline void _iowrite64(u64 val, void __iomem *mmio)
--{
--	iowrite32(val, mmio);
--	iowrite32(val >> 32, mmio + sizeof(u32));
--}
--#endif
--#endif
--
- #endif
++#define SHASH_MAX_DIGESTSIZE     64
++#define SHASH_MAX_DESCSIZE      360
++#define SHASH_MAX_STATESIZE     512
++
+ #define SHASH_DESC_ON_STACK(shash, ctx)				  \
+ 	char __##shash##_desc[sizeof(struct shash_desc) +	  \
+-		crypto_shash_descsize(ctx)] CRYPTO_MINALIGN_ATTR; \
++		SHASH_MAX_DESCSIZE] CRYPTO_MINALIGN_ATTR; \
+ 	struct shash_desc *shash = (struct shash_desc *)__##shash##_desc
+ 
+ /**
 -- 
-2.11.0
+2.17.1
