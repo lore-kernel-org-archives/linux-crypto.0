@@ -1,9 +1,7 @@
 From: Kees Cook <keescook@chromium.org>
-Subject: [PATCH v5 07/11] crypto alg: Introduce generic max
-	blocksize and alignmask
-Date: Mon, 16 Jul 2018 21:21:46 -0700
-Message-ID: <20180717042150.37761-8-keescook@chromium.org>
-References: <20180717042150.37761-1-keescook@chromium.org>
+Subject: [PATCH v5 00/11] crypto: Remove VLA usage
+Date: Mon, 16 Jul 2018 21:21:39 -0700
+Message-ID: <20180717042150.37761-1-keescook@chromium.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
@@ -18,7 +16,6 @@ Cc: Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
 	Rabin Vincent <rabinv@axis.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <dm-devel-bounces@redhat.com>
-In-Reply-To: <20180717042150.37761-1-keescook@chromium.org>
 List-Unsubscribe: <https://www.redhat.com/mailman/options/dm-devel>,
 	<mailto:dm-devel-request@redhat.com?subject=unsubscribe>
 List-Archive: <https://www.redhat.com/archives/dm-devel>
@@ -30,58 +27,84 @@ Sender: dm-devel-bounces@redhat.com
 Errors-To: dm-devel-bounces@redhat.com
 List-Id: linux-crypto.vger.kernel.org
 
-In the quest to remove all stack VLA usage from the kernel[1], this
-exposes a new general upper bound on crypto blocksize and alignmask
-(higher than for the existing cipher limits) for VLA removal,
-and introduces new checks.
+v5:
+- limit AHASH_REQUEST_ON_STACK size only to non-async hash wrapping.
+- sanity-check ahash reqsize only when doing shash wrapping.
+- remove frame_warn changes in favor of shash conversions and other fixes.
+- send ahash to shash conversion patches and other fixes separately.
 
-At present, the highest cra_alignmask in the kernel is 63. The highest
-cra_blocksize is 144 (SHA3_224_BLOCK_SIZE, 18 8-byte words). For the
-new blocksize limit, I went with 160 (20 8-byte words).
+v4:
+- add back *_REQUEST_ON_STACK patches.
+- programmatically find stack sizes for *_REQUEST_ON_STACK patches.
+- whitelist some code that trips FRAME_WARN on 32-bit builds.
+- fix alignment patches.
+
+v3:
+- drop *_REQUEST_ON_STACK patches. The rest of this series is pretty
+  straight-forward, and I'd like to get them tested in -next while
+  we continue to chip away at the *_REQUEST_ON_STACK VLA removal patches
+  separately. "Part 2" will continue with those.
+
+v2:
+- use 512 instead of PAGE_SIZE / 8 to avoid bloat on large-page archs.
+- swtich xcbc to "16" max universally.
+- fix typo in bounds check for dm buffer size.
+- examine actual reqsizes for skcipher and ahash instead of guessing.
+- improve names and comments for alg maxes
+
+
+This is nearly the last of the VLA removals[1], but it's one of the
+largest because crypto gets used in lots of places. After looking
+through code, usage, reading the threads Gustavo started, and comparing
+the use-cases to the other VLA removals that have landed in the kernel,
+I think this series is likely the best way forward to shut the door on
+VLAs forever.
+
+As background, the crypto stack usage is for callers to do an immediate
+bit of work that doesn't allocate new memory. This means that other VLA
+removal techniques (like just using kmalloc) aren't workable, and the
+next common technique is needed: examination of maximum stack usage and
+the addition of sanity checks. This series does that, and in several
+cases, these maximums were already implicit in the code.
+
+This series is intended to land via the crypto tree for 4.19, though
+it touches dm and a few other things as well, since there are dependent
+patches (new crypto #defines being used, kbuild, etc).
+
+Thanks!
+
+-Kees
 
 [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
 
-Signed-off-by: Kees Cook <keescook@chromium.org>
----
- crypto/algapi.c         | 7 ++++++-
- include/crypto/algapi.h | 4 +++-
- 2 files changed, 9 insertions(+), 2 deletions(-)
+Kees Cook (11):
+  crypto: xcbc: Remove VLA usage
+  crypto: cbc: Remove VLA usage
+  crypto: shash: Remove VLA usage
+  dm integrity: Remove VLA usage
+  crypto: ahash: Remove VLA usage
+  dm verity fec: Remove VLA usage
+  crypto alg: Introduce generic max blocksize and alignmask
+  crypto: qat: Remove VLA usage
+  crypto: shash: Remove VLA usage in unaligned hashing
+  crypto: ahash: Remove VLA usage for AHASH_REQUEST_ON_STACK
+  crypto: skcipher: Remove VLA usage for SKCIPHER_REQUEST_ON_STACK
 
-diff --git a/crypto/algapi.c b/crypto/algapi.c
-index c0755cf4f53f..496fc51bf215 100644
---- a/crypto/algapi.c
-+++ b/crypto/algapi.c
-@@ -57,9 +57,14 @@ static int crypto_check_alg(struct crypto_alg *alg)
- 	if (alg->cra_alignmask & (alg->cra_alignmask + 1))
- 		return -EINVAL;
- 
--	if (alg->cra_blocksize > PAGE_SIZE / 8)
-+	/* General maximums for all algs. */
-+	if (alg->cra_alignmask > MAX_ALGAPI_ALIGNMASK)
- 		return -EINVAL;
- 
-+	if (alg->cra_blocksize > MAX_ALGAPI_BLOCKSIZE)
-+		return -EINVAL;
-+
-+	/* Lower maximums for specific alg types. */
- 	if (!alg->cra_type && (alg->cra_flags & CRYPTO_ALG_TYPE_MASK) ==
- 			       CRYPTO_ALG_TYPE_CIPHER) {
- 		if (alg->cra_alignmask > MAX_CIPHER_ALIGNMASK)
-diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
-index bd5e8ccf1687..21371ac8f355 100644
---- a/include/crypto/algapi.h
-+++ b/include/crypto/algapi.h
-@@ -20,8 +20,10 @@
- /*
-  * Maximum values for blocksize and alignmask, used to allocate
-  * static buffers that are big enough for any combination of
-- * ciphers and architectures.
-+ * algs and architectures. Ciphers have a lower maximum size.
-  */
-+#define MAX_ALGAPI_BLOCKSIZE		160
-+#define MAX_ALGAPI_ALIGNMASK		63
- #define MAX_CIPHER_BLOCKSIZE		16
- #define MAX_CIPHER_ALIGNMASK		15
- 
+ crypto/ahash.c                           |  4 +--
+ crypto/algapi.c                          |  7 +++-
+ crypto/algif_hash.c                      |  2 +-
+ crypto/shash.c                           | 42 +++++++++++++++---------
+ crypto/xcbc.c                            |  9 +++--
+ drivers/crypto/qat/qat_common/qat_algs.c |  8 +++--
+ drivers/md/dm-integrity.c                | 23 +++++++++----
+ drivers/md/dm-verity-fec.c               |  5 ++-
+ include/crypto/algapi.h                  |  4 ++-
+ include/crypto/cbc.h                     |  4 ++-
+ include/crypto/hash.h                    | 19 +++++++++--
+ include/crypto/internal/skcipher.h       |  1 +
+ include/crypto/skcipher.h                |  4 ++-
+ include/linux/compiler-gcc.h             |  1 -
+ 14 files changed, 97 insertions(+), 36 deletions(-)
+
 -- 
 2.17.1
