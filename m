@@ -1,85 +1,47 @@
-From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-Subject: [PATCH] crypto: rmd320 - use swap macro in rmd320_transform
-Date: Wed, 18 Jul 2018 12:19:08 -0500
-Message-ID: <20180718171908.GA22962@embeddedor.com>
+From: Ken Moffat <zarniwhoop73@googlemail.com>
+Subject: Re: [PATCH] random: add a config option to trust the CPU's hwrng
+Date: Wed, 18 Jul 2018 18:36:08 +0100
+Message-ID: <CANVEwpY2H+OBnYNAf15bRRbmepFCerWrisLiLQ=h3+_692MY7A@mail.gmail.com>
+References: <20180718014344.1309-1-tytso@mit.edu> <20180718015154.GE3489@thunk.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+To: "Theodore Y. Ts'o" <tytso@mit.edu>, linux-crypto@vger.kernel.org,
+        Linux Kernel Developers List <linux-kernel@vger.kernel.org>,
+        labbott@redhat.com
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
+In-Reply-To: <20180718015154.GE3489@thunk.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Make use of the swap macro and remove unnecessary variable *tmp*.
-This makes the code easier to read and maintain.
+On 18 July 2018 at 02:51, Theodore Y. Ts'o <tytso@mit.edu> wrote:
+> On Tue, Jul 17, 2018 at 09:43:44PM -0400, Theodore Ts'o wrote:
+>> This gives the user building their own kernel (or a Linux
+>> distribution) the option of deciding whether or not to trust the CPU's
+>> hardware random number generator (e.g., RDRAND for x86 CPU's) as being
+>> correctly implemented and not having a back door introduced (perhaps
+>> courtesy of a Nation State's law enforcement or intelligence
+>> agencies).
+>>
+>> This will prevent getrandom(2) from blocking, if there is a
+>> willingness to trust the CPU manufacturer.
+>>
+>> Signed-off-by: Theodore Ts'o <tytso@mit.edu>
 
-This code was detected with the help of Coccinelle.
+(Apologies if this is a duplicate reply, I misread the tiny text in gmail a=
+sking
+me if it was ok to send non plain text (dunno what caused that), so I guess
+the first version went to /dev/null, at least as far as the list is concern=
+ed.)
 
-Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
----
- crypto/rmd320.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+On my haswell, since 4.16.4 and the corresponding 4.17-rc. my (sysv)
+bootscript to start unbound hangs for a couple of minutes unless I use the
+keyboard. Same on my kaveri.  Those both lack spinning rust, but on two
+other SSD-only machines (ryzen, phenom) the security fix did not slow down
+the boot.
 
-diff --git a/crypto/rmd320.c b/crypto/rmd320.c
-index ab3cf93..3ae1df5 100644
---- a/crypto/rmd320.c
-+++ b/crypto/rmd320.c
-@@ -53,7 +53,7 @@ struct rmd320_ctx {
- 
- static void rmd320_transform(u32 *state, const __le32 *in)
- {
--	u32 aa, bb, cc, dd, ee, aaa, bbb, ccc, ddd, eee, tmp;
-+	u32 aa, bb, cc, dd, ee, aaa, bbb, ccc, ddd, eee;
- 
- 	/* Initialize left lane */
- 	aa = state[0];
-@@ -106,7 +106,7 @@ static void rmd320_transform(u32 *state, const __le32 *in)
- 	ROUND(aaa, bbb, ccc, ddd, eee, F5, KK1, in[12],  6);
- 
- 	/* Swap contents of "a" registers */
--	tmp = aa; aa = aaa; aaa = tmp;
-+	swap(aa, aaa);
- 
- 	/* round 2: left lane" */
- 	ROUND(ee, aa, bb, cc, dd, F2, K2, in[7],   7);
-@@ -145,7 +145,7 @@ static void rmd320_transform(u32 *state, const __le32 *in)
- 	ROUND(eee, aaa, bbb, ccc, ddd, F4, KK2, in[2],  11);
- 
- 	/* Swap contents of "b" registers */
--	tmp = bb; bb = bbb; bbb = tmp;
-+	swap(bb, bbb);
- 
- 	/* round 3: left lane" */
- 	ROUND(dd, ee, aa, bb, cc, F3, K3, in[3],  11);
-@@ -184,7 +184,7 @@ static void rmd320_transform(u32 *state, const __le32 *in)
- 	ROUND(ddd, eee, aaa, bbb, ccc, F3, KK3, in[13],  5);
- 
- 	/* Swap contents of "c" registers */
--	tmp = cc; cc = ccc; ccc = tmp;
-+	swap(cc, ccc);
- 
- 	/* round 4: left lane" */
- 	ROUND(cc, dd, ee, aa, bb, F4, K4, in[1],  11);
-@@ -223,7 +223,7 @@ static void rmd320_transform(u32 *state, const __le32 *in)
- 	ROUND(ccc, ddd, eee, aaa, bbb, F2, KK4, in[14],  8);
- 
- 	/* Swap contents of "d" registers */
--	tmp = dd; dd = ddd; ddd = tmp;
-+	swap(dd, ddd);
- 
- 	/* round 5: left lane" */
- 	ROUND(bb, cc, dd, ee, aa, F5, K5, in[4],   9);
-@@ -262,7 +262,7 @@ static void rmd320_transform(u32 *state, const __le32 *in)
- 	ROUND(bbb, ccc, ddd, eee, aaa, F1, KK5, in[11], 11);
- 
- 	/* Swap contents of "e" registers */
--	tmp = ee; ee = eee; eee = tmp;
-+	swap(ee, eee);
- 
- 	/* combine results */
- 	state[0] += aa;
--- 
-2.7.4
+So, since I've got better things to do than _worry_ about than whether my
+government, or yours, is spying on me, I would prefer to have the option to
+take the risk on the machines that will then boot faster.
+
+=C4=B8en
