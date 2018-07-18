@@ -1,44 +1,68 @@
-From: "Theodore Y. Ts'o" <tytso@mit.edu>
-Subject: Re: [PATCH] random: addu a config option to trust the CPU's hwrng
-Date: Wed, 18 Jul 2018 13:36:21 -0400
-Message-ID: <20180718173621.GC30706@thunk.org>
-References: <20180718014344.1309-1-tytso@mit.edu>
- <20180718015154.GE3489@thunk.org>
- <CACXcFmk7D5t9yg9VxhKZgMvqK-LmFF0d7Dh9A3hsoGTfzzeM8A@mail.gmail.com>
+From: Joe Perches <joe@perches.com>
+Subject: make sure swap arguments are the same type? (was: Re: [PATCH]
+ crypto: rmd320 - use swap macro in rmd320_transform)
+Date: Wed, 18 Jul 2018 11:31:13 -0700
+Message-ID: <4dbef38e6020d6cb78e860a9f01fcd1de9f0fb52.camel@perches.com>
+References: <20180718171908.GA22962@embeddedor.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux Kernel Developers List <linux-kernel@vger.kernel.org>,
-        labbott@redhat.com
-To: Sandy Harris <sandyinchina@gmail.com>
+Content-Type: text/plain; charset="ISO-8859-1"
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Pablo Neira Ayuso <pablo@netfilter.org>
+To: "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Andrew Morton <akpm@linux-foundation.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <CACXcFmk7D5t9yg9VxhKZgMvqK-LmFF0d7Dh9A3hsoGTfzzeM8A@mail.gmail.com>
+In-Reply-To: <20180718171908.GA22962@embeddedor.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Jul 18, 2018 at 11:14:20AM -0400, Sandy Harris wrote:
-> Instead, I had a compile-time option to choose a number 0-32
-> for how much entropy to assume a 32-bit value from the HWRNG
-> contains. Default was something less than 32. I debated values
-> in the 24-30 range, don't recall what I chose & don't think it
-> Matters hugely.
-> 
-> Is that a better approach than the binary choice?
+On Wed, 2018-07-18 at 12:19 -0500, Gustavo A. R. Silva wrote:
+> swap
 
-This patch is only affecting the initialization of the CRNG.  It
-doesn't do anything about the entropy estimator, so it doesn't change
-the behavior of /dev/random, for example.
+Perhaps the swap macro should verify that the
+swap(a, b) arguments are the same type.
 
-In practice I doubt most people would be able to deal with a numerical
-dial, and I'm trying to ecourage people to use getrandom(2).  I view
-/dev/random as a legacy interface, and for most people a CRNG is quite
-sufficient.  For those people who are super paranoid and want a "true
-random number generator" (and the meaning of that is hazy) because a
-CRNG is Not Enough, my recommendation these days is that they get
-something like an open hardware RNG solution, such as ChaosKey from
-Altus Metrum[1].
+Something like the patch below, but this patch
+causes a compilation failure on at least a couple
+cases that aren't obviously correct in
 
-[1] https://altusmetrum.org/ChaosKey/
+net/netfilter/ipset/ip_set_bitmap_port.c
+	where a u16 is swapped with a u32.
 
-						- Ted
+and
+
+net/netfilter/ipset/ip_set_hash_netport.c
+	where a single bit bitfield is swapped with a u8
+---
+ include/linux/kernel.h | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
+
+diff --git a/include/linux/kernel.h b/include/linux/kernel.h
+index d6aac75b51ba..506b59e0da24 100644
+--- a/include/linux/kernel.h
++++ b/include/linux/kernel.h
+@@ -969,14 +969,19 @@ static inline void ftrace_dump(enum ftrace_dump_mode oops_dump_mode) { }
+  */
+ #define clamp_val(val, lo, hi) clamp_t(typeof(val), val, lo, hi)
+ 
+-
+ /**
+  * swap - swap values of @a and @b
+  * @a: first value
+  * @b: second value
++ * @a and @b must be the same type
+  */
+-#define swap(a, b) \
+-	do { typeof(a) __tmp = (a); (a) = (b); (b) = __tmp; } while (0)
++#define swap(a, b)							\
++do {									\
++	typeof(a) __tmp = (a);						\
++	BUILD_BUG_ON(!__same_type(typeof(a), typeof(b)));		\
++	(a) = (b);							\
++	(b) = __tmp;							\
++} while (0)
+ 
+ /* This counts to 12. Any more, it will return 13th argument. */
+ #define __COUNT_ARGS(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _n, X...) _n
