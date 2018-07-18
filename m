@@ -1,20 +1,21 @@
-From: "Theodore Y. Ts'o" <tytso@mit.edu>
+From: Randy Dunlap <rdunlap@infradead.org>
 Subject: Re: [PATCH] random: add a config option to trust the CPU's hwrng
-Date: Tue, 17 Jul 2018 21:51:54 -0400
-Message-ID: <20180718015154.GE3489@thunk.org>
+Date: Tue, 17 Jul 2018 22:09:10 -0700
+Message-ID: <ec07bf22-31aa-638e-b40b-4f3efb1b77b5@infradead.org>
 References: <20180718014344.1309-1-tytso@mit.edu>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Cc: labbott@redhat.com
-To: linux-crypto@vger.kernel.org,
+To: Theodore Ts'o <tytso@mit.edu>, linux-crypto@vger.kernel.org,
         Linux Kernel Developers List <linux-kernel@vger.kernel.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
 In-Reply-To: <20180718014344.1309-1-tytso@mit.edu>
+Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Jul 17, 2018 at 09:43:44PM -0400, Theodore Ts'o wrote:
+On 07/17/2018 06:43 PM, Theodore Ts'o wrote:
 > This gives the user building their own kernel (or a Linux
 > distribution) the option of deciding whether or not to trust the CPU's
 > hardware random number generator (e.g., RDRAND for x86 CPU's) as being
@@ -26,16 +27,6 @@ On Tue, Jul 17, 2018 at 09:43:44PM -0400, Theodore Ts'o wrote:
 > willingness to trust the CPU manufacturer.
 > 
 > Signed-off-by: Theodore Ts'o <tytso@mit.edu>
-
-Note, I had meant to tag this with an RFC.  I'm not sure I really want
-to push this to Linus yet.  If you have an opinion, let me know.
-
-Thanks!
-
-	   	     	      	    - Ted
-
-
-
 > ---
 > 
 >  I'm not sure Linux distro's will thank us for this.  The problem is
@@ -76,52 +67,42 @@ Thanks!
 >  
 >  endmenu
 >  
+
+Hi Ted,
+
+In case you go further with this:
+
+
 > +config RANDOM_TRUST_CPU
 > +       bool "Trust the CPU manufacturer to initialize Linux's CRNG"
 > +       depends on (X86 || X86_64 || X86_32 || S390 || PPC)
+
+	depends on X86 || S390 || PPC
+should be sufficient.
+
 > +       default n
 > +       help
+
+and all 4 lines above should be indented with one tab instead of spaces.
+
 > +	Assume that CPU manufacurer (e.g., Intel or AMD for RDSEED or
+
+	                manufacturer
+
 > +	RDRAND, IBM for the S390 and Power PC architectures) is trustworthy
 > +	for the purposes of initializing Linux's CRNG.  Since this is not
 > +	something that can be indepedently audited, this amounts to trusting
+
+	                      independently
+
 > +	that CPU manufacturer (perhaps with the insistance or requirement
+
+	                                        insistence
+
 > +	of a Nation State's intelligence or law enforcement agencies)
 > +	has not installed a hidden back door to compromise the CPU's
 > +	random number generation facilities.
-> +
-> diff --git a/drivers/char/random.c b/drivers/char/random.c
-> index 34ddfd57419b..f4013b8a711b 100644
-> --- a/drivers/char/random.c
-> +++ b/drivers/char/random.c
-> @@ -782,6 +782,7 @@ static void invalidate_batched_entropy(void);
->  static void crng_initialize(struct crng_state *crng)
->  {
->  	int		i;
-> +	int		arch_init = 1;
->  	unsigned long	rv;
->  
->  	memcpy(&crng->state[0], "expand 32-byte k", 16);
-> @@ -792,10 +793,18 @@ static void crng_initialize(struct crng_state *crng)
->  		_get_random_bytes(&crng->state[4], sizeof(__u32) * 12);
->  	for (i = 4; i < 16; i++) {
->  		if (!arch_get_random_seed_long(&rv) &&
-> -		    !arch_get_random_long(&rv))
-> +		    !arch_get_random_long(&rv)) {
->  			rv = random_get_entropy();
-> +			arch_init = 0;
-> +		}
->  		crng->state[i] ^= rv;
->  	}
-> +#ifdef CONFIG_RANDOM_TRUST_CPU
-> +	if (arch_init) {
-> +		crng_init = 2;
-> +		pr_notice("random: crng done (trusting CPU's manufacturer)\n");
-> +	}
-> +#endif
->  	crng->init_time = jiffies - CRNG_RESEED_INTERVAL - 1;
->  }
->  
-> -- 
-> 2.18.0.rc0
-> 
+
+
+-- 
+~Randy
