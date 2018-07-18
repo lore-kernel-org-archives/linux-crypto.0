@@ -1,105 +1,98 @@
 From: Eric Biggers <ebiggers3@gmail.com>
-Subject: Re: [dm-devel] [PATCH v5 05/11] crypto: ahash: Remove VLA usage
-Date: Tue, 17 Jul 2018 16:12:09 -0700
-Message-ID: <20180717231209.GJ75957@gmail.com>
-References: <20180717042150.37761-1-keescook@chromium.org>
- <20180717042150.37761-6-keescook@chromium.org>
- <20180717163936.GB75957@gmail.com>
- <CAGXu5jKKD4hzeFEdvY5QdahEr4POd9ZM_B_5Z_iU-Qmx3AYSfQ@mail.gmail.com>
+Subject: Re: [PATCH 0/6] lib/crc32: treewide: Use existing define with
+ polynomial
+Date: Tue, 17 Jul 2018 17:12:58 -0700
+Message-ID: <20180718001258.GA210746@gmail.com>
+References: <20180717160541.3843-1-krzk@kernel.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Eric Biggers <ebiggers@google.com>, qat-linux@intel.com,
-        LKML <linux-kernel@vger.kernel.org>, dm-devel@redhat.com,
-        linux-crypto <linux-crypto@vger.kernel.org>,
-        Lars Persson <larper@axis.com>,
-        Tim Chen <tim.c.chen@linux.intel.com>,
-        Alasdair Kergon <agk@redhat.com>,
-        Rabin Vincent <rabinv@axis.com>
-To: Kees Cook <keescook@chromium.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Prashant Sreedharan <prashant@broadcom.com>,
+ Pantelis Antoniou <pantelis.antoniou@gmail.com>, devel@driverdev.osuosl.org,
+ Herbert Xu <herbert@gondor.apana.org.au>, Jose Abreu <Jose.Abreu@synopsys.com>,
+ Tom Lendacky <thomas.lendacky@amd.com>,
+ Alexandre Torgue <alexandre.torgue@st.com>,
+ Siva Reddy Kallam <siva.kallam@broadcom.com>,
+ Michael Chan <mchan@broadcom.com>, Thomas Gleixner <tglx@linutronix.de>,
+ linux-arm-kernel@lists.infradead.org,
+ Florian Schilhabel <florian.c.schilhabel@googlemail.com>,
+ Fugang Duan <fugang.duan@nxp.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, linux-kernel@vger.kernel.org,
+ linux-crypto@vger.kernel.org, Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ netdev@vger.kernel.org, Vitaly Bordug <vbordug@ru.mvista.com>,
+ linuxppc-dev@lists.ozlabs.org, "David S. Miller" <davem@davemloft.net>,
+ Larry Finger <Larry.Finger@lwfinger.net>
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
 Content-Disposition: inline
-In-Reply-To: <CAGXu5jKKD4hzeFEdvY5QdahEr4POd9ZM_B_5Z_iU-Qmx3AYSfQ@mail.gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <20180717160541.3843-1-krzk@kernel.org>
+List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
+List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
+List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
+List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
+List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
+Errors-To: driverdev-devel-bounces@linuxdriverproject.org
+Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Jul 17, 2018 at 01:07:50PM -0700, Kees Cook wrote:
-> On Tue, Jul 17, 2018 at 9:39 AM, Eric Biggers <ebiggers3@gmail.com> wrote:
-> > On Mon, Jul 16, 2018 at 09:21:44PM -0700, Kees Cook wrote:
-> >> In the quest to remove all stack VLA usage from the kernel[1], this
-> >> introduces max size macros for ahash, as already done for shash, and
-> >> adjust the crypto user to max state size.
-> >>
-> >> [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
-> >>
-> >> Signed-off-by: Kees Cook <keescook@chromium.org>
-> >> ---
-> >>  crypto/ahash.c        | 4 ++--
-> >>  crypto/algif_hash.c   | 2 +-
-> >>  include/crypto/hash.h | 3 +++
-> >>  3 files changed, 6 insertions(+), 3 deletions(-)
-> >>
-> >> diff --git a/crypto/ahash.c b/crypto/ahash.c
-> >> index a64c143165b1..6435bdbe42fd 100644
-> >> --- a/crypto/ahash.c
-> >> +++ b/crypto/ahash.c
-> >> @@ -550,8 +550,8 @@ static int ahash_prepare_alg(struct ahash_alg *alg)
-> >>  {
-> >>       struct crypto_alg *base = &alg->halg.base;
-> >>
-> >> -     if (alg->halg.digestsize > PAGE_SIZE / 8 ||
-> >> -         alg->halg.statesize > PAGE_SIZE / 8 ||
-> >> +     if (alg->halg.digestsize > AHASH_MAX_DIGESTSIZE ||
-> >> +         alg->halg.statesize > AHASH_MAX_STATESIZE ||
-> >>           alg->halg.statesize == 0)
-> >>               return -EINVAL;
-> >>
-> >> diff --git a/crypto/algif_hash.c b/crypto/algif_hash.c
-> >> index bfcf595fd8f9..8974ee8ebead 100644
-> >> --- a/crypto/algif_hash.c
-> >> +++ b/crypto/algif_hash.c
-> >> @@ -239,7 +239,7 @@ static int hash_accept(struct socket *sock, struct socket *newsock, int flags,
-> >>       struct alg_sock *ask = alg_sk(sk);
-> >>       struct hash_ctx *ctx = ask->private;
-> >>       struct ahash_request *req = &ctx->req;
-> >> -     char state[crypto_ahash_statesize(crypto_ahash_reqtfm(req)) ? : 1];
-> >> +     char state[AHASH_MAX_STATESIZE];
-> >>       struct sock *sk2;
-> >>       struct alg_sock *ask2;
-> >>       struct hash_ctx *ctx2;
-> >> diff --git a/include/crypto/hash.h b/include/crypto/hash.h
-> >> index ae14cc0e0cdb..4fcd0e2368cd 100644
-> >> --- a/include/crypto/hash.h
-> >> +++ b/include/crypto/hash.h
-> >> @@ -64,6 +64,9 @@ struct ahash_request {
-> >>       void *__ctx[] CRYPTO_MINALIGN_ATTR;
-> >>  };
-> >>
-> >> +#define AHASH_MAX_DIGESTSIZE 512
-> >> +#define AHASH_MAX_STATESIZE  512
-> >> +
-> >
-> > Why is AHASH_MAX_DIGESTSIZE (512) so much larger than SHASH_MAX_DIGESTSIZE (64)?
-> > I would have expected them to be the same.
+Hi Krzysztof,
+
+On Tue, Jul 17, 2018 at 06:05:35PM +0200, Krzysztof Kozlowski wrote:
+> Hi,
 > 
-> This was a direct replacement of the PAGE_SIZE / 8 original limit.
-> This this didn't trip any frame size warnings, it seemed like we
-> didn't need to do the more narrow limitations done elsewhere.
+> Kernel defines same polynomial for CRC-32 in few places.
+> This is unnecessary duplication of the same value. Also this might
+> be error-prone for future code - every driver will define the
+> polynomial again.
 > 
-> I am, of course, happy to do a manual review and find a lower
-> alternative if that's desired.
+> This is an attempt to unify definition of polynomial.  Few obvious
+> hard-coded locations are fixed with define.
+> 
+> All series depend on each 1/6 and 2/6.
+> 
+> This could be merged in two different merge windows (1st lib/crc and then
+> the rest) or taken through one tree.
+> 
+> It would be nice to get some testing. Only generic lib/crc, bunzip, xz_crc32
+> and Freescale's Ethernet driver were tested on HW.  Rest got just different
+> builds.
+> 
+> Best regards,
+> Krzysztof
+> 
+> Krzysztof Kozlowski (6):
+>   lib/crc: Move polynomial definition to separate header
+>   lib/crc: Use consistent naming for CRC-32 polynomials
+>   crypto: stm32_crc32 - Use existing define with polynomial
+>   net: ethernet: Use existing define with polynomial
+>   staging: rtl: Use existing define with polynomial
+>   lib: Use existing define with polynomial
+> 
+>  drivers/crypto/stm32/stm32_crc32.c               | 11 ++++-------
+>  drivers/net/ethernet/amd/xgbe/xgbe-dev.c         |  4 ++--
+>  drivers/net/ethernet/apple/bmac.c                |  8 ++------
+>  drivers/net/ethernet/broadcom/tg3.c              |  3 ++-
+>  drivers/net/ethernet/freescale/fec_main.c        |  4 ++--
+>  drivers/net/ethernet/freescale/fs_enet/fec.h     |  3 ---
+>  drivers/net/ethernet/freescale/fs_enet/mac-fec.c |  3 ++-
+>  drivers/net/ethernet/micrel/ks8851_mll.c         |  3 ++-
+>  drivers/net/ethernet/synopsys/dwc-xlgmac-hw.c    |  4 ++--
+>  drivers/staging/rtl8712/rtl871x_security.c       |  5 ++---
+>  drivers/staging/rtl8723bs/core/rtw_security.c    |  5 ++---
+>  include/linux/crc32poly.h                        | 20 ++++++++++++++++++++
+>  lib/crc32.c                                      | 11 ++++++-----
+>  lib/crc32defs.h                                  | 14 --------------
+>  lib/decompress_bunzip2.c                         |  3 ++-
+>  lib/gen_crc32table.c                             |  5 +++--
+>  lib/xz/xz_crc32.c                                |  3 ++-
+>  17 files changed, 55 insertions(+), 54 deletions(-)
+>  create mode 100644 include/linux/crc32poly.h
 > 
 
-I just don't see why ahash algorithms would need such a huge maximum digest
-size.  Don't the 'ahash' algorithms all have 'shash' equivalents too?  Is there
-actually any hash algorithm, either shash or ahash, in the Linux kernel that has
-a digest size greater than 64 bytes (512 bits)?  Note that for a real
-cryptographic hash there isn't really any need for a digest size larger than
-that, since that already gives you 256-bit collision resistance; that's why
-SHA-2 and SHA-3 max out at that size.
+Did you check whether any of these users can be converted to use the CRC
+implementations in lib/, so they wouldn't need the polynomial definition
+themselves?
 
 - Eric
