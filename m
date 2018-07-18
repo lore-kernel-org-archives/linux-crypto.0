@@ -1,78 +1,110 @@
 From: Theodore Ts'o <tytso@mit.edu>
-Subject: [PATCH -v2] random: mix rdrand with entropy sent in from userspace
-Date: Tue, 17 Jul 2018 21:43:23 -0400
-Message-ID: <20180718014323.1179-1-tytso@mit.edu>
-Cc: labbott@redhat.com, Theodore Ts'o <tytso@mit.edu>,
-        stable@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>
-To: linux-crypto@vger.kernel.org, linux-random@thunk.org
-Return-path: <stable-owner@vger.kernel.org>
-Sender: stable-owner@vger.kernel.org
+Subject: [PATCH] random: add a config option to trust the CPU's hwrng
+Date: Tue, 17 Jul 2018 21:43:44 -0400
+Message-ID: <20180718014344.1309-1-tytso@mit.edu>
+Cc: labbott@redhat.com, Theodore Ts'o <tytso@mit.edu>
+To: linux-crypto@vger.kernel.org,
+        Linux Kernel Developers List <linux-kernel@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Fedora has integrated the jitter entropy daemon to work around slow
-boot problems, especially on VM's that don't support virtio-rng:
+This gives the user building their own kernel (or a Linux
+distribution) the option of deciding whether or not to trust the CPU's
+hardware random number generator (e.g., RDRAND for x86 CPU's) as being
+correctly implemented and not having a back door introduced (perhaps
+courtesy of a Nation State's law enforcement or intelligence
+agencies).
 
-    https://bugzilla.redhat.com/show_bug.cgi?id=1572944
-
-It's understandable why they did this, but the Jitter entropy daemon
-works fundamentally on the principle: "the CPU microarchitecture is
-**so** complicated and we can't figure it out, so it *must* be
-random".  Yes, it uses statistical tests to "prove" it is secure, but
-AES_ENCRYPT(NSA_KEY, COUNTER++) will also pass statistical tests with
-flying colors.
-
-So if RDRAND is available, mix it into entropy submitted from
-userspace.  It can't hurt, and if you believe the NSA has backdoored
-RDRAND, then they probably have enough details about the Intel
-microarchitecture that they can reverse engineer how the Jitter
-entropy daemon affects the microarchitecture, and attack its output
-stream.  And if RDRAND is in fact an honest DRNG, it will immeasurably
-improve on what the Jitter entropy daemon might produce.
-
-This also provides some protection against someone who is able to read
-or set the entropy seed file.
+This will prevent getrandom(2) from blocking, if there is a
+willingness to trust the CPU manufacturer.
 
 Signed-off-by: Theodore Ts'o <tytso@mit.edu>
-Cc: stable@vger.kernel.org
-Cc: Arnd Bergmann <arnd@arndb.de>
 ---
 
-Changes in v2:
- - Fix silly typo that Arnd pointed out in check the return value of
-   arch_get_random_int()
- - Break out of the loop after the first failure reported by
-   arch_get_random_int()
+ I'm not sure Linux distro's will thank us for this.  The problem is
+ trusting the CPU manfuacturer can be an emotional / political issue.
 
- drivers/char/random.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+ For example, assume that China has decided that as a result of the
+ "death sentence" that the US government threatened to impose on ZTE
+ after they were caught introducing privacy violating malware on US
+ comsumers, that they needed to be self-sufficient in their technology
+ sector, and so they decided the needed to produce their own CPU.
 
+ Even if I were convinced that Intel hadn't backdoored RDRAND (or an
+ NSA agent backdoored RDRAND for them) such that the NSA had a NOBUS
+ (nobody but us) capability to crack RDRAND generated numbers, if we
+ made a change to unconditionally trust RDRAND, then I didn't want the
+ upstream kernel developers to have to answer the question, "why are
+ you willing to trust Intel, but you aren't willing to trust a company
+ owned and controlled by a PLA general?"  (Or a company owned and
+ controlled by one of Putin's Oligarchs, if that makes you feel
+ better.)
+
+ With this patch, we don't put ourselves in this position --- but we
+ do put the Linux distro's in this position intead.  The upside is it
+ gives the choice to each person building their own Linux kernel to
+ decide whether trusting RDRAND is worth it to avoid hangs due to
+ userspace trying to get cryptographic-grade entropy early in the boot
+ process.  (Note: I trust RDRAND more than I do Jitter Entropy.)
+
+ drivers/char/Kconfig  | 14 ++++++++++++++
+ drivers/char/random.c | 11 ++++++++++-
+ 2 files changed, 24 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/char/Kconfig b/drivers/char/Kconfig
+index 212f447938ae..fe2930c4ecf0 100644
+--- a/drivers/char/Kconfig
++++ b/drivers/char/Kconfig
+@@ -554,3 +554,17 @@ config ADI
+ 
+ endmenu
+ 
++config RANDOM_TRUST_CPU
++       bool "Trust the CPU manufacturer to initialize Linux's CRNG"
++       depends on (X86 || X86_64 || X86_32 || S390 || PPC)
++       default n
++       help
++	Assume that CPU manufacurer (e.g., Intel or AMD for RDSEED or
++	RDRAND, IBM for the S390 and Power PC architectures) is trustworthy
++	for the purposes of initializing Linux's CRNG.  Since this is not
++	something that can be indepedently audited, this amounts to trusting
++	that CPU manufacturer (perhaps with the insistance or requirement
++	of a Nation State's intelligence or law enforcement agencies)
++	has not installed a hidden back door to compromise the CPU's
++	random number generation facilities.
++
 diff --git a/drivers/char/random.c b/drivers/char/random.c
-index cd888d4ee605..bd449ad52442 100644
+index 34ddfd57419b..f4013b8a711b 100644
 --- a/drivers/char/random.c
 +++ b/drivers/char/random.c
-@@ -1895,14 +1895,22 @@ static int
- write_pool(struct entropy_store *r, const char __user *buffer, size_t count)
+@@ -782,6 +782,7 @@ static void invalidate_batched_entropy(void);
+ static void crng_initialize(struct crng_state *crng)
  {
- 	size_t bytes;
--	__u32 buf[16];
-+	__u32 t, buf[16];
- 	const char __user *p = buffer;
+ 	int		i;
++	int		arch_init = 1;
+ 	unsigned long	rv;
  
- 	while (count > 0) {
-+		int b, i = 0;
-+
- 		bytes = min(count, sizeof(buf));
- 		if (copy_from_user(&buf, p, bytes))
- 			return -EFAULT;
- 
-+		for (b = bytes ; b > 0 ; b -= sizeof(__u32), i++) {
-+			if (!arch_get_random_int(&t))
-+				break;
-+			buf[i] ^= t;
+ 	memcpy(&crng->state[0], "expand 32-byte k", 16);
+@@ -792,10 +793,18 @@ static void crng_initialize(struct crng_state *crng)
+ 		_get_random_bytes(&crng->state[4], sizeof(__u32) * 12);
+ 	for (i = 4; i < 16; i++) {
+ 		if (!arch_get_random_seed_long(&rv) &&
+-		    !arch_get_random_long(&rv))
++		    !arch_get_random_long(&rv)) {
+ 			rv = random_get_entropy();
++			arch_init = 0;
 +		}
-+
- 		count -= bytes;
- 		p += bytes;
+ 		crng->state[i] ^= rv;
+ 	}
++#ifdef CONFIG_RANDOM_TRUST_CPU
++	if (arch_init) {
++		crng_init = 2;
++		pr_notice("random: crng done (trusting CPU's manufacturer)\n");
++	}
++#endif
+ 	crng->init_time = jiffies - CRNG_RESEED_INTERVAL - 1;
+ }
  
 -- 
 2.18.0.rc0
