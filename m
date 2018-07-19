@@ -1,13 +1,20 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+From: Kees Cook <keescook@chromium.org>
 Subject: Re: [PATCH v4 11/14] treewide: Prepare to remove VLA usage for AHASH_REQUEST_ON_STACK
-Date: Thu, 19 Jul 2018 11:55:51 +0900
-Message-ID: <B278D0F7-71B6-4F3D-B625-D8B0298CE5B4@linaro.org>
-References: <20180711203619.1020-1-keescook@chromium.org> <20180711203619.1020-12-keescook@chromium.org> <CAK8P3a3356dbruUfS_+fj9f+X-0jbNE8WMe5sWhJmuRY9Nvcbg@mail.gmail.com> <20180713004038.lwibdesz7ohhoind@gondor.apana.org.au> <CAGXu5jLYmC7U=bucFZCLsSXNX=T4WhCccR6hx9dwROYF+ZMt0Q@mail.gmail.com> <20180713034406.zwu2pkp3f2onybxs@gondor.apana.org.au> <CAGXu5jLR0zJ6b9axJuG_uvttNShNcN3rhQKGVjW37qPd9saY-Q@mail.gmail.com> <20180713052029.cfo24bsr5swtbdja@gondor.apana.org.au> <CAGXu5jLG4gE44z9cXL3-D1bjbZB1RgTnTsb3PWhU7B3NdRrwVg@mail.gmail.com> <CAK8P3a3nk4-EewKTXcLENTb86r1+bJz_WrkJoJt+D1uTwcpxPA@mail.gmail.com> <CAGXu5j+Q_jc_f9VybyoJqmV7_Q-3hqnC-pOubfNsi7uyAROVrQ@mail.gmail.com> <CAK8P3a3Dh+g=v++BMCtmmiOSnVu4CEUgss0U7BZS_K45aTddqg@mail.gmail.com> <CAKv+Gu-cOV6uo6MpLxr9uQSTT-ku_wn9+D7CC4+3maJtvcaG
- oA@mail.gmail.com> <CAKv+Gu8e9sm42NKwQvQzD33JTHSaEY2q7sm0W0065dDz_rzSaA@mail.gmail.com> <CAGXu5jLuWfZFTs390c3WSAReLrQ6_KOOvr0FYjXhUQ5h5b8xWA@mail.gmail.com>
-Mime-Version: 1.0 (1.0)
-Content-Type: text/plain;
-        charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
+Date: Wed, 18 Jul 2018 20:09:01 -0700
+Message-ID: <CAGXu5jJyyi1FvT9PytMkU_rPeSqMSHR7asjn8ykShZGGRPPRDg@mail.gmail.com>
+References: <20180711203619.1020-1-keescook@chromium.org> <20180711203619.1020-12-keescook@chromium.org>
+ <CAK8P3a3356dbruUfS_+fj9f+X-0jbNE8WMe5sWhJmuRY9Nvcbg@mail.gmail.com>
+ <20180713004038.lwibdesz7ohhoind@gondor.apana.org.au> <CAGXu5jLYmC7U=bucFZCLsSXNX=T4WhCccR6hx9dwROYF+ZMt0Q@mail.gmail.com>
+ <20180713034406.zwu2pkp3f2onybxs@gondor.apana.org.au> <CAGXu5jLR0zJ6b9axJuG_uvttNShNcN3rhQKGVjW37qPd9saY-Q@mail.gmail.com>
+ <20180713052029.cfo24bsr5swtbdja@gondor.apana.org.au> <CAGXu5jLG4gE44z9cXL3-D1bjbZB1RgTnTsb3PWhU7B3NdRrwVg@mail.gmail.com>
+ <CAK8P3a3nk4-EewKTXcLENTb86r1+bJz_WrkJoJt+D1uTwcpxPA@mail.gmail.com>
+ <CAGXu5j+Q_jc_f9VybyoJqmV7_Q-3hqnC-pOubfNsi7uyAROVrQ@mail.gmail.com>
+ <CAK8P3a3Dh+g=v++BMCtmmiOSnVu4CEUgss0U7BZS_K45aTddqg@mail.gmail.com>
+ <CAKv+Gu-cOV6uo6MpLxr9uQSTT-ku_wn9+D7CC4+3maJtvcaGoA@mail.gmail.com>
+ <CAKv+Gu8e9sm42NKwQvQzD33JTHSaEY2q7sm0W0065dDz_rzSaA@mail.gmail.com>
+ <CAGXu5jLuWfZFTs390c3WSAReLrQ6_KOOvr0FYjXhUQ5h5b8xWA@mail.gmail.com> <B278D0F7-71B6-4F3D-B625-D8B0298CE5B4@linaro.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
 Cc: Arnd Bergmann <arnd@arndb.de>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
@@ -24,96 +31,21 @@ Cc: Arnd Bergmann <arnd@arndb.de>,
         <linux-crypto@vger.kernel.org>, qat-linux@intel.com,
         dm-devel@redhat.com,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-To: Kees Cook <keescook@chromium.org>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAGXu5jLuWfZFTs390c3WSAReLrQ6_KOOvr0FYjXhUQ5h5b8xWA@mail.gmail.com>
+In-Reply-To: <B278D0F7-71B6-4F3D-B625-D8B0298CE5B4@linaro.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
+On Wed, Jul 18, 2018 at 7:55 PM, Ard Biesheuvel
+<ard.biesheuvel@linaro.org> wrote:
+> I have only build tested it, so if you make sure that it does not break anything, please go ahead.
 
+I can give it a spin; what's the best way? Is CONFIG_CRYPTO_MANAGER=y
+sufficient?
 
-> On 19 Jul 2018, at 11:51, Kees Cook <keescook@chromium.org> wrote:
->=20
-> On Wed, Jul 18, 2018 at 8:19 AM, Ard Biesheuvel
-> <ard.biesheuvel@linaro.org> wrote:
->> On 18 July 2018 at 23:50, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrot=
-e:
->>>> On 18 July 2018 at 05:59, Arnd Bergmann <arnd@arndb.de> wrote:
->>>>> On Sun, Jul 15, 2018 at 6:28 AM, Kees Cook <keescook@chromium.org> wro=
-te:
->>>>>=20
->>>>> After my ahash to shash conversions, only ccm is left as an ahash
->>>>> user, since it actually uses sg. But with the hard-coded value reduced=
+-Kees
 
->>>>> to 376, this doesn't trip the frame warnings any more. :)
->>>>>=20
->>>>> I'll send an updated series soon.
->>>>=20
->>>> Maybe we should get rid of that one as well then and remove
->>>> AHASH_REQUEST_ON_STACK()?
->>>>=20
->>>> I see that Ard (now on Cc) added this usage only recently. Looking
->>>> at the code some more, I also find that the descsize is probably
->>>> much smaller than 376 for all possible cases   of "cbcmac(*)",
->>>> either alg->cra_blocksize plus a few bytes or sizeof(mac_desc_ctx)
->>>> (i.e. 20) for arch/arm64/crypto/aes-glue.c.
->>>>=20
->>>> Walking the sglist here means open-coding a shash_ahash_update()
->>>> implementation in crypto_ccm_auth(), that that doesn't seem to
->>>> add much complexity over what it already has to do to chain
->>>> the sglist today.
->>>>=20
->>>=20
->>> It would be better to add a variably sized ahash request member to
->>> struct crypto_ccm_req_priv_ctx, the only problem is that the last
->>> member of that struct (skreq) is variably sized already, so it would
->>> involve having a struct ahash_request pointer pointing into the same
->>> struct, after the skreq member.
->>=20
->> Actually, I think the below should already do the trick: ahreq and
->> skreq are not used at the same time, so we can stick them in a union,
->> and take the max() of the reqsize to ensure there's enough empty space
->> after it.
->>=20
->> --------8<----------
->> diff --git a/crypto/ccm.c b/crypto/ccm.c
->> index 0a083342ec8c..b242fd0d3262 100644
->> --- a/crypto/ccm.c
->> +++ b/crypto/ccm.c
->> @@ -50,7 +50,10 @@ struct crypto_ccm_req_priv_ctx {
->>        u32 flags;
->>        struct scatterlist src[3];
->>        struct scatterlist dst[3];
->> -       struct skcipher_request skreq;
->> +       union {
->> +               struct ahash_request ahreq;
->> +               struct skcipher_request skreq;
->> +       };
->> };
->>=20
->> struct cbcmac_tfm_ctx {
->> @@ -181,7 +184,7 @@
->>        struct crypto_ccm_req_priv_ctx *pctx =3D crypto_ccm_reqctx(req);
->>        struct crypto_aead *aead =3D crypto_aead_reqtfm(req);
->>        struct crypto_ccm_ctx *ctx =3D crypto_aead_ctx(aead);
->> -       AHASH_REQUEST_ON_STACK(ahreq, ctx->mac);
->> +       struct ahash_request *ahreq =3D &pctx->ahreq;
->>        unsigned int assoclen =3D req->assoclen;
->>        struct scatterlist sg[3];
->>        u8 *odata =3D pctx->odata;
->> @@ -427,7 +430,7 @@
->>        crypto_aead_set_reqsize(
->>                tfm,
->>                align + sizeof(struct crypto_ccm_req_priv_ctx) +
->> -               crypto_skcipher_reqsize(ctr));
->> +               max(crypto_ahash_reqsize(mac), crypto_skcipher_reqsize(ct=
-r)));
->>=20
->>        return 0;
->=20
-> Oh, this is lovely! Thank you! Shall I add your S-o-b and add it to the se=
-ries?
->=20
-
-I have only build tested it, so if you make sure that it does not break anyt=
-hing, please go ahead.
+-- 
+Kees Cook
+Pixel Security
