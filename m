@@ -1,87 +1,77 @@
-From: joeyli <jlee@suse.com>
-Subject: Re: [PATCH 0/4][RFC v2] Introduce the in-kernel hibernation
- encryption
-Date: Thu, 19 Jul 2018 22:58:47 +0800
-Message-ID: <20180719145847.GJ18419@linux-l9pv.suse>
-References: <cover.1531924968.git.yu.c.chen@intel.com>
- <20180718202235.GA4132@amd>
- <20180718235851.GA22170@sandybridge-desktop>
- <20180719110149.GA4679@amd>
+From: Kees Cook <keescook@chromium.org>
+Subject: Re: [PATCH v4 11/14] treewide: Prepare to remove VLA usage for AHASH_REQUEST_ON_STACK
+Date: Thu, 19 Jul 2018 11:44:03 -0700
+Message-ID: <CAGXu5jKXtNc0ePXWAbUgiqx6K_fJQG2xptwiTdV-vd_sYiu=9w@mail.gmail.com>
+References: <20180711203619.1020-1-keescook@chromium.org> <20180711203619.1020-12-keescook@chromium.org>
+ <CAK8P3a3356dbruUfS_+fj9f+X-0jbNE8WMe5sWhJmuRY9Nvcbg@mail.gmail.com>
+ <20180713004038.lwibdesz7ohhoind@gondor.apana.org.au> <CAGXu5jLYmC7U=bucFZCLsSXNX=T4WhCccR6hx9dwROYF+ZMt0Q@mail.gmail.com>
+ <20180713034406.zwu2pkp3f2onybxs@gondor.apana.org.au> <CAGXu5jLR0zJ6b9axJuG_uvttNShNcN3rhQKGVjW37qPd9saY-Q@mail.gmail.com>
+ <20180713052029.cfo24bsr5swtbdja@gondor.apana.org.au> <CAGXu5jLG4gE44z9cXL3-D1bjbZB1RgTnTsb3PWhU7B3NdRrwVg@mail.gmail.com>
+ <CAK8P3a3nk4-EewKTXcLENTb86r1+bJz_WrkJoJt+D1uTwcpxPA@mail.gmail.com>
+ <CAGXu5j+Q_jc_f9VybyoJqmV7_Q-3hqnC-pOubfNsi7uyAROVrQ@mail.gmail.com>
+ <CAK8P3a3Dh+g=v++BMCtmmiOSnVu4CEUgss0U7BZS_K45aTddqg@mail.gmail.com>
+ <CAKv+Gu-cOV6uo6MpLxr9uQSTT-ku_wn9+D7CC4+3maJtvcaGoA@mail.gmail.com>
+ <CAKv+Gu8e9sm42NKwQvQzD33JTHSaEY2q7sm0W0065dDz_rzSaA@mail.gmail.com>
+ <CAGXu5jLuWfZFTs390c3WSAReLrQ6_KOOvr0FYjXhUQ5h5b8xWA@mail.gmail.com>
+ <B278D0F7-71B6-4F3D-B625-D8B0298CE5B4@linaro.org> <CAGXu5jJyyi1FvT9PytMkU_rPeSqMSHR7asjn8ykShZGGRPPRDg@mail.gmail.com>
+ <E9125A0C-45C8-45FF-93F6-B7AD9DC86347@linaro.org> <CAKv+Gu9WH-_keAuio6AYMu6KD877GdRUoDrua_1cqKqK8sE=7A@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Yu Chen <yu.c.chen@intel.com>,
-        "Rafael J . Wysocki" <rafael.j.wysocki@intel.com>,
+Content-Type: text/plain; charset="UTF-8"
+Cc: Arnd Bergmann <arnd@arndb.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
         Eric Biggers <ebiggers@google.com>,
-        Theodore Ts o <tytso@mit.edu>,
-        Stephan Mueller <smueller@chronox.de>,
-        Denis Kenzior <denkenz@gmail.com>, linux-pm@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        "Gu, Kookoo" <kookoo.gu@intel.com>,
-        "Zhang, Rui" <rui.zhang@intel.com>
-To: Pavel Machek <pavel@ucw.cz>
+        Alasdair Kergon <agk@redhat.com>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Lars Persson <larper@axis.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Rabin Vincent <rabinv@axis.com>,
+        Tim Chen <tim.c.chen@linux.intel.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Masahiro Yamada <yamada.masahiro@socionext.com>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>, qat-linux@intel.com,
+        dm-devel@redhat.com,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20180719110149.GA4679@amd>
+In-Reply-To: <CAKv+Gu9WH-_keAuio6AYMu6KD877GdRUoDrua_1cqKqK8sE=7A@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi,
+On Thu, Jul 19, 2018 at 7:54 AM, Ard Biesheuvel
+<ard.biesheuvel@linaro.org> wrote:
+> On 19 July 2018 at 12:13, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
+>>
+>>> On 19 Jul 2018, at 12:09, Kees Cook <keescook@chromium.org> wrote:
+>>>
+>>> On Wed, Jul 18, 2018 at 7:55 PM, Ard Biesheuvel
+>>> <ard.biesheuvel@linaro.org> wrote:
+>>>> I have only build tested it, so if you make sure that it does not break anything, please go ahead.
+>>>
+>>> I can give it a spin; what's the best way? Is CONFIG_CRYPTO_MANAGER=y
+>>> sufficient?
+>>>
+>>
+>> You should be able to test ccm(aes) with tcrypt, yes
+>
+> Apologies, I should have been more clear here. I was replying on my
+> phone while attending a meeting.
+>
+> The builtin test will only kick in for chaining mode templates if they
+> are instantiated by something that invokes the algorithm, such as
+> loading tcrypt.ko with mode=37 (assuming that ccm(aes) has to be
+> instantiated from crypto/ccm.c and some AES cipher rather than being
+> provided directly by, e.g., arm64's AES-CCM driver)
+>
+> I just did the tcrypt myself, and the patch appears to be fine. Let me
+> know if you want me to spin the patch.
 
-On Thu, Jul 19, 2018 at 01:01:49PM +0200, Pavel Machek wrote:
-> On Thu 2018-07-19 07:58:51, Yu Chen wrote:
-> > Hi,
-> > On Wed, Jul 18, 2018 at 10:22:35PM +0200, Pavel Machek wrote:
-> > > On Thu 2018-07-19 00:38:06, Chen Yu wrote:
-> > > > As security becomes more and more important, we add the in-kernel
-> > > > encryption support for hibernation.
-> > > 
-> > > Sorry, this does not really explain what security benefit it is
-> > > supposed have to against what attack scenarios.
-> > > 
-> > > Which unfortunately means it can not reviewed.
-> > > 
-> > > Note that uswsusp already provides encryption. If this is supposed to
-> > > have advantages over it, please say so.
-> > > 
-> > The advantages are described in detail in 
-> > [PATCH 1/4]'s log, please refer to that.
-> 
-> Are you refering to this?
-> 
-> # Generally the advantage is: Users do not have to
-> # encrypt the whole swap partition as other tools.
-> # After all, ideally kernel memory should be encrypted
-> # by the kernel itself.
-> 
-> Sorry, this does not really explain what security benefit it is
-> supposed have to against what attack scenarios.
-> 
-> Note that uswsusp already provides encryption. If this is supposed to
-> have advantages over it, please say so.
-> 
-> Also note that joeyli <jlee@suse.com> has patch series which encrypts
-> both in-kernel and uswsusp hibernation methods. His motivation is
-> secure boot. How does this compare to his work?
-> 
+Awesome, thanks for testing! I built a commit with you as the author.
+I'll send it out with the next batch... :)
 
-My patchset signs and encrypts the snapshot image pages in memory. The
-main logic is applied to snapshot.c
+-Kees
 
-https://github.com/joeyli/linux-s4sign/commit/bae39460393ada4c0226dd07cd5e3afcef86b71f
-
-The pros of my solution is that the signed/encrypted snapshot image can 
-be stored to anywhere. Both in-kernel and userspace.
-
-Yu's patch is encrypt the page buffer before sending to block io layer
-for writing to swap. The main logic is applied to swap.c. It's against
-the swap solution in-kernel.
-
-The pros of Yu's solution is that it encrypts the compressed image data.
-So, for the huge system memory case, it has better performance.
-
-Yu's plan is using the sysfs to switch different encrypt/sign solutions.
-And, we will share encrypt/sign helper and key manager in the above two
-solutions.
-
-Thanks a lot!
-Joey Lee
+-- 
+Kees Cook
+Pixel Security
