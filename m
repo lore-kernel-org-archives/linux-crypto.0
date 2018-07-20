@@ -1,86 +1,127 @@
-From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-Subject: Re: make sure swap arguments are the same type? (was: Re: [PATCH]
- crypto: rmd320 - use swap macro in rmd320_transform)
-Date: Fri, 20 Jul 2018 10:43:27 -0500
-Message-ID: <ac6bf6b3-b739-a6b8-c9b0-8d496fb7a470@embeddedor.com>
-References: <20180718171908.GA22962@embeddedor.com>
- <4dbef38e6020d6cb78e860a9f01fcd1de9f0fb52.camel@perches.com>
+From: Laura Abbott <labbott@redhat.com>
+Subject: Re: [PATCH] random: add a config option to trust the CPU's hwrng
+Date: Fri, 20 Jul 2018 12:09:49 -0700
+Message-ID: <fee11b5d-e2cd-9a82-c84a-bedecba2a17b@redhat.com>
+References: <20180718014344.1309-1-tytso@mit.edu>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Pablo Neira Ayuso <pablo@netfilter.org>
-To: Joe Perches <joe@perches.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Andrew Morton <akpm@linux-foundation.org>
+To: Theodore Ts'o <tytso@mit.edu>, linux-crypto@vger.kernel.org,
+        Linux Kernel Developers List <linux-kernel@vger.kernel.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <4dbef38e6020d6cb78e860a9f01fcd1de9f0fb52.camel@perches.com>
+In-Reply-To: <20180718014344.1309-1-tytso@mit.edu>
 Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi Joe,
-
-I like the idea. I'll take a look at the cases you mention and see
-if I can make them work with your version of swap.
-
-BTW, I wonder if it would be more convenient to trigger a build warning
-instead of an error.
-
-What do you think?
-
-Thanks
---
-Gustavo
-
-On 07/18/2018 01:31 PM, Joe Perches wrote:
-> On Wed, 2018-07-18 at 12:19 -0500, Gustavo A. R. Silva wrote:
->> swap
+On 07/17/2018 06:43 PM, Theodore Ts'o wrote:
+> This gives the user building their own kernel (or a Linux
+> distribution) the option of deciding whether or not to trust the CPU's
+> hardware random number generator (e.g., RDRAND for x86 CPU's) as being
+> correctly implemented and not having a back door introduced (perhaps
+> courtesy of a Nation State's law enforcement or intelligence
+> agencies).
 > 
-> Perhaps the swap macro should verify that the
-> swap(a, b) arguments are the same type.
+> This will prevent getrandom(2) from blocking, if there is a
+> willingness to trust the CPU manufacturer.
 > 
-> Something like the patch below, but this patch
-> causes a compilation failure on at least a couple
-> cases that aren't obviously correct in
-> 
-> net/netfilter/ipset/ip_set_bitmap_port.c
-> 	where a u16 is swapped with a u32.
-> 
-> and
-> 
-> net/netfilter/ipset/ip_set_hash_netport.c
-> 	where a single bit bitfield is swapped with a u8
+> Signed-off-by: Theodore Ts'o <tytso@mit.edu>
 > ---
->  include/linux/kernel.h | 11 ++++++++---
->  1 file changed, 8 insertions(+), 3 deletions(-)
 > 
-> diff --git a/include/linux/kernel.h b/include/linux/kernel.h
-> index d6aac75b51ba..506b59e0da24 100644
-> --- a/include/linux/kernel.h
-> +++ b/include/linux/kernel.h
-> @@ -969,14 +969,19 @@ static inline void ftrace_dump(enum ftrace_dump_mode oops_dump_mode) { }
->   */
->  #define clamp_val(val, lo, hi) clamp_t(typeof(val), val, lo, hi)
->  
-> -
->  /**
->   * swap - swap values of @a and @b
->   * @a: first value
->   * @b: second value
-> + * @a and @b must be the same type
->   */
-> -#define swap(a, b) \
-> -	do { typeof(a) __tmp = (a); (a) = (b); (b) = __tmp; } while (0)
-> +#define swap(a, b)							\
-> +do {									\
-> +	typeof(a) __tmp = (a);						\
-> +	BUILD_BUG_ON(!__same_type(typeof(a), typeof(b)));		\
-> +	(a) = (b);							\
-> +	(b) = __tmp;							\
-> +} while (0)
->  
->  /* This counts to 12. Any more, it will return 13th argument. */
->  #define __COUNT_ARGS(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _n, X...) _n
+>   I'm not sure Linux distro's will thank us for this.  The problem is
+>   trusting the CPU manfuacturer can be an emotional / political issue.
+> 
+
+So I went to test this patch and was pleasantly surprised to find
+that the hang from the degenerate case had been fixed in rawhide.
+This means future Fedora versions should actually just boot properly.
+
+That said, I do think this is a beneficial option to have available
+because it actually fixes the underlying problem instead of hoping
+nobody else decides to block early in the bootup process.
+
+Thanks,
+Laura
+
+>   For example, assume that China has decided that as a result of the
+>   "death sentence" that the US government threatened to impose on ZTE
+>   after they were caught introducing privacy violating malware on US
+>   comsumers, that they needed to be self-sufficient in their technology
+>   sector, and so they decided the needed to produce their own CPU.
+> 
+>   Even if I were convinced that Intel hadn't backdoored RDRAND (or an
+>   NSA agent backdoored RDRAND for them) such that the NSA had a NOBUS
+>   (nobody but us) capability to crack RDRAND generated numbers, if we
+>   made a change to unconditionally trust RDRAND, then I didn't want the
+>   upstream kernel developers to have to answer the question, "why are
+>   you willing to trust Intel, but you aren't willing to trust a company
+>   owned and controlled by a PLA general?"  (Or a company owned and
+>   controlled by one of Putin's Oligarchs, if that makes you feel
+>   better.)
+> 
+>   With this patch, we don't put ourselves in this position --- but we
+>   do put the Linux distro's in this position intead.  The upside is it
+>   gives the choice to each person building their own Linux kernel to
+>   decide whether trusting RDRAND is worth it to avoid hangs due to
+>   userspace trying to get cryptographic-grade entropy early in the boot
+>   process.  (Note: I trust RDRAND more than I do Jitter Entropy.)
+> 
+>   drivers/char/Kconfig  | 14 ++++++++++++++
+>   drivers/char/random.c | 11 ++++++++++-
+>   2 files changed, 24 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/char/Kconfig b/drivers/char/Kconfig
+> index 212f447938ae..fe2930c4ecf0 100644
+> --- a/drivers/char/Kconfig
+> +++ b/drivers/char/Kconfig
+> @@ -554,3 +554,17 @@ config ADI
+>   
+>   endmenu
+>   
+> +config RANDOM_TRUST_CPU
+> +       bool "Trust the CPU manufacturer to initialize Linux's CRNG"
+> +       depends on (X86 || X86_64 || X86_32 || S390 || PPC)
+> +       default n
+> +       help
+> +	Assume that CPU manufacurer (e.g., Intel or AMD for RDSEED or
+> +	RDRAND, IBM for the S390 and Power PC architectures) is trustworthy
+> +	for the purposes of initializing Linux's CRNG.  Since this is not
+> +	something that can be indepedently audited, this amounts to trusting
+> +	that CPU manufacturer (perhaps with the insistance or requirement
+> +	of a Nation State's intelligence or law enforcement agencies)
+> +	has not installed a hidden back door to compromise the CPU's
+> +	random number generation facilities.
+> +
+> diff --git a/drivers/char/random.c b/drivers/char/random.c
+> index 34ddfd57419b..f4013b8a711b 100644
+> --- a/drivers/char/random.c
+> +++ b/drivers/char/random.c
+> @@ -782,6 +782,7 @@ static void invalidate_batched_entropy(void);
+>   static void crng_initialize(struct crng_state *crng)
+>   {
+>   	int		i;
+> +	int		arch_init = 1;
+>   	unsigned long	rv;
+>   
+>   	memcpy(&crng->state[0], "expand 32-byte k", 16);
+> @@ -792,10 +793,18 @@ static void crng_initialize(struct crng_state *crng)
+>   		_get_random_bytes(&crng->state[4], sizeof(__u32) * 12);
+>   	for (i = 4; i < 16; i++) {
+>   		if (!arch_get_random_seed_long(&rv) &&
+> -		    !arch_get_random_long(&rv))
+> +		    !arch_get_random_long(&rv)) {
+>   			rv = random_get_entropy();
+> +			arch_init = 0;
+> +		}
+>   		crng->state[i] ^= rv;
+>   	}
+> +#ifdef CONFIG_RANDOM_TRUST_CPU
+> +	if (arch_init) {
+> +		crng_init = 2;
+> +		pr_notice("random: crng done (trusting CPU's manufacturer)\n");
+> +	}
+> +#endif
+>   	crng->init_time = jiffies - CRNG_RESEED_INTERVAL - 1;
+>   }
+>   
 > 
