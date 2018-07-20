@@ -1,9 +1,8 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: inside-secure - initialize first_rdesc to make
- GCC happy
-Date: Fri, 20 Jul 2018 13:55:22 +0800
-Message-ID: <20180720055522.desdmpxm2o7hpiqs@gondor.apana.org.au>
-References: <20180713154316.15689-1-antoine.tenart@bootlin.com>
+Subject: Re: [PATCH] crypto: inside-secure - switch to SPDX identifiers
+Date: Fri, 20 Jul 2018 13:55:14 +0800
+Message-ID: <20180720055514.zl7fogixzrjb6arq@gondor.apana.org.au>
+References: <20180713145138.987-1-antoine.tenart@bootlin.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
@@ -14,17 +13,13 @@ Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
 To: Antoine Tenart <antoine.tenart@bootlin.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20180713154316.15689-1-antoine.tenart@bootlin.com>
+In-Reply-To: <20180713145138.987-1-antoine.tenart@bootlin.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Jul 13, 2018 at 05:43:16PM +0200, Antoine Tenart wrote:
-> In the cipher safexcel_send_req function, GCC warns that
-> first_rdesc may be used uninitialized. While this should never
-> happen, this patch removes the warning by initializing this
-> variable to NULL to make GCC happy.
-> 
-> This was reported by the kbuild test robot.
+On Fri, Jul 13, 2018 at 04:51:37PM +0200, Antoine Tenart wrote:
+> Use the appropriate SPDX license identifiers and drop the license text.
+> This patch is only cosmetic.
 > 
 > Signed-off-by: Antoine Tenart <antoine.tenart@bootlin.com>
 
