@@ -1,80 +1,43 @@
-From: Antoine Tenart <antoine.tenart@bootlin.com>
-Subject: Re: [PATCH 13/14] arm64: dts: marvell: armada-cp110: update the
- crypto engine compatible
-Date: Mon, 23 Jul 2018 09:21:52 +0200
-Message-ID: <20180723072152.GA3456@kwain>
-References: <20180628151544.22134-1-antoine.tenart@bootlin.com>
- <20180628151544.22134-14-antoine.tenart@bootlin.com>
- <CAOesGMjx_Qprh+4Y6GM4BqGOeJtKWwAhkFNvBz0PGqQkyuRtrw@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-Cc: Antoine Tenart <antoine.tenart@bootlin.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        David Miller <davem@davemloft.net>,
-        Gregory CLEMENT <gregory.clement@bootlin.com>,
-        Andrew Lunn <andrew@lunn.ch>,
-        Jason Cooper <jason@lakedaemon.net>,
-        Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
-        linux-crypto@vger.kernel.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-        maxime.chevallier@bootlin.com, miquel.raynal@bootlin.com,
-        Nadav Haklai <nadavh@marvell.com>, oferh@marvell.com,
-        igall@marvell.com
-To: Olof Johansson <olof@lixom.net>
+From: Jia-Ju Bai <baijiaju1990@gmail.com>
+Subject: [PATCH] crypto: cavium: nitrox: Replace GFP_ATOMIC with GFP_KERNEL in crypto_alloc_context()
+Date: Mon, 23 Jul 2018 16:14:26 +0800
+Message-ID: <20180723081426.31780-1-baijiaju1990@gmail.com>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jia-Ju Bai <baijiaju1990@gmail.com>
+To: herbert@gondor.apana.org.au, davem@davemloft.net,
+        kstewart@linuxfoundation.org, gregkh@linuxfoundation.org,
+        tglx@linutronix.de, pombredanne@nexb.com
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <CAOesGMjx_Qprh+4Y6GM4BqGOeJtKWwAhkFNvBz0PGqQkyuRtrw@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi Olof,
+crypto_alloc_context() is only called by nitrox_skcipher_init(), which is
+never called in atomic context.
 
-On Sat, Jul 21, 2018 at 02:35:01PM -0700, Olof Johansson wrote:
-> On Thu, Jun 28, 2018 at 8:15 AM, Antoine Tenart
-> <antoine.tenart@bootlin.com> wrote:
-> > New compatibles are now supported by the Inside Secure SafeXcel driver.
-> > As they are more specific than the old ones, they should be used
-> > whenever possible. This patch updates the Marvell cp110 device tree
-> > accordingly.
-> >
-> > Signed-off-by: Antoine Tenart <antoine.tenart@bootlin.com>
-> > ---
-> >  arch/arm64/boot/dts/marvell/armada-cp110.dtsi | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/arch/arm64/boot/dts/marvell/armada-cp110.dtsi b/arch/arm64/boot/dts/marvell/armada-cp110.dtsi
-> > index 2bf083272a87..bb2914f90048 100644
-> > --- a/arch/arm64/boot/dts/marvell/armada-cp110.dtsi
-> > +++ b/arch/arm64/boot/dts/marvell/armada-cp110.dtsi
-> > @@ -427,7 +427,7 @@
-> >                 };
-> >
-> >                 CP110_LABEL(crypto): crypto@800000 {
-> > -                       compatible = "inside-secure,safexcel-eip197";
-> > +                       compatible = "inside-secure,safexcel-eip197b";
-> 
-> So the device is still compatible with the less-specific binding,
-> right? If so, it should probably have both compatible properties in
-> there, not just the more specific one.
+crypto_alloc_context() calls dma_pool_alloc() with GFP_ATOMIC,
+which is not necessary.
+GFP_ATOMIC can be replaced with GFP_KERNEL.
 
-Using "safexcel-eip197" as a compatible was a mistake as there's no such
-thing as an eip197, they all have minor versions (such as 'b').
+This is found by a static analysis tool named DCNS written by myself.
+I also manually check the kernel code before reporting it.
 
-I've thought about using the compatible for a less specific binding, but
-this isn't true for the other patch, using the compatible ending in
-"-eip97". The engine it supports is the most specific one (i.e. with the
-largest number of algorithms supported). So it would simply not work,
-and as we only have a few device trees supporting the engine as of now,
-I thought fixing this by removing the wrong compatible was a better
-solution (of course the driver is backward compatible, and using the old
-compatibles will still work).
+Signed-off-by: Jia-Ju Bai <baijiaju1990@gmail.com>
+---
+ drivers/crypto/cavium/nitrox/nitrox_lib.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Thanks,
-Antoine
-
+diff --git a/drivers/crypto/cavium/nitrox/nitrox_lib.c b/drivers/crypto/cavium/nitrox/nitrox_lib.c
+index 4fdc921ba611..ebe267379ac9 100644
+--- a/drivers/crypto/cavium/nitrox/nitrox_lib.c
++++ b/drivers/crypto/cavium/nitrox/nitrox_lib.c
+@@ -148,7 +148,7 @@ void *crypto_alloc_context(struct nitrox_device *ndev)
+ 	void *vaddr;
+ 	dma_addr_t dma;
+ 
+-	vaddr = dma_pool_alloc(ndev->ctx_pool, (GFP_ATOMIC | __GFP_ZERO), &dma);
++	vaddr = dma_pool_alloc(ndev->ctx_pool, (GFP_KERNEL | __GFP_ZERO), &dma);
+ 	if (!vaddr)
+ 		return NULL;
+ 
 -- 
-Antoine Ténart, Bootlin (formerly Free Electrons)
-Embedded Linux and Kernel engineering
-https://bootlin.com
+2.17.0
