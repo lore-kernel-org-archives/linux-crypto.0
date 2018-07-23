@@ -1,43 +1,80 @@
-From: Jia-Ju Bai <baijiaju1990@gmail.com>
-Subject: Re: [REPORT] Possible unnecessary usages of GFP_ATOMIC in
- crypto/ablkcipher.c
-Date: Mon, 23 Jul 2018 15:19:43 +0800
-Message-ID: <f0ec23d2-4766-6677-d95c-ea8d193d4083@gmail.com>
-References: <78a7d726-f2fa-3afb-3451-bbd51a41a48a@gmail.com>
- <20180723062101.zzm5royyjfda6jma@gondor.apana.org.au>
+From: Antoine Tenart <antoine.tenart@bootlin.com>
+Subject: Re: [PATCH 13/14] arm64: dts: marvell: armada-cp110: update the
+ crypto engine compatible
+Date: Mon, 23 Jul 2018 09:21:52 +0200
+Message-ID: <20180723072152.GA3456@kwain>
+References: <20180628151544.22134-1-antoine.tenart@bootlin.com>
+ <20180628151544.22134-14-antoine.tenart@bootlin.com>
+ <CAOesGMjx_Qprh+4Y6GM4BqGOeJtKWwAhkFNvBz0PGqQkyuRtrw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+Cc: Antoine Tenart <antoine.tenart@bootlin.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        David Miller <davem@davemloft.net>,
+        Gregory CLEMENT <gregory.clement@bootlin.com>,
+        Andrew Lunn <andrew@lunn.ch>,
+        Jason Cooper <jason@lakedaemon.net>,
+        Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
+        linux-crypto@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+        maxime.chevallier@bootlin.com, miquel.raynal@bootlin.com,
+        Nadav Haklai <nadavh@marvell.com>, oferh@marvell.com,
+        igall@marvell.com
+To: Olof Johansson <olof@lixom.net>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180723062101.zzm5royyjfda6jma@gondor.apana.org.au>
-Content-Language: en-US
+Content-Disposition: inline
+In-Reply-To: <CAOesGMjx_Qprh+4Y6GM4BqGOeJtKWwAhkFNvBz0PGqQkyuRtrw@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
+Hi Olof,
 
+On Sat, Jul 21, 2018 at 02:35:01PM -0700, Olof Johansson wrote:
+> On Thu, Jun 28, 2018 at 8:15 AM, Antoine Tenart
+> <antoine.tenart@bootlin.com> wrote:
+> > New compatibles are now supported by the Inside Secure SafeXcel driver.
+> > As they are more specific than the old ones, they should be used
+> > whenever possible. This patch updates the Marvell cp110 device tree
+> > accordingly.
+> >
+> > Signed-off-by: Antoine Tenart <antoine.tenart@bootlin.com>
+> > ---
+> >  arch/arm64/boot/dts/marvell/armada-cp110.dtsi | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/arch/arm64/boot/dts/marvell/armada-cp110.dtsi b/arch/arm64/boot/dts/marvell/armada-cp110.dtsi
+> > index 2bf083272a87..bb2914f90048 100644
+> > --- a/arch/arm64/boot/dts/marvell/armada-cp110.dtsi
+> > +++ b/arch/arm64/boot/dts/marvell/armada-cp110.dtsi
+> > @@ -427,7 +427,7 @@
+> >                 };
+> >
+> >                 CP110_LABEL(crypto): crypto@800000 {
+> > -                       compatible = "inside-secure,safexcel-eip197";
+> > +                       compatible = "inside-secure,safexcel-eip197b";
+> 
+> So the device is still compatible with the less-specific binding,
+> right? If so, it should probably have both compatible properties in
+> there, not just the more specific one.
 
-On 2018/7/23 14:21, Herbert Xu wrote:
-> On Mon, Jul 23, 2018 at 10:39:40AM +0800, Jia-Ju Bai wrote:
->> My tool DCNS reports three unnecessary usages of GFP_ATOMIC in
->> crypto/ablkcipher.c:
->> crypto/ablkcipher.c, 162: kmalloc(GFP_ATOMIC) in ablkcipher_next_slow
->> crypto/ablkcipher.c, 199: kmalloc(GFP_ATOMIC) in ablkcipher_copy_iv
->> crypto/ablkcipher.c, 315: kmalloc(GFP_ATOMIC) in setkey_unaligned
->>
->> I meant to manually check the code, but I find that there are many functions
->> calling ablkcipher_next_slow(),
->> ablkcipher_copy_iv() and setkey_unaligned(), so I am not sure whether the
->> above three reports are true.
->>
->> Could someone help me to validate these reports?
->> Thanks a lot in advance :)
-> They must use GFP_ATOMIC because they can be called from softirq
-> context, e.g., IPsec.
+Using "safexcel-eip197" as a compatible was a mistake as there's no such
+thing as an eip197, they all have minor versions (such as 'b').
 
-Okay, thanks for the reply.
+I've thought about using the compatible for a less specific binding, but
+this isn't true for the other patch, using the compatible ending in
+"-eip97". The engine it supports is the most specific one (i.e. with the
+largest number of algorithms supported). So it would simply not work,
+and as we only have a few device trees supporting the engine as of now,
+I thought fixing this by removing the wrong compatible was a better
+solution (of course the driver is backward compatible, and using the old
+compatibles will still work).
 
+Thanks,
+Antoine
 
-Best wishes,
-Jia-Ju Bai
+-- 
+Antoine Ténart, Bootlin (formerly Free Electrons)
+Embedded Linux and Kernel engineering
+https://bootlin.com
