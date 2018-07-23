@@ -1,16 +1,20 @@
-From: Oliver Neukum <oneukum@suse.com>
+From: Pavel Machek <pavel@ucw.cz>
 Subject: Re: [PATCH 0/4][RFC v2] Introduce the in-kernel hibernation
  encryption
-Date: Mon, 23 Jul 2018 13:42:36 +0200
-Message-ID: <1532346156.3057.11.camel@suse.com>
+Date: Mon, 23 Jul 2018 14:22:27 +0200
+Message-ID: <20180723122227.GA30092@amd>
 References: <cover.1531924968.git.yu.c.chen@intel.com>
-         <20180718202235.GA4132@amd> <20180718235851.GA22170@sandybridge-desktop>
-         <20180719110149.GA4679@amd> <20180719132003.GA30981@sandybridge-desktop>
-         <20180720102532.GA20284@amd>
+ <20180718202235.GA4132@amd>
+ <20180718235851.GA22170@sandybridge-desktop>
+ <20180719110149.GA4679@amd>
+ <20180719132003.GA30981@sandybridge-desktop>
+ <20180720102532.GA20284@amd>
+ <1532346156.3057.11.camel@suse.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: "Rafael J . Wysocki" <rafael.j.wysocki@intel.com>,
+Content-Type: multipart/signed; micalg=pgp-sha1;
+        protocol="application/pgp-signature"; boundary="huq684BweRXVnRxX"
+Cc: Yu Chen <yu.c.chen@intel.com>,
+        "Rafael J . Wysocki" <rafael.j.wysocki@intel.com>,
         Eric Biggers <ebiggers@google.com>,
         "Lee, Chun-Yi" <jlee@suse.com>, Theodore Ts o <tytso@mit.edu>,
         Stephan Mueller <smueller@chronox.de>,
@@ -18,87 +22,82 @@ Cc: "Rafael J . Wysocki" <rafael.j.wysocki@intel.com>,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         "Gu, Kookoo" <kookoo.gu@intel.com>,
         "Zhang, Rui" <rui.zhang@intel.com>
-To: Pavel Machek <pavel@ucw.cz>, Yu Chen <yu.c.chen@intel.com>
+To: Oliver Neukum <oneukum@suse.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180720102532.GA20284@amd>
+Content-Disposition: inline
+In-Reply-To: <1532346156.3057.11.camel@suse.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Fr, 2018-07-20 at 12:25 +0200, Pavel Machek wrote:
-> Hi!
 
-Hello,
+--huq684BweRXVnRxX
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> > Let me paste the log here:
-> > 
-> > 1. (This is not to compare with uswsusp but other
-> >     tools) One advantage is: Users do not have to
-> >     encrypt the whole swap partition as other tools.
-> 
-> Well.. encrypting the partition seems like good idea anyway.
+Hi!
 
-Yes, but it is a policy decision the kernel should not force.
-STD needs to work anyway.
+> > > 2. Ideally kernel memory should be encrypted by the
+> > >    kernel itself. We have uswsusp to support user
+> > >    space hibernation, however doing the encryption
+> > >    in kernel space has more advantages:
+> > >    2.1 Not having to transfer plain text kernel memory to
+> > >        user space. Per Lee, Chun-Yi, uswsusp is disabled
+> > >        when the kernel is locked down:
+> > >        https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/
+> > >        linux-fs.git/commit/?h=3Dlockdown-20180410&
+> > >        id=3D8732c1663d7c0305ae01ba5a1ee4d2299b7b4612
+> > >        due to:
+> > >        "There have some functions be locked-down because
+> > >        there have no appropriate mechanisms to check the
+> > >        integrity of writing data."
+> > >        https://patchwork.kernel.org/patch/10476751/
+> >=20
+> > So your goal is to make hibernation compatible with kernel
+> > lockdown? Do your patches provide sufficient security that hibernation
+> > can be enabled with kernel lockdown?
+>=20
+> OK, maybe I am dense, but if the key comes from user space, will that
+> be enough?
 
-> > 2. Ideally kernel memory should be encrypted by the
-> >    kernel itself. We have uswsusp to support user
-> >    space hibernation, however doing the encryption
-> >    in kernel space has more advantages:
-> >    2.1 Not having to transfer plain text kernel memory to
-> >        user space. Per Lee, Chun-Yi, uswsusp is disabled
-> >        when the kernel is locked down:
-> >        https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/
-> >        linux-fs.git/commit/?h=lockdown-20180410&
-> >        id=8732c1663d7c0305ae01ba5a1ee4d2299b7b4612
-> >        due to:
-> >        "There have some functions be locked-down because
-> >        there have no appropriate mechanisms to check the
-> >        integrity of writing data."
-> >        https://patchwork.kernel.org/patch/10476751/
-> 
-> So your goal is to make hibernation compatible with kernel
-> lockdown? Do your patches provide sufficient security that hibernation
-> can be enabled with kernel lockdown?
+Yes, that seems to be one of problems of Yu Chen's patchset.
 
-OK, maybe I am dense, but if the key comes from user space, will that
-be enough?
+> > > Joey Lee and I had a discussion on his previous work at
+> > > https://patchwork.kernel.org/patch/10476751
+> > > We collaborate on this task and his snapshot signature
+> > > feature can be based on this patch set.
+> >=20
+> > Well, his work can also work without your patchset, right?
+>=20
+> Yes. But you are objecting to encryption in kernel space at all,
+> aren't you?
 
-> >    2.2 Not having to copy each page to user space
-> >        one by one not in parallel, which might introduce
-> >        significant amount of copy_to_user() and it might
-> >        not be efficient on servers having large amount of DRAM.
-> 
-> So how big speedup can be attributed by not doing copy_to_user?
+I don't particulary love the idea of doing hibernation encryption in
+the kernel, correct.
 
-That would be an argument for compression in kernel space.
-Not encrpting would always be faster.
+But we have this weird thing called secure boot, some people seem to
+want. So we may need some crypto in the kernel -- but I'd like
+something that works with uswsusp, too. Plus, it is mandatory that
+patch explains what security guarantees they want to provide against
+what kinds of attacks...
 
-> >    2.3 Distribution has requirement to do snapshot
-> >        signature for verification, which can be built
-> >        by leveraging this patch set.
-> 
-> Signatures can be done by uswsusp, too, right?
+Lee, Chun-Yi's patch seemed more promising.				Pavel
 
-Not if you want to keep the chain of trust intact. User space
-is not signed.
+--=20
+(english) http://www.livejournal.com/~pavelmachek
+(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blo=
+g.html
 
-> >    2.4 The encryption is in the kernel, so it doesn't
-> >        have to worry too much about bugs in user space
-> >        utilities and similar, for example.
-> 
-> Answer to bugs in userspace is _not_ to move code from userspace to kernel.
+--huq684BweRXVnRxX
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
 
-Indeed.
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
 
-> > Joey Lee and I had a discussion on his previous work at
-> > https://patchwork.kernel.org/patch/10476751
-> > We collaborate on this task and his snapshot signature
-> > feature can be based on this patch set.
-> 
-> Well, his work can also work without your patchset, right?
+iEYEARECAAYFAltVyIMACgkQMOfwapXb+vIOHwCfWnqIbC9JuKoYO//G3dJDkF4H
+cqYAnReOwwOusvgY1EgOrXWVBygOU3+J
+=lsnx
+-----END PGP SIGNATURE-----
 
-Yes. But you are objecting to encryption in kernel space at all,
-aren't you?
-
-	Regards
-		Oliver
+--huq684BweRXVnRxX--
