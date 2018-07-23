@@ -1,60 +1,32 @@
-From: Olof Johansson <olof@lixom.net>
-Subject: Re: [PATCH 13/14] arm64: dts: marvell: armada-cp110: update the
- crypto engine compatible
-Date: Sat, 21 Jul 2018 14:35:01 -0700
-Message-ID: <CAOesGMjx_Qprh+4Y6GM4BqGOeJtKWwAhkFNvBz0PGqQkyuRtrw@mail.gmail.com>
-References: <20180628151544.22134-1-antoine.tenart@bootlin.com> <20180628151544.22134-14-antoine.tenart@bootlin.com>
+From: Jia-Ju Bai <baijiaju1990@gmail.com>
+Subject: [REPORT] Possible unnecessary usages of GFP_ATOMIC in
+ crypto/ablkcipher.c
+Date: Mon, 23 Jul 2018 10:39:40 +0800
+Message-ID: <78a7d726-f2fa-3afb-3451-bbd51a41a48a@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        David Miller <davem@davemloft.net>,
-        Gregory CLEMENT <gregory.clement@bootlin.com>,
-        Andrew Lunn <andrew@lunn.ch>,
-        Jason Cooper <jason@lakedaemon.net>,
-        Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
-        linux-crypto@vger.kernel.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-        maxime.chevallier@bootlin.com, miquel.raynal@bootlin.com,
-        Nadav Haklai <nadavh@marvell.com>, oferh@marvell.com,
-        igall@marvell.com
-To: Antoine Tenart <antoine.tenart@bootlin.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: herbert@gondor.apana.org.au
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180628151544.22134-14-antoine.tenart@bootlin.com>
+Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi,
+My tool DCNS reports three unnecessary usages of GFP_ATOMIC in 
+crypto/ablkcipher.c:
+crypto/ablkcipher.c, 162: kmalloc(GFP_ATOMIC) in ablkcipher_next_slow
+crypto/ablkcipher.c, 199: kmalloc(GFP_ATOMIC) in ablkcipher_copy_iv
+crypto/ablkcipher.c, 315: kmalloc(GFP_ATOMIC) in setkey_unaligned
 
-On Thu, Jun 28, 2018 at 8:15 AM, Antoine Tenart
-<antoine.tenart@bootlin.com> wrote:
-> New compatibles are now supported by the Inside Secure SafeXcel driver.
-> As they are more specific than the old ones, they should be used
-> whenever possible. This patch updates the Marvell cp110 device tree
-> accordingly.
->
-> Signed-off-by: Antoine Tenart <antoine.tenart@bootlin.com>
-> ---
->  arch/arm64/boot/dts/marvell/armada-cp110.dtsi | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/arch/arm64/boot/dts/marvell/armada-cp110.dtsi b/arch/arm64/boot/dts/marvell/armada-cp110.dtsi
-> index 2bf083272a87..bb2914f90048 100644
-> --- a/arch/arm64/boot/dts/marvell/armada-cp110.dtsi
-> +++ b/arch/arm64/boot/dts/marvell/armada-cp110.dtsi
-> @@ -427,7 +427,7 @@
->                 };
->
->                 CP110_LABEL(crypto): crypto@800000 {
-> -                       compatible = "inside-secure,safexcel-eip197";
-> +                       compatible = "inside-secure,safexcel-eip197b";
+I meant to manually check the code, but I find that there are many 
+functions calling ablkcipher_next_slow(),
+ablkcipher_copy_iv() and setkey_unaligned(), so I am not sure whether 
+the above three reports are true.
 
-So the device is still compatible with the less-specific binding,
-right? If so, it should probably have both compatible properties in
-there, not just the more specific one.
-
-(Same for another patch in this series).
+Could someone help me to validate these reports?
+Thanks a lot in advance :)
 
 
-
--Olof
+Best wishes,
+Jia-Ju Bai
