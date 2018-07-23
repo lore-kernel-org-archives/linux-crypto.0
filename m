@@ -1,103 +1,121 @@
-From: Pavel Machek <pavel@ucw.cz>
-Subject: Re: [PATCH 0/4][RFC v2] Introduce the in-kernel hibernation
- encryption
-Date: Mon, 23 Jul 2018 14:22:27 +0200
-Message-ID: <20180723122227.GA30092@amd>
-References: <cover.1531924968.git.yu.c.chen@intel.com>
- <20180718202235.GA4132@amd>
- <20180718235851.GA22170@sandybridge-desktop>
- <20180719110149.GA4679@amd>
- <20180719132003.GA30981@sandybridge-desktop>
- <20180720102532.GA20284@amd>
- <1532346156.3057.11.camel@suse.com>
+From: "Theodore Y. Ts'o" <tytso@mit.edu>
+Subject: Re: Does /dev/urandom now block until initialised ?
+Date: Mon, 23 Jul 2018 11:16:08 -0400
+Message-ID: <20180723151608.GE3358@thunk.org>
+References: <CANVEwpbaU5=wMT_iSh9XrkmbLvqKjx4+v6PDizamaY0gWvk-mg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-        protocol="application/pgp-signature"; boundary="huq684BweRXVnRxX"
-Cc: Yu Chen <yu.c.chen@intel.com>,
-        "Rafael J . Wysocki" <rafael.j.wysocki@intel.com>,
-        Eric Biggers <ebiggers@google.com>,
-        "Lee, Chun-Yi" <jlee@suse.com>, Theodore Ts o <tytso@mit.edu>,
-        Stephan Mueller <smueller@chronox.de>,
-        Denis Kenzior <denkenz@gmail.com>, linux-pm@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        "Gu, Kookoo" <kookoo.gu@intel.com>,
-        "Zhang, Rui" <rui.zhang@intel.com>
-To: Oliver Neukum <oneukum@suse.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, lkml <linux-kernel@vger.kernel.org>
+To: Ken Moffat <zarniwhoop73@googlemail.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1532346156.3057.11.camel@suse.com>
+In-Reply-To: <CANVEwpbaU5=wMT_iSh9XrkmbLvqKjx4+v6PDizamaY0gWvk-mg@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
+On Mon, Jul 23, 2018 at 04:43:01AM +0100, Ken Moffat wrote:
+> Ted,
+> 
+> last week you proposed an rfc patch to gather entropy from the CPU's
+> hwrng, and I was pleased - until I discovered one of my stalling
+> desktop machines does not have a hwrng.  At that point I thought that
+> the problem was only from reading /dev/random, so I went away to look
+> at persuading the immediate consumer (unbound) to use /dev/urandom.
+> 
+> Did that, no change.  Ran strace from the bootscript, confirmed that
+> only /dev/urandom was being used, and that it seemed to be blocking.
+> Thought maybe this was the olnl problematic bootscript, tried moving
+> it to later, but hit the same problem on chronyd (again, seems to use
+> urandom). And yes, I probably should have started chronyd first
+> anyway, but that's irrelevant to this problem.
 
---huq684BweRXVnRxX
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Nope, /dev/urandom still doesn't block.  Are you sure it isn't caused
+by something calling getrandom(2) --- which *will* block?
 
-Hi!
+We intentionally left /dev/urandom non-blocking, because of backwards
+compatibility.
 
-> > > 2. Ideally kernel memory should be encrypted by the
-> > >    kernel itself. We have uswsusp to support user
-> > >    space hibernation, however doing the encryption
-> > >    in kernel space has more advantages:
-> > >    2.1 Not having to transfer plain text kernel memory to
-> > >        user space. Per Lee, Chun-Yi, uswsusp is disabled
-> > >        when the kernel is locked down:
-> > >        https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/
-> > >        linux-fs.git/commit/?h=3Dlockdown-20180410&
-> > >        id=3D8732c1663d7c0305ae01ba5a1ee4d2299b7b4612
-> > >        due to:
-> > >        "There have some functions be locked-down because
-> > >        there have no appropriate mechanisms to check the
-> > >        integrity of writing data."
-> > >        https://patchwork.kernel.org/patch/10476751/
-> >=20
-> > So your goal is to make hibernation compatible with kernel
-> > lockdown? Do your patches provide sufficient security that hibernation
-> > can be enabled with kernel lockdown?
->=20
-> OK, maybe I am dense, but if the key comes from user space, will that
-> be enough?
+> BUT: I'm not sure if I've correctly understood what is happening.
+> It seems to me that the fix for CVE-2018-1108 (4.17-rc1, 4.16.4)
+> means /dev/urandom will now block until fully initialised.
+> 
+> Is that correct and intentional ?
 
-Yes, that seems to be one of problems of Yu Chen's patchset.
+No, that's not right.  What the fix does is more accurately account
+for the entropy accounting before getrandom(2) would become
+non-blocking.  There were a bunch of things we were doing wrong,
+including assuming that 100% of the bytes being sent via
+add_device_entropy() were random --- when some of the things that were
+feeding into it was the (fixed) information you would get from running
+dmidecode (e.g., the fixed results from the BIOS configuration data).
 
-> > > Joey Lee and I had a discussion on his previous work at
-> > > https://patchwork.kernel.org/patch/10476751
-> > > We collaborate on this task and his snapshot signature
-> > > feature can be based on this patch set.
-> >=20
-> > Well, his work can also work without your patchset, right?
->=20
-> Yes. But you are objecting to encryption in kernel space at all,
-> aren't you?
+Some of those bytes might not be known to an external adversary (such
+as your CPU mainboard's serial number), but it's not exactly *Secret*.
 
-I don't particulary love the idea of doing hibernation encryption in
-the kernel, correct.
+> If so, to get the affected desktop machines to boot I seem to have
+> some choices...
 
-But we have this weird thing called secure boot, some people seem to
-want. So we may need some crypto in the kernel -- but I'd like
-something that works with uswsusp, too. Plus, it is mandatory that
-patch explains what security guarantees they want to provide against
-what kinds of attacks...
+Well, this probably isn't going to be popular, but the other thing
+that might help is you could switch distro's.  I'm guessing you run a
+Red Hat distro, probably Fedora, right?
 
-Lee, Chun-Yi's patch seemed more promising.				Pavel
+The problem which most people are seeing turns out to be a terrible
+interaction between dracut-fips, systemd and a Red Hat specific patch
+to libgcrypt for FIPS/FEDRAMP compliance:
 
---=20
-(english) http://www.livejournal.com/~pavelmachek
-(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blo=
-g.html
+https://src.fedoraproject.org/rpms/libgcrypt/blob/master/f/libgcrypt-1.6.2-fips-ctor.patch#_23
 
---huq684BweRXVnRxX
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
+Uninstalling dracut-fips and recreating the initramfs might also help.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
+One of the reasons why I didn't see the problem when I was developing
+the remediation patch for CVE-2018-1108 is because I run Debian
+testing, which doesn't have this particular Red Hat patch.
 
-iEYEARECAAYFAltVyIMACgkQMOfwapXb+vIOHwCfWnqIbC9JuKoYO//G3dJDkF4H
-cqYAnReOwwOusvgY1EgOrXWVBygOU3+J
-=lsnx
------END PGP SIGNATURE-----
+> The latter certainly lets it boot in a reasonable time, but people
+> who understand this seem to regard it as untrustworthy.  For users
+> of /dev/urandom that is no big deal, but does it not mean that the
+> values from /dev/random will be similarly untrustworthy and
+> therefore I should not use this machine for generating long-lived
+> secure keys ?
 
---huq684BweRXVnRxX--
+This really depends on how paranoid / careful you are.  Remember, your
+keyboard controller was almost certainly built in Shenzhen, China, and
+Matt Blaze published a paper on the Jitterbug in 2006:
+
+	http://www.crypto.com/papers/jbug-Usenix06-final.pdf
+
+In practice, after 30 minutes of operation, especially if you are
+using the keyboard, the entropy pool *will* be sufficiently
+randomized, whether or not it was sufficientl randomized at boot.  The
+real danger of CVE-2018-1108 was always long-term keys generated at
+first boot.  That was the problem that was discussed in the "Mining
+your p's and q's: Detection of Widespread Weak Keys in Network
+Devices" (see https://factorable.net).
+
+So generating long-lived keys means (a) you need to be sure you trust
+all of the software on the system --- some very paranoid people such
+as Bruce Schneier used a freshly installed machine from CD-ROM that
+was never attached to the network before examining materials from
+Edward Snowden, and (b) making sure the entropy pool is initialized.
+
+Remember we are constantly feeding input from the hardware sources
+into the entropy pool; it doesn't stop the moment we think the entropy
+pool is initialized.  And you can always mix extra "stuff" into the
+entropy pool by echoing the results of say, taking series of dice
+rolls, aond sending it via the "cat" or "echo" command into
+/dev/urhandom.
+
+So it should be possible to use the machine for generated long lived
+keys; you might just need to be a bit more careful before you do it.
+It's really keys generated automatically at boot that are most at risk
+--- and you can always regenerate the host SSH keys after a fresh
+install.  In fact, what I have done in the past when I first login to
+a freshly created Cloud VM system is to run command like "dd
+if=/dev/urandom count=1 bs=256 | od -x", then login to VM, and then
+run "cat > /dev/urandom", and cut and paste the results of the od -x
+output into the guest VM, to better initialize the entropy pool on the
+VM before regenerating the host SSH keys.
+
+Cheers,
+
+					- Ted
