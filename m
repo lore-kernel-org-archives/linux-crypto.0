@@ -1,20 +1,19 @@
 From: Jia-Ju Bai <baijiaju1990@gmail.com>
-Subject: [PATCH] crypto: cavium: nitrox: Replace GFP_ATOMIC with GFP_KERNEL in crypto_alloc_context()
-Date: Mon, 23 Jul 2018 16:14:26 +0800
-Message-ID: <20180723081426.31780-1-baijiaju1990@gmail.com>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jia-Ju Bai <baijiaju1990@gmail.com>
-To: herbert@gondor.apana.org.au, davem@davemloft.net,
-        kstewart@linuxfoundation.org, gregkh@linuxfoundation.org,
-        tglx@linutronix.de, pombredanne@nexb.com
+Subject: [PATCH] crypto: qat: adf_aer: Replace GFP_ATOMIC with GFP_KERNEL in adf_dev_aer_schedule_reset()
+Date: Mon, 23 Jul 2018 16:27:44 +0800
+Message-ID: <20180723082744.25409-1-baijiaju1990@gmail.com>
+Cc: qat-linux@intel.com, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Jia-Ju Bai <baijiaju1990@gmail.com>
+To: giovanni.cabiddu@intel.com, herbert@gondor.apana.org.au,
+        davem@davemloft.net
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-crypto_alloc_context() is only called by nitrox_skcipher_init(), which is
-never called in atomic context.
+adf_dev_aer_schedule_reset() is never called in atomic context, as it
+calls wait_for_completion_timeout().
 
-crypto_alloc_context() calls dma_pool_alloc() with GFP_ATOMIC,
+adf_dev_aer_schedule_reset() calls kzalloc() with GFP_ATOMIC,
 which is not necessary.
 GFP_ATOMIC can be replaced with GFP_KERNEL.
 
@@ -23,21 +22,21 @@ I also manually check the kernel code before reporting it.
 
 Signed-off-by: Jia-Ju Bai <baijiaju1990@gmail.com>
 ---
- drivers/crypto/cavium/nitrox/nitrox_lib.c | 2 +-
+ drivers/crypto/qat/qat_common/adf_aer.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/cavium/nitrox/nitrox_lib.c b/drivers/crypto/cavium/nitrox/nitrox_lib.c
-index 4fdc921ba611..ebe267379ac9 100644
---- a/drivers/crypto/cavium/nitrox/nitrox_lib.c
-+++ b/drivers/crypto/cavium/nitrox/nitrox_lib.c
-@@ -148,7 +148,7 @@ void *crypto_alloc_context(struct nitrox_device *ndev)
- 	void *vaddr;
- 	dma_addr_t dma;
+diff --git a/drivers/crypto/qat/qat_common/adf_aer.c b/drivers/crypto/qat/qat_common/adf_aer.c
+index da8a2d3b5e9a..9225d060e18f 100644
+--- a/drivers/crypto/qat/qat_common/adf_aer.c
++++ b/drivers/crypto/qat/qat_common/adf_aer.c
+@@ -163,7 +163,7 @@ static int adf_dev_aer_schedule_reset(struct adf_accel_dev *accel_dev,
+ 		return 0;
  
--	vaddr = dma_pool_alloc(ndev->ctx_pool, (GFP_ATOMIC | __GFP_ZERO), &dma);
-+	vaddr = dma_pool_alloc(ndev->ctx_pool, (GFP_KERNEL | __GFP_ZERO), &dma);
- 	if (!vaddr)
- 		return NULL;
- 
+ 	set_bit(ADF_STATUS_RESTARTING, &accel_dev->status);
+-	reset_data = kzalloc(sizeof(*reset_data), GFP_ATOMIC);
++	reset_data = kzalloc(sizeof(*reset_data), GFP_KERNEL);
+ 	if (!reset_data)
+ 		return -ENOMEM;
+ 	reset_data->accel_dev = accel_dev;
 -- 
 2.17.0
