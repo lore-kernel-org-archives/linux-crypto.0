@@ -1,7 +1,7 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH 3/4] crypto: ccree: zero all of request ctx before use
-Date: Tue, 24 Jul 2018 15:12:45 +0100
-Message-ID: <1532441567-11694-4-git-send-email-gilad@benyossef.com>
+Subject: [PATCH 4/4] crypto: ccree: allow bigger than sector XTS op
+Date: Tue, 24 Jul 2018 15:12:46 +0100
+Message-ID: <1532441567-11694-5-git-send-email-gilad@benyossef.com>
 References: <1532441567-11694-1-git-send-email-gilad@benyossef.com>
 Cc: Ofir Drang <ofir.drang@arm.com>,
         Geert Uytterhoeven <geert+renesas@glider.be>,
@@ -13,51 +13,46 @@ In-Reply-To: <1532441567-11694-1-git-send-email-gilad@benyossef.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-In certain error path req_ctx->iv was being freed despite
-not being allocated because it was not initialized to NULL.
-Rather than play whack a mole with the structure various
-field, zero it before use.
+The ccree driver had a sanity check that we are not asked
+to encrypt an XTS buffer bigger than a sane sector size
+since XTS IV needs to include the sector number in the IV
+so this is not expected in any real use case.
 
-This fixes a kernel panic that may occur if an invalid
-buffer size was requested triggering the bug above.
+Unfortunately, this breaks cryptsetup benchmark test which
+has a synthetic performance test using 64k buffer of data
+with the same IV.
 
-Fixes: 63ee04c8b491 ("crypto: ccree - add skcipher support")
+Remove the sanity check and allow the user to hang themselves
+and/or run benchmarks if they so wish.
+
 Reported-by: Geert Uytterhoeven <geert+renesas@glider.be>
 Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 ---
- drivers/crypto/ccree/cc_cipher.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ drivers/crypto/ccree/cc_cipher.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
 diff --git a/drivers/crypto/ccree/cc_cipher.c b/drivers/crypto/ccree/cc_cipher.c
-index 64740dd..9da0ecc 100644
+index 9da0ecc..7623b299 100644
 --- a/drivers/crypto/ccree/cc_cipher.c
 +++ b/drivers/crypto/ccree/cc_cipher.c
-@@ -767,7 +767,7 @@ static int cc_cipher_encrypt(struct skcipher_request *req)
- {
- 	struct cipher_req_ctx *req_ctx = skcipher_request_ctx(req);
+@@ -19,8 +19,6 @@
  
--	req_ctx->backup_info = NULL;
-+	memset(req_ctx, 0, sizeof(*req_ctx));
+ #define template_skcipher	template_u.skcipher
  
- 	return cc_cipher_process(req, DRV_CRYPTO_DIRECTION_ENCRYPT);
- }
-@@ -782,6 +782,8 @@ static int cc_cipher_decrypt(struct skcipher_request *req)
- 	gfp_t flags = cc_gfp_flags(&req->base);
- 	unsigned int len;
- 
-+	memset(req_ctx, 0, sizeof(*req_ctx));
-+
- 	if (ctx_p->cipher_mode == DRV_CIPHER_CBC) {
- 
- 		/* Allocate and save the last IV sized bytes of the source,
-@@ -794,8 +796,6 @@ static int cc_cipher_decrypt(struct skcipher_request *req)
- 		len = req->cryptlen - ivsize;
- 		scatterwalk_map_and_copy(req_ctx->backup_info, req->src, len,
- 					 ivsize, 0);
--	} else {
--		req_ctx->backup_info = NULL;
- 	}
- 
- 	return cc_cipher_process(req, DRV_CRYPTO_DIRECTION_DECRYPT);
+-#define CC_MIN_AES_XTS_SIZE 0x10
+-#define CC_MAX_AES_XTS_SIZE 0x2000
+ struct cc_cipher_handle {
+ 	struct list_head alg_list;
+ };
+@@ -98,8 +96,7 @@ static int validate_data_size(struct cc_cipher_ctx *ctx_p,
+ 	case S_DIN_to_AES:
+ 		switch (ctx_p->cipher_mode) {
+ 		case DRV_CIPHER_XTS:
+-			if (size >= CC_MIN_AES_XTS_SIZE &&
+-			    size <= CC_MAX_AES_XTS_SIZE &&
++			if (size >= AES_BLOCK_SIZE &&
+ 			    IS_ALIGNED(size, AES_BLOCK_SIZE))
+ 				return 0;
+ 			break;
 -- 
 2.7.4
