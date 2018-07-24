@@ -1,7 +1,7 @@
 From: Kees Cook <keescook@chromium.org>
-Subject: [PATCH v6 06/18] crypto: qat: Remove VLA usage
-Date: Tue, 24 Jul 2018 09:49:24 -0700
-Message-ID: <20180724164936.37477-7-keescook@chromium.org>
+Subject: [PATCH v6 07/18] crypto: shash: Remove VLA usage in unaligned hashing
+Date: Tue, 24 Jul 2018 09:49:25 -0700
+Message-ID: <20180724164936.37477-8-keescook@chromium.org>
 References: <20180724164936.37477-1-keescook@chromium.org>
 Cc: Kees Cook <keescook@chromium.org>, Arnd Bergmann <arnd@arndb.de>,
         Eric Biggers <ebiggers@google.com>,
@@ -29,40 +29,88 @@ Sender: netdev-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
 In the quest to remove all stack VLA usage from the kernel[1], this uses
-the new upper bound for the stack buffer. Also adds a sanity check.
+the newly defined max alignment to perform unaligned hashing to avoid
+VLAs, and drops the helper function while adding sanity checks on the
+resulting buffer sizes. Additionally, the __aligned_largest macro is
+removed since this helper was the only user.
 
 [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
 
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- drivers/crypto/qat/qat_common/qat_algs.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ crypto/shash.c               | 27 ++++++++++++++++-----------
+ include/linux/compiler-gcc.h |  1 -
+ 2 files changed, 16 insertions(+), 12 deletions(-)
 
-diff --git a/drivers/crypto/qat/qat_common/qat_algs.c b/drivers/crypto/qat/qat_common/qat_algs.c
-index 1138e41d6805..a28edf7b792f 100644
---- a/drivers/crypto/qat/qat_common/qat_algs.c
-+++ b/drivers/crypto/qat/qat_common/qat_algs.c
-@@ -153,8 +153,8 @@ static int qat_alg_do_precomputes(struct icp_qat_hw_auth_algo_blk *hash,
- 	struct sha512_state sha512;
- 	int block_size = crypto_shash_blocksize(ctx->hash_tfm);
- 	int digest_size = crypto_shash_digestsize(ctx->hash_tfm);
--	char ipad[block_size];
--	char opad[block_size];
-+	char ipad[MAX_ALGAPI_BLOCKSIZE];
-+	char opad[MAX_ALGAPI_BLOCKSIZE];
- 	__be32 *hash_state_out;
- 	__be64 *hash512_state_out;
- 	int i, offset;
-@@ -164,6 +164,10 @@ static int qat_alg_do_precomputes(struct icp_qat_hw_auth_algo_blk *hash,
- 	shash->tfm = ctx->hash_tfm;
- 	shash->flags = 0x0;
+diff --git a/crypto/shash.c b/crypto/shash.c
+index 86d76b5c626c..d21f04d70dce 100644
+--- a/crypto/shash.c
++++ b/crypto/shash.c
+@@ -73,13 +73,6 @@ int crypto_shash_setkey(struct crypto_shash *tfm, const u8 *key,
+ }
+ EXPORT_SYMBOL_GPL(crypto_shash_setkey);
  
-+	if (WARN_ON(block_size > sizeof(ipad) ||
-+		    sizeof(ipad) != sizeof(opad)))
+-static inline unsigned int shash_align_buffer_size(unsigned len,
+-						   unsigned long mask)
+-{
+-	typedef u8 __aligned_largest u8_aligned;
+-	return len + (mask & ~(__alignof__(u8_aligned) - 1));
+-}
+-
+ static int shash_update_unaligned(struct shash_desc *desc, const u8 *data,
+ 				  unsigned int len)
+ {
+@@ -88,11 +81,17 @@ static int shash_update_unaligned(struct shash_desc *desc, const u8 *data,
+ 	unsigned long alignmask = crypto_shash_alignmask(tfm);
+ 	unsigned int unaligned_len = alignmask + 1 -
+ 				     ((unsigned long)data & alignmask);
+-	u8 ubuf[shash_align_buffer_size(unaligned_len, alignmask)]
+-		__aligned_largest;
++	/*
++	 * We cannot count on __aligned() working for large values:
++	 * https://patchwork.kernel.org/patch/9507697/
++	 */
++	u8 ubuf[MAX_ALGAPI_ALIGNMASK * 2];
+ 	u8 *buf = PTR_ALIGN(&ubuf[0], alignmask + 1);
+ 	int err;
+ 
++	if (WARN_ON(buf + unaligned_len > ubuf + sizeof(ubuf)))
 +		return -EINVAL;
 +
- 	if (auth_keylen > block_size) {
- 		int ret = crypto_shash_digest(shash, auth_key,
- 					      auth_keylen, ipad);
+ 	if (unaligned_len > len)
+ 		unaligned_len = len;
+ 
+@@ -124,11 +123,17 @@ static int shash_final_unaligned(struct shash_desc *desc, u8 *out)
+ 	unsigned long alignmask = crypto_shash_alignmask(tfm);
+ 	struct shash_alg *shash = crypto_shash_alg(tfm);
+ 	unsigned int ds = crypto_shash_digestsize(tfm);
+-	u8 ubuf[shash_align_buffer_size(ds, alignmask)]
+-		__aligned_largest;
++	/*
++	 * We cannot count on __aligned() working for large values:
++	 * https://patchwork.kernel.org/patch/9507697/
++	 */
++	u8 ubuf[MAX_ALGAPI_ALIGNMASK + HASH_MAX_DIGESTSIZE];
+ 	u8 *buf = PTR_ALIGN(&ubuf[0], alignmask + 1);
+ 	int err;
+ 
++	if (WARN_ON(buf + ds > ubuf + sizeof(ubuf)))
++		return -EINVAL;
++
+ 	err = shash->final(desc, buf);
+ 	if (err)
+ 		goto out;
+diff --git a/include/linux/compiler-gcc.h b/include/linux/compiler-gcc.h
+index f1a7492a5cc8..1f1cdef36a82 100644
+--- a/include/linux/compiler-gcc.h
++++ b/include/linux/compiler-gcc.h
+@@ -125,7 +125,6 @@
+  */
+ #define __pure			__attribute__((pure))
+ #define __aligned(x)		__attribute__((aligned(x)))
+-#define __aligned_largest	__attribute__((aligned))
+ #define __printf(a, b)		__attribute__((format(printf, a, b)))
+ #define __scanf(a, b)		__attribute__((format(scanf, a, b)))
+ #define __attribute_const__	__attribute__((__const__))
 -- 
 2.17.1
