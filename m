@@ -1,7 +1,7 @@
 From: Kees Cook <keescook-F7+t8E8rja9g9hUCZPvPmw@public.gmane.org>
-Subject: [PATCH v6 02/18] crypto: cbc: Remove VLA usage
-Date: Tue, 24 Jul 2018 09:49:20 -0700
-Message-ID: <20180724164936.37477-3-keescook@chromium.org>
+Subject: [PATCH v6 01/18] crypto: xcbc: Remove VLA usage
+Date: Tue, 24 Jul 2018 09:49:19 -0700
+Message-ID: <20180724164936.37477-2-keescook@chromium.org>
 References: <20180724164936.37477-1-keescook@chromium.org>
 Cc: Kees Cook <keescook-F7+t8E8rja9g9hUCZPvPmw@public.gmane.org>, Arnd Bergmann <arnd-r2nGTMty4D4@public.gmane.org>,
         Eric Biggers <ebiggers-hpIqsD4AKlfQT0dZR+AlfA@public.gmane.org>,
@@ -28,31 +28,50 @@ In-Reply-To: <20180724164936.37477-1-keescook-F7+t8E8rja9g9hUCZPvPmw@public.gman
 Sender: linux-wireless-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-In the quest to remove all stack VLA usage from the kernel[1], this
-uses the upper bounds on blocksize. Since this is always a cipher
-blocksize, use the existing cipher max blocksize.
+In the quest to remove all stack VLA usage from the kernel[1], this uses
+the maximum blocksize and adds a sanity check. For xcbc, the blocksize
+must always be 16, so use that, since it's already being enforced during
+instantiation.
 
 [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org
 
 Signed-off-by: Kees Cook <keescook-F7+t8E8rja9g9hUCZPvPmw@public.gmane.org>
 ---
- include/crypto/cbc.h | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ crypto/xcbc.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/include/crypto/cbc.h b/include/crypto/cbc.h
-index f5b8bfc22e6d..47db0aac2ab9 100644
---- a/include/crypto/cbc.h
-+++ b/include/crypto/cbc.h
-@@ -113,7 +113,9 @@ static inline int crypto_cbc_decrypt_inplace(
- 	unsigned int bsize = crypto_skcipher_blocksize(tfm);
- 	unsigned int nbytes = walk->nbytes;
- 	u8 *src = walk->src.virt.addr;
--	u8 last_iv[bsize];
-+	u8 last_iv[MAX_CIPHER_BLOCKSIZE];
-+
-+	BUG_ON(bsize > sizeof(last_iv));
+diff --git a/crypto/xcbc.c b/crypto/xcbc.c
+index 25c75af50d3f..c055f57fab11 100644
+--- a/crypto/xcbc.c
++++ b/crypto/xcbc.c
+@@ -57,15 +57,17 @@ struct xcbc_desc_ctx {
+ 	u8 ctx[];
+ };
  
- 	/* Start of the last block. */
- 	src += nbytes - (nbytes & (bsize - 1)) - bsize;
++#define XCBC_BLOCKSIZE	16
++
+ static int crypto_xcbc_digest_setkey(struct crypto_shash *parent,
+ 				     const u8 *inkey, unsigned int keylen)
+ {
+ 	unsigned long alignmask = crypto_shash_alignmask(parent);
+ 	struct xcbc_tfm_ctx *ctx = crypto_shash_ctx(parent);
+-	int bs = crypto_shash_blocksize(parent);
+ 	u8 *consts = PTR_ALIGN(&ctx->ctx[0], alignmask + 1);
+ 	int err = 0;
+-	u8 key1[bs];
++	u8 key1[XCBC_BLOCKSIZE];
++	int bs = sizeof(key1);
+ 
+ 	if ((err = crypto_cipher_setkey(ctx->child, inkey, keylen)))
+ 		return err;
+@@ -212,7 +214,7 @@ static int xcbc_create(struct crypto_template *tmpl, struct rtattr **tb)
+ 		return PTR_ERR(alg);
+ 
+ 	switch(alg->cra_blocksize) {
+-	case 16:
++	case XCBC_BLOCKSIZE:
+ 		break;
+ 	default:
+ 		goto out_put_alg;
 -- 
 2.17.1
