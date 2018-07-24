@@ -1,167 +1,126 @@
 From: Kees Cook <keescook@chromium.org>
-Subject: [PATCH v6 13/18] wireless/lib80211: Convert from ahash to shash
-Date: Tue, 24 Jul 2018 09:49:31 -0700
-Message-ID: <20180724164936.37477-14-keescook@chromium.org>
+Subject: [PATCH v6 03/18] crypto: hash: Remove VLA usage
+Date: Tue, 24 Jul 2018 09:49:21 -0700
+Message-ID: <20180724164936.37477-4-keescook@chromium.org>
 References: <20180724164936.37477-1-keescook@chromium.org>
-Cc: Kees Cook <keescook@chromium.org>, Arnd Bergmann <arnd@arndb.de>,
-        Eric Biggers <ebiggers@google.com>,
-        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
-        Alasdair Kergon <agk@redhat.com>,
-        Rabin Vincent <rabinv@axis.com>,
-        Tim Chen <tim.c.chen@linux.intel.com>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        Pavel Machek <pavel@ucw.cz>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        Lars Ellenberg <lars.ellenberg@linbit.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        David Howells <dhowe
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+	Mike Snitzer <snitzer@redhat.com>,
+	"Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+	linux-wireless@vger.kernel.org,
+	Will Deacon <will.deacon@arm.com>, linux-kernel@vger.kernel.org,
+	David Howells <dhowells@redhat.com>, dm-devel@redhat.com,
+	Jia-Ju Bai <baijiaju1990@gmail.com>,
+	Paul Mackerras <paulus@samba.org>, Pavel Machek <pavel@ucw.cz>,
+	"H. Peter Anvin" <hpa@zytor.com>, linux-afs@lists.infradead.org,
+	Alasdair Kergon <agk@redhat.com>,
+	Kees Cook <keescook@chromium.org>, devel@driverdev.osuosl.org,
+	x86@kernel.org, qat-linux@intel.com, Ingo Molnar <mingo@redhat.com>,
+	Eric Biggers <ebiggers@google.com>,
+	Geert Uytterhoeven <geert@linux-m68k.org>,
+	drbd-dev@lists.linbit.com, Rabin Vincent <rabinv@axis.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Tudor-Dan Ambarus <tudor.ambarus@microchip.com>,
+	linux-block@vger.kernel.org, Josh Poimboeuf
 To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <dm-devel-bounces@redhat.com>
 In-Reply-To: <20180724164936.37477-1-keescook@chromium.org>
-Sender: linux-kernel-owner@vger.kernel.org
+List-Unsubscribe: <https://www.redhat.com/mailman/options/dm-devel>,
+	<mailto:dm-devel-request@redhat.com?subject=unsubscribe>
+List-Archive: <https://www.redhat.com/archives/dm-devel>
+List-Post: <mailto:dm-devel@redhat.com>
+List-Help: <mailto:dm-devel-request@redhat.com?subject=help>
+List-Subscribe: <https://www.redhat.com/mailman/listinfo/dm-devel>,
+	<mailto:dm-devel-request@redhat.com?subject=subscribe>
+Sender: dm-devel-bounces@redhat.com
+Errors-To: dm-devel-bounces@redhat.com
 List-Id: linux-crypto.vger.kernel.org
 
-In preparing to remove all stack VLA usage from the kernel[1], this
-removes the discouraged use of AHASH_REQUEST_ON_STACK in favor of
-the smaller SHASH_DESC_ON_STACK by converting from ahash-wrapped-shash
-to direct shash. By removing a layer of indirection this both improves
-performance and reduces stack usage. The stack allocation will be made
-a fixed size in a later patch to the crypto subsystem.
+In the quest to remove all stack VLA usage from the kernel[1], this
+removes the VLAs in SHASH_DESC_ON_STACK (via crypto_shash_descsize())
+by using the maximum allowable size (which is now more clearly captured
+in a macro), along with a few other cases. Similar limits are turned into
+macros as well.
+
+A review of existing sizes shows that SHA512_DIGEST_SIZE (64) is the
+largest digest size and that sizeof(struct sha3_state) (360) is the
+largest descriptor size. The corresponding maximums are reduced.
 
 [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
 
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- net/wireless/lib80211_crypt_tkip.c | 58 +++++++++++++++---------------
- 1 file changed, 29 insertions(+), 29 deletions(-)
+ crypto/ahash.c        | 4 ++--
+ crypto/algif_hash.c   | 2 +-
+ crypto/shash.c        | 6 +++---
+ include/crypto/hash.h | 6 +++++-
+ 4 files changed, 11 insertions(+), 7 deletions(-)
 
-diff --git a/net/wireless/lib80211_crypt_tkip.c b/net/wireless/lib80211_crypt_tkip.c
-index ba0a1f398ce5..21040aba3a81 100644
---- a/net/wireless/lib80211_crypt_tkip.c
-+++ b/net/wireless/lib80211_crypt_tkip.c
-@@ -65,9 +65,9 @@ struct lib80211_tkip_data {
- 	int key_idx;
- 
- 	struct crypto_skcipher *rx_tfm_arc4;
--	struct crypto_ahash *rx_tfm_michael;
-+	struct crypto_shash *rx_tfm_michael;
- 	struct crypto_skcipher *tx_tfm_arc4;
--	struct crypto_ahash *tx_tfm_michael;
-+	struct crypto_shash *tx_tfm_michael;
- 
- 	/* scratch buffers for virt_to_page() (crypto API) */
- 	u8 rx_hdr[16], tx_hdr[16];
-@@ -106,8 +106,7 @@ static void *lib80211_tkip_init(int key_idx)
- 		goto fail;
- 	}
- 
--	priv->tx_tfm_michael = crypto_alloc_ahash("michael_mic", 0,
--						  CRYPTO_ALG_ASYNC);
-+	priv->tx_tfm_michael = crypto_alloc_shash("michael_mic", 0, 0);
- 	if (IS_ERR(priv->tx_tfm_michael)) {
- 		priv->tx_tfm_michael = NULL;
- 		goto fail;
-@@ -120,8 +119,7 @@ static void *lib80211_tkip_init(int key_idx)
- 		goto fail;
- 	}
- 
--	priv->rx_tfm_michael = crypto_alloc_ahash("michael_mic", 0,
--						  CRYPTO_ALG_ASYNC);
-+	priv->rx_tfm_michael = crypto_alloc_shash("michael_mic", 0, 0);
- 	if (IS_ERR(priv->rx_tfm_michael)) {
- 		priv->rx_tfm_michael = NULL;
- 		goto fail;
-@@ -131,9 +129,9 @@ static void *lib80211_tkip_init(int key_idx)
- 
-       fail:
- 	if (priv) {
--		crypto_free_ahash(priv->tx_tfm_michael);
-+		crypto_free_shash(priv->tx_tfm_michael);
- 		crypto_free_skcipher(priv->tx_tfm_arc4);
--		crypto_free_ahash(priv->rx_tfm_michael);
-+		crypto_free_shash(priv->rx_tfm_michael);
- 		crypto_free_skcipher(priv->rx_tfm_arc4);
- 		kfree(priv);
- 	}
-@@ -145,9 +143,9 @@ static void lib80211_tkip_deinit(void *priv)
+diff --git a/crypto/ahash.c b/crypto/ahash.c
+index a64c143165b1..78aaf2158c43 100644
+--- a/crypto/ahash.c
++++ b/crypto/ahash.c
+@@ -550,8 +550,8 @@ static int ahash_prepare_alg(struct ahash_alg *alg)
  {
- 	struct lib80211_tkip_data *_priv = priv;
- 	if (_priv) {
--		crypto_free_ahash(_priv->tx_tfm_michael);
-+		crypto_free_shash(_priv->tx_tfm_michael);
- 		crypto_free_skcipher(_priv->tx_tfm_arc4);
--		crypto_free_ahash(_priv->rx_tfm_michael);
-+		crypto_free_shash(_priv->rx_tfm_michael);
- 		crypto_free_skcipher(_priv->rx_tfm_arc4);
- 	}
- 	kfree(priv);
-@@ -510,29 +508,31 @@ static int lib80211_tkip_decrypt(struct sk_buff *skb, int hdr_len, void *priv)
- 	return keyidx;
- }
+ 	struct crypto_alg *base = &alg->halg.base;
  
--static int michael_mic(struct crypto_ahash *tfm_michael, u8 * key, u8 * hdr,
--		       u8 * data, size_t data_len, u8 * mic)
-+static int michael_mic(struct crypto_shash *tfm_michael, u8 *key, u8 *hdr,
-+		       u8 *data, size_t data_len, u8 *mic)
+-	if (alg->halg.digestsize > PAGE_SIZE / 8 ||
+-	    alg->halg.statesize > PAGE_SIZE / 8 ||
++	if (alg->halg.digestsize > HASH_MAX_DIGESTSIZE ||
++	    alg->halg.statesize > HASH_MAX_STATESIZE ||
+ 	    alg->halg.statesize == 0)
+ 		return -EINVAL;
+ 
+diff --git a/crypto/algif_hash.c b/crypto/algif_hash.c
+index bfcf595fd8f9..d0cde541beb6 100644
+--- a/crypto/algif_hash.c
++++ b/crypto/algif_hash.c
+@@ -239,7 +239,7 @@ static int hash_accept(struct socket *sock, struct socket *newsock, int flags,
+ 	struct alg_sock *ask = alg_sk(sk);
+ 	struct hash_ctx *ctx = ask->private;
+ 	struct ahash_request *req = &ctx->req;
+-	char state[crypto_ahash_statesize(crypto_ahash_reqtfm(req)) ? : 1];
++	char state[HASH_MAX_STATESIZE];
+ 	struct sock *sk2;
+ 	struct alg_sock *ask2;
+ 	struct hash_ctx *ctx2;
+diff --git a/crypto/shash.c b/crypto/shash.c
+index 5d732c6bb4b2..86d76b5c626c 100644
+--- a/crypto/shash.c
++++ b/crypto/shash.c
+@@ -458,9 +458,9 @@ static int shash_prepare_alg(struct shash_alg *alg)
  {
--	AHASH_REQUEST_ON_STACK(req, tfm_michael);
--	struct scatterlist sg[2];
-+	SHASH_DESC_ON_STACK(desc, tfm_michael);
- 	int err;
+ 	struct crypto_alg *base = &alg->base;
  
--	if (tfm_michael == NULL) {
--		pr_warn("%s(): tfm_michael == NULL\n", __func__);
--		return -1;
--	}
--	sg_init_table(sg, 2);
--	sg_set_buf(&sg[0], hdr, 16);
--	sg_set_buf(&sg[1], data, data_len);
-+	desc->tfm = tfm_michael;
-+	desc->flags = 0;
+-	if (alg->digestsize > PAGE_SIZE / 8 ||
+-	    alg->descsize > PAGE_SIZE / 8 ||
+-	    alg->statesize > PAGE_SIZE / 8)
++	if (alg->digestsize > HASH_MAX_DIGESTSIZE ||
++	    alg->descsize > HASH_MAX_DESCSIZE ||
++	    alg->statesize > HASH_MAX_STATESIZE)
+ 		return -EINVAL;
  
--	if (crypto_ahash_setkey(tfm_michael, key, 8))
-+	if (crypto_shash_setkey(tfm_michael, key, 8))
- 		return -1;
+ 	base->cra_type = &crypto_shash_type;
+diff --git a/include/crypto/hash.h b/include/crypto/hash.h
+index 76e432cab75d..21587011ab0f 100644
+--- a/include/crypto/hash.h
++++ b/include/crypto/hash.h
+@@ -151,9 +151,13 @@ struct shash_desc {
+ 	void *__ctx[] CRYPTO_MINALIGN_ATTR;
+ };
  
--	ahash_request_set_tfm(req, tfm_michael);
--	ahash_request_set_callback(req, 0, NULL, NULL);
--	ahash_request_set_crypt(req, sg, mic, data_len + 16);
--	err = crypto_ahash_digest(req);
--	ahash_request_zero(req);
-+	err = crypto_shash_init(desc);
-+	if (err)
-+		goto out;
-+	err = crypto_shash_update(desc, hdr, 16);
-+	if (err)
-+		goto out;
-+	err = crypto_shash_update(desc, data, data_len);
-+	if (err)
-+		goto out;
-+	err = crypto_shash_final(desc, mic);
++#define HASH_MAX_DIGESTSIZE	 64
++#define HASH_MAX_DESCSIZE	360
++#define HASH_MAX_STATESIZE	512
 +
-+out:
-+	shash_desc_zero(desc);
- 	return err;
- }
+ #define SHASH_DESC_ON_STACK(shash, ctx)				  \
+ 	char __##shash##_desc[sizeof(struct shash_desc) +	  \
+-		crypto_shash_descsize(ctx)] CRYPTO_MINALIGN_ATTR; \
++		HASH_MAX_DESCSIZE] CRYPTO_MINALIGN_ATTR; \
+ 	struct shash_desc *shash = (struct shash_desc *)__##shash##_desc
  
-@@ -654,9 +654,9 @@ static int lib80211_tkip_set_key(void *key, int len, u8 * seq, void *priv)
- {
- 	struct lib80211_tkip_data *tkey = priv;
- 	int keyidx;
--	struct crypto_ahash *tfm = tkey->tx_tfm_michael;
-+	struct crypto_shash *tfm = tkey->tx_tfm_michael;
- 	struct crypto_skcipher *tfm2 = tkey->tx_tfm_arc4;
--	struct crypto_ahash *tfm3 = tkey->rx_tfm_michael;
-+	struct crypto_shash *tfm3 = tkey->rx_tfm_michael;
- 	struct crypto_skcipher *tfm4 = tkey->rx_tfm_arc4;
- 
- 	keyidx = tkey->key_idx;
+ /**
 -- 
 2.17.1
