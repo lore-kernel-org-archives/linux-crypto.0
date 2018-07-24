@@ -1,8 +1,8 @@
 From: Kees Cook <keescook@chromium.org>
-Subject: [PATCH v6 08/18] crypto: skcipher: Remove VLA usage for
-	SKCIPHER_REQUEST_ON_STACK
-Date: Tue, 24 Jul 2018 09:49:26 -0700
-Message-ID: <20180724164936.37477-9-keescook@chromium.org>
+Subject: [PATCH v6 05/18] crypto alg: Introduce generic max
+	blocksize and alignmask
+Date: Tue, 24 Jul 2018 09:49:23 -0700
+Message-ID: <20180724164936.37477-6-keescook@chromium.org>
 References: <20180724164936.37477-1-keescook@chromium.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -40,51 +40,57 @@ Errors-To: dm-devel-bounces@redhat.com
 List-Id: linux-crypto.vger.kernel.org
 
 In the quest to remove all stack VLA usage from the kernel[1], this
-caps the skcipher request size similar to other limits and adds a sanity
-check at registration. Looking at instrumented tcrypt output, the largest
-is for lrw:
+exposes a new general upper bound on crypto blocksize and alignmask
+(higher than for the existing cipher limits) for VLA removal,
+and introduces new checks.
 
-	crypt: testing lrw(aes)
-	crypto_skcipher_set_reqsize: 8
-	crypto_skcipher_set_reqsize: 88
-	crypto_skcipher_set_reqsize: 472
+At present, the highest cra_alignmask in the kernel is 63. The highest
+cra_blocksize is 144 (SHA3_224_BLOCK_SIZE, 18 8-byte words). For the
+new blocksize limit, I went with 160 (20 8-byte words).
 
 [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
 
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- include/crypto/internal/skcipher.h | 1 +
- include/crypto/skcipher.h          | 4 +++-
- 2 files changed, 4 insertions(+), 1 deletion(-)
+ crypto/algapi.c         | 7 ++++++-
+ include/crypto/algapi.h | 4 +++-
+ 2 files changed, 9 insertions(+), 2 deletions(-)
 
-diff --git a/include/crypto/internal/skcipher.h b/include/crypto/internal/skcipher.h
-index e42f7063f245..5035482cbe68 100644
---- a/include/crypto/internal/skcipher.h
-+++ b/include/crypto/internal/skcipher.h
-@@ -130,6 +130,7 @@ static inline struct crypto_skcipher *crypto_spawn_skcipher(
- static inline void crypto_skcipher_set_reqsize(
- 	struct crypto_skcipher *skcipher, unsigned int reqsize)
- {
-+	BUG_ON(reqsize > SKCIPHER_MAX_REQSIZE);
- 	skcipher->reqsize = reqsize;
- }
+diff --git a/crypto/algapi.c b/crypto/algapi.c
+index c0755cf4f53f..496fc51bf215 100644
+--- a/crypto/algapi.c
++++ b/crypto/algapi.c
+@@ -57,9 +57,14 @@ static int crypto_check_alg(struct crypto_alg *alg)
+ 	if (alg->cra_alignmask & (alg->cra_alignmask + 1))
+ 		return -EINVAL;
  
-diff --git a/include/crypto/skcipher.h b/include/crypto/skcipher.h
-index 2f327f090c3e..c48e194438cf 100644
---- a/include/crypto/skcipher.h
-+++ b/include/crypto/skcipher.h
-@@ -139,9 +139,11 @@ struct skcipher_alg {
- 	struct crypto_alg base;
- };
+-	if (alg->cra_blocksize > PAGE_SIZE / 8)
++	/* General maximums for all algs. */
++	if (alg->cra_alignmask > MAX_ALGAPI_ALIGNMASK)
+ 		return -EINVAL;
  
-+#define SKCIPHER_MAX_REQSIZE	472
++	if (alg->cra_blocksize > MAX_ALGAPI_BLOCKSIZE)
++		return -EINVAL;
 +
- #define SKCIPHER_REQUEST_ON_STACK(name, tfm) \
- 	char __##name##_desc[sizeof(struct skcipher_request) + \
--		crypto_skcipher_reqsize(tfm)] CRYPTO_MINALIGN_ATTR; \
-+		SKCIPHER_MAX_REQSIZE] CRYPTO_MINALIGN_ATTR; \
- 	struct skcipher_request *name = (void *)__##name##_desc
++	/* Lower maximums for specific alg types. */
+ 	if (!alg->cra_type && (alg->cra_flags & CRYPTO_ALG_TYPE_MASK) ==
+ 			       CRYPTO_ALG_TYPE_CIPHER) {
+ 		if (alg->cra_alignmask > MAX_CIPHER_ALIGNMASK)
+diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
+index bd5e8ccf1687..21371ac8f355 100644
+--- a/include/crypto/algapi.h
++++ b/include/crypto/algapi.h
+@@ -20,8 +20,10 @@
+ /*
+  * Maximum values for blocksize and alignmask, used to allocate
+  * static buffers that are big enough for any combination of
+- * ciphers and architectures.
++ * algs and architectures. Ciphers have a lower maximum size.
+  */
++#define MAX_ALGAPI_BLOCKSIZE		160
++#define MAX_ALGAPI_ALIGNMASK		63
+ #define MAX_CIPHER_BLOCKSIZE		16
+ #define MAX_CIPHER_ALIGNMASK		15
  
- /**
 -- 
 2.17.1
