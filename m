@@ -1,7 +1,8 @@
 From: Kees Cook <keescook@chromium.org>
-Subject: [PATCH v6 00/18] crypto: Remove VLA usage
-Date: Tue, 24 Jul 2018 09:49:18 -0700
-Message-ID: <20180724164936.37477-1-keescook@chromium.org>
+Subject: [PATCH v6 10/18] x86/power/64: Remove VLA usage
+Date: Tue, 24 Jul 2018 09:49:28 -0700
+Message-ID: <20180724164936.37477-11-keescook@chromium.org>
+References: <20180724164936.37477-1-keescook@chromium.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
@@ -25,6 +26,7 @@ Cc: Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
 	linux-block@vger.kernel.org, Josh Poimboeuf
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <dm-devel-bounces@redhat.com>
+In-Reply-To: <20180724164936.37477-1-keescook@chromium.org>
 List-Unsubscribe: <https://www.redhat.com/mailman/options/dm-devel>,
 	<mailto:dm-devel-request@redhat.com?subject=unsubscribe>
 List-Archive: <https://www.redhat.com/archives/dm-devel>
@@ -36,113 +38,73 @@ Sender: dm-devel-bounces@redhat.com
 Errors-To: dm-devel-bounces@redhat.com
 List-Id: linux-crypto.vger.kernel.org
 
-For newly added CCs on this series: your Ack/Review would be very
-welcome! Especially for the ahash-to-shash conversion patches.
-
-v6:
-- make xcbc blocksize unconditional
-- add ahash-to-shash conversion patch series to entirely remove
-  AHASH_REQUEST_ON_STACK from the kernel
-
-v5:
-- limit AHASH_REQUEST_ON_STACK size only to non-async hash wrapping.
-- sanity-check ahash reqsize only when doing shash wrapping.
-- remove frame_warn changes in favor of shash conversions and other fixes.
-- send ahash to shash conversion patches and other fixes separately.
-
-v4:
-- add back *_REQUEST_ON_STACK patches.
-- programmatically find stack sizes for *_REQUEST_ON_STACK patches.
-- whitelist some code that trips FRAME_WARN on 32-bit builds.
-- fix alignment patches.
-
-v3:
-- drop *_REQUEST_ON_STACK patches. The rest of this series is pretty
-  straight-forward, and I'd like to get them tested in -next while
-  we continue to chip away at the *_REQUEST_ON_STACK VLA removal patches
-  separately. "Part 2" will continue with those.
-
-v2:
-- use 512 instead of PAGE_SIZE / 8 to avoid bloat on large-page archs.
-- swtich xcbc to "16" max universally.
-- fix typo in bounds check for dm buffer size.
-- examine actual reqsizes for skcipher and ahash instead of guessing.
-- improve names and comments for alg maxes
-
-This is nearly the last of the VLA removals[1], but it's one of the
-largest because crypto gets used in lots of places. After looking
-through code, usage, reading the threads Gustavo started, and comparing
-the use-cases to the other VLA removals that have landed in the kernel,
-I think this series is likely the best way forward to shut the door on
-VLAs forever.
-
-For background, the crypto stack usage is for callers to do an immediate
-bit of work that doesn't allocate new memory. This means that other VLA
-removal techniques (like just using kmalloc) aren't workable, and the
-next common technique is needed: examination of maximum stack usage and
-the addition of sanity checks. This series does that, and in several
-cases, these maximums were already implicit in the code.
-
-This series is intended to land via the crypto tree for 4.19, though it
-touches dm, networking, and a few other things as well, since there are
-dependent patches (new crypto #defines being used, etc).
-
-Thanks!
-
--Kees
+In the quest to remove all stack VLA usage from the kernel[1], this
+removes the discouraged use of AHASH_REQUEST_ON_STACK by switching to
+shash directly and allocating the descriptor in heap memory (which should
+be fine: the tfm has already been allocated there too).
 
 [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
 
-Ard Biesheuvel (1):
-  crypto: ccm: Remove VLA usage
+Signed-off-by: Kees Cook <keescook@chromium.org>
+Acked-by: Pavel Machek <pavel@ucw.cz>
+---
+ arch/x86/power/hibernate_64.c | 36 ++++++++++++++++++++---------------
+ 1 file changed, 21 insertions(+), 15 deletions(-)
 
-Kees Cook (17):
-  crypto: xcbc: Remove VLA usage
-  crypto: cbc: Remove VLA usage
-  crypto: hash: Remove VLA usage
-  dm: Remove VLA usage from hashes
-  crypto alg: Introduce generic max blocksize and alignmask
-  crypto: qat: Remove VLA usage
-  crypto: shash: Remove VLA usage in unaligned hashing
-  crypto: skcipher: Remove VLA usage for SKCIPHER_REQUEST_ON_STACK
-  ppp: mppe: Remove VLA usage
-  x86/power/64: Remove VLA usage
-  dm crypt: Convert essiv from ahash to shash
-  drbd: Convert from ahash to shash
-  wireless/lib80211: Convert from ahash to shash
-  staging: rtl8192u: ieee80211: Convert from ahash to shash
-  staging: rtl8192e: ieee80211: Convert from ahash to shash
-  rxrpc: Reuse SKCIPHER_REQUEST_ON_STACK buffer
-  crypto: Remove AHASH_REQUEST_ON_STACK
-
- arch/x86/power/hibernate_64.c                 | 36 +++++++-----
- crypto/ahash.c                                |  4 +-
- crypto/algapi.c                               |  7 ++-
- crypto/algif_hash.c                           |  2 +-
- crypto/ccm.c                                  |  9 ++-
- crypto/shash.c                                | 33 ++++++-----
- crypto/xcbc.c                                 |  8 ++-
- drivers/block/drbd/drbd_int.h                 | 13 +++--
- drivers/block/drbd/drbd_main.c                | 14 ++---
- drivers/block/drbd/drbd_nl.c                  | 39 ++++---------
- drivers/block/drbd/drbd_receiver.c            | 35 +++++------
- drivers/block/drbd/drbd_worker.c              | 56 ++++++++----------
- drivers/crypto/qat/qat_common/qat_algs.c      |  8 ++-
- drivers/md/dm-crypt.c                         | 31 +++++-----
- drivers/md/dm-integrity.c                     | 23 ++++++--
- drivers/md/dm-verity-fec.c                    |  5 +-
- drivers/net/ppp/ppp_mppe.c                    | 56 +++++++++---------
- drivers/staging/rtl8192e/rtllib_crypt_tkip.c  | 56 +++++++++---------
- .../rtl8192u/ieee80211/ieee80211_crypt_tkip.c | 57 +++++++++---------
- include/crypto/algapi.h                       |  4 +-
- include/crypto/cbc.h                          |  4 +-
- include/crypto/hash.h                         | 11 ++--
- include/crypto/internal/skcipher.h            |  1 +
- include/crypto/skcipher.h                     |  4 +-
- include/linux/compiler-gcc.h                  |  1 -
- net/rxrpc/rxkad.c                             | 25 ++++----
- net/wireless/lib80211_crypt_tkip.c            | 58 +++++++++----------
- 27 files changed, 313 insertions(+), 287 deletions(-)
-
+diff --git a/arch/x86/power/hibernate_64.c b/arch/x86/power/hibernate_64.c
+index 67ccf64c8bd8..f8e3b668d20b 100644
+--- a/arch/x86/power/hibernate_64.c
++++ b/arch/x86/power/hibernate_64.c
+@@ -233,29 +233,35 @@ struct restore_data_record {
+  */
+ static int get_e820_md5(struct e820_table *table, void *buf)
+ {
+-	struct scatterlist sg;
+-	struct crypto_ahash *tfm;
++	struct crypto_shash *tfm;
++	struct shash_desc *desc;
+ 	int size;
+ 	int ret = 0;
+ 
+-	tfm = crypto_alloc_ahash("md5", 0, CRYPTO_ALG_ASYNC);
++	tfm = crypto_alloc_shash("md5", 0, 0);
+ 	if (IS_ERR(tfm))
+ 		return -ENOMEM;
+ 
+-	{
+-		AHASH_REQUEST_ON_STACK(req, tfm);
+-		size = offsetof(struct e820_table, entries) + sizeof(struct e820_entry) * table->nr_entries;
+-		ahash_request_set_tfm(req, tfm);
+-		sg_init_one(&sg, (u8 *)table, size);
+-		ahash_request_set_callback(req, 0, NULL, NULL);
+-		ahash_request_set_crypt(req, &sg, buf, size);
+-
+-		if (crypto_ahash_digest(req))
+-			ret = -EINVAL;
+-		ahash_request_zero(req);
++	desc = kmalloc(sizeof(struct shash_desc) + crypto_shash_descsize(tfm),
++		       GFP_KERNEL);
++	if (!desc) {
++		ret = -ENOMEM;
++		goto free_tfm;
+ 	}
+-	crypto_free_ahash(tfm);
+ 
++	desc->tfm = tfm;
++	desc->flags = 0;
++
++	size = offsetof(struct e820_table, entries) +
++		sizeof(struct e820_entry) * table->nr_entries;
++
++	if (crypto_shash_digest(desc, (u8 *)table, size, buf))
++		ret = -EINVAL;
++
++	kzfree(desc);
++
++free_tfm:
++	crypto_free_shash(tfm);
+ 	return ret;
+ }
+ 
 -- 
 2.17.1
