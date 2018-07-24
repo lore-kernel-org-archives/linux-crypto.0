@@ -1,167 +1,145 @@
 From: Kees Cook <keescook@chromium.org>
-Subject: [PATCH v6 15/18] staging: rtl8192e: ieee80211: Convert from ahash to shash
-Date: Tue, 24 Jul 2018 09:49:33 -0700
-Message-ID: <20180724164936.37477-16-keescook@chromium.org>
+Subject: [PATCH v6 04/18] dm: Remove VLA usage from hashes
+Date: Tue, 24 Jul 2018 09:49:22 -0700
+Message-ID: <20180724164936.37477-5-keescook@chromium.org>
 References: <20180724164936.37477-1-keescook@chromium.org>
-Cc: Kees Cook <keescook@chromium.org>, Arnd Bergmann <arnd@arndb.de>,
-        Eric Biggers <ebiggers@google.com>,
-        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
-        Alasdair Kergon <agk@redhat.com>,
-        Rabin Vincent <rabinv@axis.com>,
-        Tim Chen <tim.c.chen@linux.intel.com>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        Pavel Machek <pavel@ucw.cz>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        Lars Ellenberg <lars.ellenberg@linbit.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        David Howells <dhowe
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+	Mike Snitzer <snitzer@redhat.com>,
+	"Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+	linux-wireless@vger.kernel.org,
+	Will Deacon <will.deacon@arm.com>, linux-kernel@vger.kernel.org,
+	David Howells <dhowells@redhat.com>, dm-devel@redhat.com,
+	Jia-Ju Bai <baijiaju1990@gmail.com>,
+	Paul Mackerras <paulus@samba.org>, Pavel Machek <pavel@ucw.cz>,
+	"H. Peter Anvin" <hpa@zytor.com>, linux-afs@lists.infradead.org,
+	Alasdair Kergon <agk@redhat.com>,
+	Kees Cook <keescook@chromium.org>, devel@driverdev.osuosl.org,
+	x86@kernel.org, qat-linux@intel.com, Ingo Molnar <mingo@redhat.com>,
+	Eric Biggers <ebiggers@google.com>,
+	Geert Uytterhoeven <geert@linux-m68k.org>,
+	drbd-dev@lists.linbit.com, Rabin Vincent <rabinv@axis.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Tudor-Dan Ambarus <tudor.ambarus@microchip.com>,
+	linux-block@vger.kernel.org, Josh Poimboeuf
 To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <netdev-owner@vger.kernel.org>
+Return-path: <dm-devel-bounces@redhat.com>
 In-Reply-To: <20180724164936.37477-1-keescook@chromium.org>
-Sender: netdev-owner@vger.kernel.org
+List-Unsubscribe: <https://www.redhat.com/mailman/options/dm-devel>,
+	<mailto:dm-devel-request@redhat.com?subject=unsubscribe>
+List-Archive: <https://www.redhat.com/archives/dm-devel>
+List-Post: <mailto:dm-devel@redhat.com>
+List-Help: <mailto:dm-devel-request@redhat.com?subject=help>
+List-Subscribe: <https://www.redhat.com/mailman/listinfo/dm-devel>,
+	<mailto:dm-devel-request@redhat.com?subject=subscribe>
+Sender: dm-devel-bounces@redhat.com
+Errors-To: dm-devel-bounces@redhat.com
 List-Id: linux-crypto.vger.kernel.org
 
-This is an identical change to the wireless/lib80211 of the same name.
-In preparing to remove all stack VLA usage from the kernel[1], this
-removes the discouraged use of AHASH_REQUEST_ON_STACK in favor of
-the smaller SHASH_DESC_ON_STACK by converting from ahash-wrapped-shash
-to direct shash. By removing a layer of indirection this both improves
-performance and reduces stack usage. The stack allocation will be made
-a fixed size in a later patch to the crypto subsystem.
+In the quest to remove all stack VLA usage from the kernel[1], this uses
+the new HASH_MAX_DIGESTSIZE from the crypto layer to allocate the upper
+bounds on stack usage.
 
 [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
 
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- drivers/staging/rtl8192e/rtllib_crypt_tkip.c | 56 ++++++++++----------
- 1 file changed, 28 insertions(+), 28 deletions(-)
+ drivers/md/dm-integrity.c  | 23 +++++++++++++++++------
+ drivers/md/dm-verity-fec.c |  5 ++++-
+ 2 files changed, 21 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/staging/rtl8192e/rtllib_crypt_tkip.c b/drivers/staging/rtl8192e/rtllib_crypt_tkip.c
-index ae103b0b7a2a..9f18be14dda6 100644
---- a/drivers/staging/rtl8192e/rtllib_crypt_tkip.c
-+++ b/drivers/staging/rtl8192e/rtllib_crypt_tkip.c
-@@ -50,9 +50,9 @@ struct rtllib_tkip_data {
- 
- 	int key_idx;
- 	struct crypto_skcipher *rx_tfm_arc4;
--	struct crypto_ahash *rx_tfm_michael;
-+	struct crypto_shash *rx_tfm_michael;
- 	struct crypto_skcipher *tx_tfm_arc4;
--	struct crypto_ahash *tx_tfm_michael;
-+	struct crypto_shash *tx_tfm_michael;
- 	/* scratch buffers for virt_to_page() (crypto API) */
- 	u8 rx_hdr[16];
- 	u8 tx_hdr[16];
-@@ -74,8 +74,7 @@ static void *rtllib_tkip_init(int key_idx)
- 		goto fail;
- 	}
- 
--	priv->tx_tfm_michael = crypto_alloc_ahash("michael_mic", 0,
--						  CRYPTO_ALG_ASYNC);
-+	priv->tx_tfm_michael = crypto_alloc_shash("michael_mic", 0, 0);
- 	if (IS_ERR(priv->tx_tfm_michael)) {
- 		pr_debug("Could not allocate crypto API michael_mic\n");
- 		priv->tx_tfm_michael = NULL;
-@@ -90,8 +89,7 @@ static void *rtllib_tkip_init(int key_idx)
- 		goto fail;
- 	}
- 
--	priv->rx_tfm_michael = crypto_alloc_ahash("michael_mic", 0,
--						  CRYPTO_ALG_ASYNC);
-+	priv->rx_tfm_michael = crypto_alloc_shash("michael_mic", 0, 0);
- 	if (IS_ERR(priv->rx_tfm_michael)) {
- 		pr_debug("Could not allocate crypto API michael_mic\n");
- 		priv->rx_tfm_michael = NULL;
-@@ -101,9 +99,9 @@ static void *rtllib_tkip_init(int key_idx)
- 
- fail:
- 	if (priv) {
--		crypto_free_ahash(priv->tx_tfm_michael);
-+		crypto_free_shash(priv->tx_tfm_michael);
- 		crypto_free_skcipher(priv->tx_tfm_arc4);
--		crypto_free_ahash(priv->rx_tfm_michael);
-+		crypto_free_shash(priv->rx_tfm_michael);
- 		crypto_free_skcipher(priv->rx_tfm_arc4);
- 		kfree(priv);
- 	}
-@@ -117,9 +115,9 @@ static void rtllib_tkip_deinit(void *priv)
- 	struct rtllib_tkip_data *_priv = priv;
- 
- 	if (_priv) {
--		crypto_free_ahash(_priv->tx_tfm_michael);
-+		crypto_free_shash(_priv->tx_tfm_michael);
- 		crypto_free_skcipher(_priv->tx_tfm_arc4);
--		crypto_free_ahash(_priv->rx_tfm_michael);
-+		crypto_free_shash(_priv->rx_tfm_michael);
- 		crypto_free_skcipher(_priv->rx_tfm_arc4);
- 	}
- 	kfree(priv);
-@@ -504,29 +502,31 @@ static int rtllib_tkip_decrypt(struct sk_buff *skb, int hdr_len, void *priv)
- }
- 
- 
--static int michael_mic(struct crypto_ahash *tfm_michael, u8 *key, u8 *hdr,
-+static int michael_mic(struct crypto_shash *tfm_michael, u8 *key, u8 *hdr,
- 		       u8 *data, size_t data_len, u8 *mic)
- {
--	AHASH_REQUEST_ON_STACK(req, tfm_michael);
--	struct scatterlist sg[2];
-+	SHASH_DESC_ON_STACK(desc, tfm_michael);
- 	int err;
- 
--	if (tfm_michael == NULL) {
--		pr_warn("michael_mic: tfm_michael == NULL\n");
--		return -1;
--	}
--	sg_init_table(sg, 2);
--	sg_set_buf(&sg[0], hdr, 16);
--	sg_set_buf(&sg[1], data, data_len);
-+	desc->tfm = tfm_michael;
-+	desc->flags = 0;
- 
--	if (crypto_ahash_setkey(tfm_michael, key, 8))
-+	if (crypto_shash_setkey(tfm_michael, key, 8))
- 		return -1;
- 
--	ahash_request_set_tfm(req, tfm_michael);
--	ahash_request_set_callback(req, 0, NULL, NULL);
--	ahash_request_set_crypt(req, sg, mic, data_len + 16);
--	err = crypto_ahash_digest(req);
--	ahash_request_zero(req);
-+	err = crypto_shash_init(desc);
-+	if (err)
-+		goto out;
-+	err = crypto_shash_update(desc, hdr, 16);
-+	if (err)
-+		goto out;
-+	err = crypto_shash_update(desc, data, data_len);
-+	if (err)
-+		goto out;
-+	err = crypto_shash_final(desc, mic);
+diff --git a/drivers/md/dm-integrity.c b/drivers/md/dm-integrity.c
+index 86438b2f10dd..884edd7cf1d0 100644
+--- a/drivers/md/dm-integrity.c
++++ b/drivers/md/dm-integrity.c
+@@ -521,7 +521,12 @@ static void section_mac(struct dm_integrity_c *ic, unsigned section, __u8 result
+ 		}
+ 		memset(result + size, 0, JOURNAL_MAC_SIZE - size);
+ 	} else {
+-		__u8 digest[size];
++		__u8 digest[HASH_MAX_DIGESTSIZE];
 +
-+out:
-+	shash_desc_zero(desc);
- 	return err;
- }
++		if (WARN_ON(size > sizeof(digest))) {
++			dm_integrity_io_error(ic, "digest_size", -EINVAL);
++			goto err;
++		}
+ 		r = crypto_shash_final(desc, digest);
+ 		if (unlikely(r)) {
+ 			dm_integrity_io_error(ic, "crypto_shash_final", r);
+@@ -1244,7 +1249,7 @@ static void integrity_metadata(struct work_struct *w)
+ 		struct bio *bio = dm_bio_from_per_bio_data(dio, sizeof(struct dm_integrity_io));
+ 		char *checksums;
+ 		unsigned extra_space = unlikely(digest_size > ic->tag_size) ? digest_size - ic->tag_size : 0;
+-		char checksums_onstack[ic->tag_size + extra_space];
++		char checksums_onstack[HASH_MAX_DIGESTSIZE];
+ 		unsigned sectors_to_process = dio->range.n_sectors;
+ 		sector_t sector = dio->range.logical_sector;
  
-@@ -663,9 +663,9 @@ static int rtllib_tkip_set_key(void *key, int len, u8 *seq, void *priv)
- {
- 	struct rtllib_tkip_data *tkey = priv;
- 	int keyidx;
--	struct crypto_ahash *tfm = tkey->tx_tfm_michael;
-+	struct crypto_shash *tfm = tkey->tx_tfm_michael;
- 	struct crypto_skcipher *tfm2 = tkey->tx_tfm_arc4;
--	struct crypto_ahash *tfm3 = tkey->rx_tfm_michael;
-+	struct crypto_shash *tfm3 = tkey->rx_tfm_michael;
- 	struct crypto_skcipher *tfm4 = tkey->rx_tfm_arc4;
+@@ -1253,8 +1258,14 @@ static void integrity_metadata(struct work_struct *w)
  
- 	keyidx = tkey->key_idx;
+ 		checksums = kmalloc((PAGE_SIZE >> SECTOR_SHIFT >> ic->sb->log2_sectors_per_block) * ic->tag_size + extra_space,
+ 				    GFP_NOIO | __GFP_NORETRY | __GFP_NOWARN);
+-		if (!checksums)
++		if (!checksums) {
+ 			checksums = checksums_onstack;
++			if (WARN_ON(extra_space &&
++				    digest_size > sizeof(checksums_onstack))) {
++				r = -EINVAL;
++				goto error;
++			}
++		}
+ 
+ 		__bio_for_each_segment(bv, bio, iter, dio->orig_bi_iter) {
+ 			unsigned pos;
+@@ -1466,7 +1477,7 @@ static bool __journal_read_write(struct dm_integrity_io *dio, struct bio *bio,
+ 				} while (++s < ic->sectors_per_block);
+ #ifdef INTERNAL_VERIFY
+ 				if (ic->internal_hash) {
+-					char checksums_onstack[max(crypto_shash_digestsize(ic->internal_hash), ic->tag_size)];
++					char checksums_onstack[max(HASH_MAX_DIGESTSIZE, MAX_TAG_SIZE)];
+ 
+ 					integrity_sector_checksum(ic, logical_sector, mem + bv.bv_offset, checksums_onstack);
+ 					if (unlikely(memcmp(checksums_onstack, journal_entry_tag(ic, je), ic->tag_size))) {
+@@ -1516,7 +1527,7 @@ static bool __journal_read_write(struct dm_integrity_io *dio, struct bio *bio,
+ 				if (ic->internal_hash) {
+ 					unsigned digest_size = crypto_shash_digestsize(ic->internal_hash);
+ 					if (unlikely(digest_size > ic->tag_size)) {
+-						char checksums_onstack[digest_size];
++						char checksums_onstack[HASH_MAX_DIGESTSIZE];
+ 						integrity_sector_checksum(ic, logical_sector, (char *)js, checksums_onstack);
+ 						memcpy(journal_entry_tag(ic, je), checksums_onstack, ic->tag_size);
+ 					} else
+@@ -1937,7 +1948,7 @@ static void do_journal_write(struct dm_integrity_c *ic, unsigned write_start,
+ 				    unlikely(from_replay) &&
+ #endif
+ 				    ic->internal_hash) {
+-					char test_tag[max(crypto_shash_digestsize(ic->internal_hash), ic->tag_size)];
++					char test_tag[max_t(size_t, HASH_MAX_DIGESTSIZE, MAX_TAG_SIZE)];
+ 
+ 					integrity_sector_checksum(ic, sec + ((l - j) << ic->sb->log2_sectors_per_block),
+ 								  (char *)access_journal_data(ic, i, l), test_tag);
+diff --git a/drivers/md/dm-verity-fec.c b/drivers/md/dm-verity-fec.c
+index 684af08d0747..0ce04e5b4afb 100644
+--- a/drivers/md/dm-verity-fec.c
++++ b/drivers/md/dm-verity-fec.c
+@@ -212,12 +212,15 @@ static int fec_read_bufs(struct dm_verity *v, struct dm_verity_io *io,
+ 	struct dm_verity_fec_io *fio = fec_io(io);
+ 	u64 block, ileaved;
+ 	u8 *bbuf, *rs_block;
+-	u8 want_digest[v->digest_size];
++	u8 want_digest[HASH_MAX_DIGESTSIZE];
+ 	unsigned n, k;
+ 
+ 	if (neras)
+ 		*neras = 0;
+ 
++	if (WARN_ON(v->digest_size > sizeof(want_digest)))
++		return -EINVAL;
++
+ 	/*
+ 	 * read each of the rsn data blocks that are part of the RS block, and
+ 	 * interleave contents to available bufs
 -- 
 2.17.1
