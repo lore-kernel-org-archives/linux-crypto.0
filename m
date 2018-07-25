@@ -1,110 +1,89 @@
-From: "Rafael J. Wysocki" <rafael@kernel.org>
-Subject: Re: [PATCH v6 10/18] x86/power/64: Remove VLA usage
-Date: Wed, 25 Jul 2018 13:32:23 +0200
-Message-ID: <CAJZ5v0gVDotjufLKUW0YuQu2vA4fmU_gqia=ZA4DocW4XHxx0w@mail.gmail.com>
-References: <20180724164936.37477-1-keescook@chromium.org> <20180724164936.37477-11-keescook@chromium.org>
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [PATCH 1/4] treewide: convert ISO_8859-1 text comments to utf-8
+Date: Wed, 25 Jul 2018 15:12:11 +0200
+Message-ID: <CAK8P3a3tOuP1FVS7oD1UhO5s4C+fLkL8VT3eCpRnSxBZxKzf6A@mail.gmail.com>
+References: <20180724111600.4158975-1-arnd@arndb.de> <20180724140010.e24a9964fd340afe2d98a994@linux-foundation.org>
+ <aa39b6d15f44555cb79d5ebdef74aeab19003d6a.camel@perches.com> <20180724175531.75276cf4e539124aa9e27177@linux-foundation.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Eric Biggers <ebiggers@google.com>,
-        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
-        Alasdair Kergon <agk@redhat.com>,
-        Rabin Vincent <rabinv@axis.com>,
-        Tim Chen <tim.c.chen@linux.intel.com>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        Pavel Machek <pavel@ucw.cz>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "the arch/x86 maintainers" <x86@kernel.org>,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        Lars Ellenberg <lars.ellenberg@linbit.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Greg Kroah-Hartman <gregk
-To: Kees Cook <keescook@chromium.org>
-Return-path: <netdev-owner@vger.kernel.org>
-In-Reply-To: <20180724164936.37477-11-keescook@chromium.org>
-Sender: netdev-owner@vger.kernel.org
+Cc: Joe Perches <joe@perches.com>,
+        Samuel Ortiz <sameo@linux.intel.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Jonathan Cameron <jic23@kernel.org>,
+        linux-wireless <linux-wireless@vger.kernel.org>,
+        Networking <netdev@vger.kernel.org>,
+        DTML <devicetree@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        linux-iio@vger.kernel.org,
+        Linux PM list <linux-pm@vger.kernel.org>,
+        lvs-devel@vger.kernel.org, netfilter-devel@vger.kernel.org,
+        coreteam@netfilter.org
+To: Andrew Morton <akpm@linux-foundation.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20180724175531.75276cf4e539124aa9e27177@linux-foundation.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Jul 24, 2018 at 6:49 PM, Kees Cook <keescook@chromium.org> wrote:
-> In the quest to remove all stack VLA usage from the kernel[1], this
-> removes the discouraged use of AHASH_REQUEST_ON_STACK by switching to
-> shash directly and allocating the descriptor in heap memory (which should
-> be fine: the tfm has already been allocated there too).
+tools/perf/tests/.gitignore:
+                            LLVM byte-codes, uncompressed
+On Wed, Jul 25, 2018 at 2:55 AM, Andrew Morton
+<akpm@linux-foundation.org> wrote:
+> On Tue, 24 Jul 2018 17:13:20 -0700 Joe Perches <joe@perches.com> wrote:
 >
-> [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
+>> On Tue, 2018-07-24 at 14:00 -0700, Andrew Morton wrote:
+>> > On Tue, 24 Jul 2018 13:13:25 +0200 Arnd Bergmann <arnd@arndb.de> wrote:
+>> > > Almost all files in the kernel are either plain text or UTF-8
+>> > > encoded. A couple however are ISO_8859-1, usually just a few
+>> > > characters in a C comments, for historic reasons.
+>> > > This converts them all to UTF-8 for consistency.
+>> []
+>> > Will we be getting a checkpatch rule to keep things this way?
+>>
+>> How would that be done?
 >
-> Signed-off-by: Kees Cook <keescook@chromium.org>
-> Acked-by: Pavel Machek <pavel@ucw.cz>
+> I'm using this, seems to work.
+>
+>         if ! file $p | grep -q -P ", ASCII text|, UTF-8 Unicode text"
+>         then
+>                 echo $p: weird charset
+>         fi
 
-I think I can queue this up if there are no objections from others.
+There are a couple of files that my version of 'find' incorrectly identified as
+something completely different, like:
 
-Do you want me to do that?
+Documentation/devicetree/bindings/pinctrl/pinctrl-sx150x.txt:
+            SemOne archive data
+Documentation/devicetree/bindings/rtc/epson,rtc7301.txt:
+            Microsoft Document Imaging Format
+Documentation/filesystems/nfs/pnfs-block-server.txt:
+            PPMN archive data
+arch/arm/boot/dts/bcm283x-rpi-usb-host.dtsi:
+        Sendmail frozen configuration  - version = "host";
+Documentation/networking/segmentation-offloads.txt:
+        StuffIt Deluxe Segment (data) : gmentation Offloads in the
+Linux Networking Stack
+arch/sparc/include/asm/visasm.h:                              SAS 7+
+arch/xtensa/kernel/setup.c:                                         ,
+init=0x454c, stat=0x090a, dev=0x2009, bas=0x2020
+drivers/cpufreq/powernow-k8.c:
+TI-XX Graphing Calculator (FLASH)
+tools/testing/selftests/net/forwarding/tc_shblocks.sh:
+                            Minix filesystem, V2 (big endian)
+tools/perf/tests/.gitignore:
+                            LLVM byte-codes, uncompressed
 
-> ---
->  arch/x86/power/hibernate_64.c | 36 ++++++++++++++++++++---------------
->  1 file changed, 21 insertions(+), 15 deletions(-)
->
-> diff --git a/arch/x86/power/hibernate_64.c b/arch/x86/power/hibernate_64.c
-> index 67ccf64c8bd8..f8e3b668d20b 100644
-> --- a/arch/x86/power/hibernate_64.c
-> +++ b/arch/x86/power/hibernate_64.c
-> @@ -233,29 +233,35 @@ struct restore_data_record {
->   */
->  static int get_e820_md5(struct e820_table *table, void *buf)
->  {
-> -       struct scatterlist sg;
-> -       struct crypto_ahash *tfm;
-> +       struct crypto_shash *tfm;
-> +       struct shash_desc *desc;
->         int size;
->         int ret = 0;
->
-> -       tfm = crypto_alloc_ahash("md5", 0, CRYPTO_ALG_ASYNC);
-> +       tfm = crypto_alloc_shash("md5", 0, 0);
->         if (IS_ERR(tfm))
->                 return -ENOMEM;
->
-> -       {
-> -               AHASH_REQUEST_ON_STACK(req, tfm);
-> -               size = offsetof(struct e820_table, entries) + sizeof(struct e820_entry) * table->nr_entries;
-> -               ahash_request_set_tfm(req, tfm);
-> -               sg_init_one(&sg, (u8 *)table, size);
-> -               ahash_request_set_callback(req, 0, NULL, NULL);
-> -               ahash_request_set_crypt(req, &sg, buf, size);
-> -
-> -               if (crypto_ahash_digest(req))
-> -                       ret = -EINVAL;
-> -               ahash_request_zero(req);
-> +       desc = kmalloc(sizeof(struct shash_desc) + crypto_shash_descsize(tfm),
-> +                      GFP_KERNEL);
-> +       if (!desc) {
-> +               ret = -ENOMEM;
-> +               goto free_tfm;
->         }
-> -       crypto_free_ahash(tfm);
->
-> +       desc->tfm = tfm;
-> +       desc->flags = 0;
-> +
-> +       size = offsetof(struct e820_table, entries) +
-> +               sizeof(struct e820_entry) * table->nr_entries;
-> +
-> +       if (crypto_shash_digest(desc, (u8 *)table, size, buf))
-> +               ret = -EINVAL;
-> +
-> +       kzfree(desc);
-> +
-> +free_tfm:
-> +       crypto_free_shash(tfm);
->         return ret;
->  }
->
-> --
-> 2.17.1
->
+All of the above seem to be valid ASCII or UTF-8 files, so the check
+above will lead
+to false-positives, but it may be good enough as they are the
+exception, and may be
+bugs in 'file'.
+
+Not sure if we need to worry about 'file' not being installed.
+
+       Arnd
