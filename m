@@ -1,75 +1,73 @@
-From: Michael Ellerman <mpe@ellerman.id.au>
-Subject: Re: [PATCH 1/4] treewide: convert ISO_8859-1 text comments to utf-8
-Date: Wed, 25 Jul 2018 14:20:25 +1000
-Message-ID: <87o9ewx7xy.fsf@concordia.ellerman.id.au>
-References: <20180724111600.4158975-1-arnd@arndb.de>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH] crypto: arm/chacha20 - always use vrev for 16-bit rotates
+Date: Wed, 25 Jul 2018 08:18:01 +0200
+Message-ID: <CAKv+Gu8dhOHRV9RTk3X7f=51yZF1nhhCvteLDjc-+aoYvzJJFA@mail.gmail.com>
+References: <20180725012907.1614-1-ebiggers3@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
-Cc: Joe Perches <joe@perches.com>, Arnd Bergmann <arnd@arndb.de>,
-        Samuel Ortiz <sameo@linux.intel.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Jonathan Cameron <jic23@kernel.org>,
-        linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-iio@vger.kernel.org,
-        linux-pm@vger.kernel.org, lvs-devel@vger.kernel.org,
-        netfilter-devel@vger.kernel.org, coreteam@netfilter.org
-To: Arnd Bergmann <arnd@arndb.de>,
-        Andrew Morton <akpm@linux-foundation.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180724111600.4158975-1-arnd@arndb.de>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Eric Biggers <ebiggers@google.com>,
+ "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+ <linux-crypto@vger.kernel.org>,
+ linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+ Herbert Xu <herbert@gondor.apana.org.au>
+To: Eric Biggers <ebiggers3@gmail.com>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <20180725012907.1614-1-ebiggers3@gmail.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-Arnd Bergmann <arnd@arndb.de> writes:
+On 25 July 2018 at 03:29, Eric Biggers <ebiggers3@gmail.com> wrote:
+> From: Eric Biggers <ebiggers@google.com>
+>
+> The 4-way ChaCha20 NEON code implements 16-bit rotates with vrev32.16,
+> but the one-way code (used on remainder blocks) implements it with
+> vshl + vsri, which is slower.  Switch the one-way code to vrev32.16 too.
+>
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
 
-> Almost all files in the kernel are either plain text or UTF-8
-> encoded. A couple however are ISO_8859-1, usually just a few
-> characters in a C comments, for historic reasons.
->
-> This converts them all to UTF-8 for consistency.
->
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+Acked-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+
 > ---
-...
->  drivers/crypto/vmx/ghashp8-ppc.pl             |  12 +-
-...
-> diff --git a/drivers/crypto/vmx/ghashp8-ppc.pl b/drivers/crypto/vmx/ghashp8-ppc.pl
-> index f746af271460..38b06503ede0 100644
-> --- a/drivers/crypto/vmx/ghashp8-ppc.pl
-> +++ b/drivers/crypto/vmx/ghashp8-ppc.pl
-> @@ -129,9 +129,9 @@ $code=<<___;
->  	 le?vperm	$IN,$IN,$IN,$lemask
->  	vxor		$zero,$zero,$zero
->  
-> -	vpmsumd		$Xl,$IN,$Hl		# H.loXi.lo
-> -	vpmsumd		$Xm,$IN,$H		# H.hiXi.lo+H.loXi.hi
-> -	vpmsumd		$Xh,$IN,$Hh		# H.hiXi.hi
-> +	vpmsumd		$Xl,$IN,$Hl		# H.lo·Xi.lo
-> +	vpmsumd		$Xm,$IN,$H		# H.hi·Xi.lo+H.lo·Xi.hi
-> +	vpmsumd		$Xh,$IN,$Hh		# H.hi·Xi.hi
->  
->  	vpmsumd		$t2,$Xl,$xC2		# 1st phase
->  
-> @@ -187,11 +187,11 @@ $code=<<___;
->  .align	5
->  Loop:
->  	 subic		$len,$len,16
-> -	vpmsumd		$Xl,$IN,$Hl		# H.loXi.lo
-> +	vpmsumd		$Xl,$IN,$Hl		# H.lo·Xi.lo
->  	 subfe.		r0,r0,r0		# borrow?-1:0
-> -	vpmsumd		$Xm,$IN,$H		# H.hiXi.lo+H.loXi.hi
-> +	vpmsumd		$Xm,$IN,$H		# H.hi·Xi.lo+H.lo·Xi.hi
->  	 and		r0,r0,$len
-> -	vpmsumd		$Xh,$IN,$Hh		# H.hiXi.hi
-> +	vpmsumd		$Xh,$IN,$Hh		# H.hi·Xi.hi
->  	 add		$inp,$inp,r0
->  
->  	vpmsumd		$t2,$Xl,$xC2		# 1st phase
-
-Acked-by: Michael Ellerman <mpe@ellerman.id.au> (powerpc)
-
-cheers
+>  arch/arm/crypto/chacha20-neon-core.S | 10 ++++------
+>  1 file changed, 4 insertions(+), 6 deletions(-)
+>
+> diff --git a/arch/arm/crypto/chacha20-neon-core.S b/arch/arm/crypto/chacha20-neon-core.S
+> index 3fecb2124c35..451a849ad518 100644
+> --- a/arch/arm/crypto/chacha20-neon-core.S
+> +++ b/arch/arm/crypto/chacha20-neon-core.S
+> @@ -51,9 +51,8 @@ ENTRY(chacha20_block_xor_neon)
+>  .Ldoubleround:
+>         // x0 += x1, x3 = rotl32(x3 ^ x0, 16)
+>         vadd.i32        q0, q0, q1
+> -       veor            q4, q3, q0
+> -       vshl.u32        q3, q4, #16
+> -       vsri.u32        q3, q4, #16
+> +       veor            q3, q3, q0
+> +       vrev32.16       q3, q3
+>
+>         // x2 += x3, x1 = rotl32(x1 ^ x2, 12)
+>         vadd.i32        q2, q2, q3
+> @@ -82,9 +81,8 @@ ENTRY(chacha20_block_xor_neon)
+>
+>         // x0 += x1, x3 = rotl32(x3 ^ x0, 16)
+>         vadd.i32        q0, q0, q1
+> -       veor            q4, q3, q0
+> -       vshl.u32        q3, q4, #16
+> -       vsri.u32        q3, q4, #16
+> +       veor            q3, q3, q0
+> +       vrev32.16       q3, q3
+>
+>         // x2 += x3, x1 = rotl32(x1 ^ x2, 12)
+>         vadd.i32        q2, q2, q3
+> --
+> 2.18.0
+>
