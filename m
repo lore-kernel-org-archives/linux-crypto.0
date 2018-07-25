@@ -1,57 +1,110 @@
-From: Kalle Valo <kvalo@codeaurora.org>
-Subject: Re: [PATCH v6 13/18] wireless/lib80211: Convert from ahash to shash
-Date: Wed, 25 Jul 2018 11:05:42 +0300
-Message-ID: <87tvong2p5.fsf@purkki.adurom.net>
-References: <20180724164936.37477-1-keescook@chromium.org>
- <20180724164936.37477-14-keescook@chromium.org>
- <1532503493.3223.0.camel@sipsolutions.net>
+From: "Rafael J. Wysocki" <rafael@kernel.org>
+Subject: Re: [PATCH v6 10/18] x86/power/64: Remove VLA usage
+Date: Wed, 25 Jul 2018 13:32:23 +0200
+Message-ID: <CAJZ5v0gVDotjufLKUW0YuQu2vA4fmU_gqia=ZA4DocW4XHxx0w@mail.gmail.com>
+References: <20180724164936.37477-1-keescook@chromium.org> <20180724164936.37477-11-keescook@chromium.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
- Mike Snitzer <snitzer@redhat.com>, Eric Biggers <ebiggers@google.com>,
- linux-wireless@vger.kernel.org, Will Deacon <will.deacon@arm.com>,
- linux-kernel@vger.kernel.org, David Howells <dhowells@redhat.com>,
- dm-devel@redhat.com, Jia-Ju Bai <baijiaju1990@gmail.com>,
- Paul Mackerras <paulus@samba.org>, Pavel Machek <pavel@ucw.cz>,
- "H. Peter Anvin" <hpa@zytor.com>, linux-afs@lists.infradead.org,
- Alasdair Kergon <agk@redhat.com>, Rabin Vincent <rabinv@axis.com>,
- devel@driverdev.osuosl.org, Herbert Xu <herbert@gondor.apana.org.au>,
- x86@kernel.org, "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
- qat-linux@intel.com, Ingo Molnar <mingo@redhat.com>, drbd-dev@lists.linbit.com,
- Kees Cook <keescook@chromium.org>, Arnd Bergmann <arnd@arndb.de>,
- Tudor-Dan Ambarus <tudor.ambarus@microchip.com>, linux-block@vger.kernel.org,
- Josh Poimboeuf <jpo
-To: Johannes Berg <johannes@sipsolutions.net>
-Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
-In-Reply-To: <1532503493.3223.0.camel@sipsolutions.net> (Johannes Berg's
- message of "Wed, 25 Jul 2018 09:24:53 +0200")
-List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
-List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel/>
-List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
-List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
-List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
- <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
-Errors-To: driverdev-devel-bounces@linuxdriverproject.org
-Sender: "devel" <driverdev-devel-bounces@linuxdriverproject.org>
+Content-Type: text/plain; charset="UTF-8"
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Eric Biggers <ebiggers@google.com>,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+        Alasdair Kergon <agk@redhat.com>,
+        Rabin Vincent <rabinv@axis.com>,
+        Tim Chen <tim.c.chen@linux.intel.com>,
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        Pavel Machek <pavel@ucw.cz>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "the arch/x86 maintainers" <x86@kernel.org>,
+        Philipp Reisner <philipp.reisner@linbit.com>,
+        Lars Ellenberg <lars.ellenberg@linbit.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Greg Kroah-Hartman <gregk
+To: Kees Cook <keescook@chromium.org>
+Return-path: <netdev-owner@vger.kernel.org>
+In-Reply-To: <20180724164936.37477-11-keescook@chromium.org>
+Sender: netdev-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Johannes Berg <johannes@sipsolutions.net> writes:
-
-> On Tue, 2018-07-24 at 09:49 -0700, Kees Cook wrote:
->> In preparing to remove all stack VLA usage from the kernel[1], this
->> removes the discouraged use of AHASH_REQUEST_ON_STACK in favor of
->> the smaller SHASH_DESC_ON_STACK by converting from ahash-wrapped-shash
->> to direct shash. By removing a layer of indirection this both improves
->> performance and reduces stack usage. The stack allocation will be made
->> a fixed size in a later patch to the crypto subsystem.
+On Tue, Jul 24, 2018 at 6:49 PM, Kees Cook <keescook@chromium.org> wrote:
+> In the quest to remove all stack VLA usage from the kernel[1], this
+> removes the discouraged use of AHASH_REQUEST_ON_STACK by switching to
+> shash directly and allocating the descriptor in heap memory (which should
+> be fine: the tfm has already been allocated there too).
 >
-> I think you sent this before - it should be in net-next now.
+> [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
+>
+> Signed-off-by: Kees Cook <keescook@chromium.org>
+> Acked-by: Pavel Machek <pavel@ucw.cz>
 
-Yup, I see it in net-next:
+I think I can queue this up if there are no objections from others.
 
-d17504b16ea2 wireless/lib80211: Convert from ahash to shash
+Do you want me to do that?
 
--- 
-Kalle Valo
+> ---
+>  arch/x86/power/hibernate_64.c | 36 ++++++++++++++++++++---------------
+>  1 file changed, 21 insertions(+), 15 deletions(-)
+>
+> diff --git a/arch/x86/power/hibernate_64.c b/arch/x86/power/hibernate_64.c
+> index 67ccf64c8bd8..f8e3b668d20b 100644
+> --- a/arch/x86/power/hibernate_64.c
+> +++ b/arch/x86/power/hibernate_64.c
+> @@ -233,29 +233,35 @@ struct restore_data_record {
+>   */
+>  static int get_e820_md5(struct e820_table *table, void *buf)
+>  {
+> -       struct scatterlist sg;
+> -       struct crypto_ahash *tfm;
+> +       struct crypto_shash *tfm;
+> +       struct shash_desc *desc;
+>         int size;
+>         int ret = 0;
+>
+> -       tfm = crypto_alloc_ahash("md5", 0, CRYPTO_ALG_ASYNC);
+> +       tfm = crypto_alloc_shash("md5", 0, 0);
+>         if (IS_ERR(tfm))
+>                 return -ENOMEM;
+>
+> -       {
+> -               AHASH_REQUEST_ON_STACK(req, tfm);
+> -               size = offsetof(struct e820_table, entries) + sizeof(struct e820_entry) * table->nr_entries;
+> -               ahash_request_set_tfm(req, tfm);
+> -               sg_init_one(&sg, (u8 *)table, size);
+> -               ahash_request_set_callback(req, 0, NULL, NULL);
+> -               ahash_request_set_crypt(req, &sg, buf, size);
+> -
+> -               if (crypto_ahash_digest(req))
+> -                       ret = -EINVAL;
+> -               ahash_request_zero(req);
+> +       desc = kmalloc(sizeof(struct shash_desc) + crypto_shash_descsize(tfm),
+> +                      GFP_KERNEL);
+> +       if (!desc) {
+> +               ret = -ENOMEM;
+> +               goto free_tfm;
+>         }
+> -       crypto_free_ahash(tfm);
+>
+> +       desc->tfm = tfm;
+> +       desc->flags = 0;
+> +
+> +       size = offsetof(struct e820_table, entries) +
+> +               sizeof(struct e820_entry) * table->nr_entries;
+> +
+> +       if (crypto_shash_digest(desc, (u8 *)table, size, buf))
+> +               ret = -EINVAL;
+> +
+> +       kzfree(desc);
+> +
+> +free_tfm:
+> +       crypto_free_shash(tfm);
+>         return ret;
+>  }
+>
+> --
+> 2.17.1
+>
