@@ -1,82 +1,82 @@
-From: joeyli <jlee@suse.com>
-Subject: Re: [PATCH 0/4][RFC v2] Introduce the in-kernel hibernation
- encryption
-Date: Thu, 26 Jul 2018 16:14:04 +0800
-Message-ID: <20180726081404.GG4244@linux-l9pv.suse>
-References: <cover.1531924968.git.yu.c.chen@intel.com>
- <20180718202235.GA4132@amd>
- <20180718235851.GA22170@sandybridge-desktop>
- <20180719110149.GA4679@amd>
- <20180719132003.GA30981@sandybridge-desktop>
- <20180720102532.GA20284@amd>
- <1532346156.3057.11.camel@suse.com>
- <20180723162302.GA4503@sandybridge-desktop>
- <1532590246.7411.3.camel@suse.com>
+From: Megha Dey <megha.dey@intel.com>
+Subject: Re: [RFC] crypto: Remove mcryptd
+Date: Thu, 26 Jul 2018 17:25:07 -0700
+Message-ID: <1532651107.19157.24.camel@megha-Z97X-UD7-TH>
+References: <1526089453-6542-1-git-send-email-megha.dey@linux.intel.com>
+         <20180720035325.m5tzeuqsfej3y6wd@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Yu Chen <yu.c.chen@intel.com>, Pavel Machek <pavel@ucw.cz>,
-        "Rafael J . Wysocki" <rafael.j.wysocki@intel.com>,
-        Eric Biggers <ebiggers@google.com>,
-        Theodore Ts o <tytso@mit.edu>,
-        Stephan Mueller <smueller@chronox.de>,
-        Denis Kenzior <denkenz@gmail.com>, linux-pm@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        "Gu, Kookoo" <kookoo.gu@intel.com>,
-        "Zhang, Rui" <rui.zhang@intel.com>
-To: Oliver Neukum <oneukum@suse.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1532590246.7411.3.camel@suse.com>
+In-Reply-To: <20180720035325.m5tzeuqsfej3y6wd@gondor.apana.org.au>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Jul 26, 2018 at 09:30:46AM +0200, Oliver Neukum wrote:
-> On Di, 2018-07-24 at 00:23 +0800, Yu Chen wrote:
-> > 
-> > Good point, we once tried to generate key in kernel, but people
-> > suggest to generate key in userspace and provide it to the
-> > kernel, which is what ecryptfs do currently, so it seems this
-> > should also be safe for encryption in kernel.
-> > https://www.spinics.net/lists/linux-crypto/msg33145.html
-> > Thus Chun-Yi's signature can use EFI key and both the key from
-> > user space.
+On Fri, 2018-07-20 at 11:53 +0800, Herbert Xu wrote:
+> On Fri, May 11, 2018 at 06:44:13PM -0700, Megha Dey wrote:
+> >
+> > +static struct ahash_alg *simd_ahash_create_compat(const char *algname,
+> > +						       const char *drvname,
+> > +						       const char *basename)
+> > +{
+> > +	struct ahash_alg *alg;
+> > +	struct ahash_alg *ialg;
+> > +	int err;
 > 
-> Hi,
+> I think there has been a misunderstsanding.  You're not actually
+> using the simd wrapper here.  All you're doing is creating a function
+> with the word simd in its name.  In all other respects this is just
+> exposing the underlying algorithm to users directly, which cannot
+> work because the underlying algorithm requires SIMD.
+
+Hi Herbert,
+
+Thanks for the feedback.
+
+I still have some questions though:
+
+1. On the existing algorithms covered in aesni_intel-glue.c (eg:
+__cbc-aes-aesni), 3 algorithms are registered in /proc/crypto:
+
+     __cbc(aes)
+     cryptd(__cbc-aes-aesni)--> registered via cryptd_create_skcipher
+
+     cbc(aes)
+     cbc-aes-aesni	--> registered via simd_skcipher_create_compat
+
+     __cbc(aes)
+     __cbc-aes-aesni    --> registered as the internal algorithm
+
+I would want to know why do we need the cryptd(__cbc-aes-aesni)
+algorithm at all. I do not see any of the associated setkey, encrypt or
+decrypt functions getting called during the selftest or while running
+tcrypt. I just see the simd_(setkey, encrypt, decrypt) functions
+directly called the inner algorithms. However, if I remove the cryptd
+algorithm, none of the algorithms are registered.
+
 > 
-> ecryptfs can trust user space. It is supposed to keep data
-> safe while the system is inoperative. The whole point of Secure
-> Boot is a cryptographic system of trust that does not include
-> user space.
+> What you need to do is create an actual simd wrapper with cryptd
+ 
+This simd wrapper is already present for skcipher right(in simd.c)?
+Assuming we only have ciphers and no hash algorithms, are any changes
+required in these wrappers?
+
+Pseudo code:
+1. Register inner algorithm (cbc-aes-aesni-mb) in aes_cbc_mb_mod_init()
+2. Register outer algorithm with the mcryptd- prefix for the driver name
+using the simd_skcipher_create_compat(mcryptd-cbc-aes-aesni-mb)
+3. tcrypt/testmanager calls the
+crypto_skcipher_encrypt->simd_skcipher_encrypt->mb_cbc_aes_encrypt 
+4. Shift helper functions which help flush outstanding jobs to glue
+layer.
+5. Delete mcryptd.c
+6. All similar simd wrapper for hash algorithms. 
+
+> and all the functions that may do SIMD work needs to invoke cryptd
+> if may_use_simd() (and other conditions) is false.
 > 
-> I seriously doubt we want to use trusted computing here. So the
-> key needs to be generated in kernel space and stored in a safe
-> manner. As we have a saolution doing that, can we come to ausable
-> synthesis?
+> This wrapper should live in crypto/simd.c.
 > 
-> 	Regards
-> 		Oliver
-
-Crurently there have two solutions, they are trusted key and EFI key.
-Both of them are generated in kernel and are not visible in user space.
-
-The trusted key is generated by kernel then sealed by the TPM's
-SRK. So the trusted key can be stored in anywhere then be enrolled
-to kernel when we need it. EVM already uses it.
-
-The EFI key is Jiri Kosina's idea. It is stored in boot services
-variable, which means that it can only be access by signed EFI binary
-(e.g. signed EFI boot stub) when secure boot be enabled. SLE applied
-this solution a couple of years.
-
-I am working on put the EFI key to key retention service. Then
-EFI key can be a master key of encrypted key. EVM can also use
-it: 
-https://github.com/joeyli/linux-s4sign/commit/bae39460393ada4c0226dd07cd5e3afcef86b71f
-https://github.com/joeyli/linux-s4sign/commit/f552f97cc3cca5acd84f424b7f946ffb5fe8e9ec
-
-That's why I want to use key retention service in hibernation
-encryption/authentication. Which means that we can use key
-API to access trusted key and EFI key.  
-
-Thanks
-Joey Lee
+> Cheers,
