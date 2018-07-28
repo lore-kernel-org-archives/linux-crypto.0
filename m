@@ -1,91 +1,51 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/6] lib/crc32: treewide: Use existing define with
- polynomial
-Date: Sat, 28 Jul 2018 00:05:13 +0800
-Message-ID: <20180727160513.fluthoaj24co2khr@gondor.apana.org.au>
-References: <20180717160541.3843-1-krzk@kernel.org>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: [PATCH 0/2] crypto/arm64: aes-ce-gcm - switch to 2-way aggregation
+Date: Sat, 28 Jul 2018 20:53:58 +0200
+Message-ID: <20180728185400.8237-1-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@st.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Siva Reddy Kallam <siva.kallam@broadcom.com>,
-        Prashant Sreedharan <prashant@broadcom.com>,
-        Michael Chan <mchan@broadcom.com>,
-        Fugang Duan <fugang.duan@nxp.com>,
-        Pantelis Antoniou <pantelis.antoniou@gmail.com>,
-        Vitaly Bordug <vbordug@ru.mvista.com>,
-        Jose Abreu <Jose.Abreu@synopsys.com>,
-        Larry Finger <Larry.Finger@lwfinger.net>,
-        Florian Schilhabel <florian.c.schilhabel@googlemail.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20180717160541.3843-1-krzk@kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: herbert@gondor.apana.org.au, jerome.forissier@linaro.org,
+ Ard Biesheuvel <ard.biesheuvel@linaro.org>, catalin.marinas@arm.com,
+ will.deacon@arm.com, vakul.garg@nxp.com, jens.wiklander@linaro.org,
+ linux-arm-kernel@lists.infradead.org
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Jul 17, 2018 at 06:05:35PM +0200, Krzysztof Kozlowski wrote:
-> Hi,
-> 
-> Kernel defines same polynomial for CRC-32 in few places.
-> This is unnecessary duplication of the same value. Also this might
-> be error-prone for future code - every driver will define the
-> polynomial again.
-> 
-> This is an attempt to unify definition of polynomial.  Few obvious
-> hard-coded locations are fixed with define.
-> 
-> All series depend on each 1/6 and 2/6.
-> 
-> This could be merged in two different merge windows (1st lib/crc and then
-> the rest) or taken through one tree.
-> 
-> It would be nice to get some testing. Only generic lib/crc, bunzip, xz_crc32
-> and Freescale's Ethernet driver were tested on HW.  Rest got just different
-> builds.
-> 
-> Best regards,
-> Krzysztof
-> 
-> 
-> 
-> 
-> Krzysztof Kozlowski (6):
->   lib/crc: Move polynomial definition to separate header
->   lib/crc: Use consistent naming for CRC-32 polynomials
->   crypto: stm32_crc32 - Use existing define with polynomial
->   net: ethernet: Use existing define with polynomial
->   staging: rtl: Use existing define with polynomial
->   lib: Use existing define with polynomial
-> 
->  drivers/crypto/stm32/stm32_crc32.c               | 11 ++++-------
->  drivers/net/ethernet/amd/xgbe/xgbe-dev.c         |  4 ++--
->  drivers/net/ethernet/apple/bmac.c                |  8 ++------
->  drivers/net/ethernet/broadcom/tg3.c              |  3 ++-
->  drivers/net/ethernet/freescale/fec_main.c        |  4 ++--
->  drivers/net/ethernet/freescale/fs_enet/fec.h     |  3 ---
->  drivers/net/ethernet/freescale/fs_enet/mac-fec.c |  3 ++-
->  drivers/net/ethernet/micrel/ks8851_mll.c         |  3 ++-
->  drivers/net/ethernet/synopsys/dwc-xlgmac-hw.c    |  4 ++--
->  drivers/staging/rtl8712/rtl871x_security.c       |  5 ++---
->  drivers/staging/rtl8723bs/core/rtw_security.c    |  5 ++---
->  include/linux/crc32poly.h                        | 20 ++++++++++++++++++++
->  lib/crc32.c                                      | 11 ++++++-----
->  lib/crc32defs.h                                  | 14 --------------
->  lib/decompress_bunzip2.c                         |  3 ++-
->  lib/gen_crc32table.c                             |  5 +++--
->  lib/xz/xz_crc32.c                                |  3 ++-
->  17 files changed, 55 insertions(+), 54 deletions(-)
->  create mode 100644 include/linux/crc32poly.h
+Update the combined AES-GCM AEAD implementation to process two blocks
+at a time, allowing us to switch to a faster version of the GHASH
+implementation.
 
-All applied.  Thanks.
+Note that this does not update the core GHASH transform, only the
+combined AES-GCM AEAD mode. GHASH is mostly used with AES anyway, and
+the ARMv8 architecture mandates support for AES instructions if
+64-bit polynomial multiplication instructions are implemented. This
+means that mosts users of the pmull.p64 based GHASH routines are better
+off using the combined AES-GCM code anyway. Users of the pmull.p8 based
+GHASH implementation are unlikely to benefit substantially from aggregation,
+given that the multiplication phase is much more dominant in this case
+(and it is only the reduction phase that is amortized over multiple
+blocks)
+
+Performance numbers for Cortex-A53 can be found after patch #2.
+
+Ard Biesheuvel (2):
+  crypto/arm64: aes-ce-gcm - operate on two input blocks at a time
+  crypto/arm64: aes-ce-gcm - implement 2-way aggregation
+
+ arch/arm64/crypto/ghash-ce-core.S | 128 +++++++++++++-------
+ arch/arm64/crypto/ghash-ce-glue.c | 117 ++++++++++++------
+ 2 files changed, 165 insertions(+), 80 deletions(-)
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.18.0
