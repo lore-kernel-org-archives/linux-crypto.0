@@ -1,96 +1,66 @@
-From: joeyli <jlee@suse.com>
-Subject: Re: [PATCH 0/4][RFC v2] Introduce the in-kernel hibernation
- encryption
-Date: Tue, 31 Jul 2018 01:04:15 +0800
-Message-ID: <20180730170415.GQ4244@linux-l9pv.suse>
-References: <cover.1531924968.git.yu.c.chen@intel.com>
- <20180718202235.GA4132@amd>
- <20180718235851.GA22170@sandybridge-desktop>
- <20180719110149.GA4679@amd>
- <20180719132003.GA30981@sandybridge-desktop>
- <20180720102532.GA20284@amd>
- <1532346156.3057.11.camel@suse.com>
- <20180723162302.GA4503@sandybridge-desktop>
- <1532590246.7411.3.camel@suse.com>
- <20180726081404.GG4244@linux-l9pv.suse>
+From: Rob Herring <robh@kernel.org>
+Subject: Re: [PATCH 1/4] treewide: convert ISO_8859-1 text comments to utf-8
+Date: Tue, 31 Jul 2018 15:49:20 -0600
+Message-ID: <20180731214920.GA20796@rob-hp-laptop>
+References: <20180724111600.4158975-1-arnd@arndb.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Yu Chen <yu.c.chen@intel.com>, Pavel Machek <pavel@ucw.cz>,
-        "Rafael J . Wysocki" <rafael.j.wysocki@intel.com>,
-        Eric Biggers <ebiggers@google.com>,
-        Theodore Ts o <tytso@mit.edu>,
-        Stephan Mueller <smueller@chronox.de>,
-        Denis Kenzior <denkenz@gmail.com>, linux-pm@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        "Gu, Kookoo" <kookoo.gu@intel.com>,
-        "Zhang, Rui" <rui.zhang@intel.com>
-To: Oliver Neukum <oneukum@suse.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+        Joe Perches <joe@perches.com>,
+        Samuel Ortiz <sameo@linux.intel.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Jonathan Cameron <jic23@kernel.org>,
+        linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-iio@vger.kernel.org,
+        linux-pm@vger.kernel.org, lvs-devel@vger.kernel.org,
+        netfilter-devel@vger.kernel.org, coreteam@netfilter.org
+To: Arnd Bergmann <arnd@arndb.de>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20180726081404.GG4244@linux-l9pv.suse>
+In-Reply-To: <20180724111600.4158975-1-arnd@arndb.de>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi all,
+On Tue, Jul 24, 2018 at 01:13:25PM +0200, Arnd Bergmann wrote:
+> Almost all files in the kernel are either plain text or UTF-8
+> encoded. A couple however are ISO_8859-1, usually just a few
+> characters in a C comments, for historic reasons.
+> 
+> This converts them all to UTF-8 for consistency.
+> 
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
+>  .../devicetree/bindings/net/nfc/pn544.txt     |   2 +-
+>  arch/arm/boot/dts/sun4i-a10-inet97fv2.dts     |   2 +-
+>  arch/arm/crypto/sha256_glue.c                 |   2 +-
+>  arch/arm/crypto/sha256_neon_glue.c            |   4 +-
+>  drivers/crypto/vmx/ghashp8-ppc.pl             |  12 +-
+>  drivers/iio/dac/ltc2632.c                     |   2 +-
+>  drivers/power/reset/ltc2952-poweroff.c        |   4 +-
+>  kernel/events/callchain.c                     |   2 +-
+>  net/netfilter/ipvs/Kconfig                    |   8 +-
+>  net/netfilter/ipvs/ip_vs_mh.c                 |   4 +-
+>  tools/power/cpupower/po/de.po                 |  44 +++----
+>  tools/power/cpupower/po/fr.po                 | 120 +++++++++---------
+>  12 files changed, 103 insertions(+), 103 deletions(-)
+> 
+> diff --git a/Documentation/devicetree/bindings/net/nfc/pn544.txt b/Documentation/devicetree/bindings/net/nfc/pn544.txt
+> index 538a86f7b2b0..72593f056b75 100644
+> --- a/Documentation/devicetree/bindings/net/nfc/pn544.txt
+> +++ b/Documentation/devicetree/bindings/net/nfc/pn544.txt
+> @@ -2,7 +2,7 @@
+>  
+>  Required properties:
+>  - compatible: Should be "nxp,pn544-i2c".
+> -- clock-frequency: I²C work frequency.
+> +- clock-frequency: IÂ²C work frequency.
 
-On Thu, Jul 26, 2018 at 04:14:04PM +0800, joeyli wrote:
-> On Thu, Jul 26, 2018 at 09:30:46AM +0200, Oliver Neukum wrote:
-> > On Di, 2018-07-24 at 00:23 +0800, Yu Chen wrote:
-> > > 
-> > > Good point, we once tried to generate key in kernel, but people
-> > > suggest to generate key in userspace and provide it to the
-> > > kernel, which is what ecryptfs do currently, so it seems this
-> > > should also be safe for encryption in kernel.
-> > > https://www.spinics.net/lists/linux-crypto/msg33145.html
-> > > Thus Chun-Yi's signature can use EFI key and both the key from
-> > > user space.
-> > 
-> > Hi,
-> > 
-> > ecryptfs can trust user space. It is supposed to keep data
-> > safe while the system is inoperative. The whole point of Secure
-> > Boot is a cryptographic system of trust that does not include
-> > user space.
-> > 
-> > I seriously doubt we want to use trusted computing here. So the
-> > key needs to be generated in kernel space and stored in a safe
-> > manner. As we have a saolution doing that, can we come to ausable
-> > synthesis?
-> > 
-> > 	Regards
-> > 		Oliver
-> 
-> Crurently there have two solutions, they are trusted key and EFI key.
-> Both of them are generated in kernel and are not visible in user space.
-> 
-> The trusted key is generated by kernel then sealed by the TPM's
-> SRK. So the trusted key can be stored in anywhere then be enrolled
-> to kernel when we need it. EVM already uses it.
-> 
-> The EFI key is Jiri Kosina's idea. It is stored in boot services
-> variable, which means that it can only be access by signed EFI binary
-> (e.g. signed EFI boot stub) when secure boot be enabled. SLE applied
-> this solution a couple of years.
-> 
-> I am working on put the EFI key to key retention service. Then
-> EFI key can be a master key of encrypted key. EVM can also use
-> it: 
-> https://github.com/joeyli/linux-s4sign/commit/bae39460393ada4c0226dd07cd5e3afcef86b71f
-> https://github.com/joeyli/linux-s4sign/commit/f552f97cc3cca5acd84f424b7f946ffb5fe8e9ec
-> 
-> That's why I want to use key retention service in hibernation
-> encryption/authentication. Which means that we can use key
-> API to access trusted key and EFI key.  
->
+I'd prefer just plain ASCII 'I2C' here, but either way:
 
-Here is a proof of concept for using the key retention service
-to encrypt/sign snapshot image. It's using EFI key now, I will
-add encrypted key support in the key handler later:
-    https://github.com/joeyli/linux-s4sign/commit/6311e97038974bc5de8121769fb4d34470009566 
+Acked-by: Rob Herring <robh@kernel.org>
 
-My next step is that cleaning up the my EFI key type patches and
-submit it to EFI/keys subsystem ASAP. Then I will clean up
-my hibernation encryption/authentication solution for reviewing.
-
-Thanks
-Joey Lee 
+Rob
