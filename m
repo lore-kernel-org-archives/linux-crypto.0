@@ -1,7 +1,7 @@
 From: Kenneth Lee <nek.in.cn@gmail.com>
-Subject: [RFC PATCH 3/7] vfio: add spimdev support
-Date: Wed,  1 Aug 2018 18:22:17 +0800
-Message-ID: <20180801102221.5308-4-nek.in.cn@gmail.com>
+Subject: [RFC PATCH 4/7] crypto: add hisilicon Queue Manager driver
+Date: Wed,  1 Aug 2018 18:22:18 +0800
+Message-ID: <20180801102221.5308-5-nek.in.cn@gmail.com>
 References: <20180801102221.5308-1-nek.in.cn@gmail.com>
 Cc: linuxarm@huawei.com
 To: Jonathan Corbet <corbet@lwn.net>,
@@ -28,856 +28,1047 @@ List-Id: linux-crypto.vger.kernel.org
 
 From: Kenneth Lee <liguozhu@hisilicon.com>
 
-SPIMDEV is "Share Parent IOMMU Mdev". It is a vfio-mdev. But differ from
-the general vfio-mdev:
+Hisilicon QM is a general IP used by some Hisilicon accelerators. It
+provides a general PCIE interface for the CPU and the accelerator to share
+a group of queues.
 
-1. It shares its parent's IOMMU.
-2. There is no hardware resource attached to the mdev is created. The
-hardware resource (A `queue') is allocated only when the mdev is
-opened.
-
-Currently only the vfio type-1 driver is updated to make it to be aware
-of.
+This commit includes a library used by the accelerator driver to access
+the QM hardware.
 
 Signed-off-by: Kenneth Lee <liguozhu@hisilicon.com>
-Signed-off-by: Zaibo Xu <xuzaibo@huawei.com>
 Signed-off-by: Zhou Wang <wangzhou1@hisilicon.com>
+Signed-off-by: Hao Fang <fanghao11@huawei.com>
 ---
- drivers/vfio/Kconfig                |   1 +
- drivers/vfio/Makefile               |   1 +
- drivers/vfio/spimdev/Kconfig        |  10 +
- drivers/vfio/spimdev/Makefile       |   3 +
- drivers/vfio/spimdev/vfio_spimdev.c | 421 ++++++++++++++++++++++++++++
- drivers/vfio/vfio_iommu_type1.c     | 136 ++++++++-
- include/linux/vfio_spimdev.h        |  95 +++++++
- include/uapi/linux/vfio_spimdev.h   |  28 ++
- 8 files changed, 689 insertions(+), 6 deletions(-)
- create mode 100644 drivers/vfio/spimdev/Kconfig
- create mode 100644 drivers/vfio/spimdev/Makefile
- create mode 100644 drivers/vfio/spimdev/vfio_spimdev.c
- create mode 100644 include/linux/vfio_spimdev.h
- create mode 100644 include/uapi/linux/vfio_spimdev.h
+ drivers/crypto/Kconfig            |   2 +
+ drivers/crypto/Makefile           |   1 +
+ drivers/crypto/hisilicon/Kconfig  |   8 +
+ drivers/crypto/hisilicon/Makefile |   1 +
+ drivers/crypto/hisilicon/qm.c     | 855 ++++++++++++++++++++++++++++++
+ drivers/crypto/hisilicon/qm.h     | 111 ++++
+ 6 files changed, 978 insertions(+)
+ create mode 100644 drivers/crypto/hisilicon/Kconfig
+ create mode 100644 drivers/crypto/hisilicon/Makefile
+ create mode 100644 drivers/crypto/hisilicon/qm.c
+ create mode 100644 drivers/crypto/hisilicon/qm.h
 
-diff --git a/drivers/vfio/Kconfig b/drivers/vfio/Kconfig
-index c84333eb5eb5..3719eba72ef1 100644
---- a/drivers/vfio/Kconfig
-+++ b/drivers/vfio/Kconfig
-@@ -47,4 +47,5 @@ menuconfig VFIO_NOIOMMU
- source "drivers/vfio/pci/Kconfig"
- source "drivers/vfio/platform/Kconfig"
- source "drivers/vfio/mdev/Kconfig"
-+source "drivers/vfio/spimdev/Kconfig"
- source "virt/lib/Kconfig"
-diff --git a/drivers/vfio/Makefile b/drivers/vfio/Makefile
-index de67c4725cce..28f3ef0cdce1 100644
---- a/drivers/vfio/Makefile
-+++ b/drivers/vfio/Makefile
-@@ -9,3 +9,4 @@ obj-$(CONFIG_VFIO_SPAPR_EEH) += vfio_spapr_eeh.o
- obj-$(CONFIG_VFIO_PCI) += pci/
- obj-$(CONFIG_VFIO_PLATFORM) += platform/
- obj-$(CONFIG_VFIO_MDEV) += mdev/
-+obj-$(CONFIG_VFIO_SPIMDEV) += spimdev/
-diff --git a/drivers/vfio/spimdev/Kconfig b/drivers/vfio/spimdev/Kconfig
+diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+index 43cccf6aff61..8da1e3170eb4 100644
+--- a/drivers/crypto/Kconfig
++++ b/drivers/crypto/Kconfig
+@@ -746,4 +746,6 @@ config CRYPTO_DEV_CCREE
+ 	  cryptographic operations on the system REE.
+ 	  If unsure say Y.
+ 
++source "drivers/crypto/hisilicon/Kconfig"
++
+ endif # CRYPTO_HW
+diff --git a/drivers/crypto/Makefile b/drivers/crypto/Makefile
+index 7ae87b4f6c8d..32e9bf64a42f 100644
+--- a/drivers/crypto/Makefile
++++ b/drivers/crypto/Makefile
+@@ -45,3 +45,4 @@ obj-$(CONFIG_CRYPTO_DEV_VMX) += vmx/
+ obj-$(CONFIG_CRYPTO_DEV_BCM_SPU) += bcm/
+ obj-$(CONFIG_CRYPTO_DEV_SAFEXCEL) += inside-secure/
+ obj-$(CONFIG_CRYPTO_DEV_ARTPEC6) += axis/
++obj-$(CONFIG_CRYPTO_DEV_HISILICON) += hisilicon/
+diff --git a/drivers/crypto/hisilicon/Kconfig b/drivers/crypto/hisilicon/Kconfig
 new file mode 100644
-index 000000000000..1226301f9d0e
+index 000000000000..0dd30f84b90e
 --- /dev/null
-+++ b/drivers/vfio/spimdev/Kconfig
-@@ -0,0 +1,10 @@
-+# SPDX-License-Identifier: GPL-2.0
-+config VFIO_SPIMDEV
-+	tristate "Support for Share Parent IOMMU MDEV"
-+	depends on VFIO_MDEV_DEVICE
++++ b/drivers/crypto/hisilicon/Kconfig
+@@ -0,0 +1,8 @@
++config CRYPTO_DEV_HISILICON
++	tristate "Support for HISILICON CRYPTO ACCELERATOR"
 +	help
-+	  Support for VFIO Share Parent IOMMU MDEV, which enable the kernel to
-+	  support for the light weight hardware accelerator framework, WrapDrive.
++	  Enable this to use Hisilicon Hardware Accelerators
 +
-+	  To compile this as a module, choose M here: the module will be called
-+	  spimdev.
-diff --git a/drivers/vfio/spimdev/Makefile b/drivers/vfio/spimdev/Makefile
++config CRYPTO_DEV_HISI_QM
++	tristate
++	depends on ARM64 && PCI
+diff --git a/drivers/crypto/hisilicon/Makefile b/drivers/crypto/hisilicon/Makefile
 new file mode 100644
-index 000000000000..d02fb69c37e4
+index 000000000000..3378afc11703
 --- /dev/null
-+++ b/drivers/vfio/spimdev/Makefile
-@@ -0,0 +1,3 @@
-+# SPDX-License-Identifier: GPL-2.0
-+spimdev-y := spimdev.o
-+obj-$(CONFIG_VFIO_SPIMDEV) += vfio_spimdev.o
-diff --git a/drivers/vfio/spimdev/vfio_spimdev.c b/drivers/vfio/spimdev/vfio_spimdev.c
++++ b/drivers/crypto/hisilicon/Makefile
+@@ -0,0 +1 @@
++obj-$(CONFIG_CRYPTO_DEV_HISI_QM) += qm.o
+diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
 new file mode 100644
-index 000000000000..1b6910c9d27d
+index 000000000000..e779bc661500
 --- /dev/null
-+++ b/drivers/vfio/spimdev/vfio_spimdev.c
-@@ -0,0 +1,421 @@
++++ b/drivers/crypto/hisilicon/qm.c
+@@ -0,0 +1,855 @@
 +// SPDX-License-Identifier: GPL-2.0+
-+#include <linux/anon_inodes.h>
-+#include <linux/idr.h>
-+#include <linux/module.h>
-+#include <linux/poll.h>
-+#include <linux/vfio_spimdev.h>
++#include <asm/page.h>
++#include <linux/bitmap.h>
++#include <linux/dma-mapping.h>
++#include <linux/io.h>
++#include <linux/irqreturn.h>
++#include <linux/log2.h>
++#include "qm.h"
 +
-+struct spimdev_mdev_state {
-+	struct vfio_spimdev *spimdev;
++#define QM_DEF_Q_NUM			128
++
++/* eq/aeq irq enable */
++#define QM_VF_AEQ_INT_SOURCE		0x0
++#define QM_VF_AEQ_INT_MASK		0x4
++#define QM_VF_EQ_INT_SOURCE		0x8
++#define QM_VF_EQ_INT_MASK		0xc
++
++/* mailbox */
++#define MAILBOX_CMD_SQC			0x0
++#define MAILBOX_CMD_CQC			0x1
++#define MAILBOX_CMD_EQC			0x2
++#define MAILBOX_CMD_AEQC		0x3
++#define MAILBOX_CMD_SQC_BT		0x4
++#define MAILBOX_CMD_CQC_BT		0x5
++
++#define MAILBOX_CMD_SEND_BASE		0x300
++#define MAILBOX_EVENT_SHIFT		8
++#define MAILBOX_STATUS_SHIFT		9
++#define MAILBOX_BUSY_SHIFT		13
++#define MAILBOX_OP_SHIFT		14
++#define MAILBOX_QUEUE_SHIFT		16
++
++/* sqc shift */
++#define SQ_HEAD_SHIFT			0
++#define SQ_TAIL_SHIFI			16
++#define SQ_HOP_NUM_SHIFT		0
++#define SQ_PAGE_SIZE_SHIFT		4
++#define SQ_BUF_SIZE_SHIFT		8
++#define SQ_SQE_SIZE_SHIFT		12
++#define SQ_HEAD_IDX_SIG_SHIFT		0
++#define SQ_TAIL_IDX_SIG_SHIFT		0
++#define SQ_CQN_SHIFT			0
++#define SQ_PRIORITY_SHIFT		0
++#define SQ_ORDERS_SHIFT			4
++#define SQ_TYPE_SHIFT			8
++
++#define SQ_TYPE_MASK			0xf
++
++/* cqc shift */
++#define CQ_HEAD_SHIFT			0
++#define CQ_TAIL_SHIFI			16
++#define CQ_HOP_NUM_SHIFT		0
++#define CQ_PAGE_SIZE_SHIFT		4
++#define CQ_BUF_SIZE_SHIFT		8
++#define CQ_SQE_SIZE_SHIFT		12
++#define CQ_PASID			0
++#define CQ_HEAD_IDX_SIG_SHIFT		0
++#define CQ_TAIL_IDX_SIG_SHIFT		0
++#define CQ_CQN_SHIFT			0
++#define CQ_PRIORITY_SHIFT		16
++#define CQ_ORDERS_SHIFT			0
++#define CQ_TYPE_SHIFT			0
++#define CQ_PHASE_SHIFT			0
++#define CQ_FLAG_SHIFT			1
++
++#define CQC_HEAD_INDEX(cqc)		((cqc)->cq_head)
++#define CQC_PHASE(cqc)			(((cqc)->dw6) & 0x1)
++#define CQC_CQ_ADDRESS(cqc)		(((u64)((cqc)->cq_base_h) << 32) | \
++					 ((cqc)->cq_base_l))
++#define CQC_PHASE_BIT			0x1
++
++/* eqc shift */
++#define MB_EQC_EQE_SHIFT		12
++#define MB_EQC_PHASE_SHIFT		16
++
++#define EQC_HEAD_INDEX(eqc)		((eqc)->eq_head)
++#define EQC_TAIL_INDEX(eqc)		((eqc)->eq_tail)
++#define EQC_PHASE(eqc)			((((eqc)->dw6) >> 16) & 0x1)
++
++#define EQC_PHASE_BIT			0x00010000
++
++/* aeqc shift */
++#define MB_AEQC_AEQE_SHIFT		12
++#define MB_AEQC_PHASE_SHIFT		16
++
++/* cqe shift */
++#define CQE_PHASE(cqe)			((cqe)->w7 & 0x1)
++#define CQE_SQ_NUM(cqe)			((cqe)->sq_num)
++#define CQE_SQ_HEAD_INDEX(cqe)		((cqe)->sq_head)
++
++/* eqe shift */
++#define EQE_PHASE(eqe)			(((eqe)->dw0 >> 16) & 0x1)
++#define EQE_CQN(eqe)			(((eqe)->dw0) & 0xffff)
++
++#define QM_EQE_CQN_MASK			0xffff
++
++/* doorbell */
++#define DOORBELL_CMD_SQ			0
++#define DOORBELL_CMD_CQ			1
++#define DOORBELL_CMD_EQ			2
++#define DOORBELL_CMD_AEQ		3
++
++#define DOORBELL_CMD_SEND_BASE		0x340
++
++#define QM_MEM_START_INIT		0x100040
++#define QM_MEM_INIT_DONE		0x100044
++#define QM_VFT_CFG_RDY			0x10006c
++#define QM_VFT_CFG_OP_WR		0x100058
++#define QM_VFT_CFG_TYPE			0x10005c
++#define QM_SQC_VFT			0x0
++#define QM_CQC_VFT			0x1
++#define QM_VFT_CFG_ADDRESS		0x100060
++#define QM_VFT_CFG_OP_ENABLE		0x100054
++
++#define QM_VFT_CFG_DATA_L		0x100064
++#define QM_VFT_CFG_DATA_H		0x100068
++#define QM_SQC_VFT_BUF_SIZE		(7ULL << 8)
++#define QM_SQC_VFT_SQC_SIZE		(5ULL << 12)
++#define QM_SQC_VFT_INDEX_NUMBER		(1ULL << 16)
++#define QM_SQC_VFT_BT_INDEX_SHIFT	22
++#define QM_SQC_VFT_START_SQN_SHIFT	28
++#define QM_SQC_VFT_VALID		(1ULL << 44)
++#define QM_CQC_VFT_BUF_SIZE		(7ULL << 8)
++#define QM_CQC_VFT_SQC_SIZE		(5ULL << 12)
++#define QM_CQC_VFT_INDEX_NUMBER		(1ULL << 16)
++#define QM_CQC_VFT_BT_INDEX_SHIFT	22
++#define QM_CQC_VFT_VALID		(1ULL << 28)
++
++struct cqe {
++	__le32 rsvd0;
++	__le16 cmd_id;
++	__le16 rsvd1;
++	__le16 sq_head;
++	__le16 sq_num;
++	__le16 rsvd2;
++	__le16 w7;
 +};
 +
-+static struct class *spimdev_class;
-+static DEFINE_IDR(spimdev_idr);
++struct eqe {
++	__le32 dw0;
++};
 +
-+static int vfio_spimdev_dev_exist(struct device *dev, void *data)
++struct aeqe {
++	__le32 dw0;
++};
++
++struct sqc {
++	__le16 head;
++	__le16 tail;
++	__le32 base_l;
++	__le32 base_h;
++	__le32 dw3;
++	__le16 qes;
++	__le16 rsvd0;
++	__le16 pasid;
++	__le16 w11;
++	__le16 cq_num;
++	__le16 w13;
++	__le32 rsvd1;
++};
++
++struct cqc {
++	__le16 head;
++	__le16 tail;
++	__le32 base_l;
++	__le32 base_h;
++	__le32 dw3;
++	__le16 qes;
++	__le16 rsvd0;
++	__le16 pasid;
++	__le16 w11;
++	__le32 dw6;
++	__le32 rsvd1;
++};
++
++#define INIT_QC(qc, base) do { \
++	(qc)->head = 0; \
++	(qc)->tail = 0; \
++	(qc)->base_l = lower_32_bits(base); \
++	(qc)->base_h = upper_32_bits(base); \
++	(qc)->pasid = 0; \
++	(qc)->w11 = 0; \
++	(qc)->rsvd1 = 0; \
++	(qc)->qes = QM_Q_DEPTH - 1; \
++} while (0)
++
++struct eqc {
++	__le16 head;
++	__le16 tail;
++	__le32 base_l;
++	__le32 base_h;
++	__le32 dw3;
++	__le32 rsvd[2];
++	__le32 dw6;
++};
++
++struct aeqc {
++	__le16 head;
++	__le16 tail;
++	__le32 base_l;
++	__le32 base_h;
++	__le32 rsvd[3];
++	__le32 dw6;
++};
++
++struct mailbox {
++	__le16 w0;
++	__le16 queue_num;
++	__le32 base_l;
++	__le32 base_h;
++	__le32 rsvd;
++};
++
++struct doorbell {
++	__le16 queue_num;
++	__le16 cmd;
++	__le16 index;
++	__le16 priority;
++};
++
++#define QM_DMA_BUF(p, buf) ((struct buf *)(p)->buf.addr)
++#define QM_SQC(p) QM_DMA_BUF(p, sqc)
++#define QM_CQC(p) QM_DMA_BUF(p, cqc)
++#define QM_EQC(p) QM_DMA_BUF(p, eqc)
++#define QM_EQE(p) QM_DMA_BUF(p, eqe)
++#define QM_AEQC(p) QM_DMA_BUF(p, aeqc)
++#define QM_AEQE(p) QM_DMA_BUF(p, aeqe)
++
++#define QP_SQE_DMA(qp) ((qp)->scqe.dma)
++#define QP_CQE(qp) ((struct cqe *)((qp)->scqe.addr + \
++				   qp->qm->sqe_size * QM_Q_DEPTH))
++#define QP_CQE_DMA(qp) ((qp)->scqe.dma + qp->qm->sqe_size * QM_Q_DEPTH)
++
++static inline void qm_writel(struct qm_info *qm, u32 val, u32 offset)
 +{
-+	return !strcmp(dev_name(dev), dev_name((struct device *)data));
++	writel(val, qm->io_base + offset);
 +}
 +
-+#ifdef CONFIG_IOMMU_SVA
-+static bool vfio_spimdev_is_valid_pasid(int pasid)
-+{
-+	struct mm_struct *mm;
++struct qm_info;
 +
-+	mm = iommu_sva_find(pasid);
-+	if (mm) {
-+		mmput(mm);
-+		return mm == current->mm;
++struct hisi_acc_qm_hw_ops {
++	int (*vft_config)(struct qm_info *qm, u16 base, u32 number);
++};
++
++static inline int hacc_qm_mb_is_busy(struct qm_info *qm)
++{
++	u32 val;
++
++	return readl_relaxed_poll_timeout(QM_ADDR(qm, MAILBOX_CMD_SEND_BASE),
++		val, !((val >> MAILBOX_BUSY_SHIFT) & 0x1), 10, 1000);
++}
++
++static inline void qm_mb_write(struct qm_info *qm, void *src)
++{
++	void __iomem *fun_base = QM_ADDR(qm, MAILBOX_CMD_SEND_BASE);
++	unsigned long tmp0 = 0, tmp1 = 0;
++
++	asm volatile("ldp %0, %1, %3\n"
++		     "stp %0, %1, %2\n"
++		     "dsb sy\n"
++		     : "=&r" (tmp0),
++		       "=&r" (tmp1),
++		       "+Q" (*((char *)fun_base))
++		     : "Q" (*((char *)src))
++		     : "memory");
++}
++
++static int qm_mb(struct qm_info *qm, u8 cmd, u64 phys_addr, u16 queue,
++		   bool op, bool event)
++{
++	struct mailbox mailbox;
++	int i = 0;
++	int ret = 0;
++
++	memset(&mailbox, 0, sizeof(struct mailbox));
++
++	mailbox.w0 = cmd |
++		     (event ? 0x1 << MAILBOX_EVENT_SHIFT : 0) |
++		     (op ? 0x1 << MAILBOX_OP_SHIFT : 0) |
++		     (0x1 << MAILBOX_BUSY_SHIFT);
++	mailbox.queue_num = queue;
++	mailbox.base_l = lower_32_bits(phys_addr);
++	mailbox.base_h = upper_32_bits(phys_addr);
++	mailbox.rsvd = 0;
++
++	mutex_lock(&qm->mailbox_lock);
++
++	while (hacc_qm_mb_is_busy(qm) && i < 10)
++		i++;
++	if (i >= 10) {
++		ret = -EBUSY;
++		dev_err(&qm->pdev->dev, "QM mail box is busy!");
++		goto busy_unlock;
++	}
++	qm_mb_write(qm, &mailbox);
++	i = 0;
++	while (hacc_qm_mb_is_busy(qm) && i < 10)
++		i++;
++	if (i >= 10) {
++		ret = -EBUSY;
++		dev_err(&qm->pdev->dev, "QM mail box is still busy!");
++		goto busy_unlock;
 +	}
 +
-+	return false;
-+}
-+#endif
++busy_unlock:
++	mutex_unlock(&qm->mailbox_lock);
 +
-+/* Check if the device is a mediated device belongs to vfio_spimdev */
-+int vfio_spimdev_is_spimdev(struct device *dev)
-+{
-+	struct mdev_device *mdev;
-+	struct device *pdev;
-+
-+	mdev = mdev_from_dev(dev);
-+	if (!mdev)
-+		return 0;
-+
-+	pdev = mdev_parent_dev(mdev);
-+	if (!pdev)
-+		return 0;
-+
-+	return class_for_each_device(spimdev_class, NULL, pdev,
-+			vfio_spimdev_dev_exist);
-+}
-+EXPORT_SYMBOL_GPL(vfio_spimdev_is_spimdev);
-+
-+struct vfio_spimdev *vfio_spimdev_pdev_spimdev(struct device *dev)
-+{
-+	struct device *class_dev;
-+
-+	if (!dev)
-+		return ERR_PTR(-EINVAL);
-+
-+	class_dev = class_find_device(spimdev_class, NULL, dev,
-+		(int(*)(struct device *, const void *))vfio_spimdev_dev_exist);
-+	if (!class_dev)
-+		return ERR_PTR(-ENODEV);
-+
-+	return container_of(class_dev, struct vfio_spimdev, cls_dev);
-+}
-+EXPORT_SYMBOL_GPL(vfio_spimdev_pdev_spimdev);
-+
-+struct vfio_spimdev *mdev_spimdev(struct mdev_device *mdev)
-+{
-+	struct device *pdev = mdev_parent_dev(mdev);
-+
-+	return vfio_spimdev_pdev_spimdev(pdev);
-+}
-+EXPORT_SYMBOL_GPL(mdev_spimdev);
-+
-+static ssize_t iommu_type_show(struct device *dev,
-+			       struct device_attribute *attr, char *buf)
-+{
-+	struct vfio_spimdev *spimdev = vfio_spimdev_pdev_spimdev(dev);
-+
-+	if (!spimdev)
-+		return -ENODEV;
-+
-+	return sprintf(buf, "%d\n", spimdev->iommu_type);
++	return ret;
 +}
 +
-+static DEVICE_ATTR_RO(iommu_type);
-+
-+static ssize_t dma_flag_show(struct device *dev,
-+			     struct device_attribute *attr, char *buf)
++static int qm_db(struct qm_info *qm, u16 qn, u8 cmd, u16 index, u8 priority)
 +{
-+	struct vfio_spimdev *spimdev = vfio_spimdev_pdev_spimdev(dev);
++	u64 doorbell = 0;
 +
-+	if (!spimdev)
-+		return -ENODEV;
++	doorbell = (u64)qn | ((u64)cmd << 16);
++	doorbell |= ((u64)index | ((u64)priority << 16)) << 32;
 +
-+	return sprintf(buf, "%d\n", spimdev->dma_flag);
++	writeq(doorbell, QM_ADDR(qm, DOORBELL_CMD_SEND_BASE));
++
++	return 0;
 +}
 +
-+static DEVICE_ATTR_RO(dma_flag);
-+
-+/* mdev->dev_attr_groups */
-+static struct attribute *vfio_spimdev_attrs[] = {
-+	&dev_attr_iommu_type.attr,
-+	&dev_attr_dma_flag.attr,
-+	NULL,
-+};
-+static const struct attribute_group vfio_spimdev_group = {
-+	.name  = VFIO_SPIMDEV_PDEV_ATTRS_GRP_NAME,
-+	.attrs = vfio_spimdev_attrs,
-+};
-+const struct attribute_group *vfio_spimdev_groups[] = {
-+	&vfio_spimdev_group,
-+	NULL,
-+};
-+
-+/* default attributes for mdev->supported_type_groups, used by registerer*/
-+#define MDEV_TYPE_ATTR_RO_EXPORT(name) \
-+		MDEV_TYPE_ATTR_RO(name); \
-+		EXPORT_SYMBOL_GPL(mdev_type_attr_##name);
-+
-+#define DEF_SIMPLE_SPIMDEV_ATTR(_name, spimdev_member, format) \
-+static ssize_t _name##_show(struct kobject *kobj, struct device *dev, \
-+			    char *buf) \
-+{ \
-+	struct vfio_spimdev *spimdev = vfio_spimdev_pdev_spimdev(dev); \
-+	if (!spimdev) \
-+		return -ENODEV; \
-+	return sprintf(buf, format, spimdev->spimdev_member); \
-+} \
-+MDEV_TYPE_ATTR_RO_EXPORT(_name)
-+
-+DEF_SIMPLE_SPIMDEV_ATTR(flags, flags, "%d");
-+DEF_SIMPLE_SPIMDEV_ATTR(name, name, "%s"); /* this should be algorithm name, */
-+		/* but you would not care if you have only one algorithm */
-+DEF_SIMPLE_SPIMDEV_ATTR(device_api, api_ver, "%s");
-+
-+/* this return total queue left, not mdev left */
-+static ssize_t
-+available_instances_show(struct kobject *kobj, struct device *dev, char *buf)
++/* @return 0 - cq/eq event, 1 - async event, 2 - abnormal error */
++static u32 qm_get_irq_source(struct qm_info *qm)
 +{
-+	struct vfio_spimdev *spimdev = vfio_spimdev_pdev_spimdev(dev);
-+
-+	return sprintf(buf, "%d",
-+			spimdev->ops->get_available_instances(spimdev));
++	return readl(QM_ADDR(qm, QM_VF_EQ_INT_SOURCE));
 +}
-+MDEV_TYPE_ATTR_RO_EXPORT(available_instances);
 +
-+static int vfio_spimdev_mdev_create(struct kobject *kobj,
-+	struct mdev_device *mdev)
++static inline struct hisi_qp *to_hisi_qp(struct qm_info *qm, struct eqe *eqe)
 +{
-+	struct device *dev = mdev_dev(mdev);
-+	struct device *pdev = mdev_parent_dev(mdev);
-+	struct spimdev_mdev_state *mdev_state;
-+	struct vfio_spimdev *spimdev = mdev_spimdev(mdev);
++	u16 cqn = eqe->dw0 & QM_EQE_CQN_MASK;
++	struct hisi_qp *qp;
 +
-+	if (!spimdev->ops->get_queue)
-+		return -ENODEV;
++	read_lock(&qm->qps_lock);
++	qp = qm->qp_array[cqn];
++	read_unlock(&qm->qps_lock);
 +
-+	mdev_state = devm_kzalloc(dev, sizeof(struct spimdev_mdev_state),
-+				  GFP_KERNEL);
-+	if (!mdev_state)
++	return qm->qp_array[cqn];
++}
++
++static inline void qm_cq_head_update(struct hisi_qp *qp)
++{
++	if (qp->qp_status.cq_head == QM_Q_DEPTH - 1) {
++		QM_CQC(qp)->dw6 = QM_CQC(qp)->dw6 ^ CQC_PHASE_BIT;
++		qp->qp_status.cq_head = 0;
++	} else {
++		qp->qp_status.cq_head++;
++	}
++}
++
++static inline void qm_poll_qp(struct hisi_qp *qp, struct qm_info *qm)
++{
++	struct cqe *cqe;
++
++	cqe = QP_CQE(qp) + qp->qp_status.cq_head;
++
++	if (qp->req_cb) {
++		while (CQE_PHASE(cqe) == CQC_PHASE(QM_CQC(qp))) {
++			dma_rmb();
++			qp->req_cb(qp, QP_SQE_ADDR(qp) +
++				   qm->sqe_size *
++				   CQE_SQ_HEAD_INDEX(cqe));
++			qm_cq_head_update(qp);
++			cqe = QP_CQE(qp) + qp->qp_status.cq_head;
++		}
++	} else if (qp->event_cb) {
++		qp->event_cb(qp);
++		qm_cq_head_update(qp);
++		cqe = QP_CQE(qp) + qp->qp_status.cq_head;
++	}
++
++	qm_db(qm, qp->queue_id, DOORBELL_CMD_CQ,
++		qp->qp_status.cq_head, 0);
++
++	/* set c_flag */
++	qm_db(qm, qp->queue_id, DOORBELL_CMD_CQ,
++		qp->qp_status.cq_head, 1);
++}
++
++static irqreturn_t qm_irq_thread(int irq, void *data)
++{
++	struct qm_info *qm = data;
++	struct eqe *eqe = QM_EQE(qm) + qm->eq_head;
++	struct eqc *eqc = QM_EQC(qm);
++	struct hisi_qp *qp;
++
++	while (EQE_PHASE(eqe) == EQC_PHASE(eqc)) {
++		qp = to_hisi_qp(qm, eqe);
++		if (qp) {
++			qm_poll_qp(qp, qm);
++		}
++
++		if (qm->eq_head == QM_Q_DEPTH - 1) {
++			eqc->dw6 = eqc->dw6 ^ EQC_PHASE_BIT;
++			eqe = QM_EQE(qm);
++			qm->eq_head = 0;
++		} else {
++			eqe++;
++			qm->eq_head++;
++		}
++	}
++
++	qm_db(qm, 0, DOORBELL_CMD_EQ, qm->eq_head, 0);
++
++	return IRQ_HANDLED;
++}
++
++static void qm_init_qp_status(struct hisi_qp *qp)
++{
++	struct hisi_acc_qp_status *qp_status = &qp->qp_status;
++
++	qp_status->sq_tail = 0;
++	qp_status->sq_head = 0;
++	qp_status->cq_head = 0;
++	qp_status->sqn = 0;
++	qp_status->cqc_phase = 1;
++	qp_status->is_sq_full = 0;
++}
++
++/* check if bit in regs is 1 */
++static inline int qm_acc_check(struct qm_info *qm, u32 offset, u32 bit)
++{
++	int val;
++
++	return readl_relaxed_poll_timeout(QM_ADDR(qm, offset), val,
++					  val & BIT(bit), 10, 1000);
++}
++
++static inline int qm_init_q_buffer(struct device *dev, size_t size,
++				 struct qm_dma_buffer *db)
++{
++	db->size = size;
++	db->addr = dma_alloc_coherent(dev, size, &db->dma, GFP_KERNEL);
++	if (!db->addr)
 +		return -ENOMEM;
-+	mdev_set_drvdata(mdev, mdev_state);
-+	mdev_state->spimdev = spimdev;
-+	dev->iommu_fwspec = pdev->iommu_fwspec;
-+	get_device(pdev);
-+	__module_get(spimdev->owner);
-+
++	memset(db->addr, 0, size);
 +	return 0;
 +}
 +
-+static int vfio_spimdev_mdev_remove(struct mdev_device *mdev)
++static inline void qm_uninit_q_buffer(struct device *dev,
++				    struct qm_dma_buffer *db)
 +{
-+	struct device *dev = mdev_dev(mdev);
-+	struct device *pdev = mdev_parent_dev(mdev);
-+	struct vfio_spimdev *spimdev = mdev_spimdev(mdev);
-+
-+	put_device(pdev);
-+	module_put(spimdev->owner);
-+	dev->iommu_fwspec = NULL;
-+	mdev_set_drvdata(mdev, NULL);
-+
-+	return 0;
++	dma_free_coherent(dev, db->size, db->addr, db->dma);
 +}
 +
-+/* Wake up the process who is waiting this queue */
-+void vfio_spimdev_wake_up(struct vfio_spimdev_queue *q)
++static inline int qm_init_bt(struct qm_info *qm, struct device *dev,
++			     size_t size, struct qm_dma_buffer *db, int mb_cmd)
 +{
-+	wake_up(&q->wait);
-+}
-+EXPORT_SYMBOL_GPL(vfio_spimdev_wake_up);
-+
-+static int vfio_spimdev_q_file_open(struct inode *inode, struct file *file)
-+{
-+	return 0;
-+}
-+
-+static int vfio_spimdev_q_file_release(struct inode *inode, struct file *file)
-+{
-+	struct vfio_spimdev_queue *q =
-+		(struct vfio_spimdev_queue *)file->private_data;
-+	struct vfio_spimdev *spimdev = q->spimdev;
 +	int ret;
 +
-+	ret = spimdev->ops->put_queue(q);
++	ret = qm_init_q_buffer(dev, size, db);
++	if (ret)
++		return -ENOMEM;
++
++	ret = qm_mb(qm, mb_cmd, db->dma, 0, 0, 0);
 +	if (ret) {
-+		dev_err(spimdev->dev, "drv put queue fail (%d)!\n", ret);
++		qm_uninit_q_buffer(dev, db);
 +		return ret;
 +	}
 +
-+	put_device(mdev_dev(q->mdev));
-+
 +	return 0;
 +}
 +
-+static long vfio_spimdev_q_file_ioctl(struct file *file, unsigned int cmd,
-+	unsigned long arg)
++/* the config should be conducted after hisi_acc_init_qm_mem() */
++static int qm_vft_common_config(struct qm_info *qm, u16 base, u32 number)
 +{
-+	struct vfio_spimdev_queue *q =
-+		(struct vfio_spimdev_queue *)file->private_data;
-+	struct vfio_spimdev *spimdev = q->spimdev;
-+
-+	if (spimdev->ops->ioctl)
-+		return spimdev->ops->ioctl(q, cmd, arg);
-+
-+	dev_err(spimdev->dev, "ioctl cmd (%d) is not supported!\n", cmd);
-+
-+	return -EINVAL;
-+}
-+
-+static int vfio_spimdev_q_file_mmap(struct file *file,
-+		struct vm_area_struct *vma)
-+{
-+	struct vfio_spimdev_queue *q =
-+		(struct vfio_spimdev_queue *)file->private_data;
-+	struct vfio_spimdev *spimdev = q->spimdev;
-+
-+	if (spimdev->ops->mmap)
-+		return spimdev->ops->mmap(q, vma);
-+
-+	dev_err(spimdev->dev, "no driver mmap!\n");
-+	return -EINVAL;
-+}
-+
-+static __poll_t vfio_spimdev_q_file_poll(struct file *file, poll_table *wait)
-+{
-+	struct vfio_spimdev_queue *q =
-+		(struct vfio_spimdev_queue *)file->private_data;
-+	struct vfio_spimdev *spimdev = q->spimdev;
-+
-+	poll_wait(file, &q->wait, wait);
-+	if (spimdev->ops->is_q_updated(q))
-+		return EPOLLIN | EPOLLRDNORM;
-+
-+	return 0;
-+}
-+
-+static const struct file_operations spimdev_q_file_ops = {
-+	.owner = THIS_MODULE,
-+	.open = vfio_spimdev_q_file_open,
-+	.unlocked_ioctl = vfio_spimdev_q_file_ioctl,
-+	.release = vfio_spimdev_q_file_release,
-+	.poll = vfio_spimdev_q_file_poll,
-+	.mmap = vfio_spimdev_q_file_mmap,
-+};
-+
-+static long vfio_spimdev_mdev_get_queue(struct mdev_device *mdev,
-+		struct vfio_spimdev *spimdev, unsigned long arg)
-+{
-+	struct vfio_spimdev_queue *q;
++	u64 tmp;
 +	int ret;
 +
-+#ifdef CONFIG_IOMMU_SVA
++	ret = qm_acc_check(qm, QM_VFT_CFG_RDY, 0);
++	if (ret)
++		return ret;
++	qm_writel(qm, 0x0, QM_VFT_CFG_OP_WR);
++	qm_writel(qm, QM_SQC_VFT, QM_VFT_CFG_TYPE);
++	qm_writel(qm, qm->pdev->devfn, QM_VFT_CFG_ADDRESS);
++
++	tmp = QM_SQC_VFT_BUF_SIZE			|
++	      QM_SQC_VFT_SQC_SIZE			|
++	      QM_SQC_VFT_INDEX_NUMBER			|
++	      QM_SQC_VFT_VALID				|
++	      (u64)base << QM_SQC_VFT_START_SQN_SHIFT;
++
++	qm_writel(qm, tmp & 0xffffffff, QM_VFT_CFG_DATA_L);
++	qm_writel(qm, tmp >> 32, QM_VFT_CFG_DATA_H);
++
++	qm_writel(qm, 0x0, QM_VFT_CFG_RDY);
++	qm_writel(qm, 0x1, QM_VFT_CFG_OP_ENABLE);
++	ret = qm_acc_check(qm, QM_VFT_CFG_RDY, 0);
++	if (ret)
++		return ret;
++	tmp = 0;
++
++	qm_writel(qm, 0x0, QM_VFT_CFG_OP_WR);
++	qm_writel(qm, QM_CQC_VFT, QM_VFT_CFG_TYPE);
++	qm_writel(qm, qm->pdev->devfn, QM_VFT_CFG_ADDRESS);
++
++	tmp = QM_CQC_VFT_BUF_SIZE			|
++	      QM_CQC_VFT_SQC_SIZE			|
++	      QM_CQC_VFT_INDEX_NUMBER			|
++	      QM_CQC_VFT_VALID;
++
++	qm_writel(qm, tmp & 0xffffffff, QM_VFT_CFG_DATA_L);
++	qm_writel(qm, tmp >> 32, QM_VFT_CFG_DATA_H);
++
++	qm_writel(qm, 0x0, QM_VFT_CFG_RDY);
++	qm_writel(qm, 0x1, QM_VFT_CFG_OP_ENABLE);
++	ret = qm_acc_check(qm, QM_VFT_CFG_RDY, 0);
++	if (ret)
++		return ret;
++	return 0;
++}
++
++static struct hisi_acc_qm_hw_ops qm_hw_ops_v1 = {
++	.vft_config = qm_vft_common_config,
++};
++
++struct hisi_qp *hisi_qm_create_qp(struct qm_info *qm, u8 alg_type)
++{
++	struct hisi_qp *qp;
++	int qp_index;
++	int ret;
++
++	write_lock(&qm->qps_lock);
++	qp_index = find_first_zero_bit(qm->qp_bitmap, qm->qp_num);
++	if (qp_index >= qm->qp_num) {
++		write_unlock(&qm->qps_lock);
++		return ERR_PTR(-EBUSY);
++	}
++	set_bit(qp_index, qm->qp_bitmap);
++
++	qp = kzalloc(sizeof(*qp), GFP_KERNEL);
++	if (!qp) {
++		ret = -ENOMEM;
++		write_unlock(&qm->qps_lock);
++		goto err_with_bitset;
++	}
++
++	qp->queue_id = qp_index;
++	qp->qm = qm;
++	qp->alg_type = alg_type;
++	qm_init_qp_status(qp);
++
++	write_unlock(&qm->qps_lock);
++	return qp;
++
++err_with_bitset:
++	clear_bit(qp_index, qm->qp_bitmap);
++	write_unlock(&qm->qps_lock);
++
++	return ERR_PTR(ret);
++}
++EXPORT_SYMBOL_GPL(hisi_qm_create_qp);
++
++int hisi_qm_start_qp(struct hisi_qp *qp, unsigned long arg)
++{
++	struct qm_info *qm = qp->qm;
++	struct device *dev = &qm->pdev->dev;
++	int ret;
++	struct sqc *sqc;
++	struct cqc *cqc;
++	int qp_index = qp->queue_id;
 +	int pasid = arg;
 +
-+	if (!vfio_spimdev_is_valid_pasid(pasid))
-+		return -EINVAL;
-+#endif
++	/* set sq and cq context */
++	qp->sqc.addr = QM_SQC(qm) + qp_index;
++	qp->sqc.dma = qm->sqc.dma + qp_index * sizeof(struct sqc);
++	sqc = QM_SQC(qp);
 +
-+	if (!spimdev->ops->get_queue)
-+		return -EINVAL;
++	qp->cqc.addr = QM_CQC(qm) + qp_index;
++	qp->cqc.dma = qm->cqc.dma + qp_index * sizeof(struct cqc);
++	cqc = QM_CQC(qp);
 +
-+	ret = spimdev->ops->get_queue(spimdev, arg, &q);
-+	if (ret < 0) {
-+		dev_err(spimdev->dev, "get_queue failed\n");
-+		return -ENODEV;
-+	}
-+
-+	ret = anon_inode_getfd("spimdev_q", &spimdev_q_file_ops,
-+			q, O_CLOEXEC | O_RDWR);
-+	if (ret < 0) {
-+		dev_err(spimdev->dev, "getfd fail %d\n", ret);
-+		goto err_with_queue;
-+	}
-+
-+	q->fd = ret;
-+	q->spimdev = spimdev;
-+	q->mdev = mdev;
-+	q->container = arg;
-+	init_waitqueue_head(&q->wait);
-+	get_device(mdev_dev(mdev));
-+
-+	return ret;
-+
-+err_with_queue:
-+	spimdev->ops->put_queue(q);
-+	return ret;
-+}
-+
-+static long vfio_spimdev_mdev_ioctl(struct mdev_device *mdev, unsigned int cmd,
-+			       unsigned long arg)
-+{
-+	struct spimdev_mdev_state *mdev_state;
-+	struct vfio_spimdev *spimdev;
-+
-+	if (!mdev)
-+		return -ENODEV;
-+
-+	mdev_state = mdev_get_drvdata(mdev);
-+	if (!mdev_state)
-+		return -ENODEV;
-+
-+	spimdev = mdev_state->spimdev;
-+	if (!spimdev)
-+		return -ENODEV;
-+
-+	if (cmd == VFIO_SPIMDEV_CMD_GET_Q)
-+		return vfio_spimdev_mdev_get_queue(mdev, spimdev, arg);
-+
-+	dev_err(spimdev->dev,
-+		"%s, ioctl cmd (0x%x) is not supported!\n", __func__, cmd);
-+	return -EINVAL;
-+}
-+
-+static void vfio_spimdev_release(struct device *dev) { }
-+static void vfio_spimdev_mdev_release(struct mdev_device *mdev) { }
-+static int vfio_spimdev_mdev_open(struct mdev_device *mdev) { return 0; }
-+
-+/**
-+ *	vfio_spimdev_register - register a spimdev
-+ *	@spimdev: device structure
-+ */
-+int vfio_spimdev_register(struct vfio_spimdev *spimdev)
-+{
-+	int ret;
-+	const char *drv_name;
-+
-+	if (!spimdev->dev)
-+		return -ENODEV;
-+
-+	drv_name = dev_driver_string(spimdev->dev);
-+	if (strstr(drv_name, "-")) {
-+		pr_err("spimdev: parent driver name cannot include '-'!\n");
-+		return -EINVAL;
-+	}
-+
-+	spimdev->dev_id = idr_alloc(&spimdev_idr, spimdev, 0, 0, GFP_KERNEL);
-+	if (spimdev->dev_id < 0)
-+		return spimdev->dev_id;
-+
-+	atomic_set(&spimdev->ref, 0);
-+	spimdev->cls_dev.parent = spimdev->dev;
-+	spimdev->cls_dev.class = spimdev_class;
-+	spimdev->cls_dev.release = vfio_spimdev_release;
-+	dev_set_name(&spimdev->cls_dev, "%s", dev_name(spimdev->dev));
-+	ret = device_register(&spimdev->cls_dev);
++	/* allocate sq and cq */
++	ret = qm_init_q_buffer(dev,
++		qm->sqe_size * QM_Q_DEPTH + sizeof(struct cqe) * QM_Q_DEPTH,
++		&qp->scqe);
 +	if (ret)
 +		return ret;
 +
-+	spimdev->mdev_fops.owner		= spimdev->owner;
-+	spimdev->mdev_fops.dev_attr_groups	= vfio_spimdev_groups;
-+	WARN_ON(!spimdev->mdev_fops.supported_type_groups);
-+	spimdev->mdev_fops.create		= vfio_spimdev_mdev_create;
-+	spimdev->mdev_fops.remove		= vfio_spimdev_mdev_remove;
-+	spimdev->mdev_fops.ioctl		= vfio_spimdev_mdev_ioctl;
-+	spimdev->mdev_fops.open			= vfio_spimdev_mdev_open;
-+	spimdev->mdev_fops.release		= vfio_spimdev_mdev_release;
++	INIT_QC(sqc, qp->scqe.dma);
++	sqc->pasid = pasid;
++	sqc->dw3 = (0 << SQ_HOP_NUM_SHIFT)      |
++		   (0 << SQ_PAGE_SIZE_SHIFT)    |
++		   (0 << SQ_BUF_SIZE_SHIFT)     |
++		   (ilog2(qm->sqe_size) << SQ_SQE_SIZE_SHIFT);
++	sqc->cq_num = qp_index;
++	sqc->w13 = 0 << SQ_PRIORITY_SHIFT	|
++		   1 << SQ_ORDERS_SHIFT		|
++		   (qp->alg_type & SQ_TYPE_MASK) << SQ_TYPE_SHIFT;
 +
-+	ret = mdev_register_device(spimdev->dev, &spimdev->mdev_fops);
++	ret = qm_mb(qm, MAILBOX_CMD_SQC, qp->sqc.dma, qp_index, 0, 0);
 +	if (ret)
-+		device_unregister(&spimdev->cls_dev);
++		return ret;
 +
-+	return ret;
++	INIT_QC(cqc, qp->scqe.dma + qm->sqe_size * QM_Q_DEPTH);
++	cqc->dw3 = (0 << CQ_HOP_NUM_SHIFT)	|
++		   (0 << CQ_PAGE_SIZE_SHIFT)	|
++		   (0 << CQ_BUF_SIZE_SHIFT)	|
++		   (4 << CQ_SQE_SIZE_SHIFT);
++	cqc->dw6 = 1 << CQ_PHASE_SHIFT | 1 << CQ_FLAG_SHIFT;
++
++	ret = qm_mb(qm, MAILBOX_CMD_CQC, qp->cqc.dma, qp_index, 0, 0);
++	if (ret)
++		return ret;
++
++	write_lock(&qm->qps_lock);
++	qm->qp_array[qp_index] = qp;
++	init_completion(&qp->completion);
++	write_unlock(&qm->qps_lock);
++
++	return qp_index;
 +}
-+EXPORT_SYMBOL_GPL(vfio_spimdev_register);
++EXPORT_SYMBOL_GPL(hisi_qm_start_qp);
 +
-+/**
-+ * vfio_spimdev_unregister - unregisters a spimdev
-+ * @spimdev: device to unregister
-+ *
-+ * Unregister a miscellaneous device that wat previously successully registered
-+ * with vfio_spimdev_register().
-+ */
-+void vfio_spimdev_unregister(struct vfio_spimdev *spimdev)
++void hisi_qm_release_qp(struct hisi_qp *qp)
 +{
-+	mdev_unregister_device(spimdev->dev);
-+	device_unregister(&spimdev->cls_dev);
++	struct qm_info *qm = qp->qm;
++	struct device *dev = &qm->pdev->dev;
++	int qid = qp->queue_id;
++
++	write_lock(&qm->qps_lock);
++	qm->qp_array[qp->queue_id] = NULL;
++	write_unlock(&qm->qps_lock);
++
++	qm_uninit_q_buffer(dev, &qp->scqe);
++	kfree(qp);
++	bitmap_clear(qm->qp_bitmap, qid, 1);
 +}
-+EXPORT_SYMBOL_GPL(vfio_spimdev_unregister);
++EXPORT_SYMBOL_GPL(hisi_qm_release_qp);
 +
-+static int __init vfio_spimdev_init(void)
++static void *qm_get_avail_sqe(struct hisi_qp *qp)
 +{
-+	spimdev_class = class_create(THIS_MODULE, VFIO_SPIMDEV_CLASS_NAME);
-+	return PTR_ERR_OR_ZERO(spimdev_class);
-+}
++	struct hisi_acc_qp_status *qp_status = &qp->qp_status;
++	void *sq_base = QP_SQE_ADDR(qp);
++	u16 sq_tail = qp_status->sq_tail;
 +
-+static __exit void vfio_spimdev_exit(void)
-+{
-+	class_destroy(spimdev_class);
-+	idr_destroy(&spimdev_idr);
-+}
++	if (qp_status->is_sq_full == 1)
++		return NULL;
 +
-+module_init(vfio_spimdev_init);
-+module_exit(vfio_spimdev_exit);
-+
-+MODULE_LICENSE("GPL");
-+MODULE_AUTHOR("Hisilicon Tech. Co., Ltd.");
-+MODULE_DESCRIPTION("VFIO Share Parent's IOMMU Mediated Device");
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index 3e5b17710a4f..0ec38a17c98c 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -41,6 +41,7 @@
- #include <linux/notifier.h>
- #include <linux/dma-iommu.h>
- #include <linux/irqdomain.h>
-+#include <linux/vfio_spimdev.h>
- 
- #define DRIVER_VERSION  "0.2"
- #define DRIVER_AUTHOR   "Alex Williamson <alex.williamson@redhat.com>"
-@@ -89,6 +90,8 @@ struct vfio_dma {
- };
- 
- struct vfio_group {
-+	/* iommu_group of mdev's parent device */
-+	struct iommu_group	*parent_group;
- 	struct iommu_group	*iommu_group;
- 	struct list_head	next;
- };
-@@ -1327,6 +1330,109 @@ static bool vfio_iommu_has_sw_msi(struct iommu_group *group, phys_addr_t *base)
- 	return ret;
- }
- 
-+/* return 0 if the device is not spimdev.
-+ * return 1 if the device is spimdev, the data will be updated with parent
-+ * 	device's group.
-+ * return -errno if other error.
-+ */
-+static int vfio_spimdev_type(struct device *dev, void *data)
-+{
-+	struct iommu_group **group = data;
-+	struct iommu_group *pgroup;
-+	int (*spimdev_mdev)(struct device *dev);
-+	struct device *pdev;
-+	int ret = 1;
-+
-+	/* vfio_spimdev module is not configurated */
-+	spimdev_mdev = symbol_get(vfio_spimdev_is_spimdev);
-+	if (!spimdev_mdev)
-+		return 0;
-+
-+	/* check if it belongs to vfio_spimdev device */
-+	if (!spimdev_mdev(dev)) {
-+		ret = 0;
-+		goto get_exit;
-+	}
-+
-+	pdev = dev->parent;
-+	pgroup = iommu_group_get(pdev);
-+	if (!pgroup) {
-+		ret = -ENODEV;
-+		goto get_exit;
-+	}
-+
-+	if (group) {
-+		/* check if all parent devices is the same */
-+		if (*group && *group != pgroup)
-+			ret = -ENODEV;
-+		else
-+			*group = pgroup;
-+	}
-+
-+	iommu_group_put(pgroup);
-+
-+get_exit:
-+	symbol_put(vfio_spimdev_is_spimdev);
-+
-+	return ret;
++	return sq_base + sq_tail * qp->qm->sqe_size;
 +}
 +
-+/* return 0 or -errno */
-+static int vfio_spimdev_bus(struct device *dev, void *data)
++int hisi_qp_send(struct hisi_qp *qp, void *msg)
 +{
-+	struct bus_type **bus = data;
++	struct hisi_acc_qp_status *qp_status = &qp->qp_status;
++	u16 sq_tail = qp_status->sq_tail;
++	u16 sq_tail_next = (sq_tail + 1) % QM_Q_DEPTH;
++	unsigned long timeout = 100;
++	void *sqe = qm_get_avail_sqe(qp);
 +
-+	if (!dev->bus)
-+		return -ENODEV;
++	if (sqe == NULL)
++		return -1;
 +
-+	/* ensure all devices has the same bus_type */
-+	if (*bus && *bus != dev->bus)
-+		return -EINVAL;
++	memcpy(sqe, msg, qp->qm->sqe_size);
 +
-+	*bus = dev->bus;
++	qm_db(qp->qm, qp->queue_id, DOORBELL_CMD_SQ, sq_tail_next, 0);
++
++	/* wait until job finished */
++	wait_for_completion_timeout(&qp->completion, timeout);
++
++	qp_status->sq_tail = sq_tail_next;
++
++	if (qp_status->sq_tail == qp_status->sq_head)
++		qp_status->is_sq_full = 1;
++
 +	return 0;
 +}
++EXPORT_SYMBOL_GPL(hisi_qp_send);
 +
-+/* return 0 means it is not spi group, 1 means it is, or -EXXX for error */
-+static int vfio_iommu_type1_attach_spigroup(struct vfio_domain *domain,
-+					    struct vfio_group *group,
-+					    struct iommu_group *iommu_group)
++int hisi_qm_init(const char *dev_name, struct qm_info *qm)
 +{
 +	int ret;
-+	struct bus_type *pbus = NULL;
-+	struct iommu_group *pgroup = NULL;
++	u16 ecam_val16;
++	struct pci_dev *pdev = qm->pdev;
 +
-+	ret = iommu_group_for_each_dev(iommu_group, &pgroup,
-+				       vfio_spimdev_type);
-+	if (ret < 0)
-+		goto out;
-+	else if (ret > 0) {
-+		domain->domain = iommu_group_share_domain(pgroup);
-+		if (IS_ERR(domain->domain))
-+			goto out;
-+		ret = iommu_group_for_each_dev(pgroup, &pbus,
-+				       vfio_spimdev_bus);
-+		if (ret < 0)
-+			goto err_with_share_domain;
++	pci_set_power_state(pdev, PCI_D0);
++	ecam_val16 = PCI_COMMAND_MASTER | PCI_COMMAND_MEMORY;
++	pci_write_config_word(pdev, PCI_COMMAND, ecam_val16);
 +
-+		if (pbus && iommu_capable(pbus, IOMMU_CAP_CACHE_COHERENCY))
-+			domain->prot |= IOMMU_CACHE;
-+
-+		group->parent_group = pgroup;
-+		INIT_LIST_HEAD(&domain->group_list);
-+		list_add(&group->next, &domain->group_list);
-+
-+		return 1;
++	ret = pci_enable_device_mem(pdev);
++	if (ret < 0) {
++		dev_err(&pdev->dev, "Can't enable device mem!\n");
++		return ret;
 +	}
++
++	ret = pci_request_mem_regions(pdev, dev_name);
++	if (ret < 0) {
++		dev_err(&pdev->dev, "Can't request mem regions!\n");
++		goto err_with_pcidev;
++	}
++
++	qm->dev_name = dev_name;
++	qm->phys_base = pci_resource_start(pdev, 2);
++	qm->size = pci_resource_len(qm->pdev, 2);
++	qm->io_base = devm_ioremap(&pdev->dev, qm->phys_base, qm->size);
++	if (!qm->io_base) {
++		ret = -EIO;
++		goto err_with_mem_regions;
++	}
++
++	dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64));
++	pci_set_master(pdev);
++
++	ret = pci_alloc_irq_vectors(pdev, 1, 1, PCI_IRQ_MSI);
++	if (ret < 0) {
++		dev_err(&pdev->dev, "Enable MSI vectors fail!\n");
++		goto err_with_mem_regions;
++	}
++
++	qm->eq_head = 0;
++	mutex_init(&qm->mailbox_lock);
++	rwlock_init(&qm->qps_lock);
++
++	if (qm->ver)
++		qm->ops = &qm_hw_ops_v1;
 +
 +	return 0;
 +
-+err_with_share_domain:
-+	iommu_group_unshare_domain(pgroup);
-+out:
++err_with_mem_regions:
++	pci_release_mem_regions(pdev);
++err_with_pcidev:
++	pci_disable_device(pdev);
++
 +	return ret;
 +}
++EXPORT_SYMBOL_GPL(hisi_qm_init);
 +
- static int vfio_iommu_type1_attach_group(void *iommu_data,
- 					 struct iommu_group *iommu_group)
- {
-@@ -1335,8 +1441,8 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
- 	struct vfio_domain *domain, *d;
- 	struct bus_type *bus = NULL, *mdev_bus;
- 	int ret;
--	bool resv_msi, msi_remap;
--	phys_addr_t resv_msi_base;
-+	bool resv_msi = false, msi_remap;
-+	phys_addr_t resv_msi_base = 0;
- 
- 	mutex_lock(&iommu->lock);
- 
-@@ -1373,6 +1479,14 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
- 	if (mdev_bus) {
- 		if ((bus == mdev_bus) && !iommu_present(bus)) {
- 			symbol_put(mdev_bus_type);
++void hisi_qm_uninit(struct qm_info *qm)
++{
++	struct pci_dev *pdev = qm->pdev;
 +
-+			ret = vfio_iommu_type1_attach_spigroup(domain, group,
-+					iommu_group);
-+			if (ret < 0)
-+				goto out_free;
-+			else if (ret > 0)
-+				goto replay_check;
++	pci_free_irq_vectors(pdev);
++	pci_release_mem_regions(pdev);
++	pci_disable_device(pdev);
++}
++EXPORT_SYMBOL_GPL(hisi_qm_uninit);
 +
- 			if (!iommu->external_domain) {
- 				INIT_LIST_HEAD(&domain->group_list);
- 				iommu->external_domain = domain;
-@@ -1451,12 +1565,13 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
- 
- 	vfio_test_domain_fgsp(domain);
- 
-+replay_check:
- 	/* replay mappings on new domains */
- 	ret = vfio_iommu_replay(iommu, domain);
- 	if (ret)
- 		goto out_detach;
- 
--	if (resv_msi) {
-+	if (!group->parent_group && resv_msi) {
- 		ret = iommu_get_msi_cookie(domain->domain, resv_msi_base);
- 		if (ret)
- 			goto out_detach;
-@@ -1471,7 +1586,10 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
- out_detach:
- 	iommu_detach_group(domain->domain, iommu_group);
- out_domain:
--	iommu_domain_free(domain->domain);
-+	if (group->parent_group)
-+		iommu_group_unshare_domain(group->parent_group);
-+	else
-+		iommu_domain_free(domain->domain);
- out_free:
- 	kfree(domain);
- 	kfree(group);
-@@ -1533,6 +1651,7 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
- 	struct vfio_iommu *iommu = iommu_data;
- 	struct vfio_domain *domain;
- 	struct vfio_group *group;
++static irqreturn_t qm_irq(int irq, void *data)
++{
++	struct qm_info *qm = data;
++	u32 int_source;
++
++	int_source = qm_get_irq_source(qm);
++	if (int_source)
++		return IRQ_WAKE_THREAD;
++
++	dev_err(&qm->pdev->dev, "invalid int source %d\n", int_source);
++
++	return IRQ_HANDLED;
++}
++
++int hisi_qm_start(struct qm_info *qm)
++{
++	struct pci_dev *pdev = qm->pdev;
++	struct device *dev = &pdev->dev;
 +	int ret;
- 
- 	mutex_lock(&iommu->lock);
- 
-@@ -1560,7 +1679,11 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
- 		if (!group)
- 			continue;
- 
--		iommu_detach_group(domain->domain, iommu_group);
-+		if (group->parent_group)
-+			iommu_group_unshare_domain(group->parent_group);
-+		else
-+			iommu_detach_group(domain->domain, iommu_group);
 +
- 		list_del(&group->next);
- 		kfree(group);
- 		/*
-@@ -1577,7 +1700,8 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
- 				else
- 					vfio_iommu_unmap_unpin_reaccount(iommu);
- 			}
--			iommu_domain_free(domain->domain);
-+			if (!ret)
-+				iommu_domain_free(domain->domain);
- 			list_del(&domain->next);
- 			kfree(domain);
- 		}
-diff --git a/include/linux/vfio_spimdev.h b/include/linux/vfio_spimdev.h
++	if (qm->pdev->is_physfn)
++		qm->ops->vft_config(qm, qm->qp_base, qm->qp_num);
++
++	ret = qm_init_q_buffer(dev,
++		max_t(size_t, sizeof(struct eqc), sizeof(struct aeqc)),
++		&qm->eqc);
++	if (ret)
++		goto err_out;
++
++	ret = qm_init_q_buffer(dev, sizeof(struct eqe) * QM_Q_DEPTH, &qm->eqe);
++	if (ret)
++		goto err_with_eqc;
++
++	QM_EQC(qm)->base_l = lower_32_bits(qm->eqe.dma);
++	QM_EQC(qm)->base_h = upper_32_bits(qm->eqe.dma);
++	QM_EQC(qm)->dw3 = 2 << MB_EQC_EQE_SHIFT;
++	QM_EQC(qm)->dw6 = (QM_Q_DEPTH - 1) | (1 << MB_EQC_PHASE_SHIFT);
++	ret = qm_mb(qm, MAILBOX_CMD_EQC, qm->eqc.dma, 0, 0, 0);
++	if (ret)
++		goto err_with_eqe;
++
++	qm->qp_bitmap = kcalloc(BITS_TO_LONGS(qm->qp_num), sizeof(long),
++				GFP_KERNEL);
++	if (!qm->qp_bitmap)
++		goto err_with_eqe;
++
++	qm->qp_array = kcalloc(qm->qp_num, sizeof(struct hisi_qp *),
++		GFP_KERNEL);
++	if (!qm->qp_array)
++		goto err_with_bitmap;
++
++	/* Init sqc_bt */
++	ret = qm_init_bt(qm, dev, sizeof(struct sqc) * qm->qp_num, &qm->sqc,
++			MAILBOX_CMD_SQC_BT);
++	if (ret)
++		goto err_with_qp_array;
++
++	/* Init cqc_bt */
++	ret = qm_init_bt(qm, dev, sizeof(struct cqc) * qm->qp_num, &qm->cqc,
++			MAILBOX_CMD_CQC_BT);
++	if (ret)
++		goto err_with_sqc;
++
++	ret = request_threaded_irq(pci_irq_vector(pdev, 0), qm_irq,
++				   qm_irq_thread, IRQF_SHARED, qm->dev_name,
++				   qm);
++	if (ret)
++		goto err_with_cqc;
++
++	writel(0x0, QM_ADDR(qm, QM_VF_EQ_INT_MASK));
++
++	return 0;
++
++err_with_cqc:
++	qm_uninit_q_buffer(dev, &qm->cqc);
++err_with_sqc:
++	qm_uninit_q_buffer(dev, &qm->sqc);
++err_with_qp_array:
++	kfree(qm->qp_array);
++err_with_bitmap:
++	kfree(qm->qp_bitmap);
++err_with_eqe:
++	qm_uninit_q_buffer(dev, &qm->eqe);
++err_with_eqc:
++	qm_uninit_q_buffer(dev, &qm->eqc);
++err_out:
++	return ret;
++}
++EXPORT_SYMBOL_GPL(hisi_qm_start);
++
++void hisi_qm_stop(struct qm_info *qm)
++{
++	struct pci_dev *pdev = qm->pdev;
++	struct device *dev = &pdev->dev;
++
++	free_irq(pci_irq_vector(pdev, 0), qm);
++	qm_uninit_q_buffer(dev, &qm->cqc);
++	kfree(qm->qp_array);
++	kfree(qm->qp_bitmap);
++	qm_uninit_q_buffer(dev, &qm->eqe);
++	qm_uninit_q_buffer(dev, &qm->eqc);
++}
++EXPORT_SYMBOL_GPL(hisi_qm_stop);
++
++/* put qm into init state, so the acce config become available */
++int hisi_qm_mem_start(struct qm_info *qm)
++{
++	u32 val;
++
++	qm_writel(qm, 0x1, QM_MEM_START_INIT);
++	return readl_relaxed_poll_timeout(QM_ADDR(qm, QM_MEM_INIT_DONE), val,
++					  val & BIT(0), 10, 1000);
++}
++EXPORT_SYMBOL_GPL(hisi_qm_mem_start);
++
++MODULE_LICENSE("GPL v2");
++MODULE_AUTHOR("Zhou Wang <wangzhou1@hisilicon.com>");
++MODULE_DESCRIPTION("HiSilicon Accelerator queue manager driver");
+diff --git a/drivers/crypto/hisilicon/qm.h b/drivers/crypto/hisilicon/qm.h
 new file mode 100644
-index 000000000000..f7e7d90013e1
+index 000000000000..b3c5c34a0d13
 --- /dev/null
-+++ b/include/linux/vfio_spimdev.h
-@@ -0,0 +1,95 @@
++++ b/drivers/crypto/hisilicon/qm.h
+@@ -0,0 +1,111 @@
 +/* SPDX-License-Identifier: GPL-2.0+ */
-+#ifndef __VFIO_SPIMDEV_H
-+#define __VFIO_SPIMDEV_H
++#ifndef HISI_ACC_QM_H
++#define HISI_ACC_QM_H
 +
-+#include <linux/device.h>
-+#include <linux/iommu.h>
-+#include <linux/mdev.h>
-+#include <linux/vfio.h>
-+#include <uapi/linux/vfio_spimdev.h>
++#include <linux/dmapool.h>
++#include <linux/iopoll.h>
++#include <linux/module.h>
++#include <linux/pci.h>
++#include <linux/slab.h>
 +
-+struct vfio_spimdev_queue;
-+struct vfio_spimdev;
++#define QM_CQE_SIZE			16
++/* default queue depth for sq/cq/eq */
++#define QM_Q_DEPTH			1024
 +
-+/**
-+ * struct vfio_spimdev_ops - WD device operations
-+ * @get_queue: get a queue from the device according to algorithm
-+ * @put_queue: free a queue to the device
-+ * @is_q_updated: check whether the task is finished
-+ * @mask_notify: mask the task irq of queue
-+ * @mmap: mmap addresses of queue to user space
-+ * @reset: reset the WD device
-+ * @reset_queue: reset the queue
-+ * @ioctl:   ioctl for user space users of the queue
-+ * @get_available_instances: get numbers of the queue remained
-+ */
-+struct vfio_spimdev_ops {
-+	int (*get_queue)(struct vfio_spimdev *spimdev, unsigned long arg,
-+		struct vfio_spimdev_queue **q);
-+	int (*put_queue)(struct vfio_spimdev_queue *q);
-+	int (*is_q_updated)(struct vfio_spimdev_queue *q);
-+	void (*mask_notify)(struct vfio_spimdev_queue *q, int event_mask);
-+	int (*mmap)(struct vfio_spimdev_queue *q, struct vm_area_struct *vma);
-+	int (*reset)(struct vfio_spimdev *spimdev);
-+	int (*reset_queue)(struct vfio_spimdev_queue *q);
-+	long (*ioctl)(struct vfio_spimdev_queue *q, unsigned int cmd,
-+			unsigned long arg);
-+	int (*get_available_instances)(struct vfio_spimdev *spimdev);
++/* qm user domain */
++#define QM_ARUSER_M_CFG_1		0x100088
++#define QM_ARUSER_M_CFG_ENABLE		0x100090
++#define QM_AWUSER_M_CFG_1		0x100098
++#define QM_AWUSER_M_CFG_ENABLE		0x1000a0
++#define QM_WUSER_M_CFG_ENABLE		0x1000a8
++
++/* qm cache */
++#define QM_CACHE_CTL			0x100050
++#define QM_AXI_M_CFG			0x1000ac
++#define QM_AXI_M_CFG_ENABLE		0x1000b0
++#define QM_PEH_AXUSER_CFG		0x1000cc
++#define QM_PEH_AXUSER_CFG_ENABLE	0x1000d0
++
++#define QP_SQE_ADDR(qp) ((qp)->scqe.addr)
++
++struct qm_dma_buffer {
++	int size;
++	void *addr;
++	dma_addr_t dma;
 +};
 +
-+struct vfio_spimdev_queue {
-+	struct mutex mutex;
-+	struct vfio_spimdev *spimdev;
-+	int qid;
-+	__u32 flags;
-+	void *priv;
-+	wait_queue_head_t wait;
-+	struct mdev_device *mdev;
-+	int fd;
-+	int container;
-+#ifdef CONFIG_IOMMU_SVA
-+	int pasid;
-+#endif
++struct qm_info {
++	int ver;
++	const char *dev_name;
++	struct pci_dev *pdev;
++
++	resource_size_t phys_base;
++	resource_size_t size;
++	void __iomem *io_base;
++
++	u32 sqe_size;
++	u32 qp_base;
++	u32 qp_num;
++
++	struct qm_dma_buffer sqc, cqc, eqc, eqe, aeqc, aeqe;
++
++	u32 eq_head;
++
++	rwlock_t qps_lock;
++	unsigned long *qp_bitmap;
++	struct hisi_qp **qp_array;
++
++	struct mutex mailbox_lock;
++
++	struct hisi_acc_qm_hw_ops *ops;
++
++};
++#define QM_ADDR(qm, off) ((qm)->io_base + off)
++
++struct hisi_acc_qp_status {
++	u16 sq_tail;
++	u16 sq_head;
++	u16 cq_head;
++	u16 sqn;
++	bool cqc_phase;
++	int is_sq_full;
 +};
 +
-+struct vfio_spimdev {
-+	const char *name;
-+	int status;
-+	atomic_t ref;
-+	struct module *owner;
-+	const struct vfio_spimdev_ops *ops;
-+	struct device *dev;
-+	struct device cls_dev;
-+	bool is_vf;
-+	u32 iommu_type;
-+	u32 dma_flag;
-+	u32 dev_id;
-+	void *priv;
-+	int flags;
-+	const char *api_ver;
-+	struct mdev_parent_ops mdev_fops;
++struct hisi_qp;
++
++struct hisi_qp_ops {
++	int (*fill_sqe)(void *sqe, void *q_parm, void *d_parm);
 +};
 +
-+int vfio_spimdev_register(struct vfio_spimdev *spimdev);
-+void vfio_spimdev_unregister(struct vfio_spimdev *spimdev);
-+void vfio_spimdev_wake_up(struct vfio_spimdev_queue *q);
-+int vfio_spimdev_is_spimdev(struct device *dev);
-+struct vfio_spimdev *vfio_spimdev_pdev_spimdev(struct device *dev);
-+int vfio_spimdev_pasid_pri_check(int pasid);
-+int vfio_spimdev_get(struct device *dev);
-+int vfio_spimdev_put(struct device *dev);
-+struct vfio_spimdev *mdev_spimdev(struct mdev_device *mdev);
++struct hisi_qp {
++	/* sq number in this function */
++	u32 queue_id;
++	u8 alg_type;
++	u8 req_type;
 +
-+extern struct mdev_type_attribute mdev_type_attr_flags;
-+extern struct mdev_type_attribute mdev_type_attr_name;
-+extern struct mdev_type_attribute mdev_type_attr_device_api;
-+extern struct mdev_type_attribute mdev_type_attr_available_instances;
-+#define VFIO_SPIMDEV_DEFAULT_MDEV_TYPE_ATTRS \
-+	&mdev_type_attr_name.attr, \
-+	&mdev_type_attr_device_api.attr, \
-+	&mdev_type_attr_available_instances.attr, \
-+	&mdev_type_attr_flags.attr
++	struct qm_dma_buffer sqc, cqc;
++	struct qm_dma_buffer scqe;
 +
-+#define _VFIO_SPIMDEV_REGION(vm_pgoff)	(vm_pgoff & 0xf)
++	struct hisi_acc_qp_status qp_status;
 +
-+#endif
-diff --git a/include/uapi/linux/vfio_spimdev.h b/include/uapi/linux/vfio_spimdev.h
-new file mode 100644
-index 000000000000..3435e5c345b4
---- /dev/null
-+++ b/include/uapi/linux/vfio_spimdev.h
-@@ -0,0 +1,28 @@
-+/* SPDX-License-Identifier: GPL-2.0+ */
-+#ifndef _UAPIVFIO_SPIMDEV_H
-+#define _UAPIVFIO_SPIMDEV_H
++	struct qm_info *qm;
 +
-+#include <linux/ioctl.h>
++	/* for crypto sync API */
++	struct completion completion;
 +
-+#define VFIO_SPIMDEV_CLASS_NAME		"spimdev"
++	struct hisi_qp_ops *hw_ops;
++	void *qp_ctx;
++	void (*event_cb)(struct hisi_qp *qp);
++	void (*req_cb)(struct hisi_qp *qp, void *data);
++};
 +
-+/* Device ATTRs in parent dev SYSFS DIR */
-+#define VFIO_SPIMDEV_PDEV_ATTRS_GRP_NAME	"params"
-+
-+/* Parent device attributes */
-+#define SPIMDEV_IOMMU_TYPE	"iommu_type"
-+#define SPIMDEV_DMA_FLAG	"dma_flag"
-+
-+/* Maximum length of algorithm name string */
-+#define VFIO_SPIMDEV_ALG_NAME_SIZE		64
-+
-+/* the bits used in SPIMDEV_DMA_FLAG attributes */
-+#define VFIO_SPIMDEV_DMA_INVALID		0
-+#define	VFIO_SPIMDEV_DMA_SINGLE_PROC_MAP	1
-+#define	VFIO_SPIMDEV_DMA_MULTI_PROC_MAP		2
-+#define	VFIO_SPIMDEV_DMA_SVM			4
-+#define	VFIO_SPIMDEV_DMA_SVM_NO_FAULT		8
-+#define	VFIO_SPIMDEV_DMA_PHY			16
-+
-+#define VFIO_SPIMDEV_CMD_GET_Q	_IO('W', 1)
++extern int hisi_qm_init(const char *dev_name, struct qm_info *qm);
++extern void hisi_qm_uninit(struct qm_info *qm);
++extern int hisi_qm_start(struct qm_info *qm);
++extern void hisi_qm_stop(struct qm_info *qm);
++extern int hisi_qm_mem_start(struct qm_info *qm);
++extern struct hisi_qp *hisi_qm_create_qp(struct qm_info *qm, u8 alg_type);
++extern int hisi_qm_start_qp(struct hisi_qp *qp, unsigned long arg);
++extern void hisi_qm_release_qp(struct hisi_qp *qp);
++extern int hisi_qp_send(struct hisi_qp *qp, void *msg);
 +#endif
 -- 
 2.17.1
