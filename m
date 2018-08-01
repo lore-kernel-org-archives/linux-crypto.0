@@ -1,93 +1,95 @@
-From: Randy Dunlap <rdunlap@infradead.org>
-Subject: Re: [RFC PATCH 3/7] vfio: add spimdev support
-Date: Wed, 1 Aug 2018 09:23:52 -0700
-Message-ID: <d11c7745-2f31-0f33-1bd8-78379dc66e6e@infradead.org>
+From: Jerome Glisse <jglisse-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [RFC PATCH 0/7] A General Accelerator Framework, WarpDrive
+Date: Wed, 1 Aug 2018 12:56:44 -0400
+Message-ID: <20180801165644.GA3820@redhat.com>
 References: <20180801102221.5308-1-nek.in.cn@gmail.com>
- <20180801102221.5308-4-nek.in.cn@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Cc: linuxarm@huawei.com
-To: Kenneth Lee <nek.in.cn@gmail.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Joerg Roedel <joro@8bytes.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Kenneth Lee <liguozhu@hisilicon.com>,
-        Hao Fang <fanghao11@huawei.com>,
-        Zhou Wang <wangzhou1@hisilicon.com>,
-        Zaibo Xu <xuzaibo@huawei.com>,
-        Philippe Ombredanne <pombredanne@nexb.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, iommu@lists.linux-foundation.org,
-        kvm@vger.kernel.org, linux-accelerators@lists.ozlabs.org,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Sanjay Kumar <sanjay.k.kumar@intel.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180801102221.5308-4-nek.in.cn@gmail.com>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Cc: Hao Fang <fanghao11-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>, Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+	kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Jonathan Corbet <corbet-T1hC0tSOHrs@public.gmane.org>,
+	Greg Kroah-Hartman <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>, linux-doc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Sanjay Kumar <sanjay.k.kumar-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
+	iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linuxarm-hv44wF8Li93QT0dZR+AlfA@public.gmane.org, Alex Williamson <alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	Thomas Gleixner <tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org>, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Philippe Ombredanne <pombredanne-od1rfyK75/E@public.gmane.org>, Zaibo Xu <xuzaibo-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>,
+	Kenneth Lee <liguozhu-C8/M+/jPZTeaMJb+Lgu22Q@public.gmane.org>,
+	"David S . Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
+	linux-accelerators-uLR06cmDAlY/bJ5BZ2RsiQ@public.gmane.org
+To: Kenneth Lee <nek.in.cn-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <20180801102221.5308-1-nek.in.cn-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 08/01/2018 03:22 AM, Kenneth Lee wrote:
-> From: Kenneth Lee <liguozhu@hisilicon.com>
-> 
-> SPIMDEV is "Share Parent IOMMU Mdev". It is a vfio-mdev. But differ from
-> the general vfio-mdev:
-> 
-> 1. It shares its parent's IOMMU.
-> 2. There is no hardware resource attached to the mdev is created. The
-> hardware resource (A `queue') is allocated only when the mdev is
-> opened.
-> 
-> Currently only the vfio type-1 driver is updated to make it to be aware
-> of.
-> 
-> Signed-off-by: Kenneth Lee <liguozhu@hisilicon.com>
-> Signed-off-by: Zaibo Xu <xuzaibo@huawei.com>
-> Signed-off-by: Zhou Wang <wangzhou1@hisilicon.com>
-> ---
->  drivers/vfio/Kconfig                |   1 +
->  drivers/vfio/Makefile               |   1 +
->  drivers/vfio/spimdev/Kconfig        |  10 +
->  drivers/vfio/spimdev/Makefile       |   3 +
->  drivers/vfio/spimdev/vfio_spimdev.c | 421 ++++++++++++++++++++++++++++
->  drivers/vfio/vfio_iommu_type1.c     | 136 ++++++++-
->  include/linux/vfio_spimdev.h        |  95 +++++++
->  include/uapi/linux/vfio_spimdev.h   |  28 ++
->  8 files changed, 689 insertions(+), 6 deletions(-)
->  create mode 100644 drivers/vfio/spimdev/Kconfig
->  create mode 100644 drivers/vfio/spimdev/Makefile
->  create mode 100644 drivers/vfio/spimdev/vfio_spimdev.c
->  create mode 100644 include/linux/vfio_spimdev.h
->  create mode 100644 include/uapi/linux/vfio_spimdev.h
-> 
-> diff --git a/drivers/vfio/spimdev/Kconfig b/drivers/vfio/spimdev/Kconfig
-> new file mode 100644
-> index 000000000000..1226301f9d0e
-> --- /dev/null
-> +++ b/drivers/vfio/spimdev/Kconfig
-> @@ -0,0 +1,10 @@
-> +# SPDX-License-Identifier: GPL-2.0
-> +config VFIO_SPIMDEV
-> +	tristate "Support for Share Parent IOMMU MDEV"
-> +	depends on VFIO_MDEV_DEVICE
-> +	help
-> +	  Support for VFIO Share Parent IOMMU MDEV, which enable the kernel to
+On Wed, Aug 01, 2018 at 06:22:14PM +0800, Kenneth Lee wrote:
+> From: Kenneth Lee <liguozhu-C8/M+/jPZTeaMJb+Lgu22Q@public.gmane.org>
+> =
 
-	                                                  enables
+> WarpDrive is an accelerator framework to expose the hardware capabilities
+> directly to the user space. It makes use of the exist vfio and vfio-mdev
+> facilities. So the user application can send request and DMA to the
+> hardware without interaction with the kernel. This remove the latency
+> of syscall and context switch.
+> =
 
-> +	  support for the light weight hardware accelerator framework, WrapDrive.
+> The patchset contains documents for the detail. Please refer to it for mo=
+re
+> information.
+> =
 
-	  support the lightweight hardware accelerator framework, WrapDrive.
+> This patchset is intended to be used with Jean Philippe Brucker's SVA
+> patch [1] (Which is also in RFC stage). But it is not mandatory. This
+> patchset is tested in the latest mainline kernel without the SVA patches.
+> So it support only one process for each accelerator.
+> =
 
-> +
-> +	  To compile this as a module, choose M here: the module will be called
-> +	  spimdev.
+> With SVA support, WarpDrive can support multi-process in the same
+> accelerator device.  We tested it in our SoC integrated Accelerator (board
+> ID: D06, Chip ID: HIP08). A reference work tree can be found here: [2].
+
+I have not fully inspected things nor do i know enough about
+this Hisilicon ZIP accelerator to ascertain, but from glimpsing
+at the code it seems that it is unsafe to use even with SVA due
+to the doorbell. There is a comment talking about safetyness
+in patch 7.
+
+Exposing thing to userspace is always enticing, but if it is
+a security risk then it should clearly say so and maybe a
+kernel boot flag should be necessary to allow such device to
+be use.
 
 
--- 
-~Randy
+My more general question is do we want to grow VFIO to become
+a more generic device driver API. This patchset adds a command
+queue concept to it (i don't think it exist today but i have
+not follow VFIO closely).
+
+Why is that any better that existing driver model ? Where a
+device create a device file (can be character device, block
+device, ...). Such models also allow for direct hardware
+access from userspace. For instance see the AMD KFD driver
+inside drivers/gpu/drm/amd
+
+So you can already do what you are doing with the Hisilicon
+driver today without this new infrastructure. This only need
+hardware that have command queue and doorbell like mechanisms.
+
+
+Unlike mdev which unify a very high level concept, it seems
+to me spimdev just introduce low level concept (namely command
+queue) and i don't see the intrinsic value here.
+
+
+Cheers,
+J=E9r=F4me
