@@ -1,114 +1,135 @@
 From: Kees Cook <keescook@chromium.org>
-Subject: [PATCH v7 8/9] crypto: shash: Remove VLA usage in unaligned hashing
-Date: Thu,  2 Aug 2018 15:51:51 -0700
-Message-ID: <20180802225152.19194-9-keescook@chromium.org>
-References: <20180802225152.19194-1-keescook@chromium.org>
-Cc: Kees Cook <keescook@chromium.org>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
-        Tudor-Dan Ambarus <tudor.ambarus@microchip.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Will Deacon <will.deacon@arm.com>,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Matthew Wilcox <mawilcox@microsoft.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, qat-linux@intel.com,
-        linux-kernel@vger.kernel.org
+Subject: [PATCH v7 0/9] crypto: Remove VLA usage
+Date: Thu,  2 Aug 2018 15:51:43 -0700
+Message-ID: <20180802225152.19194-1-keescook@chromium.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Giovanni Cabiddu <giovanni.cabiddu@intel.com>, linux-kernel@vger.kernel.org,
+	Kees Cook <keescook@chromium.org>, Mike Snitzer <snitzer@redhat.com>,
+	Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+	Tudor-Dan Ambarus <tudor.ambarus@microchip.com>,
+	Will Deacon <will.deacon@arm.com>, Matthew Wilcox <mawilcox@microsoft.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	"David S. Miller" <davem@davemloft.net>, dm-devel@redhat.com,
+	Geert Uytterhoeven <geert@linux-m68k.org>,
+	David Woodhouse <dwmw@amazon.co.uk>, qat-linux@intel.com,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Alasdair Kergon <agk@redhat.com>, linux-crypto@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180802225152.19194-1-keescook@chromium.org>
-Sender: linux-kernel-owner@vger.kernel.org
+Return-path: <dm-devel-bounces@redhat.com>
+List-Unsubscribe: <https://www.redhat.com/mailman/options/dm-devel>,
+	<mailto:dm-devel-request@redhat.com?subject=unsubscribe>
+List-Archive: <https://www.redhat.com/archives/dm-devel>
+List-Post: <mailto:dm-devel@redhat.com>
+List-Help: <mailto:dm-devel-request@redhat.com?subject=help>
+List-Subscribe: <https://www.redhat.com/mailman/listinfo/dm-devel>,
+	<mailto:dm-devel-request@redhat.com?subject=subscribe>
+Sender: dm-devel-bounces@redhat.com
+Errors-To: dm-devel-bounces@redhat.com
 List-Id: linux-crypto.vger.kernel.org
 
-In the quest to remove all stack VLA usage from the kernel[1], this uses
-the newly defined max alignment to perform unaligned hashing to avoid
-VLAs, and drops the helper function while adding sanity checks on the
-resulting buffer sizes. Additionally, the __aligned_largest macro is
-removed since this helper was the only user.
+v7 cover letter:
+
+Since the ahash->shash conversions are going via separate trees, I've
+removed those patches from this series. In the meantime, this contains
+all the remaining patches for getting rid of almost all VLAs in crypto.
+I'd _really_ like to get this landed for v4.19. Any chance of that
+happening?
+
+Series cover letter:
+
+This is nearly the last of the VLA removals[1], but it's one of the
+largest because crypto gets used in lots of places. After looking
+through code, usage, reading the threads Gustavo started, and comparing
+the use-cases to the other VLA removals that have landed in the kernel,
+I think this series is likely the best way forward to shut the door on
+VLAs forever.
+
+For background, the crypto stack usage is for callers to do an immediate
+bit of work that doesn't allocate new memory. This means that other VLA
+removal techniques (like just using kmalloc) aren't workable, and the
+next common technique is needed: examination of maximum stack usage and
+the addition of sanity checks. This series does that, and in several
+cases, these maximums were already implicit in the code.
+
+This series is intended to land via the crypto tree for 4.19, though it
+touches dm, networking, and a few other things as well, since there are
+dependent patches (new crypto #defines being used, etc).
+
+Thanks!
+
+-Kees
 
 [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
 
-Signed-off-by: Kees Cook <keescook@chromium.org>
----
- crypto/shash.c               | 27 ++++++++++++++++-----------
- include/linux/compiler-gcc.h |  1 -
- 2 files changed, 16 insertions(+), 12 deletions(-)
+Changelog:
 
-diff --git a/crypto/shash.c b/crypto/shash.c
-index 86d76b5c626c..d21f04d70dce 100644
---- a/crypto/shash.c
-+++ b/crypto/shash.c
-@@ -73,13 +73,6 @@ int crypto_shash_setkey(struct crypto_shash *tfm, const u8 *key,
- }
- EXPORT_SYMBOL_GPL(crypto_shash_setkey);
- 
--static inline unsigned int shash_align_buffer_size(unsigned len,
--						   unsigned long mask)
--{
--	typedef u8 __aligned_largest u8_aligned;
--	return len + (mask & ~(__alignof__(u8_aligned) - 1));
--}
--
- static int shash_update_unaligned(struct shash_desc *desc, const u8 *data,
- 				  unsigned int len)
- {
-@@ -88,11 +81,17 @@ static int shash_update_unaligned(struct shash_desc *desc, const u8 *data,
- 	unsigned long alignmask = crypto_shash_alignmask(tfm);
- 	unsigned int unaligned_len = alignmask + 1 -
- 				     ((unsigned long)data & alignmask);
--	u8 ubuf[shash_align_buffer_size(unaligned_len, alignmask)]
--		__aligned_largest;
-+	/*
-+	 * We cannot count on __aligned() working for large values:
-+	 * https://patchwork.kernel.org/patch/9507697/
-+	 */
-+	u8 ubuf[MAX_ALGAPI_ALIGNMASK * 2];
- 	u8 *buf = PTR_ALIGN(&ubuf[0], alignmask + 1);
- 	int err;
- 
-+	if (WARN_ON(buf + unaligned_len > ubuf + sizeof(ubuf)))
-+		return -EINVAL;
-+
- 	if (unaligned_len > len)
- 		unaligned_len = len;
- 
-@@ -124,11 +123,17 @@ static int shash_final_unaligned(struct shash_desc *desc, u8 *out)
- 	unsigned long alignmask = crypto_shash_alignmask(tfm);
- 	struct shash_alg *shash = crypto_shash_alg(tfm);
- 	unsigned int ds = crypto_shash_digestsize(tfm);
--	u8 ubuf[shash_align_buffer_size(ds, alignmask)]
--		__aligned_largest;
-+	/*
-+	 * We cannot count on __aligned() working for large values:
-+	 * https://patchwork.kernel.org/patch/9507697/
-+	 */
-+	u8 ubuf[MAX_ALGAPI_ALIGNMASK + HASH_MAX_DIGESTSIZE];
- 	u8 *buf = PTR_ALIGN(&ubuf[0], alignmask + 1);
- 	int err;
- 
-+	if (WARN_ON(buf + ds > ubuf + sizeof(ubuf)))
-+		return -EINVAL;
-+
- 	err = shash->final(desc, buf);
- 	if (err)
- 		goto out;
-diff --git a/include/linux/compiler-gcc.h b/include/linux/compiler-gcc.h
-index f1a7492a5cc8..1f1cdef36a82 100644
---- a/include/linux/compiler-gcc.h
-+++ b/include/linux/compiler-gcc.h
-@@ -125,7 +125,6 @@
-  */
- #define __pure			__attribute__((pure))
- #define __aligned(x)		__attribute__((aligned(x)))
--#define __aligned_largest	__attribute__((aligned))
- #define __printf(a, b)		__attribute__((format(printf, a, b)))
- #define __scanf(a, b)		__attribute__((format(scanf, a, b)))
- #define __attribute_const__	__attribute__((__const__))
+v7:
+- refresh and reorganization without ahash->shash conversions
+
+v6:
+- make xcbc blocksize unconditional
+- add ahash-to-shash conversion patch series to entirely remove
+  AHASH_REQUEST_ON_STACK from the kernel
+
+v5:
+- limit AHASH_REQUEST_ON_STACK size only to non-async hash wrapping.
+- sanity-check ahash reqsize only when doing shash wrapping.
+- remove frame_warn changes in favor of shash conversions and other fixes.
+- send ahash to shash conversion patches and other fixes separately.
+
+v4:
+- add back *_REQUEST_ON_STACK patches.
+- programmatically find stack sizes for *_REQUEST_ON_STACK patches.
+- whitelist some code that trips FRAME_WARN on 32-bit builds.
+- fix alignment patches.
+
+v3:
+- drop *_REQUEST_ON_STACK patches. The rest of this series is pretty
+  straight-forward, and I'd like to get them tested in -next while
+  we continue to chip away at the *_REQUEST_ON_STACK VLA removal patches
+  separately. "Part 2" will continue with those.
+
+v2:
+- use 512 instead of PAGE_SIZE / 8 to avoid bloat on large-page archs.
+- swtich xcbc to "16" max universally.
+- fix typo in bounds check for dm buffer size.
+- examine actual reqsizes for skcipher and ahash instead of guessing.
+- improve names and comments for alg maxes
+
+
+Ard Biesheuvel (1):
+  crypto: ccm: Remove VLA usage
+
+Kees Cook (8):
+  crypto: xcbc: Remove VLA usage
+  crypto: cbc: Remove VLA usage
+  crypto: hash: Remove VLA usage
+  dm: Remove VLA usage from hashes
+  crypto alg: Introduce generic max blocksize and alignmask
+  crypto: qat: Remove VLA usage
+  crypto: shash: Remove VLA usage in unaligned hashing
+  crypto: skcipher: Remove VLA usage for SKCIPHER_REQUEST_ON_STACK
+
+ crypto/ahash.c                           |  4 +--
+ crypto/algapi.c                          |  7 ++++-
+ crypto/algif_hash.c                      |  2 +-
+ crypto/ccm.c                             |  9 ++++---
+ crypto/shash.c                           | 33 ++++++++++++++----------
+ crypto/xcbc.c                            |  8 +++---
+ drivers/crypto/qat/qat_common/qat_algs.c |  8 ++++--
+ drivers/md/dm-integrity.c                | 23 ++++++++++++-----
+ drivers/md/dm-verity-fec.c               |  5 +++-
+ include/crypto/algapi.h                  |  4 ++-
+ include/crypto/cbc.h                     |  4 ++-
+ include/crypto/hash.h                    |  6 ++++-
+ include/crypto/internal/skcipher.h       |  1 +
+ include/crypto/skcipher.h                |  4 ++-
+ include/linux/compiler-gcc.h             |  1 -
+ 15 files changed, 81 insertions(+), 38 deletions(-)
+
 -- 
 2.17.1
