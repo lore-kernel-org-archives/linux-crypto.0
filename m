@@ -1,7 +1,7 @@
 From: Kees Cook <keescook@chromium.org>
-Subject: [PATCH v7 3/9] crypto: ccm: Remove VLA usage
-Date: Thu,  2 Aug 2018 15:51:46 -0700
-Message-ID: <20180802225152.19194-4-keescook@chromium.org>
+Subject: [PATCH v7 4/9] crypto: hash: Remove VLA usage
+Date: Thu,  2 Aug 2018 15:51:47 -0700
+Message-ID: <20180802225152.19194-5-keescook@chromium.org>
 References: <20180802225152.19194-1-keescook@chromium.org>
 Cc: Kees Cook <keescook@chromium.org>,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>,
@@ -26,53 +26,89 @@ In-Reply-To: <20180802225152.19194-1-keescook@chromium.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+In the quest to remove all stack VLA usage from the kernel[1], this
+removes the VLAs in SHASH_DESC_ON_STACK (via crypto_shash_descsize())
+by using the maximum allowable size (which is now more clearly captured
+in a macro), along with a few other cases. Similar limits are turned into
+macros as well.
 
-In the quest to remove all stack VLA usage from the kernel[1], this drops
-AHASH_REQUEST_ON_STACK by preallocating the ahash request area combined
-with the skcipher area (which are not used at the same time).
+A review of existing sizes shows that SHA512_DIGEST_SIZE (64) is the
+largest digest size and that sizeof(struct sha3_state) (360) is the
+largest descriptor size. The corresponding maximums are reduced.
 
 [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
 
-Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- crypto/ccm.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ crypto/ahash.c        | 4 ++--
+ crypto/algif_hash.c   | 2 +-
+ crypto/shash.c        | 6 +++---
+ include/crypto/hash.h | 6 +++++-
+ 4 files changed, 11 insertions(+), 7 deletions(-)
 
-diff --git a/crypto/ccm.c b/crypto/ccm.c
-index 0a083342ec8c..b242fd0d3262 100644
---- a/crypto/ccm.c
-+++ b/crypto/ccm.c
-@@ -50,7 +50,10 @@ struct crypto_ccm_req_priv_ctx {
- 	u32 flags;
- 	struct scatterlist src[3];
- 	struct scatterlist dst[3];
--	struct skcipher_request skreq;
-+	union {
-+		struct ahash_request ahreq;
-+		struct skcipher_request skreq;
-+	};
+diff --git a/crypto/ahash.c b/crypto/ahash.c
+index a64c143165b1..78aaf2158c43 100644
+--- a/crypto/ahash.c
++++ b/crypto/ahash.c
+@@ -550,8 +550,8 @@ static int ahash_prepare_alg(struct ahash_alg *alg)
+ {
+ 	struct crypto_alg *base = &alg->halg.base;
+ 
+-	if (alg->halg.digestsize > PAGE_SIZE / 8 ||
+-	    alg->halg.statesize > PAGE_SIZE / 8 ||
++	if (alg->halg.digestsize > HASH_MAX_DIGESTSIZE ||
++	    alg->halg.statesize > HASH_MAX_STATESIZE ||
+ 	    alg->halg.statesize == 0)
+ 		return -EINVAL;
+ 
+diff --git a/crypto/algif_hash.c b/crypto/algif_hash.c
+index bfcf595fd8f9..d0cde541beb6 100644
+--- a/crypto/algif_hash.c
++++ b/crypto/algif_hash.c
+@@ -239,7 +239,7 @@ static int hash_accept(struct socket *sock, struct socket *newsock, int flags,
+ 	struct alg_sock *ask = alg_sk(sk);
+ 	struct hash_ctx *ctx = ask->private;
+ 	struct ahash_request *req = &ctx->req;
+-	char state[crypto_ahash_statesize(crypto_ahash_reqtfm(req)) ? : 1];
++	char state[HASH_MAX_STATESIZE];
+ 	struct sock *sk2;
+ 	struct alg_sock *ask2;
+ 	struct hash_ctx *ctx2;
+diff --git a/crypto/shash.c b/crypto/shash.c
+index 5d732c6bb4b2..86d76b5c626c 100644
+--- a/crypto/shash.c
++++ b/crypto/shash.c
+@@ -458,9 +458,9 @@ static int shash_prepare_alg(struct shash_alg *alg)
+ {
+ 	struct crypto_alg *base = &alg->base;
+ 
+-	if (alg->digestsize > PAGE_SIZE / 8 ||
+-	    alg->descsize > PAGE_SIZE / 8 ||
+-	    alg->statesize > PAGE_SIZE / 8)
++	if (alg->digestsize > HASH_MAX_DIGESTSIZE ||
++	    alg->descsize > HASH_MAX_DESCSIZE ||
++	    alg->statesize > HASH_MAX_STATESIZE)
+ 		return -EINVAL;
+ 
+ 	base->cra_type = &crypto_shash_type;
+diff --git a/include/crypto/hash.h b/include/crypto/hash.h
+index 76e432cab75d..21587011ab0f 100644
+--- a/include/crypto/hash.h
++++ b/include/crypto/hash.h
+@@ -151,9 +151,13 @@ struct shash_desc {
+ 	void *__ctx[] CRYPTO_MINALIGN_ATTR;
  };
  
- struct cbcmac_tfm_ctx {
-@@ -181,7 +184,7 @@ static int crypto_ccm_auth(struct aead_request *req, struct scatterlist *plain,
- 	struct crypto_ccm_req_priv_ctx *pctx = crypto_ccm_reqctx(req);
- 	struct crypto_aead *aead = crypto_aead_reqtfm(req);
- 	struct crypto_ccm_ctx *ctx = crypto_aead_ctx(aead);
--	AHASH_REQUEST_ON_STACK(ahreq, ctx->mac);
-+	struct ahash_request *ahreq = &pctx->ahreq;
- 	unsigned int assoclen = req->assoclen;
- 	struct scatterlist sg[3];
- 	u8 *odata = pctx->odata;
-@@ -427,7 +430,7 @@ static int crypto_ccm_init_tfm(struct crypto_aead *tfm)
- 	crypto_aead_set_reqsize(
- 		tfm,
- 		align + sizeof(struct crypto_ccm_req_priv_ctx) +
--		crypto_skcipher_reqsize(ctr));
-+		max(crypto_ahash_reqsize(mac), crypto_skcipher_reqsize(ctr)));
++#define HASH_MAX_DIGESTSIZE	 64
++#define HASH_MAX_DESCSIZE	360
++#define HASH_MAX_STATESIZE	512
++
+ #define SHASH_DESC_ON_STACK(shash, ctx)				  \
+ 	char __##shash##_desc[sizeof(struct shash_desc) +	  \
+-		crypto_shash_descsize(ctx)] CRYPTO_MINALIGN_ATTR; \
++		HASH_MAX_DESCSIZE] CRYPTO_MINALIGN_ATTR; \
+ 	struct shash_desc *shash = (struct shash_desc *)__##shash##_desc
  
- 	return 0;
- 
+ /**
 -- 
 2.17.1
