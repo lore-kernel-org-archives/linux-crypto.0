@@ -1,134 +1,129 @@
-From: Andy Lutomirski <luto@amacapital.net>
-Subject: Re: [PATCH v1 2/3] zinc: Introduce minimal cryptography library
-Date: Wed, 1 Aug 2018 10:02:21 -0700
-Message-ID: <CALCETrXD_VyoyW5C1U34o-ySJ4nFcO6PQ+ZNBVYxCpJ-f65CHw@mail.gmail.com>
-References: <20180801072246.GA15677@sol.localdomain>
+From: "Tian, Kevin" <kevin.tian-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
+Subject: RE: [RFC PATCH 0/7] A General Accelerator Framework, WarpDrive
+Date: Thu, 2 Aug 2018 02:33:12 +0000
+Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D191290E1A@SHSMSX101.ccr.corp.intel.com>
+References: <20180801102221.5308-1-nek.in.cn@gmail.com>
+	<20180801165644.GA3820@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Network Development <netdev@vger.kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Andy Lutomirski <luto@kernel.org>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        Samuel Neves <sneves@dei.uc.pt>,
-        "D . J . Bernstein" <djb@cr.yp.to>,
-        Tanja Lange <tanja@hyperelliptic.org>,
-        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
-        Karthikeyan Bhargavan <karthik.bhargavan@gmail.com>
-To: Eric Biggers <ebiggers3@gmail.com>
-Return-path: <netdev-owner@vger.kernel.org>
-In-Reply-To: <20180801072246.GA15677@sol.localdomain>
-Sender: netdev-owner@vger.kernel.org
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Cc: Hao Fang <fanghao11-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>,
+	Alex Williamson <alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+	"kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	"linux-doc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-doc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Greg Kroah-Hartman <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>,
+	Zaibo Xu <xuzaibo-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>, Jonathan Corbet <corbet-T1hC0tSOHrs@public.gmane.org>,
+	"Kumar, Sanjay K" <sanjay.k.kumar-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
+	"linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	"linuxarm-hv44wF8Li93QT0dZR+AlfA@public.gmane.org" <linuxarm-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>,
+	"iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org" <iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>,
+	"linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Philippe Ombredanne <pombredanne-od1rfyK75/E@public.gmane.org>,
+	Thomas Gleixner <tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org>,
+	Kenneth Lee <liguozhu-C8/M+/jPZTeaMJb+Lgu22Q@public.gmane.org>, "David
+	S . Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>, "linux-accelerators-uLR06cmDAlY/bJ5BZ2RsiQ@public.gmane.org"
+	<linux-accelerators-uLR06cmDAlY/bJ5BZ2RsiQ@public.gmane.org>
+To: Jerome Glisse <jglisse-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, Kenneth Lee <nek.in.cn-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+In-Reply-To: <20180801165644.GA3820-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Content-Language: en-US
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-[I reordered the snippets below for readability.]
+> From: Jerome Glisse
+> Sent: Thursday, August 2, 2018 12:57 AM
+> =
 
-> On Aug 1, 2018, at 12:22 AM, Eric Biggers <ebiggers3@gmail.com> wrote:
-> In general this is great work, and I'm very excited for WireGuard to be
-> upstreamed!  But for the new crypto code, I think a few things are on
-> the wrong track, for example treating it is a special library.  Even the
-> name is contradicting itself: Zinc is "not crypto/", yet as you stated
-> it's intended that the "Zinc" algorithms will be exposed through the
-> crypto API -- just like how most of the existing crypto code in lib/ is
-> also exposed through the crypto API.  So, I think that what you're doing
-> isn't actually *that* different from what already exists in some cases;
-> and pretending that it is very different is just going to cause
-> problems.  Rather, the actual truly new thing seems to be that the
-> dispatch to architecture specific implementations is done at the lib/
-> level instead of handled by the crypto API priority numbers.
+> On Wed, Aug 01, 2018 at 06:22:14PM +0800, Kenneth Lee wrote:
+> > From: Kenneth Lee <liguozhu-C8/M+/jPZTeaMJb+Lgu22Q@public.gmane.org>
+> >
+> > WarpDrive is an accelerator framework to expose the hardware
+> capabilities
+> > directly to the user space. It makes use of the exist vfio and vfio-mdev
+> > facilities. So the user application can send request and DMA to the
+> > hardware without interaction with the kernel. This remove the latency
+> > of syscall and context switch.
+> >
+> > The patchset contains documents for the detail. Please refer to it for
+> more
+> > information.
+> >
+> > This patchset is intended to be used with Jean Philippe Brucker's SVA
+> > patch [1] (Which is also in RFC stage). But it is not mandatory. This
+> > patchset is tested in the latest mainline kernel without the SVA patche=
+s.
+> > So it support only one process for each accelerator.
+> >
+> > With SVA support, WarpDrive can support multi-process in the same
+> > accelerator device.  We tested it in our SoC integrated Accelerator (bo=
+ard
+> > ID: D06, Chip ID: HIP08). A reference work tree can be found here: [2].
+> =
 
-...
+> I have not fully inspected things nor do i know enough about
+> this Hisilicon ZIP accelerator to ascertain, but from glimpsing
+> at the code it seems that it is unsafe to use even with SVA due
+> to the doorbell. There is a comment talking about safetyness
+> in patch 7.
+> =
 
->
->
-> I think the above changes would also naturally lead to a much saner
-> patch series where each algorithm is added by its own patch, rather than
-> one monster patch that adds many algorithms and 24000 lines of code.
->
+> Exposing thing to userspace is always enticing, but if it is
+> a security risk then it should clearly say so and maybe a
+> kernel boot flag should be necessary to allow such device to
+> be use.
+> =
 
-Yes, please.
+> =
 
+> My more general question is do we want to grow VFIO to become
+> a more generic device driver API. This patchset adds a command
+> queue concept to it (i don't think it exist today but i have
+> not follow VFIO closely).
+> =
 
->
-> As for doing the architecture-specific dispatch in lib/ rather than
-> through the crypto API, there definitely are some arguments in favor of
-> it.  The main problem, though, is that your code is a mess due to all
-> the #ifdefs, and it will only get worse as people add more
-> architectures.  You may think you already added all the architectures
-> that matter, but tomorrow people will come and want to add PowerPC,
-> RISC-V, etc.  I really think you should consider splitting up
-> implementations by architecture; this would *not*, however, preclude the
-> implementations from still being accessed through a single top-level
-> "glue" function.  For example chacha20() could look like:
->
-> void chacha20(struct chacha20_ctx *state, u8 *dst, const u8 *src, u32 len,
->          bool have_simd)
-> {
->    if (chacha20_arch(dst, src, len, state->key, state->counter, have_simd))
->        goto out;
->
->    chacha20_generic(dst, src, len, state->key, state->counter);
->
-> out:
->    state->counter[0] += (len + 63) / 64;
-> }
+> Why is that any better that existing driver model ? Where a
+> device create a device file (can be character device, block
+> device, ...). Such models also allow for direct hardware
+> access from userspace. For instance see the AMD KFD driver
+> inside drivers/gpu/drm/amd
 
-I like this a *lot*.  (But why are you passing have_simd?  Shouldn't
-that check live in chacha20_arch?  If there's some init code needed,
-then chacha20_arch() should just return false before the init code
-runs.  Once the arch does whatever feature detection it needs, it can
-make chacha20_arch() start returning true.)
+One motivation I guess, is that most accelerators lack of a =
 
-As I see it, there there are two truly new thing in the zinc patchset:
-the direct (in the direct call sense) arch dispatch, and the fact that
-the functions can be called directly, without allocating contexts,
-using function pointers, etc.
+well-abstracted high level APIs similar to GPU side (e.g. OpenCL =
 
-In fact, I had a previous patch set that added such an interface for SHA256.
+clearly defines Shared Virtual Memory models). VFIO mdev
+might be an alternative common interface to enable SVA usages =
 
-https://git.kernel.org/pub/scm/linux/kernel/git/luto/linux.git/commit/?h=crypto/sha256_bpf&id=8c59a4dd8b7ba4f2e5a6461132bbd16c83ff7c1f
+on various accelerators...
 
-https://git.kernel.org/pub/scm/linux/kernel/git/luto/linux.git/commit/?h=crypto/sha256_bpf&id=7e5fbc02972b03727b71bc71f84175c36cbf01f5
+> =
 
->
-> Your patch description is also missing any mention of crypto accelerator
-> hardware.  Quite a bit of the complexity in the crypto API, such as
-> scatterlist support and asynchronous execution, exists because it
-> supports crypto accelerators.  AFAICS your new APIs cannot support
-> crypto accelerators, as your APIs are synchronous and operate on virtual
-> addresses.  I assume your justification is that "djb algorithms" like
-> ChaCha and Poly1305 don't need crypto accelerators as they are fast in
-> software.  But you never explicitly stated this and discussed the
-> tradeoffs.  Since this is basically the foundation for the design you've
-> chosen, it really needs to be addressed.
+> So you can already do what you are doing with the Hisilicon
+> driver today without this new infrastructure. This only need
+> hardware that have command queue and doorbell like mechanisms.
+> =
 
-I see this as an advantage, not a disadvantage.  A very large majority
-of in-kernel crypto users (by number of call sites under a *very*
-brief survey, not by number of CPU cycles) just want to do some
-synchronous crypto on a buffer that is addressed by a regular pointer.
-Most of these users would be slowed down if they used any form of
-async crypto, since the CPU can complete the whole operation faster
-than it could plausibly initiate and complete anything asynchronous.
-And, right now, they suffer the full overhead of allocating a context
-(often with alloca!), looking up (or caching) some crypto API data
-structures, dispatching the operation, and cleaning up.
+> =
 
-So I think the right way to do it is to have directly callable
-functions like zinc uses and to have the fancy crypto API layer on top
-of them.  So if you actually want async accelerated crypto with
-scatterlists or whatever, you can call into the fancy API, and the
-fancy API can dispatch to hardware or it can dispatch to the normal
-static API.
+> Unlike mdev which unify a very high level concept, it seems
+> to me spimdev just introduce low level concept (namely command
+> queue) and i don't see the intrinsic value here.
+> =
 
-In fact, this is exactly what my patch above did.  But Jason's work is
-more complete than mine, and mine wasn't really done because it had
-some configury issues.
+> =
 
-All that being said, for algorithms where the crypto API already has a
-reasonable implementation, I think the patch series should first
-restructure the code (so the actual software implementation is moved
-away from the crypto API wrappers) and then, if needed, replace the
-implementation with something better.  The latter should be its own
-patch with its own justification.
+> Cheers,
+> J=E9r=F4me
+> _______________________________________________
+> iommu mailing list
+> iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+> https://lists.linuxfoundation.org/mailman/listinfo/iommu
