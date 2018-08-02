@@ -1,85 +1,76 @@
-From: "Tian, Kevin" <kevin.tian@intel.com>
-Subject: RE: [RFC PATCH 0/7] A General Accelerator Framework, WarpDrive
-Date: Thu, 2 Aug 2018 04:36:52 +0000
-Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19129105A@SHSMSX101.ccr.corp.intel.com>
+From: "Tian, Kevin" <kevin.tian-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
+Subject: RE: [RFC PATCH 2/7] iommu: Add share domain interface in iommu for
+	spimdev
+Date: Thu, 2 Aug 2018 04:39:37 +0000
+Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19129107A@SHSMSX101.ccr.corp.intel.com>
 References: <20180801102221.5308-1-nek.in.cn@gmail.com>
-        <AADFC41AFE54684AB9EE6CBC0274A5D191290EB3@SHSMSX101.ccr.corp.intel.com>
- <20180802034006.GJ160746@Turing-Arch-b>
+	<20180801102221.5308-3-nek.in.cn@gmail.com>
+	<AADFC41AFE54684AB9EE6CBC0274A5D191290F49@SHSMSX101.ccr.corp.intel.com>
+	<20180802041547.GM160746@Turing-Arch-b>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-Cc: Kenneth Lee <nek.in.cn@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        "Kumar, Sanjay K" <sanjay.k.kumar@intel.com>,
-        Hao Fang <fanghao11@huawei.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linuxarm@huawei.com" <linuxarm@huawei.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Philippe Ombredanne <pombredanne@nexb.com>,
-        Zaibo Xu <xuzaibo@huawei.com>,
-        "David S . Miller" <davem@
-To: Kenneth Lee <liguozhu@hisilicon.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180802034006.GJ160746@Turing-Arch-b>
+Content-Transfer-Encoding: 7bit
+Cc: Kenneth Lee <nek.in.cn-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+	"kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Jonathan Corbet <corbet-T1hC0tSOHrs@public.gmane.org>,
+	Greg Kroah-Hartman <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>,
+	"linux-doc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-doc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, "Kumar,
+	Sanjay K" <sanjay.k.kumar-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>, Hao Fang <fanghao11-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>,
+	"iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org" <iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>,
+	"linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	"linuxarm-hv44wF8Li93QT0dZR+AlfA@public.gmane.org" <linuxarm-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>,
+	Alex Williamson <alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	Thomas Gleixner <tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org>,
+	"linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Philippe Ombredanne <pombredanne-od1rfyK75/E@public.gmane.org>, Zaibo Xu <xuzaibo-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>,
+	"David S . Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
+	"linux-accelerators-uLR06cmDAlY/bJ5BZ2RsiQ@public.gmane.org" <linux-accelerators-uLR06cmDAlY/bJ5BZ2RsiQ@public.gmane.org>
+To: Kenneth Lee <liguozhu-C8/M+/jPZTeaMJb+Lgu22Q@public.gmane.org>
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+In-Reply-To: <20180802041547.GM160746@Turing-Arch-b>
 Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
 > From: Kenneth Lee
-> Sent: Thursday, August 2, 2018 11:40 AM
+> Sent: Thursday, August 2, 2018 12:16 PM
 > 
-> On Thu, Aug 02, 2018 at 02:59:33AM +0000, Tian, Kevin wrote:
+> On Thu, Aug 02, 2018 at 03:17:03AM +0000, Tian, Kevin wrote:
 > > > From: Kenneth Lee
 > > > Sent: Wednesday, August 1, 2018 6:22 PM
 > > >
-> > > From: Kenneth Lee <liguozhu@hisilicon.com>
+> > > From: Kenneth Lee <liguozhu-C8/M+/jPZTeaMJb+Lgu22Q@public.gmane.org>
 > > >
-> > > WarpDrive is an accelerator framework to expose the hardware
-> capabilities
-> > > directly to the user space. It makes use of the exist vfio and vfio-mdev
-> > > facilities. So the user application can send request and DMA to the
-> > > hardware without interaction with the kernel. This remove the latency
-> > > of syscall and context switch.
+> > > This patch add sharing interface for a iommu_group. The new interface:
 > > >
-> > > The patchset contains documents for the detail. Please refer to it for
-> more
-> > > information.
+> > > 	iommu_group_share_domain()
+> > > 	iommu_group_unshare_domain()
 > > >
-> > > This patchset is intended to be used with Jean Philippe Brucker's SVA
-> > > patch [1] (Which is also in RFC stage). But it is not mandatory. This
-> > > patchset is tested in the latest mainline kernel without the SVA patches.
-> > > So it support only one process for each accelerator.
+> > > can be used by some virtual iommu_group (such as iommu_group for
+> > > spimdev)
+> > > to share their parent's iommu_group.
+> > >
+> > > When the domain of the group is shared, it cannot be changed before
+> > > unshared.  In the future, notification can be added if update is required.
 > >
-> > If no sharing, then why not just assigning the whole parent device to
-> > the process? IMO if SVA usage is the clear goal of your series, it
-> > might be made clearly so then Jean's series is mandatory dependency...
+> > Is it necessary or just asking VFIO to use parent domain directly?
 > >
-> 
-> We don't know how SVA will be finally. But the feature, "make use of
-> per-PASID/substream ID IOMMU page table", should be able to be enabled
-> in the
-> kernel. So we don't want to enforce it here. After we have this serial ready,
-> it
-> can be hooked to any implementation.
+> Even we add to VFIO, the iommu still need to be changed. We can move
+> the type1
+> part to VFIO if we have agreement in RFC stage.
 
-"any" or "only queue-based" implementation? some devices may not
-have queue concept, e.g. GPU.
-
-> 
-> Further more, even without "per-PASID IOMMU page table", this series has
-> its
-> value. It is not simply dedicate the whole device to the process. It "shares"
-> the device with the kernel driver. So you can support crypto and a user
-> application at the same time.
-
-OK.
+We have similar consideration in IOMMU aware mdev series. Now
+we are inclined to avoid faked entity within IOMMU layer - leave to
+caller to figure out right physical entity for any IOMMU ops. That 
+might be leveraged here too after we get a new version.
 
 Thanks
 Kevin
