@@ -1,82 +1,114 @@
 From: Kees Cook <keescook@chromium.org>
-Subject: [PATCH v7 1/9] crypto: xcbc: Remove VLA usage
-Date: Thu,  2 Aug 2018 15:51:44 -0700
-Message-ID: <20180802225152.19194-2-keescook@chromium.org>
+Subject: [PATCH v7 8/9] crypto: shash: Remove VLA usage in unaligned hashing
+Date: Thu,  2 Aug 2018 15:51:51 -0700
+Message-ID: <20180802225152.19194-9-keescook@chromium.org>
 References: <20180802225152.19194-1-keescook@chromium.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Giovanni Cabiddu <giovanni.cabiddu@intel.com>, linux-kernel@vger.kernel.org,
-	Kees Cook <keescook@chromium.org>, Mike Snitzer <snitzer@redhat.com>,
-	Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-	Tudor-Dan Ambarus <tudor.ambarus@microchip.com>,
-	Will Deacon <will.deacon@arm.com>, Matthew Wilcox <mawilcox@microsoft.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	"David S. Miller" <davem@davemloft.net>, dm-devel@redhat.com,
-	Geert Uytterhoeven <geert@linux-m68k.org>,
-	David Woodhouse <dwmw@amazon.co.uk>, qat-linux@intel.com,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Alasdair Kergon <agk@redhat.com>, linux-crypto@vger.kernel.org
+Cc: Kees Cook <keescook@chromium.org>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
+        Tudor-Dan Ambarus <tudor.ambarus@microchip.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Will Deacon <will.deacon@arm.com>,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        Matthew Wilcox <mawilcox@microsoft.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, qat-linux@intel.com,
+        linux-kernel@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <dm-devel-bounces@redhat.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <20180802225152.19194-1-keescook@chromium.org>
-List-Unsubscribe: <https://www.redhat.com/mailman/options/dm-devel>,
-	<mailto:dm-devel-request@redhat.com?subject=unsubscribe>
-List-Archive: <https://www.redhat.com/archives/dm-devel>
-List-Post: <mailto:dm-devel@redhat.com>
-List-Help: <mailto:dm-devel-request@redhat.com?subject=help>
-List-Subscribe: <https://www.redhat.com/mailman/listinfo/dm-devel>,
-	<mailto:dm-devel-request@redhat.com?subject=subscribe>
-Sender: dm-devel-bounces@redhat.com
-Errors-To: dm-devel-bounces@redhat.com
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
 In the quest to remove all stack VLA usage from the kernel[1], this uses
-the maximum blocksize and adds a sanity check. For xcbc, the blocksize
-must always be 16, so use that, since it's already being enforced during
-instantiation.
+the newly defined max alignment to perform unaligned hashing to avoid
+VLAs, and drops the helper function while adding sanity checks on the
+resulting buffer sizes. Additionally, the __aligned_largest macro is
+removed since this helper was the only user.
 
 [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
 
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- crypto/xcbc.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+ crypto/shash.c               | 27 ++++++++++++++++-----------
+ include/linux/compiler-gcc.h |  1 -
+ 2 files changed, 16 insertions(+), 12 deletions(-)
 
-diff --git a/crypto/xcbc.c b/crypto/xcbc.c
-index 25c75af50d3f..c055f57fab11 100644
---- a/crypto/xcbc.c
-+++ b/crypto/xcbc.c
-@@ -57,15 +57,17 @@ struct xcbc_desc_ctx {
- 	u8 ctx[];
- };
+diff --git a/crypto/shash.c b/crypto/shash.c
+index 86d76b5c626c..d21f04d70dce 100644
+--- a/crypto/shash.c
++++ b/crypto/shash.c
+@@ -73,13 +73,6 @@ int crypto_shash_setkey(struct crypto_shash *tfm, const u8 *key,
+ }
+ EXPORT_SYMBOL_GPL(crypto_shash_setkey);
  
-+#define XCBC_BLOCKSIZE	16
-+
- static int crypto_xcbc_digest_setkey(struct crypto_shash *parent,
- 				     const u8 *inkey, unsigned int keylen)
+-static inline unsigned int shash_align_buffer_size(unsigned len,
+-						   unsigned long mask)
+-{
+-	typedef u8 __aligned_largest u8_aligned;
+-	return len + (mask & ~(__alignof__(u8_aligned) - 1));
+-}
+-
+ static int shash_update_unaligned(struct shash_desc *desc, const u8 *data,
+ 				  unsigned int len)
  {
- 	unsigned long alignmask = crypto_shash_alignmask(parent);
- 	struct xcbc_tfm_ctx *ctx = crypto_shash_ctx(parent);
--	int bs = crypto_shash_blocksize(parent);
- 	u8 *consts = PTR_ALIGN(&ctx->ctx[0], alignmask + 1);
- 	int err = 0;
--	u8 key1[bs];
-+	u8 key1[XCBC_BLOCKSIZE];
-+	int bs = sizeof(key1);
+@@ -88,11 +81,17 @@ static int shash_update_unaligned(struct shash_desc *desc, const u8 *data,
+ 	unsigned long alignmask = crypto_shash_alignmask(tfm);
+ 	unsigned int unaligned_len = alignmask + 1 -
+ 				     ((unsigned long)data & alignmask);
+-	u8 ubuf[shash_align_buffer_size(unaligned_len, alignmask)]
+-		__aligned_largest;
++	/*
++	 * We cannot count on __aligned() working for large values:
++	 * https://patchwork.kernel.org/patch/9507697/
++	 */
++	u8 ubuf[MAX_ALGAPI_ALIGNMASK * 2];
+ 	u8 *buf = PTR_ALIGN(&ubuf[0], alignmask + 1);
+ 	int err;
  
- 	if ((err = crypto_cipher_setkey(ctx->child, inkey, keylen)))
- 		return err;
-@@ -212,7 +214,7 @@ static int xcbc_create(struct crypto_template *tmpl, struct rtattr **tb)
- 		return PTR_ERR(alg);
++	if (WARN_ON(buf + unaligned_len > ubuf + sizeof(ubuf)))
++		return -EINVAL;
++
+ 	if (unaligned_len > len)
+ 		unaligned_len = len;
  
- 	switch(alg->cra_blocksize) {
--	case 16:
-+	case XCBC_BLOCKSIZE:
- 		break;
- 	default:
- 		goto out_put_alg;
+@@ -124,11 +123,17 @@ static int shash_final_unaligned(struct shash_desc *desc, u8 *out)
+ 	unsigned long alignmask = crypto_shash_alignmask(tfm);
+ 	struct shash_alg *shash = crypto_shash_alg(tfm);
+ 	unsigned int ds = crypto_shash_digestsize(tfm);
+-	u8 ubuf[shash_align_buffer_size(ds, alignmask)]
+-		__aligned_largest;
++	/*
++	 * We cannot count on __aligned() working for large values:
++	 * https://patchwork.kernel.org/patch/9507697/
++	 */
++	u8 ubuf[MAX_ALGAPI_ALIGNMASK + HASH_MAX_DIGESTSIZE];
+ 	u8 *buf = PTR_ALIGN(&ubuf[0], alignmask + 1);
+ 	int err;
+ 
++	if (WARN_ON(buf + ds > ubuf + sizeof(ubuf)))
++		return -EINVAL;
++
+ 	err = shash->final(desc, buf);
+ 	if (err)
+ 		goto out;
+diff --git a/include/linux/compiler-gcc.h b/include/linux/compiler-gcc.h
+index f1a7492a5cc8..1f1cdef36a82 100644
+--- a/include/linux/compiler-gcc.h
++++ b/include/linux/compiler-gcc.h
+@@ -125,7 +125,6 @@
+  */
+ #define __pure			__attribute__((pure))
+ #define __aligned(x)		__attribute__((aligned(x)))
+-#define __aligned_largest	__attribute__((aligned))
+ #define __printf(a, b)		__attribute__((format(printf, a, b)))
+ #define __scanf(a, b)		__attribute__((format(scanf, a, b)))
+ #define __attribute_const__	__attribute__((__const__))
 -- 
 2.17.1
