@@ -1,76 +1,56 @@
-From: "Tian, Kevin" <kevin.tian-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
-Subject: RE: [RFC PATCH 2/7] iommu: Add share domain interface in iommu for
-	spimdev
-Date: Thu, 2 Aug 2018 04:39:37 +0000
-Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19129107A@SHSMSX101.ccr.corp.intel.com>
+From: "Tian, Kevin" <kevin.tian@intel.com>
+Subject: RE: [RFC PATCH 1/7] vfio/spimdev: Add documents for WarpDrive
+ framework
+Date: Thu, 2 Aug 2018 04:41:32 +0000
+Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D191291097@SHSMSX101.ccr.corp.intel.com>
 References: <20180801102221.5308-1-nek.in.cn@gmail.com>
-	<20180801102221.5308-3-nek.in.cn@gmail.com>
-	<AADFC41AFE54684AB9EE6CBC0274A5D191290F49@SHSMSX101.ccr.corp.intel.com>
-	<20180802041547.GM160746@Turing-Arch-b>
+ <20180801102221.5308-2-nek.in.cn@gmail.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D191290F04@SHSMSX101.ccr.corp.intel.com>
+ <20180802042235.GN160746@Turing-Arch-b>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Kenneth Lee <nek.in.cn-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-	"kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Jonathan Corbet <corbet-T1hC0tSOHrs@public.gmane.org>,
-	Greg Kroah-Hartman <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>,
-	"linux-doc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-doc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, "Kumar,
-	Sanjay K" <sanjay.k.kumar-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>, Hao Fang <fanghao11-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>,
-	"iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org" <iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>,
-	"linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	"linuxarm-hv44wF8Li93QT0dZR+AlfA@public.gmane.org" <linuxarm-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>,
-	Alex Williamson <alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	Thomas Gleixner <tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org>,
-	"linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Philippe Ombredanne <pombredanne-od1rfyK75/E@public.gmane.org>, Zaibo Xu <xuzaibo-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>,
-	"David S . Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
-	"linux-accelerators-uLR06cmDAlY/bJ5BZ2RsiQ@public.gmane.org" <linux-accelerators-uLR06cmDAlY/bJ5BZ2RsiQ@public.gmane.org>
-To: Kenneth Lee <liguozhu-C8/M+/jPZTeaMJb+Lgu22Q@public.gmane.org>
-Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-In-Reply-To: <20180802041547.GM160746@Turing-Arch-b>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: Kenneth Lee <nek.in.cn@gmail.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Joerg Roedel <joro@8bytes.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Hao Fang <fanghao11@huawei.com>,
+        Zhou Wang <wangzhou1@hisilicon.com>,
+        Zaibo Xu <xuzaibo@huawei.com>,
+        Philippe Ombredanne <pombredanne@nexb.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+To: Kenneth Lee <liguozhu@hisilicon.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20180802042235.GN160746@Turing-Arch-b>
 Content-Language: en-US
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
-List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
-Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-> From: Kenneth Lee
-> Sent: Thursday, August 2, 2018 12:16 PM
-> 
-> On Thu, Aug 02, 2018 at 03:17:03AM +0000, Tian, Kevin wrote:
-> > > From: Kenneth Lee
-> > > Sent: Wednesday, August 1, 2018 6:22 PM
-> > >
-> > > From: Kenneth Lee <liguozhu-C8/M+/jPZTeaMJb+Lgu22Q@public.gmane.org>
-> > >
-> > > This patch add sharing interface for a iommu_group. The new interface:
-> > >
-> > > 	iommu_group_share_domain()
-> > > 	iommu_group_unshare_domain()
-> > >
-> > > can be used by some virtual iommu_group (such as iommu_group for
-> > > spimdev)
-> > > to share their parent's iommu_group.
-> > >
-> > > When the domain of the group is shared, it cannot be changed before
-> > > unshared.  In the future, notification can be added if update is required.
-> >
-> > Is it necessary or just asking VFIO to use parent domain directly?
-> >
-> Even we add to VFIO, the iommu still need to be changed. We can move
-> the type1
-> part to VFIO if we have agreement in RFC stage.
-
-We have similar consideration in IOMMU aware mdev series. Now
-we are inclined to avoid faked entity within IOMMU layer - leave to
-caller to figure out right physical entity for any IOMMU ops. That 
-might be leveraged here too after we get a new version.
-
-Thanks
-Kevin
+PiBGcm9tOiBLZW5uZXRoIExlZQ0KPiBTZW50OiBUaHVyc2RheSwgQXVndXN0IDIsIDIwMTggMTI6
+MjMgUE0NCj4gDQo+IE9uIFRodSwgQXVnIDAyLCAyMDE4IGF0IDAzOjE0OjM4QU0gKzAwMDAsIFRp
+YW4sIEtldmluIHdyb3RlOg0KPiA+DQo+ID4gPiBGcm9tOiBLZW5uZXRoIExlZQ0KPiA+ID4gU2Vu
+dDogV2VkbmVzZGF5LCBBdWd1c3QgMSwgMjAxOCA2OjIyIFBNDQo+ID4gPg0KPiA+ID4gRnJvbTog
+S2VubmV0aCBMZWUgPGxpZ3Vvemh1QGhpc2lsaWNvbi5jb20+DQo+ID4gPg0KPiA+ID4gV2FycERy
+aXZlIGlzIGEgY29tbW9uIHVzZXIgc3BhY2UgYWNjZWxlcmF0b3IgZnJhbWV3b3JrLiAgSXRzIG1h
+aW4NCj4gPiA+IGNvbXBvbmVudA0KPiA+ID4gaW4gS2VybmVsIGlzIGNhbGxlZCBzcGltZGV2LCBT
+aGFyZSBQYXJlbnQgSU9NTVUgTWVkaWF0ZWQgRGV2aWNlLiBJdA0KPiA+DQo+ID4gTm90IHN1cmUg
+d2hldGhlciAic2hhcmUgcGFyZW50IElPTU1VIiBpcyBhIGdvb2QgdGVybSBoZXJlLiBiZXR0ZXIN
+Cj4gPiBzdGljayB0byB3aGF0IGNhcGFiaXR5IHlvdSBicmluZyB0byB1c2VyIHNwYWNlLCBpbnN0
+ZWFkIG9mIGRlc2NyaWJpbmcNCj4gPiBpbnRlcm5hbCB0cmljay4uLg0KPiBBZ3JlZS4gVGhlICJT
+UEkiIGlzIGFsc28gc3Ryb25nbHkgaGludCB0byAiU2hhcmUgUGVyaXBoZXJhbCBJbnRlcnJ1cHQi
+IG9yDQo+ICJTZXJpYWwNCj4gUGVyaXBoZXJhbCBJbnRlcmZhY2UiLiBQZXJzb25hbGx5IEkgaGF0
+ZSB0aGlzIG5hbWUuIEJ1dCBJIGNhbm5vdCBmaW5kIGEgYmV0dGVyDQo+IG9uZS4gSW4gdGhlIHVz
+ZXIgc3BhY2UsIHdlIGNhbiB1c2UgYSBpbXBhc3NpYmxlIG5hbWUgKFdhcnBEcml2ZSkuIEJ1dA0K
+PiBrZXJuZWwNCj4gcmVxdWlyZSBhIG5hbWUgcG9pbnQgdG8gaXRzIGZlYXR1cmUuLi4gbWF5YmUg
+SSBzaG91bGQgdXNlICJQcm9jZXNzLVNoYXJlZA0KPiBNZGV2Ig0KPiBpbiBuZXh0IHZlcnNpb24/
+DQoNCm9yIG1heWJlIG5vIG5ldyBuYW1lLiBKdXN0IHN0aWNrIHRvIG1kZXYgYnV0IGludHJvZHVj
+aW5nIHNvbWUNCm5ldyBhdHRyaWJ1dGUvY2FwYWJpbGl0eSB0byBpbmRpY2F0ZSBzdWNoIHB1cnBv
+c2UuDQoNClRoYW5rcw0KS2V2aW4NCg==
