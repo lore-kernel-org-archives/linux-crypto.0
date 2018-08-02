@@ -1,7 +1,7 @@
 From: Kees Cook <keescook@chromium.org>
-Subject: [PATCH v7 4/9] crypto: hash: Remove VLA usage
-Date: Thu,  2 Aug 2018 15:51:47 -0700
-Message-ID: <20180802225152.19194-5-keescook@chromium.org>
+Subject: [PATCH v7 6/9] crypto alg: Introduce generic max blocksize and alignmask
+Date: Thu,  2 Aug 2018 15:51:49 -0700
+Message-ID: <20180802225152.19194-7-keescook@chromium.org>
 References: <20180802225152.19194-1-keescook@chromium.org>
 Cc: Kees Cook <keescook@chromium.org>,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>,
@@ -27,88 +27,57 @@ Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
 In the quest to remove all stack VLA usage from the kernel[1], this
-removes the VLAs in SHASH_DESC_ON_STACK (via crypto_shash_descsize())
-by using the maximum allowable size (which is now more clearly captured
-in a macro), along with a few other cases. Similar limits are turned into
-macros as well.
+exposes a new general upper bound on crypto blocksize and alignmask
+(higher than for the existing cipher limits) for VLA removal,
+and introduces new checks.
 
-A review of existing sizes shows that SHA512_DIGEST_SIZE (64) is the
-largest digest size and that sizeof(struct sha3_state) (360) is the
-largest descriptor size. The corresponding maximums are reduced.
+At present, the highest cra_alignmask in the kernel is 63. The highest
+cra_blocksize is 144 (SHA3_224_BLOCK_SIZE, 18 8-byte words). For the
+new blocksize limit, I went with 160 (20 8-byte words).
 
 [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
 
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- crypto/ahash.c        | 4 ++--
- crypto/algif_hash.c   | 2 +-
- crypto/shash.c        | 6 +++---
- include/crypto/hash.h | 6 +++++-
- 4 files changed, 11 insertions(+), 7 deletions(-)
+ crypto/algapi.c         | 7 ++++++-
+ include/crypto/algapi.h | 4 +++-
+ 2 files changed, 9 insertions(+), 2 deletions(-)
 
-diff --git a/crypto/ahash.c b/crypto/ahash.c
-index a64c143165b1..78aaf2158c43 100644
---- a/crypto/ahash.c
-+++ b/crypto/ahash.c
-@@ -550,8 +550,8 @@ static int ahash_prepare_alg(struct ahash_alg *alg)
- {
- 	struct crypto_alg *base = &alg->halg.base;
- 
--	if (alg->halg.digestsize > PAGE_SIZE / 8 ||
--	    alg->halg.statesize > PAGE_SIZE / 8 ||
-+	if (alg->halg.digestsize > HASH_MAX_DIGESTSIZE ||
-+	    alg->halg.statesize > HASH_MAX_STATESIZE ||
- 	    alg->halg.statesize == 0)
+diff --git a/crypto/algapi.c b/crypto/algapi.c
+index c0755cf4f53f..496fc51bf215 100644
+--- a/crypto/algapi.c
++++ b/crypto/algapi.c
+@@ -57,9 +57,14 @@ static int crypto_check_alg(struct crypto_alg *alg)
+ 	if (alg->cra_alignmask & (alg->cra_alignmask + 1))
  		return -EINVAL;
  
-diff --git a/crypto/algif_hash.c b/crypto/algif_hash.c
-index bfcf595fd8f9..d0cde541beb6 100644
---- a/crypto/algif_hash.c
-+++ b/crypto/algif_hash.c
-@@ -239,7 +239,7 @@ static int hash_accept(struct socket *sock, struct socket *newsock, int flags,
- 	struct alg_sock *ask = alg_sk(sk);
- 	struct hash_ctx *ctx = ask->private;
- 	struct ahash_request *req = &ctx->req;
--	char state[crypto_ahash_statesize(crypto_ahash_reqtfm(req)) ? : 1];
-+	char state[HASH_MAX_STATESIZE];
- 	struct sock *sk2;
- 	struct alg_sock *ask2;
- 	struct hash_ctx *ctx2;
-diff --git a/crypto/shash.c b/crypto/shash.c
-index 5d732c6bb4b2..86d76b5c626c 100644
---- a/crypto/shash.c
-+++ b/crypto/shash.c
-@@ -458,9 +458,9 @@ static int shash_prepare_alg(struct shash_alg *alg)
- {
- 	struct crypto_alg *base = &alg->base;
- 
--	if (alg->digestsize > PAGE_SIZE / 8 ||
--	    alg->descsize > PAGE_SIZE / 8 ||
--	    alg->statesize > PAGE_SIZE / 8)
-+	if (alg->digestsize > HASH_MAX_DIGESTSIZE ||
-+	    alg->descsize > HASH_MAX_DESCSIZE ||
-+	    alg->statesize > HASH_MAX_STATESIZE)
+-	if (alg->cra_blocksize > PAGE_SIZE / 8)
++	/* General maximums for all algs. */
++	if (alg->cra_alignmask > MAX_ALGAPI_ALIGNMASK)
  		return -EINVAL;
  
- 	base->cra_type = &crypto_shash_type;
-diff --git a/include/crypto/hash.h b/include/crypto/hash.h
-index 76e432cab75d..21587011ab0f 100644
---- a/include/crypto/hash.h
-+++ b/include/crypto/hash.h
-@@ -151,9 +151,13 @@ struct shash_desc {
- 	void *__ctx[] CRYPTO_MINALIGN_ATTR;
- };
- 
-+#define HASH_MAX_DIGESTSIZE	 64
-+#define HASH_MAX_DESCSIZE	360
-+#define HASH_MAX_STATESIZE	512
++	if (alg->cra_blocksize > MAX_ALGAPI_BLOCKSIZE)
++		return -EINVAL;
 +
- #define SHASH_DESC_ON_STACK(shash, ctx)				  \
- 	char __##shash##_desc[sizeof(struct shash_desc) +	  \
--		crypto_shash_descsize(ctx)] CRYPTO_MINALIGN_ATTR; \
-+		HASH_MAX_DESCSIZE] CRYPTO_MINALIGN_ATTR; \
- 	struct shash_desc *shash = (struct shash_desc *)__##shash##_desc
++	/* Lower maximums for specific alg types. */
+ 	if (!alg->cra_type && (alg->cra_flags & CRYPTO_ALG_TYPE_MASK) ==
+ 			       CRYPTO_ALG_TYPE_CIPHER) {
+ 		if (alg->cra_alignmask > MAX_CIPHER_ALIGNMASK)
+diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
+index bd5e8ccf1687..21371ac8f355 100644
+--- a/include/crypto/algapi.h
++++ b/include/crypto/algapi.h
+@@ -20,8 +20,10 @@
+ /*
+  * Maximum values for blocksize and alignmask, used to allocate
+  * static buffers that are big enough for any combination of
+- * ciphers and architectures.
++ * algs and architectures. Ciphers have a lower maximum size.
+  */
++#define MAX_ALGAPI_BLOCKSIZE		160
++#define MAX_ALGAPI_ALIGNMASK		63
+ #define MAX_CIPHER_BLOCKSIZE		16
+ #define MAX_CIPHER_ALIGNMASK		15
  
- /**
 -- 
 2.17.1
