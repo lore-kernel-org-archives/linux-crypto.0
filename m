@@ -1,99 +1,115 @@
-From: "Tian, Kevin" <kevin.tian@intel.com>
-Subject: RE: [RFC PATCH 0/7] A General Accelerator Framework, WarpDrive
-Date: Thu, 2 Aug 2018 02:59:33 +0000
-Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D191290EB3@SHSMSX101.ccr.corp.intel.com>
+From: Kenneth Lee <liguozhu-C8/M+/jPZTeaMJb+Lgu22Q@public.gmane.org>
+Subject: Re: [RFC PATCH 3/7] vfio: add spimdev support
+Date: Thu, 2 Aug 2018 11:07:01 +0800
+Message-ID: <20180802030701.GI160746@Turing-Arch-b>
 References: <20180801102221.5308-1-nek.in.cn@gmail.com>
+	<20180801102221.5308-4-nek.in.cn@gmail.com>
+	<d11c7745-2f31-0f33-1bd8-78379dc66e6e@infradead.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-Cc: "linuxarm@huawei.com" <linuxarm@huawei.com>
-To: Kenneth Lee <nek.in.cn@gmail.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Joerg Roedel <joro@8bytes.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Kenneth Lee <liguozhu@hisilicon.com>,
-        Hao Fang <fanghao11@huawei.com>,
-        Zhou Wang <wangzhou1@hisilicon.com>,
-        Zaibo Xu <xuzaibo@huawei.com>,
-        Philippe Ombredanne <pombredanne@nexb.com>,
-        "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "kv
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180801102221.5308-1-nek.in.cn@gmail.com>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: Kenneth Lee <nek.in.cn-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+	kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Jonathan Corbet <corbet-T1hC0tSOHrs@public.gmane.org>,
+	Greg Kroah-Hartman <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>, linux-doc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Sanjay Kumar <sanjay.k.kumar-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>, Hao Fang <fanghao11-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>,
+	iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linuxarm-hv44wF8Li93QT0dZR+AlfA@public.gmane.org, Alex Williamson <alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	Thomas Gleixner <tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org>, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Philippe Ombredanne <pombredanne-od1rfyK75/E@public.gmane.org>, Zaibo Xu <xuzaibo-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>,
+	"David S . Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
+	linux-accelerators-uLR06cmDAlY/bJ5BZ2RsiQ@public.gmane.org
+To: Randy Dunlap <rdunlap-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <d11c7745-2f31-0f33-1bd8-78379dc66e6e-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-> From: Kenneth Lee
-> Sent: Wednesday, August 1, 2018 6:22 PM
-> 
-> From: Kenneth Lee <liguozhu@hisilicon.com>
-> 
-> WarpDrive is an accelerator framework to expose the hardware capabilities
-> directly to the user space. It makes use of the exist vfio and vfio-mdev
-> facilities. So the user application can send request and DMA to the
-> hardware without interaction with the kernel. This remove the latency
-> of syscall and context switch.
-> 
-> The patchset contains documents for the detail. Please refer to it for more
-> information.
-> 
-> This patchset is intended to be used with Jean Philippe Brucker's SVA
-> patch [1] (Which is also in RFC stage). But it is not mandatory. This
-> patchset is tested in the latest mainline kernel without the SVA patches.
-> So it support only one process for each accelerator.
-
-If no sharing, then why not just assigning the whole parent device to
-the process? IMO if SVA usage is the clear goal of your series, it
-might be made clearly so then Jean's series is mandatory dependency...
-
-> 
-> With SVA support, WarpDrive can support multi-process in the same
-> accelerator device.  We tested it in our SoC integrated Accelerator (board
-> ID: D06, Chip ID: HIP08). A reference work tree can be found here: [2].
-> 
-> We have noticed the IOMMU aware mdev RFC announced recently [3].
-> 
-> The IOMMU aware mdev has similar idea but different intention comparing
-> to
-> WarpDrive. It intends to dedicate part of the hardware resource to a VM.
-
-Not just to VM, though I/O Virtualization is in the name. You can assign
-such mdev to either VMs, containers, or bare metal processes. It's just
-a fully-isolated device from user space p.o.v.
-
-> And the design is supposed to be used with Scalable I/O Virtualization.
-> While spimdev is intended to share the hardware resource with a big
-> amount
-> of processes.  It just requires the hardware supporting address
-> translation per process (PCIE's PASID or ARM SMMU's substream ID).
-> 
-> But we don't see serious confliction on both design. We believe they can be
-> normalized as one.
-
-yes there are something which can be shared, e.g. regarding to
-the interface to IOMMU.
-
-Conceptually I see them different mindset on device resource sharing:
-
-WarpDrive more aims to provide a generic framework to enable SVA
-usages on various accelerators, which lack of a well-abstracted user
-API like OpenCL. SVA is a hardware capability - sort of exposing resources
-composing ONE capability to user space through mdev framework. It is
-not like a VF which naturally carries most capabilities as PF.
-
-Intel Scalable I/O virtualization is a thorough design to partition the
-device into minimal sharable copies (queue, queue pair, context), 
-while each copy carries most PF capabilities (including SVA) similar to
-VF. Also with IOMMU scalable mode support, the copy can be 
-independently assigned to any client (process, container, VM, etc.)
-
-Thanks
-Kevin
+T24gV2VkLCBBdWcgMDEsIDIwMTggYXQgMDk6MjM6NTJBTSAtMDcwMCwgUmFuZHkgRHVubGFwIHdy
+b3RlOgo+IERhdGU6IFdlZCwgMSBBdWcgMjAxOCAwOToyMzo1MiAtMDcwMAo+IEZyb206IFJhbmR5
+IER1bmxhcCA8cmR1bmxhcEBpbmZyYWRlYWQub3JnPgo+IFRvOiBLZW5uZXRoIExlZSA8bmVrLmlu
+LmNuQGdtYWlsLmNvbT4sIEpvbmF0aGFuIENvcmJldCA8Y29yYmV0QGx3bi5uZXQ+LAo+ICBIZXJi
+ZXJ0IFh1IDxoZXJiZXJ0QGdvbmRvci5hcGFuYS5vcmcuYXU+LCAiRGF2aWQgUyAuIE1pbGxlciIK
+PiAgPGRhdmVtQGRhdmVtbG9mdC5uZXQ+LCBKb2VyZyBSb2VkZWwgPGpvcm9AOGJ5dGVzLm9yZz4s
+IEFsZXggV2lsbGlhbXNvbgo+ICA8YWxleC53aWxsaWFtc29uQHJlZGhhdC5jb20+LCBLZW5uZXRo
+IExlZSA8bGlndW96aHVAaGlzaWxpY29uLmNvbT4sIEhhbwo+ICBGYW5nIDxmYW5naGFvMTFAaHVh
+d2VpLmNvbT4sIFpob3UgV2FuZyA8d2FuZ3pob3UxQGhpc2lsaWNvbi5jb20+LCBaYWlibyBYdQo+
+ICA8eHV6YWlib0BodWF3ZWkuY29tPiwgUGhpbGlwcGUgT21icmVkYW5uZSA8cG9tYnJlZGFubmVA
+bmV4Yi5jb20+LCBHcmVnCj4gIEtyb2FoLUhhcnRtYW4gPGdyZWdraEBsaW51eGZvdW5kYXRpb24u
+b3JnPiwgVGhvbWFzIEdsZWl4bmVyCj4gIDx0Z2x4QGxpbnV0cm9uaXguZGU+LCBsaW51eC1kb2NA
+dmdlci5rZXJuZWwub3JnLAo+ICBsaW51eC1rZXJuZWxAdmdlci5rZXJuZWwub3JnLCBsaW51eC1j
+cnlwdG9Admdlci5rZXJuZWwub3JnLAo+ICBpb21tdUBsaXN0cy5saW51eC1mb3VuZGF0aW9uLm9y
+Zywga3ZtQHZnZXIua2VybmVsLm9yZywKPiAgbGludXgtYWNjZWxlcmF0b3JzQGxpc3RzLm96bGFi
+cy5vcmcsIEx1IEJhb2x1IDxiYW9sdS5sdUBsaW51eC5pbnRlbC5jb20+LAo+ICBTYW5qYXkgS3Vt
+YXIgPHNhbmpheS5rLmt1bWFyQGludGVsLmNvbT4KPiBDQzogbGludXhhcm1AaHVhd2VpLmNvbQo+
+IFN1YmplY3Q6IFJlOiBbUkZDIFBBVENIIDMvN10gdmZpbzogYWRkIHNwaW1kZXYgc3VwcG9ydAo+
+IFVzZXItQWdlbnQ6IE1vemlsbGEvNS4wIChYMTE7IExpbnV4IHg4Nl82NDsgcnY6NTIuMCkgR2Vj
+a28vMjAxMDAxMDEKPiAgVGh1bmRlcmJpcmQvNTIuOS4xCj4gTWVzc2FnZS1JRDogPGQxMWM3NzQ1
+LTJmMzEtMGYzMy0xYmQ4LTc4Mzc5ZGM2NmU2ZUBpbmZyYWRlYWQub3JnPgo+IAo+IE9uIDA4LzAx
+LzIwMTggMDM6MjIgQU0sIEtlbm5ldGggTGVlIHdyb3RlOgo+ID4gRnJvbTogS2VubmV0aCBMZWUg
+PGxpZ3Vvemh1QGhpc2lsaWNvbi5jb20+Cj4gPiAKPiA+IFNQSU1ERVYgaXMgIlNoYXJlIFBhcmVu
+dCBJT01NVSBNZGV2Ii4gSXQgaXMgYSB2ZmlvLW1kZXYuIEJ1dCBkaWZmZXIgZnJvbQo+ID4gdGhl
+IGdlbmVyYWwgdmZpby1tZGV2Ogo+ID4gCj4gPiAxLiBJdCBzaGFyZXMgaXRzIHBhcmVudCdzIElP
+TU1VLgo+ID4gMi4gVGhlcmUgaXMgbm8gaGFyZHdhcmUgcmVzb3VyY2UgYXR0YWNoZWQgdG8gdGhl
+IG1kZXYgaXMgY3JlYXRlZC4gVGhlCj4gPiBoYXJkd2FyZSByZXNvdXJjZSAoQSBgcXVldWUnKSBp
+cyBhbGxvY2F0ZWQgb25seSB3aGVuIHRoZSBtZGV2IGlzCj4gPiBvcGVuZWQuCj4gPiAKPiA+IEN1
+cnJlbnRseSBvbmx5IHRoZSB2ZmlvIHR5cGUtMSBkcml2ZXIgaXMgdXBkYXRlZCB0byBtYWtlIGl0
+IHRvIGJlIGF3YXJlCj4gPiBvZi4KPiA+IAo+ID4gU2lnbmVkLW9mZi1ieTogS2VubmV0aCBMZWUg
+PGxpZ3Vvemh1QGhpc2lsaWNvbi5jb20+Cj4gPiBTaWduZWQtb2ZmLWJ5OiBaYWlibyBYdSA8eHV6
+YWlib0BodWF3ZWkuY29tPgo+ID4gU2lnbmVkLW9mZi1ieTogWmhvdSBXYW5nIDx3YW5nemhvdTFA
+aGlzaWxpY29uLmNvbT4KPiA+IC0tLQo+ID4gIGRyaXZlcnMvdmZpby9LY29uZmlnICAgICAgICAg
+ICAgICAgIHwgICAxICsKPiA+ICBkcml2ZXJzL3ZmaW8vTWFrZWZpbGUgICAgICAgICAgICAgICB8
+ICAgMSArCj4gPiAgZHJpdmVycy92ZmlvL3NwaW1kZXYvS2NvbmZpZyAgICAgICAgfCAgMTAgKwo+
+ID4gIGRyaXZlcnMvdmZpby9zcGltZGV2L01ha2VmaWxlICAgICAgIHwgICAzICsKPiA+ICBkcml2
+ZXJzL3ZmaW8vc3BpbWRldi92ZmlvX3NwaW1kZXYuYyB8IDQyMSArKysrKysrKysrKysrKysrKysr
+KysrKysrKysrCj4gPiAgZHJpdmVycy92ZmlvL3ZmaW9faW9tbXVfdHlwZTEuYyAgICAgfCAxMzYg
+KysrKysrKystCj4gPiAgaW5jbHVkZS9saW51eC92ZmlvX3NwaW1kZXYuaCAgICAgICAgfCAgOTUg
+KysrKysrKwo+ID4gIGluY2x1ZGUvdWFwaS9saW51eC92ZmlvX3NwaW1kZXYuaCAgIHwgIDI4ICsr
+Cj4gPiAgOCBmaWxlcyBjaGFuZ2VkLCA2ODkgaW5zZXJ0aW9ucygrKSwgNiBkZWxldGlvbnMoLSkK
+PiA+ICBjcmVhdGUgbW9kZSAxMDA2NDQgZHJpdmVycy92ZmlvL3NwaW1kZXYvS2NvbmZpZwo+ID4g
+IGNyZWF0ZSBtb2RlIDEwMDY0NCBkcml2ZXJzL3ZmaW8vc3BpbWRldi9NYWtlZmlsZQo+ID4gIGNy
+ZWF0ZSBtb2RlIDEwMDY0NCBkcml2ZXJzL3ZmaW8vc3BpbWRldi92ZmlvX3NwaW1kZXYuYwo+ID4g
+IGNyZWF0ZSBtb2RlIDEwMDY0NCBpbmNsdWRlL2xpbnV4L3ZmaW9fc3BpbWRldi5oCj4gPiAgY3Jl
+YXRlIG1vZGUgMTAwNjQ0IGluY2x1ZGUvdWFwaS9saW51eC92ZmlvX3NwaW1kZXYuaAo+ID4gCj4g
+PiBkaWZmIC0tZ2l0IGEvZHJpdmVycy92ZmlvL3NwaW1kZXYvS2NvbmZpZyBiL2RyaXZlcnMvdmZp
+by9zcGltZGV2L0tjb25maWcKPiA+IG5ldyBmaWxlIG1vZGUgMTAwNjQ0Cj4gPiBpbmRleCAwMDAw
+MDAwMDAwMDAuLjEyMjYzMDFmOWQwZQo+ID4gLS0tIC9kZXYvbnVsbAo+ID4gKysrIGIvZHJpdmVy
+cy92ZmlvL3NwaW1kZXYvS2NvbmZpZwo+ID4gQEAgLTAsMCArMSwxMCBAQAo+ID4gKyMgU1BEWC1M
+aWNlbnNlLUlkZW50aWZpZXI6IEdQTC0yLjAKPiA+ICtjb25maWcgVkZJT19TUElNREVWCj4gPiAr
+CXRyaXN0YXRlICJTdXBwb3J0IGZvciBTaGFyZSBQYXJlbnQgSU9NTVUgTURFViIKPiA+ICsJZGVw
+ZW5kcyBvbiBWRklPX01ERVZfREVWSUNFCj4gPiArCWhlbHAKPiA+ICsJICBTdXBwb3J0IGZvciBW
+RklPIFNoYXJlIFBhcmVudCBJT01NVSBNREVWLCB3aGljaCBlbmFibGUgdGhlIGtlcm5lbCB0bwo+
+IAo+IAkgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGVu
+YWJsZXMKPiAKPiA+ICsJICBzdXBwb3J0IGZvciB0aGUgbGlnaHQgd2VpZ2h0IGhhcmR3YXJlIGFj
+Y2VsZXJhdG9yIGZyYW1ld29yaywgV3JhcERyaXZlLgo+IAo+IAkgIHN1cHBvcnQgdGhlIGxpZ2h0
+d2VpZ2h0IGhhcmR3YXJlIGFjY2VsZXJhdG9yIGZyYW1ld29yaywgV3JhcERyaXZlLgo+IAo+ID4g
+Kwo+ID4gKwkgIFRvIGNvbXBpbGUgdGhpcyBhcyBhIG1vZHVsZSwgY2hvb3NlIE0gaGVyZTogdGhl
+IG1vZHVsZSB3aWxsIGJlIGNhbGxlZAo+ID4gKwkgIHNwaW1kZXYuCj4gCj4gCj4gLS0gCj4gflJh
+bmR5CgpUaGFua3MsIEkgd2lsbCB1cGRhdGUgaXQgaW4gbmV4dCB2ZXJzaW9uLgoKLS0gCgkJCS1L
+ZW5uZXRoKEhpc2lsaWNvbikKCj09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09CuacrOmCruS7tuWPiuWF
+tumZhOS7tuWQq+acieWNjuS4uuWFrOWPuOeahOS/neWvhuS/oeaBr++8jOS7hemZkOS6juWPkemA
+gee7meS4iumdouWcsOWdgOS4reWIl+WHuueahOS4quS6uuaIlue+pOe7hOOAguemgQrmraLku7vk
+vZXlhbbku5bkurrku6Xku7vkvZXlvaLlvI/kvb/nlKjvvIjljIXmi6zkvYbkuI3pmZDkuo7lhajp
+g6jmiJbpg6jliIblnLDms4TpnLLjgIHlpI3liLbjgIHmiJbmlaPlj5HvvInmnKzpgq7ku7bkuK0K
+55qE5L+h5oGv44CC5aaC5p6c5oKo6ZSZ5pS25LqG5pys6YKu5Lu277yM6K+35oKo56uL5Y2z55S1
+6K+d5oiW6YKu5Lu26YCa55+l5Y+R5Lu25Lq65bm25Yig6Zmk5pys6YKu5Lu277yBClRoaXMgZS1t
+YWlsIGFuZCBpdHMgYXR0YWNobWVudHMgY29udGFpbiBjb25maWRlbnRpYWwgaW5mb3JtYXRpb24g
+ZnJvbSBIVUFXRUksCndoaWNoIGlzIGludGVuZGVkIG9ubHkgZm9yIHRoZSBwZXJzb24gb3IgZW50
+aXR5IHdob3NlIGFkZHJlc3MgaXMgbGlzdGVkIGFib3ZlLgpBbnkgdXNlIG9mIHRoZSAKaW5mb3Jt
+YXRpb24gY29udGFpbmVkIGhlcmVpbiBpbiBhbnkgd2F5IChpbmNsdWRpbmcsIGJ1dCBub3QgbGlt
+aXRlZCB0bywgdG90YWwgb3IKcGFydGlhbCBkaXNjbG9zdXJlLCByZXByb2R1Y3Rpb24sIG9yIGRp
+c3NlbWluYXRpb24pIGJ5IHBlcnNvbnMgb3RoZXIgdGhhbiB0aGUKaW50ZW5kZWQgCnJlY2lwaWVu
+dChzKSBpcyBwcm9oaWJpdGVkLiBJZiB5b3UgcmVjZWl2ZSB0aGlzIGUtbWFpbCBpbiBlcnJvciwg
+cGxlYXNlIG5vdGlmeQp0aGUgc2VuZGVyIGJ5IHBob25lIG9yIGVtYWlsIGltbWVkaWF0ZWx5IGFu
+ZCBkZWxldGUgaXQhCgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fXwppb21tdSBtYWlsaW5nIGxpc3QKaW9tbXVAbGlzdHMubGludXgtZm91bmRhdGlvbi5vcmcK
+aHR0cHM6Ly9saXN0cy5saW51eGZvdW5kYXRpb24ub3JnL21haWxtYW4vbGlzdGluZm8vaW9tbXU=
