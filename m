@@ -1,47 +1,28 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Crypto Fixes for 4.18
-Date: Fri, 3 Aug 2018 13:44:20 +0800
-Message-ID: <20180803054420.4eehj2uneqimcf7g@gondor.apana.org.au>
-References: <20170223125141.GA17400@gondor.apana.org.au>
- <20170714141855.GA29426@gondor.apana.org.au>
- <20170922084401.GA15541@gondor.apana.org.au>
- <20171128230929.GA17783@gondor.apana.org.au>
- <20171222064931.GA27068@gondor.apana.org.au>
- <20180105073808.GA14405@gondor.apana.org.au>
- <20180212031702.GA26153@gondor.apana.org.au>
- <20180428080517.haxgpvqrwgotakyo@gondor.apana.org.au>
- <20180622145403.6ltjip7che227fuo@gondor.apana.org.au>
- <20180719073931.q5ny7tqgwws27lnq@gondor.apana.org.au>
+From: David Howells <dhowells@redhat.com>
+Subject: Re: [PATCH v6 16/18] rxrpc: Reuse SKCIPHER_REQUEST_ON_STACK buffer
+Date: Fri, 03 Aug 2018 10:14:28 +0100
+Message-ID: <9082.1533287668@warthog.procyon.org.uk>
+References: <CAGXu5jLVNnUXkyzGdee3zvLHw5zMaDhEGm4c4YLqU=L8q9TshA@mail.gmail.com> <20180724164936.37477-1-keescook@chromium.org> <20180724164936.37477-17-keescook@chromium.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20180719073931.q5ny7tqgwws27lnq@gondor.apana.org.au>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Cc: dhowells@redhat.com, Herbert Xu <herbert@gondor.apana.org.au>,
+        Eric Biggers <ebiggers@google.com>,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+        linux-crypto <linux-crypto@vger.kernel.org>,
+        Network Development <netdev@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>
+To: Kees Cook <keescook@chromium.org>
+Return-path: <netdev-owner@vger.kernel.org>
+In-Reply-To: <CAGXu5jLVNnUXkyzGdee3zvLHw5zMaDhEGm4c4YLqU=L8q9TshA@mail.gmail.com>
+Content-ID: <9081.1533287668.1@warthog.procyon.org.uk>
+Sender: netdev-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi Linus: 
+Hmmm...  I'm wondering if the skcipher request should be allocated on call
+initialisation and a pointer put in the rxrpc_call struct.  It's only used
+serially for any particular call.
 
-This push fixes memory corruption in the padlock-aes driver.
+For the moment, I'll pass your patch onto DaveM.
 
-
-Please pull from
-
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
-
-
-Herbert Xu (1):
-      crypto: padlock-aes - Fix Nano workaround data corruption
-
- drivers/crypto/padlock-aes.c |    8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+David
