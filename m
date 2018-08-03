@@ -1,113 +1,182 @@
-From: Yu Chen <yu.c.chen@intel.com>
-Subject: Re: [PATCH 0/4][RFC v2] Introduce the in-kernel hibernation
- encryption
-Date: Fri, 3 Aug 2018 11:37:02 +0800
-Message-ID: <20180803033702.GB416@sandybridge-desktop>
-References: <20180718202235.GA4132@amd>
- <20180718235851.GA22170@sandybridge-desktop>
- <20180719110149.GA4679@amd>
- <20180719132003.GA30981@sandybridge-desktop>
- <20180720102532.GA20284@amd>
- <1532346156.3057.11.camel@suse.com>
- <20180723162302.GA4503@sandybridge-desktop>
- <1532590246.7411.3.camel@suse.com>
- <20180726081404.GG4244@linux-l9pv.suse>
- <20180730170415.GQ4244@linux-l9pv.suse>
+From: Kenneth Lee <liguozhu-C8/M+/jPZTeaMJb+Lgu22Q@public.gmane.org>
+Subject: Re: [RFC PATCH 0/7] A General Accelerator Framework, WarpDrive
+Date: Fri, 3 Aug 2018 11:47:21 +0800
+Message-ID: <20180803034721.GC91035@Turing-Arch-b>
+References: <20180801102221.5308-1-nek.in.cn@gmail.com>
+	<20180801165644.GA3820@redhat.com>
+	<AADFC41AFE54684AB9EE6CBC0274A5D191290E1A@SHSMSX101.ccr.corp.intel.com>
+	<20180802040557.GL160746@Turing-Arch-b>
+	<20180802142243.GA3481@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Oliver Neukum <oneukum@suse.com>, Pavel Machek <pavel@ucw.cz>,
-        "Rafael J . Wysocki" <rafael.j.wysocki@intel.com>,
-        Eric Biggers <ebiggers@google.com>,
-        Theodore Ts o <tytso@mit.edu>,
-        Stephan Mueller <smueller@chronox.de>,
-        Denis Kenzior <denkenz@gmail.com>, linux-pm@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        "Gu, Kookoo" <kookoo.gu@intel.com>,
-        "Zhang, Rui" <rui.zhang@intel.com>
-To: joeyli <jlee@suse.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: "Tian, Kevin" <kevin.tian-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
+	Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+	"kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Jonathan Corbet <corbet-T1hC0tSOHrs@public.gmane.org>,
+	Greg Kroah-Hartman <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>,
+	Zaibo Xu <xuzaibo-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>,
+	"linux-doc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-doc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, "Kumar,
+	Sanjay K" <sanjay.k.kumar-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>, Hao Fang <fanghao11-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>,
+	"iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org" <iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>,
+	"linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	"linuxarm-hv44wF8Li93QT0dZR+AlfA@public.gmane.org" <linuxarm-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>,
+	Alex Williamson <alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	"linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Philippe Ombredanne <pombredanne-od1rfyK75/E@public.gmane.org>,
+	Thomas Gleixner <tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org>, Kenneth Lee <nek.in.cn-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	"David S . Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
+	"linux-accelerators-uLR06cmDAlY/bJ5BZ2RsiQ@public.gmane.org" <linux-accelerators@
+To: Jerome Glisse <jglisse-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
 Content-Disposition: inline
-In-Reply-To: <20180730170415.GQ4244@linux-l9pv.suse>
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <20180802142243.GA3481-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi Joey,
-On Tue, Jul 31, 2018 at 01:04:15AM +0800, joeyli wrote:
-> Hi all,
-> 
-> On Thu, Jul 26, 2018 at 04:14:04PM +0800, joeyli wrote:
-> > On Thu, Jul 26, 2018 at 09:30:46AM +0200, Oliver Neukum wrote:
-> > > On Di, 2018-07-24 at 00:23 +0800, Yu Chen wrote:
-> > > > 
-> > > > Good point, we once tried to generate key in kernel, but people
-> > > > suggest to generate key in userspace and provide it to the
-> > > > kernel, which is what ecryptfs do currently, so it seems this
-> > > > should also be safe for encryption in kernel.
-> > > > https://www.spinics.net/lists/linux-crypto/msg33145.html
-> > > > Thus Chun-Yi's signature can use EFI key and both the key from
-> > > > user space.
-> > > 
-> > > Hi,
-> > > 
-> > > ecryptfs can trust user space. It is supposed to keep data
-> > > safe while the system is inoperative. The whole point of Secure
-> > > Boot is a cryptographic system of trust that does not include
-> > > user space.
-> > > 
-> > > I seriously doubt we want to use trusted computing here. So the
-> > > key needs to be generated in kernel space and stored in a safe
-> > > manner. As we have a saolution doing that, can we come to ausable
-> > > synthesis?
-> > > 
-> > > 	Regards
-> > > 		Oliver
-> > 
-> > Crurently there have two solutions, they are trusted key and EFI key.
-> > Both of them are generated in kernel and are not visible in user space.
-> > 
-> > The trusted key is generated by kernel then sealed by the TPM's
-> > SRK. So the trusted key can be stored in anywhere then be enrolled
-> > to kernel when we need it. EVM already uses it.
-> > 
-> > The EFI key is Jiri Kosina's idea. It is stored in boot services
-> > variable, which means that it can only be access by signed EFI binary
-> > (e.g. signed EFI boot stub) when secure boot be enabled. SLE applied
-> > this solution a couple of years.
-> > 
-> > I am working on put the EFI key to key retention service. Then
-> > EFI key can be a master key of encrypted key. EVM can also use
-> > it: 
-> > https://github.com/joeyli/linux-s4sign/commit/bae39460393ada4c0226dd07cd5e3afcef86b71f
-> > https://github.com/joeyli/linux-s4sign/commit/f552f97cc3cca5acd84f424b7f946ffb5fe8e9ec
-> > 
-> > That's why I want to use key retention service in hibernation
-> > encryption/authentication. Which means that we can use key
-> > API to access trusted key and EFI key.  
-> >
-> 
-> Here is a proof of concept for using the key retention service
-> to encrypt/sign snapshot image. It's using EFI key now, I will
-> add encrypted key support in the key handler later:
->     https://github.com/joeyli/linux-s4sign/commit/6311e97038974bc5de8121769fb4d34470009566 
-> 
-Thanks for the work, I have two questions here:
-1. Could you please describe a little more about the scenario on
-   how the user could use the secret key for hibernation encryption?
-   A requirement is that, the user should provide a passphrase(for key derivation, i.e.)
-   during resume. I was thinking how user could interact with
-   the security key mechanism here.
-
-2. The generation of secret key in EFI boot environment is
-   using a non standard derivation method in generate_secret_key(),
-   I'm not sure if this is safe enough. This is why we tried to put
-   PBKDF2 into kernel at first and leave it to the user space then.
-
-Best,
-Yu
-
-> My next step is that cleaning up the my EFI key type patches and
-> submit it to EFI/keys subsystem ASAP. Then I will clean up
-> my hibernation encryption/authentication solution for reviewing.
-> 
-> Thanks
-> Joey Lee 
+T24gVGh1LCBBdWcgMDIsIDIwMTggYXQgMTA6MjI6NDNBTSAtMDQwMCwgSmVyb21lIEdsaXNzZSB3
+cm90ZToKPiBEYXRlOiBUaHUsIDIgQXVnIDIwMTggMTA6MjI6NDMgLTA0MDAKPiBGcm9tOiBKZXJv
+bWUgR2xpc3NlIDxqZ2xpc3NlQHJlZGhhdC5jb20+Cj4gVG86IEtlbm5ldGggTGVlIDxsaWd1b3po
+dUBoaXNpbGljb24uY29tPgo+IENDOiAiVGlhbiwgS2V2aW4iIDxrZXZpbi50aWFuQGludGVsLmNv
+bT4sIEhhbyBGYW5nIDxmYW5naGFvMTFAaHVhd2VpLmNvbT4sCj4gIEFsZXggV2lsbGlhbXNvbiA8
+YWxleC53aWxsaWFtc29uQHJlZGhhdC5jb20+LCBIZXJiZXJ0IFh1Cj4gIDxoZXJiZXJ0QGdvbmRv
+ci5hcGFuYS5vcmcuYXU+LCAia3ZtQHZnZXIua2VybmVsLm9yZyIKPiAgPGt2bUB2Z2VyLmtlcm5l
+bC5vcmc+LCBKb25hdGhhbiBDb3JiZXQgPGNvcmJldEBsd24ubmV0PiwgR3JlZwo+ICBLcm9haC1I
+YXJ0bWFuIDxncmVna2hAbGludXhmb3VuZGF0aW9uLm9yZz4sIFphaWJvIFh1IDx4dXphaWJvQGh1
+YXdlaS5jb20+LAo+ICAibGludXgtZG9jQHZnZXIua2VybmVsLm9yZyIgPGxpbnV4LWRvY0B2Z2Vy
+Lmtlcm5lbC5vcmc+LCAiS3VtYXIsIFNhbmpheSBLIgo+ICA8c2FuamF5Lmsua3VtYXJAaW50ZWwu
+Y29tPiwgS2VubmV0aCBMZWUgPG5lay5pbi5jbkBnbWFpbC5jb20+LAo+ICAiaW9tbXVAbGlzdHMu
+bGludXgtZm91bmRhdGlvbi5vcmciIDxpb21tdUBsaXN0cy5saW51eC1mb3VuZGF0aW9uLm9yZz4s
+Cj4gICJsaW51eC1rZXJuZWxAdmdlci5rZXJuZWwub3JnIiA8bGludXgta2VybmVsQHZnZXIua2Vy
+bmVsLm9yZz4sCj4gICJsaW51eGFybUBodWF3ZWkuY29tIiA8bGludXhhcm1AaHVhd2VpLmNvbT4s
+Cj4gICJsaW51eC1jcnlwdG9Admdlci5rZXJuZWwub3JnIiA8bGludXgtY3J5cHRvQHZnZXIua2Vy
+bmVsLm9yZz4sIFBoaWxpcHBlCj4gIE9tYnJlZGFubmUgPHBvbWJyZWRhbm5lQG5leGIuY29tPiwg
+VGhvbWFzIEdsZWl4bmVyIDx0Z2x4QGxpbnV0cm9uaXguZGU+LAo+ICAiRGF2aWQgUyAuIE1pbGxl
+ciIgPGRhdmVtQGRhdmVtbG9mdC5uZXQ+LAo+ICAibGludXgtYWNjZWxlcmF0b3JzQGxpc3RzLm96
+bGFicy5vcmciCj4gIDxsaW51eC1hY2NlbGVyYXRvcnNAbGlzdHMub3psYWJzLm9yZz4KPiBTdWJq
+ZWN0OiBSZTogW1JGQyBQQVRDSCAwLzddIEEgR2VuZXJhbCBBY2NlbGVyYXRvciBGcmFtZXdvcmss
+IFdhcnBEcml2ZQo+IFVzZXItQWdlbnQ6IE11dHQvMS4xMC4wICgyMDE4LTA1LTE3KQo+IE1lc3Nh
+Z2UtSUQ6IDwyMDE4MDgwMjE0MjI0My5HQTM0ODFAcmVkaGF0LmNvbT4KPiAKPiBPbiBUaHUsIEF1
+ZyAwMiwgMjAxOCBhdCAxMjowNTo1N1BNICswODAwLCBLZW5uZXRoIExlZSB3cm90ZToKPiA+IE9u
+IFRodSwgQXVnIDAyLCAyMDE4IGF0IDAyOjMzOjEyQU0gKzAwMDAsIFRpYW4sIEtldmluIHdyb3Rl
+Ogo+ID4gPiBEYXRlOiBUaHUsIDIgQXVnIDIwMTggMDI6MzM6MTIgKzAwMDAKPiA+ID4gPiBGcm9t
+OiBKZXJvbWUgR2xpc3NlCj4gPiA+ID4gT24gV2VkLCBBdWcgMDEsIDIwMTggYXQgMDY6MjI6MTRQ
+TSArMDgwMCwgS2VubmV0aCBMZWUgd3JvdGU6Cj4gPiA+ID4gPiBGcm9tOiBLZW5uZXRoIExlZSA8
+bGlndW96aHVAaGlzaWxpY29uLmNvbT4KPiA+ID4gPiA+Cj4gPiA+ID4gPiBXYXJwRHJpdmUgaXMg
+YW4gYWNjZWxlcmF0b3IgZnJhbWV3b3JrIHRvIGV4cG9zZSB0aGUgaGFyZHdhcmUKPiA+ID4gPiBj
+YXBhYmlsaXRpZXMKPiA+ID4gPiA+IGRpcmVjdGx5IHRvIHRoZSB1c2VyIHNwYWNlLiBJdCBtYWtl
+cyB1c2Ugb2YgdGhlIGV4aXN0IHZmaW8gYW5kIHZmaW8tbWRldgo+ID4gPiA+ID4gZmFjaWxpdGll
+cy4gU28gdGhlIHVzZXIgYXBwbGljYXRpb24gY2FuIHNlbmQgcmVxdWVzdCBhbmQgRE1BIHRvIHRo
+ZQo+ID4gPiA+ID4gaGFyZHdhcmUgd2l0aG91dCBpbnRlcmFjdGlvbiB3aXRoIHRoZSBrZXJuZWwu
+IFRoaXMgcmVtb3ZlIHRoZSBsYXRlbmN5Cj4gPiA+ID4gPiBvZiBzeXNjYWxsIGFuZCBjb250ZXh0
+IHN3aXRjaC4KPiA+ID4gPiA+Cj4gPiA+ID4gPiBUaGUgcGF0Y2hzZXQgY29udGFpbnMgZG9jdW1l
+bnRzIGZvciB0aGUgZGV0YWlsLiBQbGVhc2UgcmVmZXIgdG8gaXQgZm9yCj4gPiA+ID4gbW9yZQo+
+ID4gPiA+ID4gaW5mb3JtYXRpb24uCj4gPiA+ID4gPgo+ID4gPiA+ID4gVGhpcyBwYXRjaHNldCBp
+cyBpbnRlbmRlZCB0byBiZSB1c2VkIHdpdGggSmVhbiBQaGlsaXBwZSBCcnVja2VyJ3MgU1ZBCj4g
+PiA+ID4gPiBwYXRjaCBbMV0gKFdoaWNoIGlzIGFsc28gaW4gUkZDIHN0YWdlKS4gQnV0IGl0IGlz
+IG5vdCBtYW5kYXRvcnkuIFRoaXMKPiA+ID4gPiA+IHBhdGNoc2V0IGlzIHRlc3RlZCBpbiB0aGUg
+bGF0ZXN0IG1haW5saW5lIGtlcm5lbCB3aXRob3V0IHRoZSBTVkEgcGF0Y2hlcy4KPiA+ID4gPiA+
+IFNvIGl0IHN1cHBvcnQgb25seSBvbmUgcHJvY2VzcyBmb3IgZWFjaCBhY2NlbGVyYXRvci4KPiA+
+ID4gPiA+Cj4gPiA+ID4gPiBXaXRoIFNWQSBzdXBwb3J0LCBXYXJwRHJpdmUgY2FuIHN1cHBvcnQg
+bXVsdGktcHJvY2VzcyBpbiB0aGUgc2FtZQo+ID4gPiA+ID4gYWNjZWxlcmF0b3IgZGV2aWNlLiAg
+V2UgdGVzdGVkIGl0IGluIG91ciBTb0MgaW50ZWdyYXRlZCBBY2NlbGVyYXRvciAoYm9hcmQKPiA+
+ID4gPiA+IElEOiBEMDYsIENoaXAgSUQ6IEhJUDA4KS4gQSByZWZlcmVuY2Ugd29yayB0cmVlIGNh
+biBiZSBmb3VuZCBoZXJlOiBbMl0uCj4gPiA+ID4gCj4gPiA+ID4gSSBoYXZlIG5vdCBmdWxseSBp
+bnNwZWN0ZWQgdGhpbmdzIG5vciBkbyBpIGtub3cgZW5vdWdoIGFib3V0Cj4gPiA+ID4gdGhpcyBI
+aXNpbGljb24gWklQIGFjY2VsZXJhdG9yIHRvIGFzY2VydGFpbiwgYnV0IGZyb20gZ2xpbXBzaW5n
+Cj4gPiA+ID4gYXQgdGhlIGNvZGUgaXQgc2VlbXMgdGhhdCBpdCBpcyB1bnNhZmUgdG8gdXNlIGV2
+ZW4gd2l0aCBTVkEgZHVlCj4gPiA+ID4gdG8gdGhlIGRvb3JiZWxsLiBUaGVyZSBpcyBhIGNvbW1l
+bnQgdGFsa2luZyBhYm91dCBzYWZldHluZXNzCj4gPiA+ID4gaW4gcGF0Y2ggNy4KPiA+ID4gPiAK
+PiA+ID4gPiBFeHBvc2luZyB0aGluZyB0byB1c2Vyc3BhY2UgaXMgYWx3YXlzIGVudGljaW5nLCBi
+dXQgaWYgaXQgaXMKPiA+ID4gPiBhIHNlY3VyaXR5IHJpc2sgdGhlbiBpdCBzaG91bGQgY2xlYXJs
+eSBzYXkgc28gYW5kIG1heWJlIGEKPiA+ID4gPiBrZXJuZWwgYm9vdCBmbGFnIHNob3VsZCBiZSBu
+ZWNlc3NhcnkgdG8gYWxsb3cgc3VjaCBkZXZpY2UgdG8KPiA+ID4gPiBiZSB1c2UuCj4gPiA+ID4g
+Cj4gPiAKPiA+IEJ1dCBkb29yYmVsbCBpcyBqdXN0IGEgbm90aWZpY2F0aW9uLiBFeGNlcHQgZm9y
+IERPUyAodG8gbWFrZSBoYXJkd2FyZSBidXN5KSBpdAo+ID4gY2Fubm90IGFjdHVhbGx5IHRha2Ug
+b3IgY2hhbmdlIGFueXRoaW5nIGZyb20gdGhlIGtlcm5lbCBzcGFjZS4gQW5kIHRoZSBET1MKPiA+
+IHByb2JsZW0gY2FuIGJlIGFsd2F5cyB0YWtlbiBhcyB0aGUgcHJvYmxlbSB0aGF0IGEgZ3JvdXAg
+b2YgcHJvY2Vzc2VzIHNoYXJlIHRoZQo+ID4gc2FtZSBrZXJuZWwgZW50aXR5Lgo+ID4gCj4gPiBJ
+biB0aGUgY29taW5nIEhJUDA5IGhhcmR3YXJlLCB0aGUgZG9vcmJlbGwgd2lsbCBjb21lIHdpdGgg
+YSByYW5kb20gbnVtYmVyIHNvCj4gPiBvbmx5IHRoZSBwcm9jZXNzIHdobyBhbGxvY2F0ZWQgdGhl
+IHF1ZXVlIGNhbiBrbm9jayBpdCBjb3JyZWN0bHkuCj4gCj4gV2hlbiBkb29yYmVsbCBpcyByaW5n
+IHRoZSBoYXJkd2FyZSBzdGFydCBmZXRjaGluZyBjb21tYW5kcyBmcm9tCj4gdGhlIHF1ZXVlIGFu
+ZCBleGVjdXRlIHRoZW0gPyBJZiBzbyB0aGFuIGEgcm9ndWUgcHJvY2VzcyBCIG1pZ2h0Cj4gcmlu
+ZyB0aGUgZG9vcmJlbGwgb2YgcHJvY2VzcyBBIHdoaWNoIHdvdWxkIHN0YXJ0cyBleGVjdXRpb24g
+b2YKPiByYW5kb20gY29tbWFuZHMgKGllIHdoYXRldmVyIHJhbmRvbSBtZW1vcnkgdmFsdWUgdGhl
+cmUgaXMgbGVmdAo+IGluc2lkZSB0aGUgY29tbWFuZCBidWZmZXIgbWVtb3J5LCBjb3VsZCBiZSBv
+bGQgY29tbWFuZHMgaSBndWVzcykuCj4gCj4gSWYgdGhpcyBpcyBub3QgaG93IHRoaXMgZG9vcmJl
+bGwgd29ya3MgdGhlbiwgeWVzIGl0IGNhbiBvbmx5IGRvCj4gYSBkZW5pYWwgb2Ygc2VydmljZSBp
+IGd1ZXNzLiBJc3N1ZSBpIGhhdmUgd2l0aCBkb29yYmVsbCBpcyB0aGF0Cj4gaSBoYXZlIHNlZW4g
+MTAgZGlmZmVyZW50cyBpbXBsZW1lbnRhdGlvbnMgaW4gMTAgZGlmZmVyZW50cyBodwo+IGFuZCBl
+YWNoIGFyZSBkaWZmZXJlbnQgYXMgdG8gd2hhdCByaW5naW5nIG9yIHZhbHVlIHdyaXR0ZW4gdG8g
+dGhlCj4gZG9vcmJlbGwgZG9lcy4gSXQgaXMgcGFpbmZ1bGwgdG8gdHJhY2sgd2hhdCBpcyB3aGF0
+IGZvciBlYWNoIGh3Lgo+IAoKSW4gb3VyIGltcGxlbWVudGF0aW9uLCBkb29yYmVsbCBpcyBzaW1w
+bHkgYSBub3RpZmljYXRpb24sIGp1c3QgbGlrZSBhbiBpbnRlcnJ1cHQKdG8gdGhlIGFjY2VsZXJh
+dG9yLiBUaGUgY29tbWFuZCBpcyBhbGwgYWJvdXQgd2hhdCdzIGluIHRoZSBxdWV1ZS4KCkkgYWdy
+ZWUgdGhhdCB0aGVyZSBpcyBubyBzaW1wbGUgYW5kIHN0YW5kYXJkIHdheSB0byB0cmFjayB0aGUg
+c2hhcmVkIElPIHNwYWNlLgpCdXQgSSB0aGluayB3ZSBoYXZlIHRvIHRydXN0IHRoZSBkcml2ZXIg
+aW4gc29tZSB3YXkuIElmIHRoZSBkcml2ZXIgaXMgbWFsaWNpb3VzLApldmVuIGEgc2ltcGxlIGlv
+Y3RsIGNhbiBiZWNvbWUgYW4gYXR0YWNrLgoKPiAKPiA+ID4gPiBNeSBtb3JlIGdlbmVyYWwgcXVl
+c3Rpb24gaXMgZG8gd2Ugd2FudCB0byBncm93IFZGSU8gdG8gYmVjb21lCj4gPiA+ID4gYSBtb3Jl
+IGdlbmVyaWMgZGV2aWNlIGRyaXZlciBBUEkuIFRoaXMgcGF0Y2hzZXQgYWRkcyBhIGNvbW1hbmQK
+PiA+ID4gPiBxdWV1ZSBjb25jZXB0IHRvIGl0IChpIGRvbid0IHRoaW5rIGl0IGV4aXN0IHRvZGF5
+IGJ1dCBpIGhhdmUKPiA+ID4gPiBub3QgZm9sbG93IFZGSU8gY2xvc2VseSkuCj4gPiA+ID4gCj4g
+PiAKPiA+IFRoZSB0aGluZyBpcywgVkZJTyBpcyB0aGUgb25seSBwbGFjZSB0byBzdXBwb3J0IERN
+QSBmcm9tIHVzZXIgbGFuZC4gSWYgd2UgZG9uJ3QKPiA+IHB1dCBpdCBoZXJlLCB3ZSBoYXZlIHRv
+IGNyZWF0ZSBhbm90aGVyIHNpbWlsYXIgZmFjaWxpdHkgdG8gc3VwcG9ydCB0aGUgc2FtZS4KPiAK
+PiBObyBpdCBpcyBub3QsIG5ldHdvcmsgZGV2aWNlLCBHUFUsIGJsb2NrIGRldmljZSwgLi4uIHRo
+ZXkgYWxsIGRvCj4gc3VwcG9ydCBETUEuIFRoZSBwb2ludCBpIGFtIHRyeWluZyB0byBtYWtlIGhl
+cmUgaXMgdGhhdCBldmVuIGluCgpTb3JyeSwgd2FpdCBhIG1pbnV0ZSwgYXJlIHdlIHRhbGtpbmcg
+dGhlIHNhbWUgdGhpbmc/IEkgbWVhbnQgIkRNQSBmcm9tIHVzZXIKbGFuZCIsIG5vdCAiRE1BIGZy
+b20ga2VybmVsIGRyaXZlciIuIFRvIGRvIHRoYXQgd2UgaGF2ZSB0byBtYW5pcHVsYXRlIHRoZQpJ
+T01NVShVbml0KS4gSSB0aGluayBpdCBjYW4gb25seSBiZSBkb25lIGJ5IGRlZmF1bHRfZG9tYWlu
+IG9yIHZmaW8gZG9tYWluLiBPcgp0aGUgdXNlciBzcGFjZSBoYXZlIHRvIGRpcmVjdGx5IGFjY2Vz
+cyB0aGUgSU9NTVUuCgo+IHlvdXIgbWVjaGFuaXNtcyB0aGUgdXNlcnNwYWNlIG11c3QgaGF2ZSBh
+IHNwZWNpZmljIHVzZXJzcGFjZQo+IGRyaXZlcnMgZm9yIGVhY2ggaGFyZHdhcmUgYW5kIHRodXMg
+dGhlcmUgYXJlIHZpcnR1YWxseSBubwo+IGRpZmZlcmVuY2VzIGJldHdlZW4gaGF2aW5nIHRoaXMg
+dXNlcnNwYWNlIGRyaXZlciBvcGVuIGEgZGV2aWNlCj4gZmlsZSBpbiB2ZmlvIG9yIHNvbWV3aGVy
+ZSBlbHNlIGluIHRoZSBkZXZpY2UgZmlsZXN5c3RlbS4gVGhpcyBpcwo+IGp1c3QgYSBkaWZmZXJl
+bnQgcGF0aC4KPiAKClRoZSBiYXNpYyBwcm9ibGVtIFdhcnBEcml2ZSB3YW50IHRvIHNvbHZlIGl0
+IHRvIGF2b2lkIHN5c2NhbGwuIFRoaXMgaXMgaW1wb3J0YW50CnRvIGFjY2VsZXJhdG9ycy4gV2Ug
+aGF2ZSBzb21lIGRhdGEgaGVyZToKaHR0cHM6Ly93d3cuc2xpZGVzaGFyZS5uZXQvbGluYXJvb3Jn
+L3Byb2dyZXNzLWFuZC1kZW1vbnN0cmF0aW9uLW9mLXdyYXBkcml2ZS1hLWFjY2VsZXJhdG9yLWZy
+YW1ld29yay1zZm8xNzMxNwoKKHNlZSBwYWdlIDMpCgpUaGUgcGVyZm9ybWFuY2UgaXMgZGlmZmVy
+ZW50IG9uIHVzaW5nIGtlcm5lbCBhbmQgdXNlciBkcml2ZXJzLgoKQW5kIHdlIGFsc28gYmVsaWV2
+ZSB0aGUgaGFyZHdhcmUgaW50ZXJmYWNlIGNhbiBiZWNvbWUgc3RhbmRhcmQgYWZ0ZXIgc29tZXRp
+bWUuClNvbWUgY29tcGFuaWVzIGhhdmUgc3RhcnRlZCB0byBkbyB0aGlzIChzdWNoIEFSTSdzIFJl
+dmVyZSkuIEJ1dCBiZWZvcmUgdGhhdCwgd2UKc2hvdWxkIGhhdmUgYSBzb2Z0d2FyZSBjaGFubmVs
+IGZvciBpdC4KCj4gU28gdGhpcyBpcyB3aHkgaSBkbyBub3Qgc2VlIGFueSBiZW5lZml0IHRvIGhh
+dmluZyBhbGwgZHJpdmVycyB3aXRoCj4gU1ZNIChjYW4gd2UgcGxlYXNlIHVzZSBTVk0gYW5kIG5v
+dCBTVkEgYXMgU1ZNIGlzIHdoYXQgaGF2ZSBiZWVuIHVzZQo+IGluIG1vcmUgcGxhY2VzIHNvIGZh
+cikuCj4gCgpQZXJzb25hbGx5LCB3ZSBkb24ndCBjYXJlIHdoYXQgbmFtZSB0byBiZSB1c2VkLiBJ
+IHVzZWQgU1ZNIHdoZW4gSSBzdGFydCB0aGlzCndvcmsuIEFuZCB0aGVuIEplYW4gc2FpZCBTVk0g
+aGFkIGJlZW4gdXNlZCBieSBBTUQgYXMgU2VjdXJlIFZpcnR1YWwgTWFjaGluZS4gU28KaGUgY2Fs
+bGVkIGl0IFNWQS4gQW5kIG5vdy4uLiB3aG8gc2hvdWxkIEkgZm9sbG93PyA6KQoKPiAKPiBDaGVl
+cnMsCj4gSsOpcsO0bWUKCi0tIAoJCQktS2VubmV0aChIaXNpbGljb24pCgo9PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PQrmnKzpgq7ku7blj4rlhbbpmYTku7blkKvmnInljY7kuLrlhazlj7jnmoTkv53l
+r4bkv6Hmga/vvIzku4XpmZDkuo7lj5HpgIHnu5nkuIrpnaLlnLDlnYDkuK3liJflh7rnmoTkuKrk
+urrmiJbnvqTnu4TjgILnpoEK5q2i5Lu75L2V5YW25LuW5Lq65Lul5Lu75L2V5b2i5byP5L2/55So
+77yI5YyF5ous5L2G5LiN6ZmQ5LqO5YWo6YOo5oiW6YOo5YiG5Zyw5rOE6Zyy44CB5aSN5Yi244CB
+5oiW5pWj5Y+R77yJ5pys6YKu5Lu25LitCueahOS/oeaBr+OAguWmguaenOaCqOmUmeaUtuS6huac
+rOmCruS7tu+8jOivt+aCqOeri+WNs+eUteivneaIlumCruS7tumAmuefpeWPkeS7tuS6uuW5tuWI
+oOmZpOacrOmCruS7tu+8gQpUaGlzIGUtbWFpbCBhbmQgaXRzIGF0dGFjaG1lbnRzIGNvbnRhaW4g
+Y29uZmlkZW50aWFsIGluZm9ybWF0aW9uIGZyb20gSFVBV0VJLAp3aGljaCBpcyBpbnRlbmRlZCBv
+bmx5IGZvciB0aGUgcGVyc29uIG9yIGVudGl0eSB3aG9zZSBhZGRyZXNzIGlzIGxpc3RlZCBhYm92
+ZS4KQW55IHVzZSBvZiB0aGUgCmluZm9ybWF0aW9uIGNvbnRhaW5lZCBoZXJlaW4gaW4gYW55IHdh
+eSAoaW5jbHVkaW5nLCBidXQgbm90IGxpbWl0ZWQgdG8sIHRvdGFsIG9yCnBhcnRpYWwgZGlzY2xv
+c3VyZSwgcmVwcm9kdWN0aW9uLCBvciBkaXNzZW1pbmF0aW9uKSBieSBwZXJzb25zIG90aGVyIHRo
+YW4gdGhlCmludGVuZGVkIApyZWNpcGllbnQocykgaXMgcHJvaGliaXRlZC4gSWYgeW91IHJlY2Vp
+dmUgdGhpcyBlLW1haWwgaW4gZXJyb3IsIHBsZWFzZSBub3RpZnkKdGhlIHNlbmRlciBieSBwaG9u
+ZSBvciBlbWFpbCBpbW1lZGlhdGVseSBhbmQgZGVsZXRlIGl0IQoKX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX18KaW9tbXUgbWFpbGluZyBsaXN0CmlvbW11QGxp
+c3RzLmxpbnV4LWZvdW5kYXRpb24ub3JnCmh0dHBzOi8vbGlzdHMubGludXhmb3VuZGF0aW9uLm9y
+Zy9tYWlsbWFuL2xpc3RpbmZvL2lvbW11
