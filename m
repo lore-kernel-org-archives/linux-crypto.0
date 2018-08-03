@@ -1,40 +1,158 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: arm/chacha20 - always use vrev for 16-bit rotates
-Date: Fri, 3 Aug 2018 21:59:52 +0800
-Message-ID: <20180803135952.6zbc32uibhnljelw@gondor.apana.org.au>
-References: <20180725012907.1614-1-ebiggers3@gmail.com>
+From: joeyli <jlee@suse.com>
+Subject: Re: [PATCH 0/4][RFC v2] Introduce the in-kernel hibernation
+ encryption
+Date: Fri, 3 Aug 2018 22:05:53 +0800
+Message-ID: <20180803140443.GD4244@linux-l9pv.suse>
+References: <20180719132003.GA30981@sandybridge-desktop>
+ <20180720102532.GA20284@amd>
+ <1532346156.3057.11.camel@suse.com>
+ <20180723162302.GA4503@sandybridge-desktop>
+ <1532590246.7411.3.camel@suse.com>
+ <20180726081404.GG4244@linux-l9pv.suse>
+ <20180730170415.GQ4244@linux-l9pv.suse>
+ <20180803033702.GB416@sandybridge-desktop>
+ <20180803053445.GC4244@linux-l9pv.suse>
+ <CADjb_WSURQz86+E8kakNf7UBDM+aho+uaz3QdDkuGsEgan=szw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Eric Biggers <ebiggers@google.com>, linux-crypto@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org,
- Ard Biesheuvel <ard.biesheuvel@linaro.org>
-To: Eric Biggers <ebiggers3@gmail.com>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: Chen Yu <yu.c.chen@intel.com>, oneukum@suse.com,
+        Pavel Machek <pavel@ucw.cz>,
+        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
+        ebiggers@google.com, Theodore Ts'o <tytso@mit.edu>,
+        smueller@chronox.de, denkenz@gmail.com,
+        Linux PM list <linux-pm@vger.kernel.org>,
+        linux-crypto@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        kookoo.gu@intel.com, Zhang Rui <rui.zhang@intel.com>
+To: Ryan Chen <yu.chen.surf@gmail.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20180725012907.1614-1-ebiggers3@gmail.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+In-Reply-To: <CADjb_WSURQz86+E8kakNf7UBDM+aho+uaz3QdDkuGsEgan=szw@mail.gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Jul 24, 2018 at 06:29:07PM -0700, Eric Biggers wrote:
-> From: Eric Biggers <ebiggers@google.com>
-> 
-> The 4-way ChaCha20 NEON code implements 16-bit rotates with vrev32.16,
-> but the one-way code (used on remainder blocks) implements it with
-> vshl + vsri, which is slower.  Switch the one-way code to vrev32.16 too.
-> 
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
+On Fri, Aug 03, 2018 at 09:14:22PM +0800, Ryan Chen wrote:
+> On Fri, Aug 3, 2018 at 1:35 PM joeyli <jlee@suse.com> wrote:
+> >
+> > On Fri, Aug 03, 2018 at 11:37:02AM +0800, Yu Chen wrote:
+> > > Hi Joey,
+> > > On Tue, Jul 31, 2018 at 01:04:15AM +0800, joeyli wrote:
+> > > > Hi all,
+> > > >
+> > > > On Thu, Jul 26, 2018 at 04:14:04PM +0800, joeyli wrote:
+> > > > > On Thu, Jul 26, 2018 at 09:30:46AM +0200, Oliver Neukum wrote:
+> > > > > > On Di, 2018-07-24 at 00:23 +0800, Yu Chen wrote:
+> > > > > > >
+> > > > > > > Good point, we once tried to generate key in kernel, but people
+> > > > > > > suggest to generate key in userspace and provide it to the
+> > > > > > > kernel, which is what ecryptfs do currently, so it seems this
+> > > > > > > should also be safe for encryption in kernel.
+> > > > > > > https://www.spinics.net/lists/linux-crypto/msg33145.html
+> > > > > > > Thus Chun-Yi's signature can use EFI key and both the key from
+> > > > > > > user space.
+> > > > > >
+> > > > > > Hi,
+> > > > > >
+> > > > > > ecryptfs can trust user space. It is supposed to keep data
+> > > > > > safe while the system is inoperative. The whole point of Secure
+> > > > > > Boot is a cryptographic system of trust that does not include
+> > > > > > user space.
+> > > > > >
+> > > > > > I seriously doubt we want to use trusted computing here. So the
+> > > > > > key needs to be generated in kernel space and stored in a safe
+> > > > > > manner. As we have a saolution doing that, can we come to ausable
+> > > > > > synthesis?
+> > > > > >
+> > > > > >         Regards
+> > > > > >                 Oliver
+> > > > >
+> > > > > Crurently there have two solutions, they are trusted key and EFI key.
+> > > > > Both of them are generated in kernel and are not visible in user space.
+> > > > >
+> > > > > The trusted key is generated by kernel then sealed by the TPM's
+> > > > > SRK. So the trusted key can be stored in anywhere then be enrolled
+> > > > > to kernel when we need it. EVM already uses it.
+> > > > >
+> > > > > The EFI key is Jiri Kosina's idea. It is stored in boot services
+> > > > > variable, which means that it can only be access by signed EFI binary
+> > > > > (e.g. signed EFI boot stub) when secure boot be enabled. SLE applied
+> > > > > this solution a couple of years.
+> > > > >
+> > > > > I am working on put the EFI key to key retention service. Then
+> > > > > EFI key can be a master key of encrypted key. EVM can also use
+> > > > > it:
+> > > > > https://github.com/joeyli/linux-s4sign/commit/bae39460393ada4c0226dd07cd5e3afcef86b71f
+> > > > > https://github.com/joeyli/linux-s4sign/commit/f552f97cc3cca5acd84f424b7f946ffb5fe8e9ec
+> > > > >
+> > > > > That's why I want to use key retention service in hibernation
+> > > > > encryption/authentication. Which means that we can use key
+> > > > > API to access trusted key and EFI key.
+> > > > >
+> > > >
+> > > > Here is a proof of concept for using the key retention service
+> > > > to encrypt/sign snapshot image. It's using EFI key now, I will
+> > > > add encrypted key support in the key handler later:
+> > > >     https://github.com/joeyli/linux-s4sign/commit/6311e97038974bc5de8121769fb4d34470009566
+> > > >
+> > > Thanks for the work, I have two questions here:
+> >
+> > My EFI key patch set is almost done. I will send it soon.
+> >
+> Okay, please send them out then we can have further discussion
+> on that.
+> > > 1. Could you please describe a little more about the scenario on
+> > >    how the user could use the secret key for hibernation encryption?
+> > >    A requirement is that, the user should provide a passphrase(for key derivation, i.e.)
+> > >    during resume. I was thinking how user could interact with
+> > >    the security key mechanism here.
+> > >
+> >
+> > User space doesn't need to involve. The EFI root key is generated by
+> > EFI boot stub and be transfer to kernel. It's stored in EFI boot service
+> > variable that it can only be accessed by trusted EFI binary when
+> > secure boot is enabled.
+> >
+> Okay, this apply to the 'suspend' phase, right?
+> I'm still a little confused about the 'resume' phase.
+> Taking encryption as example(not signature),
+> the purpose of doing hibernation encryption is to prevent other users
+> from stealing ram content. Say, user A uses a  passphrase to generate the
+> key and encrypted the hibernation snapshot and stores it on the disk .
+> Then if user
+> B wants to do a hibernation resume to A's previous environment, B has
+> to provide the same passphrase.
+> If I understand correctly, the secret key is saved in  header and stored
+> on the disk. Which means,  any one can read the header from the disk
+> to get  the secret key in trampoline  thus decrypt the image, which is not
+> safe.
 
-Patch applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+The secret key that it's saved in snapshot header is a session key which
+is encrypted by ERK (EFI root key). The ERK only lives in kernel space.
+So the session key is still secure.
+
+When resume, the session key will be decrypted/verified by ERK. Then
+kernel uses the session key to decrypted/verified snapshot image.
+
+Of course that we can direct use ERK to encrypt/authenticate snapshot
+image. Actually the first version of hibernation verification in SLE
+direct uses ERK. So the snapshot header only keeps signature but no
+encrypted session key.
+
+I add session key in new version because I want to align with
+the use case of TPM trusted key + encrypted key. Then hibernation
+can use key retention service API to access EFI key or encrypted key.
+
+Compare the trusted key with EFI secure key:
+
+TPM SRK ----seal-----> Trusted key    ---encrypt---> Encrypted key
+ERK     ---encrypt---> EFI secure key ---encrypt---> Encrypted key
+
+Both of them can be the master key of encrypted key. 
+ 
+If EFI key can not be accepted by kernel community, then the TPM
+trusted key + encrypted key will be the only solution. We can very
+easy to switch to encrypted key by using key retention service
+API.
+
+Thanks a lot!
+Joey Lee 
