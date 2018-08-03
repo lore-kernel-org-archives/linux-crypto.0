@@ -1,158 +1,98 @@
-From: joeyli <jlee@suse.com>
-Subject: Re: [PATCH 0/4][RFC v2] Introduce the in-kernel hibernation
- encryption
-Date: Fri, 3 Aug 2018 22:05:53 +0800
-Message-ID: <20180803140443.GD4244@linux-l9pv.suse>
-References: <20180719132003.GA30981@sandybridge-desktop>
- <20180720102532.GA20284@amd>
- <1532346156.3057.11.camel@suse.com>
- <20180723162302.GA4503@sandybridge-desktop>
- <1532590246.7411.3.camel@suse.com>
- <20180726081404.GG4244@linux-l9pv.suse>
- <20180730170415.GQ4244@linux-l9pv.suse>
- <20180803033702.GB416@sandybridge-desktop>
- <20180803053445.GC4244@linux-l9pv.suse>
- <CADjb_WSURQz86+E8kakNf7UBDM+aho+uaz3QdDkuGsEgan=szw@mail.gmail.com>
+From: Alan Cox <gnomes-qBU/x9rampVanCEyBjwyrvXRex20P6io@public.gmane.org>
+Subject: Re: [RFC PATCH 0/7] A General Accelerator Framework, WarpDrive
+Date: Fri, 3 Aug 2018 15:20:43 +0100
+Message-ID: <20180803152043.40f88947@alans-desktop>
+References: <20180801102221.5308-1-nek.in.cn@gmail.com>
+	<20180801165644.GA3820@redhat.com>
+	<AADFC41AFE54684AB9EE6CBC0274A5D191290E1A@SHSMSX101.ccr.corp.intel.com>
+	<20180802111000.4649d9ed@alans-desktop>
+	<20180802144627.GB3481@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Chen Yu <yu.c.chen@intel.com>, oneukum@suse.com,
-        Pavel Machek <pavel@ucw.cz>,
-        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
-        ebiggers@google.com, Theodore Ts'o <tytso@mit.edu>,
-        smueller@chronox.de, denkenz@gmail.com,
-        Linux PM list <linux-pm@vger.kernel.org>,
-        linux-crypto@vger.kernel.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        kookoo.gu@intel.com, Zhang Rui <rui.zhang@intel.com>
-To: Ryan Chen <yu.chen.surf@gmail.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <CADjb_WSURQz86+E8kakNf7UBDM+aho+uaz3QdDkuGsEgan=szw@mail.gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: "Tian, Kevin" <kevin.tian-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
+	Alex Williamson <alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+	"kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Jonathan Corbet <corbet-T1hC0tSOHrs@public.gmane.org>,
+	Greg Kroah-Hartman <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>,
+	Zaibo Xu <xuzaibo-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>,
+	"linux-doc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-doc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, "Kumar,
+	Sanjay K" <sanjay.k.kumar-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>, Hao Fang <fanghao11-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>,
+	"linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	"linuxarm-hv44wF8Li93QT0dZR+AlfA@public.gmane.org" <linuxarm-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>,
+	"iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org" <iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>,
+	"linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Kenneth Lee <liguozhu-C8/M+/jPZTeaMJb+Lgu22Q@public.gmane.org>,
+	Philippe Ombredanne <pombredanne-od1rfyK75/E@public.gmane.org>,
+	Thomas Gleixner <tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org>,
+	Ross Zwisler <ross.zwisler-VuQAYsv1563Yd54FQh9/CA@public.gmane.org>,
+	Kenneth Lee <nek.in.cn-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, "David S . Mille
+To: Jerome Glisse <jglisse-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+In-Reply-To: <20180802144627.GB3481-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Aug 03, 2018 at 09:14:22PM +0800, Ryan Chen wrote:
-> On Fri, Aug 3, 2018 at 1:35 PM joeyli <jlee@suse.com> wrote:
-> >
-> > On Fri, Aug 03, 2018 at 11:37:02AM +0800, Yu Chen wrote:
-> > > Hi Joey,
-> > > On Tue, Jul 31, 2018 at 01:04:15AM +0800, joeyli wrote:
-> > > > Hi all,
-> > > >
-> > > > On Thu, Jul 26, 2018 at 04:14:04PM +0800, joeyli wrote:
-> > > > > On Thu, Jul 26, 2018 at 09:30:46AM +0200, Oliver Neukum wrote:
-> > > > > > On Di, 2018-07-24 at 00:23 +0800, Yu Chen wrote:
-> > > > > > >
-> > > > > > > Good point, we once tried to generate key in kernel, but people
-> > > > > > > suggest to generate key in userspace and provide it to the
-> > > > > > > kernel, which is what ecryptfs do currently, so it seems this
-> > > > > > > should also be safe for encryption in kernel.
-> > > > > > > https://www.spinics.net/lists/linux-crypto/msg33145.html
-> > > > > > > Thus Chun-Yi's signature can use EFI key and both the key from
-> > > > > > > user space.
-> > > > > >
-> > > > > > Hi,
-> > > > > >
-> > > > > > ecryptfs can trust user space. It is supposed to keep data
-> > > > > > safe while the system is inoperative. The whole point of Secure
-> > > > > > Boot is a cryptographic system of trust that does not include
-> > > > > > user space.
-> > > > > >
-> > > > > > I seriously doubt we want to use trusted computing here. So the
-> > > > > > key needs to be generated in kernel space and stored in a safe
-> > > > > > manner. As we have a saolution doing that, can we come to ausable
-> > > > > > synthesis?
-> > > > > >
-> > > > > >         Regards
-> > > > > >                 Oliver
-> > > > >
-> > > > > Crurently there have two solutions, they are trusted key and EFI key.
-> > > > > Both of them are generated in kernel and are not visible in user space.
-> > > > >
-> > > > > The trusted key is generated by kernel then sealed by the TPM's
-> > > > > SRK. So the trusted key can be stored in anywhere then be enrolled
-> > > > > to kernel when we need it. EVM already uses it.
-> > > > >
-> > > > > The EFI key is Jiri Kosina's idea. It is stored in boot services
-> > > > > variable, which means that it can only be access by signed EFI binary
-> > > > > (e.g. signed EFI boot stub) when secure boot be enabled. SLE applied
-> > > > > this solution a couple of years.
-> > > > >
-> > > > > I am working on put the EFI key to key retention service. Then
-> > > > > EFI key can be a master key of encrypted key. EVM can also use
-> > > > > it:
-> > > > > https://github.com/joeyli/linux-s4sign/commit/bae39460393ada4c0226dd07cd5e3afcef86b71f
-> > > > > https://github.com/joeyli/linux-s4sign/commit/f552f97cc3cca5acd84f424b7f946ffb5fe8e9ec
-> > > > >
-> > > > > That's why I want to use key retention service in hibernation
-> > > > > encryption/authentication. Which means that we can use key
-> > > > > API to access trusted key and EFI key.
-> > > > >
-> > > >
-> > > > Here is a proof of concept for using the key retention service
-> > > > to encrypt/sign snapshot image. It's using EFI key now, I will
-> > > > add encrypted key support in the key handler later:
-> > > >     https://github.com/joeyli/linux-s4sign/commit/6311e97038974bc5de8121769fb4d34470009566
-> > > >
-> > > Thanks for the work, I have two questions here:
-> >
-> > My EFI key patch set is almost done. I will send it soon.
-> >
-> Okay, please send them out then we can have further discussion
-> on that.
-> > > 1. Could you please describe a little more about the scenario on
-> > >    how the user could use the secret key for hibernation encryption?
-> > >    A requirement is that, the user should provide a passphrase(for key derivation, i.e.)
-> > >    during resume. I was thinking how user could interact with
-> > >    the security key mechanism here.
-> > >
-> >
-> > User space doesn't need to involve. The EFI root key is generated by
-> > EFI boot stub and be transfer to kernel. It's stored in EFI boot service
-> > variable that it can only be accessed by trusted EFI binary when
-> > secure boot is enabled.
-> >
-> Okay, this apply to the 'suspend' phase, right?
-> I'm still a little confused about the 'resume' phase.
-> Taking encryption as example(not signature),
-> the purpose of doing hibernation encryption is to prevent other users
-> from stealing ram content. Say, user A uses a  passphrase to generate the
-> key and encrypted the hibernation snapshot and stores it on the disk .
-> Then if user
-> B wants to do a hibernation resume to A's previous environment, B has
-> to provide the same passphrase.
-> If I understand correctly, the secret key is saved in  header and stored
-> on the disk. Which means,  any one can read the header from the disk
-> to get  the secret key in trampoline  thus decrypt the image, which is not
-> safe.
+> If we are going to have any kind of general purpose accelerator API then
+> > it has to be able to implement things like  
+> 
+> Why is the existing driver model not good enough ? So you want
+> a device with function X you look into /dev/X (for instance
+> for GPU you look in /dev/dri)
 
-The secret key that it's saved in snapshot header is a session key which
-is encrypted by ERK (EFI root key). The ERK only lives in kernel space.
-So the session key is still secure.
+Except when my GPU is in an FPGA in which case it might be somewhere else
+or it's a general purpose accelerator that happens to be usable as a GPU.
+Unusual today in big computer space but you'll find it in
+microcontrollers.
 
-When resume, the session key will be decrypted/verified by ERK. Then
-kernel uses the session key to decrypted/verified snapshot image.
+> Each of those device need a userspace driver and thus this
+> user space driver can easily knows where to look. I do not
+> expect that every application will reimplement those drivers
+> but instead use some kind of library that provide a high
+> level API for each of those devices.
 
-Of course that we can direct use ERK to encrypt/authenticate snapshot
-image. Actually the first version of hibernation verification in SLE
-direct uses ERK. So the snapshot header only keeps signature but no
-encrypted session key.
+Think about it from the user level. You have a pipeline of things you
+wish to execute, you need to get the right accelerator combinations and
+they need to fit together to meet system constraints like number of
+IOMMU ids the accelerator supports, where they are connected.
 
-I add session key in new version because I want to align with
-the use case of TPM trusted key + encrypted key. Then hibernation
-can use key retention service API to access EFI key or encrypted key.
+> Now you have a hierarchy of memory for the CPU (HBM, local
+> node main memory aka you DDR dimm, persistent memory) each
 
-Compare the trusted key with EFI secure key:
+It's not a heirarchy, it's a graph. There's no fundamental reason two
+accelerators can't be close to two different CPU cores but have shared
+HBM that is far from each processor. There are physical reasons it tends
+to look more like a heirarchy today.
 
-TPM SRK ----seal-----> Trusted key    ---encrypt---> Encrypted key
-ERK     ---encrypt---> EFI secure key ---encrypt---> Encrypted key
+> Anyway i think finding devices and finding relation between
+> devices and memory is 2 separate problems and as such should
+> be handled separatly.
 
-Both of them can be the master key of encrypted key. 
- 
-If EFI key can not be accepted by kernel community, then the TPM
-trusted key + encrypted key will be the only solution. We can very
-easy to switch to encrypted key by using key retention service
-API.
+At a certain level they are deeply intertwined because you need a common
+API. It's not good if I want a particular accelerator and need to then
+see which API its under on this machine and which interface I have to
+use, and maybe have a mix of FPGA, WarpDrive and Google ASIC interfaces
+all different.
 
-Thanks a lot!
-Joey Lee 
+The job of the kernel is to impose some kind of sanity and unity on this
+lot.
+
+All of it in the end comes down to
+
+'Somehow glue some chunk of memory into my address space and find any
+supporting driver I need'
+
+plus virtualization of the above.
+
+That bit's easy - but making it usable is a different story.
+
+Alan
