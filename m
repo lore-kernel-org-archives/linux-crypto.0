@@ -1,38 +1,38 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: virtio: Replace GFP_ATOMIC with GFP_KERNEL in
- __virtio_crypto_ablkcipher_do_req()
-Date: Fri, 3 Aug 2018 21:58:14 +0800
-Message-ID: <20180803135814.452fdflcronacrjr@gondor.apana.org.au>
-References: <20180723084346.16488-1-baijiaju1990@gmail.com>
+Subject: Re: [PATCH 0/4] crypto: ccree: fixes and cleanups
+Date: Fri, 3 Aug 2018 21:59:39 +0800
+Message-ID: <20180803135939.5ccgaifj4kbkfv3n@gondor.apana.org.au>
+References: <1532441567-11694-1-git-send-email-gilad@benyossef.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: mst@redhat.com, jasowang@redhat.com, arei.gonglei@huawei.com,
-        davem@davemloft.net, virtualization@lists.linux-foundation.org,
+Cc: "David S. Miller" <davem@davemloft.net>,
+        Ofir Drang <ofir.drang@arm.com>,
+        Geert Uytterhoeven <geert+renesas@glider.be>,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Jia-Ju Bai <baijiaju1990@gmail.com>
+To: Gilad Ben-Yossef <gilad@benyossef.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20180723084346.16488-1-baijiaju1990@gmail.com>
+In-Reply-To: <1532441567-11694-1-git-send-email-gilad@benyossef.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Jul 23, 2018 at 04:43:46PM +0800, Jia-Ju Bai wrote:
-> __virtio_crypto_ablkcipher_do_req() is never called in atomic context.
+On Tue, Jul 24, 2018 at 03:12:42PM +0100, Gilad Ben-Yossef wrote:
+> Various code clean ups and fix ups.
 > 
-> __virtio_crypto_ablkcipher_do_req() is only called by 
-> virtio_crypto_ablkcipher_crypt_req(), which is only called by 
-> virtcrypto_find_vqs() that is never called in atomic context.
+> Gilad Ben-Yossef (4):
+>   crypto: ccree: drop useless type flag during reg
+>   crypto: ccree: remove cipher ivgen left overs
+>   crypto: ccree: zero all of request ctx before use
+>   crypto: ccree: allow bigger than sector XTS op
 > 
-> __virtio_crypto_ablkcipher_do_req() calls kzalloc_node() with GFP_ATOMIC,
-> which is not necessary.
-> GFP_ATOMIC can be replaced with GFP_KERNEL.
-> 
-> This is found by a static analysis tool named DCNS written by myself.
-> I also manually check the kernel code before reporting it.
-> 
-> Signed-off-by: Jia-Ju Bai <baijiaju1990@gmail.com>
+>  drivers/crypto/ccree/cc_aead.c       | 16 +---------------
+>  drivers/crypto/ccree/cc_buffer_mgr.c |  8 ++------
+>  drivers/crypto/ccree/cc_cipher.c     | 36 ++++--------------------------------
+>  drivers/crypto/ccree/cc_cipher.h     |  1 -
+>  drivers/crypto/ccree/cc_driver.h     |  1 -
+>  5 files changed, 7 insertions(+), 55 deletions(-)
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
