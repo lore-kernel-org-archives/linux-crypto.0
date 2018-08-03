@@ -1,147 +1,161 @@
-From: Ryan Chen <yu.chen.surf@gmail.com>
-Subject: Re: [PATCH 0/4][RFC v2] Introduce the in-kernel hibernation encryption
-Date: Fri, 3 Aug 2018 21:14:22 +0800
-Message-ID: <CADjb_WSURQz86+E8kakNf7UBDM+aho+uaz3QdDkuGsEgan=szw@mail.gmail.com>
-References: <20180718235851.GA22170@sandybridge-desktop> <20180719110149.GA4679@amd>
- <20180719132003.GA30981@sandybridge-desktop> <20180720102532.GA20284@amd>
- <1532346156.3057.11.camel@suse.com> <20180723162302.GA4503@sandybridge-desktop>
- <1532590246.7411.3.camel@suse.com> <20180726081404.GG4244@linux-l9pv.suse>
- <20180730170415.GQ4244@linux-l9pv.suse> <20180803033702.GB416@sandybridge-desktop>
- <20180803053445.GC4244@linux-l9pv.suse>
+From: Lars Ellenberg <lars.ellenberg-63ez5xqkn6DQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH v6 12/18] drbd: Convert from ahash to shash
+Date: Fri, 3 Aug 2018 15:44:09 +0200
+Message-ID: <20180803134357.GB28982@soda.linbit>
+References: <20180724164936.37477-1-keescook@chromium.org>
+	<20180724164936.37477-13-keescook@chromium.org>
+	<CAGXu5jJB6V0r8LXOGL6+sO0NVZ0HK3VCthML=T3gLEwMABhSDQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Chen Yu <yu.c.chen@intel.com>, oneukum@suse.com,
-        Pavel Machek <pavel@ucw.cz>,
-        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
-        ebiggers@google.com, "Theodore Ts'o" <tytso@mit.edu>,
-        smueller@chronox.de, denkenz@gmail.com,
-        Linux PM list <linux-pm@vger.kernel.org>,
-        linux-crypto@vger.kernel.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        kookoo.gu@intel.com, Zhang Rui <rui.zhang@intel.com>
-To: jlee@suse.com
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180803053445.GC4244@linux-l9pv.suse>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Jens Axboe <axboe-tSWWG44O7X1aa/9Udqfwiw@public.gmane.org>, Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+	Arnd Bergmann <arnd-r2nGTMty4D4@public.gmane.org>, Eric Biggers <ebiggers-hpIqsD4AKlfQT0dZR+AlfA@public.gmane.org>,
+	"Gustavo A. R. Silva" <gustavo-L1vi/lXTdts+Va1GwOuvDg@public.gmane.org>,
+	Philipp Reisner <philipp.reisner-63ez5xqkn6DQT0dZR+AlfA@public.gmane.org>,
+	LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	linux-block <linux-block-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	linux-crypto <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, drbd-dev-cunTk1MwBs8qoQakbn7OcQ@public.gmane.org
+To: Kees Cook <keescook-F7+t8E8rja9g9hUCZPvPmw@public.gmane.org>
+Return-path: <drbd-dev-bounces-cunTk1MwBs8qoQakbn7OcQ@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <CAGXu5jJB6V0r8LXOGL6+sO0NVZ0HK3VCthML=T3gLEwMABhSDQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+List-Unsubscribe: <http://lists.linbit.com/mailman/options/drbd-dev>,
+	<mailto:drbd-dev-request-cunTk1MwBs8qoQakbn7OcQ@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linbit.com/pipermail/drbd-dev>
+List-Post: <mailto:drbd-dev-cunTk1MwBs8qoQakbn7OcQ@public.gmane.org>
+List-Help: <mailto:drbd-dev-request-cunTk1MwBs8qoQakbn7OcQ@public.gmane.org?subject=help>
+List-Subscribe: <http://lists.linbit.com/mailman/listinfo/drbd-dev>,
+	<mailto:drbd-dev-request-cunTk1MwBs8qoQakbn7OcQ@public.gmane.org?subject=subscribe>
+Sender: drbd-dev-bounces-cunTk1MwBs8qoQakbn7OcQ@public.gmane.org
+Errors-To: drbd-dev-bounces-cunTk1MwBs8qoQakbn7OcQ@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Aug 3, 2018 at 1:35 PM joeyli <jlee@suse.com> wrote:
->
-> On Fri, Aug 03, 2018 at 11:37:02AM +0800, Yu Chen wrote:
-> > Hi Joey,
-> > On Tue, Jul 31, 2018 at 01:04:15AM +0800, joeyli wrote:
-> > > Hi all,
-> > >
-> > > On Thu, Jul 26, 2018 at 04:14:04PM +0800, joeyli wrote:
-> > > > On Thu, Jul 26, 2018 at 09:30:46AM +0200, Oliver Neukum wrote:
-> > > > > On Di, 2018-07-24 at 00:23 +0800, Yu Chen wrote:
-> > > > > >
-> > > > > > Good point, we once tried to generate key in kernel, but people
-> > > > > > suggest to generate key in userspace and provide it to the
-> > > > > > kernel, which is what ecryptfs do currently, so it seems this
-> > > > > > should also be safe for encryption in kernel.
-> > > > > > https://www.spinics.net/lists/linux-crypto/msg33145.html
-> > > > > > Thus Chun-Yi's signature can use EFI key and both the key from
-> > > > > > user space.
-> > > > >
-> > > > > Hi,
-> > > > >
-> > > > > ecryptfs can trust user space. It is supposed to keep data
-> > > > > safe while the system is inoperative. The whole point of Secure
-> > > > > Boot is a cryptographic system of trust that does not include
-> > > > > user space.
-> > > > >
-> > > > > I seriously doubt we want to use trusted computing here. So the
-> > > > > key needs to be generated in kernel space and stored in a safe
-> > > > > manner. As we have a saolution doing that, can we come to ausable
-> > > > > synthesis?
-> > > > >
-> > > > >         Regards
-> > > > >                 Oliver
-> > > >
-> > > > Crurently there have two solutions, they are trusted key and EFI key.
-> > > > Both of them are generated in kernel and are not visible in user space.
-> > > >
-> > > > The trusted key is generated by kernel then sealed by the TPM's
-> > > > SRK. So the trusted key can be stored in anywhere then be enrolled
-> > > > to kernel when we need it. EVM already uses it.
-> > > >
-> > > > The EFI key is Jiri Kosina's idea. It is stored in boot services
-> > > > variable, which means that it can only be access by signed EFI binary
-> > > > (e.g. signed EFI boot stub) when secure boot be enabled. SLE applied
-> > > > this solution a couple of years.
-> > > >
-> > > > I am working on put the EFI key to key retention service. Then
-> > > > EFI key can be a master key of encrypted key. EVM can also use
-> > > > it:
-> > > > https://github.com/joeyli/linux-s4sign/commit/bae39460393ada4c0226dd07cd5e3afcef86b71f
-> > > > https://github.com/joeyli/linux-s4sign/commit/f552f97cc3cca5acd84f424b7f946ffb5fe8e9ec
-> > > >
-> > > > That's why I want to use key retention service in hibernation
-> > > > encryption/authentication. Which means that we can use key
-> > > > API to access trusted key and EFI key.
-> > > >
-> > >
-> > > Here is a proof of concept for using the key retention service
-> > > to encrypt/sign snapshot image. It's using EFI key now, I will
-> > > add encrypted key support in the key handler later:
-> > >     https://github.com/joeyli/linux-s4sign/commit/6311e97038974bc5de8121769fb4d34470009566
-> > >
-> > Thanks for the work, I have two questions here:
->
-> My EFI key patch set is almost done. I will send it soon.
->
-Okay, please send them out then we can have further discussion
-on that.
-> > 1. Could you please describe a little more about the scenario on
-> >    how the user could use the secret key for hibernation encryption?
-> >    A requirement is that, the user should provide a passphrase(for key derivation, i.e.)
-> >    during resume. I was thinking how user could interact with
-> >    the security key mechanism here.
+On Thu, Aug 02, 2018 at 04:43:19PM -0700, Kees Cook wrote:
+> On Tue, Jul 24, 2018 at 9:49 AM, Kees Cook <keescook-F7+t8E8rja9g9hUCZPvPmw@public.gmane.org> wrote:
+> > In preparing to remove all stack VLA usage from the kernel[1], this
+> > removes the discouraged use of AHASH_REQUEST_ON_STACK in favor of
+> > the smaller SHASH_DESC_ON_STACK by converting from ahash-wrapped-shash
+> > to direct shash. By removing a layer of indirection this both improves
+> > performance and reduces stack usage. The stack allocation will be made
+> > a fixed size in a later patch to the crypto subsystem.
+> 
+> Philipp or Lars, what do you think of this? Can this go via your tree
+> or maybe via Jens?
+> 
+> I'd love an Ack or Review.
+
+I'm sorry, summer time and all, limited online time ;-)
+
+I'm happy for this to go in via Jens, or any other way.
+
+Being not that fluent in the crypto stuff,
+I will just "believe" most of it.
+
+I still think I found something, comments below:
+
+> > diff --git a/drivers/block/drbd/drbd_worker.c b/drivers/block/drbd/drbd_worker.c
+> > index 1476cb3439f4..62dd3700dd84 100644
+> > --- a/drivers/block/drbd/drbd_worker.c
+> > +++ b/drivers/block/drbd/drbd_worker.c
+> > @@ -295,60 +295,54 @@ void drbd_request_endio(struct bio *bio)
+> >                 complete_master_bio(device, &m);
+> >  }
 > >
->
-> User space doesn't need to involve. The EFI root key is generated by
-> EFI boot stub and be transfer to kernel. It's stored in EFI boot service
-> variable that it can only be accessed by trusted EFI binary when
-> secure boot is enabled.
->
-Okay, this apply to the 'suspend' phase, right?
-I'm still a little confused about the 'resume' phase.
-Taking encryption as example(not signature),
-the purpose of doing hibernation encryption is to prevent other users
-from stealing ram content. Say, user A uses a  passphrase to generate the
-key and encrypted the hibernation snapshot and stores it on the disk .
-Then if user
-B wants to do a hibernation resume to A's previous environment, B has
-to provide the same passphrase.
-If I understand correctly, the secret key is saved in  header and stored
-on the disk. Which means,  any one can read the header from the disk
-to get  the secret key in trampoline  thus decrypt the image, which is not
-safe.
-Best,
-Yu
-> > 2. The generation of secret key in EFI boot environment is
-> >    using a non standard derivation method in generate_secret_key(),
-> >    I'm not sure if this is safe enough. This is why we tried to put
-> >    PBKDF2 into kernel at first and leave it to the user space then.
+> > -void drbd_csum_ee(struct crypto_ahash *tfm, struct drbd_peer_request *peer_req, void *digest)
+> > +void drbd_csum_ee(struct crypto_shash *tfm, struct drbd_peer_request *peer_req, void *digest)
+> >  {
+> > -       AHASH_REQUEST_ON_STACK(req, tfm);
+> > -       struct scatterlist sg;
+> > +       SHASH_DESC_ON_STACK(desc, tfm);
+> >         struct page *page = peer_req->pages;
+> >         struct page *tmp;
+> >         unsigned len;
 > >
->
-> Thank you for point out.
->
-> The generate_secret_key() reuse the logic in kaslr_get_random_long()
-> that it produces random seed by RDRAND, RDTSC and i8254. It doesn't
-> standard like PBKDF2, but we do not have too many choices in the
-> early boot stage. At least KASLR is using the same logic.
->
-> We can relay on user space helper. But the helper must be authenticated
-> by kernel. Currently we do not have kernel mechanism to verity user
-> space process.
->
-> Regards
-> Joey Lee
+> > -       ahash_request_set_tfm(req, tfm);
+> > -       ahash_request_set_callback(req, 0, NULL, NULL);
+> > +       desc->tfm = tfm;
+> > +       desc->flags = 0;
+> >
+> > -       sg_init_table(&sg, 1);
+> > -       crypto_ahash_init(req);
+> > +       crypto_shash_init(desc);
+> >
+> >         while ((tmp = page_chain_next(page))) {
+> >                 /* all but the last page will be fully used */
+> > -               sg_set_page(&sg, page, PAGE_SIZE, 0);
+> > -               ahash_request_set_crypt(req, &sg, NULL, sg.length);
+> > -               crypto_ahash_update(req);
+> > +               crypto_shash_update(desc, page_to_virt(page), PAGE_SIZE);
+
+These pages may be "highmem", so page_to_virt() seem not appropriate.
+I think the crypto_ahash_update() thingy did an implicit kmap() for us
+in the crypto_hash_walk()?
+Maybe it is good enough to add a kmap() here,
+and a kunmap() on the next line?
 
 
+> >                 page = tmp;
+> >         }
+> >         /* and now the last, possibly only partially used page */
+> >         len = peer_req->i.size & (PAGE_SIZE - 1);
+> > -       sg_set_page(&sg, page, len ?: PAGE_SIZE, 0);
+> > -       ahash_request_set_crypt(req, &sg, digest, sg.length);
+> > -       crypto_ahash_finup(req);
+> > -       ahash_request_zero(req);
+> > +       crypto_shash_update(desc, page_to_virt(page), len ?: PAGE_SIZE);
 
--- 
+Same here ...
+
+> > +
+> > +       crypto_shash_final(desc, digest);
+> > +       shash_desc_zero(desc);
+> >  }
+> >
+> > -void drbd_csum_bio(struct crypto_ahash *tfm, struct bio *bio, void *digest)
+> > +void drbd_csum_bio(struct crypto_shash *tfm, struct bio *bio, void *digest)
+> >  {
+> > -       AHASH_REQUEST_ON_STACK(req, tfm);
+> > -       struct scatterlist sg;
+> > +       SHASH_DESC_ON_STACK(desc, tfm);
+> >         struct bio_vec bvec;
+> >         struct bvec_iter iter;
+> >
+> > -       ahash_request_set_tfm(req, tfm);
+> > -       ahash_request_set_callback(req, 0, NULL, NULL);
+> > +       desc->tfm = tfm;
+> > +       desc->flags = 0;
+> >
+> > -       sg_init_table(&sg, 1);
+> > -       crypto_ahash_init(req);
+> > +       crypto_shash_init(desc);
+> >
+> >         bio_for_each_segment(bvec, bio, iter) {
+> > -               sg_set_page(&sg, bvec.bv_page, bvec.bv_len, bvec.bv_offset);
+> > -               ahash_request_set_crypt(req, &sg, NULL, sg.length);
+> > -               crypto_ahash_update(req);
+> > +               crypto_shash_update(desc, (u8 *)page_to_virt(bvec.bv_page) +
+> > +                                         bvec.bv_offset,
+> > +                                   bvec.bv_len);
+
+
+... and here.
+
+
+> > +
+> >                 /* REQ_OP_WRITE_SAME has only one segment,
+> >                  * checksum the payload only once. */
+> >                 if (bio_op(bio) == REQ_OP_WRITE_SAME)
+> >                         break;
+> >         }
+> > -       ahash_request_set_crypt(req, NULL, digest, 0);
+> > -       crypto_ahash_final(req);
+> > -       ahash_request_zero(req);
+> > +       crypto_shash_final(desc, digest);
+> > +       shash_desc_zero(desc);
+> >  }
+> >
+> >  /* MAYBE merge common code with w_e_end_ov_req */
+
 Thanks,
-Ryan
+
+    Lars
