@@ -1,215 +1,169 @@
-From: Jerome Glisse <jglisse@redhat.com>
+From: Jerome Glisse <jglisse-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Subject: Re: [RFC PATCH 0/7] A General Accelerator Framework, WarpDrive
-Date: Fri, 3 Aug 2018 10:39:44 -0400
-Message-ID: <20180803143944.GA4079@redhat.com>
+Date: Fri, 3 Aug 2018 10:55:26 -0400
+Message-ID: <20180803145526.GB4079@redhat.com>
 References: <20180801102221.5308-1-nek.in.cn@gmail.com>
- <20180801165644.GA3820@redhat.com>
- <AADFC41AFE54684AB9EE6CBC0274A5D191290E1A@SHSMSX101.ccr.corp.intel.com>
- <20180802040557.GL160746@Turing-Arch-b>
- <20180802142243.GA3481@redhat.com>
- <20180803034721.GC91035@Turing-Arch-b>
+	<20180801165644.GA3820@redhat.com>
+	<AADFC41AFE54684AB9EE6CBC0274A5D191290E1A@SHSMSX101.ccr.corp.intel.com>
+	<20180802111000.4649d9ed@alans-desktop>
+	<20180802144627.GB3481@redhat.com>
+	<20180803152043.40f88947@alans-desktop>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-Cc: "Tian, Kevin" <kevin.tian@intel.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Zaibo Xu <xuzaibo@huawei.com>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        "Kumar, Sanjay K" <sanjay.k.kumar@intel.com>,
-        Hao Fang <fanghao11@huawei.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linuxarm@huawei.com" <linuxarm@huawei.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Philippe Ombredanne <pombredanne@nexb.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Kenneth Lee <nek.in.cn@
-To: Kenneth Lee <liguozhu@hisilicon.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Cc: "Tian, Kevin" <kevin.tian-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
+	Alex Williamson <alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+	"kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Jonathan Corbet <corbet-T1hC0tSOHrs@public.gmane.org>,
+	Greg Kroah-Hartman <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>,
+	Zaibo Xu <xuzaibo-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>,
+	"linux-doc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-doc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, "Kumar,
+	Sanjay K" <sanjay.k.kumar-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>, Hao Fang <fanghao11-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>,
+	"linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	"linuxarm-hv44wF8Li93QT0dZR+AlfA@public.gmane.org" <linuxarm-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>,
+	"iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org" <iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>,
+	"linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Kenneth Lee <liguozhu-C8/M+/jPZTeaMJb+Lgu22Q@public.gmane.org>,
+	Philippe Ombredanne <pombredanne-od1rfyK75/E@public.gmane.org>,
+	Thomas Gleixner <tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org>,
+	Ross Zwisler <ross.zwisler-VuQAYsv1563Yd54FQh9/CA@public.gmane.org>,
+	Kenneth Lee <nek.in.cn-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, "David S . Mille
+To: Alan Cox <gnomes-qBU/x9rampVanCEyBjwyrvXRex20P6io@public.gmane.org>
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
 Content-Disposition: inline
-In-Reply-To: <20180803034721.GC91035@Turing-Arch-b>
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <20180803152043.40f88947@alans-desktop>
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Aug 03, 2018 at 11:47:21AM +0800, Kenneth Lee wrote:
-> On Thu, Aug 02, 2018 at 10:22:43AM -0400, Jerome Glisse wrote:
-> > Date: Thu, 2 Aug 2018 10:22:43 -0400
-> > From: Jerome Glisse <jglisse@redhat.com>
-> > To: Kenneth Lee <liguozhu@hisilicon.com>
-> > CC: "Tian, Kevin" <kevin.tian@intel.com>, Hao Fang <fanghao11@huawei.com>,
-> >  Alex Williamson <alex.williamson@redhat.com>, Herbert Xu
-> >  <herbert@gondor.apana.org.au>, "kvm@vger.kernel.org"
-> >  <kvm@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>, Greg
-> >  Kroah-Hartman <gregkh@linuxfoundation.org>, Zaibo Xu <xuzaibo@huawei.com>,
-> >  "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, "Kumar, Sanjay K"
-> >  <sanjay.k.kumar@intel.com>, Kenneth Lee <nek.in.cn@gmail.com>,
-> >  "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-> >  "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-> >  "linuxarm@huawei.com" <linuxarm@huawei.com>,
-> >  "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>, Philippe
-> >  Ombredanne <pombredanne@nexb.com>, Thomas Gleixner <tglx@linutronix.de>,
-> >  "David S . Miller" <davem@davemloft.net>,
-> >  "linux-accelerators@lists.ozlabs.org"
-> >  <linux-accelerators@lists.ozlabs.org>
-> > Subject: Re: [RFC PATCH 0/7] A General Accelerator Framework, WarpDrive
-> > User-Agent: Mutt/1.10.0 (2018-05-17)
-> > Message-ID: <20180802142243.GA3481@redhat.com>
-> > 
-> > On Thu, Aug 02, 2018 at 12:05:57PM +0800, Kenneth Lee wrote:
-> > > On Thu, Aug 02, 2018 at 02:33:12AM +0000, Tian, Kevin wrote:
-> > > > Date: Thu, 2 Aug 2018 02:33:12 +0000
-> > > > > From: Jerome Glisse
-> > > > > On Wed, Aug 01, 2018 at 06:22:14PM +0800, Kenneth Lee wrote:
-> > > > > > From: Kenneth Lee <liguozhu@hisilicon.com>
-> > > > > >
-> > > > > > WarpDrive is an accelerator framework to expose the hardware
-> > > > > capabilities
-> > > > > > directly to the user space. It makes use of the exist vfio and vfio-mdev
-> > > > > > facilities. So the user application can send request and DMA to the
-> > > > > > hardware without interaction with the kernel. This remove the latency
-> > > > > > of syscall and context switch.
-> > > > > >
-> > > > > > The patchset contains documents for the detail. Please refer to it for
-> > > > > more
-> > > > > > information.
-> > > > > >
-> > > > > > This patchset is intended to be used with Jean Philippe Brucker's SVA
-> > > > > > patch [1] (Which is also in RFC stage). But it is not mandatory. This
-> > > > > > patchset is tested in the latest mainline kernel without the SVA patches.
-> > > > > > So it support only one process for each accelerator.
-> > > > > >
-> > > > > > With SVA support, WarpDrive can support multi-process in the same
-> > > > > > accelerator device.  We tested it in our SoC integrated Accelerator (board
-> > > > > > ID: D06, Chip ID: HIP08). A reference work tree can be found here: [2].
-> > > > > 
-> > > > > I have not fully inspected things nor do i know enough about
-> > > > > this Hisilicon ZIP accelerator to ascertain, but from glimpsing
-> > > > > at the code it seems that it is unsafe to use even with SVA due
-> > > > > to the doorbell. There is a comment talking about safetyness
-> > > > > in patch 7.
-> > > > > 
-> > > > > Exposing thing to userspace is always enticing, but if it is
-> > > > > a security risk then it should clearly say so and maybe a
-> > > > > kernel boot flag should be necessary to allow such device to
-> > > > > be use.
-> > > > > 
-> > > 
-> > > But doorbell is just a notification. Except for DOS (to make hardware busy) it
-> > > cannot actually take or change anything from the kernel space. And the DOS
-> > > problem can be always taken as the problem that a group of processes share the
-> > > same kernel entity.
-> > > 
-> > > In the coming HIP09 hardware, the doorbell will come with a random number so
-> > > only the process who allocated the queue can knock it correctly.
-> > 
-> > When doorbell is ring the hardware start fetching commands from
-> > the queue and execute them ? If so than a rogue process B might
-> > ring the doorbell of process A which would starts execution of
-> > random commands (ie whatever random memory value there is left
-> > inside the command buffer memory, could be old commands i guess).
-> > 
-> > If this is not how this doorbell works then, yes it can only do
-> > a denial of service i guess. Issue i have with doorbell is that
-> > i have seen 10 differents implementations in 10 differents hw
-> > and each are different as to what ringing or value written to the
-> > doorbell does. It is painfull to track what is what for each hw.
-> > 
-> 
-> In our implementation, doorbell is simply a notification, just like an interrupt
-> to the accelerator. The command is all about what's in the queue.
-> 
-> I agree that there is no simple and standard way to track the shared IO space.
-> But I think we have to trust the driver in some way. If the driver is malicious,
-> even a simple ioctl can become an attack.
+On Fri, Aug 03, 2018 at 03:20:43PM +0100, Alan Cox wrote:
+> > If we are going to have any kind of general purpose accelerator API then
+> > > it has to be able to implement things like  =
 
-Trusting kernel space driver is fine, trusting user space driver is
-not in my view. AFAICT every driver developer so far always made
-sure that someone could not abuse its device to do harmfull thing to
-other process.
+> > =
+
+> > Why is the existing driver model not good enough ? So you want
+> > a device with function X you look into /dev/X (for instance
+> > for GPU you look in /dev/dri)
+> =
+
+> Except when my GPU is in an FPGA in which case it might be somewhere else
+> or it's a general purpose accelerator that happens to be usable as a GPU.
+> Unusual today in big computer space but you'll find it in
+> microcontrollers.
+
+You do need a specific userspace driver for each of those device
+correct ?
+
+You definitly do for GPU and i do not see that going away any time
+soon. I doubt Xilinx and Altera will ever compile down to same bit-
+stream format either.
+
+So userspace application is bound to use some kind of library that
+implement the userspace side of the driver and that library can
+easily provide helpers to enumerate all the devices it supports.
+
+For instance that is what OpenCL allows for both GPU and FPGA.
+One single API and multiple different hardware you can target from
+it.
 
 
-> > > > > My more general question is do we want to grow VFIO to become
-> > > > > a more generic device driver API. This patchset adds a command
-> > > > > queue concept to it (i don't think it exist today but i have
-> > > > > not follow VFIO closely).
-> > > > > 
-> > > 
-> > > The thing is, VFIO is the only place to support DMA from user land. If we don't
-> > > put it here, we have to create another similar facility to support the same.
-> > 
-> > No it is not, network device, GPU, block device, ... they all do
-> > support DMA. The point i am trying to make here is that even in
-> 
-> Sorry, wait a minute, are we talking the same thing? I meant "DMA from user
-> land", not "DMA from kernel driver". To do that we have to manipulate the
-> IOMMU(Unit). I think it can only be done by default_domain or vfio domain. Or
-> the user space have to directly access the IOMMU.
+> > Each of those device need a userspace driver and thus this
+> > user space driver can easily knows where to look. I do not
+> > expect that every application will reimplement those drivers
+> > but instead use some kind of library that provide a high
+> > level API for each of those devices.
+> =
 
-GPU do DMA in the sense that you pass to the kernel a valid
-virtual address (kernel driver do all the proper check) and
-then you can use the GPU to copy from or to that range of
-virtual address. Exactly how you want to use this compression
-engine. It does not rely on SVM but SVM going forward would
-still be the prefered option.
+> Think about it from the user level. You have a pipeline of things you
+> wish to execute, you need to get the right accelerator combinations and
+> they need to fit together to meet system constraints like number of
+> IOMMU ids the accelerator supports, where they are connected.
 
+Creating a pipe of device ie one device consuming the work of
+the previous one, is a problem on its own and it should be solved
+separatly and not inside VFIO.
 
-> > your mechanisms the userspace must have a specific userspace
-> > drivers for each hardware and thus there are virtually no
-> > differences between having this userspace driver open a device
-> > file in vfio or somewhere else in the device filesystem. This is
-> > just a different path.
-> > 
-> 
-> The basic problem WarpDrive want to solve it to avoid syscall. This is important
-> to accelerators. We have some data here:
-> https://www.slideshare.net/linaroorg/progress-and-demonstration-of-wrapdrive-a-accelerator-framework-sfo17317
-> 
-> (see page 3)
-> 
-> The performance is different on using kernel and user drivers.
+GPU (on ARM) already have this pipe thing because the IP block
+that do overlay, or the IP block that push pixel to the screen or
+the IP block that do 3D rendering are all coming from different
+company.
 
-Yes and example i point to is exactly that. You have a one time setup
-cost (creating command buffer binding PASID with command buffer and
-couple other setup steps). Then userspace no longer have to do any
-ioctl to schedule work on the GPU. It is all down from userspace and
-it use a doorbell to notify hardware when it should go look at command
-buffer for new thing to execute.
-
-My point stands on that. You have existing driver already doing so
-with no new framework and in your scheme you need a userspace driver.
-So i do not see the value add, using one path or the other in the
-userspace driver is litteraly one line to change.
+I do not see the value of having all the device enumerated through
+VFIO to address this problem. I can definitly understand having a
+specific kernel mechanism to expose to userspace what is do-able
+but i believe this should be its own thing that allow any device
+(a VFIO one, a network one, a GPU, a FPGA, ...) to be use in "pipe"
+mode.
 
 
-> And we also believe the hardware interface can become standard after sometime.
-> Some companies have started to do this (such ARM's Revere). But before that, we
-> should have a software channel for it.
+> > Now you have a hierarchy of memory for the CPU (HBM, local
+> > node main memory aka you DDR dimm, persistent memory) each
+> =
 
-I hope it does, but right now for every single piece of hardware you
-will need a specific driver (i am ignoring backward compatible hardware
-evolution as this is a thing that do exist).
+> It's not a heirarchy, it's a graph. There's no fundamental reason two
+> accelerators can't be close to two different CPU cores but have shared
+> HBM that is far from each processor. There are physical reasons it tends
+> to look more like a heirarchy today.
 
-Even if down the road for every class of hardware you can use the same
-driver, i am not sure what the value add is to do it inside VFIO versus
-a class of device driver (like USB, PCIE, DRM aka GPU, ...) ie you would
-have a compression class (/dev/compress/*) a encryption one, ...
+Yes you are right i used the wrong word.
+
+> =
+
+> > Anyway i think finding devices and finding relation between
+> > devices and memory is 2 separate problems and as such should
+> > be handled separatly.
+> =
+
+> At a certain level they are deeply intertwined because you need a common
+> API. It's not good if I want a particular accelerator and need to then
+> see which API its under on this machine and which interface I have to
+> use, and maybe have a mix of FPGA, WarpDrive and Google ASIC interfaces
+> all different.
+> =
+
+> The job of the kernel is to impose some kind of sanity and unity on this
+> lot.
+> =
+
+> All of it in the end comes down to
+> =
+
+> 'Somehow glue some chunk of memory into my address space and find any
+> supporting driver I need'
+> =
+
+> plus virtualization of the above.
+> =
+
+> That bit's easy - but making it usable is a different story.
+
+My point is that for all those devices you will have a userspace drivers
+and thus all the complexity of finding best memory for a given combination
+of hardware can be push to userspace. Kernel only have to expose the
+topology of the different memory and their relation with each of the
+devices. Very much like you have NUMA node for CPU.
 
 
-> > So this is why i do not see any benefit to having all drivers with
-> > SVM (can we please use SVM and not SVA as SVM is what have been use
-> > in more places so far).
-> > 
-> 
-> Personally, we don't care what name to be used. I used SVM when I start this
-> work. And then Jean said SVM had been used by AMD as Secure Virtual Machine. So
-> he called it SVA. And now... who should I follow? :)
+I rather see kernel having one API to expose topology, one API to
+expose device mixing capabilities (ie how can you can pipe device
+together if at all). Then having to update every single existing
+upstream driver that want to participate in the above to now become
+a VFIO driver.
 
-I think Intel call it SVM too, i do not have any strong preference
-beside have only one to remember :)
+
+I have nothing against VFIO ;) Just to me it seems that this is all
+reinventing a new device driver infrastructure under it while the
+existing one is good enough and can evolve to support all the cases
+discussed here.
 
 Cheers,
-Jérôme
+J=E9r=F4me
