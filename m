@@ -1,48 +1,46 @@
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: Re: [PATCH v1 2/3] zinc: Introduce minimal cryptography library
-Date: Sat, 4 Aug 2018 00:10:01 +0200
-Message-ID: <CAHmME9pt3PxKQmc8E-arA-W0p2tp9z_oJ-uXQwis3qD=Zvpnsg@mail.gmail.com>
-References: <20180801072246.GA15677@sol.localdomain> <CALCETrXD_VyoyW5C1U34o-ySJ4nFcO6PQ+ZNBVYxCpJ-f65CHw@mail.gmail.com>
- <CAHmME9oThR-dE3gTW0UyqAGZO80qu19ktG4YTb4iL6CNpzNNaw@mail.gmail.com> <CALCETrVziUpAU4nTaZ=t5ct=1jsWswWOy7KDNxXGPD1L=tMTGQ@mail.gmail.com>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: [PATCH 0/2] crypto: arm64/ghash-ce - performance improvements
+Date: Sat,  4 Aug 2018 20:46:23 +0200
+Message-ID: <20180804184625.28523-1-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Eric Biggers <ebiggers3@gmail.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Netdev <netdev@vger.kernel.org>,
-        David Miller <davem@davemloft.net>,
-        Andrew Lutomirski <luto@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Samuel Neves <sneves@dei.uc.pt>,
-        "Daniel J . Bernstein" <djb@cr.yp.to>,
-        Tanja Lange <tanja@hyperelliptic.org>,
-        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
-        Karthikeyan Bhargavan <karthik.bhargavan@gmail.com>
-To: Andy Lutomirski <luto@amacapital.net>
-Return-path: <netdev-owner@vger.kernel.org>
-In-Reply-To: <CALCETrVziUpAU4nTaZ=t5ct=1jsWswWOy7KDNxXGPD1L=tMTGQ@mail.gmail.com>
-Sender: netdev-owner@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>, jerome.forissier@linaro.org,
+ herbert@gondor.apana.org.au, linux-arm-kernel@lists.infradead.org,
+ jens.wiklander@linaro.org
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Aug 3, 2018 at 11:29 PM Andy Lutomirski <luto@amacapital.net> wrote:
-> Gotcha.  That was very hidden in the 24k lines.  Please make this (and
-> any similar goodies) be their own patches.
+Another bit of performance work on the GHASH driver: this time it is not
+the combined AES/GCM algorithm but the bare GHASH driver that gets updated.
 
-I know, sorry, and I certainly will have this split out. The above
-code snippet was from the much much shorter WireGuard patch (3/3), but
-indeed the simd_get/put/relax code is in the monster patch here, so
-that'll certainly be split for v2.
+Even though ARM cores that implement the polynomical multiplication
+instructions that these routines depend on are guaranteed to also support
+the AES instructions, and can thus use the AES/GCM driver, there could
+be reasons to use the accelerated GHASH in isolation, e.g., with another
+symmetric blockcipher, with a faster h/w accelerator, or potentially with
+an accelerator that does not expose the AES key to the OS.
 
->
-> Also, please consider spelling it differently:
->
-> simd_context_t simd_context = simd_get();
->
-> Because we'll feel very silly the first time some architecture has
-> more than one possible state.  (It wouldn't be entirely insane for x86
-> to distinguish between "no SIMD", "XMM only", and "go to town!", for
-> example.)
+The resulting code runs at 1.1 cycles per byte on Cortex-A53 (down from
+2.4 cycles per byte)
 
-That's a great idea. It'll also make it clearer that users shouldn't
-just dump a raw "true" in there; raw bools are more tempting to abuse
-like that.
+Ard Biesheuvel (2):
+  crypto: arm64/ghash-ce - replace NEON yield check with block limit
+  crypto: arm64/ghash-ce - implement 4-way aggregation
+
+ arch/arm64/crypto/ghash-ce-core.S | 153 ++++++++++++++------
+ arch/arm64/crypto/ghash-ce-glue.c |  87 ++++++-----
+ 2 files changed, 161 insertions(+), 79 deletions(-)
+
+-- 
+2.18.0
