@@ -1,84 +1,56 @@
-From: Oliver Neukum <oneukum@suse.com>
-Subject: Re: [PATCH 0/4][RFC v2] Introduce the in-kernel hibernation
- encryption
-Date: Mon, 06 Aug 2018 12:20:20 +0200
-Message-ID: <1533550820.15815.14.camel@suse.com>
-References: <cover.1531924968.git.yu.c.chen@intel.com>
-         <20180718202235.GA4132@amd> <20180718235851.GA22170@sandybridge-desktop>
-         <20180719110149.GA4679@amd> <20180719132003.GA30981@sandybridge-desktop>
-         <20180720102532.GA20284@amd> <1532346156.3057.11.camel@suse.com>
-         <20180723162302.GA4503@sandybridge-desktop>
-         <1532590246.7411.3.camel@suse.com> <20180806075754.GA12124@chenyu-desktop>
+From: "Rafael J. Wysocki" <rjw@rjwysocki.net>
+Subject: Re: [PATCH v6 10/18] x86/power/64: Remove VLA usage
+Date: Mon, 06 Aug 2018 12:28:28 +0200
+Message-ID: <1782361.6NaZWiq7ky@aspire.rjw.lan>
+References: <20180724164936.37477-1-keescook@chromium.org> <CAJZ5v0gVDotjufLKUW0YuQu2vA4fmU_gqia=ZA4DocW4XHxx0w@mail.gmail.com> <CAGXu5j+NPCc2hq5x7JUwgKYvY6zKN28YdtHbHVapnpgC3GwCsg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: Pavel Machek <pavel@ucw.cz>,
-        "Rafael J . Wysocki" <rafael.j.wysocki@intel.com>,
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: "Rafael J. Wysocki" <rafael@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Arnd Bergmann <arnd@arndb.de>,
         Eric Biggers <ebiggers@google.com>,
-        "Lee, Chun-Yi" <jlee@suse.com>, Theodore Ts o <tytso@mit.edu>,
-        Stephan Mueller <smueller@chronox.de>,
-        Denis Kenzior <denkenz@gmail.com>, linux-pm@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        "Gu, Kookoo" <kookoo.gu@intel.com>,
-        "Zhang, Rui" <rui.zhang@intel.com>
-To: Yu Chen <yu.c.chen@intel.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180806075754.GA12124@chenyu-desktop>
-Sender: linux-kernel-owner@vger.kernel.org
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+        Alasdair Kergon <agk@redhat.com>,
+        Rabin Vincent <rabinv@axis.com>,
+        Tim Chen <tim.c.chen@linux.intel.com>,
+        Pavel Machek <pavel@ucw.cz>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        the arch/x86 maintainers <x86@kernel.org>,
+        Philipp Reisner <philipp.reisner@linbit.com>,
+        Lars Ellenberg <lars.ellenberg@linbit.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Greg Kroah-Hartman <gregkh@
+To: Kees Cook <keescook@chromium.org>
+Return-path: <netdev-owner@vger.kernel.org>
+In-Reply-To: <CAGXu5j+NPCc2hq5x7JUwgKYvY6zKN28YdtHbHVapnpgC3GwCsg@mail.gmail.com>
+Sender: netdev-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Mo, 2018-08-06 at 15:57 +0800, Yu Chen wrote:
-> Hi Oliver,
-> On Thu, Jul 26, 2018 at 09:30:46AM +0200, Oliver Neukum wrote:
-> > On Di, 2018-07-24 at 00:23 +0800, Yu Chen wrote:
-> > > 
-> > > Good point, we once tried to generate key in kernel, but people
-> > > suggest to generate key in userspace and provide it to the
-> > > kernel, which is what ecryptfs do currently, so it seems this
-> > > should also be safe for encryption in kernel.
-> > > https://www.spinics.net/lists/linux-crypto/msg33145.html
-> > > Thus Chun-Yi's signature can use EFI key and both the key from
-> > > user space.
-> > 
-> > Hi,
-> > 
-> > ecryptfs can trust user space. It is supposed to keep data
-> > safe while the system is inoperative.
+On Wednesday, July 25, 2018 8:01:47 PM CEST Kees Cook wrote:
+> On Wed, Jul 25, 2018 at 4:32 AM, Rafael J. Wysocki <rafael@kernel.org> wrote:
+> > On Tue, Jul 24, 2018 at 6:49 PM, Kees Cook <keescook@chromium.org> wrote:
+> >> In the quest to remove all stack VLA usage from the kernel[1], this
+> >> removes the discouraged use of AHASH_REQUEST_ON_STACK by switching to
+> >> shash directly and allocating the descriptor in heap memory (which should
+> >> be fine: the tfm has already been allocated there too).
+> >>
+> >> [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
+> >>
+> >> Signed-off-by: Kees Cook <keescook@chromium.org>
+> >> Acked-by: Pavel Machek <pavel@ucw.cz>
+> >
+> > I think I can queue this up if there are no objections from others.
+> >
+> > Do you want me to do that?
 > 
-> Humm, I did not quite get the point here, let's take fscrypt
+> Sure thing. It looks like the other stand-alone patches like this one
+> are getting taken into the non-crypto trees, so that's fine.
+> 
 
-While the system is running and the fs is mounted, your data
-is as secure as root access to your machine, right? You encrypt
-a disk primarily so data cannot be recovered (and altered) while
-the system is not running.
-
-Secure Boot does not trust root fully. There is a cryptographic
-chain of trust and user space is not part of it.
-
-> for example, the kernel gets user generated key from user space,
-> and uses per-inode nonce(random bytes) as the master key to
-> do a KDF(key derivation function) on user provided key, and uses
-> that key for encryption. We can also added similar mechanism
-> to generate the key in kernel space but the key should be
-> original from user's provided key(password derived), because
-> the security boot/signature mechanism could not cover the case
-> that, two different users could resume to each other's context
-> because there isn't any certification during resume if it is
-> on the same physical hardware.
-
-Please explain. You will always have to suspend the whole machine
-with all tasks of all users. And STD with Secure Boot need not
-imply that you encrypt your discs. You need to encrypt only
-kernel memory to meet the requirements.
-
-As STD affects the whole machine it must require root rights.
-So I cannot see how you can talk about a session belonging
-to a user. Please explain.
-
-It seems to me that you can in theory encrypt the password
-by a key coming from user space, so that you need to know
-an additional key to resume the system, but that seems to me
-above and beyond what Secure Boot requires.
-
-	Regards
-		Oliver
+Applied now, thanks!
