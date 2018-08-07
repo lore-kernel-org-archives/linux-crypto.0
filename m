@@ -1,52 +1,86 @@
 From: Eric Biggers <ebiggers@kernel.org>
-Subject: Re: [RFC PATCH 3/9] crypto: chacha20-generic - refactor to allow
- varying number of rounds
-Date: Tue, 7 Aug 2018 14:51:21 -0700
-Message-ID: <20180807215121.GB25300@gmail.com>
+Subject: Re: [RFC PATCH 8/9] crypto: arm/poly1305 - add NEON accelerated
+ Poly1305 implementation
+Date: Tue, 7 Aug 2018 16:19:41 -0700
+Message-ID: <20180807231941.GC25300@gmail.com>
 References: <20180806223300.113891-1-ebiggers@kernel.org>
- <20180806223300.113891-4-ebiggers@kernel.org>
- <CAHmME9rbe6eT6dkUqKnp-GxcqGrp-tvMfTMr8kZtsn=S3cmP8A@mail.gmail.com>
- <CA+_SqcD+KpQ_X6iXUCpQh0N6pWzBorstBJDx7eBqcybY4Dvy8Q@mail.gmail.com>
- <CAEX_ruFp0KddnZyetZt997OvRzKDuN7U95MF_N9AgTh+mTcD7Q@mail.gmail.com>
+ <20180806223300.113891-9-ebiggers@kernel.org>
+ <CAKv+Gu_T+f=isb_dBF7icfTHApG+E8Y5njSQ=NmtyTHEN2VMgg@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Paul Crowley <paulcrowley@google.com>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        linux-fscrypt@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+Cc: "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>, linux-fscrypt@vger.kernel.org,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
+        Paul Crowley <paulcrowley@google.com>,
         Greg Kaiser <gkaiser@google.com>,
         Michael Halcrow <mhalcrow@google.com>,
-        tomer.ashur@esat.kuleuven.be, Eric Biggers <ebiggers@google.com>,
-        "D. J. Bernstein" <djb@cr.yp.to>
-To: Samuel Neves <samuel.c.p.neves@gmail.com>
+        "Jason A . Donenfeld" <Jason@zx2c4.com>,
+        Samuel Neves <samuel.c.p.neves@gmail.com>,
+        Tomer Ashur <tomer.ashur@esat.kuleuven.be>,
+        Eric Biggers <ebiggers@google.com>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <CAEX_ruFp0KddnZyetZt997OvRzKDuN7U95MF_N9AgTh+mTcD7Q@mail.gmail.com>
+In-Reply-To: <CAKv+Gu_T+f=isb_dBF7icfTHApG+E8Y5njSQ=NmtyTHEN2VMgg@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Aug 07, 2018 at 11:21:04AM +0100, Samuel Neves wrote:
-> > The best attack on ChaCha breaks 7 rounds, and that attack requires 2^248 operations.
-> 
-> This number, as far as I can tell, comes from the "New features of
-> Latin dances" paper. There have been some minor improvements in the
-> intervening 10 years, e.g., [1, 2, 3, 4], which pull back the
-> complexity of breaking ChaCha7 down to 2^235. In any case, every
-> attack so far appears to hit a wall at 8 rounds, with 12 rounds---the
-> recommended eSTREAM round number for Salsa20---seeming to offer a
-> reasonable security margin, still somewhat better than that of the
-> AES.
-> 
-> Best regards,
-> Samuel Neves
-> 
-> [1] https://eprint.iacr.org/2015/698
-> [2] https://eprint.iacr.org/2015/217
-> [3] https://eprint.iacr.org/2016/1034
-> [4] https://doi.org/10.1016/j.dam.2017.04.034
+Hi Ard,
 
-Thanks Samuel, I'll fix that number in the next iteration of the patchset.
+On Tue, Aug 07, 2018 at 02:09:05PM +0200, Ard Biesheuvel wrote:
+> On 7 August 2018 at 00:32, Eric Biggers <ebiggers@kernel.org> wrote:
+> > From: Eric Biggers <ebiggers@google.com>
+> >
+> > Add the Poly1305 code from OpenSSL, which was written by Andy Polyakov.
+> > I took the .S file from WireGuard, whose author has made the needed
+> > tweaks for Linux kernel integration and verified that Andy had given
+> > permission for GPLv2 distribution.  I didn't make any additional changes
+> > to the .S file.
+> >
+> > Note, for HPolyC I'd eventually like a Poly1305 implementation that
+> > allows precomputing powers of the key.  But for now this implementation
+> > just provides the existing semantics where the key and nonce are treated
+> > as a "one-time key" that must be provided for every message.
+> >
+> > Signed-off-by: Eric Biggers <ebiggers@google.com>
+> 
+> Hi Eric,
+> 
+> In the past, I worked with Andy on several occasions to get my kernel
+> changes incorporated into the upstream OpenSSL version of the
+> 'perlasm' .pl file.
+> 
+> This achieves a number of things:
+> - we get a readable version of the code in the kernel tree,
+> - our changes are reviewed upstream
+> - upgrading involves grabbing the latest .pl file rather than merging
+> generated code (which requires careful review)
+> - GPLv2 permission is made explicit, rather than something someone
+> claims to have reached agreement on,
+> - no legal ambiguity whether the output of the perl script is covered
+> by the license (which is what we incorporate here)
+> 
+> Note that the 'available under GPL depending on where you obtained the
+> code' in the CRYPTOGAMS license likely conflicts with the GPL itself,
+> but I am not a lawyer so I'd much prefer having the upstream copy
+> mention this explicitly.
+
+First, note that Jason is proposing adding this exact same .S file as part of
+his new "zinc" cryptography library, along with 7 other OpenSSL .S files.  So it
+may really be him you need to convince.
+
+But yes, I don't really like the approach of just including the .S output of the
+.pl script either, as it loses semantic information that was in the .pl script.
+Ideally the source should either be the .pl script, or else a real hand written
+.S file with the proper comments and macros to make it readable -- not something
+in-between.
+
+Getting the license clarification and possibly other changes upstream is a good
+idea too.  I noticed, though, that the actual wording used in some files
+upstream ("Permission to use under GPLv2 terms is granted") apparently still
+isn't considered sufficient by some, so a separate clarification from Andy was
+apparently still needed: see kernel commit c2e415fe75bbc83c1...
 
 - Eric
