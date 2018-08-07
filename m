@@ -1,50 +1,65 @@
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: Re: [RFC PATCH 3/9] crypto: chacha20-generic - refactor to allow
- varying number of rounds
-Date: Mon, 6 Aug 2018 20:15:43 -0400
-Message-ID: <CAHmME9o6XQ+16d4b8+BiQViSiOOApi-J_ML2UOOBpTN8hV3iVA@mail.gmail.com>
-References: <20180806223300.113891-1-ebiggers@kernel.org> <20180806223300.113891-4-ebiggers@kernel.org>
- <CAHmME9rbe6eT6dkUqKnp-GxcqGrp-tvMfTMr8kZtsn=S3cmP8A@mail.gmail.com> <CA+_SqcD+KpQ_X6iXUCpQh0N6pWzBorstBJDx7eBqcybY4Dvy8Q@mail.gmail.com>
+From: Jeffrey Walton <noloader@gmail.com>
+Subject: Re: [PATCH] crypto: remove speck
+Date: Mon, 6 Aug 2018 21:03:27 -0400
+Message-ID: <CAH8yC8kKet=fx0rYF8QEWK+TzyBgwHrLabWE72znBY=QLZVWkA@mail.gmail.com>
+References: <20180806223300.113891-1-ebiggers@kernel.org> <20180806230437.21431-1-Jason@zx2c4.com>
+Reply-To: noloader@gmail.com
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Cc: ebiggers@kernel.org, linux-crypto@vger.kernel.org,
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         linux-fscrypt@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        LKML <linux-kernel@vger.kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
+        Paul Crowley <paulcrowley@google.com>,
         Greg Kaiser <gkaiser@google.com>,
         Michael Halcrow <mhalcrow@google.com>,
-        samuel.c.p.neves@gmail.com, tomer.ashur@esat.kuleuven.be,
-        Eric Biggers <ebiggers@google.com>, djb@cr.yp.to
-To: Paul Crowley <paulcrowley@google.com>
+        Samuel Neves <samuel.c.p.neves@gmail.com>,
+        Tomer Ashur <tomer.ashur@esat.kuleuven.be>,
+        Eric Biggers <ebiggers@kernel.org>, stable@vger.kernel.org
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CA+_SqcD+KpQ_X6iXUCpQh0N6pWzBorstBJDx7eBqcybY4Dvy8Q@mail.gmail.com>
+In-Reply-To: <20180806230437.21431-1-Jason@zx2c4.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi Paul,
+On Mon, Aug 6, 2018 at 7:04 PM, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+> These are unused, undesired, and have never actually been used by
+> anybody. The original authors of this code have changed their mind about
+> its inclusion. Therefore, this patch removes it.
 
-On 8/6/18, Paul Crowley <paulcrowley@google.com> wrote:
-> Salsa20 was one of the earlier ARX proposals, and set a very
-> conservative number of rounds as befits our state of knowledge at the
-> time. Since then we've learned a lot more about cryptanalysis of such
-> offerings, and I think we can be comfortable with fewer rounds. The
-> best attack on ChaCha breaks 7 rounds, and that attack requires 2^248
-> operations. Every round of ChaCha makes attacks vastly harder.
+I think it may be unwise to completely discard Speck for several
+reasons. The two biggest pain points for me are:
 
-I'm well aware of that, which is why I mentioned that ChaCha12
-_probably_ has an adequate security. My primary concerns are a bit
-different actually from where you're going - that it breaks from
-what's becoming a pretty widely accepted "norm" and, more importantly,
-that it increases implementation complexity. These aren't really
-drastic concerns, but I am in earnest wondering the type of hardware
-analysis you did to determine that you really do need the 12-speedup.
-What's the practical landscape out there look like? What disk speeds
-were too low for which specific kind of Android usage on which
-particular hardware? Did you hit the bottlenecks when paging for code
-or when filling up caches when writing asynchronously? And for how
-much longer do you foresee underpowered hardware like that being a not
-insignificant part of the market? I'm especially curious to know
-because ostensibly at Google you have all sorts metrics regarding that
-kind of thing.
+  - political concerns addressed by other ciphers
+  - high quality lightweight block cipher implementation
+  - some regulated industries will need it for their problem domains
 
-Jason
+It seems to me the political concerns were addressed by not using
+Speck for Android. I don't believe HPolyC and Speck are orthogonal.
+Instead they provide the user with a choice which is usually a good
+thing.
+
+I also think allowing politics a heavy hand endangers other ciphers
+like SM3 and SM4. I would advise against removing them just because
+they are Chinese ciphers. I suppose the same could be argued for North
+Korea and Jipsam and Pilsung (if North Korea ever offers their
+ciphers).
+
+I think Eric, Ard and other contributions lead to a high quality
+implementation of Speck. High quality implementations that "just
+works" everywhere on multiple platforms are rather hard to come by.
+The kernel's unified implementation ensures lots of folks don't go
+making lots of mistakes when rolling their own.
+
+There are verticals that will need a choice or alternative like Speck.
+US Aerospace, US Automotive and US Hoteliers come to mind. US
+Financial my use them too (they having some trading platforms with
+absurd requirements that make Simon and Speck appear bloated and
+overweight).  Some of the verticals are going to need an alternative
+that meets technical and security goals and pass the audits.
+
+Choice is a good thing. Users need choices for technical, regulatory
+and legal reasons.
+
+Jeff
