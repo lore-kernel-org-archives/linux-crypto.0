@@ -1,52 +1,47 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/2] crypto: arm64/ghash-ce - performance improvements
-Date: Tue, 7 Aug 2018 17:53:41 +0800
-Message-ID: <20180807095341.osf4ugfhl5kzhenc@gondor.apana.org.au>
-References: <20180804184625.28523-1-ard.biesheuvel@linaro.org>
+From: Oliver Neukum <oneukum@suse.com>
+Subject: Re: [PATCH 0/4][RFC v2] Introduce the in-kernel hibernation
+ encryption
+Date: Tue, 07 Aug 2018 12:04:19 +0200
+Message-ID: <1533636259.7912.2.camel@suse.com>
+References: <20180718202235.GA4132@amd>
+         <20180718235851.GA22170@sandybridge-desktop> <20180719110149.GA4679@amd>
+         <20180719132003.GA30981@sandybridge-desktop> <20180720102532.GA20284@amd>
+         <1532346156.3057.11.camel@suse.com>
+         <20180723162302.GA4503@sandybridge-desktop>
+         <1532590246.7411.3.camel@suse.com> <20180806075754.GA12124@chenyu-desktop>
+         <1533550820.15815.14.camel@suse.com>
+         <20180807073840.GA17894@chenyu-desktop>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-Cc: jerome.forissier@linaro.org, linux-crypto@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, jens.wiklander@linaro.org
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-Content-Disposition: inline
-In-Reply-To: <20180804184625.28523-1-ard.biesheuvel@linaro.org>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+Cc: Pavel Machek <pavel@ucw.cz>,
+        "Rafael J . Wysocki" <rafael.j.wysocki@intel.com>,
+        Eric Biggers <ebiggers@google.com>,
+        "Lee, Chun-Yi" <jlee@suse.com>, Theodore Ts o <tytso@mit.edu>,
+        Stephan Mueller <smueller@chronox.de>,
+        Denis Kenzior <denkenz@gmail.com>, linux-pm@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        "Gu, Kookoo" <kookoo.gu@intel.com>,
+        "Zhang, Rui" <rui.zhang@intel.com>
+To: Yu Chen <yu.c.chen@intel.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20180807073840.GA17894@chenyu-desktop>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Sat, Aug 04, 2018 at 08:46:23PM +0200, Ard Biesheuvel wrote:
-> Another bit of performance work on the GHASH driver: this time it is not
-> the combined AES/GCM algorithm but the bare GHASH driver that gets updated.
+On Di, 2018-08-07 at 15:38 +0800, Yu Chen wrote:
+> > As STD affects the whole machine it must require root rights.
+> > So I cannot see how you can talk about a session belonging
+> > to a user. Please explain.
+> > 
 > 
-> Even though ARM cores that implement the polynomical multiplication
-> instructions that these routines depend on are guaranteed to also support
-> the AES instructions, and can thus use the AES/GCM driver, there could
-> be reasons to use the accelerated GHASH in isolation, e.g., with another
-> symmetric blockcipher, with a faster h/w accelerator, or potentially with
-> an accelerator that does not expose the AES key to the OS.
-> 
-> The resulting code runs at 1.1 cycles per byte on Cortex-A53 (down from
-> 2.4 cycles per byte)
-> 
-> Ard Biesheuvel (2):
->   crypto: arm64/ghash-ce - replace NEON yield check with block limit
->   crypto: arm64/ghash-ce - implement 4-way aggregation
-> 
->  arch/arm64/crypto/ghash-ce-core.S | 153 ++++++++++++++------
->  arch/arm64/crypto/ghash-ce-glue.c |  87 ++++++-----
->  2 files changed, 161 insertions(+), 79 deletions(-)
+> The case is for physical access, not the 'user' in OS.
 
-All applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Well, yes, but Secure Boot does not guard against anybody
+booting or halting the machine. It limits what you can
+boot by a chain of trust.
+
+I think you are trying to add a feature to Secure Boot.
+
+	Regards
+		Oliver
