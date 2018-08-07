@@ -1,7 +1,8 @@
 From: Kees Cook <keescook@chromium.org>
-Subject: [PATCH v8 0/9] crypto: Remove VLA usage
-Date: Tue,  7 Aug 2018 14:18:34 -0700
-Message-ID: <20180807211843.47586-1-keescook@chromium.org>
+Subject: [PATCH v8 1/9] crypto: xcbc: Remove VLA usage
+Date: Tue,  7 Aug 2018 14:18:35 -0700
+Message-ID: <20180807211843.47586-2-keescook@chromium.org>
+References: <20180807211843.47586-1-keescook@chromium.org>
 Cc: Kees Cook <keescook@chromium.org>,
         Eric Biggers <ebiggers@google.com>,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>,
@@ -23,114 +24,54 @@ Cc: Kees Cook <keescook@chromium.org>,
         qat-linux@intel.com, l
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20180807211843.47586-1-keescook@chromium.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-v8 cover letter:
-
-I continue to hope this can land in v4.19, but I realize that's unlikely.
-It would be nice, though, if some of the "trivial" patches could get taken
-(e.g. cbc, xcbc, ccm VLA removals) so I don't have to keep repeating them.
-*fingers crossed*
-
-Series cover letter:
-
-This is nearly the last of the VLA removals[1], but it's one of the
-largest because crypto gets used in lots of places. After looking
-through code, usage, reading the threads Gustavo started, and comparing
-the use-cases to the other VLA removals that have landed in the kernel,
-I think this series is likely the best way forward to shut the door on
-VLAs forever.
-
-For background, the crypto stack usage is for callers to do an immediate
-bit of work that doesn't allocate new memory. This means that other VLA
-removal techniques (like just using kmalloc) aren't workable, and the
-next common technique is needed: examination of maximum stack usage and
-the addition of sanity checks. This series does that, and in several
-cases, these maximums were already implicit in the code.
-
-This series is intended to land via the crypto tree for 4.19, though it
-touches dm, networking, and a few other things as well, since there are
-dependent patches (new crypto #defines being used, etc).
-
-Thanks!
-
--Kees
+In the quest to remove all stack VLA usage from the kernel[1], this uses
+the maximum blocksize and adds a sanity check. For xcbc, the blocksize
+must always be 16, so use that, since it's already being enforced during
+instantiation.
 
 [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
 
-Changelog:
+Signed-off-by: Kees Cook <keescook@chromium.org>
+---
+ crypto/xcbc.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-v8:
-- remove "impossible condition" BUG-check in cbc.
-
-v7:
-- refresh and reorganize without ahash->shash conversions
-- merge hash maximums for both shash and ahash
-
-v6:
-- make xcbc blocksize unconditional
-- add ahash-to-shash conversion patch series to entirely remove
-  AHASH_REQUEST_ON_STACK from the kernel
-
-v5:
-- limit AHASH_REQUEST_ON_STACK size only to non-async hash wrapping.
-- sanity-check ahash reqsize only when doing shash wrapping.
-- remove frame_warn changes in favor of shash conversions and other fixes.
-- send ahash to shash conversion patches and other fixes separately.
-
-v4:
-- add back *_REQUEST_ON_STACK patches.
-- programmatically find stack sizes for *_REQUEST_ON_STACK patches.
-- whitelist some code that trips FRAME_WARN on 32-bit builds.
-- fix alignment patches.
-
-v3:
-- drop *_REQUEST_ON_STACK patches. The rest of this series is pretty
-  straight-forward, and I'd like to get them tested in -next while
-  we continue to chip away at the *_REQUEST_ON_STACK VLA removal patches
-  separately. "Part 2" will continue with those.
-
-v2:
-- use 512 instead of PAGE_SIZE / 8 to avoid bloat on large-page archs.
-- swtich xcbc to "16" max universally.
-- fix typo in bounds check for dm buffer size.
-- examine actual reqsizes for skcipher and ahash instead of guessing.
-- improve names and comments for alg maxes
-
-
-
-
-
-Ard Biesheuvel (1):
-  crypto: ccm: Remove VLA usage
-
-Kees Cook (8):
-  crypto: xcbc: Remove VLA usage
-  crypto: cbc: Remove VLA usage
-  crypto: hash: Remove VLA usage
-  dm: Remove VLA usage from hashes
-  crypto alg: Introduce generic max blocksize and alignmask
-  crypto: qat: Remove VLA usage
-  crypto: shash: Remove VLA usage in unaligned hashing
-  crypto: skcipher: Remove VLA usage for SKCIPHER_REQUEST_ON_STACK
-
- crypto/ahash.c                           |  4 +--
- crypto/algapi.c                          |  7 ++++-
- crypto/algif_hash.c                      |  2 +-
- crypto/ccm.c                             |  9 ++++---
- crypto/shash.c                           | 33 ++++++++++++++----------
- crypto/xcbc.c                            |  8 +++---
- drivers/crypto/qat/qat_common/qat_algs.c |  8 ++++--
- drivers/md/dm-integrity.c                | 23 ++++++++++++-----
- drivers/md/dm-verity-fec.c               |  5 +++-
- include/crypto/algapi.h                  |  4 ++-
- include/crypto/cbc.h                     |  2 +-
- include/crypto/hash.h                    |  6 ++++-
- include/crypto/internal/skcipher.h       |  1 +
- include/crypto/skcipher.h                |  4 ++-
- include/linux/compiler-gcc.h             |  1 -
- 15 files changed, 79 insertions(+), 38 deletions(-)
-
+diff --git a/crypto/xcbc.c b/crypto/xcbc.c
+index 25c75af50d3f..c055f57fab11 100644
+--- a/crypto/xcbc.c
++++ b/crypto/xcbc.c
+@@ -57,15 +57,17 @@ struct xcbc_desc_ctx {
+ 	u8 ctx[];
+ };
+ 
++#define XCBC_BLOCKSIZE	16
++
+ static int crypto_xcbc_digest_setkey(struct crypto_shash *parent,
+ 				     const u8 *inkey, unsigned int keylen)
+ {
+ 	unsigned long alignmask = crypto_shash_alignmask(parent);
+ 	struct xcbc_tfm_ctx *ctx = crypto_shash_ctx(parent);
+-	int bs = crypto_shash_blocksize(parent);
+ 	u8 *consts = PTR_ALIGN(&ctx->ctx[0], alignmask + 1);
+ 	int err = 0;
+-	u8 key1[bs];
++	u8 key1[XCBC_BLOCKSIZE];
++	int bs = sizeof(key1);
+ 
+ 	if ((err = crypto_cipher_setkey(ctx->child, inkey, keylen)))
+ 		return err;
+@@ -212,7 +214,7 @@ static int xcbc_create(struct crypto_template *tmpl, struct rtattr **tb)
+ 		return PTR_ERR(alg);
+ 
+ 	switch(alg->cra_blocksize) {
+-	case 16:
++	case XCBC_BLOCKSIZE:
+ 		break;
+ 	default:
+ 		goto out_put_alg;
 -- 
 2.17.1
