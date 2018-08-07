@@ -1,11 +1,10 @@
 From: Kees Cook <keescook@chromium.org>
-Subject: [PATCH v8 3/9] crypto: ccm: Remove VLA usage
-Date: Tue,  7 Aug 2018 14:18:37 -0700
-Message-ID: <20180807211843.47586-4-keescook@chromium.org>
-References: <20180807211843.47586-1-keescook@chromium.org>
+Subject: [PATCH v8 0/9] crypto: Remove VLA usage
+Date: Tue,  7 Aug 2018 14:18:34 -0700
+Message-ID: <20180807211843.47586-1-keescook@chromium.org>
 Cc: Kees Cook <keescook@chromium.org>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
         Eric Biggers <ebiggers@google.com>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
         Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
         Alasdair Kergon <agk@redhat.com>,
         Mike Snitzer <snitzer@redhat.com>,
@@ -24,57 +23,114 @@ Cc: Kees Cook <keescook@chromium.org>,
         qat-linux@intel.com, l
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180807211843.47586-1-keescook@chromium.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+v8 cover letter:
 
-In the quest to remove all stack VLA usage from the kernel[1], this drops
-AHASH_REQUEST_ON_STACK by preallocating the ahash request area combined
-with the skcipher area (which are not used at the same time).
+I continue to hope this can land in v4.19, but I realize that's unlikely.
+It would be nice, though, if some of the "trivial" patches could get taken
+(e.g. cbc, xcbc, ccm VLA removals) so I don't have to keep repeating them.
+*fingers crossed*
+
+Series cover letter:
+
+This is nearly the last of the VLA removals[1], but it's one of the
+largest because crypto gets used in lots of places. After looking
+through code, usage, reading the threads Gustavo started, and comparing
+the use-cases to the other VLA removals that have landed in the kernel,
+I think this series is likely the best way forward to shut the door on
+VLAs forever.
+
+For background, the crypto stack usage is for callers to do an immediate
+bit of work that doesn't allocate new memory. This means that other VLA
+removal techniques (like just using kmalloc) aren't workable, and the
+next common technique is needed: examination of maximum stack usage and
+the addition of sanity checks. This series does that, and in several
+cases, these maximums were already implicit in the code.
+
+This series is intended to land via the crypto tree for 4.19, though it
+touches dm, networking, and a few other things as well, since there are
+dependent patches (new crypto #defines being used, etc).
+
+Thanks!
+
+-Kees
 
 [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
 
-Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Signed-off-by: Kees Cook <keescook@chromium.org>
----
- crypto/ccm.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+Changelog:
 
-diff --git a/crypto/ccm.c b/crypto/ccm.c
-index 0a083342ec8c..b242fd0d3262 100644
---- a/crypto/ccm.c
-+++ b/crypto/ccm.c
-@@ -50,7 +50,10 @@ struct crypto_ccm_req_priv_ctx {
- 	u32 flags;
- 	struct scatterlist src[3];
- 	struct scatterlist dst[3];
--	struct skcipher_request skreq;
-+	union {
-+		struct ahash_request ahreq;
-+		struct skcipher_request skreq;
-+	};
- };
- 
- struct cbcmac_tfm_ctx {
-@@ -181,7 +184,7 @@ static int crypto_ccm_auth(struct aead_request *req, struct scatterlist *plain,
- 	struct crypto_ccm_req_priv_ctx *pctx = crypto_ccm_reqctx(req);
- 	struct crypto_aead *aead = crypto_aead_reqtfm(req);
- 	struct crypto_ccm_ctx *ctx = crypto_aead_ctx(aead);
--	AHASH_REQUEST_ON_STACK(ahreq, ctx->mac);
-+	struct ahash_request *ahreq = &pctx->ahreq;
- 	unsigned int assoclen = req->assoclen;
- 	struct scatterlist sg[3];
- 	u8 *odata = pctx->odata;
-@@ -427,7 +430,7 @@ static int crypto_ccm_init_tfm(struct crypto_aead *tfm)
- 	crypto_aead_set_reqsize(
- 		tfm,
- 		align + sizeof(struct crypto_ccm_req_priv_ctx) +
--		crypto_skcipher_reqsize(ctr));
-+		max(crypto_ahash_reqsize(mac), crypto_skcipher_reqsize(ctr)));
- 
- 	return 0;
- 
+v8:
+- remove "impossible condition" BUG-check in cbc.
+
+v7:
+- refresh and reorganize without ahash->shash conversions
+- merge hash maximums for both shash and ahash
+
+v6:
+- make xcbc blocksize unconditional
+- add ahash-to-shash conversion patch series to entirely remove
+  AHASH_REQUEST_ON_STACK from the kernel
+
+v5:
+- limit AHASH_REQUEST_ON_STACK size only to non-async hash wrapping.
+- sanity-check ahash reqsize only when doing shash wrapping.
+- remove frame_warn changes in favor of shash conversions and other fixes.
+- send ahash to shash conversion patches and other fixes separately.
+
+v4:
+- add back *_REQUEST_ON_STACK patches.
+- programmatically find stack sizes for *_REQUEST_ON_STACK patches.
+- whitelist some code that trips FRAME_WARN on 32-bit builds.
+- fix alignment patches.
+
+v3:
+- drop *_REQUEST_ON_STACK patches. The rest of this series is pretty
+  straight-forward, and I'd like to get them tested in -next while
+  we continue to chip away at the *_REQUEST_ON_STACK VLA removal patches
+  separately. "Part 2" will continue with those.
+
+v2:
+- use 512 instead of PAGE_SIZE / 8 to avoid bloat on large-page archs.
+- swtich xcbc to "16" max universally.
+- fix typo in bounds check for dm buffer size.
+- examine actual reqsizes for skcipher and ahash instead of guessing.
+- improve names and comments for alg maxes
+
+
+
+
+
+Ard Biesheuvel (1):
+  crypto: ccm: Remove VLA usage
+
+Kees Cook (8):
+  crypto: xcbc: Remove VLA usage
+  crypto: cbc: Remove VLA usage
+  crypto: hash: Remove VLA usage
+  dm: Remove VLA usage from hashes
+  crypto alg: Introduce generic max blocksize and alignmask
+  crypto: qat: Remove VLA usage
+  crypto: shash: Remove VLA usage in unaligned hashing
+  crypto: skcipher: Remove VLA usage for SKCIPHER_REQUEST_ON_STACK
+
+ crypto/ahash.c                           |  4 +--
+ crypto/algapi.c                          |  7 ++++-
+ crypto/algif_hash.c                      |  2 +-
+ crypto/ccm.c                             |  9 ++++---
+ crypto/shash.c                           | 33 ++++++++++++++----------
+ crypto/xcbc.c                            |  8 +++---
+ drivers/crypto/qat/qat_common/qat_algs.c |  8 ++++--
+ drivers/md/dm-integrity.c                | 23 ++++++++++++-----
+ drivers/md/dm-verity-fec.c               |  5 +++-
+ include/crypto/algapi.h                  |  4 ++-
+ include/crypto/cbc.h                     |  2 +-
+ include/crypto/hash.h                    |  6 ++++-
+ include/crypto/internal/skcipher.h       |  1 +
+ include/crypto/skcipher.h                |  4 ++-
+ include/linux/compiler-gcc.h             |  1 -
+ 15 files changed, 79 insertions(+), 38 deletions(-)
+
 -- 
 2.17.1
