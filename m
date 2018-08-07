@@ -1,73 +1,47 @@
-From: Kees Cook <keescook@chromium.org>
-Subject: Re: [PATCH 1/9] crypto: add zbufsize() interface
-Date: Tue, 7 Aug 2018 11:10:10 -0700
-Message-ID: <CAGXu5j+dPqpJZbO_AuGsNqJzq7XGcB2deXA5RELWv1-Ywi5QOA@mail.gmail.com>
-References: <20180802215118.17752-1-keescook@chromium.org> <20180802215118.17752-2-keescook@chromium.org>
- <20180807094513.vstt5dhbb7n6kvds@gondor.apana.org.au>
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: Re: [PATCH v1 2/3] zinc: Introduce minimal cryptography library
+Date: Tue, 7 Aug 2018 11:54:01 -0700
+Message-ID: <CAHmME9rA_nb9Le4VQhtcqCfNSuHpFjZVOV6=vE12FydJD9CmAQ@mail.gmail.com>
+References: <20180801072246.GA15677@sol.localdomain> <CALCETrXD_VyoyW5C1U34o-ySJ4nFcO6PQ+ZNBVYxCpJ-f65CHw@mail.gmail.com>
+ <CAHmME9oThR-dE3gTW0UyqAGZO80qu19ktG4YTb4iL6CNpzNNaw@mail.gmail.com>
+ <CALCETrVziUpAU4nTaZ=t5ct=1jsWswWOy7KDNxXGPD1L=tMTGQ@mail.gmail.com> <CAHmME9pt3PxKQmc8E-arA-W0p2tp9z_oJ-uXQwis3qD=Zvpnsg@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Cc: Geliang Tang <geliangtang@gmail.com>,
-        Arnd Bergmann <arnd@arndb.de>, Haren Myneni <haren@us.ibm.com>,
-        Anton Vorontsov <anton@enomsg.org>,
-        Colin Cross <ccross@android.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Zhou Wang <wangzhou1@hisilicon.com>,
-        linux-crypto <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Netdev <netdev@vger.kernel.org>,
+        David Miller <davem@davemloft.net>,
+        Andrew Lutomirski <luto@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Samuel Neves <sneves@dei.uc.pt>,
+        "Daniel J . Bernstein" <djb@cr.yp.to>,
+        Tanja Lange <tanja@hyperelliptic.org>,
+        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
+        Karthikeyan Bhargavan <karthik.bhargavan@gmail.com>
+To: Andy Lutomirski <luto@amacapital.net>,
+        Eric Biggers <ebiggers3@gmail.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180807094513.vstt5dhbb7n6kvds@gondor.apana.org.au>
+In-Reply-To: <CAHmME9pt3PxKQmc8E-arA-W0p2tp9z_oJ-uXQwis3qD=Zvpnsg@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Aug 7, 2018 at 2:45 AM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> On Thu, Aug 02, 2018 at 02:51:10PM -0700, Kees Cook wrote:
->> When pstore was refactored to use the crypto compress API in:
->>
->>   commit cb3bee0369bc ("pstore: Use crypto compress API")
->>
->> nearly all the pstore-specific compression routines were replaced with
->> the existing crypto compression API. One case remained: calculating the
->> "worst case" compression sizes ahead of time so it could have a buffer
->> preallocated for doing compression (which was called "zbufsize").
->>
->> To make pstore fully algorithm-agnostic, the compression API needs to
->> grow this functionality. This adds the interface to support querying the
->> "worst case" estimate, with a new "zbufsize" routine that each compressor
->> can implement. The per-compressor implementations come in later commits.
->>
->> Signed-off-by: Kees Cook <keescook@chromium.org>
->> ---
->>  crypto/compress.c                   |  9 +++++++++
->>  include/crypto/internal/scompress.h | 11 +++++++++++
->>  include/linux/crypto.h              | 12 ++++++++++++
->>  3 files changed, 32 insertions(+)
->>
->> diff --git a/crypto/compress.c b/crypto/compress.c
->> index f2d522924a07..29a80bb3b9d3 100644
->> --- a/crypto/compress.c
->> +++ b/crypto/compress.c
->> @@ -33,12 +33,21 @@ static int crypto_decompress(struct crypto_tfm *tfm,
->>                                                          dlen);
->>  }
->>
->> +static int crypto_zbufsize(struct crypto_tfm *tfm,
->> +                        unsigned int slen, unsigned int *dlen)
->> +{
->> +     if (!tfm->__crt_alg->cra_compress.coa_zbufsize)
->> +             return -ENOTSUPP;
->> +     return tfm->__crt_alg->cra_compress.coa_zbufsize(tfm, slen, dlen);
->> +}
->
-> Please don't add new features to the old compress interface.  Any
-> new improvements should be added to scomp/acomp only.  Users who
-> need new features should be converted.
+Hey Andy, Eric, & all,
 
-So, keep crypto_scomp_zbufsize() and drop crypto_comp_zbufsize() and
-crypto_zbufsize()? Should I add crypto_acomp_zbufsize()?
+I've started the work of separating this out into 16 individual
+commits, have addressed numerous other things brought up like the
+ifdef maze, and have begun rewriting (parts of) the original commit
+message. It's still a work in progress, and I still have some work to
+do, but if you want to follow along, things are happening here:
 
--Kees
+https://git.zx2c4.com/linux-dev/log/?h=jd/wireguard
 
--- 
-Kees Cook
-Pixel Security
+I'll be rebasing and reworking this continuously, but that's how it's
+shaping up.
+
+As I'm still working on it, I won't be submitting v2 today, but if you
+have suggestions or concerns or want to poke me while I'm working on
+v2, don't hesitate to send me private email or ping me in IRC (I'm
+"zx2c4" there) to chat.
+
+Regards,
+Jason
