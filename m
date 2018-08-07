@@ -1,47 +1,42 @@
-From: Oliver Neukum <oneukum@suse.com>
-Subject: Re: [PATCH 0/4][RFC v2] Introduce the in-kernel hibernation
- encryption
-Date: Tue, 07 Aug 2018 12:04:19 +0200
-Message-ID: <1533636259.7912.2.camel@suse.com>
-References: <20180718202235.GA4132@amd>
-         <20180718235851.GA22170@sandybridge-desktop> <20180719110149.GA4679@amd>
-         <20180719132003.GA30981@sandybridge-desktop> <20180720102532.GA20284@amd>
-         <1532346156.3057.11.camel@suse.com>
-         <20180723162302.GA4503@sandybridge-desktop>
-         <1532590246.7411.3.camel@suse.com> <20180806075754.GA12124@chenyu-desktop>
-         <1533550820.15815.14.camel@suse.com>
-         <20180807073840.GA17894@chenyu-desktop>
+From: Samuel Neves <samuel.c.p.neves@gmail.com>
+Subject: Re: [RFC PATCH 3/9] crypto: chacha20-generic - refactor to allow
+ varying number of rounds
+Date: Tue, 7 Aug 2018 11:21:04 +0100
+Message-ID: <CAEX_ruFp0KddnZyetZt997OvRzKDuN7U95MF_N9AgTh+mTcD7Q@mail.gmail.com>
+References: <20180806223300.113891-1-ebiggers@kernel.org> <20180806223300.113891-4-ebiggers@kernel.org>
+ <CAHmME9rbe6eT6dkUqKnp-GxcqGrp-tvMfTMr8kZtsn=S3cmP8A@mail.gmail.com> <CA+_SqcD+KpQ_X6iXUCpQh0N6pWzBorstBJDx7eBqcybY4Dvy8Q@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: Pavel Machek <pavel@ucw.cz>,
-        "Rafael J . Wysocki" <rafael.j.wysocki@intel.com>,
-        Eric Biggers <ebiggers@google.com>,
-        "Lee, Chun-Yi" <jlee@suse.com>, Theodore Ts o <tytso@mit.edu>,
-        Stephan Mueller <smueller@chronox.de>,
-        Denis Kenzior <denkenz@gmail.com>, linux-pm@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        "Gu, Kookoo" <kookoo.gu@intel.com>,
-        "Zhang, Rui" <rui.zhang@intel.com>
-To: Yu Chen <yu.c.chen@intel.com>
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>, ebiggers@kernel.org,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        linux-fscrypt@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Greg Kaiser <gkaiser@google.com>,
+        Michael Halcrow <mhalcrow@google.com>,
+        tomer.ashur@esat.kuleuven.be, Eric Biggers <ebiggers@google.com>,
+        "D. J. Bernstein" <djb@cr.yp.to>
+To: Paul Crowley <paulcrowley@google.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180807073840.GA17894@chenyu-desktop>
+In-Reply-To: <CA+_SqcD+KpQ_X6iXUCpQh0N6pWzBorstBJDx7eBqcybY4Dvy8Q@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Di, 2018-08-07 at 15:38 +0800, Yu Chen wrote:
-> > As STD affects the whole machine it must require root rights.
-> > So I cannot see how you can talk about a session belonging
-> > to a user. Please explain.
-> > 
-> 
-> The case is for physical access, not the 'user' in OS.
+> The best attack on ChaCha breaks 7 rounds, and that attack requires 2^248 operations.
 
-Well, yes, but Secure Boot does not guard against anybody
-booting or halting the machine. It limits what you can
-boot by a chain of trust.
+This number, as far as I can tell, comes from the "New features of
+Latin dances" paper. There have been some minor improvements in the
+intervening 10 years, e.g., [1, 2, 3, 4], which pull back the
+complexity of breaking ChaCha7 down to 2^235. In any case, every
+attack so far appears to hit a wall at 8 rounds, with 12 rounds---the
+recommended eSTREAM round number for Salsa20---seeming to offer a
+reasonable security margin, still somewhat better than that of the
+AES.
 
-I think you are trying to add a feature to Secure Boot.
+Best regards,
+Samuel Neves
 
-	Regards
-		Oliver
+[1] https://eprint.iacr.org/2015/698
+[2] https://eprint.iacr.org/2015/217
+[3] https://eprint.iacr.org/2016/1034
+[4] https://doi.org/10.1016/j.dam.2017.04.034
