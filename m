@@ -1,77 +1,80 @@
 From: Kees Cook <keescook@chromium.org>
-Subject: Re: [PATCH v7 2/9] crypto: cbc: Remove VLA usage
-Date: Tue, 7 Aug 2018 13:52:20 -0700
-Message-ID: <CAGXu5jKvP0BqYx7vG1DP=W_xG40M42NL9iXdm+dqdm9b_r3YMQ@mail.gmail.com>
-References: <20180802225152.19194-1-keescook@chromium.org>
-	<20180802225152.19194-3-keescook@chromium.org>
-	<20180807094720.ljie32lewzlgymm4@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-	LKML <linux-kernel@vger.kernel.org>,
-	Arnd Bergmann <arnd@arndb.de>, Mike Snitzer <snitzer@redhat.com>,
-	Tudor-Dan Ambarus <tudor.ambarus@microchip.com>,
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-	Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-	Will Deacon <will.deacon@arm.com>, qat-linux@intel.com,
-	Matthew Wilcox <mawilcox@microsoft.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	device-mapper development <dm-devel@redhat.com>,
-	Geert Uytterhoeven <geert@linux-m68k.org>,
-	David Woodhouse <dwmw@amazon.co.uk>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Thomas Gleixner <tglx@linutronix.de>, Alasdair Kergon <agk@redhat.com>,
-	linux-crypto <linux-crypto@vger.kernel.org>
+Subject: [PATCH v8 3/9] crypto: ccm: Remove VLA usage
+Date: Tue,  7 Aug 2018 14:18:37 -0700
+Message-ID: <20180807211843.47586-4-keescook@chromium.org>
+References: <20180807211843.47586-1-keescook@chromium.org>
+Cc: Kees Cook <keescook@chromium.org>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Eric Biggers <ebiggers@google.com>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Tudor-Dan Ambarus <tudor.ambarus@microchip.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Will Deacon <will.deacon@arm.com>,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        Matthew Wilcox <willy@infradead.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+        linux-crypto@vger.kernel.org, dm-devel@redhat.com,
+        qat-linux@intel.com, l
 To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <dm-devel-bounces@redhat.com>
-In-Reply-To: <20180807094720.ljie32lewzlgymm4@gondor.apana.org.au>
-List-Unsubscribe: <https://www.redhat.com/mailman/options/dm-devel>,
-	<mailto:dm-devel-request@redhat.com?subject=unsubscribe>
-List-Archive: <https://www.redhat.com/archives/dm-devel>
-List-Post: <mailto:dm-devel@redhat.com>
-List-Help: <mailto:dm-devel-request@redhat.com?subject=help>
-List-Subscribe: <https://www.redhat.com/mailman/listinfo/dm-devel>,
-	<mailto:dm-devel-request@redhat.com?subject=subscribe>
-Sender: dm-devel-bounces@redhat.com
-Errors-To: dm-devel-bounces@redhat.com
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20180807211843.47586-1-keescook@chromium.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Aug 7, 2018 at 2:47 AM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> On Thu, Aug 02, 2018 at 03:51:45PM -0700, Kees Cook wrote:
->> In the quest to remove all stack VLA usage from the kernel[1], this
->> uses the upper bounds on blocksize. Since this is always a cipher
->> blocksize, use the existing cipher max blocksize.
->>
->> [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
->>
->> Signed-off-by: Kees Cook <keescook@chromium.org>
->> ---
->>  include/crypto/cbc.h | 4 +++-
->>  1 file changed, 3 insertions(+), 1 deletion(-)
->>
->> diff --git a/include/crypto/cbc.h b/include/crypto/cbc.h
->> index f5b8bfc22e6d..47db0aac2ab9 100644
->> --- a/include/crypto/cbc.h
->> +++ b/include/crypto/cbc.h
->> @@ -113,7 +113,9 @@ static inline int crypto_cbc_decrypt_inplace(
->>       unsigned int bsize = crypto_skcipher_blocksize(tfm);
->>       unsigned int nbytes = walk->nbytes;
->>       u8 *src = walk->src.virt.addr;
->> -     u8 last_iv[bsize];
->> +     u8 last_iv[MAX_CIPHER_BLOCKSIZE];
->> +
->> +     BUG_ON(bsize > sizeof(last_iv));
->
-> Ugh, please don't add these BUG_ONs.  Add them to the places where
-> the algorithm is created (if they aren't checking that already).
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-It's already being checked (cra_blocksize vs MAX_CIPHER_BLOCKSIZE) so
-I was just adding the BUG_ON to catch "impossible" behavior. I'll
-leave it out in the next revision.
+In the quest to remove all stack VLA usage from the kernel[1], this drops
+AHASH_REQUEST_ON_STACK by preallocating the ahash request area combined
+with the skcipher area (which are not used at the same time).
 
--Kees
+[1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
 
+Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Signed-off-by: Kees Cook <keescook@chromium.org>
+---
+ crypto/ccm.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/crypto/ccm.c b/crypto/ccm.c
+index 0a083342ec8c..b242fd0d3262 100644
+--- a/crypto/ccm.c
++++ b/crypto/ccm.c
+@@ -50,7 +50,10 @@ struct crypto_ccm_req_priv_ctx {
+ 	u32 flags;
+ 	struct scatterlist src[3];
+ 	struct scatterlist dst[3];
+-	struct skcipher_request skreq;
++	union {
++		struct ahash_request ahreq;
++		struct skcipher_request skreq;
++	};
+ };
+ 
+ struct cbcmac_tfm_ctx {
+@@ -181,7 +184,7 @@ static int crypto_ccm_auth(struct aead_request *req, struct scatterlist *plain,
+ 	struct crypto_ccm_req_priv_ctx *pctx = crypto_ccm_reqctx(req);
+ 	struct crypto_aead *aead = crypto_aead_reqtfm(req);
+ 	struct crypto_ccm_ctx *ctx = crypto_aead_ctx(aead);
+-	AHASH_REQUEST_ON_STACK(ahreq, ctx->mac);
++	struct ahash_request *ahreq = &pctx->ahreq;
+ 	unsigned int assoclen = req->assoclen;
+ 	struct scatterlist sg[3];
+ 	u8 *odata = pctx->odata;
+@@ -427,7 +430,7 @@ static int crypto_ccm_init_tfm(struct crypto_aead *tfm)
+ 	crypto_aead_set_reqsize(
+ 		tfm,
+ 		align + sizeof(struct crypto_ccm_req_priv_ctx) +
+-		crypto_skcipher_reqsize(ctr));
++		max(crypto_ahash_reqsize(mac), crypto_skcipher_reqsize(ctr)));
+ 
+ 	return 0;
+ 
 -- 
-Kees Cook
-Pixel Security
+2.17.1
