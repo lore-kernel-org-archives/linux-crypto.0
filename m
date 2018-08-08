@@ -1,51 +1,56 @@
-From: Joerg Roedel <joro@8bytes.org>
-Subject: Re: [RFC PATCH 2/7] iommu: Add share domain interface in iommu for
- spimdev
-Date: Wed, 8 Aug 2018 11:13:54 +0200
-Message-ID: <20180808091354.ppqgineql3pufwwr@8bytes.org>
-References: <20180801102221.5308-1-nek.in.cn@gmail.com>
- <20180801102221.5308-3-nek.in.cn@gmail.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [RFC] crypto: Remove mcryptd
+Date: Wed, 8 Aug 2018 17:56:21 +0800
+Message-ID: <20180808095621.h7ecacftx5ofe5ki@gondor.apana.org.au>
+References: <1526089453-6542-1-git-send-email-megha.dey@linux.intel.com>
+ <20180720035325.m5tzeuqsfej3y6wd@gondor.apana.org.au>
+ <1532651107.19157.24.camel@megha-Z97X-UD7-TH>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Jonathan Corbet <corbet@lwn.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Kenneth Lee <liguozhu@hisilicon.com>,
-        Hao Fang <fanghao11@huawei.com>,
-        Zhou Wang <wangzhou1@hisilicon.com>,
-        Zaibo Xu <xuzaibo@huawei.com>,
-        Philippe Ombredanne <pombredanne@nexb.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, iommu@lists.linux-foundation.org,
-        kvm@vger.kernel.org, linux-accelerators@lists.ozlabs.org,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Sanjay Kumar <sanjay.k.kumar@intel.com>, linuxarm@huawei.com
-To: Kenneth Lee <nek.in.cn@gmail.com>
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+To: Megha Dey <megha.dey@intel.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20180801102221.5308-3-nek.in.cn@gmail.com>
+In-Reply-To: <1532651107.19157.24.camel@megha-Z97X-UD7-TH>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Aug 01, 2018 at 06:22:16PM +0800, Kenneth Lee wrote:
-> From: Kenneth Lee <liguozhu@hisilicon.com>
+On Thu, Jul 26, 2018 at 05:25:07PM -0700, Megha Dey wrote:
 > 
-> This patch add sharing interface for a iommu_group. The new interface:
+> 1. On the existing algorithms covered in aesni_intel-glue.c (eg:
+> __cbc-aes-aesni), 3 algorithms are registered in /proc/crypto:
 > 
-> 	iommu_group_share_domain()
-> 	iommu_group_unshare_domain()
+>      __cbc(aes)
+>      cryptd(__cbc-aes-aesni)--> registered via cryptd_create_skcipher
 > 
-> can be used by some virtual iommu_group (such as iommu_group for spimdev)
-> to share their parent's iommu_group.
+>      cbc(aes)
+>      cbc-aes-aesni	--> registered via simd_skcipher_create_compat
 > 
-> When the domain of the group is shared, it cannot be changed before
-> unshared.  In the future, notification can be added if update is required.
+>      __cbc(aes)
+>      __cbc-aes-aesni    --> registered as the internal algorithm
+> 
+> I would want to know why do we need the cryptd(__cbc-aes-aesni)
+> algorithm at all. I do not see any of the associated setkey, encrypt or
+> decrypt functions getting called during the selftest or while running
+> tcrypt. I just see the simd_(setkey, encrypt, decrypt) functions
+> directly called the inner algorithms. However, if I remove the cryptd
+> algorithm, none of the algorithms are registered.
 
->From the description or the patch I don't really get why this is needed.
-Please update the description and make a case for this API addition.
+The simd functions are the fast path where you are running in a
+context where SIMD can be used directly.  cryptd is the slow path
+where we defer the work to a work queue.
 
+> > What you need to do is create an actual simd wrapper with cryptd
+>  
+> This simd wrapper is already present for skcipher right(in simd.c)?
+> Assuming we only have ciphers and no hash algorithms, are any changes
+> required in these wrappers?
 
-	Joerg
+For skcipher yes they already exist.  But this thread was about
+hashes.
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
