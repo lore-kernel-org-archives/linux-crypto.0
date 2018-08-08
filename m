@@ -1,88 +1,68 @@
-From: Kenneth Lee <nek.in.cn-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [RFC PATCH 1/7] vfio/spimdev: Add documents for WarpDrive
-	framework
-Date: Wed, 8 Aug 2018 09:43:05 +0800
-Message-ID: <7977ce04-35db-92b4-71b8-54a31484ef0b@gmail.com>
-References: <20180801102221.5308-1-nek.in.cn@gmail.com>
-	<20180801102221.5308-2-nek.in.cn@gmail.com>
-	<20180806122733.GA17232@xo-6d-61-c0.localdomain>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="gbk"; Format="flowed"
-Content-Transfer-Encoding: base64
-Cc: Hao Fang <fanghao11-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>, Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-	kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Jonathan Corbet <corbet-T1hC0tSOHrs@public.gmane.org>,
-	Greg Kroah-Hartman <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>, linux-doc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Sanjay Kumar <sanjay.k.kumar-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
-	iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linuxarm-hv44wF8Li93QT0dZR+AlfA@public.gmane.org, Alex Williamson <alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	Thomas Gleixner <tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org>, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Philippe Ombredanne <pombredanne-od1rfyK75/E@public.gmane.org>, Zaibo Xu <xuzaibo-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>,
-	Kenneth Lee <liguozhu-C8/M+/jPZTeaMJb+Lgu22Q@public.gmane.org>,
-	"David S . Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
-	linux-accelerators-uLR06cmDAlY/bJ5BZ2RsiQ@public.gmane.org
-To: Pavel Machek <pavel-+ZI9xUNit7I@public.gmane.org>
-Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-In-Reply-To: <20180806122733.GA17232-5NIqAleC692hcjWhqY66xCZi+YwRKgec@public.gmane.org>
-Content-Language: en-US
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
-List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
-Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+From: Andy Lutomirski <luto@amacapital.net>
+Subject: Re: [PATCH v1 2/3] zinc: Introduce minimal cryptography library
+Date: Tue, 7 Aug 2018 18:48:59 -0700
+Message-ID: <A44CAA94-415C-476C-9523-2D19F28EDC6D@amacapital.net>
+References: <20180801072246.GA15677@sol.localdomain> <CALCETrXD_VyoyW5C1U34o-ySJ4nFcO6PQ+ZNBVYxCpJ-f65CHw@mail.gmail.com> <CAHmME9oThR-dE3gTW0UyqAGZO80qu19ktG4YTb4iL6CNpzNNaw@mail.gmail.com> <CALCETrVziUpAU4nTaZ=t5ct=1jsWswWOy7KDNxXGPD1L=tMTGQ@mail.gmail.com> <CAHmME9pt3PxKQmc8E-arA-W0p2tp9z_oJ-uXQwis3qD=Zvpnsg@mail.gmail.com> <CAHmME9rA_nb9Le4VQhtcqCfNSuHpFjZVOV6=vE12FydJD9CmAQ@mail.gmail.com> <CALCETrWo-vCt_bHMBPAEHEr3P4=AJq-95Bf=00aAEAcE839wLw@mail.gmail.com> <CAHmME9qPay3O7Yh-R66EDhon4dJz1cuy69dWUxf3Xkt8seqLZA@mail.gmail.com>
+Mime-Version: 1.0 (1.0)
+Content-Type: text/plain;
+        charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Cc: Ingo Molnar <mingo@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        linux-arch@vger.kernel.org, Eric Biggers <ebiggers3@gmail.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Netdev <netdev@vger.kernel.org>,
+        David Miller <davem@davemloft.net>,
+        Andrew Lutomirski <luto@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Samuel Neves <sneves@dei.uc.pt>,
+        "Daniel J . Bernstein" <djb@cr.yp.to>,
+        Tanja Lange <tanja@hyperelliptic.org>,
+        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
+        Karthikeyan Bhargavan <karthik.bhargavan@gmail.com>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <CAHmME9qPay3O7Yh-R66EDhon4dJz1cuy69dWUxf3Xkt8seqLZA@mail.gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-CgrU2iAyMDE4xOowONTCMDbI1SDQx8ba0rsgMDg6Mjcgz8LO5ywgUGF2ZWwgTWFjaGVrINC0tcA6
-Cj4gSGkhCj4KPj4gV2FycERyaXZlIGlzIGEgY29tbW9uIHVzZXIgc3BhY2UgYWNjZWxlcmF0b3Ig
-ZnJhbWV3b3JrLiAgSXRzIG1haW4gY29tcG9uZW50Cj4+IGluIEtlcm5lbCBpcyBjYWxsZWQgc3Bp
-bWRldiwgU2hhcmUgUGFyZW50IElPTU1VIE1lZGlhdGVkIERldmljZS4gSXQgZXhwb3Nlcwo+IHNw
-aW1kZXYgaXMgcmVhbGx5IHVuZm9ydHVuYXRlIG5hbWUuIEl0IGxvb2tzIGxpa2UgaXQgaGFzIHNv
-bWV0aGluZyB0byBkbyB3aXRoIFNQSSwgYnV0Cj4gaXQgZG9lcyBub3QuCj4KWWVzLiBMZXQgbWUg
-Y2hhbmdlIGl0IHRvIFNoYXJlIChJT01NVSkgRG9tYWluIE1EZXYsIFNETWRldjopCj4+ICsrKyBi
-L0RvY3VtZW50YXRpb24vd2FycGRyaXZlL3dhcnBkcml2ZS5yc3QKPj4gQEAgLTAsMCArMSwxNTMg
-QEAKPj4gK0ludHJvZHVjdGlvbiBvZiBXYXJwRHJpdmUKPj4gKz09PT09PT09PT09PT09PT09PT09
-PT09PT0KPj4gKwo+PiArKldhcnBEcml2ZSogaXMgYSBnZW5lcmFsIGFjY2VsZXJhdG9yIGZyYW1l
-d29yayBidWlsdCBvbiB0b3Agb2YgdmZpby4KPj4gK0l0IGNhbiBiZSB0YWtlbiBhcyBhIGxpZ2h0
-IHdlaWdodCB2aXJ0dWFsIGZ1bmN0aW9uLCB3aGljaCB5b3UgY2FuIHVzZSB3aXRob3V0Cj4+ICsq
-U1ItSU9WKiBsaWtlIGZhY2lsaXR5IGFuZCBjYW4gYmUgc2hhcmVkIGFtb25nIG11bHRpcGxlIHBy
-b2Nlc3Nlcy4KPj4gKwo+PiArSXQgY2FuIGJlIHVzZWQgYXMgdGhlIHF1aWNrIGNoYW5uZWwgZm9y
-IGFjY2VsZXJhdG9ycywgbmV0d29yayBhZGFwdG9ycyBvcgo+PiArb3RoZXIgaGFyZHdhcmUgaW4g
-dXNlciBzcGFjZS4gSXQgY2FuIG1ha2Ugc29tZSBpbXBsZW1lbnRhdGlvbiBzaW1wbGVyLiAgRS5n
-Lgo+PiAreW91IGNhbiByZXVzZSBtb3N0IG9mIHRoZSAqbmV0ZGV2KiBkcml2ZXIgYW5kIGp1c3Qg
-c2hhcmUgc29tZSByaW5nIGJ1ZmZlciB0bwo+PiArdGhlIHVzZXIgc3BhY2UgZHJpdmVyIGZvciAq
-RFBESyogb3IgKk9EUCouIE9yIHlvdSBjYW4gY29tYmluZSB0aGUgUlNBCj4+ICthY2NlbGVyYXRv
-ciB3aXRoIHRoZSAqbmV0ZGV2KiBpbiB0aGUgdXNlciBzcGFjZSBhcyBhIFdlYiByZXZlcnNlZCBw
-cm94eSwgZXRjLgo+IFdoYXQgaXMgRFBESz8gT0RQPwpEUERLo7podHRwczovL3d3dy5kcGRrLm9y
-Zy9hYm91dC8KT0RQOiBodHRwczovL3d3dy5vcGVuZGF0YXBsYW5lLm9yZy8KCndpbGwgYWRkIHRo
-ZSByZWZlcmVuY2UgaW4gdGhlIG5leHQgUkZDCj4KPj4gK0hvdyBkb2VzIGl0IHdvcmsKPj4gKz09
-PT09PT09PT09PT09PT0KPj4gKwo+PiArKldhcnBEcml2ZSogdGFrZXMgdGhlIEhhcmR3YXJlIEFj
-Y2VsZXJhdG9yIGFzIGEgaGV0ZXJvZ2VuZW91cyBwcm9jZXNzb3Igd2hpY2gKPj4gK2NhbiBzaGFy
-ZSBzb21lIGxvYWQgZm9yIHRoZSBDUFU6Cj4+ICsKPj4gKy4uIGltYWdlOjogd2Quc3ZnCj4+ICsg
-ICAgICAgIDphbHQ6IFRoaXMgaXMgYSAuc3ZnIGltYWdlLCBpZiB5b3VyIGJyb3dzZXIgY2Fubm90
-IHNob3cgaXQsCj4+ICsgICAgICAgICAgICAgICAgdHJ5IHRvIGRvd25sb2FkIGFuZCB2aWV3IGl0
-IGxvY2FsbHkKPj4gKwo+PiArU28gaXQgcHJvdmlkZXMgdGhlIGNhcGFiaWxpdHkgdG8gdGhlIHVz
-ZXIgYXBwbGljYXRpb24gdG86Cj4+ICsKPj4gKzEuIFNlbmQgcmVxdWVzdCB0byB0aGUgaGFyZHdh
-cmUKPj4gKzIuIFNoYXJlIG1lbW9yeSB3aXRoIHRoZSBhcHBsaWNhdGlvbiBhbmQgb3RoZXIgYWNj
-ZWxlcmF0b3JzCj4+ICsKPj4gK1RoZXNlIHJlcXVpcmVtZW50cyBjYW4gYmUgZnVsZmlsbGVkIGJ5
-IFZGSU8gaWYgdGhlIGFjY2VsZXJhdG9yIGNhbiBzZXJ2ZSBlYWNoCj4+ICthcHBsaWNhdGlvbiB3
-aXRoIGEgc2VwYXJhdGVkIFZpcnR1YWwgRnVuY3Rpb24uIEJ1dCBhICpTUi1JT1YqIGxpa2UgVkYg
-KHdlIHdpbGwKPj4gK2NhbGwgaXQgKkhWRiogaGVyZWluYWZ0ZXIpIGRlc2lnbiBpcyB0b28gaGVh
-dnkgZm9yIHRoZSBhY2NlbGVyYXRvciB3aGljaAo+PiArc2VydmljZSB0aG91c2FuZHMgb2YgcHJv
-Y2Vzc2VzLgo+IFZGSU8/IFZGPyBIVkY/Cj4KPiBBbHNvICJndXAiIG1pZ2h0IGJlIHdvcnRoIHNw
-ZWxsaW5nIG91dC4KQnV0IEkgdGhpbmsgdGhlIHJlZmVyZW5jZSBbMV0gaGFzIGV4cGxhaW5lZCB0
-aGlzLgo+Cj4+ICtSZWZlcmVuY2VzCj4+ICs9PT09PT09PT09Cj4+ICsuLiBbMV0gQWNjcm9kaW5n
-IHRvIHRoZSBjb21tZW50IGluIGluIG1tL2d1cC5jLCBUaGUgKmd1cCogaXMgb25seSBzYWZlIHdp
-dGhpbgo+PiArICAgICAgIGEgc3lzY2FsbC4gIEJlY2F1c2UgaXQgY2FuIG9ubHkga2VlcCB0aGUg
-cGh5c2ljYWwgbWVtb3J5IGluIHBsYWNlCj4+ICsgICAgICAgd2l0aG91dCBtYWtpbmcgc3VyZSB0
-aGUgVk1BIHdpbGwgYWx3YXlzIHBvaW50IHRvIGl0LiBNYXliZSB3ZSBzaG91bGQKPj4gKyAgICAg
-ICByYWlzZSB0aGUgVk1fUElOTkVEIHBhdGNoc2V0IChzZWUKPj4gKyAgICAgICBodHRwczovL2xp
-c3RzLmd0Lm5ldC9saW51eC9rZXJuZWwvMTkzMTk5MykgYWdhaW4gdG8gc29sdmUgdGhpcyBwcm9i
-bAo+Cj4gSSB3ZW50IHRocm91Z2ggdGhlIGRvY3MsIGJ1dCBJIHN0aWxsIGRvbid0IGtub3cgd2hh
-dCBpdCBkb2VzLgpXaWxsIHJlZmluZSB0aGUgZG9jIGluIG5leHQgUkZDLCBob3BlIGl0IHdpbGwg
-aGVscC4KPiAJCQkJCQkJCQkJCVBhdmVsCj4KCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fCmlvbW11IG1haWxpbmcgbGlzdAppb21tdUBsaXN0cy5saW51eC1m
-b3VuZGF0aW9uLm9yZwpodHRwczovL2xpc3RzLmxpbnV4Zm91bmRhdGlvbi5vcmcvbWFpbG1hbi9s
-aXN0aW5mby9pb21tdQ==
+
+
+> On Aug 7, 2018, at 4:48 PM, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+>=20
+> Hey Andy,
+>=20
+>> On Tue, Aug 7, 2018 at 12:43 PM Andy Lutomirski <luto@amacapital.net> wro=
+te:
+>> For "zinc: add simd helper", I think it should be in include/linux,
+>> and include/linux/simd.h should (immediately or maybe in the future)
+>> include <asm/simd.h> to pick up arch-specific stuff.  And the patch
+>> should get sent to linux-arch@vger.kernel.org.
+>=20
+> I guess you saw my prompt about that in the previous commit message?
+> Based on your encouragement, I implemented it:
+> https://git.zx2c4.com/linux-dev/commit/?h=3Dsimd This is _far_ more
+> invasive than I wanted to be, as I don't want this patch submission to
+> grow unwieldy and never be merged, but I guess we can roll with this
+> for now...
+>=20
+
+I really wish we had a way to see that we use asm-generic=E2=80=99s copy of a=
+ header in all cases except where an arch opts out.
+
+>> In your blake2s_arch() implementation, you're not passing in a
+>> simd_context_t.  Is that still a work in progress?  I thought the plan
+>> was to pass it in rather than doing the check in the _arch()
+>> functions.
+>=20
+> I'm inclined to do the explicit context passing only when a function
+> is likely to be used in that kind of environment, and adjust as
+> needed. Long term, anyway, that API will be removed once the x86 guys
+> figure out lazy FPU restoration and the amortization doesn't add
+> anything.
+
+Fair enough.
+
+>=20
+> Jason
