@@ -1,194 +1,100 @@
-From: Jerome Glisse <jglisse-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [RFC PATCH 0/7] A General Accelerator Framework, WarpDrive
-Date: Wed, 8 Aug 2018 11:18:35 -0400
-Message-ID: <20180808151835.GA3429@redhat.com>
-References: <20180801102221.5308-1-nek.in.cn@gmail.com>
-	<20180801165644.GA3820@redhat.com>
-	<AADFC41AFE54684AB9EE6CBC0274A5D191290E1A@SHSMSX101.ccr.corp.intel.com>
-	<20180802040557.GL160746@Turing-Arch-b>
-	<20180802142243.GA3481@redhat.com>
-	<20180803034721.GC91035@Turing-Arch-b>
-	<20180803143944.GA4079@redhat.com>
-	<20180806031252.GG91035@Turing-Arch-b>
-	<20180806153257.GB6002@redhat.com>
-	<11bace0e-dc14-5d2c-f65c-25b852f4e9ca@gmail.com>
+From: Pavel Machek <pavel@ucw.cz>
+Subject: Re: [PATCH 0/4][RFC v2] Introduce the in-kernel hibernation
+ encryption
+Date: Wed, 8 Aug 2018 19:50:36 +0200
+Message-ID: <20180808175036.GA16217@amd>
+References: <1532346156.3057.11.camel@suse.com>
+ <20180723162302.GA4503@sandybridge-desktop>
+ <1532590246.7411.3.camel@suse.com>
+ <20180726081404.GG4244@linux-l9pv.suse>
+ <20180730170415.GQ4244@linux-l9pv.suse>
+ <20180803033702.GB416@sandybridge-desktop>
+ <20180803053445.GC4244@linux-l9pv.suse>
+ <CADjb_WSURQz86+E8kakNf7UBDM+aho+uaz3QdDkuGsEgan=szw@mail.gmail.com>
+ <20180805100200.GB22948@amd>
+ <20180806084534.GB12124@chenyu-desktop>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: "Tian, Kevin" <kevin.tian-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
-	Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-	"kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Jonathan Corbet <corbet-T1hC0tSOHrs@public.gmane.org>,
-	Greg Kroah-Hartman <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>,
-	Zaibo Xu <xuzaibo-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>,
-	"linux-doc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-doc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, "Kumar,
-	Sanjay K" <sanjay.k.kumar-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>, Hao Fang <fanghao11-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>,
-	"iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org" <iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>,
-	"linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	"linuxarm-hv44wF8Li93QT0dZR+AlfA@public.gmane.org" <linuxarm-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>,
-	Alex Williamson <alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	"linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Philippe Ombredanne <pombredanne-od1rfyK75/E@public.gmane.org>,
-	Thomas Gleixner <tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org>, Kenneth Lee <liguozhu-C8/M+/jPZTeaMJb+Lgu22Q@public.gmane.org>,
-	"David S . Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
-	"linux-accelerators-uLR06cmDAlY/bJ5BZ2RsiQ@public.gmane.org" <linux-accelerato
-To: Kenneth Lee <nek.in.cn-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+Content-Type: multipart/signed; micalg=pgp-sha1;
+        protocol="application/pgp-signature"; boundary="EVF5PPMfhYS0aIcm"
+Cc: Ryan Chen <yu.chen.surf@gmail.com>, jlee@suse.com,
+        oneukum@suse.com, "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
+        ebiggers@google.com, Theodore Ts'o <tytso@mit.edu>,
+        smueller@chronox.de, denkenz@gmail.com,
+        Linux PM list <linux-pm@vger.kernel.org>,
+        linux-crypto@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        kookoo.gu@intel.com, Zhang Rui <rui.zhang@intel.com>
+To: Yu Chen <yu.c.chen@intel.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <11bace0e-dc14-5d2c-f65c-25b852f4e9ca-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
-List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
-Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+In-Reply-To: <20180806084534.GB12124@chenyu-desktop>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-T24gV2VkLCBBdWcgMDgsIDIwMTggYXQgMDk6MDg6NDJBTSArMDgwMCwgS2VubmV0aCBMZWUgd3Jv
-dGU6Cj4gCj4gCj4g5ZyoIDIwMTjlubQwOOaciDA25pelIOaYn+acn+S4gCAxMTozMiDkuIvljYgs
-IEplcm9tZSBHbGlzc2Ug5YaZ6YGTOgo+ID4gT24gTW9uLCBBdWcgMDYsIDIwMTggYXQgMTE6MTI6
-NTJBTSArMDgwMCwgS2VubmV0aCBMZWUgd3JvdGU6Cj4gPiA+IE9uIEZyaSwgQXVnIDAzLCAyMDE4
-IGF0IDEwOjM5OjQ0QU0gLTA0MDAsIEplcm9tZSBHbGlzc2Ugd3JvdGU6Cj4gPiA+ID4gT24gRnJp
-LCBBdWcgMDMsIDIwMTggYXQgMTE6NDc6MjFBTSArMDgwMCwgS2VubmV0aCBMZWUgd3JvdGU6Cj4g
-PiA+ID4gPiBPbiBUaHUsIEF1ZyAwMiwgMjAxOCBhdCAxMDoyMjo0M0FNIC0wNDAwLCBKZXJvbWUg
-R2xpc3NlIHdyb3RlOgo+ID4gPiA+ID4gPiBPbiBUaHUsIEF1ZyAwMiwgMjAxOCBhdCAxMjowNTo1
-N1BNICswODAwLCBLZW5uZXRoIExlZSB3cm90ZToKPiA+ID4gPiA+ID4gPiBPbiBUaHUsIEF1ZyAw
-MiwgMjAxOCBhdCAwMjozMzoxMkFNICswMDAwLCBUaWFuLCBLZXZpbiB3cm90ZToKPiA+ID4gPiA+
-ID4gPiA+ID4gT24gV2VkLCBBdWcgMDEsIDIwMTggYXQgMDY6MjI6MTRQTSArMDgwMCwgS2VubmV0
-aCBMZWUgd3JvdGU6CgpbLi4uXQoKPiA+ID4gPiA+ID4gPiA+ID4gTXkgbW9yZSBnZW5lcmFsIHF1
-ZXN0aW9uIGlzIGRvIHdlIHdhbnQgdG8gZ3JvdyBWRklPIHRvIGJlY29tZQo+ID4gPiA+ID4gPiA+
-ID4gPiBhIG1vcmUgZ2VuZXJpYyBkZXZpY2UgZHJpdmVyIEFQSS4gVGhpcyBwYXRjaHNldCBhZGRz
-IGEgY29tbWFuZAo+ID4gPiA+ID4gPiA+ID4gPiBxdWV1ZSBjb25jZXB0IHRvIGl0IChpIGRvbid0
-IHRoaW5rIGl0IGV4aXN0IHRvZGF5IGJ1dCBpIGhhdmUKPiA+ID4gPiA+ID4gPiA+ID4gbm90IGZv
-bGxvdyBWRklPIGNsb3NlbHkpLgo+ID4gPiA+ID4gPiA+ID4gPiAKPiA+ID4gPiA+ID4gPiBUaGUg
-dGhpbmcgaXMsIFZGSU8gaXMgdGhlIG9ubHkgcGxhY2UgdG8gc3VwcG9ydCBETUEgZnJvbSB1c2Vy
-IGxhbmQuIElmIHdlIGRvbid0Cj4gPiA+ID4gPiA+ID4gcHV0IGl0IGhlcmUsIHdlIGhhdmUgdG8g
-Y3JlYXRlIGFub3RoZXIgc2ltaWxhciBmYWNpbGl0eSB0byBzdXBwb3J0IHRoZSBzYW1lLgo+ID4g
-PiA+ID4gPiBObyBpdCBpcyBub3QsIG5ldHdvcmsgZGV2aWNlLCBHUFUsIGJsb2NrIGRldmljZSwg
-Li4uIHRoZXkgYWxsIGRvCj4gPiA+ID4gPiA+IHN1cHBvcnQgRE1BLiBUaGUgcG9pbnQgaSBhbSB0
-cnlpbmcgdG8gbWFrZSBoZXJlIGlzIHRoYXQgZXZlbiBpbgo+ID4gPiA+ID4gU29ycnksIHdhaXQg
-YSBtaW51dGUsIGFyZSB3ZSB0YWxraW5nIHRoZSBzYW1lIHRoaW5nPyBJIG1lYW50ICJETUEgZnJv
-bSB1c2VyCj4gPiA+ID4gPiBsYW5kIiwgbm90ICJETUEgZnJvbSBrZXJuZWwgZHJpdmVyIi4gVG8g
-ZG8gdGhhdCB3ZSBoYXZlIHRvIG1hbmlwdWxhdGUgdGhlCj4gPiA+ID4gPiBJT01NVShVbml0KS4g
-SSB0aGluayBpdCBjYW4gb25seSBiZSBkb25lIGJ5IGRlZmF1bHRfZG9tYWluIG9yIHZmaW8gZG9t
-YWluLiBPcgo+ID4gPiA+ID4gdGhlIHVzZXIgc3BhY2UgaGF2ZSB0byBkaXJlY3RseSBhY2Nlc3Mg
-dGhlIElPTU1VLgo+ID4gPiA+IEdQVSBkbyBETUEgaW4gdGhlIHNlbnNlIHRoYXQgeW91IHBhc3Mg
-dG8gdGhlIGtlcm5lbCBhIHZhbGlkCj4gPiA+ID4gdmlydHVhbCBhZGRyZXNzIChrZXJuZWwgZHJp
-dmVyIGRvIGFsbCB0aGUgcHJvcGVyIGNoZWNrKSBhbmQKPiA+ID4gPiB0aGVuIHlvdSBjYW4gdXNl
-IHRoZSBHUFUgdG8gY29weSBmcm9tIG9yIHRvIHRoYXQgcmFuZ2Ugb2YKPiA+ID4gPiB2aXJ0dWFs
-IGFkZHJlc3MuIEV4YWN0bHkgaG93IHlvdSB3YW50IHRvIHVzZSB0aGlzIGNvbXByZXNzaW9uCj4g
-PiA+ID4gZW5naW5lLiBJdCBkb2VzIG5vdCByZWx5IG9uIFNWTSBidXQgU1ZNIGdvaW5nIGZvcndh
-cmQgd291bGQKPiA+ID4gPiBzdGlsbCBiZSB0aGUgcHJlZmVyZWQgb3B0aW9uLgo+ID4gPiA+IAo+
-ID4gPiBObywgU1ZNIGlzIG5vdCB0aGUgcmVhc29uIHdoeSB3ZSByZWx5IG9uIEplYW4ncyBTVk0o
-U1ZBKSBzZXJpZXMuIFdlIHJlbHkgb24KPiA+ID4gSmVhbidzIHNlcmllcyBiZWNhdXNlIG9mIG11
-bHRpLXByb2Nlc3MgKFBBU0lEIG9yIHN1YnN0cmVhbSBJRCkgc3VwcG9ydC4KPiA+ID4gCj4gPiA+
-IEJ1dCBvZiBjb3VzZSwgV2FycERyaXZlIGNhbiBzdGlsbCBiZW5lZml0IGZyb20gdGhlIFNWTSBm
-ZWF0dXJlLgo+ID4gV2UgYXJlIGdldHRpbmcgc2lkZSB0cmFja2VkIGhlcmUuIFBBU0lEL0lEIGRv
-IG5vdCByZXF1aXJlIFZGSU8uCj4gPiAKPiBZZXMsIFBBU0lEIGl0c2VsZiBkbyBub3QgcmVxdWly
-ZSBWRklPLiBCdXQgd2hhdCBpZjoKPiAKPiAxLiBTdXBwb3J0IERNQSBmcm9tIHVzZXIgc3BhY2Uu
-Cj4gMi4gVGhlIGhhcmR3YXJlIG1ha2VzIHVzZSBvZiBzdGFuZGFyZCBJT01NVS9TTU1VIGZvciBJ
-TyBhZGRyZXNzIHRyYW5zbGF0aW9uLgo+IDMuIFRoZSBJT01NVSBmYWNpbGl0eSBpcyBzaGFyZWQg
-YnkgYm90aCBrZXJuZWwgYW5kIHVzZXIgZHJpdmVycy4KPiA0LiBTdXBwb3J0IFBBU0lEIHdpdGgg
-dGhlIGN1cnJlbnQgSU9NTVUgZmFjaWxpdHkKCkkgZG8gbm90IHNlZSBob3cgYW55IG9mIHRoaXMg
-bWVhbnMgaXQgaGFzIHRvIGJlIGluIFZGSU8uCk90aGVyIGRldmljZXMgZG8ganVzdCB0aGF0LiBH
-UFVzIGRyaXZlciBmb3IgaW5zdGFuY2Ugc2hhcmUKRE1BIGVuZ2luZSAodGhhdCBjb3B5IGRhdGEg
-YXJvdW5kKSBiZXR3ZWVuIGtlcm5lbCBhbmQgdXNlcgpzcGFjZS4gU29tZXRpbWUga2VybmVsIHVz
-ZSBpdCB0byBtb3ZlIHRoaW5ncyBhcm91bmQuIEV2aWN0CnNvbWUgbWVtb3J5IHRvIG1ha2Ugcm9v
-bSBmb3IgYSBuZXcgcHJvY2VzcyBpcyB0aGUgY29tbW9uCmV4YW1wbGUuIFNhbWUgRE1BIGVuZ2lu
-ZXMgaXMgb2Z0ZW4gdXNlIGJ5IHVzZXJzcGFjZSBpdHNlbGYKZHVyaW5nIHJlbmRlcmluZyBvciBj
-b21wdXRlIChwcm9ncmFtIG1vdmluZyB0aGluZ3Mgb24gdGhlcmUKb3duKS4gU28gdGhleSBhcmUg
-YWxyZWFkeSBrZXJuZWwgZHJpdmVyIHRoYXQgZG8gYWxsIDQgb2YKdGhlIGFib3ZlIGFuZCBhcmUg
-bm90IGluIFZGSU8uCgoKPiA+ID4gPiA+ID4geW91ciBtZWNoYW5pc21zIHRoZSB1c2Vyc3BhY2Ug
-bXVzdCBoYXZlIGEgc3BlY2lmaWMgdXNlcnNwYWNlCj4gPiA+ID4gPiA+IGRyaXZlcnMgZm9yIGVh
-Y2ggaGFyZHdhcmUgYW5kIHRodXMgdGhlcmUgYXJlIHZpcnR1YWxseSBubwo+ID4gPiA+ID4gPiBk
-aWZmZXJlbmNlcyBiZXR3ZWVuIGhhdmluZyB0aGlzIHVzZXJzcGFjZSBkcml2ZXIgb3BlbiBhIGRl
-dmljZQo+ID4gPiA+ID4gPiBmaWxlIGluIHZmaW8gb3Igc29tZXdoZXJlIGVsc2UgaW4gdGhlIGRl
-dmljZSBmaWxlc3lzdGVtLiBUaGlzIGlzCj4gPiA+ID4gPiA+IGp1c3QgYSBkaWZmZXJlbnQgcGF0
-aC4KPiA+ID4gPiA+ID4gCj4gPiA+ID4gPiBUaGUgYmFzaWMgcHJvYmxlbSBXYXJwRHJpdmUgd2Fu
-dCB0byBzb2x2ZSBpdCB0byBhdm9pZCBzeXNjYWxsLiBUaGlzIGlzIGltcG9ydGFudAo+ID4gPiA+
-ID4gdG8gYWNjZWxlcmF0b3JzLiBXZSBoYXZlIHNvbWUgZGF0YSBoZXJlOgo+ID4gPiA+ID4gaHR0
-cHM6Ly93d3cuc2xpZGVzaGFyZS5uZXQvbGluYXJvb3JnL3Byb2dyZXNzLWFuZC1kZW1vbnN0cmF0
-aW9uLW9mLXdyYXBkcml2ZS1hLWFjY2VsZXJhdG9yLWZyYW1ld29yay1zZm8xNzMxNwo+ID4gPiA+
-ID4gCj4gPiA+ID4gPiAoc2VlIHBhZ2UgMykKPiA+ID4gPiA+IAo+ID4gPiA+ID4gVGhlIHBlcmZv
-cm1hbmNlIGlzIGRpZmZlcmVudCBvbiB1c2luZyBrZXJuZWwgYW5kIHVzZXIgZHJpdmVycy4KPiA+
-ID4gPiBZZXMgYW5kIGV4YW1wbGUgaSBwb2ludCB0byBpcyBleGFjdGx5IHRoYXQuIFlvdSBoYXZl
-IGEgb25lIHRpbWUgc2V0dXAKPiA+ID4gPiBjb3N0IChjcmVhdGluZyBjb21tYW5kIGJ1ZmZlciBi
-aW5kaW5nIFBBU0lEIHdpdGggY29tbWFuZCBidWZmZXIgYW5kCj4gPiA+ID4gY291cGxlIG90aGVy
-IHNldHVwIHN0ZXBzKS4gVGhlbiB1c2Vyc3BhY2Ugbm8gbG9uZ2VyIGhhdmUgdG8gZG8gYW55Cj4g
-PiA+ID4gaW9jdGwgdG8gc2NoZWR1bGUgd29yayBvbiB0aGUgR1BVLiBJdCBpcyBhbGwgZG93biBm
-cm9tIHVzZXJzcGFjZSBhbmQKPiA+ID4gPiBpdCB1c2UgYSBkb29yYmVsbCB0byBub3RpZnkgaGFy
-ZHdhcmUgd2hlbiBpdCBzaG91bGQgZ28gbG9vayBhdCBjb21tYW5kCj4gPiA+ID4gYnVmZmVyIGZv
-ciBuZXcgdGhpbmcgdG8gZXhlY3V0ZS4KPiA+ID4gPiAKPiA+ID4gPiBNeSBwb2ludCBzdGFuZHMg
-b24gdGhhdC4gWW91IGhhdmUgZXhpc3RpbmcgZHJpdmVyIGFscmVhZHkgZG9pbmcgc28KPiA+ID4g
-PiB3aXRoIG5vIG5ldyBmcmFtZXdvcmsgYW5kIGluIHlvdXIgc2NoZW1lIHlvdSBuZWVkIGEgdXNl
-cnNwYWNlIGRyaXZlci4KPiA+ID4gPiBTbyBpIGRvIG5vdCBzZWUgdGhlIHZhbHVlIGFkZCwgdXNp
-bmcgb25lIHBhdGggb3IgdGhlIG90aGVyIGluIHRoZQo+ID4gPiA+IHVzZXJzcGFjZSBkcml2ZXIg
-aXMgbGl0dGVyYWx5IG9uZSBsaW5lIHRvIGNoYW5nZS4KPiA+ID4gPiAKPiA+ID4gU29ycnksIEkn
-ZCBnb3QgY29uZnVzZSBoZXJlLiBJIHBhcnRpYWxseSBhZ3JlZSB0aGF0IHRoZSB1c2VyIGRyaXZl
-ciBpcwo+ID4gPiByZWR1bmRhbmNlIG9mIGtlcm5lbCBkcml2ZXIuIChCdXQgZm9yIFdhcnBEcml2
-ZSwgdGhlIGtlcm5lbCBkcml2ZXIgaXMgYSBmdWxsCj4gPiA+IGRyaXZlciBpbmNsdWRlIGFsbCBw
-cmVwYXJhdGlvbiBhbmQgc2V0dXAgc3R1ZmYgZm9yIHRoZSBoYXJkd2FyZSwgdGhlIHVzZXIgZHJp
-dmVyCj4gPiA+IGlzIHNpbXBseSB0byBzZW5kIHJlcXVlc3QgYW5kIHJlY2VpdmUgYW5zd2VyKS4g
-WWVzLCBpdCBpcyBqdXN0IGEgY2hvaWNlIG9mIHBhdGguCj4gPiA+IEJ1dCB0aGUgdXNlciBwYXRo
-IGlzIGZhc3RlciBpZiB0aGUgcmVxdWVzdCBjb21lIGZyb20gdXNlIHNwYWNlLiBBbmQgdG8gZG8g
-dGhhdCwKPiA+ID4gd2UgbmVlZCB1c2VyIGxhbmQgRE1BIHN1cHBvcnQuIFRoZW4gd2h5IGlzIGl0
-IGludmFsdWFibGUgdG8gbGV0IFZGSU8gaW52b2x2ZWQ/Cj4gPiBTb21lIGRyaXZlcnMgaW4gdGhl
-IGtlcm5lbCBhbHJlYWR5IGRvIGV4YWN0bHkgd2hhdCB5b3Ugc2FpZC4gVGhlIHVzZXIKPiA+IHNw
-YWNlIGVtaXQgY29tbWFuZHMgd2l0aG91dCBldmVyIGdvaW5nIGludG8ga2VybmVsIGJ5IGRpcmVj
-dGx5IHNjaGVkdWxpbmcKPiA+IGNvbW1hbmRzIGFuZCByaW5naW5nIGEgZG9vcmJlbGwuIFRoZXkg
-ZG8gbm90IG5lZWQgVkZJTyBlaXRoZXIgYW5kIHRoZXkKPiA+IGNhbiBtYXAgdXNlcnNwYWNlIGFk
-ZHJlc3MgaW50byB0aGUgRE1BIGFkZHJlc3Mgc3BhY2Ugb2YgdGhlIGRldmljZSBhbmQKPiA+IGFn
-YWluIHRoZXkgZG8gbm90IG5lZWQgVkZJTyBmb3IgdGhhdC4KPiBDb3VsZCB5b3UgcGxlYXNlIGRp
-cmVjdGx5IHBvaW50IG91dCB3aGljaCBkcml2ZXIgeW91IHJlZmVyIHRvIGhlcmU/IFRoYW5rCj4g
-eW91LgoKZHJpdmVycy9ncHUvZHJtL2FtZC8KClN1Yi1kaXJlY3Rvcnkgb2YgaW50ZXJlc3QgaXMg
-YW1ka2ZkCgpCZWNhdXNlIGl0IGlzIGEgYmlnIGRyaXZlciBoZXJlIGlzIGEgaGlnaGxldmVsIG92
-ZXJ2aWV3IG9mIGhvdyBpdCB3b3JrcwoodGhpcyBpcyBhIHNpbXBsaWZpY2F0aW9uKToKICAtIFBy
-b2Nlc3MgY2FuIGFsbG9jYXRlIEdQVXMgYnVmZmVyICh0aHJvdWdoIGlvY2x0KSBhbmQgbWFwIHRo
-ZW0gaW50bwogICAgaXRzIGFkZHJlc3Mgc3BhY2UgKHRocm91Z2ggbW1hcCBvZiBkZXZpY2UgZmls
-ZSBhdCBidWZmZXIgb2JqZWN0CiAgICBzcGVjaWZpYyBvZmZzZXQpLgogIC0gUHJvY2VzcyBjYW4g
-bWFwIGFueSB2YWxpZCByYW5nZSBvZiB2aXJ0dWFsIGFkZHJlc3Mgc3BhY2UgaW50byBkZXZpY2UK
-ICAgIGFkZHJlc3Mgc3BhY2UgKElPTU1VIG1hcHBpbmcpLiBUaGlzIG11c3QgYmUgcmVndWxhciBt
-ZW1vcnkgaWUgbm90IGFuCiAgICBtbWFwIG9mIGEgZGV2aWNlIGZpbGUgb3IgYW55IHNwZWNpYWwg
-ZmlsZSAodGhpcyBpcyB0aGUgbm9uIFBBU0lECiAgICBwYXRoKQogIC0gUHJvY2VzcyBjYW4gY3Jl
-YXRlIGEgY29tbWFuZCBxdWV1ZSBhbmQgYmluZCBpdHMgcHJvY2VzcyB0byBpdCBha2EKICAgIFBB
-U0lELCB0aGlzIGlzIGRvbmUgdGhyb3VnaCBhbiBpb2N0bC4KICAtIFByb2Nlc3MgY2FuIHNjaGVk
-dWxlIGNvbW1hbmRzIG9udG8gcXVldWVzIGl0IGNyZWF0ZWQgZnJvbSB1c2Vyc3BhY2UKICAgIHdp
-dGhvdXQgaW9jdGwuIEZvciB0aGF0IGl0IGp1c3Qgd3JpdGUgY29tbWFuZCBpbnRvIGEgcmluZyBi
-dWZmZXIKICAgIHRoYXQgaXQgbWFwcGVkIGR1cmluZyB0aGUgY29tbWFuZCBxdWV1ZSBjcmVhdGlv
-biBwcm9jZXNzIGFuZCBpdAogICAgcmluZ3MgYSBkb29yYmVsbCB3aGVuIGNvbW1hbmRzIGFyZSBy
-ZWFkeSB0byBiZSBjb25zdW1lIGJ5IHRoZQogICAgaGFyZHdhcmUuCiAgLSBDb21tYW5kcyBjYW4g
-cmVmZXJlbmNlIChhY2Nlc3MpIGFsbCAzIHR5cGVzIG9mIG9iamVjdCBhYm92ZSBpZQogICAgZWl0
-aGVyIGZ1bGwgR1BVcyBidWZmZXIsIHByb2Nlc3MgcmVndWxhciBtZW1vcnkgbWFwZWQgYXMgb2Jq
-ZWN0CiAgICAobm9uIFBBU0lEKSBhbmQgUEFTSUQgbWVtb3J5IGFsbCBhdCB0aGUgc2FtZSB0aW1l
-IGllIHlvdSBjYW4KICAgIG1peCBhbGwgb2YgdGhlIGFib3ZlIGluIHNhbWUgY29tbWFuZHMgcXVl
-dWUuCiAgLSBLZXJuZWwgY2FuIGV2aWN0LCB1bmJpbmQgYW55IHByb2Nlc3MgY29tbWFuZCBxdWV1
-ZXMsIHVuYmluZCBjb21tYW5kcwogICAgcXVldWUgYXJlIHN0aWxsIHZhbGlkIGZyb20gcHJvY2Vz
-cyBwb2ludCBvZiB2aWV3IGJ1dCBjb21tYW5kcwogICAgcHJvY2VzcyBzY2hlZHVsZXMgb24gdGhl
-bSB3aWxsIG5vdCBiZSBleGVjdXRlZCB1bnRpbCBrZXJuZWwgcmUtYmluZAogICAgdGhlIHF1ZXVl
-LgogIC0gS2VybmVsIGNhbiBzY2hlZHVsZSBjb21tYW5kcyBpdHNlbGYgb250byBpdHMgZGVkaWNh
-dGVkIGNvbW1hbmQKICAgIHF1ZXVlcyAoa2VybmVsIGRyaXZlciBjcmVhdGUgaXRzIG93biBjb21t
-YW5kIHF1ZXVlcykuCiAgLSBLZXJuZWwgY2FuIGNvbnRyb2wgcHJpb3JpdGllcyBiZXR3ZWVuIGFs
-bCB0aGUgcXVldWVzIGllIGl0IGNhbgogICAgZGVjaWRlcyB3aGljaCBxdWV1ZXMgc2hvdWxkIHRo
-ZSBoYXJkd2FyZSBleGVjdXRlZCBmaXJzdCBuZXh0LgoKSSBiZWxpZXZlIGFsbCBvZiB0aGUgYWJv
-dmUgYXJlIHRoZSBhc3BlY3RzIHRoYXQgbWF0dGVycyB0byB5b3UuIFRoZSBtYWluCnJlYXNvbiBp
-IGRvbid0IGxpa2UgY3JlYXRpbmcgYSBuZXcgZHJpdmVyIGluZnJhc3RydWN0dXJlIGlzIHRoYXQg
-YSBsb3QKb2YgZXhpc3RpbmcgZHJpdmVycyB3aWxsIHdhbnQgdG8gdXNlIHNvbWUgb2YgdGhlIG5l
-dyBmZWF0dXJlcyB0aGF0IGFyZQpjb21pbmcgKG1lbW9yeSB0b3BvbG9neSwgd2hlcmUgdG8gcGxh
-Y2UgcHJvY2VzcyBtZW1vcnksIHBpcGVsaW5lIGRldmljZXMsCi4uLikgYW5kIHRodXMgZXhpc3Rp
-bmcgZHJpdmVycyBhcmUgYmlnIChHUFUgZHJpdmVycyBhcmUgdGhlIGJpZ2dlc3Qgb2YKYWxsIHRo
-ZSBrZXJuZWwgZHJpdmVycykuCgpTbyByZXdyaXR0aW5nIHRob3NlIGV4aXN0aW5nIGRyaXZlcnMg
-aW50byBWRklPIG9yIGludG8gYW55IG5ldyBpbmZyYS0Kc3RydWN0dXJlIHNvIHRoYXQgdGhleSBj
-YW4gbGV2ZXJhZ2UgbmV3IGZlYXR1cmVzIGlzIGEgbm8gZ28gZnJvbSBteQpwb2ludCBvZiB2aWV3
-LgoKSSB3b3VsZCByYXRoZXIgc2VlIGEgc2V0IG9mIGhlbHBlcnMgc28gdGhhdCBlYWNoIGZlYXR1
-cmVzIGNhbiBiZSB1c2UKZWl0aGVyIGJ5IG5ldyBkcml2ZXJzIG9yIGV4aXN0aW5nIGRyaXZlcnMu
-IEZvciBpbnN0YW5jZSBhIG5ldyB3YXkgdG8KZXhwb3NlIG1lbW9yeSB0b3BvbG9neS4gQSBuZXcg
-d2F5IHRvIGV4cG9zZSBob3cgeW91IGNhbiBwaXBlIGRldmljZXMKZnJvbSBvbmUgdG8gYW5vdGhl
-ciAuLi4KCgpIZW5jZSBpIGRvIG5vdCBzZWUgYW55IHZhbHVlIGluIGEgd2hvbGUgbmV3IGluZnJh
-LXN0cnVjdHVyZSBpbiB3aGljaApkcml2ZXJzIG11c3QgYmUgcGFydCBvZiB0byBsZXZlcmFnZSBu
-ZXcgZmVhdHVyZXMuCgpDaGVlcnMsCkrDqXLDtG1lCl9fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fCmlvbW11IG1haWxpbmcgbGlzdAppb21tdUBsaXN0cy5saW51
-eC1mb3VuZGF0aW9uLm9yZwpodHRwczovL2xpc3RzLmxpbnV4Zm91bmRhdGlvbi5vcmcvbWFpbG1h
-bi9saXN0aW5mby9pb21tdQ==
+
+--EVF5PPMfhYS0aIcm
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+Hi!
+
+> > > > User space doesn't need to involve. The EFI root key is generated by
+> > > > EFI boot stub and be transfer to kernel. It's stored in EFI boot se=
+rvice
+> > > > variable that it can only be accessed by trusted EFI binary when
+> > > > secure boot is enabled.
+> > > >
+> > > Okay, this apply to the 'suspend' phase, right?
+> > > I'm still a little confused about the 'resume' phase.
+> > > Taking encryption as example(not signature),
+> > > the purpose of doing hibernation encryption is to prevent other users
+> > > from stealing ram content. Say, user A uses a  passphrase to generate=
+ the
+> >=20
+> > No, I don't think that's purpose here.
+> >=20
+> > Purpose here is to prevent user from reading/modifying kernel memory
+> > content on machine he owns.
+> >
+> Say, A puts his laptop into hibernation and walks away,
+> and B walks by, and opens A's laptop and wakes up the system and he
+> can do what he wants. Although EFI key/TPM trusted key is enabled,
+> currently there's no certification during resume, which sounds
+> unsafe to me. Afterall, the original requirement is to probe
+
+Define unsafe.
+
+If you want security against bad people resuming your machines, please
+take a look at existing uswsusp solutions. It defends against that.
+
+If you want security against bad people tampering with your machines
+physically, sorry, there's no way to defend against that.
+
+But I thought you were trying to do something for secure boot, and "bad
+person resumes your machine" is out of scope there.
+
+So please always explain security against _what kind of attack_ you
+are trying to improve; intelligent communication is not possible
+without that.
+
+								Pavel
+
+--=20
+(english) http://www.livejournal.com/~pavelmachek
+(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blo=
+g.html
+
+--EVF5PPMfhYS0aIcm
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAltrLWwACgkQMOfwapXb+vJriwCeMEH0FxLppyjbtaP2vkRpY8NQ
+jOwAnjWz691CHnHSi4qRKDxI5a2mGXq+
+=Rbr4
+-----END PGP SIGNATURE-----
+
+--EVF5PPMfhYS0aIcm--
