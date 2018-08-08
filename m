@@ -1,42 +1,51 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 1/9] crypto: add zbufsize() interface
-Date: Wed, 8 Aug 2018 10:53:19 +0800
-Message-ID: <20180808025319.32d57wtjpyyapwo5@gondor.apana.org.au>
-References: <20180802215118.17752-1-keescook@chromium.org>
- <20180802215118.17752-2-keescook@chromium.org>
- <20180807094513.vstt5dhbb7n6kvds@gondor.apana.org.au>
- <CAGXu5j+dPqpJZbO_AuGsNqJzq7XGcB2deXA5RELWv1-Ywi5QOA@mail.gmail.com>
+From: Joerg Roedel <joro@8bytes.org>
+Subject: Re: [RFC PATCH 2/7] iommu: Add share domain interface in iommu for
+ spimdev
+Date: Wed, 8 Aug 2018 11:13:54 +0200
+Message-ID: <20180808091354.ppqgineql3pufwwr@8bytes.org>
+References: <20180801102221.5308-1-nek.in.cn@gmail.com>
+ <20180801102221.5308-3-nek.in.cn@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Geliang Tang <geliangtang@gmail.com>,
-        Arnd Bergmann <arnd@arndb.de>, Haren Myneni <haren@us.ibm.com>,
-        Anton Vorontsov <anton@enomsg.org>,
-        Colin Cross <ccross@android.com>,
-        Tony Luck <tony.luck@intel.com>,
+Cc: Jonathan Corbet <corbet@lwn.net>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Kenneth Lee <liguozhu@hisilicon.com>,
+        Hao Fang <fanghao11@huawei.com>,
         Zhou Wang <wangzhou1@hisilicon.com>,
-        linux-crypto <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-To: Kees Cook <keescook@chromium.org>
+        Zaibo Xu <xuzaibo@huawei.com>,
+        Philippe Ombredanne <pombredanne@nexb.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, iommu@lists.linux-foundation.org,
+        kvm@vger.kernel.org, linux-accelerators@lists.ozlabs.org,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Sanjay Kumar <sanjay.k.kumar@intel.com>, linuxarm@huawei.com
+To: Kenneth Lee <nek.in.cn@gmail.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <CAGXu5j+dPqpJZbO_AuGsNqJzq7XGcB2deXA5RELWv1-Ywi5QOA@mail.gmail.com>
+In-Reply-To: <20180801102221.5308-3-nek.in.cn@gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Aug 07, 2018 at 11:10:10AM -0700, Kees Cook wrote:
->
-> > Please don't add new features to the old compress interface.  Any
-> > new improvements should be added to scomp/acomp only.  Users who
-> > need new features should be converted.
+On Wed, Aug 01, 2018 at 06:22:16PM +0800, Kenneth Lee wrote:
+> From: Kenneth Lee <liguozhu@hisilicon.com>
 > 
-> So, keep crypto_scomp_zbufsize() and drop crypto_comp_zbufsize() and
-> crypto_zbufsize()? Should I add crypto_acomp_zbufsize()?
+> This patch add sharing interface for a iommu_group. The new interface:
+> 
+> 	iommu_group_share_domain()
+> 	iommu_group_unshare_domain()
+> 
+> can be used by some virtual iommu_group (such as iommu_group for spimdev)
+> to share their parent's iommu_group.
+> 
+> When the domain of the group is shared, it cannot be changed before
+> unshared.  In the future, notification can be added if update is required.
 
-Yes and yes.  acomp is the primary interface and should support
-all the features in scomp.
+>From the description or the patch I don't really get why this is needed.
+Please update the description and make a case for this API addition.
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+
+	Joerg
