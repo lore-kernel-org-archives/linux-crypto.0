@@ -1,196 +1,157 @@
-From: Jerome Glisse <jglisse@redhat.com>
-Subject: Re: [RFC PATCH 0/7] A General Accelerator Framework, WarpDrive
-Date: Thu, 9 Aug 2018 10:46:13 -0400
-Message-ID: <20180809144613.GB3386@redhat.com>
-References: <AADFC41AFE54684AB9EE6CBC0274A5D191290E1A@SHSMSX101.ccr.corp.intel.com>
- <20180802040557.GL160746@Turing-Arch-b>
- <20180802142243.GA3481@redhat.com>
- <20180803034721.GC91035@Turing-Arch-b>
- <20180803143944.GA4079@redhat.com>
- <20180806031252.GG91035@Turing-Arch-b>
- <20180806153257.GB6002@redhat.com>
- <11bace0e-dc14-5d2c-f65c-25b852f4e9ca@gmail.com>
- <20180808151835.GA3429@redhat.com>
- <20180809080352.GI91035@Turing-Arch-b>
+From: joeyli <jlee@suse.com>
+Subject: Re: [PATCH 0/4][RFC v2] Introduce the in-kernel hibernation
+ encryption
+Date: Thu, 9 Aug 2018 23:55:45 +0800
+Message-ID: <20180809155544.GK13767@linux-l9pv.suse>
+References: <1532590246.7411.3.camel@suse.com>
+ <20180726081404.GG4244@linux-l9pv.suse>
+ <20180730170415.GQ4244@linux-l9pv.suse>
+ <20180803033702.GB416@sandybridge-desktop>
+ <20180803053445.GC4244@linux-l9pv.suse>
+ <CADjb_WSURQz86+E8kakNf7UBDM+aho+uaz3QdDkuGsEgan=szw@mail.gmail.com>
+ <20180805100200.GB22948@amd>
+ <20180806084534.GB12124@chenyu-desktop>
+ <20180808175036.GA16217@amd>
+ <20180809030135.GA21364@chenyu-desktop>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Cc: Kenneth Lee <nek.in.cn@gmail.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Zaibo Xu <xuzaibo@huawei.com>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        "Kumar, Sanjay K" <sanjay.k.kumar@intel.com>,
-        Hao Fang <fanghao11@huawei.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linuxarm@huawei.com" <linuxarm@huawei.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Philippe Ombredanne <pombredanne@nexb.com>,
-        Thomas Gleixner <tglx@linu
-To: Kenneth Lee <liguozhu@hisilicon.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: Pavel Machek <pavel@ucw.cz>, Ryan Chen <yu.chen.surf@gmail.com>,
+        oneukum@suse.com, "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
+        ebiggers@google.com, Theodore Ts'o <tytso@mit.edu>,
+        smueller@chronox.de, denkenz@gmail.com,
+        Linux PM list <linux-pm@vger.kernel.org>,
+        linux-crypto@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        kookoo.gu@intel.com, Zhang Rui <rui.zhang@intel.com>
+To: Yu Chen <yu.c.chen@intel.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20180809080352.GI91035@Turing-Arch-b>
+In-Reply-To: <20180809030135.GA21364@chenyu-desktop>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Aug 09, 2018 at 04:03:52PM +0800, Kenneth Lee wrote:
-> On Wed, Aug 08, 2018 at 11:18:35AM -0400, Jerome Glisse wrote:
-> > On Wed, Aug 08, 2018 at 09:08:42AM +0800, Kenneth Lee wrote:
-> > > 在 2018年08月06日 星期一 11:32 下午, Jerome Glisse 写道:
-> > > > On Mon, Aug 06, 2018 at 11:12:52AM +0800, Kenneth Lee wrote:
-> > > > > On Fri, Aug 03, 2018 at 10:39:44AM -0400, Jerome Glisse wrote:
-> > > > > > On Fri, Aug 03, 2018 at 11:47:21AM +0800, Kenneth Lee wrote:
-> > > > > > > On Thu, Aug 02, 2018 at 10:22:43AM -0400, Jerome Glisse wrote:
-> > > > > > > > On Thu, Aug 02, 2018 at 12:05:57PM +0800, Kenneth Lee wrote:
-
-[...]
-
-> > > > > > > > your mechanisms the userspace must have a specific userspace
-> > > > > > > > drivers for each hardware and thus there are virtually no
-> > > > > > > > differences between having this userspace driver open a device
-> > > > > > > > file in vfio or somewhere else in the device filesystem. This is
-> > > > > > > > just a different path.
-> > > > > > > > 
-> > > > > > > The basic problem WarpDrive want to solve it to avoid syscall. This is important
-> > > > > > > to accelerators. We have some data here:
-> > > > > > > https://www.slideshare.net/linaroorg/progress-and-demonstration-of-wrapdrive-a-accelerator-framework-sfo17317
-> > > > > > > 
-> > > > > > > (see page 3)
-> > > > > > > 
-> > > > > > > The performance is different on using kernel and user drivers.
-> > > > > > Yes and example i point to is exactly that. You have a one time setup
-> > > > > > cost (creating command buffer binding PASID with command buffer and
-> > > > > > couple other setup steps). Then userspace no longer have to do any
-> > > > > > ioctl to schedule work on the GPU. It is all down from userspace and
-> > > > > > it use a doorbell to notify hardware when it should go look at command
-> > > > > > buffer for new thing to execute.
-> > > > > > 
-> > > > > > My point stands on that. You have existing driver already doing so
-> > > > > > with no new framework and in your scheme you need a userspace driver.
-> > > > > > So i do not see the value add, using one path or the other in the
-> > > > > > userspace driver is litteraly one line to change.
-> > > > > > 
-> > > > > Sorry, I'd got confuse here. I partially agree that the user driver is
-> > > > > redundance of kernel driver. (But for WarpDrive, the kernel driver is a full
-> > > > > driver include all preparation and setup stuff for the hardware, the user driver
-> > > > > is simply to send request and receive answer). Yes, it is just a choice of path.
-> > > > > But the user path is faster if the request come from use space. And to do that,
-> > > > > we need user land DMA support. Then why is it invaluable to let VFIO involved?
-> > > > Some drivers in the kernel already do exactly what you said. The user
-> > > > space emit commands without ever going into kernel by directly scheduling
-> > > > commands and ringing a doorbell. They do not need VFIO either and they
-> > > > can map userspace address into the DMA address space of the device and
-> > > > again they do not need VFIO for that.
-> > > Could you please directly point out which driver you refer to here? Thank
-> > > you.
+On Thu, Aug 09, 2018 at 11:01:35AM +0800, Yu Chen wrote:
+> Hi Pavel, Joey, Oliver
+> Please let me describe the original requirement and my
+> understanding about hibernation encryption here, thus
+> help us sync on the same thread:
+> On Wed, Aug 08, 2018 at 07:50:36PM +0200, Pavel Machek wrote:
+> > Hi!
 > > 
-> > drivers/gpu/drm/amd/
+> > > > > > User space doesn't need to involve. The EFI root key is generated by
+> > > > > > EFI boot stub and be transfer to kernel. It's stored in EFI boot service
+> > > > > > variable that it can only be accessed by trusted EFI binary when
+> > > > > > secure boot is enabled.
+> > > > > >
+> > > > > Okay, this apply to the 'suspend' phase, right?
+> > > > > I'm still a little confused about the 'resume' phase.
+> > > > > Taking encryption as example(not signature),
+> > > > > the purpose of doing hibernation encryption is to prevent other users
+> > > > > from stealing ram content. Say, user A uses a  passphrase to generate the
+> > > > 
+> > > > No, I don't think that's purpose here.
+> > > > 
+> > > > Purpose here is to prevent user from reading/modifying kernel memory
+> > > > content on machine he owns.
+> > > >
+> > > Say, A puts his laptop into hibernation and walks away,
+> > > and B walks by, and opens A's laptop and wakes up the system and he
+> > > can do what he wants. Although EFI key/TPM trusted key is enabled,
+> > > currently there's no certification during resume, which sounds
+> > > unsafe to me. Afterall, the original requirement is to probe
 > > 
-> > Sub-directory of interest is amdkfd
+> > Define unsafe.
 > > 
-> > Because it is a big driver here is a highlevel overview of how it works
-> > (this is a simplification):
-> >   - Process can allocate GPUs buffer (through ioclt) and map them into
-> >     its address space (through mmap of device file at buffer object
-> >     specific offset).
-> >   - Process can map any valid range of virtual address space into device
-> >     address space (IOMMU mapping). This must be regular memory ie not an
-> >     mmap of a device file or any special file (this is the non PASID
-> >     path)
-> >   - Process can create a command queue and bind its process to it aka
-> >     PASID, this is done through an ioctl.
-> >   - Process can schedule commands onto queues it created from userspace
-> >     without ioctl. For that it just write command into a ring buffer
-> >     that it mapped during the command queue creation process and it
-> >     rings a doorbell when commands are ready to be consume by the
-> >     hardware.
-> >   - Commands can reference (access) all 3 types of object above ie
-> >     either full GPUs buffer, process regular memory maped as object
-> >     (non PASID) and PASID memory all at the same time ie you can
-> >     mix all of the above in same commands queue.
-> >   - Kernel can evict, unbind any process command queues, unbind commands
-> >     queue are still valid from process point of view but commands
-> >     process schedules on them will not be executed until kernel re-bind
-> >     the queue.
-> >   - Kernel can schedule commands itself onto its dedicated command
-> >     queues (kernel driver create its own command queues).
-> >   - Kernel can control priorities between all the queues ie it can
-> >     decides which queues should the hardware executed first next.
+> > If you want security against bad people resuming your machines, please
+> Yes, this is one of the requirements.
+> > take a look at existing uswsusp solutions. It defends against that.
+> >
+> > If you want security against bad people tampering with your machines
+> > physically, sorry, there's no way to defend against that.
+> No, this is not the requirement.
 > > 
-> 
-> Thank you. Now I think I understand the point. Indeed, I can see some drivers,
-> such GPU and IB, attach their own iommu_domain to their iommu_group and do their
-> own iommu_map().
-> 
-> But we have another requirement which is to combine some device together to
-> share the same address space. This is a little like these kinds of solution:
-> 
-> http://tce.technion.ac.il/wp-content/uploads/sites/8/2015/06/SC-7.2-M.-Silberstein.pdf
-> 
-> With that, the application can directly pass the NiC packet pointer to the
-> decryption accelerator, and get the bare data in place. This is the feature that
-> the VFIO container can provide.
-
-Yes and GPU would very much like do the same. There is already out of
-tree solution that allow NiC to stream into GPU memory or GPU to stream
-its memory to a NiC. I am sure we will want to use more accelerator in
-conjunction with GPU in the future.
-
-> 
-> > I believe all of the above are the aspects that matters to you. The main
-> > reason i don't like creating a new driver infrastructure is that a lot
-> > of existing drivers will want to use some of the new features that are
-> > coming (memory topology, where to place process memory, pipeline devices,
-> > ...) and thus existing drivers are big (GPU drivers are the biggest of
-> > all the kernel drivers).
+> > But I thought you were trying to do something for secure boot, and "bad
+> > person resumes your machine" is out of scope there.
 > > 
+> Not exactly, secure boot is one solution to meet the requirement.
+> > So please always explain security against _what kind of attack_ you
+> > are trying to improve; intelligent communication is not possible
+> > without that.
+> > 
+> User requirement:
+> A is the user, B is the attacker, user A launches a STD and
+> encrypts A's ram data, then writes these encrypted data onto
+> the disk,  so that: Even if user B has access to the disk,
+> B could not know the content of A. Which implies:
+> 1. If B unplugs the disk from A's machine, and plugs the disk onto
+>    another machine, B could not decode the content without A's
+>    'permission'.
+> 2. If B is using the same machine as A, even A has walked away leaving
+>    the system suspend, B could not resume to A's context without
+>    A's 'permission'.
 > 
-> I think it is not necessarily to rewrite the GPU driver if they don't need to
-> share their space with others. But if they do, no matter how, they have to create
-> some facility similar to VFIO container. Then why not just create them in VFIO?
+> Previously, there are three proposal for this:
+> a. Enhance the uswsusp(Pavel)
+> b. Using user provided password to generate the key, for encryption(Yu)
 
-No they do not, nor does anyone needs to. We already have that. If you want
-device to share memory object you have either:
-    - PASID and everything is just easy no need to create anything, as
-      all valid virtual address will work
-    - no PASID or one of the device does not support PASID then use the
-      existing kernel infrastructure aka dma buffer see Documentation/
-      driver-api/dma-buf.rst
+Base on your A/B users case. Your requirement is a" resume password",
+it doesn't really neeed encryption.
 
-Everything you want to do is already happening upstream and they are allready
-working example.
+Of course we can use the password to encrypt image, but it's not the
+key point for your requirement.
 
-> Actually, some GPUs have already used mdev to manage the resource by different
-> users, it is already part of VFIO.
+> c. Using security boot(TPM or EFI key) for encryption(Joey)
+>
 
-The current use of mdev with GPU is to "emulate" the SR_IOV of PCIE in
-software so that a single device can be share between multiple guests.
-For this using VFIO make sense, as we want to expose device as a single
-entity that can be manage without the userspace (QEMU) having to know
-or learn about each individual devices.
+No! The EFI key that relies on secure boot is failed. The only
+solution is TPM trusted key.
 
-QEMU just has a well define API to probe and attach device to guest.
-It is the guest that have dedicated drivers for each of those mdev
-devices.
+I agreed with Ard's comment on my EFI secure key patches:
 
+https://lkml.org/lkml/2018/8/5/31
 
-What you are trying to do is recreate a whole driver API inside the
-VFIO subsystem and i do not see any valid reasons for that. Moreover
-you want to restrict future use to only drivers that are part of this
-new driver subsystem and again i do not see any good reasons to
-mandate any of the existing driver to be rewritten inside a new VFIO
-infrastructure.
+"'Secure boot' is a misnomer, since it is too vague: it should be called
+'authenticated boot', and the catch is that authentication using
+public-key crypto does not involve secrets at all."
 
+So the EFI key can not be accepted because the secure boot is not designed
+for confidentiality. So, please forget EFI key. The only solution to
+me (or secure boot) is TPM trusted key.
 
-You can achieve everything you want to achieve with existing upstream
-solution. Re-inventing a whole new driver infrastructure should really
-be motivated with strong and obvious reasons.
+My purpose for developing the hibernation encryption/authentication
+is to prevent that the snapshot image be malicious modified. This will
+cause that the kernel space is not safe for secure boot (or we call
+it authenticated boot). In kernel space, we want to use locked-down
+mode to keep kernel space safe. 
 
-Cheers,
-Jérôme
+That's also why I said that user space helper must be authenticated by
+kernel. It also prevents malicious key can be enroll to kernel space.
+ 
+> Since I was proposing solution b, I'll say a little more about it.
+> The original idea was that, the user provides a password, then this
+> password is used to generate the key, which means, if user B has provided
+> an incorrect password, the kernel will fail to decrypt the data and is
+> likely to fail the resume process. That is to say, no matter
+> which physical machine B is using, only if he has provided the
+> password, he would be able to resume. In the first version, the key
+> deviration was firstly done in kernel space, which satisfies the
+> requirement and both saftey. Unfortunately it was rejected and
+> people would like to see the key generated in user space instead.
+> However, using user provided key directly is not safe, according
+> to the discussion in the thread. I don't have good idea on
+> how to improve this, but only have some workarounds, say, ask the
+> kernel to use TPM key to protects the user provided 'key', etc.
+
+Do not need to combind two purposes to one solution. Your requirement
+is a "resume password", not snapshot encryption. So we can just
+encrypt snapshot by TPM encrypted key but still use your tool (or
+uswsusp) to provide "resume password" to user. It's not conflict.
+
+If we still want to use the "resume password" to encrypt snapashot
+image. That's fine, but hibernation function must be locked-down
+when kernel runs in lock-down mode. Because "resume password"
+doesn't help anything in lockdown mode. Unless we found a way to
+authenticate the user space helper by kernel.
+
+Regards
+Joey Lee 
