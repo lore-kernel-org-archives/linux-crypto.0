@@ -1,101 +1,130 @@
-From: Kenneth Lee <liguozhu-C8/M+/jPZTeaMJb+Lgu22Q@public.gmane.org>
-Subject: Re: [RFC PATCH 2/7] iommu: Add share domain interface in iommu for
-	spimdev
-Date: Thu, 9 Aug 2018 09:09:38 +0800
-Message-ID: <20180809010938.GH91035@Turing-Arch-b>
-References: <20180801102221.5308-1-nek.in.cn@gmail.com>
-	<20180801102221.5308-3-nek.in.cn@gmail.com>
-	<20180808091354.ppqgineql3pufwwr@8bytes.org>
+From: Yu Chen <yu.c.chen@intel.com>
+Subject: Re: [PATCH 0/4][RFC v2] Introduce the in-kernel hibernation
+ encryption
+Date: Thu, 9 Aug 2018 11:01:35 +0800
+Message-ID: <20180809030135.GA21364@chenyu-desktop>
+References: <20180723162302.GA4503@sandybridge-desktop>
+ <1532590246.7411.3.camel@suse.com>
+ <20180726081404.GG4244@linux-l9pv.suse>
+ <20180730170415.GQ4244@linux-l9pv.suse>
+ <20180803033702.GB416@sandybridge-desktop>
+ <20180803053445.GC4244@linux-l9pv.suse>
+ <CADjb_WSURQz86+E8kakNf7UBDM+aho+uaz3QdDkuGsEgan=szw@mail.gmail.com>
+ <20180805100200.GB22948@amd>
+ <20180806084534.GB12124@chenyu-desktop>
+ <20180808175036.GA16217@amd>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Hao Fang <fanghao11-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>, Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-	kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Jonathan Corbet <corbet-T1hC0tSOHrs@public.gmane.org>, Greg
-	Kroah-Hartman <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>,
-	Zaibo Xu <xuzaibo-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>, linux-doc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Sanjay Kumar <sanjay.k.kumar-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>, Kenneth Lee <nek.in.cn-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linuxarm-hv44wF8Li93QT0dZR+AlfA@public.gmane.org, Alex Williamson <alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Philippe Ombredanne <pombredanne-od1rfyK75/E@public.gmane.org>,
-	Thomas Gleixner <tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org>,
-	"David S . Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
-	linux-accelerators-uLR06cmDAlY/bJ5BZ2RsiQ@public.gmane.org
-To: Joerg Roedel <joro-zLv9SwRftAIdnm+yROfE0A@public.gmane.org>
-Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: Ryan Chen <yu.chen.surf@gmail.com>, jlee@suse.com,
+        oneukum@suse.com, "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
+        ebiggers@google.com, Theodore Ts'o <tytso@mit.edu>,
+        smueller@chronox.de, denkenz@gmail.com,
+        Linux PM list <linux-pm@vger.kernel.org>,
+        linux-crypto@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        kookoo.gu@intel.com, Zhang Rui <rui.zhang@intel.com>
+To: Pavel Machek <pavel@ucw.cz>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20180808091354.ppqgineql3pufwwr-zLv9SwRftAIdnm+yROfE0A@public.gmane.org>
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
-List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
-Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+In-Reply-To: <20180808175036.GA16217@amd>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Aug 08, 2018 at 11:13:54AM +0200, Joerg Roedel wrote:
-> Date: Wed, 8 Aug 2018 11:13:54 +0200
-> From: Joerg Roedel <joro-zLv9SwRftAIdnm+yROfE0A@public.gmane.org>
-> To: Kenneth Lee <nek.in.cn-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> CC: Jonathan Corbet <corbet-T1hC0tSOHrs@public.gmane.org>, Herbert Xu
->  <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>, "David S . Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
->  Alex Williamson <alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, Kenneth Lee
->  <liguozhu-C8/M+/jPZTeaMJb+Lgu22Q@public.gmane.org>, Hao Fang <fanghao11-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>, Zhou Wang
->  <wangzhou1-C8/M+/jPZTeaMJb+Lgu22Q@public.gmane.org>, Zaibo Xu <xuzaibo-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>, Philippe
->  Ombredanne <pombredanne-od1rfyK75/E@public.gmane.org>, Greg Kroah-Hartman
->  <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>, Thomas Gleixner <tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org>,
->  linux-doc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
->  linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org,
->  kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-accelerators-uLR06cmDAlY/bJ5BZ2RsiQ@public.gmane.org, Lu Baolu
->  <baolu.lu-VuQAYsv1563Yd54FQh9/CA@public.gmane.org>, Sanjay Kumar <sanjay.k.kumar-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
->  linuxarm-hv44wF8Li93QT0dZR+AlfA@public.gmane.org
-> Subject: Re: [RFC PATCH 2/7] iommu: Add share domain interface in iommu for
->  spimdev
-> User-Agent: NeoMutt/20170421 (1.8.2)
-> Message-ID: <20180808091354.ppqgineql3pufwwr-zLv9SwRftAIdnm+yROfE0A@public.gmane.org>
+Hi Pavel, Joey, Oliver
+Please let me describe the original requirement and my
+understanding about hibernation encryption here, thus
+help us sync on the same thread:
+On Wed, Aug 08, 2018 at 07:50:36PM +0200, Pavel Machek wrote:
+> Hi!
 > 
-> On Wed, Aug 01, 2018 at 06:22:16PM +0800, Kenneth Lee wrote:
-> > From: Kenneth Lee <liguozhu-C8/M+/jPZTeaMJb+Lgu22Q@public.gmane.org>
-> > 
-> > This patch add sharing interface for a iommu_group. The new interface:
-> > 
-> > 	iommu_group_share_domain()
-> > 	iommu_group_unshare_domain()
-> > 
-> > can be used by some virtual iommu_group (such as iommu_group for spimdev)
-> > to share their parent's iommu_group.
-> > 
-> > When the domain of the group is shared, it cannot be changed before
-> > unshared.  In the future, notification can be added if update is required.
+> > > > > User space doesn't need to involve. The EFI root key is generated by
+> > > > > EFI boot stub and be transfer to kernel. It's stored in EFI boot service
+> > > > > variable that it can only be accessed by trusted EFI binary when
+> > > > > secure boot is enabled.
+> > > > >
+> > > > Okay, this apply to the 'suspend' phase, right?
+> > > > I'm still a little confused about the 'resume' phase.
+> > > > Taking encryption as example(not signature),
+> > > > the purpose of doing hibernation encryption is to prevent other users
+> > > > from stealing ram content. Say, user A uses a  passphrase to generate the
+> > > 
+> > > No, I don't think that's purpose here.
+> > > 
+> > > Purpose here is to prevent user from reading/modifying kernel memory
+> > > content on machine he owns.
+> > >
+> > Say, A puts his laptop into hibernation and walks away,
+> > and B walks by, and opens A's laptop and wakes up the system and he
+> > can do what he wants. Although EFI key/TPM trusted key is enabled,
+> > currently there's no certification during resume, which sounds
+> > unsafe to me. Afterall, the original requirement is to probe
 > 
-> >From the description or the patch I don't really get why this is needed.
-> Please update the description and make a case for this API addition.
+> Define unsafe.
 > 
-
-Yes, I will add more description in next version.
-
-The idea here is:
-
-1. iommu_domain is the setting of the IOMMU(the unit) of an iommu_group.
-
-2. The iommu_group originally uses a default domain or a created one (e.g. by vfio)
-   as its effective domain. There is only one user for a domain. If a device is
-   bound to vfio driver, it uses the new created domain. And if it is unbound from
-   vfio driver, it is switched back to the default domain.
-
-3. But for spimdev, we create an mdev which share it parent device's IOMMU. That
-   means, the parent device (along with its iommu group) will continue use its
-   iommu_domain, and the mdev will use the same at the same time.
-
-4. This API, is to tell the iommu_group that the domain is shared by the
-   spimdev. And it should be changed before it is unshared.
-
-Cheers
-
+> If you want security against bad people resuming your machines, please
+Yes, this is one of the requirements.
+> take a look at existing uswsusp solutions. It defends against that.
+>
+> If you want security against bad people tampering with your machines
+> physically, sorry, there's no way to defend against that.
+No, this is not the requirement.
 > 
-> 	Joerg
+> But I thought you were trying to do something for secure boot, and "bad
+> person resumes your machine" is out of scope there.
+> 
+Not exactly, secure boot is one solution to meet the requirement.
+> So please always explain security against _what kind of attack_ you
+> are trying to improve; intelligent communication is not possible
+> without that.
+> 
+User requirement:
+A is the user, B is the attacker, user A launches a STD and
+encrypts A's ram data, then writes these encrypted data onto
+the disk,  so that: Even if user B has access to the disk,
+B could not know the content of A. Which implies:
+1. If B unplugs the disk from A's machine, and plugs the disk onto
+   another machine, B could not decode the content without A's
+   'permission'.
+2. If B is using the same machine as A, even A has walked away leaving
+   the system suspend, B could not resume to A's context without
+   A's 'permission'.
 
--- 
-			-Kenneth(Hisilicon)
+Previously, there are three proposal for this:
+a. Enhance the uswsusp(Pavel)
+b. Using user provided password to generate the key, for encryption(Yu)
+c. Using security boot(TPM or EFI key) for encryption(Joey)
+
+Since I was proposing solution b, I'll say a little more about it.
+The original idea was that, the user provides a password, then this
+password is used to generate the key, which means, if user B has provided
+an incorrect password, the kernel will fail to decrypt the data and is
+likely to fail the resume process. That is to say, no matter
+which physical machine B is using, only if he has provided the
+password, he would be able to resume. In the first version, the key
+deviration was firstly done in kernel space, which satisfies the
+requirement and both saftey. Unfortunately it was rejected and
+people would like to see the key generated in user space instead.
+However, using user provided key directly is not safe, according
+to the discussion in the thread. I don't have good idea on
+how to improve this, but only have some workarounds, say, ask the
+kernel to use TPM key to protects the user provided 'key', etc.
+
+
+Then let's talk a little more about secure boot. According
+to my understanding, the situation secure boot tries to deal
+with is a little different from the user case we raised above -
+It is an enhancement for case 1, because it refuses to resume
+once the machine is changed. And it does not cover case 2. But
+if it is a requirement from the user, that's ok.
+
+uswsusp is to do all the staff in user space, and other two
+aim to do all the staff in kernel space. I'm not arguing
+which one is better, but I'm not sure how often user is using
+it, as we don't get uswsusp related bug report on kernel
+bugzilla (both internally)recent years. Another point is,
+why the compression is in kernel rather than in uswsusp,
+it looks like the same case as encryption here.
+
+
+Best,
+Yu
