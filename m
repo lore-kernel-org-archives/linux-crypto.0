@@ -1,58 +1,107 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Crypto Fixes for 4.18
-Date: Thu, 9 Aug 2018 13:47:09 +0800
-Message-ID: <20180809054709.gd5whukrd3vf6j3m@gondor.apana.org.au>
-References: <20170714141855.GA29426@gondor.apana.org.au>
- <20170922084401.GA15541@gondor.apana.org.au>
- <20171128230929.GA17783@gondor.apana.org.au>
- <20171222064931.GA27068@gondor.apana.org.au>
- <20180105073808.GA14405@gondor.apana.org.au>
- <20180212031702.GA26153@gondor.apana.org.au>
- <20180428080517.haxgpvqrwgotakyo@gondor.apana.org.au>
- <20180622145403.6ltjip7che227fuo@gondor.apana.org.au>
- <20180719073931.q5ny7tqgwws27lnq@gondor.apana.org.au>
- <20180803054420.4eehj2uneqimcf7g@gondor.apana.org.au>
+From: Pavel Machek <pavel@ucw.cz>
+Subject: Re: [PATCH 0/4][RFC v2] Introduce the in-kernel hibernation
+ encryption
+Date: Thu, 9 Aug 2018 08:53:06 +0200
+Message-ID: <20180809065306.GA24201@amd>
+References: <1532590246.7411.3.camel@suse.com>
+ <20180726081404.GG4244@linux-l9pv.suse>
+ <20180730170415.GQ4244@linux-l9pv.suse>
+ <20180803033702.GB416@sandybridge-desktop>
+ <20180803053445.GC4244@linux-l9pv.suse>
+ <CADjb_WSURQz86+E8kakNf7UBDM+aho+uaz3QdDkuGsEgan=szw@mail.gmail.com>
+ <20180805100200.GB22948@amd>
+ <20180806084534.GB12124@chenyu-desktop>
+ <20180808175036.GA16217@amd>
+ <20180809030135.GA21364@chenyu-desktop>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
+Content-Type: multipart/signed; micalg=pgp-sha1;
+        protocol="application/pgp-signature"; boundary="n8g4imXOkfNTN/H1"
+Cc: Ryan Chen <yu.chen.surf@gmail.com>, jlee@suse.com,
+        oneukum@suse.com, "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
+        ebiggers@google.com, Theodore Ts'o <tytso@mit.edu>,
+        smueller@chronox.de, denkenz@gmail.com,
+        Linux PM list <linux-pm@vger.kernel.org>,
+        linux-crypto@vger.kernel.org,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+        kookoo.gu@intel.com, Zhang Rui <rui.zhang@intel.com>
+To: Yu Chen <yu.c.chen@intel.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20180803054420.4eehj2uneqimcf7g@gondor.apana.org.au>
+In-Reply-To: <20180809030135.GA21364@chenyu-desktop>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi Linus: 
 
-This push fixes a performance regression in arm64 NEON crypto as
-well as a crash in x86 aegis/morus on unsupported CPUs.
+--n8g4imXOkfNTN/H1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+Hi!
 
-Please pull from
+> > Define unsafe.
+> >=20
+> > If you want security against bad people resuming your machines, please
+> Yes, this is one of the requirements.
 
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
+> > But I thought you were trying to do something for secure boot, and "bad
+> > person resumes your machine" is out of scope there.
+> >=20
+> Not exactly, secure boot is one solution to meet the requirement.
 
+Is it? AFAICT secure boot is something else. "Not even owner can see
+kernel memory".
 
-Ard Biesheuvel (1):
-      crypto: arm64 - revert NEON yield for fast AEAD implementations
+> > So please always explain security against _what kind of attack_ you
+> > are trying to improve; intelligent communication is not possible
+> > without that.
+> >=20
+> User requirement:
+> A is the user, B is the attacker, user A launches a STD and
+> encrypts A's ram data, then writes these encrypted data onto
+> the disk,  so that: Even if user B has access to the disk,
+> B could not know the content of A. Which implies:
+> 1. If B unplugs the disk from A's machine, and plugs the disk onto
+>    another machine, B could not decode the content without A's
+>    'permission'.
+> 2. If B is using the same machine as A, even A has walked away leaving
+>    the system suspend, B could not resume to A's context without
+>    A's 'permission'.
 
-Ondrej Mosnacek (1):
-      crypto: x86/aegis,morus - Fix and simplify CPUID checks
+Ok. Let's call this "effective resume password".
 
- arch/arm64/crypto/aes-ce-ccm-core.S    |  150 ++++++++++++--------------------
- arch/arm64/crypto/ghash-ce-core.S      |   76 ++++++----------
- arch/x86/crypto/aegis128-aesni-glue.c  |   12 +--
- arch/x86/crypto/aegis128l-aesni-glue.c |   12 +--
- arch/x86/crypto/aegis256-aesni-glue.c  |   12 +--
- arch/x86/crypto/morus1280-avx2-glue.c  |   10 +--
- arch/x86/crypto/morus1280-sse2-glue.c  |   10 +--
- arch/x86/crypto/morus640-sse2-glue.c   |   10 +--
- 8 files changed, 101 insertions(+), 191 deletions(-)
+> Previously, there are three proposal for this:
+> a. Enhance the uswsusp(Pavel)
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Actually you don't have to enhance anything. Uswsusp already provides
+"effective resume password".
+
+If you only want to ask for password on resume, RSA is needed.
+
+> Then let's talk a little more about secure boot. According
+> to my understanding, the situation secure boot tries to deal
+> with is a little different from the user case we raised above -
+> It is an enhancement for case 1, because it refuses to resume
+> once the machine is changed. And it does not cover case 2. But
+> if it is a requirement from the user, that's ok.
+
+That does not match my understanding of secure boot.
+									Pavel
+--=20
+(english) http://www.livejournal.com/~pavelmachek
+(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blo=
+g.html
+
+--n8g4imXOkfNTN/H1
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEUEARECAAYFAltr5NIACgkQMOfwapXb+vK4zACggeM5cg14StvKcoK9EU+6eGLp
+e5QAmLIzAxViZsXEdTTFXtBoQWAO0gM=
+=8X+b
+-----END PGP SIGNATURE-----
+
+--n8g4imXOkfNTN/H1--
