@@ -1,94 +1,261 @@
-From: Tom Lendacky <thomas.lendacky@amd.com>
-Subject: Re: disabling psp in bios causes errors in dmesg
-Date: Fri, 10 Aug 2018 09:11:56 -0500
-Message-ID: <1e514ed4-a2e1-32ec-4ec8-64134b2fdb9e@amd.com>
-References: <3be85fc6-6323-b368-747f-b7650b3898b4@mageia.org>
+From: Jerome Glisse <jglisse@redhat.com>
+Subject: Re: [RFC PATCH 0/7] A General Accelerator Framework, WarpDrive
+Date: Fri, 10 Aug 2018 10:32:31 -0400
+Message-ID: <20180810143231.GA7253@redhat.com>
+References: <20180802142243.GA3481@redhat.com>
+ <20180803034721.GC91035@Turing-Arch-b>
+ <20180803143944.GA4079@redhat.com>
+ <20180806031252.GG91035@Turing-Arch-b>
+ <20180806153257.GB6002@redhat.com>
+ <11bace0e-dc14-5d2c-f65c-25b852f4e9ca@gmail.com>
+ <20180808151835.GA3429@redhat.com>
+ <20180809080352.GI91035@Turing-Arch-b>
+ <20180809144613.GB3386@redhat.com>
+ <20180810033913.GK91035@Turing-Arch-b>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        gary.hook@amd.com, Brijesh Singh <brijesh.singh@amd.com>
-To: Thomas Backlund <tmb@mageia.org>, linux-crypto@vger.kernel.org
+Cc: Kenneth Lee <nek.in.cn@gmail.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Zaibo Xu <xuzaibo@huawei.com>,
+        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        "Kumar, Sanjay K" <sanjay.k.kumar@intel.com>,
+        Hao Fang <fanghao11@huawei.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linuxarm@huawei.com" <linuxarm@huawei.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Philippe Ombredanne <pombredanne@nexb.com>,
+        Thomas Gleixner <tglx@linu
+To: Kenneth Lee <liguozhu@hisilicon.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <3be85fc6-6323-b368-747f-b7650b3898b4@mageia.org>
-Content-Language: en-US
+Content-Disposition: inline
+In-Reply-To: <20180810033913.GK91035@Turing-Arch-b>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 8/10/2018 2:03 AM, Thomas Backlund wrote:
-> Hi,
+On Fri, Aug 10, 2018 at 11:39:13AM +0800, Kenneth Lee wrote:
+> On Thu, Aug 09, 2018 at 10:46:13AM -0400, Jerome Glisse wrote:
+> > Date: Thu, 9 Aug 2018 10:46:13 -0400
+> > From: Jerome Glisse <jglisse@redhat.com>
+> > To: Kenneth Lee <liguozhu@hisilicon.com>
+> > CC: Kenneth Lee <nek.in.cn@gmail.com>, "Tian, Kevin"
+> >  <kevin.tian@intel.com>, Alex Williamson <alex.williamson@redhat.com>,
+> >  Herbert Xu <herbert@gondor.apana.org.au>, "kvm@vger.kernel.org"
+> >  <kvm@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>, Greg
+> >  Kroah-Hartman <gregkh@linuxfoundation.org>, Zaibo Xu <xuzaibo@huawei.com>,
+> >  "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, "Kumar, Sanjay K"
+> >  <sanjay.k.kumar@intel.com>, Hao Fang <fanghao11@huawei.com>,
+> >  "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+> >  "linuxarm@huawei.com" <linuxarm@huawei.com>,
+> >  "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+> >  "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>, Philippe
+> >  Ombredanne <pombredanne@nexb.com>, Thomas Gleixner <tglx@linutronix.de>,
+> >  "David S . Miller" <davem@davemloft.net>,
+> >  "linux-accelerators@lists.ozlabs.org"
+> >  <linux-accelerators@lists.ozlabs.org>
+> > Subject: Re: [RFC PATCH 0/7] A General Accelerator Framework, WarpDrive
+> > User-Agent: Mutt/1.10.0 (2018-05-17)
+> > Message-ID: <20180809144613.GB3386@redhat.com>
+> > 
+> > On Thu, Aug 09, 2018 at 04:03:52PM +0800, Kenneth Lee wrote:
+> > > On Wed, Aug 08, 2018 at 11:18:35AM -0400, Jerome Glisse wrote:
+> > > > On Wed, Aug 08, 2018 at 09:08:42AM +0800, Kenneth Lee wrote:
+> > > > > Âú® 2018Âπ¥08Êúà06Êó• ÊòüÊúü‰∏Ä 11:32 ‰∏ãÂçà, Jerome Glisse ÂÜôÈÅì:
+> > > > > > On Mon, Aug 06, 2018 at 11:12:52AM +0800, Kenneth Lee wrote:
+> > > > > > > On Fri, Aug 03, 2018 at 10:39:44AM -0400, Jerome Glisse wrote:
+> > > > > > > > On Fri, Aug 03, 2018 at 11:47:21AM +0800, Kenneth Lee wrote:
+> > > > > > > > > On Thu, Aug 02, 2018 at 10:22:43AM -0400, Jerome Glisse wrote:
+> > > > > > > > > > On Thu, Aug 02, 2018 at 12:05:57PM +0800, Kenneth Lee wrote:
+> > 
+> > [...]
+> > 
+> > > > > > > > > > your mechanisms the userspace must have a specific userspace
+> > > > > > > > > > drivers for each hardware and thus there are virtually no
+> > > > > > > > > > differences between having this userspace driver open a device
+> > > > > > > > > > file in vfio or somewhere else in the device filesystem. This is
+> > > > > > > > > > just a different path.
+> > > > > > > > > > 
+> > > > > > > > > The basic problem WarpDrive want to solve it to avoid syscall. This is important
+> > > > > > > > > to accelerators. We have some data here:
+> > > > > > > > > https://www.slideshare.net/linaroorg/progress-and-demonstration-of-wrapdrive-a-accelerator-framework-sfo17317
+> > > > > > > > > 
+> > > > > > > > > (see page 3)
+> > > > > > > > > 
+> > > > > > > > > The performance is different on using kernel and user drivers.
+> > > > > > > > Yes and example i point to is exactly that. You have a one time setup
+> > > > > > > > cost (creating command buffer binding PASID with command buffer and
+> > > > > > > > couple other setup steps). Then userspace no longer have to do any
+> > > > > > > > ioctl to schedule work on the GPU. It is all down from userspace and
+> > > > > > > > it use a doorbell to notify hardware when it should go look at command
+> > > > > > > > buffer for new thing to execute.
+> > > > > > > > 
+> > > > > > > > My point stands on that. You have existing driver already doing so
+> > > > > > > > with no new framework and in your scheme you need a userspace driver.
+> > > > > > > > So i do not see the value add, using one path or the other in the
+> > > > > > > > userspace driver is litteraly one line to change.
+> > > > > > > > 
+> > > > > > > Sorry, I'd got confuse here. I partially agree that the user driver is
+> > > > > > > redundance of kernel driver. (But for WarpDrive, the kernel driver is a full
+> > > > > > > driver include all preparation and setup stuff for the hardware, the user driver
+> > > > > > > is simply to send request and receive answer). Yes, it is just a choice of path.
+> > > > > > > But the user path is faster if the request come from use space. And to do that,
+> > > > > > > we need user land DMA support. Then why is it invaluable to let VFIO involved?
+> > > > > > Some drivers in the kernel already do exactly what you said. The user
+> > > > > > space emit commands without ever going into kernel by directly scheduling
+> > > > > > commands and ringing a doorbell. They do not need VFIO either and they
+> > > > > > can map userspace address into the DMA address space of the device and
+> > > > > > again they do not need VFIO for that.
+> > > > > Could you please directly point out which driver you refer to here? Thank
+> > > > > you.
+> > > > 
+> > > > drivers/gpu/drm/amd/
+> > > > 
+> > > > Sub-directory of interest is amdkfd
+> > > > 
+> > > > Because it is a big driver here is a highlevel overview of how it works
+> > > > (this is a simplification):
+> > > >   - Process can allocate GPUs buffer (through ioclt) and map them into
+> > > >     its address space (through mmap of device file at buffer object
+> > > >     specific offset).
+> > > >   - Process can map any valid range of virtual address space into device
+> > > >     address space (IOMMU mapping). This must be regular memory ie not an
+> > > >     mmap of a device file or any special file (this is the non PASID
+> > > >     path)
+> > > >   - Process can create a command queue and bind its process to it aka
+> > > >     PASID, this is done through an ioctl.
+> > > >   - Process can schedule commands onto queues it created from userspace
+> > > >     without ioctl. For that it just write command into a ring buffer
+> > > >     that it mapped during the command queue creation process and it
+> > > >     rings a doorbell when commands are ready to be consume by the
+> > > >     hardware.
+> > > >   - Commands can reference (access) all 3 types of object above ie
+> > > >     either full GPUs buffer, process regular memory maped as object
+> > > >     (non PASID) and PASID memory all at the same time ie you can
+> > > >     mix all of the above in same commands queue.
+> > > >   - Kernel can evict, unbind any process command queues, unbind commands
+> > > >     queue are still valid from process point of view but commands
+> > > >     process schedules on them will not be executed until kernel re-bind
+> > > >     the queue.
+> > > >   - Kernel can schedule commands itself onto its dedicated command
+> > > >     queues (kernel driver create its own command queues).
+> > > >   - Kernel can control priorities between all the queues ie it can
+> > > >     decides which queues should the hardware executed first next.
+> > > > 
+> > > 
+> > > Thank you. Now I think I understand the point. Indeed, I can see some drivers,
+> > > such GPU and IB, attach their own iommu_domain to their iommu_group and do their
+> > > own iommu_map().
+> > > 
+> > > But we have another requirement which is to combine some device together to
+> > > share the same address space. This is a little like these kinds of solution:
+> > > 
+> > > http://tce.technion.ac.il/wp-content/uploads/sites/8/2015/06/SC-7.2-M.-Silberstein.pdf
+> > > 
+> > > With that, the application can directly pass the NiC packet pointer to the
+> > > decryption accelerator, and get the bare data in place. This is the feature that
+> > > the VFIO container can provide.
+> > 
+> > Yes and GPU would very much like do the same. There is already out of
+> > tree solution that allow NiC to stream into GPU memory or GPU to stream
+> > its memory to a NiC. I am sure we will want to use more accelerator in
+> > conjunction with GPU in the future.
+> > 
+> > > 
+> > > > I believe all of the above are the aspects that matters to you. The main
+> > > > reason i don't like creating a new driver infrastructure is that a lot
+> > > > of existing drivers will want to use some of the new features that are
+> > > > coming (memory topology, where to place process memory, pipeline devices,
+> > > > ...) and thus existing drivers are big (GPU drivers are the biggest of
+> > > > all the kernel drivers).
+> > > > 
+> > > 
+> > > I think it is not necessarily to rewrite the GPU driver if they don't need to
+> > > share their space with others. But if they do, no matter how, they have to create
+> > > some facility similar to VFIO container. Then why not just create them in VFIO?
+> > 
+> > No they do not, nor does anyone needs to. We already have that. If you want
+> > device to share memory object you have either:
+> >     - PASID and everything is just easy no need to create anything, as
+> >       all valid virtual address will work
+> >     - no PASID or one of the device does not support PASID then use the
+> >       existing kernel infrastructure aka dma buffer see Documentation/
+> >       driver-api/dma-buf.rst
+> > 
+> > Everything you want to do is already happening upstream and they are allready
+> > working example.
 > 
-> this is tested on kernel 4.17.14
+> OK, I accept it.
 > 
-> hw:
+> > 
+> > > Actually, some GPUs have already used mdev to manage the resource by different
+> > > users, it is already part of VFIO.
+> > 
+> > The current use of mdev with GPU is to "emulate" the SR_IOV of PCIE in
+> > software so that a single device can be share between multiple guests.
+> > For this using VFIO make sense, as we want to expose device as a single
+> > entity that can be manage without the userspace (QEMU) having to know
+> > or learn about each individual devices.
+> > 
+> > QEMU just has a well define API to probe and attach device to guest.
+> > It is the guest that have dedicated drivers for each of those mdev
+> > devices.
+> > 
 > 
-> MSI X399 GAMING PRO CARBON AC (MS-7B09) bios 1.A0
+> Agree
 > 
-> AMD Ryzen Threadripper 1950X
+> > 
+> > What you are trying to do is recreate a whole driver API inside the
+> > VFIO subsystem and i do not see any valid reasons for that. Moreover
+> > you want to restrict future use to only drivers that are part of this
+> > new driver subsystem and again i do not see any good reasons to
+> > mandate any of the existing driver to be rewritten inside a new VFIO
+> > infrastructure.
+> > 
 > 
+> I think you have persuaded me now. I thought VFIO was the only unified place to do
+> user land DMA operations. So I tried to make use of it even there was facility I
+> needed not.
 > 
-> Disabling psp in bios gets this in the logs:
+> Thank you very much for the help.
+> 
+> > 
+> > You can achieve everything you want to achieve with existing upstream
+> > solution. Re-inventing a whole new driver infrastructure should really
+> > be motivated with strong and obvious reasons.
+> 
+> I want to understand better of your idea. If I create some unified helper
+> APIs in drivers/iommu/, say:
+> 
+> 	wd_create_dev(parent_dev, wd_dev)
+> 	wd_release_dev(wd_dev)
+> 
+> The API create chrdev to take request from user space for open(resource
+> allocation), iomap, epoll (irq), and dma_map(with pasid automatically).
+> 
+> Do you think it is acceptable?
+> 
+> I agree that these all can be done with the driver itself. But without a unified
+> interface, it is hard to create a user land ecosystem for accelerator to
+> cooperate.
 
-Hmm, I'm not familiar with that BIOS option so I'm not exactly sure what
-it is doing under the covers.  Having said that, it would seem that a
-register read is indicating that SEV is supported when it is not on this
-platform.  Maybe the register read is returning all 1s, (i.e. 0xffffffff).
+I am fine with creating a new sub-system for pipelining devices (ie some
+place where it is easy for userspace to get list of all devices that can
+fit in such model). I am not sure if we want to have everything part of
+it (ie DMA mapping of memory and pipelining as same thing) i tend to be
+more unix oriented one tool for one job. But maybe it makes sense, this
+would likely avoid having each device driver have their own code to
+create dma buffer or track SVM pointer.
 
-You can work around this by blacklisting the ccp driver module for now.
-In the mean time, we'll try to understand what is occurring here and
-provide a fix if we can.
+In any case for the non SVM case i would suggest to use dma buffer, it
+has been widely use, it is well tested in many scenarios. Moreover it
+would allow many existing device driver to register themself in this
+new framework with minimal changes (couple hundred lines).
 
-Thanks,
-Tom
-
-> 
-> 
-> [† 246.748978] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables
-> this message.
-> [† 246.748978] systemd-udevd†† D††† 0†† 724††† 716 0x80000124
-> [† 246.748980] Call Trace:
-> [† 246.748986]† ? __schedule+0x234/0x840
-> [† 246.748988]† schedule+0x28/0x80
-> [† 246.748993]† __sev_do_cmd_locked+0x1f0/0x270 [ccp]
-> [† 246.748996]† ? wait_woken+0x80/0x80
-> [† 246.748997]† ? 0xffffffffc0683000
-> [† 246.749001]† __sev_platform_init_locked+0x2f/0x80 [ccp]
-> [† 246.749001]† ? mutex_lock+0xe/0x30
-> [† 246.749004]† sev_platform_init+0x1d/0x30 [ccp]
-> [† 246.749007]† psp_pci_init+0x40/0xe0 [ccp]
-> [† 246.749008]† ? 0xffffffffc0683000
-> [† 246.749011]† sp_mod_init+0x16/0x1000 [ccp]
-> [† 246.749012]† do_one_initcall+0x46/0x1c3
-> [† 246.749014]† ? _cond_resched+0x15/0x30
-> [† 246.749017]† ? kmem_cache_alloc_trace+0x3a/0x170
-> [† 246.749019]† do_init_module+0x5a/0x210
-> [† 246.749020]† load_module+0x215b/0x2530
-> [† 246.749021]† ? kmem_cache_alloc_node_trace+0x45/0x190
-> [† 246.749024]† ? vmap_page_range_noflush+0x24d/0x320
-> [† 246.749026]† ? __do_sys_init_module+0x136/0x180
-> [† 246.749026]† ? _cond_resched+0x15/0x30
-> [† 246.749027]† __do_sys_init_module+0x136/0x180
-> [† 246.749029]† do_syscall_64+0x55/0x100
-> [† 246.749031]† entry_SYSCALL_64_after_hwframe+0x44/0xa9
-> [† 246.749032] RIP: 0033:0x7ffb1a09018a
-> [† 246.749033] RSP: 002b:00007ffe196680c8 EFLAGS: 00000246 ORIG_RAX:
-> 00000000000000af
-> [† 246.749034] RAX: ffffffffffffffda RBX: 00005562bb20d080 RCX:
-> 00007ffb1a09018a
-> [† 246.749034] RDX: 00007ffb1994e6f8 RSI: 0000000000029e50 RDI:
-> 00005562bba5e710
-> [† 246.749035] RBP: 00007ffb1994e6f8 R08: 0000000000000004 R09:
-> 0000000000000000
-> [† 246.749035] R10: 0000000000000005 R11: 0000000000000246 R12:
-> 00005562bba5e710
-> [† 246.749036] R13: 0000000000020000 R14: 00005562bb1fde70 R15:
-> 00005562bb20d080
-> 
-> 
-> Should it not detect that its disabled and bail out ?
-> 
-> -- 
-> 
-> Thomas
-> 
-> 
+Cheers,
+J√©r√¥me
