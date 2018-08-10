@@ -1,55 +1,350 @@
-From: Andy Lutomirski <luto@kernel.org>
-Subject: Re: [PATCH v1 2/3] zinc: Introduce minimal cryptography library
-Date: Thu, 9 Aug 2018 11:08:25 -0700
-Message-ID: <CALCETrUgOk7veQavAWayY7vQUY0fJkwGsYxNhLxK-v3F-BEmsg@mail.gmail.com>
-References: <20180801072246.GA15677@sol.localdomain> <CALCETrXD_VyoyW5C1U34o-ySJ4nFcO6PQ+ZNBVYxCpJ-f65CHw@mail.gmail.com>
- <CAHmME9oThR-dE3gTW0UyqAGZO80qu19ktG4YTb4iL6CNpzNNaw@mail.gmail.com>
- <CALCETrVziUpAU4nTaZ=t5ct=1jsWswWOy7KDNxXGPD1L=tMTGQ@mail.gmail.com>
- <CAHmME9pt3PxKQmc8E-arA-W0p2tp9z_oJ-uXQwis3qD=Zvpnsg@mail.gmail.com>
- <CAHmME9rA_nb9Le4VQhtcqCfNSuHpFjZVOV6=vE12FydJD9CmAQ@mail.gmail.com>
- <CALCETrWo-vCt_bHMBPAEHEr3P4=AJq-95Bf=00aAEAcE839wLw@mail.gmail.com>
- <CAHmME9qPay3O7Yh-R66EDhon4dJz1cuy69dWUxf3Xkt8seqLZA@mail.gmail.com>
- <A44CAA94-415C-476C-9523-2D19F28EDC6D@amacapital.net> <CAHmME9rG8VFfuuCy=rCVmxb1CdneYGv1d4xmsyqSPooBozoOJw@mail.gmail.com>
+From: Caleb Raitto <caleb.raitto@gmail.com>
+Subject: [PATCH net-next 0/2] virtio_net: Expand affinity to arbitrary numbers of cpu and vq
+Date: Thu,  9 Aug 2018 17:28:38 -0700
+Message-ID: <20180810002840.186635-1-caleb.raitto@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Cc: Ingo Molnar <mingo@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        linux-arch <linux-arch@vger.kernel.org>,
-        Eric Biggers <ebiggers3@gmail.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Netdev <netdev@vger.kernel.org>,
-        David Miller <davem@davemloft.net>,
-        Andrew Lutomirski <luto@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Samuel Neves <sneves@dei.uc.pt>,
-        "Daniel J . Bernstein" <djb@cr.yp.to>,
-        Tanja Lange <tanja@hyperelliptic.org>,
-        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
-        Karthikeyan Bhargavan <karthik.bhargavan@gmail.com>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAHmME9rG8VFfuuCy=rCVmxb1CdneYGv1d4xmsyqSPooBozoOJw@mail.gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+Cc: arei.gonglei@huawei.com, jasowang@redhat.com,
+        netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
+        Caleb Raitto <caraitto@google.com>
+To: herbert@gondor.apana.org.au, mst@redhat.com, davem@davemloft.net
+Return-path: <netdev-owner@vger.kernel.org>
+Sender: netdev-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Aug 7, 2018 at 6:51 PM, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
-> On Tue, Aug 7, 2018 at 6:49 PM Andy Lutomirski <luto@amacapital.net> wrot=
-e:
->> I really wish we had a way to see that we use asm-generic=E2=80=99s copy=
- of a header in all cases except where an arch opts out.
->
-> It's really not that hard to do -- symlink asm-generic to a target
-> called "asm" inside an otherwise empty directory, and add that
-> otherwise empty directory to the -I paths just after arch/include.
-> Since it's searched second, it's only used if the first fails. Maybe
-> I'm missing something though, as this seems a bit too obvious. Perhaps
-> a project for another day.
+From: Caleb Raitto <caraitto@google.com>
 
-The problem here (I think) is that it's preferable for stray files in
-the kernel tree to have no effect and, with this scheme, stray files
-in arch/*/include/asm could affect the build.  So something explicit
-has an advantage.  I just think there should be way to say "this
-asm-generic file should affect all arches unless they generic-n or
-override-generic-y it or whatever".
+Virtio-net tries to pin each virtual queue rx and tx interrupt to a cpu if
+there are as many queues as cpus.
+
+Expand this heuristic to configure a reasonable affinity setting also
+when the number of cpus != the number of virtual queues.
+
+Patch 1 allows vqs to take an affinity mask with more than 1 cpu.
+Patch 2 generalizes the algorithm in virtnet_set_affinity beyond
+the case where #cpus == #vqs.
+
+Tested:
+
+# 16 vCPU, 16 queue pairs, Debian 9 recent net-next kernel, GCE
+
+# Disable GCE scripts setting affinities during startup.
+#
+# Add the following to
+# /etc/default/instance_configs.cfg.template and reboot:
+[InstanceSetup]
+set_multiqueue = false
+
+$ cd /proc/irq
+$ for i in `seq 24 60` ; do sudo grep ".*" $i/smp_affinity_list;  done
+0-15
+0
+0
+1
+1
+2
+2
+3
+3
+4
+4
+5
+5
+6
+6
+7
+7
+8
+8
+9
+9
+10
+10
+11
+11
+12
+12
+13
+13
+14
+14
+15
+15
+0-15
+0-15
+0-15
+0-15
+
+$ cd /sys/class/net/eth0/queues/
+$ for i in `seq 0 15` ; do sudo grep ".*" tx-$i/xps_cpus; done
+0001
+0002
+0004
+0008
+0010
+0020
+0040
+0080
+0100
+0200
+0400
+0800
+1000
+2000
+4000
+8000
+
+# 16 vCPU, 15 queue pairs
+$ sudo ethtool -L eth0 combined 15
+
+$ cd /proc/irq
+$ for i in `seq 24 60` ; do sudo grep ".*" $i/smp_affinity_list;  done
+0-15
+0-1
+0-1
+2
+2
+3
+3
+4
+4
+5
+5
+6
+6
+7
+7
+8
+8
+9
+9
+10
+10
+11
+11
+12
+12
+13
+13
+14
+14
+15
+15
+15
+15
+0-15
+0-15
+0-15
+0-15
+
+$ cd /sys/class/net/eth0/queues/
+$ for i in `seq 0 14` ; do sudo grep ".*" tx-$i/xps_cpus; done
+0003
+0004
+0008
+0010
+0020
+0040
+0080
+0100
+0200
+0400
+0800
+1000
+2000
+4000
+8000
+
+# 16 vCPU, 8 queue pairs
+$ sudo ethtool -L eth0 combined 8
+
+$ cd /proc/irq
+$ for i in `seq 24 60` ; do sudo grep ".*" $i/smp_affinity_list;  done
+0-15
+0-1
+0-1
+2-3
+2-3
+4-5
+4-5
+6-7
+6-7
+8-9
+8-9
+10-11
+10-11
+12-13
+12-13
+14-15
+14-15
+9
+9
+10
+10
+11
+11
+12
+12
+13
+13
+14
+14
+15
+15
+15
+15
+0-15
+0-15
+0-15
+0-15
+
+$ cd /sys/class/net/eth0/queues/
+$ for i in `seq 0 7` ; do sudo grep ".*" tx-$i/xps_cpus; done
+0003
+000c
+0030
+00c0
+0300
+0c00
+3000
+c000
+
+# 15 vCPU, 16 queue pairs
+$ sudo ethtool -L eth0 combined 16
+$ sudo sh -c "echo 0 > /sys/devices/system/cpu/cpu15/online"
+
+$ cd /proc/irq
+$ for i in `seq 24 60` ; do sudo grep ".*" $i/smp_affinity_list;  done
+0-15
+0
+0
+1
+1
+2
+2
+3
+3
+4
+4
+5
+5
+6
+6
+7
+7
+8
+8
+9
+9
+10
+10
+11
+11
+12
+12
+13
+13
+14
+14
+0
+0
+0-15
+0-15
+0-15
+0-15
+
+$ cd /sys/class/net/eth0/queues/
+$ for i in `seq 0 15` ; do sudo grep ".*" tx-$i/xps_cpus; done
+0001
+0002
+0004
+0008
+0010
+0020
+0040
+0080
+0100
+0200
+0400
+0800
+1000
+2000
+4000
+0001
+
+# 8 vCPU, 16 queue pairs
+$ for i in `seq 8 15`; \
+do sudo sh -c "echo 0 > /sys/devices/system/cpu/cpu$i/online"; done
+
+$ cd /proc/irq
+$ for i in `seq 24 60` ; do sudo grep ".*" $i/smp_affinity_list;  done
+0-15
+0
+0
+1
+1
+2
+2
+3
+3
+4
+4
+5
+5
+6
+6
+7
+7
+0
+0
+1
+1
+2
+2
+3
+3
+4
+4
+5
+5
+6
+6
+7
+7
+0-15
+0-15
+0-15
+0-15
+
+$ cd /sys/class/net/eth0/queues/
+$ for i in `seq 0 15` ; do sudo grep ".*" tx-$i/xps_cpus; done
+0001
+0002
+0004
+0008
+0010
+0020
+0040
+0080
+0001
+0002
+0004
+0008
+0010
+0020
+0040
+0080
+
+Caleb Raitto (2):
+  virtio_net: Make vp_set_vq_affinity() take a mask.
+  virtio_net: Stripe queue affinities across cores.
+
+ drivers/crypto/virtio/virtio_crypto_core.c |  4 +-
+ drivers/net/virtio_net.c                   | 46 ++++++++++++++--------
+ drivers/virtio/virtio_pci_common.c         |  7 ++--
+ drivers/virtio/virtio_pci_common.h         |  2 +-
+ include/linux/virtio_config.h              |  7 ++--
+ 5 files changed, 39 insertions(+), 27 deletions(-)
+
+-- 
+2.18.0.597.ga71716f1ad-goog
