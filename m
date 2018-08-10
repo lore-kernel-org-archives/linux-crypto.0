@@ -1,101 +1,94 @@
-From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-Subject: Re: [RFC PATCH 0/7] A General Accelerator Framework, WarpDrive
-Date: Fri, 10 Aug 2018 14:12:37 +0100
-Message-ID: <0f6bac9b-8381-1874-9367-46b5f4cef56e@arm.com>
-References: <20180802040557.GL160746@Turing-Arch-b>
- <20180802142243.GA3481@redhat.com> <20180803034721.GC91035@Turing-Arch-b>
- <20180803143944.GA4079@redhat.com> <20180806031252.GG91035@Turing-Arch-b>
- <20180806153257.GB6002@redhat.com>
- <11bace0e-dc14-5d2c-f65c-25b852f4e9ca@gmail.com>
- <20180808151835.GA3429@redhat.com> <20180809080352.GI91035@Turing-Arch-b>
- <20180809144613.GB3386@redhat.com> <20180810033913.GK91035@Turing-Arch-b>
+From: Tom Lendacky <thomas.lendacky@amd.com>
+Subject: Re: disabling psp in bios causes errors in dmesg
+Date: Fri, 10 Aug 2018 09:11:56 -0500
+Message-ID: <1e514ed4-a2e1-32ec-4ec8-64134b2fdb9e@amd.com>
+References: <3be85fc6-6323-b368-747f-b7650b3898b4@mageia.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Cc: Kenneth Lee <nek.in.cn@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Zaibo Xu <xuzaibo@huawei.com>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        "Kumar, Sanjay K" <sanjay.k.kumar@intel.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linuxarm@huawei.com" <linuxarm@huawei.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Philippe Ombredanne <pombredanne@nexb.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Hao Fang <fanghao11@h
-To: Kenneth Lee <liguozhu@hisilicon.com>,
-        Jerome Glisse <jglisse@redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 8bit
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        gary.hook@amd.com, Brijesh Singh <brijesh.singh@amd.com>
+To: Thomas Backlund <tmb@mageia.org>, linux-crypto@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180810033913.GK91035@Turing-Arch-b>
+In-Reply-To: <3be85fc6-6323-b368-747f-b7650b3898b4@mageia.org>
 Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi Kenneth,
-
-On 10/08/18 04:39, Kenneth Lee wrote:
->> You can achieve everything you want to achieve with existing upstream
->> solution. Re-inventing a whole new driver infrastructure should really
->> be motivated with strong and obvious reasons.
+On 8/10/2018 2:03 AM, Thomas Backlund wrote:
+> Hi,
 > 
-> I want to understand better of your idea. If I create some unified helper
-> APIs in drivers/iommu/, say:
+> this is tested on kernel 4.17.14
 > 
-> 	wd_create_dev(parent_dev, wd_dev)
-> 	wd_release_dev(wd_dev)
+> hw:
 > 
-> The API create chrdev to take request from user space for open(resource
-> allocation), iomap, epoll (irq), and dma_map(with pasid automatically).
+> MSI X399 GAMING PRO CARBON AC (MS-7B09) bios 1.A0
 > 
-> Do you think it is acceptable?
+> AMD Ryzen Threadripper 1950X
+> 
+> 
+> Disabling psp in bios gets this in the logs:
 
-Maybe not drivers/iommu/ :) That subsystem only contains tools for
-dealing with DMA, I don't think epoll, resource enumeration or iomap fit
-in there.
+Hmm, I'm not familiar with that BIOS option so I'm not exactly sure what
+it is doing under the covers.  Having said that, it would seem that a
+register read is indicating that SEV is supported when it is not on this
+platform.  Maybe the register read is returning all 1s, (i.e. 0xffffffff).
 
-Creating new helpers seems to be precisely what we're trying to avoid in
-this thread, and vfio-mdev does provide the components that you
-describe, so I wouldn't discard it right away. When the GPU, net, block
-or another subsystem doesn't fit your needs, either because your
-accelerator provides some specialized function, or because for
-performance reasons your client wants direct MMIO access, you can at
-least build your driver and library on top of those existing VFIO
-components:
-
-* open allocates a partition of an accelerator.
-* vfio_device_info, vfio_region_info and vfio_irq_info enumerates
-available resources.
-* vfio_irq_set deals with epoll.
-* mmap gives you a private MMIO doorbell.
-* vfio_iommu_type1 provides the DMA operations.
-
-Currently missing:
-
-* Sharing the parent IOMMU between mdev, which is also what the "IOMMU
-aware mediated device" series tackles, and seems like a logical addition
-to VFIO. I'd argue that the existing IOMMU ops (or ones implemented by
-the SVA series) can be used to deal with this
-
-* The interface to discover an accelerator near your memory node, or one
-that you can chain with other devices. If I understood correctly the
-conclusion was that the API (a topology description in sysfs?) should be
-common to various subsystems, in which case vfio-mdev (or the mediating
-driver) could also use it.
-
-* The queue abstraction discussed on patch 3/7. Perhaps the current vfio
-resource description of MMIO and IRQ is sufficient here as well, since
-vendors tend to each implement their own queue schemes. If you need
-additional features, read/write fops give the mediating driver a lot of
-freedom. To support features that are too specific for drivers/vfio/ you
-can implement a config space with capabilities and registers of your
-choice. If you're versioning the capabilities, the code to handle them
-could even be shared between different accelerator drivers and libraries.
+You can work around this by blacklisting the ccp driver module for now.
+In the mean time, we'll try to understand what is occurring here and
+provide a fix if we can.
 
 Thanks,
-Jean
+Tom
+
+> 
+> 
+> [  246.748978] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables
+> this message.
+> [  246.748978] systemd-udevd   D    0   724    716 0x80000124
+> [  246.748980] Call Trace:
+> [  246.748986]  ? __schedule+0x234/0x840
+> [  246.748988]  schedule+0x28/0x80
+> [  246.748993]  __sev_do_cmd_locked+0x1f0/0x270 [ccp]
+> [  246.748996]  ? wait_woken+0x80/0x80
+> [  246.748997]  ? 0xffffffffc0683000
+> [  246.749001]  __sev_platform_init_locked+0x2f/0x80 [ccp]
+> [  246.749001]  ? mutex_lock+0xe/0x30
+> [  246.749004]  sev_platform_init+0x1d/0x30 [ccp]
+> [  246.749007]  psp_pci_init+0x40/0xe0 [ccp]
+> [  246.749008]  ? 0xffffffffc0683000
+> [  246.749011]  sp_mod_init+0x16/0x1000 [ccp]
+> [  246.749012]  do_one_initcall+0x46/0x1c3
+> [  246.749014]  ? _cond_resched+0x15/0x30
+> [  246.749017]  ? kmem_cache_alloc_trace+0x3a/0x170
+> [  246.749019]  do_init_module+0x5a/0x210
+> [  246.749020]  load_module+0x215b/0x2530
+> [  246.749021]  ? kmem_cache_alloc_node_trace+0x45/0x190
+> [  246.749024]  ? vmap_page_range_noflush+0x24d/0x320
+> [  246.749026]  ? __do_sys_init_module+0x136/0x180
+> [  246.749026]  ? _cond_resched+0x15/0x30
+> [  246.749027]  __do_sys_init_module+0x136/0x180
+> [  246.749029]  do_syscall_64+0x55/0x100
+> [  246.749031]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
+> [  246.749032] RIP: 0033:0x7ffb1a09018a
+> [  246.749033] RSP: 002b:00007ffe196680c8 EFLAGS: 00000246 ORIG_RAX:
+> 00000000000000af
+> [  246.749034] RAX: ffffffffffffffda RBX: 00005562bb20d080 RCX:
+> 00007ffb1a09018a
+> [  246.749034] RDX: 00007ffb1994e6f8 RSI: 0000000000029e50 RDI:
+> 00005562bba5e710
+> [  246.749035] RBP: 00007ffb1994e6f8 R08: 0000000000000004 R09:
+> 0000000000000000
+> [  246.749035] R10: 0000000000000005 R11: 0000000000000246 R12:
+> 00005562bba5e710
+> [  246.749036] R13: 0000000000020000 R14: 00005562bb1fde70 R15:
+> 00005562bb20d080
+> 
+> 
+> Should it not detect that its disabled and bail out ?
+> 
+> -- 
+> 
+> Thomas
+> 
+> 
