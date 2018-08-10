@@ -1,14 +1,13 @@
 From: Caleb Raitto <caleb.raitto@gmail.com>
-Subject: [PATCH net-next 2/2] virtio_net: Stripe queue affinities across cores.
-Date: Thu,  9 Aug 2018 17:28:40 -0700
-Message-ID: <20180810002840.186635-3-caleb.raitto@gmail.com>
+Subject: [PATCH net-next 1/2] virtio_net: Make vp_set_vq_affinity() take a mask.
+Date: Thu,  9 Aug 2018 17:28:39 -0700
+Message-ID: <20180810002840.186635-2-caleb.raitto@gmail.com>
 References: <20180810002840.186635-1-caleb.raitto@gmail.com>
 Mime-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Cc: arei.gonglei@huawei.com, jasowang@redhat.com,
         netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
-        Caleb Raitto <caraitto@google.com>,
-        Willem de Bruijn <willemb@google.com>
+        Caleb Raitto <caraitto@google.com>
 To: herbert@gondor.apana.org.au, mst@redhat.com, davem@davemloft.net
 Return-path: <netdev-owner@vger.kernel.org>
 In-Reply-To: <20180810002840.186635-1-caleb.raitto@gmail.com>
@@ -17,86 +16,137 @@ List-Id: linux-crypto.vger.kernel.org
 
 From: Caleb Raitto <caraitto@google.com>
 
-Always set the affinity hint, even if #cpu != #vq.
+Make vp_set_vq_affinity() take a cpumask instead of taking a single CPU.
 
-Handle the case where #cpu > #vq (including when #cpu % #vq != 0) and
-when #vq > #cpu (including when #vq % #cpu != 0).
+If there are fewer queues than cores, queue affinity should be able to
+map to multiple cores.
 
+Link: https://patchwork.ozlabs.org/patch/948149/
+Suggested-by: Willem de Bruijn <willemb@google.com>
 Signed-off-by: Caleb Raitto <caraitto@google.com>
-Signed-off-by: Willem de Bruijn <willemb@google.com>
-Acked-by: Jon Olson <jonolson@google.com>
 ---
- drivers/net/virtio_net.c | 42 ++++++++++++++++++++++++++--------------
- 1 file changed, 27 insertions(+), 15 deletions(-)
+ drivers/crypto/virtio/virtio_crypto_core.c | 4 ++--
+ drivers/net/virtio_net.c                   | 8 ++++----
+ drivers/virtio/virtio_pci_common.c         | 7 +++----
+ drivers/virtio/virtio_pci_common.h         | 2 +-
+ include/linux/virtio_config.h              | 7 ++++---
+ 5 files changed, 14 insertions(+), 14 deletions(-)
 
+diff --git a/drivers/crypto/virtio/virtio_crypto_core.c b/drivers/crypto/virtio/virtio_crypto_core.c
+index 83326986c113..7c7198553699 100644
+--- a/drivers/crypto/virtio/virtio_crypto_core.c
++++ b/drivers/crypto/virtio/virtio_crypto_core.c
+@@ -146,7 +146,7 @@ static void virtcrypto_clean_affinity(struct virtio_crypto *vi, long hcpu)
+ 
+ 	if (vi->affinity_hint_set) {
+ 		for (i = 0; i < vi->max_data_queues; i++)
+-			virtqueue_set_affinity(vi->data_vq[i].vq, -1);
++			virtqueue_set_affinity(vi->data_vq[i].vq, NULL);
+ 
+ 		vi->affinity_hint_set = false;
+ 	}
+@@ -173,7 +173,7 @@ static void virtcrypto_set_affinity(struct virtio_crypto *vcrypto)
+ 	 *
+ 	 */
+ 	for_each_online_cpu(cpu) {
+-		virtqueue_set_affinity(vcrypto->data_vq[i].vq, cpu);
++		virtqueue_set_affinity(vcrypto->data_vq[i].vq, cpumask_of(cpu));
+ 		if (++i >= vcrypto->max_data_queues)
+ 			break;
+ 	}
 diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 43fabc0eb4d2..eb00ae6ee475 100644
+index 39a7f4452587..43fabc0eb4d2 100644
 --- a/drivers/net/virtio_net.c
 +++ b/drivers/net/virtio_net.c
-@@ -31,6 +31,7 @@
- #include <linux/average.h>
- #include <linux/filter.h>
- #include <linux/netdevice.h>
-+#include <linux/kernel.h>
- #include <linux/pci.h>
- #include <net/route.h>
- #include <net/xdp.h>
-@@ -1888,30 +1889,41 @@ static void virtnet_clean_affinity(struct virtnet_info *vi, long hcpu)
+@@ -1878,8 +1878,8 @@ static void virtnet_clean_affinity(struct virtnet_info *vi, long hcpu)
  
- static void virtnet_set_affinity(struct virtnet_info *vi)
+ 	if (vi->affinity_hint_set) {
+ 		for (i = 0; i < vi->max_queue_pairs; i++) {
+-			virtqueue_set_affinity(vi->rq[i].vq, -1);
+-			virtqueue_set_affinity(vi->sq[i].vq, -1);
++			virtqueue_set_affinity(vi->rq[i].vq, NULL);
++			virtqueue_set_affinity(vi->sq[i].vq, NULL);
+ 		}
+ 
+ 		vi->affinity_hint_set = false;
+@@ -1905,8 +1905,8 @@ static void virtnet_set_affinity(struct virtnet_info *vi)
+ 	for_each_online_cpu(cpu) {
+ 		const unsigned long *mask = cpumask_bits(cpumask_of(cpu));
+ 
+-		virtqueue_set_affinity(vi->rq[i].vq, cpu);
+-		virtqueue_set_affinity(vi->sq[i].vq, cpu);
++		virtqueue_set_affinity(vi->rq[i].vq, cpumask_of(cpu));
++		virtqueue_set_affinity(vi->sq[i].vq, cpumask_of(cpu));
+ 		__netif_set_xps_queue(vi->dev, mask, i, false);
+ 		i++;
+ 	}
+diff --git a/drivers/virtio/virtio_pci_common.c b/drivers/virtio/virtio_pci_common.c
+index 705aebd74e56..465a6f5142cc 100644
+--- a/drivers/virtio/virtio_pci_common.c
++++ b/drivers/virtio/virtio_pci_common.c
+@@ -421,7 +421,7 @@ const char *vp_bus_name(struct virtio_device *vdev)
+  * - OR over all affinities for shared MSI
+  * - ignore the affinity request if we're using INTX
+  */
+-int vp_set_vq_affinity(struct virtqueue *vq, int cpu)
++int vp_set_vq_affinity(struct virtqueue *vq, const struct cpumask *cpu_mask)
  {
--	int i;
--	int cpu;
-+	cpumask_var_t mask;
-+	int stragglers;
-+	int group_size;
-+	int i, j, cpu;
-+	int num_cpu;
-+	int stride;
- 
--	/* In multiqueue mode, when the number of cpu is equal to the number of
--	 * queue pairs, we let the queue pairs to be private to one cpu by
--	 * setting the affinity hint to eliminate the contention.
--	 */
--	if (vi->curr_queue_pairs == 1 ||
--	    vi->max_queue_pairs != num_online_cpus()) {
-+	if (!zalloc_cpumask_var(&mask, GFP_KERNEL)) {
- 		virtnet_clean_affinity(vi, -1);
- 		return;
+ 	struct virtio_device *vdev = vq->vdev;
+ 	struct virtio_pci_device *vp_dev = to_vp_device(vdev);
+@@ -435,11 +435,10 @@ int vp_set_vq_affinity(struct virtqueue *vq, int cpu)
+ 	if (vp_dev->msix_enabled) {
+ 		mask = vp_dev->msix_affinity_masks[info->msix_vector];
+ 		irq = pci_irq_vector(vp_dev->pci_dev, info->msix_vector);
+-		if (cpu == -1)
++		if (!cpu_mask)
+ 			irq_set_affinity_hint(irq, NULL);
+ 		else {
+-			cpumask_clear(mask);
+-			cpumask_set_cpu(cpu, mask);
++			cpumask_copy(mask, cpu_mask);
+ 			irq_set_affinity_hint(irq, mask);
+ 		}
  	}
+diff --git a/drivers/virtio/virtio_pci_common.h b/drivers/virtio/virtio_pci_common.h
+index 135ee3cf7175..02271002c2f3 100644
+--- a/drivers/virtio/virtio_pci_common.h
++++ b/drivers/virtio/virtio_pci_common.h
+@@ -141,7 +141,7 @@ const char *vp_bus_name(struct virtio_device *vdev);
+  * - OR over all affinities for shared MSI
+  * - ignore the affinity request if we're using INTX
+  */
+-int vp_set_vq_affinity(struct virtqueue *vq, int cpu);
++int vp_set_vq_affinity(struct virtqueue *vq, const struct cpumask *cpu_mask);
  
--	i = 0;
--	for_each_online_cpu(cpu) {
--		const unsigned long *mask = cpumask_bits(cpumask_of(cpu));
-+	num_cpu = num_online_cpus();
-+	stride = max_t(int, num_cpu / vi->curr_queue_pairs, 1);
-+	stragglers = num_cpu >= vi->curr_queue_pairs ?
-+			num_cpu % vi->curr_queue_pairs :
-+			0;
-+	cpu = cpumask_next(-1, cpu_online_mask);
+ const struct cpumask *vp_get_vq_affinity(struct virtio_device *vdev, int index);
  
--		virtqueue_set_affinity(vi->rq[i].vq, cpumask_of(cpu));
--		virtqueue_set_affinity(vi->sq[i].vq, cpumask_of(cpu));
--		__netif_set_xps_queue(vi->dev, mask, i, false);
--		i++;
-+	for (i = 0; i < vi->curr_queue_pairs; i++) {
-+		group_size = stride + (i < stragglers ? 1 : 0);
-+
-+		for (j = 0; j < group_size; j++) {
-+			cpumask_set_cpu(cpu, mask);
-+			cpu = cpumask_next_wrap(cpu, cpu_online_mask,
-+						nr_cpu_ids, false);
-+		}
-+		virtqueue_set_affinity(vi->rq[i].vq, mask);
-+		virtqueue_set_affinity(vi->sq[i].vq, mask);
-+		__netif_set_xps_queue(vi->dev, cpumask_bits(mask), i, false);
-+		cpumask_clear(mask);
- 	}
- 
- 	vi->affinity_hint_set = true;
-+	free_cpumask_var(mask);
+diff --git a/include/linux/virtio_config.h b/include/linux/virtio_config.h
+index 5559a2d31c46..32baf8e26735 100644
+--- a/include/linux/virtio_config.h
++++ b/include/linux/virtio_config.h
+@@ -79,7 +79,8 @@ struct virtio_config_ops {
+ 	u64 (*get_features)(struct virtio_device *vdev);
+ 	int (*finalize_features)(struct virtio_device *vdev);
+ 	const char *(*bus_name)(struct virtio_device *vdev);
+-	int (*set_vq_affinity)(struct virtqueue *vq, int cpu);
++	int (*set_vq_affinity)(struct virtqueue *vq,
++			       const struct cpumask *cpu_mask);
+ 	const struct cpumask *(*get_vq_affinity)(struct virtio_device *vdev,
+ 			int index);
+ };
+@@ -236,11 +237,11 @@ const char *virtio_bus_name(struct virtio_device *vdev)
+  *
+  */
+ static inline
+-int virtqueue_set_affinity(struct virtqueue *vq, int cpu)
++int virtqueue_set_affinity(struct virtqueue *vq, const struct cpumask *cpu_mask)
+ {
+ 	struct virtio_device *vdev = vq->vdev;
+ 	if (vdev->config->set_vq_affinity)
+-		return vdev->config->set_vq_affinity(vq, cpu);
++		return vdev->config->set_vq_affinity(vq, cpu_mask);
+ 	return 0;
  }
  
- static int virtnet_cpu_online(unsigned int cpu, struct hlist_node *node)
 -- 
 2.18.0.597.ga71716f1ad-goog
