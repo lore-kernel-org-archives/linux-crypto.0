@@ -1,59 +1,45 @@
-From: Joe Perches <joe@perches.com>
-Subject: Re: [PATCH] Performance Improvement in CRC16 Calculations.
-Date: Sat, 11 Aug 2018 09:35:42 -0700
-Message-ID: <8af0245c1efbec6ae4ac3d2b14d6e819cb28b98e.camel@perches.com>
-References: <1533928331-21303-1-git-send-email-jeff.lien@wdc.com>
-         <yq1in4gq5jf.fsf@oracle.com>
+From: David Miller <davem@davemloft.net>
+Subject: Re: [PATCH v2 net-next 0/2] virtio_net: Expand affinity to
+ arbitrary numbers of cpu and vq
+Date: Sat, 11 Aug 2018 12:03:24 -0700 (PDT)
+Message-ID: <20180811.120324.88920967254643809.davem@davemloft.net>
+References: <20180810011828.199888-1-caleb.raitto@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="ISO-8859-1"
+Content-Type: Text/Plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        herbert@gondor.apana.org.au, tim.c.chen@linux.intel.com,
-        david.darrington@wdc.com, jeff.furlong@wdc.com
-To: "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Jeff Lien <jeff.lien@wdc.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <yq1in4gq5jf.fsf@oracle.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Cc: herbert@gondor.apana.org.au, mst@redhat.com,
+        arei.gonglei@huawei.com, jasowang@redhat.com,
+        netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
+        caraitto@google.com
+To: caleb.raitto@gmail.com
+Return-path: <netdev-owner@vger.kernel.org>
+In-Reply-To: <20180810011828.199888-1-caleb.raitto@gmail.com>
+Sender: netdev-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Sat, 2018-08-11 at 11:36 -0400, Martin K. Petersen wrote:
-> Jeff,
-> 
-> > This patch provides a performance improvement for the CRC16
-> > calculations done in read/write workloads using the T10 Type 1/2/3
-> > guard field.  For example, today with sequential write workloads (one
-> > thread/CPU of IO) we consume 100% of the CPU because of the CRC16
-> > computation bottleneck.  Today's block devices are considerably
-> > faster, but the CRC16 calculation prevents folks from utilizing the
-> > throughput of such devices.  To speed up this calculation and expose
-> > the block device throughput, we slice the old single byte for loop
-> > into a 16 byte for loop, with a larger CRC table to match.  The result
-> > has shown 5x performance improvements on various big endian and little
-> > endian systems running the 4.18.0 kernel version.
-> 
-> The reason I went with a simple slice-by-one approach was that the
-> larger tables had a negative impact on the CPU caches. So while
-> slice-by-N numbers looked better in synthetic benchmarks, actual
-> application performance started getting affected as the tables grew
-> larger.
-> 
-> These days we obviously use the hardware-accelerated CRC calculation so
-> the software table approach mostly serves as a reference
-> implementation. But given your big vs. little endian performance
-> metrics, I'm assuming you guys are focused on embedded processors
-> without support for CRC acceleration?
-> 
-> I have no problem providing a choice for bigger tables. My only concern
-> is that the selection heuristics need to be more than one-dimensional.
-> Latency and cache side effects are often more important than throughput.
-> At least on the initiator side.
-> 
-> Also, I'd like to keep the original slice-by-one implementation for
-> reference purposes.
+From: Caleb Raitto <caleb.raitto@gmail.com>
+Date: Thu,  9 Aug 2018 18:18:27 -0700
 
-Did you see the suggested patch that allows
-either 1, 2, 4, 8 or 16 block table sizes?
+> Virtio-net tries to pin each virtual queue rx and tx interrupt to a cpu if
+> there are as many queues as cpus.
+> 
+> Expand this heuristic to configure a reasonable affinity setting also
+> when the number of cpus != the number of virtual queues.
+> 
+> Patch 1 allows vqs to take an affinity mask with more than 1 cpu.
+> Patch 2 generalizes the algorithm in virtnet_set_affinity beyond
+> the case where #cpus == #vqs.
+> 
+> v2 changes:
+> Renamed "virtio_net: Make vp_set_vq_affinity() take a mask." to
+> "virtio: Make vp_set_vq_affinity() take a mask."
+> 
+> Tested:
+ ...
 
-Perhaps you have a comment on that?
+Yes, this is so much better than the NAPI module parameter thing!
+
+I'll apply this, and we can adjust/tweak the logic if necessary
+on top of these changes.
+
+Thanks!
