@@ -1,184 +1,125 @@
-From: Kenneth Lee <liguozhu@hisilicon.com>
-Subject: Re: [RFC PATCH 0/7] A General Accelerator Framework, WarpDrive
-Date: Mon, 13 Aug 2018 17:29:31 +0800
-Message-ID: <20180813092931.GL91035@Turing-Arch-b>
-References: <20180803143944.GA4079@redhat.com>
- <20180806031252.GG91035@Turing-Arch-b>
- <20180806153257.GB6002@redhat.com>
- <11bace0e-dc14-5d2c-f65c-25b852f4e9ca@gmail.com>
- <20180808151835.GA3429@redhat.com>
- <20180809080352.GI91035@Turing-Arch-b>
- <20180809144613.GB3386@redhat.com>
- <20180810033913.GK91035@Turing-Arch-b>
- <0f6bac9b-8381-1874-9367-46b5f4cef56e@arm.com>
- <6ea4dcfd-d539-93e4-acf1-d09ea35f0ddc@gmail.com>
+From: David Laight <David.Laight@ACULAB.COM>
+Subject: RE: [PATCH] Performance Improvement in CRC16 Calculations.
+Date: Mon, 13 Aug 2018 11:45:21 +0000
+Message-ID: <8508c92d70dc41ffb66557e13c988dca@AcuMS.aculab.com>
+References: <1533928331-21303-1-git-send-email-jeff.lien@wdc.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Cc: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>,
-        Jerome Glisse <jglisse@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Zaibo Xu <xuzaibo@huawei.com>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        "Kumar, Sanjay K" <sanjay.k.kumar@intel.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
+Cc: "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "tim.c.chen@linux.intel.com" <tim.c.chen@linux.intel.com>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+        "david.darrington@wdc.com" <david.darrington@wdc.com>,
+        "jeff.furlong@wdc.com" <jeff.furlong@wdc.com>
+To: 'Jeff Lien' <jeff.lien@wdc.com>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linuxarm@huawei.com" <linuxarm@huawei.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
         "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Philippe Ombredanne <pombredanne@nexb.com>,
-        Tho
-To: Kenneth Lee <nek.in.cn@gmail.com>
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <6ea4dcfd-d539-93e4-acf1-d09ea35f0ddc@gmail.com>
+In-Reply-To: <1533928331-21303-1-git-send-email-jeff.lien@wdc.com>
+Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Sat, Aug 11, 2018 at 11:26:48PM +0800, Kenneth Lee wrote:
-> Date: Sat, 11 Aug 2018 23:26:48 +0800
-> From: Kenneth Lee <nek.in.cn@gmail.com>
-> To: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, Kenneth Lee
->  <liguozhu@hisilicon.com>, Jerome Glisse <jglisse@redhat.com>
-> CC: Herbert Xu <herbert@gondor.apana.org.au>, "kvm@vger.kernel.org"
->  <kvm@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>, Greg
->  Kroah-Hartman <gregkh@linuxfoundation.org>, Zaibo Xu <xuzaibo@huawei.com>,
->  "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, "Kumar, Sanjay K"
->  <sanjay.k.kumar@intel.com>, "Tian, Kevin" <kevin.tian@intel.com>,
->  "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
->  "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
->  "linuxarm@huawei.com" <linuxarm@huawei.com>, Alex Williamson
->  <alex.williamson@redhat.com>, "linux-crypto@vger.kernel.org"
->  <linux-crypto@vger.kernel.org>, Philippe Ombredanne
->  <pombredanne@nexb.com>, Thomas Gleixner <tglx@linutronix.de>, Hao Fang
->  <fanghao11@huawei.com>, "David S . Miller" <davem@davemloft.net>,
->  "linux-accelerators@lists.ozlabs.org"
->  <linux-accelerators@lists.ozlabs.org>
-> Subject: Re: [RFC PATCH 0/7] A General Accelerator Framework, WarpDrive
-> User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
->  Thunderbird/52.9.1
-> Message-ID: <6ea4dcfd-d539-93e4-acf1-d09ea35f0ddc@gmail.com>
+From: Jeff Lien
+> Sent: 10 August 2018 20:12
 > 
+> This patch provides a performance improvement for the CRC16 calculations done in read/write
+> workloads using the T10 Type 1/2/3 guard field.  For example, today with sequential write
+> workloads (one thread/CPU of IO) we consume 100% of the CPU because of the CRC16 computation
+> bottleneck.  Today's block devices are considerably faster, but the CRC16 calculation prevents
+> folks from utilizing the throughput of such devices.  To speed up this calculation and expose
+> the block device throughput, we slice the old single byte for loop into a 16 byte for loop,
+> with a larger CRC table to match.  The result has shown 5x performance improvements on various
+> big endian and little endian systems running the 4.18.0 kernel version.
 > 
+> FIO Sequential Write, 64K Block Size, Queue Depth 64
+> BE Base Kernel:        bw=201.5 MiB/s
+> BE Modified CRC Calc:  bw=968.1 MiB/s
+> 4.80x performance improvement
 > 
-> 在 2018年08月10日 星期五 09:12 下午, Jean-Philippe Brucker 写道:
-> >Hi Kenneth,
-> >
-> >On 10/08/18 04:39, Kenneth Lee wrote:
-> >>>You can achieve everything you want to achieve with existing upstream
-> >>>solution. Re-inventing a whole new driver infrastructure should really
-> >>>be motivated with strong and obvious reasons.
-> >>I want to understand better of your idea. If I create some unified helper
-> >>APIs in drivers/iommu/, say:
-> >>
-> >>	wd_create_dev(parent_dev, wd_dev)
-> >>	wd_release_dev(wd_dev)
-> >>
-> >>The API create chrdev to take request from user space for open(resource
-> >>allocation), iomap, epoll (irq), and dma_map(with pasid automatically).
-> >>
-> >>Do you think it is acceptable?
-> >Maybe not drivers/iommu/ :) That subsystem only contains tools for
-> >dealing with DMA, I don't think epoll, resource enumeration or iomap fit
-> >in there.
-> Yes. I should consider where to put it carefully.
-> >
-> >Creating new helpers seems to be precisely what we're trying to avoid in
-> >this thread, and vfio-mdev does provide the components that you
-> >describe, so I wouldn't discard it right away. When the GPU, net, block
-> >or another subsystem doesn't fit your needs, either because your
-> >accelerator provides some specialized function, or because for
-> >performance reasons your client wants direct MMIO access, you can at
-> >least build your driver and library on top of those existing VFIO
-> >components:
-> >
-> >* open allocates a partition of an accelerator.
-> >* vfio_device_info, vfio_region_info and vfio_irq_info enumerates
-> >available resources.
-> >* vfio_irq_set deals with epoll.
-> >* mmap gives you a private MMIO doorbell.
-> >* vfio_iommu_type1 provides the DMA operations.
-> >
-> >Currently missing:
-> >
-> >* Sharing the parent IOMMU between mdev, which is also what the "IOMMU
-> >aware mediated device" series tackles, and seems like a logical addition
-> >to VFIO. I'd argue that the existing IOMMU ops (or ones implemented by
-> >the SVA series) can be used to deal with this
-> >
-> >* The interface to discover an accelerator near your memory node, or one
-> >that you can chain with other devices. If I understood correctly the
-> >conclusion was that the API (a topology description in sysfs?) should be
-> >common to various subsystems, in which case vfio-mdev (or the mediating
-> >driver) could also use it.
-> >
-> >* The queue abstraction discussed on patch 3/7. Perhaps the current vfio
-> >resource description of MMIO and IRQ is sufficient here as well, since
-> >vendors tend to each implement their own queue schemes. If you need
-> >additional features, read/write fops give the mediating driver a lot of
-> >freedom. To support features that are too specific for drivers/vfio/ you
-> >can implement a config space with capabilities and registers of your
-> >choice. If you're versioning the capabilities, the code to handle them
-> >could even be shared between different accelerator drivers and libraries.
-> Thank you, Jean,
+> LE Base Kernel:        bw=357 MiB/s
+> LE Modified CRC Calc:  bw=1964 MiB/s
+> 5.51x performance improvement
 > 
-> The major reason that I want to remove dependency to VFIO is: I
-> accepted that the whole logic of VFIO was built on the idea of
-> creating virtual device.
+> FIO Sequential Read, 64K Block Size, Queue Depth 64
+> BE Base Kernel:        bw=611.2 MiB/s
+> BE Modified CRC calc:  bw=684.9 MiB/s
+> 1.12x performance improvement
 > 
-> Let's consider it in this way: We have hardware with IOMMU support.
-> So we create a default_domain to the particular IOMMU (unit) in the
-> group for the kernel driver to use it. Now the device is going to be
-> used by a VM or a Container. So we unbind it from the original
-> driver, and put the default_domain away,  create a new domain for
-> this particular use case.  So now the device shows up as a platform
-> or pci device to the user space. This is what VFIO try to provide.
-> Mdev extends the scenario but dose not change the intention. And I
-> think that is why Alex emphasis pre-allocating resource to the mdev.
+> LE Base Kernel:        bw=797 MiB/s
+> LE Modified CRC Calc:  bw=2730 MiB/s
+> 3.42x performance improvement
 > 
-> But what WarpDrive need is to get service from the hardware itself
-> and set mapping to its current domain, aka defaut_domain. If we do
-> it in VFIO-mdev, it looks like the VFIO framework takes all the
-> effort to put the default_domain away and create a new one and be
-> ready for user space to use. But I tell him stop using the new
-> domain and try the original one...
+> Reviewed-by: Dave Darrington <david.darrington@wdc.com>
+> Reviewed-by: Jeff Furlong <jeff.furlong@wdc.com>
+> Signed-off-by: Jeff Lien <jeff.lien@wdc.com>
+> ---
+>  crypto/crct10dif_common.c | 605 +++++++++++++++++++++++++++++++++++++++++++---
+>  1 file changed, 569 insertions(+), 36 deletions(-)
 > 
-> It is not reasonable, isn't it:)
+> diff --git a/crypto/crct10dif_common.c b/crypto/crct10dif_common.c
+> index b2fab36..40e1d6c 100644
+> --- a/crypto/crct10dif_common.c
+> +++ b/crypto/crct10dif_common.c
+> @@ -32,47 +32,580 @@
+>   * x^16 + x^15 + x^11 + x^9 + x^8 + x^7 + x^5 + x^4 + x^2 + x + 1
+>   * gt: 0x8bb7
+>   */
+> -static const __u16 t10_dif_crc_table[256] = {
+...
+> +	}
+>  };
 > 
-> So why don't I just take the request and set it into the
-> default_domain directly? The true requirement of WarpDrive is to let
-> process set the page table for particular pasid or substream id, so
-> it can accept command with address in the process space. It needs no
-> device.
+>  __u16 crc_t10dif_generic(__u16 crc, const unsigned char *buffer, size_t len)
+>  {
+> -	unsigned int i;
+> +	const __u8 *i = (const __u8 *)buffer;
+> +	const __u8 *i_end = i + len;
+> +	const __u8 *i_last16 = i + (len / 16 * 16);
 > 
-> From this perspective, it seems there is no reason to keep it in VFIO.
-> 
+> -	for (i = 0 ; i < len ; i++)
+> -		crc = (crc << 8) ^ t10_dif_crc_table[((crc >> 8) ^ buffer[i]) & 0xff];
+> +	for (; i < i_last16; i += 16) {
+> +		crc = t10_dif_crc_table[15][i[0] ^ (__u8)(crc >>  8)] ^
+> +		t10_dif_crc_table[14][i[1] ^ (__u8)(crc >>  0)] ^
+> +		t10_dif_crc_table[13][i[2]] ^
+> +		t10_dif_crc_table[12][i[3]] ^
+> +		t10_dif_crc_table[11][i[4]] ^
+> +		t10_dif_crc_table[10][i[5]] ^
+> +		t10_dif_crc_table[9][i[6]] ^
+> +		t10_dif_crc_table[8][i[7]] ^
+> +		t10_dif_crc_table[7][i[8]] ^
+> +		t10_dif_crc_table[6][i[9]] ^
+> +		t10_dif_crc_table[5][i[10]] ^
+> +		t10_dif_crc_table[4][i[11]] ^
+> +		t10_dif_crc_table[3][i[12]] ^
+> +		t10_dif_crc_table[2][i[13]] ^
+> +		t10_dif_crc_table[1][i[14]] ^
+> +		t10_dif_crc_table[0][i[15]];
+...
 
-I made a quick change basing on the RFCv1 here: 
+I suspect that all the gain comes from a slight relaxation of the
+register dependency chain and the loop unrolling.
 
-https://github.com/Kenneth-Lee/linux-kernel-warpdrive/commits/warpdrive-v0.6
+A more interesting version would be to generate the lookup table
+for a byte followed by 3 zero bytes.
+You could then run four separate register dependency chains using the
+same 256 entry lookup table.
+A little bit of work at the end of the buffer should sort it all out.
 
-I just made it compilable and not test it yet. But it shows how the idea is
-going to be.
+There is also the lookup table free version:
+uint32_t
+crc_step(uint32_t crc, uint32_t byte_val)
+{
+    uint32_t t = crc ^ (byte_val & 0xff);
+    t = (t ^ t << 4) & 0xff;
+    return crc >> 8 ^ t << 8 ^ t << 3 ^ t >> 4;
+}
 
-The Pros is: most of the virtual device stuff can be removed. Resource
-management is on the openned files only.
+	David
 
-The Cons is: as Jean said, we have to redo something that has been done by VFIO.
-These mainly are:
-
-1. Track the dma operation and remove them on resource releasing
-2. Pin the memory with gup and do accounting
-
-It not going to be easy to make a decision...
-
-> Thanks
-> Kenneth
-> >
-> >Thanks,
-> >Jean
-> >
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
+Registration No: 1397386 (Wales)
