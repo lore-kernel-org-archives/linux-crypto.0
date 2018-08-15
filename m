@@ -1,64 +1,130 @@
-From: Kees Cook <keescook@chromium.org>
-Subject: Re: [GIT PULL] gcc-plugin updates for v4.19-rc1
-Date: Wed, 15 Aug 2018 13:56:33 -0700
-Message-ID: <CAGXu5j+Yv9Bu4mJPOfkpxrom91kSKaUESHR-Tn1CAJCTTZy_8w@mail.gmail.com>
-References: <20180813214328.GA15137@beast> <CA+55aFw5Tkn6DgkAZS-UGOjJpYp2R4rFAm9ixu_=FONeqRyofg@mail.gmail.com>
- <CAGXu5jK_w7JRywdQ78FfQxeLSMmXbvyDDnaYzj27=y8wnAzKxQ@mail.gmail.com>
- <CA+55aFyFCWH3YJnRUKtSzs9Mvny0eU+=QANxoPTE+9B9CkUWDw@mail.gmail.com>
- <CAGXu5jJ1JNSxJABUTAO85z_hXjSkjD=nWEho7KrYJTqqVGivig@mail.gmail.com> <CA+55aFy6jNLsywVYdGp83AMrXBo_P-pkjkphPGrO=82SPKCpLQ@mail.gmail.com>
+From: Brijesh Singh <brijesh.singh@amd.com>
+Subject: [PATCH crypto-2.6] crypto: ccp: add timeout support in the SEV command
+Date: Wed, 15 Aug 2018 16:11:25 -0500
+Message-ID: <1534367485-4386-2-git-send-email-brijesh.singh@amd.com>
+References: <1534367485-4386-1-git-send-email-brijesh.singh@amd.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Alexander Popov <alex.popov@linux.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Ingo Molnar <mingo@kernel.org>,
-        Masahiro Yamada <yamada.masahiro@socionext.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Tycho Andersen <tycho@tycho.ws>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Laura Abbott <labbott@redhat.com>,
-        Will Deacon <will.deacon@arm.com>,
+Content-Type: text/plain
+Cc: thomas.lendacky@amd.com, Brijesh Singh <brijesh.singh@amd.com>,
+        Gary Hook <Gary.Hook@amd.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-crypto <linux-crypto@vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
+        linux-kernel@vger.kernel.org
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CA+55aFy6jNLsywVYdGp83AMrXBo_P-pkjkphPGrO=82SPKCpLQ@mail.gmail.com>
+In-Reply-To: <1534367485-4386-1-git-send-email-brijesh.singh@amd.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Aug 15, 2018 at 1:18 PM, Linus Torvalds
-<torvalds@linux-foundation.org> wrote:
-> I absolutely refuse to take any hardening patches at all that have
-> BUG() or panic() or similar machine-killing in it.
+Currently, the CCP driver assumes that the SEV command issued to the PSP
+will always return (i.e. it will never hang).  But recently, firmware bugs
+have shown that a command can hang.  Since of the SEV commands are used
+in probe routines, this can cause boot hangs and/or loss of virtualization
+capabilities.
 
-Okay, mental model adjusted. :) It was only "strong discouraged" until now.
+To protect against firmware bugs, add a timeout in the SEV command
+execution flow.  If a command does not complete within the specified
+timeout then return -ETIMEOUT and stop the driver from executing any
+further commands since the state of the SEV firmware is unknown.
 
-> I thought VLA's were mostly gone.
+Cc: Tom Lendacky <thomas.lendacky@amd.com>
+Cc: Gary Hook <Gary.Hook@amd.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: linux-kernel@vger.kernel.org
+Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+---
+ drivers/crypto/ccp/psp-dev.c | 46 +++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 41 insertions(+), 5 deletions(-)
 
-Yes. Out of the ~115 instances we counted when we started with v4.16,
-we've chipped away at them pretty steadily. Right now there are two
-"one-off"s that haven't been picked up by maintainers:
-
-https://git.kernel.org/pub/scm/linux/kernel/git/kees/linux.git/log/?h=vla/leftovers
-
-and the remaining series against crypto, for which I am waiting on
-further review for Herbert. All the really odd-ball crypto cases have
-been handled (and are up for the merge window for v4.19), but there's
-still some minor changes that Herbert is examining:
-
-https://git.kernel.org/pub/scm/linux/kernel/git/kees/linux.git/log/?h=vla/crypto
-
-And after that, there's a single patch to move -Wvla up into the
-top-level Makefile:
-
-https://patchwork.kernel.org/patch/10489873/
-
-So, we're basically done, but the timing with the merge window wasn't
-great since crypto continues to get tweaked and has taken much longer
-than I had expected.
-
--Kees
-
+diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
+index 218739b..72790d8 100644
+--- a/drivers/crypto/ccp/psp-dev.c
++++ b/drivers/crypto/ccp/psp-dev.c
+@@ -38,6 +38,17 @@ static DEFINE_MUTEX(sev_cmd_mutex);
+ static struct sev_misc_dev *misc_dev;
+ static struct psp_device *psp_master;
+ 
++static int psp_cmd_timeout = 100;
++module_param(psp_cmd_timeout, int, 0644);
++MODULE_PARM_DESC(psp_cmd_timeout, " default timeout value, in seconds, for PSP commands");
++
++static int psp_probe_timeout = 5;
++module_param(psp_probe_timeout, int, 0644);
++MODULE_PARM_DESC(psp_probe_timeout, " default timeout value, in seconds, during PSP device probe");
++
++static bool psp_dead;
++static int psp_timeout;
++
+ static struct psp_device *psp_alloc_struct(struct sp_device *sp)
+ {
+ 	struct device *dev = sp->dev;
+@@ -82,10 +93,19 @@ static irqreturn_t psp_irq_handler(int irq, void *data)
+ 	return IRQ_HANDLED;
+ }
+ 
+-static void sev_wait_cmd_ioc(struct psp_device *psp, unsigned int *reg)
++static int sev_wait_cmd_ioc(struct psp_device *psp,
++			    unsigned int *reg, unsigned int timeout)
+ {
+-	wait_event(psp->sev_int_queue, psp->sev_int_rcvd);
++	int ret;
++
++	ret = wait_event_timeout(psp->sev_int_queue,
++			psp->sev_int_rcvd, timeout * HZ);
++	if (!ret)
++		return -ETIMEDOUT;
++
+ 	*reg = ioread32(psp->io_regs + psp->vdata->cmdresp_reg);
++
++	return 0;
+ }
+ 
+ static int sev_cmd_buffer_len(int cmd)
+@@ -133,12 +153,15 @@ static int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret)
+ 	if (!psp)
+ 		return -ENODEV;
+ 
++	if (psp_dead)
++		return -EBUSY;
++
+ 	/* Get the physical address of the command buffer */
+ 	phys_lsb = data ? lower_32_bits(__psp_pa(data)) : 0;
+ 	phys_msb = data ? upper_32_bits(__psp_pa(data)) : 0;
+ 
+-	dev_dbg(psp->dev, "sev command id %#x buffer 0x%08x%08x\n",
+-		cmd, phys_msb, phys_lsb);
++	dev_dbg(psp->dev, "sev command id %#x buffer 0x%08x%08x timeout %us\n",
++		cmd, phys_msb, phys_lsb, psp_timeout);
+ 
+ 	print_hex_dump_debug("(in):  ", DUMP_PREFIX_OFFSET, 16, 2, data,
+ 			     sev_cmd_buffer_len(cmd), false);
+@@ -154,7 +177,18 @@ static int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret)
+ 	iowrite32(reg, psp->io_regs + psp->vdata->cmdresp_reg);
+ 
+ 	/* wait for command completion */
+-	sev_wait_cmd_ioc(psp, &reg);
++	ret = sev_wait_cmd_ioc(psp, &reg, psp_timeout);
++	if (ret) {
++		if (psp_ret)
++			*psp_ret = 0;
++
++		dev_err(psp->dev, "sev command %#x timed out, disabling PSP \n", cmd);
++		psp_dead = true;
++
++		return ret;
++	}
++
++	psp_timeout = psp_cmd_timeout;
+ 
+ 	if (psp_ret)
+ 		*psp_ret = reg & PSP_CMDRESP_ERR_MASK;
+@@ -888,6 +922,8 @@ void psp_pci_init(void)
+ 
+ 	psp_master = sp->psp_data;
+ 
++	psp_timeout = psp_probe_timeout;
++
+ 	if (sev_get_api_version())
+ 		goto err;
+ 
 -- 
-Kees Cook
-Pixel Security
+2.7.4
