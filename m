@@ -1,130 +1,53 @@
-From: Brijesh Singh <brijesh.singh@amd.com>
-Subject: [PATCH crypto-2.6] crypto: ccp: add timeout support in the SEV command
-Date: Wed, 15 Aug 2018 16:11:25 -0500
-Message-ID: <1534367485-4386-2-git-send-email-brijesh.singh@amd.com>
-References: <1534367485-4386-1-git-send-email-brijesh.singh@amd.com>
+From: Alexander Popov <alex.popov@linux.com>
+Subject: Re: [GIT PULL] gcc-plugin updates for v4.19-rc1
+Date: Thu, 16 Aug 2018 00:18:56 +0300
+Message-ID: <90a49b4e-7b17-0262-e358-27343549d990@linux.com>
+References: <20180813214328.GA15137@beast>
+ <CA+55aFw5Tkn6DgkAZS-UGOjJpYp2R4rFAm9ixu_=FONeqRyofg@mail.gmail.com>
+ <CAGXu5jK_w7JRywdQ78FfQxeLSMmXbvyDDnaYzj27=y8wnAzKxQ@mail.gmail.com>
+ <CA+55aFyFCWH3YJnRUKtSzs9Mvny0eU+=QANxoPTE+9B9CkUWDw@mail.gmail.com>
+ <CAGXu5jJ1JNSxJABUTAO85z_hXjSkjD=nWEho7KrYJTqqVGivig@mail.gmail.com>
+ <CA+55aFy6jNLsywVYdGp83AMrXBo_P-pkjkphPGrO=82SPKCpLQ@mail.gmail.com>
+ <CAGXu5j+Yv9Bu4mJPOfkpxrom91kSKaUESHR-Tn1CAJCTTZy_8w@mail.gmail.com>
+Reply-To: alex.popov@linux.com
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: thomas.lendacky@amd.com, Brijesh Singh <brijesh.singh@amd.com>,
-        Gary Hook <Gary.Hook@amd.com>,
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Ingo Molnar <mingo@kernel.org>,
+        Masahiro Yamada <yamada.masahiro@socionext.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Tycho Andersen <tycho@tycho.ws>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Laura Abbott <labbott@redhat.com>,
+        Will Deacon <will.deacon@arm.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-kernel@vger.kernel.org
-To: linux-crypto@vger.kernel.org
+        linux-crypto <linux-crypto@vger.kernel.org>
+To: Kees Cook <keescook@chromium.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1534367485-4386-1-git-send-email-brijesh.singh@amd.com>
+In-Reply-To: <CAGXu5j+Yv9Bu4mJPOfkpxrom91kSKaUESHR-Tn1CAJCTTZy_8w@mail.gmail.com>
+Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Currently, the CCP driver assumes that the SEV command issued to the PSP
-will always return (i.e. it will never hang).  But recently, firmware bugs
-have shown that a command can hang.  Since of the SEV commands are used
-in probe routines, this can cause boot hangs and/or loss of virtualization
-capabilities.
+On 15.08.2018 23:56, Kees Cook wrote:
+> On Wed, Aug 15, 2018 at 1:18 PM, Linus Torvalds <torvalds@linux-foundation.org> wrote:
+>> I absolutely refuse to take any hardening patches at all that have
+>> BUG() or panic() or similar machine-killing in it.
+> 
+> Okay, mental model adjusted. :) It was only "strong discouraged" until now.
 
-To protect against firmware bugs, add a timeout in the SEV command
-execution flow.  If a command does not complete within the specified
-timeout then return -ETIMEOUT and stop the driver from executing any
-further commands since the state of the SEV firmware is unknown.
+I've just got the insight, how to avoid having BUG_ON() in stackleak_erase().
+If 'task_struct.lowest_stack' is corrupted, we can erase once starting from the
+stack bottom and reset the 'lowest_stack' value.
 
-Cc: Tom Lendacky <thomas.lendacky@amd.com>
-Cc: Gary Hook <Gary.Hook@amd.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: linux-kernel@vger.kernel.org
-Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
----
- drivers/crypto/ccp/psp-dev.c | 46 +++++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 41 insertions(+), 5 deletions(-)
+>> I care not one whit about the reason for them. In fact, if the reason
+>> is stated as "it makes debugging easiler", then I fart in your general
+>> direction and call your mother a hamster.
 
-diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
-index 218739b..72790d8 100644
---- a/drivers/crypto/ccp/psp-dev.c
-+++ b/drivers/crypto/ccp/psp-dev.c
-@@ -38,6 +38,17 @@ static DEFINE_MUTEX(sev_cmd_mutex);
- static struct sev_misc_dev *misc_dev;
- static struct psp_device *psp_master;
- 
-+static int psp_cmd_timeout = 100;
-+module_param(psp_cmd_timeout, int, 0644);
-+MODULE_PARM_DESC(psp_cmd_timeout, " default timeout value, in seconds, for PSP commands");
-+
-+static int psp_probe_timeout = 5;
-+module_param(psp_probe_timeout, int, 0644);
-+MODULE_PARM_DESC(psp_probe_timeout, " default timeout value, in seconds, during PSP device probe");
-+
-+static bool psp_dead;
-+static int psp_timeout;
-+
- static struct psp_device *psp_alloc_struct(struct sp_device *sp)
- {
- 	struct device *dev = sp->dev;
-@@ -82,10 +93,19 @@ static irqreturn_t psp_irq_handler(int irq, void *data)
- 	return IRQ_HANDLED;
- }
- 
--static void sev_wait_cmd_ioc(struct psp_device *psp, unsigned int *reg)
-+static int sev_wait_cmd_ioc(struct psp_device *psp,
-+			    unsigned int *reg, unsigned int timeout)
- {
--	wait_event(psp->sev_int_queue, psp->sev_int_rcvd);
-+	int ret;
-+
-+	ret = wait_event_timeout(psp->sev_int_queue,
-+			psp->sev_int_rcvd, timeout * HZ);
-+	if (!ret)
-+		return -ETIMEDOUT;
-+
- 	*reg = ioread32(psp->io_regs + psp->vdata->cmdresp_reg);
-+
-+	return 0;
- }
- 
- static int sev_cmd_buffer_len(int cmd)
-@@ -133,12 +153,15 @@ static int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret)
- 	if (!psp)
- 		return -ENODEV;
- 
-+	if (psp_dead)
-+		return -EBUSY;
-+
- 	/* Get the physical address of the command buffer */
- 	phys_lsb = data ? lower_32_bits(__psp_pa(data)) : 0;
- 	phys_msb = data ? upper_32_bits(__psp_pa(data)) : 0;
- 
--	dev_dbg(psp->dev, "sev command id %#x buffer 0x%08x%08x\n",
--		cmd, phys_msb, phys_lsb);
-+	dev_dbg(psp->dev, "sev command id %#x buffer 0x%08x%08x timeout %us\n",
-+		cmd, phys_msb, phys_lsb, psp_timeout);
- 
- 	print_hex_dump_debug("(in):  ", DUMP_PREFIX_OFFSET, 16, 2, data,
- 			     sev_cmd_buffer_len(cmd), false);
-@@ -154,7 +177,18 @@ static int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret)
- 	iowrite32(reg, psp->io_regs + psp->vdata->cmdresp_reg);
- 
- 	/* wait for command completion */
--	sev_wait_cmd_ioc(psp, &reg);
-+	ret = sev_wait_cmd_ioc(psp, &reg, psp_timeout);
-+	if (ret) {
-+		if (psp_ret)
-+			*psp_ret = 0;
-+
-+		dev_err(psp->dev, "sev command %#x timed out, disabling PSP \n", cmd);
-+		psp_dead = true;
-+
-+		return ret;
-+	}
-+
-+	psp_timeout = psp_cmd_timeout;
- 
- 	if (psp_ret)
- 		*psp_ret = reg & PSP_CMDRESP_ERR_MASK;
-@@ -888,6 +922,8 @@ void psp_pci_init(void)
- 
- 	psp_master = sp->psp_data;
- 
-+	psp_timeout = psp_probe_timeout;
-+
- 	if (sev_get_api_version())
- 		goto err;
- 
--- 
-2.7.4
+That is plain harassment. I ask to *stop* it!
+
+--
+Alexander
