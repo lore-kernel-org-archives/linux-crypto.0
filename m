@@ -1,290 +1,34 @@
-From: Dave Watson <davejwatson@fb.com>
-Subject: [PATCH] crypto: aesni - Use unaligned loads from gcm_context_data
-Date: Wed, 15 Aug 2018 10:29:42 -0700
-Message-ID: <20180815172942.mkk56gh6poqgjgnb@davejwatson-mba.local>
+From: Pavel Machek <pavel@ucw.cz>
+Subject: Re: [PATCH] Performance Improvement in CRC16 Calculations.
+Date: Wed, 15 Aug 2018 20:31:34 +0200
+Message-ID: <20180815182538.GB9709@xo-6d-61-c0.localdomain>
+References: <1533928331-21303-1-git-send-email-jeff.lien@wdc.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Cc: Junaid Shahid <junaids@google.com>, <linux-kernel@vger.kernel.org>,
-        Stephan Mueller <smueller@chronox.de>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        Mauro Rossi <issor.oruam@gmail.com>,
-        <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        herbert@gondor.apana.org.au, tim.c.chen@linux.intel.com,
+        martin.petersen@oracle.com, david.darrington@wdc.com,
+        jeff.furlong@wdc.com
+To: Jeff Lien <jeff.lien@wdc.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
+In-Reply-To: <1533928331-21303-1-git-send-email-jeff.lien@wdc.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-A regression was reported bisecting to 1476db2d12
-"Move HashKey computation from stack to gcm_context".  That diff
-moved HashKey computation from the stack, which was explicitly aligned
-in the asm, to a struct provided from the C code, depending on
-AESNI_ALIGN_ATTR for alignment.   It appears some compilers may not
-align this struct correctly, resulting in a crash on the movdqa
-instruction when attempting to encrypt or decrypt data.
+Hi!
 
-Fix by using unaligned loads for the HashKeys.  On modern
-hardware there is no perf difference between the unaligned and
-aligned loads.  All other accesses to gcm_context_data already use
-unaligned loads.
+> This patch provides a performance improvement for the CRC16 calculations done in read/write
+> workloads using the T10 Type 1/2/3 guard field.  For example, today with sequential write
+> workloads (one thread/CPU of IO) we consume 100% of the CPU because of the CRC16 computation
+> bottleneck.  Today's block devices are considerably faster, but the CRC16 calculation prevents
+> folks from utilizing the throughput of such devices.  To speed up this calculation and expose
+> the block device throughput, we slice the old single byte for loop into a 16 byte for loop,
+> with a larger CRC table to match.  The result has shown 5x performance improvements on various
+> big endian and little endian systems running the 4.18.0 kernel version.
 
-Reported-by: Mauro Rossi <issor.oruam@gmail.com>
-Fixes: 1476db2d12 ("Move HashKey computation from stack to gcm_context")
-Signed-off-by: Dave Watson <davejwatson@fb.com>
----
- arch/x86/crypto/aesni-intel_asm.S | 66 +++++++++++++++----------------
- 1 file changed, 33 insertions(+), 33 deletions(-)
+Well, 8K table fits in cache easily, and when running benchmark, table will be cached so it is
+a win... Is it also win on non-benchmark workloads and smaller systems?
 
-diff --git a/arch/x86/crypto/aesni-intel_asm.S b/arch/x86/crypto/aesni-intel_asm.S
-index e762ef417562..d27a50656aa1 100644
---- a/arch/x86/crypto/aesni-intel_asm.S
-+++ b/arch/x86/crypto/aesni-intel_asm.S
-@@ -223,34 +223,34 @@ ALL_F:      .octa 0xffffffffffffffffffffffffffffffff
- 	pcmpeqd TWOONE(%rip), \TMP2
- 	pand	POLY(%rip), \TMP2
- 	pxor	\TMP2, \TMP3
--	movdqa	\TMP3, HashKey(%arg2)
-+	movdqu	\TMP3, HashKey(%arg2)
- 
- 	movdqa	   \TMP3, \TMP5
- 	pshufd	   $78, \TMP3, \TMP1
- 	pxor	   \TMP3, \TMP1
--	movdqa	   \TMP1, HashKey_k(%arg2)
-+	movdqu	   \TMP1, HashKey_k(%arg2)
- 
- 	GHASH_MUL  \TMP5, \TMP3, \TMP1, \TMP2, \TMP4, \TMP6, \TMP7
- # TMP5 = HashKey^2<<1 (mod poly)
--	movdqa	   \TMP5, HashKey_2(%arg2)
-+	movdqu	   \TMP5, HashKey_2(%arg2)
- # HashKey_2 = HashKey^2<<1 (mod poly)
- 	pshufd	   $78, \TMP5, \TMP1
- 	pxor	   \TMP5, \TMP1
--	movdqa	   \TMP1, HashKey_2_k(%arg2)
-+	movdqu	   \TMP1, HashKey_2_k(%arg2)
- 
- 	GHASH_MUL  \TMP5, \TMP3, \TMP1, \TMP2, \TMP4, \TMP6, \TMP7
- # TMP5 = HashKey^3<<1 (mod poly)
--	movdqa	   \TMP5, HashKey_3(%arg2)
-+	movdqu	   \TMP5, HashKey_3(%arg2)
- 	pshufd	   $78, \TMP5, \TMP1
- 	pxor	   \TMP5, \TMP1
--	movdqa	   \TMP1, HashKey_3_k(%arg2)
-+	movdqu	   \TMP1, HashKey_3_k(%arg2)
- 
- 	GHASH_MUL  \TMP5, \TMP3, \TMP1, \TMP2, \TMP4, \TMP6, \TMP7
- # TMP5 = HashKey^3<<1 (mod poly)
--	movdqa	   \TMP5, HashKey_4(%arg2)
-+	movdqu	   \TMP5, HashKey_4(%arg2)
- 	pshufd	   $78, \TMP5, \TMP1
- 	pxor	   \TMP5, \TMP1
--	movdqa	   \TMP1, HashKey_4_k(%arg2)
-+	movdqu	   \TMP1, HashKey_4_k(%arg2)
- .endm
- 
- # GCM_INIT initializes a gcm_context struct to prepare for encoding/decoding.
-@@ -271,7 +271,7 @@ ALL_F:      .octa 0xffffffffffffffffffffffffffffffff
- 	movdqu %xmm0, CurCount(%arg2) # ctx_data.current_counter = iv
- 
- 	PRECOMPUTE \SUBKEY, %xmm1, %xmm2, %xmm3, %xmm4, %xmm5, %xmm6, %xmm7,
--	movdqa HashKey(%arg2), %xmm13
-+	movdqu HashKey(%arg2), %xmm13
- 
- 	CALC_AAD_HASH %xmm13, \AAD, \AADLEN, %xmm0, %xmm1, %xmm2, %xmm3, \
- 	%xmm4, %xmm5, %xmm6
-@@ -997,7 +997,7 @@ TMP6 XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 XMM8 operation
- 	pshufd	  $78, \XMM5, \TMP6
- 	pxor	  \XMM5, \TMP6
- 	paddd     ONE(%rip), \XMM0		# INCR CNT
--	movdqa	  HashKey_4(%arg2), \TMP5
-+	movdqu	  HashKey_4(%arg2), \TMP5
- 	PCLMULQDQ 0x11, \TMP5, \TMP4           # TMP4 = a1*b1
- 	movdqa    \XMM0, \XMM1
- 	paddd     ONE(%rip), \XMM0		# INCR CNT
-@@ -1016,7 +1016,7 @@ TMP6 XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 XMM8 operation
- 	pxor	  (%arg1), \XMM2
- 	pxor	  (%arg1), \XMM3
- 	pxor	  (%arg1), \XMM4
--	movdqa	  HashKey_4_k(%arg2), \TMP5
-+	movdqu	  HashKey_4_k(%arg2), \TMP5
- 	PCLMULQDQ 0x00, \TMP5, \TMP6           # TMP6 = (a1+a0)*(b1+b0)
- 	movaps 0x10(%arg1), \TMP1
- 	AESENC	  \TMP1, \XMM1              # Round 1
-@@ -1031,7 +1031,7 @@ TMP6 XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 XMM8 operation
- 	movdqa	  \XMM6, \TMP1
- 	pshufd	  $78, \XMM6, \TMP2
- 	pxor	  \XMM6, \TMP2
--	movdqa	  HashKey_3(%arg2), \TMP5
-+	movdqu	  HashKey_3(%arg2), \TMP5
- 	PCLMULQDQ 0x11, \TMP5, \TMP1           # TMP1 = a1 * b1
- 	movaps 0x30(%arg1), \TMP3
- 	AESENC    \TMP3, \XMM1              # Round 3
-@@ -1044,7 +1044,7 @@ TMP6 XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 XMM8 operation
- 	AESENC	  \TMP3, \XMM2
- 	AESENC	  \TMP3, \XMM3
- 	AESENC	  \TMP3, \XMM4
--	movdqa	  HashKey_3_k(%arg2), \TMP5
-+	movdqu	  HashKey_3_k(%arg2), \TMP5
- 	PCLMULQDQ 0x00, \TMP5, \TMP2           # TMP2 = (a1+a0)*(b1+b0)
- 	movaps 0x50(%arg1), \TMP3
- 	AESENC	  \TMP3, \XMM1              # Round 5
-@@ -1058,7 +1058,7 @@ TMP6 XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 XMM8 operation
- 	movdqa	  \XMM7, \TMP1
- 	pshufd	  $78, \XMM7, \TMP2
- 	pxor	  \XMM7, \TMP2
--	movdqa	  HashKey_2(%arg2), \TMP5
-+	movdqu	  HashKey_2(%arg2), \TMP5
- 
-         # Multiply TMP5 * HashKey using karatsuba
- 
-@@ -1074,7 +1074,7 @@ TMP6 XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 XMM8 operation
- 	AESENC	  \TMP3, \XMM2
- 	AESENC	  \TMP3, \XMM3
- 	AESENC	  \TMP3, \XMM4
--	movdqa	  HashKey_2_k(%arg2), \TMP5
-+	movdqu	  HashKey_2_k(%arg2), \TMP5
- 	PCLMULQDQ 0x00, \TMP5, \TMP2           # TMP2 = (a1+a0)*(b1+b0)
- 	movaps 0x80(%arg1), \TMP3
- 	AESENC	  \TMP3, \XMM1             # Round 8
-@@ -1092,7 +1092,7 @@ TMP6 XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 XMM8 operation
- 	movdqa	  \XMM8, \TMP1
- 	pshufd	  $78, \XMM8, \TMP2
- 	pxor	  \XMM8, \TMP2
--	movdqa	  HashKey(%arg2), \TMP5
-+	movdqu	  HashKey(%arg2), \TMP5
- 	PCLMULQDQ 0x11, \TMP5, \TMP1          # TMP1 = a1*b1
- 	movaps 0x90(%arg1), \TMP3
- 	AESENC	  \TMP3, \XMM1            # Round 9
-@@ -1121,7 +1121,7 @@ aes_loop_par_enc_done\@:
- 	AESENCLAST \TMP3, \XMM2
- 	AESENCLAST \TMP3, \XMM3
- 	AESENCLAST \TMP3, \XMM4
--	movdqa    HashKey_k(%arg2), \TMP5
-+	movdqu    HashKey_k(%arg2), \TMP5
- 	PCLMULQDQ 0x00, \TMP5, \TMP2          # TMP2 = (a1+a0)*(b1+b0)
- 	movdqu	  (%arg4,%r11,1), \TMP3
- 	pxor	  \TMP3, \XMM1                 # Ciphertext/Plaintext XOR EK
-@@ -1205,7 +1205,7 @@ TMP6 XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 XMM8 operation
- 	pshufd	  $78, \XMM5, \TMP6
- 	pxor	  \XMM5, \TMP6
- 	paddd     ONE(%rip), \XMM0		# INCR CNT
--	movdqa	  HashKey_4(%arg2), \TMP5
-+	movdqu	  HashKey_4(%arg2), \TMP5
- 	PCLMULQDQ 0x11, \TMP5, \TMP4           # TMP4 = a1*b1
- 	movdqa    \XMM0, \XMM1
- 	paddd     ONE(%rip), \XMM0		# INCR CNT
-@@ -1224,7 +1224,7 @@ TMP6 XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 XMM8 operation
- 	pxor	  (%arg1), \XMM2
- 	pxor	  (%arg1), \XMM3
- 	pxor	  (%arg1), \XMM4
--	movdqa	  HashKey_4_k(%arg2), \TMP5
-+	movdqu	  HashKey_4_k(%arg2), \TMP5
- 	PCLMULQDQ 0x00, \TMP5, \TMP6           # TMP6 = (a1+a0)*(b1+b0)
- 	movaps 0x10(%arg1), \TMP1
- 	AESENC	  \TMP1, \XMM1              # Round 1
-@@ -1239,7 +1239,7 @@ TMP6 XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 XMM8 operation
- 	movdqa	  \XMM6, \TMP1
- 	pshufd	  $78, \XMM6, \TMP2
- 	pxor	  \XMM6, \TMP2
--	movdqa	  HashKey_3(%arg2), \TMP5
-+	movdqu	  HashKey_3(%arg2), \TMP5
- 	PCLMULQDQ 0x11, \TMP5, \TMP1           # TMP1 = a1 * b1
- 	movaps 0x30(%arg1), \TMP3
- 	AESENC    \TMP3, \XMM1              # Round 3
-@@ -1252,7 +1252,7 @@ TMP6 XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 XMM8 operation
- 	AESENC	  \TMP3, \XMM2
- 	AESENC	  \TMP3, \XMM3
- 	AESENC	  \TMP3, \XMM4
--	movdqa	  HashKey_3_k(%arg2), \TMP5
-+	movdqu	  HashKey_3_k(%arg2), \TMP5
- 	PCLMULQDQ 0x00, \TMP5, \TMP2           # TMP2 = (a1+a0)*(b1+b0)
- 	movaps 0x50(%arg1), \TMP3
- 	AESENC	  \TMP3, \XMM1              # Round 5
-@@ -1266,7 +1266,7 @@ TMP6 XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 XMM8 operation
- 	movdqa	  \XMM7, \TMP1
- 	pshufd	  $78, \XMM7, \TMP2
- 	pxor	  \XMM7, \TMP2
--	movdqa	  HashKey_2(%arg2), \TMP5
-+	movdqu	  HashKey_2(%arg2), \TMP5
- 
-         # Multiply TMP5 * HashKey using karatsuba
- 
-@@ -1282,7 +1282,7 @@ TMP6 XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 XMM8 operation
- 	AESENC	  \TMP3, \XMM2
- 	AESENC	  \TMP3, \XMM3
- 	AESENC	  \TMP3, \XMM4
--	movdqa	  HashKey_2_k(%arg2), \TMP5
-+	movdqu	  HashKey_2_k(%arg2), \TMP5
- 	PCLMULQDQ 0x00, \TMP5, \TMP2           # TMP2 = (a1+a0)*(b1+b0)
- 	movaps 0x80(%arg1), \TMP3
- 	AESENC	  \TMP3, \XMM1             # Round 8
-@@ -1300,7 +1300,7 @@ TMP6 XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 XMM8 operation
- 	movdqa	  \XMM8, \TMP1
- 	pshufd	  $78, \XMM8, \TMP2
- 	pxor	  \XMM8, \TMP2
--	movdqa	  HashKey(%arg2), \TMP5
-+	movdqu	  HashKey(%arg2), \TMP5
- 	PCLMULQDQ 0x11, \TMP5, \TMP1          # TMP1 = a1*b1
- 	movaps 0x90(%arg1), \TMP3
- 	AESENC	  \TMP3, \XMM1            # Round 9
-@@ -1329,7 +1329,7 @@ aes_loop_par_dec_done\@:
- 	AESENCLAST \TMP3, \XMM2
- 	AESENCLAST \TMP3, \XMM3
- 	AESENCLAST \TMP3, \XMM4
--	movdqa    HashKey_k(%arg2), \TMP5
-+	movdqu    HashKey_k(%arg2), \TMP5
- 	PCLMULQDQ 0x00, \TMP5, \TMP2          # TMP2 = (a1+a0)*(b1+b0)
- 	movdqu	  (%arg4,%r11,1), \TMP3
- 	pxor	  \TMP3, \XMM1                 # Ciphertext/Plaintext XOR EK
-@@ -1405,10 +1405,10 @@ TMP7 XMM1 XMM2 XMM3 XMM4 XMMDst
- 	movdqa	  \XMM1, \TMP6
- 	pshufd	  $78, \XMM1, \TMP2
- 	pxor	  \XMM1, \TMP2
--	movdqa	  HashKey_4(%arg2), \TMP5
-+	movdqu	  HashKey_4(%arg2), \TMP5
- 	PCLMULQDQ 0x11, \TMP5, \TMP6       # TMP6 = a1*b1
- 	PCLMULQDQ 0x00, \TMP5, \XMM1       # XMM1 = a0*b0
--	movdqa	  HashKey_4_k(%arg2), \TMP4
-+	movdqu	  HashKey_4_k(%arg2), \TMP4
- 	PCLMULQDQ 0x00, \TMP4, \TMP2       # TMP2 = (a1+a0)*(b1+b0)
- 	movdqa	  \XMM1, \XMMDst
- 	movdqa	  \TMP2, \XMM1              # result in TMP6, XMMDst, XMM1
-@@ -1418,10 +1418,10 @@ TMP7 XMM1 XMM2 XMM3 XMM4 XMMDst
- 	movdqa	  \XMM2, \TMP1
- 	pshufd	  $78, \XMM2, \TMP2
- 	pxor	  \XMM2, \TMP2
--	movdqa	  HashKey_3(%arg2), \TMP5
-+	movdqu	  HashKey_3(%arg2), \TMP5
- 	PCLMULQDQ 0x11, \TMP5, \TMP1       # TMP1 = a1*b1
- 	PCLMULQDQ 0x00, \TMP5, \XMM2       # XMM2 = a0*b0
--	movdqa	  HashKey_3_k(%arg2), \TMP4
-+	movdqu	  HashKey_3_k(%arg2), \TMP4
- 	PCLMULQDQ 0x00, \TMP4, \TMP2       # TMP2 = (a1+a0)*(b1+b0)
- 	pxor	  \TMP1, \TMP6
- 	pxor	  \XMM2, \XMMDst
-@@ -1433,10 +1433,10 @@ TMP7 XMM1 XMM2 XMM3 XMM4 XMMDst
- 	movdqa	  \XMM3, \TMP1
- 	pshufd	  $78, \XMM3, \TMP2
- 	pxor	  \XMM3, \TMP2
--	movdqa	  HashKey_2(%arg2), \TMP5
-+	movdqu	  HashKey_2(%arg2), \TMP5
- 	PCLMULQDQ 0x11, \TMP5, \TMP1       # TMP1 = a1*b1
- 	PCLMULQDQ 0x00, \TMP5, \XMM3       # XMM3 = a0*b0
--	movdqa	  HashKey_2_k(%arg2), \TMP4
-+	movdqu	  HashKey_2_k(%arg2), \TMP4
- 	PCLMULQDQ 0x00, \TMP4, \TMP2       # TMP2 = (a1+a0)*(b1+b0)
- 	pxor	  \TMP1, \TMP6
- 	pxor	  \XMM3, \XMMDst
-@@ -1446,10 +1446,10 @@ TMP7 XMM1 XMM2 XMM3 XMM4 XMMDst
- 	movdqa	  \XMM4, \TMP1
- 	pshufd	  $78, \XMM4, \TMP2
- 	pxor	  \XMM4, \TMP2
--	movdqa	  HashKey(%arg2), \TMP5
-+	movdqu	  HashKey(%arg2), \TMP5
- 	PCLMULQDQ 0x11, \TMP5, \TMP1	    # TMP1 = a1*b1
- 	PCLMULQDQ 0x00, \TMP5, \XMM4       # XMM4 = a0*b0
--	movdqa	  HashKey_k(%arg2), \TMP4
-+	movdqu	  HashKey_k(%arg2), \TMP4
- 	PCLMULQDQ 0x00, \TMP4, \TMP2       # TMP2 = (a1+a0)*(b1+b0)
- 	pxor	  \TMP1, \TMP6
- 	pxor	  \XMM4, \XMMDst
--- 
-2.17.1
+											Pavel
