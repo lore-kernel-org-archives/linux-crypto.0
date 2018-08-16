@@ -1,73 +1,126 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [RFC] crypto: Remove mcryptd
-Date: Thu, 16 Aug 2018 14:55:20 +0800
-Message-ID: <20180816065520.pojqi7pplpnknlv5@gondor.apana.org.au>
-References: <1526089453-6542-1-git-send-email-megha.dey@linux.intel.com>
- <20180720035325.m5tzeuqsfej3y6wd@gondor.apana.org.au>
- <1532651107.19157.24.camel@megha-Z97X-UD7-TH>
- <20180808095621.h7ecacftx5ofe5ki@gondor.apana.org.au>
- <1533868833.19050.19.camel@megha-Z97X-UD7-TH>
+From: Jeffrey Lien <Jeff.Lien@wdc.com>
+Subject: RE: [PATCH] Performance Improvement in CRC16 Calculations.
+Date: Thu, 16 Aug 2018 14:02:41 +0000
+Message-ID: <SN1PR04MB1824A5944E0428AC84B62886EA3E0@SN1PR04MB1824.namprd04.prod.outlook.com>
+References: <1533928331-21303-1-git-send-email-jeff.lien@wdc.com>
+ <20180810201601.GA80850@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-To: Megha Dey <megha.dey@intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "tim.c.chen@linux.intel.com" <tim.c.chen@linux.intel.com>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+        David Darrington <david.darrington@wdc.com>,
+        Jeff Furlong <jeff.furlong@wdc.com>
+To: Eric Biggers <ebiggers@kernel.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1533868833.19050.19.camel@megha-Z97X-UD7-TH>
+In-Reply-To: <20180810201601.GA80850@gmail.com>
+Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Aug 09, 2018 at 07:40:33PM -0700, Megha Dey wrote:
->
-> 1. 
-> @@ -495,7 +534,10 @@ static void cryptd_skcipher_encrypt(struct
-> crypto_async_request *base,
->         skcipher_request_set_crypt(subreq, req->src, req->dst,
-> req->cryptlen, req->iv);
->  
-> -       err = crypto_skcipher_encrypt(subreq);
-> +       subreq->base.data = req->base.data;
-> +       subreq->base.complete = rctx->complete;
-> +       rctx->desc = *subreq;
-> +       err = crypto_skcipher_encrypt(&rctx->desc);
->         skcipher_request_zero(subreq);
-> 
-> This change is necessary because for the multibuffer algorithms, the
-> inner algorithm needs a pointer to the original request. In the slow
-> path, since we allocate a skcipher_request on the stack, there is no
-> easy way to retrieve the request. In the mcryptd_layer, we had extra
-> logic to store this pointer. 
+Eric,
+We did not test the slice by 4 or 8 tables.  I'm not sure of  the value of =
+doing that since the slice by 16 will provide the best performance gain.   =
+If I'm missing anything here, please let me know.  =20
 
-Why do you need the original request?
+I'm working on a new version of the patch based on the feedback from others=
+ and will also change the pointer variables to start with p and fix the ind=
+enting you mentioned below in the new version of the patch. =20
 
-I think the fact that you need this at all indicates that you're
-not using cryptd correctly.  cryptd should be completely transparent
-to the underlying algorithm.  All it's doing is making sure that
-the underlying algorithm gets called in a context that allows SIMD
-use.
+Thanks
 
-> Lastly, for hashes, we have
-> struct cryptd_hash_request_ctx {
->         crypto_completion_t complete;
->         struct shash_desc desc;
-> };
-> 
-> If we were to use this(with the added fields for multibuffer), we should
-> update the shash_desc to ahash_request since we are an async algorithm
-> right?
+Jeff Lien
 
-That's a good point.  More importantly, you also need to extend
-cryptd to allow an ASYNC underlying algorithm, for skcipher as well
-as hashes.  This is not as simple as just modifying the type/mask
-during algorithm creation.  But you also need to modify the run-time
-(e.g., cryptd_skcipher_encrypt) to defer the completion in case of an
-async return value.
+-----Original Message-----
+From: Eric Biggers [mailto:ebiggers@kernel.org]=20
+Sent: Friday, August 10, 2018 3:16 PM
+To: Jeffrey Lien <Jeff.Lien@wdc.com>
+Cc: linux-kernel@vger.kernel.org; linux-crypto@vger.kernel.org; linux-block=
+@vger.kernel.org; linux-scsi@vger.kernel.org; herbert@gondor.apana.org.au; =
+tim.c.chen@linux.intel.com; martin.petersen@oracle.com; David Darrington <d=
+avid.darrington@wdc.com>; Jeff Furlong <jeff.furlong@wdc.com>
+Subject: Re: [PATCH] Performance Improvement in CRC16 Calculations.
 
-The same change also needs to be made to crypto/simd.c, but at least
-there the run-time doesn't need any changes AFAICS.
+On Fri, Aug 10, 2018 at 02:12:11PM -0500, Jeff Lien wrote:
+> This patch provides a performance improvement for the CRC16=20
+> calculations done in read/write workloads using the T10 Type 1/2/3=20
+> guard field.  For example, today with sequential write workloads (one=20
+> thread/CPU of IO) we consume 100% of the CPU because of the CRC16=20
+> computation bottleneck.  Today's block devices are considerably=20
+> faster, but the CRC16 calculation prevents folks from utilizing the=20
+> throughput of such devices.  To speed up this calculation and expose=20
+> the block device throughput, we slice the old single byte for loop into a=
+ 16 byte for loop, with a larger CRC table to match.  The result has shown =
+5x performance improvements on various big endian and little endian systems=
+ running the 4.18.0 kernel version.
+>=20
+> FIO Sequential Write, 64K Block Size, Queue Depth 64
+> BE Base Kernel:        bw=3D201.5 MiB/s
+> BE Modified CRC Calc:  bw=3D968.1 MiB/s
+> 4.80x performance improvement
+>=20
+> LE Base Kernel:        bw=3D357 MiB/s
+> LE Modified CRC Calc:  bw=3D1964 MiB/s
+> 5.51x performance improvement
+>=20
+> FIO Sequential Read, 64K Block Size, Queue Depth 64
+> BE Base Kernel:        bw=3D611.2 MiB/s
+> BE Modified CRC calc:  bw=3D684.9 MiB/s
+> 1.12x performance improvement
+>=20
+> LE Base Kernel:        bw=3D797 MiB/s
+> LE Modified CRC Calc:  bw=3D2730 MiB/s
+> 3.42x performance improvement
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Did you also test the slice-by-4 (requires 2048-byte table) and slice-by-8 =
+(requires 4096-byte table) methods?  Your proposal is slice-by-16 (requires=
+ 8192-byte table); the original was slice-by-1 (requires 512-byte table).
+
+>  __u16 crc_t10dif_generic(__u16 crc, const unsigned char *buffer,=20
+> size_t len)  {
+> -	unsigned int i;
+> +	const __u8 *i =3D (const __u8 *)buffer;
+> +	const __u8 *i_end =3D i + len;
+> +	const __u8 *i_last16 =3D i + (len / 16 * 16);
+
+'i' is normally a loop counter, not a pointer.
+Use 'p', 'p_end', and 'p_last16'.
+
+> =20
+> -	for (i =3D 0 ; i < len ; i++)
+> -		crc =3D (crc << 8) ^ t10_dif_crc_table[((crc >> 8) ^ buffer[i]) & 0xff=
+];
+> +	for (; i < i_last16; i +=3D 16) {
+> +		crc =3D t10_dif_crc_table[15][i[0] ^ (__u8)(crc >>  8)] ^
+> +		t10_dif_crc_table[14][i[1] ^ (__u8)(crc >>  0)] ^
+> +		t10_dif_crc_table[13][i[2]] ^
+> +		t10_dif_crc_table[12][i[3]] ^
+> +		t10_dif_crc_table[11][i[4]] ^
+> +		t10_dif_crc_table[10][i[5]] ^
+> +		t10_dif_crc_table[9][i[6]] ^
+> +		t10_dif_crc_table[8][i[7]] ^
+> +		t10_dif_crc_table[7][i[8]] ^
+> +		t10_dif_crc_table[6][i[9]] ^
+> +		t10_dif_crc_table[5][i[10]] ^
+> +		t10_dif_crc_table[4][i[11]] ^
+> +		t10_dif_crc_table[3][i[12]] ^
+> +		t10_dif_crc_table[2][i[13]] ^
+> +		t10_dif_crc_table[1][i[14]] ^
+> +		t10_dif_crc_table[0][i[15]];
+> +	}
+
+Please indent this properly.
+
+		crc =3D t10_dif_crc_table[15][i[0] ^ (__u8)(crc >>  8)] ^
+		      t10_dif_crc_table[14][i[1] ^ (__u8)(crc >>  0)] ^
+		      t10_dif_crc_table[13][i[2]] ^
+		      t10_dif_crc_table[12][i[3]] ^
+		      t10_dif_crc_table[11][i[4]] ^
+		      ...
+
+- Eric
