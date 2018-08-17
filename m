@@ -1,66 +1,66 @@
-From: Alexander Popov <alex.popov@linux.com>
-Subject: Re: [GIT PULL] gcc-plugin updates for v4.19-rc1
-Date: Fri, 17 Aug 2018 01:18:10 +0300
-Message-ID: <43da98d0-409b-88b9-0178-a79b581fc044@linux.com>
-References: <20180813214328.GA15137@beast>
- <CA+55aFw5Tkn6DgkAZS-UGOjJpYp2R4rFAm9ixu_=FONeqRyofg@mail.gmail.com>
- <CAGXu5jK_w7JRywdQ78FfQxeLSMmXbvyDDnaYzj27=y8wnAzKxQ@mail.gmail.com>
- <CA+55aFyFCWH3YJnRUKtSzs9Mvny0eU+=QANxoPTE+9B9CkUWDw@mail.gmail.com>
- <CAGXu5jJ1JNSxJABUTAO85z_hXjSkjD=nWEho7KrYJTqqVGivig@mail.gmail.com>
- <CA+55aFy6jNLsywVYdGp83AMrXBo_P-pkjkphPGrO=82SPKCpLQ@mail.gmail.com>
- <CAGXu5j+Yv9Bu4mJPOfkpxrom91kSKaUESHR-Tn1CAJCTTZy_8w@mail.gmail.com>
-Reply-To: alex.popov@linux.com
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+Subject: Re: [PATCH] Performance Improvement in CRC16 Calculations.
+Date: Thu, 16 Aug 2018 23:20:05 -0400
+Message-ID: <yq1a7plel22.fsf@oracle.com>
+References: <1533928331-21303-1-git-send-email-jeff.lien@wdc.com>
+        <20180810201601.GA80850@gmail.com>
+        <SN1PR04MB1824A5944E0428AC84B62886EA3E0@SN1PR04MB1824.namprd04.prod.outlook.com>
+        <ba74a9d1-cccc-913a-927a-82e561afef3d@interlog.com>
+        <7f1b5ca8-cd89-71cc-21bb-5a058bc1e908@c-s.fr>
+        <e2f9fa43-6104-214e-1570-b3753cb14b13@interlog.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Ingo Molnar <mingo@kernel.org>,
-        Masahiro Yamada <yamada.masahiro@socionext.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Tycho Andersen <tycho@tycho.ws>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Laura Abbott <labbott@redhat.com>,
-        Will Deacon <will.deacon@arm.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-crypto <linux-crypto@vger.kernel.org>
-To: Kees Cook <keescook@chromium.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>
+Content-Type: text/plain
+Cc: Christophe LEROY <christophe.leroy@c-s.fr>,
+        Jeffrey Lien <Jeff.Lien@wdc.com>,
+        Eric Biggers <ebiggers@kernel.org>,
+        "linux-kernel\@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-crypto\@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-block\@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi\@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "herbert\@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "tim.c.chen\@linux.intel.com" <tim.c.chen@linux.intel.com>,
+        "martin.petersen\@oracle.com" <martin.petersen@oracle.com>,
+        David Darrington <david.darrington@wdc.com>,
+        Jeff Furlong <jeff.furlong@wdc.com>,
+        Joe Perches <joe@perches.com>
+To: Douglas Gilbert <dgilbert@interlog.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAGXu5j+Yv9Bu4mJPOfkpxrom91kSKaUESHR-Tn1CAJCTTZy_8w@mail.gmail.com>
-Content-Language: en-US
+In-Reply-To: <e2f9fa43-6104-214e-1570-b3753cb14b13@interlog.com> (Douglas
+        Gilbert's message of "Thu, 16 Aug 2018 13:38:22 -0400")
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hello,
 
-On 15.08.2018 23:56, Kees Cook wrote:
-> On Wed, Aug 15, 2018 at 1:18 PM, Linus Torvalds
-> <torvalds@linux-foundation.org> wrote:
->> I absolutely refuse to take any hardening patches at all that have
->> BUG() or panic() or similar machine-killing in it.
-> 
-> Okay, mental model adjusted. :) It was only "strong discouraged" until now.
-> 
->> I thought VLA's were mostly gone.
-...
-> And after that, there's a single patch to move -Wvla up into the
-> top-level Makefile:
-> 
-> https://patchwork.kernel.org/patch/10489873/
-> 
-> So, we're basically done
+> With regard to your comment about slice (table ?) size, that is
+> partially addressed by a kernel build time option shown in the above
+> patch. That could be taken a bit further with a sysfs knob (where ?)
+> to reduce the effective table size from that which the kernel is built
+> with. To increase the size of the table would imply fetching some more
+> heap and having an algorithm that could generate the extra part of
+> that table required.
 
-I've just sent the 15th version of the series with changes according to the
-feedback from Linus:
+I am not a big fan of punting the decision to whoever compiles the
+kernel to pick a number between 1 and 11 ("this CRC calculation is one
+louder"). I would prefer to find a reasonable compromise between
+bandwidth and cache thrashing side effects instead of overwhelming
+people with build time choices and runtime tunables.
 
-1. BUG_ON() in stackleak_erase() is safely eliminated;
+Almost everyone is running either Tim's PCLMULQDQ version or using IP
+checksum for DIX. The software T10 CRC table implementation is mainly
+there as a reference. I don't know of any production environments using
+the table-based T10 CRC.
 
-2. Stack Clash detection (alloca() check) is completely dropped, since global
-'-Wvla' should arrive soon. stackleak_check_alloca() for arm64 is dropped as
-well in a separate commit.
+I don't have a problem making the code genuinely useful so it can be
+leveraged by processors without hardware CRC acceleration capability.
+But there needs to be some solid data guiding this decision so I'm
+looking forward to see what WDC has in store.
 
-This version is rebased onto Linus' tree.
+Our results definitely matched Christophe's in that larger slice-by-N
+are not always a win. And "faster" isn't automatically "better" from an
+application performance perspective. With the caveat that our
+measurements were done about 10 years ago and I'm sure we've come a long
+way with processors and caches since then. So the results should be
+interesting...
 
-Best regards,
-Alexander
+-- 
+Martin K. Petersen	Oracle Linux Engineering
