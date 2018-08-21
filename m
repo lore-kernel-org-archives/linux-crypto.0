@@ -1,118 +1,181 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [PATCH] arm64/crypto: remove non-standard notation
-Date: Tue, 21 Aug 2018 14:23:08 +0200
-Message-ID: <CAKv+Gu-xAmadr96vwStOxdeqi=rCEBrn8V6GofexBhpmA=JiuA@mail.gmail.com>
-References: <20180820224032.53194-1-ndesaulniers@google.com>
+Subject: Re: KASAN: use-after-free Read in sha512_ctx_mgr_resubmit
+Date: Tue, 21 Aug 2018 14:43:56 +0200
+Message-ID: <CAKv+Gu9Y0TLOuMba43HPihYqy-kk0nttBfPj1_UukiYy1cBcFw@mail.gmail.com>
+References: <00000000000072d64d05737b6b8c@google.com> <20180820073119.GA14931@sol.localdomain>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+Cc: Megha Dey <megha.dey@linux.intel.com>,
+        Tim Chen <tim.c.chen@linux.intel.com>,
         "David S. Miller" <davem@davemloft.net>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will.deacon@arm.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        syzbot <syzbot+d5455bac3ba1ee9114e5@syzkaller.appspotmail.com>,
         "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
         <linux-crypto@vger.kernel.org>,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-To: Nick Desaulniers <ndesaulniers@google.com>
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
+        "the arch/x86 maintainers" <x86@kernel.org>
+To: Eric Biggers <ebiggers@kernel.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180820224032.53194-1-ndesaulniers@google.com>
+In-Reply-To: <20180820073119.GA14931@sol.localdomain>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi Nick,
-
-On 21 August 2018 at 00:40, Nick Desaulniers <ndesaulniers@google.com> wrote:
-> It seems that:
-> ldr q8, =0x30000000200000001
+On 20 August 2018 at 09:31, Eric Biggers <ebiggers@kernel.org> wrote:
+> [+sha512-mb maintainers...]
 >
-> is a GNU as convience notation for:
-> ldr q8, .Lconstant
-> .Lconstant
-> .word 0x00000001
-> .word 0x00000002
-> .word 0x00000003
-> .word 0x00000000
+> On Wed, Aug 15, 2018 at 09:00:04AM -0700, syzbot wrote:
+>> Hello,
+>>
+>> syzbot found the following crash on:
+>>
+>> HEAD commit:    7796916146b8 Merge branch 'x86-cpu-for-linus' of git://git..
+>> git tree:       upstream
+>> console output: https://syzkaller.appspot.com/x/log.txt?x=164b1922400000
+>> kernel config:  https://syzkaller.appspot.com/x/.config?x=265bef9882cce8d7
+>> dashboard link: https://syzkaller.appspot.com/bug?extid=d5455bac3ba1ee9114e5
+>> compiler:       gcc (GCC) 8.0.1 20180413 (experimental)
+>> syzkaller repro:https://syzkaller.appspot.com/x/repro.syz?x=1013478c400000
+>> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1349c8aa400000
+>>
+>> IMPORTANT: if you fix the bug, please add the following tag to the commit:
+>> Reported-by: syzbot+d5455bac3ba1ee9114e5@syzkaller.appspotmail.com
+>>
+>> ==================================================================
+>> BUG: KASAN: use-after-free in sha512_ctx_mgr_resubmit.part.3+0x3b1/0x4a0
+>> arch/x86/crypto/sha512-mb/sha512_mb.c:136
+>> Read of size 4 at addr ffff8801b0b9e838 by task kworker/0:1/13
+>>
+>> CPU: 0 PID: 13 Comm: kworker/0:1 Not tainted 4.18.0+ #187
+>> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS
+>> Google 01/01/2011
+>> Workqueue: crypto mcryptd_flusher
+>> Call Trace:
+>>  __dump_stack lib/dump_stack.c:77 [inline]
+>>  dump_stack+0x1c9/0x2b4 lib/dump_stack.c:113
+>>  print_address_description+0x6c/0x20b mm/kasan/report.c:256
+>>  kasan_report_error mm/kasan/report.c:354 [inline]
+>>  kasan_report.cold.7+0x242/0x2fe mm/kasan/report.c:412
+>>  __asan_report_load4_noabort+0x14/0x20 mm/kasan/report.c:432
+>>  sha512_ctx_mgr_resubmit.part.3+0x3b1/0x4a0
+>> arch/x86/crypto/sha512-mb/sha512_mb.c:136
+>>  sha512_ctx_mgr_resubmit arch/x86/crypto/sha512-mb/sha512_mb.c:135 [inline]
+>>  sha512_ctx_mgr_flush+0x5c/0xb0 arch/x86/crypto/sha512-mb/sha512_mb.c:367
+>>  sha512_mb_flusher+0x27b/0x610 arch/x86/crypto/sha512-mb/sha512_mb.c:939
+>>  mcryptd_flusher+0x342/0x4b0 crypto/mcryptd.c:208
+>>  process_one_work+0xc73/0x1ba0 kernel/workqueue.c:2153
+>>  worker_thread+0x189/0x13c0 kernel/workqueue.c:2296
+>>  kthread+0x35a/0x420 kernel/kthread.c:246
+>>  ret_from_fork+0x3a/0x50 arch/x86/entry/entry_64.S:413
+>>
+>> Allocated by task 23902:
+>>  save_stack+0x43/0xd0 mm/kasan/kasan.c:448
+>>  set_track mm/kasan/kasan.c:460 [inline]
+>>  kasan_kmalloc+0xc4/0xe0 mm/kasan/kasan.c:553
+>>  __do_kmalloc mm/slab.c:3718 [inline]
+>>  __kmalloc+0x14e/0x760 mm/slab.c:3727
+>>  kmalloc include/linux/slab.h:518 [inline]
+>>  sock_kmalloc+0x156/0x1f0 net/core/sock.c:1996
+>>  hash_accept_parent_nokey+0x58/0x2e0 crypto/algif_hash.c:438
+>>  hash_accept_parent+0x5b/0x80 crypto/algif_hash.c:465
+>>  af_alg_accept+0x127/0x7d0 crypto/af_alg.c:296
+>>  alg_accept+0x46/0x60 crypto/af_alg.c:332
+>>  __sys_accept4+0x3b2/0x8a0 net/socket.c:1600
+>>  __do_sys_accept4 net/socket.c:1635 [inline]
+>>  __se_sys_accept4 net/socket.c:1632 [inline]
+>>  __x64_sys_accept4+0x97/0xf0 net/socket.c:1632
+>>  do_syscall_64+0x1b9/0x820 arch/x86/entry/common.c:290
+>>  entry_SYSCALL_64_after_hwframe+0x49/0xbe
+>>
+>> Freed by task 23902:
+>>  save_stack+0x43/0xd0 mm/kasan/kasan.c:448
+>>  set_track mm/kasan/kasan.c:460 [inline]
+>>  __kasan_slab_free+0x11a/0x170 mm/kasan/kasan.c:521
+>>  kasan_slab_free+0xe/0x10 mm/kasan/kasan.c:528
+>>  __cache_free mm/slab.c:3498 [inline]
+>>  kfree+0xd9/0x260 mm/slab.c:3813
+>>  __sock_kfree_s net/core/sock.c:2017 [inline]
+>>  sock_kfree_s+0x29/0x60 net/core/sock.c:2023
+>>  hash_sock_destruct+0x157/0x1c0 crypto/algif_hash.c:427
+>>  __sk_destruct+0x107/0xa60 net/core/sock.c:1573
+>>  sk_destruct+0x78/0x90 net/core/sock.c:1608
+>>  __sk_free+0xcf/0x300 net/core/sock.c:1619
+>>  sk_free+0x42/0x50 net/core/sock.c:1630
+>>  sock_put include/net/sock.h:1667 [inline]
+>>  af_alg_release+0x6e/0x90 crypto/af_alg.c:126
+>>  __sock_release+0xd7/0x260 net/socket.c:600
+>>  sock_close+0x19/0x20 net/socket.c:1151
+>>  __fput+0x355/0x8b0 fs/file_table.c:209
+>>  ____fput+0x15/0x20 fs/file_table.c:243
+>>  task_work_run+0x1e8/0x2a0 kernel/task_work.c:113
+>>  tracehook_notify_resume include/linux/tracehook.h:192 [inline]
+>>  exit_to_usermode_loop+0x313/0x370 arch/x86/entry/common.c:166
+>>  prepare_exit_to_usermode arch/x86/entry/common.c:197 [inline]
+>>  syscall_return_slowpath arch/x86/entry/common.c:268 [inline]
+>>  do_syscall_64+0x6be/0x820 arch/x86/entry/common.c:293
+>>  entry_SYSCALL_64_after_hwframe+0x49/0xbe
+>>
+>> The buggy address belongs to the object at ffff8801b0b9e340
+>>  which belongs to the cache kmalloc-2048 of size 2048
+>> The buggy address is located 1272 bytes inside of
+>>  2048-byte region [ffff8801b0b9e340, ffff8801b0b9eb40)
+>> The buggy address belongs to the page:
+>> page:ffffea0006c2e780 count:1 mapcount:0 mapping:ffff8801dac00c40 index:0x0
+>> compound_mapcount: 0
+>> flags: 0x2fffc0000008100(slab|head)
+>> raw: 02fffc0000008100 ffffea0007543a88 ffffea000760b188 ffff8801dac00c40
+>> raw: 0000000000000000 ffff8801b0b9e340 0000000100000003 0000000000000000
+>> page dumped because: kasan: bad access detected
+>>
+>> Memory state around the buggy address:
+>>  ffff8801b0b9e700: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+>>  ffff8801b0b9e780: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+>> > ffff8801b0b9e800: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+>>                                         ^
+>>  ffff8801b0b9e880: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+>>  ffff8801b0b9e900: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+>> ==================================================================
 >
-> based on this comment in binutils' source [0]. I've asked for this
-> non-standard convience notation to be added to other assemblers [1], but
-> until then, we can remove it and get equivalent disassembly:
+> Apparently, the SHA multibuffer algorithms sometimes return success while the
+> hash request is still being asynchronously processed, which allows an in-use
+> request to be freed or reused.  It also allows the wrong digest value to be
+> computed.
+
+[...]
+
+>
+> Personally, I'm wondering why the SHA multibuffer code is in the kernel at all
+> given all the severe issues it has that its authors/maintainers don't seem to be
+> working very hard to fix.  The code is very difficult to understand due to the
+> weird 3-layer design with "mcryptd" and other issues, making debugging it very
+> time consuming; most of the code is duplicated in 3 places (sha1-mb, sha256-mb,
+> and sha512-mb), making maintenance even more difficult; and most importantly
+> there are severe bugs, including edge cases where it computes the wrong hash, as
+> shown not only by this bug but also the sha256_mb bug I recently ran into.  It
+> seems the algorithms were never tested under load to cover these edge cases.
+>
+> That's *not* acceptable for crypto code.  Security and correctness come first.
+>
+> Also as I've shown previously, in most cases the multibuffer SHA algorithms are
+> ~1000x slower than the regular ones due to the flush delay.  So the performance
+> argument for them actually seems pretty tenuous...  And, isn't AVX2 multibuffer
+> useless on new processors, which have SHA instructions?
+>
+> I'd also be very interested to hear an explanation for why systemwide sharing of
+> hash jobs doesn't enable side-channel attacks and isn't just the latest example
+> of prioritizing "performance" over security?
+>
+> We need to have higher standards for crypto and not accept buggy spaghetti code
+> just because it's slightly faster in some artificial microbenchmark.
+>
+> So unless major improvements are made, I personally think we'd be much better
+> off without the SHA multibuffer algorithms in the kernel.
 >
 
-What do you mean by 'non-standard convenience notation'? Which asm
-'standard' does Clang actually claim to implement?
-
-This 'GCC/binutils is broken and we are reluctant to subvert Clang'
-attitude is getting a bit old tbh. In the future, could you please
-mention clang explicitly in the patch subject so it is obvious what
-the purpose of the patch is? I think we should accommodate Clang in
-Linux, but the attitude has got to go.
-
-
-> before:
-> 00000000000009d4 <neon_aes_ctr_encrypt>:
-> ...
->      a48:       9c000ac8        ldr     q8, ba0 <neon_aes_ctr_encrypt+0x1cc>
-> ...
->      ba0:       00000001        .word   0x00000001
->      ba4:       00000002        .word   0x00000002
->      ba8:       00000003        .word   0x00000003
->      bac:       00000000        .word   0x00000000
->
-> after:
->
-> 00000000000009d4 <neon_aes_ctr_encrypt>:
-> ...
->      a48:       9c000aa8        ldr     q8, b9c <neon_aes_ctr_encrypt+0x1c8>
-> ...
->      b9c:       00000001        .word   0x00000001
->      ba0:       00000002        .word   0x00000002
->      ba4:       00000003        .word   0x00000003
->      ba8:       00000000        .word   0x00000000
->
-> [0] https://sourceware.org/git/gitweb.cgi?p=binutils-gdb.git;a=blob;f=gas/testsuite/gas/aarch64/programmer-friendly.s;h=6254c6476efdc848648b05068be0574e7addc85d;hb=HEAD#l11
-> [1] https://bugs.llvm.org/show_bug.cgi?id=38642
->
-> Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
-> ---
->  arch/arm64/crypto/aes-modes.S | 8 +++++++-
->  1 file changed, 7 insertions(+), 1 deletion(-)
->
-> diff --git a/arch/arm64/crypto/aes-modes.S b/arch/arm64/crypto/aes-modes.S
-> index 483a7130cf0e..9288c5b0eca2 100644
-> --- a/arch/arm64/crypto/aes-modes.S
-> +++ b/arch/arm64/crypto/aes-modes.S
-> @@ -232,7 +232,7 @@ AES_ENTRY(aes_ctr_encrypt)
->         bmi             .Lctr1x
->         cmn             w6, #4                  /* 32 bit overflow? */
->         bcs             .Lctr1x
-> -       ldr             q8, =0x30000000200000001        /* addends 1,2,3[,0] */
-> +       ldr             q8, .Laddends /* addends 1,2,3[,0] */
->         dup             v7.4s, w6
->         mov             v0.16b, v4.16b
->         add             v7.4s, v7.4s, v8.4s
-> @@ -295,6 +295,12 @@ AES_ENTRY(aes_ctr_encrypt)
->         rev             x7, x7
->         ins             v4.d[0], x7
->         b               .Lctrcarrydone
-> +
-> +.Laddends:
-> +       .word   0x00000001
-> +       .word   0x00000002
-> +       .word   0x00000003
-> +       .word   0x00000000
-
-As Will points out, this breaks BE builds.
-
->  AES_ENDPROC(aes_ctr_encrypt)
->         .ltorg
-
-You can drop this .ltorg if you get rid of all =xxx instances.
-
-Actually, though, I would prefer it if we could use some clever short
-sequence of movi+add instructions, and get rid of the literal
-altogether. Or otherwise, please use something like
-
-ldr_l q8, .Laddends, <temp register>
-
-instead, and move the literal into the .rodata section (and use .octa
-so you don't break BE)
+I agree. The code is obviously broken in a way that would have been
+noticed if it were in wide use, and it is too complicated for mere
+mortals to fix or maintain. I suggest we simply remove it for now, and
+if anyone wants to reintroduce it, we can review the code *and* the
+justification for the approach from scratch (in which case we should
+consider factoring out the algo agnostics plumbing in a way that
+allows it to be reused by other architectures as well)
