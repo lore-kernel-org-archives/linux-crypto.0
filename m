@@ -1,145 +1,113 @@
-From: Nick Desaulniers <ndesaulniers@google.com>
-Subject: Re: [PATCH] arm64/crypto: remove non-standard notation
-Date: Tue, 21 Aug 2018 09:50:44 -0700
-Message-ID: <CAKwvOdkZR-MWuMU=j=kKXQwA0LEj1n0uoZQyTpwOzZuz9gjmJQ@mail.gmail.com>
-References: <20180820224032.53194-1-ndesaulniers@google.com> <CAKv+Gu-xAmadr96vwStOxdeqi=rCEBrn8V6GofexBhpmA=JiuA@mail.gmail.com>
+From: Tom Lendacky <thomas.lendacky@amd.com>
+Subject: Re: disabling psp in bios causes errors in dmesg
+Date: Tue, 21 Aug 2018 11:47:38 -0500
+Message-ID: <e0fb68e3-e98f-4f58-6f91-c570e8e6fdf2@amd.com>
+References: <3be85fc6-6323-b368-747f-b7650b3898b4@mageia.org>
+ <1e514ed4-a2e1-32ec-4ec8-64134b2fdb9e@amd.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will.deacon@arm.com>,
-        linux-crypto@vger.kernel.org,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        LKML <linux-kernel@vger.kernel.org>
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 8bit
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        gary.hook@amd.com, Brijesh Singh <brijesh.singh@amd.com>
+To: Thomas Backlund <tmb@mageia.org>, linux-crypto@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAKv+Gu-xAmadr96vwStOxdeqi=rCEBrn8V6GofexBhpmA=JiuA@mail.gmail.com>
+In-Reply-To: <1e514ed4-a2e1-32ec-4ec8-64134b2fdb9e@amd.com>
+Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Aug 21, 2018 at 5:23 AM Ard Biesheuvel
-<ard.biesheuvel@linaro.org> wrote:
->
-> Hi Nick,
->
-> On 21 August 2018 at 00:40, Nick Desaulniers <ndesaulniers@google.com> wrote:
-> > It seems that:
-> > ldr q8, =0x30000000200000001
-> >
-> > is a GNU as convience notation for:
-> > ldr q8, .Lconstant
-> > .Lconstant
-> > .word 0x00000001
-> > .word 0x00000002
-> > .word 0x00000003
-> > .word 0x00000000
-> >
-> > based on this comment in binutils' source [0]. I've asked for this
-> > non-standard convience notation to be added to other assemblers [1], but
-> > until then, we can remove it and get equivalent disassembly:
-> >
->
-> What do you mean by 'non-standard convenience notation'? Which asm
-> 'standard' does Clang actually claim to implement?
+On 8/10/2018 9:11 AM, Tom Lendacky wrote:
+> On 8/10/2018 2:03 AM, Thomas Backlund wrote:
+>> Hi,
+>>
+>> this is tested on kernel 4.17.14
+>>
+>> hw:
+>>
+>> MSI X399 GAMING PRO CARBON AC (MS-7B09) bios 1.A0
+>>
+>> AMD Ryzen Threadripper 1950X
+>>
+>>
+>> Disabling psp in bios gets this in the logs:
+> 
+> Hmm, I'm not familiar with that BIOS option so I'm not exactly sure what
+> it is doing under the covers.  Having said that, it would seem that a
+> register read is indicating that SEV is supported when it is not on this
+> platform.  Maybe the register read is returning all 1s, (i.e. 0xffffffff).
 
-Well, for assembly 'standard' is a bit nebulous.  But it's frustrating
-when you can't find what the `=0x...` notation means in either the ARM
-or GNU as manuals.  The source of truth happened to be a comment in
-the source [0] that explained that this was a "programmer friendly
-notation."  Sure, if you can find it.
+The register read was returning all 1s.  The issue was reported to the
+BIOS team and a fix is in process, but that may take some time to move
+through all the vendors.  So in the meantime, see the next comment below.
 
->
-> This 'GCC/binutils is broken and we are reluctant to subvert Clang'
-> attitude is getting a bit old tbh. In the future, could you please
-> mention clang explicitly in the patch subject so it is obvious what
-> the purpose of the patch is? I think we should accommodate Clang in
-> Linux, but the attitude has got to go.
+> 
+> You can work around this by blacklisting the ccp driver module for now.
+> In the mean time, we'll try to understand what is occurring here and
+> provide a fix if we can.
 
-'Reluctant?' Please assume good faith; I filed the bug/noticed
-yesterday [1]. And I'm in favor of supporting the shorthand.  That's
-not my argument at all; Strawman.
+A patch has been submitted which adds a command timeout and should also
+resolve this issue.  Please see:
+  https://marc.info/?l=linux-crypto-vger&m=153436754612783&w=2
 
->
->
-> > before:
-> > 00000000000009d4 <neon_aes_ctr_encrypt>:
-> > ...
-> >      a48:       9c000ac8        ldr     q8, ba0 <neon_aes_ctr_encrypt+0x1cc>
-> > ...
-> >      ba0:       00000001        .word   0x00000001
-> >      ba4:       00000002        .word   0x00000002
-> >      ba8:       00000003        .word   0x00000003
-> >      bac:       00000000        .word   0x00000000
-> >
-> > after:
-> >
-> > 00000000000009d4 <neon_aes_ctr_encrypt>:
-> > ...
-> >      a48:       9c000aa8        ldr     q8, b9c <neon_aes_ctr_encrypt+0x1c8>
-> > ...
-> >      b9c:       00000001        .word   0x00000001
-> >      ba0:       00000002        .word   0x00000002
-> >      ba4:       00000003        .word   0x00000003
-> >      ba8:       00000000        .word   0x00000000
-> >
-> > [0] https://sourceware.org/git/gitweb.cgi?p=binutils-gdb.git;a=blob;f=gas/testsuite/gas/aarch64/programmer-friendly.s;h=6254c6476efdc848648b05068be0574e7addc85d;hb=HEAD#l11
-> > [1] https://bugs.llvm.org/show_bug.cgi?id=38642
-> >
-> > Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
-> > ---
-> >  arch/arm64/crypto/aes-modes.S | 8 +++++++-
-> >  1 file changed, 7 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/arch/arm64/crypto/aes-modes.S b/arch/arm64/crypto/aes-modes.S
-> > index 483a7130cf0e..9288c5b0eca2 100644
-> > --- a/arch/arm64/crypto/aes-modes.S
-> > +++ b/arch/arm64/crypto/aes-modes.S
-> > @@ -232,7 +232,7 @@ AES_ENTRY(aes_ctr_encrypt)
-> >         bmi             .Lctr1x
-> >         cmn             w6, #4                  /* 32 bit overflow? */
-> >         bcs             .Lctr1x
-> > -       ldr             q8, =0x30000000200000001        /* addends 1,2,3[,0] */
-> > +       ldr             q8, .Laddends /* addends 1,2,3[,0] */
-> >         dup             v7.4s, w6
-> >         mov             v0.16b, v4.16b
-> >         add             v7.4s, v7.4s, v8.4s
-> > @@ -295,6 +295,12 @@ AES_ENTRY(aes_ctr_encrypt)
-> >         rev             x7, x7
-> >         ins             v4.d[0], x7
-> >         b               .Lctrcarrydone
-> > +
-> > +.Laddends:
-> > +       .word   0x00000001
-> > +       .word   0x00000002
-> > +       .word   0x00000003
-> > +       .word   0x00000000
->
+This patch is not yet accepted and needs adjusting when being applied to
+an older kernel (4.16 - 4.18).  Once accepted, versions of the patch will
+be submitted to stable.
 
-
-> As Will points out, this breaks BE builds.
-
-Looks like -EB and -EL are the flags for me to test with in GNU as
-(looks like a few different flags for this).  Is there a target triple
-ABI for BE?  I'll ask around here too, and post my findings.
-
->
-> >  AES_ENDPROC(aes_ctr_encrypt)
-> >         .ltorg
->
-> You can drop this .ltorg if you get rid of all =xxx instances.
->
-> Actually, though, I would prefer it if we could use some clever short
-> sequence of movi+add instructions, and get rid of the literal
-> altogether. Or otherwise, please use something like
->
-> ldr_l q8, .Laddends, <temp register>
->
-> instead, and move the literal into the .rodata section (and use .octa
-> so you don't break BE)
-
-Ah, .octa, neat.  Ok, I'll take a look for v2.
-
--- 
 Thanks,
-~Nick Desaulniers
+Tom
+
+> 
+> Thanks,
+> Tom
+> 
+>>
+>>
+>> [  246.748978] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables
+>> this message.
+>> [  246.748978] systemd-udevd   D    0   724    716 0x80000124
+>> [  246.748980] Call Trace:
+>> [  246.748986]  ? __schedule+0x234/0x840
+>> [  246.748988]  schedule+0x28/0x80
+>> [  246.748993]  __sev_do_cmd_locked+0x1f0/0x270 [ccp]
+>> [  246.748996]  ? wait_woken+0x80/0x80
+>> [  246.748997]  ? 0xffffffffc0683000
+>> [  246.749001]  __sev_platform_init_locked+0x2f/0x80 [ccp]
+>> [  246.749001]  ? mutex_lock+0xe/0x30
+>> [  246.749004]  sev_platform_init+0x1d/0x30 [ccp]
+>> [  246.749007]  psp_pci_init+0x40/0xe0 [ccp]
+>> [  246.749008]  ? 0xffffffffc0683000
+>> [  246.749011]  sp_mod_init+0x16/0x1000 [ccp]
+>> [  246.749012]  do_one_initcall+0x46/0x1c3
+>> [  246.749014]  ? _cond_resched+0x15/0x30
+>> [  246.749017]  ? kmem_cache_alloc_trace+0x3a/0x170
+>> [  246.749019]  do_init_module+0x5a/0x210
+>> [  246.749020]  load_module+0x215b/0x2530
+>> [  246.749021]  ? kmem_cache_alloc_node_trace+0x45/0x190
+>> [  246.749024]  ? vmap_page_range_noflush+0x24d/0x320
+>> [  246.749026]  ? __do_sys_init_module+0x136/0x180
+>> [  246.749026]  ? _cond_resched+0x15/0x30
+>> [  246.749027]  __do_sys_init_module+0x136/0x180
+>> [  246.749029]  do_syscall_64+0x55/0x100
+>> [  246.749031]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
+>> [  246.749032] RIP: 0033:0x7ffb1a09018a
+>> [  246.749033] RSP: 002b:00007ffe196680c8 EFLAGS: 00000246 ORIG_RAX:
+>> 00000000000000af
+>> [  246.749034] RAX: ffffffffffffffda RBX: 00005562bb20d080 RCX:
+>> 00007ffb1a09018a
+>> [  246.749034] RDX: 00007ffb1994e6f8 RSI: 0000000000029e50 RDI:
+>> 00005562bba5e710
+>> [  246.749035] RBP: 00007ffb1994e6f8 R08: 0000000000000004 R09:
+>> 0000000000000000
+>> [  246.749035] R10: 0000000000000005 R11: 0000000000000246 R12:
+>> 00005562bba5e710
+>> [  246.749036] R13: 0000000000020000 R14: 00005562bb1fde70 R15:
+>> 00005562bb20d080
+>>
+>>
+>> Should it not detect that its disabled and bail out ?
+>>
+>> -- 
+>>
+>> Thomas
+>>
+>>
