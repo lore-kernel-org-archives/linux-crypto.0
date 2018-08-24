@@ -1,49 +1,81 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Deadlock when using crypto API for block devices
-Date: Fri, 24 Aug 2018 21:22:31 +0800
-Message-ID: <20180824132231.t3narmsfcykseeee@gondor.apana.org.au>
-References: <alpine.LRH.2.02.1808231621220.8560@file01.intranet.prod.int.rdu2.redhat.com>
- <20180824021010.hfar7gasp34ddrib@gondor.apana.org.au>
- <alpine.LRH.2.02.1808240659320.27014@file01.intranet.prod.int.rdu2.redhat.com>
- <20180824112435.ggizlqrymuibm6oo@gondor.apana.org.au>
- <alpine.LRH.2.02.1808240837120.11243@file01.intranet.prod.int.rdu2.redhat.com>
- <alpine.LRH.2.02.1808240854010.15479@file01.intranet.prod.int.rdu2.redhat.com>
- <20180824132145.2zsnqwbih3iygeeq@gondor.apana.org.au>
+From: Jeffrey Lien <Jeff.Lien@wdc.com>
+Subject: RE: [PATCH] Performance Improvement in CRC16 Calculations.
+Date: Fri, 24 Aug 2018 15:32:52 +0000
+Message-ID: <SN1PR04MB18241CBDC8E4CA5275EE4424EA360@SN1PR04MB1824.namprd04.prod.outlook.com>
+References: <1533928331-21303-1-git-send-email-jeff.lien@wdc.com>
+ <yq1in4gq5jf.fsf@oracle.com> <yq1lg8zb2lp.fsf@oracle.com>
+ <20180822062016.GA10356@infradead.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, Mike Snitzer <msnitzer@redhat.com>,
-        dm-devel@redhat.com, linux-kernel@vger.kernel.org,
-        Dave Watson <davejwatson@fb.com>
-To: Mikulas Patocka <mpatocka@redhat.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "tim.c.chen@linux.intel.com" <tim.c.chen@linux.intel.com>,
+        David Darrington <david.darrington@wdc.com>,
+        Jeff Furlong <jeff.furlong@wdc.com>
+To: Christoph Hellwig <hch@infradead.org>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20180824132145.2zsnqwbih3iygeeq@gondor.apana.org.au>
+In-Reply-To: <20180822062016.GA10356@infradead.org>
+Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Aug 24, 2018 at 09:21:45PM +0800, Herbert Xu wrote:
-> On Fri, Aug 24, 2018 at 09:00:00AM -0400, Mikulas Patocka wrote:
-> >
-> > BTW. gcmaes_crypt_by_sg also contains GFP_ATOMIC and -ENOMEM, behind a 
-> > pretty complex condition. Do you mean that this condition is part of the 
-> > contract that the crypto API provides?
-> 
-> This is an implementation defect.  I think for this case we should
-> fall back to software GCM if the accelerated version fails.
-> 
-> > Should "req->src->offset + req->src->length < PAGE_SIZE" use "<=" instead? 
-> > Because if the data ends up at page boundary, it will use the atomic 
-> > allocation that can fail.
-> 
-> This condition does look strange.  It's introduced by the commit
-> e845520707f85c539ce04bb73c6070e9441480be.   Dave, what exactly is
-> it meant to do?
+I rebuilt my 4.18 kernel with CONFIG_CRYPTO_CRCT10DIF_PCLMUL=3Dy as Martin =
+recommended and got even better performance results vs the CRC Slice by 16 =
+changes.  Here's a summary of the results
 
-I forgot to Cc Dave Watson.
+FIO Sequential Write, 64K Block Size, Queue Depth 64
+PCLMUL =3D y Kernel:        bw =3D 2237 MiB/s
+Slice by 16 CRC Calc:      bw =3D 1964 MiB/s
+Base Kernel:                     bw =3D   357 MiB/s
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+FIO Sequential Read, 64K Block Size, Queue Depth 64
+PCLMUL =3D y Kernel:        bw =3D 3839 MiB/s
+Slice by 16 CRC Calc:      bw =3D 2730  MiB/s
+Base Kernel:                     bw =3D   797 MiB/s
+
+So it seems the CONFIG_CRYPTO_CRCT10DIF_PCLMUL=3Dy provides the best perfor=
+mance.  Are there any negative side effect to this config option?   If not,=
+ does it make sense to recommend all the major distro's change their config=
+ options to have CONFIG_CRYPTO_CRCT10DIF_PCLMUL=3Dy as the default option? =
+=20
+
+
+Jeff Lien
+
+
+-----Original Message-----
+From: Christoph Hellwig [mailto:hch@infradead.org]=20
+Sent: Wednesday, August 22, 2018 1:20 AM
+To: Martin K. Petersen <martin.petersen@oracle.com>
+Cc: Jeffrey Lien <Jeff.Lien@wdc.com>; linux-kernel@vger.kernel.org; linux-c=
+rypto@vger.kernel.org; linux-block@vger.kernel.org; linux-scsi@vger.kernel.=
+org; herbert@gondor.apana.org.au; tim.c.chen@linux.intel.com; David Darring=
+ton <david.darrington@wdc.com>; Jeff Furlong <jeff.furlong@wdc.com>
+Subject: Re: [PATCH] Performance Improvement in CRC16 Calculations.
+
+On Tue, Aug 21, 2018 at 09:40:34PM -0400, Martin K. Petersen wrote:
+> When crc-t10dif is initialized, the crypto infrastructure will pick=20
+> the algorithm with the highest priority currently registered. Both=20
+> block and SCSI will cause crc-t10dif to be compiled as a built-in so=20
+> this selection happens very early.
+
+Ouch.  This might actually happen in a lot of other users of the crypto fun=
+ctionality as well.
+
+> However, it seems like a bit of a deficiency in crypto that there is=20
+> no way to upgrade existing transformations if higher priority=20
+> algorithms become available. btrfs and a few others work around this=20
+> issue by not using the generic lib/ CRC functions (which defeats the=20
+> purpose of having these in the first place). Instead they are=20
+> registering their own transformation at a later time where any=20
+> accelerator modules are more likely to be loaded.
+
+If we can't fix this in crypto (which doesn't seem that easy), we should at=
+ least clearly document the issue somewhere, and fix this in the t10pi code=
+ by initializing crct10dif_tfm in a lazy fashion only once the fist block d=
+evice starts using it.
