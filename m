@@ -1,808 +1,291 @@
 From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: [PATCH v2 13/17] zinc: BLAKE2s x86_64 implementation
-Date: Fri, 24 Aug 2018 15:38:45 -0600
-Message-ID: <20180824213849.23647-14-Jason@zx2c4.com>
+Subject: [PATCH v2 03/17] zinc: ChaCha20 generic C implementation
+Date: Fri, 24 Aug 2018 15:38:35 -0600
+Message-ID: <20180824213849.23647-4-Jason@zx2c4.com>
 References: <20180824213849.23647-1-Jason@zx2c4.com>
 Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
         Andy Lutomirski <luto@kernel.org>,
         Greg KH <gregkh@linuxfoundation.org>,
         Samuel Neves <sneves@dei.uc.pt>,
         Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, x86@kernel.org,
         linux-crypto@vger.kernel.org
 To: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
         davem@davemloft.net
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <netdev-owner@vger.kernel.org>
 In-Reply-To: <20180824213849.23647-1-Jason@zx2c4.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Sender: netdev-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-These implementations from Samuel Neves support AVX and AVX-512VL.
-Originally this used AVX-512F, but Skylake thermal throttling made
-AVX-512VL more attractive and possible to do with negligable difference.
+This implements the ChaCha20 permutation as a single C statement, by way
+of the comma operator, which the compiler is able to simplify
+terrifically.
+
+Information: https://cr.yp.to/chacha.html
 
 Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
 Cc: Andy Lutomirski <luto@kernel.org>
 Cc: Greg KH <gregkh@linuxfoundation.org>
 Cc: Samuel Neves <sneves@dei.uc.pt>
 Cc: Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: Ingo Molnar <mingo@redhat.com>
-Cc: x86@kernel.org
 Cc: linux-crypto@vger.kernel.org
 ---
- lib/zinc/Makefile                      |   4 +
- lib/zinc/blake2s/blake2s-x86_64-glue.h |  53 ++
- lib/zinc/blake2s/blake2s-x86_64.S      | 685 +++++++++++++++++++++++++
- 3 files changed, 742 insertions(+)
- create mode 100644 lib/zinc/blake2s/blake2s-x86_64-glue.h
- create mode 100644 lib/zinc/blake2s/blake2s-x86_64.S
+ include/zinc/chacha20.h      |  47 ++++++++++++
+ lib/zinc/Kconfig             |   4 +
+ lib/zinc/Makefile            |   4 +
+ lib/zinc/chacha20/chacha20.c | 137 +++++++++++++++++++++++++++++++++++
+ lib/zinc/main.c              |   5 ++
+ 5 files changed, 197 insertions(+)
+ create mode 100644 include/zinc/chacha20.h
+ create mode 100644 lib/zinc/chacha20/chacha20.c
 
+diff --git a/include/zinc/chacha20.h b/include/zinc/chacha20.h
+new file mode 100644
+index 000000000000..ba50a2424ad0
+--- /dev/null
++++ b/include/zinc/chacha20.h
+@@ -0,0 +1,47 @@
++/* SPDX-License-Identifier: GPL-2.0
++ *
++ * Copyright (C) 2015-2018 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
++ */
++
++#ifndef _ZINC_CHACHA20_H
++#define _ZINC_CHACHA20_H
++
++#include <linux/simd.h>
++#include <linux/kernel.h>
++#include <linux/types.h>
++
++enum {
++	CHACHA20_IV_SIZE = 16,
++	CHACHA20_KEY_SIZE = 32,
++	CHACHA20_BLOCK_SIZE = 64,
++	HCHACHA20_KEY_SIZE = 32,
++	HCHACHA20_NONCE_SIZE = 16
++};
++
++struct chacha20_ctx {
++	u32 key[8];
++	u32 counter[4];
++} __aligned(32);
++
++void chacha20_fpu_init(void);
++
++static inline void chacha20_init(struct chacha20_ctx *state, const u8 key[CHACHA20_KEY_SIZE], const u64 nonce)
++{
++	__le32 *le_key = (__le32 *)key;
++	state->key[0] = le32_to_cpu(le_key[0]);
++	state->key[1] = le32_to_cpu(le_key[1]);
++	state->key[2] = le32_to_cpu(le_key[2]);
++	state->key[3] = le32_to_cpu(le_key[3]);
++	state->key[4] = le32_to_cpu(le_key[4]);
++	state->key[5] = le32_to_cpu(le_key[5]);
++	state->key[6] = le32_to_cpu(le_key[6]);
++	state->key[7] = le32_to_cpu(le_key[7]);
++	state->counter[0] = state->counter[1] = 0;
++	state->counter[2] = nonce & U32_MAX;
++	state->counter[3] = nonce >> 32;
++}
++void chacha20(struct chacha20_ctx *state, u8 *dst, const u8 *src, u32 len, simd_context_t simd_context);
++
++void hchacha20(u8 derived_key[CHACHA20_KEY_SIZE], const u8 nonce[HCHACHA20_NONCE_SIZE], const u8 key[HCHACHA20_KEY_SIZE], simd_context_t simd_context);
++
++#endif /* _ZINC_CHACHA20_H */
+diff --git a/lib/zinc/Kconfig b/lib/zinc/Kconfig
+index aa4f8d449d6b..5311a0d6ba8b 100644
+--- a/lib/zinc/Kconfig
++++ b/lib/zinc/Kconfig
+@@ -6,6 +6,10 @@ config ZINC
+ 	select NEON
+ 	select KERNEL_MODE_NEON
+ 
++config ZINC_CHACHA20
++	bool
++	select ZINC
++
+ config ZINC_DEBUG
+ 	bool "Zinc cryptography library debugging and self-tests"
+ 	depends on ZINC
 diff --git a/lib/zinc/Makefile b/lib/zinc/Makefile
-index 663cf6bc382d..e252eea24844 100644
+index 8e30115217db..6ec77feb4ab7 100644
 --- a/lib/zinc/Makefile
 +++ b/lib/zinc/Makefile
-@@ -52,6 +52,10 @@ endif
+@@ -2,6 +2,10 @@ ccflags-y := -O3
+ ccflags-y += -Wframe-larger-than=8192
+ ccflags-y += -D'pr_fmt(fmt)=KBUILD_MODNAME ": " fmt'
  
- ifeq ($(CONFIG_ZINC_BLAKE2S),y)
- zinc-y += blake2s/blake2s.o
-+ifeq ($(CONFIG_X86_64),y)
-+zinc-y += blake2s/blake2s-x86_64.o
-+CFLAGS_blake2s.o += -include $(srctree)/$(src)/blake2s/blake2s-x86_64-glue.h
++ifeq ($(CONFIG_ZINC_CHACHA20),y)
++zinc-y += chacha20/chacha20.o
 +endif
- endif
- 
++
  zinc-y += main.o
-diff --git a/lib/zinc/blake2s/blake2s-x86_64-glue.h b/lib/zinc/blake2s/blake2s-x86_64-glue.h
+ 
+ obj-$(CONFIG_ZINC) := zinc.o
+diff --git a/lib/zinc/chacha20/chacha20.c b/lib/zinc/chacha20/chacha20.c
 new file mode 100644
-index 000000000000..080518643588
+index 000000000000..29c487375ccd
 --- /dev/null
-+++ b/lib/zinc/blake2s/blake2s-x86_64-glue.h
-@@ -0,0 +1,53 @@
++++ b/lib/zinc/chacha20/chacha20.c
+@@ -0,0 +1,137 @@
 +/* SPDX-License-Identifier: GPL-2.0
 + *
 + * Copyright (C) 2015-2018 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
 + */
 +
-+#include <zinc/blake2s.h>
-+#include <asm/cpufeature.h>
-+#include <asm/processor.h>
-+#include <asm/fpu/api.h>
-+#include <asm/simd.h>
++#include <zinc/chacha20.h>
 +
-+#ifdef CONFIG_AS_AVX
-+asmlinkage void blake2s_compress_avx(struct blake2s_state *state, const u8 *block, const size_t nblocks, const u32 inc);
-+#endif
-+#ifdef CONFIG_AS_AVX512
-+asmlinkage void blake2s_compress_avx512(struct blake2s_state *state, const u8 *block, const size_t nblocks, const u32 inc);
++#include <linux/kernel.h>
++#include <crypto/algapi.h>
++
++#ifndef HAVE_CHACHA20_ARCH_IMPLEMENTATION
++void __init chacha20_fpu_init(void) { }
++static inline bool chacha20_arch(u8 *out, const u8 *in, const size_t len, const u32 key[8], const u32 counter[4], simd_context_t simd_context) { return false; }
++static inline bool hchacha20_arch(u8 *derived_key, const u8 *nonce, const u8 *key, simd_context_t simd_context) { return false; }
 +#endif
 +
-+static bool blake2s_use_avx __ro_after_init;
-+static bool blake2s_use_avx512 __ro_after_init;
++#define EXPAND_32_BYTE_K 0x61707865U, 0x3320646eU, 0x79622d32U, 0x6b206574U
 +
-+void __init blake2s_fpu_init(void)
++#define QUARTER_ROUND(x, a, b, c, d) ( \
++	x[a] += x[b], \
++	x[d] = rol32((x[d] ^ x[a]), 16), \
++	x[c] += x[d], \
++	x[b] = rol32((x[b] ^ x[c]), 12), \
++	x[a] += x[b], \
++	x[d] = rol32((x[d] ^ x[a]), 8), \
++	x[c] += x[d], \
++	x[b] = rol32((x[b] ^ x[c]), 7) \
++)
++
++#define C(i, j) (i * 4 + j)
++
++#define DOUBLE_ROUND(x) ( \
++	/* Column Round */ \
++	QUARTER_ROUND(x, C(0, 0), C(1, 0), C(2, 0), C(3, 0)), \
++	QUARTER_ROUND(x, C(0, 1), C(1, 1), C(2, 1), C(3, 1)), \
++	QUARTER_ROUND(x, C(0, 2), C(1, 2), C(2, 2), C(3, 2)), \
++	QUARTER_ROUND(x, C(0, 3), C(1, 3), C(2, 3), C(3, 3)), \
++	/* Diagonal Round */ \
++	QUARTER_ROUND(x, C(0, 0), C(1, 1), C(2, 2), C(3, 3)), \
++	QUARTER_ROUND(x, C(0, 1), C(1, 2), C(2, 3), C(3, 0)), \
++	QUARTER_ROUND(x, C(0, 2), C(1, 3), C(2, 0), C(3, 1)), \
++	QUARTER_ROUND(x, C(0, 3), C(1, 0), C(2, 1), C(3, 2)) \
++)
++
++#define TWENTY_ROUNDS(x) ( \
++	DOUBLE_ROUND(x), \
++	DOUBLE_ROUND(x), \
++	DOUBLE_ROUND(x), \
++	DOUBLE_ROUND(x), \
++	DOUBLE_ROUND(x), \
++	DOUBLE_ROUND(x), \
++	DOUBLE_ROUND(x), \
++	DOUBLE_ROUND(x), \
++	DOUBLE_ROUND(x), \
++	DOUBLE_ROUND(x) \
++)
++
++static void chacha20_block_generic(__le32 *stream, u32 *state)
 +{
-+#ifndef CONFIG_UML
-+	blake2s_use_avx = boot_cpu_has(X86_FEATURE_AVX) && cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM, NULL);
-+	blake2s_use_avx512 = boot_cpu_has(X86_FEATURE_AVX) && boot_cpu_has(X86_FEATURE_AVX2) &&
-+			     boot_cpu_has(X86_FEATURE_AVX512F) && boot_cpu_has(X86_FEATURE_AVX512VL) &&
-+			     cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM | XFEATURE_MASK_AVX512, NULL);
-+#endif
++	u32 x[CHACHA20_BLOCK_SIZE / sizeof(u32)];
++	int i;
++
++	for (i = 0; i < ARRAY_SIZE(x); ++i)
++		x[i] = state[i];
++
++	TWENTY_ROUNDS(x);
++
++	for (i = 0; i < ARRAY_SIZE(x); ++i)
++		stream[i] = cpu_to_le32(x[i] + state[i]);
++
++	++state[12];
 +}
 +
-+static inline bool blake2s_arch(struct blake2s_state *state, const u8 *block, size_t nblocks, const u32 inc)
++static void chacha20_generic(u8 *out, const u8 *in, u32 len, const u32 key[8], const u32 counter[4])
 +{
-+#ifdef CONFIG_AS_AVX512
-+	if (blake2s_use_avx512 && irq_fpu_usable()) {
-+		kernel_fpu_begin();
-+		blake2s_compress_avx512(state, block, nblocks, inc);
-+		kernel_fpu_end();
-+		return true;
++	__le32 buf[CHACHA20_BLOCK_SIZE / sizeof(__le32)];
++	u32 x[] = {
++		EXPAND_32_BYTE_K,
++		key[0], key[1], key[2], key[3],
++		key[4], key[5], key[6], key[7],
++		counter[0], counter[1], counter[2], counter[3]
++	};
++
++	if (out != in)
++		memmove(out, in, len);
++
++	while (len >= CHACHA20_BLOCK_SIZE) {
++		chacha20_block_generic(buf, x);
++		crypto_xor(out, (u8 *)buf, CHACHA20_BLOCK_SIZE);
++		len -= CHACHA20_BLOCK_SIZE;
++		out += CHACHA20_BLOCK_SIZE;
 +	}
-+#endif
-+#ifdef CONFIG_AS_AVX
-+	if (blake2s_use_avx && irq_fpu_usable()) {
-+		kernel_fpu_begin();
-+		blake2s_compress_avx(state, block, nblocks, inc);
-+		kernel_fpu_end();
-+		return true;
++	if (len) {
++		chacha20_block_generic(buf, x);
++		crypto_xor(out, (u8 *)buf, len);
 +	}
-+#endif
-+	return false;
 +}
 +
-+#define HAVE_BLAKE2S_ARCH_IMPLEMENTATION
-diff --git a/lib/zinc/blake2s/blake2s-x86_64.S b/lib/zinc/blake2s/blake2s-x86_64.S
-new file mode 100644
-index 000000000000..ee683e45a6c4
---- /dev/null
-+++ b/lib/zinc/blake2s/blake2s-x86_64.S
-@@ -0,0 +1,685 @@
-+/* SPDX-License-Identifier: GPL-2.0
-+ *
-+ * Copyright (C) 2015-2018 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
-+ * Copyright (C) 2017 Samuel Neves <sneves@dei.uc.pt>. All Rights Reserved.
++void chacha20(struct chacha20_ctx *state, u8 *dst, const u8 *src, u32 len, simd_context_t simd_context)
++{
++	if (!chacha20_arch(dst, src, len, state->key, state->counter, simd_context))
++		chacha20_generic(dst, src, len, state->key, state->counter);
++	state->counter[0] += (len + 63) / 64;
++}
++EXPORT_SYMBOL(chacha20);
++
++static void hchacha20_generic(u8 derived_key[CHACHA20_KEY_SIZE], const u8 nonce[HCHACHA20_NONCE_SIZE], const u8 key[HCHACHA20_KEY_SIZE])
++{
++	__le32 *out = (__force __le32 *)derived_key;
++	u32 x[] = {
++		EXPAND_32_BYTE_K,
++		le32_to_cpup((__le32 *)(key + 0)), le32_to_cpup((__le32 *)(key + 4)), le32_to_cpup((__le32 *)(key + 8)), le32_to_cpup((__le32 *)(key + 12)),
++		le32_to_cpup((__le32 *)(key + 16)), le32_to_cpup((__le32 *)(key + 20)), le32_to_cpup((__le32 *)(key + 24)), le32_to_cpup((__le32 *)(key + 28)),
++		le32_to_cpup((__le32 *)(nonce + 0)), le32_to_cpup((__le32 *)(nonce + 4)), le32_to_cpup((__le32 *)(nonce +  8)), le32_to_cpup((__le32 *)(nonce + 12))
++	};
++
++	TWENTY_ROUNDS(x);
++
++	out[0] = cpu_to_le32(x[0]);
++	out[1] = cpu_to_le32(x[1]);
++	out[2] = cpu_to_le32(x[2]);
++	out[3] = cpu_to_le32(x[3]);
++	out[4] = cpu_to_le32(x[12]);
++	out[5] = cpu_to_le32(x[13]);
++	out[6] = cpu_to_le32(x[14]);
++	out[7] = cpu_to_le32(x[15]);
++}
++
++void hchacha20(u8 derived_key[CHACHA20_KEY_SIZE], const u8 nonce[HCHACHA20_NONCE_SIZE], const u8 key[HCHACHA20_KEY_SIZE], simd_context_t simd_context)
++{
++	if (!hchacha20_arch(derived_key, nonce, key, simd_context))
++		hchacha20_generic(derived_key, nonce, key);
++}
++/* Deliberately not EXPORT_SYMBOL'd, since there are few reasons why somebody
++ * should be using this directly, rather than via xchacha20. Revisit only in
++ * the unlikely event that somebody has a good reason to export this.
 + */
+diff --git a/lib/zinc/main.c b/lib/zinc/main.c
+index 590872563955..79b85045f22f 100644
+--- a/lib/zinc/main.c
++++ b/lib/zinc/main.c
+@@ -3,6 +3,8 @@
+  * Copyright (C) 2015-2018 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
+  */
+ 
++#include <zinc/chacha20.h>
 +
-+#include <linux/linkage.h>
-+
-+.section .rodata.cst32.BLAKE2S_IV, "aM", @progbits, 32
-+.align 32
-+IV:	.octa 0xA54FF53A3C6EF372BB67AE856A09E667
-+	.octa 0x5BE0CD191F83D9AB9B05688C510E527F
-+.section .rodata.cst16.ROT16, "aM", @progbits, 16
-+.align 16
-+ROT16:	.octa 0x0D0C0F0E09080B0A0504070601000302
-+.section .rodata.cst16.ROR328, "aM", @progbits, 16
-+.align 16
-+ROR328:	.octa 0x0C0F0E0D080B0A090407060500030201
-+#ifdef CONFIG_AS_AVX512
-+.section .rodata.cst64.BLAKE2S_SIGMA, "aM", @progbits, 640
-+.align 64
-+SIGMA:
-+.long 0, 2, 4, 6, 1, 3, 5, 7, 8, 10, 12, 14, 9, 11, 13, 15
-+.long 11, 2, 12, 14, 9, 8, 15, 3, 4, 0, 13, 6, 10, 1, 7, 5
-+.long 10, 12, 11, 6, 5, 9, 13, 3, 4, 15, 14, 2, 0, 7, 8, 1
-+.long 10, 9, 7, 0, 11, 14, 1, 12, 6, 2, 15, 3, 13, 8, 5, 4
-+.long 4, 9, 8, 13, 14, 0, 10, 11, 7, 3, 12, 1, 5, 6, 15, 2
-+.long 2, 10, 4, 14, 13, 3, 9, 11, 6, 5, 7, 12, 15, 1, 8, 0
-+.long 4, 11, 14, 8, 13, 10, 12, 5, 2, 1, 15, 3, 9, 7, 0, 6
-+.long 6, 12, 0, 13, 15, 2, 1, 10, 4, 5, 11, 14, 8, 3, 9, 7
-+.long 14, 5, 4, 12, 9, 7, 3, 10, 2, 0, 6, 15, 11, 1, 13, 8
-+.long 11, 7, 13, 10, 12, 14, 0, 15, 4, 5, 6, 9, 2, 1, 8, 3
-+#endif /* CONFIG_AS_AVX512 */
-+
-+.text
-+#ifdef CONFIG_AS_AVX
-+ENTRY(blake2s_compress_avx)
-+	movl		%ecx, %ecx
-+	testq		%rdx, %rdx
-+	je .Lendofloop
-+	.align 32
-+.Lbeginofloop:
-+	addq		%rcx, 32(%rdi)
-+	vmovdqu		IV+16(%rip), %xmm1
-+	vmovdqu		(%rsi), %xmm4
-+	vpxor		32(%rdi), %xmm1, %xmm1
-+	vmovdqu		16(%rsi), %xmm3
-+	vshufps		$136, %xmm3, %xmm4, %xmm6
-+	vmovdqa		ROT16(%rip), %xmm7
-+	vpaddd		(%rdi), %xmm6, %xmm6
-+	vpaddd		16(%rdi), %xmm6, %xmm6
-+	vpxor		%xmm6, %xmm1, %xmm1
-+	vmovdqu		IV(%rip), %xmm8
-+	vpshufb		%xmm7, %xmm1, %xmm1
-+	vmovdqu		48(%rsi), %xmm5
-+	vpaddd		%xmm1, %xmm8, %xmm8
-+	vpxor		16(%rdi), %xmm8, %xmm9
-+	vmovdqu		32(%rsi), %xmm2
-+	vpblendw	$12, %xmm3, %xmm5, %xmm13
-+	vshufps		$221, %xmm5, %xmm2, %xmm12
-+	vpunpckhqdq	%xmm2, %xmm4, %xmm14
-+	vpslld		$20, %xmm9, %xmm0
-+	vpsrld		$12, %xmm9, %xmm9
-+	vpxor		%xmm0, %xmm9, %xmm0
-+	vshufps		$221, %xmm3, %xmm4, %xmm9
-+	vpaddd		%xmm9, %xmm6, %xmm9
-+	vpaddd		%xmm0, %xmm9, %xmm9
-+	vpxor		%xmm9, %xmm1, %xmm1
-+	vmovdqa		ROR328(%rip), %xmm6
-+	vpshufb		%xmm6, %xmm1, %xmm1
-+	vpaddd		%xmm1, %xmm8, %xmm8
-+	vpxor		%xmm8, %xmm0, %xmm0
-+	vpshufd		$147, %xmm1, %xmm1
-+	vpshufd		$78, %xmm8, %xmm8
-+	vpslld		$25, %xmm0, %xmm10
-+	vpsrld		$7, %xmm0, %xmm0
-+	vpxor		%xmm10, %xmm0, %xmm0
-+	vshufps		$136, %xmm5, %xmm2, %xmm10
-+	vpshufd		$57, %xmm0, %xmm0
-+	vpaddd		%xmm10, %xmm9, %xmm9
-+	vpaddd		%xmm0, %xmm9, %xmm9
-+	vpxor		%xmm9, %xmm1, %xmm1
-+	vpaddd		%xmm12, %xmm9, %xmm9
-+	vpblendw	$12, %xmm2, %xmm3, %xmm12
-+	vpshufb		%xmm7, %xmm1, %xmm1
-+	vpaddd		%xmm1, %xmm8, %xmm8
-+	vpxor		%xmm8, %xmm0, %xmm10
-+	vpslld		$20, %xmm10, %xmm0
-+	vpsrld		$12, %xmm10, %xmm10
-+	vpxor		%xmm0, %xmm10, %xmm0
-+	vpaddd		%xmm0, %xmm9, %xmm9
-+	vpxor		%xmm9, %xmm1, %xmm1
-+	vpshufb		%xmm6, %xmm1, %xmm1
-+	vpaddd		%xmm1, %xmm8, %xmm8
-+	vpxor		%xmm8, %xmm0, %xmm0
-+	vpshufd		$57, %xmm1, %xmm1
-+	vpshufd		$78, %xmm8, %xmm8
-+	vpslld		$25, %xmm0, %xmm10
-+	vpsrld		$7, %xmm0, %xmm0
-+	vpxor		%xmm10, %xmm0, %xmm0
-+	vpslldq		$4, %xmm5, %xmm10
-+	vpblendw	$240, %xmm10, %xmm12, %xmm12
-+	vpshufd		$147, %xmm0, %xmm0
-+	vpshufd		$147, %xmm12, %xmm12
-+	vpaddd		%xmm9, %xmm12, %xmm12
-+	vpaddd		%xmm0, %xmm12, %xmm12
-+	vpxor		%xmm12, %xmm1, %xmm1
-+	vpshufb		%xmm7, %xmm1, %xmm1
-+	vpaddd		%xmm1, %xmm8, %xmm8
-+	vpxor		%xmm8, %xmm0, %xmm11
-+	vpslld		$20, %xmm11, %xmm9
-+	vpsrld		$12, %xmm11, %xmm11
-+	vpxor		%xmm9, %xmm11, %xmm0
-+	vpshufd		$8, %xmm2, %xmm9
-+	vpblendw	$192, %xmm5, %xmm3, %xmm11
-+	vpblendw	$240, %xmm11, %xmm9, %xmm9
-+	vpshufd		$177, %xmm9, %xmm9
-+	vpaddd		%xmm12, %xmm9, %xmm9
-+	vpaddd		%xmm0, %xmm9, %xmm11
-+	vpxor		%xmm11, %xmm1, %xmm1
-+	vpshufb		%xmm6, %xmm1, %xmm1
-+	vpaddd		%xmm1, %xmm8, %xmm8
-+	vpxor		%xmm8, %xmm0, %xmm9
-+	vpshufd		$147, %xmm1, %xmm1
-+	vpshufd		$78, %xmm8, %xmm8
-+	vpslld		$25, %xmm9, %xmm0
-+	vpsrld		$7, %xmm9, %xmm9
-+	vpxor		%xmm0, %xmm9, %xmm0
-+	vpslldq		$4, %xmm3, %xmm9
-+	vpblendw	$48, %xmm9, %xmm2, %xmm9
-+	vpblendw	$240, %xmm9, %xmm4, %xmm9
-+	vpshufd		$57, %xmm0, %xmm0
-+	vpshufd		$177, %xmm9, %xmm9
-+	vpaddd		%xmm11, %xmm9, %xmm9
-+	vpaddd		%xmm0, %xmm9, %xmm9
-+	vpxor		%xmm9, %xmm1, %xmm1
-+	vpshufb		%xmm7, %xmm1, %xmm1
-+	vpaddd		%xmm1, %xmm8, %xmm11
-+	vpxor		%xmm11, %xmm0, %xmm0
-+	vpslld		$20, %xmm0, %xmm8
-+	vpsrld		$12, %xmm0, %xmm0
-+	vpxor		%xmm8, %xmm0, %xmm0
-+	vpunpckhdq	%xmm3, %xmm4, %xmm8
-+	vpblendw	$12, %xmm10, %xmm8, %xmm12
-+	vpshufd		$177, %xmm12, %xmm12
-+	vpaddd		%xmm9, %xmm12, %xmm9
-+	vpaddd		%xmm0, %xmm9, %xmm9
-+	vpxor		%xmm9, %xmm1, %xmm1
-+	vpshufb		%xmm6, %xmm1, %xmm1
-+	vpaddd		%xmm1, %xmm11, %xmm11
-+	vpxor		%xmm11, %xmm0, %xmm0
-+	vpshufd		$57, %xmm1, %xmm1
-+	vpshufd		$78, %xmm11, %xmm11
-+	vpslld		$25, %xmm0, %xmm12
-+	vpsrld		$7, %xmm0, %xmm0
-+	vpxor		%xmm12, %xmm0, %xmm0
-+	vpunpckhdq	%xmm5, %xmm2, %xmm12
-+	vpshufd		$147, %xmm0, %xmm0
-+	vpblendw	$15, %xmm13, %xmm12, %xmm12
-+	vpslldq		$8, %xmm5, %xmm13
-+	vpshufd		$210, %xmm12, %xmm12
-+	vpaddd		%xmm9, %xmm12, %xmm9
-+	vpaddd		%xmm0, %xmm9, %xmm9
-+	vpxor		%xmm9, %xmm1, %xmm1
-+	vpshufb		%xmm7, %xmm1, %xmm1
-+	vpaddd		%xmm1, %xmm11, %xmm11
-+	vpxor		%xmm11, %xmm0, %xmm0
-+	vpslld		$20, %xmm0, %xmm12
-+	vpsrld		$12, %xmm0, %xmm0
-+	vpxor		%xmm12, %xmm0, %xmm0
-+	vpunpckldq	%xmm4, %xmm2, %xmm12
-+	vpblendw	$240, %xmm4, %xmm12, %xmm12
-+	vpblendw	$192, %xmm13, %xmm12, %xmm12
-+	vpsrldq		$12, %xmm3, %xmm13
-+	vpaddd		%xmm12, %xmm9, %xmm9
-+	vpaddd		%xmm0, %xmm9, %xmm9
-+	vpxor		%xmm9, %xmm1, %xmm1
-+	vpshufb		%xmm6, %xmm1, %xmm1
-+	vpaddd		%xmm1, %xmm11, %xmm11
-+	vpxor		%xmm11, %xmm0, %xmm0
-+	vpshufd		$147, %xmm1, %xmm1
-+	vpshufd		$78, %xmm11, %xmm11
-+	vpslld		$25, %xmm0, %xmm12
-+	vpsrld		$7, %xmm0, %xmm0
-+	vpxor		%xmm12, %xmm0, %xmm0
-+	vpblendw	$60, %xmm2, %xmm4, %xmm12
-+	vpblendw	$3, %xmm13, %xmm12, %xmm12
-+	vpshufd		$57, %xmm0, %xmm0
-+	vpshufd		$78, %xmm12, %xmm12
-+	vpaddd		%xmm9, %xmm12, %xmm9
-+	vpaddd		%xmm0, %xmm9, %xmm9
-+	vpxor		%xmm9, %xmm1, %xmm1
-+	vpshufb		%xmm7, %xmm1, %xmm1
-+	vpaddd		%xmm1, %xmm11, %xmm11
-+	vpxor		%xmm11, %xmm0, %xmm12
-+	vpslld		$20, %xmm12, %xmm13
-+	vpsrld		$12, %xmm12, %xmm0
-+	vpblendw	$51, %xmm3, %xmm4, %xmm12
-+	vpxor		%xmm13, %xmm0, %xmm0
-+	vpblendw	$192, %xmm10, %xmm12, %xmm10
-+	vpslldq		$8, %xmm2, %xmm12
-+	vpshufd		$27, %xmm10, %xmm10
-+	vpaddd		%xmm9, %xmm10, %xmm9
-+	vpaddd		%xmm0, %xmm9, %xmm9
-+	vpxor		%xmm9, %xmm1, %xmm1
-+	vpshufb		%xmm6, %xmm1, %xmm1
-+	vpaddd		%xmm1, %xmm11, %xmm11
-+	vpxor		%xmm11, %xmm0, %xmm0
-+	vpshufd		$57, %xmm1, %xmm1
-+	vpshufd		$78, %xmm11, %xmm11
-+	vpslld		$25, %xmm0, %xmm10
-+	vpsrld		$7, %xmm0, %xmm0
-+	vpxor		%xmm10, %xmm0, %xmm0
-+	vpunpckhdq	%xmm2, %xmm8, %xmm10
-+	vpshufd		$147, %xmm0, %xmm0
-+	vpblendw	$12, %xmm5, %xmm10, %xmm10
-+	vpshufd		$210, %xmm10, %xmm10
-+	vpaddd		%xmm9, %xmm10, %xmm9
-+	vpaddd		%xmm0, %xmm9, %xmm9
-+	vpxor		%xmm9, %xmm1, %xmm1
-+	vpshufb		%xmm7, %xmm1, %xmm1
-+	vpaddd		%xmm1, %xmm11, %xmm11
-+	vpxor		%xmm11, %xmm0, %xmm10
-+	vpslld		$20, %xmm10, %xmm0
-+	vpsrld		$12, %xmm10, %xmm10
-+	vpxor		%xmm0, %xmm10, %xmm0
-+	vpblendw	$12, %xmm4, %xmm5, %xmm10
-+	vpblendw	$192, %xmm12, %xmm10, %xmm10
-+	vpunpckldq	%xmm2, %xmm4, %xmm12
-+	vpshufd		$135, %xmm10, %xmm10
-+	vpaddd		%xmm9, %xmm10, %xmm9
-+	vpaddd		%xmm0, %xmm9, %xmm9
-+	vpxor		%xmm9, %xmm1, %xmm1
-+	vpshufb		%xmm6, %xmm1, %xmm1
-+	vpaddd		%xmm1, %xmm11, %xmm13
-+	vpxor		%xmm13, %xmm0, %xmm0
-+	vpshufd		$147, %xmm1, %xmm1
-+	vpshufd		$78, %xmm13, %xmm13
-+	vpslld		$25, %xmm0, %xmm10
-+	vpsrld		$7, %xmm0, %xmm0
-+	vpxor		%xmm10, %xmm0, %xmm0
-+	vpblendw	$15, %xmm3, %xmm4, %xmm10
-+	vpblendw	$192, %xmm5, %xmm10, %xmm10
-+	vpshufd		$57, %xmm0, %xmm0
-+	vpshufd		$198, %xmm10, %xmm10
-+	vpaddd		%xmm9, %xmm10, %xmm10
-+	vpaddd		%xmm0, %xmm10, %xmm10
-+	vpxor		%xmm10, %xmm1, %xmm1
-+	vpshufb		%xmm7, %xmm1, %xmm1
-+	vpaddd		%xmm1, %xmm13, %xmm13
-+	vpxor		%xmm13, %xmm0, %xmm9
-+	vpslld		$20, %xmm9, %xmm0
-+	vpsrld		$12, %xmm9, %xmm9
-+	vpxor		%xmm0, %xmm9, %xmm0
-+	vpunpckhdq	%xmm2, %xmm3, %xmm9
-+	vpunpcklqdq	%xmm12, %xmm9, %xmm15
-+	vpunpcklqdq	%xmm12, %xmm8, %xmm12
-+	vpblendw	$15, %xmm5, %xmm8, %xmm8
-+	vpaddd		%xmm15, %xmm10, %xmm15
-+	vpaddd		%xmm0, %xmm15, %xmm15
-+	vpxor		%xmm15, %xmm1, %xmm1
-+	vpshufd		$141, %xmm8, %xmm8
-+	vpshufb		%xmm6, %xmm1, %xmm1
-+	vpaddd		%xmm1, %xmm13, %xmm13
-+	vpxor		%xmm13, %xmm0, %xmm0
-+	vpshufd		$57, %xmm1, %xmm1
-+	vpshufd		$78, %xmm13, %xmm13
-+	vpslld		$25, %xmm0, %xmm10
-+	vpsrld		$7, %xmm0, %xmm0
-+	vpxor		%xmm10, %xmm0, %xmm0
-+	vpunpcklqdq	%xmm2, %xmm3, %xmm10
-+	vpshufd		$147, %xmm0, %xmm0
-+	vpblendw	$51, %xmm14, %xmm10, %xmm14
-+	vpshufd		$135, %xmm14, %xmm14
-+	vpaddd		%xmm15, %xmm14, %xmm14
-+	vpaddd		%xmm0, %xmm14, %xmm14
-+	vpxor		%xmm14, %xmm1, %xmm1
-+	vpunpcklqdq	%xmm3, %xmm4, %xmm15
-+	vpshufb		%xmm7, %xmm1, %xmm1
-+	vpaddd		%xmm1, %xmm13, %xmm13
-+	vpxor		%xmm13, %xmm0, %xmm0
-+	vpslld		$20, %xmm0, %xmm11
-+	vpsrld		$12, %xmm0, %xmm0
-+	vpxor		%xmm11, %xmm0, %xmm0
-+	vpunpckhqdq	%xmm5, %xmm3, %xmm11
-+	vpblendw	$51, %xmm15, %xmm11, %xmm11
-+	vpunpckhqdq	%xmm3, %xmm5, %xmm15
-+	vpaddd		%xmm11, %xmm14, %xmm11
-+	vpaddd		%xmm0, %xmm11, %xmm11
-+	vpxor		%xmm11, %xmm1, %xmm1
-+	vpshufb		%xmm6, %xmm1, %xmm1
-+	vpaddd		%xmm1, %xmm13, %xmm13
-+	vpxor		%xmm13, %xmm0, %xmm0
-+	vpshufd		$147, %xmm1, %xmm1
-+	vpshufd		$78, %xmm13, %xmm13
-+	vpslld		$25, %xmm0, %xmm14
-+	vpsrld		$7, %xmm0, %xmm0
-+	vpxor		%xmm14, %xmm0, %xmm14
-+	vpunpckhqdq	%xmm4, %xmm2, %xmm0
-+	vpshufd		$57, %xmm14, %xmm14
-+	vpblendw	$51, %xmm15, %xmm0, %xmm15
-+	vpaddd		%xmm15, %xmm11, %xmm15
-+	vpaddd		%xmm14, %xmm15, %xmm15
-+	vpxor		%xmm15, %xmm1, %xmm1
-+	vpshufb		%xmm7, %xmm1, %xmm1
-+	vpaddd		%xmm1, %xmm13, %xmm13
-+	vpxor		%xmm13, %xmm14, %xmm14
-+	vpslld		$20, %xmm14, %xmm11
-+	vpsrld		$12, %xmm14, %xmm14
-+	vpxor		%xmm11, %xmm14, %xmm14
-+	vpblendw	$3, %xmm2, %xmm4, %xmm11
-+	vpslldq		$8, %xmm11, %xmm0
-+	vpblendw	$15, %xmm5, %xmm0, %xmm0
-+	vpshufd		$99, %xmm0, %xmm0
-+	vpaddd		%xmm15, %xmm0, %xmm15
-+	vpaddd		%xmm14, %xmm15, %xmm15
-+	vpxor		%xmm15, %xmm1, %xmm0
-+	vpaddd		%xmm12, %xmm15, %xmm15
-+	vpshufb		%xmm6, %xmm0, %xmm0
-+	vpaddd		%xmm0, %xmm13, %xmm13
-+	vpxor		%xmm13, %xmm14, %xmm14
-+	vpshufd		$57, %xmm0, %xmm0
-+	vpshufd		$78, %xmm13, %xmm13
-+	vpslld		$25, %xmm14, %xmm1
-+	vpsrld		$7, %xmm14, %xmm14
-+	vpxor		%xmm1, %xmm14, %xmm14
-+	vpblendw	$3, %xmm5, %xmm4, %xmm1
-+	vpshufd		$147, %xmm14, %xmm14
-+	vpaddd		%xmm14, %xmm15, %xmm15
-+	vpxor		%xmm15, %xmm0, %xmm0
-+	vpshufb		%xmm7, %xmm0, %xmm0
-+	vpaddd		%xmm0, %xmm13, %xmm13
-+	vpxor		%xmm13, %xmm14, %xmm14
-+	vpslld		$20, %xmm14, %xmm12
-+	vpsrld		$12, %xmm14, %xmm14
-+	vpxor		%xmm12, %xmm14, %xmm14
-+	vpsrldq		$4, %xmm2, %xmm12
-+	vpblendw	$60, %xmm12, %xmm1, %xmm1
-+	vpaddd		%xmm1, %xmm15, %xmm15
-+	vpaddd		%xmm14, %xmm15, %xmm15
-+	vpxor		%xmm15, %xmm0, %xmm0
-+	vpblendw	$12, %xmm4, %xmm3, %xmm1
-+	vpshufb		%xmm6, %xmm0, %xmm0
-+	vpaddd		%xmm0, %xmm13, %xmm13
-+	vpxor		%xmm13, %xmm14, %xmm14
-+	vpshufd		$147, %xmm0, %xmm0
-+	vpshufd		$78, %xmm13, %xmm13
-+	vpslld		$25, %xmm14, %xmm12
-+	vpsrld		$7, %xmm14, %xmm14
-+	vpxor		%xmm12, %xmm14, %xmm14
-+	vpsrldq		$4, %xmm5, %xmm12
-+	vpblendw	$48, %xmm12, %xmm1, %xmm1
-+	vpshufd		$33, %xmm5, %xmm12
-+	vpshufd		$57, %xmm14, %xmm14
-+	vpshufd		$108, %xmm1, %xmm1
-+	vpblendw	$51, %xmm12, %xmm10, %xmm12
-+	vpaddd		%xmm15, %xmm1, %xmm15
-+	vpaddd		%xmm14, %xmm15, %xmm15
-+	vpxor		%xmm15, %xmm0, %xmm0
-+	vpaddd		%xmm12, %xmm15, %xmm15
-+	vpshufb		%xmm7, %xmm0, %xmm0
-+	vpaddd		%xmm0, %xmm13, %xmm1
-+	vpxor		%xmm1, %xmm14, %xmm14
-+	vpslld		$20, %xmm14, %xmm13
-+	vpsrld		$12, %xmm14, %xmm14
-+	vpxor		%xmm13, %xmm14, %xmm14
-+	vpslldq		$12, %xmm3, %xmm13
-+	vpaddd		%xmm14, %xmm15, %xmm15
-+	vpxor		%xmm15, %xmm0, %xmm0
-+	vpshufb		%xmm6, %xmm0, %xmm0
-+	vpaddd		%xmm0, %xmm1, %xmm1
-+	vpxor		%xmm1, %xmm14, %xmm14
-+	vpshufd		$57, %xmm0, %xmm0
-+	vpshufd		$78, %xmm1, %xmm1
-+	vpslld		$25, %xmm14, %xmm12
-+	vpsrld		$7, %xmm14, %xmm14
-+	vpxor		%xmm12, %xmm14, %xmm14
-+	vpblendw	$51, %xmm5, %xmm4, %xmm12
-+	vpshufd		$147, %xmm14, %xmm14
-+	vpblendw	$192, %xmm13, %xmm12, %xmm12
-+	vpaddd		%xmm12, %xmm15, %xmm15
-+	vpaddd		%xmm14, %xmm15, %xmm15
-+	vpxor		%xmm15, %xmm0, %xmm0
-+	vpsrldq		$4, %xmm3, %xmm12
-+	vpshufb		%xmm7, %xmm0, %xmm0
-+	vpaddd		%xmm0, %xmm1, %xmm1
-+	vpxor		%xmm1, %xmm14, %xmm14
-+	vpslld		$20, %xmm14, %xmm13
-+	vpsrld		$12, %xmm14, %xmm14
-+	vpxor		%xmm13, %xmm14, %xmm14
-+	vpblendw	$48, %xmm2, %xmm5, %xmm13
-+	vpblendw	$3, %xmm12, %xmm13, %xmm13
-+	vpshufd		$156, %xmm13, %xmm13
-+	vpaddd		%xmm15, %xmm13, %xmm15
-+	vpaddd		%xmm14, %xmm15, %xmm15
-+	vpxor		%xmm15, %xmm0, %xmm0
-+	vpshufb		%xmm6, %xmm0, %xmm0
-+	vpaddd		%xmm0, %xmm1, %xmm1
-+	vpxor		%xmm1, %xmm14, %xmm14
-+	vpshufd		$147, %xmm0, %xmm0
-+	vpshufd		$78, %xmm1, %xmm1
-+	vpslld		$25, %xmm14, %xmm13
-+	vpsrld		$7, %xmm14, %xmm14
-+	vpxor		%xmm13, %xmm14, %xmm14
-+	vpunpcklqdq	%xmm2, %xmm4, %xmm13
-+	vpshufd		$57, %xmm14, %xmm14
-+	vpblendw	$12, %xmm12, %xmm13, %xmm12
-+	vpshufd		$180, %xmm12, %xmm12
-+	vpaddd		%xmm15, %xmm12, %xmm15
-+	vpaddd		%xmm14, %xmm15, %xmm15
-+	vpxor		%xmm15, %xmm0, %xmm0
-+	vpshufb		%xmm7, %xmm0, %xmm0
-+	vpaddd		%xmm0, %xmm1, %xmm1
-+	vpxor		%xmm1, %xmm14, %xmm14
-+	vpslld		$20, %xmm14, %xmm12
-+	vpsrld		$12, %xmm14, %xmm14
-+	vpxor		%xmm12, %xmm14, %xmm14
-+	vpunpckhqdq	%xmm9, %xmm4, %xmm12
-+	vpshufd		$198, %xmm12, %xmm12
-+	vpaddd		%xmm15, %xmm12, %xmm15
-+	vpaddd		%xmm14, %xmm15, %xmm15
-+	vpxor		%xmm15, %xmm0, %xmm0
-+	vpaddd		%xmm15, %xmm8, %xmm15
-+	vpshufb		%xmm6, %xmm0, %xmm0
-+	vpaddd		%xmm0, %xmm1, %xmm1
-+	vpxor		%xmm1, %xmm14, %xmm14
-+	vpshufd		$57, %xmm0, %xmm0
-+	vpshufd		$78, %xmm1, %xmm1
-+	vpslld		$25, %xmm14, %xmm12
-+	vpsrld		$7, %xmm14, %xmm14
-+	vpxor		%xmm12, %xmm14, %xmm14
-+	vpsrldq		$4, %xmm4, %xmm12
-+	vpshufd		$147, %xmm14, %xmm14
-+	vpaddd		%xmm14, %xmm15, %xmm15
-+	vpxor		%xmm15, %xmm0, %xmm0
-+	vpshufb		%xmm7, %xmm0, %xmm0
-+	vpaddd		%xmm0, %xmm1, %xmm1
-+	vpxor		%xmm1, %xmm14, %xmm14
-+	vpslld		$20, %xmm14, %xmm8
-+	vpsrld		$12, %xmm14, %xmm14
-+	vpxor		%xmm14, %xmm8, %xmm14
-+	vpblendw	$48, %xmm5, %xmm2, %xmm8
-+	vpblendw	$3, %xmm12, %xmm8, %xmm8
-+	vpunpckhqdq	%xmm5, %xmm4, %xmm12
-+	vpshufd		$75, %xmm8, %xmm8
-+	vpblendw	$60, %xmm10, %xmm12, %xmm10
-+	vpaddd		%xmm15, %xmm8, %xmm15
-+	vpaddd		%xmm14, %xmm15, %xmm15
-+	vpxor		%xmm0, %xmm15, %xmm0
-+	vpshufd		$45, %xmm10, %xmm10
-+	vpshufb		%xmm6, %xmm0, %xmm0
-+	vpaddd		%xmm15, %xmm10, %xmm15
-+	vpaddd		%xmm0, %xmm1, %xmm1
-+	vpxor		%xmm1, %xmm14, %xmm14
-+	vpshufd		$147, %xmm0, %xmm0
-+	vpshufd		$78, %xmm1, %xmm1
-+	vpslld		$25, %xmm14, %xmm8
-+	vpsrld		$7, %xmm14, %xmm14
-+	vpxor		%xmm14, %xmm8, %xmm8
-+	vpshufd		$57, %xmm8, %xmm8
-+	vpaddd		%xmm8, %xmm15, %xmm15
-+	vpxor		%xmm0, %xmm15, %xmm0
-+	vpshufb		%xmm7, %xmm0, %xmm0
-+	vpaddd		%xmm0, %xmm1, %xmm1
-+	vpxor		%xmm8, %xmm1, %xmm8
-+	vpslld		$20, %xmm8, %xmm10
-+	vpsrld		$12, %xmm8, %xmm8
-+	vpxor		%xmm8, %xmm10, %xmm10
-+	vpunpckldq	%xmm3, %xmm4, %xmm8
-+	vpunpcklqdq	%xmm9, %xmm8, %xmm9
-+	vpaddd		%xmm9, %xmm15, %xmm9
-+	vpaddd		%xmm10, %xmm9, %xmm9
-+	vpxor		%xmm0, %xmm9, %xmm8
-+	vpshufb		%xmm6, %xmm8, %xmm8
-+	vpaddd		%xmm8, %xmm1, %xmm1
-+	vpxor		%xmm1, %xmm10, %xmm10
-+	vpshufd		$57, %xmm8, %xmm8
-+	vpshufd		$78, %xmm1, %xmm1
-+	vpslld		$25, %xmm10, %xmm12
-+	vpsrld		$7, %xmm10, %xmm10
-+	vpxor		%xmm10, %xmm12, %xmm10
-+	vpblendw	$48, %xmm4, %xmm3, %xmm12
-+	vpshufd		$147, %xmm10, %xmm0
-+	vpunpckhdq	%xmm5, %xmm3, %xmm10
-+	vpshufd		$78, %xmm12, %xmm12
-+	vpunpcklqdq	%xmm4, %xmm10, %xmm10
-+	vpblendw	$192, %xmm2, %xmm10, %xmm10
-+	vpshufhw	$78, %xmm10, %xmm10
-+	vpaddd		%xmm10, %xmm9, %xmm10
-+	vpaddd		%xmm0, %xmm10, %xmm10
-+	vpxor		%xmm8, %xmm10, %xmm8
-+	vpshufb		%xmm7, %xmm8, %xmm8
-+	vpaddd		%xmm8, %xmm1, %xmm1
-+	vpxor		%xmm0, %xmm1, %xmm9
-+	vpslld		$20, %xmm9, %xmm0
-+	vpsrld		$12, %xmm9, %xmm9
-+	vpxor		%xmm9, %xmm0, %xmm0
-+	vpunpckhdq	%xmm5, %xmm4, %xmm9
-+	vpblendw	$240, %xmm9, %xmm2, %xmm13
-+	vpshufd		$39, %xmm13, %xmm13
-+	vpaddd		%xmm10, %xmm13, %xmm10
-+	vpaddd		%xmm0, %xmm10, %xmm10
-+	vpxor		%xmm8, %xmm10, %xmm8
-+	vpblendw	$12, %xmm4, %xmm2, %xmm13
-+	vpshufb		%xmm6, %xmm8, %xmm8
-+	vpslldq		$4, %xmm13, %xmm13
-+	vpblendw	$15, %xmm5, %xmm13, %xmm13
-+	vpaddd		%xmm8, %xmm1, %xmm1
-+	vpxor		%xmm1, %xmm0, %xmm0
-+	vpaddd		%xmm13, %xmm10, %xmm13
-+	vpshufd		$147, %xmm8, %xmm8
-+	vpshufd		$78, %xmm1, %xmm1
-+	vpslld		$25, %xmm0, %xmm14
-+	vpsrld		$7, %xmm0, %xmm0
-+	vpxor		%xmm0, %xmm14, %xmm14
-+	vpshufd		$57, %xmm14, %xmm14
-+	vpaddd		%xmm14, %xmm13, %xmm13
-+	vpxor		%xmm8, %xmm13, %xmm8
-+	vpaddd		%xmm13, %xmm12, %xmm12
-+	vpshufb		%xmm7, %xmm8, %xmm8
-+	vpaddd		%xmm8, %xmm1, %xmm1
-+	vpxor		%xmm14, %xmm1, %xmm14
-+	vpslld		$20, %xmm14, %xmm10
-+	vpsrld		$12, %xmm14, %xmm14
-+	vpxor		%xmm14, %xmm10, %xmm10
-+	vpaddd		%xmm10, %xmm12, %xmm12
-+	vpxor		%xmm8, %xmm12, %xmm8
-+	vpshufb		%xmm6, %xmm8, %xmm8
-+	vpaddd		%xmm8, %xmm1, %xmm1
-+	vpxor		%xmm1, %xmm10, %xmm0
-+	vpshufd		$57, %xmm8, %xmm8
-+	vpshufd		$78, %xmm1, %xmm1
-+	vpslld		$25, %xmm0, %xmm10
-+	vpsrld		$7, %xmm0, %xmm0
-+	vpxor		%xmm0, %xmm10, %xmm10
-+	vpblendw	$48, %xmm2, %xmm3, %xmm0
-+	vpblendw	$15, %xmm11, %xmm0, %xmm0
-+	vpshufd		$147, %xmm10, %xmm10
-+	vpshufd		$114, %xmm0, %xmm0
-+	vpaddd		%xmm12, %xmm0, %xmm0
-+	vpaddd		%xmm10, %xmm0, %xmm0
-+	vpxor		%xmm8, %xmm0, %xmm8
-+	vpshufb		%xmm7, %xmm8, %xmm8
-+	vpaddd		%xmm8, %xmm1, %xmm1
-+	vpxor		%xmm10, %xmm1, %xmm10
-+	vpslld		$20, %xmm10, %xmm11
-+	vpsrld		$12, %xmm10, %xmm10
-+	vpxor		%xmm10, %xmm11, %xmm10
-+	vpslldq		$4, %xmm4, %xmm11
-+	vpblendw	$192, %xmm11, %xmm3, %xmm3
-+	vpunpckldq	%xmm5, %xmm4, %xmm4
-+	vpshufd		$99, %xmm3, %xmm3
-+	vpaddd		%xmm0, %xmm3, %xmm3
-+	vpaddd		%xmm10, %xmm3, %xmm3
-+	vpxor		%xmm8, %xmm3, %xmm11
-+	vpunpckldq	%xmm5, %xmm2, %xmm0
-+	vpblendw	$192, %xmm2, %xmm5, %xmm2
-+	vpshufb		%xmm6, %xmm11, %xmm11
-+	vpunpckhqdq	%xmm0, %xmm9, %xmm0
-+	vpblendw	$15, %xmm4, %xmm2, %xmm4
-+	vpaddd		%xmm11, %xmm1, %xmm1
-+	vpxor		%xmm1, %xmm10, %xmm10
-+	vpshufd		$147, %xmm11, %xmm11
-+	vpshufd		$201, %xmm0, %xmm0
-+	vpslld		$25, %xmm10, %xmm8
-+	vpsrld		$7, %xmm10, %xmm10
-+	vpxor		%xmm10, %xmm8, %xmm10
-+	vpshufd		$78, %xmm1, %xmm1
-+	vpaddd		%xmm3, %xmm0, %xmm0
-+	vpshufd		$27, %xmm4, %xmm4
-+	vpshufd		$57, %xmm10, %xmm10
-+	vpaddd		%xmm10, %xmm0, %xmm0
-+	vpxor		%xmm11, %xmm0, %xmm11
-+	vpaddd		%xmm0, %xmm4, %xmm0
-+	vpshufb		%xmm7, %xmm11, %xmm7
-+	vpaddd		%xmm7, %xmm1, %xmm1
-+	vpxor		%xmm10, %xmm1, %xmm10
-+	vpslld		$20, %xmm10, %xmm8
-+	vpsrld		$12, %xmm10, %xmm10
-+	vpxor		%xmm10, %xmm8, %xmm8
-+	vpaddd		%xmm8, %xmm0, %xmm0
-+	vpxor		%xmm7, %xmm0, %xmm7
-+	vpshufb		%xmm6, %xmm7, %xmm6
-+	vpaddd		%xmm6, %xmm1, %xmm1
-+	vpxor		%xmm1, %xmm8, %xmm8
-+	vpshufd		$78, %xmm1, %xmm1
-+	vpshufd		$57, %xmm6, %xmm6
-+	vpslld		$25, %xmm8, %xmm2
-+	vpsrld		$7, %xmm8, %xmm8
-+	vpxor		%xmm8, %xmm2, %xmm8
-+	vpxor		(%rdi), %xmm1, %xmm1
-+	vpshufd		$147, %xmm8, %xmm8
-+	vpxor		%xmm0, %xmm1, %xmm0
-+	vmovups		%xmm0, (%rdi)
-+	vpxor		16(%rdi), %xmm8, %xmm0
-+	vpxor		%xmm6, %xmm0, %xmm6
-+	vmovups		%xmm6, 16(%rdi)
-+	addq		$64, %rsi
-+	decq		%rdx
-+	jnz .Lbeginofloop
-+.Lendofloop:
-+	ret
-+ENDPROC(blake2s_compress_avx)
-+#endif /* CONFIG_AS_AVX */
-+
-+#ifdef CONFIG_AS_AVX512
-+ENTRY(blake2s_compress_avx512)
-+	vmovdqu (%rdi),%xmm0
-+	vmovdqu		0x10(%rdi),%xmm1
-+	vmovdqu		0x20(%rdi),%xmm4
-+	vmovq		%rcx,%xmm5
-+	vmovdqa		IV(%rip),%xmm14
-+	vmovdqa		IV+16(%rip),%xmm15
-+	jmp		.Lblake2s_compress_avx512_mainloop
-+.align 32
-+.Lblake2s_compress_avx512_mainloop:
-+	vmovdqa		%xmm0,%xmm10
-+	vmovdqa		%xmm1,%xmm11
-+	vpaddq		%xmm5,%xmm4,%xmm4
-+	vmovdqa		%xmm14,%xmm2
-+	vpxor		%xmm15,%xmm4,%xmm3
-+	vmovdqu		(%rsi),%ymm6
-+	vmovdqu		0x20(%rsi),%ymm7
-+	addq		$0x40,%rsi
-+	leaq		SIGMA(%rip),%rax
-+	movb		$0xa,%cl
-+.Lblake2s_compress_avx512_roundloop:
-+	addq		$0x40,%rax
-+	vmovdqa		-0x40(%rax),%ymm8
-+	vmovdqa		-0x20(%rax),%ymm9
-+	vpermi2d	%ymm7,%ymm6,%ymm8
-+	vpermi2d	%ymm7,%ymm6,%ymm9
-+	vmovdqa		%ymm8,%ymm6
-+	vmovdqa		%ymm9,%ymm7
-+	vpaddd		%xmm8,%xmm0,%xmm0
-+	vpaddd		%xmm1,%xmm0,%xmm0
-+	vpxor		%xmm0,%xmm3,%xmm3
-+	vprord		$0x10,%xmm3,%xmm3
-+	vpaddd		%xmm3,%xmm2,%xmm2
-+	vpxor		%xmm2,%xmm1,%xmm1
-+	vprord		$0xc,%xmm1,%xmm1
-+	vextracti128	$0x1,%ymm8,%xmm8
-+	vpaddd		%xmm8,%xmm0,%xmm0
-+	vpaddd		%xmm1,%xmm0,%xmm0
-+	vpxor		%xmm0,%xmm3,%xmm3
-+	vprord		$0x8,%xmm3,%xmm3
-+	vpaddd		%xmm3,%xmm2,%xmm2
-+	vpxor		%xmm2,%xmm1,%xmm1
-+	vprord		$0x7,%xmm1,%xmm1
-+	vpshufd		$0x39,%xmm1,%xmm1
-+	vpshufd		$0x4e,%xmm2,%xmm2
-+	vpshufd		$0x93,%xmm3,%xmm3
-+	vpaddd		%xmm9,%xmm0,%xmm0
-+	vpaddd		%xmm1,%xmm0,%xmm0
-+	vpxor		%xmm0,%xmm3,%xmm3
-+	vprord		$0x10,%xmm3,%xmm3
-+	vpaddd		%xmm3,%xmm2,%xmm2
-+	vpxor		%xmm2,%xmm1,%xmm1
-+	vprord		$0xc,%xmm1,%xmm1
-+	vextracti128	$0x1,%ymm9,%xmm9
-+	vpaddd		%xmm9,%xmm0,%xmm0
-+	vpaddd		%xmm1,%xmm0,%xmm0
-+	vpxor		%xmm0,%xmm3,%xmm3
-+	vprord		$0x8,%xmm3,%xmm3
-+	vpaddd		%xmm3,%xmm2,%xmm2
-+	vpxor		%xmm2,%xmm1,%xmm1
-+	vprord		$0x7,%xmm1,%xmm1
-+	vpshufd		$0x93,%xmm1,%xmm1
-+	vpshufd		$0x4e,%xmm2,%xmm2
-+	vpshufd		$0x39,%xmm3,%xmm3
-+	decb		%cl
-+	jne		.Lblake2s_compress_avx512_roundloop
-+	vpxor		%xmm10,%xmm0,%xmm0
-+	vpxor		%xmm11,%xmm1,%xmm1
-+	vpxor		%xmm2,%xmm0,%xmm0
-+	vpxor		%xmm3,%xmm1,%xmm1
-+	decq		%rdx
-+	jne		.Lblake2s_compress_avx512_mainloop
-+	vmovdqu		%xmm0,(%rdi)
-+	vmovdqu		%xmm1,0x10(%rdi)
-+	vmovdqu		%xmm4,0x20(%rdi)
-+	vzeroupper
-+	retq
-+ENDPROC(blake2s_compress_avx512)
-+#endif /* CONFIG_AS_AVX512 */
+ #include <linux/init.h>
+ #include <linux/module.h>
+ 
+@@ -17,6 +19,9 @@
+ 
+ static int __init mod_init(void)
+ {
++#ifdef CONFIG_ZINC_CHACHA20
++	chacha20_fpu_init();
++#endif
+ 	return 0;
+ }
+ 
 -- 
 2.18.0
