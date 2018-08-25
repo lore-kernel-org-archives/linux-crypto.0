@@ -1,37 +1,33 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: aesni - Use unaligned loads from gcm_context_data
-Date: Sat, 25 Aug 2018 21:28:01 +0800
-Message-ID: <20180825132801.fnsr72cx4s2ohovy@gondor.apana.org.au>
-References: <20180815172942.mkk56gh6poqgjgnb@davejwatson-mba.local>
+Subject: Re: [PATCH 1/1] crypto: cavium/nitrox - fix for command corruption
+ in queue full case with backlog submissions.
+Date: Sat, 25 Aug 2018 21:29:09 +0800
+Message-ID: <20180825132909.koxcal2ke2eggv5i@gondor.apana.org.au>
+References: <1534921852-20954-1-git-send-email-Jampala.Srikanth@cavium.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Mauro Rossi <issor.oruam@gmail.com>, linux-crypto@vger.kernel.org,
-        Junaid Shahid <junaids@google.com>,
-        linux-kernel@vger.kernel.org, Stephan Mueller <smueller@chronox.de>
-To: Dave Watson <davejwatson@fb.com>
+Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, sgadam@cavium.com
+To: Srikanth Jampala <Jampala.Srikanth@cavium.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20180815172942.mkk56gh6poqgjgnb@davejwatson-mba.local>
+In-Reply-To: <1534921852-20954-1-git-send-email-Jampala.Srikanth@cavium.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Aug 15, 2018 at 10:29:42AM -0700, Dave Watson wrote:
-> A regression was reported bisecting to 1476db2d12
-> "Move HashKey computation from stack to gcm_context".  That diff
-> moved HashKey computation from the stack, which was explicitly aligned
-> in the asm, to a struct provided from the C code, depending on
-> AESNI_ALIGN_ATTR for alignment.   It appears some compilers may not
-> align this struct correctly, resulting in a crash on the movdqa
-> instruction when attempting to encrypt or decrypt data.
+On Wed, Aug 22, 2018 at 12:40:52PM +0530, Srikanth Jampala wrote:
+>      Earlier used to post the current command without checking queue full
+>      after backlog submissions. So, post the current command only after
+>      confirming the space in queue after backlog submissions.
 > 
-> Fix by using unaligned loads for the HashKeys.  On modern
-> hardware there is no perf difference between the unaligned and
-> aligned loads.  All other accesses to gcm_context_data already use
-> unaligned loads.
+>      Maintain host write index instead of reading device registers
+>      to get the next free slot to post the command.
 > 
-> Reported-by: Mauro Rossi <issor.oruam@gmail.com>
-> Fixes: 1476db2d12 ("Move HashKey computation from stack to gcm_context")
-> Signed-off-by: Dave Watson <davejwatson@fb.com>
+>      Return -ENOSPC in queue full case.
+> 
+> Signed-off-by: Srikanth Jampala <Jampala.Srikanth@cavium.com>
+> Reviewed-by: Gadam Sreerama <sgadam@cavium.com>
+> Tested-by: Jha, Chandan <Chandan.Jha@cavium.com>
 
 Patch applied.  Thanks.
 -- 
