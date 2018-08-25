@@ -1,33 +1,58 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 1/1] crypto: cavium/nitrox - fix for command corruption
- in queue full case with backlog submissions.
-Date: Sat, 25 Aug 2018 21:29:09 +0800
-Message-ID: <20180825132909.koxcal2ke2eggv5i@gondor.apana.org.au>
-References: <1534921852-20954-1-git-send-email-Jampala.Srikanth@cavium.com>
+Subject: Re: [PATCH v2] crypto: vmx - Fix sleep-in-atomic bugs
+Date: Sat, 25 Aug 2018 21:28:57 +0800
+Message-ID: <20180825132857.josnvyeztipef4pv@gondor.apana.org.au>
+References: <CAAUqJDt_y04ts7Aq0U0fhXYRus2ckkEohBTkga0pjqfoQaBOCA@mail.gmail.com>
+ <20180822062631.5664-1-omosnace@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, sgadam@cavium.com
-To: Srikanth Jampala <Jampala.Srikanth@cavium.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Cc: linux-crypto@vger.kernel.org,
+        Stephan Mueller <smueller@chronox.de>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Marcelo Henrique Cerri <marcelo.cerri@canonical.com>,
+        "Leonidas S . Barbosa" <leo.barbosa@canonical.com>,
+        Paulo Flabiano Smorigo <pfsmorigo@linux.vnet.ibm.com>,
+        linuxppc-dev@lists.ozlabs.org, stable@vger.kernel.org
+To: Ondrej Mosnacek <omosnace@redhat.com>
+Return-path: <stable-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1534921852-20954-1-git-send-email-Jampala.Srikanth@cavium.com>
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <20180822062631.5664-1-omosnace@redhat.com>
+Sender: stable-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Aug 22, 2018 at 12:40:52PM +0530, Srikanth Jampala wrote:
->      Earlier used to post the current command without checking queue full
->      after backlog submissions. So, post the current command only after
->      confirming the space in queue after backlog submissions.
+On Wed, Aug 22, 2018 at 08:26:31AM +0200, Ondrej Mosnacek wrote:
+> This patch fixes sleep-in-atomic bugs in AES-CBC and AES-XTS VMX
+> implementations. The problem is that the blkcipher_* functions should
+> not be called in atomic context.
 > 
->      Maintain host write index instead of reading device registers
->      to get the next free slot to post the command.
+> The bugs can be reproduced via the AF_ALG interface by trying to
+> encrypt/decrypt sufficiently large buffers (at least 64 KiB) using the
+> VMX implementations of 'cbc(aes)' or 'xts(aes)'. Such operations then
+> trigger BUG in crypto_yield():
 > 
->      Return -ENOSPC in queue full case.
+> [  891.863680] BUG: sleeping function called from invalid context at include/crypto/algapi.h:424
+> [  891.864622] in_atomic(): 1, irqs_disabled(): 0, pid: 12347, name: kcapi-enc
+> [  891.864739] 1 lock held by kcapi-enc/12347:
+> [  891.864811]  #0: 00000000f5d42c46 (sk_lock-AF_ALG){+.+.}, at: skcipher_recvmsg+0x50/0x530
+> [  891.865076] CPU: 5 PID: 12347 Comm: kcapi-enc Not tainted 4.19.0-0.rc0.git3.1.fc30.ppc64le #1
+> [  891.865251] Call Trace:
+> [  891.865340] [c0000003387578c0] [c000000000d67ea4] dump_stack+0xe8/0x164 (unreliable)
+> [  891.865511] [c000000338757910] [c000000000172a58] ___might_sleep+0x2f8/0x310
+> [  891.865679] [c000000338757990] [c0000000006bff74] blkcipher_walk_done+0x374/0x4a0
+> [  891.865825] [c0000003387579e0] [d000000007e73e70] p8_aes_cbc_encrypt+0x1c8/0x260 [vmx_crypto]
+> [  891.865993] [c000000338757ad0] [c0000000006c0ee0] skcipher_encrypt_blkcipher+0x60/0x80
+> [  891.866128] [c000000338757b10] [c0000000006ec504] skcipher_recvmsg+0x424/0x530
+> [  891.866283] [c000000338757bd0] [c000000000b00654] sock_recvmsg+0x74/0xa0
+> [  891.866403] [c000000338757c10] [c000000000b00f64] ___sys_recvmsg+0xf4/0x2f0
+> [  891.866515] [c000000338757d90] [c000000000b02bb8] __sys_recvmsg+0x68/0xe0
+> [  891.866631] [c000000338757e30] [c00000000000bbe4] system_call+0x5c/0x70
 > 
-> Signed-off-by: Srikanth Jampala <Jampala.Srikanth@cavium.com>
-> Reviewed-by: Gadam Sreerama <sgadam@cavium.com>
-> Tested-by: Jha, Chandan <Chandan.Jha@cavium.com>
+> Fixes: 8c755ace357c ("crypto: vmx - Adding CBC routines for VMX module")
+> Fixes: c07f5d3da643 ("crypto: vmx - Adding support for XTS")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Ondrej Mosnacek <omosnace@redhat.com>
 
 Patch applied.  Thanks.
 -- 
