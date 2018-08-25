@@ -1,26 +1,37 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] chtls: fix null dereference chtls_free_uld()
-Date: Sat, 25 Aug 2018 21:27:50 +0800
-Message-ID: <20180825132750.b2gogoloozjufjme@gondor.apana.org.au>
-References: <1533905861-27339-1-git-send-email-ganeshgr@chelsio.com>
+Subject: Re: [PATCH] crypto: aesni - Use unaligned loads from gcm_context_data
+Date: Sat, 25 Aug 2018 21:28:01 +0800
+Message-ID: <20180825132801.fnsr72cx4s2ohovy@gondor.apana.org.au>
+References: <20180815172942.mkk56gh6poqgjgnb@davejwatson-mba.local>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
-        davem@davemloft.net, indranil@chelsio.com, dt@chelsio.com,
-        Atul Gupta <atul.gupta@chelsio.com>
-To: Ganesh Goudar <ganeshgr@chelsio.com>
-Return-path: <netdev-owner@vger.kernel.org>
+Cc: Mauro Rossi <issor.oruam@gmail.com>, linux-crypto@vger.kernel.org,
+        Junaid Shahid <junaids@google.com>,
+        linux-kernel@vger.kernel.org, Stephan Mueller <smueller@chronox.de>
+To: Dave Watson <davejwatson@fb.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1533905861-27339-1-git-send-email-ganeshgr@chelsio.com>
-Sender: netdev-owner@vger.kernel.org
+In-Reply-To: <20180815172942.mkk56gh6poqgjgnb@davejwatson-mba.local>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Aug 10, 2018 at 06:27:41PM +0530, Ganesh Goudar wrote:
-> call chtls_free_uld() only for the initialized cdev,
-> this fixes NULL dereference in chtls_free_uld()
+On Wed, Aug 15, 2018 at 10:29:42AM -0700, Dave Watson wrote:
+> A regression was reported bisecting to 1476db2d12
+> "Move HashKey computation from stack to gcm_context".  That diff
+> moved HashKey computation from the stack, which was explicitly aligned
+> in the asm, to a struct provided from the C code, depending on
+> AESNI_ALIGN_ATTR for alignment.   It appears some compilers may not
+> align this struct correctly, resulting in a crash on the movdqa
+> instruction when attempting to encrypt or decrypt data.
 > 
-> Signed-off-by: Ganesh Goudar <ganeshgr@chelsio.com>
-> Signed-off-by: Atul Gupta <atul.gupta@chelsio.com>
+> Fix by using unaligned loads for the HashKeys.  On modern
+> hardware there is no perf difference between the unaligned and
+> aligned loads.  All other accesses to gcm_context_data already use
+> unaligned loads.
+> 
+> Reported-by: Mauro Rossi <issor.oruam@gmail.com>
+> Fixes: 1476db2d12 ("Move HashKey computation from stack to gcm_context")
+> Signed-off-by: Dave Watson <davejwatson@fb.com>
 
 Patch applied.  Thanks.
 -- 
