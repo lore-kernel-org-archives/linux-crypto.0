@@ -1,113 +1,115 @@
 From: "Jason A. Donenfeld" <Jason@zx2c4.com>
 Subject: Re: [PATCH v2 02/17] zinc: introduce minimal cryptography library
-Date: Sat, 25 Aug 2018 10:40:06 -0600
-Message-ID: <20180825164005.GA7748@zx2c4.com>
+Date: Sat, 25 Aug 2018 11:06:31 -0600
+Message-ID: <20180825170629.GA8971@zx2c4.com>
 References: <20180824213849.23647-1-Jason@zx2c4.com>
  <20180824213849.23647-3-Jason@zx2c4.com>
- <20180825062951.GC726@sol.localdomain>
+ <CAKv+Gu-u7vPkU49AzToGHyf_cWp0MiOmpD3cRUt8260QC2wj-Q@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        davem@davemloft.net, Andy Lutomirski <luto@kernel.org>,
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "<netdev@vger.kernel.org>" <netdev@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Andy Lutomirski <luto@kernel.org>,
         Greg KH <gregkh@linuxfoundation.org>,
         Samuel Neves <sneves@dei.uc.pt>,
         Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
-        linux-crypto@vger.kernel.org
-To: Eric Biggers <ebiggers@kernel.org>
-Return-path: <netdev-owner@vger.kernel.org>
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20180825062951.GC726@sol.localdomain>
-Sender: netdev-owner@vger.kernel.org
+In-Reply-To: <CAKv+Gu-u7vPkU49AzToGHyf_cWp0MiOmpD3cRUt8260QC2wj-Q@mail.gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hey Eric,
+Hello Ard,
 
-On Fri, Aug 24, 2018 at 11:29:52PM -0700, Eric Biggers wrote:
-> I thought you were going to wrap lines at 80 characters?  It's hard to read the
-> extremely long lines, and they encourage deep nesting.
+On Sat, Aug 25, 2018 at 11:17:42AM +0100, Ard Biesheuvel wrote:
+> Do we really need a new crypto API for WireGuard? Surely, you yourself
+> are not affected by these concerns, and I don't anticipate an
+> explosion of new crypto use cases in the kernel that would justify
+> maintaining two parallel crypto stacks.
 
-I somehow noted this for the WireGuard side of things but assumed I
-didn't need to do so for Zinc. Hah, such wishful thinking. I'll have
-this wrapped at 80 for v3.
+Yes, we really do. And the new API won't be useful for WireGuard but
+also for the majority of cryptography users within the kernel, which
+will gradually be ported to use the new API.
 
-> As I said before, I still think you need to switch the crypto API ChaCha20 and
-> Poly1305 over to use the new implementations.  It's not okay to have two
-> completely different sets of ChaCha20 and Poly1305 implementations just because
-> you want a different API, so you might as well get started on it...  The thing
-> is that before you try it, it's not clear what problems will come up that
-> require changes to the design.  So, this really ought to be addressed up-front.
+> Also, I take it this means that WireGuard will only work with your
+> routines? We don't usually impose that kind of policy in the kernel:
+> on my arm64 systems, AES/GCM runs at 2.3 cycles per byte, which is a
+> good enough reason to prefer it over a ChaCha20/Poly1305 based AEAD,
+> even if your code is faster than the current code (which is debatable,
+> as you know)
 
-It was my hope that this entire series could enter the tree through
-Dave's net-next, and that I wouldn't have to touch anything in crypto/ or
-touch any of Herbert's stuff at all in anyway. However, if you want, I
-can start to play with that in another branch for a separate patchset,
-and of course I'd really value your feedback on that and on doing it
-right.
+WireGuard is a protocol that specifies ChaPoly, and I am proposing an
+implementation of that protocol. The protocol explicitly does not
+specify other ciphers. Please read the whitepaper for extensive
+discussion and feel free to come on over to wireguard@lists.zx2c4.com if
+you really want to hardcore bikeshed on protocol particulars. The short
+answer, however, is: no WireGuard won't be adding cipher negotiation,
+and no, this isn't considered a good feature, and no, you won't have
+any luck changing that. I am certain, though, that pushing this point
+will be a terrific means of steering this implementation thread far off
+course, as various folks with their various opinions feel compelled to
+jump in about their thoughts on cipher negotiation. Yawn.
 
-> It's also not clearly explained whether/why/how the new ChaCha20 and Poly1305
-> implementations are better than the existing ones.  The patch adding the ARM and
-> ARM64 ChaCha, for example, just says who wrote them, with no mention of why the
-> particular implementations were chosen.
+Besides, your claim about "impos[ing] that kind of policy in the kernel"
+is bogus: with the exception of IPsec, dm-crypt, and AF_ALG, basically
+all users of cryptography I can find are using a very particular set of
+ciphers. For example, Bluetooth uses a particular elliptic curve that
+has been specified by the Bluetooth people, and the kernel therefore
+implements a driver that does computations over that elliptic curve.
+Nobody on LKML is clamoring for that driver to also support Curve448 or
+something, since that's not what Bluetooth specifies or how Bluetooth
+works. So too, that's not what WireGuard specifies or how WireGuard
+works.
 
-I can expand on that, sure. One primary advantage that I do touch on on
-the big introductory commit message, though, is that sharing code means
-that we benefit from the eyeballs and fuzzing hours spent on OpenSSL,
-and I think this general advantage is extremely compelling.
+> It also means that users of the crypto API will not benefit from your
+> better code. I'm sure you agree that it is a bad idea to force those
+> same crypto-impaired programmers to port their code to a new API.
 
-> You've also documented a lot of stuff in commit messages which will be lost as
-> it isn't being added to the source itself.  There are various examples of this,
-> such as information about where the various implementations came from, what you
-> changed, why a particular implementation isn't used on Skylake or whatever, etc.
-> Can you please make sure that any important information is in comments, e.g. at
-> the top of the files?
+As mentioned, I think we'll certainly be gradually porting existing
+crypto API users over to the new API where appropriate. As always, this
+is a gradual thing, and won't ever come all at once in the first
+patchset, but I'm pretty confident we can get there somewhat quickly,
+especially as new primitives become available in the new API.
 
-Good idea. I'll do that for v3.
+> I also suggested that we work with Andy Polyakov (as I have in the
+> past) to make the changes required for the kernel in the OpenSSL
+> upstream. That way, we can take the .pl files unmodified, and benefit
+> from the maintenance and review upstream. Dumping 10,000s of lines of
+> generated assembler in the kernel tree like that is really
+> unacceptable IMO.
 
-> I still think the "Zinc" name is confusing and misleading, and people are going
-> to forget that it means "crypto".  lib/crypto/ would be more intuitive.
-> But I don't care *that* much myself, and you should see what others think...
+I'm happy to do that, and indeed I do enjoy working with Andy. However,
+I don't think your characterization of the current situation is at all
+accurate. Rather, those .S files have been extensively worked with and
+crafted. They're far from being merely generated, and they've been
+pretty heavily reviewed.
 
-I'd like to keep it. It also enables a natural path for a corresponding
-userspace library that shares all of the same code, and one that I think
-will be compelling to attract academics and developers to contributing
-to these efforts. Plus, can't I name what I made?
+> I'm not sure what the relevance of
+> formally verified implementations is, though, since it only proves
+> that the code is true to the algorithm, not that the algorithm is
+> secure. Or am I missing something?
 
-> It seems you still don't explicitly clarify anywhere in the source itself that
-> the copyright holders of the code from OpenSSL have relicensed it under GPLv2.
-> I only see a GPLv2 license slapped on the files, yet no such license is presence
-> in the OpenSSL originals, at least in the one I checked.
+You are indeed missing something.
 
-The SPDX headers for those came out of a discussion on how to encode
-CRYPTOGAMS into SPDX from the SPDX mailing list several months ago.
+When the code is not true to the algorithm, that is very bad.
+When the code is true to the algorithm, that is very good.
 
-> If you did receive
-> explicit permission, then you should include an explicit clarification in each
-> file like the one in arch/arm/crypto/sha1-armv4-large.S.
+Formally verified implementations intend to increase our confidence
+in the latter.
 
-That's a good idea.
-
-> As Ard and I discussed recently on my patch
-> "crypto: arm/poly1305 - add NEON accelerated Poly1305 implementation"
-> which proposed adding the exact same poly1305-arm.S file, for all the OpenSSL
-> assembly it would probably be better to include the .pl file and generate the .S
-> file as part of the build process.  For one, there is semantic information like
-> register names in the .pl script that is lost in the .S file, thereby making the
-> .S file less readable.
-
-But on the other hand, the .S files have been modified and changed to
-fit kernel constraints and conventions. They're very much no longer
-merely "generated". This is most apparent with the x86_64 files, but is
-present too with the ARM files. We're still, I believe, bug-for-bug
-similar to the originals -- keeping with the point of going with Andy's
-implementations in the first place -- and we've been able to pretty
-trivially track OpenSSL changes -- but nonetheless important tweaks have
-been done to make this suitable to kernel space.
-
-> There are still some alignment bugs where integers are loaded from byte arrays
-> without using the unaligned access macros, e.g. in chacha20_init(),
-> hchacha20_generic(), and fe_frombytes_impl().  I found these grepping for
-> le32_to_cpu.  Interestingly, that last one is in "formally verified" code :-)
-
-Thanks. I'll do another pass at these for v3.
+Meanwhile on the algorithm side of thing, the WireGuard protocol has a
+number of proofs that the protocol is secure:
+  - https://www.wireguard.com/papers/wireguard-formal-verification.pdf
+  - https://www.wireguard.com/papers/dowling-paterson-computational-2018.pdf
+  - https://www.wireguard.com/formal-verification/
+Before you get too excited though, keep in mind that this is a proof of
+the protocol, and not of each primitive, like, say, "ChaCha20" or
+"Curve25519." However, academic literature is full of all sorts of
+curious and fascinating security analyses of the various primitives if
+this is something you're interested in.
 
 Jason
