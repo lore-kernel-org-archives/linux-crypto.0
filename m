@@ -1,102 +1,139 @@
-From: Megha Dey <megha.dey@linux.intel.com>
-Subject: Re: KASAN: use-after-free Read in sha512_ctx_mgr_resubmit
-Date: Tue, 28 Aug 2018 15:17:16 -0700
-Message-ID: <1535494636.15041.15.camel@megha-Z97X-UD7-TH>
-References: <00000000000072d64d05737b6b8c@google.com>
-         <20180820073119.GA14931@sol.localdomain>
-         <CAKv+Gu9Y0TLOuMba43HPihYqy-kk0nttBfPj1_UukiYy1cBcFw@mail.gmail.com>
-         <20180822062036.mdq4q5o5zdzuxh7s@gondor.apana.org.au>
-         <1535411336.3516.2.camel@megha-Z97X-UD7-TH>
-         <CAKv+Gu_oZ0Z37WV1h4opi-cYZT5FWU_bmrkBjx8LXpvKpPoZNA@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Tim Chen <tim.c.chen@linux.intel.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        syzbot <syzbot+d5455bac3ba1ee9114e5@syzkaller.appspotmail.com>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
-        the arch/x86 maintainers <x86@kernel.org>
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+From: Logan Gunthorpe <logang@deltatee.com>
+Subject: [PATCH v20 0/6] Add io{read|write}64 to io-64-atomic headers
+Date: Tue, 28 Aug 2018 17:48:20 -0600
+Message-ID: <20180828234826.22215-1-logang@deltatee.com>
+Cc: Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Andy Shevchenko <andy.shevchenko@gmail.com>,
+        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
+        Logan Gunthorpe <logang@deltatee.com>
+To: linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
+        linux-ntb@googlegroups.com, linux-crypto@vger.kernel.org,
+        Andrew Morton <akpm@linux-foundation.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAKv+Gu_oZ0Z37WV1h4opi-cYZT5FWU_bmrkBjx8LXpvKpPoZNA@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, 2018-08-28 at 01:01 +0200, Ard Biesheuvel wrote:
-> On 28 August 2018 at 01:08, Megha Dey <megha.dey@linux.intel.com> wrote:
-> > On Wed, 2018-08-22 at 14:20 +0800, Herbert Xu wrote:
-> >> On Tue, Aug 21, 2018 at 02:43:56PM +0200, Ard Biesheuvel wrote:
-> >> >
-> >> > I agree. The code is obviously broken in a way that would have been
-> >> > noticed if it were in wide use, and it is too complicated for mere
-> >> > mortals to fix or maintain. I suggest we simply remove it for now, and
-> >> > if anyone wants to reintroduce it, we can review the code *and* the
-> >> > justification for the approach from scratch (in which case we should
-> >> > consider factoring out the algo agnostics plumbing in a way that
-> >> > allows it to be reused by other architectures as well)
-> >>
-> >> I agree too.  Could one of you guys send me a patch to remove
-> >> them?
-> >>
-> >
-> > Hi,
-> >
-> > We are working on a fix to solve these corner cases.
-> >
-> 
-> Great. thanks.
-> 
-> But it would also be helpful if you could try and answer the questions
-> raised by Eric:
-> - in which cases does this driver result in a speedup?
-
-The multibuffer algorithm approach results in a speedup only when there
-are a large number of independent jobs. Similarly if there is a steady
-stream of independent jobs, multibuffer works well. So another way of
-looking at this is that if there are a lot of flushes, then one
-shouldn't be using multibuffer algorithms.
- 
-> - how should we tune the flush delay to prevent pathological
-> performance regressions?
-
-We have not optimized the flush delay on the ground that it should not
-be occurring often. If this seems to be happening a lot, then perhaps we
-could optimize it along the lines that if more than N "lanes" are full,
-we will continue to use the present flush algorithm, else we could
-switch to an optimized single buffer code for one of the lanes. Any
-other suggestions are welcome too.
- 
-> - is it still safe in the post-Spectre era of computing to aggregate
-> hash input from different sources (which may be different users
-> altogether) and process them as a single source of input?
-
-hmmm, I am not sure how one could do side-channel attack, could you
-maybe give an example? One could do a denial of service attack, by
-flooding it with too many requests.
-
-Also Eric had raised the issue whether we need AVX2 multibuffer now that
-we have SHA instructions. However, for cases where jobs come in fast
-enough, sha1-mb is seen to perform better than sha-ni algorithm.
-
-Since, we already have lowered the priority of the multibuffer
-algorithms, users who know that they would have a consistent inflow of
-jobs should only opt for the multibuffer algorithm.
-
->From Herbert's suggestion, I am also working on removing the mcryptd
-layer for the multibuffer algorithms, and follow the simd model to
-simplify the multibuffer model.
-
-Hence, instead of removing these algorithms, I would like to suggest the
-following:
-1. Find a fix for the corner cases of memory corruption
-2. Remove mcryptd layer, add simd interface for hash 
-3. try to reuse code for hash multibuffer algorithms instead of
-duplicating the same code 3 times.
+Andrew, can you please pick this set up again so it can get into
+linux-next again this cycle?
 
 Thanks,
-Megha 
+
+Logan
+
+--
+
+Changes since v19:
+- Rebased onto v4.19-rc1 (No Changes)
+
+Changes since v18:
+- Dropped the CAAM patch as it was subtly wrong and broke when people
+  tested it in linux-next. Seeing the code is  much trickier than it
+  appears, we'll leave it to its maintainers to clean it up
+  should they chose.
+- Restored the ioread64/iowrite64 extern prototypes as despite
+  appearing to be unusued, they are in fact used in a rare corner case
+  by the caam driver on 64bit powerpc. This was reported by Guenter testing
+  on linux-next.
+- Rebased onto v4.18-rc4 (No Changes)
+
+Changes since v17:
+- Rebased onto v4.18-rc1 (No Changes)
+
+Changes since v16:
+- Rebased onto v4.17-rc4 (No Changes)
+
+Changes since v15:
+- Rebased onto v4.17-rc1, dropping the powerpc patches which were
+  picked up by Michael
+
+Changes since v14:
+- Rebased onto v4.16-rc7
+- Replace the first two patches so that instead of correcting the
+  endianness annotations we change to using writeX() and readX() with
+  swabX() calls. This makes the big-endian functions more symmetric
+  with the little-endian versions (with respect to barriers that are
+  not included in the raw functions). As a side effect, it also fixes
+  the kbuild warnings that the first two patches tried to address.
+
+Changes since v13:
+- Changed the subject of patch 0001 to correct a nit pointed out by Luc
+
+Changes since v12:
+- Rebased onto v4.16-rc6
+- Split patch 0001 into two and reworked the commit log as requested
+  by Luc Van Oostenryck
+
+Changes since v11:
+- Rebased onto v4.16-rc5
+- Added a patch (0001) to fix some old and new sparse warnings
+  that the kbuild robot warned about this cycle. The latest version
+  of sparse was required to reproduce these.
+- Added a patch (0002) to add io{read|write}64 to parisc which the kbuild
+  robot also found errors for this cycle
+
+Changes since v10:
+- Rebased onto v4.16-rc4, this droped the drm/tilcdc patch which was
+  picked up by that tree and is already in 4.16.
+
+Changes since v9:
+- Rebased onto v4.15-rc6
+- Fixed a couple of issues in the new version of the CAAM patch as
+  pointed out by Horia
+
+Changes since v8:
+- Rebased onto v4.15-rc2, as a result rewrote patch 7 seeing someone did
+  some similar cleanup in that area.
+- Added a patch to clean up the Switchtec NTB driver which landed in
+  v4.15-rc1
+
+Changes since v7:
+- Fix minor nits from Andy Shevchenko
+- Rebased onto v4.14-rc1
+
+Changes since v6:
+ ** none **
+
+Changes since v5:
+- Added a fix to the tilcdc driver to ensure it doesn't use the
+  non-atomic operation. (This includes adding io{read|write}64[be]_is_nonatomic
+  defines).
+
+Changes since v4:
+- Add functions so the powerpc implementation of iomap.c compiles. (As
+  noticed by Horia)
+
+Changes since v3:
+
+- I noticed powerpc didn't use the appropriate functions seeing
+  readq/writeq were not defined when iomap.h was included. Thus I've
+  included a patch to adjust this
+- Fixed some mistakes with a couple of the defines in io-64-nonatomic*
+  headers
+- Fixed a typo noticed by Horia.
+
+(earlier versions were drastically different)
+*** BLURB HERE ***
+
+Logan Gunthorpe (6):
+  iomap: Use non-raw io functions for io{read|write}XXbe
+  parisc: iomap: introduce io{read|write}64
+  iomap: introduce io{read|write}64_{lo_hi|hi_lo}
+  io-64-nonatomic: add io{read|write}64[be]{_lo_hi|_hi_lo} macros
+  ntb: ntb_hw_intel: use io-64-nonatomic instead of in-driver hacks
+  ntb: ntb_hw_switchtec: Cleanup 64bit IO defines to use the common
+    header
+
+ arch/parisc/include/asm/io.h           |   9 +++
+ arch/parisc/lib/iomap.c                |  64 +++++++++++++++
+ arch/powerpc/include/asm/io.h          |   2 +
+ drivers/ntb/hw/intel/ntb_hw_intel.h    |  30 +------
+ drivers/ntb/hw/mscc/ntb_hw_switchtec.c |  36 +--------
+ include/asm-generic/iomap.h            |  22 ++++++
+ include/linux/io-64-nonatomic-hi-lo.h  |  64 +++++++++++++++
+ include/linux/io-64-nonatomic-lo-hi.h  |  64 +++++++++++++++
+ lib/iomap.c                            | 140 ++++++++++++++++++++++++++++++++-
+ 9 files changed, 366 insertions(+), 65 deletions(-)
+
+--
+2.11.0
