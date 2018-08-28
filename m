@@ -1,56 +1,76 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: KASAN: use-after-free Read in sha512_ctx_mgr_resubmit
-Date: Tue, 28 Aug 2018 01:01:00 +0200
-Message-ID: <CAKv+Gu_oZ0Z37WV1h4opi-cYZT5FWU_bmrkBjx8LXpvKpPoZNA@mail.gmail.com>
-References: <00000000000072d64d05737b6b8c@google.com> <20180820073119.GA14931@sol.localdomain>
- <CAKv+Gu9Y0TLOuMba43HPihYqy-kk0nttBfPj1_UukiYy1cBcFw@mail.gmail.com>
- <20180822062036.mdq4q5o5zdzuxh7s@gondor.apana.org.au> <1535411336.3516.2.camel@megha-Z97X-UD7-TH>
+From: Will Deacon <will.deacon@arm.com>
+Subject: Re: [PATCH 2/4] arm64: cpufeature: add feature for CRC32 instructions
+Date: Tue, 28 Aug 2018 18:01:36 +0100
+Message-ID: <20180828170135.GC19825@arm.com>
+References: <20180827110245.14812-1-ard.biesheuvel@linaro.org>
+ <20180827110245.14812-3-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Tim Chen <tim.c.chen@linux.intel.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        syzbot <syzbot+d5455bac3ba1ee9114e5@syzkaller.appspotmail.com>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
-        "the arch/x86 maintainers" <x86@kernel.org>
-To: Megha Dey <megha.dey@linux.intel.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        catalin.marinas@arm.com, herbert@gondor.apana.org.au,
+        ebiggers@google.com, suzuki.poulose@arm.com,
+        linux-kernel@vger.kernel.org
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1535411336.3516.2.camel@megha-Z97X-UD7-TH>
+Content-Disposition: inline
+In-Reply-To: <20180827110245.14812-3-ard.biesheuvel@linaro.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 28 August 2018 at 01:08, Megha Dey <megha.dey@linux.intel.com> wrote:
-> On Wed, 2018-08-22 at 14:20 +0800, Herbert Xu wrote:
->> On Tue, Aug 21, 2018 at 02:43:56PM +0200, Ard Biesheuvel wrote:
->> >
->> > I agree. The code is obviously broken in a way that would have been
->> > noticed if it were in wide use, and it is too complicated for mere
->> > mortals to fix or maintain. I suggest we simply remove it for now, and
->> > if anyone wants to reintroduce it, we can review the code *and* the
->> > justification for the approach from scratch (in which case we should
->> > consider factoring out the algo agnostics plumbing in a way that
->> > allows it to be reused by other architectures as well)
->>
->> I agree too.  Could one of you guys send me a patch to remove
->> them?
->>
->
-> Hi,
->
-> We are working on a fix to solve these corner cases.
->
+On Mon, Aug 27, 2018 at 01:02:43PM +0200, Ard Biesheuvel wrote:
+> Add a CRC32 feature bit and wire it up to the CPU id register so we
+> will be able to use alternatives patching for CRC32 operations.
+> 
+> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> ---
+>  arch/arm64/include/asm/cpucaps.h | 3 ++-
+>  arch/arm64/kernel/cpufeature.c   | 9 +++++++++
+>  2 files changed, 11 insertions(+), 1 deletion(-)
 
-Great. thanks.
+Acked-by: Will Deacon <will.deacon@arm.com>
 
-But it would also be helpful if you could try and answer the questions
-raised by Eric:
-- in which cases does this driver result in a speedup?
-- how should we tune the flush delay to prevent pathological
-performance regressions?
-- is it still safe in the post-Spectre era of computing to aggregate
-hash input from different sources (which may be different users
-altogether) and process them as a single source of input?
+With the minor caveat below...
+
+> diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
+> index ae1f70450fb2..9932aca9704b 100644
+> --- a/arch/arm64/include/asm/cpucaps.h
+> +++ b/arch/arm64/include/asm/cpucaps.h
+> @@ -51,7 +51,8 @@
+>  #define ARM64_SSBD				30
+>  #define ARM64_MISMATCHED_CACHE_TYPE		31
+>  #define ARM64_HAS_STAGE2_FWB			32
+> +#define ARM64_HAS_CRC32				33
+>  
+> -#define ARM64_NCAPS				33
+> +#define ARM64_NCAPS				34
+
+
+... if this goes via crypto, you'll almost certainly get a (trivial)
+conflict with arm64, since these numbers get bumped all the time.
+
+Will
+
+>  #endif /* __ASM_CPUCAPS_H */
+> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+> index e238b7932096..7626b80128f5 100644
+> --- a/arch/arm64/kernel/cpufeature.c
+> +++ b/arch/arm64/kernel/cpufeature.c
+> @@ -1222,6 +1222,15 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+>  		.cpu_enable = cpu_enable_hw_dbm,
+>  	},
+>  #endif
+> +	{
+> +		.desc = "CRC32 instructions",
+> +		.capability = ARM64_HAS_CRC32,
+> +		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
+> +		.matches = has_cpuid_feature,
+> +		.sys_reg = SYS_ID_AA64ISAR0_EL1,
+> +		.field_pos = ID_AA64ISAR0_CRC32_SHIFT,
+> +		.min_field_value = 1,
+> +	},
+>  	{},
+>  };
+>  
+> -- 
+> 2.18.0
+> 
