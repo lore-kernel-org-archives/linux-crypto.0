@@ -1,58 +1,61 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
+From: Krzysztof Kozlowski <krzk@kernel.org>
 Subject: Re: Locking for HW crypto accelerators
-Date: Thu, 30 Aug 2018 21:39:31 +0800
-Message-ID: <20180830133930.r7s5hmnriif46hlr@gondor.apana.org.au>
+Date: Thu, 30 Aug 2018 15:54:19 +0200
+Message-ID: <CAJKOXPdh6QReKb+Lt-_xTpRuzFbO-O-GVg+T1aA-9ST94oimwg@mail.gmail.com>
 References: <CAJKOXPfVXnazraHq-NCCM+h26FFi1U6Z3OSYOX17XH3bj-UDLQ@mail.gmail.com>
+ <3053033.se6UkFii4W@tauon.chronox.de> <CAJKOXPd7JdzM2_PiHkS1ix1yU9hZmMbGDZaL07vbON0XzORH=w@mail.gmail.com>
+ <2002208.sm9qV7UXju@tauon.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        smueller@chronox.de
-To: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: smueller@chronox.de
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <CAJKOXPfVXnazraHq-NCCM+h26FFi1U6Z3OSYOX17XH3bj-UDLQ@mail.gmail.com>
+In-Reply-To: <2002208.sm9qV7UXju@tauon.chronox.de>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Aug 30, 2018 at 02:22:22PM +0200, Krzysztof Kozlowski wrote:
-> Hi,
-> 
-> I am trying to figure out necessary locking on the driver side of
-> crypto HW accelerator for symmetric hash (actually: CRC). I
-> implemented quite simple driver for shash_alg.
-> 
-> I looked at the docs, I looked at the crypto kcapi core code... and
-> there is nothing about necessary locking. kcapi does not perform it.
-> 
-> My HW is quite similar to drivers/crypto/stm32/stm32_crc32.c so it has
-> only one HW set of registers for dealing with CRC. Or in other words,
-> only one queue of one element. :) I implemented all shash_alg
-> callbacks - init(), update(), final()... and also finup() (manually
-> calling update+final) and digest() (init+update+final).
-> 
-> Now imagine multiple user-space users of this crypto alg where all of
-> them call kcapi_md_digest() (so essentially init() -> update() ->
-> final()). It seems that kcapi does not perform any locking here so at
-> some point updates from different processes might be mixed with
-> finals:
-> 
-> Process A:             Process B:
-> init()
->                        init()
-> update()
->                        update()
-> final()
->                        final()
-> 
-> My findings show that the requests are indeed being mixed with each other...
+On Thu, 30 Aug 2018 at 15:19, Stephan Mueller <smueller@chronox.de> wrote:
+>
+> Am Donnerstag, 30. August 2018, 15:09:05 CEST schrieb Krzysztof Kozlowski:
+>
+> Hi Krzysztof,
+>
+> > Thanks Stephan for hints. Let's assume the each of init, update and
+> > final are atomic... but how about the relation between update and
+> > final? I have two concurrent users in user-space but only one HW:
+> >
+> > Process A:             Process B:
+> > init() and set_key()
+> >                        init() and different key
+> > update(some_data)
+> >                        update(different_data)
+> > final()
+> >                        final()
+> >
+> > The final() from process A will now produce the result of hashing/CRC
+> > of some_data and different_data (and even maybe mixed with init() for
+> > different key). All because in the meantime process B added its own
+> > data to the HW.
+>
+> The question is where is the state of the cipher operation kept that is
+> produced with each of the init/update/final calls. Your answer implies that
+> this state is kept in hardware.
 
-After each operation all state must be stored in the ahash_request
-object.  The next operation should then load the state from the
-request object into the hardware.
+Yes, that's correct. The HW once initialized to specific CRC
+parameters (size, polynomial, initial value), will operate on this
+till another init happens.
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> But commonly the state is kept in software. Look at ahash_request for example,
+> the __ctx pointer is intended to point to the memory the driver needs to store
+> its state.
+>
+> Pick a random driver implementation and search for ahash_request_ctx, for
+> example.
+
+I see now some drivers are indeed saving and restoring state.
+
+Thanks!
+
+Best regards,
+Krzysztof
