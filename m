@@ -1,36 +1,51 @@
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: Re: [PATCH v2 15/17] zinc: Curve25519 ARM implementation
-Date: Tue, 28 Aug 2018 23:06:42 -0600
-Message-ID: <CAHmME9rs+8kynZym=E4btqOu+Sh7MFn3kq7EPDXP27WzC9j_ZQ@mail.gmail.com>
-References: <20180824213849.23647-1-Jason@zx2c4.com> <20180824213849.23647-16-Jason@zx2c4.com>
- <CAKv+Gu-WVOBZ1sQwOKo29P_jWL86wOnzd1-sB_6mTbPX1Lz0NQ@mail.gmail.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Subject: Locking for HW crypto accelerators
+Date: Thu, 30 Aug 2018 14:22:22 +0200
+Message-ID: <CAJKOXPfVXnazraHq-NCCM+h26FFi1U6Z3OSYOX17XH3bj-UDLQ@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Cc: LKML <linux-kernel@vger.kernel.org>,
-        Netdev <netdev@vger.kernel.org>,
-        David Miller <davem@davemloft.net>,
-        Andrew Lutomirski <luto@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Samuel Neves <sneves@dei.uc.pt>,
-        "Daniel J . Bernstein" <djb@cr.yp.to>,
-        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
-        Russell King - ARM Linux <linux@armlinux.org.uk>,
-        linux-arm-kernel@lists.infradead.org,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        smueller@chronox.de
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAKv+Gu-WVOBZ1sQwOKo29P_jWL86wOnzd1-sB_6mTbPX1Lz0NQ@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hey Ard,
+Hi,
 
-Thanks for the thorough review. Very much appreciated. I've
-incorporated nearly all of your suggestions into my development tree:
+I am trying to figure out necessary locking on the driver side of
+crypto HW accelerator for symmetric hash (actually: CRC). I
+implemented quite simple driver for shash_alg.
 
-https://git.kernel.org/pub/scm/linux/kernel/git/zx2c4/linux.git/tree/lib/zinc/curve25519/curve25519-arm.S?h=jd/wireguard
+I looked at the docs, I looked at the crypto kcapi core code... and
+there is nothing about necessary locking. kcapi does not perform it.
 
-These changes will be part of v3.
+My HW is quite similar to drivers/crypto/stm32/stm32_crc32.c so it has
+only one HW set of registers for dealing with CRC. Or in other words,
+only one queue of one element. :) I implemented all shash_alg
+callbacks - init(), update(), final()... and also finup() (manually
+calling update+final) and digest() (init+update+final).
 
-Regards,
-Jason
+Now imagine multiple user-space users of this crypto alg where all of
+them call kcapi_md_digest() (so essentially init() -> update() ->
+final()). It seems that kcapi does not perform any locking here so at
+some point updates from different processes might be mixed with
+finals:
+
+Process A:             Process B:
+init()
+                       init()
+update()
+                       update()
+final()
+                       final()
+
+My findings show that the requests are indeed being mixed with each other...
+
+Should driver perform any weird locking here? Or maybe that is the
+case of using ONLY the digest() callback (so no update, no final)
+because my HW cannot track different kcapi requests?
+
+Best regards,
+Krzysztof
