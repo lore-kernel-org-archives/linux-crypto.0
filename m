@@ -1,50 +1,63 @@
-From: "Martin K. Petersen" <martin.petersen@oracle.com>
-Subject: [PATCH v2 3/3] crc-t10dif: Allow current transform to be inspected in sysfs
-Date: Thu, 30 Aug 2018 11:00:16 -0400
-Message-ID: <20180830150016.15661-3-martin.petersen@oracle.com>
-References: <20180827060918.tfz7ljufqhlej4kq@gondor.apana.org.au>
- <20180830150016.15661-1-martin.petersen@oracle.com>
-Cc: Jeff.Lien@wdc.com, ard.biesheuvel@linaro.org,
-        david.darrington@wdc.com, hch@infradead.org, jeff.furlong@wdc.com,
-        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
-        martin.petersen@oracle.com, tim.c.chen@linux.intel.com
-To: herbert@gondor.apana.org.au
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Subject: [PATCH 0/6] crypto: vf-crc - Add new driver (and required clk, DTS...)
+Date: Thu, 30 Aug 2018 19:15:33 +0200
+Message-ID: <20180830171539.20008-1-krzk@kernel.org>
+To: Krzysztof Kozlowski <krzk@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Shawn Guo <shawnguo@kernel.org>,
+        Sascha Hauer <s.hauer@pengutronix.de>,
+        Pengutronix Kernel Team <kernel@pengutronix.de>,
+        Stefan Agner <stefan@agner.ch>,
+        Fabio Estevam <fabio.estevam@nxp.com>,
+        NXP Linux Team <linux-imx@nxp.com>,
+        Michael Turquette <mturquette@baylibre.com>,
+        Stephen Boyd <sboyd@kernel.org>, linux-crypto@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-clk@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180830150016.15661-1-martin.petersen@oracle.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Add a way to print the currently active CRC algorithm in:
+Hi,
 
-	/sys/module/crc_t10dif/parameters/transform
+Add new driver for Freescale/NXP Vybrid CRC HW accelerator along with
+prerequisities:
+1. Clock,
+2. Bindings,
+3. CRC16 test tables for testing.
 
-Signed-off-by: Martin K. Petersen <martin.petersen@oracle.com>
----
- lib/crc-t10dif.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+Patch 3/6 (ARM: dts: vfxxx: Add node for CRC hardware block) depends on patch
+2/6 (clk) so it should go in following cycle (after clk change hits mainline).
 
-diff --git a/lib/crc-t10dif.c b/lib/crc-t10dif.c
-index 52f577a3868d..6507fa101eff 100644
---- a/lib/crc-t10dif.c
-+++ b/lib/crc-t10dif.c
-@@ -107,6 +107,17 @@ static void __exit crc_t10dif_mod_fini(void)
- module_init(crc_t10dif_mod_init);
- module_exit(crc_t10dif_mod_fini);
- 
-+static int crc_t10dif_transform_show(char *buffer, const struct kernel_param *kp)
-+{
-+	if (static_key_false(&crct10dif_fallback))
-+		return sprintf(buffer, "fallback\n");
-+
-+	return sprintf(buffer, "%s\n",
-+		crypto_tfm_alg_driver_name(crypto_shash_tfm(crct10dif_tfm)));
-+}
-+
-+module_param_call(transform, NULL, crc_t10dif_transform_show, NULL, 0644);
-+
- MODULE_DESCRIPTION("T10 DIF CRC calculation");
- MODULE_LICENSE("GPL");
- MODULE_SOFTDEP("pre: crct10dif");
+Best regards,
+Krzysztof
+
+
+Krzysztof Kozlowski (6):
+  dt-bindings: crypto: Add Freescale Vybrid CRC
+  clk: imx: vf610: Add CRC clock
+  ARM: dts: vfxxx: Add node for CRC hardware block
+  crypto: testmgr - Add CRC16 test tables
+  crypto - Group Freescale/NXP ARM architecture Kconfig entires together
+  crypto: vf-crc - Add new driver for Freescale Vybrid CRC
+
+ .../devicetree/bindings/crypto/fsl-vf610-crc.txt   |  16 +
+ MAINTAINERS                                        |   7 +
+ arch/arm/boot/dts/vfxxx.dtsi                       |   7 +
+ crypto/testmgr.c                                   |   6 +
+ crypto/testmgr.h                                   | 386 ++++++++++++++++++++
+ drivers/clk/imx/clk-vf610.c                        |   1 +
+ drivers/crypto/Kconfig                             |  42 ++-
+ drivers/crypto/Makefile                            |   1 +
+ drivers/crypto/vf-crc.c                            | 387 +++++++++++++++++++++
+ include/dt-bindings/clock/vf610-clock.h            |   3 +-
+ include/linux/crc32poly.h                          |   7 +
+ 11 files changed, 846 insertions(+), 17 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/crypto/fsl-vf610-crc.txt
+ create mode 100644 drivers/crypto/vf-crc.c
+
 -- 
-2.17.1
+2.14.1
