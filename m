@@ -1,7 +1,7 @@
 From: Krzysztof Kozlowski <krzk@kernel.org>
-Subject: [PATCH 1/6] dt-bindings: crypto: Add Freescale Vybrid CRC
-Date: Thu, 30 Aug 2018 19:15:34 +0200
-Message-ID: <20180830171539.20008-2-krzk@kernel.org>
+Subject: [PATCH 2/6] clk: imx: vf610: Add CRC clock
+Date: Thu, 30 Aug 2018 19:15:35 +0200
+Message-ID: <20180830171539.20008-3-krzk@kernel.org>
 References: <20180830171539.20008-1-krzk@kernel.org>
 To: Krzysztof Kozlowski <krzk@kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
@@ -23,35 +23,38 @@ In-Reply-To: <20180830171539.20008-1-krzk@kernel.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Add bindings for Freescale/NXP Vybrid CRC HW accelerator.
+Add the clock for CRC block allowing it to be enabled by HW CRC driver.
 
 Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
 ---
- .../devicetree/bindings/crypto/fsl-vf610-crc.txt         | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/crypto/fsl-vf610-crc.txt
+ drivers/clk/imx/clk-vf610.c             | 1 +
+ include/dt-bindings/clock/vf610-clock.h | 3 ++-
+ 2 files changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/Documentation/devicetree/bindings/crypto/fsl-vf610-crc.txt b/Documentation/devicetree/bindings/crypto/fsl-vf610-crc.txt
-new file mode 100644
-index 000000000000..cdd7e26baeac
---- /dev/null
-+++ b/Documentation/devicetree/bindings/crypto/fsl-vf610-crc.txt
-@@ -0,0 +1,16 @@
-+Freescale/NXP Vybrid VF500/VF610 CRC HW accelerator
-+
-+Required properties:
-+- compatible : Should be "fsl,vf610-crc"
-+- reg : Should contain register location and length.
-+- clocks : Should contain the clock driving the CRC block.
-+- clock-names : Should be set to "crc".
-+
-+Example:
-+
-+crc@40033000 {
-+	compatible = "fsl,vf610-crc";
-+	reg = <0x40033000 0x10>;
-+	clocks = <&clks VF610_CLK_CRC>;
-+	clock-names = "crc";
-+};
+diff --git a/drivers/clk/imx/clk-vf610.c b/drivers/clk/imx/clk-vf610.c
+index 6dae54325a91..78f2602c81ad 100644
+--- a/drivers/clk/imx/clk-vf610.c
++++ b/drivers/clk/imx/clk-vf610.c
+@@ -332,6 +332,7 @@ static void __init vf610_clocks_init(struct device_node *ccm_node)
+ 	clk[VF610_CLK_DSPI2] = imx_clk_gate2("dspi2", "ipg_bus", CCM_CCGR6, CCM_CCGRx_CGn(12));
+ 	clk[VF610_CLK_DSPI3] = imx_clk_gate2("dspi3", "ipg_bus", CCM_CCGR6, CCM_CCGRx_CGn(13));
+ 
++	clk[VF610_CLK_CRC] = imx_clk_gate2("crc", "ipg_bus", CCM_CCGR1, CCM_CCGRx_CGn(3));
+ 	clk[VF610_CLK_WDT] = imx_clk_gate2("wdt", "ipg_bus", CCM_CCGR1, CCM_CCGRx_CGn(14));
+ 
+ 	clk[VF610_CLK_ESDHC0_SEL] = imx_clk_mux("esdhc0_sel", CCM_CSCMR1, 16, 2, esdhc_sels, 4);
+diff --git a/include/dt-bindings/clock/vf610-clock.h b/include/dt-bindings/clock/vf610-clock.h
+index 45997750c8a0..03f0731c5a69 100644
+--- a/include/dt-bindings/clock/vf610-clock.h
++++ b/include/dt-bindings/clock/vf610-clock.h
+@@ -199,6 +199,7 @@
+ #define VF610_CLK_WKPU			186
+ #define VF610_CLK_TCON0			187
+ #define VF610_CLK_TCON1			188
+-#define VF610_CLK_END			189
++#define VF610_CLK_CRC			189
++#define VF610_CLK_END			190
+ 
+ #endif /* __DT_BINDINGS_CLOCK_VF610_H */
 -- 
 2.14.1
