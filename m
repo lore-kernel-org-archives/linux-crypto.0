@@ -1,208 +1,445 @@
-From: Sascha Hauer <s.hauer@pengutronix.de>
-Subject: Re: [PATCH 6/6] crypto: vf-crc - Add new driver for Freescale Vybrid
- CRC
-Date: Fri, 31 Aug 2018 09:39:18 +0200
-Message-ID: <20180831073918.bcmonixmeehvr42h@pengutronix.de>
-References: <20180830171539.20008-1-krzk@kernel.org>
- <20180830171539.20008-7-krzk@kernel.org>
+From: Eric Biggers <ebiggers@kernel.org>
+Subject: [PATCH] crypto: arm/chacha20 - faster 8-bit rotations and other
+ optimizations
+Date: Fri, 31 Aug 2018 01:01:40 -0700
+Message-ID: <20180831080140.20553-1-ebiggers@kernel.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Shawn Guo <shawnguo@kernel.org>,
-        Pengutronix Kernel Team <kernel@pengutronix.de>,
-        Stefan Agner <stefan@agner.ch>,
-        Fabio Estevam <fabio.estevam@nxp.com>,
-        NXP Linux Team <linux-imx@nxp.com>,
-        Michael Turquette <mturquette@baylibre.com>,
-        Stephen Boyd <sboyd@kernel.org>, linux-crypto@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-clk@vger.kernel.org
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20180830171539.20008-7-krzk@kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: linux-arm-kernel@lists.infradead.org,
+ Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: linux-crypto@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi Krzysztof,
+From: Eric Biggers <ebiggers@google.com>
 
-Some comments inline.
+Optimize ChaCha20 NEON performance by:
 
-On Thu, Aug 30, 2018 at 07:15:39PM +0200, Krzysztof Kozlowski wrote:
-> Add driver for using the Freescale/NXP Vybrid processor CRC block for
-> CRC16 and CRC32 offloading.  The driver implements shash_alg and was
-> tested using internal testmgr tests and libkcapi.
-> 
-> Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
-> ---
->  MAINTAINERS               |   7 +
->  drivers/crypto/Kconfig    |  10 ++
->  drivers/crypto/Makefile   |   1 +
->  drivers/crypto/vf-crc.c   | 387 ++++++++++++++++++++++++++++++++++++++++++++++
->  include/linux/crc32poly.h |   7 +
->  5 files changed, 412 insertions(+)
->  create mode 100644 drivers/crypto/vf-crc.c
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 0a340f680230..e84fa829a4e4 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -15388,6 +15388,13 @@ S:	Maintained
->  F:	Documentation/fb/uvesafb.txt
->  F:	drivers/video/fbdev/uvesafb.*
->  
-> +VF500/VF610 HW CRC DRIVER
-> +M:	Krzysztof Kozlowski <krzk@kernel.org>
-> +L:	linux-crypto@vger.kernel.org
-> +S:	Maintained
-> +F:	drivers/crypto/vf-crc.c
-> +F:	Documentation/devicetree/bindings/crypto/fsl-vf610-crc.txt
-> +
->  VF610 NAND DRIVER
->  M:	Stefan Agner <stefan@agner.ch>
->  L:	linux-mtd@lists.infradead.org
-> diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-> index 20314d7a7b58..0ade940ac79c 100644
-> --- a/drivers/crypto/Kconfig
-> +++ b/drivers/crypto/Kconfig
-> @@ -418,6 +418,16 @@ config CRYPTO_DEV_MXS_DCP
->  	  To compile this driver as a module, choose M here: the module
->  	  will be called mxs-dcp.
->  
-> +config CRYPTO_DEV_VF_CRC
-> +	tristate "Support for Freescale/NXP Vybrid CRC HW accelerator"
-> +	select CRYPTO_HASH
-> +	help
-> +	  This option enables support for the CRC16/32 hardware accelerator
-> +	  on Freescale/NXP Vybrid VF500/VF610 SoCs.
-> +
-> +	  To compile this driver as a module, choose M here: the module
-> +	  will be called vf-crc.
-> +
->  config CRYPTO_DEV_EXYNOS_RNG
->  	tristate "EXYNOS HW pseudo random number generator support"
->  	depends on ARCH_EXYNOS || COMPILE_TEST
-> diff --git a/drivers/crypto/Makefile b/drivers/crypto/Makefile
-> index c23396f32c8a..418c08bdc19c 100644
-> --- a/drivers/crypto/Makefile
-> +++ b/drivers/crypto/Makefile
-> @@ -41,6 +41,7 @@ obj-$(CONFIG_ARCH_STM32) += stm32/
->  obj-$(CONFIG_CRYPTO_DEV_SUN4I_SS) += sunxi-ss/
->  obj-$(CONFIG_CRYPTO_DEV_TALITOS) += talitos.o
->  obj-$(CONFIG_CRYPTO_DEV_UX500) += ux500/
-> +obj-$(CONFIG_CRYPTO_DEV_VF_CRC) += vf-crc.o
->  obj-$(CONFIG_CRYPTO_DEV_VIRTIO) += virtio/
->  obj-$(CONFIG_CRYPTO_DEV_VMX) += vmx/
->  obj-$(CONFIG_CRYPTO_DEV_BCM_SPU) += bcm/
-> +static int vf_crc_update_prepare(struct vf_crc_tfm_ctx *mctx,
-> +				 struct vf_crc_desc_ctx *desc_ctx)
-> +{
-> +	struct vf_crc *crc = desc_ctx->crc;
-> +	int ret;
-> +
-> +	ret = clk_prepare_enable(crc->clk);
-> +	if (ret) {
-> +		dev_err(crc->dev, "Failed to enable clock\n");
-> +		return ret;
-> +	}
+- Implementing the 8-bit rotations using the 'vtbl.8' instruction.
+- Streamlining the part that adds the original state and XORs the data.
+- Making some other small tweaks.
 
-Generally have you measured the performance of this driver? Is it faster
-than the software implementation?
+On ARM Cortex-A7, these optimizations improve ChaCha20 performance from
+about 11.9 cycles per byte to 11.3.
 
-Under certain circumstances a clk_prepare_enable might become expensive,
-so it could happen that all this clk enabling/disabling takes longer
-than the action you do in between. Using pm_runtime might help here.
+There is a tradeoff involved with the 'vtbl.8' rotation method since
+there is at least one CPU where it's not fastest.  But it seems to be a
+better default; see the added comment.
 
-> +
-> +	mutex_lock(&crc->lock);
-> +
-> +	/*
-> +	 * Check if we are continuing to process request already configured
-> +	 * in HW. HW has to be re-initialized only on first update() for given
-> +	 * request or if new request was processed after last call to update().
-> +	 */
-> +	if (crc->processed_desc == desc_ctx)
-> +		return 0;
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ arch/arm/crypto/chacha20-neon-core.S | 289 ++++++++++++++-------------
+ 1 file changed, 147 insertions(+), 142 deletions(-)
 
-You never set crc->processed_desc to anything, so this optimization
-never triggers.
-
-Unless properly implementing this skip-to-reinitialize-hardware really
-brings a measurerable performance gain I would just drop this
-optimization. In the end you only save a few register writes, but it
-makes the driver more complicated.
-
-> +
-> +	vf_crc_initialize_regs(mctx, desc_ctx);
-> +
-> +	return 0;
-> +}
-> +
-
-> +static int vf_crc_finup(struct shash_desc *desc, const u8 *data,
-> +			unsigned int len, u8 *out)
-> +{
-> +	return vf_crc_update(desc, data, len) ?:
-> +	       vf_crc_final(desc, out);
-> +}
-> +
-> +static int vf_crc_digest(struct shash_desc *desc, const u8 *data,
-> +			 unsigned int leng, u8 *out)
-> +{
-> +	return vf_crc_init(desc) ?: vf_crc_finup(desc, data, leng, out);
-> +}
-
-These seem unnecessary. The crypto core will set these with similar
-wrappers if unspecified.
-
-> +static int vf_crc_probe(struct platform_device *pdev)
-> +{
-> +	struct device *dev = &pdev->dev;
-> +	struct resource *res;
-> +	struct vf_crc *crc;
-> +	int ret;
-> +
-> +	if (vf_crc_data) {
-> +		dev_err(dev, "Device already registered (only one instance allowed)\n");
-> +		return -EINVAL;
-> +	}
-> +
-> +	crc = devm_kzalloc(dev, sizeof(*crc), GFP_KERNEL);
-> +	if (!crc)
-> +		return -ENOMEM;
-> +
-> +	crc->dev = dev;
-> +
-> +	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
-> +	crc->iobase = devm_ioremap_resource(dev, res);
-> +	if (IS_ERR(crc->iobase))
-> +		return PTR_ERR(crc->iobase);
-> +
-> +	crc->clk = devm_clk_get(dev, "crc");
-> +	if (IS_ERR(crc->clk)) {
-> +		dev_err(dev, "Could not get clock\n");
-> +		return PTR_ERR(crc->clk);
-> +	}
-> +
-> +	vf_crc_data = crc;
-> +
-> +	ret = crypto_register_shashes(algs, ARRAY_SIZE(algs));
-> +	if (ret) {
-> +		dev_err(dev, "Failed to register crypto algorithms\n");
-> +		goto err;
-> +	}
-> +
-> +	mutex_init(&crc->lock);
-
-Should be done before the shashes are registered.
-
-Sascha
-
+diff --git a/arch/arm/crypto/chacha20-neon-core.S b/arch/arm/crypto/chacha20-neon-core.S
+index 3fecb2124c35a..d381cebaba31d 100644
+--- a/arch/arm/crypto/chacha20-neon-core.S
++++ b/arch/arm/crypto/chacha20-neon-core.S
+@@ -18,6 +18,33 @@
+  * (at your option) any later version.
+  */
+ 
++ /*
++  * NEON doesn't have a rotate instruction.  The alternatives are, more or less:
++  *
++  * (a)  vshl.u32 + vsri.u32		(needs temporary register)
++  * (b)  vshl.u32 + vshr.u32 + vorr	(needs temporary register)
++  * (c)  vrev32.16			(16-bit rotations only)
++  * (d)  vtbl.8 + vtbl.8		(multiple of 8 bits rotations only,
++  *					 needs index vector)
++  *
++  * ChaCha20 has 16, 12, 8, and 7-bit rotations.  For the 12 and 7-bit
++  * rotations, the only choices are (a) and (b).  We use (a) since it takes
++  * two-thirds the cycles of (b) on both Cortex-A7 and Cortex-A53.
++  *
++  * For the 16-bit rotation, we use vrev32.16 since it's consistently fastest
++  * and doesn't need a temporary register.
++  *
++  * For the 8-bit rotation, we use vtbl.8 + vtbl.8.  On Cortex-A7, this sequence
++  * is twice as fast as (a), even when doing (a) on multiple registers
++  * simultaneously to eliminate the stall between vshl and vsri.  Also, it
++  * parallelizes better when temporary registers are scarce.
++  *
++  * A disadvantage is that on Cortex-A53, the vtbl sequence is the same speed as
++  * (a), so the need to load the rotation table actually makes the vtbl method
++  * slightly slower overall on that CPU.  Still, it seems to be a good
++  * compromise to get a significant speed boost on some CPUs.
++  */
++
+ #include <linux/linkage.h>
+ 
+ 	.text
+@@ -46,6 +73,9 @@ ENTRY(chacha20_block_xor_neon)
+ 	vmov		q10, q2
+ 	vmov		q11, q3
+ 
++	ldr		ip, =.Lrol8_table
++	vld1.8		{d10}, [ip, :64]
++
+ 	mov		r3, #10
+ 
+ .Ldoubleround:
+@@ -63,9 +93,9 @@ ENTRY(chacha20_block_xor_neon)
+ 
+ 	// x0 += x1, x3 = rotl32(x3 ^ x0, 8)
+ 	vadd.i32	q0, q0, q1
+-	veor		q4, q3, q0
+-	vshl.u32	q3, q4, #8
+-	vsri.u32	q3, q4, #24
++	veor		q3, q3, q0
++	vtbl.8		d6, {d6}, d10
++	vtbl.8		d7, {d7}, d10
+ 
+ 	// x2 += x3, x1 = rotl32(x1 ^ x2, 7)
+ 	vadd.i32	q2, q2, q3
+@@ -94,9 +124,9 @@ ENTRY(chacha20_block_xor_neon)
+ 
+ 	// x0 += x1, x3 = rotl32(x3 ^ x0, 8)
+ 	vadd.i32	q0, q0, q1
+-	veor		q4, q3, q0
+-	vshl.u32	q3, q4, #8
+-	vsri.u32	q3, q4, #24
++	veor		q3, q3, q0
++	vtbl.8		d6, {d6}, d10
++	vtbl.8		d7, {d7}, d10
+ 
+ 	// x2 += x3, x1 = rotl32(x1 ^ x2, 7)
+ 	vadd.i32	q2, q2, q3
+@@ -143,11 +173,11 @@ ENDPROC(chacha20_block_xor_neon)
+ 
+ 	.align		5
+ ENTRY(chacha20_4block_xor_neon)
+-	push		{r4-r6, lr}
+-	mov		ip, sp			// preserve the stack pointer
+-	sub		r3, sp, #0x20		// allocate a 32 byte buffer
+-	bic		r3, r3, #0x1f		// aligned to 32 bytes
+-	mov		sp, r3
++	push		{r4}
++	mov		r4, sp			// preserve the stack pointer
++	sub		ip, sp, #0x20		// allocate a 32 byte buffer
++	bic		ip, ip, #0x1f		// aligned to 32 bytes
++	mov		sp, ip
+ 
+ 	// r0: Input state matrix, s
+ 	// r1: 4 data blocks output, o
+@@ -157,25 +187,24 @@ ENTRY(chacha20_4block_xor_neon)
+ 	// This function encrypts four consecutive ChaCha20 blocks by loading
+ 	// the state matrix in NEON registers four times. The algorithm performs
+ 	// each operation on the corresponding word of each state matrix, hence
+-	// requires no word shuffling. For final XORing step we transpose the
+-	// matrix by interleaving 32- and then 64-bit words, which allows us to
+-	// do XOR in NEON registers.
++	// requires no word shuffling. The words are re-interleaved before the
++	// final addition of the original state and the XORing step.
+ 	//
+ 
+-	// x0..15[0-3] = s0..3[0..3]
+-	add		r3, r0, #0x20
++	// x0..15[0-3] = s0..15[0-3]
++	add		ip, r0, #0x20
+ 	vld1.32		{q0-q1}, [r0]
+-	vld1.32		{q2-q3}, [r3]
++	vld1.32		{q2-q3}, [ip]
+ 
+-	adr		r3, CTRINC
++	adr		ip, .Lctrinc1
+ 	vdup.32		q15, d7[1]
+ 	vdup.32		q14, d7[0]
+-	vld1.32		{q11}, [r3, :128]
++	vld1.32		{q4}, [ip, :128]
+ 	vdup.32		q13, d6[1]
+ 	vdup.32		q12, d6[0]
+-	vadd.i32	q12, q12, q11		// x12 += counter values 0-3
+ 	vdup.32		q11, d5[1]
+ 	vdup.32		q10, d5[0]
++	vadd.u32	q12, q12, q4		// x12 += counter values 0-3
+ 	vdup.32		q9, d4[1]
+ 	vdup.32		q8, d4[0]
+ 	vdup.32		q7, d3[1]
+@@ -187,6 +216,7 @@ ENTRY(chacha20_4block_xor_neon)
+ 	vdup.32		q1, d0[1]
+ 	vdup.32		q0, d0[0]
+ 
++	adr		ip, .Lrol8_table
+ 	mov		r3, #10
+ 
+ .Ldoubleround4:
+@@ -238,24 +268,25 @@ ENTRY(chacha20_4block_xor_neon)
+ 	// x1 += x5, x13 = rotl32(x13 ^ x1, 8)
+ 	// x2 += x6, x14 = rotl32(x14 ^ x2, 8)
+ 	// x3 += x7, x15 = rotl32(x15 ^ x3, 8)
++	vld1.8		{d16}, [ip, :64]
+ 	vadd.i32	q0, q0, q4
+ 	vadd.i32	q1, q1, q5
+ 	vadd.i32	q2, q2, q6
+ 	vadd.i32	q3, q3, q7
+ 
+-	veor		q8, q12, q0
+-	veor		q9, q13, q1
+-	vshl.u32	q12, q8, #8
+-	vshl.u32	q13, q9, #8
+-	vsri.u32	q12, q8, #24
+-	vsri.u32	q13, q9, #24
++	veor		q12, q12, q0
++	veor		q13, q13, q1
++	veor		q14, q14, q2
++	veor		q15, q15, q3
+ 
+-	veor		q8, q14, q2
+-	veor		q9, q15, q3
+-	vshl.u32	q14, q8, #8
+-	vshl.u32	q15, q9, #8
+-	vsri.u32	q14, q8, #24
+-	vsri.u32	q15, q9, #24
++	vtbl.8		d24, {d24}, d16
++	vtbl.8		d25, {d25}, d16
++	vtbl.8		d26, {d26}, d16
++	vtbl.8		d27, {d27}, d16
++	vtbl.8		d28, {d28}, d16
++	vtbl.8		d29, {d29}, d16
++	vtbl.8		d30, {d30}, d16
++	vtbl.8		d31, {d31}, d16
+ 
+ 	vld1.32		{q8-q9}, [sp, :256]
+ 
+@@ -334,24 +365,25 @@ ENTRY(chacha20_4block_xor_neon)
+ 	// x1 += x6, x12 = rotl32(x12 ^ x1, 8)
+ 	// x2 += x7, x13 = rotl32(x13 ^ x2, 8)
+ 	// x3 += x4, x14 = rotl32(x14 ^ x3, 8)
++	vld1.8		{d16}, [ip, :64]
+ 	vadd.i32	q0, q0, q5
+ 	vadd.i32	q1, q1, q6
+ 	vadd.i32	q2, q2, q7
+ 	vadd.i32	q3, q3, q4
+ 
+-	veor		q8, q15, q0
+-	veor		q9, q12, q1
+-	vshl.u32	q15, q8, #8
+-	vshl.u32	q12, q9, #8
+-	vsri.u32	q15, q8, #24
+-	vsri.u32	q12, q9, #24
++	veor		q15, q15, q0
++	veor		q12, q12, q1
++	veor		q13, q13, q2
++	veor		q14, q14, q3
+ 
+-	veor		q8, q13, q2
+-	veor		q9, q14, q3
+-	vshl.u32	q13, q8, #8
+-	vshl.u32	q14, q9, #8
+-	vsri.u32	q13, q8, #24
+-	vsri.u32	q14, q9, #24
++	vtbl.8		d30, {d30}, d16
++	vtbl.8		d31, {d31}, d16
++	vtbl.8		d24, {d24}, d16
++	vtbl.8		d25, {d25}, d16
++	vtbl.8		d26, {d26}, d16
++	vtbl.8		d27, {d27}, d16
++	vtbl.8		d28, {d28}, d16
++	vtbl.8		d29, {d29}, d16
+ 
+ 	vld1.32		{q8-q9}, [sp, :256]
+ 
+@@ -381,104 +413,74 @@ ENTRY(chacha20_4block_xor_neon)
+ 	vsri.u32	q6, q9, #25
+ 
+ 	subs		r3, r3, #1
+-	beq		0f
+-
+-	vld1.32		{q8-q9}, [sp, :256]
+-	b		.Ldoubleround4
+-
+-	// x0[0-3] += s0[0]
+-	// x1[0-3] += s0[1]
+-	// x2[0-3] += s0[2]
+-	// x3[0-3] += s0[3]
+-0:	ldmia		r0!, {r3-r6}
+-	vdup.32		q8, r3
+-	vdup.32		q9, r4
+-	vadd.i32	q0, q0, q8
+-	vadd.i32	q1, q1, q9
+-	vdup.32		q8, r5
+-	vdup.32		q9, r6
+-	vadd.i32	q2, q2, q8
+-	vadd.i32	q3, q3, q9
+-
+-	// x4[0-3] += s1[0]
+-	// x5[0-3] += s1[1]
+-	// x6[0-3] += s1[2]
+-	// x7[0-3] += s1[3]
+-	ldmia		r0!, {r3-r6}
+-	vdup.32		q8, r3
+-	vdup.32		q9, r4
+-	vadd.i32	q4, q4, q8
+-	vadd.i32	q5, q5, q9
+-	vdup.32		q8, r5
+-	vdup.32		q9, r6
+-	vadd.i32	q6, q6, q8
+-	vadd.i32	q7, q7, q9
+-
+-	// interleave 32-bit words in state n, n+1
+-	vzip.32		q0, q1
+-	vzip.32		q2, q3
+-	vzip.32		q4, q5
+-	vzip.32		q6, q7
+-
+-	// interleave 64-bit words in state n, n+2
+-	vswp		d1, d4
+-	vswp		d3, d6
+-	vswp		d9, d12
+-	vswp		d11, d14
+-
+-	// xor with corresponding input, write to output
+-	vld1.8		{q8-q9}, [r2]!
+-	veor		q8, q8, q0
+-	veor		q9, q9, q4
+-	vst1.8		{q8-q9}, [r1]!
+-
+ 	vld1.32		{q8-q9}, [sp, :256]
+-
+-	// x8[0-3] += s2[0]
+-	// x9[0-3] += s2[1]
+-	// x10[0-3] += s2[2]
+-	// x11[0-3] += s2[3]
+-	ldmia		r0!, {r3-r6}
+-	vdup.32		q0, r3
+-	vdup.32		q4, r4
+-	vadd.i32	q8, q8, q0
+-	vadd.i32	q9, q9, q4
+-	vdup.32		q0, r5
+-	vdup.32		q4, r6
+-	vadd.i32	q10, q10, q0
+-	vadd.i32	q11, q11, q4
+-
+-	// x12[0-3] += s3[0]
+-	// x13[0-3] += s3[1]
+-	// x14[0-3] += s3[2]
+-	// x15[0-3] += s3[3]
+-	ldmia		r0!, {r3-r6}
+-	vdup.32		q0, r3
+-	vdup.32		q4, r4
+-	adr		r3, CTRINC
+-	vadd.i32	q12, q12, q0
+-	vld1.32		{q0}, [r3, :128]
+-	vadd.i32	q13, q13, q4
+-	vadd.i32	q12, q12, q0		// x12 += counter values 0-3
+-
+-	vdup.32		q0, r5
+-	vdup.32		q4, r6
+-	vadd.i32	q14, q14, q0
+-	vadd.i32	q15, q15, q4
+-
+-	// interleave 32-bit words in state n, n+1
+-	vzip.32		q8, q9
+-	vzip.32		q10, q11
+-	vzip.32		q12, q13
+-	vzip.32		q14, q15
+-
+-	// interleave 64-bit words in state n, n+2
+-	vswp		d17, d20
+-	vswp		d19, d22
+-	vswp		d25, d28
++	bne		.Ldoubleround4
++
++	// re-interleave the 32-bit words of the four blocks
++	vzip.32		q14, q15	// => (14 15 14 15) (14 15 14 15)
++	vzip.32		q12, q13	// => (12 13 12 13) (12 13 12 13)
++	vzip.32		q10, q11	// => (10 11 10 11) (10 11 10 11)
++	vzip.32		q8, q9		// => (8 9 8 9) (8 9 8 9)
++	vzip.32		q6, q7		// => (6 7 6 7) (6 7 6 7)
++	vzip.32		q4, q5		// => (4 5 4 5) (4 5 4 5)
++	vzip.32		q2, q3		// => (2 3 2 3) (2 3 2 3)
++	vzip.32		q0, q1		// => (0 1 0 1) (0 1 0 1)
+ 	vswp		d27, d30
++	vswp		d25, d28
++	vswp		d19, d22
++	vswp		d17, d20
++	vswp		d11, d14
++	  vst1.32	{q14-q15}, [sp, :256]	// free up two registers
++	vswp		d9, d12
++	vswp		d3, d6
++	  vld1.32	{q14-q15}, [r0]!	// load s0..7
++	vswp		d1, d4
+ 
+-	vmov		q4, q1
++	// Swap q1 and q4 so that we'll free up consecutive registers (q0-q1)
++	// after XORing the first 32 bytes.
++	vswp		q1, q4
++
++	// blocks are: (q0 q1 q8 q12) (q2 q6 q10 q14) (q4 q5 q9 q13) (q3 q7 q11 q15)
++
++	// x0..3[0-3] += s0..3[0-3]	(add orig state to 1st row of each block)
++	vadd.u32	q0, q0, q14
++	vadd.u32	q2, q2, q14
++	vadd.u32	q4, q4, q14
++	vadd.u32	q3, q3, q14
++
++	// x4..7[0-3] += s4..7[0-3]	(add orig state to 2nd row of each block)
++	vadd.u32	q1, q1, q15
++	vadd.u32	q6, q6, q15
++	vadd.u32	q5, q5, q15
++	vadd.u32	q7, q7, q15
++
++	// XOR first 32 bytes using keystream from first two rows of first block
++	vld1.8		{q14-q15}, [r2]!
++	veor		q14, q14, q0
++	veor		q15, q15, q1
++	  vld1.32	{q0-q1}, [r0]		// load s8..s15
++	vst1.8		{q14-q15}, [r1]!
++
++	// x8..11[0-3] += s8..11[0-3]	(add orig state to 3rd row of each block)
++	vadd.u32	q8,  q8,  q0
++	vadd.u32	q10, q10, q0
++	  vld1.32	{q14-q15}, [sp, :256]
++	vadd.u32	q9,  q9,  q0
++	  adr		ip, .Lctrinc2
++	vadd.u32	q11, q11, q0
++
++	// x12..15[0-3] += s12..15[0-3] (add orig state to 4th row of each block)
++	vld1.32		{q0}, [ip, :128]	// load (1, 0, 2, 0)
++	vadd.u32	q15, q15, q1
++	vadd.u32	q13, q13, q1
++	vadd.u32	q14, q14, q1
++	vadd.u32	q12, q12, q1
++	vadd.u32	d30, d30, d1		// x12[3] += 2
++	vadd.u32	d26, d26, d1		// x12[2] += 2
++	vadd.u32	d28, d28, d0		// x12[1] += 1
++	vadd.u32	d30, d30, d0		// x12[3] += 1
++
++	// XOR the rest of the data with the keystream
+ 
+ 	vld1.8		{q0-q1}, [r2]!
+ 	veor		q0, q0, q8
+@@ -511,13 +513,16 @@ ENTRY(chacha20_4block_xor_neon)
+ 	vst1.8		{q0-q1}, [r1]!
+ 
+ 	vld1.8		{q0-q1}, [r2]
++	  mov		sp, r4		// restore original stack pointer
+ 	veor		q0, q0, q11
+ 	veor		q1, q1, q15
+ 	vst1.8		{q0-q1}, [r1]
+ 
+-	mov		sp, ip
+-	pop		{r4-r6, pc}
++	pop		{r4}
++	bx		lr
+ ENDPROC(chacha20_4block_xor_neon)
+ 
+ 	.align		4
+-CTRINC:	.word		0, 1, 2, 3
++.Lctrinc1:	.word	0, 1, 2, 3
++.Lctrinc2:	.word	1, 0, 2, 0
++.Lrol8_table:	.byte	3, 0, 1, 2, 7, 4, 5, 6
 -- 
-Pengutronix e.K.                           |                             |
-Industrial Linux Solutions                 | http://www.pengutronix.de/  |
-Peiner Str. 6-8, 31137 Hildesheim, Germany | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+2.18.0
