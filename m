@@ -1,9 +1,9 @@
 From: Randy Dunlap <rdunlap@infradead.org>
-Subject: Re: [PATCH 4/7] crypto: add hisilicon Queue Manager driver
-Date: Sun, 2 Sep 2018 19:15:07 -0700
-Message-ID: <4e46a451-d1cd-ac68-84b4-20792fdbc733@infradead.org>
+Subject: Re: [PATCH 6/7] crypto: add sdmdev support to Hisilicon QM
+Date: Sun, 2 Sep 2018 19:19:03 -0700
+Message-ID: <46e57b2b-756e-e256-5b3c-30749d865512@infradead.org>
 References: <20180903005204.26041-1-nek.in.cn@gmail.com>
- <20180903005204.26041-5-nek.in.cn@gmail.com>
+ <20180903005204.26041-7-nek.in.cn@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
@@ -27,24 +27,44 @@ To: Kenneth Lee <nek.in.cn@gmail.com>,
         Lu Baolu <baolu.lu@linux.intel.com>,
         Sanjay Kumar <sanjay.k.kumar@intel.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180903005204.26041-5-nek.in.cn@gmail.com>
+In-Reply-To: <20180903005204.26041-7-nek.in.cn@gmail.com>
 Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
 On 09/02/2018 05:52 PM, Kenneth Lee wrote:
 > diff --git a/drivers/crypto/hisilicon/Kconfig b/drivers/crypto/hisilicon/Kconfig
-> index 8ca9c503bcb0..02a6eef84101 100644
+> index 1d155708cd69..b85fab48fdab 100644
 > --- a/drivers/crypto/hisilicon/Kconfig
 > +++ b/drivers/crypto/hisilicon/Kconfig
-> @@ -1,4 +1,8 @@
->  # SPDX-License-Identifier: GPL-2.0
-> +config CRYPTO_DEV_HISILICON
-> +	tristate "Support for HISILICON CRYPTO ACCELERATOR"
+> @@ -17,6 +17,16 @@ config CRYPTO_DEV_HISI_SEC
+>  	  To compile this as a module, choose M here: the module
+>  	  will be called hisi_sec.
+>  
+> +config CRYPTO_DEV_HISI_SDMDEV
+> +	bool "Enable SDMDEV interface"
+> +	depends on CRYPTO_DEV_HISILICON
+> +	select VFIO_SDMDEV
 > +	help
-> +	  Enable this to use Hisilicon Hardware Accelerators
+> +	  Enable this enable the SDMDEV, "shared IOMMU Domain Mediated Device"
 
-	                                        Accelerators.
+At a minimum:
+	  Enable this to enable the SDMDEV,
+
+although that could be done better.  Maybe just:
+	  Enable the SDMDEV "shared IOMMU Domain Mediated Device"
+
+	  
+> +	  interface for all Hisilicon accelerators if they can. The SDMDEV
+
+probably drop "if they can":          accelerators.  The SDMDEV interface
+
+> +	  enable the WarpDrive user space accelerator driver to access the
+
+	  enables
+
+> +	  hardware function directly.
+> +
 
 
 -- 
