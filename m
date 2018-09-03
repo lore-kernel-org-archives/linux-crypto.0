@@ -1,309 +1,325 @@
 From: Corentin Labbe <clabbe@baylibre.com>
-Subject: [PATCH v2 0/2] crypto: Implement a generic crypto statistics
-Date: Mon,  3 Sep 2018 19:22:46 +0000
-Message-ID: <1536002568-18949-1-git-send-email-clabbe@baylibre.com>
+Subject: [PATCH v2 2/2] crypto: tools: Add cryptostat userspace
+Date: Mon,  3 Sep 2018 19:22:48 +0000
+Message-ID: <1536002568-18949-3-git-send-email-clabbe@baylibre.com>
+References: <1536002568-18949-1-git-send-email-clabbe@baylibre.com>
 Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         Corentin Labbe <clabbe@baylibre.com>
 To: davem@davemloft.net, herbert@gondor.apana.org.au,
         nhorman@tuxdriver.com
 Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1536002568-18949-1-git-send-email-clabbe@baylibre.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This patch is a try to implement a generic crypto driver statistics.
-The goal is to have an "ifconfig" for crypto device.
+This patch add a userspace tool for displaying kernel crypto API
+statistics.
 
-Some driver tried to implement this via a debugfs interface.
-
-This serie do it directly in the crypto API and give access to stats
-via the crypto_user(netlink) API.
-Then an userspace tool will collect information via netlink.
-Note that this userspace tool is heavily copied from libkcapi and if
-Stephan Mueller agree, I will made a PR for adding getstat to it unless
-tools/crypto is the good place for it.
-
-Example of output:
-pkcs1pad(rsa-sun8i-ce,sha1)	Akcipher
-	Encrypt: 0 bytes: 0
-	Decrypt: 0 bytes: 0
-	Sign: 0
-	Verify: 5
-	Errors: 0
-cryptd(__xts-aes-ce)	cipher
-	Encrypt: 0 bytes: 0
-	Decrypt: 0 bytes: 0
-	Errors: 0
-xts-aes-ce	cipher
-	Encrypt: 17 bytes: 4384
-	Decrypt: 17 bytes: 4384
-	Errors: 0
-cryptd(__ctr-aes-ce)	cipher
-	Encrypt: 0 bytes: 0
-	Decrypt: 0 bytes: 0
-	Errors: 0
-ctr-aes-ce	cipher
-	Encrypt: 19 bytes: 5551
-	Decrypt: 19 bytes: 5551
-	Errors: 0
-cryptd(__cbc-aes-ce)	cipher
-	Encrypt: 0 bytes: 0
-	Decrypt: 0 bytes: 0
-	Errors: 0
-cbc-aes-ce	cipher
-	Encrypt: 19 bytes: 3040
-	Decrypt: 19 bytes: 3040
-	Errors: 0
-cryptd(__ecb-aes-ce)	cipher
-	Encrypt: 0 bytes: 0
-	Decrypt: 0 bytes: 0
-	Errors: 0
-ecb-aes-ce	cipher
-	Encrypt: 14 bytes: 2624
-	Decrypt: 14 bytes: 2624
-	Errors: 0
-cbcmac-aes-ce	Hash
-	Hash: 20 bytes: 1244
-	Errors: 0
-xcbc-aes-ce	Hash
-	Hash: 28 bytes: 543
-	Errors: 0
-cmac-aes-ce	Hash
-	Hash: 36 bytes: 1472
-	Errors: 0
-__xts-aes-ce	cipher
-	Encrypt: 17 bytes: 4384
-	Decrypt: 17 bytes: 4384
-	Errors: 0
-ctr-aes-ce	cipher
-	Encrypt: 19 bytes: 5551
-	Decrypt: 19 bytes: 5551
-	Errors: 0
-__ctr-aes-ce	cipher
-	Encrypt: 19 bytes: 5551
-	Decrypt: 19 bytes: 5551
-	Errors: 0
-__cbc-aes-ce	cipher
-	Encrypt: 19 bytes: 3040
-	Decrypt: 19 bytes: 3040
-	Errors: 0
-__ecb-aes-ce	cipher
-	Encrypt: 14 bytes: 2624
-	Decrypt: 14 bytes: 2624
-	Errors: 0
-rsa-sun8i-ce	Akcipher
-	Encrypt: 7 bytes: 232
-	Decrypt: 6 bytes: 1152
-	Sign: 0
-	Verify: 5
-	Errors: 0
-sun8i_ce_rng	RNG
-	Seed: 0
-	Generate: 0 bytes: 0
-	Errors: 0
-ecb(des3_ede-generic)	cipher
-	Encrypt: 24 bytes: 4584
-	Decrypt: 24 bytes: 4584
-	Errors: 0
-ecb-des3-sun8i-ce	cipher
-	Encrypt: 18 bytes: 3072
-	Decrypt: 18 bytes: 3072
-	Errors: 0
-cbc(des3_ede-generic)	cipher
-	Encrypt: 14 bytes: 5104
-	Decrypt: 14 bytes: 5104
-	Errors: 0
-aes-ce	cipher
-	Encrypt: 0 bytes: 0
-	Decrypt: 0 bytes: 0
-	Errors: 0
-des3_ede-generic	cipher
-	Encrypt: 0 bytes: 0
-	Decrypt: 0 bytes: 0
-	Errors: 0
-des-generic	cipher
-	Encrypt: 0 bytes: 0
-	Decrypt: 0 bytes: 0
-	Errors: 0
-aes-arm64	cipher
-	Encrypt: 0 bytes: 0
-	Decrypt: 0 bytes: 0
-	Errors: 0
-crc32c-arm64-ce	Hash
-	Hash: 92 bytes: 20649
-	Errors: 0
-cbc-des3-sun8i-ce	cipher
-	Encrypt: 10 bytes: 3488
-	Decrypt: 10 bytes: 3488
-	Errors: 0
-crc32-arm64-ce	Hash
-	Hash: 92 bytes: 20649
-	Errors: 0
-ecb-aes-sun8i-ce	cipher
-	Encrypt: 18 bytes: 3168
-	Decrypt: 18 bytes: 3168
-	Errors: 0
-cbc-aes-sun8i-ce	cipher
-	Encrypt: 24 bytes: 3712
-	Decrypt: 24 bytes: 3712
-	Errors: 0
-sha256-ce	Hash
-	Hash: 26 bytes: 8860
-	Errors: 0
-sha224-ce	Hash
-	Hash: 26 bytes: 8860
-	Errors: 0
-cts(cbc-aes-sun8i-ce)	cipher
-	Encrypt: 24 bytes: 956
-	Decrypt: 24 bytes: 956
-	Errors: 0
-sha224-arm64-neon	Hash
-	Hash: 26 bytes: 8860
-	Errors: 0
-sha256-arm64-neon	Hash
-	Hash: 26 bytes: 8860
-	Errors: 0
-sha224-arm64	Hash
-	Hash: 26 bytes: 8860
-	Errors: 0
-sha256-arm64	Hash
-	Hash: 26 bytes: 8860
-	Errors: 0
-ctr-aes-sun8i-ce	cipher
-	Encrypt: 24 bytes: 6738
-	Decrypt: 24 bytes: 6738
-	Errors: 0
-sha1-ce	Hash
-	Hash: 28 bytes: 9191
-	Errors: 0
-ecdh-generic	KPP
-	Setsecret: 4
-	Generate public key: 3
-	Compute_shared_secret: 4
-	Errors: 0
-ghash-generic	Hash
-	Hash: 32 bytes: 4358
-	Errors: 0
-jitterentropy_rng	RNG
-	Seed: 0
-	Generate: 1 bytes: 48
-	Errors: 0
-drbg_nopr_hmac_sha256	RNG
-	Seed: 5
-	Generate: 9 bytes: 1056
-	Errors: 0
-drbg_nopr_hmac_sha512	RNG
-	Seed: 0
-	Generate: 0 bytes: 0
-	Errors: 0
-drbg_nopr_hmac_sha384	RNG
-	Seed: 0
-	Generate: 0 bytes: 0
-	Errors: 0
-drbg_nopr_hmac_sha1	RNG
-	Seed: 0
-	Generate: 0 bytes: 0
-	Errors: 0
-drbg_pr_hmac_sha256	RNG
-	Seed: 4
-	Generate: 8 bytes: 1024
-	Errors: 0
-drbg_pr_hmac_sha512	RNG
-	Seed: 0
-	Generate: 0 bytes: 0
-	Errors: 0
-drbg_pr_hmac_sha384	RNG
-	Seed: 0
-	Generate: 0 bytes: 0
-	Errors: 0
-drbg_pr_hmac_sha1	RNG
-	Seed: 0
-	Generate: 0 bytes: 0
-	Errors: 0
-crct10dif-generic	Hash
-	Hash: 24 bytes: 19893
-	Errors: 0
-crc32c-generic	Hash
-	Hash: 92 bytes: 20649
-	Errors: 0
-aes-generic	cipher
-	Encrypt: 0 bytes: 0
-	Decrypt: 0 bytes: 0
-	Errors: 0
-sha224-generic	Hash
-	Hash: 26 bytes: 8860
-	Errors: 0
-sha256-generic	Hash
-	Hash: 26 bytes: 8860
-	Errors: 0
-sha1-generic	Hash
-	Hash: 28 bytes: 9191
-	Errors: 0
-digest_null-generic	Hash
-	Hash: 0 bytes: 0
-	Errors: 0
-compress_null-generic	Compress
-	Compress: 0 bytes: 0
-	Decompress: 0 bytes: 0
-	Errors: 0
-ecb-cipher_null	cipher
-	Encrypt: 0 bytes: 0
-	Decrypt: 0 bytes: 0
-	Errors: 0
-cipher_null-generic	cipher
-	Encrypt: 0 bytes: 0
-	Decrypt: 0 bytes: 0
-	Errors: 0
-rsa-generic	Akcipher
-	Encrypt: 17 bytes: 2832
-	Decrypt: 9 bytes: 1920
-	Sign: 0
-	Verify: 36
-	Errors: 0
-
-Futur possible additions:
-- Add a "number of needed fallback" statistics.
-- maximum request size
-
-Please let me know your opinions about it
-
-Regards
-
-Changes since RFC:
-- Do not use anymore CRYPTO_MSG_GETALG and added a dedicated CRYPTO_MSG_GETSTAT
-
-Changes since RFC:
-- Use cryptouser(netlink) instead of /sys
-- Use atomic_t instead of unsigned long
-- moved stat code into dedicated inline function
-- spelling fixes
-
-Corentin Labbe (2):
-  crypto: Implement a generic crypto statistics
-  crypto: tools: Add cryptostat userspace
-
- crypto/Kconfig                               |  11 +
- crypto/Makefile                              |   1 +
- crypto/ahash.c                               |  21 +-
- crypto/algapi.c                              |   8 +
- crypto/{crypto_user.c => crypto_user_base.c} |   9 +-
- crypto/crypto_user_stat.c                    | 463 +++++++++++++++++++++++++++
- crypto/rng.c                                 |   1 +
- include/crypto/acompress.h                   |  38 ++-
- include/crypto/aead.h                        |  51 ++-
- include/crypto/akcipher.h                    |  76 ++++-
- include/crypto/hash.h                        |  32 +-
- include/crypto/internal/cryptouser.h         |   8 +
- include/crypto/kpp.h                         |  51 ++-
- include/crypto/rng.h                         |  29 +-
- include/crypto/skcipher.h                    |  44 ++-
- include/linux/crypto.h                       |  83 ++++-
- include/uapi/linux/cryptouser.h              |  52 +++
- tools/crypto/getstat.c                       | 294 +++++++++++++++++
- 18 files changed, 1237 insertions(+), 35 deletions(-)
- rename crypto/{crypto_user.c => crypto_user_base.c} (97%)
- create mode 100644 crypto/crypto_user_stat.c
- create mode 100644 include/crypto/internal/cryptouser.h
+Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
+---
+ tools/crypto/getstat.c | 294 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 294 insertions(+)
  create mode 100644 tools/crypto/getstat.c
 
+diff --git a/tools/crypto/getstat.c b/tools/crypto/getstat.c
+new file mode 100644
+index 000000000000..994b8e1db8c9
+--- /dev/null
++++ b/tools/crypto/getstat.c
+@@ -0,0 +1,294 @@
++/* Heavily copied from libkcapi 2015 - 2017, Stephan Mueller <smueller@chronox.de> */
++#include <errno.h>
++#include <linux/cryptouser.h>
++#include <linux/netlink.h>
++#include <linux/rtnetlink.h>
++#include <sys/types.h>
++#include <sys/socket.h>
++#include <stdlib.h>
++#include <stdio.h>
++#include <string.h>
++#include <time.h>
++#include <unistd.h>
++
++#define CR_RTA(x)  ((struct rtattr *)(((char *)(x)) + NLMSG_ALIGN(sizeof(struct crypto_user_alg))))
++
++static int get_stat(const char *drivername)
++{
++	struct {
++		struct nlmsghdr n;
++		struct crypto_user_alg cru;
++	} req;
++	struct sockaddr_nl nl;
++	int sd = 0, ret;
++	socklen_t addr_len;
++	struct iovec iov;
++	struct msghdr msg;
++	char buf[4096];
++	struct nlmsghdr *res_n = (struct nlmsghdr *)buf;
++	struct crypto_user_alg *cru_res = NULL;
++	int res_len = 0;
++	struct rtattr *tb[CRYPTOCFGA_MAX + 1];
++	struct rtattr *rta;
++	struct nlmsgerr *errmsg;
++
++	memset(&req, 0, sizeof(req));
++	memset(&buf, 0, sizeof(buf));
++	memset(&msg, 0, sizeof(msg));
++
++	req.n.nlmsg_len = NLMSG_LENGTH(sizeof(req.cru));
++	req.n.nlmsg_flags = NLM_F_REQUEST;
++	req.n.nlmsg_type = CRYPTO_MSG_GETSTAT;
++	req.n.nlmsg_seq = time(NULL);
++
++	strncpy(req.cru.cru_driver_name, drivername, strlen(drivername));
++
++	sd =  socket(AF_NETLINK, SOCK_RAW, NETLINK_CRYPTO);
++	if (sd < 0) {
++		fprintf(stderr, "Netlink error: cannot open netlink socket");
++		return -errno;
++	}
++	memset(&nl, 0, sizeof(nl));
++	nl.nl_family = AF_NETLINK;
++	if (bind(sd, (struct sockaddr *)&nl, sizeof(nl)) < 0) {
++		ret = -errno;
++		fprintf(stderr, "Netlink error: cannot bind netlink socket");
++		goto out;
++	}
++
++	/* sanity check that netlink socket was successfully opened */
++	addr_len = sizeof(nl);
++	if (getsockname(sd, (struct sockaddr *)&nl, &addr_len) < 0) {
++		ret = -errno;
++		printf("Netlink error: cannot getsockname");
++		goto out;
++	}
++	if (addr_len != sizeof(nl)) {
++		ret = -errno;
++		printf("Netlink error: wrong address length %d", addr_len);
++		goto out;
++	}
++	if (nl.nl_family != AF_NETLINK) {
++		ret = -errno;
++		printf("Netlink error: wrong address family %d",
++				nl.nl_family);
++		goto out;
++	}
++
++	memset(&nl, 0, sizeof(nl));
++	nl.nl_family = AF_NETLINK;
++	iov.iov_base = (void *)&req.n;
++	iov.iov_len = req.n.nlmsg_len;
++	msg.msg_name = &nl;
++	msg.msg_namelen = sizeof(nl);
++	msg.msg_iov = &iov;
++	msg.msg_iovlen = 1;
++	if (sendmsg(sd, &msg, 0) < 0) {
++		ret = -errno;
++		printf("Netlink error: sendmsg failed");
++		goto out;
++	}
++	memset(buf, 0, sizeof(buf));
++	iov.iov_base = buf;
++	while (1) {
++		iov.iov_len = sizeof(buf);
++		ret = recvmsg(sd, &msg, 0);
++		if (ret < 0) {
++			if (errno == EINTR || errno == EAGAIN)
++				continue;
++			ret = -errno;
++			printf("Netlink error: netlink receive error");
++			goto out;
++		}
++		if (ret == 0) {
++			ret = -errno;
++			printf("Netlink error: no data");
++			goto out;
++		}
++		if (ret > sizeof(buf)) {
++			ret = -errno;
++			printf("Netlink error: received too much data");
++			goto out;
++		}
++		break;
++	}
++
++	ret = -EFAULT;
++	res_len = res_n->nlmsg_len;
++	if (res_n->nlmsg_type == NLMSG_ERROR) {
++		errmsg = NLMSG_DATA(res_n);
++		fprintf(stderr, "Fail with %d\n", errmsg->error);
++		ret = errmsg->error;
++		goto out;
++	}
++
++	if (res_n->nlmsg_type == CRYPTO_MSG_GETSTAT) {
++		cru_res = NLMSG_DATA(res_n);
++		res_len -= NLMSG_SPACE(sizeof(*cru_res));
++	}
++	if (res_len < 0) {
++		printf("Netlink error: nlmsg len %d\n", res_len);
++		goto out;
++	}
++
++	if (!cru_res) {
++		ret = -EFAULT;
++		printf("Netlink error: no cru_res\n");
++		goto out;
++	}
++
++	rta = CR_RTA(cru_res);
++	memset(tb, 0, sizeof(struct rtattr *) * (CRYPTOCFGA_MAX + 1));
++	while (RTA_OK(rta, res_len)) {
++		if ((rta->rta_type <= CRYPTOCFGA_MAX) && (!tb[rta->rta_type]))
++			tb[rta->rta_type] = rta;
++		rta = RTA_NEXT(rta, res_len);
++	}
++	if (res_len) {
++		printf("Netlink error: unprocessed data %d",
++				res_len);
++		goto out;
++	}
++
++	if (tb[CRYPTOCFGA_STAT_HASH]) {
++		struct rtattr *rta = tb[CRYPTOCFGA_STAT_HASH];
++		struct crypto_stat *rhash =
++			(struct crypto_stat *)RTA_DATA(rta);
++		printf("%s\tHash\n\tHash: %u bytes: %llu\n\tErrors: %u\n",
++			drivername,
++			rhash->stat_hash_cnt, rhash->stat_hash_tlen,
++			rhash->stat_hash_err_cnt);
++	} else if (tb[CRYPTOCFGA_STAT_COMPRESS]) {
++		struct rtattr *rta = tb[CRYPTOCFGA_STAT_COMPRESS];
++		struct crypto_stat *rblk =
++			(struct crypto_stat *)RTA_DATA(rta);
++		printf("%s\tCompress\n\tCompress: %u bytes: %llu\n\tDecompress: %u bytes: %llu\n\tErrors: %u\n",
++			drivername,
++			rblk->stat_compress_cnt, rblk->stat_compress_tlen,
++			rblk->stat_decompress_cnt, rblk->stat_decompress_tlen,
++			rblk->stat_compress_err_cnt);
++	} else if (tb[CRYPTOCFGA_STAT_ACOMP]) {
++		struct rtattr *rta = tb[CRYPTOCFGA_STAT_ACOMP];
++		struct crypto_stat *rcomp =
++			(struct crypto_stat *)RTA_DATA(rta);
++		printf("%s\tACompress\n\tCompress: %u bytes: %llu\n\tDecompress: %u bytes: %llu\n\tErrors: %u\n",
++			drivername,
++			rcomp->stat_compress_cnt, rcomp->stat_compress_tlen,
++			rcomp->stat_decompress_cnt, rcomp->stat_decompress_tlen,
++			rcomp->stat_compress_err_cnt);
++	} else if (tb[CRYPTOCFGA_STAT_AEAD]) {
++		struct rtattr *rta = tb[CRYPTOCFGA_STAT_AEAD];
++		struct crypto_stat *raead =
++			(struct crypto_stat *) RTA_DATA(rta);
++		printf("%s\tAEAD\n\tEncrypt: %u bytes: %llu\n\tDecrypt: %u bytes: %llu\n\tErrors: %u\n",
++			drivername,
++			raead->stat_encrypt_cnt, raead->stat_encrypt_tlen,
++			raead->stat_decrypt_cnt, raead->stat_decrypt_tlen,
++			raead->stat_aead_err_cnt);
++	} else if (tb[CRYPTOCFGA_STAT_BLKCIPHER]) {
++		struct rtattr *rta = tb[CRYPTOCFGA_STAT_BLKCIPHER];
++		struct crypto_stat *rblk =
++			(struct crypto_stat *)RTA_DATA(rta);
++		printf("%s\tCipher\n\tEncrypt: %u bytes: %llu\n\tDecrypt: %u bytes: %llu\n\tErrors: %u\n",
++			drivername,
++			rblk->stat_encrypt_cnt, rblk->stat_encrypt_tlen,
++			rblk->stat_decrypt_cnt, rblk->stat_decrypt_tlen,
++			rblk->stat_cipher_err_cnt);
++	} else if (tb[CRYPTOCFGA_STAT_AKCIPHER]) {
++		struct rtattr *rta = tb[CRYPTOCFGA_STAT_AKCIPHER];
++		struct crypto_stat *rblk =
++			(struct crypto_stat *)RTA_DATA(rta);
++		printf("%s\tAkcipher\n\tEncrypt: %u bytes: %llu\n\tDecrypt: %u bytes: %llu\n\tSign: %u\n\tVerify: %u\n\tErrors: %u\n",
++			drivername,
++			rblk->stat_encrypt_cnt, rblk->stat_encrypt_tlen,
++			rblk->stat_decrypt_cnt, rblk->stat_decrypt_tlen,
++			rblk->stat_sign_cnt, rblk->stat_verify_cnt,
++			rblk->stat_akcipher_err_cnt);
++	} else if (tb[CRYPTOCFGA_STAT_CIPHER]) {
++		struct rtattr *rta = tb[CRYPTOCFGA_STAT_CIPHER];
++		struct crypto_stat *rblk =
++			(struct crypto_stat *) RTA_DATA(rta);
++		printf("%s\tcipher\n\tEncrypt: %u bytes: %llu\n\tDecrypt: %u bytes: %llu\n\tErrors: %u\n",
++			drivername,
++			rblk->stat_encrypt_cnt, rblk->stat_encrypt_tlen,
++			rblk->stat_decrypt_cnt, rblk->stat_decrypt_tlen,
++			rblk->stat_cipher_err_cnt);
++	} else if (tb[CRYPTOCFGA_STAT_RNG]) {
++		struct rtattr *rta = tb[CRYPTOCFGA_STAT_RNG];
++		struct crypto_stat *rrng =
++			(struct crypto_stat *) RTA_DATA(rta);
++		printf("%s\tRNG\n\tSeed: %u\n\tGenerate: %u bytes: %llu\n\tErrors: %u\n",
++			drivername,
++			rrng->stat_seed_cnt,
++			rrng->stat_generate_cnt, rrng->stat_generate_tlen,
++			rrng->stat_rng_err_cnt);
++	} else if (tb[CRYPTOCFGA_STAT_KPP]) {
++		struct rtattr *rta = tb[CRYPTOCFGA_STAT_KPP];
++		struct crypto_stat *rkpp =
++			(struct crypto_stat *)RTA_DATA(rta);
++		printf("%s\tKPP\n\tSetsecret: %u\n\tGenerate public key: %u\n\tCompute_shared_secret: %u\n\tErrors: %u\n",
++			drivername,
++			rkpp->stat_setsecret_cnt,
++			rkpp->stat_generate_public_key_cnt,
++			rkpp->stat_compute_shared_secret_cnt,
++			rkpp->stat_kpp_err_cnt);
++	} else {
++		fprintf(stderr, "%s is of an unknown algorithm\n", drivername);
++	}
++	ret = 0;
++out:
++	close(sd);
++	return ret;
++}
++
++int main(int argc, const char *argv[])
++{
++	char buf[4096];
++	FILE *procfd;
++	int i, lastspace;
++	int ret;
++
++	procfd = fopen("/proc/crypto", "r");
++	if (!procfd) {
++		ret = errno;
++		fprintf(stderr, "Cannot open /proc/crypto %s\n", strerror(errno));
++		return ret;
++	}
++	if (argc > 1) {
++		if (!strcmp(argv[1], "-h") || !strcmp(argv[1], "--help")) {
++			printf("Usage: %s [-h|--help] display this help\n", argv[0]);
++			printf("Usage: %s display all crypto statistics\n", argv[0]);
++			printf("Usage: %s drivername1 drivername2 ... = display crypto statistics about drivername1 ...\n", argv[0]);
++			return 0;
++		}
++		for (i = 1; i < argc; i++) {
++			ret = get_stat(argv[i]);
++			if (ret) {
++				fprintf(stderr, "Failed with %s\n", strerror(-ret));
++				return ret;
++			}
++		}
++		return 0;
++	}
++
++	while (fgets(buf, sizeof(buf), procfd)) {
++		if (!strncmp(buf, "driver", 6)) {
++			lastspace = 0;
++			i = 0;
++			while (i < strlen(buf)) {
++				i++;
++				if (buf[i] == ' ')
++					lastspace = i;
++			}
++			buf[strlen(buf) - 1] = '\0';
++			ret = get_stat(buf + lastspace + 1);
++			if (ret) {
++				fprintf(stderr, "Failed with %s\n", strerror(-ret));
++				goto out;
++			}
++		}
++	}
++out:
++	fclose(procfd);
++	return ret;
++}
 -- 
 2.16.4
