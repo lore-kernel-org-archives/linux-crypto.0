@@ -1,438 +1,309 @@
-From: Ondrej Mosnacek <omosnace@redhat.com>
-Subject: [PATCH] crypto: xts - Drop use of auxiliary buffer
-Date: Mon,  3 Sep 2018 13:29:42 +0200
-Message-ID: <20180903112942.18979-1-omosnace@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: dm-devel@redhat.com, Mikulas Patocka <mpatocka@redhat.com>,
-	linux-crypto@vger.kernel.org, Ondrej Mosnacek <omosnace@redhat.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <dm-devel-bounces@redhat.com>
-List-Unsubscribe: <https://www.redhat.com/mailman/options/dm-devel>,
-	<mailto:dm-devel-request@redhat.com?subject=unsubscribe>
-List-Archive: <https://www.redhat.com/archives/dm-devel>
-List-Post: <mailto:dm-devel@redhat.com>
-List-Help: <mailto:dm-devel-request@redhat.com?subject=help>
-List-Subscribe: <https://www.redhat.com/mailman/listinfo/dm-devel>,
-	<mailto:dm-devel-request@redhat.com?subject=subscribe>
-Sender: dm-devel-bounces@redhat.com
-Errors-To: dm-devel-bounces@redhat.com
+From: Corentin Labbe <clabbe@baylibre.com>
+Subject: [PATCH v2 0/2] crypto: Implement a generic crypto statistics
+Date: Mon,  3 Sep 2018 19:22:46 +0000
+Message-ID: <1536002568-18949-1-git-send-email-clabbe@baylibre.com>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Corentin Labbe <clabbe@baylibre.com>
+To: davem@davemloft.net, herbert@gondor.apana.org.au,
+        nhorman@tuxdriver.com
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi Herbert, Mikulas,
+This patch is a try to implement a generic crypto driver statistics.
+The goal is to have an "ifconfig" for crypto device.
 
-I noticed the discussion about using kmalloc() inside crypto code and it
-made me wonder if the code in xts.c can actually be simplified to not
-require kmalloc() at all, while not badly affecting performace. I played
-around with it a little and it turns out we can drop the whole caching
-of tweak blocks, reducing code size by ~200 lines and not only preserve,
-but even improve the performance in some cases. See the full patch
-below.
+Some driver tried to implement this via a debugfs interface.
 
-Obviously, this doesn't solve the general issue of using kmalloc() in
-crypto API routines, but it does resolve the original reported problem
-and also makes the XTS code easier to maintain.
+This serie do it directly in the crypto API and give access to stats
+via the crypto_user(netlink) API.
+Then an userspace tool will collect information via netlink.
+Note that this userspace tool is heavily copied from libkcapi and if
+Stephan Mueller agree, I will made a PR for adding getstat to it unless
+tools/crypto is the good place for it.
 
-Regards,
-Ondrej
+Example of output:
+pkcs1pad(rsa-sun8i-ce,sha1)	Akcipher
+	Encrypt: 0 bytes: 0
+	Decrypt: 0 bytes: 0
+	Sign: 0
+	Verify: 5
+	Errors: 0
+cryptd(__xts-aes-ce)	cipher
+	Encrypt: 0 bytes: 0
+	Decrypt: 0 bytes: 0
+	Errors: 0
+xts-aes-ce	cipher
+	Encrypt: 17 bytes: 4384
+	Decrypt: 17 bytes: 4384
+	Errors: 0
+cryptd(__ctr-aes-ce)	cipher
+	Encrypt: 0 bytes: 0
+	Decrypt: 0 bytes: 0
+	Errors: 0
+ctr-aes-ce	cipher
+	Encrypt: 19 bytes: 5551
+	Decrypt: 19 bytes: 5551
+	Errors: 0
+cryptd(__cbc-aes-ce)	cipher
+	Encrypt: 0 bytes: 0
+	Decrypt: 0 bytes: 0
+	Errors: 0
+cbc-aes-ce	cipher
+	Encrypt: 19 bytes: 3040
+	Decrypt: 19 bytes: 3040
+	Errors: 0
+cryptd(__ecb-aes-ce)	cipher
+	Encrypt: 0 bytes: 0
+	Decrypt: 0 bytes: 0
+	Errors: 0
+ecb-aes-ce	cipher
+	Encrypt: 14 bytes: 2624
+	Decrypt: 14 bytes: 2624
+	Errors: 0
+cbcmac-aes-ce	Hash
+	Hash: 20 bytes: 1244
+	Errors: 0
+xcbc-aes-ce	Hash
+	Hash: 28 bytes: 543
+	Errors: 0
+cmac-aes-ce	Hash
+	Hash: 36 bytes: 1472
+	Errors: 0
+__xts-aes-ce	cipher
+	Encrypt: 17 bytes: 4384
+	Decrypt: 17 bytes: 4384
+	Errors: 0
+ctr-aes-ce	cipher
+	Encrypt: 19 bytes: 5551
+	Decrypt: 19 bytes: 5551
+	Errors: 0
+__ctr-aes-ce	cipher
+	Encrypt: 19 bytes: 5551
+	Decrypt: 19 bytes: 5551
+	Errors: 0
+__cbc-aes-ce	cipher
+	Encrypt: 19 bytes: 3040
+	Decrypt: 19 bytes: 3040
+	Errors: 0
+__ecb-aes-ce	cipher
+	Encrypt: 14 bytes: 2624
+	Decrypt: 14 bytes: 2624
+	Errors: 0
+rsa-sun8i-ce	Akcipher
+	Encrypt: 7 bytes: 232
+	Decrypt: 6 bytes: 1152
+	Sign: 0
+	Verify: 5
+	Errors: 0
+sun8i_ce_rng	RNG
+	Seed: 0
+	Generate: 0 bytes: 0
+	Errors: 0
+ecb(des3_ede-generic)	cipher
+	Encrypt: 24 bytes: 4584
+	Decrypt: 24 bytes: 4584
+	Errors: 0
+ecb-des3-sun8i-ce	cipher
+	Encrypt: 18 bytes: 3072
+	Decrypt: 18 bytes: 3072
+	Errors: 0
+cbc(des3_ede-generic)	cipher
+	Encrypt: 14 bytes: 5104
+	Decrypt: 14 bytes: 5104
+	Errors: 0
+aes-ce	cipher
+	Encrypt: 0 bytes: 0
+	Decrypt: 0 bytes: 0
+	Errors: 0
+des3_ede-generic	cipher
+	Encrypt: 0 bytes: 0
+	Decrypt: 0 bytes: 0
+	Errors: 0
+des-generic	cipher
+	Encrypt: 0 bytes: 0
+	Decrypt: 0 bytes: 0
+	Errors: 0
+aes-arm64	cipher
+	Encrypt: 0 bytes: 0
+	Decrypt: 0 bytes: 0
+	Errors: 0
+crc32c-arm64-ce	Hash
+	Hash: 92 bytes: 20649
+	Errors: 0
+cbc-des3-sun8i-ce	cipher
+	Encrypt: 10 bytes: 3488
+	Decrypt: 10 bytes: 3488
+	Errors: 0
+crc32-arm64-ce	Hash
+	Hash: 92 bytes: 20649
+	Errors: 0
+ecb-aes-sun8i-ce	cipher
+	Encrypt: 18 bytes: 3168
+	Decrypt: 18 bytes: 3168
+	Errors: 0
+cbc-aes-sun8i-ce	cipher
+	Encrypt: 24 bytes: 3712
+	Decrypt: 24 bytes: 3712
+	Errors: 0
+sha256-ce	Hash
+	Hash: 26 bytes: 8860
+	Errors: 0
+sha224-ce	Hash
+	Hash: 26 bytes: 8860
+	Errors: 0
+cts(cbc-aes-sun8i-ce)	cipher
+	Encrypt: 24 bytes: 956
+	Decrypt: 24 bytes: 956
+	Errors: 0
+sha224-arm64-neon	Hash
+	Hash: 26 bytes: 8860
+	Errors: 0
+sha256-arm64-neon	Hash
+	Hash: 26 bytes: 8860
+	Errors: 0
+sha224-arm64	Hash
+	Hash: 26 bytes: 8860
+	Errors: 0
+sha256-arm64	Hash
+	Hash: 26 bytes: 8860
+	Errors: 0
+ctr-aes-sun8i-ce	cipher
+	Encrypt: 24 bytes: 6738
+	Decrypt: 24 bytes: 6738
+	Errors: 0
+sha1-ce	Hash
+	Hash: 28 bytes: 9191
+	Errors: 0
+ecdh-generic	KPP
+	Setsecret: 4
+	Generate public key: 3
+	Compute_shared_secret: 4
+	Errors: 0
+ghash-generic	Hash
+	Hash: 32 bytes: 4358
+	Errors: 0
+jitterentropy_rng	RNG
+	Seed: 0
+	Generate: 1 bytes: 48
+	Errors: 0
+drbg_nopr_hmac_sha256	RNG
+	Seed: 5
+	Generate: 9 bytes: 1056
+	Errors: 0
+drbg_nopr_hmac_sha512	RNG
+	Seed: 0
+	Generate: 0 bytes: 0
+	Errors: 0
+drbg_nopr_hmac_sha384	RNG
+	Seed: 0
+	Generate: 0 bytes: 0
+	Errors: 0
+drbg_nopr_hmac_sha1	RNG
+	Seed: 0
+	Generate: 0 bytes: 0
+	Errors: 0
+drbg_pr_hmac_sha256	RNG
+	Seed: 4
+	Generate: 8 bytes: 1024
+	Errors: 0
+drbg_pr_hmac_sha512	RNG
+	Seed: 0
+	Generate: 0 bytes: 0
+	Errors: 0
+drbg_pr_hmac_sha384	RNG
+	Seed: 0
+	Generate: 0 bytes: 0
+	Errors: 0
+drbg_pr_hmac_sha1	RNG
+	Seed: 0
+	Generate: 0 bytes: 0
+	Errors: 0
+crct10dif-generic	Hash
+	Hash: 24 bytes: 19893
+	Errors: 0
+crc32c-generic	Hash
+	Hash: 92 bytes: 20649
+	Errors: 0
+aes-generic	cipher
+	Encrypt: 0 bytes: 0
+	Decrypt: 0 bytes: 0
+	Errors: 0
+sha224-generic	Hash
+	Hash: 26 bytes: 8860
+	Errors: 0
+sha256-generic	Hash
+	Hash: 26 bytes: 8860
+	Errors: 0
+sha1-generic	Hash
+	Hash: 28 bytes: 9191
+	Errors: 0
+digest_null-generic	Hash
+	Hash: 0 bytes: 0
+	Errors: 0
+compress_null-generic	Compress
+	Compress: 0 bytes: 0
+	Decompress: 0 bytes: 0
+	Errors: 0
+ecb-cipher_null	cipher
+	Encrypt: 0 bytes: 0
+	Decrypt: 0 bytes: 0
+	Errors: 0
+cipher_null-generic	cipher
+	Encrypt: 0 bytes: 0
+	Decrypt: 0 bytes: 0
+	Errors: 0
+rsa-generic	Akcipher
+	Encrypt: 17 bytes: 2832
+	Decrypt: 9 bytes: 1920
+	Sign: 0
+	Verify: 36
+	Errors: 0
 
------>8-----
-Since commit acb9b159c784 ("crypto: gf128mul - define gf128mul_x_* in
-gf128mul.h"), the gf128mul_x_*() functions are very fast and therefore
-caching the computed XTS tweaks has only negligible advantage over
-computing them twice.
+Futur possible additions:
+- Add a "number of needed fallback" statistics.
+- maximum request size
 
-In fact, since the current caching implementation limits the size of
-the calls to the child ecb(...) algorithm to PAGE_SIZE (usually 4096 B),
-it is often actually slower than the simple recomputing implementation.
+Please let me know your opinions about it
 
-This patch simplifies the XTS template to recompute the XTS tweaks from
-scratch in the second pass and thus also removes the need to allocate a
-dynamic buffer using kmalloc().
+Regards
 
-As discussed at [1], the use of kmalloc causes deadlocks with dm-crypt.
+Changes since RFC:
+- Do not use anymore CRYPTO_MSG_GETALG and added a dedicated CRYPTO_MSG_GETSTAT
 
-PERFORMANCE RESULTS
-I measured time to encrypt/decrypt a memory buffer of varying sizes with
-xts(ecb-aes-aesni) using a tool I wrote ([2]) and the results suggest
-that after this patch the performance is either better or comparable for
-both small and large buffers. Note that there is a lot of noise in the
-measurements, but the overall difference is easy to see.
+Changes since RFC:
+- Use cryptouser(netlink) instead of /sys
+- Use atomic_t instead of unsigned long
+- moved stat code into dedicated inline function
+- spelling fixes
 
-Old code:
-ALGORITHM       KEY (b) DATA (B)        TIME ENC (ns)   TIME DEC (ns)
-        xts(aes)     256              64             331             328
-        xts(aes)     384              64             332             333
-        xts(aes)     512              64             338             348
-        xts(aes)     256             512             889             920
-        xts(aes)     384             512            1019             993
-        xts(aes)     512             512            1032             990
-        xts(aes)     256            4096            2152            2292
-        xts(aes)     384            4096            2453            2597
-        xts(aes)     512            4096            3041            2641
-        xts(aes)     256           16384            9443            8027
-        xts(aes)     384           16384            8536            8925
-        xts(aes)     512           16384            9232            9417
-        xts(aes)     256           32768           16383           14897
-        xts(aes)     384           32768           17527           16102
-        xts(aes)     512           32768           18483           17322
+Corentin Labbe (2):
+  crypto: Implement a generic crypto statistics
+  crypto: tools: Add cryptostat userspace
 
-New code:
-ALGORITHM       KEY (b) DATA (B)        TIME ENC (ns)   TIME DEC (ns)
-        xts(aes)     256              64             328             324
-        xts(aes)     384              64             324             319
-        xts(aes)     512              64             320             322
-        xts(aes)     256             512             476             473
-        xts(aes)     384             512             509             492
-        xts(aes)     512             512             531             514
-        xts(aes)     256            4096            2132            1829
-        xts(aes)     384            4096            2357            2055
-        xts(aes)     512            4096            2178            2027
-        xts(aes)     256           16384            6920            6983
-        xts(aes)     384           16384            8597            7505
-        xts(aes)     512           16384            7841            8164
-        xts(aes)     256           32768           13468           12307
-        xts(aes)     384           32768           14808           13402
-        xts(aes)     512           32768           15753           14636
+ crypto/Kconfig                               |  11 +
+ crypto/Makefile                              |   1 +
+ crypto/ahash.c                               |  21 +-
+ crypto/algapi.c                              |   8 +
+ crypto/{crypto_user.c => crypto_user_base.c} |   9 +-
+ crypto/crypto_user_stat.c                    | 463 +++++++++++++++++++++++++++
+ crypto/rng.c                                 |   1 +
+ include/crypto/acompress.h                   |  38 ++-
+ include/crypto/aead.h                        |  51 ++-
+ include/crypto/akcipher.h                    |  76 ++++-
+ include/crypto/hash.h                        |  32 +-
+ include/crypto/internal/cryptouser.h         |   8 +
+ include/crypto/kpp.h                         |  51 ++-
+ include/crypto/rng.h                         |  29 +-
+ include/crypto/skcipher.h                    |  44 ++-
+ include/linux/crypto.h                       |  83 ++++-
+ include/uapi/linux/cryptouser.h              |  52 +++
+ tools/crypto/getstat.c                       | 294 +++++++++++++++++
+ 18 files changed, 1237 insertions(+), 35 deletions(-)
+ rename crypto/{crypto_user.c => crypto_user_base.c} (97%)
+ create mode 100644 crypto/crypto_user_stat.c
+ create mode 100644 include/crypto/internal/cryptouser.h
+ create mode 100644 tools/crypto/getstat.c
 
-[1] https://lkml.org/lkml/2018/8/23/1315
-[2] https://gitlab.com/omos/linux-crypto-bench
-
-Cc: Mikulas Patocka <mpatocka@redhat.com>
-Signed-off-by: Ondrej Mosnacek <omosnace@redhat.com>
----
- crypto/xts.c | 258 ++++++---------------------------------------------
- 1 file changed, 30 insertions(+), 228 deletions(-)
-
-diff --git a/crypto/xts.c b/crypto/xts.c
-index 12284183bd20..6c49e76df8ca 100644
---- a/crypto/xts.c
-+++ b/crypto/xts.c
-@@ -26,8 +26,6 @@
- #include <crypto/b128ops.h>
- #include <crypto/gf128mul.h>
- 
--#define XTS_BUFFER_SIZE 128u
--
- struct priv {
- 	struct crypto_skcipher *child;
- 	struct crypto_cipher *tweak;
-@@ -39,19 +37,7 @@ struct xts_instance_ctx {
- };
- 
- struct rctx {
--	le128 buf[XTS_BUFFER_SIZE / sizeof(le128)];
--
- 	le128 t;
--
--	le128 *ext;
--
--	struct scatterlist srcbuf[2];
--	struct scatterlist dstbuf[2];
--	struct scatterlist *src;
--	struct scatterlist *dst;
--
--	unsigned int left;
--
- 	struct skcipher_request subreq;
- };
- 
-@@ -96,265 +82,81 @@ static int setkey(struct crypto_skcipher *parent, const u8 *key,
- 	return err;
- }
- 
--static int post_crypt(struct skcipher_request *req)
-+static int xor_tweak(struct rctx *rctx, struct skcipher_request *req)
- {
--	struct rctx *rctx = skcipher_request_ctx(req);
--	le128 *buf = rctx->ext ?: rctx->buf;
--	struct skcipher_request *subreq;
- 	const int bs = XTS_BLOCK_SIZE;
- 	struct skcipher_walk w;
--	struct scatterlist *sg;
--	unsigned offset;
-+	le128 t = rctx->t;
- 	int err;
- 
--	subreq = &rctx->subreq;
--	err = skcipher_walk_virt(&w, subreq, false);
-+	err = skcipher_walk_virt(&w, req, false);
- 
- 	while (w.nbytes) {
- 		unsigned int avail = w.nbytes;
-+		le128 *wsrc;
- 		le128 *wdst;
- 
-+		wsrc = w.src.virt.addr;
- 		wdst = w.dst.virt.addr;
- 
- 		do {
--			le128_xor(wdst, buf++, wdst);
--			wdst++;
-+			le128_xor(wdst++, &t, wsrc++);
-+			gf128mul_x_ble(&t, &t);
- 		} while ((avail -= bs) >= bs);
- 
- 		err = skcipher_walk_done(&w, avail);
- 	}
- 
--	rctx->left -= subreq->cryptlen;
--
--	if (err || !rctx->left)
--		goto out;
--
--	rctx->dst = rctx->dstbuf;
--
--	scatterwalk_done(&w.out, 0, 1);
--	sg = w.out.sg;
--	offset = w.out.offset;
--
--	if (rctx->dst != sg) {
--		rctx->dst[0] = *sg;
--		sg_unmark_end(rctx->dst);
--		scatterwalk_crypto_chain(rctx->dst, sg_next(sg), 0, 2);
--	}
--	rctx->dst[0].length -= offset - sg->offset;
--	rctx->dst[0].offset = offset;
--
--out:
- 	return err;
- }
- 
--static int pre_crypt(struct skcipher_request *req)
-+static void crypt_done(struct crypto_async_request *areq, int err)
- {
-+	struct skcipher_request *req = areq->data;
- 	struct rctx *rctx = skcipher_request_ctx(req);
--	le128 *buf = rctx->ext ?: rctx->buf;
--	struct skcipher_request *subreq;
--	const int bs = XTS_BLOCK_SIZE;
--	struct skcipher_walk w;
--	struct scatterlist *sg;
--	unsigned cryptlen;
--	unsigned offset;
--	bool more;
--	int err;
--
--	subreq = &rctx->subreq;
--	cryptlen = subreq->cryptlen;
--
--	more = rctx->left > cryptlen;
--	if (!more)
--		cryptlen = rctx->left;
--
--	skcipher_request_set_crypt(subreq, rctx->src, rctx->dst,
--				   cryptlen, NULL);
--
--	err = skcipher_walk_virt(&w, subreq, false);
--
--	while (w.nbytes) {
--		unsigned int avail = w.nbytes;
--		le128 *wsrc;
--		le128 *wdst;
--
--		wsrc = w.src.virt.addr;
--		wdst = w.dst.virt.addr;
--
--		do {
--			*buf++ = rctx->t;
--			le128_xor(wdst++, &rctx->t, wsrc++);
--			gf128mul_x_ble(&rctx->t, &rctx->t);
--		} while ((avail -= bs) >= bs);
--
--		err = skcipher_walk_done(&w, avail);
--	}
--
--	skcipher_request_set_crypt(subreq, rctx->dst, rctx->dst,
--				   cryptlen, NULL);
-+	struct skcipher_request *subreq = &rctx->subreq;
- 
--	if (err || !more)
--		goto out;
-+	if (!err)
-+		err = xor_tweak(rctx, subreq);
- 
--	rctx->src = rctx->srcbuf;
--
--	scatterwalk_done(&w.in, 0, 1);
--	sg = w.in.sg;
--	offset = w.in.offset;
--
--	if (rctx->src != sg) {
--		rctx->src[0] = *sg;
--		sg_unmark_end(rctx->src);
--		scatterwalk_crypto_chain(rctx->src, sg_next(sg), 0, 2);
--	}
--	rctx->src[0].length -= offset - sg->offset;
--	rctx->src[0].offset = offset;
--
--out:
--	return err;
-+	skcipher_request_complete(req, err);
- }
- 
--static int init_crypt(struct skcipher_request *req, crypto_completion_t done)
-+static void init_crypt(struct skcipher_request *req)
- {
- 	struct priv *ctx = crypto_skcipher_ctx(crypto_skcipher_reqtfm(req));
- 	struct rctx *rctx = skcipher_request_ctx(req);
--	struct skcipher_request *subreq;
--	gfp_t gfp;
-+	struct skcipher_request *subreq = &rctx->subreq;
- 
--	subreq = &rctx->subreq;
- 	skcipher_request_set_tfm(subreq, ctx->child);
--	skcipher_request_set_callback(subreq, req->base.flags, done, req);
--
--	gfp = req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP ? GFP_KERNEL :
--							   GFP_ATOMIC;
--	rctx->ext = NULL;
--
--	subreq->cryptlen = XTS_BUFFER_SIZE;
--	if (req->cryptlen > XTS_BUFFER_SIZE) {
--		unsigned int n = min(req->cryptlen, (unsigned int)PAGE_SIZE);
--
--		rctx->ext = kmalloc(n, gfp);
--		if (rctx->ext)
--			subreq->cryptlen = n;
--	}
--
--	rctx->src = req->src;
--	rctx->dst = req->dst;
--	rctx->left = req->cryptlen;
-+	skcipher_request_set_callback(subreq, req->base.flags, crypt_done, req);
-+	skcipher_request_set_crypt(subreq, req->dst, req->dst,
-+				   req->cryptlen, NULL);
- 
- 	/* calculate first value of T */
- 	crypto_cipher_encrypt_one(ctx->tweak, (u8 *)&rctx->t, req->iv);
--
--	return 0;
--}
--
--static void exit_crypt(struct skcipher_request *req)
--{
--	struct rctx *rctx = skcipher_request_ctx(req);
--
--	rctx->left = 0;
--
--	if (rctx->ext)
--		kzfree(rctx->ext);
--}
--
--static int do_encrypt(struct skcipher_request *req, int err)
--{
--	struct rctx *rctx = skcipher_request_ctx(req);
--	struct skcipher_request *subreq;
--
--	subreq = &rctx->subreq;
--
--	while (!err && rctx->left) {
--		err = pre_crypt(req) ?:
--		      crypto_skcipher_encrypt(subreq) ?:
--		      post_crypt(req);
--
--		if (err == -EINPROGRESS || err == -EBUSY)
--			return err;
--	}
--
--	exit_crypt(req);
--	return err;
--}
--
--static void encrypt_done(struct crypto_async_request *areq, int err)
--{
--	struct skcipher_request *req = areq->data;
--	struct skcipher_request *subreq;
--	struct rctx *rctx;
--
--	rctx = skcipher_request_ctx(req);
--
--	if (err == -EINPROGRESS) {
--		if (rctx->left != req->cryptlen)
--			return;
--		goto out;
--	}
--
--	subreq = &rctx->subreq;
--	subreq->base.flags &= CRYPTO_TFM_REQ_MAY_BACKLOG;
--
--	err = do_encrypt(req, err ?: post_crypt(req));
--	if (rctx->left)
--		return;
--
--out:
--	skcipher_request_complete(req, err);
- }
- 
- static int encrypt(struct skcipher_request *req)
--{
--	return do_encrypt(req, init_crypt(req, encrypt_done));
--}
--
--static int do_decrypt(struct skcipher_request *req, int err)
- {
- 	struct rctx *rctx = skcipher_request_ctx(req);
--	struct skcipher_request *subreq;
--
--	subreq = &rctx->subreq;
-+	struct skcipher_request *subreq = &rctx->subreq;
- 
--	while (!err && rctx->left) {
--		err = pre_crypt(req) ?:
--		      crypto_skcipher_decrypt(subreq) ?:
--		      post_crypt(req);
--
--		if (err == -EINPROGRESS || err == -EBUSY)
--			return err;
--	}
--
--	exit_crypt(req);
--	return err;
--}
--
--static void decrypt_done(struct crypto_async_request *areq, int err)
--{
--	struct skcipher_request *req = areq->data;
--	struct skcipher_request *subreq;
--	struct rctx *rctx;
--
--	rctx = skcipher_request_ctx(req);
--
--	if (err == -EINPROGRESS) {
--		if (rctx->left != req->cryptlen)
--			return;
--		goto out;
--	}
--
--	subreq = &rctx->subreq;
--	subreq->base.flags &= CRYPTO_TFM_REQ_MAY_BACKLOG;
--
--	err = do_decrypt(req, err ?: post_crypt(req));
--	if (rctx->left)
--		return;
--
--out:
--	skcipher_request_complete(req, err);
-+	init_crypt(req);
-+	return xor_tweak(rctx, req) ?:
-+		crypto_skcipher_encrypt(subreq) ?:
-+		xor_tweak(rctx, subreq);
- }
- 
- static int decrypt(struct skcipher_request *req)
- {
--	return do_decrypt(req, init_crypt(req, decrypt_done));
-+	struct rctx *rctx = skcipher_request_ctx(req);
-+	struct skcipher_request *subreq = &rctx->subreq;
-+
-+	init_crypt(req);
-+	return xor_tweak(rctx, req) ?:
-+		crypto_skcipher_decrypt(subreq) ?:
-+		xor_tweak(rctx, subreq);
- }
- 
- static int init_tfm(struct crypto_skcipher *tfm)
 -- 
-2.17.1
+2.16.4
