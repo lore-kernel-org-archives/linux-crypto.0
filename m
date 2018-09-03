@@ -1,7 +1,7 @@
 From: Kenneth Lee <nek.in.cn@gmail.com>
-Subject: [PATCH 3/7] vfio: add sdmdev support
-Date: Mon,  3 Sep 2018 08:52:00 +0800
-Message-ID: <20180903005204.26041-4-nek.in.cn@gmail.com>
+Subject: [PATCH 5/7] crypto: Add Hisilicon Zip driver
+Date: Mon,  3 Sep 2018 08:52:02 +0800
+Message-ID: <20180903005204.26041-6-nek.in.cn@gmail.com>
 References: <20180903005204.26041-1-nek.in.cn@gmail.com>
 Cc: linuxarm@huawei.com
 To: Jonathan Corbet <corbet@lwn.net>,
@@ -28,819 +28,699 @@ List-Id: linux-crypto.vger.kernel.org
 
 From: Kenneth Lee <liguozhu@hisilicon.com>
 
-SDMDEV is "Share Domain Mdev". It is a vfio-mdev. But differ from
-the general vfio-mdev, it shares its parent's IOMMU. If Multi-PASID
-support is enabled in the IOMMU (not yet in the current kernel HEAD),
-multiple process can share the IOMMU by different PASID. If it is not
-support, only one process can share the IOMMU with the kernel driver.
+The Hisilicon ZIP accelerator implements zlib and gzip algorithm support
+for the software. It uses Hisilicon QM as the interface to the CPU, so it
+is shown up as a PCIE device to the CPU with a group of queues.
 
-Currently only the vfio type-1 driver is updated to make it to be aware
-of.
+This commit provides PCIE driver to the accelerator and register it to
+the crypto subsystem.
 
 Signed-off-by: Kenneth Lee <liguozhu@hisilicon.com>
-Signed-off-by: Zaibo Xu <xuzaibo@huawei.com>
 Signed-off-by: Zhou Wang <wangzhou1@hisilicon.com>
+Signed-off-by: Hao Fang <fanghao11@huawei.com>
 ---
- drivers/vfio/Kconfig              |   1 +
- drivers/vfio/Makefile             |   1 +
- drivers/vfio/sdmdev/Kconfig       |  10 +
- drivers/vfio/sdmdev/Makefile      |   3 +
- drivers/vfio/sdmdev/vfio_sdmdev.c | 363 ++++++++++++++++++++++++++++++
- drivers/vfio/vfio_iommu_type1.c   | 151 ++++++++++++-
- include/linux/vfio_sdmdev.h       |  96 ++++++++
- include/uapi/linux/vfio_sdmdev.h  |  29 +++
- 8 files changed, 648 insertions(+), 6 deletions(-)
- create mode 100644 drivers/vfio/sdmdev/Kconfig
- create mode 100644 drivers/vfio/sdmdev/Makefile
- create mode 100644 drivers/vfio/sdmdev/vfio_sdmdev.c
- create mode 100644 include/linux/vfio_sdmdev.h
- create mode 100644 include/uapi/linux/vfio_sdmdev.h
+ drivers/crypto/hisilicon/Kconfig          |   7 +
+ drivers/crypto/hisilicon/Makefile         |   1 +
+ drivers/crypto/hisilicon/zip/Makefile     |   2 +
+ drivers/crypto/hisilicon/zip/zip.h        |  57 ++++
+ drivers/crypto/hisilicon/zip/zip_crypto.c | 353 ++++++++++++++++++++++
+ drivers/crypto/hisilicon/zip/zip_crypto.h |   8 +
+ drivers/crypto/hisilicon/zip/zip_main.c   | 195 ++++++++++++
+ 7 files changed, 623 insertions(+)
+ create mode 100644 drivers/crypto/hisilicon/zip/Makefile
+ create mode 100644 drivers/crypto/hisilicon/zip/zip.h
+ create mode 100644 drivers/crypto/hisilicon/zip/zip_crypto.c
+ create mode 100644 drivers/crypto/hisilicon/zip/zip_crypto.h
+ create mode 100644 drivers/crypto/hisilicon/zip/zip_main.c
 
-diff --git a/drivers/vfio/Kconfig b/drivers/vfio/Kconfig
-index c84333eb5eb5..5af7d1db505e 100644
---- a/drivers/vfio/Kconfig
-+++ b/drivers/vfio/Kconfig
-@@ -47,4 +47,5 @@ menuconfig VFIO_NOIOMMU
- source "drivers/vfio/pci/Kconfig"
- source "drivers/vfio/platform/Kconfig"
- source "drivers/vfio/mdev/Kconfig"
-+source "drivers/vfio/sdmdev/Kconfig"
- source "virt/lib/Kconfig"
-diff --git a/drivers/vfio/Makefile b/drivers/vfio/Makefile
-index de67c4725cce..678592360a7a 100644
---- a/drivers/vfio/Makefile
-+++ b/drivers/vfio/Makefile
-@@ -9,3 +9,4 @@ obj-$(CONFIG_VFIO_SPAPR_EEH) += vfio_spapr_eeh.o
- obj-$(CONFIG_VFIO_PCI) += pci/
- obj-$(CONFIG_VFIO_PLATFORM) += platform/
- obj-$(CONFIG_VFIO_MDEV) += mdev/
-+obj-$(CONFIG_VFIO_SDMDEV) += sdmdev/
-diff --git a/drivers/vfio/sdmdev/Kconfig b/drivers/vfio/sdmdev/Kconfig
-new file mode 100644
-index 000000000000..51474272870d
---- /dev/null
-+++ b/drivers/vfio/sdmdev/Kconfig
-@@ -0,0 +1,10 @@
-+# SPDX-License-Identifier: GPL-2.0
-+config VFIO_SDMDEV
-+	tristate "Support for Share Domain MDEV"
-+	depends on VFIO_MDEV_DEVICE
+diff --git a/drivers/crypto/hisilicon/Kconfig b/drivers/crypto/hisilicon/Kconfig
+index 02a6eef84101..1d155708cd69 100644
+--- a/drivers/crypto/hisilicon/Kconfig
++++ b/drivers/crypto/hisilicon/Kconfig
+@@ -20,3 +20,10 @@ config CRYPTO_DEV_HISI_SEC
+ config CRYPTO_DEV_HISI_QM
+ 	tristate
+ 	depends on ARM64 && PCI
++
++config CRYPTO_DEV_HISI_ZIP
++	tristate "Support for HISI ZIP Driver"
++	depends on ARM64 && CRYPTO_DEV_HISILICON
++	select CRYPTO_DEV_HISI_QM
 +	help
-+	  Support for VFIO Share Domain MDEV, which enables the kernel to
-+	  support light weight hardware accelerator framework, WarpDrive.
-+
-+	  To compile this as a module, choose M here: the module will be called
-+	  sdmdev.
-diff --git a/drivers/vfio/sdmdev/Makefile b/drivers/vfio/sdmdev/Makefile
++	  Support for HiSilicon HIP08 ZIP Driver
+diff --git a/drivers/crypto/hisilicon/Makefile b/drivers/crypto/hisilicon/Makefile
+index 05e9052e0f52..c97c5b27c3cb 100644
+--- a/drivers/crypto/hisilicon/Makefile
++++ b/drivers/crypto/hisilicon/Makefile
+@@ -1,3 +1,4 @@
+ # SPDX-License-Identifier: GPL-2.0
+ obj-$(CONFIG_CRYPTO_DEV_HISI_SEC) += sec/
+ obj-$(CONFIG_CRYPTO_DEV_HISI_QM) += qm.o
++obj-$(CONFIG_CRYPTO_DEV_HISI_ZIP) += zip/
+diff --git a/drivers/crypto/hisilicon/zip/Makefile b/drivers/crypto/hisilicon/zip/Makefile
 new file mode 100644
-index 000000000000..ccaaa03f3184
+index 000000000000..a936f099ee22
 --- /dev/null
-+++ b/drivers/vfio/sdmdev/Makefile
-@@ -0,0 +1,3 @@
-+# SPDX-License-Identifier: GPL-2.0
-+sdmdev-y := sdmdev.o
-+obj-$(CONFIG_VFIO_SDMDEV) += vfio_sdmdev.o
-diff --git a/drivers/vfio/sdmdev/vfio_sdmdev.c b/drivers/vfio/sdmdev/vfio_sdmdev.c
++++ b/drivers/crypto/hisilicon/zip/Makefile
+@@ -0,0 +1,2 @@
++obj-$(CONFIG_CRYPTO_DEV_HISI_ZIP) += hisi_zip.o
++hisi_zip-objs = zip_main.o zip_crypto.o
+diff --git a/drivers/crypto/hisilicon/zip/zip.h b/drivers/crypto/hisilicon/zip/zip.h
 new file mode 100644
-index 000000000000..c6eb5d4bdab0
+index 000000000000..87515e158b17
 --- /dev/null
-+++ b/drivers/vfio/sdmdev/vfio_sdmdev.c
-@@ -0,0 +1,363 @@
-+// SPDX-License-Identifier: GPL-2.0+
-+#include <linux/module.h>
-+#include <linux/vfio_sdmdev.h>
-+
-+static struct class *sdmdev_class;
-+
-+static int vfio_sdmdev_dev_exist(struct device *dev, void *data)
-+{
-+	return !strcmp(dev_name(dev), dev_name((struct device *)data));
-+}
-+
-+#ifdef CONFIG_IOMMU_SVA
-+static bool vfio_sdmdev_is_valid_pasid(int pasid)
-+{
-+	struct mm_struct *mm;
-+
-+	mm = iommu_sva_find(pasid);
-+	if (mm) {
-+		mmput(mm);
-+		return mm == current->mm;
-+	}
-+
-+	return false;
-+}
-+#endif
-+
-+/* Check if the device is a mediated device belongs to vfio_sdmdev */
-+int vfio_sdmdev_is_sdmdev(struct device *dev)
-+{
-+	struct mdev_device *mdev;
-+	struct device *pdev;
-+
-+	mdev = mdev_from_dev(dev);
-+	if (!mdev)
-+		return 0;
-+
-+	pdev = mdev_parent_dev(mdev);
-+	if (!pdev)
-+		return 0;
-+
-+	return class_for_each_device(sdmdev_class, NULL, pdev,
-+			vfio_sdmdev_dev_exist);
-+}
-+EXPORT_SYMBOL_GPL(vfio_sdmdev_is_sdmdev);
-+
-+struct vfio_sdmdev *vfio_sdmdev_pdev_sdmdev(struct device *dev)
-+{
-+	struct device *class_dev;
-+
-+	if (!dev)
-+		return ERR_PTR(-EINVAL);
-+
-+	class_dev = class_find_device(sdmdev_class, NULL, dev,
-+		(int(*)(struct device *, const void *))vfio_sdmdev_dev_exist);
-+	if (!class_dev)
-+		return ERR_PTR(-ENODEV);
-+
-+	return container_of(class_dev, struct vfio_sdmdev, cls_dev);
-+}
-+EXPORT_SYMBOL_GPL(vfio_sdmdev_pdev_sdmdev);
-+
-+struct vfio_sdmdev *mdev_sdmdev(struct mdev_device *mdev)
-+{
-+	struct device *pdev = mdev_parent_dev(mdev);
-+
-+	return vfio_sdmdev_pdev_sdmdev(pdev);
-+}
-+EXPORT_SYMBOL_GPL(mdev_sdmdev);
-+
-+static ssize_t iommu_type_show(struct device *dev,
-+			       struct device_attribute *attr, char *buf)
-+{
-+	struct vfio_sdmdev *sdmdev = vfio_sdmdev_pdev_sdmdev(dev);
-+
-+	if (!sdmdev)
-+		return -ENODEV;
-+
-+	return sprintf(buf, "%d\n", sdmdev->iommu_type);
-+}
-+
-+static DEVICE_ATTR_RO(iommu_type);
-+
-+static ssize_t dma_flag_show(struct device *dev,
-+			     struct device_attribute *attr, char *buf)
-+{
-+	struct vfio_sdmdev *sdmdev = vfio_sdmdev_pdev_sdmdev(dev);
-+
-+	if (!sdmdev)
-+		return -ENODEV;
-+
-+	return sprintf(buf, "%d\n", sdmdev->dma_flag);
-+}
-+
-+static DEVICE_ATTR_RO(dma_flag);
-+
-+/* mdev->dev_attr_groups */
-+static struct attribute *vfio_sdmdev_attrs[] = {
-+	&dev_attr_iommu_type.attr,
-+	&dev_attr_dma_flag.attr,
-+	NULL,
-+};
-+static const struct attribute_group vfio_sdmdev_group = {
-+	.name  = VFIO_SDMDEV_PDEV_ATTRS_GRP_NAME,
-+	.attrs = vfio_sdmdev_attrs,
-+};
-+const struct attribute_group *vfio_sdmdev_groups[] = {
-+	&vfio_sdmdev_group,
-+	NULL,
-+};
-+
-+/* default attributes for mdev->supported_type_groups, used by registerer*/
-+#define MDEV_TYPE_ATTR_RO_EXPORT(name) \
-+		MDEV_TYPE_ATTR_RO(name); \
-+		EXPORT_SYMBOL_GPL(mdev_type_attr_##name);
-+
-+#define DEF_SIMPLE_SDMDEV_ATTR(_name, sdmdev_member, format) \
-+static ssize_t _name##_show(struct kobject *kobj, struct device *dev, \
-+			    char *buf) \
-+{ \
-+	struct vfio_sdmdev *sdmdev = vfio_sdmdev_pdev_sdmdev(dev); \
-+	if (!sdmdev) \
-+		return -ENODEV; \
-+	return sprintf(buf, format, sdmdev->sdmdev_member); \
-+} \
-+MDEV_TYPE_ATTR_RO_EXPORT(_name)
-+
-+DEF_SIMPLE_SDMDEV_ATTR(flags, flags, "%d");
-+DEF_SIMPLE_SDMDEV_ATTR(name, name, "%s"); /* this should be algorithm name, */
-+		/* but you would not care if you have only one algorithm */
-+DEF_SIMPLE_SDMDEV_ATTR(device_api, api_ver, "%s");
-+
-+static ssize_t
-+available_instances_show(struct kobject *kobj, struct device *dev, char *buf)
-+{
-+	struct vfio_sdmdev *sdmdev = vfio_sdmdev_pdev_sdmdev(dev);
-+	int nr_inst = 0;
-+
-+	nr_inst = sdmdev->ops->get_available_instances ?
-+		sdmdev->ops->get_available_instances(sdmdev) : 0;
-+	return sprintf(buf, "%d", nr_inst);
-+}
-+MDEV_TYPE_ATTR_RO_EXPORT(available_instances);
-+
-+static int vfio_sdmdev_mdev_create(struct kobject *kobj,
-+	struct mdev_device *mdev)
-+{
-+	struct device *pdev = mdev_parent_dev(mdev);
-+	struct vfio_sdmdev_queue *q;
-+	struct vfio_sdmdev *sdmdev = mdev_sdmdev(mdev);
-+	int ret;
-+
-+	if (!sdmdev->ops->get_queue)
-+		return -ENODEV;
-+
-+	ret = sdmdev->ops->get_queue(sdmdev, &q);
-+	if (ret)
-+		return ret;
-+
-+	q->sdmdev = sdmdev;
-+	q->mdev = mdev;
-+	init_waitqueue_head(&q->wait);
-+
-+	mdev_set_drvdata(mdev, q);
-+	get_device(pdev);
-+
-+	return 0;
-+}
-+
-+static int vfio_sdmdev_mdev_remove(struct mdev_device *mdev)
-+{
-+	struct vfio_sdmdev_queue *q =
-+		(struct vfio_sdmdev_queue *)mdev_get_drvdata(mdev);
-+	struct vfio_sdmdev *sdmdev = q->sdmdev;
-+	struct device *pdev = mdev_parent_dev(mdev);
-+
-+	put_device(pdev);
-+
-+	if (sdmdev->ops->put_queue);
-+		sdmdev->ops->put_queue(q);
-+
-+	return 0;
-+}
-+
-+/* Wake up the process who is waiting this queue */
-+void vfio_sdmdev_wake_up(struct vfio_sdmdev_queue *q)
-+{
-+	wake_up_all(&q->wait);
-+}
-+EXPORT_SYMBOL_GPL(vfio_sdmdev_wake_up);
-+
-+static int vfio_sdmdev_mdev_mmap(struct mdev_device *mdev,
-+				 struct vm_area_struct *vma)
-+{
-+	struct vfio_sdmdev_queue *q =
-+		(struct vfio_sdmdev_queue *)mdev_get_drvdata(mdev);
-+	struct vfio_sdmdev *sdmdev = q->sdmdev;
-+
-+	if (sdmdev->ops->mmap)
-+		return sdmdev->ops->mmap(q, vma);
-+
-+	dev_err(sdmdev->dev, "no driver mmap!\n");
-+	return -EINVAL;
-+}
-+
-+static inline int vfio_sdmdev_wait(struct vfio_sdmdev_queue *q,
-+				   unsigned long timeout)
-+{
-+	int ret;
-+	struct vfio_sdmdev *sdmdev = q->sdmdev;
-+
-+	if (!sdmdev->ops->mask_notify)
-+		return -ENODEV;
-+
-+	sdmdev->ops->mask_notify(q, VFIO_SDMDEV_EVENT_Q_UPDATE);
-+
-+	ret = timeout ?  wait_event_interruptible_timeout(q->wait,
-+			sdmdev->ops->is_q_updated(q), timeout) :
-+		     wait_event_interruptible(q->wait,
-+			sdmdev->ops->is_q_updated(q));
-+
-+	sdmdev->ops->mask_notify(q, 0);
-+
-+	return ret;
-+}
-+
-+static long vfio_sdmdev_mdev_ioctl(struct mdev_device *mdev, unsigned int cmd,
-+			       unsigned long arg)
-+{
-+	struct vfio_sdmdev_queue *q =
-+		(struct vfio_sdmdev_queue *)mdev_get_drvdata(mdev);
-+	struct vfio_sdmdev *sdmdev = q->sdmdev;
-+
-+	switch (cmd) {
-+	case VFIO_SDMDEV_CMD_WAIT:
-+		return vfio_sdmdev_wait(q, arg);
-+
-+#ifdef CONFIG_IOMMU_SVA
-+	case VFIO_SDMDEV_CMD_BIND_PASID:
-+		int ret;
-+
-+		if (!vfio_sdmdev_is_valid_pasid(arg))
-+			return -EINVAL;
-+
-+		mutex_lock(&q->mutex);
-+		q->pasid = arg;
-+
-+		if (sdmdev->ops->start_queue)
-+			ret = sdmdev->ops->start_queue(q);
-+
-+		mutex_unlock(&q->mutex);
-+
-+		return ret;
-+#endif
-+
-+	default:
-+		if (sdmdev->ops->ioctl)
-+			return sdmdev->ops->ioctl(q, cmd, arg);
-+
-+		dev_err(sdmdev->dev, "ioctl cmd (%d) is not supported!\n", cmd);
-+		return -EINVAL;
-+	}
-+}
-+
-+static void vfio_sdmdev_release(struct device *dev) { }
-+
-+static void vfio_sdmdev_mdev_release(struct mdev_device *mdev)
-+{
-+	struct vfio_sdmdev_queue *q =
-+		(struct vfio_sdmdev_queue *)mdev_get_drvdata(mdev);
-+	struct vfio_sdmdev *sdmdev = q->sdmdev;
-+
-+	if (sdmdev->ops->stop_queue)
-+		sdmdev->ops->stop_queue(q);
-+}
-+
-+static int vfio_sdmdev_mdev_open(struct mdev_device *mdev)
-+{
-+#ifndef CONFIG_IOMMU_SVA
-+	struct vfio_sdmdev_queue *q =
-+		(struct vfio_sdmdev_queue *)mdev_get_drvdata(mdev);
-+	struct vfio_sdmdev *sdmdev = q->sdmdev;
-+
-+	if (sdmdev->ops->start_queue)
-+		sdmdev->ops->start_queue(q);
-+#endif
-+
-+	return 0;
-+}
-+
-+/**
-+ *	vfio_sdmdev_register - register a sdmdev
-+ *	@sdmdev: device structure
-+ */
-+int vfio_sdmdev_register(struct vfio_sdmdev *sdmdev)
-+{
-+	int ret;
-+
-+	if (!sdmdev->dev)
-+		return -ENODEV;
-+
-+	atomic_set(&sdmdev->ref, 0);
-+	sdmdev->cls_dev.parent = sdmdev->dev;
-+	sdmdev->cls_dev.class = sdmdev_class;
-+	sdmdev->cls_dev.release = vfio_sdmdev_release;
-+	dev_set_name(&sdmdev->cls_dev, "%s", dev_name(sdmdev->dev));
-+	ret = device_register(&sdmdev->cls_dev);
-+	if (ret)
-+		goto err;
-+
-+	sdmdev->mdev_fops.owner			= THIS_MODULE;
-+	sdmdev->mdev_fops.dev_attr_groups	= vfio_sdmdev_groups;
-+	WARN_ON(!sdmdev->mdev_fops.supported_type_groups);
-+	sdmdev->mdev_fops.create		= vfio_sdmdev_mdev_create;
-+	sdmdev->mdev_fops.remove		= vfio_sdmdev_mdev_remove;
-+	sdmdev->mdev_fops.ioctl			= vfio_sdmdev_mdev_ioctl;
-+	sdmdev->mdev_fops.open			= vfio_sdmdev_mdev_open;
-+	sdmdev->mdev_fops.release		= vfio_sdmdev_mdev_release;
-+	sdmdev->mdev_fops.mmap			= vfio_sdmdev_mdev_mmap,
-+
-+	ret = mdev_register_device(sdmdev->dev, &sdmdev->mdev_fops);
-+	if (ret)
-+		goto err_with_cls_dev;
-+
-+	return 0;
-+
-+err_with_cls_dev:
-+	device_unregister(&sdmdev->cls_dev);
-+err:
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(vfio_sdmdev_register);
-+
-+/**
-+ * vfio_sdmdev_unregister - unregisters a sdmdev
-+ * @sdmdev: device to unregister
-+ *
-+ * Unregister a sdmdev that wat previously successully registered with
-+ * vfio_sdmdev_register().
-+ */
-+void vfio_sdmdev_unregister(struct vfio_sdmdev *sdmdev)
-+{
-+	mdev_unregister_device(sdmdev->dev);
-+	device_unregister(&sdmdev->cls_dev);
-+}
-+EXPORT_SYMBOL_GPL(vfio_sdmdev_unregister);
-+
-+static int __init vfio_sdmdev_init(void)
-+{
-+	sdmdev_class = class_create(THIS_MODULE, VFIO_SDMDEV_CLASS_NAME);
-+	return PTR_ERR_OR_ZERO(sdmdev_class);
-+}
-+
-+static __exit void vfio_sdmdev_exit(void)
-+{
-+	class_destroy(sdmdev_class);
-+}
-+
-+module_init(vfio_sdmdev_init);
-+module_exit(vfio_sdmdev_exit);
-+
-+MODULE_LICENSE("GPL");
-+MODULE_AUTHOR("Hisilicon Tech. Co., Ltd.");
-+MODULE_DESCRIPTION("VFIO Share Domain Mediated Device");
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index d9fd3188615d..ba73231d8692 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -41,6 +41,7 @@
- #include <linux/notifier.h>
- #include <linux/dma-iommu.h>
- #include <linux/irqdomain.h>
-+#include <linux/vfio_sdmdev.h>
- 
- #define DRIVER_VERSION  "0.2"
- #define DRIVER_AUTHOR   "Alex Williamson <alex.williamson@redhat.com>"
-@@ -89,6 +90,8 @@ struct vfio_dma {
- };
- 
- struct vfio_group {
-+	/* iommu_group of mdev's parent device */
-+	struct iommu_group	*parent_group;
- 	struct iommu_group	*iommu_group;
- 	struct list_head	next;
- };
-@@ -1327,6 +1330,109 @@ static bool vfio_iommu_has_sw_msi(struct iommu_group *group, phys_addr_t *base)
- 	return ret;
- }
- 
-+/* return 0 if the device is not sdmdev.
-+ * return 1 if the device is sdmdev, the data will be updated with parent
-+ *	device's group.
-+ * return -errno if other error.
-+ */
-+static int vfio_sdmdev_type(struct device *dev, void *data)
-+{
-+	struct iommu_group **group = data;
-+	struct iommu_group *pgroup;
-+	int (*_is_sdmdev)(struct device *dev);
-+	struct device *pdev;
-+	int ret = 1;
-+
-+	/* vfio_sdmdev module is not configurated */
-+	_is_sdmdev = symbol_get(vfio_sdmdev_is_sdmdev);
-+	if (!_is_sdmdev)
-+		return 0;
-+
-+	/* check if it belongs to vfio_sdmdev device */
-+	if (!_is_sdmdev(dev)) {
-+		ret = 0;
-+		goto out;
-+	}
-+
-+	pdev = dev->parent;
-+	pgroup = iommu_group_get(pdev);
-+	if (!pgroup) {
-+		ret = -ENODEV;
-+		goto out;
-+	}
-+
-+	if (group) {
-+		/* check if all parent devices is the same */
-+		if (*group && *group != pgroup)
-+			ret = -ENODEV;
-+		else
-+			*group = pgroup;
-+	}
-+
-+	iommu_group_put(pgroup);
-+
-+out:
-+	symbol_put(vfio_sdmdev_is_sdmdev);
-+
-+	return ret;
-+}
-+
-+/* return 0 or -errno */
-+static int vfio_sdmdev_bus(struct device *dev, void *data)
-+{
-+	struct bus_type **bus = data;
-+
-+	if (!dev->bus)
-+		return -ENODEV;
-+
-+	/* ensure all devices has the same bus_type */
-+	if (*bus && *bus != dev->bus)
-+		return -EINVAL;
-+
-+	*bus = dev->bus;
-+	return 0;
-+}
-+
-+/* return 0 means it is not sd group, 1 means it is, or -EXXX for error */
-+static int vfio_iommu_type1_attach_sdgroup(struct vfio_domain *domain,
-+					    struct vfio_group *group,
-+					    struct iommu_group *iommu_group)
-+{
-+	int ret;
-+	struct bus_type *pbus = NULL;
-+	struct iommu_group *pgroup = NULL;
-+
-+	ret = iommu_group_for_each_dev(iommu_group, &pgroup,
-+				       vfio_sdmdev_type);
-+	if (ret < 0)
-+		goto out;
-+	else if (ret > 0) {
-+		domain->domain = iommu_group_share_domain(pgroup);
-+		if (IS_ERR(domain->domain))
-+			goto out;
-+		ret = iommu_group_for_each_dev(pgroup, &pbus,
-+				       vfio_sdmdev_bus);
-+		if (ret < 0)
-+			goto err_with_share_domain;
-+
-+		if (pbus && iommu_capable(pbus, IOMMU_CAP_CACHE_COHERENCY))
-+			domain->prot |= IOMMU_CACHE;
-+
-+		group->parent_group = pgroup;
-+		INIT_LIST_HEAD(&domain->group_list);
-+		list_add(&group->next, &domain->group_list);
-+
-+		return 1;
-+	}
-+
-+	return 0;
-+
-+err_with_share_domain:
-+	iommu_group_unshare_domain(pgroup);
-+out:
-+	return ret;
-+}
-+
- static int vfio_iommu_type1_attach_group(void *iommu_data,
- 					 struct iommu_group *iommu_group)
- {
-@@ -1335,8 +1441,8 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
- 	struct vfio_domain *domain, *d;
- 	struct bus_type *bus = NULL, *mdev_bus;
- 	int ret;
--	bool resv_msi, msi_remap;
--	phys_addr_t resv_msi_base;
-+	bool resv_msi = false, msi_remap;
-+	phys_addr_t resv_msi_base = 0;
- 
- 	mutex_lock(&iommu->lock);
- 
-@@ -1373,6 +1479,14 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
- 	if (mdev_bus) {
- 		if ((bus == mdev_bus) && !iommu_present(bus)) {
- 			symbol_put(mdev_bus_type);
-+
-+			ret = vfio_iommu_type1_attach_sdgroup(domain, group,
-+					iommu_group);
-+			if (ret < 0)
-+				goto out_free;
-+			else if (ret > 0)
-+				goto replay_check;
-+
- 			if (!iommu->external_domain) {
- 				INIT_LIST_HEAD(&domain->group_list);
- 				iommu->external_domain = domain;
-@@ -1451,12 +1565,13 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
- 
- 	vfio_test_domain_fgsp(domain);
- 
-+replay_check:
- 	/* replay mappings on new domains */
- 	ret = vfio_iommu_replay(iommu, domain);
- 	if (ret)
- 		goto out_detach;
- 
--	if (resv_msi) {
-+	if (!group->parent_group && resv_msi) {
- 		ret = iommu_get_msi_cookie(domain->domain, resv_msi_base);
- 		if (ret)
- 			goto out_detach;
-@@ -1471,7 +1586,10 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
- out_detach:
- 	iommu_detach_group(domain->domain, iommu_group);
- out_domain:
--	iommu_domain_free(domain->domain);
-+	if (group->parent_group)
-+		iommu_group_unshare_domain(group->parent_group);
-+	else
-+		iommu_domain_free(domain->domain);
- out_free:
- 	kfree(domain);
- 	kfree(group);
-@@ -1527,12 +1645,25 @@ static void vfio_sanity_check_pfn_list(struct vfio_iommu *iommu)
- 	WARN_ON(iommu->notifier.head);
- }
- 
-+static void vfio_iommu_undo(struct vfio_iommu *iommu,
-+			    struct iommu_domain *domain)
-+{
-+	struct rb_node *n = rb_first(&iommu->dma_list);
-+	struct vfio_dma *dma;
-+
-+	for (; n; n = rb_next(n)) {
-+		dma = rb_entry(n, struct vfio_dma, node);
-+		iommu_unmap(domain, dma->iova, dma->size);
-+	}
-+}
-+
- static void vfio_iommu_type1_detach_group(void *iommu_data,
- 					  struct iommu_group *iommu_group)
- {
- 	struct vfio_iommu *iommu = iommu_data;
- 	struct vfio_domain *domain;
- 	struct vfio_group *group;
-+	struct iommu_domain *sdomain = NULL;
- 
- 	mutex_lock(&iommu->lock);
- 
-@@ -1560,7 +1691,12 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
- 		if (!group)
- 			continue;
- 
--		iommu_detach_group(domain->domain, iommu_group);
-+		if (group->parent_group)
-+			sdomain = iommu_group_unshare_domain(
-+					group->parent_group);
-+		else
-+			iommu_detach_group(domain->domain, iommu_group);
-+
- 		list_del(&group->next);
- 		kfree(group);
- 		/*
-@@ -1577,7 +1713,10 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
- 				else
- 					vfio_iommu_unmap_unpin_reaccount(iommu);
- 			}
--			iommu_domain_free(domain->domain);
-+			if (domain->domain != sdomain)
-+				iommu_domain_free(domain->domain);
-+			else
-+				vfio_iommu_undo(iommu, sdomain);
- 			list_del(&domain->next);
- 			kfree(domain);
- 		}
-diff --git a/include/linux/vfio_sdmdev.h b/include/linux/vfio_sdmdev.h
-new file mode 100644
-index 000000000000..fbc9fb3f4abc
---- /dev/null
-+++ b/include/linux/vfio_sdmdev.h
-@@ -0,0 +1,96 @@
++++ b/drivers/crypto/hisilicon/zip/zip.h
+@@ -0,0 +1,57 @@
 +/* SPDX-License-Identifier: GPL-2.0+ */
-+#ifndef __VFIO_SDMDEV_H
-+#define __VFIO_SDMDEV_H
++#ifndef HISI_ZIP_H
++#define HISI_ZIP_H
 +
-+#include <linux/device.h>
-+#include <linux/iommu.h>
-+#include <linux/mdev.h>
-+#include <linux/vfio.h>
-+#include <uapi/linux/vfio_sdmdev.h>
++#include <linux/list.h>
++#include "../qm.h"
 +
-+struct vfio_sdmdev_queue;
-+struct vfio_sdmdev;
++#define HZIP_SQE_SIZE			128
++#define HZIP_SQ_SIZE			(HZIP_SQE_SIZE * QM_Q_DEPTH)
++#define QM_CQ_SIZE			(QM_CQE_SIZE * QM_Q_DEPTH)
++#define HZIP_PF_DEF_Q_NUM		64
++#define HZIP_PF_DEF_Q_BASE		0
 +
-+/* event bit used to mask the hardware irq */
-+#define VFIO_SDMDEV_EVENT_Q_UPDATE BIT(0) /* irq if queue is updated */
++struct hisi_zip {
++	struct qm_info qm;
++	struct list_head list;
 +
-+/**
-+ * struct vfio_sdmdev_ops - WD device operations
-+ * @get_queue: get a queue from the device according to algorithm
-+ * @put_queue: free a queue to the device
-+ * @start_queue: put queue into action with current process's pasid.
-+ * @stop_queue: stop queue from running state
-+ * @is_q_updated: check whether the task is finished
-+ * @mask_notify: mask the task irq of queue
-+ * @mmap: mmap addresses of queue to user space
-+ * @reset: reset the WD device
-+ * @reset_queue: reset the queue
-+ * @ioctl:   ioctl for user space users of the queue
-+ * @get_available_instances: get numbers of the queue remained
-+ */
-+struct vfio_sdmdev_ops {
-+	int (*get_queue)(struct vfio_sdmdev *sdmdev,
-+			 struct vfio_sdmdev_queue **q);
-+	void (*put_queue)(struct vfio_sdmdev_queue *q);
-+	int (*start_queue)(struct vfio_sdmdev_queue *q);
-+	void (*stop_queue)(struct vfio_sdmdev_queue *q);
-+	int (*is_q_updated)(struct vfio_sdmdev_queue *q);
-+	void (*mask_notify)(struct vfio_sdmdev_queue *q, int event_mask);
-+	int (*mmap)(struct vfio_sdmdev_queue *q, struct vm_area_struct *vma);
-+	int (*reset)(struct vfio_sdmdev *sdmdev);
-+	int (*reset_queue)(struct vfio_sdmdev_queue *q);
-+	long (*ioctl)(struct vfio_sdmdev_queue *q, unsigned int cmd,
-+			unsigned long arg);
-+	int (*get_available_instances)(struct vfio_sdmdev *sdmdev);
-+};
-+
-+struct vfio_sdmdev_queue {
-+	struct mutex mutex;
-+	struct vfio_sdmdev *sdmdev;
-+	__u32 flags;
-+	void *priv;
-+	wait_queue_head_t wait;
-+	struct mdev_device *mdev;
-+	int fd;
-+	int container;
-+#ifdef CONFIG_IOMMU_SVA
-+	int pasid;
++#ifdef CONFIG_CRYPTO_DEV_HISI_SPIMDEV
++	struct vfio_spimdev *spimdev;
 +#endif
 +};
 +
-+struct vfio_sdmdev {
-+	const char *name;
-+	int status;
-+	atomic_t ref;
-+	const struct vfio_sdmdev_ops *ops;
++struct hisi_zip_sqe {
++	__u32 consumed;
++	__u32 produced;
++	__u32 comp_data_length;
++	__u32 dw3;
++	__u32 input_data_length;
++	__u32 lba_l;
++	__u32 lba_h;
++	__u32 dw7;
++	__u32 dw8;
++	__u32 dw9;
++	__u32 dw10;
++	__u32 priv_info;
++	__u32 dw12;
++	__u32 tag;
++	__u32 dest_avail_out;
++	__u32 rsvd0;
++	__u32 comp_head_addr_l;
++	__u32 comp_head_addr_h;
++	__u32 source_addr_l;
++	__u32 source_addr_h;
++	__u32 dest_addr_l;
++	__u32 dest_addr_h;
++	__u32 stream_ctx_addr_l;
++	__u32 stream_ctx_addr_h;
++	__u32 cipher_key1_addr_l;
++	__u32 cipher_key1_addr_h;
++	__u32 cipher_key2_addr_l;
++	__u32 cipher_key2_addr_h;
++	__u32 rsvd1[4];
++};
++
++extern struct list_head hisi_zip_list;
++
++#endif
+diff --git a/drivers/crypto/hisilicon/zip/zip_crypto.c b/drivers/crypto/hisilicon/zip/zip_crypto.c
+new file mode 100644
+index 000000000000..0a0e3de8e1d6
+--- /dev/null
++++ b/drivers/crypto/hisilicon/zip/zip_crypto.c
+@@ -0,0 +1,353 @@
++/* SPDX-License-Identifier: GPL-2.0+ */
++#include <linux/crypto.h>
++#include <linux/dma-mapping.h>
++#include <linux/pci.h>
++#include <linux/topology.h>
++#include "../qm.h"
++#include "zip.h"
++
++#define INPUT_BUFFER_SIZE	(64 * 1024)
++#define OUTPUT_BUFFER_SIZE	(64 * 1024)
++
++#define COMP_NAME_TO_TYPE(alg_name)			\
++	(!strcmp((alg_name), "zlib-deflate") ? 0x02 :	\
++	 !strcmp((alg_name), "gzip") ? 0x03 : 0)	\
++
++struct hisi_zip_buffer {
++	u8 *input;
++	dma_addr_t input_dma;
++	u8 *output;
++	dma_addr_t output_dma;
++};
++
++struct hisi_zip_qp_ctx {
++	struct hisi_zip_buffer buffer;
++	struct hisi_qp *qp;
++	struct hisi_zip_sqe zip_sqe;
++};
++
++struct hisi_zip_ctx {
++#define QPC_COMP	0
++#define QPC_DECOMP	1
++	struct hisi_zip_qp_ctx qp_ctx[2];
++};
++
++static struct hisi_zip *find_zip_device(int node)
++{
++	struct hisi_zip *hisi_zip, *ret = NULL;
 +	struct device *dev;
-+	struct device cls_dev;
-+	bool is_vf;
-+	u32 iommu_type;
-+	u32 dma_flag;
-+	void *priv;
-+	int flags;
-+	const char *api_ver;
-+	struct mdev_parent_ops mdev_fops;
++	int min_distance = 100;
++
++	list_for_each_entry(hisi_zip, &hisi_zip_list, list) {
++		dev = &hisi_zip->qm.pdev->dev;
++		if (node_distance(dev->numa_node, node) < min_distance) {
++			ret = hisi_zip;
++			min_distance = node_distance(dev->numa_node, node);
++		}
++	}
++
++	return ret;
++}
++
++static void hisi_zip_qp_event_notifier(struct hisi_qp *qp)
++{
++	complete(&qp->completion);
++}
++
++static int hisi_zip_fill_sqe_v1(void *sqe, void *q_parm, u32 len)
++{
++	struct hisi_zip_sqe *zip_sqe = (struct hisi_zip_sqe *)sqe;
++	struct hisi_zip_qp_ctx *qp_ctx = (struct hisi_zip_qp_ctx *)q_parm;
++	struct hisi_zip_buffer *buffer = &qp_ctx->buffer;
++
++	memset(zip_sqe, 0, sizeof(struct hisi_zip_sqe));
++
++	zip_sqe->input_data_length = len;
++	zip_sqe->dw9 = qp_ctx->qp->req_type;
++	zip_sqe->dest_avail_out = OUTPUT_BUFFER_SIZE;
++	zip_sqe->source_addr_l = lower_32_bits(buffer->input_dma);
++	zip_sqe->source_addr_h = upper_32_bits(buffer->input_dma);
++	zip_sqe->dest_addr_l = lower_32_bits(buffer->output_dma);
++	zip_sqe->dest_addr_h = upper_32_bits(buffer->output_dma);
++
++	return 0;
++}
++
++/* let's allocate one buffer now, may have problem in async case */
++static int hisi_zip_alloc_qp_buffer(struct hisi_zip_qp_ctx *hisi_zip_qp_ctx)
++{
++	struct hisi_zip_buffer *buffer = &hisi_zip_qp_ctx->buffer;
++	struct hisi_qp *qp = hisi_zip_qp_ctx->qp;
++	struct device *dev = &qp->qm->pdev->dev;
++	int ret;
++
++	buffer->input = dma_alloc_coherent(dev, INPUT_BUFFER_SIZE,
++					   &buffer->input_dma, GFP_KERNEL);
++	if (!buffer->input)
++		return -ENOMEM;
++
++	buffer->output = dma_alloc_coherent(dev, OUTPUT_BUFFER_SIZE,
++					    &buffer->output_dma, GFP_KERNEL);
++	if (!buffer->output) {
++		ret = -ENOMEM;
++		goto err_alloc_output_buffer;
++	}
++
++	return 0;
++
++err_alloc_output_buffer:
++	dma_free_coherent(dev, INPUT_BUFFER_SIZE, buffer->input,
++			  buffer->input_dma);
++	return ret;
++}
++
++static void hisi_zip_free_qp_buffer(struct hisi_zip_qp_ctx *hisi_zip_qp_ctx)
++{
++	struct hisi_zip_buffer *buffer = &hisi_zip_qp_ctx->buffer;
++	struct hisi_qp *qp = hisi_zip_qp_ctx->qp;
++	struct device *dev = &qp->qm->pdev->dev;
++
++	dma_free_coherent(dev, INPUT_BUFFER_SIZE, buffer->input,
++			  buffer->input_dma);
++	dma_free_coherent(dev, OUTPUT_BUFFER_SIZE, buffer->output,
++			  buffer->output_dma);
++}
++
++static int hisi_zip_create_qp(struct qm_info *qm, struct hisi_zip_qp_ctx *ctx,
++			      int alg_type, int req_type)
++{
++	struct hisi_qp *qp;
++	int ret;
++
++	qp = hisi_qm_create_qp(qm, alg_type);
++
++	if (IS_ERR(qp))
++		return PTR_ERR(qp);
++
++	qp->event_cb = hisi_zip_qp_event_notifier;
++	qp->req_type = req_type;
++
++	qp->qp_ctx = ctx;
++	ctx->qp = qp;
++
++	ret = hisi_zip_alloc_qp_buffer(ctx);
++	if (ret)
++		goto err_with_qp;
++
++	ret = hisi_qm_start_qp(qp, 0);
++	if (ret < 0)
++		goto err_with_qp_buffer;
++
++	return 0;
++err_with_qp_buffer:
++	hisi_zip_free_qp_buffer(ctx);
++err_with_qp:
++	hisi_qm_release_qp(qp);
++	return ret;
++}
++
++static void hisi_zip_release_qp(struct hisi_zip_qp_ctx *ctx)
++{
++	hisi_qm_release_qp(ctx->qp);
++	hisi_zip_free_qp_buffer(ctx);
++}
++
++static int hisi_zip_alloc_comp_ctx(struct crypto_tfm *tfm)
++{
++	struct hisi_zip_ctx *hisi_zip_ctx = crypto_tfm_ctx(tfm);
++	const char *alg_name = crypto_tfm_alg_name(tfm);
++	struct hisi_zip *hisi_zip;
++	struct qm_info *qm;
++	int ret, i, j;
++
++	u8 req_type = COMP_NAME_TO_TYPE(alg_name);
++
++	/* find the proper zip device */
++	hisi_zip = find_zip_device(cpu_to_node(smp_processor_id()));
++	if (!hisi_zip) {
++		pr_err("Can not find proper ZIP device!\n");
++		return -ENODEV;
++	}
++	qm = &hisi_zip->qm;
++
++	for (i = 0; i < 2; i++) {
++	/* it is just happen that 0 is compress, 1 is decompress on alg_type */
++		ret = hisi_zip_create_qp(qm, &hisi_zip_ctx->qp_ctx[i], i,
++					 req_type);
++		if (ret)
++			goto err;
++	}
++
++	return 0;
++err:
++	for (j = i-1; j >= 0; j--)
++		hisi_zip_release_qp(&hisi_zip_ctx->qp_ctx[j]);
++
++	return ret;
++}
++
++static void hisi_zip_free_comp_ctx(struct crypto_tfm *tfm)
++{
++	struct hisi_zip_ctx *hisi_zip_ctx = crypto_tfm_ctx(tfm);
++	int i;
++
++	/* release the qp */
++	for (i = 1; i >= 0; i--)
++		hisi_zip_release_qp(&hisi_zip_ctx->qp_ctx[i]);
++}
++
++static int hisi_zip_copy_data_to_buffer(struct hisi_zip_qp_ctx *qp_ctx,
++					const u8 *src, unsigned int slen)
++{
++	struct hisi_zip_buffer *buffer = &qp_ctx->buffer;
++
++	if (slen > INPUT_BUFFER_SIZE)
++		return -EINVAL;
++
++	memcpy(buffer->input, src, slen);
++
++	return 0;
++}
++
++static struct hisi_zip_sqe *hisi_zip_get_writeback_sqe(struct hisi_qp *qp)
++{
++	struct hisi_acc_qp_status *qp_status = &qp->qp_status;
++	struct hisi_zip_sqe *sq_base = QP_SQE_ADDR(qp);
++	u16 sq_head = qp_status->sq_head;
++
++	return sq_base + sq_head;
++}
++
++static int hisi_zip_copy_data_from_buffer(struct hisi_zip_qp_ctx *qp_ctx,
++					  u8 *dst, unsigned int *dlen)
++{
++	struct hisi_zip_buffer *buffer = &qp_ctx->buffer;
++	struct hisi_qp *qp = qp_ctx->qp;
++	struct hisi_zip_sqe *zip_sqe = hisi_zip_get_writeback_sqe(qp);
++	u32 status = zip_sqe->dw3 & 0xff;
++	u16 sq_head;
++
++	if (status != 0) {
++		pr_err("hisi zip: %s fail!\n", (qp->alg_type == 0) ?
++		       "compression" : "decompression");
++		return status;
++	}
++
++	if (zip_sqe->produced > OUTPUT_BUFFER_SIZE)
++		return -ENOMEM;
++
++	memcpy(dst, buffer->output, zip_sqe->produced);
++	*dlen = zip_sqe->produced;
++
++	sq_head = qp->qp_status.sq_head;
++	if (sq_head == QM_Q_DEPTH - 1)
++		qp->qp_status.sq_head = 0;
++	else
++		qp->qp_status.sq_head++;
++
++	return 0;
++}
++
++static int hisi_zip_compress(struct crypto_tfm *tfm, const u8 *src,
++			     unsigned int slen, u8 *dst, unsigned int *dlen)
++{
++	struct hisi_zip_ctx *hisi_zip_ctx = crypto_tfm_ctx(tfm);
++	struct hisi_zip_qp_ctx *qp_ctx = &hisi_zip_ctx->qp_ctx[QPC_COMP];
++	struct hisi_qp *qp = qp_ctx->qp;
++	struct hisi_zip_sqe *zip_sqe = &qp_ctx->zip_sqe;
++	int ret;
++
++	ret = hisi_zip_copy_data_to_buffer(qp_ctx, src, slen);
++	if (ret < 0)
++		return ret;
++
++	hisi_zip_fill_sqe_v1(zip_sqe, qp_ctx, slen);
++
++	/* send command to start the compress job */
++	hisi_qp_send(qp, zip_sqe);
++
++	return hisi_zip_copy_data_from_buffer(qp_ctx, dst, dlen);
++}
++
++static int hisi_zip_decompress(struct crypto_tfm *tfm, const u8 *src,
++			       unsigned int slen, u8 *dst, unsigned int *dlen)
++{
++	struct hisi_zip_ctx *hisi_zip_ctx = crypto_tfm_ctx(tfm);
++	struct hisi_zip_qp_ctx *qp_ctx = &hisi_zip_ctx->qp_ctx[QPC_DECOMP];
++	struct hisi_qp *qp = qp_ctx->qp;
++	struct hisi_zip_sqe *zip_sqe = &qp_ctx->zip_sqe;
++	int ret;
++
++	ret = hisi_zip_copy_data_to_buffer(qp_ctx, src, slen);
++	if (ret < 0)
++		return ret;
++
++	hisi_zip_fill_sqe_v1(zip_sqe, qp_ctx, slen);
++
++	/* send command to start the decompress job */
++	hisi_qp_send(qp, zip_sqe);
++
++	return hisi_zip_copy_data_from_buffer(qp_ctx, dst, dlen);
++}
++
++static struct crypto_alg hisi_zip_zlib = {
++	.cra_name		= "zlib-deflate",
++	.cra_flags		= CRYPTO_ALG_TYPE_COMPRESS,
++	.cra_ctxsize		= sizeof(struct hisi_zip_ctx),
++	.cra_priority           = 300,
++	.cra_module		= THIS_MODULE,
++	.cra_init		= hisi_zip_alloc_comp_ctx,
++	.cra_exit		= hisi_zip_free_comp_ctx,
++	.cra_u			= {
++		.compress = {
++			.coa_compress	= hisi_zip_compress,
++			.coa_decompress	= hisi_zip_decompress
++		}
++	}
 +};
 +
-+int vfio_sdmdev_register(struct vfio_sdmdev *sdmdev);
-+void vfio_sdmdev_unregister(struct vfio_sdmdev *sdmdev);
-+void vfio_sdmdev_wake_up(struct vfio_sdmdev_queue *q);
-+int vfio_sdmdev_is_sdmdev(struct device *dev);
-+struct vfio_sdmdev *vfio_sdmdev_pdev_sdmdev(struct device *dev);
-+struct vfio_sdmdev *mdev_sdmdev(struct mdev_device *mdev);
++static struct crypto_alg hisi_zip_gzip = {
++	.cra_name		= "gzip",
++	.cra_flags		= CRYPTO_ALG_TYPE_COMPRESS,
++	.cra_ctxsize		= sizeof(struct hisi_zip_ctx),
++	.cra_priority           = 300,
++	.cra_module		= THIS_MODULE,
++	.cra_init		= hisi_zip_alloc_comp_ctx,
++	.cra_exit		= hisi_zip_free_comp_ctx,
++	.cra_u			= {
++		.compress = {
++			.coa_compress	= hisi_zip_compress,
++			.coa_decompress	= hisi_zip_decompress
++		}
++	}
++};
 +
-+extern struct mdev_type_attribute mdev_type_attr_flags;
-+extern struct mdev_type_attribute mdev_type_attr_name;
-+extern struct mdev_type_attribute mdev_type_attr_device_api;
-+extern struct mdev_type_attribute mdev_type_attr_available_instances;
-+#define VFIO_SDMDEV_DEFAULT_MDEV_TYPE_ATTRS \
-+	&mdev_type_attr_name.attr, \
-+	&mdev_type_attr_device_api.attr, \
-+	&mdev_type_attr_available_instances.attr, \
-+	&mdev_type_attr_flags.attr
++int hisi_zip_register_to_crypto(void)
++{
++	int ret;
 +
-+#define _VFIO_SDMDEV_REGION(vm_pgoff)	(vm_pgoff & 0xf)
++	ret = crypto_register_alg(&hisi_zip_zlib);
++	if (ret < 0) {
++		pr_err("Zlib algorithm registration failed\n");
++		return ret;
++	}
 +
-+#endif
-diff --git a/include/uapi/linux/vfio_sdmdev.h b/include/uapi/linux/vfio_sdmdev.h
++	ret = crypto_register_alg(&hisi_zip_gzip);
++	if (ret < 0) {
++		pr_err("Gzip algorithm registration failed\n");
++		goto err_unregister_zlib;
++	}
++
++	return 0;
++
++err_unregister_zlib:
++	crypto_unregister_alg(&hisi_zip_zlib);
++
++	return ret;
++}
++
++void hisi_zip_unregister_from_crypto(void)
++{
++	crypto_unregister_alg(&hisi_zip_zlib);
++	crypto_unregister_alg(&hisi_zip_gzip);
++}
+diff --git a/drivers/crypto/hisilicon/zip/zip_crypto.h b/drivers/crypto/hisilicon/zip/zip_crypto.h
 new file mode 100644
-index 000000000000..79fa33fbc8c0
+index 000000000000..84eefd74c9c4
 --- /dev/null
-+++ b/include/uapi/linux/vfio_sdmdev.h
-@@ -0,0 +1,29 @@
++++ b/drivers/crypto/hisilicon/zip/zip_crypto.h
+@@ -0,0 +1,8 @@
 +/* SPDX-License-Identifier: GPL-2.0+ */
-+#ifndef _UAPIVFIO_SDMDEV_H
-+#define _UAPIVFIO_SDMDEV_H
++#ifndef HISI_ZIP_CRYPTO_H
++#define HISI_ZIP_CRYPTO_H
 +
-+#include <linux/ioctl.h>
++int hisi_zip_register_to_crypto(void);
++void hisi_zip_unregister_from_crypto(void);
 +
-+#define VFIO_SDMDEV_CLASS_NAME		"sdmdev"
-+
-+/* Device ATTRs in parent dev SYSFS DIR */
-+#define VFIO_SDMDEV_PDEV_ATTRS_GRP_NAME	"params"
-+
-+/* Parent device attributes */
-+#define SDMDEV_IOMMU_TYPE	"iommu_type"
-+#define SDMDEV_DMA_FLAG		"dma_flag"
-+
-+/* Maximum length of algorithm name string */
-+#define VFIO_SDMDEV_ALG_NAME_SIZE		64
-+
-+/* the bits used in SDMDEV_DMA_FLAG attributes */
-+#define VFIO_SDMDEV_DMA_INVALID			0
-+#define	VFIO_SDMDEV_DMA_SINGLE_PROC_MAP		1
-+#define	VFIO_SDMDEV_DMA_MULTI_PROC_MAP		2
-+#define	VFIO_SDMDEV_DMA_SVM			4
-+#define	VFIO_SDMDEV_DMA_SVM_NO_FAULT		8
-+#define	VFIO_SDMDEV_DMA_PHY			16
-+
-+#define VFIO_SDMDEV_CMD_WAIT		_IO('W', 1)
-+#define VFIO_SDMDEV_CMD_BIND_PASID	_IO('W', 2)
 +#endif
+diff --git a/drivers/crypto/hisilicon/zip/zip_main.c b/drivers/crypto/hisilicon/zip/zip_main.c
+new file mode 100644
+index 000000000000..cad4c97f4826
+--- /dev/null
++++ b/drivers/crypto/hisilicon/zip/zip_main.c
+@@ -0,0 +1,195 @@
++// SPDX-License-Identifier: GPL-2.0+
++#include <linux/bitops.h>
++#include <linux/init.h>
++#include <linux/io.h>
++#include <linux/kernel.h>
++#include <linux/module.h>
++#include <linux/pci.h>
++#include "zip.h"
++#include "zip_crypto.h"
++
++#define HZIP_VF_NUM			63
++#define HZIP_QUEUE_NUM_V1		4096
++#define HZIP_QUEUE_NUM_V2		1024
++
++#define HZIP_FSM_MAX_CNT		0x301008
++
++#define HZIP_PORT_ARCA_CHE_0		0x301040
++#define HZIP_PORT_ARCA_CHE_1		0x301044
++#define HZIP_PORT_AWCA_CHE_0		0x301060
++#define HZIP_PORT_AWCA_CHE_1		0x301064
++
++#define HZIP_BD_RUSER_32_63		0x301110
++#define HZIP_SGL_RUSER_32_63		0x30111c
++#define HZIP_DATA_RUSER_32_63		0x301128
++#define HZIP_DATA_WUSER_32_63		0x301134
++#define HZIP_BD_WUSER_32_63		0x301140
++
++LIST_HEAD(hisi_zip_list);
++DEFINE_MUTEX(hisi_zip_list_lock);
++
++static const char hisi_zip_name[] = "hisi_zip";
++
++static const struct pci_device_id hisi_zip_dev_ids[] = {
++	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, 0xa250) },
++	{ 0, }
++};
++
++static inline void hisi_zip_add_to_list(struct hisi_zip *hisi_zip)
++{
++	mutex_lock(&hisi_zip_list_lock);
++	list_add_tail(&hisi_zip->list, &hisi_zip_list);
++	mutex_unlock(&hisi_zip_list_lock);
++}
++
++static inline void hisi_zip_remove_from_list(struct hisi_zip *hisi_zip)
++{
++	mutex_lock(&hisi_zip_list_lock);
++	list_del(&hisi_zip->list);
++	mutex_unlock(&hisi_zip_list_lock);
++}
++
++static void hisi_zip_set_user_domain_and_cache(struct hisi_zip *hisi_zip)
++{
++	u32 val;
++
++	/* qm user domain */
++	writel(0x40001070, hisi_zip->qm.io_base + QM_ARUSER_M_CFG_1);
++	writel(0xfffffffe, hisi_zip->qm.io_base + QM_ARUSER_M_CFG_ENABLE);
++	writel(0x40001070, hisi_zip->qm.io_base + QM_AWUSER_M_CFG_1);
++	writel(0xfffffffe, hisi_zip->qm.io_base + QM_AWUSER_M_CFG_ENABLE);
++	writel(0xffffffff, hisi_zip->qm.io_base + QM_WUSER_M_CFG_ENABLE);
++	writel(0x4893,     hisi_zip->qm.io_base + QM_CACHE_CTL);
++
++	val = readl(hisi_zip->qm.io_base + QM_PEH_AXUSER_CFG);
++	val |= (1 << 11);
++	writel(val, hisi_zip->qm.io_base + QM_PEH_AXUSER_CFG);
++
++	/* qm cache */
++	writel(0xffff,     hisi_zip->qm.io_base + QM_AXI_M_CFG);
++	writel(0xffffffff, hisi_zip->qm.io_base + QM_AXI_M_CFG_ENABLE);
++	writel(0xffffffff, hisi_zip->qm.io_base + QM_PEH_AXUSER_CFG_ENABLE);
++
++	/* cache */
++	writel(0xffffffff, hisi_zip->qm.io_base + HZIP_PORT_ARCA_CHE_0);
++	writel(0xffffffff, hisi_zip->qm.io_base + HZIP_PORT_ARCA_CHE_1);
++	writel(0xffffffff, hisi_zip->qm.io_base + HZIP_PORT_AWCA_CHE_0);
++	writel(0xffffffff, hisi_zip->qm.io_base + HZIP_PORT_AWCA_CHE_1);
++	/* user domain configurations */
++	writel(0x40001070, hisi_zip->qm.io_base + HZIP_BD_RUSER_32_63);
++	writel(0x40001070, hisi_zip->qm.io_base + HZIP_SGL_RUSER_32_63);
++#ifdef CONFIG_IOMMU_SVA
++	writel(0x40001071, hisi_zip->qm.io_base + HZIP_DATA_RUSER_32_63);
++	writel(0x40001071, hisi_zip->qm.io_base + HZIP_DATA_WUSER_32_63);
++#else
++	writel(0x40001070, hisi_zip->qm.io_base + HZIP_DATA_RUSER_32_63);
++	writel(0x40001070, hisi_zip->qm.io_base + HZIP_DATA_WUSER_32_63);
++#endif
++	writel(0x40001070, hisi_zip->qm.io_base + HZIP_BD_WUSER_32_63);
++
++	/* fsm count */
++	writel(0xfffffff, hisi_zip->qm.io_base + HZIP_FSM_MAX_CNT);
++
++	/* clock gating, core, decompress verify enable */
++	writel(0x10005, hisi_zip->qm.io_base + 0x301004);
++}
++
++static int hisi_zip_probe(struct pci_dev *pdev, const struct pci_device_id *id)
++{
++	struct hisi_zip *hisi_zip;
++	struct qm_info *qm;
++	int ret;
++	u8 rev_id;
++
++	hisi_zip = devm_kzalloc(&pdev->dev, sizeof(*hisi_zip), GFP_KERNEL);
++	if (!hisi_zip)
++		return -ENOMEM;
++	hisi_zip_add_to_list(hisi_zip);
++	pci_set_drvdata(pdev, hisi_zip);
++
++	qm = &hisi_zip->qm;
++	qm->pdev = pdev;
++
++	pci_read_config_byte(pdev, PCI_REVISION_ID, &rev_id);
++	if (rev_id == 0x20)
++		qm->ver = 1;
++	qm->sqe_size = HZIP_SQE_SIZE;
++	ret = hisi_qm_init(hisi_zip_name, qm);
++	if (ret)
++		goto err_with_hisi_zip;
++
++	if (pdev->is_physfn) {
++		ret = hisi_qm_mem_start(qm);
++		if (ret)
++			goto err_with_qm_init;
++
++		hisi_zip_set_user_domain_and_cache(hisi_zip);
++
++		qm->qp_base = HZIP_PF_DEF_Q_BASE;
++		qm->qp_num = HZIP_PF_DEF_Q_NUM;
++	}
++
++	ret = hisi_qm_start(qm);
++	if (ret)
++		goto err_with_qm_init;
++
++	return 0;
++
++err_with_qm_init:
++	hisi_qm_uninit(qm);
++err_with_hisi_zip:
++	kfree(hisi_zip);
++	return ret;
++}
++
++static void hisi_zip_remove(struct pci_dev *pdev)
++{
++	struct hisi_zip *hisi_zip = pci_get_drvdata(pdev);
++	struct qm_info *qm = &hisi_zip->qm;
++
++	hisi_qm_stop(qm);
++	hisi_qm_uninit(qm);
++	hisi_zip_remove_from_list(hisi_zip);
++	kfree(hisi_zip);
++}
++
++static struct pci_driver hisi_zip_pci_driver = {
++	.name		= "hisi_zip",
++	.id_table	= hisi_zip_dev_ids,
++	.probe		= hisi_zip_probe,
++	.remove		= hisi_zip_remove,
++};
++
++static int __init hisi_zip_init(void)
++{
++	int ret;
++
++	ret = pci_register_driver(&hisi_zip_pci_driver);
++	if (ret < 0) {
++		pr_err("zip: can't register hisi zip driver.\n");
++		return ret;
++	}
++
++	ret = hisi_zip_register_to_crypto();
++	if (ret < 0) {
++		pr_err("zip: can't register hisi zip to crypto.\n");
++		pci_unregister_driver(&hisi_zip_pci_driver);
++		return ret;
++	}
++
++	return 0;
++}
++
++static void __exit hisi_zip_exit(void)
++{
++	hisi_zip_unregister_from_crypto();
++	pci_unregister_driver(&hisi_zip_pci_driver);
++}
++
++module_init(hisi_zip_init);
++module_exit(hisi_zip_exit);
++
++MODULE_LICENSE("GPL v2");
++MODULE_AUTHOR("Zhou Wang <wangzhou1@hisilicon.com>");
++MODULE_DESCRIPTION("Driver for HiSilicon ZIP accelerator");
++MODULE_DEVICE_TABLE(pci, hisi_zip_dev_ids);
 -- 
 2.17.1
