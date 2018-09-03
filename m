@@ -1,13 +1,12 @@
-From: Randy Dunlap <rdunlap@infradead.org>
-Subject: Re: [PATCH 7/7] vfio/sdmdev: add user sample
-Date: Sun, 2 Sep 2018 19:25:12 -0700
-Message-ID: <ff75ff6a-2cd8-b25e-8d19-52e8f57141da@infradead.org>
+From: Lu Baolu <baolu.lu@linux.intel.com>
+Subject: Re: [RFCv2 PATCH 0/7] A General Accelerator Framework, WarpDrive
+Date: Mon, 3 Sep 2018 10:32:16 +0800
+Message-ID: <81edb8ff-d046-34e5-aee7-d8564e2517c2@linux.intel.com>
 References: <20180903005204.26041-1-nek.in.cn@gmail.com>
- <20180903005204.26041-8-nek.in.cn@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Cc: linuxarm@huawei.com
+Cc: baolu.lu@linux.intel.com, linuxarm@huawei.com
 To: Kenneth Lee <nek.in.cn@gmail.com>,
         Jonathan Corbet <corbet@lwn.net>,
         Herbert Xu <herbert@gondor.apana.org.au>,
@@ -24,124 +23,92 @@ To: Kenneth Lee <nek.in.cn@gmail.com>,
         linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-crypto@vger.kernel.org, iommu@lists.linux-foundation.org,
         kvm@vger.kernel.org, linux-accelerators@lists.ozlabs.org,
-        Lu Baolu <baolu.lu@linux.intel.com>,
         Sanjay Kumar <sanjay.k.kumar@intel.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180903005204.26041-8-nek.in.cn@gmail.com>
+In-Reply-To: <20180903005204.26041-1-nek.in.cn@gmail.com>
 Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 09/02/2018 05:52 PM, Kenneth Lee wrote:
+Hi,
+
+On 09/03/2018 08:51 AM, Kenneth Lee wrote:
 > From: Kenneth Lee <liguozhu@hisilicon.com>
 > 
-> This is the sample code to demostrate how WrapDrive user application
-> should be.
+> WarpDrive is an accelerator framework to expose the hardware capabilities
+> directly to the user space. It makes use of the exist vfio and vfio-mdev
+> facilities. So the user application can send request and DMA to the
+> hardware without interaction with the kernel. This removes the latency
+> of syscall.
 > 
-> It contains:
+> WarpDrive is the name for the whole framework. The component in kernel
+> is called SDMDEV, Share Domain Mediated Device. Driver driver exposes its
+> hardware resource by registering to SDMDEV as a VFIO-Mdev. So the user
+> library of WarpDrive can access it via VFIO interface.
 > 
-> 1. wd.[ch], the common library to provide WrapDrive interface.
-
-                                            WarpDrive
-
-> 2. drv/*, the user driver to access the hardware upon spimdev
-> 3. test/*, the test application to use WrapDrive interface to access the
-
-                                         WarpDrive
-
->    hardware queue(s) of the accelerator.
+> The patchset contains document for the detail. Please refer to it for more
+> information.
 > 
-> The Hisilicon HIP08 ZIP accelerator is used in this sample.
+> This patchset is intended to be used with Jean Philippe Brucker's SVA
+> patch [1], which enables not only IO side page fault, but also PASID
+> support to IOMMU and VFIO.
 > 
-> Signed-off-by: Zaibo Xu <xuzaibo@huawei.com>
-> Signed-off-by: Kenneth Lee <liguozhu@hisilicon.com>
-> Signed-off-by: Hao Fang <fanghao11@huawei.com>
-> Signed-off-by: Zhou Wang <wangzhou1@hisilicon.com>
-> ---
->  samples/warpdrive/AUTHORS              |   2 +
->  samples/warpdrive/ChangeLog            |   1 +
->  samples/warpdrive/Makefile.am          |   9 +
->  samples/warpdrive/NEWS                 |   1 +
->  samples/warpdrive/README               |  32 +++
->  samples/warpdrive/autogen.sh           |   3 +
->  samples/warpdrive/cleanup.sh           |  13 ++
->  samples/warpdrive/configure.ac         |  52 +++++
->  samples/warpdrive/drv/hisi_qm_udrv.c   | 223 ++++++++++++++++++
->  samples/warpdrive/drv/hisi_qm_udrv.h   |  53 +++++
->  samples/warpdrive/test/Makefile.am     |   7 +
->  samples/warpdrive/test/comp_hw.h       |  23 ++
->  samples/warpdrive/test/test_hisi_zip.c | 206 +++++++++++++++++
->  samples/warpdrive/wd.c                 | 309 +++++++++++++++++++++++++
->  samples/warpdrive/wd.h                 | 154 ++++++++++++
->  samples/warpdrive/wd_adapter.c         |  74 ++++++
->  samples/warpdrive/wd_adapter.h         |  43 ++++
->  17 files changed, 1205 insertions(+)
->  create mode 100644 samples/warpdrive/AUTHORS
->  create mode 100644 samples/warpdrive/ChangeLog
->  create mode 100644 samples/warpdrive/Makefile.am
->  create mode 100644 samples/warpdrive/NEWS
->  create mode 100644 samples/warpdrive/README
->  create mode 100755 samples/warpdrive/autogen.sh
->  create mode 100755 samples/warpdrive/cleanup.sh
->  create mode 100644 samples/warpdrive/configure.ac
->  create mode 100644 samples/warpdrive/drv/hisi_qm_udrv.c
->  create mode 100644 samples/warpdrive/drv/hisi_qm_udrv.h
->  create mode 100644 samples/warpdrive/test/Makefile.am
->  create mode 100644 samples/warpdrive/test/comp_hw.h
->  create mode 100644 samples/warpdrive/test/test_hisi_zip.c
->  create mode 100644 samples/warpdrive/wd.c
->  create mode 100644 samples/warpdrive/wd.h
->  create mode 100644 samples/warpdrive/wd_adapter.c
->  create mode 100644 samples/warpdrive/wd_adapter.h
+> With these features, WarpDrive can support non-pinned memory and
+> multi-process in the same accelerator device.  We tested it in our SoC
+> integrated Accelerator (board ID: D06, Chip ID: HIP08). A reference work
+> tree can be found here: [2].
+> 
+> But it is not mandatory. This patchset is tested in the latest mainline
+> kernel without the SVA patches.  So it supports only one process for each
+> accelerator.
+> 
+> We have noticed the IOMMU aware mdev RFC announced recently [3].
+> 
+> The IOMMU aware mdev has similar idea but different intention comparing to
+> WarpDrive. It intends to dedicate part of the hardware resource to a VM.
+> And the design is supposed to be used with Scalable I/O Virtualization.
+> While sdmdev is intended to share the hardware resource with a big amount
+> of processes.  It just requires the hardware supporting address
+> translation per process (PCIE's PASID or ARM SMMU's substream ID).
+> 
+> But we don't see serious confliction on both design. We believe they can be
+> normalized as one.
+> 
+> The patch 1 is document of the framework. The patch 2 and 3 add sdmdev
+> support. The patch 4, 5 and 6 is drivers for Hislicon's ZIP Accelerator
+> which is registered to both crypto and warpdrive(sdmdev) and can be
+> used from kernel or user space at the same time. The patch 7 is a user
+> space sample demonstrating how WarpDrive works.
+> 
+> 
+> Change History:
+> V2 changed from V1:
+> 	1. Change kernel framework name from SPIMDEV (Share Parent IOMMU
+> 	   Mdev) to SDMDEV (Share Domain Mdev).
+> 	2. Allocate Hardware Resource when a new mdev is created (While
+> 	   it is allocated when the mdev is openned)
+> 	3. Unmap pages from the shared domain when the sdmdev iommu group is
+> 	   detached. (This procedure is necessary, but missed in V1)
+> 	4. Update document accordingly.
+> 	5. Rebase to the latest kernel (4.19.0-rc1)
+> 	
+> 	According the review comment on RFCv1, We did try to use dma-buf
+> 	as back end of WarpDrive. It can work properly with the current
+> 	solution [4], but it cannot make use of process's
+> 	own memory address space directly. This is important to many
+> 	acceleration scenario. So dma-buf will be taken as a backup
+> 	alternative for noiommu scenario, it will be added in the future
+> 	version.
+> 
+> 
+> Refernces:
+> [1] https://www.spinics.net/lists/kernel/msg2651481.html
+> [2] https://github.com/Kenneth-Lee/linux-kernel-warpdrive/tree/warpdrive-sva-v0.5
+> [3] https://lkml.org/lkml/2018/7/22/34
 
-> diff --git a/samples/warpdrive/README b/samples/warpdrive/README
-> new file mode 100644
-> index 000000000000..3adf66b112fc
-> --- /dev/null
-> +++ b/samples/warpdrive/README
-> @@ -0,0 +1,32 @@
-> +WD User Land Demonstration
-> +==========================
-> +
-> +This directory contains some applications and libraries to demonstrate how a
-> +
-> +WrapDrive application can be constructed.
+Please refer to the latest version posted here for discussion.
 
-   WarpDrive
+https://lkml.org/lkml/2018/8/30/107
 
-> +
-> +
-> +As a demo, we try to make it simple and clear for understanding. It is not
-> +
-> +supposed to be used in business scenario.
-> +
-> +
-> +The directory contains the following elements:
-> +
-> +wd.[ch]
-> +	A demonstration WrapDrive fundamental library which wraps the basic
-
-	                WarpDrive
-
-> +	operations to the WrapDrive-ed device.
-
-                          WarpDrive
-
-> +
-> +wd_adapter.[ch]
-> +	User driver adaptor for wd.[ch]
-> +
-> +wd_utils.[ch]
-> +	Some utitlities function used by WD and its drivers
-> +
-> +drv/*
-> +	User drivers. It helps to fulfill the semantic of wd.[ch] for
-> +	particular hardware
-> +
-> +test/*
-> +	Test applications to use the wrapdrive library
-
-	                             warpdrive
-
--- 
-~Randy
+Best regards,
+Lu Baolu
