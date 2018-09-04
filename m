@@ -1,68 +1,125 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v8 0/9] crypto: Remove VLA usage
-Date: Tue, 4 Sep 2018 13:19:05 +0800
-Message-ID: <20180904051905.a2vyzijz6xyxvyhb@gondor.apana.org.au>
-References: <20180807211843.47586-1-keescook@chromium.org>
+Subject: Re: [PATCH] crypto: x86 - remove SHA multibuffer routines and mcryptd
+Date: Tue, 4 Sep 2018 13:19:52 +0800
+Message-ID: <20180904051952.d23crymm6ve7sect@gondor.apana.org.au>
+References: <20180822085144.4872-1-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Eric Biggers <ebiggers@google.com>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Tudor-Dan Ambarus <tudor.ambarus@microchip.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
+Cc: linux-crypto@vger.kernel.org, linux-m68k@lists.linux-m68k.org,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        ebiggers@google.com, Megha Dey <megha.dey@linux.intel.com>,
+        Tim Chen <tim.c.chen@linux.intel.com>,
         Geert Uytterhoeven <geert@linux-m68k.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Will Deacon <will.deacon@arm.com>,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Matthew Wilcox <willy@infradead.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
-        linux-crypto@vger.kernel.org, dm-devel@redhat.com,
-        qat-linux@intel.com, linux-kernel@vger.kernel.org
-To: Kees Cook <keescook@chromium.org>
+        Martin Schwidefsky <schwidefsky@de.ibm.com>,
+        Heiko Carstens <heiko.carstens@de.ibm.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20180807211843.47586-1-keescook@chromium.org>
+In-Reply-To: <20180822085144.4872-1-ard.biesheuvel@linaro.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Aug 07, 2018 at 02:18:34PM -0700, Kees Cook wrote:
-> v8 cover letter:
+On Wed, Aug 22, 2018 at 10:51:44AM +0200, Ard Biesheuvel wrote:
+> As it turns out, the AVX2 multibuffer SHA routines are currently
+> broken [0], in a way that would have likely been noticed if this
+> code were in wide use. Since the code is too complicated to be
+> maintained by anyone except the original authors, and since the
+> performance benefits for real-world use cases are debatable to
+> begin with, it is better to drop it entirely for the moment.
 > 
-> I continue to hope this can land in v4.19, but I realize that's unlikely.
-> It would be nice, though, if some of the "trivial" patches could get taken
-> (e.g. cbc, xcbc, ccm VLA removals) so I don't have to keep repeating them.
-> *fingers crossed*
+> [0] https://marc.info/?l=linux-crypto-vger&m=153476243825350&w=2
 > 
-> Series cover letter:
-> 
-> This is nearly the last of the VLA removals[1], but it's one of the
-> largest because crypto gets used in lots of places. After looking
-> through code, usage, reading the threads Gustavo started, and comparing
-> the use-cases to the other VLA removals that have landed in the kernel,
-> I think this series is likely the best way forward to shut the door on
-> VLAs forever.
-> 
-> For background, the crypto stack usage is for callers to do an immediate
-> bit of work that doesn't allocate new memory. This means that other VLA
-> removal techniques (like just using kmalloc) aren't workable, and the
-> next common technique is needed: examination of maximum stack usage and
-> the addition of sanity checks. This series does that, and in several
-> cases, these maximums were already implicit in the code.
-> 
-> This series is intended to land via the crypto tree for 4.19, though it
-> touches dm, networking, and a few other things as well, since there are
-> dependent patches (new crypto #defines being used, etc).
+> Suggested-by: Eric Biggers <ebiggers@google.com>
+> Cc: Megha Dey <megha.dey@linux.intel.com>
+> Cc: Tim Chen <tim.c.chen@linux.intel.com>
+> Cc: Geert Uytterhoeven <geert@linux-m68k.org>
+> Cc: Martin Schwidefsky <schwidefsky@de.ibm.com>
+> Cc: Heiko Carstens <heiko.carstens@de.ibm.com>
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Ingo Molnar <mingo@redhat.com>
+> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> ---
+>  MAINTAINERS                                   |    8 -
+>  arch/m68k/configs/amiga_defconfig             |    1 -
+>  arch/m68k/configs/apollo_defconfig            |    1 -
+>  arch/m68k/configs/atari_defconfig             |    1 -
+>  arch/m68k/configs/bvme6000_defconfig          |    1 -
+>  arch/m68k/configs/hp300_defconfig             |    1 -
+>  arch/m68k/configs/mac_defconfig               |    1 -
+>  arch/m68k/configs/multi_defconfig             |    1 -
+>  arch/m68k/configs/mvme147_defconfig           |    1 -
+>  arch/m68k/configs/mvme16x_defconfig           |    1 -
+>  arch/m68k/configs/q40_defconfig               |    1 -
+>  arch/m68k/configs/sun3_defconfig              |    1 -
+>  arch/m68k/configs/sun3x_defconfig             |    1 -
+>  arch/s390/configs/debug_defconfig             |    1 -
+>  arch/s390/configs/performance_defconfig       |    1 -
+>  arch/x86/crypto/Makefile                      |    3 -
+>  arch/x86/crypto/sha1-mb/Makefile              |   14 -
+>  arch/x86/crypto/sha1-mb/sha1_mb.c             | 1011 ----------------
+>  arch/x86/crypto/sha1-mb/sha1_mb_ctx.h         |  134 ---
+>  arch/x86/crypto/sha1-mb/sha1_mb_mgr.h         |  110 --
+>  .../crypto/sha1-mb/sha1_mb_mgr_datastruct.S   |  287 -----
+>  .../crypto/sha1-mb/sha1_mb_mgr_flush_avx2.S   |  304 -----
+>  .../crypto/sha1-mb/sha1_mb_mgr_init_avx2.c    |   64 -
+>  .../crypto/sha1-mb/sha1_mb_mgr_submit_avx2.S  |  209 ----
+>  arch/x86/crypto/sha1-mb/sha1_x8_avx2.S        |  492 --------
+>  arch/x86/crypto/sha256-mb/Makefile            |   14 -
+>  arch/x86/crypto/sha256-mb/sha256_mb.c         | 1013 ----------------
+>  arch/x86/crypto/sha256-mb/sha256_mb_ctx.h     |  134 ---
+>  arch/x86/crypto/sha256-mb/sha256_mb_mgr.h     |  108 --
+>  .../sha256-mb/sha256_mb_mgr_datastruct.S      |  304 -----
+>  .../sha256-mb/sha256_mb_mgr_flush_avx2.S      |  307 -----
+>  .../sha256-mb/sha256_mb_mgr_init_avx2.c       |   65 -
+>  .../sha256-mb/sha256_mb_mgr_submit_avx2.S     |  214 ----
+>  arch/x86/crypto/sha256-mb/sha256_x8_avx2.S    |  598 ----------
+>  arch/x86/crypto/sha512-mb/Makefile            |   12 -
+>  arch/x86/crypto/sha512-mb/sha512_mb.c         | 1047 -----------------
+>  arch/x86/crypto/sha512-mb/sha512_mb_ctx.h     |  128 --
+>  arch/x86/crypto/sha512-mb/sha512_mb_mgr.h     |  104 --
+>  .../sha512-mb/sha512_mb_mgr_datastruct.S      |  281 -----
+>  .../sha512-mb/sha512_mb_mgr_flush_avx2.S      |  297 -----
+>  .../sha512-mb/sha512_mb_mgr_init_avx2.c       |   69 --
+>  .../sha512-mb/sha512_mb_mgr_submit_avx2.S     |  224 ----
+>  arch/x86/crypto/sha512-mb/sha512_x4_avx2.S    |  531 ---------
+>  crypto/Kconfig                                |   62 -
+>  crypto/Makefile                               |    1 -
+>  crypto/mcryptd.c                              |  675 -----------
+>  include/crypto/mcryptd.h                      |  114 --
+>  47 files changed, 8952 deletions(-)
+>  delete mode 100644 arch/x86/crypto/sha1-mb/Makefile
+>  delete mode 100644 arch/x86/crypto/sha1-mb/sha1_mb.c
+>  delete mode 100644 arch/x86/crypto/sha1-mb/sha1_mb_ctx.h
+>  delete mode 100644 arch/x86/crypto/sha1-mb/sha1_mb_mgr.h
+>  delete mode 100644 arch/x86/crypto/sha1-mb/sha1_mb_mgr_datastruct.S
+>  delete mode 100644 arch/x86/crypto/sha1-mb/sha1_mb_mgr_flush_avx2.S
+>  delete mode 100644 arch/x86/crypto/sha1-mb/sha1_mb_mgr_init_avx2.c
+>  delete mode 100644 arch/x86/crypto/sha1-mb/sha1_mb_mgr_submit_avx2.S
+>  delete mode 100644 arch/x86/crypto/sha1-mb/sha1_x8_avx2.S
+>  delete mode 100644 arch/x86/crypto/sha256-mb/Makefile
+>  delete mode 100644 arch/x86/crypto/sha256-mb/sha256_mb.c
+>  delete mode 100644 arch/x86/crypto/sha256-mb/sha256_mb_ctx.h
+>  delete mode 100644 arch/x86/crypto/sha256-mb/sha256_mb_mgr.h
+>  delete mode 100644 arch/x86/crypto/sha256-mb/sha256_mb_mgr_datastruct.S
+>  delete mode 100644 arch/x86/crypto/sha256-mb/sha256_mb_mgr_flush_avx2.S
+>  delete mode 100644 arch/x86/crypto/sha256-mb/sha256_mb_mgr_init_avx2.c
+>  delete mode 100644 arch/x86/crypto/sha256-mb/sha256_mb_mgr_submit_avx2.S
+>  delete mode 100644 arch/x86/crypto/sha256-mb/sha256_x8_avx2.S
+>  delete mode 100644 arch/x86/crypto/sha512-mb/Makefile
+>  delete mode 100644 arch/x86/crypto/sha512-mb/sha512_mb.c
+>  delete mode 100644 arch/x86/crypto/sha512-mb/sha512_mb_ctx.h
+>  delete mode 100644 arch/x86/crypto/sha512-mb/sha512_mb_mgr.h
+>  delete mode 100644 arch/x86/crypto/sha512-mb/sha512_mb_mgr_datastruct.S
+>  delete mode 100644 arch/x86/crypto/sha512-mb/sha512_mb_mgr_flush_avx2.S
+>  delete mode 100644 arch/x86/crypto/sha512-mb/sha512_mb_mgr_init_avx2.c
+>  delete mode 100644 arch/x86/crypto/sha512-mb/sha512_mb_mgr_submit_avx2.S
+>  delete mode 100644 arch/x86/crypto/sha512-mb/sha512_x4_avx2.S
+>  delete mode 100644 crypto/mcryptd.c
+>  delete mode 100644 include/crypto/mcryptd.h
 
-I have applied patches 1-4 and 6-8.  I'd like to get an ack from
-the dm folks regarding patch 5.  As to patch 9, please fix it so
-it doesn't rely on the BUG_ON to catch things.
-
-Thanks,
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
