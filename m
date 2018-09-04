@@ -1,7 +1,8 @@
 From: Kees Cook <keescook@chromium.org>
-Subject: [PATCH 0/2] crypto: Remove VLA usage from skcipher
-Date: Tue,  4 Sep 2018 11:16:27 -0700
-Message-ID: <20180904181629.20712-1-keescook@chromium.org>
+Subject: [PATCH 2/2] crypto: skcipher: Remove VLA usage for SKCIPHER_REQUEST_ON_STACK
+Date: Tue,  4 Sep 2018 11:16:29 -0700
+Message-ID: <20180904181629.20712-3-keescook@chromium.org>
+References: <20180904181629.20712-1-keescook@chromium.org>
 Cc: Kees Cook <keescook@chromium.org>,
         Eric Biggers <ebiggers@google.com>,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>,
@@ -19,37 +20,58 @@ Cc: Kees Cook <keescook@chromium.org>,
         linux-arm-kernel@lists.infradead.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20180904181629.20712-1-keescook@chromium.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This removes VLAs[1] from SKCIPHER_REQUEST_ON_STACK by making it possible
-for crypto_skcipher_set_reqsize() to fail. Callers are updated to handle
-the error condition.
+In the quest to remove all stack VLA usage from the kernel[1], this
+caps the skcipher request size similar to other limits and adds a sanity
+check at registration. Looking at instrumented tcrypt output, the largest
+is for lrw:
 
--Kees
+	crypt: testing lrw(aes)
+	crypto_skcipher_set_reqsize: 8
+	crypto_skcipher_set_reqsize: 88
+	crypto_skcipher_set_reqsize: 472
 
 [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
 
-Kees Cook (2):
-  crypto: skcipher: Allow crypto_skcipher_set_reqsize() to fail
-  crypto: skcipher: Remove VLA usage for SKCIPHER_REQUEST_ON_STACK
+Signed-off-by: Kees Cook <keescook@chromium.org>
+---
+ include/crypto/internal/skcipher.h | 3 +++
+ include/crypto/skcipher.h          | 4 +++-
+ 2 files changed, 6 insertions(+), 1 deletion(-)
 
- crypto/cryptd.c                                |  7 +++++--
- crypto/ctr.c                                   |  7 +++++--
- crypto/cts.c                                   |  7 +++++--
- crypto/lrw.c                                   |  9 ++++++---
- crypto/simd.c                                  |  7 +++++--
- crypto/xts.c                                   | 11 ++++++++---
- drivers/crypto/amcc/crypto4xx_core.c           |  8 +++++++-
- drivers/crypto/cavium/nitrox/nitrox_algs.c     |  9 +++++++--
- drivers/crypto/ccree/cc_cipher.c               |  6 ++++--
- drivers/crypto/hisilicon/sec/sec_algs.c        |  5 ++++-
- drivers/crypto/inside-secure/safexcel_cipher.c |  5 ++++-
- drivers/crypto/marvell/cipher.c                |  4 +---
- drivers/crypto/sunxi-ss/sun4i-ss-cipher.c      |  4 +---
- include/crypto/internal/skcipher.h             |  7 ++++++-
- include/crypto/skcipher.h                      |  4 +++-
- 15 files changed, 71 insertions(+), 29 deletions(-)
-
+diff --git a/include/crypto/internal/skcipher.h b/include/crypto/internal/skcipher.h
+index d2926ecae2ac..6da811c0747e 100644
+--- a/include/crypto/internal/skcipher.h
++++ b/include/crypto/internal/skcipher.h
+@@ -130,6 +130,9 @@ static inline struct crypto_skcipher *crypto_spawn_skcipher(
+ static inline int crypto_skcipher_set_reqsize(
+ 	struct crypto_skcipher *skcipher, unsigned int reqsize)
+ {
++	if (WARN_ON(reqsize > SKCIPHER_MAX_REQSIZE))
++		return -EINVAL;
++
+ 	skcipher->reqsize = reqsize;
+ 
+ 	return 0;
+diff --git a/include/crypto/skcipher.h b/include/crypto/skcipher.h
+index 2f327f090c3e..c48e194438cf 100644
+--- a/include/crypto/skcipher.h
++++ b/include/crypto/skcipher.h
+@@ -139,9 +139,11 @@ struct skcipher_alg {
+ 	struct crypto_alg base;
+ };
+ 
++#define SKCIPHER_MAX_REQSIZE	472
++
+ #define SKCIPHER_REQUEST_ON_STACK(name, tfm) \
+ 	char __##name##_desc[sizeof(struct skcipher_request) + \
+-		crypto_skcipher_reqsize(tfm)] CRYPTO_MINALIGN_ATTR; \
++		SKCIPHER_MAX_REQSIZE] CRYPTO_MINALIGN_ATTR; \
+ 	struct skcipher_request *name = (void *)__##name##_desc
+ 
+ /**
 -- 
 2.17.1
