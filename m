@@ -1,69 +1,87 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 2/4] arm64: cpufeature: add feature for CRC32 instructions
-Date: Tue, 4 Sep 2018 11:18:55 +0800
-Message-ID: <20180904031855.mjpdndeh57lqziuk@gondor.apana.org.au>
-References: <20180827110245.14812-1-ard.biesheuvel@linaro.org>
- <20180827110245.14812-3-ard.biesheuvel@linaro.org>
- <20180828170135.GC19825@arm.com>
- <CAKv+Gu-tM9aKZJ3ppt9yLVP_V5YA_yN8D1j_-NtM+qQCdnc6JA@mail.gmail.com>
+Subject: Re: [PATCH v2] crypto: remove Speck
+Date: Tue, 4 Sep 2018 12:55:59 +0800
+Message-ID: <20180904045559.jfzqhwcfyq42x2cs@gondor.apana.org.au>
+References: <20180807011937.GA133621@gmail.com>
+ <20180807062225.6331-1-Jason@zx2c4.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Will Deacon <will.deacon@arm.com>,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Eric Biggers <ebiggers@google.com>,
-        "Suzuki K. Poulose" <suzuki.poulose@arm.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Greg Kaiser <gkaiser@google.com>,
+ Tomer Ashur <tomer.ashur@esat.kuleuven.be>,
+ Samuel Neves <samuel.c.p.neves@gmail.com>,
+ Michael Halcrow <mhalcrow@google.com>, linux-kernel@vger.kernel.org,
+ stable@vger.kernel.org, Eric Biggers <ebiggers@kernel.org>,
+ linux-fscrypt@vger.kernel.org, linux-crypto@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, Paul Crowley <paulcrowley@google.com>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 Content-Disposition: inline
-In-Reply-To: <CAKv+Gu-tM9aKZJ3ppt9yLVP_V5YA_yN8D1j_-NtM+qQCdnc6JA@mail.gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <20180807062225.6331-1-Jason@zx2c4.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Aug 28, 2018 at 08:43:35PM +0200, Ard Biesheuvel wrote:
-> On 28 August 2018 at 19:01, Will Deacon <will.deacon@arm.com> wrote:
-> > On Mon, Aug 27, 2018 at 01:02:43PM +0200, Ard Biesheuvel wrote:
-> >> Add a CRC32 feature bit and wire it up to the CPU id register so we
-> >> will be able to use alternatives patching for CRC32 operations.
-> >>
-> >> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> >> ---
-> >>  arch/arm64/include/asm/cpucaps.h | 3 ++-
-> >>  arch/arm64/kernel/cpufeature.c   | 9 +++++++++
-> >>  2 files changed, 11 insertions(+), 1 deletion(-)
-> >
-> > Acked-by: Will Deacon <will.deacon@arm.com>
-> >
-> > With the minor caveat below...
-> >
-> >> diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
-> >> index ae1f70450fb2..9932aca9704b 100644
-> >> --- a/arch/arm64/include/asm/cpucaps.h
-> >> +++ b/arch/arm64/include/asm/cpucaps.h
-> >> @@ -51,7 +51,8 @@
-> >>  #define ARM64_SSBD                           30
-> >>  #define ARM64_MISMATCHED_CACHE_TYPE          31
-> >>  #define ARM64_HAS_STAGE2_FWB                 32
-> >> +#define ARM64_HAS_CRC32                              33
-> >>
-> >> -#define ARM64_NCAPS                          33
-> >> +#define ARM64_NCAPS                          34
-> >
-> >
-> > ... if this goes via crypto, you'll almost certainly get a (trivial)
-> > conflict with arm64, since these numbers get bumped all the time.
-> >
+On Tue, Aug 07, 2018 at 08:22:25AM +0200, Jason A. Donenfeld wrote:
+> These are unused, undesired, and have never actually been used by
+> anybody. The original authors of this code have changed their mind about
+> its inclusion. While originally proposed for disk encryption on low-end
+> devices, the idea was discarded [1] in favor of something else before
+> that could really get going. Therefore, this patch removes Speck.
 > 
-> I think the first three patches should go through the arm64 tree. The
-> last one just removes the now redundant crc32 SIMD driver, and Herbert
-> could pick that up separately, i.e., it should be totally independent.
+> [1] https://marc.info/?l=linux-crypto-vger&m=153359499015659
+> 
+> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+> Acked-by: Eric Biggers <ebiggers@google.com>
+> Cc: stable@vger.kernel.org
+> ---
+>  Documentation/filesystems/fscrypt.rst |  10 -
+>  arch/arm/crypto/Kconfig               |   6 -
+>  arch/arm/crypto/Makefile              |   2 -
+>  arch/arm/crypto/speck-neon-core.S     | 434 ---------------
+>  arch/arm/crypto/speck-neon-glue.c     | 288 ----------
+>  arch/arm64/crypto/Kconfig             |   6 -
+>  arch/arm64/crypto/Makefile            |   3 -
+>  arch/arm64/crypto/speck-neon-core.S   | 352 ------------
+>  arch/arm64/crypto/speck-neon-glue.c   | 282 ----------
+>  arch/m68k/configs/amiga_defconfig     |   1 -
+>  arch/m68k/configs/apollo_defconfig    |   1 -
+>  arch/m68k/configs/atari_defconfig     |   1 -
+>  arch/m68k/configs/bvme6000_defconfig  |   1 -
+>  arch/m68k/configs/hp300_defconfig     |   1 -
+>  arch/m68k/configs/mac_defconfig       |   1 -
+>  arch/m68k/configs/multi_defconfig     |   1 -
+>  arch/m68k/configs/mvme147_defconfig   |   1 -
+>  arch/m68k/configs/mvme16x_defconfig   |   1 -
+>  arch/m68k/configs/q40_defconfig       |   1 -
+>  arch/m68k/configs/sun3_defconfig      |   1 -
+>  arch/m68k/configs/sun3x_defconfig     |   1 -
+>  arch/s390/defconfig                   |   1 -
+>  crypto/Kconfig                        |  14 -
+>  crypto/Makefile                       |   1 -
+>  crypto/speck.c                        | 307 -----------
+>  crypto/testmgr.c                      |  24 -
+>  crypto/testmgr.h                      | 738 --------------------------
+>  fs/crypto/fscrypt_private.h           |   4 -
+>  fs/crypto/keyinfo.c                   |  10 -
+>  include/crypto/speck.h                |  62 ---
+>  include/uapi/linux/fs.h               |   4 +-
+>  31 files changed, 2 insertions(+), 2558 deletions(-)
+>  delete mode 100644 arch/arm/crypto/speck-neon-core.S
+>  delete mode 100644 arch/arm/crypto/speck-neon-glue.c
+>  delete mode 100644 arch/arm64/crypto/speck-neon-core.S
+>  delete mode 100644 arch/arm64/crypto/speck-neon-glue.c
+>  delete mode 100644 crypto/speck.c
+>  delete mode 100644 include/crypto/speck.h
 
-Yes let's do that.
-
-Thanks,
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
