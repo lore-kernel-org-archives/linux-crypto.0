@@ -1,12 +1,11 @@
-From: Jerome Glisse <jglisse@redhat.com>
-Subject: Re: [RFCv2 PATCH 0/7] A General Accelerator Framework, WarpDrive
-Date: Tue, 4 Sep 2018 11:00:19 -0400
-Message-ID: <20180904150019.GA4024@redhat.com>
-References: <20180903005204.26041-1-nek.in.cn@gmail.com>
+From: kbuild test robot <lkp@intel.com>
+Subject: [RFC PATCH] vfio: vfio_sdmdev_groups[] can be static
+Date: Tue, 4 Sep 2018 23:31:35 +0800
+Message-ID: <20180904153135.GI17047@intel.com>
+References: <20180903005204.26041-4-nek.in.cn@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-Cc: Jonathan Corbet <corbet@lwn.net>,
+Content-Type: text/plain; charset=us-ascii
+Cc: kbuild-all@01.org, Jonathan Corbet <corbet@lwn.net>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S . Miller" <davem@davemloft.net>,
         Joerg Roedel <joro@8bytes.org>,
@@ -26,101 +25,27 @@ Cc: Jonathan Corbet <corbet@lwn.net>,
 To: Kenneth Lee <nek.in.cn@gmail.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20180903005204.26041-1-nek.in.cn@gmail.com>
+In-Reply-To: <20180903005204.26041-4-nek.in.cn@gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Sep 03, 2018 at 08:51:57AM +0800, Kenneth Lee wrote:
-> From: Kenneth Lee <liguozhu@hisilicon.com>
-> 
-> WarpDrive is an accelerator framework to expose the hardware capabilities
-> directly to the user space. It makes use of the exist vfio and vfio-mdev
-> facilities. So the user application can send request and DMA to the
-> hardware without interaction with the kernel. This removes the latency
-> of syscall.
-> 
-> WarpDrive is the name for the whole framework. The component in kernel
-> is called SDMDEV, Share Domain Mediated Device. Driver driver exposes its
-> hardware resource by registering to SDMDEV as a VFIO-Mdev. So the user
-> library of WarpDrive can access it via VFIO interface.
-> 
-> The patchset contains document for the detail. Please refer to it for more
-> information.
-> 
-> This patchset is intended to be used with Jean Philippe Brucker's SVA
-> patch [1], which enables not only IO side page fault, but also PASID
-> support to IOMMU and VFIO.
-> 
-> With these features, WarpDrive can support non-pinned memory and
-> multi-process in the same accelerator device.  We tested it in our SoC
-> integrated Accelerator (board ID: D06, Chip ID: HIP08). A reference work
-> tree can be found here: [2].
-> 
-> But it is not mandatory. This patchset is tested in the latest mainline
-> kernel without the SVA patches.  So it supports only one process for each
-> accelerator.
-> 
-> We have noticed the IOMMU aware mdev RFC announced recently [3].
-> 
-> The IOMMU aware mdev has similar idea but different intention comparing to
-> WarpDrive. It intends to dedicate part of the hardware resource to a VM.
-> And the design is supposed to be used with Scalable I/O Virtualization.
-> While sdmdev is intended to share the hardware resource with a big amount
-> of processes.  It just requires the hardware supporting address
-> translation per process (PCIE's PASID or ARM SMMU's substream ID).
-> 
-> But we don't see serious confliction on both design. We believe they can be
-> normalized as one.
-> 
 
-So once again i do not understand why you are trying to do things
-this way. Kernel already have tons of example of everything you
-want to do without a new framework. Moreover i believe you are
-confuse by VFIO. To me VFIO is for VM not to create general device
-driver frame work.
+Fixes: 1e47d5e60865 ("vfio: add sdmdev support")
+Signed-off-by: kbuild test robot <fengguang.wu@intel.com>
+---
+ vfio_sdmdev.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-So here is your use case as i understand it. You have a device
-with a limited number of command queues (can be just one) and in
-some case it can support SVA/SVM (when hardware support it and it
-is not disabled). Final requirement is being able to schedule cmds
-from userspace without ioctl. All of this exists already exists
-upstream in few device drivers.
-
-
-So here is how every body else is doing it. Please explain why
-this does not work.
-
-1 Userspace open device file driver. Kernel device driver create
-  a context and associate it with on open. This context can be
-  uniq to the process and can bind hardware resources (like a
-  command queue) to the process.
-2 Userspace bind/acquire a commands queue and initialize it with
-  an ioctl on the device file. Through that ioctl userspace can
-  be inform wether either SVA/SVM works for the device. If SVA/
-  SVM works then kernel device driver bind the process to the
-  device as part of this ioctl.
-3 If SVM/SVA does not work userspace do an ioctl to create dma
-  buffer or something that does exactly the same thing.
-4 Userspace mmap the command queue (mmap of the device file by
-  using informations gather at step 2)
-5 Userspace can write commands into the queue it mapped
-6 When userspace close the device file all resources are release
-  just like any existing device drivers.
-
-Now if you want to create a device driver framework that expose
-a device file with generic API for all of the above steps fine.
-But it does not need to be part of VFIO whatsoever or explain
-why.
-
-
-Note that if IOMMU is fully disabled you probably want to block
-userspace from being able to directly scheduling commands onto
-the hardware as it would allow userspace to DMA anywhere and thus
-would open the kernel to easy exploits. In this case you can still
-keeps the same API as above and use page fault tricks to valid
-commands written by userspace into fake commands ring. This will
-be as slow or maybe even slower than ioctl but at least it allows
-you to validate commands.
-
-Cheers,
-Jérôme
+diff --git a/drivers/vfio/sdmdev/vfio_sdmdev.c b/drivers/vfio/sdmdev/vfio_sdmdev.c
+index c6eb5d4..e7d3c23 100644
+--- a/drivers/vfio/sdmdev/vfio_sdmdev.c
++++ b/drivers/vfio/sdmdev/vfio_sdmdev.c
+@@ -103,7 +103,7 @@ static const struct attribute_group vfio_sdmdev_group = {
+ 	.name  = VFIO_SDMDEV_PDEV_ATTRS_GRP_NAME,
+ 	.attrs = vfio_sdmdev_attrs,
+ };
+-const struct attribute_group *vfio_sdmdev_groups[] = {
++static const struct attribute_group *vfio_sdmdev_groups[] = {
+ 	&vfio_sdmdev_group,
+ 	NULL,
+ };
