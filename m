@@ -1,44 +1,52 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2 1/3] crypto: Introduce notifier for new crypto
- algorithms
-Date: Tue, 4 Sep 2018 13:21:51 +0800
-Message-ID: <20180904052151.ys2mtoixeax6jj5w@gondor.apana.org.au>
-References: <20180827060918.tfz7ljufqhlej4kq@gondor.apana.org.au>
- <20180830150016.15661-1-martin.petersen@oracle.com>
+Subject: Re: [PATCH v2] crypto: arm/chacha20 - faster 8-bit rotations and
+ other optimizations
+Date: Tue, 4 Sep 2018 13:22:11 +0800
+Message-ID: <20180904052211.tlncsdzljwjh5xyg@gondor.apana.org.au>
+References: <20180901071707.14712-1-ebiggers@kernel.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Jeff.Lien@wdc.com, ard.biesheuvel@linaro.org,
-        david.darrington@wdc.com, hch@infradead.org, jeff.furlong@wdc.com,
-        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
-        tim.c.chen@linux.intel.com
-To: "Martin K. Petersen" <martin.petersen@oracle.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: Eric Biggers <ebiggers@kernel.org>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 Content-Disposition: inline
-In-Reply-To: <20180830150016.15661-1-martin.petersen@oracle.com>
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <20180901071707.14712-1-ebiggers@kernel.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Aug 30, 2018 at 11:00:14AM -0400, Martin K. Petersen wrote:
-> Introduce a facility that can be used to receive a notification
-> callback when a new algorithm becomes available. This can be used by
-> existing crypto registrations to trigger a switch from a software-only
-> algorithm to a hardware-accelerated version.
+On Sat, Sep 01, 2018 at 12:17:07AM -0700, Eric Biggers wrote:
+> From: Eric Biggers <ebiggers@google.com>
 > 
-> A new CRYPTO_MSG_ALG_LOADED state is introduced to the existing crypto
-> notification chain, and the register/unregister functions are exported
-> so they can be called by subsystems outside of crypto.
+> Optimize ChaCha20 NEON performance by:
 > 
-> Signed-off-by: Martin K. Petersen <martin.petersen@oracle.com>
-> Suggested-by: Herbert Xu <herbert@gondor.apana.org.au>
+> - Implementing the 8-bit rotations using the 'vtbl.8' instruction.
+> - Streamlining the part that adds the original state and XORs the data.
+> - Making some other small tweaks.
+> 
+> On ARM Cortex-A7, these optimizations improve ChaCha20 performance from
+> about 12.08 cycles per byte to about 11.37 -- a 5.9% improvement.
+> 
+> There is a tradeoff involved with the 'vtbl.8' rotation method since
+> there is at least one CPU (Cortex-A53) where it's not fastest.  But it
+> seems to be a better default; see the added comment.  Overall, this
+> patch reduces Cortex-A53 performance by less than 0.5%.
+> 
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
 > ---
->  crypto/algapi.c         |  2 ++
->  crypto/algboss.c        |  2 ++
->  crypto/internal.h       |  8 --------
->  include/crypto/algapi.h | 10 ++++++++++
->  4 files changed, 14 insertions(+), 8 deletions(-)
+>  arch/arm/crypto/chacha20-neon-core.S | 277 ++++++++++++++-------------
+>  1 file changed, 143 insertions(+), 134 deletions(-)
 
-All applied.  Thanks.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
