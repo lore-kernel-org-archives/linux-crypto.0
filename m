@@ -1,7 +1,7 @@
 From: kbuild test robot <lkp@intel.com>
-Subject: [RFC PATCH] vfio: vfio_sdmdev_groups[] can be static
-Date: Tue, 4 Sep 2018 23:31:35 +0800
-Message-ID: <20180904153135.GI17047@intel.com>
+Subject: Re: [PATCH 3/7] vfio: add sdmdev support
+Date: Tue, 4 Sep 2018 23:32:04 +0800
+Message-ID: <20180904153204.GJ17047@intel.com>
 References: <20180903005204.26041-4-nek.in.cn@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
@@ -29,23 +29,34 @@ In-Reply-To: <20180903005204.26041-4-nek.in.cn@gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
+Hi Kenneth,
 
-Fixes: 1e47d5e60865 ("vfio: add sdmdev support")
-Signed-off-by: kbuild test robot <fengguang.wu@intel.com>
+Thank you for the patch! Perhaps something to improve:
+
+[auto build test WARNING on cryptodev/master]
+[also build test WARNING on v4.19-rc2 next-20180831]
+[if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
+
+url:    https://github.com/0day-ci/linux/commits/Kenneth-Lee/A-General-Accelerator-Framework-WarpDrive/20180903-162733
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
+reproduce:
+        # apt-get install sparse
+        make ARCH=x86_64 allmodconfig
+        make C=1 CF=-D__CHECK_ENDIAN__
+:::::: branch date: 3 hours ago
+:::::: commit date: 3 hours ago
+
+>> drivers/vfio/sdmdev/vfio_sdmdev.c:106:30: sparse: symbol 'vfio_sdmdev_groups' was not declared. Should it be static?
+   drivers/vfio/sdmdev/vfio_sdmdev.c: In function 'vfio_sdmdev_mdev_remove':
+   drivers/vfio/sdmdev/vfio_sdmdev.c:178:2: warning: this 'if' clause does not guard... [-Wmisleading-indentation]
+     if (sdmdev->ops->put_queue);
+     ^~
+   drivers/vfio/sdmdev/vfio_sdmdev.c:179:3: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the 'if'
+      sdmdev->ops->put_queue(q);
+      ^~~~~~
+
+Please review and possibly fold the followup patch.
+
 ---
- vfio_sdmdev.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/vfio/sdmdev/vfio_sdmdev.c b/drivers/vfio/sdmdev/vfio_sdmdev.c
-index c6eb5d4..e7d3c23 100644
---- a/drivers/vfio/sdmdev/vfio_sdmdev.c
-+++ b/drivers/vfio/sdmdev/vfio_sdmdev.c
-@@ -103,7 +103,7 @@ static const struct attribute_group vfio_sdmdev_group = {
- 	.name  = VFIO_SDMDEV_PDEV_ATTRS_GRP_NAME,
- 	.attrs = vfio_sdmdev_attrs,
- };
--const struct attribute_group *vfio_sdmdev_groups[] = {
-+static const struct attribute_group *vfio_sdmdev_groups[] = {
- 	&vfio_sdmdev_group,
- 	NULL,
- };
+0-DAY kernel test infrastructure                Open Source Technology Center
+https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
