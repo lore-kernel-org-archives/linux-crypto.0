@@ -1,38 +1,126 @@
-From: Rob Herring <robh@kernel.org>
-Subject: Re: [PATCH 2/6] clk: imx: vf610: Add CRC clock
-Date: Tue, 04 Sep 2018 08:36:47 -0500
-Message-ID: <5b8e8a6f.1c69fb81.8fb5e.93c2@mx.google.com>
-References: <20180830171539.20008-1-krzk@kernel.org>
- <20180830171539.20008-3-krzk@kernel.org>
+From: Jerome Glisse <jglisse@redhat.com>
+Subject: Re: [RFCv2 PATCH 0/7] A General Accelerator Framework, WarpDrive
+Date: Tue, 4 Sep 2018 11:00:19 -0400
+Message-ID: <20180904150019.GA4024@redhat.com>
+References: <20180903005204.26041-1-nek.in.cn@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: , devicetree@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
- linux-kernel@vger.kernel.org, Krzysztof Kozlowski <krzk@kernel.org>,
- linux-clk@vger.kernel.org, linux-crypto@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>, linux-arm-kernel@lists.infradead.org
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <20180830171539.20008-3-krzk@kernel.org>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+Cc: Jonathan Corbet <corbet@lwn.net>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Joerg Roedel <joro@8bytes.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Kenneth Lee <liguozhu@hisilicon.com>,
+        Hao Fang <fanghao11@huawei.com>,
+        Zhou Wang <wangzhou1@hisilicon.com>,
+        Zaibo Xu <xuzaibo@huawei.com>,
+        Philippe Ombredanne <pombredanne@nexb.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, iommu@lists.linux-foundation.org,
+        kvm@vger.kernel.org, linux-accelerators@lists.ozlabs.org,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Sanjay Kumar <sanjay.k.kumar@intel.com>, linuxarm@huawei.com
+To: Kenneth Lee <nek.in.cn@gmail.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20180903005204.26041-1-nek.in.cn@gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, 30 Aug 2018 19:15:35 +0200, Krzysztof Kozlowski wrote:
-> Add the clock for CRC block allowing it to be enabled by HW CRC driver.
+On Mon, Sep 03, 2018 at 08:51:57AM +0800, Kenneth Lee wrote:
+> From: Kenneth Lee <liguozhu@hisilicon.com>
 > 
-> Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
-> ---
->  drivers/clk/imx/clk-vf610.c             | 1 +
->  include/dt-bindings/clock/vf610-clock.h | 3 ++-
->  2 files changed, 3 insertions(+), 1 deletion(-)
+> WarpDrive is an accelerator framework to expose the hardware capabilities
+> directly to the user space. It makes use of the exist vfio and vfio-mdev
+> facilities. So the user application can send request and DMA to the
+> hardware without interaction with the kernel. This removes the latency
+> of syscall.
+> 
+> WarpDrive is the name for the whole framework. The component in kernel
+> is called SDMDEV, Share Domain Mediated Device. Driver driver exposes its
+> hardware resource by registering to SDMDEV as a VFIO-Mdev. So the user
+> library of WarpDrive can access it via VFIO interface.
+> 
+> The patchset contains document for the detail. Please refer to it for more
+> information.
+> 
+> This patchset is intended to be used with Jean Philippe Brucker's SVA
+> patch [1], which enables not only IO side page fault, but also PASID
+> support to IOMMU and VFIO.
+> 
+> With these features, WarpDrive can support non-pinned memory and
+> multi-process in the same accelerator device.  We tested it in our SoC
+> integrated Accelerator (board ID: D06, Chip ID: HIP08). A reference work
+> tree can be found here: [2].
+> 
+> But it is not mandatory. This patchset is tested in the latest mainline
+> kernel without the SVA patches.  So it supports only one process for each
+> accelerator.
+> 
+> We have noticed the IOMMU aware mdev RFC announced recently [3].
+> 
+> The IOMMU aware mdev has similar idea but different intention comparing to
+> WarpDrive. It intends to dedicate part of the hardware resource to a VM.
+> And the design is supposed to be used with Scalable I/O Virtualization.
+> While sdmdev is intended to share the hardware resource with a big amount
+> of processes.  It just requires the hardware supporting address
+> translation per process (PCIE's PASID or ARM SMMU's substream ID).
+> 
+> But we don't see serious confliction on both design. We believe they can be
+> normalized as one.
 > 
 
-Reviewed-by: Rob Herring <robh@kernel.org>
+So once again i do not understand why you are trying to do things
+this way. Kernel already have tons of example of everything you
+want to do without a new framework. Moreover i believe you are
+confuse by VFIO. To me VFIO is for VM not to create general device
+driver frame work.
+
+So here is your use case as i understand it. You have a device
+with a limited number of command queues (can be just one) and in
+some case it can support SVA/SVM (when hardware support it and it
+is not disabled). Final requirement is being able to schedule cmds
+from userspace without ioctl. All of this exists already exists
+upstream in few device drivers.
+
+
+So here is how every body else is doing it. Please explain why
+this does not work.
+
+1 Userspace open device file driver. Kernel device driver create
+  a context and associate it with on open. This context can be
+  uniq to the process and can bind hardware resources (like a
+  command queue) to the process.
+2 Userspace bind/acquire a commands queue and initialize it with
+  an ioctl on the device file. Through that ioctl userspace can
+  be inform wether either SVA/SVM works for the device. If SVA/
+  SVM works then kernel device driver bind the process to the
+  device as part of this ioctl.
+3 If SVM/SVA does not work userspace do an ioctl to create dma
+  buffer or something that does exactly the same thing.
+4 Userspace mmap the command queue (mmap of the device file by
+  using informations gather at step 2)
+5 Userspace can write commands into the queue it mapped
+6 When userspace close the device file all resources are release
+  just like any existing device drivers.
+
+Now if you want to create a device driver framework that expose
+a device file with generic API for all of the above steps fine.
+But it does not need to be part of VFIO whatsoever or explain
+why.
+
+
+Note that if IOMMU is fully disabled you probably want to block
+userspace from being able to directly scheduling commands onto
+the hardware as it would allow userspace to DMA anywhere and thus
+would open the kernel to easy exploits. In this case you can still
+keeps the same API as above and use page fault tricks to valid
+commands written by userspace into fake commands ring. This will
+be as slow or maybe even slower than ioctl but at least it allows
+you to validate commands.
+
+Cheers,
+Jérôme
