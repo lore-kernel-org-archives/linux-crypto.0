@@ -1,133 +1,424 @@
-From: Borislav Petkov <bp@alien8.de>
-Subject: Re: [PATCH crypto-2.6] crypto: ccp: add timeout support in the SEV
- command
-Date: Tue, 4 Sep 2018 10:11:51 +0200
-Message-ID: <20180904081151.GC32615@zn.tnic>
-References: <1534367485-4386-1-git-send-email-brijesh.singh@amd.com>
- <1534367485-4386-2-git-send-email-brijesh.singh@amd.com>
+From: Ondrej Mosnacek <omosnace@redhat.com>
+Subject: [PATCH v2] crypto: xts - Drop use of auxiliary buffer
+Date: Tue,  4 Sep 2018 10:06:42 +0200
+Message-ID: <20180904080642.26897-1-omosnace@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Cc: linux-crypto@vger.kernel.org, thomas.lendacky@amd.com,
-        Gary Hook <Gary.Hook@amd.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-kernel@vger.kernel.org
-To: Brijesh Singh <brijesh.singh@amd.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1534367485-4386-2-git-send-email-brijesh.singh@amd.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: dm-devel@redhat.com, Mikulas Patocka <mpatocka@redhat.com>,
+	linux-crypto@vger.kernel.org, Ondrej Mosnacek <omosnace@redhat.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <dm-devel-bounces@redhat.com>
+List-Unsubscribe: <https://www.redhat.com/mailman/options/dm-devel>,
+	<mailto:dm-devel-request@redhat.com?subject=unsubscribe>
+List-Archive: <https://www.redhat.com/archives/dm-devel>
+List-Post: <mailto:dm-devel@redhat.com>
+List-Help: <mailto:dm-devel-request@redhat.com?subject=help>
+List-Subscribe: <https://www.redhat.com/mailman/listinfo/dm-devel>,
+	<mailto:dm-devel-request@redhat.com?subject=subscribe>
+Sender: dm-devel-bounces@redhat.com
+Errors-To: dm-devel-bounces@redhat.com
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Aug 15, 2018 at 04:11:25PM -0500, Brijesh Singh wrote:
-> Currently, the CCP driver assumes that the SEV command issued to the PSP
-> will always return (i.e. it will never hang).  But recently, firmware bugs
-> have shown that a command can hang.  Since of the SEV commands are used
-> in probe routines, this can cause boot hangs and/or loss of virtualization
-> capabilities.
-> 
-> To protect against firmware bugs, add a timeout in the SEV command
-> execution flow.  If a command does not complete within the specified
-> timeout then return -ETIMEOUT and stop the driver from executing any
-> further commands since the state of the SEV firmware is unknown.
-> 
-> Cc: Tom Lendacky <thomas.lendacky@amd.com>
-> Cc: Gary Hook <Gary.Hook@amd.com>
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Cc: linux-kernel@vger.kernel.org
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> ---
->  drivers/crypto/ccp/psp-dev.c | 46 +++++++++++++++++++++++++++++++++++++++-----
->  1 file changed, 41 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
-> index 218739b..72790d8 100644
-> --- a/drivers/crypto/ccp/psp-dev.c
-> +++ b/drivers/crypto/ccp/psp-dev.c
-> @@ -38,6 +38,17 @@ static DEFINE_MUTEX(sev_cmd_mutex);
->  static struct sev_misc_dev *misc_dev;
->  static struct psp_device *psp_master;
->  
-> +static int psp_cmd_timeout = 100;
-> +module_param(psp_cmd_timeout, int, 0644);
-> +MODULE_PARM_DESC(psp_cmd_timeout, " default timeout value, in seconds, for PSP commands");
-> +
-> +static int psp_probe_timeout = 5;
-> +module_param(psp_probe_timeout, int, 0644);
-> +MODULE_PARM_DESC(psp_probe_timeout, " default timeout value, in seconds, during PSP device probe");
+Since commit acb9b159c784 ("crypto: gf128mul - define gf128mul_x_* in
+gf128mul.h"), the gf128mul_x_*() functions are very fast and therefore
+caching the computed XTS tweaks has only negligible advantage over
+computing them twice.
 
-Just a question: what prevents the user from supplying non-sensical
-values here?
+In fact, since the current caching implementation limits the size of
+the calls to the child ecb(...) algorithm to PAGE_SIZE (usually 4096 B),
+it is often actually slower than the simple recomputing implementation.
 
-I think we should clamp them to only allowed values because I don't want
-to be debugging some strange bugs due to that.
+This patch simplifies the XTS template to recompute the XTS tweaks from
+scratch in the second pass and thus also removes the need to allocate a
+dynamic buffer using kmalloc().
 
-> +
-> +static bool psp_dead;
-> +static int psp_timeout;
-> +
->  static struct psp_device *psp_alloc_struct(struct sp_device *sp)
->  {
->  	struct device *dev = sp->dev;
-> @@ -82,10 +93,19 @@ static irqreturn_t psp_irq_handler(int irq, void *data)
->  	return IRQ_HANDLED;
->  }
->  
-> -static void sev_wait_cmd_ioc(struct psp_device *psp, unsigned int *reg)
-> +static int sev_wait_cmd_ioc(struct psp_device *psp,
-> +			    unsigned int *reg, unsigned int timeout)
->  {
-> -	wait_event(psp->sev_int_queue, psp->sev_int_rcvd);
-> +	int ret;
-> +
-> +	ret = wait_event_timeout(psp->sev_int_queue,
-> +			psp->sev_int_rcvd, timeout * HZ);
+As discussed at [1], the use of kmalloc causes deadlocks with dm-crypt.
 
-Align args at opening brace.
+PERFORMANCE RESULTS
+I measured time to encrypt/decrypt a memory buffer of varying sizes with
+xts(ecb-aes-aesni) using a tool I wrote ([2]) and the results suggest
+that after this patch the performance is either better or comparable for
+both small and large buffers. Note that there is a lot of noise in the
+measurements, but the overall difference is easy to see.
 
-> +	if (!ret)
-> +		return -ETIMEDOUT;
-> +
->  	*reg = ioread32(psp->io_regs + psp->vdata->cmdresp_reg);
-> +
-> +	return 0;
->  }
->  
->  static int sev_cmd_buffer_len(int cmd)
-> @@ -133,12 +153,15 @@ static int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret)
->  	if (!psp)
->  		return -ENODEV;
->  
-> +	if (psp_dead)
-> +		return -EBUSY;
-> +
->  	/* Get the physical address of the command buffer */
->  	phys_lsb = data ? lower_32_bits(__psp_pa(data)) : 0;
->  	phys_msb = data ? upper_32_bits(__psp_pa(data)) : 0;
->  
-> -	dev_dbg(psp->dev, "sev command id %#x buffer 0x%08x%08x\n",
-> -		cmd, phys_msb, phys_lsb);
-> +	dev_dbg(psp->dev, "sev command id %#x buffer 0x%08x%08x timeout %us\n",
-> +		cmd, phys_msb, phys_lsb, psp_timeout);
->  
->  	print_hex_dump_debug("(in):  ", DUMP_PREFIX_OFFSET, 16, 2, data,
->  			     sev_cmd_buffer_len(cmd), false);
-> @@ -154,7 +177,18 @@ static int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret)
->  	iowrite32(reg, psp->io_regs + psp->vdata->cmdresp_reg);
->  
->  	/* wait for command completion */
-> -	sev_wait_cmd_ioc(psp, &reg);
-> +	ret = sev_wait_cmd_ioc(psp, &reg, psp_timeout);
-> +	if (ret) {
-> +		if (psp_ret)
-> +			*psp_ret = 0;
-> +
-> +		dev_err(psp->dev, "sev command %#x timed out, disabling PSP \n", cmd);
-									   ^
+Old code:
+ALGORITHM       KEY (b) DATA (B)        TIME ENC (ns)   TIME DEC (ns)
+        xts(aes)     256              64             331             328
+        xts(aes)     384              64             332             333
+        xts(aes)     512              64             338             348
+        xts(aes)     256             512             889             920
+        xts(aes)     384             512            1019             993
+        xts(aes)     512             512            1032             990
+        xts(aes)     256            4096            2152            2292
+        xts(aes)     384            4096            2453            2597
+        xts(aes)     512            4096            3041            2641
+        xts(aes)     256           16384            9443            8027
+        xts(aes)     384           16384            8536            8925
+        xts(aes)     512           16384            9232            9417
+        xts(aes)     256           32768           16383           14897
+        xts(aes)     384           32768           17527           16102
+        xts(aes)     512           32768           18483           17322
 
-Trailing space.
+New code:
+ALGORITHM       KEY (b) DATA (B)        TIME ENC (ns)   TIME DEC (ns)
+        xts(aes)     256              64             328             324
+        xts(aes)     384              64             324             319
+        xts(aes)     512              64             320             322
+        xts(aes)     256             512             476             473
+        xts(aes)     384             512             509             492
+        xts(aes)     512             512             531             514
+        xts(aes)     256            4096            2132            1829
+        xts(aes)     384            4096            2357            2055
+        xts(aes)     512            4096            2178            2027
+        xts(aes)     256           16384            6920            6983
+        xts(aes)     384           16384            8597            7505
+        xts(aes)     512           16384            7841            8164
+        xts(aes)     256           32768           13468           12307
+        xts(aes)     384           32768           14808           13402
+        xts(aes)     512           32768           15753           14636
 
+[1] https://lkml.org/lkml/2018/8/23/1315
+[2] https://gitlab.com/omos/linux-crypto-bench
+
+Cc: Mikulas Patocka <mpatocka@redhat.com>
+Signed-off-by: Ondrej Mosnacek <omosnace@redhat.com>
+---
+ crypto/xts.c | 258 ++++++---------------------------------------------
+ 1 file changed, 30 insertions(+), 228 deletions(-)
+
+v1: https://www.spinics.net/lists/linux-crypto/msg34776.html
+Changes in v2:
+  - rebase to latest cryptodev tree
+
+diff --git a/crypto/xts.c b/crypto/xts.c
+index ccf55fbb8bc2..6c49e76df8ca 100644
+--- a/crypto/xts.c
++++ b/crypto/xts.c
+@@ -26,8 +26,6 @@
+ #include <crypto/b128ops.h>
+ #include <crypto/gf128mul.h>
+ 
+-#define XTS_BUFFER_SIZE 128u
+-
+ struct priv {
+ 	struct crypto_skcipher *child;
+ 	struct crypto_cipher *tweak;
+@@ -39,19 +37,7 @@ struct xts_instance_ctx {
+ };
+ 
+ struct rctx {
+-	le128 buf[XTS_BUFFER_SIZE / sizeof(le128)];
+-
+ 	le128 t;
+-
+-	le128 *ext;
+-
+-	struct scatterlist srcbuf[2];
+-	struct scatterlist dstbuf[2];
+-	struct scatterlist *src;
+-	struct scatterlist *dst;
+-
+-	unsigned int left;
+-
+ 	struct skcipher_request subreq;
+ };
+ 
+@@ -96,265 +82,81 @@ static int setkey(struct crypto_skcipher *parent, const u8 *key,
+ 	return err;
+ }
+ 
+-static int post_crypt(struct skcipher_request *req)
++static int xor_tweak(struct rctx *rctx, struct skcipher_request *req)
+ {
+-	struct rctx *rctx = skcipher_request_ctx(req);
+-	le128 *buf = rctx->ext ?: rctx->buf;
+-	struct skcipher_request *subreq;
+ 	const int bs = XTS_BLOCK_SIZE;
+ 	struct skcipher_walk w;
+-	struct scatterlist *sg;
+-	unsigned offset;
++	le128 t = rctx->t;
+ 	int err;
+ 
+-	subreq = &rctx->subreq;
+-	err = skcipher_walk_virt(&w, subreq, false);
++	err = skcipher_walk_virt(&w, req, false);
+ 
+ 	while (w.nbytes) {
+ 		unsigned int avail = w.nbytes;
++		le128 *wsrc;
+ 		le128 *wdst;
+ 
++		wsrc = w.src.virt.addr;
+ 		wdst = w.dst.virt.addr;
+ 
+ 		do {
+-			le128_xor(wdst, buf++, wdst);
+-			wdst++;
++			le128_xor(wdst++, &t, wsrc++);
++			gf128mul_x_ble(&t, &t);
+ 		} while ((avail -= bs) >= bs);
+ 
+ 		err = skcipher_walk_done(&w, avail);
+ 	}
+ 
+-	rctx->left -= subreq->cryptlen;
+-
+-	if (err || !rctx->left)
+-		goto out;
+-
+-	rctx->dst = rctx->dstbuf;
+-
+-	scatterwalk_done(&w.out, 0, 1);
+-	sg = w.out.sg;
+-	offset = w.out.offset;
+-
+-	if (rctx->dst != sg) {
+-		rctx->dst[0] = *sg;
+-		sg_unmark_end(rctx->dst);
+-		scatterwalk_crypto_chain(rctx->dst, sg_next(sg), 2);
+-	}
+-	rctx->dst[0].length -= offset - sg->offset;
+-	rctx->dst[0].offset = offset;
+-
+-out:
+ 	return err;
+ }
+ 
+-static int pre_crypt(struct skcipher_request *req)
++static void crypt_done(struct crypto_async_request *areq, int err)
+ {
++	struct skcipher_request *req = areq->data;
+ 	struct rctx *rctx = skcipher_request_ctx(req);
+-	le128 *buf = rctx->ext ?: rctx->buf;
+-	struct skcipher_request *subreq;
+-	const int bs = XTS_BLOCK_SIZE;
+-	struct skcipher_walk w;
+-	struct scatterlist *sg;
+-	unsigned cryptlen;
+-	unsigned offset;
+-	bool more;
+-	int err;
+-
+-	subreq = &rctx->subreq;
+-	cryptlen = subreq->cryptlen;
+-
+-	more = rctx->left > cryptlen;
+-	if (!more)
+-		cryptlen = rctx->left;
+-
+-	skcipher_request_set_crypt(subreq, rctx->src, rctx->dst,
+-				   cryptlen, NULL);
+-
+-	err = skcipher_walk_virt(&w, subreq, false);
+-
+-	while (w.nbytes) {
+-		unsigned int avail = w.nbytes;
+-		le128 *wsrc;
+-		le128 *wdst;
+-
+-		wsrc = w.src.virt.addr;
+-		wdst = w.dst.virt.addr;
+-
+-		do {
+-			*buf++ = rctx->t;
+-			le128_xor(wdst++, &rctx->t, wsrc++);
+-			gf128mul_x_ble(&rctx->t, &rctx->t);
+-		} while ((avail -= bs) >= bs);
+-
+-		err = skcipher_walk_done(&w, avail);
+-	}
+-
+-	skcipher_request_set_crypt(subreq, rctx->dst, rctx->dst,
+-				   cryptlen, NULL);
++	struct skcipher_request *subreq = &rctx->subreq;
+ 
+-	if (err || !more)
+-		goto out;
++	if (!err)
++		err = xor_tweak(rctx, subreq);
+ 
+-	rctx->src = rctx->srcbuf;
+-
+-	scatterwalk_done(&w.in, 0, 1);
+-	sg = w.in.sg;
+-	offset = w.in.offset;
+-
+-	if (rctx->src != sg) {
+-		rctx->src[0] = *sg;
+-		sg_unmark_end(rctx->src);
+-		scatterwalk_crypto_chain(rctx->src, sg_next(sg), 2);
+-	}
+-	rctx->src[0].length -= offset - sg->offset;
+-	rctx->src[0].offset = offset;
+-
+-out:
+-	return err;
++	skcipher_request_complete(req, err);
+ }
+ 
+-static int init_crypt(struct skcipher_request *req, crypto_completion_t done)
++static void init_crypt(struct skcipher_request *req)
+ {
+ 	struct priv *ctx = crypto_skcipher_ctx(crypto_skcipher_reqtfm(req));
+ 	struct rctx *rctx = skcipher_request_ctx(req);
+-	struct skcipher_request *subreq;
+-	gfp_t gfp;
++	struct skcipher_request *subreq = &rctx->subreq;
+ 
+-	subreq = &rctx->subreq;
+ 	skcipher_request_set_tfm(subreq, ctx->child);
+-	skcipher_request_set_callback(subreq, req->base.flags, done, req);
+-
+-	gfp = req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP ? GFP_KERNEL :
+-							   GFP_ATOMIC;
+-	rctx->ext = NULL;
+-
+-	subreq->cryptlen = XTS_BUFFER_SIZE;
+-	if (req->cryptlen > XTS_BUFFER_SIZE) {
+-		unsigned int n = min(req->cryptlen, (unsigned int)PAGE_SIZE);
+-
+-		rctx->ext = kmalloc(n, gfp);
+-		if (rctx->ext)
+-			subreq->cryptlen = n;
+-	}
+-
+-	rctx->src = req->src;
+-	rctx->dst = req->dst;
+-	rctx->left = req->cryptlen;
++	skcipher_request_set_callback(subreq, req->base.flags, crypt_done, req);
++	skcipher_request_set_crypt(subreq, req->dst, req->dst,
++				   req->cryptlen, NULL);
+ 
+ 	/* calculate first value of T */
+ 	crypto_cipher_encrypt_one(ctx->tweak, (u8 *)&rctx->t, req->iv);
+-
+-	return 0;
+-}
+-
+-static void exit_crypt(struct skcipher_request *req)
+-{
+-	struct rctx *rctx = skcipher_request_ctx(req);
+-
+-	rctx->left = 0;
+-
+-	if (rctx->ext)
+-		kzfree(rctx->ext);
+-}
+-
+-static int do_encrypt(struct skcipher_request *req, int err)
+-{
+-	struct rctx *rctx = skcipher_request_ctx(req);
+-	struct skcipher_request *subreq;
+-
+-	subreq = &rctx->subreq;
+-
+-	while (!err && rctx->left) {
+-		err = pre_crypt(req) ?:
+-		      crypto_skcipher_encrypt(subreq) ?:
+-		      post_crypt(req);
+-
+-		if (err == -EINPROGRESS || err == -EBUSY)
+-			return err;
+-	}
+-
+-	exit_crypt(req);
+-	return err;
+-}
+-
+-static void encrypt_done(struct crypto_async_request *areq, int err)
+-{
+-	struct skcipher_request *req = areq->data;
+-	struct skcipher_request *subreq;
+-	struct rctx *rctx;
+-
+-	rctx = skcipher_request_ctx(req);
+-
+-	if (err == -EINPROGRESS) {
+-		if (rctx->left != req->cryptlen)
+-			return;
+-		goto out;
+-	}
+-
+-	subreq = &rctx->subreq;
+-	subreq->base.flags &= CRYPTO_TFM_REQ_MAY_BACKLOG;
+-
+-	err = do_encrypt(req, err ?: post_crypt(req));
+-	if (rctx->left)
+-		return;
+-
+-out:
+-	skcipher_request_complete(req, err);
+ }
+ 
+ static int encrypt(struct skcipher_request *req)
+-{
+-	return do_encrypt(req, init_crypt(req, encrypt_done));
+-}
+-
+-static int do_decrypt(struct skcipher_request *req, int err)
+ {
+ 	struct rctx *rctx = skcipher_request_ctx(req);
+-	struct skcipher_request *subreq;
+-
+-	subreq = &rctx->subreq;
++	struct skcipher_request *subreq = &rctx->subreq;
+ 
+-	while (!err && rctx->left) {
+-		err = pre_crypt(req) ?:
+-		      crypto_skcipher_decrypt(subreq) ?:
+-		      post_crypt(req);
+-
+-		if (err == -EINPROGRESS || err == -EBUSY)
+-			return err;
+-	}
+-
+-	exit_crypt(req);
+-	return err;
+-}
+-
+-static void decrypt_done(struct crypto_async_request *areq, int err)
+-{
+-	struct skcipher_request *req = areq->data;
+-	struct skcipher_request *subreq;
+-	struct rctx *rctx;
+-
+-	rctx = skcipher_request_ctx(req);
+-
+-	if (err == -EINPROGRESS) {
+-		if (rctx->left != req->cryptlen)
+-			return;
+-		goto out;
+-	}
+-
+-	subreq = &rctx->subreq;
+-	subreq->base.flags &= CRYPTO_TFM_REQ_MAY_BACKLOG;
+-
+-	err = do_decrypt(req, err ?: post_crypt(req));
+-	if (rctx->left)
+-		return;
+-
+-out:
+-	skcipher_request_complete(req, err);
++	init_crypt(req);
++	return xor_tweak(rctx, req) ?:
++		crypto_skcipher_encrypt(subreq) ?:
++		xor_tweak(rctx, subreq);
+ }
+ 
+ static int decrypt(struct skcipher_request *req)
+ {
+-	return do_decrypt(req, init_crypt(req, decrypt_done));
++	struct rctx *rctx = skcipher_request_ctx(req);
++	struct skcipher_request *subreq = &rctx->subreq;
++
++	init_crypt(req);
++	return xor_tweak(rctx, req) ?:
++		crypto_skcipher_decrypt(subreq) ?:
++		xor_tweak(rctx, subreq);
+ }
+ 
+ static int init_tfm(struct crypto_skcipher *tfm)
 -- 
-Regards/Gruss,
-    Boris.
-
-Good mailing practices for 400: avoid top-posting and trim the reply.
+2.17.1
