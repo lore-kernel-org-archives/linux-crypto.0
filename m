@@ -1,33 +1,39 @@
-From: Torsten Duwe <duwe@lst.de>
-Subject: Re: [PATCH v2 1/3] crypto: Introduce notifier for new crypto
- algorithms
-Date: Tue, 4 Sep 2018 15:30:06 +0200
-Message-ID: <20180904133006.GA28715@lst.de>
-References: <20180827060918.tfz7ljufqhlej4kq@gondor.apana.org.au> <20180830150016.15661-1-martin.petersen@oracle.com>
+From: Rob Herring <robh@kernel.org>
+Subject: Re: [PATCH 1/6] dt-bindings: crypto: Add Freescale Vybrid CRC
+Date: Mon, 3 Sep 2018 20:20:10 -0500
+Message-ID: <20180904012005.GA2470@bogus>
+References: <20180830171539.20008-1-krzk@kernel.org>
+ <20180830171539.20008-2-krzk@kernel.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: herbert@gondor.apana.org.au, Jeff.Lien@wdc.com,
-        ard.biesheuvel@linaro.org, david.darrington@wdc.com,
-        hch@infradead.org, jeff.furlong@wdc.com,
-        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
-        tim.c.chen@linux.intel.com
-To: "Martin K. Petersen" <martin.petersen@oracle.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: devicetree@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
+ linux-kernel@vger.kernel.org, Krzysztof Kozlowski <krzk@kernel.org>,
+ linux-clk@vger.kernel.org, linux-crypto@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>, linux-arm-kernel@lists.infradead.org
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 Content-Disposition: inline
-In-Reply-To: <20180830150016.15661-1-martin.petersen@oracle.com>
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <20180830171539.20008-2-krzk@kernel.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Aug 30, 2018 at 11:00:14AM -0400, Martin K. Petersen wrote:
-> Introduce a facility that can be used to receive a notification
-> callback when a new algorithm becomes available. This can be used by
-> existing crypto registrations to trigger a switch from a software-only
-> algorithm to a hardware-accelerated version.
+On Thu, 30 Aug 2018 19:15:34 +0200, Krzysztof Kozlowski wrote:
+> Add bindings for Freescale/NXP Vybrid CRC HW accelerator.
+> 
+> Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
+> ---
+>  .../devicetree/bindings/crypto/fsl-vf610-crc.txt         | 16 ++++++++++++++++
+>  1 file changed, 16 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/crypto/fsl-vf610-crc.txt
+> 
 
-While this is apparently fine with the patch set you sent, what about
-cases where the crypto context of old and new implementation is not
-100% compatible? The switch will still work for sure if there are no
-current active users of the algo, but otherwise...? Just a thought.
-
-	Torsten
+Reviewed-by: Rob Herring <robh@kernel.org>
