@@ -1,9 +1,10 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v8 5/9] dm: Remove VLA usage from hashes
-Date: Tue, 4 Sep 2018 11:13:18 +0800
-Message-ID: <20180904031318.47jc3jrxcdjeac5y@gondor.apana.org.au>
+Subject: Re: [PATCH v8 9/9] crypto: skcipher: Remove VLA usage for
+ SKCIPHER_REQUEST_ON_STACK
+Date: Tue, 4 Sep 2018 11:15:09 +0800
+Message-ID: <20180904031509.korwr7o7e4i7cjcq@gondor.apana.org.au>
 References: <20180807211843.47586-1-keescook@chromium.org>
- <20180807211843.47586-6-keescook@chromium.org>
+ <20180807211843.47586-10-keescook@chromium.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: Eric Biggers <ebiggers@google.com>,
@@ -27,20 +28,41 @@ Cc: Eric Biggers <ebiggers@google.com>,
 To: Kees Cook <keescook@chromium.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20180807211843.47586-6-keescook@chromium.org>
+In-Reply-To: <20180807211843.47586-10-keescook@chromium.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Aug 07, 2018 at 02:18:39PM -0700, Kees Cook wrote:
-> In the quest to remove all stack VLA usage from the kernel[1], this uses
-> the new HASH_MAX_DIGESTSIZE from the crypto layer to allocate the upper
-> bounds on stack usage.
+On Tue, Aug 07, 2018 at 02:18:43PM -0700, Kees Cook wrote:
+> In the quest to remove all stack VLA usage from the kernel[1], this
+> caps the skcipher request size similar to other limits and adds a sanity
+> check at registration. Looking at instrumented tcrypt output, the largest
+> is for lrw:
+> 
+> 	crypt: testing lrw(aes)
+> 	crypto_skcipher_set_reqsize: 8
+> 	crypto_skcipher_set_reqsize: 88
+> 	crypto_skcipher_set_reqsize: 472
 > 
 > [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
 > 
 > Signed-off-by: Kees Cook <keescook@chromium.org>
+> ---
+>  include/crypto/internal/skcipher.h | 1 +
+>  include/crypto/skcipher.h          | 4 +++-
+>  2 files changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/include/crypto/internal/skcipher.h b/include/crypto/internal/skcipher.h
+> index e42f7063f245..5035482cbe68 100644
+> --- a/include/crypto/internal/skcipher.h
+> +++ b/include/crypto/internal/skcipher.h
+> @@ -130,6 +130,7 @@ static inline struct crypto_skcipher *crypto_spawn_skcipher(
+>  static inline void crypto_skcipher_set_reqsize(
+>  	struct crypto_skcipher *skcipher, unsigned int reqsize)
+>  {
+> +	BUG_ON(reqsize > SKCIPHER_MAX_REQSIZE);
 
-Can the dm folks please review this patch?
+Please do not add these BUG_ONs.  Instead allow this function to
+fail and check for the failure in the caller.
 
 Thanks,
 -- 
