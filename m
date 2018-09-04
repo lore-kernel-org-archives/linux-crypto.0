@@ -1,62 +1,67 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: x86 - remove SHA multibuffer routines and mcryptd
-Date: Tue, 4 Sep 2018 11:17:31 +0800
-Message-ID: <20180904031731.ehi2jzx3retkhyql@gondor.apana.org.au>
-References: <20180822085144.4872-1-ard.biesheuvel@linaro.org>
- <a877e275-4dd7-6580-2351-db8d3a4ba1a2@linux.intel.com>
- <1535411993.3516.4.camel@megha-Z97X-UD7-TH>
+Subject: Re: [PATCH 2/4] arm64: cpufeature: add feature for CRC32 instructions
+Date: Tue, 4 Sep 2018 11:18:55 +0800
+Message-ID: <20180904031855.mjpdndeh57lqziuk@gondor.apana.org.au>
+References: <20180827110245.14812-1-ard.biesheuvel@linaro.org>
+ <20180827110245.14812-3-ard.biesheuvel@linaro.org>
+ <20180828170135.GC19825@arm.com>
+ <CAKv+Gu-tM9aKZJ3ppt9yLVP_V5YA_yN8D1j_-NtM+qQCdnc6JA@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Tim Chen <tim.c.chen@linux.intel.com>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        linux-crypto@vger.kernel.org, linux-m68k@lists.linux-m68k.org,
-        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        ebiggers@google.com, Geert Uytterhoeven <geert@linux-m68k.org>,
-        Martin Schwidefsky <schwidefsky@de.ibm.com>,
-        Heiko Carstens <heiko.carstens@de.ibm.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>
-To: Megha Dey <megha.dey@linux.intel.com>
+Cc: Will Deacon <will.deacon@arm.com>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Eric Biggers <ebiggers@google.com>,
+        "Suzuki K. Poulose" <suzuki.poulose@arm.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1535411993.3516.4.camel@megha-Z97X-UD7-TH>
+In-Reply-To: <CAKv+Gu-tM9aKZJ3ppt9yLVP_V5YA_yN8D1j_-NtM+qQCdnc6JA@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Aug 27, 2018 at 04:19:53PM -0700, Megha Dey wrote:
-> On Mon, 2018-08-27 at 15:28 -0700, Tim Chen wrote:
-> > On 08/22/2018 01:51 AM, Ard Biesheuvel wrote:
-> > > As it turns out, the AVX2 multibuffer SHA routines are currently
-> > > broken [0], in a way that would have likely been noticed if this
-> > > code were in wide use. Since the code is too complicated to be
-> > > maintained by anyone except the original authors, and since the
-> > > performance benefits for real-world use cases are debatable to
-> > > begin with, it is better to drop it entirely for the moment.
-> > > 
-> > > [0] https://marc.info/?l=linux-crypto-vger&m=153476243825350&w=2
-> > 
-> > Sorry I was out of the loop for a while and haven't been following
-> > the code too closely.
-> > 
-> > Megha is maintaining the code now.  Before we pull the code,
-> > please give us a chance to fix it first.
-> > 
-> > Thanks.
-> > 
-> > Tim
-> > 
+On Tue, Aug 28, 2018 at 08:43:35PM +0200, Ard Biesheuvel wrote:
+> On 28 August 2018 at 19:01, Will Deacon <will.deacon@arm.com> wrote:
+> > On Mon, Aug 27, 2018 at 01:02:43PM +0200, Ard Biesheuvel wrote:
+> >> Add a CRC32 feature bit and wire it up to the CPU id register so we
+> >> will be able to use alternatives patching for CRC32 operations.
+> >>
+> >> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> >> ---
+> >>  arch/arm64/include/asm/cpucaps.h | 3 ++-
+> >>  arch/arm64/kernel/cpufeature.c   | 9 +++++++++
+> >>  2 files changed, 11 insertions(+), 1 deletion(-)
+> >
+> > Acked-by: Will Deacon <will.deacon@arm.com>
+> >
+> > With the minor caveat below...
+> >
+> >> diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
+> >> index ae1f70450fb2..9932aca9704b 100644
+> >> --- a/arch/arm64/include/asm/cpucaps.h
+> >> +++ b/arch/arm64/include/asm/cpucaps.h
+> >> @@ -51,7 +51,8 @@
+> >>  #define ARM64_SSBD                           30
+> >>  #define ARM64_MISMATCHED_CACHE_TYPE          31
+> >>  #define ARM64_HAS_STAGE2_FWB                 32
+> >> +#define ARM64_HAS_CRC32                              33
+> >>
+> >> -#define ARM64_NCAPS                          33
+> >> +#define ARM64_NCAPS                          34
+> >
+> >
+> > ... if this goes via crypto, you'll almost certainly get a (trivial)
+> > conflict with arm64, since these numbers get bumped all the time.
+> >
 > 
-> Hi,
-> 
-> I am working to find a fix for these corner cases. If possible, we would
-> like to fix the issues instead of removing the code altogether.
+> I think the first three patches should go through the arm64 tree. The
+> last one just removes the now redundant crc32 SIMD driver, and Herbert
+> could pick that up separately, i.e., it should be totally independent.
 
-I think it has taken way too long to fix these issues.  The fact
-that these issues have existed for so long also means that hardly
-anyone uses these mb algorithms.
-
-So I think it is best if we remove everything and then add them
-back after a proper review process.
+Yes let's do that.
 
 Thanks,
 -- 
