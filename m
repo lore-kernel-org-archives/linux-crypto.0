@@ -1,80 +1,133 @@
-From: Kees Cook <keescook@chromium.org>
-Subject: Re: [PATCH v8 0/9] crypto: Remove VLA usage
-Date: Mon, 3 Sep 2018 22:50:41 -0700
-Message-ID: <CAGXu5jLHkNSGhR7Tk6wg8Vw-7nHPFfAgWyJ0NLMjGQw1BOKovg@mail.gmail.com>
-References: <20180807211843.47586-1-keescook@chromium.org>
-	<20180904051905.a2vyzijz6xyxvyhb@gondor.apana.org.au>
+From: Borislav Petkov <bp@alien8.de>
+Subject: Re: [PATCH crypto-2.6] crypto: ccp: add timeout support in the SEV
+ command
+Date: Tue, 4 Sep 2018 10:11:51 +0200
+Message-ID: <20180904081151.GC32615@zn.tnic>
+References: <1534367485-4386-1-git-send-email-brijesh.singh@amd.com>
+ <1534367485-4386-2-git-send-email-brijesh.singh@amd.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-	LKML <linux-kernel@vger.kernel.org>,
-	Arnd Bergmann <arnd@arndb.de>, Mike Snitzer <snitzer@redhat.com>,
-	Tudor-Dan Ambarus <tudor.ambarus@microchip.com>,
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-	Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-	Will Deacon <will.deacon@arm.com>, qat-linux@intel.com,
-	Matthew Wilcox <willy@infradead.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	"Gustavo A. R. Silva" <gustavo@embeddedor.com>,
-	device-mapper development <dm-devel@redhat.com>,
-	Eric Biggers <ebiggers@google.com>, David Woodhouse <dwmw@amazon.co.uk>,
-	Geert Uytterhoeven <geert@linux-m68k.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Thomas Gleixner <tglx@linutronix.de>, Alasdair Kergon <agk@redhat.com>,
-	linux-crypto <linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <dm-devel-bounces@redhat.com>
-In-Reply-To: <20180904051905.a2vyzijz6xyxvyhb@gondor.apana.org.au>
-List-Unsubscribe: <https://www.redhat.com/mailman/options/dm-devel>,
-	<mailto:dm-devel-request@redhat.com?subject=unsubscribe>
-List-Archive: <https://www.redhat.com/archives/dm-devel>
-List-Post: <mailto:dm-devel@redhat.com>
-List-Help: <mailto:dm-devel-request@redhat.com?subject=help>
-List-Subscribe: <https://www.redhat.com/mailman/listinfo/dm-devel>,
-	<mailto:dm-devel-request@redhat.com?subject=subscribe>
-Sender: dm-devel-bounces@redhat.com
-Errors-To: dm-devel-bounces@redhat.com
+Content-Type: text/plain; charset=utf-8
+Cc: linux-crypto@vger.kernel.org, thomas.lendacky@amd.com,
+        Gary Hook <Gary.Hook@amd.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-kernel@vger.kernel.org
+To: Brijesh Singh <brijesh.singh@amd.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1534367485-4386-2-git-send-email-brijesh.singh@amd.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Sep 3, 2018 at 10:19 PM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> On Tue, Aug 07, 2018 at 02:18:34PM -0700, Kees Cook wrote:
->> v8 cover letter:
->>
->> I continue to hope this can land in v4.19, but I realize that's unlikely.
->> It would be nice, though, if some of the "trivial" patches could get taken
->> (e.g. cbc, xcbc, ccm VLA removals) so I don't have to keep repeating them.
->> *fingers crossed*
->>
->> Series cover letter:
->>
->> This is nearly the last of the VLA removals[1], but it's one of the
->> largest because crypto gets used in lots of places. After looking
->> through code, usage, reading the threads Gustavo started, and comparing
->> the use-cases to the other VLA removals that have landed in the kernel,
->> I think this series is likely the best way forward to shut the door on
->> VLAs forever.
->>
->> For background, the crypto stack usage is for callers to do an immediate
->> bit of work that doesn't allocate new memory. This means that other VLA
->> removal techniques (like just using kmalloc) aren't workable, and the
->> next common technique is needed: examination of maximum stack usage and
->> the addition of sanity checks. This series does that, and in several
->> cases, these maximums were already implicit in the code.
->>
->> This series is intended to land via the crypto tree for 4.19, though it
->> touches dm, networking, and a few other things as well, since there are
->> dependent patches (new crypto #defines being used, etc).
->
-> I have applied patches 1-4 and 6-8.  I'd like to get an ack from
-> the dm folks regarding patch 5.  As to patch 9, please fix it so
-> it doesn't rely on the BUG_ON to catch things.
+On Wed, Aug 15, 2018 at 04:11:25PM -0500, Brijesh Singh wrote:
+> Currently, the CCP driver assumes that the SEV command issued to the PSP
+> will always return (i.e. it will never hang).  But recently, firmware bugs
+> have shown that a command can hang.  Since of the SEV commands are used
+> in probe routines, this can cause boot hangs and/or loss of virtualization
+> capabilities.
+> 
+> To protect against firmware bugs, add a timeout in the SEV command
+> execution flow.  If a command does not complete within the specified
+> timeout then return -ETIMEOUT and stop the driver from executing any
+> further commands since the state of the SEV firmware is unknown.
+> 
+> Cc: Tom Lendacky <thomas.lendacky@amd.com>
+> Cc: Gary Hook <Gary.Hook@amd.com>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: linux-kernel@vger.kernel.org
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> ---
+>  drivers/crypto/ccp/psp-dev.c | 46 +++++++++++++++++++++++++++++++++++++++-----
+>  1 file changed, 41 insertions(+), 5 deletions(-)
+> 
+> diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
+> index 218739b..72790d8 100644
+> --- a/drivers/crypto/ccp/psp-dev.c
+> +++ b/drivers/crypto/ccp/psp-dev.c
+> @@ -38,6 +38,17 @@ static DEFINE_MUTEX(sev_cmd_mutex);
+>  static struct sev_misc_dev *misc_dev;
+>  static struct psp_device *psp_master;
+>  
+> +static int psp_cmd_timeout = 100;
+> +module_param(psp_cmd_timeout, int, 0644);
+> +MODULE_PARM_DESC(psp_cmd_timeout, " default timeout value, in seconds, for PSP commands");
+> +
+> +static int psp_probe_timeout = 5;
+> +module_param(psp_probe_timeout, int, 0644);
+> +MODULE_PARM_DESC(psp_probe_timeout, " default timeout value, in seconds, during PSP device probe");
 
-Great! Thanks very much. I'll get a patch prepared to plumb
-crypto_skcipher_set_reqsize() failures.
+Just a question: what prevents the user from supplying non-sensical
+values here?
 
--Kees
+I think we should clamp them to only allowed values because I don't want
+to be debugging some strange bugs due to that.
+
+> +
+> +static bool psp_dead;
+> +static int psp_timeout;
+> +
+>  static struct psp_device *psp_alloc_struct(struct sp_device *sp)
+>  {
+>  	struct device *dev = sp->dev;
+> @@ -82,10 +93,19 @@ static irqreturn_t psp_irq_handler(int irq, void *data)
+>  	return IRQ_HANDLED;
+>  }
+>  
+> -static void sev_wait_cmd_ioc(struct psp_device *psp, unsigned int *reg)
+> +static int sev_wait_cmd_ioc(struct psp_device *psp,
+> +			    unsigned int *reg, unsigned int timeout)
+>  {
+> -	wait_event(psp->sev_int_queue, psp->sev_int_rcvd);
+> +	int ret;
+> +
+> +	ret = wait_event_timeout(psp->sev_int_queue,
+> +			psp->sev_int_rcvd, timeout * HZ);
+
+Align args at opening brace.
+
+> +	if (!ret)
+> +		return -ETIMEDOUT;
+> +
+>  	*reg = ioread32(psp->io_regs + psp->vdata->cmdresp_reg);
+> +
+> +	return 0;
+>  }
+>  
+>  static int sev_cmd_buffer_len(int cmd)
+> @@ -133,12 +153,15 @@ static int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret)
+>  	if (!psp)
+>  		return -ENODEV;
+>  
+> +	if (psp_dead)
+> +		return -EBUSY;
+> +
+>  	/* Get the physical address of the command buffer */
+>  	phys_lsb = data ? lower_32_bits(__psp_pa(data)) : 0;
+>  	phys_msb = data ? upper_32_bits(__psp_pa(data)) : 0;
+>  
+> -	dev_dbg(psp->dev, "sev command id %#x buffer 0x%08x%08x\n",
+> -		cmd, phys_msb, phys_lsb);
+> +	dev_dbg(psp->dev, "sev command id %#x buffer 0x%08x%08x timeout %us\n",
+> +		cmd, phys_msb, phys_lsb, psp_timeout);
+>  
+>  	print_hex_dump_debug("(in):  ", DUMP_PREFIX_OFFSET, 16, 2, data,
+>  			     sev_cmd_buffer_len(cmd), false);
+> @@ -154,7 +177,18 @@ static int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret)
+>  	iowrite32(reg, psp->io_regs + psp->vdata->cmdresp_reg);
+>  
+>  	/* wait for command completion */
+> -	sev_wait_cmd_ioc(psp, &reg);
+> +	ret = sev_wait_cmd_ioc(psp, &reg, psp_timeout);
+> +	if (ret) {
+> +		if (psp_ret)
+> +			*psp_ret = 0;
+> +
+> +		dev_err(psp->dev, "sev command %#x timed out, disabling PSP \n", cmd);
+									   ^
+
+Trailing space.
 
 -- 
-Kees Cook
-Pixel Security
+Regards/Gruss,
+    Boris.
+
+Good mailing practices for 400: avoid top-posting and trim the reply.
