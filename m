@@ -1,99 +1,182 @@
-From: Ondrej Mosnacek <omosnace@redhat.com>
-Subject: [PATCH] crypto: x86/aegis,morus - Do not require OSXSAVE for SSE2
-Date: Wed,  5 Sep 2018 09:26:41 +0200
-Message-ID: <20180905072641.13677-1-omosnace@redhat.com>
-Cc: linux-crypto@vger.kernel.org, Zdenek Kaspar <zkaspar82@gmail.com>,
-        Ondrej Mosnacek <omosnace@redhat.com>, stable@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <stable-owner@vger.kernel.org>
-Sender: stable-owner@vger.kernel.org
+From: Dan Carpenter <dan.carpenter@oracle.com>
+Subject: Re: [PATCH 3/7] vfio: add sdmdev support
+Date: Wed, 5 Sep 2018 10:27:37 +0300
+Message-ID: <20180905072737.figussnuhdtlbnee@mwanda>
+References: <20180903005204.26041-4-nek.in.cn@gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+ Zaibo Xu <xuzaibo@huawei.com>, Sanjay Kumar <sanjay.k.kumar@intel.com>,
+ linuxarm@huawei.com, Hao Fang <fanghao11@huawei.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>, Jonathan Corbet <corbet@lwn.net>,
+ Joerg Roedel <joro@8bytes.org>, iommu@lists.linux-foundation.org,
+ linux-crypto@vger.kernel.org, Alex Williamson <alex.williamson@redhat.com>,
+ Thomas Gleixner <tglx@linutronix.de>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, linux-kernel@vger.kernel.org,
+ Zhou Wang <wangzhou1@hisilicon.com>, kbuild-all@01.org,
+ Philippe Ombredanne <pombredanne@nexb.com>,
+ Kenneth Lee <liguozhu@hisilicon.com>, "David S . Miller" <davem@davemloft.net>,
+ linux-accelerators@lists.ozlabs.org, Lu Baolu <baolu.lu@linux.intel.com>
+To: kbuild@01.org, Kenneth Lee <nek.in.cn@gmail.com>
+Return-path: <kbuild-bounces@lists.01.org>
+Content-Disposition: inline
+In-Reply-To: <20180903005204.26041-4-nek.in.cn@gmail.com>
+List-Unsubscribe: <https://lists.01.org/mailman/options/kbuild>,
+ <mailto:kbuild-request@lists.01.org?subject=unsubscribe>
+List-Archive: <http://lists.01.org/pipermail/kbuild/>
+List-Post: <mailto:kbuild@lists.01.org>
+List-Help: <mailto:kbuild-request@lists.01.org?subject=help>
+List-Subscribe: <https://lists.01.org/mailman/listinfo/kbuild>,
+ <mailto:kbuild-request@lists.01.org?subject=subscribe>
+Errors-To: kbuild-bounces@lists.01.org
+Sender: "kbuild" <kbuild-bounces@lists.01.org>
 List-Id: linux-crypto.vger.kernel.org
 
-It turns out OSXSAVE needs to be checked only for AVX, not for SSE.
-Without this patch the affected modules refuse to load on CPUs with SSE2
-but without AVX support.
+Hi Kenneth,
 
-Fixes: 877ccce7cbe8 ("crypto: x86/aegis,morus - Fix and simplify CPUID checks")
-Cc: <stable@vger.kernel.org> # 4.18
-Reported-by: Zdenek Kaspar <zkaspar82@gmail.com>
-Signed-off-by: Ondrej Mosnacek <omosnace@redhat.com>
----
- arch/x86/crypto/aegis128-aesni-glue.c  | 1 -
- arch/x86/crypto/aegis128l-aesni-glue.c | 1 -
- arch/x86/crypto/aegis256-aesni-glue.c  | 1 -
- arch/x86/crypto/morus1280-sse2-glue.c  | 1 -
- arch/x86/crypto/morus640-sse2-glue.c   | 1 -
- 5 files changed, 5 deletions(-)
+Thank you for the patch! Perhaps something to improve:
 
-NOTE: This patch doesn't apply to the current crypto-2.6 tree [1], since
-it is based on v4.18-rc7, which doesn't contain the commit this patch is
-fixing. It needs to merge in the v4.18 tag before this patch can be
-applied.
+[auto build test WARNING on cryptodev/master]
+[also build test WARNING on v4.19-rc2 next-20180905]
+[if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
 
-Thanks,
-Ondrej
+url:    https://github.com/0day-ci/linux/commits/Kenneth-Lee/A-General-Accelerator-Framework-WarpDrive/20180903-162733
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
 
-[1] https://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git/
+smatch warnings:
+drivers/vfio/sdmdev/vfio_sdmdev.c:78 iommu_type_show() error: 'sdmdev' dereferencing possible ERR_PTR()
+drivers/vfio/sdmdev/vfio_sdmdev.c:91 dma_flag_show() error: 'sdmdev' dereferencing possible ERR_PTR()
+drivers/vfio/sdmdev/vfio_sdmdev.c:127 flags_show() error: 'sdmdev' dereferencing possible ERR_PTR()
+drivers/vfio/sdmdev/vfio_sdmdev.c:128 name_show() error: 'sdmdev' dereferencing possible ERR_PTR()
+drivers/vfio/sdmdev/vfio_sdmdev.c:130 device_api_show() error: 'sdmdev' dereferencing possible ERR_PTR()
+drivers/vfio/sdmdev/vfio_sdmdev.c:138 available_instances_show() error: 'sdmdev' dereferencing possible ERR_PTR()
+drivers/vfio/sdmdev/vfio_sdmdev.c:178 vfio_sdmdev_mdev_remove() warn: if();
 
-diff --git a/arch/x86/crypto/aegis128-aesni-glue.c b/arch/x86/crypto/aegis128-aesni-glue.c
-index acd11b3bf639..2a356b948720 100644
---- a/arch/x86/crypto/aegis128-aesni-glue.c
-+++ b/arch/x86/crypto/aegis128-aesni-glue.c
-@@ -379,7 +379,6 @@ static int __init crypto_aegis128_aesni_module_init(void)
- {
- 	if (!boot_cpu_has(X86_FEATURE_XMM2) ||
- 	    !boot_cpu_has(X86_FEATURE_AES) ||
--	    !boot_cpu_has(X86_FEATURE_OSXSAVE) ||
- 	    !cpu_has_xfeatures(XFEATURE_MASK_SSE, NULL))
- 		return -ENODEV;
- 
-diff --git a/arch/x86/crypto/aegis128l-aesni-glue.c b/arch/x86/crypto/aegis128l-aesni-glue.c
-index 2071c3d1ae07..dbe8bb980da1 100644
---- a/arch/x86/crypto/aegis128l-aesni-glue.c
-+++ b/arch/x86/crypto/aegis128l-aesni-glue.c
-@@ -379,7 +379,6 @@ static int __init crypto_aegis128l_aesni_module_init(void)
- {
- 	if (!boot_cpu_has(X86_FEATURE_XMM2) ||
- 	    !boot_cpu_has(X86_FEATURE_AES) ||
--	    !boot_cpu_has(X86_FEATURE_OSXSAVE) ||
- 	    !cpu_has_xfeatures(XFEATURE_MASK_SSE, NULL))
- 		return -ENODEV;
- 
-diff --git a/arch/x86/crypto/aegis256-aesni-glue.c b/arch/x86/crypto/aegis256-aesni-glue.c
-index b5f2a8fd5a71..8bebda2de92f 100644
---- a/arch/x86/crypto/aegis256-aesni-glue.c
-+++ b/arch/x86/crypto/aegis256-aesni-glue.c
-@@ -379,7 +379,6 @@ static int __init crypto_aegis256_aesni_module_init(void)
- {
- 	if (!boot_cpu_has(X86_FEATURE_XMM2) ||
- 	    !boot_cpu_has(X86_FEATURE_AES) ||
--	    !boot_cpu_has(X86_FEATURE_OSXSAVE) ||
- 	    !cpu_has_xfeatures(XFEATURE_MASK_SSE, NULL))
- 		return -ENODEV;
- 
-diff --git a/arch/x86/crypto/morus1280-sse2-glue.c b/arch/x86/crypto/morus1280-sse2-glue.c
-index 95cf857d2cbb..f40244eaf14d 100644
---- a/arch/x86/crypto/morus1280-sse2-glue.c
-+++ b/arch/x86/crypto/morus1280-sse2-glue.c
-@@ -40,7 +40,6 @@ MORUS1280_DECLARE_ALGS(sse2, "morus1280-sse2", 350);
- static int __init crypto_morus1280_sse2_module_init(void)
- {
- 	if (!boot_cpu_has(X86_FEATURE_XMM2) ||
--	    !boot_cpu_has(X86_FEATURE_OSXSAVE) ||
- 	    !cpu_has_xfeatures(XFEATURE_MASK_SSE, NULL))
- 		return -ENODEV;
- 
-diff --git a/arch/x86/crypto/morus640-sse2-glue.c b/arch/x86/crypto/morus640-sse2-glue.c
-index 615fb7bc9a32..9afaf8f8565a 100644
---- a/arch/x86/crypto/morus640-sse2-glue.c
-+++ b/arch/x86/crypto/morus640-sse2-glue.c
-@@ -40,7 +40,6 @@ MORUS640_DECLARE_ALGS(sse2, "morus640-sse2", 400);
- static int __init crypto_morus640_sse2_module_init(void)
- {
- 	if (!boot_cpu_has(X86_FEATURE_XMM2) ||
--	    !boot_cpu_has(X86_FEATURE_OSXSAVE) ||
- 	    !cpu_has_xfeatures(XFEATURE_MASK_SSE, NULL))
- 		return -ENODEV;
- 
--- 
-2.17.1
+# https://github.com/0day-ci/linux/commit/1e47d5e608652b4a2c813dbeaf5aa6811f6ceaf7
+git remote add linux-review https://github.com/0day-ci/linux
+git remote update linux-review
+git checkout 1e47d5e608652b4a2c813dbeaf5aa6811f6ceaf7
+vim +/sdmdev +78 drivers/vfio/sdmdev/vfio_sdmdev.c
+
+1e47d5e6 Kenneth Lee 2018-09-03   69  
+1e47d5e6 Kenneth Lee 2018-09-03   70  static ssize_t iommu_type_show(struct device *dev,
+1e47d5e6 Kenneth Lee 2018-09-03   71  			       struct device_attribute *attr, char *buf)
+1e47d5e6 Kenneth Lee 2018-09-03   72  {
+1e47d5e6 Kenneth Lee 2018-09-03   73  	struct vfio_sdmdev *sdmdev = vfio_sdmdev_pdev_sdmdev(dev);
+                                                                     ^^^^^^^^^^^^^^^^^^^^^^^
+Presumably this returns error pointers instead of NULL?
+
+1e47d5e6 Kenneth Lee 2018-09-03   74  
+1e47d5e6 Kenneth Lee 2018-09-03   75  	if (!sdmdev)
+1e47d5e6 Kenneth Lee 2018-09-03   76  		return -ENODEV;
+1e47d5e6 Kenneth Lee 2018-09-03   77  
+1e47d5e6 Kenneth Lee 2018-09-03  @78  	return sprintf(buf, "%d\n", sdmdev->iommu_type);
+1e47d5e6 Kenneth Lee 2018-09-03   79  }
+1e47d5e6 Kenneth Lee 2018-09-03   80  
+1e47d5e6 Kenneth Lee 2018-09-03   81  static DEVICE_ATTR_RO(iommu_type);
+1e47d5e6 Kenneth Lee 2018-09-03   82  
+1e47d5e6 Kenneth Lee 2018-09-03   83  static ssize_t dma_flag_show(struct device *dev,
+1e47d5e6 Kenneth Lee 2018-09-03   84  			     struct device_attribute *attr, char *buf)
+1e47d5e6 Kenneth Lee 2018-09-03   85  {
+1e47d5e6 Kenneth Lee 2018-09-03   86  	struct vfio_sdmdev *sdmdev = vfio_sdmdev_pdev_sdmdev(dev);
+1e47d5e6 Kenneth Lee 2018-09-03   87  
+1e47d5e6 Kenneth Lee 2018-09-03   88  	if (!sdmdev)
+1e47d5e6 Kenneth Lee 2018-09-03   89  		return -ENODEV;
+1e47d5e6 Kenneth Lee 2018-09-03   90  
+1e47d5e6 Kenneth Lee 2018-09-03  @91  	return sprintf(buf, "%d\n", sdmdev->dma_flag);
+1e47d5e6 Kenneth Lee 2018-09-03   92  }
+1e47d5e6 Kenneth Lee 2018-09-03   93  
+1e47d5e6 Kenneth Lee 2018-09-03   94  static DEVICE_ATTR_RO(dma_flag);
+1e47d5e6 Kenneth Lee 2018-09-03   95  
+1e47d5e6 Kenneth Lee 2018-09-03   96  /* mdev->dev_attr_groups */
+1e47d5e6 Kenneth Lee 2018-09-03   97  static struct attribute *vfio_sdmdev_attrs[] = {
+1e47d5e6 Kenneth Lee 2018-09-03   98  	&dev_attr_iommu_type.attr,
+1e47d5e6 Kenneth Lee 2018-09-03   99  	&dev_attr_dma_flag.attr,
+1e47d5e6 Kenneth Lee 2018-09-03  100  	NULL,
+1e47d5e6 Kenneth Lee 2018-09-03  101  };
+1e47d5e6 Kenneth Lee 2018-09-03  102  static const struct attribute_group vfio_sdmdev_group = {
+1e47d5e6 Kenneth Lee 2018-09-03  103  	.name  = VFIO_SDMDEV_PDEV_ATTRS_GRP_NAME,
+1e47d5e6 Kenneth Lee 2018-09-03  104  	.attrs = vfio_sdmdev_attrs,
+1e47d5e6 Kenneth Lee 2018-09-03  105  };
+1e47d5e6 Kenneth Lee 2018-09-03  106  const struct attribute_group *vfio_sdmdev_groups[] = {
+1e47d5e6 Kenneth Lee 2018-09-03  107  	&vfio_sdmdev_group,
+1e47d5e6 Kenneth Lee 2018-09-03  108  	NULL,
+1e47d5e6 Kenneth Lee 2018-09-03  109  };
+1e47d5e6 Kenneth Lee 2018-09-03  110  
+1e47d5e6 Kenneth Lee 2018-09-03  111  /* default attributes for mdev->supported_type_groups, used by registerer*/
+1e47d5e6 Kenneth Lee 2018-09-03  112  #define MDEV_TYPE_ATTR_RO_EXPORT(name) \
+1e47d5e6 Kenneth Lee 2018-09-03  113  		MDEV_TYPE_ATTR_RO(name); \
+1e47d5e6 Kenneth Lee 2018-09-03  114  		EXPORT_SYMBOL_GPL(mdev_type_attr_##name);
+1e47d5e6 Kenneth Lee 2018-09-03  115  
+1e47d5e6 Kenneth Lee 2018-09-03  116  #define DEF_SIMPLE_SDMDEV_ATTR(_name, sdmdev_member, format) \
+1e47d5e6 Kenneth Lee 2018-09-03  117  static ssize_t _name##_show(struct kobject *kobj, struct device *dev, \
+1e47d5e6 Kenneth Lee 2018-09-03  118  			    char *buf) \
+1e47d5e6 Kenneth Lee 2018-09-03  119  { \
+1e47d5e6 Kenneth Lee 2018-09-03  120  	struct vfio_sdmdev *sdmdev = vfio_sdmdev_pdev_sdmdev(dev); \
+1e47d5e6 Kenneth Lee 2018-09-03  121  	if (!sdmdev) \
+1e47d5e6 Kenneth Lee 2018-09-03  122  		return -ENODEV; \
+1e47d5e6 Kenneth Lee 2018-09-03  123  	return sprintf(buf, format, sdmdev->sdmdev_member); \
+1e47d5e6 Kenneth Lee 2018-09-03  124  } \
+1e47d5e6 Kenneth Lee 2018-09-03  125  MDEV_TYPE_ATTR_RO_EXPORT(_name)
+1e47d5e6 Kenneth Lee 2018-09-03  126  
+1e47d5e6 Kenneth Lee 2018-09-03 @127  DEF_SIMPLE_SDMDEV_ATTR(flags, flags, "%d");
+1e47d5e6 Kenneth Lee 2018-09-03 @128  DEF_SIMPLE_SDMDEV_ATTR(name, name, "%s"); /* this should be algorithm name, */
+1e47d5e6 Kenneth Lee 2018-09-03  129  		/* but you would not care if you have only one algorithm */
+1e47d5e6 Kenneth Lee 2018-09-03 @130  DEF_SIMPLE_SDMDEV_ATTR(device_api, api_ver, "%s");
+1e47d5e6 Kenneth Lee 2018-09-03  131  
+1e47d5e6 Kenneth Lee 2018-09-03  132  static ssize_t
+1e47d5e6 Kenneth Lee 2018-09-03  133  available_instances_show(struct kobject *kobj, struct device *dev, char *buf)
+1e47d5e6 Kenneth Lee 2018-09-03  134  {
+1e47d5e6 Kenneth Lee 2018-09-03  135  	struct vfio_sdmdev *sdmdev = vfio_sdmdev_pdev_sdmdev(dev);
+1e47d5e6 Kenneth Lee 2018-09-03  136  	int nr_inst = 0;
+1e47d5e6 Kenneth Lee 2018-09-03  137  
+1e47d5e6 Kenneth Lee 2018-09-03 @138  	nr_inst = sdmdev->ops->get_available_instances ?
+1e47d5e6 Kenneth Lee 2018-09-03  139  		sdmdev->ops->get_available_instances(sdmdev) : 0;
+1e47d5e6 Kenneth Lee 2018-09-03  140  	return sprintf(buf, "%d", nr_inst);
+1e47d5e6 Kenneth Lee 2018-09-03  141  }
+1e47d5e6 Kenneth Lee 2018-09-03  142  MDEV_TYPE_ATTR_RO_EXPORT(available_instances);
+1e47d5e6 Kenneth Lee 2018-09-03  143  
+1e47d5e6 Kenneth Lee 2018-09-03  144  static int vfio_sdmdev_mdev_create(struct kobject *kobj,
+1e47d5e6 Kenneth Lee 2018-09-03  145  	struct mdev_device *mdev)
+1e47d5e6 Kenneth Lee 2018-09-03  146  {
+1e47d5e6 Kenneth Lee 2018-09-03  147  	struct device *pdev = mdev_parent_dev(mdev);
+1e47d5e6 Kenneth Lee 2018-09-03  148  	struct vfio_sdmdev_queue *q;
+1e47d5e6 Kenneth Lee 2018-09-03  149  	struct vfio_sdmdev *sdmdev = mdev_sdmdev(mdev);
+1e47d5e6 Kenneth Lee 2018-09-03  150  	int ret;
+1e47d5e6 Kenneth Lee 2018-09-03  151  
+1e47d5e6 Kenneth Lee 2018-09-03  152  	if (!sdmdev->ops->get_queue)
+1e47d5e6 Kenneth Lee 2018-09-03  153  		return -ENODEV;
+1e47d5e6 Kenneth Lee 2018-09-03  154  
+1e47d5e6 Kenneth Lee 2018-09-03  155  	ret = sdmdev->ops->get_queue(sdmdev, &q);
+1e47d5e6 Kenneth Lee 2018-09-03  156  	if (ret)
+1e47d5e6 Kenneth Lee 2018-09-03  157  		return ret;
+1e47d5e6 Kenneth Lee 2018-09-03  158  
+1e47d5e6 Kenneth Lee 2018-09-03  159  	q->sdmdev = sdmdev;
+1e47d5e6 Kenneth Lee 2018-09-03  160  	q->mdev = mdev;
+1e47d5e6 Kenneth Lee 2018-09-03  161  	init_waitqueue_head(&q->wait);
+1e47d5e6 Kenneth Lee 2018-09-03  162  
+1e47d5e6 Kenneth Lee 2018-09-03  163  	mdev_set_drvdata(mdev, q);
+1e47d5e6 Kenneth Lee 2018-09-03  164  	get_device(pdev);
+1e47d5e6 Kenneth Lee 2018-09-03  165  
+1e47d5e6 Kenneth Lee 2018-09-03  166  	return 0;
+1e47d5e6 Kenneth Lee 2018-09-03  167  }
+1e47d5e6 Kenneth Lee 2018-09-03  168  
+1e47d5e6 Kenneth Lee 2018-09-03  169  static int vfio_sdmdev_mdev_remove(struct mdev_device *mdev)
+1e47d5e6 Kenneth Lee 2018-09-03  170  {
+1e47d5e6 Kenneth Lee 2018-09-03  171  	struct vfio_sdmdev_queue *q =
+1e47d5e6 Kenneth Lee 2018-09-03  172  		(struct vfio_sdmdev_queue *)mdev_get_drvdata(mdev);
+1e47d5e6 Kenneth Lee 2018-09-03  173  	struct vfio_sdmdev *sdmdev = q->sdmdev;
+1e47d5e6 Kenneth Lee 2018-09-03  174  	struct device *pdev = mdev_parent_dev(mdev);
+1e47d5e6 Kenneth Lee 2018-09-03  175  
+1e47d5e6 Kenneth Lee 2018-09-03  176  	put_device(pdev);
+1e47d5e6 Kenneth Lee 2018-09-03  177  
+1e47d5e6 Kenneth Lee 2018-09-03 @178  	if (sdmdev->ops->put_queue);
+                                                                   ^
+Extra semicolon breaks the code.
+
+1e47d5e6 Kenneth Lee 2018-09-03  179  		sdmdev->ops->put_queue(q);
+1e47d5e6 Kenneth Lee 2018-09-03  180  
+1e47d5e6 Kenneth Lee 2018-09-03  181  	return 0;
+1e47d5e6 Kenneth Lee 2018-09-03  182  }
+1e47d5e6 Kenneth Lee 2018-09-03  183  
