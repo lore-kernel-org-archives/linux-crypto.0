@@ -1,186 +1,139 @@
-From: Kenneth Lee <liguozhu@hisilicon.com>
-Subject: Re: [PATCH 7/7] vfio/sdmdev: add user sample
-Date: Thu, 6 Sep 2018 17:10:32 +0800
-Message-ID: <20180906091032.GE230707@Turing-Arch-b>
+From: Kenneth Lee <liguozhu-C8/M+/jPZTeaMJb+Lgu22Q@public.gmane.org>
+Subject: Re: [RFCv2 PATCH 0/7] A General Accelerator Framework, WarpDrive
+Date: Thu, 6 Sep 2018 17:11:35 +0800
+Message-ID: <20180906091135.GF230707@Turing-Arch-b>
 References: <20180903005204.26041-1-nek.in.cn@gmail.com>
- <20180903005204.26041-8-nek.in.cn@gmail.com>
- <ff75ff6a-2cd8-b25e-8d19-52e8f57141da@infradead.org>
+	<81edb8ff-d046-34e5-aee7-d8564e2517c2@linux.intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Cc: Kenneth Lee <nek.in.cn@gmail.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Joerg Roedel <joro@8bytes.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Hao Fang <fanghao11@huawei.com>,
-        Zhou Wang <wangzhou1@hisilicon.com>,
-        Zaibo Xu <xuzaibo@huawei.com>,
-        Philippe Ombredanne <pombredanne@nexb.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-crypto@vger.kernel.org>, <iommu@lists.linux-foundation.org>,
-        <kvm@vger.kernel.org>, <linux-accelerators@lists.ozlabs.org>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Sanjay Kumar <sanjay.k.kumar@intel.com>, <linuxarm@huawei.com>
-To: Randy Dunlap <rdunlap@infradead.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Transfer-Encoding: base64
+Cc: Kenneth Lee <nek.in.cn-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+	kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Jonathan Corbet <corbet-T1hC0tSOHrs@public.gmane.org>,
+	Greg Kroah-Hartman <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>, linux-doc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Sanjay Kumar <sanjay.k.kumar-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>, Hao Fang <fanghao11-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>,
+	iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linuxarm-hv44wF8Li93QT0dZR+AlfA@public.gmane.org, Alex Williamson <alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	Thomas Gleixner <tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org>, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Philippe Ombredanne <pombredanne-od1rfyK75/E@public.gmane.org>,
+	"David S . Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
+	linux-accelerators-uLR06cmDAlY/bJ5BZ2RsiQ@public.gmane.org
+To: Lu Baolu <baolu.lu-VuQAYsv1563Yd54FQh9/CA@public.gmane.org>
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
 Content-Disposition: inline
-In-Reply-To: <ff75ff6a-2cd8-b25e-8d19-52e8f57141da@infradead.org>
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <81edb8ff-d046-34e5-aee7-d8564e2517c2-VuQAYsv1563Yd54FQh9/CA@public.gmane.org>
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Sun, Sep 02, 2018 at 07:25:12PM -0700, Randy Dunlap wrote:
-> Date: Sun, 2 Sep 2018 19:25:12 -0700
-> From: Randy Dunlap <rdunlap@infradead.org>
-> To: Kenneth Lee <nek.in.cn@gmail.com>, Jonathan Corbet <corbet@lwn.net>,
->  Herbert Xu <herbert@gondor.apana.org.au>, "David S . Miller"
->  <davem@davemloft.net>, Joerg Roedel <joro@8bytes.org>, Alex Williamson
->  <alex.williamson@redhat.com>, Kenneth Lee <liguozhu@hisilicon.com>, Hao
->  Fang <fanghao11@huawei.com>, Zhou Wang <wangzhou1@hisilicon.com>, Zaibo Xu
->  <xuzaibo@huawei.com>, Philippe Ombredanne <pombredanne@nexb.com>, Greg
->  Kroah-Hartman <gregkh@linuxfoundation.org>, Thomas Gleixner
->  <tglx@linutronix.de>, linux-doc@vger.kernel.org,
->  linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
->  iommu@lists.linux-foundation.org, kvm@vger.kernel.org,
->  linux-accelerators@lists.ozlabs.org, Lu Baolu <baolu.lu@linux.intel.com>,
->  Sanjay Kumar <sanjay.k.kumar@intel.com>
-> CC: linuxarm@huawei.com
-> Subject: Re: [PATCH 7/7] vfio/sdmdev: add user sample
-> User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
->  Thunderbird/52.9.1
-> Message-ID: <ff75ff6a-2cd8-b25e-8d19-52e8f57141da@infradead.org>
-> 
-> On 09/02/2018 05:52 PM, Kenneth Lee wrote:
-> > From: Kenneth Lee <liguozhu@hisilicon.com>
-> > 
-> > This is the sample code to demostrate how WrapDrive user application
-> > should be.
-> > 
-> > It contains:
-> > 
-> > 1. wd.[ch], the common library to provide WrapDrive interface.
-> 
->                                             WarpDrive
-> 
-> > 2. drv/*, the user driver to access the hardware upon spimdev
-> > 3. test/*, the test application to use WrapDrive interface to access the
-> 
->                                          WarpDrive
-> 
-> >    hardware queue(s) of the accelerator.
-> > 
-> > The Hisilicon HIP08 ZIP accelerator is used in this sample.
-> > 
-> > Signed-off-by: Zaibo Xu <xuzaibo@huawei.com>
-> > Signed-off-by: Kenneth Lee <liguozhu@hisilicon.com>
-> > Signed-off-by: Hao Fang <fanghao11@huawei.com>
-> > Signed-off-by: Zhou Wang <wangzhou1@hisilicon.com>
-> > ---
-> >  samples/warpdrive/AUTHORS              |   2 +
-> >  samples/warpdrive/ChangeLog            |   1 +
-> >  samples/warpdrive/Makefile.am          |   9 +
-> >  samples/warpdrive/NEWS                 |   1 +
-> >  samples/warpdrive/README               |  32 +++
-> >  samples/warpdrive/autogen.sh           |   3 +
-> >  samples/warpdrive/cleanup.sh           |  13 ++
-> >  samples/warpdrive/configure.ac         |  52 +++++
-> >  samples/warpdrive/drv/hisi_qm_udrv.c   | 223 ++++++++++++++++++
-> >  samples/warpdrive/drv/hisi_qm_udrv.h   |  53 +++++
-> >  samples/warpdrive/test/Makefile.am     |   7 +
-> >  samples/warpdrive/test/comp_hw.h       |  23 ++
-> >  samples/warpdrive/test/test_hisi_zip.c | 206 +++++++++++++++++
-> >  samples/warpdrive/wd.c                 | 309 +++++++++++++++++++++++++
-> >  samples/warpdrive/wd.h                 | 154 ++++++++++++
-> >  samples/warpdrive/wd_adapter.c         |  74 ++++++
-> >  samples/warpdrive/wd_adapter.h         |  43 ++++
-> >  17 files changed, 1205 insertions(+)
-> >  create mode 100644 samples/warpdrive/AUTHORS
-> >  create mode 100644 samples/warpdrive/ChangeLog
-> >  create mode 100644 samples/warpdrive/Makefile.am
-> >  create mode 100644 samples/warpdrive/NEWS
-> >  create mode 100644 samples/warpdrive/README
-> >  create mode 100755 samples/warpdrive/autogen.sh
-> >  create mode 100755 samples/warpdrive/cleanup.sh
-> >  create mode 100644 samples/warpdrive/configure.ac
-> >  create mode 100644 samples/warpdrive/drv/hisi_qm_udrv.c
-> >  create mode 100644 samples/warpdrive/drv/hisi_qm_udrv.h
-> >  create mode 100644 samples/warpdrive/test/Makefile.am
-> >  create mode 100644 samples/warpdrive/test/comp_hw.h
-> >  create mode 100644 samples/warpdrive/test/test_hisi_zip.c
-> >  create mode 100644 samples/warpdrive/wd.c
-> >  create mode 100644 samples/warpdrive/wd.h
-> >  create mode 100644 samples/warpdrive/wd_adapter.c
-> >  create mode 100644 samples/warpdrive/wd_adapter.h
-> 
-> > diff --git a/samples/warpdrive/README b/samples/warpdrive/README
-> > new file mode 100644
-> > index 000000000000..3adf66b112fc
-> > --- /dev/null
-> > +++ b/samples/warpdrive/README
-> > @@ -0,0 +1,32 @@
-> > +WD User Land Demonstration
-> > +==========================
-> > +
-> > +This directory contains some applications and libraries to demonstrate how a
-> > +
-> > +WrapDrive application can be constructed.
-> 
->    WarpDrive
-> 
-> > +
-> > +
-> > +As a demo, we try to make it simple and clear for understanding. It is not
-> > +
-> > +supposed to be used in business scenario.
-> > +
-> > +
-> > +The directory contains the following elements:
-> > +
-> > +wd.[ch]
-> > +	A demonstration WrapDrive fundamental library which wraps the basic
-> 
-> 	                WarpDrive
-> 
-> > +	operations to the WrapDrive-ed device.
-> 
->                           WarpDrive
-> 
-> > +
-> > +wd_adapter.[ch]
-> > +	User driver adaptor for wd.[ch]
-> > +
-> > +wd_utils.[ch]
-> > +	Some utitlities function used by WD and its drivers
-> > +
-> > +drv/*
-> > +	User drivers. It helps to fulfill the semantic of wd.[ch] for
-> > +	particular hardware
-> > +
-> > +test/*
-> > +	Test applications to use the wrapdrive library
-> 
-> 	                             warpdrive
-> 
-> -- 
-> ~Randy
-
-Thank you, will change them all in the coming version.
-
--- 
-			-Kenneth(Hisilicon)
-
-================================================================================
-本邮件及其附件含有华为公司的保密信息，仅限于发送给上面地址中列出的个人或群组。禁
-止任何其他人以任何形式使用（包括但不限于全部或部分地泄露、复制、或散发）本邮件中
-的信息。如果您错收了本邮件，请您立即电话或邮件通知发件人并删除本邮件！
-This e-mail and its attachments contain confidential information from HUAWEI,
-which is intended only for the person or entity whose address is listed above.
-Any use of the 
-information contained herein in any way (including, but not limited to, total or
-partial disclosure, reproduction, or dissemination) by persons other than the
-intended 
-recipient(s) is prohibited. If you receive this e-mail in error, please notify
-the sender by phone or email immediately and delete it!
+T24gTW9uLCBTZXAgMDMsIDIwMTggYXQgMTA6MzI6MTZBTSArMDgwMCwgTHUgQmFvbHUgd3JvdGU6
+Cj4gRGF0ZTogTW9uLCAzIFNlcCAyMDE4IDEwOjMyOjE2ICswODAwCj4gRnJvbTogTHUgQmFvbHUg
+PGJhb2x1Lmx1QGxpbnV4LmludGVsLmNvbT4KPiBUbzogS2VubmV0aCBMZWUgPG5lay5pbi5jbkBn
+bWFpbC5jb20+LCBKb25hdGhhbiBDb3JiZXQgPGNvcmJldEBsd24ubmV0PiwKPiAgSGVyYmVydCBY
+dSA8aGVyYmVydEBnb25kb3IuYXBhbmEub3JnLmF1PiwgIkRhdmlkIFMgLiBNaWxsZXIiCj4gIDxk
+YXZlbUBkYXZlbWxvZnQubmV0PiwgSm9lcmcgUm9lZGVsIDxqb3JvQDhieXRlcy5vcmc+LCBBbGV4
+IFdpbGxpYW1zb24KPiAgPGFsZXgud2lsbGlhbXNvbkByZWRoYXQuY29tPiwgS2VubmV0aCBMZWUg
+PGxpZ3Vvemh1QGhpc2lsaWNvbi5jb20+LCBIYW8KPiAgRmFuZyA8ZmFuZ2hhbzExQGh1YXdlaS5j
+b20+LCBaaG91IFdhbmcgPHdhbmd6aG91MUBoaXNpbGljb24uY29tPiwgWmFpYm8gWHUKPiAgPHh1
+emFpYm9AaHVhd2VpLmNvbT4sIFBoaWxpcHBlIE9tYnJlZGFubmUgPHBvbWJyZWRhbm5lQG5leGIu
+Y29tPiwgR3JlZwo+ICBLcm9haC1IYXJ0bWFuIDxncmVna2hAbGludXhmb3VuZGF0aW9uLm9yZz4s
+IFRob21hcyBHbGVpeG5lcgo+ICA8dGdseEBsaW51dHJvbml4LmRlPiwgbGludXgtZG9jQHZnZXIu
+a2VybmVsLm9yZywKPiAgbGludXgta2VybmVsQHZnZXIua2VybmVsLm9yZywgbGludXgtY3J5cHRv
+QHZnZXIua2VybmVsLm9yZywKPiAgaW9tbXVAbGlzdHMubGludXgtZm91bmRhdGlvbi5vcmcsIGt2
+bUB2Z2VyLmtlcm5lbC5vcmcsCj4gIGxpbnV4LWFjY2VsZXJhdG9yc0BsaXN0cy5vemxhYnMub3Jn
+LCBTYW5qYXkgS3VtYXIKPiAgPHNhbmpheS5rLmt1bWFyQGludGVsLmNvbT4KPiBDQzogYmFvbHUu
+bHVAbGludXguaW50ZWwuY29tLCBsaW51eGFybUBodWF3ZWkuY29tCj4gU3ViamVjdDogUmU6IFtS
+RkN2MiBQQVRDSCAwLzddIEEgR2VuZXJhbCBBY2NlbGVyYXRvciBGcmFtZXdvcmssIFdhcnBEcml2
+ZQo+IFVzZXItQWdlbnQ6IE1vemlsbGEvNS4wIChYMTE7IExpbnV4IHg4Nl82NDsgcnY6NTIuMCkg
+R2Vja28vMjAxMDAxMDEKPiAgVGh1bmRlcmJpcmQvNTIuOS4xCj4gTWVzc2FnZS1JRDogPDgxZWRi
+OGZmLWQwNDYtMzRlNS1hZWU3LWQ4NTY0ZTI1MTdjMkBsaW51eC5pbnRlbC5jb20+Cj4gCj4gSGks
+Cj4gCj4gT24gMDkvMDMvMjAxOCAwODo1MSBBTSwgS2VubmV0aCBMZWUgd3JvdGU6Cj4gPkZyb206
+IEtlbm5ldGggTGVlIDxsaWd1b3podUBoaXNpbGljb24uY29tPgo+ID4KPiA+V2FycERyaXZlIGlz
+IGFuIGFjY2VsZXJhdG9yIGZyYW1ld29yayB0byBleHBvc2UgdGhlIGhhcmR3YXJlIGNhcGFiaWxp
+dGllcwo+ID5kaXJlY3RseSB0byB0aGUgdXNlciBzcGFjZS4gSXQgbWFrZXMgdXNlIG9mIHRoZSBl
+eGlzdCB2ZmlvIGFuZCB2ZmlvLW1kZXYKPiA+ZmFjaWxpdGllcy4gU28gdGhlIHVzZXIgYXBwbGlj
+YXRpb24gY2FuIHNlbmQgcmVxdWVzdCBhbmQgRE1BIHRvIHRoZQo+ID5oYXJkd2FyZSB3aXRob3V0
+IGludGVyYWN0aW9uIHdpdGggdGhlIGtlcm5lbC4gVGhpcyByZW1vdmVzIHRoZSBsYXRlbmN5Cj4g
+Pm9mIHN5c2NhbGwuCj4gPgo+ID5XYXJwRHJpdmUgaXMgdGhlIG5hbWUgZm9yIHRoZSB3aG9sZSBm
+cmFtZXdvcmsuIFRoZSBjb21wb25lbnQgaW4ga2VybmVsCj4gPmlzIGNhbGxlZCBTRE1ERVYsIFNo
+YXJlIERvbWFpbiBNZWRpYXRlZCBEZXZpY2UuIERyaXZlciBkcml2ZXIgZXhwb3NlcyBpdHMKPiA+
+aGFyZHdhcmUgcmVzb3VyY2UgYnkgcmVnaXN0ZXJpbmcgdG8gU0RNREVWIGFzIGEgVkZJTy1NZGV2
+LiBTbyB0aGUgdXNlcgo+ID5saWJyYXJ5IG9mIFdhcnBEcml2ZSBjYW4gYWNjZXNzIGl0IHZpYSBW
+RklPIGludGVyZmFjZS4KPiA+Cj4gPlRoZSBwYXRjaHNldCBjb250YWlucyBkb2N1bWVudCBmb3Ig
+dGhlIGRldGFpbC4gUGxlYXNlIHJlZmVyIHRvIGl0IGZvciBtb3JlCj4gPmluZm9ybWF0aW9uLgo+
+ID4KPiA+VGhpcyBwYXRjaHNldCBpcyBpbnRlbmRlZCB0byBiZSB1c2VkIHdpdGggSmVhbiBQaGls
+aXBwZSBCcnVja2VyJ3MgU1ZBCj4gPnBhdGNoIFsxXSwgd2hpY2ggZW5hYmxlcyBub3Qgb25seSBJ
+TyBzaWRlIHBhZ2UgZmF1bHQsIGJ1dCBhbHNvIFBBU0lECj4gPnN1cHBvcnQgdG8gSU9NTVUgYW5k
+IFZGSU8uCj4gPgo+ID5XaXRoIHRoZXNlIGZlYXR1cmVzLCBXYXJwRHJpdmUgY2FuIHN1cHBvcnQg
+bm9uLXBpbm5lZCBtZW1vcnkgYW5kCj4gPm11bHRpLXByb2Nlc3MgaW4gdGhlIHNhbWUgYWNjZWxl
+cmF0b3IgZGV2aWNlLiAgV2UgdGVzdGVkIGl0IGluIG91ciBTb0MKPiA+aW50ZWdyYXRlZCBBY2Nl
+bGVyYXRvciAoYm9hcmQgSUQ6IEQwNiwgQ2hpcCBJRDogSElQMDgpLiBBIHJlZmVyZW5jZSB3b3Jr
+Cj4gPnRyZWUgY2FuIGJlIGZvdW5kIGhlcmU6IFsyXS4KPiA+Cj4gPkJ1dCBpdCBpcyBub3QgbWFu
+ZGF0b3J5LiBUaGlzIHBhdGNoc2V0IGlzIHRlc3RlZCBpbiB0aGUgbGF0ZXN0IG1haW5saW5lCj4g
+Pmtlcm5lbCB3aXRob3V0IHRoZSBTVkEgcGF0Y2hlcy4gIFNvIGl0IHN1cHBvcnRzIG9ubHkgb25l
+IHByb2Nlc3MgZm9yIGVhY2gKPiA+YWNjZWxlcmF0b3IuCj4gPgo+ID5XZSBoYXZlIG5vdGljZWQg
+dGhlIElPTU1VIGF3YXJlIG1kZXYgUkZDIGFubm91bmNlZCByZWNlbnRseSBbM10uCj4gPgo+ID5U
+aGUgSU9NTVUgYXdhcmUgbWRldiBoYXMgc2ltaWxhciBpZGVhIGJ1dCBkaWZmZXJlbnQgaW50ZW50
+aW9uIGNvbXBhcmluZyB0bwo+ID5XYXJwRHJpdmUuIEl0IGludGVuZHMgdG8gZGVkaWNhdGUgcGFy
+dCBvZiB0aGUgaGFyZHdhcmUgcmVzb3VyY2UgdG8gYSBWTS4KPiA+QW5kIHRoZSBkZXNpZ24gaXMg
+c3VwcG9zZWQgdG8gYmUgdXNlZCB3aXRoIFNjYWxhYmxlIEkvTyBWaXJ0dWFsaXphdGlvbi4KPiA+
+V2hpbGUgc2RtZGV2IGlzIGludGVuZGVkIHRvIHNoYXJlIHRoZSBoYXJkd2FyZSByZXNvdXJjZSB3
+aXRoIGEgYmlnIGFtb3VudAo+ID5vZiBwcm9jZXNzZXMuICBJdCBqdXN0IHJlcXVpcmVzIHRoZSBo
+YXJkd2FyZSBzdXBwb3J0aW5nIGFkZHJlc3MKPiA+dHJhbnNsYXRpb24gcGVyIHByb2Nlc3MgKFBD
+SUUncyBQQVNJRCBvciBBUk0gU01NVSdzIHN1YnN0cmVhbSBJRCkuCj4gPgo+ID5CdXQgd2UgZG9u
+J3Qgc2VlIHNlcmlvdXMgY29uZmxpY3Rpb24gb24gYm90aCBkZXNpZ24uIFdlIGJlbGlldmUgdGhl
+eSBjYW4gYmUKPiA+bm9ybWFsaXplZCBhcyBvbmUuCj4gPgo+ID5UaGUgcGF0Y2ggMSBpcyBkb2N1
+bWVudCBvZiB0aGUgZnJhbWV3b3JrLiBUaGUgcGF0Y2ggMiBhbmQgMyBhZGQgc2RtZGV2Cj4gPnN1
+cHBvcnQuIFRoZSBwYXRjaCA0LCA1IGFuZCA2IGlzIGRyaXZlcnMgZm9yIEhpc2xpY29uJ3MgWklQ
+IEFjY2VsZXJhdG9yCj4gPndoaWNoIGlzIHJlZ2lzdGVyZWQgdG8gYm90aCBjcnlwdG8gYW5kIHdh
+cnBkcml2ZShzZG1kZXYpIGFuZCBjYW4gYmUKPiA+dXNlZCBmcm9tIGtlcm5lbCBvciB1c2VyIHNw
+YWNlIGF0IHRoZSBzYW1lIHRpbWUuIFRoZSBwYXRjaCA3IGlzIGEgdXNlcgo+ID5zcGFjZSBzYW1w
+bGUgZGVtb25zdHJhdGluZyBob3cgV2FycERyaXZlIHdvcmtzLgo+ID4KPiA+Cj4gPkNoYW5nZSBI
+aXN0b3J5Ogo+ID5WMiBjaGFuZ2VkIGZyb20gVjE6Cj4gPgkxLiBDaGFuZ2Uga2VybmVsIGZyYW1l
+d29yayBuYW1lIGZyb20gU1BJTURFViAoU2hhcmUgUGFyZW50IElPTU1VCj4gPgkgICBNZGV2KSB0
+byBTRE1ERVYgKFNoYXJlIERvbWFpbiBNZGV2KS4KPiA+CTIuIEFsbG9jYXRlIEhhcmR3YXJlIFJl
+c291cmNlIHdoZW4gYSBuZXcgbWRldiBpcyBjcmVhdGVkIChXaGlsZQo+ID4JICAgaXQgaXMgYWxs
+b2NhdGVkIHdoZW4gdGhlIG1kZXYgaXMgb3Blbm5lZCkKPiA+CTMuIFVubWFwIHBhZ2VzIGZyb20g
+dGhlIHNoYXJlZCBkb21haW4gd2hlbiB0aGUgc2RtZGV2IGlvbW11IGdyb3VwIGlzCj4gPgkgICBk
+ZXRhY2hlZC4gKFRoaXMgcHJvY2VkdXJlIGlzIG5lY2Vzc2FyeSwgYnV0IG1pc3NlZCBpbiBWMSkK
+PiA+CTQuIFVwZGF0ZSBkb2N1bWVudCBhY2NvcmRpbmdseS4KPiA+CTUuIFJlYmFzZSB0byB0aGUg
+bGF0ZXN0IGtlcm5lbCAoNC4xOS4wLXJjMSkKPiA+CQo+ID4JQWNjb3JkaW5nIHRoZSByZXZpZXcg
+Y29tbWVudCBvbiBSRkN2MSwgV2UgZGlkIHRyeSB0byB1c2UgZG1hLWJ1Zgo+ID4JYXMgYmFjayBl
+bmQgb2YgV2FycERyaXZlLiBJdCBjYW4gd29yayBwcm9wZXJseSB3aXRoIHRoZSBjdXJyZW50Cj4g
+Pglzb2x1dGlvbiBbNF0sIGJ1dCBpdCBjYW5ub3QgbWFrZSB1c2Ugb2YgcHJvY2VzcydzCj4gPglv
+d24gbWVtb3J5IGFkZHJlc3Mgc3BhY2UgZGlyZWN0bHkuIFRoaXMgaXMgaW1wb3J0YW50IHRvIG1h
+bnkKPiA+CWFjY2VsZXJhdGlvbiBzY2VuYXJpby4gU28gZG1hLWJ1ZiB3aWxsIGJlIHRha2VuIGFz
+IGEgYmFja3VwCj4gPglhbHRlcm5hdGl2ZSBmb3Igbm9pb21tdSBzY2VuYXJpbywgaXQgd2lsbCBi
+ZSBhZGRlZCBpbiB0aGUgZnV0dXJlCj4gPgl2ZXJzaW9uLgo+ID4KPiA+Cj4gPlJlZmVybmNlczoK
+PiA+WzFdIGh0dHBzOi8vd3d3LnNwaW5pY3MubmV0L2xpc3RzL2tlcm5lbC9tc2cyNjUxNDgxLmh0
+bWwKPiA+WzJdIGh0dHBzOi8vZ2l0aHViLmNvbS9LZW5uZXRoLUxlZS9saW51eC1rZXJuZWwtd2Fy
+cGRyaXZlL3RyZWUvd2FycGRyaXZlLXN2YS12MC41Cj4gPlszXSBodHRwczovL2xrbWwub3JnL2xr
+bWwvMjAxOC83LzIyLzM0Cj4gCj4gUGxlYXNlIHJlZmVyIHRvIHRoZSBsYXRlc3QgdmVyc2lvbiBw
+b3N0ZWQgaGVyZSBmb3IgZGlzY3Vzc2lvbi4KPiAKPiBodHRwczovL2xrbWwub3JnL2xrbWwvMjAx
+OC84LzMwLzEwNwoKU3VyZS4gVGhhbmsgeW91LgoKPiAKPiBCZXN0IHJlZ2FyZHMsCj4gTHUgQmFv
+bHUKCi0tIAoJCQktS2VubmV0aChIaXNpbGljb24pCgo9PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQrm
+nKzpgq7ku7blj4rlhbbpmYTku7blkKvmnInljY7kuLrlhazlj7jnmoTkv53lr4bkv6Hmga/vvIzk
+u4XpmZDkuo7lj5HpgIHnu5nkuIrpnaLlnLDlnYDkuK3liJflh7rnmoTkuKrkurrmiJbnvqTnu4Tj
+gILnpoEK5q2i5Lu75L2V5YW25LuW5Lq65Lul5Lu75L2V5b2i5byP5L2/55So77yI5YyF5ous5L2G
+5LiN6ZmQ5LqO5YWo6YOo5oiW6YOo5YiG5Zyw5rOE6Zyy44CB5aSN5Yi244CB5oiW5pWj5Y+R77yJ
+5pys6YKu5Lu25LitCueahOS/oeaBr+OAguWmguaenOaCqOmUmeaUtuS6huacrOmCruS7tu+8jOiv
+t+aCqOeri+WNs+eUteivneaIlumCruS7tumAmuefpeWPkeS7tuS6uuW5tuWIoOmZpOacrOmCruS7
+tu+8gQpUaGlzIGUtbWFpbCBhbmQgaXRzIGF0dGFjaG1lbnRzIGNvbnRhaW4gY29uZmlkZW50aWFs
+IGluZm9ybWF0aW9uIGZyb20gSFVBV0VJLAp3aGljaCBpcyBpbnRlbmRlZCBvbmx5IGZvciB0aGUg
+cGVyc29uIG9yIGVudGl0eSB3aG9zZSBhZGRyZXNzIGlzIGxpc3RlZCBhYm92ZS4KQW55IHVzZSBv
+ZiB0aGUgCmluZm9ybWF0aW9uIGNvbnRhaW5lZCBoZXJlaW4gaW4gYW55IHdheSAoaW5jbHVkaW5n
+LCBidXQgbm90IGxpbWl0ZWQgdG8sIHRvdGFsIG9yCnBhcnRpYWwgZGlzY2xvc3VyZSwgcmVwcm9k
+dWN0aW9uLCBvciBkaXNzZW1pbmF0aW9uKSBieSBwZXJzb25zIG90aGVyIHRoYW4gdGhlCmludGVu
+ZGVkIApyZWNpcGllbnQocykgaXMgcHJvaGliaXRlZC4gSWYgeW91IHJlY2VpdmUgdGhpcyBlLW1h
+aWwgaW4gZXJyb3IsIHBsZWFzZSBub3RpZnkKdGhlIHNlbmRlciBieSBwaG9uZSBvciBlbWFpbCBp
+bW1lZGlhdGVseSBhbmQgZGVsZXRlIGl0IQoKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX18KaW9tbXUgbWFpbGluZyBsaXN0CmlvbW11QGxpc3RzLmxpbnV4LWZv
+dW5kYXRpb24ub3JnCmh0dHBzOi8vbGlzdHMubGludXhmb3VuZGF0aW9uLm9yZy9tYWlsbWFuL2xp
+c3RpbmZvL2lvbW11
