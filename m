@@ -1,7 +1,8 @@
 From: Kees Cook <keescook@chromium.org>
-Subject: [PATCH v2 0/4] crypto: skcipher - Remove VLA usage
-Date: Thu,  6 Sep 2018 15:58:50 -0700
-Message-ID: <20180906225854.40989-1-keescook@chromium.org>
+Subject: [PATCH v2 3/4] crypto: skcipher - Remove VLA usage for SKCIPHER_REQUEST_ON_STACK
+Date: Thu,  6 Sep 2018 15:58:53 -0700
+Message-ID: <20180906225854.40989-4-keescook@chromium.org>
+References: <20180906225854.40989-1-keescook@chromium.org>
 Cc: Kees Cook <keescook@chromium.org>,
         Eric Biggers <ebiggers@google.com>,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>,
@@ -20,63 +21,91 @@ Cc: Kees Cook <keescook@chromium.org>,
         linux-arm-kernel@lists.infradead.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20180906225854.40989-1-keescook@chromium.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This removes VLAs[1] from SKCIPHER_REQUEST_ON_STACK by making sure that
-on-stack requests are being used only on non-ASYNC algorithms and that
-enough space has been reserved.
+In the quest to remove all stack VLA usage from the kernel[1], this caps
+the non-ASYNC skcipher request size similar to other limits and adds a
+sanity check at usage. After a review of all non-ASYNC algorithm callers
+of crypto_skcipher_set_reqsize(), the largest appears to be 384:
 
-v2:
-- Instead of globally failing large reqsizes, limit to only non-ASYNC users
-  of the on-stack request.
-- Remove unused tfm argument after VLA removal.
-
--Kees
+4       struct sun4i_cipher_req_ctx
+96      struct crypto_rfc3686_req_ctx
+375     cts:
+                160     crypto_skcipher_blocksize(cipher) (max)
+                152     struct crypto_cts_reqctx
+                63      align_mask (max)
+384     struct rctx (lrw, xts)
 
 [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
 
-Kees Cook (4):
-  crypto: skcipher - Consolidate encrypt/decrypt sanity check
-  crypto: skcipher - Enforce non-ASYNC for on-stack requests
-  crypto: skcipher - Remove VLA usage for SKCIPHER_REQUEST_ON_STACK
-  crypto: skcipher - Remove unused argument to SKCIPHER_REQUEST_ON_STACK()
+Signed-off-by: Kees Cook <keescook@chromium.org>
+---
+ include/crypto/skcipher.h | 28 ++++++++++++++++------------
+ 1 file changed, 16 insertions(+), 12 deletions(-)
 
- arch/s390/crypto/aes_s390.c                   |  8 +-
- arch/x86/crypto/fpu.c                         |  4 +-
- crypto/algif_aead.c                           |  2 +-
- crypto/authenc.c                              |  2 +-
- crypto/authencesn.c                           |  2 +-
- crypto/cryptd.c                               |  4 +-
- crypto/echainiv.c                             |  2 +-
- crypto/gcm.c                                  |  2 +-
- crypto/seqiv.c                                |  2 +-
- drivers/block/cryptoloop.c                    |  2 +-
- drivers/crypto/axis/artpec6_crypto.c          |  2 +-
- drivers/crypto/ccp/ccp-crypto-aes-xts.c       |  2 +-
- drivers/crypto/chelsio/chcr_algo.c            |  2 +-
- drivers/crypto/mxs-dcp.c                      |  2 +-
- drivers/crypto/omap-aes.c                     |  2 +-
- drivers/crypto/picoxcell_crypto.c             |  2 +-
- drivers/crypto/qce/ablkcipher.c               |  2 +-
- drivers/crypto/sahara.c                       |  8 +-
- drivers/crypto/vmx/aes_cbc.c                  |  4 +-
- drivers/crypto/vmx/aes_ctr.c                  |  2 +-
- drivers/crypto/vmx/aes_xts.c                  |  2 +-
- drivers/net/ppp/ppp_mppe.c                    |  6 +-
- drivers/staging/rtl8192e/rtllib_crypt_tkip.c  |  4 +-
- drivers/staging/rtl8192e/rtllib_crypt_wep.c   |  4 +-
- .../rtl8192u/ieee80211/ieee80211_crypt_tkip.c |  4 +-
- .../rtl8192u/ieee80211/ieee80211_crypt_wep.c  |  4 +-
- drivers/usb/wusbcore/crypto.c                 |  2 +-
- include/crypto/skcipher.h                     | 74 ++++++++++++++-----
- net/ceph/crypto.c                             |  2 +-
- net/mac802154/llsec.c                         |  4 +-
- net/rxrpc/rxkad.c                             | 10 +--
- net/sunrpc/auth_gss/gss_krb5_crypto.c         | 14 ++--
- net/wireless/lib80211_crypt_tkip.c            |  4 +-
- net/wireless/lib80211_crypt_wep.c             |  4 +-
- 34 files changed, 116 insertions(+), 80 deletions(-)
-
+diff --git a/include/crypto/skcipher.h b/include/crypto/skcipher.h
+index 3aabd5d098ed..cca216999bf1 100644
+--- a/include/crypto/skcipher.h
++++ b/include/crypto/skcipher.h
+@@ -144,9 +144,10 @@ struct skcipher_alg {
+ /*
+  * This must only ever be used with synchronous algorithms.
+  */
++#define MAX_SYNC_SKCIPHER_REQSIZE	384
+ #define SKCIPHER_REQUEST_ON_STACK(name, tfm) \
+ 	char __##name##_desc[sizeof(struct skcipher_request) + \
+-		crypto_skcipher_reqsize(tfm)] CRYPTO_MINALIGN_ATTR = { 1 }; \
++		MAX_SYNC_SKCIPHER_REQSIZE] CRYPTO_MINALIGN_ATTR = { 1 }; \
+ 	struct skcipher_request *name = (void *)__##name##_desc
+ 
+ /**
+@@ -412,6 +413,17 @@ static inline unsigned int crypto_skcipher_default_keysize(
+ 	return tfm->keysize;
+ }
+ 
++/**
++ * crypto_skcipher_reqsize() - obtain size of the request data structure
++ * @tfm: cipher handle
++ *
++ * Return: number of bytes
++ */
++static inline unsigned int crypto_skcipher_reqsize(struct crypto_skcipher *tfm)
++{
++	return tfm->reqsize;
++}
++
+ /**
+  * crypto_skcipher_reqtfm() - obtain cipher handle from request
+  * @req: skcipher_request out of which the cipher handle is to be obtained
+@@ -446,6 +458,9 @@ static inline struct crypto_skcipher *crypto_skcipher_reqtfm_check(
+ 		if (WARN_ON(crypto_skcipher_alg(tfm)->base.cra_flags &
+ 				CRYPTO_ALG_ASYNC))
+ 			return ERR_PTR(-EINVAL);
++		if (WARN_ON(crypto_skcipher_reqsize(tfm) >
++				MAX_SYNC_SKCIPHER_REQSIZE))
++			return ERR_PTR(-ENOSPC);
+ 	}
+ 
+ 	if (crypto_skcipher_get_flags(tfm) & CRYPTO_TFM_NEED_KEY)
+@@ -507,17 +522,6 @@ static inline int crypto_skcipher_decrypt(struct skcipher_request *req)
+  * skcipher handle to the crypto_skcipher_* API calls.
+  */
+ 
+-/**
+- * crypto_skcipher_reqsize() - obtain size of the request data structure
+- * @tfm: cipher handle
+- *
+- * Return: number of bytes
+- */
+-static inline unsigned int crypto_skcipher_reqsize(struct crypto_skcipher *tfm)
+-{
+-	return tfm->reqsize;
+-}
+-
+ /**
+  * skcipher_request_set_tfm() - update cipher handle reference in request
+  * @req: request handle to be modified
 -- 
 2.17.1
