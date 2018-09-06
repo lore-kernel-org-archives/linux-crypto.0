@@ -1,299 +1,86 @@
-From: Kenneth Lee <liguozhu@hisilicon.com>
-Subject: Re: [PATCH 3/7] vfio: add sdmdev support
-Date: Thu, 6 Sep 2018 17:01:40 +0800
-Message-ID: <20180906090140.GB230707@Turing-Arch-b>
+From: Kenneth Lee <liguozhu-C8/M+/jPZTeaMJb+Lgu22Q@public.gmane.org>
+Subject: Re: [PATCH 4/7] crypto: add hisilicon Queue Manager driver
+Date: Thu, 6 Sep 2018 17:08:01 +0800
+Message-ID: <20180906090801.GC230707@Turing-Arch-b>
 References: <20180903005204.26041-1-nek.in.cn@gmail.com>
- <20180903005204.26041-4-nek.in.cn@gmail.com>
- <4ea51b20-dcc1-db32-18eb-24a004ab9085@linux.intel.com>
+	<20180903005204.26041-5-nek.in.cn@gmail.com>
+	<4e46a451-d1cd-ac68-84b4-20792fdbc733@infradead.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Cc: Kenneth Lee <nek.in.cn@gmail.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Joerg Roedel <joro@8bytes.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Hao Fang <fanghao11@huawei.com>,
-        Zhou Wang <wangzhou1@hisilicon.com>,
-        Zaibo Xu <xuzaibo@huawei.com>,
-        Philippe Ombredanne <pombredanne@nexb.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-crypto@vger.kernel.org>, <iommu@lists.linux-foundation.org>,
-        <kvm@vger.kernel.org>, <linux-accelerators@lists.ozlabs.org>,
-        Sanjay Kumar <sanjay.k.kumar@intel.com>, <linuxarm@huawei.com>
-To: Lu Baolu <baolu.lu@linux.intel.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Transfer-Encoding: base64
+Cc: Kenneth Lee <nek.in.cn-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+	kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Jonathan Corbet <corbet-T1hC0tSOHrs@public.gmane.org>,
+	Greg Kroah-Hartman <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>, linux-doc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Sanjay Kumar <sanjay.k.kumar-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>, Hao Fang <fanghao11-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>,
+	iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linuxarm-hv44wF8Li93QT0dZR+AlfA@public.gmane.org, Alex Williamson <alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	Thomas Gleixner <tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org>, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Philippe Ombredanne <pombredanne-od1rfyK75/E@public.gmane.org>,
+	"David S . Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
+	linux-accelerators-uLR06cmDAlY/bJ5BZ2RsiQ@public.gmane.org
+To: Randy Dunlap <rdunlap-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
 Content-Disposition: inline
-In-Reply-To: <4ea51b20-dcc1-db32-18eb-24a004ab9085@linux.intel.com>
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <4e46a451-d1cd-ac68-84b4-20792fdbc733-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Sep 03, 2018 at 10:55:57AM +0800, Lu Baolu wrote:
-> Date: Mon, 3 Sep 2018 10:55:57 +0800
-> From: Lu Baolu <baolu.lu@linux.intel.com>
-> To: Kenneth Lee <nek.in.cn@gmail.com>, Jonathan Corbet <corbet@lwn.net>,
->  Herbert Xu <herbert@gondor.apana.org.au>, "David S . Miller"
->  <davem@davemloft.net>, Joerg Roedel <joro@8bytes.org>, Alex Williamson
->  <alex.williamson@redhat.com>, Kenneth Lee <liguozhu@hisilicon.com>, Hao
->  Fang <fanghao11@huawei.com>, Zhou Wang <wangzhou1@hisilicon.com>, Zaibo Xu
->  <xuzaibo@huawei.com>, Philippe Ombredanne <pombredanne@nexb.com>, Greg
->  Kroah-Hartman <gregkh@linuxfoundation.org>, Thomas Gleixner
->  <tglx@linutronix.de>, linux-doc@vger.kernel.org,
->  linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
->  iommu@lists.linux-foundation.org, kvm@vger.kernel.org,
->  linux-accelerators@lists.ozlabs.org, Sanjay Kumar
->  <sanjay.k.kumar@intel.com>
-> CC: linuxarm@huawei.com, baolu.lu@linux.intel.com
-> Subject: Re: [PATCH 3/7] vfio: add sdmdev support
-> User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
->  Thunderbird/52.9.1
-> Message-ID: <4ea51b20-dcc1-db32-18eb-24a004ab9085@linux.intel.com>
-> 
-> Hi,
-> 
-> On 09/03/2018 08:52 AM, Kenneth Lee wrote:
-> >From: Kenneth Lee <liguozhu@hisilicon.com>
-> >
-> >SDMDEV is "Share Domain Mdev". It is a vfio-mdev. But differ from
-> >the general vfio-mdev, it shares its parent's IOMMU. If Multi-PASID
-> >support is enabled in the IOMMU (not yet in the current kernel HEAD),
-> >multiple process can share the IOMMU by different PASID. If it is not
-> >support, only one process can share the IOMMU with the kernel driver.
-> >
-> 
-> If only for share domain purpose, I don't think it's necessary to create
-> a new device type.
-> 
-
-Yes, if ONLY for share domain purpose. But we need also to share the interrupt.
-
-> >Currently only the vfio type-1 driver is updated to make it to be aware
-> >of.
-> >
-> >Signed-off-by: Kenneth Lee <liguozhu@hisilicon.com>
-> >Signed-off-by: Zaibo Xu <xuzaibo@huawei.com>
-> >Signed-off-by: Zhou Wang <wangzhou1@hisilicon.com>
-> >---
-> >  drivers/vfio/Kconfig              |   1 +
-> >  drivers/vfio/Makefile             |   1 +
-> >  drivers/vfio/sdmdev/Kconfig       |  10 +
-> >  drivers/vfio/sdmdev/Makefile      |   3 +
-> >  drivers/vfio/sdmdev/vfio_sdmdev.c | 363 ++++++++++++++++++++++++++++++
-> >  drivers/vfio/vfio_iommu_type1.c   | 151 ++++++++++++-
-> >  include/linux/vfio_sdmdev.h       |  96 ++++++++
-> >  include/uapi/linux/vfio_sdmdev.h  |  29 +++
-> >  8 files changed, 648 insertions(+), 6 deletions(-)
-> >  create mode 100644 drivers/vfio/sdmdev/Kconfig
-> >  create mode 100644 drivers/vfio/sdmdev/Makefile
-> >  create mode 100644 drivers/vfio/sdmdev/vfio_sdmdev.c
-> >  create mode 100644 include/linux/vfio_sdmdev.h
-> >  create mode 100644 include/uapi/linux/vfio_sdmdev.h
-> >
-> 
-> [--cut for short --]
-> 
-> >diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> >index d9fd3188615d..ba73231d8692 100644
-> >--- a/drivers/vfio/vfio_iommu_type1.c
-> >+++ b/drivers/vfio/vfio_iommu_type1.c
-> >@@ -41,6 +41,7 @@
-> >  #include <linux/notifier.h>
-> >  #include <linux/dma-iommu.h>
-> >  #include <linux/irqdomain.h>
-> >+#include <linux/vfio_sdmdev.h>
-> >  #define DRIVER_VERSION  "0.2"
-> >  #define DRIVER_AUTHOR   "Alex Williamson <alex.williamson@redhat.com>"
-> >@@ -89,6 +90,8 @@ struct vfio_dma {
-> >  };
-> >  struct vfio_group {
-> >+	/* iommu_group of mdev's parent device */
-> >+	struct iommu_group	*parent_group;
-> >  	struct iommu_group	*iommu_group;
-> >  	struct list_head	next;
-> >  };
-> >@@ -1327,6 +1330,109 @@ static bool vfio_iommu_has_sw_msi(struct iommu_group *group, phys_addr_t *base)
-> >  	return ret;
-> >  }
-> >+/* return 0 if the device is not sdmdev.
-> >+ * return 1 if the device is sdmdev, the data will be updated with parent
-> >+ *	device's group.
-> >+ * return -errno if other error.
-> >+ */
-> >+static int vfio_sdmdev_type(struct device *dev, void *data)
-> >+{
-> >+	struct iommu_group **group = data;
-> >+	struct iommu_group *pgroup;
-> >+	int (*_is_sdmdev)(struct device *dev);
-> >+	struct device *pdev;
-> >+	int ret = 1;
-> >+
-> >+	/* vfio_sdmdev module is not configurated */
-> >+	_is_sdmdev = symbol_get(vfio_sdmdev_is_sdmdev);
-> >+	if (!_is_sdmdev)
-> >+		return 0;
-> >+
-> >+	/* check if it belongs to vfio_sdmdev device */
-> >+	if (!_is_sdmdev(dev)) {
-> >+		ret = 0;
-> >+		goto out;
-> >+	}
-> >+
-> >+	pdev = dev->parent;
-> >+	pgroup = iommu_group_get(pdev);
-> >+	if (!pgroup) {
-> >+		ret = -ENODEV;
-> >+		goto out;
-> >+	}
-> >+
-> >+	if (group) {
-> >+		/* check if all parent devices is the same */
-> >+		if (*group && *group != pgroup)
-> >+			ret = -ENODEV;
-> >+		else
-> >+			*group = pgroup;
-> >+	}
-> >+
-> >+	iommu_group_put(pgroup);
-> >+
-> >+out:
-> >+	symbol_put(vfio_sdmdev_is_sdmdev);
-> >+
-> >+	return ret;
-> >+}
-> >+
-> >+/* return 0 or -errno */
-> >+static int vfio_sdmdev_bus(struct device *dev, void *data)
-> >+{
-> >+	struct bus_type **bus = data;
-> >+
-> >+	if (!dev->bus)
-> >+		return -ENODEV;
-> >+
-> >+	/* ensure all devices has the same bus_type */
-> >+	if (*bus && *bus != dev->bus)
-> >+		return -EINVAL;
-> >+
-> >+	*bus = dev->bus;
-> >+	return 0;
-> >+}
-> >+
-> >+/* return 0 means it is not sd group, 1 means it is, or -EXXX for error */
-> >+static int vfio_iommu_type1_attach_sdgroup(struct vfio_domain *domain,
-> >+					    struct vfio_group *group,
-> >+					    struct iommu_group *iommu_group)
-> >+{
-> >+	int ret;
-> >+	struct bus_type *pbus = NULL;
-> >+	struct iommu_group *pgroup = NULL;
-> >+
-> >+	ret = iommu_group_for_each_dev(iommu_group, &pgroup,
-> >+				       vfio_sdmdev_type);
-> >+	if (ret < 0)
-> >+		goto out;
-> >+	else if (ret > 0) {
-> >+		domain->domain = iommu_group_share_domain(pgroup);
-> >+		if (IS_ERR(domain->domain))
-> >+			goto out;
-> >+		ret = iommu_group_for_each_dev(pgroup, &pbus,
-> >+				       vfio_sdmdev_bus);
-> >+		if (ret < 0)
-> >+			goto err_with_share_domain;
-> >+
-> >+		if (pbus && iommu_capable(pbus, IOMMU_CAP_CACHE_COHERENCY))
-> >+			domain->prot |= IOMMU_CACHE;
-> >+
-> >+		group->parent_group = pgroup;
-> >+		INIT_LIST_HEAD(&domain->group_list);
-> >+		list_add(&group->next, &domain->group_list);
-> >+
-> >+		return 1;
-> >+	}
-> 
-> This doesn't match the function name. It only gets the domain from the
-> parent device. It hasn't been really attached.
-> 
-> >+
-> >+	return 0;
-> >+
-> >+err_with_share_domain:
-> >+	iommu_group_unshare_domain(pgroup);
-> >+out:
-> >+	return ret;
-> >+}
-> >+
-> >  static int vfio_iommu_type1_attach_group(void *iommu_data,
-> >  					 struct iommu_group *iommu_group)
-> >  {
-> >@@ -1335,8 +1441,8 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
-> >  	struct vfio_domain *domain, *d;
-> >  	struct bus_type *bus = NULL, *mdev_bus;
-> >  	int ret;
-> >-	bool resv_msi, msi_remap;
-> >-	phys_addr_t resv_msi_base;
-> >+	bool resv_msi = false, msi_remap;
-> >+	phys_addr_t resv_msi_base = 0;
-> >  	mutex_lock(&iommu->lock);
-> >@@ -1373,6 +1479,14 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
-> >  	if (mdev_bus) {
-> >  		if ((bus == mdev_bus) && !iommu_present(bus)) {
-> >  			symbol_put(mdev_bus_type);
-> >+
-> >+			ret = vfio_iommu_type1_attach_sdgroup(domain, group,
-> >+					iommu_group);
-> >+			if (ret < 0)
-> >+				goto out_free;
-> >+			else if (ret > 0)
-> >+				goto replay_check;
-> 
-> Here you get the domain from the parent device and save it for later
-> use. The actual attaching is ignored.
-> 
-> I don't think this follows the philosophy of this function. It actually
-> make all devices in the group with the same bus type to share a single
-> domain.
-
-I think the original logic here is:
-
-1. Create a new vfio_domain along with a iommu_domain for the group attached to
-   the container
-2. Try to match the vfio_domain with the domain list in the container. If there
-   is a match, free the created one and and reuse it, or add the new vfio_domain
-   to the list. 
-
-   With this design, the same configuration to the IOMMU(unit) will be applied
-   only once.
-
-
-For iommu_group that shares IOMMU with its parent, the configuration will never
-be the same (The PASID will be different), so it is not necessary to merge them.
-
-> 
-> Further more, the parent domain might be a domain of type
-> IOMMU_DOMAIN_DMA. That will not be able to use as an
-> IOMMU_DOMAIN_UNMANAGED domain for iommu APIs.
-
-Indeed, it should be checked when the domain is shared. Unmanaged domain should
-not be used for sharing. I will update it in the future.
-
-> 
-> Best regards,
-> Lu Baolu
-
--- 
-			-Kenneth(Hisilicon)
-
-================================================================================
-本邮件及其附件含有华为公司的保密信息，仅限于发送给上面地址中列出的个人或群组。禁
-止任何其他人以任何形式使用（包括但不限于全部或部分地泄露、复制、或散发）本邮件中
-的信息。如果您错收了本邮件，请您立即电话或邮件通知发件人并删除本邮件！
-This e-mail and its attachments contain confidential information from HUAWEI,
-which is intended only for the person or entity whose address is listed above.
-Any use of the 
-information contained herein in any way (including, but not limited to, total or
-partial disclosure, reproduction, or dissemination) by persons other than the
-intended 
-recipient(s) is prohibited. If you receive this e-mail in error, please notify
-the sender by phone or email immediately and delete it!
+T24gU3VuLCBTZXAgMDIsIDIwMTggYXQgMDc6MTU6MDdQTSAtMDcwMCwgUmFuZHkgRHVubGFwIHdy
+b3RlOgo+IERhdGU6IFN1biwgMiBTZXAgMjAxOCAxOToxNTowNyAtMDcwMAo+IEZyb206IFJhbmR5
+IER1bmxhcCA8cmR1bmxhcEBpbmZyYWRlYWQub3JnPgo+IFRvOiBLZW5uZXRoIExlZSA8bmVrLmlu
+LmNuQGdtYWlsLmNvbT4sIEpvbmF0aGFuIENvcmJldCA8Y29yYmV0QGx3bi5uZXQ+LAo+ICBIZXJi
+ZXJ0IFh1IDxoZXJiZXJ0QGdvbmRvci5hcGFuYS5vcmcuYXU+LCAiRGF2aWQgUyAuIE1pbGxlciIK
+PiAgPGRhdmVtQGRhdmVtbG9mdC5uZXQ+LCBKb2VyZyBSb2VkZWwgPGpvcm9AOGJ5dGVzLm9yZz4s
+IEFsZXggV2lsbGlhbXNvbgo+ICA8YWxleC53aWxsaWFtc29uQHJlZGhhdC5jb20+LCBLZW5uZXRo
+IExlZSA8bGlndW96aHVAaGlzaWxpY29uLmNvbT4sIEhhbwo+ICBGYW5nIDxmYW5naGFvMTFAaHVh
+d2VpLmNvbT4sIFpob3UgV2FuZyA8d2FuZ3pob3UxQGhpc2lsaWNvbi5jb20+LCBaYWlibyBYdQo+
+ICA8eHV6YWlib0BodWF3ZWkuY29tPiwgUGhpbGlwcGUgT21icmVkYW5uZSA8cG9tYnJlZGFubmVA
+bmV4Yi5jb20+LCBHcmVnCj4gIEtyb2FoLUhhcnRtYW4gPGdyZWdraEBsaW51eGZvdW5kYXRpb24u
+b3JnPiwgVGhvbWFzIEdsZWl4bmVyCj4gIDx0Z2x4QGxpbnV0cm9uaXguZGU+LCBsaW51eC1kb2NA
+dmdlci5rZXJuZWwub3JnLAo+ICBsaW51eC1rZXJuZWxAdmdlci5rZXJuZWwub3JnLCBsaW51eC1j
+cnlwdG9Admdlci5rZXJuZWwub3JnLAo+ICBpb21tdUBsaXN0cy5saW51eC1mb3VuZGF0aW9uLm9y
+Zywga3ZtQHZnZXIua2VybmVsLm9yZywKPiAgbGludXgtYWNjZWxlcmF0b3JzQGxpc3RzLm96bGFi
+cy5vcmcsIEx1IEJhb2x1IDxiYW9sdS5sdUBsaW51eC5pbnRlbC5jb20+LAo+ICBTYW5qYXkgS3Vt
+YXIgPHNhbmpheS5rLmt1bWFyQGludGVsLmNvbT4KPiBDQzogbGludXhhcm1AaHVhd2VpLmNvbQo+
+IFN1YmplY3Q6IFJlOiBbUEFUQ0ggNC83XSBjcnlwdG86IGFkZCBoaXNpbGljb24gUXVldWUgTWFu
+YWdlciBkcml2ZXIKPiBVc2VyLUFnZW50OiBNb3ppbGxhLzUuMCAoWDExOyBMaW51eCB4ODZfNjQ7
+IHJ2OjUyLjApIEdlY2tvLzIwMTAwMTAxCj4gIFRodW5kZXJiaXJkLzUyLjkuMQo+IE1lc3NhZ2Ut
+SUQ6IDw0ZTQ2YTQ1MS1kMWNkLWFjNjgtODRiNC0yMDc5MmZkYmM3MzNAaW5mcmFkZWFkLm9yZz4K
+PiAKPiBPbiAwOS8wMi8yMDE4IDA1OjUyIFBNLCBLZW5uZXRoIExlZSB3cm90ZToKPiA+IGRpZmYg
+LS1naXQgYS9kcml2ZXJzL2NyeXB0by9oaXNpbGljb24vS2NvbmZpZyBiL2RyaXZlcnMvY3J5cHRv
+L2hpc2lsaWNvbi9LY29uZmlnCj4gPiBpbmRleCA4Y2E5YzUwM2JjYjAuLjAyYTZlZWY4NDEwMSAx
+MDA2NDQKPiA+IC0tLSBhL2RyaXZlcnMvY3J5cHRvL2hpc2lsaWNvbi9LY29uZmlnCj4gPiArKysg
+Yi9kcml2ZXJzL2NyeXB0by9oaXNpbGljb24vS2NvbmZpZwo+ID4gQEAgLTEsNCArMSw4IEBACj4g
+PiAgIyBTUERYLUxpY2Vuc2UtSWRlbnRpZmllcjogR1BMLTIuMAo+ID4gK2NvbmZpZyBDUllQVE9f
+REVWX0hJU0lMSUNPTgo+ID4gKwl0cmlzdGF0ZSAiU3VwcG9ydCBmb3IgSElTSUxJQ09OIENSWVBU
+TyBBQ0NFTEVSQVRPUiIKPiA+ICsJaGVscAo+ID4gKwkgIEVuYWJsZSB0aGlzIHRvIHVzZSBIaXNp
+bGljb24gSGFyZHdhcmUgQWNjZWxlcmF0b3JzCj4gCj4gCSAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICBBY2NlbGVyYXRvcnMuCgpUaGFua3MsIHdpbGwgY2hhbmdlIGl0IGlu
+IG5leHQgdmVyc2lvbi4KCj4gCj4gCj4gLS0gCj4gflJhbmR5CgotLSAKCQkJLUtlbm5ldGgoSGlz
+aWxpY29uKQoKPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0K5pys6YKu5Lu25Y+K5YW26ZmE5Lu25ZCr
+5pyJ5Y2O5Li65YWs5Y+455qE5L+d5a+G5L+h5oGv77yM5LuF6ZmQ5LqO5Y+R6YCB57uZ5LiK6Z2i
+5Zyw5Z2A5Lit5YiX5Ye655qE5Liq5Lq65oiW576k57uE44CC56aBCuatouS7u+S9leWFtuS7luS6
+uuS7peS7u+S9leW9ouW8j+S9v+eUqO+8iOWMheaLrOS9huS4jemZkOS6juWFqOmDqOaIlumDqOWI
+huWcsOazhOmcsuOAgeWkjeWItuOAgeaIluaVo+WPke+8ieacrOmCruS7tuS4rQrnmoTkv6Hmga/j
+gILlpoLmnpzmgqjplJnmlLbkuobmnKzpgq7ku7bvvIzor7fmgqjnq4vljbPnlLXor53miJbpgq7k
+u7bpgJrnn6Xlj5Hku7bkurrlubbliKDpmaTmnKzpgq7ku7bvvIEKVGhpcyBlLW1haWwgYW5kIGl0
+cyBhdHRhY2htZW50cyBjb250YWluIGNvbmZpZGVudGlhbCBpbmZvcm1hdGlvbiBmcm9tIEhVQVdF
+SSwKd2hpY2ggaXMgaW50ZW5kZWQgb25seSBmb3IgdGhlIHBlcnNvbiBvciBlbnRpdHkgd2hvc2Ug
+YWRkcmVzcyBpcyBsaXN0ZWQgYWJvdmUuCkFueSB1c2Ugb2YgdGhlIAppbmZvcm1hdGlvbiBjb250
+YWluZWQgaGVyZWluIGluIGFueSB3YXkgKGluY2x1ZGluZywgYnV0IG5vdCBsaW1pdGVkIHRvLCB0
+b3RhbCBvcgpwYXJ0aWFsIGRpc2Nsb3N1cmUsIHJlcHJvZHVjdGlvbiwgb3IgZGlzc2VtaW5hdGlv
+bikgYnkgcGVyc29ucyBvdGhlciB0aGFuIHRoZQppbnRlbmRlZCAKcmVjaXBpZW50KHMpIGlzIHBy
+b2hpYml0ZWQuIElmIHlvdSByZWNlaXZlIHRoaXMgZS1tYWlsIGluIGVycm9yLCBwbGVhc2Ugbm90
+aWZ5CnRoZSBzZW5kZXIgYnkgcGhvbmUgb3IgZW1haWwgaW1tZWRpYXRlbHkgYW5kIGRlbGV0ZSBp
+dCEKCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmlvbW11
+IG1haWxpbmcgbGlzdAppb21tdUBsaXN0cy5saW51eC1mb3VuZGF0aW9uLm9yZwpodHRwczovL2xp
+c3RzLmxpbnV4Zm91bmRhdGlvbi5vcmcvbWFpbG1hbi9saXN0aW5mby9pb21tdQ==
