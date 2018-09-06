@@ -1,17 +1,20 @@
-From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: Re: [PATCH 2/2] crypto: skcipher: Remove VLA usage for SKCIPHER_REQUEST_ON_STACK
-Date: Thu, 6 Sep 2018 11:25:02 +0300
-Message-ID: <CAOtvUMdMgG944iYdmMPCPajhuf0MTNNnora_4nfoaj+nHLGYUg@mail.gmail.com>
-References: <20180904181629.20712-1-keescook@chromium.org> <20180904181629.20712-3-keescook@chromium.org>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 2/2] crypto: skcipher: Remove VLA usage for
+ SKCIPHER_REQUEST_ON_STACK
+Date: Thu, 6 Sep 2018 16:51:00 +0800
+Message-ID: <20180906085100.xcqqftgqg4sizkec@gondor.apana.org.au>
+References: <20180904181629.20712-1-keescook@chromium.org>
+ <20180904181629.20712-3-keescook@chromium.org>
  <CAKv+Gu9uJ+ZjBSCM=aU0GDvYR72cy2k8reXdLV5on3dOVw8KdQ@mail.gmail.com>
  <CAGXu5jKmcuhULMR=O9B_hJAxEK8uV36uoMxm4F3F8yYSuMzYNA@mail.gmail.com>
  <CAKv+Gu_0vWUqkUex45iW=pAfUbKVsqzP9MDf6OOwTg-nUVPZNg@mail.gmail.com>
- <CAOtvUMfu4-DWD4n4c5itjArAYWhGaBnPBEnkh6cbCubG-k9cCA@mail.gmail.com> <CAKv+Gu8bKcPksgoryaVjoD9G5KeCYrqWOCgVhqrBqGw5dCzXag@mail.gmail.com>
+ <CAOtvUMfu4-DWD4n4c5itjArAYWhGaBnPBEnkh6cbCubG-k9cCA@mail.gmail.com>
+ <CAKv+Gu8bKcPksgoryaVjoD9G5KeCYrqWOCgVhqrBqGw5dCzXag@mail.gmail.com>
+ <CAKv+Gu-QkCE0pY4+5anEZ0eWv-FTH1QJtOQfPcTVLcvNf7XNiA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Cc: Kees Cook <keescook@chromium.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
+Content-Type: text/plain; charset=us-ascii
+Cc: Gilad Ben-Yossef <gilad@benyossef.com>,
+        Kees Cook <keescook@chromium.org>,
         Eric Biggers <ebiggers@google.com>,
         Antoine Tenart <antoine.tenart@bootlin.com>,
         Boris Brezillon <boris.brezillon@bootlin.com>,
@@ -28,65 +31,23 @@ Cc: Kees Cook <keescook@chromium.org>,
         linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
 To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAKv+Gu8bKcPksgoryaVjoD9G5KeCYrqWOCgVhqrBqGw5dCzXag@mail.gmail.com>
+Content-Disposition: inline
+In-Reply-To: <CAKv+Gu-QkCE0pY4+5anEZ0eWv-FTH1QJtOQfPcTVLcvNf7XNiA@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Sep 6, 2018 at 10:21 AM, Ard Biesheuvel
-<ard.biesheuvel@linaro.org> wrote:
-
->>> The skcipher implementations based on crypto IP blocks are typically
->>> asynchronous, and I wouldn't be surprised if a fair number of
->>> SKCIPHER_REQUEST_ON_STACK() users are limited to synchronous
->>> skciphers.
->>
->> According to Herbert, SKCIPHER_REQUEST_ON_STACK() may only be used
->> for invoking synchronous ciphers.
->>
->> In fact, due to the way the crypto API is built, if you try using it
->> with any transformation that uses DMA
->> you would most probably end up trying to DMA to/from the stack which
->> as we all know is not a great idea.
->>
+On Thu, Sep 06, 2018 at 10:11:59AM +0200, Ard Biesheuvel wrote:
 >
-> Ah yes, I found [0] which contains that quote.
->
-> So that means that Kees can disregard the occurrences that are async
-> only, but it still implies that we cannot limit the reqsize like he
-> proposes unless we take the sync/async nature into account.
-> It also means we should probably BUG() or WARN() in
-> SKCIPHER_REQUEST_ON_STACK() when used with an async algo.
->
->>>
->>> So we could formalize this and limit SKCIPHER_REQUEST_ON_STACK() to
->>> synchronous skciphers, which implies that the reqsize limit only has
->>> to apply synchronous skciphers as well. But before we can do this, we
->>> have to identify the remaining occurrences that allow asynchronous
->>> skciphers to be used, and replace them with heap allocations.
->>
->> Any such occurrences are almost for sure broken already due to the DMA
->> issue I've mentioned.
->>
->
-> I am not convinced of this. The skcipher request struct does not
-> contain any payload buffers, and whether the algo specific ctx struct
-> is used for DMA is completely up to the driver. So I am quite sure
-> there are plenty of async algos that work fine with
-> SKCIPHER_REQUEST_ON_STACK() and vmapped stacks.
+> That way, we will almost certainly oops on a NULL pointer dereference
+> right after, but we at least the stack corruption.
 
+A crash is just as bad as a BUG_ON.
 
-You are right that it is up to the driver but the cost is an extra
-memory allocation and release
-*per request* for any per request data that needs to be DMAable beyond
-the actual plain
-and cipher text buffers such as the IV, so driver writers have an
-incentive against doing that :-)
+Is this even a real problem? Do we have any users of this construct
+that is using it on async algorithms?
 
-Gilad
-
-
---=20
-Gilad Ben-Yossef
-Chief Coffee Drinker
-
-values of =CE=B2 will give rise to dom!
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
