@@ -1,139 +1,55 @@
-From: Kenneth Lee <liguozhu-C8/M+/jPZTeaMJb+Lgu22Q@public.gmane.org>
-Subject: Re: [RFCv2 PATCH 0/7] A General Accelerator Framework, WarpDrive
-Date: Thu, 6 Sep 2018 17:11:35 +0800
-Message-ID: <20180906091135.GF230707@Turing-Arch-b>
-References: <20180903005204.26041-1-nek.in.cn@gmail.com>
-	<81edb8ff-d046-34e5-aee7-d8564e2517c2@linux.intel.com>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH 2/2] crypto: skcipher: Remove VLA usage for SKCIPHER_REQUEST_ON_STACK
+Date: Thu, 6 Sep 2018 11:29:41 +0200
+Message-ID: <CAKv+Gu_0ehX9sLCtUYR00D4iQw+ytwmsLKmG6dgq9EnLjidKFw@mail.gmail.com>
+References: <20180904181629.20712-1-keescook@chromium.org> <20180904181629.20712-3-keescook@chromium.org>
+ <CAKv+Gu9uJ+ZjBSCM=aU0GDvYR72cy2k8reXdLV5on3dOVw8KdQ@mail.gmail.com>
+ <CAGXu5jKmcuhULMR=O9B_hJAxEK8uV36uoMxm4F3F8yYSuMzYNA@mail.gmail.com>
+ <CAKv+Gu_0vWUqkUex45iW=pAfUbKVsqzP9MDf6OOwTg-nUVPZNg@mail.gmail.com>
+ <CAOtvUMfu4-DWD4n4c5itjArAYWhGaBnPBEnkh6cbCubG-k9cCA@mail.gmail.com>
+ <CAKv+Gu8bKcPksgoryaVjoD9G5KeCYrqWOCgVhqrBqGw5dCzXag@mail.gmail.com>
+ <CAKv+Gu-QkCE0pY4+5anEZ0eWv-FTH1QJtOQfPcTVLcvNf7XNiA@mail.gmail.com> <20180906085100.xcqqftgqg4sizkec@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: Kenneth Lee <nek.in.cn-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-	kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Jonathan Corbet <corbet-T1hC0tSOHrs@public.gmane.org>,
-	Greg Kroah-Hartman <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>, linux-doc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Sanjay Kumar <sanjay.k.kumar-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>, Hao Fang <fanghao11-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>,
-	iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linuxarm-hv44wF8Li93QT0dZR+AlfA@public.gmane.org, Alex Williamson <alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	Thomas Gleixner <tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org>, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Philippe Ombredanne <pombredanne-od1rfyK75/E@public.gmane.org>,
-	"David S . Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
-	linux-accelerators-uLR06cmDAlY/bJ5BZ2RsiQ@public.gmane.org
-To: Lu Baolu <baolu.lu-VuQAYsv1563Yd54FQh9/CA@public.gmane.org>
-Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <81edb8ff-d046-34e5-aee7-d8564e2517c2-VuQAYsv1563Yd54FQh9/CA@public.gmane.org>
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
-List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
-Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Content-Type: text/plain; charset="UTF-8"
+Cc: Gilad Ben-Yossef <gilad@benyossef.com>,
+        Kees Cook <keescook@chromium.org>,
+        Eric Biggers <ebiggers@google.com>,
+        Antoine Tenart <antoine.tenart@bootlin.com>,
+        Boris Brezillon <boris.brezillon@bootlin.com>,
+        Arnaud Ebalard <arno@natisbad.org>,
+        Corentin Labbe <clabbe.montjoie@gmail.com>,
+        Maxime Ripard <maxime.ripard@bootlin.com>,
+        Chen-Yu Tsai <wens@csie.org>,
+        Christian Lamparter <chunkeey@gmail.com>,
+        Philippe Ombredanne <pombredanne@nexb.com>,
+        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20180906085100.xcqqftgqg4sizkec@gondor.apana.org.au>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-T24gTW9uLCBTZXAgMDMsIDIwMTggYXQgMTA6MzI6MTZBTSArMDgwMCwgTHUgQmFvbHUgd3JvdGU6
-Cj4gRGF0ZTogTW9uLCAzIFNlcCAyMDE4IDEwOjMyOjE2ICswODAwCj4gRnJvbTogTHUgQmFvbHUg
-PGJhb2x1Lmx1QGxpbnV4LmludGVsLmNvbT4KPiBUbzogS2VubmV0aCBMZWUgPG5lay5pbi5jbkBn
-bWFpbC5jb20+LCBKb25hdGhhbiBDb3JiZXQgPGNvcmJldEBsd24ubmV0PiwKPiAgSGVyYmVydCBY
-dSA8aGVyYmVydEBnb25kb3IuYXBhbmEub3JnLmF1PiwgIkRhdmlkIFMgLiBNaWxsZXIiCj4gIDxk
-YXZlbUBkYXZlbWxvZnQubmV0PiwgSm9lcmcgUm9lZGVsIDxqb3JvQDhieXRlcy5vcmc+LCBBbGV4
-IFdpbGxpYW1zb24KPiAgPGFsZXgud2lsbGlhbXNvbkByZWRoYXQuY29tPiwgS2VubmV0aCBMZWUg
-PGxpZ3Vvemh1QGhpc2lsaWNvbi5jb20+LCBIYW8KPiAgRmFuZyA8ZmFuZ2hhbzExQGh1YXdlaS5j
-b20+LCBaaG91IFdhbmcgPHdhbmd6aG91MUBoaXNpbGljb24uY29tPiwgWmFpYm8gWHUKPiAgPHh1
-emFpYm9AaHVhd2VpLmNvbT4sIFBoaWxpcHBlIE9tYnJlZGFubmUgPHBvbWJyZWRhbm5lQG5leGIu
-Y29tPiwgR3JlZwo+ICBLcm9haC1IYXJ0bWFuIDxncmVna2hAbGludXhmb3VuZGF0aW9uLm9yZz4s
-IFRob21hcyBHbGVpeG5lcgo+ICA8dGdseEBsaW51dHJvbml4LmRlPiwgbGludXgtZG9jQHZnZXIu
-a2VybmVsLm9yZywKPiAgbGludXgta2VybmVsQHZnZXIua2VybmVsLm9yZywgbGludXgtY3J5cHRv
-QHZnZXIua2VybmVsLm9yZywKPiAgaW9tbXVAbGlzdHMubGludXgtZm91bmRhdGlvbi5vcmcsIGt2
-bUB2Z2VyLmtlcm5lbC5vcmcsCj4gIGxpbnV4LWFjY2VsZXJhdG9yc0BsaXN0cy5vemxhYnMub3Jn
-LCBTYW5qYXkgS3VtYXIKPiAgPHNhbmpheS5rLmt1bWFyQGludGVsLmNvbT4KPiBDQzogYmFvbHUu
-bHVAbGludXguaW50ZWwuY29tLCBsaW51eGFybUBodWF3ZWkuY29tCj4gU3ViamVjdDogUmU6IFtS
-RkN2MiBQQVRDSCAwLzddIEEgR2VuZXJhbCBBY2NlbGVyYXRvciBGcmFtZXdvcmssIFdhcnBEcml2
-ZQo+IFVzZXItQWdlbnQ6IE1vemlsbGEvNS4wIChYMTE7IExpbnV4IHg4Nl82NDsgcnY6NTIuMCkg
-R2Vja28vMjAxMDAxMDEKPiAgVGh1bmRlcmJpcmQvNTIuOS4xCj4gTWVzc2FnZS1JRDogPDgxZWRi
-OGZmLWQwNDYtMzRlNS1hZWU3LWQ4NTY0ZTI1MTdjMkBsaW51eC5pbnRlbC5jb20+Cj4gCj4gSGks
-Cj4gCj4gT24gMDkvMDMvMjAxOCAwODo1MSBBTSwgS2VubmV0aCBMZWUgd3JvdGU6Cj4gPkZyb206
-IEtlbm5ldGggTGVlIDxsaWd1b3podUBoaXNpbGljb24uY29tPgo+ID4KPiA+V2FycERyaXZlIGlz
-IGFuIGFjY2VsZXJhdG9yIGZyYW1ld29yayB0byBleHBvc2UgdGhlIGhhcmR3YXJlIGNhcGFiaWxp
-dGllcwo+ID5kaXJlY3RseSB0byB0aGUgdXNlciBzcGFjZS4gSXQgbWFrZXMgdXNlIG9mIHRoZSBl
-eGlzdCB2ZmlvIGFuZCB2ZmlvLW1kZXYKPiA+ZmFjaWxpdGllcy4gU28gdGhlIHVzZXIgYXBwbGlj
-YXRpb24gY2FuIHNlbmQgcmVxdWVzdCBhbmQgRE1BIHRvIHRoZQo+ID5oYXJkd2FyZSB3aXRob3V0
-IGludGVyYWN0aW9uIHdpdGggdGhlIGtlcm5lbC4gVGhpcyByZW1vdmVzIHRoZSBsYXRlbmN5Cj4g
-Pm9mIHN5c2NhbGwuCj4gPgo+ID5XYXJwRHJpdmUgaXMgdGhlIG5hbWUgZm9yIHRoZSB3aG9sZSBm
-cmFtZXdvcmsuIFRoZSBjb21wb25lbnQgaW4ga2VybmVsCj4gPmlzIGNhbGxlZCBTRE1ERVYsIFNo
-YXJlIERvbWFpbiBNZWRpYXRlZCBEZXZpY2UuIERyaXZlciBkcml2ZXIgZXhwb3NlcyBpdHMKPiA+
-aGFyZHdhcmUgcmVzb3VyY2UgYnkgcmVnaXN0ZXJpbmcgdG8gU0RNREVWIGFzIGEgVkZJTy1NZGV2
-LiBTbyB0aGUgdXNlcgo+ID5saWJyYXJ5IG9mIFdhcnBEcml2ZSBjYW4gYWNjZXNzIGl0IHZpYSBW
-RklPIGludGVyZmFjZS4KPiA+Cj4gPlRoZSBwYXRjaHNldCBjb250YWlucyBkb2N1bWVudCBmb3Ig
-dGhlIGRldGFpbC4gUGxlYXNlIHJlZmVyIHRvIGl0IGZvciBtb3JlCj4gPmluZm9ybWF0aW9uLgo+
-ID4KPiA+VGhpcyBwYXRjaHNldCBpcyBpbnRlbmRlZCB0byBiZSB1c2VkIHdpdGggSmVhbiBQaGls
-aXBwZSBCcnVja2VyJ3MgU1ZBCj4gPnBhdGNoIFsxXSwgd2hpY2ggZW5hYmxlcyBub3Qgb25seSBJ
-TyBzaWRlIHBhZ2UgZmF1bHQsIGJ1dCBhbHNvIFBBU0lECj4gPnN1cHBvcnQgdG8gSU9NTVUgYW5k
-IFZGSU8uCj4gPgo+ID5XaXRoIHRoZXNlIGZlYXR1cmVzLCBXYXJwRHJpdmUgY2FuIHN1cHBvcnQg
-bm9uLXBpbm5lZCBtZW1vcnkgYW5kCj4gPm11bHRpLXByb2Nlc3MgaW4gdGhlIHNhbWUgYWNjZWxl
-cmF0b3IgZGV2aWNlLiAgV2UgdGVzdGVkIGl0IGluIG91ciBTb0MKPiA+aW50ZWdyYXRlZCBBY2Nl
-bGVyYXRvciAoYm9hcmQgSUQ6IEQwNiwgQ2hpcCBJRDogSElQMDgpLiBBIHJlZmVyZW5jZSB3b3Jr
-Cj4gPnRyZWUgY2FuIGJlIGZvdW5kIGhlcmU6IFsyXS4KPiA+Cj4gPkJ1dCBpdCBpcyBub3QgbWFu
-ZGF0b3J5LiBUaGlzIHBhdGNoc2V0IGlzIHRlc3RlZCBpbiB0aGUgbGF0ZXN0IG1haW5saW5lCj4g
-Pmtlcm5lbCB3aXRob3V0IHRoZSBTVkEgcGF0Y2hlcy4gIFNvIGl0IHN1cHBvcnRzIG9ubHkgb25l
-IHByb2Nlc3MgZm9yIGVhY2gKPiA+YWNjZWxlcmF0b3IuCj4gPgo+ID5XZSBoYXZlIG5vdGljZWQg
-dGhlIElPTU1VIGF3YXJlIG1kZXYgUkZDIGFubm91bmNlZCByZWNlbnRseSBbM10uCj4gPgo+ID5U
-aGUgSU9NTVUgYXdhcmUgbWRldiBoYXMgc2ltaWxhciBpZGVhIGJ1dCBkaWZmZXJlbnQgaW50ZW50
-aW9uIGNvbXBhcmluZyB0bwo+ID5XYXJwRHJpdmUuIEl0IGludGVuZHMgdG8gZGVkaWNhdGUgcGFy
-dCBvZiB0aGUgaGFyZHdhcmUgcmVzb3VyY2UgdG8gYSBWTS4KPiA+QW5kIHRoZSBkZXNpZ24gaXMg
-c3VwcG9zZWQgdG8gYmUgdXNlZCB3aXRoIFNjYWxhYmxlIEkvTyBWaXJ0dWFsaXphdGlvbi4KPiA+
-V2hpbGUgc2RtZGV2IGlzIGludGVuZGVkIHRvIHNoYXJlIHRoZSBoYXJkd2FyZSByZXNvdXJjZSB3
-aXRoIGEgYmlnIGFtb3VudAo+ID5vZiBwcm9jZXNzZXMuICBJdCBqdXN0IHJlcXVpcmVzIHRoZSBo
-YXJkd2FyZSBzdXBwb3J0aW5nIGFkZHJlc3MKPiA+dHJhbnNsYXRpb24gcGVyIHByb2Nlc3MgKFBD
-SUUncyBQQVNJRCBvciBBUk0gU01NVSdzIHN1YnN0cmVhbSBJRCkuCj4gPgo+ID5CdXQgd2UgZG9u
-J3Qgc2VlIHNlcmlvdXMgY29uZmxpY3Rpb24gb24gYm90aCBkZXNpZ24uIFdlIGJlbGlldmUgdGhl
-eSBjYW4gYmUKPiA+bm9ybWFsaXplZCBhcyBvbmUuCj4gPgo+ID5UaGUgcGF0Y2ggMSBpcyBkb2N1
-bWVudCBvZiB0aGUgZnJhbWV3b3JrLiBUaGUgcGF0Y2ggMiBhbmQgMyBhZGQgc2RtZGV2Cj4gPnN1
-cHBvcnQuIFRoZSBwYXRjaCA0LCA1IGFuZCA2IGlzIGRyaXZlcnMgZm9yIEhpc2xpY29uJ3MgWklQ
-IEFjY2VsZXJhdG9yCj4gPndoaWNoIGlzIHJlZ2lzdGVyZWQgdG8gYm90aCBjcnlwdG8gYW5kIHdh
-cnBkcml2ZShzZG1kZXYpIGFuZCBjYW4gYmUKPiA+dXNlZCBmcm9tIGtlcm5lbCBvciB1c2VyIHNw
-YWNlIGF0IHRoZSBzYW1lIHRpbWUuIFRoZSBwYXRjaCA3IGlzIGEgdXNlcgo+ID5zcGFjZSBzYW1w
-bGUgZGVtb25zdHJhdGluZyBob3cgV2FycERyaXZlIHdvcmtzLgo+ID4KPiA+Cj4gPkNoYW5nZSBI
-aXN0b3J5Ogo+ID5WMiBjaGFuZ2VkIGZyb20gVjE6Cj4gPgkxLiBDaGFuZ2Uga2VybmVsIGZyYW1l
-d29yayBuYW1lIGZyb20gU1BJTURFViAoU2hhcmUgUGFyZW50IElPTU1VCj4gPgkgICBNZGV2KSB0
-byBTRE1ERVYgKFNoYXJlIERvbWFpbiBNZGV2KS4KPiA+CTIuIEFsbG9jYXRlIEhhcmR3YXJlIFJl
-c291cmNlIHdoZW4gYSBuZXcgbWRldiBpcyBjcmVhdGVkIChXaGlsZQo+ID4JICAgaXQgaXMgYWxs
-b2NhdGVkIHdoZW4gdGhlIG1kZXYgaXMgb3Blbm5lZCkKPiA+CTMuIFVubWFwIHBhZ2VzIGZyb20g
-dGhlIHNoYXJlZCBkb21haW4gd2hlbiB0aGUgc2RtZGV2IGlvbW11IGdyb3VwIGlzCj4gPgkgICBk
-ZXRhY2hlZC4gKFRoaXMgcHJvY2VkdXJlIGlzIG5lY2Vzc2FyeSwgYnV0IG1pc3NlZCBpbiBWMSkK
-PiA+CTQuIFVwZGF0ZSBkb2N1bWVudCBhY2NvcmRpbmdseS4KPiA+CTUuIFJlYmFzZSB0byB0aGUg
-bGF0ZXN0IGtlcm5lbCAoNC4xOS4wLXJjMSkKPiA+CQo+ID4JQWNjb3JkaW5nIHRoZSByZXZpZXcg
-Y29tbWVudCBvbiBSRkN2MSwgV2UgZGlkIHRyeSB0byB1c2UgZG1hLWJ1Zgo+ID4JYXMgYmFjayBl
-bmQgb2YgV2FycERyaXZlLiBJdCBjYW4gd29yayBwcm9wZXJseSB3aXRoIHRoZSBjdXJyZW50Cj4g
-Pglzb2x1dGlvbiBbNF0sIGJ1dCBpdCBjYW5ub3QgbWFrZSB1c2Ugb2YgcHJvY2VzcydzCj4gPglv
-d24gbWVtb3J5IGFkZHJlc3Mgc3BhY2UgZGlyZWN0bHkuIFRoaXMgaXMgaW1wb3J0YW50IHRvIG1h
-bnkKPiA+CWFjY2VsZXJhdGlvbiBzY2VuYXJpby4gU28gZG1hLWJ1ZiB3aWxsIGJlIHRha2VuIGFz
-IGEgYmFja3VwCj4gPglhbHRlcm5hdGl2ZSBmb3Igbm9pb21tdSBzY2VuYXJpbywgaXQgd2lsbCBi
-ZSBhZGRlZCBpbiB0aGUgZnV0dXJlCj4gPgl2ZXJzaW9uLgo+ID4KPiA+Cj4gPlJlZmVybmNlczoK
-PiA+WzFdIGh0dHBzOi8vd3d3LnNwaW5pY3MubmV0L2xpc3RzL2tlcm5lbC9tc2cyNjUxNDgxLmh0
-bWwKPiA+WzJdIGh0dHBzOi8vZ2l0aHViLmNvbS9LZW5uZXRoLUxlZS9saW51eC1rZXJuZWwtd2Fy
-cGRyaXZlL3RyZWUvd2FycGRyaXZlLXN2YS12MC41Cj4gPlszXSBodHRwczovL2xrbWwub3JnL2xr
-bWwvMjAxOC83LzIyLzM0Cj4gCj4gUGxlYXNlIHJlZmVyIHRvIHRoZSBsYXRlc3QgdmVyc2lvbiBw
-b3N0ZWQgaGVyZSBmb3IgZGlzY3Vzc2lvbi4KPiAKPiBodHRwczovL2xrbWwub3JnL2xrbWwvMjAx
-OC84LzMwLzEwNwoKU3VyZS4gVGhhbmsgeW91LgoKPiAKPiBCZXN0IHJlZ2FyZHMsCj4gTHUgQmFv
-bHUKCi0tIAoJCQktS2VubmV0aChIaXNpbGljb24pCgo9PT09PT09PT09PT09PT09PT09PT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQrm
-nKzpgq7ku7blj4rlhbbpmYTku7blkKvmnInljY7kuLrlhazlj7jnmoTkv53lr4bkv6Hmga/vvIzk
-u4XpmZDkuo7lj5HpgIHnu5nkuIrpnaLlnLDlnYDkuK3liJflh7rnmoTkuKrkurrmiJbnvqTnu4Tj
-gILnpoEK5q2i5Lu75L2V5YW25LuW5Lq65Lul5Lu75L2V5b2i5byP5L2/55So77yI5YyF5ous5L2G
-5LiN6ZmQ5LqO5YWo6YOo5oiW6YOo5YiG5Zyw5rOE6Zyy44CB5aSN5Yi244CB5oiW5pWj5Y+R77yJ
-5pys6YKu5Lu25LitCueahOS/oeaBr+OAguWmguaenOaCqOmUmeaUtuS6huacrOmCruS7tu+8jOiv
-t+aCqOeri+WNs+eUteivneaIlumCruS7tumAmuefpeWPkeS7tuS6uuW5tuWIoOmZpOacrOmCruS7
-tu+8gQpUaGlzIGUtbWFpbCBhbmQgaXRzIGF0dGFjaG1lbnRzIGNvbnRhaW4gY29uZmlkZW50aWFs
-IGluZm9ybWF0aW9uIGZyb20gSFVBV0VJLAp3aGljaCBpcyBpbnRlbmRlZCBvbmx5IGZvciB0aGUg
-cGVyc29uIG9yIGVudGl0eSB3aG9zZSBhZGRyZXNzIGlzIGxpc3RlZCBhYm92ZS4KQW55IHVzZSBv
-ZiB0aGUgCmluZm9ybWF0aW9uIGNvbnRhaW5lZCBoZXJlaW4gaW4gYW55IHdheSAoaW5jbHVkaW5n
-LCBidXQgbm90IGxpbWl0ZWQgdG8sIHRvdGFsIG9yCnBhcnRpYWwgZGlzY2xvc3VyZSwgcmVwcm9k
-dWN0aW9uLCBvciBkaXNzZW1pbmF0aW9uKSBieSBwZXJzb25zIG90aGVyIHRoYW4gdGhlCmludGVu
-ZGVkIApyZWNpcGllbnQocykgaXMgcHJvaGliaXRlZC4gSWYgeW91IHJlY2VpdmUgdGhpcyBlLW1h
-aWwgaW4gZXJyb3IsIHBsZWFzZSBub3RpZnkKdGhlIHNlbmRlciBieSBwaG9uZSBvciBlbWFpbCBp
-bW1lZGlhdGVseSBhbmQgZGVsZXRlIGl0IQoKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX18KaW9tbXUgbWFpbGluZyBsaXN0CmlvbW11QGxpc3RzLmxpbnV4LWZv
-dW5kYXRpb24ub3JnCmh0dHBzOi8vbGlzdHMubGludXhmb3VuZGF0aW9uLm9yZy9tYWlsbWFuL2xp
-c3RpbmZvL2lvbW11
+On 6 September 2018 at 10:51, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> On Thu, Sep 06, 2018 at 10:11:59AM +0200, Ard Biesheuvel wrote:
+>>
+>> That way, we will almost certainly oops on a NULL pointer dereference
+>> right after, but we at least the stack corruption.
+>
+> A crash is just as bad as a BUG_ON.
+>
+> Is this even a real problem? Do we have any users of this construct
+> that is using it on async algorithms?
+>
+
+Perhaps not, but it is not enforced atm.
+
+In any case, limiting the reqsize is going to break things, so that
+needs to occur based on the sync/async nature of the algo. That also
+means we'll corrupt the stack if we ever end up using
+SKCIPHER_REQUEST_ON_STACK() with an async algo whose reqsize is
+greater than the sync reqsize limit, so I do think some additional
+sanity check is appropriate.
