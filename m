@@ -1,86 +1,111 @@
-From: Kenneth Lee <liguozhu-C8/M+/jPZTeaMJb+Lgu22Q@public.gmane.org>
-Subject: Re: [PATCH 4/7] crypto: add hisilicon Queue Manager driver
-Date: Thu, 6 Sep 2018 17:08:01 +0800
-Message-ID: <20180906090801.GC230707@Turing-Arch-b>
+From: Kenneth Lee <liguozhu@hisilicon.com>
+Subject: Re: [PATCH 6/7] crypto: add sdmdev support to Hisilicon QM
+Date: Thu, 6 Sep 2018 17:09:31 +0800
+Message-ID: <20180906090931.GD230707@Turing-Arch-b>
 References: <20180903005204.26041-1-nek.in.cn@gmail.com>
-	<20180903005204.26041-5-nek.in.cn@gmail.com>
-	<4e46a451-d1cd-ac68-84b4-20792fdbc733@infradead.org>
+ <20180903005204.26041-7-nek.in.cn@gmail.com>
+ <46e57b2b-756e-e256-5b3c-30749d865512@infradead.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: Kenneth Lee <nek.in.cn-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-	kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Jonathan Corbet <corbet-T1hC0tSOHrs@public.gmane.org>,
-	Greg Kroah-Hartman <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>, linux-doc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Sanjay Kumar <sanjay.k.kumar-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>, Hao Fang <fanghao11-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>,
-	iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linuxarm-hv44wF8Li93QT0dZR+AlfA@public.gmane.org, Alex Williamson <alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	Thomas Gleixner <tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org>, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Philippe Ombredanne <pombredanne-od1rfyK75/E@public.gmane.org>,
-	"David S . Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
-	linux-accelerators-uLR06cmDAlY/bJ5BZ2RsiQ@public.gmane.org
-To: Randy Dunlap <rdunlap-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
-Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+Content-Transfer-Encoding: 8bit
+Cc: Kenneth Lee <nek.in.cn@gmail.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Joerg Roedel <joro@8bytes.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Hao Fang <fanghao11@huawei.com>,
+        Zhou Wang <wangzhou1@hisilicon.com>,
+        Zaibo Xu <xuzaibo@huawei.com>,
+        Philippe Ombredanne <pombredanne@nexb.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-crypto@vger.kernel.org>, <iommu@lists.linux-foundation.org>,
+        <kvm@vger.kernel.org>, <linux-accelerators@lists.ozlabs.org>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Sanjay Kumar <sanjay.k.kumar@intel.com>, <linuxarm@huawei.com>
+To: Randy Dunlap <rdunlap@infradead.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <4e46a451-d1cd-ac68-84b4-20792fdbc733-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
-List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
-Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+In-Reply-To: <46e57b2b-756e-e256-5b3c-30749d865512@infradead.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-T24gU3VuLCBTZXAgMDIsIDIwMTggYXQgMDc6MTU6MDdQTSAtMDcwMCwgUmFuZHkgRHVubGFwIHdy
-b3RlOgo+IERhdGU6IFN1biwgMiBTZXAgMjAxOCAxOToxNTowNyAtMDcwMAo+IEZyb206IFJhbmR5
-IER1bmxhcCA8cmR1bmxhcEBpbmZyYWRlYWQub3JnPgo+IFRvOiBLZW5uZXRoIExlZSA8bmVrLmlu
-LmNuQGdtYWlsLmNvbT4sIEpvbmF0aGFuIENvcmJldCA8Y29yYmV0QGx3bi5uZXQ+LAo+ICBIZXJi
-ZXJ0IFh1IDxoZXJiZXJ0QGdvbmRvci5hcGFuYS5vcmcuYXU+LCAiRGF2aWQgUyAuIE1pbGxlciIK
-PiAgPGRhdmVtQGRhdmVtbG9mdC5uZXQ+LCBKb2VyZyBSb2VkZWwgPGpvcm9AOGJ5dGVzLm9yZz4s
-IEFsZXggV2lsbGlhbXNvbgo+ICA8YWxleC53aWxsaWFtc29uQHJlZGhhdC5jb20+LCBLZW5uZXRo
-IExlZSA8bGlndW96aHVAaGlzaWxpY29uLmNvbT4sIEhhbwo+ICBGYW5nIDxmYW5naGFvMTFAaHVh
-d2VpLmNvbT4sIFpob3UgV2FuZyA8d2FuZ3pob3UxQGhpc2lsaWNvbi5jb20+LCBaYWlibyBYdQo+
-ICA8eHV6YWlib0BodWF3ZWkuY29tPiwgUGhpbGlwcGUgT21icmVkYW5uZSA8cG9tYnJlZGFubmVA
-bmV4Yi5jb20+LCBHcmVnCj4gIEtyb2FoLUhhcnRtYW4gPGdyZWdraEBsaW51eGZvdW5kYXRpb24u
-b3JnPiwgVGhvbWFzIEdsZWl4bmVyCj4gIDx0Z2x4QGxpbnV0cm9uaXguZGU+LCBsaW51eC1kb2NA
-dmdlci5rZXJuZWwub3JnLAo+ICBsaW51eC1rZXJuZWxAdmdlci5rZXJuZWwub3JnLCBsaW51eC1j
-cnlwdG9Admdlci5rZXJuZWwub3JnLAo+ICBpb21tdUBsaXN0cy5saW51eC1mb3VuZGF0aW9uLm9y
-Zywga3ZtQHZnZXIua2VybmVsLm9yZywKPiAgbGludXgtYWNjZWxlcmF0b3JzQGxpc3RzLm96bGFi
-cy5vcmcsIEx1IEJhb2x1IDxiYW9sdS5sdUBsaW51eC5pbnRlbC5jb20+LAo+ICBTYW5qYXkgS3Vt
-YXIgPHNhbmpheS5rLmt1bWFyQGludGVsLmNvbT4KPiBDQzogbGludXhhcm1AaHVhd2VpLmNvbQo+
-IFN1YmplY3Q6IFJlOiBbUEFUQ0ggNC83XSBjcnlwdG86IGFkZCBoaXNpbGljb24gUXVldWUgTWFu
-YWdlciBkcml2ZXIKPiBVc2VyLUFnZW50OiBNb3ppbGxhLzUuMCAoWDExOyBMaW51eCB4ODZfNjQ7
-IHJ2OjUyLjApIEdlY2tvLzIwMTAwMTAxCj4gIFRodW5kZXJiaXJkLzUyLjkuMQo+IE1lc3NhZ2Ut
-SUQ6IDw0ZTQ2YTQ1MS1kMWNkLWFjNjgtODRiNC0yMDc5MmZkYmM3MzNAaW5mcmFkZWFkLm9yZz4K
-PiAKPiBPbiAwOS8wMi8yMDE4IDA1OjUyIFBNLCBLZW5uZXRoIExlZSB3cm90ZToKPiA+IGRpZmYg
-LS1naXQgYS9kcml2ZXJzL2NyeXB0by9oaXNpbGljb24vS2NvbmZpZyBiL2RyaXZlcnMvY3J5cHRv
-L2hpc2lsaWNvbi9LY29uZmlnCj4gPiBpbmRleCA4Y2E5YzUwM2JjYjAuLjAyYTZlZWY4NDEwMSAx
-MDA2NDQKPiA+IC0tLSBhL2RyaXZlcnMvY3J5cHRvL2hpc2lsaWNvbi9LY29uZmlnCj4gPiArKysg
-Yi9kcml2ZXJzL2NyeXB0by9oaXNpbGljb24vS2NvbmZpZwo+ID4gQEAgLTEsNCArMSw4IEBACj4g
-PiAgIyBTUERYLUxpY2Vuc2UtSWRlbnRpZmllcjogR1BMLTIuMAo+ID4gK2NvbmZpZyBDUllQVE9f
-REVWX0hJU0lMSUNPTgo+ID4gKwl0cmlzdGF0ZSAiU3VwcG9ydCBmb3IgSElTSUxJQ09OIENSWVBU
-TyBBQ0NFTEVSQVRPUiIKPiA+ICsJaGVscAo+ID4gKwkgIEVuYWJsZSB0aGlzIHRvIHVzZSBIaXNp
-bGljb24gSGFyZHdhcmUgQWNjZWxlcmF0b3JzCj4gCj4gCSAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICBBY2NlbGVyYXRvcnMuCgpUaGFua3MsIHdpbGwgY2hhbmdlIGl0IGlu
-IG5leHQgdmVyc2lvbi4KCj4gCj4gCj4gLS0gCj4gflJhbmR5CgotLSAKCQkJLUtlbm5ldGgoSGlz
-aWxpY29uKQoKPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0K5pys6YKu5Lu25Y+K5YW26ZmE5Lu25ZCr
-5pyJ5Y2O5Li65YWs5Y+455qE5L+d5a+G5L+h5oGv77yM5LuF6ZmQ5LqO5Y+R6YCB57uZ5LiK6Z2i
-5Zyw5Z2A5Lit5YiX5Ye655qE5Liq5Lq65oiW576k57uE44CC56aBCuatouS7u+S9leWFtuS7luS6
-uuS7peS7u+S9leW9ouW8j+S9v+eUqO+8iOWMheaLrOS9huS4jemZkOS6juWFqOmDqOaIlumDqOWI
-huWcsOazhOmcsuOAgeWkjeWItuOAgeaIluaVo+WPke+8ieacrOmCruS7tuS4rQrnmoTkv6Hmga/j
-gILlpoLmnpzmgqjplJnmlLbkuobmnKzpgq7ku7bvvIzor7fmgqjnq4vljbPnlLXor53miJbpgq7k
-u7bpgJrnn6Xlj5Hku7bkurrlubbliKDpmaTmnKzpgq7ku7bvvIEKVGhpcyBlLW1haWwgYW5kIGl0
-cyBhdHRhY2htZW50cyBjb250YWluIGNvbmZpZGVudGlhbCBpbmZvcm1hdGlvbiBmcm9tIEhVQVdF
-SSwKd2hpY2ggaXMgaW50ZW5kZWQgb25seSBmb3IgdGhlIHBlcnNvbiBvciBlbnRpdHkgd2hvc2Ug
-YWRkcmVzcyBpcyBsaXN0ZWQgYWJvdmUuCkFueSB1c2Ugb2YgdGhlIAppbmZvcm1hdGlvbiBjb250
-YWluZWQgaGVyZWluIGluIGFueSB3YXkgKGluY2x1ZGluZywgYnV0IG5vdCBsaW1pdGVkIHRvLCB0
-b3RhbCBvcgpwYXJ0aWFsIGRpc2Nsb3N1cmUsIHJlcHJvZHVjdGlvbiwgb3IgZGlzc2VtaW5hdGlv
-bikgYnkgcGVyc29ucyBvdGhlciB0aGFuIHRoZQppbnRlbmRlZCAKcmVjaXBpZW50KHMpIGlzIHBy
-b2hpYml0ZWQuIElmIHlvdSByZWNlaXZlIHRoaXMgZS1tYWlsIGluIGVycm9yLCBwbGVhc2Ugbm90
-aWZ5CnRoZSBzZW5kZXIgYnkgcGhvbmUgb3IgZW1haWwgaW1tZWRpYXRlbHkgYW5kIGRlbGV0ZSBp
-dCEKCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmlvbW11
-IG1haWxpbmcgbGlzdAppb21tdUBsaXN0cy5saW51eC1mb3VuZGF0aW9uLm9yZwpodHRwczovL2xp
-c3RzLmxpbnV4Zm91bmRhdGlvbi5vcmcvbWFpbG1hbi9saXN0aW5mby9pb21tdQ==
+On Sun, Sep 02, 2018 at 07:19:03PM -0700, Randy Dunlap wrote:
+> Date: Sun, 2 Sep 2018 19:19:03 -0700
+> From: Randy Dunlap <rdunlap@infradead.org>
+> To: Kenneth Lee <nek.in.cn@gmail.com>, Jonathan Corbet <corbet@lwn.net>,
+>  Herbert Xu <herbert@gondor.apana.org.au>, "David S . Miller"
+>  <davem@davemloft.net>, Joerg Roedel <joro@8bytes.org>, Alex Williamson
+>  <alex.williamson@redhat.com>, Kenneth Lee <liguozhu@hisilicon.com>, Hao
+>  Fang <fanghao11@huawei.com>, Zhou Wang <wangzhou1@hisilicon.com>, Zaibo Xu
+>  <xuzaibo@huawei.com>, Philippe Ombredanne <pombredanne@nexb.com>, Greg
+>  Kroah-Hartman <gregkh@linuxfoundation.org>, Thomas Gleixner
+>  <tglx@linutronix.de>, linux-doc@vger.kernel.org,
+>  linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+>  iommu@lists.linux-foundation.org, kvm@vger.kernel.org,
+>  linux-accelerators@lists.ozlabs.org, Lu Baolu <baolu.lu@linux.intel.com>,
+>  Sanjay Kumar <sanjay.k.kumar@intel.com>
+> CC: linuxarm@huawei.com
+> Subject: Re: [PATCH 6/7] crypto: add sdmdev support to Hisilicon QM
+> User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+>  Thunderbird/52.9.1
+> Message-ID: <46e57b2b-756e-e256-5b3c-30749d865512@infradead.org>
+> 
+> On 09/02/2018 05:52 PM, Kenneth Lee wrote:
+> > diff --git a/drivers/crypto/hisilicon/Kconfig b/drivers/crypto/hisilicon/Kconfig
+> > index 1d155708cd69..b85fab48fdab 100644
+> > --- a/drivers/crypto/hisilicon/Kconfig
+> > +++ b/drivers/crypto/hisilicon/Kconfig
+> > @@ -17,6 +17,16 @@ config CRYPTO_DEV_HISI_SEC
+> >  	  To compile this as a module, choose M here: the module
+> >  	  will be called hisi_sec.
+> >  
+> > +config CRYPTO_DEV_HISI_SDMDEV
+> > +	bool "Enable SDMDEV interface"
+> > +	depends on CRYPTO_DEV_HISILICON
+> > +	select VFIO_SDMDEV
+> > +	help
+> > +	  Enable this enable the SDMDEV, "shared IOMMU Domain Mediated Device"
+> 
+> At a minimum:
+> 	  Enable this to enable the SDMDEV,
+> 
+> although that could be done better.  Maybe just:
+> 	  Enable the SDMDEV "shared IOMMU Domain Mediated Device"
+> 
+> 	  
+> > +	  interface for all Hisilicon accelerators if they can. The SDMDEV
+> 
+> probably drop "if they can":          accelerators.  The SDMDEV interface
+> 
+> > +	  enable the WarpDrive user space accelerator driver to access the
+> 
+> 	  enables
+
+Thank you, will change them all in the coming version.
+
+> 
+> > +	  hardware function directly.
+> > +
+> 
+> 
+> -- 
+> ~Randy
+
+-- 
+			-Kenneth(Hisilicon)
+
+================================================================================
+本邮件及其附件含有华为公司的保密信息，仅限于发送给上面地址中列出的个人或群组。禁
+止任何其他人以任何形式使用（包括但不限于全部或部分地泄露、复制、或散发）本邮件中
+的信息。如果您错收了本邮件，请您立即电话或邮件通知发件人并删除本邮件！
+This e-mail and its attachments contain confidential information from HUAWEI,
+which is intended only for the person or entity whose address is listed above.
+Any use of the 
+information contained herein in any way (including, but not limited to, total or
+partial disclosure, reproduction, or dissemination) by persons other than the
+intended 
+recipient(s) is prohibited. If you receive this e-mail in error, please notify
+the sender by phone or email immediately and delete it!
