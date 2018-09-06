@@ -1,7 +1,7 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+From: Gilad Ben-Yossef <gilad@benyossef.com>
 Subject: Re: [PATCH 2/2] crypto: skcipher: Remove VLA usage for SKCIPHER_REQUEST_ON_STACK
-Date: Thu, 6 Sep 2018 10:11:59 +0200
-Message-ID: <CAKv+Gu-QkCE0pY4+5anEZ0eWv-FTH1QJtOQfPcTVLcvNf7XNiA@mail.gmail.com>
+Date: Thu, 6 Sep 2018 11:25:02 +0300
+Message-ID: <CAOtvUMdMgG944iYdmMPCPajhuf0MTNNnora_4nfoaj+nHLGYUg@mail.gmail.com>
 References: <20180904181629.20712-1-keescook@chromium.org> <20180904181629.20712-3-keescook@chromium.org>
  <CAKv+Gu9uJ+ZjBSCM=aU0GDvYR72cy2k8reXdLV5on3dOVw8KdQ@mail.gmail.com>
  <CAGXu5jKmcuhULMR=O9B_hJAxEK8uV36uoMxm4F3F8yYSuMzYNA@mail.gmail.com>
@@ -26,117 +26,15 @@ Cc: Kees Cook <keescook@chromium.org>,
         <linux-crypto@vger.kernel.org>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
-To: Gilad Ben-Yossef <gilad@benyossef.com>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <CAKv+Gu8bKcPksgoryaVjoD9G5KeCYrqWOCgVhqrBqGw5dCzXag@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 6 September 2018 at 09:21, Ard Biesheuvel <ard.biesheuvel@linaro.org> wr=
-ote:
-> On 6 September 2018 at 06:53, Gilad Ben-Yossef <gilad@benyossef.com> wrot=
-e:
->> On Thu, Sep 6, 2018 at 1:49 AM, Ard Biesheuvel
->> <ard.biesheuvel@linaro.org> wrote:
->>> On 5 September 2018 at 23:05, Kees Cook <keescook@chromium.org> wrote:
->>>> On Wed, Sep 5, 2018 at 2:18 AM, Ard Biesheuvel
->>>> <ard.biesheuvel@linaro.org> wrote:
->>>>> On 4 September 2018 at 20:16, Kees Cook <keescook@chromium.org> wrote=
-:
->>>>>> In the quest to remove all stack VLA usage from the kernel[1], this
->>>>>> caps the skcipher request size similar to other limits and adds a sa=
-nity
->>>>>> check at registration. Looking at instrumented tcrypt output, the la=
-rgest
->>>>>> is for lrw:
->>>>>>
->>>>>>         crypt: testing lrw(aes)
->>>>>>         crypto_skcipher_set_reqsize: 8
->>>>>>         crypto_skcipher_set_reqsize: 88
->>>>>>         crypto_skcipher_set_reqsize: 472
->>>>>>
->>>>>
->>>>> Are you sure this is a representative sampling? I haven't double
->>>>> checked myself, but we have plenty of drivers for peripherals in
->>>>> drivers/crypto that implement block ciphers, and they would not turn
->>>>> up in tcrypt unless you are running on a platform that provides the
->>>>> hardware in question.
->>>>
->>>> Hrm, excellent point. Looking at this again:
->>>>
->>>> The core part of the VLA is using this in the ON_STACK macro:
->>>>
->>>> static inline unsigned int crypto_skcipher_reqsize(struct crypto_skcip=
-her *tfm)
->>>> {
->>>>         return tfm->reqsize;
->>>> }
->>>>
->>>> I don't find any struct crypto_skcipher .reqsize static initializers,
->>>> and the initial reqsize is here:
->>>>
->>>> static int crypto_init_skcipher_ops_ablkcipher(struct crypto_tfm *tfm)
->>>> {
->>>> ...
->>>>         skcipher->reqsize =3D crypto_ablkcipher_reqsize(ablkcipher) +
->>>>                             sizeof(struct ablkcipher_request);
->>>>
->>>> with updates via crypto_skcipher_set_reqsize().
->>>>
->>>> So I have to examine ablkcipher reqsize too:
->>>>
->>>> static inline unsigned int crypto_ablkcipher_reqsize(
->>>>         struct crypto_ablkcipher *tfm)
->>>> {
->>>>         return crypto_ablkcipher_crt(tfm)->reqsize;
->>>> }
->>>>
->>>> And of the crt_ablkcipher.reqsize assignments/initializers, I found:
->>>>
->>>> ablkcipher reqsize:
->>>> 1       struct dcp_aes_req_ctx
->>>> 8       struct atmel_tdes_reqctx
->>>> 8       struct cryptd_blkcipher_request_ctx
->>>> 8       struct mtk_aes_reqctx
->>>> 8       struct omap_des_reqctx
->>>> 8       struct s5p_aes_reqctx
->>>> 8       struct sahara_aes_reqctx
->>>> 8       struct stm32_cryp_reqctx
->>>> 8       struct stm32_cryp_reqctx
->>>> 16      struct ablk_ctx
->>>> 24      struct atmel_aes_reqctx
->>>> 48      struct omap_aes_reqctx
->>>> 48      struct omap_aes_reqctx
->>>> 48      struct qat_crypto_request
->>>> 56      struct artpec6_crypto_request_context
->>>> 64      struct chcr_blkcipher_req_ctx
->>>> 80      struct spacc_req
->>>> 80      struct virtio_crypto_sym_request
->>>> 136     struct qce_cipher_reqctx
->>>> 168     struct n2_request_context
->>>> 328     struct ccp_des3_req_ctx
->>>> 400     struct ccp_aes_req_ctx
->>>> 536     struct hifn_request_context
->>>> 992     struct cvm_req_ctx
->>>> 2456    struct iproc_reqctx_s
->>>>
->>>> The base ablkcipher wrapper is:
->>>> 80      struct ablkcipher_request
->>>>
->>>> And in my earlier skcipher wrapper analysis, lrw was the largest
->>>> skcipher wrapper:
->>>> 384     struct rctx
->>>>
->>>> iproc_reqctx_s is an extreme outlier, with cvm_req_ctx at a bit less t=
-han half.
->>>>
->>>> Making this a 2920 byte fixed array doesn't seem sensible at all
->>>> (though that's what's already possible to use with existing
->>>> SKCIPHER_REQUEST_ON_STACK users).
->>>>
->>>> What's the right path forward here?
->>>>
->>>
+On Thu, Sep 6, 2018 at 10:21 AM, Ard Biesheuvel
+<ard.biesheuvel@linaro.org> wrote:
+
 >>> The skcipher implementations based on crypto IP blocks are typically
 >>> asynchronous, and I wouldn't be surprised if a fair number of
 >>> SKCIPHER_REQUEST_ON_STACK() users are limited to synchronous
@@ -159,29 +57,6 @@ han half.
 > It also means we should probably BUG() or WARN() in
 > SKCIPHER_REQUEST_ON_STACK() when used with an async algo.
 >
-
-Something like this should do the trick:
-
-diff --git a/include/crypto/skcipher.h b/include/crypto/skcipher.h
-index 2f327f090c3e..70584e0f26bc 100644
---- a/include/crypto/skcipher.h
-+++ b/include/crypto/skcipher.h
-@@ -142,7 +142,9 @@ struct skcipher_alg {
- #define SKCIPHER_REQUEST_ON_STACK(name, tfm) \
-        char __##name##_desc[sizeof(struct skcipher_request) + \
-                crypto_skcipher_reqsize(tfm)] CRYPTO_MINALIGN_ATTR; \
--       struct skcipher_request *name =3D (void *)__##name##_desc
-+       struct skcipher_request *name =3D WARN_ON( \
-+               crypto_skcipher_alg(tfm)->base.cra_flags & CRYPTO_ALG_ASYNC=
-) \
-+               ? NULL : (void *)__##name##_desc
-
- /**
-  * DOC: Symmetric Key Cipher API
-
-That way, we will almost certainly oops on a NULL pointer dereference
-right after, but we at least the stack corruption.
-
 >>>
 >>> So we could formalize this and limit SKCIPHER_REQUEST_ON_STACK() to
 >>> synchronous skciphers, which implies that the reqsize limit only has
@@ -198,13 +73,20 @@ right after, but we at least the stack corruption.
 > is used for DMA is completely up to the driver. So I am quite sure
 > there are plenty of async algos that work fine with
 > SKCIPHER_REQUEST_ON_STACK() and vmapped stacks.
->
->> Gilad
->>
->> --
->> Gilad Ben-Yossef
->> Chief Coffee Drinker
->>
->> values of =CE=B2 will give rise to dom!
->
-> [0] https://www.redhat.com/archives/dm-devel/2018-January/msg00087.html
+
+
+You are right that it is up to the driver but the cost is an extra
+memory allocation and release
+*per request* for any per request data that needs to be DMAable beyond
+the actual plain
+and cipher text buffers such as the IV, so driver writers have an
+incentive against doing that :-)
+
+Gilad
+
+
+--=20
+Gilad Ben-Yossef
+Chief Coffee Drinker
+
+values of =CE=B2 will give rise to dom!
