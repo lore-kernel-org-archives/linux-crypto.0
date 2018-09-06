@@ -1,15 +1,16 @@
-From: Kees Cook <keescook@chromium.org>
+From: Gilad Ben-Yossef <gilad@benyossef.com>
 Subject: Re: [PATCH 2/2] crypto: skcipher: Remove VLA usage for SKCIPHER_REQUEST_ON_STACK
-Date: Wed, 5 Sep 2018 17:43:50 -0700
-Message-ID: <CAGXu5j+z8eQKu_3sm93pdo+bBZDFqkHNM3Y0tKTDbnHfUNzywg@mail.gmail.com>
+Date: Thu, 6 Sep 2018 07:53:58 +0300
+Message-ID: <CAOtvUMfu4-DWD4n4c5itjArAYWhGaBnPBEnkh6cbCubG-k9cCA@mail.gmail.com>
 References: <20180904181629.20712-1-keescook@chromium.org> <20180904181629.20712-3-keescook@chromium.org>
  <CAKv+Gu9uJ+ZjBSCM=aU0GDvYR72cy2k8reXdLV5on3dOVw8KdQ@mail.gmail.com>
  <CAGXu5jKmcuhULMR=O9B_hJAxEK8uV36uoMxm4F3F8yYSuMzYNA@mail.gmail.com> <CAKv+Gu_0vWUqkUex45iW=pAfUbKVsqzP9MDf6OOwTg-nUVPZNg@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+Content-Transfer-Encoding: quoted-printable
+Cc: Kees Cook <keescook@chromium.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
         Eric Biggers <ebiggers@google.com>,
-        Gilad Ben-Yossef <gilad@benyossef.com>,
         Antoine Tenart <antoine.tenart@bootlin.com>,
         Boris Brezillon <boris.brezillon@bootlin.com>,
         Arnaud Ebalard <arno@natisbad.org>,
@@ -29,15 +30,17 @@ In-Reply-To: <CAKv+Gu_0vWUqkUex45iW=pAfUbKVsqzP9MDf6OOwTg-nUVPZNg@mail.gmail.com
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Sep 5, 2018 at 3:49 PM, Ard Biesheuvel
+On Thu, Sep 6, 2018 at 1:49 AM, Ard Biesheuvel
 <ard.biesheuvel@linaro.org> wrote:
 > On 5 September 2018 at 23:05, Kees Cook <keescook@chromium.org> wrote:
 >> On Wed, Sep 5, 2018 at 2:18 AM, Ard Biesheuvel
 >> <ard.biesheuvel@linaro.org> wrote:
 >>> On 4 September 2018 at 20:16, Kees Cook <keescook@chromium.org> wrote:
 >>>> In the quest to remove all stack VLA usage from the kernel[1], this
->>>> caps the skcipher request size similar to other limits and adds a sanity
->>>> check at registration. Looking at instrumented tcrypt output, the largest
+>>>> caps the skcipher request size similar to other limits and adds a sani=
+ty
+>>>> check at registration. Looking at instrumented tcrypt output, the larg=
+est
 >>>> is for lrw:
 >>>>
 >>>>         crypt: testing lrw(aes)
@@ -56,7 +59,8 @@ On Wed, Sep 5, 2018 at 3:49 PM, Ard Biesheuvel
 >>
 >> The core part of the VLA is using this in the ON_STACK macro:
 >>
->> static inline unsigned int crypto_skcipher_reqsize(struct crypto_skcipher *tfm)
+>> static inline unsigned int crypto_skcipher_reqsize(struct crypto_skciphe=
+r *tfm)
 >> {
 >>         return tfm->reqsize;
 >> }
@@ -67,7 +71,7 @@ On Wed, Sep 5, 2018 at 3:49 PM, Ard Biesheuvel
 >> static int crypto_init_skcipher_ops_ablkcipher(struct crypto_tfm *tfm)
 >> {
 >> ...
->>         skcipher->reqsize = crypto_ablkcipher_reqsize(ablkcipher) +
+>>         skcipher->reqsize =3D crypto_ablkcipher_reqsize(ablkcipher) +
 >>                             sizeof(struct ablkcipher_request);
 >>
 >> with updates via crypto_skcipher_set_reqsize().
@@ -116,7 +120,8 @@ On Wed, Sep 5, 2018 at 3:49 PM, Ard Biesheuvel
 >> skcipher wrapper:
 >> 384     struct rctx
 >>
->> iproc_reqctx_s is an extreme outlier, with cvm_req_ctx at a bit less than half.
+>> iproc_reqctx_s is an extreme outlier, with cvm_req_ctx at a bit less tha=
+n half.
 >>
 >> Making this a 2920 byte fixed array doesn't seem sensible at all
 >> (though that's what's already possible to use with existing
@@ -130,37 +135,28 @@ On Wed, Sep 5, 2018 at 3:49 PM, Ard Biesheuvel
 > SKCIPHER_REQUEST_ON_STACK() users are limited to synchronous
 > skciphers.
 
-Looks similar to ahash vs shash. :) Yes, so nearly all
-crypto_alloc_skcipher() users explicitly mask away ASYNC. What's left
-appears to be:
+According to Herbert, SKCIPHER_REQUEST_ON_STACK() may only be used
+for invoking synchronous ciphers.
 
-crypto/drbg.c:  sk_tfm = crypto_alloc_skcipher(ctr_name, 0, 0);
-crypto/tcrypt.c:        tfm = crypto_alloc_skcipher(algo, 0, async ? 0
-: CRYPTO_ALG_ASYNC);
-drivers/crypto/omap-aes.c:      ctx->ctr =
-crypto_alloc_skcipher("ecb(aes)", 0, 0);
-drivers/md/dm-crypt.c:          cc->cipher_tfm.tfms[i] =
-crypto_alloc_skcipher(ciphermode, 0, 0);
-drivers/md/dm-integrity.c:              ic->journal_crypt =
-crypto_alloc_skcipher(ic->journal_crypt_alg.alg_string, 0, 0);
-fs/crypto/keyinfo.c:    struct crypto_skcipher *tfm =
-crypto_alloc_skcipher("ecb(aes)", 0, 0);
-fs/crypto/keyinfo.c:    ctfm = crypto_alloc_skcipher(mode->cipher_str, 0, 0);
-fs/ecryptfs/crypto.c:   crypt_stat->tfm =
-crypto_alloc_skcipher(full_alg_name, 0, 0);
+In fact, due to the way the crypto API is built, if you try using it
+with any transformation that uses DMA
+you would most probably end up trying to DMA to/from the stack which
+as we all know is not a great idea.
 
-I'll cross-reference this with SKCIPHER_REQUEST_ON_STACK...
-
+>
 > So we could formalize this and limit SKCIPHER_REQUEST_ON_STACK() to
 > synchronous skciphers, which implies that the reqsize limit only has
 > to apply synchronous skciphers as well. But before we can do this, we
 > have to identify the remaining occurrences that allow asynchronous
 > skciphers to be used, and replace them with heap allocations.
 
-Sounds good; thanks!
+Any such occurrences are almost for sure broken already due to the DMA
+issue I've mentioned.
 
--Kees
+Gilad
 
--- 
-Kees Cook
-Pixel Security
+--=20
+Gilad Ben-Yossef
+Chief Coffee Drinker
+
+values of =CE=B2 will give rise to dom!
