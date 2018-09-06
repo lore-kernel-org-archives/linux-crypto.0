@@ -1,148 +1,186 @@
-From: Tim Chen <tim.c.chen@linux.intel.com>
-Subject: Re: KASAN: use-after-free Read in sha512_mb_flusher
-Date: Thu, 6 Sep 2018 10:21:46 -0700
-Message-ID: <f3e884fe-1900-99af-c027-353edb7663bb@linux.intel.com>
-References: <00000000000091258805737be8b3@google.com>
- <20180821024615.GC706@sol.localdomain>
+From: Randy Dunlap <rdunlap@infradead.org>
+Subject: Re: [PATCH 1/7] vfio/sdmdev: Add documents for WarpDrive framework
+Date: Thu, 6 Sep 2018 11:36:36 -0700
+Message-ID: <56f5f66d-f6d9-f4fa-40ca-e4a8bad170c1@infradead.org>
+References: <20180903005204.26041-1-nek.in.cn@gmail.com>
+ <20180903005204.26041-2-nek.in.cn@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Cc: davem@davemloft.net, herbert@gondor.apana.org.au, hpa@zytor.com,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        megha.dey@linux.intel.com, mingo@redhat.com,
-        syzkaller-bugs@googlegroups.com, tglx@linutronix.de, x86@kernel.org
-To: Eric Biggers <ebiggers@kernel.org>,
-        syzbot <syzbot+94ee41ce442afe333d2e@syzkaller.appspotmail.com>
+Cc: linuxarm@huawei.com
+To: Kenneth Lee <nek.in.cn@gmail.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Joerg Roedel <joro@8bytes.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Kenneth Lee <liguozhu@hisilicon.com>,
+        Hao Fang <fanghao11@huawei.com>,
+        Zhou Wang <wangzhou1@hisilicon.com>,
+        Zaibo Xu <xuzaibo@huawei.com>,
+        Philippe Ombredanne <pombredanne@nexb.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, iommu@lists.linux-foundation.org,
+        kvm@vger.kernel.org, linux-accelerators@lists.ozlabs.org,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Sanjay Kumar <sanjay.k.kumar@intel.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180821024615.GC706@sol.localdomain>
+In-Reply-To: <20180903005204.26041-2-nek.in.cn@gmail.com>
 Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 08/20/2018 07:46 PM, Eric Biggers wrote:
-> On Wed, Aug 15, 2018 at 09:35:03AM -0700, syzbot wrote:
->> Hello,
->>
->> syzbot found the following crash on:
->>
->> HEAD commit:    5ed5da74de9e Add linux-next specific files for 20180813
->> git tree:       linux-next
->> console output: https://syzkaller.appspot.com/x/log.txt?x=13fd82c4400000
->> kernel config:  https://syzkaller.appspot.com/x/.config?x=18edf0289d1b5ab
->> dashboard link: https://syzkaller.appspot.com/bug?extid=94ee41ce442afe333d2e
->> compiler:       gcc (GCC) 8.0.1 20180413 (experimental)
->>
->> Unfortunately, I don't have any reproducer for this crash yet.
->>
->> IMPORTANT: if you fix the bug, please add the following tag to the commit:
->> Reported-by: syzbot+94ee41ce442afe333d2e@syzkaller.appspotmail.com
->>
->> RDX: 00000000200002c0 RSI: 0000000000000005 RDI: 0000000000000004
->> RBP: 00000000009300a0 R08: 0000000000000000 R09: 0000000000000000
->> R10: 0000000000000f6a R11: 0000000000000246 R12: 0000000000000006
->> R13: 00000000004d3840 R14: 00000000004c85ae R15: 0000000000000003
->> ==================================================================
->> BUG: KASAN: use-after-free in sha512_mb_flusher+0x572/0x610
->> arch/x86/crypto/sha512-mb/sha512_mb.c:940
->> Read of size 8 at addr ffff8801b35669d8 by task kworker/0:2/1879
->>
->> CPU: 0 PID: 1879 Comm: kworker/0:2 Not tainted 4.18.0-next-20180813+ #37
->> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS
->> Google 01/01/2011
->> Workqueue: crypto mcryptd_flusher
->> Call Trace:
->>  __dump_stack lib/dump_stack.c:77 [inline]
->>  dump_stack+0x1c9/0x2b4 lib/dump_stack.c:113
->>  print_address_description+0x6c/0x20b mm/kasan/report.c:256
->>  kasan_report_error mm/kasan/report.c:354 [inline]
->>  kasan_report.cold.7+0x242/0x30d mm/kasan/report.c:412
->>  __asan_report_load8_noabort+0x14/0x20 mm/kasan/report.c:433
->>  sha512_mb_flusher+0x572/0x610 arch/x86/crypto/sha512-mb/sha512_mb.c:940
->>  mcryptd_flusher+0x342/0x4b0 crypto/mcryptd.c:208
->>  process_one_work+0xc73/0x1aa0 kernel/workqueue.c:2153
->>  worker_thread+0x189/0x13c0 kernel/workqueue.c:2296
->>  kthread+0x35a/0x420 kernel/kthread.c:246
->>  ret_from_fork+0x3a/0x50 arch/x86/entry/entry_64.S:415
->>
->> Allocated by task 18983:
->>  save_stack+0x43/0xd0 mm/kasan/kasan.c:448
->>  set_track mm/kasan/kasan.c:460 [inline]
->>  kasan_kmalloc+0xc4/0xe0 mm/kasan/kasan.c:553
->>  __do_kmalloc mm/slab.c:3718 [inline]
->>  __kmalloc+0x14e/0x720 mm/slab.c:3727
->>  kmalloc include/linux/slab.h:518 [inline]
->>  sock_kmalloc+0x156/0x1f0 net/core/sock.c:1983
->>  hash_accept_parent_nokey+0x58/0x2e0 crypto/algif_hash.c:438
->>  hash_accept_parent+0x5b/0x80 crypto/algif_hash.c:465
->>  af_alg_accept+0x127/0x7d0 crypto/af_alg.c:296
->>  alg_accept+0x46/0x60 crypto/af_alg.c:332
->>  __sys_accept4+0x3b2/0x8a0 net/socket.c:1589
->>  __do_sys_accept4 net/socket.c:1624 [inline]
->>  __se_sys_accept4 net/socket.c:1621 [inline]
->>  __x64_sys_accept4+0x97/0xf0 net/socket.c:1621
->>  do_syscall_64+0x1b9/0x820 arch/x86/entry/common.c:290
->>  entry_SYSCALL_64_after_hwframe+0x49/0xbe
->>
->> Freed by task 18979:
->>  save_stack+0x43/0xd0 mm/kasan/kasan.c:448
->>  set_track mm/kasan/kasan.c:460 [inline]
->>  __kasan_slab_free+0x11a/0x170 mm/kasan/kasan.c:521
->>  kasan_slab_free+0xe/0x10 mm/kasan/kasan.c:528
->>  __cache_free mm/slab.c:3498 [inline]
->>  kfree+0xd9/0x210 mm/slab.c:3813
->>  __sock_kfree_s net/core/sock.c:2004 [inline]
->>  sock_kfree_s+0x29/0x60 net/core/sock.c:2010
->>  hash_sock_destruct+0x157/0x1c0 crypto/algif_hash.c:427
->>  __sk_destruct+0x107/0xa60 net/core/sock.c:1560
->>  sk_destruct+0x78/0x90 net/core/sock.c:1595
->>  __sk_free+0xcf/0x300 net/core/sock.c:1606
->>  sk_free+0x42/0x50 net/core/sock.c:1617
->>  sock_put include/net/sock.h:1691 [inline]
->>  af_alg_release+0x6e/0x90 crypto/af_alg.c:126
->>  __sock_release+0xd7/0x250 net/socket.c:580
->>  sock_close+0x19/0x20 net/socket.c:1140
->>  __fput+0x376/0x8a0 fs/file_table.c:279
->>  ____fput+0x15/0x20 fs/file_table.c:312
->>  task_work_run+0x1e8/0x2a0 kernel/task_work.c:113
->>  tracehook_notify_resume include/linux/tracehook.h:193 [inline]
->>  exit_to_usermode_loop+0x318/0x380 arch/x86/entry/common.c:166
->>  prepare_exit_to_usermode arch/x86/entry/common.c:197 [inline]
->>  syscall_return_slowpath arch/x86/entry/common.c:268 [inline]
->>  do_syscall_64+0x6be/0x820 arch/x86/entry/common.c:293
->>  entry_SYSCALL_64_after_hwframe+0x49/0xbe
->>
->> The buggy address belongs to the object at ffff8801b3566600
->>  which belongs to the cache kmalloc-2048 of size 2048
->> The buggy address is located 984 bytes inside of
->>  2048-byte region [ffff8801b3566600, ffff8801b3566e00)
->> The buggy address belongs to the page:
->> page:ffffea0006cd5980 count:1 mapcount:0 mapping:ffff8801dac00c40 index:0x0
->> compound_mapcount: 0
->> flags: 0x2fffc0000008100(slab|head)
->> raw: 02fffc0000008100 ffffea0006cf2c08 ffffea000764ef08 ffff8801dac00c40
->> raw: 0000000000000000 ffff8801b3566600 0000000100000003 0000000000000000
->> page dumped because: kasan: bad access detected
->>
->> Memory state around the buggy address:
->>  ffff8801b3566880: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->>  ffff8801b3566900: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->>> ffff8801b3566980: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->>                                                     ^
->>  ffff8801b3566a00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->>  ffff8801b3566a80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->> ==================================================================
->>
->>
-> 
-> This is probably the same root cause as the other sha512_mb use-after-free
-> (https://lkml.org/lkml/2018/8/15/296), see my reply there.
-> 
-> #syz dup: KASAN: use-after-free Read in sha512_ctx_mgr_resubmit
-> 
-> - Eric
-> 
+Hi,
 
-Yes, I think it is similar to the previous report.  Megha is working to debug
-it.
+On 09/02/2018 05:51 PM, Kenneth Lee wrote:
+> From: Kenneth Lee <liguozhu@hisilicon.com>
+> 
+> WarpDrive is a common user space accelerator framework.  Its main component
+> in Kernel is called sdmdev, Share Domain Mediated Device. It exposes
+> the hardware capabilities to the user space via vfio-mdev. So processes in
+> user land can obtain a "queue" by open the device and direct access the
+> hardware MMIO space or do DMA operation via VFIO interface.
+> 
+> WarpDrive is intended to be used with Jean Philippe Brucker's SVA
+> patchset to support multi-process. But This is not a must.  Without the
+> SVA patches, WarpDrive can still work for one process for every hardware
+> device.
+> 
+> This patch add detail documents for the framework.
+> 
+> Signed-off-by: Kenneth Lee <liguozhu@hisilicon.com>
+> ---
+>  Documentation/00-INDEX                |   2 +
+>  Documentation/warpdrive/warpdrive.rst | 100 ++++
+>  Documentation/warpdrive/wd-arch.svg   | 728 ++++++++++++++++++++++++++
+>  3 files changed, 830 insertions(+)
+>  create mode 100644 Documentation/warpdrive/warpdrive.rst
+>  create mode 100644 Documentation/warpdrive/wd-arch.svg
 
-Tim
+> diff --git a/Documentation/warpdrive/warpdrive.rst b/Documentation/warpdrive/warpdrive.rst
+> new file mode 100644
+> index 000000000000..6d2a5d1e08c4
+> --- /dev/null
+> +++ b/Documentation/warpdrive/warpdrive.rst
+> @@ -0,0 +1,100 @@
+> +Introduction of WarpDrive
+> +=========================
+> +
+> +*WarpDrive* is a general accelerator framework for user space. It intends to
+> +provide interface for the user process to send request to hardware
+> +accelerator without heavy user-kernel interaction cost.
+> +
+> +The *WarpDrive* user library is supposed to provide a pipe-based API, such as:
+
+Do you say "is supposed to" because it doesn't do that (yet)?
+Or you could just change that to say:
+
+   The WarpDrive user library provides a pipe-based API, such as:
+
+
+> +        ::
+> +        int wd_request_queue(struct wd_queue *q);
+> +        void wd_release_queue(struct wd_queue *q);
+> +
+> +        int wd_send(struct wd_queue *q, void *req);
+> +        int wd_recv(struct wd_queue *q, void **req);
+> +        int wd_recv_sync(struct wd_queue *q, void **req);
+> +        int wd_flush(struct wd_queue *q);
+> +
+> +*wd_request_queue* creates the pipe connection, *queue*, between the
+> +application and the hardware. The application sends request and pulls the
+> +answer back by asynchronized wd_send/wd_recv, which directly interact with the
+> +hardware (by MMIO or share memory) without syscall.
+> +
+> +*WarpDrive* maintains a unified application address space among all involved
+> +accelerators.  With the following APIs: ::
+
+Seems like an extra '.' there.  How about:
+
+  accelerators with the following APIs: ::
+
+> +
+> +        int wd_mem_share(struct wd_queue *q, const void *addr,
+> +                         size_t size, int flags);
+> +        void wd_mem_unshare(struct wd_queue *q, const void *addr, size_t size);
+> +
+> +The referred process space shared by these APIs can be directly referred by the
+> +hardware. The process can also dedicate its whole process space with flags,
+> +*WD_SHARE_ALL* (not in this patch yet).
+> +
+> +The name *WarpDrive* is simply a cool and general name meaning the framework
+> +makes the application faster. As it will be explained in this text later, the
+> +facility in kernel is called *SDMDEV*, namely "Share Domain Mediated Device".
+> +
+> +
+> +How does it work
+> +================
+> +
+> +*WarpDrive* is built upon *VFIO-MDEV*. The queue is wrapped as *mdev* in VFIO.
+> +So memory sharing can be done via standard VFIO standard DMA interface.
+> +
+> +The architecture is illustrated as follow figure:
+> +
+> +.. image:: wd-arch.svg
+> +        :alt: WarpDrive Architecture
+> +
+> +Accelerator driver shares its capability via *SDMDEV* API: ::
+> +
+> +        vfio_sdmdev_register(struct vfio_sdmdev *sdmdev);
+> +        vfio_sdmdev_unregister(struct vfio_sdmdev *sdmdev);
+> +        vfio_sdmdev_wake_up(struct spimdev_queue *q);
+> +
+> +*vfio_sdmdev_register* is a helper function to register the hardware to the
+> +*VFIO_MDEV* framework. The queue creation is done by *mdev* creation interface.
+> +
+> +*WarpDrive* User library mmap the mdev to access its mmio space and shared
+
+s/mmio/MMIO/
+
+> +memory. Request can be sent to, or receive from, hardware in this mmap-ed
+> +space until the queue is full or empty.
+> +
+> +The user library can wait on the queue by ioctl(VFIO_SDMDEV_CMD_WAIT) the mdev
+> +if the queue is full or empty. If the queue status is changed, the hardware
+> +driver use *vfio_sdmdev_wake_up* to wake up the waiting process.
+> +
+> +
+> +Multiple processes support
+> +==========================
+> +
+> +In the latest mainline kernel (4.18) when this document is written,
+> +multi-process is not supported in VFIO yet.
+> +
+> +Jean Philippe Brucker has a patchset to enable it[1]_. We have tested it
+> +with our hardware (which is known as *D06*). It works well. *WarpDrive* rely
+> +on them to support multiple processes. If it is not enabled, *WarpDrive* can
+> +still work, but it support only one mdev for a process, which will share the
+> +same io map table with kernel. (But it is not going to be a security problem,
+> +since the user application cannot access the kernel address space)
+> +
+> +When multiprocess is support, mdev can be created based on how many
+> +hardware resource (queue) is available. Because the VFIO framework accepts only
+> +one open from one mdev iommu_group. Mdev become the smallest unit for process
+> +to use queue. And the mdev will not be released if the user process exist. So
+> +it will need a resource agent to manage the mdev allocation for the user
+> +process. This is not in this document's range.
+> +
+> +
+> +Legacy Mode Support
+> +===================
+> +For the hardware on which IOMMU is not support, WarpDrive can run on *NOIOMMU*
+> +mode. That require some update to the mdev driver, which is not included in
+> +this version yet.
+> +
+> +
+> +References
+> +==========
+> +.. [1] https://patchwork.kernel.org/patch/10394851/
+> +
+> +.. vim: tw=78
+
+thanks,
+-- 
+~Randy
