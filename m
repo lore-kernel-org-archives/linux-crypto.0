@@ -1,58 +1,138 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [PATCH v2 2/4] crypto: skcipher - Enforce non-ASYNC for on-stack requests
-Date: Fri, 7 Sep 2018 08:56:23 +0200
-Message-ID: <CAKv+Gu9kHpBTKjQKA3W4Q424FeY+Zq4srq2-r0MxjfCNKHT_5A@mail.gmail.com>
-References: <20180906225854.40989-1-keescook@chromium.org> <20180906225854.40989-3-keescook@chromium.org>
- <20180907034242.zhm4dglzkldhvh3x@gondor.apana.org.au>
+From: Eric Dumazet <edumazet@google.com>
+Subject: Re: [PATCH] net/sock: move memory_allocated over to percpu_counter variables
+Date: Fri, 7 Sep 2018 00:03:13 -0700
+Message-ID: <CANn89iKJcgMWb2Kmk6L9k=NkfBUKZ6BwriWr3O+N5Y0u5dy=9g@mail.gmail.com>
+References: <20180906192034.8467-1-olof@lixom.net> <CANn89i+akEWrHELBkZJQOxok-ZfYy+FNPUWdPEfB6c4YyWLqJA@mail.gmail.com>
+ <20180907033257.2nlgiqm2t4jiwhzc@gondor.apana.org.au> <CAOesGMgRrb4D2S_qWwgo00iNxbCL9EEGfhD5Ji-2HMWuZeq0Yw@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Cc: Kees Cook <keescook@chromium.org>,
-        Eric Biggers <ebiggers@google.com>,
-        Gilad Ben-Yossef <gilad@benyossef.com>,
-        Alexander Stein <alexander.stein@systec-electronic.com>,
-        Antoine Tenart <antoine.tenart@bootlin.com>,
-        Boris Brezillon <boris.brezillon@bootlin.com>,
-        Arnaud Ebalard <arno@natisbad.org>,
-        Corentin Labbe <clabbe.montjoie@gmail.com>,
-        Maxime Ripard <maxime.ripard@bootlin.com>,
-        Chen-Yu Tsai <wens@csie.org>,
-        Christian Lamparter <chunkeey@gmail.com>,
-        Philippe Ombredanne <pombredanne@nexb.com>,
-        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        David Miller <davem@davemloft.net>,
+        Neil Horman <nhorman@tuxdriver.com>,
+        Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+        Vladislav Yasevich <vyasevich@gmail.com>,
+        Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
+        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+        linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+        linux-sctp@vger.kernel.org, netdev <netdev@vger.kernel.org>,
+        linux-decnet-user@lists.sourceforge.net,
+        kernel-team <kernel-team@fb.com>,
+        Yuchung Cheng <ycheng@google.com>,
+        Neal Cardwell <ncardwell@google.com>
+To: Olof Johansson <olof@lixom.net>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180907034242.zhm4dglzkldhvh3x@gondor.apana.org.au>
+In-Reply-To: <CAOesGMgRrb4D2S_qWwgo00iNxbCL9EEGfhD5Ji-2HMWuZeq0Yw@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 7 September 2018 at 05:42, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> On Thu, Sep 06, 2018 at 03:58:52PM -0700, Kees Cook wrote:
->>
->> @@ -437,6 +442,12 @@ static inline struct crypto_skcipher *crypto_skcipher_reqtfm_check(
->>  {
->>       struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
->>
->> +     if (req->__onstack) {
->> +             if (WARN_ON(crypto_skcipher_alg(tfm)->base.cra_flags &
->> +                             CRYPTO_ALG_ASYNC))
->> +                     return ERR_PTR(-EINVAL);
->> +     }
+On Thu, Sep 6, 2018 at 11:20 PM Olof Johansson <olof@lixom.net> wrote:
 >
-> Sorry but I don't like imposing a run-time check on everybody when
-> stack-based requests are the odd ones out.  If we're going to make
-> this a run-time check (I'd much prefer a compile-time check, but I
-> understand that this may involve too much churn), then please do it
-> for stack-based request users only.
+> Hi,
 >
+> On Thu, Sep 6, 2018 at 8:32 PM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> > On Thu, Sep 06, 2018 at 12:33:58PM -0700, Eric Dumazet wrote:
+> >> On Thu, Sep 6, 2018 at 12:21 PM Olof Johansson <olof@lixom.net> wrote:
+> >> >
+> >> > Today these are all global shared variables per protocol, and in
+> >> > particular tcp_memory_allocated can get hot on a system with
+> >> > large number of CPUs and a substantial number of connections.
+> >> >
+> >> > Moving it over to a per-cpu variable makes it significantly cheaper,
+> >> > and the added overhead when summing up the percpu copies is still smaller
+> >> > than the cost of having a hot cacheline bouncing around.
+> >>
+> >> I am curious. We never noticed contention on this variable, at least for TCP.
+> >
+> > Yes these variables are heavily amortised so I'm surprised that
+> > they would cause much contention.
+> >
+> >> Please share some numbers with us.
+> >
+> > Indeed.
+>
+> Certainly, just had to collect them again.
+>
+> This is on a dual xeon box, with ~150-200k TCP connections. I see
+> about .7% CPU spent in __sk_mem_{reduce,raise}_allocated in the
+> inlined atomic ops, most of those in reduce.
+>
+> Call path for reduce is practically all from tcp_write_timer on softirq:
+>
+>                 __sk_mem_reduce_allocated
+>                 tcp_write_timer
+>                 call_timer_fn
+>                 run_timer_softirq
+>                 __do_softirq
+>                 irq_exit
+>                 smp_apic_timer_interrupt
+>                 apic_timer_interrupt
+>                 cpuidle_enter_state
+>
+> With this patch, I see about .18+.11+.07 = .36% in percpu-related
+> functions called from the same __sk_mem functions.
+>
+> Now, that's a halving of cycles samples on that specific setup. The
+> real difference though, is on another platform where atomics are more
+> expensive. There, this makes a significant difference. Unfortunately,
+> I can't share specifics but I think this change stands on its own on
+> the dual xeon setup as well, maybe with slightly less strong wording
+> on just how hot the variable/line happens to be.
 
-OK, so given that all SKCIPHER_REQUEST_ON_STACK occurrences are
-updated in this series anyway, perhaps we should add
-skcipher_[en|de]crypt_onstack() flavors that encapsulate the
-additional check? Only question is how to enforce at compile time that
-those are used instead of the ordinary ones when using a stack
-allocated request. Would you mind using some macro foo here involving
-__builtin_types_compatible_p() ?
+
+Problem is : we have platforms with more than 100 cpus, and
+sk_memory_allocated() cost will be too expensive,
+especially if the host is under memory pressure, since all cpus will
+touch their private counter.
+
+per cpu variables do not really scale, they were ok 10 years ago when
+no more than 16 cpus were the norm.
+
+I would prefer change TCP to not aggressively call
+__sk_mem_reduce_allocated() from tcp_write_timer()
+
+Ideally only tcp_retransmit_timer() should attempt to reduce forward
+allocations, after recurring timeout.
+
+Note that after 20c64d5cd5a2bdcdc8982a06cb05e5e1bd851a3d ("net: avoid
+sk_forward_alloc overflows")
+we have better control over sockets having huge forward allocations.
+
+Something like :
+
+diff --git a/net/ipv4/tcp_timer.c b/net/ipv4/tcp_timer.c
+index 7fdf222a0bdfe9775970082f6b5dcdcc82b2ae1a..7e2e17cde9b6a9be835edfac26b64f4ce9411538
+100644
+--- a/net/ipv4/tcp_timer.c
++++ b/net/ipv4/tcp_timer.c
+@@ -505,6 +505,8 @@ void tcp_retransmit_timer(struct sock *sk)
+                        mib_idx = LINUX_MIB_TCPTIMEOUTS;
+                }
+                __NET_INC_STATS(sock_net(sk), mib_idx);
++       } else {
++               sk_mem_reclaim(sk);
+        }
+
+        tcp_enter_loss(sk);
+@@ -576,11 +578,11 @@ void tcp_write_timer_handler(struct sock *sk)
+
+        if (((1 << sk->sk_state) & (TCPF_CLOSE | TCPF_LISTEN)) ||
+            !icsk->icsk_pending)
+-               goto out;
++               return;
+
+        if (time_after(icsk->icsk_timeout, jiffies)) {
+                sk_reset_timer(sk, &icsk->icsk_retransmit_timer,
+icsk->icsk_timeout);
+-               goto out;
++               return;
+        }
+
+        tcp_mstamp_refresh(tcp_sk(sk));
+@@ -602,9 +604,6 @@ void tcp_write_timer_handler(struct sock *sk)
+                tcp_probe_timer(sk);
+                break;
+        }
+-
+-out:
+-       sk_mem_reclaim(sk);
+ }
