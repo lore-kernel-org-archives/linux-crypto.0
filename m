@@ -1,435 +1,61 @@
-From: Ondrej Mosnacek <omosnace@redhat.com>
-Subject: [PATCH 2/2] crypto: lrw - Do not use auxiliary buffer
-Date: Fri,  7 Sep 2018 13:27:58 +0200
-Message-ID: <20180907112758.14602-3-omosnace@redhat.com>
-References: <20180907112758.14602-1-omosnace@redhat.com>
+From: Kees Cook <keescook@chromium.org>
+Subject: Re: [PATCH v2 2/4] crypto: skcipher - Enforce non-ASYNC for on-stack requests
+Date: Fri, 7 Sep 2018 09:02:45 -0700
+Message-ID: <CAGXu5jLx8bdr+Ld7QE1LxttPB-LOs-H96kyx0O0MXq9MzX2vNw@mail.gmail.com>
+References: <20180906225854.40989-1-keescook@chromium.org> <20180906225854.40989-3-keescook@chromium.org>
+ <20180907034242.zhm4dglzkldhvh3x@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Eric Biggers <ebiggers@kernel.org>, dm-devel@redhat.com,
-	Mikulas Patocka <mpatocka@redhat.com>, linux-crypto@vger.kernel.org,
-	Ondrej Mosnacek <omosnace@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Cc: Eric Biggers <ebiggers@google.com>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Gilad Ben-Yossef <gilad@benyossef.com>,
+        Alexander Stein <alexander.stein@systec-electronic.com>,
+        Antoine Tenart <antoine.tenart@bootlin.com>,
+        Boris Brezillon <boris.brezillon@bootlin.com>,
+        Arnaud Ebalard <arno@natisbad.org>,
+        Corentin Labbe <clabbe.montjoie@gmail.com>,
+        Maxime Ripard <maxime.ripard@bootlin.com>,
+        Chen-Yu Tsai <wens@csie.org>,
+        Christian Lamparter <chunkeey@gmail.com>,
+        Philippe Ombredanne <pombredanne@nexb.com>,
+        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+        linux-crypto <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
 To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <dm-devel-bounces@redhat.com>
-In-Reply-To: <20180907112758.14602-1-omosnace@redhat.com>
-List-Unsubscribe: <https://www.redhat.com/mailman/options/dm-devel>,
-	<mailto:dm-devel-request@redhat.com?subject=unsubscribe>
-List-Archive: <https://www.redhat.com/archives/dm-devel>
-List-Post: <mailto:dm-devel@redhat.com>
-List-Help: <mailto:dm-devel-request@redhat.com?subject=help>
-List-Subscribe: <https://www.redhat.com/mailman/listinfo/dm-devel>,
-	<mailto:dm-devel-request@redhat.com?subject=subscribe>
-Sender: dm-devel-bounces@redhat.com
-Errors-To: dm-devel-bounces@redhat.com
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20180907034242.zhm4dglzkldhvh3x@gondor.apana.org.au>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This patch simplifies the LRW template to recompute the LRW tweaks from
-scratch in the second pass and thus also removes the need to allocate a
-dynamic buffer using kmalloc().
+On Thu, Sep 6, 2018 at 8:42 PM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> On Thu, Sep 06, 2018 at 03:58:52PM -0700, Kees Cook wrote:
+>>
+>> @@ -437,6 +442,12 @@ static inline struct crypto_skcipher *crypto_skcipher_reqtfm_check(
+>>  {
+>>       struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+>>
+>> +     if (req->__onstack) {
+>> +             if (WARN_ON(crypto_skcipher_alg(tfm)->base.cra_flags &
+>> +                             CRYPTO_ALG_ASYNC))
+>> +                     return ERR_PTR(-EINVAL);
+>> +     }
+>
+> Sorry but I don't like imposing a run-time check on everybody when
+> stack-based requests are the odd ones out.  If we're going to make
+> this a run-time check (I'd much prefer a compile-time check, but I
+> understand that this may involve too much churn), then please do it
+> for stack-based request users only.
 
-As discussed at [1], the use of kmalloc causes deadlocks with dm-crypt.
+I'll continue to investigate alternatives, but I wanted to point out
+that the struct change actually fills an existing padding byte (so no
+change in memory usage) and marking this as an unlikely() test means
+it wouldn't even be measurable due to the branch predictor (so no
+change in speed). encrypt/decrypt entry is a tiny tiny fraction of the
+actual work done during encryption/decryption, etc.
 
-PERFORMANCE MEASUREMENTS (x86_64)
-Performed using: https://gitlab.com/omos/linux-crypto-bench
-Crypto driver used: lrw(ecb-aes-aesni)
+-Kees
 
-The results show that the new code has about the same performance as the
-old code. For 512-byte message it seems to be even slightly faster, but
-that might be just noise.
-
-Before:
-       ALGORITHM KEY (b)        DATA (B)   TIME ENC (ns)   TIME DEC (ns)
-        lrw(aes)     256              64             200             203
-        lrw(aes)     320              64             202             204
-        lrw(aes)     384              64             204             205
-        lrw(aes)     256             512             415             415
-        lrw(aes)     320             512             432             440
-        lrw(aes)     384             512             449             451
-        lrw(aes)     256            4096            1838            1995
-        lrw(aes)     320            4096            2123            1980
-        lrw(aes)     384            4096            2100            2119
-        lrw(aes)     256           16384            7183            6954
-        lrw(aes)     320           16384            7844            7631
-        lrw(aes)     384           16384            8256            8126
-        lrw(aes)     256           32768           14772           14484
-        lrw(aes)     320           32768           15281           15431
-        lrw(aes)     384           32768           16469           16293
-
-After:
-       ALGORITHM KEY (b)        DATA (B)   TIME ENC (ns)   TIME DEC (ns)
-        lrw(aes)     256              64             197             196
-        lrw(aes)     320              64             200             197
-        lrw(aes)     384              64             203             199
-        lrw(aes)     256             512             385             380
-        lrw(aes)     320             512             401             395
-        lrw(aes)     384             512             415             415
-        lrw(aes)     256            4096            1869            1846
-        lrw(aes)     320            4096            2080            1981
-        lrw(aes)     384            4096            2160            2109
-        lrw(aes)     256           16384            7077            7127
-        lrw(aes)     320           16384            7807            7766
-        lrw(aes)     384           16384            8108            8357
-        lrw(aes)     256           32768           14111           14454
-        lrw(aes)     320           32768           15268           15082
-        lrw(aes)     384           32768           16581           16250
-
-[1] https://lkml.org/lkml/2018/8/23/1315
-
-Signed-off-by: Ondrej Mosnacek <omosnace@redhat.com>
----
- crypto/lrw.c | 274 ++++++++-------------------------------------------
- 1 file changed, 42 insertions(+), 232 deletions(-)
-
-diff --git a/crypto/lrw.c b/crypto/lrw.c
-index b4f30b6f16d6..990eb0f2f51e 100644
---- a/crypto/lrw.c
-+++ b/crypto/lrw.c
-@@ -29,8 +29,6 @@
- #include <crypto/b128ops.h>
- #include <crypto/gf128mul.h>
- 
--#define LRW_BUFFER_SIZE 128u
--
- #define LRW_BLOCK_SIZE 16
- 
- struct priv {
-@@ -56,19 +54,7 @@ struct priv {
- };
- 
- struct rctx {
--	be128 buf[LRW_BUFFER_SIZE / sizeof(be128)];
--
--	be128 t;
--
--	be128 *ext;
--
--	struct scatterlist srcbuf[2];
--	struct scatterlist dstbuf[2];
--	struct scatterlist *src;
--	struct scatterlist *dst;
--
--	unsigned int left;
--
-+	be128 t, orig_iv;
- 	struct skcipher_request subreq;
- };
- 
-@@ -135,85 +121,26 @@ static int next_index(u32 *counter)
- 	return res;
- }
- 
--static int post_crypt(struct skcipher_request *req)
-+/*
-+ * We compute the tweak masks twice (both before and after the ECB encryption or
-+ * decryption) to avoid having to allocate a temporary buffer and/or make
-+ * mutliple calls to the 'ecb(..)' instance, which usually would be slower than
-+ * just doing the gf128mul_x_ble() calls again.
-+ */
-+static int xor_tweak(struct skcipher_request *req, struct skcipher_request *subreq)
- {
--	struct rctx *rctx = skcipher_request_ctx(req);
--	be128 *buf = rctx->ext ?: rctx->buf;
--	struct skcipher_request *subreq;
- 	const int bs = LRW_BLOCK_SIZE;
--	struct skcipher_walk w;
--	struct scatterlist *sg;
--	unsigned offset;
--	int err;
--
--	subreq = &rctx->subreq;
--	err = skcipher_walk_virt(&w, subreq, false);
--
--	while (w.nbytes) {
--		unsigned int avail = w.nbytes;
--		be128 *wdst;
--
--		wdst = w.dst.virt.addr;
--
--		do {
--			be128_xor(wdst, buf++, wdst);
--			wdst++;
--		} while ((avail -= bs) >= bs);
--
--		err = skcipher_walk_done(&w, avail);
--	}
--
--	rctx->left -= subreq->cryptlen;
--
--	if (err || !rctx->left)
--		goto out;
--
--	rctx->dst = rctx->dstbuf;
--
--	scatterwalk_done(&w.out, 0, 1);
--	sg = w.out.sg;
--	offset = w.out.offset;
--
--	if (rctx->dst != sg) {
--		rctx->dst[0] = *sg;
--		sg_unmark_end(rctx->dst);
--		scatterwalk_crypto_chain(rctx->dst, sg_next(sg), 2);
--	}
--	rctx->dst[0].length -= offset - sg->offset;
--	rctx->dst[0].offset = offset;
--
--out:
--	return err;
--}
--
--static int pre_crypt(struct skcipher_request *req)
--{
- 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
--	struct rctx *rctx = skcipher_request_ctx(req);
- 	struct priv *ctx = crypto_skcipher_ctx(tfm);
--	be128 *buf = rctx->ext ?: rctx->buf;
--	struct skcipher_request *subreq;
--	const int bs = LRW_BLOCK_SIZE;
-+	struct rctx *rctx = skcipher_request_ctx(req);
-+	be128 t = rctx->t;
- 	struct skcipher_walk w;
--	struct scatterlist *sg;
--	unsigned cryptlen;
--	unsigned offset;
--	bool more;
- 	__u32 *iv;
- 	u32 counter[4];
- 	int err;
- 
--	subreq = &rctx->subreq;
- 	skcipher_request_set_tfm(subreq, tfm);
- 
--	cryptlen = subreq->cryptlen;
--	more = rctx->left > cryptlen;
--	if (!more)
--		cryptlen = rctx->left;
--
--	skcipher_request_set_crypt(subreq, rctx->src, rctx->dst,
--				   cryptlen, req->iv);
--
- 	err = skcipher_walk_virt(&w, subreq, false);
- 	iv = w.iv;
- 
-@@ -231,13 +158,11 @@ static int pre_crypt(struct skcipher_request *req)
- 		wdst = w.dst.virt.addr;
- 
- 		do {
--			*buf++ = rctx->t;
--			be128_xor(wdst++, &rctx->t, wsrc++);
-+			be128_xor(wdst++, &t, wsrc++);
- 
- 			/* T <- I*Key2, using the optimization
- 			 * discussed in the specification */
--			be128_xor(&rctx->t, &rctx->t,
--				  &ctx->mulinc[next_index(counter)]);
-+			be128_xor(&t, &t, &ctx->mulinc[next_index(counter)]);
- 		} while ((avail -= bs) >= bs);
- 
- 		if (w.nbytes == w.total) {
-@@ -250,175 +175,60 @@ static int pre_crypt(struct skcipher_request *req)
- 		err = skcipher_walk_done(&w, avail);
- 	}
- 
--	skcipher_request_set_tfm(subreq, ctx->child);
--	skcipher_request_set_crypt(subreq, rctx->dst, rctx->dst,
--				   cryptlen, NULL);
--
--	if (err || !more)
--		goto out;
--
--	rctx->src = rctx->srcbuf;
--
--	scatterwalk_done(&w.in, 0, 1);
--	sg = w.in.sg;
--	offset = w.in.offset;
--
--	if (rctx->src != sg) {
--		rctx->src[0] = *sg;
--		sg_unmark_end(rctx->src);
--		scatterwalk_crypto_chain(rctx->src, sg_next(sg), 2);
--	}
--	rctx->src[0].length -= offset - sg->offset;
--	rctx->src[0].offset = offset;
--
--out:
- 	return err;
- }
- 
--static int init_crypt(struct skcipher_request *req, crypto_completion_t done)
--{
--	struct priv *ctx = crypto_skcipher_ctx(crypto_skcipher_reqtfm(req));
--	struct rctx *rctx = skcipher_request_ctx(req);
--	struct skcipher_request *subreq;
--	gfp_t gfp;
--
--	subreq = &rctx->subreq;
--	skcipher_request_set_callback(subreq, req->base.flags, done, req);
--
--	gfp = req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP ? GFP_KERNEL :
--							   GFP_ATOMIC;
--	rctx->ext = NULL;
--
--	subreq->cryptlen = LRW_BUFFER_SIZE;
--	if (req->cryptlen > LRW_BUFFER_SIZE) {
--		unsigned int n = min(req->cryptlen, (unsigned int)PAGE_SIZE);
--
--		rctx->ext = kmalloc(n, gfp);
--		if (rctx->ext)
--			subreq->cryptlen = n;
--	}
--
--	rctx->src = req->src;
--	rctx->dst = req->dst;
--	rctx->left = req->cryptlen;
--
--	/* calculate first value of T */
--	memcpy(&rctx->t, req->iv, sizeof(rctx->t));
--
--	/* T <- I*Key2 */
--	gf128mul_64k_bbe(&rctx->t, ctx->table);
--
--	return 0;
--}
--
--static void exit_crypt(struct skcipher_request *req)
-+static void crypt_done(struct crypto_async_request *areq, int err)
- {
-+	struct skcipher_request *req = areq->data;
- 	struct rctx *rctx = skcipher_request_ctx(req);
-+	struct skcipher_request *subreq = &rctx->subreq;
- 
--	rctx->left = 0;
-+	if (!err)
-+		err = xor_tweak(req, subreq);
- 
--	if (rctx->ext)
--		kzfree(rctx->ext);
-+	skcipher_request_complete(req, err);
- }
- 
--static int do_encrypt(struct skcipher_request *req, int err)
-+static void init_crypt(struct skcipher_request *req)
- {
-+	struct priv *ctx = crypto_skcipher_ctx(crypto_skcipher_reqtfm(req));
- 	struct rctx *rctx = skcipher_request_ctx(req);
--	struct skcipher_request *subreq;
-+	struct skcipher_request *subreq = &rctx->subreq;
- 
--	subreq = &rctx->subreq;
--
--	while (!err && rctx->left) {
--		err = pre_crypt(req) ?:
--		      crypto_skcipher_encrypt(subreq) ?:
--		      post_crypt(req);
--
--		if (err == -EINPROGRESS || err == -EBUSY)
--			return err;
--	}
--
--	exit_crypt(req);
--	return err;
--}
--
--static void encrypt_done(struct crypto_async_request *areq, int err)
--{
--	struct skcipher_request *req = areq->data;
--	struct skcipher_request *subreq;
--	struct rctx *rctx;
--
--	rctx = skcipher_request_ctx(req);
--
--	if (err == -EINPROGRESS) {
--		if (rctx->left != req->cryptlen)
--			return;
--		goto out;
--	}
--
--	subreq = &rctx->subreq;
--	subreq->base.flags &= CRYPTO_TFM_REQ_MAY_BACKLOG;
-+	skcipher_request_set_tfm(subreq, ctx->child);
-+	skcipher_request_set_callback(subreq, req->base.flags, crypt_done, req);
-+	skcipher_request_set_crypt(subreq, req->dst, req->dst,
-+				   req->cryptlen, &rctx->orig_iv);
- 
--	err = do_encrypt(req, err ?: post_crypt(req));
--	if (rctx->left)
--		return;
-+	/* calculate first value of T */
-+	memcpy(&rctx->orig_iv, req->iv, sizeof(rctx->t));
-+	rctx->t = rctx->orig_iv;
- 
--out:
--	skcipher_request_complete(req, err);
-+	/* T <- I*Key2 */
-+	gf128mul_64k_bbe(&rctx->t, ctx->table);
- }
- 
- static int encrypt(struct skcipher_request *req)
--{
--	return do_encrypt(req, init_crypt(req, encrypt_done));
--}
--
--static int do_decrypt(struct skcipher_request *req, int err)
- {
- 	struct rctx *rctx = skcipher_request_ctx(req);
--	struct skcipher_request *subreq;
--
--	subreq = &rctx->subreq;
-+	struct skcipher_request *subreq = &rctx->subreq;
- 
--	while (!err && rctx->left) {
--		err = pre_crypt(req) ?:
--		      crypto_skcipher_decrypt(subreq) ?:
--		      post_crypt(req);
--
--		if (err == -EINPROGRESS || err == -EBUSY)
--			return err;
--	}
--
--	exit_crypt(req);
--	return err;
--}
--
--static void decrypt_done(struct crypto_async_request *areq, int err)
--{
--	struct skcipher_request *req = areq->data;
--	struct skcipher_request *subreq;
--	struct rctx *rctx;
--
--	rctx = skcipher_request_ctx(req);
--
--	if (err == -EINPROGRESS) {
--		if (rctx->left != req->cryptlen)
--			return;
--		goto out;
--	}
--
--	subreq = &rctx->subreq;
--	subreq->base.flags &= CRYPTO_TFM_REQ_MAY_BACKLOG;
--
--	err = do_decrypt(req, err ?: post_crypt(req));
--	if (rctx->left)
--		return;
--
--out:
--	skcipher_request_complete(req, err);
-+	init_crypt(req);
-+	return xor_tweak(req, req) ?:
-+		crypto_skcipher_encrypt(subreq) ?:
-+		xor_tweak(req, subreq);
- }
- 
- static int decrypt(struct skcipher_request *req)
- {
--	return do_decrypt(req, init_crypt(req, decrypt_done));
-+	struct rctx *rctx = skcipher_request_ctx(req);
-+	struct skcipher_request *subreq = &rctx->subreq;
-+
-+	init_crypt(req);
-+	return xor_tweak(req, req) ?:
-+		crypto_skcipher_decrypt(subreq) ?:
-+		xor_tweak(req, subreq);
- }
- 
- static int init_tfm(struct crypto_skcipher *tfm)
 -- 
-2.17.1
+Kees Cook
+Pixel Security
