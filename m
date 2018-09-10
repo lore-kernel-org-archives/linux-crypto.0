@@ -1,65 +1,34 @@
-From: Li Yang <leoyang.li@nxp.com>
-Subject: Re: [PATCH 04/11] soc: fsl: dpio: add congestion notification support
-Date: Mon, 10 Sep 2018 15:11:48 -0500
-Message-ID: <CADRPPNQ=sw-3=LO5SmUnhQnixNUUDgTz6oCweORtbyahNLizUg@mail.gmail.com>
-References: <20180910171550.5659-1-horia.geanta@nxp.com> <20180910171550.5659-5-horia.geanta@nxp.com>
+From: "Theodore Y. Ts'o" <tytso@mit.edu>
+Subject: Re: rng_dev_read: Kernel memory exposure attempt detected from SLUB
+ object 'kmalloc-64'
+Date: Mon, 10 Sep 2018 16:42:19 -0400
+Message-ID: <20180910204219.GG16557@thunk.org>
+References: <alpine.LRH.2.21.1809102006280.8926@math.ut.ee>
+ <20180910195342.GD16557@thunk.org>
+ <CAKv+Gu-GUdYgy=cJnD5-HB3c2vxv53YbzY10CATocqP2DQrAwg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        Stuart Yoder <stuyoder@gmail.com>,
-        Laurentiu Tudor <laurentiu.tudor@nxp.com>,
-        Roy Pledge <roy.pledge@nxp.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will.deacon@arm.com>,
-        David Miller <davem@davemloft.net>, aymen.sghaier@nxp.com,
-        linux-crypto@vger.kernel.org,
-        "moderated list:ARM/FREESCALE IMX / MXC ARM ARCHITECTURE"
-        <linux-arm-kernel@lists.infradead.org>,
-        lkml <linux-kernel@vger.kernel.org>
-To: Horia Geanta <horia.geanta@nxp.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: Meelis Roos <mroos@linux.ee>,
+        Linux Kernel list <linux-kernel@vger.kernel.org>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180910171550.5659-5-horia.geanta@nxp.com>
+Content-Disposition: inline
+In-Reply-To: <CAKv+Gu-GUdYgy=cJnD5-HB3c2vxv53YbzY10CATocqP2DQrAwg@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Sep 10, 2018 at 12:19 PM Horia Geantă <horia.geanta@nxp.com> wrote:
->
-> Add support for Congestion State Change Notifications (CSCN), which
-> allow DPIO users to be notified when a congestion group changes its
-> state (due to hitting the entrance / exit threshold).
->
-> Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
+On Mon, Sep 10, 2018 at 10:02:38PM +0200, Ard Biesheuvel wrote:
+> >> [146535.257274] tpm tpm0: A TPM error (379) occurred attempting get random
+> >> [146535.257304] usercopy: Kernel memory exposure attempt detected from SLUB object 'kmalloc-64' (offset 0, size 379)!
+> 
+> The TPM return code '379' is returned from rng_get_data(), and
+> interpreted as a byte count rather than an error code.
 
-Acked-by: Li Yang <leoyang.li@nxp.com>
-> ---
->  include/soc/fsl/dpaa2-global.h | 15 +++++++++++++++
->  1 file changed, 15 insertions(+)
->
-> diff --git a/include/soc/fsl/dpaa2-global.h b/include/soc/fsl/dpaa2-global.h
-> index 9bc0713346a8..2bfc379d3dc9 100644
-> --- a/include/soc/fsl/dpaa2-global.h
-> +++ b/include/soc/fsl/dpaa2-global.h
-> @@ -174,4 +174,19 @@ static inline const struct dpaa2_fd *dpaa2_dq_fd(const struct dpaa2_dq *dq)
->         return (const struct dpaa2_fd *)&dq->dq.fd[0];
->  }
->
-> +#define DPAA2_CSCN_SIZE                sizeof(struct dpaa2_dq)
-> +#define DPAA2_CSCN_ALIGN       16
-> +#define DPAA2_CSCN_STATE_CG    BIT(0)
-> +
-> +/**
-> + * dpaa2_cscn_state_congested() - Check congestion state
-> + * @cscn: congestion SCN (delivered to WQ or memory)
-> + *
-> +i * Return true is congested.
-> + */
-> +static inline bool dpaa2_cscn_state_congested(struct dpaa2_dq *cscn)
-> +{
-> +       return !!(cscn->scn.state & DPAA2_CSCN_STATE_CG);
-> +}
-> +
->  #endif /* __FSL_DPAA2_GLOBAL_H */
-> --
-> 2.16.2
->
+So there are two bugs here.  Once is in the TPM hw_random driver; it
+shouldn't be returning the TPM error code.  The second is that
+rng_dev_read() should be more suspicious and validate the number of
+bytes returned from the low-level hw_random driver for sanity.
+
+      	       	    		  	    - Ted
