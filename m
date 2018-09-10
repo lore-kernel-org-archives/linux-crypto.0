@@ -1,78 +1,49 @@
-From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
-Subject: [PATCH 01/11] bus: fsl-mc: add support for dpseci device type
-Date: Mon, 10 Sep 2018 20:15:40 +0300
-Message-ID: <20180910171550.5659-2-horia.geanta@nxp.com>
-References: <20180910171550.5659-1-horia.geanta@nxp.com>
+From: Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: [PATCH crypto-2.6] crypto: ccp: add timeout support in the SEV
+ command
+Date: Mon, 10 Sep 2018 14:06:57 -0500
+Message-ID: <e327fa7f-2d4d-2181-c3f4-607faf16c9b5@amd.com>
+References: <1534367485-4386-1-git-send-email-brijesh.singh@amd.com>
+ <1534367485-4386-2-git-send-email-brijesh.singh@amd.com>
+ <20180904081151.GC32615@zn.tnic>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Cc: "David S . Miller" <davem@davemloft.net>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: brijesh.singh@amd.com, linux-crypto@vger.kernel.org,
+        thomas.lendacky@amd.com, Gary Hook <Gary.Hook@amd.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
         linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        Stuart Yoder <stuyoder@gmail.com>,
-        Laurentiu Tudor <laurentiu.tudor@nxp.com>,
-        Li Yang <leoyang.li@nxp.com>, Roy Pledge <roy.pledge@nxp.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will.deacon@arm.com>
+To: Borislav Petkov <bp@alien8.de>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180910171550.5659-1-horia.geanta@nxp.com>
+In-Reply-To: <20180904081151.GC32615@zn.tnic>
+Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
----
- drivers/bus/fsl-mc/fsl-mc-bus.c | 5 +++++
- include/linux/fsl/mc.h          | 6 ++++++
- 2 files changed, 11 insertions(+)
+Hi Boris,
 
-diff --git a/drivers/bus/fsl-mc/fsl-mc-bus.c b/drivers/bus/fsl-mc/fsl-mc-bus.c
-index 5d8266c6571f..4552b06fe601 100644
---- a/drivers/bus/fsl-mc/fsl-mc-bus.c
-+++ b/drivers/bus/fsl-mc/fsl-mc-bus.c
-@@ -188,6 +188,10 @@ struct device_type fsl_mc_bus_dprtc_type = {
- 	.name = "fsl_mc_bus_dprtc"
- };
- 
-+struct device_type fsl_mc_bus_dpseci_type = {
-+	.name = "fsl_mc_bus_dpseci"
-+};
-+
- static struct device_type *fsl_mc_get_device_type(const char *type)
- {
- 	static const struct {
-@@ -203,6 +207,7 @@ static struct device_type *fsl_mc_get_device_type(const char *type)
- 		{ &fsl_mc_bus_dpmcp_type, "dpmcp" },
- 		{ &fsl_mc_bus_dpmac_type, "dpmac" },
- 		{ &fsl_mc_bus_dprtc_type, "dprtc" },
-+		{ &fsl_mc_bus_dpseci_type, "dpseci" },
- 		{ NULL, NULL }
- 	};
- 	int i;
-diff --git a/include/linux/fsl/mc.h b/include/linux/fsl/mc.h
-index f27cb14088a4..5160f06ffbac 100644
---- a/include/linux/fsl/mc.h
-+++ b/include/linux/fsl/mc.h
-@@ -405,6 +405,7 @@ extern struct device_type fsl_mc_bus_dpcon_type;
- extern struct device_type fsl_mc_bus_dpmcp_type;
- extern struct device_type fsl_mc_bus_dpmac_type;
- extern struct device_type fsl_mc_bus_dprtc_type;
-+extern struct device_type fsl_mc_bus_dpseci_type;
- 
- static inline bool is_fsl_mc_bus_dprc(const struct fsl_mc_device *mc_dev)
- {
-@@ -451,6 +452,11 @@ static inline bool is_fsl_mc_bus_dprtc(const struct fsl_mc_device *mc_dev)
- 	return mc_dev->dev.type == &fsl_mc_bus_dprtc_type;
- }
- 
-+static inline bool is_fsl_mc_bus_dpseci(const struct fsl_mc_device *mc_dev)
-+{
-+	return mc_dev->dev.type == &fsl_mc_bus_dpseci_type;
-+}
-+
- /*
-  * Data Path Buffer Pool (DPBP) API
-  * Contains initialization APIs and runtime control APIs for DPBP
--- 
-2.16.2
+
+On 09/04/2018 03:11 AM, Borislav Petkov wrote:
+...
+
+>> +
+>> +static int psp_probe_timeout = 5;
+>> +module_param(psp_probe_timeout, int, 0644);
+>> +MODULE_PARM_DESC(psp_probe_timeout, " default timeout value, in seconds, during PSP device probe");
+> 
+> Just a question: what prevents the user from supplying non-sensical
+> values here?
+> 
+> I think we should clamp them to only allowed values because I don't want
+> to be debugging some strange bugs due to that.
+> 
+
+Nothing prevent user from supplying a bogus number. The main question
+is, clamp with what number ?
+
+IMO, if user is overriding the default timeout number then its possible
+that user is dealing with a buggy firmware which does not work with
+default timeout and silently clamping the value will not help them.
+
+
+- Brijesh
