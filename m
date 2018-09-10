@@ -1,7 +1,7 @@
 From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
-Subject: [PATCH 09/11] crypto: caam - export ahash shared descriptor generation
-Date: Mon, 10 Sep 2018 20:15:48 +0300
-Message-ID: <20180910171550.5659-10-horia.geanta@nxp.com>
+Subject: [PATCH 03/11] soc: fsl: dpio: add frame list format support
+Date: Mon, 10 Sep 2018 20:15:42 +0300
+Message-ID: <20180910171550.5659-4-horia.geanta@nxp.com>
 References: <20180910171550.5659-1-horia.geanta@nxp.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -21,287 +21,277 @@ In-Reply-To: <20180910171550.5659-1-horia.geanta@nxp.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-caam/qi2 driver will support ahash algorithms,
-thus move ahash descriptors generation in a shared location.
+Add support for dpaa2_fd_list format, i.e. dpaa2_fl_entry structure
+and accessors.
+
+Frame list entries (FLEs) are similar, but not identical to FDs:
++ "F" (final) bit
+- FMT[b'01] is reserved
+- DD, SC, DROPP bits (covered by "FD compatibility" field in FLE case)
+- FLC[5:0] not used for stashing
 
 Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
 ---
- drivers/crypto/caam/Kconfig         |  3 ++
- drivers/crypto/caam/Makefile        |  1 +
- drivers/crypto/caam/caamhash.c      | 79 +++++-------------------------------
- drivers/crypto/caam/caamhash_desc.c | 80 +++++++++++++++++++++++++++++++++++++
- drivers/crypto/caam/caamhash_desc.h | 21 ++++++++++
- 5 files changed, 114 insertions(+), 70 deletions(-)
- create mode 100644 drivers/crypto/caam/caamhash_desc.c
- create mode 100644 drivers/crypto/caam/caamhash_desc.h
+ include/soc/fsl/dpaa2-fd.h | 242 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 242 insertions(+)
 
-diff --git a/drivers/crypto/caam/Kconfig b/drivers/crypto/caam/Kconfig
-index 8d162cb34591..03c1db0239ae 100644
---- a/drivers/crypto/caam/Kconfig
-+++ b/drivers/crypto/caam/Kconfig
-@@ -172,3 +172,6 @@ config CRYPTO_DEV_FSL_CAAM_CRYPTO_API_DESC
- 	def_tristate (CRYPTO_DEV_FSL_CAAM_CRYPTO_API || \
- 		      CRYPTO_DEV_FSL_CAAM_CRYPTO_API_QI || \
- 		      CRYPTO_DEV_FSL_DPAA2_CAAM)
-+
-+config CRYPTO_DEV_FSL_CAAM_AHASH_API_DESC
-+	def_tristate (CRYPTO_DEV_FSL_CAAM_AHASH_API)
-diff --git a/drivers/crypto/caam/Makefile b/drivers/crypto/caam/Makefile
-index fd507bab1828..7bbfd06a11ff 100644
---- a/drivers/crypto/caam/Makefile
-+++ b/drivers/crypto/caam/Makefile
-@@ -15,6 +15,7 @@ obj-$(CONFIG_CRYPTO_DEV_FSL_CAAM_CRYPTO_API) += caamalg.o
- obj-$(CONFIG_CRYPTO_DEV_FSL_CAAM_CRYPTO_API_QI) += caamalg_qi.o
- obj-$(CONFIG_CRYPTO_DEV_FSL_CAAM_CRYPTO_API_DESC) += caamalg_desc.o
- obj-$(CONFIG_CRYPTO_DEV_FSL_CAAM_AHASH_API) += caamhash.o
-+obj-$(CONFIG_CRYPTO_DEV_FSL_CAAM_AHASH_API_DESC) += caamhash_desc.o
- obj-$(CONFIG_CRYPTO_DEV_FSL_CAAM_RNG_API) += caamrng.o
- obj-$(CONFIG_CRYPTO_DEV_FSL_CAAM_PKC_API) += caam_pkc.o
+diff --git a/include/soc/fsl/dpaa2-fd.h b/include/soc/fsl/dpaa2-fd.h
+index 2576abaa7779..2bbd0e8c9f0c 100644
+--- a/include/soc/fsl/dpaa2-fd.h
++++ b/include/soc/fsl/dpaa2-fd.h
+@@ -66,6 +66,15 @@ struct dpaa2_fd {
+ #define SG_BPID_MASK		0x3FFF
+ #define SG_FINAL_FLAG_MASK	0x1
+ #define SG_FINAL_FLAG_SHIFT	15
++#define FL_SHORT_LEN_FLAG_MASK	0x1
++#define FL_SHORT_LEN_FLAG_SHIFT	14
++#define FL_SHORT_LEN_MASK	0x3FFFF
++#define FL_OFFSET_MASK		0x0FFF
++#define FL_FORMAT_MASK		0x3
++#define FL_FORMAT_SHIFT		12
++#define FL_BPID_MASK		0x3FFF
++#define FL_FINAL_FLAG_MASK	0x1
++#define FL_FINAL_FLAG_SHIFT	15
  
-diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
-index 43975ab5f09c..4c30bb5516d6 100644
---- a/drivers/crypto/caam/caamhash.c
-+++ b/drivers/crypto/caam/caamhash.c
-@@ -62,6 +62,7 @@
- #include "error.h"
- #include "sg_sw_sec4.h"
- #include "key_gen.h"
-+#include "caamhash_desc.h"
- 
- #define CAAM_CRA_PRIORITY		3000
- 
-@@ -71,14 +72,6 @@
- #define CAAM_MAX_HASH_BLOCK_SIZE	SHA512_BLOCK_SIZE
- #define CAAM_MAX_HASH_DIGEST_SIZE	SHA512_DIGEST_SIZE
- 
--/* length of descriptors text */
--#define DESC_AHASH_BASE			(3 * CAAM_CMD_SZ)
--#define DESC_AHASH_UPDATE_LEN		(6 * CAAM_CMD_SZ)
--#define DESC_AHASH_UPDATE_FIRST_LEN	(DESC_AHASH_BASE + 4 * CAAM_CMD_SZ)
--#define DESC_AHASH_FINAL_LEN		(DESC_AHASH_BASE + 5 * CAAM_CMD_SZ)
--#define DESC_AHASH_FINUP_LEN		(DESC_AHASH_BASE + 5 * CAAM_CMD_SZ)
--#define DESC_AHASH_DIGEST_LEN		(DESC_AHASH_BASE + 4 * CAAM_CMD_SZ)
--
- #define DESC_HASH_MAX_USED_BYTES	(DESC_AHASH_FINAL_LEN + \
- 					 CAAM_MAX_HASH_KEY_SIZE)
- #define DESC_HASH_MAX_USED_LEN		(DESC_HASH_MAX_USED_BYTES / CAAM_CMD_SZ)
-@@ -235,60 +228,6 @@ static inline int ctx_map_to_sec4_sg(struct device *jrdev,
- 	return 0;
+ /* Error bits in FD CTRL */
+ #define FD_CTRL_ERR_MASK	0x000000FF
+@@ -435,4 +444,237 @@ static inline void dpaa2_sg_set_final(struct dpaa2_sg_entry *sg, bool final)
+ 	sg->format_offset |= cpu_to_le16(final << SG_FINAL_FLAG_SHIFT);
  }
  
--/*
-- * For ahash update, final and finup (import_ctx = true)
-- *     import context, read and write to seqout
-- * For ahash firsts and digest (import_ctx = false)
-- *     read and write to seqout
-- */
--static inline void ahash_gen_sh_desc(u32 *desc, u32 state, int digestsize,
--				     struct caam_hash_ctx *ctx, bool import_ctx,
--				     int era)
--{
--	u32 op = ctx->adata.algtype;
--	u32 *skip_key_load;
--
--	init_sh_desc(desc, HDR_SHARE_SERIAL);
--
--	/* Append key if it has been set; ahash update excluded */
--	if ((state != OP_ALG_AS_UPDATE) && (ctx->adata.keylen)) {
--		/* Skip key loading if already shared */
--		skip_key_load = append_jump(desc, JUMP_JSL | JUMP_TEST_ALL |
--					    JUMP_COND_SHRD);
--
--		if (era < 6)
--			append_key_as_imm(desc, ctx->key, ctx->adata.keylen_pad,
--					  ctx->adata.keylen, CLASS_2 |
--					  KEY_DEST_MDHA_SPLIT | KEY_ENC);
--		else
--			append_proto_dkp(desc, &ctx->adata);
--
--		set_jump_tgt_here(desc, skip_key_load);
--
--		op |= OP_ALG_AAI_HMAC_PRECOMP;
--	}
--
--	/* If needed, import context from software */
--	if (import_ctx)
--		append_seq_load(desc, ctx->ctx_len, LDST_CLASS_2_CCB |
--				LDST_SRCDST_BYTE_CONTEXT);
--
--	/* Class 2 operation */
--	append_operation(desc, op | state | OP_ALG_ENCRYPT);
--
--	/*
--	 * Load from buf and/or src and write to req->result or state->context
--	 * Calculate remaining bytes to read
--	 */
--	append_math_add(desc, VARSEQINLEN, SEQINLEN, REG0, CAAM_CMD_SZ);
--	/* Read remaining bytes */
--	append_seq_fifo_load(desc, 0, FIFOLD_CLASS_CLASS2 | FIFOLD_TYPE_LAST2 |
--			     FIFOLD_TYPE_MSG | KEY_VLF);
--	/* Store class2 context bytes */
--	append_seq_store(desc, digestsize, LDST_CLASS_2_CCB |
--			 LDST_SRCDST_BYTE_CONTEXT);
--}
--
- static int ahash_set_sh_desc(struct crypto_ahash *ahash)
- {
- 	struct caam_hash_ctx *ctx = crypto_ahash_ctx(ahash);
-@@ -301,8 +240,8 @@ static int ahash_set_sh_desc(struct crypto_ahash *ahash)
- 
- 	/* ahash_update shared descriptor */
- 	desc = ctx->sh_desc_update;
--	ahash_gen_sh_desc(desc, OP_ALG_AS_UPDATE, ctx->ctx_len, ctx, true,
--			  ctrlpriv->era);
-+	cnstr_shdsc_ahash(desc, &ctx->adata, OP_ALG_AS_UPDATE, ctx->ctx_len,
-+			  ctx->ctx_len, true, ctrlpriv->era);
- 	dma_sync_single_for_device(jrdev, ctx->sh_desc_update_dma,
- 				   desc_bytes(desc), ctx->dir);
- #ifdef DEBUG
-@@ -313,8 +252,8 @@ static int ahash_set_sh_desc(struct crypto_ahash *ahash)
- 
- 	/* ahash_update_first shared descriptor */
- 	desc = ctx->sh_desc_update_first;
--	ahash_gen_sh_desc(desc, OP_ALG_AS_INIT, ctx->ctx_len, ctx, false,
--			  ctrlpriv->era);
-+	cnstr_shdsc_ahash(desc, &ctx->adata, OP_ALG_AS_INIT, ctx->ctx_len,
-+			  ctx->ctx_len, false, ctrlpriv->era);
- 	dma_sync_single_for_device(jrdev, ctx->sh_desc_update_first_dma,
- 				   desc_bytes(desc), ctx->dir);
- #ifdef DEBUG
-@@ -325,8 +264,8 @@ static int ahash_set_sh_desc(struct crypto_ahash *ahash)
- 
- 	/* ahash_final shared descriptor */
- 	desc = ctx->sh_desc_fin;
--	ahash_gen_sh_desc(desc, OP_ALG_AS_FINALIZE, digestsize, ctx, true,
--			  ctrlpriv->era);
-+	cnstr_shdsc_ahash(desc, &ctx->adata, OP_ALG_AS_FINALIZE, digestsize,
-+			  ctx->ctx_len, true, ctrlpriv->era);
- 	dma_sync_single_for_device(jrdev, ctx->sh_desc_fin_dma,
- 				   desc_bytes(desc), ctx->dir);
- #ifdef DEBUG
-@@ -337,8 +276,8 @@ static int ahash_set_sh_desc(struct crypto_ahash *ahash)
- 
- 	/* ahash_digest shared descriptor */
- 	desc = ctx->sh_desc_digest;
--	ahash_gen_sh_desc(desc, OP_ALG_AS_INITFINAL, digestsize, ctx, false,
--			  ctrlpriv->era);
-+	cnstr_shdsc_ahash(desc, &ctx->adata, OP_ALG_AS_INITFINAL, digestsize,
-+			  ctx->ctx_len, false, ctrlpriv->era);
- 	dma_sync_single_for_device(jrdev, ctx->sh_desc_digest_dma,
- 				   desc_bytes(desc), ctx->dir);
- #ifdef DEBUG
-diff --git a/drivers/crypto/caam/caamhash_desc.c b/drivers/crypto/caam/caamhash_desc.c
-new file mode 100644
-index 000000000000..a12f7959a2c3
---- /dev/null
-+++ b/drivers/crypto/caam/caamhash_desc.c
-@@ -0,0 +1,80 @@
-+// SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
-+/*
-+ * Shared descriptors for ahash algorithms
-+ *
-+ * Copyright 2017 NXP
++/**
++ * struct dpaa2_fl_entry - structure for frame list entry.
++ * @addr:          address in the FLE
++ * @len:           length in the FLE
++ * @bpid:          buffer pool ID
++ * @format_offset: format, offset, and short-length fields
++ * @frc:           frame context
++ * @ctrl:          control bits...including pta, pvt1, pvt2, err, etc
++ * @flc:           flow context address
 + */
++struct dpaa2_fl_entry {
++	__le64 addr;
++	__le32 len;
++	__le16 bpid;
++	__le16 format_offset;
++	__le32 frc;
++	__le32 ctrl;
++	__le64 flc;
++};
 +
-+#include "compat.h"
-+#include "desc_constr.h"
-+#include "caamhash_desc.h"
++enum dpaa2_fl_format {
++	dpaa2_fl_single = 0,
++	dpaa2_fl_res,
++	dpaa2_fl_sg
++};
 +
 +/**
-+ * cnstr_shdsc_ahash - ahash shared descriptor
-+ * @desc: pointer to buffer used for descriptor construction
-+ * @adata: pointer to authentication transform definitions.
-+ *         A split key is required for SEC Era < 6; the size of the split key
-+ *         is specified in this case.
-+ *         Valid algorithm values - one of OP_ALG_ALGSEL_{MD5, SHA1, SHA224,
-+ *         SHA256, SHA384, SHA512}.
-+ * @state: algorithm state OP_ALG_AS_{INIT, FINALIZE, INITFINALIZE, UPDATE}
-+ * @digestsize: algorithm's digest size
-+ * @ctx_len: size of Context Register
-+ * @import_ctx: true if previous Context Register needs to be restored
-+ *              must be true for ahash update and final
-+ *              must be false for for ahash first and digest
-+ * @era: SEC Era
-+ */
-+void cnstr_shdsc_ahash(u32 * const desc, struct alginfo *adata, u32 state,
-+		       int digestsize, int ctx_len, bool import_ctx, int era)
-+{
-+	u32 op = adata->algtype;
-+
-+	init_sh_desc(desc, HDR_SHARE_SERIAL);
-+
-+	/* Append key if it has been set; ahash update excluded */
-+	if (state != OP_ALG_AS_UPDATE && adata->keylen) {
-+		u32 *skip_key_load;
-+
-+		/* Skip key loading if already shared */
-+		skip_key_load = append_jump(desc, JUMP_JSL | JUMP_TEST_ALL |
-+					    JUMP_COND_SHRD);
-+
-+		if (era < 6)
-+			append_key_as_imm(desc, adata->key_virt,
-+					  adata->keylen_pad,
-+					  adata->keylen, CLASS_2 |
-+					  KEY_DEST_MDHA_SPLIT | KEY_ENC);
-+		else
-+			append_proto_dkp(desc, adata);
-+
-+		set_jump_tgt_here(desc, skip_key_load);
-+
-+		op |= OP_ALG_AAI_HMAC_PRECOMP;
-+	}
-+
-+	/* If needed, import context from software */
-+	if (import_ctx)
-+		append_seq_load(desc, ctx_len, LDST_CLASS_2_CCB |
-+				LDST_SRCDST_BYTE_CONTEXT);
-+
-+	/* Class 2 operation */
-+	append_operation(desc, op | state | OP_ALG_ENCRYPT);
-+
-+	/*
-+	 * Load from buf and/or src and write to req->result or state->context
-+	 * Calculate remaining bytes to read
-+	 */
-+	append_math_add(desc, VARSEQINLEN, SEQINLEN, REG0, CAAM_CMD_SZ);
-+	/* Read remaining bytes */
-+	append_seq_fifo_load(desc, 0, FIFOLD_CLASS_CLASS2 | FIFOLD_TYPE_LAST2 |
-+			     FIFOLD_TYPE_MSG | KEY_VLF);
-+	/* Store class2 context bytes */
-+	append_seq_store(desc, digestsize, LDST_CLASS_2_CCB |
-+			 LDST_SRCDST_BYTE_CONTEXT);
-+}
-+EXPORT_SYMBOL(cnstr_shdsc_ahash);
-+
-+MODULE_LICENSE("Dual BSD/GPL");
-+MODULE_DESCRIPTION("FSL CAAM ahash descriptors support");
-+MODULE_AUTHOR("NXP Semiconductors");
-diff --git a/drivers/crypto/caam/caamhash_desc.h b/drivers/crypto/caam/caamhash_desc.h
-new file mode 100644
-index 000000000000..631fc1ac312c
---- /dev/null
-+++ b/drivers/crypto/caam/caamhash_desc.h
-@@ -0,0 +1,21 @@
-+/* SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause) */
-+/*
-+ * Shared descriptors for ahash algorithms
++ * dpaa2_fl_get_addr() - get the addr field of FLE
++ * @fle: the given frame list entry
 + *
-+ * Copyright 2017 NXP
++ * Return the address in the frame list entry.
 + */
++static inline dma_addr_t dpaa2_fl_get_addr(const struct dpaa2_fl_entry *fle)
++{
++	return (dma_addr_t)le64_to_cpu(fle->addr);
++}
 +
-+#ifndef _CAAMHASH_DESC_H_
-+#define _CAAMHASH_DESC_H_
++/**
++ * dpaa2_fl_set_addr() - Set the addr field of FLE
++ * @fle: the given frame list entry
++ * @addr: the address needs to be set in frame list entry
++ */
++static inline void dpaa2_fl_set_addr(struct dpaa2_fl_entry *fle,
++				     dma_addr_t addr)
++{
++	fle->addr = cpu_to_le64(addr);
++}
 +
-+/* length of descriptors text */
-+#define DESC_AHASH_BASE			(3 * CAAM_CMD_SZ)
-+#define DESC_AHASH_UPDATE_LEN		(6 * CAAM_CMD_SZ)
-+#define DESC_AHASH_UPDATE_FIRST_LEN	(DESC_AHASH_BASE + 4 * CAAM_CMD_SZ)
-+#define DESC_AHASH_FINAL_LEN		(DESC_AHASH_BASE + 5 * CAAM_CMD_SZ)
-+#define DESC_AHASH_DIGEST_LEN		(DESC_AHASH_BASE + 4 * CAAM_CMD_SZ)
++/**
++ * dpaa2_fl_get_frc() - Get the frame context in the FLE
++ * @fle: the given frame list entry
++ *
++ * Return the frame context field in the frame lsit entry.
++ */
++static inline u32 dpaa2_fl_get_frc(const struct dpaa2_fl_entry *fle)
++{
++	return le32_to_cpu(fle->frc);
++}
 +
-+void cnstr_shdsc_ahash(u32 * const desc, struct alginfo *adata, u32 state,
-+		       int digestsize, int ctx_len, bool import_ctx, int era);
++/**
++ * dpaa2_fl_set_frc() - Set the frame context in the FLE
++ * @fle: the given frame list entry
++ * @frc: the frame context needs to be set in frame list entry
++ */
++static inline void dpaa2_fl_set_frc(struct dpaa2_fl_entry *fle, u32 frc)
++{
++	fle->frc = cpu_to_le32(frc);
++}
 +
-+#endif /* _CAAMHASH_DESC_H_ */
++/**
++ * dpaa2_fl_get_ctrl() - Get the control bits in the FLE
++ * @fle: the given frame list entry
++ *
++ * Return the control bits field in the frame list entry.
++ */
++static inline u32 dpaa2_fl_get_ctrl(const struct dpaa2_fl_entry *fle)
++{
++	return le32_to_cpu(fle->ctrl);
++}
++
++/**
++ * dpaa2_fl_set_ctrl() - Set the control bits in the FLE
++ * @fle: the given frame list entry
++ * @ctrl: the control bits to be set in the frame list entry
++ */
++static inline void dpaa2_fl_set_ctrl(struct dpaa2_fl_entry *fle, u32 ctrl)
++{
++	fle->ctrl = cpu_to_le32(ctrl);
++}
++
++/**
++ * dpaa2_fl_get_flc() - Get the flow context in the FLE
++ * @fle: the given frame list entry
++ *
++ * Return the flow context in the frame list entry.
++ */
++static inline dma_addr_t dpaa2_fl_get_flc(const struct dpaa2_fl_entry *fle)
++{
++	return (dma_addr_t)le64_to_cpu(fle->flc);
++}
++
++/**
++ * dpaa2_fl_set_flc() - Set the flow context field of FLE
++ * @fle: the given frame list entry
++ * @flc_addr: the flow context needs to be set in frame list entry
++ */
++static inline void dpaa2_fl_set_flc(struct dpaa2_fl_entry *fle,
++				    dma_addr_t flc_addr)
++{
++	fle->flc = cpu_to_le64(flc_addr);
++}
++
++static inline bool dpaa2_fl_short_len(const struct dpaa2_fl_entry *fle)
++{
++	return !!((le16_to_cpu(fle->format_offset) >>
++		  FL_SHORT_LEN_FLAG_SHIFT) & FL_SHORT_LEN_FLAG_MASK);
++}
++
++/**
++ * dpaa2_fl_get_len() - Get the length in the FLE
++ * @fle: the given frame list entry
++ *
++ * Return the length field in the frame list entry.
++ */
++static inline u32 dpaa2_fl_get_len(const struct dpaa2_fl_entry *fle)
++{
++	if (dpaa2_fl_short_len(fle))
++		return le32_to_cpu(fle->len) & FL_SHORT_LEN_MASK;
++
++	return le32_to_cpu(fle->len);
++}
++
++/**
++ * dpaa2_fl_set_len() - Set the length field of FLE
++ * @fle: the given frame list entry
++ * @len: the length needs to be set in frame list entry
++ */
++static inline void dpaa2_fl_set_len(struct dpaa2_fl_entry *fle, u32 len)
++{
++	fle->len = cpu_to_le32(len);
++}
++
++/**
++ * dpaa2_fl_get_offset() - Get the offset field in the frame list entry
++ * @fle: the given frame list entry
++ *
++ * Return the offset.
++ */
++static inline u16 dpaa2_fl_get_offset(const struct dpaa2_fl_entry *fle)
++{
++	return le16_to_cpu(fle->format_offset) & FL_OFFSET_MASK;
++}
++
++/**
++ * dpaa2_fl_set_offset() - Set the offset field of FLE
++ * @fle: the given frame list entry
++ * @offset: the offset needs to be set in frame list entry
++ */
++static inline void dpaa2_fl_set_offset(struct dpaa2_fl_entry *fle, u16 offset)
++{
++	fle->format_offset &= cpu_to_le16(~FL_OFFSET_MASK);
++	fle->format_offset |= cpu_to_le16(offset);
++}
++
++/**
++ * dpaa2_fl_get_format() - Get the format field in the FLE
++ * @fle: the given frame list entry
++ *
++ * Return the format.
++ */
++static inline enum dpaa2_fl_format dpaa2_fl_get_format(const struct dpaa2_fl_entry *fle)
++{
++	return (enum dpaa2_fl_format)((le16_to_cpu(fle->format_offset) >>
++				       FL_FORMAT_SHIFT) & FL_FORMAT_MASK);
++}
++
++/**
++ * dpaa2_fl_set_format() - Set the format field of FLE
++ * @fle: the given frame list entry
++ * @format: the format needs to be set in frame list entry
++ */
++static inline void dpaa2_fl_set_format(struct dpaa2_fl_entry *fle,
++				       enum dpaa2_fl_format format)
++{
++	fle->format_offset &= cpu_to_le16(~(FL_FORMAT_MASK << FL_FORMAT_SHIFT));
++	fle->format_offset |= cpu_to_le16(format << FL_FORMAT_SHIFT);
++}
++
++/**
++ * dpaa2_fl_get_bpid() - Get the bpid field in the FLE
++ * @fle: the given frame list entry
++ *
++ * Return the buffer pool id.
++ */
++static inline u16 dpaa2_fl_get_bpid(const struct dpaa2_fl_entry *fle)
++{
++	return le16_to_cpu(fle->bpid) & FL_BPID_MASK;
++}
++
++/**
++ * dpaa2_fl_set_bpid() - Set the bpid field of FLE
++ * @fle: the given frame list entry
++ * @bpid: buffer pool id to be set
++ */
++static inline void dpaa2_fl_set_bpid(struct dpaa2_fl_entry *fle, u16 bpid)
++{
++	fle->bpid &= cpu_to_le16(~(FL_BPID_MASK));
++	fle->bpid |= cpu_to_le16(bpid);
++}
++
++/**
++ * dpaa2_fl_is_final() - Check final bit in FLE
++ * @fle: the given frame list entry
++ *
++ * Return bool.
++ */
++static inline bool dpaa2_fl_is_final(const struct dpaa2_fl_entry *fle)
++{
++	return !!(le16_to_cpu(fle->format_offset) >> FL_FINAL_FLAG_SHIFT);
++}
++
++/**
++ * dpaa2_fl_set_final() - Set the final bit in FLE
++ * @fle: the given frame list entry
++ * @final: the final boolean to be set
++ */
++static inline void dpaa2_fl_set_final(struct dpaa2_fl_entry *fle, bool final)
++{
++	fle->format_offset &= cpu_to_le16(~(FL_FINAL_FLAG_MASK <<
++					    FL_FINAL_FLAG_SHIFT));
++	fle->format_offset |= cpu_to_le16(final << FL_FINAL_FLAG_SHIFT);
++}
++
+ #endif /* __FSL_DPAA2_FD_H */
 -- 
 2.16.2
