@@ -1,7 +1,7 @@
 From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
-Subject: [PATCH 08/11] crypto: caam/qi2 - add skcipher algorithms
-Date: Mon, 10 Sep 2018 20:15:47 +0300
-Message-ID: <20180910171550.5659-9-horia.geanta@nxp.com>
+Subject: [PATCH 05/11] crypto: caam - add DPAA2-CAAM (DPSECI) backend API
+Date: Mon, 10 Sep 2018 20:15:44 +0300
+Message-ID: <20180910171550.5659-6-horia.geanta@nxp.com>
 References: <20180910171550.5659-1-horia.geanta@nxp.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -21,702 +21,946 @@ In-Reply-To: <20180910171550.5659-1-horia.geanta@nxp.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Add support to submit the following skcipher algorithms
-via the DPSECI backend:
-cbc({aes,des,des3_ede})
-ctr(aes), rfc3686(ctr(aes))
-xts(aes)
+Add the low-level API that allows to manage DPSECI DPAA2 objects
+that sit on the Management Complex (MC) fsl-mc bus.
+
+The API is compatible with MC firmware 10.2.0+.
 
 Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
 ---
- drivers/crypto/caam/Kconfig       |   1 +
- drivers/crypto/caam/caamalg_qi2.c | 562 ++++++++++++++++++++++++++++++++++++++
- drivers/crypto/caam/caamalg_qi2.h |  20 +-
- 3 files changed, 582 insertions(+), 1 deletion(-)
+ drivers/crypto/caam/dpseci.c     | 426 +++++++++++++++++++++++++++++++++++++++
+ drivers/crypto/caam/dpseci.h     | 333 ++++++++++++++++++++++++++++++
+ drivers/crypto/caam/dpseci_cmd.h | 149 ++++++++++++++
+ 3 files changed, 908 insertions(+)
+ create mode 100644 drivers/crypto/caam/dpseci.c
+ create mode 100644 drivers/crypto/caam/dpseci.h
+ create mode 100644 drivers/crypto/caam/dpseci_cmd.h
 
-diff --git a/drivers/crypto/caam/Kconfig b/drivers/crypto/caam/Kconfig
-index a186b853b05c..8d162cb34591 100644
---- a/drivers/crypto/caam/Kconfig
-+++ b/drivers/crypto/caam/Kconfig
-@@ -157,6 +157,7 @@ config CRYPTO_DEV_FSL_DPAA2_CAAM
- 	tristate "QorIQ DPAA2 CAAM (DPSECI) driver"
- 	depends on FSL_MC_DPIO
- 	select CRYPTO_DEV_FSL_CAAM_COMMON
-+	select CRYPTO_BLKCIPHER
- 	select CRYPTO_AUTHENC
- 	select CRYPTO_AEAD
- 	help
-diff --git a/drivers/crypto/caam/caamalg_qi2.c b/drivers/crypto/caam/caamalg_qi2.c
-index e883386278a4..b7931ad1154e 100644
---- a/drivers/crypto/caam/caamalg_qi2.c
-+++ b/drivers/crypto/caam/caamalg_qi2.c
-@@ -56,6 +56,12 @@ struct caam_aead_alg {
- 	bool registered;
- };
- 
-+struct caam_skcipher_alg {
-+	struct skcipher_alg skcipher;
-+	struct caam_alg_entry caam;
-+	bool registered;
-+};
-+
- /**
-  * caam_ctx - per-session context
-  * @flc: Flow Contexts array
-@@ -813,6 +819,248 @@ static int rfc4543_setkey(struct crypto_aead *aead,
- 	return rfc4543_set_sh_desc(aead);
- }
- 
-+static int skcipher_setkey(struct crypto_skcipher *skcipher, const u8 *key,
-+			   unsigned int keylen)
-+{
-+	struct caam_ctx *ctx = crypto_skcipher_ctx(skcipher);
-+	struct caam_skcipher_alg *alg =
-+		container_of(crypto_skcipher_alg(skcipher),
-+			     struct caam_skcipher_alg, skcipher);
-+	struct device *dev = ctx->dev;
-+	struct caam_flc *flc;
-+	unsigned int ivsize = crypto_skcipher_ivsize(skcipher);
-+	u32 *desc;
-+	u32 ctx1_iv_off = 0;
-+	const bool ctr_mode = ((ctx->cdata.algtype & OP_ALG_AAI_MASK) ==
-+			       OP_ALG_AAI_CTR_MOD128);
-+	const bool is_rfc3686 = alg->caam.rfc3686;
-+
-+	print_hex_dump_debug("key in @" __stringify(__LINE__)": ",
-+			     DUMP_PREFIX_ADDRESS, 16, 4, key, keylen, 1);
-+
-+	/*
-+	 * AES-CTR needs to load IV in CONTEXT1 reg
-+	 * at an offset of 128bits (16bytes)
-+	 * CONTEXT1[255:128] = IV
-+	 */
-+	if (ctr_mode)
-+		ctx1_iv_off = 16;
-+
-+	/*
-+	 * RFC3686 specific:
-+	 *	| CONTEXT1[255:128] = {NONCE, IV, COUNTER}
-+	 *	| *key = {KEY, NONCE}
-+	 */
-+	if (is_rfc3686) {
-+		ctx1_iv_off = 16 + CTR_RFC3686_NONCE_SIZE;
-+		keylen -= CTR_RFC3686_NONCE_SIZE;
-+	}
-+
-+	ctx->cdata.keylen = keylen;
-+	ctx->cdata.key_virt = key;
-+	ctx->cdata.key_inline = true;
-+
-+	/* skcipher_encrypt shared descriptor */
-+	flc = &ctx->flc[ENCRYPT];
-+	desc = flc->sh_desc;
-+	cnstr_shdsc_skcipher_encap(desc, &ctx->cdata, ivsize, is_rfc3686,
-+				   ctx1_iv_off);
-+	flc->flc[1] = cpu_to_caam32(desc_len(desc)); /* SDL */
-+	dma_sync_single_for_device(dev, ctx->flc_dma[ENCRYPT],
-+				   sizeof(flc->flc) + desc_bytes(desc),
-+				   ctx->dir);
-+
-+	/* skcipher_decrypt shared descriptor */
-+	flc = &ctx->flc[DECRYPT];
-+	desc = flc->sh_desc;
-+	cnstr_shdsc_skcipher_decap(desc, &ctx->cdata, ivsize, is_rfc3686,
-+				   ctx1_iv_off);
-+	flc->flc[1] = cpu_to_caam32(desc_len(desc)); /* SDL */
-+	dma_sync_single_for_device(dev, ctx->flc_dma[DECRYPT],
-+				   sizeof(flc->flc) + desc_bytes(desc),
-+				   ctx->dir);
-+
-+	return 0;
-+}
-+
-+static int xts_skcipher_setkey(struct crypto_skcipher *skcipher, const u8 *key,
-+			       unsigned int keylen)
-+{
-+	struct caam_ctx *ctx = crypto_skcipher_ctx(skcipher);
-+	struct device *dev = ctx->dev;
-+	struct caam_flc *flc;
-+	u32 *desc;
-+
-+	if (keylen != 2 * AES_MIN_KEY_SIZE  && keylen != 2 * AES_MAX_KEY_SIZE) {
-+		dev_err(dev, "key size mismatch\n");
-+		crypto_skcipher_set_flags(skcipher, CRYPTO_TFM_RES_BAD_KEY_LEN);
-+		return -EINVAL;
-+	}
-+
-+	ctx->cdata.keylen = keylen;
-+	ctx->cdata.key_virt = key;
-+	ctx->cdata.key_inline = true;
-+
-+	/* xts_skcipher_encrypt shared descriptor */
-+	flc = &ctx->flc[ENCRYPT];
-+	desc = flc->sh_desc;
-+	cnstr_shdsc_xts_skcipher_encap(desc, &ctx->cdata);
-+	flc->flc[1] = cpu_to_caam32(desc_len(desc)); /* SDL */
-+	dma_sync_single_for_device(dev, ctx->flc_dma[ENCRYPT],
-+				   sizeof(flc->flc) + desc_bytes(desc),
-+				   ctx->dir);
-+
-+	/* xts_skcipher_decrypt shared descriptor */
-+	flc = &ctx->flc[DECRYPT];
-+	desc = flc->sh_desc;
-+	cnstr_shdsc_xts_skcipher_decap(desc, &ctx->cdata);
-+	flc->flc[1] = cpu_to_caam32(desc_len(desc)); /* SDL */
-+	dma_sync_single_for_device(dev, ctx->flc_dma[DECRYPT],
-+				   sizeof(flc->flc) + desc_bytes(desc),
-+				   ctx->dir);
-+
-+	return 0;
-+}
-+
-+static struct skcipher_edesc *skcipher_edesc_alloc(struct skcipher_request *req)
-+{
-+	struct crypto_skcipher *skcipher = crypto_skcipher_reqtfm(req);
-+	struct caam_request *req_ctx = skcipher_request_ctx(req);
-+	struct dpaa2_fl_entry *in_fle = &req_ctx->fd_flt[1];
-+	struct dpaa2_fl_entry *out_fle = &req_ctx->fd_flt[0];
-+	struct caam_ctx *ctx = crypto_skcipher_ctx(skcipher);
-+	struct device *dev = ctx->dev;
-+	gfp_t flags = (req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
-+		       GFP_KERNEL : GFP_ATOMIC;
-+	int src_nents, mapped_src_nents, dst_nents = 0, mapped_dst_nents = 0;
-+	struct skcipher_edesc *edesc;
-+	dma_addr_t iv_dma;
-+	u8 *iv;
-+	int ivsize = crypto_skcipher_ivsize(skcipher);
-+	int dst_sg_idx, qm_sg_ents, qm_sg_bytes;
-+	struct dpaa2_sg_entry *sg_table;
-+
-+	src_nents = sg_nents_for_len(req->src, req->cryptlen);
-+	if (unlikely(src_nents < 0)) {
-+		dev_err(dev, "Insufficient bytes (%d) in src S/G\n",
-+			req->cryptlen);
-+		return ERR_PTR(src_nents);
-+	}
-+
-+	if (unlikely(req->dst != req->src)) {
-+		dst_nents = sg_nents_for_len(req->dst, req->cryptlen);
-+		if (unlikely(dst_nents < 0)) {
-+			dev_err(dev, "Insufficient bytes (%d) in dst S/G\n",
-+				req->cryptlen);
-+			return ERR_PTR(dst_nents);
-+		}
-+
-+		mapped_src_nents = dma_map_sg(dev, req->src, src_nents,
-+					      DMA_TO_DEVICE);
-+		if (unlikely(!mapped_src_nents)) {
-+			dev_err(dev, "unable to map source\n");
-+			return ERR_PTR(-ENOMEM);
-+		}
-+
-+		mapped_dst_nents = dma_map_sg(dev, req->dst, dst_nents,
-+					      DMA_FROM_DEVICE);
-+		if (unlikely(!mapped_dst_nents)) {
-+			dev_err(dev, "unable to map destination\n");
-+			dma_unmap_sg(dev, req->src, src_nents, DMA_TO_DEVICE);
-+			return ERR_PTR(-ENOMEM);
-+		}
-+	} else {
-+		mapped_src_nents = dma_map_sg(dev, req->src, src_nents,
-+					      DMA_BIDIRECTIONAL);
-+		if (unlikely(!mapped_src_nents)) {
-+			dev_err(dev, "unable to map source\n");
-+			return ERR_PTR(-ENOMEM);
-+		}
-+	}
-+
-+	qm_sg_ents = 1 + mapped_src_nents;
-+	dst_sg_idx = qm_sg_ents;
-+
-+	qm_sg_ents += mapped_dst_nents > 1 ? mapped_dst_nents : 0;
-+	qm_sg_bytes = qm_sg_ents * sizeof(struct dpaa2_sg_entry);
-+	if (unlikely(offsetof(struct skcipher_edesc, sgt) + qm_sg_bytes +
-+		     ivsize > CAAM_QI_MEMCACHE_SIZE)) {
-+		dev_err(dev, "No space for %d S/G entries and/or %dB IV\n",
-+			qm_sg_ents, ivsize);
-+		caam_unmap(dev, req->src, req->dst, src_nents, dst_nents, 0,
-+			   0, 0, 0);
-+		return ERR_PTR(-ENOMEM);
-+	}
-+
-+	/* allocate space for base edesc, link tables and IV */
-+	edesc = qi_cache_zalloc(GFP_DMA | flags);
-+	if (unlikely(!edesc)) {
-+		dev_err(dev, "could not allocate extended descriptor\n");
-+		caam_unmap(dev, req->src, req->dst, src_nents, dst_nents, 0,
-+			   0, 0, 0);
-+		return ERR_PTR(-ENOMEM);
-+	}
-+
-+	/* Make sure IV is located in a DMAable area */
-+	sg_table = &edesc->sgt[0];
-+	iv = (u8 *)(sg_table + qm_sg_ents);
-+	memcpy(iv, req->iv, ivsize);
-+
-+	iv_dma = dma_map_single(dev, iv, ivsize, DMA_TO_DEVICE);
-+	if (dma_mapping_error(dev, iv_dma)) {
-+		dev_err(dev, "unable to map IV\n");
-+		caam_unmap(dev, req->src, req->dst, src_nents, dst_nents, 0,
-+			   0, 0, 0);
-+		qi_cache_free(edesc);
-+		return ERR_PTR(-ENOMEM);
-+	}
-+
-+	edesc->src_nents = src_nents;
-+	edesc->dst_nents = dst_nents;
-+	edesc->iv_dma = iv_dma;
-+	edesc->qm_sg_bytes = qm_sg_bytes;
-+
-+	dma_to_qm_sg_one(sg_table, iv_dma, ivsize, 0);
-+	sg_to_qm_sg_last(req->src, mapped_src_nents, sg_table + 1, 0);
-+
-+	if (mapped_dst_nents > 1)
-+		sg_to_qm_sg_last(req->dst, mapped_dst_nents, sg_table +
-+				 dst_sg_idx, 0);
-+
-+	edesc->qm_sg_dma = dma_map_single(dev, sg_table, edesc->qm_sg_bytes,
-+					  DMA_TO_DEVICE);
-+	if (dma_mapping_error(dev, edesc->qm_sg_dma)) {
-+		dev_err(dev, "unable to map S/G table\n");
-+		caam_unmap(dev, req->src, req->dst, src_nents, dst_nents,
-+			   iv_dma, ivsize, 0, 0);
-+		qi_cache_free(edesc);
-+		return ERR_PTR(-ENOMEM);
-+	}
-+
-+	memset(&req_ctx->fd_flt, 0, sizeof(req_ctx->fd_flt));
-+	dpaa2_fl_set_final(in_fle, true);
-+	dpaa2_fl_set_len(in_fle, req->cryptlen + ivsize);
-+	dpaa2_fl_set_len(out_fle, req->cryptlen);
-+
-+	dpaa2_fl_set_format(in_fle, dpaa2_fl_sg);
-+	dpaa2_fl_set_addr(in_fle, edesc->qm_sg_dma);
-+
-+	if (req->src == req->dst) {
-+		dpaa2_fl_set_format(out_fle, dpaa2_fl_sg);
-+		dpaa2_fl_set_addr(out_fle, edesc->qm_sg_dma +
-+				  sizeof(*sg_table));
-+	} else if (mapped_dst_nents > 1) {
-+		dpaa2_fl_set_format(out_fle, dpaa2_fl_sg);
-+		dpaa2_fl_set_addr(out_fle, edesc->qm_sg_dma + dst_sg_idx *
-+				  sizeof(*sg_table));
-+	} else {
-+		dpaa2_fl_set_format(out_fle, dpaa2_fl_single);
-+		dpaa2_fl_set_addr(out_fle, sg_dma_address(req->dst));
-+	}
-+
-+	return edesc;
-+}
-+
- static void aead_unmap(struct device *dev, struct aead_edesc *edesc,
- 		       struct aead_request *req)
- {
-@@ -824,6 +1072,16 @@ static void aead_unmap(struct device *dev, struct aead_edesc *edesc,
- 	dma_unmap_single(dev, edesc->assoclen_dma, 4, DMA_TO_DEVICE);
- }
- 
-+static void skcipher_unmap(struct device *dev, struct skcipher_edesc *edesc,
-+			   struct skcipher_request *req)
-+{
-+	struct crypto_skcipher *skcipher = crypto_skcipher_reqtfm(req);
-+	int ivsize = crypto_skcipher_ivsize(skcipher);
-+
-+	caam_unmap(dev, req->src, req->dst, edesc->src_nents, edesc->dst_nents,
-+		   edesc->iv_dma, ivsize, edesc->qm_sg_dma, edesc->qm_sg_bytes);
-+}
-+
- static void aead_encrypt_done(void *cbk_ctx, u32 status)
- {
- 	struct crypto_async_request *areq = cbk_ctx;
-@@ -949,6 +1207,138 @@ static int ipsec_gcm_decrypt(struct aead_request *req)
- 	return aead_decrypt(req);
- }
- 
-+static void skcipher_encrypt_done(void *cbk_ctx, u32 status)
-+{
-+	struct crypto_async_request *areq = cbk_ctx;
-+	struct skcipher_request *req = skcipher_request_cast(areq);
-+	struct caam_request *req_ctx = to_caam_req(areq);
-+	struct crypto_skcipher *skcipher = crypto_skcipher_reqtfm(req);
-+	struct caam_ctx *ctx = crypto_skcipher_ctx(skcipher);
-+	struct skcipher_edesc *edesc = req_ctx->edesc;
-+	int ecode = 0;
-+	int ivsize = crypto_skcipher_ivsize(skcipher);
-+
-+	dev_dbg(ctx->dev, "%s %d: err 0x%x\n", __func__, __LINE__, status);
-+
-+	if (unlikely(status)) {
-+		caam_qi2_strstatus(ctx->dev, status);
-+		ecode = -EIO;
-+	}
-+
-+	print_hex_dump_debug("dstiv  @" __stringify(__LINE__)": ",
-+			     DUMP_PREFIX_ADDRESS, 16, 4, req->iv,
-+			     edesc->src_nents > 1 ? 100 : ivsize, 1);
-+	caam_dump_sg(KERN_DEBUG, "dst    @" __stringify(__LINE__)": ",
-+		     DUMP_PREFIX_ADDRESS, 16, 4, req->dst,
-+		     edesc->dst_nents > 1 ? 100 : req->cryptlen, 1);
-+
-+	skcipher_unmap(ctx->dev, edesc, req);
-+
-+	/*
-+	 * The crypto API expects us to set the IV (req->iv) to the last
-+	 * ciphertext block. This is used e.g. by the CTS mode.
-+	 */
-+	scatterwalk_map_and_copy(req->iv, req->dst, req->cryptlen - ivsize,
-+				 ivsize, 0);
-+
-+	qi_cache_free(edesc);
-+	skcipher_request_complete(req, ecode);
-+}
-+
-+static void skcipher_decrypt_done(void *cbk_ctx, u32 status)
-+{
-+	struct crypto_async_request *areq = cbk_ctx;
-+	struct skcipher_request *req = skcipher_request_cast(areq);
-+	struct caam_request *req_ctx = to_caam_req(areq);
-+	struct crypto_skcipher *skcipher = crypto_skcipher_reqtfm(req);
-+	struct caam_ctx *ctx = crypto_skcipher_ctx(skcipher);
-+	struct skcipher_edesc *edesc = req_ctx->edesc;
-+	int ecode = 0;
-+	int ivsize = crypto_skcipher_ivsize(skcipher);
-+
-+	dev_dbg(ctx->dev, "%s %d: err 0x%x\n", __func__, __LINE__, status);
-+
-+	if (unlikely(status)) {
-+		caam_qi2_strstatus(ctx->dev, status);
-+		ecode = -EIO;
-+	}
-+
-+	print_hex_dump_debug("dstiv  @" __stringify(__LINE__)": ",
-+			     DUMP_PREFIX_ADDRESS, 16, 4, req->iv,
-+			     edesc->src_nents > 1 ? 100 : ivsize, 1);
-+	caam_dump_sg(KERN_DEBUG, "dst    @" __stringify(__LINE__)": ",
-+		     DUMP_PREFIX_ADDRESS, 16, 4, req->dst,
-+		     edesc->dst_nents > 1 ? 100 : req->cryptlen, 1);
-+
-+	skcipher_unmap(ctx->dev, edesc, req);
-+	qi_cache_free(edesc);
-+	skcipher_request_complete(req, ecode);
-+}
-+
-+static int skcipher_encrypt(struct skcipher_request *req)
-+{
-+	struct skcipher_edesc *edesc;
-+	struct crypto_skcipher *skcipher = crypto_skcipher_reqtfm(req);
-+	struct caam_ctx *ctx = crypto_skcipher_ctx(skcipher);
-+	struct caam_request *caam_req = skcipher_request_ctx(req);
-+	int ret;
-+
-+	/* allocate extended descriptor */
-+	edesc = skcipher_edesc_alloc(req);
-+	if (IS_ERR(edesc))
-+		return PTR_ERR(edesc);
-+
-+	caam_req->flc = &ctx->flc[ENCRYPT];
-+	caam_req->flc_dma = ctx->flc_dma[ENCRYPT];
-+	caam_req->cbk = skcipher_encrypt_done;
-+	caam_req->ctx = &req->base;
-+	caam_req->edesc = edesc;
-+	ret = dpaa2_caam_enqueue(ctx->dev, caam_req);
-+	if (ret != -EINPROGRESS &&
-+	    !(ret == -EBUSY && req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG)) {
-+		skcipher_unmap(ctx->dev, edesc, req);
-+		qi_cache_free(edesc);
-+	}
-+
-+	return ret;
-+}
-+
-+static int skcipher_decrypt(struct skcipher_request *req)
-+{
-+	struct skcipher_edesc *edesc;
-+	struct crypto_skcipher *skcipher = crypto_skcipher_reqtfm(req);
-+	struct caam_ctx *ctx = crypto_skcipher_ctx(skcipher);
-+	struct caam_request *caam_req = skcipher_request_ctx(req);
-+	int ivsize = crypto_skcipher_ivsize(skcipher);
-+	int ret;
-+
-+	/* allocate extended descriptor */
-+	edesc = skcipher_edesc_alloc(req);
-+	if (IS_ERR(edesc))
-+		return PTR_ERR(edesc);
-+
-+	/*
-+	 * The crypto API expects us to set the IV (req->iv) to the last
-+	 * ciphertext block.
-+	 */
-+	scatterwalk_map_and_copy(req->iv, req->src, req->cryptlen - ivsize,
-+				 ivsize, 0);
-+
-+	caam_req->flc = &ctx->flc[DECRYPT];
-+	caam_req->flc_dma = ctx->flc_dma[DECRYPT];
-+	caam_req->cbk = skcipher_decrypt_done;
-+	caam_req->ctx = &req->base;
-+	caam_req->edesc = edesc;
-+	ret = dpaa2_caam_enqueue(ctx->dev, caam_req);
-+	if (ret != -EINPROGRESS &&
-+	    !(ret == -EBUSY && req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG)) {
-+		skcipher_unmap(ctx->dev, edesc, req);
-+		qi_cache_free(edesc);
-+	}
-+
-+	return ret;
-+}
-+
- static int caam_cra_init(struct caam_ctx *ctx, struct caam_alg_entry *caam,
- 			 bool uses_dkp)
- {
-@@ -977,6 +1367,16 @@ static int caam_cra_init(struct caam_ctx *ctx, struct caam_alg_entry *caam,
- 	return 0;
- }
- 
-+static int caam_cra_init_skcipher(struct crypto_skcipher *tfm)
-+{
-+	struct skcipher_alg *alg = crypto_skcipher_alg(tfm);
-+	struct caam_skcipher_alg *caam_alg =
-+		container_of(alg, typeof(*caam_alg), skcipher);
-+
-+	crypto_skcipher_set_reqsize(tfm, sizeof(struct caam_request));
-+	return caam_cra_init(crypto_skcipher_ctx(tfm), &caam_alg->caam, false);
-+}
-+
- static int caam_cra_init_aead(struct crypto_aead *tfm)
- {
- 	struct aead_alg *alg = crypto_aead_alg(tfm);
-@@ -995,11 +1395,124 @@ static void caam_exit_common(struct caam_ctx *ctx)
- 			       DMA_ATTR_SKIP_CPU_SYNC);
- }
- 
-+static void caam_cra_exit(struct crypto_skcipher *tfm)
-+{
-+	caam_exit_common(crypto_skcipher_ctx(tfm));
-+}
-+
- static void caam_cra_exit_aead(struct crypto_aead *tfm)
- {
- 	caam_exit_common(crypto_aead_ctx(tfm));
- }
- 
-+static struct caam_skcipher_alg driver_algs[] = {
-+	{
-+		.skcipher = {
-+			.base = {
-+				.cra_name = "cbc(aes)",
-+				.cra_driver_name = "cbc-aes-caam-qi2",
-+				.cra_blocksize = AES_BLOCK_SIZE,
-+			},
-+			.setkey = skcipher_setkey,
-+			.encrypt = skcipher_encrypt,
-+			.decrypt = skcipher_decrypt,
-+			.min_keysize = AES_MIN_KEY_SIZE,
-+			.max_keysize = AES_MAX_KEY_SIZE,
-+			.ivsize = AES_BLOCK_SIZE,
-+		},
-+		.caam.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_CBC,
-+	},
-+	{
-+		.skcipher = {
-+			.base = {
-+				.cra_name = "cbc(des3_ede)",
-+				.cra_driver_name = "cbc-3des-caam-qi2",
-+				.cra_blocksize = DES3_EDE_BLOCK_SIZE,
-+			},
-+			.setkey = skcipher_setkey,
-+			.encrypt = skcipher_encrypt,
-+			.decrypt = skcipher_decrypt,
-+			.min_keysize = DES3_EDE_KEY_SIZE,
-+			.max_keysize = DES3_EDE_KEY_SIZE,
-+			.ivsize = DES3_EDE_BLOCK_SIZE,
-+		},
-+		.caam.class1_alg_type = OP_ALG_ALGSEL_3DES | OP_ALG_AAI_CBC,
-+	},
-+	{
-+		.skcipher = {
-+			.base = {
-+				.cra_name = "cbc(des)",
-+				.cra_driver_name = "cbc-des-caam-qi2",
-+				.cra_blocksize = DES_BLOCK_SIZE,
-+			},
-+			.setkey = skcipher_setkey,
-+			.encrypt = skcipher_encrypt,
-+			.decrypt = skcipher_decrypt,
-+			.min_keysize = DES_KEY_SIZE,
-+			.max_keysize = DES_KEY_SIZE,
-+			.ivsize = DES_BLOCK_SIZE,
-+		},
-+		.caam.class1_alg_type = OP_ALG_ALGSEL_DES | OP_ALG_AAI_CBC,
-+	},
-+	{
-+		.skcipher = {
-+			.base = {
-+				.cra_name = "ctr(aes)",
-+				.cra_driver_name = "ctr-aes-caam-qi2",
-+				.cra_blocksize = 1,
-+			},
-+			.setkey = skcipher_setkey,
-+			.encrypt = skcipher_encrypt,
-+			.decrypt = skcipher_decrypt,
-+			.min_keysize = AES_MIN_KEY_SIZE,
-+			.max_keysize = AES_MAX_KEY_SIZE,
-+			.ivsize = AES_BLOCK_SIZE,
-+			.chunksize = AES_BLOCK_SIZE,
-+		},
-+		.caam.class1_alg_type = OP_ALG_ALGSEL_AES |
-+					OP_ALG_AAI_CTR_MOD128,
-+	},
-+	{
-+		.skcipher = {
-+			.base = {
-+				.cra_name = "rfc3686(ctr(aes))",
-+				.cra_driver_name = "rfc3686-ctr-aes-caam-qi2",
-+				.cra_blocksize = 1,
-+			},
-+			.setkey = skcipher_setkey,
-+			.encrypt = skcipher_encrypt,
-+			.decrypt = skcipher_decrypt,
-+			.min_keysize = AES_MIN_KEY_SIZE +
-+				       CTR_RFC3686_NONCE_SIZE,
-+			.max_keysize = AES_MAX_KEY_SIZE +
-+				       CTR_RFC3686_NONCE_SIZE,
-+			.ivsize = CTR_RFC3686_IV_SIZE,
-+			.chunksize = AES_BLOCK_SIZE,
-+		},
-+		.caam = {
-+			.class1_alg_type = OP_ALG_ALGSEL_AES |
-+					   OP_ALG_AAI_CTR_MOD128,
-+			.rfc3686 = true,
-+		},
-+	},
-+	{
-+		.skcipher = {
-+			.base = {
-+				.cra_name = "xts(aes)",
-+				.cra_driver_name = "xts-aes-caam-qi2",
-+				.cra_blocksize = AES_BLOCK_SIZE,
-+			},
-+			.setkey = xts_skcipher_setkey,
-+			.encrypt = skcipher_encrypt,
-+			.decrypt = skcipher_decrypt,
-+			.min_keysize = 2 * AES_MIN_KEY_SIZE,
-+			.max_keysize = 2 * AES_MAX_KEY_SIZE,
-+			.ivsize = AES_BLOCK_SIZE,
-+		},
-+		.caam.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_XTS,
-+	}
-+};
-+
- static struct caam_aead_alg driver_aeads[] = {
- 	{
- 		.aead = {
-@@ -2162,6 +2675,19 @@ static struct caam_aead_alg driver_aeads[] = {
- 	},
- };
- 
-+static void caam_skcipher_alg_init(struct caam_skcipher_alg *t_alg)
-+{
-+	struct skcipher_alg *alg = &t_alg->skcipher;
-+
-+	alg->base.cra_module = THIS_MODULE;
-+	alg->base.cra_priority = CAAM_CRA_PRIORITY;
-+	alg->base.cra_ctxsize = sizeof(struct caam_ctx);
-+	alg->base.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_KERN_DRIVER_ONLY;
-+
-+	alg->init = caam_cra_init_skcipher;
-+	alg->exit = caam_cra_exit;
-+}
-+
- static void caam_aead_alg_init(struct caam_aead_alg *t_alg)
- {
- 	struct aead_alg *alg = &t_alg->aead;
-@@ -2720,6 +3246,35 @@ static int dpaa2_caam_probe(struct fsl_mc_device *dpseci_dev)
- 	}
- 
- 	/* register crypto algorithms the device supports */
-+	for (i = 0; i < ARRAY_SIZE(driver_algs); i++) {
-+		struct caam_skcipher_alg *t_alg = driver_algs + i;
-+		u32 alg_sel = t_alg->caam.class1_alg_type & OP_ALG_ALGSEL_MASK;
-+
-+		/* Skip DES algorithms if not supported by device */
-+		if (!priv->sec_attr.des_acc_num &&
-+		    (alg_sel == OP_ALG_ALGSEL_3DES ||
-+		     alg_sel == OP_ALG_ALGSEL_DES))
-+			continue;
-+
-+		/* Skip AES algorithms if not supported by device */
-+		if (!priv->sec_attr.aes_acc_num &&
-+		    alg_sel == OP_ALG_ALGSEL_AES)
-+			continue;
-+
-+		t_alg->caam.dev = dev;
-+		caam_skcipher_alg_init(t_alg);
-+
-+		err = crypto_register_skcipher(&t_alg->skcipher);
-+		if (err) {
-+			dev_warn(dev, "%s alg registration failed: %d\n",
-+				 t_alg->skcipher.base.cra_driver_name, err);
-+			continue;
-+		}
-+
-+		t_alg->registered = true;
-+		registered = true;
-+	}
-+
- 	for (i = 0; i < ARRAY_SIZE(driver_aeads); i++) {
- 		struct caam_aead_alg *t_alg = driver_aeads + i;
- 		u32 c1_alg_sel = t_alg->caam.class1_alg_type &
-@@ -2793,6 +3348,13 @@ static int __cold dpaa2_caam_remove(struct fsl_mc_device *ls_dev)
- 			crypto_unregister_aead(&t_alg->aead);
- 	}
- 
-+	for (i = 0; i < ARRAY_SIZE(driver_algs); i++) {
-+		struct caam_skcipher_alg *t_alg = driver_algs + i;
-+
-+		if (t_alg->registered)
-+			crypto_unregister_skcipher(&t_alg->skcipher);
-+	}
-+
- 	dpaa2_dpseci_disable(priv);
- 	dpaa2_dpseci_dpio_free(priv);
- 	dpaa2_dpseci_free(priv);
-diff --git a/drivers/crypto/caam/caamalg_qi2.h b/drivers/crypto/caam/caamalg_qi2.h
-index 811d88e10918..71a08330eb09 100644
---- a/drivers/crypto/caam/caamalg_qi2.h
-+++ b/drivers/crypto/caam/caamalg_qi2.h
-@@ -140,6 +140,24 @@ struct aead_edesc {
- 	struct dpaa2_sg_entry sgt[0];
- };
- 
+diff --git a/drivers/crypto/caam/dpseci.c b/drivers/crypto/caam/dpseci.c
+new file mode 100644
+index 000000000000..8a68531ded0b
+--- /dev/null
++++ b/drivers/crypto/caam/dpseci.c
+@@ -0,0 +1,426 @@
++// SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
 +/*
-+ * skcipher_edesc - s/w-extended skcipher descriptor
-+ * @src_nents: number of segments in input scatterlist
-+ * @dst_nents: number of segments in output scatterlist
-+ * @iv_dma: dma address of iv for checking continuity and link table
-+ * @qm_sg_bytes: length of dma mapped qm_sg space
-+ * @qm_sg_dma: I/O virtual address of h/w link table
-+ * @sgt: the h/w link table, followed by IV
++ * Copyright 2013-2016 Freescale Semiconductor Inc.
++ * Copyright 2017-2018 NXP
 + */
-+struct skcipher_edesc {
-+	int src_nents;
-+	int dst_nents;
-+	dma_addr_t iv_dma;
-+	int qm_sg_bytes;
-+	dma_addr_t qm_sg_dma;
-+	struct dpaa2_sg_entry sgt[0];
++
++#include <linux/fsl/mc.h>
++#include "dpseci.h"
++#include "dpseci_cmd.h"
++
++/**
++ * dpseci_open() - Open a control session for the specified object
++ * @mc_io:	Pointer to MC portal's I/O object
++ * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
++ * @dpseci_id:	DPSECI unique ID
++ * @token:	Returned token; use in subsequent API calls
++ *
++ * This function can be used to open a control session for an already created
++ * object; an object may have been declared statically in the DPL
++ * or created dynamically.
++ * This function returns a unique authentication token, associated with the
++ * specific object ID and the specific MC portal; this token must be used in all
++ * subsequent commands for this specific object.
++ *
++ * Return:	'0' on success, error code otherwise
++ */
++int dpseci_open(struct fsl_mc_io *mc_io, u32 cmd_flags, int dpseci_id,
++		u16 *token)
++{
++	struct fsl_mc_command cmd = { 0 };
++	struct dpseci_cmd_open *cmd_params;
++	int err;
++
++	cmd.header = mc_encode_cmd_header(DPSECI_CMDID_OPEN,
++					  cmd_flags,
++					  0);
++	cmd_params = (struct dpseci_cmd_open *)cmd.params;
++	cmd_params->dpseci_id = cpu_to_le32(dpseci_id);
++	err = mc_send_command(mc_io, &cmd);
++	if (err)
++		return err;
++
++	*token = mc_cmd_hdr_read_token(&cmd);
++
++	return 0;
++}
++
++/**
++ * dpseci_close() - Close the control session of the object
++ * @mc_io:	Pointer to MC portal's I/O object
++ * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
++ * @token:	Token of DPSECI object
++ *
++ * After this function is called, no further operations are allowed on the
++ * object without opening a new control session.
++ *
++ * Return:	'0' on success, error code otherwise
++ */
++int dpseci_close(struct fsl_mc_io *mc_io, u32 cmd_flags, u16 token)
++{
++	struct fsl_mc_command cmd = { 0 };
++
++	cmd.header = mc_encode_cmd_header(DPSECI_CMDID_CLOSE,
++					  cmd_flags,
++					  token);
++	return mc_send_command(mc_io, &cmd);
++}
++
++/**
++ * dpseci_enable() - Enable the DPSECI, allow sending and receiving frames
++ * @mc_io:	Pointer to MC portal's I/O object
++ * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
++ * @token:	Token of DPSECI object
++ *
++ * Return:	'0' on success, error code otherwise
++ */
++int dpseci_enable(struct fsl_mc_io *mc_io, u32 cmd_flags, u16 token)
++{
++	struct fsl_mc_command cmd = { 0 };
++
++	cmd.header = mc_encode_cmd_header(DPSECI_CMDID_ENABLE,
++					  cmd_flags,
++					  token);
++	return mc_send_command(mc_io, &cmd);
++}
++
++/**
++ * dpseci_disable() - Disable the DPSECI, stop sending and receiving frames
++ * @mc_io:	Pointer to MC portal's I/O object
++ * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
++ * @token:	Token of DPSECI object
++ *
++ * Return:	'0' on success, error code otherwise
++ */
++int dpseci_disable(struct fsl_mc_io *mc_io, u32 cmd_flags, u16 token)
++{
++	struct fsl_mc_command cmd = { 0 };
++
++	cmd.header = mc_encode_cmd_header(DPSECI_CMDID_DISABLE,
++					  cmd_flags,
++					  token);
++
++	return mc_send_command(mc_io, &cmd);
++}
++
++/**
++ * dpseci_is_enabled() - Check if the DPSECI is enabled.
++ * @mc_io:	Pointer to MC portal's I/O object
++ * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
++ * @token:	Token of DPSECI object
++ * @en:		Returns '1' if object is enabled; '0' otherwise
++ *
++ * Return:	'0' on success, error code otherwise
++ */
++int dpseci_is_enabled(struct fsl_mc_io *mc_io, u32 cmd_flags, u16 token,
++		      int *en)
++{
++	struct fsl_mc_command cmd = { 0 };
++	struct dpseci_rsp_is_enabled *rsp_params;
++	int err;
++
++	cmd.header = mc_encode_cmd_header(DPSECI_CMDID_IS_ENABLED,
++					  cmd_flags,
++					  token);
++	err = mc_send_command(mc_io, &cmd);
++	if (err)
++		return err;
++
++	rsp_params = (struct dpseci_rsp_is_enabled *)cmd.params;
++	*en = dpseci_get_field(rsp_params->is_enabled, ENABLE);
++
++	return 0;
++}
++
++/**
++ * dpseci_get_attributes() - Retrieve DPSECI attributes
++ * @mc_io:	Pointer to MC portal's I/O object
++ * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
++ * @token:	Token of DPSECI object
++ * @attr:	Returned object's attributes
++ *
++ * Return:	'0' on success, error code otherwise
++ */
++int dpseci_get_attributes(struct fsl_mc_io *mc_io, u32 cmd_flags, u16 token,
++			  struct dpseci_attr *attr)
++{
++	struct fsl_mc_command cmd = { 0 };
++	struct dpseci_rsp_get_attributes *rsp_params;
++	int err;
++
++	cmd.header = mc_encode_cmd_header(DPSECI_CMDID_GET_ATTR,
++					  cmd_flags,
++					  token);
++	err = mc_send_command(mc_io, &cmd);
++	if (err)
++		return err;
++
++	rsp_params = (struct dpseci_rsp_get_attributes *)cmd.params;
++	attr->id = le32_to_cpu(rsp_params->id);
++	attr->num_tx_queues = rsp_params->num_tx_queues;
++	attr->num_rx_queues = rsp_params->num_rx_queues;
++	attr->options = le32_to_cpu(rsp_params->options);
++
++	return 0;
++}
++
++/**
++ * dpseci_set_rx_queue() - Set Rx queue configuration
++ * @mc_io:	Pointer to MC portal's I/O object
++ * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
++ * @token:	Token of DPSECI object
++ * @queue:	Select the queue relative to number of priorities configured at
++ *		DPSECI creation; use DPSECI_ALL_QUEUES to configure all
++ *		Rx queues identically.
++ * @cfg:	Rx queue configuration
++ *
++ * Return:	'0' on success, error code otherwise
++ */
++int dpseci_set_rx_queue(struct fsl_mc_io *mc_io, u32 cmd_flags, u16 token,
++			u8 queue, const struct dpseci_rx_queue_cfg *cfg)
++{
++	struct fsl_mc_command cmd = { 0 };
++	struct dpseci_cmd_queue *cmd_params;
++
++	cmd.header = mc_encode_cmd_header(DPSECI_CMDID_SET_RX_QUEUE,
++					  cmd_flags,
++					  token);
++	cmd_params = (struct dpseci_cmd_queue *)cmd.params;
++	cmd_params->dest_id = cpu_to_le32(cfg->dest_cfg.dest_id);
++	cmd_params->priority = cfg->dest_cfg.priority;
++	cmd_params->queue = queue;
++	dpseci_set_field(cmd_params->dest_type, DEST_TYPE,
++			 cfg->dest_cfg.dest_type);
++	cmd_params->user_ctx = cpu_to_le64(cfg->user_ctx);
++	cmd_params->options = cpu_to_le32(cfg->options);
++	dpseci_set_field(cmd_params->order_preservation_en, ORDER_PRESERVATION,
++			 cfg->order_preservation_en);
++
++	return mc_send_command(mc_io, &cmd);
++}
++
++/**
++ * dpseci_get_rx_queue() - Retrieve Rx queue attributes
++ * @mc_io:	Pointer to MC portal's I/O object
++ * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
++ * @token:	Token of DPSECI object
++ * @queue:	Select the queue relative to number of priorities configured at
++ *		DPSECI creation
++ * @attr:	Returned Rx queue attributes
++ *
++ * Return:	'0' on success, error code otherwise
++ */
++int dpseci_get_rx_queue(struct fsl_mc_io *mc_io, u32 cmd_flags, u16 token,
++			u8 queue, struct dpseci_rx_queue_attr *attr)
++{
++	struct fsl_mc_command cmd = { 0 };
++	struct dpseci_cmd_queue *cmd_params;
++	int err;
++
++	cmd.header = mc_encode_cmd_header(DPSECI_CMDID_GET_RX_QUEUE,
++					  cmd_flags,
++					  token);
++	cmd_params = (struct dpseci_cmd_queue *)cmd.params;
++	cmd_params->queue = queue;
++	err = mc_send_command(mc_io, &cmd);
++	if (err)
++		return err;
++
++	attr->dest_cfg.dest_id = le32_to_cpu(cmd_params->dest_id);
++	attr->dest_cfg.priority = cmd_params->priority;
++	attr->dest_cfg.dest_type = dpseci_get_field(cmd_params->dest_type,
++						    DEST_TYPE);
++	attr->user_ctx = le64_to_cpu(cmd_params->user_ctx);
++	attr->fqid = le32_to_cpu(cmd_params->fqid);
++	attr->order_preservation_en =
++		dpseci_get_field(cmd_params->order_preservation_en,
++				 ORDER_PRESERVATION);
++
++	return 0;
++}
++
++/**
++ * dpseci_get_tx_queue() - Retrieve Tx queue attributes
++ * @mc_io:	Pointer to MC portal's I/O object
++ * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
++ * @token:	Token of DPSECI object
++ * @queue:	Select the queue relative to number of priorities configured at
++ *		DPSECI creation
++ * @attr:	Returned Tx queue attributes
++ *
++ * Return:	'0' on success, error code otherwise
++ */
++int dpseci_get_tx_queue(struct fsl_mc_io *mc_io, u32 cmd_flags, u16 token,
++			u8 queue, struct dpseci_tx_queue_attr *attr)
++{
++	struct fsl_mc_command cmd = { 0 };
++	struct dpseci_cmd_queue *cmd_params;
++	struct dpseci_rsp_get_tx_queue *rsp_params;
++	int err;
++
++	cmd.header = mc_encode_cmd_header(DPSECI_CMDID_GET_TX_QUEUE,
++					  cmd_flags,
++					  token);
++	cmd_params = (struct dpseci_cmd_queue *)cmd.params;
++	cmd_params->queue = queue;
++	err = mc_send_command(mc_io, &cmd);
++	if (err)
++		return err;
++
++	rsp_params = (struct dpseci_rsp_get_tx_queue *)cmd.params;
++	attr->fqid = le32_to_cpu(rsp_params->fqid);
++	attr->priority = rsp_params->priority;
++
++	return 0;
++}
++
++/**
++ * dpseci_get_sec_attr() - Retrieve SEC accelerator attributes
++ * @mc_io:	Pointer to MC portal's I/O object
++ * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
++ * @token:	Token of DPSECI object
++ * @attr:	Returned SEC attributes
++ *
++ * Return:	'0' on success, error code otherwise
++ */
++int dpseci_get_sec_attr(struct fsl_mc_io *mc_io, u32 cmd_flags, u16 token,
++			struct dpseci_sec_attr *attr)
++{
++	struct fsl_mc_command cmd = { 0 };
++	struct dpseci_rsp_get_sec_attr *rsp_params;
++	int err;
++
++	cmd.header = mc_encode_cmd_header(DPSECI_CMDID_GET_SEC_ATTR,
++					  cmd_flags,
++					  token);
++	err = mc_send_command(mc_io, &cmd);
++	if (err)
++		return err;
++
++	rsp_params = (struct dpseci_rsp_get_sec_attr *)cmd.params;
++	attr->ip_id = le16_to_cpu(rsp_params->ip_id);
++	attr->major_rev = rsp_params->major_rev;
++	attr->minor_rev = rsp_params->minor_rev;
++	attr->era = rsp_params->era;
++	attr->deco_num = rsp_params->deco_num;
++	attr->zuc_auth_acc_num = rsp_params->zuc_auth_acc_num;
++	attr->zuc_enc_acc_num = rsp_params->zuc_enc_acc_num;
++	attr->snow_f8_acc_num = rsp_params->snow_f8_acc_num;
++	attr->snow_f9_acc_num = rsp_params->snow_f9_acc_num;
++	attr->crc_acc_num = rsp_params->crc_acc_num;
++	attr->pk_acc_num = rsp_params->pk_acc_num;
++	attr->kasumi_acc_num = rsp_params->kasumi_acc_num;
++	attr->rng_acc_num = rsp_params->rng_acc_num;
++	attr->md_acc_num = rsp_params->md_acc_num;
++	attr->arc4_acc_num = rsp_params->arc4_acc_num;
++	attr->des_acc_num = rsp_params->des_acc_num;
++	attr->aes_acc_num = rsp_params->aes_acc_num;
++	attr->ccha_acc_num = rsp_params->ccha_acc_num;
++	attr->ptha_acc_num = rsp_params->ptha_acc_num;
++
++	return 0;
++}
++
++/**
++ * dpseci_get_api_version() - Get Data Path SEC Interface API version
++ * @mc_io:	Pointer to MC portal's I/O object
++ * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
++ * @major_ver:	Major version of data path sec API
++ * @minor_ver:	Minor version of data path sec API
++ *
++ * Return:	'0' on success, error code otherwise
++ */
++int dpseci_get_api_version(struct fsl_mc_io *mc_io, u32 cmd_flags,
++			   u16 *major_ver, u16 *minor_ver)
++{
++	struct fsl_mc_command cmd = { 0 };
++	struct dpseci_rsp_get_api_version *rsp_params;
++	int err;
++
++	cmd.header = mc_encode_cmd_header(DPSECI_CMDID_GET_API_VERSION,
++					  cmd_flags, 0);
++	err = mc_send_command(mc_io, &cmd);
++	if (err)
++		return err;
++
++	rsp_params = (struct dpseci_rsp_get_api_version *)cmd.params;
++	*major_ver = le16_to_cpu(rsp_params->major);
++	*minor_ver = le16_to_cpu(rsp_params->minor);
++
++	return 0;
++}
++
++/**
++ * dpseci_set_congestion_notification() - Set congestion group
++ *	notification configuration
++ * @mc_io:	Pointer to MC portal's I/O object
++ * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
++ * @token:	Token of DPSECI object
++ * @cfg:	congestion notification configuration
++ *
++ * Return:	'0' on success, error code otherwise
++ */
++int dpseci_set_congestion_notification(struct fsl_mc_io *mc_io, u32 cmd_flags,
++	u16 token, const struct dpseci_congestion_notification_cfg *cfg)
++{
++	struct fsl_mc_command cmd = { 0 };
++	struct dpseci_cmd_congestion_notification *cmd_params;
++
++	cmd.header = mc_encode_cmd_header(
++			DPSECI_CMDID_SET_CONGESTION_NOTIFICATION,
++			cmd_flags,
++			token);
++	cmd_params = (struct dpseci_cmd_congestion_notification *)cmd.params;
++	cmd_params->dest_id = cpu_to_le32(cfg->dest_cfg.dest_id);
++	cmd_params->notification_mode = cpu_to_le16(cfg->notification_mode);
++	cmd_params->priority = cfg->dest_cfg.priority;
++	dpseci_set_field(cmd_params->options, CGN_DEST_TYPE,
++			 cfg->dest_cfg.dest_type);
++	dpseci_set_field(cmd_params->options, CGN_UNITS, cfg->units);
++	cmd_params->message_iova = cpu_to_le64(cfg->message_iova);
++	cmd_params->message_ctx = cpu_to_le64(cfg->message_ctx);
++	cmd_params->threshold_entry = cpu_to_le32(cfg->threshold_entry);
++	cmd_params->threshold_exit = cpu_to_le32(cfg->threshold_exit);
++
++	return mc_send_command(mc_io, &cmd);
++}
++
++/**
++ * dpseci_get_congestion_notification() - Get congestion group notification
++ *	configuration
++ * @mc_io:	Pointer to MC portal's I/O object
++ * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
++ * @token:	Token of DPSECI object
++ * @cfg:	congestion notification configuration
++ *
++ * Return:	'0' on success, error code otherwise
++ */
++int dpseci_get_congestion_notification(struct fsl_mc_io *mc_io, u32 cmd_flags,
++	u16 token, struct dpseci_congestion_notification_cfg *cfg)
++{
++	struct fsl_mc_command cmd = { 0 };
++	struct dpseci_cmd_congestion_notification *rsp_params;
++	int err;
++
++	cmd.header = mc_encode_cmd_header(
++			DPSECI_CMDID_GET_CONGESTION_NOTIFICATION,
++			cmd_flags,
++			token);
++	err = mc_send_command(mc_io, &cmd);
++	if (err)
++		return err;
++
++	rsp_params = (struct dpseci_cmd_congestion_notification *)cmd.params;
++	cfg->dest_cfg.dest_id = le32_to_cpu(rsp_params->dest_id);
++	cfg->notification_mode = le16_to_cpu(rsp_params->notification_mode);
++	cfg->dest_cfg.priority = rsp_params->priority;
++	cfg->dest_cfg.dest_type = dpseci_get_field(rsp_params->options,
++						   CGN_DEST_TYPE);
++	cfg->units = dpseci_get_field(rsp_params->options, CGN_UNITS);
++	cfg->message_iova = le64_to_cpu(rsp_params->message_iova);
++	cfg->message_ctx = le64_to_cpu(rsp_params->message_ctx);
++	cfg->threshold_entry = le32_to_cpu(rsp_params->threshold_entry);
++	cfg->threshold_exit = le32_to_cpu(rsp_params->threshold_exit);
++
++	return 0;
++}
+diff --git a/drivers/crypto/caam/dpseci.h b/drivers/crypto/caam/dpseci.h
+new file mode 100644
+index 000000000000..4550e134d166
+--- /dev/null
++++ b/drivers/crypto/caam/dpseci.h
+@@ -0,0 +1,333 @@
++/* SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause) */
++/*
++ * Copyright 2013-2016 Freescale Semiconductor Inc.
++ * Copyright 2017-2018 NXP
++ */
++#ifndef _DPSECI_H_
++#define _DPSECI_H_
++
++/*
++ * Data Path SEC Interface API
++ * Contains initialization APIs and runtime control APIs for DPSECI
++ */
++
++struct fsl_mc_io;
++
++/**
++ * General DPSECI macros
++ */
++
++/**
++ * Maximum number of Tx/Rx queues per DPSECI object
++ */
++#define DPSECI_MAX_QUEUE_NUM		16
++
++/**
++ * All queues considered; see dpseci_set_rx_queue()
++ */
++#define DPSECI_ALL_QUEUES	(u8)(-1)
++
++int dpseci_open(struct fsl_mc_io *mc_io, u32 cmd_flags, int dpseci_id,
++		u16 *token);
++
++int dpseci_close(struct fsl_mc_io *mc_io, u32 cmd_flags, u16 token);
++
++/**
++ * Enable the Congestion Group support
++ */
++#define DPSECI_OPT_HAS_CG		0x000020
++
++/**
++ * struct dpseci_cfg - Structure representing DPSECI configuration
++ * @options: Any combination of the following flags:
++ *		DPSECI_OPT_HAS_CG
++ * @num_tx_queues: num of queues towards the SEC
++ * @num_rx_queues: num of queues back from the SEC
++ * @priorities: Priorities for the SEC hardware processing;
++ *		each place in the array is the priority of the tx queue
++ *		towards the SEC;
++ *		valid priorities are configured with values 1-8;
++ */
++struct dpseci_cfg {
++	u32 options;
++	u8 num_tx_queues;
++	u8 num_rx_queues;
++	u8 priorities[DPSECI_MAX_QUEUE_NUM];
 +};
 +
- /**
-  * caam_flc - Flow Context (FLC)
-  * @flc: Flow Context options
-@@ -167,7 +185,7 @@ enum optype {
-  * @flc_dma: I/O virtual address of Flow Context
-  * @cbk: Callback function to invoke when job is completed
-  * @ctx: arbit context attached with request by the application
-- * @edesc: extended descriptor; points to aead_edesc
-+ * @edesc: extended descriptor; points to one of {skcipher,aead}_edesc
-  */
- struct caam_request {
- 	struct dpaa2_fl_entry fd_flt[2];
++int dpseci_enable(struct fsl_mc_io *mc_io, u32 cmd_flags, u16 token);
++
++int dpseci_disable(struct fsl_mc_io *mc_io, u32 cmd_flags, u16 token);
++
++int dpseci_is_enabled(struct fsl_mc_io *mc_io, u32 cmd_flags, u16 token,
++		      int *en);
++
++/**
++ * struct dpseci_attr - Structure representing DPSECI attributes
++ * @id: DPSECI object ID
++ * @num_tx_queues: number of queues towards the SEC
++ * @num_rx_queues: number of queues back from the SEC
++ * @options: any combination of the following flags:
++ *		DPSECI_OPT_HAS_CG
++ */
++struct dpseci_attr {
++	int id;
++	u8 num_tx_queues;
++	u8 num_rx_queues;
++	u32 options;
++};
++
++int dpseci_get_attributes(struct fsl_mc_io *mc_io, u32 cmd_flags, u16 token,
++			  struct dpseci_attr *attr);
++
++/**
++ * enum dpseci_dest - DPSECI destination types
++ * @DPSECI_DEST_NONE: Unassigned destination; The queue is set in parked mode
++ *	and does not generate FQDAN notifications; user is expected to dequeue
++ *	from the queue based on polling or other user-defined method
++ * @DPSECI_DEST_DPIO: The queue is set in schedule mode and generates FQDAN
++ *	notifications to the specified DPIO; user is expected to dequeue from
++ *	the queue only after notification is received
++ * @DPSECI_DEST_DPCON: The queue is set in schedule mode and does not generate
++ *	FQDAN notifications, but is connected to the specified DPCON object;
++ *	user is expected to dequeue from the DPCON channel
++ */
++enum dpseci_dest {
++	DPSECI_DEST_NONE = 0,
++	DPSECI_DEST_DPIO,
++	DPSECI_DEST_DPCON
++};
++
++/**
++ * struct dpseci_dest_cfg - Structure representing DPSECI destination parameters
++ * @dest_type: Destination type
++ * @dest_id: Either DPIO ID or DPCON ID, depending on the destination type
++ * @priority: Priority selection within the DPIO or DPCON channel; valid values
++ *	are 0-1 or 0-7, depending on the number of priorities in that channel;
++ *	not relevant for 'DPSECI_DEST_NONE' option
++ */
++struct dpseci_dest_cfg {
++	enum dpseci_dest dest_type;
++	int dest_id;
++	u8 priority;
++};
++
++/**
++ * DPSECI queue modification options
++ */
++
++/**
++ * Select to modify the user's context associated with the queue
++ */
++#define DPSECI_QUEUE_OPT_USER_CTX		0x00000001
++
++/**
++ * Select to modify the queue's destination
++ */
++#define DPSECI_QUEUE_OPT_DEST			0x00000002
++
++/**
++ * Select to modify the queue's order preservation
++ */
++#define DPSECI_QUEUE_OPT_ORDER_PRESERVATION	0x00000004
++
++/**
++ * struct dpseci_rx_queue_cfg - DPSECI RX queue configuration
++ * @options: Flags representing the suggested modifications to the queue;
++ *	Use any combination of 'DPSECI_QUEUE_OPT_<X>' flags
++ * @order_preservation_en: order preservation configuration for the rx queue
++ * valid only if 'DPSECI_QUEUE_OPT_ORDER_PRESERVATION' is contained in 'options'
++ * @user_ctx: User context value provided in the frame descriptor of each
++ *	dequeued frame;	valid only if 'DPSECI_QUEUE_OPT_USER_CTX' is contained
++ *	in 'options'
++ * @dest_cfg: Queue destination parameters; valid only if
++ *	'DPSECI_QUEUE_OPT_DEST' is contained in 'options'
++ */
++struct dpseci_rx_queue_cfg {
++	u32 options;
++	int order_preservation_en;
++	u64 user_ctx;
++	struct dpseci_dest_cfg dest_cfg;
++};
++
++int dpseci_set_rx_queue(struct fsl_mc_io *mc_io, u32 cmd_flags, u16 token,
++			u8 queue, const struct dpseci_rx_queue_cfg *cfg);
++
++/**
++ * struct dpseci_rx_queue_attr - Structure representing attributes of Rx queues
++ * @user_ctx: User context value provided in the frame descriptor of each
++ *	dequeued frame
++ * @order_preservation_en: Status of the order preservation configuration on the
++ *	queue
++ * @dest_cfg: Queue destination configuration
++ * @fqid: Virtual FQID value to be used for dequeue operations
++ */
++struct dpseci_rx_queue_attr {
++	u64 user_ctx;
++	int order_preservation_en;
++	struct dpseci_dest_cfg dest_cfg;
++	u32 fqid;
++};
++
++int dpseci_get_rx_queue(struct fsl_mc_io *mc_io, u32 cmd_flags, u16 token,
++			u8 queue, struct dpseci_rx_queue_attr *attr);
++
++/**
++ * struct dpseci_tx_queue_attr - Structure representing attributes of Tx queues
++ * @fqid: Virtual FQID to be used for sending frames to SEC hardware
++ * @priority: SEC hardware processing priority for the queue
++ */
++struct dpseci_tx_queue_attr {
++	u32 fqid;
++	u8 priority;
++};
++
++int dpseci_get_tx_queue(struct fsl_mc_io *mc_io, u32 cmd_flags, u16 token,
++			u8 queue, struct dpseci_tx_queue_attr *attr);
++
++/**
++ * struct dpseci_sec_attr - Structure representing attributes of the SEC
++ *	hardware accelerator
++ * @ip_id: ID for SEC
++ * @major_rev: Major revision number for SEC
++ * @minor_rev: Minor revision number for SEC
++ * @era: SEC Era
++ * @deco_num: The number of copies of the DECO that are implemented in this
++ *	version of SEC
++ * @zuc_auth_acc_num: The number of copies of ZUCA that are implemented in this
++ *	version of SEC
++ * @zuc_enc_acc_num: The number of copies of ZUCE that are implemented in this
++ *	version of SEC
++ * @snow_f8_acc_num: The number of copies of the SNOW-f8 module that are
++ *	implemented in this version of SEC
++ * @snow_f9_acc_num: The number of copies of the SNOW-f9 module that are
++ *	implemented in this version of SEC
++ * @crc_acc_num: The number of copies of the CRC module that are implemented in
++ *	this version of SEC
++ * @pk_acc_num:  The number of copies of the Public Key module that are
++ *	implemented in this version of SEC
++ * @kasumi_acc_num: The number of copies of the Kasumi module that are
++ *	implemented in this version of SEC
++ * @rng_acc_num: The number of copies of the Random Number Generator that are
++ *	implemented in this version of SEC
++ * @md_acc_num: The number of copies of the MDHA (Hashing module) that are
++ *	implemented in this version of SEC
++ * @arc4_acc_num: The number of copies of the ARC4 module that are implemented
++ *	in this version of SEC
++ * @des_acc_num: The number of copies of the DES module that are implemented in
++ *	this version of SEC
++ * @aes_acc_num: The number of copies of the AES module that are implemented in
++ *	this version of SEC
++ * @ccha_acc_num: The number of copies of the ChaCha20 module that are
++ *	implemented in this version of SEC.
++ * @ptha_acc_num: The number of copies of the Poly1305 module that are
++ *	implemented in this version of SEC.
++ **/
++struct dpseci_sec_attr {
++	u16 ip_id;
++	u8 major_rev;
++	u8 minor_rev;
++	u8 era;
++	u8 deco_num;
++	u8 zuc_auth_acc_num;
++	u8 zuc_enc_acc_num;
++	u8 snow_f8_acc_num;
++	u8 snow_f9_acc_num;
++	u8 crc_acc_num;
++	u8 pk_acc_num;
++	u8 kasumi_acc_num;
++	u8 rng_acc_num;
++	u8 md_acc_num;
++	u8 arc4_acc_num;
++	u8 des_acc_num;
++	u8 aes_acc_num;
++	u8 ccha_acc_num;
++	u8 ptha_acc_num;
++};
++
++int dpseci_get_sec_attr(struct fsl_mc_io *mc_io, u32 cmd_flags, u16 token,
++			struct dpseci_sec_attr *attr);
++
++int dpseci_get_api_version(struct fsl_mc_io *mc_io, u32 cmd_flags,
++			   u16 *major_ver, u16 *minor_ver);
++
++/**
++ * enum dpseci_congestion_unit - DPSECI congestion units
++ * @DPSECI_CONGESTION_UNIT_BYTES: bytes units
++ * @DPSECI_CONGESTION_UNIT_FRAMES: frames units
++ */
++enum dpseci_congestion_unit {
++	DPSECI_CONGESTION_UNIT_BYTES = 0,
++	DPSECI_CONGESTION_UNIT_FRAMES
++};
++
++/**
++ * CSCN message is written to message_iova once entering a
++ * congestion state (see 'threshold_entry')
++ */
++#define DPSECI_CGN_MODE_WRITE_MEM_ON_ENTER		0x00000001
++
++/**
++ * CSCN message is written to message_iova once exiting a
++ * congestion state (see 'threshold_exit')
++ */
++#define DPSECI_CGN_MODE_WRITE_MEM_ON_EXIT		0x00000002
++
++/**
++ * CSCN write will attempt to allocate into a cache (coherent write);
++ * valid only if 'DPSECI_CGN_MODE_WRITE_MEM_<X>' is selected
++ */
++#define DPSECI_CGN_MODE_COHERENT_WRITE			0x00000004
++
++/**
++ * if 'dpseci_dest_cfg.dest_type != DPSECI_DEST_NONE' CSCN message is sent to
++ * DPIO/DPCON's WQ channel once entering a congestion state
++ * (see 'threshold_entry')
++ */
++#define DPSECI_CGN_MODE_NOTIFY_DEST_ON_ENTER		0x00000008
++
++/**
++ * if 'dpseci_dest_cfg.dest_type != DPSECI_DEST_NONE' CSCN message is sent to
++ * DPIO/DPCON's WQ channel once exiting a congestion state
++ * (see 'threshold_exit')
++ */
++#define DPSECI_CGN_MODE_NOTIFY_DEST_ON_EXIT		0x00000010
++
++/**
++ * if 'dpseci_dest_cfg.dest_type != DPSECI_DEST_NONE' when the CSCN is written
++ * to the sw-portal's DQRR, the DQRI interrupt is asserted immediately
++ * (if enabled)
++ */
++#define DPSECI_CGN_MODE_INTR_COALESCING_DISABLED	0x00000020
++
++/**
++ * struct dpseci_congestion_notification_cfg - congestion notification
++ *	configuration
++ * @units: units type
++ * @threshold_entry: above this threshold we enter a congestion state.
++ *	set it to '0' to disable it
++ * @threshold_exit: below this threshold we exit the congestion state.
++ * @message_ctx: The context that will be part of the CSCN message
++ * @message_iova: I/O virtual address (must be in DMA-able memory),
++ *	must be 16B aligned;
++ * @dest_cfg: CSCN can be send to either DPIO or DPCON WQ channel
++ * @notification_mode: Mask of available options; use 'DPSECI_CGN_MODE_<X>'
++ *	values
++ */
++struct dpseci_congestion_notification_cfg {
++	enum dpseci_congestion_unit units;
++	u32 threshold_entry;
++	u32 threshold_exit;
++	u64 message_ctx;
++	u64 message_iova;
++	struct dpseci_dest_cfg dest_cfg;
++	u16 notification_mode;
++};
++
++int dpseci_set_congestion_notification(struct fsl_mc_io *mc_io, u32 cmd_flags,
++	u16 token, const struct dpseci_congestion_notification_cfg *cfg);
++
++int dpseci_get_congestion_notification(struct fsl_mc_io *mc_io, u32 cmd_flags,
++	u16 token, struct dpseci_congestion_notification_cfg *cfg);
++
++#endif /* _DPSECI_H_ */
+diff --git a/drivers/crypto/caam/dpseci_cmd.h b/drivers/crypto/caam/dpseci_cmd.h
+new file mode 100644
+index 000000000000..6ab77ead6e3d
+--- /dev/null
++++ b/drivers/crypto/caam/dpseci_cmd.h
+@@ -0,0 +1,149 @@
++/* SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause) */
++/*
++ * Copyright 2013-2016 Freescale Semiconductor Inc.
++ * Copyright 2017-2018 NXP
++ */
++
++#ifndef _DPSECI_CMD_H_
++#define _DPSECI_CMD_H_
++
++/* DPSECI Version */
++#define DPSECI_VER_MAJOR				5
++#define DPSECI_VER_MINOR				3
++
++#define DPSECI_VER(maj, min)	(((maj) << 16) | (min))
++#define DPSECI_VERSION		DPSECI_VER(DPSECI_VER_MAJOR, DPSECI_VER_MINOR)
++
++/* Command versioning */
++#define DPSECI_CMD_BASE_VERSION		1
++#define DPSECI_CMD_BASE_VERSION_V2	2
++#define DPSECI_CMD_ID_OFFSET		4
++
++#define DPSECI_CMD_V1(id)	(((id) << DPSECI_CMD_ID_OFFSET) | \
++				 DPSECI_CMD_BASE_VERSION)
++
++#define DPSECI_CMD_V2(id)	(((id) << DPSECI_CMD_ID_OFFSET) | \
++				 DPSECI_CMD_BASE_VERSION_V2)
++
++/* Command IDs */
++#define DPSECI_CMDID_CLOSE				DPSECI_CMD_V1(0x800)
++#define DPSECI_CMDID_OPEN				DPSECI_CMD_V1(0x809)
++#define DPSECI_CMDID_GET_API_VERSION			DPSECI_CMD_V1(0xa09)
++
++#define DPSECI_CMDID_ENABLE				DPSECI_CMD_V1(0x002)
++#define DPSECI_CMDID_DISABLE				DPSECI_CMD_V1(0x003)
++#define DPSECI_CMDID_GET_ATTR				DPSECI_CMD_V1(0x004)
++#define DPSECI_CMDID_IS_ENABLED				DPSECI_CMD_V1(0x006)
++
++#define DPSECI_CMDID_SET_RX_QUEUE			DPSECI_CMD_V1(0x194)
++#define DPSECI_CMDID_GET_RX_QUEUE			DPSECI_CMD_V1(0x196)
++#define DPSECI_CMDID_GET_TX_QUEUE			DPSECI_CMD_V1(0x197)
++#define DPSECI_CMDID_GET_SEC_ATTR			DPSECI_CMD_V2(0x198)
++#define DPSECI_CMDID_SET_CONGESTION_NOTIFICATION	DPSECI_CMD_V1(0x170)
++#define DPSECI_CMDID_GET_CONGESTION_NOTIFICATION	DPSECI_CMD_V1(0x171)
++
++/* Macros for accessing command fields smaller than 1 byte */
++#define DPSECI_MASK(field)	\
++	GENMASK(DPSECI_##field##_SHIFT + DPSECI_##field##_SIZE - 1,	\
++		DPSECI_##field##_SHIFT)
++
++#define dpseci_set_field(var, field, val)	\
++	((var) |= (((val) << DPSECI_##field##_SHIFT) & DPSECI_MASK(field)))
++
++#define dpseci_get_field(var, field)	\
++	(((var) & DPSECI_MASK(field)) >> DPSECI_##field##_SHIFT)
++
++struct dpseci_cmd_open {
++	__le32 dpseci_id;
++};
++
++#define DPSECI_ENABLE_SHIFT	0
++#define DPSECI_ENABLE_SIZE	1
++
++struct dpseci_rsp_is_enabled {
++	u8 is_enabled;
++};
++
++struct dpseci_rsp_get_attributes {
++	__le32 id;
++	__le32 pad0;
++	u8 num_tx_queues;
++	u8 num_rx_queues;
++	u8 pad1[6];
++	__le32 options;
++};
++
++#define DPSECI_DEST_TYPE_SHIFT	0
++#define DPSECI_DEST_TYPE_SIZE	4
++
++#define DPSECI_ORDER_PRESERVATION_SHIFT	0
++#define DPSECI_ORDER_PRESERVATION_SIZE	1
++
++struct dpseci_cmd_queue {
++	__le32 dest_id;
++	u8 priority;
++	u8 queue;
++	u8 dest_type;
++	u8 pad;
++	__le64 user_ctx;
++	union {
++		__le32 options;
++		__le32 fqid;
++	};
++	u8 order_preservation_en;
++};
++
++struct dpseci_rsp_get_tx_queue {
++	__le32 pad;
++	__le32 fqid;
++	u8 priority;
++};
++
++struct dpseci_rsp_get_sec_attr {
++	__le16 ip_id;
++	u8 major_rev;
++	u8 minor_rev;
++	u8 era;
++	u8 pad0[3];
++	u8 deco_num;
++	u8 zuc_auth_acc_num;
++	u8 zuc_enc_acc_num;
++	u8 pad1;
++	u8 snow_f8_acc_num;
++	u8 snow_f9_acc_num;
++	u8 crc_acc_num;
++	u8 pad2;
++	u8 pk_acc_num;
++	u8 kasumi_acc_num;
++	u8 rng_acc_num;
++	u8 pad3;
++	u8 md_acc_num;
++	u8 arc4_acc_num;
++	u8 des_acc_num;
++	u8 aes_acc_num;
++	u8 ccha_acc_num;
++	u8 ptha_acc_num;
++};
++
++struct dpseci_rsp_get_api_version {
++	__le16 major;
++	__le16 minor;
++};
++
++#define DPSECI_CGN_DEST_TYPE_SHIFT	0
++#define DPSECI_CGN_DEST_TYPE_SIZE	4
++#define DPSECI_CGN_UNITS_SHIFT		4
++#define DPSECI_CGN_UNITS_SIZE		2
++
++struct dpseci_cmd_congestion_notification {
++	__le32 dest_id;
++	__le16 notification_mode;
++	u8 priority;
++	u8 options;
++	__le64 message_iova;
++	__le64 message_ctx;
++	__le32 threshold_entry;
++	__le32 threshold_exit;
++};
++
++#endif /* _DPSECI_CMD_H_ */
 -- 
 2.16.2
