@@ -1,71 +1,102 @@
-From: Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH 2/4] arm64: cpufeature: add feature for CRC32 instructions
-Date: Mon, 10 Sep 2018 16:45:33 +0100
-Message-ID: <20180910154533.3yxh7iooqbbsp7nc@armageddon.cambridge.arm.com>
-References: <20180827110245.14812-1-ard.biesheuvel@linaro.org>
- <20180827110245.14812-3-ard.biesheuvel@linaro.org>
- <20180828170135.GC19825@arm.com>
- <CAKv+Gu-tM9aKZJ3ppt9yLVP_V5YA_yN8D1j_-NtM+qQCdnc6JA@mail.gmail.com>
- <20180904031855.mjpdndeh57lqziuk@gondor.apana.org.au>
+From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
+Subject: [PATCH 00/11] crypto: caam - add DPAA2 (DPSECI) driver
+Date: Mon, 10 Sep 2018 20:15:39 +0300
+Message-ID: <20180910171550.5659-1-horia.geanta@nxp.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        "Suzuki K. Poulose" <suzuki.poulose@arm.com>,
-        Eric Biggers <ebiggers@google.com>,
-        Will Deacon <will.deacon@arm.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Cc: "David S . Miller" <davem@davemloft.net>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        Stuart Yoder <stuyoder@gmail.com>,
+        Laurentiu Tudor <laurentiu.tudor@nxp.com>,
+        Li Yang <leoyang.li@nxp.com>, Roy Pledge <roy.pledge@nxp.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will.deacon@arm.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20180904031855.mjpdndeh57lqziuk@gondor.apana.org.au>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Sep 04, 2018 at 11:18:55AM +0800, Herbert Xu wrote:
-> On Tue, Aug 28, 2018 at 08:43:35PM +0200, Ard Biesheuvel wrote:
-> > On 28 August 2018 at 19:01, Will Deacon <will.deacon@arm.com> wrote:
-> > > On Mon, Aug 27, 2018 at 01:02:43PM +0200, Ard Biesheuvel wrote:
-> > >> Add a CRC32 feature bit and wire it up to the CPU id register so we
-> > >> will be able to use alternatives patching for CRC32 operations.
-> > >>
-> > >> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> > >> ---
-> > >>  arch/arm64/include/asm/cpucaps.h | 3 ++-
-> > >>  arch/arm64/kernel/cpufeature.c   | 9 +++++++++
-> > >>  2 files changed, 11 insertions(+), 1 deletion(-)
-> > >
-> > > Acked-by: Will Deacon <will.deacon@arm.com>
-> > >
-> > > With the minor caveat below...
-> > >
-> > >> diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
-> > >> index ae1f70450fb2..9932aca9704b 100644
-> > >> --- a/arch/arm64/include/asm/cpucaps.h
-> > >> +++ b/arch/arm64/include/asm/cpucaps.h
-> > >> @@ -51,7 +51,8 @@
-> > >>  #define ARM64_SSBD                           30
-> > >>  #define ARM64_MISMATCHED_CACHE_TYPE          31
-> > >>  #define ARM64_HAS_STAGE2_FWB                 32
-> > >> +#define ARM64_HAS_CRC32                              33
-> > >>
-> > >> -#define ARM64_NCAPS                          33
-> > >> +#define ARM64_NCAPS                          34
-> > >
-> > >
-> > > ... if this goes via crypto, you'll almost certainly get a (trivial)
-> > > conflict with arm64, since these numbers get bumped all the time.
-> > >
-> > 
-> > I think the first three patches should go through the arm64 tree. The
-> > last one just removes the now redundant crc32 SIMD driver, and Herbert
-> > could pick that up separately, i.e., it should be totally independent.
-> 
-> Yes let's do that.
+Hi,
 
-I queued the first 3 patches for 4.19. Thanks.
+This patch set adds the CAAM crypto engine driver for DPAA2
+(Data Path Acceleration Architecture v2) found on ARMv8-based SoCs
+like LS1088A, LS2088A, LX2160A.
+
+Previously sent RFC can be found here:
+https://www.mail-archive.com/linux-crypto@vger.kernel.org/msg27290.html
+
+Driver consists of:
+-DPSECI (Data Path SEC Interface) backend - low-level API that allows
+to manage DPSECI devices (DPAA2 objects) that sit on
+the Management Complex (MC) fsl-mc bus
+-algorithms frontend - AEAD, skcipher and ahash algorithms implementation
+
+Patches 1-4 are fsl-mc bus and DPIO dependencies.
+Stuart, Laurentiu, Leo, Roy, please review the patches and let me know
+if you have anything against going with them through the cryptodev tree.
+
+Patches 5-10 are the core of the patch set, adding the driver.
+For symmetric encryption the new skcipher interface is used.
+
+Patch 11 enables driver on arm64. It will be built only if dependency
+on DPIO (CONFIG_FSL_MC_DPIO) is satisfied.
+
+Note: multiple modprobe/rmmod won't work without the following patches
+[5/7,v7] bus/fsl-mc: support dma configure for devices on fsl-mc bus
+https://patchwork.kernel.org/patch/10594179
+[7/7,v7] arm64: dts: ls208xa: comply with the iommu map binding for fsl_mc
+https://patchwork.kernel.org/patch/10594171
+(for LS1088A a similar DT update is needed)
+
+Thanks,
+Horia
+
+Horia Geantă (11):
+  bus: fsl-mc: add support for dpseci device type
+  Revert "staging: fsl-mc/dpio: remove couple of unused functions"
+  soc: fsl: dpio: add frame list format support
+  soc: fsl: dpio: add congestion notification support
+  crypto: caam - add DPAA2-CAAM (DPSECI) backend API
+  crypto: caam - add Queue Interface v2 error codes
+  crypto: caam/qi2 - add DPAA2-CAAM driver
+  crypto: caam/qi2 - add skcipher algorithms
+  crypto: caam - export ahash shared descriptor generation
+  crypto: caam/qi2 - add support for ahash algorithms
+  arm64: defconfig: enable CAAM crypto engine on QorIQ DPAA2 SoCs
+
+ arch/arm64/configs/defconfig        |    1 +
+ drivers/bus/fsl-mc/fsl-mc-bus.c     |    5 +
+ drivers/crypto/Makefile             |    2 +-
+ drivers/crypto/caam/Kconfig         |   55 +-
+ drivers/crypto/caam/Makefile        |   10 +-
+ drivers/crypto/caam/caamalg_qi2.c   | 5165 +++++++++++++++++++++++++++++++++++
+ drivers/crypto/caam/caamalg_qi2.h   |  223 ++
+ drivers/crypto/caam/caamhash.c      |   79 +-
+ drivers/crypto/caam/caamhash_desc.c |   80 +
+ drivers/crypto/caam/caamhash_desc.h |   21 +
+ drivers/crypto/caam/compat.h        |    1 +
+ drivers/crypto/caam/dpseci.c        |  426 +++
+ drivers/crypto/caam/dpseci.h        |  333 +++
+ drivers/crypto/caam/dpseci_cmd.h    |  149 +
+ drivers/crypto/caam/error.c         |   79 +-
+ drivers/crypto/caam/error.h         |    6 +-
+ drivers/crypto/caam/regs.h          |    2 +
+ drivers/soc/fsl/dpio/dpio-service.c |   58 +
+ include/linux/fsl/mc.h              |    6 +
+ include/soc/fsl/dpaa2-fd.h          |  242 ++
+ include/soc/fsl/dpaa2-global.h      |   15 +
+ include/soc/fsl/dpaa2-io.h          |    4 +
+ 22 files changed, 6871 insertions(+), 91 deletions(-)
+ create mode 100644 drivers/crypto/caam/caamalg_qi2.c
+ create mode 100644 drivers/crypto/caam/caamalg_qi2.h
+ create mode 100644 drivers/crypto/caam/caamhash_desc.c
+ create mode 100644 drivers/crypto/caam/caamhash_desc.h
+ create mode 100644 drivers/crypto/caam/dpseci.c
+ create mode 100644 drivers/crypto/caam/dpseci.h
+ create mode 100644 drivers/crypto/caam/dpseci_cmd.h
 
 -- 
-Catalin
+2.16.2
