@@ -1,7 +1,7 @@
 From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
-Subject: [PATCH 05/11] crypto: caam - add DPAA2-CAAM (DPSECI) backend API
-Date: Mon, 10 Sep 2018 20:15:44 +0300
-Message-ID: <20180910171550.5659-6-horia.geanta@nxp.com>
+Subject: [PATCH 10/11] crypto: caam/qi2 - add support for ahash algorithms
+Date: Mon, 10 Sep 2018 20:15:49 +0300
+Message-ID: <20180910171550.5659-11-horia.geanta@nxp.com>
 References: <20180910171550.5659-1-horia.geanta@nxp.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -21,946 +21,1818 @@ In-Reply-To: <20180910171550.5659-1-horia.geanta@nxp.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Add the low-level API that allows to manage DPSECI DPAA2 objects
-that sit on the Management Complex (MC) fsl-mc bus.
-
-The API is compatible with MC firmware 10.2.0+.
+Add support for unkeyed and keyed (hmac) md5, sha algorithms.
 
 Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
 ---
- drivers/crypto/caam/dpseci.c     | 426 +++++++++++++++++++++++++++++++++++++++
- drivers/crypto/caam/dpseci.h     | 333 ++++++++++++++++++++++++++++++
- drivers/crypto/caam/dpseci_cmd.h | 149 ++++++++++++++
- 3 files changed, 908 insertions(+)
- create mode 100644 drivers/crypto/caam/dpseci.c
- create mode 100644 drivers/crypto/caam/dpseci.h
- create mode 100644 drivers/crypto/caam/dpseci_cmd.h
+ drivers/crypto/caam/Kconfig       |    4 +-
+ drivers/crypto/caam/caamalg_qi2.c | 1712 +++++++++++++++++++++++++++++++++++++
+ drivers/crypto/caam/caamalg_qi2.h |   16 +
+ 3 files changed, 1731 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/caam/dpseci.c b/drivers/crypto/caam/dpseci.c
-new file mode 100644
-index 000000000000..8a68531ded0b
---- /dev/null
-+++ b/drivers/crypto/caam/dpseci.c
-@@ -0,0 +1,426 @@
-+// SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
+diff --git a/drivers/crypto/caam/Kconfig b/drivers/crypto/caam/Kconfig
+index 03c1db0239ae..ec42fb652167 100644
+--- a/drivers/crypto/caam/Kconfig
++++ b/drivers/crypto/caam/Kconfig
+@@ -160,6 +160,7 @@ config CRYPTO_DEV_FSL_DPAA2_CAAM
+ 	select CRYPTO_BLKCIPHER
+ 	select CRYPTO_AUTHENC
+ 	select CRYPTO_AEAD
++	select CRYPTO_HASH
+ 	help
+ 	  CAAM driver for QorIQ Data Path Acceleration Architecture 2.
+ 	  It handles DPSECI DPAA2 objects that sit on the Management Complex
+@@ -174,4 +175,5 @@ config CRYPTO_DEV_FSL_CAAM_CRYPTO_API_DESC
+ 		      CRYPTO_DEV_FSL_DPAA2_CAAM)
+ 
+ config CRYPTO_DEV_FSL_CAAM_AHASH_API_DESC
+-	def_tristate (CRYPTO_DEV_FSL_CAAM_AHASH_API)
++	def_tristate (CRYPTO_DEV_FSL_CAAM_AHASH_API || \
++		      CRYPTO_DEV_FSL_DPAA2_CAAM)
+diff --git a/drivers/crypto/caam/caamalg_qi2.c b/drivers/crypto/caam/caamalg_qi2.c
+index b7931ad1154e..94bff046f06a 100644
+--- a/drivers/crypto/caam/caamalg_qi2.c
++++ b/drivers/crypto/caam/caamalg_qi2.c
+@@ -14,6 +14,7 @@
+ #include "sg_sw_qm2.h"
+ #include "key_gen.h"
+ #include "caamalg_desc.h"
++#include "caamhash_desc.h"
+ #include <linux/fsl/mc.h>
+ #include <soc/fsl/dpaa2-io.h>
+ #include <soc/fsl/dpaa2-fd.h>
+@@ -135,6 +136,8 @@ static struct caam_request *to_caam_req(struct crypto_async_request *areq)
+ 	case CRYPTO_ALG_TYPE_AEAD:
+ 		return aead_request_ctx(container_of(areq, struct aead_request,
+ 						     base));
++	case CRYPTO_ALG_TYPE_AHASH:
++		return ahash_request_ctx(ahash_request_cast(areq));
+ 	default:
+ 		return ERR_PTR(-EINVAL);
+ 	}
+@@ -2701,6 +2704,1648 @@ static void caam_aead_alg_init(struct caam_aead_alg *t_alg)
+ 	alg->exit = caam_cra_exit_aead;
+ }
+ 
++/* max hash key is max split key size */
++#define CAAM_MAX_HASH_KEY_SIZE		(SHA512_DIGEST_SIZE * 2)
++
++#define CAAM_MAX_HASH_BLOCK_SIZE	SHA512_BLOCK_SIZE
++
++/* caam context sizes for hashes: running digest + 8 */
++#define HASH_MSG_LEN			8
++#define MAX_CTX_LEN			(HASH_MSG_LEN + SHA512_DIGEST_SIZE)
++
++enum hash_optype {
++	UPDATE = 0,
++	UPDATE_FIRST,
++	FINALIZE,
++	DIGEST,
++	HASH_NUM_OP
++};
++
++/**
++ * caam_hash_ctx - ahash per-session context
++ * @flc: Flow Contexts array
++ * @flc_dma: I/O virtual addresses of the Flow Contexts
++ * @dev: dpseci device
++ * @ctx_len: size of Context Register
++ * @adata: hashing algorithm details
++ */
++struct caam_hash_ctx {
++	struct caam_flc flc[HASH_NUM_OP];
++	dma_addr_t flc_dma[HASH_NUM_OP];
++	struct device *dev;
++	int ctx_len;
++	struct alginfo adata;
++};
++
++/* ahash state */
++struct caam_hash_state {
++	struct caam_request caam_req;
++	dma_addr_t buf_dma;
++	dma_addr_t ctx_dma;
++	u8 buf_0[CAAM_MAX_HASH_BLOCK_SIZE] ____cacheline_aligned;
++	int buflen_0;
++	u8 buf_1[CAAM_MAX_HASH_BLOCK_SIZE] ____cacheline_aligned;
++	int buflen_1;
++	u8 caam_ctx[MAX_CTX_LEN] ____cacheline_aligned;
++	int (*update)(struct ahash_request *req);
++	int (*final)(struct ahash_request *req);
++	int (*finup)(struct ahash_request *req);
++	int current_buf;
++};
++
++struct caam_export_state {
++	u8 buf[CAAM_MAX_HASH_BLOCK_SIZE];
++	u8 caam_ctx[MAX_CTX_LEN];
++	int buflen;
++	int (*update)(struct ahash_request *req);
++	int (*final)(struct ahash_request *req);
++	int (*finup)(struct ahash_request *req);
++};
++
++static inline void switch_buf(struct caam_hash_state *state)
++{
++	state->current_buf ^= 1;
++}
++
++static inline u8 *current_buf(struct caam_hash_state *state)
++{
++	return state->current_buf ? state->buf_1 : state->buf_0;
++}
++
++static inline u8 *alt_buf(struct caam_hash_state *state)
++{
++	return state->current_buf ? state->buf_0 : state->buf_1;
++}
++
++static inline int *current_buflen(struct caam_hash_state *state)
++{
++	return state->current_buf ? &state->buflen_1 : &state->buflen_0;
++}
++
++static inline int *alt_buflen(struct caam_hash_state *state)
++{
++	return state->current_buf ? &state->buflen_0 : &state->buflen_1;
++}
++
++/* Map current buffer in state (if length > 0) and put it in link table */
++static inline int buf_map_to_qm_sg(struct device *dev,
++				   struct dpaa2_sg_entry *qm_sg,
++				   struct caam_hash_state *state)
++{
++	int buflen = *current_buflen(state);
++
++	if (!buflen)
++		return 0;
++
++	state->buf_dma = dma_map_single(dev, current_buf(state), buflen,
++					DMA_TO_DEVICE);
++	if (dma_mapping_error(dev, state->buf_dma)) {
++		dev_err(dev, "unable to map buf\n");
++		state->buf_dma = 0;
++		return -ENOMEM;
++	}
++
++	dma_to_qm_sg_one(qm_sg, state->buf_dma, buflen, 0);
++
++	return 0;
++}
++
++/* Map state->caam_ctx, and add it to link table */
++static inline int ctx_map_to_qm_sg(struct device *dev,
++				   struct caam_hash_state *state, int ctx_len,
++				   struct dpaa2_sg_entry *qm_sg, u32 flag)
++{
++	state->ctx_dma = dma_map_single(dev, state->caam_ctx, ctx_len, flag);
++	if (dma_mapping_error(dev, state->ctx_dma)) {
++		dev_err(dev, "unable to map ctx\n");
++		state->ctx_dma = 0;
++		return -ENOMEM;
++	}
++
++	dma_to_qm_sg_one(qm_sg, state->ctx_dma, ctx_len, 0);
++
++	return 0;
++}
++
++static int ahash_set_sh_desc(struct crypto_ahash *ahash)
++{
++	struct caam_hash_ctx *ctx = crypto_ahash_ctx(ahash);
++	int digestsize = crypto_ahash_digestsize(ahash);
++	struct dpaa2_caam_priv *priv = dev_get_drvdata(ctx->dev);
++	struct caam_flc *flc;
++	u32 *desc;
++
++	/* ahash_update shared descriptor */
++	flc = &ctx->flc[UPDATE];
++	desc = flc->sh_desc;
++	cnstr_shdsc_ahash(desc, &ctx->adata, OP_ALG_AS_UPDATE, ctx->ctx_len,
++			  ctx->ctx_len, true, priv->sec_attr.era);
++	flc->flc[1] = cpu_to_caam32(desc_len(desc)); /* SDL */
++	dma_sync_single_for_device(ctx->dev, ctx->flc_dma[UPDATE],
++				   desc_bytes(desc), DMA_BIDIRECTIONAL);
++	print_hex_dump_debug("ahash update shdesc@" __stringify(__LINE__)": ",
++			     DUMP_PREFIX_ADDRESS, 16, 4, desc, desc_bytes(desc),
++			     1);
++
++	/* ahash_update_first shared descriptor */
++	flc = &ctx->flc[UPDATE_FIRST];
++	desc = flc->sh_desc;
++	cnstr_shdsc_ahash(desc, &ctx->adata, OP_ALG_AS_INIT, ctx->ctx_len,
++			  ctx->ctx_len, false, priv->sec_attr.era);
++	flc->flc[1] = cpu_to_caam32(desc_len(desc)); /* SDL */
++	dma_sync_single_for_device(ctx->dev, ctx->flc_dma[UPDATE_FIRST],
++				   desc_bytes(desc), DMA_BIDIRECTIONAL);
++	print_hex_dump_debug("ahash update first shdesc@" __stringify(__LINE__)": ",
++			     DUMP_PREFIX_ADDRESS, 16, 4, desc, desc_bytes(desc),
++			     1);
++
++	/* ahash_final shared descriptor */
++	flc = &ctx->flc[FINALIZE];
++	desc = flc->sh_desc;
++	cnstr_shdsc_ahash(desc, &ctx->adata, OP_ALG_AS_FINALIZE, digestsize,
++			  ctx->ctx_len, true, priv->sec_attr.era);
++	flc->flc[1] = cpu_to_caam32(desc_len(desc)); /* SDL */
++	dma_sync_single_for_device(ctx->dev, ctx->flc_dma[FINALIZE],
++				   desc_bytes(desc), DMA_BIDIRECTIONAL);
++	print_hex_dump_debug("ahash final shdesc@" __stringify(__LINE__)": ",
++			     DUMP_PREFIX_ADDRESS, 16, 4, desc, desc_bytes(desc),
++			     1);
++
++	/* ahash_digest shared descriptor */
++	flc = &ctx->flc[DIGEST];
++	desc = flc->sh_desc;
++	cnstr_shdsc_ahash(desc, &ctx->adata, OP_ALG_AS_INITFINAL, digestsize,
++			  ctx->ctx_len, false, priv->sec_attr.era);
++	flc->flc[1] = cpu_to_caam32(desc_len(desc)); /* SDL */
++	dma_sync_single_for_device(ctx->dev, ctx->flc_dma[DIGEST],
++				   desc_bytes(desc), DMA_BIDIRECTIONAL);
++	print_hex_dump_debug("ahash digest shdesc@" __stringify(__LINE__)": ",
++			     DUMP_PREFIX_ADDRESS, 16, 4, desc, desc_bytes(desc),
++			     1);
++
++	return 0;
++}
++
++/* Digest hash size if it is too large */
++static int hash_digest_key(struct caam_hash_ctx *ctx, const u8 *key_in,
++			   u32 *keylen, u8 *key_out, u32 digestsize)
++{
++	struct caam_request *req_ctx;
++	u32 *desc;
++	struct split_key_sh_result result;
++	dma_addr_t src_dma, dst_dma;
++	struct caam_flc *flc;
++	dma_addr_t flc_dma;
++	int ret = -ENOMEM;
++	struct dpaa2_fl_entry *in_fle, *out_fle;
++
++	req_ctx = kzalloc(sizeof(*req_ctx), GFP_KERNEL | GFP_DMA);
++	if (!req_ctx)
++		return -ENOMEM;
++
++	in_fle = &req_ctx->fd_flt[1];
++	out_fle = &req_ctx->fd_flt[0];
++
++	flc = kzalloc(sizeof(*flc), GFP_KERNEL | GFP_DMA);
++	if (!flc)
++		goto err_flc;
++
++	src_dma = dma_map_single(ctx->dev, (void *)key_in, *keylen,
++				 DMA_TO_DEVICE);
++	if (dma_mapping_error(ctx->dev, src_dma)) {
++		dev_err(ctx->dev, "unable to map key input memory\n");
++		goto err_src_dma;
++	}
++	dst_dma = dma_map_single(ctx->dev, (void *)key_out, digestsize,
++				 DMA_FROM_DEVICE);
++	if (dma_mapping_error(ctx->dev, dst_dma)) {
++		dev_err(ctx->dev, "unable to map key output memory\n");
++		goto err_dst_dma;
++	}
++
++	desc = flc->sh_desc;
++
++	init_sh_desc(desc, 0);
++
++	/* descriptor to perform unkeyed hash on key_in */
++	append_operation(desc, ctx->adata.algtype | OP_ALG_ENCRYPT |
++			 OP_ALG_AS_INITFINAL);
++	append_seq_fifo_load(desc, *keylen, FIFOLD_CLASS_CLASS2 |
++			     FIFOLD_TYPE_LAST2 | FIFOLD_TYPE_MSG);
++	append_seq_store(desc, digestsize, LDST_CLASS_2_CCB |
++			 LDST_SRCDST_BYTE_CONTEXT);
++
++	flc->flc[1] = cpu_to_caam32(desc_len(desc)); /* SDL */
++	flc_dma = dma_map_single(ctx->dev, flc, sizeof(flc->flc) +
++				 desc_bytes(desc), DMA_TO_DEVICE);
++	if (dma_mapping_error(ctx->dev, flc_dma)) {
++		dev_err(ctx->dev, "unable to map shared descriptor\n");
++		goto err_flc_dma;
++	}
++
++	dpaa2_fl_set_final(in_fle, true);
++	dpaa2_fl_set_format(in_fle, dpaa2_fl_single);
++	dpaa2_fl_set_addr(in_fle, src_dma);
++	dpaa2_fl_set_len(in_fle, *keylen);
++	dpaa2_fl_set_format(out_fle, dpaa2_fl_single);
++	dpaa2_fl_set_addr(out_fle, dst_dma);
++	dpaa2_fl_set_len(out_fle, digestsize);
++
++	print_hex_dump_debug("key_in@" __stringify(__LINE__)": ",
++			     DUMP_PREFIX_ADDRESS, 16, 4, key_in, *keylen, 1);
++	print_hex_dump_debug("shdesc@" __stringify(__LINE__)": ",
++			     DUMP_PREFIX_ADDRESS, 16, 4, desc, desc_bytes(desc),
++			     1);
++
++	result.err = 0;
++	init_completion(&result.completion);
++	result.dev = ctx->dev;
++
++	req_ctx->flc = flc;
++	req_ctx->flc_dma = flc_dma;
++	req_ctx->cbk = split_key_sh_done;
++	req_ctx->ctx = &result;
++
++	ret = dpaa2_caam_enqueue(ctx->dev, req_ctx);
++	if (ret == -EINPROGRESS) {
++		/* in progress */
++		wait_for_completion(&result.completion);
++		ret = result.err;
++		print_hex_dump_debug("digested key@" __stringify(__LINE__)": ",
++				     DUMP_PREFIX_ADDRESS, 16, 4, key_in,
++				     digestsize, 1);
++	}
++
++	dma_unmap_single(ctx->dev, flc_dma, sizeof(flc->flc) + desc_bytes(desc),
++			 DMA_TO_DEVICE);
++err_flc_dma:
++	dma_unmap_single(ctx->dev, dst_dma, digestsize, DMA_FROM_DEVICE);
++err_dst_dma:
++	dma_unmap_single(ctx->dev, src_dma, *keylen, DMA_TO_DEVICE);
++err_src_dma:
++	kfree(flc);
++err_flc:
++	kfree(req_ctx);
++
++	*keylen = digestsize;
++
++	return ret;
++}
++
++static int ahash_setkey(struct crypto_ahash *ahash, const u8 *key,
++			unsigned int keylen)
++{
++	struct caam_hash_ctx *ctx = crypto_ahash_ctx(ahash);
++	unsigned int blocksize = crypto_tfm_alg_blocksize(&ahash->base);
++	unsigned int digestsize = crypto_ahash_digestsize(ahash);
++	int ret;
++	u8 *hashed_key = NULL;
++
++	dev_dbg(ctx->dev, "keylen %d blocksize %d\n", keylen, blocksize);
++
++	if (keylen > blocksize) {
++		hashed_key = kmalloc_array(digestsize, sizeof(*hashed_key),
++					   GFP_KERNEL | GFP_DMA);
++		if (!hashed_key)
++			return -ENOMEM;
++		ret = hash_digest_key(ctx, key, &keylen, hashed_key,
++				      digestsize);
++		if (ret)
++			goto bad_free_key;
++		key = hashed_key;
++	}
++
++	ctx->adata.keylen = keylen;
++	ctx->adata.keylen_pad = split_key_len(ctx->adata.algtype &
++					      OP_ALG_ALGSEL_MASK);
++	if (ctx->adata.keylen_pad > CAAM_MAX_HASH_KEY_SIZE)
++		goto bad_free_key;
++
++	ctx->adata.key_virt = key;
++	ctx->adata.key_inline = true;
++
++	ret = ahash_set_sh_desc(ahash);
++	kfree(hashed_key);
++	return ret;
++bad_free_key:
++	kfree(hashed_key);
++	crypto_ahash_set_flags(ahash, CRYPTO_TFM_RES_BAD_KEY_LEN);
++	return -EINVAL;
++}
++
++static inline void ahash_unmap(struct device *dev, struct ahash_edesc *edesc,
++			       struct ahash_request *req, int dst_len)
++{
++	struct caam_hash_state *state = ahash_request_ctx(req);
++
++	if (edesc->src_nents)
++		dma_unmap_sg(dev, req->src, edesc->src_nents, DMA_TO_DEVICE);
++	if (edesc->dst_dma)
++		dma_unmap_single(dev, edesc->dst_dma, dst_len, DMA_FROM_DEVICE);
++
++	if (edesc->qm_sg_bytes)
++		dma_unmap_single(dev, edesc->qm_sg_dma, edesc->qm_sg_bytes,
++				 DMA_TO_DEVICE);
++
++	if (state->buf_dma) {
++		dma_unmap_single(dev, state->buf_dma, *current_buflen(state),
++				 DMA_TO_DEVICE);
++		state->buf_dma = 0;
++	}
++}
++
++static inline void ahash_unmap_ctx(struct device *dev,
++				   struct ahash_edesc *edesc,
++				   struct ahash_request *req, int dst_len,
++				   u32 flag)
++{
++	struct crypto_ahash *ahash = crypto_ahash_reqtfm(req);
++	struct caam_hash_ctx *ctx = crypto_ahash_ctx(ahash);
++	struct caam_hash_state *state = ahash_request_ctx(req);
++
++	if (state->ctx_dma) {
++		dma_unmap_single(dev, state->ctx_dma, ctx->ctx_len, flag);
++		state->ctx_dma = 0;
++	}
++	ahash_unmap(dev, edesc, req, dst_len);
++}
++
++static void ahash_done(void *cbk_ctx, u32 status)
++{
++	struct crypto_async_request *areq = cbk_ctx;
++	struct ahash_request *req = ahash_request_cast(areq);
++	struct crypto_ahash *ahash = crypto_ahash_reqtfm(req);
++	struct caam_hash_state *state = ahash_request_ctx(req);
++	struct ahash_edesc *edesc = state->caam_req.edesc;
++	struct caam_hash_ctx *ctx = crypto_ahash_ctx(ahash);
++	int digestsize = crypto_ahash_digestsize(ahash);
++	int ecode = 0;
++
++	dev_dbg(ctx->dev, "%s %d: err 0x%x\n", __func__, __LINE__, status);
++
++	if (unlikely(status)) {
++		caam_qi2_strstatus(ctx->dev, status);
++		ecode = -EIO;
++	}
++
++	ahash_unmap(ctx->dev, edesc, req, digestsize);
++	qi_cache_free(edesc);
++
++	print_hex_dump_debug("ctx@" __stringify(__LINE__)": ",
++			     DUMP_PREFIX_ADDRESS, 16, 4, state->caam_ctx,
++			     ctx->ctx_len, 1);
++	if (req->result)
++		print_hex_dump_debug("result@" __stringify(__LINE__)": ",
++				     DUMP_PREFIX_ADDRESS, 16, 4, req->result,
++				     digestsize, 1);
++
++	req->base.complete(&req->base, ecode);
++}
++
++static void ahash_done_bi(void *cbk_ctx, u32 status)
++{
++	struct crypto_async_request *areq = cbk_ctx;
++	struct ahash_request *req = ahash_request_cast(areq);
++	struct crypto_ahash *ahash = crypto_ahash_reqtfm(req);
++	struct caam_hash_state *state = ahash_request_ctx(req);
++	struct ahash_edesc *edesc = state->caam_req.edesc;
++	struct caam_hash_ctx *ctx = crypto_ahash_ctx(ahash);
++	int ecode = 0;
++
++	dev_dbg(ctx->dev, "%s %d: err 0x%x\n", __func__, __LINE__, status);
++
++	if (unlikely(status)) {
++		caam_qi2_strstatus(ctx->dev, status);
++		ecode = -EIO;
++	}
++
++	ahash_unmap_ctx(ctx->dev, edesc, req, ctx->ctx_len, DMA_BIDIRECTIONAL);
++	switch_buf(state);
++	qi_cache_free(edesc);
++
++	print_hex_dump_debug("ctx@" __stringify(__LINE__)": ",
++			     DUMP_PREFIX_ADDRESS, 16, 4, state->caam_ctx,
++			     ctx->ctx_len, 1);
++	if (req->result)
++		print_hex_dump_debug("result@" __stringify(__LINE__)": ",
++				     DUMP_PREFIX_ADDRESS, 16, 4, req->result,
++				     crypto_ahash_digestsize(ahash), 1);
++
++	req->base.complete(&req->base, ecode);
++}
++
++static void ahash_done_ctx_src(void *cbk_ctx, u32 status)
++{
++	struct crypto_async_request *areq = cbk_ctx;
++	struct ahash_request *req = ahash_request_cast(areq);
++	struct crypto_ahash *ahash = crypto_ahash_reqtfm(req);
++	struct caam_hash_state *state = ahash_request_ctx(req);
++	struct ahash_edesc *edesc = state->caam_req.edesc;
++	struct caam_hash_ctx *ctx = crypto_ahash_ctx(ahash);
++	int digestsize = crypto_ahash_digestsize(ahash);
++	int ecode = 0;
++
++	dev_dbg(ctx->dev, "%s %d: err 0x%x\n", __func__, __LINE__, status);
++
++	if (unlikely(status)) {
++		caam_qi2_strstatus(ctx->dev, status);
++		ecode = -EIO;
++	}
++
++	ahash_unmap_ctx(ctx->dev, edesc, req, digestsize, DMA_TO_DEVICE);
++	qi_cache_free(edesc);
++
++	print_hex_dump_debug("ctx@" __stringify(__LINE__)": ",
++			     DUMP_PREFIX_ADDRESS, 16, 4, state->caam_ctx,
++			     ctx->ctx_len, 1);
++	if (req->result)
++		print_hex_dump_debug("result@" __stringify(__LINE__)": ",
++				     DUMP_PREFIX_ADDRESS, 16, 4, req->result,
++				     digestsize, 1);
++
++	req->base.complete(&req->base, ecode);
++}
++
++static void ahash_done_ctx_dst(void *cbk_ctx, u32 status)
++{
++	struct crypto_async_request *areq = cbk_ctx;
++	struct ahash_request *req = ahash_request_cast(areq);
++	struct crypto_ahash *ahash = crypto_ahash_reqtfm(req);
++	struct caam_hash_state *state = ahash_request_ctx(req);
++	struct ahash_edesc *edesc = state->caam_req.edesc;
++	struct caam_hash_ctx *ctx = crypto_ahash_ctx(ahash);
++	int ecode = 0;
++
++	dev_dbg(ctx->dev, "%s %d: err 0x%x\n", __func__, __LINE__, status);
++
++	if (unlikely(status)) {
++		caam_qi2_strstatus(ctx->dev, status);
++		ecode = -EIO;
++	}
++
++	ahash_unmap_ctx(ctx->dev, edesc, req, ctx->ctx_len, DMA_FROM_DEVICE);
++	switch_buf(state);
++	qi_cache_free(edesc);
++
++	print_hex_dump_debug("ctx@" __stringify(__LINE__)": ",
++			     DUMP_PREFIX_ADDRESS, 16, 4, state->caam_ctx,
++			     ctx->ctx_len, 1);
++	if (req->result)
++		print_hex_dump_debug("result@" __stringify(__LINE__)": ",
++				     DUMP_PREFIX_ADDRESS, 16, 4, req->result,
++				     crypto_ahash_digestsize(ahash), 1);
++
++	req->base.complete(&req->base, ecode);
++}
++
++static int ahash_update_ctx(struct ahash_request *req)
++{
++	struct crypto_ahash *ahash = crypto_ahash_reqtfm(req);
++	struct caam_hash_ctx *ctx = crypto_ahash_ctx(ahash);
++	struct caam_hash_state *state = ahash_request_ctx(req);
++	struct caam_request *req_ctx = &state->caam_req;
++	struct dpaa2_fl_entry *in_fle = &req_ctx->fd_flt[1];
++	struct dpaa2_fl_entry *out_fle = &req_ctx->fd_flt[0];
++	gfp_t flags = (req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
++		      GFP_KERNEL : GFP_ATOMIC;
++	u8 *buf = current_buf(state);
++	int *buflen = current_buflen(state);
++	u8 *next_buf = alt_buf(state);
++	int *next_buflen = alt_buflen(state), last_buflen;
++	int in_len = *buflen + req->nbytes, to_hash;
++	int src_nents, mapped_nents, qm_sg_bytes, qm_sg_src_index;
++	struct ahash_edesc *edesc;
++	int ret = 0;
++
++	last_buflen = *next_buflen;
++	*next_buflen = in_len & (crypto_tfm_alg_blocksize(&ahash->base) - 1);
++	to_hash = in_len - *next_buflen;
++
++	if (to_hash) {
++		struct dpaa2_sg_entry *sg_table;
++
++		src_nents = sg_nents_for_len(req->src,
++					     req->nbytes - (*next_buflen));
++		if (src_nents < 0) {
++			dev_err(ctx->dev, "Invalid number of src SG.\n");
++			return src_nents;
++		}
++
++		if (src_nents) {
++			mapped_nents = dma_map_sg(ctx->dev, req->src, src_nents,
++						  DMA_TO_DEVICE);
++			if (!mapped_nents) {
++				dev_err(ctx->dev, "unable to DMA map source\n");
++				return -ENOMEM;
++			}
++		} else {
++			mapped_nents = 0;
++		}
++
++		/* allocate space for base edesc and link tables */
++		edesc = qi_cache_zalloc(GFP_DMA | flags);
++		if (!edesc) {
++			dma_unmap_sg(ctx->dev, req->src, src_nents,
++				     DMA_TO_DEVICE);
++			return -ENOMEM;
++		}
++
++		edesc->src_nents = src_nents;
++		qm_sg_src_index = 1 + (*buflen ? 1 : 0);
++		qm_sg_bytes = (qm_sg_src_index + mapped_nents) *
++			      sizeof(*sg_table);
++		sg_table = &edesc->sgt[0];
++
++		ret = ctx_map_to_qm_sg(ctx->dev, state, ctx->ctx_len, sg_table,
++				       DMA_BIDIRECTIONAL);
++		if (ret)
++			goto unmap_ctx;
++
++		ret = buf_map_to_qm_sg(ctx->dev, sg_table + 1, state);
++		if (ret)
++			goto unmap_ctx;
++
++		if (mapped_nents) {
++			sg_to_qm_sg_last(req->src, mapped_nents,
++					 sg_table + qm_sg_src_index, 0);
++			if (*next_buflen)
++				scatterwalk_map_and_copy(next_buf, req->src,
++							 to_hash - *buflen,
++							 *next_buflen, 0);
++		} else {
++			dpaa2_sg_set_final(sg_table + qm_sg_src_index - 1,
++					   true);
++		}
++
++		edesc->qm_sg_dma = dma_map_single(ctx->dev, sg_table,
++						  qm_sg_bytes, DMA_TO_DEVICE);
++		if (dma_mapping_error(ctx->dev, edesc->qm_sg_dma)) {
++			dev_err(ctx->dev, "unable to map S/G table\n");
++			ret = -ENOMEM;
++			goto unmap_ctx;
++		}
++		edesc->qm_sg_bytes = qm_sg_bytes;
++
++		memset(&req_ctx->fd_flt, 0, sizeof(req_ctx->fd_flt));
++		dpaa2_fl_set_final(in_fle, true);
++		dpaa2_fl_set_format(in_fle, dpaa2_fl_sg);
++		dpaa2_fl_set_addr(in_fle, edesc->qm_sg_dma);
++		dpaa2_fl_set_len(in_fle, ctx->ctx_len + to_hash);
++		dpaa2_fl_set_format(out_fle, dpaa2_fl_single);
++		dpaa2_fl_set_addr(out_fle, state->ctx_dma);
++		dpaa2_fl_set_len(out_fle, ctx->ctx_len);
++
++		req_ctx->flc = &ctx->flc[UPDATE];
++		req_ctx->flc_dma = ctx->flc_dma[UPDATE];
++		req_ctx->cbk = ahash_done_bi;
++		req_ctx->ctx = &req->base;
++		req_ctx->edesc = edesc;
++
++		ret = dpaa2_caam_enqueue(ctx->dev, req_ctx);
++		if (ret != -EINPROGRESS &&
++		    !(ret == -EBUSY &&
++		      req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG))
++			goto unmap_ctx;
++	} else if (*next_buflen) {
++		scatterwalk_map_and_copy(buf + *buflen, req->src, 0,
++					 req->nbytes, 0);
++		*buflen = *next_buflen;
++		*next_buflen = last_buflen;
++	}
++
++	print_hex_dump_debug("buf@" __stringify(__LINE__)": ",
++			     DUMP_PREFIX_ADDRESS, 16, 4, buf, *buflen, 1);
++	print_hex_dump_debug("next buf@" __stringify(__LINE__)": ",
++			     DUMP_PREFIX_ADDRESS, 16, 4, next_buf, *next_buflen,
++			     1);
++
++	return ret;
++unmap_ctx:
++	ahash_unmap_ctx(ctx->dev, edesc, req, ctx->ctx_len, DMA_BIDIRECTIONAL);
++	qi_cache_free(edesc);
++	return ret;
++}
++
++static int ahash_final_ctx(struct ahash_request *req)
++{
++	struct crypto_ahash *ahash = crypto_ahash_reqtfm(req);
++	struct caam_hash_ctx *ctx = crypto_ahash_ctx(ahash);
++	struct caam_hash_state *state = ahash_request_ctx(req);
++	struct caam_request *req_ctx = &state->caam_req;
++	struct dpaa2_fl_entry *in_fle = &req_ctx->fd_flt[1];
++	struct dpaa2_fl_entry *out_fle = &req_ctx->fd_flt[0];
++	gfp_t flags = (req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
++		      GFP_KERNEL : GFP_ATOMIC;
++	int buflen = *current_buflen(state);
++	int qm_sg_bytes, qm_sg_src_index;
++	int digestsize = crypto_ahash_digestsize(ahash);
++	struct ahash_edesc *edesc;
++	struct dpaa2_sg_entry *sg_table;
++	int ret;
++
++	/* allocate space for base edesc and link tables */
++	edesc = qi_cache_zalloc(GFP_DMA | flags);
++	if (!edesc)
++		return -ENOMEM;
++
++	qm_sg_src_index = 1 + (buflen ? 1 : 0);
++	qm_sg_bytes = qm_sg_src_index * sizeof(*sg_table);
++	sg_table = &edesc->sgt[0];
++
++	ret = ctx_map_to_qm_sg(ctx->dev, state, ctx->ctx_len, sg_table,
++			       DMA_TO_DEVICE);
++	if (ret)
++		goto unmap_ctx;
++
++	ret = buf_map_to_qm_sg(ctx->dev, sg_table + 1, state);
++	if (ret)
++		goto unmap_ctx;
++
++	dpaa2_sg_set_final(sg_table + qm_sg_src_index - 1, true);
++
++	edesc->qm_sg_dma = dma_map_single(ctx->dev, sg_table, qm_sg_bytes,
++					  DMA_TO_DEVICE);
++	if (dma_mapping_error(ctx->dev, edesc->qm_sg_dma)) {
++		dev_err(ctx->dev, "unable to map S/G table\n");
++		ret = -ENOMEM;
++		goto unmap_ctx;
++	}
++	edesc->qm_sg_bytes = qm_sg_bytes;
++
++	edesc->dst_dma = dma_map_single(ctx->dev, req->result, digestsize,
++					DMA_FROM_DEVICE);
++	if (dma_mapping_error(ctx->dev, edesc->dst_dma)) {
++		dev_err(ctx->dev, "unable to map dst\n");
++		edesc->dst_dma = 0;
++		ret = -ENOMEM;
++		goto unmap_ctx;
++	}
++
++	memset(&req_ctx->fd_flt, 0, sizeof(req_ctx->fd_flt));
++	dpaa2_fl_set_final(in_fle, true);
++	dpaa2_fl_set_format(in_fle, dpaa2_fl_sg);
++	dpaa2_fl_set_addr(in_fle, edesc->qm_sg_dma);
++	dpaa2_fl_set_len(in_fle, ctx->ctx_len + buflen);
++	dpaa2_fl_set_format(out_fle, dpaa2_fl_single);
++	dpaa2_fl_set_addr(out_fle, edesc->dst_dma);
++	dpaa2_fl_set_len(out_fle, digestsize);
++
++	req_ctx->flc = &ctx->flc[FINALIZE];
++	req_ctx->flc_dma = ctx->flc_dma[FINALIZE];
++	req_ctx->cbk = ahash_done_ctx_src;
++	req_ctx->ctx = &req->base;
++	req_ctx->edesc = edesc;
++
++	ret = dpaa2_caam_enqueue(ctx->dev, req_ctx);
++	if (ret == -EINPROGRESS ||
++	    (ret == -EBUSY && req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG))
++		return ret;
++
++unmap_ctx:
++	ahash_unmap_ctx(ctx->dev, edesc, req, digestsize, DMA_FROM_DEVICE);
++	qi_cache_free(edesc);
++	return ret;
++}
++
++static int ahash_finup_ctx(struct ahash_request *req)
++{
++	struct crypto_ahash *ahash = crypto_ahash_reqtfm(req);
++	struct caam_hash_ctx *ctx = crypto_ahash_ctx(ahash);
++	struct caam_hash_state *state = ahash_request_ctx(req);
++	struct caam_request *req_ctx = &state->caam_req;
++	struct dpaa2_fl_entry *in_fle = &req_ctx->fd_flt[1];
++	struct dpaa2_fl_entry *out_fle = &req_ctx->fd_flt[0];
++	gfp_t flags = (req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
++		      GFP_KERNEL : GFP_ATOMIC;
++	int buflen = *current_buflen(state);
++	int qm_sg_bytes, qm_sg_src_index;
++	int src_nents, mapped_nents;
++	int digestsize = crypto_ahash_digestsize(ahash);
++	struct ahash_edesc *edesc;
++	struct dpaa2_sg_entry *sg_table;
++	int ret;
++
++	src_nents = sg_nents_for_len(req->src, req->nbytes);
++	if (src_nents < 0) {
++		dev_err(ctx->dev, "Invalid number of src SG.\n");
++		return src_nents;
++	}
++
++	if (src_nents) {
++		mapped_nents = dma_map_sg(ctx->dev, req->src, src_nents,
++					  DMA_TO_DEVICE);
++		if (!mapped_nents) {
++			dev_err(ctx->dev, "unable to DMA map source\n");
++			return -ENOMEM;
++		}
++	} else {
++		mapped_nents = 0;
++	}
++
++	/* allocate space for base edesc and link tables */
++	edesc = qi_cache_zalloc(GFP_DMA | flags);
++	if (!edesc) {
++		dma_unmap_sg(ctx->dev, req->src, src_nents, DMA_TO_DEVICE);
++		return -ENOMEM;
++	}
++
++	edesc->src_nents = src_nents;
++	qm_sg_src_index = 1 + (buflen ? 1 : 0);
++	qm_sg_bytes = (qm_sg_src_index + mapped_nents) * sizeof(*sg_table);
++	sg_table = &edesc->sgt[0];
++
++	ret = ctx_map_to_qm_sg(ctx->dev, state, ctx->ctx_len, sg_table,
++			       DMA_TO_DEVICE);
++	if (ret)
++		goto unmap_ctx;
++
++	ret = buf_map_to_qm_sg(ctx->dev, sg_table + 1, state);
++	if (ret)
++		goto unmap_ctx;
++
++	sg_to_qm_sg_last(req->src, mapped_nents, sg_table + qm_sg_src_index, 0);
++
++	edesc->qm_sg_dma = dma_map_single(ctx->dev, sg_table, qm_sg_bytes,
++					  DMA_TO_DEVICE);
++	if (dma_mapping_error(ctx->dev, edesc->qm_sg_dma)) {
++		dev_err(ctx->dev, "unable to map S/G table\n");
++		ret = -ENOMEM;
++		goto unmap_ctx;
++	}
++	edesc->qm_sg_bytes = qm_sg_bytes;
++
++	edesc->dst_dma = dma_map_single(ctx->dev, req->result, digestsize,
++					DMA_FROM_DEVICE);
++	if (dma_mapping_error(ctx->dev, edesc->dst_dma)) {
++		dev_err(ctx->dev, "unable to map dst\n");
++		edesc->dst_dma = 0;
++		ret = -ENOMEM;
++		goto unmap_ctx;
++	}
++
++	memset(&req_ctx->fd_flt, 0, sizeof(req_ctx->fd_flt));
++	dpaa2_fl_set_final(in_fle, true);
++	dpaa2_fl_set_format(in_fle, dpaa2_fl_sg);
++	dpaa2_fl_set_addr(in_fle, edesc->qm_sg_dma);
++	dpaa2_fl_set_len(in_fle, ctx->ctx_len + buflen + req->nbytes);
++	dpaa2_fl_set_format(out_fle, dpaa2_fl_single);
++	dpaa2_fl_set_addr(out_fle, edesc->dst_dma);
++	dpaa2_fl_set_len(out_fle, digestsize);
++
++	req_ctx->flc = &ctx->flc[FINALIZE];
++	req_ctx->flc_dma = ctx->flc_dma[FINALIZE];
++	req_ctx->cbk = ahash_done_ctx_src;
++	req_ctx->ctx = &req->base;
++	req_ctx->edesc = edesc;
++
++	ret = dpaa2_caam_enqueue(ctx->dev, req_ctx);
++	if (ret == -EINPROGRESS ||
++	    (ret == -EBUSY && req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG))
++		return ret;
++
++unmap_ctx:
++	ahash_unmap_ctx(ctx->dev, edesc, req, digestsize, DMA_FROM_DEVICE);
++	qi_cache_free(edesc);
++	return ret;
++}
++
++static int ahash_digest(struct ahash_request *req)
++{
++	struct crypto_ahash *ahash = crypto_ahash_reqtfm(req);
++	struct caam_hash_ctx *ctx = crypto_ahash_ctx(ahash);
++	struct caam_hash_state *state = ahash_request_ctx(req);
++	struct caam_request *req_ctx = &state->caam_req;
++	struct dpaa2_fl_entry *in_fle = &req_ctx->fd_flt[1];
++	struct dpaa2_fl_entry *out_fle = &req_ctx->fd_flt[0];
++	gfp_t flags = (req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
++		      GFP_KERNEL : GFP_ATOMIC;
++	int digestsize = crypto_ahash_digestsize(ahash);
++	int src_nents, mapped_nents;
++	struct ahash_edesc *edesc;
++	int ret = -ENOMEM;
++
++	state->buf_dma = 0;
++
++	src_nents = sg_nents_for_len(req->src, req->nbytes);
++	if (src_nents < 0) {
++		dev_err(ctx->dev, "Invalid number of src SG.\n");
++		return src_nents;
++	}
++
++	if (src_nents) {
++		mapped_nents = dma_map_sg(ctx->dev, req->src, src_nents,
++					  DMA_TO_DEVICE);
++		if (!mapped_nents) {
++			dev_err(ctx->dev, "unable to map source for DMA\n");
++			return ret;
++		}
++	} else {
++		mapped_nents = 0;
++	}
++
++	/* allocate space for base edesc and link tables */
++	edesc = qi_cache_zalloc(GFP_DMA | flags);
++	if (!edesc) {
++		dma_unmap_sg(ctx->dev, req->src, src_nents, DMA_TO_DEVICE);
++		return ret;
++	}
++
++	edesc->src_nents = src_nents;
++	memset(&req_ctx->fd_flt, 0, sizeof(req_ctx->fd_flt));
++
++	if (mapped_nents > 1) {
++		int qm_sg_bytes;
++		struct dpaa2_sg_entry *sg_table = &edesc->sgt[0];
++
++		qm_sg_bytes = mapped_nents * sizeof(*sg_table);
++		sg_to_qm_sg_last(req->src, mapped_nents, sg_table, 0);
++		edesc->qm_sg_dma = dma_map_single(ctx->dev, sg_table,
++						  qm_sg_bytes, DMA_TO_DEVICE);
++		if (dma_mapping_error(ctx->dev, edesc->qm_sg_dma)) {
++			dev_err(ctx->dev, "unable to map S/G table\n");
++			goto unmap;
++		}
++		edesc->qm_sg_bytes = qm_sg_bytes;
++		dpaa2_fl_set_format(in_fle, dpaa2_fl_sg);
++		dpaa2_fl_set_addr(in_fle, edesc->qm_sg_dma);
++	} else {
++		dpaa2_fl_set_format(in_fle, dpaa2_fl_single);
++		dpaa2_fl_set_addr(in_fle, sg_dma_address(req->src));
++	}
++
++	edesc->dst_dma = dma_map_single(ctx->dev, req->result, digestsize,
++					DMA_FROM_DEVICE);
++	if (dma_mapping_error(ctx->dev, edesc->dst_dma)) {
++		dev_err(ctx->dev, "unable to map dst\n");
++		edesc->dst_dma = 0;
++		goto unmap;
++	}
++
++	dpaa2_fl_set_final(in_fle, true);
++	dpaa2_fl_set_len(in_fle, req->nbytes);
++	dpaa2_fl_set_format(out_fle, dpaa2_fl_single);
++	dpaa2_fl_set_addr(out_fle, edesc->dst_dma);
++	dpaa2_fl_set_len(out_fle, digestsize);
++
++	req_ctx->flc = &ctx->flc[DIGEST];
++	req_ctx->flc_dma = ctx->flc_dma[DIGEST];
++	req_ctx->cbk = ahash_done;
++	req_ctx->ctx = &req->base;
++	req_ctx->edesc = edesc;
++	ret = dpaa2_caam_enqueue(ctx->dev, req_ctx);
++	if (ret == -EINPROGRESS ||
++	    (ret == -EBUSY && req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG))
++		return ret;
++
++unmap:
++	ahash_unmap(ctx->dev, edesc, req, digestsize);
++	qi_cache_free(edesc);
++	return ret;
++}
++
++static int ahash_final_no_ctx(struct ahash_request *req)
++{
++	struct crypto_ahash *ahash = crypto_ahash_reqtfm(req);
++	struct caam_hash_ctx *ctx = crypto_ahash_ctx(ahash);
++	struct caam_hash_state *state = ahash_request_ctx(req);
++	struct caam_request *req_ctx = &state->caam_req;
++	struct dpaa2_fl_entry *in_fle = &req_ctx->fd_flt[1];
++	struct dpaa2_fl_entry *out_fle = &req_ctx->fd_flt[0];
++	gfp_t flags = (req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
++		      GFP_KERNEL : GFP_ATOMIC;
++	u8 *buf = current_buf(state);
++	int buflen = *current_buflen(state);
++	int digestsize = crypto_ahash_digestsize(ahash);
++	struct ahash_edesc *edesc;
++	int ret = -ENOMEM;
++
++	/* allocate space for base edesc and link tables */
++	edesc = qi_cache_zalloc(GFP_DMA | flags);
++	if (!edesc)
++		return ret;
++
++	state->buf_dma = dma_map_single(ctx->dev, buf, buflen, DMA_TO_DEVICE);
++	if (dma_mapping_error(ctx->dev, state->buf_dma)) {
++		dev_err(ctx->dev, "unable to map src\n");
++		goto unmap;
++	}
++
++	edesc->dst_dma = dma_map_single(ctx->dev, req->result, digestsize,
++					DMA_FROM_DEVICE);
++	if (dma_mapping_error(ctx->dev, edesc->dst_dma)) {
++		dev_err(ctx->dev, "unable to map dst\n");
++		edesc->dst_dma = 0;
++		goto unmap;
++	}
++
++	memset(&req_ctx->fd_flt, 0, sizeof(req_ctx->fd_flt));
++	dpaa2_fl_set_final(in_fle, true);
++	dpaa2_fl_set_format(in_fle, dpaa2_fl_single);
++	dpaa2_fl_set_addr(in_fle, state->buf_dma);
++	dpaa2_fl_set_len(in_fle, buflen);
++	dpaa2_fl_set_format(out_fle, dpaa2_fl_single);
++	dpaa2_fl_set_addr(out_fle, edesc->dst_dma);
++	dpaa2_fl_set_len(out_fle, digestsize);
++
++	req_ctx->flc = &ctx->flc[DIGEST];
++	req_ctx->flc_dma = ctx->flc_dma[DIGEST];
++	req_ctx->cbk = ahash_done;
++	req_ctx->ctx = &req->base;
++	req_ctx->edesc = edesc;
++
++	ret = dpaa2_caam_enqueue(ctx->dev, req_ctx);
++	if (ret == -EINPROGRESS ||
++	    (ret == -EBUSY && req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG))
++		return ret;
++
++unmap:
++	ahash_unmap(ctx->dev, edesc, req, digestsize);
++	qi_cache_free(edesc);
++	return ret;
++}
++
++static int ahash_update_no_ctx(struct ahash_request *req)
++{
++	struct crypto_ahash *ahash = crypto_ahash_reqtfm(req);
++	struct caam_hash_ctx *ctx = crypto_ahash_ctx(ahash);
++	struct caam_hash_state *state = ahash_request_ctx(req);
++	struct caam_request *req_ctx = &state->caam_req;
++	struct dpaa2_fl_entry *in_fle = &req_ctx->fd_flt[1];
++	struct dpaa2_fl_entry *out_fle = &req_ctx->fd_flt[0];
++	gfp_t flags = (req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
++		      GFP_KERNEL : GFP_ATOMIC;
++	u8 *buf = current_buf(state);
++	int *buflen = current_buflen(state);
++	u8 *next_buf = alt_buf(state);
++	int *next_buflen = alt_buflen(state);
++	int in_len = *buflen + req->nbytes, to_hash;
++	int qm_sg_bytes, src_nents, mapped_nents;
++	struct ahash_edesc *edesc;
++	int ret = 0;
++
++	*next_buflen = in_len & (crypto_tfm_alg_blocksize(&ahash->base) - 1);
++	to_hash = in_len - *next_buflen;
++
++	if (to_hash) {
++		struct dpaa2_sg_entry *sg_table;
++
++		src_nents = sg_nents_for_len(req->src,
++					     req->nbytes - *next_buflen);
++		if (src_nents < 0) {
++			dev_err(ctx->dev, "Invalid number of src SG.\n");
++			return src_nents;
++		}
++
++		if (src_nents) {
++			mapped_nents = dma_map_sg(ctx->dev, req->src, src_nents,
++						  DMA_TO_DEVICE);
++			if (!mapped_nents) {
++				dev_err(ctx->dev, "unable to DMA map source\n");
++				return -ENOMEM;
++			}
++		} else {
++			mapped_nents = 0;
++		}
++
++		/* allocate space for base edesc and link tables */
++		edesc = qi_cache_zalloc(GFP_DMA | flags);
++		if (!edesc) {
++			dma_unmap_sg(ctx->dev, req->src, src_nents,
++				     DMA_TO_DEVICE);
++			return -ENOMEM;
++		}
++
++		edesc->src_nents = src_nents;
++		qm_sg_bytes = (1 + mapped_nents) * sizeof(*sg_table);
++		sg_table = &edesc->sgt[0];
++
++		ret = buf_map_to_qm_sg(ctx->dev, sg_table, state);
++		if (ret)
++			goto unmap_ctx;
++
++		sg_to_qm_sg_last(req->src, mapped_nents, sg_table + 1, 0);
++
++		if (*next_buflen)
++			scatterwalk_map_and_copy(next_buf, req->src,
++						 to_hash - *buflen,
++						 *next_buflen, 0);
++
++		edesc->qm_sg_dma = dma_map_single(ctx->dev, sg_table,
++						  qm_sg_bytes, DMA_TO_DEVICE);
++		if (dma_mapping_error(ctx->dev, edesc->qm_sg_dma)) {
++			dev_err(ctx->dev, "unable to map S/G table\n");
++			ret = -ENOMEM;
++			goto unmap_ctx;
++		}
++		edesc->qm_sg_bytes = qm_sg_bytes;
++
++		state->ctx_dma = dma_map_single(ctx->dev, state->caam_ctx,
++						ctx->ctx_len, DMA_FROM_DEVICE);
++		if (dma_mapping_error(ctx->dev, state->ctx_dma)) {
++			dev_err(ctx->dev, "unable to map ctx\n");
++			state->ctx_dma = 0;
++			ret = -ENOMEM;
++			goto unmap_ctx;
++		}
++
++		memset(&req_ctx->fd_flt, 0, sizeof(req_ctx->fd_flt));
++		dpaa2_fl_set_final(in_fle, true);
++		dpaa2_fl_set_format(in_fle, dpaa2_fl_sg);
++		dpaa2_fl_set_addr(in_fle, edesc->qm_sg_dma);
++		dpaa2_fl_set_len(in_fle, to_hash);
++		dpaa2_fl_set_format(out_fle, dpaa2_fl_single);
++		dpaa2_fl_set_addr(out_fle, state->ctx_dma);
++		dpaa2_fl_set_len(out_fle, ctx->ctx_len);
++
++		req_ctx->flc = &ctx->flc[UPDATE_FIRST];
++		req_ctx->flc_dma = ctx->flc_dma[UPDATE_FIRST];
++		req_ctx->cbk = ahash_done_ctx_dst;
++		req_ctx->ctx = &req->base;
++		req_ctx->edesc = edesc;
++
++		ret = dpaa2_caam_enqueue(ctx->dev, req_ctx);
++		if (ret != -EINPROGRESS &&
++		    !(ret == -EBUSY &&
++		      req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG))
++			goto unmap_ctx;
++
++		state->update = ahash_update_ctx;
++		state->finup = ahash_finup_ctx;
++		state->final = ahash_final_ctx;
++	} else if (*next_buflen) {
++		scatterwalk_map_and_copy(buf + *buflen, req->src, 0,
++					 req->nbytes, 0);
++		*buflen = *next_buflen;
++		*next_buflen = 0;
++	}
++
++	print_hex_dump_debug("buf@" __stringify(__LINE__)": ",
++			     DUMP_PREFIX_ADDRESS, 16, 4, buf, *buflen, 1);
++	print_hex_dump_debug("next buf@" __stringify(__LINE__)": ",
++			     DUMP_PREFIX_ADDRESS, 16, 4, next_buf, *next_buflen,
++			     1);
++
++	return ret;
++unmap_ctx:
++	ahash_unmap_ctx(ctx->dev, edesc, req, ctx->ctx_len, DMA_TO_DEVICE);
++	qi_cache_free(edesc);
++	return ret;
++}
++
++static int ahash_finup_no_ctx(struct ahash_request *req)
++{
++	struct crypto_ahash *ahash = crypto_ahash_reqtfm(req);
++	struct caam_hash_ctx *ctx = crypto_ahash_ctx(ahash);
++	struct caam_hash_state *state = ahash_request_ctx(req);
++	struct caam_request *req_ctx = &state->caam_req;
++	struct dpaa2_fl_entry *in_fle = &req_ctx->fd_flt[1];
++	struct dpaa2_fl_entry *out_fle = &req_ctx->fd_flt[0];
++	gfp_t flags = (req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
++		      GFP_KERNEL : GFP_ATOMIC;
++	int buflen = *current_buflen(state);
++	int qm_sg_bytes, src_nents, mapped_nents;
++	int digestsize = crypto_ahash_digestsize(ahash);
++	struct ahash_edesc *edesc;
++	struct dpaa2_sg_entry *sg_table;
++	int ret;
++
++	src_nents = sg_nents_for_len(req->src, req->nbytes);
++	if (src_nents < 0) {
++		dev_err(ctx->dev, "Invalid number of src SG.\n");
++		return src_nents;
++	}
++
++	if (src_nents) {
++		mapped_nents = dma_map_sg(ctx->dev, req->src, src_nents,
++					  DMA_TO_DEVICE);
++		if (!mapped_nents) {
++			dev_err(ctx->dev, "unable to DMA map source\n");
++			return -ENOMEM;
++		}
++	} else {
++		mapped_nents = 0;
++	}
++
++	/* allocate space for base edesc and link tables */
++	edesc = qi_cache_zalloc(GFP_DMA | flags);
++	if (!edesc) {
++		dma_unmap_sg(ctx->dev, req->src, src_nents, DMA_TO_DEVICE);
++		return -ENOMEM;
++	}
++
++	edesc->src_nents = src_nents;
++	qm_sg_bytes = (2 + mapped_nents) * sizeof(*sg_table);
++	sg_table = &edesc->sgt[0];
++
++	ret = buf_map_to_qm_sg(ctx->dev, sg_table, state);
++	if (ret)
++		goto unmap;
++
++	sg_to_qm_sg_last(req->src, mapped_nents, sg_table + 1, 0);
++
++	edesc->qm_sg_dma = dma_map_single(ctx->dev, sg_table, qm_sg_bytes,
++					  DMA_TO_DEVICE);
++	if (dma_mapping_error(ctx->dev, edesc->qm_sg_dma)) {
++		dev_err(ctx->dev, "unable to map S/G table\n");
++		ret = -ENOMEM;
++		goto unmap;
++	}
++	edesc->qm_sg_bytes = qm_sg_bytes;
++
++	edesc->dst_dma = dma_map_single(ctx->dev, req->result, digestsize,
++					DMA_FROM_DEVICE);
++	if (dma_mapping_error(ctx->dev, edesc->dst_dma)) {
++		dev_err(ctx->dev, "unable to map dst\n");
++		edesc->dst_dma = 0;
++		ret = -ENOMEM;
++		goto unmap;
++	}
++
++	memset(&req_ctx->fd_flt, 0, sizeof(req_ctx->fd_flt));
++	dpaa2_fl_set_final(in_fle, true);
++	dpaa2_fl_set_format(in_fle, dpaa2_fl_sg);
++	dpaa2_fl_set_addr(in_fle, edesc->qm_sg_dma);
++	dpaa2_fl_set_len(in_fle, buflen + req->nbytes);
++	dpaa2_fl_set_format(out_fle, dpaa2_fl_single);
++	dpaa2_fl_set_addr(out_fle, edesc->dst_dma);
++	dpaa2_fl_set_len(out_fle, digestsize);
++
++	req_ctx->flc = &ctx->flc[DIGEST];
++	req_ctx->flc_dma = ctx->flc_dma[DIGEST];
++	req_ctx->cbk = ahash_done;
++	req_ctx->ctx = &req->base;
++	req_ctx->edesc = edesc;
++	ret = dpaa2_caam_enqueue(ctx->dev, req_ctx);
++	if (ret != -EINPROGRESS &&
++	    !(ret == -EBUSY && req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG))
++		goto unmap;
++
++	return ret;
++unmap:
++	ahash_unmap(ctx->dev, edesc, req, digestsize);
++	qi_cache_free(edesc);
++	return -ENOMEM;
++}
++
++static int ahash_update_first(struct ahash_request *req)
++{
++	struct crypto_ahash *ahash = crypto_ahash_reqtfm(req);
++	struct caam_hash_ctx *ctx = crypto_ahash_ctx(ahash);
++	struct caam_hash_state *state = ahash_request_ctx(req);
++	struct caam_request *req_ctx = &state->caam_req;
++	struct dpaa2_fl_entry *in_fle = &req_ctx->fd_flt[1];
++	struct dpaa2_fl_entry *out_fle = &req_ctx->fd_flt[0];
++	gfp_t flags = (req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
++		      GFP_KERNEL : GFP_ATOMIC;
++	u8 *next_buf = alt_buf(state);
++	int *next_buflen = alt_buflen(state);
++	int to_hash;
++	int src_nents, mapped_nents;
++	struct ahash_edesc *edesc;
++	int ret = 0;
++
++	*next_buflen = req->nbytes & (crypto_tfm_alg_blocksize(&ahash->base) -
++				      1);
++	to_hash = req->nbytes - *next_buflen;
++
++	if (to_hash) {
++		struct dpaa2_sg_entry *sg_table;
++
++		src_nents = sg_nents_for_len(req->src,
++					     req->nbytes - (*next_buflen));
++		if (src_nents < 0) {
++			dev_err(ctx->dev, "Invalid number of src SG.\n");
++			return src_nents;
++		}
++
++		if (src_nents) {
++			mapped_nents = dma_map_sg(ctx->dev, req->src, src_nents,
++						  DMA_TO_DEVICE);
++			if (!mapped_nents) {
++				dev_err(ctx->dev, "unable to map source for DMA\n");
++				return -ENOMEM;
++			}
++		} else {
++			mapped_nents = 0;
++		}
++
++		/* allocate space for base edesc and link tables */
++		edesc = qi_cache_zalloc(GFP_DMA | flags);
++		if (!edesc) {
++			dma_unmap_sg(ctx->dev, req->src, src_nents,
++				     DMA_TO_DEVICE);
++			return -ENOMEM;
++		}
++
++		edesc->src_nents = src_nents;
++		sg_table = &edesc->sgt[0];
++
++		memset(&req_ctx->fd_flt, 0, sizeof(req_ctx->fd_flt));
++		dpaa2_fl_set_final(in_fle, true);
++		dpaa2_fl_set_len(in_fle, to_hash);
++
++		if (mapped_nents > 1) {
++			int qm_sg_bytes;
++
++			sg_to_qm_sg_last(req->src, mapped_nents, sg_table, 0);
++			qm_sg_bytes = mapped_nents * sizeof(*sg_table);
++			edesc->qm_sg_dma = dma_map_single(ctx->dev, sg_table,
++							  qm_sg_bytes,
++							  DMA_TO_DEVICE);
++			if (dma_mapping_error(ctx->dev, edesc->qm_sg_dma)) {
++				dev_err(ctx->dev, "unable to map S/G table\n");
++				ret = -ENOMEM;
++				goto unmap_ctx;
++			}
++			edesc->qm_sg_bytes = qm_sg_bytes;
++			dpaa2_fl_set_format(in_fle, dpaa2_fl_sg);
++			dpaa2_fl_set_addr(in_fle, edesc->qm_sg_dma);
++		} else {
++			dpaa2_fl_set_format(in_fle, dpaa2_fl_single);
++			dpaa2_fl_set_addr(in_fle, sg_dma_address(req->src));
++		}
++
++		if (*next_buflen)
++			scatterwalk_map_and_copy(next_buf, req->src, to_hash,
++						 *next_buflen, 0);
++
++		state->ctx_dma = dma_map_single(ctx->dev, state->caam_ctx,
++						ctx->ctx_len, DMA_FROM_DEVICE);
++		if (dma_mapping_error(ctx->dev, state->ctx_dma)) {
++			dev_err(ctx->dev, "unable to map ctx\n");
++			state->ctx_dma = 0;
++			ret = -ENOMEM;
++			goto unmap_ctx;
++		}
++
++		dpaa2_fl_set_format(out_fle, dpaa2_fl_single);
++		dpaa2_fl_set_addr(out_fle, state->ctx_dma);
++		dpaa2_fl_set_len(out_fle, ctx->ctx_len);
++
++		req_ctx->flc = &ctx->flc[UPDATE_FIRST];
++		req_ctx->flc_dma = ctx->flc_dma[UPDATE_FIRST];
++		req_ctx->cbk = ahash_done_ctx_dst;
++		req_ctx->ctx = &req->base;
++		req_ctx->edesc = edesc;
++
++		ret = dpaa2_caam_enqueue(ctx->dev, req_ctx);
++		if (ret != -EINPROGRESS &&
++		    !(ret == -EBUSY && req->base.flags &
++		      CRYPTO_TFM_REQ_MAY_BACKLOG))
++			goto unmap_ctx;
++
++		state->update = ahash_update_ctx;
++		state->finup = ahash_finup_ctx;
++		state->final = ahash_final_ctx;
++	} else if (*next_buflen) {
++		state->update = ahash_update_no_ctx;
++		state->finup = ahash_finup_no_ctx;
++		state->final = ahash_final_no_ctx;
++		scatterwalk_map_and_copy(next_buf, req->src, 0,
++					 req->nbytes, 0);
++		switch_buf(state);
++	}
++
++	print_hex_dump_debug("next buf@" __stringify(__LINE__)": ",
++			     DUMP_PREFIX_ADDRESS, 16, 4, next_buf, *next_buflen,
++			     1);
++
++	return ret;
++unmap_ctx:
++	ahash_unmap_ctx(ctx->dev, edesc, req, ctx->ctx_len, DMA_TO_DEVICE);
++	qi_cache_free(edesc);
++	return ret;
++}
++
++static int ahash_finup_first(struct ahash_request *req)
++{
++	return ahash_digest(req);
++}
++
++static int ahash_init(struct ahash_request *req)
++{
++	struct caam_hash_state *state = ahash_request_ctx(req);
++
++	state->update = ahash_update_first;
++	state->finup = ahash_finup_first;
++	state->final = ahash_final_no_ctx;
++
++	state->ctx_dma = 0;
++	state->current_buf = 0;
++	state->buf_dma = 0;
++	state->buflen_0 = 0;
++	state->buflen_1 = 0;
++
++	return 0;
++}
++
++static int ahash_update(struct ahash_request *req)
++{
++	struct caam_hash_state *state = ahash_request_ctx(req);
++
++	return state->update(req);
++}
++
++static int ahash_finup(struct ahash_request *req)
++{
++	struct caam_hash_state *state = ahash_request_ctx(req);
++
++	return state->finup(req);
++}
++
++static int ahash_final(struct ahash_request *req)
++{
++	struct caam_hash_state *state = ahash_request_ctx(req);
++
++	return state->final(req);
++}
++
++static int ahash_export(struct ahash_request *req, void *out)
++{
++	struct caam_hash_state *state = ahash_request_ctx(req);
++	struct caam_export_state *export = out;
++	int len;
++	u8 *buf;
++
++	if (state->current_buf) {
++		buf = state->buf_1;
++		len = state->buflen_1;
++	} else {
++		buf = state->buf_0;
++		len = state->buflen_0;
++	}
++
++	memcpy(export->buf, buf, len);
++	memcpy(export->caam_ctx, state->caam_ctx, sizeof(export->caam_ctx));
++	export->buflen = len;
++	export->update = state->update;
++	export->final = state->final;
++	export->finup = state->finup;
++
++	return 0;
++}
++
++static int ahash_import(struct ahash_request *req, const void *in)
++{
++	struct caam_hash_state *state = ahash_request_ctx(req);
++	const struct caam_export_state *export = in;
++
++	memset(state, 0, sizeof(*state));
++	memcpy(state->buf_0, export->buf, export->buflen);
++	memcpy(state->caam_ctx, export->caam_ctx, sizeof(state->caam_ctx));
++	state->buflen_0 = export->buflen;
++	state->update = export->update;
++	state->final = export->final;
++	state->finup = export->finup;
++
++	return 0;
++}
++
++struct caam_hash_template {
++	char name[CRYPTO_MAX_ALG_NAME];
++	char driver_name[CRYPTO_MAX_ALG_NAME];
++	char hmac_name[CRYPTO_MAX_ALG_NAME];
++	char hmac_driver_name[CRYPTO_MAX_ALG_NAME];
++	unsigned int blocksize;
++	struct ahash_alg template_ahash;
++	u32 alg_type;
++};
++
++/* ahash descriptors */
++static struct caam_hash_template driver_hash[] = {
++	{
++		.name = "sha1",
++		.driver_name = "sha1-caam-qi2",
++		.hmac_name = "hmac(sha1)",
++		.hmac_driver_name = "hmac-sha1-caam-qi2",
++		.blocksize = SHA1_BLOCK_SIZE,
++		.template_ahash = {
++			.init = ahash_init,
++			.update = ahash_update,
++			.final = ahash_final,
++			.finup = ahash_finup,
++			.digest = ahash_digest,
++			.export = ahash_export,
++			.import = ahash_import,
++			.setkey = ahash_setkey,
++			.halg = {
++				.digestsize = SHA1_DIGEST_SIZE,
++				.statesize = sizeof(struct caam_export_state),
++			},
++		},
++		.alg_type = OP_ALG_ALGSEL_SHA1,
++	}, {
++		.name = "sha224",
++		.driver_name = "sha224-caam-qi2",
++		.hmac_name = "hmac(sha224)",
++		.hmac_driver_name = "hmac-sha224-caam-qi2",
++		.blocksize = SHA224_BLOCK_SIZE,
++		.template_ahash = {
++			.init = ahash_init,
++			.update = ahash_update,
++			.final = ahash_final,
++			.finup = ahash_finup,
++			.digest = ahash_digest,
++			.export = ahash_export,
++			.import = ahash_import,
++			.setkey = ahash_setkey,
++			.halg = {
++				.digestsize = SHA224_DIGEST_SIZE,
++				.statesize = sizeof(struct caam_export_state),
++			},
++		},
++		.alg_type = OP_ALG_ALGSEL_SHA224,
++	}, {
++		.name = "sha256",
++		.driver_name = "sha256-caam-qi2",
++		.hmac_name = "hmac(sha256)",
++		.hmac_driver_name = "hmac-sha256-caam-qi2",
++		.blocksize = SHA256_BLOCK_SIZE,
++		.template_ahash = {
++			.init = ahash_init,
++			.update = ahash_update,
++			.final = ahash_final,
++			.finup = ahash_finup,
++			.digest = ahash_digest,
++			.export = ahash_export,
++			.import = ahash_import,
++			.setkey = ahash_setkey,
++			.halg = {
++				.digestsize = SHA256_DIGEST_SIZE,
++				.statesize = sizeof(struct caam_export_state),
++			},
++		},
++		.alg_type = OP_ALG_ALGSEL_SHA256,
++	}, {
++		.name = "sha384",
++		.driver_name = "sha384-caam-qi2",
++		.hmac_name = "hmac(sha384)",
++		.hmac_driver_name = "hmac-sha384-caam-qi2",
++		.blocksize = SHA384_BLOCK_SIZE,
++		.template_ahash = {
++			.init = ahash_init,
++			.update = ahash_update,
++			.final = ahash_final,
++			.finup = ahash_finup,
++			.digest = ahash_digest,
++			.export = ahash_export,
++			.import = ahash_import,
++			.setkey = ahash_setkey,
++			.halg = {
++				.digestsize = SHA384_DIGEST_SIZE,
++				.statesize = sizeof(struct caam_export_state),
++			},
++		},
++		.alg_type = OP_ALG_ALGSEL_SHA384,
++	}, {
++		.name = "sha512",
++		.driver_name = "sha512-caam-qi2",
++		.hmac_name = "hmac(sha512)",
++		.hmac_driver_name = "hmac-sha512-caam-qi2",
++		.blocksize = SHA512_BLOCK_SIZE,
++		.template_ahash = {
++			.init = ahash_init,
++			.update = ahash_update,
++			.final = ahash_final,
++			.finup = ahash_finup,
++			.digest = ahash_digest,
++			.export = ahash_export,
++			.import = ahash_import,
++			.setkey = ahash_setkey,
++			.halg = {
++				.digestsize = SHA512_DIGEST_SIZE,
++				.statesize = sizeof(struct caam_export_state),
++			},
++		},
++		.alg_type = OP_ALG_ALGSEL_SHA512,
++	}, {
++		.name = "md5",
++		.driver_name = "md5-caam-qi2",
++		.hmac_name = "hmac(md5)",
++		.hmac_driver_name = "hmac-md5-caam-qi2",
++		.blocksize = MD5_BLOCK_WORDS * 4,
++		.template_ahash = {
++			.init = ahash_init,
++			.update = ahash_update,
++			.final = ahash_final,
++			.finup = ahash_finup,
++			.digest = ahash_digest,
++			.export = ahash_export,
++			.import = ahash_import,
++			.setkey = ahash_setkey,
++			.halg = {
++				.digestsize = MD5_DIGEST_SIZE,
++				.statesize = sizeof(struct caam_export_state),
++			},
++		},
++		.alg_type = OP_ALG_ALGSEL_MD5,
++	}
++};
++
++struct caam_hash_alg {
++	struct list_head entry;
++	struct device *dev;
++	int alg_type;
++	struct ahash_alg ahash_alg;
++};
++
++static int caam_hash_cra_init(struct crypto_tfm *tfm)
++{
++	struct crypto_ahash *ahash = __crypto_ahash_cast(tfm);
++	struct crypto_alg *base = tfm->__crt_alg;
++	struct hash_alg_common *halg =
++		 container_of(base, struct hash_alg_common, base);
++	struct ahash_alg *alg =
++		 container_of(halg, struct ahash_alg, halg);
++	struct caam_hash_alg *caam_hash =
++		 container_of(alg, struct caam_hash_alg, ahash_alg);
++	struct caam_hash_ctx *ctx = crypto_tfm_ctx(tfm);
++	/* Sizes for MDHA running digests: MD5, SHA1, 224, 256, 384, 512 */
++	static const u8 runninglen[] = { HASH_MSG_LEN + MD5_DIGEST_SIZE,
++					 HASH_MSG_LEN + SHA1_DIGEST_SIZE,
++					 HASH_MSG_LEN + 32,
++					 HASH_MSG_LEN + SHA256_DIGEST_SIZE,
++					 HASH_MSG_LEN + 64,
++					 HASH_MSG_LEN + SHA512_DIGEST_SIZE };
++	dma_addr_t dma_addr;
++	int i;
++
++	ctx->dev = caam_hash->dev;
++
++	dma_addr = dma_map_single_attrs(ctx->dev, ctx->flc, sizeof(ctx->flc),
++					DMA_BIDIRECTIONAL,
++					DMA_ATTR_SKIP_CPU_SYNC);
++	if (dma_mapping_error(ctx->dev, dma_addr)) {
++		dev_err(ctx->dev, "unable to map shared descriptors\n");
++		return -ENOMEM;
++	}
++
++	for (i = 0; i < HASH_NUM_OP; i++)
++		ctx->flc_dma[i] = dma_addr + i * sizeof(ctx->flc[i]);
++
++	/* copy descriptor header template value */
++	ctx->adata.algtype = OP_TYPE_CLASS2_ALG | caam_hash->alg_type;
++
++	ctx->ctx_len = runninglen[(ctx->adata.algtype &
++				   OP_ALG_ALGSEL_SUBMASK) >>
++				  OP_ALG_ALGSEL_SHIFT];
++
++	crypto_ahash_set_reqsize(__crypto_ahash_cast(tfm),
++				 sizeof(struct caam_hash_state));
++
++	return ahash_set_sh_desc(ahash);
++}
++
++static void caam_hash_cra_exit(struct crypto_tfm *tfm)
++{
++	struct caam_hash_ctx *ctx = crypto_tfm_ctx(tfm);
++
++	dma_unmap_single_attrs(ctx->dev, ctx->flc_dma[0], sizeof(ctx->flc),
++			       DMA_BIDIRECTIONAL, DMA_ATTR_SKIP_CPU_SYNC);
++}
++
++static struct caam_hash_alg *caam_hash_alloc(struct device *dev,
++	struct caam_hash_template *template, bool keyed)
++{
++	struct caam_hash_alg *t_alg;
++	struct ahash_alg *halg;
++	struct crypto_alg *alg;
++
++	t_alg = kzalloc(sizeof(*t_alg), GFP_KERNEL);
++	if (!t_alg)
++		return ERR_PTR(-ENOMEM);
++
++	t_alg->ahash_alg = template->template_ahash;
++	halg = &t_alg->ahash_alg;
++	alg = &halg->halg.base;
++
++	if (keyed) {
++		snprintf(alg->cra_name, CRYPTO_MAX_ALG_NAME, "%s",
++			 template->hmac_name);
++		snprintf(alg->cra_driver_name, CRYPTO_MAX_ALG_NAME, "%s",
++			 template->hmac_driver_name);
++	} else {
++		snprintf(alg->cra_name, CRYPTO_MAX_ALG_NAME, "%s",
++			 template->name);
++		snprintf(alg->cra_driver_name, CRYPTO_MAX_ALG_NAME, "%s",
++			 template->driver_name);
++		t_alg->ahash_alg.setkey = NULL;
++	}
++	alg->cra_module = THIS_MODULE;
++	alg->cra_init = caam_hash_cra_init;
++	alg->cra_exit = caam_hash_cra_exit;
++	alg->cra_ctxsize = sizeof(struct caam_hash_ctx);
++	alg->cra_priority = CAAM_CRA_PRIORITY;
++	alg->cra_blocksize = template->blocksize;
++	alg->cra_alignmask = 0;
++	alg->cra_flags = CRYPTO_ALG_ASYNC;
++
++	t_alg->alg_type = template->alg_type;
++	t_alg->dev = dev;
++
++	return t_alg;
++}
++
+ static void dpaa2_caam_fqdan_cb(struct dpaa2_io_notification_ctx *nctx)
+ {
+ 	struct dpaa2_caam_priv_per_cpu *ppriv;
+@@ -3158,6 +4803,8 @@ static int __cold dpaa2_dpseci_disable(struct dpaa2_caam_priv *priv)
+ 	return 0;
+ }
+ 
++static struct list_head hash_list;
++
+ static int dpaa2_caam_probe(struct fsl_mc_device *dpseci_dev)
+ {
+ 	struct device *dev;
+@@ -3316,6 +4963,61 @@ static int dpaa2_caam_probe(struct fsl_mc_device *dpseci_dev)
+ 	if (registered)
+ 		dev_info(dev, "algorithms registered in /proc/crypto\n");
+ 
++	/* register hash algorithms the device supports */
++	INIT_LIST_HEAD(&hash_list);
++
++	/*
++	 * Skip registration of any hashing algorithms if MD block
++	 * is not present.
++	 */
++	if (!priv->sec_attr.md_acc_num)
++		return 0;
++
++	for (i = 0; i < ARRAY_SIZE(driver_hash); i++) {
++		struct caam_hash_alg *t_alg;
++		struct caam_hash_template *alg = driver_hash + i;
++
++		/* register hmac version */
++		t_alg = caam_hash_alloc(dev, alg, true);
++		if (IS_ERR(t_alg)) {
++			err = PTR_ERR(t_alg);
++			dev_warn(dev, "%s hash alg allocation failed: %d\n",
++				 alg->driver_name, err);
++			continue;
++		}
++
++		err = crypto_register_ahash(&t_alg->ahash_alg);
++		if (err) {
++			dev_warn(dev, "%s alg registration failed: %d\n",
++				 t_alg->ahash_alg.halg.base.cra_driver_name,
++				 err);
++			kfree(t_alg);
++		} else {
++			list_add_tail(&t_alg->entry, &hash_list);
++		}
++
++		/* register unkeyed version */
++		t_alg = caam_hash_alloc(dev, alg, false);
++		if (IS_ERR(t_alg)) {
++			err = PTR_ERR(t_alg);
++			dev_warn(dev, "%s alg allocation failed: %d\n",
++				 alg->driver_name, err);
++			continue;
++		}
++
++		err = crypto_register_ahash(&t_alg->ahash_alg);
++		if (err) {
++			dev_warn(dev, "%s alg registration failed: %d\n",
++				 t_alg->ahash_alg.halg.base.cra_driver_name,
++				 err);
++			kfree(t_alg);
++		} else {
++			list_add_tail(&t_alg->entry, &hash_list);
++		}
++	}
++	if (!list_empty(&hash_list))
++		dev_info(dev, "hash algorithms registered in /proc/crypto\n");
++
+ 	return err;
+ 
+ err_bind:
+@@ -3355,6 +5057,16 @@ static int __cold dpaa2_caam_remove(struct fsl_mc_device *ls_dev)
+ 			crypto_unregister_skcipher(&t_alg->skcipher);
+ 	}
+ 
++	if (hash_list.next) {
++		struct caam_hash_alg *t_hash_alg, *p;
++
++		list_for_each_entry_safe(t_hash_alg, p, &hash_list, entry) {
++			crypto_unregister_ahash(&t_hash_alg->ahash_alg);
++			list_del(&t_hash_alg->entry);
++			kfree(t_hash_alg);
++		}
++	}
++
+ 	dpaa2_dpseci_disable(priv);
+ 	dpaa2_dpseci_dpio_free(priv);
+ 	dpaa2_dpseci_free(priv);
+diff --git a/drivers/crypto/caam/caamalg_qi2.h b/drivers/crypto/caam/caamalg_qi2.h
+index 71a08330eb09..9823bdefd029 100644
+--- a/drivers/crypto/caam/caamalg_qi2.h
++++ b/drivers/crypto/caam/caamalg_qi2.h
+@@ -158,6 +158,22 @@ struct skcipher_edesc {
+ 	struct dpaa2_sg_entry sgt[0];
+ };
+ 
 +/*
-+ * Copyright 2013-2016 Freescale Semiconductor Inc.
-+ * Copyright 2017-2018 NXP
++ * ahash_edesc - s/w-extended ahash descriptor
++ * @dst_dma: I/O virtual address of req->result
++ * @qm_sg_dma: I/O virtual address of h/w link table
++ * @src_nents: number of segments in input scatterlist
++ * @qm_sg_bytes: length of dma mapped qm_sg space
++ * @sgt: pointer to h/w link table
 + */
-+
-+#include <linux/fsl/mc.h>
-+#include "dpseci.h"
-+#include "dpseci_cmd.h"
-+
-+/**
-+ * dpseci_open() - Open a control session for the specified object
-+ * @mc_io:	Pointer to MC portal's I/O object
-+ * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
-+ * @dpseci_id:	DPSECI unique ID
-+ * @token:	Returned token; use in subsequent API calls
-+ *
-+ * This function can be used to open a control session for an already created
-+ * object; an object may have been declared statically in the DPL
-+ * or created dynamically.
-+ * This function returns a unique authentication token, associated with the
-+ * specific object ID and the specific MC portal; this token must be used in all
-+ * subsequent commands for this specific object.
-+ *
-+ * Return:	'0' on success, error code otherwise
-+ */
-+int dpseci_open(struct fsl_mc_io *mc_io, u32 cmd_flags, int dpseci_id,
-+		u16 *token)
-+{
-+	struct fsl_mc_command cmd = { 0 };
-+	struct dpseci_cmd_open *cmd_params;
-+	int err;
-+
-+	cmd.header = mc_encode_cmd_header(DPSECI_CMDID_OPEN,
-+					  cmd_flags,
-+					  0);
-+	cmd_params = (struct dpseci_cmd_open *)cmd.params;
-+	cmd_params->dpseci_id = cpu_to_le32(dpseci_id);
-+	err = mc_send_command(mc_io, &cmd);
-+	if (err)
-+		return err;
-+
-+	*token = mc_cmd_hdr_read_token(&cmd);
-+
-+	return 0;
-+}
-+
-+/**
-+ * dpseci_close() - Close the control session of the object
-+ * @mc_io:	Pointer to MC portal's I/O object
-+ * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
-+ * @token:	Token of DPSECI object
-+ *
-+ * After this function is called, no further operations are allowed on the
-+ * object without opening a new control session.
-+ *
-+ * Return:	'0' on success, error code otherwise
-+ */
-+int dpseci_close(struct fsl_mc_io *mc_io, u32 cmd_flags, u16 token)
-+{
-+	struct fsl_mc_command cmd = { 0 };
-+
-+	cmd.header = mc_encode_cmd_header(DPSECI_CMDID_CLOSE,
-+					  cmd_flags,
-+					  token);
-+	return mc_send_command(mc_io, &cmd);
-+}
-+
-+/**
-+ * dpseci_enable() - Enable the DPSECI, allow sending and receiving frames
-+ * @mc_io:	Pointer to MC portal's I/O object
-+ * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
-+ * @token:	Token of DPSECI object
-+ *
-+ * Return:	'0' on success, error code otherwise
-+ */
-+int dpseci_enable(struct fsl_mc_io *mc_io, u32 cmd_flags, u16 token)
-+{
-+	struct fsl_mc_command cmd = { 0 };
-+
-+	cmd.header = mc_encode_cmd_header(DPSECI_CMDID_ENABLE,
-+					  cmd_flags,
-+					  token);
-+	return mc_send_command(mc_io, &cmd);
-+}
-+
-+/**
-+ * dpseci_disable() - Disable the DPSECI, stop sending and receiving frames
-+ * @mc_io:	Pointer to MC portal's I/O object
-+ * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
-+ * @token:	Token of DPSECI object
-+ *
-+ * Return:	'0' on success, error code otherwise
-+ */
-+int dpseci_disable(struct fsl_mc_io *mc_io, u32 cmd_flags, u16 token)
-+{
-+	struct fsl_mc_command cmd = { 0 };
-+
-+	cmd.header = mc_encode_cmd_header(DPSECI_CMDID_DISABLE,
-+					  cmd_flags,
-+					  token);
-+
-+	return mc_send_command(mc_io, &cmd);
-+}
-+
-+/**
-+ * dpseci_is_enabled() - Check if the DPSECI is enabled.
-+ * @mc_io:	Pointer to MC portal's I/O object
-+ * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
-+ * @token:	Token of DPSECI object
-+ * @en:		Returns '1' if object is enabled; '0' otherwise
-+ *
-+ * Return:	'0' on success, error code otherwise
-+ */
-+int dpseci_is_enabled(struct fsl_mc_io *mc_io, u32 cmd_flags, u16 token,
-+		      int *en)
-+{
-+	struct fsl_mc_command cmd = { 0 };
-+	struct dpseci_rsp_is_enabled *rsp_params;
-+	int err;
-+
-+	cmd.header = mc_encode_cmd_header(DPSECI_CMDID_IS_ENABLED,
-+					  cmd_flags,
-+					  token);
-+	err = mc_send_command(mc_io, &cmd);
-+	if (err)
-+		return err;
-+
-+	rsp_params = (struct dpseci_rsp_is_enabled *)cmd.params;
-+	*en = dpseci_get_field(rsp_params->is_enabled, ENABLE);
-+
-+	return 0;
-+}
-+
-+/**
-+ * dpseci_get_attributes() - Retrieve DPSECI attributes
-+ * @mc_io:	Pointer to MC portal's I/O object
-+ * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
-+ * @token:	Token of DPSECI object
-+ * @attr:	Returned object's attributes
-+ *
-+ * Return:	'0' on success, error code otherwise
-+ */
-+int dpseci_get_attributes(struct fsl_mc_io *mc_io, u32 cmd_flags, u16 token,
-+			  struct dpseci_attr *attr)
-+{
-+	struct fsl_mc_command cmd = { 0 };
-+	struct dpseci_rsp_get_attributes *rsp_params;
-+	int err;
-+
-+	cmd.header = mc_encode_cmd_header(DPSECI_CMDID_GET_ATTR,
-+					  cmd_flags,
-+					  token);
-+	err = mc_send_command(mc_io, &cmd);
-+	if (err)
-+		return err;
-+
-+	rsp_params = (struct dpseci_rsp_get_attributes *)cmd.params;
-+	attr->id = le32_to_cpu(rsp_params->id);
-+	attr->num_tx_queues = rsp_params->num_tx_queues;
-+	attr->num_rx_queues = rsp_params->num_rx_queues;
-+	attr->options = le32_to_cpu(rsp_params->options);
-+
-+	return 0;
-+}
-+
-+/**
-+ * dpseci_set_rx_queue() - Set Rx queue configuration
-+ * @mc_io:	Pointer to MC portal's I/O object
-+ * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
-+ * @token:	Token of DPSECI object
-+ * @queue:	Select the queue relative to number of priorities configured at
-+ *		DPSECI creation; use DPSECI_ALL_QUEUES to configure all
-+ *		Rx queues identically.
-+ * @cfg:	Rx queue configuration
-+ *
-+ * Return:	'0' on success, error code otherwise
-+ */
-+int dpseci_set_rx_queue(struct fsl_mc_io *mc_io, u32 cmd_flags, u16 token,
-+			u8 queue, const struct dpseci_rx_queue_cfg *cfg)
-+{
-+	struct fsl_mc_command cmd = { 0 };
-+	struct dpseci_cmd_queue *cmd_params;
-+
-+	cmd.header = mc_encode_cmd_header(DPSECI_CMDID_SET_RX_QUEUE,
-+					  cmd_flags,
-+					  token);
-+	cmd_params = (struct dpseci_cmd_queue *)cmd.params;
-+	cmd_params->dest_id = cpu_to_le32(cfg->dest_cfg.dest_id);
-+	cmd_params->priority = cfg->dest_cfg.priority;
-+	cmd_params->queue = queue;
-+	dpseci_set_field(cmd_params->dest_type, DEST_TYPE,
-+			 cfg->dest_cfg.dest_type);
-+	cmd_params->user_ctx = cpu_to_le64(cfg->user_ctx);
-+	cmd_params->options = cpu_to_le32(cfg->options);
-+	dpseci_set_field(cmd_params->order_preservation_en, ORDER_PRESERVATION,
-+			 cfg->order_preservation_en);
-+
-+	return mc_send_command(mc_io, &cmd);
-+}
-+
-+/**
-+ * dpseci_get_rx_queue() - Retrieve Rx queue attributes
-+ * @mc_io:	Pointer to MC portal's I/O object
-+ * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
-+ * @token:	Token of DPSECI object
-+ * @queue:	Select the queue relative to number of priorities configured at
-+ *		DPSECI creation
-+ * @attr:	Returned Rx queue attributes
-+ *
-+ * Return:	'0' on success, error code otherwise
-+ */
-+int dpseci_get_rx_queue(struct fsl_mc_io *mc_io, u32 cmd_flags, u16 token,
-+			u8 queue, struct dpseci_rx_queue_attr *attr)
-+{
-+	struct fsl_mc_command cmd = { 0 };
-+	struct dpseci_cmd_queue *cmd_params;
-+	int err;
-+
-+	cmd.header = mc_encode_cmd_header(DPSECI_CMDID_GET_RX_QUEUE,
-+					  cmd_flags,
-+					  token);
-+	cmd_params = (struct dpseci_cmd_queue *)cmd.params;
-+	cmd_params->queue = queue;
-+	err = mc_send_command(mc_io, &cmd);
-+	if (err)
-+		return err;
-+
-+	attr->dest_cfg.dest_id = le32_to_cpu(cmd_params->dest_id);
-+	attr->dest_cfg.priority = cmd_params->priority;
-+	attr->dest_cfg.dest_type = dpseci_get_field(cmd_params->dest_type,
-+						    DEST_TYPE);
-+	attr->user_ctx = le64_to_cpu(cmd_params->user_ctx);
-+	attr->fqid = le32_to_cpu(cmd_params->fqid);
-+	attr->order_preservation_en =
-+		dpseci_get_field(cmd_params->order_preservation_en,
-+				 ORDER_PRESERVATION);
-+
-+	return 0;
-+}
-+
-+/**
-+ * dpseci_get_tx_queue() - Retrieve Tx queue attributes
-+ * @mc_io:	Pointer to MC portal's I/O object
-+ * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
-+ * @token:	Token of DPSECI object
-+ * @queue:	Select the queue relative to number of priorities configured at
-+ *		DPSECI creation
-+ * @attr:	Returned Tx queue attributes
-+ *
-+ * Return:	'0' on success, error code otherwise
-+ */
-+int dpseci_get_tx_queue(struct fsl_mc_io *mc_io, u32 cmd_flags, u16 token,
-+			u8 queue, struct dpseci_tx_queue_attr *attr)
-+{
-+	struct fsl_mc_command cmd = { 0 };
-+	struct dpseci_cmd_queue *cmd_params;
-+	struct dpseci_rsp_get_tx_queue *rsp_params;
-+	int err;
-+
-+	cmd.header = mc_encode_cmd_header(DPSECI_CMDID_GET_TX_QUEUE,
-+					  cmd_flags,
-+					  token);
-+	cmd_params = (struct dpseci_cmd_queue *)cmd.params;
-+	cmd_params->queue = queue;
-+	err = mc_send_command(mc_io, &cmd);
-+	if (err)
-+		return err;
-+
-+	rsp_params = (struct dpseci_rsp_get_tx_queue *)cmd.params;
-+	attr->fqid = le32_to_cpu(rsp_params->fqid);
-+	attr->priority = rsp_params->priority;
-+
-+	return 0;
-+}
-+
-+/**
-+ * dpseci_get_sec_attr() - Retrieve SEC accelerator attributes
-+ * @mc_io:	Pointer to MC portal's I/O object
-+ * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
-+ * @token:	Token of DPSECI object
-+ * @attr:	Returned SEC attributes
-+ *
-+ * Return:	'0' on success, error code otherwise
-+ */
-+int dpseci_get_sec_attr(struct fsl_mc_io *mc_io, u32 cmd_flags, u16 token,
-+			struct dpseci_sec_attr *attr)
-+{
-+	struct fsl_mc_command cmd = { 0 };
-+	struct dpseci_rsp_get_sec_attr *rsp_params;
-+	int err;
-+
-+	cmd.header = mc_encode_cmd_header(DPSECI_CMDID_GET_SEC_ATTR,
-+					  cmd_flags,
-+					  token);
-+	err = mc_send_command(mc_io, &cmd);
-+	if (err)
-+		return err;
-+
-+	rsp_params = (struct dpseci_rsp_get_sec_attr *)cmd.params;
-+	attr->ip_id = le16_to_cpu(rsp_params->ip_id);
-+	attr->major_rev = rsp_params->major_rev;
-+	attr->minor_rev = rsp_params->minor_rev;
-+	attr->era = rsp_params->era;
-+	attr->deco_num = rsp_params->deco_num;
-+	attr->zuc_auth_acc_num = rsp_params->zuc_auth_acc_num;
-+	attr->zuc_enc_acc_num = rsp_params->zuc_enc_acc_num;
-+	attr->snow_f8_acc_num = rsp_params->snow_f8_acc_num;
-+	attr->snow_f9_acc_num = rsp_params->snow_f9_acc_num;
-+	attr->crc_acc_num = rsp_params->crc_acc_num;
-+	attr->pk_acc_num = rsp_params->pk_acc_num;
-+	attr->kasumi_acc_num = rsp_params->kasumi_acc_num;
-+	attr->rng_acc_num = rsp_params->rng_acc_num;
-+	attr->md_acc_num = rsp_params->md_acc_num;
-+	attr->arc4_acc_num = rsp_params->arc4_acc_num;
-+	attr->des_acc_num = rsp_params->des_acc_num;
-+	attr->aes_acc_num = rsp_params->aes_acc_num;
-+	attr->ccha_acc_num = rsp_params->ccha_acc_num;
-+	attr->ptha_acc_num = rsp_params->ptha_acc_num;
-+
-+	return 0;
-+}
-+
-+/**
-+ * dpseci_get_api_version() - Get Data Path SEC Interface API version
-+ * @mc_io:	Pointer to MC portal's I/O object
-+ * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
-+ * @major_ver:	Major version of data path sec API
-+ * @minor_ver:	Minor version of data path sec API
-+ *
-+ * Return:	'0' on success, error code otherwise
-+ */
-+int dpseci_get_api_version(struct fsl_mc_io *mc_io, u32 cmd_flags,
-+			   u16 *major_ver, u16 *minor_ver)
-+{
-+	struct fsl_mc_command cmd = { 0 };
-+	struct dpseci_rsp_get_api_version *rsp_params;
-+	int err;
-+
-+	cmd.header = mc_encode_cmd_header(DPSECI_CMDID_GET_API_VERSION,
-+					  cmd_flags, 0);
-+	err = mc_send_command(mc_io, &cmd);
-+	if (err)
-+		return err;
-+
-+	rsp_params = (struct dpseci_rsp_get_api_version *)cmd.params;
-+	*major_ver = le16_to_cpu(rsp_params->major);
-+	*minor_ver = le16_to_cpu(rsp_params->minor);
-+
-+	return 0;
-+}
-+
-+/**
-+ * dpseci_set_congestion_notification() - Set congestion group
-+ *	notification configuration
-+ * @mc_io:	Pointer to MC portal's I/O object
-+ * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
-+ * @token:	Token of DPSECI object
-+ * @cfg:	congestion notification configuration
-+ *
-+ * Return:	'0' on success, error code otherwise
-+ */
-+int dpseci_set_congestion_notification(struct fsl_mc_io *mc_io, u32 cmd_flags,
-+	u16 token, const struct dpseci_congestion_notification_cfg *cfg)
-+{
-+	struct fsl_mc_command cmd = { 0 };
-+	struct dpseci_cmd_congestion_notification *cmd_params;
-+
-+	cmd.header = mc_encode_cmd_header(
-+			DPSECI_CMDID_SET_CONGESTION_NOTIFICATION,
-+			cmd_flags,
-+			token);
-+	cmd_params = (struct dpseci_cmd_congestion_notification *)cmd.params;
-+	cmd_params->dest_id = cpu_to_le32(cfg->dest_cfg.dest_id);
-+	cmd_params->notification_mode = cpu_to_le16(cfg->notification_mode);
-+	cmd_params->priority = cfg->dest_cfg.priority;
-+	dpseci_set_field(cmd_params->options, CGN_DEST_TYPE,
-+			 cfg->dest_cfg.dest_type);
-+	dpseci_set_field(cmd_params->options, CGN_UNITS, cfg->units);
-+	cmd_params->message_iova = cpu_to_le64(cfg->message_iova);
-+	cmd_params->message_ctx = cpu_to_le64(cfg->message_ctx);
-+	cmd_params->threshold_entry = cpu_to_le32(cfg->threshold_entry);
-+	cmd_params->threshold_exit = cpu_to_le32(cfg->threshold_exit);
-+
-+	return mc_send_command(mc_io, &cmd);
-+}
-+
-+/**
-+ * dpseci_get_congestion_notification() - Get congestion group notification
-+ *	configuration
-+ * @mc_io:	Pointer to MC portal's I/O object
-+ * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
-+ * @token:	Token of DPSECI object
-+ * @cfg:	congestion notification configuration
-+ *
-+ * Return:	'0' on success, error code otherwise
-+ */
-+int dpseci_get_congestion_notification(struct fsl_mc_io *mc_io, u32 cmd_flags,
-+	u16 token, struct dpseci_congestion_notification_cfg *cfg)
-+{
-+	struct fsl_mc_command cmd = { 0 };
-+	struct dpseci_cmd_congestion_notification *rsp_params;
-+	int err;
-+
-+	cmd.header = mc_encode_cmd_header(
-+			DPSECI_CMDID_GET_CONGESTION_NOTIFICATION,
-+			cmd_flags,
-+			token);
-+	err = mc_send_command(mc_io, &cmd);
-+	if (err)
-+		return err;
-+
-+	rsp_params = (struct dpseci_cmd_congestion_notification *)cmd.params;
-+	cfg->dest_cfg.dest_id = le32_to_cpu(rsp_params->dest_id);
-+	cfg->notification_mode = le16_to_cpu(rsp_params->notification_mode);
-+	cfg->dest_cfg.priority = rsp_params->priority;
-+	cfg->dest_cfg.dest_type = dpseci_get_field(rsp_params->options,
-+						   CGN_DEST_TYPE);
-+	cfg->units = dpseci_get_field(rsp_params->options, CGN_UNITS);
-+	cfg->message_iova = le64_to_cpu(rsp_params->message_iova);
-+	cfg->message_ctx = le64_to_cpu(rsp_params->message_ctx);
-+	cfg->threshold_entry = le32_to_cpu(rsp_params->threshold_entry);
-+	cfg->threshold_exit = le32_to_cpu(rsp_params->threshold_exit);
-+
-+	return 0;
-+}
-diff --git a/drivers/crypto/caam/dpseci.h b/drivers/crypto/caam/dpseci.h
-new file mode 100644
-index 000000000000..4550e134d166
---- /dev/null
-+++ b/drivers/crypto/caam/dpseci.h
-@@ -0,0 +1,333 @@
-+/* SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause) */
-+/*
-+ * Copyright 2013-2016 Freescale Semiconductor Inc.
-+ * Copyright 2017-2018 NXP
-+ */
-+#ifndef _DPSECI_H_
-+#define _DPSECI_H_
-+
-+/*
-+ * Data Path SEC Interface API
-+ * Contains initialization APIs and runtime control APIs for DPSECI
-+ */
-+
-+struct fsl_mc_io;
-+
-+/**
-+ * General DPSECI macros
-+ */
-+
-+/**
-+ * Maximum number of Tx/Rx queues per DPSECI object
-+ */
-+#define DPSECI_MAX_QUEUE_NUM		16
-+
-+/**
-+ * All queues considered; see dpseci_set_rx_queue()
-+ */
-+#define DPSECI_ALL_QUEUES	(u8)(-1)
-+
-+int dpseci_open(struct fsl_mc_io *mc_io, u32 cmd_flags, int dpseci_id,
-+		u16 *token);
-+
-+int dpseci_close(struct fsl_mc_io *mc_io, u32 cmd_flags, u16 token);
-+
-+/**
-+ * Enable the Congestion Group support
-+ */
-+#define DPSECI_OPT_HAS_CG		0x000020
-+
-+/**
-+ * struct dpseci_cfg - Structure representing DPSECI configuration
-+ * @options: Any combination of the following flags:
-+ *		DPSECI_OPT_HAS_CG
-+ * @num_tx_queues: num of queues towards the SEC
-+ * @num_rx_queues: num of queues back from the SEC
-+ * @priorities: Priorities for the SEC hardware processing;
-+ *		each place in the array is the priority of the tx queue
-+ *		towards the SEC;
-+ *		valid priorities are configured with values 1-8;
-+ */
-+struct dpseci_cfg {
-+	u32 options;
-+	u8 num_tx_queues;
-+	u8 num_rx_queues;
-+	u8 priorities[DPSECI_MAX_QUEUE_NUM];
++struct ahash_edesc {
++	dma_addr_t dst_dma;
++	dma_addr_t qm_sg_dma;
++	int src_nents;
++	int qm_sg_bytes;
++	struct dpaa2_sg_entry sgt[0];
 +};
 +
-+int dpseci_enable(struct fsl_mc_io *mc_io, u32 cmd_flags, u16 token);
-+
-+int dpseci_disable(struct fsl_mc_io *mc_io, u32 cmd_flags, u16 token);
-+
-+int dpseci_is_enabled(struct fsl_mc_io *mc_io, u32 cmd_flags, u16 token,
-+		      int *en);
-+
-+/**
-+ * struct dpseci_attr - Structure representing DPSECI attributes
-+ * @id: DPSECI object ID
-+ * @num_tx_queues: number of queues towards the SEC
-+ * @num_rx_queues: number of queues back from the SEC
-+ * @options: any combination of the following flags:
-+ *		DPSECI_OPT_HAS_CG
-+ */
-+struct dpseci_attr {
-+	int id;
-+	u8 num_tx_queues;
-+	u8 num_rx_queues;
-+	u32 options;
-+};
-+
-+int dpseci_get_attributes(struct fsl_mc_io *mc_io, u32 cmd_flags, u16 token,
-+			  struct dpseci_attr *attr);
-+
-+/**
-+ * enum dpseci_dest - DPSECI destination types
-+ * @DPSECI_DEST_NONE: Unassigned destination; The queue is set in parked mode
-+ *	and does not generate FQDAN notifications; user is expected to dequeue
-+ *	from the queue based on polling or other user-defined method
-+ * @DPSECI_DEST_DPIO: The queue is set in schedule mode and generates FQDAN
-+ *	notifications to the specified DPIO; user is expected to dequeue from
-+ *	the queue only after notification is received
-+ * @DPSECI_DEST_DPCON: The queue is set in schedule mode and does not generate
-+ *	FQDAN notifications, but is connected to the specified DPCON object;
-+ *	user is expected to dequeue from the DPCON channel
-+ */
-+enum dpseci_dest {
-+	DPSECI_DEST_NONE = 0,
-+	DPSECI_DEST_DPIO,
-+	DPSECI_DEST_DPCON
-+};
-+
-+/**
-+ * struct dpseci_dest_cfg - Structure representing DPSECI destination parameters
-+ * @dest_type: Destination type
-+ * @dest_id: Either DPIO ID or DPCON ID, depending on the destination type
-+ * @priority: Priority selection within the DPIO or DPCON channel; valid values
-+ *	are 0-1 or 0-7, depending on the number of priorities in that channel;
-+ *	not relevant for 'DPSECI_DEST_NONE' option
-+ */
-+struct dpseci_dest_cfg {
-+	enum dpseci_dest dest_type;
-+	int dest_id;
-+	u8 priority;
-+};
-+
-+/**
-+ * DPSECI queue modification options
-+ */
-+
-+/**
-+ * Select to modify the user's context associated with the queue
-+ */
-+#define DPSECI_QUEUE_OPT_USER_CTX		0x00000001
-+
-+/**
-+ * Select to modify the queue's destination
-+ */
-+#define DPSECI_QUEUE_OPT_DEST			0x00000002
-+
-+/**
-+ * Select to modify the queue's order preservation
-+ */
-+#define DPSECI_QUEUE_OPT_ORDER_PRESERVATION	0x00000004
-+
-+/**
-+ * struct dpseci_rx_queue_cfg - DPSECI RX queue configuration
-+ * @options: Flags representing the suggested modifications to the queue;
-+ *	Use any combination of 'DPSECI_QUEUE_OPT_<X>' flags
-+ * @order_preservation_en: order preservation configuration for the rx queue
-+ * valid only if 'DPSECI_QUEUE_OPT_ORDER_PRESERVATION' is contained in 'options'
-+ * @user_ctx: User context value provided in the frame descriptor of each
-+ *	dequeued frame;	valid only if 'DPSECI_QUEUE_OPT_USER_CTX' is contained
-+ *	in 'options'
-+ * @dest_cfg: Queue destination parameters; valid only if
-+ *	'DPSECI_QUEUE_OPT_DEST' is contained in 'options'
-+ */
-+struct dpseci_rx_queue_cfg {
-+	u32 options;
-+	int order_preservation_en;
-+	u64 user_ctx;
-+	struct dpseci_dest_cfg dest_cfg;
-+};
-+
-+int dpseci_set_rx_queue(struct fsl_mc_io *mc_io, u32 cmd_flags, u16 token,
-+			u8 queue, const struct dpseci_rx_queue_cfg *cfg);
-+
-+/**
-+ * struct dpseci_rx_queue_attr - Structure representing attributes of Rx queues
-+ * @user_ctx: User context value provided in the frame descriptor of each
-+ *	dequeued frame
-+ * @order_preservation_en: Status of the order preservation configuration on the
-+ *	queue
-+ * @dest_cfg: Queue destination configuration
-+ * @fqid: Virtual FQID value to be used for dequeue operations
-+ */
-+struct dpseci_rx_queue_attr {
-+	u64 user_ctx;
-+	int order_preservation_en;
-+	struct dpseci_dest_cfg dest_cfg;
-+	u32 fqid;
-+};
-+
-+int dpseci_get_rx_queue(struct fsl_mc_io *mc_io, u32 cmd_flags, u16 token,
-+			u8 queue, struct dpseci_rx_queue_attr *attr);
-+
-+/**
-+ * struct dpseci_tx_queue_attr - Structure representing attributes of Tx queues
-+ * @fqid: Virtual FQID to be used for sending frames to SEC hardware
-+ * @priority: SEC hardware processing priority for the queue
-+ */
-+struct dpseci_tx_queue_attr {
-+	u32 fqid;
-+	u8 priority;
-+};
-+
-+int dpseci_get_tx_queue(struct fsl_mc_io *mc_io, u32 cmd_flags, u16 token,
-+			u8 queue, struct dpseci_tx_queue_attr *attr);
-+
-+/**
-+ * struct dpseci_sec_attr - Structure representing attributes of the SEC
-+ *	hardware accelerator
-+ * @ip_id: ID for SEC
-+ * @major_rev: Major revision number for SEC
-+ * @minor_rev: Minor revision number for SEC
-+ * @era: SEC Era
-+ * @deco_num: The number of copies of the DECO that are implemented in this
-+ *	version of SEC
-+ * @zuc_auth_acc_num: The number of copies of ZUCA that are implemented in this
-+ *	version of SEC
-+ * @zuc_enc_acc_num: The number of copies of ZUCE that are implemented in this
-+ *	version of SEC
-+ * @snow_f8_acc_num: The number of copies of the SNOW-f8 module that are
-+ *	implemented in this version of SEC
-+ * @snow_f9_acc_num: The number of copies of the SNOW-f9 module that are
-+ *	implemented in this version of SEC
-+ * @crc_acc_num: The number of copies of the CRC module that are implemented in
-+ *	this version of SEC
-+ * @pk_acc_num:  The number of copies of the Public Key module that are
-+ *	implemented in this version of SEC
-+ * @kasumi_acc_num: The number of copies of the Kasumi module that are
-+ *	implemented in this version of SEC
-+ * @rng_acc_num: The number of copies of the Random Number Generator that are
-+ *	implemented in this version of SEC
-+ * @md_acc_num: The number of copies of the MDHA (Hashing module) that are
-+ *	implemented in this version of SEC
-+ * @arc4_acc_num: The number of copies of the ARC4 module that are implemented
-+ *	in this version of SEC
-+ * @des_acc_num: The number of copies of the DES module that are implemented in
-+ *	this version of SEC
-+ * @aes_acc_num: The number of copies of the AES module that are implemented in
-+ *	this version of SEC
-+ * @ccha_acc_num: The number of copies of the ChaCha20 module that are
-+ *	implemented in this version of SEC.
-+ * @ptha_acc_num: The number of copies of the Poly1305 module that are
-+ *	implemented in this version of SEC.
-+ **/
-+struct dpseci_sec_attr {
-+	u16 ip_id;
-+	u8 major_rev;
-+	u8 minor_rev;
-+	u8 era;
-+	u8 deco_num;
-+	u8 zuc_auth_acc_num;
-+	u8 zuc_enc_acc_num;
-+	u8 snow_f8_acc_num;
-+	u8 snow_f9_acc_num;
-+	u8 crc_acc_num;
-+	u8 pk_acc_num;
-+	u8 kasumi_acc_num;
-+	u8 rng_acc_num;
-+	u8 md_acc_num;
-+	u8 arc4_acc_num;
-+	u8 des_acc_num;
-+	u8 aes_acc_num;
-+	u8 ccha_acc_num;
-+	u8 ptha_acc_num;
-+};
-+
-+int dpseci_get_sec_attr(struct fsl_mc_io *mc_io, u32 cmd_flags, u16 token,
-+			struct dpseci_sec_attr *attr);
-+
-+int dpseci_get_api_version(struct fsl_mc_io *mc_io, u32 cmd_flags,
-+			   u16 *major_ver, u16 *minor_ver);
-+
-+/**
-+ * enum dpseci_congestion_unit - DPSECI congestion units
-+ * @DPSECI_CONGESTION_UNIT_BYTES: bytes units
-+ * @DPSECI_CONGESTION_UNIT_FRAMES: frames units
-+ */
-+enum dpseci_congestion_unit {
-+	DPSECI_CONGESTION_UNIT_BYTES = 0,
-+	DPSECI_CONGESTION_UNIT_FRAMES
-+};
-+
-+/**
-+ * CSCN message is written to message_iova once entering a
-+ * congestion state (see 'threshold_entry')
-+ */
-+#define DPSECI_CGN_MODE_WRITE_MEM_ON_ENTER		0x00000001
-+
-+/**
-+ * CSCN message is written to message_iova once exiting a
-+ * congestion state (see 'threshold_exit')
-+ */
-+#define DPSECI_CGN_MODE_WRITE_MEM_ON_EXIT		0x00000002
-+
-+/**
-+ * CSCN write will attempt to allocate into a cache (coherent write);
-+ * valid only if 'DPSECI_CGN_MODE_WRITE_MEM_<X>' is selected
-+ */
-+#define DPSECI_CGN_MODE_COHERENT_WRITE			0x00000004
-+
-+/**
-+ * if 'dpseci_dest_cfg.dest_type != DPSECI_DEST_NONE' CSCN message is sent to
-+ * DPIO/DPCON's WQ channel once entering a congestion state
-+ * (see 'threshold_entry')
-+ */
-+#define DPSECI_CGN_MODE_NOTIFY_DEST_ON_ENTER		0x00000008
-+
-+/**
-+ * if 'dpseci_dest_cfg.dest_type != DPSECI_DEST_NONE' CSCN message is sent to
-+ * DPIO/DPCON's WQ channel once exiting a congestion state
-+ * (see 'threshold_exit')
-+ */
-+#define DPSECI_CGN_MODE_NOTIFY_DEST_ON_EXIT		0x00000010
-+
-+/**
-+ * if 'dpseci_dest_cfg.dest_type != DPSECI_DEST_NONE' when the CSCN is written
-+ * to the sw-portal's DQRR, the DQRI interrupt is asserted immediately
-+ * (if enabled)
-+ */
-+#define DPSECI_CGN_MODE_INTR_COALESCING_DISABLED	0x00000020
-+
-+/**
-+ * struct dpseci_congestion_notification_cfg - congestion notification
-+ *	configuration
-+ * @units: units type
-+ * @threshold_entry: above this threshold we enter a congestion state.
-+ *	set it to '0' to disable it
-+ * @threshold_exit: below this threshold we exit the congestion state.
-+ * @message_ctx: The context that will be part of the CSCN message
-+ * @message_iova: I/O virtual address (must be in DMA-able memory),
-+ *	must be 16B aligned;
-+ * @dest_cfg: CSCN can be send to either DPIO or DPCON WQ channel
-+ * @notification_mode: Mask of available options; use 'DPSECI_CGN_MODE_<X>'
-+ *	values
-+ */
-+struct dpseci_congestion_notification_cfg {
-+	enum dpseci_congestion_unit units;
-+	u32 threshold_entry;
-+	u32 threshold_exit;
-+	u64 message_ctx;
-+	u64 message_iova;
-+	struct dpseci_dest_cfg dest_cfg;
-+	u16 notification_mode;
-+};
-+
-+int dpseci_set_congestion_notification(struct fsl_mc_io *mc_io, u32 cmd_flags,
-+	u16 token, const struct dpseci_congestion_notification_cfg *cfg);
-+
-+int dpseci_get_congestion_notification(struct fsl_mc_io *mc_io, u32 cmd_flags,
-+	u16 token, struct dpseci_congestion_notification_cfg *cfg);
-+
-+#endif /* _DPSECI_H_ */
-diff --git a/drivers/crypto/caam/dpseci_cmd.h b/drivers/crypto/caam/dpseci_cmd.h
-new file mode 100644
-index 000000000000..6ab77ead6e3d
---- /dev/null
-+++ b/drivers/crypto/caam/dpseci_cmd.h
-@@ -0,0 +1,149 @@
-+/* SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause) */
-+/*
-+ * Copyright 2013-2016 Freescale Semiconductor Inc.
-+ * Copyright 2017-2018 NXP
-+ */
-+
-+#ifndef _DPSECI_CMD_H_
-+#define _DPSECI_CMD_H_
-+
-+/* DPSECI Version */
-+#define DPSECI_VER_MAJOR				5
-+#define DPSECI_VER_MINOR				3
-+
-+#define DPSECI_VER(maj, min)	(((maj) << 16) | (min))
-+#define DPSECI_VERSION		DPSECI_VER(DPSECI_VER_MAJOR, DPSECI_VER_MINOR)
-+
-+/* Command versioning */
-+#define DPSECI_CMD_BASE_VERSION		1
-+#define DPSECI_CMD_BASE_VERSION_V2	2
-+#define DPSECI_CMD_ID_OFFSET		4
-+
-+#define DPSECI_CMD_V1(id)	(((id) << DPSECI_CMD_ID_OFFSET) | \
-+				 DPSECI_CMD_BASE_VERSION)
-+
-+#define DPSECI_CMD_V2(id)	(((id) << DPSECI_CMD_ID_OFFSET) | \
-+				 DPSECI_CMD_BASE_VERSION_V2)
-+
-+/* Command IDs */
-+#define DPSECI_CMDID_CLOSE				DPSECI_CMD_V1(0x800)
-+#define DPSECI_CMDID_OPEN				DPSECI_CMD_V1(0x809)
-+#define DPSECI_CMDID_GET_API_VERSION			DPSECI_CMD_V1(0xa09)
-+
-+#define DPSECI_CMDID_ENABLE				DPSECI_CMD_V1(0x002)
-+#define DPSECI_CMDID_DISABLE				DPSECI_CMD_V1(0x003)
-+#define DPSECI_CMDID_GET_ATTR				DPSECI_CMD_V1(0x004)
-+#define DPSECI_CMDID_IS_ENABLED				DPSECI_CMD_V1(0x006)
-+
-+#define DPSECI_CMDID_SET_RX_QUEUE			DPSECI_CMD_V1(0x194)
-+#define DPSECI_CMDID_GET_RX_QUEUE			DPSECI_CMD_V1(0x196)
-+#define DPSECI_CMDID_GET_TX_QUEUE			DPSECI_CMD_V1(0x197)
-+#define DPSECI_CMDID_GET_SEC_ATTR			DPSECI_CMD_V2(0x198)
-+#define DPSECI_CMDID_SET_CONGESTION_NOTIFICATION	DPSECI_CMD_V1(0x170)
-+#define DPSECI_CMDID_GET_CONGESTION_NOTIFICATION	DPSECI_CMD_V1(0x171)
-+
-+/* Macros for accessing command fields smaller than 1 byte */
-+#define DPSECI_MASK(field)	\
-+	GENMASK(DPSECI_##field##_SHIFT + DPSECI_##field##_SIZE - 1,	\
-+		DPSECI_##field##_SHIFT)
-+
-+#define dpseci_set_field(var, field, val)	\
-+	((var) |= (((val) << DPSECI_##field##_SHIFT) & DPSECI_MASK(field)))
-+
-+#define dpseci_get_field(var, field)	\
-+	(((var) & DPSECI_MASK(field)) >> DPSECI_##field##_SHIFT)
-+
-+struct dpseci_cmd_open {
-+	__le32 dpseci_id;
-+};
-+
-+#define DPSECI_ENABLE_SHIFT	0
-+#define DPSECI_ENABLE_SIZE	1
-+
-+struct dpseci_rsp_is_enabled {
-+	u8 is_enabled;
-+};
-+
-+struct dpseci_rsp_get_attributes {
-+	__le32 id;
-+	__le32 pad0;
-+	u8 num_tx_queues;
-+	u8 num_rx_queues;
-+	u8 pad1[6];
-+	__le32 options;
-+};
-+
-+#define DPSECI_DEST_TYPE_SHIFT	0
-+#define DPSECI_DEST_TYPE_SIZE	4
-+
-+#define DPSECI_ORDER_PRESERVATION_SHIFT	0
-+#define DPSECI_ORDER_PRESERVATION_SIZE	1
-+
-+struct dpseci_cmd_queue {
-+	__le32 dest_id;
-+	u8 priority;
-+	u8 queue;
-+	u8 dest_type;
-+	u8 pad;
-+	__le64 user_ctx;
-+	union {
-+		__le32 options;
-+		__le32 fqid;
-+	};
-+	u8 order_preservation_en;
-+};
-+
-+struct dpseci_rsp_get_tx_queue {
-+	__le32 pad;
-+	__le32 fqid;
-+	u8 priority;
-+};
-+
-+struct dpseci_rsp_get_sec_attr {
-+	__le16 ip_id;
-+	u8 major_rev;
-+	u8 minor_rev;
-+	u8 era;
-+	u8 pad0[3];
-+	u8 deco_num;
-+	u8 zuc_auth_acc_num;
-+	u8 zuc_enc_acc_num;
-+	u8 pad1;
-+	u8 snow_f8_acc_num;
-+	u8 snow_f9_acc_num;
-+	u8 crc_acc_num;
-+	u8 pad2;
-+	u8 pk_acc_num;
-+	u8 kasumi_acc_num;
-+	u8 rng_acc_num;
-+	u8 pad3;
-+	u8 md_acc_num;
-+	u8 arc4_acc_num;
-+	u8 des_acc_num;
-+	u8 aes_acc_num;
-+	u8 ccha_acc_num;
-+	u8 ptha_acc_num;
-+};
-+
-+struct dpseci_rsp_get_api_version {
-+	__le16 major;
-+	__le16 minor;
-+};
-+
-+#define DPSECI_CGN_DEST_TYPE_SHIFT	0
-+#define DPSECI_CGN_DEST_TYPE_SIZE	4
-+#define DPSECI_CGN_UNITS_SHIFT		4
-+#define DPSECI_CGN_UNITS_SIZE		2
-+
-+struct dpseci_cmd_congestion_notification {
-+	__le32 dest_id;
-+	__le16 notification_mode;
-+	u8 priority;
-+	u8 options;
-+	__le64 message_iova;
-+	__le64 message_ctx;
-+	__le32 threshold_entry;
-+	__le32 threshold_exit;
-+};
-+
-+#endif /* _DPSECI_CMD_H_ */
+ /**
+  * caam_flc - Flow Context (FLC)
+  * @flc: Flow Context options
 -- 
 2.16.2
