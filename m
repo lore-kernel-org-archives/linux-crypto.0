@@ -1,138 +1,307 @@
 From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
-Subject: [PATCH 06/11] crypto: caam - add Queue Interface v2 error codes
-Date: Mon, 10 Sep 2018 20:15:45 +0300
-Message-ID: <20180910171550.5659-7-horia.geanta@nxp.com>
+Subject: [PATCH 09/11] crypto: caam - export ahash shared descriptor generation
+Date: Mon, 10 Sep 2018 20:15:48 +0300
+Message-ID: <20180910171550.5659-10-horia.geanta@nxp.com>
 References: <20180910171550.5659-1-horia.geanta@nxp.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: linux-kernel@vger.kernel.org, Aymen Sghaier <aymen.sghaier@nxp.com>,
- "David S . Miller" <davem@davemloft.net>, linux-arm-kernel@lists.infradead.org,
- linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Cc: "David S . Miller" <davem@davemloft.net>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>,
- Stuart Yoder <stuyoder@gmail.com>,
- Laurentiu Tudor <laurentiu.tudor@nxp.com>, Li Yang <leoyang.li@nxp.com>,
- Roy Pledge <roy.pledge@nxp.com>, Catalin Marinas <catalin.marinas@arm.com>,
- Will Deacon <will.deacon@arm.com>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+        Stuart Yoder <stuyoder@gmail.com>,
+        Laurentiu Tudor <laurentiu.tudor@nxp.com>,
+        Li Yang <leoyang.li@nxp.com>, Roy Pledge <roy.pledge@nxp.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will.deacon@arm.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <20180910171550.5659-1-horia.geanta@nxp.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-QWRkIHN1cHBvcnQgdG8gdHJhbnNsYXRlIGVycm9yIGNvZGVzIHJldHVybmVkIGJ5IFFJIHYyLCBp
-LmUuClF1ZXVlIEludGVyZmFjZSBwcmVzZW50IG9uIERhdGFQYXRoIEFjY2VsZXJhdGlvbiBBcmNo
-aXRlY3R1cmUKdjIgKERQQUEyKS4KClNpZ25lZC1vZmYtYnk6IEhvcmlhIEdlYW50xIMgPGhvcmlh
-LmdlYW50YUBueHAuY29tPgotLS0KIGRyaXZlcnMvY3J5cHRvL2NhYW0vZXJyb3IuYyB8IDc1ICsr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKystLQogZHJpdmVycy9jcnlw
-dG8vY2FhbS9lcnJvci5oIHwgIDYgKysrLQogZHJpdmVycy9jcnlwdG8vY2FhbS9yZWdzLmggIHwg
-IDIgKysKIDMgZmlsZXMgY2hhbmdlZCwgNzkgaW5zZXJ0aW9ucygrKSwgNCBkZWxldGlvbnMoLSkK
-CmRpZmYgLS1naXQgYS9kcml2ZXJzL2NyeXB0by9jYWFtL2Vycm9yLmMgYi9kcml2ZXJzL2NyeXB0
-by9jYWFtL2Vycm9yLmMKaW5kZXggOGRhODhiZWIxYWJiLi5kYjBmMGQ5Njg0MmUgMTAwNjQ0Ci0t
-LSBhL2RyaXZlcnMvY3J5cHRvL2NhYW0vZXJyb3IuYworKysgYi9kcml2ZXJzL2NyeXB0by9jYWFt
-L2Vycm9yLmMKQEAgLTEwOCw2ICsxMDgsNTQgQEAgc3RhdGljIGNvbnN0IHN0cnVjdCB7CiAJeyAw
-eEYxLCAiM0dQUCBIRk4gbWF0Y2hlcyBvciBleGNlZWRzIHRoZSBUaHJlc2hvbGQiIH0sCiB9Owog
-CitzdGF0aWMgY29uc3Qgc3RydWN0IHsKKwl1OCB2YWx1ZTsKKwljb25zdCBjaGFyICplcnJvcl90
-ZXh0OworfSBxaV9lcnJvcl9saXN0W10gPSB7CisJeyAweDFGLCAiSm9iIHRlcm1pbmF0ZWQgYnkg
-RlEgb3IgSUNJRCBmbHVzaCIgfSwKKwl7IDB4MjAsICJGRCBmb3JtYXQgZXJyb3IifSwKKwl7IDB4
-MjEsICJGRCBjb21tYW5kIGZvcm1hdCBlcnJvciJ9LAorCXsgMHgyMywgIkZMIGZvcm1hdCBlcnJv
-ciJ9LAorCXsgMHgyNSwgIkNSSkQgc3BlY2lmaWVkIGluIEZELCBidXQgbm90IGVuYWJsZWQgaW4g
-RkxDIn0sCisJeyAweDMwLCAiTWF4LiBidWZmZXIgc2l6ZSB0b28gc21hbGwifSwKKwl7IDB4MzEs
-ICJESFIgZXhjZWVkcyBtYXguIGJ1ZmZlciBzaXplIChhbGxvY2F0ZSBtb2RlLCBTL0cgZm9ybWF0
-KSJ9LAorCXsgMHgzMiwgIlNHVCBleGNlZWRzIG1heC4gYnVmZmVyIHNpemUgKGFsbG9jYXRlIG1v
-ZGUsIFMvRyBmb3JtYXQifSwKKwl7IDB4MzMsICJTaXplIG92ZXIvdW5kZXJmbG93IChhbGxvY2F0
-ZSBtb2RlKSJ9LAorCXsgMHgzNCwgIlNpemUgb3Zlci91bmRlcmZsb3cgKHJldXNlIG1vZGUpIn0s
-CisJeyAweDM1LCAiTGVuZ3RoIGV4Y2VlZHMgbWF4LiBzaG9ydCBsZW5ndGggKGFsbG9jYXRlIG1v
-ZGUsIFMvRy8gZm9ybWF0KSJ9LAorCXsgMHgzNiwgIk1lbW9yeSBmb290cHJpbnQgZXhjZWVkcyBt
-YXguIHZhbHVlIChhbGxvY2F0ZSBtb2RlLCBTL0cvIGZvcm1hdCkifSwKKwl7IDB4NDEsICJTQkMg
-ZnJhbWUgZm9ybWF0IG5vdCBzdXBwb3J0ZWQgKGFsbG9jYXRlIG1vZGUpIn0sCisJeyAweDQyLCAi
-UG9vbCAwIGludmFsaWQgLyBwb29sIDEgc2l6ZSA8IHBvb2wgMCBzaXplIChhbGxvY2F0ZSBtb2Rl
-KSJ9LAorCXsgMHg0MywgIkFubm90YXRpb24gb3V0cHV0IGVuYWJsZWQgYnV0IEFTQVIgPSAwIChh
-bGxvY2F0ZSBtb2RlKSJ9LAorCXsgMHg0NCwgIlVuc3VwcG9ydGVkIG9yIHJlc2VydmVkIGZyYW1l
-IGZvcm1hdCBvciBTR0hSID0gMSAocmV1c2UgbW9kZSkifSwKKwl7IDB4NDUsICJESFIgY29ycmVj
-dGlvbiB1bmRlcmZsb3cgKHJldXNlIG1vZGUsIHNpbmdsZSBidWZmZXIgZm9ybWF0KSJ9LAorCXsg
-MHg0NiwgIkFubm90YXRpb24gbGVuZ3RoIGV4Y2VlZHMgb2Zmc2V0IChyZXVzZSBtb2RlKSJ9LAor
-CXsgMHg0OCwgIkFubm90YXRpb24gb3V0cHV0IGVuYWJsZWQgYnV0IEFTQSBsaW1pdGVkIGJ5IEFT
-QVIgKHJldXNlIG1vZGUpIn0sCisJeyAweDQ5LCAiRGF0YSBvZmZzZXQgY29ycmVjdGlvbiBleGNl
-ZWRzIGlucHV0IGZyYW1lIGRhdGEgbGVuZ3RoIChyZXVzZSBtb2RlKSJ9LAorCXsgMHg0QiwgIkFu
-bm90YXRpb24gb3V0cHV0IGVuYWJsZWQgYnV0IEFTQSBjYW5ub3RlIGJlIGV4cGFuZGVkIChmcmFt
-ZSBsaXN0KSJ9LAorCXsgMHg1MSwgIlVuc3VwcG9ydGVkIElGIHJldXNlIG1vZGUifSwKKwl7IDB4
-NTIsICJVbnN1cHBvcnRlZCBGTCB1c2UgbW9kZSJ9LAorCXsgMHg1MywgIlVuc3VwcG9ydGVkIFJK
-RCB1c2UgbW9kZSJ9LAorCXsgMHg1NCwgIlVuc3VwcG9ydGVkIGlubGluZSBkZXNjcmlwdG9yIHVz
-ZSBtb2RlIn0sCisJeyAweEMwLCAiVGFibGUgYnVmZmVyIHBvb2wgMCBkZXBsZXRpb24ifSwKKwl7
-IDB4QzEsICJUYWJsZSBidWZmZXIgcG9vbCAxIGRlcGxldGlvbiJ9LAorCXsgMHhDMiwgIkRhdGEg
-YnVmZmVyIHBvb2wgMCBkZXBsZXRpb24sIG5vIE9GIGFsbG9jYXRlZCJ9LAorCXsgMHhDMywgIkRh
-dGEgYnVmZmVyIHBvb2wgMSBkZXBsZXRpb24sIG5vIE9GIGFsbG9jYXRlZCJ9LAorCXsgMHhDNCwg
-IkRhdGEgYnVmZmVyIHBvb2wgMCBkZXBsZXRpb24sIHBhcnRpYWwgT0YgYWxsb2NhdGVkIn0sCisJ
-eyAweEM1LCAiRGF0YSBidWZmZXIgcG9vbCAxIGRlcGxldGlvbiwgcGFydGlhbCBPRiBhbGxvY2F0
-ZWQifSwKKwl7IDB4RDAsICJGTEMgcmVhZCBlcnJvciJ9LAorCXsgMHhEMSwgIkZMIHJlYWQgZXJy
-b3IifSwKKwl7IDB4RDIsICJGTCB3cml0ZSBlcnJvciJ9LAorCXsgMHhEMywgIk9GIFNHVCB3cml0
-ZSBlcnJvciJ9LAorCXsgMHhENCwgIlBUQSByZWFkIGVycm9yIn0sCisJeyAweEQ1LCAiUFRBIHdy
-aXRlIGVycm9yIn0sCisJeyAweEQ2LCAiT0YgU0dUIEYtYml0IHdyaXRlIGVycm9yIn0sCisJeyAw
-eEQ3LCAiQVNBIHdyaXRlIGVycm9yIn0sCisJeyAweEUxLCAiRkxDW0lDUl09MCBJQ0lEIGVycm9y
-In0sCisJeyAweEUyLCAiRkxDW0lDUl09MSBJQ0lEIGVycm9yIn0sCisJeyAweEU0LCAic291cmNl
-IG9mIElDSUQgZmx1c2ggbm90IHRydXN0ZWQgKEJESSA9IDApIn0sCit9OworCiBzdGF0aWMgY29u
-c3QgY2hhciAqIGNvbnN0IGNoYV9pZF9saXN0W10gPSB7CiAJIiIsCiAJIkFFUyIsCkBAIC0yMzYs
-NiArMjg0LDI3IEBAIHN0YXRpYyB2b2lkIHJlcG9ydF9kZWNvX3N0YXR1cyhzdHJ1Y3QgZGV2aWNl
-ICpqcmRldiwgY29uc3QgdTMyIHN0YXR1cywKIAkJc3RhdHVzLCBlcnJvciwgaWR4X3N0ciwgaWR4
-LCBlcnJfc3RyLCBlcnJfZXJyX2NvZGUpOwogfQogCitzdGF0aWMgdm9pZCByZXBvcnRfcWlfc3Rh
-dHVzKHN0cnVjdCBkZXZpY2UgKnFpZGV2LCBjb25zdCB1MzIgc3RhdHVzLAorCQkJICAgICBjb25z
-dCBjaGFyICplcnJvcikKK3sKKwl1OCBlcnJfaWQgPSBzdGF0dXMgJiBKUlNUQV9RSUVSUl9FUlJP
-Ul9NQVNLOworCWNvbnN0IGNoYXIgKmVycl9zdHIgPSAidW5pZGVudGlmaWVkIGVycm9yIHZhbHVl
-IDB4IjsKKwljaGFyIGVycl9lcnJfY29kZVszXSA9IHsgMCB9OworCWludCBpOworCisJZm9yIChp
-ID0gMDsgaSA8IEFSUkFZX1NJWkUocWlfZXJyb3JfbGlzdCk7IGkrKykKKwkJaWYgKHFpX2Vycm9y
-X2xpc3RbaV0udmFsdWUgPT0gZXJyX2lkKQorCQkJYnJlYWs7CisKKwlpZiAoaSAhPSBBUlJBWV9T
-SVpFKHFpX2Vycm9yX2xpc3QpICYmIHFpX2Vycm9yX2xpc3RbaV0uZXJyb3JfdGV4dCkKKwkJZXJy
-X3N0ciA9IHFpX2Vycm9yX2xpc3RbaV0uZXJyb3JfdGV4dDsKKwllbHNlCisJCXNucHJpbnRmKGVy
-cl9lcnJfY29kZSwgc2l6ZW9mKGVycl9lcnJfY29kZSksICIlMDJ4IiwgZXJyX2lkKTsKKworCWRl
-dl9lcnIocWlkZXYsICIlMDh4OiAlczogJXMlc1xuIiwKKwkJc3RhdHVzLCBlcnJvciwgZXJyX3N0
-ciwgZXJyX2Vycl9jb2RlKTsKK30KKwogc3RhdGljIHZvaWQgcmVwb3J0X2pyX3N0YXR1cyhzdHJ1
-Y3QgZGV2aWNlICpqcmRldiwgY29uc3QgdTMyIHN0YXR1cywKIAkJCSAgICAgY29uc3QgY2hhciAq
-ZXJyb3IpCiB7CkBAIC0yNTAsNyArMzE5LDcgQEAgc3RhdGljIHZvaWQgcmVwb3J0X2NvbmRfY29k
-ZV9zdGF0dXMoc3RydWN0IGRldmljZSAqanJkZXYsIGNvbnN0IHUzMiBzdGF0dXMsCiAJCXN0YXR1
-cywgZXJyb3IsIF9fZnVuY19fKTsKIH0KIAotdm9pZCBjYWFtX2pyX3N0cnN0YXR1cyhzdHJ1Y3Qg
-ZGV2aWNlICpqcmRldiwgdTMyIHN0YXR1cykKK3ZvaWQgY2FhbV9zdHJzdGF0dXMoc3RydWN0IGRl
-dmljZSAqanJkZXYsIHUzMiBzdGF0dXMsIGJvb2wgcWlfdjIpCiB7CiAJc3RhdGljIGNvbnN0IHN0
-cnVjdCBzdGF0X3NyYyB7CiAJCXZvaWQgKCpyZXBvcnRfc3NlZCkoc3RydWN0IGRldmljZSAqanJk
-ZXYsIGNvbnN0IHUzMiBzdGF0dXMsCkBAIC0yNjIsNyArMzMxLDcgQEAgdm9pZCBjYWFtX2pyX3N0
-cnN0YXR1cyhzdHJ1Y3QgZGV2aWNlICpqcmRldiwgdTMyIHN0YXR1cykKIAkJeyByZXBvcnRfY2Ni
-X3N0YXR1cywgIkNDQiIgfSwKIAkJeyByZXBvcnRfanVtcF9zdGF0dXMsICJKdW1wIiB9LAogCQl7
-IHJlcG9ydF9kZWNvX3N0YXR1cywgIkRFQ08iIH0sCi0JCXsgTlVMTCwgIlF1ZXVlIE1hbmFnZXIg
-SW50ZXJmYWNlIiB9LAorCQl7IHJlcG9ydF9xaV9zdGF0dXMsICJRdWV1ZSBNYW5hZ2VyIEludGVy
-ZmFjZSIgfSwKIAkJeyByZXBvcnRfanJfc3RhdHVzLCAiSm9iIFJpbmciIH0sCiAJCXsgcmVwb3J0
-X2NvbmRfY29kZV9zdGF0dXMsICJDb25kaXRpb24gQ29kZSIgfSwKIAkJeyBOVUxMLCBOVUxMIH0s
-CkBAIC0yODgsNCArMzU3LDQgQEAgdm9pZCBjYWFtX2pyX3N0cnN0YXR1cyhzdHJ1Y3QgZGV2aWNl
-ICpqcmRldiwgdTMyIHN0YXR1cykKIAllbHNlCiAJCWRldl9lcnIoanJkZXYsICIlZDogdW5rbm93
-biBlcnJvciBzb3VyY2VcbiIsIHNzcmMpOwogfQotRVhQT1JUX1NZTUJPTChjYWFtX2pyX3N0cnN0
-YXR1cyk7CitFWFBPUlRfU1lNQk9MKGNhYW1fc3Ryc3RhdHVzKTsKZGlmZiAtLWdpdCBhL2RyaXZl
-cnMvY3J5cHRvL2NhYW0vZXJyb3IuaCBiL2RyaXZlcnMvY3J5cHRvL2NhYW0vZXJyb3IuaAppbmRl
-eCA1YWEzMzJiYWM0YjAuLjY3ZWE5NDA3OTgzNyAxMDA2NDQKLS0tIGEvZHJpdmVycy9jcnlwdG8v
-Y2FhbS9lcnJvci5oCisrKyBiL2RyaXZlcnMvY3J5cHRvL2NhYW0vZXJyb3IuaApAQCAtOCw3ICs4
-LDExIEBACiAjaWZuZGVmIENBQU1fRVJST1JfSAogI2RlZmluZSBDQUFNX0VSUk9SX0gKICNkZWZp
-bmUgQ0FBTV9FUlJPUl9TVFJfTUFYIDMwMgotdm9pZCBjYWFtX2pyX3N0cnN0YXR1cyhzdHJ1Y3Qg
-ZGV2aWNlICpqcmRldiwgdTMyIHN0YXR1cyk7CisKK3ZvaWQgY2FhbV9zdHJzdGF0dXMoc3RydWN0
-IGRldmljZSAqZGV2LCB1MzIgc3RhdHVzLCBib29sIHFpX3YyKTsKKworI2RlZmluZSBjYWFtX2py
-X3N0cnN0YXR1cyhqcmRldiwgc3RhdHVzKSBjYWFtX3N0cnN0YXR1cyhqcmRldiwgc3RhdHVzLCBm
-YWxzZSkKKyNkZWZpbmUgY2FhbV9xaTJfc3Ryc3RhdHVzKHFpZGV2LCBzdGF0dXMpIGNhYW1fc3Ry
-c3RhdHVzKHFpZGV2LCBzdGF0dXMsIHRydWUpCiAKIHZvaWQgY2FhbV9kdW1wX3NnKGNvbnN0IGNo
-YXIgKmxldmVsLCBjb25zdCBjaGFyICpwcmVmaXhfc3RyLCBpbnQgcHJlZml4X3R5cGUsCiAJCSAg
-aW50IHJvd3NpemUsIGludCBncm91cHNpemUsIHN0cnVjdCBzY2F0dGVybGlzdCAqc2csCmRpZmYg
-LS1naXQgYS9kcml2ZXJzL2NyeXB0by9jYWFtL3JlZ3MuaCBiL2RyaXZlcnMvY3J5cHRvL2NhYW0v
-cmVncy5oCmluZGV4IDRmYjkxYmEzOWMzNi4uY2I5MzBjODY4MDI5IDEwMDY0NAotLS0gYS9kcml2
-ZXJzL2NyeXB0by9jYWFtL3JlZ3MuaAorKysgYi9kcml2ZXJzL2NyeXB0by9jYWFtL3JlZ3MuaApA
-QCAtNjMzLDYgKzYzMyw4IEBAIHN0cnVjdCBjYWFtX2pvYl9yaW5nIHsKICNkZWZpbmUgSlJTVEFf
-REVDT0VSUl9JTlZTSUdOICAgICAgIDB4ODYKICNkZWZpbmUgSlJTVEFfREVDT0VSUl9EU0FTSUdO
-ICAgICAgIDB4ODcKIAorI2RlZmluZSBKUlNUQV9RSUVSUl9FUlJPUl9NQVNLICAgICAgMHgwMGZm
-CisKICNkZWZpbmUgSlJTVEFfQ0NCRVJSX0pVTVAgICAgICAgICAgIDB4MDgwMDAwMDAKICNkZWZp
-bmUgSlJTVEFfQ0NCRVJSX0lOREVYX01BU0sgICAgIDB4ZmYwMAogI2RlZmluZSBKUlNUQV9DQ0JF
-UlJfSU5ERVhfU0hJRlQgICAgOAotLSAKMi4xNi4yCgoKX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX18KbGludXgtYXJtLWtlcm5lbCBtYWlsaW5nIGxpc3QKbGlu
-dXgtYXJtLWtlcm5lbEBsaXN0cy5pbmZyYWRlYWQub3JnCmh0dHA6Ly9saXN0cy5pbmZyYWRlYWQu
-b3JnL21haWxtYW4vbGlzdGluZm8vbGludXgtYXJtLWtlcm5lbAo=
+caam/qi2 driver will support ahash algorithms,
+thus move ahash descriptors generation in a shared location.
+
+Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
+---
+ drivers/crypto/caam/Kconfig         |  3 ++
+ drivers/crypto/caam/Makefile        |  1 +
+ drivers/crypto/caam/caamhash.c      | 79 +++++-------------------------------
+ drivers/crypto/caam/caamhash_desc.c | 80 +++++++++++++++++++++++++++++++++++++
+ drivers/crypto/caam/caamhash_desc.h | 21 ++++++++++
+ 5 files changed, 114 insertions(+), 70 deletions(-)
+ create mode 100644 drivers/crypto/caam/caamhash_desc.c
+ create mode 100644 drivers/crypto/caam/caamhash_desc.h
+
+diff --git a/drivers/crypto/caam/Kconfig b/drivers/crypto/caam/Kconfig
+index 8d162cb34591..03c1db0239ae 100644
+--- a/drivers/crypto/caam/Kconfig
++++ b/drivers/crypto/caam/Kconfig
+@@ -172,3 +172,6 @@ config CRYPTO_DEV_FSL_CAAM_CRYPTO_API_DESC
+ 	def_tristate (CRYPTO_DEV_FSL_CAAM_CRYPTO_API || \
+ 		      CRYPTO_DEV_FSL_CAAM_CRYPTO_API_QI || \
+ 		      CRYPTO_DEV_FSL_DPAA2_CAAM)
++
++config CRYPTO_DEV_FSL_CAAM_AHASH_API_DESC
++	def_tristate (CRYPTO_DEV_FSL_CAAM_AHASH_API)
+diff --git a/drivers/crypto/caam/Makefile b/drivers/crypto/caam/Makefile
+index fd507bab1828..7bbfd06a11ff 100644
+--- a/drivers/crypto/caam/Makefile
++++ b/drivers/crypto/caam/Makefile
+@@ -15,6 +15,7 @@ obj-$(CONFIG_CRYPTO_DEV_FSL_CAAM_CRYPTO_API) += caamalg.o
+ obj-$(CONFIG_CRYPTO_DEV_FSL_CAAM_CRYPTO_API_QI) += caamalg_qi.o
+ obj-$(CONFIG_CRYPTO_DEV_FSL_CAAM_CRYPTO_API_DESC) += caamalg_desc.o
+ obj-$(CONFIG_CRYPTO_DEV_FSL_CAAM_AHASH_API) += caamhash.o
++obj-$(CONFIG_CRYPTO_DEV_FSL_CAAM_AHASH_API_DESC) += caamhash_desc.o
+ obj-$(CONFIG_CRYPTO_DEV_FSL_CAAM_RNG_API) += caamrng.o
+ obj-$(CONFIG_CRYPTO_DEV_FSL_CAAM_PKC_API) += caam_pkc.o
+ 
+diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
+index 43975ab5f09c..4c30bb5516d6 100644
+--- a/drivers/crypto/caam/caamhash.c
++++ b/drivers/crypto/caam/caamhash.c
+@@ -62,6 +62,7 @@
+ #include "error.h"
+ #include "sg_sw_sec4.h"
+ #include "key_gen.h"
++#include "caamhash_desc.h"
+ 
+ #define CAAM_CRA_PRIORITY		3000
+ 
+@@ -71,14 +72,6 @@
+ #define CAAM_MAX_HASH_BLOCK_SIZE	SHA512_BLOCK_SIZE
+ #define CAAM_MAX_HASH_DIGEST_SIZE	SHA512_DIGEST_SIZE
+ 
+-/* length of descriptors text */
+-#define DESC_AHASH_BASE			(3 * CAAM_CMD_SZ)
+-#define DESC_AHASH_UPDATE_LEN		(6 * CAAM_CMD_SZ)
+-#define DESC_AHASH_UPDATE_FIRST_LEN	(DESC_AHASH_BASE + 4 * CAAM_CMD_SZ)
+-#define DESC_AHASH_FINAL_LEN		(DESC_AHASH_BASE + 5 * CAAM_CMD_SZ)
+-#define DESC_AHASH_FINUP_LEN		(DESC_AHASH_BASE + 5 * CAAM_CMD_SZ)
+-#define DESC_AHASH_DIGEST_LEN		(DESC_AHASH_BASE + 4 * CAAM_CMD_SZ)
+-
+ #define DESC_HASH_MAX_USED_BYTES	(DESC_AHASH_FINAL_LEN + \
+ 					 CAAM_MAX_HASH_KEY_SIZE)
+ #define DESC_HASH_MAX_USED_LEN		(DESC_HASH_MAX_USED_BYTES / CAAM_CMD_SZ)
+@@ -235,60 +228,6 @@ static inline int ctx_map_to_sec4_sg(struct device *jrdev,
+ 	return 0;
+ }
+ 
+-/*
+- * For ahash update, final and finup (import_ctx = true)
+- *     import context, read and write to seqout
+- * For ahash firsts and digest (import_ctx = false)
+- *     read and write to seqout
+- */
+-static inline void ahash_gen_sh_desc(u32 *desc, u32 state, int digestsize,
+-				     struct caam_hash_ctx *ctx, bool import_ctx,
+-				     int era)
+-{
+-	u32 op = ctx->adata.algtype;
+-	u32 *skip_key_load;
+-
+-	init_sh_desc(desc, HDR_SHARE_SERIAL);
+-
+-	/* Append key if it has been set; ahash update excluded */
+-	if ((state != OP_ALG_AS_UPDATE) && (ctx->adata.keylen)) {
+-		/* Skip key loading if already shared */
+-		skip_key_load = append_jump(desc, JUMP_JSL | JUMP_TEST_ALL |
+-					    JUMP_COND_SHRD);
+-
+-		if (era < 6)
+-			append_key_as_imm(desc, ctx->key, ctx->adata.keylen_pad,
+-					  ctx->adata.keylen, CLASS_2 |
+-					  KEY_DEST_MDHA_SPLIT | KEY_ENC);
+-		else
+-			append_proto_dkp(desc, &ctx->adata);
+-
+-		set_jump_tgt_here(desc, skip_key_load);
+-
+-		op |= OP_ALG_AAI_HMAC_PRECOMP;
+-	}
+-
+-	/* If needed, import context from software */
+-	if (import_ctx)
+-		append_seq_load(desc, ctx->ctx_len, LDST_CLASS_2_CCB |
+-				LDST_SRCDST_BYTE_CONTEXT);
+-
+-	/* Class 2 operation */
+-	append_operation(desc, op | state | OP_ALG_ENCRYPT);
+-
+-	/*
+-	 * Load from buf and/or src and write to req->result or state->context
+-	 * Calculate remaining bytes to read
+-	 */
+-	append_math_add(desc, VARSEQINLEN, SEQINLEN, REG0, CAAM_CMD_SZ);
+-	/* Read remaining bytes */
+-	append_seq_fifo_load(desc, 0, FIFOLD_CLASS_CLASS2 | FIFOLD_TYPE_LAST2 |
+-			     FIFOLD_TYPE_MSG | KEY_VLF);
+-	/* Store class2 context bytes */
+-	append_seq_store(desc, digestsize, LDST_CLASS_2_CCB |
+-			 LDST_SRCDST_BYTE_CONTEXT);
+-}
+-
+ static int ahash_set_sh_desc(struct crypto_ahash *ahash)
+ {
+ 	struct caam_hash_ctx *ctx = crypto_ahash_ctx(ahash);
+@@ -301,8 +240,8 @@ static int ahash_set_sh_desc(struct crypto_ahash *ahash)
+ 
+ 	/* ahash_update shared descriptor */
+ 	desc = ctx->sh_desc_update;
+-	ahash_gen_sh_desc(desc, OP_ALG_AS_UPDATE, ctx->ctx_len, ctx, true,
+-			  ctrlpriv->era);
++	cnstr_shdsc_ahash(desc, &ctx->adata, OP_ALG_AS_UPDATE, ctx->ctx_len,
++			  ctx->ctx_len, true, ctrlpriv->era);
+ 	dma_sync_single_for_device(jrdev, ctx->sh_desc_update_dma,
+ 				   desc_bytes(desc), ctx->dir);
+ #ifdef DEBUG
+@@ -313,8 +252,8 @@ static int ahash_set_sh_desc(struct crypto_ahash *ahash)
+ 
+ 	/* ahash_update_first shared descriptor */
+ 	desc = ctx->sh_desc_update_first;
+-	ahash_gen_sh_desc(desc, OP_ALG_AS_INIT, ctx->ctx_len, ctx, false,
+-			  ctrlpriv->era);
++	cnstr_shdsc_ahash(desc, &ctx->adata, OP_ALG_AS_INIT, ctx->ctx_len,
++			  ctx->ctx_len, false, ctrlpriv->era);
+ 	dma_sync_single_for_device(jrdev, ctx->sh_desc_update_first_dma,
+ 				   desc_bytes(desc), ctx->dir);
+ #ifdef DEBUG
+@@ -325,8 +264,8 @@ static int ahash_set_sh_desc(struct crypto_ahash *ahash)
+ 
+ 	/* ahash_final shared descriptor */
+ 	desc = ctx->sh_desc_fin;
+-	ahash_gen_sh_desc(desc, OP_ALG_AS_FINALIZE, digestsize, ctx, true,
+-			  ctrlpriv->era);
++	cnstr_shdsc_ahash(desc, &ctx->adata, OP_ALG_AS_FINALIZE, digestsize,
++			  ctx->ctx_len, true, ctrlpriv->era);
+ 	dma_sync_single_for_device(jrdev, ctx->sh_desc_fin_dma,
+ 				   desc_bytes(desc), ctx->dir);
+ #ifdef DEBUG
+@@ -337,8 +276,8 @@ static int ahash_set_sh_desc(struct crypto_ahash *ahash)
+ 
+ 	/* ahash_digest shared descriptor */
+ 	desc = ctx->sh_desc_digest;
+-	ahash_gen_sh_desc(desc, OP_ALG_AS_INITFINAL, digestsize, ctx, false,
+-			  ctrlpriv->era);
++	cnstr_shdsc_ahash(desc, &ctx->adata, OP_ALG_AS_INITFINAL, digestsize,
++			  ctx->ctx_len, false, ctrlpriv->era);
+ 	dma_sync_single_for_device(jrdev, ctx->sh_desc_digest_dma,
+ 				   desc_bytes(desc), ctx->dir);
+ #ifdef DEBUG
+diff --git a/drivers/crypto/caam/caamhash_desc.c b/drivers/crypto/caam/caamhash_desc.c
+new file mode 100644
+index 000000000000..a12f7959a2c3
+--- /dev/null
++++ b/drivers/crypto/caam/caamhash_desc.c
+@@ -0,0 +1,80 @@
++// SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
++/*
++ * Shared descriptors for ahash algorithms
++ *
++ * Copyright 2017 NXP
++ */
++
++#include "compat.h"
++#include "desc_constr.h"
++#include "caamhash_desc.h"
++
++/**
++ * cnstr_shdsc_ahash - ahash shared descriptor
++ * @desc: pointer to buffer used for descriptor construction
++ * @adata: pointer to authentication transform definitions.
++ *         A split key is required for SEC Era < 6; the size of the split key
++ *         is specified in this case.
++ *         Valid algorithm values - one of OP_ALG_ALGSEL_{MD5, SHA1, SHA224,
++ *         SHA256, SHA384, SHA512}.
++ * @state: algorithm state OP_ALG_AS_{INIT, FINALIZE, INITFINALIZE, UPDATE}
++ * @digestsize: algorithm's digest size
++ * @ctx_len: size of Context Register
++ * @import_ctx: true if previous Context Register needs to be restored
++ *              must be true for ahash update and final
++ *              must be false for for ahash first and digest
++ * @era: SEC Era
++ */
++void cnstr_shdsc_ahash(u32 * const desc, struct alginfo *adata, u32 state,
++		       int digestsize, int ctx_len, bool import_ctx, int era)
++{
++	u32 op = adata->algtype;
++
++	init_sh_desc(desc, HDR_SHARE_SERIAL);
++
++	/* Append key if it has been set; ahash update excluded */
++	if (state != OP_ALG_AS_UPDATE && adata->keylen) {
++		u32 *skip_key_load;
++
++		/* Skip key loading if already shared */
++		skip_key_load = append_jump(desc, JUMP_JSL | JUMP_TEST_ALL |
++					    JUMP_COND_SHRD);
++
++		if (era < 6)
++			append_key_as_imm(desc, adata->key_virt,
++					  adata->keylen_pad,
++					  adata->keylen, CLASS_2 |
++					  KEY_DEST_MDHA_SPLIT | KEY_ENC);
++		else
++			append_proto_dkp(desc, adata);
++
++		set_jump_tgt_here(desc, skip_key_load);
++
++		op |= OP_ALG_AAI_HMAC_PRECOMP;
++	}
++
++	/* If needed, import context from software */
++	if (import_ctx)
++		append_seq_load(desc, ctx_len, LDST_CLASS_2_CCB |
++				LDST_SRCDST_BYTE_CONTEXT);
++
++	/* Class 2 operation */
++	append_operation(desc, op | state | OP_ALG_ENCRYPT);
++
++	/*
++	 * Load from buf and/or src and write to req->result or state->context
++	 * Calculate remaining bytes to read
++	 */
++	append_math_add(desc, VARSEQINLEN, SEQINLEN, REG0, CAAM_CMD_SZ);
++	/* Read remaining bytes */
++	append_seq_fifo_load(desc, 0, FIFOLD_CLASS_CLASS2 | FIFOLD_TYPE_LAST2 |
++			     FIFOLD_TYPE_MSG | KEY_VLF);
++	/* Store class2 context bytes */
++	append_seq_store(desc, digestsize, LDST_CLASS_2_CCB |
++			 LDST_SRCDST_BYTE_CONTEXT);
++}
++EXPORT_SYMBOL(cnstr_shdsc_ahash);
++
++MODULE_LICENSE("Dual BSD/GPL");
++MODULE_DESCRIPTION("FSL CAAM ahash descriptors support");
++MODULE_AUTHOR("NXP Semiconductors");
+diff --git a/drivers/crypto/caam/caamhash_desc.h b/drivers/crypto/caam/caamhash_desc.h
+new file mode 100644
+index 000000000000..631fc1ac312c
+--- /dev/null
++++ b/drivers/crypto/caam/caamhash_desc.h
+@@ -0,0 +1,21 @@
++/* SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause) */
++/*
++ * Shared descriptors for ahash algorithms
++ *
++ * Copyright 2017 NXP
++ */
++
++#ifndef _CAAMHASH_DESC_H_
++#define _CAAMHASH_DESC_H_
++
++/* length of descriptors text */
++#define DESC_AHASH_BASE			(3 * CAAM_CMD_SZ)
++#define DESC_AHASH_UPDATE_LEN		(6 * CAAM_CMD_SZ)
++#define DESC_AHASH_UPDATE_FIRST_LEN	(DESC_AHASH_BASE + 4 * CAAM_CMD_SZ)
++#define DESC_AHASH_FINAL_LEN		(DESC_AHASH_BASE + 5 * CAAM_CMD_SZ)
++#define DESC_AHASH_DIGEST_LEN		(DESC_AHASH_BASE + 4 * CAAM_CMD_SZ)
++
++void cnstr_shdsc_ahash(u32 * const desc, struct alginfo *adata, u32 state,
++		       int digestsize, int ctx_len, bool import_ctx, int era);
++
++#endif /* _CAAMHASH_DESC_H_ */
+-- 
+2.16.2
