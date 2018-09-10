@@ -1,441 +1,296 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH 3/4] crypto: arm64/aes-blk - add support for CTS-CBC mode
-Date: Mon, 10 Sep 2018 16:41:14 +0200
-Message-ID: <20180910144115.25727-4-ard.biesheuvel@linaro.org>
-References: <20180910144115.25727-1-ard.biesheuvel@linaro.org>
+From: Jerome Glisse <jglisse-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [RFCv2 PATCH 0/7] A General Accelerator Framework, WarpDrive
+Date: Mon, 10 Sep 2018 10:54:23 -0400
+Message-ID: <20180910145423.GA3488@redhat.com>
+References: <20180903005204.26041-1-nek.in.cn@gmail.com>
+	<20180904150019.GA4024@redhat.com>
+	<20180904101509.62314b67@t450s.home>
+	<20180906094532.GG230707@Turing-Arch-b>
+	<20180906133133.GA3830@redhat.com>
+	<20180907040138.GI230707@Turing-Arch-b>
+	<20180907165303.GA3519@redhat.com>
+	<20180910032809.GJ230707@Turing-Arch-b>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>, Theodore Ts'o <tytso@mit.edu>,
- herbert@gondor.apana.org.au, Steve Capper <steve.capper@arm.com>,
- Eric Biggers <ebiggers@google.com>, linux-arm-kernel@lists.infradead.org
-To: linux-crypto@vger.kernel.org
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <20180910144115.25727-1-ard.biesheuvel@linaro.org>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Cc: Kenneth Lee <nek.in.cn-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+	kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Jonathan Corbet <corbet-T1hC0tSOHrs@public.gmane.org>,
+	Greg Kroah-Hartman <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>, linux-doc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Sanjay Kumar <sanjay.k.kumar-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>, Hao Fang <fanghao11-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>,
+	iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linuxarm-hv44wF8Li93QT0dZR+AlfA@public.gmane.org, Alex Williamson <alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Philippe Ombredanne <pombredanne-od1rfyK75/E@public.gmane.org>,
+	Thomas Gleixner <tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org>,
+	"David S . Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
+	linux-accelerators-uLR06cmDAlY/bJ5BZ2RsiQ@public.gmane.org
+To: Kenneth Lee <liguozhu-C8/M+/jPZTeaMJb+Lgu22Q@public.gmane.org>
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <20180910032809.GJ230707@Turing-Arch-b>
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-Currently, we rely on the generic CTS chaining mode wrapper to
-instantiate the cts(cbc(aes)) skcipher. Due to the high performance
-of the ARMv8 Crypto Extensions AES instructions (~1 cycles per byte),
-any overhead in the chaining mode layers is amplified, and so it pays
-off considerably to fold the CTS handling into the SIMD routines.
+On Mon, Sep 10, 2018 at 11:28:09AM +0800, Kenneth Lee wrote:
+> On Fri, Sep 07, 2018 at 12:53:06PM -0400, Jerome Glisse wrote:
+> > On Fri, Sep 07, 2018 at 12:01:38PM +0800, Kenneth Lee wrote:
+> > > On Thu, Sep 06, 2018 at 09:31:33AM -0400, Jerome Glisse wrote:
+> > > > On Thu, Sep 06, 2018 at 05:45:32PM +0800, Kenneth Lee wrote:
+> > > > > On Tue, Sep 04, 2018 at 10:15:09AM -0600, Alex Williamson wrote:
+> > > > > > On Tue, 4 Sep 2018 11:00:19 -0400 Jerome Glisse <jglisse@redhat=
+.com> wrote:
+> > > > > > > On Mon, Sep 03, 2018 at 08:51:57AM +0800, Kenneth Lee wrote:
 
-On Cortex-A53, this results in a ~50% speedup for smaller input sizes.
+[...]
 
-Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
----
-This patch supersedes '[RFC/RFT PATCH] crypto: arm64/aes-ce - add support
-for CTS-CBC mode' sent out last Saturday.
+> > > I took a look at i915_gem_execbuffer_ioctl(). It seems it "copy_from_=
+user" the
+> > > user memory to the kernel. That is not what we need. What we try to g=
+et is: the
+> > > user application do something on its data, and push it away to the ac=
+celerator,
+> > > and says: "I'm tied, it is your turn to do the job...". Then the acce=
+lerator has
+> > > the memory, referring any portion of it with the same VAs of the appl=
+ication,
+> > > even the VAs are stored inside the memory itself.
+> > =
 
-Changes:
-- keep subreq and scatterlist in request ctx structure
-- optimize away second scatterwalk_ffwd() invocation when encrypting in-place
-- keep permute table in .rodata section
-- polish asm code (drop literal + offset reference, reorder insns)
+> > You were not looking at right place see drivers/gpu/drm/i915/i915_gem_u=
+serptr.c
+> > It does GUP and create GEM object AFAICR you can wrap that GEM object i=
+nto a
+> > dma buffer object.
+> > =
 
-Raw performance numbers after the patch.
+> =
 
- arch/arm64/crypto/aes-glue.c  | 165 ++++++++++++++++++++
- arch/arm64/crypto/aes-modes.S |  79 +++++++++-
- 2 files changed, 243 insertions(+), 1 deletion(-)
+> Thank you for directing me to this implementation. It is interesting:).
+> =
 
-diff --git a/arch/arm64/crypto/aes-glue.c b/arch/arm64/crypto/aes-glue.c
-index 1c6934544c1f..26d2b0263ba6 100644
---- a/arch/arm64/crypto/aes-glue.c
-+++ b/arch/arm64/crypto/aes-glue.c
-@@ -15,6 +15,7 @@
- #include <crypto/internal/hash.h>
- #include <crypto/internal/simd.h>
- #include <crypto/internal/skcipher.h>
-+#include <crypto/scatterwalk.h>
- #include <linux/module.h>
- #include <linux/cpufeature.h>
- #include <crypto/xts.h>
-@@ -31,6 +32,8 @@
- #define aes_ecb_decrypt		ce_aes_ecb_decrypt
- #define aes_cbc_encrypt		ce_aes_cbc_encrypt
- #define aes_cbc_decrypt		ce_aes_cbc_decrypt
-+#define aes_cbc_cts_encrypt	ce_aes_cbc_cts_encrypt
-+#define aes_cbc_cts_decrypt	ce_aes_cbc_cts_decrypt
- #define aes_ctr_encrypt		ce_aes_ctr_encrypt
- #define aes_xts_encrypt		ce_aes_xts_encrypt
- #define aes_xts_decrypt		ce_aes_xts_decrypt
-@@ -45,6 +48,8 @@ MODULE_DESCRIPTION("AES-ECB/CBC/CTR/XTS using ARMv8 Crypto Extensions");
- #define aes_ecb_decrypt		neon_aes_ecb_decrypt
- #define aes_cbc_encrypt		neon_aes_cbc_encrypt
- #define aes_cbc_decrypt		neon_aes_cbc_decrypt
-+#define aes_cbc_cts_encrypt	neon_aes_cbc_cts_encrypt
-+#define aes_cbc_cts_decrypt	neon_aes_cbc_cts_decrypt
- #define aes_ctr_encrypt		neon_aes_ctr_encrypt
- #define aes_xts_encrypt		neon_aes_xts_encrypt
- #define aes_xts_decrypt		neon_aes_xts_decrypt
-@@ -73,6 +78,11 @@ asmlinkage void aes_cbc_encrypt(u8 out[], u8 const in[], u32 const rk[],
- asmlinkage void aes_cbc_decrypt(u8 out[], u8 const in[], u32 const rk[],
- 				int rounds, int blocks, u8 iv[]);
- 
-+asmlinkage void aes_cbc_cts_encrypt(u8 out[], u8 const in[], u32 const rk[],
-+				int rounds, int bytes, u8 const iv[]);
-+asmlinkage void aes_cbc_cts_decrypt(u8 out[], u8 const in[], u32 const rk[],
-+				int rounds, int bytes, u8 const iv[]);
-+
- asmlinkage void aes_ctr_encrypt(u8 out[], u8 const in[], u32 const rk[],
- 				int rounds, int blocks, u8 ctr[]);
- 
-@@ -87,6 +97,12 @@ asmlinkage void aes_mac_update(u8 const in[], u32 const rk[], int rounds,
- 			       int blocks, u8 dg[], int enc_before,
- 			       int enc_after);
- 
-+struct cts_cbc_req_ctx {
-+	struct scatterlist sg_src[2];
-+	struct scatterlist sg_dst[2];
-+	struct skcipher_request subreq;
-+};
-+
- struct crypto_aes_xts_ctx {
- 	struct crypto_aes_ctx key1;
- 	struct crypto_aes_ctx __aligned(8) key2;
-@@ -209,6 +225,136 @@ static int cbc_decrypt(struct skcipher_request *req)
- 	return err;
- }
- 
-+static int cts_cbc_init_tfm(struct crypto_skcipher *tfm)
-+{
-+	crypto_skcipher_set_reqsize(tfm, sizeof(struct cts_cbc_req_ctx));
-+	return 0;
-+}
-+
-+static int cts_cbc_encrypt(struct skcipher_request *req)
-+{
-+	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-+	struct crypto_aes_ctx *ctx = crypto_skcipher_ctx(tfm);
-+	struct cts_cbc_req_ctx *rctx = skcipher_request_ctx(req);
-+	int err, rounds = 6 + ctx->key_length / 4;
-+	int cbc_blocks = DIV_ROUND_UP(req->cryptlen, AES_BLOCK_SIZE) - 2;
-+	struct scatterlist *src = req->src, *dst = req->dst;
-+	struct skcipher_walk walk;
-+
-+	skcipher_request_set_tfm(&rctx->subreq, tfm);
-+
-+	if (req->cryptlen == AES_BLOCK_SIZE)
-+		cbc_blocks = 1;
-+
-+	if (cbc_blocks > 0) {
-+		unsigned int blocks;
-+
-+		skcipher_request_set_crypt(&rctx->subreq, req->src, req->dst,
-+					   cbc_blocks * AES_BLOCK_SIZE,
-+					   req->iv);
-+
-+		err = skcipher_walk_virt(&walk, &rctx->subreq, false);
-+
-+		while ((blocks = (walk.nbytes / AES_BLOCK_SIZE))) {
-+			kernel_neon_begin();
-+			aes_cbc_encrypt(walk.dst.virt.addr, walk.src.virt.addr,
-+					ctx->key_enc, rounds, blocks, walk.iv);
-+			kernel_neon_end();
-+			err = skcipher_walk_done(&walk,
-+						 walk.nbytes % AES_BLOCK_SIZE);
-+		}
-+		if (err)
-+			return err;
-+
-+		if (req->cryptlen == AES_BLOCK_SIZE)
-+			return 0;
-+
-+		dst = src = scatterwalk_ffwd(rctx->sg_src, req->src,
-+					     rctx->subreq.cryptlen);
-+		if (req->dst != req->src)
-+			dst = scatterwalk_ffwd(rctx->sg_dst, req->dst,
-+					       rctx->subreq.cryptlen);
-+	}
-+
-+	/* handle ciphertext stealing */
-+	skcipher_request_set_crypt(&rctx->subreq, src, dst,
-+				   req->cryptlen - cbc_blocks * AES_BLOCK_SIZE,
-+				   req->iv);
-+
-+	err = skcipher_walk_virt(&walk, &rctx->subreq, false);
-+	if (err)
-+		return err;
-+
-+	kernel_neon_begin();
-+	aes_cbc_cts_encrypt(walk.dst.virt.addr, walk.src.virt.addr,
-+			    ctx->key_enc, rounds, walk.nbytes, walk.iv);
-+	kernel_neon_end();
-+
-+	return skcipher_walk_done(&walk, 0);
-+}
-+
-+static int cts_cbc_decrypt(struct skcipher_request *req)
-+{
-+	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-+	struct crypto_aes_ctx *ctx = crypto_skcipher_ctx(tfm);
-+	struct cts_cbc_req_ctx *rctx = skcipher_request_ctx(req);
-+	int err, rounds = 6 + ctx->key_length / 4;
-+	int cbc_blocks = DIV_ROUND_UP(req->cryptlen, AES_BLOCK_SIZE) - 2;
-+	struct scatterlist *src = req->src, *dst = req->dst;
-+	struct skcipher_walk walk;
-+
-+	skcipher_request_set_tfm(&rctx->subreq, tfm);
-+
-+	if (req->cryptlen == AES_BLOCK_SIZE)
-+		cbc_blocks = 1;
-+
-+	if (cbc_blocks > 0) {
-+		unsigned int blocks;
-+
-+		skcipher_request_set_crypt(&rctx->subreq, req->src, req->dst,
-+					   cbc_blocks * AES_BLOCK_SIZE,
-+					   req->iv);
-+
-+		err = skcipher_walk_virt(&walk, &rctx->subreq, false);
-+
-+		while ((blocks = (walk.nbytes / AES_BLOCK_SIZE))) {
-+			kernel_neon_begin();
-+			aes_cbc_decrypt(walk.dst.virt.addr, walk.src.virt.addr,
-+					ctx->key_dec, rounds, blocks, walk.iv);
-+			kernel_neon_end();
-+			err = skcipher_walk_done(&walk,
-+						 walk.nbytes % AES_BLOCK_SIZE);
-+		}
-+		if (err)
-+			return err;
-+
-+		if (req->cryptlen == AES_BLOCK_SIZE)
-+			return 0;
-+
-+		dst = src = scatterwalk_ffwd(rctx->sg_src, req->src,
-+					     rctx->subreq.cryptlen);
-+		if (req->dst != req->src)
-+			dst = scatterwalk_ffwd(rctx->sg_dst, req->dst,
-+					       rctx->subreq.cryptlen);
-+	}
-+
-+	/* handle ciphertext stealing */
-+	skcipher_request_set_crypt(&rctx->subreq, src, dst,
-+				   req->cryptlen - cbc_blocks * AES_BLOCK_SIZE,
-+				   req->iv);
-+
-+	err = skcipher_walk_virt(&walk, &rctx->subreq, false);
-+	if (err)
-+		return err;
-+
-+	kernel_neon_begin();
-+	aes_cbc_cts_decrypt(walk.dst.virt.addr, walk.src.virt.addr,
-+			    ctx->key_dec, rounds, walk.nbytes, walk.iv);
-+	kernel_neon_end();
-+
-+	return skcipher_walk_done(&walk, 0);
-+}
-+
- static int ctr_encrypt(struct skcipher_request *req)
- {
- 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-@@ -334,6 +480,25 @@ static struct skcipher_alg aes_algs[] = { {
- 	.setkey		= skcipher_aes_setkey,
- 	.encrypt	= cbc_encrypt,
- 	.decrypt	= cbc_decrypt,
-+}, {
-+	.base = {
-+		.cra_name		= "__cts(cbc(aes))",
-+		.cra_driver_name	= "__cts-cbc-aes-" MODE,
-+		.cra_priority		= PRIO,
-+		.cra_flags		= CRYPTO_ALG_INTERNAL,
-+		.cra_blocksize		= 1,
-+		.cra_ctxsize		= sizeof(struct crypto_aes_ctx),
-+		.cra_module		= THIS_MODULE,
-+	},
-+	.min_keysize	= AES_MIN_KEY_SIZE,
-+	.max_keysize	= AES_MAX_KEY_SIZE,
-+	.ivsize		= AES_BLOCK_SIZE,
-+	.chunksize	= AES_BLOCK_SIZE,
-+	.walksize	= 2 * AES_BLOCK_SIZE,
-+	.setkey		= skcipher_aes_setkey,
-+	.encrypt	= cts_cbc_encrypt,
-+	.decrypt	= cts_cbc_decrypt,
-+	.init		= cts_cbc_init_tfm,
- }, {
- 	.base = {
- 		.cra_name		= "__ctr(aes)",
-diff --git a/arch/arm64/crypto/aes-modes.S b/arch/arm64/crypto/aes-modes.S
-index 35632d11200f..82931fba53d2 100644
---- a/arch/arm64/crypto/aes-modes.S
-+++ b/arch/arm64/crypto/aes-modes.S
-@@ -170,6 +170,84 @@ AES_ENTRY(aes_cbc_decrypt)
- AES_ENDPROC(aes_cbc_decrypt)
- 
- 
-+	/*
-+	 * aes_cbc_cts_encrypt(u8 out[], u8 const in[], u32 const rk[],
-+	 *		       int rounds, int bytes, u8 const iv[])
-+	 * aes_cbc_cts_decrypt(u8 out[], u8 const in[], u32 const rk[],
-+	 *		       int rounds, int bytes, u8 const iv[])
-+	 */
-+
-+AES_ENTRY(aes_cbc_cts_encrypt)
-+	adr_l		x8, .Lcts_permute_table
-+	sub		x4, x4, #16
-+	add		x9, x8, #32
-+	add		x8, x8, x4
-+	sub		x9, x9, x4
-+	ld1		{v3.16b}, [x8]
-+	ld1		{v4.16b}, [x9]
-+
-+	ld1		{v0.16b}, [x1], x4		/* overlapping loads */
-+	ld1		{v1.16b}, [x1]
-+
-+	ld1		{v5.16b}, [x5]			/* get iv */
-+	enc_prepare	w3, x2, x6
-+
-+	eor		v0.16b, v0.16b, v5.16b		/* xor with iv */
-+	tbl		v1.16b, {v1.16b}, v4.16b
-+	encrypt_block	v0, w3, x2, x6, w7
-+
-+	eor		v1.16b, v1.16b, v0.16b
-+	tbl		v0.16b, {v0.16b}, v3.16b
-+	encrypt_block	v1, w3, x2, x6, w7
-+
-+	add		x4, x0, x4
-+	st1		{v0.16b}, [x4]			/* overlapping stores */
-+	st1		{v1.16b}, [x0]
-+	ret
-+AES_ENDPROC(aes_cbc_cts_encrypt)
-+
-+AES_ENTRY(aes_cbc_cts_decrypt)
-+	adr_l		x8, .Lcts_permute_table
-+	sub		x4, x4, #16
-+	add		x9, x8, #32
-+	add		x8, x8, x4
-+	sub		x9, x9, x4
-+	ld1		{v3.16b}, [x8]
-+	ld1		{v4.16b}, [x9]
-+
-+	ld1		{v0.16b}, [x1], x4		/* overlapping loads */
-+	ld1		{v1.16b}, [x1]
-+
-+	ld1		{v5.16b}, [x5]			/* get iv */
-+	dec_prepare	w3, x2, x6
-+
-+	tbl		v2.16b, {v1.16b}, v4.16b
-+	decrypt_block	v0, w3, x2, x6, w7
-+	eor		v2.16b, v2.16b, v0.16b
-+
-+	tbx		v0.16b, {v1.16b}, v4.16b
-+	tbl		v2.16b, {v2.16b}, v3.16b
-+	decrypt_block	v0, w3, x2, x6, w7
-+	eor		v0.16b, v0.16b, v5.16b		/* xor with iv */
-+
-+	add		x4, x0, x4
-+	st1		{v2.16b}, [x4]			/* overlapping stores */
-+	st1		{v0.16b}, [x0]
-+	ret
-+AES_ENDPROC(aes_cbc_cts_decrypt)
-+
-+	.section	".rodata", "a"
-+	.align		6
-+.Lcts_permute_table:
-+	.byte		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
-+	.byte		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
-+	.byte		 0x0,  0x1,  0x2,  0x3,  0x4,  0x5,  0x6,  0x7
-+	.byte		 0x8,  0x9,  0xa,  0xb,  0xc,  0xd,  0xe,  0xf
-+	.byte		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
-+	.byte		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
-+	.previous
-+
-+
- 	/*
- 	 * aes_ctr_encrypt(u8 out[], u8 const in[], u8 const rk[], int rounds,
- 	 *		   int blocks, u8 ctr[])
-@@ -253,7 +331,6 @@ AES_ENTRY(aes_ctr_encrypt)
- 	ins		v4.d[0], x7
- 	b		.Lctrcarrydone
- AES_ENDPROC(aes_ctr_encrypt)
--	.ltorg
- 
- 
- 	/*
--- 
-2.18.0
+> But it is not yet solve my problem. If I understand it right, the userptr=
+ in
+> i915 do the following:
+> =
 
-Cortex-A53 @ 1 GHz
+> 1. The user process sets a user pointer with size to the kernel via ioctl.
+> 2. The kernel wraps it as a dma-buf and keeps the process's mm for further
+>    reference.
+> 3. The user pages are allocated, GUPed or DMA mapped to the device. So th=
+e data
+>    can be shared between the user space and the hardware.
+> =
 
-BEFORE:
+> But my scenario is: =
 
-testing speed of async cts(cbc(aes)) (cts(cbc-aes-ce)) encryption
- 0 (128 bit key,   16 byte blocks): 1407866 ops in 1 secs ( 22525856 bytes)
- 1 (128 bit key,   64 byte blocks):  466814 ops in 1 secs ( 29876096 bytes)
- 2 (128 bit key,  256 byte blocks):  401023 ops in 1 secs (102661888 bytes)
- 3 (128 bit key, 1024 byte blocks):  258238 ops in 1 secs (264435712 bytes)
- 4 (128 bit key, 8192 byte blocks):   57905 ops in 1 secs (474357760 bytes)
- 5 (192 bit key,   16 byte blocks): 1388333 ops in 1 secs ( 22213328 bytes)
- 6 (192 bit key,   64 byte blocks):  448595 ops in 1 secs ( 28710080 bytes)
- 7 (192 bit key,  256 byte blocks):  376951 ops in 1 secs ( 96499456 bytes)
- 8 (192 bit key, 1024 byte blocks):  231635 ops in 1 secs (237194240 bytes)
- 9 (192 bit key, 8192 byte blocks):   43345 ops in 1 secs (355082240 bytes)
-10 (256 bit key,   16 byte blocks): 1370820 ops in 1 secs ( 21933120 bytes)
-11 (256 bit key,   64 byte blocks):  452352 ops in 1 secs ( 28950528 bytes)
-12 (256 bit key,  256 byte blocks):  376506 ops in 1 secs ( 96385536 bytes)
-13 (256 bit key, 1024 byte blocks):  223219 ops in 1 secs (228576256 bytes)
-14 (256 bit key, 8192 byte blocks):   44874 ops in 1 secs (367607808 bytes)
+> =
 
-testing speed of async cts(cbc(aes)) (cts(cbc-aes-ce)) decryption
- 0 (128 bit key,   16 byte blocks): 1402795 ops in 1 secs ( 22444720 bytes)
- 1 (128 bit key,   64 byte blocks):  403300 ops in 1 secs ( 25811200 bytes)
- 2 (128 bit key,  256 byte blocks):  367710 ops in 1 secs ( 94133760 bytes)
- 3 (128 bit key, 1024 byte blocks):  269118 ops in 1 secs (275576832 bytes)
- 4 (128 bit key, 8192 byte blocks):   74706 ops in 1 secs (611991552 bytes)
- 5 (192 bit key,   16 byte blocks): 1381390 ops in 1 secs ( 22102240 bytes)
- 6 (192 bit key,   64 byte blocks):  388555 ops in 1 secs ( 24867520 bytes)
- 7 (192 bit key,  256 byte blocks):  350282 ops in 1 secs ( 89672192 bytes)
- 8 (192 bit key, 1024 byte blocks):  251268 ops in 1 secs (257298432 bytes)
- 9 (192 bit key, 8192 byte blocks):   56535 ops in 1 secs (463134720 bytes)
-10 (256 bit key,   16 byte blocks): 1364334 ops in 1 secs ( 21829344 bytes)
-11 (256 bit key,   64 byte blocks):  392610 ops in 1 secs ( 25127040 bytes)
-12 (256 bit key,  256 byte blocks):  351150 ops in 1 secs ( 89894400 bytes)
-13 (256 bit key, 1024 byte blocks):  247455 ops in 1 secs (253393920 bytes)
-14 (256 bit key, 8192 byte blocks):   62530 ops in 1 secs (512245760 bytes)
+> 1. The user process has some data in the user space, pointed by a pointer=
+, say
+>    ptr1. And within the memory, there may be some other pointers, let's s=
+ay one
+>    of them is ptr2.
+> 2. Now I need to assign ptr1 *directly* to the hardware MMIO space. And t=
+he
+>    hardware must refer ptr1 and ptr2 *directly* for data.
+> =
 
-AFTER:
+> Userptr lets the hardware and process share the same memory space. But I =
+need
+> them to share the same *address space*. So IOMMU is a MUST for WarpDrive,
+> NOIOMMU mode, as Jean said, is just for verifying some of the procedure i=
+s OK.
 
-testing speed of async cts(cbc(aes)) (cts-cbc-aes-ce) encryption
- 0 (128 bit key,   16 byte blocks): 1380568 ops in 1 secs ( 22089088 bytes)
- 1 (128 bit key,   64 byte blocks):  692731 ops in 1 secs ( 44334784 bytes)
- 2 (128 bit key,  256 byte blocks):  556393 ops in 1 secs (142436608 bytes)
- 3 (128 bit key, 1024 byte blocks):  314635 ops in 1 secs (322186240 bytes)
- 4 (128 bit key, 8192 byte blocks):   57550 ops in 1 secs (471449600 bytes)
- 5 (192 bit key,   16 byte blocks): 1367027 ops in 1 secs ( 21872432 bytes)
- 6 (192 bit key,   64 byte blocks):  675058 ops in 1 secs ( 43203712 bytes)
- 7 (192 bit key,  256 byte blocks):  523177 ops in 1 secs (133933312 bytes)
- 8 (192 bit key, 1024 byte blocks):  279235 ops in 1 secs (285936640 bytes)
- 9 (192 bit key, 8192 byte blocks):   46316 ops in 1 secs (379420672 bytes)
-10 (256 bit key,   16 byte blocks): 1353576 ops in 1 secs ( 21657216 bytes)
-11 (256 bit key,   64 byte blocks):  664523 ops in 1 secs ( 42529472 bytes)
-12 (256 bit key,  256 byte blocks):  508141 ops in 1 secs (130084096 bytes)
-13 (256 bit key, 1024 byte blocks):  264386 ops in 1 secs (270731264 bytes)
-14 (256 bit key, 8192 byte blocks):   47224 ops in 1 secs (386859008 bytes)
+So to be 100% clear should we _ignore_ the non SVA/SVM case ?
+If so then wait for necessary SVA/SVM to land and do warp drive
+without non SVA/SVM path.
 
-testing speed of async cts(cbc(aes)) (cts-cbc-aes-ce) decryption
- 0 (128 bit key,   16 byte blocks): 1388553 ops in 1 secs ( 22216848 bytes)
- 1 (128 bit key,   64 byte blocks):  688402 ops in 1 secs ( 44057728 bytes)
- 2 (128 bit key,  256 byte blocks):  589268 ops in 1 secs (150852608 bytes)
- 3 (128 bit key, 1024 byte blocks):  372238 ops in 1 secs (381171712 bytes)
- 4 (128 bit key, 8192 byte blocks):   75691 ops in 1 secs (620060672 bytes)
- 5 (192 bit key,   16 byte blocks): 1366220 ops in 1 secs ( 21859520 bytes)
- 6 (192 bit key,   64 byte blocks):  666889 ops in 1 secs ( 42680896 bytes)
- 7 (192 bit key,  256 byte blocks):  561809 ops in 1 secs (143823104 bytes)
- 8 (192 bit key, 1024 byte blocks):  344117 ops in 1 secs (352375808 bytes)
- 9 (192 bit key, 8192 byte blocks):   63150 ops in 1 secs (517324800 bytes)
-10 (256 bit key,   16 byte blocks): 1349266 ops in 1 secs ( 21588256 bytes)
-11 (256 bit key,   64 byte blocks):  661056 ops in 1 secs ( 42307584 bytes)
-12 (256 bit key,  256 byte blocks):  550261 ops in 1 secs (140866816 bytes)
-13 (256 bit key, 1024 byte blocks):  332947 ops in 1 secs (340937728 bytes)
-14 (256 bit key, 8192 byte blocks):   68759 ops in 1 secs (563273728 bytes)
+If you still want non SVA/SVM path what you want to do only works
+if both ptr1 and ptr2 are in a range that is DMA mapped to the
+device (moreover you need DMA address to match process address
+which is not an easy feat).
+
+Now even if you only want SVA/SVM, i do not see what is the point
+of doing this inside VFIO. AMD GPU driver does not and there would
+be no benefit for them to be there. Well a AMD VFIO mdev device
+driver for QEMU guest might be useful but they have SVIO IIRC.
+
+For SVA/SVM your usage model is:
+
+Setup:
+    - user space create a warp drive context for the process
+    - user space create a device specific context for the process
+    - user space create a user space command queue for the device
+    - user space bind command queue
+
+    At this point the kernel driver has bound the process address
+    space to the device with a command queue and userspace
+
+Usage:
+    - user space schedule work and call appropriate flush/update
+      ioctl from time to time. Might be optional depends on the
+      hardware, but probably a good idea to enforce so that kernel
+      can unbind the command queue to bind another process command
+      queue.
+    ...
+
+Cleanup:
+    - user space unbind command queue
+    - user space destroy device specific context
+    - user space destroy warp drive context
+    All the above can be implicit when closing the device file.
+
+So again in the above model i do not see anywhere something from
+VFIO that would benefit this model.
+
+
+> > > And I don't understand why I should avoid to use VFIO? As Alex said, =
+VFIO is the
+> > > user driver framework. And I need exactly a user driver interface. Wh=
+y should I
+> > > invent another wheel? It has most of stuff I need:
+> > > =
+
+> > > 1. Connecting multiple devices to the same application space
+> > > 2. Pinning and DMA from the application space to the whole set of dev=
+ice
+> > > 3. Managing hardware resource by device
+> > > =
+
+> > > We just need the last step: make sure multiple applications and the k=
+ernel can
+> > > share the same IOMMU. Then why shouldn't we use VFIO?
+> > =
+
+> > Because tons of other drivers already do all of the above outside VFIO.=
+ Many
+> > driver have a sizeable userspace side to them (anything with ioctl do) =
+so they
+> > can be construded as userspace driver too.
+> > =
+
+> =
+
+> Ignoring if there are *tons* of drivers are doing that;), even I do the s=
+ame as
+> i915 and solve the address space problem. And if I don't need to with VFI=
+O, why
+> should I spend so much effort to do it again?
+
+Because you do not need any code from VFIO, nor do you need to reinvent
+things. If non SVA/SVM matters to you then use dma buffer. If not then
+i do not see anything in VFIO that you need.
+
+
+> > So there is no reasons to do that under VFIO. Especialy as in your exam=
+ple
+> > it is not a real user space device driver, the userspace portion only k=
+nows
+> > about writting command into command buffer AFAICT.
+> > =
+
+> > VFIO is for real userspace driver where interrupt, configurations, ... =
+ie
+> > all the driver is handled in userspace. This means that the userspace h=
+ave
+> > to be trusted as it could program the device to do DMA to anywhere (if
+> > IOMMU is disabled at boot which is still the default configuration in t=
+he
+> > kernel).
+> > =
+
+> =
+
+> But as Alex explained, VFIO is not simply used by VM. So it need not to h=
+ave all
+> stuffs as a driver in host system. And I do need to share the user space =
+as DMA
+> buffer to the hardware. And I can get it with just a little update, then =
+it can
+> service me perfectly. I don't understand why I should choose a long route.
+
+Again this is not the long route i do not see anything in VFIO that
+benefit you in the SVA/SVM case. A basic character device driver can
+do that.
+
+
+> > So i do not see any reasons to do anything you want inside VFIO. All you
+> > want to do can be done outside as easily. Moreover it would be better if
+> > you define clearly each scenario because from where i sit it looks like
+> > you are opening the door wide open to userspace to DMA anywhere when IO=
+MMU
+> > is disabled.
+> > =
+
+> > When IOMMU is disabled you can _not_ expose command queue to userspace
+> > unless your device has its own page table and all commands are relative
+> > to that page table and the device page table is populated by kernel dri=
+ver
+> > in secure way (ie by checking that what is populated can be access).
+> > =
+
+> > I do not believe your example device to have such page table nor do i s=
+ee
+> > a fallback path when IOMMU is disabled that force user to do ioctl for
+> > each commands.
+> > =
+
+> > Yes i understand that you target SVA/SVM but still you claim to support
+> > non SVA/SVM. The point is that userspace can not be trusted if you want
+> > to have random program use your device. I am pretty sure that all user
+> > of VFIO are trusted process (like QEMU).
+> > =
+
+> > =
+
+> > Finaly i am convince that the IOMMU grouping stuff related to VFIO is
+> > useless for your usecase. I really do not see the point of that, it
+> > does complicate things for you for no reasons AFAICT.
+> =
+
+> Indeed, I don't like the group thing. I believe VFIO's maintains would no=
+t like
+> it very much either;). But the problem is, the group reflects to the same
+> IOMMU(unit), which may shared with other devices.  It is a security probl=
+em. I
+> cannot ignore it. I have to take it into account event I don't use VFIO.
+
+To me it seems you are making a policy decission in kernel space ie
+wether the device should be isolated in its own group or not is a
+decission that is up to the sys admin or something in userspace.
+Right now existing user of SVA/SVM don't (at least AFAICT).
+
+Do we really want to force such isolation ?
+
+
+> > > And personally, I believe the maturity and correctness of a framework=
+ are driven
+> > > by applications. Now the problem in accelerator world is that we don'=
+t have a
+> > > direction. If we believe the requirement is right, the method itself =
+is not a
+> > > big problem in the end. We just need to let people have a unify platf=
+orm to
+> > > share their work together.
+> > =
+
+> > I am not against that but it seems to me that all you want to do is only
+> > a matter of simplifying discovery of such devices and sharing few common
+> > ioctl (DMA mapping, creating command queue, managing command queue, ...)
+> > and again for all this i do not see the point of doing this under VFIO.
+> =
+
+> It is not a problem of device management, it is a problem of sharing addr=
+ess
+> space.
+
+This ties back to IOMMU SVA/SVM group isolation above.
+
+J=E9r=F4me
