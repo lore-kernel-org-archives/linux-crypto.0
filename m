@@ -1,141 +1,45 @@
-From: Ondrej Mosnacek <omosnace@redhat.com>
-Subject: Re: [PATCH 4.4.y] crypto: vmx - Fix sleep-in-atomic bugs
-Date: Mon, 10 Sep 2018 09:47:12 +0200
-Message-ID: <CAFqZXNuEvqv1moz1KDj_NgJoi=-mYrLvkHqKKzGN+MQqJ8d7ew@mail.gmail.com>
-References: <20180910074204.10812-1-omosnace@redhat.com>
+From: Srikanth Jampala <Jampala.Srikanth@cavium.com>
+Subject: [PATCH] crypto: cavium/nitrox - use dma_pool_zalloc()
+Date: Mon, 10 Sep 2018 13:54:52 +0530
+Message-ID: <20180910082452.19842-1-Jampala.Srikanth@cavium.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
-To: stable@vger.kernel.org
-Return-path: <stable-owner@vger.kernel.org>
-In-Reply-To: <20180910074204.10812-1-omosnace@redhat.com>
-Sender: stable-owner@vger.kernel.org
+Content-Type: text/plain
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        sgadam@cavium.com, Jampala.Srikanth@cavium.com
+To: herbert@gondor.apana.org.au, davem@davemloft.net
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Sep 10, 2018 at 9:42 AM Ondrej Mosnacek <omosnace@redhat.com> wrote:
-> commit 0522236d4f9c5ab2e79889cb020d1acbe5da416e upstream.
->
-> Conflicts:
->   drivers/crypto/vmx/
->     aes_cbc.c - adapted enable/disable calls to v4.4 state
->     aes_xts.c - did not exist yet in v4.4
->
-> This patch fixes sleep-in-atomic bugs in AES-CBC and AES-XTS VMX
-> implementations. The problem is that the blkcipher_* functions should
-> not be called in atomic context.
->
-> The bugs can be reproduced via the AF_ALG interface by trying to
-> encrypt/decrypt sufficiently large buffers (at least 64 KiB) using the
-> VMX implementations of 'cbc(aes)' or 'xts(aes)'. Such operations then
-> trigger BUG in crypto_yield():
->
-> [  891.863680] BUG: sleeping function called from invalid context at include/crypto/algapi.h:424
-> [  891.864622] in_atomic(): 1, irqs_disabled(): 0, pid: 12347, name: kcapi-enc
-> [  891.864739] 1 lock held by kcapi-enc/12347:
-> [  891.864811]  #0: 00000000f5d42c46 (sk_lock-AF_ALG){+.+.}, at: skcipher_recvmsg+0x50/0x530
-> [  891.865076] CPU: 5 PID: 12347 Comm: kcapi-enc Not tainted 4.19.0-0.rc0.git3.1.fc30.ppc64le #1
-> [  891.865251] Call Trace:
-> [  891.865340] [c0000003387578c0] [c000000000d67ea4] dump_stack+0xe8/0x164 (unreliable)
-> [  891.865511] [c000000338757910] [c000000000172a58] ___might_sleep+0x2f8/0x310
-> [  891.865679] [c000000338757990] [c0000000006bff74] blkcipher_walk_done+0x374/0x4a0
-> [  891.865825] [c0000003387579e0] [d000000007e73e70] p8_aes_cbc_encrypt+0x1c8/0x260 [vmx_crypto]
-> [  891.865993] [c000000338757ad0] [c0000000006c0ee0] skcipher_encrypt_blkcipher+0x60/0x80
-> [  891.866128] [c000000338757b10] [c0000000006ec504] skcipher_recvmsg+0x424/0x530
-> [  891.866283] [c000000338757bd0] [c000000000b00654] sock_recvmsg+0x74/0xa0
-> [  891.866403] [c000000338757c10] [c000000000b00f64] ___sys_recvmsg+0xf4/0x2f0
-> [  891.866515] [c000000338757d90] [c000000000b02bb8] __sys_recvmsg+0x68/0xe0
-> [  891.866631] [c000000338757e30] [c00000000000bbe4] system_call+0x5c/0x70
->
-> Fixes: 8c755ace357c ("crypto: vmx - Adding CBC routines for VMX module")
-> Fixes: c07f5d3da643 ("crypto: vmx - Adding support for XTS")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Ondrej Mosnacek <omosnace@redhat.com>
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-> Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+use dma_pool_zalloc() instead of dma_pool_alloc with __GFP_ZERO flag.
+crypto dma pool renamed to "nitrox-context".
 
-Whoops, sorry about that last Signed-off-by, I cherry-picked from
-another stable commit and forgot to edit it out...
+Signed-off-by: Srikanth Jampala <Jampala.Srikanth@cavium.com>
+---
+ drivers/crypto/cavium/nitrox/nitrox_lib.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-> ---
->  drivers/crypto/vmx/aes_cbc.c | 30 ++++++++++++++----------------
->  1 file changed, 14 insertions(+), 16 deletions(-)
->
-> diff --git a/drivers/crypto/vmx/aes_cbc.c b/drivers/crypto/vmx/aes_cbc.c
-> index 9506e8693c81..d8ef1147b344 100644
-> --- a/drivers/crypto/vmx/aes_cbc.c
-> +++ b/drivers/crypto/vmx/aes_cbc.c
-> @@ -111,24 +111,23 @@ static int p8_aes_cbc_encrypt(struct blkcipher_desc *desc,
->                 ret = crypto_blkcipher_encrypt(&fallback_desc, dst, src,
->                                                nbytes);
->         } else {
-> -               preempt_disable();
-> -               pagefault_disable();
-> -               enable_kernel_altivec();
-> -               enable_kernel_vsx();
-> -
->                 blkcipher_walk_init(&walk, dst, src, nbytes);
->                 ret = blkcipher_walk_virt(desc, &walk);
->                 while ((nbytes = walk.nbytes)) {
-> +                       preempt_disable();
-> +                       pagefault_disable();
-> +                       enable_kernel_vsx();
-> +                       enable_kernel_altivec();
->                         aes_p8_cbc_encrypt(walk.src.virt.addr,
->                                            walk.dst.virt.addr,
->                                            nbytes & AES_BLOCK_MASK,
->                                            &ctx->enc_key, walk.iv, 1);
-> +                       pagefault_enable();
-> +                       preempt_enable();
-> +
->                         nbytes &= AES_BLOCK_SIZE - 1;
->                         ret = blkcipher_walk_done(desc, &walk, nbytes);
->                 }
-> -
-> -               pagefault_enable();
-> -               preempt_enable();
->         }
->
->         return ret;
-> @@ -152,24 +151,23 @@ static int p8_aes_cbc_decrypt(struct blkcipher_desc *desc,
->                 ret = crypto_blkcipher_decrypt(&fallback_desc, dst, src,
->                                                nbytes);
->         } else {
-> -               preempt_disable();
-> -               pagefault_disable();
-> -               enable_kernel_altivec();
-> -               enable_kernel_vsx();
-> -
->                 blkcipher_walk_init(&walk, dst, src, nbytes);
->                 ret = blkcipher_walk_virt(desc, &walk);
->                 while ((nbytes = walk.nbytes)) {
-> +                       preempt_disable();
-> +                       pagefault_disable();
-> +                       enable_kernel_vsx();
-> +                       enable_kernel_altivec();
->                         aes_p8_cbc_encrypt(walk.src.virt.addr,
->                                            walk.dst.virt.addr,
->                                            nbytes & AES_BLOCK_MASK,
->                                            &ctx->dec_key, walk.iv, 0);
-> +                       pagefault_enable();
-> +                       preempt_enable();
-> +
->                         nbytes &= AES_BLOCK_SIZE - 1;
->                         ret = blkcipher_walk_done(desc, &walk, nbytes);
->                 }
-> -
-> -               pagefault_enable();
-> -               preempt_enable();
->         }
->
->         return ret;
-> --
-> 2.17.1
->
-
-
+diff --git a/drivers/crypto/cavium/nitrox/nitrox_lib.c b/drivers/crypto/cavium/nitrox/nitrox_lib.c
+index 4d31df07777f..7a721c7c12a4 100644
+--- a/drivers/crypto/cavium/nitrox/nitrox_lib.c
++++ b/drivers/crypto/cavium/nitrox/nitrox_lib.c
+@@ -122,7 +122,7 @@ static int create_crypto_dma_pool(struct nitrox_device *ndev)
+ 
+ 	/* Crypto context pool, 16 byte aligned */
+ 	size = CRYPTO_CTX_SIZE + sizeof(struct ctx_hdr);
+-	ndev->ctx_pool = dma_pool_create("crypto-context",
++	ndev->ctx_pool = dma_pool_create("nitrox-context",
+ 					 DEV(ndev), size, 16, 0);
+ 	if (!ndev->ctx_pool)
+ 		return -ENOMEM;
+@@ -149,7 +149,7 @@ void *crypto_alloc_context(struct nitrox_device *ndev)
+ 	void *vaddr;
+ 	dma_addr_t dma;
+ 
+-	vaddr = dma_pool_alloc(ndev->ctx_pool, (GFP_KERNEL | __GFP_ZERO), &dma);
++	vaddr = dma_pool_zalloc(ndev->ctx_pool, GFP_KERNEL, &dma);
+ 	if (!vaddr)
+ 		return NULL;
+ 
 -- 
-Ondrej Mosnacek <omosnace at redhat dot com>
-Associate Software Engineer, Security Technologies
-Red Hat, Inc.
+2.17.1
