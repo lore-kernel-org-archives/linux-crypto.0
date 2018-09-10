@@ -1,7 +1,7 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH 4/4] crypto: arm64/aes-blk - improve XTS mask handling
-Date: Mon, 10 Sep 2018 16:41:15 +0200
-Message-ID: <20180910144115.25727-5-ard.biesheuvel@linaro.org>
+Subject: [PATCH 3/4] crypto: arm64/aes-blk - add support for CTS-CBC mode
+Date: Mon, 10 Sep 2018 16:41:14 +0200
+Message-ID: <20180910144115.25727-4-ard.biesheuvel@linaro.org>
 References: <20180910144115.25727-1-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -23,171 +23,346 @@ Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-The Crypto Extension instantiation of the aes-modes.S collection of
-skciphers uses only 15 NEON registers for the round key array, whereas
-the pure NEON flavor uses 16 NEON registers for the AES S-box.
+Currently, we rely on the generic CTS chaining mode wrapper to
+instantiate the cts(cbc(aes)) skcipher. Due to the high performance
+of the ARMv8 Crypto Extensions AES instructions (~1 cycles per byte),
+any overhead in the chaining mode layers is amplified, and so it pays
+off considerably to fold the CTS handling into the SIMD routines.
 
-This means we have a spare register available that we can use to hold
-the XTS mask vector, removing the need to reload it at every iteration
-of the inner loop.
-
-Since the pure NEON version does not permit this optimization, tweak
-the macros so we can factor out this functionality. Also, replace the
-literal load with a short sequence to compose the mask vector.
-
-On Cortex-A53, this results in a ~4% speedup.
+On Cortex-A53, this results in a ~50% speedup for smaller input sizes.
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
+This patch supersedes '[RFC/RFT PATCH] crypto: arm64/aes-ce - add support
+for CTS-CBC mode' sent out last Saturday.
+
+Changes:
+- keep subreq and scatterlist in request ctx structure
+- optimize away second scatterwalk_ffwd() invocation when encrypting in-place
+- keep permute table in .rodata section
+- polish asm code (drop literal + offset reference, reorder insns)
+
 Raw performance numbers after the patch.
 
- arch/arm64/crypto/aes-ce.S    |  5 +++
- arch/arm64/crypto/aes-modes.S | 40 ++++++++++----------
- arch/arm64/crypto/aes-neon.S  |  6 +++
- 3 files changed, 32 insertions(+), 19 deletions(-)
+ arch/arm64/crypto/aes-glue.c  | 165 ++++++++++++++++++++
+ arch/arm64/crypto/aes-modes.S |  79 +++++++++-
+ 2 files changed, 243 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/crypto/aes-ce.S b/arch/arm64/crypto/aes-ce.S
-index 623e74ed1c67..143070510809 100644
---- a/arch/arm64/crypto/aes-ce.S
-+++ b/arch/arm64/crypto/aes-ce.S
-@@ -17,6 +17,11 @@
+diff --git a/arch/arm64/crypto/aes-glue.c b/arch/arm64/crypto/aes-glue.c
+index 1c6934544c1f..26d2b0263ba6 100644
+--- a/arch/arm64/crypto/aes-glue.c
++++ b/arch/arm64/crypto/aes-glue.c
+@@ -15,6 +15,7 @@
+ #include <crypto/internal/hash.h>
+ #include <crypto/internal/simd.h>
+ #include <crypto/internal/skcipher.h>
++#include <crypto/scatterwalk.h>
+ #include <linux/module.h>
+ #include <linux/cpufeature.h>
+ #include <crypto/xts.h>
+@@ -31,6 +32,8 @@
+ #define aes_ecb_decrypt		ce_aes_ecb_decrypt
+ #define aes_cbc_encrypt		ce_aes_cbc_encrypt
+ #define aes_cbc_decrypt		ce_aes_cbc_decrypt
++#define aes_cbc_cts_encrypt	ce_aes_cbc_cts_encrypt
++#define aes_cbc_cts_decrypt	ce_aes_cbc_cts_decrypt
+ #define aes_ctr_encrypt		ce_aes_ctr_encrypt
+ #define aes_xts_encrypt		ce_aes_xts_encrypt
+ #define aes_xts_decrypt		ce_aes_xts_decrypt
+@@ -45,6 +48,8 @@ MODULE_DESCRIPTION("AES-ECB/CBC/CTR/XTS using ARMv8 Crypto Extensions");
+ #define aes_ecb_decrypt		neon_aes_ecb_decrypt
+ #define aes_cbc_encrypt		neon_aes_cbc_encrypt
+ #define aes_cbc_decrypt		neon_aes_cbc_decrypt
++#define aes_cbc_cts_encrypt	neon_aes_cbc_cts_encrypt
++#define aes_cbc_cts_decrypt	neon_aes_cbc_cts_decrypt
+ #define aes_ctr_encrypt		neon_aes_ctr_encrypt
+ #define aes_xts_encrypt		neon_aes_xts_encrypt
+ #define aes_xts_decrypt		neon_aes_xts_decrypt
+@@ -73,6 +78,11 @@ asmlinkage void aes_cbc_encrypt(u8 out[], u8 const in[], u32 const rk[],
+ asmlinkage void aes_cbc_decrypt(u8 out[], u8 const in[], u32 const rk[],
+ 				int rounds, int blocks, u8 iv[]);
  
- 	.arch		armv8-a+crypto
++asmlinkage void aes_cbc_cts_encrypt(u8 out[], u8 const in[], u32 const rk[],
++				int rounds, int bytes, u8 const iv[]);
++asmlinkage void aes_cbc_cts_decrypt(u8 out[], u8 const in[], u32 const rk[],
++				int rounds, int bytes, u8 const iv[]);
++
+ asmlinkage void aes_ctr_encrypt(u8 out[], u8 const in[], u32 const rk[],
+ 				int rounds, int blocks, u8 ctr[]);
  
-+	xtsmask		.req	v16
+@@ -87,6 +97,12 @@ asmlinkage void aes_mac_update(u8 const in[], u32 const rk[], int rounds,
+ 			       int blocks, u8 dg[], int enc_before,
+ 			       int enc_after);
+ 
++struct cts_cbc_req_ctx {
++	struct scatterlist sg_src[2];
++	struct scatterlist sg_dst[2];
++	struct skcipher_request subreq;
++};
 +
-+	.macro		xts_reload_mask, tmp
-+	.endm
+ struct crypto_aes_xts_ctx {
+ 	struct crypto_aes_ctx key1;
+ 	struct crypto_aes_ctx __aligned(8) key2;
+@@ -209,6 +225,136 @@ static int cbc_decrypt(struct skcipher_request *req)
+ 	return err;
+ }
+ 
++static int cts_cbc_init_tfm(struct crypto_skcipher *tfm)
++{
++	crypto_skcipher_set_reqsize(tfm, sizeof(struct cts_cbc_req_ctx));
++	return 0;
++}
 +
- 	/* preload all round keys */
- 	.macro		load_round_keys, rounds, rk
- 	cmp		\rounds, #12
++static int cts_cbc_encrypt(struct skcipher_request *req)
++{
++	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
++	struct crypto_aes_ctx *ctx = crypto_skcipher_ctx(tfm);
++	struct cts_cbc_req_ctx *rctx = skcipher_request_ctx(req);
++	int err, rounds = 6 + ctx->key_length / 4;
++	int cbc_blocks = DIV_ROUND_UP(req->cryptlen, AES_BLOCK_SIZE) - 2;
++	struct scatterlist *src = req->src, *dst = req->dst;
++	struct skcipher_walk walk;
++
++	skcipher_request_set_tfm(&rctx->subreq, tfm);
++
++	if (req->cryptlen == AES_BLOCK_SIZE)
++		cbc_blocks = 1;
++
++	if (cbc_blocks > 0) {
++		unsigned int blocks;
++
++		skcipher_request_set_crypt(&rctx->subreq, req->src, req->dst,
++					   cbc_blocks * AES_BLOCK_SIZE,
++					   req->iv);
++
++		err = skcipher_walk_virt(&walk, &rctx->subreq, false);
++
++		while ((blocks = (walk.nbytes / AES_BLOCK_SIZE))) {
++			kernel_neon_begin();
++			aes_cbc_encrypt(walk.dst.virt.addr, walk.src.virt.addr,
++					ctx->key_enc, rounds, blocks, walk.iv);
++			kernel_neon_end();
++			err = skcipher_walk_done(&walk,
++						 walk.nbytes % AES_BLOCK_SIZE);
++		}
++		if (err)
++			return err;
++
++		if (req->cryptlen == AES_BLOCK_SIZE)
++			return 0;
++
++		dst = src = scatterwalk_ffwd(rctx->sg_src, req->src,
++					     rctx->subreq.cryptlen);
++		if (req->dst != req->src)
++			dst = scatterwalk_ffwd(rctx->sg_dst, req->dst,
++					       rctx->subreq.cryptlen);
++	}
++
++	/* handle ciphertext stealing */
++	skcipher_request_set_crypt(&rctx->subreq, src, dst,
++				   req->cryptlen - cbc_blocks * AES_BLOCK_SIZE,
++				   req->iv);
++
++	err = skcipher_walk_virt(&walk, &rctx->subreq, false);
++	if (err)
++		return err;
++
++	kernel_neon_begin();
++	aes_cbc_cts_encrypt(walk.dst.virt.addr, walk.src.virt.addr,
++			    ctx->key_enc, rounds, walk.nbytes, walk.iv);
++	kernel_neon_end();
++
++	return skcipher_walk_done(&walk, 0);
++}
++
++static int cts_cbc_decrypt(struct skcipher_request *req)
++{
++	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
++	struct crypto_aes_ctx *ctx = crypto_skcipher_ctx(tfm);
++	struct cts_cbc_req_ctx *rctx = skcipher_request_ctx(req);
++	int err, rounds = 6 + ctx->key_length / 4;
++	int cbc_blocks = DIV_ROUND_UP(req->cryptlen, AES_BLOCK_SIZE) - 2;
++	struct scatterlist *src = req->src, *dst = req->dst;
++	struct skcipher_walk walk;
++
++	skcipher_request_set_tfm(&rctx->subreq, tfm);
++
++	if (req->cryptlen == AES_BLOCK_SIZE)
++		cbc_blocks = 1;
++
++	if (cbc_blocks > 0) {
++		unsigned int blocks;
++
++		skcipher_request_set_crypt(&rctx->subreq, req->src, req->dst,
++					   cbc_blocks * AES_BLOCK_SIZE,
++					   req->iv);
++
++		err = skcipher_walk_virt(&walk, &rctx->subreq, false);
++
++		while ((blocks = (walk.nbytes / AES_BLOCK_SIZE))) {
++			kernel_neon_begin();
++			aes_cbc_decrypt(walk.dst.virt.addr, walk.src.virt.addr,
++					ctx->key_dec, rounds, blocks, walk.iv);
++			kernel_neon_end();
++			err = skcipher_walk_done(&walk,
++						 walk.nbytes % AES_BLOCK_SIZE);
++		}
++		if (err)
++			return err;
++
++		if (req->cryptlen == AES_BLOCK_SIZE)
++			return 0;
++
++		dst = src = scatterwalk_ffwd(rctx->sg_src, req->src,
++					     rctx->subreq.cryptlen);
++		if (req->dst != req->src)
++			dst = scatterwalk_ffwd(rctx->sg_dst, req->dst,
++					       rctx->subreq.cryptlen);
++	}
++
++	/* handle ciphertext stealing */
++	skcipher_request_set_crypt(&rctx->subreq, src, dst,
++				   req->cryptlen - cbc_blocks * AES_BLOCK_SIZE,
++				   req->iv);
++
++	err = skcipher_walk_virt(&walk, &rctx->subreq, false);
++	if (err)
++		return err;
++
++	kernel_neon_begin();
++	aes_cbc_cts_decrypt(walk.dst.virt.addr, walk.src.virt.addr,
++			    ctx->key_dec, rounds, walk.nbytes, walk.iv);
++	kernel_neon_end();
++
++	return skcipher_walk_done(&walk, 0);
++}
++
+ static int ctr_encrypt(struct skcipher_request *req)
+ {
+ 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+@@ -334,6 +480,25 @@ static struct skcipher_alg aes_algs[] = { {
+ 	.setkey		= skcipher_aes_setkey,
+ 	.encrypt	= cbc_encrypt,
+ 	.decrypt	= cbc_decrypt,
++}, {
++	.base = {
++		.cra_name		= "__cts(cbc(aes))",
++		.cra_driver_name	= "__cts-cbc-aes-" MODE,
++		.cra_priority		= PRIO,
++		.cra_flags		= CRYPTO_ALG_INTERNAL,
++		.cra_blocksize		= 1,
++		.cra_ctxsize		= sizeof(struct crypto_aes_ctx),
++		.cra_module		= THIS_MODULE,
++	},
++	.min_keysize	= AES_MIN_KEY_SIZE,
++	.max_keysize	= AES_MAX_KEY_SIZE,
++	.ivsize		= AES_BLOCK_SIZE,
++	.chunksize	= AES_BLOCK_SIZE,
++	.walksize	= 2 * AES_BLOCK_SIZE,
++	.setkey		= skcipher_aes_setkey,
++	.encrypt	= cts_cbc_encrypt,
++	.decrypt	= cts_cbc_decrypt,
++	.init		= cts_cbc_init_tfm,
+ }, {
+ 	.base = {
+ 		.cra_name		= "__ctr(aes)",
 diff --git a/arch/arm64/crypto/aes-modes.S b/arch/arm64/crypto/aes-modes.S
-index 82931fba53d2..5c0fa7905d24 100644
+index 35632d11200f..82931fba53d2 100644
 --- a/arch/arm64/crypto/aes-modes.S
 +++ b/arch/arm64/crypto/aes-modes.S
-@@ -340,17 +340,19 @@ AES_ENDPROC(aes_ctr_encrypt)
- 	 *		   int blocks, u8 const rk2[], u8 iv[], int first)
- 	 */
+@@ -170,6 +170,84 @@ AES_ENTRY(aes_cbc_decrypt)
+ AES_ENDPROC(aes_cbc_decrypt)
  
--	.macro		next_tweak, out, in, const, tmp
-+	.macro		next_tweak, out, in, tmp
- 	sshr		\tmp\().2d,  \in\().2d,   #63
--	and		\tmp\().16b, \tmp\().16b, \const\().16b
-+	and		\tmp\().16b, \tmp\().16b, xtsmask.16b
- 	add		\out\().2d,  \in\().2d,   \in\().2d
- 	ext		\tmp\().16b, \tmp\().16b, \tmp\().16b, #8
- 	eor		\out\().16b, \out\().16b, \tmp\().16b
- 	.endm
  
--.Lxts_mul_x:
--CPU_LE(	.quad		1, 0x87		)
--CPU_BE(	.quad		0x87, 1		)
-+	.macro		xts_load_mask, tmp
-+	movi		xtsmask.2s, #0x1
-+	movi		\tmp\().2s, #0x87
-+	uzp1		xtsmask.4s, xtsmask.4s, \tmp\().4s
-+	.endm
- 
- AES_ENTRY(aes_xts_encrypt)
- 	stp		x29, x30, [sp, #-16]!
-@@ -362,24 +364,24 @@ AES_ENTRY(aes_xts_encrypt)
- 	enc_prepare	w3, x5, x8
- 	encrypt_block	v4, w3, x5, x8, w7		/* first tweak */
- 	enc_switch_key	w3, x2, x8
--	ldr		q7, .Lxts_mul_x
-+	xts_load_mask	v8
- 	b		.LxtsencNx
- 
- .Lxtsencnotfirst:
- 	enc_prepare	w3, x2, x8
- .LxtsencloopNx:
--	ldr		q7, .Lxts_mul_x
--	next_tweak	v4, v4, v7, v8
-+	xts_reload_mask	v8
-+	next_tweak	v4, v4, v8
- .LxtsencNx:
- 	subs		w4, w4, #4
- 	bmi		.Lxtsenc1x
- 	ld1		{v0.16b-v3.16b}, [x1], #64	/* get 4 pt blocks */
--	next_tweak	v5, v4, v7, v8
-+	next_tweak	v5, v4, v8
- 	eor		v0.16b, v0.16b, v4.16b
--	next_tweak	v6, v5, v7, v8
-+	next_tweak	v6, v5, v8
- 	eor		v1.16b, v1.16b, v5.16b
- 	eor		v2.16b, v2.16b, v6.16b
--	next_tweak	v7, v6, v7, v8
-+	next_tweak	v7, v6, v8
- 	eor		v3.16b, v3.16b, v7.16b
- 	bl		aes_encrypt_block4x
- 	eor		v3.16b, v3.16b, v7.16b
-@@ -401,7 +403,7 @@ AES_ENTRY(aes_xts_encrypt)
- 	st1		{v0.16b}, [x0], #16
- 	subs		w4, w4, #1
- 	beq		.Lxtsencout
--	next_tweak	v4, v4, v7, v8
-+	next_tweak	v4, v4, v8
- 	b		.Lxtsencloop
- .Lxtsencout:
- 	st1		{v4.16b}, [x6]
-@@ -420,24 +422,24 @@ AES_ENTRY(aes_xts_decrypt)
- 	enc_prepare	w3, x5, x8
- 	encrypt_block	v4, w3, x5, x8, w7		/* first tweak */
- 	dec_prepare	w3, x2, x8
--	ldr		q7, .Lxts_mul_x
-+	xts_load_mask	v8
- 	b		.LxtsdecNx
- 
- .Lxtsdecnotfirst:
- 	dec_prepare	w3, x2, x8
- .LxtsdecloopNx:
--	ldr		q7, .Lxts_mul_x
--	next_tweak	v4, v4, v7, v8
-+	xts_reload_mask	v8
-+	next_tweak	v4, v4, v8
- .LxtsdecNx:
- 	subs		w4, w4, #4
- 	bmi		.Lxtsdec1x
- 	ld1		{v0.16b-v3.16b}, [x1], #64	/* get 4 ct blocks */
--	next_tweak	v5, v4, v7, v8
-+	next_tweak	v5, v4, v8
- 	eor		v0.16b, v0.16b, v4.16b
--	next_tweak	v6, v5, v7, v8
-+	next_tweak	v6, v5, v8
- 	eor		v1.16b, v1.16b, v5.16b
- 	eor		v2.16b, v2.16b, v6.16b
--	next_tweak	v7, v6, v7, v8
-+	next_tweak	v7, v6, v8
- 	eor		v3.16b, v3.16b, v7.16b
- 	bl		aes_decrypt_block4x
- 	eor		v3.16b, v3.16b, v7.16b
-@@ -459,7 +461,7 @@ AES_ENTRY(aes_xts_decrypt)
- 	st1		{v0.16b}, [x0], #16
- 	subs		w4, w4, #1
- 	beq		.Lxtsdecout
--	next_tweak	v4, v4, v7, v8
-+	next_tweak	v4, v4, v8
- 	b		.Lxtsdecloop
- .Lxtsdecout:
- 	st1		{v4.16b}, [x6]
-diff --git a/arch/arm64/crypto/aes-neon.S b/arch/arm64/crypto/aes-neon.S
-index 1c7b45b7268e..29100f692e8a 100644
---- a/arch/arm64/crypto/aes-neon.S
-+++ b/arch/arm64/crypto/aes-neon.S
-@@ -14,6 +14,12 @@
- #define AES_ENTRY(func)		ENTRY(neon_ ## func)
- #define AES_ENDPROC(func)	ENDPROC(neon_ ## func)
- 
-+	xtsmask		.req	v7
++	/*
++	 * aes_cbc_cts_encrypt(u8 out[], u8 const in[], u32 const rk[],
++	 *		       int rounds, int bytes, u8 const iv[])
++	 * aes_cbc_cts_decrypt(u8 out[], u8 const in[], u32 const rk[],
++	 *		       int rounds, int bytes, u8 const iv[])
++	 */
 +
-+	.macro		xts_reload_mask, tmp
-+	xts_load_mask	\tmp
-+	.endm
++AES_ENTRY(aes_cbc_cts_encrypt)
++	adr_l		x8, .Lcts_permute_table
++	sub		x4, x4, #16
++	add		x9, x8, #32
++	add		x8, x8, x4
++	sub		x9, x9, x4
++	ld1		{v3.16b}, [x8]
++	ld1		{v4.16b}, [x9]
 +
- 	/* multiply by polynomial 'x' in GF(2^8) */
- 	.macro		mul_by_x, out, in, temp, const
- 	sshr		\temp, \in, #7
++	ld1		{v0.16b}, [x1], x4		/* overlapping loads */
++	ld1		{v1.16b}, [x1]
++
++	ld1		{v5.16b}, [x5]			/* get iv */
++	enc_prepare	w3, x2, x6
++
++	eor		v0.16b, v0.16b, v5.16b		/* xor with iv */
++	tbl		v1.16b, {v1.16b}, v4.16b
++	encrypt_block	v0, w3, x2, x6, w7
++
++	eor		v1.16b, v1.16b, v0.16b
++	tbl		v0.16b, {v0.16b}, v3.16b
++	encrypt_block	v1, w3, x2, x6, w7
++
++	add		x4, x0, x4
++	st1		{v0.16b}, [x4]			/* overlapping stores */
++	st1		{v1.16b}, [x0]
++	ret
++AES_ENDPROC(aes_cbc_cts_encrypt)
++
++AES_ENTRY(aes_cbc_cts_decrypt)
++	adr_l		x8, .Lcts_permute_table
++	sub		x4, x4, #16
++	add		x9, x8, #32
++	add		x8, x8, x4
++	sub		x9, x9, x4
++	ld1		{v3.16b}, [x8]
++	ld1		{v4.16b}, [x9]
++
++	ld1		{v0.16b}, [x1], x4		/* overlapping loads */
++	ld1		{v1.16b}, [x1]
++
++	ld1		{v5.16b}, [x5]			/* get iv */
++	dec_prepare	w3, x2, x6
++
++	tbl		v2.16b, {v1.16b}, v4.16b
++	decrypt_block	v0, w3, x2, x6, w7
++	eor		v2.16b, v2.16b, v0.16b
++
++	tbx		v0.16b, {v1.16b}, v4.16b
++	tbl		v2.16b, {v2.16b}, v3.16b
++	decrypt_block	v0, w3, x2, x6, w7
++	eor		v0.16b, v0.16b, v5.16b		/* xor with iv */
++
++	add		x4, x0, x4
++	st1		{v2.16b}, [x4]			/* overlapping stores */
++	st1		{v0.16b}, [x0]
++	ret
++AES_ENDPROC(aes_cbc_cts_decrypt)
++
++	.section	".rodata", "a"
++	.align		6
++.Lcts_permute_table:
++	.byte		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
++	.byte		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
++	.byte		 0x0,  0x1,  0x2,  0x3,  0x4,  0x5,  0x6,  0x7
++	.byte		 0x8,  0x9,  0xa,  0xb,  0xc,  0xd,  0xe,  0xf
++	.byte		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
++	.byte		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
++	.previous
++
++
+ 	/*
+ 	 * aes_ctr_encrypt(u8 out[], u8 const in[], u8 const rk[], int rounds,
+ 	 *		   int blocks, u8 ctr[])
+@@ -253,7 +331,6 @@ AES_ENTRY(aes_ctr_encrypt)
+ 	ins		v4.d[0], x7
+ 	b		.Lctrcarrydone
+ AES_ENDPROC(aes_ctr_encrypt)
+-	.ltorg
+ 
+ 
+ 	/*
 -- 
 2.18.0
 
@@ -195,52 +370,72 @@ Cortex-A53 @ 1 GHz
 
 BEFORE:
 
-testing speed of async xts(aes) (xts-aes-ce) encryption
-0 (256 bit key,   16 byte blocks): 1338059 ops in 1 secs ( 21408944 bytes)
-1 (256 bit key,   64 byte blocks): 1249191 ops in 1 secs ( 79948224 bytes)
-2 (256 bit key,  256 byte blocks):  918979 ops in 1 secs (235258624 bytes)
-3 (256 bit key, 1024 byte blocks):  456993 ops in 1 secs (467960832 bytes)
-4 (256 bit key, 8192 byte blocks):   74937 ops in 1 secs (613883904 bytes)
-5 (512 bit key,   16 byte blocks): 1269281 ops in 1 secs ( 20308496 bytes)
-6 (512 bit key,   64 byte blocks): 1176362 ops in 1 secs ( 75287168 bytes)
-7 (512 bit key,  256 byte blocks):  840553 ops in 1 secs (215181568 bytes)
-8 (512 bit key, 1024 byte blocks):  400329 ops in 1 secs (409936896 bytes)
-9 (512 bit key, 8192 byte blocks):   64268 ops in 1 secs (526483456 bytes)
+testing speed of async cts(cbc(aes)) (cts(cbc-aes-ce)) encryption
+ 0 (128 bit key,   16 byte blocks): 1407866 ops in 1 secs ( 22525856 bytes)
+ 1 (128 bit key,   64 byte blocks):  466814 ops in 1 secs ( 29876096 bytes)
+ 2 (128 bit key,  256 byte blocks):  401023 ops in 1 secs (102661888 bytes)
+ 3 (128 bit key, 1024 byte blocks):  258238 ops in 1 secs (264435712 bytes)
+ 4 (128 bit key, 8192 byte blocks):   57905 ops in 1 secs (474357760 bytes)
+ 5 (192 bit key,   16 byte blocks): 1388333 ops in 1 secs ( 22213328 bytes)
+ 6 (192 bit key,   64 byte blocks):  448595 ops in 1 secs ( 28710080 bytes)
+ 7 (192 bit key,  256 byte blocks):  376951 ops in 1 secs ( 96499456 bytes)
+ 8 (192 bit key, 1024 byte blocks):  231635 ops in 1 secs (237194240 bytes)
+ 9 (192 bit key, 8192 byte blocks):   43345 ops in 1 secs (355082240 bytes)
+10 (256 bit key,   16 byte blocks): 1370820 ops in 1 secs ( 21933120 bytes)
+11 (256 bit key,   64 byte blocks):  452352 ops in 1 secs ( 28950528 bytes)
+12 (256 bit key,  256 byte blocks):  376506 ops in 1 secs ( 96385536 bytes)
+13 (256 bit key, 1024 byte blocks):  223219 ops in 1 secs (228576256 bytes)
+14 (256 bit key, 8192 byte blocks):   44874 ops in 1 secs (367607808 bytes)
 
-testing speed of async xts(aes) (xts-aes-ce) decryption
-0 (256 bit key,   16 byte blocks): 1333819 ops in 1 secs ( 21341104 bytes)
-1 (256 bit key,   64 byte blocks): 1239393 ops in 1 secs ( 79321152 bytes)
-2 (256 bit key,  256 byte blocks):  913715 ops in 1 secs (233911040 bytes)
-3 (256 bit key, 1024 byte blocks):  455176 ops in 1 secs (466100224 bytes)
-4 (256 bit key, 8192 byte blocks):   74343 ops in 1 secs (609017856 bytes)
-5 (512 bit key,   16 byte blocks): 1274941 ops in 1 secs ( 20399056 bytes)
-6 (512 bit key,   64 byte blocks): 1182107 ops in 1 secs ( 75654848 bytes)
-7 (512 bit key,  256 byte blocks):  844930 ops in 1 secs (216302080 bytes)
-8 (512 bit key, 1024 byte blocks):  401614 ops in 1 secs (411252736 bytes)
-9 (512 bit key, 8192 byte blocks):   63913 ops in 1 secs (523575296 bytes)
+testing speed of async cts(cbc(aes)) (cts(cbc-aes-ce)) decryption
+ 0 (128 bit key,   16 byte blocks): 1402795 ops in 1 secs ( 22444720 bytes)
+ 1 (128 bit key,   64 byte blocks):  403300 ops in 1 secs ( 25811200 bytes)
+ 2 (128 bit key,  256 byte blocks):  367710 ops in 1 secs ( 94133760 bytes)
+ 3 (128 bit key, 1024 byte blocks):  269118 ops in 1 secs (275576832 bytes)
+ 4 (128 bit key, 8192 byte blocks):   74706 ops in 1 secs (611991552 bytes)
+ 5 (192 bit key,   16 byte blocks): 1381390 ops in 1 secs ( 22102240 bytes)
+ 6 (192 bit key,   64 byte blocks):  388555 ops in 1 secs ( 24867520 bytes)
+ 7 (192 bit key,  256 byte blocks):  350282 ops in 1 secs ( 89672192 bytes)
+ 8 (192 bit key, 1024 byte blocks):  251268 ops in 1 secs (257298432 bytes)
+ 9 (192 bit key, 8192 byte blocks):   56535 ops in 1 secs (463134720 bytes)
+10 (256 bit key,   16 byte blocks): 1364334 ops in 1 secs ( 21829344 bytes)
+11 (256 bit key,   64 byte blocks):  392610 ops in 1 secs ( 25127040 bytes)
+12 (256 bit key,  256 byte blocks):  351150 ops in 1 secs ( 89894400 bytes)
+13 (256 bit key, 1024 byte blocks):  247455 ops in 1 secs (253393920 bytes)
+14 (256 bit key, 8192 byte blocks):   62530 ops in 1 secs (512245760 bytes)
 
 AFTER:
 
-testing speed of async xts(aes) (xts-aes-ce) encryption
-0 (256 bit key,   16 byte blocks): 1398063 ops in 1 secs ( 22369008 bytes)
-1 (256 bit key,   64 byte blocks): 1302694 ops in 1 secs ( 83372416 bytes)
-2 (256 bit key,  256 byte blocks):  951692 ops in 1 secs (243633152 bytes)
-3 (256 bit key, 1024 byte blocks):  473198 ops in 1 secs (484554752 bytes)
-4 (256 bit key, 8192 byte blocks):   77204 ops in 1 secs (632455168 bytes)
-5 (512 bit key,   16 byte blocks): 1323582 ops in 1 secs ( 21177312 bytes)
-6 (512 bit key,   64 byte blocks): 1222306 ops in 1 secs ( 78227584 bytes)
-7 (512 bit key,  256 byte blocks):  871791 ops in 1 secs (223178496 bytes)
-8 (512 bit key, 1024 byte blocks):  413557 ops in 1 secs (423482368 bytes)
-9 (512 bit key, 8192 byte blocks):   66014 ops in 1 secs (540786688 bytes)
+testing speed of async cts(cbc(aes)) (cts-cbc-aes-ce) encryption
+ 0 (128 bit key,   16 byte blocks): 1380568 ops in 1 secs ( 22089088 bytes)
+ 1 (128 bit key,   64 byte blocks):  692731 ops in 1 secs ( 44334784 bytes)
+ 2 (128 bit key,  256 byte blocks):  556393 ops in 1 secs (142436608 bytes)
+ 3 (128 bit key, 1024 byte blocks):  314635 ops in 1 secs (322186240 bytes)
+ 4 (128 bit key, 8192 byte blocks):   57550 ops in 1 secs (471449600 bytes)
+ 5 (192 bit key,   16 byte blocks): 1367027 ops in 1 secs ( 21872432 bytes)
+ 6 (192 bit key,   64 byte blocks):  675058 ops in 1 secs ( 43203712 bytes)
+ 7 (192 bit key,  256 byte blocks):  523177 ops in 1 secs (133933312 bytes)
+ 8 (192 bit key, 1024 byte blocks):  279235 ops in 1 secs (285936640 bytes)
+ 9 (192 bit key, 8192 byte blocks):   46316 ops in 1 secs (379420672 bytes)
+10 (256 bit key,   16 byte blocks): 1353576 ops in 1 secs ( 21657216 bytes)
+11 (256 bit key,   64 byte blocks):  664523 ops in 1 secs ( 42529472 bytes)
+12 (256 bit key,  256 byte blocks):  508141 ops in 1 secs (130084096 bytes)
+13 (256 bit key, 1024 byte blocks):  264386 ops in 1 secs (270731264 bytes)
+14 (256 bit key, 8192 byte blocks):   47224 ops in 1 secs (386859008 bytes)
 
-testing speed of async xts(aes) (xts-aes-ce) decryption
-0 (256 bit key,   16 byte blocks): 1399388 ops in 1 secs ( 22390208 bytes)
-1 (256 bit key,   64 byte blocks): 1300861 ops in 1 secs ( 83255104 bytes)
-2 (256 bit key,  256 byte blocks):  951950 ops in 1 secs (243699200 bytes)
-3 (256 bit key, 1024 byte blocks):  473399 ops in 1 secs (484760576 bytes)
-4 (256 bit key, 8192 byte blocks):   77168 ops in 1 secs (632160256 bytes)
-5 (512 bit key,   16 byte blocks): 1317833 ops in 1 secs ( 21085328 bytes)
-6 (512 bit key,   64 byte blocks): 1217145 ops in 1 secs ( 77897280 bytes)
-7 (512 bit key,  256 byte blocks):  868323 ops in 1 secs (222290688 bytes)
-8 (512 bit key, 1024 byte blocks):  412821 ops in 1 secs (422728704 bytes)
-9 (512 bit key, 8192 byte blocks):   65919 ops in 1 secs (540008448 bytes)
+testing speed of async cts(cbc(aes)) (cts-cbc-aes-ce) decryption
+ 0 (128 bit key,   16 byte blocks): 1388553 ops in 1 secs ( 22216848 bytes)
+ 1 (128 bit key,   64 byte blocks):  688402 ops in 1 secs ( 44057728 bytes)
+ 2 (128 bit key,  256 byte blocks):  589268 ops in 1 secs (150852608 bytes)
+ 3 (128 bit key, 1024 byte blocks):  372238 ops in 1 secs (381171712 bytes)
+ 4 (128 bit key, 8192 byte blocks):   75691 ops in 1 secs (620060672 bytes)
+ 5 (192 bit key,   16 byte blocks): 1366220 ops in 1 secs ( 21859520 bytes)
+ 6 (192 bit key,   64 byte blocks):  666889 ops in 1 secs ( 42680896 bytes)
+ 7 (192 bit key,  256 byte blocks):  561809 ops in 1 secs (143823104 bytes)
+ 8 (192 bit key, 1024 byte blocks):  344117 ops in 1 secs (352375808 bytes)
+ 9 (192 bit key, 8192 byte blocks):   63150 ops in 1 secs (517324800 bytes)
+10 (256 bit key,   16 byte blocks): 1349266 ops in 1 secs ( 21588256 bytes)
+11 (256 bit key,   64 byte blocks):  661056 ops in 1 secs ( 42307584 bytes)
+12 (256 bit key,  256 byte blocks):  550261 ops in 1 secs (140866816 bytes)
+13 (256 bit key, 1024 byte blocks):  332947 ops in 1 secs (340937728 bytes)
+14 (256 bit key, 8192 byte blocks):   68759 ops in 1 secs (563273728 bytes)
