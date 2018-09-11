@@ -1,14 +1,15 @@
 From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: [PATCH net-next v3 14/17] zinc: Curve25519 generic C implementations and selftest
-Date: Mon, 10 Sep 2018 19:08:35 -0600
-Message-ID: <20180911010838.8818-16-Jason@zx2c4.com>
+Subject: [PATCH net-next v3 15/17] zinc: Curve25519 ARM implementation
+Date: Mon, 10 Sep 2018 19:08:36 -0600
+Message-ID: <20180911010838.8818-17-Jason@zx2c4.com>
 References: <20180911010838.8818-1-Jason@zx2c4.com>
 Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
         Andy Lutomirski <luto@kernel.org>,
         Samuel Neves <sneves@dei.uc.pt>,
+        "D . J . Bernstein" <djb@cr.yp.to>,
         Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
-        Karthikeyan Bhargavan <karthik.bhargavan@gmail.com>,
-        linux-crypto@vger.kernel.org
+        Russell King <linux@armlinux.org.uk>,
+        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org
 To: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
         davem@davemloft.net, gregkh@linuxfoundation.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
@@ -16,3204 +17,2194 @@ In-Reply-To: <20180911010838.8818-1-Jason@zx2c4.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This contains two formally verified C implementations of the Curve25519
-scalar multiplication function, one for 32-bit systems, and one for
-64-bit systems whose compiler supports efficient 128-bit integer types.
-Not only are these implementations formally verified, but they are also
-the fastest available C implementations. They have been modified to be
-friendly to kernel space and to be generally less horrendous looking,
-but still an effort has been made to retain their formally verified
-characteristic, and so the C might look slightly unidiomatic.
-
-The 64-bit version comes from HACL*: https://github.com/project-everest/hacl-star
-The 32-bit version comes from Fiat: https://github.com/mit-plv/fiat-crypto
-
-Information: https://cr.yp.to/ecdh.html
+This comes from Dan Bernstein and Peter Schwabe's public domain NEON
+code, and has been modified to be friendly for kernel space, as well as
+removing some qhasm strangeness to be more idiomatic.
 
 Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
 Cc: Andy Lutomirski <luto@kernel.org>
 Cc: Greg KH <gregkh@linuxfoundation.org>
 Cc: Samuel Neves <sneves@dei.uc.pt>
+Cc: D. J. Bernstein <djb@cr.yp.to>
 Cc: Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>
-Cc: Karthikeyan Bhargavan <karthik.bhargavan@gmail.com>
+Cc: Russell King <linux@armlinux.org.uk>
+Cc: linux-arm-kernel@lists.infradead.org
 Cc: linux-crypto@vger.kernel.org
 ---
- include/zinc/curve25519.h               |   28 +
- lib/zinc/Kconfig                        |    4 +
- lib/zinc/Makefile                       |    4 +
- lib/zinc/curve25519/curve25519-fiat32.h |  862 +++++++++++++++
- lib/zinc/curve25519/curve25519-hacl64.h |  785 ++++++++++++++
- lib/zinc/curve25519/curve25519.c        |   83 ++
- lib/zinc/main.c                         |    5 +
- lib/zinc/selftest/curve25519.h          | 1321 +++++++++++++++++++++++
- 8 files changed, 3092 insertions(+)
- create mode 100644 include/zinc/curve25519.h
- create mode 100644 lib/zinc/curve25519/curve25519-fiat32.h
- create mode 100644 lib/zinc/curve25519/curve25519-hacl64.h
- create mode 100644 lib/zinc/curve25519/curve25519.c
- create mode 100644 lib/zinc/selftest/curve25519.h
+ lib/zinc/Makefile                         |    4 +
+ lib/zinc/curve25519/curve25519-arm-glue.h |   46 +
+ lib/zinc/curve25519/curve25519-arm.S      | 2095 +++++++++++++++++++++
+ 3 files changed, 2145 insertions(+)
+ create mode 100644 lib/zinc/curve25519/curve25519-arm-glue.h
+ create mode 100644 lib/zinc/curve25519/curve25519-arm.S
 
-diff --git a/include/zinc/curve25519.h b/include/zinc/curve25519.h
-new file mode 100644
-index 000000000000..0e1caf02f1d8
---- /dev/null
-+++ b/include/zinc/curve25519.h
-@@ -0,0 +1,28 @@
-+/* SPDX-License-Identifier: GPL-2.0
-+ *
-+ * Copyright (C) 2015-2018 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
-+ */
-+
-+#ifndef _ZINC_CURVE25519_H
-+#define _ZINC_CURVE25519_H
-+
-+#include <linux/types.h>
-+
-+enum curve25519_lengths {
-+	CURVE25519_POINT_SIZE = 32
-+};
-+
-+bool __must_check curve25519(u8 mypublic[CURVE25519_POINT_SIZE],
-+			     const u8 secret[CURVE25519_POINT_SIZE],
-+			     const u8 basepoint[CURVE25519_POINT_SIZE]);
-+void curve25519_generate_secret(u8 secret[CURVE25519_POINT_SIZE]);
-+bool __must_check curve25519_generate_public(
-+	u8 pub[CURVE25519_POINT_SIZE], const u8 secret[CURVE25519_POINT_SIZE]);
-+
-+void curve25519_fpu_init(void);
-+
-+#ifdef DEBUG
-+bool curve25519_selftest(void);
-+#endif
-+
-+#endif /* _ZINC_CURVE25519_H */
-diff --git a/lib/zinc/Kconfig b/lib/zinc/Kconfig
-index 25b46a87509f..285ba527efed 100644
---- a/lib/zinc/Kconfig
-+++ b/lib/zinc/Kconfig
-@@ -24,6 +24,10 @@ config ZINC_BLAKE2S
- 	bool
- 	select ZINC
- 
-+config ZINC_CURVE25519
-+	bool
-+	select ZINC
-+
- config ZINC_DEBUG
- 	bool "Zinc cryptography library debugging and self-tests"
- 	depends on ZINC
 diff --git a/lib/zinc/Makefile b/lib/zinc/Makefile
-index eb1d86ed2be9..c545705effd5 100644
+index c545705effd5..8ab3093f80d8 100644
 --- a/lib/zinc/Makefile
 +++ b/lib/zinc/Makefile
-@@ -51,6 +51,10 @@ ifeq ($(CONFIG_ZINC_CHACHA20POLY1305),y)
- zinc-y += chacha20poly1305.o
+@@ -53,6 +53,10 @@ endif
+ 
+ ifeq ($(CONFIG_ZINC_CURVE25519),y)
+ zinc-y += curve25519/curve25519.o
++ifeq ($(CONFIG_ARM)$(CONFIG_KERNEL_MODE_NEON),yy)
++zinc-y += curve25519/curve25519-arm.o
++CFLAGS_curve25519.o += -include $(srctree)/$(src)/curve25519/curve25519-arm-glue.h
++endif
  endif
  
-+ifeq ($(CONFIG_ZINC_CURVE25519),y)
-+zinc-y += curve25519/curve25519.o
-+endif
-+
  ifeq ($(CONFIG_ZINC_BLAKE2S),y)
- zinc-y += blake2s/blake2s.o
- ifeq ($(CONFIG_X86_64)$(CONFIG_UML),y)
-diff --git a/lib/zinc/curve25519/curve25519-fiat32.h b/lib/zinc/curve25519/curve25519-fiat32.h
+diff --git a/lib/zinc/curve25519/curve25519-arm-glue.h b/lib/zinc/curve25519/curve25519-arm-glue.h
 new file mode 100644
-index 000000000000..8fa327cb1edc
+index 000000000000..36e8002e2477
 --- /dev/null
-+++ b/lib/zinc/curve25519/curve25519-fiat32.h
-@@ -0,0 +1,862 @@
-+/* SPDX-License-Identifier: GPL-2.0
-+ *
-+ * Copyright (C) 2015-2016 The fiat-crypto Authors.
-+ * Copyright (C) 2018 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
-+ *
-+ * This is a machine-generated formally verified implementation of Curve25519
-+ * ECDH from: <https://github.com/mit-plv/fiat-crypto>. Though originally
-+ * machine generated, it has been tweaked to be suitable for use in the kernel.
-+ * It is optimized for 32-bit machines and machines that cannot work efficiently
-+ * with 128-bit integer types.
-+ */
-+
-+/* fe means field element. Here the field is \Z/(2^255-19). An element t,
-+ * entries t[0]...t[9], represents the integer t[0]+2^26 t[1]+2^51 t[2]+2^77
-+ * t[3]+2^102 t[4]+...+2^230 t[9].
-+ * fe limbs are bounded by 1.125*2^26,1.125*2^25,1.125*2^26,1.125*2^25,etc.
-+ * Multiplication and carrying produce fe from fe_loose.
-+ */
-+typedef struct fe { u32 v[10]; } fe;
-+
-+/* fe_loose limbs are bounded by 3.375*2^26,3.375*2^25,3.375*2^26,3.375*2^25,etc
-+ * Addition and subtraction produce fe_loose from (fe, fe).
-+ */
-+typedef struct fe_loose { u32 v[10]; } fe_loose;
-+
-+static __always_inline void fe_frombytes_impl(u32 h[10], const u8 *s)
-+{
-+	/* Ignores top bit of s. */
-+	u32 a0 = get_unaligned_le32(s);
-+	u32 a1 = get_unaligned_le32(s+4);
-+	u32 a2 = get_unaligned_le32(s+8);
-+	u32 a3 = get_unaligned_le32(s+12);
-+	u32 a4 = get_unaligned_le32(s+16);
-+	u32 a5 = get_unaligned_le32(s+20);
-+	u32 a6 = get_unaligned_le32(s+24);
-+	u32 a7 = get_unaligned_le32(s+28);
-+	h[0] = a0&((1<<26)-1);                    /* 26 used, 32-26 left.   26 */
-+	h[1] = (a0>>26) | ((a1&((1<<19)-1))<< 6); /* (32-26) + 19 =  6+19 = 25 */
-+	h[2] = (a1>>19) | ((a2&((1<<13)-1))<<13); /* (32-19) + 13 = 13+13 = 26 */
-+	h[3] = (a2>>13) | ((a3&((1<< 6)-1))<<19); /* (32-13) +  6 = 19+ 6 = 25 */
-+	h[4] = (a3>> 6);                          /* (32- 6)              = 26 */
-+	h[5] = a4&((1<<25)-1);                    /*                        25 */
-+	h[6] = (a4>>25) | ((a5&((1<<19)-1))<< 7); /* (32-25) + 19 =  7+19 = 26 */
-+	h[7] = (a5>>19) | ((a6&((1<<12)-1))<<13); /* (32-19) + 12 = 13+12 = 25 */
-+	h[8] = (a6>>12) | ((a7&((1<< 6)-1))<<20); /* (32-12) +  6 = 20+ 6 = 26 */
-+	h[9] = (a7>> 6)&((1<<25)-1); /*                                     25 */
-+}
-+
-+static __always_inline void fe_frombytes(fe *h, const u8 *s)
-+{
-+	fe_frombytes_impl(h->v, s);
-+}
-+
-+static __always_inline u8 /*bool*/
-+addcarryx_u25(u8 /*bool*/ c, u32 a, u32 b, u32 *low)
-+{
-+	/* This function extracts 25 bits of result and 1 bit of carry
-+	 * (26 total), so a 32-bit intermediate is sufficient.
-+	 */
-+	u32 x = a + b + c;
-+	*low = x & ((1 << 25) - 1);
-+	return (x >> 25) & 1;
-+}
-+
-+static __always_inline u8 /*bool*/
-+addcarryx_u26(u8 /*bool*/ c, u32 a, u32 b, u32 *low)
-+{
-+	/* This function extracts 26 bits of result and 1 bit of carry
-+	 * (27 total), so a 32-bit intermediate is sufficient.
-+	 */
-+	u32 x = a + b + c;
-+	*low = x & ((1 << 26) - 1);
-+	return (x >> 26) & 1;
-+}
-+
-+static __always_inline u8 /*bool*/
-+subborrow_u25(u8 /*bool*/ c, u32 a, u32 b, u32 *low)
-+{
-+	/* This function extracts 25 bits of result and 1 bit of borrow
-+	 * (26 total), so a 32-bit intermediate is sufficient.
-+	 */
-+	u32 x = a - b - c;
-+	*low = x & ((1 << 25) - 1);
-+	return x >> 31;
-+}
-+
-+static __always_inline u8 /*bool*/
-+subborrow_u26(u8 /*bool*/ c, u32 a, u32 b, u32 *low)
-+{
-+	/* This function extracts 26 bits of result and 1 bit of borrow
-+	 *(27 total), so a 32-bit intermediate is sufficient.
-+	 */
-+	u32 x = a - b - c;
-+	*low = x & ((1 << 26) - 1);
-+	return x >> 31;
-+}
-+
-+static __always_inline u32 cmovznz32(u32 t, u32 z, u32 nz)
-+{
-+	t = -!!t; /* all set if nonzero, 0 if 0 */
-+	return (t&nz) | ((~t)&z);
-+}
-+
-+static __always_inline void fe_freeze(u32 out[10], const u32 in1[10])
-+{
-+	{ const u32 x17 = in1[9];
-+	{ const u32 x18 = in1[8];
-+	{ const u32 x16 = in1[7];
-+	{ const u32 x14 = in1[6];
-+	{ const u32 x12 = in1[5];
-+	{ const u32 x10 = in1[4];
-+	{ const u32 x8 = in1[3];
-+	{ const u32 x6 = in1[2];
-+	{ const u32 x4 = in1[1];
-+	{ const u32 x2 = in1[0];
-+	{ u32 x20; u8/*bool*/ x21 = subborrow_u26(0x0, x2, 0x3ffffed, &x20);
-+	{ u32 x23; u8/*bool*/ x24 = subborrow_u25(x21, x4, 0x1ffffff, &x23);
-+	{ u32 x26; u8/*bool*/ x27 = subborrow_u26(x24, x6, 0x3ffffff, &x26);
-+	{ u32 x29; u8/*bool*/ x30 = subborrow_u25(x27, x8, 0x1ffffff, &x29);
-+	{ u32 x32; u8/*bool*/ x33 = subborrow_u26(x30, x10, 0x3ffffff, &x32);
-+	{ u32 x35; u8/*bool*/ x36 = subborrow_u25(x33, x12, 0x1ffffff, &x35);
-+	{ u32 x38; u8/*bool*/ x39 = subborrow_u26(x36, x14, 0x3ffffff, &x38);
-+	{ u32 x41; u8/*bool*/ x42 = subborrow_u25(x39, x16, 0x1ffffff, &x41);
-+	{ u32 x44; u8/*bool*/ x45 = subborrow_u26(x42, x18, 0x3ffffff, &x44);
-+	{ u32 x47; u8/*bool*/ x48 = subborrow_u25(x45, x17, 0x1ffffff, &x47);
-+	{ u32 x49 = cmovznz32(x48, 0x0, 0xffffffff);
-+	{ u32 x50 = (x49 & 0x3ffffed);
-+	{ u32 x52; u8/*bool*/ x53 = addcarryx_u26(0x0, x20, x50, &x52);
-+	{ u32 x54 = (x49 & 0x1ffffff);
-+	{ u32 x56; u8/*bool*/ x57 = addcarryx_u25(x53, x23, x54, &x56);
-+	{ u32 x58 = (x49 & 0x3ffffff);
-+	{ u32 x60; u8/*bool*/ x61 = addcarryx_u26(x57, x26, x58, &x60);
-+	{ u32 x62 = (x49 & 0x1ffffff);
-+	{ u32 x64; u8/*bool*/ x65 = addcarryx_u25(x61, x29, x62, &x64);
-+	{ u32 x66 = (x49 & 0x3ffffff);
-+	{ u32 x68; u8/*bool*/ x69 = addcarryx_u26(x65, x32, x66, &x68);
-+	{ u32 x70 = (x49 & 0x1ffffff);
-+	{ u32 x72; u8/*bool*/ x73 = addcarryx_u25(x69, x35, x70, &x72);
-+	{ u32 x74 = (x49 & 0x3ffffff);
-+	{ u32 x76; u8/*bool*/ x77 = addcarryx_u26(x73, x38, x74, &x76);
-+	{ u32 x78 = (x49 & 0x1ffffff);
-+	{ u32 x80; u8/*bool*/ x81 = addcarryx_u25(x77, x41, x78, &x80);
-+	{ u32 x82 = (x49 & 0x3ffffff);
-+	{ u32 x84; u8/*bool*/ x85 = addcarryx_u26(x81, x44, x82, &x84);
-+	{ u32 x86 = (x49 & 0x1ffffff);
-+	{ u32 x88; addcarryx_u25(x85, x47, x86, &x88);
-+	out[0] = x52;
-+	out[1] = x56;
-+	out[2] = x60;
-+	out[3] = x64;
-+	out[4] = x68;
-+	out[5] = x72;
-+	out[6] = x76;
-+	out[7] = x80;
-+	out[8] = x84;
-+	out[9] = x88;
-+	}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
-+}
-+
-+static __always_inline void fe_tobytes(u8 s[32], const fe *f)
-+{
-+	u32 h[10];
-+	fe_freeze(h, f->v);
-+	s[0] = h[0] >> 0;
-+	s[1] = h[0] >> 8;
-+	s[2] = h[0] >> 16;
-+	s[3] = (h[0] >> 24) | (h[1] << 2);
-+	s[4] = h[1] >> 6;
-+	s[5] = h[1] >> 14;
-+	s[6] = (h[1] >> 22) | (h[2] << 3);
-+	s[7] = h[2] >> 5;
-+	s[8] = h[2] >> 13;
-+	s[9] = (h[2] >> 21) | (h[3] << 5);
-+	s[10] = h[3] >> 3;
-+	s[11] = h[3] >> 11;
-+	s[12] = (h[3] >> 19) | (h[4] << 6);
-+	s[13] = h[4] >> 2;
-+	s[14] = h[4] >> 10;
-+	s[15] = h[4] >> 18;
-+	s[16] = h[5] >> 0;
-+	s[17] = h[5] >> 8;
-+	s[18] = h[5] >> 16;
-+	s[19] = (h[5] >> 24) | (h[6] << 1);
-+	s[20] = h[6] >> 7;
-+	s[21] = h[6] >> 15;
-+	s[22] = (h[6] >> 23) | (h[7] << 3);
-+	s[23] = h[7] >> 5;
-+	s[24] = h[7] >> 13;
-+	s[25] = (h[7] >> 21) | (h[8] << 4);
-+	s[26] = h[8] >> 4;
-+	s[27] = h[8] >> 12;
-+	s[28] = (h[8] >> 20) | (h[9] << 6);
-+	s[29] = h[9] >> 2;
-+	s[30] = h[9] >> 10;
-+	s[31] = h[9] >> 18;
-+}
-+
-+/* h = f */
-+static __always_inline void fe_copy(fe *h, const fe *f)
-+{
-+	memmove(h, f, sizeof(u32) * 10);
-+}
-+
-+static __always_inline void fe_copy_lt(fe_loose *h, const fe *f)
-+{
-+	memmove(h, f, sizeof(u32) * 10);
-+}
-+
-+/* h = 0 */
-+static __always_inline void fe_0(fe *h)
-+{
-+	memset(h, 0, sizeof(u32) * 10);
-+}
-+
-+/* h = 1 */
-+static __always_inline void fe_1(fe *h)
-+{
-+	memset(h, 0, sizeof(u32) * 10);
-+	h->v[0] = 1;
-+}
-+
-+static void fe_add_impl(u32 out[10], const u32 in1[10], const u32 in2[10])
-+{
-+	{ const u32 x20 = in1[9];
-+	{ const u32 x21 = in1[8];
-+	{ const u32 x19 = in1[7];
-+	{ const u32 x17 = in1[6];
-+	{ const u32 x15 = in1[5];
-+	{ const u32 x13 = in1[4];
-+	{ const u32 x11 = in1[3];
-+	{ const u32 x9 = in1[2];
-+	{ const u32 x7 = in1[1];
-+	{ const u32 x5 = in1[0];
-+	{ const u32 x38 = in2[9];
-+	{ const u32 x39 = in2[8];
-+	{ const u32 x37 = in2[7];
-+	{ const u32 x35 = in2[6];
-+	{ const u32 x33 = in2[5];
-+	{ const u32 x31 = in2[4];
-+	{ const u32 x29 = in2[3];
-+	{ const u32 x27 = in2[2];
-+	{ const u32 x25 = in2[1];
-+	{ const u32 x23 = in2[0];
-+	out[0] = (x5 + x23);
-+	out[1] = (x7 + x25);
-+	out[2] = (x9 + x27);
-+	out[3] = (x11 + x29);
-+	out[4] = (x13 + x31);
-+	out[5] = (x15 + x33);
-+	out[6] = (x17 + x35);
-+	out[7] = (x19 + x37);
-+	out[8] = (x21 + x39);
-+	out[9] = (x20 + x38);
-+	}}}}}}}}}}}}}}}}}}}}
-+}
-+
-+/* h = f + g
-+ * Can overlap h with f or g.
-+ */
-+static __always_inline void fe_add(fe_loose *h, const fe *f, const fe *g)
-+{
-+	fe_add_impl(h->v, f->v, g->v);
-+}
-+
-+static void fe_sub_impl(u32 out[10], const u32 in1[10], const u32 in2[10])
-+{
-+	{ const u32 x20 = in1[9];
-+	{ const u32 x21 = in1[8];
-+	{ const u32 x19 = in1[7];
-+	{ const u32 x17 = in1[6];
-+	{ const u32 x15 = in1[5];
-+	{ const u32 x13 = in1[4];
-+	{ const u32 x11 = in1[3];
-+	{ const u32 x9 = in1[2];
-+	{ const u32 x7 = in1[1];
-+	{ const u32 x5 = in1[0];
-+	{ const u32 x38 = in2[9];
-+	{ const u32 x39 = in2[8];
-+	{ const u32 x37 = in2[7];
-+	{ const u32 x35 = in2[6];
-+	{ const u32 x33 = in2[5];
-+	{ const u32 x31 = in2[4];
-+	{ const u32 x29 = in2[3];
-+	{ const u32 x27 = in2[2];
-+	{ const u32 x25 = in2[1];
-+	{ const u32 x23 = in2[0];
-+	out[0] = ((0x7ffffda + x5) - x23);
-+	out[1] = ((0x3fffffe + x7) - x25);
-+	out[2] = ((0x7fffffe + x9) - x27);
-+	out[3] = ((0x3fffffe + x11) - x29);
-+	out[4] = ((0x7fffffe + x13) - x31);
-+	out[5] = ((0x3fffffe + x15) - x33);
-+	out[6] = ((0x7fffffe + x17) - x35);
-+	out[7] = ((0x3fffffe + x19) - x37);
-+	out[8] = ((0x7fffffe + x21) - x39);
-+	out[9] = ((0x3fffffe + x20) - x38);
-+	}}}}}}}}}}}}}}}}}}}}
-+}
-+
-+/* h = f - g
-+ * Can overlap h with f or g.
-+ */
-+static __always_inline void fe_sub(fe_loose *h, const fe *f, const fe *g)
-+{
-+	fe_sub_impl(h->v, f->v, g->v);
-+}
-+
-+static void fe_mul_impl(u32 out[10], const u32 in1[10], const u32 in2[10])
-+{
-+	{ const u32 x20 = in1[9];
-+	{ const u32 x21 = in1[8];
-+	{ const u32 x19 = in1[7];
-+	{ const u32 x17 = in1[6];
-+	{ const u32 x15 = in1[5];
-+	{ const u32 x13 = in1[4];
-+	{ const u32 x11 = in1[3];
-+	{ const u32 x9 = in1[2];
-+	{ const u32 x7 = in1[1];
-+	{ const u32 x5 = in1[0];
-+	{ const u32 x38 = in2[9];
-+	{ const u32 x39 = in2[8];
-+	{ const u32 x37 = in2[7];
-+	{ const u32 x35 = in2[6];
-+	{ const u32 x33 = in2[5];
-+	{ const u32 x31 = in2[4];
-+	{ const u32 x29 = in2[3];
-+	{ const u32 x27 = in2[2];
-+	{ const u32 x25 = in2[1];
-+	{ const u32 x23 = in2[0];
-+	{ u64 x40 = ((u64)x23 * x5);
-+	{ u64 x41 = (((u64)x23 * x7) + ((u64)x25 * x5));
-+	{ u64 x42 = ((((u64)(0x2 * x25) * x7) + ((u64)x23 * x9)) + ((u64)x27 * x5));
-+	{ u64 x43 = (((((u64)x25 * x9) + ((u64)x27 * x7)) + ((u64)x23 * x11)) + ((u64)x29 * x5));
-+	{ u64 x44 = (((((u64)x27 * x9) + (0x2 * (((u64)x25 * x11) + ((u64)x29 * x7)))) + ((u64)x23 * x13)) + ((u64)x31 * x5));
-+	{ u64 x45 = (((((((u64)x27 * x11) + ((u64)x29 * x9)) + ((u64)x25 * x13)) + ((u64)x31 * x7)) + ((u64)x23 * x15)) + ((u64)x33 * x5));
-+	{ u64 x46 = (((((0x2 * ((((u64)x29 * x11) + ((u64)x25 * x15)) + ((u64)x33 * x7))) + ((u64)x27 * x13)) + ((u64)x31 * x9)) + ((u64)x23 * x17)) + ((u64)x35 * x5));
-+	{ u64 x47 = (((((((((u64)x29 * x13) + ((u64)x31 * x11)) + ((u64)x27 * x15)) + ((u64)x33 * x9)) + ((u64)x25 * x17)) + ((u64)x35 * x7)) + ((u64)x23 * x19)) + ((u64)x37 * x5));
-+	{ u64 x48 = (((((((u64)x31 * x13) + (0x2 * (((((u64)x29 * x15) + ((u64)x33 * x11)) + ((u64)x25 * x19)) + ((u64)x37 * x7)))) + ((u64)x27 * x17)) + ((u64)x35 * x9)) + ((u64)x23 * x21)) + ((u64)x39 * x5));
-+	{ u64 x49 = (((((((((((u64)x31 * x15) + ((u64)x33 * x13)) + ((u64)x29 * x17)) + ((u64)x35 * x11)) + ((u64)x27 * x19)) + ((u64)x37 * x9)) + ((u64)x25 * x21)) + ((u64)x39 * x7)) + ((u64)x23 * x20)) + ((u64)x38 * x5));
-+	{ u64 x50 = (((((0x2 * ((((((u64)x33 * x15) + ((u64)x29 * x19)) + ((u64)x37 * x11)) + ((u64)x25 * x20)) + ((u64)x38 * x7))) + ((u64)x31 * x17)) + ((u64)x35 * x13)) + ((u64)x27 * x21)) + ((u64)x39 * x9));
-+	{ u64 x51 = (((((((((u64)x33 * x17) + ((u64)x35 * x15)) + ((u64)x31 * x19)) + ((u64)x37 * x13)) + ((u64)x29 * x21)) + ((u64)x39 * x11)) + ((u64)x27 * x20)) + ((u64)x38 * x9));
-+	{ u64 x52 = (((((u64)x35 * x17) + (0x2 * (((((u64)x33 * x19) + ((u64)x37 * x15)) + ((u64)x29 * x20)) + ((u64)x38 * x11)))) + ((u64)x31 * x21)) + ((u64)x39 * x13));
-+	{ u64 x53 = (((((((u64)x35 * x19) + ((u64)x37 * x17)) + ((u64)x33 * x21)) + ((u64)x39 * x15)) + ((u64)x31 * x20)) + ((u64)x38 * x13));
-+	{ u64 x54 = (((0x2 * ((((u64)x37 * x19) + ((u64)x33 * x20)) + ((u64)x38 * x15))) + ((u64)x35 * x21)) + ((u64)x39 * x17));
-+	{ u64 x55 = (((((u64)x37 * x21) + ((u64)x39 * x19)) + ((u64)x35 * x20)) + ((u64)x38 * x17));
-+	{ u64 x56 = (((u64)x39 * x21) + (0x2 * (((u64)x37 * x20) + ((u64)x38 * x19))));
-+	{ u64 x57 = (((u64)x39 * x20) + ((u64)x38 * x21));
-+	{ u64 x58 = ((u64)(0x2 * x38) * x20);
-+	{ u64 x59 = (x48 + (x58 << 0x4));
-+	{ u64 x60 = (x59 + (x58 << 0x1));
-+	{ u64 x61 = (x60 + x58);
-+	{ u64 x62 = (x47 + (x57 << 0x4));
-+	{ u64 x63 = (x62 + (x57 << 0x1));
-+	{ u64 x64 = (x63 + x57);
-+	{ u64 x65 = (x46 + (x56 << 0x4));
-+	{ u64 x66 = (x65 + (x56 << 0x1));
-+	{ u64 x67 = (x66 + x56);
-+	{ u64 x68 = (x45 + (x55 << 0x4));
-+	{ u64 x69 = (x68 + (x55 << 0x1));
-+	{ u64 x70 = (x69 + x55);
-+	{ u64 x71 = (x44 + (x54 << 0x4));
-+	{ u64 x72 = (x71 + (x54 << 0x1));
-+	{ u64 x73 = (x72 + x54);
-+	{ u64 x74 = (x43 + (x53 << 0x4));
-+	{ u64 x75 = (x74 + (x53 << 0x1));
-+	{ u64 x76 = (x75 + x53);
-+	{ u64 x77 = (x42 + (x52 << 0x4));
-+	{ u64 x78 = (x77 + (x52 << 0x1));
-+	{ u64 x79 = (x78 + x52);
-+	{ u64 x80 = (x41 + (x51 << 0x4));
-+	{ u64 x81 = (x80 + (x51 << 0x1));
-+	{ u64 x82 = (x81 + x51);
-+	{ u64 x83 = (x40 + (x50 << 0x4));
-+	{ u64 x84 = (x83 + (x50 << 0x1));
-+	{ u64 x85 = (x84 + x50);
-+	{ u64 x86 = (x85 >> 0x1a);
-+	{ u32 x87 = ((u32)x85 & 0x3ffffff);
-+	{ u64 x88 = (x86 + x82);
-+	{ u64 x89 = (x88 >> 0x19);
-+	{ u32 x90 = ((u32)x88 & 0x1ffffff);
-+	{ u64 x91 = (x89 + x79);
-+	{ u64 x92 = (x91 >> 0x1a);
-+	{ u32 x93 = ((u32)x91 & 0x3ffffff);
-+	{ u64 x94 = (x92 + x76);
-+	{ u64 x95 = (x94 >> 0x19);
-+	{ u32 x96 = ((u32)x94 & 0x1ffffff);
-+	{ u64 x97 = (x95 + x73);
-+	{ u64 x98 = (x97 >> 0x1a);
-+	{ u32 x99 = ((u32)x97 & 0x3ffffff);
-+	{ u64 x100 = (x98 + x70);
-+	{ u64 x101 = (x100 >> 0x19);
-+	{ u32 x102 = ((u32)x100 & 0x1ffffff);
-+	{ u64 x103 = (x101 + x67);
-+	{ u64 x104 = (x103 >> 0x1a);
-+	{ u32 x105 = ((u32)x103 & 0x3ffffff);
-+	{ u64 x106 = (x104 + x64);
-+	{ u64 x107 = (x106 >> 0x19);
-+	{ u32 x108 = ((u32)x106 & 0x1ffffff);
-+	{ u64 x109 = (x107 + x61);
-+	{ u64 x110 = (x109 >> 0x1a);
-+	{ u32 x111 = ((u32)x109 & 0x3ffffff);
-+	{ u64 x112 = (x110 + x49);
-+	{ u64 x113 = (x112 >> 0x19);
-+	{ u32 x114 = ((u32)x112 & 0x1ffffff);
-+	{ u64 x115 = (x87 + (0x13 * x113));
-+	{ u32 x116 = (u32) (x115 >> 0x1a);
-+	{ u32 x117 = ((u32)x115 & 0x3ffffff);
-+	{ u32 x118 = (x116 + x90);
-+	{ u32 x119 = (x118 >> 0x19);
-+	{ u32 x120 = (x118 & 0x1ffffff);
-+	out[0] = x117;
-+	out[1] = x120;
-+	out[2] = (x119 + x93);
-+	out[3] = x96;
-+	out[4] = x99;
-+	out[5] = x102;
-+	out[6] = x105;
-+	out[7] = x108;
-+	out[8] = x111;
-+	out[9] = x114;
-+	}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
-+}
-+
-+static __always_inline void fe_mul_ttt(fe *h, const fe *f, const fe *g)
-+{
-+	fe_mul_impl(h->v, f->v, g->v);
-+}
-+
-+static __always_inline void fe_mul_tlt(fe *h, const fe_loose *f, const fe *g)
-+{
-+	fe_mul_impl(h->v, f->v, g->v);
-+}
-+
-+static __always_inline void
-+fe_mul_tll(fe *h, const fe_loose *f, const fe_loose *g)
-+{
-+	fe_mul_impl(h->v, f->v, g->v);
-+}
-+
-+static void fe_sqr_impl(u32 out[10], const u32 in1[10])
-+{
-+	{ const u32 x17 = in1[9];
-+	{ const u32 x18 = in1[8];
-+	{ const u32 x16 = in1[7];
-+	{ const u32 x14 = in1[6];
-+	{ const u32 x12 = in1[5];
-+	{ const u32 x10 = in1[4];
-+	{ const u32 x8 = in1[3];
-+	{ const u32 x6 = in1[2];
-+	{ const u32 x4 = in1[1];
-+	{ const u32 x2 = in1[0];
-+	{ u64 x19 = ((u64)x2 * x2);
-+	{ u64 x20 = ((u64)(0x2 * x2) * x4);
-+	{ u64 x21 = (0x2 * (((u64)x4 * x4) + ((u64)x2 * x6)));
-+	{ u64 x22 = (0x2 * (((u64)x4 * x6) + ((u64)x2 * x8)));
-+	{ u64 x23 = ((((u64)x6 * x6) + ((u64)(0x4 * x4) * x8)) + ((u64)(0x2 * x2) * x10));
-+	{ u64 x24 = (0x2 * ((((u64)x6 * x8) + ((u64)x4 * x10)) + ((u64)x2 * x12)));
-+	{ u64 x25 = (0x2 * (((((u64)x8 * x8) + ((u64)x6 * x10)) + ((u64)x2 * x14)) + ((u64)(0x2 * x4) * x12)));
-+	{ u64 x26 = (0x2 * (((((u64)x8 * x10) + ((u64)x6 * x12)) + ((u64)x4 * x14)) + ((u64)x2 * x16)));
-+	{ u64 x27 = (((u64)x10 * x10) + (0x2 * ((((u64)x6 * x14) + ((u64)x2 * x18)) + (0x2 * (((u64)x4 * x16) + ((u64)x8 * x12))))));
-+	{ u64 x28 = (0x2 * ((((((u64)x10 * x12) + ((u64)x8 * x14)) + ((u64)x6 * x16)) + ((u64)x4 * x18)) + ((u64)x2 * x17)));
-+	{ u64 x29 = (0x2 * (((((u64)x12 * x12) + ((u64)x10 * x14)) + ((u64)x6 * x18)) + (0x2 * (((u64)x8 * x16) + ((u64)x4 * x17)))));
-+	{ u64 x30 = (0x2 * (((((u64)x12 * x14) + ((u64)x10 * x16)) + ((u64)x8 * x18)) + ((u64)x6 * x17)));
-+	{ u64 x31 = (((u64)x14 * x14) + (0x2 * (((u64)x10 * x18) + (0x2 * (((u64)x12 * x16) + ((u64)x8 * x17))))));
-+	{ u64 x32 = (0x2 * ((((u64)x14 * x16) + ((u64)x12 * x18)) + ((u64)x10 * x17)));
-+	{ u64 x33 = (0x2 * ((((u64)x16 * x16) + ((u64)x14 * x18)) + ((u64)(0x2 * x12) * x17)));
-+	{ u64 x34 = (0x2 * (((u64)x16 * x18) + ((u64)x14 * x17)));
-+	{ u64 x35 = (((u64)x18 * x18) + ((u64)(0x4 * x16) * x17));
-+	{ u64 x36 = ((u64)(0x2 * x18) * x17);
-+	{ u64 x37 = ((u64)(0x2 * x17) * x17);
-+	{ u64 x38 = (x27 + (x37 << 0x4));
-+	{ u64 x39 = (x38 + (x37 << 0x1));
-+	{ u64 x40 = (x39 + x37);
-+	{ u64 x41 = (x26 + (x36 << 0x4));
-+	{ u64 x42 = (x41 + (x36 << 0x1));
-+	{ u64 x43 = (x42 + x36);
-+	{ u64 x44 = (x25 + (x35 << 0x4));
-+	{ u64 x45 = (x44 + (x35 << 0x1));
-+	{ u64 x46 = (x45 + x35);
-+	{ u64 x47 = (x24 + (x34 << 0x4));
-+	{ u64 x48 = (x47 + (x34 << 0x1));
-+	{ u64 x49 = (x48 + x34);
-+	{ u64 x50 = (x23 + (x33 << 0x4));
-+	{ u64 x51 = (x50 + (x33 << 0x1));
-+	{ u64 x52 = (x51 + x33);
-+	{ u64 x53 = (x22 + (x32 << 0x4));
-+	{ u64 x54 = (x53 + (x32 << 0x1));
-+	{ u64 x55 = (x54 + x32);
-+	{ u64 x56 = (x21 + (x31 << 0x4));
-+	{ u64 x57 = (x56 + (x31 << 0x1));
-+	{ u64 x58 = (x57 + x31);
-+	{ u64 x59 = (x20 + (x30 << 0x4));
-+	{ u64 x60 = (x59 + (x30 << 0x1));
-+	{ u64 x61 = (x60 + x30);
-+	{ u64 x62 = (x19 + (x29 << 0x4));
-+	{ u64 x63 = (x62 + (x29 << 0x1));
-+	{ u64 x64 = (x63 + x29);
-+	{ u64 x65 = (x64 >> 0x1a);
-+	{ u32 x66 = ((u32)x64 & 0x3ffffff);
-+	{ u64 x67 = (x65 + x61);
-+	{ u64 x68 = (x67 >> 0x19);
-+	{ u32 x69 = ((u32)x67 & 0x1ffffff);
-+	{ u64 x70 = (x68 + x58);
-+	{ u64 x71 = (x70 >> 0x1a);
-+	{ u32 x72 = ((u32)x70 & 0x3ffffff);
-+	{ u64 x73 = (x71 + x55);
-+	{ u64 x74 = (x73 >> 0x19);
-+	{ u32 x75 = ((u32)x73 & 0x1ffffff);
-+	{ u64 x76 = (x74 + x52);
-+	{ u64 x77 = (x76 >> 0x1a);
-+	{ u32 x78 = ((u32)x76 & 0x3ffffff);
-+	{ u64 x79 = (x77 + x49);
-+	{ u64 x80 = (x79 >> 0x19);
-+	{ u32 x81 = ((u32)x79 & 0x1ffffff);
-+	{ u64 x82 = (x80 + x46);
-+	{ u64 x83 = (x82 >> 0x1a);
-+	{ u32 x84 = ((u32)x82 & 0x3ffffff);
-+	{ u64 x85 = (x83 + x43);
-+	{ u64 x86 = (x85 >> 0x19);
-+	{ u32 x87 = ((u32)x85 & 0x1ffffff);
-+	{ u64 x88 = (x86 + x40);
-+	{ u64 x89 = (x88 >> 0x1a);
-+	{ u32 x90 = ((u32)x88 & 0x3ffffff);
-+	{ u64 x91 = (x89 + x28);
-+	{ u64 x92 = (x91 >> 0x19);
-+	{ u32 x93 = ((u32)x91 & 0x1ffffff);
-+	{ u64 x94 = (x66 + (0x13 * x92));
-+	{ u32 x95 = (u32) (x94 >> 0x1a);
-+	{ u32 x96 = ((u32)x94 & 0x3ffffff);
-+	{ u32 x97 = (x95 + x69);
-+	{ u32 x98 = (x97 >> 0x19);
-+	{ u32 x99 = (x97 & 0x1ffffff);
-+	out[0] = x96;
-+	out[1] = x99;
-+	out[2] = (x98 + x72);
-+	out[3] = x75;
-+	out[4] = x78;
-+	out[5] = x81;
-+	out[6] = x84;
-+	out[7] = x87;
-+	out[8] = x90;
-+	out[9] = x93;
-+	}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
-+}
-+
-+static __always_inline void fe_sq_tl(fe *h, const fe_loose *f)
-+{
-+	fe_sqr_impl(h->v, f->v);
-+}
-+
-+static __always_inline void fe_sq_tt(fe *h, const fe *f)
-+{
-+	fe_sqr_impl(h->v, f->v);
-+}
-+
-+static __always_inline void fe_loose_invert(fe *out, const fe_loose *z)
-+{
-+	fe t0;
-+	fe t1;
-+	fe t2;
-+	fe t3;
-+	int i;
-+
-+	fe_sq_tl(&t0, z);
-+	fe_sq_tt(&t1, &t0);
-+	for (i = 1; i < 2; ++i)
-+		fe_sq_tt(&t1, &t1);
-+	fe_mul_tlt(&t1, z, &t1);
-+	fe_mul_ttt(&t0, &t0, &t1);
-+	fe_sq_tt(&t2, &t0);
-+	fe_mul_ttt(&t1, &t1, &t2);
-+	fe_sq_tt(&t2, &t1);
-+	for (i = 1; i < 5; ++i)
-+		fe_sq_tt(&t2, &t2);
-+	fe_mul_ttt(&t1, &t2, &t1);
-+	fe_sq_tt(&t2, &t1);
-+	for (i = 1; i < 10; ++i)
-+		fe_sq_tt(&t2, &t2);
-+	fe_mul_ttt(&t2, &t2, &t1);
-+	fe_sq_tt(&t3, &t2);
-+	for (i = 1; i < 20; ++i)
-+		fe_sq_tt(&t3, &t3);
-+	fe_mul_ttt(&t2, &t3, &t2);
-+	fe_sq_tt(&t2, &t2);
-+	for (i = 1; i < 10; ++i)
-+		fe_sq_tt(&t2, &t2);
-+	fe_mul_ttt(&t1, &t2, &t1);
-+	fe_sq_tt(&t2, &t1);
-+	for (i = 1; i < 50; ++i)
-+		fe_sq_tt(&t2, &t2);
-+	fe_mul_ttt(&t2, &t2, &t1);
-+	fe_sq_tt(&t3, &t2);
-+	for (i = 1; i < 100; ++i)
-+		fe_sq_tt(&t3, &t3);
-+	fe_mul_ttt(&t2, &t3, &t2);
-+	fe_sq_tt(&t2, &t2);
-+	for (i = 1; i < 50; ++i)
-+		fe_sq_tt(&t2, &t2);
-+	fe_mul_ttt(&t1, &t2, &t1);
-+	fe_sq_tt(&t1, &t1);
-+	for (i = 1; i < 5; ++i)
-+		fe_sq_tt(&t1, &t1);
-+	fe_mul_ttt(out, &t1, &t0);
-+}
-+
-+static __always_inline void fe_invert(fe *out, const fe *z)
-+{
-+	fe_loose l;
-+	fe_copy_lt(&l, z);
-+	fe_loose_invert(out, &l);
-+}
-+
-+/* Replace (f,g) with (g,f) if b == 1;
-+ * replace (f,g) with (f,g) if b == 0.
-+ *
-+ * Preconditions: b in {0,1}
-+ */
-+static __always_inline void fe_cswap(fe *f, fe *g, unsigned int b)
-+{
-+	unsigned i;
-+	b = 0-b;
-+	for (i = 0; i < 10; i++) {
-+		u32 x = f->v[i] ^ g->v[i];
-+		x &= b;
-+		f->v[i] ^= x;
-+		g->v[i] ^= x;
-+	}
-+}
-+
-+/* NOTE: based on fiat-crypto fe_mul, edited for in2=121666, 0, 0.*/
-+static __always_inline void fe_mul_121666_impl(u32 out[10], const u32 in1[10])
-+{
-+	{ const u32 x20 = in1[9];
-+	{ const u32 x21 = in1[8];
-+	{ const u32 x19 = in1[7];
-+	{ const u32 x17 = in1[6];
-+	{ const u32 x15 = in1[5];
-+	{ const u32 x13 = in1[4];
-+	{ const u32 x11 = in1[3];
-+	{ const u32 x9 = in1[2];
-+	{ const u32 x7 = in1[1];
-+	{ const u32 x5 = in1[0];
-+	{ const u32 x38 = 0;
-+	{ const u32 x39 = 0;
-+	{ const u32 x37 = 0;
-+	{ const u32 x35 = 0;
-+	{ const u32 x33 = 0;
-+	{ const u32 x31 = 0;
-+	{ const u32 x29 = 0;
-+	{ const u32 x27 = 0;
-+	{ const u32 x25 = 0;
-+	{ const u32 x23 = 121666;
-+	{ u64 x40 = ((u64)x23 * x5);
-+	{ u64 x41 = (((u64)x23 * x7) + ((u64)x25 * x5));
-+	{ u64 x42 = ((((u64)(0x2 * x25) * x7) + ((u64)x23 * x9)) + ((u64)x27 * x5));
-+	{ u64 x43 = (((((u64)x25 * x9) + ((u64)x27 * x7)) + ((u64)x23 * x11)) + ((u64)x29 * x5));
-+	{ u64 x44 = (((((u64)x27 * x9) + (0x2 * (((u64)x25 * x11) + ((u64)x29 * x7)))) + ((u64)x23 * x13)) + ((u64)x31 * x5));
-+	{ u64 x45 = (((((((u64)x27 * x11) + ((u64)x29 * x9)) + ((u64)x25 * x13)) + ((u64)x31 * x7)) + ((u64)x23 * x15)) + ((u64)x33 * x5));
-+	{ u64 x46 = (((((0x2 * ((((u64)x29 * x11) + ((u64)x25 * x15)) + ((u64)x33 * x7))) + ((u64)x27 * x13)) + ((u64)x31 * x9)) + ((u64)x23 * x17)) + ((u64)x35 * x5));
-+	{ u64 x47 = (((((((((u64)x29 * x13) + ((u64)x31 * x11)) + ((u64)x27 * x15)) + ((u64)x33 * x9)) + ((u64)x25 * x17)) + ((u64)x35 * x7)) + ((u64)x23 * x19)) + ((u64)x37 * x5));
-+	{ u64 x48 = (((((((u64)x31 * x13) + (0x2 * (((((u64)x29 * x15) + ((u64)x33 * x11)) + ((u64)x25 * x19)) + ((u64)x37 * x7)))) + ((u64)x27 * x17)) + ((u64)x35 * x9)) + ((u64)x23 * x21)) + ((u64)x39 * x5));
-+	{ u64 x49 = (((((((((((u64)x31 * x15) + ((u64)x33 * x13)) + ((u64)x29 * x17)) + ((u64)x35 * x11)) + ((u64)x27 * x19)) + ((u64)x37 * x9)) + ((u64)x25 * x21)) + ((u64)x39 * x7)) + ((u64)x23 * x20)) + ((u64)x38 * x5));
-+	{ u64 x50 = (((((0x2 * ((((((u64)x33 * x15) + ((u64)x29 * x19)) + ((u64)x37 * x11)) + ((u64)x25 * x20)) + ((u64)x38 * x7))) + ((u64)x31 * x17)) + ((u64)x35 * x13)) + ((u64)x27 * x21)) + ((u64)x39 * x9));
-+	{ u64 x51 = (((((((((u64)x33 * x17) + ((u64)x35 * x15)) + ((u64)x31 * x19)) + ((u64)x37 * x13)) + ((u64)x29 * x21)) + ((u64)x39 * x11)) + ((u64)x27 * x20)) + ((u64)x38 * x9));
-+	{ u64 x52 = (((((u64)x35 * x17) + (0x2 * (((((u64)x33 * x19) + ((u64)x37 * x15)) + ((u64)x29 * x20)) + ((u64)x38 * x11)))) + ((u64)x31 * x21)) + ((u64)x39 * x13));
-+	{ u64 x53 = (((((((u64)x35 * x19) + ((u64)x37 * x17)) + ((u64)x33 * x21)) + ((u64)x39 * x15)) + ((u64)x31 * x20)) + ((u64)x38 * x13));
-+	{ u64 x54 = (((0x2 * ((((u64)x37 * x19) + ((u64)x33 * x20)) + ((u64)x38 * x15))) + ((u64)x35 * x21)) + ((u64)x39 * x17));
-+	{ u64 x55 = (((((u64)x37 * x21) + ((u64)x39 * x19)) + ((u64)x35 * x20)) + ((u64)x38 * x17));
-+	{ u64 x56 = (((u64)x39 * x21) + (0x2 * (((u64)x37 * x20) + ((u64)x38 * x19))));
-+	{ u64 x57 = (((u64)x39 * x20) + ((u64)x38 * x21));
-+	{ u64 x58 = ((u64)(0x2 * x38) * x20);
-+	{ u64 x59 = (x48 + (x58 << 0x4));
-+	{ u64 x60 = (x59 + (x58 << 0x1));
-+	{ u64 x61 = (x60 + x58);
-+	{ u64 x62 = (x47 + (x57 << 0x4));
-+	{ u64 x63 = (x62 + (x57 << 0x1));
-+	{ u64 x64 = (x63 + x57);
-+	{ u64 x65 = (x46 + (x56 << 0x4));
-+	{ u64 x66 = (x65 + (x56 << 0x1));
-+	{ u64 x67 = (x66 + x56);
-+	{ u64 x68 = (x45 + (x55 << 0x4));
-+	{ u64 x69 = (x68 + (x55 << 0x1));
-+	{ u64 x70 = (x69 + x55);
-+	{ u64 x71 = (x44 + (x54 << 0x4));
-+	{ u64 x72 = (x71 + (x54 << 0x1));
-+	{ u64 x73 = (x72 + x54);
-+	{ u64 x74 = (x43 + (x53 << 0x4));
-+	{ u64 x75 = (x74 + (x53 << 0x1));
-+	{ u64 x76 = (x75 + x53);
-+	{ u64 x77 = (x42 + (x52 << 0x4));
-+	{ u64 x78 = (x77 + (x52 << 0x1));
-+	{ u64 x79 = (x78 + x52);
-+	{ u64 x80 = (x41 + (x51 << 0x4));
-+	{ u64 x81 = (x80 + (x51 << 0x1));
-+	{ u64 x82 = (x81 + x51);
-+	{ u64 x83 = (x40 + (x50 << 0x4));
-+	{ u64 x84 = (x83 + (x50 << 0x1));
-+	{ u64 x85 = (x84 + x50);
-+	{ u64 x86 = (x85 >> 0x1a);
-+	{ u32 x87 = ((u32)x85 & 0x3ffffff);
-+	{ u64 x88 = (x86 + x82);
-+	{ u64 x89 = (x88 >> 0x19);
-+	{ u32 x90 = ((u32)x88 & 0x1ffffff);
-+	{ u64 x91 = (x89 + x79);
-+	{ u64 x92 = (x91 >> 0x1a);
-+	{ u32 x93 = ((u32)x91 & 0x3ffffff);
-+	{ u64 x94 = (x92 + x76);
-+	{ u64 x95 = (x94 >> 0x19);
-+	{ u32 x96 = ((u32)x94 & 0x1ffffff);
-+	{ u64 x97 = (x95 + x73);
-+	{ u64 x98 = (x97 >> 0x1a);
-+	{ u32 x99 = ((u32)x97 & 0x3ffffff);
-+	{ u64 x100 = (x98 + x70);
-+	{ u64 x101 = (x100 >> 0x19);
-+	{ u32 x102 = ((u32)x100 & 0x1ffffff);
-+	{ u64 x103 = (x101 + x67);
-+	{ u64 x104 = (x103 >> 0x1a);
-+	{ u32 x105 = ((u32)x103 & 0x3ffffff);
-+	{ u64 x106 = (x104 + x64);
-+	{ u64 x107 = (x106 >> 0x19);
-+	{ u32 x108 = ((u32)x106 & 0x1ffffff);
-+	{ u64 x109 = (x107 + x61);
-+	{ u64 x110 = (x109 >> 0x1a);
-+	{ u32 x111 = ((u32)x109 & 0x3ffffff);
-+	{ u64 x112 = (x110 + x49);
-+	{ u64 x113 = (x112 >> 0x19);
-+	{ u32 x114 = ((u32)x112 & 0x1ffffff);
-+	{ u64 x115 = (x87 + (0x13 * x113));
-+	{ u32 x116 = (u32) (x115 >> 0x1a);
-+	{ u32 x117 = ((u32)x115 & 0x3ffffff);
-+	{ u32 x118 = (x116 + x90);
-+	{ u32 x119 = (x118 >> 0x19);
-+	{ u32 x120 = (x118 & 0x1ffffff);
-+	out[0] = x117;
-+	out[1] = x120;
-+	out[2] = (x119 + x93);
-+	out[3] = x96;
-+	out[4] = x99;
-+	out[5] = x102;
-+	out[6] = x105;
-+	out[7] = x108;
-+	out[8] = x111;
-+	out[9] = x114;
-+	}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
-+}
-+
-+static __always_inline void fe_mul121666(fe *h, const fe_loose *f)
-+{
-+	fe_mul_121666_impl(h->v, f->v);
-+}
-+
-+static void curve25519_generic(u8 out[CURVE25519_POINT_SIZE],
-+			       const u8 scalar[CURVE25519_POINT_SIZE],
-+			       const u8 point[CURVE25519_POINT_SIZE])
-+{
-+	fe x1, x2, z2, x3, z3, tmp0, tmp1;
-+	fe_loose x2l, z2l, x3l, tmp0l, tmp1l;
-+	unsigned swap = 0;
-+	int pos;
-+	u8 e[32];
-+
-+	memcpy(e, scalar, 32);
-+	normalize_secret(e);
-+
-+	/* The following implementation was transcribed to Coq and proven to
-+	 * correspond to unary scalar multiplication in affine coordinates given
-+	 * that x1 != 0 is the x coordinate of some point on the curve. It was
-+	 * also checked in Coq that doing a ladderstep with x1 = x3 = 0 gives
-+	 * z2' = z3' = 0, and z2 = z3 = 0 gives z2' = z3' = 0. The statement was
-+	 * quantified over the underlying field, so it applies to Curve25519
-+	 * itself and the quadratic twist of Curve25519. It was not proven in
-+	 * Coq that prime-field arithmetic correctly simulates extension-field
-+	 * arithmetic on prime-field values. The decoding of the byte array
-+	 * representation of e was not considered.
-+	 *
-+	 * Specification of Montgomery curves in affine coordinates:
-+	 * <https://github.com/mit-plv/fiat-crypto/blob/2456d821825521f7e03e65882cc3521795b0320f/src/Spec/MontgomeryCurve.v#L27>
-+	 *
-+	 * Proof that these form a group that is isomorphic to a Weierstrass
-+	 * curve:
-+	 * <https://github.com/mit-plv/fiat-crypto/blob/2456d821825521f7e03e65882cc3521795b0320f/src/Curves/Montgomery/AffineProofs.v#L35>
-+	 *
-+	 * Coq transcription and correctness proof of the loop
-+	 * (where scalarbits=255):
-+	 * <https://github.com/mit-plv/fiat-crypto/blob/2456d821825521f7e03e65882cc3521795b0320f/src/Curves/Montgomery/XZ.v#L118>
-+	 * <https://github.com/mit-plv/fiat-crypto/blob/2456d821825521f7e03e65882cc3521795b0320f/src/Curves/Montgomery/XZProofs.v#L278>
-+	 * preconditions: 0 <= e < 2^255 (not necessarily e < order),
-+	 * fe_invert(0) = 0
-+	 */
-+	fe_frombytes(&x1, point);
-+	fe_1(&x2);
-+	fe_0(&z2);
-+	fe_copy(&x3, &x1);
-+	fe_1(&z3);
-+
-+	for (pos = 254; pos >= 0; --pos) {
-+		/* loop invariant as of right before the test, for the case
-+		 * where x1 != 0:
-+		 *   pos >= -1; if z2 = 0 then x2 is nonzero; if z3 = 0 then x3
-+		 *   is nonzero
-+		 *   let r := e >> (pos+1) in the following equalities of
-+		 *   projective points:
-+		 *   to_xz (r*P)     === if swap then (x3, z3) else (x2, z2)
-+		 *   to_xz ((r+1)*P) === if swap then (x2, z2) else (x3, z3)
-+		 *   x1 is the nonzero x coordinate of the nonzero
-+		 *   point (r*P-(r+1)*P)
-+		 */
-+		unsigned b = 1 & (e[pos / 8] >> (pos & 7));
-+		swap ^= b;
-+		fe_cswap(&x2, &x3, swap);
-+		fe_cswap(&z2, &z3, swap);
-+		swap = b;
-+		/* Coq transcription of ladderstep formula (called from
-+		 * transcribed loop):
-+		 * <https://github.com/mit-plv/fiat-crypto/blob/2456d821825521f7e03e65882cc3521795b0320f/src/Curves/Montgomery/XZ.v#L89>
-+		 * <https://github.com/mit-plv/fiat-crypto/blob/2456d821825521f7e03e65882cc3521795b0320f/src/Curves/Montgomery/XZProofs.v#L131>
-+		 * x1 != 0 <https://github.com/mit-plv/fiat-crypto/blob/2456d821825521f7e03e65882cc3521795b0320f/src/Curves/Montgomery/XZProofs.v#L217>
-+		 * x1  = 0 <https://github.com/mit-plv/fiat-crypto/blob/2456d821825521f7e03e65882cc3521795b0320f/src/Curves/Montgomery/XZProofs.v#L147>
-+		 */
-+		fe_sub(&tmp0l, &x3, &z3);
-+		fe_sub(&tmp1l, &x2, &z2);
-+		fe_add(&x2l, &x2, &z2);
-+		fe_add(&z2l, &x3, &z3);
-+		fe_mul_tll(&z3, &tmp0l, &x2l);
-+		fe_mul_tll(&z2, &z2l, &tmp1l);
-+		fe_sq_tl(&tmp0, &tmp1l);
-+		fe_sq_tl(&tmp1, &x2l);
-+		fe_add(&x3l, &z3, &z2);
-+		fe_sub(&z2l, &z3, &z2);
-+		fe_mul_ttt(&x2, &tmp1, &tmp0);
-+		fe_sub(&tmp1l, &tmp1, &tmp0);
-+		fe_sq_tl(&z2, &z2l);
-+		fe_mul121666(&z3, &tmp1l);
-+		fe_sq_tl(&x3, &x3l);
-+		fe_add(&tmp0l, &tmp0, &z3);
-+		fe_mul_ttt(&z3, &x1, &z2);
-+		fe_mul_tll(&z2, &tmp1l, &tmp0l);
-+	}
-+	/* here pos=-1, so r=e, so to_xz (e*P) === if swap then (x3, z3)
-+	 * else (x2, z2)
-+	 */
-+	fe_cswap(&x2, &x3, swap);
-+	fe_cswap(&z2, &z3, swap);
-+
-+	fe_invert(&z2, &z2);
-+	fe_mul_ttt(&x2, &x2, &z2);
-+	fe_tobytes(out, &x2);
-+
-+	memzero_explicit(&x1, sizeof(x1));
-+	memzero_explicit(&x2, sizeof(x2));
-+	memzero_explicit(&z2, sizeof(z2));
-+	memzero_explicit(&x3, sizeof(x3));
-+	memzero_explicit(&z3, sizeof(z3));
-+	memzero_explicit(&tmp0, sizeof(tmp0));
-+	memzero_explicit(&tmp1, sizeof(tmp1));
-+	memzero_explicit(&x2l, sizeof(x2l));
-+	memzero_explicit(&z2l, sizeof(z2l));
-+	memzero_explicit(&x3l, sizeof(x3l));
-+	memzero_explicit(&tmp0l, sizeof(tmp0l));
-+	memzero_explicit(&tmp1l, sizeof(tmp1l));
-+	memzero_explicit(&e, sizeof(e));
-+}
-diff --git a/lib/zinc/curve25519/curve25519-hacl64.h b/lib/zinc/curve25519/curve25519-hacl64.h
-new file mode 100644
-index 000000000000..ebe88fcdc937
---- /dev/null
-+++ b/lib/zinc/curve25519/curve25519-hacl64.h
-@@ -0,0 +1,785 @@
-+/* SPDX-License-Identifier: GPL-2.0
-+ *
-+ * Copyright (C) 2016-2017 INRIA and Microsoft Corporation.
-+ * Copyright (C) 2018 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
-+ *
-+ * This is a machine-generated formally verified implementation of Curve25519
-+ * ECDH from: <https://github.com/mitls/hacl-star>. Though originally machine
-+ * generated, it has been tweaked to be suitable for use in the kernel. It is
-+ * optimized for 64-bit machines that can efficiently work with 128-bit
-+ * integer types.
-+ */
-+
-+typedef __uint128_t u128;
-+
-+static __always_inline u64 u64_eq_mask(u64 a, u64 b)
-+{
-+	u64 x = a ^ b;
-+	u64 minus_x = ~x + (u64)1U;
-+	u64 x_or_minus_x = x | minus_x;
-+	u64 xnx = x_or_minus_x >> (u32)63U;
-+	u64 c = xnx - (u64)1U;
-+	return c;
-+}
-+
-+static __always_inline u64 u64_gte_mask(u64 a, u64 b)
-+{
-+	u64 x = a;
-+	u64 y = b;
-+	u64 x_xor_y = x ^ y;
-+	u64 x_sub_y = x - y;
-+	u64 x_sub_y_xor_y = x_sub_y ^ y;
-+	u64 q = x_xor_y | x_sub_y_xor_y;
-+	u64 x_xor_q = x ^ q;
-+	u64 x_xor_q_ = x_xor_q >> (u32)63U;
-+	u64 c = x_xor_q_ - (u64)1U;
-+	return c;
-+}
-+
-+static __always_inline void modulo_carry_top(u64 *b)
-+{
-+	u64 b4 = b[4];
-+	u64 b0 = b[0];
-+	u64 b4_ = b4 & 0x7ffffffffffffLLU;
-+	u64 b0_ = b0 + 19 * (b4 >> 51);
-+	b[4] = b4_;
-+	b[0] = b0_;
-+}
-+
-+static __always_inline void fproduct_copy_from_wide_(u64 *output, u128 *input)
-+{
-+	{
-+		u128 xi = input[0];
-+		output[0] = ((u64)(xi));
-+	}
-+	{
-+		u128 xi = input[1];
-+		output[1] = ((u64)(xi));
-+	}
-+	{
-+		u128 xi = input[2];
-+		output[2] = ((u64)(xi));
-+	}
-+	{
-+		u128 xi = input[3];
-+		output[3] = ((u64)(xi));
-+	}
-+	{
-+		u128 xi = input[4];
-+		output[4] = ((u64)(xi));
-+	}
-+}
-+
-+static __always_inline void
-+fproduct_sum_scalar_multiplication_(u128 *output, u64 *input, u64 s)
-+{
-+	output[0] += (u128)input[0] * s;
-+	output[1] += (u128)input[1] * s;
-+	output[2] += (u128)input[2] * s;
-+	output[3] += (u128)input[3] * s;
-+	output[4] += (u128)input[4] * s;
-+}
-+
-+static __always_inline void fproduct_carry_wide_(u128 *tmp)
-+{
-+	{
-+		u32 ctr = 0;
-+		u128 tctr = tmp[ctr];
-+		u128 tctrp1 = tmp[ctr + 1];
-+		u64 r0 = ((u64)(tctr)) & 0x7ffffffffffffLLU;
-+		u128 c = ((tctr) >> (51));
-+		tmp[ctr] = ((u128)(r0));
-+		tmp[ctr + 1] = ((tctrp1) + (c));
-+	}
-+	{
-+		u32 ctr = 1;
-+		u128 tctr = tmp[ctr];
-+		u128 tctrp1 = tmp[ctr + 1];
-+		u64 r0 = ((u64)(tctr)) & 0x7ffffffffffffLLU;
-+		u128 c = ((tctr) >> (51));
-+		tmp[ctr] = ((u128)(r0));
-+		tmp[ctr + 1] = ((tctrp1) + (c));
-+	}
-+
-+	{
-+		u32 ctr = 2;
-+		u128 tctr = tmp[ctr];
-+		u128 tctrp1 = tmp[ctr + 1];
-+		u64 r0 = ((u64)(tctr)) & 0x7ffffffffffffLLU;
-+		u128 c = ((tctr) >> (51));
-+		tmp[ctr] = ((u128)(r0));
-+		tmp[ctr + 1] = ((tctrp1) + (c));
-+	}
-+	{
-+		u32 ctr = 3;
-+		u128 tctr = tmp[ctr];
-+		u128 tctrp1 = tmp[ctr + 1];
-+		u64 r0 = ((u64)(tctr)) & 0x7ffffffffffffLLU;
-+		u128 c = ((tctr) >> (51));
-+		tmp[ctr] = ((u128)(r0));
-+		tmp[ctr + 1] = ((tctrp1) + (c));
-+	}
-+}
-+
-+static __always_inline void fmul_shift_reduce(u64 *output)
-+{
-+	u64 tmp = output[4];
-+	u64 b0;
-+	{
-+		u32 ctr = 5 - 0 - 1;
-+		u64 z = output[ctr - 1];
-+		output[ctr] = z;
-+	}
-+	{
-+		u32 ctr = 5 - 1 - 1;
-+		u64 z = output[ctr - 1];
-+		output[ctr] = z;
-+	}
-+	{
-+		u32 ctr = 5 - 2 - 1;
-+		u64 z = output[ctr - 1];
-+		output[ctr] = z;
-+	}
-+	{
-+		u32 ctr = 5 - 3 - 1;
-+		u64 z = output[ctr - 1];
-+		output[ctr] = z;
-+	}
-+	output[0] = tmp;
-+	b0 = output[0];
-+	output[0] = 19 * b0;
-+}
-+
-+static __always_inline void fmul_mul_shift_reduce_(u128 *output, u64 *input,
-+						   u64 *input21)
-+{
-+	u32 i;
-+	u64 input2i;
-+	{
-+		u64 input2i = input21[0];
-+		fproduct_sum_scalar_multiplication_(output, input, input2i);
-+		fmul_shift_reduce(input);
-+	}
-+	{
-+		u64 input2i = input21[1];
-+		fproduct_sum_scalar_multiplication_(output, input, input2i);
-+		fmul_shift_reduce(input);
-+	}
-+	{
-+		u64 input2i = input21[2];
-+		fproduct_sum_scalar_multiplication_(output, input, input2i);
-+		fmul_shift_reduce(input);
-+	}
-+	{
-+		u64 input2i = input21[3];
-+		fproduct_sum_scalar_multiplication_(output, input, input2i);
-+		fmul_shift_reduce(input);
-+	}
-+	i = 4;
-+	input2i = input21[i];
-+	fproduct_sum_scalar_multiplication_(output, input, input2i);
-+}
-+
-+static __always_inline void fmul_fmul(u64 *output, u64 *input, u64 *input21)
-+{
-+	u64 tmp[5];
-+	memcpy(tmp, input, 5 * sizeof(*input));
-+	{
-+		u128 b4;
-+		u128 b0;
-+		u128 b4_;
-+		u128 b0_;
-+		u64 i0;
-+		u64 i1;
-+		u64 i0_;
-+		u64 i1_;
-+		u128 t[5] = { 0 };
-+		fmul_mul_shift_reduce_(t, tmp, input21);
-+		fproduct_carry_wide_(t);
-+		b4 = t[4];
-+		b0 = t[0];
-+		b4_ = ((b4) & (((u128)(0x7ffffffffffffLLU))));
-+		b0_ = ((b0) + (((u128)(19) * (((u64)(((b4) >> (51))))))));
-+		t[4] = b4_;
-+		t[0] = b0_;
-+		fproduct_copy_from_wide_(output, t);
-+		i0 = output[0];
-+		i1 = output[1];
-+		i0_ = i0 & 0x7ffffffffffffLLU;
-+		i1_ = i1 + (i0 >> 51);
-+		output[0] = i0_;
-+		output[1] = i1_;
-+	}
-+}
-+
-+static __always_inline void fsquare_fsquare__(u128 *tmp, u64 *output)
-+{
-+	u64 r0 = output[0];
-+	u64 r1 = output[1];
-+	u64 r2 = output[2];
-+	u64 r3 = output[3];
-+	u64 r4 = output[4];
-+	u64 d0 = r0 * 2;
-+	u64 d1 = r1 * 2;
-+	u64 d2 = r2 * 2 * 19;
-+	u64 d419 = r4 * 19;
-+	u64 d4 = d419 * 2;
-+	u128 s0 = ((((((u128)(r0) * (r0))) + (((u128)(d4) * (r1))))) +
-+		   (((u128)(d2) * (r3))));
-+	u128 s1 = ((((((u128)(d0) * (r1))) + (((u128)(d4) * (r2))))) +
-+		   (((u128)(r3 * 19) * (r3))));
-+	u128 s2 = ((((((u128)(d0) * (r2))) + (((u128)(r1) * (r1))))) +
-+		   (((u128)(d4) * (r3))));
-+	u128 s3 = ((((((u128)(d0) * (r3))) + (((u128)(d1) * (r2))))) +
-+		   (((u128)(r4) * (d419))));
-+	u128 s4 = ((((((u128)(d0) * (r4))) + (((u128)(d1) * (r3))))) +
-+		   (((u128)(r2) * (r2))));
-+	tmp[0] = s0;
-+	tmp[1] = s1;
-+	tmp[2] = s2;
-+	tmp[3] = s3;
-+	tmp[4] = s4;
-+}
-+
-+static __always_inline void fsquare_fsquare_(u128 *tmp, u64 *output)
-+{
-+	u128 b4;
-+	u128 b0;
-+	u128 b4_;
-+	u128 b0_;
-+	u64 i0;
-+	u64 i1;
-+	u64 i0_;
-+	u64 i1_;
-+	fsquare_fsquare__(tmp, output);
-+	fproduct_carry_wide_(tmp);
-+	b4 = tmp[4];
-+	b0 = tmp[0];
-+	b4_ = ((b4) & (((u128)(0x7ffffffffffffLLU))));
-+	b0_ = ((b0) + (((u128)(19) * (((u64)(((b4) >> (51))))))));
-+	tmp[4] = b4_;
-+	tmp[0] = b0_;
-+	fproduct_copy_from_wide_(output, tmp);
-+	i0 = output[0];
-+	i1 = output[1];
-+	i0_ = i0 & 0x7ffffffffffffLLU;
-+	i1_ = i1 + (i0 >> 51);
-+	output[0] = i0_;
-+	output[1] = i1_;
-+}
-+
-+static __always_inline void fsquare_fsquare_times_(u64 *output, u128 *tmp,
-+						   u32 count1)
-+{
-+	u32 i;
-+	fsquare_fsquare_(tmp, output);
-+	for (i = 1; i < count1; ++i)
-+		fsquare_fsquare_(tmp, output);
-+}
-+
-+static __always_inline void fsquare_fsquare_times(u64 *output, u64 *input,
-+						  u32 count1)
-+{
-+	u128 t[5];
-+	memcpy(output, input, 5 * sizeof(*input));
-+	fsquare_fsquare_times_(output, t, count1);
-+}
-+
-+static __always_inline void fsquare_fsquare_times_inplace(u64 *output,
-+							  u32 count1)
-+{
-+	u128 t[5];
-+	fsquare_fsquare_times_(output, t, count1);
-+}
-+
-+static __always_inline void crecip_crecip(u64 *out, u64 *z)
-+{
-+	u64 buf[20] = { 0 };
-+	u64 *a0 = buf;
-+	u64 *t00 = buf + 5;
-+	u64 *b0 = buf + 10;
-+	u64 *t01;
-+	u64 *b1;
-+	u64 *c0;
-+	u64 *a;
-+	u64 *t0;
-+	u64 *b;
-+	u64 *c;
-+	fsquare_fsquare_times(a0, z, 1);
-+	fsquare_fsquare_times(t00, a0, 2);
-+	fmul_fmul(b0, t00, z);
-+	fmul_fmul(a0, b0, a0);
-+	fsquare_fsquare_times(t00, a0, 1);
-+	fmul_fmul(b0, t00, b0);
-+	fsquare_fsquare_times(t00, b0, 5);
-+	t01 = buf + 5;
-+	b1 = buf + 10;
-+	c0 = buf + 15;
-+	fmul_fmul(b1, t01, b1);
-+	fsquare_fsquare_times(t01, b1, 10);
-+	fmul_fmul(c0, t01, b1);
-+	fsquare_fsquare_times(t01, c0, 20);
-+	fmul_fmul(t01, t01, c0);
-+	fsquare_fsquare_times_inplace(t01, 10);
-+	fmul_fmul(b1, t01, b1);
-+	fsquare_fsquare_times(t01, b1, 50);
-+	a = buf;
-+	t0 = buf + 5;
-+	b = buf + 10;
-+	c = buf + 15;
-+	fmul_fmul(c, t0, b);
-+	fsquare_fsquare_times(t0, c, 100);
-+	fmul_fmul(t0, t0, c);
-+	fsquare_fsquare_times_inplace(t0, 50);
-+	fmul_fmul(t0, t0, b);
-+	fsquare_fsquare_times_inplace(t0, 5);
-+	fmul_fmul(out, t0, a);
-+}
-+
-+static __always_inline void fsum(u64 *a, u64 *b)
-+{
-+	a[0] += b[0];
-+	a[1] += b[1];
-+	a[2] += b[2];
-+	a[3] += b[3];
-+	a[4] += b[4];
-+}
-+
-+static __always_inline void fdifference(u64 *a, u64 *b)
-+{
-+	u64 tmp[5] = { 0 };
-+	u64 b0;
-+	u64 b1;
-+	u64 b2;
-+	u64 b3;
-+	u64 b4;
-+	memcpy(tmp, b, 5 * sizeof(*b));
-+	b0 = tmp[0];
-+	b1 = tmp[1];
-+	b2 = tmp[2];
-+	b3 = tmp[3];
-+	b4 = tmp[4];
-+	tmp[0] = b0 + 0x3fffffffffff68LLU;
-+	tmp[1] = b1 + 0x3ffffffffffff8LLU;
-+	tmp[2] = b2 + 0x3ffffffffffff8LLU;
-+	tmp[3] = b3 + 0x3ffffffffffff8LLU;
-+	tmp[4] = b4 + 0x3ffffffffffff8LLU;
-+	{
-+		u64 xi = a[0];
-+		u64 yi = tmp[0];
-+		a[0] = yi - xi;
-+	}
-+	{
-+		u64 xi = a[1];
-+		u64 yi = tmp[1];
-+		a[1] = yi - xi;
-+	}
-+	{
-+		u64 xi = a[2];
-+		u64 yi = tmp[2];
-+		a[2] = yi - xi;
-+	}
-+	{
-+		u64 xi = a[3];
-+		u64 yi = tmp[3];
-+		a[3] = yi - xi;
-+	}
-+	{
-+		u64 xi = a[4];
-+		u64 yi = tmp[4];
-+		a[4] = yi - xi;
-+	}
-+}
-+
-+static __always_inline void fscalar(u64 *output, u64 *b, u64 s)
-+{
-+	u128 tmp[5];
-+	u128 b4;
-+	u128 b0;
-+	u128 b4_;
-+	u128 b0_;
-+	{
-+		u64 xi = b[0];
-+		tmp[0] = ((u128)(xi) * (s));
-+	}
-+	{
-+		u64 xi = b[1];
-+		tmp[1] = ((u128)(xi) * (s));
-+	}
-+	{
-+		u64 xi = b[2];
-+		tmp[2] = ((u128)(xi) * (s));
-+	}
-+	{
-+		u64 xi = b[3];
-+		tmp[3] = ((u128)(xi) * (s));
-+	}
-+	{
-+		u64 xi = b[4];
-+		tmp[4] = ((u128)(xi) * (s));
-+	}
-+	fproduct_carry_wide_(tmp);
-+	b4 = tmp[4];
-+	b0 = tmp[0];
-+	b4_ = ((b4) & (((u128)(0x7ffffffffffffLLU))));
-+	b0_ = ((b0) + (((u128)(19) * (((u64)(((b4) >> (51))))))));
-+	tmp[4] = b4_;
-+	tmp[0] = b0_;
-+	fproduct_copy_from_wide_(output, tmp);
-+}
-+
-+static __always_inline void fmul(u64 *output, u64 *a, u64 *b)
-+{
-+	fmul_fmul(output, a, b);
-+}
-+
-+static __always_inline void crecip(u64 *output, u64 *input)
-+{
-+	crecip_crecip(output, input);
-+}
-+
-+static __always_inline void point_swap_conditional_step(u64 *a, u64 *b,
-+							u64 swap1, u32 ctr)
-+{
-+	u32 i = ctr - 1;
-+	u64 ai = a[i];
-+	u64 bi = b[i];
-+	u64 x = swap1 & (ai ^ bi);
-+	u64 ai1 = ai ^ x;
-+	u64 bi1 = bi ^ x;
-+	a[i] = ai1;
-+	b[i] = bi1;
-+}
-+
-+static __always_inline void point_swap_conditional5(u64 *a, u64 *b, u64 swap1)
-+{
-+	point_swap_conditional_step(a, b, swap1, 5);
-+	point_swap_conditional_step(a, b, swap1, 4);
-+	point_swap_conditional_step(a, b, swap1, 3);
-+	point_swap_conditional_step(a, b, swap1, 2);
-+	point_swap_conditional_step(a, b, swap1, 1);
-+}
-+
-+static __always_inline void point_swap_conditional(u64 *a, u64 *b, u64 iswap)
-+{
-+	u64 swap1 = 0 - iswap;
-+	point_swap_conditional5(a, b, swap1);
-+	point_swap_conditional5(a + 5, b + 5, swap1);
-+}
-+
-+static __always_inline void point_copy(u64 *output, u64 *input)
-+{
-+	memcpy(output, input, 5 * sizeof(*input));
-+	memcpy(output + 5, input + 5, 5 * sizeof(*input));
-+}
-+
-+static __always_inline void addanddouble_fmonty(u64 *pp, u64 *ppq, u64 *p,
-+						u64 *pq, u64 *qmqp)
-+{
-+	u64 *qx = qmqp;
-+	u64 *x2 = pp;
-+	u64 *z2 = pp + 5;
-+	u64 *x3 = ppq;
-+	u64 *z3 = ppq + 5;
-+	u64 *x = p;
-+	u64 *z = p + 5;
-+	u64 *xprime = pq;
-+	u64 *zprime = pq + 5;
-+	u64 buf[40] = { 0 };
-+	u64 *origx = buf;
-+	u64 *origxprime0 = buf + 5;
-+	u64 *xxprime0;
-+	u64 *zzprime0;
-+	u64 *origxprime;
-+	xxprime0 = buf + 25;
-+	zzprime0 = buf + 30;
-+	memcpy(origx, x, 5 * sizeof(*x));
-+	fsum(x, z);
-+	fdifference(z, origx);
-+	memcpy(origxprime0, xprime, 5 * sizeof(*xprime));
-+	fsum(xprime, zprime);
-+	fdifference(zprime, origxprime0);
-+	fmul(xxprime0, xprime, z);
-+	fmul(zzprime0, x, zprime);
-+	origxprime = buf + 5;
-+	{
-+		u64 *xx0;
-+		u64 *zz0;
-+		u64 *xxprime;
-+		u64 *zzprime;
-+		u64 *zzzprime;
-+		xx0 = buf + 15;
-+		zz0 = buf + 20;
-+		xxprime = buf + 25;
-+		zzprime = buf + 30;
-+		zzzprime = buf + 35;
-+		memcpy(origxprime, xxprime, 5 * sizeof(*xxprime));
-+		fsum(xxprime, zzprime);
-+		fdifference(zzprime, origxprime);
-+		fsquare_fsquare_times(x3, xxprime, 1);
-+		fsquare_fsquare_times(zzzprime, zzprime, 1);
-+		fmul(z3, zzzprime, qx);
-+		fsquare_fsquare_times(xx0, x, 1);
-+		fsquare_fsquare_times(zz0, z, 1);
-+		{
-+			u64 *zzz;
-+			u64 *xx;
-+			u64 *zz;
-+			u64 scalar;
-+			zzz = buf + 10;
-+			xx = buf + 15;
-+			zz = buf + 20;
-+			fmul(x2, xx, zz);
-+			fdifference(zz, xx);
-+			scalar = 121665;
-+			fscalar(zzz, zz, scalar);
-+			fsum(zzz, xx);
-+			fmul(z2, zzz, zz);
-+		}
-+	}
-+}
-+
-+static __always_inline void
-+ladder_smallloop_cmult_small_loop_step(u64 *nq, u64 *nqpq, u64 *nq2, u64 *nqpq2,
-+				       u64 *q, u8 byt)
-+{
-+	u64 bit0 = (u64)(byt >> 7);
-+	u64 bit;
-+	point_swap_conditional(nq, nqpq, bit0);
-+	addanddouble_fmonty(nq2, nqpq2, nq, nqpq, q);
-+	bit = (u64)(byt >> 7);
-+	point_swap_conditional(nq2, nqpq2, bit);
-+}
-+
-+static __always_inline void
-+ladder_smallloop_cmult_small_loop_double_step(u64 *nq, u64 *nqpq, u64 *nq2,
-+					      u64 *nqpq2, u64 *q, u8 byt)
-+{
-+	u8 byt1;
-+	ladder_smallloop_cmult_small_loop_step(nq, nqpq, nq2, nqpq2, q, byt);
-+	byt1 = byt << 1;
-+	ladder_smallloop_cmult_small_loop_step(nq2, nqpq2, nq, nqpq, q, byt1);
-+}
-+
-+static __always_inline void
-+ladder_smallloop_cmult_small_loop(u64 *nq, u64 *nqpq, u64 *nq2, u64 *nqpq2,
-+				  u64 *q, u8 byt, u32 i)
-+{
-+	while (i--) {
-+		ladder_smallloop_cmult_small_loop_double_step(nq, nqpq, nq2,
-+							      nqpq2, q, byt);
-+		byt <<= 2;
-+	}
-+}
-+
-+static __always_inline void ladder_bigloop_cmult_big_loop(u8 *n1, u64 *nq,
-+							  u64 *nqpq, u64 *nq2,
-+							  u64 *nqpq2, u64 *q,
-+							  u32 i)
-+{
-+	while (i--) {
-+		u8 byte = n1[i];
-+		ladder_smallloop_cmult_small_loop(nq, nqpq, nq2, nqpq2, q,
-+						  byte, 4);
-+	}
-+}
-+
-+static __always_inline void ladder_cmult(u64 *result, u8 *n1, u64 *q)
-+{
-+	u64 point_buf[40] = { 0 };
-+	u64 *nq = point_buf;
-+	u64 *nqpq = point_buf + 10;
-+	u64 *nq2 = point_buf + 20;
-+	u64 *nqpq2 = point_buf + 30;
-+	point_copy(nqpq, q);
-+	nq[0] = 1;
-+	ladder_bigloop_cmult_big_loop(n1, nq, nqpq, nq2, nqpq2, q, 32);
-+	point_copy(result, nq);
-+}
-+
-+static __always_inline void format_fexpand(u64 *output, const u8 *input)
-+{
-+	const u8 *x00 = input + 6;
-+	const u8 *x01 = input + 12;
-+	const u8 *x02 = input + 19;
-+	const u8 *x0 = input + 24;
-+	u64 i0, i1, i2, i3, i4, output0, output1, output2, output3, output4;
-+	i0 = get_unaligned_le64(input);
-+	i1 = get_unaligned_le64(x00);
-+	i2 = get_unaligned_le64(x01);
-+	i3 = get_unaligned_le64(x02);
-+	i4 = get_unaligned_le64(x0);
-+	output0 = i0 & 0x7ffffffffffffLLU;
-+	output1 = i1 >> 3 & 0x7ffffffffffffLLU;
-+	output2 = i2 >> 6 & 0x7ffffffffffffLLU;
-+	output3 = i3 >> 1 & 0x7ffffffffffffLLU;
-+	output4 = i4 >> 12 & 0x7ffffffffffffLLU;
-+	output[0] = output0;
-+	output[1] = output1;
-+	output[2] = output2;
-+	output[3] = output3;
-+	output[4] = output4;
-+}
-+
-+static __always_inline void format_fcontract_first_carry_pass(u64 *input)
-+{
-+	u64 t0 = input[0];
-+	u64 t1 = input[1];
-+	u64 t2 = input[2];
-+	u64 t3 = input[3];
-+	u64 t4 = input[4];
-+	u64 t1_ = t1 + (t0 >> 51);
-+	u64 t0_ = t0 & 0x7ffffffffffffLLU;
-+	u64 t2_ = t2 + (t1_ >> 51);
-+	u64 t1__ = t1_ & 0x7ffffffffffffLLU;
-+	u64 t3_ = t3 + (t2_ >> 51);
-+	u64 t2__ = t2_ & 0x7ffffffffffffLLU;
-+	u64 t4_ = t4 + (t3_ >> 51);
-+	u64 t3__ = t3_ & 0x7ffffffffffffLLU;
-+	input[0] = t0_;
-+	input[1] = t1__;
-+	input[2] = t2__;
-+	input[3] = t3__;
-+	input[4] = t4_;
-+}
-+
-+static __always_inline void format_fcontract_first_carry_full(u64 *input)
-+{
-+	format_fcontract_first_carry_pass(input);
-+	modulo_carry_top(input);
-+}
-+
-+static __always_inline void format_fcontract_second_carry_pass(u64 *input)
-+{
-+	u64 t0 = input[0];
-+	u64 t1 = input[1];
-+	u64 t2 = input[2];
-+	u64 t3 = input[3];
-+	u64 t4 = input[4];
-+	u64 t1_ = t1 + (t0 >> 51);
-+	u64 t0_ = t0 & 0x7ffffffffffffLLU;
-+	u64 t2_ = t2 + (t1_ >> 51);
-+	u64 t1__ = t1_ & 0x7ffffffffffffLLU;
-+	u64 t3_ = t3 + (t2_ >> 51);
-+	u64 t2__ = t2_ & 0x7ffffffffffffLLU;
-+	u64 t4_ = t4 + (t3_ >> 51);
-+	u64 t3__ = t3_ & 0x7ffffffffffffLLU;
-+	input[0] = t0_;
-+	input[1] = t1__;
-+	input[2] = t2__;
-+	input[3] = t3__;
-+	input[4] = t4_;
-+}
-+
-+static __always_inline void format_fcontract_second_carry_full(u64 *input)
-+{
-+	u64 i0;
-+	u64 i1;
-+	u64 i0_;
-+	u64 i1_;
-+	format_fcontract_second_carry_pass(input);
-+	modulo_carry_top(input);
-+	i0 = input[0];
-+	i1 = input[1];
-+	i0_ = i0 & 0x7ffffffffffffLLU;
-+	i1_ = i1 + (i0 >> 51);
-+	input[0] = i0_;
-+	input[1] = i1_;
-+}
-+
-+static __always_inline void format_fcontract_trim(u64 *input)
-+{
-+	u64 a0 = input[0];
-+	u64 a1 = input[1];
-+	u64 a2 = input[2];
-+	u64 a3 = input[3];
-+	u64 a4 = input[4];
-+	u64 mask0 = u64_gte_mask(a0, 0x7ffffffffffedLLU);
-+	u64 mask1 = u64_eq_mask(a1, 0x7ffffffffffffLLU);
-+	u64 mask2 = u64_eq_mask(a2, 0x7ffffffffffffLLU);
-+	u64 mask3 = u64_eq_mask(a3, 0x7ffffffffffffLLU);
-+	u64 mask4 = u64_eq_mask(a4, 0x7ffffffffffffLLU);
-+	u64 mask = (((mask0 & mask1) & mask2) & mask3) & mask4;
-+	u64 a0_ = a0 - (0x7ffffffffffedLLU & mask);
-+	u64 a1_ = a1 - (0x7ffffffffffffLLU & mask);
-+	u64 a2_ = a2 - (0x7ffffffffffffLLU & mask);
-+	u64 a3_ = a3 - (0x7ffffffffffffLLU & mask);
-+	u64 a4_ = a4 - (0x7ffffffffffffLLU & mask);
-+	input[0] = a0_;
-+	input[1] = a1_;
-+	input[2] = a2_;
-+	input[3] = a3_;
-+	input[4] = a4_;
-+}
-+
-+static __always_inline void format_fcontract_store(u8 *output, u64 *input)
-+{
-+	u64 t0 = input[0];
-+	u64 t1 = input[1];
-+	u64 t2 = input[2];
-+	u64 t3 = input[3];
-+	u64 t4 = input[4];
-+	u64 o0 = t1 << 51 | t0;
-+	u64 o1 = t2 << 38 | t1 >> 13;
-+	u64 o2 = t3 << 25 | t2 >> 26;
-+	u64 o3 = t4 << 12 | t3 >> 39;
-+	u8 *b0 = output;
-+	u8 *b1 = output + 8;
-+	u8 *b2 = output + 16;
-+	u8 *b3 = output + 24;
-+	put_unaligned_le64(o0, b0);
-+	put_unaligned_le64(o1, b1);
-+	put_unaligned_le64(o2, b2);
-+	put_unaligned_le64(o3, b3);
-+}
-+
-+static __always_inline void format_fcontract(u8 *output, u64 *input)
-+{
-+	format_fcontract_first_carry_full(input);
-+	format_fcontract_second_carry_full(input);
-+	format_fcontract_trim(input);
-+	format_fcontract_store(output, input);
-+}
-+
-+static __always_inline void format_scalar_of_point(u8 *scalar, u64 *point)
-+{
-+	u64 *x = point;
-+	u64 *z = point + 5;
-+	u64 buf[10] __aligned(32) = { 0 };
-+	u64 *zmone = buf;
-+	u64 *sc = buf + 5;
-+	crecip(zmone, z);
-+	fmul(sc, x, zmone);
-+	format_fcontract(scalar, sc);
-+}
-+
-+static void curve25519_generic(u8 mypublic[CURVE25519_POINT_SIZE],
-+			       const u8 secret[CURVE25519_POINT_SIZE],
-+			       const u8 basepoint[CURVE25519_POINT_SIZE])
-+{
-+	u64 buf0[10] __aligned(32) = { 0 };
-+	u64 *x0 = buf0;
-+	u64 *z = buf0 + 5;
-+	u64 *q;
-+	format_fexpand(x0, basepoint);
-+	z[0] = 1;
-+	q = buf0;
-+	{
-+		u8 e[32] __aligned(32) = { 0 };
-+		u8 *scalar;
-+		memcpy(e, secret, 32);
-+		normalize_secret(e);
-+		scalar = e;
-+		{
-+			u64 buf[15] = { 0 };
-+			u64 *nq = buf;
-+			u64 *x = nq;
-+			x[0] = 1;
-+			ladder_cmult(nq, scalar, q);
-+			format_scalar_of_point(mypublic, nq);
-+			memzero_explicit(buf, sizeof(buf));
-+		}
-+		memzero_explicit(e, sizeof(e));
-+	}
-+	memzero_explicit(buf0, sizeof(buf0));
-+}
-diff --git a/lib/zinc/curve25519/curve25519.c b/lib/zinc/curve25519/curve25519.c
-new file mode 100644
-index 000000000000..183eeb5bc548
---- /dev/null
-+++ b/lib/zinc/curve25519/curve25519.c
-@@ -0,0 +1,83 @@
++++ b/lib/zinc/curve25519/curve25519-arm-glue.h
+@@ -0,0 +1,46 @@
 +/* SPDX-License-Identifier: GPL-2.0
 + *
 + * Copyright (C) 2015-2018 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
-+ *
-+ * This is an implementation of the Curve25519 ECDH algorithm, using either
-+ * a 32-bit implementation or a 64-bit implementation with 128-bit integers,
-+ * depending on what is supported by the target compiler.
-+ *
-+ * Information: https://cr.yp.to/ecdh.html
 + */
 +
 +#include <zinc/curve25519.h>
++#include <asm/hwcap.h>
++#include <asm/neon.h>
++#include <asm/simd.h>
 +
-+#include <asm/unaligned.h>
-+#include <linux/version.h>
-+#include <linux/string.h>
-+#include <linux/random.h>
-+#include <crypto/algapi.h>
++#if IS_ENABLED(CONFIG_KERNEL_MODE_NEON) && __LINUX_ARM_ARCH__ == 7
++#define ARM_USE_NEON
++asmlinkage void curve25519_neon(u8 mypublic[CURVE25519_POINT_SIZE],
++				const u8 secret[CURVE25519_POINT_SIZE],
++				const u8 basepoint[CURVE25519_POINT_SIZE]);
++#endif
 +
-+#ifndef HAVE_CURVE25519_ARCH_IMPLEMENTATION
++static bool curve25519_use_neon __ro_after_init;
++
 +void __init curve25519_fpu_init(void)
 +{
++	curve25519_use_neon = elf_hwcap & HWCAP_NEON;
 +}
++
 +static inline bool curve25519_arch(u8 mypublic[CURVE25519_POINT_SIZE],
 +				   const u8 secret[CURVE25519_POINT_SIZE],
 +				   const u8 basepoint[CURVE25519_POINT_SIZE])
 +{
++#ifdef ARM_USE_NEON
++	if (curve25519_use_neon && may_use_simd()) {
++		kernel_neon_begin();
++		curve25519_neon(mypublic, secret, basepoint);
++		kernel_neon_end();
++		return true;
++	}
++#endif
 +	return false;
 +}
++
 +static inline bool curve25519_base_arch(u8 pub[CURVE25519_POINT_SIZE],
 +					const u8 secret[CURVE25519_POINT_SIZE])
 +{
 +	return false;
 +}
-+#endif
 +
-+static __always_inline void normalize_secret(u8 secret[CURVE25519_POINT_SIZE])
-+{
-+	secret[0] &= 248;
-+	secret[31] &= 127;
-+	secret[31] |= 64;
-+}
-+
-+#if defined(CONFIG_ARCH_SUPPORTS_INT128) && defined(__SIZEOF_INT128__)
-+#include "curve25519-hacl64.h"
-+#else
-+#include "curve25519-fiat32.h"
-+#endif
-+
-+static const u8 null_point[CURVE25519_POINT_SIZE] = { 0 };
-+
-+bool curve25519(u8 mypublic[CURVE25519_POINT_SIZE],
-+		const u8 secret[CURVE25519_POINT_SIZE],
-+		const u8 basepoint[CURVE25519_POINT_SIZE])
-+{
-+	if (!curve25519_arch(mypublic, secret, basepoint))
-+		curve25519_generic(mypublic, secret, basepoint);
-+	return crypto_memneq(mypublic, null_point, CURVE25519_POINT_SIZE);
-+}
-+EXPORT_SYMBOL(curve25519);
-+
-+bool curve25519_generate_public(u8 pub[CURVE25519_POINT_SIZE],
-+				const u8 secret[CURVE25519_POINT_SIZE])
-+{
-+	static const u8 basepoint[CURVE25519_POINT_SIZE] __aligned(32) = { 9 };
-+
-+	if (unlikely(!crypto_memneq(secret, null_point, CURVE25519_POINT_SIZE)))
-+		return false;
-+
-+	if (curve25519_base_arch(pub, secret))
-+		return crypto_memneq(pub, null_point, CURVE25519_POINT_SIZE);
-+	return curve25519(pub, secret, basepoint);
-+}
-+EXPORT_SYMBOL(curve25519_generate_public);
-+
-+void curve25519_generate_secret(u8 secret[CURVE25519_POINT_SIZE])
-+{
-+	get_random_bytes_wait(secret, CURVE25519_POINT_SIZE);
-+	normalize_secret(secret);
-+}
-+EXPORT_SYMBOL(curve25519_generate_secret);
-+
-+#include "../selftest/curve25519.h"
-diff --git a/lib/zinc/main.c b/lib/zinc/main.c
-index b1d650d82edb..8138b6d99754 100644
---- a/lib/zinc/main.c
-+++ b/lib/zinc/main.c
-@@ -7,6 +7,7 @@
- #include <zinc/chacha20.h>
- #include <zinc/poly1305.h>
- #include <zinc/blake2s.h>
-+#include <zinc/curve25519.h>
- 
- #include <linux/init.h>
- #include <linux/module.h>
-@@ -35,6 +36,10 @@ static int __init mod_init(void)
- #ifdef CONFIG_ZINC_BLAKE2S
- 	blake2s_fpu_init();
- 	selftest(blake2s);
-+#endif
-+#ifdef CONFIG_ZINC_CURVE25519
-+	curve25519_fpu_init();
-+	selftest(curve25519);
- #endif
- 	return 0;
- }
-diff --git a/lib/zinc/selftest/curve25519.h b/lib/zinc/selftest/curve25519.h
++#define HAVE_CURVE25519_ARCH_IMPLEMENTATION
+diff --git a/lib/zinc/curve25519/curve25519-arm.S b/lib/zinc/curve25519/curve25519-arm.S
 new file mode 100644
-index 000000000000..b9ac9897106d
+index 000000000000..ad6690b8ffd7
 --- /dev/null
-+++ b/lib/zinc/selftest/curve25519.h
-@@ -0,0 +1,1321 @@
++++ b/lib/zinc/curve25519/curve25519-arm.S
+@@ -0,0 +1,2095 @@
 +/* SPDX-License-Identifier: GPL-2.0
 + *
 + * Copyright (C) 2015-2018 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
++ *
++ * Based on public domain code from Daniel J. Bernstein and Peter Schwabe. This
++ * has been built from SUPERCOP's curve25519/neon2/scalarmult.pq using qhasm,
++ * but has subsequently been manually reworked for use in kernel space.
 + */
 +
-+#ifdef DEBUG
-+struct curve25519_test_vector {
-+	u8 private[CURVE25519_POINT_SIZE];
-+	u8 public[CURVE25519_POINT_SIZE];
-+	u8 result[CURVE25519_POINT_SIZE];
-+	bool valid;
-+};
-+static const struct curve25519_test_vector curve25519_test_vectors[] __initconst = {
-+	{
-+		.private = { 0x77, 0x07, 0x6d, 0x0a, 0x73, 0x18, 0xa5, 0x7d,
-+			     0x3c, 0x16, 0xc1, 0x72, 0x51, 0xb2, 0x66, 0x45,
-+			     0xdf, 0x4c, 0x2f, 0x87, 0xeb, 0xc0, 0x99, 0x2a,
-+			     0xb1, 0x77, 0xfb, 0xa5, 0x1d, 0xb9, 0x2c, 0x2a },
-+		.public = { 0xde, 0x9e, 0xdb, 0x7d, 0x7b, 0x7d, 0xc1, 0xb4,
-+			    0xd3, 0x5b, 0x61, 0xc2, 0xec, 0xe4, 0x35, 0x37,
-+			    0x3f, 0x83, 0x43, 0xc8, 0x5b, 0x78, 0x67, 0x4d,
-+			    0xad, 0xfc, 0x7e, 0x14, 0x6f, 0x88, 0x2b, 0x4f },
-+		.result = { 0x4a, 0x5d, 0x9d, 0x5b, 0xa4, 0xce, 0x2d, 0xe1,
-+			    0x72, 0x8e, 0x3b, 0xf4, 0x80, 0x35, 0x0f, 0x25,
-+			    0xe0, 0x7e, 0x21, 0xc9, 0x47, 0xd1, 0x9e, 0x33,
-+			    0x76, 0xf0, 0x9b, 0x3c, 0x1e, 0x16, 0x17, 0x42 },
-+		.valid = true
-+	},
-+	{
-+		.private = { 0x5d, 0xab, 0x08, 0x7e, 0x62, 0x4a, 0x8a, 0x4b,
-+			     0x79, 0xe1, 0x7f, 0x8b, 0x83, 0x80, 0x0e, 0xe6,
-+			     0x6f, 0x3b, 0xb1, 0x29, 0x26, 0x18, 0xb6, 0xfd,
-+			     0x1c, 0x2f, 0x8b, 0x27, 0xff, 0x88, 0xe0, 0xeb },
-+		.public = { 0x85, 0x20, 0xf0, 0x09, 0x89, 0x30, 0xa7, 0x54,
-+			    0x74, 0x8b, 0x7d, 0xdc, 0xb4, 0x3e, 0xf7, 0x5a,
-+			    0x0d, 0xbf, 0x3a, 0x0d, 0x26, 0x38, 0x1a, 0xf4,
-+			    0xeb, 0xa4, 0xa9, 0x8e, 0xaa, 0x9b, 0x4e, 0x6a },
-+		.result = { 0x4a, 0x5d, 0x9d, 0x5b, 0xa4, 0xce, 0x2d, 0xe1,
-+			    0x72, 0x8e, 0x3b, 0xf4, 0x80, 0x35, 0x0f, 0x25,
-+			    0xe0, 0x7e, 0x21, 0xc9, 0x47, 0xd1, 0x9e, 0x33,
-+			    0x76, 0xf0, 0x9b, 0x3c, 0x1e, 0x16, 0x17, 0x42 },
-+		.valid = true
-+	},
-+	{
-+		.private = { 1 },
-+		.public = { 0x25, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
-+		.result = { 0x3c, 0x77, 0x77, 0xca, 0xf9, 0x97, 0xb2, 0x64,
-+			    0x41, 0x60, 0x77, 0x66, 0x5b, 0x4e, 0x22, 0x9d,
-+			    0x0b, 0x95, 0x48, 0xdc, 0x0c, 0xd8, 0x19, 0x98,
-+			    0xdd, 0xcd, 0xc5, 0xc8, 0x53, 0x3c, 0x79, 0x7f },
-+		.valid = true
-+	},
-+	{
-+		.private = { 1 },
-+		.public = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff },
-+		.result = { 0xb3, 0x2d, 0x13, 0x62, 0xc2, 0x48, 0xd6, 0x2f,
-+			    0xe6, 0x26, 0x19, 0xcf, 0xf0, 0x4d, 0xd4, 0x3d,
-+			    0xb7, 0x3f, 0xfc, 0x1b, 0x63, 0x08, 0xed, 0xe3,
-+			    0x0b, 0x78, 0xd8, 0x73, 0x80, 0xf1, 0xe8, 0x34 },
-+		.valid = true
-+	},
-+	{
-+		.private = { 0xa5, 0x46, 0xe3, 0x6b, 0xf0, 0x52, 0x7c, 0x9d,
-+			     0x3b, 0x16, 0x15, 0x4b, 0x82, 0x46, 0x5e, 0xdd,
-+			     0x62, 0x14, 0x4c, 0x0a, 0xc1, 0xfc, 0x5a, 0x18,
-+			     0x50, 0x6a, 0x22, 0x44, 0xba, 0x44, 0x9a, 0xc4 },
-+		.public = { 0xe6, 0xdb, 0x68, 0x67, 0x58, 0x30, 0x30, 0xdb,
-+			    0x35, 0x94, 0xc1, 0xa4, 0x24, 0xb1, 0x5f, 0x7c,
-+			    0x72, 0x66, 0x24, 0xec, 0x26, 0xb3, 0x35, 0x3b,
-+			    0x10, 0xa9, 0x03, 0xa6, 0xd0, 0xab, 0x1c, 0x4c },
-+		.result = { 0xc3, 0xda, 0x55, 0x37, 0x9d, 0xe9, 0xc6, 0x90,
-+			    0x8e, 0x94, 0xea, 0x4d, 0xf2, 0x8d, 0x08, 0x4f,
-+			    0x32, 0xec, 0xcf, 0x03, 0x49, 0x1c, 0x71, 0xf7,
-+			    0x54, 0xb4, 0x07, 0x55, 0x77, 0xa2, 0x85, 0x52 },
-+		.valid = true
-+	},
-+	{
-+		.private = { 1, 2, 3, 4 },
-+		.public = { 0 },
-+		.result = { 0 },
-+		.valid = false
-+	},
-+	{
-+		.private = { 2, 4, 6, 8 },
-+		.public = { 0xe0, 0xeb, 0x7a, 0x7c, 0x3b, 0x41, 0xb8, 0xae,
-+			    0x16, 0x56, 0xe3, 0xfa, 0xf1, 0x9f, 0xc4, 0x6a,
-+			    0xda, 0x09, 0x8d, 0xeb, 0x9c, 0x32, 0xb1, 0xfd,
-+			    0x86, 0x62, 0x05, 0x16, 0x5f, 0x49, 0xb8 },
-+		.result = { 0 },
-+		.valid = false
-+	},
-+	{
-+		.private = { 0xff, 0xff, 0xff, 0xff, 0x0a, 0xff, 0xff, 0xff,
-+			     0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			     0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			     0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff },
-+		.public = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0x0a, 0x00, 0xfb, 0x9f },
-+		.result = { 0x77, 0x52, 0xb6, 0x18, 0xc1, 0x2d, 0x48, 0xd2,
-+			    0xc6, 0x93, 0x46, 0x83, 0x81, 0x7c, 0xc6, 0x57,
-+			    0xf3, 0x31, 0x03, 0x19, 0x49, 0x48, 0x20, 0x05,
-+			    0x42, 0x2b, 0x4e, 0xae, 0x8d, 0x1d, 0x43, 0x23 },
-+		.valid = true
-+	},
-+	{
-+		.private = { 0x8e, 0x0a, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
-+		.public = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x8e, 0x06 },
-+		.result = { 0x5a, 0xdf, 0xaa, 0x25, 0x86, 0x8e, 0x32, 0x3d,
-+			    0xae, 0x49, 0x62, 0xc1, 0x01, 0x5c, 0xb3, 0x12,
-+			    0xe1, 0xc5, 0xc7, 0x9e, 0x95, 0x3f, 0x03, 0x99,
-+			    0xb0, 0xba, 0x16, 0x22, 0xf3, 0xb6, 0xf7, 0x0c },
-+		.valid = true
-+	},
-+	/* wycheproof - normal case */
-+	{
-+		.private = { 0x48, 0x52, 0x83, 0x4d, 0x9d, 0x6b, 0x77, 0xda,
-+			     0xde, 0xab, 0xaa, 0xf2, 0xe1, 0x1d, 0xca, 0x66,
-+			     0xd1, 0x9f, 0xe7, 0x49, 0x93, 0xa7, 0xbe, 0xc3,
-+			     0x6c, 0x6e, 0x16, 0xa0, 0x98, 0x3f, 0xea, 0xba },
-+		.public = { 0x9c, 0x64, 0x7d, 0x9a, 0xe5, 0x89, 0xb9, 0xf5,
-+			    0x8f, 0xdc, 0x3c, 0xa4, 0x94, 0x7e, 0xfb, 0xc9,
-+			    0x15, 0xc4, 0xb2, 0xe0, 0x8e, 0x74, 0x4a, 0x0e,
-+			    0xdf, 0x46, 0x9d, 0xac, 0x59, 0xc8, 0xf8, 0x5a },
-+		.result = { 0x87, 0xb7, 0xf2, 0x12, 0xb6, 0x27, 0xf7, 0xa5,
-+			    0x4c, 0xa5, 0xe0, 0xbc, 0xda, 0xdd, 0xd5, 0x38,
-+			    0x9d, 0x9d, 0xe6, 0x15, 0x6c, 0xdb, 0xcf, 0x8e,
-+			    0xbe, 0x14, 0xff, 0xbc, 0xfb, 0x43, 0x65, 0x51 },
-+		.valid = true
-+	},
-+	/* wycheproof - public key on twist */
-+	{
-+		.private = { 0x58, 0x8c, 0x06, 0x1a, 0x50, 0x80, 0x4a, 0xc4,
-+			     0x88, 0xad, 0x77, 0x4a, 0xc7, 0x16, 0xc3, 0xf5,
-+			     0xba, 0x71, 0x4b, 0x27, 0x12, 0xe0, 0x48, 0x49,
-+			     0x13, 0x79, 0xa5, 0x00, 0x21, 0x19, 0x98, 0xa8 },
-+		.public = { 0x63, 0xaa, 0x40, 0xc6, 0xe3, 0x83, 0x46, 0xc5,
-+			    0xca, 0xf2, 0x3a, 0x6d, 0xf0, 0xa5, 0xe6, 0xc8,
-+			    0x08, 0x89, 0xa0, 0x86, 0x47, 0xe5, 0x51, 0xb3,
-+			    0x56, 0x34, 0x49, 0xbe, 0xfc, 0xfc, 0x97, 0x33 },
-+		.result = { 0xb1, 0xa7, 0x07, 0x51, 0x94, 0x95, 0xff, 0xff,
-+			    0xb2, 0x98, 0xff, 0x94, 0x17, 0x16, 0xb0, 0x6d,
-+			    0xfa, 0xb8, 0x7c, 0xf8, 0xd9, 0x11, 0x23, 0xfe,
-+			    0x2b, 0xe9, 0xa2, 0x33, 0xdd, 0xa2, 0x22, 0x12 },
-+		.valid = true
-+	},
-+	/* wycheproof - public key on twist */
-+	{
-+		.private = { 0xb0, 0x5b, 0xfd, 0x32, 0xe5, 0x53, 0x25, 0xd9,
-+			     0xfd, 0x64, 0x8c, 0xb3, 0x02, 0x84, 0x80, 0x39,
-+			     0x00, 0x0b, 0x39, 0x0e, 0x44, 0xd5, 0x21, 0xe5,
-+			     0x8a, 0xab, 0x3b, 0x29, 0xa6, 0x96, 0x0b, 0xa8 },
-+		.public = { 0x0f, 0x83, 0xc3, 0x6f, 0xde, 0xd9, 0xd3, 0x2f,
-+			    0xad, 0xf4, 0xef, 0xa3, 0xae, 0x93, 0xa9, 0x0b,
-+			    0xb5, 0xcf, 0xa6, 0x68, 0x93, 0xbc, 0x41, 0x2c,
-+			    0x43, 0xfa, 0x72, 0x87, 0xdb, 0xb9, 0x97, 0x79 },
-+		.result = { 0x67, 0xdd, 0x4a, 0x6e, 0x16, 0x55, 0x33, 0x53,
-+			    0x4c, 0x0e, 0x3f, 0x17, 0x2e, 0x4a, 0xb8, 0x57,
-+			    0x6b, 0xca, 0x92, 0x3a, 0x5f, 0x07, 0xb2, 0xc0,
-+			    0x69, 0xb4, 0xc3, 0x10, 0xff, 0x2e, 0x93, 0x5b },
-+		.valid = true
-+	},
-+	/* wycheproof - public key on twist */
-+	{
-+		.private = { 0x70, 0xe3, 0x4b, 0xcb, 0xe1, 0xf4, 0x7f, 0xbc,
-+			     0x0f, 0xdd, 0xfd, 0x7c, 0x1e, 0x1a, 0xa5, 0x3d,
-+			     0x57, 0xbf, 0xe0, 0xf6, 0x6d, 0x24, 0x30, 0x67,
-+			     0xb4, 0x24, 0xbb, 0x62, 0x10, 0xbe, 0xd1, 0x9c },
-+		.public = { 0x0b, 0x82, 0x11, 0xa2, 0xb6, 0x04, 0x90, 0x97,
-+			    0xf6, 0x87, 0x1c, 0x6c, 0x05, 0x2d, 0x3c, 0x5f,
-+			    0xc1, 0xba, 0x17, 0xda, 0x9e, 0x32, 0xae, 0x45,
-+			    0x84, 0x03, 0xb0, 0x5b, 0xb2, 0x83, 0x09, 0x2a },
-+		.result = { 0x4a, 0x06, 0x38, 0xcf, 0xaa, 0x9e, 0xf1, 0x93,
-+			    0x3b, 0x47, 0xf8, 0x93, 0x92, 0x96, 0xa6, 0xb2,
-+			    0x5b, 0xe5, 0x41, 0xef, 0x7f, 0x70, 0xe8, 0x44,
-+			    0xc0, 0xbc, 0xc0, 0x0b, 0x13, 0x4d, 0xe6, 0x4a },
-+		.valid = true
-+	},
-+	/* wycheproof - public key on twist */
-+	{
-+		.private = { 0x68, 0xc1, 0xf3, 0xa6, 0x53, 0xa4, 0xcd, 0xb1,
-+			     0xd3, 0x7b, 0xba, 0x94, 0x73, 0x8f, 0x8b, 0x95,
-+			     0x7a, 0x57, 0xbe, 0xb2, 0x4d, 0x64, 0x6e, 0x99,
-+			     0x4d, 0xc2, 0x9a, 0x27, 0x6a, 0xad, 0x45, 0x8d },
-+		.public = { 0x34, 0x3a, 0xc2, 0x0a, 0x3b, 0x9c, 0x6a, 0x27,
-+			    0xb1, 0x00, 0x81, 0x76, 0x50, 0x9a, 0xd3, 0x07,
-+			    0x35, 0x85, 0x6e, 0xc1, 0xc8, 0xd8, 0xfc, 0xae,
-+			    0x13, 0x91, 0x2d, 0x08, 0xd1, 0x52, 0xf4, 0x6c },
-+		.result = { 0x39, 0x94, 0x91, 0xfc, 0xe8, 0xdf, 0xab, 0x73,
-+			    0xb4, 0xf9, 0xf6, 0x11, 0xde, 0x8e, 0xa0, 0xb2,
-+			    0x7b, 0x28, 0xf8, 0x59, 0x94, 0x25, 0x0b, 0x0f,
-+			    0x47, 0x5d, 0x58, 0x5d, 0x04, 0x2a, 0xc2, 0x07 },
-+		.valid = true
-+	},
-+	/* wycheproof - public key on twist */
-+	{
-+		.private = { 0xd8, 0x77, 0xb2, 0x6d, 0x06, 0xdf, 0xf9, 0xd9,
-+			     0xf7, 0xfd, 0x4c, 0x5b, 0x37, 0x69, 0xf8, 0xcd,
-+			     0xd5, 0xb3, 0x05, 0x16, 0xa5, 0xab, 0x80, 0x6b,
-+			     0xe3, 0x24, 0xff, 0x3e, 0xb6, 0x9e, 0xa0, 0xb2 },
-+		.public = { 0xfa, 0x69, 0x5f, 0xc7, 0xbe, 0x8d, 0x1b, 0xe5,
-+			    0xbf, 0x70, 0x48, 0x98, 0xf3, 0x88, 0xc4, 0x52,
-+			    0xba, 0xfd, 0xd3, 0xb8, 0xea, 0xe8, 0x05, 0xf8,
-+			    0x68, 0x1a, 0x8d, 0x15, 0xc2, 0xd4, 0xe1, 0x42 },
-+		.result = { 0x2c, 0x4f, 0xe1, 0x1d, 0x49, 0x0a, 0x53, 0x86,
-+			    0x17, 0x76, 0xb1, 0x3b, 0x43, 0x54, 0xab, 0xd4,
-+			    0xcf, 0x5a, 0x97, 0x69, 0x9d, 0xb6, 0xe6, 0xc6,
-+			    0x8c, 0x16, 0x26, 0xd0, 0x76, 0x62, 0xf7, 0x58 },
-+		.valid = true
-+	},
-+	/* wycheproof - public key = 0 */
-+	{
-+		.private = { 0x20, 0x74, 0x94, 0x03, 0x8f, 0x2b, 0xb8, 0x11,
-+			     0xd4, 0x78, 0x05, 0xbc, 0xdf, 0x04, 0xa2, 0xac,
-+			     0x58, 0x5a, 0xda, 0x7f, 0x2f, 0x23, 0x38, 0x9b,
-+			     0xfd, 0x46, 0x58, 0xf9, 0xdd, 0xd4, 0xde, 0xbc },
-+		.public = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
-+		.result = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
-+		.valid = false
-+	},
-+	/* wycheproof - public key = 1 */
-+	{
-+		.private = { 0x20, 0x2e, 0x89, 0x72, 0xb6, 0x1c, 0x7e, 0x61,
-+			     0x93, 0x0e, 0xb9, 0x45, 0x0b, 0x50, 0x70, 0xea,
-+			     0xe1, 0xc6, 0x70, 0x47, 0x56, 0x85, 0x54, 0x1f,
-+			     0x04, 0x76, 0x21, 0x7e, 0x48, 0x18, 0xcf, 0xab },
-+		.public = { 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
-+		.result = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
-+		.valid = false
-+	},
-+	/* wycheproof - edge case on twist */
-+	{
-+		.private = { 0x38, 0xdd, 0xe9, 0xf3, 0xe7, 0xb7, 0x99, 0x04,
-+			     0x5f, 0x9a, 0xc3, 0x79, 0x3d, 0x4a, 0x92, 0x77,
-+			     0xda, 0xde, 0xad, 0xc4, 0x1b, 0xec, 0x02, 0x90,
-+			     0xf8, 0x1f, 0x74, 0x4f, 0x73, 0x77, 0x5f, 0x84 },
-+		.public = { 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
-+		.result = { 0x9a, 0x2c, 0xfe, 0x84, 0xff, 0x9c, 0x4a, 0x97,
-+			    0x39, 0x62, 0x5c, 0xae, 0x4a, 0x3b, 0x82, 0xa9,
-+			    0x06, 0x87, 0x7a, 0x44, 0x19, 0x46, 0xf8, 0xd7,
-+			    0xb3, 0xd7, 0x95, 0xfe, 0x8f, 0x5d, 0x16, 0x39 },
-+		.valid = true
-+	},
-+	/* wycheproof - edge case on twist */
-+	{
-+		.private = { 0x98, 0x57, 0xa9, 0x14, 0xe3, 0xc2, 0x90, 0x36,
-+			     0xfd, 0x9a, 0x44, 0x2b, 0xa5, 0x26, 0xb5, 0xcd,
-+			     0xcd, 0xf2, 0x82, 0x16, 0x15, 0x3e, 0x63, 0x6c,
-+			     0x10, 0x67, 0x7a, 0xca, 0xb6, 0xbd, 0x6a, 0xa5 },
-+		.public = { 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
-+		.result = { 0x4d, 0xa4, 0xe0, 0xaa, 0x07, 0x2c, 0x23, 0x2e,
-+			    0xe2, 0xf0, 0xfa, 0x4e, 0x51, 0x9a, 0xe5, 0x0b,
-+			    0x52, 0xc1, 0xed, 0xd0, 0x8a, 0x53, 0x4d, 0x4e,
-+			    0xf3, 0x46, 0xc2, 0xe1, 0x06, 0xd2, 0x1d, 0x60 },
-+		.valid = true
-+	},
-+	/* wycheproof - edge case on twist */
-+	{
-+		.private = { 0x48, 0xe2, 0x13, 0x0d, 0x72, 0x33, 0x05, 0xed,
-+			     0x05, 0xe6, 0xe5, 0x89, 0x4d, 0x39, 0x8a, 0x5e,
-+			     0x33, 0x36, 0x7a, 0x8c, 0x6a, 0xac, 0x8f, 0xcd,
-+			     0xf0, 0xa8, 0x8e, 0x4b, 0x42, 0x82, 0x0d, 0xb7 },
-+		.public = { 0xff, 0xff, 0xff, 0x03, 0x00, 0x00, 0xf8, 0xff,
-+			    0xff, 0x1f, 0x00, 0x00, 0xc0, 0xff, 0xff, 0xff,
-+			    0x00, 0x00, 0x00, 0xfe, 0xff, 0xff, 0x07, 0x00,
-+			    0x00, 0xf0, 0xff, 0xff, 0x3f, 0x00, 0x00, 0x00 },
-+		.result = { 0x9e, 0xd1, 0x0c, 0x53, 0x74, 0x7f, 0x64, 0x7f,
-+			    0x82, 0xf4, 0x51, 0x25, 0xd3, 0xde, 0x15, 0xa1,
-+			    0xe6, 0xb8, 0x24, 0x49, 0x6a, 0xb4, 0x04, 0x10,
-+			    0xff, 0xcc, 0x3c, 0xfe, 0x95, 0x76, 0x0f, 0x3b },
-+		.valid = true
-+	},
-+	/* wycheproof - edge case on twist */
-+	{
-+		.private = { 0x28, 0xf4, 0x10, 0x11, 0x69, 0x18, 0x51, 0xb3,
-+			     0xa6, 0x2b, 0x64, 0x15, 0x53, 0xb3, 0x0d, 0x0d,
-+			     0xfd, 0xdc, 0xb8, 0xff, 0xfc, 0xf5, 0x37, 0x00,
-+			     0xa7, 0xbe, 0x2f, 0x6a, 0x87, 0x2e, 0x9f, 0xb0 },
-+		.public = { 0x00, 0x00, 0x00, 0xfc, 0xff, 0xff, 0x07, 0x00,
-+			    0x00, 0xe0, 0xff, 0xff, 0x3f, 0x00, 0x00, 0x00,
-+			    0xff, 0xff, 0xff, 0x01, 0x00, 0x00, 0xf8, 0xff,
-+			    0xff, 0x0f, 0x00, 0x00, 0xc0, 0xff, 0xff, 0x7f },
-+		.result = { 0xcf, 0x72, 0xb4, 0xaa, 0x6a, 0xa1, 0xc9, 0xf8,
-+			    0x94, 0xf4, 0x16, 0x5b, 0x86, 0x10, 0x9a, 0xa4,
-+			    0x68, 0x51, 0x76, 0x48, 0xe1, 0xf0, 0xcc, 0x70,
-+			    0xe1, 0xab, 0x08, 0x46, 0x01, 0x76, 0x50, 0x6b },
-+		.valid = true
-+	},
-+	/* wycheproof - edge case on twist */
-+	{
-+		.private = { 0x18, 0xa9, 0x3b, 0x64, 0x99, 0xb9, 0xf6, 0xb3,
-+			     0x22, 0x5c, 0xa0, 0x2f, 0xef, 0x41, 0x0e, 0x0a,
-+			     0xde, 0xc2, 0x35, 0x32, 0x32, 0x1d, 0x2d, 0x8e,
-+			     0xf1, 0xa6, 0xd6, 0x02, 0xa8, 0xc6, 0x5b, 0x83 },
-+		.public = { 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff,
-+			    0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff,
-+			    0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff,
-+			    0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0x7f },
-+		.result = { 0x5d, 0x50, 0xb6, 0x28, 0x36, 0xbb, 0x69, 0x57,
-+			    0x94, 0x10, 0x38, 0x6c, 0xf7, 0xbb, 0x81, 0x1c,
-+			    0x14, 0xbf, 0x85, 0xb1, 0xc7, 0xb1, 0x7e, 0x59,
-+			    0x24, 0xc7, 0xff, 0xea, 0x91, 0xef, 0x9e, 0x12 },
-+		.valid = true
-+	},
-+	/* wycheproof - edge case on twist */
-+	{
-+		.private = { 0xc0, 0x1d, 0x13, 0x05, 0xa1, 0x33, 0x8a, 0x1f,
-+			     0xca, 0xc2, 0xba, 0x7e, 0x2e, 0x03, 0x2b, 0x42,
-+			     0x7e, 0x0b, 0x04, 0x90, 0x31, 0x65, 0xac, 0xa9,
-+			     0x57, 0xd8, 0xd0, 0x55, 0x3d, 0x87, 0x17, 0xb0 },
-+		.public = { 0xea, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x7f },
-+		.result = { 0x19, 0x23, 0x0e, 0xb1, 0x48, 0xd5, 0xd6, 0x7c,
-+			    0x3c, 0x22, 0xab, 0x1d, 0xae, 0xff, 0x80, 0xa5,
-+			    0x7e, 0xae, 0x42, 0x65, 0xce, 0x28, 0x72, 0x65,
-+			    0x7b, 0x2c, 0x80, 0x99, 0xfc, 0x69, 0x8e, 0x50 },
-+		.valid = true
-+	},
-+	/* wycheproof - edge case for public key */
-+	{
-+		.private = { 0x38, 0x6f, 0x7f, 0x16, 0xc5, 0x07, 0x31, 0xd6,
-+			     0x4f, 0x82, 0xe6, 0xa1, 0x70, 0xb1, 0x42, 0xa4,
-+			     0xe3, 0x4f, 0x31, 0xfd, 0x77, 0x68, 0xfc, 0xb8,
-+			     0x90, 0x29, 0x25, 0xe7, 0xd1, 0xe2, 0x1a, 0xbe },
-+		.public = { 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
-+		.result = { 0x0f, 0xca, 0xb5, 0xd8, 0x42, 0xa0, 0x78, 0xd7,
-+			    0xa7, 0x1f, 0xc5, 0x9b, 0x57, 0xbf, 0xb4, 0xca,
-+			    0x0b, 0xe6, 0x87, 0x3b, 0x49, 0xdc, 0xdb, 0x9f,
-+			    0x44, 0xe1, 0x4a, 0xe8, 0xfb, 0xdf, 0xa5, 0x42 },
-+		.valid = true
-+	},
-+	/* wycheproof - edge case for public key */
-+	{
-+		.private = { 0xe0, 0x23, 0xa2, 0x89, 0xbd, 0x5e, 0x90, 0xfa,
-+			     0x28, 0x04, 0xdd, 0xc0, 0x19, 0xa0, 0x5e, 0xf3,
-+			     0xe7, 0x9d, 0x43, 0x4b, 0xb6, 0xea, 0x2f, 0x52,
-+			     0x2e, 0xcb, 0x64, 0x3a, 0x75, 0x29, 0x6e, 0x95 },
-+		.public = { 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00,
-+			    0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00,
-+			    0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00,
-+			    0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00 },
-+		.result = { 0x54, 0xce, 0x8f, 0x22, 0x75, 0xc0, 0x77, 0xe3,
-+			    0xb1, 0x30, 0x6a, 0x39, 0x39, 0xc5, 0xe0, 0x3e,
-+			    0xef, 0x6b, 0xbb, 0x88, 0x06, 0x05, 0x44, 0x75,
-+			    0x8d, 0x9f, 0xef, 0x59, 0xb0, 0xbc, 0x3e, 0x4f },
-+		.valid = true
-+	},
-+	/* wycheproof - edge case for public key */
-+	{
-+		.private = { 0x68, 0xf0, 0x10, 0xd6, 0x2e, 0xe8, 0xd9, 0x26,
-+			     0x05, 0x3a, 0x36, 0x1c, 0x3a, 0x75, 0xc6, 0xea,
-+			     0x4e, 0xbd, 0xc8, 0x60, 0x6a, 0xb2, 0x85, 0x00,
-+			     0x3a, 0x6f, 0x8f, 0x40, 0x76, 0xb0, 0x1e, 0x83 },
-+		.public = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x03 },
-+		.result = { 0xf1, 0x36, 0x77, 0x5c, 0x5b, 0xeb, 0x0a, 0xf8,
-+			    0x11, 0x0a, 0xf1, 0x0b, 0x20, 0x37, 0x23, 0x32,
-+			    0x04, 0x3c, 0xab, 0x75, 0x24, 0x19, 0x67, 0x87,
-+			    0x75, 0xa2, 0x23, 0xdf, 0x57, 0xc9, 0xd3, 0x0d },
-+		.valid = true
-+	},
-+	/* wycheproof - edge case for public key */
-+	{
-+		.private = { 0x58, 0xeb, 0xcb, 0x35, 0xb0, 0xf8, 0x84, 0x5c,
-+			     0xaf, 0x1e, 0xc6, 0x30, 0xf9, 0x65, 0x76, 0xb6,
-+			     0x2c, 0x4b, 0x7b, 0x6c, 0x36, 0xb2, 0x9d, 0xeb,
-+			     0x2c, 0xb0, 0x08, 0x46, 0x51, 0x75, 0x5c, 0x96 },
-+		.public = { 0xff, 0xff, 0xff, 0xfb, 0xff, 0xff, 0xfb, 0xff,
-+			    0xff, 0xdf, 0xff, 0xff, 0xdf, 0xff, 0xff, 0xff,
-+			    0xfe, 0xff, 0xff, 0xfe, 0xff, 0xff, 0xf7, 0xff,
-+			    0xff, 0xf7, 0xff, 0xff, 0xbf, 0xff, 0xff, 0x3f },
-+		.result = { 0xbf, 0x9a, 0xff, 0xd0, 0x6b, 0x84, 0x40, 0x85,
-+			    0x58, 0x64, 0x60, 0x96, 0x2e, 0xf2, 0x14, 0x6f,
-+			    0xf3, 0xd4, 0x53, 0x3d, 0x94, 0x44, 0xaa, 0xb0,
-+			    0x06, 0xeb, 0x88, 0xcc, 0x30, 0x54, 0x40, 0x7d },
-+		.valid = true
-+	},
-+	/* wycheproof - edge case for public key */
-+	{
-+		.private = { 0x18, 0x8c, 0x4b, 0xc5, 0xb9, 0xc4, 0x4b, 0x38,
-+			     0xbb, 0x65, 0x8b, 0x9b, 0x2a, 0xe8, 0x2d, 0x5b,
-+			     0x01, 0x01, 0x5e, 0x09, 0x31, 0x84, 0xb1, 0x7c,
-+			     0xb7, 0x86, 0x35, 0x03, 0xa7, 0x83, 0xe1, 0xbb },
-+		.public = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x3f },
-+		.result = { 0xd4, 0x80, 0xde, 0x04, 0xf6, 0x99, 0xcb, 0x3b,
-+			    0xe0, 0x68, 0x4a, 0x9c, 0xc2, 0xe3, 0x12, 0x81,
-+			    0xea, 0x0b, 0xc5, 0xa9, 0xdc, 0xc1, 0x57, 0xd3,
-+			    0xd2, 0x01, 0x58, 0xd4, 0x6c, 0xa5, 0x24, 0x6d },
-+		.valid = true
-+	},
-+	/* wycheproof - edge case for public key */
-+	{
-+		.private = { 0xe0, 0x6c, 0x11, 0xbb, 0x2e, 0x13, 0xce, 0x3d,
-+			     0xc7, 0x67, 0x3f, 0x67, 0xf5, 0x48, 0x22, 0x42,
-+			     0x90, 0x94, 0x23, 0xa9, 0xae, 0x95, 0xee, 0x98,
-+			     0x6a, 0x98, 0x8d, 0x98, 0xfa, 0xee, 0x23, 0xa2 },
-+		.public = { 0xff, 0xff, 0xff, 0xff, 0xfe, 0xff, 0xff, 0x7f,
-+			    0xff, 0xff, 0xff, 0xff, 0xfe, 0xff, 0xff, 0x7f,
-+			    0xff, 0xff, 0xff, 0xff, 0xfe, 0xff, 0xff, 0x7f,
-+			    0xff, 0xff, 0xff, 0xff, 0xfe, 0xff, 0xff, 0x7f },
-+		.result = { 0x4c, 0x44, 0x01, 0xcc, 0xe6, 0xb5, 0x1e, 0x4c,
-+			    0xb1, 0x8f, 0x27, 0x90, 0x24, 0x6c, 0x9b, 0xf9,
-+			    0x14, 0xdb, 0x66, 0x77, 0x50, 0xa1, 0xcb, 0x89,
-+			    0x06, 0x90, 0x92, 0xaf, 0x07, 0x29, 0x22, 0x76 },
-+		.valid = true
-+	},
-+	/* wycheproof - edge case for public key */
-+	{
-+		.private = { 0xc0, 0x65, 0x8c, 0x46, 0xdd, 0xe1, 0x81, 0x29,
-+			     0x29, 0x38, 0x77, 0x53, 0x5b, 0x11, 0x62, 0xb6,
-+			     0xf9, 0xf5, 0x41, 0x4a, 0x23, 0xcf, 0x4d, 0x2c,
-+			     0xbc, 0x14, 0x0a, 0x4d, 0x99, 0xda, 0x2b, 0x8f },
-+		.public = { 0xeb, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x7f },
-+		.result = { 0x57, 0x8b, 0xa8, 0xcc, 0x2d, 0xbd, 0xc5, 0x75,
-+			    0xaf, 0xcf, 0x9d, 0xf2, 0xb3, 0xee, 0x61, 0x89,
-+			    0xf5, 0x33, 0x7d, 0x68, 0x54, 0xc7, 0x9b, 0x4c,
-+			    0xe1, 0x65, 0xea, 0x12, 0x29, 0x3b, 0x3a, 0x0f },
-+		.valid = true
-+	},
-+	/* wycheproof - public key with low order */
-+	{
-+		.private = { 0x10, 0x25, 0x5c, 0x92, 0x30, 0xa9, 0x7a, 0x30,
-+			     0xa4, 0x58, 0xca, 0x28, 0x4a, 0x62, 0x96, 0x69,
-+			     0x29, 0x3a, 0x31, 0x89, 0x0c, 0xda, 0x9d, 0x14,
-+			     0x7f, 0xeb, 0xc7, 0xd1, 0xe2, 0x2d, 0x6b, 0xb1 },
-+		.public = { 0xe0, 0xeb, 0x7a, 0x7c, 0x3b, 0x41, 0xb8, 0xae,
-+			    0x16, 0x56, 0xe3, 0xfa, 0xf1, 0x9f, 0xc4, 0x6a,
-+			    0xda, 0x09, 0x8d, 0xeb, 0x9c, 0x32, 0xb1, 0xfd,
-+			    0x86, 0x62, 0x05, 0x16, 0x5f, 0x49, 0xb8, 0x00 },
-+		.result = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
-+		.valid = false
-+	},
-+	/* wycheproof - public key with low order */
-+	{
-+		.private = { 0x78, 0xf1, 0xe8, 0xed, 0xf1, 0x44, 0x81, 0xb3,
-+			     0x89, 0x44, 0x8d, 0xac, 0x8f, 0x59, 0xc7, 0x0b,
-+			     0x03, 0x8e, 0x7c, 0xf9, 0x2e, 0xf2, 0xc7, 0xef,
-+			     0xf5, 0x7a, 0x72, 0x46, 0x6e, 0x11, 0x52, 0x96 },
-+		.public = { 0x5f, 0x9c, 0x95, 0xbc, 0xa3, 0x50, 0x8c, 0x24,
-+			    0xb1, 0xd0, 0xb1, 0x55, 0x9c, 0x83, 0xef, 0x5b,
-+			    0x04, 0x44, 0x5c, 0xc4, 0x58, 0x1c, 0x8e, 0x86,
-+			    0xd8, 0x22, 0x4e, 0xdd, 0xd0, 0x9f, 0x11, 0x57 },
-+		.result = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
-+		.valid = false
-+	},
-+	/* wycheproof - public key with low order */
-+	{
-+		.private = { 0xa0, 0xa0, 0x5a, 0x3e, 0x8f, 0x9f, 0x44, 0x20,
-+			     0x4d, 0x5f, 0x80, 0x59, 0xa9, 0x4a, 0xc7, 0xdf,
-+			     0xc3, 0x9a, 0x49, 0xac, 0x01, 0x6d, 0xd7, 0x43,
-+			     0xdb, 0xfa, 0x43, 0xc5, 0xd6, 0x71, 0xfd, 0x88 },
-+		.public = { 0xec, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x7f },
-+		.result = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
-+		.valid = false
-+	},
-+	/* wycheproof - public key with low order */
-+	{
-+		.private = { 0xd0, 0xdb, 0xb3, 0xed, 0x19, 0x06, 0x66, 0x3f,
-+			     0x15, 0x42, 0x0a, 0xf3, 0x1f, 0x4e, 0xaf, 0x65,
-+			     0x09, 0xd9, 0xa9, 0x94, 0x97, 0x23, 0x50, 0x06,
-+			     0x05, 0xad, 0x7c, 0x1c, 0x6e, 0x74, 0x50, 0xa9 },
-+		.public = { 0xed, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x7f },
-+		.result = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
-+		.valid = false
-+	},
-+	/* wycheproof - public key with low order */
-+	{
-+		.private = { 0xc0, 0xb1, 0xd0, 0xeb, 0x22, 0xb2, 0x44, 0xfe,
-+			     0x32, 0x91, 0x14, 0x00, 0x72, 0xcd, 0xd9, 0xd9,
-+			     0x89, 0xb5, 0xf0, 0xec, 0xd9, 0x6c, 0x10, 0x0f,
-+			     0xeb, 0x5b, 0xca, 0x24, 0x1c, 0x1d, 0x9f, 0x8f },
-+		.public = { 0xee, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x7f },
-+		.result = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
-+		.valid = false
-+	},
-+	/* wycheproof - public key with low order */
-+	{
-+		.private = { 0x48, 0x0b, 0xf4, 0x5f, 0x59, 0x49, 0x42, 0xa8,
-+			     0xbc, 0x0f, 0x33, 0x53, 0xc6, 0xe8, 0xb8, 0x85,
-+			     0x3d, 0x77, 0xf3, 0x51, 0xf1, 0xc2, 0xca, 0x6c,
-+			     0x2d, 0x1a, 0xbf, 0x8a, 0x00, 0xb4, 0x22, 0x9c },
-+		.public = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80 },
-+		.result = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
-+		.valid = false
-+	},
-+	/* wycheproof - public key with low order */
-+	{
-+		.private = { 0x30, 0xf9, 0x93, 0xfc, 0xf8, 0x51, 0x4f, 0xc8,
-+			     0x9b, 0xd8, 0xdb, 0x14, 0xcd, 0x43, 0xba, 0x0d,
-+			     0x4b, 0x25, 0x30, 0xe7, 0x3c, 0x42, 0x76, 0xa0,
-+			     0x5e, 0x1b, 0x14, 0x5d, 0x42, 0x0c, 0xed, 0xb4 },
-+		.public = { 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80 },
-+		.result = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
-+		.valid = false
-+	},
-+	/* wycheproof - public key with low order */
-+	{
-+		.private = { 0xc0, 0x49, 0x74, 0xb7, 0x58, 0x38, 0x0e, 0x2a,
-+			     0x5b, 0x5d, 0xf6, 0xeb, 0x09, 0xbb, 0x2f, 0x6b,
-+			     0x34, 0x34, 0xf9, 0x82, 0x72, 0x2a, 0x8e, 0x67,
-+			     0x6d, 0x3d, 0xa2, 0x51, 0xd1, 0xb3, 0xde, 0x83 },
-+		.public = { 0xe0, 0xeb, 0x7a, 0x7c, 0x3b, 0x41, 0xb8, 0xae,
-+			    0x16, 0x56, 0xe3, 0xfa, 0xf1, 0x9f, 0xc4, 0x6a,
-+			    0xda, 0x09, 0x8d, 0xeb, 0x9c, 0x32, 0xb1, 0xfd,
-+			    0x86, 0x62, 0x05, 0x16, 0x5f, 0x49, 0xb8, 0x80 },
-+		.result = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
-+		.valid = false
-+	},
-+	/* wycheproof - public key with low order */
-+	{
-+		.private = { 0x50, 0x2a, 0x31, 0x37, 0x3d, 0xb3, 0x24, 0x46,
-+			     0x84, 0x2f, 0xe5, 0xad, 0xd3, 0xe0, 0x24, 0x02,
-+			     0x2e, 0xa5, 0x4f, 0x27, 0x41, 0x82, 0xaf, 0xc3,
-+			     0xd9, 0xf1, 0xbb, 0x3d, 0x39, 0x53, 0x4e, 0xb5 },
-+		.public = { 0x5f, 0x9c, 0x95, 0xbc, 0xa3, 0x50, 0x8c, 0x24,
-+			    0xb1, 0xd0, 0xb1, 0x55, 0x9c, 0x83, 0xef, 0x5b,
-+			    0x04, 0x44, 0x5c, 0xc4, 0x58, 0x1c, 0x8e, 0x86,
-+			    0xd8, 0x22, 0x4e, 0xdd, 0xd0, 0x9f, 0x11, 0xd7 },
-+		.result = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
-+		.valid = false
-+	},
-+	/* wycheproof - public key with low order */
-+	{
-+		.private = { 0x90, 0xfa, 0x64, 0x17, 0xb0, 0xe3, 0x70, 0x30,
-+			     0xfd, 0x6e, 0x43, 0xef, 0xf2, 0xab, 0xae, 0xf1,
-+			     0x4c, 0x67, 0x93, 0x11, 0x7a, 0x03, 0x9c, 0xf6,
-+			     0x21, 0x31, 0x8b, 0xa9, 0x0f, 0x4e, 0x98, 0xbe },
-+		.public = { 0xec, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff },
-+		.result = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
-+		.valid = false
-+	},
-+	/* wycheproof - public key with low order */
-+	{
-+		.private = { 0x78, 0xad, 0x3f, 0x26, 0x02, 0x7f, 0x1c, 0x9f,
-+			     0xdd, 0x97, 0x5a, 0x16, 0x13, 0xb9, 0x47, 0x77,
-+			     0x9b, 0xad, 0x2c, 0xf2, 0xb7, 0x41, 0xad, 0xe0,
-+			     0x18, 0x40, 0x88, 0x5a, 0x30, 0xbb, 0x97, 0x9c },
-+		.public = { 0xed, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff },
-+		.result = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
-+		.valid = false
-+	},
-+	/* wycheproof - public key with low order */
-+	{
-+		.private = { 0x98, 0xe2, 0x3d, 0xe7, 0xb1, 0xe0, 0x92, 0x6e,
-+			     0xd9, 0xc8, 0x7e, 0x7b, 0x14, 0xba, 0xf5, 0x5f,
-+			     0x49, 0x7a, 0x1d, 0x70, 0x96, 0xf9, 0x39, 0x77,
-+			     0x68, 0x0e, 0x44, 0xdc, 0x1c, 0x7b, 0x7b, 0x8b },
-+		.public = { 0xee, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff },
-+		.result = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
-+		.valid = false
-+	},
-+	/* wycheproof - public key >= p */
-+	{
-+		.private = { 0xf0, 0x1e, 0x48, 0xda, 0xfa, 0xc9, 0xd7, 0xbc,
-+			     0xf5, 0x89, 0xcb, 0xc3, 0x82, 0xc8, 0x78, 0xd1,
-+			     0x8b, 0xda, 0x35, 0x50, 0x58, 0x9f, 0xfb, 0x5d,
-+			     0x50, 0xb5, 0x23, 0xbe, 0xbe, 0x32, 0x9d, 0xae },
-+		.public = { 0xef, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x7f },
-+		.result = { 0xbd, 0x36, 0xa0, 0x79, 0x0e, 0xb8, 0x83, 0x09,
-+			    0x8c, 0x98, 0x8b, 0x21, 0x78, 0x67, 0x73, 0xde,
-+			    0x0b, 0x3a, 0x4d, 0xf1, 0x62, 0x28, 0x2c, 0xf1,
-+			    0x10, 0xde, 0x18, 0xdd, 0x48, 0x4c, 0xe7, 0x4b },
-+		.valid = true
-+	},
-+	/* wycheproof - public key >= p */
-+	{
-+		.private = { 0x28, 0x87, 0x96, 0xbc, 0x5a, 0xff, 0x4b, 0x81,
-+			     0xa3, 0x75, 0x01, 0x75, 0x7b, 0xc0, 0x75, 0x3a,
-+			     0x3c, 0x21, 0x96, 0x47, 0x90, 0xd3, 0x86, 0x99,
-+			     0x30, 0x8d, 0xeb, 0xc1, 0x7a, 0x6e, 0xaf, 0x8d },
-+		.public = { 0xf0, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x7f },
-+		.result = { 0xb4, 0xe0, 0xdd, 0x76, 0xda, 0x7b, 0x07, 0x17,
-+			    0x28, 0xb6, 0x1f, 0x85, 0x67, 0x71, 0xaa, 0x35,
-+			    0x6e, 0x57, 0xed, 0xa7, 0x8a, 0x5b, 0x16, 0x55,
-+			    0xcc, 0x38, 0x20, 0xfb, 0x5f, 0x85, 0x4c, 0x5c },
-+		.valid = true
-+	},
-+	/* wycheproof - public key >= p */
-+	{
-+		.private = { 0x98, 0xdf, 0x84, 0x5f, 0x66, 0x51, 0xbf, 0x11,
-+			     0x38, 0x22, 0x1f, 0x11, 0x90, 0x41, 0xf7, 0x2b,
-+			     0x6d, 0xbc, 0x3c, 0x4a, 0xce, 0x71, 0x43, 0xd9,
-+			     0x9f, 0xd5, 0x5a, 0xd8, 0x67, 0x48, 0x0d, 0xa8 },
-+		.public = { 0xf1, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x7f },
-+		.result = { 0x6f, 0xdf, 0x6c, 0x37, 0x61, 0x1d, 0xbd, 0x53,
-+			    0x04, 0xdc, 0x0f, 0x2e, 0xb7, 0xc9, 0x51, 0x7e,
-+			    0xb3, 0xc5, 0x0e, 0x12, 0xfd, 0x05, 0x0a, 0xc6,
-+			    0xde, 0xc2, 0x70, 0x71, 0xd4, 0xbf, 0xc0, 0x34 },
-+		.valid = true
-+	},
-+	/* wycheproof - public key >= p */
-+	{
-+		.private = { 0xf0, 0x94, 0x98, 0xe4, 0x6f, 0x02, 0xf8, 0x78,
-+			     0x82, 0x9e, 0x78, 0xb8, 0x03, 0xd3, 0x16, 0xa2,
-+			     0xed, 0x69, 0x5d, 0x04, 0x98, 0xa0, 0x8a, 0xbd,
-+			     0xf8, 0x27, 0x69, 0x30, 0xe2, 0x4e, 0xdc, 0xb0 },
-+		.public = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x7f },
-+		.result = { 0x4c, 0x8f, 0xc4, 0xb1, 0xc6, 0xab, 0x88, 0xfb,
-+			    0x21, 0xf1, 0x8f, 0x6d, 0x4c, 0x81, 0x02, 0x40,
-+			    0xd4, 0xe9, 0x46, 0x51, 0xba, 0x44, 0xf7, 0xa2,
-+			    0xc8, 0x63, 0xce, 0xc7, 0xdc, 0x56, 0x60, 0x2d },
-+		.valid = true
-+	},
-+	/* wycheproof - public key >= p */
-+	{
-+		.private = { 0x18, 0x13, 0xc1, 0x0a, 0x5c, 0x7f, 0x21, 0xf9,
-+			     0x6e, 0x17, 0xf2, 0x88, 0xc0, 0xcc, 0x37, 0x60,
-+			     0x7c, 0x04, 0xc5, 0xf5, 0xae, 0xa2, 0xdb, 0x13,
-+			     0x4f, 0x9e, 0x2f, 0xfc, 0x66, 0xbd, 0x9d, 0xb8 },
-+		.public = { 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80 },
-+		.result = { 0x1c, 0xd0, 0xb2, 0x82, 0x67, 0xdc, 0x54, 0x1c,
-+			    0x64, 0x2d, 0x6d, 0x7d, 0xca, 0x44, 0xa8, 0xb3,
-+			    0x8a, 0x63, 0x73, 0x6e, 0xef, 0x5c, 0x4e, 0x65,
-+			    0x01, 0xff, 0xbb, 0xb1, 0x78, 0x0c, 0x03, 0x3c },
-+		.valid = true
-+	},
-+	/* wycheproof - public key >= p */
-+	{
-+		.private = { 0x78, 0x57, 0xfb, 0x80, 0x86, 0x53, 0x64, 0x5a,
-+			     0x0b, 0xeb, 0x13, 0x8a, 0x64, 0xf5, 0xf4, 0xd7,
-+			     0x33, 0xa4, 0x5e, 0xa8, 0x4c, 0x3c, 0xda, 0x11,
-+			     0xa9, 0xc0, 0x6f, 0x7e, 0x71, 0x39, 0x14, 0x9e },
-+		.public = { 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80 },
-+		.result = { 0x87, 0x55, 0xbe, 0x01, 0xc6, 0x0a, 0x7e, 0x82,
-+			    0x5c, 0xff, 0x3e, 0x0e, 0x78, 0xcb, 0x3a, 0xa4,
-+			    0x33, 0x38, 0x61, 0x51, 0x6a, 0xa5, 0x9b, 0x1c,
-+			    0x51, 0xa8, 0xb2, 0xa5, 0x43, 0xdf, 0xa8, 0x22 },
-+		.valid = true
-+	},
-+	/* wycheproof - public key >= p */
-+	{
-+		.private = { 0xe0, 0x3a, 0xa8, 0x42, 0xe2, 0xab, 0xc5, 0x6e,
-+			     0x81, 0xe8, 0x7b, 0x8b, 0x9f, 0x41, 0x7b, 0x2a,
-+			     0x1e, 0x59, 0x13, 0xc7, 0x23, 0xee, 0xd2, 0x8d,
-+			     0x75, 0x2f, 0x8d, 0x47, 0xa5, 0x9f, 0x49, 0x8f },
-+		.public = { 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80 },
-+		.result = { 0x54, 0xc9, 0xa1, 0xed, 0x95, 0xe5, 0x46, 0xd2,
-+			    0x78, 0x22, 0xa3, 0x60, 0x93, 0x1d, 0xda, 0x60,
-+			    0xa1, 0xdf, 0x04, 0x9d, 0xa6, 0xf9, 0x04, 0x25,
-+			    0x3c, 0x06, 0x12, 0xbb, 0xdc, 0x08, 0x74, 0x76 },
-+		.valid = true
-+	},
-+	/* wycheproof - public key >= p */
-+	{
-+		.private = { 0xf8, 0xf7, 0x07, 0xb7, 0x99, 0x9b, 0x18, 0xcb,
-+			     0x0d, 0x6b, 0x96, 0x12, 0x4f, 0x20, 0x45, 0x97,
-+			     0x2c, 0xa2, 0x74, 0xbf, 0xc1, 0x54, 0xad, 0x0c,
-+			     0x87, 0x03, 0x8c, 0x24, 0xc6, 0xd0, 0xd4, 0xb2 },
-+		.public = { 0xda, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff },
-+		.result = { 0xcc, 0x1f, 0x40, 0xd7, 0x43, 0xcd, 0xc2, 0x23,
-+			    0x0e, 0x10, 0x43, 0xda, 0xba, 0x8b, 0x75, 0xe8,
-+			    0x10, 0xf1, 0xfb, 0xab, 0x7f, 0x25, 0x52, 0x69,
-+			    0xbd, 0x9e, 0xbb, 0x29, 0xe6, 0xbf, 0x49, 0x4f },
-+		.valid = true
-+	},
-+	/* wycheproof - public key >= p */
-+	{
-+		.private = { 0xa0, 0x34, 0xf6, 0x84, 0xfa, 0x63, 0x1e, 0x1a,
-+			     0x34, 0x81, 0x18, 0xc1, 0xce, 0x4c, 0x98, 0x23,
-+			     0x1f, 0x2d, 0x9e, 0xec, 0x9b, 0xa5, 0x36, 0x5b,
-+			     0x4a, 0x05, 0xd6, 0x9a, 0x78, 0x5b, 0x07, 0x96 },
-+		.public = { 0xdb, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff },
-+		.result = { 0x54, 0x99, 0x8e, 0xe4, 0x3a, 0x5b, 0x00, 0x7b,
-+			    0xf4, 0x99, 0xf0, 0x78, 0xe7, 0x36, 0x52, 0x44,
-+			    0x00, 0xa8, 0xb5, 0xc7, 0xe9, 0xb9, 0xb4, 0x37,
-+			    0x71, 0x74, 0x8c, 0x7c, 0xdf, 0x88, 0x04, 0x12 },
-+		.valid = true
-+	},
-+	/* wycheproof - public key >= p */
-+	{
-+		.private = { 0x30, 0xb6, 0xc6, 0xa0, 0xf2, 0xff, 0xa6, 0x80,
-+			     0x76, 0x8f, 0x99, 0x2b, 0xa8, 0x9e, 0x15, 0x2d,
-+			     0x5b, 0xc9, 0x89, 0x3d, 0x38, 0xc9, 0x11, 0x9b,
-+			     0xe4, 0xf7, 0x67, 0xbf, 0xab, 0x6e, 0x0c, 0xa5 },
-+		.public = { 0xdc, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff },
-+		.result = { 0xea, 0xd9, 0xb3, 0x8e, 0xfd, 0xd7, 0x23, 0x63,
-+			    0x79, 0x34, 0xe5, 0x5a, 0xb7, 0x17, 0xa7, 0xae,
-+			    0x09, 0xeb, 0x86, 0xa2, 0x1d, 0xc3, 0x6a, 0x3f,
-+			    0xee, 0xb8, 0x8b, 0x75, 0x9e, 0x39, 0x1e, 0x09 },
-+		.valid = true
-+	},
-+	/* wycheproof - public key >= p */
-+	{
-+		.private = { 0x90, 0x1b, 0x9d, 0xcf, 0x88, 0x1e, 0x01, 0xe0,
-+			     0x27, 0x57, 0x50, 0x35, 0xd4, 0x0b, 0x43, 0xbd,
-+			     0xc1, 0xc5, 0x24, 0x2e, 0x03, 0x08, 0x47, 0x49,
-+			     0x5b, 0x0c, 0x72, 0x86, 0x46, 0x9b, 0x65, 0x91 },
-+		.public = { 0xea, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff },
-+		.result = { 0x60, 0x2f, 0xf4, 0x07, 0x89, 0xb5, 0x4b, 0x41,
-+			    0x80, 0x59, 0x15, 0xfe, 0x2a, 0x62, 0x21, 0xf0,
-+			    0x7a, 0x50, 0xff, 0xc2, 0xc3, 0xfc, 0x94, 0xcf,
-+			    0x61, 0xf1, 0x3d, 0x79, 0x04, 0xe8, 0x8e, 0x0e },
-+		.valid = true
-+	},
-+	/* wycheproof - public key >= p */
-+	{
-+		.private = { 0x80, 0x46, 0x67, 0x7c, 0x28, 0xfd, 0x82, 0xc9,
-+			     0xa1, 0xbd, 0xb7, 0x1a, 0x1a, 0x1a, 0x34, 0xfa,
-+			     0xba, 0x12, 0x25, 0xe2, 0x50, 0x7f, 0xe3, 0xf5,
-+			     0x4d, 0x10, 0xbd, 0x5b, 0x0d, 0x86, 0x5f, 0x8e },
-+		.public = { 0xeb, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff },
-+		.result = { 0xe0, 0x0a, 0xe8, 0xb1, 0x43, 0x47, 0x12, 0x47,
-+			    0xba, 0x24, 0xf1, 0x2c, 0x88, 0x55, 0x36, 0xc3,
-+			    0xcb, 0x98, 0x1b, 0x58, 0xe1, 0xe5, 0x6b, 0x2b,
-+			    0xaf, 0x35, 0xc1, 0x2a, 0xe1, 0xf7, 0x9c, 0x26 },
-+		.valid = true
-+	},
-+	/* wycheproof - public key >= p */
-+	{
-+		.private = { 0x60, 0x2f, 0x7e, 0x2f, 0x68, 0xa8, 0x46, 0xb8,
-+			     0x2c, 0xc2, 0x69, 0xb1, 0xd4, 0x8e, 0x93, 0x98,
-+			     0x86, 0xae, 0x54, 0xfd, 0x63, 0x6c, 0x1f, 0xe0,
-+			     0x74, 0xd7, 0x10, 0x12, 0x7d, 0x47, 0x24, 0x91 },
-+		.public = { 0xef, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff },
-+		.result = { 0x98, 0xcb, 0x9b, 0x50, 0xdd, 0x3f, 0xc2, 0xb0,
-+			    0xd4, 0xf2, 0xd2, 0xbf, 0x7c, 0x5c, 0xfd, 0xd1,
-+			    0x0c, 0x8f, 0xcd, 0x31, 0xfc, 0x40, 0xaf, 0x1a,
-+			    0xd4, 0x4f, 0x47, 0xc1, 0x31, 0x37, 0x63, 0x62 },
-+		.valid = true
-+	},
-+	/* wycheproof - public key >= p */
-+	{
-+		.private = { 0x60, 0x88, 0x7b, 0x3d, 0xc7, 0x24, 0x43, 0x02,
-+			     0x6e, 0xbe, 0xdb, 0xbb, 0xb7, 0x06, 0x65, 0xf4,
-+			     0x2b, 0x87, 0xad, 0xd1, 0x44, 0x0e, 0x77, 0x68,
-+			     0xfb, 0xd7, 0xe8, 0xe2, 0xce, 0x5f, 0x63, 0x9d },
-+		.public = { 0xf0, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff },
-+		.result = { 0x38, 0xd6, 0x30, 0x4c, 0x4a, 0x7e, 0x6d, 0x9f,
-+			    0x79, 0x59, 0x33, 0x4f, 0xb5, 0x24, 0x5b, 0xd2,
-+			    0xc7, 0x54, 0x52, 0x5d, 0x4c, 0x91, 0xdb, 0x95,
-+			    0x02, 0x06, 0x92, 0x62, 0x34, 0xc1, 0xf6, 0x33 },
-+		.valid = true
-+	},
-+	/* wycheproof - public key >= p */
-+	{
-+		.private = { 0x78, 0xd3, 0x1d, 0xfa, 0x85, 0x44, 0x97, 0xd7,
-+			     0x2d, 0x8d, 0xef, 0x8a, 0x1b, 0x7f, 0xb0, 0x06,
-+			     0xce, 0xc2, 0xd8, 0xc4, 0x92, 0x46, 0x47, 0xc9,
-+			     0x38, 0x14, 0xae, 0x56, 0xfa, 0xed, 0xa4, 0x95 },
-+		.public = { 0xf1, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff },
-+		.result = { 0x78, 0x6c, 0xd5, 0x49, 0x96, 0xf0, 0x14, 0xa5,
-+			    0xa0, 0x31, 0xec, 0x14, 0xdb, 0x81, 0x2e, 0xd0,
-+			    0x83, 0x55, 0x06, 0x1f, 0xdb, 0x5d, 0xe6, 0x80,
-+			    0xa8, 0x00, 0xac, 0x52, 0x1f, 0x31, 0x8e, 0x23 },
-+		.valid = true
-+	},
-+	/* wycheproof - public key >= p */
-+	{
-+		.private = { 0xc0, 0x4c, 0x5b, 0xae, 0xfa, 0x83, 0x02, 0xdd,
-+			     0xde, 0xd6, 0xa4, 0xbb, 0x95, 0x77, 0x61, 0xb4,
-+			     0xeb, 0x97, 0xae, 0xfa, 0x4f, 0xc3, 0xb8, 0x04,
-+			     0x30, 0x85, 0xf9, 0x6a, 0x56, 0x59, 0xb3, 0xa5 },
-+		.public = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff },
-+		.result = { 0x29, 0xae, 0x8b, 0xc7, 0x3e, 0x9b, 0x10, 0xa0,
-+			    0x8b, 0x4f, 0x68, 0x1c, 0x43, 0xc3, 0xe0, 0xac,
-+			    0x1a, 0x17, 0x1d, 0x31, 0xb3, 0x8f, 0x1a, 0x48,
-+			    0xef, 0xba, 0x29, 0xae, 0x63, 0x9e, 0xa1, 0x34 },
-+		.valid = true
-+	},
-+	/* wycheproof - RFC 7748 */
-+	{
-+		.private = { 0xa0, 0x46, 0xe3, 0x6b, 0xf0, 0x52, 0x7c, 0x9d,
-+			     0x3b, 0x16, 0x15, 0x4b, 0x82, 0x46, 0x5e, 0xdd,
-+			     0x62, 0x14, 0x4c, 0x0a, 0xc1, 0xfc, 0x5a, 0x18,
-+			     0x50, 0x6a, 0x22, 0x44, 0xba, 0x44, 0x9a, 0x44 },
-+		.public = { 0xe6, 0xdb, 0x68, 0x67, 0x58, 0x30, 0x30, 0xdb,
-+			    0x35, 0x94, 0xc1, 0xa4, 0x24, 0xb1, 0x5f, 0x7c,
-+			    0x72, 0x66, 0x24, 0xec, 0x26, 0xb3, 0x35, 0x3b,
-+			    0x10, 0xa9, 0x03, 0xa6, 0xd0, 0xab, 0x1c, 0x4c },
-+		.result = { 0xc3, 0xda, 0x55, 0x37, 0x9d, 0xe9, 0xc6, 0x90,
-+			    0x8e, 0x94, 0xea, 0x4d, 0xf2, 0x8d, 0x08, 0x4f,
-+			    0x32, 0xec, 0xcf, 0x03, 0x49, 0x1c, 0x71, 0xf7,
-+			    0x54, 0xb4, 0x07, 0x55, 0x77, 0xa2, 0x85, 0x52 },
-+		.valid = true
-+	},
-+	/* wycheproof - RFC 7748 */
-+	{
-+		.private = { 0x48, 0x66, 0xe9, 0xd4, 0xd1, 0xb4, 0x67, 0x3c,
-+			     0x5a, 0xd2, 0x26, 0x91, 0x95, 0x7d, 0x6a, 0xf5,
-+			     0xc1, 0x1b, 0x64, 0x21, 0xe0, 0xea, 0x01, 0xd4,
-+			     0x2c, 0xa4, 0x16, 0x9e, 0x79, 0x18, 0xba, 0x4d },
-+		.public = { 0xe5, 0x21, 0x0f, 0x12, 0x78, 0x68, 0x11, 0xd3,
-+			    0xf4, 0xb7, 0x95, 0x9d, 0x05, 0x38, 0xae, 0x2c,
-+			    0x31, 0xdb, 0xe7, 0x10, 0x6f, 0xc0, 0x3c, 0x3e,
-+			    0xfc, 0x4c, 0xd5, 0x49, 0xc7, 0x15, 0xa4, 0x13 },
-+		.result = { 0x95, 0xcb, 0xde, 0x94, 0x76, 0xe8, 0x90, 0x7d,
-+			    0x7a, 0xad, 0xe4, 0x5c, 0xb4, 0xb8, 0x73, 0xf8,
-+			    0x8b, 0x59, 0x5a, 0x68, 0x79, 0x9f, 0xa1, 0x52,
-+			    0xe6, 0xf8, 0xf7, 0x64, 0x7a, 0xac, 0x79, 0x57 },
-+		.valid = true
-+	},
-+	/* wycheproof - edge case for shared secret */
-+	{
-+		.private = { 0xa0, 0xa4, 0xf1, 0x30, 0xb9, 0x8a, 0x5b, 0xe4,
-+			     0xb1, 0xce, 0xdb, 0x7c, 0xb8, 0x55, 0x84, 0xa3,
-+			     0x52, 0x0e, 0x14, 0x2d, 0x47, 0x4d, 0xc9, 0xcc,
-+			     0xb9, 0x09, 0xa0, 0x73, 0xa9, 0x76, 0xbf, 0x63 },
-+		.public = { 0x0a, 0xb4, 0xe7, 0x63, 0x80, 0xd8, 0x4d, 0xde,
-+			    0x4f, 0x68, 0x33, 0xc5, 0x8f, 0x2a, 0x9f, 0xb8,
-+			    0xf8, 0x3b, 0xb0, 0x16, 0x9b, 0x17, 0x2b, 0xe4,
-+			    0xb6, 0xe0, 0x59, 0x28, 0x87, 0x74, 0x1a, 0x36 },
-+		.result = { 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
-+		.valid = true
-+	},
-+	/* wycheproof - edge case for shared secret */
-+	{
-+		.private = { 0xa0, 0xa4, 0xf1, 0x30, 0xb9, 0x8a, 0x5b, 0xe4,
-+			     0xb1, 0xce, 0xdb, 0x7c, 0xb8, 0x55, 0x84, 0xa3,
-+			     0x52, 0x0e, 0x14, 0x2d, 0x47, 0x4d, 0xc9, 0xcc,
-+			     0xb9, 0x09, 0xa0, 0x73, 0xa9, 0x76, 0xbf, 0x63 },
-+		.public = { 0x89, 0xe1, 0x0d, 0x57, 0x01, 0xb4, 0x33, 0x7d,
-+			    0x2d, 0x03, 0x21, 0x81, 0x53, 0x8b, 0x10, 0x64,
-+			    0xbd, 0x40, 0x84, 0x40, 0x1c, 0xec, 0xa1, 0xfd,
-+			    0x12, 0x66, 0x3a, 0x19, 0x59, 0x38, 0x80, 0x00 },
-+		.result = { 0x09, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
-+		.valid = true
-+	},
-+	/* wycheproof - edge case for shared secret */
-+	{
-+		.private = { 0xa0, 0xa4, 0xf1, 0x30, 0xb9, 0x8a, 0x5b, 0xe4,
-+			     0xb1, 0xce, 0xdb, 0x7c, 0xb8, 0x55, 0x84, 0xa3,
-+			     0x52, 0x0e, 0x14, 0x2d, 0x47, 0x4d, 0xc9, 0xcc,
-+			     0xb9, 0x09, 0xa0, 0x73, 0xa9, 0x76, 0xbf, 0x63 },
-+		.public = { 0x2b, 0x55, 0xd3, 0xaa, 0x4a, 0x8f, 0x80, 0xc8,
-+			    0xc0, 0xb2, 0xae, 0x5f, 0x93, 0x3e, 0x85, 0xaf,
-+			    0x49, 0xbe, 0xac, 0x36, 0xc2, 0xfa, 0x73, 0x94,
-+			    0xba, 0xb7, 0x6c, 0x89, 0x33, 0xf8, 0xf8, 0x1d },
-+		.result = { 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
-+		.valid = true
-+	},
-+	/* wycheproof - edge case for shared secret */
-+	{
-+		.private = { 0xa0, 0xa4, 0xf1, 0x30, 0xb9, 0x8a, 0x5b, 0xe4,
-+			     0xb1, 0xce, 0xdb, 0x7c, 0xb8, 0x55, 0x84, 0xa3,
-+			     0x52, 0x0e, 0x14, 0x2d, 0x47, 0x4d, 0xc9, 0xcc,
-+			     0xb9, 0x09, 0xa0, 0x73, 0xa9, 0x76, 0xbf, 0x63 },
-+		.public = { 0x63, 0xe5, 0xb1, 0xfe, 0x96, 0x01, 0xfe, 0x84,
-+			    0x38, 0x5d, 0x88, 0x66, 0xb0, 0x42, 0x12, 0x62,
-+			    0xf7, 0x8f, 0xbf, 0xa5, 0xaf, 0xf9, 0x58, 0x5e,
-+			    0x62, 0x66, 0x79, 0xb1, 0x85, 0x47, 0xd9, 0x59 },
-+		.result = { 0xfe, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x3f },
-+		.valid = true
-+	},
-+	/* wycheproof - edge case for shared secret */
-+	{
-+		.private = { 0xa0, 0xa4, 0xf1, 0x30, 0xb9, 0x8a, 0x5b, 0xe4,
-+			     0xb1, 0xce, 0xdb, 0x7c, 0xb8, 0x55, 0x84, 0xa3,
-+			     0x52, 0x0e, 0x14, 0x2d, 0x47, 0x4d, 0xc9, 0xcc,
-+			     0xb9, 0x09, 0xa0, 0x73, 0xa9, 0x76, 0xbf, 0x63 },
-+		.public = { 0xe4, 0x28, 0xf3, 0xda, 0xc1, 0x78, 0x09, 0xf8,
-+			    0x27, 0xa5, 0x22, 0xce, 0x32, 0x35, 0x50, 0x58,
-+			    0xd0, 0x73, 0x69, 0x36, 0x4a, 0xa7, 0x89, 0x02,
-+			    0xee, 0x10, 0x13, 0x9b, 0x9f, 0x9d, 0xd6, 0x53 },
-+		.result = { 0xfc, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x3f },
-+		.valid = true
-+	},
-+	/* wycheproof - edge case for shared secret */
-+	{
-+		.private = { 0xa0, 0xa4, 0xf1, 0x30, 0xb9, 0x8a, 0x5b, 0xe4,
-+			     0xb1, 0xce, 0xdb, 0x7c, 0xb8, 0x55, 0x84, 0xa3,
-+			     0x52, 0x0e, 0x14, 0x2d, 0x47, 0x4d, 0xc9, 0xcc,
-+			     0xb9, 0x09, 0xa0, 0x73, 0xa9, 0x76, 0xbf, 0x63 },
-+		.public = { 0xb3, 0xb5, 0x0e, 0x3e, 0xd3, 0xa4, 0x07, 0xb9,
-+			    0x5d, 0xe9, 0x42, 0xef, 0x74, 0x57, 0x5b, 0x5a,
-+			    0xb8, 0xa1, 0x0c, 0x09, 0xee, 0x10, 0x35, 0x44,
-+			    0xd6, 0x0b, 0xdf, 0xed, 0x81, 0x38, 0xab, 0x2b },
-+		.result = { 0xf9, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x3f },
-+		.valid = true
-+	},
-+	/* wycheproof - edge case for shared secret */
-+	{
-+		.private = { 0xa0, 0xa4, 0xf1, 0x30, 0xb9, 0x8a, 0x5b, 0xe4,
-+			     0xb1, 0xce, 0xdb, 0x7c, 0xb8, 0x55, 0x84, 0xa3,
-+			     0x52, 0x0e, 0x14, 0x2d, 0x47, 0x4d, 0xc9, 0xcc,
-+			     0xb9, 0x09, 0xa0, 0x73, 0xa9, 0x76, 0xbf, 0x63 },
-+		.public = { 0x21, 0x3f, 0xff, 0xe9, 0x3d, 0x5e, 0xa8, 0xcd,
-+			    0x24, 0x2e, 0x46, 0x28, 0x44, 0x02, 0x99, 0x22,
-+			    0xc4, 0x3c, 0x77, 0xc9, 0xe3, 0xe4, 0x2f, 0x56,
-+			    0x2f, 0x48, 0x5d, 0x24, 0xc5, 0x01, 0xa2, 0x0b },
-+		.result = { 0xf3, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x3f },
-+		.valid = true
-+	},
-+	/* wycheproof - edge case for shared secret */
-+	{
-+		.private = { 0xa0, 0xa4, 0xf1, 0x30, 0xb9, 0x8a, 0x5b, 0xe4,
-+			     0xb1, 0xce, 0xdb, 0x7c, 0xb8, 0x55, 0x84, 0xa3,
-+			     0x52, 0x0e, 0x14, 0x2d, 0x47, 0x4d, 0xc9, 0xcc,
-+			     0xb9, 0x09, 0xa0, 0x73, 0xa9, 0x76, 0xbf, 0x63 },
-+		.public = { 0x91, 0xb2, 0x32, 0xa1, 0x78, 0xb3, 0xcd, 0x53,
-+			    0x09, 0x32, 0x44, 0x1e, 0x61, 0x39, 0x41, 0x8f,
-+			    0x72, 0x17, 0x22, 0x92, 0xf1, 0xda, 0x4c, 0x18,
-+			    0x34, 0xfc, 0x5e, 0xbf, 0xef, 0xb5, 0x1e, 0x3f },
-+		.result = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x03 },
-+		.valid = true
-+	},
-+	/* wycheproof - edge case for shared secret */
-+	{
-+		.private = { 0xa0, 0xa4, 0xf1, 0x30, 0xb9, 0x8a, 0x5b, 0xe4,
-+			     0xb1, 0xce, 0xdb, 0x7c, 0xb8, 0x55, 0x84, 0xa3,
-+			     0x52, 0x0e, 0x14, 0x2d, 0x47, 0x4d, 0xc9, 0xcc,
-+			     0xb9, 0x09, 0xa0, 0x73, 0xa9, 0x76, 0xbf, 0x63 },
-+		.public = { 0x04, 0x5c, 0x6e, 0x11, 0xc5, 0xd3, 0x32, 0x55,
-+			    0x6c, 0x78, 0x22, 0xfe, 0x94, 0xeb, 0xf8, 0x9b,
-+			    0x56, 0xa3, 0x87, 0x8d, 0xc2, 0x7c, 0xa0, 0x79,
-+			    0x10, 0x30, 0x58, 0x84, 0x9f, 0xab, 0xcb, 0x4f },
-+		.result = { 0xe5, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x7f },
-+		.valid = true
-+	},
-+	/* wycheproof - edge case for shared secret */
-+	{
-+		.private = { 0xa0, 0xa4, 0xf1, 0x30, 0xb9, 0x8a, 0x5b, 0xe4,
-+			     0xb1, 0xce, 0xdb, 0x7c, 0xb8, 0x55, 0x84, 0xa3,
-+			     0x52, 0x0e, 0x14, 0x2d, 0x47, 0x4d, 0xc9, 0xcc,
-+			     0xb9, 0x09, 0xa0, 0x73, 0xa9, 0x76, 0xbf, 0x63 },
-+		.public = { 0x1c, 0xa2, 0x19, 0x0b, 0x71, 0x16, 0x35, 0x39,
-+			    0x06, 0x3c, 0x35, 0x77, 0x3b, 0xda, 0x0c, 0x9c,
-+			    0x92, 0x8e, 0x91, 0x36, 0xf0, 0x62, 0x0a, 0xeb,
-+			    0x09, 0x3f, 0x09, 0x91, 0x97, 0xb7, 0xf7, 0x4e },
-+		.result = { 0xe3, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x7f },
-+		.valid = true
-+	},
-+	/* wycheproof - edge case for shared secret */
-+	{
-+		.private = { 0xa0, 0xa4, 0xf1, 0x30, 0xb9, 0x8a, 0x5b, 0xe4,
-+			     0xb1, 0xce, 0xdb, 0x7c, 0xb8, 0x55, 0x84, 0xa3,
-+			     0x52, 0x0e, 0x14, 0x2d, 0x47, 0x4d, 0xc9, 0xcc,
-+			     0xb9, 0x09, 0xa0, 0x73, 0xa9, 0x76, 0xbf, 0x63 },
-+		.public = { 0xf7, 0x6e, 0x90, 0x10, 0xac, 0x33, 0xc5, 0x04,
-+			    0x3b, 0x2d, 0x3b, 0x76, 0xa8, 0x42, 0x17, 0x10,
-+			    0x00, 0xc4, 0x91, 0x62, 0x22, 0xe9, 0xe8, 0x58,
-+			    0x97, 0xa0, 0xae, 0xc7, 0xf6, 0x35, 0x0b, 0x3c },
-+		.result = { 0xdd, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x7f },
-+		.valid = true
-+	},
-+	/* wycheproof - edge case for shared secret */
-+	{
-+		.private = { 0xa0, 0xa4, 0xf1, 0x30, 0xb9, 0x8a, 0x5b, 0xe4,
-+			     0xb1, 0xce, 0xdb, 0x7c, 0xb8, 0x55, 0x84, 0xa3,
-+			     0x52, 0x0e, 0x14, 0x2d, 0x47, 0x4d, 0xc9, 0xcc,
-+			     0xb9, 0x09, 0xa0, 0x73, 0xa9, 0x76, 0xbf, 0x63 },
-+		.public = { 0xbb, 0x72, 0x68, 0x8d, 0x8f, 0x8a, 0xa7, 0xa3,
-+			    0x9c, 0xd6, 0x06, 0x0c, 0xd5, 0xc8, 0x09, 0x3c,
-+			    0xde, 0xc6, 0xfe, 0x34, 0x19, 0x37, 0xc3, 0x88,
-+			    0x6a, 0x99, 0x34, 0x6c, 0xd0, 0x7f, 0xaa, 0x55 },
-+		.result = { 0xdb, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x7f },
-+		.valid = true
-+	},
-+	/* wycheproof - edge case for shared secret */
-+	{
-+		.private = { 0xa0, 0xa4, 0xf1, 0x30, 0xb9, 0x8a, 0x5b, 0xe4,
-+			     0xb1, 0xce, 0xdb, 0x7c, 0xb8, 0x55, 0x84, 0xa3,
-+			     0x52, 0x0e, 0x14, 0x2d, 0x47, 0x4d, 0xc9, 0xcc,
-+			     0xb9, 0x09, 0xa0, 0x73, 0xa9, 0x76, 0xbf, 0x63 },
-+		.public = { 0x88, 0xfd, 0xde, 0xa1, 0x93, 0x39, 0x1c, 0x6a,
-+			    0x59, 0x33, 0xef, 0x9b, 0x71, 0x90, 0x15, 0x49,
-+			    0x44, 0x72, 0x05, 0xaa, 0xe9, 0xda, 0x92, 0x8a,
-+			    0x6b, 0x91, 0xa3, 0x52, 0xba, 0x10, 0xf4, 0x1f },
-+		.result = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02 },
-+		.valid = true
-+	},
-+	/* wycheproof - edge case for shared secret */
-+	{
-+		.private = { 0xa0, 0xa4, 0xf1, 0x30, 0xb9, 0x8a, 0x5b, 0xe4,
-+			     0xb1, 0xce, 0xdb, 0x7c, 0xb8, 0x55, 0x84, 0xa3,
-+			     0x52, 0x0e, 0x14, 0x2d, 0x47, 0x4d, 0xc9, 0xcc,
-+			     0xb9, 0x09, 0xa0, 0x73, 0xa9, 0x76, 0xbf, 0x63 },
-+		.public = { 0x30, 0x3b, 0x39, 0x2f, 0x15, 0x31, 0x16, 0xca,
-+			    0xd9, 0xcc, 0x68, 0x2a, 0x00, 0xcc, 0xc4, 0x4c,
-+			    0x95, 0xff, 0x0d, 0x3b, 0xbe, 0x56, 0x8b, 0xeb,
-+			    0x6c, 0x4e, 0x73, 0x9b, 0xaf, 0xdc, 0x2c, 0x68 },
-+		.result = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80, 0x00 },
-+		.valid = true
-+	},
-+	/* wycheproof - checking for overflow */
-+	{
-+		.private = { 0xc8, 0x17, 0x24, 0x70, 0x40, 0x00, 0xb2, 0x6d,
-+			     0x31, 0x70, 0x3c, 0xc9, 0x7e, 0x3a, 0x37, 0x8d,
-+			     0x56, 0xfa, 0xd8, 0x21, 0x93, 0x61, 0xc8, 0x8c,
-+			     0xca, 0x8b, 0xd7, 0xc5, 0x71, 0x9b, 0x12, 0xb2 },
-+		.public = { 0xfd, 0x30, 0x0a, 0xeb, 0x40, 0xe1, 0xfa, 0x58,
-+			    0x25, 0x18, 0x41, 0x2b, 0x49, 0xb2, 0x08, 0xa7,
-+			    0x84, 0x2b, 0x1e, 0x1f, 0x05, 0x6a, 0x04, 0x01,
-+			    0x78, 0xea, 0x41, 0x41, 0x53, 0x4f, 0x65, 0x2d },
-+		.result = { 0xb7, 0x34, 0x10, 0x5d, 0xc2, 0x57, 0x58, 0x5d,
-+			    0x73, 0xb5, 0x66, 0xcc, 0xb7, 0x6f, 0x06, 0x27,
-+			    0x95, 0xcc, 0xbe, 0xc8, 0x91, 0x28, 0xe5, 0x2b,
-+			    0x02, 0xf3, 0xe5, 0x96, 0x39, 0xf1, 0x3c, 0x46 },
-+		.valid = true
-+	},
-+	/* wycheproof - checking for overflow */
-+	{
-+		.private = { 0xc8, 0x17, 0x24, 0x70, 0x40, 0x00, 0xb2, 0x6d,
-+			     0x31, 0x70, 0x3c, 0xc9, 0x7e, 0x3a, 0x37, 0x8d,
-+			     0x56, 0xfa, 0xd8, 0x21, 0x93, 0x61, 0xc8, 0x8c,
-+			     0xca, 0x8b, 0xd7, 0xc5, 0x71, 0x9b, 0x12, 0xb2 },
-+		.public = { 0xc8, 0xef, 0x79, 0xb5, 0x14, 0xd7, 0x68, 0x26,
-+			    0x77, 0xbc, 0x79, 0x31, 0xe0, 0x6e, 0xe5, 0xc2,
-+			    0x7c, 0x9b, 0x39, 0x2b, 0x4a, 0xe9, 0x48, 0x44,
-+			    0x73, 0xf5, 0x54, 0xe6, 0x67, 0x8e, 0xcc, 0x2e },
-+		.result = { 0x64, 0x7a, 0x46, 0xb6, 0xfc, 0x3f, 0x40, 0xd6,
-+			    0x21, 0x41, 0xee, 0x3c, 0xee, 0x70, 0x6b, 0x4d,
-+			    0x7a, 0x92, 0x71, 0x59, 0x3a, 0x7b, 0x14, 0x3e,
-+			    0x8e, 0x2e, 0x22, 0x79, 0x88, 0x3e, 0x45, 0x50 },
-+		.valid = true
-+	},
-+	/* wycheproof - checking for overflow */
-+	{
-+		.private = { 0xc8, 0x17, 0x24, 0x70, 0x40, 0x00, 0xb2, 0x6d,
-+			     0x31, 0x70, 0x3c, 0xc9, 0x7e, 0x3a, 0x37, 0x8d,
-+			     0x56, 0xfa, 0xd8, 0x21, 0x93, 0x61, 0xc8, 0x8c,
-+			     0xca, 0x8b, 0xd7, 0xc5, 0x71, 0x9b, 0x12, 0xb2 },
-+		.public = { 0x64, 0xae, 0xac, 0x25, 0x04, 0x14, 0x48, 0x61,
-+			    0x53, 0x2b, 0x7b, 0xbc, 0xb6, 0xc8, 0x7d, 0x67,
-+			    0xdd, 0x4c, 0x1f, 0x07, 0xeb, 0xc2, 0xe0, 0x6e,
-+			    0xff, 0xb9, 0x5a, 0xec, 0xc6, 0x17, 0x0b, 0x2c },
-+		.result = { 0x4f, 0xf0, 0x3d, 0x5f, 0xb4, 0x3c, 0xd8, 0x65,
-+			    0x7a, 0x3c, 0xf3, 0x7c, 0x13, 0x8c, 0xad, 0xce,
-+			    0xcc, 0xe5, 0x09, 0xe4, 0xeb, 0xa0, 0x89, 0xd0,
-+			    0xef, 0x40, 0xb4, 0xe4, 0xfb, 0x94, 0x61, 0x55 },
-+		.valid = true
-+	},
-+	/* wycheproof - checking for overflow */
-+	{
-+		.private = { 0xc8, 0x17, 0x24, 0x70, 0x40, 0x00, 0xb2, 0x6d,
-+			     0x31, 0x70, 0x3c, 0xc9, 0x7e, 0x3a, 0x37, 0x8d,
-+			     0x56, 0xfa, 0xd8, 0x21, 0x93, 0x61, 0xc8, 0x8c,
-+			     0xca, 0x8b, 0xd7, 0xc5, 0x71, 0x9b, 0x12, 0xb2 },
-+		.public = { 0xbf, 0x68, 0xe3, 0x5e, 0x9b, 0xdb, 0x7e, 0xee,
-+			    0x1b, 0x50, 0x57, 0x02, 0x21, 0x86, 0x0f, 0x5d,
-+			    0xcd, 0xad, 0x8a, 0xcb, 0xab, 0x03, 0x1b, 0x14,
-+			    0x97, 0x4c, 0xc4, 0x90, 0x13, 0xc4, 0x98, 0x31 },
-+		.result = { 0x21, 0xce, 0xe5, 0x2e, 0xfd, 0xbc, 0x81, 0x2e,
-+			    0x1d, 0x02, 0x1a, 0x4a, 0xf1, 0xe1, 0xd8, 0xbc,
-+			    0x4d, 0xb3, 0xc4, 0x00, 0xe4, 0xd2, 0xa2, 0xc5,
-+			    0x6a, 0x39, 0x26, 0xdb, 0x4d, 0x99, 0xc6, 0x5b },
-+		.valid = true
-+	},
-+	/* wycheproof - checking for overflow */
-+	{
-+		.private = { 0xc8, 0x17, 0x24, 0x70, 0x40, 0x00, 0xb2, 0x6d,
-+			     0x31, 0x70, 0x3c, 0xc9, 0x7e, 0x3a, 0x37, 0x8d,
-+			     0x56, 0xfa, 0xd8, 0x21, 0x93, 0x61, 0xc8, 0x8c,
-+			     0xca, 0x8b, 0xd7, 0xc5, 0x71, 0x9b, 0x12, 0xb2 },
-+		.public = { 0x53, 0x47, 0xc4, 0x91, 0x33, 0x1a, 0x64, 0xb4,
-+			    0x3d, 0xdc, 0x68, 0x30, 0x34, 0xe6, 0x77, 0xf5,
-+			    0x3d, 0xc3, 0x2b, 0x52, 0xa5, 0x2a, 0x57, 0x7c,
-+			    0x15, 0xa8, 0x3b, 0xf2, 0x98, 0xe9, 0x9f, 0x19 },
-+		.result = { 0x18, 0xcb, 0x89, 0xe4, 0xe2, 0x0c, 0x0c, 0x2b,
-+			    0xd3, 0x24, 0x30, 0x52, 0x45, 0x26, 0x6c, 0x93,
-+			    0x27, 0x69, 0x0b, 0xbe, 0x79, 0xac, 0xb8, 0x8f,
-+			    0x5b, 0x8f, 0xb3, 0xf7, 0x4e, 0xca, 0x3e, 0x52 },
-+		.valid = true
-+	},
-+	/* wycheproof - private key == -1 (mod order) */
-+	{
-+		.private = { 0xa0, 0x23, 0xcd, 0xd0, 0x83, 0xef, 0x5b, 0xb8,
-+			     0x2f, 0x10, 0xd6, 0x2e, 0x59, 0xe1, 0x5a, 0x68,
-+			     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x50 },
-+		.public = { 0x25, 0x8e, 0x04, 0x52, 0x3b, 0x8d, 0x25, 0x3e,
-+			    0xe6, 0x57, 0x19, 0xfc, 0x69, 0x06, 0xc6, 0x57,
-+			    0x19, 0x2d, 0x80, 0x71, 0x7e, 0xdc, 0x82, 0x8f,
-+			    0xa0, 0xaf, 0x21, 0x68, 0x6e, 0x2f, 0xaa, 0x75 },
-+		.result = { 0x25, 0x8e, 0x04, 0x52, 0x3b, 0x8d, 0x25, 0x3e,
-+			    0xe6, 0x57, 0x19, 0xfc, 0x69, 0x06, 0xc6, 0x57,
-+			    0x19, 0x2d, 0x80, 0x71, 0x7e, 0xdc, 0x82, 0x8f,
-+			    0xa0, 0xaf, 0x21, 0x68, 0x6e, 0x2f, 0xaa, 0x75 },
-+		.valid = true
-+	},
-+	/* wycheproof - private key == 1 (mod order) on twist */
-+	{
-+		.private = { 0x58, 0x08, 0x3d, 0xd2, 0x61, 0xad, 0x91, 0xef,
-+			     0xf9, 0x52, 0x32, 0x2e, 0xc8, 0x24, 0xc6, 0x82,
-+			     0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+			     0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x5f },
-+		.public = { 0x2e, 0xae, 0x5e, 0xc3, 0xdd, 0x49, 0x4e, 0x9f,
-+			    0x2d, 0x37, 0xd2, 0x58, 0xf8, 0x73, 0xa8, 0xe6,
-+			    0xe9, 0xd0, 0xdb, 0xd1, 0xe3, 0x83, 0xef, 0x64,
-+			    0xd9, 0x8b, 0xb9, 0x1b, 0x3e, 0x0b, 0xe0, 0x35 },
-+		.result = { 0x2e, 0xae, 0x5e, 0xc3, 0xdd, 0x49, 0x4e, 0x9f,
-+			    0x2d, 0x37, 0xd2, 0x58, 0xf8, 0x73, 0xa8, 0xe6,
-+			    0xe9, 0xd0, 0xdb, 0xd1, 0xe3, 0x83, 0xef, 0x64,
-+			    0xd9, 0x8b, 0xb9, 0x1b, 0x3e, 0x0b, 0xe0, 0x35 },
-+		.valid = true
-+	}
-+};
++#if __LINUX_ARM_ARCH__ == 7
++#include <linux/linkage.h>
 +
-+bool __init curve25519_selftest(void)
-+{
-+	bool success = true, ret, ret2;
-+	size_t i = 0, j;
-+	u8 in[CURVE25519_POINT_SIZE];
-+	u8 out[CURVE25519_POINT_SIZE], out2[CURVE25519_POINT_SIZE];
++.text
++.fpu neon
++.align 4
 +
-+	for (i = 0; i < ARRAY_SIZE(curve25519_test_vectors); ++i) {
-+		memset(out, 0, CURVE25519_POINT_SIZE);
-+		ret = curve25519(out, curve25519_test_vectors[i].private,
-+				 curve25519_test_vectors[i].public);
-+		if (ret != curve25519_test_vectors[i].valid ||
-+		    memcmp(out, curve25519_test_vectors[i].result,
-+			   CURVE25519_POINT_SIZE)) {
-+			pr_info("curve25519 self-test %zu: FAIL\n", i + 1);
-+			success = false;
-+			break;
-+		}
-+	}
++ENTRY(curve25519_neon)
++	push		{r4-r11, lr}
++	mov		ip, sp
++	sub		r3, sp, #704
++	and		r3, r3, #0xfffffff0
++	mov		sp, r3
++	movw		r4, #0
++	movw		r5, #254
++	vmov.i32	q0, #1
++	vshr.u64	q1, q0, #7
++	vshr.u64	q0, q0, #8
++	vmov.i32	d4, #19
++	vmov.i32	d5, #38
++	add		r6, sp, #480
++	vst1.8		{d2-d3}, [r6, : 128]
++	add		r6, sp, #496
++	vst1.8		{d0-d1}, [r6, : 128]
++	add		r6, sp, #512
++	vst1.8		{d4-d5}, [r6, : 128]
++	add		r6, r3, #0
++	vmov.i32	q2, #0
++	vst1.8		{d4-d5}, [r6, : 128]!
++	vst1.8		{d4-d5}, [r6, : 128]!
++	vst1.8		d4, [r6, : 64]
++	add		r6, r3, #0
++	movw		r7, #960
++	sub		r7, r7, #2
++	neg		r7, r7
++	sub		r7, r7, r7, LSL #7
++	str		r7, [r6]
++	add		r6, sp, #672
++	vld1.8		{d4-d5}, [r1]!
++	vld1.8		{d6-d7}, [r1]
++	vst1.8		{d4-d5}, [r6, : 128]!
++	vst1.8		{d6-d7}, [r6, : 128]
++	sub		r1, r6, #16
++	ldrb		r6, [r1]
++	and		r6, r6, #248
++	strb		r6, [r1]
++	ldrb		r6, [r1, #31]
++	and		r6, r6, #127
++	orr		r6, r6, #64
++	strb		r6, [r1, #31]
++	vmov.i64	q2, #0xffffffff
++	vshr.u64	q3, q2, #7
++	vshr.u64	q2, q2, #6
++	vld1.8		{d8}, [r2]
++	vld1.8		{d10}, [r2]
++	add		r2, r2, #6
++	vld1.8		{d12}, [r2]
++	vld1.8		{d14}, [r2]
++	add		r2, r2, #6
++	vld1.8		{d16}, [r2]
++	add		r2, r2, #4
++	vld1.8		{d18}, [r2]
++	vld1.8		{d20}, [r2]
++	add		r2, r2, #6
++	vld1.8		{d22}, [r2]
++	add		r2, r2, #2
++	vld1.8		{d24}, [r2]
++	vld1.8		{d26}, [r2]
++	vshr.u64	q5, q5, #26
++	vshr.u64	q6, q6, #3
++	vshr.u64	q7, q7, #29
++	vshr.u64	q8, q8, #6
++	vshr.u64	q10, q10, #25
++	vshr.u64	q11, q11, #3
++	vshr.u64	q12, q12, #12
++	vshr.u64	q13, q13, #38
++	vand		q4, q4, q2
++	vand		q6, q6, q2
++	vand		q8, q8, q2
++	vand		q10, q10, q2
++	vand		q2, q12, q2
++	vand		q5, q5, q3
++	vand		q7, q7, q3
++	vand		q9, q9, q3
++	vand		q11, q11, q3
++	vand		q3, q13, q3
++	add		r2, r3, #48
++	vadd.i64	q12, q4, q1
++	vadd.i64	q13, q10, q1
++	vshr.s64	q12, q12, #26
++	vshr.s64	q13, q13, #26
++	vadd.i64	q5, q5, q12
++	vshl.i64	q12, q12, #26
++	vadd.i64	q14, q5, q0
++	vadd.i64	q11, q11, q13
++	vshl.i64	q13, q13, #26
++	vadd.i64	q15, q11, q0
++	vsub.i64	q4, q4, q12
++	vshr.s64	q12, q14, #25
++	vsub.i64	q10, q10, q13
++	vshr.s64	q13, q15, #25
++	vadd.i64	q6, q6, q12
++	vshl.i64	q12, q12, #25
++	vadd.i64	q14, q6, q1
++	vadd.i64	q2, q2, q13
++	vsub.i64	q5, q5, q12
++	vshr.s64	q12, q14, #26
++	vshl.i64	q13, q13, #25
++	vadd.i64	q14, q2, q1
++	vadd.i64	q7, q7, q12
++	vshl.i64	q12, q12, #26
++	vadd.i64	q15, q7, q0
++	vsub.i64	q11, q11, q13
++	vshr.s64	q13, q14, #26
++	vsub.i64	q6, q6, q12
++	vshr.s64	q12, q15, #25
++	vadd.i64	q3, q3, q13
++	vshl.i64	q13, q13, #26
++	vadd.i64	q14, q3, q0
++	vadd.i64	q8, q8, q12
++	vshl.i64	q12, q12, #25
++	vadd.i64	q15, q8, q1
++	add		r2, r2, #8
++	vsub.i64	q2, q2, q13
++	vshr.s64	q13, q14, #25
++	vsub.i64	q7, q7, q12
++	vshr.s64	q12, q15, #26
++	vadd.i64	q14, q13, q13
++	vadd.i64	q9, q9, q12
++	vtrn.32		d12, d14
++	vshl.i64	q12, q12, #26
++	vtrn.32		d13, d15
++	vadd.i64	q0, q9, q0
++	vadd.i64	q4, q4, q14
++	vst1.8		d12, [r2, : 64]!
++	vshl.i64	q6, q13, #4
++	vsub.i64	q7, q8, q12
++	vshr.s64	q0, q0, #25
++	vadd.i64	q4, q4, q6
++	vadd.i64	q6, q10, q0
++	vshl.i64	q0, q0, #25
++	vadd.i64	q8, q6, q1
++	vadd.i64	q4, q4, q13
++	vshl.i64	q10, q13, #25
++	vadd.i64	q1, q4, q1
++	vsub.i64	q0, q9, q0
++	vshr.s64	q8, q8, #26
++	vsub.i64	q3, q3, q10
++	vtrn.32		d14, d0
++	vshr.s64	q1, q1, #26
++	vtrn.32		d15, d1
++	vadd.i64	q0, q11, q8
++	vst1.8		d14, [r2, : 64]
++	vshl.i64	q7, q8, #26
++	vadd.i64	q5, q5, q1
++	vtrn.32		d4, d6
++	vshl.i64	q1, q1, #26
++	vtrn.32		d5, d7
++	vsub.i64	q3, q6, q7
++	add		r2, r2, #16
++	vsub.i64	q1, q4, q1
++	vst1.8		d4, [r2, : 64]
++	vtrn.32		d6, d0
++	vtrn.32		d7, d1
++	sub		r2, r2, #8
++	vtrn.32		d2, d10
++	vtrn.32		d3, d11
++	vst1.8		d6, [r2, : 64]
++	sub		r2, r2, #24
++	vst1.8		d2, [r2, : 64]
++	add		r2, r3, #96
++	vmov.i32	q0, #0
++	vmov.i64	d2, #0xff
++	vmov.i64	d3, #0
++	vshr.u32	q1, q1, #7
++	vst1.8		{d2-d3}, [r2, : 128]!
++	vst1.8		{d0-d1}, [r2, : 128]!
++	vst1.8		d0, [r2, : 64]
++	add		r2, r3, #144
++	vmov.i32	q0, #0
++	vst1.8		{d0-d1}, [r2, : 128]!
++	vst1.8		{d0-d1}, [r2, : 128]!
++	vst1.8		d0, [r2, : 64]
++	add		r2, r3, #240
++	vmov.i32	q0, #0
++	vmov.i64	d2, #0xff
++	vmov.i64	d3, #0
++	vshr.u32	q1, q1, #7
++	vst1.8		{d2-d3}, [r2, : 128]!
++	vst1.8		{d0-d1}, [r2, : 128]!
++	vst1.8		d0, [r2, : 64]
++	add		r2, r3, #48
++	add		r6, r3, #192
++	vld1.8		{d0-d1}, [r2, : 128]!
++	vld1.8		{d2-d3}, [r2, : 128]!
++	vld1.8		{d4}, [r2, : 64]
++	vst1.8		{d0-d1}, [r6, : 128]!
++	vst1.8		{d2-d3}, [r6, : 128]!
++	vst1.8		d4, [r6, : 64]
++.Lmainloop:
++	mov		r2, r5, LSR #3
++	and		r6, r5, #7
++	ldrb		r2, [r1, r2]
++	mov		r2, r2, LSR r6
++	and		r2, r2, #1
++	str		r5, [sp, #456]
++	eor		r4, r4, r2
++	str		r2, [sp, #460]
++	neg		r2, r4
++	add		r4, r3, #96
++	add		r5, r3, #192
++	add		r6, r3, #144
++	vld1.8		{d8-d9}, [r4, : 128]!
++	add		r7, r3, #240
++	vld1.8		{d10-d11}, [r5, : 128]!
++	veor		q6, q4, q5
++	vld1.8		{d14-d15}, [r6, : 128]!
++	vdup.i32	q8, r2
++	vld1.8		{d18-d19}, [r7, : 128]!
++	veor		q10, q7, q9
++	vld1.8		{d22-d23}, [r4, : 128]!
++	vand		q6, q6, q8
++	vld1.8		{d24-d25}, [r5, : 128]!
++	vand		q10, q10, q8
++	vld1.8		{d26-d27}, [r6, : 128]!
++	veor		q4, q4, q6
++	vld1.8		{d28-d29}, [r7, : 128]!
++	veor		q5, q5, q6
++	vld1.8		{d0}, [r4, : 64]
++	veor		q6, q7, q10
++	vld1.8		{d2}, [r5, : 64]
++	veor		q7, q9, q10
++	vld1.8		{d4}, [r6, : 64]
++	veor		q9, q11, q12
++	vld1.8		{d6}, [r7, : 64]
++	veor		q10, q0, q1
++	sub		r2, r4, #32
++	vand		q9, q9, q8
++	sub		r4, r5, #32
++	vand		q10, q10, q8
++	sub		r5, r6, #32
++	veor		q11, q11, q9
++	sub		r6, r7, #32
++	veor		q0, q0, q10
++	veor		q9, q12, q9
++	veor		q1, q1, q10
++	veor		q10, q13, q14
++	veor		q12, q2, q3
++	vand		q10, q10, q8
++	vand		q8, q12, q8
++	veor		q12, q13, q10
++	veor		q2, q2, q8
++	veor		q10, q14, q10
++	veor		q3, q3, q8
++	vadd.i32	q8, q4, q6
++	vsub.i32	q4, q4, q6
++	vst1.8		{d16-d17}, [r2, : 128]!
++	vadd.i32	q6, q11, q12
++	vst1.8		{d8-d9}, [r5, : 128]!
++	vsub.i32	q4, q11, q12
++	vst1.8		{d12-d13}, [r2, : 128]!
++	vadd.i32	q6, q0, q2
++	vst1.8		{d8-d9}, [r5, : 128]!
++	vsub.i32	q0, q0, q2
++	vst1.8		d12, [r2, : 64]
++	vadd.i32	q2, q5, q7
++	vst1.8		d0, [r5, : 64]
++	vsub.i32	q0, q5, q7
++	vst1.8		{d4-d5}, [r4, : 128]!
++	vadd.i32	q2, q9, q10
++	vst1.8		{d0-d1}, [r6, : 128]!
++	vsub.i32	q0, q9, q10
++	vst1.8		{d4-d5}, [r4, : 128]!
++	vadd.i32	q2, q1, q3
++	vst1.8		{d0-d1}, [r6, : 128]!
++	vsub.i32	q0, q1, q3
++	vst1.8		d4, [r4, : 64]
++	vst1.8		d0, [r6, : 64]
++	add		r2, sp, #512
++	add		r4, r3, #96
++	add		r5, r3, #144
++	vld1.8		{d0-d1}, [r2, : 128]
++	vld1.8		{d2-d3}, [r4, : 128]!
++	vld1.8		{d4-d5}, [r5, : 128]!
++	vzip.i32	q1, q2
++	vld1.8		{d6-d7}, [r4, : 128]!
++	vld1.8		{d8-d9}, [r5, : 128]!
++	vshl.i32	q5, q1, #1
++	vzip.i32	q3, q4
++	vshl.i32	q6, q2, #1
++	vld1.8		{d14}, [r4, : 64]
++	vshl.i32	q8, q3, #1
++	vld1.8		{d15}, [r5, : 64]
++	vshl.i32	q9, q4, #1
++	vmul.i32	d21, d7, d1
++	vtrn.32		d14, d15
++	vmul.i32	q11, q4, q0
++	vmul.i32	q0, q7, q0
++	vmull.s32	q12, d2, d2
++	vmlal.s32	q12, d11, d1
++	vmlal.s32	q12, d12, d0
++	vmlal.s32	q12, d13, d23
++	vmlal.s32	q12, d16, d22
++	vmlal.s32	q12, d7, d21
++	vmull.s32	q10, d2, d11
++	vmlal.s32	q10, d4, d1
++	vmlal.s32	q10, d13, d0
++	vmlal.s32	q10, d6, d23
++	vmlal.s32	q10, d17, d22
++	vmull.s32	q13, d10, d4
++	vmlal.s32	q13, d11, d3
++	vmlal.s32	q13, d13, d1
++	vmlal.s32	q13, d16, d0
++	vmlal.s32	q13, d17, d23
++	vmlal.s32	q13, d8, d22
++	vmull.s32	q1, d10, d5
++	vmlal.s32	q1, d11, d4
++	vmlal.s32	q1, d6, d1
++	vmlal.s32	q1, d17, d0
++	vmlal.s32	q1, d8, d23
++	vmull.s32	q14, d10, d6
++	vmlal.s32	q14, d11, d13
++	vmlal.s32	q14, d4, d4
++	vmlal.s32	q14, d17, d1
++	vmlal.s32	q14, d18, d0
++	vmlal.s32	q14, d9, d23
++	vmull.s32	q11, d10, d7
++	vmlal.s32	q11, d11, d6
++	vmlal.s32	q11, d12, d5
++	vmlal.s32	q11, d8, d1
++	vmlal.s32	q11, d19, d0
++	vmull.s32	q15, d10, d8
++	vmlal.s32	q15, d11, d17
++	vmlal.s32	q15, d12, d6
++	vmlal.s32	q15, d13, d5
++	vmlal.s32	q15, d19, d1
++	vmlal.s32	q15, d14, d0
++	vmull.s32	q2, d10, d9
++	vmlal.s32	q2, d11, d8
++	vmlal.s32	q2, d12, d7
++	vmlal.s32	q2, d13, d6
++	vmlal.s32	q2, d14, d1
++	vmull.s32	q0, d15, d1
++	vmlal.s32	q0, d10, d14
++	vmlal.s32	q0, d11, d19
++	vmlal.s32	q0, d12, d8
++	vmlal.s32	q0, d13, d17
++	vmlal.s32	q0, d6, d6
++	add		r2, sp, #480
++	vld1.8		{d18-d19}, [r2, : 128]
++	vmull.s32	q3, d16, d7
++	vmlal.s32	q3, d10, d15
++	vmlal.s32	q3, d11, d14
++	vmlal.s32	q3, d12, d9
++	vmlal.s32	q3, d13, d8
++	add		r2, sp, #496
++	vld1.8		{d8-d9}, [r2, : 128]
++	vadd.i64	q5, q12, q9
++	vadd.i64	q6, q15, q9
++	vshr.s64	q5, q5, #26
++	vshr.s64	q6, q6, #26
++	vadd.i64	q7, q10, q5
++	vshl.i64	q5, q5, #26
++	vadd.i64	q8, q7, q4
++	vadd.i64	q2, q2, q6
++	vshl.i64	q6, q6, #26
++	vadd.i64	q10, q2, q4
++	vsub.i64	q5, q12, q5
++	vshr.s64	q8, q8, #25
++	vsub.i64	q6, q15, q6
++	vshr.s64	q10, q10, #25
++	vadd.i64	q12, q13, q8
++	vshl.i64	q8, q8, #25
++	vadd.i64	q13, q12, q9
++	vadd.i64	q0, q0, q10
++	vsub.i64	q7, q7, q8
++	vshr.s64	q8, q13, #26
++	vshl.i64	q10, q10, #25
++	vadd.i64	q13, q0, q9
++	vadd.i64	q1, q1, q8
++	vshl.i64	q8, q8, #26
++	vadd.i64	q15, q1, q4
++	vsub.i64	q2, q2, q10
++	vshr.s64	q10, q13, #26
++	vsub.i64	q8, q12, q8
++	vshr.s64	q12, q15, #25
++	vadd.i64	q3, q3, q10
++	vshl.i64	q10, q10, #26
++	vadd.i64	q13, q3, q4
++	vadd.i64	q14, q14, q12
++	add		r2, r3, #288
++	vshl.i64	q12, q12, #25
++	add		r4, r3, #336
++	vadd.i64	q15, q14, q9
++	add		r2, r2, #8
++	vsub.i64	q0, q0, q10
++	add		r4, r4, #8
++	vshr.s64	q10, q13, #25
++	vsub.i64	q1, q1, q12
++	vshr.s64	q12, q15, #26
++	vadd.i64	q13, q10, q10
++	vadd.i64	q11, q11, q12
++	vtrn.32		d16, d2
++	vshl.i64	q12, q12, #26
++	vtrn.32		d17, d3
++	vadd.i64	q1, q11, q4
++	vadd.i64	q4, q5, q13
++	vst1.8		d16, [r2, : 64]!
++	vshl.i64	q5, q10, #4
++	vst1.8		d17, [r4, : 64]!
++	vsub.i64	q8, q14, q12
++	vshr.s64	q1, q1, #25
++	vadd.i64	q4, q4, q5
++	vadd.i64	q5, q6, q1
++	vshl.i64	q1, q1, #25
++	vadd.i64	q6, q5, q9
++	vadd.i64	q4, q4, q10
++	vshl.i64	q10, q10, #25
++	vadd.i64	q9, q4, q9
++	vsub.i64	q1, q11, q1
++	vshr.s64	q6, q6, #26
++	vsub.i64	q3, q3, q10
++	vtrn.32		d16, d2
++	vshr.s64	q9, q9, #26
++	vtrn.32		d17, d3
++	vadd.i64	q1, q2, q6
++	vst1.8		d16, [r2, : 64]
++	vshl.i64	q2, q6, #26
++	vst1.8		d17, [r4, : 64]
++	vadd.i64	q6, q7, q9
++	vtrn.32		d0, d6
++	vshl.i64	q7, q9, #26
++	vtrn.32		d1, d7
++	vsub.i64	q2, q5, q2
++	add		r2, r2, #16
++	vsub.i64	q3, q4, q7
++	vst1.8		d0, [r2, : 64]
++	add		r4, r4, #16
++	vst1.8		d1, [r4, : 64]
++	vtrn.32		d4, d2
++	vtrn.32		d5, d3
++	sub		r2, r2, #8
++	sub		r4, r4, #8
++	vtrn.32		d6, d12
++	vtrn.32		d7, d13
++	vst1.8		d4, [r2, : 64]
++	vst1.8		d5, [r4, : 64]
++	sub		r2, r2, #24
++	sub		r4, r4, #24
++	vst1.8		d6, [r2, : 64]
++	vst1.8		d7, [r4, : 64]
++	add		r2, r3, #240
++	add		r4, r3, #96
++	vld1.8		{d0-d1}, [r4, : 128]!
++	vld1.8		{d2-d3}, [r4, : 128]!
++	vld1.8		{d4}, [r4, : 64]
++	add		r4, r3, #144
++	vld1.8		{d6-d7}, [r4, : 128]!
++	vtrn.32		q0, q3
++	vld1.8		{d8-d9}, [r4, : 128]!
++	vshl.i32	q5, q0, #4
++	vtrn.32		q1, q4
++	vshl.i32	q6, q3, #4
++	vadd.i32	q5, q5, q0
++	vadd.i32	q6, q6, q3
++	vshl.i32	q7, q1, #4
++	vld1.8		{d5}, [r4, : 64]
++	vshl.i32	q8, q4, #4
++	vtrn.32		d4, d5
++	vadd.i32	q7, q7, q1
++	vadd.i32	q8, q8, q4
++	vld1.8		{d18-d19}, [r2, : 128]!
++	vshl.i32	q10, q2, #4
++	vld1.8		{d22-d23}, [r2, : 128]!
++	vadd.i32	q10, q10, q2
++	vld1.8		{d24}, [r2, : 64]
++	vadd.i32	q5, q5, q0
++	add		r2, r3, #192
++	vld1.8		{d26-d27}, [r2, : 128]!
++	vadd.i32	q6, q6, q3
++	vld1.8		{d28-d29}, [r2, : 128]!
++	vadd.i32	q8, q8, q4
++	vld1.8		{d25}, [r2, : 64]
++	vadd.i32	q10, q10, q2
++	vtrn.32		q9, q13
++	vadd.i32	q7, q7, q1
++	vadd.i32	q5, q5, q0
++	vtrn.32		q11, q14
++	vadd.i32	q6, q6, q3
++	add		r2, sp, #528
++	vadd.i32	q10, q10, q2
++	vtrn.32		d24, d25
++	vst1.8		{d12-d13}, [r2, : 128]
++	vshl.i32	q6, q13, #1
++	add		r2, sp, #544
++	vst1.8		{d20-d21}, [r2, : 128]
++	vshl.i32	q10, q14, #1
++	add		r2, sp, #560
++	vst1.8		{d12-d13}, [r2, : 128]
++	vshl.i32	q15, q12, #1
++	vadd.i32	q8, q8, q4
++	vext.32		d10, d31, d30, #0
++	vadd.i32	q7, q7, q1
++	add		r2, sp, #576
++	vst1.8		{d16-d17}, [r2, : 128]
++	vmull.s32	q8, d18, d5
++	vmlal.s32	q8, d26, d4
++	vmlal.s32	q8, d19, d9
++	vmlal.s32	q8, d27, d3
++	vmlal.s32	q8, d22, d8
++	vmlal.s32	q8, d28, d2
++	vmlal.s32	q8, d23, d7
++	vmlal.s32	q8, d29, d1
++	vmlal.s32	q8, d24, d6
++	vmlal.s32	q8, d25, d0
++	add		r2, sp, #592
++	vst1.8		{d14-d15}, [r2, : 128]
++	vmull.s32	q2, d18, d4
++	vmlal.s32	q2, d12, d9
++	vmlal.s32	q2, d13, d8
++	vmlal.s32	q2, d19, d3
++	vmlal.s32	q2, d22, d2
++	vmlal.s32	q2, d23, d1
++	vmlal.s32	q2, d24, d0
++	add		r2, sp, #608
++	vst1.8		{d20-d21}, [r2, : 128]
++	vmull.s32	q7, d18, d9
++	vmlal.s32	q7, d26, d3
++	vmlal.s32	q7, d19, d8
++	vmlal.s32	q7, d27, d2
++	vmlal.s32	q7, d22, d7
++	vmlal.s32	q7, d28, d1
++	vmlal.s32	q7, d23, d6
++	vmlal.s32	q7, d29, d0
++	add		r2, sp, #624
++	vst1.8		{d10-d11}, [r2, : 128]
++	vmull.s32	q5, d18, d3
++	vmlal.s32	q5, d19, d2
++	vmlal.s32	q5, d22, d1
++	vmlal.s32	q5, d23, d0
++	vmlal.s32	q5, d12, d8
++	add		r2, sp, #640
++	vst1.8		{d16-d17}, [r2, : 128]
++	vmull.s32	q4, d18, d8
++	vmlal.s32	q4, d26, d2
++	vmlal.s32	q4, d19, d7
++	vmlal.s32	q4, d27, d1
++	vmlal.s32	q4, d22, d6
++	vmlal.s32	q4, d28, d0
++	vmull.s32	q8, d18, d7
++	vmlal.s32	q8, d26, d1
++	vmlal.s32	q8, d19, d6
++	vmlal.s32	q8, d27, d0
++	add		r2, sp, #544
++	vld1.8		{d20-d21}, [r2, : 128]
++	vmlal.s32	q7, d24, d21
++	vmlal.s32	q7, d25, d20
++	vmlal.s32	q4, d23, d21
++	vmlal.s32	q4, d29, d20
++	vmlal.s32	q8, d22, d21
++	vmlal.s32	q8, d28, d20
++	vmlal.s32	q5, d24, d20
++	add		r2, sp, #544
++	vst1.8		{d14-d15}, [r2, : 128]
++	vmull.s32	q7, d18, d6
++	vmlal.s32	q7, d26, d0
++	add		r2, sp, #624
++	vld1.8		{d30-d31}, [r2, : 128]
++	vmlal.s32	q2, d30, d21
++	vmlal.s32	q7, d19, d21
++	vmlal.s32	q7, d27, d20
++	add		r2, sp, #592
++	vld1.8		{d26-d27}, [r2, : 128]
++	vmlal.s32	q4, d25, d27
++	vmlal.s32	q8, d29, d27
++	vmlal.s32	q8, d25, d26
++	vmlal.s32	q7, d28, d27
++	vmlal.s32	q7, d29, d26
++	add		r2, sp, #576
++	vld1.8		{d28-d29}, [r2, : 128]
++	vmlal.s32	q4, d24, d29
++	vmlal.s32	q8, d23, d29
++	vmlal.s32	q8, d24, d28
++	vmlal.s32	q7, d22, d29
++	vmlal.s32	q7, d23, d28
++	add		r2, sp, #576
++	vst1.8		{d8-d9}, [r2, : 128]
++	add		r2, sp, #528
++	vld1.8		{d8-d9}, [r2, : 128]
++	vmlal.s32	q7, d24, d9
++	vmlal.s32	q7, d25, d31
++	vmull.s32	q1, d18, d2
++	vmlal.s32	q1, d19, d1
++	vmlal.s32	q1, d22, d0
++	vmlal.s32	q1, d24, d27
++	vmlal.s32	q1, d23, d20
++	vmlal.s32	q1, d12, d7
++	vmlal.s32	q1, d13, d6
++	vmull.s32	q6, d18, d1
++	vmlal.s32	q6, d19, d0
++	vmlal.s32	q6, d23, d27
++	vmlal.s32	q6, d22, d20
++	vmlal.s32	q6, d24, d26
++	vmull.s32	q0, d18, d0
++	vmlal.s32	q0, d22, d27
++	vmlal.s32	q0, d23, d26
++	vmlal.s32	q0, d24, d31
++	vmlal.s32	q0, d19, d20
++	add		r2, sp, #608
++	vld1.8		{d18-d19}, [r2, : 128]
++	vmlal.s32	q2, d18, d7
++	vmlal.s32	q2, d19, d6
++	vmlal.s32	q5, d18, d6
++	vmlal.s32	q5, d19, d21
++	vmlal.s32	q1, d18, d21
++	vmlal.s32	q1, d19, d29
++	vmlal.s32	q0, d18, d28
++	vmlal.s32	q0, d19, d9
++	vmlal.s32	q6, d18, d29
++	vmlal.s32	q6, d19, d28
++	add		r2, sp, #560
++	vld1.8		{d18-d19}, [r2, : 128]
++	add		r2, sp, #480
++	vld1.8		{d22-d23}, [r2, : 128]
++	vmlal.s32	q5, d19, d7
++	vmlal.s32	q0, d18, d21
++	vmlal.s32	q0, d19, d29
++	vmlal.s32	q6, d18, d6
++	add		r2, sp, #496
++	vld1.8		{d6-d7}, [r2, : 128]
++	vmlal.s32	q6, d19, d21
++	add		r2, sp, #544
++	vld1.8		{d18-d19}, [r2, : 128]
++	vmlal.s32	q0, d30, d8
++	add		r2, sp, #640
++	vld1.8		{d20-d21}, [r2, : 128]
++	vmlal.s32	q5, d30, d29
++	add		r2, sp, #576
++	vld1.8		{d24-d25}, [r2, : 128]
++	vmlal.s32	q1, d30, d28
++	vadd.i64	q13, q0, q11
++	vadd.i64	q14, q5, q11
++	vmlal.s32	q6, d30, d9
++	vshr.s64	q4, q13, #26
++	vshr.s64	q13, q14, #26
++	vadd.i64	q7, q7, q4
++	vshl.i64	q4, q4, #26
++	vadd.i64	q14, q7, q3
++	vadd.i64	q9, q9, q13
++	vshl.i64	q13, q13, #26
++	vadd.i64	q15, q9, q3
++	vsub.i64	q0, q0, q4
++	vshr.s64	q4, q14, #25
++	vsub.i64	q5, q5, q13
++	vshr.s64	q13, q15, #25
++	vadd.i64	q6, q6, q4
++	vshl.i64	q4, q4, #25
++	vadd.i64	q14, q6, q11
++	vadd.i64	q2, q2, q13
++	vsub.i64	q4, q7, q4
++	vshr.s64	q7, q14, #26
++	vshl.i64	q13, q13, #25
++	vadd.i64	q14, q2, q11
++	vadd.i64	q8, q8, q7
++	vshl.i64	q7, q7, #26
++	vadd.i64	q15, q8, q3
++	vsub.i64	q9, q9, q13
++	vshr.s64	q13, q14, #26
++	vsub.i64	q6, q6, q7
++	vshr.s64	q7, q15, #25
++	vadd.i64	q10, q10, q13
++	vshl.i64	q13, q13, #26
++	vadd.i64	q14, q10, q3
++	vadd.i64	q1, q1, q7
++	add		r2, r3, #144
++	vshl.i64	q7, q7, #25
++	add		r4, r3, #96
++	vadd.i64	q15, q1, q11
++	add		r2, r2, #8
++	vsub.i64	q2, q2, q13
++	add		r4, r4, #8
++	vshr.s64	q13, q14, #25
++	vsub.i64	q7, q8, q7
++	vshr.s64	q8, q15, #26
++	vadd.i64	q14, q13, q13
++	vadd.i64	q12, q12, q8
++	vtrn.32		d12, d14
++	vshl.i64	q8, q8, #26
++	vtrn.32		d13, d15
++	vadd.i64	q3, q12, q3
++	vadd.i64	q0, q0, q14
++	vst1.8		d12, [r2, : 64]!
++	vshl.i64	q7, q13, #4
++	vst1.8		d13, [r4, : 64]!
++	vsub.i64	q1, q1, q8
++	vshr.s64	q3, q3, #25
++	vadd.i64	q0, q0, q7
++	vadd.i64	q5, q5, q3
++	vshl.i64	q3, q3, #25
++	vadd.i64	q6, q5, q11
++	vadd.i64	q0, q0, q13
++	vshl.i64	q7, q13, #25
++	vadd.i64	q8, q0, q11
++	vsub.i64	q3, q12, q3
++	vshr.s64	q6, q6, #26
++	vsub.i64	q7, q10, q7
++	vtrn.32		d2, d6
++	vshr.s64	q8, q8, #26
++	vtrn.32		d3, d7
++	vadd.i64	q3, q9, q6
++	vst1.8		d2, [r2, : 64]
++	vshl.i64	q6, q6, #26
++	vst1.8		d3, [r4, : 64]
++	vadd.i64	q1, q4, q8
++	vtrn.32		d4, d14
++	vshl.i64	q4, q8, #26
++	vtrn.32		d5, d15
++	vsub.i64	q5, q5, q6
++	add		r2, r2, #16
++	vsub.i64	q0, q0, q4
++	vst1.8		d4, [r2, : 64]
++	add		r4, r4, #16
++	vst1.8		d5, [r4, : 64]
++	vtrn.32		d10, d6
++	vtrn.32		d11, d7
++	sub		r2, r2, #8
++	sub		r4, r4, #8
++	vtrn.32		d0, d2
++	vtrn.32		d1, d3
++	vst1.8		d10, [r2, : 64]
++	vst1.8		d11, [r4, : 64]
++	sub		r2, r2, #24
++	sub		r4, r4, #24
++	vst1.8		d0, [r2, : 64]
++	vst1.8		d1, [r4, : 64]
++	add		r2, r3, #288
++	add		r4, r3, #336
++	vld1.8		{d0-d1}, [r2, : 128]!
++	vld1.8		{d2-d3}, [r4, : 128]!
++	vsub.i32	q0, q0, q1
++	vld1.8		{d2-d3}, [r2, : 128]!
++	vld1.8		{d4-d5}, [r4, : 128]!
++	vsub.i32	q1, q1, q2
++	add		r5, r3, #240
++	vld1.8		{d4}, [r2, : 64]
++	vld1.8		{d6}, [r4, : 64]
++	vsub.i32	q2, q2, q3
++	vst1.8		{d0-d1}, [r5, : 128]!
++	vst1.8		{d2-d3}, [r5, : 128]!
++	vst1.8		d4, [r5, : 64]
++	add		r2, r3, #144
++	add		r4, r3, #96
++	add		r5, r3, #144
++	add		r6, r3, #192
++	vld1.8		{d0-d1}, [r2, : 128]!
++	vld1.8		{d2-d3}, [r4, : 128]!
++	vsub.i32	q2, q0, q1
++	vadd.i32	q0, q0, q1
++	vld1.8		{d2-d3}, [r2, : 128]!
++	vld1.8		{d6-d7}, [r4, : 128]!
++	vsub.i32	q4, q1, q3
++	vadd.i32	q1, q1, q3
++	vld1.8		{d6}, [r2, : 64]
++	vld1.8		{d10}, [r4, : 64]
++	vsub.i32	q6, q3, q5
++	vadd.i32	q3, q3, q5
++	vst1.8		{d4-d5}, [r5, : 128]!
++	vst1.8		{d0-d1}, [r6, : 128]!
++	vst1.8		{d8-d9}, [r5, : 128]!
++	vst1.8		{d2-d3}, [r6, : 128]!
++	vst1.8		d12, [r5, : 64]
++	vst1.8		d6, [r6, : 64]
++	add		r2, r3, #0
++	add		r4, r3, #240
++	vld1.8		{d0-d1}, [r4, : 128]!
++	vld1.8		{d2-d3}, [r4, : 128]!
++	vld1.8		{d4}, [r4, : 64]
++	add		r4, r3, #336
++	vld1.8		{d6-d7}, [r4, : 128]!
++	vtrn.32		q0, q3
++	vld1.8		{d8-d9}, [r4, : 128]!
++	vshl.i32	q5, q0, #4
++	vtrn.32		q1, q4
++	vshl.i32	q6, q3, #4
++	vadd.i32	q5, q5, q0
++	vadd.i32	q6, q6, q3
++	vshl.i32	q7, q1, #4
++	vld1.8		{d5}, [r4, : 64]
++	vshl.i32	q8, q4, #4
++	vtrn.32		d4, d5
++	vadd.i32	q7, q7, q1
++	vadd.i32	q8, q8, q4
++	vld1.8		{d18-d19}, [r2, : 128]!
++	vshl.i32	q10, q2, #4
++	vld1.8		{d22-d23}, [r2, : 128]!
++	vadd.i32	q10, q10, q2
++	vld1.8		{d24}, [r2, : 64]
++	vadd.i32	q5, q5, q0
++	add		r2, r3, #288
++	vld1.8		{d26-d27}, [r2, : 128]!
++	vadd.i32	q6, q6, q3
++	vld1.8		{d28-d29}, [r2, : 128]!
++	vadd.i32	q8, q8, q4
++	vld1.8		{d25}, [r2, : 64]
++	vadd.i32	q10, q10, q2
++	vtrn.32		q9, q13
++	vadd.i32	q7, q7, q1
++	vadd.i32	q5, q5, q0
++	vtrn.32		q11, q14
++	vadd.i32	q6, q6, q3
++	add		r2, sp, #528
++	vadd.i32	q10, q10, q2
++	vtrn.32		d24, d25
++	vst1.8		{d12-d13}, [r2, : 128]
++	vshl.i32	q6, q13, #1
++	add		r2, sp, #544
++	vst1.8		{d20-d21}, [r2, : 128]
++	vshl.i32	q10, q14, #1
++	add		r2, sp, #560
++	vst1.8		{d12-d13}, [r2, : 128]
++	vshl.i32	q15, q12, #1
++	vadd.i32	q8, q8, q4
++	vext.32		d10, d31, d30, #0
++	vadd.i32	q7, q7, q1
++	add		r2, sp, #576
++	vst1.8		{d16-d17}, [r2, : 128]
++	vmull.s32	q8, d18, d5
++	vmlal.s32	q8, d26, d4
++	vmlal.s32	q8, d19, d9
++	vmlal.s32	q8, d27, d3
++	vmlal.s32	q8, d22, d8
++	vmlal.s32	q8, d28, d2
++	vmlal.s32	q8, d23, d7
++	vmlal.s32	q8, d29, d1
++	vmlal.s32	q8, d24, d6
++	vmlal.s32	q8, d25, d0
++	add		r2, sp, #592
++	vst1.8		{d14-d15}, [r2, : 128]
++	vmull.s32	q2, d18, d4
++	vmlal.s32	q2, d12, d9
++	vmlal.s32	q2, d13, d8
++	vmlal.s32	q2, d19, d3
++	vmlal.s32	q2, d22, d2
++	vmlal.s32	q2, d23, d1
++	vmlal.s32	q2, d24, d0
++	add		r2, sp, #608
++	vst1.8		{d20-d21}, [r2, : 128]
++	vmull.s32	q7, d18, d9
++	vmlal.s32	q7, d26, d3
++	vmlal.s32	q7, d19, d8
++	vmlal.s32	q7, d27, d2
++	vmlal.s32	q7, d22, d7
++	vmlal.s32	q7, d28, d1
++	vmlal.s32	q7, d23, d6
++	vmlal.s32	q7, d29, d0
++	add		r2, sp, #624
++	vst1.8		{d10-d11}, [r2, : 128]
++	vmull.s32	q5, d18, d3
++	vmlal.s32	q5, d19, d2
++	vmlal.s32	q5, d22, d1
++	vmlal.s32	q5, d23, d0
++	vmlal.s32	q5, d12, d8
++	add		r2, sp, #640
++	vst1.8		{d16-d17}, [r2, : 128]
++	vmull.s32	q4, d18, d8
++	vmlal.s32	q4, d26, d2
++	vmlal.s32	q4, d19, d7
++	vmlal.s32	q4, d27, d1
++	vmlal.s32	q4, d22, d6
++	vmlal.s32	q4, d28, d0
++	vmull.s32	q8, d18, d7
++	vmlal.s32	q8, d26, d1
++	vmlal.s32	q8, d19, d6
++	vmlal.s32	q8, d27, d0
++	add		r2, sp, #544
++	vld1.8		{d20-d21}, [r2, : 128]
++	vmlal.s32	q7, d24, d21
++	vmlal.s32	q7, d25, d20
++	vmlal.s32	q4, d23, d21
++	vmlal.s32	q4, d29, d20
++	vmlal.s32	q8, d22, d21
++	vmlal.s32	q8, d28, d20
++	vmlal.s32	q5, d24, d20
++	add		r2, sp, #544
++	vst1.8		{d14-d15}, [r2, : 128]
++	vmull.s32	q7, d18, d6
++	vmlal.s32	q7, d26, d0
++	add		r2, sp, #624
++	vld1.8		{d30-d31}, [r2, : 128]
++	vmlal.s32	q2, d30, d21
++	vmlal.s32	q7, d19, d21
++	vmlal.s32	q7, d27, d20
++	add		r2, sp, #592
++	vld1.8		{d26-d27}, [r2, : 128]
++	vmlal.s32	q4, d25, d27
++	vmlal.s32	q8, d29, d27
++	vmlal.s32	q8, d25, d26
++	vmlal.s32	q7, d28, d27
++	vmlal.s32	q7, d29, d26
++	add		r2, sp, #576
++	vld1.8		{d28-d29}, [r2, : 128]
++	vmlal.s32	q4, d24, d29
++	vmlal.s32	q8, d23, d29
++	vmlal.s32	q8, d24, d28
++	vmlal.s32	q7, d22, d29
++	vmlal.s32	q7, d23, d28
++	add		r2, sp, #576
++	vst1.8		{d8-d9}, [r2, : 128]
++	add		r2, sp, #528
++	vld1.8		{d8-d9}, [r2, : 128]
++	vmlal.s32	q7, d24, d9
++	vmlal.s32	q7, d25, d31
++	vmull.s32	q1, d18, d2
++	vmlal.s32	q1, d19, d1
++	vmlal.s32	q1, d22, d0
++	vmlal.s32	q1, d24, d27
++	vmlal.s32	q1, d23, d20
++	vmlal.s32	q1, d12, d7
++	vmlal.s32	q1, d13, d6
++	vmull.s32	q6, d18, d1
++	vmlal.s32	q6, d19, d0
++	vmlal.s32	q6, d23, d27
++	vmlal.s32	q6, d22, d20
++	vmlal.s32	q6, d24, d26
++	vmull.s32	q0, d18, d0
++	vmlal.s32	q0, d22, d27
++	vmlal.s32	q0, d23, d26
++	vmlal.s32	q0, d24, d31
++	vmlal.s32	q0, d19, d20
++	add		r2, sp, #608
++	vld1.8		{d18-d19}, [r2, : 128]
++	vmlal.s32	q2, d18, d7
++	vmlal.s32	q2, d19, d6
++	vmlal.s32	q5, d18, d6
++	vmlal.s32	q5, d19, d21
++	vmlal.s32	q1, d18, d21
++	vmlal.s32	q1, d19, d29
++	vmlal.s32	q0, d18, d28
++	vmlal.s32	q0, d19, d9
++	vmlal.s32	q6, d18, d29
++	vmlal.s32	q6, d19, d28
++	add		r2, sp, #560
++	vld1.8		{d18-d19}, [r2, : 128]
++	add		r2, sp, #480
++	vld1.8		{d22-d23}, [r2, : 128]
++	vmlal.s32	q5, d19, d7
++	vmlal.s32	q0, d18, d21
++	vmlal.s32	q0, d19, d29
++	vmlal.s32	q6, d18, d6
++	add		r2, sp, #496
++	vld1.8		{d6-d7}, [r2, : 128]
++	vmlal.s32	q6, d19, d21
++	add		r2, sp, #544
++	vld1.8		{d18-d19}, [r2, : 128]
++	vmlal.s32	q0, d30, d8
++	add		r2, sp, #640
++	vld1.8		{d20-d21}, [r2, : 128]
++	vmlal.s32	q5, d30, d29
++	add		r2, sp, #576
++	vld1.8		{d24-d25}, [r2, : 128]
++	vmlal.s32	q1, d30, d28
++	vadd.i64	q13, q0, q11
++	vadd.i64	q14, q5, q11
++	vmlal.s32	q6, d30, d9
++	vshr.s64	q4, q13, #26
++	vshr.s64	q13, q14, #26
++	vadd.i64	q7, q7, q4
++	vshl.i64	q4, q4, #26
++	vadd.i64	q14, q7, q3
++	vadd.i64	q9, q9, q13
++	vshl.i64	q13, q13, #26
++	vadd.i64	q15, q9, q3
++	vsub.i64	q0, q0, q4
++	vshr.s64	q4, q14, #25
++	vsub.i64	q5, q5, q13
++	vshr.s64	q13, q15, #25
++	vadd.i64	q6, q6, q4
++	vshl.i64	q4, q4, #25
++	vadd.i64	q14, q6, q11
++	vadd.i64	q2, q2, q13
++	vsub.i64	q4, q7, q4
++	vshr.s64	q7, q14, #26
++	vshl.i64	q13, q13, #25
++	vadd.i64	q14, q2, q11
++	vadd.i64	q8, q8, q7
++	vshl.i64	q7, q7, #26
++	vadd.i64	q15, q8, q3
++	vsub.i64	q9, q9, q13
++	vshr.s64	q13, q14, #26
++	vsub.i64	q6, q6, q7
++	vshr.s64	q7, q15, #25
++	vadd.i64	q10, q10, q13
++	vshl.i64	q13, q13, #26
++	vadd.i64	q14, q10, q3
++	vadd.i64	q1, q1, q7
++	add		r2, r3, #288
++	vshl.i64	q7, q7, #25
++	add		r4, r3, #96
++	vadd.i64	q15, q1, q11
++	add		r2, r2, #8
++	vsub.i64	q2, q2, q13
++	add		r4, r4, #8
++	vshr.s64	q13, q14, #25
++	vsub.i64	q7, q8, q7
++	vshr.s64	q8, q15, #26
++	vadd.i64	q14, q13, q13
++	vadd.i64	q12, q12, q8
++	vtrn.32		d12, d14
++	vshl.i64	q8, q8, #26
++	vtrn.32		d13, d15
++	vadd.i64	q3, q12, q3
++	vadd.i64	q0, q0, q14
++	vst1.8		d12, [r2, : 64]!
++	vshl.i64	q7, q13, #4
++	vst1.8		d13, [r4, : 64]!
++	vsub.i64	q1, q1, q8
++	vshr.s64	q3, q3, #25
++	vadd.i64	q0, q0, q7
++	vadd.i64	q5, q5, q3
++	vshl.i64	q3, q3, #25
++	vadd.i64	q6, q5, q11
++	vadd.i64	q0, q0, q13
++	vshl.i64	q7, q13, #25
++	vadd.i64	q8, q0, q11
++	vsub.i64	q3, q12, q3
++	vshr.s64	q6, q6, #26
++	vsub.i64	q7, q10, q7
++	vtrn.32		d2, d6
++	vshr.s64	q8, q8, #26
++	vtrn.32		d3, d7
++	vadd.i64	q3, q9, q6
++	vst1.8		d2, [r2, : 64]
++	vshl.i64	q6, q6, #26
++	vst1.8		d3, [r4, : 64]
++	vadd.i64	q1, q4, q8
++	vtrn.32		d4, d14
++	vshl.i64	q4, q8, #26
++	vtrn.32		d5, d15
++	vsub.i64	q5, q5, q6
++	add		r2, r2, #16
++	vsub.i64	q0, q0, q4
++	vst1.8		d4, [r2, : 64]
++	add		r4, r4, #16
++	vst1.8		d5, [r4, : 64]
++	vtrn.32		d10, d6
++	vtrn.32		d11, d7
++	sub		r2, r2, #8
++	sub		r4, r4, #8
++	vtrn.32		d0, d2
++	vtrn.32		d1, d3
++	vst1.8		d10, [r2, : 64]
++	vst1.8		d11, [r4, : 64]
++	sub		r2, r2, #24
++	sub		r4, r4, #24
++	vst1.8		d0, [r2, : 64]
++	vst1.8		d1, [r4, : 64]
++	add		r2, sp, #512
++	add		r4, r3, #144
++	add		r5, r3, #192
++	vld1.8		{d0-d1}, [r2, : 128]
++	vld1.8		{d2-d3}, [r4, : 128]!
++	vld1.8		{d4-d5}, [r5, : 128]!
++	vzip.i32	q1, q2
++	vld1.8		{d6-d7}, [r4, : 128]!
++	vld1.8		{d8-d9}, [r5, : 128]!
++	vshl.i32	q5, q1, #1
++	vzip.i32	q3, q4
++	vshl.i32	q6, q2, #1
++	vld1.8		{d14}, [r4, : 64]
++	vshl.i32	q8, q3, #1
++	vld1.8		{d15}, [r5, : 64]
++	vshl.i32	q9, q4, #1
++	vmul.i32	d21, d7, d1
++	vtrn.32		d14, d15
++	vmul.i32	q11, q4, q0
++	vmul.i32	q0, q7, q0
++	vmull.s32	q12, d2, d2
++	vmlal.s32	q12, d11, d1
++	vmlal.s32	q12, d12, d0
++	vmlal.s32	q12, d13, d23
++	vmlal.s32	q12, d16, d22
++	vmlal.s32	q12, d7, d21
++	vmull.s32	q10, d2, d11
++	vmlal.s32	q10, d4, d1
++	vmlal.s32	q10, d13, d0
++	vmlal.s32	q10, d6, d23
++	vmlal.s32	q10, d17, d22
++	vmull.s32	q13, d10, d4
++	vmlal.s32	q13, d11, d3
++	vmlal.s32	q13, d13, d1
++	vmlal.s32	q13, d16, d0
++	vmlal.s32	q13, d17, d23
++	vmlal.s32	q13, d8, d22
++	vmull.s32	q1, d10, d5
++	vmlal.s32	q1, d11, d4
++	vmlal.s32	q1, d6, d1
++	vmlal.s32	q1, d17, d0
++	vmlal.s32	q1, d8, d23
++	vmull.s32	q14, d10, d6
++	vmlal.s32	q14, d11, d13
++	vmlal.s32	q14, d4, d4
++	vmlal.s32	q14, d17, d1
++	vmlal.s32	q14, d18, d0
++	vmlal.s32	q14, d9, d23
++	vmull.s32	q11, d10, d7
++	vmlal.s32	q11, d11, d6
++	vmlal.s32	q11, d12, d5
++	vmlal.s32	q11, d8, d1
++	vmlal.s32	q11, d19, d0
++	vmull.s32	q15, d10, d8
++	vmlal.s32	q15, d11, d17
++	vmlal.s32	q15, d12, d6
++	vmlal.s32	q15, d13, d5
++	vmlal.s32	q15, d19, d1
++	vmlal.s32	q15, d14, d0
++	vmull.s32	q2, d10, d9
++	vmlal.s32	q2, d11, d8
++	vmlal.s32	q2, d12, d7
++	vmlal.s32	q2, d13, d6
++	vmlal.s32	q2, d14, d1
++	vmull.s32	q0, d15, d1
++	vmlal.s32	q0, d10, d14
++	vmlal.s32	q0, d11, d19
++	vmlal.s32	q0, d12, d8
++	vmlal.s32	q0, d13, d17
++	vmlal.s32	q0, d6, d6
++	add		r2, sp, #480
++	vld1.8		{d18-d19}, [r2, : 128]
++	vmull.s32	q3, d16, d7
++	vmlal.s32	q3, d10, d15
++	vmlal.s32	q3, d11, d14
++	vmlal.s32	q3, d12, d9
++	vmlal.s32	q3, d13, d8
++	add		r2, sp, #496
++	vld1.8		{d8-d9}, [r2, : 128]
++	vadd.i64	q5, q12, q9
++	vadd.i64	q6, q15, q9
++	vshr.s64	q5, q5, #26
++	vshr.s64	q6, q6, #26
++	vadd.i64	q7, q10, q5
++	vshl.i64	q5, q5, #26
++	vadd.i64	q8, q7, q4
++	vadd.i64	q2, q2, q6
++	vshl.i64	q6, q6, #26
++	vadd.i64	q10, q2, q4
++	vsub.i64	q5, q12, q5
++	vshr.s64	q8, q8, #25
++	vsub.i64	q6, q15, q6
++	vshr.s64	q10, q10, #25
++	vadd.i64	q12, q13, q8
++	vshl.i64	q8, q8, #25
++	vadd.i64	q13, q12, q9
++	vadd.i64	q0, q0, q10
++	vsub.i64	q7, q7, q8
++	vshr.s64	q8, q13, #26
++	vshl.i64	q10, q10, #25
++	vadd.i64	q13, q0, q9
++	vadd.i64	q1, q1, q8
++	vshl.i64	q8, q8, #26
++	vadd.i64	q15, q1, q4
++	vsub.i64	q2, q2, q10
++	vshr.s64	q10, q13, #26
++	vsub.i64	q8, q12, q8
++	vshr.s64	q12, q15, #25
++	vadd.i64	q3, q3, q10
++	vshl.i64	q10, q10, #26
++	vadd.i64	q13, q3, q4
++	vadd.i64	q14, q14, q12
++	add		r2, r3, #144
++	vshl.i64	q12, q12, #25
++	add		r4, r3, #192
++	vadd.i64	q15, q14, q9
++	add		r2, r2, #8
++	vsub.i64	q0, q0, q10
++	add		r4, r4, #8
++	vshr.s64	q10, q13, #25
++	vsub.i64	q1, q1, q12
++	vshr.s64	q12, q15, #26
++	vadd.i64	q13, q10, q10
++	vadd.i64	q11, q11, q12
++	vtrn.32		d16, d2
++	vshl.i64	q12, q12, #26
++	vtrn.32		d17, d3
++	vadd.i64	q1, q11, q4
++	vadd.i64	q4, q5, q13
++	vst1.8		d16, [r2, : 64]!
++	vshl.i64	q5, q10, #4
++	vst1.8		d17, [r4, : 64]!
++	vsub.i64	q8, q14, q12
++	vshr.s64	q1, q1, #25
++	vadd.i64	q4, q4, q5
++	vadd.i64	q5, q6, q1
++	vshl.i64	q1, q1, #25
++	vadd.i64	q6, q5, q9
++	vadd.i64	q4, q4, q10
++	vshl.i64	q10, q10, #25
++	vadd.i64	q9, q4, q9
++	vsub.i64	q1, q11, q1
++	vshr.s64	q6, q6, #26
++	vsub.i64	q3, q3, q10
++	vtrn.32		d16, d2
++	vshr.s64	q9, q9, #26
++	vtrn.32		d17, d3
++	vadd.i64	q1, q2, q6
++	vst1.8		d16, [r2, : 64]
++	vshl.i64	q2, q6, #26
++	vst1.8		d17, [r4, : 64]
++	vadd.i64	q6, q7, q9
++	vtrn.32		d0, d6
++	vshl.i64	q7, q9, #26
++	vtrn.32		d1, d7
++	vsub.i64	q2, q5, q2
++	add		r2, r2, #16
++	vsub.i64	q3, q4, q7
++	vst1.8		d0, [r2, : 64]
++	add		r4, r4, #16
++	vst1.8		d1, [r4, : 64]
++	vtrn.32		d4, d2
++	vtrn.32		d5, d3
++	sub		r2, r2, #8
++	sub		r4, r4, #8
++	vtrn.32		d6, d12
++	vtrn.32		d7, d13
++	vst1.8		d4, [r2, : 64]
++	vst1.8		d5, [r4, : 64]
++	sub		r2, r2, #24
++	sub		r4, r4, #24
++	vst1.8		d6, [r2, : 64]
++	vst1.8		d7, [r4, : 64]
++	add		r2, r3, #336
++	add		r4, r3, #288
++	vld1.8		{d0-d1}, [r2, : 128]!
++	vld1.8		{d2-d3}, [r4, : 128]!
++	vadd.i32	q0, q0, q1
++	vld1.8		{d2-d3}, [r2, : 128]!
++	vld1.8		{d4-d5}, [r4, : 128]!
++	vadd.i32	q1, q1, q2
++	add		r5, r3, #288
++	vld1.8		{d4}, [r2, : 64]
++	vld1.8		{d6}, [r4, : 64]
++	vadd.i32	q2, q2, q3
++	vst1.8		{d0-d1}, [r5, : 128]!
++	vst1.8		{d2-d3}, [r5, : 128]!
++	vst1.8		d4, [r5, : 64]
++	add		r2, r3, #48
++	add		r4, r3, #144
++	vld1.8		{d0-d1}, [r4, : 128]!
++	vld1.8		{d2-d3}, [r4, : 128]!
++	vld1.8		{d4}, [r4, : 64]
++	add		r4, r3, #288
++	vld1.8		{d6-d7}, [r4, : 128]!
++	vtrn.32		q0, q3
++	vld1.8		{d8-d9}, [r4, : 128]!
++	vshl.i32	q5, q0, #4
++	vtrn.32		q1, q4
++	vshl.i32	q6, q3, #4
++	vadd.i32	q5, q5, q0
++	vadd.i32	q6, q6, q3
++	vshl.i32	q7, q1, #4
++	vld1.8		{d5}, [r4, : 64]
++	vshl.i32	q8, q4, #4
++	vtrn.32		d4, d5
++	vadd.i32	q7, q7, q1
++	vadd.i32	q8, q8, q4
++	vld1.8		{d18-d19}, [r2, : 128]!
++	vshl.i32	q10, q2, #4
++	vld1.8		{d22-d23}, [r2, : 128]!
++	vadd.i32	q10, q10, q2
++	vld1.8		{d24}, [r2, : 64]
++	vadd.i32	q5, q5, q0
++	add		r2, r3, #240
++	vld1.8		{d26-d27}, [r2, : 128]!
++	vadd.i32	q6, q6, q3
++	vld1.8		{d28-d29}, [r2, : 128]!
++	vadd.i32	q8, q8, q4
++	vld1.8		{d25}, [r2, : 64]
++	vadd.i32	q10, q10, q2
++	vtrn.32		q9, q13
++	vadd.i32	q7, q7, q1
++	vadd.i32	q5, q5, q0
++	vtrn.32		q11, q14
++	vadd.i32	q6, q6, q3
++	add		r2, sp, #528
++	vadd.i32	q10, q10, q2
++	vtrn.32		d24, d25
++	vst1.8		{d12-d13}, [r2, : 128]
++	vshl.i32	q6, q13, #1
++	add		r2, sp, #544
++	vst1.8		{d20-d21}, [r2, : 128]
++	vshl.i32	q10, q14, #1
++	add		r2, sp, #560
++	vst1.8		{d12-d13}, [r2, : 128]
++	vshl.i32	q15, q12, #1
++	vadd.i32	q8, q8, q4
++	vext.32		d10, d31, d30, #0
++	vadd.i32	q7, q7, q1
++	add		r2, sp, #576
++	vst1.8		{d16-d17}, [r2, : 128]
++	vmull.s32	q8, d18, d5
++	vmlal.s32	q8, d26, d4
++	vmlal.s32	q8, d19, d9
++	vmlal.s32	q8, d27, d3
++	vmlal.s32	q8, d22, d8
++	vmlal.s32	q8, d28, d2
++	vmlal.s32	q8, d23, d7
++	vmlal.s32	q8, d29, d1
++	vmlal.s32	q8, d24, d6
++	vmlal.s32	q8, d25, d0
++	add		r2, sp, #592
++	vst1.8		{d14-d15}, [r2, : 128]
++	vmull.s32	q2, d18, d4
++	vmlal.s32	q2, d12, d9
++	vmlal.s32	q2, d13, d8
++	vmlal.s32	q2, d19, d3
++	vmlal.s32	q2, d22, d2
++	vmlal.s32	q2, d23, d1
++	vmlal.s32	q2, d24, d0
++	add		r2, sp, #608
++	vst1.8		{d20-d21}, [r2, : 128]
++	vmull.s32	q7, d18, d9
++	vmlal.s32	q7, d26, d3
++	vmlal.s32	q7, d19, d8
++	vmlal.s32	q7, d27, d2
++	vmlal.s32	q7, d22, d7
++	vmlal.s32	q7, d28, d1
++	vmlal.s32	q7, d23, d6
++	vmlal.s32	q7, d29, d0
++	add		r2, sp, #624
++	vst1.8		{d10-d11}, [r2, : 128]
++	vmull.s32	q5, d18, d3
++	vmlal.s32	q5, d19, d2
++	vmlal.s32	q5, d22, d1
++	vmlal.s32	q5, d23, d0
++	vmlal.s32	q5, d12, d8
++	add		r2, sp, #640
++	vst1.8		{d16-d17}, [r2, : 128]
++	vmull.s32	q4, d18, d8
++	vmlal.s32	q4, d26, d2
++	vmlal.s32	q4, d19, d7
++	vmlal.s32	q4, d27, d1
++	vmlal.s32	q4, d22, d6
++	vmlal.s32	q4, d28, d0
++	vmull.s32	q8, d18, d7
++	vmlal.s32	q8, d26, d1
++	vmlal.s32	q8, d19, d6
++	vmlal.s32	q8, d27, d0
++	add		r2, sp, #544
++	vld1.8		{d20-d21}, [r2, : 128]
++	vmlal.s32	q7, d24, d21
++	vmlal.s32	q7, d25, d20
++	vmlal.s32	q4, d23, d21
++	vmlal.s32	q4, d29, d20
++	vmlal.s32	q8, d22, d21
++	vmlal.s32	q8, d28, d20
++	vmlal.s32	q5, d24, d20
++	add		r2, sp, #544
++	vst1.8		{d14-d15}, [r2, : 128]
++	vmull.s32	q7, d18, d6
++	vmlal.s32	q7, d26, d0
++	add		r2, sp, #624
++	vld1.8		{d30-d31}, [r2, : 128]
++	vmlal.s32	q2, d30, d21
++	vmlal.s32	q7, d19, d21
++	vmlal.s32	q7, d27, d20
++	add		r2, sp, #592
++	vld1.8		{d26-d27}, [r2, : 128]
++	vmlal.s32	q4, d25, d27
++	vmlal.s32	q8, d29, d27
++	vmlal.s32	q8, d25, d26
++	vmlal.s32	q7, d28, d27
++	vmlal.s32	q7, d29, d26
++	add		r2, sp, #576
++	vld1.8		{d28-d29}, [r2, : 128]
++	vmlal.s32	q4, d24, d29
++	vmlal.s32	q8, d23, d29
++	vmlal.s32	q8, d24, d28
++	vmlal.s32	q7, d22, d29
++	vmlal.s32	q7, d23, d28
++	add		r2, sp, #576
++	vst1.8		{d8-d9}, [r2, : 128]
++	add		r2, sp, #528
++	vld1.8		{d8-d9}, [r2, : 128]
++	vmlal.s32	q7, d24, d9
++	vmlal.s32	q7, d25, d31
++	vmull.s32	q1, d18, d2
++	vmlal.s32	q1, d19, d1
++	vmlal.s32	q1, d22, d0
++	vmlal.s32	q1, d24, d27
++	vmlal.s32	q1, d23, d20
++	vmlal.s32	q1, d12, d7
++	vmlal.s32	q1, d13, d6
++	vmull.s32	q6, d18, d1
++	vmlal.s32	q6, d19, d0
++	vmlal.s32	q6, d23, d27
++	vmlal.s32	q6, d22, d20
++	vmlal.s32	q6, d24, d26
++	vmull.s32	q0, d18, d0
++	vmlal.s32	q0, d22, d27
++	vmlal.s32	q0, d23, d26
++	vmlal.s32	q0, d24, d31
++	vmlal.s32	q0, d19, d20
++	add		r2, sp, #608
++	vld1.8		{d18-d19}, [r2, : 128]
++	vmlal.s32	q2, d18, d7
++	vmlal.s32	q2, d19, d6
++	vmlal.s32	q5, d18, d6
++	vmlal.s32	q5, d19, d21
++	vmlal.s32	q1, d18, d21
++	vmlal.s32	q1, d19, d29
++	vmlal.s32	q0, d18, d28
++	vmlal.s32	q0, d19, d9
++	vmlal.s32	q6, d18, d29
++	vmlal.s32	q6, d19, d28
++	add		r2, sp, #560
++	vld1.8		{d18-d19}, [r2, : 128]
++	add		r2, sp, #480
++	vld1.8		{d22-d23}, [r2, : 128]
++	vmlal.s32	q5, d19, d7
++	vmlal.s32	q0, d18, d21
++	vmlal.s32	q0, d19, d29
++	vmlal.s32	q6, d18, d6
++	add		r2, sp, #496
++	vld1.8		{d6-d7}, [r2, : 128]
++	vmlal.s32	q6, d19, d21
++	add		r2, sp, #544
++	vld1.8		{d18-d19}, [r2, : 128]
++	vmlal.s32	q0, d30, d8
++	add		r2, sp, #640
++	vld1.8		{d20-d21}, [r2, : 128]
++	vmlal.s32	q5, d30, d29
++	add		r2, sp, #576
++	vld1.8		{d24-d25}, [r2, : 128]
++	vmlal.s32	q1, d30, d28
++	vadd.i64	q13, q0, q11
++	vadd.i64	q14, q5, q11
++	vmlal.s32	q6, d30, d9
++	vshr.s64	q4, q13, #26
++	vshr.s64	q13, q14, #26
++	vadd.i64	q7, q7, q4
++	vshl.i64	q4, q4, #26
++	vadd.i64	q14, q7, q3
++	vadd.i64	q9, q9, q13
++	vshl.i64	q13, q13, #26
++	vadd.i64	q15, q9, q3
++	vsub.i64	q0, q0, q4
++	vshr.s64	q4, q14, #25
++	vsub.i64	q5, q5, q13
++	vshr.s64	q13, q15, #25
++	vadd.i64	q6, q6, q4
++	vshl.i64	q4, q4, #25
++	vadd.i64	q14, q6, q11
++	vadd.i64	q2, q2, q13
++	vsub.i64	q4, q7, q4
++	vshr.s64	q7, q14, #26
++	vshl.i64	q13, q13, #25
++	vadd.i64	q14, q2, q11
++	vadd.i64	q8, q8, q7
++	vshl.i64	q7, q7, #26
++	vadd.i64	q15, q8, q3
++	vsub.i64	q9, q9, q13
++	vshr.s64	q13, q14, #26
++	vsub.i64	q6, q6, q7
++	vshr.s64	q7, q15, #25
++	vadd.i64	q10, q10, q13
++	vshl.i64	q13, q13, #26
++	vadd.i64	q14, q10, q3
++	vadd.i64	q1, q1, q7
++	add		r2, r3, #240
++	vshl.i64	q7, q7, #25
++	add		r4, r3, #144
++	vadd.i64	q15, q1, q11
++	add		r2, r2, #8
++	vsub.i64	q2, q2, q13
++	add		r4, r4, #8
++	vshr.s64	q13, q14, #25
++	vsub.i64	q7, q8, q7
++	vshr.s64	q8, q15, #26
++	vadd.i64	q14, q13, q13
++	vadd.i64	q12, q12, q8
++	vtrn.32		d12, d14
++	vshl.i64	q8, q8, #26
++	vtrn.32		d13, d15
++	vadd.i64	q3, q12, q3
++	vadd.i64	q0, q0, q14
++	vst1.8		d12, [r2, : 64]!
++	vshl.i64	q7, q13, #4
++	vst1.8		d13, [r4, : 64]!
++	vsub.i64	q1, q1, q8
++	vshr.s64	q3, q3, #25
++	vadd.i64	q0, q0, q7
++	vadd.i64	q5, q5, q3
++	vshl.i64	q3, q3, #25
++	vadd.i64	q6, q5, q11
++	vadd.i64	q0, q0, q13
++	vshl.i64	q7, q13, #25
++	vadd.i64	q8, q0, q11
++	vsub.i64	q3, q12, q3
++	vshr.s64	q6, q6, #26
++	vsub.i64	q7, q10, q7
++	vtrn.32		d2, d6
++	vshr.s64	q8, q8, #26
++	vtrn.32		d3, d7
++	vadd.i64	q3, q9, q6
++	vst1.8		d2, [r2, : 64]
++	vshl.i64	q6, q6, #26
++	vst1.8		d3, [r4, : 64]
++	vadd.i64	q1, q4, q8
++	vtrn.32		d4, d14
++	vshl.i64	q4, q8, #26
++	vtrn.32		d5, d15
++	vsub.i64	q5, q5, q6
++	add		r2, r2, #16
++	vsub.i64	q0, q0, q4
++	vst1.8		d4, [r2, : 64]
++	add		r4, r4, #16
++	vst1.8		d5, [r4, : 64]
++	vtrn.32		d10, d6
++	vtrn.32		d11, d7
++	sub		r2, r2, #8
++	sub		r4, r4, #8
++	vtrn.32		d0, d2
++	vtrn.32		d1, d3
++	vst1.8		d10, [r2, : 64]
++	vst1.8		d11, [r4, : 64]
++	sub		r2, r2, #24
++	sub		r4, r4, #24
++	vst1.8		d0, [r2, : 64]
++	vst1.8		d1, [r4, : 64]
++	ldr		r2, [sp, #456]
++	ldr		r4, [sp, #460]
++	subs		r5, r2, #1
++	bge		.Lmainloop
++	add		r1, r3, #144
++	add		r2, r3, #336
++	vld1.8		{d0-d1}, [r1, : 128]!
++	vld1.8		{d2-d3}, [r1, : 128]!
++	vld1.8		{d4}, [r1, : 64]
++	vst1.8		{d0-d1}, [r2, : 128]!
++	vst1.8		{d2-d3}, [r2, : 128]!
++	vst1.8		d4, [r2, : 64]
++	movw		r1, #0
++.Linvertloop:
++	add		r2, r3, #144
++	movw		r4, #0
++	movw		r5, #2
++	cmp		r1, #1
++	moveq		r5, #1
++	addeq		r2, r3, #336
++	addeq		r4, r3, #48
++	cmp		r1, #2
++	moveq		r5, #1
++	addeq		r2, r3, #48
++	cmp		r1, #3
++	moveq		r5, #5
++	addeq		r4, r3, #336
++	cmp		r1, #4
++	moveq		r5, #10
++	cmp		r1, #5
++	moveq		r5, #20
++	cmp		r1, #6
++	moveq		r5, #10
++	addeq		r2, r3, #336
++	addeq		r4, r3, #336
++	cmp		r1, #7
++	moveq		r5, #50
++	cmp		r1, #8
++	moveq		r5, #100
++	cmp		r1, #9
++	moveq		r5, #50
++	addeq		r2, r3, #336
++	cmp		r1, #10
++	moveq		r5, #5
++	addeq		r2, r3, #48
++	cmp		r1, #11
++	moveq		r5, #0
++	addeq		r2, r3, #96
++	add		r6, r3, #144
++	add		r7, r3, #288
++	vld1.8		{d0-d1}, [r6, : 128]!
++	vld1.8		{d2-d3}, [r6, : 128]!
++	vld1.8		{d4}, [r6, : 64]
++	vst1.8		{d0-d1}, [r7, : 128]!
++	vst1.8		{d2-d3}, [r7, : 128]!
++	vst1.8		d4, [r7, : 64]
++	cmp		r5, #0
++	beq		.Lskipsquaringloop
++.Lsquaringloop:
++	add		r6, r3, #288
++	add		r7, r3, #288
++	add		r8, r3, #288
++	vmov.i32	q0, #19
++	vmov.i32	q1, #0
++	vmov.i32	q2, #1
++	vzip.i32	q1, q2
++	vld1.8		{d4-d5}, [r7, : 128]!
++	vld1.8		{d6-d7}, [r7, : 128]!
++	vld1.8		{d9}, [r7, : 64]
++	vld1.8		{d10-d11}, [r6, : 128]!
++	add		r7, sp, #384
++	vld1.8		{d12-d13}, [r6, : 128]!
++	vmul.i32	q7, q2, q0
++	vld1.8		{d8}, [r6, : 64]
++	vext.32		d17, d11, d10, #1
++	vmul.i32	q9, q3, q0
++	vext.32		d16, d10, d8, #1
++	vshl.u32	q10, q5, q1
++	vext.32		d22, d14, d4, #1
++	vext.32		d24, d18, d6, #1
++	vshl.u32	q13, q6, q1
++	vshl.u32	d28, d8, d2
++	vrev64.i32	d22, d22
++	vmul.i32	d1, d9, d1
++	vrev64.i32	d24, d24
++	vext.32		d29, d8, d13, #1
++	vext.32		d0, d1, d9, #1
++	vrev64.i32	d0, d0
++	vext.32		d2, d9, d1, #1
++	vext.32		d23, d15, d5, #1
++	vmull.s32	q4, d20, d4
++	vrev64.i32	d23, d23
++	vmlal.s32	q4, d21, d1
++	vrev64.i32	d2, d2
++	vmlal.s32	q4, d26, d19
++	vext.32		d3, d5, d15, #1
++	vmlal.s32	q4, d27, d18
++	vrev64.i32	d3, d3
++	vmlal.s32	q4, d28, d15
++	vext.32		d14, d12, d11, #1
++	vmull.s32	q5, d16, d23
++	vext.32		d15, d13, d12, #1
++	vmlal.s32	q5, d17, d4
++	vst1.8		d8, [r7, : 64]!
++	vmlal.s32	q5, d14, d1
++	vext.32		d12, d9, d8, #0
++	vmlal.s32	q5, d15, d19
++	vmov.i64	d13, #0
++	vmlal.s32	q5, d29, d18
++	vext.32		d25, d19, d7, #1
++	vmlal.s32	q6, d20, d5
++	vrev64.i32	d25, d25
++	vmlal.s32	q6, d21, d4
++	vst1.8		d11, [r7, : 64]!
++	vmlal.s32	q6, d26, d1
++	vext.32		d9, d10, d10, #0
++	vmlal.s32	q6, d27, d19
++	vmov.i64	d8, #0
++	vmlal.s32	q6, d28, d18
++	vmlal.s32	q4, d16, d24
++	vmlal.s32	q4, d17, d5
++	vmlal.s32	q4, d14, d4
++	vst1.8		d12, [r7, : 64]!
++	vmlal.s32	q4, d15, d1
++	vext.32		d10, d13, d12, #0
++	vmlal.s32	q4, d29, d19
++	vmov.i64	d11, #0
++	vmlal.s32	q5, d20, d6
++	vmlal.s32	q5, d21, d5
++	vmlal.s32	q5, d26, d4
++	vext.32		d13, d8, d8, #0
++	vmlal.s32	q5, d27, d1
++	vmov.i64	d12, #0
++	vmlal.s32	q5, d28, d19
++	vst1.8		d9, [r7, : 64]!
++	vmlal.s32	q6, d16, d25
++	vmlal.s32	q6, d17, d6
++	vst1.8		d10, [r7, : 64]
++	vmlal.s32	q6, d14, d5
++	vext.32		d8, d11, d10, #0
++	vmlal.s32	q6, d15, d4
++	vmov.i64	d9, #0
++	vmlal.s32	q6, d29, d1
++	vmlal.s32	q4, d20, d7
++	vmlal.s32	q4, d21, d6
++	vmlal.s32	q4, d26, d5
++	vext.32		d11, d12, d12, #0
++	vmlal.s32	q4, d27, d4
++	vmov.i64	d10, #0
++	vmlal.s32	q4, d28, d1
++	vmlal.s32	q5, d16, d0
++	sub		r6, r7, #32
++	vmlal.s32	q5, d17, d7
++	vmlal.s32	q5, d14, d6
++	vext.32		d30, d9, d8, #0
++	vmlal.s32	q5, d15, d5
++	vld1.8		{d31}, [r6, : 64]!
++	vmlal.s32	q5, d29, d4
++	vmlal.s32	q15, d20, d0
++	vext.32		d0, d6, d18, #1
++	vmlal.s32	q15, d21, d25
++	vrev64.i32	d0, d0
++	vmlal.s32	q15, d26, d24
++	vext.32		d1, d7, d19, #1
++	vext.32		d7, d10, d10, #0
++	vmlal.s32	q15, d27, d23
++	vrev64.i32	d1, d1
++	vld1.8		{d6}, [r6, : 64]
++	vmlal.s32	q15, d28, d22
++	vmlal.s32	q3, d16, d4
++	add		r6, r6, #24
++	vmlal.s32	q3, d17, d2
++	vext.32		d4, d31, d30, #0
++	vmov		d17, d11
++	vmlal.s32	q3, d14, d1
++	vext.32		d11, d13, d13, #0
++	vext.32		d13, d30, d30, #0
++	vmlal.s32	q3, d15, d0
++	vext.32		d1, d8, d8, #0
++	vmlal.s32	q3, d29, d3
++	vld1.8		{d5}, [r6, : 64]
++	sub		r6, r6, #16
++	vext.32		d10, d6, d6, #0
++	vmov.i32	q1, #0xffffffff
++	vshl.i64	q4, q1, #25
++	add		r7, sp, #480
++	vld1.8		{d14-d15}, [r7, : 128]
++	vadd.i64	q9, q2, q7
++	vshl.i64	q1, q1, #26
++	vshr.s64	q10, q9, #26
++	vld1.8		{d0}, [r6, : 64]!
++	vadd.i64	q5, q5, q10
++	vand		q9, q9, q1
++	vld1.8		{d16}, [r6, : 64]!
++	add		r6, sp, #496
++	vld1.8		{d20-d21}, [r6, : 128]
++	vadd.i64	q11, q5, q10
++	vsub.i64	q2, q2, q9
++	vshr.s64	q9, q11, #25
++	vext.32		d12, d5, d4, #0
++	vand		q11, q11, q4
++	vadd.i64	q0, q0, q9
++	vmov		d19, d7
++	vadd.i64	q3, q0, q7
++	vsub.i64	q5, q5, q11
++	vshr.s64	q11, q3, #26
++	vext.32		d18, d11, d10, #0
++	vand		q3, q3, q1
++	vadd.i64	q8, q8, q11
++	vadd.i64	q11, q8, q10
++	vsub.i64	q0, q0, q3
++	vshr.s64	q3, q11, #25
++	vand		q11, q11, q4
++	vadd.i64	q3, q6, q3
++	vadd.i64	q6, q3, q7
++	vsub.i64	q8, q8, q11
++	vshr.s64	q11, q6, #26
++	vand		q6, q6, q1
++	vadd.i64	q9, q9, q11
++	vadd.i64	d25, d19, d21
++	vsub.i64	q3, q3, q6
++	vshr.s64	d23, d25, #25
++	vand		q4, q12, q4
++	vadd.i64	d21, d23, d23
++	vshl.i64	d25, d23, #4
++	vadd.i64	d21, d21, d23
++	vadd.i64	d25, d25, d21
++	vadd.i64	d4, d4, d25
++	vzip.i32	q0, q8
++	vadd.i64	d12, d4, d14
++	add		r6, r8, #8
++	vst1.8		d0, [r6, : 64]
++	vsub.i64	d19, d19, d9
++	add		r6, r6, #16
++	vst1.8		d16, [r6, : 64]
++	vshr.s64	d22, d12, #26
++	vand		q0, q6, q1
++	vadd.i64	d10, d10, d22
++	vzip.i32	q3, q9
++	vsub.i64	d4, d4, d0
++	sub		r6, r6, #8
++	vst1.8		d6, [r6, : 64]
++	add		r6, r6, #16
++	vst1.8		d18, [r6, : 64]
++	vzip.i32	q2, q5
++	sub		r6, r6, #32
++	vst1.8		d4, [r6, : 64]
++	subs		r5, r5, #1
++	bhi		.Lsquaringloop
++.Lskipsquaringloop:
++	mov		r2, r2
++	add		r5, r3, #288
++	add		r6, r3, #144
++	vmov.i32	q0, #19
++	vmov.i32	q1, #0
++	vmov.i32	q2, #1
++	vzip.i32	q1, q2
++	vld1.8		{d4-d5}, [r5, : 128]!
++	vld1.8		{d6-d7}, [r5, : 128]!
++	vld1.8		{d9}, [r5, : 64]
++	vld1.8		{d10-d11}, [r2, : 128]!
++	add		r5, sp, #384
++	vld1.8		{d12-d13}, [r2, : 128]!
++	vmul.i32	q7, q2, q0
++	vld1.8		{d8}, [r2, : 64]
++	vext.32		d17, d11, d10, #1
++	vmul.i32	q9, q3, q0
++	vext.32		d16, d10, d8, #1
++	vshl.u32	q10, q5, q1
++	vext.32		d22, d14, d4, #1
++	vext.32		d24, d18, d6, #1
++	vshl.u32	q13, q6, q1
++	vshl.u32	d28, d8, d2
++	vrev64.i32	d22, d22
++	vmul.i32	d1, d9, d1
++	vrev64.i32	d24, d24
++	vext.32		d29, d8, d13, #1
++	vext.32		d0, d1, d9, #1
++	vrev64.i32	d0, d0
++	vext.32		d2, d9, d1, #1
++	vext.32		d23, d15, d5, #1
++	vmull.s32	q4, d20, d4
++	vrev64.i32	d23, d23
++	vmlal.s32	q4, d21, d1
++	vrev64.i32	d2, d2
++	vmlal.s32	q4, d26, d19
++	vext.32		d3, d5, d15, #1
++	vmlal.s32	q4, d27, d18
++	vrev64.i32	d3, d3
++	vmlal.s32	q4, d28, d15
++	vext.32		d14, d12, d11, #1
++	vmull.s32	q5, d16, d23
++	vext.32		d15, d13, d12, #1
++	vmlal.s32	q5, d17, d4
++	vst1.8		d8, [r5, : 64]!
++	vmlal.s32	q5, d14, d1
++	vext.32		d12, d9, d8, #0
++	vmlal.s32	q5, d15, d19
++	vmov.i64	d13, #0
++	vmlal.s32	q5, d29, d18
++	vext.32		d25, d19, d7, #1
++	vmlal.s32	q6, d20, d5
++	vrev64.i32	d25, d25
++	vmlal.s32	q6, d21, d4
++	vst1.8		d11, [r5, : 64]!
++	vmlal.s32	q6, d26, d1
++	vext.32		d9, d10, d10, #0
++	vmlal.s32	q6, d27, d19
++	vmov.i64	d8, #0
++	vmlal.s32	q6, d28, d18
++	vmlal.s32	q4, d16, d24
++	vmlal.s32	q4, d17, d5
++	vmlal.s32	q4, d14, d4
++	vst1.8		d12, [r5, : 64]!
++	vmlal.s32	q4, d15, d1
++	vext.32		d10, d13, d12, #0
++	vmlal.s32	q4, d29, d19
++	vmov.i64	d11, #0
++	vmlal.s32	q5, d20, d6
++	vmlal.s32	q5, d21, d5
++	vmlal.s32	q5, d26, d4
++	vext.32		d13, d8, d8, #0
++	vmlal.s32	q5, d27, d1
++	vmov.i64	d12, #0
++	vmlal.s32	q5, d28, d19
++	vst1.8		d9, [r5, : 64]!
++	vmlal.s32	q6, d16, d25
++	vmlal.s32	q6, d17, d6
++	vst1.8		d10, [r5, : 64]
++	vmlal.s32	q6, d14, d5
++	vext.32		d8, d11, d10, #0
++	vmlal.s32	q6, d15, d4
++	vmov.i64	d9, #0
++	vmlal.s32	q6, d29, d1
++	vmlal.s32	q4, d20, d7
++	vmlal.s32	q4, d21, d6
++	vmlal.s32	q4, d26, d5
++	vext.32		d11, d12, d12, #0
++	vmlal.s32	q4, d27, d4
++	vmov.i64	d10, #0
++	vmlal.s32	q4, d28, d1
++	vmlal.s32	q5, d16, d0
++	sub		r2, r5, #32
++	vmlal.s32	q5, d17, d7
++	vmlal.s32	q5, d14, d6
++	vext.32		d30, d9, d8, #0
++	vmlal.s32	q5, d15, d5
++	vld1.8		{d31}, [r2, : 64]!
++	vmlal.s32	q5, d29, d4
++	vmlal.s32	q15, d20, d0
++	vext.32		d0, d6, d18, #1
++	vmlal.s32	q15, d21, d25
++	vrev64.i32	d0, d0
++	vmlal.s32	q15, d26, d24
++	vext.32		d1, d7, d19, #1
++	vext.32		d7, d10, d10, #0
++	vmlal.s32	q15, d27, d23
++	vrev64.i32	d1, d1
++	vld1.8		{d6}, [r2, : 64]
++	vmlal.s32	q15, d28, d22
++	vmlal.s32	q3, d16, d4
++	add		r2, r2, #24
++	vmlal.s32	q3, d17, d2
++	vext.32		d4, d31, d30, #0
++	vmov		d17, d11
++	vmlal.s32	q3, d14, d1
++	vext.32		d11, d13, d13, #0
++	vext.32		d13, d30, d30, #0
++	vmlal.s32	q3, d15, d0
++	vext.32		d1, d8, d8, #0
++	vmlal.s32	q3, d29, d3
++	vld1.8		{d5}, [r2, : 64]
++	sub		r2, r2, #16
++	vext.32		d10, d6, d6, #0
++	vmov.i32	q1, #0xffffffff
++	vshl.i64	q4, q1, #25
++	add		r5, sp, #480
++	vld1.8		{d14-d15}, [r5, : 128]
++	vadd.i64	q9, q2, q7
++	vshl.i64	q1, q1, #26
++	vshr.s64	q10, q9, #26
++	vld1.8		{d0}, [r2, : 64]!
++	vadd.i64	q5, q5, q10
++	vand		q9, q9, q1
++	vld1.8		{d16}, [r2, : 64]!
++	add		r2, sp, #496
++	vld1.8		{d20-d21}, [r2, : 128]
++	vadd.i64	q11, q5, q10
++	vsub.i64	q2, q2, q9
++	vshr.s64	q9, q11, #25
++	vext.32		d12, d5, d4, #0
++	vand		q11, q11, q4
++	vadd.i64	q0, q0, q9
++	vmov		d19, d7
++	vadd.i64	q3, q0, q7
++	vsub.i64	q5, q5, q11
++	vshr.s64	q11, q3, #26
++	vext.32		d18, d11, d10, #0
++	vand		q3, q3, q1
++	vadd.i64	q8, q8, q11
++	vadd.i64	q11, q8, q10
++	vsub.i64	q0, q0, q3
++	vshr.s64	q3, q11, #25
++	vand		q11, q11, q4
++	vadd.i64	q3, q6, q3
++	vadd.i64	q6, q3, q7
++	vsub.i64	q8, q8, q11
++	vshr.s64	q11, q6, #26
++	vand		q6, q6, q1
++	vadd.i64	q9, q9, q11
++	vadd.i64	d25, d19, d21
++	vsub.i64	q3, q3, q6
++	vshr.s64	d23, d25, #25
++	vand		q4, q12, q4
++	vadd.i64	d21, d23, d23
++	vshl.i64	d25, d23, #4
++	vadd.i64	d21, d21, d23
++	vadd.i64	d25, d25, d21
++	vadd.i64	d4, d4, d25
++	vzip.i32	q0, q8
++	vadd.i64	d12, d4, d14
++	add		r2, r6, #8
++	vst1.8		d0, [r2, : 64]
++	vsub.i64	d19, d19, d9
++	add		r2, r2, #16
++	vst1.8		d16, [r2, : 64]
++	vshr.s64	d22, d12, #26
++	vand		q0, q6, q1
++	vadd.i64	d10, d10, d22
++	vzip.i32	q3, q9
++	vsub.i64	d4, d4, d0
++	sub		r2, r2, #8
++	vst1.8		d6, [r2, : 64]
++	add		r2, r2, #16
++	vst1.8		d18, [r2, : 64]
++	vzip.i32	q2, q5
++	sub		r2, r2, #32
++	vst1.8		d4, [r2, : 64]
++	cmp		r4, #0
++	beq		.Lskippostcopy
++	add		r2, r3, #144
++	mov		r4, r4
++	vld1.8		{d0-d1}, [r2, : 128]!
++	vld1.8		{d2-d3}, [r2, : 128]!
++	vld1.8		{d4}, [r2, : 64]
++	vst1.8		{d0-d1}, [r4, : 128]!
++	vst1.8		{d2-d3}, [r4, : 128]!
++	vst1.8		d4, [r4, : 64]
++.Lskippostcopy:
++	cmp		r1, #1
++	bne		.Lskipfinalcopy
++	add		r2, r3, #288
++	add		r4, r3, #144
++	vld1.8		{d0-d1}, [r2, : 128]!
++	vld1.8		{d2-d3}, [r2, : 128]!
++	vld1.8		{d4}, [r2, : 64]
++	vst1.8		{d0-d1}, [r4, : 128]!
++	vst1.8		{d2-d3}, [r4, : 128]!
++	vst1.8		d4, [r4, : 64]
++.Lskipfinalcopy:
++	add		r1, r1, #1
++	cmp		r1, #12
++	blo		.Linvertloop
++	add		r1, r3, #144
++	ldr		r2, [r1], #4
++	ldr		r3, [r1], #4
++	ldr		r4, [r1], #4
++	ldr		r5, [r1], #4
++	ldr		r6, [r1], #4
++	ldr		r7, [r1], #4
++	ldr		r8, [r1], #4
++	ldr		r9, [r1], #4
++	ldr		r10, [r1], #4
++	ldr		r1, [r1]
++	add		r11, r1, r1, LSL #4
++	add		r11, r11, r1, LSL #1
++	add		r11, r11, #16777216
++	mov		r11, r11, ASR #25
++	add		r11, r11, r2
++	mov		r11, r11, ASR #26
++	add		r11, r11, r3
++	mov		r11, r11, ASR #25
++	add		r11, r11, r4
++	mov		r11, r11, ASR #26
++	add		r11, r11, r5
++	mov		r11, r11, ASR #25
++	add		r11, r11, r6
++	mov		r11, r11, ASR #26
++	add		r11, r11, r7
++	mov		r11, r11, ASR #25
++	add		r11, r11, r8
++	mov		r11, r11, ASR #26
++	add		r11, r11, r9
++	mov		r11, r11, ASR #25
++	add		r11, r11, r10
++	mov		r11, r11, ASR #26
++	add		r11, r11, r1
++	mov		r11, r11, ASR #25
++	add		r2, r2, r11
++	add		r2, r2, r11, LSL #1
++	add		r2, r2, r11, LSL #4
++	mov		r11, r2, ASR #26
++	add		r3, r3, r11
++	sub		r2, r2, r11, LSL #26
++	mov		r11, r3, ASR #25
++	add		r4, r4, r11
++	sub		r3, r3, r11, LSL #25
++	mov		r11, r4, ASR #26
++	add		r5, r5, r11
++	sub		r4, r4, r11, LSL #26
++	mov		r11, r5, ASR #25
++	add		r6, r6, r11
++	sub		r5, r5, r11, LSL #25
++	mov		r11, r6, ASR #26
++	add		r7, r7, r11
++	sub		r6, r6, r11, LSL #26
++	mov		r11, r7, ASR #25
++	add		r8, r8, r11
++	sub		r7, r7, r11, LSL #25
++	mov		r11, r8, ASR #26
++	add		r9, r9, r11
++	sub		r8, r8, r11, LSL #26
++	mov		r11, r9, ASR #25
++	add		r10, r10, r11
++	sub		r9, r9, r11, LSL #25
++	mov		r11, r10, ASR #26
++	add		r1, r1, r11
++	sub		r10, r10, r11, LSL #26
++	mov		r11, r1, ASR #25
++	sub		r1, r1, r11, LSL #25
++	add		r2, r2, r3, LSL #26
++	mov		r3, r3, LSR #6
++	add		r3, r3, r4, LSL #19
++	mov		r4, r4, LSR #13
++	add		r4, r4, r5, LSL #13
++	mov		r5, r5, LSR #19
++	add		r5, r5, r6, LSL #6
++	add		r6, r7, r8, LSL #25
++	mov		r7, r8, LSR #7
++	add		r7, r7, r9, LSL #19
++	mov		r8, r9, LSR #13
++	add		r8, r8, r10, LSL #12
++	mov		r9, r10, LSR #20
++	add		r1, r9, r1, LSL #6
++	str		r2, [r0]
++	str		r3, [r0, #4]
++	str		r4, [r0, #8]
++	str		r5, [r0, #12]
++	str		r6, [r0, #16]
++	str		r7, [r0, #20]
++	str		r8, [r0, #24]
++	str		r1, [r0, #28]
++	movw		r0, #0
++	mov		sp, ip
++	pop		{r4-r11, pc}
++ENDPROC(curve25519_neon)
 +
-+	for (i = 0; i < 5; ++i) {
-+		get_random_bytes(in, sizeof(in));
-+		ret = curve25519_generate_public(out, in);
-+		ret2 = curve25519(out2, in, (u8[CURVE25519_POINT_SIZE]){ 9 });
-+		if (ret != ret2 || memcmp(out, out2, CURVE25519_POINT_SIZE)) {
-+			pr_info("curve25519 basepoint self-test %zu: FAIL: input - 0x",
-+				i + 1);
-+			for (j = CURVE25519_POINT_SIZE; j-- > 0;)
-+				printk(KERN_CONT "%02x", in[j]);
-+			printk(KERN_CONT "\n");
-+			success = false;
-+			break;
-+		}
-+	}
-+
-+	if (success)
-+		pr_info("curve25519 self-tests: pass\n");
-+	return success;
-+}
 +#endif
 -- 
 2.18.0
