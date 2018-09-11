@@ -1,120 +1,32 @@
-From: Andy Lutomirski <luto@amacapital.net>
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
 Subject: Re: [PATCH net-next v3 02/17] zinc: introduce minimal cryptography library
-Date: Tue, 11 Sep 2018 15:16:28 -0700
-Message-ID: <49BAF465-B3DC-4155-BFF9-DB6C386C1878@amacapital.net>
-References: <20180911010838.8818-1-Jason@zx2c4.com> <20180911010838.8818-3-Jason@zx2c4.com> <CAKv+Gu9nSeo4PFVrtjtqGQ32eqyxUp3xVCczZfu+dhFz5yLM0A@mail.gmail.com> <20180911145624.GA21635@kroah.com> <20180911214737.GA81235@gmail.com>
-Mime-Version: 1.0 (1.0)
-Content-Type: text/plain;
-        charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+Date: Tue, 11 Sep 2018 16:18:27 -0600
+Message-ID: <CAHmME9q+mqT+vtM1FdBvf8=nAFu=u+wN48sOxqLcFthxYVn7NQ@mail.gmail.com>
+References: <20180911010838.8818-1-Jason@zx2c4.com> <20180911010838.8818-3-Jason@zx2c4.com>
+ <CAKv+Gu9nSeo4PFVrtjtqGQ32eqyxUp3xVCczZfu+dhFz5yLM0A@mail.gmail.com>
+ <20180911145624.GA21635@kroah.com> <20180911214737.GA81235@gmail.com> <49BAF465-B3DC-4155-BFF9-DB6C386C1878@amacapital.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Cc: Eric Biggers <ebiggers@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "<netdev@vger.kernel.org>" <netdev@vger.kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Andy Lutomirski <luto@kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Netdev <netdev@vger.kernel.org>,
+        David Miller <davem@davemloft.net>,
+        Andrew Lutomirski <luto@kernel.org>,
         Samuel Neves <sneves@dei.uc.pt>,
         Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>
-To: Eric Biggers <ebiggers@kernel.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180911214737.GA81235@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Andy Lutomirski <luto@amacapital.net>
+Return-path: <netdev-owner@vger.kernel.org>
+In-Reply-To: <49BAF465-B3DC-4155-BFF9-DB6C386C1878@amacapital.net>
+Sender: netdev-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
+On Tue, Sep 11, 2018 at 4:16 PM Andy Lutomirski <luto@amacapital.net> wrote:
+> Jason, can you do one of these conversions as an example?
 
+My preference is really to leave that to a different patch series. But
+if you think I *must*, then I shall.
 
-> On Sep 11, 2018, at 2:47 PM, Eric Biggers <ebiggers@kernel.org> wrote:
->=20
->> On Tue, Sep 11, 2018 at 04:56:24PM +0200, Greg Kroah-Hartman wrote:
->> On Tue, Sep 11, 2018 at 12:08:56PM +0200, Ard Biesheuvel wrote:
->>>> As Zinc is simply library code, its config options are un-menued, with
->>>> the exception of CONFIG_ZINC_DEBUG, which enables various selftests and=
-
->>>> BUG_ONs.
->>>>=20
->>>=20
->>> In spite of the wall of text, you fail to point out exactly why the
->>> existing AEAD API in unsuitable, and why fixing it is not an option.
->>>=20
->>> As I pointed out in a previous version, I don't think we need a
->>> separate crypto API/library in the kernel, and I don't think you have
->>> convinced anyone else yet either.
->>=20
->> Um, then why do people keep sprinkling new crypto/hash code all around
->> the kernel tree?  It's because what we have as a crypto api is complex
->> and is hard to use for many in-kernel users.
->>=20
->> Something like this new interface (zinc) is a much "saner" api for
->> writing kernel code that has to interact with crypto/hash primitives.
->>=20
->> I see no reason why the existing crypto code can be redone to use the
->> zinc crypto primitives over time, making there only be one main location
->> for the crypto algorithms.  But to do it the other way around is pretty
->> much impossible given the complexities in the existing api that has been
->> created over time.
->>=20
->> Not to say that the existing api is not a viable one, but ugh, really?
->> You have to admit it is a pain to try to use in any "normal" type of
->> "here's a bytestream, go give me a hash" type of method, right?
->>=20
->> Also there is the added benefit that the crypto primitives here have
->> been audited by a number of people (so Jason stated), and they are
->> written in a way that the crypto community can more easily interact and
->> contribute to.  Which is _way_ better than what we have today.
->>=20
->> So this gets my "stamp of approval" for whatever it is worth :)
->>=20
->=20
-> I think you mean you see no reason why it *cannot* be converted?  The
-> conversions definitely *should* be done, just like how some of the existin=
-g
-> crypto API algorithms like SHA-256 already wrap implementations in lib/.  I=
-n my
-> view, lib/zinc/ isn't fundamentally different from what we already have fo=
-r some
-> algorithms.  So it's misguided to design/present it as some novel thing, w=
-hich
-> unfortunately this patchset still does to a large extent.  (The actual new=
- thing
-> is how architecture-specific implementations are handled.)
->=20
-> Of course, the real problem is that even after multiple revisions of this
-> patchset, there's still no actual conversions of the existing crypto API
-> algorithms over to use the new implementations.  "Zinc" is still completel=
-y
-> separate from the existing crypto API.
->=20
-
-Jason, can you do one of these conversions as an example?
-
-> So, it's not yet clear that the conversions will actually work out without=
-
-> problems that would require changes in "Zinc".  I don't think it makes sen=
-se to
-> merge all this stuff without doing the conversions, or at the very least
-> demonstrating how they will be done.
->=20
-> In particular, in its current form "Zinc" is useless for anyone that needs=
- the
-> existing crypto API.  For example, for HPolyC,
-> (https://lkml.org/lkml/2018/8/6/857), I need to make improvements to ChaCh=
-a and
-> Poly1305 in the existing crypto API, e.g. to add support for XChaCha and
-> NEON-accelerated Poly1305.  Having completely separate ChaCha and Poly1305=
-
-> implementations in Zinc doesn't help at all.  If anything, it makes things=
-
-> harder because people will have to review/maintain both sets of implementa=
-tions;
-> and when trying to make the improvements I need, I'll find myself in the m=
-iddle
-> of a holy war between two competing camps who each have their own opinion a=
-bout
-> The Right Way To Do Crypto, and their own crypto implementations and APIs i=
-n the
-> kernel.
->=20
-> - Eric
+Jason
