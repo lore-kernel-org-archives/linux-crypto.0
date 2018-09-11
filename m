@@ -1,12 +1,16 @@
-From: Andy Lutomirski <luto@amacapital.net>
-Subject: Re: [PATCH net-next v3 02/17] zinc: introduce minimal cryptography library
-Date: Tue, 11 Sep 2018 16:01:19 -0700
-Message-ID: <2E01FBB6-030A-40AB-8BEE-F8F271A57568@amacapital.net>
-References: <20180911010838.8818-1-Jason@zx2c4.com> <20180911010838.8818-3-Jason@zx2c4.com> <CAKv+Gu9nSeo4PFVrtjtqGQ32eqyxUp3xVCczZfu+dhFz5yLM0A@mail.gmail.com> <20180911145624.GA21635@kroah.com> <20180911214737.GA81235@gmail.com> <49BAF465-B3DC-4155-BFF9-DB6C386C1878@amacapital.net> <CAHmME9q+mqT+vtM1FdBvf8=nAFu=u+wN48sOxqLcFthxYVn7NQ@mail.gmail.com>
-Mime-Version: 1.0 (1.0)
-Content-Type: text/plain;
-        charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+From: Andrew Lunn <andrew@lunn.ch>
+Subject: Re: [PATCH net-next v3 02/17] zinc: introduce minimal cryptography
+ library
+Date: Wed, 12 Sep 2018 01:30:15 +0200
+Message-ID: <20180911233015.GD11474@lunn.ch>
+References: <20180911010838.8818-1-Jason@zx2c4.com>
+ <20180911010838.8818-3-Jason@zx2c4.com>
+ <CAKv+Gu9nSeo4PFVrtjtqGQ32eqyxUp3xVCczZfu+dhFz5yLM0A@mail.gmail.com>
+ <20180911145624.GA21635@kroah.com>
+ <20180911214737.GA81235@gmail.com>
+ <CAHmME9rFUruF-VN1pmU-k5nFsb9ppAPhPpW-5Ho9dKL2HCg4kA@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Cc: Eric Biggers <ebiggers@kernel.org>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>,
@@ -19,29 +23,34 @@ Cc: Eric Biggers <ebiggers@kernel.org>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 To: "Jason A. Donenfeld" <Jason@zx2c4.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAHmME9q+mqT+vtM1FdBvf8=nAFu=u+wN48sOxqLcFthxYVn7NQ@mail.gmail.com>
+Content-Disposition: inline
+In-Reply-To: <CAHmME9rFUruF-VN1pmU-k5nFsb9ppAPhPpW-5Ho9dKL2HCg4kA@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
+On Tue, Sep 11, 2018 at 04:02:52PM -0600, Jason A. Donenfeld wrote:
+> On Tue, Sep 11, 2018 at 3:47 PM Eric Biggers <ebiggers@kernel.org> wrote:
+> > Of course, the real problem is that even after multiple revisions of this
+> > patchset, there's still no actual conversions of the existing crypto API
+> > algorithms over to use the new implementations.  "Zinc" is still completely
+> > separate from the existing crypto API.
+> 
+> No this is not, "the real problem [...] after multiple revisions"
+> because I've offered to do this and stated pretty clearly my intent to
+> do so. But, as I've mentioned before, I'd really prefer to land this
+> series through net-next
 
+Hi Jason
 
-> On Sep 11, 2018, at 3:18 PM, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
->=20
->> On Tue, Sep 11, 2018 at 4:16 PM Andy Lutomirski <luto@amacapital.net> wro=
-te:
->> Jason, can you do one of these conversions as an example?
->=20
-> My preference is really to leave that to a different patch series. But
-> if you think I *must*, then I shall.
->=20
->=20
+Just as an FYI:
 
-I think Ard=E2=80=99s point is valid: in the long run we don=E2=80=99t want t=
-wo competing software implementations of each primitive. It clearly *should*=
- be possible to make crypto API call into zinc for synchronous software oper=
-ations, but a demonstration of how this actually works and that there isn=E2=
-=80=99t some change to zinc to make it would well would be in order, I think=
-.
+1) I don't think anybody in netdev has taken a serious look at the
+network code yet. There is little point until the controversial part
+of the code, Zinc, has been sorted out.
 
-IMO the right approach is do one conversion right away and save the rest for=
- later.=
+2) I personally would be surprised if DaveM took this code without
+having an Acked-by from the crypto subsystem people. In the same way,
+i doubt the crypto people would take an Ethernet driver without having
+DaveM's Acked-by.
+
+       Andrew
