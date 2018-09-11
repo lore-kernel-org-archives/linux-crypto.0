@@ -1,7 +1,7 @@
 From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: [PATCH net-next v3 02/17] zinc: introduce minimal cryptography library
-Date: Mon, 10 Sep 2018 19:08:22 -0600
-Message-ID: <20180911010838.8818-3-Jason@zx2c4.com>
+Subject: [PATCH net-next v3 03/17] zinc: ChaCha20 generic C implementation
+Date: Mon, 10 Sep 2018 19:08:23 -0600
+Message-ID: <20180911010838.8818-4-Jason@zx2c4.com>
 References: <20180911010838.8818-1-Jason@zx2c4.com>
 Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
         Andy Lutomirski <luto@kernel.org>,
@@ -10,151 +10,16 @@ Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
         linux-crypto@vger.kernel.org
 To: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
         davem@davemloft.net, gregkh@linuxfoundation.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <netdev-owner@vger.kernel.org>
 In-Reply-To: <20180911010838.8818-1-Jason@zx2c4.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Sender: netdev-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Zinc stands for "Zinc Is Neat Crypto" or "Zinc as IN Crypto" or maybe
-just "Zx2c4's INsane Cryptolib." It's also short, easy to type, and
-plays nicely with the recent trend of naming crypto libraries after
-elements. The guiding principle is "don't overdo it". It's less of a
-library and more of a directory tree for organizing well-curated direct
-implementations of cryptography primitives.
+This implements the ChaCha20 permutation as a single C statement, by way
+of the comma operator, which the compiler is able to simplify
+terrifically.
 
-Zinc is a new cryptography API that is much more minimal and lower-level
-than the current one. It intends to complement it and provide a basis
-upon which the current crypto API might build, as the provider of
-software implementations of cryptographic primitives. It is motivated by
-three primary observations in crypto API design:
-
-  * Highly composable "cipher modes" and related abstractions from
-    90s cryptographers did not turn out to be as terrific an idea as
-    hoped, leading to a host of API misuse problems.
-
-  * Most programmers are afraid of crypto code, and so prefer to
-    integrate it into libraries in a highly abstracted manner, so as to
-    shield themselves from implementation details. Cryptographers, on
-    the other hand, prefer simple direct implementations, which they're
-    able to verify for high assurance and optimize in accordance with
-    their expertise.
-
-  * Overly abstracted and flexible cryptography APIs lead to a host of
-    dangerous problems and performance issues. The kernel is in the
-    business usually not of coming up with new uses of crypto, but
-    rather implementing various constructions, which means it essentially
-    needs a library of primitives, not a highly abstracted enterprise-ready
-    pluggable system, with a few particular exceptions.
-
-This last observation has seen itself play out several times over and
-over again within the kernel:
-
-  * The perennial move of actual primitives away from crypto/ and into
-    lib/, so that users can actually call these functions directly with
-    no overhead and without lots of allocations, function pointers,
-    string specifier parsing, and general clunkiness. For example:
-    sha256, chacha20, siphash, sha1, and so forth live in lib/ rather
-    than in crypto/. Zinc intends to stop the cluttering of lib/ and
-    introduce these direct primitives into their proper place, lib/zinc/.
-
-  * An abundance of misuse bugs with the present crypto API that have
-    been very unpleasant to clean up.
-
-  * A hesitance to even use cryptography, because of the overhead and
-    headaches involved in accessing the routines.
-
-Zinc goes in a rather different direction. Rather than providing a
-thoroughly designed and abstracted API, Zinc gives you simple functions,
-which implement some primitive, or some particular and specific
-construction of primitives. It is not dynamic in the least, though one
-could imagine implementing a complex dynamic dispatch mechanism (such as
-the current crypto API) on top of these basic functions. After all,
-dynamic dispatch is usually needed for applications with cipher agility,
-such as IPsec, dm-crypt, AF_ALG, and so forth, and the existing crypto
-API will continue to play that role. However, Zinc will provide a non-
-haphazard way of directly utilizing crypto routines in applications
-that do have neither the need nor desire for abstraction and dynamic
-dispatch.
-
-It also organizes the implementations in a simple, straight-forward,
-and direct manner, making it enjoyable and intuitive to work on.
-Rather than moving optimized assembly implementations into arch/, it
-keeps them all together in lib/zinc/, making it simple and obvious to
-compare and contrast what's happening. This is, notably, exactly what
-the lib/raid6/ tree does, and that seems to work out rather well. It's
-also the pattern of most successful crypto libraries. The architecture-
-specific glue-code is made a part of each translation unit, rather than
-being in a separate one, so that generic and architecture-optimized code
-are combined at compile-time, and incompatibility branches compiled out by
-the optimizer.
-
-All implementations have been extensively tested and fuzzed, and are
-selected for their quality, trustworthiness, and performance. Wherever
-possible and performant, formally verified implementations are used,
-such as those from HACL* [1] and Fiat-Crypto [2]. The routines also take
-special care to zero out secrets using memzero_explicit (and future work
-is planned to have gcc do this more reliably and performantly with
-compiler plugins). The performance of the selected implementations is
-state-of-the-art and unrivaled on a broad array of hardware, though of
-course we will continue to fine tune these to the hardware demands
-needed by kernel contributors. Each implementation also comes with
-extensive self-tests and crafted test vectors, pulled from various
-places such as Wycheproof [9].
-
-Regularity of function signatures is important, so that users can easily
-"guess" the name of the function they want. Though, individual
-primitives are oftentimes not trivially interchangeable, having been
-designed for different things and requiring different parameters and
-semantics, and so the function signatures they provide will directly
-reflect the realities of the primitives' usages, rather than hiding it
-behind (inevitably leaky) abstractions. Also, in contrast to the current
-crypto API, Zinc functions can work on stack buffers, and can be called
-with different keys, without requiring allocations or locking.
-
-SIMD is used automatically when available, though some routines may
-benefit from either having their SIMD disabled for particular
-invocations, or to have the SIMD initialization calls amortized over
-several invocations of the function, and so Zinc utilizes function
-signatures enabling that in conjunction with the recently introduced
-simd_context_t.
-
-More generally, Zinc provides function signatures that allow just what
-is required by the various callers. This isn't to say that users of the
-functions will be permitted to pollute the function semantics with weird
-particular needs, but we are trying very hard not to overdo it, and that
-means looking carefully at what's actually necessary, and doing just that,
-and not much more than that. Remember: practicality and cleanliness rather
-than over-zealous infrastructure.
-
-Zinc provides also an opening for the best implementers in academia to
-contribute their time and effort to the kernel, by being sufficiently
-simple and inviting. In discussing this commit with some of the best and
-brightest over the last few years, there are many who are eager to
-devote rare talent and energy to this effort.
-
-Following the merging of this, I expect for the primitives that
-currently exist in lib/ to work their way into lib/zinc/, after intense
-scrutiny of each implementation, potentially replacing them with either
-formally-verified implementations, or better studied and faster
-state-of-the-art implementations.
-
-Also following the merging of this, I expect for the old crypto API
-implementations to be ported over to use Zinc for their software-based
-implementations.
-
-As Zinc is simply library code, its config options are un-menued, with
-the exception of CONFIG_ZINC_DEBUG, which enables various selftests and
-BUG_ONs.
-
-[1] https://github.com/project-everest/hacl-star
-[2] https://github.com/mit-plv/fiat-crypto
-[3] https://cr.yp.to/ecdh.html
-[4] https://cr.yp.to/chacha.html
-[5] https://cr.yp.to/snuffle/xsalsa-20081128.pdf
-[6] https://cr.yp.to/mac.html
-[7] https://blake2.net/
-[8] https://tools.ietf.org/html/rfc8439
-[9] https://github.com/google/wycheproof
+Information: https://cr.yp.to/chacha.html
 
 Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
 Cc: Andy Lutomirski <luto@kernel.org>
@@ -163,138 +28,300 @@ Cc: Samuel Neves <sneves@dei.uc.pt>
 Cc: Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>
 Cc: linux-crypto@vger.kernel.org
 ---
- MAINTAINERS       |  8 ++++++++
- lib/Kconfig       |  2 ++
- lib/Makefile      |  2 ++
- lib/zinc/Kconfig  | 20 ++++++++++++++++++++
- lib/zinc/Makefile |  8 ++++++++
- lib/zinc/main.c   | 31 +++++++++++++++++++++++++++++++
- 6 files changed, 71 insertions(+)
- create mode 100644 lib/zinc/Kconfig
- create mode 100644 lib/zinc/Makefile
- create mode 100644 lib/zinc/main.c
+ include/zinc/chacha20.h      |  53 +++++++++++
+ lib/zinc/Kconfig             |   4 +
+ lib/zinc/Makefile            |   4 +
+ lib/zinc/chacha20/chacha20.c | 168 +++++++++++++++++++++++++++++++++++
+ lib/zinc/main.c              |   5 ++
+ 5 files changed, 234 insertions(+)
+ create mode 100644 include/zinc/chacha20.h
+ create mode 100644 lib/zinc/chacha20/chacha20.c
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 2ef884b883c3..d2092e52320d 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -16160,6 +16160,14 @@ Q:	https://patchwork.linuxtv.org/project/linux-media/list/
- S:	Maintained
- F:	drivers/media/dvb-frontends/zd1301_demod*
- 
-+ZINC CRYPTOGRAPHY LIBRARY
-+M:	Jason A. Donenfeld <Jason@zx2c4.com>
-+M:	Samuel Neves <sneves@dei.uc.pt>
-+S:	Maintained
-+F:	lib/zinc/
-+F:	include/zinc/
-+L:	linux-crypto@vger.kernel.org
-+
- ZPOOL COMPRESSED PAGE STORAGE API
- M:	Dan Streetman <ddstreet@ieee.org>
- L:	linux-mm@kvack.org
-diff --git a/lib/Kconfig b/lib/Kconfig
-index a3928d4438b5..3e6848269c66 100644
---- a/lib/Kconfig
-+++ b/lib/Kconfig
-@@ -485,6 +485,8 @@ config GLOB_SELFTEST
- 	  module load) by a small amount, so you're welcome to play with
- 	  it, but you probably don't need it.
- 
-+source "lib/zinc/Kconfig"
-+
- #
- # Netlink attribute parsing support is select'ed if needed
- #
-diff --git a/lib/Makefile b/lib/Makefile
-index ca3f7ebb900d..3f16e35d2c11 100644
---- a/lib/Makefile
-+++ b/lib/Makefile
-@@ -214,6 +214,8 @@ obj-$(CONFIG_PERCPU_TEST) += percpu_test.o
- 
- obj-$(CONFIG_ASN1) += asn1_decoder.o
- 
-+obj-$(CONFIG_ZINC) += zinc/
-+
- obj-$(CONFIG_FONT_SUPPORT) += fonts/
- 
- obj-$(CONFIG_PRIME_NUMBERS) += prime_numbers.o
-diff --git a/lib/zinc/Kconfig b/lib/zinc/Kconfig
+diff --git a/include/zinc/chacha20.h b/include/zinc/chacha20.h
 new file mode 100644
-index 000000000000..aa4f8d449d6b
+index 000000000000..d09afbccb601
 --- /dev/null
-+++ b/lib/zinc/Kconfig
-@@ -0,0 +1,20 @@
-+config ZINC
-+	tristate
-+	select CRYPTO_BLKCIPHER
-+	select VFP
-+	select VFPv3
-+	select NEON
-+	select KERNEL_MODE_NEON
-+
-+config ZINC_DEBUG
-+	bool "Zinc cryptography library debugging and self-tests"
-+	depends on ZINC
-+	help
-+	  This builds a series of self-tests for the Zinc crypto library, which
-+	  help diagnose any cryptographic algorithm implementation issues that
-+	  might be at the root cause of potential bugs. It also adds various
-+	  debugging traps.
-+
-+	  Unless you're developing and testing cryptographic routines, or are
-+	  especially paranoid about correctness on your hardware, you may say
-+	  N here.
-diff --git a/lib/zinc/Makefile b/lib/zinc/Makefile
-new file mode 100644
-index 000000000000..dad47573de42
---- /dev/null
-+++ b/lib/zinc/Makefile
-@@ -0,0 +1,8 @@
-+ccflags-y := -O3
-+ccflags-y += -Wframe-larger-than=8192
-+ccflags-y += -D'pr_fmt(fmt)=KBUILD_MODNAME ": " fmt'
-+ccflags-$(CONFIG_ZINC_DEBUG) += -DDEBUG
-+
-+zinc-y += main.o
-+
-+obj-$(CONFIG_ZINC) := zinc.o
-diff --git a/lib/zinc/main.c b/lib/zinc/main.c
-new file mode 100644
-index 000000000000..ceece33ff5a7
---- /dev/null
-+++ b/lib/zinc/main.c
-@@ -0,0 +1,31 @@
++++ b/include/zinc/chacha20.h
+@@ -0,0 +1,53 @@
 +/* SPDX-License-Identifier: GPL-2.0
 + *
 + * Copyright (C) 2015-2018 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
 + */
 +
-+#include <linux/init.h>
-+#include <linux/module.h>
++#ifndef _ZINC_CHACHA20_H
++#define _ZINC_CHACHA20_H
 +
-+#ifdef DEBUG
-+#define selftest(which) do { \
-+	if (!which ## _selftest()) \
-+		return -ENOTRECOVERABLE; \
-+} while (0)
-+#else
-+#define selftest(which)
++#include <asm/unaligned.h>
++#include <linux/simd.h>
++#include <linux/kernel.h>
++#include <linux/types.h>
++
++enum {
++	CHACHA20_IV_SIZE = 16,
++	CHACHA20_KEY_SIZE = 32,
++	CHACHA20_BLOCK_SIZE = 64,
++	HCHACHA20_KEY_SIZE = 32,
++	HCHACHA20_NONCE_SIZE = 16
++};
++
++struct chacha20_ctx {
++	u32 key[8];
++	u32 counter[4];
++} __aligned(32);
++
++void chacha20_fpu_init(void);
++
++static inline void chacha20_init(struct chacha20_ctx *state,
++				 const u8 key[CHACHA20_KEY_SIZE],
++				 const u64 nonce)
++{
++	state->key[0] = get_unaligned_le32(key + 0);
++	state->key[1] = get_unaligned_le32(key + 4);
++	state->key[2] = get_unaligned_le32(key + 8);
++	state->key[3] = get_unaligned_le32(key + 12);
++	state->key[4] = get_unaligned_le32(key + 16);
++	state->key[5] = get_unaligned_le32(key + 20);
++	state->key[6] = get_unaligned_le32(key + 24);
++	state->key[7] = get_unaligned_le32(key + 28);
++	state->counter[0] = state->counter[1] = 0;
++	state->counter[2] = nonce & U32_MAX;
++	state->counter[3] = nonce >> 32;
++}
++void chacha20(struct chacha20_ctx *state, u8 *dst, const u8 *src, u32 len,
++	      simd_context_t simd_context);
++
++/* Derived key should be 32-bit aligned */
++void hchacha20(u8 derived_key[CHACHA20_KEY_SIZE],
++	       const u8 nonce[HCHACHA20_NONCE_SIZE],
++	       const u8 key[HCHACHA20_KEY_SIZE], simd_context_t simd_context);
++
++#endif /* _ZINC_CHACHA20_H */
+diff --git a/lib/zinc/Kconfig b/lib/zinc/Kconfig
+index aa4f8d449d6b..5311a0d6ba8b 100644
+--- a/lib/zinc/Kconfig
++++ b/lib/zinc/Kconfig
+@@ -6,6 +6,10 @@ config ZINC
+ 	select NEON
+ 	select KERNEL_MODE_NEON
+ 
++config ZINC_CHACHA20
++	bool
++	select ZINC
++
+ config ZINC_DEBUG
+ 	bool "Zinc cryptography library debugging and self-tests"
+ 	depends on ZINC
+diff --git a/lib/zinc/Makefile b/lib/zinc/Makefile
+index dad47573de42..0b5a964bfba6 100644
+--- a/lib/zinc/Makefile
++++ b/lib/zinc/Makefile
+@@ -3,6 +3,10 @@ ccflags-y += -Wframe-larger-than=8192
+ ccflags-y += -D'pr_fmt(fmt)=KBUILD_MODNAME ": " fmt'
+ ccflags-$(CONFIG_ZINC_DEBUG) += -DDEBUG
+ 
++ifeq ($(CONFIG_ZINC_CHACHA20),y)
++zinc-y += chacha20/chacha20.o
++endif
++
+ zinc-y += main.o
+ 
+ obj-$(CONFIG_ZINC) := zinc.o
+diff --git a/lib/zinc/chacha20/chacha20.c b/lib/zinc/chacha20/chacha20.c
+new file mode 100644
+index 000000000000..ab5ef07dd4b5
+--- /dev/null
++++ b/lib/zinc/chacha20/chacha20.c
+@@ -0,0 +1,168 @@
++/* SPDX-License-Identifier: GPL-2.0
++ *
++ * Copyright (C) 2015-2018 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
++ *
++ * Implementation of the ChaCha20 stream cipher.
++ *
++ * Information: https://cr.yp.to/chacha.html
++ */
++
++#include <zinc/chacha20.h>
++
++#include <linux/kernel.h>
++#include <crypto/algapi.h>
++
++#ifndef HAVE_CHACHA20_ARCH_IMPLEMENTATION
++void __init chacha20_fpu_init(void)
++{
++}
++static inline bool chacha20_arch(u8 *out, const u8 *in, const size_t len,
++				 const u32 key[8], const u32 counter[4],
++				 simd_context_t simd_context)
++{
++	return false;
++}
++static inline bool hchacha20_arch(u8 *derived_key, const u8 *nonce,
++				  const u8 *key, simd_context_t simd_context)
++{
++	return false;
++}
 +#endif
 +
-+static int __init mod_init(void)
++#define EXPAND_32_BYTE_K 0x61707865U, 0x3320646eU, 0x79622d32U, 0x6b206574U
++
++#define QUARTER_ROUND(x, a, b, c, d) ( \
++	x[a] += x[b], \
++	x[d] = rol32((x[d] ^ x[a]), 16), \
++	x[c] += x[d], \
++	x[b] = rol32((x[b] ^ x[c]), 12), \
++	x[a] += x[b], \
++	x[d] = rol32((x[d] ^ x[a]), 8), \
++	x[c] += x[d], \
++	x[b] = rol32((x[b] ^ x[c]), 7) \
++)
++
++#define C(i, j) (i * 4 + j)
++
++#define DOUBLE_ROUND(x) ( \
++	/* Column Round */ \
++	QUARTER_ROUND(x, C(0, 0), C(1, 0), C(2, 0), C(3, 0)), \
++	QUARTER_ROUND(x, C(0, 1), C(1, 1), C(2, 1), C(3, 1)), \
++	QUARTER_ROUND(x, C(0, 2), C(1, 2), C(2, 2), C(3, 2)), \
++	QUARTER_ROUND(x, C(0, 3), C(1, 3), C(2, 3), C(3, 3)), \
++	/* Diagonal Round */ \
++	QUARTER_ROUND(x, C(0, 0), C(1, 1), C(2, 2), C(3, 3)), \
++	QUARTER_ROUND(x, C(0, 1), C(1, 2), C(2, 3), C(3, 0)), \
++	QUARTER_ROUND(x, C(0, 2), C(1, 3), C(2, 0), C(3, 1)), \
++	QUARTER_ROUND(x, C(0, 3), C(1, 0), C(2, 1), C(3, 2)) \
++)
++
++#define TWENTY_ROUNDS(x) ( \
++	DOUBLE_ROUND(x), \
++	DOUBLE_ROUND(x), \
++	DOUBLE_ROUND(x), \
++	DOUBLE_ROUND(x), \
++	DOUBLE_ROUND(x), \
++	DOUBLE_ROUND(x), \
++	DOUBLE_ROUND(x), \
++	DOUBLE_ROUND(x), \
++	DOUBLE_ROUND(x), \
++	DOUBLE_ROUND(x) \
++)
++
++static void chacha20_block_generic(__le32 *stream, u32 *state)
 +{
-+	return 0;
++	u32 x[CHACHA20_BLOCK_SIZE / sizeof(u32)];
++	int i;
++
++	for (i = 0; i < ARRAY_SIZE(x); ++i)
++		x[i] = state[i];
++
++	TWENTY_ROUNDS(x);
++
++	for (i = 0; i < ARRAY_SIZE(x); ++i)
++		stream[i] = cpu_to_le32(x[i] + state[i]);
++
++	++state[12];
 +}
 +
-+static void __exit mod_exit(void)
++static void chacha20_generic(u8 *out, const u8 *in, u32 len, const u32 key[8],
++			     const u32 counter[4])
 +{
++	__le32 buf[CHACHA20_BLOCK_SIZE / sizeof(__le32)];
++	u32 x[] = {
++		EXPAND_32_BYTE_K,
++		key[0], key[1], key[2], key[3],
++		key[4], key[5], key[6], key[7],
++		counter[0], counter[1], counter[2], counter[3]
++	};
++
++	if (out != in)
++		memmove(out, in, len);
++
++	while (len >= CHACHA20_BLOCK_SIZE) {
++		chacha20_block_generic(buf, x);
++		crypto_xor(out, (u8 *)buf, CHACHA20_BLOCK_SIZE);
++		len -= CHACHA20_BLOCK_SIZE;
++		out += CHACHA20_BLOCK_SIZE;
++	}
++	if (len) {
++		chacha20_block_generic(buf, x);
++		crypto_xor(out, (u8 *)buf, len);
++	}
 +}
 +
-+module_init(mod_init);
-+module_exit(mod_exit);
-+MODULE_LICENSE("GPL v2");
-+MODULE_DESCRIPTION("Zinc cryptography library");
-+MODULE_AUTHOR("Jason A. Donenfeld <Jason@zx2c4.com>");
++void chacha20(struct chacha20_ctx *state, u8 *dst, const u8 *src, u32 len,
++	      simd_context_t simd_context)
++{
++	if (!chacha20_arch(dst, src, len, state->key, state->counter,
++			   simd_context))
++		chacha20_generic(dst, src, len, state->key, state->counter);
++	state->counter[0] += (len + 63) / 64;
++}
++EXPORT_SYMBOL(chacha20);
++
++static void hchacha20_generic(u8 derived_key[CHACHA20_KEY_SIZE],
++			      const u8 nonce[HCHACHA20_NONCE_SIZE],
++			      const u8 key[HCHACHA20_KEY_SIZE])
++{
++	__le32 *out = (__force __le32 *)derived_key;
++	u32 x[] = { EXPAND_32_BYTE_K,
++		    get_unaligned_le32(key + 0),
++		    get_unaligned_le32(key + 4),
++		    get_unaligned_le32(key + 8),
++		    get_unaligned_le32(key + 12),
++		    get_unaligned_le32(key + 16),
++		    get_unaligned_le32(key + 20),
++		    get_unaligned_le32(key + 24),
++		    get_unaligned_le32(key + 28),
++		    get_unaligned_le32(nonce + 0),
++		    get_unaligned_le32(nonce + 4),
++		    get_unaligned_le32(nonce + 8),
++		    get_unaligned_le32(nonce + 12)
++	};
++
++	TWENTY_ROUNDS(x);
++
++	out[0] = cpu_to_le32(x[0]);
++	out[1] = cpu_to_le32(x[1]);
++	out[2] = cpu_to_le32(x[2]);
++	out[3] = cpu_to_le32(x[3]);
++	out[4] = cpu_to_le32(x[12]);
++	out[5] = cpu_to_le32(x[13]);
++	out[6] = cpu_to_le32(x[14]);
++	out[7] = cpu_to_le32(x[15]);
++}
++
++/* Derived key should be 32-bit aligned */
++void hchacha20(u8 derived_key[CHACHA20_KEY_SIZE],
++	       const u8 nonce[HCHACHA20_NONCE_SIZE],
++	       const u8 key[HCHACHA20_KEY_SIZE], simd_context_t simd_context)
++{
++	if (!hchacha20_arch(derived_key, nonce, key, simd_context))
++		hchacha20_generic(derived_key, nonce, key);
++}
++/* Deliberately not EXPORT_SYMBOL'd, since there are few reasons why somebody
++ * should be using this directly, rather than via xchacha20. Revisit only in
++ * the unlikely event that somebody has a good reason to export this.
++ */
+diff --git a/lib/zinc/main.c b/lib/zinc/main.c
+index ceece33ff5a7..7e8e84b706b7 100644
+--- a/lib/zinc/main.c
++++ b/lib/zinc/main.c
+@@ -3,6 +3,8 @@
+  * Copyright (C) 2015-2018 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
+  */
+ 
++#include <zinc/chacha20.h>
++
+ #include <linux/init.h>
+ #include <linux/module.h>
+ 
+@@ -17,6 +19,9 @@
+ 
+ static int __init mod_init(void)
+ {
++#ifdef CONFIG_ZINC_CHACHA20
++	chacha20_fpu_init();
++#endif
+ 	return 0;
+ }
+ 
 -- 
 2.18.0
