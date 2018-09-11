@@ -1,46 +1,66 @@
-From: Borislav Petkov <bp@alien8.de>
-Subject: Re: [PATCH crypto-2.6] crypto: ccp: add timeout support in the SEV
- command
-Date: Tue, 11 Sep 2018 15:53:25 +0200
-Message-ID: <20180911135325.GI12094@zn.tnic>
-References: <1534367485-4386-1-git-send-email-brijesh.singh@amd.com>
- <1534367485-4386-2-git-send-email-brijesh.singh@amd.com>
- <20180904081151.GC32615@zn.tnic>
- <e327fa7f-2d4d-2181-c3f4-607faf16c9b5@amd.com>
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: Re: [PATCH net-next v3 02/17] zinc: introduce minimal cryptography
+ library
+Date: Tue, 11 Sep 2018 16:56:24 +0200
+Message-ID: <20180911145624.GA21635@kroah.com>
+References: <20180911010838.8818-1-Jason@zx2c4.com>
+ <20180911010838.8818-3-Jason@zx2c4.com>
+ <CAKv+Gu9nSeo4PFVrtjtqGQ32eqyxUp3xVCczZfu+dhFz5yLM0A@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Cc: linux-crypto@vger.kernel.org, thomas.lendacky@amd.com,
-        Gary Hook <Gary.Hook@amd.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-kernel@vger.kernel.org
-To: Brijesh Singh <brijesh.singh@amd.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "<netdev@vger.kernel.org>" <netdev@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Andy Lutomirski <luto@kernel.org>,
+        Samuel Neves <sneves@dei.uc.pt>,
+        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <e327fa7f-2d4d-2181-c3f4-607faf16c9b5@amd.com>
+In-Reply-To: <CAKv+Gu9nSeo4PFVrtjtqGQ32eqyxUp3xVCczZfu+dhFz5yLM0A@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Sep 10, 2018 at 02:06:57PM -0500, Brijesh Singh wrote:
-> Nothing prevent user from supplying a bogus number. The main question
-> is, clamp with what number ?
+On Tue, Sep 11, 2018 at 12:08:56PM +0200, Ard Biesheuvel wrote:
+> > As Zinc is simply library code, its config options are un-menued, with
+> > the exception of CONFIG_ZINC_DEBUG, which enables various selftests and
+> > BUG_ONs.
+> >
+> 
+> In spite of the wall of text, you fail to point out exactly why the
+> existing AEAD API in unsuitable, and why fixing it is not an option.
+> 
+> As I pointed out in a previous version, I don't think we need a
+> separate crypto API/library in the kernel, and I don't think you have
+> convinced anyone else yet either.
 
-So you definitely want to forbid too large timeouts - that wouldn't make
-any sense anyway. And too small either, because a too small timeout
-would make a potentially functioning fw broken.
+Um, then why do people keep sprinkling new crypto/hash code all around
+the kernel tree?  It's because what we have as a crypto api is complex
+and is hard to use for many in-kernel users.
 
-> IMO, if user is overriding the default timeout number then its possible
-> that user is dealing with a buggy firmware which does not work with
-> default timeout and silently clamping the value will not help them.
+Something like this new interface (zinc) is a much "saner" api for
+writing kernel code that has to interact with crypto/hash primitives.
 
-No one said "silently" - you simply say:
+I see no reason why the existing crypto code can be redone to use the
+zinc crypto primitives over time, making there only be one main location
+for the crypto algorithms.  But to do it the other way around is pretty
+much impossible given the complexities in the existing api that has been
+created over time.
 
-	"Correcting PSP	"Correcting PSP probe timeout to X seconds."
+Not to say that the existing api is not a viable one, but ugh, really?
+You have to admit it is a pain to try to use in any "normal" type of
+"here's a bytestream, go give me a hash" type of method, right?
 
-when loading the driver so that the user is aware that the value she
-entered might not be an optimal one.
+Also there is the added benefit that the crypto primitives here have
+been audited by a number of people (so Jason stated), and they are
+written in a way that the crypto community can more easily interact and
+contribute to.  Which is _way_ better than what we have today.
 
--- 
-Regards/Gruss,
-    Boris.
+So this gets my "stamp of approval" for whatever it is worth :)
 
-Good mailing practices for 400: avoid top-posting and trim the reply.
+thanks,
+
+greg k-h
