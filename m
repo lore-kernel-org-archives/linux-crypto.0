@@ -1,7 +1,7 @@
 From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
-Subject: [PATCH v2 12/12] arm64: defconfig: enable CAAM crypto engine on QorIQ DPAA2 SoCs
-Date: Wed, 12 Sep 2018 11:59:37 +0300
-Message-ID: <20180912085937.22489-13-horia.geanta@nxp.com>
+Subject: [PATCH v2 01/12] bus: fsl-mc: add support for dpseci device type
+Date: Wed, 12 Sep 2018 11:59:26 +0300
+Message-ID: <20180912085937.22489-2-horia.geanta@nxp.com>
 References: <20180912085937.22489-1-horia.geanta@nxp.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -21,27 +21,58 @@ In-Reply-To: <20180912085937.22489-1-horia.geanta@nxp.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Enable CAAM (Cryptographic Accelerator and Assurance Module) driver
-for QorIQ Data Path Acceleration Architecture (DPAA) v2.
-It handles DPSECI (Data Path SEC Interface) DPAA2 objects that sit
-on the Management Complex (MC) fsl-mc bus.
-
 Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
 ---
- arch/arm64/configs/defconfig | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/bus/fsl-mc/fsl-mc-bus.c | 5 +++++
+ include/linux/fsl/mc.h          | 6 ++++++
+ 2 files changed, 11 insertions(+)
 
-diff --git a/arch/arm64/configs/defconfig b/arch/arm64/configs/defconfig
-index 6815db53674e..3d165b4cdd2a 100644
---- a/arch/arm64/configs/defconfig
-+++ b/arch/arm64/configs/defconfig
-@@ -698,6 +698,7 @@ CONFIG_MEMTEST=y
- CONFIG_SECURITY=y
- CONFIG_CRYPTO_ECHAINIV=y
- CONFIG_CRYPTO_ANSI_CPRNG=y
-+CONFIG_CRYPTO_DEV_FSL_DPAA2_CAAM=y
- CONFIG_ARM64_CRYPTO=y
- CONFIG_CRYPTO_SHA1_ARM64_CE=y
- CONFIG_CRYPTO_SHA2_ARM64_CE=y
+diff --git a/drivers/bus/fsl-mc/fsl-mc-bus.c b/drivers/bus/fsl-mc/fsl-mc-bus.c
+index 5d8266c6571f..4552b06fe601 100644
+--- a/drivers/bus/fsl-mc/fsl-mc-bus.c
++++ b/drivers/bus/fsl-mc/fsl-mc-bus.c
+@@ -188,6 +188,10 @@ struct device_type fsl_mc_bus_dprtc_type = {
+ 	.name = "fsl_mc_bus_dprtc"
+ };
+ 
++struct device_type fsl_mc_bus_dpseci_type = {
++	.name = "fsl_mc_bus_dpseci"
++};
++
+ static struct device_type *fsl_mc_get_device_type(const char *type)
+ {
+ 	static const struct {
+@@ -203,6 +207,7 @@ static struct device_type *fsl_mc_get_device_type(const char *type)
+ 		{ &fsl_mc_bus_dpmcp_type, "dpmcp" },
+ 		{ &fsl_mc_bus_dpmac_type, "dpmac" },
+ 		{ &fsl_mc_bus_dprtc_type, "dprtc" },
++		{ &fsl_mc_bus_dpseci_type, "dpseci" },
+ 		{ NULL, NULL }
+ 	};
+ 	int i;
+diff --git a/include/linux/fsl/mc.h b/include/linux/fsl/mc.h
+index f27cb14088a4..5160f06ffbac 100644
+--- a/include/linux/fsl/mc.h
++++ b/include/linux/fsl/mc.h
+@@ -405,6 +405,7 @@ extern struct device_type fsl_mc_bus_dpcon_type;
+ extern struct device_type fsl_mc_bus_dpmcp_type;
+ extern struct device_type fsl_mc_bus_dpmac_type;
+ extern struct device_type fsl_mc_bus_dprtc_type;
++extern struct device_type fsl_mc_bus_dpseci_type;
+ 
+ static inline bool is_fsl_mc_bus_dprc(const struct fsl_mc_device *mc_dev)
+ {
+@@ -451,6 +452,11 @@ static inline bool is_fsl_mc_bus_dprtc(const struct fsl_mc_device *mc_dev)
+ 	return mc_dev->dev.type == &fsl_mc_bus_dprtc_type;
+ }
+ 
++static inline bool is_fsl_mc_bus_dpseci(const struct fsl_mc_device *mc_dev)
++{
++	return mc_dev->dev.type == &fsl_mc_bus_dpseci_type;
++}
++
+ /*
+  * Data Path Buffer Pool (DPBP) API
+  * Contains initialization APIs and runtime control APIs for DPBP
 -- 
 2.16.2
