@@ -1,52 +1,57 @@
-From: Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCH crypto-2.6] crypto: ccp: add timeout support in the SEV
- command
-Date: Tue, 11 Sep 2018 19:11:05 -0500
-Message-ID: <ec8245a3-1620-4501-0ebd-f04dfe973bc8@amd.com>
-References: <1534367485-4386-1-git-send-email-brijesh.singh@amd.com>
- <1534367485-4386-2-git-send-email-brijesh.singh@amd.com>
- <20180904051930.5kvyyu75ym5mubuz@gondor.apana.org.au>
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: Re: [PATCH net-next v3 02/17] zinc: introduce minimal cryptography library
+Date: Tue, 11 Sep 2018 22:29:34 -0600
+Message-ID: <CAHmME9pp1f-3eUvyFAR1nvvvcmtaqQio_X1EmKwSaLNBgDiHLQ@mail.gmail.com>
+References: <20180911010838.8818-1-Jason@zx2c4.com> <20180911010838.8818-3-Jason@zx2c4.com>
+ <CAKv+Gu9nSeo4PFVrtjtqGQ32eqyxUp3xVCczZfu+dhFz5yLM0A@mail.gmail.com>
+ <20180911145624.GA21635@kroah.com> <20180911214737.GA81235@gmail.com>
+ <49BAF465-B3DC-4155-BFF9-DB6C386C1878@amacapital.net> <CAHmME9q+mqT+vtM1FdBvf8=nAFu=u+wN48sOxqLcFthxYVn7NQ@mail.gmail.com>
+ <2E01FBB6-030A-40AB-8BEE-F8F271A57568@amacapital.net> <CAHmME9om2rJONj6mMvSPHjiZDQKe05BCe=GonHN=c2Rg4n=pkg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Cc: brijesh.singh@amd.com, linux-crypto@vger.kernel.org,
-        thomas.lendacky@amd.com, Gary Hook <Gary.Hook@amd.com>,
-        linux-kernel@vger.kernel.org, Ingo Molnar <mingo@redhat.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Netdev <netdev@vger.kernel.org>,
+        David Miller <davem@davemloft.net>,
+        Andrew Lutomirski <luto@kernel.org>,
+        Samuel Neves <sneves@dei.uc.pt>,
+        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Andy Lutomirski <luto@amacapital.net>,
+        Eric Biggers <ebiggers@kernel.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180904051930.5kvyyu75ym5mubuz@gondor.apana.org.au>
-Content-Language: en-US
+In-Reply-To: <CAHmME9om2rJONj6mMvSPHjiZDQKe05BCe=GonHN=c2Rg4n=pkg@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
+Hi Eric, Andy,
 
-On 9/4/18 12:19 AM, Herbert Xu wrote:
-> On Wed, Aug 15, 2018 at 04:11:25PM -0500, Brijesh Singh wrote:
->> Currently, the CCP driver assumes that the SEV command issued to the PSP
->> will always return (i.e. it will never hang).  But recently, firmware bugs
->> have shown that a command can hang.  Since of the SEV commands are used
->> in probe routines, this can cause boot hangs and/or loss of virtualization
->> capabilities.
->>
->> To protect against firmware bugs, add a timeout in the SEV command
->> execution flow.  If a command does not complete within the specified
->> timeout then return -ETIMEOUT and stop the driver from executing any
->> further commands since the state of the SEV firmware is unknown.
->>
->> Cc: Tom Lendacky <thomas.lendacky@amd.com>
->> Cc: Gary Hook <Gary.Hook@amd.com>
->> Cc: Herbert Xu <herbert@gondor.apana.org.au>
->> Cc: linux-kernel@vger.kernel.org
->> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
->> ---
->>  drivers/crypto/ccp/psp-dev.c | 46 +++++++++++++++++++++++++++++++++++++++-----
->>  1 file changed, 41 insertions(+), 5 deletions(-)
-> Patch applied.  Thanks.
-Thanks Herbert.
+> On Tue, Sep 11, 2018 at 5:01 PM Andy Lutomirski <luto@amacapital.net> wro=
+te:
+> > I think Ard=E2=80=99s point is valid: in the long run we don=E2=80=99t =
+want two competing software implementations of each primitive. It clearly *=
+should* be possible to make crypto API call into zinc for synchronous softw=
+are operations, but a demonstration of how this actually works and that the=
+re isn=E2=80=99t some change to zinc to make it would well would be in orde=
+r, I think.
+> >
+> > IMO the right approach is do one conversion right away and save the res=
+t for later.
 
-Can you please include this patch in your next 4.19-rcX pull request?
-Multiple folks are encountering this firmware bug on Ryzen systems. I
-will submit the modified version of this patch for stable release (s) so
-that we fix issues in 4.18,.17 and .16. thank you.
+It turned out to be fairly straight forward and quick to do. I'm on a
+transatlantic plane so the connection is super spotty, but you can
+check out the three commits added to:
+<https://git.kernel.org/pub/scm/linux/kernel/git/zx2c4/linux.git/log?h=3Djd=
+/wireguard>
+-- the two "crypto:" commits and the one "random:" commit.
+Alternatively, you can look directly at
+<https://git.kernel.org/pub/scm/linux/kernel/git/zx2c4/linux.git/tree/crypt=
+o/poly1305_zinc.c?h=3Djd/wireguard>
+and <https://git.kernel.org/pub/scm/linux/kernel/git/zx2c4/linux.git/tree/c=
+rypto/chacha20_zinc.c?h=3Djd/wireguard>.
+I'll be refining and checking these over the next week or so, but the
+basics were super easy to do.
 
--Brijesh
+Jason
