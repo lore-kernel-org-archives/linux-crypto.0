@@ -1,32 +1,52 @@
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: Re: [PATCH net-next v3 02/17] zinc: introduce minimal cryptography library
-Date: Tue, 11 Sep 2018 18:02:15 -0600
-Message-ID: <CAHmME9rSRn5z16B9Ck3+PK_Zmj0LdiJAVmmT+7La6_mht8tMUA@mail.gmail.com>
-References: <20180911214737.GA81235@gmail.com> <CAHmME9rFUruF-VN1pmU-k5nFsb9ppAPhPpW-5Ho9dKL2HCg4kA@mail.gmail.com>
- <20180911233015.GD11474@lunn.ch> <20180911.165739.2032677219588723041.davem@davemloft.net>
+From: Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: [PATCH crypto-2.6] crypto: ccp: add timeout support in the SEV
+ command
+Date: Tue, 11 Sep 2018 19:11:05 -0500
+Message-ID: <ec8245a3-1620-4501-0ebd-f04dfe973bc8@amd.com>
+References: <1534367485-4386-1-git-send-email-brijesh.singh@amd.com>
+ <1534367485-4386-2-git-send-email-brijesh.singh@amd.com>
+ <20180904051930.5kvyyu75ym5mubuz@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Andrew Lunn <andrew@lunn.ch>, Eric Biggers <ebiggers@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Netdev <netdev@vger.kernel.org>,
-        Andrew Lutomirski <luto@kernel.org>,
-        Samuel Neves <sneves@dei.uc.pt>,
-        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: David Miller <davem@davemloft.net>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Cc: brijesh.singh@amd.com, linux-crypto@vger.kernel.org,
+        thomas.lendacky@amd.com, Gary Hook <Gary.Hook@amd.com>,
+        linux-kernel@vger.kernel.org, Ingo Molnar <mingo@redhat.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180911.165739.2032677219588723041.davem@davemloft.net>
+In-Reply-To: <20180904051930.5kvyyu75ym5mubuz@gondor.apana.org.au>
+Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Sep 11, 2018 at 5:57 PM David Miller <davem@davemloft.net> wrote:
-> Both of Andrew's statements are completely true.
->
-> I'm not looking at any of the networking bits until the crypto stuff
-> is fully sorted and fully supported and Ack'd by crypto folks.
 
-Seems reasonable to me.
+On 9/4/18 12:19 AM, Herbert Xu wrote:
+> On Wed, Aug 15, 2018 at 04:11:25PM -0500, Brijesh Singh wrote:
+>> Currently, the CCP driver assumes that the SEV command issued to the PSP
+>> will always return (i.e. it will never hang).  But recently, firmware bugs
+>> have shown that a command can hang.  Since of the SEV commands are used
+>> in probe routines, this can cause boot hangs and/or loss of virtualization
+>> capabilities.
+>>
+>> To protect against firmware bugs, add a timeout in the SEV command
+>> execution flow.  If a command does not complete within the specified
+>> timeout then return -ETIMEOUT and stop the driver from executing any
+>> further commands since the state of the SEV firmware is unknown.
+>>
+>> Cc: Tom Lendacky <thomas.lendacky@amd.com>
+>> Cc: Gary Hook <Gary.Hook@amd.com>
+>> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+>> Cc: linux-kernel@vger.kernel.org
+>> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+>> ---
+>>  drivers/crypto/ccp/psp-dev.c | 46 +++++++++++++++++++++++++++++++++++++++-----
+>>  1 file changed, 41 insertions(+), 5 deletions(-)
+> Patch applied.  Thanks.
+Thanks Herbert.
 
-Jason
+Can you please include this patch in your next 4.19-rcX pull request?
+Multiple folks are encountering this firmware bug on Ryzen systems. I
+will submit the modified version of this patch for stable release (s) so
+that we fix issues in 4.18,.17 and .16. thank you.
+
+-Brijesh
