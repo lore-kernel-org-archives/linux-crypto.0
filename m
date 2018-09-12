@@ -1,7 +1,7 @@
 From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
-Subject: [PATCH v2 03/12] soc: fsl: dpio: add frame list format support
-Date: Wed, 12 Sep 2018 11:59:28 +0300
-Message-ID: <20180912085937.22489-4-horia.geanta@nxp.com>
+Subject: [PATCH v2 07/12] crypto: caam - add Queue Interface v2 error codes
+Date: Wed, 12 Sep 2018 11:59:32 +0300
+Message-ID: <20180912085937.22489-8-horia.geanta@nxp.com>
 References: <20180912085937.22489-1-horia.geanta@nxp.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -21,277 +21,157 @@ In-Reply-To: <20180912085937.22489-1-horia.geanta@nxp.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Add support for dpaa2_fd_list format, i.e. dpaa2_fl_entry structure
-and accessors.
-
-Frame list entries (FLEs) are similar, but not identical to FDs:
-+ "F" (final) bit
-- FMT[b'01] is reserved
-- DD, SC, DROPP bits (covered by "FD compatibility" field in FLE case)
-- FLC[5:0] not used for stashing
+Add support to translate error codes returned by QI v2, i.e.
+Queue Interface present on DataPath Acceleration Architecture
+v2 (DPAA2).
 
 Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
 ---
- include/soc/fsl/dpaa2-fd.h | 242 +++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 242 insertions(+)
+ drivers/crypto/caam/error.c | 75 +++++++++++++++++++++++++++++++++++++++++++--
+ drivers/crypto/caam/error.h |  6 +++-
+ drivers/crypto/caam/regs.h  |  2 ++
+ 3 files changed, 79 insertions(+), 4 deletions(-)
 
-diff --git a/include/soc/fsl/dpaa2-fd.h b/include/soc/fsl/dpaa2-fd.h
-index 2576abaa7779..90ae8d191f1a 100644
---- a/include/soc/fsl/dpaa2-fd.h
-+++ b/include/soc/fsl/dpaa2-fd.h
-@@ -66,6 +66,15 @@ struct dpaa2_fd {
- #define SG_BPID_MASK		0x3FFF
- #define SG_FINAL_FLAG_MASK	0x1
- #define SG_FINAL_FLAG_SHIFT	15
-+#define FL_SHORT_LEN_FLAG_MASK	0x1
-+#define FL_SHORT_LEN_FLAG_SHIFT	14
-+#define FL_SHORT_LEN_MASK	0x3FFFF
-+#define FL_OFFSET_MASK		0x0FFF
-+#define FL_FORMAT_MASK		0x3
-+#define FL_FORMAT_SHIFT		12
-+#define FL_BPID_MASK		0x3FFF
-+#define FL_FINAL_FLAG_MASK	0x1
-+#define FL_FINAL_FLAG_SHIFT	15
+diff --git a/drivers/crypto/caam/error.c b/drivers/crypto/caam/error.c
+index 8da88beb1abb..db0f0d96842e 100644
+--- a/drivers/crypto/caam/error.c
++++ b/drivers/crypto/caam/error.c
+@@ -108,6 +108,54 @@ static const struct {
+ 	{ 0xF1, "3GPP HFN matches or exceeds the Threshold" },
+ };
  
- /* Error bits in FD CTRL */
- #define FD_CTRL_ERR_MASK	0x000000FF
-@@ -435,4 +444,237 @@ static inline void dpaa2_sg_set_final(struct dpaa2_sg_entry *sg, bool final)
- 	sg->format_offset |= cpu_to_le16(final << SG_FINAL_FLAG_SHIFT);
++static const struct {
++	u8 value;
++	const char *error_text;
++} qi_error_list[] = {
++	{ 0x1F, "Job terminated by FQ or ICID flush" },
++	{ 0x20, "FD format error"},
++	{ 0x21, "FD command format error"},
++	{ 0x23, "FL format error"},
++	{ 0x25, "CRJD specified in FD, but not enabled in FLC"},
++	{ 0x30, "Max. buffer size too small"},
++	{ 0x31, "DHR exceeds max. buffer size (allocate mode, S/G format)"},
++	{ 0x32, "SGT exceeds max. buffer size (allocate mode, S/G format"},
++	{ 0x33, "Size over/underflow (allocate mode)"},
++	{ 0x34, "Size over/underflow (reuse mode)"},
++	{ 0x35, "Length exceeds max. short length (allocate mode, S/G/ format)"},
++	{ 0x36, "Memory footprint exceeds max. value (allocate mode, S/G/ format)"},
++	{ 0x41, "SBC frame format not supported (allocate mode)"},
++	{ 0x42, "Pool 0 invalid / pool 1 size < pool 0 size (allocate mode)"},
++	{ 0x43, "Annotation output enabled but ASAR = 0 (allocate mode)"},
++	{ 0x44, "Unsupported or reserved frame format or SGHR = 1 (reuse mode)"},
++	{ 0x45, "DHR correction underflow (reuse mode, single buffer format)"},
++	{ 0x46, "Annotation length exceeds offset (reuse mode)"},
++	{ 0x48, "Annotation output enabled but ASA limited by ASAR (reuse mode)"},
++	{ 0x49, "Data offset correction exceeds input frame data length (reuse mode)"},
++	{ 0x4B, "Annotation output enabled but ASA cannote be expanded (frame list)"},
++	{ 0x51, "Unsupported IF reuse mode"},
++	{ 0x52, "Unsupported FL use mode"},
++	{ 0x53, "Unsupported RJD use mode"},
++	{ 0x54, "Unsupported inline descriptor use mode"},
++	{ 0xC0, "Table buffer pool 0 depletion"},
++	{ 0xC1, "Table buffer pool 1 depletion"},
++	{ 0xC2, "Data buffer pool 0 depletion, no OF allocated"},
++	{ 0xC3, "Data buffer pool 1 depletion, no OF allocated"},
++	{ 0xC4, "Data buffer pool 0 depletion, partial OF allocated"},
++	{ 0xC5, "Data buffer pool 1 depletion, partial OF allocated"},
++	{ 0xD0, "FLC read error"},
++	{ 0xD1, "FL read error"},
++	{ 0xD2, "FL write error"},
++	{ 0xD3, "OF SGT write error"},
++	{ 0xD4, "PTA read error"},
++	{ 0xD5, "PTA write error"},
++	{ 0xD6, "OF SGT F-bit write error"},
++	{ 0xD7, "ASA write error"},
++	{ 0xE1, "FLC[ICR]=0 ICID error"},
++	{ 0xE2, "FLC[ICR]=1 ICID error"},
++	{ 0xE4, "source of ICID flush not trusted (BDI = 0)"},
++};
++
+ static const char * const cha_id_list[] = {
+ 	"",
+ 	"AES",
+@@ -236,6 +284,27 @@ static void report_deco_status(struct device *jrdev, const u32 status,
+ 		status, error, idx_str, idx, err_str, err_err_code);
  }
  
-+/**
-+ * struct dpaa2_fl_entry - structure for frame list entry.
-+ * @addr:          address in the FLE
-+ * @len:           length in the FLE
-+ * @bpid:          buffer pool ID
-+ * @format_offset: format, offset, and short-length fields
-+ * @frc:           frame context
-+ * @ctrl:          control bits...including pta, pvt1, pvt2, err, etc
-+ * @flc:           flow context address
-+ */
-+struct dpaa2_fl_entry {
-+	__le64 addr;
-+	__le32 len;
-+	__le16 bpid;
-+	__le16 format_offset;
-+	__le32 frc;
-+	__le32 ctrl;
-+	__le64 flc;
-+};
-+
-+enum dpaa2_fl_format {
-+	dpaa2_fl_single = 0,
-+	dpaa2_fl_res,
-+	dpaa2_fl_sg
-+};
-+
-+/**
-+ * dpaa2_fl_get_addr() - get the addr field of FLE
-+ * @fle: the given frame list entry
-+ *
-+ * Return the address in the frame list entry.
-+ */
-+static inline dma_addr_t dpaa2_fl_get_addr(const struct dpaa2_fl_entry *fle)
++static void report_qi_status(struct device *qidev, const u32 status,
++			     const char *error)
 +{
-+	return (dma_addr_t)le64_to_cpu(fle->addr);
++	u8 err_id = status & JRSTA_QIERR_ERROR_MASK;
++	const char *err_str = "unidentified error value 0x";
++	char err_err_code[3] = { 0 };
++	int i;
++
++	for (i = 0; i < ARRAY_SIZE(qi_error_list); i++)
++		if (qi_error_list[i].value == err_id)
++			break;
++
++	if (i != ARRAY_SIZE(qi_error_list) && qi_error_list[i].error_text)
++		err_str = qi_error_list[i].error_text;
++	else
++		snprintf(err_err_code, sizeof(err_err_code), "%02x", err_id);
++
++	dev_err(qidev, "%08x: %s: %s%s\n",
++		status, error, err_str, err_err_code);
 +}
 +
-+/**
-+ * dpaa2_fl_set_addr() - Set the addr field of FLE
-+ * @fle: the given frame list entry
-+ * @addr: the address needs to be set in frame list entry
-+ */
-+static inline void dpaa2_fl_set_addr(struct dpaa2_fl_entry *fle,
-+				     dma_addr_t addr)
-+{
-+	fle->addr = cpu_to_le64(addr);
-+}
+ static void report_jr_status(struct device *jrdev, const u32 status,
+ 			     const char *error)
+ {
+@@ -250,7 +319,7 @@ static void report_cond_code_status(struct device *jrdev, const u32 status,
+ 		status, error, __func__);
+ }
+ 
+-void caam_jr_strstatus(struct device *jrdev, u32 status)
++void caam_strstatus(struct device *jrdev, u32 status, bool qi_v2)
+ {
+ 	static const struct stat_src {
+ 		void (*report_ssed)(struct device *jrdev, const u32 status,
+@@ -262,7 +331,7 @@ void caam_jr_strstatus(struct device *jrdev, u32 status)
+ 		{ report_ccb_status, "CCB" },
+ 		{ report_jump_status, "Jump" },
+ 		{ report_deco_status, "DECO" },
+-		{ NULL, "Queue Manager Interface" },
++		{ report_qi_status, "Queue Manager Interface" },
+ 		{ report_jr_status, "Job Ring" },
+ 		{ report_cond_code_status, "Condition Code" },
+ 		{ NULL, NULL },
+@@ -288,4 +357,4 @@ void caam_jr_strstatus(struct device *jrdev, u32 status)
+ 	else
+ 		dev_err(jrdev, "%d: unknown error source\n", ssrc);
+ }
+-EXPORT_SYMBOL(caam_jr_strstatus);
++EXPORT_SYMBOL(caam_strstatus);
+diff --git a/drivers/crypto/caam/error.h b/drivers/crypto/caam/error.h
+index 5aa332bac4b0..67ea94079837 100644
+--- a/drivers/crypto/caam/error.h
++++ b/drivers/crypto/caam/error.h
+@@ -8,7 +8,11 @@
+ #ifndef CAAM_ERROR_H
+ #define CAAM_ERROR_H
+ #define CAAM_ERROR_STR_MAX 302
+-void caam_jr_strstatus(struct device *jrdev, u32 status);
 +
-+/**
-+ * dpaa2_fl_get_frc() - Get the frame context in the FLE
-+ * @fle: the given frame list entry
-+ *
-+ * Return the frame context field in the frame lsit entry.
-+ */
-+static inline u32 dpaa2_fl_get_frc(const struct dpaa2_fl_entry *fle)
-+{
-+	return le32_to_cpu(fle->frc);
-+}
++void caam_strstatus(struct device *dev, u32 status, bool qi_v2);
 +
-+/**
-+ * dpaa2_fl_set_frc() - Set the frame context in the FLE
-+ * @fle: the given frame list entry
-+ * @frc: the frame context needs to be set in frame list entry
-+ */
-+static inline void dpaa2_fl_set_frc(struct dpaa2_fl_entry *fle, u32 frc)
-+{
-+	fle->frc = cpu_to_le32(frc);
-+}
++#define caam_jr_strstatus(jrdev, status) caam_strstatus(jrdev, status, false)
++#define caam_qi2_strstatus(qidev, status) caam_strstatus(qidev, status, true)
+ 
+ void caam_dump_sg(const char *level, const char *prefix_str, int prefix_type,
+ 		  int rowsize, int groupsize, struct scatterlist *sg,
+diff --git a/drivers/crypto/caam/regs.h b/drivers/crypto/caam/regs.h
+index ce3f9ad7120f..457815f965c0 100644
+--- a/drivers/crypto/caam/regs.h
++++ b/drivers/crypto/caam/regs.h
+@@ -633,6 +633,8 @@ struct caam_job_ring {
+ #define JRSTA_DECOERR_INVSIGN       0x86
+ #define JRSTA_DECOERR_DSASIGN       0x87
+ 
++#define JRSTA_QIERR_ERROR_MASK      0x00ff
 +
-+/**
-+ * dpaa2_fl_get_ctrl() - Get the control bits in the FLE
-+ * @fle: the given frame list entry
-+ *
-+ * Return the control bits field in the frame list entry.
-+ */
-+static inline u32 dpaa2_fl_get_ctrl(const struct dpaa2_fl_entry *fle)
-+{
-+	return le32_to_cpu(fle->ctrl);
-+}
-+
-+/**
-+ * dpaa2_fl_set_ctrl() - Set the control bits in the FLE
-+ * @fle: the given frame list entry
-+ * @ctrl: the control bits to be set in the frame list entry
-+ */
-+static inline void dpaa2_fl_set_ctrl(struct dpaa2_fl_entry *fle, u32 ctrl)
-+{
-+	fle->ctrl = cpu_to_le32(ctrl);
-+}
-+
-+/**
-+ * dpaa2_fl_get_flc() - Get the flow context in the FLE
-+ * @fle: the given frame list entry
-+ *
-+ * Return the flow context in the frame list entry.
-+ */
-+static inline dma_addr_t dpaa2_fl_get_flc(const struct dpaa2_fl_entry *fle)
-+{
-+	return (dma_addr_t)le64_to_cpu(fle->flc);
-+}
-+
-+/**
-+ * dpaa2_fl_set_flc() - Set the flow context field of FLE
-+ * @fle: the given frame list entry
-+ * @flc_addr: the flow context needs to be set in frame list entry
-+ */
-+static inline void dpaa2_fl_set_flc(struct dpaa2_fl_entry *fle,
-+				    dma_addr_t flc_addr)
-+{
-+	fle->flc = cpu_to_le64(flc_addr);
-+}
-+
-+static inline bool dpaa2_fl_short_len(const struct dpaa2_fl_entry *fle)
-+{
-+	return !!((le16_to_cpu(fle->format_offset) >>
-+		  FL_SHORT_LEN_FLAG_SHIFT) & FL_SHORT_LEN_FLAG_MASK);
-+}
-+
-+/**
-+ * dpaa2_fl_get_len() - Get the length in the FLE
-+ * @fle: the given frame list entry
-+ *
-+ * Return the length field in the frame list entry.
-+ */
-+static inline u32 dpaa2_fl_get_len(const struct dpaa2_fl_entry *fle)
-+{
-+	if (dpaa2_fl_short_len(fle))
-+		return le32_to_cpu(fle->len) & FL_SHORT_LEN_MASK;
-+
-+	return le32_to_cpu(fle->len);
-+}
-+
-+/**
-+ * dpaa2_fl_set_len() - Set the length field of FLE
-+ * @fle: the given frame list entry
-+ * @len: the length needs to be set in frame list entry
-+ */
-+static inline void dpaa2_fl_set_len(struct dpaa2_fl_entry *fle, u32 len)
-+{
-+	fle->len = cpu_to_le32(len);
-+}
-+
-+/**
-+ * dpaa2_fl_get_offset() - Get the offset field in the frame list entry
-+ * @fle: the given frame list entry
-+ *
-+ * Return the offset.
-+ */
-+static inline u16 dpaa2_fl_get_offset(const struct dpaa2_fl_entry *fle)
-+{
-+	return le16_to_cpu(fle->format_offset) & FL_OFFSET_MASK;
-+}
-+
-+/**
-+ * dpaa2_fl_set_offset() - Set the offset field of FLE
-+ * @fle: the given frame list entry
-+ * @offset: the offset needs to be set in frame list entry
-+ */
-+static inline void dpaa2_fl_set_offset(struct dpaa2_fl_entry *fle, u16 offset)
-+{
-+	fle->format_offset &= cpu_to_le16(~FL_OFFSET_MASK);
-+	fle->format_offset |= cpu_to_le16(offset);
-+}
-+
-+/**
-+ * dpaa2_fl_get_format() - Get the format field in the FLE
-+ * @fle: the given frame list entry
-+ *
-+ * Return the format.
-+ */
-+static inline enum dpaa2_fl_format dpaa2_fl_get_format(const struct dpaa2_fl_entry *fle)
-+{
-+	return (enum dpaa2_fl_format)((le16_to_cpu(fle->format_offset) >>
-+				       FL_FORMAT_SHIFT) & FL_FORMAT_MASK);
-+}
-+
-+/**
-+ * dpaa2_fl_set_format() - Set the format field of FLE
-+ * @fle: the given frame list entry
-+ * @format: the format needs to be set in frame list entry
-+ */
-+static inline void dpaa2_fl_set_format(struct dpaa2_fl_entry *fle,
-+				       enum dpaa2_fl_format format)
-+{
-+	fle->format_offset &= cpu_to_le16(~(FL_FORMAT_MASK << FL_FORMAT_SHIFT));
-+	fle->format_offset |= cpu_to_le16(format << FL_FORMAT_SHIFT);
-+}
-+
-+/**
-+ * dpaa2_fl_get_bpid() - Get the bpid field in the FLE
-+ * @fle: the given frame list entry
-+ *
-+ * Return the buffer pool id.
-+ */
-+static inline u16 dpaa2_fl_get_bpid(const struct dpaa2_fl_entry *fle)
-+{
-+	return le16_to_cpu(fle->bpid) & FL_BPID_MASK;
-+}
-+
-+/**
-+ * dpaa2_fl_set_bpid() - Set the bpid field of FLE
-+ * @fle: the given frame list entry
-+ * @bpid: buffer pool id to be set
-+ */
-+static inline void dpaa2_fl_set_bpid(struct dpaa2_fl_entry *fle, u16 bpid)
-+{
-+	fle->bpid &= cpu_to_le16(~(FL_BPID_MASK));
-+	fle->bpid |= cpu_to_le16(bpid);
-+}
-+
-+/**
-+ * dpaa2_fl_is_final() - Check final bit in FLE
-+ * @fle: the given frame list entry
-+ *
-+ * Return bool.
-+ */
-+static inline bool dpaa2_fl_is_final(const struct dpaa2_fl_entry *fle)
-+{
-+	return !!(le16_to_cpu(fle->format_offset) >> FL_FINAL_FLAG_SHIFT);
-+}
-+
-+/**
-+ * dpaa2_fl_set_final() - Set the final bit in FLE
-+ * @fle: the given frame list entry
-+ * @final: the final boolean to be set
-+ */
-+static inline void dpaa2_fl_set_final(struct dpaa2_fl_entry *fle, bool final)
-+{
-+	fle->format_offset &= cpu_to_le16((~(FL_FINAL_FLAG_MASK <<
-+					     FL_FINAL_FLAG_SHIFT)) & 0xFFFF);
-+	fle->format_offset |= cpu_to_le16(final << FL_FINAL_FLAG_SHIFT);
-+}
-+
- #endif /* __FSL_DPAA2_FD_H */
+ #define JRSTA_CCBERR_JUMP           0x08000000
+ #define JRSTA_CCBERR_INDEX_MASK     0xff00
+ #define JRSTA_CCBERR_INDEX_SHIFT    8
 -- 
 2.16.2
