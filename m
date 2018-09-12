@@ -1,57 +1,47 @@
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: Re: [PATCH net-next v3 02/17] zinc: introduce minimal cryptography library
-Date: Tue, 11 Sep 2018 22:29:34 -0600
-Message-ID: <CAHmME9pp1f-3eUvyFAR1nvvvcmtaqQio_X1EmKwSaLNBgDiHLQ@mail.gmail.com>
-References: <20180911010838.8818-1-Jason@zx2c4.com> <20180911010838.8818-3-Jason@zx2c4.com>
- <CAKv+Gu9nSeo4PFVrtjtqGQ32eqyxUp3xVCczZfu+dhFz5yLM0A@mail.gmail.com>
- <20180911145624.GA21635@kroah.com> <20180911214737.GA81235@gmail.com>
- <49BAF465-B3DC-4155-BFF9-DB6C386C1878@amacapital.net> <CAHmME9q+mqT+vtM1FdBvf8=nAFu=u+wN48sOxqLcFthxYVn7NQ@mail.gmail.com>
- <2E01FBB6-030A-40AB-8BEE-F8F271A57568@amacapital.net> <CAHmME9om2rJONj6mMvSPHjiZDQKe05BCe=GonHN=c2Rg4n=pkg@mail.gmail.com>
+From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
+Subject: [PATCH v2 12/12] arm64: defconfig: enable CAAM crypto engine on QorIQ DPAA2 SoCs
+Date: Wed, 12 Sep 2018 11:59:37 +0300
+Message-ID: <20180912085937.22489-13-horia.geanta@nxp.com>
+References: <20180912085937.22489-1-horia.geanta@nxp.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Netdev <netdev@vger.kernel.org>,
-        David Miller <davem@davemloft.net>,
-        Andrew Lutomirski <luto@kernel.org>,
-        Samuel Neves <sneves@dei.uc.pt>,
-        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Andy Lutomirski <luto@amacapital.net>,
-        Eric Biggers <ebiggers@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Cc: "David S . Miller" <davem@davemloft.net>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        Stuart Yoder <stuyoder@gmail.com>,
+        Laurentiu Tudor <laurentiu.tudor@nxp.com>,
+        Li Yang <leoyang.li@nxp.com>, Roy Pledge <roy.pledge@nxp.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will.deacon@arm.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAHmME9om2rJONj6mMvSPHjiZDQKe05BCe=GonHN=c2Rg4n=pkg@mail.gmail.com>
+In-Reply-To: <20180912085937.22489-1-horia.geanta@nxp.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi Eric, Andy,
+Enable CAAM (Cryptographic Accelerator and Assurance Module) driver
+for QorIQ Data Path Acceleration Architecture (DPAA) v2.
+It handles DPSECI (Data Path SEC Interface) DPAA2 objects that sit
+on the Management Complex (MC) fsl-mc bus.
 
-> On Tue, Sep 11, 2018 at 5:01 PM Andy Lutomirski <luto@amacapital.net> wro=
-te:
-> > I think Ard=E2=80=99s point is valid: in the long run we don=E2=80=99t =
-want two competing software implementations of each primitive. It clearly *=
-should* be possible to make crypto API call into zinc for synchronous softw=
-are operations, but a demonstration of how this actually works and that the=
-re isn=E2=80=99t some change to zinc to make it would well would be in orde=
-r, I think.
-> >
-> > IMO the right approach is do one conversion right away and save the res=
-t for later.
+Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
+---
+ arch/arm64/configs/defconfig | 1 +
+ 1 file changed, 1 insertion(+)
 
-It turned out to be fairly straight forward and quick to do. I'm on a
-transatlantic plane so the connection is super spotty, but you can
-check out the three commits added to:
-<https://git.kernel.org/pub/scm/linux/kernel/git/zx2c4/linux.git/log?h=3Djd=
-/wireguard>
--- the two "crypto:" commits and the one "random:" commit.
-Alternatively, you can look directly at
-<https://git.kernel.org/pub/scm/linux/kernel/git/zx2c4/linux.git/tree/crypt=
-o/poly1305_zinc.c?h=3Djd/wireguard>
-and <https://git.kernel.org/pub/scm/linux/kernel/git/zx2c4/linux.git/tree/c=
-rypto/chacha20_zinc.c?h=3Djd/wireguard>.
-I'll be refining and checking these over the next week or so, but the
-basics were super easy to do.
-
-Jason
+diff --git a/arch/arm64/configs/defconfig b/arch/arm64/configs/defconfig
+index 6815db53674e..3d165b4cdd2a 100644
+--- a/arch/arm64/configs/defconfig
++++ b/arch/arm64/configs/defconfig
+@@ -698,6 +698,7 @@ CONFIG_MEMTEST=y
+ CONFIG_SECURITY=y
+ CONFIG_CRYPTO_ECHAINIV=y
+ CONFIG_CRYPTO_ANSI_CPRNG=y
++CONFIG_CRYPTO_DEV_FSL_DPAA2_CAAM=y
+ CONFIG_ARM64_CRYPTO=y
+ CONFIG_CRYPTO_SHA1_ARM64_CE=y
+ CONFIG_CRYPTO_SHA2_ARM64_CE=y
+-- 
+2.16.2
