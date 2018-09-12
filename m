@@ -1,111 +1,66 @@
-From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
-Subject: [PATCH v2 00/12] crypto: caam - add DPAA2 (DPSECI) driver
-Date: Wed, 12 Sep 2018 11:59:25 +0300
-Message-ID: <20180912085937.22489-1-horia.geanta@nxp.com>
+From: Laurentiu Tudor <laurentiu.tudor@nxp.com>
+Subject: Re: [PATCH v2 01/12] bus: fsl-mc: add support for dpseci device type
+Date: Wed, 12 Sep 2018 09:41:31 +0000
+Message-ID: <1d9bd63f-7170-d64a-71bf-07401fde32d3@nxp.com>
+References: <20180912085937.22489-1-horia.geanta@nxp.com>
+ <20180912085937.22489-2-horia.geanta@nxp.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Cc: "David S . Miller" <davem@davemloft.net>,
         Aymen Sghaier <aymen.sghaier@nxp.com>,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        Stuart Yoder <stuyoder@gmail.com>,
-        Laurentiu Tudor <laurentiu.tudor@nxp.com>,
-        Li Yang <leoyang.li@nxp.com>, Roy Pledge <roy.pledge@nxp.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-arm-kernel@lists.infradead.org"
+        <linux-arm-kernel@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: Horia Geanta <horia.geanta@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Stuart Yoder <stuyoder@gmail.com>, Leo Li <leoyang.li@nxp.com>,
+        Roy Pledge <roy.pledge@nxp.com>,
         Catalin Marinas <catalin.marinas@arm.com>,
         Will Deacon <will.deacon@arm.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20180912085937.22489-2-horia.geanta@nxp.com>
+Content-Language: en-US
+Content-ID: <1C7E84BA29B47B44BBA8AB945B207911@eurprd04.prod.outlook.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi,
-
-This patch set adds the CAAM crypto engine driver for DPAA2
-(Data Path Acceleration Architecture v2) found on ARMv8-based SoCs
-like LS1088A, LS2088A, LX2160A.
-
-v1 -> v2:
-5/12 - new patch fixing sparse endianness-related warnings
-2/12 - changed commit message, since it's not a straightforward revert
-3/12, 8/12, 11/12 - fixed sparse and compiler warnings
-
-Previous versions:
-v1: https://www.mail-archive.com/linux-kernel@vger.kernel.org/msg1763549.html
-RFC: https://www.mail-archive.com/linux-crypto@vger.kernel.org/msg27290.html
-
-Driver consists of:
--DPSECI (Data Path SEC Interface) backend - low-level API that allows
-to manage DPSECI devices (DPAA2 objects) that sit on
-the Management Complex (MC) fsl-mc bus
--algorithms frontend - AEAD, skcipher and ahash algorithms implementation
-
-Patches 1-4 are fsl-mc bus and DPIO dependencies.
-Stuart, Laurentiu, Leo, Roy, please review the patches and let me know
-if you have anything against going with them through the cryptodev tree.
-
-Patch 5 fixes sparse endianness-related warnings in regs.h helper functions.
-
-Patches 6-11 are the core of the patch set, adding the driver.
-For symmetric encryption the new skcipher interface is used.
-
-Patch 12 enables driver on arm64. It will be built only if dependency
-on DPIO (CONFIG_FSL_MC_DPIO) is satisfied.
-
-Note: multiple modprobe/rmmod won't work without the following patches
-[5/7,v7] bus/fsl-mc: support dma configure for devices on fsl-mc bus
-https://patchwork.kernel.org/patch/10594179
-[7/7,v7] arm64: dts: ls208xa: comply with the iommu map binding for fsl_mc
-https://patchwork.kernel.org/patch/10594171
-(for LS1088A a similar DT update is needed)
-
-Thanks,
-Horia
-
-Horia Geantă (12):
-  bus: fsl-mc: add support for dpseci device type
-  soc: fsl: dpio: add back some frame queue functions
-  soc: fsl: dpio: add frame list format support
-  soc: fsl: dpio: add congestion notification support
-  crypto: caam - fix implicit casts in endianness helpers
-  crypto: caam - add DPAA2-CAAM (DPSECI) backend API
-  crypto: caam - add Queue Interface v2 error codes
-  crypto: caam/qi2 - add DPAA2-CAAM driver
-  crypto: caam/qi2 - add skcipher algorithms
-  crypto: caam - export ahash shared descriptor generation
-  crypto: caam/qi2 - add support for ahash algorithms
-  arm64: defconfig: enable CAAM crypto engine on QorIQ DPAA2 SoCs
-
- arch/arm64/configs/defconfig        |    1 +
- drivers/bus/fsl-mc/fsl-mc-bus.c     |    5 +
- drivers/crypto/Makefile             |    2 +-
- drivers/crypto/caam/Kconfig         |   55 +-
- drivers/crypto/caam/Makefile        |   10 +-
- drivers/crypto/caam/caamalg_qi2.c   | 5165 +++++++++++++++++++++++++++++++++++
- drivers/crypto/caam/caamalg_qi2.h   |  223 ++
- drivers/crypto/caam/caamhash.c      |   79 +-
- drivers/crypto/caam/caamhash_desc.c |   80 +
- drivers/crypto/caam/caamhash_desc.h |   21 +
- drivers/crypto/caam/compat.h        |    1 +
- drivers/crypto/caam/dpseci.c        |  426 +++
- drivers/crypto/caam/dpseci.h        |  333 +++
- drivers/crypto/caam/dpseci_cmd.h    |  149 +
- drivers/crypto/caam/error.c         |   79 +-
- drivers/crypto/caam/error.h         |    6 +-
- drivers/crypto/caam/regs.h          |   30 +-
- drivers/soc/fsl/dpio/dpio-service.c |   58 +
- include/linux/fsl/mc.h              |    6 +
- include/soc/fsl/dpaa2-fd.h          |  242 ++
- include/soc/fsl/dpaa2-global.h      |   15 +
- include/soc/fsl/dpaa2-io.h          |    4 +
- 22 files changed, 6885 insertions(+), 105 deletions(-)
- create mode 100644 drivers/crypto/caam/caamalg_qi2.c
- create mode 100644 drivers/crypto/caam/caamalg_qi2.h
- create mode 100644 drivers/crypto/caam/caamhash_desc.c
- create mode 100644 drivers/crypto/caam/caamhash_desc.h
- create mode 100644 drivers/crypto/caam/dpseci.c
- create mode 100644 drivers/crypto/caam/dpseci.h
- create mode 100644 drivers/crypto/caam/dpseci_cmd.h
-
--- 
-2.16.2
+DQoNCk9uIDEyLjA5LjIwMTggMTE6NTksIEhvcmlhIEdlYW50xIMgd3JvdGU6DQo+IFNpZ25lZC1v
+ZmYtYnk6IEhvcmlhIEdlYW50xIMgPGhvcmlhLmdlYW50YUBueHAuY29tPg0KDQpBY2tlZC1ieTog
+TGF1cmVudGl1IFR1ZG9yIDxsYXVyZW50aXUudHVkb3JAbnhwLmNvbT4NCg0KPiAtLS0NCj4gICBk
+cml2ZXJzL2J1cy9mc2wtbWMvZnNsLW1jLWJ1cy5jIHwgNSArKysrKw0KPiAgIGluY2x1ZGUvbGlu
+dXgvZnNsL21jLmggICAgICAgICAgfCA2ICsrKysrKw0KPiAgIDIgZmlsZXMgY2hhbmdlZCwgMTEg
+aW5zZXJ0aW9ucygrKQ0KPiANCj4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvYnVzL2ZzbC1tYy9mc2wt
+bWMtYnVzLmMgYi9kcml2ZXJzL2J1cy9mc2wtbWMvZnNsLW1jLWJ1cy5jDQo+IGluZGV4IDVkODI2
+NmM2NTcxZi4uNDU1MmIwNmZlNjAxIDEwMDY0NA0KPiAtLS0gYS9kcml2ZXJzL2J1cy9mc2wtbWMv
+ZnNsLW1jLWJ1cy5jDQo+ICsrKyBiL2RyaXZlcnMvYnVzL2ZzbC1tYy9mc2wtbWMtYnVzLmMNCj4g
+QEAgLTE4OCw2ICsxODgsMTAgQEAgc3RydWN0IGRldmljZV90eXBlIGZzbF9tY19idXNfZHBydGNf
+dHlwZSA9IHsNCj4gICAJLm5hbWUgPSAiZnNsX21jX2J1c19kcHJ0YyINCj4gICB9Ow0KPiAgIA0K
+PiArc3RydWN0IGRldmljZV90eXBlIGZzbF9tY19idXNfZHBzZWNpX3R5cGUgPSB7DQo+ICsJLm5h
+bWUgPSAiZnNsX21jX2J1c19kcHNlY2kiDQo+ICt9Ow0KPiArDQo+ICAgc3RhdGljIHN0cnVjdCBk
+ZXZpY2VfdHlwZSAqZnNsX21jX2dldF9kZXZpY2VfdHlwZShjb25zdCBjaGFyICp0eXBlKQ0KPiAg
+IHsNCj4gICAJc3RhdGljIGNvbnN0IHN0cnVjdCB7DQo+IEBAIC0yMDMsNiArMjA3LDcgQEAgc3Rh
+dGljIHN0cnVjdCBkZXZpY2VfdHlwZSAqZnNsX21jX2dldF9kZXZpY2VfdHlwZShjb25zdCBjaGFy
+ICp0eXBlKQ0KPiAgIAkJeyAmZnNsX21jX2J1c19kcG1jcF90eXBlLCAiZHBtY3AiIH0sDQo+ICAg
+CQl7ICZmc2xfbWNfYnVzX2RwbWFjX3R5cGUsICJkcG1hYyIgfSwNCj4gICAJCXsgJmZzbF9tY19i
+dXNfZHBydGNfdHlwZSwgImRwcnRjIiB9LA0KPiArCQl7ICZmc2xfbWNfYnVzX2Rwc2VjaV90eXBl
+LCAiZHBzZWNpIiB9LA0KPiAgIAkJeyBOVUxMLCBOVUxMIH0NCj4gICAJfTsNCj4gICAJaW50IGk7
+DQo+IGRpZmYgLS1naXQgYS9pbmNsdWRlL2xpbnV4L2ZzbC9tYy5oIGIvaW5jbHVkZS9saW51eC9m
+c2wvbWMuaA0KPiBpbmRleCBmMjdjYjE0MDg4YTQuLjUxNjBmMDZmZmJhYyAxMDA2NDQNCj4gLS0t
+IGEvaW5jbHVkZS9saW51eC9mc2wvbWMuaA0KPiArKysgYi9pbmNsdWRlL2xpbnV4L2ZzbC9tYy5o
+DQo+IEBAIC00MDUsNiArNDA1LDcgQEAgZXh0ZXJuIHN0cnVjdCBkZXZpY2VfdHlwZSBmc2xfbWNf
+YnVzX2RwY29uX3R5cGU7DQo+ICAgZXh0ZXJuIHN0cnVjdCBkZXZpY2VfdHlwZSBmc2xfbWNfYnVz
+X2RwbWNwX3R5cGU7DQo+ICAgZXh0ZXJuIHN0cnVjdCBkZXZpY2VfdHlwZSBmc2xfbWNfYnVzX2Rw
+bWFjX3R5cGU7DQo+ICAgZXh0ZXJuIHN0cnVjdCBkZXZpY2VfdHlwZSBmc2xfbWNfYnVzX2RwcnRj
+X3R5cGU7DQo+ICtleHRlcm4gc3RydWN0IGRldmljZV90eXBlIGZzbF9tY19idXNfZHBzZWNpX3R5
+cGU7DQo+ICAgDQo+ICAgc3RhdGljIGlubGluZSBib29sIGlzX2ZzbF9tY19idXNfZHByYyhjb25z
+dCBzdHJ1Y3QgZnNsX21jX2RldmljZSAqbWNfZGV2KQ0KPiAgIHsNCj4gQEAgLTQ1MSw2ICs0NTIs
+MTEgQEAgc3RhdGljIGlubGluZSBib29sIGlzX2ZzbF9tY19idXNfZHBydGMoY29uc3Qgc3RydWN0
+IGZzbF9tY19kZXZpY2UgKm1jX2RldikNCj4gICAJcmV0dXJuIG1jX2Rldi0+ZGV2LnR5cGUgPT0g
+JmZzbF9tY19idXNfZHBydGNfdHlwZTsNCj4gICB9DQo+ICAgDQo+ICtzdGF0aWMgaW5saW5lIGJv
+b2wgaXNfZnNsX21jX2J1c19kcHNlY2koY29uc3Qgc3RydWN0IGZzbF9tY19kZXZpY2UgKm1jX2Rl
+dikNCj4gK3sNCj4gKwlyZXR1cm4gbWNfZGV2LT5kZXYudHlwZSA9PSAmZnNsX21jX2J1c19kcHNl
+Y2lfdHlwZTsNCj4gK30NCj4gKw0KPiAgIC8qDQo+ICAgICogRGF0YSBQYXRoIEJ1ZmZlciBQb29s
+IChEUEJQKSBBUEkNCj4gICAgKiBDb250YWlucyBpbml0aWFsaXphdGlvbiBBUElzIGFuZCBydW50
+aW1lIGNvbnRyb2wgQVBJcyBmb3IgRFBCUA0KPiA=
