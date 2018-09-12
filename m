@@ -1,74 +1,297 @@
 From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
-Subject: [PATCH v2 05/12] crypto: caam - fix implicit casts in endianness
- helpers
-Date: Wed, 12 Sep 2018 11:59:30 +0300
-Message-ID: <20180912085937.22489-6-horia.geanta@nxp.com>
+Subject: [PATCH v2 03/12] soc: fsl: dpio: add frame list format support
+Date: Wed, 12 Sep 2018 11:59:28 +0300
+Message-ID: <20180912085937.22489-4-horia.geanta@nxp.com>
 References: <20180912085937.22489-1-horia.geanta@nxp.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: linux-kernel@vger.kernel.org, Aymen Sghaier <aymen.sghaier@nxp.com>,
- "David S . Miller" <davem@davemloft.net>, linux-arm-kernel@lists.infradead.org,
- linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Cc: "David S . Miller" <davem@davemloft.net>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>,
- Stuart Yoder <stuyoder@gmail.com>,
- Laurentiu Tudor <laurentiu.tudor@nxp.com>, Li Yang <leoyang.li@nxp.com>,
- Roy Pledge <roy.pledge@nxp.com>, Catalin Marinas <catalin.marinas@arm.com>,
- Will Deacon <will.deacon@arm.com>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+        Stuart Yoder <stuyoder@gmail.com>,
+        Laurentiu Tudor <laurentiu.tudor@nxp.com>,
+        Li Yang <leoyang.li@nxp.com>, Roy Pledge <roy.pledge@nxp.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will.deacon@arm.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <20180912085937.22489-1-horia.geanta@nxp.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Rml4IHRoZSBmb2xsb3dpbmcgc3BhcnNlIGVuZGlhbm5lc3Mgd2FybmluZ3M6Cgpkcml2ZXJzL2Ny
-eXB0by9jYWFtL3JlZ3MuaDo5NToxOiBzcGFyc2U6IGluY29ycmVjdCB0eXBlIGluIHJldHVybiBl
-eHByZXNzaW9uIChkaWZmZXJlbnQgYmFzZSB0eXBlcykgQEAgICAgZXhwZWN0ZWQgdW5zaWduZWQg
-aW50IEBAICAgIGdvdCByZXN0cmljdGVkIF9fbGUzMnVuc2lnbmVkIGludCBAQApkcml2ZXJzL2Ny
-eXB0by9jYWFtL3JlZ3MuaDo5NToxOiAgICBleHBlY3RlZCB1bnNpZ25lZCBpbnQKZHJpdmVycy9j
-cnlwdG8vY2FhbS9yZWdzLmg6OTU6MTogICAgZ290IHJlc3RyaWN0ZWQgX19sZTMyIFt1c2VydHlw
-ZV0gPG5vaWRlbnQ+CmRyaXZlcnMvY3J5cHRvL2NhYW0vcmVncy5oOjk1OjE6IHNwYXJzZTogaW5j
-b3JyZWN0IHR5cGUgaW4gcmV0dXJuIGV4cHJlc3Npb24gKGRpZmZlcmVudCBiYXNlIHR5cGVzKSBA
-QCAgICBleHBlY3RlZCB1bnNpZ25lZCBpbnQgQEAgICAgZ290IHJlc3RyaWN0ZWQgX19iZTMydW5z
-aWduZWQgaW50IEBACmRyaXZlcnMvY3J5cHRvL2NhYW0vcmVncy5oOjk1OjE6ICAgIGV4cGVjdGVk
-IHVuc2lnbmVkIGludApkcml2ZXJzL2NyeXB0by9jYWFtL3JlZ3MuaDo5NToxOiAgICBnb3QgcmVz
-dHJpY3RlZCBfX2JlMzIgW3VzZXJ0eXBlXSA8bm9pZGVudD4KCmRyaXZlcnMvY3J5cHRvL2NhYW0v
-cmVncy5oOjkyOjE6IHNwYXJzZTogY2FzdCB0byByZXN0cmljdGVkIF9fbGUzMgpkcml2ZXJzL2Ny
-eXB0by9jYWFtL3JlZ3MuaDo5MjoxOiBzcGFyc2U6IGNhc3QgdG8gcmVzdHJpY3RlZCBfX2JlMzIK
-CkZpeGVzOiAyNjFlYTA1OGYwMTYgKCJjcnlwdG86IGNhYW0gLSBoYW5kbGUgY29yZSBlbmRpYW5u
-ZXNzICE9IGNhYW0gZW5kaWFubmVzcyIpClJlcG9ydGVkLWJ5OiBrYnVpbGQgdGVzdCByb2JvdCA8
-bGtwQGludGVsLmNvbT4KU2lnbmVkLW9mZi1ieTogSG9yaWEgR2VhbnTEgyA8aG9yaWEuZ2VhbnRh
-QG54cC5jb20+Ci0tLQogZHJpdmVycy9jcnlwdG8vY2FhbS9yZWdzLmggfCAyOCArKysrKysrKysr
-KysrKy0tLS0tLS0tLS0tLS0tCiAxIGZpbGUgY2hhbmdlZCwgMTQgaW5zZXJ0aW9ucygrKSwgMTQg
-ZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvZHJpdmVycy9jcnlwdG8vY2FhbS9yZWdzLmggYi9k
-cml2ZXJzL2NyeXB0by9jYWFtL3JlZ3MuaAppbmRleCA0ZmI5MWJhMzljMzYuLmNlM2Y5YWQ3MTIw
-ZiAxMDA2NDQKLS0tIGEvZHJpdmVycy9jcnlwdG8vY2FhbS9yZWdzLmgKKysrIGIvZHJpdmVycy9j
-cnlwdG8vY2FhbS9yZWdzLmgKQEAgLTcwLDIyICs3MCwyMiBAQAogZXh0ZXJuIGJvb2wgY2FhbV9s
-aXR0bGVfZW5kOwogZXh0ZXJuIGJvb2wgY2FhbV9pbXg7CiAKLSNkZWZpbmUgY2FhbV90b19jcHUo
-bGVuKQkJCQlcCi1zdGF0aWMgaW5saW5lIHUjI2xlbiBjYWFtIyNsZW4gIyMgX3RvX2NwdSh1IyNs
-ZW4gdmFsKQlcCi17CQkJCQkJCVwKLQlpZiAoY2FhbV9saXR0bGVfZW5kKQkJCQlcCi0JCXJldHVy
-biBsZSMjbGVuICMjIF90b19jcHUodmFsKTsJCVwKLQllbHNlCQkJCQkJXAotCQlyZXR1cm4gYmUj
-I2xlbiAjIyBfdG9fY3B1KHZhbCk7CQlcCisjZGVmaW5lIGNhYW1fdG9fY3B1KGxlbikJCQkJCQlc
-CitzdGF0aWMgaW5saW5lIHUjI2xlbiBjYWFtIyNsZW4gIyMgX3RvX2NwdSh1IyNsZW4gdmFsKQkJ
-CVwKK3sJCQkJCQkJCQlcCisJaWYgKGNhYW1fbGl0dGxlX2VuZCkJCQkJCQlcCisJCXJldHVybiBs
-ZSMjbGVuICMjIF90b19jcHUoKF9fZm9yY2UgX19sZSMjbGVuKXZhbCk7CVwKKwllbHNlCQkJCQkJ
-CQlcCisJCXJldHVybiBiZSMjbGVuICMjIF90b19jcHUoKF9fZm9yY2UgX19iZSMjbGVuKXZhbCk7
-CVwKIH0KIAotI2RlZmluZSBjcHVfdG9fY2FhbShsZW4pCQkJCVwKLXN0YXRpYyBpbmxpbmUgdSMj
-bGVuIGNwdV90b19jYWFtIyNsZW4odSMjbGVuIHZhbCkJXAotewkJCQkJCQlcCi0JaWYgKGNhYW1f
-bGl0dGxlX2VuZCkJCQkJXAotCQlyZXR1cm4gY3B1X3RvX2xlIyNsZW4odmFsKTsJCVwKLQllbHNl
-CQkJCQkJXAotCQlyZXR1cm4gY3B1X3RvX2JlIyNsZW4odmFsKTsJCVwKKyNkZWZpbmUgY3B1X3Rv
-X2NhYW0obGVuKQkJCQkJXAorc3RhdGljIGlubGluZSB1IyNsZW4gY3B1X3RvX2NhYW0jI2xlbih1
-IyNsZW4gdmFsKQkJXAorewkJCQkJCQkJXAorCWlmIChjYWFtX2xpdHRsZV9lbmQpCQkJCQlcCisJ
-CXJldHVybiAoX19mb3JjZSB1IyNsZW4pY3B1X3RvX2xlIyNsZW4odmFsKTsJXAorCWVsc2UJCQkJ
-CQkJXAorCQlyZXR1cm4gKF9fZm9yY2UgdSMjbGVuKWNwdV90b19iZSMjbGVuKHZhbCk7CVwKIH0K
-IAogY2FhbV90b19jcHUoMTYpCi0tIAoyLjE2LjIKCgpfX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fXwpsaW51eC1hcm0ta2VybmVsIG1haWxpbmcgbGlzdApsaW51
-eC1hcm0ta2VybmVsQGxpc3RzLmluZnJhZGVhZC5vcmcKaHR0cDovL2xpc3RzLmluZnJhZGVhZC5v
-cmcvbWFpbG1hbi9saXN0aW5mby9saW51eC1hcm0ta2VybmVsCg==
+Add support for dpaa2_fd_list format, i.e. dpaa2_fl_entry structure
+and accessors.
+
+Frame list entries (FLEs) are similar, but not identical to FDs:
++ "F" (final) bit
+- FMT[b'01] is reserved
+- DD, SC, DROPP bits (covered by "FD compatibility" field in FLE case)
+- FLC[5:0] not used for stashing
+
+Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
+---
+ include/soc/fsl/dpaa2-fd.h | 242 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 242 insertions(+)
+
+diff --git a/include/soc/fsl/dpaa2-fd.h b/include/soc/fsl/dpaa2-fd.h
+index 2576abaa7779..90ae8d191f1a 100644
+--- a/include/soc/fsl/dpaa2-fd.h
++++ b/include/soc/fsl/dpaa2-fd.h
+@@ -66,6 +66,15 @@ struct dpaa2_fd {
+ #define SG_BPID_MASK		0x3FFF
+ #define SG_FINAL_FLAG_MASK	0x1
+ #define SG_FINAL_FLAG_SHIFT	15
++#define FL_SHORT_LEN_FLAG_MASK	0x1
++#define FL_SHORT_LEN_FLAG_SHIFT	14
++#define FL_SHORT_LEN_MASK	0x3FFFF
++#define FL_OFFSET_MASK		0x0FFF
++#define FL_FORMAT_MASK		0x3
++#define FL_FORMAT_SHIFT		12
++#define FL_BPID_MASK		0x3FFF
++#define FL_FINAL_FLAG_MASK	0x1
++#define FL_FINAL_FLAG_SHIFT	15
+ 
+ /* Error bits in FD CTRL */
+ #define FD_CTRL_ERR_MASK	0x000000FF
+@@ -435,4 +444,237 @@ static inline void dpaa2_sg_set_final(struct dpaa2_sg_entry *sg, bool final)
+ 	sg->format_offset |= cpu_to_le16(final << SG_FINAL_FLAG_SHIFT);
+ }
+ 
++/**
++ * struct dpaa2_fl_entry - structure for frame list entry.
++ * @addr:          address in the FLE
++ * @len:           length in the FLE
++ * @bpid:          buffer pool ID
++ * @format_offset: format, offset, and short-length fields
++ * @frc:           frame context
++ * @ctrl:          control bits...including pta, pvt1, pvt2, err, etc
++ * @flc:           flow context address
++ */
++struct dpaa2_fl_entry {
++	__le64 addr;
++	__le32 len;
++	__le16 bpid;
++	__le16 format_offset;
++	__le32 frc;
++	__le32 ctrl;
++	__le64 flc;
++};
++
++enum dpaa2_fl_format {
++	dpaa2_fl_single = 0,
++	dpaa2_fl_res,
++	dpaa2_fl_sg
++};
++
++/**
++ * dpaa2_fl_get_addr() - get the addr field of FLE
++ * @fle: the given frame list entry
++ *
++ * Return the address in the frame list entry.
++ */
++static inline dma_addr_t dpaa2_fl_get_addr(const struct dpaa2_fl_entry *fle)
++{
++	return (dma_addr_t)le64_to_cpu(fle->addr);
++}
++
++/**
++ * dpaa2_fl_set_addr() - Set the addr field of FLE
++ * @fle: the given frame list entry
++ * @addr: the address needs to be set in frame list entry
++ */
++static inline void dpaa2_fl_set_addr(struct dpaa2_fl_entry *fle,
++				     dma_addr_t addr)
++{
++	fle->addr = cpu_to_le64(addr);
++}
++
++/**
++ * dpaa2_fl_get_frc() - Get the frame context in the FLE
++ * @fle: the given frame list entry
++ *
++ * Return the frame context field in the frame lsit entry.
++ */
++static inline u32 dpaa2_fl_get_frc(const struct dpaa2_fl_entry *fle)
++{
++	return le32_to_cpu(fle->frc);
++}
++
++/**
++ * dpaa2_fl_set_frc() - Set the frame context in the FLE
++ * @fle: the given frame list entry
++ * @frc: the frame context needs to be set in frame list entry
++ */
++static inline void dpaa2_fl_set_frc(struct dpaa2_fl_entry *fle, u32 frc)
++{
++	fle->frc = cpu_to_le32(frc);
++}
++
++/**
++ * dpaa2_fl_get_ctrl() - Get the control bits in the FLE
++ * @fle: the given frame list entry
++ *
++ * Return the control bits field in the frame list entry.
++ */
++static inline u32 dpaa2_fl_get_ctrl(const struct dpaa2_fl_entry *fle)
++{
++	return le32_to_cpu(fle->ctrl);
++}
++
++/**
++ * dpaa2_fl_set_ctrl() - Set the control bits in the FLE
++ * @fle: the given frame list entry
++ * @ctrl: the control bits to be set in the frame list entry
++ */
++static inline void dpaa2_fl_set_ctrl(struct dpaa2_fl_entry *fle, u32 ctrl)
++{
++	fle->ctrl = cpu_to_le32(ctrl);
++}
++
++/**
++ * dpaa2_fl_get_flc() - Get the flow context in the FLE
++ * @fle: the given frame list entry
++ *
++ * Return the flow context in the frame list entry.
++ */
++static inline dma_addr_t dpaa2_fl_get_flc(const struct dpaa2_fl_entry *fle)
++{
++	return (dma_addr_t)le64_to_cpu(fle->flc);
++}
++
++/**
++ * dpaa2_fl_set_flc() - Set the flow context field of FLE
++ * @fle: the given frame list entry
++ * @flc_addr: the flow context needs to be set in frame list entry
++ */
++static inline void dpaa2_fl_set_flc(struct dpaa2_fl_entry *fle,
++				    dma_addr_t flc_addr)
++{
++	fle->flc = cpu_to_le64(flc_addr);
++}
++
++static inline bool dpaa2_fl_short_len(const struct dpaa2_fl_entry *fle)
++{
++	return !!((le16_to_cpu(fle->format_offset) >>
++		  FL_SHORT_LEN_FLAG_SHIFT) & FL_SHORT_LEN_FLAG_MASK);
++}
++
++/**
++ * dpaa2_fl_get_len() - Get the length in the FLE
++ * @fle: the given frame list entry
++ *
++ * Return the length field in the frame list entry.
++ */
++static inline u32 dpaa2_fl_get_len(const struct dpaa2_fl_entry *fle)
++{
++	if (dpaa2_fl_short_len(fle))
++		return le32_to_cpu(fle->len) & FL_SHORT_LEN_MASK;
++
++	return le32_to_cpu(fle->len);
++}
++
++/**
++ * dpaa2_fl_set_len() - Set the length field of FLE
++ * @fle: the given frame list entry
++ * @len: the length needs to be set in frame list entry
++ */
++static inline void dpaa2_fl_set_len(struct dpaa2_fl_entry *fle, u32 len)
++{
++	fle->len = cpu_to_le32(len);
++}
++
++/**
++ * dpaa2_fl_get_offset() - Get the offset field in the frame list entry
++ * @fle: the given frame list entry
++ *
++ * Return the offset.
++ */
++static inline u16 dpaa2_fl_get_offset(const struct dpaa2_fl_entry *fle)
++{
++	return le16_to_cpu(fle->format_offset) & FL_OFFSET_MASK;
++}
++
++/**
++ * dpaa2_fl_set_offset() - Set the offset field of FLE
++ * @fle: the given frame list entry
++ * @offset: the offset needs to be set in frame list entry
++ */
++static inline void dpaa2_fl_set_offset(struct dpaa2_fl_entry *fle, u16 offset)
++{
++	fle->format_offset &= cpu_to_le16(~FL_OFFSET_MASK);
++	fle->format_offset |= cpu_to_le16(offset);
++}
++
++/**
++ * dpaa2_fl_get_format() - Get the format field in the FLE
++ * @fle: the given frame list entry
++ *
++ * Return the format.
++ */
++static inline enum dpaa2_fl_format dpaa2_fl_get_format(const struct dpaa2_fl_entry *fle)
++{
++	return (enum dpaa2_fl_format)((le16_to_cpu(fle->format_offset) >>
++				       FL_FORMAT_SHIFT) & FL_FORMAT_MASK);
++}
++
++/**
++ * dpaa2_fl_set_format() - Set the format field of FLE
++ * @fle: the given frame list entry
++ * @format: the format needs to be set in frame list entry
++ */
++static inline void dpaa2_fl_set_format(struct dpaa2_fl_entry *fle,
++				       enum dpaa2_fl_format format)
++{
++	fle->format_offset &= cpu_to_le16(~(FL_FORMAT_MASK << FL_FORMAT_SHIFT));
++	fle->format_offset |= cpu_to_le16(format << FL_FORMAT_SHIFT);
++}
++
++/**
++ * dpaa2_fl_get_bpid() - Get the bpid field in the FLE
++ * @fle: the given frame list entry
++ *
++ * Return the buffer pool id.
++ */
++static inline u16 dpaa2_fl_get_bpid(const struct dpaa2_fl_entry *fle)
++{
++	return le16_to_cpu(fle->bpid) & FL_BPID_MASK;
++}
++
++/**
++ * dpaa2_fl_set_bpid() - Set the bpid field of FLE
++ * @fle: the given frame list entry
++ * @bpid: buffer pool id to be set
++ */
++static inline void dpaa2_fl_set_bpid(struct dpaa2_fl_entry *fle, u16 bpid)
++{
++	fle->bpid &= cpu_to_le16(~(FL_BPID_MASK));
++	fle->bpid |= cpu_to_le16(bpid);
++}
++
++/**
++ * dpaa2_fl_is_final() - Check final bit in FLE
++ * @fle: the given frame list entry
++ *
++ * Return bool.
++ */
++static inline bool dpaa2_fl_is_final(const struct dpaa2_fl_entry *fle)
++{
++	return !!(le16_to_cpu(fle->format_offset) >> FL_FINAL_FLAG_SHIFT);
++}
++
++/**
++ * dpaa2_fl_set_final() - Set the final bit in FLE
++ * @fle: the given frame list entry
++ * @final: the final boolean to be set
++ */
++static inline void dpaa2_fl_set_final(struct dpaa2_fl_entry *fle, bool final)
++{
++	fle->format_offset &= cpu_to_le16((~(FL_FINAL_FLAG_MASK <<
++					     FL_FINAL_FLAG_SHIFT)) & 0xFFFF);
++	fle->format_offset |= cpu_to_le16(final << FL_FINAL_FLAG_SHIFT);
++}
++
+ #endif /* __FSL_DPAA2_FD_H */
+-- 
+2.16.2
