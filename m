@@ -1,7 +1,7 @@
 From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
-Subject: [PATCH v2 01/12] bus: fsl-mc: add support for dpseci device type
-Date: Wed, 12 Sep 2018 11:59:26 +0300
-Message-ID: <20180912085937.22489-2-horia.geanta@nxp.com>
+Subject: [PATCH v2 02/12] soc: fsl: dpio: add back some frame queue functions
+Date: Wed, 12 Sep 2018 11:59:27 +0300
+Message-ID: <20180912085937.22489-3-horia.geanta@nxp.com>
 References: <20180912085937.22489-1-horia.geanta@nxp.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -21,58 +21,110 @@ In-Reply-To: <20180912085937.22489-1-horia.geanta@nxp.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
+This commit adds back functions removed in
+commit a211c8170b3c ("staging: fsl-mc/dpio: remove couple of unused functions")
+since dpseci object will make use of them.
+
+Acked-by: Li Yang <leoyang.li@nxp.com>
 Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
 ---
- drivers/bus/fsl-mc/fsl-mc-bus.c | 5 +++++
- include/linux/fsl/mc.h          | 6 ++++++
- 2 files changed, 11 insertions(+)
+ drivers/soc/fsl/dpio/dpio-service.c | 58 +++++++++++++++++++++++++++++++++++++
+ include/soc/fsl/dpaa2-io.h          |  4 +++
+ 2 files changed, 62 insertions(+)
 
-diff --git a/drivers/bus/fsl-mc/fsl-mc-bus.c b/drivers/bus/fsl-mc/fsl-mc-bus.c
-index 5d8266c6571f..4552b06fe601 100644
---- a/drivers/bus/fsl-mc/fsl-mc-bus.c
-+++ b/drivers/bus/fsl-mc/fsl-mc-bus.c
-@@ -188,6 +188,10 @@ struct device_type fsl_mc_bus_dprtc_type = {
- 	.name = "fsl_mc_bus_dprtc"
- };
- 
-+struct device_type fsl_mc_bus_dpseci_type = {
-+	.name = "fsl_mc_bus_dpseci"
-+};
-+
- static struct device_type *fsl_mc_get_device_type(const char *type)
- {
- 	static const struct {
-@@ -203,6 +207,7 @@ static struct device_type *fsl_mc_get_device_type(const char *type)
- 		{ &fsl_mc_bus_dpmcp_type, "dpmcp" },
- 		{ &fsl_mc_bus_dpmac_type, "dpmac" },
- 		{ &fsl_mc_bus_dprtc_type, "dprtc" },
-+		{ &fsl_mc_bus_dpseci_type, "dpseci" },
- 		{ NULL, NULL }
- 	};
- 	int i;
-diff --git a/include/linux/fsl/mc.h b/include/linux/fsl/mc.h
-index f27cb14088a4..5160f06ffbac 100644
---- a/include/linux/fsl/mc.h
-+++ b/include/linux/fsl/mc.h
-@@ -405,6 +405,7 @@ extern struct device_type fsl_mc_bus_dpcon_type;
- extern struct device_type fsl_mc_bus_dpmcp_type;
- extern struct device_type fsl_mc_bus_dpmac_type;
- extern struct device_type fsl_mc_bus_dprtc_type;
-+extern struct device_type fsl_mc_bus_dpseci_type;
- 
- static inline bool is_fsl_mc_bus_dprc(const struct fsl_mc_device *mc_dev)
- {
-@@ -451,6 +452,11 @@ static inline bool is_fsl_mc_bus_dprtc(const struct fsl_mc_device *mc_dev)
- 	return mc_dev->dev.type == &fsl_mc_bus_dprtc_type;
+diff --git a/drivers/soc/fsl/dpio/dpio-service.c b/drivers/soc/fsl/dpio/dpio-service.c
+index 9b17f72349ed..321a92613a7e 100644
+--- a/drivers/soc/fsl/dpio/dpio-service.c
++++ b/drivers/soc/fsl/dpio/dpio-service.c
+@@ -309,6 +309,37 @@ int dpaa2_io_service_rearm(struct dpaa2_io *d,
  }
+ EXPORT_SYMBOL_GPL(dpaa2_io_service_rearm);
  
-+static inline bool is_fsl_mc_bus_dpseci(const struct fsl_mc_device *mc_dev)
++/**
++ * dpaa2_io_service_pull_fq() - pull dequeue functions from a fq.
++ * @d: the given DPIO service.
++ * @fqid: the given frame queue id.
++ * @s: the dpaa2_io_store object for the result.
++ *
++ * Return 0 for success, or error code for failure.
++ */
++int dpaa2_io_service_pull_fq(struct dpaa2_io *d, u32 fqid,
++			     struct dpaa2_io_store *s)
 +{
-+	return mc_dev->dev.type == &fsl_mc_bus_dpseci_type;
-+}
++	struct qbman_pull_desc pd;
++	int err;
 +
- /*
-  * Data Path Buffer Pool (DPBP) API
-  * Contains initialization APIs and runtime control APIs for DPBP
++	qbman_pull_desc_clear(&pd);
++	qbman_pull_desc_set_storage(&pd, s->vaddr, s->paddr, 1);
++	qbman_pull_desc_set_numframes(&pd, (u8)s->max);
++	qbman_pull_desc_set_fq(&pd, fqid);
++
++	d = service_select(d);
++	if (!d)
++		return -ENODEV;
++	s->swp = d->swp;
++	err = qbman_swp_pull(d->swp, &pd);
++	if (err)
++		s->swp = NULL;
++
++	return err;
++}
++EXPORT_SYMBOL(dpaa2_io_service_pull_fq);
++
+ /**
+  * dpaa2_io_service_pull_channel() - pull dequeue functions from a channel.
+  * @d: the given DPIO service.
+@@ -341,6 +372,33 @@ int dpaa2_io_service_pull_channel(struct dpaa2_io *d, u32 channelid,
+ }
+ EXPORT_SYMBOL_GPL(dpaa2_io_service_pull_channel);
+ 
++/**
++ * dpaa2_io_service_enqueue_fq() - Enqueue a frame to a frame queue.
++ * @d: the given DPIO service.
++ * @fqid: the given frame queue id.
++ * @fd: the frame descriptor which is enqueued.
++ *
++ * Return 0 for successful enqueue, -EBUSY if the enqueue ring is not ready,
++ * or -ENODEV if there is no dpio service.
++ */
++int dpaa2_io_service_enqueue_fq(struct dpaa2_io *d,
++				u32 fqid,
++				const struct dpaa2_fd *fd)
++{
++	struct qbman_eq_desc ed;
++
++	d = service_select(d);
++	if (!d)
++		return -ENODEV;
++
++	qbman_eq_desc_clear(&ed);
++	qbman_eq_desc_set_no_orp(&ed, 0);
++	qbman_eq_desc_set_fq(&ed, fqid);
++
++	return qbman_swp_enqueue(d->swp, &ed, fd);
++}
++EXPORT_SYMBOL(dpaa2_io_service_enqueue_fq);
++
+ /**
+  * dpaa2_io_service_enqueue_qd() - Enqueue a frame to a QD.
+  * @d: the given DPIO service.
+diff --git a/include/soc/fsl/dpaa2-io.h b/include/soc/fsl/dpaa2-io.h
+index ab51e40d11db..70997ab2146c 100644
+--- a/include/soc/fsl/dpaa2-io.h
++++ b/include/soc/fsl/dpaa2-io.h
+@@ -97,9 +97,13 @@ void dpaa2_io_service_deregister(struct dpaa2_io *service,
+ int dpaa2_io_service_rearm(struct dpaa2_io *service,
+ 			   struct dpaa2_io_notification_ctx *ctx);
+ 
++int dpaa2_io_service_pull_fq(struct dpaa2_io *d, u32 fqid,
++			     struct dpaa2_io_store *s);
+ int dpaa2_io_service_pull_channel(struct dpaa2_io *d, u32 channelid,
+ 				  struct dpaa2_io_store *s);
+ 
++int dpaa2_io_service_enqueue_fq(struct dpaa2_io *d, u32 fqid,
++				const struct dpaa2_fd *fd);
+ int dpaa2_io_service_enqueue_qd(struct dpaa2_io *d, u32 qdid, u8 prio,
+ 				u16 qdbin, const struct dpaa2_fd *fd);
+ int dpaa2_io_service_release(struct dpaa2_io *d, u32 bpid,
 -- 
 2.16.2
