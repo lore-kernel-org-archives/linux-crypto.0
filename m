@@ -1,8 +1,7 @@
 From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Subject: [PATCH 0/2] dt-bindings: Cleanup spurious commas in hisilicon hip07
- dt.
-Date: Wed, 12 Sep 2018 17:05:50 +0100
-Message-ID: <20180912160552.11604-1-Jonathan.Cameron@huawei.com>
+Subject: [PATCH 1/2] dt-bindings: crypto: hip07-sec, drop incorrect commas
+Date: Wed, 12 Sep 2018 17:07:17 +0100
+Message-ID: <20180912160718.3324-2-Jonathan.Cameron@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
@@ -21,24 +20,31 @@ Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-Rob Herring picked up on an issue in our sec dt binding doc where we had
-an unnecessary comma in the addresses provided as part of the node name.
-The comment wasn't fixed before the series was applied, hence this follow up.
+There should not be a comma in the address used for the instance
+so drop them.
 
-This was a cut and paste job from a few of the its entries already present
-in the hip07 dtsi.
+This is a left over from a review of the final version before
+Herbert Xu picked the series up.
 
-This series tidies up this loose end.  It has no particular urgency
-as nothing stops working if you have a comma present and it is unlikely
-an userspace code would be using these.
+Reported-by: Rob Herring <robh+dt@kernel.org>
+Signed-off-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Fixes: 8f026dc887fe ("dt-bindings: Add bidnings for Hisilicon SEC crypto accelerators")
+---
+ .../devicetree/bindings/crypto/hisilicon,hip07-sec.txt          | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Jonathan Cameron (2):
-  dt-bindings: crypto: hip07-sec, drop incorrect commas
-  arm64: dts: hisilicon hip07: drop commas from @address node names
-
- .../bindings/crypto/hisilicon,hip07-sec.txt   |  2 +-
- arch/arm64/boot/dts/hisilicon/hip07.dtsi      | 28 +++++++++----------
- 2 files changed, 15 insertions(+), 15 deletions(-)
-
+diff --git a/Documentation/devicetree/bindings/crypto/hisilicon,hip07-sec.txt b/Documentation/devicetree/bindings/crypto/hisilicon,hip07-sec.txt
+index 78d2db9d4de5..d28fd1af01b4 100644
+--- a/Documentation/devicetree/bindings/crypto/hisilicon,hip07-sec.txt
++++ b/Documentation/devicetree/bindings/crypto/hisilicon,hip07-sec.txt
+@@ -24,7 +24,7 @@ Optional properties:
+ 
+ Example:
+ 
+-p1_sec_a: crypto@400,d2000000 {
++p1_sec_a: crypto@400d2000000 {
+ 	compatible = "hisilicon,hip07-sec";
+ 	reg = <0x400 0xd0000000 0x0 0x10000
+ 	       0x400 0xd2000000 0x0 0x10000
 -- 
 2.18.0
