@@ -1,61 +1,88 @@
 From: Kees Cook <keescook@chromium.org>
-Subject: Re: [PATCH v8 5/9] dm: Remove VLA usage from hashes
-Date: Thu, 13 Sep 2018 09:41:45 -0700
-Message-ID: <CAGXu5jKfR4JD5O1brLh=NFUvu2jMHHZ4JF93ZKwfk1CuuhGbbg@mail.gmail.com>
-References: <20180807211843.47586-1-keescook@chromium.org>
-	<20180807211843.47586-6-keescook@chromium.org>
-	<20180904031318.47jc3jrxcdjeac5y@gondor.apana.org.au>
+Subject: Re: [PATCH v2 2/4] crypto: skcipher - Enforce non-ASYNC for on-stack
+ requests
+Date: Thu, 13 Sep 2018 09:46:17 -0700
+Message-ID: <CAGXu5j+ti_nzxeu64e-X+igNEsnXiW1rjkn7R63DMBCxBOeTNg@mail.gmail.com>
+References: <20180906225854.40989-1-keescook@chromium.org>
+ <20180906225854.40989-3-keescook@chromium.org>
+ <20180907034242.zhm4dglzkldhvh3x@gondor.apana.org.au>
+ <CAKv+Gu9kHpBTKjQKA3W4Q424FeY+Zq4srq2-r0MxjfCNKHT_5A@mail.gmail.com>
+ <20180911055230.iiiq2uu5gczlwjon@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Cc: Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>, Arnd Bergmann <arnd@arndb.de>,
-	Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-	Tudor-Dan Ambarus <tudor.ambarus@microchip.com>,
-	Will Deacon <will.deacon@arm.com>, LKML <linux-kernel@vger.kernel.org>,
-	Matthew Wilcox <willy@infradead.org>,
-	"Gustavo A. R. Silva" <gustavo@embeddedor.com>,
-	device-mapper development <dm-devel@redhat.com>,
-	Eric Biggers <ebiggers@google.com>,
-	linux-crypto <linux-crypto@vger.kernel.org>,
-	Geert Uytterhoeven <geert@linux-m68k.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Thomas Gleixner <tglx@linutronix.de>
-To: Mike Snitzer <snitzer@redhat.com>, Alasdair Kergon <agk@redhat.com>
-Return-path: <dm-devel-bounces@redhat.com>
-In-Reply-To: <20180904031318.47jc3jrxcdjeac5y@gondor.apana.org.au>
-List-Unsubscribe: <https://www.redhat.com/mailman/options/dm-devel>,
-	<mailto:dm-devel-request@redhat.com?subject=unsubscribe>
-List-Archive: <https://www.redhat.com/archives/dm-devel>
-List-Post: <mailto:dm-devel@redhat.com>
-List-Help: <mailto:dm-devel-request@redhat.com?subject=help>
-List-Subscribe: <https://www.redhat.com/mailman/listinfo/dm-devel>,
-	<mailto:dm-devel-request@redhat.com?subject=subscribe>
-Sender: dm-devel-bounces@redhat.com
-Errors-To: dm-devel-bounces@redhat.com
+Cc: Maxime Ripard <maxime.ripard@bootlin.com>,
+ Arnaud Ebalard <arno@natisbad.org>, Christian Lamparter <chunkeey@gmail.com>,
+ Eric Biggers <ebiggers@google.com>,
+ Antoine Tenart <antoine.tenart@bootlin.com>,
+ Boris Brezillon <boris.brezillon@bootlin.com>,
+ Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Gilad Ben-Yossef <gilad@benyossef.com>, Chen-Yu Tsai <wens@csie.org>,
+ Corentin Labbe <clabbe.montjoie@gmail.com>,
+ "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+ <linux-crypto@vger.kernel.org>, Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+ Philippe Ombredanne <pombredanne@nexb.com>,
+ linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+ Alexander Stein <alexander.stein@systec-electronic.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <20180911055230.iiiq2uu5gczlwjon@gondor.apana.org.au>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Sep 3, 2018 at 8:13 PM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> On Tue, Aug 07, 2018 at 02:18:39PM -0700, Kees Cook wrote:
->> In the quest to remove all stack VLA usage from the kernel[1], this uses
->> the new HASH_MAX_DIGESTSIZE from the crypto layer to allocate the upper
->> bounds on stack usage.
+On Mon, Sep 10, 2018 at 10:52 PM, Herbert Xu
+<herbert@gondor.apana.org.au> wrote:
+> On Fri, Sep 07, 2018 at 08:56:23AM +0200, Ard Biesheuvel wrote:
 >>
->> [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
->>
->> Signed-off-by: Kees Cook <keescook@chromium.org>
+>> OK, so given that all SKCIPHER_REQUEST_ON_STACK occurrences are
+>> updated in this series anyway, perhaps we should add
+>> skcipher_[en|de]crypt_onstack() flavors that encapsulate the
+>> additional check? Only question is how to enforce at compile time that
+>> those are used instead of the ordinary ones when using a stack
+>> allocated request. Would you mind using some macro foo here involving
+>> __builtin_types_compatible_p() ?
 >
-> Can the dm folks please review this patch?
+> Something like a completely new type which in reality is just a
+> wrapper around skcipher:
+>
+>         struct crypto_sync_skcipher {
+>                 struct crypto_skcipher base;
+>         } tfm;
+>
+>         tfm = crypto_alloc_sync_skcipher(...);
+>
+>         crypto_sync_skcipher_encrypt(...)
+>         crypto_sync_skcipher_decrypt(...)
+>
+> These functions would just be trivial inline functions around their
+> crypto_skcipher counterparts.
 
-Mike or Alasdair, can you Ack this patch so Herbert can include it in
-the crypto tree? This is blocking some VLA removals[1]...
+This means new wrappers for the other helpers too, yes? For example:
 
-Thanks!
+        SKCIPHER_REQUEST_ON_STACK(nreq, ctx->null);
+
+        skcipher_request_set_tfm(nreq, ctx->null);
+        skcipher_request_set_callback(nreq, req->base.flags, NULL, NULL);
+        skcipher_request_set_crypt(nreq, req->src, req->dst, nbytes, NULL);
+
+        return crypto_skcipher_encrypt(nreq);
+
+For the above, we'd also need:
+
+sync_skcipher_request_set_tfm()
+sync_skcipher_request_set_callback()
+sync_skcipher_request_set_crypt()
 
 -Kees
-
-[1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
 
 -- 
 Kees Cook
