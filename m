@@ -1,67 +1,62 @@
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: Re: [PATCH net-next v3 02/17] zinc: introduce minimal cryptography library
-Date: Thu, 13 Sep 2018 17:58:39 +0200
-Message-ID: <CAHmME9qjTyYpm_PsQ5_oZSfZBGa29zME1XHVak9F4Ued-qm67g@mail.gmail.com>
-References: <20180911010838.8818-1-Jason@zx2c4.com> <20180911010838.8818-3-Jason@zx2c4.com>
- <CAKv+Gu9nSeo4PFVrtjtqGQ32eqyxUp3xVCczZfu+dhFz5yLM0A@mail.gmail.com>
- <CAHmME9rTEFLaYmzFrc719LW2DWS2Ua_vL6by1UXZ9uDvMpbhYw@mail.gmail.com>
- <CAKv+Gu9RGo9rtGsmwMLZ_=-WSQ_h7har4agXP-2XOKupq-KYtA@mail.gmail.com>
- <CALCETrU2qkLVaxC=cpU5iAeT5B7xGsR+m2ZWtLVK37jMMWtcAA@mail.gmail.com>
- <CAKv+Gu8z1r7F_wbR6-e0Vbryqby7djDy2OR6JJURCsTo6ZMa2g@mail.gmail.com>
- <CAHmME9pcODNc2m26DH1cQY6R+grxYW5dvFpNDpz_GiugM3qufw@mail.gmail.com> <CAKv+Gu9GVbSETjp01tANMwJgA6O9aexhnH+47836KjZg+71q2A@mail.gmail.com>
+From: Kees Cook <keescook@chromium.org>
+Subject: Re: [PATCH v8 5/9] dm: Remove VLA usage from hashes
+Date: Thu, 13 Sep 2018 09:41:45 -0700
+Message-ID: <CAGXu5jKfR4JD5O1brLh=NFUvu2jMHHZ4JF93ZKwfk1CuuhGbbg@mail.gmail.com>
+References: <20180807211843.47586-1-keescook@chromium.org>
+	<20180807211843.47586-6-keescook@chromium.org>
+	<20180904031318.47jc3jrxcdjeac5y@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Andrew Lutomirski <luto@kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Netdev <netdev@vger.kernel.org>,
-        David Miller <davem@davemloft.net>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Samuel Neves <sneves@dei.uc.pt>,
-        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAKv+Gu9GVbSETjp01tANMwJgA6O9aexhnH+47836KjZg+71q2A@mail.gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>, Arnd Bergmann <arnd@arndb.de>,
+	Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+	Tudor-Dan Ambarus <tudor.ambarus@microchip.com>,
+	Will Deacon <will.deacon@arm.com>, LKML <linux-kernel@vger.kernel.org>,
+	Matthew Wilcox <willy@infradead.org>,
+	"Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+	device-mapper development <dm-devel@redhat.com>,
+	Eric Biggers <ebiggers@google.com>,
+	linux-crypto <linux-crypto@vger.kernel.org>,
+	Geert Uytterhoeven <geert@linux-m68k.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Thomas Gleixner <tglx@linutronix.de>
+To: Mike Snitzer <snitzer@redhat.com>, Alasdair Kergon <agk@redhat.com>
+Return-path: <dm-devel-bounces@redhat.com>
+In-Reply-To: <20180904031318.47jc3jrxcdjeac5y@gondor.apana.org.au>
+List-Unsubscribe: <https://www.redhat.com/mailman/options/dm-devel>,
+	<mailto:dm-devel-request@redhat.com?subject=unsubscribe>
+List-Archive: <https://www.redhat.com/archives/dm-devel>
+List-Post: <mailto:dm-devel@redhat.com>
+List-Help: <mailto:dm-devel-request@redhat.com?subject=help>
+List-Subscribe: <https://www.redhat.com/mailman/listinfo/dm-devel>,
+	<mailto:dm-devel-request@redhat.com?subject=subscribe>
+Sender: dm-devel-bounces@redhat.com
+Errors-To: dm-devel-bounces@redhat.com
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Sep 13, 2018 at 5:43 PM Ard Biesheuvel
-<ard.biesheuvel@linaro.org> wrote:
-> I'd prefer it if all the accelerated software implementations live in
-> the same place. But I do strongly prefer arch code to live in
-> arch/$arch
+On Mon, Sep 3, 2018 at 8:13 PM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> On Tue, Aug 07, 2018 at 02:18:39PM -0700, Kees Cook wrote:
+>> In the quest to remove all stack VLA usage from the kernel[1], this uses
+>> the new HASH_MAX_DIGESTSIZE from the crypto layer to allocate the upper
+>> bounds on stack usage.
+>>
+>> [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
+>>
+>> Signed-off-by: Kees Cook <keescook@chromium.org>
+>
+> Can the dm folks please review this patch?
 
-Zinc follows the scheme of the raid6 code, as well as of most other
-crypto libraries: code is grouped by cipher, making it easy for people
-to work with and understand differing implementations. It also allows
-us to trivially link these together at compile time rather than at
-link time, which makes cipher selection much more efficient. It's
-really much more maintainable this way.
+Mike or Alasdair, can you Ack this patch so Herbert can include it in
+the crypto tree? This is blocking some VLA removals[1]...
 
-> I think AES-GCM is a useful example here. I really like the SIMD token
-> abstraction a lot, but I would like to understand how this would work
-> in Zinc if you have
-> a) a generic implementation
-> b) perhaps an arch specific scalar implementation
-> c) a pure NEON implementation
-> d) an implementation using AES instructions but not the PMULL instructions
-> e) an implementation that uses AES and PMULL instructions.
+Thanks!
 
-The same way that Zinc currently chooses between the five different
-implementations for, say, x86_64 ChaCha20:
+-Kees
 
-- Generic C scalar
-- SSSE3
-- AVX2
-- AVX512F
-- AVX512VL
+[1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
 
-We make a decision based on CPU capabilities, SIMD context, and input
-length, and then choose the right function.
-
-> You know what? If you're up for it, let's not wait until Plumbers, but
-> instead, let's collaborate off list to get this into shape.
-
-Sure, sounds good.
-
-Jason
+-- 
+Kees Cook
+Pixel Security
