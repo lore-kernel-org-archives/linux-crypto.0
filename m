@@ -1,15 +1,16 @@
 From: "Jason A. Donenfeld" <Jason@zx2c4.com>
 Subject: Re: [PATCH net-next v3 02/17] zinc: introduce minimal cryptography library
-Date: Thu, 13 Sep 2018 16:32:41 +0200
-Message-ID: <CAHmME9pcODNc2m26DH1cQY6R+grxYW5dvFpNDpz_GiugM3qufw@mail.gmail.com>
+Date: Thu, 13 Sep 2018 16:34:44 +0200
+Message-ID: <CAHmME9oXXHZQXuvum1x69tojsRwXtBM32VXsL2SXbBuq2JCVeg@mail.gmail.com>
 References: <20180911010838.8818-1-Jason@zx2c4.com> <20180911010838.8818-3-Jason@zx2c4.com>
  <CAKv+Gu9nSeo4PFVrtjtqGQ32eqyxUp3xVCczZfu+dhFz5yLM0A@mail.gmail.com>
  <CAHmME9rTEFLaYmzFrc719LW2DWS2Ua_vL6by1UXZ9uDvMpbhYw@mail.gmail.com>
  <CAKv+Gu9RGo9rtGsmwMLZ_=-WSQ_h7har4agXP-2XOKupq-KYtA@mail.gmail.com>
- <CALCETrU2qkLVaxC=cpU5iAeT5B7xGsR+m2ZWtLVK37jMMWtcAA@mail.gmail.com> <CAKv+Gu8z1r7F_wbR6-e0Vbryqby7djDy2OR6JJURCsTo6ZMa2g@mail.gmail.com>
+ <CALCETrU2qkLVaxC=cpU5iAeT5B7xGsR+m2ZWtLVK37jMMWtcAA@mail.gmail.com> <c5855aa4-1561-8387-aebb-0a7587ac6d4f@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Cc: Andrew Lutomirski <luto@kernel.org>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
         LKML <linux-kernel@vger.kernel.org>,
         Netdev <netdev@vger.kernel.org>,
         David Miller <davem@davemloft.net>,
@@ -17,84 +18,46 @@ Cc: Andrew Lutomirski <luto@kernel.org>,
         Samuel Neves <sneves@dei.uc.pt>,
         Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: gmazyland@gmail.com
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAKv+Gu8z1r7F_wbR6-e0Vbryqby7djDy2OR6JJURCsTo6ZMa2g@mail.gmail.com>
+In-Reply-To: <c5855aa4-1561-8387-aebb-0a7587ac6d4f@gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Sep 13, 2018 at 7:41 AM Ard Biesheuvel
-<ard.biesheuvel@linaro.org> wrote:
-> But one of the supposed selling points of this crypto library is that
-> it gives engineers who are frightened of crypto in general and the
-> crypto API in particular simple and easy to use crypto primitives
-> rather than having to jump through the crypto API's hoops.
+Hi Milan,
 
-The goal is for engineers who want to specifically use algorithm X
-from within the kernel in a non-dynamic way to be able to then use
-algorithm X with a simple function call. The goal is not to open it up
-to people who have no idea what they're doing; for that a NaCL-like
-library with functions like "crypto_box_open" or something would fit
-the bill; but that's also not what we're trying to do here. Please
-don't confuse the design goals. The rest of your email is therefore a
-bit of a straw man; cut the rhetoric out.
+On Thu, Sep 13, 2018 at 8:40 AM Milan Broz <gmazyland@gmail.com> wrote:
+> Please note, that dm-crypt now uses not only block ciphers and modes,
+> but also authenticated encryption and hashes (for ESSIV and HMAC
+> in authenticated composed modes) and RNG (for random IV).
+> We use crypto API, including async variants (I hope correctly :)
+>
+> There is a long time battle to move initialization vectors generators
+> from dm-crypt to crypto API. If there are any plans to use a new library,
+> this issue should be discussed as well.
+> (Some dm-crypt IV generators are disk encryption specific, some do more
+> that just IV so porting is not straightforward etc).
+>
+> Related problem here is an optimization of chain of sectors encryption -
+> if we have new crypto API, it would be nice if can take chain of sectors
+> so possible implementation can process this chain in one batch
+> (every sector need to be tweaked by differently generated IV - and we
+> are back in problem above).
+> I think filesystem encryption uses the same pattern.
+>
+> And btw, we use the same algorithms through AF_ALG in userspace (cryptsetup).
+>
+> So please, if you mention dm-crypt, note that it is very complex
+> crypto API consumer :) And everything is dynamic, configurable through
+> dm-crypt options.
+>
+> That said, I would be more than happy to help in experiments to porting dm-crypt
+> to any other crypto library, but if it doesn't not help with problems
+> mentioned above, I do not see any compelling reason for the new library for dm-crypt...
 
-> A crypto library whose only encryption algorithm is a stream cipher
-> does *not* deliver on that promise, since it is only suitable for
-> cases where IVs are guaranteed not to be reused.
-
-False. We also offer XChaCha20Poly1305, which takes a massive nonce,
-suitable for random generation.
-
-If there became a useful case for AES-PMAC-SIV or even AES-GCM or
-something to that extent, then Zinc would add that as required. But
-we're not going to start adding random ciphers unless they're needed.
-
-> You yourself were
-> bitten by the clunkiness of the crypto API when attempting to use the
-> SHA26 code, right? So shouldn't we move that into this crypto library
-> as well?
-
-As stated in the initial commit, and in numerous other emails
-stretching back a year, yes, sha256 and other things in lib/ are going
-to be put into Zinc following the initial merge of Zinc. These changes
-will happen incrementally, like everything else that happens in the
-kernel. Sha256, in particular, is probably the first thing I'll port
-post-merge.
-
-> I think it is reasonable for WireGuard to standardize on
-> ChaCha20/Poly1305 only, although I have my concerns about the flag day
-> that will be required if this 'one true cipher' ever does turn out to
-> be compromised (either that, or we will have to go back in time and
-> add some kind of protocol versioning to existing deployments of
-> WireGuard)
-
-Those concerns are not valid and have already been addressed (to you,
-I believe) on this mailing list and elsewhere. WireGuard is versioned,
-hence there's no need to "add" versioning, and it is prepared to roll
-out new cryptography in a subsequent version should there be any
-issues. In other words, your concern is based on a misunderstanding of
-the protocol. If you have issues, however, with the design decisions
-of WireGuard, something that's been heavily discussed with members of
-the linux kernel community, networking community, cryptography
-community, and so forth, for the last 3 years, I invite you to bring
-them up on <wireguard@lists.zx2c4.com>.
-
-> And frankly, if the code were as good as the prose, we wouldn't be
-> having this discussion.
-
-Please cut out this rhetoric. That's an obviously unprovable
-statement, but it probably isn't true anyway. I wish you'd stick to
-technical concerns only, rather than what appears to be a desire to
-derail this by any means necessary.
-
-> Zinc adds its own clunky ways to mix arch and
-> generic code, involving GCC -include command line arguments and
-> #ifdefs everywhere. My review comments on this were completely ignored
-> by Jason.
-
-No, they were not ignored. v2 cleaned up the #ifdefs. v4 has already
-cleaned up the makefile stuff and will be even cleaner. Good things
-await, don't worry.
+dm-crypt is probably a good consumer of the existing crypto API and
+won't be impacted by the introduction of Zinc, which is really just
+the exposure of a couple low level simple crypto functions, and not a
+fancy API like the crypto API which dm-crypt happily uses.
 
 Jason
