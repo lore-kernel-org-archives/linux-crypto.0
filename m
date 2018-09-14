@@ -1,107 +1,44 @@
-From: Janakarajan Natarajan <Janakarajan.Natarajan@amd.com>
-Subject: [PATCH 2/2] Allow SEV firmware to be chosen based on Family and Model
-Date: Fri, 14 Sep 2018 17:32:04 -0500
-Message-ID: <5c58c32c0ce89c35a95e151734f5d43a3ed0dca0.1536959537.git.Janakarajan.Natarajan@amd.com>
-References: <cover.1536959537.git.Janakarajan.Natarajan@amd.com>
+From: Li Yang <leoyang.li@nxp.com>
+Subject: Re: [PATCH v2 03/12] soc: fsl: dpio: add frame list format support
+Date: Fri, 14 Sep 2018 18:26:48 -0500
+Message-ID: <CADRPPNQYPZGPo0y7pv3CFFJH6Kn4rL42w8YgH-d3pMrU=Q0FFQ@mail.gmail.com>
+References: <20180912085937.22489-1-horia.geanta@nxp.com> <20180912085937.22489-4-horia.geanta@nxp.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: Tom Lendacky <thomas.lendacky@amd.com>,
-        Gary Hook <gary.hook@amd.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Janakarajan Natarajan <Janakarajan.Natarajan@amd.com>
-To: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        Stuart Yoder <stuyoder@gmail.com>,
+        Laurentiu Tudor <laurentiu.tudor@nxp.com>,
+        Roy Pledge <roy.pledge@nxp.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will.deacon@arm.com>,
+        David Miller <davem@davemloft.net>, aymen.sghaier@nxp.com,
+        linux-crypto@vger.kernel.org,
+        "moderated list:ARM/FREESCALE IMX / MXC ARM ARCHITECTURE"
+        <linux-arm-kernel@lists.infradead.org>,
+        lkml <linux-kernel@vger.kernel.org>
+To: Horia Geanta <horia.geanta@nxp.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <cover.1536959537.git.Janakarajan.Natarajan@amd.com>
+In-Reply-To: <20180912085937.22489-4-horia.geanta@nxp.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-During PSP initialization, there is an attempt to update the SEV firmware
-by looking in /lib/firmware/amd/. Currently, sev.fw is the expected name
-of the firmware blob.
+On Wed, Sep 12, 2018 at 4:02 AM Horia Geantă <horia.geanta@nxp.com> wrote:
+>
+> Add support for dpaa2_fd_list format, i.e. dpaa2_fl_entry structure
+> and accessors.
+>
+> Frame list entries (FLEs) are similar, but not identical to FDs:
+> + "F" (final) bit
+> - FMT[b'01] is reserved
+> - DD, SC, DROPP bits (covered by "FD compatibility" field in FLE case)
+> - FLC[5:0] not used for stashing
+>
+> Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
 
-This patch will allow for firmware filenames based on the family and
-model of the processor.
+Acked-by: Li Yang <leoyang.li@nxp.com>
 
-Model specific firmware files are given highest priority. Followed by
-firmware for a subset of models. Lastly, failing the previous two options,
-fallback to looking for sev.fw.
-
-Signed-off-by: Janakarajan Natarajan <Janakarajan.Natarajan@amd.com>
----
- drivers/crypto/ccp/psp-dev.c | 44 ++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 40 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
-index f541e60..3b33863 100644
---- a/drivers/crypto/ccp/psp-dev.c
-+++ b/drivers/crypto/ccp/psp-dev.c
-@@ -31,8 +31,9 @@
- 		((psp_master->api_major) >= _maj &&	\
- 		 (psp_master->api_minor) >= _min)
- 
--#define DEVICE_NAME	"sev"
--#define SEV_FW_FILE	"amd/sev.fw"
-+#define DEVICE_NAME		"sev"
-+#define SEV_FW_FILE		"amd/sev.fw"
-+#define SEV_FW_NAME_SIZE	64
- 
- static DEFINE_MUTEX(sev_cmd_mutex);
- static struct sev_misc_dev *misc_dev;
-@@ -440,6 +441,40 @@ static int sev_get_api_version(void)
- 	return 0;
- }
- 
-+int sev_get_firmware(struct device *dev, const struct firmware **firmware)
-+{
-+	char fw_name_specific[SEV_FW_NAME_SIZE];
-+	char fw_name_subset[SEV_FW_NAME_SIZE];
-+
-+	snprintf(fw_name_specific, sizeof(fw_name_specific),
-+		 "amd/amd_sev_fam%.2xh_model%.2xh.sbin",
-+		 boot_cpu_data.x86, boot_cpu_data.x86_model);
-+
-+	snprintf(fw_name_subset, sizeof(fw_name_subset),
-+		 "amd/amd_sev_fam%.2xh_model%.1xxh.sbin",
-+		 boot_cpu_data.x86, (boot_cpu_data.x86_model & 0xf0) >> 4);
-+
-+	/* Check for SEV FW for a particular model.
-+	 * Ex. amd_sev_fam17h_model00h.sbin for Family 17h Model 00h
-+	 *
-+	 * or
-+	 *
-+	 * Check for SEV FW common to a subset of models.
-+	 * Ex. amd_sev_fam17h_model0xh.sbin for
-+	 *     Family 17h Model 00h -- Family 17h Model 0Fh
-+	 *
-+	 * or
-+	 *
-+	 * Fall-back to using generic name: sev.fw
-+	 */
-+	if ((firmware_request_nowarn(firmware, fw_name_specific, dev) >= 0) ||
-+	    (firmware_request_nowarn(firmware, fw_name_subset, dev) >= 0) ||
-+	    (firmware_request_nowarn(firmware, SEV_FW_FILE, dev) >= 0))
-+		return 0;
-+
-+	return -ENOENT;
-+}
-+
- /* Don't fail if SEV FW couldn't be updated. Continue with existing SEV FW */
- static int sev_update_firmware(struct device *dev)
- {
-@@ -449,9 +484,10 @@ static int sev_update_firmware(struct device *dev)
- 	struct page *p;
- 	u64 data_size;
- 
--	ret = request_firmware(&firmware, SEV_FW_FILE, dev);
--	if (ret < 0)
-+	if (sev_get_firmware(dev, &firmware) == -ENOENT) {
-+		dev_dbg(dev, "No SEV firmware file present\n");
- 		return -1;
-+	}
- 
- 	/*
- 	 * SEV FW expects the physical address given to it to be 32
--- 
-2.7.4
+> ---
+>  include/soc/fsl/dpaa2-fd.h | 242 +++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 242 insertions(+)
+>
