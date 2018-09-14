@@ -1,31 +1,78 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 1/1] crypto: cavium/nitrox - Added support for SR-IOV
- configuration.
-Date: Fri, 14 Sep 2018 14:12:18 +0800
-Message-ID: <20180914061218.uhtza76d72cwpipj@gondor.apana.org.au>
-References: <1536303678-3674-1-git-send-email-Jampala.Srikanth@cavium.com>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH net-next v3 02/17] zinc: introduce minimal cryptography library
+Date: Fri, 14 Sep 2018 08:15:24 +0200
+Message-ID: <CAKv+Gu8zULznCmgz++LNNTwfTifaz5L92h=vvWb4yh5fHh-huQ@mail.gmail.com>
+References: <20180911010838.8818-1-Jason@zx2c4.com> <20180911010838.8818-3-Jason@zx2c4.com>
+ <CAKv+Gu9nSeo4PFVrtjtqGQ32eqyxUp3xVCczZfu+dhFz5yLM0A@mail.gmail.com>
+ <CAHmME9rTEFLaYmzFrc719LW2DWS2Ua_vL6by1UXZ9uDvMpbhYw@mail.gmail.com>
+ <CAKv+Gu9RGo9rtGsmwMLZ_=-WSQ_h7har4agXP-2XOKupq-KYtA@mail.gmail.com>
+ <CALCETrU2qkLVaxC=cpU5iAeT5B7xGsR+m2ZWtLVK37jMMWtcAA@mail.gmail.com>
+ <CAKv+Gu8z1r7F_wbR6-e0Vbryqby7djDy2OR6JJURCsTo6ZMa2g@mail.gmail.com>
+ <CAHmME9pcODNc2m26DH1cQY6R+grxYW5dvFpNDpz_GiugM3qufw@mail.gmail.com>
+ <CAKv+Gu9GVbSETjp01tANMwJgA6O9aexhnH+47836KjZg+71q2A@mail.gmail.com> <CAHmME9qjTyYpm_PsQ5_oZSfZBGa29zME1XHVak9F4Ued-qm67g@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, sgadam@cavium.com
-To: Srikanth Jampala <Jampala.Srikanth@cavium.com>
+Content-Type: text/plain; charset="UTF-8"
+Cc: Andrew Lutomirski <luto@kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Netdev <netdev@vger.kernel.org>,
+        David Miller <davem@davemloft.net>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Samuel Neves <sneves@dei.uc.pt>,
+        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1536303678-3674-1-git-send-email-Jampala.Srikanth@cavium.com>
+In-Reply-To: <CAHmME9qjTyYpm_PsQ5_oZSfZBGa29zME1XHVak9F4Ued-qm67g@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Sep 07, 2018 at 12:31:18PM +0530, Srikanth Jampala wrote:
-> Added support to configure SR-IOV using sysfs interface.
-> Supported VF modes are 16, 32, 64 and 128. Grouped the
-> hardware configuration functions to "nitrox_hal.h" file.
-> Changed driver version to "1.1".
-> 
-> Signed-off-by: Srikanth Jampala <Jampala.Srikanth@cavium.com>
-> Reviewed-by: Gadam Sreerama <sgadam@cavium.com>
+On 13 September 2018 at 17:58, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+> On Thu, Sep 13, 2018 at 5:43 PM Ard Biesheuvel
+> <ard.biesheuvel@linaro.org> wrote:
+>> I'd prefer it if all the accelerated software implementations live in
+>> the same place. But I do strongly prefer arch code to live in
+>> arch/$arch
+>
+> Zinc follows the scheme of the raid6 code, as well as of most other
+> crypto libraries: code is grouped by cipher, making it easy for people
+> to work with and understand differing implementations. It also allows
+> us to trivially link these together at compile time rather than at
+> link time, which makes cipher selection much more efficient. It's
+> really much more maintainable this way.
+>
+>> I think AES-GCM is a useful example here. I really like the SIMD token
+>> abstraction a lot, but I would like to understand how this would work
+>> in Zinc if you have
+>> a) a generic implementation
+>> b) perhaps an arch specific scalar implementation
+>> c) a pure NEON implementation
+>> d) an implementation using AES instructions but not the PMULL instructions
+>> e) an implementation that uses AES and PMULL instructions.
+>
+> The same way that Zinc currently chooses between the five different
+> implementations for, say, x86_64 ChaCha20:
+>
+> - Generic C scalar
+> - SSSE3
+> - AVX2
+> - AVX512F
+> - AVX512VL
+>
+> We make a decision based on CPU capabilities, SIMD context, and input
+> length, and then choose the right function.
+>
 
-Patch applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+OK, so given random.c's future dependency on Zinc (for ChaCha20), and
+the fact that Zinc is one monolithic piece of code, all versions of
+all algorithms will always be statically linked into the kernel
+proper. I'm not sure that is acceptable.
+
+>> You know what? If you're up for it, let's not wait until Plumbers, but
+>> instead, let's collaborate off list to get this into shape.
+>
+> Sure, sounds good.
+>
+
+BTW you haven't answered my question yet about what happens when the
+WireGuard protocol version changes: will we need a flag day and switch
+all deployments over at the same time?
