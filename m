@@ -1,107 +1,60 @@
-From: Jerome Glisse <jglisse@redhat.com>
-Subject: Re: [RFCv2 PATCH 0/7] A General Accelerator Framework, WarpDrive
-Date: Fri, 14 Sep 2018 10:13:43 -0400
-Message-ID: <20180914141342.GB3826@redhat.com>
-References: <20180907165303.GA3519@redhat.com>
- <20180910032809.GJ230707@Turing-Arch-b>
- <20180910145423.GA3488@redhat.com>
- <20180911024209.GK230707@Turing-Arch-b>
- <20180911033358.GA4730@redhat.com>
- <20180911064043.GA207969@Turing-Arch-b>
- <20180911134013.GA3932@redhat.com>
- <20180913083232.GB207969@Turing-Arch-b>
- <20180913145149.GB3576@redhat.com>
- <AADFC41AFE54684AB9EE6CBC0274A5D191303A7F@SHSMSX101.ccr.corp.intel.com>
+From: David Sterba <dsterba-AlSwsSmVLrQ@public.gmane.org>
+Subject: Re: [PATCH v2 05/17] compat_ioctl: move more drivers to
+ generic_compat_ioctl_ptrarg
+Date: Fri, 14 Sep 2018 16:23:24 +0200
+Message-ID: <20180914142324.GI5847@twin.jikos.cz>
+References: <20180912150142.157913-1-arnd@arndb.de>
+ <20180912151134.436719-1-arnd@arndb.de>
+Reply-To: dsterba-AlSwsSmVLrQ@public.gmane.org
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-Cc: Kenneth Lee <liguozhu@hisilicon.com>,
-        Kenneth Lee <nek.in.cn@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Zaibo Xu <xuzaibo@huawei.com>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        "Kumar, Sanjay K" <sanjay.k.kumar@intel.com>,
-        Hao Fang <fanghao11@huawei.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linuxarm@huawei.com" <linuxarm@huawei.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Zhou Wang <wangzhou1@hisilicon.com>,
-        Philippe Ombredanne <pombredanne@
-To: "Tian, Kevin" <kevin.tian@intel.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: linux-fbdev-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-iio-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+ linux-pci-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-remoteproc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+ linux-nvme-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, platform-driver-x86-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+ sparclinux-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, devel-gWbeCf7V1WCQmaza687I9mD2FQJk+8+b@public.gmane.org,
+ linux-scsi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-nvdimm-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org,
+ linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, qat-linux-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, amd-gfx-PD4FTy7X32lNgt0PjOBp9y5qC8QIuHrW@public.gmane.org,
+ linux-input-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-media-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+ linaro-mm-sig-cunTk1MwBs8s++Sfvej+rw@public.gmane.org, dri-devel-PD4FTy7X32lNgt0PjOBp9y5qC8QIuHrW@public.gmane.org,
+ ceph-devel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Greg Kroah-Hartman <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>,
+ linux-usb-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-wireless-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+ linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+ netdev-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+ linuxppc-dev-uLR06cmDAlY/bJ5BZ2RsiQ@public.gmane.org, "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
+ linux-btrfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org
+To: Arnd Bergmann <arnd-r2nGTMty4D4@public.gmane.org>
+Return-path: <linux-nvdimm-bounces-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org>
 Content-Disposition: inline
-In-Reply-To: <AADFC41AFE54684AB9EE6CBC0274A5D191303A7F@SHSMSX101.ccr.corp.intel.com>
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <20180912151134.436719-1-arnd-r2nGTMty4D4@public.gmane.org>
+List-Unsubscribe: <https://lists.01.org/mailman/options/linux-nvdimm>,
+ <mailto:linux-nvdimm-request-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.01.org/pipermail/linux-nvdimm/>
+List-Post: <mailto:linux-nvdimm-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org>
+List-Help: <mailto:linux-nvdimm-request-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.01.org/mailman/listinfo/linux-nvdimm>,
+ <mailto:linux-nvdimm-request-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org?subject=subscribe>
+Errors-To: linux-nvdimm-bounces-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org
+Sender: "Linux-nvdimm" <linux-nvdimm-bounces-hn68Rpc1hR1g9hUCZPvPmw@public.gmane.org>
 List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Sep 14, 2018 at 06:50:55AM +0000, Tian, Kevin wrote:
-> > From: Jerome Glisse
-> > Sent: Thursday, September 13, 2018 10:52 PM
-> >
-> [...]
->  > AFAIK, on x86 and PPC at least, all PCIE devices are in the same group
-> > by default at boot or at least all devices behind the same bridge.
+On Wed, Sep 12, 2018 at 05:08:52PM +0200, Arnd Bergmann wrote:
+> The .ioctl and .compat_ioctl file operations have the same prototype so
+> they can both point to the same function, which works great almost all
+> the time when all the commands are compatible.
 > 
-> the group thing reflects physical hierarchy limitation, not changed
-> cross boot. Please note iommu group defines the minimal isolation
-> boundary - all devices within same group must be attached to the
-> same iommu domain or address space, because physically IOMMU
-> cannot differentiate DMAs out of those devices. devices behind
-> legacy PCI-X bridge is one example. other examples include devices
-> behind a PCIe switch port which doesn't support ACS thus cannot
-> route p2p transaction to IOMMU. If talking about typical PCIe 
-> endpoint (with upstreaming ports all supporting ACS), you'll get
-> one device per group.
+> One exception is the s390 architecture, where a compat pointer is only
+> 31 bit wide, and converting it into a 64-bit pointer requires calling
+> compat_ptr(). Most drivers here will ever run in s390, but since we now
+> have a generic helper for it, it's easy enough to use it consistently.
 > 
-> One iommu group today is attached to only one iommu domain.
-> In the future one group may attach to multiple domains, as the
-> aux domain concept being discussed in another thread.
-
-Thanks for the info.
-
+> I double-checked all these drivers to ensure that all ioctl arguments
+> are used as pointers or are ignored, but are not interpreted as integer
+> values.
 > 
-> > 
-> > Maybe they are kernel option to avoid that and userspace init program
-> > can definitly re-arrange that base on sysadmin policy).
-> 
-> I don't think there is such option, as it may break isolation model
-> enabled by IOMMU.
-> 
-> [...]
-> > > > That is why i am being pedantic :) on making sure there is good reasons
-> > > > to do what you do inside VFIO. I do believe that we want a common
-> > frame-
-> > > > work like the one you are proposing but i do not believe it should be
-> > > > part of VFIO given the baggages it comes with and that are not relevant
-> > > > to the use cases for this kind of devices.
-> > >
-> 
-> The purpose of VFIO is clear - the kernel portal for granting generic 
-> device resource (mmio, irq, etc.) to user space. VFIO doesn't care
-> what exactly a resource is used for (queue, cmd reg, etc.). If really
-> pursuing VFIO path is necessary, maybe such common framework
-> should lay down in user space, which gets all granted resource from
-> kernel driver thru VFIO and then provides accelerator services to 
-> other processes?
+> Signed-off-by: Arnd Bergmann <arnd-r2nGTMty4D4@public.gmane.org>
+> ---
 
-Except that many existing device driver falls under that description
-(ie exposing mmio, command queues, ...) and are not under VFIO.
+>  fs/btrfs/super.c                            | 2 +-
 
-Up to mdev VFIO was all about handling a full device to userspace AFAIK.
-With the introduction of mdev a host kernel driver can "slice" its
-device and share it through VFIO to userspace. Note that in that case
-it might never end over any mmio, irq, ... the host driver might just
-be handling over memory and would be polling from it to schedule on
-the real hardware.
-
-
-The question i am asking about warpdrive is wether being in VFIO is
-necessary ? as i do not see the requirement myself.
-
-Cheers,
-Jérôme
+Acked-by: David Sterba <dsterba-IBi9RG/b67k@public.gmane.org>
