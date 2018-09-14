@@ -1,78 +1,67 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Subject: Re: [PATCH net-next v3 02/17] zinc: introduce minimal cryptography library
-Date: Fri, 14 Sep 2018 08:15:24 +0200
-Message-ID: <CAKv+Gu8zULznCmgz++LNNTwfTifaz5L92h=vvWb4yh5fHh-huQ@mail.gmail.com>
+Date: Fri, 14 Sep 2018 08:21:00 +0200
+Message-ID: <CAKv+Gu8qtt5n2r=ro1m3U+q311fims=N+jtacV-767oz-92C9g@mail.gmail.com>
 References: <20180911010838.8818-1-Jason@zx2c4.com> <20180911010838.8818-3-Jason@zx2c4.com>
  <CAKv+Gu9nSeo4PFVrtjtqGQ32eqyxUp3xVCczZfu+dhFz5yLM0A@mail.gmail.com>
- <CAHmME9rTEFLaYmzFrc719LW2DWS2Ua_vL6by1UXZ9uDvMpbhYw@mail.gmail.com>
- <CAKv+Gu9RGo9rtGsmwMLZ_=-WSQ_h7har4agXP-2XOKupq-KYtA@mail.gmail.com>
- <CALCETrU2qkLVaxC=cpU5iAeT5B7xGsR+m2ZWtLVK37jMMWtcAA@mail.gmail.com>
- <CAKv+Gu8z1r7F_wbR6-e0Vbryqby7djDy2OR6JJURCsTo6ZMa2g@mail.gmail.com>
- <CAHmME9pcODNc2m26DH1cQY6R+grxYW5dvFpNDpz_GiugM3qufw@mail.gmail.com>
- <CAKv+Gu9GVbSETjp01tANMwJgA6O9aexhnH+47836KjZg+71q2A@mail.gmail.com> <CAHmME9qjTyYpm_PsQ5_oZSfZBGa29zME1XHVak9F4Ued-qm67g@mail.gmail.com>
+ <20180911220849.GC81235@gmail.com> <CAHmME9rxrC+CAR-xoXd-bZO1HYZ+TjvT_K4xgQwWXE53zi61xQ@mail.gmail.com>
+ <CAKv+Gu9ZjX3A4bHHgRAkJtr+SKwti+d3dwE0fhGtmeQB_refqw@mail.gmail.com> <20180912183444.GB222557@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Cc: Andrew Lutomirski <luto@kernel.org>,
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
         LKML <linux-kernel@vger.kernel.org>,
         Netdev <netdev@vger.kernel.org>,
         David Miller <davem@davemloft.net>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Andrew Lutomirski <luto@kernel.org>,
         Samuel Neves <sneves@dei.uc.pt>,
         Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAHmME9qjTyYpm_PsQ5_oZSfZBGa29zME1XHVak9F4Ued-qm67g@mail.gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
+To: Eric Biggers <ebiggers@kernel.org>
+Return-path: <netdev-owner@vger.kernel.org>
+In-Reply-To: <20180912183444.GB222557@gmail.com>
+Sender: netdev-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 13 September 2018 at 17:58, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
-> On Thu, Sep 13, 2018 at 5:43 PM Ard Biesheuvel
-> <ard.biesheuvel@linaro.org> wrote:
->> I'd prefer it if all the accelerated software implementations live in
->> the same place. But I do strongly prefer arch code to live in
->> arch/$arch
+On 12 September 2018 at 20:34, Eric Biggers <ebiggers@kernel.org> wrote:
+> On Wed, Sep 12, 2018 at 08:19:21PM +0200, Ard Biesheuvel wrote:
+>> On 12 September 2018 at 20:16, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+>> > Hi Eric,
+>> >
+>> > On Wed, Sep 12, 2018 at 12:08 AM Eric Biggers <ebiggers@kernel.org> wrote:
+>> >> I'd strongly prefer the assembly to be readable too.  Jason, I'm not sure if
+>> >> you've actually read through the asm from the OpenSSL implementations, but the
+>> >> generated .S files actually do lose a lot of semantic information that was in
+>> >> the original .pl scripts.
+>> >
+>> > The thing to keep in mind is that the .S was not directly and blindly
+>> > generated from the .pl. We started with the output of the .pl, and
+>> > then, particularly in the case of x86_64, worked with it a lot, and
+>> > now it's something a bit different. We've definitely spent a lot of
+>> > time reading that assembly.
+>> >
+>>
+>> Can we please have those changes as a separate patch? Preferably to
+>> the .pl file rather than the .S file, so we can easily distinguish the
+>> code from upstream from the code that you modified.
+>>
+>> > I'll see if I can improve the readability with some register name
+>> > remapping on ARM. No guarantees, but I'll play a bit and see if I can
+>> > make it a bit better.
+>> >
+>> > Jason
 >
-> Zinc follows the scheme of the raid6 code, as well as of most other
-> crypto libraries: code is grouped by cipher, making it easy for people
-> to work with and understand differing implementations. It also allows
-> us to trivially link these together at compile time rather than at
-> link time, which makes cipher selection much more efficient. It's
-> really much more maintainable this way.
+> FWIW, yesterday I made a modified version of poly1305-armv4.pl that generates an
+> asm file that works in kernel mode.  The changes are actually pretty small, and
+> I think we can get them upstream into OpenSSL like they were for sha256-armv4.pl
+> and sha512-armv4.pl.  I'll start a thread with Andy Polyakov and you two.
 >
->> I think AES-GCM is a useful example here. I really like the SIMD token
->> abstraction a lot, but I would like to understand how this would work
->> in Zinc if you have
->> a) a generic implementation
->> b) perhaps an arch specific scalar implementation
->> c) a pure NEON implementation
->> d) an implementation using AES instructions but not the PMULL instructions
->> e) an implementation that uses AES and PMULL instructions.
->
-> The same way that Zinc currently chooses between the five different
-> implementations for, say, x86_64 ChaCha20:
->
-> - Generic C scalar
-> - SSSE3
-> - AVX2
-> - AVX512F
-> - AVX512VL
->
-> We make a decision based on CPU capabilities, SIMD context, and input
-> length, and then choose the right function.
->
-
-OK, so given random.c's future dependency on Zinc (for ChaCha20), and
-the fact that Zinc is one monolithic piece of code, all versions of
-all algorithms will always be statically linked into the kernel
-proper. I'm not sure that is acceptable.
-
->> You know what? If you're up for it, let's not wait until Plumbers, but
->> instead, let's collaborate off list to get this into shape.
->
-> Sure, sounds good.
+> But I don't have time to help with all the many OpenSSL asm files Jason is
+> proposing, just maybe poly1305-armv4 and chacha-armv4 for now.
 >
 
-BTW you haven't answered my question yet about what happens when the
-WireGuard protocol version changes: will we need a flag day and switch
-all deployments over at the same time?
+Thanks Eric. I reached out to Andy Polyakov off line, and he is happy
+to work with us again on this, although he did point out that our
+experiences on ARM may not extrapolate to x86_64, given the fact that
+the perl sources there also contain parameterization for the calling
+convention differences between Windows and SysV.
