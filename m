@@ -1,115 +1,71 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [PATCH net-next v4 00/20] WireGuard: Secure Network Tunnel
-Date: Fri, 14 Sep 2018 19:39:57 +0200
-Message-ID: <CAKv+Gu_LYsNs88uF4+G1xfOtWvNPOjiiYZKqZf7qSBkvn6iEoA@mail.gmail.com>
-References: <20180914161954.7325-1-Jason@zx2c4.com>
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: Re: [PATCH net-next v4 08/20] zinc: Poly1305 ARM and ARM64 implementations
+Date: Fri, 14 Sep 2018 19:45:32 +0200
+Message-ID: <CAHmME9rnzs5x3RTa3ZY0wYvScwssOumNL90YMTXyO4sv8Lwvgw@mail.gmail.com>
+References: <20180914162240.7925-1-Jason@zx2c4.com> <20180914162240.7925-9-Jason@zx2c4.com>
+ <CAKv+Gu8BD=fLk3zm8tvRQ3H-yiePqzXOrKLEz1BLFSRRz2opOQ@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "<netdev@vger.kernel.org>" <netdev@vger.kernel.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc: LKML <linux-kernel@vger.kernel.org>,
+        Netdev <netdev@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        David Miller <davem@davemloft.net>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Samuel Neves <sneves@dei.uc.pt>,
+        Andrew Lutomirski <luto@kernel.org>,
+        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
+        Andy Polyakov <appro@openssl.org>,
+        Russell King - ARM Linux <linux@armlinux.org.uk>,
+        linux-arm-kernel@lists.infradead.org
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180914161954.7325-1-Jason@zx2c4.com>
+In-Reply-To: <CAKv+Gu8BD=fLk3zm8tvRQ3H-yiePqzXOrKLEz1BLFSRRz2opOQ@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 14 September 2018 at 18:19, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
-> Changes v3->v4:
->   - Remove mistaken double 07/17 patch.
->   - Fix whitespace issues in blake2s assembly.
->   - It's not possible to put compound literals into __initconst, so
->     we now instead just use boring fixed size struct members.
->   - Move away from makefile ifdef maze and instead prefer kconfig values,
->     which also makes the design a bit more modular too, which could help
->     in the future.
+Hi Ard,
 
-Could you elaborate on this? From the patches, it is not clear to me
-how this has improved.
+On Fri, Sep 14, 2018 at 7:27 PM Ard Biesheuvel
+<ard.biesheuvel@linaro.org> wrote:
+> As I asked in response to v3, could we please have this as a separate
+> patch on top? The diff below is corrupted.
 
->   - Port old crypto API implementations (ChaCha20 and Poly1305) to Zinc.
->   - Port security/keys/big_key to Zinc as second example of a good usage of
->     Zinc.
->   - Document precisely what is different between the kernel code and
->     CRYPTOGAMS code when the CRYPTOGAMS code is used.
->   - Move changelog to top of 00/20 message so that people can
->     actually find it.
->
-> -----------------------------------------------------------
->
-> This patchset is available on git.kernel.org in this branch, where it may be
-> pulled directly for inclusion into net-next:
->
->   * https://git.kernel.org/pub/scm/linux/kernel/git/zx2c4/linux.git/log/?h=jd/wireguard
->
-> -----------------------------------------------------------
->
-> WireGuard is a secure network tunnel written especially for Linux, which
-> has faced around three years of serious development, deployment, and
-> scrutiny. It delivers excellent performance and is extremely easy to
-> use and configure. It has been designed with the primary goal of being
-> both easy to audit by virtue of being small and highly secure from a
-> cryptography and systems security perspective. WireGuard is used by some
-> massive companies pushing enormous amounts of traffic, and likely
-> already today you've consumed bytes that at some point transited through
-> a WireGuard tunnel. Even as an out-of-tree module, WireGuard has been
-> integrated into various userspace tools, Linux distributions, mobile
-> phones, and data centers. There are ports in several languages to
-> several operating systems, and even commercial hardware and services
-> sold integrating WireGuard. It is time, therefore, for WireGuard to be
-> properly integrated into Linux.
->
-> Ample information, including documentation, installation instructions,
-> and project details, is available at:
->
->   * https://www.wireguard.com/
->   * https://www.wireguard.com/papers/wireguard.pdf
->
-> As it is currently an out-of-tree module, it lives in its own git repo
-> and has its own mailing list, and every commit for the module is tested
-> against every stable kernel since 3.10 on a variety of architectures
-> using an extensive test suite:
->
->   * https://git.zx2c4.com/WireGuard
->     https://git.kernel.org/pub/scm/linux/kernel/git/zx2c4/WireGuard.git/
->   * https://lists.zx2c4.com/mailman/listinfo/wireguard
->   * https://www.wireguard.com/build-status/
->
-> The project has been broadly discussed at conferences, and was presented
-> to the Netdev developers in Seoul last November, where a paper was
-> released detailing some interesting aspects of the project. Dave asked
-> me after the talk if I would consider sending in a v1 "sooner rather
-> than later", hence this patchset. A decision is still waiting from the
-> Linux Plumbers Conference, but an update on these topics may be presented
-> in Vancouver in a few months. Prior presentations:
->
->   * https://www.wireguard.com/presentations/
->   * https://www.wireguard.com/papers/wireguard-netdev22.pdf
->
-> The cryptography in the protocol itself has been formally verified by
-> several independent academic teams with positive results, and I know of
-> two additional efforts on their way to further corroborate those
-> findings. The version 1 protocol is "complete", and so the purpose of
-> this review is to assess the implementation of the protocol. However, it
-> still may be of interest to know that the thing you're reviewing uses a
-> protocol with various nice security properties:
->
->   * https://www.wireguard.com/formal-verification/
->
-> This patchset is divided into four segments. The first introduces a very
-> simple helper for working with the FPU state for the purposes of amortizing
-> SIMD operations. The second segment is a small collection of cryptographic
-> primitives, split up into several commits by primitive and by hardware. The
-> third shows usage of Zinc within the existing crypto API and as a replacement
-> to the existing crypto API. The last is WireGuard itself, presented as an
-> unintrusive and self-contained virtual network driver.
->
-> It is intended that this entire patch series enter the kernel through
-> DaveM's net-next tree. Subsequently, WireGuard patches will go through
-> DaveM's net-next tree, while Zinc patches will go through Greg KH's tree.
->
-> Enjoy,
-> Jason
+I had played with that originally, but thought it made things actually
+harder to review, whereas here you have the changes presented pretty
+straight forwardly, and I'd appreciate your review of them. If you and
+Eric both prefer I split this into two commits, with the first one
+just plopping down the CRYPTOGAMS code as is and the second one
+bringing it up to kernel-snuff, I can do that.
+
+> Also, both Andy and Eric have offered to get involved in upstreaming
+> these changes to OpenSSL, so there is no delta to begin with.
+
+Yes, I think this is probably a good long-term plan, which we can act
+on sometime after Zinc is merged.
+
+> I still don't like the GCC -includes, especially because these .h
+> files contain function and variable definitions so they are not
+> actually header files to begin with.
+
+I very very strongly disagree with you here. I think doing it via
+-include is significantly cleaner than any of the alternatives, and
+allows the code to be cleanly expressed as conditionals that the
+optimizer trivially compiles out in the case of stub functions
+returning false and branch optimizes when the stub functions return
+true. It is extremely important that these compile together as one
+compilation unit. Yes, this is a different design than the crypto
+API's approach, but I believe the approach presented here poses
+significant improvements and is a lot cleaner.
+
+> Also, you mentioned in the commit log that you got rid of defines and
+> made the code more modular, but as far as I can tell, libzinc is still
+> a single monolithic binary that is essentially always builtin once we
+> move random.c to it.
+
+Yes, it's still monolithic, but it's now trivial to split up when the
+time comes to do that. If you and AndyL think that it should be split
+into multiple modules _now_, then I can go ahead and do that for v5.
+But if it's not essential, it seems simpler to keep it as is. I'll
+wait for word from you two on this.
+
+Jason
