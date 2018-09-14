@@ -1,47 +1,32 @@
-From: Al Viro <viro@ZenIV.linux.org.uk>
-Subject: Re: [PATCH v2 05/17] compat_ioctl: move more drivers to
- generic_compat_ioctl_ptrarg
-Date: Fri, 14 Sep 2018 21:57:48 +0100
-Message-ID: <20180914205748.GC19965@ZenIV.linux.org.uk>
-References: <20180912150142.157913-1-arnd@arndb.de>
- <20180912151134.436719-1-arnd@arndb.de>
- <20180914203506.GE35251@wrath>
+From: Janakarajan Natarajan <Janakarajan.Natarajan@amd.com>
+Subject: [PATCH 0/2] Miscellaneous SEV fixes
+Date: Fri, 14 Sep 2018 17:32:02 -0500
+Message-ID: <cover.1536959537.git.Janakarajan.Natarajan@amd.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Arnd Bergmann <arnd@arndb.de>, linux-fsdevel@vger.kernel.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        devel@driverdev.osuosl.org, linux-kernel@vger.kernel.org,
-        qat-linux@intel.com, linux-crypto@vger.kernel.org,
-        linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        linaro-mm-sig@lists.linaro.org, amd-gfx@lists.freedesktop.org,
-        linux-input@vger.kernel.org, linux-iio@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-nvdimm@lists.01.org,
-        linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
-        platform-driver-x86@vger.kernel.org,
-        linux-remoteproc@vger.kernel.org, sparclinux@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-usb@vger.kernel.org,
-        linux-fbdev@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-btrfs@vg
-To: Darren Hart <dvhart@infradead.org>
-Return-path: <netdev-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20180914203506.GE35251@wrath>
-Sender: netdev-owner@vger.kernel.org
+Content-Type: text/plain
+Cc: Tom Lendacky <thomas.lendacky@amd.com>,
+        Gary Hook <gary.hook@amd.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Janakarajan Natarajan <Janakarajan.Natarajan@amd.com>
+To: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Sep 14, 2018 at 01:35:06PM -0700, Darren Hart wrote:
- 
-> Acked-by: Darren Hart (VMware) <dvhart@infradead.org>
-> 
-> As for a longer term solution, would it be possible to init fops in such
-> a way that the compat_ioctl call defaults to generic_compat_ioctl_ptrarg
-> so we don't have to duplicate this boilerplate for every ioctl fops
-> structure?
+The first patch provides a fix for a static checker warning.
 
-	Bad idea, that...  Because several years down the road somebody will add
-an ioctl that takes an unsigned int for argument.  Without so much as looking
-at your magical mystery macro being used to initialize file_operations.
+The second patch allows for the SEV firmware blob, which will
+be searched for when updating SEV during PSP initialization,
+to be named based on the family and model of the processor.
 
-	FWIW, I would name that helper in more blunt way - something like
-compat_ioctl_only_compat_pointer_ioctls_here()...
+Janakarajan Natarajan (2):
+  Fix static checker warning
+  Allow SEV firmware to be chosen based on Family and Model
+
+ drivers/crypto/ccp/psp-dev.c | 46 +++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 41 insertions(+), 5 deletions(-)
+
+-- 
+2.7.4
