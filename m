@@ -1,24 +1,121 @@
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: Re: [PATCH net-next v4 20/20] net: WireGuard secure network tunnel
-Date: Sun, 16 Sep 2018 01:48:46 +0200
-Message-ID: <CAHmME9p9z_aO_9FS7ouCOPG3dCENgBPzUs=Rc0ciaiY9kCK3RA@mail.gmail.com>
-References: <20180914162240.7925-21-Jason@zx2c4.com> <201809160701.EQDrNg4f%fengguang.wu@intel.com>
+From: kbuild test robot <lkp@intel.com>
+Subject: Re: [PATCH net-next v4 19/20] security/keys: rewrite big_key crypto
+ to use Zinc
+Date: Sun, 16 Sep 2018 07:52:00 +0800
+Message-ID: <201809160738.Z71qdjGu%fengguang.wu@intel.com>
+References: <20180914162240.7925-20-Jason@zx2c4.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: kbuild-all@01.org, LKML <linux-kernel@vger.kernel.org>,
-        Netdev <netdev@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        David Miller <davem@davemloft.net>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: kbuild test robot <lkp@intel.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: kbuild-all@01.org, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
+        davem@davemloft.net, gregkh@linuxfoundation.org,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Samuel Neves <sneves@dei.uc.pt>,
+        Andy Lutomirski <luto@kernel.org>,
+        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
+        Eric Biggers <ebiggers3@gmail.com>,
+        David Howells <dhowells@redhat.com>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <201809160701.EQDrNg4f%fengguang.wu@intel.com>
+Content-Disposition: inline
+In-Reply-To: <20180914162240.7925-20-Jason@zx2c4.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi Mr. Ro Bot,
+Hi Jason,
 
-Looks like this is related to stack frames with KASAN. I've fixed this for v5.
+I love your patch! Yet something to improve:
 
-Thanks,
-Jason
+[auto build test ERROR on net-next/master]
+
+url:    https://github.com/0day-ci/linux/commits/Jason-A-Donenfeld/WireGuard-Secure-Network-Tunnel/20180916-043623
+config: arm64-defconfig
+compiler: aarch64-linux-gnu-gcc (Debian 7.2.0-11) 7.2.0
+reproduce:
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        GCC_VERSION=7.2.0 make.cross ARCH=arm64  defconfig
+        GCC_VERSION=7.2.0 make.cross ARCH=arm64 
+
+All errors (new ones prefixed by >>):
+
+>> drivers/acpi/Kconfig:9:error: recursive dependency detected!
+   drivers/acpi/Kconfig:9: symbol ACPI depends on ARCH_SUPPORTS_ACPI
+   drivers/acpi/Kconfig:6: symbol ARCH_SUPPORTS_ACPI is selected by EFI
+   arch/arm64/Kconfig:1253: symbol EFI depends on KERNEL_MODE_NEON
+   arch/arm64/Kconfig:262: symbol KERNEL_MODE_NEON is implied by ZINC_ARCH_ARM
+   lib/zinc/Kconfig:42: symbol ZINC_ARCH_ARM depends on ZINC
+>> lib/zinc/Kconfig:1: symbol ZINC is selected by ZINC_CHACHA20
+>> lib/zinc/Kconfig:4: symbol ZINC_CHACHA20 is selected by ZINC_CHACHA20POLY1305
+>> lib/zinc/Kconfig:13: symbol ZINC_CHACHA20POLY1305 is selected by BIG_KEYS
+>> security/keys/Kconfig:44: symbol BIG_KEYS depends on KEYS
+>> security/keys/Kconfig:5: symbol KEYS is selected by FS_ENCRYPTION
+>> fs/crypto/Kconfig:1: symbol FS_ENCRYPTION is selected by UBIFS_FS_ENCRYPTION
+>> fs/ubifs/Kconfig:65: symbol UBIFS_FS_ENCRYPTION depends on MISC_FILESYSTEMS
+>> fs/Kconfig:218: symbol MISC_FILESYSTEMS is selected by ACPI_APEI
+>> drivers/acpi/apei/Kconfig:8: symbol ACPI_APEI depends on ACPI
+   For a resolution refer to Documentation/kbuild/kconfig-language.txt
+   subsection "Kconfig recursive dependency limitations"
+
+vim +4 lib/zinc/Kconfig
+
+32bbe22e Jason A. Donenfeld 2018-09-14  @1  config ZINC
+32bbe22e Jason A. Donenfeld 2018-09-14   2  	tristate
+32bbe22e Jason A. Donenfeld 2018-09-14   3  
+35f45248 Jason A. Donenfeld 2018-09-14  @4  config ZINC_CHACHA20
+35f45248 Jason A. Donenfeld 2018-09-14   5  	bool
+35f45248 Jason A. Donenfeld 2018-09-14   6  	select ZINC
+35f45248 Jason A. Donenfeld 2018-09-14   7  	select CRYPTO_ALGAPI
+35f45248 Jason A. Donenfeld 2018-09-14   8  
+0a36c146 Jason A. Donenfeld 2018-09-14   9  config ZINC_POLY1305
+0a36c146 Jason A. Donenfeld 2018-09-14  10  	bool
+0a36c146 Jason A. Donenfeld 2018-09-14  11  	select ZINC
+0a36c146 Jason A. Donenfeld 2018-09-14  12  
+1b5dbb86 Jason A. Donenfeld 2018-09-14 @13  config ZINC_CHACHA20POLY1305
+1b5dbb86 Jason A. Donenfeld 2018-09-14  14  	bool
+1b5dbb86 Jason A. Donenfeld 2018-09-14  15  	select ZINC
+1b5dbb86 Jason A. Donenfeld 2018-09-14  16  	select ZINC_CHACHA20
+1b5dbb86 Jason A. Donenfeld 2018-09-14  17  	select ZINC_POLY1305
+1b5dbb86 Jason A. Donenfeld 2018-09-14  18  	select CRYPTO_BLKCIPHER
+1b5dbb86 Jason A. Donenfeld 2018-09-14  19  
+a740374c Jason A. Donenfeld 2018-09-14  20  config ZINC_BLAKE2S
+a740374c Jason A. Donenfeld 2018-09-14  21  	bool
+a740374c Jason A. Donenfeld 2018-09-14  22  	select ZINC
+a740374c Jason A. Donenfeld 2018-09-14  23  
+cec5aa7c Jason A. Donenfeld 2018-09-14  24  config ZINC_CURVE25519
+cec5aa7c Jason A. Donenfeld 2018-09-14  25  	bool
+cec5aa7c Jason A. Donenfeld 2018-09-14  26  	select ZINC
+cec5aa7c Jason A. Donenfeld 2018-09-14  27  	select CONFIG_CRYPTO
+cec5aa7c Jason A. Donenfeld 2018-09-14  28  
+32bbe22e Jason A. Donenfeld 2018-09-14  29  config ZINC_DEBUG
+32bbe22e Jason A. Donenfeld 2018-09-14  30  	bool "Zinc cryptography library debugging and self-tests"
+32bbe22e Jason A. Donenfeld 2018-09-14  31  	depends on ZINC
+32bbe22e Jason A. Donenfeld 2018-09-14  32  	help
+32bbe22e Jason A. Donenfeld 2018-09-14  33  	  This builds a series of self-tests for the Zinc crypto library, which
+32bbe22e Jason A. Donenfeld 2018-09-14  34  	  help diagnose any cryptographic algorithm implementation issues that
+32bbe22e Jason A. Donenfeld 2018-09-14  35  	  might be at the root cause of potential bugs. It also adds various
+32bbe22e Jason A. Donenfeld 2018-09-14  36  	  debugging traps.
+32bbe22e Jason A. Donenfeld 2018-09-14  37  
+32bbe22e Jason A. Donenfeld 2018-09-14  38  	  Unless you're developing and testing cryptographic routines, or are
+32bbe22e Jason A. Donenfeld 2018-09-14  39  	  especially paranoid about correctness on your hardware, you may say
+32bbe22e Jason A. Donenfeld 2018-09-14  40  	  N here.
+32bbe22e Jason A. Donenfeld 2018-09-14  41  
+32bbe22e Jason A. Donenfeld 2018-09-14 @42  config ZINC_ARCH_ARM
+32bbe22e Jason A. Donenfeld 2018-09-14  43  	def_bool y
+32bbe22e Jason A. Donenfeld 2018-09-14  44  	depends on ARM
+32bbe22e Jason A. Donenfeld 2018-09-14  45  	depends on ZINC
+32bbe22e Jason A. Donenfeld 2018-09-14  46  	imply VFP
+32bbe22e Jason A. Donenfeld 2018-09-14  47  	imply VFPv3 if CPU_V7
+32bbe22e Jason A. Donenfeld 2018-09-14  48  	imply NEON if CPU_V7
+32bbe22e Jason A. Donenfeld 2018-09-14  49  	imply KERNEL_MODE_NEON if CPU_V7
+32bbe22e Jason A. Donenfeld 2018-09-14  50  
+
+:::::: The code at line 4 was first introduced by commit
+:::::: 35f45248597b5a2c80f0f4a680344c22c86efe7d zinc: ChaCha20 generic C implementation
+
+:::::: TO: Jason A. Donenfeld <Jason@zx2c4.com>
+:::::: CC: 0day robot <lkp@intel.com>
+
+---
+0-DAY kernel test infrastructure                Open Source Technology Center
+https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
