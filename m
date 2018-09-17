@@ -1,7 +1,7 @@
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 Subject: Re: [PATCH 4.4.y] crypto: vmx - Fix sleep-in-atomic bugs
-Date: Mon, 17 Sep 2018 13:47:15 +0200
-Message-ID: <20180917114715.GG13057@kroah.com>
+Date: Mon, 17 Sep 2018 13:47:51 +0200
+Message-ID: <20180917114751.GH13057@kroah.com>
 References: <20180910074204.10812-1-omosnace@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
@@ -22,4 +22,6 @@ On Mon, Sep 10, 2018 at 09:42:04AM +0200, Ondrej Mosnacek wrote:
 >     aes_cbc.c - adapted enable/disable calls to v4.4 state
 >     aes_xts.c - did not exist yet in v4.4
 
-We don't need these lines here...  I'll go hand edit it out...
+Now applied, thanks.
+
+greg k-h
