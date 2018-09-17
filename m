@@ -1,37 +1,34 @@
-From: David Miller <davem@davemloft.net>
-Subject: Re: [PATCH net-next v3 02/17] zinc: introduce minimal cryptography
- library
-Date: Sun, 16 Sep 2018 21:45:49 -0700 (PDT)
-Message-ID: <20180916.214549.234387075817326903.davem@davemloft.net>
-References: <20180911233015.GD11474@lunn.ch>
-        <20180911.165739.2032677219588723041.davem@davemloft.net>
-        <CALCETrXrJPcs3h9CtF50N4k2AGx3qzspJd_UW3t+KGYOj7+p=Q@mail.gmail.com>
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: Re: [PATCH net-next v4 18/20] crypto: port ChaCha20 to Zinc
+Date: Mon, 17 Sep 2018 06:54:26 +0200
+Message-ID: <CAHmME9orPSvUH3dmnBvRfy_TEBoLO5VNHEMXaMo9a1WGP-rcXg@mail.gmail.com>
+References: <20180914162240.7925-1-Jason@zx2c4.com> <20180914162240.7925-19-Jason@zx2c4.com>
+ <72e893e7efbef428d4fd23b7332d9e829acd5e7d.camel@strongswan.org>
 Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-Cc: andrew@lunn.ch, Jason@zx2c4.com, ebiggers@kernel.org,
-        gregkh@linuxfoundation.org, ard.biesheuvel@linaro.org,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        sneves@dei.uc.pt, jeanphilippe.aumasson@gmail.com,
-        linux-crypto@vger.kernel.org
-To: luto@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Cc: LKML <linux-kernel@vger.kernel.org>,
+        Netdev <netdev@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        David Miller <davem@davemloft.net>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Samuel Neves <sneves@dei.uc.pt>,
+        Andrew Lutomirski <luto@kernel.org>,
+        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
+        Eric Biggers <ebiggers@google.com>
+To: Martin Willi <martin@strongswan.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CALCETrXrJPcs3h9CtF50N4k2AGx3qzspJd_UW3t+KGYOj7+p=Q@mail.gmail.com>
+In-Reply-To: <72e893e7efbef428d4fd23b7332d9e829acd5e7d.camel@strongswan.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-From: Andy Lutomirski <luto@kernel.org>
-Date: Sun, 16 Sep 2018 21:09:11 -0700
+Hey Martin,
 
-> CRYPTO API
-> M:      Herbert Xu <herbert@gondor.apana.org.au>
-> M:      "David S. Miller" <davem@davemloft.net>
-> L:      linux-crypto@vger.kernel.org
-> 
-> Herbert hasn't replied to any of these submissions.  You're the other
-> maintainer :)
+Thanks for running these and pointing this out. I've replicated the
+results with tcrypt and fixed some issues, and the next patch series
+should be a lot closer to what you'd expect, instead of the regression
+you noticed. Most of the slowdown happened as a result of over-eager
+XSAVEs, which I've now rectified. I'm still working on a few other
+facets of it, but I believe v5 will be more satisfactory when posted.
 
-Herbert is the primary crypto maintainer, I haven't done a serious
-review of crypto code in ages.
-
-So yes, Herbert review is what is important here.
+Regards,
+Jason
