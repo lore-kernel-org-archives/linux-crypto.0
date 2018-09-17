@@ -1,151 +1,40 @@
-From: Christoph Manszewski <c.manszewski@samsung.com>
-Subject: [PATCH v2 4/4] crypto: s5p-sss: Add aes-ctr support
-Date: Mon, 17 Sep 2018 17:09:30 +0200
-Message-ID: <20180917151011eucas1p274a1407a02081b49aa03da85cc9aec4c~VOImIjh2C1107511075eucas1p2w@eucas1p2.samsung.com>
-References: <1537196970-5987-1-git-send-email-c.manszewski@samsung.com>
-        <CGME20180917151011eucas1p274a1407a02081b49aa03da85cc9aec4c@eucas1p2.samsung.com>
-Content-Type: text/plain; charset="utf-8"
-Cc: Christoph Manszewski <c.manszewski@samsung.com>,
-        Krzysztof Kozlowski <krzk@kernel.org>,
-        Vladimir Zapolskiy <vz@mleia.com>,
-        Kamil Konieczny <k.konieczny@partner.samsung.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-samsung-soc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
-To: linux-crypto@vger.kernel.org
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: Re: [PATCH net-next v3 02/17] zinc: introduce minimal cryptography library
+Date: Mon, 17 Sep 2018 17:28:52 +0200
+Message-ID: <CAHmME9qQR4ynsZ5xXejEdnr3oZcOnpRRTdohX+eT9Df+AU2_iA@mail.gmail.com>
+References: <20180911214737.GA81235@gmail.com> <CAHmME9rFUruF-VN1pmU-k5nFsb9ppAPhPpW-5Ho9dKL2HCg4kA@mail.gmail.com>
+ <20180911233015.GD11474@lunn.ch> <20180911.165739.2032677219588723041.davem@davemloft.net>
+ <CALCETrXrJPcs3h9CtF50N4k2AGx3qzspJd_UW3t+KGYOj7+p=Q@mail.gmail.com>
+ <CAKv+Gu8QgRo-Oex2Sk5unET3FMq+1Cp2btAWXCB8xsALxjatHg@mail.gmail.com> <35BC21D7-01F4-4F91-A7E9-8D15DE5B95D6@amacapital.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Andrew Lutomirski <luto@kernel.org>,
+        David Miller <davem@davemloft.net>,
+        Andrew Lunn <andrew@lunn.ch>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Netdev <netdev@vger.kernel.org>, Samuel Neves <sneves@dei.uc.pt>,
+        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Andy Lutomirski <luto@amacapital.net>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1537196970-5987-1-git-send-email-c.manszewski@samsung.com>
+In-Reply-To: <35BC21D7-01F4-4F91-A7E9-8D15DE5B95D6@amacapital.net>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Add support for aes counter(ctr) block cipher mode of operation for
-Exynos Hardware. In contrast to ecb and cbc modes, aes-ctr allows
-encyption/decryption for request sizes not being a multiple of 16(bytes).
+On Mon, Sep 17, 2018 at 4:52 PM Andy Lutomirski <luto@amacapital.net> wrote:
+> > * (Nit) The GCC command line -include'd .h files contain variable and
+> > function definitions so they are actually .c files.
+>
+> Hmm. I would suggest just getting rid of the -include magic entirely.  The resulting ifdef will be more comprehensible.
 
-Hardware requires block sizes being a multiple of 16(bytes). In order to
-achieve this, copy request source and destination memory, and align it's size
-to 16. That way hardware processes additional bytes, that are omitted
-when copying the result back to its original destination.
-
-Tested on Odroid-U3 with Exynos 4412 CPU, kernel 4.19-rc2 with crypto
-run-time self test testmgr.
-
-Signed-off-by: Christoph Manszewski <c.manszewski@samsung.com>
-Reviewed-by: Krzysztof Kozlowski <krzk@kernel.org>
----
- drivers/crypto/s5p-sss.c | 45 ++++++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 40 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/crypto/s5p-sss.c b/drivers/crypto/s5p-sss.c
-index ba8f2e2ea88f..0064be0e3941 100644
---- a/drivers/crypto/s5p-sss.c
-+++ b/drivers/crypto/s5p-sss.c
-@@ -1813,7 +1813,7 @@ static struct ahash_alg algs_sha1_md5_sha256[] = {
- };
- 
- static void s5p_set_aes(struct s5p_aes_dev *dev,
--			const u8 *key, const u8 *iv,
-+			const u8 *key, const u8 *iv, const u8 *ctr,
- 			unsigned int keylen)
- {
- 	void __iomem *keystart;
-@@ -1821,6 +1821,9 @@ static void s5p_set_aes(struct s5p_aes_dev *dev,
- 	if (iv)
- 		memcpy_toio(dev->aes_ioaddr + SSS_REG_AES_IV_DATA(0), iv, 0x10);
- 
-+	if (ctr)
-+		memcpy_toio(dev->aes_ioaddr + SSS_REG_AES_CNT_DATA(0), ctr, 0x10);
-+
- 	if (keylen == AES_KEYSIZE_256)
- 		keystart = dev->aes_ioaddr + SSS_REG_AES_KEY_DATA(0);
- 	else if (keylen == AES_KEYSIZE_192)
-@@ -1902,8 +1905,9 @@ static void s5p_aes_crypt_start(struct s5p_aes_dev *dev, unsigned long mode)
- 	u32 aes_control;
- 	unsigned long flags;
- 	int err;
--	u8 *iv;
-+	u8 *iv, *ctr;
- 
-+	/* This sets bit [13:12] to 00, which selects 128-bit counter */
- 	aes_control = SSS_AES_KEY_CHANGE_MODE;
- 	if (mode & FLAGS_AES_DECRYPT)
- 		aes_control |= SSS_AES_MODE_DECRYPT;
-@@ -1911,11 +1915,14 @@ static void s5p_aes_crypt_start(struct s5p_aes_dev *dev, unsigned long mode)
- 	if ((mode & FLAGS_AES_MODE_MASK) == FLAGS_AES_CBC) {
- 		aes_control |= SSS_AES_CHAIN_MODE_CBC;
- 		iv = req->info;
-+		ctr = NULL;
- 	} else if ((mode & FLAGS_AES_MODE_MASK) == FLAGS_AES_CTR) {
- 		aes_control |= SSS_AES_CHAIN_MODE_CTR;
--		iv = req->info;
-+		iv = NULL;
-+		ctr = req->info;
- 	} else {
- 		iv = NULL; /* AES_ECB */
-+		ctr = NULL;
- 	}
- 
- 	if (dev->ctx->keylen == AES_KEYSIZE_192)
-@@ -1947,7 +1954,7 @@ static void s5p_aes_crypt_start(struct s5p_aes_dev *dev, unsigned long mode)
- 		goto outdata_error;
- 
- 	SSS_AES_WRITE(dev, AES_CONTROL, aes_control);
--	s5p_set_aes(dev, dev->ctx->aes_key, iv, dev->ctx->keylen);
-+	s5p_set_aes(dev, dev->ctx->aes_key, iv, ctr, dev->ctx->keylen);
- 
- 	s5p_set_dma_indata(dev,  dev->sg_src);
- 	s5p_set_dma_outdata(dev, dev->sg_dst);
-@@ -2025,7 +2032,8 @@ static int s5p_aes_crypt(struct ablkcipher_request *req, unsigned long mode)
- 	struct s5p_aes_ctx *ctx = crypto_ablkcipher_ctx(tfm);
- 	struct s5p_aes_dev *dev = ctx->dev;
- 
--	if (!IS_ALIGNED(req->nbytes, AES_BLOCK_SIZE)) {
-+	if (!IS_ALIGNED(req->nbytes, AES_BLOCK_SIZE) &&
-+			((mode & FLAGS_AES_MODE_MASK) != FLAGS_AES_CTR)) {
- 		dev_err(dev->dev, "request size is not exact amount of AES blocks\n");
- 		return -EINVAL;
- 	}
-@@ -2072,6 +2080,11 @@ static int s5p_aes_cbc_decrypt(struct ablkcipher_request *req)
- 	return s5p_aes_crypt(req, FLAGS_AES_DECRYPT | FLAGS_AES_CBC);
- }
- 
-+static int s5p_aes_ctr_crypt(struct ablkcipher_request *req)
-+{
-+	return s5p_aes_crypt(req, FLAGS_AES_CTR);
-+}
-+
- static int s5p_aes_cra_init(struct crypto_tfm *tfm)
- {
- 	struct s5p_aes_ctx *ctx = crypto_tfm_ctx(tfm);
-@@ -2126,6 +2139,28 @@ static struct crypto_alg algs[] = {
- 			.decrypt	= s5p_aes_cbc_decrypt,
- 		}
- 	},
-+	{
-+		.cra_name		= "ctr(aes)",
-+		.cra_driver_name	= "ctr-aes-s5p",
-+		.cra_priority		= 100,
-+		.cra_flags		= CRYPTO_ALG_TYPE_ABLKCIPHER |
-+					  CRYPTO_ALG_ASYNC |
-+					  CRYPTO_ALG_KERN_DRIVER_ONLY,
-+		.cra_blocksize		= AES_BLOCK_SIZE,
-+		.cra_ctxsize		= sizeof(struct s5p_aes_ctx),
-+		.cra_alignmask		= 0x0f,
-+		.cra_type		= &crypto_ablkcipher_type,
-+		.cra_module		= THIS_MODULE,
-+		.cra_init		= s5p_aes_cra_init,
-+		.cra_u.ablkcipher = {
-+			.min_keysize	= AES_MIN_KEY_SIZE,
-+			.max_keysize	= AES_MAX_KEY_SIZE,
-+			.ivsize		= AES_BLOCK_SIZE,
-+			.setkey		= s5p_aes_setkey,
-+			.encrypt	= s5p_aes_ctr_crypt,
-+			.decrypt	= s5p_aes_ctr_crypt,
-+		}
-+	},
- };
- 
- static int s5p_aes_probe(struct platform_device *pdev)
--- 
-2.7.4
+I really don't think so, actually. The way the -include stuff works
+now is that the glue code is inlined in the same place that the
+assembly object file is added to the build object list, so it gels
+together cleanly, as the thing is defined and set in one single place.
+I could go back to the ifdefs - and even make them as clean as
+possible - but I think that puts more things in more places and is
+therefore more confusing. The -include system now works extremely
+well.
