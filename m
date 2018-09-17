@@ -1,34 +1,50 @@
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: Re: [PATCH net-next v3 02/17] zinc: introduce minimal cryptography library
-Date: Mon, 17 Sep 2018 16:59:46 +0200
-Message-ID: <CAHmME9oxv248pQ9+T6Jc50_3Wb6HELGtpVZod6dGQ4KoAp6+jA@mail.gmail.com>
-References: <20180911233015.GD11474@lunn.ch> <20180911.165739.2032677219588723041.davem@davemloft.net>
- <CALCETrXrJPcs3h9CtF50N4k2AGx3qzspJd_UW3t+KGYOj7+p=Q@mail.gmail.com>
- <20180916.214549.234387075817326903.davem@davemloft.net> <40088431-D4EE-4D1C-A369-2CE15F758483@amacapital.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Cc: David Miller <davem@davemloft.net>,
+From: Christoph Manszewski <c.manszewski@samsung.com>
+Subject: [PATCH v2 0/4] crypto: s5p-sss: Fix and add aes-ctr support
+Date: Mon, 17 Sep 2018 17:09:26 +0200
+Message-ID: <20180917151002eucas1p27689f043367e1bc64bf63bc402dffcdd~VOId3-CTL2961529615eucas1p2I@eucas1p2.samsung.com>
+References: <CGME20180917151002eucas1p27689f043367e1bc64bf63bc402dffcdd@eucas1p2.samsung.com>
+Content-Type: text/plain; charset="utf-8"
+Cc: Christoph Manszewski <c.manszewski@samsung.com>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        Vladimir Zapolskiy <vz@mleia.com>,
+        Kamil Konieczny <k.konieczny@partner.samsung.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Andrew Lutomirski <luto@kernel.org>,
-        Andrew Lunn <andrew@lunn.ch>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Netdev <netdev@vger.kernel.org>, Samuel Neves <sneves@dei.uc.pt>,
-        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Andy Lutomirski <luto@amacapital.net>
-Return-path: <netdev-owner@vger.kernel.org>
-In-Reply-To: <40088431-D4EE-4D1C-A369-2CE15F758483@amacapital.net>
-Sender: netdev-owner@vger.kernel.org
+        "David S. Miller" <davem@davemloft.net>,
+        linux-samsung-soc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Sep 17, 2018 at 4:56 PM Andy Lutomirski <luto@amacapital.net> wrote=
-:
-> Would you accept Ard=E2=80=99s (and/or Eric Biggers=E2=80=99, perhaps, as=
- an alternative)?  Or, if you really want Herbert=E2=80=99s review, can you=
- ask him to review it?  (Hi Herbert!)
+Hello,
 
-Preferably Eric's.
+This patch series adds aes-ctr support in s5p-sss.c driver. Additionally it
+it provides a fix, and a minor code cleanup.
+
+Patch 1 contains a simple fix, of a possible race condition.
+Patches 2-3 are code cleanup patches.
+Patch 4 adds support for aes-ctr block cipher mode of operation.
+
+Regards,
+Chris
+
+Changes in v2:
+- pass dev->req directly to s5p_aes_complete in s5p_aes_interrupt
+non-error path,
+- move req asignment in s5p_aes_interrupt before if statement,
+- change commit message and subject for patch 2/4,
+- remove empty lines and add rationale in commit message for 
+patch 3/4,
+
+Christoph Manszewski (4):
+  crypto: s5p-sss: Fix race in error handling
+  crypto: s5p-sss: Fix Fix argument list alignment
+  crypto: s5p-sss: Minor code cleanup
+  crypto: s5p-sss: Add aes-ctr support
+
+ drivers/crypto/s5p-sss.c | 113 +++++++++++++++++++++++++++--------------------
+ 1 file changed, 65 insertions(+), 48 deletions(-)
+
+-- 
+2.7.4
