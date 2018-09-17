@@ -1,197 +1,313 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [PATCH net-next v3 02/17] zinc: introduce minimal cryptography library
-Date: Sun, 16 Sep 2018 22:26:21 -0700
-Message-ID: <CAKv+Gu8QgRo-Oex2Sk5unET3FMq+1Cp2btAWXCB8xsALxjatHg@mail.gmail.com>
-References: <20180911214737.GA81235@gmail.com> <CAHmME9rFUruF-VN1pmU-k5nFsb9ppAPhPpW-5Ho9dKL2HCg4kA@mail.gmail.com>
- <20180911233015.GD11474@lunn.ch> <20180911.165739.2032677219588723041.davem@davemloft.net>
- <CALCETrXrJPcs3h9CtF50N4k2AGx3qzspJd_UW3t+KGYOj7+p=Q@mail.gmail.com>
+From: Kenneth Lee <liguozhu-C8/M+/jPZTeaMJb+Lgu22Q@public.gmane.org>
+Subject: Re: [RFCv2 PATCH 0/7] A General Accelerator Framework, WarpDrive
+Date: Mon, 17 Sep 2018 16:39:40 +0800
+Message-ID: <20180917083940.GE207969@Turing-Arch-b>
+References: <20180903005204.26041-1-nek.in.cn@gmail.com>
+	<20180917014244.GA27596@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: "David S. Miller" <davem@davemloft.net>,
-        Andrew Lunn <andrew@lunn.ch>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Network Development <netdev@vger.kernel.org>,
-        Samuel Neves <sneves@dei.uc.pt>,
-        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Andy Lutomirski <luto@kernel.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CALCETrXrJPcs3h9CtF50N4k2AGx3qzspJd_UW3t+KGYOj7+p=Q@mail.gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Cc: Kenneth Lee <nek.in.cn-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+	kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Jonathan Corbet <corbet-T1hC0tSOHrs@public.gmane.org>,
+	Greg Kroah-Hartman <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>, linux-doc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Sanjay Kumar <sanjay.k.kumar-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>, Hao Fang <fanghao11-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>,
+	iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linuxarm-hv44wF8Li93QT0dZR+AlfA@public.gmane.org, Alex Williamson <alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	Thomas Gleixner <tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org>, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Philippe Ombredanne <pombredanne-od1rfyK75/E@public.gmane.org>,
+	"David S . Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
+	linux-accelerators-uLR06cmDAlY/bJ5BZ2RsiQ@public.gmane.org
+To: Jerome Glisse <jglisse-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <20180917014244.GA27596-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 17 September 2018 at 06:09, Andy Lutomirski <luto@kernel.org> wrote:
-> On Tue, Sep 11, 2018 at 4:57 PM David Miller <davem@davemloft.net> wrote:
->>
->> From: Andrew Lunn <andrew@lunn.ch>
->> Date: Wed, 12 Sep 2018 01:30:15 +0200
->>
->> > Just as an FYI:
->> >
->> > 1) I don't think anybody in netdev has taken a serious look at the
->> > network code yet. There is little point until the controversial part
->> > of the code, Zinc, has been sorted out.
->> >
->> > 2) I personally would be surprised if DaveM took this code without
->> > having an Acked-by from the crypto subsystem people. In the same way,
->> > i doubt the crypto people would take an Ethernet driver without having
->> > DaveM's Acked-by.
->>
->> Both of Andrew's statements are completely true.
->>
->> I'm not looking at any of the networking bits until the crypto stuff
->> is fully sorted and fully supported and Ack'd by crypto folks.
->
-> So, as a process question, whom exactly are we waiting for:
->
-> CRYPTO API
-> M:      Herbert Xu <herbert@gondor.apana.org.au>
-> M:      "David S. Miller" <davem@davemloft.net>
-> L:      linux-crypto@vger.kernel.org
->
-> Herbert hasn't replied to any of these submissions.  You're the other
-> maintainer :)
->
-> To the extent that you (DaveM) want my ack, here's what I think of the
-> series so far:
->
-> The new APIs to the crypto primitives are good.  For code that wants
-> to do a specific known crypto operation, they are much, much more
-> pleasant to use than the existing crypto API.  The code cleanups in
-> the big keys patch speak for themselves IMO.  I have no problem with
-> the addition of a brand-new API to the kernel, especially when it's a
-> nice one like Zinc's, even if that API starts out with only a couple
-> of users.
->
-> Zinc's arrangement of arch code is just fine.  Sure, there are
-> arguments that putting arch-specific code in arch/ is better, but this
-> is mostly bikeshedding IMO.
->
-> There has been some discussion of the exact best way to handle
-> simd_relax() and some other minor nitpicks of API details.  This kind
-> of stuff doesn't need to block the series -- it can always be reworked
-> down the road if needed.
->
-> There are two things I don't like right now, though:
->
-> 1. Zinc conflates the addition of a new API with the replacement of
-> some algorithm implementations.  This is problematic.  Look at the
-> recent benchmarks of ipsec before and after this series.  Apparently
-> big packets get faster and small packets get slower.  It would be
-> really nice to bisect the series to narrow down *where* the regression
-> came from, but, as currently structured, you can't.
->
-> The right way to do this is to rearrange the series.  First, the new
-> Zinc APIs should be added, and they should be backed with the
-> *existing* crypto code.  (If the code needs to be moved or copied to a
-> new location, so be it.  The patch will be messy because somehow the
-> Zinc API is going to have to dispatch to the arch-specific code, and
-> the way that the crypto API handles it is not exactly friendly to this
-> type of use.  So be it.)  Then another patch should switch the crypto
-> API to use the Zinc interface.  That patch, *by itself*, can be
-> benchmarked.  If it causes a regression for small ipsec packets, then
-> it can be tracked down relatively easily.  Once this is all done, the
-> actual crypto implementation can be changed, and that changed can be
-> reviewed on its own merits.
->
-> As a simplistic example, I wrote this code a while back:
->
-> https://git.kernel.org/pub/scm/linux/kernel/git/luto/linux.git/commit/?h=crypto/sha256_bpf&id=e9e12f056f2abed50a30b762db9185799f5864e6
->
-> and its two parents.  This series added a more Zinc-like API to
-> SHA256.  And it did it without replacing the SHA256 implementation.
-> Doing this for Zinc would be a bit more complication, since the arch
-> code would need to be invoked too, but it should be doable.
->
-> FWIW, Wireguard should not actually depend on the replacement of the
-> crypto implementation.
->
-> 2. The new Zinc crypto implementations look like they're brand new.  I
-> realize that they have some history, some of them are derived from
-> OpenSSL, etc, but none of this is really apparent in the patches
-> themselves.  It would be great if the kernel could literally share the
-> same code as something like OpenSSL, since OpenSSL gets much more
-> attention than the kernel's crypto.  Failing that, it would be nice if
-> the patches made it more clear how the code differs from its origin.
-> At the very least, though, if the replacement of the crypto code were,
-> as above, a patch that just replaced the crypto code, it would be much
-> easier to review and benchmark intelligently.
->
+On Sun, Sep 16, 2018 at 09:42:44PM -0400, Jerome Glisse wrote:
+> Date: Sun, 16 Sep 2018 21:42:44 -0400
+> From: Jerome Glisse <jglisse-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> To: Kenneth Lee <nek.in.cn-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> CC: Jonathan Corbet <corbet-T1hC0tSOHrs@public.gmane.org>, Herbert Xu
+>  <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>, "David S . Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
+>  Joerg Roedel <joro-zLv9SwRftAIdnm+yROfE0A@public.gmane.org>, Alex Williamson
+>  <alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, Kenneth Lee <liguozhu-C8/M+/jPZTeaMJb+Lgu22Q@public.gmane.org>, Hao
+>  Fang <fanghao11-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>, Zhou Wang <wangzhou1-C8/M+/jPZTeaMJb+Lgu22Q@public.gmane.org>, Zaibo =
+Xu
+>  <xuzaibo-hv44wF8Li93QT0dZR+AlfA@public.gmane.org>, Philippe Ombredanne <pombredanne-od1rfyK75/E@public.gmane.org>, Greg
+>  Kroah-Hartman <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>, Thomas Gleixner
+>  <tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org>, linux-doc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+>  linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+>  iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+>  linux-accelerators-uLR06cmDAlY/bJ5BZ2RsiQ@public.gmane.org, Lu Baolu <baolu.lu-VuQAYsv1563Yd54FQh9/CA@public.gmane.org>,
+>  Sanjay Kumar <sanjay.k.kumar-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>, linuxarm-hv44wF8Li93QT0dZR+AlfA@public.gmane.org
+> Subject: Re: [RFCv2 PATCH 0/7] A General Accelerator Framework, WarpDrive
+> User-Agent: Mutt/1.10.1 (2018-07-13)
+> Message-ID: <20180917014244.GA27596-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> =
 
-OK, so let me summarize my remaining concerns as well. I may be a bit
-more finicky than Andy, though.
+> So i want to summarize issues i have as this threads have dig deep into
+> details. For this i would like to differentiate two cases first the easy
+> one when relying on SVA/SVM. Then the second one when there is no SVA/SVM.
 
-First of all, the rate at which new revisions of this series are
-appearing increases the review effort unnecessarily, especially given
-that the latest version seemed to have some issues that would have
-been spotted by a simple build test. I would like to urge Jason to
-bear with us and bring this discussion to a close before resubmitting.
+Thank you very much for the summary.
 
-As far as I can tell (i.e., as a user not a network dev), WireGuard is
-an excellent piece of code, and I would like to see it merged. I also
-think there is little disagreement about the quality of the proposed
-algorithm implementations and the usefulness of having a set of easy
-to use solid crypto primitives in addition to or complementing the
-current crypto API.
+> In both cases your objectives as i understand them:
+> =
 
-I do have some concerns over how the code is organized though:
+> [R1]- expose a common user space API that make it easy to share boiler
+>       plate code accross many devices (discovering devices, opening
+>       device, creating context, creating command queue ...).
+> [R2]- try to share the device as much as possible up to device limits
+>       (number of independant queues the device has)
+> [R3]- minimize syscall by allowing user space to directly schedule on the
+>       device queue without a round trip to the kernel
+> =
 
-* simd_relax() is currently not called by the crypto routines
-themselves. This means that the worst case scheduling latency is
-unbounded, which is unacceptable for the -rt kernel. The worst case
-scheduling latency should never be proportional to the input size.
-(Apologies for not spotting that earlier)
+> I don't think i missed any.
+> =
 
-* Using a cute name for the crypto library [that will end up being the
-preferred choice for casual use only] may confuse people, given that
-we have lots of code in crypto/ already. I'd much prefer using, e.g.,
-crypto/lib and crypto/api (regardless of where the arch specific
-pieces live)
+> =
 
-* I'd prefer the arch specific pieces to live under arch, but I can
-live with keeping them in a single place, as long as the arch
-maintainers have some kind of jurisdiction over them. I also think
-there should be some overlap between the maintainership
-responsibilities of the two generic pieces (api and lib).
+> (1) Device with SVA/SVM
+> =
 
-* (Nit) The GCC command line -include'd .h files contain variable and
-function definitions so they are actually .c files.
+> For that case it is easy, you do not need to be in VFIO or part of any
+> thing specific in the kernel. There is no security risk (modulo bug in
+> the SVA/SVM silicon). Fork/exec is properly handle and binding a process
+> to a device is just couple dozen lines of code.
+> =
 
-* (Nit) Referencing CONFIG_xxx macros from -include'd files adds the
-implicit assumption that the -include appears after the -include of
-kconfig.h.
 
-* Adding /conditional/ -include's (or #include's) increases the size
-of the validation space, which is why we generally prefer
-unconditional includes (and static inline stubs), and 'if
-(IS_ENABLED(CONFIG_xxx))' over #ifdef CONFIG_xxx
+This is right...logically. But the kernel has no clear definition about "De=
+vice
+with SVA/SVM" and no boiler plate for doing so. Then VFIO may become one of=
+ the
+boiler plate.
 
-* The current organization of the code puts all available (for the
-arch) versions of all routines into a single module, which can only be
-built in once we update random.c to use Zinc's chacha20 routines. This
-bloats the core kernel (which is a huge deal for embedded systems that
-have very strict boot requirements). It also makes it impossible to
-simply blacklist a module if you, for instance, prefer to use the
-[potentially more power efficient] scalar code over the SIMD code when
-using a distro kernel.
+VFIO is one of the wrappers for IOMMU for user space. And maybe it is the o=
+nly
+one. If we add that support within VFIO, which solve most of the problem of
+SVA/SVM, it will save a lot of work in the future.
 
-[To summarize the 4 points above, I'd much rather see a more
-conventional organization where different parts are provided by
-different modules. I don't think the argument that inlining is needed
-for performance is actually valid, given that we have branch
-predictors and static keys, and the arch SIMD code is built as
-separate object files anyway]
+I think this is the key confliction between us. So could Alex please say
+something here? If the VFIO is going to take this into its scope, we can try
+together to solve all the problem on the way. If it it is not, it is also
+simple, we can just go to another way to fulfill this part of requirements =
+even
+we have to duplicate most of the code.
 
-* If we reuse source files from OpenSSL, we should use that actual
-source which is the perlasm not the emitted assembler. Also, we should
-work with Andy Polyakov (as I have done several times over the past 5+
-years) to upstream the changes we apply to the kernel version of the
-code. The same applies to code from other sources, btw, but I am not
-personally familiar with them.
+Another point I need to emphasis here: because we have to replace the hardw=
+are
+queue when fork, so it won't be very simple even in SVA/SVM case.
 
-* If upstreaming the changes is not an option, they should be applied
-as a separate patch and not hidden in a 5000 line patch without any
-justification or documentation (but Jason is already working on that)
+> =
+
+> (2) Device does not have SVA/SVM (or it is disabled)
+> =
+
+> You want to still allow device to be part of your framework. However
+> here i see fundamentals securities issues and you move the burden of
+> being careful to user space which i think is a bad idea. We should
+> never trus the userspace from kernel space.
+> =
+
+> To keep the same API for the user space code you want a 1:1 mapping
+> between device physical address and process virtual address (ie if
+> device access device physical address A it is accessing the same
+> memory as what is backing the virtual address A in the process.
+> =
+
+> Security issues are on two things:
+> [I1]- fork/exec, a process who opened any such device and created an
+>       active queue can transfer without its knowledge control of its
+>       commands queue through COW. The parent map some anonymous region
+>       to the device as a command queue buffer but because of COW the
+>       parent can be the first to copy on write and thus the child can
+>       inherit the original pages that are mapped to the hardware.
+>       Here parent lose control and child gain it.
+
+This is indeed an issue. But it remains an issue only if you continue to us=
+e the
+queue and the memory after fork. We can use at_fork kinds of gadget to fix =
+it in
+user space.
+
+>From some perspectives, I think the issue can be solved by iommu_notifier. =
+For
+example, when the process is fork-ed, we can set the mapped device mmio spa=
+ce as
+COW for the child process, so a new queue can be created and set to the same
+state as the parent's if the space is accessed. Then we can have two separa=
+ted
+queues for both the parent and the child. The memory part can be done in the
+same way.
+
+The thing is, the same strategy can be applied to VFIO without changing its
+original feature.
+
+> =
+
+> [I2]- Because of [R3] you want to allow userspace to schedule commands
+>       on the device without doing an ioctl and thus here user space
+>       can schedule any commands to the device with any address. What
+>       happens if that address have not been mapped by the user space
+>       is undefined and in fact can not be defined as what each IOMMU
+>       does on invalid address access is different from IOMMU to IOMMU.
+> =
+
+>       In case of a bad IOMMU, or simply an IOMMU improperly setup by
+>       the kernel, this can potentialy allow user space to DMA anywhere.
+
+I don't think this is an issue. If you cannot trust IOMMU and proper setup =
+of
+IOMMU in kernel, you cannot trust anything. And the whole VFIO framework is
+untrustable.
+
+> =
+
+> [I3]- By relying on GUP in VFIO you are not abiding by the implicit
+>       contract (at least i hope it is implicit) that you should not
+>       try to map to the device any file backed vma (private or share).
+> =
+
+>       The VFIO code never check the vma controlling the addresses that
+>       are provided to VFIO_IOMMU_MAP_DMA ioctl. Which means that the
+>       user space can provide file backed range.
+> =
+
+>       I am guessing that the VFIO code never had any issues because its
+>       number one user is QEMU and QEMU never does that (and that's good
+>       as no one should ever do that).
+> =
+
+>       So if process does that you are opening your self to serious file
+>       system corruption (depending on file system this can lead to total
+>       data loss for the filesystem).
+> =
+
+>       Issue is that once you GUP you never abide to file system flushing
+>       which write protect the page before writing to the disk. So
+>       because the page is still map with write permission to the device
+>       (assuming VFIO_IOMMU_MAP_DMA was a write map) then the device can
+>       write to the page while it is in the middle of being written back
+>       to disk. Consult your nearest file system specialist to ask him
+>       how bad that can be.
+
+Same as I2, it is an issue, but the problem can be solved in VFIO if we rea=
+lly
+take it in the scope of VFIO.
+
+> =
+
+> [I4]- Design issue, mdev design As Far As I Understand It is about
+>       sharing a single device to multiple clients (most obvious case
+>       here is again QEMU guest). But you are going against that model,
+>       in fact AFAIUI you are doing the exect opposite. When there is
+>       no SVA/SVM you want only one mdev device that can not be share.
+
+Wait. It is NOT "I want only one mdev device when there is no SVA/SVM", it =
+is "I
+can support only one mdev when there is no PASID support for the IOMMU".
+
+> =
+
+>       So this is counter intuitive to the mdev existing design. It is
+>       not about sharing device among multiple users but about giving
+>       exclusive access to the device to one user.
+> =
+
+> =
+
+> =
+
+> All the reasons above is why i believe a different model would serve
+> you and your user better. Below is a design that avoids all of the
+> above issues and still delivers all of your objectives with the
+> exceptions of the third one [R3] when there is no SVA/SVM.
+> =
+
+> =
+
+> Create a subsystem (very much boiler plate code) which allow device to
+> register themself against (very much like what you do in your current
+> patchset but outside of VFIO).
+> =
+
+> That subsystem will create a device file for each registered system and
+> expose a common API (ie set of ioctl) for each of those device files.
+> =
+
+> When user space create a queue (through an ioctl after opening the device
+> file) the kernel can return -EBUSY if all the device queue are in use,
+> or create a device queue and return a flag like SYNC_ONLY for device that
+> do not have SVA/SVM.
+> =
+
+> For device with SVA/SVM at the time the process create a queue you bind
+> the process PASID to the device queue. From there on the userspace can
+> schedule commands and use the device without going to kernel space.
+
+As mentioned previously, this is not enough for fork scenario.
+
+> =
+
+> For device without SVA/SVM you create a fake queue that is just pure
+> memory is not related to the device. From there on the userspace must
+> call an ioctl every time it wants the device to consume its queue
+> (hence why the SYNC_ONLY flag for synchronous operation only). The
+> kernel portion read the fake queue expose to user space and copy
+> commands into the real hardware queue but first it properly map any
+> of the process memory needed for those commands to the device and
+> adjust the device physical address with the one it gets from dma_map
+> API.
+> =
+
+
+But in this way, we will lost most of the benefit of avoiding syscall.
+
+> With that model it is "easy" to listen to mmu_notifier and to abide by
+> them to avoid issues [I1], [I3] and [I4]. You obviously avoid the [I2]
+> issue by only mapping a fake device queue to userspace.
+> =
+
+> So yes with that models it means that every device that wish to support
+> the non SVA/SVM case will have to do extra work (ie emulate its command
+> queue in software in the kernel). But by doing so, you support an
+> unlimited number of process on your device (ie all the process can share
+> one single hardware command queues or multiple hardware queues).
+
+If I can do this, I will not need WarpDrive at all:(
+
+> =
+
+> The big advantages i see here is that the process do not have to worry
+> about doing something wrong. You are protecting yourself and your user
+> from stupid mistakes.
+> =
+
+> =
+
+> I hope this is useful to you.
+> =
+
+
+Anyway, I will try to address the problem you mentioned in next version, and
+make both options (on-VFIO or off-VFIO) are available. Thanks.
+
+> Cheers,
+> J=E9r=F4me
+
+
+Cheers
+-- =
+
+			-Kenneth(Hisilicon)
