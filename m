@@ -1,39 +1,110 @@
-From: Kamil Konieczny <k.konieczny@partner.samsung.com>
-Subject: Re: [PATCH v2 3/4] crypto: s5p-sss: Minor code cleanup
-Date: Mon, 17 Sep 2018 17:49:13 +0200
-Message-ID: <20180917154915eucas1p138e4193dc80c976f356e94589f6e4a40~VOqtgu4ye0974509745eucas1p1R@eucas1p1.samsung.com>
-References: <1537196970-5987-1-git-send-email-c.manszewski@samsung.com>
-        <CGME20180917151009eucas1p145fdde4a56241418a49a1da14c5bdb02@eucas1p1.samsung.com>
-        <20180917151009eucas1p145fdde4a56241418a49a1da14c5bdb02~VOIkhD_S60202502025eucas1p1F@eucas1p1.samsung.com>
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: Re: [PATCH net-next v3 02/17] zinc: introduce minimal cryptography library
+Date: Mon, 17 Sep 2018 17:52:29 +0200
+Message-ID: <CAHmME9qwRzuoo-3Hxahwu=Li2LCz06Uowaq1GFmkts6tsffM7w@mail.gmail.com>
+References: <20180911214737.GA81235@gmail.com> <CAHmME9rFUruF-VN1pmU-k5nFsb9ppAPhPpW-5Ho9dKL2HCg4kA@mail.gmail.com>
+ <20180911233015.GD11474@lunn.ch> <20180911.165739.2032677219588723041.davem@davemloft.net>
+ <CALCETrXrJPcs3h9CtF50N4k2AGx3qzspJd_UW3t+KGYOj7+p=Q@mail.gmail.com> <CAKv+Gu8QgRo-Oex2Sk5unET3FMq+1Cp2btAWXCB8xsALxjatHg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: Krzysztof Kozlowski <krzk@kernel.org>,
-        Vladimir Zapolskiy <vz@mleia.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-samsung-soc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
-To: Christoph Manszewski <c.manszewski@samsung.com>,
-        linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Cc: Andrew Lutomirski <luto@kernel.org>,
+        David Miller <davem@davemloft.net>,
+        Andrew Lunn <andrew@lunn.ch>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Netdev <netdev@vger.kernel.org>, Samuel Neves <sneves@dei.uc.pt>,
+        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180917151009eucas1p145fdde4a56241418a49a1da14c5bdb02~VOIkhD_S60202502025eucas1p1F@eucas1p1.samsung.com>
-Content-Language: en-US
+In-Reply-To: <CAKv+Gu8QgRo-Oex2Sk5unET3FMq+1Cp2btAWXCB8xsALxjatHg@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
+Hi Ard,
+
+On Mon, Sep 17, 2018 at 7:26 AM Ard Biesheuvel
+<ard.biesheuvel@linaro.org> wrote:
+> OK, so let me summarize my remaining concerns as well. I may be a bit
+> more finicky than Andy, though.
+
+Yes, and generally hostile to this whole initiative since the
+beginning. But I am very grateful for your reviews nonetheless, and
+I'll do my best to incorporate as much as is reasonable.
+
+> I would like to urge Jason to
+> bear with us and bring this discussion to a close before resubmitting.
+
+What I fear is that either:
+- You don't like the Zinc initiative in one way or another, and the
+desire to "keep discussing" and adding more things is less out of
+their necessity and more out of a desire to stall it indefinitely.
+- You're going to bikeshed and bikeshed and waste tons of time until
+Zinc copies lots of the same design decisions from the present crypto
+API.
+
+I do sincerely hope these are only fears and not what actually is
+going on. I'll do my best to take into serious consideration what you
+say -- many are indeed extremely helpful --  but I certainly won't be
+wholesale accepting all the things you've mentioned.
+
+Nevertheless, I'll make sure v5 has a pretty healthy quantity of
+improvements in it before resubmitting.
+
+> * simd_relax() is currently not called by the crypto routines
+> themselves. This means that the worst case scheduling latency is
+> unbounded, which is unacceptable for the -rt kernel. The worst case
+> scheduling latency should never be proportional to the input size.
+> (Apologies for not spotting that earlier)
+
+Good catch. I actually did this correct when porting the crypto API to
+use Zinc (in those later top commits in v4), but I hadn't in the Zinc
+code itself. I'll address this for v5.
+
+> maintainership
+> responsibilities
+
+Samuel and I intend to maintain Zinc in lib/zinc/ and send future
+updates to it through Greg's tree, as mentioned in the 00/ cover
+letter. The maintainership of the existing crypto API won't change.
+
+> * The current organization of the code puts all available (for the
+> arch) versions of all routines into a single module, which can only be
+> built in once we update random.c to use Zinc's chacha20 routines. This
+> bloats the core kernel (which is a huge deal for embedded systems that
+> have very strict boot requirements).
+
+I'll split each Zinc primitive into a separate module for v5, per your
+and Andy's desire. And the SIMD code is already toggle-able via a
+Kconfig menu option.
+
+> we should
+> work with Andy Polyakov (as I have done several times over the past 5+
+> years) to upstream the changes we apply to the kernel version of the
+> code.
+
+Indeed this is the intent.
+
+> The same applies to code from other sources, btw, but I am not
+> personally familiar with them.
+
+Good news on this front:
+- Rene wrote the MIPS code specifically for WireGuard, so that _is_ upstream.
+- Samuel wrote the BLAKE2 assembly, and he's the co-maintainer of Zinc with me.
+- I talk to Dan and Peter a decent amount about qhasm.
+- I'm in very close contact with the team behind HACL*, and they're
+treating Zinc as a target -- stylistically and with regards to kernel
+requirements -- which means they're looking at what's happening in
+this patchset and adjusting accordingly.
 
 
-On 17.09.2018 17:09, Christoph Manszewski wrote:
-> Modifications in s5p-sss.c:
-> - remove unnecessary 'goto' statements (making code shorter),
-> - change uint_8 and uint_32 to u8 and u32 types (for consistency in the
-> driver and making code shorter),
-> 
-> Signed-off-by: Christoph Manszewski <c.manszewski@samsung.com>
-> Reviewed-by: Krzysztof Kozlowski <krzk@kernel.org>
+> * If upstreaming the changes is not an option, they should be applied
+> as a separate patch and not hidden in a 5000 line patch without any
+> justification or documentation (but Jason is already working on that)
 
-Acked-by: Kamil Konieczny <k.konieczny@partner.samsung.com>
+Indeed this is already underway.
 
-Thanks!
-Kamil
+Thanks again for your review.
+
+Jason
