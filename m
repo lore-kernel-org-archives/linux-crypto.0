@@ -1,85 +1,53 @@
-From: Kamil Konieczny <k.konieczny@partner.samsung.com>
-Subject: Re: [PATCH v2 4/4] crypto: s5p-sss: Add aes-ctr support
-Date: Mon, 17 Sep 2018 17:54:20 +0200
-Message-ID: <20180917155422eucas1p2ea33c73f046cb19c7be5fac7e9191059~VOvLUVLIR0418604186eucas1p2i@eucas1p2.samsung.com>
-References: <1537196970-5987-1-git-send-email-c.manszewski@samsung.com>
-        <CGME20180917151011eucas1p274a1407a02081b49aa03da85cc9aec4c@eucas1p2.samsung.com>
-        <20180917151011eucas1p274a1407a02081b49aa03da85cc9aec4c~VOImIjh2C1107511075eucas1p2w@eucas1p2.samsung.com>
+From: Andy Lutomirski <luto@amacapital.net>
+Subject: Re: [PATCH net-next v3 02/17] zinc: introduce minimal cryptography library
+Date: Mon, 17 Sep 2018 09:06:36 -0700
+Message-ID: <CALCETrXXg_nnp_pafK3+Pwd00PRUr=X=WfLu+YFYeggRs8-i1Q@mail.gmail.com>
+References: <20180911214737.GA81235@gmail.com> <CAHmME9rFUruF-VN1pmU-k5nFsb9ppAPhPpW-5Ho9dKL2HCg4kA@mail.gmail.com>
+ <20180911233015.GD11474@lunn.ch> <20180911.165739.2032677219588723041.davem@davemloft.net>
+ <CALCETrXrJPcs3h9CtF50N4k2AGx3qzspJd_UW3t+KGYOj7+p=Q@mail.gmail.com>
+ <CAKv+Gu8QgRo-Oex2Sk5unET3FMq+1Cp2btAWXCB8xsALxjatHg@mail.gmail.com>
+ <35BC21D7-01F4-4F91-A7E9-8D15DE5B95D6@amacapital.net> <CAHmME9qQR4ynsZ5xXejEdnr3oZcOnpRRTdohX+eT9Df+AU2_iA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: Krzysztof Kozlowski <krzk@kernel.org>,
-        Vladimir Zapolskiy <vz@mleia.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-samsung-soc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
-To: Christoph Manszewski <c.manszewski@samsung.com>,
-        linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Andrew Lutomirski <luto@kernel.org>,
+        "David S. Miller" <davem@davemloft.net>, andrew@lunn.ch,
+        Eric Biggers <ebiggers@kernel.org>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Network Development <netdev@vger.kernel.org>,
+        Samuel Neves <sneves@dei.uc.pt>,
+        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180917151011eucas1p274a1407a02081b49aa03da85cc9aec4c~VOImIjh2C1107511075eucas1p2w@eucas1p2.samsung.com>
-Content-Language: en-US
+In-Reply-To: <CAHmME9qQR4ynsZ5xXejEdnr3oZcOnpRRTdohX+eT9Df+AU2_iA@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
+> On Sep 17, 2018, at 8:28 AM, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+>
+> On Mon, Sep 17, 2018 at 4:52 PM Andy Lutomirski <luto@amacapital.net> wrote:
+>>> * (Nit) The GCC command line -include'd .h files contain variable and
+>>> function definitions so they are actually .c files.
+>>
+>> Hmm. I would suggest just getting rid of the -include magic entirely.  The resulting ifdef will be more comprehensible.
+>
+> I really don't think so, actually. The way the -include stuff works
+> now is that the glue code is inlined in the same place that the
+> assembly object file is added to the build object list, so it gels
+> together cleanly, as the thing is defined and set in one single place.
+> I could go back to the ifdefs - and even make them as clean as
+> possible - but I think that puts more things in more places and is
+> therefore more confusing. The -include system now works extremely
+> well.
 
+Is it really better than:
 
-On 17.09.2018 17:09, Christoph Manszewski wrote:
-> Add support for aes counter(ctr) block cipher mode of operation for
-> Exynos Hardware. In contrast to ecb and cbc modes, aes-ctr allows
-> encyption/decryption for request sizes not being a multiple of 16(bytes).
-> 
-> Hardware requires block sizes being a multiple of 16(bytes). In order to
-> achieve this, copy request source and destination memory, and align it's size
-> to 16. That way hardware processes additional bytes, that are omitted
-> when copying the result back to its original destination.
-> 
-> Tested on Odroid-U3 with Exynos 4412 CPU, kernel 4.19-rc2 with crypto
-> run-time self test testmgr.
-> 
-> Signed-off-by: Christoph Manszewski <c.manszewski@samsung.com>
-> Reviewed-by: Krzysztof Kozlowski <krzk@kernel.org>
-> ---
->  drivers/crypto/s5p-sss.c | 45 ++++++++++++++++++++++++++++++++++++++++-----
->  1 file changed, 40 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/crypto/s5p-sss.c b/drivers/crypto/s5p-sss.c
-> index ba8f2e2ea88f..0064be0e3941 100644
-> --- a/drivers/crypto/s5p-sss.c
-> +++ b/drivers/crypto/s5p-sss.c
-> @@ -1813,7 +1813,7 @@ static struct ahash_alg algs_sha1_md5_sha256[] = {
->  };
->  
->  static void s5p_set_aes(struct s5p_aes_dev *dev,
-> -			const u8 *key, const u8 *iv,
-> +			const u8 *key, const u8 *iv, const u8 *ctr,
->  			unsigned int keylen)
->  {
->  	void __iomem *keystart;
-> @@ -1821,6 +1821,9 @@ static void s5p_set_aes(struct s5p_aes_dev *dev,
->  	if (iv)
->  		memcpy_toio(dev->aes_ioaddr + SSS_REG_AES_IV_DATA(0), iv, 0x10);
->  
-> +	if (ctr)
-> +		memcpy_toio(dev->aes_ioaddr + SSS_REG_AES_CNT_DATA(0), ctr, 0x10);
-> +
->  	if (keylen == AES_KEYSIZE_256)
->  		keystart = dev->aes_ioaddr + SSS_REG_AES_KEY_DATA(0);
->  	else if (keylen == AES_KEYSIZE_192)
-> @@ -1902,8 +1905,9 @@ static void s5p_aes_crypt_start(struct s5p_aes_dev *dev, unsigned long mode)
->  	u32 aes_control;
->  	unsigned long flags;
->  	int err;
-> -	u8 *iv;
-> +	u8 *iv, *ctr;
->  
-> +	/* This sets bit [13:12] to 00, which selects 128-bit counter */
+#ifdef CONFIG_X86_64
+#include "whatever"
+#endif
 
-s/bit/bits/
-
-This this,
-
-Acked-by: Kamil Konieczny <k.konieczny@partner.samsung.com>
-
-Thanks!
-Kamil
+It seems a more obfuscated than needed to put the equivalent of that
+into the Makefile, and I don't think people really like searching
+through the Makefile to figure out why the code does what it does.
