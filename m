@@ -1,88 +1,71 @@
 From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: Re: [PATCH net-next v3 02/17] zinc: introduce minimal cryptography
- library
-Date: Tue, 18 Sep 2018 22:36:59 +0200
-Message-ID: <20180918203658.GA28723@zx2c4.com>
-References: <20180911214737.GA81235@gmail.com>
- <CAHmME9rFUruF-VN1pmU-k5nFsb9ppAPhPpW-5Ho9dKL2HCg4kA@mail.gmail.com>
- <20180911233015.GD11474@lunn.ch>
- <20180911.165739.2032677219588723041.davem@davemloft.net>
- <CALCETrXrJPcs3h9CtF50N4k2AGx3qzspJd_UW3t+KGYOj7+p=Q@mail.gmail.com>
- <CAKv+Gu8QgRo-Oex2Sk5unET3FMq+1Cp2btAWXCB8xsALxjatHg@mail.gmail.com>
- <CAHmME9qwRzuoo-3Hxahwu=Li2LCz06Uowaq1GFmkts6tsffM7w@mail.gmail.com>
- <CAKv+Gu8OKyVvvgLy48GDV2KJt-UmmHbf5x0qNxQC_SDiddb9-g@mail.gmail.com>
+Subject: Re: [PATCH net-next v5 00/20] WireGuard: Secure Network Tunnel
+Date: Tue, 18 Sep 2018 23:01:21 +0200
+Message-ID: <20180918210120.GA29812@zx2c4.com>
+References: <20180918161646.19105-1-Jason@zx2c4.com>
+ <CAKv+Gu8doWS+BYzqoT7499CJX0hLm1jBSMfVxJoG3wsWFO7t1w@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Cc: Andrew Lutomirski <luto@kernel.org>,
-        David Miller <davem@davemloft.net>,
-        Andrew Lunn <andrew@lunn.ch>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Netdev <netdev@vger.kernel.org>, Samuel Neves <sneves@dei.uc.pt>,
-        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "<netdev@vger.kernel.org>" <netdev@vger.kernel.org>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <CAKv+Gu8OKyVvvgLy48GDV2KJt-UmmHbf5x0qNxQC_SDiddb9-g@mail.gmail.com>
+In-Reply-To: <CAKv+Gu8doWS+BYzqoT7499CJX0hLm1jBSMfVxJoG3wsWFO7t1w@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
 Hi Ard,
 
-On Tue, Sep 18, 2018 at 11:53:11AM -0700, Ard Biesheuvel wrote:
-> On 17 September 2018 at 08:52, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
-> > Hi Ard,
+On Tue, Sep 18, 2018 at 11:28:50AM -0700, Ard Biesheuvel wrote:
+> On 18 September 2018 at 09:16, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+> >   - While I initially wasn't going to do this for the initial
+> >     patchset, it was just so simple to do: now there's a nosimd
+> >     module parameter that can be used to disable simd instructions
+> >     for debugging and testing, or on weird systems.
 > >
 > 
-> Given that you show no interest whatsoever in gaining an understanding
-> of the underlying requirements that we have to deal with in the crypto
-> API, the only way to get my point across is by repeatedly stating it
+> I was going to respond in the other thread but it is probably better
+> to move the discussion here.
+> 
+> My concern about the monolithic nature of each algo module is not only
+> about SIMD, and it has nothing to do with weird systems. It has to do
+> with micro-architectural differences which are more common on ARM than
+> on other architectures *, I suppose. But generalizing from that, it
+> has to do with policy which is currently owned by userland and not by
+> the kernel. This will also be important for choosing between the time
+> variant but less safe table based scalar AES and the much slower time
+> invariant version (which is substantially slower, especially on
+> decryption) once we move AES into this library.
+> 
+> So a command line option for the kernel is not the solution here. If
+> we can't have separate modules, could we at least have per-module
+> options that put the policy decisions back into userland?
+> 
+> * as an example, the SHA256 NEON code I collaborated on with Andy
+> Polyakov 2 years ago is significantly faster on some cores and not on
+> others
 
-Sorry if I've come across that way, but I am certainly interested in
-gaining such an understanding of said requirements.
+Interesting concern. There are micro-architectural quirks on x86 too
+that the current code actually already considers. Notably, we use an
+AVX-512VL path for Skylake-X but an AVX-512F path for Knights Landing
+and Coffee Lake and others, due to thermal throttling when touching the
+zmm registers on Skylake-X. So, in the code, we have it automatically
+select the right thing based on the micro-architecture.
 
-> I have pointed out to you numerous times (as has Eric) that the
-> ChaCha20 ARM code you are importing from the OpenSSL project has been
-> found to be slower on Cortex-A7, which represents the vast majority of
-> devices expected to be in the field in 1~2 years.
+Is the same thing not possible with ARM? Do you not have access to this
+information already, such that the module can just always do the right
+thing and not require any user intervention?
 
-I mentioned in the other thread that I intend immanently to begin
-benching on a variety of ARM boards, and I should have numbers and
-results and conclusions somewhat soon for the list.
-
-My initial notion here was that it'd be better to go with AndyP's code
-no matter what, and then later work with him on contributing said
-improvements, and then port these back to the kernel. However, you and
-Andy made a compelling point about code replacement -- that it's okay to
-replace all in one go only if there are positive benchmark results. So I
-think what I'll do to appease this is -- if the benchmarks are indeed
-how Eric suggested -- stick with your faster code, and then follow up
-with replacement plans after the merge. (I feel a bit more comfortable
-with varying ChaCha code, because implementations tend to be pretty
-straight forward and harder to screw up in subtle ways than, say,
-poly1305 or curve25519.)
-
-> have asked you more than once to split out your changes to the
-> upstream OpenSSL code into separate patches so we can more easily
-> track them, but v5 now puts them in the commit log (again) [but in a
-> corrupted way - the preprocessor directives are filtered out by
-> git-commit], which means we cannot use git diff/blame etc to look at
-> them.
-
-Didnt't realize this was so important to you. It's trivial to do, so
-I'll do that for AndyP's implementations for the next revision.
-
-
-> Upstreaming code is about taking an interest in other people's use
-> cases, and about choosing your battles. It is unfortunate that we have
-> spent all this time talking about a couple of crypto routines, while
-> the actual meat of your submission is in WireGuard itself, which I'm
-> sure you much rather talk about.
-
-I don't find it unfortunate; getting the crypto right is of the utmost
-importance.
+If so, that would be ideal. If not (and I'm curious to learn why not
+exactly), then indeed we could add some runtime nobs in /sys/module/
+{algo}/parameters/{nob}, or the like. This would be super easy to do,
+should we ever encounter a situation where we're unable to auto-detect
+the correct thing.
 
 Regards,
 Jason
