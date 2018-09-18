@@ -1,56 +1,60 @@
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: Re: [PATCH net-next v3 02/17] zinc: introduce minimal cryptography library
-Date: Tue, 18 Sep 2018 02:56:18 +0200
-Message-ID: <CAHmME9pdesobgG=AeZ74Rb+aJ-gGDEYj624MnYDz-A=w9fkiYA@mail.gmail.com>
-References: <20180911214737.GA81235@gmail.com> <CAHmME9rFUruF-VN1pmU-k5nFsb9ppAPhPpW-5Ho9dKL2HCg4kA@mail.gmail.com>
- <20180911233015.GD11474@lunn.ch> <20180911.165739.2032677219588723041.davem@davemloft.net>
- <CALCETrXrJPcs3h9CtF50N4k2AGx3qzspJd_UW3t+KGYOj7+p=Q@mail.gmail.com>
- <CAKv+Gu8QgRo-Oex2Sk5unET3FMq+1Cp2btAWXCB8xsALxjatHg@mail.gmail.com>
- <35BC21D7-01F4-4F91-A7E9-8D15DE5B95D6@amacapital.net> <CAHmME9o2sB-rQo0DRh56AFe7ZLJJh+CU6Z1m5XZ4tA8vATCy1g@mail.gmail.com>
- <CALCETrWHWZibRev=hZeE1_YFjktnpV9VBN_QmvHJfakb-saRuA@mail.gmail.com>
- <CAHmME9o+Q25t8c2Yk5_5ob2yJsu=7OA7WeAM71S5krP8KMY5GQ@mail.gmail.com> <63AAE78E-25D7-46E7-84AB-5D0DFD0F1BF2@amacapital.net>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH net-next v3 02/17] zinc: introduce minimal cryptography
+ library
+Date: Tue, 18 Sep 2018 12:21:34 +0800
+Message-ID: <20180918042133.4ybztgdooxkoyiru@gondor.apana.org.au>
+References: <CAHmME9qwRzuoo-3Hxahwu=Li2LCz06Uowaq1GFmkts6tsffM7w@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Andrew Lutomirski <luto@kernel.org>,
-        David Miller <davem@davemloft.net>,
-        Andrew Lunn <andrew@lunn.ch>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Netdev <netdev@vger.kernel.org>, Samuel Neves <sneves@dei.uc.pt>,
-        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Andy Lutomirski <luto@amacapital.net>
+Content-Type: text/plain; charset=us-ascii
+Cc: ard.biesheuvel@linaro.org, luto@kernel.org, davem@davemloft.net,
+        andrew@lunn.ch, ebiggers@kernel.org, gregkh@linuxfoundation.org,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+        sneves@dei.uc.pt, jeanphilippe.aumasson@gmail.com,
+        linux-crypto@vger.kernel.org
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <63AAE78E-25D7-46E7-84AB-5D0DFD0F1BF2@amacapital.net>
+Content-Disposition: inline
+In-Reply-To: <CAHmME9qwRzuoo-3Hxahwu=Li2LCz06Uowaq1GFmkts6tsffM7w@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hey Andy,
+Hi Jason:
 
-On Mon, Sep 17, 2018 at 6:18 PM Andy Lutomirski <luto@amacapital.net> wrote=
-:
-> I think it=E2=80=99s fine for later. It=E2=80=99s potentially useful for =
-benchmarking and debugging.
+Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+> 
+> On Mon, Sep 17, 2018 at 7:26 AM Ard Biesheuvel
+> <ard.biesheuvel@linaro.org> wrote:
+>> OK, so let me summarize my remaining concerns as well. I may be a bit
+>> more finicky than Andy, though.
+> 
+> Yes, and generally hostile to this whole initiative since the
+> beginning. But I am very grateful for your reviews nonetheless, and
+> I'll do my best to incorporate as much as is reasonable.
+ 
+>> I would like to urge Jason to
+>> bear with us and bring this discussion to a close before resubmitting.
+> 
+> What I fear is that either:
+> - You don't like the Zinc initiative in one way or another, and the
+> desire to "keep discussing" and adding more things is less out of
+> their necessity and more out of a desire to stall it indefinitely.
+> - You're going to bikeshed and bikeshed and waste tons of time until
+> Zinc copies lots of the same design decisions from the present crypto
+> API.
 
-I went ahead and added it anyway in the end. It was really quite easy
-to do, and it sets a good template for future primitives that are
-added to Zinc.
+That may be your view but from what I've read Ard has been very
+constructive in pointing out issues in your submission.  If your
+response to criticism is to dismiss them as hostile then I'm afraid
+that we will not be able to progress on this patch series.
 
-Meanwhile, I've fully triaged the regression Martin found, and in the
-same test he performed, the Zinc code now runs faster than the old
-code (which should be no surprise).
+Please keep in mind that this is a large project that has to support
+multiple users on one hand (not just WireGuard) and complex hardware
+acceleration drivers on the other.  Ard has been one of the most
+prolific contributors to the crypto code and his review should be
+taken seriously.
 
-I've also finished getting rid of -include, per your suggestion, and
-modularizing each algorithm to be loadable independently, per your
-suggestion.
-
-All and all, v5 is turning out really well, and I'll probably submit
-it sometime soon. My tree was just added to the kbuild test bot, so
-I'll hopefully get an email about any breakage *before* I submit this
-time.
-
-Regards,
-Jason
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
