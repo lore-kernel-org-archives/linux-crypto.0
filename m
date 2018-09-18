@@ -1,15 +1,17 @@
 From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: [PATCH net-next v5 07/20] zinc: Poly1305 generic C implementations and selftest
-Date: Tue, 18 Sep 2018 18:16:33 +0200
-Message-ID: <20180918161646.19105-8-Jason@zx2c4.com>
+Subject: [PATCH net-next v5 08/20] zinc: Poly1305 x86_64 implementation
+Date: Tue, 18 Sep 2018 18:16:34 +0200
+Message-ID: <20180918161646.19105-9-Jason@zx2c4.com>
 References: <20180918161646.19105-1-Jason@zx2c4.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
         Samuel Neves <sneves@dei.uc.pt>,
         Andy Lutomirski <luto@kernel.org>,
-        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>
+        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
+        Andy Polyakov <appro@openssl.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, x86@kernel.org
 To: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
         linux-crypto@vger.kernel.org, davem@davemloft.net,
         gregkh@linuxfoundation.org
@@ -18,1535 +20,3146 @@ In-Reply-To: <20180918161646.19105-1-Jason@zx2c4.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-These two C implementations -- a 32x32 one and a 64x64 one, depending on
-the platform -- come from Andrew Moon's public domain poly1305-donna
-portable code, modified for usage in the kernel and for usage with
-accelerated primitives.
+This provides AVX, AVX-2, and AVX-512F implementations for Poly1305.
+The AVX-512F implementation is disabled on Skylake, due to throttling.
+These come from Andy Polyakov's implementation, with the following
+modifications from Samuel Neves:
 
-Information: https://cr.yp.to/mac.html
+  - Some cosmetic changes, like renaming labels to .Lname, constants,
+    and other Linux conventions.
+
+  - CPU feature checking is done in C by the glue code, so that has been
+    removed from the assembly.
+
+  - poly1305_blocks_avx512 jumped to the middle of the poly1305_blocks_avx2
+    for the final blocks. To appease objtool, the relevant tail avx2 code
+    was duplicated for the avx512 function.
+
+  - The original uses %rbp as a scratch register. However, the kernel
+    expects %rbp to be a valid frame pointer at any given time in order
+    to do proper unwinding. Thus we need to alter the code in order to
+    preserve it. The most straightforward manner in which this was
+    accomplished was by replacing $d3, formerly %r10, by %rdi, and
+    replacing %rbp by %r10. Because %rdi, a pointer to the context
+    structure, does not change and is not used by poly1305_iteration,
+    it is safe to use it here, and the overhead of saving and restoring
+    it should be minimal.
+
+  - The original hardcodes returns as .byte 0xf3,0xc3, aka "rep ret".
+    We replace this by "ret". "rep ret" was meant to help with AMD K8
+    chips, cf. http://repzret.org/p/repzret. It makes no sense to
+    continue to use this kludge for code that won't even run on ancient
+    AMD chips.
+
+Cycle counts on a Core i7 6700HQ using the AVX-2 codepath:
+
+size	old	new
+----	----	----
+0	70	68
+16	92	90
+32	134	104
+48	172	120
+64	218	136
+80	254	158
+96	298	174
+112	342	192
+128	388	212
+144	428	228
+160	466	246
+176	510	264
+192	550	282
+208	594	302
+224	628	316
+240	676	334
+256	716	354
+272	764	374
+288	802	352
+304	420	366
+320	428	360
+336	484	378
+352	426	384
+368	478	400
+384	488	394
+400	542	408
+416	486	416
+432	534	430
+448	544	422
+464	600	438
+480	540	448
+496	594	464
+512	602	456
+528	656	476
+544	600	480
+560	650	494
+576	664	490
+592	714	508
+608	656	514
+624	708	532
+640	716	524
+656	770	536
+672	716	548
+688	770	562
+704	774	552
+720	826	568
+736	768	574
+752	822	592
+768	830	584
+784	884	602
+800	828	610
+816	884	628
+832	888	618
+848	942	632
+864	884	644
+880	936	660
+896	948	652
+912	1000	664
+928	942	676
+944	994	690
+960	1002	680
+976	1054	694
+992	1002	706
+1008	1052	720
+
+Cycle counts on a Xeon Gold 5120 using the AVX-512 codepath:
+
+size	old	new
+----	----	----
+0	74	70
+16	96	92
+32	136	106
+48	184	124
+64	218	138
+80	260	160
+96	300	176
+112	342	194
+128	384	212
+144	420	226
+160	464	248
+176	504	264
+192	544	282
+208	582	300
+224	624	318
+240	662	338
+256	708	358
+272	748	372
+288	788	358
+304	422	370
+320	432	364
+336	486	380
+352	434	390
+368	480	408
+384	490	398
+400	542	412
+416	492	426
+432	538	436
+448	546	432
+464	600	448
+480	548	456
+496	594	476
+512	606	470
+528	656	480
+544	606	498
+560	652	512
+576	662	508
+592	716	522
+608	664	538
+624	710	552
+640	720	516
+656	772	526
+672	722	544
+688	768	556
+704	778	556
+720	832	568
+736	780	584
+752	826	600
+768	836	560
+784	888	572
+800	838	588
+816	884	604
+832	894	598
+848	946	612
+864	896	628
+880	942	644
+896	952	608
+912	1004	616
+928	954	634
+944	1000	646
+960	1008	646
+976	1062	658
+992	1012	674
+1008	1058	690
 
 Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
-Cc: Samuel Neves <sneves@dei.uc.pt>
+Signed-off-by: Samuel Neves <sneves@dei.uc.pt>
 Cc: Andy Lutomirski <luto@kernel.org>
 Cc: Greg KH <gregkh@linuxfoundation.org>
 Cc: Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>
+Cc: Andy Polyakov <appro@openssl.org>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Ingo Molnar <mingo@redhat.com>
+Cc: x86@kernel.org
 ---
- include/zinc/poly1305.h              |  31 +
- lib/zinc/Kconfig                     |   3 +
- lib/zinc/Makefile                    |   3 +
- lib/zinc/poly1305/poly1305-donna32.h | 205 +++++++
- lib/zinc/poly1305/poly1305-donna64.h | 182 ++++++
- lib/zinc/poly1305/poly1305.c         | 155 +++++
- lib/zinc/selftest/poly1305.h         | 875 +++++++++++++++++++++++++++
- 7 files changed, 1454 insertions(+)
- create mode 100644 include/zinc/poly1305.h
- create mode 100644 lib/zinc/poly1305/poly1305-donna32.h
- create mode 100644 lib/zinc/poly1305/poly1305-donna64.h
- create mode 100644 lib/zinc/poly1305/poly1305.c
- create mode 100644 lib/zinc/selftest/poly1305.h
+ lib/zinc/Makefile                        |    1 +
+ lib/zinc/poly1305/poly1305-x86_64-glue.h |  125 +
+ lib/zinc/poly1305/poly1305-x86_64.S      | 2792 ++++++++++++++++++++++
+ lib/zinc/poly1305/poly1305.c             |    4 +-
+ 4 files changed, 2921 insertions(+), 1 deletion(-)
+ create mode 100644 lib/zinc/poly1305/poly1305-x86_64-glue.h
+ create mode 100644 lib/zinc/poly1305/poly1305-x86_64.S
 
-diff --git a/include/zinc/poly1305.h b/include/zinc/poly1305.h
-new file mode 100644
-index 000000000000..f6ea9dc26c95
---- /dev/null
-+++ b/include/zinc/poly1305.h
-@@ -0,0 +1,31 @@
-+/* SPDX-License-Identifier: MIT
-+ *
-+ * Copyright (C) 2015-2018 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
-+ */
-+
-+#ifndef _ZINC_POLY1305_H
-+#define _ZINC_POLY1305_H
-+
-+#include <linux/simd.h>
-+#include <linux/types.h>
-+
-+enum poly1305_lengths {
-+	POLY1305_BLOCK_SIZE = 16,
-+	POLY1305_KEY_SIZE = 32,
-+	POLY1305_MAC_SIZE = 16
-+};
-+
-+struct poly1305_ctx {
-+	u8 opaque[24 * sizeof(u64)];
-+	u32 nonce[4];
-+	u8 data[POLY1305_BLOCK_SIZE];
-+	size_t num;
-+} __aligned(8);
-+
-+void poly1305_init(struct poly1305_ctx *ctx, const u8 key[POLY1305_KEY_SIZE]);
-+void poly1305_update(struct poly1305_ctx *ctx, const u8 *input, size_t len,
-+		     simd_context_t *simd_context);
-+void poly1305_final(struct poly1305_ctx *ctx, u8 mac[POLY1305_MAC_SIZE],
-+		    simd_context_t *simd_context);
-+
-+#endif /* _ZINC_POLY1305_H */
-diff --git a/lib/zinc/Kconfig b/lib/zinc/Kconfig
-index 1ca1ae1e9ea9..f9ef8f7e3c25 100644
---- a/lib/zinc/Kconfig
-+++ b/lib/zinc/Kconfig
-@@ -2,6 +2,9 @@ config ZINC_CHACHA20
- 	tristate
- 	select CRYPTO_ALGAPI
- 
-+config ZINC_POLY1305
-+	tristate
-+
- config ZINC_DEBUG
- 	bool "Zinc cryptography library debugging and self-tests"
- 	help
 diff --git a/lib/zinc/Makefile b/lib/zinc/Makefile
-index 5c7b452d6a19..ce9707d79ea8 100644
+index ce9707d79ea8..f61d5ff4e386 100644
 --- a/lib/zinc/Makefile
 +++ b/lib/zinc/Makefile
-@@ -9,3 +9,6 @@ zinc_chacha20-$(CONFIG_ZINC_ARCH_ARM) += chacha20/chacha20-arm.o
- zinc_chacha20-$(CONFIG_ZINC_ARCH_ARM64) += chacha20/chacha20-arm64.o
- zinc_chacha20-$(CONFIG_ZINC_ARCH_MIPS) += chacha20/chacha20-mips.o
+@@ -11,4 +11,5 @@ zinc_chacha20-$(CONFIG_ZINC_ARCH_MIPS) += chacha20/chacha20-mips.o
  obj-$(CONFIG_ZINC_CHACHA20) += zinc_chacha20.o
-+
-+zinc_poly1305-y := poly1305/poly1305.o
-+obj-$(CONFIG_ZINC_POLY1305) += zinc_poly1305.o
-diff --git a/lib/zinc/poly1305/poly1305-donna32.h b/lib/zinc/poly1305/poly1305-donna32.h
+ 
+ zinc_poly1305-y := poly1305/poly1305.o
++zinc_poly1305-$(CONFIG_ZINC_ARCH_X86_64) += poly1305/poly1305-x86_64.o
+ obj-$(CONFIG_ZINC_POLY1305) += zinc_poly1305.o
+diff --git a/lib/zinc/poly1305/poly1305-x86_64-glue.h b/lib/zinc/poly1305/poly1305-x86_64-glue.h
 new file mode 100644
-index 000000000000..931ce66aed2a
+index 000000000000..8862d23ec7e5
 --- /dev/null
-+++ b/lib/zinc/poly1305/poly1305-donna32.h
-@@ -0,0 +1,205 @@
++++ b/lib/zinc/poly1305/poly1305-x86_64-glue.h
+@@ -0,0 +1,125 @@
 +/* SPDX-License-Identifier: MIT
 + *
 + * Copyright (C) 2015-2018 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
-+ *
-+ * This is based in part on Andrew Moon's poly1305-donna, which is in the
-+ * public domain.
 + */
 +
-+struct poly1305_internal {
-+	u32 h[5];
-+	u32 r[5];
-+	u32 s[4];
-+};
++#include <asm/cpufeature.h>
++#include <asm/processor.h>
++#include <asm/intel-family.h>
 +
-+static void poly1305_init_generic(void *ctx, const u8 key[16])
++asmlinkage void poly1305_init_x86_64(void *ctx,
++				     const u8 key[POLY1305_KEY_SIZE]);
++asmlinkage void poly1305_blocks_x86_64(void *ctx, const u8 *inp,
++				       const size_t len, const u32 padbit);
++asmlinkage void poly1305_emit_x86_64(void *ctx, u8 mac[POLY1305_MAC_SIZE],
++				     const u32 nonce[4]);
++#ifdef CONFIG_AS_AVX
++asmlinkage void poly1305_emit_avx(void *ctx, u8 mac[POLY1305_MAC_SIZE],
++				  const u32 nonce[4]);
++asmlinkage void poly1305_blocks_avx(void *ctx, const u8 *inp, const size_t len,
++				    const u32 padbit);
++#endif
++#ifdef CONFIG_AS_AVX2
++asmlinkage void poly1305_blocks_avx2(void *ctx, const u8 *inp, const size_t len,
++				     const u32 padbit);
++#endif
++#ifdef CONFIG_AS_AVX512
++asmlinkage void poly1305_blocks_avx512(void *ctx, const u8 *inp,
++				       const size_t len, const u32 padbit);
++#endif
++
++static bool poly1305_use_avx __ro_after_init;
++static bool poly1305_use_avx2 __ro_after_init;
++static bool poly1305_use_avx512 __ro_after_init;
++
++static void __init poly1305_fpu_init(void)
 +{
-+	struct poly1305_internal *st = (struct poly1305_internal *)ctx;
-+
-+	/* r &= 0xffffffc0ffffffc0ffffffc0fffffff */
-+	st->r[0] = (get_unaligned_le32(&key[0])) & 0x3ffffff;
-+	st->r[1] = (get_unaligned_le32(&key[3]) >> 2) & 0x3ffff03;
-+	st->r[2] = (get_unaligned_le32(&key[6]) >> 4) & 0x3ffc0ff;
-+	st->r[3] = (get_unaligned_le32(&key[9]) >> 6) & 0x3f03fff;
-+	st->r[4] = (get_unaligned_le32(&key[12]) >> 8) & 0x00fffff;
-+
-+	/* s = 5*r */
-+	st->s[0] = st->r[1] * 5;
-+	st->s[1] = st->r[2] * 5;
-+	st->s[2] = st->r[3] * 5;
-+	st->s[3] = st->r[4] * 5;
-+
-+	/* h = 0 */
-+	st->h[0] = 0;
-+	st->h[1] = 0;
-+	st->h[2] = 0;
-+	st->h[3] = 0;
-+	st->h[4] = 0;
++	poly1305_use_avx =
++		boot_cpu_has(X86_FEATURE_AVX) &&
++		cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM, NULL);
++	poly1305_use_avx2 =
++		boot_cpu_has(X86_FEATURE_AVX) &&
++		boot_cpu_has(X86_FEATURE_AVX2) &&
++		cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM, NULL);
++	poly1305_use_avx512 =
++		boot_cpu_has(X86_FEATURE_AVX) &&
++		boot_cpu_has(X86_FEATURE_AVX2) &&
++		boot_cpu_has(X86_FEATURE_AVX512F) &&
++		cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM |
++				  XFEATURE_MASK_AVX512, NULL) &&
++		/* Skylake downclocks unacceptably much when using zmm. */
++		boot_cpu_data.x86_model != INTEL_FAM6_SKYLAKE_X;
 +}
 +
-+static void poly1305_blocks_generic(void *ctx, const u8 *input, size_t len,
-+				    const u32 padbit)
-+{
-+	struct poly1305_internal *st = (struct poly1305_internal *)ctx;
-+	const u32 hibit = padbit << 24;
-+	u32 r0, r1, r2, r3, r4;
-+	u32 s1, s2, s3, s4;
-+	u32 h0, h1, h2, h3, h4;
-+	u64 d0, d1, d2, d3, d4;
-+	u32 c;
-+
-+	r0 = st->r[0];
-+	r1 = st->r[1];
-+	r2 = st->r[2];
-+	r3 = st->r[3];
-+	r4 = st->r[4];
-+
-+	s1 = st->s[0];
-+	s2 = st->s[1];
-+	s3 = st->s[2];
-+	s4 = st->s[3];
-+
-+	h0 = st->h[0];
-+	h1 = st->h[1];
-+	h2 = st->h[2];
-+	h3 = st->h[3];
-+	h4 = st->h[4];
-+
-+	while (len >= POLY1305_BLOCK_SIZE) {
-+		/* h += m[i] */
-+		h0 += (get_unaligned_le32(&input[0])) & 0x3ffffff;
-+		h1 += (get_unaligned_le32(&input[3]) >> 2) & 0x3ffffff;
-+		h2 += (get_unaligned_le32(&input[6]) >> 4) & 0x3ffffff;
-+		h3 += (get_unaligned_le32(&input[9]) >> 6) & 0x3ffffff;
-+		h4 += (get_unaligned_le32(&input[12]) >> 8) | hibit;
-+
-+		/* h *= r */
-+		d0 = ((u64)h0 * r0) + ((u64)h1 * s4) +
-+		     ((u64)h2 * s3) + ((u64)h3 * s2) +
-+		     ((u64)h4 * s1);
-+		d1 = ((u64)h0 * r1) + ((u64)h1 * r0) +
-+		     ((u64)h2 * s4) + ((u64)h3 * s3) +
-+		     ((u64)h4 * s2);
-+		d2 = ((u64)h0 * r2) + ((u64)h1 * r1) +
-+		     ((u64)h2 * r0) + ((u64)h3 * s4) +
-+		     ((u64)h4 * s3);
-+		d3 = ((u64)h0 * r3) + ((u64)h1 * r2) +
-+		     ((u64)h2 * r1) + ((u64)h3 * r0) +
-+		     ((u64)h4 * s4);
-+		d4 = ((u64)h0 * r4) + ((u64)h1 * r3) +
-+		     ((u64)h2 * r2) + ((u64)h3 * r1) +
-+		     ((u64)h4 * r0);
-+
-+		/* (partial) h %= p */
-+		c = (u32)(d0 >> 26);
-+		h0 = (u32)d0 & 0x3ffffff;
-+		d1 += c;
-+		c = (u32)(d1 >> 26);
-+		h1 = (u32)d1 & 0x3ffffff;
-+		d2 += c;
-+		c = (u32)(d2 >> 26);
-+		h2 = (u32)d2 & 0x3ffffff;
-+		d3 += c;
-+		c = (u32)(d3 >> 26);
-+		h3 = (u32)d3 & 0x3ffffff;
-+		d4 += c;
-+		c = (u32)(d4 >> 26);
-+		h4 = (u32)d4 & 0x3ffffff;
-+		h0 += c * 5;
-+		c = (h0 >> 26);
-+		h0 = h0 & 0x3ffffff;
-+		h1 += c;
-+
-+		input += POLY1305_BLOCK_SIZE;
-+		len -= POLY1305_BLOCK_SIZE;
-+	}
-+
-+	st->h[0] = h0;
-+	st->h[1] = h1;
-+	st->h[2] = h2;
-+	st->h[3] = h3;
-+	st->h[4] = h4;
-+}
-+
-+static void poly1305_emit_generic(void *ctx, u8 mac[16], const u32 nonce[4])
-+{
-+	struct poly1305_internal *st = (struct poly1305_internal *)ctx;
-+	u32 h0, h1, h2, h3, h4, c;
-+	u32 g0, g1, g2, g3, g4;
-+	u64 f;
-+	u32 mask;
-+
-+	/* fully carry h */
-+	h0 = st->h[0];
-+	h1 = st->h[1];
-+	h2 = st->h[2];
-+	h3 = st->h[3];
-+	h4 = st->h[4];
-+
-+	c = h1 >> 26;
-+	h1 = h1 & 0x3ffffff;
-+	h2 += c;
-+	c = h2 >> 26;
-+	h2 = h2 & 0x3ffffff;
-+	h3 += c;
-+	c = h3 >> 26;
-+	h3 = h3 & 0x3ffffff;
-+	h4 += c;
-+	c = h4 >> 26;
-+	h4 = h4 & 0x3ffffff;
-+	h0 += c * 5;
-+	c = h0 >> 26;
-+	h0 = h0 & 0x3ffffff;
-+	h1 += c;
-+
-+	/* compute h + -p */
-+	g0 = h0 + 5;
-+	c = g0 >> 26;
-+	g0 &= 0x3ffffff;
-+	g1 = h1 + c;
-+	c = g1 >> 26;
-+	g1 &= 0x3ffffff;
-+	g2 = h2 + c;
-+	c = g2 >> 26;
-+	g2 &= 0x3ffffff;
-+	g3 = h3 + c;
-+	c = g3 >> 26;
-+	g3 &= 0x3ffffff;
-+	g4 = h4 + c - (1UL << 26);
-+
-+	/* select h if h < p, or h + -p if h >= p */
-+	mask = (g4 >> ((sizeof(u32) * 8) - 1)) - 1;
-+	g0 &= mask;
-+	g1 &= mask;
-+	g2 &= mask;
-+	g3 &= mask;
-+	g4 &= mask;
-+	mask = ~mask;
-+
-+	h0 = (h0 & mask) | g0;
-+	h1 = (h1 & mask) | g1;
-+	h2 = (h2 & mask) | g2;
-+	h3 = (h3 & mask) | g3;
-+	h4 = (h4 & mask) | g4;
-+
-+	/* h = h % (2^128) */
-+	h0 = ((h0) | (h1 << 26)) & 0xffffffff;
-+	h1 = ((h1 >> 6) | (h2 << 20)) & 0xffffffff;
-+	h2 = ((h2 >> 12) | (h3 << 14)) & 0xffffffff;
-+	h3 = ((h3 >> 18) | (h4 << 8)) & 0xffffffff;
-+
-+	/* mac = (h + nonce) % (2^128) */
-+	f = (u64)h0 + nonce[0];
-+	h0 = (u32)f;
-+	f = (u64)h1 + nonce[1] + (f >> 32);
-+	h1 = (u32)f;
-+	f = (u64)h2 + nonce[2] + (f >> 32);
-+	h2 = (u32)f;
-+	f = (u64)h3 + nonce[3] + (f >> 32);
-+	h3 = (u32)f;
-+
-+	put_unaligned_le32(h0, &mac[0]);
-+	put_unaligned_le32(h1, &mac[4]);
-+	put_unaligned_le32(h2, &mac[8]);
-+	put_unaligned_le32(h3, &mac[12]);
-+}
-diff --git a/lib/zinc/poly1305/poly1305-donna64.h b/lib/zinc/poly1305/poly1305-donna64.h
-new file mode 100644
-index 000000000000..8e82c20b9831
---- /dev/null
-+++ b/lib/zinc/poly1305/poly1305-donna64.h
-@@ -0,0 +1,182 @@
-+/* SPDX-License-Identifier: MIT
-+ *
-+ * Copyright (C) 2015-2018 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
-+ *
-+ * This is based in part on Andrew Moon's poly1305-donna, which is in the
-+ * public domain.
-+ */
-+
-+typedef __uint128_t u128;
-+
-+struct poly1305_internal {
-+	u64 r[3];
-+	u64 h[3];
-+	u64 s[2];
-+};
-+
-+static void poly1305_init_generic(void *ctx, const u8 key[16])
-+{
-+	struct poly1305_internal *st = (struct poly1305_internal *)ctx;
-+	u64 t0, t1;
-+
-+	/* r &= 0xffffffc0ffffffc0ffffffc0fffffff */
-+	t0 = get_unaligned_le64(&key[0]);
-+	t1 = get_unaligned_le64(&key[8]);
-+
-+	st->r[0] = t0 & 0xffc0fffffff;
-+	st->r[1] = ((t0 >> 44) | (t1 << 20)) & 0xfffffc0ffff;
-+	st->r[2] = ((t1 >> 24)) & 0x00ffffffc0f;
-+
-+	/* s = 20*r */
-+	st->s[0] = st->r[1] * 20;
-+	st->s[1] = st->r[2] * 20;
-+
-+	/* h = 0 */
-+	st->h[0] = 0;
-+	st->h[1] = 0;
-+	st->h[2] = 0;
-+}
-+
-+static void poly1305_blocks_generic(void *ctx, const u8 *input, size_t len,
-+				    const u32 padbit)
-+{
-+	struct poly1305_internal *st = (struct poly1305_internal *)ctx;
-+	const u64 hibit = ((u64)padbit) << 40;
-+	u64 r0, r1, r2;
-+	u64 s1, s2;
-+	u64 h0, h1, h2;
-+	u64 c;
-+	u128 d0, d1, d2, d;
-+
-+	r0 = st->r[0];
-+	r1 = st->r[1];
-+	r2 = st->r[2];
-+
-+	h0 = st->h[0];
-+	h1 = st->h[1];
-+	h2 = st->h[2];
-+
-+	s1 = st->s[0];
-+	s2 = st->s[1];
-+
-+	while (len >= POLY1305_BLOCK_SIZE) {
-+		u64 t0, t1;
-+
-+		/* h += m[i] */
-+		t0 = get_unaligned_le64(&input[0]);
-+		t1 = get_unaligned_le64(&input[8]);
-+
-+		h0 += t0 & 0xfffffffffff;
-+		h1 += ((t0 >> 44) | (t1 << 20)) & 0xfffffffffff;
-+		h2 += (((t1 >> 24)) & 0x3ffffffffff) | hibit;
-+
-+		/* h *= r */
-+		d0 = (u128)h0 * r0;
-+		d = (u128)h1 * s2;
-+		d0 += d;
-+		d = (u128)h2 * s1;
-+		d0 += d;
-+		d1 = (u128)h0 * r1;
-+		d = (u128)h1 * r0;
-+		d1 += d;
-+		d = (u128)h2 * s2;
-+		d1 += d;
-+		d2 = (u128)h0 * r2;
-+		d = (u128)h1 * r1;
-+		d2 += d;
-+		d = (u128)h2 * r0;
-+		d2 += d;
-+
-+		/* (partial) h %= p */
-+		c = (u64)(d0 >> 44);
-+		h0 = (u64)d0 & 0xfffffffffff;
-+		d1 += c;
-+		c = (u64)(d1 >> 44);
-+		h1 = (u64)d1 & 0xfffffffffff;
-+		d2 += c;
-+		c = (u64)(d2 >> 42);
-+		h2 = (u64)d2 & 0x3ffffffffff;
-+		h0 += c * 5;
-+		c = h0 >> 44;
-+		h0 = h0 & 0xfffffffffff;
-+		h1 += c;
-+
-+		input += POLY1305_BLOCK_SIZE;
-+		len -= POLY1305_BLOCK_SIZE;
-+	}
-+
-+	st->h[0] = h0;
-+	st->h[1] = h1;
-+	st->h[2] = h2;
-+}
-+
-+static void poly1305_emit_generic(void *ctx, u8 mac[16], const u32 nonce[4])
-+{
-+	struct poly1305_internal *st = (struct poly1305_internal *)ctx;
-+	u64 h0, h1, h2, c;
-+	u64 g0, g1, g2;
-+	u64 t0, t1;
-+
-+	/* fully carry h */
-+	h0 = st->h[0];
-+	h1 = st->h[1];
-+	h2 = st->h[2];
-+
-+	c = h1 >> 44;
-+	h1 &= 0xfffffffffff;
-+	h2 += c;
-+	c = h2 >> 42;
-+	h2 &= 0x3ffffffffff;
-+	h0 += c * 5;
-+	c = h0 >> 44;
-+	h0 &= 0xfffffffffff;
-+	h1 += c;
-+	c = h1 >> 44;
-+	h1 &= 0xfffffffffff;
-+	h2 += c;
-+	c = h2 >> 42;
-+	h2 &= 0x3ffffffffff;
-+	h0 += c * 5;
-+	c = h0 >> 44;
-+	h0 &= 0xfffffffffff;
-+	h1 += c;
-+
-+	/* compute h + -p */
-+	g0 = h0 + 5;
-+	c  = g0 >> 44;
-+	g0 &= 0xfffffffffff;
-+	g1 = h1 + c;
-+	c  = g1 >> 44;
-+	g1 &= 0xfffffffffff;
-+	g2 = h2 + c - (1ULL << 42);
-+
-+	/* select h if h < p, or h + -p if h >= p */
-+	c = (g2 >> ((sizeof(u64) * 8) - 1)) - 1;
-+	g0 &= c;
-+	g1 &= c;
-+	g2 &= c;
-+	c  = ~c;
-+	h0 = (h0 & c) | g0;
-+	h1 = (h1 & c) | g1;
-+	h2 = (h2 & c) | g2;
-+
-+	/* h = (h + nonce) */
-+	t0 = ((u64)nonce[1] << 32) | nonce[0];
-+	t1 = ((u64)nonce[3] << 32) | nonce[2];
-+
-+	h0 += t0 & 0xfffffffffff;
-+	c = h0 >> 44;
-+	h0 &= 0xfffffffffff;
-+	h1 += (((t0 >> 44) | (t1 << 20)) & 0xfffffffffff) + c;
-+	c = h1 >> 44;
-+	h1 &= 0xfffffffffff;
-+	h2 += (((t1 >> 24)) & 0x3ffffffffff) + c;
-+	h2 &= 0x3ffffffffff;
-+
-+	/* mac = h % (2^128) */
-+	h0 = h0 | (h1 << 44);
-+	h1 = (h1 >> 20) | (h2 << 24);
-+
-+	put_unaligned_le64(h0, &mac[0]);
-+	put_unaligned_le64(h1, &mac[8]);
-+}
-diff --git a/lib/zinc/poly1305/poly1305.c b/lib/zinc/poly1305/poly1305.c
-new file mode 100644
-index 000000000000..dbab82f33aa7
---- /dev/null
-+++ b/lib/zinc/poly1305/poly1305.c
-@@ -0,0 +1,155 @@
-+/* SPDX-License-Identifier: MIT
-+ *
-+ * Copyright (C) 2015-2018 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
-+ *
-+ * Implementation of the Poly1305 message authenticator.
-+ *
-+ * Information: https://cr.yp.to/mac.html
-+ */
-+
-+#include <zinc/poly1305.h>
-+
-+#include <asm/unaligned.h>
-+#include <linux/kernel.h>
-+#include <linux/string.h>
-+#include <linux/module.h>
-+#include <linux/init.h>
-+
-+#ifndef HAVE_POLY1305_ARCH_IMPLEMENTATION
 +static inline bool poly1305_init_arch(void *ctx,
 +				      const u8 key[POLY1305_KEY_SIZE])
 +{
-+	return false;
++	poly1305_init_x86_64(ctx, key);
++	return true;
 +}
-+static inline bool poly1305_blocks_arch(void *ctx, const u8 *input,
++
++struct poly1305_arch_internal {
++	u32 h[5];
++	u32 is_base2_26;
++	u64 r[2];
++	u64 pad;
++	struct { u32 r2, r1, r4, r3; } rn[9];
++};
++
++static inline bool poly1305_blocks_arch(void *ctx, const u8 *inp,
 +					const size_t len, const u32 padbit,
 +					simd_context_t *simd_context)
 +{
-+	return false;
++	struct poly1305_arch_internal *state = ctx;
++
++	if (!poly1305_use_avx ||
++	    (len < (POLY1305_BLOCK_SIZE * 18) && !state->is_base2_26) ||
++	    !simd_use(simd_context))
++	    poly1305_blocks_x86_64(ctx, inp, len, padbit);
++	else
++#ifdef CONFIG_AS_AVX512
++	if (poly1305_use_avx512)
++		poly1305_blocks_avx512(ctx, inp, len, padbit);
++	else
++#endif
++#ifdef CONFIG_AS_AVX2
++	if (poly1305_use_avx2)
++		poly1305_blocks_avx2(ctx, inp, len, padbit);
++	else
++#endif
++#ifdef CONFIG_AS_AVX
++	if (poly1305_use_avx)
++		poly1305_blocks_avx(ctx, inp, len, padbit);
++	else
++#endif
++		poly1305_blocks_x86_64(ctx, inp, len, padbit);
++	return true;
 +}
++
 +static inline bool poly1305_emit_arch(void *ctx, u8 mac[POLY1305_MAC_SIZE],
 +				      const u32 nonce[4],
 +				      simd_context_t *simd_context)
 +{
-+	return false;
-+}
-+void __init poly1305_fpu_init(void)
-+{
-+}
++	struct poly1305_arch_internal *state = ctx;
++
++	if (!poly1305_use_avx || !state->is_base2_26 ||!simd_use(simd_context))
++		poly1305_emit_x86_64(ctx, mac, nonce);
++	else
++#ifdef CONFIG_AS_AVX512
++	if (poly1305_use_avx512)
++		poly1305_emit_avx(ctx, mac, nonce);
++	else
 +#endif
-+
-+#if defined(CONFIG_ARCH_SUPPORTS_INT128) && defined(__SIZEOF_INT128__)
-+#include "poly1305-donna64.h"
-+#else
-+#include "poly1305-donna32.h"
++#ifdef CONFIG_AS_AVX2
++	if (poly1305_use_avx2)
++		poly1305_emit_avx(ctx, mac, nonce);
++	else
 +#endif
-+
-+void poly1305_init(struct poly1305_ctx *ctx, const u8 key[POLY1305_KEY_SIZE])
-+{
-+	ctx->nonce[0] = get_unaligned_le32(&key[16]);
-+	ctx->nonce[1] = get_unaligned_le32(&key[20]);
-+	ctx->nonce[2] = get_unaligned_le32(&key[24]);
-+	ctx->nonce[3] = get_unaligned_le32(&key[28]);
-+
-+	if (!poly1305_init_arch(ctx->opaque, key))
-+		poly1305_init_generic(ctx->opaque, key);
-+
-+	ctx->num = 0;
-+}
-+EXPORT_SYMBOL(poly1305_init);
-+
-+static inline void poly1305_blocks(void *ctx, const u8 *input, const size_t len,
-+				   const u32 padbit,
-+				   simd_context_t *simd_context)
-+{
-+	if (!poly1305_blocks_arch(ctx, input, len, padbit, simd_context))
-+		poly1305_blocks_generic(ctx, input, len, padbit);
-+}
-+
-+static inline void poly1305_emit(void *ctx, u8 mac[POLY1305_KEY_SIZE],
-+				 const u32 nonce[4],
-+				 simd_context_t *simd_context)
-+{
-+	if (!poly1305_emit_arch(ctx, mac, nonce, simd_context))
-+		poly1305_emit_generic(ctx, mac, nonce);
-+}
-+
-+void poly1305_update(struct poly1305_ctx *ctx, const u8 *input, size_t len,
-+		     simd_context_t *simd_context)
-+{
-+	const size_t num = ctx->num % POLY1305_BLOCK_SIZE;
-+	size_t rem;
-+
-+	if (num) {
-+		rem = POLY1305_BLOCK_SIZE - num;
-+		if (len < rem) {
-+			memcpy(ctx->data + num, input, len);
-+			ctx->num = num + len;
-+			return;
-+		}
-+		memcpy(ctx->data + num, input, rem);
-+		poly1305_blocks(ctx->opaque, ctx->data, POLY1305_BLOCK_SIZE, 1,
-+				simd_context);
-+		input += rem;
-+		len -= rem;
-+	}
-+
-+	rem = len % POLY1305_BLOCK_SIZE;
-+	len -= rem;
-+
-+	if (len >= POLY1305_BLOCK_SIZE) {
-+		poly1305_blocks(ctx->opaque, input, len, 1, simd_context);
-+		input += len;
-+	}
-+
-+	if (rem)
-+		memcpy(ctx->data, input, rem);
-+
-+	ctx->num = rem;
-+}
-+EXPORT_SYMBOL(poly1305_update);
-+
-+void poly1305_final(struct poly1305_ctx *ctx, u8 mac[POLY1305_MAC_SIZE],
-+		    simd_context_t *simd_context)
-+{
-+	size_t num = ctx->num % POLY1305_BLOCK_SIZE;
-+
-+	if (num) {
-+		ctx->data[num++] = 1;
-+		while (num < POLY1305_BLOCK_SIZE)
-+			ctx->data[num++] = 0;
-+		poly1305_blocks(ctx->opaque, ctx->data, POLY1305_BLOCK_SIZE, 0,
-+				simd_context);
-+	}
-+
-+	poly1305_emit(ctx->opaque, mac, ctx->nonce, simd_context);
-+
-+	memzero_explicit(ctx, sizeof(*ctx));
-+}
-+EXPORT_SYMBOL(poly1305_final);
-+
-+#include "../selftest/poly1305.h"
-+
-+static bool nosimd __initdata = false;
-+
-+static int __init mod_init(void)
-+{
-+	if (!nosimd)
-+		poly1305_fpu_init();
-+#ifdef DEBUG
-+	if (!poly1305_selftest())
-+		return -ENOTRECOVERABLE;
++#ifdef CONFIG_AS_AVX
++	if (poly1305_use_avx)
++		poly1305_emit_avx(ctx, mac, nonce);
++	else
 +#endif
-+	return 0;
++		poly1305_emit_x86_64(ctx, mac, nonce);
++	return true;
 +}
-+
-+static void __exit mod_exit(void)
-+{
-+}
-+
-+module_param(nosimd, bool, 0);
-+module_init(mod_init);
-+module_exit(mod_exit);
-+MODULE_LICENSE("GPL v2");
-+MODULE_DESCRIPTION("Poly1305 one-time authenticator");
-+MODULE_AUTHOR("Jason A. Donenfeld <Jason@zx2c4.com>");
-diff --git a/lib/zinc/selftest/poly1305.h b/lib/zinc/selftest/poly1305.h
+diff --git a/lib/zinc/poly1305/poly1305-x86_64.S b/lib/zinc/poly1305/poly1305-x86_64.S
 new file mode 100644
-index 000000000000..1439c98e879a
+index 000000000000..a0d43437ac73
 --- /dev/null
-+++ b/lib/zinc/selftest/poly1305.h
-@@ -0,0 +1,875 @@
-+/* SPDX-License-Identifier: MIT
++++ b/lib/zinc/poly1305/poly1305-x86_64.S
+@@ -0,0 +1,2792 @@
++/* SPDX-License-Identifier: BSD-3-Clause
 + *
++ * Copyright (C) 2017 Samuel Neves <sneves@dei.uc.pt>. All Rights Reserved.
 + * Copyright (C) 2015-2018 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
++ * Copyright (C) 2006-2017 CRYPTOGAMS by <appro@openssl.org>. All Rights Reserved.
++ *
++ * This is based in part on Andy Polyakov's implementation from CRYPTOGAMS.
 + */
 +
-+#ifdef DEBUG
-+struct poly1305_testvec {
-+	u8 input[600];
-+	u8 output[POLY1305_MAC_SIZE];
-+	u8 key[POLY1305_KEY_SIZE];
-+	size_t ilen;
-+};
++#include <linux/linkage.h>
 +
-+static const struct poly1305_testvec poly1305_testvecs[] __initconst = {
-+{ /* RFC7539 */
-+	.input	= { 0x43, 0x72, 0x79, 0x70, 0x74, 0x6f, 0x67, 0x72,
-+		    0x61, 0x70, 0x68, 0x69, 0x63, 0x20, 0x46, 0x6f,
-+		    0x72, 0x75, 0x6d, 0x20, 0x52, 0x65, 0x73, 0x65,
-+		    0x61, 0x72, 0x63, 0x68, 0x20, 0x47, 0x72, 0x6f,
-+		    0x75, 0x70 },
-+	.ilen	= 34,
-+	.output	= { 0xa8, 0x06, 0x1d, 0xc1, 0x30, 0x51, 0x36, 0xc6,
-+		    0xc2, 0x2b, 0x8b, 0xaf, 0x0c, 0x01, 0x27, 0xa9 },
-+	.key	= { 0x85, 0xd6, 0xbe, 0x78, 0x57, 0x55, 0x6d, 0x33,
-+		    0x7f, 0x44, 0x52, 0xfe, 0x42, 0xd5, 0x06, 0xa8,
-+		    0x01, 0x03, 0x80, 0x8a, 0xfb, 0x0d, 0xb2, 0xfd,
-+		    0x4a, 0xbf, 0xf6, 0xaf, 0x41, 0x49, 0xf5, 0x1b },
-+}, { /* "The Poly1305-AES message-authentication code" */
-+	.input	= { 0xf3, 0xf6 },
-+	.ilen	= 2,
-+	.output	= { 0xf4, 0xc6, 0x33, 0xc3, 0x04, 0x4f, 0xc1, 0x45,
-+		    0xf8, 0x4f, 0x33, 0x5c, 0xb8, 0x19, 0x53, 0xde },
-+	.key	= { 0x85, 0x1f, 0xc4, 0x0c, 0x34, 0x67, 0xac, 0x0b,
-+		    0xe0, 0x5c, 0xc2, 0x04, 0x04, 0xf3, 0xf7, 0x00,
-+		    0x58, 0x0b, 0x3b, 0x0f, 0x94, 0x47, 0xbb, 0x1e,
-+		    0x69, 0xd0, 0x95, 0xb5, 0x92, 0x8b, 0x6d, 0xbc },
-+}, {
-+	.input	= "",
-+	.ilen	= 0,
-+	.output	= { 0xdd, 0x3f, 0xab, 0x22, 0x51, 0xf1, 0x1a, 0xc7,
-+		    0x59, 0xf0, 0x88, 0x71, 0x29, 0xcc, 0x2e, 0xe7 },
-+	.key	= { 0xa0, 0xf3, 0x08, 0x00, 0x00, 0xf4, 0x64, 0x00,
-+		    0xd0, 0xc7, 0xe9, 0x07, 0x6c, 0x83, 0x44, 0x03,
-+		    0xdd, 0x3f, 0xab, 0x22, 0x51, 0xf1, 0x1a, 0xc7,
-+		    0x59, 0xf0, 0x88, 0x71, 0x29, 0xcc, 0x2e, 0xe7 },
-+}, {
-+	.input	= { 0x66, 0x3c, 0xea, 0x19, 0x0f, 0xfb, 0x83, 0xd8,
-+		    0x95, 0x93, 0xf3, 0xf4, 0x76, 0xb6, 0xbc, 0x24,
-+		    0xd7, 0xe6, 0x79, 0x10, 0x7e, 0xa2, 0x6a, 0xdb,
-+		    0x8c, 0xaf, 0x66, 0x52, 0xd0, 0x65, 0x61, 0x36 },
-+	.ilen	= 32,
-+	.output	= { 0x0e, 0xe1, 0xc1, 0x6b, 0xb7, 0x3f, 0x0f, 0x4f,
-+		    0xd1, 0x98, 0x81, 0x75, 0x3c, 0x01, 0xcd, 0xbe },
-+	.key	= { 0x48, 0x44, 0x3d, 0x0b, 0xb0, 0xd2, 0x11, 0x09,
-+		    0xc8, 0x9a, 0x10, 0x0b, 0x5c, 0xe2, 0xc2, 0x08,
-+		    0x83, 0x14, 0x9c, 0x69, 0xb5, 0x61, 0xdd, 0x88,
-+		    0x29, 0x8a, 0x17, 0x98, 0xb1, 0x07, 0x16, 0xef },
-+}, {
-+	.input	= { 0xab, 0x08, 0x12, 0x72, 0x4a, 0x7f, 0x1e, 0x34,
-+		    0x27, 0x42, 0xcb, 0xed, 0x37, 0x4d, 0x94, 0xd1,
-+		    0x36, 0xc6, 0xb8, 0x79, 0x5d, 0x45, 0xb3, 0x81,
-+		    0x98, 0x30, 0xf2, 0xc0, 0x44, 0x91, 0xfa, 0xf0,
-+		    0x99, 0x0c, 0x62, 0xe4, 0x8b, 0x80, 0x18, 0xb2,
-+		    0xc3, 0xe4, 0xa0, 0xfa, 0x31, 0x34, 0xcb, 0x67,
-+		    0xfa, 0x83, 0xe1, 0x58, 0xc9, 0x94, 0xd9, 0x61,
-+		    0xc4, 0xcb, 0x21, 0x09, 0x5c, 0x1b, 0xf9 },
-+	.ilen	= 63,
-+	.output	= { 0x51, 0x54, 0xad, 0x0d, 0x2c, 0xb2, 0x6e, 0x01,
-+		    0x27, 0x4f, 0xc5, 0x11, 0x48, 0x49, 0x1f, 0x1b },
-+	.key	= { 0x12, 0x97, 0x6a, 0x08, 0xc4, 0x42, 0x6d, 0x0c,
-+		    0xe8, 0xa8, 0x24, 0x07, 0xc4, 0xf4, 0x82, 0x07,
-+		    0x80, 0xf8, 0xc2, 0x0a, 0xa7, 0x12, 0x02, 0xd1,
-+		    0xe2, 0x91, 0x79, 0xcb, 0xcb, 0x55, 0x5a, 0x57 },
-+}, { /* self-generated vectors exercise "significant" lengths, such that they
-+      * are handled by different code paths */
-+	.input	= { 0xab, 0x08, 0x12, 0x72, 0x4a, 0x7f, 0x1e, 0x34,
-+		    0x27, 0x42, 0xcb, 0xed, 0x37, 0x4d, 0x94, 0xd1,
-+		    0x36, 0xc6, 0xb8, 0x79, 0x5d, 0x45, 0xb3, 0x81,
-+		    0x98, 0x30, 0xf2, 0xc0, 0x44, 0x91, 0xfa, 0xf0,
-+		    0x99, 0x0c, 0x62, 0xe4, 0x8b, 0x80, 0x18, 0xb2,
-+		    0xc3, 0xe4, 0xa0, 0xfa, 0x31, 0x34, 0xcb, 0x67,
-+		    0xfa, 0x83, 0xe1, 0x58, 0xc9, 0x94, 0xd9, 0x61,
-+		    0xc4, 0xcb, 0x21, 0x09, 0x5c, 0x1b, 0xf9, 0xaf },
-+	.ilen	= 64,
-+	.output	= { 0x81, 0x20, 0x59, 0xa5, 0xda, 0x19, 0x86, 0x37,
-+		    0xca, 0xc7, 0xc4, 0xa6, 0x31, 0xbe, 0xe4, 0x66 },
-+	.key	= { 0x12, 0x97, 0x6a, 0x08, 0xc4, 0x42, 0x6d, 0x0c,
-+		    0xe8, 0xa8, 0x24, 0x07, 0xc4, 0xf4, 0x82, 0x07,
-+		    0x80, 0xf8, 0xc2, 0x0a, 0xa7, 0x12, 0x02, 0xd1,
-+		    0xe2, 0x91, 0x79, 0xcb, 0xcb, 0x55, 0x5a, 0x57 },
-+}, {
-+	.input	= { 0xab, 0x08, 0x12, 0x72, 0x4a, 0x7f, 0x1e, 0x34,
-+		    0x27, 0x42, 0xcb, 0xed, 0x37, 0x4d, 0x94, 0xd1,
-+		    0x36, 0xc6, 0xb8, 0x79, 0x5d, 0x45, 0xb3, 0x81,
-+		    0x98, 0x30, 0xf2, 0xc0, 0x44, 0x91, 0xfa, 0xf0,
-+		    0x99, 0x0c, 0x62, 0xe4, 0x8b, 0x80, 0x18, 0xb2,
-+		    0xc3, 0xe4, 0xa0, 0xfa, 0x31, 0x34, 0xcb, 0x67 },
-+	.ilen	= 48,
-+	.output	= { 0x5b, 0x88, 0xd7, 0xf6, 0x22, 0x8b, 0x11, 0xe2,
-+		    0xe2, 0x85, 0x79, 0xa5, 0xc0, 0xc1, 0xf7, 0x61 },
-+	.key	= { 0x12, 0x97, 0x6a, 0x08, 0xc4, 0x42, 0x6d, 0x0c,
-+		    0xe8, 0xa8, 0x24, 0x07, 0xc4, 0xf4, 0x82, 0x07,
-+		    0x80, 0xf8, 0xc2, 0x0a, 0xa7, 0x12, 0x02, 0xd1,
-+		    0xe2, 0x91, 0x79, 0xcb, 0xcb, 0x55, 0x5a, 0x57 },
-+}, {
-+	.input	= { 0xab, 0x08, 0x12, 0x72, 0x4a, 0x7f, 0x1e, 0x34,
-+		    0x27, 0x42, 0xcb, 0xed, 0x37, 0x4d, 0x94, 0xd1,
-+		    0x36, 0xc6, 0xb8, 0x79, 0x5d, 0x45, 0xb3, 0x81,
-+		    0x98, 0x30, 0xf2, 0xc0, 0x44, 0x91, 0xfa, 0xf0,
-+		    0x99, 0x0c, 0x62, 0xe4, 0x8b, 0x80, 0x18, 0xb2,
-+		    0xc3, 0xe4, 0xa0, 0xfa, 0x31, 0x34, 0xcb, 0x67,
-+		    0xfa, 0x83, 0xe1, 0x58, 0xc9, 0x94, 0xd9, 0x61,
-+		    0xc4, 0xcb, 0x21, 0x09, 0x5c, 0x1b, 0xf9, 0xaf,
-+		    0x66, 0x3c, 0xea, 0x19, 0x0f, 0xfb, 0x83, 0xd8,
-+		    0x95, 0x93, 0xf3, 0xf4, 0x76, 0xb6, 0xbc, 0x24,
-+		    0xd7, 0xe6, 0x79, 0x10, 0x7e, 0xa2, 0x6a, 0xdb,
-+		    0x8c, 0xaf, 0x66, 0x52, 0xd0, 0x65, 0x61, 0x36 },
-+	.ilen	= 96,
-+	.output	= { 0xbb, 0xb6, 0x13, 0xb2, 0xb6, 0xd7, 0x53, 0xba,
-+		    0x07, 0x39, 0x5b, 0x91, 0x6a, 0xae, 0xce, 0x15 },
-+	.key	= { 0x12, 0x97, 0x6a, 0x08, 0xc4, 0x42, 0x6d, 0x0c,
-+		    0xe8, 0xa8, 0x24, 0x07, 0xc4, 0xf4, 0x82, 0x07,
-+		    0x80, 0xf8, 0xc2, 0x0a, 0xa7, 0x12, 0x02, 0xd1,
-+		    0xe2, 0x91, 0x79, 0xcb, 0xcb, 0x55, 0x5a, 0x57 },
-+}, {
-+	.input	= { 0xab, 0x08, 0x12, 0x72, 0x4a, 0x7f, 0x1e, 0x34,
-+		    0x27, 0x42, 0xcb, 0xed, 0x37, 0x4d, 0x94, 0xd1,
-+		    0x36, 0xc6, 0xb8, 0x79, 0x5d, 0x45, 0xb3, 0x81,
-+		    0x98, 0x30, 0xf2, 0xc0, 0x44, 0x91, 0xfa, 0xf0,
-+		    0x99, 0x0c, 0x62, 0xe4, 0x8b, 0x80, 0x18, 0xb2,
-+		    0xc3, 0xe4, 0xa0, 0xfa, 0x31, 0x34, 0xcb, 0x67,
-+		    0xfa, 0x83, 0xe1, 0x58, 0xc9, 0x94, 0xd9, 0x61,
-+		    0xc4, 0xcb, 0x21, 0x09, 0x5c, 0x1b, 0xf9, 0xaf,
-+		    0x48, 0x44, 0x3d, 0x0b, 0xb0, 0xd2, 0x11, 0x09,
-+		    0xc8, 0x9a, 0x10, 0x0b, 0x5c, 0xe2, 0xc2, 0x08,
-+		    0x83, 0x14, 0x9c, 0x69, 0xb5, 0x61, 0xdd, 0x88,
-+		    0x29, 0x8a, 0x17, 0x98, 0xb1, 0x07, 0x16, 0xef,
-+		    0x66, 0x3c, 0xea, 0x19, 0x0f, 0xfb, 0x83, 0xd8,
-+		    0x95, 0x93, 0xf3, 0xf4, 0x76, 0xb6, 0xbc, 0x24 },
-+	.ilen	= 112,
-+	.output	= { 0xc7, 0x94, 0xd7, 0x05, 0x7d, 0x17, 0x78, 0xc4,
-+		    0xbb, 0xee, 0x0a, 0x39, 0xb3, 0xd9, 0x73, 0x42 },
-+	.key	= { 0x12, 0x97, 0x6a, 0x08, 0xc4, 0x42, 0x6d, 0x0c,
-+		    0xe8, 0xa8, 0x24, 0x07, 0xc4, 0xf4, 0x82, 0x07,
-+		    0x80, 0xf8, 0xc2, 0x0a, 0xa7, 0x12, 0x02, 0xd1,
-+		    0xe2, 0x91, 0x79, 0xcb, 0xcb, 0x55, 0x5a, 0x57 },
-+}, {
-+	.input	= { 0xab, 0x08, 0x12, 0x72, 0x4a, 0x7f, 0x1e, 0x34,
-+		    0x27, 0x42, 0xcb, 0xed, 0x37, 0x4d, 0x94, 0xd1,
-+		    0x36, 0xc6, 0xb8, 0x79, 0x5d, 0x45, 0xb3, 0x81,
-+		    0x98, 0x30, 0xf2, 0xc0, 0x44, 0x91, 0xfa, 0xf0,
-+		    0x99, 0x0c, 0x62, 0xe4, 0x8b, 0x80, 0x18, 0xb2,
-+		    0xc3, 0xe4, 0xa0, 0xfa, 0x31, 0x34, 0xcb, 0x67,
-+		    0xfa, 0x83, 0xe1, 0x58, 0xc9, 0x94, 0xd9, 0x61,
-+		    0xc4, 0xcb, 0x21, 0x09, 0x5c, 0x1b, 0xf9, 0xaf,
-+		    0x48, 0x44, 0x3d, 0x0b, 0xb0, 0xd2, 0x11, 0x09,
-+		    0xc8, 0x9a, 0x10, 0x0b, 0x5c, 0xe2, 0xc2, 0x08,
-+		    0x83, 0x14, 0x9c, 0x69, 0xb5, 0x61, 0xdd, 0x88,
-+		    0x29, 0x8a, 0x17, 0x98, 0xb1, 0x07, 0x16, 0xef,
-+		    0x66, 0x3c, 0xea, 0x19, 0x0f, 0xfb, 0x83, 0xd8,
-+		    0x95, 0x93, 0xf3, 0xf4, 0x76, 0xb6, 0xbc, 0x24,
-+		    0xd7, 0xe6, 0x79, 0x10, 0x7e, 0xa2, 0x6a, 0xdb,
-+		    0x8c, 0xaf, 0x66, 0x52, 0xd0, 0x65, 0x61, 0x36 },
-+	.ilen	= 128,
-+	.output	= { 0xff, 0xbc, 0xb9, 0xb3, 0x71, 0x42, 0x31, 0x52,
-+		    0xd7, 0xfc, 0xa5, 0xad, 0x04, 0x2f, 0xba, 0xa9 },
-+	.key	= { 0x12, 0x97, 0x6a, 0x08, 0xc4, 0x42, 0x6d, 0x0c,
-+		    0xe8, 0xa8, 0x24, 0x07, 0xc4, 0xf4, 0x82, 0x07,
-+		    0x80, 0xf8, 0xc2, 0x0a, 0xa7, 0x12, 0x02, 0xd1,
-+		    0xe2, 0x91, 0x79, 0xcb, 0xcb, 0x55, 0x5a, 0x57 },
-+}, {
-+	.input	= { 0xab, 0x08, 0x12, 0x72, 0x4a, 0x7f, 0x1e, 0x34,
-+		    0x27, 0x42, 0xcb, 0xed, 0x37, 0x4d, 0x94, 0xd1,
-+		    0x36, 0xc6, 0xb8, 0x79, 0x5d, 0x45, 0xb3, 0x81,
-+		    0x98, 0x30, 0xf2, 0xc0, 0x44, 0x91, 0xfa, 0xf0,
-+		    0x99, 0x0c, 0x62, 0xe4, 0x8b, 0x80, 0x18, 0xb2,
-+		    0xc3, 0xe4, 0xa0, 0xfa, 0x31, 0x34, 0xcb, 0x67,
-+		    0xfa, 0x83, 0xe1, 0x58, 0xc9, 0x94, 0xd9, 0x61,
-+		    0xc4, 0xcb, 0x21, 0x09, 0x5c, 0x1b, 0xf9, 0xaf,
-+		    0x48, 0x44, 0x3d, 0x0b, 0xb0, 0xd2, 0x11, 0x09,
-+		    0xc8, 0x9a, 0x10, 0x0b, 0x5c, 0xe2, 0xc2, 0x08,
-+		    0x83, 0x14, 0x9c, 0x69, 0xb5, 0x61, 0xdd, 0x88,
-+		    0x29, 0x8a, 0x17, 0x98, 0xb1, 0x07, 0x16, 0xef,
-+		    0x66, 0x3c, 0xea, 0x19, 0x0f, 0xfb, 0x83, 0xd8,
-+		    0x95, 0x93, 0xf3, 0xf4, 0x76, 0xb6, 0xbc, 0x24,
-+		    0xd7, 0xe6, 0x79, 0x10, 0x7e, 0xa2, 0x6a, 0xdb,
-+		    0x8c, 0xaf, 0x66, 0x52, 0xd0, 0x65, 0x61, 0x36,
-+		    0x81, 0x20, 0x59, 0xa5, 0xda, 0x19, 0x86, 0x37,
-+		    0xca, 0xc7, 0xc4, 0xa6, 0x31, 0xbe, 0xe4, 0x66 },
-+	.ilen	= 144,
-+	.output	= { 0x06, 0x9e, 0xd6, 0xb8, 0xef, 0x0f, 0x20, 0x7b,
-+		    0x3e, 0x24, 0x3b, 0xb1, 0x01, 0x9f, 0xe6, 0x32 },
-+	.key	= { 0x12, 0x97, 0x6a, 0x08, 0xc4, 0x42, 0x6d, 0x0c,
-+		    0xe8, 0xa8, 0x24, 0x07, 0xc4, 0xf4, 0x82, 0x07,
-+		    0x80, 0xf8, 0xc2, 0x0a, 0xa7, 0x12, 0x02, 0xd1,
-+		    0xe2, 0x91, 0x79, 0xcb, 0xcb, 0x55, 0x5a, 0x57 },
-+}, {
-+	.input	= { 0xab, 0x08, 0x12, 0x72, 0x4a, 0x7f, 0x1e, 0x34,
-+		    0x27, 0x42, 0xcb, 0xed, 0x37, 0x4d, 0x94, 0xd1,
-+		    0x36, 0xc6, 0xb8, 0x79, 0x5d, 0x45, 0xb3, 0x81,
-+		    0x98, 0x30, 0xf2, 0xc0, 0x44, 0x91, 0xfa, 0xf0,
-+		    0x99, 0x0c, 0x62, 0xe4, 0x8b, 0x80, 0x18, 0xb2,
-+		    0xc3, 0xe4, 0xa0, 0xfa, 0x31, 0x34, 0xcb, 0x67,
-+		    0xfa, 0x83, 0xe1, 0x58, 0xc9, 0x94, 0xd9, 0x61,
-+		    0xc4, 0xcb, 0x21, 0x09, 0x5c, 0x1b, 0xf9, 0xaf,
-+		    0x48, 0x44, 0x3d, 0x0b, 0xb0, 0xd2, 0x11, 0x09,
-+		    0xc8, 0x9a, 0x10, 0x0b, 0x5c, 0xe2, 0xc2, 0x08,
-+		    0x83, 0x14, 0x9c, 0x69, 0xb5, 0x61, 0xdd, 0x88,
-+		    0x29, 0x8a, 0x17, 0x98, 0xb1, 0x07, 0x16, 0xef,
-+		    0x66, 0x3c, 0xea, 0x19, 0x0f, 0xfb, 0x83, 0xd8,
-+		    0x95, 0x93, 0xf3, 0xf4, 0x76, 0xb6, 0xbc, 0x24,
-+		    0xd7, 0xe6, 0x79, 0x10, 0x7e, 0xa2, 0x6a, 0xdb,
-+		    0x8c, 0xaf, 0x66, 0x52, 0xd0, 0x65, 0x61, 0x36,
-+		    0x81, 0x20, 0x59, 0xa5, 0xda, 0x19, 0x86, 0x37,
-+		    0xca, 0xc7, 0xc4, 0xa6, 0x31, 0xbe, 0xe4, 0x66,
-+		    0x5b, 0x88, 0xd7, 0xf6, 0x22, 0x8b, 0x11, 0xe2,
-+		    0xe2, 0x85, 0x79, 0xa5, 0xc0, 0xc1, 0xf7, 0x61 },
-+	.ilen	= 160,
-+	.output	= { 0xcc, 0xa3, 0x39, 0xd9, 0xa4, 0x5f, 0xa2, 0x36,
-+		    0x8c, 0x2c, 0x68, 0xb3, 0xa4, 0x17, 0x91, 0x33 },
-+	.key	= { 0x12, 0x97, 0x6a, 0x08, 0xc4, 0x42, 0x6d, 0x0c,
-+		    0xe8, 0xa8, 0x24, 0x07, 0xc4, 0xf4, 0x82, 0x07,
-+		    0x80, 0xf8, 0xc2, 0x0a, 0xa7, 0x12, 0x02, 0xd1,
-+		    0xe2, 0x91, 0x79, 0xcb, 0xcb, 0x55, 0x5a, 0x57 },
-+}, {
-+	.input	= { 0xab, 0x08, 0x12, 0x72, 0x4a, 0x7f, 0x1e, 0x34,
-+		    0x27, 0x42, 0xcb, 0xed, 0x37, 0x4d, 0x94, 0xd1,
-+		    0x36, 0xc6, 0xb8, 0x79, 0x5d, 0x45, 0xb3, 0x81,
-+		    0x98, 0x30, 0xf2, 0xc0, 0x44, 0x91, 0xfa, 0xf0,
-+		    0x99, 0x0c, 0x62, 0xe4, 0x8b, 0x80, 0x18, 0xb2,
-+		    0xc3, 0xe4, 0xa0, 0xfa, 0x31, 0x34, 0xcb, 0x67,
-+		    0xfa, 0x83, 0xe1, 0x58, 0xc9, 0x94, 0xd9, 0x61,
-+		    0xc4, 0xcb, 0x21, 0x09, 0x5c, 0x1b, 0xf9, 0xaf,
-+		    0x48, 0x44, 0x3d, 0x0b, 0xb0, 0xd2, 0x11, 0x09,
-+		    0xc8, 0x9a, 0x10, 0x0b, 0x5c, 0xe2, 0xc2, 0x08,
-+		    0x83, 0x14, 0x9c, 0x69, 0xb5, 0x61, 0xdd, 0x88,
-+		    0x29, 0x8a, 0x17, 0x98, 0xb1, 0x07, 0x16, 0xef,
-+		    0x66, 0x3c, 0xea, 0x19, 0x0f, 0xfb, 0x83, 0xd8,
-+		    0x95, 0x93, 0xf3, 0xf4, 0x76, 0xb6, 0xbc, 0x24,
-+		    0xd7, 0xe6, 0x79, 0x10, 0x7e, 0xa2, 0x6a, 0xdb,
-+		    0x8c, 0xaf, 0x66, 0x52, 0xd0, 0x65, 0x61, 0x36,
-+		    0x81, 0x20, 0x59, 0xa5, 0xda, 0x19, 0x86, 0x37,
-+		    0xca, 0xc7, 0xc4, 0xa6, 0x31, 0xbe, 0xe4, 0x66,
-+		    0x5b, 0x88, 0xd7, 0xf6, 0x22, 0x8b, 0x11, 0xe2,
-+		    0xe2, 0x85, 0x79, 0xa5, 0xc0, 0xc1, 0xf7, 0x61,
-+		    0xab, 0x08, 0x12, 0x72, 0x4a, 0x7f, 0x1e, 0x34,
-+		    0x27, 0x42, 0xcb, 0xed, 0x37, 0x4d, 0x94, 0xd1,
-+		    0x36, 0xc6, 0xb8, 0x79, 0x5d, 0x45, 0xb3, 0x81,
-+		    0x98, 0x30, 0xf2, 0xc0, 0x44, 0x91, 0xfa, 0xf0,
-+		    0x99, 0x0c, 0x62, 0xe4, 0x8b, 0x80, 0x18, 0xb2,
-+		    0xc3, 0xe4, 0xa0, 0xfa, 0x31, 0x34, 0xcb, 0x67,
-+		    0xfa, 0x83, 0xe1, 0x58, 0xc9, 0x94, 0xd9, 0x61,
-+		    0xc4, 0xcb, 0x21, 0x09, 0x5c, 0x1b, 0xf9, 0xaf,
-+		    0x48, 0x44, 0x3d, 0x0b, 0xb0, 0xd2, 0x11, 0x09,
-+		    0xc8, 0x9a, 0x10, 0x0b, 0x5c, 0xe2, 0xc2, 0x08,
-+		    0x83, 0x14, 0x9c, 0x69, 0xb5, 0x61, 0xdd, 0x88,
-+		    0x29, 0x8a, 0x17, 0x98, 0xb1, 0x07, 0x16, 0xef,
-+		    0x66, 0x3c, 0xea, 0x19, 0x0f, 0xfb, 0x83, 0xd8,
-+		    0x95, 0x93, 0xf3, 0xf4, 0x76, 0xb6, 0xbc, 0x24,
-+		    0xd7, 0xe6, 0x79, 0x10, 0x7e, 0xa2, 0x6a, 0xdb,
-+		    0x8c, 0xaf, 0x66, 0x52, 0xd0, 0x65, 0x61, 0x36 },
-+	.ilen	= 288,
-+	.output	= { 0x53, 0xf6, 0xe8, 0x28, 0xa2, 0xf0, 0xfe, 0x0e,
-+		    0xe8, 0x15, 0xbf, 0x0b, 0xd5, 0x84, 0x1a, 0x34 },
-+	.key	= { 0x12, 0x97, 0x6a, 0x08, 0xc4, 0x42, 0x6d, 0x0c,
-+		    0xe8, 0xa8, 0x24, 0x07, 0xc4, 0xf4, 0x82, 0x07,
-+		    0x80, 0xf8, 0xc2, 0x0a, 0xa7, 0x12, 0x02, 0xd1,
-+		    0xe2, 0x91, 0x79, 0xcb, 0xcb, 0x55, 0x5a, 0x57 },
-+}, {
-+	.input	= { 0xab, 0x08, 0x12, 0x72, 0x4a, 0x7f, 0x1e, 0x34,
-+		    0x27, 0x42, 0xcb, 0xed, 0x37, 0x4d, 0x94, 0xd1,
-+		    0x36, 0xc6, 0xb8, 0x79, 0x5d, 0x45, 0xb3, 0x81,
-+		    0x98, 0x30, 0xf2, 0xc0, 0x44, 0x91, 0xfa, 0xf0,
-+		    0x99, 0x0c, 0x62, 0xe4, 0x8b, 0x80, 0x18, 0xb2,
-+		    0xc3, 0xe4, 0xa0, 0xfa, 0x31, 0x34, 0xcb, 0x67,
-+		    0xfa, 0x83, 0xe1, 0x58, 0xc9, 0x94, 0xd9, 0x61,
-+		    0xc4, 0xcb, 0x21, 0x09, 0x5c, 0x1b, 0xf9, 0xaf,
-+		    0x48, 0x44, 0x3d, 0x0b, 0xb0, 0xd2, 0x11, 0x09,
-+		    0xc8, 0x9a, 0x10, 0x0b, 0x5c, 0xe2, 0xc2, 0x08,
-+		    0x83, 0x14, 0x9c, 0x69, 0xb5, 0x61, 0xdd, 0x88,
-+		    0x29, 0x8a, 0x17, 0x98, 0xb1, 0x07, 0x16, 0xef,
-+		    0x66, 0x3c, 0xea, 0x19, 0x0f, 0xfb, 0x83, 0xd8,
-+		    0x95, 0x93, 0xf3, 0xf4, 0x76, 0xb6, 0xbc, 0x24,
-+		    0xd7, 0xe6, 0x79, 0x10, 0x7e, 0xa2, 0x6a, 0xdb,
-+		    0x8c, 0xaf, 0x66, 0x52, 0xd0, 0x65, 0x61, 0x36,
-+		    0x81, 0x20, 0x59, 0xa5, 0xda, 0x19, 0x86, 0x37,
-+		    0xca, 0xc7, 0xc4, 0xa6, 0x31, 0xbe, 0xe4, 0x66,
-+		    0x5b, 0x88, 0xd7, 0xf6, 0x22, 0x8b, 0x11, 0xe2,
-+		    0xe2, 0x85, 0x79, 0xa5, 0xc0, 0xc1, 0xf7, 0x61,
-+		    0xab, 0x08, 0x12, 0x72, 0x4a, 0x7f, 0x1e, 0x34,
-+		    0x27, 0x42, 0xcb, 0xed, 0x37, 0x4d, 0x94, 0xd1,
-+		    0x36, 0xc6, 0xb8, 0x79, 0x5d, 0x45, 0xb3, 0x81,
-+		    0x98, 0x30, 0xf2, 0xc0, 0x44, 0x91, 0xfa, 0xf0,
-+		    0x99, 0x0c, 0x62, 0xe4, 0x8b, 0x80, 0x18, 0xb2,
-+		    0xc3, 0xe4, 0xa0, 0xfa, 0x31, 0x34, 0xcb, 0x67,
-+		    0xfa, 0x83, 0xe1, 0x58, 0xc9, 0x94, 0xd9, 0x61,
-+		    0xc4, 0xcb, 0x21, 0x09, 0x5c, 0x1b, 0xf9, 0xaf,
-+		    0x48, 0x44, 0x3d, 0x0b, 0xb0, 0xd2, 0x11, 0x09,
-+		    0xc8, 0x9a, 0x10, 0x0b, 0x5c, 0xe2, 0xc2, 0x08,
-+		    0x83, 0x14, 0x9c, 0x69, 0xb5, 0x61, 0xdd, 0x88,
-+		    0x29, 0x8a, 0x17, 0x98, 0xb1, 0x07, 0x16, 0xef,
-+		    0x66, 0x3c, 0xea, 0x19, 0x0f, 0xfb, 0x83, 0xd8,
-+		    0x95, 0x93, 0xf3, 0xf4, 0x76, 0xb6, 0xbc, 0x24,
-+		    0xd7, 0xe6, 0x79, 0x10, 0x7e, 0xa2, 0x6a, 0xdb,
-+		    0x8c, 0xaf, 0x66, 0x52, 0xd0, 0x65, 0x61, 0x36,
-+		    0x81, 0x20, 0x59, 0xa5, 0xda, 0x19, 0x86, 0x37,
-+		    0xca, 0xc7, 0xc4, 0xa6, 0x31, 0xbe, 0xe4, 0x66,
-+		    0x5b, 0x88, 0xd7, 0xf6, 0x22, 0x8b, 0x11, 0xe2,
-+		    0xe2, 0x85, 0x79, 0xa5, 0xc0, 0xc1, 0xf7, 0x61 },
-+	.ilen	= 320,
-+	.output	= { 0xb8, 0x46, 0xd4, 0x4e, 0x9b, 0xbd, 0x53, 0xce,
-+		    0xdf, 0xfb, 0xfb, 0xb6, 0xb7, 0xfa, 0x49, 0x33 },
-+	.key	= { 0x12, 0x97, 0x6a, 0x08, 0xc4, 0x42, 0x6d, 0x0c,
-+		    0xe8, 0xa8, 0x24, 0x07, 0xc4, 0xf4, 0x82, 0x07,
-+		    0x80, 0xf8, 0xc2, 0x0a, 0xa7, 0x12, 0x02, 0xd1,
-+		    0xe2, 0x91, 0x79, 0xcb, 0xcb, 0x55, 0x5a, 0x57 },
-+}, { /* 4th power of the key spills to 131th bit in SIMD key setup */
-+	.input	= { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+		    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+		    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+		    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+		    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+		    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+		    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+		    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+		    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+		    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+		    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+		    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+		    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+		    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+		    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+		    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+		    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+		    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+		    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+		    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+		    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+		    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+		    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+		    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+		    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+		    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+		    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+		    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+		    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+		    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+		    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+		    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff },
-+	.ilen	= 256,
-+	.output	= { 0x07, 0x14, 0x5a, 0x4c, 0x02, 0xfe, 0x5f, 0xa3,
-+		    0x20, 0x36, 0xde, 0x68, 0xfa, 0xbe, 0x90, 0x66 },
-+	.key	= { 0xad, 0x62, 0x81, 0x07, 0xe8, 0x35, 0x1d, 0x0f,
-+		    0x2c, 0x23, 0x1a, 0x05, 0xdc, 0x4a, 0x41, 0x06,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
-+}, { /* OpenSSL's poly1305_ieee754.c failed this in final stage */
-+	.input	= { 0x84, 0x23, 0x64, 0xe1, 0x56, 0x33, 0x6c, 0x09,
-+		    0x98, 0xb9, 0x33, 0xa6, 0x23, 0x77, 0x26, 0x18,
-+		    0x0d, 0x9e, 0x3f, 0xdc, 0xbd, 0xe4, 0xcd, 0x5d,
-+		    0x17, 0x08, 0x0f, 0xc3, 0xbe, 0xb4, 0x96, 0x14,
-+		    0xd7, 0x12, 0x2c, 0x03, 0x74, 0x63, 0xff, 0x10,
-+		    0x4d, 0x73, 0xf1, 0x9c, 0x12, 0x70, 0x46, 0x28,
-+		    0xd4, 0x17, 0xc4, 0xc5, 0x4a, 0x3f, 0xe3, 0x0d,
-+		    0x3c, 0x3d, 0x77, 0x14, 0x38, 0x2d, 0x43, 0xb0,
-+		    0x38, 0x2a, 0x50, 0xa5, 0xde, 0xe5, 0x4b, 0xe8,
-+		    0x44, 0xb0, 0x76, 0xe8, 0xdf, 0x88, 0x20, 0x1a,
-+		    0x1c, 0xd4, 0x3b, 0x90, 0xeb, 0x21, 0x64, 0x3f,
-+		    0xa9, 0x6f, 0x39, 0xb5, 0x18, 0xaa, 0x83, 0x40,
-+		    0xc9, 0x42, 0xff, 0x3c, 0x31, 0xba, 0xf7, 0xc9,
-+		    0xbd, 0xbf, 0x0f, 0x31, 0xae, 0x3f, 0xa0, 0x96,
-+		    0xbf, 0x8c, 0x63, 0x03, 0x06, 0x09, 0x82, 0x9f,
-+		    0xe7, 0x2e, 0x17, 0x98, 0x24, 0x89, 0x0b, 0xc8,
-+		    0xe0, 0x8c, 0x31, 0x5c, 0x1c, 0xce, 0x2a, 0x83,
-+		    0x14, 0x4d, 0xbb, 0xff, 0x09, 0xf7, 0x4e, 0x3e,
-+		    0xfc, 0x77, 0x0b, 0x54, 0xd0, 0x98, 0x4a, 0x8f,
-+		    0x19, 0xb1, 0x47, 0x19, 0xe6, 0x36, 0x35, 0x64,
-+		    0x1d, 0x6b, 0x1e, 0xed, 0xf6, 0x3e, 0xfb, 0xf0,
-+		    0x80, 0xe1, 0x78, 0x3d, 0x32, 0x44, 0x54, 0x12,
-+		    0x11, 0x4c, 0x20, 0xde, 0x0b, 0x83, 0x7a, 0x0d,
-+		    0xfa, 0x33, 0xd6, 0xb8, 0x28, 0x25, 0xff, 0xf4,
-+		    0x4c, 0x9a, 0x70, 0xea, 0x54, 0xce, 0x47, 0xf0,
-+		    0x7d, 0xf6, 0x98, 0xe6, 0xb0, 0x33, 0x23, 0xb5,
-+		    0x30, 0x79, 0x36, 0x4a, 0x5f, 0xc3, 0xe9, 0xdd,
-+		    0x03, 0x43, 0x92, 0xbd, 0xde, 0x86, 0xdc, 0xcd,
-+		    0xda, 0x94, 0x32, 0x1c, 0x5e, 0x44, 0x06, 0x04,
-+		    0x89, 0x33, 0x6c, 0xb6, 0x5b, 0xf3, 0x98, 0x9c,
-+		    0x36, 0xf7, 0x28, 0x2c, 0x2f, 0x5d, 0x2b, 0x88,
-+		    0x2c, 0x17, 0x1e, 0x74 },
-+	.ilen	= 252,
-+	.output	= { 0xf2, 0x48, 0x31, 0x2e, 0x57, 0x8d, 0x9d, 0x58,
-+		    0xf8, 0xb7, 0xbb, 0x4d, 0x19, 0x10, 0x54, 0x31 },
-+	.key	= { 0x95, 0xd5, 0xc0, 0x05, 0x50, 0x3e, 0x51, 0x0d,
-+		    0x8c, 0xd0, 0xaa, 0x07, 0x2c, 0x4a, 0x4d, 0x06,
-+		    0x6e, 0xab, 0xc5, 0x2d, 0x11, 0x65, 0x3d, 0xf4,
-+		    0x7f, 0xbf, 0x63, 0xab, 0x19, 0x8b, 0xcc, 0x26 },
-+}, { /* AVX2 in OpenSSL's poly1305-x86.pl failed this with 176+32 split */
-+	.input	= { 0x24, 0x8a, 0xc3, 0x10, 0x85, 0xb6, 0xc2, 0xad,
-+		    0xaa, 0xa3, 0x82, 0x59, 0xa0, 0xd7, 0x19, 0x2c,
-+		    0x5c, 0x35, 0xd1, 0xbb, 0x4e, 0xf3, 0x9a, 0xd9,
-+		    0x4c, 0x38, 0xd1, 0xc8, 0x24, 0x79, 0xe2, 0xdd,
-+		    0x21, 0x59, 0xa0, 0x77, 0x02, 0x4b, 0x05, 0x89,
-+		    0xbc, 0x8a, 0x20, 0x10, 0x1b, 0x50, 0x6f, 0x0a,
-+		    0x1a, 0xd0, 0xbb, 0xab, 0x76, 0xe8, 0x3a, 0x83,
-+		    0xf1, 0xb9, 0x4b, 0xe6, 0xbe, 0xae, 0x74, 0xe8,
-+		    0x74, 0xca, 0xb6, 0x92, 0xc5, 0x96, 0x3a, 0x75,
-+		    0x43, 0x6b, 0x77, 0x61, 0x21, 0xec, 0x9f, 0x62,
-+		    0x39, 0x9a, 0x3e, 0x66, 0xb2, 0xd2, 0x27, 0x07,
-+		    0xda, 0xe8, 0x19, 0x33, 0xb6, 0x27, 0x7f, 0x3c,
-+		    0x85, 0x16, 0xbc, 0xbe, 0x26, 0xdb, 0xbd, 0x86,
-+		    0xf3, 0x73, 0x10, 0x3d, 0x7c, 0xf4, 0xca, 0xd1,
-+		    0x88, 0x8c, 0x95, 0x21, 0x18, 0xfb, 0xfb, 0xd0,
-+		    0xd7, 0xb4, 0xbe, 0xdc, 0x4a, 0xe4, 0x93, 0x6a,
-+		    0xff, 0x91, 0x15, 0x7e, 0x7a, 0xa4, 0x7c, 0x54,
-+		    0x44, 0x2e, 0xa7, 0x8d, 0x6a, 0xc2, 0x51, 0xd3,
-+		    0x24, 0xa0, 0xfb, 0xe4, 0x9d, 0x89, 0xcc, 0x35,
-+		    0x21, 0xb6, 0x6d, 0x16, 0xe9, 0xc6, 0x6a, 0x37,
-+		    0x09, 0x89, 0x4e, 0x4e, 0xb0, 0xa4, 0xee, 0xdc,
-+		    0x4a, 0xe1, 0x94, 0x68, 0xe6, 0x6b, 0x81, 0xf2,
-+		    0x71, 0x35, 0x1b, 0x1d, 0x92, 0x1e, 0xa5, 0x51,
-+		    0x04, 0x7a, 0xbc, 0xc6, 0xb8, 0x7a, 0x90, 0x1f,
-+		    0xde, 0x7d, 0xb7, 0x9f, 0xa1, 0x81, 0x8c, 0x11,
-+		    0x33, 0x6d, 0xbc, 0x07, 0x24, 0x4a, 0x40, 0xeb },
-+	.ilen	= 208,
-+	.output	= { 0xbc, 0x93, 0x9b, 0xc5, 0x28, 0x14, 0x80, 0xfa,
-+		    0x99, 0xc6, 0xd6, 0x8c, 0x25, 0x8e, 0xc4, 0x2f },
-+	.key	= { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-+		    0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
-+}, { /* test vectors from Google */
-+	.input	= "",
-+	.ilen	= 0,
-+	.output	= { 0x47, 0x10, 0x13, 0x0e, 0x9f, 0x6f, 0xea, 0x8d,
-+		    0x72, 0x29, 0x38, 0x50, 0xa6, 0x67, 0xd8, 0x6c },
-+	.key	= { 0xc8, 0xaf, 0xaa, 0xc3, 0x31, 0xee, 0x37, 0x2c,
-+		    0xd6, 0x08, 0x2d, 0xe1, 0x34, 0x94, 0x3b, 0x17,
-+		    0x47, 0x10, 0x13, 0x0e, 0x9f, 0x6f, 0xea, 0x8d,
-+		    0x72, 0x29, 0x38, 0x50, 0xa6, 0x67, 0xd8, 0x6c },
-+}, {
-+	.input	= { 0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x20, 0x77, 0x6f,
-+		    0x72, 0x6c, 0x64, 0x21 },
-+	.ilen	= 12,
-+	.output	= { 0xa6, 0xf7, 0x45, 0x00, 0x8f, 0x81, 0xc9, 0x16,
-+		    0xa2, 0x0d, 0xcc, 0x74, 0xee, 0xf2, 0xb2, 0xf0 },
-+	.key	= { 0x74, 0x68, 0x69, 0x73, 0x20, 0x69, 0x73, 0x20,
-+		    0x33, 0x32, 0x2d, 0x62, 0x79, 0x74, 0x65, 0x20,
-+		    0x6b, 0x65, 0x79, 0x20, 0x66, 0x6f, 0x72, 0x20,
-+		    0x50, 0x6f, 0x6c, 0x79, 0x31, 0x33, 0x30, 0x35 },
-+}, {
-+	.input	= { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
-+	.ilen	= 32,
-+	.output	= { 0x49, 0xec, 0x78, 0x09, 0x0e, 0x48, 0x1e, 0xc6,
-+		    0xc2, 0x6b, 0x33, 0xb9, 0x1c, 0xcc, 0x03, 0x07 },
-+	.key	= { 0x74, 0x68, 0x69, 0x73, 0x20, 0x69, 0x73, 0x20,
-+		    0x33, 0x32, 0x2d, 0x62, 0x79, 0x74, 0x65, 0x20,
-+		    0x6b, 0x65, 0x79, 0x20, 0x66, 0x6f, 0x72, 0x20,
-+		    0x50, 0x6f, 0x6c, 0x79, 0x31, 0x33, 0x30, 0x35 },
-+}, {
-+	.input	= { 0x89, 0xda, 0xb8, 0x0b, 0x77, 0x17, 0xc1, 0xdb,
-+		    0x5d, 0xb4, 0x37, 0x86, 0x0a, 0x3f, 0x70, 0x21,
-+		    0x8e, 0x93, 0xe1, 0xb8, 0xf4, 0x61, 0xfb, 0x67,
-+		    0x7f, 0x16, 0xf3, 0x5f, 0x6f, 0x87, 0xe2, 0xa9,
-+		    0x1c, 0x99, 0xbc, 0x3a, 0x47, 0xac, 0xe4, 0x76,
-+		    0x40, 0xcc, 0x95, 0xc3, 0x45, 0xbe, 0x5e, 0xcc,
-+		    0xa5, 0xa3, 0x52, 0x3c, 0x35, 0xcc, 0x01, 0x89,
-+		    0x3a, 0xf0, 0xb6, 0x4a, 0x62, 0x03, 0x34, 0x27,
-+		    0x03, 0x72, 0xec, 0x12, 0x48, 0x2d, 0x1b, 0x1e,
-+		    0x36, 0x35, 0x61, 0x69, 0x8a, 0x57, 0x8b, 0x35,
-+		    0x98, 0x03, 0x49, 0x5b, 0xb4, 0xe2, 0xef, 0x19,
-+		    0x30, 0xb1, 0x7a, 0x51, 0x90, 0xb5, 0x80, 0xf1,
-+		    0x41, 0x30, 0x0d, 0xf3, 0x0a, 0xdb, 0xec, 0xa2,
-+		    0x8f, 0x64, 0x27, 0xa8, 0xbc, 0x1a, 0x99, 0x9f,
-+		    0xd5, 0x1c, 0x55, 0x4a, 0x01, 0x7d, 0x09, 0x5d,
-+		    0x8c, 0x3e, 0x31, 0x27, 0xda, 0xf9, 0xf5, 0x95 },
-+	.ilen	= 128,
-+	.output	= { 0xc8, 0x5d, 0x15, 0xed, 0x44, 0xc3, 0x78, 0xd6,
-+		    0xb0, 0x0e, 0x23, 0x06, 0x4c, 0x7b, 0xcd, 0x51 },
-+	.key	= { 0x2d, 0x77, 0x3b, 0xe3, 0x7a, 0xdb, 0x1e, 0x4d,
-+		    0x68, 0x3b, 0xf0, 0x07, 0x5e, 0x79, 0xc4, 0xee,
-+		    0x03, 0x79, 0x18, 0x53, 0x5a, 0x7f, 0x99, 0xcc,
-+		    0xb7, 0x04, 0x0f, 0xb5, 0xf5, 0xf4, 0x3a, 0xea },
-+}, {
-+	.input	= { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0b,
-+		    0x17, 0x03, 0x03, 0x02, 0x00, 0x00, 0x00, 0x00,
-+		    0x06, 0xdb, 0x1f, 0x1f, 0x36, 0x8d, 0x69, 0x6a,
-+		    0x81, 0x0a, 0x34, 0x9c, 0x0c, 0x71, 0x4c, 0x9a,
-+		    0x5e, 0x78, 0x50, 0xc2, 0x40, 0x7d, 0x72, 0x1a,
-+		    0xcd, 0xed, 0x95, 0xe0, 0x18, 0xd7, 0xa8, 0x52,
-+		    0x66, 0xa6, 0xe1, 0x28, 0x9c, 0xdb, 0x4a, 0xeb,
-+		    0x18, 0xda, 0x5a, 0xc8, 0xa2, 0xb0, 0x02, 0x6d,
-+		    0x24, 0xa5, 0x9a, 0xd4, 0x85, 0x22, 0x7f, 0x3e,
-+		    0xae, 0xdb, 0xb2, 0xe7, 0xe3, 0x5e, 0x1c, 0x66,
-+		    0xcd, 0x60, 0xf9, 0xab, 0xf7, 0x16, 0xdc, 0xc9,
-+		    0xac, 0x42, 0x68, 0x2d, 0xd7, 0xda, 0xb2, 0x87,
-+		    0xa7, 0x02, 0x4c, 0x4e, 0xef, 0xc3, 0x21, 0xcc,
-+		    0x05, 0x74, 0xe1, 0x67, 0x93, 0xe3, 0x7c, 0xec,
-+		    0x03, 0xc5, 0xbd, 0xa4, 0x2b, 0x54, 0xc1, 0x14,
-+		    0xa8, 0x0b, 0x57, 0xaf, 0x26, 0x41, 0x6c, 0x7b,
-+		    0xe7, 0x42, 0x00, 0x5e, 0x20, 0x85, 0x5c, 0x73,
-+		    0xe2, 0x1d, 0xc8, 0xe2, 0xed, 0xc9, 0xd4, 0x35,
-+		    0xcb, 0x6f, 0x60, 0x59, 0x28, 0x00, 0x11, 0xc2,
-+		    0x70, 0xb7, 0x15, 0x70, 0x05, 0x1c, 0x1c, 0x9b,
-+		    0x30, 0x52, 0x12, 0x66, 0x20, 0xbc, 0x1e, 0x27,
-+		    0x30, 0xfa, 0x06, 0x6c, 0x7a, 0x50, 0x9d, 0x53,
-+		    0xc6, 0x0e, 0x5a, 0xe1, 0xb4, 0x0a, 0xa6, 0xe3,
-+		    0x9e, 0x49, 0x66, 0x92, 0x28, 0xc9, 0x0e, 0xec,
-+		    0xb4, 0xa5, 0x0d, 0xb3, 0x2a, 0x50, 0xbc, 0x49,
-+		    0xe9, 0x0b, 0x4f, 0x4b, 0x35, 0x9a, 0x1d, 0xfd,
-+		    0x11, 0x74, 0x9c, 0xd3, 0x86, 0x7f, 0xcf, 0x2f,
-+		    0xb7, 0xbb, 0x6c, 0xd4, 0x73, 0x8f, 0x6a, 0x4a,
-+		    0xd6, 0xf7, 0xca, 0x50, 0x58, 0xf7, 0x61, 0x88,
-+		    0x45, 0xaf, 0x9f, 0x02, 0x0f, 0x6c, 0x3b, 0x96,
-+		    0x7b, 0x8f, 0x4c, 0xd4, 0xa9, 0x1e, 0x28, 0x13,
-+		    0xb5, 0x07, 0xae, 0x66, 0xf2, 0xd3, 0x5c, 0x18,
-+		    0x28, 0x4f, 0x72, 0x92, 0x18, 0x60, 0x62, 0xe1,
-+		    0x0f, 0xd5, 0x51, 0x0d, 0x18, 0x77, 0x53, 0x51,
-+		    0xef, 0x33, 0x4e, 0x76, 0x34, 0xab, 0x47, 0x43,
-+		    0xf5, 0xb6, 0x8f, 0x49, 0xad, 0xca, 0xb3, 0x84,
-+		    0xd3, 0xfd, 0x75, 0xf7, 0x39, 0x0f, 0x40, 0x06,
-+		    0xef, 0x2a, 0x29, 0x5c, 0x8c, 0x7a, 0x07, 0x6a,
-+		    0xd5, 0x45, 0x46, 0xcd, 0x25, 0xd2, 0x10, 0x7f,
-+		    0xbe, 0x14, 0x36, 0xc8, 0x40, 0x92, 0x4a, 0xae,
-+		    0xbe, 0x5b, 0x37, 0x08, 0x93, 0xcd, 0x63, 0xd1,
-+		    0x32, 0x5b, 0x86, 0x16, 0xfc, 0x48, 0x10, 0x88,
-+		    0x6b, 0xc1, 0x52, 0xc5, 0x32, 0x21, 0xb6, 0xdf,
-+		    0x37, 0x31, 0x19, 0x39, 0x32, 0x55, 0xee, 0x72,
-+		    0xbc, 0xaa, 0x88, 0x01, 0x74, 0xf1, 0x71, 0x7f,
-+		    0x91, 0x84, 0xfa, 0x91, 0x64, 0x6f, 0x17, 0xa2,
-+		    0x4a, 0xc5, 0x5d, 0x16, 0xbf, 0xdd, 0xca, 0x95,
-+		    0x81, 0xa9, 0x2e, 0xda, 0x47, 0x92, 0x01, 0xf0,
-+		    0xed, 0xbf, 0x63, 0x36, 0x00, 0xd6, 0x06, 0x6d,
-+		    0x1a, 0xb3, 0x6d, 0x5d, 0x24, 0x15, 0xd7, 0x13,
-+		    0x51, 0xbb, 0xcd, 0x60, 0x8a, 0x25, 0x10, 0x8d,
-+		    0x25, 0x64, 0x19, 0x92, 0xc1, 0xf2, 0x6c, 0x53,
-+		    0x1c, 0xf9, 0xf9, 0x02, 0x03, 0xbc, 0x4c, 0xc1,
-+		    0x9f, 0x59, 0x27, 0xd8, 0x34, 0xb0, 0xa4, 0x71,
-+		    0x16, 0xd3, 0x88, 0x4b, 0xbb, 0x16, 0x4b, 0x8e,
-+		    0xc8, 0x83, 0xd1, 0xac, 0x83, 0x2e, 0x56, 0xb3,
-+		    0x91, 0x8a, 0x98, 0x60, 0x1a, 0x08, 0xd1, 0x71,
-+		    0x88, 0x15, 0x41, 0xd5, 0x94, 0xdb, 0x39, 0x9c,
-+		    0x6a, 0xe6, 0x15, 0x12, 0x21, 0x74, 0x5a, 0xec,
-+		    0x81, 0x4c, 0x45, 0xb0, 0xb0, 0x5b, 0x56, 0x54,
-+		    0x36, 0xfd, 0x6f, 0x13, 0x7a, 0xa1, 0x0a, 0x0c,
-+		    0x0b, 0x64, 0x37, 0x61, 0xdb, 0xd6, 0xf9, 0xa9,
-+		    0xdc, 0xb9, 0x9b, 0x1a, 0x6e, 0x69, 0x08, 0x54,
-+		    0xce, 0x07, 0x69, 0xcd, 0xe3, 0x97, 0x61, 0xd8,
-+		    0x2f, 0xcd, 0xec, 0x15, 0xf0, 0xd9, 0x2d, 0x7d,
-+		    0x8e, 0x94, 0xad, 0xe8, 0xeb, 0x83, 0xfb, 0xe0 },
-+	.ilen	= 528,
-+	.output	= { 0x26, 0x37, 0x40, 0x8f, 0xe1, 0x30, 0x86, 0xea,
-+		    0x73, 0xf9, 0x71, 0xe3, 0x42, 0x5e, 0x28, 0x20 },
-+	.key	= { 0x99, 0xe5, 0x82, 0x2d, 0xd4, 0x17, 0x3c, 0x99,
-+		    0x5e, 0x3d, 0xae, 0x0d, 0xde, 0xfb, 0x97, 0x74,
-+		    0x3f, 0xde, 0x3b, 0x08, 0x01, 0x34, 0xb3, 0x9f,
-+		    0x76, 0xe9, 0xbf, 0x8d, 0x0e, 0x88, 0xd5, 0x46 },
-+}, { /* test vectors from Hanno Böck */
-+	.input	= { 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc,
-+		    0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc,
-+		    0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc,
-+		    0xcc, 0x80, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc,
-+		    0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc,
-+		    0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc,
-+		    0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc,
-+		    0xcc, 0xcc, 0xcc, 0xcc, 0xce, 0xcc, 0xcc, 0xcc,
-+		    0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc,
-+		    0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xc5,
-+		    0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc,
-+		    0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc,
-+		    0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xe3, 0xcc, 0xcc,
-+		    0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc,
-+		    0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc,
-+		    0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc,
-+		    0xcc, 0xcc, 0xcc, 0xcc, 0xac, 0xcc, 0xcc, 0xcc,
-+		    0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xe6,
-+		    0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0x00, 0x00, 0x00,
-+		    0xaf, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc,
-+		    0xcc, 0xcc, 0xff, 0xff, 0xff, 0xf5, 0x00, 0x00,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x00, 0xff, 0xff, 0xff, 0xe7, 0x00, 0x00, 0x00,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x00, 0x00, 0x71, 0x92, 0x05, 0xa8, 0x52, 0x1d,
-+		    0xfc },
-+	.ilen	= 257,
-+	.output	= { 0x85, 0x59, 0xb8, 0x76, 0xec, 0xee, 0xd6, 0x6e,
-+		    0xb3, 0x77, 0x98, 0xc0, 0x45, 0x7b, 0xaf, 0xf9 },
-+	.key	= { 0x7f, 0x1b, 0x02, 0x64, 0x00, 0x00, 0x00, 0x00,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc },
-+}, {
-+	.input	= { 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa,
-+		    0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa,
-+		    0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa,
-+		    0xaa, 0xaa, 0xaa, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x00, 0x00, 0x00, 0x00, 0x80, 0x02, 0x64 },
-+	.ilen	= 39,
-+	.output	= { 0x00, 0xbd, 0x12, 0x58, 0x97, 0x8e, 0x20, 0x54,
-+		    0x44, 0xc9, 0xaa, 0xaa, 0x82, 0x00, 0x6f, 0xed },
-+	.key	= { 0xe0, 0x00, 0x16, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x00, 0x00, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa,
-+		    0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa },
-+}, {
-+	.input	= { 0x02, 0xfc },
-+	.ilen	= 2,
-+	.output	= { 0x06, 0x12, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c,
-+		    0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c },
-+	.key	= { 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c,
-+		    0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c,
-+		    0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c,
-+		    0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c },
-+}, {
-+	.input	= { 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
-+		    0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
-+		    0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
-+		    0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
-+		    0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7a, 0x7b,
-+		    0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
-+		    0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
-+		    0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
-+		    0x7b, 0x7b, 0x5c, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
-+		    0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
-+		    0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
-+		    0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
-+		    0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
-+		    0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
-+		    0x7b, 0x7b, 0x7b, 0x7b, 0x6e, 0x7b, 0x00, 0x7b,
-+		    0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
-+		    0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
-+		    0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
-+		    0x7b, 0x7b, 0x7b, 0x7a, 0x7b, 0x7b, 0x7b, 0x7b,
-+		    0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
-+		    0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
-+		    0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x5c,
-+		    0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
-+		    0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
-+		    0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
-+		    0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
-+		    0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
-+		    0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
-+		    0x7b, 0x6e, 0x7b, 0x00, 0x13, 0x00, 0x00, 0x00,
-+		    0x00, 0xb3, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0xf2, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x00, 0x00, 0x00, 0x20, 0x00, 0xef, 0xff, 0x00,
-+		    0x09, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0x00, 0x00,
-+		    0x00, 0x00, 0x09, 0x00, 0x00, 0x00, 0x64, 0x00,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x00, 0x00, 0x00, 0x13, 0x00, 0x00, 0x00, 0x00,
-+		    0xb3, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf2,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x00, 0x00, 0x20, 0x00, 0xef, 0xff, 0x00, 0x09,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x00, 0x7a, 0x00, 0x00, 0x10, 0x00, 0x00, 0x00,
-+		    0x00, 0x09, 0x00, 0x00, 0x00, 0x64, 0x00, 0x00,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xfc },
-+	.ilen	= 415,
-+	.output	= { 0x33, 0x20, 0x5b, 0xbf, 0x9e, 0x9f, 0x8f, 0x72,
-+		    0x12, 0xab, 0x9e, 0x2a, 0xb9, 0xb7, 0xe4, 0xa5 },
-+	.key	= { 0x00, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x1e, 0x00, 0x00,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x7b, 0x7b },
-+}, {
-+	.input	= { 0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77,
-+		    0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77,
-+		    0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77,
-+		    0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77,
-+		    0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77,
-+		    0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77,
-+		    0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77,
-+		    0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77,
-+		    0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77,
-+		    0x77, 0x77, 0x77, 0x77, 0xff, 0xff, 0xff, 0xe9,
-+		    0xe9, 0xac, 0xac, 0xac, 0xac, 0xac, 0xac, 0xac,
-+		    0xac, 0xac, 0xac, 0xac, 0x00, 0x00, 0xac, 0xac,
-+		    0xec, 0x01, 0x00, 0xac, 0xac, 0xac, 0x2c, 0xac,
-+		    0xa2, 0xac, 0xac, 0xac, 0xac, 0xac, 0xac, 0xac,
-+		    0xac, 0xac, 0xac, 0xac, 0x64, 0xf2 },
-+	.ilen	= 118,
-+	.output	= { 0x02, 0xee, 0x7c, 0x8c, 0x54, 0x6d, 0xde, 0xb1,
-+		    0xa4, 0x67, 0xe4, 0xc3, 0x98, 0x11, 0x58, 0xb9 },
-+	.key	= { 0x00, 0x00, 0x00, 0x7f, 0x00, 0x00, 0x00, 0x7f,
-+		    0x01, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00,
-+		    0x00, 0x00, 0xcf, 0x77, 0x77, 0x77, 0x77, 0x77,
-+		    0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77 },
-+}, { /* nacl */
-+	.input	= { 0x8e, 0x99, 0x3b, 0x9f, 0x48, 0x68, 0x12, 0x73,
-+		    0xc2, 0x96, 0x50, 0xba, 0x32, 0xfc, 0x76, 0xce,
-+		    0x48, 0x33, 0x2e, 0xa7, 0x16, 0x4d, 0x96, 0xa4,
-+		    0x47, 0x6f, 0xb8, 0xc5, 0x31, 0xa1, 0x18, 0x6a,
-+		    0xc0, 0xdf, 0xc1, 0x7c, 0x98, 0xdc, 0xe8, 0x7b,
-+		    0x4d, 0xa7, 0xf0, 0x11, 0xec, 0x48, 0xc9, 0x72,
-+		    0x71, 0xd2, 0xc2, 0x0f, 0x9b, 0x92, 0x8f, 0xe2,
-+		    0x27, 0x0d, 0x6f, 0xb8, 0x63, 0xd5, 0x17, 0x38,
-+		    0xb4, 0x8e, 0xee, 0xe3, 0x14, 0xa7, 0xcc, 0x8a,
-+		    0xb9, 0x32, 0x16, 0x45, 0x48, 0xe5, 0x26, 0xae,
-+		    0x90, 0x22, 0x43, 0x68, 0x51, 0x7a, 0xcf, 0xea,
-+		    0xbd, 0x6b, 0xb3, 0x73, 0x2b, 0xc0, 0xe9, 0xda,
-+		    0x99, 0x83, 0x2b, 0x61, 0xca, 0x01, 0xb6, 0xde,
-+		    0x56, 0x24, 0x4a, 0x9e, 0x88, 0xd5, 0xf9, 0xb3,
-+		    0x79, 0x73, 0xf6, 0x22, 0xa4, 0x3d, 0x14, 0xa6,
-+		    0x59, 0x9b, 0x1f, 0x65, 0x4c, 0xb4, 0x5a, 0x74,
-+		    0xe3, 0x55, 0xa5 },
-+	.ilen	= 131,
-+	.output	= { 0xf3, 0xff, 0xc7, 0x70, 0x3f, 0x94, 0x00, 0xe5,
-+		    0x2a, 0x7d, 0xfb, 0x4b, 0x3d, 0x33, 0x05, 0xd9 },
-+	.key	= { 0xee, 0xa6, 0xa7, 0x25, 0x1c, 0x1e, 0x72, 0x91,
-+		    0x6d, 0x11, 0xc2, 0xcb, 0x21, 0x4d, 0x3c, 0x25,
-+		    0x25, 0x39, 0x12, 0x1d, 0x8e, 0x23, 0x4e, 0x65,
-+		    0x2d, 0x65, 0x1f, 0xa4, 0xc8, 0xcf, 0xf8, 0x80 },
-+}, { /* wrap 2^130-5 */
-+	.input	= { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+		    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff },
-+	.ilen	= 16,
-+	.output	= { 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
-+	.key	= { 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
-+}, { /* wrap 2^128 */
-+	.input	= { 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
-+	.ilen	= 16,
-+	.output	= { 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
-+	.key	= { 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+		    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff },
-+}, { /* limb carry */
-+	.input	= { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+		    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+		    0xf0, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+		    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+		    0x11, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
-+	.ilen	= 48,
-+	.output	= { 0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
-+	.key	= { 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
-+}, { /* 2^130-5 */
-+	.input	= { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+		    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+		    0xfb, 0xfe, 0xfe, 0xfe, 0xfe, 0xfe, 0xfe, 0xfe,
-+		    0xfe, 0xfe, 0xfe, 0xfe, 0xfe, 0xfe, 0xfe, 0xfe,
-+		    0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01,
-+		    0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01 },
-+	.ilen	= 48,
-+	.output	= { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
-+	.key	= { 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
-+}, { /* 2^130-6 */
-+	.input	= { 0xfd, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+		    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff },
-+	.ilen	= 16,
-+	.output	= { 0xfa, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+		    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff },
-+	.key	= { 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
-+}, { /* 5*H+L reduction intermediate */
-+	.input	= { 0xe3, 0x35, 0x94, 0xd7, 0x50, 0x5e, 0x43, 0xb9,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x33, 0x94, 0xd7, 0x50, 0x5e, 0x43, 0x79, 0xcd,
-+		    0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
-+	.ilen	= 64,
-+	.output	= { 0x14, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x55, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
-+	.key	= { 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
-+}, { /* 5*H+L reduction final */
-+	.input	= { 0xe3, 0x35, 0x94, 0xd7, 0x50, 0x5e, 0x43, 0xb9,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x33, 0x94, 0xd7, 0x50, 0x5e, 0x43, 0x79, 0xcd,
-+		    0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
-+	.ilen	= 48,
-+	.output	= { 0x13, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
-+	.key	= { 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
-+} };
++.section .rodata.cst192.Lconst, "aM", @progbits, 192
++.align	64
++.Lconst:
++.long	0x0ffffff,0,0x0ffffff,0,0x0ffffff,0,0x0ffffff,0
++.long	16777216,0,16777216,0,16777216,0,16777216,0
++.long	0x3ffffff,0,0x3ffffff,0,0x3ffffff,0,0x3ffffff,0
++.long	2,2,2,3,2,0,2,1
++.long	0,0,0,1, 0,2,0,3, 0,4,0,5, 0,6,0,7
 +
-+static bool __init poly1305_selftest(void)
-+{
-+	simd_context_t simd_context;
-+	bool success = true;
-+	size_t i, j;
++.text
 +
-+	simd_get(&simd_context);
-+	for (i = 0; i < ARRAY_SIZE(poly1305_testvecs); ++i) {
-+		struct poly1305_ctx poly1305;
-+		u8 out[POLY1305_MAC_SIZE];
++.align	32
++ENTRY(poly1305_init_x86_64)
++	xorq	%rax,%rax
++	movq	%rax,0(%rdi)
++	movq	%rax,8(%rdi)
++	movq	%rax,16(%rdi)
 +
-+		memset(out, 0, sizeof(out));
-+		memset(&poly1305, 0, sizeof(poly1305));
-+		poly1305_init(&poly1305, poly1305_testvecs[i].key);
-+		poly1305_update(&poly1305, poly1305_testvecs[i].input,
-+				poly1305_testvecs[i].ilen, &simd_context);
-+		poly1305_final(&poly1305, out, &simd_context);
-+		if (memcmp(out, poly1305_testvecs[i].output,
-+			   POLY1305_MAC_SIZE)) {
-+			pr_info("poly1305 self-test %zu: FAIL\n", i + 1);
-+			success = false;
-+		}
-+		simd_relax(&simd_context);
++	cmpq	$0,%rsi
++	je	.Lno_key
 +
-+		if (poly1305_testvecs[i].ilen <= 1)
-+			continue;
++	movq	$0x0ffffffc0fffffff,%rax
++	movq	$0x0ffffffc0ffffffc,%rcx
++	andq	0(%rsi),%rax
++	andq	8(%rsi),%rcx
++	movq	%rax,24(%rdi)
++	movq	%rcx,32(%rdi)
++	movl	$1,%eax
++.Lno_key:
++	ret
++ENDPROC(poly1305_init_x86_64)
 +
-+		for (j = 1; j < poly1305_testvecs[i].ilen - 1; ++j) {
-+			memset(out, 0, sizeof(out));
-+			memset(&poly1305, 0, sizeof(poly1305));
-+			poly1305_init(&poly1305, poly1305_testvecs[i].key);
-+			poly1305_update(&poly1305, poly1305_testvecs[i].input,
-+					j, &simd_context);
-+			poly1305_update(&poly1305,
-+					poly1305_testvecs[i].input + j,
-+					poly1305_testvecs[i].ilen - j,
-+					&simd_context);
-+			poly1305_final(&poly1305, out, &simd_context);
-+			if (memcmp(out, poly1305_testvecs[i].output,
-+				   POLY1305_MAC_SIZE)) {
-+				pr_info("poly1305 self-test %zu (split %zu): FAIL\n",
-+					i + 1, j);
-+				success = false;
-+			}
-+			simd_relax(&simd_context);
-+		}
-+	}
-+	simd_put(&simd_context);
++.align	32
++ENTRY(poly1305_blocks_x86_64)
++.Lblocks:
++	shrq	$4,%rdx
++	jz	.Lno_data
 +
-+	if (success)
-+		pr_info("poly1305 self-tests: pass\n");
++	pushq	%rbx
++	pushq	%r12
++	pushq	%r13
++	pushq	%r14
++	pushq	%r15
++	pushq	%rdi
 +
-+	return success;
-+}
-+#endif
++.Lblocks_body:
++
++	movq	%rdx,%r15
++
++	movq	24(%rdi),%r11
++	movq	32(%rdi),%r13
++
++	movq	0(%rdi),%r14
++	movq	8(%rdi),%rbx
++	movq	16(%rdi),%r10
++
++	movq	%r13,%r12
++	shrq	$2,%r13
++	movq	%r12,%rax
++	addq	%r12,%r13
++	jmp	.Loop
++
++.align	32
++.Loop:
++
++	addq	0(%rsi),%r14
++	adcq	8(%rsi),%rbx
++	leaq	16(%rsi),%rsi
++	adcq	%rcx,%r10
++	mulq	%r14
++	movq	%rax,%r9
++	movq	%r11,%rax
++	movq	%rdx,%rdi
++
++	mulq	%r14
++	movq	%rax,%r14
++	movq	%r11,%rax
++	movq	%rdx,%r8
++
++	mulq	%rbx
++	addq	%rax,%r9
++	movq	%r13,%rax
++	adcq	%rdx,%rdi
++
++	mulq	%rbx
++	movq	%r10,%rbx
++	addq	%rax,%r14
++	adcq	%rdx,%r8
++
++	imulq	%r13,%rbx
++	addq	%rbx,%r9
++	movq	%r8,%rbx
++	adcq	$0,%rdi
++
++	imulq	%r11,%r10
++	addq	%r9,%rbx
++	movq	$-4,%rax
++	adcq	%r10,%rdi
++
++	andq	%rdi,%rax
++	movq	%rdi,%r10
++	shrq	$2,%rdi
++	andq	$3,%r10
++	addq	%rdi,%rax
++	addq	%rax,%r14
++	adcq	$0,%rbx
++	adcq	$0,%r10
++
++	movq	%r12,%rax
++	decq	%r15
++	jnz	.Loop
++
++	movq	0(%rsp),%rdi
++
++	movq	%r14,0(%rdi)
++	movq	%rbx,8(%rdi)
++	movq	%r10,16(%rdi)
++
++	movq	8(%rsp),%r15
++	movq	16(%rsp),%r14
++	movq	24(%rsp),%r13
++	movq	32(%rsp),%r12
++	movq	40(%rsp),%rbx
++	leaq	48(%rsp),%rsp
++.Lno_data:
++.Lblocks_epilogue:
++	ret
++ENDPROC(poly1305_blocks_x86_64)
++
++.align	32
++ENTRY(poly1305_emit_x86_64)
++.Lemit:
++	movq	0(%rdi),%r8
++	movq	8(%rdi),%r9
++	movq	16(%rdi),%r10
++
++	movq	%r8,%rax
++	addq	$5,%r8
++	movq	%r9,%rcx
++	adcq	$0,%r9
++	adcq	$0,%r10
++	shrq	$2,%r10
++	cmovnzq	%r8,%rax
++	cmovnzq	%r9,%rcx
++
++	addq	0(%rdx),%rax
++	adcq	8(%rdx),%rcx
++	movq	%rax,0(%rsi)
++	movq	%rcx,8(%rsi)
++
++	ret
++ENDPROC(poly1305_emit_x86_64)
++
++.macro __poly1305_block
++	mulq	%r14
++	movq	%rax,%r9
++	movq	%r11,%rax
++	movq	%rdx,%rdi
++
++	mulq	%r14
++	movq	%rax,%r14
++	movq	%r11,%rax
++	movq	%rdx,%r8
++
++	mulq	%rbx
++	addq	%rax,%r9
++	movq	%r13,%rax
++	adcq	%rdx,%rdi
++
++	mulq	%rbx
++	movq	%r10,%rbx
++	addq	%rax,%r14
++	adcq	%rdx,%r8
++
++	imulq	%r13,%rbx
++	addq	%rbx,%r9
++	movq	%r8,%rbx
++	adcq	$0,%rdi
++
++	imulq	%r11,%r10
++	addq	%r9,%rbx
++	movq	$-4,%rax
++	adcq	%r10,%rdi
++
++	andq	%rdi,%rax
++	movq	%rdi,%r10
++	shrq	$2,%rdi
++	andq	$3,%r10
++	addq	%rdi,%rax
++	addq	%rax,%r14
++	adcq	$0,%rbx
++	adcq	$0,%r10
++.endm
++
++.macro __poly1305_init_avx
++	movq	%r11,%r14
++	movq	%r12,%rbx
++	xorq	%r10,%r10
++
++	leaq	48+64(%rdi),%rdi
++
++	movq	%r12,%rax
++	movq	%rdi,0(%rsp)
++	__poly1305_block
++	movq	0(%rsp),%rdi
++
++	movl	$0x3ffffff,%eax
++	movl	$0x3ffffff,%edx
++	movq	%r14,%r8
++	andl	%r14d,%eax
++	movq	%r11,%r9
++	andl	%r11d,%edx
++	movl	%eax,-64(%rdi)
++	shrq	$26,%r8
++	movl	%edx,-60(%rdi)
++	shrq	$26,%r9
++
++	movl	$0x3ffffff,%eax
++	movl	$0x3ffffff,%edx
++	andl	%r8d,%eax
++	andl	%r9d,%edx
++	movl	%eax,-48(%rdi)
++	leal	(%rax,%rax,4),%eax
++	movl	%edx,-44(%rdi)
++	leal	(%rdx,%rdx,4),%edx
++	movl	%eax,-32(%rdi)
++	shrq	$26,%r8
++	movl	%edx,-28(%rdi)
++	shrq	$26,%r9
++
++	movq	%rbx,%rax
++	movq	%r12,%rdx
++	shlq	$12,%rax
++	shlq	$12,%rdx
++	orq	%r8,%rax
++	orq	%r9,%rdx
++	andl	$0x3ffffff,%eax
++	andl	$0x3ffffff,%edx
++	movl	%eax,-16(%rdi)
++	leal	(%rax,%rax,4),%eax
++	movl	%edx,-12(%rdi)
++	leal	(%rdx,%rdx,4),%edx
++	movl	%eax,0(%rdi)
++	movq	%rbx,%r8
++	movl	%edx,4(%rdi)
++	movq	%r12,%r9
++
++	movl	$0x3ffffff,%eax
++	movl	$0x3ffffff,%edx
++	shrq	$14,%r8
++	shrq	$14,%r9
++	andl	%r8d,%eax
++	andl	%r9d,%edx
++	movl	%eax,16(%rdi)
++	leal	(%rax,%rax,4),%eax
++	movl	%edx,20(%rdi)
++	leal	(%rdx,%rdx,4),%edx
++	movl	%eax,32(%rdi)
++	shrq	$26,%r8
++	movl	%edx,36(%rdi)
++	shrq	$26,%r9
++
++	movq	%r10,%rax
++	shlq	$24,%rax
++	orq	%rax,%r8
++	movl	%r8d,48(%rdi)
++	leaq	(%r8,%r8,4),%r8
++	movl	%r9d,52(%rdi)
++	leaq	(%r9,%r9,4),%r9
++	movl	%r8d,64(%rdi)
++	movl	%r9d,68(%rdi)
++
++	movq	%r12,%rax
++	movq	%rdi,0(%rsp)
++	__poly1305_block
++	movq	0(%rsp),%rdi
++
++	movl	$0x3ffffff,%eax
++	movq	%r14,%r8
++	andl	%r14d,%eax
++	shrq	$26,%r8
++	movl	%eax,-52(%rdi)
++
++	movl	$0x3ffffff,%edx
++	andl	%r8d,%edx
++	movl	%edx,-36(%rdi)
++	leal	(%rdx,%rdx,4),%edx
++	shrq	$26,%r8
++	movl	%edx,-20(%rdi)
++
++	movq	%rbx,%rax
++	shlq	$12,%rax
++	orq	%r8,%rax
++	andl	$0x3ffffff,%eax
++	movl	%eax,-4(%rdi)
++	leal	(%rax,%rax,4),%eax
++	movq	%rbx,%r8
++	movl	%eax,12(%rdi)
++
++	movl	$0x3ffffff,%edx
++	shrq	$14,%r8
++	andl	%r8d,%edx
++	movl	%edx,28(%rdi)
++	leal	(%rdx,%rdx,4),%edx
++	shrq	$26,%r8
++	movl	%edx,44(%rdi)
++
++	movq	%r10,%rax
++	shlq	$24,%rax
++	orq	%rax,%r8
++	movl	%r8d,60(%rdi)
++	leaq	(%r8,%r8,4),%r8
++	movl	%r8d,76(%rdi)
++
++	movq	%r12,%rax
++	movq	%rdi,0(%rsp)
++	__poly1305_block
++	movq	0(%rsp),%rdi
++
++	movl	$0x3ffffff,%eax
++	movq	%r14,%r8
++	andl	%r14d,%eax
++	shrq	$26,%r8
++	movl	%eax,-56(%rdi)
++
++	movl	$0x3ffffff,%edx
++	andl	%r8d,%edx
++	movl	%edx,-40(%rdi)
++	leal	(%rdx,%rdx,4),%edx
++	shrq	$26,%r8
++	movl	%edx,-24(%rdi)
++
++	movq	%rbx,%rax
++	shlq	$12,%rax
++	orq	%r8,%rax
++	andl	$0x3ffffff,%eax
++	movl	%eax,-8(%rdi)
++	leal	(%rax,%rax,4),%eax
++	movq	%rbx,%r8
++	movl	%eax,8(%rdi)
++
++	movl	$0x3ffffff,%edx
++	shrq	$14,%r8
++	andl	%r8d,%edx
++	movl	%edx,24(%rdi)
++	leal	(%rdx,%rdx,4),%edx
++	shrq	$26,%r8
++	movl	%edx,40(%rdi)
++
++	movq	%r10,%rax
++	shlq	$24,%rax
++	orq	%rax,%r8
++	movl	%r8d,56(%rdi)
++	leaq	(%r8,%r8,4),%r8
++	movl	%r8d,72(%rdi)
++
++	leaq	-48-64(%rdi),%rdi
++.endm
++
++#ifdef CONFIG_AS_AVX
++.align	32
++ENTRY(poly1305_blocks_avx)
++
++	movl	20(%rdi),%r8d
++	cmpq	$128,%rdx
++	jae	.Lblocks_avx
++	testl	%r8d,%r8d
++	jz	.Lblocks
++
++.Lblocks_avx:
++	andq	$-16,%rdx
++	jz	.Lno_data_avx
++
++	vzeroupper
++
++	testl	%r8d,%r8d
++	jz	.Lbase2_64_avx
++
++	testq	$31,%rdx
++	jz	.Leven_avx
++
++	pushq	%rbx
++	pushq	%r12
++	pushq	%r13
++	pushq	%r14
++	pushq	%r15
++	pushq	%rdi
++
++.Lblocks_avx_body:
++
++	movq	%rdx,%r15
++
++	movq	0(%rdi),%r8
++	movq	8(%rdi),%r9
++	movl	16(%rdi),%r10d
++
++	movq	24(%rdi),%r11
++	movq	32(%rdi),%r13
++
++
++	movl	%r8d,%r14d
++	andq	$-2147483648,%r8
++	movq	%r9,%r12
++	movl	%r9d,%ebx
++	andq	$-2147483648,%r9
++
++	shrq	$6,%r8
++	shlq	$52,%r12
++	addq	%r8,%r14
++	shrq	$12,%rbx
++	shrq	$18,%r9
++	addq	%r12,%r14
++	adcq	%r9,%rbx
++
++	movq	%r10,%r8
++	shlq	$40,%r8
++	shrq	$24,%r10
++	addq	%r8,%rbx
++	adcq	$0,%r10
++
++	movq	$-4,%r9
++	movq	%r10,%r8
++	andq	%r10,%r9
++	shrq	$2,%r8
++	andq	$3,%r10
++	addq	%r9,%r8
++	addq	%r8,%r14
++	adcq	$0,%rbx
++	adcq	$0,%r10
++
++	movq	%r13,%r12
++	movq	%r13,%rax
++	shrq	$2,%r13
++	addq	%r12,%r13
++
++	addq	0(%rsi),%r14
++	adcq	8(%rsi),%rbx
++	leaq	16(%rsi),%rsi
++	adcq	%rcx,%r10
++
++	movq	%rdi,0(%rsp)
++	__poly1305_block
++	movq	0(%rsp),%rdi
++
++	testq	%rcx,%rcx
++	jz	.Lstore_base2_64_avx
++
++
++	movq	%r14,%rax
++	movq	%r14,%rdx
++	shrq	$52,%r14
++	movq	%rbx,%r11
++	movq	%rbx,%r12
++	shrq	$26,%rdx
++	andq	$0x3ffffff,%rax
++	shlq	$12,%r11
++	andq	$0x3ffffff,%rdx
++	shrq	$14,%rbx
++	orq	%r11,%r14
++	shlq	$24,%r10
++	andq	$0x3ffffff,%r14
++	shrq	$40,%r12
++	andq	$0x3ffffff,%rbx
++	orq	%r12,%r10
++
++	subq	$16,%r15
++	jz	.Lstore_base2_26_avx
++
++	vmovd	%eax,%xmm0
++	vmovd	%edx,%xmm1
++	vmovd	%r14d,%xmm2
++	vmovd	%ebx,%xmm3
++	vmovd	%r10d,%xmm4
++	jmp	.Lproceed_avx
++
++.align	32
++.Lstore_base2_64_avx:
++	movq	%r14,0(%rdi)
++	movq	%rbx,8(%rdi)
++	movq	%r10,16(%rdi)
++	jmp	.Ldone_avx
++
++.align	16
++.Lstore_base2_26_avx:
++	movl	%eax,0(%rdi)
++	movl	%edx,4(%rdi)
++	movl	%r14d,8(%rdi)
++	movl	%ebx,12(%rdi)
++	movl	%r10d,16(%rdi)
++.align	16
++.Ldone_avx:
++	movq	8(%rsp),%r15
++	movq	16(%rsp),%r14
++	movq	24(%rsp),%r13
++	movq	32(%rsp),%r12
++	movq	40(%rsp),%rbx
++	leaq	48(%rsp),%rsp
++
++.Lno_data_avx:
++.Lblocks_avx_epilogue:
++	ret
++
++.align	32
++.Lbase2_64_avx:
++
++	pushq	%rbx
++	pushq	%r12
++	pushq	%r13
++	pushq	%r14
++	pushq	%r15
++	pushq	%rdi
++
++.Lbase2_64_avx_body:
++
++	movq	%rdx,%r15
++
++	movq	24(%rdi),%r11
++	movq	32(%rdi),%r13
++
++	movq	0(%rdi),%r14
++	movq	8(%rdi),%rbx
++	movl	16(%rdi),%r10d
++
++	movq	%r13,%r12
++	movq	%r13,%rax
++	shrq	$2,%r13
++	addq	%r12,%r13
++
++	testq	$31,%rdx
++	jz	.Linit_avx
++
++	addq	0(%rsi),%r14
++	adcq	8(%rsi),%rbx
++	leaq	16(%rsi),%rsi
++	adcq	%rcx,%r10
++	subq	$16,%r15
++
++	movq	%rdi,0(%rsp)
++	__poly1305_block
++	movq	0(%rsp),%rdi
++
++.Linit_avx:
++
++	movq	%r14,%rax
++	movq	%r14,%rdx
++	shrq	$52,%r14
++	movq	%rbx,%r8
++	movq	%rbx,%r9
++	shrq	$26,%rdx
++	andq	$0x3ffffff,%rax
++	shlq	$12,%r8
++	andq	$0x3ffffff,%rdx
++	shrq	$14,%rbx
++	orq	%r8,%r14
++	shlq	$24,%r10
++	andq	$0x3ffffff,%r14
++	shrq	$40,%r9
++	andq	$0x3ffffff,%rbx
++	orq	%r9,%r10
++
++	vmovd	%eax,%xmm0
++	vmovd	%edx,%xmm1
++	vmovd	%r14d,%xmm2
++	vmovd	%ebx,%xmm3
++	vmovd	%r10d,%xmm4
++	movl	$1,20(%rdi)
++
++	__poly1305_init_avx
++
++.Lproceed_avx:
++	movq	%r15,%rdx
++
++	movq	8(%rsp),%r15
++	movq	16(%rsp),%r14
++	movq	24(%rsp),%r13
++	movq	32(%rsp),%r12
++	movq	40(%rsp),%rbx
++	leaq	48(%rsp),%rax
++	leaq	48(%rsp),%rsp
++
++.Lbase2_64_avx_epilogue:
++	jmp	.Ldo_avx
++
++
++.align	32
++.Leven_avx:
++	vmovd	0(%rdi),%xmm0
++	vmovd	4(%rdi),%xmm1
++	vmovd	8(%rdi),%xmm2
++	vmovd	12(%rdi),%xmm3
++	vmovd	16(%rdi),%xmm4
++
++.Ldo_avx:
++	leaq	8(%rsp),%r10
++	andq	$-32,%rsp
++	subq	$8,%rsp
++	leaq	-88(%rsp),%r11
++	subq	$0x178,%rsp
++	subq	$64,%rdx
++	leaq	-32(%rsi),%rax
++	cmovcq	%rax,%rsi
++
++	vmovdqu	48(%rdi),%xmm14
++	leaq	112(%rdi),%rdi
++	leaq	.Lconst(%rip),%rcx
++
++	vmovdqu	32(%rsi),%xmm5
++	vmovdqu	48(%rsi),%xmm6
++	vmovdqa	64(%rcx),%xmm15
++
++	vpsrldq	$6,%xmm5,%xmm7
++	vpsrldq	$6,%xmm6,%xmm8
++	vpunpckhqdq	%xmm6,%xmm5,%xmm9
++	vpunpcklqdq	%xmm6,%xmm5,%xmm5
++	vpunpcklqdq	%xmm8,%xmm7,%xmm8
++
++	vpsrlq	$40,%xmm9,%xmm9
++	vpsrlq	$26,%xmm5,%xmm6
++	vpand	%xmm15,%xmm5,%xmm5
++	vpsrlq	$4,%xmm8,%xmm7
++	vpand	%xmm15,%xmm6,%xmm6
++	vpsrlq	$30,%xmm8,%xmm8
++	vpand	%xmm15,%xmm7,%xmm7
++	vpand	%xmm15,%xmm8,%xmm8
++	vpor	32(%rcx),%xmm9,%xmm9
++
++	jbe	.Lskip_loop_avx
++
++
++	vmovdqu	-48(%rdi),%xmm11
++	vmovdqu	-32(%rdi),%xmm12
++	vpshufd	$0xEE,%xmm14,%xmm13
++	vpshufd	$0x44,%xmm14,%xmm10
++	vmovdqa	%xmm13,-144(%r11)
++	vmovdqa	%xmm10,0(%rsp)
++	vpshufd	$0xEE,%xmm11,%xmm14
++	vmovdqu	-16(%rdi),%xmm10
++	vpshufd	$0x44,%xmm11,%xmm11
++	vmovdqa	%xmm14,-128(%r11)
++	vmovdqa	%xmm11,16(%rsp)
++	vpshufd	$0xEE,%xmm12,%xmm13
++	vmovdqu	0(%rdi),%xmm11
++	vpshufd	$0x44,%xmm12,%xmm12
++	vmovdqa	%xmm13,-112(%r11)
++	vmovdqa	%xmm12,32(%rsp)
++	vpshufd	$0xEE,%xmm10,%xmm14
++	vmovdqu	16(%rdi),%xmm12
++	vpshufd	$0x44,%xmm10,%xmm10
++	vmovdqa	%xmm14,-96(%r11)
++	vmovdqa	%xmm10,48(%rsp)
++	vpshufd	$0xEE,%xmm11,%xmm13
++	vmovdqu	32(%rdi),%xmm10
++	vpshufd	$0x44,%xmm11,%xmm11
++	vmovdqa	%xmm13,-80(%r11)
++	vmovdqa	%xmm11,64(%rsp)
++	vpshufd	$0xEE,%xmm12,%xmm14
++	vmovdqu	48(%rdi),%xmm11
++	vpshufd	$0x44,%xmm12,%xmm12
++	vmovdqa	%xmm14,-64(%r11)
++	vmovdqa	%xmm12,80(%rsp)
++	vpshufd	$0xEE,%xmm10,%xmm13
++	vmovdqu	64(%rdi),%xmm12
++	vpshufd	$0x44,%xmm10,%xmm10
++	vmovdqa	%xmm13,-48(%r11)
++	vmovdqa	%xmm10,96(%rsp)
++	vpshufd	$0xEE,%xmm11,%xmm14
++	vpshufd	$0x44,%xmm11,%xmm11
++	vmovdqa	%xmm14,-32(%r11)
++	vmovdqa	%xmm11,112(%rsp)
++	vpshufd	$0xEE,%xmm12,%xmm13
++	vmovdqa	0(%rsp),%xmm14
++	vpshufd	$0x44,%xmm12,%xmm12
++	vmovdqa	%xmm13,-16(%r11)
++	vmovdqa	%xmm12,128(%rsp)
++
++	jmp	.Loop_avx
++
++.align	32
++.Loop_avx:
++
++	vpmuludq	%xmm5,%xmm14,%xmm10
++	vpmuludq	%xmm6,%xmm14,%xmm11
++	vmovdqa	%xmm2,32(%r11)
++	vpmuludq	%xmm7,%xmm14,%xmm12
++	vmovdqa	16(%rsp),%xmm2
++	vpmuludq	%xmm8,%xmm14,%xmm13
++	vpmuludq	%xmm9,%xmm14,%xmm14
++
++	vmovdqa	%xmm0,0(%r11)
++	vpmuludq	32(%rsp),%xmm9,%xmm0
++	vmovdqa	%xmm1,16(%r11)
++	vpmuludq	%xmm8,%xmm2,%xmm1
++	vpaddq	%xmm0,%xmm10,%xmm10
++	vpaddq	%xmm1,%xmm14,%xmm14
++	vmovdqa	%xmm3,48(%r11)
++	vpmuludq	%xmm7,%xmm2,%xmm0
++	vpmuludq	%xmm6,%xmm2,%xmm1
++	vpaddq	%xmm0,%xmm13,%xmm13
++	vmovdqa	48(%rsp),%xmm3
++	vpaddq	%xmm1,%xmm12,%xmm12
++	vmovdqa	%xmm4,64(%r11)
++	vpmuludq	%xmm5,%xmm2,%xmm2
++	vpmuludq	%xmm7,%xmm3,%xmm0
++	vpaddq	%xmm2,%xmm11,%xmm11
++
++	vmovdqa	64(%rsp),%xmm4
++	vpaddq	%xmm0,%xmm14,%xmm14
++	vpmuludq	%xmm6,%xmm3,%xmm1
++	vpmuludq	%xmm5,%xmm3,%xmm3
++	vpaddq	%xmm1,%xmm13,%xmm13
++	vmovdqa	80(%rsp),%xmm2
++	vpaddq	%xmm3,%xmm12,%xmm12
++	vpmuludq	%xmm9,%xmm4,%xmm0
++	vpmuludq	%xmm8,%xmm4,%xmm4
++	vpaddq	%xmm0,%xmm11,%xmm11
++	vmovdqa	96(%rsp),%xmm3
++	vpaddq	%xmm4,%xmm10,%xmm10
++
++	vmovdqa	128(%rsp),%xmm4
++	vpmuludq	%xmm6,%xmm2,%xmm1
++	vpmuludq	%xmm5,%xmm2,%xmm2
++	vpaddq	%xmm1,%xmm14,%xmm14
++	vpaddq	%xmm2,%xmm13,%xmm13
++	vpmuludq	%xmm9,%xmm3,%xmm0
++	vpmuludq	%xmm8,%xmm3,%xmm1
++	vpaddq	%xmm0,%xmm12,%xmm12
++	vmovdqu	0(%rsi),%xmm0
++	vpaddq	%xmm1,%xmm11,%xmm11
++	vpmuludq	%xmm7,%xmm3,%xmm3
++	vpmuludq	%xmm7,%xmm4,%xmm7
++	vpaddq	%xmm3,%xmm10,%xmm10
++
++	vmovdqu	16(%rsi),%xmm1
++	vpaddq	%xmm7,%xmm11,%xmm11
++	vpmuludq	%xmm8,%xmm4,%xmm8
++	vpmuludq	%xmm9,%xmm4,%xmm9
++	vpsrldq	$6,%xmm0,%xmm2
++	vpaddq	%xmm8,%xmm12,%xmm12
++	vpaddq	%xmm9,%xmm13,%xmm13
++	vpsrldq	$6,%xmm1,%xmm3
++	vpmuludq	112(%rsp),%xmm5,%xmm9
++	vpmuludq	%xmm6,%xmm4,%xmm5
++	vpunpckhqdq	%xmm1,%xmm0,%xmm4
++	vpaddq	%xmm9,%xmm14,%xmm14
++	vmovdqa	-144(%r11),%xmm9
++	vpaddq	%xmm5,%xmm10,%xmm10
++
++	vpunpcklqdq	%xmm1,%xmm0,%xmm0
++	vpunpcklqdq	%xmm3,%xmm2,%xmm3
++
++
++	vpsrldq	$5,%xmm4,%xmm4
++	vpsrlq	$26,%xmm0,%xmm1
++	vpand	%xmm15,%xmm0,%xmm0
++	vpsrlq	$4,%xmm3,%xmm2
++	vpand	%xmm15,%xmm1,%xmm1
++	vpand	0(%rcx),%xmm4,%xmm4
++	vpsrlq	$30,%xmm3,%xmm3
++	vpand	%xmm15,%xmm2,%xmm2
++	vpand	%xmm15,%xmm3,%xmm3
++	vpor	32(%rcx),%xmm4,%xmm4
++
++	vpaddq	0(%r11),%xmm0,%xmm0
++	vpaddq	16(%r11),%xmm1,%xmm1
++	vpaddq	32(%r11),%xmm2,%xmm2
++	vpaddq	48(%r11),%xmm3,%xmm3
++	vpaddq	64(%r11),%xmm4,%xmm4
++
++	leaq	32(%rsi),%rax
++	leaq	64(%rsi),%rsi
++	subq	$64,%rdx
++	cmovcq	%rax,%rsi
++
++	vpmuludq	%xmm0,%xmm9,%xmm5
++	vpmuludq	%xmm1,%xmm9,%xmm6
++	vpaddq	%xmm5,%xmm10,%xmm10
++	vpaddq	%xmm6,%xmm11,%xmm11
++	vmovdqa	-128(%r11),%xmm7
++	vpmuludq	%xmm2,%xmm9,%xmm5
++	vpmuludq	%xmm3,%xmm9,%xmm6
++	vpaddq	%xmm5,%xmm12,%xmm12
++	vpaddq	%xmm6,%xmm13,%xmm13
++	vpmuludq	%xmm4,%xmm9,%xmm9
++	vpmuludq	-112(%r11),%xmm4,%xmm5
++	vpaddq	%xmm9,%xmm14,%xmm14
++
++	vpaddq	%xmm5,%xmm10,%xmm10
++	vpmuludq	%xmm2,%xmm7,%xmm6
++	vpmuludq	%xmm3,%xmm7,%xmm5
++	vpaddq	%xmm6,%xmm13,%xmm13
++	vmovdqa	-96(%r11),%xmm8
++	vpaddq	%xmm5,%xmm14,%xmm14
++	vpmuludq	%xmm1,%xmm7,%xmm6
++	vpmuludq	%xmm0,%xmm7,%xmm7
++	vpaddq	%xmm6,%xmm12,%xmm12
++	vpaddq	%xmm7,%xmm11,%xmm11
++
++	vmovdqa	-80(%r11),%xmm9
++	vpmuludq	%xmm2,%xmm8,%xmm5
++	vpmuludq	%xmm1,%xmm8,%xmm6
++	vpaddq	%xmm5,%xmm14,%xmm14
++	vpaddq	%xmm6,%xmm13,%xmm13
++	vmovdqa	-64(%r11),%xmm7
++	vpmuludq	%xmm0,%xmm8,%xmm8
++	vpmuludq	%xmm4,%xmm9,%xmm5
++	vpaddq	%xmm8,%xmm12,%xmm12
++	vpaddq	%xmm5,%xmm11,%xmm11
++	vmovdqa	-48(%r11),%xmm8
++	vpmuludq	%xmm3,%xmm9,%xmm9
++	vpmuludq	%xmm1,%xmm7,%xmm6
++	vpaddq	%xmm9,%xmm10,%xmm10
++
++	vmovdqa	-16(%r11),%xmm9
++	vpaddq	%xmm6,%xmm14,%xmm14
++	vpmuludq	%xmm0,%xmm7,%xmm7
++	vpmuludq	%xmm4,%xmm8,%xmm5
++	vpaddq	%xmm7,%xmm13,%xmm13
++	vpaddq	%xmm5,%xmm12,%xmm12
++	vmovdqu	32(%rsi),%xmm5
++	vpmuludq	%xmm3,%xmm8,%xmm7
++	vpmuludq	%xmm2,%xmm8,%xmm8
++	vpaddq	%xmm7,%xmm11,%xmm11
++	vmovdqu	48(%rsi),%xmm6
++	vpaddq	%xmm8,%xmm10,%xmm10
++
++	vpmuludq	%xmm2,%xmm9,%xmm2
++	vpmuludq	%xmm3,%xmm9,%xmm3
++	vpsrldq	$6,%xmm5,%xmm7
++	vpaddq	%xmm2,%xmm11,%xmm11
++	vpmuludq	%xmm4,%xmm9,%xmm4
++	vpsrldq	$6,%xmm6,%xmm8
++	vpaddq	%xmm3,%xmm12,%xmm2
++	vpaddq	%xmm4,%xmm13,%xmm3
++	vpmuludq	-32(%r11),%xmm0,%xmm4
++	vpmuludq	%xmm1,%xmm9,%xmm0
++	vpunpckhqdq	%xmm6,%xmm5,%xmm9
++	vpaddq	%xmm4,%xmm14,%xmm4
++	vpaddq	%xmm0,%xmm10,%xmm0
++
++	vpunpcklqdq	%xmm6,%xmm5,%xmm5
++	vpunpcklqdq	%xmm8,%xmm7,%xmm8
++
++
++	vpsrldq	$5,%xmm9,%xmm9
++	vpsrlq	$26,%xmm5,%xmm6
++	vmovdqa	0(%rsp),%xmm14
++	vpand	%xmm15,%xmm5,%xmm5
++	vpsrlq	$4,%xmm8,%xmm7
++	vpand	%xmm15,%xmm6,%xmm6
++	vpand	0(%rcx),%xmm9,%xmm9
++	vpsrlq	$30,%xmm8,%xmm8
++	vpand	%xmm15,%xmm7,%xmm7
++	vpand	%xmm15,%xmm8,%xmm8
++	vpor	32(%rcx),%xmm9,%xmm9
++
++	vpsrlq	$26,%xmm3,%xmm13
++	vpand	%xmm15,%xmm3,%xmm3
++	vpaddq	%xmm13,%xmm4,%xmm4
++
++	vpsrlq	$26,%xmm0,%xmm10
++	vpand	%xmm15,%xmm0,%xmm0
++	vpaddq	%xmm10,%xmm11,%xmm1
++
++	vpsrlq	$26,%xmm4,%xmm10
++	vpand	%xmm15,%xmm4,%xmm4
++
++	vpsrlq	$26,%xmm1,%xmm11
++	vpand	%xmm15,%xmm1,%xmm1
++	vpaddq	%xmm11,%xmm2,%xmm2
++
++	vpaddq	%xmm10,%xmm0,%xmm0
++	vpsllq	$2,%xmm10,%xmm10
++	vpaddq	%xmm10,%xmm0,%xmm0
++
++	vpsrlq	$26,%xmm2,%xmm12
++	vpand	%xmm15,%xmm2,%xmm2
++	vpaddq	%xmm12,%xmm3,%xmm3
++
++	vpsrlq	$26,%xmm0,%xmm10
++	vpand	%xmm15,%xmm0,%xmm0
++	vpaddq	%xmm10,%xmm1,%xmm1
++
++	vpsrlq	$26,%xmm3,%xmm13
++	vpand	%xmm15,%xmm3,%xmm3
++	vpaddq	%xmm13,%xmm4,%xmm4
++
++	ja	.Loop_avx
++
++.Lskip_loop_avx:
++	vpshufd	$0x10,%xmm14,%xmm14
++	addq	$32,%rdx
++	jnz	.Long_tail_avx
++
++	vpaddq	%xmm2,%xmm7,%xmm7
++	vpaddq	%xmm0,%xmm5,%xmm5
++	vpaddq	%xmm1,%xmm6,%xmm6
++	vpaddq	%xmm3,%xmm8,%xmm8
++	vpaddq	%xmm4,%xmm9,%xmm9
++
++.Long_tail_avx:
++	vmovdqa	%xmm2,32(%r11)
++	vmovdqa	%xmm0,0(%r11)
++	vmovdqa	%xmm1,16(%r11)
++	vmovdqa	%xmm3,48(%r11)
++	vmovdqa	%xmm4,64(%r11)
++
++	vpmuludq	%xmm7,%xmm14,%xmm12
++	vpmuludq	%xmm5,%xmm14,%xmm10
++	vpshufd	$0x10,-48(%rdi),%xmm2
++	vpmuludq	%xmm6,%xmm14,%xmm11
++	vpmuludq	%xmm8,%xmm14,%xmm13
++	vpmuludq	%xmm9,%xmm14,%xmm14
++
++	vpmuludq	%xmm8,%xmm2,%xmm0
++	vpaddq	%xmm0,%xmm14,%xmm14
++	vpshufd	$0x10,-32(%rdi),%xmm3
++	vpmuludq	%xmm7,%xmm2,%xmm1
++	vpaddq	%xmm1,%xmm13,%xmm13
++	vpshufd	$0x10,-16(%rdi),%xmm4
++	vpmuludq	%xmm6,%xmm2,%xmm0
++	vpaddq	%xmm0,%xmm12,%xmm12
++	vpmuludq	%xmm5,%xmm2,%xmm2
++	vpaddq	%xmm2,%xmm11,%xmm11
++	vpmuludq	%xmm9,%xmm3,%xmm3
++	vpaddq	%xmm3,%xmm10,%xmm10
++
++	vpshufd	$0x10,0(%rdi),%xmm2
++	vpmuludq	%xmm7,%xmm4,%xmm1
++	vpaddq	%xmm1,%xmm14,%xmm14
++	vpmuludq	%xmm6,%xmm4,%xmm0
++	vpaddq	%xmm0,%xmm13,%xmm13
++	vpshufd	$0x10,16(%rdi),%xmm3
++	vpmuludq	%xmm5,%xmm4,%xmm4
++	vpaddq	%xmm4,%xmm12,%xmm12
++	vpmuludq	%xmm9,%xmm2,%xmm1
++	vpaddq	%xmm1,%xmm11,%xmm11
++	vpshufd	$0x10,32(%rdi),%xmm4
++	vpmuludq	%xmm8,%xmm2,%xmm2
++	vpaddq	%xmm2,%xmm10,%xmm10
++
++	vpmuludq	%xmm6,%xmm3,%xmm0
++	vpaddq	%xmm0,%xmm14,%xmm14
++	vpmuludq	%xmm5,%xmm3,%xmm3
++	vpaddq	%xmm3,%xmm13,%xmm13
++	vpshufd	$0x10,48(%rdi),%xmm2
++	vpmuludq	%xmm9,%xmm4,%xmm1
++	vpaddq	%xmm1,%xmm12,%xmm12
++	vpshufd	$0x10,64(%rdi),%xmm3
++	vpmuludq	%xmm8,%xmm4,%xmm0
++	vpaddq	%xmm0,%xmm11,%xmm11
++	vpmuludq	%xmm7,%xmm4,%xmm4
++	vpaddq	%xmm4,%xmm10,%xmm10
++
++	vpmuludq	%xmm5,%xmm2,%xmm2
++	vpaddq	%xmm2,%xmm14,%xmm14
++	vpmuludq	%xmm9,%xmm3,%xmm1
++	vpaddq	%xmm1,%xmm13,%xmm13
++	vpmuludq	%xmm8,%xmm3,%xmm0
++	vpaddq	%xmm0,%xmm12,%xmm12
++	vpmuludq	%xmm7,%xmm3,%xmm1
++	vpaddq	%xmm1,%xmm11,%xmm11
++	vpmuludq	%xmm6,%xmm3,%xmm3
++	vpaddq	%xmm3,%xmm10,%xmm10
++
++	jz	.Lshort_tail_avx
++
++	vmovdqu	0(%rsi),%xmm0
++	vmovdqu	16(%rsi),%xmm1
++
++	vpsrldq	$6,%xmm0,%xmm2
++	vpsrldq	$6,%xmm1,%xmm3
++	vpunpckhqdq	%xmm1,%xmm0,%xmm4
++	vpunpcklqdq	%xmm1,%xmm0,%xmm0
++	vpunpcklqdq	%xmm3,%xmm2,%xmm3
++
++	vpsrlq	$40,%xmm4,%xmm4
++	vpsrlq	$26,%xmm0,%xmm1
++	vpand	%xmm15,%xmm0,%xmm0
++	vpsrlq	$4,%xmm3,%xmm2
++	vpand	%xmm15,%xmm1,%xmm1
++	vpsrlq	$30,%xmm3,%xmm3
++	vpand	%xmm15,%xmm2,%xmm2
++	vpand	%xmm15,%xmm3,%xmm3
++	vpor	32(%rcx),%xmm4,%xmm4
++
++	vpshufd	$0x32,-64(%rdi),%xmm9
++	vpaddq	0(%r11),%xmm0,%xmm0
++	vpaddq	16(%r11),%xmm1,%xmm1
++	vpaddq	32(%r11),%xmm2,%xmm2
++	vpaddq	48(%r11),%xmm3,%xmm3
++	vpaddq	64(%r11),%xmm4,%xmm4
++
++	vpmuludq	%xmm0,%xmm9,%xmm5
++	vpaddq	%xmm5,%xmm10,%xmm10
++	vpmuludq	%xmm1,%xmm9,%xmm6
++	vpaddq	%xmm6,%xmm11,%xmm11
++	vpmuludq	%xmm2,%xmm9,%xmm5
++	vpaddq	%xmm5,%xmm12,%xmm12
++	vpshufd	$0x32,-48(%rdi),%xmm7
++	vpmuludq	%xmm3,%xmm9,%xmm6
++	vpaddq	%xmm6,%xmm13,%xmm13
++	vpmuludq	%xmm4,%xmm9,%xmm9
++	vpaddq	%xmm9,%xmm14,%xmm14
++
++	vpmuludq	%xmm3,%xmm7,%xmm5
++	vpaddq	%xmm5,%xmm14,%xmm14
++	vpshufd	$0x32,-32(%rdi),%xmm8
++	vpmuludq	%xmm2,%xmm7,%xmm6
++	vpaddq	%xmm6,%xmm13,%xmm13
++	vpshufd	$0x32,-16(%rdi),%xmm9
++	vpmuludq	%xmm1,%xmm7,%xmm5
++	vpaddq	%xmm5,%xmm12,%xmm12
++	vpmuludq	%xmm0,%xmm7,%xmm7
++	vpaddq	%xmm7,%xmm11,%xmm11
++	vpmuludq	%xmm4,%xmm8,%xmm8
++	vpaddq	%xmm8,%xmm10,%xmm10
++
++	vpshufd	$0x32,0(%rdi),%xmm7
++	vpmuludq	%xmm2,%xmm9,%xmm6
++	vpaddq	%xmm6,%xmm14,%xmm14
++	vpmuludq	%xmm1,%xmm9,%xmm5
++	vpaddq	%xmm5,%xmm13,%xmm13
++	vpshufd	$0x32,16(%rdi),%xmm8
++	vpmuludq	%xmm0,%xmm9,%xmm9
++	vpaddq	%xmm9,%xmm12,%xmm12
++	vpmuludq	%xmm4,%xmm7,%xmm6
++	vpaddq	%xmm6,%xmm11,%xmm11
++	vpshufd	$0x32,32(%rdi),%xmm9
++	vpmuludq	%xmm3,%xmm7,%xmm7
++	vpaddq	%xmm7,%xmm10,%xmm10
++
++	vpmuludq	%xmm1,%xmm8,%xmm5
++	vpaddq	%xmm5,%xmm14,%xmm14
++	vpmuludq	%xmm0,%xmm8,%xmm8
++	vpaddq	%xmm8,%xmm13,%xmm13
++	vpshufd	$0x32,48(%rdi),%xmm7
++	vpmuludq	%xmm4,%xmm9,%xmm6
++	vpaddq	%xmm6,%xmm12,%xmm12
++	vpshufd	$0x32,64(%rdi),%xmm8
++	vpmuludq	%xmm3,%xmm9,%xmm5
++	vpaddq	%xmm5,%xmm11,%xmm11
++	vpmuludq	%xmm2,%xmm9,%xmm9
++	vpaddq	%xmm9,%xmm10,%xmm10
++
++	vpmuludq	%xmm0,%xmm7,%xmm7
++	vpaddq	%xmm7,%xmm14,%xmm14
++	vpmuludq	%xmm4,%xmm8,%xmm6
++	vpaddq	%xmm6,%xmm13,%xmm13
++	vpmuludq	%xmm3,%xmm8,%xmm5
++	vpaddq	%xmm5,%xmm12,%xmm12
++	vpmuludq	%xmm2,%xmm8,%xmm6
++	vpaddq	%xmm6,%xmm11,%xmm11
++	vpmuludq	%xmm1,%xmm8,%xmm8
++	vpaddq	%xmm8,%xmm10,%xmm10
++
++.Lshort_tail_avx:
++
++	vpsrldq	$8,%xmm14,%xmm9
++	vpsrldq	$8,%xmm13,%xmm8
++	vpsrldq	$8,%xmm11,%xmm6
++	vpsrldq	$8,%xmm10,%xmm5
++	vpsrldq	$8,%xmm12,%xmm7
++	vpaddq	%xmm8,%xmm13,%xmm13
++	vpaddq	%xmm9,%xmm14,%xmm14
++	vpaddq	%xmm5,%xmm10,%xmm10
++	vpaddq	%xmm6,%xmm11,%xmm11
++	vpaddq	%xmm7,%xmm12,%xmm12
++
++	vpsrlq	$26,%xmm13,%xmm3
++	vpand	%xmm15,%xmm13,%xmm13
++	vpaddq	%xmm3,%xmm14,%xmm14
++
++	vpsrlq	$26,%xmm10,%xmm0
++	vpand	%xmm15,%xmm10,%xmm10
++	vpaddq	%xmm0,%xmm11,%xmm11
++
++	vpsrlq	$26,%xmm14,%xmm4
++	vpand	%xmm15,%xmm14,%xmm14
++
++	vpsrlq	$26,%xmm11,%xmm1
++	vpand	%xmm15,%xmm11,%xmm11
++	vpaddq	%xmm1,%xmm12,%xmm12
++
++	vpaddq	%xmm4,%xmm10,%xmm10
++	vpsllq	$2,%xmm4,%xmm4
++	vpaddq	%xmm4,%xmm10,%xmm10
++
++	vpsrlq	$26,%xmm12,%xmm2
++	vpand	%xmm15,%xmm12,%xmm12
++	vpaddq	%xmm2,%xmm13,%xmm13
++
++	vpsrlq	$26,%xmm10,%xmm0
++	vpand	%xmm15,%xmm10,%xmm10
++	vpaddq	%xmm0,%xmm11,%xmm11
++
++	vpsrlq	$26,%xmm13,%xmm3
++	vpand	%xmm15,%xmm13,%xmm13
++	vpaddq	%xmm3,%xmm14,%xmm14
++
++	vmovd	%xmm10,-112(%rdi)
++	vmovd	%xmm11,-108(%rdi)
++	vmovd	%xmm12,-104(%rdi)
++	vmovd	%xmm13,-100(%rdi)
++	vmovd	%xmm14,-96(%rdi)
++	leaq	-8(%r10),%rsp
++
++	vzeroupper
++	ret
++ENDPROC(poly1305_blocks_avx)
++
++.align	32
++ENTRY(poly1305_emit_avx)
++	cmpl	$0,20(%rdi)
++	je	.Lemit
++
++	movl	0(%rdi),%eax
++	movl	4(%rdi),%ecx
++	movl	8(%rdi),%r8d
++	movl	12(%rdi),%r11d
++	movl	16(%rdi),%r10d
++
++	shlq	$26,%rcx
++	movq	%r8,%r9
++	shlq	$52,%r8
++	addq	%rcx,%rax
++	shrq	$12,%r9
++	addq	%rax,%r8
++	adcq	$0,%r9
++
++	shlq	$14,%r11
++	movq	%r10,%rax
++	shrq	$24,%r10
++	addq	%r11,%r9
++	shlq	$40,%rax
++	addq	%rax,%r9
++	adcq	$0,%r10
++
++	movq	%r10,%rax
++	movq	%r10,%rcx
++	andq	$3,%r10
++	shrq	$2,%rax
++	andq	$-4,%rcx
++	addq	%rcx,%rax
++	addq	%rax,%r8
++	adcq	$0,%r9
++	adcq	$0,%r10
++
++	movq	%r8,%rax
++	addq	$5,%r8
++	movq	%r9,%rcx
++	adcq	$0,%r9
++	adcq	$0,%r10
++	shrq	$2,%r10
++	cmovnzq	%r8,%rax
++	cmovnzq	%r9,%rcx
++
++	addq	0(%rdx),%rax
++	adcq	8(%rdx),%rcx
++	movq	%rax,0(%rsi)
++	movq	%rcx,8(%rsi)
++
++	ret
++ENDPROC(poly1305_emit_avx)
++#endif /* CONFIG_AS_AVX */
++
++#ifdef CONFIG_AS_AVX2
++.align	32
++ENTRY(poly1305_blocks_avx2)
++
++	movl	20(%rdi),%r8d
++	cmpq	$128,%rdx
++	jae	.Lblocks_avx2
++	testl	%r8d,%r8d
++	jz	.Lblocks
++
++.Lblocks_avx2:
++	andq	$-16,%rdx
++	jz	.Lno_data_avx2
++
++	vzeroupper
++
++	testl	%r8d,%r8d
++	jz	.Lbase2_64_avx2
++
++	testq	$63,%rdx
++	jz	.Leven_avx2
++
++	pushq	%rbx
++	pushq	%r12
++	pushq	%r13
++	pushq	%r14
++	pushq	%r15
++	pushq	%rdi
++
++.Lblocks_avx2_body:
++
++	movq	%rdx,%r15
++
++	movq	0(%rdi),%r8
++	movq	8(%rdi),%r9
++	movl	16(%rdi),%r10d
++
++	movq	24(%rdi),%r11
++	movq	32(%rdi),%r13
++
++
++	movl	%r8d,%r14d
++	andq	$-2147483648,%r8
++	movq	%r9,%r12
++	movl	%r9d,%ebx
++	andq	$-2147483648,%r9
++
++	shrq	$6,%r8
++	shlq	$52,%r12
++	addq	%r8,%r14
++	shrq	$12,%rbx
++	shrq	$18,%r9
++	addq	%r12,%r14
++	adcq	%r9,%rbx
++
++	movq	%r10,%r8
++	shlq	$40,%r8
++	shrq	$24,%r10
++	addq	%r8,%rbx
++	adcq	$0,%r10
++
++	movq	$-4,%r9
++	movq	%r10,%r8
++	andq	%r10,%r9
++	shrq	$2,%r8
++	andq	$3,%r10
++	addq	%r9,%r8
++	addq	%r8,%r14
++	adcq	$0,%rbx
++	adcq	$0,%r10
++
++	movq	%r13,%r12
++	movq	%r13,%rax
++	shrq	$2,%r13
++	addq	%r12,%r13
++
++.Lbase2_26_pre_avx2:
++	addq	0(%rsi),%r14
++	adcq	8(%rsi),%rbx
++	leaq	16(%rsi),%rsi
++	adcq	%rcx,%r10
++	subq	$16,%r15
++
++	movq	%rdi,0(%rsp)
++	__poly1305_block
++	movq	0(%rsp),%rdi
++	movq	%r12,%rax
++
++	testq	$63,%r15
++	jnz	.Lbase2_26_pre_avx2
++
++	testq	%rcx,%rcx
++	jz	.Lstore_base2_64_avx2
++
++
++	movq	%r14,%rax
++	movq	%r14,%rdx
++	shrq	$52,%r14
++	movq	%rbx,%r11
++	movq	%rbx,%r12
++	shrq	$26,%rdx
++	andq	$0x3ffffff,%rax
++	shlq	$12,%r11
++	andq	$0x3ffffff,%rdx
++	shrq	$14,%rbx
++	orq	%r11,%r14
++	shlq	$24,%r10
++	andq	$0x3ffffff,%r14
++	shrq	$40,%r12
++	andq	$0x3ffffff,%rbx
++	orq	%r12,%r10
++
++	testq	%r15,%r15
++	jz	.Lstore_base2_26_avx2
++
++	vmovd	%eax,%xmm0
++	vmovd	%edx,%xmm1
++	vmovd	%r14d,%xmm2
++	vmovd	%ebx,%xmm3
++	vmovd	%r10d,%xmm4
++	jmp	.Lproceed_avx2
++
++.align	32
++.Lstore_base2_64_avx2:
++	movq	%r14,0(%rdi)
++	movq	%rbx,8(%rdi)
++	movq	%r10,16(%rdi)
++	jmp	.Ldone_avx2
++
++.align	16
++.Lstore_base2_26_avx2:
++	movl	%eax,0(%rdi)
++	movl	%edx,4(%rdi)
++	movl	%r14d,8(%rdi)
++	movl	%ebx,12(%rdi)
++	movl	%r10d,16(%rdi)
++.align	16
++.Ldone_avx2:
++	movq	8(%rsp),%r15
++	movq	16(%rsp),%r14
++	movq	24(%rsp),%r13
++	movq	32(%rsp),%r12
++	movq	40(%rsp),%rbx
++	leaq	48(%rsp),%rsp
++
++.Lno_data_avx2:
++.Lblocks_avx2_epilogue:
++	ret
++
++
++.align	32
++.Lbase2_64_avx2:
++
++
++	pushq	%rbx
++	pushq	%r12
++	pushq	%r13
++	pushq	%r14
++	pushq	%r15
++	pushq	%rdi
++
++.Lbase2_64_avx2_body:
++
++	movq	%rdx,%r15
++
++	movq	24(%rdi),%r11
++	movq	32(%rdi),%r13
++
++	movq	0(%rdi),%r14
++	movq	8(%rdi),%rbx
++	movl	16(%rdi),%r10d
++
++	movq	%r13,%r12
++	movq	%r13,%rax
++	shrq	$2,%r13
++	addq	%r12,%r13
++
++	testq	$63,%rdx
++	jz	.Linit_avx2
++
++.Lbase2_64_pre_avx2:
++	addq	0(%rsi),%r14
++	adcq	8(%rsi),%rbx
++	leaq	16(%rsi),%rsi
++	adcq	%rcx,%r10
++	subq	$16,%r15
++
++	movq	%rdi,0(%rsp)
++	__poly1305_block
++	movq	0(%rsp),%rdi
++	movq	%r12,%rax
++
++	testq	$63,%r15
++	jnz	.Lbase2_64_pre_avx2
++
++.Linit_avx2:
++
++	movq	%r14,%rax
++	movq	%r14,%rdx
++	shrq	$52,%r14
++	movq	%rbx,%r8
++	movq	%rbx,%r9
++	shrq	$26,%rdx
++	andq	$0x3ffffff,%rax
++	shlq	$12,%r8
++	andq	$0x3ffffff,%rdx
++	shrq	$14,%rbx
++	orq	%r8,%r14
++	shlq	$24,%r10
++	andq	$0x3ffffff,%r14
++	shrq	$40,%r9
++	andq	$0x3ffffff,%rbx
++	orq	%r9,%r10
++
++	vmovd	%eax,%xmm0
++	vmovd	%edx,%xmm1
++	vmovd	%r14d,%xmm2
++	vmovd	%ebx,%xmm3
++	vmovd	%r10d,%xmm4
++	movl	$1,20(%rdi)
++
++	__poly1305_init_avx
++
++.Lproceed_avx2:
++	movq	%r15,%rdx
++
++	movq	8(%rsp),%r15
++	movq	16(%rsp),%r14
++	movq	24(%rsp),%r13
++	movq	32(%rsp),%r12
++	movq	40(%rsp),%rbx
++	leaq	48(%rsp),%rax
++	leaq	48(%rsp),%rsp
++
++.Lbase2_64_avx2_epilogue:
++	jmp	.Ldo_avx2
++
++
++.align	32
++.Leven_avx2:
++
++	vmovd	0(%rdi),%xmm0
++	vmovd	4(%rdi),%xmm1
++	vmovd	8(%rdi),%xmm2
++	vmovd	12(%rdi),%xmm3
++	vmovd	16(%rdi),%xmm4
++
++.Ldo_avx2:
++	leaq	8(%rsp),%r10
++	subq	$0x128,%rsp
++	leaq	.Lconst(%rip),%rcx
++	leaq	48+64(%rdi),%rdi
++	vmovdqa	96(%rcx),%ymm7
++
++
++	vmovdqu	-64(%rdi),%xmm9
++	andq	$-512,%rsp
++	vmovdqu	-48(%rdi),%xmm10
++	vmovdqu	-32(%rdi),%xmm6
++	vmovdqu	-16(%rdi),%xmm11
++	vmovdqu	0(%rdi),%xmm12
++	vmovdqu	16(%rdi),%xmm13
++	leaq	144(%rsp),%rax
++	vmovdqu	32(%rdi),%xmm14
++	vpermd	%ymm9,%ymm7,%ymm9
++	vmovdqu	48(%rdi),%xmm15
++	vpermd	%ymm10,%ymm7,%ymm10
++	vmovdqu	64(%rdi),%xmm5
++	vpermd	%ymm6,%ymm7,%ymm6
++	vmovdqa	%ymm9,0(%rsp)
++	vpermd	%ymm11,%ymm7,%ymm11
++	vmovdqa	%ymm10,32-144(%rax)
++	vpermd	%ymm12,%ymm7,%ymm12
++	vmovdqa	%ymm6,64-144(%rax)
++	vpermd	%ymm13,%ymm7,%ymm13
++	vmovdqa	%ymm11,96-144(%rax)
++	vpermd	%ymm14,%ymm7,%ymm14
++	vmovdqa	%ymm12,128-144(%rax)
++	vpermd	%ymm15,%ymm7,%ymm15
++	vmovdqa	%ymm13,160-144(%rax)
++	vpermd	%ymm5,%ymm7,%ymm5
++	vmovdqa	%ymm14,192-144(%rax)
++	vmovdqa	%ymm15,224-144(%rax)
++	vmovdqa	%ymm5,256-144(%rax)
++	vmovdqa	64(%rcx),%ymm5
++
++
++
++	vmovdqu	0(%rsi),%xmm7
++	vmovdqu	16(%rsi),%xmm8
++	vinserti128	$1,32(%rsi),%ymm7,%ymm7
++	vinserti128	$1,48(%rsi),%ymm8,%ymm8
++	leaq	64(%rsi),%rsi
++
++	vpsrldq	$6,%ymm7,%ymm9
++	vpsrldq	$6,%ymm8,%ymm10
++	vpunpckhqdq	%ymm8,%ymm7,%ymm6
++	vpunpcklqdq	%ymm10,%ymm9,%ymm9
++	vpunpcklqdq	%ymm8,%ymm7,%ymm7
++
++	vpsrlq	$30,%ymm9,%ymm10
++	vpsrlq	$4,%ymm9,%ymm9
++	vpsrlq	$26,%ymm7,%ymm8
++	vpsrlq	$40,%ymm6,%ymm6
++	vpand	%ymm5,%ymm9,%ymm9
++	vpand	%ymm5,%ymm7,%ymm7
++	vpand	%ymm5,%ymm8,%ymm8
++	vpand	%ymm5,%ymm10,%ymm10
++	vpor	32(%rcx),%ymm6,%ymm6
++
++	vpaddq	%ymm2,%ymm9,%ymm2
++	subq	$64,%rdx
++	jz	.Ltail_avx2
++	jmp	.Loop_avx2
++
++.align	32
++.Loop_avx2:
++
++	vpaddq	%ymm0,%ymm7,%ymm0
++	vmovdqa	0(%rsp),%ymm7
++	vpaddq	%ymm1,%ymm8,%ymm1
++	vmovdqa	32(%rsp),%ymm8
++	vpaddq	%ymm3,%ymm10,%ymm3
++	vmovdqa	96(%rsp),%ymm9
++	vpaddq	%ymm4,%ymm6,%ymm4
++	vmovdqa	48(%rax),%ymm10
++	vmovdqa	112(%rax),%ymm5
++
++	vpmuludq	%ymm2,%ymm7,%ymm13
++	vpmuludq	%ymm2,%ymm8,%ymm14
++	vpmuludq	%ymm2,%ymm9,%ymm15
++	vpmuludq	%ymm2,%ymm10,%ymm11
++	vpmuludq	%ymm2,%ymm5,%ymm12
++
++	vpmuludq	%ymm0,%ymm8,%ymm6
++	vpmuludq	%ymm1,%ymm8,%ymm2
++	vpaddq	%ymm6,%ymm12,%ymm12
++	vpaddq	%ymm2,%ymm13,%ymm13
++	vpmuludq	%ymm3,%ymm8,%ymm6
++	vpmuludq	64(%rsp),%ymm4,%ymm2
++	vpaddq	%ymm6,%ymm15,%ymm15
++	vpaddq	%ymm2,%ymm11,%ymm11
++	vmovdqa	-16(%rax),%ymm8
++
++	vpmuludq	%ymm0,%ymm7,%ymm6
++	vpmuludq	%ymm1,%ymm7,%ymm2
++	vpaddq	%ymm6,%ymm11,%ymm11
++	vpaddq	%ymm2,%ymm12,%ymm12
++	vpmuludq	%ymm3,%ymm7,%ymm6
++	vpmuludq	%ymm4,%ymm7,%ymm2
++	vmovdqu	0(%rsi),%xmm7
++	vpaddq	%ymm6,%ymm14,%ymm14
++	vpaddq	%ymm2,%ymm15,%ymm15
++	vinserti128	$1,32(%rsi),%ymm7,%ymm7
++
++	vpmuludq	%ymm3,%ymm8,%ymm6
++	vpmuludq	%ymm4,%ymm8,%ymm2
++	vmovdqu	16(%rsi),%xmm8
++	vpaddq	%ymm6,%ymm11,%ymm11
++	vpaddq	%ymm2,%ymm12,%ymm12
++	vmovdqa	16(%rax),%ymm2
++	vpmuludq	%ymm1,%ymm9,%ymm6
++	vpmuludq	%ymm0,%ymm9,%ymm9
++	vpaddq	%ymm6,%ymm14,%ymm14
++	vpaddq	%ymm9,%ymm13,%ymm13
++	vinserti128	$1,48(%rsi),%ymm8,%ymm8
++	leaq	64(%rsi),%rsi
++
++	vpmuludq	%ymm1,%ymm2,%ymm6
++	vpmuludq	%ymm0,%ymm2,%ymm2
++	vpsrldq	$6,%ymm7,%ymm9
++	vpaddq	%ymm6,%ymm15,%ymm15
++	vpaddq	%ymm2,%ymm14,%ymm14
++	vpmuludq	%ymm3,%ymm10,%ymm6
++	vpmuludq	%ymm4,%ymm10,%ymm2
++	vpsrldq	$6,%ymm8,%ymm10
++	vpaddq	%ymm6,%ymm12,%ymm12
++	vpaddq	%ymm2,%ymm13,%ymm13
++	vpunpckhqdq	%ymm8,%ymm7,%ymm6
++
++	vpmuludq	%ymm3,%ymm5,%ymm3
++	vpmuludq	%ymm4,%ymm5,%ymm4
++	vpunpcklqdq	%ymm8,%ymm7,%ymm7
++	vpaddq	%ymm3,%ymm13,%ymm2
++	vpaddq	%ymm4,%ymm14,%ymm3
++	vpunpcklqdq	%ymm10,%ymm9,%ymm10
++	vpmuludq	80(%rax),%ymm0,%ymm4
++	vpmuludq	%ymm1,%ymm5,%ymm0
++	vmovdqa	64(%rcx),%ymm5
++	vpaddq	%ymm4,%ymm15,%ymm4
++	vpaddq	%ymm0,%ymm11,%ymm0
++
++	vpsrlq	$26,%ymm3,%ymm14
++	vpand	%ymm5,%ymm3,%ymm3
++	vpaddq	%ymm14,%ymm4,%ymm4
++
++	vpsrlq	$26,%ymm0,%ymm11
++	vpand	%ymm5,%ymm0,%ymm0
++	vpaddq	%ymm11,%ymm12,%ymm1
++
++	vpsrlq	$26,%ymm4,%ymm15
++	vpand	%ymm5,%ymm4,%ymm4
++
++	vpsrlq	$4,%ymm10,%ymm9
++
++	vpsrlq	$26,%ymm1,%ymm12
++	vpand	%ymm5,%ymm1,%ymm1
++	vpaddq	%ymm12,%ymm2,%ymm2
++
++	vpaddq	%ymm15,%ymm0,%ymm0
++	vpsllq	$2,%ymm15,%ymm15
++	vpaddq	%ymm15,%ymm0,%ymm0
++
++	vpand	%ymm5,%ymm9,%ymm9
++	vpsrlq	$26,%ymm7,%ymm8
++
++	vpsrlq	$26,%ymm2,%ymm13
++	vpand	%ymm5,%ymm2,%ymm2
++	vpaddq	%ymm13,%ymm3,%ymm3
++
++	vpaddq	%ymm9,%ymm2,%ymm2
++	vpsrlq	$30,%ymm10,%ymm10
++
++	vpsrlq	$26,%ymm0,%ymm11
++	vpand	%ymm5,%ymm0,%ymm0
++	vpaddq	%ymm11,%ymm1,%ymm1
++
++	vpsrlq	$40,%ymm6,%ymm6
++
++	vpsrlq	$26,%ymm3,%ymm14
++	vpand	%ymm5,%ymm3,%ymm3
++	vpaddq	%ymm14,%ymm4,%ymm4
++
++	vpand	%ymm5,%ymm7,%ymm7
++	vpand	%ymm5,%ymm8,%ymm8
++	vpand	%ymm5,%ymm10,%ymm10
++	vpor	32(%rcx),%ymm6,%ymm6
++
++	subq	$64,%rdx
++	jnz	.Loop_avx2
++
++.byte	0x66,0x90
++.Ltail_avx2:
++
++	vpaddq	%ymm0,%ymm7,%ymm0
++	vmovdqu	4(%rsp),%ymm7
++	vpaddq	%ymm1,%ymm8,%ymm1
++	vmovdqu	36(%rsp),%ymm8
++	vpaddq	%ymm3,%ymm10,%ymm3
++	vmovdqu	100(%rsp),%ymm9
++	vpaddq	%ymm4,%ymm6,%ymm4
++	vmovdqu	52(%rax),%ymm10
++	vmovdqu	116(%rax),%ymm5
++
++	vpmuludq	%ymm2,%ymm7,%ymm13
++	vpmuludq	%ymm2,%ymm8,%ymm14
++	vpmuludq	%ymm2,%ymm9,%ymm15
++	vpmuludq	%ymm2,%ymm10,%ymm11
++	vpmuludq	%ymm2,%ymm5,%ymm12
++
++	vpmuludq	%ymm0,%ymm8,%ymm6
++	vpmuludq	%ymm1,%ymm8,%ymm2
++	vpaddq	%ymm6,%ymm12,%ymm12
++	vpaddq	%ymm2,%ymm13,%ymm13
++	vpmuludq	%ymm3,%ymm8,%ymm6
++	vpmuludq	68(%rsp),%ymm4,%ymm2
++	vpaddq	%ymm6,%ymm15,%ymm15
++	vpaddq	%ymm2,%ymm11,%ymm11
++
++	vpmuludq	%ymm0,%ymm7,%ymm6
++	vpmuludq	%ymm1,%ymm7,%ymm2
++	vpaddq	%ymm6,%ymm11,%ymm11
++	vmovdqu	-12(%rax),%ymm8
++	vpaddq	%ymm2,%ymm12,%ymm12
++	vpmuludq	%ymm3,%ymm7,%ymm6
++	vpmuludq	%ymm4,%ymm7,%ymm2
++	vpaddq	%ymm6,%ymm14,%ymm14
++	vpaddq	%ymm2,%ymm15,%ymm15
++
++	vpmuludq	%ymm3,%ymm8,%ymm6
++	vpmuludq	%ymm4,%ymm8,%ymm2
++	vpaddq	%ymm6,%ymm11,%ymm11
++	vpaddq	%ymm2,%ymm12,%ymm12
++	vmovdqu	20(%rax),%ymm2
++	vpmuludq	%ymm1,%ymm9,%ymm6
++	vpmuludq	%ymm0,%ymm9,%ymm9
++	vpaddq	%ymm6,%ymm14,%ymm14
++	vpaddq	%ymm9,%ymm13,%ymm13
++
++	vpmuludq	%ymm1,%ymm2,%ymm6
++	vpmuludq	%ymm0,%ymm2,%ymm2
++	vpaddq	%ymm6,%ymm15,%ymm15
++	vpaddq	%ymm2,%ymm14,%ymm14
++	vpmuludq	%ymm3,%ymm10,%ymm6
++	vpmuludq	%ymm4,%ymm10,%ymm2
++	vpaddq	%ymm6,%ymm12,%ymm12
++	vpaddq	%ymm2,%ymm13,%ymm13
++
++	vpmuludq	%ymm3,%ymm5,%ymm3
++	vpmuludq	%ymm4,%ymm5,%ymm4
++	vpaddq	%ymm3,%ymm13,%ymm2
++	vpaddq	%ymm4,%ymm14,%ymm3
++	vpmuludq	84(%rax),%ymm0,%ymm4
++	vpmuludq	%ymm1,%ymm5,%ymm0
++	vmovdqa	64(%rcx),%ymm5
++	vpaddq	%ymm4,%ymm15,%ymm4
++	vpaddq	%ymm0,%ymm11,%ymm0
++
++	vpsrldq	$8,%ymm12,%ymm8
++	vpsrldq	$8,%ymm2,%ymm9
++	vpsrldq	$8,%ymm3,%ymm10
++	vpsrldq	$8,%ymm4,%ymm6
++	vpsrldq	$8,%ymm0,%ymm7
++	vpaddq	%ymm8,%ymm12,%ymm12
++	vpaddq	%ymm9,%ymm2,%ymm2
++	vpaddq	%ymm10,%ymm3,%ymm3
++	vpaddq	%ymm6,%ymm4,%ymm4
++	vpaddq	%ymm7,%ymm0,%ymm0
++
++	vpermq	$0x2,%ymm3,%ymm10
++	vpermq	$0x2,%ymm4,%ymm6
++	vpermq	$0x2,%ymm0,%ymm7
++	vpermq	$0x2,%ymm12,%ymm8
++	vpermq	$0x2,%ymm2,%ymm9
++	vpaddq	%ymm10,%ymm3,%ymm3
++	vpaddq	%ymm6,%ymm4,%ymm4
++	vpaddq	%ymm7,%ymm0,%ymm0
++	vpaddq	%ymm8,%ymm12,%ymm12
++	vpaddq	%ymm9,%ymm2,%ymm2
++
++	vpsrlq	$26,%ymm3,%ymm14
++	vpand	%ymm5,%ymm3,%ymm3
++	vpaddq	%ymm14,%ymm4,%ymm4
++
++	vpsrlq	$26,%ymm0,%ymm11
++	vpand	%ymm5,%ymm0,%ymm0
++	vpaddq	%ymm11,%ymm12,%ymm1
++
++	vpsrlq	$26,%ymm4,%ymm15
++	vpand	%ymm5,%ymm4,%ymm4
++
++	vpsrlq	$26,%ymm1,%ymm12
++	vpand	%ymm5,%ymm1,%ymm1
++	vpaddq	%ymm12,%ymm2,%ymm2
++
++	vpaddq	%ymm15,%ymm0,%ymm0
++	vpsllq	$2,%ymm15,%ymm15
++	vpaddq	%ymm15,%ymm0,%ymm0
++
++	vpsrlq	$26,%ymm2,%ymm13
++	vpand	%ymm5,%ymm2,%ymm2
++	vpaddq	%ymm13,%ymm3,%ymm3
++
++	vpsrlq	$26,%ymm0,%ymm11
++	vpand	%ymm5,%ymm0,%ymm0
++	vpaddq	%ymm11,%ymm1,%ymm1
++
++	vpsrlq	$26,%ymm3,%ymm14
++	vpand	%ymm5,%ymm3,%ymm3
++	vpaddq	%ymm14,%ymm4,%ymm4
++
++	vmovd	%xmm0,-112(%rdi)
++	vmovd	%xmm1,-108(%rdi)
++	vmovd	%xmm2,-104(%rdi)
++	vmovd	%xmm3,-100(%rdi)
++	vmovd	%xmm4,-96(%rdi)
++	leaq	-8(%r10),%rsp
++
++	vzeroupper
++	ret
++
++ENDPROC(poly1305_blocks_avx2)
++#endif /* CONFIG_AS_AVX2 */
++
++#ifdef CONFIG_AS_AVX512
++.align	32
++ENTRY(poly1305_blocks_avx512)
++
++	movl	20(%rdi),%r8d
++	cmpq	$128,%rdx
++	jae	.Lblocks_avx2_512
++	testl	%r8d,%r8d
++	jz	.Lblocks
++
++.Lblocks_avx2_512:
++	andq	$-16,%rdx
++	jz	.Lno_data_avx2_512
++
++	vzeroupper
++
++	testl	%r8d,%r8d
++	jz	.Lbase2_64_avx2_512
++
++	testq	$63,%rdx
++	jz	.Leven_avx2_512
++
++	pushq	%rbx
++	pushq	%r12
++	pushq	%r13
++	pushq	%r14
++	pushq	%r15
++	pushq	%rdi
++
++.Lblocks_avx2_body_512:
++
++	movq	%rdx,%r15
++
++	movq	0(%rdi),%r8
++	movq	8(%rdi),%r9
++	movl	16(%rdi),%r10d
++
++	movq	24(%rdi),%r11
++	movq	32(%rdi),%r13
++
++
++	movl	%r8d,%r14d
++	andq	$-2147483648,%r8
++	movq	%r9,%r12
++	movl	%r9d,%ebx
++	andq	$-2147483648,%r9
++
++	shrq	$6,%r8
++	shlq	$52,%r12
++	addq	%r8,%r14
++	shrq	$12,%rbx
++	shrq	$18,%r9
++	addq	%r12,%r14
++	adcq	%r9,%rbx
++
++	movq	%r10,%r8
++	shlq	$40,%r8
++	shrq	$24,%r10
++	addq	%r8,%rbx
++	adcq	$0,%r10
++
++	movq	$-4,%r9
++	movq	%r10,%r8
++	andq	%r10,%r9
++	shrq	$2,%r8
++	andq	$3,%r10
++	addq	%r9,%r8
++	addq	%r8,%r14
++	adcq	$0,%rbx
++	adcq	$0,%r10
++
++	movq	%r13,%r12
++	movq	%r13,%rax
++	shrq	$2,%r13
++	addq	%r12,%r13
++
++.Lbase2_26_pre_avx2_512:
++	addq	0(%rsi),%r14
++	adcq	8(%rsi),%rbx
++	leaq	16(%rsi),%rsi
++	adcq	%rcx,%r10
++	subq	$16,%r15
++
++	movq	%rdi,0(%rsp)
++	__poly1305_block
++	movq	0(%rsp),%rdi
++	movq	%r12,%rax
++
++	testq	$63,%r15
++	jnz	.Lbase2_26_pre_avx2_512
++
++	testq	%rcx,%rcx
++	jz	.Lstore_base2_64_avx2_512
++
++
++	movq	%r14,%rax
++	movq	%r14,%rdx
++	shrq	$52,%r14
++	movq	%rbx,%r11
++	movq	%rbx,%r12
++	shrq	$26,%rdx
++	andq	$0x3ffffff,%rax
++	shlq	$12,%r11
++	andq	$0x3ffffff,%rdx
++	shrq	$14,%rbx
++	orq	%r11,%r14
++	shlq	$24,%r10
++	andq	$0x3ffffff,%r14
++	shrq	$40,%r12
++	andq	$0x3ffffff,%rbx
++	orq	%r12,%r10
++
++	testq	%r15,%r15
++	jz	.Lstore_base2_26_avx2_512
++
++	vmovd	%eax,%xmm0
++	vmovd	%edx,%xmm1
++	vmovd	%r14d,%xmm2
++	vmovd	%ebx,%xmm3
++	vmovd	%r10d,%xmm4
++	jmp	.Lproceed_avx2_512
++
++.align	32
++.Lstore_base2_64_avx2_512:
++	movq	%r14,0(%rdi)
++	movq	%rbx,8(%rdi)
++	movq	%r10,16(%rdi)
++	jmp	.Ldone_avx2_512
++
++.align	16
++.Lstore_base2_26_avx2_512:
++	movl	%eax,0(%rdi)
++	movl	%edx,4(%rdi)
++	movl	%r14d,8(%rdi)
++	movl	%ebx,12(%rdi)
++	movl	%r10d,16(%rdi)
++.align	16
++.Ldone_avx2_512:
++	movq	8(%rsp),%r15
++	movq	16(%rsp),%r14
++	movq	24(%rsp),%r13
++	movq	32(%rsp),%r12
++	movq	40(%rsp),%rbx
++	leaq	48(%rsp),%rsp
++
++.Lno_data_avx2_512:
++.Lblocks_avx2_epilogue_512:
++	ret
++
++
++.align	32
++.Lbase2_64_avx2_512:
++
++	pushq	%rbx
++	pushq	%r12
++	pushq	%r13
++	pushq	%r14
++	pushq	%r15
++	pushq	%rdi
++
++.Lbase2_64_avx2_body_512:
++
++	movq	%rdx,%r15
++
++	movq	24(%rdi),%r11
++	movq	32(%rdi),%r13
++
++	movq	0(%rdi),%r14
++	movq	8(%rdi),%rbx
++	movl	16(%rdi),%r10d
++
++	movq	%r13,%r12
++	movq	%r13,%rax
++	shrq	$2,%r13
++	addq	%r12,%r13
++
++	testq	$63,%rdx
++	jz	.Linit_avx2_512
++
++.Lbase2_64_pre_avx2_512:
++	addq	0(%rsi),%r14
++	adcq	8(%rsi),%rbx
++	leaq	16(%rsi),%rsi
++	adcq	%rcx,%r10
++	subq	$16,%r15
++
++	movq	%rdi,0(%rsp)
++	__poly1305_block
++	movq	0(%rsp),%rdi
++	movq	%r12,%rax
++
++	testq	$63,%r15
++	jnz	.Lbase2_64_pre_avx2_512
++
++.Linit_avx2_512:
++
++	movq	%r14,%rax
++	movq	%r14,%rdx
++	shrq	$52,%r14
++	movq	%rbx,%r8
++	movq	%rbx,%r9
++	shrq	$26,%rdx
++	andq	$0x3ffffff,%rax
++	shlq	$12,%r8
++	andq	$0x3ffffff,%rdx
++	shrq	$14,%rbx
++	orq	%r8,%r14
++	shlq	$24,%r10
++	andq	$0x3ffffff,%r14
++	shrq	$40,%r9
++	andq	$0x3ffffff,%rbx
++	orq	%r9,%r10
++
++	vmovd	%eax,%xmm0
++	vmovd	%edx,%xmm1
++	vmovd	%r14d,%xmm2
++	vmovd	%ebx,%xmm3
++	vmovd	%r10d,%xmm4
++	movl	$1,20(%rdi)
++
++	__poly1305_init_avx
++
++.Lproceed_avx2_512:
++	movq	%r15,%rdx
++
++	movq	8(%rsp),%r15
++	movq	16(%rsp),%r14
++	movq	24(%rsp),%r13
++	movq	32(%rsp),%r12
++	movq	40(%rsp),%rbx
++	leaq	48(%rsp),%rax
++	leaq	48(%rsp),%rsp
++
++.Lbase2_64_avx2_epilogue_512:
++	jmp	.Ldo_avx2_512
++
++
++.align	32
++.Leven_avx2_512:
++
++	vmovd	0(%rdi),%xmm0
++	vmovd	4(%rdi),%xmm1
++	vmovd	8(%rdi),%xmm2
++	vmovd	12(%rdi),%xmm3
++	vmovd	16(%rdi),%xmm4
++
++.Ldo_avx2_512:
++	cmpq	$512,%rdx
++	jae	.Lblocks_avx512
++.Lskip_avx512:
++	leaq	8(%rsp),%r10
++
++	subq	$0x128,%rsp
++	leaq	.Lconst(%rip),%rcx
++	leaq	48+64(%rdi),%rdi
++	vmovdqa	96(%rcx),%ymm7
++
++
++	vmovdqu	-64(%rdi),%xmm9
++	andq	$-512,%rsp
++	vmovdqu	-48(%rdi),%xmm10
++	vmovdqu	-32(%rdi),%xmm6
++	vmovdqu	-16(%rdi),%xmm11
++	vmovdqu	0(%rdi),%xmm12
++	vmovdqu	16(%rdi),%xmm13
++	leaq	144(%rsp),%rax
++	vmovdqu	32(%rdi),%xmm14
++	vpermd	%ymm9,%ymm7,%ymm9
++	vmovdqu	48(%rdi),%xmm15
++	vpermd	%ymm10,%ymm7,%ymm10
++	vmovdqu	64(%rdi),%xmm5
++	vpermd	%ymm6,%ymm7,%ymm6
++	vmovdqa	%ymm9,0(%rsp)
++	vpermd	%ymm11,%ymm7,%ymm11
++	vmovdqa	%ymm10,32-144(%rax)
++	vpermd	%ymm12,%ymm7,%ymm12
++	vmovdqa	%ymm6,64-144(%rax)
++	vpermd	%ymm13,%ymm7,%ymm13
++	vmovdqa	%ymm11,96-144(%rax)
++	vpermd	%ymm14,%ymm7,%ymm14
++	vmovdqa	%ymm12,128-144(%rax)
++	vpermd	%ymm15,%ymm7,%ymm15
++	vmovdqa	%ymm13,160-144(%rax)
++	vpermd	%ymm5,%ymm7,%ymm5
++	vmovdqa	%ymm14,192-144(%rax)
++	vmovdqa	%ymm15,224-144(%rax)
++	vmovdqa	%ymm5,256-144(%rax)
++	vmovdqa	64(%rcx),%ymm5
++
++
++
++	vmovdqu	0(%rsi),%xmm7
++	vmovdqu	16(%rsi),%xmm8
++	vinserti128	$1,32(%rsi),%ymm7,%ymm7
++	vinserti128	$1,48(%rsi),%ymm8,%ymm8
++	leaq	64(%rsi),%rsi
++
++	vpsrldq	$6,%ymm7,%ymm9
++	vpsrldq	$6,%ymm8,%ymm10
++	vpunpckhqdq	%ymm8,%ymm7,%ymm6
++	vpunpcklqdq	%ymm10,%ymm9,%ymm9
++	vpunpcklqdq	%ymm8,%ymm7,%ymm7
++
++	vpsrlq	$30,%ymm9,%ymm10
++	vpsrlq	$4,%ymm9,%ymm9
++	vpsrlq	$26,%ymm7,%ymm8
++	vpsrlq	$40,%ymm6,%ymm6
++	vpand	%ymm5,%ymm9,%ymm9
++	vpand	%ymm5,%ymm7,%ymm7
++	vpand	%ymm5,%ymm8,%ymm8
++	vpand	%ymm5,%ymm10,%ymm10
++	vpor	32(%rcx),%ymm6,%ymm6
++
++	vpaddq	%ymm2,%ymm9,%ymm2
++	subq	$64,%rdx
++	jz	.Ltail_avx2_512
++	jmp	.Loop_avx2_512
++
++.align	32
++.Loop_avx2_512:
++
++	vpaddq	%ymm0,%ymm7,%ymm0
++	vmovdqa	0(%rsp),%ymm7
++	vpaddq	%ymm1,%ymm8,%ymm1
++	vmovdqa	32(%rsp),%ymm8
++	vpaddq	%ymm3,%ymm10,%ymm3
++	vmovdqa	96(%rsp),%ymm9
++	vpaddq	%ymm4,%ymm6,%ymm4
++	vmovdqa	48(%rax),%ymm10
++	vmovdqa	112(%rax),%ymm5
++
++	vpmuludq	%ymm2,%ymm7,%ymm13
++	vpmuludq	%ymm2,%ymm8,%ymm14
++	vpmuludq	%ymm2,%ymm9,%ymm15
++	vpmuludq	%ymm2,%ymm10,%ymm11
++	vpmuludq	%ymm2,%ymm5,%ymm12
++
++	vpmuludq	%ymm0,%ymm8,%ymm6
++	vpmuludq	%ymm1,%ymm8,%ymm2
++	vpaddq	%ymm6,%ymm12,%ymm12
++	vpaddq	%ymm2,%ymm13,%ymm13
++	vpmuludq	%ymm3,%ymm8,%ymm6
++	vpmuludq	64(%rsp),%ymm4,%ymm2
++	vpaddq	%ymm6,%ymm15,%ymm15
++	vpaddq	%ymm2,%ymm11,%ymm11
++	vmovdqa	-16(%rax),%ymm8
++
++	vpmuludq	%ymm0,%ymm7,%ymm6
++	vpmuludq	%ymm1,%ymm7,%ymm2
++	vpaddq	%ymm6,%ymm11,%ymm11
++	vpaddq	%ymm2,%ymm12,%ymm12
++	vpmuludq	%ymm3,%ymm7,%ymm6
++	vpmuludq	%ymm4,%ymm7,%ymm2
++	vmovdqu	0(%rsi),%xmm7
++	vpaddq	%ymm6,%ymm14,%ymm14
++	vpaddq	%ymm2,%ymm15,%ymm15
++	vinserti128	$1,32(%rsi),%ymm7,%ymm7
++
++	vpmuludq	%ymm3,%ymm8,%ymm6
++	vpmuludq	%ymm4,%ymm8,%ymm2
++	vmovdqu	16(%rsi),%xmm8
++	vpaddq	%ymm6,%ymm11,%ymm11
++	vpaddq	%ymm2,%ymm12,%ymm12
++	vmovdqa	16(%rax),%ymm2
++	vpmuludq	%ymm1,%ymm9,%ymm6
++	vpmuludq	%ymm0,%ymm9,%ymm9
++	vpaddq	%ymm6,%ymm14,%ymm14
++	vpaddq	%ymm9,%ymm13,%ymm13
++	vinserti128	$1,48(%rsi),%ymm8,%ymm8
++	leaq	64(%rsi),%rsi
++
++	vpmuludq	%ymm1,%ymm2,%ymm6
++	vpmuludq	%ymm0,%ymm2,%ymm2
++	vpsrldq	$6,%ymm7,%ymm9
++	vpaddq	%ymm6,%ymm15,%ymm15
++	vpaddq	%ymm2,%ymm14,%ymm14
++	vpmuludq	%ymm3,%ymm10,%ymm6
++	vpmuludq	%ymm4,%ymm10,%ymm2
++	vpsrldq	$6,%ymm8,%ymm10
++	vpaddq	%ymm6,%ymm12,%ymm12
++	vpaddq	%ymm2,%ymm13,%ymm13
++	vpunpckhqdq	%ymm8,%ymm7,%ymm6
++
++	vpmuludq	%ymm3,%ymm5,%ymm3
++	vpmuludq	%ymm4,%ymm5,%ymm4
++	vpunpcklqdq	%ymm8,%ymm7,%ymm7
++	vpaddq	%ymm3,%ymm13,%ymm2
++	vpaddq	%ymm4,%ymm14,%ymm3
++	vpunpcklqdq	%ymm10,%ymm9,%ymm10
++	vpmuludq	80(%rax),%ymm0,%ymm4
++	vpmuludq	%ymm1,%ymm5,%ymm0
++	vmovdqa	64(%rcx),%ymm5
++	vpaddq	%ymm4,%ymm15,%ymm4
++	vpaddq	%ymm0,%ymm11,%ymm0
++
++	vpsrlq	$26,%ymm3,%ymm14
++	vpand	%ymm5,%ymm3,%ymm3
++	vpaddq	%ymm14,%ymm4,%ymm4
++
++	vpsrlq	$26,%ymm0,%ymm11
++	vpand	%ymm5,%ymm0,%ymm0
++	vpaddq	%ymm11,%ymm12,%ymm1
++
++	vpsrlq	$26,%ymm4,%ymm15
++	vpand	%ymm5,%ymm4,%ymm4
++
++	vpsrlq	$4,%ymm10,%ymm9
++
++	vpsrlq	$26,%ymm1,%ymm12
++	vpand	%ymm5,%ymm1,%ymm1
++	vpaddq	%ymm12,%ymm2,%ymm2
++
++	vpaddq	%ymm15,%ymm0,%ymm0
++	vpsllq	$2,%ymm15,%ymm15
++	vpaddq	%ymm15,%ymm0,%ymm0
++
++	vpand	%ymm5,%ymm9,%ymm9
++	vpsrlq	$26,%ymm7,%ymm8
++
++	vpsrlq	$26,%ymm2,%ymm13
++	vpand	%ymm5,%ymm2,%ymm2
++	vpaddq	%ymm13,%ymm3,%ymm3
++
++	vpaddq	%ymm9,%ymm2,%ymm2
++	vpsrlq	$30,%ymm10,%ymm10
++
++	vpsrlq	$26,%ymm0,%ymm11
++	vpand	%ymm5,%ymm0,%ymm0
++	vpaddq	%ymm11,%ymm1,%ymm1
++
++	vpsrlq	$40,%ymm6,%ymm6
++
++	vpsrlq	$26,%ymm3,%ymm14
++	vpand	%ymm5,%ymm3,%ymm3
++	vpaddq	%ymm14,%ymm4,%ymm4
++
++	vpand	%ymm5,%ymm7,%ymm7
++	vpand	%ymm5,%ymm8,%ymm8
++	vpand	%ymm5,%ymm10,%ymm10
++	vpor	32(%rcx),%ymm6,%ymm6
++
++	subq	$64,%rdx
++	jnz	.Loop_avx2_512
++
++.byte	0x66,0x90
++.Ltail_avx2_512:
++
++	vpaddq	%ymm0,%ymm7,%ymm0
++	vmovdqu	4(%rsp),%ymm7
++	vpaddq	%ymm1,%ymm8,%ymm1
++	vmovdqu	36(%rsp),%ymm8
++	vpaddq	%ymm3,%ymm10,%ymm3
++	vmovdqu	100(%rsp),%ymm9
++	vpaddq	%ymm4,%ymm6,%ymm4
++	vmovdqu	52(%rax),%ymm10
++	vmovdqu	116(%rax),%ymm5
++
++	vpmuludq	%ymm2,%ymm7,%ymm13
++	vpmuludq	%ymm2,%ymm8,%ymm14
++	vpmuludq	%ymm2,%ymm9,%ymm15
++	vpmuludq	%ymm2,%ymm10,%ymm11
++	vpmuludq	%ymm2,%ymm5,%ymm12
++
++	vpmuludq	%ymm0,%ymm8,%ymm6
++	vpmuludq	%ymm1,%ymm8,%ymm2
++	vpaddq	%ymm6,%ymm12,%ymm12
++	vpaddq	%ymm2,%ymm13,%ymm13
++	vpmuludq	%ymm3,%ymm8,%ymm6
++	vpmuludq	68(%rsp),%ymm4,%ymm2
++	vpaddq	%ymm6,%ymm15,%ymm15
++	vpaddq	%ymm2,%ymm11,%ymm11
++
++	vpmuludq	%ymm0,%ymm7,%ymm6
++	vpmuludq	%ymm1,%ymm7,%ymm2
++	vpaddq	%ymm6,%ymm11,%ymm11
++	vmovdqu	-12(%rax),%ymm8
++	vpaddq	%ymm2,%ymm12,%ymm12
++	vpmuludq	%ymm3,%ymm7,%ymm6
++	vpmuludq	%ymm4,%ymm7,%ymm2
++	vpaddq	%ymm6,%ymm14,%ymm14
++	vpaddq	%ymm2,%ymm15,%ymm15
++
++	vpmuludq	%ymm3,%ymm8,%ymm6
++	vpmuludq	%ymm4,%ymm8,%ymm2
++	vpaddq	%ymm6,%ymm11,%ymm11
++	vpaddq	%ymm2,%ymm12,%ymm12
++	vmovdqu	20(%rax),%ymm2
++	vpmuludq	%ymm1,%ymm9,%ymm6
++	vpmuludq	%ymm0,%ymm9,%ymm9
++	vpaddq	%ymm6,%ymm14,%ymm14
++	vpaddq	%ymm9,%ymm13,%ymm13
++
++	vpmuludq	%ymm1,%ymm2,%ymm6
++	vpmuludq	%ymm0,%ymm2,%ymm2
++	vpaddq	%ymm6,%ymm15,%ymm15
++	vpaddq	%ymm2,%ymm14,%ymm14
++	vpmuludq	%ymm3,%ymm10,%ymm6
++	vpmuludq	%ymm4,%ymm10,%ymm2
++	vpaddq	%ymm6,%ymm12,%ymm12
++	vpaddq	%ymm2,%ymm13,%ymm13
++
++	vpmuludq	%ymm3,%ymm5,%ymm3
++	vpmuludq	%ymm4,%ymm5,%ymm4
++	vpaddq	%ymm3,%ymm13,%ymm2
++	vpaddq	%ymm4,%ymm14,%ymm3
++	vpmuludq	84(%rax),%ymm0,%ymm4
++	vpmuludq	%ymm1,%ymm5,%ymm0
++	vmovdqa	64(%rcx),%ymm5
++	vpaddq	%ymm4,%ymm15,%ymm4
++	vpaddq	%ymm0,%ymm11,%ymm0
++
++	vpsrldq	$8,%ymm12,%ymm8
++	vpsrldq	$8,%ymm2,%ymm9
++	vpsrldq	$8,%ymm3,%ymm10
++	vpsrldq	$8,%ymm4,%ymm6
++	vpsrldq	$8,%ymm0,%ymm7
++	vpaddq	%ymm8,%ymm12,%ymm12
++	vpaddq	%ymm9,%ymm2,%ymm2
++	vpaddq	%ymm10,%ymm3,%ymm3
++	vpaddq	%ymm6,%ymm4,%ymm4
++	vpaddq	%ymm7,%ymm0,%ymm0
++
++	vpermq	$0x2,%ymm3,%ymm10
++	vpermq	$0x2,%ymm4,%ymm6
++	vpermq	$0x2,%ymm0,%ymm7
++	vpermq	$0x2,%ymm12,%ymm8
++	vpermq	$0x2,%ymm2,%ymm9
++	vpaddq	%ymm10,%ymm3,%ymm3
++	vpaddq	%ymm6,%ymm4,%ymm4
++	vpaddq	%ymm7,%ymm0,%ymm0
++	vpaddq	%ymm8,%ymm12,%ymm12
++	vpaddq	%ymm9,%ymm2,%ymm2
++
++	vpsrlq	$26,%ymm3,%ymm14
++	vpand	%ymm5,%ymm3,%ymm3
++	vpaddq	%ymm14,%ymm4,%ymm4
++
++	vpsrlq	$26,%ymm0,%ymm11
++	vpand	%ymm5,%ymm0,%ymm0
++	vpaddq	%ymm11,%ymm12,%ymm1
++
++	vpsrlq	$26,%ymm4,%ymm15
++	vpand	%ymm5,%ymm4,%ymm4
++
++	vpsrlq	$26,%ymm1,%ymm12
++	vpand	%ymm5,%ymm1,%ymm1
++	vpaddq	%ymm12,%ymm2,%ymm2
++
++	vpaddq	%ymm15,%ymm0,%ymm0
++	vpsllq	$2,%ymm15,%ymm15
++	vpaddq	%ymm15,%ymm0,%ymm0
++
++	vpsrlq	$26,%ymm2,%ymm13
++	vpand	%ymm5,%ymm2,%ymm2
++	vpaddq	%ymm13,%ymm3,%ymm3
++
++	vpsrlq	$26,%ymm0,%ymm11
++	vpand	%ymm5,%ymm0,%ymm0
++	vpaddq	%ymm11,%ymm1,%ymm1
++
++	vpsrlq	$26,%ymm3,%ymm14
++	vpand	%ymm5,%ymm3,%ymm3
++	vpaddq	%ymm14,%ymm4,%ymm4
++
++	vmovd	%xmm0,-112(%rdi)
++	vmovd	%xmm1,-108(%rdi)
++	vmovd	%xmm2,-104(%rdi)
++	vmovd	%xmm3,-100(%rdi)
++	vmovd	%xmm4,-96(%rdi)
++	leaq	-8(%r10),%rsp
++
++	vzeroupper
++	ret
++
++.Lblocks_avx512:
++
++	movl	$15,%eax
++	kmovw	%eax,%k2
++	leaq	8(%rsp),%r10
++
++	subq	$0x128,%rsp
++	leaq	.Lconst(%rip),%rcx
++	leaq	48+64(%rdi),%rdi
++	vmovdqa	96(%rcx),%ymm9
++
++	vmovdqu32	-64(%rdi),%zmm16{%k2}{z}
++	andq	$-512,%rsp
++	vmovdqu32	-48(%rdi),%zmm17{%k2}{z}
++	movq	$0x20,%rax
++	vmovdqu32	-32(%rdi),%zmm21{%k2}{z}
++	vmovdqu32	-16(%rdi),%zmm18{%k2}{z}
++	vmovdqu32	0(%rdi),%zmm22{%k2}{z}
++	vmovdqu32	16(%rdi),%zmm19{%k2}{z}
++	vmovdqu32	32(%rdi),%zmm23{%k2}{z}
++	vmovdqu32	48(%rdi),%zmm20{%k2}{z}
++	vmovdqu32	64(%rdi),%zmm24{%k2}{z}
++	vpermd	%zmm16,%zmm9,%zmm16
++	vpbroadcastq	64(%rcx),%zmm5
++	vpermd	%zmm17,%zmm9,%zmm17
++	vpermd	%zmm21,%zmm9,%zmm21
++	vpermd	%zmm18,%zmm9,%zmm18
++	vmovdqa64	%zmm16,0(%rsp){%k2}
++	vpsrlq	$32,%zmm16,%zmm7
++	vpermd	%zmm22,%zmm9,%zmm22
++	vmovdqu64	%zmm17,0(%rsp,%rax,1){%k2}
++	vpsrlq	$32,%zmm17,%zmm8
++	vpermd	%zmm19,%zmm9,%zmm19
++	vmovdqa64	%zmm21,64(%rsp){%k2}
++	vpermd	%zmm23,%zmm9,%zmm23
++	vpermd	%zmm20,%zmm9,%zmm20
++	vmovdqu64	%zmm18,64(%rsp,%rax,1){%k2}
++	vpermd	%zmm24,%zmm9,%zmm24
++	vmovdqa64	%zmm22,128(%rsp){%k2}
++	vmovdqu64	%zmm19,128(%rsp,%rax,1){%k2}
++	vmovdqa64	%zmm23,192(%rsp){%k2}
++	vmovdqu64	%zmm20,192(%rsp,%rax,1){%k2}
++	vmovdqa64	%zmm24,256(%rsp){%k2}
++
++	vpmuludq	%zmm7,%zmm16,%zmm11
++	vpmuludq	%zmm7,%zmm17,%zmm12
++	vpmuludq	%zmm7,%zmm18,%zmm13
++	vpmuludq	%zmm7,%zmm19,%zmm14
++	vpmuludq	%zmm7,%zmm20,%zmm15
++	vpsrlq	$32,%zmm18,%zmm9
++
++	vpmuludq	%zmm8,%zmm24,%zmm25
++	vpmuludq	%zmm8,%zmm16,%zmm26
++	vpmuludq	%zmm8,%zmm17,%zmm27
++	vpmuludq	%zmm8,%zmm18,%zmm28
++	vpmuludq	%zmm8,%zmm19,%zmm29
++	vpsrlq	$32,%zmm19,%zmm10
++	vpaddq	%zmm25,%zmm11,%zmm11
++	vpaddq	%zmm26,%zmm12,%zmm12
++	vpaddq	%zmm27,%zmm13,%zmm13
++	vpaddq	%zmm28,%zmm14,%zmm14
++	vpaddq	%zmm29,%zmm15,%zmm15
++
++	vpmuludq	%zmm9,%zmm23,%zmm25
++	vpmuludq	%zmm9,%zmm24,%zmm26
++	vpmuludq	%zmm9,%zmm17,%zmm28
++	vpmuludq	%zmm9,%zmm18,%zmm29
++	vpmuludq	%zmm9,%zmm16,%zmm27
++	vpsrlq	$32,%zmm20,%zmm6
++	vpaddq	%zmm25,%zmm11,%zmm11
++	vpaddq	%zmm26,%zmm12,%zmm12
++	vpaddq	%zmm28,%zmm14,%zmm14
++	vpaddq	%zmm29,%zmm15,%zmm15
++	vpaddq	%zmm27,%zmm13,%zmm13
++
++	vpmuludq	%zmm10,%zmm22,%zmm25
++	vpmuludq	%zmm10,%zmm16,%zmm28
++	vpmuludq	%zmm10,%zmm17,%zmm29
++	vpmuludq	%zmm10,%zmm23,%zmm26
++	vpmuludq	%zmm10,%zmm24,%zmm27
++	vpaddq	%zmm25,%zmm11,%zmm11
++	vpaddq	%zmm28,%zmm14,%zmm14
++	vpaddq	%zmm29,%zmm15,%zmm15
++	vpaddq	%zmm26,%zmm12,%zmm12
++	vpaddq	%zmm27,%zmm13,%zmm13
++
++	vpmuludq	%zmm6,%zmm24,%zmm28
++	vpmuludq	%zmm6,%zmm16,%zmm29
++	vpmuludq	%zmm6,%zmm21,%zmm25
++	vpmuludq	%zmm6,%zmm22,%zmm26
++	vpmuludq	%zmm6,%zmm23,%zmm27
++	vpaddq	%zmm28,%zmm14,%zmm14
++	vpaddq	%zmm29,%zmm15,%zmm15
++	vpaddq	%zmm25,%zmm11,%zmm11
++	vpaddq	%zmm26,%zmm12,%zmm12
++	vpaddq	%zmm27,%zmm13,%zmm13
++
++	vmovdqu64	0(%rsi),%zmm10
++	vmovdqu64	64(%rsi),%zmm6
++	leaq	128(%rsi),%rsi
++
++	vpsrlq	$26,%zmm14,%zmm28
++	vpandq	%zmm5,%zmm14,%zmm14
++	vpaddq	%zmm28,%zmm15,%zmm15
++
++	vpsrlq	$26,%zmm11,%zmm25
++	vpandq	%zmm5,%zmm11,%zmm11
++	vpaddq	%zmm25,%zmm12,%zmm12
++
++	vpsrlq	$26,%zmm15,%zmm29
++	vpandq	%zmm5,%zmm15,%zmm15
++
++	vpsrlq	$26,%zmm12,%zmm26
++	vpandq	%zmm5,%zmm12,%zmm12
++	vpaddq	%zmm26,%zmm13,%zmm13
++
++	vpaddq	%zmm29,%zmm11,%zmm11
++	vpsllq	$2,%zmm29,%zmm29
++	vpaddq	%zmm29,%zmm11,%zmm11
++
++	vpsrlq	$26,%zmm13,%zmm27
++	vpandq	%zmm5,%zmm13,%zmm13
++	vpaddq	%zmm27,%zmm14,%zmm14
++
++	vpsrlq	$26,%zmm11,%zmm25
++	vpandq	%zmm5,%zmm11,%zmm11
++	vpaddq	%zmm25,%zmm12,%zmm12
++
++	vpsrlq	$26,%zmm14,%zmm28
++	vpandq	%zmm5,%zmm14,%zmm14
++	vpaddq	%zmm28,%zmm15,%zmm15
++
++	vpunpcklqdq	%zmm6,%zmm10,%zmm7
++	vpunpckhqdq	%zmm6,%zmm10,%zmm6
++
++	vmovdqa32	128(%rcx),%zmm25
++	movl	$0x7777,%eax
++	kmovw	%eax,%k1
++
++	vpermd	%zmm16,%zmm25,%zmm16
++	vpermd	%zmm17,%zmm25,%zmm17
++	vpermd	%zmm18,%zmm25,%zmm18
++	vpermd	%zmm19,%zmm25,%zmm19
++	vpermd	%zmm20,%zmm25,%zmm20
++
++	vpermd	%zmm11,%zmm25,%zmm16{%k1}
++	vpermd	%zmm12,%zmm25,%zmm17{%k1}
++	vpermd	%zmm13,%zmm25,%zmm18{%k1}
++	vpermd	%zmm14,%zmm25,%zmm19{%k1}
++	vpermd	%zmm15,%zmm25,%zmm20{%k1}
++
++	vpslld	$2,%zmm17,%zmm21
++	vpslld	$2,%zmm18,%zmm22
++	vpslld	$2,%zmm19,%zmm23
++	vpslld	$2,%zmm20,%zmm24
++	vpaddd	%zmm17,%zmm21,%zmm21
++	vpaddd	%zmm18,%zmm22,%zmm22
++	vpaddd	%zmm19,%zmm23,%zmm23
++	vpaddd	%zmm20,%zmm24,%zmm24
++
++	vpbroadcastq	32(%rcx),%zmm30
++
++	vpsrlq	$52,%zmm7,%zmm9
++	vpsllq	$12,%zmm6,%zmm10
++	vporq	%zmm10,%zmm9,%zmm9
++	vpsrlq	$26,%zmm7,%zmm8
++	vpsrlq	$14,%zmm6,%zmm10
++	vpsrlq	$40,%zmm6,%zmm6
++	vpandq	%zmm5,%zmm9,%zmm9
++	vpandq	%zmm5,%zmm7,%zmm7
++
++	vpaddq	%zmm2,%zmm9,%zmm2
++	subq	$192,%rdx
++	jbe	.Ltail_avx512
++	jmp	.Loop_avx512
++
++.align	32
++.Loop_avx512:
++
++	vpmuludq	%zmm2,%zmm17,%zmm14
++	vpaddq	%zmm0,%zmm7,%zmm0
++	vpmuludq	%zmm2,%zmm18,%zmm15
++	vpandq	%zmm5,%zmm8,%zmm8
++	vpmuludq	%zmm2,%zmm23,%zmm11
++	vpandq	%zmm5,%zmm10,%zmm10
++	vpmuludq	%zmm2,%zmm24,%zmm12
++	vporq	%zmm30,%zmm6,%zmm6
++	vpmuludq	%zmm2,%zmm16,%zmm13
++	vpaddq	%zmm1,%zmm8,%zmm1
++	vpaddq	%zmm3,%zmm10,%zmm3
++	vpaddq	%zmm4,%zmm6,%zmm4
++
++	vmovdqu64	0(%rsi),%zmm10
++	vmovdqu64	64(%rsi),%zmm6
++	leaq	128(%rsi),%rsi
++	vpmuludq	%zmm0,%zmm19,%zmm28
++	vpmuludq	%zmm0,%zmm20,%zmm29
++	vpmuludq	%zmm0,%zmm16,%zmm25
++	vpmuludq	%zmm0,%zmm17,%zmm26
++	vpaddq	%zmm28,%zmm14,%zmm14
++	vpaddq	%zmm29,%zmm15,%zmm15
++	vpaddq	%zmm25,%zmm11,%zmm11
++	vpaddq	%zmm26,%zmm12,%zmm12
++
++	vpmuludq	%zmm1,%zmm18,%zmm28
++	vpmuludq	%zmm1,%zmm19,%zmm29
++	vpmuludq	%zmm1,%zmm24,%zmm25
++	vpmuludq	%zmm0,%zmm18,%zmm27
++	vpaddq	%zmm28,%zmm14,%zmm14
++	vpaddq	%zmm29,%zmm15,%zmm15
++	vpaddq	%zmm25,%zmm11,%zmm11
++	vpaddq	%zmm27,%zmm13,%zmm13
++
++	vpunpcklqdq	%zmm6,%zmm10,%zmm7
++	vpunpckhqdq	%zmm6,%zmm10,%zmm6
++
++	vpmuludq	%zmm3,%zmm16,%zmm28
++	vpmuludq	%zmm3,%zmm17,%zmm29
++	vpmuludq	%zmm1,%zmm16,%zmm26
++	vpmuludq	%zmm1,%zmm17,%zmm27
++	vpaddq	%zmm28,%zmm14,%zmm14
++	vpaddq	%zmm29,%zmm15,%zmm15
++	vpaddq	%zmm26,%zmm12,%zmm12
++	vpaddq	%zmm27,%zmm13,%zmm13
++
++	vpmuludq	%zmm4,%zmm24,%zmm28
++	vpmuludq	%zmm4,%zmm16,%zmm29
++	vpmuludq	%zmm3,%zmm22,%zmm25
++	vpmuludq	%zmm3,%zmm23,%zmm26
++	vpaddq	%zmm28,%zmm14,%zmm14
++	vpmuludq	%zmm3,%zmm24,%zmm27
++	vpaddq	%zmm29,%zmm15,%zmm15
++	vpaddq	%zmm25,%zmm11,%zmm11
++	vpaddq	%zmm26,%zmm12,%zmm12
++	vpaddq	%zmm27,%zmm13,%zmm13
++
++	vpmuludq	%zmm4,%zmm21,%zmm25
++	vpmuludq	%zmm4,%zmm22,%zmm26
++	vpmuludq	%zmm4,%zmm23,%zmm27
++	vpaddq	%zmm25,%zmm11,%zmm0
++	vpaddq	%zmm26,%zmm12,%zmm1
++	vpaddq	%zmm27,%zmm13,%zmm2
++
++	vpsrlq	$52,%zmm7,%zmm9
++	vpsllq	$12,%zmm6,%zmm10
++
++	vpsrlq	$26,%zmm14,%zmm3
++	vpandq	%zmm5,%zmm14,%zmm14
++	vpaddq	%zmm3,%zmm15,%zmm4
++
++	vporq	%zmm10,%zmm9,%zmm9
++
++	vpsrlq	$26,%zmm0,%zmm11
++	vpandq	%zmm5,%zmm0,%zmm0
++	vpaddq	%zmm11,%zmm1,%zmm1
++
++	vpandq	%zmm5,%zmm9,%zmm9
++
++	vpsrlq	$26,%zmm4,%zmm15
++	vpandq	%zmm5,%zmm4,%zmm4
++
++	vpsrlq	$26,%zmm1,%zmm12
++	vpandq	%zmm5,%zmm1,%zmm1
++	vpaddq	%zmm12,%zmm2,%zmm2
++
++	vpaddq	%zmm15,%zmm0,%zmm0
++	vpsllq	$2,%zmm15,%zmm15
++	vpaddq	%zmm15,%zmm0,%zmm0
++
++	vpaddq	%zmm9,%zmm2,%zmm2
++	vpsrlq	$26,%zmm7,%zmm8
++
++	vpsrlq	$26,%zmm2,%zmm13
++	vpandq	%zmm5,%zmm2,%zmm2
++	vpaddq	%zmm13,%zmm14,%zmm3
++
++	vpsrlq	$14,%zmm6,%zmm10
++
++	vpsrlq	$26,%zmm0,%zmm11
++	vpandq	%zmm5,%zmm0,%zmm0
++	vpaddq	%zmm11,%zmm1,%zmm1
++
++	vpsrlq	$40,%zmm6,%zmm6
++
++	vpsrlq	$26,%zmm3,%zmm14
++	vpandq	%zmm5,%zmm3,%zmm3
++	vpaddq	%zmm14,%zmm4,%zmm4
++
++	vpandq	%zmm5,%zmm7,%zmm7
++
++	subq	$128,%rdx
++	ja	.Loop_avx512
++
++.Ltail_avx512:
++
++	vpsrlq	$32,%zmm16,%zmm16
++	vpsrlq	$32,%zmm17,%zmm17
++	vpsrlq	$32,%zmm18,%zmm18
++	vpsrlq	$32,%zmm23,%zmm23
++	vpsrlq	$32,%zmm24,%zmm24
++	vpsrlq	$32,%zmm19,%zmm19
++	vpsrlq	$32,%zmm20,%zmm20
++	vpsrlq	$32,%zmm21,%zmm21
++	vpsrlq	$32,%zmm22,%zmm22
++
++	leaq	(%rsi,%rdx,1),%rsi
++
++	vpaddq	%zmm0,%zmm7,%zmm0
++
++	vpmuludq	%zmm2,%zmm17,%zmm14
++	vpmuludq	%zmm2,%zmm18,%zmm15
++	vpmuludq	%zmm2,%zmm23,%zmm11
++	vpandq	%zmm5,%zmm8,%zmm8
++	vpmuludq	%zmm2,%zmm24,%zmm12
++	vpandq	%zmm5,%zmm10,%zmm10
++	vpmuludq	%zmm2,%zmm16,%zmm13
++	vporq	%zmm30,%zmm6,%zmm6
++	vpaddq	%zmm1,%zmm8,%zmm1
++	vpaddq	%zmm3,%zmm10,%zmm3
++	vpaddq	%zmm4,%zmm6,%zmm4
++
++	vmovdqu	0(%rsi),%xmm7
++	vpmuludq	%zmm0,%zmm19,%zmm28
++	vpmuludq	%zmm0,%zmm20,%zmm29
++	vpmuludq	%zmm0,%zmm16,%zmm25
++	vpmuludq	%zmm0,%zmm17,%zmm26
++	vpaddq	%zmm28,%zmm14,%zmm14
++	vpaddq	%zmm29,%zmm15,%zmm15
++	vpaddq	%zmm25,%zmm11,%zmm11
++	vpaddq	%zmm26,%zmm12,%zmm12
++
++	vmovdqu	16(%rsi),%xmm8
++	vpmuludq	%zmm1,%zmm18,%zmm28
++	vpmuludq	%zmm1,%zmm19,%zmm29
++	vpmuludq	%zmm1,%zmm24,%zmm25
++	vpmuludq	%zmm0,%zmm18,%zmm27
++	vpaddq	%zmm28,%zmm14,%zmm14
++	vpaddq	%zmm29,%zmm15,%zmm15
++	vpaddq	%zmm25,%zmm11,%zmm11
++	vpaddq	%zmm27,%zmm13,%zmm13
++
++	vinserti128	$1,32(%rsi),%ymm7,%ymm7
++	vpmuludq	%zmm3,%zmm16,%zmm28
++	vpmuludq	%zmm3,%zmm17,%zmm29
++	vpmuludq	%zmm1,%zmm16,%zmm26
++	vpmuludq	%zmm1,%zmm17,%zmm27
++	vpaddq	%zmm28,%zmm14,%zmm14
++	vpaddq	%zmm29,%zmm15,%zmm15
++	vpaddq	%zmm26,%zmm12,%zmm12
++	vpaddq	%zmm27,%zmm13,%zmm13
++
++	vinserti128	$1,48(%rsi),%ymm8,%ymm8
++	vpmuludq	%zmm4,%zmm24,%zmm28
++	vpmuludq	%zmm4,%zmm16,%zmm29
++	vpmuludq	%zmm3,%zmm22,%zmm25
++	vpmuludq	%zmm3,%zmm23,%zmm26
++	vpmuludq	%zmm3,%zmm24,%zmm27
++	vpaddq	%zmm28,%zmm14,%zmm3
++	vpaddq	%zmm29,%zmm15,%zmm15
++	vpaddq	%zmm25,%zmm11,%zmm11
++	vpaddq	%zmm26,%zmm12,%zmm12
++	vpaddq	%zmm27,%zmm13,%zmm13
++
++	vpmuludq	%zmm4,%zmm21,%zmm25
++	vpmuludq	%zmm4,%zmm22,%zmm26
++	vpmuludq	%zmm4,%zmm23,%zmm27
++	vpaddq	%zmm25,%zmm11,%zmm0
++	vpaddq	%zmm26,%zmm12,%zmm1
++	vpaddq	%zmm27,%zmm13,%zmm2
++
++	movl	$1,%eax
++	vpermq	$0xb1,%zmm3,%zmm14
++	vpermq	$0xb1,%zmm15,%zmm4
++	vpermq	$0xb1,%zmm0,%zmm11
++	vpermq	$0xb1,%zmm1,%zmm12
++	vpermq	$0xb1,%zmm2,%zmm13
++	vpaddq	%zmm14,%zmm3,%zmm3
++	vpaddq	%zmm15,%zmm4,%zmm4
++	vpaddq	%zmm11,%zmm0,%zmm0
++	vpaddq	%zmm12,%zmm1,%zmm1
++	vpaddq	%zmm13,%zmm2,%zmm2
++
++	kmovw	%eax,%k3
++	vpermq	$0x2,%zmm3,%zmm14
++	vpermq	$0x2,%zmm4,%zmm15
++	vpermq	$0x2,%zmm0,%zmm11
++	vpermq	$0x2,%zmm1,%zmm12
++	vpermq	$0x2,%zmm2,%zmm13
++	vpaddq	%zmm14,%zmm3,%zmm3
++	vpaddq	%zmm15,%zmm4,%zmm4
++	vpaddq	%zmm11,%zmm0,%zmm0
++	vpaddq	%zmm12,%zmm1,%zmm1
++	vpaddq	%zmm13,%zmm2,%zmm2
++
++	vextracti64x4	$0x1,%zmm3,%ymm14
++	vextracti64x4	$0x1,%zmm4,%ymm15
++	vextracti64x4	$0x1,%zmm0,%ymm11
++	vextracti64x4	$0x1,%zmm1,%ymm12
++	vextracti64x4	$0x1,%zmm2,%ymm13
++	vpaddq	%zmm14,%zmm3,%zmm3{%k3}{z}
++	vpaddq	%zmm15,%zmm4,%zmm4{%k3}{z}
++	vpaddq	%zmm11,%zmm0,%zmm0{%k3}{z}
++	vpaddq	%zmm12,%zmm1,%zmm1{%k3}{z}
++	vpaddq	%zmm13,%zmm2,%zmm2{%k3}{z}
++
++	vpsrlq	$26,%ymm3,%ymm14
++	vpand	%ymm5,%ymm3,%ymm3
++	vpsrldq	$6,%ymm7,%ymm9
++	vpsrldq	$6,%ymm8,%ymm10
++	vpunpckhqdq	%ymm8,%ymm7,%ymm6
++	vpaddq	%ymm14,%ymm4,%ymm4
++
++	vpsrlq	$26,%ymm0,%ymm11
++	vpand	%ymm5,%ymm0,%ymm0
++	vpunpcklqdq	%ymm10,%ymm9,%ymm9
++	vpunpcklqdq	%ymm8,%ymm7,%ymm7
++	vpaddq	%ymm11,%ymm1,%ymm1
++
++	vpsrlq	$26,%ymm4,%ymm15
++	vpand	%ymm5,%ymm4,%ymm4
++
++	vpsrlq	$26,%ymm1,%ymm12
++	vpand	%ymm5,%ymm1,%ymm1
++	vpsrlq	$30,%ymm9,%ymm10
++	vpsrlq	$4,%ymm9,%ymm9
++	vpaddq	%ymm12,%ymm2,%ymm2
++
++	vpaddq	%ymm15,%ymm0,%ymm0
++	vpsllq	$2,%ymm15,%ymm15
++	vpsrlq	$26,%ymm7,%ymm8
++	vpsrlq	$40,%ymm6,%ymm6
++	vpaddq	%ymm15,%ymm0,%ymm0
++
++	vpsrlq	$26,%ymm2,%ymm13
++	vpand	%ymm5,%ymm2,%ymm2
++	vpand	%ymm5,%ymm9,%ymm9
++	vpand	%ymm5,%ymm7,%ymm7
++	vpaddq	%ymm13,%ymm3,%ymm3
++
++	vpsrlq	$26,%ymm0,%ymm11
++	vpand	%ymm5,%ymm0,%ymm0
++	vpaddq	%ymm2,%ymm9,%ymm2
++	vpand	%ymm5,%ymm8,%ymm8
++	vpaddq	%ymm11,%ymm1,%ymm1
++
++	vpsrlq	$26,%ymm3,%ymm14
++	vpand	%ymm5,%ymm3,%ymm3
++	vpand	%ymm5,%ymm10,%ymm10
++	vpor	32(%rcx),%ymm6,%ymm6
++	vpaddq	%ymm14,%ymm4,%ymm4
++
++	leaq	144(%rsp),%rax
++	addq	$64,%rdx
++	jnz	.Ltail_avx2_512
++
++	vpsubq	%ymm9,%ymm2,%ymm2
++	vmovd	%xmm0,-112(%rdi)
++	vmovd	%xmm1,-108(%rdi)
++	vmovd	%xmm2,-104(%rdi)
++	vmovd	%xmm3,-100(%rdi)
++	vmovd	%xmm4,-96(%rdi)
++	vzeroall
++	leaq	-8(%r10),%rsp
++
++	ret
++
++ENDPROC(poly1305_blocks_avx512)
++#endif /* CONFIG_AS_AVX512 */
+diff --git a/lib/zinc/poly1305/poly1305.c b/lib/zinc/poly1305/poly1305.c
+index dbab82f33aa7..8bf2b95ca615 100644
+--- a/lib/zinc/poly1305/poly1305.c
++++ b/lib/zinc/poly1305/poly1305.c
+@@ -15,7 +15,9 @@
+ #include <linux/module.h>
+ #include <linux/init.h>
+ 
+-#ifndef HAVE_POLY1305_ARCH_IMPLEMENTATION
++#if defined(CONFIG_ZINC_ARCH_X86_64)
++#include "poly1305-x86_64-glue.h"
++#else
+ static inline bool poly1305_init_arch(void *ctx,
+ 				      const u8 key[POLY1305_KEY_SIZE])
+ {
 -- 
 2.19.0
