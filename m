@@ -1,18 +1,15 @@
 From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: [PATCH net-next v5 15/20] zinc: Curve25519 x86_64 implementation
-Date: Tue, 18 Sep 2018 18:16:41 +0200
-Message-ID: <20180918161646.19105-16-Jason@zx2c4.com>
+Subject: [PATCH net-next v5 17/20] crypto: port Poly1305 to Zinc
+Date: Tue, 18 Sep 2018 18:16:43 +0200
+Message-ID: <20180918161646.19105-18-Jason@zx2c4.com>
 References: <20180918161646.19105-1-Jason@zx2c4.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
         Samuel Neves <sneves@dei.uc.pt>,
         Andy Lutomirski <luto@kernel.org>,
         Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
-        =?UTF-8?q?Armando=20Faz-Hern=C3=A1ndez?= <armfazh@gmail.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, x86@kernel.org
+        Eric Biggers <ebiggers@google.com>
 To: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
         linux-crypto@vger.kernel.org, davem@davemloft.net,
         gregkh@linuxfoundation.org
@@ -21,2435 +18,1814 @@ In-Reply-To: <20180918161646.19105-1-Jason@zx2c4.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This implementation is the fastest available x86_64 implementation, and
-unlike Sandy2x, it doesn't requie use of the floating point registers at
-all. Instead it makes use of BMI2 and ADX, available on recent
-microarchitectures. The implementation was written by Armando
-Faz-Hernández with contributions (upstream) from Samuel Neves and me,
-in addition to further changes in the kernel implementation from us.
+Now that Poly1305 is in Zinc, we can have the crypto API code simply
+call into it. We have to do a little bit of book keeping here, because
+the crypto API receives the key in the first few calls to update.
 
 Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
-Signed-off-by: Samuel Neves <sneves@dei.uc.pt>
+Cc: Samuel Neves <sneves@dei.uc.pt>
 Cc: Andy Lutomirski <luto@kernel.org>
 Cc: Greg KH <gregkh@linuxfoundation.org>
 Cc: Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>
-Cc: Armando Faz-Hernández <armfazh@gmail.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: Ingo Molnar <mingo@redhat.com>
-Cc: x86@kernel.org
+Cc: Eric Biggers <ebiggers@google.com>
 ---
- lib/zinc/curve25519/curve25519-x86_64-glue.h |   46 +
- lib/zinc/curve25519/curve25519-x86_64.h      | 2333 ++++++++++++++++++
- lib/zinc/curve25519/curve25519.c             |    4 +-
- 3 files changed, 2382 insertions(+), 1 deletion(-)
- create mode 100644 lib/zinc/curve25519/curve25519-x86_64-glue.h
- create mode 100644 lib/zinc/curve25519/curve25519-x86_64.h
+ arch/x86/crypto/Makefile               |   3 -
+ arch/x86/crypto/poly1305-avx2-x86_64.S | 388 ----------------
+ arch/x86/crypto/poly1305-sse2-x86_64.S | 584 -------------------------
+ arch/x86/crypto/poly1305_glue.c        | 205 ---------
+ crypto/Kconfig                         |  15 +-
+ crypto/Makefile                        |   2 +-
+ crypto/chacha20poly1305.c              |  12 +-
+ crypto/poly1305_generic.c              | 304 -------------
+ crypto/poly1305_zinc.c                 |  98 +++++
+ include/crypto/poly1305.h              |  40 --
+ 10 files changed, 107 insertions(+), 1544 deletions(-)
+ delete mode 100644 arch/x86/crypto/poly1305-avx2-x86_64.S
+ delete mode 100644 arch/x86/crypto/poly1305-sse2-x86_64.S
+ delete mode 100644 arch/x86/crypto/poly1305_glue.c
+ delete mode 100644 crypto/poly1305_generic.c
+ create mode 100644 crypto/poly1305_zinc.c
+ delete mode 100644 include/crypto/poly1305.h
 
-diff --git a/lib/zinc/curve25519/curve25519-x86_64-glue.h b/lib/zinc/curve25519/curve25519-x86_64-glue.h
+diff --git a/arch/x86/crypto/Makefile b/arch/x86/crypto/Makefile
+index a450ad573dcb..cf830219846b 100644
+--- a/arch/x86/crypto/Makefile
++++ b/arch/x86/crypto/Makefile
+@@ -34,7 +34,6 @@ obj-$(CONFIG_CRYPTO_CRC32_PCLMUL) += crc32-pclmul.o
+ obj-$(CONFIG_CRYPTO_SHA256_SSSE3) += sha256-ssse3.o
+ obj-$(CONFIG_CRYPTO_SHA512_SSSE3) += sha512-ssse3.o
+ obj-$(CONFIG_CRYPTO_CRCT10DIF_PCLMUL) += crct10dif-pclmul.o
+-obj-$(CONFIG_CRYPTO_POLY1305_X86_64) += poly1305-x86_64.o
+ 
+ obj-$(CONFIG_CRYPTO_AEGIS128_AESNI_SSE2) += aegis128-aesni.o
+ obj-$(CONFIG_CRYPTO_AEGIS128L_AESNI_SSE2) += aegis128l-aesni.o
+@@ -110,10 +109,8 @@ aesni-intel-y := aesni-intel_asm.o aesni-intel_glue.o fpu.o
+ aesni-intel-$(CONFIG_64BIT) += aesni-intel_avx-x86_64.o aes_ctrby8_avx-x86_64.o
+ ghash-clmulni-intel-y := ghash-clmulni-intel_asm.o ghash-clmulni-intel_glue.o
+ sha1-ssse3-y := sha1_ssse3_asm.o sha1_ssse3_glue.o
+-poly1305-x86_64-y := poly1305-sse2-x86_64.o poly1305_glue.o
+ ifeq ($(avx2_supported),yes)
+ sha1-ssse3-y += sha1_avx2_x86_64_asm.o
+-poly1305-x86_64-y += poly1305-avx2-x86_64.o
+ endif
+ ifeq ($(sha1_ni_supported),yes)
+ sha1-ssse3-y += sha1_ni_asm.o
+diff --git a/arch/x86/crypto/poly1305-avx2-x86_64.S b/arch/x86/crypto/poly1305-avx2-x86_64.S
+deleted file mode 100644
+index 3b6e70d085da..000000000000
+--- a/arch/x86/crypto/poly1305-avx2-x86_64.S
++++ /dev/null
+@@ -1,388 +0,0 @@
+-/*
+- * Poly1305 authenticator algorithm, RFC7539, x64 AVX2 functions
+- *
+- * Copyright (C) 2015 Martin Willi
+- *
+- * This program is free software; you can redistribute it and/or modify
+- * it under the terms of the GNU General Public License as published by
+- * the Free Software Foundation; either version 2 of the License, or
+- * (at your option) any later version.
+- */
+-
+-#include <linux/linkage.h>
+-
+-.section	.rodata.cst32.ANMASK, "aM", @progbits, 32
+-.align 32
+-ANMASK:	.octa 0x0000000003ffffff0000000003ffffff
+-	.octa 0x0000000003ffffff0000000003ffffff
+-
+-.section	.rodata.cst32.ORMASK, "aM", @progbits, 32
+-.align 32
+-ORMASK:	.octa 0x00000000010000000000000001000000
+-	.octa 0x00000000010000000000000001000000
+-
+-.text
+-
+-#define h0 0x00(%rdi)
+-#define h1 0x04(%rdi)
+-#define h2 0x08(%rdi)
+-#define h3 0x0c(%rdi)
+-#define h4 0x10(%rdi)
+-#define r0 0x00(%rdx)
+-#define r1 0x04(%rdx)
+-#define r2 0x08(%rdx)
+-#define r3 0x0c(%rdx)
+-#define r4 0x10(%rdx)
+-#define u0 0x00(%r8)
+-#define u1 0x04(%r8)
+-#define u2 0x08(%r8)
+-#define u3 0x0c(%r8)
+-#define u4 0x10(%r8)
+-#define w0 0x14(%r8)
+-#define w1 0x18(%r8)
+-#define w2 0x1c(%r8)
+-#define w3 0x20(%r8)
+-#define w4 0x24(%r8)
+-#define y0 0x28(%r8)
+-#define y1 0x2c(%r8)
+-#define y2 0x30(%r8)
+-#define y3 0x34(%r8)
+-#define y4 0x38(%r8)
+-#define m %rsi
+-#define hc0 %ymm0
+-#define hc1 %ymm1
+-#define hc2 %ymm2
+-#define hc3 %ymm3
+-#define hc4 %ymm4
+-#define hc0x %xmm0
+-#define hc1x %xmm1
+-#define hc2x %xmm2
+-#define hc3x %xmm3
+-#define hc4x %xmm4
+-#define t1 %ymm5
+-#define t2 %ymm6
+-#define t1x %xmm5
+-#define t2x %xmm6
+-#define ruwy0 %ymm7
+-#define ruwy1 %ymm8
+-#define ruwy2 %ymm9
+-#define ruwy3 %ymm10
+-#define ruwy4 %ymm11
+-#define ruwy0x %xmm7
+-#define ruwy1x %xmm8
+-#define ruwy2x %xmm9
+-#define ruwy3x %xmm10
+-#define ruwy4x %xmm11
+-#define svxz1 %ymm12
+-#define svxz2 %ymm13
+-#define svxz3 %ymm14
+-#define svxz4 %ymm15
+-#define d0 %r9
+-#define d1 %r10
+-#define d2 %r11
+-#define d3 %r12
+-#define d4 %r13
+-
+-ENTRY(poly1305_4block_avx2)
+-	# %rdi: Accumulator h[5]
+-	# %rsi: 64 byte input block m
+-	# %rdx: Poly1305 key r[5]
+-	# %rcx: Quadblock count
+-	# %r8:  Poly1305 derived key r^2 u[5], r^3 w[5], r^4 y[5],
+-
+-	# This four-block variant uses loop unrolled block processing. It
+-	# requires 4 Poly1305 keys: r, r^2, r^3 and r^4:
+-	# h = (h + m) * r  =>  h = (h + m1) * r^4 + m2 * r^3 + m3 * r^2 + m4 * r
+-
+-	vzeroupper
+-	push		%rbx
+-	push		%r12
+-	push		%r13
+-
+-	# combine r0,u0,w0,y0
+-	vmovd		y0,ruwy0x
+-	vmovd		w0,t1x
+-	vpunpcklqdq	t1,ruwy0,ruwy0
+-	vmovd		u0,t1x
+-	vmovd		r0,t2x
+-	vpunpcklqdq	t2,t1,t1
+-	vperm2i128	$0x20,t1,ruwy0,ruwy0
+-
+-	# combine r1,u1,w1,y1 and s1=r1*5,v1=u1*5,x1=w1*5,z1=y1*5
+-	vmovd		y1,ruwy1x
+-	vmovd		w1,t1x
+-	vpunpcklqdq	t1,ruwy1,ruwy1
+-	vmovd		u1,t1x
+-	vmovd		r1,t2x
+-	vpunpcklqdq	t2,t1,t1
+-	vperm2i128	$0x20,t1,ruwy1,ruwy1
+-	vpslld		$2,ruwy1,svxz1
+-	vpaddd		ruwy1,svxz1,svxz1
+-
+-	# combine r2,u2,w2,y2 and s2=r2*5,v2=u2*5,x2=w2*5,z2=y2*5
+-	vmovd		y2,ruwy2x
+-	vmovd		w2,t1x
+-	vpunpcklqdq	t1,ruwy2,ruwy2
+-	vmovd		u2,t1x
+-	vmovd		r2,t2x
+-	vpunpcklqdq	t2,t1,t1
+-	vperm2i128	$0x20,t1,ruwy2,ruwy2
+-	vpslld		$2,ruwy2,svxz2
+-	vpaddd		ruwy2,svxz2,svxz2
+-
+-	# combine r3,u3,w3,y3 and s3=r3*5,v3=u3*5,x3=w3*5,z3=y3*5
+-	vmovd		y3,ruwy3x
+-	vmovd		w3,t1x
+-	vpunpcklqdq	t1,ruwy3,ruwy3
+-	vmovd		u3,t1x
+-	vmovd		r3,t2x
+-	vpunpcklqdq	t2,t1,t1
+-	vperm2i128	$0x20,t1,ruwy3,ruwy3
+-	vpslld		$2,ruwy3,svxz3
+-	vpaddd		ruwy3,svxz3,svxz3
+-
+-	# combine r4,u4,w4,y4 and s4=r4*5,v4=u4*5,x4=w4*5,z4=y4*5
+-	vmovd		y4,ruwy4x
+-	vmovd		w4,t1x
+-	vpunpcklqdq	t1,ruwy4,ruwy4
+-	vmovd		u4,t1x
+-	vmovd		r4,t2x
+-	vpunpcklqdq	t2,t1,t1
+-	vperm2i128	$0x20,t1,ruwy4,ruwy4
+-	vpslld		$2,ruwy4,svxz4
+-	vpaddd		ruwy4,svxz4,svxz4
+-
+-.Ldoblock4:
+-	# hc0 = [m[48-51] & 0x3ffffff, m[32-35] & 0x3ffffff,
+-	#	 m[16-19] & 0x3ffffff, m[ 0- 3] & 0x3ffffff + h0]
+-	vmovd		0x00(m),hc0x
+-	vmovd		0x10(m),t1x
+-	vpunpcklqdq	t1,hc0,hc0
+-	vmovd		0x20(m),t1x
+-	vmovd		0x30(m),t2x
+-	vpunpcklqdq	t2,t1,t1
+-	vperm2i128	$0x20,t1,hc0,hc0
+-	vpand		ANMASK(%rip),hc0,hc0
+-	vmovd		h0,t1x
+-	vpaddd		t1,hc0,hc0
+-	# hc1 = [(m[51-54] >> 2) & 0x3ffffff, (m[35-38] >> 2) & 0x3ffffff,
+-	#	 (m[19-22] >> 2) & 0x3ffffff, (m[ 3- 6] >> 2) & 0x3ffffff + h1]
+-	vmovd		0x03(m),hc1x
+-	vmovd		0x13(m),t1x
+-	vpunpcklqdq	t1,hc1,hc1
+-	vmovd		0x23(m),t1x
+-	vmovd		0x33(m),t2x
+-	vpunpcklqdq	t2,t1,t1
+-	vperm2i128	$0x20,t1,hc1,hc1
+-	vpsrld		$2,hc1,hc1
+-	vpand		ANMASK(%rip),hc1,hc1
+-	vmovd		h1,t1x
+-	vpaddd		t1,hc1,hc1
+-	# hc2 = [(m[54-57] >> 4) & 0x3ffffff, (m[38-41] >> 4) & 0x3ffffff,
+-	#	 (m[22-25] >> 4) & 0x3ffffff, (m[ 6- 9] >> 4) & 0x3ffffff + h2]
+-	vmovd		0x06(m),hc2x
+-	vmovd		0x16(m),t1x
+-	vpunpcklqdq	t1,hc2,hc2
+-	vmovd		0x26(m),t1x
+-	vmovd		0x36(m),t2x
+-	vpunpcklqdq	t2,t1,t1
+-	vperm2i128	$0x20,t1,hc2,hc2
+-	vpsrld		$4,hc2,hc2
+-	vpand		ANMASK(%rip),hc2,hc2
+-	vmovd		h2,t1x
+-	vpaddd		t1,hc2,hc2
+-	# hc3 = [(m[57-60] >> 6) & 0x3ffffff, (m[41-44] >> 6) & 0x3ffffff,
+-	#	 (m[25-28] >> 6) & 0x3ffffff, (m[ 9-12] >> 6) & 0x3ffffff + h3]
+-	vmovd		0x09(m),hc3x
+-	vmovd		0x19(m),t1x
+-	vpunpcklqdq	t1,hc3,hc3
+-	vmovd		0x29(m),t1x
+-	vmovd		0x39(m),t2x
+-	vpunpcklqdq	t2,t1,t1
+-	vperm2i128	$0x20,t1,hc3,hc3
+-	vpsrld		$6,hc3,hc3
+-	vpand		ANMASK(%rip),hc3,hc3
+-	vmovd		h3,t1x
+-	vpaddd		t1,hc3,hc3
+-	# hc4 = [(m[60-63] >> 8) | (1<<24), (m[44-47] >> 8) | (1<<24),
+-	#	 (m[28-31] >> 8) | (1<<24), (m[12-15] >> 8) | (1<<24) + h4]
+-	vmovd		0x0c(m),hc4x
+-	vmovd		0x1c(m),t1x
+-	vpunpcklqdq	t1,hc4,hc4
+-	vmovd		0x2c(m),t1x
+-	vmovd		0x3c(m),t2x
+-	vpunpcklqdq	t2,t1,t1
+-	vperm2i128	$0x20,t1,hc4,hc4
+-	vpsrld		$8,hc4,hc4
+-	vpor		ORMASK(%rip),hc4,hc4
+-	vmovd		h4,t1x
+-	vpaddd		t1,hc4,hc4
+-
+-	# t1 = [ hc0[3] * r0, hc0[2] * u0, hc0[1] * w0, hc0[0] * y0 ]
+-	vpmuludq	hc0,ruwy0,t1
+-	# t1 += [ hc1[3] * s4, hc1[2] * v4, hc1[1] * x4, hc1[0] * z4 ]
+-	vpmuludq	hc1,svxz4,t2
+-	vpaddq		t2,t1,t1
+-	# t1 += [ hc2[3] * s3, hc2[2] * v3, hc2[1] * x3, hc2[0] * z3 ]
+-	vpmuludq	hc2,svxz3,t2
+-	vpaddq		t2,t1,t1
+-	# t1 += [ hc3[3] * s2, hc3[2] * v2, hc3[1] * x2, hc3[0] * z2 ]
+-	vpmuludq	hc3,svxz2,t2
+-	vpaddq		t2,t1,t1
+-	# t1 += [ hc4[3] * s1, hc4[2] * v1, hc4[1] * x1, hc4[0] * z1 ]
+-	vpmuludq	hc4,svxz1,t2
+-	vpaddq		t2,t1,t1
+-	# d0 = t1[0] + t1[1] + t[2] + t[3]
+-	vpermq		$0xee,t1,t2
+-	vpaddq		t2,t1,t1
+-	vpsrldq		$8,t1,t2
+-	vpaddq		t2,t1,t1
+-	vmovq		t1x,d0
+-
+-	# t1 = [ hc0[3] * r1, hc0[2] * u1,hc0[1] * w1, hc0[0] * y1 ]
+-	vpmuludq	hc0,ruwy1,t1
+-	# t1 += [ hc1[3] * r0, hc1[2] * u0, hc1[1] * w0, hc1[0] * y0 ]
+-	vpmuludq	hc1,ruwy0,t2
+-	vpaddq		t2,t1,t1
+-	# t1 += [ hc2[3] * s4, hc2[2] * v4, hc2[1] * x4, hc2[0] * z4 ]
+-	vpmuludq	hc2,svxz4,t2
+-	vpaddq		t2,t1,t1
+-	# t1 += [ hc3[3] * s3, hc3[2] * v3, hc3[1] * x3, hc3[0] * z3 ]
+-	vpmuludq	hc3,svxz3,t2
+-	vpaddq		t2,t1,t1
+-	# t1 += [ hc4[3] * s2, hc4[2] * v2, hc4[1] * x2, hc4[0] * z2 ]
+-	vpmuludq	hc4,svxz2,t2
+-	vpaddq		t2,t1,t1
+-	# d1 = t1[0] + t1[1] + t1[3] + t1[4]
+-	vpermq		$0xee,t1,t2
+-	vpaddq		t2,t1,t1
+-	vpsrldq		$8,t1,t2
+-	vpaddq		t2,t1,t1
+-	vmovq		t1x,d1
+-
+-	# t1 = [ hc0[3] * r2, hc0[2] * u2, hc0[1] * w2, hc0[0] * y2 ]
+-	vpmuludq	hc0,ruwy2,t1
+-	# t1 += [ hc1[3] * r1, hc1[2] * u1, hc1[1] * w1, hc1[0] * y1 ]
+-	vpmuludq	hc1,ruwy1,t2
+-	vpaddq		t2,t1,t1
+-	# t1 += [ hc2[3] * r0, hc2[2] * u0, hc2[1] * w0, hc2[0] * y0 ]
+-	vpmuludq	hc2,ruwy0,t2
+-	vpaddq		t2,t1,t1
+-	# t1 += [ hc3[3] * s4, hc3[2] * v4, hc3[1] * x4, hc3[0] * z4 ]
+-	vpmuludq	hc3,svxz4,t2
+-	vpaddq		t2,t1,t1
+-	# t1 += [ hc4[3] * s3, hc4[2] * v3, hc4[1] * x3, hc4[0] * z3 ]
+-	vpmuludq	hc4,svxz3,t2
+-	vpaddq		t2,t1,t1
+-	# d2 = t1[0] + t1[1] + t1[2] + t1[3]
+-	vpermq		$0xee,t1,t2
+-	vpaddq		t2,t1,t1
+-	vpsrldq		$8,t1,t2
+-	vpaddq		t2,t1,t1
+-	vmovq		t1x,d2
+-
+-	# t1 = [ hc0[3] * r3, hc0[2] * u3, hc0[1] * w3, hc0[0] * y3 ]
+-	vpmuludq	hc0,ruwy3,t1
+-	# t1 += [ hc1[3] * r2, hc1[2] * u2, hc1[1] * w2, hc1[0] * y2 ]
+-	vpmuludq	hc1,ruwy2,t2
+-	vpaddq		t2,t1,t1
+-	# t1 += [ hc2[3] * r1, hc2[2] * u1, hc2[1] * w1, hc2[0] * y1 ]
+-	vpmuludq	hc2,ruwy1,t2
+-	vpaddq		t2,t1,t1
+-	# t1 += [ hc3[3] * r0, hc3[2] * u0, hc3[1] * w0, hc3[0] * y0 ]
+-	vpmuludq	hc3,ruwy0,t2
+-	vpaddq		t2,t1,t1
+-	# t1 += [ hc4[3] * s4, hc4[2] * v4, hc4[1] * x4, hc4[0] * z4 ]
+-	vpmuludq	hc4,svxz4,t2
+-	vpaddq		t2,t1,t1
+-	# d3 = t1[0] + t1[1] + t1[2] + t1[3]
+-	vpermq		$0xee,t1,t2
+-	vpaddq		t2,t1,t1
+-	vpsrldq		$8,t1,t2
+-	vpaddq		t2,t1,t1
+-	vmovq		t1x,d3
+-
+-	# t1 = [ hc0[3] * r4, hc0[2] * u4, hc0[1] * w4, hc0[0] * y4 ]
+-	vpmuludq	hc0,ruwy4,t1
+-	# t1 += [ hc1[3] * r3, hc1[2] * u3, hc1[1] * w3, hc1[0] * y3 ]
+-	vpmuludq	hc1,ruwy3,t2
+-	vpaddq		t2,t1,t1
+-	# t1 += [ hc2[3] * r2, hc2[2] * u2, hc2[1] * w2, hc2[0] * y2 ]
+-	vpmuludq	hc2,ruwy2,t2
+-	vpaddq		t2,t1,t1
+-	# t1 += [ hc3[3] * r1, hc3[2] * u1, hc3[1] * w1, hc3[0] * y1 ]
+-	vpmuludq	hc3,ruwy1,t2
+-	vpaddq		t2,t1,t1
+-	# t1 += [ hc4[3] * r0, hc4[2] * u0, hc4[1] * w0, hc4[0] * y0 ]
+-	vpmuludq	hc4,ruwy0,t2
+-	vpaddq		t2,t1,t1
+-	# d4 = t1[0] + t1[1] + t1[2] + t1[3]
+-	vpermq		$0xee,t1,t2
+-	vpaddq		t2,t1,t1
+-	vpsrldq		$8,t1,t2
+-	vpaddq		t2,t1,t1
+-	vmovq		t1x,d4
+-
+-	# d1 += d0 >> 26
+-	mov		d0,%rax
+-	shr		$26,%rax
+-	add		%rax,d1
+-	# h0 = d0 & 0x3ffffff
+-	mov		d0,%rbx
+-	and		$0x3ffffff,%ebx
+-
+-	# d2 += d1 >> 26
+-	mov		d1,%rax
+-	shr		$26,%rax
+-	add		%rax,d2
+-	# h1 = d1 & 0x3ffffff
+-	mov		d1,%rax
+-	and		$0x3ffffff,%eax
+-	mov		%eax,h1
+-
+-	# d3 += d2 >> 26
+-	mov		d2,%rax
+-	shr		$26,%rax
+-	add		%rax,d3
+-	# h2 = d2 & 0x3ffffff
+-	mov		d2,%rax
+-	and		$0x3ffffff,%eax
+-	mov		%eax,h2
+-
+-	# d4 += d3 >> 26
+-	mov		d3,%rax
+-	shr		$26,%rax
+-	add		%rax,d4
+-	# h3 = d3 & 0x3ffffff
+-	mov		d3,%rax
+-	and		$0x3ffffff,%eax
+-	mov		%eax,h3
+-
+-	# h0 += (d4 >> 26) * 5
+-	mov		d4,%rax
+-	shr		$26,%rax
+-	lea		(%eax,%eax,4),%eax
+-	add		%eax,%ebx
+-	# h4 = d4 & 0x3ffffff
+-	mov		d4,%rax
+-	and		$0x3ffffff,%eax
+-	mov		%eax,h4
+-
+-	# h1 += h0 >> 26
+-	mov		%ebx,%eax
+-	shr		$26,%eax
+-	add		%eax,h1
+-	# h0 = h0 & 0x3ffffff
+-	andl		$0x3ffffff,%ebx
+-	mov		%ebx,h0
+-
+-	add		$0x40,m
+-	dec		%rcx
+-	jnz		.Ldoblock4
+-
+-	vzeroupper
+-	pop		%r13
+-	pop		%r12
+-	pop		%rbx
+-	ret
+-ENDPROC(poly1305_4block_avx2)
+diff --git a/arch/x86/crypto/poly1305-sse2-x86_64.S b/arch/x86/crypto/poly1305-sse2-x86_64.S
+deleted file mode 100644
+index c88c670cb5fc..000000000000
+--- a/arch/x86/crypto/poly1305-sse2-x86_64.S
++++ /dev/null
+@@ -1,584 +0,0 @@
+-/*
+- * Poly1305 authenticator algorithm, RFC7539, x64 SSE2 functions
+- *
+- * Copyright (C) 2015 Martin Willi
+- *
+- * This program is free software; you can redistribute it and/or modify
+- * it under the terms of the GNU General Public License as published by
+- * the Free Software Foundation; either version 2 of the License, or
+- * (at your option) any later version.
+- */
+-
+-#include <linux/linkage.h>
+-
+-.section	.rodata.cst16.ANMASK, "aM", @progbits, 16
+-.align 16
+-ANMASK:	.octa 0x0000000003ffffff0000000003ffffff
+-
+-.section	.rodata.cst16.ORMASK, "aM", @progbits, 16
+-.align 16
+-ORMASK:	.octa 0x00000000010000000000000001000000
+-
+-.text
+-
+-#define h0 0x00(%rdi)
+-#define h1 0x04(%rdi)
+-#define h2 0x08(%rdi)
+-#define h3 0x0c(%rdi)
+-#define h4 0x10(%rdi)
+-#define r0 0x00(%rdx)
+-#define r1 0x04(%rdx)
+-#define r2 0x08(%rdx)
+-#define r3 0x0c(%rdx)
+-#define r4 0x10(%rdx)
+-#define s1 0x00(%rsp)
+-#define s2 0x04(%rsp)
+-#define s3 0x08(%rsp)
+-#define s4 0x0c(%rsp)
+-#define m %rsi
+-#define h01 %xmm0
+-#define h23 %xmm1
+-#define h44 %xmm2
+-#define t1 %xmm3
+-#define t2 %xmm4
+-#define t3 %xmm5
+-#define t4 %xmm6
+-#define mask %xmm7
+-#define d0 %r8
+-#define d1 %r9
+-#define d2 %r10
+-#define d3 %r11
+-#define d4 %r12
+-
+-ENTRY(poly1305_block_sse2)
+-	# %rdi: Accumulator h[5]
+-	# %rsi: 16 byte input block m
+-	# %rdx: Poly1305 key r[5]
+-	# %rcx: Block count
+-
+-	# This single block variant tries to improve performance by doing two
+-	# multiplications in parallel using SSE instructions. There is quite
+-	# some quardword packing involved, hence the speedup is marginal.
+-
+-	push		%rbx
+-	push		%r12
+-	sub		$0x10,%rsp
+-
+-	# s1..s4 = r1..r4 * 5
+-	mov		r1,%eax
+-	lea		(%eax,%eax,4),%eax
+-	mov		%eax,s1
+-	mov		r2,%eax
+-	lea		(%eax,%eax,4),%eax
+-	mov		%eax,s2
+-	mov		r3,%eax
+-	lea		(%eax,%eax,4),%eax
+-	mov		%eax,s3
+-	mov		r4,%eax
+-	lea		(%eax,%eax,4),%eax
+-	mov		%eax,s4
+-
+-	movdqa		ANMASK(%rip),mask
+-
+-.Ldoblock:
+-	# h01 = [0, h1, 0, h0]
+-	# h23 = [0, h3, 0, h2]
+-	# h44 = [0, h4, 0, h4]
+-	movd		h0,h01
+-	movd		h1,t1
+-	movd		h2,h23
+-	movd		h3,t2
+-	movd		h4,h44
+-	punpcklqdq	t1,h01
+-	punpcklqdq	t2,h23
+-	punpcklqdq	h44,h44
+-
+-	# h01 += [ (m[3-6] >> 2) & 0x3ffffff, m[0-3] & 0x3ffffff ]
+-	movd		0x00(m),t1
+-	movd		0x03(m),t2
+-	psrld		$2,t2
+-	punpcklqdq	t2,t1
+-	pand		mask,t1
+-	paddd		t1,h01
+-	# h23 += [ (m[9-12] >> 6) & 0x3ffffff, (m[6-9] >> 4) & 0x3ffffff ]
+-	movd		0x06(m),t1
+-	movd		0x09(m),t2
+-	psrld		$4,t1
+-	psrld		$6,t2
+-	punpcklqdq	t2,t1
+-	pand		mask,t1
+-	paddd		t1,h23
+-	# h44 += [ (m[12-15] >> 8) | (1 << 24), (m[12-15] >> 8) | (1 << 24) ]
+-	mov		0x0c(m),%eax
+-	shr		$8,%eax
+-	or		$0x01000000,%eax
+-	movd		%eax,t1
+-	pshufd		$0xc4,t1,t1
+-	paddd		t1,h44
+-
+-	# t1[0] = h0 * r0 + h2 * s3
+-	# t1[1] = h1 * s4 + h3 * s2
+-	movd		r0,t1
+-	movd		s4,t2
+-	punpcklqdq	t2,t1
+-	pmuludq		h01,t1
+-	movd		s3,t2
+-	movd		s2,t3
+-	punpcklqdq	t3,t2
+-	pmuludq		h23,t2
+-	paddq		t2,t1
+-	# t2[0] = h0 * r1 + h2 * s4
+-	# t2[1] = h1 * r0 + h3 * s3
+-	movd		r1,t2
+-	movd		r0,t3
+-	punpcklqdq	t3,t2
+-	pmuludq		h01,t2
+-	movd		s4,t3
+-	movd		s3,t4
+-	punpcklqdq	t4,t3
+-	pmuludq		h23,t3
+-	paddq		t3,t2
+-	# t3[0] = h4 * s1
+-	# t3[1] = h4 * s2
+-	movd		s1,t3
+-	movd		s2,t4
+-	punpcklqdq	t4,t3
+-	pmuludq		h44,t3
+-	# d0 = t1[0] + t1[1] + t3[0]
+-	# d1 = t2[0] + t2[1] + t3[1]
+-	movdqa		t1,t4
+-	punpcklqdq	t2,t4
+-	punpckhqdq	t2,t1
+-	paddq		t4,t1
+-	paddq		t3,t1
+-	movq		t1,d0
+-	psrldq		$8,t1
+-	movq		t1,d1
+-
+-	# t1[0] = h0 * r2 + h2 * r0
+-	# t1[1] = h1 * r1 + h3 * s4
+-	movd		r2,t1
+-	movd		r1,t2
+-	punpcklqdq 	t2,t1
+-	pmuludq		h01,t1
+-	movd		r0,t2
+-	movd		s4,t3
+-	punpcklqdq	t3,t2
+-	pmuludq		h23,t2
+-	paddq		t2,t1
+-	# t2[0] = h0 * r3 + h2 * r1
+-	# t2[1] = h1 * r2 + h3 * r0
+-	movd		r3,t2
+-	movd		r2,t3
+-	punpcklqdq	t3,t2
+-	pmuludq		h01,t2
+-	movd		r1,t3
+-	movd		r0,t4
+-	punpcklqdq	t4,t3
+-	pmuludq		h23,t3
+-	paddq		t3,t2
+-	# t3[0] = h4 * s3
+-	# t3[1] = h4 * s4
+-	movd		s3,t3
+-	movd		s4,t4
+-	punpcklqdq	t4,t3
+-	pmuludq		h44,t3
+-	# d2 = t1[0] + t1[1] + t3[0]
+-	# d3 = t2[0] + t2[1] + t3[1]
+-	movdqa		t1,t4
+-	punpcklqdq	t2,t4
+-	punpckhqdq	t2,t1
+-	paddq		t4,t1
+-	paddq		t3,t1
+-	movq		t1,d2
+-	psrldq		$8,t1
+-	movq		t1,d3
+-
+-	# t1[0] = h0 * r4 + h2 * r2
+-	# t1[1] = h1 * r3 + h3 * r1
+-	movd		r4,t1
+-	movd		r3,t2
+-	punpcklqdq	t2,t1
+-	pmuludq		h01,t1
+-	movd		r2,t2
+-	movd		r1,t3
+-	punpcklqdq	t3,t2
+-	pmuludq		h23,t2
+-	paddq		t2,t1
+-	# t3[0] = h4 * r0
+-	movd		r0,t3
+-	pmuludq		h44,t3
+-	# d4 = t1[0] + t1[1] + t3[0]
+-	movdqa		t1,t4
+-	psrldq		$8,t4
+-	paddq		t4,t1
+-	paddq		t3,t1
+-	movq		t1,d4
+-
+-	# d1 += d0 >> 26
+-	mov		d0,%rax
+-	shr		$26,%rax
+-	add		%rax,d1
+-	# h0 = d0 & 0x3ffffff
+-	mov		d0,%rbx
+-	and		$0x3ffffff,%ebx
+-
+-	# d2 += d1 >> 26
+-	mov		d1,%rax
+-	shr		$26,%rax
+-	add		%rax,d2
+-	# h1 = d1 & 0x3ffffff
+-	mov		d1,%rax
+-	and		$0x3ffffff,%eax
+-	mov		%eax,h1
+-
+-	# d3 += d2 >> 26
+-	mov		d2,%rax
+-	shr		$26,%rax
+-	add		%rax,d3
+-	# h2 = d2 & 0x3ffffff
+-	mov		d2,%rax
+-	and		$0x3ffffff,%eax
+-	mov		%eax,h2
+-
+-	# d4 += d3 >> 26
+-	mov		d3,%rax
+-	shr		$26,%rax
+-	add		%rax,d4
+-	# h3 = d3 & 0x3ffffff
+-	mov		d3,%rax
+-	and		$0x3ffffff,%eax
+-	mov		%eax,h3
+-
+-	# h0 += (d4 >> 26) * 5
+-	mov		d4,%rax
+-	shr		$26,%rax
+-	lea		(%eax,%eax,4),%eax
+-	add		%eax,%ebx
+-	# h4 = d4 & 0x3ffffff
+-	mov		d4,%rax
+-	and		$0x3ffffff,%eax
+-	mov		%eax,h4
+-
+-	# h1 += h0 >> 26
+-	mov		%ebx,%eax
+-	shr		$26,%eax
+-	add		%eax,h1
+-	# h0 = h0 & 0x3ffffff
+-	andl		$0x3ffffff,%ebx
+-	mov		%ebx,h0
+-
+-	add		$0x10,m
+-	dec		%rcx
+-	jnz		.Ldoblock
+-
+-	add		$0x10,%rsp
+-	pop		%r12
+-	pop		%rbx
+-	ret
+-ENDPROC(poly1305_block_sse2)
+-
+-
+-#define u0 0x00(%r8)
+-#define u1 0x04(%r8)
+-#define u2 0x08(%r8)
+-#define u3 0x0c(%r8)
+-#define u4 0x10(%r8)
+-#define hc0 %xmm0
+-#define hc1 %xmm1
+-#define hc2 %xmm2
+-#define hc3 %xmm5
+-#define hc4 %xmm6
+-#define ru0 %xmm7
+-#define ru1 %xmm8
+-#define ru2 %xmm9
+-#define ru3 %xmm10
+-#define ru4 %xmm11
+-#define sv1 %xmm12
+-#define sv2 %xmm13
+-#define sv3 %xmm14
+-#define sv4 %xmm15
+-#undef d0
+-#define d0 %r13
+-
+-ENTRY(poly1305_2block_sse2)
+-	# %rdi: Accumulator h[5]
+-	# %rsi: 16 byte input block m
+-	# %rdx: Poly1305 key r[5]
+-	# %rcx: Doubleblock count
+-	# %r8:  Poly1305 derived key r^2 u[5]
+-
+-	# This two-block variant further improves performance by using loop
+-	# unrolled block processing. This is more straight forward and does
+-	# less byte shuffling, but requires a second Poly1305 key r^2:
+-	# h = (h + m) * r    =>    h = (h + m1) * r^2 + m2 * r
+-
+-	push		%rbx
+-	push		%r12
+-	push		%r13
+-
+-	# combine r0,u0
+-	movd		u0,ru0
+-	movd		r0,t1
+-	punpcklqdq	t1,ru0
+-
+-	# combine r1,u1 and s1=r1*5,v1=u1*5
+-	movd		u1,ru1
+-	movd		r1,t1
+-	punpcklqdq	t1,ru1
+-	movdqa		ru1,sv1
+-	pslld		$2,sv1
+-	paddd		ru1,sv1
+-
+-	# combine r2,u2 and s2=r2*5,v2=u2*5
+-	movd		u2,ru2
+-	movd		r2,t1
+-	punpcklqdq	t1,ru2
+-	movdqa		ru2,sv2
+-	pslld		$2,sv2
+-	paddd		ru2,sv2
+-
+-	# combine r3,u3 and s3=r3*5,v3=u3*5
+-	movd		u3,ru3
+-	movd		r3,t1
+-	punpcklqdq	t1,ru3
+-	movdqa		ru3,sv3
+-	pslld		$2,sv3
+-	paddd		ru3,sv3
+-
+-	# combine r4,u4 and s4=r4*5,v4=u4*5
+-	movd		u4,ru4
+-	movd		r4,t1
+-	punpcklqdq	t1,ru4
+-	movdqa		ru4,sv4
+-	pslld		$2,sv4
+-	paddd		ru4,sv4
+-
+-.Ldoblock2:
+-	# hc0 = [ m[16-19] & 0x3ffffff, h0 + m[0-3] & 0x3ffffff ]
+-	movd		0x00(m),hc0
+-	movd		0x10(m),t1
+-	punpcklqdq	t1,hc0
+-	pand		ANMASK(%rip),hc0
+-	movd		h0,t1
+-	paddd		t1,hc0
+-	# hc1 = [ (m[19-22] >> 2) & 0x3ffffff, h1 + (m[3-6] >> 2) & 0x3ffffff ]
+-	movd		0x03(m),hc1
+-	movd		0x13(m),t1
+-	punpcklqdq	t1,hc1
+-	psrld		$2,hc1
+-	pand		ANMASK(%rip),hc1
+-	movd		h1,t1
+-	paddd		t1,hc1
+-	# hc2 = [ (m[22-25] >> 4) & 0x3ffffff, h2 + (m[6-9] >> 4) & 0x3ffffff ]
+-	movd		0x06(m),hc2
+-	movd		0x16(m),t1
+-	punpcklqdq	t1,hc2
+-	psrld		$4,hc2
+-	pand		ANMASK(%rip),hc2
+-	movd		h2,t1
+-	paddd		t1,hc2
+-	# hc3 = [ (m[25-28] >> 6) & 0x3ffffff, h3 + (m[9-12] >> 6) & 0x3ffffff ]
+-	movd		0x09(m),hc3
+-	movd		0x19(m),t1
+-	punpcklqdq	t1,hc3
+-	psrld		$6,hc3
+-	pand		ANMASK(%rip),hc3
+-	movd		h3,t1
+-	paddd		t1,hc3
+-	# hc4 = [ (m[28-31] >> 8) | (1<<24), h4 + (m[12-15] >> 8) | (1<<24) ]
+-	movd		0x0c(m),hc4
+-	movd		0x1c(m),t1
+-	punpcklqdq	t1,hc4
+-	psrld		$8,hc4
+-	por		ORMASK(%rip),hc4
+-	movd		h4,t1
+-	paddd		t1,hc4
+-
+-	# t1 = [ hc0[1] * r0, hc0[0] * u0 ]
+-	movdqa		ru0,t1
+-	pmuludq		hc0,t1
+-	# t1 += [ hc1[1] * s4, hc1[0] * v4 ]
+-	movdqa		sv4,t2
+-	pmuludq		hc1,t2
+-	paddq		t2,t1
+-	# t1 += [ hc2[1] * s3, hc2[0] * v3 ]
+-	movdqa		sv3,t2
+-	pmuludq		hc2,t2
+-	paddq		t2,t1
+-	# t1 += [ hc3[1] * s2, hc3[0] * v2 ]
+-	movdqa		sv2,t2
+-	pmuludq		hc3,t2
+-	paddq		t2,t1
+-	# t1 += [ hc4[1] * s1, hc4[0] * v1 ]
+-	movdqa		sv1,t2
+-	pmuludq		hc4,t2
+-	paddq		t2,t1
+-	# d0 = t1[0] + t1[1]
+-	movdqa		t1,t2
+-	psrldq		$8,t2
+-	paddq		t2,t1
+-	movq		t1,d0
+-
+-	# t1 = [ hc0[1] * r1, hc0[0] * u1 ]
+-	movdqa		ru1,t1
+-	pmuludq		hc0,t1
+-	# t1 += [ hc1[1] * r0, hc1[0] * u0 ]
+-	movdqa		ru0,t2
+-	pmuludq		hc1,t2
+-	paddq		t2,t1
+-	# t1 += [ hc2[1] * s4, hc2[0] * v4 ]
+-	movdqa		sv4,t2
+-	pmuludq		hc2,t2
+-	paddq		t2,t1
+-	# t1 += [ hc3[1] * s3, hc3[0] * v3 ]
+-	movdqa		sv3,t2
+-	pmuludq		hc3,t2
+-	paddq		t2,t1
+-	# t1 += [ hc4[1] * s2, hc4[0] * v2 ]
+-	movdqa		sv2,t2
+-	pmuludq		hc4,t2
+-	paddq		t2,t1
+-	# d1 = t1[0] + t1[1]
+-	movdqa		t1,t2
+-	psrldq		$8,t2
+-	paddq		t2,t1
+-	movq		t1,d1
+-
+-	# t1 = [ hc0[1] * r2, hc0[0] * u2 ]
+-	movdqa		ru2,t1
+-	pmuludq		hc0,t1
+-	# t1 += [ hc1[1] * r1, hc1[0] * u1 ]
+-	movdqa		ru1,t2
+-	pmuludq		hc1,t2
+-	paddq		t2,t1
+-	# t1 += [ hc2[1] * r0, hc2[0] * u0 ]
+-	movdqa		ru0,t2
+-	pmuludq		hc2,t2
+-	paddq		t2,t1
+-	# t1 += [ hc3[1] * s4, hc3[0] * v4 ]
+-	movdqa		sv4,t2
+-	pmuludq		hc3,t2
+-	paddq		t2,t1
+-	# t1 += [ hc4[1] * s3, hc4[0] * v3 ]
+-	movdqa		sv3,t2
+-	pmuludq		hc4,t2
+-	paddq		t2,t1
+-	# d2 = t1[0] + t1[1]
+-	movdqa		t1,t2
+-	psrldq		$8,t2
+-	paddq		t2,t1
+-	movq		t1,d2
+-
+-	# t1 = [ hc0[1] * r3, hc0[0] * u3 ]
+-	movdqa		ru3,t1
+-	pmuludq		hc0,t1
+-	# t1 += [ hc1[1] * r2, hc1[0] * u2 ]
+-	movdqa		ru2,t2
+-	pmuludq		hc1,t2
+-	paddq		t2,t1
+-	# t1 += [ hc2[1] * r1, hc2[0] * u1 ]
+-	movdqa		ru1,t2
+-	pmuludq		hc2,t2
+-	paddq		t2,t1
+-	# t1 += [ hc3[1] * r0, hc3[0] * u0 ]
+-	movdqa		ru0,t2
+-	pmuludq		hc3,t2
+-	paddq		t2,t1
+-	# t1 += [ hc4[1] * s4, hc4[0] * v4 ]
+-	movdqa		sv4,t2
+-	pmuludq		hc4,t2
+-	paddq		t2,t1
+-	# d3 = t1[0] + t1[1]
+-	movdqa		t1,t2
+-	psrldq		$8,t2
+-	paddq		t2,t1
+-	movq		t1,d3
+-
+-	# t1 = [ hc0[1] * r4, hc0[0] * u4 ]
+-	movdqa		ru4,t1
+-	pmuludq		hc0,t1
+-	# t1 += [ hc1[1] * r3, hc1[0] * u3 ]
+-	movdqa		ru3,t2
+-	pmuludq		hc1,t2
+-	paddq		t2,t1
+-	# t1 += [ hc2[1] * r2, hc2[0] * u2 ]
+-	movdqa		ru2,t2
+-	pmuludq		hc2,t2
+-	paddq		t2,t1
+-	# t1 += [ hc3[1] * r1, hc3[0] * u1 ]
+-	movdqa		ru1,t2
+-	pmuludq		hc3,t2
+-	paddq		t2,t1
+-	# t1 += [ hc4[1] * r0, hc4[0] * u0 ]
+-	movdqa		ru0,t2
+-	pmuludq		hc4,t2
+-	paddq		t2,t1
+-	# d4 = t1[0] + t1[1]
+-	movdqa		t1,t2
+-	psrldq		$8,t2
+-	paddq		t2,t1
+-	movq		t1,d4
+-
+-	# d1 += d0 >> 26
+-	mov		d0,%rax
+-	shr		$26,%rax
+-	add		%rax,d1
+-	# h0 = d0 & 0x3ffffff
+-	mov		d0,%rbx
+-	and		$0x3ffffff,%ebx
+-
+-	# d2 += d1 >> 26
+-	mov		d1,%rax
+-	shr		$26,%rax
+-	add		%rax,d2
+-	# h1 = d1 & 0x3ffffff
+-	mov		d1,%rax
+-	and		$0x3ffffff,%eax
+-	mov		%eax,h1
+-
+-	# d3 += d2 >> 26
+-	mov		d2,%rax
+-	shr		$26,%rax
+-	add		%rax,d3
+-	# h2 = d2 & 0x3ffffff
+-	mov		d2,%rax
+-	and		$0x3ffffff,%eax
+-	mov		%eax,h2
+-
+-	# d4 += d3 >> 26
+-	mov		d3,%rax
+-	shr		$26,%rax
+-	add		%rax,d4
+-	# h3 = d3 & 0x3ffffff
+-	mov		d3,%rax
+-	and		$0x3ffffff,%eax
+-	mov		%eax,h3
+-
+-	# h0 += (d4 >> 26) * 5
+-	mov		d4,%rax
+-	shr		$26,%rax
+-	lea		(%eax,%eax,4),%eax
+-	add		%eax,%ebx
+-	# h4 = d4 & 0x3ffffff
+-	mov		d4,%rax
+-	and		$0x3ffffff,%eax
+-	mov		%eax,h4
+-
+-	# h1 += h0 >> 26
+-	mov		%ebx,%eax
+-	shr		$26,%eax
+-	add		%eax,h1
+-	# h0 = h0 & 0x3ffffff
+-	andl		$0x3ffffff,%ebx
+-	mov		%ebx,h0
+-
+-	add		$0x20,m
+-	dec		%rcx
+-	jnz		.Ldoblock2
+-
+-	pop		%r13
+-	pop		%r12
+-	pop		%rbx
+-	ret
+-ENDPROC(poly1305_2block_sse2)
+diff --git a/arch/x86/crypto/poly1305_glue.c b/arch/x86/crypto/poly1305_glue.c
+deleted file mode 100644
+index f012b7e28ad1..000000000000
+--- a/arch/x86/crypto/poly1305_glue.c
++++ /dev/null
+@@ -1,205 +0,0 @@
+-/*
+- * Poly1305 authenticator algorithm, RFC7539, SIMD glue code
+- *
+- * Copyright (C) 2015 Martin Willi
+- *
+- * This program is free software; you can redistribute it and/or modify
+- * it under the terms of the GNU General Public License as published by
+- * the Free Software Foundation; either version 2 of the License, or
+- * (at your option) any later version.
+- */
+-
+-#include <crypto/algapi.h>
+-#include <crypto/internal/hash.h>
+-#include <crypto/poly1305.h>
+-#include <linux/crypto.h>
+-#include <linux/kernel.h>
+-#include <linux/module.h>
+-#include <asm/fpu/api.h>
+-#include <asm/simd.h>
+-
+-struct poly1305_simd_desc_ctx {
+-	struct poly1305_desc_ctx base;
+-	/* derived key u set? */
+-	bool uset;
+-#ifdef CONFIG_AS_AVX2
+-	/* derived keys r^3, r^4 set? */
+-	bool wset;
+-#endif
+-	/* derived Poly1305 key r^2 */
+-	u32 u[5];
+-	/* ... silently appended r^3 and r^4 when using AVX2 */
+-};
+-
+-asmlinkage void poly1305_block_sse2(u32 *h, const u8 *src,
+-				    const u32 *r, unsigned int blocks);
+-asmlinkage void poly1305_2block_sse2(u32 *h, const u8 *src, const u32 *r,
+-				     unsigned int blocks, const u32 *u);
+-#ifdef CONFIG_AS_AVX2
+-asmlinkage void poly1305_4block_avx2(u32 *h, const u8 *src, const u32 *r,
+-				     unsigned int blocks, const u32 *u);
+-static bool poly1305_use_avx2;
+-#endif
+-
+-static int poly1305_simd_init(struct shash_desc *desc)
+-{
+-	struct poly1305_simd_desc_ctx *sctx = shash_desc_ctx(desc);
+-
+-	sctx->uset = false;
+-#ifdef CONFIG_AS_AVX2
+-	sctx->wset = false;
+-#endif
+-
+-	return crypto_poly1305_init(desc);
+-}
+-
+-static void poly1305_simd_mult(u32 *a, const u32 *b)
+-{
+-	u8 m[POLY1305_BLOCK_SIZE];
+-
+-	memset(m, 0, sizeof(m));
+-	/* The poly1305 block function adds a hi-bit to the accumulator which
+-	 * we don't need for key multiplication; compensate for it. */
+-	a[4] -= 1 << 24;
+-	poly1305_block_sse2(a, m, b, 1);
+-}
+-
+-static unsigned int poly1305_simd_blocks(struct poly1305_desc_ctx *dctx,
+-					 const u8 *src, unsigned int srclen)
+-{
+-	struct poly1305_simd_desc_ctx *sctx;
+-	unsigned int blocks, datalen;
+-
+-	BUILD_BUG_ON(offsetof(struct poly1305_simd_desc_ctx, base));
+-	sctx = container_of(dctx, struct poly1305_simd_desc_ctx, base);
+-
+-	if (unlikely(!dctx->sset)) {
+-		datalen = crypto_poly1305_setdesckey(dctx, src, srclen);
+-		src += srclen - datalen;
+-		srclen = datalen;
+-	}
+-
+-#ifdef CONFIG_AS_AVX2
+-	if (poly1305_use_avx2 && srclen >= POLY1305_BLOCK_SIZE * 4) {
+-		if (unlikely(!sctx->wset)) {
+-			if (!sctx->uset) {
+-				memcpy(sctx->u, dctx->r, sizeof(sctx->u));
+-				poly1305_simd_mult(sctx->u, dctx->r);
+-				sctx->uset = true;
+-			}
+-			memcpy(sctx->u + 5, sctx->u, sizeof(sctx->u));
+-			poly1305_simd_mult(sctx->u + 5, dctx->r);
+-			memcpy(sctx->u + 10, sctx->u + 5, sizeof(sctx->u));
+-			poly1305_simd_mult(sctx->u + 10, dctx->r);
+-			sctx->wset = true;
+-		}
+-		blocks = srclen / (POLY1305_BLOCK_SIZE * 4);
+-		poly1305_4block_avx2(dctx->h, src, dctx->r, blocks, sctx->u);
+-		src += POLY1305_BLOCK_SIZE * 4 * blocks;
+-		srclen -= POLY1305_BLOCK_SIZE * 4 * blocks;
+-	}
+-#endif
+-	if (likely(srclen >= POLY1305_BLOCK_SIZE * 2)) {
+-		if (unlikely(!sctx->uset)) {
+-			memcpy(sctx->u, dctx->r, sizeof(sctx->u));
+-			poly1305_simd_mult(sctx->u, dctx->r);
+-			sctx->uset = true;
+-		}
+-		blocks = srclen / (POLY1305_BLOCK_SIZE * 2);
+-		poly1305_2block_sse2(dctx->h, src, dctx->r, blocks, sctx->u);
+-		src += POLY1305_BLOCK_SIZE * 2 * blocks;
+-		srclen -= POLY1305_BLOCK_SIZE * 2 * blocks;
+-	}
+-	if (srclen >= POLY1305_BLOCK_SIZE) {
+-		poly1305_block_sse2(dctx->h, src, dctx->r, 1);
+-		srclen -= POLY1305_BLOCK_SIZE;
+-	}
+-	return srclen;
+-}
+-
+-static int poly1305_simd_update(struct shash_desc *desc,
+-				const u8 *src, unsigned int srclen)
+-{
+-	struct poly1305_desc_ctx *dctx = shash_desc_ctx(desc);
+-	unsigned int bytes;
+-
+-	/* kernel_fpu_begin/end is costly, use fallback for small updates */
+-	if (srclen <= 288 || !may_use_simd())
+-		return crypto_poly1305_update(desc, src, srclen);
+-
+-	kernel_fpu_begin();
+-
+-	if (unlikely(dctx->buflen)) {
+-		bytes = min(srclen, POLY1305_BLOCK_SIZE - dctx->buflen);
+-		memcpy(dctx->buf + dctx->buflen, src, bytes);
+-		src += bytes;
+-		srclen -= bytes;
+-		dctx->buflen += bytes;
+-
+-		if (dctx->buflen == POLY1305_BLOCK_SIZE) {
+-			poly1305_simd_blocks(dctx, dctx->buf,
+-					     POLY1305_BLOCK_SIZE);
+-			dctx->buflen = 0;
+-		}
+-	}
+-
+-	if (likely(srclen >= POLY1305_BLOCK_SIZE)) {
+-		bytes = poly1305_simd_blocks(dctx, src, srclen);
+-		src += srclen - bytes;
+-		srclen = bytes;
+-	}
+-
+-	kernel_fpu_end();
+-
+-	if (unlikely(srclen)) {
+-		dctx->buflen = srclen;
+-		memcpy(dctx->buf, src, srclen);
+-	}
+-
+-	return 0;
+-}
+-
+-static struct shash_alg alg = {
+-	.digestsize	= POLY1305_DIGEST_SIZE,
+-	.init		= poly1305_simd_init,
+-	.update		= poly1305_simd_update,
+-	.final		= crypto_poly1305_final,
+-	.descsize	= sizeof(struct poly1305_simd_desc_ctx),
+-	.base		= {
+-		.cra_name		= "poly1305",
+-		.cra_driver_name	= "poly1305-simd",
+-		.cra_priority		= 300,
+-		.cra_blocksize		= POLY1305_BLOCK_SIZE,
+-		.cra_module		= THIS_MODULE,
+-	},
+-};
+-
+-static int __init poly1305_simd_mod_init(void)
+-{
+-	if (!boot_cpu_has(X86_FEATURE_XMM2))
+-		return -ENODEV;
+-
+-#ifdef CONFIG_AS_AVX2
+-	poly1305_use_avx2 = boot_cpu_has(X86_FEATURE_AVX) &&
+-			    boot_cpu_has(X86_FEATURE_AVX2) &&
+-			    cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM, NULL);
+-	alg.descsize = sizeof(struct poly1305_simd_desc_ctx);
+-	if (poly1305_use_avx2)
+-		alg.descsize += 10 * sizeof(u32);
+-#endif
+-	return crypto_register_shash(&alg);
+-}
+-
+-static void __exit poly1305_simd_mod_exit(void)
+-{
+-	crypto_unregister_shash(&alg);
+-}
+-
+-module_init(poly1305_simd_mod_init);
+-module_exit(poly1305_simd_mod_exit);
+-
+-MODULE_LICENSE("GPL");
+-MODULE_AUTHOR("Martin Willi <martin@strongswan.org>");
+-MODULE_DESCRIPTION("Poly1305 authenticator");
+-MODULE_ALIAS_CRYPTO("poly1305");
+-MODULE_ALIAS_CRYPTO("poly1305-simd");
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index f3e40ac56d93..47859a0f8052 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -656,24 +656,13 @@ config CRYPTO_GHASH
+ config CRYPTO_POLY1305
+ 	tristate "Poly1305 authenticator algorithm"
+ 	select CRYPTO_HASH
++	select ZINC_POLY1305
+ 	help
+ 	  Poly1305 authenticator algorithm, RFC7539.
+ 
+ 	  Poly1305 is an authenticator algorithm designed by Daniel J. Bernstein.
+ 	  It is used for the ChaCha20-Poly1305 AEAD, specified in RFC7539 for use
+-	  in IETF protocols. This is the portable C implementation of Poly1305.
+-
+-config CRYPTO_POLY1305_X86_64
+-	tristate "Poly1305 authenticator algorithm (x86_64/SSE2/AVX2)"
+-	depends on X86 && 64BIT
+-	select CRYPTO_POLY1305
+-	help
+-	  Poly1305 authenticator algorithm, RFC7539.
+-
+-	  Poly1305 is an authenticator algorithm designed by Daniel J. Bernstein.
+-	  It is used for the ChaCha20-Poly1305 AEAD, specified in RFC7539 for use
+-	  in IETF protocols. This is the x86_64 assembler implementation using SIMD
+-	  instructions.
++	  in IETF protocols.
+ 
+ config CRYPTO_MD4
+ 	tristate "MD4 digest algorithm"
+diff --git a/crypto/Makefile b/crypto/Makefile
+index 6d1d40eeb964..5e60348d02e2 100644
+--- a/crypto/Makefile
++++ b/crypto/Makefile
+@@ -118,7 +118,7 @@ obj-$(CONFIG_CRYPTO_SEED) += seed.o
+ obj-$(CONFIG_CRYPTO_SPECK) += speck.o
+ obj-$(CONFIG_CRYPTO_SALSA20) += salsa20_generic.o
+ obj-$(CONFIG_CRYPTO_CHACHA20) += chacha20_generic.o
+-obj-$(CONFIG_CRYPTO_POLY1305) += poly1305_generic.o
++obj-$(CONFIG_CRYPTO_POLY1305) += poly1305_zinc.o
+ obj-$(CONFIG_CRYPTO_DEFLATE) += deflate.o
+ obj-$(CONFIG_CRYPTO_MICHAEL_MIC) += michael_mic.o
+ obj-$(CONFIG_CRYPTO_CRC32C) += crc32c_generic.o
+diff --git a/crypto/chacha20poly1305.c b/crypto/chacha20poly1305.c
+index 600afa99941f..bf523797bef3 100644
+--- a/crypto/chacha20poly1305.c
++++ b/crypto/chacha20poly1305.c
+@@ -14,7 +14,7 @@
+ #include <crypto/internal/skcipher.h>
+ #include <crypto/scatterwalk.h>
+ #include <crypto/chacha20.h>
+-#include <crypto/poly1305.h>
++#include <zinc/poly1305.h>
+ #include <linux/err.h>
+ #include <linux/init.h>
+ #include <linux/kernel.h>
+@@ -62,7 +62,7 @@ struct chachapoly_req_ctx {
+ 	/* the key we generate for Poly1305 using Chacha20 */
+ 	u8 key[POLY1305_KEY_SIZE];
+ 	/* calculated Poly1305 tag */
+-	u8 tag[POLY1305_DIGEST_SIZE];
++	u8 tag[POLY1305_MAC_SIZE];
+ 	/* length of data to en/decrypt, without ICV */
+ 	unsigned int cryptlen;
+ 	/* Actual AD, excluding IV */
+@@ -471,7 +471,7 @@ static int chachapoly_decrypt(struct aead_request *req)
+ {
+ 	struct chachapoly_req_ctx *rctx = aead_request_ctx(req);
+ 
+-	rctx->cryptlen = req->cryptlen - POLY1305_DIGEST_SIZE;
++	rctx->cryptlen = req->cryptlen - POLY1305_MAC_SIZE;
+ 
+ 	/* decrypt call chain:
+ 	 * - poly_genkey/done()
+@@ -513,7 +513,7 @@ static int chachapoly_setkey(struct crypto_aead *aead, const u8 *key,
+ static int chachapoly_setauthsize(struct crypto_aead *tfm,
+ 				  unsigned int authsize)
+ {
+-	if (authsize != POLY1305_DIGEST_SIZE)
++	if (authsize != POLY1305_MAC_SIZE)
+ 		return -EINVAL;
+ 
+ 	return 0;
+@@ -613,7 +613,7 @@ static int chachapoly_create(struct crypto_template *tmpl, struct rtattr **tb,
+ 	poly_hash = __crypto_hash_alg_common(poly);
+ 
+ 	err = -EINVAL;
+-	if (poly_hash->digestsize != POLY1305_DIGEST_SIZE)
++	if (poly_hash->digestsize != POLY1305_MAC_SIZE)
+ 		goto out_put_poly;
+ 
+ 	err = -ENOMEM;
+@@ -666,7 +666,7 @@ static int chachapoly_create(struct crypto_template *tmpl, struct rtattr **tb,
+ 				     ctx->saltlen;
+ 	inst->alg.ivsize = ivsize;
+ 	inst->alg.chunksize = crypto_skcipher_alg_chunksize(chacha);
+-	inst->alg.maxauthsize = POLY1305_DIGEST_SIZE;
++	inst->alg.maxauthsize = POLY1305_MAC_SIZE;
+ 	inst->alg.init = chachapoly_init;
+ 	inst->alg.exit = chachapoly_exit;
+ 	inst->alg.encrypt = chachapoly_encrypt;
+diff --git a/crypto/poly1305_generic.c b/crypto/poly1305_generic.c
+deleted file mode 100644
+index 47d3a6b83931..000000000000
+--- a/crypto/poly1305_generic.c
++++ /dev/null
+@@ -1,304 +0,0 @@
+-/*
+- * Poly1305 authenticator algorithm, RFC7539
+- *
+- * Copyright (C) 2015 Martin Willi
+- *
+- * Based on public domain code by Andrew Moon and Daniel J. Bernstein.
+- *
+- * This program is free software; you can redistribute it and/or modify
+- * it under the terms of the GNU General Public License as published by
+- * the Free Software Foundation; either version 2 of the License, or
+- * (at your option) any later version.
+- */
+-
+-#include <crypto/algapi.h>
+-#include <crypto/internal/hash.h>
+-#include <crypto/poly1305.h>
+-#include <linux/crypto.h>
+-#include <linux/kernel.h>
+-#include <linux/module.h>
+-#include <asm/unaligned.h>
+-
+-static inline u64 mlt(u64 a, u64 b)
+-{
+-	return a * b;
+-}
+-
+-static inline u32 sr(u64 v, u_char n)
+-{
+-	return v >> n;
+-}
+-
+-static inline u32 and(u32 v, u32 mask)
+-{
+-	return v & mask;
+-}
+-
+-int crypto_poly1305_init(struct shash_desc *desc)
+-{
+-	struct poly1305_desc_ctx *dctx = shash_desc_ctx(desc);
+-
+-	memset(dctx->h, 0, sizeof(dctx->h));
+-	dctx->buflen = 0;
+-	dctx->rset = false;
+-	dctx->sset = false;
+-
+-	return 0;
+-}
+-EXPORT_SYMBOL_GPL(crypto_poly1305_init);
+-
+-static void poly1305_setrkey(struct poly1305_desc_ctx *dctx, const u8 *key)
+-{
+-	/* r &= 0xffffffc0ffffffc0ffffffc0fffffff */
+-	dctx->r[0] = (get_unaligned_le32(key +  0) >> 0) & 0x3ffffff;
+-	dctx->r[1] = (get_unaligned_le32(key +  3) >> 2) & 0x3ffff03;
+-	dctx->r[2] = (get_unaligned_le32(key +  6) >> 4) & 0x3ffc0ff;
+-	dctx->r[3] = (get_unaligned_le32(key +  9) >> 6) & 0x3f03fff;
+-	dctx->r[4] = (get_unaligned_le32(key + 12) >> 8) & 0x00fffff;
+-}
+-
+-static void poly1305_setskey(struct poly1305_desc_ctx *dctx, const u8 *key)
+-{
+-	dctx->s[0] = get_unaligned_le32(key +  0);
+-	dctx->s[1] = get_unaligned_le32(key +  4);
+-	dctx->s[2] = get_unaligned_le32(key +  8);
+-	dctx->s[3] = get_unaligned_le32(key + 12);
+-}
+-
+-/*
+- * Poly1305 requires a unique key for each tag, which implies that we can't set
+- * it on the tfm that gets accessed by multiple users simultaneously. Instead we
+- * expect the key as the first 32 bytes in the update() call.
+- */
+-unsigned int crypto_poly1305_setdesckey(struct poly1305_desc_ctx *dctx,
+-					const u8 *src, unsigned int srclen)
+-{
+-	if (!dctx->sset) {
+-		if (!dctx->rset && srclen >= POLY1305_BLOCK_SIZE) {
+-			poly1305_setrkey(dctx, src);
+-			src += POLY1305_BLOCK_SIZE;
+-			srclen -= POLY1305_BLOCK_SIZE;
+-			dctx->rset = true;
+-		}
+-		if (srclen >= POLY1305_BLOCK_SIZE) {
+-			poly1305_setskey(dctx, src);
+-			src += POLY1305_BLOCK_SIZE;
+-			srclen -= POLY1305_BLOCK_SIZE;
+-			dctx->sset = true;
+-		}
+-	}
+-	return srclen;
+-}
+-EXPORT_SYMBOL_GPL(crypto_poly1305_setdesckey);
+-
+-static unsigned int poly1305_blocks(struct poly1305_desc_ctx *dctx,
+-				    const u8 *src, unsigned int srclen,
+-				    u32 hibit)
+-{
+-	u32 r0, r1, r2, r3, r4;
+-	u32 s1, s2, s3, s4;
+-	u32 h0, h1, h2, h3, h4;
+-	u64 d0, d1, d2, d3, d4;
+-	unsigned int datalen;
+-
+-	if (unlikely(!dctx->sset)) {
+-		datalen = crypto_poly1305_setdesckey(dctx, src, srclen);
+-		src += srclen - datalen;
+-		srclen = datalen;
+-	}
+-
+-	r0 = dctx->r[0];
+-	r1 = dctx->r[1];
+-	r2 = dctx->r[2];
+-	r3 = dctx->r[3];
+-	r4 = dctx->r[4];
+-
+-	s1 = r1 * 5;
+-	s2 = r2 * 5;
+-	s3 = r3 * 5;
+-	s4 = r4 * 5;
+-
+-	h0 = dctx->h[0];
+-	h1 = dctx->h[1];
+-	h2 = dctx->h[2];
+-	h3 = dctx->h[3];
+-	h4 = dctx->h[4];
+-
+-	while (likely(srclen >= POLY1305_BLOCK_SIZE)) {
+-
+-		/* h += m[i] */
+-		h0 += (get_unaligned_le32(src +  0) >> 0) & 0x3ffffff;
+-		h1 += (get_unaligned_le32(src +  3) >> 2) & 0x3ffffff;
+-		h2 += (get_unaligned_le32(src +  6) >> 4) & 0x3ffffff;
+-		h3 += (get_unaligned_le32(src +  9) >> 6) & 0x3ffffff;
+-		h4 += (get_unaligned_le32(src + 12) >> 8) | hibit;
+-
+-		/* h *= r */
+-		d0 = mlt(h0, r0) + mlt(h1, s4) + mlt(h2, s3) +
+-		     mlt(h3, s2) + mlt(h4, s1);
+-		d1 = mlt(h0, r1) + mlt(h1, r0) + mlt(h2, s4) +
+-		     mlt(h3, s3) + mlt(h4, s2);
+-		d2 = mlt(h0, r2) + mlt(h1, r1) + mlt(h2, r0) +
+-		     mlt(h3, s4) + mlt(h4, s3);
+-		d3 = mlt(h0, r3) + mlt(h1, r2) + mlt(h2, r1) +
+-		     mlt(h3, r0) + mlt(h4, s4);
+-		d4 = mlt(h0, r4) + mlt(h1, r3) + mlt(h2, r2) +
+-		     mlt(h3, r1) + mlt(h4, r0);
+-
+-		/* (partial) h %= p */
+-		d1 += sr(d0, 26);     h0 = and(d0, 0x3ffffff);
+-		d2 += sr(d1, 26);     h1 = and(d1, 0x3ffffff);
+-		d3 += sr(d2, 26);     h2 = and(d2, 0x3ffffff);
+-		d4 += sr(d3, 26);     h3 = and(d3, 0x3ffffff);
+-		h0 += sr(d4, 26) * 5; h4 = and(d4, 0x3ffffff);
+-		h1 += h0 >> 26;       h0 = h0 & 0x3ffffff;
+-
+-		src += POLY1305_BLOCK_SIZE;
+-		srclen -= POLY1305_BLOCK_SIZE;
+-	}
+-
+-	dctx->h[0] = h0;
+-	dctx->h[1] = h1;
+-	dctx->h[2] = h2;
+-	dctx->h[3] = h3;
+-	dctx->h[4] = h4;
+-
+-	return srclen;
+-}
+-
+-int crypto_poly1305_update(struct shash_desc *desc,
+-			   const u8 *src, unsigned int srclen)
+-{
+-	struct poly1305_desc_ctx *dctx = shash_desc_ctx(desc);
+-	unsigned int bytes;
+-
+-	if (unlikely(dctx->buflen)) {
+-		bytes = min(srclen, POLY1305_BLOCK_SIZE - dctx->buflen);
+-		memcpy(dctx->buf + dctx->buflen, src, bytes);
+-		src += bytes;
+-		srclen -= bytes;
+-		dctx->buflen += bytes;
+-
+-		if (dctx->buflen == POLY1305_BLOCK_SIZE) {
+-			poly1305_blocks(dctx, dctx->buf,
+-					POLY1305_BLOCK_SIZE, 1 << 24);
+-			dctx->buflen = 0;
+-		}
+-	}
+-
+-	if (likely(srclen >= POLY1305_BLOCK_SIZE)) {
+-		bytes = poly1305_blocks(dctx, src, srclen, 1 << 24);
+-		src += srclen - bytes;
+-		srclen = bytes;
+-	}
+-
+-	if (unlikely(srclen)) {
+-		dctx->buflen = srclen;
+-		memcpy(dctx->buf, src, srclen);
+-	}
+-
+-	return 0;
+-}
+-EXPORT_SYMBOL_GPL(crypto_poly1305_update);
+-
+-int crypto_poly1305_final(struct shash_desc *desc, u8 *dst)
+-{
+-	struct poly1305_desc_ctx *dctx = shash_desc_ctx(desc);
+-	u32 h0, h1, h2, h3, h4;
+-	u32 g0, g1, g2, g3, g4;
+-	u32 mask;
+-	u64 f = 0;
+-
+-	if (unlikely(!dctx->sset))
+-		return -ENOKEY;
+-
+-	if (unlikely(dctx->buflen)) {
+-		dctx->buf[dctx->buflen++] = 1;
+-		memset(dctx->buf + dctx->buflen, 0,
+-		       POLY1305_BLOCK_SIZE - dctx->buflen);
+-		poly1305_blocks(dctx, dctx->buf, POLY1305_BLOCK_SIZE, 0);
+-	}
+-
+-	/* fully carry h */
+-	h0 = dctx->h[0];
+-	h1 = dctx->h[1];
+-	h2 = dctx->h[2];
+-	h3 = dctx->h[3];
+-	h4 = dctx->h[4];
+-
+-	h2 += (h1 >> 26);     h1 = h1 & 0x3ffffff;
+-	h3 += (h2 >> 26);     h2 = h2 & 0x3ffffff;
+-	h4 += (h3 >> 26);     h3 = h3 & 0x3ffffff;
+-	h0 += (h4 >> 26) * 5; h4 = h4 & 0x3ffffff;
+-	h1 += (h0 >> 26);     h0 = h0 & 0x3ffffff;
+-
+-	/* compute h + -p */
+-	g0 = h0 + 5;
+-	g1 = h1 + (g0 >> 26);             g0 &= 0x3ffffff;
+-	g2 = h2 + (g1 >> 26);             g1 &= 0x3ffffff;
+-	g3 = h3 + (g2 >> 26);             g2 &= 0x3ffffff;
+-	g4 = h4 + (g3 >> 26) - (1 << 26); g3 &= 0x3ffffff;
+-
+-	/* select h if h < p, or h + -p if h >= p */
+-	mask = (g4 >> ((sizeof(u32) * 8) - 1)) - 1;
+-	g0 &= mask;
+-	g1 &= mask;
+-	g2 &= mask;
+-	g3 &= mask;
+-	g4 &= mask;
+-	mask = ~mask;
+-	h0 = (h0 & mask) | g0;
+-	h1 = (h1 & mask) | g1;
+-	h2 = (h2 & mask) | g2;
+-	h3 = (h3 & mask) | g3;
+-	h4 = (h4 & mask) | g4;
+-
+-	/* h = h % (2^128) */
+-	h0 = (h0 >>  0) | (h1 << 26);
+-	h1 = (h1 >>  6) | (h2 << 20);
+-	h2 = (h2 >> 12) | (h3 << 14);
+-	h3 = (h3 >> 18) | (h4 <<  8);
+-
+-	/* mac = (h + s) % (2^128) */
+-	f = (f >> 32) + h0 + dctx->s[0]; put_unaligned_le32(f, dst +  0);
+-	f = (f >> 32) + h1 + dctx->s[1]; put_unaligned_le32(f, dst +  4);
+-	f = (f >> 32) + h2 + dctx->s[2]; put_unaligned_le32(f, dst +  8);
+-	f = (f >> 32) + h3 + dctx->s[3]; put_unaligned_le32(f, dst + 12);
+-
+-	return 0;
+-}
+-EXPORT_SYMBOL_GPL(crypto_poly1305_final);
+-
+-static struct shash_alg poly1305_alg = {
+-	.digestsize	= POLY1305_DIGEST_SIZE,
+-	.init		= crypto_poly1305_init,
+-	.update		= crypto_poly1305_update,
+-	.final		= crypto_poly1305_final,
+-	.descsize	= sizeof(struct poly1305_desc_ctx),
+-	.base		= {
+-		.cra_name		= "poly1305",
+-		.cra_driver_name	= "poly1305-generic",
+-		.cra_priority		= 100,
+-		.cra_blocksize		= POLY1305_BLOCK_SIZE,
+-		.cra_module		= THIS_MODULE,
+-	},
+-};
+-
+-static int __init poly1305_mod_init(void)
+-{
+-	return crypto_register_shash(&poly1305_alg);
+-}
+-
+-static void __exit poly1305_mod_exit(void)
+-{
+-	crypto_unregister_shash(&poly1305_alg);
+-}
+-
+-module_init(poly1305_mod_init);
+-module_exit(poly1305_mod_exit);
+-
+-MODULE_LICENSE("GPL");
+-MODULE_AUTHOR("Martin Willi <martin@strongswan.org>");
+-MODULE_DESCRIPTION("Poly1305 authenticator");
+-MODULE_ALIAS_CRYPTO("poly1305");
+-MODULE_ALIAS_CRYPTO("poly1305-generic");
+diff --git a/crypto/poly1305_zinc.c b/crypto/poly1305_zinc.c
 new file mode 100644
-index 000000000000..1b9b71922a82
+index 000000000000..4794442edf26
 --- /dev/null
-+++ b/lib/zinc/curve25519/curve25519-x86_64-glue.h
-@@ -0,0 +1,46 @@
-+/* SPDX-License-Identifier: MIT
++++ b/crypto/poly1305_zinc.c
+@@ -0,0 +1,98 @@
++/* SPDX-License-Identifier: GPL-2.0
 + *
-+ * Copyright (C) 2015-2018 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
-+ */
-+
-+#include <asm/cpufeature.h>
-+#include <asm/processor.h>
-+
-+#include "curve25519-x86_64.h"
-+
-+static bool curve25519_use_bmi2 __ro_after_init;
-+static bool curve25519_use_adx __ro_after_init;
-+
-+static void __init curve25519_fpu_init(void)
-+{
-+	curve25519_use_bmi2 = boot_cpu_has(X86_FEATURE_BMI2);
-+	curve25519_use_adx = boot_cpu_has(X86_FEATURE_BMI2) &&
-+			     boot_cpu_has(X86_FEATURE_ADX);
-+}
-+
-+static inline bool curve25519_arch(u8 mypublic[CURVE25519_POINT_SIZE],
-+				   const u8 secret[CURVE25519_POINT_SIZE],
-+				   const u8 basepoint[CURVE25519_POINT_SIZE])
-+{
-+	if (curve25519_use_adx) {
-+		curve25519_adx(mypublic, secret, basepoint);
-+		return true;
-+	} else if (curve25519_use_bmi2) {
-+		curve25519_bmi2(mypublic, secret, basepoint);
-+		return true;
-+	}
-+	return false;
-+}
-+
-+static inline bool curve25519_base_arch(u8 pub[CURVE25519_POINT_SIZE],
-+					const u8 secret[CURVE25519_POINT_SIZE])
-+{
-+	if (curve25519_use_adx) {
-+		curve25519_adx_base(pub, secret);
-+		return true;
-+	} else if (curve25519_use_bmi2) {
-+		curve25519_bmi2_base(pub, secret);
-+		return true;
-+	}
-+	return false;
-+}
-diff --git a/lib/zinc/curve25519/curve25519-x86_64.h b/lib/zinc/curve25519/curve25519-x86_64.h
-new file mode 100644
-index 000000000000..76ba7d906a1a
---- /dev/null
-+++ b/lib/zinc/curve25519/curve25519-x86_64.h
-@@ -0,0 +1,2333 @@
-+/* SPDX-License-Identifier: LGPL-2.1
-+ *
-+ * Copyright (c) 2017 Armando Faz <armfazh@ic.unicamp.br>. All Rights Reserved.
 + * Copyright (C) 2018 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
-+ * Copyright (C) 2018 Samuel Neves <sneves@dei.uc.pt>. All Rights Reserved.
 + */
 +
-+enum { NUM_WORDS_ELTFP25519 = 4 };
-+typedef __aligned(32) u64 eltfp25519_1w[NUM_WORDS_ELTFP25519];
-+typedef __aligned(32) u64 eltfp25519_1w_buffer[2 * NUM_WORDS_ELTFP25519];
++#include <crypto/algapi.h>
++#include <crypto/internal/hash.h>
++#include <zinc/poly1305.h>
++#include <linux/crypto.h>
++#include <linux/kernel.h>
++#include <linux/module.h>
++#include <linux/simd.h>
 +
-+#define mul_eltfp25519_1w_adx(c, a, b) do { \
-+	mul_256x256_integer_adx(m.buffer, a, b); \
-+	red_eltfp25519_1w_adx(c, m.buffer); \
-+} while (0)
-+
-+#define mul_eltfp25519_1w_bmi2(c, a, b) do { \
-+	mul_256x256_integer_bmi2(m.buffer, a, b); \
-+	red_eltfp25519_1w_bmi2(c, m.buffer); \
-+} while (0)
-+
-+#define sqr_eltfp25519_1w_adx(a) do { \
-+	sqr_256x256_integer_adx(m.buffer, a); \
-+	red_eltfp25519_1w_adx(a, m.buffer); \
-+} while (0)
-+
-+#define sqr_eltfp25519_1w_bmi2(a) do { \
-+	sqr_256x256_integer_bmi2(m.buffer, a); \
-+	red_eltfp25519_1w_bmi2(a, m.buffer); \
-+} while (0)
-+
-+#define mul_eltfp25519_2w_adx(c, a, b) do { \
-+	mul2_256x256_integer_adx(m.buffer, a, b); \
-+	red_eltfp25519_2w_adx(c, m.buffer); \
-+} while (0)
-+
-+#define mul_eltfp25519_2w_bmi2(c, a, b) do { \
-+	mul2_256x256_integer_bmi2(m.buffer, a, b); \
-+	red_eltfp25519_2w_bmi2(c, m.buffer); \
-+} while (0)
-+
-+#define sqr_eltfp25519_2w_adx(a) do { \
-+	sqr2_256x256_integer_adx(m.buffer, a); \
-+	red_eltfp25519_2w_adx(a, m.buffer); \
-+} while (0)
-+
-+#define sqr_eltfp25519_2w_bmi2(a) do { \
-+	sqr2_256x256_integer_bmi2(m.buffer, a); \
-+	red_eltfp25519_2w_bmi2(a, m.buffer); \
-+} while (0)
-+
-+#define sqrn_eltfp25519_1w_adx(a, times) do { \
-+	int ____counter = (times); \
-+	while (____counter-- > 0) \
-+		sqr_eltfp25519_1w_adx(a); \
-+} while (0)
-+
-+#define sqrn_eltfp25519_1w_bmi2(a, times) do { \
-+	int ____counter = (times); \
-+	while (____counter-- > 0) \
-+		sqr_eltfp25519_1w_bmi2(a); \
-+} while (0)
-+
-+#define copy_eltfp25519_1w(C, A) do { \
-+	(C)[0] = (A)[0]; \
-+	(C)[1] = (A)[1]; \
-+	(C)[2] = (A)[2]; \
-+	(C)[3] = (A)[3]; \
-+} while (0)
-+
-+#define setzero_eltfp25519_1w(C) do { \
-+	(C)[0] = 0; \
-+	(C)[1] = 0; \
-+	(C)[2] = 0; \
-+	(C)[3] = 0; \
-+} while (0)
-+
-+__aligned(32) static const u64 table_ladder_8k[252 * NUM_WORDS_ELTFP25519] = {
-+	/*   1 */ 0xfffffffffffffff3UL, 0xffffffffffffffffUL,
-+		  0xffffffffffffffffUL, 0x5fffffffffffffffUL,
-+	/*   2 */ 0x6b8220f416aafe96UL, 0x82ebeb2b4f566a34UL,
-+		  0xd5a9a5b075a5950fUL, 0x5142b2cf4b2488f4UL,
-+	/*   3 */ 0x6aaebc750069680cUL, 0x89cf7820a0f99c41UL,
-+		  0x2a58d9183b56d0f4UL, 0x4b5aca80e36011a4UL,
-+	/*   4 */ 0x329132348c29745dUL, 0xf4a2e616e1642fd7UL,
-+		  0x1e45bb03ff67bc34UL, 0x306912d0f42a9b4aUL,
-+	/*   5 */ 0xff886507e6af7154UL, 0x04f50e13dfeec82fUL,
-+		  0xaa512fe82abab5ceUL, 0x174e251a68d5f222UL,
-+	/*   6 */ 0xcf96700d82028898UL, 0x1743e3370a2c02c5UL,
-+		  0x379eec98b4e86eaaUL, 0x0c59888a51e0482eUL,
-+	/*   7 */ 0xfbcbf1d699b5d189UL, 0xacaef0d58e9fdc84UL,
-+		  0xc1c20d06231f7614UL, 0x2938218da274f972UL,
-+	/*   8 */ 0xf6af49beff1d7f18UL, 0xcc541c22387ac9c2UL,
-+		  0x96fcc9ef4015c56bUL, 0x69c1627c690913a9UL,
-+	/*   9 */ 0x7a86fd2f4733db0eUL, 0xfdb8c4f29e087de9UL,
-+		  0x095e4b1a8ea2a229UL, 0x1ad7a7c829b37a79UL,
-+	/*  10 */ 0x342d89cad17ea0c0UL, 0x67bedda6cced2051UL,
-+		  0x19ca31bf2bb42f74UL, 0x3df7b4c84980acbbUL,
-+	/*  11 */ 0xa8c6444dc80ad883UL, 0xb91e440366e3ab85UL,
-+		  0xc215cda00164f6d8UL, 0x3d867c6ef247e668UL,
-+	/*  12 */ 0xc7dd582bcc3e658cUL, 0xfd2c4748ee0e5528UL,
-+		  0xa0fd9b95cc9f4f71UL, 0x7529d871b0675ddfUL,
-+	/*  13 */ 0xb8f568b42d3cbd78UL, 0x1233011b91f3da82UL,
-+		  0x2dce6ccd4a7c3b62UL, 0x75e7fc8e9e498603UL,
-+	/*  14 */ 0x2f4f13f1fcd0b6ecUL, 0xf1a8ca1f29ff7a45UL,
-+		  0xc249c1a72981e29bUL, 0x6ebe0dbb8c83b56aUL,
-+	/*  15 */ 0x7114fa8d170bb222UL, 0x65a2dcd5bf93935fUL,
-+		  0xbdc41f68b59c979aUL, 0x2f0eef79a2ce9289UL,
-+	/*  16 */ 0x42ecbf0c083c37ceUL, 0x2930bc09ec496322UL,
-+		  0xf294b0c19cfeac0dUL, 0x3780aa4bedfabb80UL,
-+	/*  17 */ 0x56c17d3e7cead929UL, 0xe7cb4beb2e5722c5UL,
-+		  0x0ce931732dbfe15aUL, 0x41b883c7621052f8UL,
-+	/*  18 */ 0xdbf75ca0c3d25350UL, 0x2936be086eb1e351UL,
-+		  0xc936e03cb4a9b212UL, 0x1d45bf82322225aaUL,
-+	/*  19 */ 0xe81ab1036a024cc5UL, 0xe212201c304c9a72UL,
-+		  0xc5d73fba6832b1fcUL, 0x20ffdb5a4d839581UL,
-+	/*  20 */ 0xa283d367be5d0fadUL, 0x6c2b25ca8b164475UL,
-+		  0x9d4935467caaf22eUL, 0x5166408eee85ff49UL,
-+	/*  21 */ 0x3c67baa2fab4e361UL, 0xb3e433c67ef35cefUL,
-+		  0x5259729241159b1cUL, 0x6a621892d5b0ab33UL,
-+	/*  22 */ 0x20b74a387555cdcbUL, 0x532aa10e1208923fUL,
-+		  0xeaa17b7762281dd1UL, 0x61ab3443f05c44bfUL,
-+	/*  23 */ 0x257a6c422324def8UL, 0x131c6c1017e3cf7fUL,
-+		  0x23758739f630a257UL, 0x295a407a01a78580UL,
-+	/*  24 */ 0xf8c443246d5da8d9UL, 0x19d775450c52fa5dUL,
-+		  0x2afcfc92731bf83dUL, 0x7d10c8e81b2b4700UL,
-+	/*  25 */ 0xc8e0271f70baa20bUL, 0x993748867ca63957UL,
-+		  0x5412efb3cb7ed4bbUL, 0x3196d36173e62975UL,
-+	/*  26 */ 0xde5bcad141c7dffcUL, 0x47cc8cd2b395c848UL,
-+		  0xa34cd942e11af3cbUL, 0x0256dbf2d04ecec2UL,
-+	/*  27 */ 0x875ab7e94b0e667fUL, 0xcad4dd83c0850d10UL,
-+		  0x47f12e8f4e72c79fUL, 0x5f1a87bb8c85b19bUL,
-+	/*  28 */ 0x7ae9d0b6437f51b8UL, 0x12c7ce5518879065UL,
-+		  0x2ade09fe5cf77aeeUL, 0x23a05a2f7d2c5627UL,
-+	/*  29 */ 0x5908e128f17c169aUL, 0xf77498dd8ad0852dUL,
-+		  0x74b4c4ceab102f64UL, 0x183abadd10139845UL,
-+	/*  30 */ 0xb165ba8daa92aaacUL, 0xd5c5ef9599386705UL,
-+		  0xbe2f8f0cf8fc40d1UL, 0x2701e635ee204514UL,
-+	/*  31 */ 0x629fa80020156514UL, 0xf223868764a8c1ceUL,
-+		  0x5b894fff0b3f060eUL, 0x60d9944cf708a3faUL,
-+	/*  32 */ 0xaeea001a1c7a201fUL, 0xebf16a633ee2ce63UL,
-+		  0x6f7709594c7a07e1UL, 0x79b958150d0208cbUL,
-+	/*  33 */ 0x24b55e5301d410e7UL, 0xe3a34edff3fdc84dUL,
-+		  0xd88768e4904032d8UL, 0x131384427b3aaeecUL,
-+	/*  34 */ 0x8405e51286234f14UL, 0x14dc4739adb4c529UL,
-+		  0xb8a2b5b250634ffdUL, 0x2fe2a94ad8a7ff93UL,
-+	/*  35 */ 0xec5c57efe843faddUL, 0x2843ce40f0bb9918UL,
-+		  0xa4b561d6cf3d6305UL, 0x743629bde8fb777eUL,
-+	/*  36 */ 0x343edd46bbaf738fUL, 0xed981828b101a651UL,
-+		  0xa401760b882c797aUL, 0x1fc223e28dc88730UL,
-+	/*  37 */ 0x48604e91fc0fba0eUL, 0xb637f78f052c6fa4UL,
-+		  0x91ccac3d09e9239cUL, 0x23f7eed4437a687cUL,
-+	/*  38 */ 0x5173b1118d9bd800UL, 0x29d641b63189d4a7UL,
-+		  0xfdbf177988bbc586UL, 0x2959894fcad81df5UL,
-+	/*  39 */ 0xaebc8ef3b4bbc899UL, 0x4148995ab26992b9UL,
-+		  0x24e20b0134f92cfbUL, 0x40d158894a05dee8UL,
-+	/*  40 */ 0x46b00b1185af76f6UL, 0x26bac77873187a79UL,
-+		  0x3dc0bf95ab8fff5fUL, 0x2a608bd8945524d7UL,
-+	/*  41 */ 0x26449588bd446302UL, 0x7c4bc21c0388439cUL,
-+		  0x8e98a4f383bd11b2UL, 0x26218d7bc9d876b9UL,
-+	/*  42 */ 0xe3081542997c178aUL, 0x3c2d29a86fb6606fUL,
-+		  0x5c217736fa279374UL, 0x7dde05734afeb1faUL,
-+	/*  43 */ 0x3bf10e3906d42babUL, 0xe4f7803e1980649cUL,
-+		  0xe6053bf89595bf7aUL, 0x394faf38da245530UL,
-+	/*  44 */ 0x7a8efb58896928f4UL, 0xfbc778e9cc6a113cUL,
-+		  0x72670ce330af596fUL, 0x48f222a81d3d6cf7UL,
-+	/*  45 */ 0xf01fce410d72caa7UL, 0x5a20ecc7213b5595UL,
-+		  0x7bc21165c1fa1483UL, 0x07f89ae31da8a741UL,
-+	/*  46 */ 0x05d2c2b4c6830ff9UL, 0xd43e330fc6316293UL,
-+		  0xa5a5590a96d3a904UL, 0x705edb91a65333b6UL,
-+	/*  47 */ 0x048ee15e0bb9a5f7UL, 0x3240cfca9e0aaf5dUL,
-+		  0x8f4b71ceedc4a40bUL, 0x621c0da3de544a6dUL,
-+	/*  48 */ 0x92872836a08c4091UL, 0xce8375b010c91445UL,
-+		  0x8a72eb524f276394UL, 0x2667fcfa7ec83635UL,
-+	/*  49 */ 0x7f4c173345e8752aUL, 0x061b47feee7079a5UL,
-+		  0x25dd9afa9f86ff34UL, 0x3780cef5425dc89cUL,
-+	/*  50 */ 0x1a46035a513bb4e9UL, 0x3e1ef379ac575adaUL,
-+		  0xc78c5f1c5fa24b50UL, 0x321a967634fd9f22UL,
-+	/*  51 */ 0x946707b8826e27faUL, 0x3dca84d64c506fd0UL,
-+		  0xc189218075e91436UL, 0x6d9284169b3b8484UL,
-+	/*  52 */ 0x3a67e840383f2ddfUL, 0x33eec9a30c4f9b75UL,
-+		  0x3ec7c86fa783ef47UL, 0x26ec449fbac9fbc4UL,
-+	/*  53 */ 0x5c0f38cba09b9e7dUL, 0x81168cc762a3478cUL,
-+		  0x3e23b0d306fc121cUL, 0x5a238aa0a5efdcddUL,
-+	/*  54 */ 0x1ba26121c4ea43ffUL, 0x36f8c77f7c8832b5UL,
-+		  0x88fbea0b0adcf99aUL, 0x5ca9938ec25bebf9UL,
-+	/*  55 */ 0xd5436a5e51fccda0UL, 0x1dbc4797c2cd893bUL,
-+		  0x19346a65d3224a08UL, 0x0f5034e49b9af466UL,
-+	/*  56 */ 0xf23c3967a1e0b96eUL, 0xe58b08fa867a4d88UL,
-+		  0xfb2fabc6a7341679UL, 0x2a75381eb6026946UL,
-+	/*  57 */ 0xc80a3be4c19420acUL, 0x66b1f6c681f2b6dcUL,
-+		  0x7cf7036761e93388UL, 0x25abbbd8a660a4c4UL,
-+	/*  58 */ 0x91ea12ba14fd5198UL, 0x684950fc4a3cffa9UL,
-+		  0xf826842130f5ad28UL, 0x3ea988f75301a441UL,
-+	/*  59 */ 0xc978109a695f8c6fUL, 0x1746eb4a0530c3f3UL,
-+		  0x444d6d77b4459995UL, 0x75952b8c054e5cc7UL,
-+	/*  60 */ 0xa3703f7915f4d6aaUL, 0x66c346202f2647d8UL,
-+		  0xd01469df811d644bUL, 0x77fea47d81a5d71fUL,
-+	/*  61 */ 0xc5e9529ef57ca381UL, 0x6eeeb4b9ce2f881aUL,
-+		  0xb6e91a28e8009bd6UL, 0x4b80be3e9afc3fecUL,
-+	/*  62 */ 0x7e3773c526aed2c5UL, 0x1b4afcb453c9a49dUL,
-+		  0xa920bdd7baffb24dUL, 0x7c54699f122d400eUL,
-+	/*  63 */ 0xef46c8e14fa94bc8UL, 0xe0b074ce2952ed5eUL,
-+		  0xbea450e1dbd885d5UL, 0x61b68649320f712cUL,
-+	/*  64 */ 0x8a485f7309ccbdd1UL, 0xbd06320d7d4d1a2dUL,
-+		  0x25232973322dbef4UL, 0x445dc4758c17f770UL,
-+	/*  65 */ 0xdb0434177cc8933cUL, 0xed6fe82175ea059fUL,
-+		  0x1efebefdc053db34UL, 0x4adbe867c65daf99UL,
-+	/*  66 */ 0x3acd71a2a90609dfUL, 0xe5e991856dd04050UL,
-+		  0x1ec69b688157c23cUL, 0x697427f6885cfe4dUL,
-+	/*  67 */ 0xd7be7b9b65e1a851UL, 0xa03d28d522c536ddUL,
-+		  0x28399d658fd2b645UL, 0x49e5b7e17c2641e1UL,
-+	/*  68 */ 0x6f8c3a98700457a4UL, 0x5078f0a25ebb6778UL,
-+		  0xd13c3ccbc382960fUL, 0x2e003258a7df84b1UL,
-+	/*  69 */ 0x8ad1f39be6296a1cUL, 0xc1eeaa652a5fbfb2UL,
-+		  0x33ee0673fd26f3cbUL, 0x59256173a69d2cccUL,
-+	/*  70 */ 0x41ea07aa4e18fc41UL, 0xd9fc19527c87a51eUL,
-+		  0xbdaacb805831ca6fUL, 0x445b652dc916694fUL,
-+	/*  71 */ 0xce92a3a7f2172315UL, 0x1edc282de11b9964UL,
-+		  0xa1823aafe04c314aUL, 0x790a2d94437cf586UL,
-+	/*  72 */ 0x71c447fb93f6e009UL, 0x8922a56722845276UL,
-+		  0xbf70903b204f5169UL, 0x2f7a89891ba319feUL,
-+	/*  73 */ 0x02a08eb577e2140cUL, 0xed9a4ed4427bdcf4UL,
-+		  0x5253ec44e4323cd1UL, 0x3e88363c14e9355bUL,
-+	/*  74 */ 0xaa66c14277110b8cUL, 0x1ae0391610a23390UL,
-+		  0x2030bd12c93fc2a2UL, 0x3ee141579555c7abUL,
-+	/*  75 */ 0x9214de3a6d6e7d41UL, 0x3ccdd88607f17efeUL,
-+		  0x674f1288f8e11217UL, 0x5682250f329f93d0UL,
-+	/*  76 */ 0x6cf00b136d2e396eUL, 0x6e4cf86f1014debfUL,
-+		  0x5930b1b5bfcc4e83UL, 0x047069b48aba16b6UL,
-+	/*  77 */ 0x0d4ce4ab69b20793UL, 0xb24db91a97d0fb9eUL,
-+		  0xcdfa50f54e00d01dUL, 0x221b1085368bddb5UL,
-+	/*  78 */ 0xe7e59468b1e3d8d2UL, 0x53c56563bd122f93UL,
-+		  0xeee8a903e0663f09UL, 0x61efa662cbbe3d42UL,
-+	/*  79 */ 0x2cf8ddddde6eab2aUL, 0x9bf80ad51435f231UL,
-+		  0x5deadacec9f04973UL, 0x29275b5d41d29b27UL,
-+	/*  80 */ 0xcfde0f0895ebf14fUL, 0xb9aab96b054905a7UL,
-+		  0xcae80dd9a1c420fdUL, 0x0a63bf2f1673bbc7UL,
-+	/*  81 */ 0x092f6e11958fbc8cUL, 0x672a81e804822fadUL,
-+		  0xcac8351560d52517UL, 0x6f3f7722c8f192f8UL,
-+	/*  82 */ 0xf8ba90ccc2e894b7UL, 0x2c7557a438ff9f0dUL,
-+		  0x894d1d855ae52359UL, 0x68e122157b743d69UL,
-+	/*  83 */ 0xd87e5570cfb919f3UL, 0x3f2cdecd95798db9UL,
-+		  0x2121154710c0a2ceUL, 0x3c66a115246dc5b2UL,
-+	/*  84 */ 0xcbedc562294ecb72UL, 0xba7143c36a280b16UL,
-+		  0x9610c2efd4078b67UL, 0x6144735d946a4b1eUL,
-+	/*  85 */ 0x536f111ed75b3350UL, 0x0211db8c2041d81bUL,
-+		  0xf93cb1000e10413cUL, 0x149dfd3c039e8876UL,
-+	/*  86 */ 0xd479dde46b63155bUL, 0xb66e15e93c837976UL,
-+		  0xdafde43b1f13e038UL, 0x5fafda1a2e4b0b35UL,
-+	/*  87 */ 0x3600bbdf17197581UL, 0x3972050bbe3cd2c2UL,
-+		  0x5938906dbdd5be86UL, 0x34fce5e43f9b860fUL,
-+	/*  88 */ 0x75a8a4cd42d14d02UL, 0x828dabc53441df65UL,
-+		  0x33dcabedd2e131d3UL, 0x3ebad76fb814d25fUL,
-+	/*  89 */ 0xd4906f566f70e10fUL, 0x5d12f7aa51690f5aUL,
-+		  0x45adb16e76cefcf2UL, 0x01f768aead232999UL,
-+	/*  90 */ 0x2b6cc77b6248febdUL, 0x3cd30628ec3aaffdUL,
-+		  0xce1c0b80d4ef486aUL, 0x4c3bff2ea6f66c23UL,
-+	/*  91 */ 0x3f2ec4094aeaeb5fUL, 0x61b19b286e372ca7UL,
-+		  0x5eefa966de2a701dUL, 0x23b20565de55e3efUL,
-+	/*  92 */ 0xe301ca5279d58557UL, 0x07b2d4ce27c2874fUL,
-+		  0xa532cd8a9dcf1d67UL, 0x2a52fee23f2bff56UL,
-+	/*  93 */ 0x8624efb37cd8663dUL, 0xbbc7ac20ffbd7594UL,
-+		  0x57b85e9c82d37445UL, 0x7b3052cb86a6ec66UL,
-+	/*  94 */ 0x3482f0ad2525e91eUL, 0x2cb68043d28edca0UL,
-+		  0xaf4f6d052e1b003aUL, 0x185f8c2529781b0aUL,
-+	/*  95 */ 0xaa41de5bd80ce0d6UL, 0x9407b2416853e9d6UL,
-+		  0x563ec36e357f4c3aUL, 0x4cc4b8dd0e297bceUL,
-+	/*  96 */ 0xa2fc1a52ffb8730eUL, 0x1811f16e67058e37UL,
-+		  0x10f9a366cddf4ee1UL, 0x72f4a0c4a0b9f099UL,
-+	/*  97 */ 0x8c16c06f663f4ea7UL, 0x693b3af74e970fbaUL,
-+		  0x2102e7f1d69ec345UL, 0x0ba53cbc968a8089UL,
-+	/*  98 */ 0xca3d9dc7fea15537UL, 0x4c6824bb51536493UL,
-+		  0xb9886314844006b1UL, 0x40d2a72ab454cc60UL,
-+	/*  99 */ 0x5936a1b712570975UL, 0x91b9d648debda657UL,
-+		  0x3344094bb64330eaUL, 0x006ba10d12ee51d0UL,
-+	/* 100 */ 0x19228468f5de5d58UL, 0x0eb12f4c38cc05b0UL,
-+		  0xa1039f9dd5601990UL, 0x4502d4ce4fff0e0bUL,
-+	/* 101 */ 0xeb2054106837c189UL, 0xd0f6544c6dd3b93cUL,
-+		  0x40727064c416d74fUL, 0x6e15c6114b502ef0UL,
-+	/* 102 */ 0x4df2a398cfb1a76bUL, 0x11256c7419f2f6b1UL,
-+		  0x4a497962066e6043UL, 0x705b3aab41355b44UL,
-+	/* 103 */ 0x365ef536d797b1d8UL, 0x00076bd622ddf0dbUL,
-+		  0x3bbf33b0e0575a88UL, 0x3777aa05c8e4ca4dUL,
-+	/* 104 */ 0x392745c85578db5fUL, 0x6fda4149dbae5ae2UL,
-+		  0xb1f0b00b8adc9867UL, 0x09963437d36f1da3UL,
-+	/* 105 */ 0x7e824e90a5dc3853UL, 0xccb5f6641f135cbdUL,
-+		  0x6736d86c87ce8fccUL, 0x625f3ce26604249fUL,
-+	/* 106 */ 0xaf8ac8059502f63fUL, 0x0c05e70a2e351469UL,
-+		  0x35292e9c764b6305UL, 0x1a394360c7e23ac3UL,
-+	/* 107 */ 0xd5c6d53251183264UL, 0x62065abd43c2b74fUL,
-+		  0xb5fbf5d03b973f9bUL, 0x13a3da3661206e5eUL,
-+	/* 108 */ 0xc6bd5837725d94e5UL, 0x18e30912205016c5UL,
-+		  0x2088ce1570033c68UL, 0x7fba1f495c837987UL,
-+	/* 109 */ 0x5a8c7423f2f9079dUL, 0x1735157b34023fc5UL,
-+		  0xe4f9b49ad2fab351UL, 0x6691ff72c878e33cUL,
-+	/* 110 */ 0x122c2adedc5eff3eUL, 0xf8dd4bf1d8956cf4UL,
-+		  0xeb86205d9e9e5bdaUL, 0x049b92b9d975c743UL,
-+	/* 111 */ 0xa5379730b0f6c05aUL, 0x72a0ffacc6f3a553UL,
-+		  0xb0032c34b20dcd6dUL, 0x470e9dbc88d5164aUL,
-+	/* 112 */ 0xb19cf10ca237c047UL, 0xb65466711f6c81a2UL,
-+		  0xb3321bd16dd80b43UL, 0x48c14f600c5fbe8eUL,
-+	/* 113 */ 0x66451c264aa6c803UL, 0xb66e3904a4fa7da6UL,
-+		  0xd45f19b0b3128395UL, 0x31602627c3c9bc10UL,
-+	/* 114 */ 0x3120dc4832e4e10dUL, 0xeb20c46756c717f7UL,
-+		  0x00f52e3f67280294UL, 0x566d4fc14730c509UL,
-+	/* 115 */ 0x7e3a5d40fd837206UL, 0xc1e926dc7159547aUL,
-+		  0x216730fba68d6095UL, 0x22e8c3843f69cea7UL,
-+	/* 116 */ 0x33d074e8930e4b2bUL, 0xb6e4350e84d15816UL,
-+		  0x5534c26ad6ba2365UL, 0x7773c12f89f1f3f3UL,
-+	/* 117 */ 0x8cba404da57962aaUL, 0x5b9897a81999ce56UL,
-+		  0x508e862f121692fcUL, 0x3a81907fa093c291UL,
-+	/* 118 */ 0x0dded0ff4725a510UL, 0x10d8cc10673fc503UL,
-+		  0x5b9d151c9f1f4e89UL, 0x32a5c1d5cb09a44cUL,
-+	/* 119 */ 0x1e0aa442b90541fbUL, 0x5f85eb7cc1b485dbUL,
-+		  0xbee595ce8a9df2e5UL, 0x25e496c722422236UL,
-+	/* 120 */ 0x5edf3c46cd0fe5b9UL, 0x34e75a7ed2a43388UL,
-+		  0xe488de11d761e352UL, 0x0e878a01a085545cUL,
-+	/* 121 */ 0xba493c77e021bb04UL, 0x2b4d1843c7df899aUL,
-+		  0x9ea37a487ae80d67UL, 0x67a9958011e41794UL,
-+	/* 122 */ 0x4b58051a6697b065UL, 0x47e33f7d8d6ba6d4UL,
-+		  0xbb4da8d483ca46c1UL, 0x68becaa181c2db0dUL,
-+	/* 123 */ 0x8d8980e90b989aa5UL, 0xf95eb14a2c93c99bUL,
-+		  0x51c6c7c4796e73a2UL, 0x6e228363b5efb569UL,
-+	/* 124 */ 0xc6bbc0b02dd624c8UL, 0x777eb47dec8170eeUL,
-+		  0x3cde15a004cfafa9UL, 0x1dc6bc087160bf9bUL,
-+	/* 125 */ 0x2e07e043eec34002UL, 0x18e9fc677a68dc7fUL,
-+		  0xd8da03188bd15b9aUL, 0x48fbc3bb00568253UL,
-+	/* 126 */ 0x57547d4cfb654ce1UL, 0xd3565b82a058e2adUL,
-+		  0xf63eaf0bbf154478UL, 0x47531ef114dfbb18UL,
-+	/* 127 */ 0xe1ec630a4278c587UL, 0x5507d546ca8e83f3UL,
-+		  0x85e135c63adc0c2bUL, 0x0aa7efa85682844eUL,
-+	/* 128 */ 0x72691ba8b3e1f615UL, 0x32b4e9701fbe3ffaUL,
-+		  0x97b6d92e39bb7868UL, 0x2cfe53dea02e39e8UL,
-+	/* 129 */ 0x687392cd85cd52b0UL, 0x27ff66c910e29831UL,
-+		  0x97134556a9832d06UL, 0x269bb0360a84f8a0UL,
-+	/* 130 */ 0x706e55457643f85cUL, 0x3734a48c9b597d1bUL,
-+		  0x7aee91e8c6efa472UL, 0x5cd6abc198a9d9e0UL,
-+	/* 131 */ 0x0e04de06cb3ce41aUL, 0xd8c6eb893402e138UL,
-+		  0x904659bb686e3772UL, 0x7215c371746ba8c8UL,
-+	/* 132 */ 0xfd12a97eeae4a2d9UL, 0x9514b7516394f2c5UL,
-+		  0x266fd5809208f294UL, 0x5c847085619a26b9UL,
-+	/* 133 */ 0x52985410fed694eaUL, 0x3c905b934a2ed254UL,
-+		  0x10bb47692d3be467UL, 0x063b3d2d69e5e9e1UL,
-+	/* 134 */ 0x472726eedda57debUL, 0xefb6c4ae10f41891UL,
-+		  0x2b1641917b307614UL, 0x117c554fc4f45b7cUL,
-+	/* 135 */ 0xc07cf3118f9d8812UL, 0x01dbd82050017939UL,
-+		  0xd7e803f4171b2827UL, 0x1015e87487d225eaUL,
-+	/* 136 */ 0xc58de3fed23acc4dUL, 0x50db91c294a7be2dUL,
-+		  0x0b94d43d1c9cf457UL, 0x6b1640fa6e37524aUL,
-+	/* 137 */ 0x692f346c5fda0d09UL, 0x200b1c59fa4d3151UL,
-+		  0xb8c46f760777a296UL, 0x4b38395f3ffdfbcfUL,
-+	/* 138 */ 0x18d25e00be54d671UL, 0x60d50582bec8aba6UL,
-+		  0x87ad8f263b78b982UL, 0x50fdf64e9cda0432UL,
-+	/* 139 */ 0x90f567aac578dcf0UL, 0xef1e9b0ef2a3133bUL,
-+		  0x0eebba9242d9de71UL, 0x15473c9bf03101c7UL,
-+	/* 140 */ 0x7c77e8ae56b78095UL, 0xb678e7666e6f078eUL,
-+		  0x2da0b9615348ba1fUL, 0x7cf931c1ff733f0bUL,
-+	/* 141 */ 0x26b357f50a0a366cUL, 0xe9708cf42b87d732UL,
-+		  0xc13aeea5f91cb2c0UL, 0x35d90c991143bb4cUL,
-+	/* 142 */ 0x47c1c404a9a0d9dcUL, 0x659e58451972d251UL,
-+		  0x3875a8c473b38c31UL, 0x1fbd9ed379561f24UL,
-+	/* 143 */ 0x11fabc6fd41ec28dUL, 0x7ef8dfe3cd2a2dcaUL,
-+		  0x72e73b5d8c404595UL, 0x6135fa4954b72f27UL,
-+	/* 144 */ 0xccfc32a2de24b69cUL, 0x3f55698c1f095d88UL,
-+		  0xbe3350ed5ac3f929UL, 0x5e9bf806ca477eebUL,
-+	/* 145 */ 0xe9ce8fb63c309f68UL, 0x5376f63565e1f9f4UL,
-+		  0xd1afcfb35a6393f1UL, 0x6632a1ede5623506UL,
-+	/* 146 */ 0x0b7d6c390c2ded4cUL, 0x56cb3281df04cb1fUL,
-+		  0x66305a1249ecc3c7UL, 0x5d588b60a38ca72aUL,
-+	/* 147 */ 0xa6ecbf78e8e5f42dUL, 0x86eeb44b3c8a3eecUL,
-+		  0xec219c48fbd21604UL, 0x1aaf1af517c36731UL,
-+	/* 148 */ 0xc306a2836769bde7UL, 0x208280622b1e2adbUL,
-+		  0x8027f51ffbff94a6UL, 0x76cfa1ce1124f26bUL,
-+	/* 149 */ 0x18eb00562422abb6UL, 0xf377c4d58f8c29c3UL,
-+		  0x4dbbc207f531561aUL, 0x0253b7f082128a27UL,
-+	/* 150 */ 0x3d1f091cb62c17e0UL, 0x4860e1abd64628a9UL,
-+		  0x52d17436309d4253UL, 0x356f97e13efae576UL,
-+	/* 151 */ 0xd351e11aa150535bUL, 0x3e6b45bb1dd878ccUL,
-+		  0x0c776128bed92c98UL, 0x1d34ae93032885b8UL,
-+	/* 152 */ 0x4ba0488ca85ba4c3UL, 0x985348c33c9ce6ceUL,
-+		  0x66124c6f97bda770UL, 0x0f81a0290654124aUL,
-+	/* 153 */ 0x9ed09ca6569b86fdUL, 0x811009fd18af9a2dUL,
-+		  0xff08d03f93d8c20aUL, 0x52a148199faef26bUL,
-+	/* 154 */ 0x3e03f9dc2d8d1b73UL, 0x4205801873961a70UL,
-+		  0xc0d987f041a35970UL, 0x07aa1f15a1c0d549UL,
-+	/* 155 */ 0xdfd46ce08cd27224UL, 0x6d0a024f934e4239UL,
-+		  0x808a7a6399897b59UL, 0x0a4556e9e13d95a2UL,
-+	/* 156 */ 0xd21a991fe9c13045UL, 0x9b0e8548fe7751b8UL,
-+		  0x5da643cb4bf30035UL, 0x77db28d63940f721UL,
-+	/* 157 */ 0xfc5eeb614adc9011UL, 0x5229419ae8c411ebUL,
-+		  0x9ec3e7787d1dcf74UL, 0x340d053e216e4cb5UL,
-+	/* 158 */ 0xcac7af39b48df2b4UL, 0xc0faec2871a10a94UL,
-+		  0x140a69245ca575edUL, 0x0cf1c37134273a4cUL,
-+	/* 159 */ 0xc8ee306ac224b8a5UL, 0x57eaee7ccb4930b0UL,
-+		  0xa1e806bdaacbe74fUL, 0x7d9a62742eeb657dUL,
-+	/* 160 */ 0x9eb6b6ef546c4830UL, 0x885cca1fddb36e2eUL,
-+		  0xe6b9f383ef0d7105UL, 0x58654fef9d2e0412UL,
-+	/* 161 */ 0xa905c4ffbe0e8e26UL, 0x942de5df9b31816eUL,
-+		  0x497d723f802e88e1UL, 0x30684dea602f408dUL,
-+	/* 162 */ 0x21e5a278a3e6cb34UL, 0xaefb6e6f5b151dc4UL,
-+		  0xb30b8e049d77ca15UL, 0x28c3c9cf53b98981UL,
-+	/* 163 */ 0x287fb721556cdd2aUL, 0x0d317ca897022274UL,
-+		  0x7468c7423a543258UL, 0x4a7f11464eb5642fUL,
-+	/* 164 */ 0xa237a4774d193aa6UL, 0xd865986ea92129a1UL,
-+		  0x24c515ecf87c1a88UL, 0x604003575f39f5ebUL,
-+	/* 165 */ 0x47b9f189570a9b27UL, 0x2b98cede465e4b78UL,
-+		  0x026df551dbb85c20UL, 0x74fcd91047e21901UL,
-+	/* 166 */ 0x13e2a90a23c1bfa3UL, 0x0cb0074e478519f6UL,
-+		  0x5ff1cbbe3af6cf44UL, 0x67fe5438be812dbeUL,
-+	/* 167 */ 0xd13cf64fa40f05b0UL, 0x054dfb2f32283787UL,
-+		  0x4173915b7f0d2aeaUL, 0x482f144f1f610d4eUL,
-+	/* 168 */ 0xf6210201b47f8234UL, 0x5d0ae1929e70b990UL,
-+		  0xdcd7f455b049567cUL, 0x7e93d0f1f0916f01UL,
-+	/* 169 */ 0xdd79cbf18a7db4faUL, 0xbe8391bf6f74c62fUL,
-+		  0x027145d14b8291bdUL, 0x585a73ea2cbf1705UL,
-+	/* 170 */ 0x485ca03e928a0db2UL, 0x10fc01a5742857e7UL,
-+		  0x2f482edbd6d551a7UL, 0x0f0433b5048fdb8aUL,
-+	/* 171 */ 0x60da2e8dd7dc6247UL, 0x88b4c9d38cd4819aUL,
-+		  0x13033ac001f66697UL, 0x273b24fe3b367d75UL,
-+	/* 172 */ 0xc6e8f66a31b3b9d4UL, 0x281514a494df49d5UL,
-+		  0xd1726fdfc8b23da7UL, 0x4b3ae7d103dee548UL,
-+	/* 173 */ 0xc6256e19ce4b9d7eUL, 0xff5c5cf186e3c61cUL,
-+		  0xacc63ca34b8ec145UL, 0x74621888fee66574UL,
-+	/* 174 */ 0x956f409645290a1eUL, 0xef0bf8e3263a962eUL,
-+		  0xed6a50eb5ec2647bUL, 0x0694283a9dca7502UL,
-+	/* 175 */ 0x769b963643a2dcd1UL, 0x42b7c8ea09fc5353UL,
-+		  0x4f002aee13397eabUL, 0x63005e2c19b7d63aUL,
-+	/* 176 */ 0xca6736da63023beaUL, 0x966c7f6db12a99b7UL,
-+		  0xace09390c537c5e1UL, 0x0b696063a1aa89eeUL,
-+	/* 177 */ 0xebb03e97288c56e5UL, 0x432a9f9f938c8be8UL,
-+		  0xa6a5a93d5b717f71UL, 0x1a5fb4c3e18f9d97UL,
-+	/* 178 */ 0x1c94e7ad1c60cdceUL, 0xee202a43fc02c4a0UL,
-+		  0x8dafe4d867c46a20UL, 0x0a10263c8ac27b58UL,
-+	/* 179 */ 0xd0dea9dfe4432a4aUL, 0x856af87bbe9277c5UL,
-+		  0xce8472acc212c71aUL, 0x6f151b6d9bbb1e91UL,
-+	/* 180 */ 0x26776c527ceed56aUL, 0x7d211cb7fbf8faecUL,
-+		  0x37ae66a6fd4609ccUL, 0x1f81b702d2770c42UL,
-+	/* 181 */ 0x2fb0b057eac58392UL, 0xe1dd89fe29744e9dUL,
-+		  0xc964f8eb17beb4f8UL, 0x29571073c9a2d41eUL,
-+	/* 182 */ 0xa948a18981c0e254UL, 0x2df6369b65b22830UL,
-+		  0xa33eb2d75fcfd3c6UL, 0x078cd6ec4199a01fUL,
-+	/* 183 */ 0x4a584a41ad900d2fUL, 0x32142b78e2c74c52UL,
-+		  0x68c4e8338431c978UL, 0x7f69ea9008689fc2UL,
-+	/* 184 */ 0x52f2c81e46a38265UL, 0xfd78072d04a832fdUL,
-+		  0x8cd7d5fa25359e94UL, 0x4de71b7454cc29d2UL,
-+	/* 185 */ 0x42eb60ad1eda6ac9UL, 0x0aad37dfdbc09c3aUL,
-+		  0x81004b71e33cc191UL, 0x44e6be345122803cUL,
-+	/* 186 */ 0x03fe8388ba1920dbUL, 0xf5d57c32150db008UL,
-+		  0x49c8c4281af60c29UL, 0x21edb518de701aeeUL,
-+	/* 187 */ 0x7fb63e418f06dc99UL, 0xa4460d99c166d7b8UL,
-+		  0x24dd5248ce520a83UL, 0x5ec3ad712b928358UL,
-+	/* 188 */ 0x15022a5fbd17930fUL, 0xa4f64a77d82570e3UL,
-+		  0x12bc8d6915783712UL, 0x498194c0fc620abbUL,
-+	/* 189 */ 0x38a2d9d255686c82UL, 0x785c6bd9193e21f0UL,
-+		  0xe4d5c81ab24a5484UL, 0x56307860b2e20989UL,
-+	/* 190 */ 0x429d55f78b4d74c4UL, 0x22f1834643350131UL,
-+		  0x1e60c24598c71fffUL, 0x59f2f014979983efUL,
-+	/* 191 */ 0x46a47d56eb494a44UL, 0x3e22a854d636a18eUL,
-+		  0xb346e15274491c3bUL, 0x2ceafd4e5390cde7UL,
-+	/* 192 */ 0xba8a8538be0d6675UL, 0x4b9074bb50818e23UL,
-+		  0xcbdab89085d304c3UL, 0x61a24fe0e56192c4UL,
-+	/* 193 */ 0xcb7615e6db525bcbUL, 0xdd7d8c35a567e4caUL,
-+		  0xe6b4153acafcdd69UL, 0x2d668e097f3c9766UL,
-+	/* 194 */ 0xa57e7e265ce55ef0UL, 0x5d9f4e527cd4b967UL,
-+		  0xfbc83606492fd1e5UL, 0x090d52beb7c3f7aeUL,
-+	/* 195 */ 0x09b9515a1e7b4d7cUL, 0x1f266a2599da44c0UL,
-+		  0xa1c49548e2c55504UL, 0x7ef04287126f15ccUL,
-+	/* 196 */ 0xfed1659dbd30ef15UL, 0x8b4ab9eec4e0277bUL,
-+		  0x884d6236a5df3291UL, 0x1fd96ea6bf5cf788UL,
-+	/* 197 */ 0x42a161981f190d9aUL, 0x61d849507e6052c1UL,
-+		  0x9fe113bf285a2cd5UL, 0x7c22d676dbad85d8UL,
-+	/* 198 */ 0x82e770ed2bfbd27dUL, 0x4c05b2ece996f5a5UL,
-+		  0xcd40a9c2b0900150UL, 0x5895319213d9bf64UL,
-+	/* 199 */ 0xe7cc5d703fea2e08UL, 0xb50c491258e2188cUL,
-+		  0xcce30baa48205bf0UL, 0x537c659ccfa32d62UL,
-+	/* 200 */ 0x37b6623a98cfc088UL, 0xfe9bed1fa4d6aca4UL,
-+		  0x04d29b8e56a8d1b0UL, 0x725f71c40b519575UL,
-+	/* 201 */ 0x28c7f89cd0339ce6UL, 0x8367b14469ddc18bUL,
-+		  0x883ada83a6a1652cUL, 0x585f1974034d6c17UL,
-+	/* 202 */ 0x89cfb266f1b19188UL, 0xe63b4863e7c35217UL,
-+		  0xd88c9da6b4c0526aUL, 0x3e035c9df0954635UL,
-+	/* 203 */ 0xdd9d5412fb45de9dUL, 0xdd684532e4cff40dUL,
-+		  0x4b5c999b151d671cUL, 0x2d8c2cc811e7f690UL,
-+	/* 204 */ 0x7f54be1d90055d40UL, 0xa464c5df464aaf40UL,
-+		  0x33979624f0e917beUL, 0x2c018dc527356b30UL,
-+	/* 205 */ 0xa5415024e330b3d4UL, 0x73ff3d96691652d3UL,
-+		  0x94ec42c4ef9b59f1UL, 0x0747201618d08e5aUL,
-+	/* 206 */ 0x4d6ca48aca411c53UL, 0x66415f2fcfa66119UL,
-+		  0x9c4dd40051e227ffUL, 0x59810bc09a02f7ebUL,
-+	/* 207 */ 0x2a7eb171b3dc101dUL, 0x441c5ab99ffef68eUL,
-+		  0x32025c9b93b359eaUL, 0x5e8ce0a71e9d112fUL,
-+	/* 208 */ 0xbfcccb92429503fdUL, 0xd271ba752f095d55UL,
-+		  0x345ead5e972d091eUL, 0x18c8df11a83103baUL,
-+	/* 209 */ 0x90cd949a9aed0f4cUL, 0xc5d1f4cb6660e37eUL,
-+		  0xb8cac52d56c52e0bUL, 0x6e42e400c5808e0dUL,
-+	/* 210 */ 0xa3b46966eeaefd23UL, 0x0c4f1f0be39ecdcaUL,
-+		  0x189dc8c9d683a51dUL, 0x51f27f054c09351bUL,
-+	/* 211 */ 0x4c487ccd2a320682UL, 0x587ea95bb3df1c96UL,
-+		  0xc8ccf79e555cb8e8UL, 0x547dc829a206d73dUL,
-+	/* 212 */ 0xb822a6cd80c39b06UL, 0xe96d54732000d4c6UL,
-+		  0x28535b6f91463b4dUL, 0x228f4660e2486e1dUL,
-+	/* 213 */ 0x98799538de8d3abfUL, 0x8cd8330045ebca6eUL,
-+		  0x79952a008221e738UL, 0x4322e1a7535cd2bbUL,
-+	/* 214 */ 0xb114c11819d1801cUL, 0x2016e4d84f3f5ec7UL,
-+		  0xdd0e2df409260f4cUL, 0x5ec362c0ae5f7266UL,
-+	/* 215 */ 0xc0462b18b8b2b4eeUL, 0x7cc8d950274d1afbUL,
-+		  0xf25f7105436b02d2UL, 0x43bbf8dcbff9ccd3UL,
-+	/* 216 */ 0xb6ad1767a039e9dfUL, 0xb0714da8f69d3583UL,
-+		  0x5e55fa18b42931f5UL, 0x4ed5558f33c60961UL,
-+	/* 217 */ 0x1fe37901c647a5ddUL, 0x593ddf1f8081d357UL,
-+		  0x0249a4fd813fd7a6UL, 0x69acca274e9caf61UL,
-+	/* 218 */ 0x047ba3ea330721c9UL, 0x83423fc20e7e1ea0UL,
-+		  0x1df4c0af01314a60UL, 0x09a62dab89289527UL,
-+	/* 219 */ 0xa5b325a49cc6cb00UL, 0xe94b5dc654b56cb6UL,
-+		  0x3be28779adc994a0UL, 0x4296e8f8ba3a4aadUL,
-+	/* 220 */ 0x328689761e451eabUL, 0x2e4d598bff59594aUL,
-+		  0x49b96853d7a7084aUL, 0x4980a319601420a8UL,
-+	/* 221 */ 0x9565b9e12f552c42UL, 0x8a5318db7100fe96UL,
-+		  0x05c90b4d43add0d7UL, 0x538b4cd66a5d4edaUL,
-+	/* 222 */ 0xf4e94fc3e89f039fUL, 0x592c9af26f618045UL,
-+		  0x08a36eb5fd4b9550UL, 0x25fffaf6c2ed1419UL,
-+	/* 223 */ 0x34434459cc79d354UL, 0xeeecbfb4b1d5476bUL,
-+		  0xddeb34a061615d99UL, 0x5129cecceb64b773UL,
-+	/* 224 */ 0xee43215894993520UL, 0x772f9c7cf14c0b3bUL,
-+		  0xd2e2fce306bedad5UL, 0x715f42b546f06a97UL,
-+	/* 225 */ 0x434ecdceda5b5f1aUL, 0x0da17115a49741a9UL,
-+		  0x680bd77c73edad2eUL, 0x487c02354edd9041UL,
-+	/* 226 */ 0xb8efeff3a70ed9c4UL, 0x56a32aa3e857e302UL,
-+		  0xdf3a68bd48a2a5a0UL, 0x07f650b73176c444UL,
-+	/* 227 */ 0xe38b9b1626e0ccb1UL, 0x79e053c18b09fb36UL,
-+		  0x56d90319c9f94964UL, 0x1ca941e7ac9ff5c4UL,
-+	/* 228 */ 0x49c4df29162fa0bbUL, 0x8488cf3282b33305UL,
-+		  0x95dfda14cabb437dUL, 0x3391f78264d5ad86UL,
-+	/* 229 */ 0x729ae06ae2b5095dUL, 0xd58a58d73259a946UL,
-+		  0xe9834262d13921edUL, 0x27fedafaa54bb592UL,
-+	/* 230 */ 0xa99dc5b829ad48bbUL, 0x5f025742499ee260UL,
-+		  0x802c8ecd5d7513fdUL, 0x78ceb3ef3f6dd938UL,
-+	/* 231 */ 0xc342f44f8a135d94UL, 0x7b9edb44828cdda3UL,
-+		  0x9436d11a0537cfe7UL, 0x5064b164ec1ab4c8UL,
-+	/* 232 */ 0x7020eccfd37eb2fcUL, 0x1f31ea3ed90d25fcUL,
-+		  0x1b930d7bdfa1bb34UL, 0x5344467a48113044UL,
-+	/* 233 */ 0x70073170f25e6dfbUL, 0xe385dc1a50114cc8UL,
-+		  0x2348698ac8fc4f00UL, 0x2a77a55284dd40d8UL,
-+	/* 234 */ 0xfe06afe0c98c6ce4UL, 0xc235df96dddfd6e4UL,
-+		  0x1428d01e33bf1ed3UL, 0x785768ec9300bdafUL,
-+	/* 235 */ 0x9702e57a91deb63bUL, 0x61bdb8bfe5ce8b80UL,
-+		  0x645b426f3d1d58acUL, 0x4804a82227a557bcUL,
-+	/* 236 */ 0x8e57048ab44d2601UL, 0x68d6501a4b3a6935UL,
-+		  0xc39c9ec3f9e1c293UL, 0x4172f257d4de63e2UL,
-+	/* 237 */ 0xd368b450330c6401UL, 0x040d3017418f2391UL,
-+		  0x2c34bb6090b7d90dUL, 0x16f649228fdfd51fUL,
-+	/* 238 */ 0xbea6818e2b928ef5UL, 0xe28ccf91cdc11e72UL,
-+		  0x594aaa68e77a36cdUL, 0x313034806c7ffd0fUL,
-+	/* 239 */ 0x8a9d27ac2249bd65UL, 0x19a3b464018e9512UL,
-+		  0xc26ccff352b37ec7UL, 0x056f68341d797b21UL,
-+	/* 240 */ 0x5e79d6757efd2327UL, 0xfabdbcb6553afe15UL,
-+		  0xd3e7222c6eaf5a60UL, 0x7046c76d4dae743bUL,
-+	/* 241 */ 0x660be872b18d4a55UL, 0x19992518574e1496UL,
-+		  0xc103053a302bdcbbUL, 0x3ed8e9800b218e8eUL,
-+	/* 242 */ 0x7b0b9239fa75e03eUL, 0xefe9fb684633c083UL,
-+		  0x98a35fbe391a7793UL, 0x6065510fe2d0fe34UL,
-+	/* 243 */ 0x55cb668548abad0cUL, 0xb4584548da87e527UL,
-+		  0x2c43ecea0107c1ddUL, 0x526028809372de35UL,
-+	/* 244 */ 0x3415c56af9213b1fUL, 0x5bee1a4d017e98dbUL,
-+		  0x13f6b105b5cf709bUL, 0x5ff20e3482b29ab6UL,
-+	/* 245 */ 0x0aa29c75cc2e6c90UL, 0xfc7d73ca3a70e206UL,
-+		  0x899fc38fc4b5c515UL, 0x250386b124ffc207UL,
-+	/* 246 */ 0x54ea28d5ae3d2b56UL, 0x9913149dd6de60ceUL,
-+		  0x16694fc58f06d6c1UL, 0x46b23975eb018fc7UL,
-+	/* 247 */ 0x470a6a0fb4b7b4e2UL, 0x5d92475a8f7253deUL,
-+		  0xabeee5b52fbd3adbUL, 0x7fa20801a0806968UL,
-+	/* 248 */ 0x76f3faf19f7714d2UL, 0xb3e840c12f4660c3UL,
-+		  0x0fb4cd8df212744eUL, 0x4b065a251d3a2dd2UL,
-+	/* 249 */ 0x5cebde383d77cd4aUL, 0x6adf39df882c9cb1UL,
-+		  0xa2dd242eb09af759UL, 0x3147c0e50e5f6422UL,
-+	/* 250 */ 0x164ca5101d1350dbUL, 0xf8d13479c33fc962UL,
-+		  0xe640ce4d13e5da08UL, 0x4bdee0c45061f8baUL,
-+	/* 251 */ 0xd7c46dc1a4edb1c9UL, 0x5514d7b6437fd98aUL,
-+		  0x58942f6bb2a1c00bUL, 0x2dffb2ab1d70710eUL,
-+	/* 252 */ 0xccdfcf2fc18b6d68UL, 0xa8ebcba8b7806167UL,
-+		  0x980697f95e2937e3UL, 0x02fbba1cd0126e8cUL
++struct poly1305_desc_ctx {
++	struct poly1305_ctx ctx;
++	u8 key[POLY1305_KEY_SIZE];
++	unsigned int rem_key_bytes;
 +};
 +
-+/* c is two 512-bit products: c0[0:7]=a0[0:3]*b0[0:3] and c1[8:15]=a1[4:7]*b1[4:7]
-+ * a is two 256-bit integers: a0[0:3] and a1[4:7]
-+ * b is two 256-bit integers: b0[0:3] and b1[4:7]
-+ */
-+static void mul2_256x256_integer_adx(u64 *const c, const u64 *const a,
-+				     const u64 *const b)
++static int crypto_poly1305_init(struct shash_desc *desc)
 +{
-+	asm volatile(
-+		"xorl %%r14d, %%r14d ;"
-+		"movq   (%1), %%rdx; "	/* A[0] */
-+		"mulx   (%2),  %%r8, %%r15; " /* A[0]*B[0] */
-+		"xorl %%r10d, %%r10d ;"
-+		"movq %%r8, (%0) ;"
-+		"mulx  8(%2), %%r10, %%rax; " /* A[0]*B[1] */
-+		"adox %%r10, %%r15 ;"
-+		"mulx 16(%2),  %%r8, %%rbx; " /* A[0]*B[2] */
-+		"adox  %%r8, %%rax ;"
-+		"mulx 24(%2), %%r10, %%rcx; " /* A[0]*B[3] */
-+		"adox %%r10, %%rbx ;"
-+		/******************************************/
-+		"adox %%r14, %%rcx ;"
-+
-+		"movq  8(%1), %%rdx; "	/* A[1] */
-+		"mulx   (%2),  %%r8,  %%r9; " /* A[1]*B[0] */
-+		"adox %%r15,  %%r8 ;"
-+		"movq  %%r8, 8(%0) ;"
-+		"mulx  8(%2), %%r10, %%r11; " /* A[1]*B[1] */
-+		"adox %%r10,  %%r9 ;"
-+		"adcx  %%r9, %%rax ;"
-+		"mulx 16(%2),  %%r8, %%r13; " /* A[1]*B[2] */
-+		"adox  %%r8, %%r11 ;"
-+		"adcx %%r11, %%rbx ;"
-+		"mulx 24(%2), %%r10, %%r15; " /* A[1]*B[3] */
-+		"adox %%r10, %%r13 ;"
-+		"adcx %%r13, %%rcx ;"
-+		/******************************************/
-+		"adox %%r14, %%r15 ;"
-+		"adcx %%r14, %%r15 ;"
-+
-+		"movq 16(%1), %%rdx; " /* A[2] */
-+		"xorl %%r10d, %%r10d ;"
-+		"mulx   (%2),  %%r8,  %%r9; " /* A[2]*B[0] */
-+		"adox %%rax,  %%r8 ;"
-+		"movq %%r8, 16(%0) ;"
-+		"mulx  8(%2), %%r10, %%r11; " /* A[2]*B[1] */
-+		"adox %%r10,  %%r9 ;"
-+		"adcx  %%r9, %%rbx ;"
-+		"mulx 16(%2),  %%r8, %%r13; " /* A[2]*B[2] */
-+		"adox  %%r8, %%r11 ;"
-+		"adcx %%r11, %%rcx ;"
-+		"mulx 24(%2), %%r10, %%rax; " /* A[2]*B[3] */
-+		"adox %%r10, %%r13 ;"
-+		"adcx %%r13, %%r15 ;"
-+		/******************************************/
-+		"adox %%r14, %%rax ;"
-+		"adcx %%r14, %%rax ;"
-+
-+		"movq 24(%1), %%rdx; " /* A[3] */
-+		"xorl %%r10d, %%r10d ;"
-+		"mulx   (%2),  %%r8,  %%r9; " /* A[3]*B[0] */
-+		"adox %%rbx,  %%r8 ;"
-+		"movq %%r8, 24(%0) ;"
-+		"mulx  8(%2), %%r10, %%r11; " /* A[3]*B[1] */
-+		"adox %%r10,  %%r9 ;"
-+		"adcx  %%r9, %%rcx ;"
-+		"movq %%rcx, 32(%0) ;"
-+		"mulx 16(%2),  %%r8, %%r13; " /* A[3]*B[2] */
-+		"adox  %%r8, %%r11 ;"
-+		"adcx %%r11, %%r15 ;"
-+		"movq %%r15, 40(%0) ;"
-+		"mulx 24(%2), %%r10, %%rbx; " /* A[3]*B[3] */
-+		"adox %%r10, %%r13 ;"
-+		"adcx %%r13, %%rax ;"
-+		"movq %%rax, 48(%0) ;"
-+		/******************************************/
-+		"adox %%r14, %%rbx ;"
-+		"adcx %%r14, %%rbx ;"
-+		"movq %%rbx, 56(%0) ;"
-+
-+		"movq 32(%1), %%rdx; "	/* C[0] */
-+		"mulx 32(%2),  %%r8, %%r15; " /* C[0]*D[0] */
-+		"xorl %%r10d, %%r10d ;"
-+		"movq %%r8, 64(%0);"
-+		"mulx 40(%2), %%r10, %%rax; " /* C[0]*D[1] */
-+		"adox %%r10, %%r15 ;"
-+		"mulx 48(%2),  %%r8, %%rbx; " /* C[0]*D[2] */
-+		"adox  %%r8, %%rax ;"
-+		"mulx 56(%2), %%r10, %%rcx; " /* C[0]*D[3] */
-+		"adox %%r10, %%rbx ;"
-+		/******************************************/
-+		"adox %%r14, %%rcx ;"
-+
-+		"movq 40(%1), %%rdx; " /* C[1] */
-+		"xorl %%r10d, %%r10d ;"
-+		"mulx 32(%2),  %%r8,  %%r9; " /* C[1]*D[0] */
-+		"adox %%r15,  %%r8 ;"
-+		"movq  %%r8, 72(%0);"
-+		"mulx 40(%2), %%r10, %%r11; " /* C[1]*D[1] */
-+		"adox %%r10,  %%r9 ;"
-+		"adcx  %%r9, %%rax ;"
-+		"mulx 48(%2),  %%r8, %%r13; " /* C[1]*D[2] */
-+		"adox  %%r8, %%r11 ;"
-+		"adcx %%r11, %%rbx ;"
-+		"mulx 56(%2), %%r10, %%r15; " /* C[1]*D[3] */
-+		"adox %%r10, %%r13 ;"
-+		"adcx %%r13, %%rcx ;"
-+		/******************************************/
-+		"adox %%r14, %%r15 ;"
-+		"adcx %%r14, %%r15 ;"
-+
-+		"movq 48(%1), %%rdx; " /* C[2] */
-+		"xorl %%r10d, %%r10d ;"
-+		"mulx 32(%2),  %%r8,  %%r9; " /* C[2]*D[0] */
-+		"adox %%rax,  %%r8 ;"
-+		"movq  %%r8, 80(%0);"
-+		"mulx 40(%2), %%r10, %%r11; " /* C[2]*D[1] */
-+		"adox %%r10,  %%r9 ;"
-+		"adcx  %%r9, %%rbx ;"
-+		"mulx 48(%2),  %%r8, %%r13; " /* C[2]*D[2] */
-+		"adox  %%r8, %%r11 ;"
-+		"adcx %%r11, %%rcx ;"
-+		"mulx 56(%2), %%r10, %%rax; " /* C[2]*D[3] */
-+		"adox %%r10, %%r13 ;"
-+		"adcx %%r13, %%r15 ;"
-+		/******************************************/
-+		"adox %%r14, %%rax ;"
-+		"adcx %%r14, %%rax ;"
-+
-+		"movq 56(%1), %%rdx; " /* C[3] */
-+		"xorl %%r10d, %%r10d ;"
-+		"mulx 32(%2),  %%r8,  %%r9; " /* C[3]*D[0] */
-+		"adox %%rbx,  %%r8 ;"
-+		"movq  %%r8, 88(%0);"
-+		"mulx 40(%2), %%r10, %%r11; " /* C[3]*D[1] */
-+		"adox %%r10,  %%r9 ;"
-+		"adcx  %%r9, %%rcx ;"
-+		"movq %%rcx,  96(%0) ;"
-+		"mulx 48(%2),  %%r8, %%r13; " /* C[3]*D[2] */
-+		"adox  %%r8, %%r11 ;"
-+		"adcx %%r11, %%r15 ;"
-+		"movq %%r15, 104(%0) ;"
-+		"mulx 56(%2), %%r10, %%rbx; " /* C[3]*D[3] */
-+		"adox %%r10, %%r13 ;"
-+		"adcx %%r13, %%rax ;"
-+		"movq %%rax, 112(%0) ;"
-+		/******************************************/
-+		"adox %%r14, %%rbx ;"
-+		"adcx %%r14, %%rbx ;"
-+		"movq %%rbx, 120(%0) ;"
-+		:
-+		: "r"(c), "r"(a), "r"(b)
-+		: "memory", "cc", "%rax", "%rbx", "%rcx", "%rdx", "%r8", "%r9",
-+		  "%r10", "%r11", "%r13", "%r14", "%r15");
++	struct poly1305_desc_ctx *dctx = shash_desc_ctx(desc);
++	dctx->rem_key_bytes = POLY1305_KEY_SIZE;
++	return 0;
 +}
 +
-+static void mul2_256x256_integer_bmi2(u64 *const c, const u64 *const a,
-+				      const u64 *const b)
++static int crypto_poly1305_update(struct shash_desc *desc, const u8 *src,
++				  unsigned int srclen)
 +{
-+	asm volatile(
-+		"movq   (%1), %%rdx; "	/* A[0] */
-+		"mulx   (%2),  %%r8, %%r15; " /* A[0]*B[0] */
-+		"movq %%r8,  (%0) ;"
-+		"mulx  8(%2), %%r10, %%rax; " /* A[0]*B[1] */
-+		"addq %%r10, %%r15 ;"
-+		"mulx 16(%2),  %%r8, %%rbx; " /* A[0]*B[2] */
-+		"adcq  %%r8, %%rax ;"
-+		"mulx 24(%2), %%r10, %%rcx; " /* A[0]*B[3] */
-+		"adcq %%r10, %%rbx ;"
-+		/******************************************/
-+		"adcq    $0, %%rcx ;"
-+
-+		"movq  8(%1), %%rdx; "	/* A[1] */
-+		"mulx   (%2),  %%r8,  %%r9; " /* A[1]*B[0] */
-+		"addq %%r15,  %%r8 ;"
-+		"movq %%r8, 8(%0) ;"
-+		"mulx  8(%2), %%r10, %%r11; " /* A[1]*B[1] */
-+		"adcq %%r10,  %%r9 ;"
-+		"mulx 16(%2),  %%r8, %%r13; " /* A[1]*B[2] */
-+		"adcq  %%r8, %%r11 ;"
-+		"mulx 24(%2), %%r10, %%r15; " /* A[1]*B[3] */
-+		"adcq %%r10, %%r13 ;"
-+		/******************************************/
-+		"adcq    $0, %%r15 ;"
-+
-+		"addq  %%r9, %%rax ;"
-+		"adcq %%r11, %%rbx ;"
-+		"adcq %%r13, %%rcx ;"
-+		"adcq    $0, %%r15 ;"
-+
-+		"movq 16(%1), %%rdx; "	/* A[2] */
-+		"mulx   (%2),  %%r8,  %%r9; " /* A[2]*B[0] */
-+		"addq %%rax,  %%r8 ;"
-+		"movq %%r8, 16(%0) ;"
-+		"mulx  8(%2), %%r10, %%r11; " /* A[2]*B[1] */
-+		"adcq %%r10,  %%r9 ;"
-+		"mulx 16(%2),  %%r8, %%r13; " /* A[2]*B[2] */
-+		"adcq  %%r8, %%r11 ;"
-+		"mulx 24(%2), %%r10, %%rax; " /* A[2]*B[3] */
-+		"adcq %%r10, %%r13 ;"
-+		/******************************************/
-+		"adcq    $0, %%rax ;"
-+
-+		"addq  %%r9, %%rbx ;"
-+		"adcq %%r11, %%rcx ;"
-+		"adcq %%r13, %%r15 ;"
-+		"adcq    $0, %%rax ;"
-+
-+		"movq 24(%1), %%rdx; "	/* A[3] */
-+		"mulx   (%2),  %%r8,  %%r9; " /* A[3]*B[0] */
-+		"addq %%rbx,  %%r8 ;"
-+		"movq %%r8, 24(%0) ;"
-+		"mulx  8(%2), %%r10, %%r11; " /* A[3]*B[1] */
-+		"adcq %%r10,  %%r9 ;"
-+		"mulx 16(%2),  %%r8, %%r13; " /* A[3]*B[2] */
-+		"adcq  %%r8, %%r11 ;"
-+		"mulx 24(%2), %%r10, %%rbx; " /* A[3]*B[3] */
-+		"adcq %%r10, %%r13 ;"
-+		/******************************************/
-+		"adcq    $0, %%rbx ;"
-+
-+		"addq  %%r9, %%rcx ;"
-+		"movq %%rcx, 32(%0) ;"
-+		"adcq %%r11, %%r15 ;"
-+		"movq %%r15, 40(%0) ;"
-+		"adcq %%r13, %%rax ;"
-+		"movq %%rax, 48(%0) ;"
-+		"adcq    $0, %%rbx ;"
-+		"movq %%rbx, 56(%0) ;"
-+
-+		"movq 32(%1), %%rdx; "	/* C[0] */
-+		"mulx 32(%2),  %%r8, %%r15; " /* C[0]*D[0] */
-+		"movq %%r8, 64(%0) ;"
-+		"mulx 40(%2), %%r10, %%rax; " /* C[0]*D[1] */
-+		"addq %%r10, %%r15 ;"
-+		"mulx 48(%2),  %%r8, %%rbx; " /* C[0]*D[2] */
-+		"adcq  %%r8, %%rax ;"
-+		"mulx 56(%2), %%r10, %%rcx; " /* C[0]*D[3] */
-+		"adcq %%r10, %%rbx ;"
-+		/******************************************/
-+		"adcq    $0, %%rcx ;"
-+
-+		"movq 40(%1), %%rdx; "	/* C[1] */
-+		"mulx 32(%2),  %%r8,  %%r9; " /* C[1]*D[0] */
-+		"addq %%r15,  %%r8 ;"
-+		"movq %%r8, 72(%0) ;"
-+		"mulx 40(%2), %%r10, %%r11; " /* C[1]*D[1] */
-+		"adcq %%r10,  %%r9 ;"
-+		"mulx 48(%2),  %%r8, %%r13; " /* C[1]*D[2] */
-+		"adcq  %%r8, %%r11 ;"
-+		"mulx 56(%2), %%r10, %%r15; " /* C[1]*D[3] */
-+		"adcq %%r10, %%r13 ;"
-+		/******************************************/
-+		"adcq    $0, %%r15 ;"
-+
-+		"addq  %%r9, %%rax ;"
-+		"adcq %%r11, %%rbx ;"
-+		"adcq %%r13, %%rcx ;"
-+		"adcq    $0, %%r15 ;"
-+
-+		"movq 48(%1), %%rdx; "	/* C[2] */
-+		"mulx 32(%2),  %%r8,  %%r9; " /* C[2]*D[0] */
-+		"addq %%rax,  %%r8 ;"
-+		"movq %%r8, 80(%0) ;"
-+		"mulx 40(%2), %%r10, %%r11; " /* C[2]*D[1] */
-+		"adcq %%r10,  %%r9 ;"
-+		"mulx 48(%2),  %%r8, %%r13; " /* C[2]*D[2] */
-+		"adcq  %%r8, %%r11 ;"
-+		"mulx 56(%2), %%r10, %%rax; " /* C[2]*D[3] */
-+		"adcq %%r10, %%r13 ;"
-+		/******************************************/
-+		"adcq    $0, %%rax ;"
-+
-+		"addq  %%r9, %%rbx ;"
-+		"adcq %%r11, %%rcx ;"
-+		"adcq %%r13, %%r15 ;"
-+		"adcq    $0, %%rax ;"
-+
-+		"movq 56(%1), %%rdx; "	/* C[3] */
-+		"mulx 32(%2),  %%r8,  %%r9; " /* C[3]*D[0] */
-+		"addq %%rbx,  %%r8 ;"
-+		"movq %%r8, 88(%0) ;"
-+		"mulx 40(%2), %%r10, %%r11; " /* C[3]*D[1] */
-+		"adcq %%r10,  %%r9 ;"
-+		"mulx 48(%2),  %%r8, %%r13; " /* C[3]*D[2] */
-+		"adcq  %%r8, %%r11 ;"
-+		"mulx 56(%2), %%r10, %%rbx; " /* C[3]*D[3] */
-+		"adcq %%r10, %%r13 ;"
-+		/******************************************/
-+		"adcq    $0, %%rbx ;"
-+
-+		"addq  %%r9, %%rcx ;"
-+		"movq %%rcx,  96(%0) ;"
-+		"adcq %%r11, %%r15 ;"
-+		"movq %%r15, 104(%0) ;"
-+		"adcq %%r13, %%rax ;"
-+		"movq %%rax, 112(%0) ;"
-+		"adcq    $0, %%rbx ;"
-+		"movq %%rbx, 120(%0) ;"
-+		:
-+		: "r"(c), "r"(a), "r"(b)
-+		: "memory", "cc", "%rax", "%rbx", "%rcx", "%rdx", "%r8", "%r9",
-+		  "%r10", "%r11", "%r13", "%r15");
-+}
-+
-+static void sqr2_256x256_integer_adx(u64 *const c, const u64 *const a)
-+{
-+	asm volatile(
-+		"movq   (%1), %%rdx        ;" /* A[0]      */
-+		"mulx  8(%1),  %%r8, %%r14 ;" /* A[1]*A[0] */
-+		"xorl %%r15d, %%r15d;"
-+		"mulx 16(%1),  %%r9, %%r10 ;" /* A[2]*A[0] */
-+		"adcx %%r14,  %%r9 ;"
-+		"mulx 24(%1), %%rax, %%rcx ;" /* A[3]*A[0] */
-+		"adcx %%rax, %%r10 ;"
-+		"movq 24(%1), %%rdx        ;" /* A[3]      */
-+		"mulx  8(%1), %%r11, %%rbx ;" /* A[1]*A[3] */
-+		"adcx %%rcx, %%r11 ;"
-+		"mulx 16(%1), %%rax, %%r13 ;" /* A[2]*A[3] */
-+		"adcx %%rax, %%rbx ;"
-+		"movq  8(%1), %%rdx        ;" /* A[1]      */
-+		"adcx %%r15, %%r13 ;"
-+		"mulx 16(%1), %%rax, %%rcx ;" /* A[2]*A[1] */
-+		"movq    $0, %%r14 ;"
-+		/******************************************/
-+		"adcx %%r15, %%r14 ;"
-+
-+		"xorl %%r15d, %%r15d;"
-+		"adox %%rax, %%r10 ;"
-+		"adcx  %%r8,  %%r8 ;"
-+		"adox %%rcx, %%r11 ;"
-+		"adcx  %%r9,  %%r9 ;"
-+		"adox %%r15, %%rbx ;"
-+		"adcx %%r10, %%r10 ;"
-+		"adox %%r15, %%r13 ;"
-+		"adcx %%r11, %%r11 ;"
-+		"adox %%r15, %%r14 ;"
-+		"adcx %%rbx, %%rbx ;"
-+		"adcx %%r13, %%r13 ;"
-+		"adcx %%r14, %%r14 ;"
-+
-+		"movq   (%1), %%rdx ;"
-+		"mulx %%rdx, %%rax, %%rcx ;" /* A[0]^2 */
-+		/*******************/
-+		"movq %%rax,  0(%0) ;"
-+		"addq %%rcx,  %%r8 ;"
-+		"movq  %%r8,  8(%0) ;"
-+		"movq  8(%1), %%rdx ;"
-+		"mulx %%rdx, %%rax, %%rcx ;" /* A[1]^2 */
-+		"adcq %%rax,  %%r9 ;"
-+		"movq  %%r9, 16(%0) ;"
-+		"adcq %%rcx, %%r10 ;"
-+		"movq %%r10, 24(%0) ;"
-+		"movq 16(%1), %%rdx ;"
-+		"mulx %%rdx, %%rax, %%rcx ;" /* A[2]^2 */
-+		"adcq %%rax, %%r11 ;"
-+		"movq %%r11, 32(%0) ;"
-+		"adcq %%rcx, %%rbx ;"
-+		"movq %%rbx, 40(%0) ;"
-+		"movq 24(%1), %%rdx ;"
-+		"mulx %%rdx, %%rax, %%rcx ;" /* A[3]^2 */
-+		"adcq %%rax, %%r13 ;"
-+		"movq %%r13, 48(%0) ;"
-+		"adcq %%rcx, %%r14 ;"
-+		"movq %%r14, 56(%0) ;"
-+
-+
-+		"movq 32(%1), %%rdx        ;" /* B[0]      */
-+		"mulx 40(%1),  %%r8, %%r14 ;" /* B[1]*B[0] */
-+		"xorl %%r15d, %%r15d;"
-+		"mulx 48(%1),  %%r9, %%r10 ;" /* B[2]*B[0] */
-+		"adcx %%r14,  %%r9 ;"
-+		"mulx 56(%1), %%rax, %%rcx ;" /* B[3]*B[0] */
-+		"adcx %%rax, %%r10 ;"
-+		"movq 56(%1), %%rdx        ;" /* B[3]      */
-+		"mulx 40(%1), %%r11, %%rbx ;" /* B[1]*B[3] */
-+		"adcx %%rcx, %%r11 ;"
-+		"mulx 48(%1), %%rax, %%r13 ;" /* B[2]*B[3] */
-+		"adcx %%rax, %%rbx ;"
-+		"movq 40(%1), %%rdx        ;" /* B[1]      */
-+		"adcx %%r15, %%r13 ;"
-+		"mulx 48(%1), %%rax, %%rcx ;" /* B[2]*B[1] */
-+		"movq    $0, %%r14 ;"
-+		/******************************************/
-+		"adcx %%r15, %%r14 ;"
-+
-+		"xorl %%r15d, %%r15d;"
-+		"adox %%rax, %%r10 ;"
-+		"adcx  %%r8,  %%r8 ;"
-+		"adox %%rcx, %%r11 ;"
-+		"adcx  %%r9,  %%r9 ;"
-+		"adox %%r15, %%rbx ;"
-+		"adcx %%r10, %%r10 ;"
-+		"adox %%r15, %%r13 ;"
-+		"adcx %%r11, %%r11 ;"
-+		"adox %%r15, %%r14 ;"
-+		"adcx %%rbx, %%rbx ;"
-+		"adcx %%r13, %%r13 ;"
-+		"adcx %%r14, %%r14 ;"
-+
-+		"movq 32(%1), %%rdx ;"
-+		"mulx %%rdx, %%rax, %%rcx ;" /* B[0]^2 */
-+		/*******************/
-+		"movq %%rax,  64(%0) ;"
-+		"addq %%rcx,  %%r8 ;"
-+		"movq  %%r8,  72(%0) ;"
-+		"movq 40(%1), %%rdx ;"
-+		"mulx %%rdx, %%rax, %%rcx ;" /* B[1]^2 */
-+		"adcq %%rax,  %%r9 ;"
-+		"movq  %%r9,  80(%0) ;"
-+		"adcq %%rcx, %%r10 ;"
-+		"movq %%r10,  88(%0) ;"
-+		"movq 48(%1), %%rdx ;"
-+		"mulx %%rdx, %%rax, %%rcx ;" /* B[2]^2 */
-+		"adcq %%rax, %%r11 ;"
-+		"movq %%r11,  96(%0) ;"
-+		"adcq %%rcx, %%rbx ;"
-+		"movq %%rbx, 104(%0) ;"
-+		"movq 56(%1), %%rdx ;"
-+		"mulx %%rdx, %%rax, %%rcx ;" /* B[3]^2 */
-+		"adcq %%rax, %%r13 ;"
-+		"movq %%r13, 112(%0) ;"
-+		"adcq %%rcx, %%r14 ;"
-+		"movq %%r14, 120(%0) ;"
-+		:
-+		: "r"(c), "r"(a)
-+		: "memory", "cc", "%rax", "%rbx", "%rcx", "%rdx", "%r8", "%r9",
-+		  "%r10", "%r11", "%r13", "%r14", "%r15");
-+}
-+
-+static void sqr2_256x256_integer_bmi2(u64 *const c, const u64 *const a)
-+{
-+	asm volatile(
-+		"movq  8(%1), %%rdx        ;" /* A[1]      */
-+		"mulx   (%1),  %%r8,  %%r9 ;" /* A[0]*A[1] */
-+		"mulx 16(%1), %%r10, %%r11 ;" /* A[2]*A[1] */
-+		"mulx 24(%1), %%rcx, %%r14 ;" /* A[3]*A[1] */
-+
-+		"movq 16(%1), %%rdx        ;" /* A[2]      */
-+		"mulx 24(%1), %%r15, %%r13 ;" /* A[3]*A[2] */
-+		"mulx   (%1), %%rax, %%rdx ;" /* A[0]*A[2] */
-+
-+		"addq %%rax,  %%r9 ;"
-+		"adcq %%rdx, %%r10 ;"
-+		"adcq %%rcx, %%r11 ;"
-+		"adcq %%r14, %%r15 ;"
-+		"adcq    $0, %%r13 ;"
-+		"movq    $0, %%r14 ;"
-+		"adcq    $0, %%r14 ;"
-+
-+		"movq   (%1), %%rdx        ;" /* A[0]      */
-+		"mulx 24(%1), %%rax, %%rcx ;" /* A[0]*A[3] */
-+
-+		"addq %%rax, %%r10 ;"
-+		"adcq %%rcx, %%r11 ;"
-+		"adcq    $0, %%r15 ;"
-+		"adcq    $0, %%r13 ;"
-+		"adcq    $0, %%r14 ;"
-+
-+		"shldq $1, %%r13, %%r14 ;"
-+		"shldq $1, %%r15, %%r13 ;"
-+		"shldq $1, %%r11, %%r15 ;"
-+		"shldq $1, %%r10, %%r11 ;"
-+		"shldq $1,  %%r9, %%r10 ;"
-+		"shldq $1,  %%r8,  %%r9 ;"
-+		"shlq  $1,  %%r8        ;"
-+
-+		/*******************/
-+		"mulx %%rdx, %%rax, %%rcx ; " /* A[0]^2 */
-+		/*******************/
-+		"movq %%rax,  0(%0) ;"
-+		"addq %%rcx,  %%r8 ;"
-+		"movq  %%r8,  8(%0) ;"
-+		"movq  8(%1), %%rdx ;"
-+		"mulx %%rdx, %%rax, %%rcx ; " /* A[1]^2 */
-+		"adcq %%rax,  %%r9 ;"
-+		"movq  %%r9, 16(%0) ;"
-+		"adcq %%rcx, %%r10 ;"
-+		"movq %%r10, 24(%0) ;"
-+		"movq 16(%1), %%rdx ;"
-+		"mulx %%rdx, %%rax, %%rcx ; " /* A[2]^2 */
-+		"adcq %%rax, %%r11 ;"
-+		"movq %%r11, 32(%0) ;"
-+		"adcq %%rcx, %%r15 ;"
-+		"movq %%r15, 40(%0) ;"
-+		"movq 24(%1), %%rdx ;"
-+		"mulx %%rdx, %%rax, %%rcx ; " /* A[3]^2 */
-+		"adcq %%rax, %%r13 ;"
-+		"movq %%r13, 48(%0) ;"
-+		"adcq %%rcx, %%r14 ;"
-+		"movq %%r14, 56(%0) ;"
-+
-+		"movq 40(%1), %%rdx        ;" /* B[1]      */
-+		"mulx 32(%1),  %%r8,  %%r9 ;" /* B[0]*B[1] */
-+		"mulx 48(%1), %%r10, %%r11 ;" /* B[2]*B[1] */
-+		"mulx 56(%1), %%rcx, %%r14 ;" /* B[3]*B[1] */
-+
-+		"movq 48(%1), %%rdx        ;" /* B[2]      */
-+		"mulx 56(%1), %%r15, %%r13 ;" /* B[3]*B[2] */
-+		"mulx 32(%1), %%rax, %%rdx ;" /* B[0]*B[2] */
-+
-+		"addq %%rax,  %%r9 ;"
-+		"adcq %%rdx, %%r10 ;"
-+		"adcq %%rcx, %%r11 ;"
-+		"adcq %%r14, %%r15 ;"
-+		"adcq    $0, %%r13 ;"
-+		"movq    $0, %%r14 ;"
-+		"adcq    $0, %%r14 ;"
-+
-+		"movq 32(%1), %%rdx        ;" /* B[0]      */
-+		"mulx 56(%1), %%rax, %%rcx ;" /* B[0]*B[3] */
-+
-+		"addq %%rax, %%r10 ;"
-+		"adcq %%rcx, %%r11 ;"
-+		"adcq    $0, %%r15 ;"
-+		"adcq    $0, %%r13 ;"
-+		"adcq    $0, %%r14 ;"
-+
-+		"shldq $1, %%r13, %%r14 ;"
-+		"shldq $1, %%r15, %%r13 ;"
-+		"shldq $1, %%r11, %%r15 ;"
-+		"shldq $1, %%r10, %%r11 ;"
-+		"shldq $1,  %%r9, %%r10 ;"
-+		"shldq $1,  %%r8,  %%r9 ;"
-+		"shlq  $1,  %%r8        ;"
-+
-+		/*******************/
-+		"mulx %%rdx, %%rax, %%rcx ; " /* B[0]^2 */
-+		/*******************/
-+		"movq %%rax,  64(%0) ;"
-+		"addq %%rcx,  %%r8 ;"
-+		"movq  %%r8,  72(%0) ;"
-+		"movq 40(%1), %%rdx ;"
-+		"mulx %%rdx, %%rax, %%rcx ; " /* B[1]^2 */
-+		"adcq %%rax,  %%r9 ;"
-+		"movq  %%r9,  80(%0) ;"
-+		"adcq %%rcx, %%r10 ;"
-+		"movq %%r10,  88(%0) ;"
-+		"movq 48(%1), %%rdx ;"
-+		"mulx %%rdx, %%rax, %%rcx ; " /* B[2]^2 */
-+		"adcq %%rax, %%r11 ;"
-+		"movq %%r11,  96(%0) ;"
-+		"adcq %%rcx, %%r15 ;"
-+		"movq %%r15, 104(%0) ;"
-+		"movq 56(%1), %%rdx ;"
-+		"mulx %%rdx, %%rax, %%rcx ; " /* B[3]^2 */
-+		"adcq %%rax, %%r13 ;"
-+		"movq %%r13, 112(%0) ;"
-+		"adcq %%rcx, %%r14 ;"
-+		"movq %%r14, 120(%0) ;"
-+		:
-+		: "r"(c), "r"(a)
-+		: "memory", "cc", "%rax", "%rcx", "%rdx", "%r8", "%r9", "%r10",
-+		  "%r11", "%r13", "%r14", "%r15");
-+}
-+
-+static void red_eltfp25519_2w_adx(u64 *const c, const u64 *const a)
-+{
-+	asm volatile(
-+		"movl    $38, %%edx; "	/* 2*c = 38 = 2^256 */
-+		"mulx 32(%1),  %%r8, %%r10; " /* c*C[4] */
-+		"xorl %%ebx, %%ebx ;"
-+		"adox   (%1),  %%r8 ;"
-+		"mulx 40(%1),  %%r9, %%r11; " /* c*C[5] */
-+		"adcx %%r10,  %%r9 ;"
-+		"adox  8(%1),  %%r9 ;"
-+		"mulx 48(%1), %%r10, %%rax; " /* c*C[6] */
-+		"adcx %%r11, %%r10 ;"
-+		"adox 16(%1), %%r10 ;"
-+		"mulx 56(%1), %%r11, %%rcx; " /* c*C[7] */
-+		"adcx %%rax, %%r11 ;"
-+		"adox 24(%1), %%r11 ;"
-+		/***************************************/
-+		"adcx %%rbx, %%rcx ;"
-+		"adox  %%rbx, %%rcx ;"
-+		"imul %%rdx, %%rcx ;" /* c*C[4], cf=0, of=0 */
-+		"adcx %%rcx,  %%r8 ;"
-+		"adcx %%rbx,  %%r9 ;"
-+		"movq  %%r9,  8(%0) ;"
-+		"adcx %%rbx, %%r10 ;"
-+		"movq %%r10, 16(%0) ;"
-+		"adcx %%rbx, %%r11 ;"
-+		"movq %%r11, 24(%0) ;"
-+		"mov     $0, %%ecx ;"
-+		"cmovc %%edx, %%ecx ;"
-+		"addq %%rcx,  %%r8 ;"
-+		"movq  %%r8,   (%0) ;"
-+
-+		"mulx  96(%1),  %%r8, %%r10; " /* c*C[4] */
-+		"xorl %%ebx, %%ebx ;"
-+		"adox 64(%1),  %%r8 ;"
-+		"mulx 104(%1),  %%r9, %%r11; " /* c*C[5] */
-+		"adcx %%r10,  %%r9 ;"
-+		"adox 72(%1),  %%r9 ;"
-+		"mulx 112(%1), %%r10, %%rax; " /* c*C[6] */
-+		"adcx %%r11, %%r10 ;"
-+		"adox 80(%1), %%r10 ;"
-+		"mulx 120(%1), %%r11, %%rcx; " /* c*C[7] */
-+		"adcx %%rax, %%r11 ;"
-+		"adox 88(%1), %%r11 ;"
-+		/****************************************/
-+		"adcx %%rbx, %%rcx ;"
-+		"adox  %%rbx, %%rcx ;"
-+		"imul %%rdx, %%rcx ;" /* c*C[4], cf=0, of=0 */
-+		"adcx %%rcx,  %%r8 ;"
-+		"adcx %%rbx,  %%r9 ;"
-+		"movq  %%r9, 40(%0) ;"
-+		"adcx %%rbx, %%r10 ;"
-+		"movq %%r10, 48(%0) ;"
-+		"adcx %%rbx, %%r11 ;"
-+		"movq %%r11, 56(%0) ;"
-+		"mov     $0, %%ecx ;"
-+		"cmovc %%edx, %%ecx ;"
-+		"addq %%rcx,  %%r8 ;"
-+		"movq  %%r8, 32(%0) ;"
-+		:
-+		: "r"(c), "r"(a)
-+		: "memory", "cc", "%rax", "%rbx", "%rcx", "%rdx", "%r8", "%r9",
-+		  "%r10", "%r11");
-+}
-+
-+static void red_eltfp25519_2w_bmi2(u64 *const c, const u64 *const a)
-+{
-+	asm volatile(
-+		"movl    $38, %%edx ; "       /* 2*c = 38 = 2^256 */
-+		"mulx 32(%1),  %%r8, %%r10 ;" /* c*C[4] */
-+		"mulx 40(%1),  %%r9, %%r11 ;" /* c*C[5] */
-+		"addq %%r10,  %%r9 ;"
-+		"mulx 48(%1), %%r10, %%rax ;" /* c*C[6] */
-+		"adcq %%r11, %%r10 ;"
-+		"mulx 56(%1), %%r11, %%rcx ;" /* c*C[7] */
-+		"adcq %%rax, %%r11 ;"
-+		/***************************************/
-+		"adcq    $0, %%rcx ;"
-+		"addq   (%1),  %%r8 ;"
-+		"adcq  8(%1),  %%r9 ;"
-+		"adcq 16(%1), %%r10 ;"
-+		"adcq 24(%1), %%r11 ;"
-+		"adcq     $0, %%rcx ;"
-+		"imul %%rdx, %%rcx ;" /* c*C[4], cf=0 */
-+		"addq %%rcx,  %%r8 ;"
-+		"adcq    $0,  %%r9 ;"
-+		"movq  %%r9,  8(%0) ;"
-+		"adcq    $0, %%r10 ;"
-+		"movq %%r10, 16(%0) ;"
-+		"adcq    $0, %%r11 ;"
-+		"movq %%r11, 24(%0) ;"
-+		"mov     $0, %%ecx ;"
-+		"cmovc %%edx, %%ecx ;"
-+		"addq %%rcx,  %%r8 ;"
-+		"movq  %%r8,   (%0) ;"
-+
-+		"mulx  96(%1),  %%r8, %%r10 ;" /* c*C[4] */
-+		"mulx 104(%1),  %%r9, %%r11 ;" /* c*C[5] */
-+		"addq %%r10,  %%r9 ;"
-+		"mulx 112(%1), %%r10, %%rax ;" /* c*C[6] */
-+		"adcq %%r11, %%r10 ;"
-+		"mulx 120(%1), %%r11, %%rcx ;" /* c*C[7] */
-+		"adcq %%rax, %%r11 ;"
-+		/****************************************/
-+		"adcq    $0, %%rcx ;"
-+		"addq 64(%1),  %%r8 ;"
-+		"adcq 72(%1),  %%r9 ;"
-+		"adcq 80(%1), %%r10 ;"
-+		"adcq 88(%1), %%r11 ;"
-+		"adcq     $0, %%rcx ;"
-+		"imul %%rdx, %%rcx ;" /* c*C[4], cf=0 */
-+		"addq %%rcx,  %%r8 ;"
-+		"adcq    $0,  %%r9 ;"
-+		"movq  %%r9, 40(%0) ;"
-+		"adcq    $0, %%r10 ;"
-+		"movq %%r10, 48(%0) ;"
-+		"adcq    $0, %%r11 ;"
-+		"movq %%r11, 56(%0) ;"
-+		"mov     $0, %%ecx ;"
-+		"cmovc %%edx, %%ecx ;"
-+		"addq %%rcx,  %%r8 ;"
-+		"movq  %%r8, 32(%0) ;"
-+		:
-+		: "r"(c), "r"(a)
-+		: "memory", "cc", "%rax", "%rcx", "%rdx", "%r8", "%r9", "%r10",
-+		  "%r11");
-+}
-+
-+static void mul_256x256_integer_adx(u64 *const c, const u64 *const a,
-+				    const u64 *const b)
-+{
-+	asm volatile(
-+		"movq   (%1), %%rdx; "	/* A[0] */
-+		"mulx   (%2),  %%r8,  %%r9; " /* A[0]*B[0] */
-+		"xorl %%r10d, %%r10d ;"
-+		"movq  %%r8,  (%0) ;"
-+		"mulx  8(%2), %%r10, %%r11; " /* A[0]*B[1] */
-+		"adox  %%r9, %%r10 ;"
-+		"movq %%r10, 8(%0) ;"
-+		"mulx 16(%2), %%r15, %%r13; " /* A[0]*B[2] */
-+		"adox %%r11, %%r15 ;"
-+		"mulx 24(%2), %%r14, %%rdx; " /* A[0]*B[3] */
-+		"adox %%r13, %%r14 ;"
-+		"movq $0, %%rax ;"
-+		/******************************************/
-+		"adox %%rdx, %%rax ;"
-+
-+		"movq  8(%1), %%rdx; "	/* A[1] */
-+		"mulx   (%2),  %%r8,  %%r9; " /* A[1]*B[0] */
-+		"xorl %%r10d, %%r10d ;"
-+		"adcx 8(%0),  %%r8 ;"
-+		"movq  %%r8,  8(%0) ;"
-+		"mulx  8(%2), %%r10, %%r11; " /* A[1]*B[1] */
-+		"adox  %%r9, %%r10 ;"
-+		"adcx %%r15, %%r10 ;"
-+		"movq %%r10, 16(%0) ;"
-+		"mulx 16(%2), %%r15, %%r13; " /* A[1]*B[2] */
-+		"adox %%r11, %%r15 ;"
-+		"adcx %%r14, %%r15 ;"
-+		"movq $0, %%r8  ;"
-+		"mulx 24(%2), %%r14, %%rdx; " /* A[1]*B[3] */
-+		"adox %%r13, %%r14 ;"
-+		"adcx %%rax, %%r14 ;"
-+		"movq $0, %%rax ;"
-+		/******************************************/
-+		"adox %%rdx, %%rax ;"
-+		"adcx  %%r8, %%rax ;"
-+
-+		"movq 16(%1), %%rdx; "	/* A[2] */
-+		"mulx   (%2),  %%r8,  %%r9; " /* A[2]*B[0] */
-+		"xorl %%r10d, %%r10d ;"
-+		"adcx 16(%0), %%r8 ;"
-+		"movq  %%r8, 16(%0) ;"
-+		"mulx  8(%2), %%r10, %%r11; " /* A[2]*B[1] */
-+		"adox  %%r9, %%r10 ;"
-+		"adcx %%r15, %%r10 ;"
-+		"movq %%r10, 24(%0) ;"
-+		"mulx 16(%2), %%r15, %%r13; " /* A[2]*B[2] */
-+		"adox %%r11, %%r15 ;"
-+		"adcx %%r14, %%r15 ;"
-+		"movq $0, %%r8  ;"
-+		"mulx 24(%2), %%r14, %%rdx; " /* A[2]*B[3] */
-+		"adox %%r13, %%r14 ;"
-+		"adcx %%rax, %%r14 ;"
-+		"movq $0, %%rax ;"
-+		/******************************************/
-+		"adox %%rdx, %%rax ;"
-+		"adcx  %%r8, %%rax ;"
-+
-+		"movq 24(%1), %%rdx; "	/* A[3] */
-+		"mulx   (%2),  %%r8,  %%r9; " /* A[3]*B[0] */
-+		"xorl %%r10d, %%r10d ;"
-+		"adcx 24(%0), %%r8 ;"
-+		"movq  %%r8, 24(%0) ;"
-+		"mulx  8(%2), %%r10, %%r11; " /* A[3]*B[1] */
-+		"adox  %%r9, %%r10 ;"
-+		"adcx %%r15, %%r10 ;"
-+		"movq %%r10, 32(%0) ;"
-+		"mulx 16(%2), %%r15, %%r13; " /* A[3]*B[2] */
-+		"adox %%r11, %%r15 ;"
-+		"adcx %%r14, %%r15 ;"
-+		"movq %%r15, 40(%0) ;"
-+		"movq $0, %%r8  ;"
-+		"mulx 24(%2), %%r14, %%rdx; " /* A[3]*B[3] */
-+		"adox %%r13, %%r14 ;"
-+		"adcx %%rax, %%r14 ;"
-+		"movq %%r14, 48(%0) ;"
-+		"movq $0, %%rax ;"
-+		/******************************************/
-+		"adox %%rdx, %%rax ;"
-+		"adcx  %%r8, %%rax ;"
-+		"movq %%rax, 56(%0) ;"
-+		:
-+		: "r"(c), "r"(a), "r"(b)
-+		: "memory", "cc", "%rax", "%rdx", "%r8", "%r9", "%r10", "%r11",
-+		  "%r13", "%r14", "%r15");
-+}
-+
-+static void mul_256x256_integer_bmi2(u64 *const c, const u64 *const a,
-+				     const u64 *const b)
-+{
-+	asm volatile(
-+		"movq   (%1), %%rdx; "	/* A[0] */
-+		"mulx   (%2),  %%r8, %%r15; " /* A[0]*B[0] */
-+		"movq %%r8,  (%0) ;"
-+		"mulx  8(%2), %%r10, %%rax; " /* A[0]*B[1] */
-+		"addq %%r10, %%r15 ;"
-+		"mulx 16(%2),  %%r8, %%rbx; " /* A[0]*B[2] */
-+		"adcq  %%r8, %%rax ;"
-+		"mulx 24(%2), %%r10, %%rcx; " /* A[0]*B[3] */
-+		"adcq %%r10, %%rbx ;"
-+		/******************************************/
-+		"adcq    $0, %%rcx ;"
-+
-+		"movq  8(%1), %%rdx; "	/* A[1] */
-+		"mulx   (%2),  %%r8,  %%r9; " /* A[1]*B[0] */
-+		"addq %%r15,  %%r8 ;"
-+		"movq %%r8, 8(%0) ;"
-+		"mulx  8(%2), %%r10, %%r11; " /* A[1]*B[1] */
-+		"adcq %%r10,  %%r9 ;"
-+		"mulx 16(%2),  %%r8, %%r13; " /* A[1]*B[2] */
-+		"adcq  %%r8, %%r11 ;"
-+		"mulx 24(%2), %%r10, %%r15; " /* A[1]*B[3] */
-+		"adcq %%r10, %%r13 ;"
-+		/******************************************/
-+		"adcq    $0, %%r15 ;"
-+
-+		"addq  %%r9, %%rax ;"
-+		"adcq %%r11, %%rbx ;"
-+		"adcq %%r13, %%rcx ;"
-+		"adcq    $0, %%r15 ;"
-+
-+		"movq 16(%1), %%rdx; "	/* A[2] */
-+		"mulx   (%2),  %%r8,  %%r9; " /* A[2]*B[0] */
-+		"addq %%rax,  %%r8 ;"
-+		"movq %%r8, 16(%0) ;"
-+		"mulx  8(%2), %%r10, %%r11; " /* A[2]*B[1] */
-+		"adcq %%r10,  %%r9 ;"
-+		"mulx 16(%2),  %%r8, %%r13; " /* A[2]*B[2] */
-+		"adcq  %%r8, %%r11 ;"
-+		"mulx 24(%2), %%r10, %%rax; " /* A[2]*B[3] */
-+		"adcq %%r10, %%r13 ;"
-+		/******************************************/
-+		"adcq    $0, %%rax ;"
-+
-+		"addq  %%r9, %%rbx ;"
-+		"adcq %%r11, %%rcx ;"
-+		"adcq %%r13, %%r15 ;"
-+		"adcq    $0, %%rax ;"
-+
-+		"movq 24(%1), %%rdx; "	/* A[3] */
-+		"mulx   (%2),  %%r8,  %%r9; " /* A[3]*B[0] */
-+		"addq %%rbx,  %%r8 ;"
-+		"movq %%r8, 24(%0) ;"
-+		"mulx  8(%2), %%r10, %%r11; " /* A[3]*B[1] */
-+		"adcq %%r10,  %%r9 ;"
-+		"mulx 16(%2),  %%r8, %%r13; " /* A[3]*B[2] */
-+		"adcq  %%r8, %%r11 ;"
-+		"mulx 24(%2), %%r10, %%rbx; " /* A[3]*B[3] */
-+		"adcq %%r10, %%r13 ;"
-+		/******************************************/
-+		"adcq    $0, %%rbx ;"
-+
-+		"addq  %%r9, %%rcx ;"
-+		"movq %%rcx, 32(%0) ;"
-+		"adcq %%r11, %%r15 ;"
-+		"movq %%r15, 40(%0) ;"
-+		"adcq %%r13, %%rax ;"
-+		"movq %%rax, 48(%0) ;"
-+		"adcq    $0, %%rbx ;"
-+		"movq %%rbx, 56(%0) ;"
-+		:
-+		: "r"(c), "r"(a), "r"(b)
-+		: "memory", "cc", "%rax", "%rbx", "%rcx", "%rdx", "%r8", "%r9",
-+		  "%r10", "%r11", "%r13", "%r15");
-+}
-+
-+static void sqr_256x256_integer_adx(u64 *const c, const u64 *const a)
-+{
-+	asm volatile(
-+		"movq   (%1), %%rdx        ;" /* A[0]      */
-+		"mulx  8(%1),  %%r8, %%r14 ;" /* A[1]*A[0] */
-+		"xorl %%r15d, %%r15d;"
-+		"mulx 16(%1),  %%r9, %%r10 ;" /* A[2]*A[0] */
-+		"adcx %%r14,  %%r9 ;"
-+		"mulx 24(%1), %%rax, %%rcx ;" /* A[3]*A[0] */
-+		"adcx %%rax, %%r10 ;"
-+		"movq 24(%1), %%rdx        ;" /* A[3]      */
-+		"mulx  8(%1), %%r11, %%rbx ;" /* A[1]*A[3] */
-+		"adcx %%rcx, %%r11 ;"
-+		"mulx 16(%1), %%rax, %%r13 ;" /* A[2]*A[3] */
-+		"adcx %%rax, %%rbx ;"
-+		"movq  8(%1), %%rdx        ;" /* A[1]      */
-+		"adcx %%r15, %%r13 ;"
-+		"mulx 16(%1), %%rax, %%rcx ;" /* A[2]*A[1] */
-+		"movq    $0, %%r14 ;"
-+		/******************************************/
-+		"adcx %%r15, %%r14 ;"
-+
-+		"xorl %%r15d, %%r15d;"
-+		"adox %%rax, %%r10 ;"
-+		"adcx  %%r8,  %%r8 ;"
-+		"adox %%rcx, %%r11 ;"
-+		"adcx  %%r9,  %%r9 ;"
-+		"adox %%r15, %%rbx ;"
-+		"adcx %%r10, %%r10 ;"
-+		"adox %%r15, %%r13 ;"
-+		"adcx %%r11, %%r11 ;"
-+		"adox %%r15, %%r14 ;"
-+		"adcx %%rbx, %%rbx ;"
-+		"adcx %%r13, %%r13 ;"
-+		"adcx %%r14, %%r14 ;"
-+
-+		"movq   (%1), %%rdx ;"
-+		"mulx %%rdx, %%rax, %%rcx ;" /* A[0]^2 */
-+		/*******************/
-+		"movq %%rax,  0(%0) ;"
-+		"addq %%rcx,  %%r8 ;"
-+		"movq  %%r8,  8(%0) ;"
-+		"movq  8(%1), %%rdx ;"
-+		"mulx %%rdx, %%rax, %%rcx ;" /* A[1]^2 */
-+		"adcq %%rax,  %%r9 ;"
-+		"movq  %%r9, 16(%0) ;"
-+		"adcq %%rcx, %%r10 ;"
-+		"movq %%r10, 24(%0) ;"
-+		"movq 16(%1), %%rdx ;"
-+		"mulx %%rdx, %%rax, %%rcx ;" /* A[2]^2 */
-+		"adcq %%rax, %%r11 ;"
-+		"movq %%r11, 32(%0) ;"
-+		"adcq %%rcx, %%rbx ;"
-+		"movq %%rbx, 40(%0) ;"
-+		"movq 24(%1), %%rdx ;"
-+		"mulx %%rdx, %%rax, %%rcx ;" /* A[3]^2 */
-+		"adcq %%rax, %%r13 ;"
-+		"movq %%r13, 48(%0) ;"
-+		"adcq %%rcx, %%r14 ;"
-+		"movq %%r14, 56(%0) ;"
-+		:
-+		: "r"(c), "r"(a)
-+		: "memory", "cc", "%rax", "%rbx", "%rcx", "%rdx", "%r8", "%r9",
-+		  "%r10", "%r11", "%r13", "%r14", "%r15");
-+}
-+
-+static void sqr_256x256_integer_bmi2(u64 *const c, const u64 *const a)
-+{
-+	asm volatile(
-+		"movq  8(%1), %%rdx        ;" /* A[1]      */
-+		"mulx   (%1),  %%r8,  %%r9 ;" /* A[0]*A[1] */
-+		"mulx 16(%1), %%r10, %%r11 ;" /* A[2]*A[1] */
-+		"mulx 24(%1), %%rcx, %%r14 ;" /* A[3]*A[1] */
-+
-+		"movq 16(%1), %%rdx        ;" /* A[2]      */
-+		"mulx 24(%1), %%r15, %%r13 ;" /* A[3]*A[2] */
-+		"mulx   (%1), %%rax, %%rdx ;" /* A[0]*A[2] */
-+
-+		"addq %%rax,  %%r9 ;"
-+		"adcq %%rdx, %%r10 ;"
-+		"adcq %%rcx, %%r11 ;"
-+		"adcq %%r14, %%r15 ;"
-+		"adcq    $0, %%r13 ;"
-+		"movq    $0, %%r14 ;"
-+		"adcq    $0, %%r14 ;"
-+
-+		"movq   (%1), %%rdx        ;" /* A[0]      */
-+		"mulx 24(%1), %%rax, %%rcx ;" /* A[0]*A[3] */
-+
-+		"addq %%rax, %%r10 ;"
-+		"adcq %%rcx, %%r11 ;"
-+		"adcq    $0, %%r15 ;"
-+		"adcq    $0, %%r13 ;"
-+		"adcq    $0, %%r14 ;"
-+
-+		"shldq $1, %%r13, %%r14 ;"
-+		"shldq $1, %%r15, %%r13 ;"
-+		"shldq $1, %%r11, %%r15 ;"
-+		"shldq $1, %%r10, %%r11 ;"
-+		"shldq $1,  %%r9, %%r10 ;"
-+		"shldq $1,  %%r8,  %%r9 ;"
-+		"shlq  $1,  %%r8        ;"
-+
-+		/*******************/
-+		"mulx %%rdx, %%rax, %%rcx ;" /* A[0]^2 */
-+		/*******************/
-+		"movq %%rax,  0(%0) ;"
-+		"addq %%rcx,  %%r8 ;"
-+		"movq  %%r8,  8(%0) ;"
-+		"movq  8(%1), %%rdx ;"
-+		"mulx %%rdx, %%rax, %%rcx ;" /* A[1]^2 */
-+		"adcq %%rax,  %%r9 ;"
-+		"movq  %%r9, 16(%0) ;"
-+		"adcq %%rcx, %%r10 ;"
-+		"movq %%r10, 24(%0) ;"
-+		"movq 16(%1), %%rdx ;"
-+		"mulx %%rdx, %%rax, %%rcx ;" /* A[2]^2 */
-+		"adcq %%rax, %%r11 ;"
-+		"movq %%r11, 32(%0) ;"
-+		"adcq %%rcx, %%r15 ;"
-+		"movq %%r15, 40(%0) ;"
-+		"movq 24(%1), %%rdx ;"
-+		"mulx %%rdx, %%rax, %%rcx ;" /* A[3]^2 */
-+		"adcq %%rax, %%r13 ;"
-+		"movq %%r13, 48(%0) ;"
-+		"adcq %%rcx, %%r14 ;"
-+		"movq %%r14, 56(%0) ;"
-+		:
-+		: "r"(c), "r"(a)
-+		: "memory", "cc", "%rax", "%rcx", "%rdx", "%r8", "%r9", "%r10",
-+		  "%r11", "%r13", "%r14", "%r15");
-+}
-+
-+static void red_eltfp25519_1w_adx(u64 *const c, const u64 *const a)
-+{
-+	asm volatile(
-+		"movl    $38, %%edx ;"	/* 2*c = 38 = 2^256 */
-+		"mulx 32(%1),  %%r8, %%r10 ;" /* c*C[4] */
-+		"xorl %%ebx, %%ebx ;"
-+		"adox   (%1),  %%r8 ;"
-+		"mulx 40(%1),  %%r9, %%r11 ;" /* c*C[5] */
-+		"adcx %%r10,  %%r9 ;"
-+		"adox  8(%1),  %%r9 ;"
-+		"mulx 48(%1), %%r10, %%rax ;" /* c*C[6] */
-+		"adcx %%r11, %%r10 ;"
-+		"adox 16(%1), %%r10 ;"
-+		"mulx 56(%1), %%r11, %%rcx ;" /* c*C[7] */
-+		"adcx %%rax, %%r11 ;"
-+		"adox 24(%1), %%r11 ;"
-+		/***************************************/
-+		"adcx %%rbx, %%rcx ;"
-+		"adox  %%rbx, %%rcx ;"
-+		"imul %%rdx, %%rcx ;" /* c*C[4], cf=0, of=0 */
-+		"adcx %%rcx,  %%r8 ;"
-+		"adcx %%rbx,  %%r9 ;"
-+		"movq  %%r9,  8(%0) ;"
-+		"adcx %%rbx, %%r10 ;"
-+		"movq %%r10, 16(%0) ;"
-+		"adcx %%rbx, %%r11 ;"
-+		"movq %%r11, 24(%0) ;"
-+		"mov     $0, %%ecx ;"
-+		"cmovc %%edx, %%ecx ;"
-+		"addq %%rcx,  %%r8 ;"
-+		"movq  %%r8,   (%0) ;"
-+		:
-+		: "r"(c), "r"(a)
-+		: "memory", "cc", "%rax", "%rbx", "%rcx", "%rdx", "%r8", "%r9",
-+		  "%r10", "%r11");
-+}
-+
-+static void red_eltfp25519_1w_bmi2(u64 *const c, const u64 *const a)
-+{
-+	asm volatile(
-+		"movl    $38, %%edx ;"	/* 2*c = 38 = 2^256 */
-+		"mulx 32(%1),  %%r8, %%r10 ;" /* c*C[4] */
-+		"mulx 40(%1),  %%r9, %%r11 ;" /* c*C[5] */
-+		"addq %%r10,  %%r9 ;"
-+		"mulx 48(%1), %%r10, %%rax ;" /* c*C[6] */
-+		"adcq %%r11, %%r10 ;"
-+		"mulx 56(%1), %%r11, %%rcx ;" /* c*C[7] */
-+		"adcq %%rax, %%r11 ;"
-+		/***************************************/
-+		"adcq    $0, %%rcx ;"
-+		"addq   (%1),  %%r8 ;"
-+		"adcq  8(%1),  %%r9 ;"
-+		"adcq 16(%1), %%r10 ;"
-+		"adcq 24(%1), %%r11 ;"
-+		"adcq     $0, %%rcx ;"
-+		"imul %%rdx, %%rcx ;" /* c*C[4], cf=0 */
-+		"addq %%rcx,  %%r8 ;"
-+		"adcq    $0,  %%r9 ;"
-+		"movq  %%r9,  8(%0) ;"
-+		"adcq    $0, %%r10 ;"
-+		"movq %%r10, 16(%0) ;"
-+		"adcq    $0, %%r11 ;"
-+		"movq %%r11, 24(%0) ;"
-+		"mov     $0, %%ecx ;"
-+		"cmovc %%edx, %%ecx ;"
-+		"addq %%rcx,  %%r8 ;"
-+		"movq  %%r8,   (%0) ;"
-+		:
-+		: "r"(c), "r"(a)
-+		: "memory", "cc", "%rax", "%rcx", "%rdx", "%r8", "%r9", "%r10",
-+		  "%r11");
-+}
-+
-+static __always_inline void
-+add_eltfp25519_1w_adx(u64 *const c, const u64 *const a, const u64 *const b)
-+{
-+	asm volatile(
-+		"mov     $38, %%eax ;"
-+		"xorl  %%ecx, %%ecx ;"
-+		"movq   (%2),  %%r8 ;"
-+		"adcx   (%1),  %%r8 ;"
-+		"movq  8(%2),  %%r9 ;"
-+		"adcx  8(%1),  %%r9 ;"
-+		"movq 16(%2), %%r10 ;"
-+		"adcx 16(%1), %%r10 ;"
-+		"movq 24(%2), %%r11 ;"
-+		"adcx 24(%1), %%r11 ;"
-+		"cmovc %%eax, %%ecx ;"
-+		"xorl %%eax, %%eax  ;"
-+		"adcx %%rcx,  %%r8  ;"
-+		"adcx %%rax,  %%r9  ;"
-+		"movq  %%r9,  8(%0) ;"
-+		"adcx %%rax, %%r10  ;"
-+		"movq %%r10, 16(%0) ;"
-+		"adcx %%rax, %%r11  ;"
-+		"movq %%r11, 24(%0) ;"
-+		"mov     $38, %%ecx ;"
-+		"cmovc %%ecx, %%eax ;"
-+		"addq %%rax,  %%r8  ;"
-+		"movq  %%r8,   (%0) ;"
-+		:
-+		: "r"(c), "r"(a), "r"(b)
-+		: "memory", "cc", "%rax", "%rcx", "%r8", "%r9", "%r10", "%r11");
-+}
-+
-+static __always_inline void
-+add_eltfp25519_1w_bmi2(u64 *const c, const u64 *const a, const u64 *const b)
-+{
-+	asm volatile(
-+		"mov     $38, %%eax ;"
-+		"movq   (%2),  %%r8 ;"
-+		"addq   (%1),  %%r8 ;"
-+		"movq  8(%2),  %%r9 ;"
-+		"adcq  8(%1),  %%r9 ;"
-+		"movq 16(%2), %%r10 ;"
-+		"adcq 16(%1), %%r10 ;"
-+		"movq 24(%2), %%r11 ;"
-+		"adcq 24(%1), %%r11 ;"
-+		"mov      $0, %%ecx ;"
-+		"cmovc %%eax, %%ecx ;"
-+		"addq %%rcx,  %%r8  ;"
-+		"adcq    $0,  %%r9  ;"
-+		"movq  %%r9,  8(%0) ;"
-+		"adcq    $0, %%r10  ;"
-+		"movq %%r10, 16(%0) ;"
-+		"adcq    $0, %%r11  ;"
-+		"movq %%r11, 24(%0) ;"
-+		"mov     $0, %%ecx  ;"
-+		"cmovc %%eax, %%ecx ;"
-+		"addq %%rcx,  %%r8  ;"
-+		"movq  %%r8,   (%0) ;"
-+		:
-+		: "r"(c), "r"(a), "r"(b)
-+		: "memory", "cc", "%rax", "%rcx", "%r8", "%r9", "%r10", "%r11");
-+}
-+
-+static __always_inline void
-+sub_eltfp25519_1w(u64 *const c, const u64 *const a, const u64 *const b)
-+{
-+	asm volatile(
-+		"mov     $38, %%eax ;"
-+		"movq   (%1),  %%r8 ;"
-+		"subq   (%2),  %%r8 ;"
-+		"movq  8(%1),  %%r9 ;"
-+		"sbbq  8(%2),  %%r9 ;"
-+		"movq 16(%1), %%r10 ;"
-+		"sbbq 16(%2), %%r10 ;"
-+		"movq 24(%1), %%r11 ;"
-+		"sbbq 24(%2), %%r11 ;"
-+		"mov      $0, %%ecx ;"
-+		"cmovc %%eax, %%ecx ;"
-+		"subq %%rcx,  %%r8  ;"
-+		"sbbq    $0,  %%r9  ;"
-+		"movq  %%r9,  8(%0) ;"
-+		"sbbq    $0, %%r10  ;"
-+		"movq %%r10, 16(%0) ;"
-+		"sbbq    $0, %%r11  ;"
-+		"movq %%r11, 24(%0) ;"
-+		"mov     $0, %%ecx  ;"
-+		"cmovc %%eax, %%ecx ;"
-+		"subq %%rcx,  %%r8  ;"
-+		"movq  %%r8,   (%0) ;"
-+		:
-+		: "r"(c), "r"(a), "r"(b)
-+		: "memory", "cc", "%rax", "%rcx", "%r8", "%r9", "%r10", "%r11");
-+}
-+
-+/* Multiplication by a24 = (A+2)/4 = (486662+2)/4 = 121666 */
-+static __always_inline void
-+mul_a24_eltfp25519_1w(u64 *const c, const u64 *const a)
-+{
-+	const u64 a24 = 121666;
-+	asm volatile(
-+		"movq     %2, %%rdx ;"
-+		"mulx   (%1),  %%r8, %%r10 ;"
-+		"mulx  8(%1),  %%r9, %%r11 ;"
-+		"addq %%r10,  %%r9 ;"
-+		"mulx 16(%1), %%r10, %%rax ;"
-+		"adcq %%r11, %%r10 ;"
-+		"mulx 24(%1), %%r11, %%rcx ;"
-+		"adcq %%rax, %%r11 ;"
-+		/**************************/
-+		"adcq    $0, %%rcx ;"
-+		"movl   $38, %%edx ;" /* 2*c = 38 = 2^256 mod 2^255-19*/
-+		"imul %%rdx, %%rcx ;"
-+		"addq %%rcx,  %%r8 ;"
-+		"adcq    $0,  %%r9 ;"
-+		"movq  %%r9,  8(%0) ;"
-+		"adcq    $0, %%r10 ;"
-+		"movq %%r10, 16(%0) ;"
-+		"adcq    $0, %%r11 ;"
-+		"movq %%r11, 24(%0) ;"
-+		"mov     $0, %%ecx ;"
-+		"cmovc %%edx, %%ecx ;"
-+		"addq %%rcx,  %%r8 ;"
-+		"movq  %%r8,   (%0) ;"
-+		:
-+		: "r"(c), "r"(a), "r"(a24)
-+		: "memory", "cc", "%rax", "%rcx", "%rdx", "%r8", "%r9", "%r10",
-+		  "%r11");
-+}
-+
-+static void inv_eltfp25519_1w_adx(u64 *const c, const u64 *const a)
-+{
-+	struct {
-+		eltfp25519_1w_buffer buffer;
-+		eltfp25519_1w x0, x1, x2;
-+	} __aligned(32) m;
-+	u64 *T[4];
-+
-+	T[0] = m.x0;
-+	T[1] = c; /* x^(-1) */
-+	T[2] = m.x1;
-+	T[3] = m.x2;
-+
-+	copy_eltfp25519_1w(T[1], a);
-+	sqrn_eltfp25519_1w_adx(T[1], 1);
-+	copy_eltfp25519_1w(T[2], T[1]);
-+	sqrn_eltfp25519_1w_adx(T[2], 2);
-+	mul_eltfp25519_1w_adx(T[0], a, T[2]);
-+	mul_eltfp25519_1w_adx(T[1], T[1], T[0]);
-+	copy_eltfp25519_1w(T[2], T[1]);
-+	sqrn_eltfp25519_1w_adx(T[2], 1);
-+	mul_eltfp25519_1w_adx(T[0], T[0], T[2]);
-+	copy_eltfp25519_1w(T[2], T[0]);
-+	sqrn_eltfp25519_1w_adx(T[2], 5);
-+	mul_eltfp25519_1w_adx(T[0], T[0], T[2]);
-+	copy_eltfp25519_1w(T[2], T[0]);
-+	sqrn_eltfp25519_1w_adx(T[2], 10);
-+	mul_eltfp25519_1w_adx(T[2], T[2], T[0]);
-+	copy_eltfp25519_1w(T[3], T[2]);
-+	sqrn_eltfp25519_1w_adx(T[3], 20);
-+	mul_eltfp25519_1w_adx(T[3], T[3], T[2]);
-+	sqrn_eltfp25519_1w_adx(T[3], 10);
-+	mul_eltfp25519_1w_adx(T[3], T[3], T[0]);
-+	copy_eltfp25519_1w(T[0], T[3]);
-+	sqrn_eltfp25519_1w_adx(T[0], 50);
-+	mul_eltfp25519_1w_adx(T[0], T[0], T[3]);
-+	copy_eltfp25519_1w(T[2], T[0]);
-+	sqrn_eltfp25519_1w_adx(T[2], 100);
-+	mul_eltfp25519_1w_adx(T[2], T[2], T[0]);
-+	sqrn_eltfp25519_1w_adx(T[2], 50);
-+	mul_eltfp25519_1w_adx(T[2], T[2], T[3]);
-+	sqrn_eltfp25519_1w_adx(T[2], 5);
-+	mul_eltfp25519_1w_adx(T[1], T[1], T[2]);
-+
-+	memzero_explicit(&m, sizeof(m));
-+}
-+
-+static void inv_eltfp25519_1w_bmi2(u64 *const c, const u64 *const a)
-+{
-+	struct {
-+		eltfp25519_1w_buffer buffer;
-+		eltfp25519_1w x0, x1, x2;
-+	} __aligned(32) m;
-+	u64 *T[5];
-+
-+	T[0] = m.x0;
-+	T[1] = c; /* x^(-1) */
-+	T[2] = m.x1;
-+	T[3] = m.x2;
-+
-+	copy_eltfp25519_1w(T[1], a);
-+	sqrn_eltfp25519_1w_bmi2(T[1], 1);
-+	copy_eltfp25519_1w(T[2], T[1]);
-+	sqrn_eltfp25519_1w_bmi2(T[2], 2);
-+	mul_eltfp25519_1w_bmi2(T[0], a, T[2]);
-+	mul_eltfp25519_1w_bmi2(T[1], T[1], T[0]);
-+	copy_eltfp25519_1w(T[2], T[1]);
-+	sqrn_eltfp25519_1w_bmi2(T[2], 1);
-+	mul_eltfp25519_1w_bmi2(T[0], T[0], T[2]);
-+	copy_eltfp25519_1w(T[2], T[0]);
-+	sqrn_eltfp25519_1w_bmi2(T[2], 5);
-+	mul_eltfp25519_1w_bmi2(T[0], T[0], T[2]);
-+	copy_eltfp25519_1w(T[2], T[0]);
-+	sqrn_eltfp25519_1w_bmi2(T[2], 10);
-+	mul_eltfp25519_1w_bmi2(T[2], T[2], T[0]);
-+	copy_eltfp25519_1w(T[3], T[2]);
-+	sqrn_eltfp25519_1w_bmi2(T[3], 20);
-+	mul_eltfp25519_1w_bmi2(T[3], T[3], T[2]);
-+	sqrn_eltfp25519_1w_bmi2(T[3], 10);
-+	mul_eltfp25519_1w_bmi2(T[3], T[3], T[0]);
-+	copy_eltfp25519_1w(T[0], T[3]);
-+	sqrn_eltfp25519_1w_bmi2(T[0], 50);
-+	mul_eltfp25519_1w_bmi2(T[0], T[0], T[3]);
-+	copy_eltfp25519_1w(T[2], T[0]);
-+	sqrn_eltfp25519_1w_bmi2(T[2], 100);
-+	mul_eltfp25519_1w_bmi2(T[2], T[2], T[0]);
-+	sqrn_eltfp25519_1w_bmi2(T[2], 50);
-+	mul_eltfp25519_1w_bmi2(T[2], T[2], T[3]);
-+	sqrn_eltfp25519_1w_bmi2(T[2], 5);
-+	mul_eltfp25519_1w_bmi2(T[1], T[1], T[2]);
-+
-+	memzero_explicit(&m, sizeof(m));
-+}
-+
-+/* Given c, a 256-bit number, fred_eltfp25519_1w updates c
-+ * with a number such that 0 <= C < 2**255-19.
-+ */
-+static __always_inline void fred_eltfp25519_1w(u64 *const c)
-+{
-+	u64 tmp0 = 38, tmp1 = 19;
-+	asm volatile(
-+		"btrq   $63,    %3 ;" /* Put bit 255 in carry flag and clear */
-+		"cmovncl %k5,   %k4 ;" /* c[255] ? 38 : 19 */
-+
-+		/* Add either 19 or 38 to c */
-+		"addq    %4,   %0 ;"
-+		"adcq    $0,   %1 ;"
-+		"adcq    $0,   %2 ;"
-+		"adcq    $0,   %3 ;"
-+
-+		/* Test for bit 255 again; only triggered on overflow modulo 2^255-19 */
-+		"movl    $0,  %k4 ;"
-+		"cmovnsl %k5,  %k4 ;" /* c[255] ? 0 : 19 */
-+		"btrq   $63,   %3 ;" /* Clear bit 255 */
-+
-+		/* Subtract 19 if necessary */
-+		"subq    %4,   %0 ;"
-+		"sbbq    $0,   %1 ;"
-+		"sbbq    $0,   %2 ;"
-+		"sbbq    $0,   %3 ;"
-+
-+		: "+r"(c[0]), "+r"(c[1]), "+r"(c[2]), "+r"(c[3]), "+r"(tmp0),
-+		  "+r"(tmp1)
-+		:
-+		: "memory", "cc");
-+}
-+
-+static __always_inline void cswap(u8 bit, u64 *const px, u64 *const py)
-+{
-+	u64 temp;
-+	asm volatile(
-+		"test %9, %9 ;"
-+		"movq %0, %8 ;"
-+		"cmovnzq %4, %0 ;"
-+		"cmovnzq %8, %4 ;"
-+		"movq %1, %8 ;"
-+		"cmovnzq %5, %1 ;"
-+		"cmovnzq %8, %5 ;"
-+		"movq %2, %8 ;"
-+		"cmovnzq %6, %2 ;"
-+		"cmovnzq %8, %6 ;"
-+		"movq %3, %8 ;"
-+		"cmovnzq %7, %3 ;"
-+		"cmovnzq %8, %7 ;"
-+		: "+r"(px[0]), "+r"(px[1]), "+r"(px[2]), "+r"(px[3]),
-+		  "+r"(py[0]), "+r"(py[1]), "+r"(py[2]), "+r"(py[3]),
-+		  "=r"(temp)
-+		: "r"(bit)
-+		: "cc"
-+	);
-+}
-+
-+static __always_inline void cselect(u8 bit, u64 *const px, const u64 *const py)
-+{
-+	asm volatile(
-+		"test %4, %4 ;"
-+		"cmovnzq %5, %0 ;"
-+		"cmovnzq %6, %1 ;"
-+		"cmovnzq %7, %2 ;"
-+		"cmovnzq %8, %3 ;"
-+		: "+r"(px[0]), "+r"(px[1]), "+r"(px[2]), "+r"(px[3])
-+		: "r"(bit), "rm"(py[0]), "rm"(py[1]), "rm"(py[2]), "rm"(py[3])
-+		: "cc"
-+	);
-+}
-+
-+static __always_inline void clamp_secret(u8 secret[CURVE25519_POINT_SIZE])
-+{
-+	secret[0] &= 248;
-+	secret[31] &= 127;
-+	secret[31] |= 64;
-+}
-+
-+static void curve25519_adx(u8 shared[CURVE25519_POINT_SIZE],
-+			   const u8 private_key[CURVE25519_POINT_SIZE],
-+			   const u8 session_key[CURVE25519_POINT_SIZE])
-+{
-+	struct {
-+		u64 buffer[4 * NUM_WORDS_ELTFP25519];
-+		u64 coordinates[4 * NUM_WORDS_ELTFP25519];
-+		u64 workspace[6 * NUM_WORDS_ELTFP25519];
-+		u8 session[CURVE25519_POINT_SIZE];
-+		u8 private[CURVE25519_POINT_SIZE];
-+	} __aligned(32) m;
-+
-+	int i = 0, j = 0;
-+	u64 prev = 0;
-+	u64 *const X1 = (u64 *)m.session;
-+	u64 *const key = (u64 *)m.private;
-+	u64 *const Px = m.coordinates + 0;
-+	u64 *const Pz = m.coordinates + 4;
-+	u64 *const Qx = m.coordinates + 8;
-+	u64 *const Qz = m.coordinates + 12;
-+	u64 *const X2 = Qx;
-+	u64 *const Z2 = Qz;
-+	u64 *const X3 = Px;
-+	u64 *const Z3 = Pz;
-+	u64 *const X2Z2 = Qx;
-+	u64 *const X3Z3 = Px;
-+
-+	u64 *const A = m.workspace + 0;
-+	u64 *const B = m.workspace + 4;
-+	u64 *const D = m.workspace + 8;
-+	u64 *const C = m.workspace + 12;
-+	u64 *const DA = m.workspace + 16;
-+	u64 *const CB = m.workspace + 20;
-+	u64 *const AB = A;
-+	u64 *const DC = D;
-+	u64 *const DACB = DA;
-+
-+	memcpy(m.private, private_key, sizeof(m.private));
-+	memcpy(m.session, session_key, sizeof(m.session));
-+
-+	clamp_secret(m.private);
-+
-+	/* As in the draft:
-+	 * When receiving such an array, implementations of curve25519
-+	 * MUST mask the most-significant bit in the final byte. This
-+	 * is done to preserve compatibility with point formats which
-+	 * reserve the sign bit for use in other protocols and to
-+	 * increase resistance to implementation fingerprinting
-+	 */
-+	m.session[CURVE25519_POINT_SIZE - 1] &= (1 << (255 % 8)) - 1;
-+
-+	copy_eltfp25519_1w(Px, X1);
-+	setzero_eltfp25519_1w(Pz);
-+	setzero_eltfp25519_1w(Qx);
-+	setzero_eltfp25519_1w(Qz);
-+
-+	Pz[0] = 1;
-+	Qx[0] = 1;
-+
-+	/* main-loop */
-+	prev = 0;
-+	j = 62;
-+	for (i = 3; i >= 0; --i) {
-+		while (j >= 0) {
-+			u64 bit = (key[i] >> j) & 0x1;
-+			u64 swap = bit ^ prev;
-+			prev = bit;
-+
-+			add_eltfp25519_1w_adx(A, X2, Z2);	/* A = (X2+Z2) */
-+			sub_eltfp25519_1w(B, X2, Z2);		/* B = (X2-Z2) */
-+			add_eltfp25519_1w_adx(C, X3, Z3);	/* C = (X3+Z3) */
-+			sub_eltfp25519_1w(D, X3, Z3);		/* D = (X3-Z3) */
-+			mul_eltfp25519_2w_adx(DACB, AB, DC);	/* [DA|CB] = [A|B]*[D|C] */
-+
-+			cselect(swap, A, C);
-+			cselect(swap, B, D);
-+
-+			sqr_eltfp25519_2w_adx(AB);		/* [AA|BB] = [A^2|B^2] */
-+			add_eltfp25519_1w_adx(X3, DA, CB);	/* X3 = (DA+CB) */
-+			sub_eltfp25519_1w(Z3, DA, CB);		/* Z3 = (DA-CB) */
-+			sqr_eltfp25519_2w_adx(X3Z3);		/* [X3|Z3] = [(DA+CB)|(DA+CB)]^2 */
-+
-+			copy_eltfp25519_1w(X2, B);		/* X2 = B^2 */
-+			sub_eltfp25519_1w(Z2, A, B);		/* Z2 = E = AA-BB */
-+
-+			mul_a24_eltfp25519_1w(B, Z2);		/* B = a24*E */
-+			add_eltfp25519_1w_adx(B, B, X2);	/* B = a24*E+B */
-+			mul_eltfp25519_2w_adx(X2Z2, X2Z2, AB);	/* [X2|Z2] = [B|E]*[A|a24*E+B] */
-+			mul_eltfp25519_1w_adx(Z3, Z3, X1);	/* Z3 = Z3*X1 */
-+			--j;
++	struct poly1305_desc_ctx *dctx = shash_desc_ctx(desc);
++	simd_context_t simd_context;
++
++	if (unlikely(dctx->rem_key_bytes)) {
++		unsigned int key_bytes = min(srclen, dctx->rem_key_bytes);
++		memcpy(dctx->key + (POLY1305_KEY_SIZE - dctx->rem_key_bytes),
++		       src, key_bytes);
++		src += key_bytes;
++		srclen -= key_bytes;
++		dctx->rem_key_bytes -= key_bytes;
++		if (!dctx->rem_key_bytes) {
++			poly1305_init(&dctx->ctx, dctx->key);
++			memzero_explicit(dctx->key, sizeof(dctx->key));
 +		}
-+		j = 63;
++		if (!srclen)
++			return 0;
 +	}
 +
-+	inv_eltfp25519_1w_adx(A, Qz);
-+	mul_eltfp25519_1w_adx((u64 *)shared, Qx, A);
-+	fred_eltfp25519_1w((u64 *)shared);
++	simd_get(&simd_context);
++	poly1305_update(&dctx->ctx, src, srclen, &simd_context);
++	simd_put(&simd_context);
 +
-+	memzero_explicit(&m, sizeof(m));
++	return 0;
 +}
 +
-+static void curve25519_adx_base(u8 session_key[CURVE25519_POINT_SIZE],
-+				const u8 private_key[CURVE25519_POINT_SIZE])
++static int crypto_poly1305_final(struct shash_desc *desc, u8 *dst)
 +{
-+	struct {
-+		u64 buffer[4 * NUM_WORDS_ELTFP25519];
-+		u64 coordinates[4 * NUM_WORDS_ELTFP25519];
-+		u64 workspace[4 * NUM_WORDS_ELTFP25519];
-+		u8 private[CURVE25519_POINT_SIZE];
-+	} __aligned(32) m;
++	struct poly1305_desc_ctx *dctx = shash_desc_ctx(desc);
++	simd_context_t simd_context;
 +
-+	const int ite[4] = { 64, 64, 64, 63 };
-+	const int q = 3;
-+	u64 swap = 1;
-+
-+	int i = 0, j = 0, k = 0;
-+	u64 *const key = (u64 *)m.private;
-+	u64 *const Ur1 = m.coordinates + 0;
-+	u64 *const Zr1 = m.coordinates + 4;
-+	u64 *const Ur2 = m.coordinates + 8;
-+	u64 *const Zr2 = m.coordinates + 12;
-+
-+	u64 *const UZr1 = m.coordinates + 0;
-+	u64 *const ZUr2 = m.coordinates + 8;
-+
-+	u64 *const A = m.workspace + 0;
-+	u64 *const B = m.workspace + 4;
-+	u64 *const C = m.workspace + 8;
-+	u64 *const D = m.workspace + 12;
-+
-+	u64 *const AB = m.workspace + 0;
-+	u64 *const CD = m.workspace + 8;
-+
-+	const u64 *const P = table_ladder_8k;
-+
-+	memcpy(m.private, private_key, sizeof(m.private));
-+
-+	clamp_secret(m.private);
-+
-+	setzero_eltfp25519_1w(Ur1);
-+	setzero_eltfp25519_1w(Zr1);
-+	setzero_eltfp25519_1w(Zr2);
-+	Ur1[0] = 1;
-+	Zr1[0] = 1;
-+	Zr2[0] = 1;
-+
-+	/* G-S */
-+	Ur2[3] = 0x1eaecdeee27cab34UL;
-+	Ur2[2] = 0xadc7a0b9235d48e2UL;
-+	Ur2[1] = 0xbbf095ae14b2edf8UL;
-+	Ur2[0] = 0x7e94e1fec82faabdUL;
-+
-+	/* main-loop */
-+	j = q;
-+	for (i = 0; i < NUM_WORDS_ELTFP25519; ++i) {
-+		while (j < ite[i]) {
-+			u64 bit = (key[i] >> j) & 0x1;
-+			k = (64 * i + j - q);
-+			swap = swap ^ bit;
-+			cswap(swap, Ur1, Ur2);
-+			cswap(swap, Zr1, Zr2);
-+			swap = bit;
-+			/* Addition */
-+			sub_eltfp25519_1w(B, Ur1, Zr1);		/* B = Ur1-Zr1 */
-+			add_eltfp25519_1w_adx(A, Ur1, Zr1);	/* A = Ur1+Zr1 */
-+			mul_eltfp25519_1w_adx(C, &P[4 * k], B);	/* C = M0-B */
-+			sub_eltfp25519_1w(B, A, C);		/* B = (Ur1+Zr1) - M*(Ur1-Zr1) */
-+			add_eltfp25519_1w_adx(A, A, C);		/* A = (Ur1+Zr1) + M*(Ur1-Zr1) */
-+			sqr_eltfp25519_2w_adx(AB);		/* A = A^2      |  B = B^2 */
-+			mul_eltfp25519_2w_adx(UZr1, ZUr2, AB);	/* Ur1 = Zr2*A  |  Zr1 = Ur2*B */
-+			++j;
-+		}
-+		j = 0;
-+	}
-+
-+	/* Doubling */
-+	for (i = 0; i < q; ++i) {
-+		add_eltfp25519_1w_adx(A, Ur1, Zr1);	/*  A = Ur1+Zr1 */
-+		sub_eltfp25519_1w(B, Ur1, Zr1);		/*  B = Ur1-Zr1 */
-+		sqr_eltfp25519_2w_adx(AB);		/*  A = A**2     B = B**2 */
-+		copy_eltfp25519_1w(C, B);		/*  C = B */
-+		sub_eltfp25519_1w(B, A, B);		/*  B = A-B */
-+		mul_a24_eltfp25519_1w(D, B);		/*  D = my_a24*B */
-+		add_eltfp25519_1w_adx(D, D, C);		/*  D = D+C */
-+		mul_eltfp25519_2w_adx(UZr1, AB, CD);	/*  Ur1 = A*B   Zr1 = Zr1*A */
-+	}
-+
-+	/* Convert to affine coordinates */
-+	inv_eltfp25519_1w_adx(A, Zr1);
-+	mul_eltfp25519_1w_adx((u64 *)session_key, Ur1, A);
-+	fred_eltfp25519_1w((u64 *)session_key);
-+
-+	memzero_explicit(&m, sizeof(m));
++	simd_get(&simd_context);
++	poly1305_final(&dctx->ctx, dst, &simd_context);
++	simd_put(&simd_context);
++	return 0;
 +}
 +
-+static void curve25519_bmi2(u8 shared[CURVE25519_POINT_SIZE],
-+			    const u8 private_key[CURVE25519_POINT_SIZE],
-+			    const u8 session_key[CURVE25519_POINT_SIZE])
++static struct shash_alg poly1305_alg = {
++	.digestsize	= POLY1305_MAC_SIZE,
++	.init		= crypto_poly1305_init,
++	.update		= crypto_poly1305_update,
++	.final		= crypto_poly1305_final,
++	.descsize	= sizeof(struct poly1305_desc_ctx),
++	.base		= {
++		.cra_name		= "poly1305",
++		.cra_driver_name	= "poly1305-software",
++		.cra_priority		= 100,
++		.cra_blocksize		= POLY1305_BLOCK_SIZE,
++		.cra_module		= THIS_MODULE,
++	},
++};
++
++static int __init poly1305_mod_init(void)
 +{
-+	struct {
-+		u64 buffer[4 * NUM_WORDS_ELTFP25519];
-+		u64 coordinates[4 * NUM_WORDS_ELTFP25519];
-+		u64 workspace[6 * NUM_WORDS_ELTFP25519];
-+		u8 session[CURVE25519_POINT_SIZE];
-+		u8 private[CURVE25519_POINT_SIZE];
-+	} __aligned(32) m;
-+
-+	int i = 0, j = 0;
-+	u64 prev = 0;
-+	u64 *const X1 = (u64 *)m.session;
-+	u64 *const key = (u64 *)m.private;
-+	u64 *const Px = m.coordinates + 0;
-+	u64 *const Pz = m.coordinates + 4;
-+	u64 *const Qx = m.coordinates + 8;
-+	u64 *const Qz = m.coordinates + 12;
-+	u64 *const X2 = Qx;
-+	u64 *const Z2 = Qz;
-+	u64 *const X3 = Px;
-+	u64 *const Z3 = Pz;
-+	u64 *const X2Z2 = Qx;
-+	u64 *const X3Z3 = Px;
-+
-+	u64 *const A = m.workspace + 0;
-+	u64 *const B = m.workspace + 4;
-+	u64 *const D = m.workspace + 8;
-+	u64 *const C = m.workspace + 12;
-+	u64 *const DA = m.workspace + 16;
-+	u64 *const CB = m.workspace + 20;
-+	u64 *const AB = A;
-+	u64 *const DC = D;
-+	u64 *const DACB = DA;
-+
-+	memcpy(m.private, private_key, sizeof(m.private));
-+	memcpy(m.session, session_key, sizeof(m.session));
-+
-+	clamp_secret(m.private);
-+
-+	/* As in the draft:
-+	 * When receiving such an array, implementations of curve25519
-+	 * MUST mask the most-significant bit in the final byte. This
-+	 * is done to preserve compatibility with point formats which
-+	 * reserve the sign bit for use in other protocols and to
-+	 * increase resistance to implementation fingerprinting
-+	 */
-+	m.session[CURVE25519_POINT_SIZE - 1] &= (1 << (255 % 8)) - 1;
-+
-+	copy_eltfp25519_1w(Px, X1);
-+	setzero_eltfp25519_1w(Pz);
-+	setzero_eltfp25519_1w(Qx);
-+	setzero_eltfp25519_1w(Qz);
-+
-+	Pz[0] = 1;
-+	Qx[0] = 1;
-+
-+	/* main-loop */
-+	prev = 0;
-+	j = 62;
-+	for (i = 3; i >= 0; --i) {
-+		while (j >= 0) {
-+			u64 bit = (key[i] >> j) & 0x1;
-+			u64 swap = bit ^ prev;
-+			prev = bit;
-+
-+			add_eltfp25519_1w_bmi2(A, X2, Z2);	/* A = (X2+Z2) */
-+			sub_eltfp25519_1w(B, X2, Z2);		/* B = (X2-Z2) */
-+			add_eltfp25519_1w_bmi2(C, X3, Z3);	/* C = (X3+Z3) */
-+			sub_eltfp25519_1w(D, X3, Z3);		/* D = (X3-Z3) */
-+			mul_eltfp25519_2w_bmi2(DACB, AB, DC);	/* [DA|CB] = [A|B]*[D|C] */
-+
-+			cselect(swap, A, C);
-+			cselect(swap, B, D);
-+
-+			sqr_eltfp25519_2w_bmi2(AB);		/* [AA|BB] = [A^2|B^2] */
-+			add_eltfp25519_1w_bmi2(X3, DA, CB);	/* X3 = (DA+CB) */
-+			sub_eltfp25519_1w(Z3, DA, CB);		/* Z3 = (DA-CB) */
-+			sqr_eltfp25519_2w_bmi2(X3Z3);		/* [X3|Z3] = [(DA+CB)|(DA+CB)]^2 */
-+
-+			copy_eltfp25519_1w(X2, B);		/* X2 = B^2 */
-+			sub_eltfp25519_1w(Z2, A, B);		/* Z2 = E = AA-BB */
-+
-+			mul_a24_eltfp25519_1w(B, Z2);		/* B = a24*E */
-+			add_eltfp25519_1w_bmi2(B, B, X2);	/* B = a24*E+B */
-+			mul_eltfp25519_2w_bmi2(X2Z2, X2Z2, AB);	/* [X2|Z2] = [B|E]*[A|a24*E+B] */
-+			mul_eltfp25519_1w_bmi2(Z3, Z3, X1);	/* Z3 = Z3*X1 */
-+			--j;
-+		}
-+		j = 63;
-+	}
-+
-+	inv_eltfp25519_1w_bmi2(A, Qz);
-+	mul_eltfp25519_1w_bmi2((u64 *)shared, Qx, A);
-+	fred_eltfp25519_1w((u64 *)shared);
-+
-+	memzero_explicit(&m, sizeof(m));
++	return crypto_register_shash(&poly1305_alg);
 +}
 +
-+static void curve25519_bmi2_base(u8 session_key[CURVE25519_POINT_SIZE],
-+				 const u8 private_key[CURVE25519_POINT_SIZE])
++static void __exit poly1305_mod_exit(void)
 +{
-+	struct {
-+		u64 buffer[4 * NUM_WORDS_ELTFP25519];
-+		u64 coordinates[4 * NUM_WORDS_ELTFP25519];
-+		u64 workspace[4 * NUM_WORDS_ELTFP25519];
-+		u8 private[CURVE25519_POINT_SIZE];
-+	} __aligned(32) m;
-+
-+	const int ite[4] = { 64, 64, 64, 63 };
-+	const int q = 3;
-+	u64 swap = 1;
-+
-+	int i = 0, j = 0, k = 0;
-+	u64 *const key = (u64 *)m.private;
-+	u64 *const Ur1 = m.coordinates + 0;
-+	u64 *const Zr1 = m.coordinates + 4;
-+	u64 *const Ur2 = m.coordinates + 8;
-+	u64 *const Zr2 = m.coordinates + 12;
-+
-+	u64 *const UZr1 = m.coordinates + 0;
-+	u64 *const ZUr2 = m.coordinates + 8;
-+
-+	u64 *const A = m.workspace + 0;
-+	u64 *const B = m.workspace + 4;
-+	u64 *const C = m.workspace + 8;
-+	u64 *const D = m.workspace + 12;
-+
-+	u64 *const AB = m.workspace + 0;
-+	u64 *const CD = m.workspace + 8;
-+
-+	const u64 *const P = table_ladder_8k;
-+
-+	memcpy(m.private, private_key, sizeof(m.private));
-+
-+	clamp_secret(m.private);
-+
-+	setzero_eltfp25519_1w(Ur1);
-+	setzero_eltfp25519_1w(Zr1);
-+	setzero_eltfp25519_1w(Zr2);
-+	Ur1[0] = 1;
-+	Zr1[0] = 1;
-+	Zr2[0] = 1;
-+
-+	/* G-S */
-+	Ur2[3] = 0x1eaecdeee27cab34UL;
-+	Ur2[2] = 0xadc7a0b9235d48e2UL;
-+	Ur2[1] = 0xbbf095ae14b2edf8UL;
-+	Ur2[0] = 0x7e94e1fec82faabdUL;
-+
-+	/* main-loop */
-+	j = q;
-+	for (i = 0; i < NUM_WORDS_ELTFP25519; ++i) {
-+		while (j < ite[i]) {
-+			u64 bit = (key[i] >> j) & 0x1;
-+			k = (64 * i + j - q);
-+			swap = swap ^ bit;
-+			cswap(swap, Ur1, Ur2);
-+			cswap(swap, Zr1, Zr2);
-+			swap = bit;
-+			/* Addition */
-+			sub_eltfp25519_1w(B, Ur1, Zr1);		/* B = Ur1-Zr1 */
-+			add_eltfp25519_1w_bmi2(A, Ur1, Zr1);	/* A = Ur1+Zr1 */
-+			mul_eltfp25519_1w_bmi2(C, &P[4 * k], B);/* C = M0-B */
-+			sub_eltfp25519_1w(B, A, C);		/* B = (Ur1+Zr1) - M*(Ur1-Zr1) */
-+			add_eltfp25519_1w_bmi2(A, A, C);	/* A = (Ur1+Zr1) + M*(Ur1-Zr1) */
-+			sqr_eltfp25519_2w_bmi2(AB);		/* A = A^2      |  B = B^2 */
-+			mul_eltfp25519_2w_bmi2(UZr1, ZUr2, AB);	/* Ur1 = Zr2*A  |  Zr1 = Ur2*B */
-+			++j;
-+		}
-+		j = 0;
-+	}
-+
-+	/* Doubling */
-+	for (i = 0; i < q; ++i) {
-+		add_eltfp25519_1w_bmi2(A, Ur1, Zr1);	/*  A = Ur1+Zr1 */
-+		sub_eltfp25519_1w(B, Ur1, Zr1);		/*  B = Ur1-Zr1 */
-+		sqr_eltfp25519_2w_bmi2(AB);		/*  A = A**2     B = B**2 */
-+		copy_eltfp25519_1w(C, B);		/*  C = B */
-+		sub_eltfp25519_1w(B, A, B);		/*  B = A-B */
-+		mul_a24_eltfp25519_1w(D, B);		/*  D = my_a24*B */
-+		add_eltfp25519_1w_bmi2(D, D, C);	/*  D = D+C */
-+		mul_eltfp25519_2w_bmi2(UZr1, AB, CD);	/*  Ur1 = A*B   Zr1 = Zr1*A */
-+	}
-+
-+	/* Convert to affine coordinates */
-+	inv_eltfp25519_1w_bmi2(A, Zr1);
-+	mul_eltfp25519_1w_bmi2((u64 *)session_key, Ur1, A);
-+	fred_eltfp25519_1w((u64 *)session_key);
-+
-+	memzero_explicit(&m, sizeof(m));
++	crypto_unregister_shash(&poly1305_alg);
 +}
-diff --git a/lib/zinc/curve25519/curve25519.c b/lib/zinc/curve25519/curve25519.c
-index 61dff8578a77..d3d4445d1ac2 100644
---- a/lib/zinc/curve25519/curve25519.c
-+++ b/lib/zinc/curve25519/curve25519.c
-@@ -19,7 +19,9 @@
- #include <linux/init.h>
- #include <crypto/algapi.h>
- 
--#ifndef HAVE_CURVE25519_ARCH_IMPLEMENTATION
-+#if defined(CONFIG_ZINC_ARCH_X86_64)
-+#include "curve25519-x86_64-glue.h"
-+#else
- void __init curve25519_fpu_init(void)
- {
- }
++
++module_init(poly1305_mod_init);
++module_exit(poly1305_mod_exit);
++
++MODULE_LICENSE("GPL");
++MODULE_AUTHOR("Jason A. Donenfeld <Jason@zx2c4.com>");
++MODULE_DESCRIPTION("Poly1305 authenticator");
++MODULE_ALIAS_CRYPTO("poly1305");
++MODULE_ALIAS_CRYPTO("poly1305-software");
+diff --git a/include/crypto/poly1305.h b/include/crypto/poly1305.h
+deleted file mode 100644
+index f718a19da82f..000000000000
+--- a/include/crypto/poly1305.h
++++ /dev/null
+@@ -1,40 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0 */
+-/*
+- * Common values for the Poly1305 algorithm
+- */
+-
+-#ifndef _CRYPTO_POLY1305_H
+-#define _CRYPTO_POLY1305_H
+-
+-#include <linux/types.h>
+-#include <linux/crypto.h>
+-
+-#define POLY1305_BLOCK_SIZE	16
+-#define POLY1305_KEY_SIZE	32
+-#define POLY1305_DIGEST_SIZE	16
+-
+-struct poly1305_desc_ctx {
+-	/* key */
+-	u32 r[5];
+-	/* finalize key */
+-	u32 s[4];
+-	/* accumulator */
+-	u32 h[5];
+-	/* partial buffer */
+-	u8 buf[POLY1305_BLOCK_SIZE];
+-	/* bytes used in partial buffer */
+-	unsigned int buflen;
+-	/* r key has been set */
+-	bool rset;
+-	/* s key has been set */
+-	bool sset;
+-};
+-
+-int crypto_poly1305_init(struct shash_desc *desc);
+-unsigned int crypto_poly1305_setdesckey(struct poly1305_desc_ctx *dctx,
+-					const u8 *src, unsigned int srclen);
+-int crypto_poly1305_update(struct shash_desc *desc,
+-			   const u8 *src, unsigned int srclen);
+-int crypto_poly1305_final(struct shash_desc *desc, u8 *dst);
+-
+-#endif
 -- 
 2.19.0
