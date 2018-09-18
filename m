@@ -1,43 +1,65 @@
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Subject: Re: [PATCH v2 1/4] crypto: s5p-sss: Fix race in error handling
-Date: Tue, 18 Sep 2018 09:33:35 +0200
-Message-ID: <CAJKOXPeADXdhBYiVeErjgxnGdTLJVKNtpK65mXzg6m=hL8XRJA@mail.gmail.com>
-References: <CGME20180917151006eucas1p2226806b94605b061bc1bc3e9b5a6c495@eucas1p2.samsung.com>
- <1537196970-5987-1-git-send-email-c.manszewski@samsung.com> <20180917151006eucas1p2226806b94605b061bc1bc3e9b5a6c495~VOIhXssSK0729007290eucas1p25@eucas1p2.samsung.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH][RFC] crypto: skcipher: Remove VLA usage
+Date: Tue, 18 Sep 2018 17:22:19 +0800
+Message-ID: <20180918092219.kwqb37g6td2xs54f@gondor.apana.org.au>
+References: <20180913182328.GA9812@beast>
+ <CAGXu5jJdqs4Rf=RvRtzQavT0oAtEEWppmjJRFRhLL4iQfCkVnQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: linux-crypto@vger.kernel.org, vz@mleia.com,
-        k.konieczny@partner.samsung.com, herbert@gondor.apana.org.au,
-        davem@davemloft.net,
-        "linux-samsung-soc@vger.kernel.org"
-        <linux-samsung-soc@vger.kernel.org>, linux-kernel@vger.kernel.org,
-        =?UTF-8?B?QmFydMWCb21pZWogxbtvxYJuaWVya2lld2ljeg==?=
-        <b.zolnierkie@samsung.com>
-To: c.manszewski@samsung.com
+Content-Type: text/plain; charset=us-ascii
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Eric Biggers <ebiggers@google.com>,
+        Gilad Ben-Yossef <gilad@benyossef.com>,
+        Alexander Stein <alexander.stein@systec-electronic.com>,
+        Antoine Tenart <antoine.tenart@bootlin.com>,
+        Boris Brezillon <boris.brezillon@bootlin.com>,
+        Arnaud Ebalard <arno@natisbad.org>,
+        Corentin Labbe <clabbe.montjoie@gmail.com>,
+        Maxime Ripard <maxime.ripard@bootlin.com>,
+        Chen-Yu Tsai <wens@csie.org>,
+        Christian Lamparter <chunkeey@gmail.com>,
+        Philippe Ombredanne <pombredanne@nexb.com>,
+        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+        linux-crypto <linux-crypto@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
+To: Kees Cook <keescook@chromium.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180917151006eucas1p2226806b94605b061bc1bc3e9b5a6c495~VOIhXssSK0729007290eucas1p25@eucas1p2.samsung.com>
+Content-Disposition: inline
+In-Reply-To: <CAGXu5jJdqs4Rf=RvRtzQavT0oAtEEWppmjJRFRhLL4iQfCkVnQ@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, 17 Sep 2018 at 17:10, Christoph Manszewski
-<c.manszewski@samsung.com> wrote:
->
-> Remove a race condition introduced by error path in functions:
-> s5p_aes_interrupt and s5p_aes_crypt_start. Setting the busy field of
-> struct s5p_aes_dev to false made it possible for s5p_tasklet_cb to
-> change the req field, before s5p_aes_complete was called.
->
-> Change the first parameter of s5p_aes_complete to struct
-> ablkcipher_request. Before spin_unlock, make a copy of the currently
-> handled request, to ensure s5p_aes_complete function call with the
-> correct request.
->
-> Signed-off-by: Christoph Manszewski <c.manszewski@samsung.com>
-> ---
->  drivers/crypto/s5p-sss.c | 12 +++++++-----
->  1 file changed, 7 insertions(+), 5 deletions(-)
+On Mon, Sep 17, 2018 at 10:30:36PM -0700, Kees Cook wrote:
+> On Thu, Sep 13, 2018 at 11:23 AM, Kees Cook <keescook@chromium.org> wrote:
+> > RFC follow-up to https://lkml.kernel.org/r/CAGXu5j+bpLK=EQ9LHkO8V=sdaQwt==6fbGhgn2Vi1E9_WxSGRQ@mail.gmail.com
+> >
+> > The core API changes:
+> >
+> >         struct crypto_sync_skcipher
+> >         crypto_alloc_sync_skcipher()
+> >         crypto_free_sync_skcipher()
+> >         crypto_sync_skcipher_setkey()
+> >         skcipher_request_set_sync_tfm()
+> >         SKCIPHER_REQUEST_ON_STACK type check
+> >
+> > and a single user's refactoring as an example:
+> >
+> >         drivers/crypto/ccp/ccp-crypto.h
+> >         drivers/crypto/ccp/ccp-crypto-aes-xts.c
+> >
+> > Does this look correct? If so, I can continue and do the other 60
+> > instances of SKCIPHER_REQUEST_ON_STACK().
+> 
+> Herbert, how does this look? Should I do the other 60 instances? I'd
+> really like to get this finished up. :)
 
-Reviewed-by: Krzysztof Kozlowski <krzk@kernel.org>
+Hi Kees:
 
-Best regards,
-Krzysztof
+Yes I like this.  This looks a lot simpler than I thought it would
+be.
+
+Thanks!
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
