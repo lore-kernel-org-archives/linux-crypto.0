@@ -1,103 +1,127 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [PATCH net-next v3 02/17] zinc: introduce minimal cryptography library
-Date: Tue, 18 Sep 2018 09:06:13 -0700
-Message-ID: <CAKv+Gu-t5HPj+Y3-7JqkaKTdt-0ewOUobQaEuikpeOaX_SF+zg@mail.gmail.com>
-References: <20180911214737.GA81235@gmail.com> <CAHmME9rFUruF-VN1pmU-k5nFsb9ppAPhPpW-5Ho9dKL2HCg4kA@mail.gmail.com>
- <20180911233015.GD11474@lunn.ch> <20180911.165739.2032677219588723041.davem@davemloft.net>
- <CALCETrXrJPcs3h9CtF50N4k2AGx3qzspJd_UW3t+KGYOj7+p=Q@mail.gmail.com>
- <CAHmME9ohGPTX-fkhP6zaWdx3SbkiqO5kWkWE-bDk=pm-nUqYvw@mail.gmail.com> <8937D6B1-D21C-4C47-8A89-A466CDB6FB04@amacapital.net>
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: [PATCH net-next v5 00/20] WireGuard: Secure Network Tunnel
+Date: Tue, 18 Sep 2018 18:16:26 +0200
+Message-ID: <20180918161646.19105-1-Jason@zx2c4.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Andrew Lutomirski <luto@kernel.org>,
-        David Miller <davem@davemloft.net>,
-        Andrew Lunn <andrew@lunn.ch>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Netdev <netdev@vger.kernel.org>, Samuel Neves <sneves@dei.uc.pt>,
-        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Andy Lutomirski <luto@amacapital.net>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>
+To: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+        linux-crypto@vger.kernel.org, davem@davemloft.net,
+        gregkh@linuxfoundation.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <8937D6B1-D21C-4C47-8A89-A466CDB6FB04@amacapital.net>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 17 September 2018 at 07:53, Andy Lutomirski <luto@amacapital.net> wrote:
->
->
->
->> On Sep 16, 2018, at 10:07 PM, Jason A. Donenfeld <Jason@zx2c4.com> wrote=
-:
->>
->> Hey Andy,
->>
->> Thanks a lot for your feedback.
->>
->>> On Mon, Sep 17, 2018 at 6:09 AM Andy Lutomirski <luto@kernel.org> wrote=
-:
->>> 1. Zinc conflates the addition of a new API with the replacement of
->>> some algorithm implementations.  This is problematic.  Look at the
->>> recent benchmarks of ipsec before and after this series.  Apparently
->>> big packets get faster and small packets get slower.  It would be
->>> really nice to bisect the series to narrow down *where* the regression
->>> came from, but, as currently structured, you can't.
->>>
->>> The right way to do this is to rearrange the series.  First, the new
->>> Zinc APIs should be added, and they should be backed with the
->>> *existing* crypto code.  (If the code needs to be moved or copied to a
->>> new location, so be it.  The patch will be messy because somehow the
->>> Zinc API is going to have to dispatch to the arch-specific code, and
->>> the way that the crypto API handles it is not exactly friendly to this
->>> type of use.  So be it.)  Then another patch should switch the crypto
->>> API to use the Zinc interface.  That patch, *by itself*, can be
->>> benchmarked.  If it causes a regression for small ipsec packets, then
->>> it can be tracked down relatively easily.  Once this is all done, the
->>> actual crypto implementation can be changed, and that changed can be
->>> reviewed on its own merits.
->>
->> That ipsec regression was less related to the implementation and more
->> related to calling kernel_fpu_begin() unnecessarily, something I've
->> now fixed. So I'm not sure that's such a good example. However, I can
->> try to implement Zinc over the existing assembly (Martin's and Ard's),
->> first, as you've described. This will be a pretty large amount of
->> work, but if you think it's worth it for the commit history, then I'll
->> do it.
->
-> Ard, what do you think?  I think it would
-> be nice, but if the authors of that assembly are convinced it should be r=
-eplaced, then this step is optional IMO.
->
+v5 has the most comprehensive set of changes yet, and I think should
+finally address all of the relevant issues brought up on the mailing
+list. In particular, this feedback has come from:
 
-I don't think there is any problem with switching to faster code
-immediately, as long as we have data that supports the claim  that it
-is actually faster on hardware people care about. The arm64 ChaCha20
-code in the kernel is slower than the OpenSSL code as far as I know,
-so I have no problems whatsoever with dropping it. The ARM version,
-however, is slower on Cortex-A7 (according to Eric's benchmarks),
-which is the only 32-bit ARM core anybody cares about these days.
+  - Andy Lutomirski
+  - Eric Biggers
+  - Ard Biesheuvel
+  - Kevin Easton
+  - Andrew Lunn
+  - Martin Willi
 
->>
->>> 2. The new Zinc crypto implementations look like they're brand new.  I
->>> realize that they have some history, some of them are derived from
->>> OpenSSL, etc, but none of this is really apparent in the patches
->>> themselves.
->>
->> The whole point of going with these is that they _aren't_ brand new,
->> yet they are very fast. Eyeballs and fuzzer hours are important, and
->> AndyP's seems to get the most eyeballs and fuzzer hours, generally.
->>
->>> it would be nice if
->>> the patches made it more clear how the code differs from its origin.
->>> At the very least, though, if the replacement of the crypto code were,
->>> as above, a patch that just replaced the crypto code, it would be much
->>> easier to review and benchmark intelligently.
->>
->> You seem to have replied to the v3 thread, not the v4 thread. I've
->> already started to include lots of detail about the origins of the
->> code and [any] important differences in v4, and I'll continue to add
->> more detail for v5.
->
-> This is indeed better.  Ard=E2=80=99s reply covers this better.
+Changes v4->v5:
+---------------
+  - Use fewer inlines, except when measured as necessary.
+  - Reduce size of scattergather array to fit within stack on
+    small systems.
+  - Account for larger stack frames with KASAN.
+  - The x86_64 implementations are selected according to input length.
+  - Avoid using simd for small blocks on x86_64.
+  - The simd_get/put API is now pass by reference, so that the user
+    can lazily use the context based on whether or not it's needed.
+    See the description again in the first commit for this.
+  - Add cycle counts for different sizes for x86_64 commit messages.
+  - Relax simd during chapoly sg loop.
+  - Replace -include with #if defined(...)
+  - Saner and simpler Kconfig.
+  - Split into separate modules instead of one monolithic zinc.
+  - The combination of these three last items means that there no
+    longer are any conditionals in our Makefile.
+  - Martin showed a performance regression using tcrypt in v4. This
+    has been triaged and fixed, and now the Zinc code runs faster
+    than the previous code.
+  - While I initially wasn't going to do this for the initial
+    patchset, it was just so simple to do: now there's a nosimd
+    module parameter that can be used to disable simd instructions
+    for debugging and testing, or on weird systems.
+
+-----------------------------------------------------------
+
+This patchset is available on git.kernel.org in this branch, where it may be
+pulled directly for inclusion into net-next:
+
+  * https://git.kernel.org/pub/scm/linux/kernel/git/zx2c4/linux.git/log/?h=jd/wireguard
+
+-----------------------------------------------------------
+
+WireGuard is a secure network tunnel written especially for Linux, which
+has faced around three years of serious development, deployment, and
+scrutiny. It delivers excellent performance and is extremely easy to
+use and configure. It has been designed with the primary goal of being
+both easy to audit by virtue of being small and highly secure from a
+cryptography and systems security perspective. WireGuard is used by some
+massive companies pushing enormous amounts of traffic, and likely
+already today you've consumed bytes that at some point transited through
+a WireGuard tunnel. Even as an out-of-tree module, WireGuard has been
+integrated into various userspace tools, Linux distributions, mobile
+phones, and data centers. There are ports in several languages to
+several operating systems, and even commercial hardware and services
+sold integrating WireGuard. It is time, therefore, for WireGuard to be
+properly integrated into Linux.
+
+Ample information, including documentation, installation instructions,
+and project details, is available at:
+
+  * https://www.wireguard.com/
+  * https://www.wireguard.com/papers/wireguard.pdf
+
+As it is currently an out-of-tree module, it lives in its own git repo
+and has its own mailing list, and every commit for the module is tested
+against every stable kernel since 3.10 on a variety of architectures
+using an extensive test suite:
+
+  * https://git.zx2c4.com/WireGuard
+    https://git.kernel.org/pub/scm/linux/kernel/git/zx2c4/WireGuard.git/
+  * https://lists.zx2c4.com/mailman/listinfo/wireguard
+  * https://www.wireguard.com/build-status/
+
+The project has been broadly discussed at conferences, and was presented
+to the Netdev developers in Seoul last November, where a paper was
+released detailing some interesting aspects of the project. Dave asked
+me after the talk if I would consider sending in a v1 "sooner rather
+than later", hence this patchset. A decision is still waiting from the
+Linux Plumbers Conference, but an update on these topics may be presented
+in Vancouver in a few months. Prior presentations:
+
+  * https://www.wireguard.com/presentations/
+  * https://www.wireguard.com/papers/wireguard-netdev22.pdf
+
+The cryptography in the protocol itself has been formally verified by
+several independent academic teams with positive results, and I know of
+two additional efforts on their way to further corroborate those
+findings. The version 1 protocol is "complete", and so the purpose of
+this review is to assess the implementation of the protocol. However, it
+still may be of interest to know that the thing you're reviewing uses a
+protocol with various nice security properties:
+
+  * https://www.wireguard.com/formal-verification/
+
+This patchset is divided into four segments. The first introduces a very
+simple helper for working with the FPU state for the purposes of amortizing
+SIMD operations. The second segment is a small collection of cryptographic
+primitives, split up into several commits by primitive and by hardware. The
+third shows usage of Zinc within the existing crypto API and as a replacement
+to the existing crypto API. The last is WireGuard itself, presented as an
+unintrusive and self-contained virtual network driver.
+
+It is intended that this entire patch series enter the kernel through
+DaveM's net-next tree. Subsequently, WireGuard patches will go through
+DaveM's net-next tree, while Zinc patches will go through Greg KH's tree.
+
+Enjoy,
+Jason
