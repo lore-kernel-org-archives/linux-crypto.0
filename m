@@ -1,50 +1,59 @@
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: Re: [PATCH net-next v3 02/17] zinc: introduce minimal cryptography library
-Date: Tue, 18 Sep 2018 06:26:11 +0200
-Message-ID: <CAHmME9rthEDfL7=xNsafZfcL_N0SrB-VKrBWiZMWTQ2bd=gUvw@mail.gmail.com>
-References: <CAHmME9qwRzuoo-3Hxahwu=Li2LCz06Uowaq1GFmkts6tsffM7w@mail.gmail.com>
- <20180918042133.4ybztgdooxkoyiru@gondor.apana.org.au>
+From: Kees Cook <keescook@chromium.org>
+Subject: Re: [PATCH][RFC] crypto: skcipher: Remove VLA usage
+Date: Mon, 17 Sep 2018 22:30:36 -0700
+Message-ID: <CAGXu5jJdqs4Rf=RvRtzQavT0oAtEEWppmjJRFRhLL4iQfCkVnQ@mail.gmail.com>
+References: <20180913182328.GA9812@beast>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Andrew Lutomirski <luto@kernel.org>,
-        David Miller <davem@davemloft.net>,
-        Andrew Lunn <andrew@lunn.ch>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Netdev <netdev@vger.kernel.org>, Samuel Neves <sneves@dei.uc.pt>,
-        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+        Eric Biggers <ebiggers@google.com>,
+        Gilad Ben-Yossef <gilad@benyossef.com>,
+        Alexander Stein <alexander.stein@systec-electronic.com>,
+        Antoine Tenart <antoine.tenart@bootlin.com>,
+        Boris Brezillon <boris.brezillon@bootlin.com>,
+        Arnaud Ebalard <arno@natisbad.org>,
+        Corentin Labbe <clabbe.montjoie@gmail.com>,
+        Maxime Ripard <maxime.ripard@bootlin.com>,
+        Chen-Yu Tsai <wens@csie.org>,
+        Christian Lamparter <chunkeey@gmail.com>,
+        Philippe Ombredanne <pombredanne@nexb.com>,
+        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+        linux-crypto <linux-crypto@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180918042133.4ybztgdooxkoyiru@gondor.apana.org.au>
+In-Reply-To: <20180913182328.GA9812@beast>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi Herbert,
+On Thu, Sep 13, 2018 at 11:23 AM, Kees Cook <keescook@chromium.org> wrote:
+> RFC follow-up to https://lkml.kernel.org/r/CAGXu5j+bpLK=EQ9LHkO8V=sdaQwt==6fbGhgn2Vi1E9_WxSGRQ@mail.gmail.com
+>
+> The core API changes:
+>
+>         struct crypto_sync_skcipher
+>         crypto_alloc_sync_skcipher()
+>         crypto_free_sync_skcipher()
+>         crypto_sync_skcipher_setkey()
+>         skcipher_request_set_sync_tfm()
+>         SKCIPHER_REQUEST_ON_STACK type check
+>
+> and a single user's refactoring as an example:
+>
+>         drivers/crypto/ccp/ccp-crypto.h
+>         drivers/crypto/ccp/ccp-crypto-aes-xts.c
+>
+> Does this look correct? If so, I can continue and do the other 60
+> instances of SKCIPHER_REQUEST_ON_STACK().
 
-On Tue, Sep 18, 2018 at 6:21 AM Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> That may be your view but from what I've read Ard has been very
-> constructive in pointing out issues in your submission.
-> Please keep in mind that this is a large project that has to support
-> multiple users on one hand (not just WireGuard) and complex hardware
-> acceleration drivers on the other.  Ard has been one of the most
-> prolific contributors to the crypto code and his review should be
-> taken seriously.
+Herbert, how does this look? Should I do the other 60 instances? I'd
+really like to get this finished up. :)
 
-I'm well aware, which is why I also wrote:
+Thanks!
 
-"I do sincerely hope these are only fears and not what actually is
-going on. I'll do my best to take into serious consideration what you
-say -- many are indeed extremely helpful"
+-Kees
 
-Worry not, I've been working around the clock to implement suggestions
-from Ard and from others.
-
-I'll be submitting v5 fairly soon, which will probably be a good spot
-for you to review as well, if you're interested. I'm just going to
-give kbuild testbot a few more hours on it first.
-
-Regards,
-Jason
+-- 
+Kees Cook
+Pixel Security
