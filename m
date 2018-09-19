@@ -1,11 +1,12 @@
 From: Kees Cook <keescook@chromium.org>
-Subject: [PATCH crypto-next 22/23] crypto: picoxcell - Remove VLA usage of skcipher
-Date: Tue, 18 Sep 2018 19:10:59 -0700
-Message-ID: <20180919021100.3380-23-keescook@chromium.org>
+Subject: [PATCH crypto-next 18/23] crypto: artpec6 - Remove VLA usage of skcipher
+Date: Tue, 18 Sep 2018 19:10:55 -0700
+Message-ID: <20180919021100.3380-19-keescook@chromium.org>
 References: <20180919021100.3380-1-keescook@chromium.org>
 Cc: Kees Cook <keescook@chromium.org>,
-        Jamie Iles <jamie@jamieiles.com>,
-        linux-arm-kernel@lists.infradead.org,
+        Jesper Nilsson <jesper.nilsson@axis.com>,
+        Lars Persson <lars.persson@axis.com>,
+        linux-arm-kernel@axis.com,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>,
         Eric Biggers <ebiggers@google.com>,
         linux-crypto <linux-crypto@vger.kernel.org>,
@@ -23,86 +24,69 @@ which uses a fixed stack size.
 
 [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
 
-Cc: Jamie Iles <jamie@jamieiles.com>
-Cc: linux-arm-kernel@lists.infradead.org
+Cc: Jesper Nilsson <jesper.nilsson@axis.com>
+Cc: Lars Persson <lars.persson@axis.com>
+Cc: linux-arm-kernel@axis.com
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- drivers/crypto/picoxcell_crypto.c | 21 ++++++++++-----------
- 1 file changed, 10 insertions(+), 11 deletions(-)
+ drivers/crypto/axis/artpec6_crypto.c | 19 +++++++++----------
+ 1 file changed, 9 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/crypto/picoxcell_crypto.c b/drivers/crypto/picoxcell_crypto.c
-index 321d5e2ac833..a28f1d18fe01 100644
---- a/drivers/crypto/picoxcell_crypto.c
-+++ b/drivers/crypto/picoxcell_crypto.c
-@@ -171,7 +171,7 @@ struct spacc_ablk_ctx {
- 	 * The fallback cipher. If the operation can't be done in hardware,
- 	 * fallback to a software version.
- 	 */
--	struct crypto_skcipher		*sw_cipher;
-+	struct crypto_sync_skcipher	*sw_cipher;
+diff --git a/drivers/crypto/axis/artpec6_crypto.c b/drivers/crypto/axis/artpec6_crypto.c
+index 7f07a5085e9b..e5a080e87ea8 100644
+--- a/drivers/crypto/axis/artpec6_crypto.c
++++ b/drivers/crypto/axis/artpec6_crypto.c
+@@ -330,7 +330,7 @@ struct artpec6_cryptotfm_context {
+ 	size_t key_length;
+ 	u32 key_md;
+ 	int crypto_type;
+-	struct crypto_skcipher *fallback;
++	struct crypto_sync_skcipher *fallback;
  };
  
- /* AEAD cipher context. */
-@@ -799,17 +799,17 @@ static int spacc_aes_setkey(struct crypto_ablkcipher *cipher, const u8 *key,
- 		 * Set the fallback transform to use the same request flags as
- 		 * the hardware transform.
- 		 */
--		crypto_skcipher_clear_flags(ctx->sw_cipher,
-+		crypto_sync_skcipher_clear_flags(ctx->sw_cipher,
- 					    CRYPTO_TFM_REQ_MASK);
--		crypto_skcipher_set_flags(ctx->sw_cipher,
-+		crypto_sync_skcipher_set_flags(ctx->sw_cipher,
- 					  cipher->base.crt_flags &
- 					  CRYPTO_TFM_REQ_MASK);
+ struct artpec6_crypto_aead_hw_ctx {
+@@ -1199,15 +1199,15 @@ artpec6_crypto_ctr_crypt(struct skcipher_request *req, bool encrypt)
+ 		pr_debug("counter %x will overflow (nblks %u), falling back\n",
+ 			 counter, counter + nblks);
  
--		err = crypto_skcipher_setkey(ctx->sw_cipher, key, len);
-+		err = crypto_sync_skcipher_setkey(ctx->sw_cipher, key, len);
+-		ret = crypto_skcipher_setkey(ctx->fallback, ctx->aes_key,
+-					     ctx->key_length);
++		ret = crypto_sync_skcipher_setkey(ctx->fallback, ctx->aes_key,
++						  ctx->key_length);
+ 		if (ret)
+ 			return ret;
  
- 		tfm->crt_flags &= ~CRYPTO_TFM_RES_MASK;
- 		tfm->crt_flags |=
--			crypto_skcipher_get_flags(ctx->sw_cipher) &
-+			crypto_sync_skcipher_get_flags(ctx->sw_cipher) &
- 			CRYPTO_TFM_RES_MASK;
+ 		{
+-			SKCIPHER_REQUEST_ON_STACK(subreq, ctx->fallback);
++			SYNC_SKCIPHER_REQUEST_ON_STACK(subreq, ctx->fallback);
  
- 		if (err)
-@@ -914,7 +914,7 @@ static int spacc_ablk_do_fallback(struct ablkcipher_request *req,
- 	struct crypto_tfm *old_tfm =
- 	    crypto_ablkcipher_tfm(crypto_ablkcipher_reqtfm(req));
- 	struct spacc_ablk_ctx *ctx = crypto_tfm_ctx(old_tfm);
--	SKCIPHER_REQUEST_ON_STACK(subreq, ctx->sw_cipher);
-+	SYNC_SKCIPHER_REQUEST_ON_STACK(subreq, ctx->sw_cipher);
- 	int err;
- 
- 	/*
-@@ -922,7 +922,7 @@ static int spacc_ablk_do_fallback(struct ablkcipher_request *req,
- 	 * the ciphering has completed, put the old transform back into the
- 	 * request.
- 	 */
--	skcipher_request_set_tfm(subreq, ctx->sw_cipher);
-+	skcipher_request_set_sync_tfm(subreq, ctx->sw_cipher);
- 	skcipher_request_set_callback(subreq, req->base.flags, NULL, NULL);
- 	skcipher_request_set_crypt(subreq, req->src, req->dst,
- 				   req->nbytes, req->info);
-@@ -1020,9 +1020,8 @@ static int spacc_ablk_cra_init(struct crypto_tfm *tfm)
- 	ctx->generic.flags = spacc_alg->type;
- 	ctx->generic.engine = engine;
- 	if (alg->cra_flags & CRYPTO_ALG_NEED_FALLBACK) {
--		ctx->sw_cipher = crypto_alloc_skcipher(
--			alg->cra_name, 0, CRYPTO_ALG_ASYNC |
--					  CRYPTO_ALG_NEED_FALLBACK);
-+		ctx->sw_cipher = crypto_alloc_sync_skcipher(
-+			alg->cra_name, 0, CRYPTO_ALG_NEED_FALLBACK);
- 		if (IS_ERR(ctx->sw_cipher)) {
- 			dev_warn(engine->dev, "failed to allocate fallback for %s\n",
- 				 alg->cra_name);
-@@ -1041,7 +1040,7 @@ static void spacc_ablk_cra_exit(struct crypto_tfm *tfm)
+-			skcipher_request_set_tfm(subreq, ctx->fallback);
++			skcipher_request_set_sync_tfm(subreq, ctx->fallback);
+ 			skcipher_request_set_callback(subreq, req->base.flags,
+ 						      NULL, NULL);
+ 			skcipher_request_set_crypt(subreq, req->src, req->dst,
+@@ -1561,10 +1561,9 @@ static int artpec6_crypto_aes_ctr_init(struct crypto_skcipher *tfm)
  {
- 	struct spacc_ablk_ctx *ctx = crypto_tfm_ctx(tfm);
+ 	struct artpec6_cryptotfm_context *ctx = crypto_skcipher_ctx(tfm);
  
--	crypto_free_skcipher(ctx->sw_cipher);
-+	crypto_free_sync_skcipher(ctx->sw_cipher);
+-	ctx->fallback = crypto_alloc_skcipher(crypto_tfm_alg_name(&tfm->base),
+-					      0,
+-					      CRYPTO_ALG_ASYNC |
+-					      CRYPTO_ALG_NEED_FALLBACK);
++	ctx->fallback =
++		crypto_alloc_sync_skcipher(crypto_tfm_alg_name(&tfm->base),
++					   0, CRYPTO_ALG_NEED_FALLBACK);
+ 	if (IS_ERR(ctx->fallback))
+ 		return PTR_ERR(ctx->fallback);
+ 
+@@ -1605,7 +1604,7 @@ static void artpec6_crypto_aes_ctr_exit(struct crypto_skcipher *tfm)
+ {
+ 	struct artpec6_cryptotfm_context *ctx = crypto_skcipher_ctx(tfm);
+ 
+-	crypto_free_skcipher(ctx->fallback);
++	crypto_free_sync_skcipher(ctx->fallback);
+ 	artpec6_crypto_aes_exit(tfm);
  }
  
- static int spacc_ablk_encrypt(struct ablkcipher_request *req)
 -- 
 2.17.1
