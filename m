@@ -1,48 +1,57 @@
-From: Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: [PATCH net-next v5 04/20] zinc: ChaCha20 x86_64 implementation
-Date: Wed, 19 Sep 2018 08:13:40 +0200 (CEST)
-Message-ID: <alpine.DEB.2.21.1809190802160.1468@nanos.tec.linutronix.de>
-References: <20180918161646.19105-1-Jason@zx2c4.com> <20180918161646.19105-5-Jason@zx2c4.com> <alpine.DEB.2.21.1809190017050.1468@nanos.tec.linutronix.de> <CAHmME9oARODJsrDbcNK7A22KrTRJP945hj9+oCJtQM6OjGF4Ag@mail.gmail.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Crypto Fixes for 4.19
+Date: Wed, 19 Sep 2018 14:22:01 +0800
+Message-ID: <20180919062201.ov5o4vljvholgsed@gondor.apana.org.au>
+References: <20170223125141.GA17400@gondor.apana.org.au>
+ <20170714141855.GA29426@gondor.apana.org.au>
+ <20170922084401.GA15541@gondor.apana.org.au>
+ <20171128230929.GA17783@gondor.apana.org.au>
+ <20171222064931.GA27068@gondor.apana.org.au>
+ <20180105073808.GA14405@gondor.apana.org.au>
+ <20180212031702.GA26153@gondor.apana.org.au>
+ <20180428080517.haxgpvqrwgotakyo@gondor.apana.org.au>
+ <20180622145403.6ltjip7che227fuo@gondor.apana.org.au>
+ <20180829033353.agnzxra3jk2r2mzg@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Cc: LKML <linux-kernel@vger.kernel.org>,
-        Netdev <netdev@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        David Miller <davem@davemloft.net>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Samuel Neves <sneves@dei.uc.pt>,
-        Andrew Lutomirski <luto@kernel.org>,
-        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
-        Andy Polyakov <appro@openssl.org>, mingo@redhat.com,
-        X86 ML <x86@kernel.org>,
-        Kate Stewart <kstewart@linuxfoundation.org>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Content-Type: text/plain; charset=us-ascii
+To: Greg KH <gregkh@linuxfoundation.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAHmME9oARODJsrDbcNK7A22KrTRJP945hj9+oCJtQM6OjGF4Ag@mail.gmail.com>
+Content-Disposition: inline
+In-Reply-To: <20180829033353.agnzxra3jk2r2mzg@gondor.apana.org.au>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Jason,
+Hi Greg: 
 
-On Wed, 19 Sep 2018, Jason A. Donenfeld wrote:
-> On Wed, Sep 19, 2018 at 12:30 AM Thomas Gleixner <tglx@linutronix.de> wrote:
-> >
-> > > +++ b/lib/zinc/chacha20/chacha20-x86_64-glue.h
-> > > @@ -0,0 +1,100 @@
-> > > +/* SPDX-License-Identifier: MIT
-> >
-> > Please put that into a separate one liner comment. Also this should be
-> > 'GPL-2.0[+] or MIT' I think.
-> 
-> I had that originally, but changed it to just MIT, since MIT is a
-> subset of GPL-2.0. And looking at tree repo, it appears this is what
-> others do too.
+This push fixes a potential boot hang in ccp and an incorrect
+CPU capability check in aegis/morus on x86.
 
-Subset? Not really. Both MIT and BSD3-Clause are GPL2.0 compatible
-licenses. And if your intention is to have those files MIT/BSD only, yes
-then the single license identifier is the right thing. If you want it dual
-licensed then it should be expressed there clearly.
+
+Please pull from
+
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
+
+
+Brijesh Singh (1):
+      crypto: ccp - add timeout support in the SEV command
+
+Ondrej Mosnacek (1):
+      crypto: x86/aegis,morus - Do not require OSXSAVE for SSE2
+
+ arch/x86/crypto/aegis128-aesni-glue.c  |  1 -
+ arch/x86/crypto/aegis128l-aesni-glue.c |  1 -
+ arch/x86/crypto/aegis256-aesni-glue.c  |  1 -
+ arch/x86/crypto/morus1280-sse2-glue.c  |  1 -
+ arch/x86/crypto/morus640-sse2-glue.c   |  1 -
+ drivers/crypto/ccp/psp-dev.c           | 46 ++++++++++++++++++++++++++++++----
+ 6 files changed, 41 insertions(+), 10 deletions(-)
 
 Thanks,
-
-	tglx
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
