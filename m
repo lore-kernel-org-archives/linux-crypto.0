@@ -1,79 +1,58 @@
-From: Randy Dunlap <rdunlap@infradead.org>
-Subject: Re: process? [Re: Crypto Fixes for 4.19]
-Date: Wed, 19 Sep 2018 09:48:42 -0700
-Message-ID: <06e6fac1-6011-7117-454f-af930a288d75@infradead.org>
-References: <20171128230929.GA17783@gondor.apana.org.au>
- <20171222064931.GA27068@gondor.apana.org.au>
- <20180105073808.GA14405@gondor.apana.org.au>
- <20180212031702.GA26153@gondor.apana.org.au>
- <20180428080517.haxgpvqrwgotakyo@gondor.apana.org.au>
- <20180622145403.6ltjip7che227fuo@gondor.apana.org.au>
- <20180829033353.agnzxra3jk2r2mzg@gondor.apana.org.au>
- <20180919062201.ov5o4vljvholgsed@gondor.apana.org.au>
- <20180919132324.GA24399@kroah.com>
- <d8c061a9-b415-e092-c28f-9e433d83b59b@infradead.org>
- <20180919164019.GA7195@kroah.com>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH net-next v3 02/17] zinc: introduce minimal cryptography library
+Date: Wed, 19 Sep 2018 09:55:32 -0700
+Message-ID: <CAKv+Gu-JVLCbMuqFzsdC5TwOu0_jS4OeekD_GQcunV_7zGxAbQ@mail.gmail.com>
+References: <20180911214737.GA81235@gmail.com> <CAHmME9rFUruF-VN1pmU-k5nFsb9ppAPhPpW-5Ho9dKL2HCg4kA@mail.gmail.com>
+ <20180911233015.GD11474@lunn.ch> <20180911.165739.2032677219588723041.davem@davemloft.net>
+ <CALCETrXrJPcs3h9CtF50N4k2AGx3qzspJd_UW3t+KGYOj7+p=Q@mail.gmail.com>
+ <CAKv+Gu8QgRo-Oex2Sk5unET3FMq+1Cp2btAWXCB8xsALxjatHg@mail.gmail.com>
+ <CAHmME9qwRzuoo-3Hxahwu=Li2LCz06Uowaq1GFmkts6tsffM7w@mail.gmail.com>
+ <CAKv+Gu8OKyVvvgLy48GDV2KJt-UmmHbf5x0qNxQC_SDiddb9-g@mail.gmail.com> <20180918203658.GA28723@zx2c4.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+Content-Type: text/plain; charset="UTF-8"
+Cc: Andrew Lutomirski <luto@kernel.org>,
+        David Miller <davem@davemloft.net>,
+        Andrew Lunn <andrew@lunn.ch>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Netdev <netdev@vger.kernel.org>, Samuel Neves <sneves@dei.uc.pt>,
+        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Greg KH <gregkh@linuxfoundation.org>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180919164019.GA7195@kroah.com>
-Content-Language: en-US
+In-Reply-To: <20180918203658.GA28723@zx2c4.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 9/19/18 9:40 AM, Greg KH wrote:
-> On Wed, Sep 19, 2018 at 09:10:55AM -0700, Randy Dunlap wrote:
->> On 9/19/18 6:23 AM, Greg KH wrote:
->>> On Wed, Sep 19, 2018 at 02:22:01PM +0800, Herbert Xu wrote:
->>>> Hi Greg: 
->>>>
->>>> This push fixes a potential boot hang in ccp and an incorrect
->>>> CPU capability check in aegis/morus on x86.
->>>>
->>>>
->>>> Please pull from
->>>>
->>>> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
->>>
->>> Now pulled, thanks.
->>>
->>> greg k-h
+On 18 September 2018 at 13:36, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+> Hi Ard,
+>
+> On Tue, Sep 18, 2018 at 11:53:11AM -0700, Ard Biesheuvel wrote:
+>> On 17 September 2018 at 08:52, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+>> > Hi Ard,
+>> >
 >>
->> Hi,
->> Just a process question:
->>
->> It looks like Greg is not adding Signed-of-by: <himself>
->> to mainline git commits, although the prior mainline git committer did so.
->>
->> Is that omission on purpose?
-> 
-> s-o-b does not get added to git pulls, I "trust" the subsystem
-> maintainer got it correct.  That's what Linus has always done in the
-> past, what am I doing differently here?
-> 
->> submitting-patches.rst says:
->> The Signed-off-by: tag indicates that the signer was involved in the
->> development of the patch, or that he/she was in the patch's delivery path.
-> 
-> Yes, but not for git pulls.
-> 
-> I have not applied any patches sent in emails at this point in time, so
-> there's nothing that I could have even signed off on.
+>> Given that you show no interest whatsoever in gaining an understanding
+>> of the underlying requirements that we have to deal with in the crypto
+>> API, the only way to get my point across is by repeatedly stating it
+>
+> Sorry if I've come across that way, but I am certainly interested in
+> gaining such an understanding of said requirements.
+>
 
-OK, I see.
+Excellent.
 
-> confused,
+So you are probably aware that there is a big push in the industry
+these days towards high-performance accelerators on a coherent fabric,
+potentially with device side caches, and this is the main reason that
+the crypto API abstractions are the way they are today.
 
-no, that's me :)
-
-
-thanks,
--- 
-~Randy
+So while standardizing on Chacha20Poly1305 in WireGuard [while still a
+policy decision in my view] seems reasonable to me, the decision to
+limit WireGuard to synchronous software implementations seems to me
+like something we may want to revisit in the future. What is your view
+on that? And is the ChaCha20/Poly1305 AEAD construction in WireGuard
+identical to the one in RFC 7539, i.e., could an accelerator built for
+the IPsec flavor of ChaCha20Poly1305 potentially be reused for
+WireGuard?
