@@ -1,9 +1,14 @@
 From: Kees Cook <keescook@chromium.org>
-Subject: [PATCH crypto-next 15/23] crypto: cryptd - Remove VLA usage of skcipher
-Date: Tue, 18 Sep 2018 19:10:52 -0700
-Message-ID: <20180919021100.3380-16-keescook@chromium.org>
+Subject: [PATCH crypto-next 11/23] wusb: Remove VLA usage of skcipher
+Date: Tue, 18 Sep 2018 19:10:48 -0700
+Message-ID: <20180919021100.3380-12-keescook@chromium.org>
 References: <20180919021100.3380-1-keescook@chromium.org>
 Cc: Kees Cook <keescook@chromium.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Felipe Balbi <felipe.balbi@linux.intel.com>,
+        Johan Hovold <johan@kernel.org>,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+        linux-usb@vger.kernel.org,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>,
         Eric Biggers <ebiggers@google.com>,
         linux-crypto <linux-crypto@vger.kernel.org>,
@@ -21,106 +26,87 @@ which uses a fixed stack size.
 
 [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
 
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Felipe Balbi <felipe.balbi@linux.intel.com>
+Cc: Johan Hovold <johan@kernel.org>
+Cc: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+Cc: linux-usb@vger.kernel.org
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- crypto/cryptd.c | 32 +++++++++++++++++---------------
- 1 file changed, 17 insertions(+), 15 deletions(-)
+ drivers/usb/wusbcore/crypto.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/crypto/cryptd.c b/crypto/cryptd.c
-index addca7bae33f..7118fb5efbaa 100644
---- a/crypto/cryptd.c
-+++ b/crypto/cryptd.c
-@@ -76,7 +76,7 @@ struct cryptd_blkcipher_request_ctx {
- 
- struct cryptd_skcipher_ctx {
- 	atomic_t refcnt;
--	struct crypto_skcipher *child;
-+	struct crypto_sync_skcipher *child;
- };
- 
- struct cryptd_skcipher_request_ctx {
-@@ -449,14 +449,16 @@ static int cryptd_skcipher_setkey(struct crypto_skcipher *parent,
- 				  const u8 *key, unsigned int keylen)
+diff --git a/drivers/usb/wusbcore/crypto.c b/drivers/usb/wusbcore/crypto.c
+index aff50eb09ca9..68ddee86a886 100644
+--- a/drivers/usb/wusbcore/crypto.c
++++ b/drivers/usb/wusbcore/crypto.c
+@@ -189,7 +189,7 @@ struct wusb_mac_scratch {
+  * NOTE: blen is not aligned to a block size, we'll pad zeros, that's
+  *       what sg[4] is for. Maybe there is a smarter way to do this.
+  */
+-static int wusb_ccm_mac(struct crypto_skcipher *tfm_cbc,
++static int wusb_ccm_mac(struct crypto_sync_skcipher *tfm_cbc,
+ 			struct crypto_cipher *tfm_aes,
+ 			struct wusb_mac_scratch *scratch,
+ 			void *mic,
+@@ -198,7 +198,7 @@ static int wusb_ccm_mac(struct crypto_skcipher *tfm_cbc,
+ 			size_t blen)
  {
- 	struct cryptd_skcipher_ctx *ctx = crypto_skcipher_ctx(parent);
--	struct crypto_skcipher *child = ctx->child;
-+	struct crypto_sync_skcipher *child = ctx->child;
- 	int err;
+ 	int result = 0;
+-	SKCIPHER_REQUEST_ON_STACK(req, tfm_cbc);
++	SYNC_SKCIPHER_REQUEST_ON_STACK(req, tfm_cbc);
+ 	struct scatterlist sg[4], sg_dst;
+ 	void *dst_buf;
+ 	size_t dst_size;
+@@ -224,7 +224,7 @@ static int wusb_ccm_mac(struct crypto_skcipher *tfm_cbc,
+ 	if (!dst_buf)
+ 		goto error_dst_buf;
  
--	crypto_skcipher_clear_flags(child, CRYPTO_TFM_REQ_MASK);
--	crypto_skcipher_set_flags(child, crypto_skcipher_get_flags(parent) &
-+	crypto_sync_skcipher_clear_flags(child, CRYPTO_TFM_REQ_MASK);
-+	crypto_sync_skcipher_set_flags(child,
-+				       crypto_skcipher_get_flags(parent) &
- 					 CRYPTO_TFM_REQ_MASK);
--	err = crypto_skcipher_setkey(child, key, keylen);
--	crypto_skcipher_set_flags(parent, crypto_skcipher_get_flags(child) &
-+	err = crypto_sync_skcipher_setkey(child, key, keylen);
-+	crypto_skcipher_set_flags(parent,
-+				  crypto_sync_skcipher_get_flags(child) &
- 					  CRYPTO_TFM_RES_MASK);
- 	return err;
- }
-@@ -483,13 +485,13 @@ static void cryptd_skcipher_encrypt(struct crypto_async_request *base,
- 	struct cryptd_skcipher_request_ctx *rctx = skcipher_request_ctx(req);
- 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
- 	struct cryptd_skcipher_ctx *ctx = crypto_skcipher_ctx(tfm);
--	struct crypto_skcipher *child = ctx->child;
--	SKCIPHER_REQUEST_ON_STACK(subreq, child);
-+	struct crypto_sync_skcipher *child = ctx->child;
-+	SYNC_SKCIPHER_REQUEST_ON_STACK(subreq, child);
+-	iv = kzalloc(crypto_skcipher_ivsize(tfm_cbc), GFP_KERNEL);
++	iv = kzalloc(crypto_sync_skcipher_ivsize(tfm_cbc), GFP_KERNEL);
+ 	if (!iv)
+ 		goto error_iv;
  
- 	if (unlikely(err == -EINPROGRESS))
- 		goto out;
+@@ -251,7 +251,7 @@ static int wusb_ccm_mac(struct crypto_skcipher *tfm_cbc,
+ 	sg_set_page(&sg[3], ZERO_PAGE(0), zero_padding, 0);
+ 	sg_init_one(&sg_dst, dst_buf, dst_size);
  
--	skcipher_request_set_tfm(subreq, child);
-+	skcipher_request_set_sync_tfm(subreq, child);
- 	skcipher_request_set_callback(subreq, CRYPTO_TFM_REQ_MAY_SLEEP,
- 				      NULL, NULL);
- 	skcipher_request_set_crypt(subreq, req->src, req->dst, req->cryptlen,
-@@ -511,13 +513,13 @@ static void cryptd_skcipher_decrypt(struct crypto_async_request *base,
- 	struct cryptd_skcipher_request_ctx *rctx = skcipher_request_ctx(req);
- 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
- 	struct cryptd_skcipher_ctx *ctx = crypto_skcipher_ctx(tfm);
--	struct crypto_skcipher *child = ctx->child;
--	SKCIPHER_REQUEST_ON_STACK(subreq, child);
-+	struct crypto_sync_skcipher *child = ctx->child;
-+	SYNC_SKCIPHER_REQUEST_ON_STACK(subreq, child);
- 
- 	if (unlikely(err == -EINPROGRESS))
- 		goto out;
- 
--	skcipher_request_set_tfm(subreq, child);
-+	skcipher_request_set_sync_tfm(subreq, child);
- 	skcipher_request_set_callback(subreq, CRYPTO_TFM_REQ_MAY_SLEEP,
- 				      NULL, NULL);
- 	skcipher_request_set_crypt(subreq, req->src, req->dst, req->cryptlen,
-@@ -568,7 +570,7 @@ static int cryptd_skcipher_init_tfm(struct crypto_skcipher *tfm)
- 	if (IS_ERR(cipher))
- 		return PTR_ERR(cipher);
- 
--	ctx->child = cipher;
-+	ctx->child = (struct crypto_sync_skcipher *)cipher;
- 	crypto_skcipher_set_reqsize(
- 		tfm, sizeof(struct cryptd_skcipher_request_ctx));
- 	return 0;
-@@ -578,7 +580,7 @@ static void cryptd_skcipher_exit_tfm(struct crypto_skcipher *tfm)
+-	skcipher_request_set_tfm(req, tfm_cbc);
++	skcipher_request_set_sync_tfm(req, tfm_cbc);
+ 	skcipher_request_set_callback(req, 0, NULL, NULL);
+ 	skcipher_request_set_crypt(req, sg, &sg_dst, dst_size, iv);
+ 	result = crypto_skcipher_encrypt(req);
+@@ -298,19 +298,19 @@ ssize_t wusb_prf(void *out, size_t out_size,
  {
- 	struct cryptd_skcipher_ctx *ctx = crypto_skcipher_ctx(tfm);
+ 	ssize_t result, bytes = 0, bitr;
+ 	struct aes_ccm_nonce n = *_n;
+-	struct crypto_skcipher *tfm_cbc;
++	struct crypto_sync_skcipher *tfm_cbc;
+ 	struct crypto_cipher *tfm_aes;
+ 	struct wusb_mac_scratch *scratch;
+ 	u64 sfn = 0;
+ 	__le64 sfn_le;
  
--	crypto_free_skcipher(ctx->child);
-+	crypto_free_sync_skcipher(ctx->child);
+-	tfm_cbc = crypto_alloc_skcipher("cbc(aes)", 0, CRYPTO_ALG_ASYNC);
++	tfm_cbc = crypto_alloc_sync_skcipher("cbc(aes)", 0, 0);
+ 	if (IS_ERR(tfm_cbc)) {
+ 		result = PTR_ERR(tfm_cbc);
+ 		printk(KERN_ERR "E: can't load CBC(AES): %d\n", (int)result);
+ 		goto error_alloc_cbc;
+ 	}
+-	result = crypto_skcipher_setkey(tfm_cbc, key, 16);
++	result = crypto_sync_skcipher_setkey(tfm_cbc, key, 16);
+ 	if (result < 0) {
+ 		printk(KERN_ERR "E: can't set CBC key: %d\n", (int)result);
+ 		goto error_setkey_cbc;
+@@ -351,7 +351,7 @@ ssize_t wusb_prf(void *out, size_t out_size,
+ 	crypto_free_cipher(tfm_aes);
+ error_alloc_aes:
+ error_setkey_cbc:
+-	crypto_free_skcipher(tfm_cbc);
++	crypto_free_sync_skcipher(tfm_cbc);
+ error_alloc_cbc:
+ 	return result;
  }
- 
- static void cryptd_skcipher_free(struct skcipher_instance *inst)
-@@ -1243,7 +1245,7 @@ struct crypto_skcipher *cryptd_skcipher_child(struct cryptd_skcipher *tfm)
- {
- 	struct cryptd_skcipher_ctx *ctx = crypto_skcipher_ctx(&tfm->base);
- 
--	return ctx->child;
-+	return &ctx->child->base;
- }
- EXPORT_SYMBOL_GPL(cryptd_skcipher_child);
- 
 -- 
 2.17.1
