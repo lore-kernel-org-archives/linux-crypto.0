@@ -1,9 +1,12 @@
 From: Kees Cook <keescook@chromium.org>
-Subject: [PATCH crypto-next 06/23] x86/fpu: Remove VLA usage of skcipher
-Date: Tue, 18 Sep 2018 19:10:43 -0700
-Message-ID: <20180919021100.3380-7-keescook@chromium.org>
+Subject: [PATCH crypto-next 04/23] mac802154: Remove VLA usage of skcipher
+Date: Tue, 18 Sep 2018 19:10:41 -0700
+Message-ID: <20180919021100.3380-5-keescook@chromium.org>
 References: <20180919021100.3380-1-keescook@chromium.org>
-Cc: Kees Cook <keescook@chromium.org>, x86@kernel.org,
+Cc: Kees Cook <keescook@chromium.org>,
+        Alexander Aring <alex.aring@gmail.com>,
+        Stefan Schmidt <stefan@datenfreihafen.org>,
+        linux-wpan@vger.kernel.org,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>,
         Eric Biggers <ebiggers@google.com>,
         linux-crypto <linux-crypto@vger.kernel.org>,
@@ -21,93 +24,98 @@ which uses a fixed stack size.
 
 [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
 
-Cc: x86@kernel.org
+Cc: Alexander Aring <alex.aring@gmail.com>
+Cc: Stefan Schmidt <stefan@datenfreihafen.org>
+Cc: linux-wpan@vger.kernel.org
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- arch/x86/crypto/fpu.c | 30 ++++++++++++++++--------------
- 1 file changed, 16 insertions(+), 14 deletions(-)
+ net/mac802154/llsec.c | 16 ++++++++--------
+ net/mac802154/llsec.h |  2 +-
+ 2 files changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/arch/x86/crypto/fpu.c b/arch/x86/crypto/fpu.c
-index 406680476c52..be9b3766f241 100644
---- a/arch/x86/crypto/fpu.c
-+++ b/arch/x86/crypto/fpu.c
-@@ -20,21 +20,23 @@
- #include <asm/fpu/api.h>
+diff --git a/net/mac802154/llsec.c b/net/mac802154/llsec.c
+index 2fb703d70803..7e29f88dbf6a 100644
+--- a/net/mac802154/llsec.c
++++ b/net/mac802154/llsec.c
+@@ -146,18 +146,18 @@ llsec_key_alloc(const struct ieee802154_llsec_key *template)
+ 			goto err_tfm;
+ 	}
  
- struct crypto_fpu_ctx {
--	struct crypto_skcipher *child;
-+	struct crypto_sync_skcipher *child;
+-	key->tfm0 = crypto_alloc_skcipher("ctr(aes)", 0, CRYPTO_ALG_ASYNC);
++	key->tfm0 = crypto_alloc_sync_skcipher("ctr(aes)", 0, 0);
+ 	if (IS_ERR(key->tfm0))
+ 		goto err_tfm;
+ 
+-	if (crypto_skcipher_setkey(key->tfm0, template->key,
++	if (crypto_sync_skcipher_setkey(key->tfm0, template->key,
+ 				   IEEE802154_LLSEC_KEY_SIZE))
+ 		goto err_tfm0;
+ 
+ 	return key;
+ 
+ err_tfm0:
+-	crypto_free_skcipher(key->tfm0);
++	crypto_free_sync_skcipher(key->tfm0);
+ err_tfm:
+ 	for (i = 0; i < ARRAY_SIZE(key->tfm); i++)
+ 		if (key->tfm[i])
+@@ -177,7 +177,7 @@ static void llsec_key_release(struct kref *ref)
+ 	for (i = 0; i < ARRAY_SIZE(key->tfm); i++)
+ 		crypto_free_aead(key->tfm[i]);
+ 
+-	crypto_free_skcipher(key->tfm0);
++	crypto_free_sync_skcipher(key->tfm0);
+ 	kzfree(key);
+ }
+ 
+@@ -622,7 +622,7 @@ llsec_do_encrypt_unauth(struct sk_buff *skb, const struct mac802154_llsec *sec,
+ {
+ 	u8 iv[16];
+ 	struct scatterlist src;
+-	SKCIPHER_REQUEST_ON_STACK(req, key->tfm0);
++	SYNC_SKCIPHER_REQUEST_ON_STACK(req, key->tfm0);
+ 	int err, datalen;
+ 	unsigned char *data;
+ 
+@@ -632,7 +632,7 @@ llsec_do_encrypt_unauth(struct sk_buff *skb, const struct mac802154_llsec *sec,
+ 	datalen = skb_tail_pointer(skb) - data;
+ 	sg_init_one(&src, data, datalen);
+ 
+-	skcipher_request_set_tfm(req, key->tfm0);
++	skcipher_request_set_sync_tfm(req, key->tfm0);
+ 	skcipher_request_set_callback(req, 0, NULL, NULL);
+ 	skcipher_request_set_crypt(req, &src, &src, datalen, iv);
+ 	err = crypto_skcipher_encrypt(req);
+@@ -840,7 +840,7 @@ llsec_do_decrypt_unauth(struct sk_buff *skb, const struct mac802154_llsec *sec,
+ 	unsigned char *data;
+ 	int datalen;
+ 	struct scatterlist src;
+-	SKCIPHER_REQUEST_ON_STACK(req, key->tfm0);
++	SYNC_SKCIPHER_REQUEST_ON_STACK(req, key->tfm0);
+ 	int err;
+ 
+ 	llsec_geniv(iv, dev_addr, &hdr->sec);
+@@ -849,7 +849,7 @@ llsec_do_decrypt_unauth(struct sk_buff *skb, const struct mac802154_llsec *sec,
+ 
+ 	sg_init_one(&src, data, datalen);
+ 
+-	skcipher_request_set_tfm(req, key->tfm0);
++	skcipher_request_set_sync_tfm(req, key->tfm0);
+ 	skcipher_request_set_callback(req, 0, NULL, NULL);
+ 	skcipher_request_set_crypt(req, &src, &src, datalen, iv);
+ 
+diff --git a/net/mac802154/llsec.h b/net/mac802154/llsec.h
+index 6f3b658e3279..8be46d74dc39 100644
+--- a/net/mac802154/llsec.h
++++ b/net/mac802154/llsec.h
+@@ -29,7 +29,7 @@ struct mac802154_llsec_key {
+ 
+ 	/* one tfm for each authsize (4/8/16) */
+ 	struct crypto_aead *tfm[3];
+-	struct crypto_skcipher *tfm0;
++	struct crypto_sync_skcipher *tfm0;
+ 
+ 	struct kref ref;
  };
- 
- static int crypto_fpu_setkey(struct crypto_skcipher *parent, const u8 *key,
- 			     unsigned int keylen)
- {
- 	struct crypto_fpu_ctx *ctx = crypto_skcipher_ctx(parent);
--	struct crypto_skcipher *child = ctx->child;
-+	struct crypto_sync_skcipher *child = ctx->child;
- 	int err;
- 
--	crypto_skcipher_clear_flags(child, CRYPTO_TFM_REQ_MASK);
--	crypto_skcipher_set_flags(child, crypto_skcipher_get_flags(parent) &
-+	crypto_sync_skcipher_clear_flags(child, CRYPTO_TFM_REQ_MASK);
-+	crypto_sync_skcipher_set_flags(child,
-+				       crypto_skcipher_get_flags(parent) &
- 					 CRYPTO_TFM_REQ_MASK);
--	err = crypto_skcipher_setkey(child, key, keylen);
--	crypto_skcipher_set_flags(parent, crypto_skcipher_get_flags(child) &
-+	err = crypto_sync_skcipher_setkey(child, key, keylen);
-+	crypto_skcipher_set_flags(parent,
-+				  crypto_sync_skcipher_get_flags(child) &
- 					  CRYPTO_TFM_RES_MASK);
- 	return err;
- }
-@@ -43,11 +45,11 @@ static int crypto_fpu_encrypt(struct skcipher_request *req)
- {
- 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
- 	struct crypto_fpu_ctx *ctx = crypto_skcipher_ctx(tfm);
--	struct crypto_skcipher *child = ctx->child;
--	SKCIPHER_REQUEST_ON_STACK(subreq, child);
-+	struct crypto_sync_skcipher *child = ctx->child;
-+	SYNC_SKCIPHER_REQUEST_ON_STACK(subreq, child);
- 	int err;
- 
--	skcipher_request_set_tfm(subreq, child);
-+	skcipher_request_set_sync_tfm(subreq, child);
- 	skcipher_request_set_callback(subreq, 0, NULL, NULL);
- 	skcipher_request_set_crypt(subreq, req->src, req->dst, req->cryptlen,
- 				   req->iv);
-@@ -64,11 +66,11 @@ static int crypto_fpu_decrypt(struct skcipher_request *req)
- {
- 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
- 	struct crypto_fpu_ctx *ctx = crypto_skcipher_ctx(tfm);
--	struct crypto_skcipher *child = ctx->child;
--	SKCIPHER_REQUEST_ON_STACK(subreq, child);
-+	struct crypto_sync_skcipher *child = ctx->child;
-+	SYNC_SKCIPHER_REQUEST_ON_STACK(subreq, child);
- 	int err;
- 
--	skcipher_request_set_tfm(subreq, child);
-+	skcipher_request_set_sync_tfm(subreq, child);
- 	skcipher_request_set_callback(subreq, 0, NULL, NULL);
- 	skcipher_request_set_crypt(subreq, req->src, req->dst, req->cryptlen,
- 				   req->iv);
-@@ -93,7 +95,7 @@ static int crypto_fpu_init_tfm(struct crypto_skcipher *tfm)
- 	if (IS_ERR(cipher))
- 		return PTR_ERR(cipher);
- 
--	ctx->child = cipher;
-+	ctx->child = (struct crypto_sync_skcipher *)cipher;
- 
- 	return 0;
- }
-@@ -102,7 +104,7 @@ static void crypto_fpu_exit_tfm(struct crypto_skcipher *tfm)
- {
- 	struct crypto_fpu_ctx *ctx = crypto_skcipher_ctx(tfm);
- 
--	crypto_free_skcipher(ctx->child);
-+	crypto_free_sync_skcipher(ctx->child);
- }
- 
- static void crypto_fpu_free(struct skcipher_instance *inst)
 -- 
 2.17.1
