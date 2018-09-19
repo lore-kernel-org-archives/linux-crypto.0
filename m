@@ -1,10 +1,9 @@
 From: Kees Cook <keescook@chromium.org>
-Subject: [PATCH crypto-next 17/23] crypto: qce - Remove VLA usage of skcipher
-Date: Tue, 18 Sep 2018 19:10:54 -0700
-Message-ID: <20180919021100.3380-18-keescook@chromium.org>
+Subject: [PATCH crypto-next 20/23] crypto: mxs-dcp - Remove VLA usage of skcipher
+Date: Tue, 18 Sep 2018 19:10:57 -0700
+Message-ID: <20180919021100.3380-21-keescook@chromium.org>
 References: <20180919021100.3380-1-keescook@chromium.org>
 Cc: Kees Cook <keescook@chromium.org>,
-        Himanshu Jha <himanshujha199640@gmail.com>,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>,
         Eric Biggers <ebiggers@google.com>,
         linux-crypto <linux-crypto@vger.kernel.org>,
@@ -22,71 +21,80 @@ which uses a fixed stack size.
 
 [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
 
-Cc: Himanshu Jha <himanshujha199640@gmail.com>
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- drivers/crypto/qce/ablkcipher.c | 13 ++++++-------
- drivers/crypto/qce/cipher.h     |  2 +-
- 2 files changed, 7 insertions(+), 8 deletions(-)
+ drivers/crypto/mxs-dcp.c | 21 ++++++++++-----------
+ 1 file changed, 10 insertions(+), 11 deletions(-)
 
-diff --git a/drivers/crypto/qce/ablkcipher.c b/drivers/crypto/qce/ablkcipher.c
-index ea4d96bf47e8..585e1cab9ae3 100644
---- a/drivers/crypto/qce/ablkcipher.c
-+++ b/drivers/crypto/qce/ablkcipher.c
-@@ -189,7 +189,7 @@ static int qce_ablkcipher_setkey(struct crypto_ablkcipher *ablk, const u8 *key,
- 	memcpy(ctx->enc_key, key, keylen);
- 	return 0;
- fallback:
--	ret = crypto_skcipher_setkey(ctx->fallback, key, keylen);
-+	ret = crypto_sync_skcipher_setkey(ctx->fallback, key, keylen);
- 	if (!ret)
- 		ctx->enc_keylen = keylen;
- 	return ret;
-@@ -212,9 +212,9 @@ static int qce_ablkcipher_crypt(struct ablkcipher_request *req, int encrypt)
+diff --git a/drivers/crypto/mxs-dcp.c b/drivers/crypto/mxs-dcp.c
+index a10c418d4e5c..430174be6f92 100644
+--- a/drivers/crypto/mxs-dcp.c
++++ b/drivers/crypto/mxs-dcp.c
+@@ -84,7 +84,7 @@ struct dcp_async_ctx {
+ 	unsigned int			hot:1;
  
- 	if (IS_AES(rctx->flags) && ctx->enc_keylen != AES_KEYSIZE_128 &&
- 	    ctx->enc_keylen != AES_KEYSIZE_256) {
--		SKCIPHER_REQUEST_ON_STACK(subreq, ctx->fallback);
-+		SYNC_SKCIPHER_REQUEST_ON_STACK(subreq, ctx->fallback);
- 
--		skcipher_request_set_tfm(subreq, ctx->fallback);
-+		skcipher_request_set_sync_tfm(subreq, ctx->fallback);
- 		skcipher_request_set_callback(subreq, req->base.flags,
- 					      NULL, NULL);
- 		skcipher_request_set_crypt(subreq, req->src, req->dst,
-@@ -245,9 +245,8 @@ static int qce_ablkcipher_init(struct crypto_tfm *tfm)
- 	memset(ctx, 0, sizeof(*ctx));
- 	tfm->crt_ablkcipher.reqsize = sizeof(struct qce_cipher_reqctx);
- 
--	ctx->fallback = crypto_alloc_skcipher(crypto_tfm_alg_name(tfm), 0,
--					      CRYPTO_ALG_ASYNC |
--					      CRYPTO_ALG_NEED_FALLBACK);
-+	ctx->fallback = crypto_alloc_sync_skcipher(crypto_tfm_alg_name(tfm),
-+						   0, CRYPTO_ALG_NEED_FALLBACK);
- 	return PTR_ERR_OR_ZERO(ctx->fallback);
- }
- 
-@@ -255,7 +254,7 @@ static void qce_ablkcipher_exit(struct crypto_tfm *tfm)
- {
- 	struct qce_cipher_ctx *ctx = crypto_tfm_ctx(tfm);
- 
--	crypto_free_skcipher(ctx->fallback);
-+	crypto_free_sync_skcipher(ctx->fallback);
- }
- 
- struct qce_ablkcipher_def {
-diff --git a/drivers/crypto/qce/cipher.h b/drivers/crypto/qce/cipher.h
-index 2b0278bb6e92..ee055bfe98a0 100644
---- a/drivers/crypto/qce/cipher.h
-+++ b/drivers/crypto/qce/cipher.h
-@@ -22,7 +22,7 @@
- struct qce_cipher_ctx {
- 	u8 enc_key[QCE_MAX_KEY_SIZE];
- 	unsigned int enc_keylen;
--	struct crypto_skcipher *fallback;
-+	struct crypto_sync_skcipher *fallback;
+ 	/* Crypto-specific context */
+-	struct crypto_skcipher		*fallback;
++	struct crypto_sync_skcipher	*fallback;
+ 	unsigned int			key_len;
+ 	uint8_t				key[AES_KEYSIZE_128];
  };
+@@ -376,10 +376,10 @@ static int mxs_dcp_block_fallback(struct ablkcipher_request *req, int enc)
+ {
+ 	struct crypto_ablkcipher *tfm = crypto_ablkcipher_reqtfm(req);
+ 	struct dcp_async_ctx *ctx = crypto_ablkcipher_ctx(tfm);
+-	SKCIPHER_REQUEST_ON_STACK(subreq, ctx->fallback);
++	SYNC_SKCIPHER_REQUEST_ON_STACK(subreq, ctx->fallback);
+ 	int ret;
  
- /**
+-	skcipher_request_set_tfm(subreq, ctx->fallback);
++	skcipher_request_set_sync_tfm(subreq, ctx->fallback);
+ 	skcipher_request_set_callback(subreq, req->base.flags, NULL, NULL);
+ 	skcipher_request_set_crypt(subreq, req->src, req->dst,
+ 				   req->nbytes, req->info);
+@@ -460,16 +460,16 @@ static int mxs_dcp_aes_setkey(struct crypto_ablkcipher *tfm, const u8 *key,
+ 	 * but is supported by in-kernel software implementation, we use
+ 	 * software fallback.
+ 	 */
+-	crypto_skcipher_clear_flags(actx->fallback, CRYPTO_TFM_REQ_MASK);
+-	crypto_skcipher_set_flags(actx->fallback,
++	crypto_sync_skcipher_clear_flags(actx->fallback, CRYPTO_TFM_REQ_MASK);
++	crypto_sync_skcipher_set_flags(actx->fallback,
+ 				  tfm->base.crt_flags & CRYPTO_TFM_REQ_MASK);
+ 
+-	ret = crypto_skcipher_setkey(actx->fallback, key, len);
++	ret = crypto_sync_skcipher_setkey(actx->fallback, key, len);
+ 	if (!ret)
+ 		return 0;
+ 
+ 	tfm->base.crt_flags &= ~CRYPTO_TFM_RES_MASK;
+-	tfm->base.crt_flags |= crypto_skcipher_get_flags(actx->fallback) &
++	tfm->base.crt_flags |= crypto_sync_skcipher_get_flags(actx->fallback) &
+ 			       CRYPTO_TFM_RES_MASK;
+ 
+ 	return ret;
+@@ -478,11 +478,10 @@ static int mxs_dcp_aes_setkey(struct crypto_ablkcipher *tfm, const u8 *key,
+ static int mxs_dcp_aes_fallback_init(struct crypto_tfm *tfm)
+ {
+ 	const char *name = crypto_tfm_alg_name(tfm);
+-	const uint32_t flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_NEED_FALLBACK;
+ 	struct dcp_async_ctx *actx = crypto_tfm_ctx(tfm);
+-	struct crypto_skcipher *blk;
++	struct crypto_sync_skcipher *blk;
+ 
+-	blk = crypto_alloc_skcipher(name, 0, flags);
++	blk = crypto_alloc_sync_skcipher(name, 0, CRYPTO_ALG_NEED_FALLBACK);
+ 	if (IS_ERR(blk))
+ 		return PTR_ERR(blk);
+ 
+@@ -495,7 +494,7 @@ static void mxs_dcp_aes_fallback_exit(struct crypto_tfm *tfm)
+ {
+ 	struct dcp_async_ctx *actx = crypto_tfm_ctx(tfm);
+ 
+-	crypto_free_skcipher(actx->fallback);
++	crypto_free_sync_skcipher(actx->fallback);
+ }
+ 
+ /*
 -- 
 2.17.1
