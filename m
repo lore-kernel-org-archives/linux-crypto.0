@@ -1,38 +1,39 @@
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: Re: [PATCH net-next v5 07/20] zinc: Poly1305 generic C
- implementations and selftest
-Date: Wed, 19 Sep 2018 14:26:38 +0200
-Message-ID: <CAHmME9rsXFG6oUnc3e57Q9LY0R39eoTODZdyKk6OqJe7ssEY3g@mail.gmail.com>
-References: <20180918161646.19105-1-Jason@zx2c4.com> <20180918161646.19105-8-Jason@zx2c4.com>
- <20180919005054.GC74746@gmail.com> <CAHmME9oL98adRp6xXqaXxA0E4Oa4ecPW+JHChCS3hTgH7RLPjA@mail.gmail.com>
- <BF781C43-52C2-410A-A6D0-AAD0AC998C2D@amacapital.net> <CAHmME9oERxpgxavBjoHEGwPCCq+O20eiDAXPvDSKgB4D+TRcDQ@mail.gmail.com>
+From: Andrew Lunn <andrew@lunn.ch>
+Subject: Re: [PATCH net-next v5 20/20] net: WireGuard secure network tunnel
+Date: Wed, 19 Sep 2018 14:38:53 +0200
+Message-ID: <20180919123853.GC26940@lunn.ch>
+References: <20180918161646.19105-1-Jason@zx2c4.com>
+ <20180918161646.19105-21-Jason@zx2c4.com>
+ <20180918233411.GB17466@lunn.ch>
+ <CAHmME9rwVLu+H88Nq+kGaVfZsZjoVUM_SdosjSRRpreUd2uGuQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Eric Biggers <ebiggers@kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
+Content-Type: text/plain; charset=us-ascii
+Cc: LKML <linux-kernel@vger.kernel.org>,
         Netdev <netdev@vger.kernel.org>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         David Miller <davem@davemloft.net>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Samuel Neves <sneves@dei.uc.pt>,
-        Andrew Lutomirski <luto@kernel.org>,
-        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>
-To: Andy Lutomirski <luto@amacapital.net>
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAHmME9oERxpgxavBjoHEGwPCCq+O20eiDAXPvDSKgB4D+TRcDQ@mail.gmail.com>
+Content-Disposition: inline
+In-Reply-To: <CAHmME9rwVLu+H88Nq+kGaVfZsZjoVUM_SdosjSRRpreUd2uGuQ@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Sep 19, 2018 at 1:50 PM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
->
-> On Wed, Sep 19, 2018 at 6:19 AM Andy Lutomirski <luto@amacapital.net> wrote:
-> > Can you not uglify the code a bit by using normal (non-compound) liberals as described in the response to that email?
->
-> I can define a bunch of variables, and then string them all together
-> in an array at the end. This is a bit ugly and less maintainable, but
-> would be the best of both worlds.
+On Wed, Sep 19, 2018 at 04:04:01AM +0200, Jason A. Donenfeld wrote:
+> Hi Andrew,
+> 
+> On Wed, Sep 19, 2018 at 1:34 AM Andrew Lunn <andrew@lunn.ch> wrote:
+> > I see this BUG_ON() is still here. It really needs to be removed. It
+> > does not look like you need to crash the kernel here. Can you add in a
+> > test of len >= 128, do a WARN and then return. I think you then leak
+> > some memory, but i would much prefer that to a crashed machine.
+> 
+> Sure, I'll change it to that.
 
-Alright, I wrote a little program to do this for me in a way that
-actually doesn't look half bad. Thanks for suggesting.
+Great, thanks. I noticed there is at least one more BUG()
+statements. It would be good to remove them all. BUG() should only be
+used when something bad has already happened and we want to minimise
+the damage by killing the machine immediately.
 
-Jason
+    Andrew
