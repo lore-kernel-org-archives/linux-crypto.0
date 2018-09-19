@@ -1,81 +1,33 @@
-From: Gary R Hook <ghook@amd.com>
-Subject: Re: [PATCH 2/2] Allow SEV firmware to be chosen based on Family and
- Model
-Date: Wed, 19 Sep 2018 13:41:19 +0000
-Message-ID: <1ac0bcb0-92fd-ea8c-691f-7b80fff5e251@amd.com>
+From: Dan Carpenter <dan.carpenter@oracle.com>
+Subject: Re: [PATCH 1/2] Fix static checker warning
+Date: Wed, 19 Sep 2018 16:57:42 +0300
+Message-ID: <20180919135741.5icpyesntcfbgtcr@mwanda>
 References: <cover.1536959537.git.Janakarajan.Natarajan@amd.com>
- <5c58c32c0ce89c35a95e151734f5d43a3ed0dca0.1536959537.git.Janakarajan.Natarajan@amd.com>
+ <31c49295223e51f5c1c4e36e7a09fe100dab1711.1536959537.git.Janakarajan.Natarajan@amd.com>
+ <8dfca0f4-6639-3444-148f-eb0b0817fec6@amd.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+Content-Type: text/plain; charset=us-ascii
+Cc: "Natarajan, Janakarajan" <Janakarajan.Natarajan@amd.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
         "Hook, Gary" <Gary.Hook@amd.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S . Miller" <davem@davemloft.net>,
         "Singh, Brijesh" <brijesh.singh@amd.com>
-To: "Natarajan, Janakarajan" <Janakarajan.Natarajan@amd.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: Gary R Hook <ghook@amd.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <5c58c32c0ce89c35a95e151734f5d43a3ed0dca0.1536959537.git.Janakarajan.Natarajan@amd.com>
-Content-Language: en-US
-Content-ID: <7EC152EDB77D3A43BDE544759DB4093C@namprd12.prod.outlook.com>
+Content-Disposition: inline
+In-Reply-To: <8dfca0f4-6639-3444-148f-eb0b0817fec6@amd.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-T24gMDkvMTQvMjAxOCAwNTozMiBQTSwgSmFuYWthcmFqYW4gTmF0YXJhamFuIHdyb3RlOg0KPiBE
-dXJpbmcgUFNQIGluaXRpYWxpemF0aW9uLCB0aGVyZSBpcyBhbiBhdHRlbXB0IHRvIHVwZGF0ZSB0
-aGUgU0VWIGZpcm13YXJlDQo+IGJ5IGxvb2tpbmcgaW4gL2xpYi9maXJtd2FyZS9hbWQvLiBDdXJy
-ZW50bHksIHNldi5mdyBpcyB0aGUgZXhwZWN0ZWQgbmFtZQ0KPiBvZiB0aGUgZmlybXdhcmUgYmxv
-Yi4NCj4gDQo+IFRoaXMgcGF0Y2ggd2lsbCBhbGxvdyBmb3IgZmlybXdhcmUgZmlsZW5hbWVzIGJh
-c2VkIG9uIHRoZSBmYW1pbHkgYW5kDQo+IG1vZGVsIG9mIHRoZSBwcm9jZXNzb3IuDQo+IA0KPiBN
-b2RlbCBzcGVjaWZpYyBmaXJtd2FyZSBmaWxlcyBhcmUgZ2l2ZW4gaGlnaGVzdCBwcmlvcml0eS4g
-Rm9sbG93ZWQgYnkNCj4gZmlybXdhcmUgZm9yIGEgc3Vic2V0IG9mIG1vZGVscy4gTGFzdGx5LCBm
-YWlsaW5nIHRoZSBwcmV2aW91cyB0d28gb3B0aW9ucywNCj4gZmFsbGJhY2sgdG8gbG9va2luZyBm
-b3Igc2V2LmZ3Lg0KPiANCj4gU2lnbmVkLW9mZi1ieTogSmFuYWthcmFqYW4gTmF0YXJhamFuIDxK
-YW5ha2FyYWphbi5OYXRhcmFqYW5AYW1kLmNvbT4NCg0KQWNrZWQtYnk6IEdhcnkgUiBIb29rIDxn
-YXJ5Lmhvb2tAYW1kLmNvbT4NCg0KPiAtLS0NCj4gICBkcml2ZXJzL2NyeXB0by9jY3AvcHNwLWRl
-di5jIHwgNDQgKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKy0tLS0NCj4g
-ICAxIGZpbGUgY2hhbmdlZCwgNDAgaW5zZXJ0aW9ucygrKSwgNCBkZWxldGlvbnMoLSkNCj4gDQo+
-IGRpZmYgLS1naXQgYS9kcml2ZXJzL2NyeXB0by9jY3AvcHNwLWRldi5jIGIvZHJpdmVycy9jcnlw
-dG8vY2NwL3BzcC1kZXYuYw0KPiBpbmRleCBmNTQxZTYwLi4zYjMzODYzIDEwMDY0NA0KPiAtLS0g
-YS9kcml2ZXJzL2NyeXB0by9jY3AvcHNwLWRldi5jDQo+ICsrKyBiL2RyaXZlcnMvY3J5cHRvL2Nj
-cC9wc3AtZGV2LmMNCj4gQEAgLTMxLDggKzMxLDkgQEANCj4gICAJCSgocHNwX21hc3Rlci0+YXBp
-X21ham9yKSA+PSBfbWFqICYmCVwNCj4gICAJCSAocHNwX21hc3Rlci0+YXBpX21pbm9yKSA+PSBf
-bWluKQ0KPiAgIA0KPiAtI2RlZmluZSBERVZJQ0VfTkFNRQkic2V2Ig0KPiAtI2RlZmluZSBTRVZf
-RldfRklMRQkiYW1kL3Nldi5mdyINCj4gKyNkZWZpbmUgREVWSUNFX05BTUUJCSJzZXYiDQo+ICsj
-ZGVmaW5lIFNFVl9GV19GSUxFCQkiYW1kL3Nldi5mdyINCj4gKyNkZWZpbmUgU0VWX0ZXX05BTUVf
-U0laRQk2NA0KPiAgIA0KPiAgIHN0YXRpYyBERUZJTkVfTVVURVgoc2V2X2NtZF9tdXRleCk7DQo+
-ICAgc3RhdGljIHN0cnVjdCBzZXZfbWlzY19kZXYgKm1pc2NfZGV2Ow0KPiBAQCAtNDQwLDYgKzQ0
-MSw0MCBAQCBzdGF0aWMgaW50IHNldl9nZXRfYXBpX3ZlcnNpb24odm9pZCkNCj4gICAJcmV0dXJu
-IDA7DQo+ICAgfQ0KPiAgIA0KPiAraW50IHNldl9nZXRfZmlybXdhcmUoc3RydWN0IGRldmljZSAq
-ZGV2LCBjb25zdCBzdHJ1Y3QgZmlybXdhcmUgKipmaXJtd2FyZSkNCj4gK3sNCj4gKwljaGFyIGZ3
-X25hbWVfc3BlY2lmaWNbU0VWX0ZXX05BTUVfU0laRV07DQo+ICsJY2hhciBmd19uYW1lX3N1YnNl
-dFtTRVZfRldfTkFNRV9TSVpFXTsNCj4gKw0KPiArCXNucHJpbnRmKGZ3X25hbWVfc3BlY2lmaWMs
-IHNpemVvZihmd19uYW1lX3NwZWNpZmljKSwNCj4gKwkJICJhbWQvYW1kX3Nldl9mYW0lLjJ4aF9t
-b2RlbCUuMnhoLnNiaW4iLA0KPiArCQkgYm9vdF9jcHVfZGF0YS54ODYsIGJvb3RfY3B1X2RhdGEu
-eDg2X21vZGVsKTsNCj4gKw0KPiArCXNucHJpbnRmKGZ3X25hbWVfc3Vic2V0LCBzaXplb2YoZndf
-bmFtZV9zdWJzZXQpLA0KPiArCQkgImFtZC9hbWRfc2V2X2ZhbSUuMnhoX21vZGVsJS4xeHhoLnNi
-aW4iLA0KPiArCQkgYm9vdF9jcHVfZGF0YS54ODYsIChib290X2NwdV9kYXRhLng4Nl9tb2RlbCAm
-IDB4ZjApID4+IDQpOw0KPiArDQo+ICsJLyogQ2hlY2sgZm9yIFNFViBGVyBmb3IgYSBwYXJ0aWN1
-bGFyIG1vZGVsLg0KPiArCSAqIEV4LiBhbWRfc2V2X2ZhbTE3aF9tb2RlbDAwaC5zYmluIGZvciBG
-YW1pbHkgMTdoIE1vZGVsIDAwaA0KPiArCSAqDQo+ICsJICogb3INCj4gKwkgKg0KPiArCSAqIENo
-ZWNrIGZvciBTRVYgRlcgY29tbW9uIHRvIGEgc3Vic2V0IG9mIG1vZGVscy4NCj4gKwkgKiBFeC4g
-YW1kX3Nldl9mYW0xN2hfbW9kZWwweGguc2JpbiBmb3INCj4gKwkgKiAgICAgRmFtaWx5IDE3aCBN
-b2RlbCAwMGggLS0gRmFtaWx5IDE3aCBNb2RlbCAwRmgNCj4gKwkgKg0KPiArCSAqIG9yDQo+ICsJ
-ICoNCj4gKwkgKiBGYWxsLWJhY2sgdG8gdXNpbmcgZ2VuZXJpYyBuYW1lOiBzZXYuZncNCj4gKwkg
-Ki8NCj4gKwlpZiAoKGZpcm13YXJlX3JlcXVlc3Rfbm93YXJuKGZpcm13YXJlLCBmd19uYW1lX3Nw
-ZWNpZmljLCBkZXYpID49IDApIHx8DQo+ICsJICAgIChmaXJtd2FyZV9yZXF1ZXN0X25vd2Fybihm
-aXJtd2FyZSwgZndfbmFtZV9zdWJzZXQsIGRldikgPj0gMCkgfHwNCj4gKwkgICAgKGZpcm13YXJl
-X3JlcXVlc3Rfbm93YXJuKGZpcm13YXJlLCBTRVZfRldfRklMRSwgZGV2KSA+PSAwKSkNCj4gKwkJ
-cmV0dXJuIDA7DQo+ICsNCj4gKwlyZXR1cm4gLUVOT0VOVDsNCj4gK30NCj4gKw0KPiAgIC8qIERv
-bid0IGZhaWwgaWYgU0VWIEZXIGNvdWxkbid0IGJlIHVwZGF0ZWQuIENvbnRpbnVlIHdpdGggZXhp
-c3RpbmcgU0VWIEZXICovDQo+ICAgc3RhdGljIGludCBzZXZfdXBkYXRlX2Zpcm13YXJlKHN0cnVj
-dCBkZXZpY2UgKmRldikNCj4gICB7DQo+IEBAIC00NDksOSArNDg0LDEwIEBAIHN0YXRpYyBpbnQg
-c2V2X3VwZGF0ZV9maXJtd2FyZShzdHJ1Y3QgZGV2aWNlICpkZXYpDQo+ICAgCXN0cnVjdCBwYWdl
-ICpwOw0KPiAgIAl1NjQgZGF0YV9zaXplOw0KPiAgIA0KPiAtCXJldCA9IHJlcXVlc3RfZmlybXdh
-cmUoJmZpcm13YXJlLCBTRVZfRldfRklMRSwgZGV2KTsNCj4gLQlpZiAocmV0IDwgMCkNCj4gKwlp
-ZiAoc2V2X2dldF9maXJtd2FyZShkZXYsICZmaXJtd2FyZSkgPT0gLUVOT0VOVCkgew0KPiArCQlk
-ZXZfZGJnKGRldiwgIk5vIFNFViBmaXJtd2FyZSBmaWxlIHByZXNlbnRcbiIpOw0KPiAgIAkJcmV0
-dXJuIC0xOw0KPiArCX0NCj4gICANCj4gICAJLyoNCj4gICAJICogU0VWIEZXIGV4cGVjdHMgdGhl
-IHBoeXNpY2FsIGFkZHJlc3MgZ2l2ZW4gdG8gaXQgdG8gYmUgMzINCj4gDQoNCg==
+Sounds reasonable.  The subject needs a subsystem prefix and it might
+be better to make it more specific.  Like so:
+
+[PATCH 1/2] crypto: ccp - potential uninitialized variable
+
+I don't know if Herbert fixes those things up himself normally?
+
+regards,
+dan carpenter
