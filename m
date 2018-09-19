@@ -1,57 +1,325 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Crypto Fixes for 4.19
-Date: Wed, 19 Sep 2018 14:22:01 +0800
-Message-ID: <20180919062201.ov5o4vljvholgsed@gondor.apana.org.au>
-References: <20170223125141.GA17400@gondor.apana.org.au>
- <20170714141855.GA29426@gondor.apana.org.au>
- <20170922084401.GA15541@gondor.apana.org.au>
- <20171128230929.GA17783@gondor.apana.org.au>
- <20171222064931.GA27068@gondor.apana.org.au>
- <20180105073808.GA14405@gondor.apana.org.au>
- <20180212031702.GA26153@gondor.apana.org.au>
- <20180428080517.haxgpvqrwgotakyo@gondor.apana.org.au>
- <20180622145403.6ltjip7che227fuo@gondor.apana.org.au>
- <20180829033353.agnzxra3jk2r2mzg@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: Greg KH <gregkh@linuxfoundation.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+From: Corentin Labbe <clabbe@baylibre.com>
+Subject: [PATCH v3 2/2] crypto: tools: Add cryptostat userspace
+Date: Wed, 19 Sep 2018 10:10:55 +0000
+Message-ID: <1537351855-16618-3-git-send-email-clabbe@baylibre.com>
+References: <1537351855-16618-1-git-send-email-clabbe@baylibre.com>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Corentin Labbe <clabbe@baylibre.com>
+To: davem@davemloft.net, herbert@gondor.apana.org.au,
+        nhorman@tuxdriver.com
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20180829033353.agnzxra3jk2r2mzg@gondor.apana.org.au>
+In-Reply-To: <1537351855-16618-1-git-send-email-clabbe@baylibre.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi Greg: 
+This patch adds an userspace tool for displaying kernel crypto API
+statistics.
 
-This push fixes a potential boot hang in ccp and an incorrect
-CPU capability check in aegis/morus on x86.
+Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
+---
+ tools/crypto/getstat.c | 294 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 294 insertions(+)
+ create mode 100644 tools/crypto/getstat.c
 
-
-Please pull from
-
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
-
-
-Brijesh Singh (1):
-      crypto: ccp - add timeout support in the SEV command
-
-Ondrej Mosnacek (1):
-      crypto: x86/aegis,morus - Do not require OSXSAVE for SSE2
-
- arch/x86/crypto/aegis128-aesni-glue.c  |  1 -
- arch/x86/crypto/aegis128l-aesni-glue.c |  1 -
- arch/x86/crypto/aegis256-aesni-glue.c  |  1 -
- arch/x86/crypto/morus1280-sse2-glue.c  |  1 -
- arch/x86/crypto/morus640-sse2-glue.c   |  1 -
- drivers/crypto/ccp/psp-dev.c           | 46 ++++++++++++++++++++++++++++++----
- 6 files changed, 41 insertions(+), 10 deletions(-)
-
-Thanks,
+diff --git a/tools/crypto/getstat.c b/tools/crypto/getstat.c
+new file mode 100644
+index 000000000000..24115173a483
+--- /dev/null
++++ b/tools/crypto/getstat.c
+@@ -0,0 +1,294 @@
++/* Heavily copied from libkcapi 2015 - 2017, Stephan Mueller <smueller@chronox.de> */
++#include <errno.h>
++#include <linux/cryptouser.h>
++#include <linux/netlink.h>
++#include <linux/rtnetlink.h>
++#include <sys/types.h>
++#include <sys/socket.h>
++#include <stdlib.h>
++#include <stdio.h>
++#include <string.h>
++#include <time.h>
++#include <unistd.h>
++
++#define CR_RTA(x)  ((struct rtattr *)(((char *)(x)) + NLMSG_ALIGN(sizeof(struct crypto_user_alg))))
++
++static int get_stat(const char *drivername)
++{
++	struct {
++		struct nlmsghdr n;
++		struct crypto_user_alg cru;
++	} req;
++	struct sockaddr_nl nl;
++	int sd = 0, ret;
++	socklen_t addr_len;
++	struct iovec iov;
++	struct msghdr msg;
++	char buf[4096];
++	struct nlmsghdr *res_n = (struct nlmsghdr *)buf;
++	struct crypto_user_alg *cru_res = NULL;
++	int res_len = 0;
++	struct rtattr *tb[CRYPTOCFGA_MAX + 1];
++	struct rtattr *rta;
++	struct nlmsgerr *errmsg;
++
++	memset(&req, 0, sizeof(req));
++	memset(&buf, 0, sizeof(buf));
++	memset(&msg, 0, sizeof(msg));
++
++	req.n.nlmsg_len = NLMSG_LENGTH(sizeof(req.cru));
++	req.n.nlmsg_flags = NLM_F_REQUEST;
++	req.n.nlmsg_type = CRYPTO_MSG_GETSTAT;
++	req.n.nlmsg_seq = time(NULL);
++
++	strncpy(req.cru.cru_driver_name, drivername, strlen(drivername));
++
++	sd =  socket(AF_NETLINK, SOCK_RAW, NETLINK_CRYPTO);
++	if (sd < 0) {
++		fprintf(stderr, "Netlink error: cannot open netlink socket");
++		return -errno;
++	}
++	memset(&nl, 0, sizeof(nl));
++	nl.nl_family = AF_NETLINK;
++	if (bind(sd, (struct sockaddr *)&nl, sizeof(nl)) < 0) {
++		ret = -errno;
++		fprintf(stderr, "Netlink error: cannot bind netlink socket");
++		goto out;
++	}
++
++	/* sanity check that netlink socket was successfully opened */
++	addr_len = sizeof(nl);
++	if (getsockname(sd, (struct sockaddr *)&nl, &addr_len) < 0) {
++		ret = -errno;
++		printf("Netlink error: cannot getsockname");
++		goto out;
++	}
++	if (addr_len != sizeof(nl)) {
++		ret = -errno;
++		printf("Netlink error: wrong address length %d", addr_len);
++		goto out;
++	}
++	if (nl.nl_family != AF_NETLINK) {
++		ret = -errno;
++		printf("Netlink error: wrong address family %d",
++				nl.nl_family);
++		goto out;
++	}
++
++	memset(&nl, 0, sizeof(nl));
++	nl.nl_family = AF_NETLINK;
++	iov.iov_base = (void *)&req.n;
++	iov.iov_len = req.n.nlmsg_len;
++	msg.msg_name = &nl;
++	msg.msg_namelen = sizeof(nl);
++	msg.msg_iov = &iov;
++	msg.msg_iovlen = 1;
++	if (sendmsg(sd, &msg, 0) < 0) {
++		ret = -errno;
++		printf("Netlink error: sendmsg failed");
++		goto out;
++	}
++	memset(buf, 0, sizeof(buf));
++	iov.iov_base = buf;
++	while (1) {
++		iov.iov_len = sizeof(buf);
++		ret = recvmsg(sd, &msg, 0);
++		if (ret < 0) {
++			if (errno == EINTR || errno == EAGAIN)
++				continue;
++			ret = -errno;
++			printf("Netlink error: netlink receive error");
++			goto out;
++		}
++		if (ret == 0) {
++			ret = -errno;
++			printf("Netlink error: no data");
++			goto out;
++		}
++		if (ret > sizeof(buf)) {
++			ret = -errno;
++			printf("Netlink error: received too much data");
++			goto out;
++		}
++		break;
++	}
++
++	ret = -EFAULT;
++	res_len = res_n->nlmsg_len;
++	if (res_n->nlmsg_type == NLMSG_ERROR) {
++		errmsg = NLMSG_DATA(res_n);
++		fprintf(stderr, "Fail with %d\n", errmsg->error);
++		ret = errmsg->error;
++		goto out;
++	}
++
++	if (res_n->nlmsg_type == CRYPTO_MSG_GETSTAT) {
++		cru_res = NLMSG_DATA(res_n);
++		res_len -= NLMSG_SPACE(sizeof(*cru_res));
++	}
++	if (res_len < 0) {
++		printf("Netlink error: nlmsg len %d\n", res_len);
++		goto out;
++	}
++
++	if (!cru_res) {
++		ret = -EFAULT;
++		printf("Netlink error: no cru_res\n");
++		goto out;
++	}
++
++	rta = CR_RTA(cru_res);
++	memset(tb, 0, sizeof(struct rtattr *) * (CRYPTOCFGA_MAX + 1));
++	while (RTA_OK(rta, res_len)) {
++		if ((rta->rta_type <= CRYPTOCFGA_MAX) && (!tb[rta->rta_type]))
++			tb[rta->rta_type] = rta;
++		rta = RTA_NEXT(rta, res_len);
++	}
++	if (res_len) {
++		printf("Netlink error: unprocessed data %d",
++				res_len);
++		goto out;
++	}
++
++	if (tb[CRYPTOCFGA_STAT_HASH]) {
++		struct rtattr *rta = tb[CRYPTOCFGA_STAT_HASH];
++		struct crypto_stat *rhash =
++			(struct crypto_stat *)RTA_DATA(rta);
++		printf("%s\tHash\n\tHash: %u bytes: %llu\n\tErrors: %u\n",
++			drivername,
++			rhash->stat_hash_cnt, rhash->stat_hash_tlen,
++			rhash->stat_hash_err_cnt);
++	} else if (tb[CRYPTOCFGA_STAT_COMPRESS]) {
++		struct rtattr *rta = tb[CRYPTOCFGA_STAT_COMPRESS];
++		struct crypto_stat *rblk =
++			(struct crypto_stat *)RTA_DATA(rta);
++		printf("%s\tCompress\n\tCompress: %u bytes: %llu\n\tDecompress: %u bytes: %llu\n\tErrors: %u\n",
++			drivername,
++			rblk->stat_compress_cnt, rblk->stat_compress_tlen,
++			rblk->stat_decompress_cnt, rblk->stat_decompress_tlen,
++			rblk->stat_compress_err_cnt);
++	} else if (tb[CRYPTOCFGA_STAT_ACOMP]) {
++		struct rtattr *rta = tb[CRYPTOCFGA_STAT_ACOMP];
++		struct crypto_stat *rcomp =
++			(struct crypto_stat *)RTA_DATA(rta);
++		printf("%s\tACompress\n\tCompress: %u bytes: %llu\n\tDecompress: %u bytes: %llu\n\tErrors: %u\n",
++			drivername,
++			rcomp->stat_compress_cnt, rcomp->stat_compress_tlen,
++			rcomp->stat_decompress_cnt, rcomp->stat_decompress_tlen,
++			rcomp->stat_compress_err_cnt);
++	} else if (tb[CRYPTOCFGA_STAT_AEAD]) {
++		struct rtattr *rta = tb[CRYPTOCFGA_STAT_AEAD];
++		struct crypto_stat *raead =
++			(struct crypto_stat *)RTA_DATA(rta);
++		printf("%s\tAEAD\n\tEncrypt: %u bytes: %llu\n\tDecrypt: %u bytes: %llu\n\tErrors: %u\n",
++			drivername,
++			raead->stat_encrypt_cnt, raead->stat_encrypt_tlen,
++			raead->stat_decrypt_cnt, raead->stat_decrypt_tlen,
++			raead->stat_aead_err_cnt);
++	} else if (tb[CRYPTOCFGA_STAT_BLKCIPHER]) {
++		struct rtattr *rta = tb[CRYPTOCFGA_STAT_BLKCIPHER];
++		struct crypto_stat *rblk =
++			(struct crypto_stat *)RTA_DATA(rta);
++		printf("%s\tCipher\n\tEncrypt: %u bytes: %llu\n\tDecrypt: %u bytes: %llu\n\tErrors: %u\n",
++			drivername,
++			rblk->stat_encrypt_cnt, rblk->stat_encrypt_tlen,
++			rblk->stat_decrypt_cnt, rblk->stat_decrypt_tlen,
++			rblk->stat_cipher_err_cnt);
++	} else if (tb[CRYPTOCFGA_STAT_AKCIPHER]) {
++		struct rtattr *rta = tb[CRYPTOCFGA_STAT_AKCIPHER];
++		struct crypto_stat *rblk =
++			(struct crypto_stat *)RTA_DATA(rta);
++		printf("%s\tAkcipher\n\tEncrypt: %u bytes: %llu\n\tDecrypt: %u bytes: %llu\n\tSign: %u\n\tVerify: %u\n\tErrors: %u\n",
++			drivername,
++			rblk->stat_encrypt_cnt, rblk->stat_encrypt_tlen,
++			rblk->stat_decrypt_cnt, rblk->stat_decrypt_tlen,
++			rblk->stat_sign_cnt, rblk->stat_verify_cnt,
++			rblk->stat_akcipher_err_cnt);
++	} else if (tb[CRYPTOCFGA_STAT_CIPHER]) {
++		struct rtattr *rta = tb[CRYPTOCFGA_STAT_CIPHER];
++		struct crypto_stat *rblk =
++			(struct crypto_stat *)RTA_DATA(rta);
++		printf("%s\tcipher\n\tEncrypt: %u bytes: %llu\n\tDecrypt: %u bytes: %llu\n\tErrors: %u\n",
++			drivername,
++			rblk->stat_encrypt_cnt, rblk->stat_encrypt_tlen,
++			rblk->stat_decrypt_cnt, rblk->stat_decrypt_tlen,
++			rblk->stat_cipher_err_cnt);
++	} else if (tb[CRYPTOCFGA_STAT_RNG]) {
++		struct rtattr *rta = tb[CRYPTOCFGA_STAT_RNG];
++		struct crypto_stat *rrng =
++			(struct crypto_stat *)RTA_DATA(rta);
++		printf("%s\tRNG\n\tSeed: %u\n\tGenerate: %u bytes: %llu\n\tErrors: %u\n",
++			drivername,
++			rrng->stat_seed_cnt,
++			rrng->stat_generate_cnt, rrng->stat_generate_tlen,
++			rrng->stat_rng_err_cnt);
++	} else if (tb[CRYPTOCFGA_STAT_KPP]) {
++		struct rtattr *rta = tb[CRYPTOCFGA_STAT_KPP];
++		struct crypto_stat *rkpp =
++			(struct crypto_stat *)RTA_DATA(rta);
++		printf("%s\tKPP\n\tSetsecret: %u\n\tGenerate public key: %u\n\tCompute_shared_secret: %u\n\tErrors: %u\n",
++			drivername,
++			rkpp->stat_setsecret_cnt,
++			rkpp->stat_generate_public_key_cnt,
++			rkpp->stat_compute_shared_secret_cnt,
++			rkpp->stat_kpp_err_cnt);
++	} else {
++		fprintf(stderr, "%s is of an unknown algorithm\n", drivername);
++	}
++	ret = 0;
++out:
++	close(sd);
++	return ret;
++}
++
++int main(int argc, const char *argv[])
++{
++	char buf[4096];
++	FILE *procfd;
++	int i, lastspace;
++	int ret;
++
++	procfd = fopen("/proc/crypto", "r");
++	if (!procfd) {
++		ret = errno;
++		fprintf(stderr, "Cannot open /proc/crypto %s\n", strerror(errno));
++		return ret;
++	}
++	if (argc > 1) {
++		if (!strcmp(argv[1], "-h") || !strcmp(argv[1], "--help")) {
++			printf("Usage: %s [-h|--help] display this help\n", argv[0]);
++			printf("Usage: %s display all crypto statistics\n", argv[0]);
++			printf("Usage: %s drivername1 drivername2 ... = display crypto statistics about drivername1 ...\n", argv[0]);
++			return 0;
++		}
++		for (i = 1; i < argc; i++) {
++			ret = get_stat(argv[i]);
++			if (ret) {
++				fprintf(stderr, "Failed with %s\n", strerror(-ret));
++				return ret;
++			}
++		}
++		return 0;
++	}
++
++	while (fgets(buf, sizeof(buf), procfd)) {
++		if (!strncmp(buf, "driver", 6)) {
++			lastspace = 0;
++			i = 0;
++			while (i < strlen(buf)) {
++				i++;
++				if (buf[i] == ' ')
++					lastspace = i;
++			}
++			buf[strlen(buf) - 1] = '\0';
++			ret = get_stat(buf + lastspace + 1);
++			if (ret) {
++				fprintf(stderr, "Failed with %s\n", strerror(-ret));
++				goto out;
++			}
++		}
++	}
++out:
++	fclose(procfd);
++	return ret;
++}
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.16.4
