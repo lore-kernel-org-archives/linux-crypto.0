@@ -1,92 +1,56 @@
-From: Kees Cook <keescook@chromium.org>
-Subject: [PATCH crypto-next 18/23] crypto: artpec6 - Remove VLA usage of skcipher
-Date: Tue, 18 Sep 2018 19:10:55 -0700
-Message-ID: <20180919021100.3380-19-keescook@chromium.org>
-References: <20180919021100.3380-1-keescook@chromium.org>
-Cc: Kees Cook <keescook@chromium.org>,
-        Jesper Nilsson <jesper.nilsson@axis.com>,
-        Lars Persson <lars.persson@axis.com>,
-        linux-arm-kernel@axis.com,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Eric Biggers <ebiggers@google.com>,
-        linux-crypto <linux-crypto@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+From: Andy Lutomirski <luto@amacapital.net>
+Subject: Re: [PATCH net-next v5 07/20] zinc: Poly1305 generic C implementations and selftest
+Date: Tue, 18 Sep 2018 21:13:04 -0700
+Message-ID: <BF781C43-52C2-410A-A6D0-AAD0AC998C2D@amacapital.net>
+References: <20180918161646.19105-1-Jason@zx2c4.com> <20180918161646.19105-8-Jason@zx2c4.com> <20180919005054.GC74746@gmail.com> <CAHmME9oL98adRp6xXqaXxA0E4Oa4ecPW+JHChCS3hTgH7RLPjA@mail.gmail.com>
+Mime-Version: 1.0 (1.0)
+Content-Type: text/plain;
+        charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Cc: Eric Biggers <ebiggers@kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Netdev <netdev@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        David Miller <davem@davemloft.net>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Samuel Neves <sneves@dei.uc.pt>,
+        Andrew Lutomirski <luto@kernel.org>,
+        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180919021100.3380-1-keescook@chromium.org>
+In-Reply-To: <CAHmME9oL98adRp6xXqaXxA0E4Oa4ecPW+JHChCS3hTgH7RLPjA@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-In the quest to remove all stack VLA usage from the kernel[1], this
-replaces struct crypto_skcipher and SKCIPHER_REQUEST_ON_STACK() usage
-with struct crypto_sync_skcipher and SYNC_SKCIPHER_REQUEST_ON_STACK(),
-which uses a fixed stack size.
 
-[1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
+> On Sep 18, 2018, at 6:35 PM, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+>=20
+>> On Wed, Sep 19, 2018 at 2:50 AM Eric Biggers <ebiggers@kernel.org> wrote:=
 
-Cc: Jesper Nilsson <jesper.nilsson@axis.com>
-Cc: Lars Persson <lars.persson@axis.com>
-Cc: linux-arm-kernel@axis.com
-Signed-off-by: Kees Cook <keescook@chromium.org>
----
- drivers/crypto/axis/artpec6_crypto.c | 19 +++++++++----------
- 1 file changed, 9 insertions(+), 10 deletions(-)
+>> Hardcoding the 'input' array to 600 bytes forces the full amount of space=
+ to be
+>> reserved in the kernel image for every test vector.  Also, if anyone adds=
+ a
+>> longer test vector they will need to remember to increase the value.
+>>=20
+>> It should be a const pointer instead, like the test vectors in crypto/tes=
+tmgr.h.
+>=20
+> I know. The agony. This has been really annoying me. I originally did
+> it the right way, but removed it last week, when I noticed that gcc
+> failed to put it in the initconst section:
+>=20
+> https://git.zx2c4.com/WireGuard/commit/?id=3Df4698d20f13946afc6ce99e98685b=
+a3f9adc4474
+>=20
+> Even changing the (u8[]){ ... } into a (const u8[]){ ... } or even
+> into a const string literal does not do the trick. It makes it into
+> the constant data section with const, but it does not make it into the
+> initconst section. What a bummer.
+>=20
+> I went asking about this on the gcc mailing list, to see if there was
+> just some aspect of C that I had overlooked:
+> https://gcc.gnu.org/ml/gcc/2018-09/msg00043.html
 
-diff --git a/drivers/crypto/axis/artpec6_crypto.c b/drivers/crypto/axis/artpec6_crypto.c
-index 7f07a5085e9b..e5a080e87ea8 100644
---- a/drivers/crypto/axis/artpec6_crypto.c
-+++ b/drivers/crypto/axis/artpec6_crypto.c
-@@ -330,7 +330,7 @@ struct artpec6_cryptotfm_context {
- 	size_t key_length;
- 	u32 key_md;
- 	int crypto_type;
--	struct crypto_skcipher *fallback;
-+	struct crypto_sync_skcipher *fallback;
- };
- 
- struct artpec6_crypto_aead_hw_ctx {
-@@ -1199,15 +1199,15 @@ artpec6_crypto_ctr_crypt(struct skcipher_request *req, bool encrypt)
- 		pr_debug("counter %x will overflow (nblks %u), falling back\n",
- 			 counter, counter + nblks);
- 
--		ret = crypto_skcipher_setkey(ctx->fallback, ctx->aes_key,
--					     ctx->key_length);
-+		ret = crypto_sync_skcipher_setkey(ctx->fallback, ctx->aes_key,
-+						  ctx->key_length);
- 		if (ret)
- 			return ret;
- 
- 		{
--			SKCIPHER_REQUEST_ON_STACK(subreq, ctx->fallback);
-+			SYNC_SKCIPHER_REQUEST_ON_STACK(subreq, ctx->fallback);
- 
--			skcipher_request_set_tfm(subreq, ctx->fallback);
-+			skcipher_request_set_sync_tfm(subreq, ctx->fallback);
- 			skcipher_request_set_callback(subreq, req->base.flags,
- 						      NULL, NULL);
- 			skcipher_request_set_crypt(subreq, req->src, req->dst,
-@@ -1561,10 +1561,9 @@ static int artpec6_crypto_aes_ctr_init(struct crypto_skcipher *tfm)
- {
- 	struct artpec6_cryptotfm_context *ctx = crypto_skcipher_ctx(tfm);
- 
--	ctx->fallback = crypto_alloc_skcipher(crypto_tfm_alg_name(&tfm->base),
--					      0,
--					      CRYPTO_ALG_ASYNC |
--					      CRYPTO_ALG_NEED_FALLBACK);
-+	ctx->fallback =
-+		crypto_alloc_sync_skcipher(crypto_tfm_alg_name(&tfm->base),
-+					   0, CRYPTO_ALG_NEED_FALLBACK);
- 	if (IS_ERR(ctx->fallback))
- 		return PTR_ERR(ctx->fallback);
- 
-@@ -1605,7 +1604,7 @@ static void artpec6_crypto_aes_ctr_exit(struct crypto_skcipher *tfm)
- {
- 	struct artpec6_cryptotfm_context *ctx = crypto_skcipher_ctx(tfm);
- 
--	crypto_free_skcipher(ctx->fallback);
-+	crypto_free_sync_skcipher(ctx->fallback);
- 	artpec6_crypto_aes_exit(tfm);
- }
- 
--- 
-2.17.1
+Can you not uglify the code a bit by using normal (non-compound) liberals as=
+ described in the response to that email?
