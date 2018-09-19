@@ -1,9 +1,11 @@
 From: Kees Cook <keescook@chromium.org>
-Subject: [PATCH crypto-next 19/23] crypto: chelsio - Remove VLA usage of skcipher
-Date: Tue, 18 Sep 2018 19:10:56 -0700
-Message-ID: <20180919021100.3380-20-keescook@chromium.org>
+Subject: [PATCH crypto-next 22/23] crypto: picoxcell - Remove VLA usage of skcipher
+Date: Tue, 18 Sep 2018 19:10:59 -0700
+Message-ID: <20180919021100.3380-23-keescook@chromium.org>
 References: <20180919021100.3380-1-keescook@chromium.org>
-Cc: Kees Cook <keescook@chromium.org>, Harsh Jain <harsh@chelsio.com>,
+Cc: Kees Cook <keescook@chromium.org>,
+        Jamie Iles <jamie@jamieiles.com>,
+        linux-arm-kernel@lists.infradead.org,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>,
         Eric Biggers <ebiggers@google.com>,
         linux-crypto <linux-crypto@vger.kernel.org>,
@@ -21,101 +23,86 @@ which uses a fixed stack size.
 
 [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
 
-Cc: Harsh Jain <harsh@chelsio.com>
+Cc: Jamie Iles <jamie@jamieiles.com>
+Cc: linux-arm-kernel@lists.infradead.org
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- drivers/crypto/chelsio/chcr_algo.c   | 27 ++++++++++++++-------------
- drivers/crypto/chelsio/chcr_crypto.h |  2 +-
- 2 files changed, 15 insertions(+), 14 deletions(-)
+ drivers/crypto/picoxcell_crypto.c | 21 ++++++++++-----------
+ 1 file changed, 10 insertions(+), 11 deletions(-)
 
-diff --git a/drivers/crypto/chelsio/chcr_algo.c b/drivers/crypto/chelsio/chcr_algo.c
-index 5c539af8ed60..dfc3a10bb55b 100644
---- a/drivers/crypto/chelsio/chcr_algo.c
-+++ b/drivers/crypto/chelsio/chcr_algo.c
-@@ -671,7 +671,7 @@ static int chcr_sg_ent_in_wr(struct scatterlist *src,
- 	return min(srclen, dstlen);
- }
+diff --git a/drivers/crypto/picoxcell_crypto.c b/drivers/crypto/picoxcell_crypto.c
+index 321d5e2ac833..a28f1d18fe01 100644
+--- a/drivers/crypto/picoxcell_crypto.c
++++ b/drivers/crypto/picoxcell_crypto.c
+@@ -171,7 +171,7 @@ struct spacc_ablk_ctx {
+ 	 * The fallback cipher. If the operation can't be done in hardware,
+ 	 * fallback to a software version.
+ 	 */
+-	struct crypto_skcipher		*sw_cipher;
++	struct crypto_sync_skcipher	*sw_cipher;
+ };
  
--static int chcr_cipher_fallback(struct crypto_skcipher *cipher,
-+static int chcr_cipher_fallback(struct crypto_sync_skcipher *cipher,
- 				u32 flags,
- 				struct scatterlist *src,
- 				struct scatterlist *dst,
-@@ -681,9 +681,9 @@ static int chcr_cipher_fallback(struct crypto_skcipher *cipher,
- {
+ /* AEAD cipher context. */
+@@ -799,17 +799,17 @@ static int spacc_aes_setkey(struct crypto_ablkcipher *cipher, const u8 *key,
+ 		 * Set the fallback transform to use the same request flags as
+ 		 * the hardware transform.
+ 		 */
+-		crypto_skcipher_clear_flags(ctx->sw_cipher,
++		crypto_sync_skcipher_clear_flags(ctx->sw_cipher,
+ 					    CRYPTO_TFM_REQ_MASK);
+-		crypto_skcipher_set_flags(ctx->sw_cipher,
++		crypto_sync_skcipher_set_flags(ctx->sw_cipher,
+ 					  cipher->base.crt_flags &
+ 					  CRYPTO_TFM_REQ_MASK);
+ 
+-		err = crypto_skcipher_setkey(ctx->sw_cipher, key, len);
++		err = crypto_sync_skcipher_setkey(ctx->sw_cipher, key, len);
+ 
+ 		tfm->crt_flags &= ~CRYPTO_TFM_RES_MASK;
+ 		tfm->crt_flags |=
+-			crypto_skcipher_get_flags(ctx->sw_cipher) &
++			crypto_sync_skcipher_get_flags(ctx->sw_cipher) &
+ 			CRYPTO_TFM_RES_MASK;
+ 
+ 		if (err)
+@@ -914,7 +914,7 @@ static int spacc_ablk_do_fallback(struct ablkcipher_request *req,
+ 	struct crypto_tfm *old_tfm =
+ 	    crypto_ablkcipher_tfm(crypto_ablkcipher_reqtfm(req));
+ 	struct spacc_ablk_ctx *ctx = crypto_tfm_ctx(old_tfm);
+-	SKCIPHER_REQUEST_ON_STACK(subreq, ctx->sw_cipher);
++	SYNC_SKCIPHER_REQUEST_ON_STACK(subreq, ctx->sw_cipher);
  	int err;
  
--	SKCIPHER_REQUEST_ON_STACK(subreq, cipher);
-+	SYNC_SKCIPHER_REQUEST_ON_STACK(subreq, cipher);
- 
--	skcipher_request_set_tfm(subreq, cipher);
-+	skcipher_request_set_sync_tfm(subreq, cipher);
- 	skcipher_request_set_callback(subreq, flags, NULL, NULL);
- 	skcipher_request_set_crypt(subreq, src, dst,
- 				   nbytes, iv);
-@@ -854,13 +854,14 @@ static int chcr_cipher_fallback_setkey(struct crypto_ablkcipher *cipher,
- 	struct ablk_ctx *ablkctx = ABLK_CTX(c_ctx(cipher));
- 	int err = 0;
- 
--	crypto_skcipher_clear_flags(ablkctx->sw_cipher, CRYPTO_TFM_REQ_MASK);
--	crypto_skcipher_set_flags(ablkctx->sw_cipher, cipher->base.crt_flags &
--				  CRYPTO_TFM_REQ_MASK);
--	err = crypto_skcipher_setkey(ablkctx->sw_cipher, key, keylen);
-+	crypto_sync_skcipher_clear_flags(ablkctx->sw_cipher,
-+				CRYPTO_TFM_REQ_MASK);
-+	crypto_sync_skcipher_set_flags(ablkctx->sw_cipher,
-+				cipher->base.crt_flags & CRYPTO_TFM_REQ_MASK);
-+	err = crypto_sync_skcipher_setkey(ablkctx->sw_cipher, key, keylen);
- 	tfm->crt_flags &= ~CRYPTO_TFM_RES_MASK;
- 	tfm->crt_flags |=
--		crypto_skcipher_get_flags(ablkctx->sw_cipher) &
-+		crypto_sync_skcipher_get_flags(ablkctx->sw_cipher) &
- 		CRYPTO_TFM_RES_MASK;
- 	return err;
- }
-@@ -1360,8 +1361,8 @@ static int chcr_cra_init(struct crypto_tfm *tfm)
- 	struct chcr_context *ctx = crypto_tfm_ctx(tfm);
- 	struct ablk_ctx *ablkctx = ABLK_CTX(ctx);
- 
--	ablkctx->sw_cipher = crypto_alloc_skcipher(alg->cra_name, 0,
--				CRYPTO_ALG_ASYNC | CRYPTO_ALG_NEED_FALLBACK);
-+	ablkctx->sw_cipher = crypto_alloc_sync_skcipher(alg->cra_name, 0,
-+				CRYPTO_ALG_NEED_FALLBACK);
- 	if (IS_ERR(ablkctx->sw_cipher)) {
- 		pr_err("failed to allocate fallback for %s\n", alg->cra_name);
- 		return PTR_ERR(ablkctx->sw_cipher);
-@@ -1390,8 +1391,8 @@ static int chcr_rfc3686_init(struct crypto_tfm *tfm)
- 	/*RFC3686 initialises IV counter value to 1, rfc3686(ctr(aes))
- 	 * cannot be used as fallback in chcr_handle_cipher_response
+ 	/*
+@@ -922,7 +922,7 @@ static int spacc_ablk_do_fallback(struct ablkcipher_request *req,
+ 	 * the ciphering has completed, put the old transform back into the
+ 	 * request.
  	 */
--	ablkctx->sw_cipher = crypto_alloc_skcipher("ctr(aes)", 0,
--				CRYPTO_ALG_ASYNC | CRYPTO_ALG_NEED_FALLBACK);
-+	ablkctx->sw_cipher = crypto_alloc_sync_skcipher("ctr(aes)", 0,
-+				CRYPTO_ALG_NEED_FALLBACK);
- 	if (IS_ERR(ablkctx->sw_cipher)) {
- 		pr_err("failed to allocate fallback for %s\n", alg->cra_name);
- 		return PTR_ERR(ablkctx->sw_cipher);
-@@ -1406,7 +1407,7 @@ static void chcr_cra_exit(struct crypto_tfm *tfm)
- 	struct chcr_context *ctx = crypto_tfm_ctx(tfm);
- 	struct ablk_ctx *ablkctx = ABLK_CTX(ctx);
+-	skcipher_request_set_tfm(subreq, ctx->sw_cipher);
++	skcipher_request_set_sync_tfm(subreq, ctx->sw_cipher);
+ 	skcipher_request_set_callback(subreq, req->base.flags, NULL, NULL);
+ 	skcipher_request_set_crypt(subreq, req->src, req->dst,
+ 				   req->nbytes, req->info);
+@@ -1020,9 +1020,8 @@ static int spacc_ablk_cra_init(struct crypto_tfm *tfm)
+ 	ctx->generic.flags = spacc_alg->type;
+ 	ctx->generic.engine = engine;
+ 	if (alg->cra_flags & CRYPTO_ALG_NEED_FALLBACK) {
+-		ctx->sw_cipher = crypto_alloc_skcipher(
+-			alg->cra_name, 0, CRYPTO_ALG_ASYNC |
+-					  CRYPTO_ALG_NEED_FALLBACK);
++		ctx->sw_cipher = crypto_alloc_sync_skcipher(
++			alg->cra_name, 0, CRYPTO_ALG_NEED_FALLBACK);
+ 		if (IS_ERR(ctx->sw_cipher)) {
+ 			dev_warn(engine->dev, "failed to allocate fallback for %s\n",
+ 				 alg->cra_name);
+@@ -1041,7 +1040,7 @@ static void spacc_ablk_cra_exit(struct crypto_tfm *tfm)
+ {
+ 	struct spacc_ablk_ctx *ctx = crypto_tfm_ctx(tfm);
  
--	crypto_free_skcipher(ablkctx->sw_cipher);
-+	crypto_free_sync_skcipher(ablkctx->sw_cipher);
- 	if (ablkctx->aes_generic)
- 		crypto_free_cipher(ablkctx->aes_generic);
- }
-diff --git a/drivers/crypto/chelsio/chcr_crypto.h b/drivers/crypto/chelsio/chcr_crypto.h
-index 54835cb109e5..e26b72cfe4b6 100644
---- a/drivers/crypto/chelsio/chcr_crypto.h
-+++ b/drivers/crypto/chelsio/chcr_crypto.h
-@@ -170,7 +170,7 @@ static inline struct chcr_context *h_ctx(struct crypto_ahash *tfm)
+-	crypto_free_skcipher(ctx->sw_cipher);
++	crypto_free_sync_skcipher(ctx->sw_cipher);
  }
  
- struct ablk_ctx {
--	struct crypto_skcipher *sw_cipher;
-+	struct crypto_sync_skcipher *sw_cipher;
- 	struct crypto_cipher *aes_generic;
- 	__be32 key_ctx_hdr;
- 	unsigned int enckey_len;
+ static int spacc_ablk_encrypt(struct ablkcipher_request *req)
 -- 
 2.17.1
