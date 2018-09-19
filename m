@@ -1,41 +1,80 @@
-From: Greg KH <gregkh@linuxfoundation.org>
-Subject: Re: Crypto Fixes for 4.19
-Date: Wed, 19 Sep 2018 15:23:24 +0200
-Message-ID: <20180919132324.GA24399@kroah.com>
-References: <20170714141855.GA29426@gondor.apana.org.au>
- <20170922084401.GA15541@gondor.apana.org.au>
- <20171128230929.GA17783@gondor.apana.org.au>
- <20171222064931.GA27068@gondor.apana.org.au>
- <20180105073808.GA14405@gondor.apana.org.au>
- <20180212031702.GA26153@gondor.apana.org.au>
- <20180428080517.haxgpvqrwgotakyo@gondor.apana.org.au>
- <20180622145403.6ltjip7che227fuo@gondor.apana.org.au>
- <20180829033353.agnzxra3jk2r2mzg@gondor.apana.org.au>
- <20180919062201.ov5o4vljvholgsed@gondor.apana.org.au>
+From: "Lendacky, Thomas" <Thomas.Lendacky@amd.com>
+Subject: Re: [PATCH 2/2] Allow SEV firmware to be chosen based on Family and
+ Model
+Date: Wed, 19 Sep 2018 13:29:30 +0000
+Message-ID: <85155459-44ef-b200-f442-fc5fde75a1ae@amd.com>
+References: <cover.1536959537.git.Janakarajan.Natarajan@amd.com>
+ <5c58c32c0ce89c35a95e151734f5d43a3ed0dca0.1536959537.git.Janakarajan.Natarajan@amd.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Linus Torvalds <torvalds@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: "Hook, Gary" <Gary.Hook@amd.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        "Singh, Brijesh" <brijesh.singh@amd.com>
+To: "Natarajan, Janakarajan" <Janakarajan.Natarajan@amd.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20180919062201.ov5o4vljvholgsed@gondor.apana.org.au>
+In-Reply-To: <5c58c32c0ce89c35a95e151734f5d43a3ed0dca0.1536959537.git.Janakarajan.Natarajan@amd.com>
+Content-Language: en-US
+Content-ID: <4730B51C1681B44AAC99B2A4747D6F9A@namprd12.prod.outlook.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Sep 19, 2018 at 02:22:01PM +0800, Herbert Xu wrote:
-> Hi Greg: 
-> 
-> This push fixes a potential boot hang in ccp and an incorrect
-> CPU capability check in aegis/morus on x86.
-> 
-> 
-> Please pull from
-> 
-> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
-
-Now pulled, thanks.
-
-greg k-h
+DQoNCk9uIDA5LzE0LzIwMTggMDU6MzIgUE0sIEphbmFrYXJhamFuIE5hdGFyYWphbiB3cm90ZToN
+Cj4gRHVyaW5nIFBTUCBpbml0aWFsaXphdGlvbiwgdGhlcmUgaXMgYW4gYXR0ZW1wdCB0byB1cGRh
+dGUgdGhlIFNFViBmaXJtd2FyZQ0KPiBieSBsb29raW5nIGluIC9saWIvZmlybXdhcmUvYW1kLy4g
+Q3VycmVudGx5LCBzZXYuZncgaXMgdGhlIGV4cGVjdGVkIG5hbWUNCj4gb2YgdGhlIGZpcm13YXJl
+IGJsb2IuDQo+IA0KPiBUaGlzIHBhdGNoIHdpbGwgYWxsb3cgZm9yIGZpcm13YXJlIGZpbGVuYW1l
+cyBiYXNlZCBvbiB0aGUgZmFtaWx5IGFuZA0KPiBtb2RlbCBvZiB0aGUgcHJvY2Vzc29yLg0KPiAN
+Cj4gTW9kZWwgc3BlY2lmaWMgZmlybXdhcmUgZmlsZXMgYXJlIGdpdmVuIGhpZ2hlc3QgcHJpb3Jp
+dHkuIEZvbGxvd2VkIGJ5DQo+IGZpcm13YXJlIGZvciBhIHN1YnNldCBvZiBtb2RlbHMuIExhc3Rs
+eSwgZmFpbGluZyB0aGUgcHJldmlvdXMgdHdvIG9wdGlvbnMsDQo+IGZhbGxiYWNrIHRvIGxvb2tp
+bmcgZm9yIHNldi5mdy4NCj4gDQo+IFNpZ25lZC1vZmYtYnk6IEphbmFrYXJhamFuIE5hdGFyYWph
+biA8SmFuYWthcmFqYW4uTmF0YXJhamFuQGFtZC5jb20+DQoNClJldmlld2VkLWJ5OiBUb20gTGVu
+ZGFja3kgPHRob21hcy5sZW5kYWNreUBhbWQuY29tPg0KDQo+IC0tLQ0KPiAgZHJpdmVycy9jcnlw
+dG8vY2NwL3BzcC1kZXYuYyB8IDQ0ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKystLS0tDQo+ICAxIGZpbGUgY2hhbmdlZCwgNDAgaW5zZXJ0aW9ucygrKSwgNCBkZWxldGlv
+bnMoLSkNCj4gDQo+IGRpZmYgLS1naXQgYS9kcml2ZXJzL2NyeXB0by9jY3AvcHNwLWRldi5jIGIv
+ZHJpdmVycy9jcnlwdG8vY2NwL3BzcC1kZXYuYw0KPiBpbmRleCBmNTQxZTYwLi4zYjMzODYzIDEw
+MDY0NA0KPiAtLS0gYS9kcml2ZXJzL2NyeXB0by9jY3AvcHNwLWRldi5jDQo+ICsrKyBiL2RyaXZl
+cnMvY3J5cHRvL2NjcC9wc3AtZGV2LmMNCj4gQEAgLTMxLDggKzMxLDkgQEANCj4gIAkJKChwc3Bf
+bWFzdGVyLT5hcGlfbWFqb3IpID49IF9tYWogJiYJXA0KPiAgCQkgKHBzcF9tYXN0ZXItPmFwaV9t
+aW5vcikgPj0gX21pbikNCj4gIA0KPiAtI2RlZmluZSBERVZJQ0VfTkFNRQkic2V2Ig0KPiAtI2Rl
+ZmluZSBTRVZfRldfRklMRQkiYW1kL3Nldi5mdyINCj4gKyNkZWZpbmUgREVWSUNFX05BTUUJCSJz
+ZXYiDQo+ICsjZGVmaW5lIFNFVl9GV19GSUxFCQkiYW1kL3Nldi5mdyINCj4gKyNkZWZpbmUgU0VW
+X0ZXX05BTUVfU0laRQk2NA0KPiAgDQo+ICBzdGF0aWMgREVGSU5FX01VVEVYKHNldl9jbWRfbXV0
+ZXgpOw0KPiAgc3RhdGljIHN0cnVjdCBzZXZfbWlzY19kZXYgKm1pc2NfZGV2Ow0KPiBAQCAtNDQw
+LDYgKzQ0MSw0MCBAQCBzdGF0aWMgaW50IHNldl9nZXRfYXBpX3ZlcnNpb24odm9pZCkNCj4gIAly
+ZXR1cm4gMDsNCj4gIH0NCj4gIA0KPiAraW50IHNldl9nZXRfZmlybXdhcmUoc3RydWN0IGRldmlj
+ZSAqZGV2LCBjb25zdCBzdHJ1Y3QgZmlybXdhcmUgKipmaXJtd2FyZSkNCj4gK3sNCj4gKwljaGFy
+IGZ3X25hbWVfc3BlY2lmaWNbU0VWX0ZXX05BTUVfU0laRV07DQo+ICsJY2hhciBmd19uYW1lX3N1
+YnNldFtTRVZfRldfTkFNRV9TSVpFXTsNCj4gKw0KPiArCXNucHJpbnRmKGZ3X25hbWVfc3BlY2lm
+aWMsIHNpemVvZihmd19uYW1lX3NwZWNpZmljKSwNCj4gKwkJICJhbWQvYW1kX3Nldl9mYW0lLjJ4
+aF9tb2RlbCUuMnhoLnNiaW4iLA0KPiArCQkgYm9vdF9jcHVfZGF0YS54ODYsIGJvb3RfY3B1X2Rh
+dGEueDg2X21vZGVsKTsNCj4gKw0KPiArCXNucHJpbnRmKGZ3X25hbWVfc3Vic2V0LCBzaXplb2Yo
+ZndfbmFtZV9zdWJzZXQpLA0KPiArCQkgImFtZC9hbWRfc2V2X2ZhbSUuMnhoX21vZGVsJS4xeHho
+LnNiaW4iLA0KPiArCQkgYm9vdF9jcHVfZGF0YS54ODYsIChib290X2NwdV9kYXRhLng4Nl9tb2Rl
+bCAmIDB4ZjApID4+IDQpOw0KPiArDQo+ICsJLyogQ2hlY2sgZm9yIFNFViBGVyBmb3IgYSBwYXJ0
+aWN1bGFyIG1vZGVsLg0KPiArCSAqIEV4LiBhbWRfc2V2X2ZhbTE3aF9tb2RlbDAwaC5zYmluIGZv
+ciBGYW1pbHkgMTdoIE1vZGVsIDAwaA0KPiArCSAqDQo+ICsJICogb3INCj4gKwkgKg0KPiArCSAq
+IENoZWNrIGZvciBTRVYgRlcgY29tbW9uIHRvIGEgc3Vic2V0IG9mIG1vZGVscy4NCj4gKwkgKiBF
+eC4gYW1kX3Nldl9mYW0xN2hfbW9kZWwweGguc2JpbiBmb3INCj4gKwkgKiAgICAgRmFtaWx5IDE3
+aCBNb2RlbCAwMGggLS0gRmFtaWx5IDE3aCBNb2RlbCAwRmgNCj4gKwkgKg0KPiArCSAqIG9yDQo+
+ICsJICoNCj4gKwkgKiBGYWxsLWJhY2sgdG8gdXNpbmcgZ2VuZXJpYyBuYW1lOiBzZXYuZncNCj4g
+KwkgKi8NCj4gKwlpZiAoKGZpcm13YXJlX3JlcXVlc3Rfbm93YXJuKGZpcm13YXJlLCBmd19uYW1l
+X3NwZWNpZmljLCBkZXYpID49IDApIHx8DQo+ICsJICAgIChmaXJtd2FyZV9yZXF1ZXN0X25vd2Fy
+bihmaXJtd2FyZSwgZndfbmFtZV9zdWJzZXQsIGRldikgPj0gMCkgfHwNCj4gKwkgICAgKGZpcm13
+YXJlX3JlcXVlc3Rfbm93YXJuKGZpcm13YXJlLCBTRVZfRldfRklMRSwgZGV2KSA+PSAwKSkNCj4g
+KwkJcmV0dXJuIDA7DQo+ICsNCj4gKwlyZXR1cm4gLUVOT0VOVDsNCj4gK30NCj4gKw0KPiAgLyog
+RG9uJ3QgZmFpbCBpZiBTRVYgRlcgY291bGRuJ3QgYmUgdXBkYXRlZC4gQ29udGludWUgd2l0aCBl
+eGlzdGluZyBTRVYgRlcgKi8NCj4gIHN0YXRpYyBpbnQgc2V2X3VwZGF0ZV9maXJtd2FyZShzdHJ1
+Y3QgZGV2aWNlICpkZXYpDQo+ICB7DQo+IEBAIC00NDksOSArNDg0LDEwIEBAIHN0YXRpYyBpbnQg
+c2V2X3VwZGF0ZV9maXJtd2FyZShzdHJ1Y3QgZGV2aWNlICpkZXYpDQo+ICAJc3RydWN0IHBhZ2Ug
+KnA7DQo+ICAJdTY0IGRhdGFfc2l6ZTsNCj4gIA0KPiAtCXJldCA9IHJlcXVlc3RfZmlybXdhcmUo
+JmZpcm13YXJlLCBTRVZfRldfRklMRSwgZGV2KTsNCj4gLQlpZiAocmV0IDwgMCkNCj4gKwlpZiAo
+c2V2X2dldF9maXJtd2FyZShkZXYsICZmaXJtd2FyZSkgPT0gLUVOT0VOVCkgew0KPiArCQlkZXZf
+ZGJnKGRldiwgIk5vIFNFViBmaXJtd2FyZSBmaWxlIHByZXNlbnRcbiIpOw0KPiAgCQlyZXR1cm4g
+LTE7DQo+ICsJfQ0KPiAgDQo+ICAJLyoNCj4gIAkgKiBTRVYgRlcgZXhwZWN0cyB0aGUgcGh5c2lj
+YWwgYWRkcmVzcyBnaXZlbiB0byBpdCB0byBiZSAzMg0KPiANCg==
