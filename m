@@ -1,34 +1,67 @@
-From: "Natarajan, Janakarajan" <Janakarajan.Natarajan@amd.com>
-Subject: Re: [PATCH 1/2] Fix static checker warning
-Date: Thu, 20 Sep 2018 15:43:48 +0000
-Message-ID: <7aa02bf8-8813-98e5-6729-af4ae63da7d0@amd.com>
-References: <cover.1536959537.git.Janakarajan.Natarajan@amd.com>
- <31c49295223e51f5c1c4e36e7a09fe100dab1711.1536959537.git.Janakarajan.Natarajan@amd.com>
- <8dfca0f4-6639-3444-148f-eb0b0817fec6@amd.com>
- <20180919135741.5icpyesntcfbgtcr@mwanda>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        "Hook, Gary" <Gary.Hook@amd.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        "Singh, Brijesh" <brijesh.singh@amd.com>
-To: Dan Carpenter <dan.carpenter@oracle.com>,
-        "Hook, Gary" <Gary.Hook@amd.com>
+From: Andy Lutomirski <luto@amacapital.net>
+Subject: Re: [PATCH net-next v5 02/20] zinc: introduce minimal cryptography library
+Date: Thu, 20 Sep 2018 09:01:36 -0700
+Message-ID: <043F588D-4F40-49AB-9F19-1C6180F0393E@amacapital.net>
+References: <20180918161646.19105-1-Jason@zx2c4.com> <20180918161646.19105-3-Jason@zx2c4.com> <CAKv+Gu-0oTBrg3T8TsNYPOdrmJSSC313-CYASO34kb_nviva6A@mail.gmail.com>
+Mime-Version: 1.0 (1.0)
+Content-Type: text/plain;
+        charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Eric Biggers <ebiggers@google.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "<netdev@vger.kernel.org>" <netdev@vger.kernel.org>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Samuel Neves <sneves@dei.uc.pt>,
+        Andy Lutomirski <luto@kernel.org>,
+        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180919135741.5icpyesntcfbgtcr@mwanda>
-Content-Language: en-US
-Content-ID: <204A5A755F5C124CA257A74B32CF0552@namprd12.prod.outlook.com>
+In-Reply-To: <CAKv+Gu-0oTBrg3T8TsNYPOdrmJSSC313-CYASO34kb_nviva6A@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-T24gOS8xOS8yMDE4IDg6NTcgQU0sIERhbiBDYXJwZW50ZXIgd3JvdGU6DQo+IFNvdW5kcyByZWFz
-b25hYmxlLiAgVGhlIHN1YmplY3QgbmVlZHMgYSBzdWJzeXN0ZW0gcHJlZml4IGFuZCBpdCBtaWdo
-dA0KPiBiZSBiZXR0ZXIgdG8gbWFrZSBpdCBtb3JlIHNwZWNpZmljLiAgTGlrZSBzbzoNCj4NCj4g
-W1BBVENIIDEvMl0gY3J5cHRvOiBjY3AgLSBwb3RlbnRpYWwgdW5pbml0aWFsaXplZCB2YXJpYWJs
-ZQ0KDQpJJ2xsIHB1dCBvdXQgYSB2MiB3aXRoIHRoZSBzdWJqZWN0cyBmaXhlZC4NCg0KVGhhbmtz
-Lg0KDQo+DQo+IEkgZG9uJ3Qga25vdyBpZiBIZXJiZXJ0IGZpeGVzIHRob3NlIHRoaW5ncyB1cCBo
-aW1zZWxmIG5vcm1hbGx5Pw0KPg0KPiByZWdhcmRzLA0KPiBkYW4gY2FycGVudGVyDQo+DQoNCg==
+
+
+> On Sep 20, 2018, at 8:41 AM, Ard Biesheuvel <ard.biesheuvel@linaro.org> wr=
+ote:
+>=20
+> (+ Arnd, Eric)
+>=20
+> On 18 September 2018 at 09:16, Jason A. Donenfeld <Jason@zx2c4.com> wrote:=
+
+> ...
+>=20
+>> diff --git a/lib/zinc/Makefile b/lib/zinc/Makefile
+>> new file mode 100644
+>> index 000000000000..83dfd63988c0
+>> --- /dev/null
+>> +++ b/lib/zinc/Makefile
+>> @@ -0,0 +1,4 @@
+>=20
+> Apologies for not spotting these before:
+>=20
+>> +ccflags-y :=3D -O3
+>=20
+> -O3 optimization has been problematic in the past, at least on x86 but
+> I think on other architectures as well. Please stick with -O2.
+>=20
+>> +ccflags-y +=3D -Wframe-larger-than=3D$(if (CONFIG_KASAN),16384,8192)
+>=20
+> There is no way we can support code in the kernel with that kind of
+> stack space requirements. I will let Arnd comment on what we typically
+> allow, since he deals with such issues on a regular basis.
+
+To make matters worse, KASAN is incompatible with VMAP_STACK right now, and K=
+ASAN is not so good at detecting stack overflow.
+
+>=20
+>> +ccflags-y +=3D -D'pr_fmt(fmt)=3D"zinc: " fmt'
+>> +ccflags-$(CONFIG_ZINC_DEBUG) +=3D -DDEBUG
+>> --
+>> 2.19.0
+>>=20
