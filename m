@@ -1,7 +1,7 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH 2/3] crypto: add output feedback mode
-Date: Thu, 20 Sep 2018 14:18:39 +0100
-Message-ID: <1537449521-16182-3-git-send-email-gilad@benyossef.com>
+Subject: [PATCH 1/3] crypto: testmgr: update sm4 test vectors
+Date: Thu, 20 Sep 2018 14:18:38 +0100
+Message-ID: <1537449521-16182-2-git-send-email-gilad@benyossef.com>
 References: <1537449521-16182-1-git-send-email-gilad@benyossef.com>
 Cc: ofir.drang@arm.com, linux-crypto@vger.kernel.org,
         linux-kernel@vger.kernel.org
@@ -12,283 +12,243 @@ In-Reply-To: <1537449521-16182-1-git-send-email-gilad@benyossef.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Add a generic version of output feedback mode. We already have support of
-several hardware based transformations of this mode and the needed test
-vectors but we somehow missed adding a generic software one. Fix this now.
+Add additional test vectors from "The SM4 Blockcipher Algorithm And Its
+Modes Of Operations" draft-ribose-cfrg-sm4-10 and register cipher speed
+tests for sm4.
 
 Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 ---
- crypto/Kconfig  |  12 +++
- crypto/Makefile |   1 +
- crypto/ofb.c    | 225 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 238 insertions(+)
- create mode 100644 crypto/ofb.c
+ crypto/tcrypt.c  |  16 ++++++++
+ crypto/tcrypt.h  |   1 +
+ crypto/testmgr.c |  12 ++++++
+ crypto/testmgr.h | 122 +++++++++++++++++++++++++++++++++++++++++++++++++++----
+ 4 files changed, 144 insertions(+), 7 deletions(-)
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 90f2811..d8cb65b 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -456,6 +456,18 @@ config CRYPTO_LRW
- 	  The first 128, 192 or 256 bits in the key are used for AES and the
- 	  rest is used to tie each cipher block to its logical position.
+diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
+index bdde95e..e56c3e1 100644
+--- a/crypto/tcrypt.c
++++ b/crypto/tcrypt.c
+@@ -2033,6 +2033,8 @@ static int do_test(const char *alg, u32 type, u32 mask, int m, u32 num_mb)
+ 		break;
+ 	case 191:
+ 		ret += tcrypt_test("ecb(sm4)");
++		ret += tcrypt_test("cbc(sm4)");
++		ret += tcrypt_test("ctr(sm4)");
+ 		break;
+ 	case 200:
+ 		test_cipher_speed("ecb(aes)", ENCRYPT, sec, NULL, 0,
+@@ -2282,6 +2284,20 @@ static int do_test(const char *alg, u32 type, u32 mask, int m, u32 num_mb)
+ 				   num_mb);
+ 		break;
  
-+config CRYPTO_OFB
-+	tristate "OFB support"
-+	select CRYPTO_BLKCIPHER
-+	select CRYPTO_MANAGER
-+	help
-+	  OFB: the Output Feedback mode makes a block cipher into a synchronous
-+	  stream cipher. It generates keystream blocks, which are then XORed
-+	  with the plaintext blocks to get the ciphertext. Flipping a bit in the
-+	  ciphertext produces a flipped bit in the plaintext at the same
-+	  location. This property allows many error correcting codes to function
-+	  normally even when applied before encryption.
-+
- config CRYPTO_PCBC
- 	tristate "PCBC support"
- 	select CRYPTO_BLKCIPHER
-diff --git a/crypto/Makefile b/crypto/Makefile
-index d719843..5cde057 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -141,6 +141,7 @@ obj-$(CONFIG_CRYPTO_USER_API_SKCIPHER) += algif_skcipher.o
- obj-$(CONFIG_CRYPTO_USER_API_RNG) += algif_rng.o
- obj-$(CONFIG_CRYPTO_USER_API_AEAD) += algif_aead.o
- obj-$(CONFIG_CRYPTO_ZSTD) += zstd.o
-+obj-$(CONFIG_CRYPTO_OFB) += ofb.o
- 
- ecdh_generic-y := ecc.o
- ecdh_generic-y += ecdh.o
-diff --git a/crypto/ofb.c b/crypto/ofb.c
-new file mode 100644
-index 0000000..8866317
---- /dev/null
-+++ b/crypto/ofb.c
-@@ -0,0 +1,225 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+/*
-+ * OFB: Output FeedBack mode
-+ *
-+ * Copyright (C) 2018 ARM Limited or its affiliates.
-+ * All rights reserved.
-+ *
-+ * Based loosely on public domain code gleaned from libtomcrypt
-+ * (https://github.com/libtom/libtomcrypt).
-+ */
-+
-+#include <crypto/algapi.h>
-+#include <crypto/internal/skcipher.h>
-+#include <linux/err.h>
-+#include <linux/init.h>
-+#include <linux/kernel.h>
-+#include <linux/module.h>
-+#include <linux/scatterlist.h>
-+#include <linux/slab.h>
-+
-+struct crypto_ofb_ctx {
-+	struct crypto_cipher *child;
-+	int cnt;
-+};
-+
-+
-+static int crypto_ofb_setkey(struct crypto_skcipher *parent, const u8 *key,
-+			     unsigned int keylen)
-+{
-+	struct crypto_ofb_ctx *ctx = crypto_skcipher_ctx(parent);
-+	struct crypto_cipher *child = ctx->child;
-+	int err;
-+
-+	crypto_cipher_clear_flags(child, CRYPTO_TFM_REQ_MASK);
-+	crypto_cipher_set_flags(child, crypto_skcipher_get_flags(parent) &
-+				       CRYPTO_TFM_REQ_MASK);
-+	err = crypto_cipher_setkey(child, key, keylen);
-+	crypto_skcipher_set_flags(parent, crypto_cipher_get_flags(child) &
-+				  CRYPTO_TFM_RES_MASK);
-+	return err;
-+}
-+
-+static int crypto_ofb_encrypt_segment(struct crypto_ofb_ctx *ctx,
-+				      struct skcipher_walk *walk,
-+				      struct crypto_cipher *tfm)
-+{
-+	int bsize = crypto_cipher_blocksize(tfm);
-+	int nbytes = walk->nbytes;
-+
-+	u8 *src = walk->src.virt.addr;
-+	u8 *dst = walk->dst.virt.addr;
-+	u8 *iv = walk->iv;
-+
-+	do {
-+		if (ctx->cnt == bsize) {
-+			if (nbytes < bsize)
-+				break;
-+			crypto_cipher_encrypt_one(tfm, iv, iv);
-+			ctx->cnt = 0;
++	case 218:
++		test_cipher_speed("ecb(sm4)", ENCRYPT, sec, NULL, 0,
++				speed_template_16);
++		test_cipher_speed("ecb(sm4)", DECRYPT, sec, NULL, 0,
++				speed_template_16);
++		test_cipher_speed("cbc(sm4)", ENCRYPT, sec, NULL, 0,
++				speed_template_16);
++		test_cipher_speed("cbc(sm4)", DECRYPT, sec, NULL, 0,
++				speed_template_16);
++		test_cipher_speed("ctr(sm4)", ENCRYPT, sec, NULL, 0,
++				speed_template_16);
++		test_cipher_speed("ctr(sm4)", DECRYPT, sec, NULL, 0,
++				speed_template_16);
++		break;
+ 	case 300:
+ 		if (alg) {
+ 			test_hash_speed(alg, sec, generic_hash_speed_template);
+diff --git a/crypto/tcrypt.h b/crypto/tcrypt.h
+index f0bfee1..d09ea8b 100644
+--- a/crypto/tcrypt.h
++++ b/crypto/tcrypt.h
+@@ -51,6 +51,7 @@ static struct cipher_speed_template des3_speed_template[] = {
+  * Cipher speed tests
+  */
+ static u8 speed_template_8[] = {8, 0};
++static u8 speed_template_16[] = {16, 0};
+ static u8 speed_template_24[] = {24, 0};
+ static u8 speed_template_8_16[] = {8, 16, 0};
+ static u8 speed_template_8_32[] = {8, 32, 0};
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index 1c9bf38..bd13bc9 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -2662,6 +2662,12 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 			.cipher = __VECS(serpent_cbc_tv_template)
+ 		},
+ 	}, {
++		.alg = "cbc(sm4)",
++		.test = alg_test_skcipher,
++		.suite = {
++			.cipher = __VECS(sm4_cbc_tv_template)
 +		}
-+		*dst = *src ^ iv[ctx->cnt];
-+		src++;
-+		dst++;
-+		ctx->cnt++;
-+	} while (--nbytes);
-+	return nbytes;
-+}
-+
-+static int crypto_ofb_encrypt(struct skcipher_request *req)
-+{
-+	struct skcipher_walk walk;
-+	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-+	unsigned int bsize;
-+	struct crypto_ofb_ctx *ctx = crypto_skcipher_ctx(tfm);
-+	struct crypto_cipher *child = ctx->child;
-+	int ret = 0;
-+
-+	bsize =  crypto_cipher_blocksize(child);
-+	ctx->cnt = bsize;
-+
-+	ret = skcipher_walk_virt(&walk, req, false);
-+
-+	while (walk.nbytes) {
-+		ret = crypto_ofb_encrypt_segment(ctx, &walk, child);
-+		ret = skcipher_walk_done(&walk, ret);
++	}, {
+ 		.alg = "cbc(twofish)",
+ 		.test = alg_test_skcipher,
+ 		.suite = {
+@@ -2785,6 +2791,12 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 			.cipher = __VECS(serpent_ctr_tv_template)
+ 		}
+ 	}, {
++		.alg = "ctr(sm4)",
++		.test = alg_test_skcipher,
++		.suite = {
++			.cipher = __VECS(sm4_ctr_tv_template)
++		}
++	}, {
+ 		.alg = "ctr(twofish)",
+ 		.test = alg_test_skcipher,
+ 		.suite = {
+diff --git a/crypto/testmgr.h b/crypto/testmgr.h
+index 0b3d7ca..b091b2e 100644
+--- a/crypto/testmgr.h
++++ b/crypto/testmgr.h
+@@ -10133,12 +10133,13 @@ static const struct cipher_testvec serpent_xts_tv_template[] = {
+ };
+ 
+ /*
+- * SM4 test vector taken from the draft RFC
+- * https://tools.ietf.org/html/draft-crypto-sm4-00#ref-GBT.32907-2016
++ * SM4 test vectors taken from the "The SM4 Blockcipher Algorithm And Its
++ * Modes Of Operations" draft RFC
++ * https://datatracker.ietf.org/doc/draft-ribose-cfrg-sm4
+  */
+ 
+ static const struct cipher_testvec sm4_tv_template[] = {
+-	{ /* SM4 Appendix A: Example Calculations. Example 1. */
++	{ /* GB/T 32907-2016 Example 1. */
+ 		.key	= "\x01\x23\x45\x67\x89\xAB\xCD\xEF"
+ 			  "\xFE\xDC\xBA\x98\x76\x54\x32\x10",
+ 		.klen	= 16,
+@@ -10147,10 +10148,7 @@ static const struct cipher_testvec sm4_tv_template[] = {
+ 		.ctext	= "\x68\x1E\xDF\x34\xD2\x06\x96\x5E"
+ 			  "\x86\xB3\xE9\x4F\x53\x6E\x42\x46",
+ 		.len	= 16,
+-	}, { /*
+-	      *  SM4 Appendix A: Example Calculations.
+-	      *  Last 10 iterations of Example 2.
+-	      */
++	}, { /* Last 10 iterations of GB/T 32907-2016 Example 2. */
+ 		.key    = "\x01\x23\x45\x67\x89\xAB\xCD\xEF"
+ 			  "\xFE\xDC\xBA\x98\x76\x54\x32\x10",
+ 		.klen	= 16,
+@@ -10195,6 +10193,116 @@ static const struct cipher_testvec sm4_tv_template[] = {
+ 			  "\x59\x52\x98\xc7\xc6\xfd\x27\x1f"
+ 			  "\x4\x2\xf8\x4\xc3\x3d\x3f\x66",
+ 		.len	= 160
++	}, { /* A.2.1.1 SM4-ECB Example 1 */
++		.key	= "\x01\x23\x45\x67\x89\xAB\xCD\xEF"
++			  "\xFE\xDC\xBA\x98\x76\x54\x32\x10",
++		.klen	= 16,
++		.ptext	= "\xaa\xaa\xaa\xaa\xbb\xbb\xbb\xbb"
++			  "\xcc\xcc\xcc\xcc\xdd\xdd\xdd\xdd"
++			  "\xee\xee\xee\xee\xff\xff\xff\xff"
++			  "\xaa\xaa\xaa\xaa\xbb\xbb\xbb\xbb",
++		.ctext	= "\x5e\xc8\x14\x3d\xe5\x09\xcf\xf7"
++			  "\xb5\x17\x9f\x8f\x47\x4b\x86\x19"
++			  "\x2f\x1d\x30\x5a\x7f\xb1\x7d\xf9"
++			  "\x85\xf8\x1c\x84\x82\x19\x23\x04",
++		.len	= 32,
++	}, { /* A.2.1.2 SM4-ECB Example 2 */
++		.key	= "\xFE\xDC\xBA\x98\x76\x54\x32\x10"
++			  "\x01\x23\x45\x67\x89\xAB\xCD\xEF",
++		.klen	= 16,
++		.ptext	= "\xaa\xaa\xaa\xaa\xbb\xbb\xbb\xbb"
++			  "\xcc\xcc\xcc\xcc\xdd\xdd\xdd\xdd"
++			  "\xee\xee\xee\xee\xff\xff\xff\xff"
++			  "\xaa\xaa\xaa\xaa\xbb\xbb\xbb\xbb",
++		.ctext	= "\xC5\x87\x68\x97\xE4\xA5\x9B\xBB"
++			  "\xA7\x2A\x10\xC8\x38\x72\x24\x5B"
++			  "\x12\xDD\x90\xBC\x2D\x20\x06\x92"
++			  "\xB5\x29\xA4\x15\x5A\xC9\xE6\x00",
++		.len	= 32,
 +	}
-+
-+	return ret;
-+}
-+
-+/* OFB encrypt and decrypt are identical */
-+static int crypto_ofb_decrypt(struct skcipher_request *req)
-+{
-+	return crypto_ofb_encrypt(req);
-+}
-+
-+static int crypto_ofb_init_tfm(struct crypto_skcipher *tfm)
-+{
-+	struct skcipher_instance *inst = skcipher_alg_instance(tfm);
-+	struct crypto_spawn *spawn = skcipher_instance_ctx(inst);
-+	struct crypto_ofb_ctx *ctx = crypto_skcipher_ctx(tfm);
-+	struct crypto_cipher *cipher;
-+
-+	cipher = crypto_spawn_cipher(spawn);
-+	if (IS_ERR(cipher))
-+		return PTR_ERR(cipher);
-+
-+	ctx->child = cipher;
-+	return 0;
-+}
-+
-+static void crypto_ofb_exit_tfm(struct crypto_skcipher *tfm)
-+{
-+	struct crypto_ofb_ctx *ctx = crypto_skcipher_ctx(tfm);
-+
-+	crypto_free_cipher(ctx->child);
-+}
-+
-+static void crypto_ofb_free(struct skcipher_instance *inst)
-+{
-+	crypto_drop_skcipher(skcipher_instance_ctx(inst));
-+	kfree(inst);
-+}
-+
-+static int crypto_ofb_create(struct crypto_template *tmpl, struct rtattr **tb)
-+{
-+	struct skcipher_instance *inst;
-+	struct crypto_attr_type *algt;
-+	struct crypto_spawn *spawn;
-+	struct crypto_alg *alg;
-+	u32 mask;
-+	int err;
-+
-+	err = crypto_check_attr_type(tb, CRYPTO_ALG_TYPE_SKCIPHER);
-+	if (err)
-+		return err;
-+
-+	inst = kzalloc(sizeof(*inst) + sizeof(*spawn), GFP_KERNEL);
-+	if (!inst)
-+		return -ENOMEM;
-+
-+	algt = crypto_get_attr_type(tb);
-+	err = PTR_ERR(algt);
-+	if (IS_ERR(algt))
-+		goto err_free_inst;
-+
-+	mask = CRYPTO_ALG_TYPE_MASK |
-+		crypto_requires_off(algt->type, algt->mask,
-+				    CRYPTO_ALG_NEED_FALLBACK);
-+
-+	alg = crypto_get_attr_alg(tb, CRYPTO_ALG_TYPE_CIPHER, mask);
-+	err = PTR_ERR(alg);
-+	if (IS_ERR(alg))
-+		goto err_free_inst;
-+
-+	spawn = skcipher_instance_ctx(inst);
-+	err = crypto_init_spawn(spawn, alg, skcipher_crypto_instance(inst),
-+				CRYPTO_ALG_TYPE_MASK);
-+	crypto_mod_put(alg);
-+	if (err)
-+		goto err_free_inst;
-+
-+	err = crypto_inst_setname(skcipher_crypto_instance(inst), "ofb", alg);
-+	if (err)
-+		goto err_drop_spawn;
-+
-+	inst->alg.base.cra_priority = alg->cra_priority;
-+	inst->alg.base.cra_blocksize = alg->cra_blocksize;
-+	inst->alg.base.cra_alignmask = alg->cra_alignmask;
-+
-+	/* We access the data as u32s when xoring. */
-+	inst->alg.base.cra_alignmask |= __alignof__(u32) - 1;
-+
-+	inst->alg.ivsize = alg->cra_blocksize;
-+	inst->alg.min_keysize = alg->cra_cipher.cia_min_keysize;
-+	inst->alg.max_keysize = alg->cra_cipher.cia_max_keysize;
-+
-+	inst->alg.base.cra_ctxsize = sizeof(struct crypto_ofb_ctx);
-+
-+	inst->alg.init = crypto_ofb_init_tfm;
-+	inst->alg.exit = crypto_ofb_exit_tfm;
-+
-+	inst->alg.setkey = crypto_ofb_setkey;
-+	inst->alg.encrypt = crypto_ofb_encrypt;
-+	inst->alg.decrypt = crypto_ofb_decrypt;
-+
-+	inst->free = crypto_ofb_free;
-+
-+	err = skcipher_register_instance(tmpl, inst);
-+	if (err)
-+		goto err_drop_spawn;
-+
-+out:
-+	return err;
-+
-+err_drop_spawn:
-+	crypto_drop_spawn(spawn);
-+err_free_inst:
-+	kfree(inst);
-+	goto out;
-+}
-+
-+static struct crypto_template crypto_ofb_tmpl = {
-+	.name = "ofb",
-+	.create = crypto_ofb_create,
-+	.module = THIS_MODULE,
 +};
 +
-+static int __init crypto_ofb_module_init(void)
-+{
-+	return crypto_register_template(&crypto_ofb_tmpl);
-+}
++static const struct cipher_testvec sm4_cbc_tv_template[] = {
++	{ /* A.2.2.1 SM4-CBC Example 1 */
++		.key	= "\x01\x23\x45\x67\x89\xAB\xCD\xEF"
++			  "\xFE\xDC\xBA\x98\x76\x54\x32\x10",
++		.klen	= 16,
++		.ptext	= "\xaa\xaa\xaa\xaa\xbb\xbb\xbb\xbb"
++			  "\xcc\xcc\xcc\xcc\xdd\xdd\xdd\xdd"
++			  "\xee\xee\xee\xee\xff\xff\xff\xff"
++			  "\xaa\xaa\xaa\xaa\xbb\xbb\xbb\xbb",
++		.iv	= "\x00\x01\x02\x03\x04\x05\x06\x07"
++			  "\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F",
++		.ctext	= "\x78\xEB\xB1\x1C\xC4\x0B\x0A\x48"
++			  "\x31\x2A\xAE\xB2\x04\x02\x44\xCB"
++			  "\x4C\xB7\x01\x69\x51\x90\x92\x26"
++			  "\x97\x9B\x0D\x15\xDC\x6A\x8F\x6D",
++		.len	= 32,
++	}, { /* A.2.2.2 SM4-CBC Example 2 */
++		.key	= "\xFE\xDC\xBA\x98\x76\x54\x32\x10"
++			  "\x01\x23\x45\x67\x89\xAB\xCD\xEF",
++		.klen	= 16,
++		.ptext	= "\xaa\xaa\xaa\xaa\xbb\xbb\xbb\xbb"
++			  "\xcc\xcc\xcc\xcc\xdd\xdd\xdd\xdd"
++			  "\xee\xee\xee\xee\xff\xff\xff\xff"
++			  "\xaa\xaa\xaa\xaa\xbb\xbb\xbb\xbb",
++		.iv	= "\x00\x01\x02\x03\x04\x05\x06\x07"
++			  "\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F",
++		.ctext	= "\x0d\x3a\x6d\xdc\x2d\x21\xc6\x98"
++			  "\x85\x72\x15\x58\x7b\x7b\xb5\x9a"
++			  "\x91\xf2\xc1\x47\x91\x1a\x41\x44"
++			  "\x66\x5e\x1f\xa1\xd4\x0b\xae\x38",
++		.len	= 32,
++	}
++};
 +
-+static void __exit crypto_ofb_module_exit(void)
-+{
-+	crypto_unregister_template(&crypto_ofb_tmpl);
-+}
-+
-+module_init(crypto_ofb_module_init);
-+module_exit(crypto_ofb_module_exit);
-+
-+MODULE_LICENSE("GPL");
-+MODULE_DESCRIPTION("OFB block cipher algorithm");
-+MODULE_ALIAS_CRYPTO("ofb");
++static const struct cipher_testvec sm4_ctr_tv_template[] = {
++	{ /* A.2.5.1 SM4-CTR Example 1 */
++		.key	= "\x01\x23\x45\x67\x89\xAB\xCD\xEF"
++			  "\xFE\xDC\xBA\x98\x76\x54\x32\x10",
++		.klen	= 16,
++		.ptext	= "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xbb\xbb\xbb\xbb\xbb\xbb\xbb\xbb"
++			  "\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc"
++			  "\xdd\xdd\xdd\xdd\xdd\xdd\xdd\xdd"
++			  "\xee\xee\xee\xee\xee\xee\xee\xee"
++			  "\xff\xff\xff\xff\xff\xff\xff\xff"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xbb\xbb\xbb\xbb\xbb\xbb\xbb\xbb",
++		.iv	= "\x00\x01\x02\x03\x04\x05\x06\x07"
++			  "\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F",
++		.ctext	= "\xac\x32\x36\xcb\x97\x0c\xc2\x07"
++			  "\x91\x36\x4c\x39\x5a\x13\x42\xd1"
++			  "\xa3\xcb\xc1\x87\x8c\x6f\x30\xcd"
++			  "\x07\x4c\xce\x38\x5c\xdd\x70\xc7"
++			  "\xf2\x34\xbc\x0e\x24\xc1\x19\x80"
++			  "\xfd\x12\x86\x31\x0c\xe3\x7b\x92"
++			  "\x6e\x02\xfc\xd0\xfa\xa0\xba\xf3"
++			  "\x8b\x29\x33\x85\x1d\x82\x45\x14",
++		.len	= 64,
++	}, { /* A.2.5.2 SM4-CTR Example 2 */
++		.key	= "\xFE\xDC\xBA\x98\x76\x54\x32\x10"
++			  "\x01\x23\x45\x67\x89\xAB\xCD\xEF",
++		.klen	= 16,
++		.ptext	= "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xbb\xbb\xbb\xbb\xbb\xbb\xbb\xbb"
++			  "\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc"
++			  "\xdd\xdd\xdd\xdd\xdd\xdd\xdd\xdd"
++			  "\xee\xee\xee\xee\xee\xee\xee\xee"
++			  "\xff\xff\xff\xff\xff\xff\xff\xff"
++			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
++			  "\xbb\xbb\xbb\xbb\xbb\xbb\xbb\xbb",
++		.iv	= "\x00\x01\x02\x03\x04\x05\x06\x07"
++			  "\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F",
++		.ctext	= "\x5d\xcc\xcd\x25\xb9\x5a\xb0\x74"
++			  "\x17\xa0\x85\x12\xee\x16\x0e\x2f"
++			  "\x8f\x66\x15\x21\xcb\xba\xb4\x4c"
++			  "\xc8\x71\x38\x44\x5b\xc2\x9e\x5c"
++			  "\x0a\xe0\x29\x72\x05\xd6\x27\x04"
++			  "\x17\x3b\x21\x23\x9b\x88\x7f\x6c"
++			  "\x8c\xb5\xb8\x00\x91\x7a\x24\x88"
++			  "\x28\x4b\xde\x9e\x16\xea\x29\x06",
++		.len	= 64,
+ 	}
+ };
+ 
 -- 
 2.7.4
