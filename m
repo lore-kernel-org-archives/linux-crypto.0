@@ -1,40 +1,31 @@
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: Re: [PATCH crypto-next 11/23] wusb: Remove VLA usage of skcipher
-Date: Thu, 20 Sep 2018 12:39:38 +0200
-Message-ID: <20180920103938.GA14523@kroah.com>
-References: <20180919021100.3380-1-keescook@chromium.org>
- <20180919021100.3380-12-keescook@chromium.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        Felipe Balbi <felipe.balbi@linux.intel.com>,
-        Johan Hovold <johan@kernel.org>,
-        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
-        linux-usb@vger.kernel.org,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Eric Biggers <ebiggers@google.com>,
-        linux-crypto <linux-crypto@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-To: Kees Cook <keescook@chromium.org>
+From: Gilad Ben-Yossef <gilad@benyossef.com>
+Subject: [PATCH 0/3] crypto: OFB and tests
+Date: Thu, 20 Sep 2018 14:18:37 +0100
+Message-ID: <1537449521-16182-1-git-send-email-gilad@benyossef.com>
+Cc: ofir.drang@arm.com, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20180919021100.3380-12-keescook@chromium.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Sep 18, 2018 at 07:10:48PM -0700, Kees Cook wrote:
-> In the quest to remove all stack VLA usage from the kernel[1], this
-> replaces struct crypto_skcipher and SKCIPHER_REQUEST_ON_STACK() usage
-> with struct crypto_sync_skcipher and SYNC_SKCIPHER_REQUEST_ON_STACK(),
-> which uses a fixed stack size.
-> 
-> [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
-> 
-> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Cc: Felipe Balbi <felipe.balbi@linux.intel.com>
-> Cc: Johan Hovold <johan@kernel.org>
-> Cc: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-> Cc: linux-usb@vger.kernel.org
-> Signed-off-by: Kees Cook <keescook@chromium.org>
+Add OFB mode generic implementation and more SM4 tests
 
-Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Gilad Ben-Yossef (3):
+  crypto: testmgr: update sm4 test vectors
+  crypto: add output feedback mode
+  crypto: tcrypt: add OFB functional tests
+
+ crypto/Kconfig   |  12 +++
+ crypto/Makefile  |   1 +
+ crypto/ofb.c     | 225 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ crypto/tcrypt.c  |  17 +++++
+ crypto/tcrypt.h  |   1 +
+ crypto/testmgr.c |  12 +++
+ crypto/testmgr.h | 122 ++++++++++++++++++++++++++++--
+ 7 files changed, 383 insertions(+), 7 deletions(-)
+ create mode 100644 crypto/ofb.c
+
+-- 
+2.7.4
