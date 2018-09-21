@@ -1,59 +1,115 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/4] crypto: arm64/aes-blk - cleanups and optimizations
- for XTS/CTS-CBC
-Date: Fri, 21 Sep 2018 13:44:09 +0800
-Message-ID: <20180921054409.pbf7bjyw27j4rj7h@gondor.apana.org.au>
-References: <20180910144115.25727-1-ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH v2 00/12] crypto: caam - add DPAA2 (DPSECI) driver
+Date: Fri, 21 Sep 2018 13:44:51 +0800
+Message-ID: <20180921054451.fkw4o4dwaqfuweyd@gondor.apana.org.au>
+References: <20180912085937.22489-1-horia.geanta@nxp.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Steve Capper <steve.capper@arm.com>, Theodore Ts'o <tytso@mit.edu>,
- linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- Eric Biggers <ebiggers@google.com>
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Cc: Stuart Yoder <stuyoder@gmail.com>,
+        Laurentiu Tudor <laurentiu.tudor@nxp.com>,
+        Li Yang <leoyang.li@nxp.com>, Roy Pledge <roy.pledge@nxp.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will.deacon@arm.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org
+To: Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20180910144115.25727-1-ard.biesheuvel@linaro.org>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+In-Reply-To: <20180912085937.22489-1-horia.geanta@nxp.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Sep 10, 2018 at 04:41:11PM +0200, Ard Biesheuvel wrote:
-> Some cleanups and optimizations for the arm64  AES skcipher routines.
+On Wed, Sep 12, 2018 at 11:59:25AM +0300, Horia Geantă wrote:
+> Hi,
 > 
-> Patch #1 fixes the peculiar use of u8 arrays to refer to AES round keys,
-> which are natively arrays of u32.
+> This patch set adds the CAAM crypto engine driver for DPAA2
+> (Data Path Acceleration Architecture v2) found on ARMv8-based SoCs
+> like LS1088A, LS2088A, LX2160A.
 > 
-> Patch #2 partially reverts the use of NEON yield calls, which is not
-> needed for skciphers.
+> v1 -> v2:
+> 5/12 - new patch fixing sparse endianness-related warnings
+> 2/12 - changed commit message, since it's not a straightforward revert
+> 3/12, 8/12, 11/12 - fixed sparse and compiler warnings
 > 
-> Patch #3 adds support for cts(cbc(aes)) in the NEON chaining mode handling.
+> Previous versions:
+> v1: https://www.mail-archive.com/linux-kernel@vger.kernel.org/msg1763549.html
+> RFC: https://www.mail-archive.com/linux-crypto@vger.kernel.org/msg27290.html
 > 
-> Patch #4 tweaks the XTS handling to remove a literal load from the inner
-> loop.
+> Driver consists of:
+> -DPSECI (Data Path SEC Interface) backend - low-level API that allows
+> to manage DPSECI devices (DPAA2 objects) that sit on
+> the Management Complex (MC) fsl-mc bus
+> -algorithms frontend - AEAD, skcipher and ahash algorithms implementation
 > 
-> Cc: Eric Biggers <ebiggers@google.com>
-> Cc: Theodore Ts'o <tytso@mit.edu>
-> Cc: Steve Capper <steve.capper@arm.com>
+> Patches 1-4 are fsl-mc bus and DPIO dependencies.
+> Stuart, Laurentiu, Leo, Roy, please review the patches and let me know
+> if you have anything against going with them through the cryptodev tree.
 > 
-> Ard Biesheuvel (4):
->   crypto: arm64/aes-blk - remove pointless (u8 *) casts
->   crypto: arm64/aes-blk - revert NEON yield for skciphers
->   crypto: arm64/aes-blk - add support for CTS-CBC mode
->   crypto: aes/arm64-blk - improve XTS mask handling
+> Patch 5 fixes sparse endianness-related warnings in regs.h helper functions.
 > 
->  arch/arm64/crypto/aes-ce.S    |   5 +
->  arch/arm64/crypto/aes-glue.c  | 212 +++++++++--
->  arch/arm64/crypto/aes-modes.S | 400 ++++++++++----------
->  arch/arm64/crypto/aes-neon.S  |   6 +
->  4 files changed, 406 insertions(+), 217 deletions(-)
+> Patches 6-11 are the core of the patch set, adding the driver.
+> For symmetric encryption the new skcipher interface is used.
+> 
+> Patch 12 enables driver on arm64. It will be built only if dependency
+> on DPIO (CONFIG_FSL_MC_DPIO) is satisfied.
+> 
+> Note: multiple modprobe/rmmod won't work without the following patches
+> [5/7,v7] bus/fsl-mc: support dma configure for devices on fsl-mc bus
+> https://patchwork.kernel.org/patch/10594179
+> [7/7,v7] arm64: dts: ls208xa: comply with the iommu map binding for fsl_mc
+> https://patchwork.kernel.org/patch/10594171
+> (for LS1088A a similar DT update is needed)
+> 
+> Thanks,
+> Horia
+> 
+> Horia Geantă (12):
+>   bus: fsl-mc: add support for dpseci device type
+>   soc: fsl: dpio: add back some frame queue functions
+>   soc: fsl: dpio: add frame list format support
+>   soc: fsl: dpio: add congestion notification support
+>   crypto: caam - fix implicit casts in endianness helpers
+>   crypto: caam - add DPAA2-CAAM (DPSECI) backend API
+>   crypto: caam - add Queue Interface v2 error codes
+>   crypto: caam/qi2 - add DPAA2-CAAM driver
+>   crypto: caam/qi2 - add skcipher algorithms
+>   crypto: caam - export ahash shared descriptor generation
+>   crypto: caam/qi2 - add support for ahash algorithms
+>   arm64: defconfig: enable CAAM crypto engine on QorIQ DPAA2 SoCs
+> 
+>  arch/arm64/configs/defconfig        |    1 +
+>  drivers/bus/fsl-mc/fsl-mc-bus.c     |    5 +
+>  drivers/crypto/Makefile             |    2 +-
+>  drivers/crypto/caam/Kconfig         |   55 +-
+>  drivers/crypto/caam/Makefile        |   10 +-
+>  drivers/crypto/caam/caamalg_qi2.c   | 5165 +++++++++++++++++++++++++++++++++++
+>  drivers/crypto/caam/caamalg_qi2.h   |  223 ++
+>  drivers/crypto/caam/caamhash.c      |   79 +-
+>  drivers/crypto/caam/caamhash_desc.c |   80 +
+>  drivers/crypto/caam/caamhash_desc.h |   21 +
+>  drivers/crypto/caam/compat.h        |    1 +
+>  drivers/crypto/caam/dpseci.c        |  426 +++
+>  drivers/crypto/caam/dpseci.h        |  333 +++
+>  drivers/crypto/caam/dpseci_cmd.h    |  149 +
+>  drivers/crypto/caam/error.c         |   79 +-
+>  drivers/crypto/caam/error.h         |    6 +-
+>  drivers/crypto/caam/regs.h          |   30 +-
+>  drivers/soc/fsl/dpio/dpio-service.c |   58 +
+>  include/linux/fsl/mc.h              |    6 +
+>  include/soc/fsl/dpaa2-fd.h          |  242 ++
+>  include/soc/fsl/dpaa2-global.h      |   15 +
+>  include/soc/fsl/dpaa2-io.h          |    4 +
+>  22 files changed, 6885 insertions(+), 105 deletions(-)
+>  create mode 100644 drivers/crypto/caam/caamalg_qi2.c
+>  create mode 100644 drivers/crypto/caam/caamalg_qi2.h
+>  create mode 100644 drivers/crypto/caam/caamhash_desc.c
+>  create mode 100644 drivers/crypto/caam/caamhash_desc.h
+>  create mode 100644 drivers/crypto/caam/dpseci.c
+>  create mode 100644 drivers/crypto/caam/dpseci.h
+>  create mode 100644 drivers/crypto/caam/dpseci_cmd.h
 
 All applied.  Thanks.
 -- 
