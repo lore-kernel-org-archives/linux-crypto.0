@@ -1,35 +1,38 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/2] Miscellaneous SEV fixes
-Date: Fri, 21 Sep 2018 13:46:08 +0800
-Message-ID: <20180921054608.vll7blxtjxiy3dyp@gondor.apana.org.au>
-References: <cover.1536959537.git.Janakarajan.Natarajan@amd.com>
+Subject: Re: [PATCH 1/2] cpufeature: avoid warning when compiling with clang
+Date: Fri, 21 Sep 2018 13:46:31 +0800
+Message-ID: <20180921054631.m573qaxoqhql3juj@gondor.apana.org.au>
+References: <20180916043825.23247-1-stefan@agner.ch>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Gary Hook <gary.hook@amd.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Brijesh Singh <brijesh.singh@amd.com>
-To: Janakarajan Natarajan <Janakarajan.Natarajan@amd.com>
+Cc: davem@davemloft.net, ard.biesheuvel@linaro.org,
+        linux@armlinux.org.uk, linux-crypto@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+To: Stefan Agner <stefan@agner.ch>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <cover.1536959537.git.Janakarajan.Natarajan@amd.com>
+In-Reply-To: <20180916043825.23247-1-stefan@agner.ch>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Sep 14, 2018 at 05:32:02PM -0500, Janakarajan Natarajan wrote:
-> The first patch provides a fix for a static checker warning.
+On Sat, Sep 15, 2018 at 09:38:24PM -0700, Stefan Agner wrote:
+> The table id (second) argument to MODULE_DEVICE_TABLE is often
+> referenced otherwise. This is not the case for CPU features. This
+> leads to warnings when building the kernel with Clang:
+>   arch/arm/crypto/aes-ce-glue.c:450:1: warning: variable
+>     'cpu_feature_match_AES' is not needed and will not be emitted
+>     [-Wunneeded-internal-declaration]
+>   module_cpu_feature_match(AES, aes_init);
+>   ^
 > 
-> The second patch allows for the SEV firmware blob, which will
-> be searched for when updating SEV during PSP initialization,
-> to be named based on the family and model of the processor.
+> Avoid warnings by using __maybe_unused, similar to commit 1f318a8bafcf
+> ("modules: mark __inittest/__exittest as __maybe_unused").
 > 
-> Janakarajan Natarajan (2):
->   Fix static checker warning
->   Allow SEV firmware to be chosen based on Family and Model
-> 
->  drivers/crypto/ccp/psp-dev.c | 46 +++++++++++++++++++++++++++++++++++++++-----
->  1 file changed, 41 insertions(+), 5 deletions(-)
+> Fixes: 67bad2fdb754 ("cpu: add generic support for CPU feature based module autoloading")
+> Signed-off-by: Stefan Agner <stefan@agner.ch>
+> ---
+>  include/linux/cpufeature.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
 All applied.  Thanks.
 -- 
