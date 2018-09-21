@@ -1,115 +1,73 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2 00/12] crypto: caam - add DPAA2 (DPSECI) driver
-Date: Fri, 21 Sep 2018 13:44:51 +0800
-Message-ID: <20180921054451.fkw4o4dwaqfuweyd@gondor.apana.org.au>
-References: <20180912085937.22489-1-horia.geanta@nxp.com>
+Subject: Re: [PATCH v4 0/4] crypto: lrw - Fixes and improvements
+Date: Fri, 21 Sep 2018 13:45:34 +0800
+Message-ID: <20180921054534.7iqfb3omlowromhr@gondor.apana.org.au>
+References: <20180913085134.11694-1-omosnace@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Cc: Stuart Yoder <stuyoder@gmail.com>,
-        Laurentiu Tudor <laurentiu.tudor@nxp.com>,
-        Li Yang <leoyang.li@nxp.com>, Roy Pledge <roy.pledge@nxp.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will.deacon@arm.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org
-To: Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Eric Biggers <ebiggers@kernel.org>, dm-devel@redhat.com,
+	Mikulas Patocka <mpatocka@redhat.com>, linux-crypto@vger.kernel.org
+To: Ondrej Mosnacek <omosnace@redhat.com>
+Return-path: <dm-devel-bounces@redhat.com>
 Content-Disposition: inline
-In-Reply-To: <20180912085937.22489-1-horia.geanta@nxp.com>
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <20180913085134.11694-1-omosnace@redhat.com>
+List-Unsubscribe: <https://www.redhat.com/mailman/options/dm-devel>,
+	<mailto:dm-devel-request@redhat.com?subject=unsubscribe>
+List-Archive: <https://www.redhat.com/archives/dm-devel>
+List-Post: <mailto:dm-devel@redhat.com>
+List-Help: <mailto:dm-devel-request@redhat.com?subject=help>
+List-Subscribe: <https://www.redhat.com/mailman/listinfo/dm-devel>,
+	<mailto:dm-devel-request@redhat.com?subject=subscribe>
+Sender: dm-devel-bounces@redhat.com
+Errors-To: dm-devel-bounces@redhat.com
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Sep 12, 2018 at 11:59:25AM +0300, Horia Geantă wrote:
-> Hi,
+On Thu, Sep 13, 2018 at 10:51:30AM +0200, Ondrej Mosnacek wrote:
+> This patchset contains a corner-case fix and several improvements  for
+> the LRW template.
 > 
-> This patch set adds the CAAM crypto engine driver for DPAA2
-> (Data Path Acceleration Architecture v2) found on ARMv8-based SoCs
-> like LS1088A, LS2088A, LX2160A.
+> The first patch fixes an out-of-bounds array access (and subsequently
+> incorrect cipher output) when the LRW counter goes from all ones to all
+> zeros. This patch should be applied to the crypto-2.6 tree and also go
+> to stable.
 > 
-> v1 -> v2:
-> 5/12 - new patch fixing sparse endianness-related warnings
-> 2/12 - changed commit message, since it's not a straightforward revert
-> 3/12, 8/12, 11/12 - fixed sparse and compiler warnings
+> The second patch adds a test vector for lrw(aes) that covers the above
+> bug.
 > 
-> Previous versions:
-> v1: https://www.mail-archive.com/linux-kernel@vger.kernel.org/msg1763549.html
-> RFC: https://www.mail-archive.com/linux-crypto@vger.kernel.org/msg27290.html
+> The third patch is a small optimization of the LRW tweak computation.
 > 
-> Driver consists of:
-> -DPSECI (Data Path SEC Interface) backend - low-level API that allows
-> to manage DPSECI devices (DPAA2 objects) that sit on
-> the Management Complex (MC) fsl-mc bus
-> -algorithms frontend - AEAD, skcipher and ahash algorithms implementation
+> The fourth patch is a follow-up to a similar patch for XTS (it
+> simplifies away the use of dynamically allocated auxiliary buffer to
+> cache the computed tweak values):
+> https://patchwork.kernel.org/patch/10588775/
 > 
-> Patches 1-4 are fsl-mc bus and DPIO dependencies.
-> Stuart, Laurentiu, Leo, Roy, please review the patches and let me know
-> if you have anything against going with them through the cryptodev tree.
+> Patches 2-4 should be applied only to cryptodev-2.6, but they all depend
+> on the first patch.
 > 
-> Patch 5 fixes sparse endianness-related warnings in regs.h helper functions.
+> Changes in v4:
+>   - applied various corrections/suggestions from Eric Biggers
+>   - added a fix for buggy behavior on counter wrap-around (+ test vector)
 > 
-> Patches 6-11 are the core of the patch set, adding the driver.
-> For symmetric encryption the new skcipher interface is used.
+> v3: https://www.spinics.net/lists/linux-crypto/msg34946.html
+> Changes in v3:
+>   - fix a copy-paste error
 > 
-> Patch 12 enables driver on arm64. It will be built only if dependency
-> on DPIO (CONFIG_FSL_MC_DPIO) is satisfied.
+> v2: https://www.spinics.net/lists/linux-crypto/msg34890.html
+> Changes in v2:
+>   - small cleanup suggested by Eric Biggers
 > 
-> Note: multiple modprobe/rmmod won't work without the following patches
-> [5/7,v7] bus/fsl-mc: support dma configure for devices on fsl-mc bus
-> https://patchwork.kernel.org/patch/10594179
-> [7/7,v7] arm64: dts: ls208xa: comply with the iommu map binding for fsl_mc
-> https://patchwork.kernel.org/patch/10594171
-> (for LS1088A a similar DT update is needed)
+> v1: https://www.spinics.net/lists/linux-crypto/msg34871.html
 > 
-> Thanks,
-> Horia
+> Ondrej Mosnacek (4):
+>   crypto: lrw - Fix out-of bounds access on counter overflow
+>   crypto: testmgr - Add test for LRW counter wrap-around
+>   crypto: lrw - Optimize tweak computation
+>   crypto: lrw - Do not use auxiliary buffer
 > 
-> Horia Geantă (12):
->   bus: fsl-mc: add support for dpseci device type
->   soc: fsl: dpio: add back some frame queue functions
->   soc: fsl: dpio: add frame list format support
->   soc: fsl: dpio: add congestion notification support
->   crypto: caam - fix implicit casts in endianness helpers
->   crypto: caam - add DPAA2-CAAM (DPSECI) backend API
->   crypto: caam - add Queue Interface v2 error codes
->   crypto: caam/qi2 - add DPAA2-CAAM driver
->   crypto: caam/qi2 - add skcipher algorithms
->   crypto: caam - export ahash shared descriptor generation
->   crypto: caam/qi2 - add support for ahash algorithms
->   arm64: defconfig: enable CAAM crypto engine on QorIQ DPAA2 SoCs
-> 
->  arch/arm64/configs/defconfig        |    1 +
->  drivers/bus/fsl-mc/fsl-mc-bus.c     |    5 +
->  drivers/crypto/Makefile             |    2 +-
->  drivers/crypto/caam/Kconfig         |   55 +-
->  drivers/crypto/caam/Makefile        |   10 +-
->  drivers/crypto/caam/caamalg_qi2.c   | 5165 +++++++++++++++++++++++++++++++++++
->  drivers/crypto/caam/caamalg_qi2.h   |  223 ++
->  drivers/crypto/caam/caamhash.c      |   79 +-
->  drivers/crypto/caam/caamhash_desc.c |   80 +
->  drivers/crypto/caam/caamhash_desc.h |   21 +
->  drivers/crypto/caam/compat.h        |    1 +
->  drivers/crypto/caam/dpseci.c        |  426 +++
->  drivers/crypto/caam/dpseci.h        |  333 +++
->  drivers/crypto/caam/dpseci_cmd.h    |  149 +
->  drivers/crypto/caam/error.c         |   79 +-
->  drivers/crypto/caam/error.h         |    6 +-
->  drivers/crypto/caam/regs.h          |   30 +-
->  drivers/soc/fsl/dpio/dpio-service.c |   58 +
->  include/linux/fsl/mc.h              |    6 +
->  include/soc/fsl/dpaa2-fd.h          |  242 ++
->  include/soc/fsl/dpaa2-global.h      |   15 +
->  include/soc/fsl/dpaa2-io.h          |    4 +
->  22 files changed, 6885 insertions(+), 105 deletions(-)
->  create mode 100644 drivers/crypto/caam/caamalg_qi2.c
->  create mode 100644 drivers/crypto/caam/caamalg_qi2.h
->  create mode 100644 drivers/crypto/caam/caamhash_desc.c
->  create mode 100644 drivers/crypto/caam/caamhash_desc.h
->  create mode 100644 drivers/crypto/caam/dpseci.c
->  create mode 100644 drivers/crypto/caam/dpseci.h
->  create mode 100644 drivers/crypto/caam/dpseci_cmd.h
+>  crypto/lrw.c     | 342 +++++++++++++----------------------------------
+>  crypto/testmgr.h |  21 +++
+>  2 files changed, 112 insertions(+), 251 deletions(-)
 
 All applied.  Thanks.
 -- 
