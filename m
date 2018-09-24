@@ -1,93 +1,84 @@
-From: Gary R Hook <ghook@amd.com>
+From: Nick Desaulniers <ndesaulniers@google.com>
 Subject: Re: [PATCH] crypto: ccp: Remove forward declaration
-Date: Mon, 24 Sep 2018 21:27:14 +0000
-Message-ID: <a0640c0d-6186-01d5-fa56-74be64f9895a@amd.com>
+Date: Mon, 24 Sep 2018 14:42:56 -0700
+Message-ID: <CAKwvOdkOp5eV-o9++y=5b=5NS4fG_snT3OA8DGBnsZWtD60cUA@mail.gmail.com>
 References: <20180924172615.25591-1-natechancellor@gmail.com>
- <33c9afa7-ea62-1248-1da4-381f93238627@amd.com>
- <CAKwvOdkc=OymUoszBR7+QLiOfV2T_GiQ2Oom_C=Ebz76YU_sPw@mail.gmail.com>
+ <33c9afa7-ea62-1248-1da4-381f93238627@amd.com> <20180924194040.GA17672@flashbox>
+ <9cbc1f67-719e-de75-8b0c-2de4da71b2f8@amd.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="UTF-8"
 Cc: Nathan Chancellor <natechancellor@gmail.com>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        "Hook, Gary" <Gary.Hook@amd.com>,
+        Thomas.Lendacky@amd.com, Gary.Hook@amd.com,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-To: Nick Desaulniers <ndesaulniers@google.com>
+        linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
+To: ghook@amd.com
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAKwvOdkc=OymUoszBR7+QLiOfV2T_GiQ2Oom_C=Ebz76YU_sPw@mail.gmail.com>
-Content-Language: en-US
-Content-ID: <9C180124ABD872478B26F84A417C0977@namprd12.prod.outlook.com>
+In-Reply-To: <9cbc1f67-719e-de75-8b0c-2de4da71b2f8@amd.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-T24gMDkvMjQvMjAxOCAwMzoyNCBQTSwgTmljayBEZXNhdWxuaWVycyB3cm90ZToNCj4gT24gTW9u
-LCBTZXAgMjQsIDIwMTggYXQgMTI6MTggUE0gR2FyeSBSIEhvb2sgPGdob29rQGFtZC5jb20+IHdy
-b3RlOg0KPj4NCj4+IE9uIDA5LzI0LzIwMTggMTI6MjYgUE0sIE5hdGhhbiBDaGFuY2VsbG9yIHdy
-b3RlOg0KPj4+IENsYW5nIGVtaXRzIGEgd2FybmluZyBhYm91dCB0aGlzIGNvbnN0cnVjdDoNCj4+
-Pg0KPj4+IGRyaXZlcnMvY3J5cHRvL2NjcC9zcC1wbGF0Zm9ybS5jOjM2OjM2OiB3YXJuaW5nOiB0
-ZW50YXRpdmUgYXJyYXkNCj4+PiBkZWZpbml0aW9uIGFzc3VtZWQgdG8gaGF2ZSBvbmUgZWxlbWVu
-dA0KPj4+IHN0YXRpYyBjb25zdCBzdHJ1Y3QgYWNwaV9kZXZpY2VfaWQgc3BfYWNwaV9tYXRjaFtd
-Ow0KPj4+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeDQo+Pj4gMSB3YXJu
-aW5nIGdlbmVyYXRlZC4NCj4+Pg0KPj4+IEp1c3QgcmVtb3ZlIHRoZSBmb3J3YXJkIGRlY2xhcmF0
-aW9ucyBhbmQgbW92ZSB0aGUgaW5pdGlhbGl6YXRpb25zIHVwDQo+Pj4gc28gdGhhdCB0aGV5IGNh
-biBiZSB1c2VkIGluIHNwX2dldF9vZl92ZXJzaW9uIGFuZCBzcF9nZXRfYWNwaV92ZXJzaW9uLg0K
-Pj4NCj4+IEknbSBub3QgZ29pbmcgdG8gb3V0IGFuZCBvdXQgb2JqZWN0IHRvIHRoaXMganVzdCB5
-ZXQuDQo+IA0KPiBUZW50YXRpdmUgYXJyYXkgZGVmaW5pdGlvbnMgbmVlZCB0byBoYXZlIHRoZSBj
-b3JyZWN0IGxlbmd0aCBzcGVjaWZpZWQ7DQo+IGl0IHNob3VsZCBlaXRoZXIgYmUgZm9yd2FyZCBk
-ZWNsYXJlZCBhcyB0aGUgY29ycmVjdCBsZW5ndGgsIG9yIGFzIHRoaXMNCj4gcGF0Y2ggZG9lcywg
-c2tpcCB0aGUgZm9yd2FyZCBkZWNsYXJlIGFuZCBtb3ZlIHVwIHRoZSBkZWZpbml0aW9uLg0KPiBU
-aGFua3MgZm9yIHRoaXMgcGF0Y2ggTmF0aGFuLg0KPiBSZXZpZXdlZC1ieTogTmljayBEZXNhdWxu
-aWVycyA8bmRlc2F1bG5pZXJzQGdvb2dsZS5jb20+DQoNCg0KQ2hlY2tlZCBteSBDOTksIGFuZCB1
-c2luZyBib3RoIHN0YXRpYyBhbmQgW10gdG8gY3JlYXRlIGEgZGVjbGFyYXRpb24gDQooYmVjYXVz
-ZSBpdCdzIHJlYWxseSBhIGRlZmluaXRpb24pIGFwcGFyZW50bHkgaXNuJ3QgdmFsaWQuIEkgc2hv
-dWxkIGhhdmUgDQprbm93biB0aGF0LiBTaW5jZSBJJ20gb2xkIHNjaG9vbC4uLg0KDQpBY2tlZC1i
-eTogR2FyeSBSIEhvb2sgPGdhcnkuaG9va0BhbWQuY29tPg0KDQoNCj4gDQo+Pg0KPj4gSSBhbSBu
-b3QgYSBjbGFuZyBleHBlcnQuIENhbiB5b3UgcGxlYXNlIHByb3ZpZGUgYSBtYWtlIGNvbW1hbmQg
-dGhhdA0KPj4gd291bGQgZXhwbGFpbiBob3cgeW91IHByZWNpcGl0YXRlZCB0aGlzIGNvbXBsYWlu
-dD8NCj4+DQo+Pg0KPj4+IFJlcG9ydGVkLWJ5OiBOaWNrIERlc2F1bG5pZXJzIDxuZGVzYXVsbmll
-cnNAZ29vZ2xlLmNvbT4NCj4+PiBTaWduZWQtb2ZmLWJ5OiBOYXRoYW4gQ2hhbmNlbGxvciA8bmF0
-ZWNoYW5jZWxsb3JAZ21haWwuY29tPg0KPj4+IC0tLQ0KPj4+ICAgIGRyaXZlcnMvY3J5cHRvL2Nj
-cC9zcC1wbGF0Zm9ybS5jIHwgNTMgKysrKysrKysrKysrKysrLS0tLS0tLS0tLS0tLS0tLS0NCj4+
-PiAgICAxIGZpbGUgY2hhbmdlZCwgMjUgaW5zZXJ0aW9ucygrKSwgMjggZGVsZXRpb25zKC0pDQo+
-Pj4NCj4+PiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9jcnlwdG8vY2NwL3NwLXBsYXRmb3JtLmMgYi9k
-cml2ZXJzL2NyeXB0by9jY3Avc3AtcGxhdGZvcm0uYw0KPj4+IGluZGV4IDcxNzM0ZjI1NGZkMS4u
-Yjc1ZGM3ZGIyZDRhIDEwMDY0NA0KPj4+IC0tLSBhL2RyaXZlcnMvY3J5cHRvL2NjcC9zcC1wbGF0
-Zm9ybS5jDQo+Pj4gKysrIGIvZHJpdmVycy9jcnlwdG8vY2NwL3NwLXBsYXRmb3JtLmMNCj4+PiBA
-QCAtMzMsOCArMzMsMzEgQEAgc3RydWN0IHNwX3BsYXRmb3JtIHsNCj4+PiAgICAgICAgdW5zaWdu
-ZWQgaW50IGlycV9jb3VudDsNCj4+PiAgICB9Ow0KPj4+DQo+Pj4gLXN0YXRpYyBjb25zdCBzdHJ1
-Y3QgYWNwaV9kZXZpY2VfaWQgc3BfYWNwaV9tYXRjaFtdOw0KPj4+IC1zdGF0aWMgY29uc3Qgc3Ry
-dWN0IG9mX2RldmljZV9pZCBzcF9vZl9tYXRjaFtdOw0KPj4+ICtzdGF0aWMgY29uc3Qgc3RydWN0
-IHNwX2Rldl92ZGF0YSBkZXZfdmRhdGFbXSA9IHsNCj4+PiArICAgICB7DQo+Pj4gKyAgICAgICAg
-ICAgICAuYmFyID0gMCwNCj4+PiArI2lmZGVmIENPTkZJR19DUllQVE9fREVWX1NQX0NDUA0KPj4+
-ICsgICAgICAgICAgICAgLmNjcF92ZGF0YSA9ICZjY3B2M19wbGF0Zm9ybSwNCj4+PiArI2VuZGlm
-DQo+Pj4gKyAgICAgfSwNCj4+PiArfTsNCj4+PiArDQo+Pj4gKyNpZmRlZiBDT05GSUdfQUNQSQ0K
-Pj4+ICtzdGF0aWMgY29uc3Qgc3RydWN0IGFjcGlfZGV2aWNlX2lkIHNwX2FjcGlfbWF0Y2hbXSA9
-IHsNCj4+PiArICAgICB7ICJBTURJMEMwMCIsIChrZXJuZWxfdWxvbmdfdCkmZGV2X3ZkYXRhWzBd
-IH0sDQo+Pj4gKyAgICAgeyB9LA0KPj4+ICt9Ow0KPj4+ICtNT0RVTEVfREVWSUNFX1RBQkxFKGFj
-cGksIHNwX2FjcGlfbWF0Y2gpOw0KPj4+ICsjZW5kaWYNCj4+PiArDQo+Pj4gKyNpZmRlZiBDT05G
-SUdfT0YNCj4+PiArc3RhdGljIGNvbnN0IHN0cnVjdCBvZl9kZXZpY2VfaWQgc3Bfb2ZfbWF0Y2hb
-XSA9IHsNCj4+PiArICAgICB7IC5jb21wYXRpYmxlID0gImFtZCxjY3Atc2VhdHRsZS12MWEiLA0K
-Pj4+ICsgICAgICAgLmRhdGEgPSAoY29uc3Qgdm9pZCAqKSZkZXZfdmRhdGFbMF0gfSwNCj4+PiAr
-ICAgICB7IH0sDQo+Pj4gK307DQo+Pj4gK01PRFVMRV9ERVZJQ0VfVEFCTEUob2YsIHNwX29mX21h
-dGNoKTsNCj4+PiArI2VuZGlmDQo+Pj4NCj4+PiAgICBzdGF0aWMgc3RydWN0IHNwX2Rldl92ZGF0
-YSAqc3BfZ2V0X29mX3ZlcnNpb24oc3RydWN0IHBsYXRmb3JtX2RldmljZSAqcGRldikNCj4+PiAg
-ICB7DQo+Pj4gQEAgLTIwMSwzMiArMjI0LDYgQEAgc3RhdGljIGludCBzcF9wbGF0Zm9ybV9yZXN1
-bWUoc3RydWN0IHBsYXRmb3JtX2RldmljZSAqcGRldikNCj4+PiAgICB9DQo+Pj4gICAgI2VuZGlm
-DQo+Pj4NCj4+PiAtc3RhdGljIGNvbnN0IHN0cnVjdCBzcF9kZXZfdmRhdGEgZGV2X3ZkYXRhW10g
-PSB7DQo+Pj4gLSAgICAgew0KPj4+IC0gICAgICAgICAgICAgLmJhciA9IDAsDQo+Pj4gLSNpZmRl
-ZiBDT05GSUdfQ1JZUFRPX0RFVl9TUF9DQ1ANCj4+PiAtICAgICAgICAgICAgIC5jY3BfdmRhdGEg
-PSAmY2NwdjNfcGxhdGZvcm0sDQo+Pj4gLSNlbmRpZg0KPj4+IC0gICAgIH0sDQo+Pj4gLX07DQo+
-Pj4gLQ0KPj4+IC0jaWZkZWYgQ09ORklHX0FDUEkNCj4+PiAtc3RhdGljIGNvbnN0IHN0cnVjdCBh
-Y3BpX2RldmljZV9pZCBzcF9hY3BpX21hdGNoW10gPSB7DQo+Pj4gLSAgICAgeyAiQU1ESTBDMDAi
-LCAoa2VybmVsX3Vsb25nX3QpJmRldl92ZGF0YVswXSB9LA0KPj4+IC0gICAgIHsgfSwNCj4+PiAt
-fTsNCj4+PiAtTU9EVUxFX0RFVklDRV9UQUJMRShhY3BpLCBzcF9hY3BpX21hdGNoKTsNCj4+PiAt
-I2VuZGlmDQo+Pj4gLQ0KPj4+IC0jaWZkZWYgQ09ORklHX09GDQo+Pj4gLXN0YXRpYyBjb25zdCBz
-dHJ1Y3Qgb2ZfZGV2aWNlX2lkIHNwX29mX21hdGNoW10gPSB7DQo+Pj4gLSAgICAgeyAuY29tcGF0
-aWJsZSA9ICJhbWQsY2NwLXNlYXR0bGUtdjFhIiwNCj4+PiAtICAgICAgIC5kYXRhID0gKGNvbnN0
-IHZvaWQgKikmZGV2X3ZkYXRhWzBdIH0sDQo+Pj4gLSAgICAgeyB9LA0KPj4+IC19Ow0KPj4+IC1N
-T0RVTEVfREVWSUNFX1RBQkxFKG9mLCBzcF9vZl9tYXRjaCk7DQo+Pj4gLSNlbmRpZg0KPj4+IC0N
-Cj4+PiAgICBzdGF0aWMgc3RydWN0IHBsYXRmb3JtX2RyaXZlciBzcF9wbGF0Zm9ybV9kcml2ZXIg
-PSB7DQo+Pj4gICAgICAgIC5kcml2ZXIgPSB7DQo+Pj4gICAgICAgICAgICAgICAgLm5hbWUgPSAi
-Y2NwIiwNCj4+Pg0KPj4NCj4gDQo+IA0KDQo=
+On Mon, Sep 24, 2018 at 2:22 PM Gary R Hook <ghook@amd.com> wrote:
+>
+> On 09/24/2018 02:40 PM, Nathan Chancellor wrote:
+> > On Mon, Sep 24, 2018 at 07:18:23PM +0000, Gary R Hook wrote:
+> >> On 09/24/2018 12:26 PM, Nathan Chancellor wrote:
+> >>> Clang emits a warning about this construct:
+> >>>
+> >>> drivers/crypto/ccp/sp-platform.c:36:36: warning: tentative array
+> >>> definition assumed to have one element
+> >>> static const struct acpi_device_id sp_acpi_match[];
+> >>>                                      ^
+> >>> 1 warning generated.
+> >>>
+> >>> Just remove the forward declarations and move the initializations up
+> >>> so that they can be used in sp_get_of_version and sp_get_acpi_version.
+> >>
+> >> I'm not going to out and out object to this just yet.
+> >>
+> >> I am not a clang expert. Can you please provide a make command that
+> >> would explain how you precipitated this complaint?
+> >>
+> >
+> > Hi Gary,
+> >
+> > I can produce the warning with Clang 6.0 using the following set of
+> > commands:
+> >
+> > make ARCH=arm64 CC=clang CROSS_COMPILE=aarch64-linux-gnu- allyesconfig
+> > ./scripts/config -d CONFIG_CPU_BIG_ENDIAN
+> > make ARCH=arm64 CC=clang CROSS_COMPILE=aarch64-linux-gnu- olddefconfig
+> > make ARCH=arm64 CC=clang CROSS_COMPILE=aarch64-linux-gnu- drivers/crypto/ccp/sp-platform.o
+>
+> No, I"m not getting a warning on my system. I get this:
+>
+> ghook@taos:~/src/cryptodev-2.6/src$ make ARCH=arm64 CC=clang
+> CROSS_COMPILE=aarch64-linux-gnu- CFLAGS=-v
+> arch/arm64/Makefile:27: ld does not support --fix-cortex-a53-843419;
+> kernel may be susceptible to erratum
+> arch/arm64/Makefile:40: LSE atomics not supported by binutils
+
+./scripts/config -d CONFIG_ARM64_LSE_ATOMICS
+
+> arch/arm64/Makefile:48: Detected assembler with broken .inst;
+> disassembly will be unreliable
+>    CALL    scripts/checksyscalls.sh
+>    VDSOA   arch/arm64/kernel/vdso/gettimeofday.o
+> arch/arm64/kernel/vdso/gettimeofday.S: Assembler messages:
+> arch/arm64/kernel/vdso/gettimeofday.S:28: Error: no such instruction:
+> `vdso_data .req x6'
+> arch/arm64/kernel/vdso/gettimeofday.S:29: Error: no such instruction:
+> `seqcnt .req w7'
+> arch/arm64/kernel/vdso/gettimeofday.S:30: Error: no such instruction:
+> `w_tmp .req w8'
+> ...
+>
+> The only reason I bring this up is that it would be helpful to be able
+> to recreate results. I figure I'm not set up for this.
+>
+> That said... please see my response to Nick.
+
+
+
+-- 
+Thanks,
+~Nick Desaulniers
