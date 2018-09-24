@@ -1,134 +1,237 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [PATCH crypto-next 06/23] x86/fpu: Remove VLA usage of skcipher
-Date: Mon, 24 Sep 2018 13:45:41 +0200
-Message-ID: <CAKv+Gu8OXbMZqQCM3MOa0Feag94j+wnKKfCCyzit3eRJSN5+_A@mail.gmail.com>
-References: <20180919021100.3380-1-keescook@chromium.org> <20180919021100.3380-7-keescook@chromium.org>
+Subject: Re: [PATCH crypto-next 01/23] crypto: skcipher - Introduce crypto_sync_skcipher
+Date: Mon, 24 Sep 2018 13:48:30 +0200
+Message-ID: <CAKv+Gu8v0e-6Xv4_1W5qcUV_3Hed9rTXmJ9vzYTf1jEHnyaxaQ@mail.gmail.com>
+References: <20180919021100.3380-1-keescook@chromium.org> <20180919021100.3380-2-keescook@chromium.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        "the arch/x86 maintainers" <x86@kernel.org>,
         Eric Biggers <ebiggers@google.com>,
         "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
         <linux-crypto@vger.kernel.org>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 To: Kees Cook <keescook@chromium.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180919021100.3380-7-keescook@chromium.org>
+In-Reply-To: <20180919021100.3380-2-keescook@chromium.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
 On Wed, 19 Sep 2018 at 04:11, Kees Cook <keescook@chromium.org> wrote:
 >
-> In the quest to remove all stack VLA usage from the kernel[1], this
-> replaces struct crypto_skcipher and SKCIPHER_REQUEST_ON_STACK() usage
-> with struct crypto_sync_skcipher and SYNC_SKCIPHER_REQUEST_ON_STACK(),
-> which uses a fixed stack size.
+> In preparation for removal of VLAs due to skcipher requests on the stack
+> via SKCIPHER_REQUEST_ON_STACK() usage, this introduces the infrastructure
+> for the "sync skcipher" tfm, which is for handling the on-stack cases of
+> skcipher, which are always non-ASYNC and have a known limited request
+> size.
 >
-> [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
+> The crypto API additions:
 >
-> Cc: x86@kernel.org
+>         struct crypto_sync_skcipher (wrapper for struct crypto_skcipher)
+>         crypto_alloc_sync_skcipher()
+>         crypto_free_sync_skcipher()
+>         crypto_sync_skcipher_setkey()
+>         crypto_sync_skcipher_get_flags()
+>         crypto_sync_skcipher_set_flags()
+>         crypto_sync_skcipher_clear_flags()
+>         crypto_sync_skcipher_blocksize()
+>         crypto_sync_skcipher_ivsize()
+>         crypto_sync_skcipher_reqtfm()
+>         skcipher_request_set_sync_tfm()
+>         SYNC_SKCIPHER_REQUEST_ON_STACK() (with tfm type check)
+>
 > Signed-off-by: Kees Cook <keescook@chromium.org>
-
-Doing some archeology on this driver, it turns out that the FPU
-wrapper was introduced to support combining the generic CTR, LRW, XTS
-and PCBC chaining modes with the AES-NI core transform. In the mean
-time, CTR, LRW and XTS support have been implemented natively, which
-leaves pcbc-aes-aesni as the only remaining user of the fpu template.
-
-Since there are no users of pcbc(aes) in the kernel, could we perhaps
-just remove this driver and all the special handling we have for it in
-aesni-intel_glue.c?
-
-If not, or in case we prefer to defer that to the next release:
 
 Reviewed-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
 > ---
->  arch/x86/crypto/fpu.c | 30 ++++++++++++++++--------------
->  1 file changed, 16 insertions(+), 14 deletions(-)
+>  crypto/skcipher.c         | 24 +++++++++++++
+>  include/crypto/skcipher.h | 75 +++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 99 insertions(+)
 >
-> diff --git a/arch/x86/crypto/fpu.c b/arch/x86/crypto/fpu.c
-> index 406680476c52..be9b3766f241 100644
-> --- a/arch/x86/crypto/fpu.c
-> +++ b/arch/x86/crypto/fpu.c
-> @@ -20,21 +20,23 @@
->  #include <asm/fpu/api.h>
+> diff --git a/crypto/skcipher.c b/crypto/skcipher.c
+> index 0bd8c6caa498..4caab81d2d02 100644
+> --- a/crypto/skcipher.c
+> +++ b/crypto/skcipher.c
+> @@ -949,6 +949,30 @@ struct crypto_skcipher *crypto_alloc_skcipher(const char *alg_name,
+>  }
+>  EXPORT_SYMBOL_GPL(crypto_alloc_skcipher);
 >
->  struct crypto_fpu_ctx {
-> -       struct crypto_skcipher *child;
-> +       struct crypto_sync_skcipher *child;
+> +struct crypto_sync_skcipher *crypto_alloc_sync_skcipher(
+> +                               const char *alg_name, u32 type, u32 mask)
+> +{
+> +       struct crypto_skcipher *tfm;
+> +
+> +       /* Only sync algorithms allowed. */
+> +       mask |= CRYPTO_ALG_ASYNC;
+> +
+> +       tfm = crypto_alloc_tfm(alg_name, &crypto_skcipher_type2, type, mask);
+> +
+> +       /*
+> +        * Make sure we do not allocate something that might get used with
+> +        * an on-stack request: check the request size.
+> +        */
+> +       if (!IS_ERR(tfm) && WARN_ON(crypto_skcipher_reqsize(tfm) >
+> +                                   MAX_SYNC_SKCIPHER_REQSIZE)) {
+> +               crypto_free_skcipher(tfm);
+> +               return ERR_PTR(-EINVAL);
+> +       }
+> +
+> +       return (struct crypto_sync_skcipher *)tfm;
+> +}
+> +EXPORT_SYMBOL_GPL(crypto_alloc_sync_skcipher);
+> +
+>  int crypto_has_skcipher2(const char *alg_name, u32 type, u32 mask)
+>  {
+>         return crypto_type_has_alg(alg_name, &crypto_skcipher_type2,
+> diff --git a/include/crypto/skcipher.h b/include/crypto/skcipher.h
+> index 2f327f090c3e..d00ce90dc7da 100644
+> --- a/include/crypto/skcipher.h
+> +++ b/include/crypto/skcipher.h
+> @@ -65,6 +65,10 @@ struct crypto_skcipher {
+>         struct crypto_tfm base;
 >  };
 >
->  static int crypto_fpu_setkey(struct crypto_skcipher *parent, const u8 *key,
->                              unsigned int keylen)
+> +struct crypto_sync_skcipher {
+> +       struct crypto_skcipher base;
+> +};
+> +
+>  /**
+>   * struct skcipher_alg - symmetric key cipher definition
+>   * @min_keysize: Minimum key size supported by the transformation. This is the
+> @@ -139,6 +143,19 @@ struct skcipher_alg {
+>         struct crypto_alg base;
+>  };
+>
+> +#define MAX_SYNC_SKCIPHER_REQSIZE      384
+> +/*
+> + * This performs a type-check against the "tfm" argument to make sure
+> + * all users have the correct skcipher tfm for doing on-stack requests.
+> + */
+> +#define SYNC_SKCIPHER_REQUEST_ON_STACK(name, tfm) \
+> +       char __##name##_desc[sizeof(struct skcipher_request) + \
+> +                            MAX_SYNC_SKCIPHER_REQSIZE + \
+> +                            (!(sizeof((struct crypto_sync_skcipher *)1 == \
+> +                                      (typeof(tfm))1))) \
+> +                           ] CRYPTO_MINALIGN_ATTR; \
+> +       struct skcipher_request *name = (void *)__##name##_desc
+> +
+>  #define SKCIPHER_REQUEST_ON_STACK(name, tfm) \
+>         char __##name##_desc[sizeof(struct skcipher_request) + \
+>                 crypto_skcipher_reqsize(tfm)] CRYPTO_MINALIGN_ATTR; \
+> @@ -197,6 +214,9 @@ static inline struct crypto_skcipher *__crypto_skcipher_cast(
+>  struct crypto_skcipher *crypto_alloc_skcipher(const char *alg_name,
+>                                               u32 type, u32 mask);
+>
+> +struct crypto_sync_skcipher *crypto_alloc_sync_skcipher(const char *alg_name,
+> +                                             u32 type, u32 mask);
+> +
+>  static inline struct crypto_tfm *crypto_skcipher_tfm(
+>         struct crypto_skcipher *tfm)
 >  {
->         struct crypto_fpu_ctx *ctx = crypto_skcipher_ctx(parent);
-> -       struct crypto_skcipher *child = ctx->child;
-> +       struct crypto_sync_skcipher *child = ctx->child;
->         int err;
->
-> -       crypto_skcipher_clear_flags(child, CRYPTO_TFM_REQ_MASK);
-> -       crypto_skcipher_set_flags(child, crypto_skcipher_get_flags(parent) &
-> +       crypto_sync_skcipher_clear_flags(child, CRYPTO_TFM_REQ_MASK);
-> +       crypto_sync_skcipher_set_flags(child,
-> +                                      crypto_skcipher_get_flags(parent) &
->                                          CRYPTO_TFM_REQ_MASK);
-> -       err = crypto_skcipher_setkey(child, key, keylen);
-> -       crypto_skcipher_set_flags(parent, crypto_skcipher_get_flags(child) &
-> +       err = crypto_sync_skcipher_setkey(child, key, keylen);
-> +       crypto_skcipher_set_flags(parent,
-> +                                 crypto_sync_skcipher_get_flags(child) &
->                                           CRYPTO_TFM_RES_MASK);
->         return err;
->  }
-> @@ -43,11 +45,11 @@ static int crypto_fpu_encrypt(struct skcipher_request *req)
->  {
->         struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
->         struct crypto_fpu_ctx *ctx = crypto_skcipher_ctx(tfm);
-> -       struct crypto_skcipher *child = ctx->child;
-> -       SKCIPHER_REQUEST_ON_STACK(subreq, child);
-> +       struct crypto_sync_skcipher *child = ctx->child;
-> +       SYNC_SKCIPHER_REQUEST_ON_STACK(subreq, child);
->         int err;
->
-> -       skcipher_request_set_tfm(subreq, child);
-> +       skcipher_request_set_sync_tfm(subreq, child);
->         skcipher_request_set_callback(subreq, 0, NULL, NULL);
->         skcipher_request_set_crypt(subreq, req->src, req->dst, req->cryptlen,
->                                    req->iv);
-> @@ -64,11 +66,11 @@ static int crypto_fpu_decrypt(struct skcipher_request *req)
->  {
->         struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
->         struct crypto_fpu_ctx *ctx = crypto_skcipher_ctx(tfm);
-> -       struct crypto_skcipher *child = ctx->child;
-> -       SKCIPHER_REQUEST_ON_STACK(subreq, child);
-> +       struct crypto_sync_skcipher *child = ctx->child;
-> +       SYNC_SKCIPHER_REQUEST_ON_STACK(subreq, child);
->         int err;
->
-> -       skcipher_request_set_tfm(subreq, child);
-> +       skcipher_request_set_sync_tfm(subreq, child);
->         skcipher_request_set_callback(subreq, 0, NULL, NULL);
->         skcipher_request_set_crypt(subreq, req->src, req->dst, req->cryptlen,
->                                    req->iv);
-> @@ -93,7 +95,7 @@ static int crypto_fpu_init_tfm(struct crypto_skcipher *tfm)
->         if (IS_ERR(cipher))
->                 return PTR_ERR(cipher);
->
-> -       ctx->child = cipher;
-> +       ctx->child = (struct crypto_sync_skcipher *)cipher;
->
->         return 0;
->  }
-> @@ -102,7 +104,7 @@ static void crypto_fpu_exit_tfm(struct crypto_skcipher *tfm)
->  {
->         struct crypto_fpu_ctx *ctx = crypto_skcipher_ctx(tfm);
->
-> -       crypto_free_skcipher(ctx->child);
-> +       crypto_free_sync_skcipher(ctx->child);
+> @@ -212,6 +232,11 @@ static inline void crypto_free_skcipher(struct crypto_skcipher *tfm)
+>         crypto_destroy_tfm(tfm, crypto_skcipher_tfm(tfm));
 >  }
 >
->  static void crypto_fpu_free(struct skcipher_instance *inst)
+> +static inline void crypto_free_sync_skcipher(struct crypto_sync_skcipher *tfm)
+> +{
+> +       crypto_free_skcipher(&tfm->base);
+> +}
+> +
+>  /**
+>   * crypto_has_skcipher() - Search for the availability of an skcipher.
+>   * @alg_name: is the cra_name / name or cra_driver_name / driver name of the
+> @@ -280,6 +305,12 @@ static inline unsigned int crypto_skcipher_ivsize(struct crypto_skcipher *tfm)
+>         return tfm->ivsize;
+>  }
+>
+> +static inline unsigned int crypto_sync_skcipher_ivsize(
+> +       struct crypto_sync_skcipher *tfm)
+> +{
+> +       return crypto_skcipher_ivsize(&tfm->base);
+> +}
+> +
+>  static inline unsigned int crypto_skcipher_alg_chunksize(
+>         struct skcipher_alg *alg)
+>  {
+> @@ -356,6 +387,12 @@ static inline unsigned int crypto_skcipher_blocksize(
+>         return crypto_tfm_alg_blocksize(crypto_skcipher_tfm(tfm));
+>  }
+>
+> +static inline unsigned int crypto_sync_skcipher_blocksize(
+> +       struct crypto_sync_skcipher *tfm)
+> +{
+> +       return crypto_skcipher_blocksize(&tfm->base);
+> +}
+> +
+>  static inline unsigned int crypto_skcipher_alignmask(
+>         struct crypto_skcipher *tfm)
+>  {
+> @@ -379,6 +416,24 @@ static inline void crypto_skcipher_clear_flags(struct crypto_skcipher *tfm,
+>         crypto_tfm_clear_flags(crypto_skcipher_tfm(tfm), flags);
+>  }
+>
+> +static inline u32 crypto_sync_skcipher_get_flags(
+> +       struct crypto_sync_skcipher *tfm)
+> +{
+> +       return crypto_skcipher_get_flags(&tfm->base);
+> +}
+> +
+> +static inline void crypto_sync_skcipher_set_flags(
+> +       struct crypto_sync_skcipher *tfm, u32 flags)
+> +{
+> +       crypto_skcipher_set_flags(&tfm->base, flags);
+> +}
+> +
+> +static inline void crypto_sync_skcipher_clear_flags(
+> +       struct crypto_sync_skcipher *tfm, u32 flags)
+> +{
+> +       crypto_skcipher_clear_flags(&tfm->base, flags);
+> +}
+> +
+>  /**
+>   * crypto_skcipher_setkey() - set key for cipher
+>   * @tfm: cipher handle
+> @@ -401,6 +456,12 @@ static inline int crypto_skcipher_setkey(struct crypto_skcipher *tfm,
+>         return tfm->setkey(tfm, key, keylen);
+>  }
+>
+> +static inline int crypto_sync_skcipher_setkey(struct crypto_sync_skcipher *tfm,
+> +                                        const u8 *key, unsigned int keylen)
+> +{
+> +       return crypto_skcipher_setkey(&tfm->base, key, keylen);
+> +}
+> +
+>  static inline unsigned int crypto_skcipher_default_keysize(
+>         struct crypto_skcipher *tfm)
+>  {
+> @@ -422,6 +483,14 @@ static inline struct crypto_skcipher *crypto_skcipher_reqtfm(
+>         return __crypto_skcipher_cast(req->base.tfm);
+>  }
+>
+> +static inline struct crypto_sync_skcipher *crypto_sync_skcipher_reqtfm(
+> +       struct skcipher_request *req)
+> +{
+> +       struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+> +
+> +       return container_of(tfm, struct crypto_sync_skcipher, base);
+> +}
+> +
+>  /**
+>   * crypto_skcipher_encrypt() - encrypt plaintext
+>   * @req: reference to the skcipher_request handle that holds all information
+> @@ -500,6 +569,12 @@ static inline void skcipher_request_set_tfm(struct skcipher_request *req,
+>         req->base.tfm = crypto_skcipher_tfm(tfm);
+>  }
+>
+> +static inline void skcipher_request_set_sync_tfm(struct skcipher_request *req,
+> +                                           struct crypto_sync_skcipher *tfm)
+> +{
+> +       skcipher_request_set_tfm(req, &tfm->base);
+> +}
+> +
+>  static inline struct skcipher_request *skcipher_request_cast(
+>         struct crypto_async_request *req)
+>  {
 > --
 > 2.17.1
 >
