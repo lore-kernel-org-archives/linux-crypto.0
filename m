@@ -1,54 +1,43 @@
 From: Kees Cook <keescook@chromium.org>
-Subject: Re: [PATCH crypto-next 06/23] x86/fpu: Remove VLA usage of skcipher
-Date: Mon, 24 Sep 2018 10:35:24 -0700
-Message-ID: <CAGXu5jJxCHHxYzJy2v9sQ03qnDPAjf_biCxudaSuDH6LBEki2A@mail.gmail.com>
-References: <20180919021100.3380-1-keescook@chromium.org> <20180919021100.3380-7-keescook@chromium.org>
- <CAKv+Gu8OXbMZqQCM3MOa0Feag94j+wnKKfCCyzit3eRJSN5+_A@mail.gmail.com>
+Subject: Re: [PATCH crypto-next 07/23] block: cryptoloop: Remove VLA usage of skcipher
+Date: Mon, 24 Sep 2018 10:53:30 -0700
+Message-ID: <CAGXu5jLw3+nvb9opPeoCyH0MhyVK5UY7H5qeQ2b8GFTUGDGrUQ@mail.gmail.com>
+References: <20180919021100.3380-1-keescook@chromium.org> <20180919021100.3380-8-keescook@chromium.org>
+ <CAKv+Gu8ynaVi1KCMNsjCU0ucAjFFku=ourh9Yc9Rizoc4ztvOQ@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        "the arch/x86 maintainers" <x86@kernel.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        linux-block <linux-block@vger.kernel.org>,
         Eric Biggers <ebiggers@google.com>,
         "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
         <linux-crypto@vger.kernel.org>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAKv+Gu8OXbMZqQCM3MOa0Feag94j+wnKKfCCyzit3eRJSN5+_A@mail.gmail.com>
+In-Reply-To: <CAKv+Gu8ynaVi1KCMNsjCU0ucAjFFku=ourh9Yc9Rizoc4ztvOQ@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Sep 24, 2018 at 4:45 AM, Ard Biesheuvel
+On Mon, Sep 24, 2018 at 4:52 AM, Ard Biesheuvel
 <ard.biesheuvel@linaro.org> wrote:
 > On Wed, 19 Sep 2018 at 04:11, Kees Cook <keescook@chromium.org> wrote:
+>> @@ -119,7 +119,7 @@ cryptoloop_transfer(struct loop_device *lo, int cmd,
+>>         unsigned in_offs, out_offs;
+>>         int err;
 >>
->> In the quest to remove all stack VLA usage from the kernel[1], this
->> replaces struct crypto_skcipher and SKCIPHER_REQUEST_ON_STACK() usage
->> with struct crypto_sync_skcipher and SYNC_SKCIPHER_REQUEST_ON_STACK(),
->> which uses a fixed stack size.
+>> -       skcipher_request_set_tfm(req, tfm);
+>> +       skcipher_request_set_sync_tfm(req, tfm);
+>>         skcipher_request_set_callback(req, CRYPTO_TFM_REQ_MAY_SLEEP,
+>>                                       NULL, NULL);
 >>
->> [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
->>
->> Cc: x86@kernel.org
->> Signed-off-by: Kees Cook <keescook@chromium.org>
 >
-> Doing some archeology on this driver, it turns out that the FPU
-> wrapper was introduced to support combining the generic CTR, LRW, XTS
-> and PCBC chaining modes with the AES-NI core transform. In the mean
-> time, CTR, LRW and XTS support have been implemented natively, which
-> leaves pcbc-aes-aesni as the only remaining user of the fpu template.
->
-> Since there are no users of pcbc(aes) in the kernel, could we perhaps
-> just remove this driver and all the special handling we have for it in
-> aesni-intel_glue.c?
+> Does this work?
 
-Both options get rid of the VLA, so I'm happy either way. ;)
-
-> If not, or in case we prefer to defer that to the next release:
->
-> Reviewed-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-
-Thanks!
+Everything is a direct wrapper for existing types and functions, so I
+wouldn't expect any functional change. I haven't been able to test
+this particular interface, though. cryptoloop is very deprecated,
+isn't it?
 
 -Kees
 
