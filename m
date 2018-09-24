@@ -1,73 +1,132 @@
-From: Gary R Hook <ghook@amd.com>
+From: Nathan Chancellor <natechancellor@gmail.com>
 Subject: Re: [PATCH] crypto: ccp: Remove forward declaration
-Date: Mon, 24 Sep 2018 19:18:23 +0000
-Message-ID: <33c9afa7-ea62-1248-1da4-381f93238627@amd.com>
+Date: Mon, 24 Sep 2018 12:40:40 -0700
+Message-ID: <20180924194040.GA17672@flashbox>
 References: <20180924172615.25591-1-natechancellor@gmail.com>
+ <33c9afa7-ea62-1248-1da4-381f93238627@amd.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+Content-Type: text/plain; charset=us-ascii
+Cc: "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+        "Hook, Gary" <Gary.Hook@amd.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         Nick Desaulniers <ndesaulniers@google.com>
-To: Nathan Chancellor <natechancellor@gmail.com>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        "Hook, Gary" <Gary.Hook@amd.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
+To: Gary R Hook <ghook@amd.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180924172615.25591-1-natechancellor@gmail.com>
-Content-Language: en-US
-Content-ID: <56836D7413406F4191B4356291A47C5F@namprd12.prod.outlook.com>
+Content-Disposition: inline
+In-Reply-To: <33c9afa7-ea62-1248-1da4-381f93238627@amd.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-T24gMDkvMjQvMjAxOCAxMjoyNiBQTSwgTmF0aGFuIENoYW5jZWxsb3Igd3JvdGU6DQo+IENsYW5n
-IGVtaXRzIGEgd2FybmluZyBhYm91dCB0aGlzIGNvbnN0cnVjdDoNCj4gDQo+IGRyaXZlcnMvY3J5
-cHRvL2NjcC9zcC1wbGF0Zm9ybS5jOjM2OjM2OiB3YXJuaW5nOiB0ZW50YXRpdmUgYXJyYXkNCj4g
-ZGVmaW5pdGlvbiBhc3N1bWVkIHRvIGhhdmUgb25lIGVsZW1lbnQNCj4gc3RhdGljIGNvbnN0IHN0
-cnVjdCBhY3BpX2RldmljZV9pZCBzcF9hY3BpX21hdGNoW107DQo+ICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgIF4NCj4gMSB3YXJuaW5nIGdlbmVyYXRlZC4NCj4gDQo+IEp1c3Qg
-cmVtb3ZlIHRoZSBmb3J3YXJkIGRlY2xhcmF0aW9ucyBhbmQgbW92ZSB0aGUgaW5pdGlhbGl6YXRp
-b25zIHVwDQo+IHNvIHRoYXQgdGhleSBjYW4gYmUgdXNlZCBpbiBzcF9nZXRfb2ZfdmVyc2lvbiBh
-bmQgc3BfZ2V0X2FjcGlfdmVyc2lvbi4NCg0KSSdtIG5vdCBnb2luZyB0byBvdXQgYW5kIG91dCBv
-YmplY3QgdG8gdGhpcyBqdXN0IHlldC4NCg0KSSBhbSBub3QgYSBjbGFuZyBleHBlcnQuIENhbiB5
-b3UgcGxlYXNlIHByb3ZpZGUgYSBtYWtlIGNvbW1hbmQgdGhhdCANCndvdWxkIGV4cGxhaW4gaG93
-IHlvdSBwcmVjaXBpdGF0ZWQgdGhpcyBjb21wbGFpbnQ/DQoNCg0KPiBSZXBvcnRlZC1ieTogTmlj
-ayBEZXNhdWxuaWVycyA8bmRlc2F1bG5pZXJzQGdvb2dsZS5jb20+DQo+IFNpZ25lZC1vZmYtYnk6
-IE5hdGhhbiBDaGFuY2VsbG9yIDxuYXRlY2hhbmNlbGxvckBnbWFpbC5jb20+DQo+IC0tLQ0KPiAg
-IGRyaXZlcnMvY3J5cHRvL2NjcC9zcC1wbGF0Zm9ybS5jIHwgNTMgKysrKysrKysrKysrKysrLS0t
-LS0tLS0tLS0tLS0tLS0NCj4gICAxIGZpbGUgY2hhbmdlZCwgMjUgaW5zZXJ0aW9ucygrKSwgMjgg
-ZGVsZXRpb25zKC0pDQo+IA0KPiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9jcnlwdG8vY2NwL3NwLXBs
-YXRmb3JtLmMgYi9kcml2ZXJzL2NyeXB0by9jY3Avc3AtcGxhdGZvcm0uYw0KPiBpbmRleCA3MTcz
-NGYyNTRmZDEuLmI3NWRjN2RiMmQ0YSAxMDA2NDQNCj4gLS0tIGEvZHJpdmVycy9jcnlwdG8vY2Nw
-L3NwLXBsYXRmb3JtLmMNCj4gKysrIGIvZHJpdmVycy9jcnlwdG8vY2NwL3NwLXBsYXRmb3JtLmMN
-Cj4gQEAgLTMzLDggKzMzLDMxIEBAIHN0cnVjdCBzcF9wbGF0Zm9ybSB7DQo+ICAgCXVuc2lnbmVk
-IGludCBpcnFfY291bnQ7DQo+ICAgfTsNCj4gICANCj4gLXN0YXRpYyBjb25zdCBzdHJ1Y3QgYWNw
-aV9kZXZpY2VfaWQgc3BfYWNwaV9tYXRjaFtdOw0KPiAtc3RhdGljIGNvbnN0IHN0cnVjdCBvZl9k
-ZXZpY2VfaWQgc3Bfb2ZfbWF0Y2hbXTsNCj4gK3N0YXRpYyBjb25zdCBzdHJ1Y3Qgc3BfZGV2X3Zk
-YXRhIGRldl92ZGF0YVtdID0gew0KPiArCXsNCj4gKwkJLmJhciA9IDAsDQo+ICsjaWZkZWYgQ09O
-RklHX0NSWVBUT19ERVZfU1BfQ0NQDQo+ICsJCS5jY3BfdmRhdGEgPSAmY2NwdjNfcGxhdGZvcm0s
-DQo+ICsjZW5kaWYNCj4gKwl9LA0KPiArfTsNCj4gKw0KPiArI2lmZGVmIENPTkZJR19BQ1BJDQo+
-ICtzdGF0aWMgY29uc3Qgc3RydWN0IGFjcGlfZGV2aWNlX2lkIHNwX2FjcGlfbWF0Y2hbXSA9IHsN
-Cj4gKwl7ICJBTURJMEMwMCIsIChrZXJuZWxfdWxvbmdfdCkmZGV2X3ZkYXRhWzBdIH0sDQo+ICsJ
-eyB9LA0KPiArfTsNCj4gK01PRFVMRV9ERVZJQ0VfVEFCTEUoYWNwaSwgc3BfYWNwaV9tYXRjaCk7
-DQo+ICsjZW5kaWYNCj4gKw0KPiArI2lmZGVmIENPTkZJR19PRg0KPiArc3RhdGljIGNvbnN0IHN0
-cnVjdCBvZl9kZXZpY2VfaWQgc3Bfb2ZfbWF0Y2hbXSA9IHsNCj4gKwl7IC5jb21wYXRpYmxlID0g
-ImFtZCxjY3Atc2VhdHRsZS12MWEiLA0KPiArCSAgLmRhdGEgPSAoY29uc3Qgdm9pZCAqKSZkZXZf
-dmRhdGFbMF0gfSwNCj4gKwl7IH0sDQo+ICt9Ow0KPiArTU9EVUxFX0RFVklDRV9UQUJMRShvZiwg
-c3Bfb2ZfbWF0Y2gpOw0KPiArI2VuZGlmDQo+ICAgDQo+ICAgc3RhdGljIHN0cnVjdCBzcF9kZXZf
-dmRhdGEgKnNwX2dldF9vZl92ZXJzaW9uKHN0cnVjdCBwbGF0Zm9ybV9kZXZpY2UgKnBkZXYpDQo+
-ICAgew0KPiBAQCAtMjAxLDMyICsyMjQsNiBAQCBzdGF0aWMgaW50IHNwX3BsYXRmb3JtX3Jlc3Vt
-ZShzdHJ1Y3QgcGxhdGZvcm1fZGV2aWNlICpwZGV2KQ0KPiAgIH0NCj4gICAjZW5kaWYNCj4gICAN
-Cj4gLXN0YXRpYyBjb25zdCBzdHJ1Y3Qgc3BfZGV2X3ZkYXRhIGRldl92ZGF0YVtdID0gew0KPiAt
-CXsNCj4gLQkJLmJhciA9IDAsDQo+IC0jaWZkZWYgQ09ORklHX0NSWVBUT19ERVZfU1BfQ0NQDQo+
-IC0JCS5jY3BfdmRhdGEgPSAmY2NwdjNfcGxhdGZvcm0sDQo+IC0jZW5kaWYNCj4gLQl9LA0KPiAt
-fTsNCj4gLQ0KPiAtI2lmZGVmIENPTkZJR19BQ1BJDQo+IC1zdGF0aWMgY29uc3Qgc3RydWN0IGFj
-cGlfZGV2aWNlX2lkIHNwX2FjcGlfbWF0Y2hbXSA9IHsNCj4gLQl7ICJBTURJMEMwMCIsIChrZXJu
-ZWxfdWxvbmdfdCkmZGV2X3ZkYXRhWzBdIH0sDQo+IC0JeyB9LA0KPiAtfTsNCj4gLU1PRFVMRV9E
-RVZJQ0VfVEFCTEUoYWNwaSwgc3BfYWNwaV9tYXRjaCk7DQo+IC0jZW5kaWYNCj4gLQ0KPiAtI2lm
-ZGVmIENPTkZJR19PRg0KPiAtc3RhdGljIGNvbnN0IHN0cnVjdCBvZl9kZXZpY2VfaWQgc3Bfb2Zf
-bWF0Y2hbXSA9IHsNCj4gLQl7IC5jb21wYXRpYmxlID0gImFtZCxjY3Atc2VhdHRsZS12MWEiLA0K
-PiAtCSAgLmRhdGEgPSAoY29uc3Qgdm9pZCAqKSZkZXZfdmRhdGFbMF0gfSwNCj4gLQl7IH0sDQo+
-IC19Ow0KPiAtTU9EVUxFX0RFVklDRV9UQUJMRShvZiwgc3Bfb2ZfbWF0Y2gpOw0KPiAtI2VuZGlm
-DQo+IC0NCj4gICBzdGF0aWMgc3RydWN0IHBsYXRmb3JtX2RyaXZlciBzcF9wbGF0Zm9ybV9kcml2
-ZXIgPSB7DQo+ICAgCS5kcml2ZXIgPSB7DQo+ICAgCQkubmFtZSA9ICJjY3AiLA0KPiANCg0K
+On Mon, Sep 24, 2018 at 07:18:23PM +0000, Gary R Hook wrote:
+> On 09/24/2018 12:26 PM, Nathan Chancellor wrote:
+> > Clang emits a warning about this construct:
+> > 
+> > drivers/crypto/ccp/sp-platform.c:36:36: warning: tentative array
+> > definition assumed to have one element
+> > static const struct acpi_device_id sp_acpi_match[];
+> >                                     ^
+> > 1 warning generated.
+> > 
+> > Just remove the forward declarations and move the initializations up
+> > so that they can be used in sp_get_of_version and sp_get_acpi_version.
+> 
+> I'm not going to out and out object to this just yet.
+> 
+> I am not a clang expert. Can you please provide a make command that 
+> would explain how you precipitated this complaint?
+> 
+
+Hi Gary,
+
+I can produce the warning with Clang 6.0 using the following set of
+commands:
+
+make ARCH=arm64 CC=clang CROSS_COMPILE=aarch64-linux-gnu- allyesconfig
+./scripts/config -d CONFIG_CPU_BIG_ENDIAN
+make ARCH=arm64 CC=clang CROSS_COMPILE=aarch64-linux-gnu- olddefconfig
+make ARCH=arm64 CC=clang CROSS_COMPILE=aarch64-linux-gnu- drivers/crypto/ccp/sp-platform.o
+
+Nathan
+
+> 
+> > Reported-by: Nick Desaulniers <ndesaulniers@google.com>
+> > Signed-off-by: Nathan Chancellor <natechancellor@gmail.com>
+> > ---
+> >   drivers/crypto/ccp/sp-platform.c | 53 +++++++++++++++-----------------
+> >   1 file changed, 25 insertions(+), 28 deletions(-)
+> > 
+> > diff --git a/drivers/crypto/ccp/sp-platform.c b/drivers/crypto/ccp/sp-platform.c
+> > index 71734f254fd1..b75dc7db2d4a 100644
+> > --- a/drivers/crypto/ccp/sp-platform.c
+> > +++ b/drivers/crypto/ccp/sp-platform.c
+> > @@ -33,8 +33,31 @@ struct sp_platform {
+> >   	unsigned int irq_count;
+> >   };
+> >   
+> > -static const struct acpi_device_id sp_acpi_match[];
+> > -static const struct of_device_id sp_of_match[];
+> > +static const struct sp_dev_vdata dev_vdata[] = {
+> > +	{
+> > +		.bar = 0,
+> > +#ifdef CONFIG_CRYPTO_DEV_SP_CCP
+> > +		.ccp_vdata = &ccpv3_platform,
+> > +#endif
+> > +	},
+> > +};
+> > +
+> > +#ifdef CONFIG_ACPI
+> > +static const struct acpi_device_id sp_acpi_match[] = {
+> > +	{ "AMDI0C00", (kernel_ulong_t)&dev_vdata[0] },
+> > +	{ },
+> > +};
+> > +MODULE_DEVICE_TABLE(acpi, sp_acpi_match);
+> > +#endif
+> > +
+> > +#ifdef CONFIG_OF
+> > +static const struct of_device_id sp_of_match[] = {
+> > +	{ .compatible = "amd,ccp-seattle-v1a",
+> > +	  .data = (const void *)&dev_vdata[0] },
+> > +	{ },
+> > +};
+> > +MODULE_DEVICE_TABLE(of, sp_of_match);
+> > +#endif
+> >   
+> >   static struct sp_dev_vdata *sp_get_of_version(struct platform_device *pdev)
+> >   {
+> > @@ -201,32 +224,6 @@ static int sp_platform_resume(struct platform_device *pdev)
+> >   }
+> >   #endif
+> >   
+> > -static const struct sp_dev_vdata dev_vdata[] = {
+> > -	{
+> > -		.bar = 0,
+> > -#ifdef CONFIG_CRYPTO_DEV_SP_CCP
+> > -		.ccp_vdata = &ccpv3_platform,
+> > -#endif
+> > -	},
+> > -};
+> > -
+> > -#ifdef CONFIG_ACPI
+> > -static const struct acpi_device_id sp_acpi_match[] = {
+> > -	{ "AMDI0C00", (kernel_ulong_t)&dev_vdata[0] },
+> > -	{ },
+> > -};
+> > -MODULE_DEVICE_TABLE(acpi, sp_acpi_match);
+> > -#endif
+> > -
+> > -#ifdef CONFIG_OF
+> > -static const struct of_device_id sp_of_match[] = {
+> > -	{ .compatible = "amd,ccp-seattle-v1a",
+> > -	  .data = (const void *)&dev_vdata[0] },
+> > -	{ },
+> > -};
+> > -MODULE_DEVICE_TABLE(of, sp_of_match);
+> > -#endif
+> > -
+> >   static struct platform_driver sp_platform_driver = {
+> >   	.driver = {
+> >   		.name = "ccp",
+> > 
+> 
