@@ -1,46 +1,73 @@
-From: Kees Cook <keescook@chromium.org>
-Subject: Re: [PATCH crypto-next 07/23] block: cryptoloop: Remove VLA usage of skcipher
-Date: Mon, 24 Sep 2018 10:53:30 -0700
-Message-ID: <CAGXu5jLw3+nvb9opPeoCyH0MhyVK5UY7H5qeQ2b8GFTUGDGrUQ@mail.gmail.com>
-References: <20180919021100.3380-1-keescook@chromium.org> <20180919021100.3380-8-keescook@chromium.org>
- <CAKv+Gu8ynaVi1KCMNsjCU0ucAjFFku=ourh9Yc9Rizoc4ztvOQ@mail.gmail.com>
+From: Gary R Hook <ghook@amd.com>
+Subject: Re: [PATCH] crypto: ccp: Remove forward declaration
+Date: Mon, 24 Sep 2018 19:18:23 +0000
+Message-ID: <33c9afa7-ea62-1248-1da4-381f93238627@amd.com>
+References: <20180924172615.25591-1-natechancellor@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        Jens Axboe <axboe@kernel.dk>,
-        linux-block <linux-block@vger.kernel.org>,
-        Eric Biggers <ebiggers@google.com>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>
+To: Nathan Chancellor <natechancellor@gmail.com>,
+        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+        "Hook, Gary" <Gary.Hook@amd.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAKv+Gu8ynaVi1KCMNsjCU0ucAjFFku=ourh9Yc9Rizoc4ztvOQ@mail.gmail.com>
+In-Reply-To: <20180924172615.25591-1-natechancellor@gmail.com>
+Content-Language: en-US
+Content-ID: <56836D7413406F4191B4356291A47C5F@namprd12.prod.outlook.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Sep 24, 2018 at 4:52 AM, Ard Biesheuvel
-<ard.biesheuvel@linaro.org> wrote:
-> On Wed, 19 Sep 2018 at 04:11, Kees Cook <keescook@chromium.org> wrote:
->> @@ -119,7 +119,7 @@ cryptoloop_transfer(struct loop_device *lo, int cmd,
->>         unsigned in_offs, out_offs;
->>         int err;
->>
->> -       skcipher_request_set_tfm(req, tfm);
->> +       skcipher_request_set_sync_tfm(req, tfm);
->>         skcipher_request_set_callback(req, CRYPTO_TFM_REQ_MAY_SLEEP,
->>                                       NULL, NULL);
->>
->
-> Does this work?
-
-Everything is a direct wrapper for existing types and functions, so I
-wouldn't expect any functional change. I haven't been able to test
-this particular interface, though. cryptoloop is very deprecated,
-isn't it?
-
--Kees
-
--- 
-Kees Cook
-Pixel Security
+T24gMDkvMjQvMjAxOCAxMjoyNiBQTSwgTmF0aGFuIENoYW5jZWxsb3Igd3JvdGU6DQo+IENsYW5n
+IGVtaXRzIGEgd2FybmluZyBhYm91dCB0aGlzIGNvbnN0cnVjdDoNCj4gDQo+IGRyaXZlcnMvY3J5
+cHRvL2NjcC9zcC1wbGF0Zm9ybS5jOjM2OjM2OiB3YXJuaW5nOiB0ZW50YXRpdmUgYXJyYXkNCj4g
+ZGVmaW5pdGlvbiBhc3N1bWVkIHRvIGhhdmUgb25lIGVsZW1lbnQNCj4gc3RhdGljIGNvbnN0IHN0
+cnVjdCBhY3BpX2RldmljZV9pZCBzcF9hY3BpX21hdGNoW107DQo+ICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgIF4NCj4gMSB3YXJuaW5nIGdlbmVyYXRlZC4NCj4gDQo+IEp1c3Qg
+cmVtb3ZlIHRoZSBmb3J3YXJkIGRlY2xhcmF0aW9ucyBhbmQgbW92ZSB0aGUgaW5pdGlhbGl6YXRp
+b25zIHVwDQo+IHNvIHRoYXQgdGhleSBjYW4gYmUgdXNlZCBpbiBzcF9nZXRfb2ZfdmVyc2lvbiBh
+bmQgc3BfZ2V0X2FjcGlfdmVyc2lvbi4NCg0KSSdtIG5vdCBnb2luZyB0byBvdXQgYW5kIG91dCBv
+YmplY3QgdG8gdGhpcyBqdXN0IHlldC4NCg0KSSBhbSBub3QgYSBjbGFuZyBleHBlcnQuIENhbiB5
+b3UgcGxlYXNlIHByb3ZpZGUgYSBtYWtlIGNvbW1hbmQgdGhhdCANCndvdWxkIGV4cGxhaW4gaG93
+IHlvdSBwcmVjaXBpdGF0ZWQgdGhpcyBjb21wbGFpbnQ/DQoNCg0KPiBSZXBvcnRlZC1ieTogTmlj
+ayBEZXNhdWxuaWVycyA8bmRlc2F1bG5pZXJzQGdvb2dsZS5jb20+DQo+IFNpZ25lZC1vZmYtYnk6
+IE5hdGhhbiBDaGFuY2VsbG9yIDxuYXRlY2hhbmNlbGxvckBnbWFpbC5jb20+DQo+IC0tLQ0KPiAg
+IGRyaXZlcnMvY3J5cHRvL2NjcC9zcC1wbGF0Zm9ybS5jIHwgNTMgKysrKysrKysrKysrKysrLS0t
+LS0tLS0tLS0tLS0tLS0NCj4gICAxIGZpbGUgY2hhbmdlZCwgMjUgaW5zZXJ0aW9ucygrKSwgMjgg
+ZGVsZXRpb25zKC0pDQo+IA0KPiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9jcnlwdG8vY2NwL3NwLXBs
+YXRmb3JtLmMgYi9kcml2ZXJzL2NyeXB0by9jY3Avc3AtcGxhdGZvcm0uYw0KPiBpbmRleCA3MTcz
+NGYyNTRmZDEuLmI3NWRjN2RiMmQ0YSAxMDA2NDQNCj4gLS0tIGEvZHJpdmVycy9jcnlwdG8vY2Nw
+L3NwLXBsYXRmb3JtLmMNCj4gKysrIGIvZHJpdmVycy9jcnlwdG8vY2NwL3NwLXBsYXRmb3JtLmMN
+Cj4gQEAgLTMzLDggKzMzLDMxIEBAIHN0cnVjdCBzcF9wbGF0Zm9ybSB7DQo+ICAgCXVuc2lnbmVk
+IGludCBpcnFfY291bnQ7DQo+ICAgfTsNCj4gICANCj4gLXN0YXRpYyBjb25zdCBzdHJ1Y3QgYWNw
+aV9kZXZpY2VfaWQgc3BfYWNwaV9tYXRjaFtdOw0KPiAtc3RhdGljIGNvbnN0IHN0cnVjdCBvZl9k
+ZXZpY2VfaWQgc3Bfb2ZfbWF0Y2hbXTsNCj4gK3N0YXRpYyBjb25zdCBzdHJ1Y3Qgc3BfZGV2X3Zk
+YXRhIGRldl92ZGF0YVtdID0gew0KPiArCXsNCj4gKwkJLmJhciA9IDAsDQo+ICsjaWZkZWYgQ09O
+RklHX0NSWVBUT19ERVZfU1BfQ0NQDQo+ICsJCS5jY3BfdmRhdGEgPSAmY2NwdjNfcGxhdGZvcm0s
+DQo+ICsjZW5kaWYNCj4gKwl9LA0KPiArfTsNCj4gKw0KPiArI2lmZGVmIENPTkZJR19BQ1BJDQo+
+ICtzdGF0aWMgY29uc3Qgc3RydWN0IGFjcGlfZGV2aWNlX2lkIHNwX2FjcGlfbWF0Y2hbXSA9IHsN
+Cj4gKwl7ICJBTURJMEMwMCIsIChrZXJuZWxfdWxvbmdfdCkmZGV2X3ZkYXRhWzBdIH0sDQo+ICsJ
+eyB9LA0KPiArfTsNCj4gK01PRFVMRV9ERVZJQ0VfVEFCTEUoYWNwaSwgc3BfYWNwaV9tYXRjaCk7
+DQo+ICsjZW5kaWYNCj4gKw0KPiArI2lmZGVmIENPTkZJR19PRg0KPiArc3RhdGljIGNvbnN0IHN0
+cnVjdCBvZl9kZXZpY2VfaWQgc3Bfb2ZfbWF0Y2hbXSA9IHsNCj4gKwl7IC5jb21wYXRpYmxlID0g
+ImFtZCxjY3Atc2VhdHRsZS12MWEiLA0KPiArCSAgLmRhdGEgPSAoY29uc3Qgdm9pZCAqKSZkZXZf
+dmRhdGFbMF0gfSwNCj4gKwl7IH0sDQo+ICt9Ow0KPiArTU9EVUxFX0RFVklDRV9UQUJMRShvZiwg
+c3Bfb2ZfbWF0Y2gpOw0KPiArI2VuZGlmDQo+ICAgDQo+ICAgc3RhdGljIHN0cnVjdCBzcF9kZXZf
+dmRhdGEgKnNwX2dldF9vZl92ZXJzaW9uKHN0cnVjdCBwbGF0Zm9ybV9kZXZpY2UgKnBkZXYpDQo+
+ICAgew0KPiBAQCAtMjAxLDMyICsyMjQsNiBAQCBzdGF0aWMgaW50IHNwX3BsYXRmb3JtX3Jlc3Vt
+ZShzdHJ1Y3QgcGxhdGZvcm1fZGV2aWNlICpwZGV2KQ0KPiAgIH0NCj4gICAjZW5kaWYNCj4gICAN
+Cj4gLXN0YXRpYyBjb25zdCBzdHJ1Y3Qgc3BfZGV2X3ZkYXRhIGRldl92ZGF0YVtdID0gew0KPiAt
+CXsNCj4gLQkJLmJhciA9IDAsDQo+IC0jaWZkZWYgQ09ORklHX0NSWVBUT19ERVZfU1BfQ0NQDQo+
+IC0JCS5jY3BfdmRhdGEgPSAmY2NwdjNfcGxhdGZvcm0sDQo+IC0jZW5kaWYNCj4gLQl9LA0KPiAt
+fTsNCj4gLQ0KPiAtI2lmZGVmIENPTkZJR19BQ1BJDQo+IC1zdGF0aWMgY29uc3Qgc3RydWN0IGFj
+cGlfZGV2aWNlX2lkIHNwX2FjcGlfbWF0Y2hbXSA9IHsNCj4gLQl7ICJBTURJMEMwMCIsIChrZXJu
+ZWxfdWxvbmdfdCkmZGV2X3ZkYXRhWzBdIH0sDQo+IC0JeyB9LA0KPiAtfTsNCj4gLU1PRFVMRV9E
+RVZJQ0VfVEFCTEUoYWNwaSwgc3BfYWNwaV9tYXRjaCk7DQo+IC0jZW5kaWYNCj4gLQ0KPiAtI2lm
+ZGVmIENPTkZJR19PRg0KPiAtc3RhdGljIGNvbnN0IHN0cnVjdCBvZl9kZXZpY2VfaWQgc3Bfb2Zf
+bWF0Y2hbXSA9IHsNCj4gLQl7IC5jb21wYXRpYmxlID0gImFtZCxjY3Atc2VhdHRsZS12MWEiLA0K
+PiAtCSAgLmRhdGEgPSAoY29uc3Qgdm9pZCAqKSZkZXZfdmRhdGFbMF0gfSwNCj4gLQl7IH0sDQo+
+IC19Ow0KPiAtTU9EVUxFX0RFVklDRV9UQUJMRShvZiwgc3Bfb2ZfbWF0Y2gpOw0KPiAtI2VuZGlm
+DQo+IC0NCj4gICBzdGF0aWMgc3RydWN0IHBsYXRmb3JtX2RyaXZlciBzcF9wbGF0Zm9ybV9kcml2
+ZXIgPSB7DQo+ICAgCS5kcml2ZXIgPSB7DQo+ICAgCQkubmFtZSA9ICJjY3AiLA0KPiANCg0K
