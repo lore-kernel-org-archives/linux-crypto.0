@@ -1,15 +1,12 @@
-From: Joe Perches <joe@perches.com>
-Subject: Re: [PATCH net-next v6 02/23] zinc: introduce minimal cryptography
- library
-Date: Tue, 25 Sep 2018 13:05:06 -0700
-Message-ID: <748429eee2fc77afd01630c24bd2cf66a545aec5.camel@perches.com>
-References: <20180925145622.29959-1-Jason@zx2c4.com>
-         <20180925145622.29959-3-Jason@zx2c4.com>
-         <2b5f2df2f1278c118a913259a44efdf589719293.camel@perches.com>
-         <CAHmME9qLzFHPm2aaEKOmjBA95-c3CZuT+kQiuksLRRWQ_ad2sw@mail.gmail.com>
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: Re: [PATCH net-next v6 02/23] zinc: introduce minimal cryptography library
+Date: Tue, 25 Sep 2018 22:12:54 +0200
+Message-ID: <CAHmME9peVqXDq7hmFZ+4cus+Y97NHS-TyBKF9GkdLvixdmq6hw@mail.gmail.com>
+References: <20180925145622.29959-1-Jason@zx2c4.com> <20180925145622.29959-3-Jason@zx2c4.com>
+ <2b5f2df2f1278c118a913259a44efdf589719293.camel@perches.com>
+ <CAHmME9qLzFHPm2aaEKOmjBA95-c3CZuT+kQiuksLRRWQ_ad2sw@mail.gmail.com> <748429eee2fc77afd01630c24bd2cf66a545aec5.camel@perches.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="UTF-8"
 Cc: LKML <linux-kernel@vger.kernel.org>,
         Netdev <netdev@vger.kernel.org>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
@@ -18,41 +15,42 @@ Cc: LKML <linux-kernel@vger.kernel.org>,
         Samuel Neves <sneves@dei.uc.pt>,
         Andrew Lutomirski <luto@kernel.org>,
         Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+To: Joe Perches <joe@perches.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAHmME9qLzFHPm2aaEKOmjBA95-c3CZuT+kQiuksLRRWQ_ad2sw@mail.gmail.com>
+In-Reply-To: <748429eee2fc77afd01630c24bd2cf66a545aec5.camel@perches.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, 2018-09-25 at 21:43 +0200, Jason A. Donenfeld wrote:
-> On Tue, Sep 25, 2018 at 8:33 PM Joe Perches <joe@perches.com> wrote:
-> > I think the -Dpr_fmt is especially odd and not
-> > really acceptable as it not used anywhere else
-> > in the kernel.
-> 
-> There are about 2000 cases in the kernel of the same '#define
-> pr_fmt...' being pasted into the top of the file, which seems a bit
-> cumbersome. Rather than having to paste that into each and every file
-> that I pr_err from,
+Hi Joe,
 
-As far as I can tell, zinc doesn't use pr_err, just
-pr_info in all the selftest blocks which are only
-used when DEBUG is #defined.
+On Tue, Sep 25, 2018 at 10:05 PM Joe Perches <joe@perches.com> wrote:
+> As far as I can tell, zinc doesn't use pr_err, just
+> pr_info
 
-Perhaps all the pr_info uses should use pr_debug
-instead as well as dynamic debugging which already
-optionally adds KBUILD_MODINFO.
+Yes, pr_info, not pr_err. Apologies for my imprecision. But the
+distinction does not matter at all, since they both use pr_fmt in
+exactly the same way, which is sufficient for the purposes of this
+discussion.
 
->  why can't I just do this from the makefile, since
-> I want that same pr_fmt to copy the whole directory?
+> >  why can't I just do this from the makefile, since
+> > I want that same pr_fmt to copy the whole directory?
+>
+> Ideally all of those
+>
+> #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+>
+> uses will be removed one day soon and the default
+> will change.
+>
+> https://lore.kernel.org/patchwork/cover/904507/
+>
+> This slightly odd use might complicate that.
 
-Ideally all of those
+Oh, that's good to see. In this case, I'm prefixing all of them with
+zinc: instead of zinc_chacha20: (the modname), but I wouldn't object
+to that changing to KBUILD_MODNAME if your patch lands. IOW, once your
+patch lands, I'm happy to revisit this discussion and fall back to
+using the sane defaults you're in the process of setting up for
+everyone.
 
-#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
-
-uses will be removed one day soon and the default
-will change.
-
-https://lore.kernel.org/patchwork/cover/904507/
-
-This slightly odd use might complicate that.
+Jason
