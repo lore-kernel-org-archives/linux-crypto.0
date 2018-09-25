@@ -1,67 +1,86 @@
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [PATCH v8 7/9] crypto: qat: Remove VLA usage
-Date: Tue, 25 Sep 2018 18:12:10 +0200
-Message-ID: <CAK8P3a3kiH-a+JG8FqUw7nc_hk+9z-FdsGFT57SxR83W32zKzQ@mail.gmail.com>
-References: <20180807211843.47586-1-keescook@chromium.org> <20180807211843.47586-8-keescook@chromium.org>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH crypto-next 07/23] block: cryptoloop: Remove VLA usage of skcipher
+Date: Tue, 25 Sep 2018 18:16:39 +0200
+Message-ID: <CAKv+Gu_p2UgYMZ5jEUudruUOPYQEF-=VMou=xXbj_rd+-Lxktg@mail.gmail.com>
+References: <20180919021100.3380-1-keescook@chromium.org> <20180919021100.3380-8-keescook@chromium.org>
+ <CAKv+Gu8ynaVi1KCMNsjCU0ucAjFFku=ourh9Yc9Rizoc4ztvOQ@mail.gmail.com>
+ <CAGXu5jLw3+nvb9opPeoCyH0MhyVK5UY7H5qeQ2b8GFTUGDGrUQ@mail.gmail.com>
+ <CAKv+Gu-xKWsiegZXnsMvmMVgKTo7S2cm4wEqdaL7w9z64X7SAA@mail.gmail.com> <9c71afda-a668-10b3-842e-26f72e425691@kernel.dk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        Eric Biggers <ebiggers@google.com>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Tudor Ambarus <tudor.ambarus@microchip.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        Will Deacon <will.deacon@arm.com>,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Matthew Wilcox <willy@infradead.org>,
-        David Miller <davem@davemloft.net>,
-        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+Cc: Kees Cook <keescook@chromium.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-block@vger.kernel.org, Eric Biggers <ebiggers@google.com>,
         "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>, dm-devel@redhat.com,
-        qa
-To: Kees Cook <keescook@chromium.org>
+        <linux-crypto@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Jens Axboe <axboe@kernel.dk>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180807211843.47586-8-keescook@chromium.org>
+In-Reply-To: <9c71afda-a668-10b3-842e-26f72e425691@kernel.dk>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Aug 7, 2018 at 11:18 PM Kees Cook <keescook@chromium.org> wrote:
+On Tue, 25 Sep 2018 at 18:03, Jens Axboe <axboe@kernel.dk> wrote:
 >
-> In the quest to remove all stack VLA usage from the kernel[1], this uses
-> the new upper bound for the stack buffer. Also adds a sanity check.
+> On 9/25/18 3:25 AM, Ard Biesheuvel wrote:
+> > On Mon, 24 Sep 2018 at 19:53, Kees Cook <keescook@chromium.org> wrote:
+> >>
+> >> On Mon, Sep 24, 2018 at 4:52 AM, Ard Biesheuvel
+> >> <ard.biesheuvel@linaro.org> wrote:
+> >>> On Wed, 19 Sep 2018 at 04:11, Kees Cook <keescook@chromium.org> wrote:
+> >>>> @@ -119,7 +119,7 @@ cryptoloop_transfer(struct loop_device *lo, int cmd,
+> >>>>         unsigned in_offs, out_offs;
+> >>>>         int err;
+> >>>>
+> >>>> -       skcipher_request_set_tfm(req, tfm);
+> >>>> +       skcipher_request_set_sync_tfm(req, tfm);
+> >>>>         skcipher_request_set_callback(req, CRYPTO_TFM_REQ_MAY_SLEEP,
+> >>>>                                       NULL, NULL);
+> >>>>
+> >>>
+> >>> Does this work?
+> >>
+> >> Everything is a direct wrapper for existing types and functions, so I
+> >> wouldn't expect any functional change. I haven't been able to test
+> >> this particular interface, though. cryptoloop is very deprecated,
+> >> isn't it?
+> >>
+> >
+> > Ah yes, I managed to confuse myself there. This looks all fine to me.
+> >
+> > In any case, this is another example where we may decide to fix the
+> > code rather than retain the request allocation on the stack (but that
+> > is Jens's call ultimately, I suppose)
+> >
+> > diff --git a/drivers/block/cryptoloop.c b/drivers/block/cryptoloop.c
+> > index 7033a4beda66..5ed2167219ba 100644
+> > --- a/drivers/block/cryptoloop.c
+> > +++ b/drivers/block/cryptoloop.c
+> > @@ -110,7 +110,7 @@ cryptoloop_transfer(struct loop_device *lo, int cmd,
+> >                     int size, sector_t IV)
+> >  {
+> >         struct crypto_skcipher *tfm = lo->key_data;
+> > -       SKCIPHER_REQUEST_ON_STACK(req, tfm);
+> > +       struct skcipher_request *req;
+> >         struct scatterlist sg_out;
+> >         struct scatterlist sg_in;
+> >
+> > @@ -119,7 +119,10 @@ cryptoloop_transfer(struct loop_device *lo, int cmd,
+> >         unsigned in_offs, out_offs;
+> >         int err;
+> >
+> > -       skcipher_request_set_tfm(req, tfm);
+> > +       req = skcipher_request_alloc(tfm, GFP_NOIO);
+> > +       if (!req)
+> > +               return -ENOMEM;
 >
-> [1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
+> Is this going to be reliable? ->transfer() is called when we're doing IO,
+> and you'd normally need a mempool backed allocation to make this safe
+> and guarantee forward progress.
 >
-> Signed-off-by: Kees Cook <keescook@chromium.org>
 
-After rebasing to linux-next, I now get a warning about this file:
-
-drivers/crypto/qat/qat_common/qat_algs.c: In function 'qat_alg_do_precomputes':
-drivers/crypto/qat/qat_common/qat_algs.c:257:1: error: the frame size
-of 1112 bytes is larger than 1024 bytes [-Werror=frame-larger-than=]
-
-I assume it was already possible to get into that state with the VLA,
-but it seems bad enough that I think we need to do something
-about it.
-
-The large stack variables add up to 1084 bytes, which fully explains
-how we got here:
-
-        SHASH_DESC_ON_STACK(shash, ctx->hash_tfm); /* 360 */
-        struct sha1_state sha1;  /* 92 */
-        struct sha256_state sha256; /* 104 */
-        struct sha512_state sha512; /* 208 */
-        char ipad[MAX_ALGAPI_BLOCKSIZE]; /* 160 */
-        char opad[MAX_ALGAPI_BLOCKSIZE]; /* 160 */
-
-The question is what we can do about it. One simple step I've tried
-is to move the sha1/sha256/sha512 into a union, which saves around
-200 bytes and should bring us (slightly) below the warning
-limit, but I suspect we can do better than that. Any ideas?
-
-        Arnd
+As far as I can tell, this function is only called from
+lo_read_transfer/lo_write_transfer, both of which do an unconditional
+alloc_page(GFP_NOIO), which is why I assumed that kmalloc(GFP_NOIO)
+would be permissible in the same context. Are you saying this may not
+be the case?
