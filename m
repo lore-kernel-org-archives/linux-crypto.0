@@ -1,3474 +1,1789 @@
 From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: [PATCH net-next v6 05/23] zinc: import Andy Polyakov's ChaCha20 ARM and ARM64 implementations
-Date: Tue, 25 Sep 2018 16:56:04 +0200
-Message-ID: <20180925145622.29959-6-Jason@zx2c4.com>
+Subject: [PATCH net-next v6 09/23] zinc: Poly1305 generic C implementations and selftest
+Date: Tue, 25 Sep 2018 16:56:08 +0200
+Message-ID: <20180925145622.29959-10-Jason@zx2c4.com>
 References: <20180925145622.29959-1-Jason@zx2c4.com>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
         Samuel Neves <sneves@dei.uc.pt>,
         Andy Lutomirski <luto@kernel.org>,
-        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
-        Andy Polyakov <appro@openssl.org>,
-        Russell King <linux@armlinux.org.uk>,
-        linux-arm-kernel@lists.infradead.org
+        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>
 To: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
         linux-crypto@vger.kernel.org, davem@davemloft.net,
         gregkh@linuxfoundation.org
-Return-path: <netdev-owner@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <20180925145622.29959-1-Jason@zx2c4.com>
-Sender: netdev-owner@vger.kernel.org
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-These NEON and non-NEON implementations come from Andy Polyakov's
-implementation, and are included here in raw form without modification,
-so that subsequent commits that fix these up for the kernel can see how
-it has changed. This awkward commit splitting has been requested for the
-ARM[64] implementations in particular.
+These two C implementations -- a 32x32 one and a 64x64 one, depending on
+the platform -- come from Andrew Moon's public domain poly1305-donna
+portable code, modified for usage in the kernel and for usage with
+accelerated primitives.
 
-While this is CRYPTOGAMS code, the originating code for this happens to
-be the same as OpenSSL's commit 87cc649f30aaf69b351701875b9dac07c29ce8a2
+Information: https://cr.yp.to/mac.html
 
 Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
-Based-on-code-from: Andy Polyakov <appro@openssl.org>
 Cc: Samuel Neves <sneves@dei.uc.pt>
 Cc: Andy Lutomirski <luto@kernel.org>
 Cc: Greg KH <gregkh@linuxfoundation.org>
 Cc: Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>
-Cc: Andy Polyakov <appro@openssl.org>
-Cc: Russell King <linux@armlinux.org.uk>
-Cc: linux-arm-kernel@lists.infradead.org
 ---
- lib/zinc/chacha20/chacha20-arm-cryptogams.S   | 1440 ++++++++++++
- lib/zinc/chacha20/chacha20-arm64-cryptogams.S | 1973 +++++++++++++++++
- 2 files changed, 3413 insertions(+)
- create mode 100644 lib/zinc/chacha20/chacha20-arm-cryptogams.S
- create mode 100644 lib/zinc/chacha20/chacha20-arm64-cryptogams.S
+ include/zinc/poly1305.h              |   31 +
+ lib/zinc/Kconfig                     |    3 +
+ lib/zinc/Makefile                    |    3 +
+ lib/zinc/poly1305/poly1305-donna32.h |  205 +++++
+ lib/zinc/poly1305/poly1305-donna64.h |  182 +++++
+ lib/zinc/poly1305/poly1305.c         |  155 ++++
+ lib/zinc/selftest/poly1305.h         | 1112 ++++++++++++++++++++++++++
+ 7 files changed, 1691 insertions(+)
+ create mode 100644 include/zinc/poly1305.h
+ create mode 100644 lib/zinc/poly1305/poly1305-donna32.h
+ create mode 100644 lib/zinc/poly1305/poly1305-donna64.h
+ create mode 100644 lib/zinc/poly1305/poly1305.c
+ create mode 100644 lib/zinc/selftest/poly1305.h
 
-diff --git a/lib/zinc/chacha20/chacha20-arm-cryptogams.S b/lib/zinc/chacha20/chacha20-arm-cryptogams.S
+diff --git a/include/zinc/poly1305.h b/include/zinc/poly1305.h
 new file mode 100644
-index 000000000000..05a3a9e6e93f
+index 000000000000..13fe0e50fc3c
 --- /dev/null
-+++ b/lib/zinc/chacha20/chacha20-arm-cryptogams.S
-@@ -0,0 +1,1440 @@
-+/* SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause */
++++ b/include/zinc/poly1305.h
+@@ -0,0 +1,31 @@
++/* SPDX-License-Identifier: GPL-2.0 OR MIT */
 +/*
-+ * Copyright (C) 2006-2017 CRYPTOGAMS by <appro@openssl.org>. All Rights Reserved.
++ * Copyright (C) 2015-2018 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
 + */
 +
-+#include "arm_arch.h"
-+
-+.text
-+#if defined(__thumb2__) || defined(__clang__)
-+.syntax	unified
-+#endif
-+#if defined(__thumb2__)
-+.thumb
-+#else
-+.code	32
-+#endif
-+
-+#if defined(__thumb2__) || defined(__clang__)
-+#define ldrhsb	ldrbhs
-+#endif
-+
-+.align	5
-+.Lsigma:
-+.long	0x61707865,0x3320646e,0x79622d32,0x6b206574	@ endian-neutral
-+.Lone:
-+.long	1,0,0,0
-+.Lrot8:
-+.long	0x02010003,0x06050407
-+#if __ARM_MAX_ARCH__>=7
-+.LOPENSSL_armcap:
-+.word   OPENSSL_armcap_P-.LChaCha20_ctr32
-+#else
-+.word	-1
-+#endif
-+
-+.globl	ChaCha20_ctr32
-+.type	ChaCha20_ctr32,%function
-+.align	5
-+ChaCha20_ctr32:
-+.LChaCha20_ctr32:
-+	ldr	r12,[sp,#0]		@ pull pointer to counter and nonce
-+	stmdb	sp!,{r0-r2,r4-r11,lr}
-+#if __ARM_ARCH__<7 && !defined(__thumb2__)
-+	sub	r14,pc,#16		@ ChaCha20_ctr32
-+#else
-+	adr	r14,.LChaCha20_ctr32
-+#endif
-+	cmp	r2,#0			@ len==0?
-+#ifdef	__thumb2__
-+	itt	eq
-+#endif
-+	addeq	sp,sp,#4*3
-+	beq	.Lno_data
-+#if __ARM_MAX_ARCH__>=7
-+	cmp	r2,#192			@ test len
-+	bls	.Lshort
-+	ldr	r4,[r14,#-24]
-+	ldr	r4,[r14,r4]
-+# ifdef	__APPLE__
-+	ldr	r4,[r4]
-+# endif
-+	tst	r4,#ARMV7_NEON
-+	bne	.LChaCha20_neon
-+.Lshort:
-+#endif
-+	ldmia	r12,{r4-r7}		@ load counter and nonce
-+	sub	sp,sp,#4*(16)		@ off-load area
-+	sub	r14,r14,#64		@ .Lsigma
-+	stmdb	sp!,{r4-r7}		@ copy counter and nonce
-+	ldmia	r3,{r4-r11}		@ load key
-+	ldmia	r14,{r0-r3}		@ load sigma
-+	stmdb	sp!,{r4-r11}		@ copy key
-+	stmdb	sp!,{r0-r3}		@ copy sigma
-+	str	r10,[sp,#4*(16+10)]	@ off-load "rx"
-+	str	r11,[sp,#4*(16+11)]	@ off-load "rx"
-+	b	.Loop_outer_enter
-+
-+.align	4
-+.Loop_outer:
-+	ldmia	sp,{r0-r9}		@ load key material
-+	str	r11,[sp,#4*(32+2)]	@ save len
-+	str	r12,  [sp,#4*(32+1)]	@ save inp
-+	str	r14,  [sp,#4*(32+0)]	@ save out
-+.Loop_outer_enter:
-+	ldr	r11, [sp,#4*(15)]
-+	 mov	r4,r4,ror#19	@ twist b[0..3]
-+	ldr	r12,[sp,#4*(12)]	@ modulo-scheduled load
-+	 mov	r5,r5,ror#19
-+	ldr	r10, [sp,#4*(13)]
-+	 mov	r6,r6,ror#19
-+	ldr	r14,[sp,#4*(14)]
-+	 mov	r7,r7,ror#19
-+	mov	r11,r11,ror#8	@ twist d[0..3]
-+	mov	r12,r12,ror#8
-+	mov	r10,r10,ror#8
-+	mov	r14,r14,ror#8
-+	str	r11, [sp,#4*(16+15)]
-+	mov	r11,#10
-+	b	.Loop
-+
-+.align	4
-+.Loop:
-+	subs	r11,r11,#1
-+	add	r0,r0,r4,ror#13
-+	add	r1,r1,r5,ror#13
-+	eor	r12,r0,r12,ror#24
-+	eor	r10,r1,r10,ror#24
-+	add	r8,r8,r12,ror#16
-+	add	r9,r9,r10,ror#16
-+	eor	r4,r8,r4,ror#13
-+	eor	r5,r9,r5,ror#13
-+	add	r0,r0,r4,ror#20
-+	add	r1,r1,r5,ror#20
-+	eor	r12,r0,r12,ror#16
-+	eor	r10,r1,r10,ror#16
-+	add	r8,r8,r12,ror#24
-+	str	r10,[sp,#4*(16+13)]
-+	add	r9,r9,r10,ror#24
-+	ldr	r10,[sp,#4*(16+15)]
-+	str	r8,[sp,#4*(16+8)]
-+	eor	r4,r4,r8,ror#12
-+	str	r9,[sp,#4*(16+9)]
-+	eor	r5,r5,r9,ror#12
-+	ldr	r8,[sp,#4*(16+10)]
-+	add	r2,r2,r6,ror#13
-+	ldr	r9,[sp,#4*(16+11)]
-+	add	r3,r3,r7,ror#13
-+	eor	r14,r2,r14,ror#24
-+	eor	r10,r3,r10,ror#24
-+	add	r8,r8,r14,ror#16
-+	add	r9,r9,r10,ror#16
-+	eor	r6,r8,r6,ror#13
-+	eor	r7,r9,r7,ror#13
-+	add	r2,r2,r6,ror#20
-+	add	r3,r3,r7,ror#20
-+	eor	r14,r2,r14,ror#16
-+	eor	r10,r3,r10,ror#16
-+	add	r8,r8,r14,ror#24
-+	add	r9,r9,r10,ror#24
-+	eor	r6,r6,r8,ror#12
-+	eor	r7,r7,r9,ror#12
-+	add	r0,r0,r5,ror#13
-+	add	r1,r1,r6,ror#13
-+	eor	r10,r0,r10,ror#24
-+	eor	r12,r1,r12,ror#24
-+	add	r8,r8,r10,ror#16
-+	add	r9,r9,r12,ror#16
-+	eor	r5,r8,r5,ror#13
-+	eor	r6,r9,r6,ror#13
-+	add	r0,r0,r5,ror#20
-+	add	r1,r1,r6,ror#20
-+	eor	r10,r0,r10,ror#16
-+	eor	r12,r1,r12,ror#16
-+	str	r10,[sp,#4*(16+15)]
-+	add	r8,r8,r10,ror#24
-+	ldr	r10,[sp,#4*(16+13)]
-+	add	r9,r9,r12,ror#24
-+	str	r8,[sp,#4*(16+10)]
-+	eor	r5,r5,r8,ror#12
-+	str	r9,[sp,#4*(16+11)]
-+	eor	r6,r6,r9,ror#12
-+	ldr	r8,[sp,#4*(16+8)]
-+	add	r2,r2,r7,ror#13
-+	ldr	r9,[sp,#4*(16+9)]
-+	add	r3,r3,r4,ror#13
-+	eor	r10,r2,r10,ror#24
-+	eor	r14,r3,r14,ror#24
-+	add	r8,r8,r10,ror#16
-+	add	r9,r9,r14,ror#16
-+	eor	r7,r8,r7,ror#13
-+	eor	r4,r9,r4,ror#13
-+	add	r2,r2,r7,ror#20
-+	add	r3,r3,r4,ror#20
-+	eor	r10,r2,r10,ror#16
-+	eor	r14,r3,r14,ror#16
-+	add	r8,r8,r10,ror#24
-+	add	r9,r9,r14,ror#24
-+	eor	r7,r7,r8,ror#12
-+	eor	r4,r4,r9,ror#12
-+	bne	.Loop
-+
-+	ldr	r11,[sp,#4*(32+2)]	@ load len
-+
-+	str	r8, [sp,#4*(16+8)]	@ modulo-scheduled store
-+	str	r9, [sp,#4*(16+9)]
-+	str	r12,[sp,#4*(16+12)]
-+	str	r10, [sp,#4*(16+13)]
-+	str	r14,[sp,#4*(16+14)]
-+
-+	@ at this point we have first half of 512-bit result in
-+	@ rx and second half at sp+4*(16+8)
-+
-+	cmp	r11,#64		@ done yet?
-+#ifdef	__thumb2__
-+	itete	lo
-+#endif
-+	addlo	r12,sp,#4*(0)		@ shortcut or ...
-+	ldrhs	r12,[sp,#4*(32+1)]	@ ... load inp
-+	addlo	r14,sp,#4*(0)		@ shortcut or ...
-+	ldrhs	r14,[sp,#4*(32+0)]	@ ... load out
-+
-+	ldr	r8,[sp,#4*(0)]	@ load key material
-+	ldr	r9,[sp,#4*(1)]
-+
-+#if __ARM_ARCH__>=6 || !defined(__ARMEB__)
-+# if __ARM_ARCH__<7
-+	orr	r10,r12,r14
-+	tst	r10,#3		@ are input and output aligned?
-+	ldr	r10,[sp,#4*(2)]
-+	bne	.Lunaligned
-+	cmp	r11,#64		@ restore flags
-+# else
-+	ldr	r10,[sp,#4*(2)]
-+# endif
-+	ldr	r11,[sp,#4*(3)]
-+
-+	add	r0,r0,r8	@ accumulate key material
-+	add	r1,r1,r9
-+# ifdef	__thumb2__
-+	itt	hs
-+# endif
-+	ldrhs	r8,[r12],#16		@ load input
-+	ldrhs	r9,[r12,#-12]
-+
-+	add	r2,r2,r10
-+	add	r3,r3,r11
-+# ifdef	__thumb2__
-+	itt	hs
-+# endif
-+	ldrhs	r10,[r12,#-8]
-+	ldrhs	r11,[r12,#-4]
-+# if __ARM_ARCH__>=6 && defined(__ARMEB__)
-+	rev	r0,r0
-+	rev	r1,r1
-+	rev	r2,r2
-+	rev	r3,r3
-+# endif
-+# ifdef	__thumb2__
-+	itt	hs
-+# endif
-+	eorhs	r0,r0,r8	@ xor with input
-+	eorhs	r1,r1,r9
-+	 add	r8,sp,#4*(4)
-+	str	r0,[r14],#16		@ store output
-+# ifdef	__thumb2__
-+	itt	hs
-+# endif
-+	eorhs	r2,r2,r10
-+	eorhs	r3,r3,r11
-+	 ldmia	r8,{r8-r11}	@ load key material
-+	str	r1,[r14,#-12]
-+	str	r2,[r14,#-8]
-+	str	r3,[r14,#-4]
-+
-+	add	r4,r8,r4,ror#13 @ accumulate key material
-+	add	r5,r9,r5,ror#13
-+# ifdef	__thumb2__
-+	itt	hs
-+# endif
-+	ldrhs	r8,[r12],#16		@ load input
-+	ldrhs	r9,[r12,#-12]
-+	add	r6,r10,r6,ror#13
-+	add	r7,r11,r7,ror#13
-+# ifdef	__thumb2__
-+	itt	hs
-+# endif
-+	ldrhs	r10,[r12,#-8]
-+	ldrhs	r11,[r12,#-4]
-+# if __ARM_ARCH__>=6 && defined(__ARMEB__)
-+	rev	r4,r4
-+	rev	r5,r5
-+	rev	r6,r6
-+	rev	r7,r7
-+# endif
-+# ifdef	__thumb2__
-+	itt	hs
-+# endif
-+	eorhs	r4,r4,r8
-+	eorhs	r5,r5,r9
-+	 add	r8,sp,#4*(8)
-+	str	r4,[r14],#16		@ store output
-+# ifdef	__thumb2__
-+	itt	hs
-+# endif
-+	eorhs	r6,r6,r10
-+	eorhs	r7,r7,r11
-+	str	r5,[r14,#-12]
-+	 ldmia	r8,{r8-r11}	@ load key material
-+	str	r6,[r14,#-8]
-+	 add	r0,sp,#4*(16+8)
-+	str	r7,[r14,#-4]
-+
-+	ldmia	r0,{r0-r7}	@ load second half
-+
-+	add	r0,r0,r8	@ accumulate key material
-+	add	r1,r1,r9
-+# ifdef	__thumb2__
-+	itt	hs
-+# endif
-+	ldrhs	r8,[r12],#16		@ load input
-+	ldrhs	r9,[r12,#-12]
-+# ifdef	__thumb2__
-+	itt	hi
-+# endif
-+	 strhi	r10,[sp,#4*(16+10)]	@ copy "rx" while at it
-+	 strhi	r11,[sp,#4*(16+11)]	@ copy "rx" while at it
-+	add	r2,r2,r10
-+	add	r3,r3,r11
-+# ifdef	__thumb2__
-+	itt	hs
-+# endif
-+	ldrhs	r10,[r12,#-8]
-+	ldrhs	r11,[r12,#-4]
-+# if __ARM_ARCH__>=6 && defined(__ARMEB__)
-+	rev	r0,r0
-+	rev	r1,r1
-+	rev	r2,r2
-+	rev	r3,r3
-+# endif
-+# ifdef	__thumb2__
-+	itt	hs
-+# endif
-+	eorhs	r0,r0,r8
-+	eorhs	r1,r1,r9
-+	 add	r8,sp,#4*(12)
-+	str	r0,[r14],#16		@ store output
-+# ifdef	__thumb2__
-+	itt	hs
-+# endif
-+	eorhs	r2,r2,r10
-+	eorhs	r3,r3,r11
-+	str	r1,[r14,#-12]
-+	 ldmia	r8,{r8-r11}	@ load key material
-+	str	r2,[r14,#-8]
-+	str	r3,[r14,#-4]
-+
-+	add	r4,r8,r4,ror#24 @ accumulate key material
-+	add	r5,r9,r5,ror#24
-+# ifdef	__thumb2__
-+	itt	hi
-+# endif
-+	 addhi	r8,r8,#1		@ next counter value
-+	 strhi	r8,[sp,#4*(12)]	@ save next counter value
-+# ifdef	__thumb2__
-+	itt	hs
-+# endif
-+	ldrhs	r8,[r12],#16		@ load input
-+	ldrhs	r9,[r12,#-12]
-+	add	r6,r10,r6,ror#24
-+	add	r7,r11,r7,ror#24
-+# ifdef	__thumb2__
-+	itt	hs
-+# endif
-+	ldrhs	r10,[r12,#-8]
-+	ldrhs	r11,[r12,#-4]
-+# if __ARM_ARCH__>=6 && defined(__ARMEB__)
-+	rev	r4,r4
-+	rev	r5,r5
-+	rev	r6,r6
-+	rev	r7,r7
-+# endif
-+# ifdef	__thumb2__
-+	itt	hs
-+# endif
-+	eorhs	r4,r4,r8
-+	eorhs	r5,r5,r9
-+# ifdef	__thumb2__
-+	 it	ne
-+# endif
-+	 ldrne	r8,[sp,#4*(32+2)]	@ re-load len
-+# ifdef	__thumb2__
-+	itt	hs
-+# endif
-+	eorhs	r6,r6,r10
-+	eorhs	r7,r7,r11
-+	str	r4,[r14],#16		@ store output
-+	str	r5,[r14,#-12]
-+# ifdef	__thumb2__
-+	it	hs
-+# endif
-+	 subhs	r11,r8,#64		@ len-=64
-+	str	r6,[r14,#-8]
-+	str	r7,[r14,#-4]
-+	bhi	.Loop_outer
-+
-+	beq	.Ldone
-+# if __ARM_ARCH__<7
-+	b	.Ltail
-+
-+.align	4
-+.Lunaligned:				@ unaligned endian-neutral path
-+	cmp	r11,#64		@ restore flags
-+# endif
-+#endif
-+#if __ARM_ARCH__<7
-+	ldr	r11,[sp,#4*(3)]
-+	add	r0,r8,r0	@ accumulate key material
-+	add	r1,r9,r1
-+	add	r2,r10,r2
-+# ifdef	__thumb2__
-+	itete	lo
-+# endif
-+	eorlo	r8,r8,r8		@ zero or ...
-+	ldrhsb	r8,[r12],#16			@ ... load input
-+	eorlo	r9,r9,r9
-+	ldrhsb	r9,[r12,#-12]
-+
-+	add	r3,r11,r3
-+# ifdef	__thumb2__
-+	itete	lo
-+# endif
-+	eorlo	r10,r10,r10
-+	ldrhsb	r10,[r12,#-8]
-+	eorlo	r11,r11,r11
-+	ldrhsb	r11,[r12,#-4]
-+
-+	eor	r0,r8,r0		@ xor with input (or zero)
-+	eor	r1,r9,r1
-+# ifdef	__thumb2__
-+	itt	hs
-+# endif
-+	ldrhsb	r8,[r12,#-15]		@ load more input
-+	ldrhsb	r9,[r12,#-11]
-+	eor	r2,r10,r2
-+	 strb	r0,[r14],#16		@ store output
-+	eor	r3,r11,r3
-+# ifdef	__thumb2__
-+	itt	hs
-+# endif
-+	ldrhsb	r10,[r12,#-7]
-+	ldrhsb	r11,[r12,#-3]
-+	 strb	r1,[r14,#-12]
-+	eor	r0,r8,r0,lsr#8
-+	 strb	r2,[r14,#-8]
-+	eor	r1,r9,r1,lsr#8
-+# ifdef	__thumb2__
-+	itt	hs
-+# endif
-+	ldrhsb	r8,[r12,#-14]		@ load more input
-+	ldrhsb	r9,[r12,#-10]
-+	 strb	r3,[r14,#-4]
-+	eor	r2,r10,r2,lsr#8
-+	 strb	r0,[r14,#-15]
-+	eor	r3,r11,r3,lsr#8
-+# ifdef	__thumb2__
-+	itt	hs
-+# endif
-+	ldrhsb	r10,[r12,#-6]
-+	ldrhsb	r11,[r12,#-2]
-+	 strb	r1,[r14,#-11]
-+	eor	r0,r8,r0,lsr#8
-+	 strb	r2,[r14,#-7]
-+	eor	r1,r9,r1,lsr#8
-+# ifdef	__thumb2__
-+	itt	hs
-+# endif
-+	ldrhsb	r8,[r12,#-13]		@ load more input
-+	ldrhsb	r9,[r12,#-9]
-+	 strb	r3,[r14,#-3]
-+	eor	r2,r10,r2,lsr#8
-+	 strb	r0,[r14,#-14]
-+	eor	r3,r11,r3,lsr#8
-+# ifdef	__thumb2__
-+	itt	hs
-+# endif
-+	ldrhsb	r10,[r12,#-5]
-+	ldrhsb	r11,[r12,#-1]
-+	 strb	r1,[r14,#-10]
-+	 strb	r2,[r14,#-6]
-+	eor	r0,r8,r0,lsr#8
-+	 strb	r3,[r14,#-2]
-+	eor	r1,r9,r1,lsr#8
-+	 strb	r0,[r14,#-13]
-+	eor	r2,r10,r2,lsr#8
-+	 strb	r1,[r14,#-9]
-+	eor	r3,r11,r3,lsr#8
-+	 strb	r2,[r14,#-5]
-+	 strb	r3,[r14,#-1]
-+	add	r8,sp,#4*(4+0)
-+	ldmia	r8,{r8-r11}		@ load key material
-+	add	r0,sp,#4*(16+8)
-+	add	r4,r8,r4,ror#13	@ accumulate key material
-+	add	r5,r9,r5,ror#13
-+	add	r6,r10,r6,ror#13
-+# ifdef	__thumb2__
-+	itete	lo
-+# endif
-+	eorlo	r8,r8,r8		@ zero or ...
-+	ldrhsb	r8,[r12],#16			@ ... load input
-+	eorlo	r9,r9,r9
-+	ldrhsb	r9,[r12,#-12]
-+
-+	add	r7,r11,r7,ror#13
-+# ifdef	__thumb2__
-+	itete	lo
-+# endif
-+	eorlo	r10,r10,r10
-+	ldrhsb	r10,[r12,#-8]
-+	eorlo	r11,r11,r11
-+	ldrhsb	r11,[r12,#-4]
-+
-+	eor	r4,r8,r4		@ xor with input (or zero)
-+	eor	r5,r9,r5
-+# ifdef	__thumb2__
-+	itt	hs
-+# endif
-+	ldrhsb	r8,[r12,#-15]		@ load more input
-+	ldrhsb	r9,[r12,#-11]
-+	eor	r6,r10,r6
-+	 strb	r4,[r14],#16		@ store output
-+	eor	r7,r11,r7
-+# ifdef	__thumb2__
-+	itt	hs
-+# endif
-+	ldrhsb	r10,[r12,#-7]
-+	ldrhsb	r11,[r12,#-3]
-+	 strb	r5,[r14,#-12]
-+	eor	r4,r8,r4,lsr#8
-+	 strb	r6,[r14,#-8]
-+	eor	r5,r9,r5,lsr#8
-+# ifdef	__thumb2__
-+	itt	hs
-+# endif
-+	ldrhsb	r8,[r12,#-14]		@ load more input
-+	ldrhsb	r9,[r12,#-10]
-+	 strb	r7,[r14,#-4]
-+	eor	r6,r10,r6,lsr#8
-+	 strb	r4,[r14,#-15]
-+	eor	r7,r11,r7,lsr#8
-+# ifdef	__thumb2__
-+	itt	hs
-+# endif
-+	ldrhsb	r10,[r12,#-6]
-+	ldrhsb	r11,[r12,#-2]
-+	 strb	r5,[r14,#-11]
-+	eor	r4,r8,r4,lsr#8
-+	 strb	r6,[r14,#-7]
-+	eor	r5,r9,r5,lsr#8
-+# ifdef	__thumb2__
-+	itt	hs
-+# endif
-+	ldrhsb	r8,[r12,#-13]		@ load more input
-+	ldrhsb	r9,[r12,#-9]
-+	 strb	r7,[r14,#-3]
-+	eor	r6,r10,r6,lsr#8
-+	 strb	r4,[r14,#-14]
-+	eor	r7,r11,r7,lsr#8
-+# ifdef	__thumb2__
-+	itt	hs
-+# endif
-+	ldrhsb	r10,[r12,#-5]
-+	ldrhsb	r11,[r12,#-1]
-+	 strb	r5,[r14,#-10]
-+	 strb	r6,[r14,#-6]
-+	eor	r4,r8,r4,lsr#8
-+	 strb	r7,[r14,#-2]
-+	eor	r5,r9,r5,lsr#8
-+	 strb	r4,[r14,#-13]
-+	eor	r6,r10,r6,lsr#8
-+	 strb	r5,[r14,#-9]
-+	eor	r7,r11,r7,lsr#8
-+	 strb	r6,[r14,#-5]
-+	 strb	r7,[r14,#-1]
-+	add	r8,sp,#4*(4+4)
-+	ldmia	r8,{r8-r11}		@ load key material
-+	ldmia	r0,{r0-r7}		@ load second half
-+# ifdef	__thumb2__
-+	itt	hi
-+# endif
-+	strhi	r10,[sp,#4*(16+10)]		@ copy "rx"
-+	strhi	r11,[sp,#4*(16+11)]		@ copy "rx"
-+	add	r0,r8,r0	@ accumulate key material
-+	add	r1,r9,r1
-+	add	r2,r10,r2
-+# ifdef	__thumb2__
-+	itete	lo
-+# endif
-+	eorlo	r8,r8,r8		@ zero or ...
-+	ldrhsb	r8,[r12],#16			@ ... load input
-+	eorlo	r9,r9,r9
-+	ldrhsb	r9,[r12,#-12]
-+
-+	add	r3,r11,r3
-+# ifdef	__thumb2__
-+	itete	lo
-+# endif
-+	eorlo	r10,r10,r10
-+	ldrhsb	r10,[r12,#-8]
-+	eorlo	r11,r11,r11
-+	ldrhsb	r11,[r12,#-4]
-+
-+	eor	r0,r8,r0		@ xor with input (or zero)
-+	eor	r1,r9,r1
-+# ifdef	__thumb2__
-+	itt	hs
-+# endif
-+	ldrhsb	r8,[r12,#-15]		@ load more input
-+	ldrhsb	r9,[r12,#-11]
-+	eor	r2,r10,r2
-+	 strb	r0,[r14],#16		@ store output
-+	eor	r3,r11,r3
-+# ifdef	__thumb2__
-+	itt	hs
-+# endif
-+	ldrhsb	r10,[r12,#-7]
-+	ldrhsb	r11,[r12,#-3]
-+	 strb	r1,[r14,#-12]
-+	eor	r0,r8,r0,lsr#8
-+	 strb	r2,[r14,#-8]
-+	eor	r1,r9,r1,lsr#8
-+# ifdef	__thumb2__
-+	itt	hs
-+# endif
-+	ldrhsb	r8,[r12,#-14]		@ load more input
-+	ldrhsb	r9,[r12,#-10]
-+	 strb	r3,[r14,#-4]
-+	eor	r2,r10,r2,lsr#8
-+	 strb	r0,[r14,#-15]
-+	eor	r3,r11,r3,lsr#8
-+# ifdef	__thumb2__
-+	itt	hs
-+# endif
-+	ldrhsb	r10,[r12,#-6]
-+	ldrhsb	r11,[r12,#-2]
-+	 strb	r1,[r14,#-11]
-+	eor	r0,r8,r0,lsr#8
-+	 strb	r2,[r14,#-7]
-+	eor	r1,r9,r1,lsr#8
-+# ifdef	__thumb2__
-+	itt	hs
-+# endif
-+	ldrhsb	r8,[r12,#-13]		@ load more input
-+	ldrhsb	r9,[r12,#-9]
-+	 strb	r3,[r14,#-3]
-+	eor	r2,r10,r2,lsr#8
-+	 strb	r0,[r14,#-14]
-+	eor	r3,r11,r3,lsr#8
-+# ifdef	__thumb2__
-+	itt	hs
-+# endif
-+	ldrhsb	r10,[r12,#-5]
-+	ldrhsb	r11,[r12,#-1]
-+	 strb	r1,[r14,#-10]
-+	 strb	r2,[r14,#-6]
-+	eor	r0,r8,r0,lsr#8
-+	 strb	r3,[r14,#-2]
-+	eor	r1,r9,r1,lsr#8
-+	 strb	r0,[r14,#-13]
-+	eor	r2,r10,r2,lsr#8
-+	 strb	r1,[r14,#-9]
-+	eor	r3,r11,r3,lsr#8
-+	 strb	r2,[r14,#-5]
-+	 strb	r3,[r14,#-1]
-+	add	r8,sp,#4*(4+8)
-+	ldmia	r8,{r8-r11}		@ load key material
-+	add	r4,r8,r4,ror#24	@ accumulate key material
-+# ifdef	__thumb2__
-+	itt	hi
-+# endif
-+	addhi	r8,r8,#1			@ next counter value
-+	strhi	r8,[sp,#4*(12)]		@ save next counter value
-+	add	r5,r9,r5,ror#24
-+	add	r6,r10,r6,ror#24
-+# ifdef	__thumb2__
-+	itete	lo
-+# endif
-+	eorlo	r8,r8,r8		@ zero or ...
-+	ldrhsb	r8,[r12],#16			@ ... load input
-+	eorlo	r9,r9,r9
-+	ldrhsb	r9,[r12,#-12]
-+
-+	add	r7,r11,r7,ror#24
-+# ifdef	__thumb2__
-+	itete	lo
-+# endif
-+	eorlo	r10,r10,r10
-+	ldrhsb	r10,[r12,#-8]
-+	eorlo	r11,r11,r11
-+	ldrhsb	r11,[r12,#-4]
-+
-+	eor	r4,r8,r4		@ xor with input (or zero)
-+	eor	r5,r9,r5
-+# ifdef	__thumb2__
-+	itt	hs
-+# endif
-+	ldrhsb	r8,[r12,#-15]		@ load more input
-+	ldrhsb	r9,[r12,#-11]
-+	eor	r6,r10,r6
-+	 strb	r4,[r14],#16		@ store output
-+	eor	r7,r11,r7
-+# ifdef	__thumb2__
-+	itt	hs
-+# endif
-+	ldrhsb	r10,[r12,#-7]
-+	ldrhsb	r11,[r12,#-3]
-+	 strb	r5,[r14,#-12]
-+	eor	r4,r8,r4,lsr#8
-+	 strb	r6,[r14,#-8]
-+	eor	r5,r9,r5,lsr#8
-+# ifdef	__thumb2__
-+	itt	hs
-+# endif
-+	ldrhsb	r8,[r12,#-14]		@ load more input
-+	ldrhsb	r9,[r12,#-10]
-+	 strb	r7,[r14,#-4]
-+	eor	r6,r10,r6,lsr#8
-+	 strb	r4,[r14,#-15]
-+	eor	r7,r11,r7,lsr#8
-+# ifdef	__thumb2__
-+	itt	hs
-+# endif
-+	ldrhsb	r10,[r12,#-6]
-+	ldrhsb	r11,[r12,#-2]
-+	 strb	r5,[r14,#-11]
-+	eor	r4,r8,r4,lsr#8
-+	 strb	r6,[r14,#-7]
-+	eor	r5,r9,r5,lsr#8
-+# ifdef	__thumb2__
-+	itt	hs
-+# endif
-+	ldrhsb	r8,[r12,#-13]		@ load more input
-+	ldrhsb	r9,[r12,#-9]
-+	 strb	r7,[r14,#-3]
-+	eor	r6,r10,r6,lsr#8
-+	 strb	r4,[r14,#-14]
-+	eor	r7,r11,r7,lsr#8
-+# ifdef	__thumb2__
-+	itt	hs
-+# endif
-+	ldrhsb	r10,[r12,#-5]
-+	ldrhsb	r11,[r12,#-1]
-+	 strb	r5,[r14,#-10]
-+	 strb	r6,[r14,#-6]
-+	eor	r4,r8,r4,lsr#8
-+	 strb	r7,[r14,#-2]
-+	eor	r5,r9,r5,lsr#8
-+	 strb	r4,[r14,#-13]
-+	eor	r6,r10,r6,lsr#8
-+	 strb	r5,[r14,#-9]
-+	eor	r7,r11,r7,lsr#8
-+	 strb	r6,[r14,#-5]
-+	 strb	r7,[r14,#-1]
-+# ifdef	__thumb2__
-+	it	ne
-+# endif
-+	ldrne	r8,[sp,#4*(32+2)]		@ re-load len
-+# ifdef	__thumb2__
-+	it	hs
-+# endif
-+	subhs	r11,r8,#64			@ len-=64
-+	bhi	.Loop_outer
-+
-+	beq	.Ldone
-+#endif
-+
-+.Ltail:
-+	ldr	r12,[sp,#4*(32+1)]	@ load inp
-+	add	r9,sp,#4*(0)
-+	ldr	r14,[sp,#4*(32+0)]	@ load out
-+
-+.Loop_tail:
-+	ldrb	r10,[r9],#1	@ read buffer on stack
-+	ldrb	r11,[r12],#1		@ read input
-+	subs	r8,r8,#1
-+	eor	r11,r11,r10
-+	strb	r11,[r14],#1		@ store output
-+	bne	.Loop_tail
-+
-+.Ldone:
-+	add	sp,sp,#4*(32+3)
-+.Lno_data:
-+	ldmia	sp!,{r4-r11,pc}
-+.size	ChaCha20_ctr32,.-ChaCha20_ctr32
-+#if __ARM_MAX_ARCH__>=7
-+.arch	armv7-a
-+.fpu	neon
-+
-+.type	ChaCha20_neon,%function
-+.align	5
-+ChaCha20_neon:
-+	ldr		r12,[sp,#0]		@ pull pointer to counter and nonce
-+	stmdb		sp!,{r0-r2,r4-r11,lr}
-+.LChaCha20_neon:
-+	adr		r14,.Lsigma
-+	vstmdb		sp!,{d8-d15}		@ ABI spec says so
-+	stmdb		sp!,{r0-r3}
-+
-+	vld1.32		{q1-q2},[r3]		@ load key
-+	ldmia		r3,{r4-r11}		@ load key
-+
-+	sub		sp,sp,#4*(16+16)
-+	vld1.32		{q3},[r12]		@ load counter and nonce
-+	add		r12,sp,#4*8
-+	ldmia		r14,{r0-r3}		@ load sigma
-+	vld1.32		{q0},[r14]!		@ load sigma
-+	vld1.32		{q12},[r14]!		@ one
-+	@ vld1.32	{d30},[r14]		@ rot8
-+	vst1.32		{q2-q3},[r12]		@ copy 1/2key|counter|nonce
-+	vst1.32		{q0-q1},[sp]		@ copy sigma|1/2key
-+
-+	str		r10,[sp,#4*(16+10)]	@ off-load "rx"
-+	str		r11,[sp,#4*(16+11)]	@ off-load "rx"
-+	vshl.i32	d26,d24,#1	@ two
-+	vstr		d24,[sp,#4*(16+0)]
-+	vshl.i32	d28,d24,#2	@ four
-+	vstr		d26,[sp,#4*(16+2)]
-+	vmov		q4,q0
-+	vstr		d28,[sp,#4*(16+4)]
-+	vmov		q8,q0
-+	@ vstr		d30,[sp,#4*(16+6)]
-+	vmov		q5,q1
-+	vmov		q9,q1
-+	b		.Loop_neon_enter
-+
-+.align	4
-+.Loop_neon_outer:
-+	ldmia		sp,{r0-r9}		@ load key material
-+	cmp		r11,#64*2		@ if len<=64*2
-+	bls		.Lbreak_neon		@ switch to integer-only
-+	@ vldr		d30,[sp,#4*(16+6)]	@ rot8
-+	vmov		q4,q0
-+	str		r11,[sp,#4*(32+2)]	@ save len
-+	vmov		q8,q0
-+	str		r12,  [sp,#4*(32+1)]	@ save inp
-+	vmov		q5,q1
-+	str		r14,  [sp,#4*(32+0)]	@ save out
-+	vmov		q9,q1
-+.Loop_neon_enter:
-+	ldr		r11, [sp,#4*(15)]
-+	 mov		r4,r4,ror#19	@ twist b[0..3]
-+	vadd.i32	q7,q3,q12		@ counter+1
-+	ldr		r12,[sp,#4*(12)]	@ modulo-scheduled load
-+	 mov		r5,r5,ror#19
-+	vmov		q6,q2
-+	ldr		r10, [sp,#4*(13)]
-+	 mov		r6,r6,ror#19
-+	vmov		q10,q2
-+	ldr		r14,[sp,#4*(14)]
-+	 mov		r7,r7,ror#19
-+	vadd.i32	q11,q7,q12		@ counter+2
-+	add		r12,r12,#3	@ counter+3
-+	mov		r11,r11,ror#8	@ twist d[0..3]
-+	mov		r12,r12,ror#8
-+	mov		r10,r10,ror#8
-+	mov		r14,r14,ror#8
-+	str		r11, [sp,#4*(16+15)]
-+	mov		r11,#10
-+	b		.Loop_neon
-+
-+.align	4
-+.Loop_neon:
-+	subs		r11,r11,#1
-+	vadd.i32	q0,q0,q1
-+	add	r0,r0,r4,ror#13
-+	vadd.i32	q4,q4,q5
-+	add	r1,r1,r5,ror#13
-+	vadd.i32	q8,q8,q9
-+	eor	r12,r0,r12,ror#24
-+	veor	q3,q3,q0
-+	eor	r10,r1,r10,ror#24
-+	veor	q7,q7,q4
-+	add	r8,r8,r12,ror#16
-+	veor	q11,q11,q8
-+	add	r9,r9,r10,ror#16
-+	vrev32.16	q3,q3
-+	eor	r4,r8,r4,ror#13
-+	vrev32.16	q7,q7
-+	eor	r5,r9,r5,ror#13
-+	vrev32.16	q11,q11
-+	add	r0,r0,r4,ror#20
-+	vadd.i32	q2,q2,q3
-+	add	r1,r1,r5,ror#20
-+	vadd.i32	q6,q6,q7
-+	eor	r12,r0,r12,ror#16
-+	vadd.i32	q10,q10,q11
-+	eor	r10,r1,r10,ror#16
-+	veor	q12,q1,q2
-+	add	r8,r8,r12,ror#24
-+	veor	q13,q5,q6
-+	str	r10,[sp,#4*(16+13)]
-+	veor	q14,q9,q10
-+	add	r9,r9,r10,ror#24
-+	vshr.u32	q1,q12,#20
-+	ldr	r10,[sp,#4*(16+15)]
-+	vshr.u32	q5,q13,#20
-+	str	r8,[sp,#4*(16+8)]
-+	vshr.u32	q9,q14,#20
-+	eor	r4,r4,r8,ror#12
-+	vsli.32	q1,q12,#12
-+	str	r9,[sp,#4*(16+9)]
-+	vsli.32	q5,q13,#12
-+	eor	r5,r5,r9,ror#12
-+	vsli.32	q9,q14,#12
-+	ldr	r8,[sp,#4*(16+10)]
-+	vadd.i32	q0,q0,q1
-+	add	r2,r2,r6,ror#13
-+	vadd.i32	q4,q4,q5
-+	ldr	r9,[sp,#4*(16+11)]
-+	vadd.i32	q8,q8,q9
-+	add	r3,r3,r7,ror#13
-+	veor	q12,q3,q0
-+	eor	r14,r2,r14,ror#24
-+	veor	q13,q7,q4
-+	eor	r10,r3,r10,ror#24
-+	veor	q14,q11,q8
-+	add	r8,r8,r14,ror#16
-+	vshr.u32	q3,q12,#24
-+	add	r9,r9,r10,ror#16
-+	vshr.u32	q7,q13,#24
-+	eor	r6,r8,r6,ror#13
-+	vshr.u32	q11,q14,#24
-+	eor	r7,r9,r7,ror#13
-+	vsli.32	q3,q12,#8
-+	add	r2,r2,r6,ror#20
-+	vsli.32	q7,q13,#8
-+	add	r3,r3,r7,ror#20
-+	vsli.32	q11,q14,#8
-+	eor	r14,r2,r14,ror#16
-+	vadd.i32	q2,q2,q3
-+	eor	r10,r3,r10,ror#16
-+	vadd.i32	q6,q6,q7
-+	add	r8,r8,r14,ror#24
-+	vadd.i32	q10,q10,q11
-+	add	r9,r9,r10,ror#24
-+	veor	q12,q1,q2
-+	eor	r6,r6,r8,ror#12
-+	veor	q13,q5,q6
-+	eor	r7,r7,r9,ror#12
-+	veor	q14,q9,q10
-+	vshr.u32	q1,q12,#25
-+	vshr.u32	q5,q13,#25
-+	vshr.u32	q9,q14,#25
-+	vsli.32	q1,q12,#7
-+	vsli.32	q5,q13,#7
-+	vsli.32	q9,q14,#7
-+	vext.8	q2,q2,q2,#8
-+	vext.8	q6,q6,q6,#8
-+	vext.8	q10,q10,q10,#8
-+	vext.8	q1,q1,q1,#4
-+	vext.8	q5,q5,q5,#4
-+	vext.8	q9,q9,q9,#4
-+	vext.8	q3,q3,q3,#12
-+	vext.8	q7,q7,q7,#12
-+	vext.8	q11,q11,q11,#12
-+	vadd.i32	q0,q0,q1
-+	add	r0,r0,r5,ror#13
-+	vadd.i32	q4,q4,q5
-+	add	r1,r1,r6,ror#13
-+	vadd.i32	q8,q8,q9
-+	eor	r10,r0,r10,ror#24
-+	veor	q3,q3,q0
-+	eor	r12,r1,r12,ror#24
-+	veor	q7,q7,q4
-+	add	r8,r8,r10,ror#16
-+	veor	q11,q11,q8
-+	add	r9,r9,r12,ror#16
-+	vrev32.16	q3,q3
-+	eor	r5,r8,r5,ror#13
-+	vrev32.16	q7,q7
-+	eor	r6,r9,r6,ror#13
-+	vrev32.16	q11,q11
-+	add	r0,r0,r5,ror#20
-+	vadd.i32	q2,q2,q3
-+	add	r1,r1,r6,ror#20
-+	vadd.i32	q6,q6,q7
-+	eor	r10,r0,r10,ror#16
-+	vadd.i32	q10,q10,q11
-+	eor	r12,r1,r12,ror#16
-+	veor	q12,q1,q2
-+	str	r10,[sp,#4*(16+15)]
-+	veor	q13,q5,q6
-+	add	r8,r8,r10,ror#24
-+	veor	q14,q9,q10
-+	ldr	r10,[sp,#4*(16+13)]
-+	vshr.u32	q1,q12,#20
-+	add	r9,r9,r12,ror#24
-+	vshr.u32	q5,q13,#20
-+	str	r8,[sp,#4*(16+10)]
-+	vshr.u32	q9,q14,#20
-+	eor	r5,r5,r8,ror#12
-+	vsli.32	q1,q12,#12
-+	str	r9,[sp,#4*(16+11)]
-+	vsli.32	q5,q13,#12
-+	eor	r6,r6,r9,ror#12
-+	vsli.32	q9,q14,#12
-+	ldr	r8,[sp,#4*(16+8)]
-+	vadd.i32	q0,q0,q1
-+	add	r2,r2,r7,ror#13
-+	vadd.i32	q4,q4,q5
-+	ldr	r9,[sp,#4*(16+9)]
-+	vadd.i32	q8,q8,q9
-+	add	r3,r3,r4,ror#13
-+	veor	q12,q3,q0
-+	eor	r10,r2,r10,ror#24
-+	veor	q13,q7,q4
-+	eor	r14,r3,r14,ror#24
-+	veor	q14,q11,q8
-+	add	r8,r8,r10,ror#16
-+	vshr.u32	q3,q12,#24
-+	add	r9,r9,r14,ror#16
-+	vshr.u32	q7,q13,#24
-+	eor	r7,r8,r7,ror#13
-+	vshr.u32	q11,q14,#24
-+	eor	r4,r9,r4,ror#13
-+	vsli.32	q3,q12,#8
-+	add	r2,r2,r7,ror#20
-+	vsli.32	q7,q13,#8
-+	add	r3,r3,r4,ror#20
-+	vsli.32	q11,q14,#8
-+	eor	r10,r2,r10,ror#16
-+	vadd.i32	q2,q2,q3
-+	eor	r14,r3,r14,ror#16
-+	vadd.i32	q6,q6,q7
-+	add	r8,r8,r10,ror#24
-+	vadd.i32	q10,q10,q11
-+	add	r9,r9,r14,ror#24
-+	veor	q12,q1,q2
-+	eor	r7,r7,r8,ror#12
-+	veor	q13,q5,q6
-+	eor	r4,r4,r9,ror#12
-+	veor	q14,q9,q10
-+	vshr.u32	q1,q12,#25
-+	vshr.u32	q5,q13,#25
-+	vshr.u32	q9,q14,#25
-+	vsli.32	q1,q12,#7
-+	vsli.32	q5,q13,#7
-+	vsli.32	q9,q14,#7
-+	vext.8	q2,q2,q2,#8
-+	vext.8	q6,q6,q6,#8
-+	vext.8	q10,q10,q10,#8
-+	vext.8	q1,q1,q1,#12
-+	vext.8	q5,q5,q5,#12
-+	vext.8	q9,q9,q9,#12
-+	vext.8	q3,q3,q3,#4
-+	vext.8	q7,q7,q7,#4
-+	vext.8	q11,q11,q11,#4
-+	bne		.Loop_neon
-+
-+	add		r11,sp,#32
-+	vld1.32		{q12-q13},[sp]		@ load key material
-+	vld1.32		{q14-q15},[r11]
-+
-+	ldr		r11,[sp,#4*(32+2)]	@ load len
-+
-+	str		r8, [sp,#4*(16+8)]	@ modulo-scheduled store
-+	str		r9, [sp,#4*(16+9)]
-+	str		r12,[sp,#4*(16+12)]
-+	str		r10, [sp,#4*(16+13)]
-+	str		r14,[sp,#4*(16+14)]
-+
-+	@ at this point we have first half of 512-bit result in
-+	@ rx and second half at sp+4*(16+8)
-+
-+	ldr		r12,[sp,#4*(32+1)]	@ load inp
-+	ldr		r14,[sp,#4*(32+0)]	@ load out
-+
-+	vadd.i32	q0,q0,q12		@ accumulate key material
-+	vadd.i32	q4,q4,q12
-+	vadd.i32	q8,q8,q12
-+	vldr		d24,[sp,#4*(16+0)]	@ one
-+
-+	vadd.i32	q1,q1,q13
-+	vadd.i32	q5,q5,q13
-+	vadd.i32	q9,q9,q13
-+	vldr		d26,[sp,#4*(16+2)]	@ two
-+
-+	vadd.i32	q2,q2,q14
-+	vadd.i32	q6,q6,q14
-+	vadd.i32	q10,q10,q14
-+	vadd.i32	d14,d14,d24	@ counter+1
-+	vadd.i32	d22,d22,d26	@ counter+2
-+
-+	vadd.i32	q3,q3,q15
-+	vadd.i32	q7,q7,q15
-+	vadd.i32	q11,q11,q15
-+
-+	cmp		r11,#64*4
-+	blo		.Ltail_neon
-+
-+	vld1.8		{q12-q13},[r12]!	@ load input
-+	 mov		r11,sp
-+	vld1.8		{q14-q15},[r12]!
-+	veor		q0,q0,q12		@ xor with input
-+	veor		q1,q1,q13
-+	vld1.8		{q12-q13},[r12]!
-+	veor		q2,q2,q14
-+	veor		q3,q3,q15
-+	vld1.8		{q14-q15},[r12]!
-+
-+	veor		q4,q4,q12
-+	 vst1.8		{q0-q1},[r14]!	@ store output
-+	veor		q5,q5,q13
-+	vld1.8		{q12-q13},[r12]!
-+	veor		q6,q6,q14
-+	 vst1.8		{q2-q3},[r14]!
-+	veor		q7,q7,q15
-+	vld1.8		{q14-q15},[r12]!
-+
-+	veor		q8,q8,q12
-+	 vld1.32	{q0-q1},[r11]!	@ load for next iteration
-+	 veor		d25,d25,d25
-+	 vldr		d24,[sp,#4*(16+4)]	@ four
-+	veor		q9,q9,q13
-+	 vld1.32	{q2-q3},[r11]
-+	veor		q10,q10,q14
-+	 vst1.8		{q4-q5},[r14]!
-+	veor		q11,q11,q15
-+	 vst1.8		{q6-q7},[r14]!
-+
-+	vadd.i32	d6,d6,d24	@ next counter value
-+	vldr		d24,[sp,#4*(16+0)]	@ one
-+
-+	ldmia		sp,{r8-r11}	@ load key material
-+	add		r0,r0,r8	@ accumulate key material
-+	ldr		r8,[r12],#16		@ load input
-+	 vst1.8		{q8-q9},[r14]!
-+	add		r1,r1,r9
-+	ldr		r9,[r12,#-12]
-+	 vst1.8		{q10-q11},[r14]!
-+	add		r2,r2,r10
-+	ldr		r10,[r12,#-8]
-+	add		r3,r3,r11
-+	ldr		r11,[r12,#-4]
-+# ifdef	__ARMEB__
-+	rev		r0,r0
-+	rev		r1,r1
-+	rev		r2,r2
-+	rev		r3,r3
-+# endif
-+	eor		r0,r0,r8	@ xor with input
-+	 add		r8,sp,#4*(4)
-+	eor		r1,r1,r9
-+	str		r0,[r14],#16		@ store output
-+	eor		r2,r2,r10
-+	str		r1,[r14,#-12]
-+	eor		r3,r3,r11
-+	 ldmia		r8,{r8-r11}	@ load key material
-+	str		r2,[r14,#-8]
-+	str		r3,[r14,#-4]
-+
-+	add		r4,r8,r4,ror#13 @ accumulate key material
-+	ldr		r8,[r12],#16		@ load input
-+	add		r5,r9,r5,ror#13
-+	ldr		r9,[r12,#-12]
-+	add		r6,r10,r6,ror#13
-+	ldr		r10,[r12,#-8]
-+	add		r7,r11,r7,ror#13
-+	ldr		r11,[r12,#-4]
-+# ifdef	__ARMEB__
-+	rev		r4,r4
-+	rev		r5,r5
-+	rev		r6,r6
-+	rev		r7,r7
-+# endif
-+	eor		r4,r4,r8
-+	 add		r8,sp,#4*(8)
-+	eor		r5,r5,r9
-+	str		r4,[r14],#16		@ store output
-+	eor		r6,r6,r10
-+	str		r5,[r14,#-12]
-+	eor		r7,r7,r11
-+	 ldmia		r8,{r8-r11}	@ load key material
-+	str		r6,[r14,#-8]
-+	 add		r0,sp,#4*(16+8)
-+	str		r7,[r14,#-4]
-+
-+	ldmia		r0,{r0-r7}	@ load second half
-+
-+	add		r0,r0,r8	@ accumulate key material
-+	ldr		r8,[r12],#16		@ load input
-+	add		r1,r1,r9
-+	ldr		r9,[r12,#-12]
-+# ifdef	__thumb2__
-+	it	hi
-+# endif
-+	 strhi		r10,[sp,#4*(16+10)]	@ copy "rx" while at it
-+	add		r2,r2,r10
-+	ldr		r10,[r12,#-8]
-+# ifdef	__thumb2__
-+	it	hi
-+# endif
-+	 strhi		r11,[sp,#4*(16+11)]	@ copy "rx" while at it
-+	add		r3,r3,r11
-+	ldr		r11,[r12,#-4]
-+# ifdef	__ARMEB__
-+	rev		r0,r0
-+	rev		r1,r1
-+	rev		r2,r2
-+	rev		r3,r3
-+# endif
-+	eor		r0,r0,r8
-+	 add		r8,sp,#4*(12)
-+	eor		r1,r1,r9
-+	str		r0,[r14],#16		@ store output
-+	eor		r2,r2,r10
-+	str		r1,[r14,#-12]
-+	eor		r3,r3,r11
-+	 ldmia		r8,{r8-r11}	@ load key material
-+	str		r2,[r14,#-8]
-+	str		r3,[r14,#-4]
-+
-+	add		r4,r8,r4,ror#24 @ accumulate key material
-+	 add		r8,r8,#4		@ next counter value
-+	add		r5,r9,r5,ror#24
-+	 str		r8,[sp,#4*(12)]	@ save next counter value
-+	ldr		r8,[r12],#16		@ load input
-+	add		r6,r10,r6,ror#24
-+	 add		r4,r4,#3		@ counter+3
-+	ldr		r9,[r12,#-12]
-+	add		r7,r11,r7,ror#24
-+	ldr		r10,[r12,#-8]
-+	ldr		r11,[r12,#-4]
-+# ifdef	__ARMEB__
-+	rev		r4,r4
-+	rev		r5,r5
-+	rev		r6,r6
-+	rev		r7,r7
-+# endif
-+	eor		r4,r4,r8
-+# ifdef	__thumb2__
-+	it	hi
-+# endif
-+	 ldrhi		r8,[sp,#4*(32+2)]	@ re-load len
-+	eor		r5,r5,r9
-+	eor		r6,r6,r10
-+	str		r4,[r14],#16		@ store output
-+	eor		r7,r7,r11
-+	str		r5,[r14,#-12]
-+	 sub		r11,r8,#64*4	@ len-=64*4
-+	str		r6,[r14,#-8]
-+	str		r7,[r14,#-4]
-+	bhi		.Loop_neon_outer
-+
-+	b		.Ldone_neon
-+
-+.align	4
-+.Lbreak_neon:
-+	@ harmonize NEON and integer-only stack frames: load data
-+	@ from NEON frame, but save to integer-only one; distance
-+	@ between the two is 4*(32+4+16-32)=4*(20).
-+
-+	str		r11, [sp,#4*(20+32+2)]	@ save len
-+	 add		r11,sp,#4*(32+4)
-+	str		r12,   [sp,#4*(20+32+1)]	@ save inp
-+	str		r14,   [sp,#4*(20+32+0)]	@ save out
-+
-+	ldr		r12,[sp,#4*(16+10)]
-+	ldr		r14,[sp,#4*(16+11)]
-+	 vldmia		r11,{d8-d15}			@ fulfill ABI requirement
-+	str		r12,[sp,#4*(20+16+10)]	@ copy "rx"
-+	str		r14,[sp,#4*(20+16+11)]	@ copy "rx"
-+
-+	ldr		r11, [sp,#4*(15)]
-+	 mov		r4,r4,ror#19		@ twist b[0..3]
-+	ldr		r12,[sp,#4*(12)]		@ modulo-scheduled load
-+	 mov		r5,r5,ror#19
-+	ldr		r10, [sp,#4*(13)]
-+	 mov		r6,r6,ror#19
-+	ldr		r14,[sp,#4*(14)]
-+	 mov		r7,r7,ror#19
-+	mov		r11,r11,ror#8		@ twist d[0..3]
-+	mov		r12,r12,ror#8
-+	mov		r10,r10,ror#8
-+	mov		r14,r14,ror#8
-+	str		r11, [sp,#4*(20+16+15)]
-+	add		r11,sp,#4*(20)
-+	vst1.32		{q0-q1},[r11]!		@ copy key
-+	add		sp,sp,#4*(20)			@ switch frame
-+	vst1.32		{q2-q3},[r11]
-+	mov		r11,#10
-+	b		.Loop				@ go integer-only
-+
-+.align	4
-+.Ltail_neon:
-+	cmp		r11,#64*3
-+	bhs		.L192_or_more_neon
-+	cmp		r11,#64*2
-+	bhs		.L128_or_more_neon
-+	cmp		r11,#64*1
-+	bhs		.L64_or_more_neon
-+
-+	add		r8,sp,#4*(8)
-+	vst1.8		{q0-q1},[sp]
-+	add		r10,sp,#4*(0)
-+	vst1.8		{q2-q3},[r8]
-+	b		.Loop_tail_neon
-+
-+.align	4
-+.L64_or_more_neon:
-+	vld1.8		{q12-q13},[r12]!
-+	vld1.8		{q14-q15},[r12]!
-+	veor		q0,q0,q12
-+	veor		q1,q1,q13
-+	veor		q2,q2,q14
-+	veor		q3,q3,q15
-+	vst1.8		{q0-q1},[r14]!
-+	vst1.8		{q2-q3},[r14]!
-+
-+	beq		.Ldone_neon
-+
-+	add		r8,sp,#4*(8)
-+	vst1.8		{q4-q5},[sp]
-+	add		r10,sp,#4*(0)
-+	vst1.8		{q6-q7},[r8]
-+	sub		r11,r11,#64*1	@ len-=64*1
-+	b		.Loop_tail_neon
-+
-+.align	4
-+.L128_or_more_neon:
-+	vld1.8		{q12-q13},[r12]!
-+	vld1.8		{q14-q15},[r12]!
-+	veor		q0,q0,q12
-+	veor		q1,q1,q13
-+	vld1.8		{q12-q13},[r12]!
-+	veor		q2,q2,q14
-+	veor		q3,q3,q15
-+	vld1.8		{q14-q15},[r12]!
-+
-+	veor		q4,q4,q12
-+	veor		q5,q5,q13
-+	 vst1.8		{q0-q1},[r14]!
-+	veor		q6,q6,q14
-+	 vst1.8		{q2-q3},[r14]!
-+	veor		q7,q7,q15
-+	vst1.8		{q4-q5},[r14]!
-+	vst1.8		{q6-q7},[r14]!
-+
-+	beq		.Ldone_neon
-+
-+	add		r8,sp,#4*(8)
-+	vst1.8		{q8-q9},[sp]
-+	add		r10,sp,#4*(0)
-+	vst1.8		{q10-q11},[r8]
-+	sub		r11,r11,#64*2	@ len-=64*2
-+	b		.Loop_tail_neon
-+
-+.align	4
-+.L192_or_more_neon:
-+	vld1.8		{q12-q13},[r12]!
-+	vld1.8		{q14-q15},[r12]!
-+	veor		q0,q0,q12
-+	veor		q1,q1,q13
-+	vld1.8		{q12-q13},[r12]!
-+	veor		q2,q2,q14
-+	veor		q3,q3,q15
-+	vld1.8		{q14-q15},[r12]!
-+
-+	veor		q4,q4,q12
-+	veor		q5,q5,q13
-+	vld1.8		{q12-q13},[r12]!
-+	veor		q6,q6,q14
-+	 vst1.8		{q0-q1},[r14]!
-+	veor		q7,q7,q15
-+	vld1.8		{q14-q15},[r12]!
-+
-+	veor		q8,q8,q12
-+	 vst1.8		{q2-q3},[r14]!
-+	veor		q9,q9,q13
-+	 vst1.8		{q4-q5},[r14]!
-+	veor		q10,q10,q14
-+	 vst1.8		{q6-q7},[r14]!
-+	veor		q11,q11,q15
-+	vst1.8		{q8-q9},[r14]!
-+	vst1.8		{q10-q11},[r14]!
-+
-+	beq		.Ldone_neon
-+
-+	ldmia		sp,{r8-r11}	@ load key material
-+	add		r0,r0,r8	@ accumulate key material
-+	 add		r8,sp,#4*(4)
-+	add		r1,r1,r9
-+	add		r2,r2,r10
-+	add		r3,r3,r11
-+	 ldmia		r8,{r8-r11}	@ load key material
-+
-+	add		r4,r8,r4,ror#13 @ accumulate key material
-+	 add		r8,sp,#4*(8)
-+	add		r5,r9,r5,ror#13
-+	add		r6,r10,r6,ror#13
-+	add		r7,r11,r7,ror#13
-+	 ldmia		r8,{r8-r11}	@ load key material
-+# ifdef	__ARMEB__
-+	rev		r0,r0
-+	rev		r1,r1
-+	rev		r2,r2
-+	rev		r3,r3
-+	rev		r4,r4
-+	rev		r5,r5
-+	rev		r6,r6
-+	rev		r7,r7
-+# endif
-+	stmia		sp,{r0-r7}
-+	 add		r0,sp,#4*(16+8)
-+
-+	ldmia		r0,{r0-r7}	@ load second half
-+
-+	add		r0,r0,r8	@ accumulate key material
-+	 add		r8,sp,#4*(12)
-+	add		r1,r1,r9
-+	add		r2,r2,r10
-+	add		r3,r3,r11
-+	 ldmia		r8,{r8-r11}	@ load key material
-+
-+	add		r4,r8,r4,ror#24 @ accumulate key material
-+	 add		r8,sp,#4*(8)
-+	add		r5,r9,r5,ror#24
-+	 add		r4,r4,#3		@ counter+3
-+	add		r6,r10,r6,ror#24
-+	add		r7,r11,r7,ror#24
-+	 ldr		r11,[sp,#4*(32+2)]	@ re-load len
-+# ifdef	__ARMEB__
-+	rev		r0,r0
-+	rev		r1,r1
-+	rev		r2,r2
-+	rev		r3,r3
-+	rev		r4,r4
-+	rev		r5,r5
-+	rev		r6,r6
-+	rev		r7,r7
-+# endif
-+	stmia		r8,{r0-r7}
-+	 add		r10,sp,#4*(0)
-+	 sub		r11,r11,#64*3	@ len-=64*3
-+
-+.Loop_tail_neon:
-+	ldrb		r8,[r10],#1	@ read buffer on stack
-+	ldrb		r9,[r12],#1		@ read input
-+	subs		r11,r11,#1
-+	eor		r8,r8,r9
-+	strb		r8,[r14],#1		@ store output
-+	bne		.Loop_tail_neon
-+
-+.Ldone_neon:
-+	add		sp,sp,#4*(32+4)
-+	vldmia		sp,{d8-d15}
-+	add		sp,sp,#4*(16+3)
-+	ldmia		sp!,{r4-r11,pc}
-+.size	ChaCha20_neon,.-ChaCha20_neon
-+.comm	OPENSSL_armcap_P,4,4
-+#endif
-diff --git a/lib/zinc/chacha20/chacha20-arm64-cryptogams.S b/lib/zinc/chacha20/chacha20-arm64-cryptogams.S
++#ifndef _ZINC_POLY1305_H
++#define _ZINC_POLY1305_H
++
++#include <linux/simd.h>
++#include <linux/types.h>
++
++enum poly1305_lengths {
++	POLY1305_BLOCK_SIZE = 16,
++	POLY1305_KEY_SIZE = 32,
++	POLY1305_MAC_SIZE = 16
++};
++
++struct poly1305_ctx {
++	u8 opaque[24 * sizeof(u64)];
++	u32 nonce[4];
++	u8 data[POLY1305_BLOCK_SIZE];
++	size_t num;
++} __aligned(8);
++
++void poly1305_init(struct poly1305_ctx *ctx, const u8 key[POLY1305_KEY_SIZE]);
++void poly1305_update(struct poly1305_ctx *ctx, const u8 *input, size_t len,
++		     simd_context_t *simd_context);
++void poly1305_final(struct poly1305_ctx *ctx, u8 mac[POLY1305_MAC_SIZE],
++		    simd_context_t *simd_context);
++
++#endif /* _ZINC_POLY1305_H */
+diff --git a/lib/zinc/Kconfig b/lib/zinc/Kconfig
+index 1ca1ae1e9ea9..f9ef8f7e3c25 100644
+--- a/lib/zinc/Kconfig
++++ b/lib/zinc/Kconfig
+@@ -2,6 +2,9 @@ config ZINC_CHACHA20
+ 	tristate
+ 	select CRYPTO_ALGAPI
+ 
++config ZINC_POLY1305
++	tristate
++
+ config ZINC_DEBUG
+ 	bool "Zinc cryptography library debugging and self-tests"
+ 	help
+diff --git a/lib/zinc/Makefile b/lib/zinc/Makefile
+index 60d568cf5206..6fc9626c55fa 100644
+--- a/lib/zinc/Makefile
++++ b/lib/zinc/Makefile
+@@ -9,3 +9,6 @@ zinc_chacha20-$(CONFIG_ZINC_ARCH_ARM64) += chacha20/chacha20-arm64.o
+ zinc_chacha20-$(CONFIG_ZINC_ARCH_MIPS) += chacha20/chacha20-mips.o
+ AFLAGS_chacha20-mips.o += -O2 # This is required to fill the branch delay slots
+ obj-$(CONFIG_ZINC_CHACHA20) += zinc_chacha20.o
++
++zinc_poly1305-y := poly1305/poly1305.o
++obj-$(CONFIG_ZINC_POLY1305) += zinc_poly1305.o
+diff --git a/lib/zinc/poly1305/poly1305-donna32.h b/lib/zinc/poly1305/poly1305-donna32.h
 new file mode 100644
-index 000000000000..4d029bfdad3a
+index 000000000000..2e7565dd9679
 --- /dev/null
-+++ b/lib/zinc/chacha20/chacha20-arm64-cryptogams.S
-@@ -0,0 +1,1973 @@
-+/* SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause */
++++ b/lib/zinc/poly1305/poly1305-donna32.h
+@@ -0,0 +1,205 @@
++/* SPDX-License-Identifier: GPL-2.0 OR MIT */
 +/*
-+ * Copyright (C) 2006-2017 CRYPTOGAMS by <appro@openssl.org>. All Rights Reserved.
++ * Copyright (C) 2015-2018 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
++ *
++ * This is based in part on Andrew Moon's poly1305-donna, which is in the
++ * public domain.
 + */
 +
-+#include "arm_arch.h"
++struct poly1305_internal {
++	u32 h[5];
++	u32 r[5];
++	u32 s[4];
++};
 +
-+.text
++static void poly1305_init_generic(void *ctx, const u8 key[16])
++{
++	struct poly1305_internal *st = (struct poly1305_internal *)ctx;
 +
++	/* r &= 0xffffffc0ffffffc0ffffffc0fffffff */
++	st->r[0] = (get_unaligned_le32(&key[0])) & 0x3ffffff;
++	st->r[1] = (get_unaligned_le32(&key[3]) >> 2) & 0x3ffff03;
++	st->r[2] = (get_unaligned_le32(&key[6]) >> 4) & 0x3ffc0ff;
++	st->r[3] = (get_unaligned_le32(&key[9]) >> 6) & 0x3f03fff;
++	st->r[4] = (get_unaligned_le32(&key[12]) >> 8) & 0x00fffff;
 +
++	/* s = 5*r */
++	st->s[0] = st->r[1] * 5;
++	st->s[1] = st->r[2] * 5;
++	st->s[2] = st->r[3] * 5;
++	st->s[3] = st->r[4] * 5;
 +
-+.align	5
-+.Lsigma:
-+.quad	0x3320646e61707865,0x6b20657479622d32		// endian-neutral
-+.Lone:
-+.long	1,0,0,0
-+.LOPENSSL_armcap_P:
-+#ifdef	__ILP32__
-+.long	OPENSSL_armcap_P-.
++	/* h = 0 */
++	st->h[0] = 0;
++	st->h[1] = 0;
++	st->h[2] = 0;
++	st->h[3] = 0;
++	st->h[4] = 0;
++}
++
++static void poly1305_blocks_generic(void *ctx, const u8 *input, size_t len,
++				    const u32 padbit)
++{
++	struct poly1305_internal *st = (struct poly1305_internal *)ctx;
++	const u32 hibit = padbit << 24;
++	u32 r0, r1, r2, r3, r4;
++	u32 s1, s2, s3, s4;
++	u32 h0, h1, h2, h3, h4;
++	u64 d0, d1, d2, d3, d4;
++	u32 c;
++
++	r0 = st->r[0];
++	r1 = st->r[1];
++	r2 = st->r[2];
++	r3 = st->r[3];
++	r4 = st->r[4];
++
++	s1 = st->s[0];
++	s2 = st->s[1];
++	s3 = st->s[2];
++	s4 = st->s[3];
++
++	h0 = st->h[0];
++	h1 = st->h[1];
++	h2 = st->h[2];
++	h3 = st->h[3];
++	h4 = st->h[4];
++
++	while (len >= POLY1305_BLOCK_SIZE) {
++		/* h += m[i] */
++		h0 += (get_unaligned_le32(&input[0])) & 0x3ffffff;
++		h1 += (get_unaligned_le32(&input[3]) >> 2) & 0x3ffffff;
++		h2 += (get_unaligned_le32(&input[6]) >> 4) & 0x3ffffff;
++		h3 += (get_unaligned_le32(&input[9]) >> 6) & 0x3ffffff;
++		h4 += (get_unaligned_le32(&input[12]) >> 8) | hibit;
++
++		/* h *= r */
++		d0 = ((u64)h0 * r0) + ((u64)h1 * s4) +
++		     ((u64)h2 * s3) + ((u64)h3 * s2) +
++		     ((u64)h4 * s1);
++		d1 = ((u64)h0 * r1) + ((u64)h1 * r0) +
++		     ((u64)h2 * s4) + ((u64)h3 * s3) +
++		     ((u64)h4 * s2);
++		d2 = ((u64)h0 * r2) + ((u64)h1 * r1) +
++		     ((u64)h2 * r0) + ((u64)h3 * s4) +
++		     ((u64)h4 * s3);
++		d3 = ((u64)h0 * r3) + ((u64)h1 * r2) +
++		     ((u64)h2 * r1) + ((u64)h3 * r0) +
++		     ((u64)h4 * s4);
++		d4 = ((u64)h0 * r4) + ((u64)h1 * r3) +
++		     ((u64)h2 * r2) + ((u64)h3 * r1) +
++		     ((u64)h4 * r0);
++
++		/* (partial) h %= p */
++		c = (u32)(d0 >> 26);
++		h0 = (u32)d0 & 0x3ffffff;
++		d1 += c;
++		c = (u32)(d1 >> 26);
++		h1 = (u32)d1 & 0x3ffffff;
++		d2 += c;
++		c = (u32)(d2 >> 26);
++		h2 = (u32)d2 & 0x3ffffff;
++		d3 += c;
++		c = (u32)(d3 >> 26);
++		h3 = (u32)d3 & 0x3ffffff;
++		d4 += c;
++		c = (u32)(d4 >> 26);
++		h4 = (u32)d4 & 0x3ffffff;
++		h0 += c * 5;
++		c = (h0 >> 26);
++		h0 = h0 & 0x3ffffff;
++		h1 += c;
++
++		input += POLY1305_BLOCK_SIZE;
++		len -= POLY1305_BLOCK_SIZE;
++	}
++
++	st->h[0] = h0;
++	st->h[1] = h1;
++	st->h[2] = h2;
++	st->h[3] = h3;
++	st->h[4] = h4;
++}
++
++static void poly1305_emit_generic(void *ctx, u8 mac[16], const u32 nonce[4])
++{
++	struct poly1305_internal *st = (struct poly1305_internal *)ctx;
++	u32 h0, h1, h2, h3, h4, c;
++	u32 g0, g1, g2, g3, g4;
++	u64 f;
++	u32 mask;
++
++	/* fully carry h */
++	h0 = st->h[0];
++	h1 = st->h[1];
++	h2 = st->h[2];
++	h3 = st->h[3];
++	h4 = st->h[4];
++
++	c = h1 >> 26;
++	h1 = h1 & 0x3ffffff;
++	h2 += c;
++	c = h2 >> 26;
++	h2 = h2 & 0x3ffffff;
++	h3 += c;
++	c = h3 >> 26;
++	h3 = h3 & 0x3ffffff;
++	h4 += c;
++	c = h4 >> 26;
++	h4 = h4 & 0x3ffffff;
++	h0 += c * 5;
++	c = h0 >> 26;
++	h0 = h0 & 0x3ffffff;
++	h1 += c;
++
++	/* compute h + -p */
++	g0 = h0 + 5;
++	c = g0 >> 26;
++	g0 &= 0x3ffffff;
++	g1 = h1 + c;
++	c = g1 >> 26;
++	g1 &= 0x3ffffff;
++	g2 = h2 + c;
++	c = g2 >> 26;
++	g2 &= 0x3ffffff;
++	g3 = h3 + c;
++	c = g3 >> 26;
++	g3 &= 0x3ffffff;
++	g4 = h4 + c - (1UL << 26);
++
++	/* select h if h < p, or h + -p if h >= p */
++	mask = (g4 >> ((sizeof(u32) * 8) - 1)) - 1;
++	g0 &= mask;
++	g1 &= mask;
++	g2 &= mask;
++	g3 &= mask;
++	g4 &= mask;
++	mask = ~mask;
++
++	h0 = (h0 & mask) | g0;
++	h1 = (h1 & mask) | g1;
++	h2 = (h2 & mask) | g2;
++	h3 = (h3 & mask) | g3;
++	h4 = (h4 & mask) | g4;
++
++	/* h = h % (2^128) */
++	h0 = ((h0) | (h1 << 26)) & 0xffffffff;
++	h1 = ((h1 >> 6) | (h2 << 20)) & 0xffffffff;
++	h2 = ((h2 >> 12) | (h3 << 14)) & 0xffffffff;
++	h3 = ((h3 >> 18) | (h4 << 8)) & 0xffffffff;
++
++	/* mac = (h + nonce) % (2^128) */
++	f = (u64)h0 + nonce[0];
++	h0 = (u32)f;
++	f = (u64)h1 + nonce[1] + (f >> 32);
++	h1 = (u32)f;
++	f = (u64)h2 + nonce[2] + (f >> 32);
++	h2 = (u32)f;
++	f = (u64)h3 + nonce[3] + (f >> 32);
++	h3 = (u32)f;
++
++	put_unaligned_le32(h0, &mac[0]);
++	put_unaligned_le32(h1, &mac[4]);
++	put_unaligned_le32(h2, &mac[8]);
++	put_unaligned_le32(h3, &mac[12]);
++}
+diff --git a/lib/zinc/poly1305/poly1305-donna64.h b/lib/zinc/poly1305/poly1305-donna64.h
+new file mode 100644
+index 000000000000..7850e0a11600
+--- /dev/null
++++ b/lib/zinc/poly1305/poly1305-donna64.h
+@@ -0,0 +1,182 @@
++/* SPDX-License-Identifier: GPL-2.0 OR MIT */
++/*
++ * Copyright (C) 2015-2018 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
++ *
++ * This is based in part on Andrew Moon's poly1305-donna, which is in the
++ * public domain.
++ */
++
++typedef __uint128_t u128;
++
++struct poly1305_internal {
++	u64 r[3];
++	u64 h[3];
++	u64 s[2];
++};
++
++static void poly1305_init_generic(void *ctx, const u8 key[16])
++{
++	struct poly1305_internal *st = (struct poly1305_internal *)ctx;
++	u64 t0, t1;
++
++	/* r &= 0xffffffc0ffffffc0ffffffc0fffffff */
++	t0 = get_unaligned_le64(&key[0]);
++	t1 = get_unaligned_le64(&key[8]);
++
++	st->r[0] = t0 & 0xffc0fffffff;
++	st->r[1] = ((t0 >> 44) | (t1 << 20)) & 0xfffffc0ffff;
++	st->r[2] = ((t1 >> 24)) & 0x00ffffffc0f;
++
++	/* s = 20*r */
++	st->s[0] = st->r[1] * 20;
++	st->s[1] = st->r[2] * 20;
++
++	/* h = 0 */
++	st->h[0] = 0;
++	st->h[1] = 0;
++	st->h[2] = 0;
++}
++
++static void poly1305_blocks_generic(void *ctx, const u8 *input, size_t len,
++				    const u32 padbit)
++{
++	struct poly1305_internal *st = (struct poly1305_internal *)ctx;
++	const u64 hibit = ((u64)padbit) << 40;
++	u64 r0, r1, r2;
++	u64 s1, s2;
++	u64 h0, h1, h2;
++	u64 c;
++	u128 d0, d1, d2, d;
++
++	r0 = st->r[0];
++	r1 = st->r[1];
++	r2 = st->r[2];
++
++	h0 = st->h[0];
++	h1 = st->h[1];
++	h2 = st->h[2];
++
++	s1 = st->s[0];
++	s2 = st->s[1];
++
++	while (len >= POLY1305_BLOCK_SIZE) {
++		u64 t0, t1;
++
++		/* h += m[i] */
++		t0 = get_unaligned_le64(&input[0]);
++		t1 = get_unaligned_le64(&input[8]);
++
++		h0 += t0 & 0xfffffffffff;
++		h1 += ((t0 >> 44) | (t1 << 20)) & 0xfffffffffff;
++		h2 += (((t1 >> 24)) & 0x3ffffffffff) | hibit;
++
++		/* h *= r */
++		d0 = (u128)h0 * r0;
++		d = (u128)h1 * s2;
++		d0 += d;
++		d = (u128)h2 * s1;
++		d0 += d;
++		d1 = (u128)h0 * r1;
++		d = (u128)h1 * r0;
++		d1 += d;
++		d = (u128)h2 * s2;
++		d1 += d;
++		d2 = (u128)h0 * r2;
++		d = (u128)h1 * r1;
++		d2 += d;
++		d = (u128)h2 * r0;
++		d2 += d;
++
++		/* (partial) h %= p */
++		c = (u64)(d0 >> 44);
++		h0 = (u64)d0 & 0xfffffffffff;
++		d1 += c;
++		c = (u64)(d1 >> 44);
++		h1 = (u64)d1 & 0xfffffffffff;
++		d2 += c;
++		c = (u64)(d2 >> 42);
++		h2 = (u64)d2 & 0x3ffffffffff;
++		h0 += c * 5;
++		c = h0 >> 44;
++		h0 = h0 & 0xfffffffffff;
++		h1 += c;
++
++		input += POLY1305_BLOCK_SIZE;
++		len -= POLY1305_BLOCK_SIZE;
++	}
++
++	st->h[0] = h0;
++	st->h[1] = h1;
++	st->h[2] = h2;
++}
++
++static void poly1305_emit_generic(void *ctx, u8 mac[16], const u32 nonce[4])
++{
++	struct poly1305_internal *st = (struct poly1305_internal *)ctx;
++	u64 h0, h1, h2, c;
++	u64 g0, g1, g2;
++	u64 t0, t1;
++
++	/* fully carry h */
++	h0 = st->h[0];
++	h1 = st->h[1];
++	h2 = st->h[2];
++
++	c = h1 >> 44;
++	h1 &= 0xfffffffffff;
++	h2 += c;
++	c = h2 >> 42;
++	h2 &= 0x3ffffffffff;
++	h0 += c * 5;
++	c = h0 >> 44;
++	h0 &= 0xfffffffffff;
++	h1 += c;
++	c = h1 >> 44;
++	h1 &= 0xfffffffffff;
++	h2 += c;
++	c = h2 >> 42;
++	h2 &= 0x3ffffffffff;
++	h0 += c * 5;
++	c = h0 >> 44;
++	h0 &= 0xfffffffffff;
++	h1 += c;
++
++	/* compute h + -p */
++	g0 = h0 + 5;
++	c  = g0 >> 44;
++	g0 &= 0xfffffffffff;
++	g1 = h1 + c;
++	c  = g1 >> 44;
++	g1 &= 0xfffffffffff;
++	g2 = h2 + c - (1ULL << 42);
++
++	/* select h if h < p, or h + -p if h >= p */
++	c = (g2 >> ((sizeof(u64) * 8) - 1)) - 1;
++	g0 &= c;
++	g1 &= c;
++	g2 &= c;
++	c  = ~c;
++	h0 = (h0 & c) | g0;
++	h1 = (h1 & c) | g1;
++	h2 = (h2 & c) | g2;
++
++	/* h = (h + nonce) */
++	t0 = ((u64)nonce[1] << 32) | nonce[0];
++	t1 = ((u64)nonce[3] << 32) | nonce[2];
++
++	h0 += t0 & 0xfffffffffff;
++	c = h0 >> 44;
++	h0 &= 0xfffffffffff;
++	h1 += (((t0 >> 44) | (t1 << 20)) & 0xfffffffffff) + c;
++	c = h1 >> 44;
++	h1 &= 0xfffffffffff;
++	h2 += (((t1 >> 24)) & 0x3ffffffffff) + c;
++	h2 &= 0x3ffffffffff;
++
++	/* mac = h % (2^128) */
++	h0 = h0 | (h1 << 44);
++	h1 = (h1 >> 20) | (h2 << 24);
++
++	put_unaligned_le64(h0, &mac[0]);
++	put_unaligned_le64(h1, &mac[8]);
++}
+diff --git a/lib/zinc/poly1305/poly1305.c b/lib/zinc/poly1305/poly1305.c
+new file mode 100644
+index 000000000000..538abc359d1d
+--- /dev/null
++++ b/lib/zinc/poly1305/poly1305.c
+@@ -0,0 +1,155 @@
++// SPDX-License-Identifier: GPL-2.0 OR MIT
++/*
++ * Copyright (C) 2015-2018 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
++ *
++ * Implementation of the Poly1305 message authenticator.
++ *
++ * Information: https://cr.yp.to/mac.html
++ */
++
++#include <zinc/poly1305.h>
++
++#include <asm/unaligned.h>
++#include <linux/kernel.h>
++#include <linux/string.h>
++#include <linux/module.h>
++#include <linux/init.h>
++
++#ifndef HAVE_POLY1305_ARCH_IMPLEMENTATION
++static inline bool poly1305_init_arch(void *ctx,
++				      const u8 key[POLY1305_KEY_SIZE])
++{
++	return false;
++}
++static inline bool poly1305_blocks_arch(void *ctx, const u8 *input,
++					const size_t len, const u32 padbit,
++					simd_context_t *simd_context)
++{
++	return false;
++}
++static inline bool poly1305_emit_arch(void *ctx, u8 mac[POLY1305_MAC_SIZE],
++				      const u32 nonce[4],
++				      simd_context_t *simd_context)
++{
++	return false;
++}
++void __init poly1305_fpu_init(void)
++{
++}
++#endif
++
++#if defined(CONFIG_ARCH_SUPPORTS_INT128) && defined(__SIZEOF_INT128__)
++#include "poly1305-donna64.h"
 +#else
-+.quad	OPENSSL_armcap_P-.
-+#endif
-+.byte	67,104,97,67,104,97,50,48,32,102,111,114,32,65,82,77,118,56,44,32,67,82,89,80,84,79,71,65,77,83,32,98,121,32,60,97,112,112,114,111,64,111,112,101,110,115,115,108,46,111,114,103,62,0
-+.align	2
-+
-+.globl	ChaCha20_ctr32
-+.type	ChaCha20_ctr32,%function
-+.align	5
-+ChaCha20_ctr32:
-+	cbz	x2,.Labort
-+	adr	x5,.LOPENSSL_armcap_P
-+	cmp	x2,#192
-+	b.lo	.Lshort
-+#ifdef	__ILP32__
-+	ldrsw	x6,[x5]
-+#else
-+	ldr	x6,[x5]
-+#endif
-+	ldr	w17,[x6,x5]
-+	tst	w17,#ARMV7_NEON
-+	b.ne	ChaCha20_neon
-+
-+.Lshort:
-+	stp	x29,x30,[sp,#-96]!
-+	add	x29,sp,#0
-+
-+	adr	x5,.Lsigma
-+	stp	x19,x20,[sp,#16]
-+	stp	x21,x22,[sp,#32]
-+	stp	x23,x24,[sp,#48]
-+	stp	x25,x26,[sp,#64]
-+	stp	x27,x28,[sp,#80]
-+	sub	sp,sp,#64
-+
-+	ldp	x22,x23,[x5]		// load sigma
-+	ldp	x24,x25,[x3]		// load key
-+	ldp	x26,x27,[x3,#16]
-+	ldp	x28,x30,[x4]		// load counter
-+#ifdef	__ARMEB__
-+	ror	x24,x24,#32
-+	ror	x25,x25,#32
-+	ror	x26,x26,#32
-+	ror	x27,x27,#32
-+	ror	x28,x28,#32
-+	ror	x30,x30,#32
++#include "poly1305-donna32.h"
 +#endif
 +
-+.Loop_outer:
-+	mov	w5,w22			// unpack key block
-+	lsr	x6,x22,#32
-+	mov	w7,w23
-+	lsr	x8,x23,#32
-+	mov	w9,w24
-+	lsr	x10,x24,#32
-+	mov	w11,w25
-+	lsr	x12,x25,#32
-+	mov	w13,w26
-+	lsr	x14,x26,#32
-+	mov	w15,w27
-+	lsr	x16,x27,#32
-+	mov	w17,w28
-+	lsr	x19,x28,#32
-+	mov	w20,w30
-+	lsr	x21,x30,#32
++void poly1305_init(struct poly1305_ctx *ctx, const u8 key[POLY1305_KEY_SIZE])
++{
++	ctx->nonce[0] = get_unaligned_le32(&key[16]);
++	ctx->nonce[1] = get_unaligned_le32(&key[20]);
++	ctx->nonce[2] = get_unaligned_le32(&key[24]);
++	ctx->nonce[3] = get_unaligned_le32(&key[28]);
 +
-+	mov	x4,#10
-+	subs	x2,x2,#64
-+.Loop:
-+	sub	x4,x4,#1
-+	add	w5,w5,w9
-+	add	w6,w6,w10
-+	add	w7,w7,w11
-+	add	w8,w8,w12
-+	eor	w17,w17,w5
-+	eor	w19,w19,w6
-+	eor	w20,w20,w7
-+	eor	w21,w21,w8
-+	ror	w17,w17,#16
-+	ror	w19,w19,#16
-+	ror	w20,w20,#16
-+	ror	w21,w21,#16
-+	add	w13,w13,w17
-+	add	w14,w14,w19
-+	add	w15,w15,w20
-+	add	w16,w16,w21
-+	eor	w9,w9,w13
-+	eor	w10,w10,w14
-+	eor	w11,w11,w15
-+	eor	w12,w12,w16
-+	ror	w9,w9,#20
-+	ror	w10,w10,#20
-+	ror	w11,w11,#20
-+	ror	w12,w12,#20
-+	add	w5,w5,w9
-+	add	w6,w6,w10
-+	add	w7,w7,w11
-+	add	w8,w8,w12
-+	eor	w17,w17,w5
-+	eor	w19,w19,w6
-+	eor	w20,w20,w7
-+	eor	w21,w21,w8
-+	ror	w17,w17,#24
-+	ror	w19,w19,#24
-+	ror	w20,w20,#24
-+	ror	w21,w21,#24
-+	add	w13,w13,w17
-+	add	w14,w14,w19
-+	add	w15,w15,w20
-+	add	w16,w16,w21
-+	eor	w9,w9,w13
-+	eor	w10,w10,w14
-+	eor	w11,w11,w15
-+	eor	w12,w12,w16
-+	ror	w9,w9,#25
-+	ror	w10,w10,#25
-+	ror	w11,w11,#25
-+	ror	w12,w12,#25
-+	add	w5,w5,w10
-+	add	w6,w6,w11
-+	add	w7,w7,w12
-+	add	w8,w8,w9
-+	eor	w21,w21,w5
-+	eor	w17,w17,w6
-+	eor	w19,w19,w7
-+	eor	w20,w20,w8
-+	ror	w21,w21,#16
-+	ror	w17,w17,#16
-+	ror	w19,w19,#16
-+	ror	w20,w20,#16
-+	add	w15,w15,w21
-+	add	w16,w16,w17
-+	add	w13,w13,w19
-+	add	w14,w14,w20
-+	eor	w10,w10,w15
-+	eor	w11,w11,w16
-+	eor	w12,w12,w13
-+	eor	w9,w9,w14
-+	ror	w10,w10,#20
-+	ror	w11,w11,#20
-+	ror	w12,w12,#20
-+	ror	w9,w9,#20
-+	add	w5,w5,w10
-+	add	w6,w6,w11
-+	add	w7,w7,w12
-+	add	w8,w8,w9
-+	eor	w21,w21,w5
-+	eor	w17,w17,w6
-+	eor	w19,w19,w7
-+	eor	w20,w20,w8
-+	ror	w21,w21,#24
-+	ror	w17,w17,#24
-+	ror	w19,w19,#24
-+	ror	w20,w20,#24
-+	add	w15,w15,w21
-+	add	w16,w16,w17
-+	add	w13,w13,w19
-+	add	w14,w14,w20
-+	eor	w10,w10,w15
-+	eor	w11,w11,w16
-+	eor	w12,w12,w13
-+	eor	w9,w9,w14
-+	ror	w10,w10,#25
-+	ror	w11,w11,#25
-+	ror	w12,w12,#25
-+	ror	w9,w9,#25
-+	cbnz	x4,.Loop
++	if (!poly1305_init_arch(ctx->opaque, key))
++		poly1305_init_generic(ctx->opaque, key);
 +
-+	add	w5,w5,w22		// accumulate key block
-+	add	x6,x6,x22,lsr#32
-+	add	w7,w7,w23
-+	add	x8,x8,x23,lsr#32
-+	add	w9,w9,w24
-+	add	x10,x10,x24,lsr#32
-+	add	w11,w11,w25
-+	add	x12,x12,x25,lsr#32
-+	add	w13,w13,w26
-+	add	x14,x14,x26,lsr#32
-+	add	w15,w15,w27
-+	add	x16,x16,x27,lsr#32
-+	add	w17,w17,w28
-+	add	x19,x19,x28,lsr#32
-+	add	w20,w20,w30
-+	add	x21,x21,x30,lsr#32
++	ctx->num = 0;
++}
++EXPORT_SYMBOL(poly1305_init);
 +
-+	b.lo	.Ltail
++static inline void poly1305_blocks(void *ctx, const u8 *input, const size_t len,
++				   const u32 padbit,
++				   simd_context_t *simd_context)
++{
++	if (!poly1305_blocks_arch(ctx, input, len, padbit, simd_context))
++		poly1305_blocks_generic(ctx, input, len, padbit);
++}
 +
-+	add	x5,x5,x6,lsl#32	// pack
-+	add	x7,x7,x8,lsl#32
-+	ldp	x6,x8,[x1,#0]		// load input
-+	add	x9,x9,x10,lsl#32
-+	add	x11,x11,x12,lsl#32
-+	ldp	x10,x12,[x1,#16]
-+	add	x13,x13,x14,lsl#32
-+	add	x15,x15,x16,lsl#32
-+	ldp	x14,x16,[x1,#32]
-+	add	x17,x17,x19,lsl#32
-+	add	x20,x20,x21,lsl#32
-+	ldp	x19,x21,[x1,#48]
-+	add	x1,x1,#64
-+#ifdef	__ARMEB__
-+	rev	x5,x5
-+	rev	x7,x7
-+	rev	x9,x9
-+	rev	x11,x11
-+	rev	x13,x13
-+	rev	x15,x15
-+	rev	x17,x17
-+	rev	x20,x20
++static inline void poly1305_emit(void *ctx, u8 mac[POLY1305_KEY_SIZE],
++				 const u32 nonce[4],
++				 simd_context_t *simd_context)
++{
++	if (!poly1305_emit_arch(ctx, mac, nonce, simd_context))
++		poly1305_emit_generic(ctx, mac, nonce);
++}
++
++void poly1305_update(struct poly1305_ctx *ctx, const u8 *input, size_t len,
++		     simd_context_t *simd_context)
++{
++	const size_t num = ctx->num;
++	size_t rem;
++
++	if (num) {
++		rem = POLY1305_BLOCK_SIZE - num;
++		if (len < rem) {
++			memcpy(ctx->data + num, input, len);
++			ctx->num = num + len;
++			return;
++		}
++		memcpy(ctx->data + num, input, rem);
++		poly1305_blocks(ctx->opaque, ctx->data, POLY1305_BLOCK_SIZE, 1,
++				simd_context);
++		input += rem;
++		len -= rem;
++	}
++
++	rem = len % POLY1305_BLOCK_SIZE;
++	len -= rem;
++
++	if (len >= POLY1305_BLOCK_SIZE) {
++		poly1305_blocks(ctx->opaque, input, len, 1, simd_context);
++		input += len;
++	}
++
++	if (rem)
++		memcpy(ctx->data, input, rem);
++
++	ctx->num = rem;
++}
++EXPORT_SYMBOL(poly1305_update);
++
++void poly1305_final(struct poly1305_ctx *ctx, u8 mac[POLY1305_MAC_SIZE],
++		    simd_context_t *simd_context)
++{
++	size_t num = ctx->num;
++
++	if (num) {
++		ctx->data[num++] = 1;
++		while (num < POLY1305_BLOCK_SIZE)
++			ctx->data[num++] = 0;
++		poly1305_blocks(ctx->opaque, ctx->data, POLY1305_BLOCK_SIZE, 0,
++				simd_context);
++	}
++
++	poly1305_emit(ctx->opaque, mac, ctx->nonce, simd_context);
++
++	memzero_explicit(ctx, sizeof(*ctx));
++}
++EXPORT_SYMBOL(poly1305_final);
++
++#include "../selftest/poly1305.h"
++
++static bool nosimd __initdata = false;
++
++static int __init mod_init(void)
++{
++	if (!nosimd)
++		poly1305_fpu_init();
++#ifdef DEBUG
++	if (!poly1305_selftest())
++		return -ENOTRECOVERABLE;
 +#endif
-+	eor	x5,x5,x6
-+	eor	x7,x7,x8
-+	eor	x9,x9,x10
-+	eor	x11,x11,x12
-+	eor	x13,x13,x14
-+	eor	x15,x15,x16
-+	eor	x17,x17,x19
-+	eor	x20,x20,x21
++	return 0;
++}
 +
-+	stp	x5,x7,[x0,#0]		// store output
-+	add	x28,x28,#1			// increment counter
-+	stp	x9,x11,[x0,#16]
-+	stp	x13,x15,[x0,#32]
-+	stp	x17,x20,[x0,#48]
-+	add	x0,x0,#64
++static void __exit mod_exit(void)
++{
++}
 +
-+	b.hi	.Loop_outer
++module_param(nosimd, bool, 0);
++module_init(mod_init);
++module_exit(mod_exit);
++MODULE_LICENSE("GPL v2");
++MODULE_DESCRIPTION("Poly1305 one-time authenticator");
++MODULE_AUTHOR("Jason A. Donenfeld <Jason@zx2c4.com>");
+diff --git a/lib/zinc/selftest/poly1305.h b/lib/zinc/selftest/poly1305.h
+new file mode 100644
+index 000000000000..e806ab2856fe
+--- /dev/null
++++ b/lib/zinc/selftest/poly1305.h
+@@ -0,0 +1,1112 @@
++/* SPDX-License-Identifier: GPL-2.0 OR MIT */
++/*
++ * Copyright (C) 2015-2018 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
++ */
 +
-+	ldp	x19,x20,[x29,#16]
-+	add	sp,sp,#64
-+	ldp	x21,x22,[x29,#32]
-+	ldp	x23,x24,[x29,#48]
-+	ldp	x25,x26,[x29,#64]
-+	ldp	x27,x28,[x29,#80]
-+	ldp	x29,x30,[sp],#96
-+.Labort:
-+	ret
++#ifdef DEBUG
++struct poly1305_testvec {
++	const u8 *input, *output, *key;
++	size_t ilen;
++};
 +
-+.align	4
-+.Ltail:
-+	add	x2,x2,#64
-+.Less_than_64:
-+	sub	x0,x0,#1
-+	add	x1,x1,x2
-+	add	x0,x0,x2
-+	add	x4,sp,x2
-+	neg	x2,x2
++/* RFC7539 */
++static const u8 input01[] __initconst = {
++	0x43, 0x72, 0x79, 0x70, 0x74, 0x6f, 0x67, 0x72,
++	0x61, 0x70, 0x68, 0x69, 0x63, 0x20, 0x46, 0x6f,
++	0x72, 0x75, 0x6d, 0x20, 0x52, 0x65, 0x73, 0x65,
++	0x61, 0x72, 0x63, 0x68, 0x20, 0x47, 0x72, 0x6f,
++	0x75, 0x70
++};
++static const u8 output01[] __initconst = {
++	0xa8, 0x06, 0x1d, 0xc1, 0x30, 0x51, 0x36, 0xc6,
++	0xc2, 0x2b, 0x8b, 0xaf, 0x0c, 0x01, 0x27, 0xa9
++};
++static const u8 key01[] __initconst = {
++	0x85, 0xd6, 0xbe, 0x78, 0x57, 0x55, 0x6d, 0x33,
++	0x7f, 0x44, 0x52, 0xfe, 0x42, 0xd5, 0x06, 0xa8,
++	0x01, 0x03, 0x80, 0x8a, 0xfb, 0x0d, 0xb2, 0xfd,
++	0x4a, 0xbf, 0xf6, 0xaf, 0x41, 0x49, 0xf5, 0x1b
++};
 +
-+	add	x5,x5,x6,lsl#32	// pack
-+	add	x7,x7,x8,lsl#32
-+	add	x9,x9,x10,lsl#32
-+	add	x11,x11,x12,lsl#32
-+	add	x13,x13,x14,lsl#32
-+	add	x15,x15,x16,lsl#32
-+	add	x17,x17,x19,lsl#32
-+	add	x20,x20,x21,lsl#32
-+#ifdef	__ARMEB__
-+	rev	x5,x5
-+	rev	x7,x7
-+	rev	x9,x9
-+	rev	x11,x11
-+	rev	x13,x13
-+	rev	x15,x15
-+	rev	x17,x17
-+	rev	x20,x20
++/* "The Poly1305-AES message-authentication code" */
++static const u8 input02[] __initconst = {
++	0xf3, 0xf6
++};
++static const u8 output02[] __initconst = {
++	0xf4, 0xc6, 0x33, 0xc3, 0x04, 0x4f, 0xc1, 0x45,
++	0xf8, 0x4f, 0x33, 0x5c, 0xb8, 0x19, 0x53, 0xde
++};
++static const u8 key02[] __initconst = {
++	0x85, 0x1f, 0xc4, 0x0c, 0x34, 0x67, 0xac, 0x0b,
++	0xe0, 0x5c, 0xc2, 0x04, 0x04, 0xf3, 0xf7, 0x00,
++	0x58, 0x0b, 0x3b, 0x0f, 0x94, 0x47, 0xbb, 0x1e,
++	0x69, 0xd0, 0x95, 0xb5, 0x92, 0x8b, 0x6d, 0xbc
++};
++
++static const u8 input03[] __initconst = { };
++static const u8 output03[] __initconst = {
++	0xdd, 0x3f, 0xab, 0x22, 0x51, 0xf1, 0x1a, 0xc7,
++	0x59, 0xf0, 0x88, 0x71, 0x29, 0xcc, 0x2e, 0xe7
++};
++static const u8 key03[] __initconst = {
++	0xa0, 0xf3, 0x08, 0x00, 0x00, 0xf4, 0x64, 0x00,
++	0xd0, 0xc7, 0xe9, 0x07, 0x6c, 0x83, 0x44, 0x03,
++	0xdd, 0x3f, 0xab, 0x22, 0x51, 0xf1, 0x1a, 0xc7,
++	0x59, 0xf0, 0x88, 0x71, 0x29, 0xcc, 0x2e, 0xe7
++};
++
++static const u8 input04[] __initconst = {
++	0x66, 0x3c, 0xea, 0x19, 0x0f, 0xfb, 0x83, 0xd8,
++	0x95, 0x93, 0xf3, 0xf4, 0x76, 0xb6, 0xbc, 0x24,
++	0xd7, 0xe6, 0x79, 0x10, 0x7e, 0xa2, 0x6a, 0xdb,
++	0x8c, 0xaf, 0x66, 0x52, 0xd0, 0x65, 0x61, 0x36
++};
++static const u8 output04[] __initconst = {
++	0x0e, 0xe1, 0xc1, 0x6b, 0xb7, 0x3f, 0x0f, 0x4f,
++	0xd1, 0x98, 0x81, 0x75, 0x3c, 0x01, 0xcd, 0xbe
++};
++static const u8 key04[] __initconst = {
++	0x48, 0x44, 0x3d, 0x0b, 0xb0, 0xd2, 0x11, 0x09,
++	0xc8, 0x9a, 0x10, 0x0b, 0x5c, 0xe2, 0xc2, 0x08,
++	0x83, 0x14, 0x9c, 0x69, 0xb5, 0x61, 0xdd, 0x88,
++	0x29, 0x8a, 0x17, 0x98, 0xb1, 0x07, 0x16, 0xef
++};
++
++static const u8 input05[] __initconst = {
++	0xab, 0x08, 0x12, 0x72, 0x4a, 0x7f, 0x1e, 0x34,
++	0x27, 0x42, 0xcb, 0xed, 0x37, 0x4d, 0x94, 0xd1,
++	0x36, 0xc6, 0xb8, 0x79, 0x5d, 0x45, 0xb3, 0x81,
++	0x98, 0x30, 0xf2, 0xc0, 0x44, 0x91, 0xfa, 0xf0,
++	0x99, 0x0c, 0x62, 0xe4, 0x8b, 0x80, 0x18, 0xb2,
++	0xc3, 0xe4, 0xa0, 0xfa, 0x31, 0x34, 0xcb, 0x67,
++	0xfa, 0x83, 0xe1, 0x58, 0xc9, 0x94, 0xd9, 0x61,
++	0xc4, 0xcb, 0x21, 0x09, 0x5c, 0x1b, 0xf9
++};
++static const u8 output05[] __initconst = {
++	0x51, 0x54, 0xad, 0x0d, 0x2c, 0xb2, 0x6e, 0x01,
++	0x27, 0x4f, 0xc5, 0x11, 0x48, 0x49, 0x1f, 0x1b
++};
++static const u8 key05[] __initconst = {
++	0x12, 0x97, 0x6a, 0x08, 0xc4, 0x42, 0x6d, 0x0c,
++	0xe8, 0xa8, 0x24, 0x07, 0xc4, 0xf4, 0x82, 0x07,
++	0x80, 0xf8, 0xc2, 0x0a, 0xa7, 0x12, 0x02, 0xd1,
++	0xe2, 0x91, 0x79, 0xcb, 0xcb, 0x55, 0x5a, 0x57
++};
++
++/* self-generated vectors exercise "significant" lengths, such that they
++ * are handled by different code paths */
++static const u8 input06[] __initconst = {
++	0xab, 0x08, 0x12, 0x72, 0x4a, 0x7f, 0x1e, 0x34,
++	0x27, 0x42, 0xcb, 0xed, 0x37, 0x4d, 0x94, 0xd1,
++	0x36, 0xc6, 0xb8, 0x79, 0x5d, 0x45, 0xb3, 0x81,
++	0x98, 0x30, 0xf2, 0xc0, 0x44, 0x91, 0xfa, 0xf0,
++	0x99, 0x0c, 0x62, 0xe4, 0x8b, 0x80, 0x18, 0xb2,
++	0xc3, 0xe4, 0xa0, 0xfa, 0x31, 0x34, 0xcb, 0x67,
++	0xfa, 0x83, 0xe1, 0x58, 0xc9, 0x94, 0xd9, 0x61,
++	0xc4, 0xcb, 0x21, 0x09, 0x5c, 0x1b, 0xf9, 0xaf
++};
++static const u8 output06[] __initconst = {
++	0x81, 0x20, 0x59, 0xa5, 0xda, 0x19, 0x86, 0x37,
++	0xca, 0xc7, 0xc4, 0xa6, 0x31, 0xbe, 0xe4, 0x66
++};
++static const u8 key06[] __initconst = {
++	0x12, 0x97, 0x6a, 0x08, 0xc4, 0x42, 0x6d, 0x0c,
++	0xe8, 0xa8, 0x24, 0x07, 0xc4, 0xf4, 0x82, 0x07,
++	0x80, 0xf8, 0xc2, 0x0a, 0xa7, 0x12, 0x02, 0xd1,
++	0xe2, 0x91, 0x79, 0xcb, 0xcb, 0x55, 0x5a, 0x57
++};
++
++static const u8 input07[] __initconst = {
++	0xab, 0x08, 0x12, 0x72, 0x4a, 0x7f, 0x1e, 0x34,
++	0x27, 0x42, 0xcb, 0xed, 0x37, 0x4d, 0x94, 0xd1,
++	0x36, 0xc6, 0xb8, 0x79, 0x5d, 0x45, 0xb3, 0x81,
++	0x98, 0x30, 0xf2, 0xc0, 0x44, 0x91, 0xfa, 0xf0,
++	0x99, 0x0c, 0x62, 0xe4, 0x8b, 0x80, 0x18, 0xb2,
++	0xc3, 0xe4, 0xa0, 0xfa, 0x31, 0x34, 0xcb, 0x67
++};
++static const u8 output07[] __initconst = {
++	0x5b, 0x88, 0xd7, 0xf6, 0x22, 0x8b, 0x11, 0xe2,
++	0xe2, 0x85, 0x79, 0xa5, 0xc0, 0xc1, 0xf7, 0x61
++};
++static const u8 key07[] __initconst = {
++	0x12, 0x97, 0x6a, 0x08, 0xc4, 0x42, 0x6d, 0x0c,
++	0xe8, 0xa8, 0x24, 0x07, 0xc4, 0xf4, 0x82, 0x07,
++	0x80, 0xf8, 0xc2, 0x0a, 0xa7, 0x12, 0x02, 0xd1,
++	0xe2, 0x91, 0x79, 0xcb, 0xcb, 0x55, 0x5a, 0x57
++};
++
++static const u8 input08[] __initconst = {
++	0xab, 0x08, 0x12, 0x72, 0x4a, 0x7f, 0x1e, 0x34,
++	0x27, 0x42, 0xcb, 0xed, 0x37, 0x4d, 0x94, 0xd1,
++	0x36, 0xc6, 0xb8, 0x79, 0x5d, 0x45, 0xb3, 0x81,
++	0x98, 0x30, 0xf2, 0xc0, 0x44, 0x91, 0xfa, 0xf0,
++	0x99, 0x0c, 0x62, 0xe4, 0x8b, 0x80, 0x18, 0xb2,
++	0xc3, 0xe4, 0xa0, 0xfa, 0x31, 0x34, 0xcb, 0x67,
++	0xfa, 0x83, 0xe1, 0x58, 0xc9, 0x94, 0xd9, 0x61,
++	0xc4, 0xcb, 0x21, 0x09, 0x5c, 0x1b, 0xf9, 0xaf,
++	0x66, 0x3c, 0xea, 0x19, 0x0f, 0xfb, 0x83, 0xd8,
++	0x95, 0x93, 0xf3, 0xf4, 0x76, 0xb6, 0xbc, 0x24,
++	0xd7, 0xe6, 0x79, 0x10, 0x7e, 0xa2, 0x6a, 0xdb,
++	0x8c, 0xaf, 0x66, 0x52, 0xd0, 0x65, 0x61, 0x36
++};
++static const u8 output08[] __initconst = {
++	0xbb, 0xb6, 0x13, 0xb2, 0xb6, 0xd7, 0x53, 0xba,
++	0x07, 0x39, 0x5b, 0x91, 0x6a, 0xae, 0xce, 0x15
++};
++static const u8 key08[] __initconst = {
++	0x12, 0x97, 0x6a, 0x08, 0xc4, 0x42, 0x6d, 0x0c,
++	0xe8, 0xa8, 0x24, 0x07, 0xc4, 0xf4, 0x82, 0x07,
++	0x80, 0xf8, 0xc2, 0x0a, 0xa7, 0x12, 0x02, 0xd1,
++	0xe2, 0x91, 0x79, 0xcb, 0xcb, 0x55, 0x5a, 0x57
++};
++
++static const u8 input09[] __initconst = {
++	0xab, 0x08, 0x12, 0x72, 0x4a, 0x7f, 0x1e, 0x34,
++	0x27, 0x42, 0xcb, 0xed, 0x37, 0x4d, 0x94, 0xd1,
++	0x36, 0xc6, 0xb8, 0x79, 0x5d, 0x45, 0xb3, 0x81,
++	0x98, 0x30, 0xf2, 0xc0, 0x44, 0x91, 0xfa, 0xf0,
++	0x99, 0x0c, 0x62, 0xe4, 0x8b, 0x80, 0x18, 0xb2,
++	0xc3, 0xe4, 0xa0, 0xfa, 0x31, 0x34, 0xcb, 0x67,
++	0xfa, 0x83, 0xe1, 0x58, 0xc9, 0x94, 0xd9, 0x61,
++	0xc4, 0xcb, 0x21, 0x09, 0x5c, 0x1b, 0xf9, 0xaf,
++	0x48, 0x44, 0x3d, 0x0b, 0xb0, 0xd2, 0x11, 0x09,
++	0xc8, 0x9a, 0x10, 0x0b, 0x5c, 0xe2, 0xc2, 0x08,
++	0x83, 0x14, 0x9c, 0x69, 0xb5, 0x61, 0xdd, 0x88,
++	0x29, 0x8a, 0x17, 0x98, 0xb1, 0x07, 0x16, 0xef,
++	0x66, 0x3c, 0xea, 0x19, 0x0f, 0xfb, 0x83, 0xd8,
++	0x95, 0x93, 0xf3, 0xf4, 0x76, 0xb6, 0xbc, 0x24
++};
++static const u8 output09[] __initconst = {
++	0xc7, 0x94, 0xd7, 0x05, 0x7d, 0x17, 0x78, 0xc4,
++	0xbb, 0xee, 0x0a, 0x39, 0xb3, 0xd9, 0x73, 0x42
++};
++static const u8 key09[] __initconst = {
++	0x12, 0x97, 0x6a, 0x08, 0xc4, 0x42, 0x6d, 0x0c,
++	0xe8, 0xa8, 0x24, 0x07, 0xc4, 0xf4, 0x82, 0x07,
++	0x80, 0xf8, 0xc2, 0x0a, 0xa7, 0x12, 0x02, 0xd1,
++	0xe2, 0x91, 0x79, 0xcb, 0xcb, 0x55, 0x5a, 0x57
++};
++
++static const u8 input10[] __initconst = {
++	0xab, 0x08, 0x12, 0x72, 0x4a, 0x7f, 0x1e, 0x34,
++	0x27, 0x42, 0xcb, 0xed, 0x37, 0x4d, 0x94, 0xd1,
++	0x36, 0xc6, 0xb8, 0x79, 0x5d, 0x45, 0xb3, 0x81,
++	0x98, 0x30, 0xf2, 0xc0, 0x44, 0x91, 0xfa, 0xf0,
++	0x99, 0x0c, 0x62, 0xe4, 0x8b, 0x80, 0x18, 0xb2,
++	0xc3, 0xe4, 0xa0, 0xfa, 0x31, 0x34, 0xcb, 0x67,
++	0xfa, 0x83, 0xe1, 0x58, 0xc9, 0x94, 0xd9, 0x61,
++	0xc4, 0xcb, 0x21, 0x09, 0x5c, 0x1b, 0xf9, 0xaf,
++	0x48, 0x44, 0x3d, 0x0b, 0xb0, 0xd2, 0x11, 0x09,
++	0xc8, 0x9a, 0x10, 0x0b, 0x5c, 0xe2, 0xc2, 0x08,
++	0x83, 0x14, 0x9c, 0x69, 0xb5, 0x61, 0xdd, 0x88,
++	0x29, 0x8a, 0x17, 0x98, 0xb1, 0x07, 0x16, 0xef,
++	0x66, 0x3c, 0xea, 0x19, 0x0f, 0xfb, 0x83, 0xd8,
++	0x95, 0x93, 0xf3, 0xf4, 0x76, 0xb6, 0xbc, 0x24,
++	0xd7, 0xe6, 0x79, 0x10, 0x7e, 0xa2, 0x6a, 0xdb,
++	0x8c, 0xaf, 0x66, 0x52, 0xd0, 0x65, 0x61, 0x36
++};
++static const u8 output10[] __initconst = {
++	0xff, 0xbc, 0xb9, 0xb3, 0x71, 0x42, 0x31, 0x52,
++	0xd7, 0xfc, 0xa5, 0xad, 0x04, 0x2f, 0xba, 0xa9
++};
++static const u8 key10[] __initconst = {
++	0x12, 0x97, 0x6a, 0x08, 0xc4, 0x42, 0x6d, 0x0c,
++	0xe8, 0xa8, 0x24, 0x07, 0xc4, 0xf4, 0x82, 0x07,
++	0x80, 0xf8, 0xc2, 0x0a, 0xa7, 0x12, 0x02, 0xd1,
++	0xe2, 0x91, 0x79, 0xcb, 0xcb, 0x55, 0x5a, 0x57
++};
++
++static const u8 input11[] __initconst = {
++	0xab, 0x08, 0x12, 0x72, 0x4a, 0x7f, 0x1e, 0x34,
++	0x27, 0x42, 0xcb, 0xed, 0x37, 0x4d, 0x94, 0xd1,
++	0x36, 0xc6, 0xb8, 0x79, 0x5d, 0x45, 0xb3, 0x81,
++	0x98, 0x30, 0xf2, 0xc0, 0x44, 0x91, 0xfa, 0xf0,
++	0x99, 0x0c, 0x62, 0xe4, 0x8b, 0x80, 0x18, 0xb2,
++	0xc3, 0xe4, 0xa0, 0xfa, 0x31, 0x34, 0xcb, 0x67,
++	0xfa, 0x83, 0xe1, 0x58, 0xc9, 0x94, 0xd9, 0x61,
++	0xc4, 0xcb, 0x21, 0x09, 0x5c, 0x1b, 0xf9, 0xaf,
++	0x48, 0x44, 0x3d, 0x0b, 0xb0, 0xd2, 0x11, 0x09,
++	0xc8, 0x9a, 0x10, 0x0b, 0x5c, 0xe2, 0xc2, 0x08,
++	0x83, 0x14, 0x9c, 0x69, 0xb5, 0x61, 0xdd, 0x88,
++	0x29, 0x8a, 0x17, 0x98, 0xb1, 0x07, 0x16, 0xef,
++	0x66, 0x3c, 0xea, 0x19, 0x0f, 0xfb, 0x83, 0xd8,
++	0x95, 0x93, 0xf3, 0xf4, 0x76, 0xb6, 0xbc, 0x24,
++	0xd7, 0xe6, 0x79, 0x10, 0x7e, 0xa2, 0x6a, 0xdb,
++	0x8c, 0xaf, 0x66, 0x52, 0xd0, 0x65, 0x61, 0x36,
++	0x81, 0x20, 0x59, 0xa5, 0xda, 0x19, 0x86, 0x37,
++	0xca, 0xc7, 0xc4, 0xa6, 0x31, 0xbe, 0xe4, 0x66
++};
++static const u8 output11[] __initconst = {
++	0x06, 0x9e, 0xd6, 0xb8, 0xef, 0x0f, 0x20, 0x7b,
++	0x3e, 0x24, 0x3b, 0xb1, 0x01, 0x9f, 0xe6, 0x32
++};
++static const u8 key11[] __initconst = {
++	0x12, 0x97, 0x6a, 0x08, 0xc4, 0x42, 0x6d, 0x0c,
++	0xe8, 0xa8, 0x24, 0x07, 0xc4, 0xf4, 0x82, 0x07,
++	0x80, 0xf8, 0xc2, 0x0a, 0xa7, 0x12, 0x02, 0xd1,
++	0xe2, 0x91, 0x79, 0xcb, 0xcb, 0x55, 0x5a, 0x57
++};
++
++static const u8 input12[] __initconst = {
++	0xab, 0x08, 0x12, 0x72, 0x4a, 0x7f, 0x1e, 0x34,
++	0x27, 0x42, 0xcb, 0xed, 0x37, 0x4d, 0x94, 0xd1,
++	0x36, 0xc6, 0xb8, 0x79, 0x5d, 0x45, 0xb3, 0x81,
++	0x98, 0x30, 0xf2, 0xc0, 0x44, 0x91, 0xfa, 0xf0,
++	0x99, 0x0c, 0x62, 0xe4, 0x8b, 0x80, 0x18, 0xb2,
++	0xc3, 0xe4, 0xa0, 0xfa, 0x31, 0x34, 0xcb, 0x67,
++	0xfa, 0x83, 0xe1, 0x58, 0xc9, 0x94, 0xd9, 0x61,
++	0xc4, 0xcb, 0x21, 0x09, 0x5c, 0x1b, 0xf9, 0xaf,
++	0x48, 0x44, 0x3d, 0x0b, 0xb0, 0xd2, 0x11, 0x09,
++	0xc8, 0x9a, 0x10, 0x0b, 0x5c, 0xe2, 0xc2, 0x08,
++	0x83, 0x14, 0x9c, 0x69, 0xb5, 0x61, 0xdd, 0x88,
++	0x29, 0x8a, 0x17, 0x98, 0xb1, 0x07, 0x16, 0xef,
++	0x66, 0x3c, 0xea, 0x19, 0x0f, 0xfb, 0x83, 0xd8,
++	0x95, 0x93, 0xf3, 0xf4, 0x76, 0xb6, 0xbc, 0x24,
++	0xd7, 0xe6, 0x79, 0x10, 0x7e, 0xa2, 0x6a, 0xdb,
++	0x8c, 0xaf, 0x66, 0x52, 0xd0, 0x65, 0x61, 0x36,
++	0x81, 0x20, 0x59, 0xa5, 0xda, 0x19, 0x86, 0x37,
++	0xca, 0xc7, 0xc4, 0xa6, 0x31, 0xbe, 0xe4, 0x66,
++	0x5b, 0x88, 0xd7, 0xf6, 0x22, 0x8b, 0x11, 0xe2,
++	0xe2, 0x85, 0x79, 0xa5, 0xc0, 0xc1, 0xf7, 0x61
++};
++static const u8 output12[] __initconst = {
++	0xcc, 0xa3, 0x39, 0xd9, 0xa4, 0x5f, 0xa2, 0x36,
++	0x8c, 0x2c, 0x68, 0xb3, 0xa4, 0x17, 0x91, 0x33
++};
++static const u8 key12[] __initconst = {
++	0x12, 0x97, 0x6a, 0x08, 0xc4, 0x42, 0x6d, 0x0c,
++	0xe8, 0xa8, 0x24, 0x07, 0xc4, 0xf4, 0x82, 0x07,
++	0x80, 0xf8, 0xc2, 0x0a, 0xa7, 0x12, 0x02, 0xd1,
++	0xe2, 0x91, 0x79, 0xcb, 0xcb, 0x55, 0x5a, 0x57
++};
++
++static const u8 input13[] __initconst = {
++	0xab, 0x08, 0x12, 0x72, 0x4a, 0x7f, 0x1e, 0x34,
++	0x27, 0x42, 0xcb, 0xed, 0x37, 0x4d, 0x94, 0xd1,
++	0x36, 0xc6, 0xb8, 0x79, 0x5d, 0x45, 0xb3, 0x81,
++	0x98, 0x30, 0xf2, 0xc0, 0x44, 0x91, 0xfa, 0xf0,
++	0x99, 0x0c, 0x62, 0xe4, 0x8b, 0x80, 0x18, 0xb2,
++	0xc3, 0xe4, 0xa0, 0xfa, 0x31, 0x34, 0xcb, 0x67,
++	0xfa, 0x83, 0xe1, 0x58, 0xc9, 0x94, 0xd9, 0x61,
++	0xc4, 0xcb, 0x21, 0x09, 0x5c, 0x1b, 0xf9, 0xaf,
++	0x48, 0x44, 0x3d, 0x0b, 0xb0, 0xd2, 0x11, 0x09,
++	0xc8, 0x9a, 0x10, 0x0b, 0x5c, 0xe2, 0xc2, 0x08,
++	0x83, 0x14, 0x9c, 0x69, 0xb5, 0x61, 0xdd, 0x88,
++	0x29, 0x8a, 0x17, 0x98, 0xb1, 0x07, 0x16, 0xef,
++	0x66, 0x3c, 0xea, 0x19, 0x0f, 0xfb, 0x83, 0xd8,
++	0x95, 0x93, 0xf3, 0xf4, 0x76, 0xb6, 0xbc, 0x24,
++	0xd7, 0xe6, 0x79, 0x10, 0x7e, 0xa2, 0x6a, 0xdb,
++	0x8c, 0xaf, 0x66, 0x52, 0xd0, 0x65, 0x61, 0x36,
++	0x81, 0x20, 0x59, 0xa5, 0xda, 0x19, 0x86, 0x37,
++	0xca, 0xc7, 0xc4, 0xa6, 0x31, 0xbe, 0xe4, 0x66,
++	0x5b, 0x88, 0xd7, 0xf6, 0x22, 0x8b, 0x11, 0xe2,
++	0xe2, 0x85, 0x79, 0xa5, 0xc0, 0xc1, 0xf7, 0x61,
++	0xab, 0x08, 0x12, 0x72, 0x4a, 0x7f, 0x1e, 0x34,
++	0x27, 0x42, 0xcb, 0xed, 0x37, 0x4d, 0x94, 0xd1,
++	0x36, 0xc6, 0xb8, 0x79, 0x5d, 0x45, 0xb3, 0x81,
++	0x98, 0x30, 0xf2, 0xc0, 0x44, 0x91, 0xfa, 0xf0,
++	0x99, 0x0c, 0x62, 0xe4, 0x8b, 0x80, 0x18, 0xb2,
++	0xc3, 0xe4, 0xa0, 0xfa, 0x31, 0x34, 0xcb, 0x67,
++	0xfa, 0x83, 0xe1, 0x58, 0xc9, 0x94, 0xd9, 0x61,
++	0xc4, 0xcb, 0x21, 0x09, 0x5c, 0x1b, 0xf9, 0xaf,
++	0x48, 0x44, 0x3d, 0x0b, 0xb0, 0xd2, 0x11, 0x09,
++	0xc8, 0x9a, 0x10, 0x0b, 0x5c, 0xe2, 0xc2, 0x08,
++	0x83, 0x14, 0x9c, 0x69, 0xb5, 0x61, 0xdd, 0x88,
++	0x29, 0x8a, 0x17, 0x98, 0xb1, 0x07, 0x16, 0xef,
++	0x66, 0x3c, 0xea, 0x19, 0x0f, 0xfb, 0x83, 0xd8,
++	0x95, 0x93, 0xf3, 0xf4, 0x76, 0xb6, 0xbc, 0x24,
++	0xd7, 0xe6, 0x79, 0x10, 0x7e, 0xa2, 0x6a, 0xdb,
++	0x8c, 0xaf, 0x66, 0x52, 0xd0, 0x65, 0x61, 0x36
++};
++static const u8 output13[] __initconst = {
++	0x53, 0xf6, 0xe8, 0x28, 0xa2, 0xf0, 0xfe, 0x0e,
++	0xe8, 0x15, 0xbf, 0x0b, 0xd5, 0x84, 0x1a, 0x34
++};
++static const u8 key13[] __initconst = {
++	0x12, 0x97, 0x6a, 0x08, 0xc4, 0x42, 0x6d, 0x0c,
++	0xe8, 0xa8, 0x24, 0x07, 0xc4, 0xf4, 0x82, 0x07,
++	0x80, 0xf8, 0xc2, 0x0a, 0xa7, 0x12, 0x02, 0xd1,
++	0xe2, 0x91, 0x79, 0xcb, 0xcb, 0x55, 0x5a, 0x57
++};
++
++static const u8 input14[] __initconst = {
++	0xab, 0x08, 0x12, 0x72, 0x4a, 0x7f, 0x1e, 0x34,
++	0x27, 0x42, 0xcb, 0xed, 0x37, 0x4d, 0x94, 0xd1,
++	0x36, 0xc6, 0xb8, 0x79, 0x5d, 0x45, 0xb3, 0x81,
++	0x98, 0x30, 0xf2, 0xc0, 0x44, 0x91, 0xfa, 0xf0,
++	0x99, 0x0c, 0x62, 0xe4, 0x8b, 0x80, 0x18, 0xb2,
++	0xc3, 0xe4, 0xa0, 0xfa, 0x31, 0x34, 0xcb, 0x67,
++	0xfa, 0x83, 0xe1, 0x58, 0xc9, 0x94, 0xd9, 0x61,
++	0xc4, 0xcb, 0x21, 0x09, 0x5c, 0x1b, 0xf9, 0xaf,
++	0x48, 0x44, 0x3d, 0x0b, 0xb0, 0xd2, 0x11, 0x09,
++	0xc8, 0x9a, 0x10, 0x0b, 0x5c, 0xe2, 0xc2, 0x08,
++	0x83, 0x14, 0x9c, 0x69, 0xb5, 0x61, 0xdd, 0x88,
++	0x29, 0x8a, 0x17, 0x98, 0xb1, 0x07, 0x16, 0xef,
++	0x66, 0x3c, 0xea, 0x19, 0x0f, 0xfb, 0x83, 0xd8,
++	0x95, 0x93, 0xf3, 0xf4, 0x76, 0xb6, 0xbc, 0x24,
++	0xd7, 0xe6, 0x79, 0x10, 0x7e, 0xa2, 0x6a, 0xdb,
++	0x8c, 0xaf, 0x66, 0x52, 0xd0, 0x65, 0x61, 0x36,
++	0x81, 0x20, 0x59, 0xa5, 0xda, 0x19, 0x86, 0x37,
++	0xca, 0xc7, 0xc4, 0xa6, 0x31, 0xbe, 0xe4, 0x66,
++	0x5b, 0x88, 0xd7, 0xf6, 0x22, 0x8b, 0x11, 0xe2,
++	0xe2, 0x85, 0x79, 0xa5, 0xc0, 0xc1, 0xf7, 0x61,
++	0xab, 0x08, 0x12, 0x72, 0x4a, 0x7f, 0x1e, 0x34,
++	0x27, 0x42, 0xcb, 0xed, 0x37, 0x4d, 0x94, 0xd1,
++	0x36, 0xc6, 0xb8, 0x79, 0x5d, 0x45, 0xb3, 0x81,
++	0x98, 0x30, 0xf2, 0xc0, 0x44, 0x91, 0xfa, 0xf0,
++	0x99, 0x0c, 0x62, 0xe4, 0x8b, 0x80, 0x18, 0xb2,
++	0xc3, 0xe4, 0xa0, 0xfa, 0x31, 0x34, 0xcb, 0x67,
++	0xfa, 0x83, 0xe1, 0x58, 0xc9, 0x94, 0xd9, 0x61,
++	0xc4, 0xcb, 0x21, 0x09, 0x5c, 0x1b, 0xf9, 0xaf,
++	0x48, 0x44, 0x3d, 0x0b, 0xb0, 0xd2, 0x11, 0x09,
++	0xc8, 0x9a, 0x10, 0x0b, 0x5c, 0xe2, 0xc2, 0x08,
++	0x83, 0x14, 0x9c, 0x69, 0xb5, 0x61, 0xdd, 0x88,
++	0x29, 0x8a, 0x17, 0x98, 0xb1, 0x07, 0x16, 0xef,
++	0x66, 0x3c, 0xea, 0x19, 0x0f, 0xfb, 0x83, 0xd8,
++	0x95, 0x93, 0xf3, 0xf4, 0x76, 0xb6, 0xbc, 0x24,
++	0xd7, 0xe6, 0x79, 0x10, 0x7e, 0xa2, 0x6a, 0xdb,
++	0x8c, 0xaf, 0x66, 0x52, 0xd0, 0x65, 0x61, 0x36,
++	0x81, 0x20, 0x59, 0xa5, 0xda, 0x19, 0x86, 0x37,
++	0xca, 0xc7, 0xc4, 0xa6, 0x31, 0xbe, 0xe4, 0x66,
++	0x5b, 0x88, 0xd7, 0xf6, 0x22, 0x8b, 0x11, 0xe2,
++	0xe2, 0x85, 0x79, 0xa5, 0xc0, 0xc1, 0xf7, 0x61
++};
++static const u8 output14[] __initconst = {
++	0xb8, 0x46, 0xd4, 0x4e, 0x9b, 0xbd, 0x53, 0xce,
++	0xdf, 0xfb, 0xfb, 0xb6, 0xb7, 0xfa, 0x49, 0x33
++};
++static const u8 key14[] __initconst = {
++	0x12, 0x97, 0x6a, 0x08, 0xc4, 0x42, 0x6d, 0x0c,
++	0xe8, 0xa8, 0x24, 0x07, 0xc4, 0xf4, 0x82, 0x07,
++	0x80, 0xf8, 0xc2, 0x0a, 0xa7, 0x12, 0x02, 0xd1,
++	0xe2, 0x91, 0x79, 0xcb, 0xcb, 0x55, 0x5a, 0x57
++};
++
++/* 4th power of the key spills to 131th bit in SIMD key setup */
++static const u8 input15[] __initconst = {
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
++};
++static const u8 output15[] __initconst = {
++	0x07, 0x14, 0x5a, 0x4c, 0x02, 0xfe, 0x5f, 0xa3,
++	0x20, 0x36, 0xde, 0x68, 0xfa, 0xbe, 0x90, 0x66
++};
++static const u8 key15[] __initconst = {
++	0xad, 0x62, 0x81, 0x07, 0xe8, 0x35, 0x1d, 0x0f,
++	0x2c, 0x23, 0x1a, 0x05, 0xdc, 0x4a, 0x41, 0x06,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
++};
++
++/* OpenSSL's poly1305_ieee754.c failed this in final stage */
++static const u8 input16[] __initconst = {
++	0x84, 0x23, 0x64, 0xe1, 0x56, 0x33, 0x6c, 0x09,
++	0x98, 0xb9, 0x33, 0xa6, 0x23, 0x77, 0x26, 0x18,
++	0x0d, 0x9e, 0x3f, 0xdc, 0xbd, 0xe4, 0xcd, 0x5d,
++	0x17, 0x08, 0x0f, 0xc3, 0xbe, 0xb4, 0x96, 0x14,
++	0xd7, 0x12, 0x2c, 0x03, 0x74, 0x63, 0xff, 0x10,
++	0x4d, 0x73, 0xf1, 0x9c, 0x12, 0x70, 0x46, 0x28,
++	0xd4, 0x17, 0xc4, 0xc5, 0x4a, 0x3f, 0xe3, 0x0d,
++	0x3c, 0x3d, 0x77, 0x14, 0x38, 0x2d, 0x43, 0xb0,
++	0x38, 0x2a, 0x50, 0xa5, 0xde, 0xe5, 0x4b, 0xe8,
++	0x44, 0xb0, 0x76, 0xe8, 0xdf, 0x88, 0x20, 0x1a,
++	0x1c, 0xd4, 0x3b, 0x90, 0xeb, 0x21, 0x64, 0x3f,
++	0xa9, 0x6f, 0x39, 0xb5, 0x18, 0xaa, 0x83, 0x40,
++	0xc9, 0x42, 0xff, 0x3c, 0x31, 0xba, 0xf7, 0xc9,
++	0xbd, 0xbf, 0x0f, 0x31, 0xae, 0x3f, 0xa0, 0x96,
++	0xbf, 0x8c, 0x63, 0x03, 0x06, 0x09, 0x82, 0x9f,
++	0xe7, 0x2e, 0x17, 0x98, 0x24, 0x89, 0x0b, 0xc8,
++	0xe0, 0x8c, 0x31, 0x5c, 0x1c, 0xce, 0x2a, 0x83,
++	0x14, 0x4d, 0xbb, 0xff, 0x09, 0xf7, 0x4e, 0x3e,
++	0xfc, 0x77, 0x0b, 0x54, 0xd0, 0x98, 0x4a, 0x8f,
++	0x19, 0xb1, 0x47, 0x19, 0xe6, 0x36, 0x35, 0x64,
++	0x1d, 0x6b, 0x1e, 0xed, 0xf6, 0x3e, 0xfb, 0xf0,
++	0x80, 0xe1, 0x78, 0x3d, 0x32, 0x44, 0x54, 0x12,
++	0x11, 0x4c, 0x20, 0xde, 0x0b, 0x83, 0x7a, 0x0d,
++	0xfa, 0x33, 0xd6, 0xb8, 0x28, 0x25, 0xff, 0xf4,
++	0x4c, 0x9a, 0x70, 0xea, 0x54, 0xce, 0x47, 0xf0,
++	0x7d, 0xf6, 0x98, 0xe6, 0xb0, 0x33, 0x23, 0xb5,
++	0x30, 0x79, 0x36, 0x4a, 0x5f, 0xc3, 0xe9, 0xdd,
++	0x03, 0x43, 0x92, 0xbd, 0xde, 0x86, 0xdc, 0xcd,
++	0xda, 0x94, 0x32, 0x1c, 0x5e, 0x44, 0x06, 0x04,
++	0x89, 0x33, 0x6c, 0xb6, 0x5b, 0xf3, 0x98, 0x9c,
++	0x36, 0xf7, 0x28, 0x2c, 0x2f, 0x5d, 0x2b, 0x88,
++	0x2c, 0x17, 0x1e, 0x74
++};
++static const u8 output16[] __initconst = {
++	0xf2, 0x48, 0x31, 0x2e, 0x57, 0x8d, 0x9d, 0x58,
++	0xf8, 0xb7, 0xbb, 0x4d, 0x19, 0x10, 0x54, 0x31
++};
++static const u8 key16[] __initconst = {
++	0x95, 0xd5, 0xc0, 0x05, 0x50, 0x3e, 0x51, 0x0d,
++	0x8c, 0xd0, 0xaa, 0x07, 0x2c, 0x4a, 0x4d, 0x06,
++	0x6e, 0xab, 0xc5, 0x2d, 0x11, 0x65, 0x3d, 0xf4,
++	0x7f, 0xbf, 0x63, 0xab, 0x19, 0x8b, 0xcc, 0x26
++};
++
++/* AVX2 in OpenSSL's poly1305-x86.pl failed this with 176+32 split */
++static const u8 input17[] __initconst = {
++	0x24, 0x8a, 0xc3, 0x10, 0x85, 0xb6, 0xc2, 0xad,
++	0xaa, 0xa3, 0x82, 0x59, 0xa0, 0xd7, 0x19, 0x2c,
++	0x5c, 0x35, 0xd1, 0xbb, 0x4e, 0xf3, 0x9a, 0xd9,
++	0x4c, 0x38, 0xd1, 0xc8, 0x24, 0x79, 0xe2, 0xdd,
++	0x21, 0x59, 0xa0, 0x77, 0x02, 0x4b, 0x05, 0x89,
++	0xbc, 0x8a, 0x20, 0x10, 0x1b, 0x50, 0x6f, 0x0a,
++	0x1a, 0xd0, 0xbb, 0xab, 0x76, 0xe8, 0x3a, 0x83,
++	0xf1, 0xb9, 0x4b, 0xe6, 0xbe, 0xae, 0x74, 0xe8,
++	0x74, 0xca, 0xb6, 0x92, 0xc5, 0x96, 0x3a, 0x75,
++	0x43, 0x6b, 0x77, 0x61, 0x21, 0xec, 0x9f, 0x62,
++	0x39, 0x9a, 0x3e, 0x66, 0xb2, 0xd2, 0x27, 0x07,
++	0xda, 0xe8, 0x19, 0x33, 0xb6, 0x27, 0x7f, 0x3c,
++	0x85, 0x16, 0xbc, 0xbe, 0x26, 0xdb, 0xbd, 0x86,
++	0xf3, 0x73, 0x10, 0x3d, 0x7c, 0xf4, 0xca, 0xd1,
++	0x88, 0x8c, 0x95, 0x21, 0x18, 0xfb, 0xfb, 0xd0,
++	0xd7, 0xb4, 0xbe, 0xdc, 0x4a, 0xe4, 0x93, 0x6a,
++	0xff, 0x91, 0x15, 0x7e, 0x7a, 0xa4, 0x7c, 0x54,
++	0x44, 0x2e, 0xa7, 0x8d, 0x6a, 0xc2, 0x51, 0xd3,
++	0x24, 0xa0, 0xfb, 0xe4, 0x9d, 0x89, 0xcc, 0x35,
++	0x21, 0xb6, 0x6d, 0x16, 0xe9, 0xc6, 0x6a, 0x37,
++	0x09, 0x89, 0x4e, 0x4e, 0xb0, 0xa4, 0xee, 0xdc,
++	0x4a, 0xe1, 0x94, 0x68, 0xe6, 0x6b, 0x81, 0xf2,
++	0x71, 0x35, 0x1b, 0x1d, 0x92, 0x1e, 0xa5, 0x51,
++	0x04, 0x7a, 0xbc, 0xc6, 0xb8, 0x7a, 0x90, 0x1f,
++	0xde, 0x7d, 0xb7, 0x9f, 0xa1, 0x81, 0x8c, 0x11,
++	0x33, 0x6d, 0xbc, 0x07, 0x24, 0x4a, 0x40, 0xeb
++};
++static const u8 output17[] __initconst = {
++	0xbc, 0x93, 0x9b, 0xc5, 0x28, 0x14, 0x80, 0xfa,
++	0x99, 0xc6, 0xd6, 0x8c, 0x25, 0x8e, 0xc4, 0x2f
++};
++static const u8 key17[] __initconst = {
++	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
++	0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
++};
++
++/* test vectors from Google */
++static const u8 input18[] __initconst = { };
++static const u8 output18[] __initconst = {
++	0x47, 0x10, 0x13, 0x0e, 0x9f, 0x6f, 0xea, 0x8d,
++	0x72, 0x29, 0x38, 0x50, 0xa6, 0x67, 0xd8, 0x6c
++};
++static const u8 key18[] __initconst = {
++	0xc8, 0xaf, 0xaa, 0xc3, 0x31, 0xee, 0x37, 0x2c,
++	0xd6, 0x08, 0x2d, 0xe1, 0x34, 0x94, 0x3b, 0x17,
++	0x47, 0x10, 0x13, 0x0e, 0x9f, 0x6f, 0xea, 0x8d,
++	0x72, 0x29, 0x38, 0x50, 0xa6, 0x67, 0xd8, 0x6c
++};
++
++static const u8 input19[] __initconst = {
++	0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x20, 0x77, 0x6f,
++	0x72, 0x6c, 0x64, 0x21
++};
++static const u8 output19[] __initconst = {
++	0xa6, 0xf7, 0x45, 0x00, 0x8f, 0x81, 0xc9, 0x16,
++	0xa2, 0x0d, 0xcc, 0x74, 0xee, 0xf2, 0xb2, 0xf0
++};
++static const u8 key19[] __initconst = {
++	0x74, 0x68, 0x69, 0x73, 0x20, 0x69, 0x73, 0x20,
++	0x33, 0x32, 0x2d, 0x62, 0x79, 0x74, 0x65, 0x20,
++	0x6b, 0x65, 0x79, 0x20, 0x66, 0x6f, 0x72, 0x20,
++	0x50, 0x6f, 0x6c, 0x79, 0x31, 0x33, 0x30, 0x35
++};
++
++static const u8 input20[] __initconst = {
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
++};
++static const u8 output20[] __initconst = {
++	0x49, 0xec, 0x78, 0x09, 0x0e, 0x48, 0x1e, 0xc6,
++	0xc2, 0x6b, 0x33, 0xb9, 0x1c, 0xcc, 0x03, 0x07
++};
++static const u8 key20[] __initconst = {
++	0x74, 0x68, 0x69, 0x73, 0x20, 0x69, 0x73, 0x20,
++	0x33, 0x32, 0x2d, 0x62, 0x79, 0x74, 0x65, 0x20,
++	0x6b, 0x65, 0x79, 0x20, 0x66, 0x6f, 0x72, 0x20,
++	0x50, 0x6f, 0x6c, 0x79, 0x31, 0x33, 0x30, 0x35
++};
++
++static const u8 input21[] __initconst = {
++	0x89, 0xda, 0xb8, 0x0b, 0x77, 0x17, 0xc1, 0xdb,
++	0x5d, 0xb4, 0x37, 0x86, 0x0a, 0x3f, 0x70, 0x21,
++	0x8e, 0x93, 0xe1, 0xb8, 0xf4, 0x61, 0xfb, 0x67,
++	0x7f, 0x16, 0xf3, 0x5f, 0x6f, 0x87, 0xe2, 0xa9,
++	0x1c, 0x99, 0xbc, 0x3a, 0x47, 0xac, 0xe4, 0x76,
++	0x40, 0xcc, 0x95, 0xc3, 0x45, 0xbe, 0x5e, 0xcc,
++	0xa5, 0xa3, 0x52, 0x3c, 0x35, 0xcc, 0x01, 0x89,
++	0x3a, 0xf0, 0xb6, 0x4a, 0x62, 0x03, 0x34, 0x27,
++	0x03, 0x72, 0xec, 0x12, 0x48, 0x2d, 0x1b, 0x1e,
++	0x36, 0x35, 0x61, 0x69, 0x8a, 0x57, 0x8b, 0x35,
++	0x98, 0x03, 0x49, 0x5b, 0xb4, 0xe2, 0xef, 0x19,
++	0x30, 0xb1, 0x7a, 0x51, 0x90, 0xb5, 0x80, 0xf1,
++	0x41, 0x30, 0x0d, 0xf3, 0x0a, 0xdb, 0xec, 0xa2,
++	0x8f, 0x64, 0x27, 0xa8, 0xbc, 0x1a, 0x99, 0x9f,
++	0xd5, 0x1c, 0x55, 0x4a, 0x01, 0x7d, 0x09, 0x5d,
++	0x8c, 0x3e, 0x31, 0x27, 0xda, 0xf9, 0xf5, 0x95
++};
++static const u8 output21[] __initconst = {
++	0xc8, 0x5d, 0x15, 0xed, 0x44, 0xc3, 0x78, 0xd6,
++	0xb0, 0x0e, 0x23, 0x06, 0x4c, 0x7b, 0xcd, 0x51
++};
++static const u8 key21[] __initconst = {
++	0x2d, 0x77, 0x3b, 0xe3, 0x7a, 0xdb, 0x1e, 0x4d,
++	0x68, 0x3b, 0xf0, 0x07, 0x5e, 0x79, 0xc4, 0xee,
++	0x03, 0x79, 0x18, 0x53, 0x5a, 0x7f, 0x99, 0xcc,
++	0xb7, 0x04, 0x0f, 0xb5, 0xf5, 0xf4, 0x3a, 0xea
++};
++
++static const u8 input22[] __initconst = {
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0b,
++	0x17, 0x03, 0x03, 0x02, 0x00, 0x00, 0x00, 0x00,
++	0x06, 0xdb, 0x1f, 0x1f, 0x36, 0x8d, 0x69, 0x6a,
++	0x81, 0x0a, 0x34, 0x9c, 0x0c, 0x71, 0x4c, 0x9a,
++	0x5e, 0x78, 0x50, 0xc2, 0x40, 0x7d, 0x72, 0x1a,
++	0xcd, 0xed, 0x95, 0xe0, 0x18, 0xd7, 0xa8, 0x52,
++	0x66, 0xa6, 0xe1, 0x28, 0x9c, 0xdb, 0x4a, 0xeb,
++	0x18, 0xda, 0x5a, 0xc8, 0xa2, 0xb0, 0x02, 0x6d,
++	0x24, 0xa5, 0x9a, 0xd4, 0x85, 0x22, 0x7f, 0x3e,
++	0xae, 0xdb, 0xb2, 0xe7, 0xe3, 0x5e, 0x1c, 0x66,
++	0xcd, 0x60, 0xf9, 0xab, 0xf7, 0x16, 0xdc, 0xc9,
++	0xac, 0x42, 0x68, 0x2d, 0xd7, 0xda, 0xb2, 0x87,
++	0xa7, 0x02, 0x4c, 0x4e, 0xef, 0xc3, 0x21, 0xcc,
++	0x05, 0x74, 0xe1, 0x67, 0x93, 0xe3, 0x7c, 0xec,
++	0x03, 0xc5, 0xbd, 0xa4, 0x2b, 0x54, 0xc1, 0x14,
++	0xa8, 0x0b, 0x57, 0xaf, 0x26, 0x41, 0x6c, 0x7b,
++	0xe7, 0x42, 0x00, 0x5e, 0x20, 0x85, 0x5c, 0x73,
++	0xe2, 0x1d, 0xc8, 0xe2, 0xed, 0xc9, 0xd4, 0x35,
++	0xcb, 0x6f, 0x60, 0x59, 0x28, 0x00, 0x11, 0xc2,
++	0x70, 0xb7, 0x15, 0x70, 0x05, 0x1c, 0x1c, 0x9b,
++	0x30, 0x52, 0x12, 0x66, 0x20, 0xbc, 0x1e, 0x27,
++	0x30, 0xfa, 0x06, 0x6c, 0x7a, 0x50, 0x9d, 0x53,
++	0xc6, 0x0e, 0x5a, 0xe1, 0xb4, 0x0a, 0xa6, 0xe3,
++	0x9e, 0x49, 0x66, 0x92, 0x28, 0xc9, 0x0e, 0xec,
++	0xb4, 0xa5, 0x0d, 0xb3, 0x2a, 0x50, 0xbc, 0x49,
++	0xe9, 0x0b, 0x4f, 0x4b, 0x35, 0x9a, 0x1d, 0xfd,
++	0x11, 0x74, 0x9c, 0xd3, 0x86, 0x7f, 0xcf, 0x2f,
++	0xb7, 0xbb, 0x6c, 0xd4, 0x73, 0x8f, 0x6a, 0x4a,
++	0xd6, 0xf7, 0xca, 0x50, 0x58, 0xf7, 0x61, 0x88,
++	0x45, 0xaf, 0x9f, 0x02, 0x0f, 0x6c, 0x3b, 0x96,
++	0x7b, 0x8f, 0x4c, 0xd4, 0xa9, 0x1e, 0x28, 0x13,
++	0xb5, 0x07, 0xae, 0x66, 0xf2, 0xd3, 0x5c, 0x18,
++	0x28, 0x4f, 0x72, 0x92, 0x18, 0x60, 0x62, 0xe1,
++	0x0f, 0xd5, 0x51, 0x0d, 0x18, 0x77, 0x53, 0x51,
++	0xef, 0x33, 0x4e, 0x76, 0x34, 0xab, 0x47, 0x43,
++	0xf5, 0xb6, 0x8f, 0x49, 0xad, 0xca, 0xb3, 0x84,
++	0xd3, 0xfd, 0x75, 0xf7, 0x39, 0x0f, 0x40, 0x06,
++	0xef, 0x2a, 0x29, 0x5c, 0x8c, 0x7a, 0x07, 0x6a,
++	0xd5, 0x45, 0x46, 0xcd, 0x25, 0xd2, 0x10, 0x7f,
++	0xbe, 0x14, 0x36, 0xc8, 0x40, 0x92, 0x4a, 0xae,
++	0xbe, 0x5b, 0x37, 0x08, 0x93, 0xcd, 0x63, 0xd1,
++	0x32, 0x5b, 0x86, 0x16, 0xfc, 0x48, 0x10, 0x88,
++	0x6b, 0xc1, 0x52, 0xc5, 0x32, 0x21, 0xb6, 0xdf,
++	0x37, 0x31, 0x19, 0x39, 0x32, 0x55, 0xee, 0x72,
++	0xbc, 0xaa, 0x88, 0x01, 0x74, 0xf1, 0x71, 0x7f,
++	0x91, 0x84, 0xfa, 0x91, 0x64, 0x6f, 0x17, 0xa2,
++	0x4a, 0xc5, 0x5d, 0x16, 0xbf, 0xdd, 0xca, 0x95,
++	0x81, 0xa9, 0x2e, 0xda, 0x47, 0x92, 0x01, 0xf0,
++	0xed, 0xbf, 0x63, 0x36, 0x00, 0xd6, 0x06, 0x6d,
++	0x1a, 0xb3, 0x6d, 0x5d, 0x24, 0x15, 0xd7, 0x13,
++	0x51, 0xbb, 0xcd, 0x60, 0x8a, 0x25, 0x10, 0x8d,
++	0x25, 0x64, 0x19, 0x92, 0xc1, 0xf2, 0x6c, 0x53,
++	0x1c, 0xf9, 0xf9, 0x02, 0x03, 0xbc, 0x4c, 0xc1,
++	0x9f, 0x59, 0x27, 0xd8, 0x34, 0xb0, 0xa4, 0x71,
++	0x16, 0xd3, 0x88, 0x4b, 0xbb, 0x16, 0x4b, 0x8e,
++	0xc8, 0x83, 0xd1, 0xac, 0x83, 0x2e, 0x56, 0xb3,
++	0x91, 0x8a, 0x98, 0x60, 0x1a, 0x08, 0xd1, 0x71,
++	0x88, 0x15, 0x41, 0xd5, 0x94, 0xdb, 0x39, 0x9c,
++	0x6a, 0xe6, 0x15, 0x12, 0x21, 0x74, 0x5a, 0xec,
++	0x81, 0x4c, 0x45, 0xb0, 0xb0, 0x5b, 0x56, 0x54,
++	0x36, 0xfd, 0x6f, 0x13, 0x7a, 0xa1, 0x0a, 0x0c,
++	0x0b, 0x64, 0x37, 0x61, 0xdb, 0xd6, 0xf9, 0xa9,
++	0xdc, 0xb9, 0x9b, 0x1a, 0x6e, 0x69, 0x08, 0x54,
++	0xce, 0x07, 0x69, 0xcd, 0xe3, 0x97, 0x61, 0xd8,
++	0x2f, 0xcd, 0xec, 0x15, 0xf0, 0xd9, 0x2d, 0x7d,
++	0x8e, 0x94, 0xad, 0xe8, 0xeb, 0x83, 0xfb, 0xe0
++};
++static const u8 output22[] __initconst = {
++	0x26, 0x37, 0x40, 0x8f, 0xe1, 0x30, 0x86, 0xea,
++	0x73, 0xf9, 0x71, 0xe3, 0x42, 0x5e, 0x28, 0x20
++};
++static const u8 key22[] __initconst = {
++	0x99, 0xe5, 0x82, 0x2d, 0xd4, 0x17, 0x3c, 0x99,
++	0x5e, 0x3d, 0xae, 0x0d, 0xde, 0xfb, 0x97, 0x74,
++	0x3f, 0xde, 0x3b, 0x08, 0x01, 0x34, 0xb3, 0x9f,
++	0x76, 0xe9, 0xbf, 0x8d, 0x0e, 0x88, 0xd5, 0x46
++};
++
++/* test vectors from Hanno Böck */
++static const u8 input23[] __initconst = {
++	0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc,
++	0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc,
++	0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc,
++	0xcc, 0x80, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc,
++	0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc,
++	0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc,
++	0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc,
++	0xcc, 0xcc, 0xcc, 0xcc, 0xce, 0xcc, 0xcc, 0xcc,
++	0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc,
++	0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xc5,
++	0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc,
++	0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc,
++	0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xe3, 0xcc, 0xcc,
++	0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc,
++	0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc,
++	0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc,
++	0xcc, 0xcc, 0xcc, 0xcc, 0xac, 0xcc, 0xcc, 0xcc,
++	0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xe6,
++	0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0x00, 0x00, 0x00,
++	0xaf, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc,
++	0xcc, 0xcc, 0xff, 0xff, 0xff, 0xf5, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0xff, 0xff, 0xff, 0xe7, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x71, 0x92, 0x05, 0xa8, 0x52, 0x1d,
++	0xfc
++};
++static const u8 output23[] __initconst = {
++	0x85, 0x59, 0xb8, 0x76, 0xec, 0xee, 0xd6, 0x6e,
++	0xb3, 0x77, 0x98, 0xc0, 0x45, 0x7b, 0xaf, 0xf9
++};
++static const u8 key23[] __initconst = {
++	0x7f, 0x1b, 0x02, 0x64, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc
++};
++
++static const u8 input24[] __initconst = {
++	0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa,
++	0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa,
++	0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa,
++	0xaa, 0xaa, 0xaa, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x80, 0x02, 0x64
++};
++static const u8 output24[] __initconst = {
++	0x00, 0xbd, 0x12, 0x58, 0x97, 0x8e, 0x20, 0x54,
++	0x44, 0xc9, 0xaa, 0xaa, 0x82, 0x00, 0x6f, 0xed
++};
++static const u8 key24[] __initconst = {
++	0xe0, 0x00, 0x16, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa,
++	0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa
++};
++
++static const u8 input25[] __initconst = {
++	0x02, 0xfc
++};
++static const u8 output25[] __initconst = {
++	0x06, 0x12, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c,
++	0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c
++};
++static const u8 key25[] __initconst = {
++	0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c,
++	0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c,
++	0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c,
++	0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c
++};
++
++static const u8 input26[] __initconst = {
++	0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
++	0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
++	0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
++	0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
++	0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7a, 0x7b,
++	0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
++	0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
++	0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
++	0x7b, 0x7b, 0x5c, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
++	0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
++	0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
++	0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
++	0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
++	0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
++	0x7b, 0x7b, 0x7b, 0x7b, 0x6e, 0x7b, 0x00, 0x7b,
++	0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
++	0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
++	0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
++	0x7b, 0x7b, 0x7b, 0x7a, 0x7b, 0x7b, 0x7b, 0x7b,
++	0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
++	0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
++	0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x5c,
++	0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
++	0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
++	0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
++	0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
++	0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
++	0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
++	0x7b, 0x6e, 0x7b, 0x00, 0x13, 0x00, 0x00, 0x00,
++	0x00, 0xb3, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0xf2, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x20, 0x00, 0xef, 0xff, 0x00,
++	0x09, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0x00, 0x00,
++	0x00, 0x00, 0x09, 0x00, 0x00, 0x00, 0x64, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x13, 0x00, 0x00, 0x00, 0x00,
++	0xb3, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf2,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x20, 0x00, 0xef, 0xff, 0x00, 0x09,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x7a, 0x00, 0x00, 0x10, 0x00, 0x00, 0x00,
++	0x00, 0x09, 0x00, 0x00, 0x00, 0x64, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xfc
++};
++static const u8 output26[] __initconst = {
++	0x33, 0x20, 0x5b, 0xbf, 0x9e, 0x9f, 0x8f, 0x72,
++	0x12, 0xab, 0x9e, 0x2a, 0xb9, 0xb7, 0xe4, 0xa5
++};
++static const u8 key26[] __initconst = {
++	0x00, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x1e, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x7b, 0x7b
++};
++
++static const u8 input27[] __initconst = {
++	0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77,
++	0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77,
++	0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77,
++	0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77,
++	0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77,
++	0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77,
++	0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77,
++	0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77,
++	0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77,
++	0x77, 0x77, 0x77, 0x77, 0xff, 0xff, 0xff, 0xe9,
++	0xe9, 0xac, 0xac, 0xac, 0xac, 0xac, 0xac, 0xac,
++	0xac, 0xac, 0xac, 0xac, 0x00, 0x00, 0xac, 0xac,
++	0xec, 0x01, 0x00, 0xac, 0xac, 0xac, 0x2c, 0xac,
++	0xa2, 0xac, 0xac, 0xac, 0xac, 0xac, 0xac, 0xac,
++	0xac, 0xac, 0xac, 0xac, 0x64, 0xf2
++};
++static const u8 output27[] __initconst = {
++	0x02, 0xee, 0x7c, 0x8c, 0x54, 0x6d, 0xde, 0xb1,
++	0xa4, 0x67, 0xe4, 0xc3, 0x98, 0x11, 0x58, 0xb9
++};
++static const u8 key27[] __initconst = {
++	0x00, 0x00, 0x00, 0x7f, 0x00, 0x00, 0x00, 0x7f,
++	0x01, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0xcf, 0x77, 0x77, 0x77, 0x77, 0x77,
++	0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77
++};
++
++/* nacl */
++static const u8 input28[] __initconst = {
++	0x8e, 0x99, 0x3b, 0x9f, 0x48, 0x68, 0x12, 0x73,
++	0xc2, 0x96, 0x50, 0xba, 0x32, 0xfc, 0x76, 0xce,
++	0x48, 0x33, 0x2e, 0xa7, 0x16, 0x4d, 0x96, 0xa4,
++	0x47, 0x6f, 0xb8, 0xc5, 0x31, 0xa1, 0x18, 0x6a,
++	0xc0, 0xdf, 0xc1, 0x7c, 0x98, 0xdc, 0xe8, 0x7b,
++	0x4d, 0xa7, 0xf0, 0x11, 0xec, 0x48, 0xc9, 0x72,
++	0x71, 0xd2, 0xc2, 0x0f, 0x9b, 0x92, 0x8f, 0xe2,
++	0x27, 0x0d, 0x6f, 0xb8, 0x63, 0xd5, 0x17, 0x38,
++	0xb4, 0x8e, 0xee, 0xe3, 0x14, 0xa7, 0xcc, 0x8a,
++	0xb9, 0x32, 0x16, 0x45, 0x48, 0xe5, 0x26, 0xae,
++	0x90, 0x22, 0x43, 0x68, 0x51, 0x7a, 0xcf, 0xea,
++	0xbd, 0x6b, 0xb3, 0x73, 0x2b, 0xc0, 0xe9, 0xda,
++	0x99, 0x83, 0x2b, 0x61, 0xca, 0x01, 0xb6, 0xde,
++	0x56, 0x24, 0x4a, 0x9e, 0x88, 0xd5, 0xf9, 0xb3,
++	0x79, 0x73, 0xf6, 0x22, 0xa4, 0x3d, 0x14, 0xa6,
++	0x59, 0x9b, 0x1f, 0x65, 0x4c, 0xb4, 0x5a, 0x74,
++	0xe3, 0x55, 0xa5
++};
++static const u8 output28[] __initconst = {
++	0xf3, 0xff, 0xc7, 0x70, 0x3f, 0x94, 0x00, 0xe5,
++	0x2a, 0x7d, 0xfb, 0x4b, 0x3d, 0x33, 0x05, 0xd9
++};
++static const u8 key28[] __initconst = {
++	0xee, 0xa6, 0xa7, 0x25, 0x1c, 0x1e, 0x72, 0x91,
++	0x6d, 0x11, 0xc2, 0xcb, 0x21, 0x4d, 0x3c, 0x25,
++	0x25, 0x39, 0x12, 0x1d, 0x8e, 0x23, 0x4e, 0x65,
++	0x2d, 0x65, 0x1f, 0xa4, 0xc8, 0xcf, 0xf8, 0x80
++};
++
++/* wrap 2^130-5 */
++static const u8 input29[] __initconst = {
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
++};
++static const u8 output29[] __initconst = {
++	0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
++};
++static const u8 key29[] __initconst = {
++	0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
++};
++
++/* wrap 2^128 */
++static const u8 input30[] __initconst = {
++	0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
++};
++static const u8 output30[] __initconst = {
++	0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
++};
++static const u8 key30[] __initconst = {
++	0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
++};
++
++/* limb carry */
++static const u8 input31[] __initconst = {
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xf0, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0x11, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
++};
++static const u8 output31[] __initconst = {
++	0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
++};
++static const u8 key31[] __initconst = {
++	0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
++};
++
++/* 2^130-5 */
++static const u8 input32[] __initconst = {
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xfb, 0xfe, 0xfe, 0xfe, 0xfe, 0xfe, 0xfe, 0xfe,
++	0xfe, 0xfe, 0xfe, 0xfe, 0xfe, 0xfe, 0xfe, 0xfe,
++	0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01,
++	0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01
++};
++static const u8 output32[] __initconst = {
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
++};
++static const u8 key32[] __initconst = {
++	0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
++};
++
++/* 2^130-6 */
++static const u8 input33[] __initconst = {
++	0xfd, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
++};
++static const u8 output33[] __initconst = {
++	0xfa, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
++};
++static const u8 key33[] __initconst = {
++	0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
++};
++
++/* 5*H+L reduction intermediate */
++static const u8 input34[] __initconst = {
++	0xe3, 0x35, 0x94, 0xd7, 0x50, 0x5e, 0x43, 0xb9,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x33, 0x94, 0xd7, 0x50, 0x5e, 0x43, 0x79, 0xcd,
++	0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
++};
++static const u8 output34[] __initconst = {
++	0x14, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x55, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
++};
++static const u8 key34[] __initconst = {
++	0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
++};
++
++/* 5*H+L reduction final */
++static const u8 input35[] __initconst = {
++	0xe3, 0x35, 0x94, 0xd7, 0x50, 0x5e, 0x43, 0xb9,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x33, 0x94, 0xd7, 0x50, 0x5e, 0x43, 0x79, 0xcd,
++	0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
++};
++static const u8 output35[] __initconst = {
++	0x13, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
++};
++static const u8 key35[] __initconst = {
++	0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
++};
++
++static const struct poly1305_testvec poly1305_testvecs[] __initconst = {
++	{ input01, output01, key01, sizeof(input01) },
++	{ input02, output02, key02, sizeof(input02) },
++	{ input03, output03, key03, sizeof(input03) },
++	{ input04, output04, key04, sizeof(input04) },
++	{ input05, output05, key05, sizeof(input05) },
++	{ input06, output06, key06, sizeof(input06) },
++	{ input07, output07, key07, sizeof(input07) },
++	{ input08, output08, key08, sizeof(input08) },
++	{ input09, output09, key09, sizeof(input09) },
++	{ input10, output10, key10, sizeof(input10) },
++	{ input11, output11, key11, sizeof(input11) },
++	{ input12, output12, key12, sizeof(input12) },
++	{ input13, output13, key13, sizeof(input13) },
++	{ input14, output14, key14, sizeof(input14) },
++	{ input15, output15, key15, sizeof(input15) },
++	{ input16, output16, key16, sizeof(input16) },
++	{ input17, output17, key17, sizeof(input17) },
++	{ input18, output18, key18, sizeof(input18) },
++	{ input19, output19, key19, sizeof(input19) },
++	{ input20, output20, key20, sizeof(input20) },
++	{ input21, output21, key21, sizeof(input21) },
++	{ input22, output22, key22, sizeof(input22) },
++	{ input23, output23, key23, sizeof(input23) },
++	{ input24, output24, key24, sizeof(input24) },
++	{ input25, output25, key25, sizeof(input25) },
++	{ input26, output26, key26, sizeof(input26) },
++	{ input27, output27, key27, sizeof(input27) },
++	{ input28, output28, key28, sizeof(input28) },
++	{ input29, output29, key29, sizeof(input29) },
++	{ input30, output30, key30, sizeof(input30) },
++	{ input31, output31, key31, sizeof(input31) },
++	{ input32, output32, key32, sizeof(input32) },
++	{ input33, output33, key33, sizeof(input33) },
++	{ input34, output34, key34, sizeof(input34) },
++	{ input35, output35, key35, sizeof(input35) }
++};
++
++static bool __init poly1305_selftest(void)
++{
++	simd_context_t simd_context;
++	bool success = true;
++	size_t i, j;
++
++	simd_get(&simd_context);
++	for (i = 0; i < ARRAY_SIZE(poly1305_testvecs); ++i) {
++		struct poly1305_ctx poly1305;
++		u8 out[POLY1305_MAC_SIZE];
++
++		memset(out, 0, sizeof(out));
++		memset(&poly1305, 0, sizeof(poly1305));
++		poly1305_init(&poly1305, poly1305_testvecs[i].key);
++		poly1305_update(&poly1305, poly1305_testvecs[i].input,
++				poly1305_testvecs[i].ilen, &simd_context);
++		poly1305_final(&poly1305, out, &simd_context);
++		if (memcmp(out, poly1305_testvecs[i].output,
++			   POLY1305_MAC_SIZE)) {
++			pr_info("poly1305 self-test %zu: FAIL\n", i + 1);
++			success = false;
++		}
++		simd_relax(&simd_context);
++
++		if (poly1305_testvecs[i].ilen <= 1)
++			continue;
++
++		for (j = 1; j < poly1305_testvecs[i].ilen - 1; ++j) {
++			memset(out, 0, sizeof(out));
++			memset(&poly1305, 0, sizeof(poly1305));
++			poly1305_init(&poly1305, poly1305_testvecs[i].key);
++			poly1305_update(&poly1305, poly1305_testvecs[i].input,
++					j, &simd_context);
++			poly1305_update(&poly1305,
++					poly1305_testvecs[i].input + j,
++					poly1305_testvecs[i].ilen - j,
++					&simd_context);
++			poly1305_final(&poly1305, out, &simd_context);
++			if (memcmp(out, poly1305_testvecs[i].output,
++				   POLY1305_MAC_SIZE)) {
++				pr_info("poly1305 self-test %zu (split %zu): FAIL\n",
++					i + 1, j);
++				success = false;
++			}
++
++			memset(out, 0, sizeof(out));
++			memset(&poly1305, 0, sizeof(poly1305));
++			poly1305_init(&poly1305, poly1305_testvecs[i].key);
++			poly1305_update(&poly1305, poly1305_testvecs[i].input,
++					j, &simd_context);
++			poly1305_update(&poly1305,
++					poly1305_testvecs[i].input + j,
++					poly1305_testvecs[i].ilen - j,
++					(simd_context_t []){ HAVE_NO_SIMD });
++			poly1305_final(&poly1305, out, &simd_context);
++			if (memcmp(out, poly1305_testvecs[i].output,
++				   POLY1305_MAC_SIZE)) {
++				pr_info("poly1305 self-test %zu (split %zu, mixed simd): FAIL\n",
++					i + 1, j);
++				success = false;
++			}
++			simd_relax(&simd_context);
++		}
++	}
++	simd_put(&simd_context);
++
++	if (success)
++		pr_info("poly1305 self-tests: pass\n");
++
++	return success;
++}
 +#endif
-+	stp	x5,x7,[sp,#0]
-+	stp	x9,x11,[sp,#16]
-+	stp	x13,x15,[sp,#32]
-+	stp	x17,x20,[sp,#48]
-+
-+.Loop_tail:
-+	ldrb	w10,[x1,x2]
-+	ldrb	w11,[x4,x2]
-+	add	x2,x2,#1
-+	eor	w10,w10,w11
-+	strb	w10,[x0,x2]
-+	cbnz	x2,.Loop_tail
-+
-+	stp	xzr,xzr,[sp,#0]
-+	stp	xzr,xzr,[sp,#16]
-+	stp	xzr,xzr,[sp,#32]
-+	stp	xzr,xzr,[sp,#48]
-+
-+	ldp	x19,x20,[x29,#16]
-+	add	sp,sp,#64
-+	ldp	x21,x22,[x29,#32]
-+	ldp	x23,x24,[x29,#48]
-+	ldp	x25,x26,[x29,#64]
-+	ldp	x27,x28,[x29,#80]
-+	ldp	x29,x30,[sp],#96
-+	ret
-+.size	ChaCha20_ctr32,.-ChaCha20_ctr32
-+
-+.type	ChaCha20_neon,%function
-+.align	5
-+ChaCha20_neon:
-+	stp	x29,x30,[sp,#-96]!
-+	add	x29,sp,#0
-+
-+	adr	x5,.Lsigma
-+	stp	x19,x20,[sp,#16]
-+	stp	x21,x22,[sp,#32]
-+	stp	x23,x24,[sp,#48]
-+	stp	x25,x26,[sp,#64]
-+	stp	x27,x28,[sp,#80]
-+	cmp	x2,#512
-+	b.hs	.L512_or_more_neon
-+
-+	sub	sp,sp,#64
-+
-+	ldp	x22,x23,[x5]		// load sigma
-+	ld1	{v24.4s},[x5],#16
-+	ldp	x24,x25,[x3]		// load key
-+	ldp	x26,x27,[x3,#16]
-+	ld1	{v25.4s,v26.4s},[x3]
-+	ldp	x28,x30,[x4]		// load counter
-+	ld1	{v27.4s},[x4]
-+	ld1	{v31.4s},[x5]
-+#ifdef	__ARMEB__
-+	rev64	v24.4s,v24.4s
-+	ror	x24,x24,#32
-+	ror	x25,x25,#32
-+	ror	x26,x26,#32
-+	ror	x27,x27,#32
-+	ror	x28,x28,#32
-+	ror	x30,x30,#32
-+#endif
-+	add	v27.4s,v27.4s,v31.4s		// += 1
-+	add	v28.4s,v27.4s,v31.4s
-+	add	v29.4s,v28.4s,v31.4s
-+	shl	v31.4s,v31.4s,#2			// 1 -> 4
-+
-+.Loop_outer_neon:
-+	mov	w5,w22			// unpack key block
-+	lsr	x6,x22,#32
-+	mov	v0.16b,v24.16b
-+	mov	w7,w23
-+	lsr	x8,x23,#32
-+	mov	v4.16b,v24.16b
-+	mov	w9,w24
-+	lsr	x10,x24,#32
-+	mov	v16.16b,v24.16b
-+	mov	w11,w25
-+	mov	v1.16b,v25.16b
-+	lsr	x12,x25,#32
-+	mov	v5.16b,v25.16b
-+	mov	w13,w26
-+	mov	v17.16b,v25.16b
-+	lsr	x14,x26,#32
-+	mov	v3.16b,v27.16b
-+	mov	w15,w27
-+	mov	v7.16b,v28.16b
-+	lsr	x16,x27,#32
-+	mov	v19.16b,v29.16b
-+	mov	w17,w28
-+	mov	v2.16b,v26.16b
-+	lsr	x19,x28,#32
-+	mov	v6.16b,v26.16b
-+	mov	w20,w30
-+	mov	v18.16b,v26.16b
-+	lsr	x21,x30,#32
-+
-+	mov	x4,#10
-+	subs	x2,x2,#256
-+.Loop_neon:
-+	sub	x4,x4,#1
-+	add	v0.4s,v0.4s,v1.4s
-+	add	w5,w5,w9
-+	add	v4.4s,v4.4s,v5.4s
-+	add	w6,w6,w10
-+	add	v16.4s,v16.4s,v17.4s
-+	add	w7,w7,w11
-+	eor	v3.16b,v3.16b,v0.16b
-+	add	w8,w8,w12
-+	eor	v7.16b,v7.16b,v4.16b
-+	eor	w17,w17,w5
-+	eor	v19.16b,v19.16b,v16.16b
-+	eor	w19,w19,w6
-+	rev32	v3.8h,v3.8h
-+	eor	w20,w20,w7
-+	rev32	v7.8h,v7.8h
-+	eor	w21,w21,w8
-+	rev32	v19.8h,v19.8h
-+	ror	w17,w17,#16
-+	add	v2.4s,v2.4s,v3.4s
-+	ror	w19,w19,#16
-+	add	v6.4s,v6.4s,v7.4s
-+	ror	w20,w20,#16
-+	add	v18.4s,v18.4s,v19.4s
-+	ror	w21,w21,#16
-+	eor	v20.16b,v1.16b,v2.16b
-+	add	w13,w13,w17
-+	eor	v21.16b,v5.16b,v6.16b
-+	add	w14,w14,w19
-+	eor	v22.16b,v17.16b,v18.16b
-+	add	w15,w15,w20
-+	ushr	v1.4s,v20.4s,#20
-+	add	w16,w16,w21
-+	ushr	v5.4s,v21.4s,#20
-+	eor	w9,w9,w13
-+	ushr	v17.4s,v22.4s,#20
-+	eor	w10,w10,w14
-+	sli	v1.4s,v20.4s,#12
-+	eor	w11,w11,w15
-+	sli	v5.4s,v21.4s,#12
-+	eor	w12,w12,w16
-+	sli	v17.4s,v22.4s,#12
-+	ror	w9,w9,#20
-+	add	v0.4s,v0.4s,v1.4s
-+	ror	w10,w10,#20
-+	add	v4.4s,v4.4s,v5.4s
-+	ror	w11,w11,#20
-+	add	v16.4s,v16.4s,v17.4s
-+	ror	w12,w12,#20
-+	eor	v20.16b,v3.16b,v0.16b
-+	add	w5,w5,w9
-+	eor	v21.16b,v7.16b,v4.16b
-+	add	w6,w6,w10
-+	eor	v22.16b,v19.16b,v16.16b
-+	add	w7,w7,w11
-+	ushr	v3.4s,v20.4s,#24
-+	add	w8,w8,w12
-+	ushr	v7.4s,v21.4s,#24
-+	eor	w17,w17,w5
-+	ushr	v19.4s,v22.4s,#24
-+	eor	w19,w19,w6
-+	sli	v3.4s,v20.4s,#8
-+	eor	w20,w20,w7
-+	sli	v7.4s,v21.4s,#8
-+	eor	w21,w21,w8
-+	sli	v19.4s,v22.4s,#8
-+	ror	w17,w17,#24
-+	add	v2.4s,v2.4s,v3.4s
-+	ror	w19,w19,#24
-+	add	v6.4s,v6.4s,v7.4s
-+	ror	w20,w20,#24
-+	add	v18.4s,v18.4s,v19.4s
-+	ror	w21,w21,#24
-+	eor	v20.16b,v1.16b,v2.16b
-+	add	w13,w13,w17
-+	eor	v21.16b,v5.16b,v6.16b
-+	add	w14,w14,w19
-+	eor	v22.16b,v17.16b,v18.16b
-+	add	w15,w15,w20
-+	ushr	v1.4s,v20.4s,#25
-+	add	w16,w16,w21
-+	ushr	v5.4s,v21.4s,#25
-+	eor	w9,w9,w13
-+	ushr	v17.4s,v22.4s,#25
-+	eor	w10,w10,w14
-+	sli	v1.4s,v20.4s,#7
-+	eor	w11,w11,w15
-+	sli	v5.4s,v21.4s,#7
-+	eor	w12,w12,w16
-+	sli	v17.4s,v22.4s,#7
-+	ror	w9,w9,#25
-+	ext	v2.16b,v2.16b,v2.16b,#8
-+	ror	w10,w10,#25
-+	ext	v6.16b,v6.16b,v6.16b,#8
-+	ror	w11,w11,#25
-+	ext	v18.16b,v18.16b,v18.16b,#8
-+	ror	w12,w12,#25
-+	ext	v3.16b,v3.16b,v3.16b,#12
-+	ext	v7.16b,v7.16b,v7.16b,#12
-+	ext	v19.16b,v19.16b,v19.16b,#12
-+	ext	v1.16b,v1.16b,v1.16b,#4
-+	ext	v5.16b,v5.16b,v5.16b,#4
-+	ext	v17.16b,v17.16b,v17.16b,#4
-+	add	v0.4s,v0.4s,v1.4s
-+	add	w5,w5,w10
-+	add	v4.4s,v4.4s,v5.4s
-+	add	w6,w6,w11
-+	add	v16.4s,v16.4s,v17.4s
-+	add	w7,w7,w12
-+	eor	v3.16b,v3.16b,v0.16b
-+	add	w8,w8,w9
-+	eor	v7.16b,v7.16b,v4.16b
-+	eor	w21,w21,w5
-+	eor	v19.16b,v19.16b,v16.16b
-+	eor	w17,w17,w6
-+	rev32	v3.8h,v3.8h
-+	eor	w19,w19,w7
-+	rev32	v7.8h,v7.8h
-+	eor	w20,w20,w8
-+	rev32	v19.8h,v19.8h
-+	ror	w21,w21,#16
-+	add	v2.4s,v2.4s,v3.4s
-+	ror	w17,w17,#16
-+	add	v6.4s,v6.4s,v7.4s
-+	ror	w19,w19,#16
-+	add	v18.4s,v18.4s,v19.4s
-+	ror	w20,w20,#16
-+	eor	v20.16b,v1.16b,v2.16b
-+	add	w15,w15,w21
-+	eor	v21.16b,v5.16b,v6.16b
-+	add	w16,w16,w17
-+	eor	v22.16b,v17.16b,v18.16b
-+	add	w13,w13,w19
-+	ushr	v1.4s,v20.4s,#20
-+	add	w14,w14,w20
-+	ushr	v5.4s,v21.4s,#20
-+	eor	w10,w10,w15
-+	ushr	v17.4s,v22.4s,#20
-+	eor	w11,w11,w16
-+	sli	v1.4s,v20.4s,#12
-+	eor	w12,w12,w13
-+	sli	v5.4s,v21.4s,#12
-+	eor	w9,w9,w14
-+	sli	v17.4s,v22.4s,#12
-+	ror	w10,w10,#20
-+	add	v0.4s,v0.4s,v1.4s
-+	ror	w11,w11,#20
-+	add	v4.4s,v4.4s,v5.4s
-+	ror	w12,w12,#20
-+	add	v16.4s,v16.4s,v17.4s
-+	ror	w9,w9,#20
-+	eor	v20.16b,v3.16b,v0.16b
-+	add	w5,w5,w10
-+	eor	v21.16b,v7.16b,v4.16b
-+	add	w6,w6,w11
-+	eor	v22.16b,v19.16b,v16.16b
-+	add	w7,w7,w12
-+	ushr	v3.4s,v20.4s,#24
-+	add	w8,w8,w9
-+	ushr	v7.4s,v21.4s,#24
-+	eor	w21,w21,w5
-+	ushr	v19.4s,v22.4s,#24
-+	eor	w17,w17,w6
-+	sli	v3.4s,v20.4s,#8
-+	eor	w19,w19,w7
-+	sli	v7.4s,v21.4s,#8
-+	eor	w20,w20,w8
-+	sli	v19.4s,v22.4s,#8
-+	ror	w21,w21,#24
-+	add	v2.4s,v2.4s,v3.4s
-+	ror	w17,w17,#24
-+	add	v6.4s,v6.4s,v7.4s
-+	ror	w19,w19,#24
-+	add	v18.4s,v18.4s,v19.4s
-+	ror	w20,w20,#24
-+	eor	v20.16b,v1.16b,v2.16b
-+	add	w15,w15,w21
-+	eor	v21.16b,v5.16b,v6.16b
-+	add	w16,w16,w17
-+	eor	v22.16b,v17.16b,v18.16b
-+	add	w13,w13,w19
-+	ushr	v1.4s,v20.4s,#25
-+	add	w14,w14,w20
-+	ushr	v5.4s,v21.4s,#25
-+	eor	w10,w10,w15
-+	ushr	v17.4s,v22.4s,#25
-+	eor	w11,w11,w16
-+	sli	v1.4s,v20.4s,#7
-+	eor	w12,w12,w13
-+	sli	v5.4s,v21.4s,#7
-+	eor	w9,w9,w14
-+	sli	v17.4s,v22.4s,#7
-+	ror	w10,w10,#25
-+	ext	v2.16b,v2.16b,v2.16b,#8
-+	ror	w11,w11,#25
-+	ext	v6.16b,v6.16b,v6.16b,#8
-+	ror	w12,w12,#25
-+	ext	v18.16b,v18.16b,v18.16b,#8
-+	ror	w9,w9,#25
-+	ext	v3.16b,v3.16b,v3.16b,#4
-+	ext	v7.16b,v7.16b,v7.16b,#4
-+	ext	v19.16b,v19.16b,v19.16b,#4
-+	ext	v1.16b,v1.16b,v1.16b,#12
-+	ext	v5.16b,v5.16b,v5.16b,#12
-+	ext	v17.16b,v17.16b,v17.16b,#12
-+	cbnz	x4,.Loop_neon
-+
-+	add	w5,w5,w22		// accumulate key block
-+	add	v0.4s,v0.4s,v24.4s
-+	add	x6,x6,x22,lsr#32
-+	add	v4.4s,v4.4s,v24.4s
-+	add	w7,w7,w23
-+	add	v16.4s,v16.4s,v24.4s
-+	add	x8,x8,x23,lsr#32
-+	add	v2.4s,v2.4s,v26.4s
-+	add	w9,w9,w24
-+	add	v6.4s,v6.4s,v26.4s
-+	add	x10,x10,x24,lsr#32
-+	add	v18.4s,v18.4s,v26.4s
-+	add	w11,w11,w25
-+	add	v3.4s,v3.4s,v27.4s
-+	add	x12,x12,x25,lsr#32
-+	add	w13,w13,w26
-+	add	v7.4s,v7.4s,v28.4s
-+	add	x14,x14,x26,lsr#32
-+	add	w15,w15,w27
-+	add	v19.4s,v19.4s,v29.4s
-+	add	x16,x16,x27,lsr#32
-+	add	w17,w17,w28
-+	add	v1.4s,v1.4s,v25.4s
-+	add	x19,x19,x28,lsr#32
-+	add	w20,w20,w30
-+	add	v5.4s,v5.4s,v25.4s
-+	add	x21,x21,x30,lsr#32
-+	add	v17.4s,v17.4s,v25.4s
-+
-+	b.lo	.Ltail_neon
-+
-+	add	x5,x5,x6,lsl#32	// pack
-+	add	x7,x7,x8,lsl#32
-+	ldp	x6,x8,[x1,#0]		// load input
-+	add	x9,x9,x10,lsl#32
-+	add	x11,x11,x12,lsl#32
-+	ldp	x10,x12,[x1,#16]
-+	add	x13,x13,x14,lsl#32
-+	add	x15,x15,x16,lsl#32
-+	ldp	x14,x16,[x1,#32]
-+	add	x17,x17,x19,lsl#32
-+	add	x20,x20,x21,lsl#32
-+	ldp	x19,x21,[x1,#48]
-+	add	x1,x1,#64
-+#ifdef	__ARMEB__
-+	rev	x5,x5
-+	rev	x7,x7
-+	rev	x9,x9
-+	rev	x11,x11
-+	rev	x13,x13
-+	rev	x15,x15
-+	rev	x17,x17
-+	rev	x20,x20
-+#endif
-+	ld1	{v20.16b,v21.16b,v22.16b,v23.16b},[x1],#64
-+	eor	x5,x5,x6
-+	eor	x7,x7,x8
-+	eor	x9,x9,x10
-+	eor	x11,x11,x12
-+	eor	x13,x13,x14
-+	eor	v0.16b,v0.16b,v20.16b
-+	eor	x15,x15,x16
-+	eor	v1.16b,v1.16b,v21.16b
-+	eor	x17,x17,x19
-+	eor	v2.16b,v2.16b,v22.16b
-+	eor	x20,x20,x21
-+	eor	v3.16b,v3.16b,v23.16b
-+	ld1	{v20.16b,v21.16b,v22.16b,v23.16b},[x1],#64
-+
-+	stp	x5,x7,[x0,#0]		// store output
-+	add	x28,x28,#4			// increment counter
-+	stp	x9,x11,[x0,#16]
-+	add	v27.4s,v27.4s,v31.4s		// += 4
-+	stp	x13,x15,[x0,#32]
-+	add	v28.4s,v28.4s,v31.4s
-+	stp	x17,x20,[x0,#48]
-+	add	v29.4s,v29.4s,v31.4s
-+	add	x0,x0,#64
-+
-+	st1	{v0.16b,v1.16b,v2.16b,v3.16b},[x0],#64
-+	ld1	{v0.16b,v1.16b,v2.16b,v3.16b},[x1],#64
-+
-+	eor	v4.16b,v4.16b,v20.16b
-+	eor	v5.16b,v5.16b,v21.16b
-+	eor	v6.16b,v6.16b,v22.16b
-+	eor	v7.16b,v7.16b,v23.16b
-+	st1	{v4.16b,v5.16b,v6.16b,v7.16b},[x0],#64
-+
-+	eor	v16.16b,v16.16b,v0.16b
-+	eor	v17.16b,v17.16b,v1.16b
-+	eor	v18.16b,v18.16b,v2.16b
-+	eor	v19.16b,v19.16b,v3.16b
-+	st1	{v16.16b,v17.16b,v18.16b,v19.16b},[x0],#64
-+
-+	b.hi	.Loop_outer_neon
-+
-+	ldp	x19,x20,[x29,#16]
-+	add	sp,sp,#64
-+	ldp	x21,x22,[x29,#32]
-+	ldp	x23,x24,[x29,#48]
-+	ldp	x25,x26,[x29,#64]
-+	ldp	x27,x28,[x29,#80]
-+	ldp	x29,x30,[sp],#96
-+	ret
-+
-+.Ltail_neon:
-+	add	x2,x2,#256
-+	cmp	x2,#64
-+	b.lo	.Less_than_64
-+
-+	add	x5,x5,x6,lsl#32	// pack
-+	add	x7,x7,x8,lsl#32
-+	ldp	x6,x8,[x1,#0]		// load input
-+	add	x9,x9,x10,lsl#32
-+	add	x11,x11,x12,lsl#32
-+	ldp	x10,x12,[x1,#16]
-+	add	x13,x13,x14,lsl#32
-+	add	x15,x15,x16,lsl#32
-+	ldp	x14,x16,[x1,#32]
-+	add	x17,x17,x19,lsl#32
-+	add	x20,x20,x21,lsl#32
-+	ldp	x19,x21,[x1,#48]
-+	add	x1,x1,#64
-+#ifdef	__ARMEB__
-+	rev	x5,x5
-+	rev	x7,x7
-+	rev	x9,x9
-+	rev	x11,x11
-+	rev	x13,x13
-+	rev	x15,x15
-+	rev	x17,x17
-+	rev	x20,x20
-+#endif
-+	eor	x5,x5,x6
-+	eor	x7,x7,x8
-+	eor	x9,x9,x10
-+	eor	x11,x11,x12
-+	eor	x13,x13,x14
-+	eor	x15,x15,x16
-+	eor	x17,x17,x19
-+	eor	x20,x20,x21
-+
-+	stp	x5,x7,[x0,#0]		// store output
-+	add	x28,x28,#4			// increment counter
-+	stp	x9,x11,[x0,#16]
-+	stp	x13,x15,[x0,#32]
-+	stp	x17,x20,[x0,#48]
-+	add	x0,x0,#64
-+	b.eq	.Ldone_neon
-+	sub	x2,x2,#64
-+	cmp	x2,#64
-+	b.lo	.Less_than_128
-+
-+	ld1	{v20.16b,v21.16b,v22.16b,v23.16b},[x1],#64
-+	eor	v0.16b,v0.16b,v20.16b
-+	eor	v1.16b,v1.16b,v21.16b
-+	eor	v2.16b,v2.16b,v22.16b
-+	eor	v3.16b,v3.16b,v23.16b
-+	st1	{v0.16b,v1.16b,v2.16b,v3.16b},[x0],#64
-+	b.eq	.Ldone_neon
-+	sub	x2,x2,#64
-+	cmp	x2,#64
-+	b.lo	.Less_than_192
-+
-+	ld1	{v20.16b,v21.16b,v22.16b,v23.16b},[x1],#64
-+	eor	v4.16b,v4.16b,v20.16b
-+	eor	v5.16b,v5.16b,v21.16b
-+	eor	v6.16b,v6.16b,v22.16b
-+	eor	v7.16b,v7.16b,v23.16b
-+	st1	{v4.16b,v5.16b,v6.16b,v7.16b},[x0],#64
-+	b.eq	.Ldone_neon
-+	sub	x2,x2,#64
-+
-+	st1	{v16.16b,v17.16b,v18.16b,v19.16b},[sp]
-+	b	.Last_neon
-+
-+.Less_than_128:
-+	st1	{v0.16b,v1.16b,v2.16b,v3.16b},[sp]
-+	b	.Last_neon
-+.Less_than_192:
-+	st1	{v4.16b,v5.16b,v6.16b,v7.16b},[sp]
-+	b	.Last_neon
-+
-+.align	4
-+.Last_neon:
-+	sub	x0,x0,#1
-+	add	x1,x1,x2
-+	add	x0,x0,x2
-+	add	x4,sp,x2
-+	neg	x2,x2
-+
-+.Loop_tail_neon:
-+	ldrb	w10,[x1,x2]
-+	ldrb	w11,[x4,x2]
-+	add	x2,x2,#1
-+	eor	w10,w10,w11
-+	strb	w10,[x0,x2]
-+	cbnz	x2,.Loop_tail_neon
-+
-+	stp	xzr,xzr,[sp,#0]
-+	stp	xzr,xzr,[sp,#16]
-+	stp	xzr,xzr,[sp,#32]
-+	stp	xzr,xzr,[sp,#48]
-+
-+.Ldone_neon:
-+	ldp	x19,x20,[x29,#16]
-+	add	sp,sp,#64
-+	ldp	x21,x22,[x29,#32]
-+	ldp	x23,x24,[x29,#48]
-+	ldp	x25,x26,[x29,#64]
-+	ldp	x27,x28,[x29,#80]
-+	ldp	x29,x30,[sp],#96
-+	ret
-+.size	ChaCha20_neon,.-ChaCha20_neon
-+.type	ChaCha20_512_neon,%function
-+.align	5
-+ChaCha20_512_neon:
-+	stp	x29,x30,[sp,#-96]!
-+	add	x29,sp,#0
-+
-+	adr	x5,.Lsigma
-+	stp	x19,x20,[sp,#16]
-+	stp	x21,x22,[sp,#32]
-+	stp	x23,x24,[sp,#48]
-+	stp	x25,x26,[sp,#64]
-+	stp	x27,x28,[sp,#80]
-+
-+.L512_or_more_neon:
-+	sub	sp,sp,#128+64
-+
-+	ldp	x22,x23,[x5]		// load sigma
-+	ld1	{v24.4s},[x5],#16
-+	ldp	x24,x25,[x3]		// load key
-+	ldp	x26,x27,[x3,#16]
-+	ld1	{v25.4s,v26.4s},[x3]
-+	ldp	x28,x30,[x4]		// load counter
-+	ld1	{v27.4s},[x4]
-+	ld1	{v31.4s},[x5]
-+#ifdef	__ARMEB__
-+	rev64	v24.4s,v24.4s
-+	ror	x24,x24,#32
-+	ror	x25,x25,#32
-+	ror	x26,x26,#32
-+	ror	x27,x27,#32
-+	ror	x28,x28,#32
-+	ror	x30,x30,#32
-+#endif
-+	add	v27.4s,v27.4s,v31.4s		// += 1
-+	stp	q24,q25,[sp,#0]		// off-load key block, invariant part
-+	add	v27.4s,v27.4s,v31.4s		// not typo
-+	str	q26,[sp,#32]
-+	add	v28.4s,v27.4s,v31.4s
-+	add	v29.4s,v28.4s,v31.4s
-+	add	v30.4s,v29.4s,v31.4s
-+	shl	v31.4s,v31.4s,#2			// 1 -> 4
-+
-+	stp	d8,d9,[sp,#128+0]		// meet ABI requirements
-+	stp	d10,d11,[sp,#128+16]
-+	stp	d12,d13,[sp,#128+32]
-+	stp	d14,d15,[sp,#128+48]
-+
-+	sub	x2,x2,#512			// not typo
-+
-+.Loop_outer_512_neon:
-+	mov	v0.16b,v24.16b
-+	mov	v4.16b,v24.16b
-+	mov	v8.16b,v24.16b
-+	mov	v12.16b,v24.16b
-+	mov	v16.16b,v24.16b
-+	mov	v20.16b,v24.16b
-+	mov	v1.16b,v25.16b
-+	mov	w5,w22			// unpack key block
-+	mov	v5.16b,v25.16b
-+	lsr	x6,x22,#32
-+	mov	v9.16b,v25.16b
-+	mov	w7,w23
-+	mov	v13.16b,v25.16b
-+	lsr	x8,x23,#32
-+	mov	v17.16b,v25.16b
-+	mov	w9,w24
-+	mov	v21.16b,v25.16b
-+	lsr	x10,x24,#32
-+	mov	v3.16b,v27.16b
-+	mov	w11,w25
-+	mov	v7.16b,v28.16b
-+	lsr	x12,x25,#32
-+	mov	v11.16b,v29.16b
-+	mov	w13,w26
-+	mov	v15.16b,v30.16b
-+	lsr	x14,x26,#32
-+	mov	v2.16b,v26.16b
-+	mov	w15,w27
-+	mov	v6.16b,v26.16b
-+	lsr	x16,x27,#32
-+	add	v19.4s,v3.4s,v31.4s			// +4
-+	mov	w17,w28
-+	add	v23.4s,v7.4s,v31.4s			// +4
-+	lsr	x19,x28,#32
-+	mov	v10.16b,v26.16b
-+	mov	w20,w30
-+	mov	v14.16b,v26.16b
-+	lsr	x21,x30,#32
-+	mov	v18.16b,v26.16b
-+	stp	q27,q28,[sp,#48]		// off-load key block, variable part
-+	mov	v22.16b,v26.16b
-+	str	q29,[sp,#80]
-+
-+	mov	x4,#5
-+	subs	x2,x2,#512
-+.Loop_upper_neon:
-+	sub	x4,x4,#1
-+	add	v0.4s,v0.4s,v1.4s
-+	add	w5,w5,w9
-+	add	v4.4s,v4.4s,v5.4s
-+	add	w6,w6,w10
-+	add	v8.4s,v8.4s,v9.4s
-+	add	w7,w7,w11
-+	add	v12.4s,v12.4s,v13.4s
-+	add	w8,w8,w12
-+	add	v16.4s,v16.4s,v17.4s
-+	eor	w17,w17,w5
-+	add	v20.4s,v20.4s,v21.4s
-+	eor	w19,w19,w6
-+	eor	v3.16b,v3.16b,v0.16b
-+	eor	w20,w20,w7
-+	eor	v7.16b,v7.16b,v4.16b
-+	eor	w21,w21,w8
-+	eor	v11.16b,v11.16b,v8.16b
-+	ror	w17,w17,#16
-+	eor	v15.16b,v15.16b,v12.16b
-+	ror	w19,w19,#16
-+	eor	v19.16b,v19.16b,v16.16b
-+	ror	w20,w20,#16
-+	eor	v23.16b,v23.16b,v20.16b
-+	ror	w21,w21,#16
-+	rev32	v3.8h,v3.8h
-+	add	w13,w13,w17
-+	rev32	v7.8h,v7.8h
-+	add	w14,w14,w19
-+	rev32	v11.8h,v11.8h
-+	add	w15,w15,w20
-+	rev32	v15.8h,v15.8h
-+	add	w16,w16,w21
-+	rev32	v19.8h,v19.8h
-+	eor	w9,w9,w13
-+	rev32	v23.8h,v23.8h
-+	eor	w10,w10,w14
-+	add	v2.4s,v2.4s,v3.4s
-+	eor	w11,w11,w15
-+	add	v6.4s,v6.4s,v7.4s
-+	eor	w12,w12,w16
-+	add	v10.4s,v10.4s,v11.4s
-+	ror	w9,w9,#20
-+	add	v14.4s,v14.4s,v15.4s
-+	ror	w10,w10,#20
-+	add	v18.4s,v18.4s,v19.4s
-+	ror	w11,w11,#20
-+	add	v22.4s,v22.4s,v23.4s
-+	ror	w12,w12,#20
-+	eor	v24.16b,v1.16b,v2.16b
-+	add	w5,w5,w9
-+	eor	v25.16b,v5.16b,v6.16b
-+	add	w6,w6,w10
-+	eor	v26.16b,v9.16b,v10.16b
-+	add	w7,w7,w11
-+	eor	v27.16b,v13.16b,v14.16b
-+	add	w8,w8,w12
-+	eor	v28.16b,v17.16b,v18.16b
-+	eor	w17,w17,w5
-+	eor	v29.16b,v21.16b,v22.16b
-+	eor	w19,w19,w6
-+	ushr	v1.4s,v24.4s,#20
-+	eor	w20,w20,w7
-+	ushr	v5.4s,v25.4s,#20
-+	eor	w21,w21,w8
-+	ushr	v9.4s,v26.4s,#20
-+	ror	w17,w17,#24
-+	ushr	v13.4s,v27.4s,#20
-+	ror	w19,w19,#24
-+	ushr	v17.4s,v28.4s,#20
-+	ror	w20,w20,#24
-+	ushr	v21.4s,v29.4s,#20
-+	ror	w21,w21,#24
-+	sli	v1.4s,v24.4s,#12
-+	add	w13,w13,w17
-+	sli	v5.4s,v25.4s,#12
-+	add	w14,w14,w19
-+	sli	v9.4s,v26.4s,#12
-+	add	w15,w15,w20
-+	sli	v13.4s,v27.4s,#12
-+	add	w16,w16,w21
-+	sli	v17.4s,v28.4s,#12
-+	eor	w9,w9,w13
-+	sli	v21.4s,v29.4s,#12
-+	eor	w10,w10,w14
-+	add	v0.4s,v0.4s,v1.4s
-+	eor	w11,w11,w15
-+	add	v4.4s,v4.4s,v5.4s
-+	eor	w12,w12,w16
-+	add	v8.4s,v8.4s,v9.4s
-+	ror	w9,w9,#25
-+	add	v12.4s,v12.4s,v13.4s
-+	ror	w10,w10,#25
-+	add	v16.4s,v16.4s,v17.4s
-+	ror	w11,w11,#25
-+	add	v20.4s,v20.4s,v21.4s
-+	ror	w12,w12,#25
-+	eor	v24.16b,v3.16b,v0.16b
-+	add	w5,w5,w10
-+	eor	v25.16b,v7.16b,v4.16b
-+	add	w6,w6,w11
-+	eor	v26.16b,v11.16b,v8.16b
-+	add	w7,w7,w12
-+	eor	v27.16b,v15.16b,v12.16b
-+	add	w8,w8,w9
-+	eor	v28.16b,v19.16b,v16.16b
-+	eor	w21,w21,w5
-+	eor	v29.16b,v23.16b,v20.16b
-+	eor	w17,w17,w6
-+	ushr	v3.4s,v24.4s,#24
-+	eor	w19,w19,w7
-+	ushr	v7.4s,v25.4s,#24
-+	eor	w20,w20,w8
-+	ushr	v11.4s,v26.4s,#24
-+	ror	w21,w21,#16
-+	ushr	v15.4s,v27.4s,#24
-+	ror	w17,w17,#16
-+	ushr	v19.4s,v28.4s,#24
-+	ror	w19,w19,#16
-+	ushr	v23.4s,v29.4s,#24
-+	ror	w20,w20,#16
-+	sli	v3.4s,v24.4s,#8
-+	add	w15,w15,w21
-+	sli	v7.4s,v25.4s,#8
-+	add	w16,w16,w17
-+	sli	v11.4s,v26.4s,#8
-+	add	w13,w13,w19
-+	sli	v15.4s,v27.4s,#8
-+	add	w14,w14,w20
-+	sli	v19.4s,v28.4s,#8
-+	eor	w10,w10,w15
-+	sli	v23.4s,v29.4s,#8
-+	eor	w11,w11,w16
-+	add	v2.4s,v2.4s,v3.4s
-+	eor	w12,w12,w13
-+	add	v6.4s,v6.4s,v7.4s
-+	eor	w9,w9,w14
-+	add	v10.4s,v10.4s,v11.4s
-+	ror	w10,w10,#20
-+	add	v14.4s,v14.4s,v15.4s
-+	ror	w11,w11,#20
-+	add	v18.4s,v18.4s,v19.4s
-+	ror	w12,w12,#20
-+	add	v22.4s,v22.4s,v23.4s
-+	ror	w9,w9,#20
-+	eor	v24.16b,v1.16b,v2.16b
-+	add	w5,w5,w10
-+	eor	v25.16b,v5.16b,v6.16b
-+	add	w6,w6,w11
-+	eor	v26.16b,v9.16b,v10.16b
-+	add	w7,w7,w12
-+	eor	v27.16b,v13.16b,v14.16b
-+	add	w8,w8,w9
-+	eor	v28.16b,v17.16b,v18.16b
-+	eor	w21,w21,w5
-+	eor	v29.16b,v21.16b,v22.16b
-+	eor	w17,w17,w6
-+	ushr	v1.4s,v24.4s,#25
-+	eor	w19,w19,w7
-+	ushr	v5.4s,v25.4s,#25
-+	eor	w20,w20,w8
-+	ushr	v9.4s,v26.4s,#25
-+	ror	w21,w21,#24
-+	ushr	v13.4s,v27.4s,#25
-+	ror	w17,w17,#24
-+	ushr	v17.4s,v28.4s,#25
-+	ror	w19,w19,#24
-+	ushr	v21.4s,v29.4s,#25
-+	ror	w20,w20,#24
-+	sli	v1.4s,v24.4s,#7
-+	add	w15,w15,w21
-+	sli	v5.4s,v25.4s,#7
-+	add	w16,w16,w17
-+	sli	v9.4s,v26.4s,#7
-+	add	w13,w13,w19
-+	sli	v13.4s,v27.4s,#7
-+	add	w14,w14,w20
-+	sli	v17.4s,v28.4s,#7
-+	eor	w10,w10,w15
-+	sli	v21.4s,v29.4s,#7
-+	eor	w11,w11,w16
-+	ext	v2.16b,v2.16b,v2.16b,#8
-+	eor	w12,w12,w13
-+	ext	v6.16b,v6.16b,v6.16b,#8
-+	eor	w9,w9,w14
-+	ext	v10.16b,v10.16b,v10.16b,#8
-+	ror	w10,w10,#25
-+	ext	v14.16b,v14.16b,v14.16b,#8
-+	ror	w11,w11,#25
-+	ext	v18.16b,v18.16b,v18.16b,#8
-+	ror	w12,w12,#25
-+	ext	v22.16b,v22.16b,v22.16b,#8
-+	ror	w9,w9,#25
-+	ext	v3.16b,v3.16b,v3.16b,#12
-+	ext	v7.16b,v7.16b,v7.16b,#12
-+	ext	v11.16b,v11.16b,v11.16b,#12
-+	ext	v15.16b,v15.16b,v15.16b,#12
-+	ext	v19.16b,v19.16b,v19.16b,#12
-+	ext	v23.16b,v23.16b,v23.16b,#12
-+	ext	v1.16b,v1.16b,v1.16b,#4
-+	ext	v5.16b,v5.16b,v5.16b,#4
-+	ext	v9.16b,v9.16b,v9.16b,#4
-+	ext	v13.16b,v13.16b,v13.16b,#4
-+	ext	v17.16b,v17.16b,v17.16b,#4
-+	ext	v21.16b,v21.16b,v21.16b,#4
-+	add	v0.4s,v0.4s,v1.4s
-+	add	w5,w5,w9
-+	add	v4.4s,v4.4s,v5.4s
-+	add	w6,w6,w10
-+	add	v8.4s,v8.4s,v9.4s
-+	add	w7,w7,w11
-+	add	v12.4s,v12.4s,v13.4s
-+	add	w8,w8,w12
-+	add	v16.4s,v16.4s,v17.4s
-+	eor	w17,w17,w5
-+	add	v20.4s,v20.4s,v21.4s
-+	eor	w19,w19,w6
-+	eor	v3.16b,v3.16b,v0.16b
-+	eor	w20,w20,w7
-+	eor	v7.16b,v7.16b,v4.16b
-+	eor	w21,w21,w8
-+	eor	v11.16b,v11.16b,v8.16b
-+	ror	w17,w17,#16
-+	eor	v15.16b,v15.16b,v12.16b
-+	ror	w19,w19,#16
-+	eor	v19.16b,v19.16b,v16.16b
-+	ror	w20,w20,#16
-+	eor	v23.16b,v23.16b,v20.16b
-+	ror	w21,w21,#16
-+	rev32	v3.8h,v3.8h
-+	add	w13,w13,w17
-+	rev32	v7.8h,v7.8h
-+	add	w14,w14,w19
-+	rev32	v11.8h,v11.8h
-+	add	w15,w15,w20
-+	rev32	v15.8h,v15.8h
-+	add	w16,w16,w21
-+	rev32	v19.8h,v19.8h
-+	eor	w9,w9,w13
-+	rev32	v23.8h,v23.8h
-+	eor	w10,w10,w14
-+	add	v2.4s,v2.4s,v3.4s
-+	eor	w11,w11,w15
-+	add	v6.4s,v6.4s,v7.4s
-+	eor	w12,w12,w16
-+	add	v10.4s,v10.4s,v11.4s
-+	ror	w9,w9,#20
-+	add	v14.4s,v14.4s,v15.4s
-+	ror	w10,w10,#20
-+	add	v18.4s,v18.4s,v19.4s
-+	ror	w11,w11,#20
-+	add	v22.4s,v22.4s,v23.4s
-+	ror	w12,w12,#20
-+	eor	v24.16b,v1.16b,v2.16b
-+	add	w5,w5,w9
-+	eor	v25.16b,v5.16b,v6.16b
-+	add	w6,w6,w10
-+	eor	v26.16b,v9.16b,v10.16b
-+	add	w7,w7,w11
-+	eor	v27.16b,v13.16b,v14.16b
-+	add	w8,w8,w12
-+	eor	v28.16b,v17.16b,v18.16b
-+	eor	w17,w17,w5
-+	eor	v29.16b,v21.16b,v22.16b
-+	eor	w19,w19,w6
-+	ushr	v1.4s,v24.4s,#20
-+	eor	w20,w20,w7
-+	ushr	v5.4s,v25.4s,#20
-+	eor	w21,w21,w8
-+	ushr	v9.4s,v26.4s,#20
-+	ror	w17,w17,#24
-+	ushr	v13.4s,v27.4s,#20
-+	ror	w19,w19,#24
-+	ushr	v17.4s,v28.4s,#20
-+	ror	w20,w20,#24
-+	ushr	v21.4s,v29.4s,#20
-+	ror	w21,w21,#24
-+	sli	v1.4s,v24.4s,#12
-+	add	w13,w13,w17
-+	sli	v5.4s,v25.4s,#12
-+	add	w14,w14,w19
-+	sli	v9.4s,v26.4s,#12
-+	add	w15,w15,w20
-+	sli	v13.4s,v27.4s,#12
-+	add	w16,w16,w21
-+	sli	v17.4s,v28.4s,#12
-+	eor	w9,w9,w13
-+	sli	v21.4s,v29.4s,#12
-+	eor	w10,w10,w14
-+	add	v0.4s,v0.4s,v1.4s
-+	eor	w11,w11,w15
-+	add	v4.4s,v4.4s,v5.4s
-+	eor	w12,w12,w16
-+	add	v8.4s,v8.4s,v9.4s
-+	ror	w9,w9,#25
-+	add	v12.4s,v12.4s,v13.4s
-+	ror	w10,w10,#25
-+	add	v16.4s,v16.4s,v17.4s
-+	ror	w11,w11,#25
-+	add	v20.4s,v20.4s,v21.4s
-+	ror	w12,w12,#25
-+	eor	v24.16b,v3.16b,v0.16b
-+	add	w5,w5,w10
-+	eor	v25.16b,v7.16b,v4.16b
-+	add	w6,w6,w11
-+	eor	v26.16b,v11.16b,v8.16b
-+	add	w7,w7,w12
-+	eor	v27.16b,v15.16b,v12.16b
-+	add	w8,w8,w9
-+	eor	v28.16b,v19.16b,v16.16b
-+	eor	w21,w21,w5
-+	eor	v29.16b,v23.16b,v20.16b
-+	eor	w17,w17,w6
-+	ushr	v3.4s,v24.4s,#24
-+	eor	w19,w19,w7
-+	ushr	v7.4s,v25.4s,#24
-+	eor	w20,w20,w8
-+	ushr	v11.4s,v26.4s,#24
-+	ror	w21,w21,#16
-+	ushr	v15.4s,v27.4s,#24
-+	ror	w17,w17,#16
-+	ushr	v19.4s,v28.4s,#24
-+	ror	w19,w19,#16
-+	ushr	v23.4s,v29.4s,#24
-+	ror	w20,w20,#16
-+	sli	v3.4s,v24.4s,#8
-+	add	w15,w15,w21
-+	sli	v7.4s,v25.4s,#8
-+	add	w16,w16,w17
-+	sli	v11.4s,v26.4s,#8
-+	add	w13,w13,w19
-+	sli	v15.4s,v27.4s,#8
-+	add	w14,w14,w20
-+	sli	v19.4s,v28.4s,#8
-+	eor	w10,w10,w15
-+	sli	v23.4s,v29.4s,#8
-+	eor	w11,w11,w16
-+	add	v2.4s,v2.4s,v3.4s
-+	eor	w12,w12,w13
-+	add	v6.4s,v6.4s,v7.4s
-+	eor	w9,w9,w14
-+	add	v10.4s,v10.4s,v11.4s
-+	ror	w10,w10,#20
-+	add	v14.4s,v14.4s,v15.4s
-+	ror	w11,w11,#20
-+	add	v18.4s,v18.4s,v19.4s
-+	ror	w12,w12,#20
-+	add	v22.4s,v22.4s,v23.4s
-+	ror	w9,w9,#20
-+	eor	v24.16b,v1.16b,v2.16b
-+	add	w5,w5,w10
-+	eor	v25.16b,v5.16b,v6.16b
-+	add	w6,w6,w11
-+	eor	v26.16b,v9.16b,v10.16b
-+	add	w7,w7,w12
-+	eor	v27.16b,v13.16b,v14.16b
-+	add	w8,w8,w9
-+	eor	v28.16b,v17.16b,v18.16b
-+	eor	w21,w21,w5
-+	eor	v29.16b,v21.16b,v22.16b
-+	eor	w17,w17,w6
-+	ushr	v1.4s,v24.4s,#25
-+	eor	w19,w19,w7
-+	ushr	v5.4s,v25.4s,#25
-+	eor	w20,w20,w8
-+	ushr	v9.4s,v26.4s,#25
-+	ror	w21,w21,#24
-+	ushr	v13.4s,v27.4s,#25
-+	ror	w17,w17,#24
-+	ushr	v17.4s,v28.4s,#25
-+	ror	w19,w19,#24
-+	ushr	v21.4s,v29.4s,#25
-+	ror	w20,w20,#24
-+	sli	v1.4s,v24.4s,#7
-+	add	w15,w15,w21
-+	sli	v5.4s,v25.4s,#7
-+	add	w16,w16,w17
-+	sli	v9.4s,v26.4s,#7
-+	add	w13,w13,w19
-+	sli	v13.4s,v27.4s,#7
-+	add	w14,w14,w20
-+	sli	v17.4s,v28.4s,#7
-+	eor	w10,w10,w15
-+	sli	v21.4s,v29.4s,#7
-+	eor	w11,w11,w16
-+	ext	v2.16b,v2.16b,v2.16b,#8
-+	eor	w12,w12,w13
-+	ext	v6.16b,v6.16b,v6.16b,#8
-+	eor	w9,w9,w14
-+	ext	v10.16b,v10.16b,v10.16b,#8
-+	ror	w10,w10,#25
-+	ext	v14.16b,v14.16b,v14.16b,#8
-+	ror	w11,w11,#25
-+	ext	v18.16b,v18.16b,v18.16b,#8
-+	ror	w12,w12,#25
-+	ext	v22.16b,v22.16b,v22.16b,#8
-+	ror	w9,w9,#25
-+	ext	v3.16b,v3.16b,v3.16b,#4
-+	ext	v7.16b,v7.16b,v7.16b,#4
-+	ext	v11.16b,v11.16b,v11.16b,#4
-+	ext	v15.16b,v15.16b,v15.16b,#4
-+	ext	v19.16b,v19.16b,v19.16b,#4
-+	ext	v23.16b,v23.16b,v23.16b,#4
-+	ext	v1.16b,v1.16b,v1.16b,#12
-+	ext	v5.16b,v5.16b,v5.16b,#12
-+	ext	v9.16b,v9.16b,v9.16b,#12
-+	ext	v13.16b,v13.16b,v13.16b,#12
-+	ext	v17.16b,v17.16b,v17.16b,#12
-+	ext	v21.16b,v21.16b,v21.16b,#12
-+	cbnz	x4,.Loop_upper_neon
-+
-+	add	w5,w5,w22		// accumulate key block
-+	add	x6,x6,x22,lsr#32
-+	add	w7,w7,w23
-+	add	x8,x8,x23,lsr#32
-+	add	w9,w9,w24
-+	add	x10,x10,x24,lsr#32
-+	add	w11,w11,w25
-+	add	x12,x12,x25,lsr#32
-+	add	w13,w13,w26
-+	add	x14,x14,x26,lsr#32
-+	add	w15,w15,w27
-+	add	x16,x16,x27,lsr#32
-+	add	w17,w17,w28
-+	add	x19,x19,x28,lsr#32
-+	add	w20,w20,w30
-+	add	x21,x21,x30,lsr#32
-+
-+	add	x5,x5,x6,lsl#32	// pack
-+	add	x7,x7,x8,lsl#32
-+	ldp	x6,x8,[x1,#0]		// load input
-+	add	x9,x9,x10,lsl#32
-+	add	x11,x11,x12,lsl#32
-+	ldp	x10,x12,[x1,#16]
-+	add	x13,x13,x14,lsl#32
-+	add	x15,x15,x16,lsl#32
-+	ldp	x14,x16,[x1,#32]
-+	add	x17,x17,x19,lsl#32
-+	add	x20,x20,x21,lsl#32
-+	ldp	x19,x21,[x1,#48]
-+	add	x1,x1,#64
-+#ifdef	__ARMEB__
-+	rev	x5,x5
-+	rev	x7,x7
-+	rev	x9,x9
-+	rev	x11,x11
-+	rev	x13,x13
-+	rev	x15,x15
-+	rev	x17,x17
-+	rev	x20,x20
-+#endif
-+	eor	x5,x5,x6
-+	eor	x7,x7,x8
-+	eor	x9,x9,x10
-+	eor	x11,x11,x12
-+	eor	x13,x13,x14
-+	eor	x15,x15,x16
-+	eor	x17,x17,x19
-+	eor	x20,x20,x21
-+
-+	stp	x5,x7,[x0,#0]		// store output
-+	add	x28,x28,#1			// increment counter
-+	mov	w5,w22			// unpack key block
-+	lsr	x6,x22,#32
-+	stp	x9,x11,[x0,#16]
-+	mov	w7,w23
-+	lsr	x8,x23,#32
-+	stp	x13,x15,[x0,#32]
-+	mov	w9,w24
-+	lsr	x10,x24,#32
-+	stp	x17,x20,[x0,#48]
-+	add	x0,x0,#64
-+	mov	w11,w25
-+	lsr	x12,x25,#32
-+	mov	w13,w26
-+	lsr	x14,x26,#32
-+	mov	w15,w27
-+	lsr	x16,x27,#32
-+	mov	w17,w28
-+	lsr	x19,x28,#32
-+	mov	w20,w30
-+	lsr	x21,x30,#32
-+
-+	mov	x4,#5
-+.Loop_lower_neon:
-+	sub	x4,x4,#1
-+	add	v0.4s,v0.4s,v1.4s
-+	add	w5,w5,w9
-+	add	v4.4s,v4.4s,v5.4s
-+	add	w6,w6,w10
-+	add	v8.4s,v8.4s,v9.4s
-+	add	w7,w7,w11
-+	add	v12.4s,v12.4s,v13.4s
-+	add	w8,w8,w12
-+	add	v16.4s,v16.4s,v17.4s
-+	eor	w17,w17,w5
-+	add	v20.4s,v20.4s,v21.4s
-+	eor	w19,w19,w6
-+	eor	v3.16b,v3.16b,v0.16b
-+	eor	w20,w20,w7
-+	eor	v7.16b,v7.16b,v4.16b
-+	eor	w21,w21,w8
-+	eor	v11.16b,v11.16b,v8.16b
-+	ror	w17,w17,#16
-+	eor	v15.16b,v15.16b,v12.16b
-+	ror	w19,w19,#16
-+	eor	v19.16b,v19.16b,v16.16b
-+	ror	w20,w20,#16
-+	eor	v23.16b,v23.16b,v20.16b
-+	ror	w21,w21,#16
-+	rev32	v3.8h,v3.8h
-+	add	w13,w13,w17
-+	rev32	v7.8h,v7.8h
-+	add	w14,w14,w19
-+	rev32	v11.8h,v11.8h
-+	add	w15,w15,w20
-+	rev32	v15.8h,v15.8h
-+	add	w16,w16,w21
-+	rev32	v19.8h,v19.8h
-+	eor	w9,w9,w13
-+	rev32	v23.8h,v23.8h
-+	eor	w10,w10,w14
-+	add	v2.4s,v2.4s,v3.4s
-+	eor	w11,w11,w15
-+	add	v6.4s,v6.4s,v7.4s
-+	eor	w12,w12,w16
-+	add	v10.4s,v10.4s,v11.4s
-+	ror	w9,w9,#20
-+	add	v14.4s,v14.4s,v15.4s
-+	ror	w10,w10,#20
-+	add	v18.4s,v18.4s,v19.4s
-+	ror	w11,w11,#20
-+	add	v22.4s,v22.4s,v23.4s
-+	ror	w12,w12,#20
-+	eor	v24.16b,v1.16b,v2.16b
-+	add	w5,w5,w9
-+	eor	v25.16b,v5.16b,v6.16b
-+	add	w6,w6,w10
-+	eor	v26.16b,v9.16b,v10.16b
-+	add	w7,w7,w11
-+	eor	v27.16b,v13.16b,v14.16b
-+	add	w8,w8,w12
-+	eor	v28.16b,v17.16b,v18.16b
-+	eor	w17,w17,w5
-+	eor	v29.16b,v21.16b,v22.16b
-+	eor	w19,w19,w6
-+	ushr	v1.4s,v24.4s,#20
-+	eor	w20,w20,w7
-+	ushr	v5.4s,v25.4s,#20
-+	eor	w21,w21,w8
-+	ushr	v9.4s,v26.4s,#20
-+	ror	w17,w17,#24
-+	ushr	v13.4s,v27.4s,#20
-+	ror	w19,w19,#24
-+	ushr	v17.4s,v28.4s,#20
-+	ror	w20,w20,#24
-+	ushr	v21.4s,v29.4s,#20
-+	ror	w21,w21,#24
-+	sli	v1.4s,v24.4s,#12
-+	add	w13,w13,w17
-+	sli	v5.4s,v25.4s,#12
-+	add	w14,w14,w19
-+	sli	v9.4s,v26.4s,#12
-+	add	w15,w15,w20
-+	sli	v13.4s,v27.4s,#12
-+	add	w16,w16,w21
-+	sli	v17.4s,v28.4s,#12
-+	eor	w9,w9,w13
-+	sli	v21.4s,v29.4s,#12
-+	eor	w10,w10,w14
-+	add	v0.4s,v0.4s,v1.4s
-+	eor	w11,w11,w15
-+	add	v4.4s,v4.4s,v5.4s
-+	eor	w12,w12,w16
-+	add	v8.4s,v8.4s,v9.4s
-+	ror	w9,w9,#25
-+	add	v12.4s,v12.4s,v13.4s
-+	ror	w10,w10,#25
-+	add	v16.4s,v16.4s,v17.4s
-+	ror	w11,w11,#25
-+	add	v20.4s,v20.4s,v21.4s
-+	ror	w12,w12,#25
-+	eor	v24.16b,v3.16b,v0.16b
-+	add	w5,w5,w10
-+	eor	v25.16b,v7.16b,v4.16b
-+	add	w6,w6,w11
-+	eor	v26.16b,v11.16b,v8.16b
-+	add	w7,w7,w12
-+	eor	v27.16b,v15.16b,v12.16b
-+	add	w8,w8,w9
-+	eor	v28.16b,v19.16b,v16.16b
-+	eor	w21,w21,w5
-+	eor	v29.16b,v23.16b,v20.16b
-+	eor	w17,w17,w6
-+	ushr	v3.4s,v24.4s,#24
-+	eor	w19,w19,w7
-+	ushr	v7.4s,v25.4s,#24
-+	eor	w20,w20,w8
-+	ushr	v11.4s,v26.4s,#24
-+	ror	w21,w21,#16
-+	ushr	v15.4s,v27.4s,#24
-+	ror	w17,w17,#16
-+	ushr	v19.4s,v28.4s,#24
-+	ror	w19,w19,#16
-+	ushr	v23.4s,v29.4s,#24
-+	ror	w20,w20,#16
-+	sli	v3.4s,v24.4s,#8
-+	add	w15,w15,w21
-+	sli	v7.4s,v25.4s,#8
-+	add	w16,w16,w17
-+	sli	v11.4s,v26.4s,#8
-+	add	w13,w13,w19
-+	sli	v15.4s,v27.4s,#8
-+	add	w14,w14,w20
-+	sli	v19.4s,v28.4s,#8
-+	eor	w10,w10,w15
-+	sli	v23.4s,v29.4s,#8
-+	eor	w11,w11,w16
-+	add	v2.4s,v2.4s,v3.4s
-+	eor	w12,w12,w13
-+	add	v6.4s,v6.4s,v7.4s
-+	eor	w9,w9,w14
-+	add	v10.4s,v10.4s,v11.4s
-+	ror	w10,w10,#20
-+	add	v14.4s,v14.4s,v15.4s
-+	ror	w11,w11,#20
-+	add	v18.4s,v18.4s,v19.4s
-+	ror	w12,w12,#20
-+	add	v22.4s,v22.4s,v23.4s
-+	ror	w9,w9,#20
-+	eor	v24.16b,v1.16b,v2.16b
-+	add	w5,w5,w10
-+	eor	v25.16b,v5.16b,v6.16b
-+	add	w6,w6,w11
-+	eor	v26.16b,v9.16b,v10.16b
-+	add	w7,w7,w12
-+	eor	v27.16b,v13.16b,v14.16b
-+	add	w8,w8,w9
-+	eor	v28.16b,v17.16b,v18.16b
-+	eor	w21,w21,w5
-+	eor	v29.16b,v21.16b,v22.16b
-+	eor	w17,w17,w6
-+	ushr	v1.4s,v24.4s,#25
-+	eor	w19,w19,w7
-+	ushr	v5.4s,v25.4s,#25
-+	eor	w20,w20,w8
-+	ushr	v9.4s,v26.4s,#25
-+	ror	w21,w21,#24
-+	ushr	v13.4s,v27.4s,#25
-+	ror	w17,w17,#24
-+	ushr	v17.4s,v28.4s,#25
-+	ror	w19,w19,#24
-+	ushr	v21.4s,v29.4s,#25
-+	ror	w20,w20,#24
-+	sli	v1.4s,v24.4s,#7
-+	add	w15,w15,w21
-+	sli	v5.4s,v25.4s,#7
-+	add	w16,w16,w17
-+	sli	v9.4s,v26.4s,#7
-+	add	w13,w13,w19
-+	sli	v13.4s,v27.4s,#7
-+	add	w14,w14,w20
-+	sli	v17.4s,v28.4s,#7
-+	eor	w10,w10,w15
-+	sli	v21.4s,v29.4s,#7
-+	eor	w11,w11,w16
-+	ext	v2.16b,v2.16b,v2.16b,#8
-+	eor	w12,w12,w13
-+	ext	v6.16b,v6.16b,v6.16b,#8
-+	eor	w9,w9,w14
-+	ext	v10.16b,v10.16b,v10.16b,#8
-+	ror	w10,w10,#25
-+	ext	v14.16b,v14.16b,v14.16b,#8
-+	ror	w11,w11,#25
-+	ext	v18.16b,v18.16b,v18.16b,#8
-+	ror	w12,w12,#25
-+	ext	v22.16b,v22.16b,v22.16b,#8
-+	ror	w9,w9,#25
-+	ext	v3.16b,v3.16b,v3.16b,#12
-+	ext	v7.16b,v7.16b,v7.16b,#12
-+	ext	v11.16b,v11.16b,v11.16b,#12
-+	ext	v15.16b,v15.16b,v15.16b,#12
-+	ext	v19.16b,v19.16b,v19.16b,#12
-+	ext	v23.16b,v23.16b,v23.16b,#12
-+	ext	v1.16b,v1.16b,v1.16b,#4
-+	ext	v5.16b,v5.16b,v5.16b,#4
-+	ext	v9.16b,v9.16b,v9.16b,#4
-+	ext	v13.16b,v13.16b,v13.16b,#4
-+	ext	v17.16b,v17.16b,v17.16b,#4
-+	ext	v21.16b,v21.16b,v21.16b,#4
-+	add	v0.4s,v0.4s,v1.4s
-+	add	w5,w5,w9
-+	add	v4.4s,v4.4s,v5.4s
-+	add	w6,w6,w10
-+	add	v8.4s,v8.4s,v9.4s
-+	add	w7,w7,w11
-+	add	v12.4s,v12.4s,v13.4s
-+	add	w8,w8,w12
-+	add	v16.4s,v16.4s,v17.4s
-+	eor	w17,w17,w5
-+	add	v20.4s,v20.4s,v21.4s
-+	eor	w19,w19,w6
-+	eor	v3.16b,v3.16b,v0.16b
-+	eor	w20,w20,w7
-+	eor	v7.16b,v7.16b,v4.16b
-+	eor	w21,w21,w8
-+	eor	v11.16b,v11.16b,v8.16b
-+	ror	w17,w17,#16
-+	eor	v15.16b,v15.16b,v12.16b
-+	ror	w19,w19,#16
-+	eor	v19.16b,v19.16b,v16.16b
-+	ror	w20,w20,#16
-+	eor	v23.16b,v23.16b,v20.16b
-+	ror	w21,w21,#16
-+	rev32	v3.8h,v3.8h
-+	add	w13,w13,w17
-+	rev32	v7.8h,v7.8h
-+	add	w14,w14,w19
-+	rev32	v11.8h,v11.8h
-+	add	w15,w15,w20
-+	rev32	v15.8h,v15.8h
-+	add	w16,w16,w21
-+	rev32	v19.8h,v19.8h
-+	eor	w9,w9,w13
-+	rev32	v23.8h,v23.8h
-+	eor	w10,w10,w14
-+	add	v2.4s,v2.4s,v3.4s
-+	eor	w11,w11,w15
-+	add	v6.4s,v6.4s,v7.4s
-+	eor	w12,w12,w16
-+	add	v10.4s,v10.4s,v11.4s
-+	ror	w9,w9,#20
-+	add	v14.4s,v14.4s,v15.4s
-+	ror	w10,w10,#20
-+	add	v18.4s,v18.4s,v19.4s
-+	ror	w11,w11,#20
-+	add	v22.4s,v22.4s,v23.4s
-+	ror	w12,w12,#20
-+	eor	v24.16b,v1.16b,v2.16b
-+	add	w5,w5,w9
-+	eor	v25.16b,v5.16b,v6.16b
-+	add	w6,w6,w10
-+	eor	v26.16b,v9.16b,v10.16b
-+	add	w7,w7,w11
-+	eor	v27.16b,v13.16b,v14.16b
-+	add	w8,w8,w12
-+	eor	v28.16b,v17.16b,v18.16b
-+	eor	w17,w17,w5
-+	eor	v29.16b,v21.16b,v22.16b
-+	eor	w19,w19,w6
-+	ushr	v1.4s,v24.4s,#20
-+	eor	w20,w20,w7
-+	ushr	v5.4s,v25.4s,#20
-+	eor	w21,w21,w8
-+	ushr	v9.4s,v26.4s,#20
-+	ror	w17,w17,#24
-+	ushr	v13.4s,v27.4s,#20
-+	ror	w19,w19,#24
-+	ushr	v17.4s,v28.4s,#20
-+	ror	w20,w20,#24
-+	ushr	v21.4s,v29.4s,#20
-+	ror	w21,w21,#24
-+	sli	v1.4s,v24.4s,#12
-+	add	w13,w13,w17
-+	sli	v5.4s,v25.4s,#12
-+	add	w14,w14,w19
-+	sli	v9.4s,v26.4s,#12
-+	add	w15,w15,w20
-+	sli	v13.4s,v27.4s,#12
-+	add	w16,w16,w21
-+	sli	v17.4s,v28.4s,#12
-+	eor	w9,w9,w13
-+	sli	v21.4s,v29.4s,#12
-+	eor	w10,w10,w14
-+	add	v0.4s,v0.4s,v1.4s
-+	eor	w11,w11,w15
-+	add	v4.4s,v4.4s,v5.4s
-+	eor	w12,w12,w16
-+	add	v8.4s,v8.4s,v9.4s
-+	ror	w9,w9,#25
-+	add	v12.4s,v12.4s,v13.4s
-+	ror	w10,w10,#25
-+	add	v16.4s,v16.4s,v17.4s
-+	ror	w11,w11,#25
-+	add	v20.4s,v20.4s,v21.4s
-+	ror	w12,w12,#25
-+	eor	v24.16b,v3.16b,v0.16b
-+	add	w5,w5,w10
-+	eor	v25.16b,v7.16b,v4.16b
-+	add	w6,w6,w11
-+	eor	v26.16b,v11.16b,v8.16b
-+	add	w7,w7,w12
-+	eor	v27.16b,v15.16b,v12.16b
-+	add	w8,w8,w9
-+	eor	v28.16b,v19.16b,v16.16b
-+	eor	w21,w21,w5
-+	eor	v29.16b,v23.16b,v20.16b
-+	eor	w17,w17,w6
-+	ushr	v3.4s,v24.4s,#24
-+	eor	w19,w19,w7
-+	ushr	v7.4s,v25.4s,#24
-+	eor	w20,w20,w8
-+	ushr	v11.4s,v26.4s,#24
-+	ror	w21,w21,#16
-+	ushr	v15.4s,v27.4s,#24
-+	ror	w17,w17,#16
-+	ushr	v19.4s,v28.4s,#24
-+	ror	w19,w19,#16
-+	ushr	v23.4s,v29.4s,#24
-+	ror	w20,w20,#16
-+	sli	v3.4s,v24.4s,#8
-+	add	w15,w15,w21
-+	sli	v7.4s,v25.4s,#8
-+	add	w16,w16,w17
-+	sli	v11.4s,v26.4s,#8
-+	add	w13,w13,w19
-+	sli	v15.4s,v27.4s,#8
-+	add	w14,w14,w20
-+	sli	v19.4s,v28.4s,#8
-+	eor	w10,w10,w15
-+	sli	v23.4s,v29.4s,#8
-+	eor	w11,w11,w16
-+	add	v2.4s,v2.4s,v3.4s
-+	eor	w12,w12,w13
-+	add	v6.4s,v6.4s,v7.4s
-+	eor	w9,w9,w14
-+	add	v10.4s,v10.4s,v11.4s
-+	ror	w10,w10,#20
-+	add	v14.4s,v14.4s,v15.4s
-+	ror	w11,w11,#20
-+	add	v18.4s,v18.4s,v19.4s
-+	ror	w12,w12,#20
-+	add	v22.4s,v22.4s,v23.4s
-+	ror	w9,w9,#20
-+	eor	v24.16b,v1.16b,v2.16b
-+	add	w5,w5,w10
-+	eor	v25.16b,v5.16b,v6.16b
-+	add	w6,w6,w11
-+	eor	v26.16b,v9.16b,v10.16b
-+	add	w7,w7,w12
-+	eor	v27.16b,v13.16b,v14.16b
-+	add	w8,w8,w9
-+	eor	v28.16b,v17.16b,v18.16b
-+	eor	w21,w21,w5
-+	eor	v29.16b,v21.16b,v22.16b
-+	eor	w17,w17,w6
-+	ushr	v1.4s,v24.4s,#25
-+	eor	w19,w19,w7
-+	ushr	v5.4s,v25.4s,#25
-+	eor	w20,w20,w8
-+	ushr	v9.4s,v26.4s,#25
-+	ror	w21,w21,#24
-+	ushr	v13.4s,v27.4s,#25
-+	ror	w17,w17,#24
-+	ushr	v17.4s,v28.4s,#25
-+	ror	w19,w19,#24
-+	ushr	v21.4s,v29.4s,#25
-+	ror	w20,w20,#24
-+	sli	v1.4s,v24.4s,#7
-+	add	w15,w15,w21
-+	sli	v5.4s,v25.4s,#7
-+	add	w16,w16,w17
-+	sli	v9.4s,v26.4s,#7
-+	add	w13,w13,w19
-+	sli	v13.4s,v27.4s,#7
-+	add	w14,w14,w20
-+	sli	v17.4s,v28.4s,#7
-+	eor	w10,w10,w15
-+	sli	v21.4s,v29.4s,#7
-+	eor	w11,w11,w16
-+	ext	v2.16b,v2.16b,v2.16b,#8
-+	eor	w12,w12,w13
-+	ext	v6.16b,v6.16b,v6.16b,#8
-+	eor	w9,w9,w14
-+	ext	v10.16b,v10.16b,v10.16b,#8
-+	ror	w10,w10,#25
-+	ext	v14.16b,v14.16b,v14.16b,#8
-+	ror	w11,w11,#25
-+	ext	v18.16b,v18.16b,v18.16b,#8
-+	ror	w12,w12,#25
-+	ext	v22.16b,v22.16b,v22.16b,#8
-+	ror	w9,w9,#25
-+	ext	v3.16b,v3.16b,v3.16b,#4
-+	ext	v7.16b,v7.16b,v7.16b,#4
-+	ext	v11.16b,v11.16b,v11.16b,#4
-+	ext	v15.16b,v15.16b,v15.16b,#4
-+	ext	v19.16b,v19.16b,v19.16b,#4
-+	ext	v23.16b,v23.16b,v23.16b,#4
-+	ext	v1.16b,v1.16b,v1.16b,#12
-+	ext	v5.16b,v5.16b,v5.16b,#12
-+	ext	v9.16b,v9.16b,v9.16b,#12
-+	ext	v13.16b,v13.16b,v13.16b,#12
-+	ext	v17.16b,v17.16b,v17.16b,#12
-+	ext	v21.16b,v21.16b,v21.16b,#12
-+	cbnz	x4,.Loop_lower_neon
-+
-+	add	w5,w5,w22		// accumulate key block
-+	ldp	q24,q25,[sp,#0]
-+	add	x6,x6,x22,lsr#32
-+	ldp	q26,q27,[sp,#32]
-+	add	w7,w7,w23
-+	ldp	q28,q29,[sp,#64]
-+	add	x8,x8,x23,lsr#32
-+	add	v0.4s,v0.4s,v24.4s
-+	add	w9,w9,w24
-+	add	v4.4s,v4.4s,v24.4s
-+	add	x10,x10,x24,lsr#32
-+	add	v8.4s,v8.4s,v24.4s
-+	add	w11,w11,w25
-+	add	v12.4s,v12.4s,v24.4s
-+	add	x12,x12,x25,lsr#32
-+	add	v16.4s,v16.4s,v24.4s
-+	add	w13,w13,w26
-+	add	v20.4s,v20.4s,v24.4s
-+	add	x14,x14,x26,lsr#32
-+	add	v2.4s,v2.4s,v26.4s
-+	add	w15,w15,w27
-+	add	v6.4s,v6.4s,v26.4s
-+	add	x16,x16,x27,lsr#32
-+	add	v10.4s,v10.4s,v26.4s
-+	add	w17,w17,w28
-+	add	v14.4s,v14.4s,v26.4s
-+	add	x19,x19,x28,lsr#32
-+	add	v18.4s,v18.4s,v26.4s
-+	add	w20,w20,w30
-+	add	v22.4s,v22.4s,v26.4s
-+	add	x21,x21,x30,lsr#32
-+	add	v19.4s,v19.4s,v31.4s			// +4
-+	add	x5,x5,x6,lsl#32	// pack
-+	add	v23.4s,v23.4s,v31.4s			// +4
-+	add	x7,x7,x8,lsl#32
-+	add	v3.4s,v3.4s,v27.4s
-+	ldp	x6,x8,[x1,#0]		// load input
-+	add	v7.4s,v7.4s,v28.4s
-+	add	x9,x9,x10,lsl#32
-+	add	v11.4s,v11.4s,v29.4s
-+	add	x11,x11,x12,lsl#32
-+	add	v15.4s,v15.4s,v30.4s
-+	ldp	x10,x12,[x1,#16]
-+	add	v19.4s,v19.4s,v27.4s
-+	add	x13,x13,x14,lsl#32
-+	add	v23.4s,v23.4s,v28.4s
-+	add	x15,x15,x16,lsl#32
-+	add	v1.4s,v1.4s,v25.4s
-+	ldp	x14,x16,[x1,#32]
-+	add	v5.4s,v5.4s,v25.4s
-+	add	x17,x17,x19,lsl#32
-+	add	v9.4s,v9.4s,v25.4s
-+	add	x20,x20,x21,lsl#32
-+	add	v13.4s,v13.4s,v25.4s
-+	ldp	x19,x21,[x1,#48]
-+	add	v17.4s,v17.4s,v25.4s
-+	add	x1,x1,#64
-+	add	v21.4s,v21.4s,v25.4s
-+
-+#ifdef	__ARMEB__
-+	rev	x5,x5
-+	rev	x7,x7
-+	rev	x9,x9
-+	rev	x11,x11
-+	rev	x13,x13
-+	rev	x15,x15
-+	rev	x17,x17
-+	rev	x20,x20
-+#endif
-+	ld1	{v24.16b,v25.16b,v26.16b,v27.16b},[x1],#64
-+	eor	x5,x5,x6
-+	eor	x7,x7,x8
-+	eor	x9,x9,x10
-+	eor	x11,x11,x12
-+	eor	x13,x13,x14
-+	eor	v0.16b,v0.16b,v24.16b
-+	eor	x15,x15,x16
-+	eor	v1.16b,v1.16b,v25.16b
-+	eor	x17,x17,x19
-+	eor	v2.16b,v2.16b,v26.16b
-+	eor	x20,x20,x21
-+	eor	v3.16b,v3.16b,v27.16b
-+	ld1	{v24.16b,v25.16b,v26.16b,v27.16b},[x1],#64
-+
-+	stp	x5,x7,[x0,#0]		// store output
-+	add	x28,x28,#7			// increment counter
-+	stp	x9,x11,[x0,#16]
-+	stp	x13,x15,[x0,#32]
-+	stp	x17,x20,[x0,#48]
-+	add	x0,x0,#64
-+	st1	{v0.16b,v1.16b,v2.16b,v3.16b},[x0],#64
-+
-+	ld1	{v0.16b,v1.16b,v2.16b,v3.16b},[x1],#64
-+	eor	v4.16b,v4.16b,v24.16b
-+	eor	v5.16b,v5.16b,v25.16b
-+	eor	v6.16b,v6.16b,v26.16b
-+	eor	v7.16b,v7.16b,v27.16b
-+	st1	{v4.16b,v5.16b,v6.16b,v7.16b},[x0],#64
-+
-+	ld1	{v4.16b,v5.16b,v6.16b,v7.16b},[x1],#64
-+	eor	v8.16b,v8.16b,v0.16b
-+	ldp	q24,q25,[sp,#0]
-+	eor	v9.16b,v9.16b,v1.16b
-+	ldp	q26,q27,[sp,#32]
-+	eor	v10.16b,v10.16b,v2.16b
-+	eor	v11.16b,v11.16b,v3.16b
-+	st1	{v8.16b,v9.16b,v10.16b,v11.16b},[x0],#64
-+
-+	ld1	{v8.16b,v9.16b,v10.16b,v11.16b},[x1],#64
-+	eor	v12.16b,v12.16b,v4.16b
-+	eor	v13.16b,v13.16b,v5.16b
-+	eor	v14.16b,v14.16b,v6.16b
-+	eor	v15.16b,v15.16b,v7.16b
-+	st1	{v12.16b,v13.16b,v14.16b,v15.16b},[x0],#64
-+
-+	ld1	{v12.16b,v13.16b,v14.16b,v15.16b},[x1],#64
-+	eor	v16.16b,v16.16b,v8.16b
-+	eor	v17.16b,v17.16b,v9.16b
-+	eor	v18.16b,v18.16b,v10.16b
-+	eor	v19.16b,v19.16b,v11.16b
-+	st1	{v16.16b,v17.16b,v18.16b,v19.16b},[x0],#64
-+
-+	shl	v0.4s,v31.4s,#1			// 4 -> 8
-+	eor	v20.16b,v20.16b,v12.16b
-+	eor	v21.16b,v21.16b,v13.16b
-+	eor	v22.16b,v22.16b,v14.16b
-+	eor	v23.16b,v23.16b,v15.16b
-+	st1	{v20.16b,v21.16b,v22.16b,v23.16b},[x0],#64
-+
-+	add	v27.4s,v27.4s,v0.4s			// += 8
-+	add	v28.4s,v28.4s,v0.4s
-+	add	v29.4s,v29.4s,v0.4s
-+	add	v30.4s,v30.4s,v0.4s
-+
-+	b.hs	.Loop_outer_512_neon
-+
-+	adds	x2,x2,#512
-+	ushr	v0.4s,v31.4s,#2			// 4 -> 1
-+
-+	ldp	d8,d9,[sp,#128+0]		// meet ABI requirements
-+	ldp	d10,d11,[sp,#128+16]
-+	ldp	d12,d13,[sp,#128+32]
-+	ldp	d14,d15,[sp,#128+48]
-+
-+	stp	q24,q31,[sp,#0]		// wipe off-load area
-+	stp	q24,q31,[sp,#32]
-+	stp	q24,q31,[sp,#64]
-+
-+	b.eq	.Ldone_512_neon
-+
-+	cmp	x2,#192
-+	sub	v27.4s,v27.4s,v0.4s			// -= 1
-+	sub	v28.4s,v28.4s,v0.4s
-+	sub	v29.4s,v29.4s,v0.4s
-+	add	sp,sp,#128
-+	b.hs	.Loop_outer_neon
-+
-+	eor	v25.16b,v25.16b,v25.16b
-+	eor	v26.16b,v26.16b,v26.16b
-+	eor	v27.16b,v27.16b,v27.16b
-+	eor	v28.16b,v28.16b,v28.16b
-+	eor	v29.16b,v29.16b,v29.16b
-+	eor	v30.16b,v30.16b,v30.16b
-+	b	.Loop_outer
-+
-+.Ldone_512_neon:
-+	ldp	x19,x20,[x29,#16]
-+	add	sp,sp,#128+64
-+	ldp	x21,x22,[x29,#32]
-+	ldp	x23,x24,[x29,#48]
-+	ldp	x25,x26,[x29,#64]
-+	ldp	x27,x28,[x29,#80]
-+	ldp	x29,x30,[sp],#96
-+	ret
-+.size	ChaCha20_512_neon,.-ChaCha20_512_neon
 -- 
 2.19.0
