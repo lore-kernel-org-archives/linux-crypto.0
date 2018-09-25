@@ -1,17 +1,14 @@
-From: Joe Perches <joe@perches.com>
-Subject: Re: [PATCH net-next v6 02/23] zinc: introduce minimal cryptography
- library
-Date: Tue, 25 Sep 2018 13:21:45 -0700
-Message-ID: <abedae13e59e01200531931e530b46e937501c4a.camel@perches.com>
-References: <20180925145622.29959-1-Jason@zx2c4.com>
-         <20180925145622.29959-3-Jason@zx2c4.com>
-         <2b5f2df2f1278c118a913259a44efdf589719293.camel@perches.com>
-         <CAHmME9qLzFHPm2aaEKOmjBA95-c3CZuT+kQiuksLRRWQ_ad2sw@mail.gmail.com>
-         <748429eee2fc77afd01630c24bd2cf66a545aec5.camel@perches.com>
-         <CAHmME9peVqXDq7hmFZ+4cus+Y97NHS-TyBKF9GkdLvixdmq6hw@mail.gmail.com>
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: Re: [PATCH net-next v6 02/23] zinc: introduce minimal cryptography library
+Date: Tue, 25 Sep 2018 22:54:29 +0200
+Message-ID: <CAHmME9qp0_jQn5PeDHJc+Vs003vyqqMTdPmnchjBxxNMvHcJWA@mail.gmail.com>
+References: <20180925145622.29959-1-Jason@zx2c4.com> <20180925145622.29959-3-Jason@zx2c4.com>
+ <2b5f2df2f1278c118a913259a44efdf589719293.camel@perches.com>
+ <CAHmME9qLzFHPm2aaEKOmjBA95-c3CZuT+kQiuksLRRWQ_ad2sw@mail.gmail.com>
+ <748429eee2fc77afd01630c24bd2cf66a545aec5.camel@perches.com>
+ <CAHmME9peVqXDq7hmFZ+4cus+Y97NHS-TyBKF9GkdLvixdmq6hw@mail.gmail.com> <abedae13e59e01200531931e530b46e937501c4a.camel@perches.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="UTF-8"
 Cc: LKML <linux-kernel@vger.kernel.org>,
         Netdev <netdev@vger.kernel.org>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
@@ -20,45 +17,23 @@ Cc: LKML <linux-kernel@vger.kernel.org>,
         Samuel Neves <sneves@dei.uc.pt>,
         Andrew Lutomirski <luto@kernel.org>,
         Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+To: Joe Perches <joe@perches.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAHmME9peVqXDq7hmFZ+4cus+Y97NHS-TyBKF9GkdLvixdmq6hw@mail.gmail.com>
+In-Reply-To: <abedae13e59e01200531931e530b46e937501c4a.camel@perches.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, 2018-09-25 at 22:12 +0200, Jason A. Donenfeld wrote:
-> Hi Joe,
-> 
-> On Tue, Sep 25, 2018 at 10:05 PM Joe Perches <joe@perches.com> wrote:
-> > As far as I can tell, zinc doesn't use pr_err, just
-> > pr_info
-> 
-> Yes, pr_info, not pr_err. Apologies for my imprecision. But the
-> distinction does not matter at all, since they both use pr_fmt in
-> exactly the same way, which is sufficient for the purposes of this
-> discussion.
-> 
-> > >  why can't I just do this from the makefile, since
-> > > I want that same pr_fmt to copy the whole directory?
-> > 
-> > Ideally all of those
-> > 
-> > #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
-> > 
-> > uses will be removed one day soon and the default
-> > will change.
-> > 
-> > https://lore.kernel.org/patchwork/cover/904507/
-> > 
-> > This slightly odd use might complicate that.
-> 
-> Oh, that's good to see. In this case, I'm prefixing all of them with
-> zinc: instead of zinc_chacha20: (the modname), but I wouldn't object
-> to that changing to KBUILD_MODNAME if your patch lands. IOW, once your
-> patch lands, I'm happy to revisit this discussion and fall back to
-> using the sane defaults you're in the process of setting up for
-> everyone.
+Hi Joe,
 
-I'd still prefer as all these are effectively
-debugging output that you convert the pr_info
-uses pr_debug and so avoid using pr_fmt altogether.
+On Tue, Sep 25, 2018 at 10:21 PM Joe Perches <joe@perches.com> wrote:
+> I'd still prefer as all these are effectively
+> debugging output that you convert the pr_info
+> uses pr_debug and so avoid using pr_fmt altogether.
+
+I started to write back, "sure no problem, this will be in v7," but
+then I gave it a closer look, and I think actually I'll be changing
+these into pr_err/pr_info and not naming this "DEBUG" but rather
+"SELFTEST", since I think these are actually very good to have beyond
+mere debugging.
+
+Jason
