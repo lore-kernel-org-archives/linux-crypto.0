@@ -1,50 +1,67 @@
-From: Horia Geanta <horia.geanta@nxp.com>
-Subject: Re: [PATCH] crypto: caam/qi2 - add CONFIG_NETDEVICES dependency
-Date: Wed, 26 Sep 2018 13:07:21 +0000
-Message-ID: <VI1PR0402MB3485AB14555EE65B951F787998150@VI1PR0402MB3485.eurprd04.prod.outlook.com>
-References: <20180926130045.2295764-1-arnd@arndb.de>
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: Re: [PATCH net-next v6 07/23] zinc: ChaCha20 ARM and ARM64 implementations
+Date: Wed, 26 Sep 2018 15:32:45 +0200
+Message-ID: <CAHmME9r9KppoFwwNVpzpYbU+9dCPzb7Pit+4iRa4MY_ouJBWrA@mail.gmail.com>
+References: <20180925145622.29959-1-Jason@zx2c4.com> <20180925145622.29959-8-Jason@zx2c4.com>
+ <CAKv+Gu9mVAfdBvOMCFqRJj+wBiWu3JVOgPZdkcdjzqSdQQ5Jrw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-2"
-Content-Transfer-Encoding: quoted-printable
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
+Content-Type: text/plain; charset="UTF-8"
+Cc: LKML <linux-kernel@vger.kernel.org>,
+        Netdev <netdev@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        David Miller <davem@davemloft.net>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Samuel Neves <sneves@dei.uc.pt>,
+        Andrew Lutomirski <luto@kernel.org>,
+        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
+        Russell King - ARM Linux <linux@armlinux.org.uk>,
+        linux-arm-kernel@lists.infradead.org
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Language: en-US
+In-Reply-To: <CAKv+Gu9mVAfdBvOMCFqRJj+wBiWu3JVOgPZdkcdjzqSdQQ5Jrw@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 9/26/2018 4:01 PM, Arnd Bergmann wrote:=0A=
-> This driver implements a (part of a) network driver, and fails to=0A=
-> build if we have turned off networking support:=0A=
-> =0A=
-> drivers/crypto/caam/caamalg_qi2.o: In function `dpaa2_caam_fqdan_cb':=0A=
-> caamalg_qi2.c:(.text+0x577c): undefined reference to `napi_schedule_prep'=
-=0A=
-> caamalg_qi2.c:(.text+0x578c): undefined reference to `__napi_schedule_irq=
-off'=0A=
-> drivers/crypto/caam/caamalg_qi2.o: In function `dpaa2_dpseci_poll':=0A=
-> caamalg_qi2.c:(.text+0x59b8): undefined reference to `napi_complete_done'=
-=0A=
-> drivers/crypto/caam/caamalg_qi2.o: In function `dpaa2_caam_remove':=0A=
-> caamalg_qi2.c:(.text.unlikely+0x4e0): undefined reference to `napi_disabl=
-e'=0A=
-> caamalg_qi2.c:(.text.unlikely+0x4e8): undefined reference to `netif_napi_=
-del'=0A=
-> drivers/crypto/caam/caamalg_qi2.o: In function `dpaa2_dpseci_setup':=0A=
-> caamalg_qi2.c:(.text.unlikely+0xc98): undefined reference to `netif_napi_=
-add'=0A=
-> =0A=
-> From what I can tell, CONFIG_NETDEVICES is the correct dependency here,=
-=0A=
-> and adding it fixes the randconfig failures.=0A=
-> =0A=
-> Fixes: 8d818c105501 ("crypto: caam/qi2 - add DPAA2-CAAM driver")=0A=
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>=0A=
-Acked-by: Horia Geant=E3 <horia.geanta@nxp.com>=0A=
-=0A=
-Thanks,=0A=
-Horia=0A=
+Hi Ard,
+
+On Wed, Sep 26, 2018 at 10:59 AM Ard Biesheuvel
+<ard.biesheuvel@linaro.org> wrote:
+> > +static inline bool chacha20_arch(struct chacha20_ctx *state, u8 *dst,
+> > +                                const u8 *src, size_t len,
+> > +                                simd_context_t *simd_context)
+> > +{
+> > +#if defined(CONFIG_KERNEL_MODE_NEON)
+> > +       if (chacha20_use_neon && len >= CHACHA20_BLOCK_SIZE * 3 &&
+> > +           simd_use(simd_context))
+> > +               chacha20_neon(dst, src, len, state->key, state->counter);
+> > +       else
+> > +#endif
+>
+> Better to use IS_ENABLED() here:
+>
+> > +       if (IS_ENABLED(CONFIG_KERNEL_MODE_NEON)) &&
+> > +           chacha20_use_neon && len >= CHACHA20_BLOCK_SIZE * 3 &&
+> > +           simd_use(simd_context))
+
+Good idea. I'll fix that up.
+
+>
+> Also, this still has unbounded worst case scheduling latency, given
+> that the outer library function passes its entire input straight into
+> the NEON routine.
+
+The vast majority of crypto routines in arch/*/crypto/ follow this
+same exact pattern, actually. I realize a few don't -- probably the
+ones you had a hand in :) -- but I think this is up to the caller to
+handle. I made a change so that in chacha20poly1305.c, it calls
+simd_relax after handling each scatter-gather element, so a
+"construction" will handle this gracefully. But I believe it's up to
+the caller to decide on what sizes of information it wants to pass to
+primitives. Put differently, this also hasn't ever been an issue
+before -- the existing state of the tree indicates this -- and so I
+don't anticipate this will be a real issue now. And if it becomes one,
+this is something we can address *later*, but certainly there's no use
+of adding additional complexity to the initial patchset to do this
+now.
+
+Jason
