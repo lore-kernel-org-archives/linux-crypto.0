@@ -1,42 +1,52 @@
-From: Rob Herring <robh@kernel.org>
-Subject: Re: [PATCH 1/2] dt-bindings: crypto: hip07-sec, drop incorrect commas
-Date: Wed, 26 Sep 2018 15:36:31 -0500
-Message-ID: <20180926203631.GA30812@bogus>
-References: <20180912160718.3324-2-Jonathan.Cameron@huawei.com>
+From: valdis.kletnieks@vt.edu
+Subject: [PATCH] crypto/morus(640,1280) - make crypto_...-algs static
+Date: Wed, 26 Sep 2018 18:49:38 -0400
+Message-ID: <113445.1538002178@turing-police.cc.vt.edu>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org,
- linux-crypto@vger.kernel.org, xuwei <xuwei5@huawei.com>
-To: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-Content-Disposition: inline
-In-Reply-To: <20180912160718.3324-2-Jonathan.Cameron@huawei.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Sep 12, 2018 at 05:07:17PM +0100, Jonathan Cameron wrote:
-> There should not be a comma in the address used for the instance
-> so drop them.
-> 
-> This is a left over from a review of the final version before
-> Herbert Xu picked the series up.
-> 
-> Reported-by: Rob Herring <robh+dt@kernel.org>
-> Signed-off-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-> Fixes: 8f026dc887fe ("dt-bindings: Add bidnings for Hisilicon SEC crypto accelerators")
-> ---
->  .../devicetree/bindings/crypto/hisilicon,hip07-sec.txt          | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+sparse complains thusly:
 
-Applied. The dts change can go thru arm-soc.
+  CHECK   arch/x86/crypto/morus640-sse2-glue.c
+arch/x86/crypto/morus640-sse2-glue.c:38:1: warning: symbol 'crypto_morus640_sse2_algs' was not declared. Should it be static?
+  CHECK   arch/x86/crypto/morus1280-sse2-glue.c
+arch/x86/crypto/morus1280-sse2-glue.c:38:1: warning: symbol 'crypto_morus1280_sse2_algs' was not declared. Should it be static?
+  CHECK   arch/x86/crypto/morus1280-avx2-glue.c
+arch/x86/crypto/morus1280-avx2-glue.c:38:1: warning: symbol 'crypto_morus1280_avx2_algs' was not declared. Should it be static?
 
-Rob
+and sparse is correct - these don't need to be global and polluting the namespace.
+
+Signed-off-by: Valdis Kletnieks <valdis.kletnieks@vt.edu>
+---
+diff --git a/include/crypto/morus1280_glue.h b/include/crypto/morus1280_glue.h
+index b26dd70efd9a..ba782e10065e 100644
+--- a/include/crypto/morus1280_glue.h
++++ b/include/crypto/morus1280_glue.h
+@@ -82,7 +82,7 @@ void cryptd_morus1280_glue_exit_tfm(struct crypto_aead *aead);
+ 	{ \
+ 	} \
+ 	\
+-	struct aead_alg crypto_morus1280_##id##_algs[] = {\
++	static struct aead_alg crypto_morus1280_##id##_algs[] = {\
+ 		{ \
+ 			.setkey = crypto_morus1280_glue_setkey, \
+ 			.setauthsize = crypto_morus1280_glue_setauthsize, \
+diff --git a/include/crypto/morus640_glue.h b/include/crypto/morus640_glue.h
+index 90c8db07e740..27fa790a2362 100644
+--- a/include/crypto/morus640_glue.h
++++ b/include/crypto/morus640_glue.h
+@@ -82,7 +82,7 @@ void cryptd_morus640_glue_exit_tfm(struct crypto_aead *aead);
+ 	{ \
+ 	} \
+ 	\
+-	struct aead_alg crypto_morus640_##id##_algs[] = {\
++	static struct aead_alg crypto_morus640_##id##_algs[] = {\
+ 		{ \
+ 			.setkey = crypto_morus640_glue_setkey, \
+ 			.setauthsize = crypto_morus640_glue_setauthsize, \
