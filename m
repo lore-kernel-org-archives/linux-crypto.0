@@ -1,38 +1,57 @@
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: Re: [PATCH net-next v6 07/23] zinc: ChaCha20 ARM and ARM64 implementations
-Date: Wed, 26 Sep 2018 17:58:53 +0200
-Message-ID: <CAHmME9q9QcCEZfTykJdS5Qcvv97Ve4PEFhFKYWKFyQXgn8+m9g@mail.gmail.com>
-References: <20180925145622.29959-1-Jason@zx2c4.com> <20180925145622.29959-8-Jason@zx2c4.com>
- <CAKv+Gu9mVAfdBvOMCFqRJj+wBiWu3JVOgPZdkcdjzqSdQQ5Jrw@mail.gmail.com>
- <CAHmME9r9KppoFwwNVpzpYbU+9dCPzb7Pit+4iRa4MY_ouJBWrA@mail.gmail.com>
- <CAKv+Gu8ih-TsASRGqK+ST_5+EQ0=Zo-zhGCadOdGyPjucMFTCg@mail.gmail.com>
- <CAKv+Gu8w74dUSEAGxxh=C6To6F=bSm8DjiExUPmh_LUyhoDLhg@mail.gmail.com>
- <CAHmME9pbRabkGjNh-65S9qBNNS1GLJSwZ_tTM507S_Ezr1=QLg@mail.gmail.com>
- <CAHmME9ru=kJO8QiW+uNNgt5NgFVZzRsQ4tNSgo+f+KfHs3fAKQ@mail.gmail.com> <CAKv+Gu-WDt8f9qVjLDRPHL7THS0BjtKHThw2RMfHbWBT8Hs8aQ@mail.gmail.com>
+From: =?UTF-8?Q?Ivan_Lab=c3=a1th?= <labokml@labo.rs>
+Subject: Re: [PATCH net-next v6 23/23] net: WireGuard secure network tunnel
+Date: Wed, 26 Sep 2018 18:00:31 +0200
+Message-ID: <7830522a-968e-0880-beb7-44904466cf14@labo.rs>
+References: <20180925145622.29959-1-Jason@zx2c4.com>
+ <20180925145622.29959-24-Jason@zx2c4.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Netdev <netdev@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        David Miller <davem@davemloft.net>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Samuel Neves <sneves@dei.uc.pt>,
-        Andrew Lutomirski <luto@kernel.org>,
-        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
-        Russell King - ARM Linux <linux@armlinux.org.uk>,
-        linux-arm-kernel@lists.infradead.org
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAKv+Gu-WDt8f9qVjLDRPHL7THS0BjtKHThw2RMfHbWBT8Hs8aQ@mail.gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+        linux-crypto@vger.kernel.org, davem@davemloft.net,
+        gregkh@linuxfoundation.org
+Return-path: <netdev-owner@vger.kernel.org>
+In-Reply-To: <20180925145622.29959-24-Jason@zx2c4.com>
+Content-Language: en-US
+Sender: netdev-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Sep 26, 2018 at 5:52 PM Ard Biesheuvel
-<ard.biesheuvel@linaro.org> wrote:
-> Nice one :-)
->
-> This works for me (but perhaps add a comment as well)
+On 25.09.2018 16:56, Jason A. Donenfeld wrote:
+> Extensive documentation and description of the protocol and
+> considerations, along with formal proofs of the cryptography, are> available at:
+> 
+>   * https://www.wireguard.com/
+>   * https://www.wireguard.com/papers/wireguard.pdf
+[]
+> +enum { HANDSHAKE_DSCP = 0x88 /* AF41, plus 00 ECN */ };
+[]
+> +	if (skb->protocol == htons(ETH_P_IP)) {
+> +		len = ntohs(ip_hdr(skb)->tot_len);
+> +		if (unlikely(len < sizeof(struct iphdr)))
+> +			goto dishonest_packet_size;
+> +		if (INET_ECN_is_ce(PACKET_CB(skb)->ds))
+> +			IP_ECN_set_ce(ip_hdr(skb));
+> +	} else if (skb->protocol == htons(ETH_P_IPV6)) {
+> +		len = ntohs(ipv6_hdr(skb)->payload_len) +
+> +		      sizeof(struct ipv6hdr);
+> +		if (INET_ECN_is_ce(PACKET_CB(skb)->ds))
+> +			IP6_ECN_set_ce(skb, ipv6_hdr(skb));
+> +	} else
+[]
+> +	skb_queue_walk (&packets, skb) {
+> +		/* 0 for no outer TOS: no leak. TODO: should we use flowi->tos
+> +		 * as outer? */
+> +		PACKET_CB(skb)->ds = ip_tunnel_ecn_encap(0, ip_hdr(skb), skb);
+> +		PACKET_CB(skb)->nonce =
+> +				atomic64_inc_return(&key->counter.counter) - 1;
+> +		if (unlikely(PACKET_CB(skb)->nonce >= REJECT_AFTER_MESSAGES))
+> +			goto out_invalid;
+> +	}
+Hi,
 
-Sure. Just a prototype; it'll be clean for v7.
+is there documentation and/or rationale for ecn handling?
+Quick search for ecn and dscp didn't reveal any.
+
+Regards,
+Ivan
