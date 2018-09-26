@@ -1,72 +1,77 @@
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: Re: [PATCH net-next v6 23/23] net: WireGuard secure network tunnel
-Date: Wed, 26 Sep 2018 18:04:09 +0200
-Message-ID: <CAHmME9oQJ9y51Pv7U=+=5uDA_tb+U1zWZdsLcyNMhdcFZmjM8Q@mail.gmail.com>
-References: <20180925145622.29959-1-Jason@zx2c4.com> <20180925145622.29959-24-Jason@zx2c4.com>
- <7830522a-968e-0880-beb7-44904466cf14@labo.rs>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+From: Andy Lutomirski <luto@amacapital.net>
+Subject: Re: [PATCH net-next v6 07/23] zinc: ChaCha20 ARM and ARM64 implementations
+Date: Wed, 26 Sep 2018 09:21:23 -0700
+Message-ID: <D93C2C15-DC70-4A95-9350-AD4036C9556A@amacapital.net>
+References: <20180925145622.29959-1-Jason@zx2c4.com> <20180925145622.29959-8-Jason@zx2c4.com> <CAKv+Gu9mVAfdBvOMCFqRJj+wBiWu3JVOgPZdkcdjzqSdQQ5Jrw@mail.gmail.com> <CAHmME9r9KppoFwwNVpzpYbU+9dCPzb7Pit+4iRa4MY_ouJBWrA@mail.gmail.com> <CAKv+Gu8ih-TsASRGqK+ST_5+EQ0=Zo-zhGCadOdGyPjucMFTCg@mail.gmail.com>
+Mime-Version: 1.0 (1.0)
+Content-Type: text/plain;
+        charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Cc: LKML <linux-kernel@vger.kernel.org>,
-        Netdev <netdev@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        David Miller <davem@davemloft.net>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: labokml@labo.rs, Dave Taht <dave.taht@gmail.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <7830522a-968e-0880-beb7-44904466cf14@labo.rs>
-Sender: linux-kernel-owner@vger.kernel.org
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "<netdev@vger.kernel.org>" <netdev@vger.kernel.org>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Samuel Neves <sneves@dei.uc.pt>,
+        Andy Lutomirski <luto@kernel.org>,
+        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
+        Russell King <linux@armlinux.org.uk>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Return-path: <netdev-owner@vger.kernel.org>
+In-Reply-To: <CAKv+Gu8ih-TsASRGqK+ST_5+EQ0=Zo-zhGCadOdGyPjucMFTCg@mail.gmail.com>
+Sender: netdev-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi Ivan,
 
-On Wed, Sep 26, 2018 at 6:00 PM Ivan Lab=C3=A1th <labokml@labo.rs> wrote:
->
-> On 25.09.2018 16:56, Jason A. Donenfeld wrote:
-> > Extensive documentation and description of the protocol and
-> > considerations, along with formal proofs of the cryptography, are> avai=
-lable at:
-> >
-> >   * https://www.wireguard.com/
-> >   * https://www.wireguard.com/papers/wireguard.pdf
-> []
-> > +enum { HANDSHAKE_DSCP =3D 0x88 /* AF41, plus 00 ECN */ };
-> []
-> > +     if (skb->protocol =3D=3D htons(ETH_P_IP)) {
-> > +             len =3D ntohs(ip_hdr(skb)->tot_len);
-> > +             if (unlikely(len < sizeof(struct iphdr)))
-> > +                     goto dishonest_packet_size;
-> > +             if (INET_ECN_is_ce(PACKET_CB(skb)->ds))
-> > +                     IP_ECN_set_ce(ip_hdr(skb));
-> > +     } else if (skb->protocol =3D=3D htons(ETH_P_IPV6)) {
-> > +             len =3D ntohs(ipv6_hdr(skb)->payload_len) +
-> > +                   sizeof(struct ipv6hdr);
-> > +             if (INET_ECN_is_ce(PACKET_CB(skb)->ds))
-> > +                     IP6_ECN_set_ce(skb, ipv6_hdr(skb));
-> > +     } else
-> []
-> > +     skb_queue_walk (&packets, skb) {
-> > +             /* 0 for no outer TOS: no leak. TODO: should we use flowi=
-->tos
-> > +              * as outer? */
-> > +             PACKET_CB(skb)->ds =3D ip_tunnel_ecn_encap(0, ip_hdr(skb)=
-, skb);
-> > +             PACKET_CB(skb)->nonce =3D
-> > +                             atomic64_inc_return(&key->counter.counter=
-) - 1;
-> > +             if (unlikely(PACKET_CB(skb)->nonce >=3D REJECT_AFTER_MESS=
-AGES))
-> > +                     goto out_invalid;
-> > +     }
-> Hi,
->
-> is there documentation and/or rationale for ecn handling?
-> Quick search for ecn and dscp didn't reveal any.
 
-ECN support was developed with Dave Taht so that it does the right
-thing with CAKE and such. He's CC'd, so that he can fill in details,
-and sure, we can write these up. As well, I can add the rationale for
-the handshake-packet-specific DSCP value to the paper in the next few
-days; thanks for pointing out these documentation oversights.
+> On Sep 26, 2018, at 7:02 AM, Ard Biesheuvel <ard.biesheuvel@linaro.org> wr=
+ote:
+>=20
+> (+ Herbert, Thomas)
+>=20
+>> On Wed, 26 Sep 2018 at 15:33, Jason A. Donenfeld <Jason@zx2c4.com> wrote:=
 
-Jason
+>>=20
+>> Hi Ard,
+>> .
+>=20
+>> And if it becomes one,
+>> this is something we can address *later*, but certainly there's no use
+>> of adding additional complexity to the initial patchset to do this
+>> now.
+>>=20
+>=20
+> You are introducing a very useful SIMD abstraction, but it lets code
+> run with preemption disabled for unbounded amounts of time, and so now
+> is the time to ensure we get it right.
+>=20
+> Part of the [justified] criticism on the current state of the crypto
+> API is on its complexity, and so I don't think it makes sense to keep
+> it simple now and add the complexity later (and the same concern
+> applies to async support btw).
+
+Are, is what you=E2=80=99re saying that the Zinc chacha20 functions should c=
+all simd_relax() every n bytes automatically for some reasonable value of n?=
+  If so, seems sensible, except that some care might be needed to make sure t=
+hey interact with preemption correctly.
+
+What I mean is: the public Zinc entry points should either be callable in an=
+ atomic context or they should not be.  I think this should be checked at ru=
+ntime in an appropriate place with an __might_sleep or similar.  Or simd_rel=
+ax should learn to *not* schedule if the result of preempt_enable() leaves i=
+t atomic. (And the latter needs to be done in a way that works even on non-p=
+reempt kernels, and I don=E2=80=99t remember whether that=E2=80=99s possible=
+.). And this should happen regardless of how many bytes are processed. IOW, c=
+alling into Zinc should be equally not atomic-safe for 100 bytes and for 10 M=
+B.
+
+As for async, ISTM a really good WireGuard accelerator would expose a differ=
+ent interface than crypto API supports, and it probably makes sense to wait f=
+or such hardware to show up before figuring out how to use it.  And no matte=
+r what form it takes, I don=E2=80=99t think it should complicate the basic Z=
+inc crypto entry points.=
