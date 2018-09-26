@@ -1,69 +1,73 @@
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Subject: Re: [PATCH net-next v6 07/23] zinc: ChaCha20 ARM and ARM64 implementations
-Date: Wed, 26 Sep 2018 19:07:19 +0200
-Message-ID: <CAHmME9o4usa8TDPA0=mHY-8ijQNVc-jH4UMU-EZuSK2wqaieKQ@mail.gmail.com>
+Date: Wed, 26 Sep 2018 19:08:30 +0200
+Message-ID: <CAKv+Gu__KE5taR-w5ZVKySM0zA3Y3tooTi=wvboX07qeWxBxkA@mail.gmail.com>
 References: <20180925145622.29959-1-Jason@zx2c4.com> <20180925145622.29959-8-Jason@zx2c4.com>
  <CAKv+Gu9mVAfdBvOMCFqRJj+wBiWu3JVOgPZdkcdjzqSdQQ5Jrw@mail.gmail.com>
  <CAHmME9r9KppoFwwNVpzpYbU+9dCPzb7Pit+4iRa4MY_ouJBWrA@mail.gmail.com>
  <CAKv+Gu8ih-TsASRGqK+ST_5+EQ0=Zo-zhGCadOdGyPjucMFTCg@mail.gmail.com>
- <CAHmME9p5b=L0FSL72gCszhvut-kr=aD4ZniY9qsJxiBnZk8qNQ@mail.gmail.com> <CAKv+Gu9hOW0pOjDjrvg1q-v85aiwSZRnjivnvRTCwxMdph4j7g@mail.gmail.com>
+ <D93C2C15-DC70-4A95-9350-AD4036C9556A@amacapital.net> <CAHmME9pZKUMnnSZ0670rUH4H61g0x88c-B-DZYw_X-8+xgH-=g@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+Content-Transfer-Encoding: quoted-printable
+Cc: Andy Lutomirski <luto@amacapital.net>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
         Thomas Gleixner <tglx@linutronix.de>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Netdev <netdev@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        David Miller <davem@davemloft.net>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "<netdev@vger.kernel.org>" <netdev@vger.kernel.org>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Samuel Neves <sneves@dei.uc.pt>,
-        Andrew Lutomirski <luto@kernel.org>,
+        Andy Lutomirski <luto@kernel.org>,
         Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
-        Russell King - ARM Linux <linux@armlinux.org.uk>,
-        linux-arm-kernel@lists.infradead.org
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+        Russell King <linux@armlinux.org.uk>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAKv+Gu9hOW0pOjDjrvg1q-v85aiwSZRnjivnvRTCwxMdph4j7g@mail.gmail.com>
+In-Reply-To: <CAHmME9pZKUMnnSZ0670rUH4H61g0x88c-B-DZYw_X-8+xgH-=g@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Sep 26, 2018 at 6:55 PM Ard Biesheuvel
-<ard.biesheuvel@linaro.org> wrote:
-> Framing it as /needless/ complexity does not help at all. The changes
-> you are proposing are very useful, but nobody wants two crypto
-> subsystems with two different maintainers in the kernel, so I would
-> like to understand where this is going in the future. I am not saying
-> it should block these patches though.
+On Wed, 26 Sep 2018 at 19:03, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+>
+> On Wed, Sep 26, 2018 at 6:21 PM Andy Lutomirski <luto@amacapital.net> wro=
+te:
+> > Are, is what you=E2=80=99re saying that the Zinc chacha20 functions sho=
+uld call simd_relax() every n bytes automatically for some reasonable value=
+ of n?  If so, seems sensible, except that some care might be needed to mak=
+e sure they interact with preemption correctly.
+> >
+> > What I mean is: the public Zinc entry points should either be callable =
+in an atomic context or they should not be.  I think this should be checked=
+ at runtime in an appropriate place with an __might_sleep or similar.  Or s=
+imd_relax should learn to *not* schedule if the result of preempt_enable() =
+leaves it atomic. (And the latter needs to be done in a way that works even=
+ on non-preempt kernels, and I don=E2=80=99t remember whether that=E2=80=99=
+s possible.). And this should happen regardless of how many bytes are proce=
+ssed. IOW, calling into Zinc should be equally not atomic-safe for 100 byte=
+s and for 10 MB.
+>
+> I'm not sure this is actually a problem. Namely:
+>
+> preempt_disable();
+> kernel_fpu_begin();
+> kernel_fpu_end();
+> schedule(); <--- bug!
+>
+> Calling kernel_fpu_end() disables preemption, but AFAIK, preemption
+> enabling/disabling is recursive, so kernel_fpu_end's use of
+> preempt_disable won't actually do anything until the outer preempt
+> enable is called:
+>
+> preempt_disable();
+> kernel_fpu_begin();
+> kernel_fpu_end();
+> preempt_enable();
+> schedule(); <--- works!
+>
+> Or am I missing some more subtle point?
+>
 
-Thanks for clarifying. I understood you to be intending to block the
-patches until they were converted to an async interface, which is not
-what Zinc's about. Seeing as you're just curious about future
-directions, that seems much more tenable.
-
-> Also, I have spent a *lot* of time looking at your code, and trying to
-> make it better, especially for use cases that weren't on your radar to
-> begin with
-
-I am extremely grateful for a good portion of your reviews indeed. As
-I mentioned earlier, much is very useful. But in other places, I fear
-you're steering this in a direction I really am hesitant to go.
-
-> (e.g., 'pet projects' [your words]
-
-Taken out of context.
-
-> consideration for other aspects of kernel programming, e.g.,
-> preemption under -rt, stack size constraints, coding style, importing
-> code from other projects etc.
-
-And indeed all of these concerns I've been pretty amenable to, and
-continue to do so. What I'm commenting on are things outside of these.
-
-
-> - please try to be less dismissive of
-> feedback first time around, but try to understand why people are
-> raising these issues
-
-Apologies, and duly noted. I'll give you the benefit of the doubt.
-
-Jason
+No that seems accurate to me.
