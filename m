@@ -1,94 +1,92 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [PATCH net-next v6 07/23] zinc: ChaCha20 ARM and ARM64 implementations
-Date: Wed, 26 Sep 2018 16:02:22 +0200
-Message-ID: <CAKv+Gu8ih-TsASRGqK+ST_5+EQ0=Zo-zhGCadOdGyPjucMFTCg@mail.gmail.com>
-References: <20180925145622.29959-1-Jason@zx2c4.com> <20180925145622.29959-8-Jason@zx2c4.com>
- <CAKv+Gu9mVAfdBvOMCFqRJj+wBiWu3JVOgPZdkcdjzqSdQQ5Jrw@mail.gmail.com> <CAHmME9r9KppoFwwNVpzpYbU+9dCPzb7Pit+4iRa4MY_ouJBWrA@mail.gmail.com>
+From: syzbot <syzbot+87dbe4b17debcec16d71@syzkaller.appspotmail.com>
+Subject: BUG: unable to handle kernel NULL pointer dereference in sha1_mb_mgr_get_comp_job_avx2
+Date: Wed, 26 Sep 2018 07:27:04 -0700
+Message-ID: <0000000000002e9bdb0576c70441@google.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "<netdev@vger.kernel.org>" <netdev@vger.kernel.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Samuel Neves <sneves@dei.uc.pt>,
-        Andy Lutomirski <luto@kernel.org>,
-        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
-        Russell King <linux@armlinux.org.uk>,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Thomas Gleixner <tglx@linutronix.de>
-Return-path: <netdev-owner@vger.kernel.org>
-In-Reply-To: <CAHmME9r9KppoFwwNVpzpYbU+9dCPzb7Pit+4iRa4MY_ouJBWrA@mail.gmail.com>
-Sender: netdev-owner@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+To: bp@alien8.de, davem@davemloft.net, herbert@gondor.apana.org.au,
+        hpa@zytor.com, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, megha.dey@linux.intel.com,
+        mingo@redhat.com, syzkaller-bugs@googlegroups.com,
+        tglx@linutronix.de, tim.c.chen@linux.intel.com, x86@kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-(+ Herbert, Thomas)
+Hello,
 
-On Wed, 26 Sep 2018 at 15:33, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
->
-> Hi Ard,
->
-> On Wed, Sep 26, 2018 at 10:59 AM Ard Biesheuvel
-> <ard.biesheuvel@linaro.org> wrote:
-> > > +static inline bool chacha20_arch(struct chacha20_ctx *state, u8 *dst,
-> > > +                                const u8 *src, size_t len,
-> > > +                                simd_context_t *simd_context)
-> > > +{
-> > > +#if defined(CONFIG_KERNEL_MODE_NEON)
-> > > +       if (chacha20_use_neon && len >= CHACHA20_BLOCK_SIZE * 3 &&
-> > > +           simd_use(simd_context))
-> > > +               chacha20_neon(dst, src, len, state->key, state->counter);
-> > > +       else
-> > > +#endif
-> >
-> > Better to use IS_ENABLED() here:
-> >
-> > > +       if (IS_ENABLED(CONFIG_KERNEL_MODE_NEON)) &&
-> > > +           chacha20_use_neon && len >= CHACHA20_BLOCK_SIZE * 3 &&
-> > > +           simd_use(simd_context))
->
-> Good idea. I'll fix that up.
->
-> >
-> > Also, this still has unbounded worst case scheduling latency, given
-> > that the outer library function passes its entire input straight into
-> > the NEON routine.
->
-> The vast majority of crypto routines in arch/*/crypto/ follow this
-> same exact pattern, actually. I realize a few don't -- probably the
-> ones you had a hand in :) -- but I think this is up to the caller to
-> handle.
+syzbot found the following crash on:
 
-Anything that uses the scatterwalk API (AEADs and skciphers) will
-handle at most a page at a time. Hashes are different, which is why
-some of them have to handle it explicitly.
+HEAD commit:    a38523185b40 erge tag 'libnvdimm-fixes-4.19-rc6' of git://..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1767b7fa400000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=dfb440e26f0a6f6f
+dashboard link: https://syzkaller.appspot.com/bug?extid=87dbe4b17debcec16d71
+compiler:       gcc (GCC) 8.0.1 20180413 (experimental)
 
-> I made a change so that in chacha20poly1305.c, it calls
-> simd_relax after handling each scatter-gather element, so a
-> "construction" will handle this gracefully. But I believe it's up to
-> the caller to decide on what sizes of information it wants to pass to
-> primitives. Put differently, this also hasn't ever been an issue
-> before -- the existing state of the tree indicates this -- and so I
-> don't anticipate this will be a real issue now.
+Unfortunately, I don't have any reproducer for this crash yet.
 
-The state of the tree does not capture all relevant context or
-history. The scheduling latency issue was brought up very recently by
-the -rt folks on the mailing lists.
+IMPORTANT: if you fix the bug, please add the following tag to the commit:
+Reported-by: syzbot+87dbe4b17debcec16d71@syzkaller.appspotmail.com
 
-> And if it becomes one,
-> this is something we can address *later*, but certainly there's no use
-> of adding additional complexity to the initial patchset to do this
-> now.
->
+BUG: unable to handle kernel NULL pointer dereference at 0000000000000034
+PGD 1b8b87067 P4D 1b8b87067 PUD 1b8b88067 PMD 0
+Oops: 0002 [#1] PREEMPT SMP KASAN
+CPU: 1 PID: 24 Comm: kworker/1:1 Not tainted 4.19.0-rc5+ #32
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS  
+Google 01/01/2011
+Workqueue: crypto mcryptd_flusher
+RIP: 0010:sha1_mb_mgr_get_comp_job_avx2+0x62/0xba  
+arch/x86/crypto/sha1-mb/sha1_mb_mgr_flush_avx2.S:256
+Code: 04 c4 e2 69 3b d3 c4 c1 79 7e d0 49 f7 c0 f0 ff ff ff 75 6e 49 6b d8  
+08 48 8d 9c 1f 08 01 00 00 48 8b 03 48 c7 03 00 00 00 00 <c7> 40 34 02 00  
+00 00 48 8b 9f 00 01 00 00 48 c1 e3 04 4c 09 c3 48
+kobject: 'loop1' (00000000307f8c2f): kobject_uevent_env
+RSP: 0018:ffff8801d94473c0 EFLAGS: 00010206
+RAX: 0000000000000000 RBX: ffff8801d4818688 RCX: 1ffff1003b2869e1
+RDX: 1ffffd1ffffa2591 RSI: ffffffff81454f3a RDI: ffff8801d4818580
+RBP: ffff8801d9447520 R08: 0000000000000000 R09: 0000000000000006
+kobject: 'loop1' (00000000307f8c2f): fill_kobj_path: path  
+= '/devices/virtual/block/loop1'
+R10: 0000000000000000 R11: ffff8801d9434640 R12: ffff8801d94474f8
+R13: 0000000000000001 R14: ffff8801bb509720 R15: 0000000000000200
+FS:  0000000000000000(0000) GS:ffff8801dad00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+kobject: 'loop4' (00000000fa342cfc): kobject_uevent_env
+CR2: 0000000000000034 CR3: 00000001b8b85000 CR4: 00000000001406e0
+kobject: 'loop4' (00000000fa342cfc): fill_kobj_path: path  
+= '/devices/virtual/block/loop4'
+Call Trace:
+  sha1_mb_flusher+0x2f4/0x60b arch/x86/crypto/sha1-mb/sha1_mb.c:918
+  mcryptd_flusher+0x3af/0x520 crypto/mcryptd.c:208
+  process_one_work+0xc90/0x1b90 kernel/workqueue.c:2153
+  worker_thread+0x17f/0x1390 kernel/workqueue.c:2296
+  kthread+0x35a/0x420 kernel/kthread.c:246
+  ret_from_fork+0x3a/0x50 arch/x86/entry/entry_64.S:413
+Modules linked in:
+CR2: 0000000000000034
+---[ end trace 7d3a48e5625a9543 ]---
+RIP: 0010:sha1_mb_mgr_get_comp_job_avx2+0x62/0xba  
+arch/x86/crypto/sha1-mb/sha1_mb_mgr_flush_avx2.S:256
+Code: 04 c4 e2 69 3b d3 c4 c1 79 7e d0 49 f7 c0 f0 ff ff ff 75 6e 49 6b d8  
+08 48 8d 9c 1f 08 01 00 00 48 8b 03 48 c7 03 00 00 00 00 <c7> 40 34 02 00  
+00 00 48 8b 9f 00 01 00 00 48 c1 e3 04 4c 09 c3 48
+RSP: 0018:ffff8801d94473c0 EFLAGS: 00010206
+RAX: 0000000000000000 RBX: ffff8801d4818688 RCX: 1ffff1003b2869e1
+RDX: 1ffffd1ffffa2591 RSI: ffffffff81454f3a RDI: ffff8801d4818580
+RBP: ffff8801d9447520 R08: 0000000000000000 R09: 0000000000000006
+R10: 0000000000000000 R11: ffff8801d9434640 R12: ffff8801d94474f8
+R13: 0000000000000001 R14: ffff8801bb509720 R15: 0000000000000200
+FS:  0000000000000000(0000) GS:ffff8801dad00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000000000034 CR3: 00000001b8b85000 CR4: 00000000001406e0
 
-You are introducing a very useful SIMD abstraction, but it lets code
-run with preemption disabled for unbounded amounts of time, and so now
-is the time to ensure we get it right.
 
-Part of the [justified] criticism on the current state of the crypto
-API is on its complexity, and so I don't think it makes sense to keep
-it simple now and add the complexity later (and the same concern
-applies to async support btw).
+---
+This bug is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this bug report. See:
+https://goo.gl/tpsmEJ#bug-status-tracking for how to communicate with  
+syzbot.
