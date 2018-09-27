@@ -1,130 +1,132 @@
 From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: Re: [PATCH net-next v6 00/23] WireGuard: Secure Network Tunnel
-Date: Thu, 27 Sep 2018 23:35:39 +0200
-Message-ID: <20180927213537.GA27576@zx2c4.com>
-References: <20180925145622.29959-1-Jason@zx2c4.com>
- <20180927182944.GA22921@gmail.com>
+Subject: Re: [PATCH net-next v6 23/23] net: WireGuard secure network tunnel
+Date: Fri, 28 Sep 2018 00:37:03 +0200
+Message-ID: <CAHmME9q7WRGF3TTRhhy0i_EB4ad2DaSD=tnHM92zfV4Cckyw=A@mail.gmail.com>
+References: <20180925145622.29959-1-Jason@zx2c4.com> <20180925145622.29959-24-Jason@zx2c4.com>
+ <20180927011526.GB1193@lunn.ch>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        linux-crypto@vger.kernel.org, davem@davemloft.net,
-        gregkh@linuxfoundation.org
-To: Eric Biggers <ebiggers@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Cc: LKML <linux-kernel@vger.kernel.org>,
+        Netdev <netdev@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        David Miller <davem@davemloft.net>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Andrew Lunn <andrew@lunn.ch>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20180927182944.GA22921@gmail.com>
+In-Reply-To: <20180927011526.GB1193@lunn.ch>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi Eric,
+Hi Andrew,
 
-On Thu, Sep 27, 2018 at 8:29 PM Eric Biggers <ebiggers@kernel.org> wrote:
-> Why is Herbert Xu's existing crypto tree being circumvented, especially for
-> future patches (the initial merge isn't quite as important as that's a one-time
-> event)?  I like being able to check out cryptodev to test upcoming crypto
-> patches.  And currently, changes to APIs, algorithms, tests, and implementations
-> all go through cryptodev, which is convenient for crypto developers.
+Thanks for following up with this.
+
+On Thu, Sep 27, 2018 at 3:15 AM Andrew Lunn <andrew@lunn.ch> wrote:
+> I know you have been concentrating on the crypto code, so i'm not
+> expecting too many changes at the moment in the network code.
+
+I should be addressing things in parallel, actually, so I'm happy to
+work on this.
+
+> WARNING: Avoid crashing the kernel - try using WARN_ON & recovery code rather than BUG() or BUG_ON()
+> #2984: FILE: drivers/net/wireguard/noise.c:293:
+> +       BUG_ON(first_len > BLAKE2S_HASH_SIZE || second_len > BLAKE2S_HASH_SIZE ||
+
+I was actually going to ask you about this, because it applies
+similarly in another context too that I'm trying to refine. The above
+function you quote has the following properties:
+
+- Only ever accepts fixed length parameters, so the compiler can
+constant fold invocations of it fantastically. Those parameters are
+fixed length in the sense that they're enum/macro constants. They
+never come from the user or from a packet or something.
+- Never produces an incorrect result. For said constants, all inputs
+are valid, and so it succeeds in producing an output every time.
+- Is a "pure" function, just knocking bytes around, without needing to
+interact with fancy kernel-y things; could be implemented on some sort
+of WWII-era rotor machine provided you had the patience.
+
+Because of the above, there's never any error to return to the user of
+the function. Also, because it only ever takes constant sized inputs,
+in theory I should be able to change that BUG_ON() to BUILD_BUG_ON(),
+but in practice the optimizer/inliner isn't actually that aggressive.
+
+But what I would like is some way of signaling to the developer using
+this function that they've passed it an illegal value, and their code
+should not ship until that's fixed, under any circumstances at all  --
+that their usage of the function is completely unacceptable and wrong.
+Bla bla strong statements.
+
+For this, I figured the notion would come across with the aberrant
+behavior of "crash the developer's [in this case, my] QEMU instance"
+when "#ifdef DEBUG is true". This is the same kind of place where I'd
+have an "assert()" statement in userland. It sounds like what you're
+saying is that a WARN_ON is equally as effective instead? Or given the
+above, do you think the BUG_ON is actually sensible? Or neither and I
+should do something else?
+
+> WARNING: Macros with flow control statements should be avoided
+> #5471: FILE: drivers/net/wireguard/selftest/allowedips.h:456:
+> +#define init_peer(name) do {                                               \
+> +               name = kzalloc(sizeof(*name), GFP_KERNEL);                 \
+> +               if (unlikely(!name)) {                                     \
+> +                       pr_info("allowedips self-test: out of memory\n");  \
+> +                       goto free;                                         \
+> +               }                                                          \
+> +               kref_init(&name->refcount);                                \
+> +       } while (0)
+
+This is part of a debugging selftest, where I'm initing a bunch of
+peers one after another, and this macro helps keep the test clear
+while offloading the actual irrelevant coding part to this macro. The
+test itself then just has code like:
+
+    init_peer(a);
+    init_peer(b);
+    init_peer(c);
+    init_peer(d);
+    init_peer(e);
+    init_peer(f);
+    init_peer(g);
+    init_peer(h);
+
+    insert(4, a, 192, 168, 4, 0, 24);
+    insert(4, b, 192, 168, 4, 4, 32);
+    insert(4, c, 192, 168, 0, 0, 16);
+    insert(4, d, 192, 95, 5, 64, 27);
+    /* replaces previous entry, and maskself is required */
+    insert(4, c, 192, 95, 5, 65, 27);
+    insert(6, d, 0x26075300, 0x60006b00, 0, 0xc05f0543, 128);
+    insert(6, c, 0x26075300, 0x60006b00, 0, 0, 64);
+    ...
+
+And so forth. I can probably figure out a different way to code this
+if you really want, but I thought this would be clear.
+
+> The namespace pollution also needs to be addresses. You have some
+> pretty generic named global symbols. I picked out a few examples from
+> objdump
 >
-> Apparently, you're proposing that someone adding a new algorithm will now have
-> to submit the API portion to one maintainer (Herbert Xu) and the implementation
-> portion to another maintainer (you), and they'll go through separate git trees.
-> That's inconvenient for developers, and it seems that in practice you and
-> Herbert will be stepping on each other's toes a lot.
+> 00002a94 g     F .text      00000060 peer_put
+> 00003484 g     F .text      0000004c timers_stop
+> 00003520 g     F .text      00000114 packet_queue_init
+> 00002640 g     F .text      00000034 device_uninit
+> 000026bc g     F .text      00000288 peer_create
+> 000090d4 g     F .text      000001bc ratelimiter_init
 >
-> Can you please reach some kind of sane agreement with Herbert so that the
-> development process isn't fractured into two?  Perhaps you could review patches,
-> but Herbert could still apply them?
+> Please make use of a prefix for global symbols, e.g. wg_.
 
-I think you're overthinking it a bit. Zinc will have a few software
-implementations of primitives that are useful in cases where it's nice to call
-the primitive directly. Think: various usages of sha2, siphash, the wireguard
-suite (what this patchset includes), other things in lib/, etc. In so much as
-this winds up duplicating things within the crypto API, I'll work with Herbert
-to build one on top of the other -- as I've done in the two commits in this
-series. But beyond that, think of the two initiatives as orthogonal. I'm
-working on curating a few primitives that are maximally useful throughout
-the kernel for various uses, and doing so in a way that I think brings
-about a certain quality. Meanwhile the crypto API is amassing a huge
-collection of primitives for some things, and that will continue to exist,
-and Herbert will continue to maintain that. I expect for the crossover
-to be fairly isolated and manageable, without too much foreseeable tree-
-conflicts and such. Therefore, Samuel Neves and I plan to maintain the
-codebase we've spent quite some time writing, and maintain our own tree for
-it, which we'll be submitting through Greg. In other words, this is not
-a matter of "circumvention" or "stepping on toes", but rather separate
-efforts. I'm quite certain to the extent they overlap we'll be able to work
-out fairly easily.
+Will do. v7 will include the wg_ prefix.
 
-Either way, I'll take your suggestion and reach out to Herbert, since at
-least a discussion between the two of us sounds like it could be productive.
+On a slightly related note, out of curiosity, any idea what's up with
+the future of LTO in the kernel? It sounds like that'd be nice to have
+on a module-by-module basis. IOW, I'd love to LTO all of my .c files
+in wireguard together, and then only ever expose mod_init/exit and
+whatever I explicitly EXPORT_SYMBOL, and then have the compiler and
+linker treat the rest of everything as essentially in one .c file and
+optimize the heck out of it, and then strip all the symbols. It would,
+incidentally, remove the need for said symbol prefixes, since I
+wouldn't be making anything global. (Probably perf/ftrace/etc would
+become harder to use though.)
 
-> I'm also wondering about the criteria for making additions and changes to
-> "Zinc".  You mentioned before that one of the "advantages" of Zinc is that it
-> doesn't include "cipher modes from 90s cryptographers" -- what does that mean
-> exactly?  You've also indicated before that you don't want people modifying the
-> Poly1305 implementations as they are too error-prone.  Useful contributions
-> could be blocked or discouraged in the future. Can you please elaborate on
-> your criteria for contributions to Zinc?
->
-> Also, will you allow algorithms that aren't up to modern security standards but
-> are needed for compatibility reasons, e.g. MD5, SHA-1, and DES?  There are
-> existing standards, APIs, and data formats that use these "legacy" algorithms;
-> so implementations of them are often still needed, whether we like it or not.
->
-> And does it matter who designed the algorithms, e.g. do algorithms from Daniel
-> Bernstein get effectively a free pass, while algorithms from certain countries,
-> governments, or organizations are not allowed?  E.g. wireless driver developers
-> may need the SM4 block cipher (which is now supported by the crypto API) as it's
-> specified in a Chinese wireless standard.  Will you allow SM4 in Zinc?  Or will
-> people have to submit some algorithms to Herbert and some to you due to
-> disagreements about what algorithms should be included?
-
-Similarly here, I think you're over-politicizing everything. Stable address
-generation for IPv6 uses SHA1 -- see net/ipv6/addrconf.c:3203 -- do you think
-that this should use, say, the SM3 chinese hash function instead? No, of
-course not, for a variety of interesting reasons. Rather, it should use some
-simple hash function that's fast in software that we have available in Zinc.
-On the other hand, it seems like parts of the kernel that have pretty high-
-levels of cipher agility -- such as dmcrypt, ipsec, wifi apparently, and
-so on -- will continue to use dynamic-dispatch system like the crypto API,
-since that's what it was made to do and is effective at doing. And so, your
-example of SM4 seems to fit perfectly into what the crypto API is well-suited
-for, and it would fit naturally in there.
-
-In other words, the "political criteria" for what we add to lib/zinc/ will
-mostly be the same as for the rest of lib/: are there things using it that
-benefit from it being there in a direct and obvious way, and does the
-implementation meet certain quality standards.
-
-> to change them yourself, e.g. when you added the part that converts the
-> accumulator from base 26 to base 32.  I worry there may be double standards
-> here
-
-We do actually appreciate your concern here. However, there's a lot more that
-went into that short patch than meets the eye:
-
-  - It matches exactly what Andy Polyakov's code is doing for the exact
-    same reason, so this isn't something that's actually "new". (There
-    are paths inside his implementation that branch from the vector code
-    to the scalar code.)
-  - It has been discussed at length with Andy, including what kinds of
-    proofs we'll need if we want to chop it down further (to remove that
-    final reduction), and why we both don't want to do that yet, and so
-    we go with the full carrying for the avoidance of risk.
-  - We've proved its correctness with Z3, actually using an even looser
-    constraint on digit size than what Andy mentioned to us, thus resulting
-    in a stronger proof result. So we're certain this isn't rubbish.
-  - There's been some considerable computing power sunk into fuzzing it.
-
-There's no doubt about it, we've done our due-diligence here. This is in
-fact the kind of efforts we require of submissions. You could fault us for
-not detailing this in "the commit message" -- except as this is still a
-patch series, we're putting improvements into the 00/XX change log, instead
-of adding fixes and additions on top of the series. Of course in the ordinary
-course of kernel development, this would exist instead as a standalone commit.
-If you have a better idea of how this kind of thing can be communicated, and
-where precisely, in the pre-merge process, I'd be interested in hearing
-suggestions.
-
-Thanks,
 Jason
