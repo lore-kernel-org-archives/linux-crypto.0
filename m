@@ -1,71 +1,58 @@
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: Re: [PATCH net-next v6 07/23] zinc: ChaCha20 ARM and ARM64 implementations
-Date: Thu, 27 Sep 2018 02:04:56 +0200
-Message-ID: <CAHmME9qNn5aRgtbV3bAsz3xW1A49a7RMMkOzGruBUPzLVUxVNg@mail.gmail.com>
-References: <20180925145622.29959-1-Jason@zx2c4.com> <20180925145622.29959-8-Jason@zx2c4.com>
- <CAKv+Gu9mVAfdBvOMCFqRJj+wBiWu3JVOgPZdkcdjzqSdQQ5Jrw@mail.gmail.com>
- <CAHmME9r9KppoFwwNVpzpYbU+9dCPzb7Pit+4iRa4MY_ouJBWrA@mail.gmail.com>
- <CAKv+Gu8ih-TsASRGqK+ST_5+EQ0=Zo-zhGCadOdGyPjucMFTCg@mail.gmail.com>
- <CAKv+Gu8w74dUSEAGxxh=C6To6F=bSm8DjiExUPmh_LUyhoDLhg@mail.gmail.com>
- <CAHmME9pbRabkGjNh-65S9qBNNS1GLJSwZ_tTM507S_Ezr1=QLg@mail.gmail.com>
- <CAHmME9ru=kJO8QiW+uNNgt5NgFVZzRsQ4tNSgo+f+KfHs3fAKQ@mail.gmail.com> <CAKv+Gu-WDt8f9qVjLDRPHL7THS0BjtKHThw2RMfHbWBT8Hs8aQ@mail.gmail.com>
+From: Andrew Lunn <andrew@lunn.ch>
+Subject: Re: [PATCH net-next v6 23/23] net: WireGuard secure network tunnel
+Date: Thu, 27 Sep 2018 03:15:26 +0200
+Message-ID: <20180927011526.GB1193@lunn.ch>
+References: <20180925145622.29959-1-Jason@zx2c4.com>
+ <20180925145622.29959-24-Jason@zx2c4.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Netdev <netdev@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        David Miller <davem@davemloft.net>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Samuel Neves <sneves@dei.uc.pt>,
-        Andrew Lutomirski <luto@kernel.org>,
-        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
-        Russell King - ARM Linux <linux@armlinux.org.uk>,
-        linux-arm-kernel@lists.infradead.org
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+        linux-crypto@vger.kernel.org, davem@davemloft.net,
+        gregkh@linuxfoundation.org
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAKv+Gu-WDt8f9qVjLDRPHL7THS0BjtKHThw2RMfHbWBT8Hs8aQ@mail.gmail.com>
+Content-Disposition: inline
+In-Reply-To: <20180925145622.29959-24-Jason@zx2c4.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Sep 26, 2018 at 5:52 PM Ard Biesheuvel
-<ard.biesheuvel@linaro.org> wrote:
->
-> On Wed, 26 Sep 2018 at 17:50, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
-> >
-> > On Wed, Sep 26, 2018 at 5:45 PM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
-> > > So what you have in mind is something like calling simd_relax() every
-> > > 4096 bytes or so?
-> >
-> > That was actually pretty easy, putting together both of your suggestions:
-> >
-> > static inline bool chacha20_arch(struct chacha20_ctx *state, u8 *dst,
-> >                  u8 *src, size_t len,
-> >                  simd_context_t *simd_context)
-> > {
-> >     while (len > PAGE_SIZE) {
-> >         chacha20_arch(state, dst, src, PAGE_SIZE, simd_context);
-> >         len -= PAGE_SIZE;
-> >         src += PAGE_SIZE;
-> >         dst += PAGE_SIZE;
-> >         simd_relax(simd_context);
-> >     }
-> >     if (IS_ENABLED(CONFIG_KERNEL_MODE_NEON) && chacha20_use_neon &&
-> >         len >= CHACHA20_BLOCK_SIZE * 3 && simd_use(simd_context))
-> >         chacha20_neon(dst, src, len, state->key, state->counter);
-> >     else
-> >         chacha20_arm(dst, src, len, state->key, state->counter);
-> >
-> >     state->counter[0] += (len + 63) / 64;
-> >     return true;
-> > }
->
-> Nice one :-)
->
-> This works for me (but perhaps add a comment as well)
+Hi Jason
 
-As elegant as my quick recursive solution was, gcc produced kind of
-bad code from it, as you might expect. So I've implemented this using
-a boring old loop that works the way it's supposed to. This is marked
-for v7.
+I know you have been concentrating on the crypto code, so i'm not
+expecting too many changes at the moment in the network code.
+
+It would be good to further reduce the number of checkpatch warnings.
+The biggest problem i have at the moment is that all the trivial to
+fix warnings are hiding a few more important warnings. There are a few
+like these which are not obvious to see:
+
+WARNING: Avoid crashing the kernel - try using WARN_ON & recovery code rather than BUG() or BUG_ON()
+#2984: FILE: drivers/net/wireguard/noise.c:293:
++       BUG_ON(first_len > BLAKE2S_HASH_SIZE || second_len > BLAKE2S_HASH_SIZE ||
+
+WARNING: Macros with flow control statements should be avoided
+#5471: FILE: drivers/net/wireguard/selftest/allowedips.h:456:
++#define init_peer(name) do {                                               \
++               name = kzalloc(sizeof(*name), GFP_KERNEL);                 \
++               if (unlikely(!name)) {                                     \
++                       pr_info("allowedips self-test: out of memory\n");  \
++                       goto free;                                         \
++               }                                                          \
++               kref_init(&name->refcount);                                \
++       } while (0)
+
+
+The namespace pollution also needs to be addresses. You have some
+pretty generic named global symbols. I picked out a few examples from
+objdump
+
+00002a94 g     F .text	    00000060 peer_put
+00003484 g     F .text	    0000004c timers_stop
+00003520 g     F .text	    00000114 packet_queue_init
+00002640 g     F .text	    00000034 device_uninit
+000026bc g     F .text	    00000288 peer_create
+000090d4 g     F .text	    000001bc ratelimiter_init
+
+Please make use of a prefix for global symbols, e.g. wg_.
+
+       Andrew
