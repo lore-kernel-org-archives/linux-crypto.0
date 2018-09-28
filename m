@@ -1,33 +1,60 @@
 From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: Re: [PATCH net-next v6 00/23] WireGuard: Secure Network Tunnel
-Date: Fri, 28 Sep 2018 15:40:37 +0200
-Message-ID: <CAHmME9oEq4xSVTzDAiPkuZ=ix=TMLYLjLDv9x+EQeLi7HTbYqw@mail.gmail.com>
-References: <20180925145622.29959-1-Jason@zx2c4.com> <20180927182944.GA22921@gmail.com>
- <20180927213537.GA27576@zx2c4.com> <20180928011726.GA98113@gmail.com>
- <20180928023546.GA20765@zx2c4.com> <20180928045542.GA545@zzz.localdomain>
- <CAHmME9rJ4CewfDEqWh00ZowjWg9TaYpksVSzKSSxoKya-M8_LA@mail.gmail.com> <CAKv+Gu-ZMR7zEAKv6_2tyD3OqnjVugOzKHzBEXW3pQs5W-SvLw@mail.gmail.com>
+Subject: Re: [PATCH net-next v6 01/23] asm: simd context helper API
+Date: Fri, 28 Sep 2018 15:45:20 +0200
+Message-ID: <CAHmME9qpRSNZnPds8dcoObstWhMm_QXs55o=QHipLFfT7n=edg@mail.gmail.com>
+References: <20180925145622.29959-1-Jason@zx2c4.com> <20180925145622.29959-2-Jason@zx2c4.com>
+ <CAKv+Gu9e35+AyktmSq9qeNE0LR83_yrEEB3DiQv0bmyArivqRQ@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Cc: Eric Biggers <ebiggers@kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
+Cc: LKML <linux-kernel@vger.kernel.org>,
         Netdev <netdev@vger.kernel.org>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         David Miller <davem@davemloft.net>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Samuel Neves <sneves@dei.uc.pt>,
+        Andrew Lutomirski <luto@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        linux-arch@vger.kernel.org
 To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAKv+Gu-ZMR7zEAKv6_2tyD3OqnjVugOzKHzBEXW3pQs5W-SvLw@mail.gmail.com>
+In-Reply-To: <CAKv+Gu9e35+AyktmSq9qeNE0LR83_yrEEB3DiQv0bmyArivqRQ@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Sep 28, 2018 at 9:52 AM Ard Biesheuvel
+On Fri, Sep 28, 2018 at 10:28 AM Ard Biesheuvel
 <ard.biesheuvel@linaro.org> wrote:
-> As I understood from someone who was at your Kernel Recipes talk, you
-> mentioned that it actually stands for 'zinc is not crypto/' (note the
-> slash)
+> Given that this patch applies to all architectures at once, it is
+> probably better to drop the unrelated reordering hunks to avoid
+> conflicts.
 
-I mentioned this was in v1 but it wasn't taken as lightly as planned
-and was removed, so if it needs a recursive acronym it can be "zinc is
-nice crypto", "zinc is neat crypto", or as the commit message
-mentions, "zinc as in crypto." Alternatively, it can just not stand
-for anything at all. Zinc -> Zinc. That's what the thing is called.
+Ack. Will retain order for v7.
+
+> > +static __must_check inline bool may_use_simd(void)
+> > +{
+> > +       return !in_interrupt();
+> > +}
+> > +
+>
+> Remember this guy?
+>
+> https://marc.info/?l=linux-arch&m=149631094625176&w=2
+>
+> That was never merged, so let's get it right this time.
+
+Wow, nice memory. I had forgotten all about that. Queued for v7.
+
+> > +static inline void simd_relax(simd_context_t *ctx)
+> > +{
+> > +#ifdef CONFIG_PREEMPT
+> > +       if ((*ctx & HAVE_SIMD_IN_USE) && need_resched()) {
+> > +               simd_put(ctx);
+> > +               simd_get(ctx);
+> > +       }
+> > +#endif
+>
+> Could we return a bool here indicating whether we rescheduled or not?
+> In some cases, we could pass that into the asm code as a 'reload'
+> param, allowing repeated loads of key schedules, round constant tables
+> or S-boxes to be elided.
+
+Sure, sounds easy enough.
