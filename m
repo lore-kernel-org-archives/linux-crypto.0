@@ -1,91 +1,177 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: qat - Fix KASAN stack-out-of-bounds bug in
- adf_probe()
-Date: Fri, 28 Sep 2018 13:10:23 +0800
-Message-ID: <20180928051023.3hcs7hctgplnh4go@gondor.apana.org.au>
-References: <1537663315-4168-1-git-send-email-longman@redhat.com>
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: Re: [PATCH net-next v6 00/23] WireGuard: Secure Network Tunnel
+Date: Fri, 28 Sep 2018 07:46:41 +0200
+Message-ID: <CAHmME9rJ4CewfDEqWh00ZowjWg9TaYpksVSzKSSxoKya-M8_LA@mail.gmail.com>
+References: <20180925145622.29959-1-Jason@zx2c4.com> <20180927182944.GA22921@gmail.com>
+ <20180927213537.GA27576@zx2c4.com> <20180928011726.GA98113@gmail.com>
+ <20180928023546.GA20765@zx2c4.com> <20180928045542.GA545@zzz.localdomain>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        "David S. Miller" <davem@davemloft.net>, qat-linux@intel.com,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Conor McLoughlin <conor.mcloughlin@intel.com>
-To: Waiman Long <longman@redhat.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1537663315-4168-1-git-send-email-longman@redhat.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Cc: LKML <linux-kernel@vger.kernel.org>,
+        Netdev <netdev@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        David Miller <davem@davemloft.net>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Eric Biggers <ebiggers@kernel.org>
+Return-path: <netdev-owner@vger.kernel.org>
+In-Reply-To: <20180928045542.GA545@zzz.localdomain>
+Sender: netdev-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Sat, Sep 22, 2018 at 08:41:55PM -0400, Waiman Long wrote:
-> The following KASAN warning was printed when booting a 64-bit kernel
-> on some systems with Intel CPUs:
-> 
-> [   44.512826] ==================================================================
-> [   44.520165] BUG: KASAN: stack-out-of-bounds in find_first_bit+0xb0/0xc0
-> [   44.526786] Read of size 8 at addr ffff88041e02fc50 by task kworker/0:2/124
-> 
-> [   44.535253] CPU: 0 PID: 124 Comm: kworker/0:2 Tainted: G               X --------- ---  4.18.0-12.el8.x86_64+debug #1
-> [   44.545858] Hardware name: Intel Corporation PURLEY/PURLEY, BIOS BKVDTRL1.86B.0005.D08.1712070559 12/07/2017
-> [   44.555682] Workqueue: events work_for_cpu_fn
-> [   44.560043] Call Trace:
-> [   44.562502]  dump_stack+0x9a/0xe9
-> [   44.565832]  print_address_description+0x65/0x22e
-> [   44.570683]  ? find_first_bit+0xb0/0xc0
-> [   44.570689]  kasan_report.cold.6+0x92/0x19f
-> [   44.578726]  find_first_bit+0xb0/0xc0
-> [   44.578737]  adf_probe+0x9eb/0x19a0 [qat_c62x]
-> [   44.578751]  ? adf_remove+0x110/0x110 [qat_c62x]
-> [   44.591490]  ? mark_held_locks+0xc8/0x140
-> [   44.591498]  ? _raw_spin_unlock+0x30/0x30
-> [   44.591505]  ? trace_hardirqs_on_caller+0x381/0x570
-> [   44.604418]  ? adf_remove+0x110/0x110 [qat_c62x]
-> [   44.604427]  local_pci_probe+0xd4/0x180
-> [   44.604432]  ? pci_device_shutdown+0x110/0x110
-> [   44.617386]  work_for_cpu_fn+0x51/0xa0
-> [   44.621145]  process_one_work+0x8fe/0x16e0
-> [   44.625263]  ? pwq_dec_nr_in_flight+0x2d0/0x2d0
-> [   44.629799]  ? lock_acquire+0x14c/0x400
-> [   44.633645]  ? move_linked_works+0x12e/0x2a0
-> [   44.637928]  worker_thread+0x536/0xb50
-> [   44.641690]  ? __kthread_parkme+0xb6/0x180
-> [   44.645796]  ? process_one_work+0x16e0/0x16e0
-> [   44.650160]  kthread+0x30c/0x3d0
-> [   44.653400]  ? kthread_create_worker_on_cpu+0xc0/0xc0
-> [   44.658457]  ret_from_fork+0x3a/0x50
-> 
-> [   44.663557] The buggy address belongs to the page:
-> [   44.668350] page:ffffea0010780bc0 count:0 mapcount:0 mapping:0000000000000000 index:0x0
-> [   44.676356] flags: 0x17ffffc0000000()
-> [   44.680023] raw: 0017ffffc0000000 ffffea0010780bc8 ffffea0010780bc8 0000000000000000
-> [   44.687769] raw: 0000000000000000 0000000000000000 00000000ffffffff 0000000000000000
-> [   44.695510] page dumped because: kasan: bad access detected
-> 
-> [   44.702578] Memory state around the buggy address:
-> [   44.707372]  ffff88041e02fb00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> [   44.714593]  ffff88041e02fb80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> [   44.721810] >ffff88041e02fc00: 00 00 00 00 00 00 f1 f1 f1 f1 04 f2 f2 f2 f2 f2
-> [   44.729028]                                                  ^
-> [   44.734864]  ffff88041e02fc80: f2 f2 00 00 00 00 f3 f3 f3 f3 00 00 00 00 00 00
-> [   44.742082]  ffff88041e02fd00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> [   44.749299] ==================================================================
-> 
-> Looking into the code:
-> 
->   int ret, bar_mask;
->     :
->   for_each_set_bit(bar_nr, (const unsigned long *)&bar_mask,
-> 
-> It is casting a 32-bit integer pointer to a 64-bit unsigned long
-> pointer. There are two problems here. First, the 32-bit pointer address
-> may not be 64-bit aligned. Secondly, it is accessing an extra 4 bytes.
-> 
-> This is fixed by changing the bar_mask type to unsigned long.
-> 
-> Signed-off-by: Waiman Long <longman@redhat.com>
+Hi Eric,
 
-Patch applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+On Fri, Sep 28, 2018 at 6:55 AM Eric Biggers <ebiggers@kernel.org> wrote:
+> And you still haven't answered my question about adding a new algorithm that is
+> useful to have in both APIs.  You're proposing that in most cases the crypto API
+> part will need to go through Herbert while the implementation will need to go
+> through you/Greg, right?  Or will you/Greg be taking both?  Or will Herbert take
+> both?
+
+If an implementation enters Zinc, it will go through my tree. If it
+enters the crypto API, it will go through Herbert's tree. If there
+wind up being messy tree dependency and merge timing issues, I can
+work this out in the usual way with Herbert. I'll be sure to discuss
+these edge cases with him when we discuss. I think there's a way to
+handle that with minimum friction.
+
+> A documentation file for Zinc is a good idea.  Some of the information in your
+> commit messages should be moved there too.
+
+Will do.
+
+> I'm not trying to "politicize" this, but rather determine your criteria for
+> including algorithms in Zinc, which you haven't made clear.  Since for the
+> second time you've avoided answering my question about whether you'd allow the
+> SM4 cipher in Zinc, and you designed WireGuard to be "cryptographically
+> opinionated", and you were one of the loudest voices calling for the Speck
+> cipher to be removed, and your justification for Zinc complains about cipher
+> modes from "90s cryptographers", I think it's reasonable for people to wonder
+> whether as the Zinc (i.e. Linux crypto library) maintainer you will restrict the
+> inclusion of crypto algorithms to the ones you prefer, rather than the ones that
+> users need.  Note that the kernel is used by people all over the world and needs
+> to support various standards, protocols, and APIs that use different crypto
+> algorithms, not always the ones we'd like; and different users have different
+> preferences.  People need to know whether the Linux kernel's crypto library will
+> meet (or be allowed to meet) their crypto needs.
+
+WireGuard is indeed quite opinionated in its primitive choices, but I
+don't think it'd be wise to apply the same design to Zinc. There are
+APIs where the goal is to have a limited set of high-level functions,
+and have those implemented in only a preferred set of primitives. NaCl
+is a good example of this -- functions like "crypto_secretbox" that
+are actually xsalsapoly under the hood. Zinc doesn't intend to become
+an API like those, but rather to provide the actual primitives for use
+cases where that specific primitive is used. Sometimes the kernel is
+in the business of being able to pick its own crypto -- random.c, tcp
+sequence numbers, big_key.c, etc -- but most of the time the kernel is
+in the business of implementing other people's crypto, for specific
+devices/protocols/diskformats. And for those use cases we need not
+some high-level API like NaCl, but rather direct access to the
+primitives that are required to implement those drivers. WireGuard is
+one such example, but so would be Bluetooth, CIFS/SMB, WiFi, and so
+on. We're in the business of writing drivers, after all. So, no, I
+don't think I'd knock down the addition of a primitive because of a
+simple preference for a different primitive, if it was clearly the
+case that the driver requiring it really benefited from having
+accessible via the plain Zinc function calls. Sorry if I hadn't made
+this clear earlier -- I thought Ard had asked more or less the same
+thing about DES and I answered accordingly, but maybe that wasn't made
+clear enough there.
+
+> > For example, check out the avx blocks function. The radix conversion
+> > happens in a few different places throughout. The reason we need it
+> > separately here is because, unlike userspace, it's possible the kernel
+> > code will transition from 2^26 back to 2^64 as a result of the FPU
+> > context changing.
+>
+> IOW, you had to rewrite the x86 assembly algorithm in C and make it use a
+> different Poly1305 context format.  That's a major change, where bugs can be
+> introduced -- and at least one was introduced, in fact.  I'd appreciate it if
+> you were more accurate in describing your modifications and the potential risks
+> involved.
+
+A different Poly1305 context format? Not at all - it's using the exact
+same context struct as the assembly. And it's making the same
+conversion that the assembly is. There's not something "different"
+happening; that's the whole point.
+
+Also, this is not some process of frightfully transcribing assembly to
+C and hoping it all works out. This is a careful process of reasoning
+about the limbs, proving that the carries are correct, and that the
+arithmetic done in C actually corresponds to what we want. And then
+finally we check that what we've implemented is indeed the same as
+what the assembly implemented. Finally, as I mentioned, hopefully Andy
+will be folding this back into his implementations sometime soon
+anyway.
+
+> > That's a good idea. I can include some discussion about this as well in
+> > the commit message that introduces the glue code, too, I guess? I've
+> > been hesitant to fill these commit messages up even more, given there
+> > are already so many walls of text and whatnot, but if you think that'd
+> > be useful, I'll do that for v7, and also add comments.
+>
+> Please prefer to put information in the code or documentation rather than in
+> commit messages, when appropriate.
+
+Okay, no problem.
+
+> > This is complete and utter garbage, and I find its insinuations insulting
+> > and ridiculous. There is absolutely no lack of honesty and no double
+> > standard being applied whatsoever. Your attempt to cast doubt about the
+> > quality of standards applied and the integrity of the process is wholly
+> > inappropriate. When I tell you that high standards were applied and that
+> > due-diligence was done in developing a particular patch, I mean what I
+> > say.
+>
+> I
+> disagree that my concerns are "complete and utter garbage".  And I think that
+> the fact that you prefer to respond by attacking me, rather than committing to
+> be more accurate in your claims and to treat all contributions fairly, is
+> problematic.
+
+I believe you have the sequence of events wrong. I've stated and made
+that there isn't a double standard, that the standards intend to be
+evenly rigorous, and I solicited your feedback on how I could best
+communicate changes in pre-merged patch series; I did the things
+you've said one should do. But your rhetoric then moved to questioning
+my integrity, and I believe that was uncalled for, inappropriate, and
+not a useful contribution to this mostly productive discussion --
+hence garbage. In other words, I provided an acceptable defense, not
+an attack. But can we move past all this schoolyard nonsense? Cut the
+rhetoric, please; it's really quite overwhelming.
+
+> It's great that you found and fixed this
+> bug on your own, and of course that raises my level of confidence in your work.
+
+Good.
+
+> Still, the v6 patchset still includes your claim that "All implementations have
+> been extensively tested and fuzzed"; so that claim was objectively wrong.
+
+I don't think that claim is wrong. The fuzzing and testing that's been
+done has been extensive, and the fuzzing and testing that continues to
+occur is extensive. As mentioned, the bug was fixed pretty much right
+after git-send-email. If you'd like I can try to space out the patch
+submissions by a little bit longer -- that would probably have various
+benefits -- but given that the netdev code is yet to receive a
+thorough review, I think we've got a bit of time before this is
+merged. The faster-paced patch cycles might inadvertently introduce
+things that get fixed immediately after sending then, unfortunately,
+but I don't think this will be the case with the final series that's
+merged. Though I'm incorporating tons and tons of feedback right now,
+I do look forward to the structure of the series settling down a
+little bit and the pace of suggestions decreasing, so that I can focus
+on auditing and verifying again. But given the dynamism and
+interesting insights of the reviews so far, I think the fast pace has
+actually been useful for elucidating the various expectations and
+suggestions of reviewers. It's most certainly improved this patchset
+in terrific ways.
+
+> Well, it doesn't help that you yourself claim that Zinc stands for
+> "Zx2c4's INsane Cryptolib"...
+
+This expansion of the acronym was intended as a totally ridiculous
+joke. I guess it wasn't received well. I'll remove it from the next
+series. Sorry.
+
+Jason
