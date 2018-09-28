@@ -1,54 +1,111 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2 0/4] crypto: s5p-sss: Fix and add aes-ctr support
-Date: Fri, 28 Sep 2018 13:07:43 +0800
-Message-ID: <20180928050743.7mqgbs2femmacq5o@gondor.apana.org.au>
-References: <CGME20180917151002eucas1p27689f043367e1bc64bf63bc402dffcdd@eucas1p2.samsung.com>
- <20180917151002eucas1p27689f043367e1bc64bf63bc402dffcdd~VOId3-CTL2961529615eucas1p2I@eucas1p2.samsung.com>
+Subject: Re: [PATCH crypto-next 00/23] crypto: skcipher - Remove VLA usage
+Date: Fri, 28 Sep 2018 13:08:23 +0800
+Message-ID: <20180928050823.pggznhgv47wu4pd4@gondor.apana.org.au>
+References: <20180919021100.3380-1-keescook@chromium.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org,
-        Krzysztof Kozlowski <krzk@kernel.org>,
-        Vladimir Zapolskiy <vz@mleia.com>,
-        Kamil Konieczny <k.konieczny@partner.samsung.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-samsung-soc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
-To: Christoph Manszewski <c.manszewski@samsung.com>
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Eric Biggers <ebiggers@google.com>,
+        linux-crypto <linux-crypto@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Kees Cook <keescook@chromium.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20180917151002eucas1p27689f043367e1bc64bf63bc402dffcdd~VOId3-CTL2961529615eucas1p2I@eucas1p2.samsung.com>
+In-Reply-To: <20180919021100.3380-1-keescook@chromium.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Sep 17, 2018 at 05:09:26PM +0200, Christoph Manszewski wrote:
-> Hello,
+On Tue, Sep 18, 2018 at 07:10:37PM -0700, Kees Cook wrote:
+> This is the full follow-up to earlier discussions[1] that suggested
+> adding a new struct crypto_sync_skcipher to handle the VLA removal from
+> SKCIPHER_REQUEST_ON_STACK.
 > 
-> This patch series adds aes-ctr support in s5p-sss.c driver. Additionally it
-> it provides a fix, and a minor code cleanup.
+> This series is effectively a no-op change: everything is a wrapper
+> around struct crypto_skcipher, but provides compile-time enforcement
+> for not putting an ASYNC skcipher on the stack, which allows us to
+> declare the on-stack requests with a fixed stack size.
 > 
-> Patch 1 contains a simple fix, of a possible race condition.
-> Patches 2-3 are code cleanup patches.
-> Patch 4 adds support for aes-ctr block cipher mode of operation.
+> [1] https://lkml.kernel.org/r/CAGXu5j+bpLK=EQ9LHkO8V=sdaQwt==6fbGhgn2Vi1E9_WxSGRQ@mail.gmail.com
 > 
-> Regards,
-> Chris
+> -Kees
 > 
-> Changes in v2:
-> - pass dev->req directly to s5p_aes_complete in s5p_aes_interrupt
-> non-error path,
-> - move req asignment in s5p_aes_interrupt before if statement,
-> - change commit message and subject for patch 2/4,
-> - remove empty lines and add rationale in commit message for 
-> patch 3/4,
+> Kees Cook (23):
+>   crypto: skcipher - Introduce crypto_sync_skcipher
+>   gss_krb5: Remove VLA usage of skcipher
+>   lib80211: Remove VLA usage of skcipher
+>   mac802154: Remove VLA usage of skcipher
+>   s390/crypto: Remove VLA usage of skcipher
+>   x86/fpu: Remove VLA usage of skcipher
+>   block: cryptoloop: Remove VLA usage of skcipher
+>   libceph: Remove VLA usage of skcipher
+>   ppp: mppe: Remove VLA usage of skcipher
+>   rxrpc: Remove VLA usage of skcipher
+>   wusb: Remove VLA usage of skcipher
+>   crypto: ccp - Remove VLA usage of skcipher
+>   crypto: vmx - Remove VLA usage of skcipher
+>   crypto: null - Remove VLA usage of skcipher
+>   crypto: cryptd - Remove VLA usage of skcipher
+>   crypto: sahara - Remove VLA usage of skcipher
+>   crypto: qce - Remove VLA usage of skcipher
+>   crypto: artpec6 - Remove VLA usage of skcipher
+>   crypto: chelsio - Remove VLA usage of skcipher
+>   crypto: mxs-dcp - Remove VLA usage of skcipher
+>   crypto: omap-aes - Remove VLA usage of skcipher
+>   crypto: picoxcell - Remove VLA usage of skcipher
+>   crypto: skcipher - Remove SKCIPHER_REQUEST_ON_STACK()
 > 
-> Christoph Manszewski (4):
->   crypto: s5p-sss: Fix race in error handling
->   crypto: s5p-sss: Fix Fix argument list alignment
->   crypto: s5p-sss: Minor code cleanup
->   crypto: s5p-sss: Add aes-ctr support
-> 
->  drivers/crypto/s5p-sss.c | 113 +++++++++++++++++++++++++++--------------------
->  1 file changed, 65 insertions(+), 48 deletions(-)
+>  arch/s390/crypto/aes_s390.c                   | 48 +++++-----
+>  arch/x86/crypto/fpu.c                         | 30 ++++---
+>  crypto/algif_aead.c                           | 12 +--
+>  crypto/authenc.c                              |  8 +-
+>  crypto/authencesn.c                           |  8 +-
+>  crypto/cryptd.c                               | 32 +++----
+>  crypto/crypto_null.c                          | 11 ++-
+>  crypto/echainiv.c                             |  4 +-
+>  crypto/gcm.c                                  |  8 +-
+>  crypto/seqiv.c                                |  4 +-
+>  crypto/skcipher.c                             | 24 +++++
+>  drivers/block/cryptoloop.c                    | 22 ++---
+>  drivers/crypto/axis/artpec6_crypto.c          | 19 ++--
+>  drivers/crypto/ccp/ccp-crypto-aes-xts.c       | 13 +--
+>  drivers/crypto/ccp/ccp-crypto.h               |  2 +-
+>  drivers/crypto/chelsio/chcr_algo.c            | 27 +++---
+>  drivers/crypto/chelsio/chcr_crypto.h          |  2 +-
+>  drivers/crypto/mxs-dcp.c                      | 21 +++--
+>  drivers/crypto/omap-aes.c                     | 17 ++--
+>  drivers/crypto/omap-aes.h                     |  2 +-
+>  drivers/crypto/picoxcell_crypto.c             | 21 +++--
+>  drivers/crypto/qce/ablkcipher.c               | 13 ++-
+>  drivers/crypto/qce/cipher.h                   |  2 +-
+>  drivers/crypto/sahara.c                       | 31 ++++---
+>  drivers/crypto/vmx/aes_cbc.c                  | 22 ++---
+>  drivers/crypto/vmx/aes_ctr.c                  | 18 ++--
+>  drivers/crypto/vmx/aes_xts.c                  | 18 ++--
+>  drivers/net/ppp/ppp_mppe.c                    | 27 +++---
+>  drivers/staging/rtl8192e/rtllib_crypt_tkip.c  | 34 ++++----
+>  drivers/staging/rtl8192e/rtllib_crypt_wep.c   | 28 +++---
+>  .../rtl8192u/ieee80211/ieee80211_crypt_tkip.c | 34 ++++----
+>  .../rtl8192u/ieee80211/ieee80211_crypt_wep.c  | 26 +++---
+>  drivers/usb/wusbcore/crypto.c                 | 16 ++--
+>  include/crypto/internal/geniv.h               |  2 +-
+>  include/crypto/null.h                         |  2 +-
+>  include/crypto/skcipher.h                     | 74 +++++++++++++++-
+>  include/linux/sunrpc/gss_krb5.h               | 30 +++----
+>  net/ceph/crypto.c                             | 12 +--
+>  net/ceph/crypto.h                             |  2 +-
+>  net/mac802154/llsec.c                         | 16 ++--
+>  net/mac802154/llsec.h                         |  2 +-
+>  net/rxrpc/ar-internal.h                       |  2 +-
+>  net/rxrpc/rxkad.c                             | 44 +++++-----
+>  net/sunrpc/auth_gss/gss_krb5_crypto.c         | 87 ++++++++++---------
+>  net/sunrpc/auth_gss/gss_krb5_keys.c           |  9 +-
+>  net/sunrpc/auth_gss/gss_krb5_mech.c           | 53 ++++++-----
+>  net/sunrpc/auth_gss/gss_krb5_seqnum.c         | 18 ++--
+>  net/sunrpc/auth_gss/gss_krb5_wrap.c           | 20 ++---
+>  net/wireless/lib80211_crypt_tkip.c            | 34 ++++----
+>  net/wireless/lib80211_crypt_wep.c             | 28 +++---
+>  50 files changed, 563 insertions(+), 476 deletions(-)
 
 All applied.  Thanks.
 -- 
