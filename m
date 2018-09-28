@@ -1,304 +1,335 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [PATCH 2/3] crypto: add output feedback mode
-Date: Fri, 28 Sep 2018 12:06:29 +0200
-Message-ID: <CAKv+Gu9T7Z2oV8TEaN8uVdrFxGmmCKLh6ZjDnRnhgCmLwuVf4w@mail.gmail.com>
-References: <1537449521-16182-1-git-send-email-gilad@benyossef.com> <1537449521-16182-3-git-send-email-gilad@benyossef.com>
+Subject: Re: [PATCH v3 2/2] crypto: tools: Add cryptostat userspace
+Date: Fri, 28 Sep 2018 15:13:26 +0200
+Message-ID: <CAKv+Gu9VCZx=UHSoN7SexZeTzLK6yk9YAe5qMdhhDMUFnqTSCQ@mail.gmail.com>
+References: <1537351855-16618-1-git-send-email-clabbe@baylibre.com> <1537351855-16618-3-git-send-email-clabbe@baylibre.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>, ofir.drang@arm.com,
+Cc: "David S. Miller" <davem@davemloft.net>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        nhorman@tuxdriver.com,
         "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
         <linux-crypto@vger.kernel.org>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-To: Gilad Ben-Yossef <gilad@benyossef.com>
+To: Corentin Labbe <clabbe@baylibre.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1537449521-16182-3-git-send-email-gilad@benyossef.com>
+In-Reply-To: <1537351855-16618-3-git-send-email-clabbe@baylibre.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 20 September 2018 at 15:18, Gilad Ben-Yossef <gilad@benyossef.com> wrote:
-> Add a generic version of output feedback mode. We already have support of
-> several hardware based transformations of this mode and the needed test
-> vectors but we somehow missed adding a generic software one. Fix this now.
+On 19 September 2018 at 12:10, Corentin Labbe <clabbe@baylibre.com> wrote:
+> This patch adds an userspace tool for displaying kernel crypto API
+> statistics.
 >
-> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+> Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
 
-I couldn't find any users of OFB in the kernel. Any idea who is using
-it and for what?
+How do I actually build this thing?
 
 > ---
->  crypto/Kconfig  |  12 +++
->  crypto/Makefile |   1 +
->  crypto/ofb.c    | 225 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  3 files changed, 238 insertions(+)
->  create mode 100644 crypto/ofb.c
+>  tools/crypto/getstat.c | 294 +++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 294 insertions(+)
+>  create mode 100644 tools/crypto/getstat.c
 >
-> diff --git a/crypto/Kconfig b/crypto/Kconfig
-> index 90f2811..d8cb65b 100644
-> --- a/crypto/Kconfig
-> +++ b/crypto/Kconfig
-> @@ -456,6 +456,18 @@ config CRYPTO_LRW
->           The first 128, 192 or 256 bits in the key are used for AES and the
->           rest is used to tie each cipher block to its logical position.
->
-> +config CRYPTO_OFB
-> +       tristate "OFB support"
-> +       select CRYPTO_BLKCIPHER
-> +       select CRYPTO_MANAGER
-> +       help
-> +         OFB: the Output Feedback mode makes a block cipher into a synchronous
-> +         stream cipher. It generates keystream blocks, which are then XORed
-> +         with the plaintext blocks to get the ciphertext. Flipping a bit in the
-> +         ciphertext produces a flipped bit in the plaintext at the same
-> +         location. This property allows many error correcting codes to function
-> +         normally even when applied before encryption.
-> +
->  config CRYPTO_PCBC
->         tristate "PCBC support"
->         select CRYPTO_BLKCIPHER
-> diff --git a/crypto/Makefile b/crypto/Makefile
-> index d719843..5cde057 100644
-> --- a/crypto/Makefile
-> +++ b/crypto/Makefile
-> @@ -141,6 +141,7 @@ obj-$(CONFIG_CRYPTO_USER_API_SKCIPHER) += algif_skcipher.o
->  obj-$(CONFIG_CRYPTO_USER_API_RNG) += algif_rng.o
->  obj-$(CONFIG_CRYPTO_USER_API_AEAD) += algif_aead.o
->  obj-$(CONFIG_CRYPTO_ZSTD) += zstd.o
-> +obj-$(CONFIG_CRYPTO_OFB) += ofb.o
->
->  ecdh_generic-y := ecc.o
->  ecdh_generic-y += ecdh.o
-> diff --git a/crypto/ofb.c b/crypto/ofb.c
+> diff --git a/tools/crypto/getstat.c b/tools/crypto/getstat.c
 > new file mode 100644
-> index 0000000..8866317
+> index 000000000000..24115173a483
 > --- /dev/null
-> +++ b/crypto/ofb.c
-> @@ -0,0 +1,225 @@
-> +// SPDX-License-Identifier: GPL-2.0
+> +++ b/tools/crypto/getstat.c
+> @@ -0,0 +1,294 @@
+> +/* Heavily copied from libkcapi 2015 - 2017, Stephan Mueller <smueller@chronox.de> */
+> +#include <errno.h>
+> +#include <linux/cryptouser.h>
+> +#include <linux/netlink.h>
+> +#include <linux/rtnetlink.h>
+> +#include <sys/types.h>
+> +#include <sys/socket.h>
+> +#include <stdlib.h>
+> +#include <stdio.h>
+> +#include <string.h>
+> +#include <time.h>
+> +#include <unistd.h>
 > +
-> +/*
-> + * OFB: Output FeedBack mode
-> + *
-> + * Copyright (C) 2018 ARM Limited or its affiliates.
-> + * All rights reserved.
-> + *
-> + * Based loosely on public domain code gleaned from libtomcrypt
-> + * (https://github.com/libtom/libtomcrypt).
-> + */
+> +#define CR_RTA(x)  ((struct rtattr *)(((char *)(x)) + NLMSG_ALIGN(sizeof(struct crypto_user_alg))))
 > +
-> +#include <crypto/algapi.h>
-> +#include <crypto/internal/skcipher.h>
-> +#include <linux/err.h>
-> +#include <linux/init.h>
-> +#include <linux/kernel.h>
-> +#include <linux/module.h>
-> +#include <linux/scatterlist.h>
-> +#include <linux/slab.h>
-> +
-> +struct crypto_ofb_ctx {
-> +       struct crypto_cipher *child;
-> +       int cnt;
-> +};
-> +
-> +
-> +static int crypto_ofb_setkey(struct crypto_skcipher *parent, const u8 *key,
-> +                            unsigned int keylen)
+> +static int get_stat(const char *drivername)
 > +{
-> +       struct crypto_ofb_ctx *ctx = crypto_skcipher_ctx(parent);
-> +       struct crypto_cipher *child = ctx->child;
-> +       int err;
+> +       struct {
+> +               struct nlmsghdr n;
+> +               struct crypto_user_alg cru;
+> +       } req;
+> +       struct sockaddr_nl nl;
+> +       int sd = 0, ret;
+> +       socklen_t addr_len;
+> +       struct iovec iov;
+> +       struct msghdr msg;
+> +       char buf[4096];
+> +       struct nlmsghdr *res_n = (struct nlmsghdr *)buf;
+> +       struct crypto_user_alg *cru_res = NULL;
+> +       int res_len = 0;
+> +       struct rtattr *tb[CRYPTOCFGA_MAX + 1];
+> +       struct rtattr *rta;
+> +       struct nlmsgerr *errmsg;
 > +
-> +       crypto_cipher_clear_flags(child, CRYPTO_TFM_REQ_MASK);
-> +       crypto_cipher_set_flags(child, crypto_skcipher_get_flags(parent) &
-> +                                      CRYPTO_TFM_REQ_MASK);
-> +       err = crypto_cipher_setkey(child, key, keylen);
-> +       crypto_skcipher_set_flags(parent, crypto_cipher_get_flags(child) &
-> +                                 CRYPTO_TFM_RES_MASK);
-> +       return err;
-> +}
+> +       memset(&req, 0, sizeof(req));
+> +       memset(&buf, 0, sizeof(buf));
+> +       memset(&msg, 0, sizeof(msg));
 > +
-> +static int crypto_ofb_encrypt_segment(struct crypto_ofb_ctx *ctx,
-> +                                     struct skcipher_walk *walk,
-> +                                     struct crypto_cipher *tfm)
-> +{
-> +       int bsize = crypto_cipher_blocksize(tfm);
-> +       int nbytes = walk->nbytes;
+> +       req.n.nlmsg_len = NLMSG_LENGTH(sizeof(req.cru));
+> +       req.n.nlmsg_flags = NLM_F_REQUEST;
+> +       req.n.nlmsg_type = CRYPTO_MSG_GETSTAT;
+> +       req.n.nlmsg_seq = time(NULL);
 > +
-> +       u8 *src = walk->src.virt.addr;
-> +       u8 *dst = walk->dst.virt.addr;
-> +       u8 *iv = walk->iv;
+> +       strncpy(req.cru.cru_driver_name, drivername, strlen(drivername));
 > +
-> +       do {
-> +               if (ctx->cnt == bsize) {
-> +                       if (nbytes < bsize)
-> +                               break;
-> +                       crypto_cipher_encrypt_one(tfm, iv, iv);
-> +                       ctx->cnt = 0;
-> +               }
-> +               *dst = *src ^ iv[ctx->cnt];
-> +               src++;
-> +               dst++;
-> +               ctx->cnt++;
-> +       } while (--nbytes);
-> +       return nbytes;
-> +}
-> +
-> +static int crypto_ofb_encrypt(struct skcipher_request *req)
-> +{
-> +       struct skcipher_walk walk;
-> +       struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-> +       unsigned int bsize;
-> +       struct crypto_ofb_ctx *ctx = crypto_skcipher_ctx(tfm);
-> +       struct crypto_cipher *child = ctx->child;
-> +       int ret = 0;
-> +
-> +       bsize =  crypto_cipher_blocksize(child);
-> +       ctx->cnt = bsize;
-> +
-> +       ret = skcipher_walk_virt(&walk, req, false);
-> +
-> +       while (walk.nbytes) {
-> +               ret = crypto_ofb_encrypt_segment(ctx, &walk, child);
-> +               ret = skcipher_walk_done(&walk, ret);
+> +       sd =  socket(AF_NETLINK, SOCK_RAW, NETLINK_CRYPTO);
+> +       if (sd < 0) {
+> +               fprintf(stderr, "Netlink error: cannot open netlink socket");
+> +               return -errno;
+> +       }
+> +       memset(&nl, 0, sizeof(nl));
+> +       nl.nl_family = AF_NETLINK;
+> +       if (bind(sd, (struct sockaddr *)&nl, sizeof(nl)) < 0) {
+> +               ret = -errno;
+> +               fprintf(stderr, "Netlink error: cannot bind netlink socket");
+> +               goto out;
 > +       }
 > +
+> +       /* sanity check that netlink socket was successfully opened */
+> +       addr_len = sizeof(nl);
+> +       if (getsockname(sd, (struct sockaddr *)&nl, &addr_len) < 0) {
+> +               ret = -errno;
+> +               printf("Netlink error: cannot getsockname");
+> +               goto out;
+> +       }
+> +       if (addr_len != sizeof(nl)) {
+> +               ret = -errno;
+> +               printf("Netlink error: wrong address length %d", addr_len);
+> +               goto out;
+> +       }
+> +       if (nl.nl_family != AF_NETLINK) {
+> +               ret = -errno;
+> +               printf("Netlink error: wrong address family %d",
+> +                               nl.nl_family);
+> +               goto out;
+> +       }
+> +
+> +       memset(&nl, 0, sizeof(nl));
+> +       nl.nl_family = AF_NETLINK;
+> +       iov.iov_base = (void *)&req.n;
+> +       iov.iov_len = req.n.nlmsg_len;
+> +       msg.msg_name = &nl;
+> +       msg.msg_namelen = sizeof(nl);
+> +       msg.msg_iov = &iov;
+> +       msg.msg_iovlen = 1;
+> +       if (sendmsg(sd, &msg, 0) < 0) {
+> +               ret = -errno;
+> +               printf("Netlink error: sendmsg failed");
+> +               goto out;
+> +       }
+> +       memset(buf, 0, sizeof(buf));
+> +       iov.iov_base = buf;
+> +       while (1) {
+> +               iov.iov_len = sizeof(buf);
+> +               ret = recvmsg(sd, &msg, 0);
+> +               if (ret < 0) {
+> +                       if (errno == EINTR || errno == EAGAIN)
+> +                               continue;
+> +                       ret = -errno;
+> +                       printf("Netlink error: netlink receive error");
+> +                       goto out;
+> +               }
+> +               if (ret == 0) {
+> +                       ret = -errno;
+> +                       printf("Netlink error: no data");
+> +                       goto out;
+> +               }
+> +               if (ret > sizeof(buf)) {
+> +                       ret = -errno;
+> +                       printf("Netlink error: received too much data");
+> +                       goto out;
+> +               }
+> +               break;
+> +       }
+> +
+> +       ret = -EFAULT;
+> +       res_len = res_n->nlmsg_len;
+> +       if (res_n->nlmsg_type == NLMSG_ERROR) {
+> +               errmsg = NLMSG_DATA(res_n);
+> +               fprintf(stderr, "Fail with %d\n", errmsg->error);
+> +               ret = errmsg->error;
+> +               goto out;
+> +       }
+> +
+> +       if (res_n->nlmsg_type == CRYPTO_MSG_GETSTAT) {
+> +               cru_res = NLMSG_DATA(res_n);
+> +               res_len -= NLMSG_SPACE(sizeof(*cru_res));
+> +       }
+> +       if (res_len < 0) {
+> +               printf("Netlink error: nlmsg len %d\n", res_len);
+> +               goto out;
+> +       }
+> +
+> +       if (!cru_res) {
+> +               ret = -EFAULT;
+> +               printf("Netlink error: no cru_res\n");
+> +               goto out;
+> +       }
+> +
+> +       rta = CR_RTA(cru_res);
+> +       memset(tb, 0, sizeof(struct rtattr *) * (CRYPTOCFGA_MAX + 1));
+> +       while (RTA_OK(rta, res_len)) {
+> +               if ((rta->rta_type <= CRYPTOCFGA_MAX) && (!tb[rta->rta_type]))
+> +                       tb[rta->rta_type] = rta;
+> +               rta = RTA_NEXT(rta, res_len);
+> +       }
+> +       if (res_len) {
+> +               printf("Netlink error: unprocessed data %d",
+> +                               res_len);
+> +               goto out;
+> +       }
+> +
+> +       if (tb[CRYPTOCFGA_STAT_HASH]) {
+> +               struct rtattr *rta = tb[CRYPTOCFGA_STAT_HASH];
+> +               struct crypto_stat *rhash =
+> +                       (struct crypto_stat *)RTA_DATA(rta);
+> +               printf("%s\tHash\n\tHash: %u bytes: %llu\n\tErrors: %u\n",
+> +                       drivername,
+> +                       rhash->stat_hash_cnt, rhash->stat_hash_tlen,
+> +                       rhash->stat_hash_err_cnt);
+> +       } else if (tb[CRYPTOCFGA_STAT_COMPRESS]) {
+> +               struct rtattr *rta = tb[CRYPTOCFGA_STAT_COMPRESS];
+> +               struct crypto_stat *rblk =
+> +                       (struct crypto_stat *)RTA_DATA(rta);
+> +               printf("%s\tCompress\n\tCompress: %u bytes: %llu\n\tDecompress: %u bytes: %llu\n\tErrors: %u\n",
+> +                       drivername,
+> +                       rblk->stat_compress_cnt, rblk->stat_compress_tlen,
+> +                       rblk->stat_decompress_cnt, rblk->stat_decompress_tlen,
+> +                       rblk->stat_compress_err_cnt);
+> +       } else if (tb[CRYPTOCFGA_STAT_ACOMP]) {
+> +               struct rtattr *rta = tb[CRYPTOCFGA_STAT_ACOMP];
+> +               struct crypto_stat *rcomp =
+> +                       (struct crypto_stat *)RTA_DATA(rta);
+> +               printf("%s\tACompress\n\tCompress: %u bytes: %llu\n\tDecompress: %u bytes: %llu\n\tErrors: %u\n",
+> +                       drivername,
+> +                       rcomp->stat_compress_cnt, rcomp->stat_compress_tlen,
+> +                       rcomp->stat_decompress_cnt, rcomp->stat_decompress_tlen,
+> +                       rcomp->stat_compress_err_cnt);
+> +       } else if (tb[CRYPTOCFGA_STAT_AEAD]) {
+> +               struct rtattr *rta = tb[CRYPTOCFGA_STAT_AEAD];
+> +               struct crypto_stat *raead =
+> +                       (struct crypto_stat *)RTA_DATA(rta);
+> +               printf("%s\tAEAD\n\tEncrypt: %u bytes: %llu\n\tDecrypt: %u bytes: %llu\n\tErrors: %u\n",
+> +                       drivername,
+> +                       raead->stat_encrypt_cnt, raead->stat_encrypt_tlen,
+> +                       raead->stat_decrypt_cnt, raead->stat_decrypt_tlen,
+> +                       raead->stat_aead_err_cnt);
+> +       } else if (tb[CRYPTOCFGA_STAT_BLKCIPHER]) {
+> +               struct rtattr *rta = tb[CRYPTOCFGA_STAT_BLKCIPHER];
+> +               struct crypto_stat *rblk =
+> +                       (struct crypto_stat *)RTA_DATA(rta);
+> +               printf("%s\tCipher\n\tEncrypt: %u bytes: %llu\n\tDecrypt: %u bytes: %llu\n\tErrors: %u\n",
+> +                       drivername,
+> +                       rblk->stat_encrypt_cnt, rblk->stat_encrypt_tlen,
+> +                       rblk->stat_decrypt_cnt, rblk->stat_decrypt_tlen,
+> +                       rblk->stat_cipher_err_cnt);
+> +       } else if (tb[CRYPTOCFGA_STAT_AKCIPHER]) {
+> +               struct rtattr *rta = tb[CRYPTOCFGA_STAT_AKCIPHER];
+> +               struct crypto_stat *rblk =
+> +                       (struct crypto_stat *)RTA_DATA(rta);
+> +               printf("%s\tAkcipher\n\tEncrypt: %u bytes: %llu\n\tDecrypt: %u bytes: %llu\n\tSign: %u\n\tVerify: %u\n\tErrors: %u\n",
+> +                       drivername,
+> +                       rblk->stat_encrypt_cnt, rblk->stat_encrypt_tlen,
+> +                       rblk->stat_decrypt_cnt, rblk->stat_decrypt_tlen,
+> +                       rblk->stat_sign_cnt, rblk->stat_verify_cnt,
+> +                       rblk->stat_akcipher_err_cnt);
+> +       } else if (tb[CRYPTOCFGA_STAT_CIPHER]) {
+> +               struct rtattr *rta = tb[CRYPTOCFGA_STAT_CIPHER];
+> +               struct crypto_stat *rblk =
+> +                       (struct crypto_stat *)RTA_DATA(rta);
+> +               printf("%s\tcipher\n\tEncrypt: %u bytes: %llu\n\tDecrypt: %u bytes: %llu\n\tErrors: %u\n",
+> +                       drivername,
+> +                       rblk->stat_encrypt_cnt, rblk->stat_encrypt_tlen,
+> +                       rblk->stat_decrypt_cnt, rblk->stat_decrypt_tlen,
+> +                       rblk->stat_cipher_err_cnt);
+> +       } else if (tb[CRYPTOCFGA_STAT_RNG]) {
+> +               struct rtattr *rta = tb[CRYPTOCFGA_STAT_RNG];
+> +               struct crypto_stat *rrng =
+> +                       (struct crypto_stat *)RTA_DATA(rta);
+> +               printf("%s\tRNG\n\tSeed: %u\n\tGenerate: %u bytes: %llu\n\tErrors: %u\n",
+> +                       drivername,
+> +                       rrng->stat_seed_cnt,
+> +                       rrng->stat_generate_cnt, rrng->stat_generate_tlen,
+> +                       rrng->stat_rng_err_cnt);
+> +       } else if (tb[CRYPTOCFGA_STAT_KPP]) {
+> +               struct rtattr *rta = tb[CRYPTOCFGA_STAT_KPP];
+> +               struct crypto_stat *rkpp =
+> +                       (struct crypto_stat *)RTA_DATA(rta);
+> +               printf("%s\tKPP\n\tSetsecret: %u\n\tGenerate public key: %u\n\tCompute_shared_secret: %u\n\tErrors: %u\n",
+> +                       drivername,
+> +                       rkpp->stat_setsecret_cnt,
+> +                       rkpp->stat_generate_public_key_cnt,
+> +                       rkpp->stat_compute_shared_secret_cnt,
+> +                       rkpp->stat_kpp_err_cnt);
+> +       } else {
+> +               fprintf(stderr, "%s is of an unknown algorithm\n", drivername);
+> +       }
+> +       ret = 0;
+> +out:
+> +       close(sd);
 > +       return ret;
 > +}
 > +
-> +/* OFB encrypt and decrypt are identical */
-> +static int crypto_ofb_decrypt(struct skcipher_request *req)
+> +int main(int argc, const char *argv[])
 > +{
-> +       return crypto_ofb_encrypt(req);
-> +}
+> +       char buf[4096];
+> +       FILE *procfd;
+> +       int i, lastspace;
+> +       int ret;
 > +
-> +static int crypto_ofb_init_tfm(struct crypto_skcipher *tfm)
-> +{
-> +       struct skcipher_instance *inst = skcipher_alg_instance(tfm);
-> +       struct crypto_spawn *spawn = skcipher_instance_ctx(inst);
-> +       struct crypto_ofb_ctx *ctx = crypto_skcipher_ctx(tfm);
-> +       struct crypto_cipher *cipher;
+> +       procfd = fopen("/proc/crypto", "r");
+> +       if (!procfd) {
+> +               ret = errno;
+> +               fprintf(stderr, "Cannot open /proc/crypto %s\n", strerror(errno));
+> +               return ret;
+> +       }
+> +       if (argc > 1) {
+> +               if (!strcmp(argv[1], "-h") || !strcmp(argv[1], "--help")) {
+> +                       printf("Usage: %s [-h|--help] display this help\n", argv[0]);
+> +                       printf("Usage: %s display all crypto statistics\n", argv[0]);
+> +                       printf("Usage: %s drivername1 drivername2 ... = display crypto statistics about drivername1 ...\n", argv[0]);
+> +                       return 0;
+> +               }
+> +               for (i = 1; i < argc; i++) {
+> +                       ret = get_stat(argv[i]);
+> +                       if (ret) {
+> +                               fprintf(stderr, "Failed with %s\n", strerror(-ret));
+> +                               return ret;
+> +                       }
+> +               }
+> +               return 0;
+> +       }
 > +
-> +       cipher = crypto_spawn_cipher(spawn);
-> +       if (IS_ERR(cipher))
-> +               return PTR_ERR(cipher);
-> +
-> +       ctx->child = cipher;
-> +       return 0;
-> +}
-> +
-> +static void crypto_ofb_exit_tfm(struct crypto_skcipher *tfm)
-> +{
-> +       struct crypto_ofb_ctx *ctx = crypto_skcipher_ctx(tfm);
-> +
-> +       crypto_free_cipher(ctx->child);
-> +}
-> +
-> +static void crypto_ofb_free(struct skcipher_instance *inst)
-> +{
-> +       crypto_drop_skcipher(skcipher_instance_ctx(inst));
-> +       kfree(inst);
-> +}
-> +
-> +static int crypto_ofb_create(struct crypto_template *tmpl, struct rtattr **tb)
-> +{
-> +       struct skcipher_instance *inst;
-> +       struct crypto_attr_type *algt;
-> +       struct crypto_spawn *spawn;
-> +       struct crypto_alg *alg;
-> +       u32 mask;
-> +       int err;
-> +
-> +       err = crypto_check_attr_type(tb, CRYPTO_ALG_TYPE_SKCIPHER);
-> +       if (err)
-> +               return err;
-> +
-> +       inst = kzalloc(sizeof(*inst) + sizeof(*spawn), GFP_KERNEL);
-> +       if (!inst)
-> +               return -ENOMEM;
-> +
-> +       algt = crypto_get_attr_type(tb);
-> +       err = PTR_ERR(algt);
-> +       if (IS_ERR(algt))
-> +               goto err_free_inst;
-> +
-> +       mask = CRYPTO_ALG_TYPE_MASK |
-> +               crypto_requires_off(algt->type, algt->mask,
-> +                                   CRYPTO_ALG_NEED_FALLBACK);
-> +
-> +       alg = crypto_get_attr_alg(tb, CRYPTO_ALG_TYPE_CIPHER, mask);
-> +       err = PTR_ERR(alg);
-> +       if (IS_ERR(alg))
-> +               goto err_free_inst;
-> +
-> +       spawn = skcipher_instance_ctx(inst);
-> +       err = crypto_init_spawn(spawn, alg, skcipher_crypto_instance(inst),
-> +                               CRYPTO_ALG_TYPE_MASK);
-> +       crypto_mod_put(alg);
-> +       if (err)
-> +               goto err_free_inst;
-> +
-> +       err = crypto_inst_setname(skcipher_crypto_instance(inst), "ofb", alg);
-> +       if (err)
-> +               goto err_drop_spawn;
-> +
-> +       inst->alg.base.cra_priority = alg->cra_priority;
-> +       inst->alg.base.cra_blocksize = alg->cra_blocksize;
-> +       inst->alg.base.cra_alignmask = alg->cra_alignmask;
-> +
-> +       /* We access the data as u32s when xoring. */
-> +       inst->alg.base.cra_alignmask |= __alignof__(u32) - 1;
-> +
-> +       inst->alg.ivsize = alg->cra_blocksize;
-> +       inst->alg.min_keysize = alg->cra_cipher.cia_min_keysize;
-> +       inst->alg.max_keysize = alg->cra_cipher.cia_max_keysize;
-> +
-> +       inst->alg.base.cra_ctxsize = sizeof(struct crypto_ofb_ctx);
-> +
-> +       inst->alg.init = crypto_ofb_init_tfm;
-> +       inst->alg.exit = crypto_ofb_exit_tfm;
-> +
-> +       inst->alg.setkey = crypto_ofb_setkey;
-> +       inst->alg.encrypt = crypto_ofb_encrypt;
-> +       inst->alg.decrypt = crypto_ofb_decrypt;
-> +
-> +       inst->free = crypto_ofb_free;
-> +
-> +       err = skcipher_register_instance(tmpl, inst);
-> +       if (err)
-> +               goto err_drop_spawn;
-> +
+> +       while (fgets(buf, sizeof(buf), procfd)) {
+> +               if (!strncmp(buf, "driver", 6)) {
+> +                       lastspace = 0;
+> +                       i = 0;
+> +                       while (i < strlen(buf)) {
+> +                               i++;
+> +                               if (buf[i] == ' ')
+> +                                       lastspace = i;
+> +                       }
+> +                       buf[strlen(buf) - 1] = '\0';
+> +                       ret = get_stat(buf + lastspace + 1);
+> +                       if (ret) {
+> +                               fprintf(stderr, "Failed with %s\n", strerror(-ret));
+> +                               goto out;
+> +                       }
+> +               }
+> +       }
 > +out:
-> +       return err;
-> +
-> +err_drop_spawn:
-> +       crypto_drop_spawn(spawn);
-> +err_free_inst:
-> +       kfree(inst);
-> +       goto out;
+> +       fclose(procfd);
+> +       return ret;
 > +}
-> +
-> +static struct crypto_template crypto_ofb_tmpl = {
-> +       .name = "ofb",
-> +       .create = crypto_ofb_create,
-> +       .module = THIS_MODULE,
-> +};
-> +
-> +static int __init crypto_ofb_module_init(void)
-> +{
-> +       return crypto_register_template(&crypto_ofb_tmpl);
-> +}
-> +
-> +static void __exit crypto_ofb_module_exit(void)
-> +{
-> +       crypto_unregister_template(&crypto_ofb_tmpl);
-> +}
-> +
-> +module_init(crypto_ofb_module_init);
-> +module_exit(crypto_ofb_module_exit);
-> +
-> +MODULE_LICENSE("GPL");
-> +MODULE_DESCRIPTION("OFB block cipher algorithm");
-> +MODULE_ALIAS_CRYPTO("ofb");
 > --
-> 2.7.4
+> 2.16.4
 >
