@@ -1,36 +1,32 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/3] crypto: OFB and tests
-Date: Fri, 28 Sep 2018 13:09:30 +0800
-Message-ID: <20180928050930.6ohzrmgtxnuqgxfd@gondor.apana.org.au>
-References: <1537449521-16182-1-git-send-email-gilad@benyossef.com>
+Subject: Re: [PATCH cryptodev-2.6 1/3] crypto: cavium/nitrox - added support
+ to identify the NITROX device partname.
+Date: Fri, 28 Sep 2018 13:09:48 +0800
+Message-ID: <20180928050948.qmoul4drqhs3n7cz@gondor.apana.org.au>
+References: <20180921113802.26475-1-Jampala.Srikanth@cavium.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>, ofir.drang@arm.com,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Gilad Ben-Yossef <gilad@benyossef.com>
+Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, sgadam@cavium.com
+To: Srikanth Jampala <Jampala.Srikanth@cavium.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1537449521-16182-1-git-send-email-gilad@benyossef.com>
+In-Reply-To: <20180921113802.26475-1-Jampala.Srikanth@cavium.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Sep 20, 2018 at 02:18:37PM +0100, Gilad Ben-Yossef wrote:
-> Add OFB mode generic implementation and more SM4 tests
+On Fri, Sep 21, 2018 at 05:08:00PM +0530, Srikanth Jampala wrote:
+> Get the device partname based on it's capabilities like,
+> core frequency, number of cores and revision id.
 > 
-> Gilad Ben-Yossef (3):
->   crypto: testmgr: update sm4 test vectors
->   crypto: add output feedback mode
->   crypto: tcrypt: add OFB functional tests
-> 
->  crypto/Kconfig   |  12 +++
->  crypto/Makefile  |   1 +
->  crypto/ofb.c     | 225 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  crypto/tcrypt.c  |  17 +++++
->  crypto/tcrypt.h  |   1 +
->  crypto/testmgr.c |  12 +++
->  crypto/testmgr.h | 122 ++++++++++++++++++++++++++++--
->  7 files changed, 383 insertions(+), 7 deletions(-)
->  create mode 100644 crypto/ofb.c
+> Signed-off-by: Srikanth Jampala <Jampala.Srikanth@cavium.com>
+> ---
+>  drivers/crypto/cavium/nitrox/nitrox_csr.h  | 111 +++++++++++++++++++++
+>  drivers/crypto/cavium/nitrox/nitrox_dev.h  |  17 +++-
+>  drivers/crypto/cavium/nitrox/nitrox_hal.c  |  57 +++++++++++
+>  drivers/crypto/cavium/nitrox/nitrox_hal.h  |   1 +
+>  drivers/crypto/cavium/nitrox/nitrox_main.c |  20 ----
+>  5 files changed, 184 insertions(+), 22 deletions(-)
 
 All applied.  Thanks.
 -- 
