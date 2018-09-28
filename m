@@ -1,42 +1,88 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: mxs-dcp - Fix wait logic on chan threads
-Date: Fri, 28 Sep 2018 13:10:08 +0800
-Message-ID: <20180928051007.53pokj4jmazcdikz@gondor.apana.org.au>
-References: <163d1af7d51bfa330f4cc685c5c493cd38aa584b.1537541211.git.leonard.crestez@nxp.com>
+Subject: Re: [PATCH] crypto: qat - Fix KASAN stack-out-of-bounds bug in
+ adf_probe()
+Date: Fri, 28 Sep 2018 13:10:23 +0800
+Message-ID: <20180928051023.3hcs7hctgplnh4go@gondor.apana.org.au>
+References: <1537663315-4168-1-git-send-email-longman@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Marek Vasut <marek.vasut@gmail.com>,
-        "David S . Miller " <davem@davemloft.net>,
-        Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
-        Franck LENORMAND <franck.lenormand@nxp.com>,
-        Fabio Estevam <fabio.estevam@nxp.com>,
-        Shawn Guo <shawnguo@kernel.org>, linux-crypto@vger.kernel.org,
-        linux-imx@nxp.com, kernel@pengutronix.de,
-        linux-kernel@vger.kernel.org
-To: Leonard Crestez <leonard.crestez@nxp.com>
+Cc: Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        "David S. Miller" <davem@davemloft.net>, qat-linux@intel.com,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Conor McLoughlin <conor.mcloughlin@intel.com>
+To: Waiman Long <longman@redhat.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <163d1af7d51bfa330f4cc685c5c493cd38aa584b.1537541211.git.leonard.crestez@nxp.com>
+In-Reply-To: <1537663315-4168-1-git-send-email-longman@redhat.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Sep 21, 2018 at 06:03:18PM +0300, Leonard Crestez wrote:
-> When compiling with CONFIG_DEBUG_ATOMIC_SLEEP=y the mxs-dcp driver
-> prints warnings such as:
+On Sat, Sep 22, 2018 at 08:41:55PM -0400, Waiman Long wrote:
+> The following KASAN warning was printed when booting a 64-bit kernel
+> on some systems with Intel CPUs:
 > 
-> WARNING: CPU: 0 PID: 120 at kernel/sched/core.c:7736 __might_sleep+0x98/0x9c
-> do not call blocking ops when !TASK_RUNNING; state=1 set at [<8081978c>] dcp_chan_thread_sha+0x3c/0x2ec
+> [   44.512826] ==================================================================
+> [   44.520165] BUG: KASAN: stack-out-of-bounds in find_first_bit+0xb0/0xc0
+> [   44.526786] Read of size 8 at addr ffff88041e02fc50 by task kworker/0:2/124
 > 
-> The problem is that blocking ops will manipulate current->state
-> themselves so it is not allowed to call them between
-> set_current_state(TASK_INTERRUPTIBLE) and schedule().
+> [   44.535253] CPU: 0 PID: 124 Comm: kworker/0:2 Tainted: G               X --------- ---  4.18.0-12.el8.x86_64+debug #1
+> [   44.545858] Hardware name: Intel Corporation PURLEY/PURLEY, BIOS BKVDTRL1.86B.0005.D08.1712070559 12/07/2017
+> [   44.555682] Workqueue: events work_for_cpu_fn
+> [   44.560043] Call Trace:
+> [   44.562502]  dump_stack+0x9a/0xe9
+> [   44.565832]  print_address_description+0x65/0x22e
+> [   44.570683]  ? find_first_bit+0xb0/0xc0
+> [   44.570689]  kasan_report.cold.6+0x92/0x19f
+> [   44.578726]  find_first_bit+0xb0/0xc0
+> [   44.578737]  adf_probe+0x9eb/0x19a0 [qat_c62x]
+> [   44.578751]  ? adf_remove+0x110/0x110 [qat_c62x]
+> [   44.591490]  ? mark_held_locks+0xc8/0x140
+> [   44.591498]  ? _raw_spin_unlock+0x30/0x30
+> [   44.591505]  ? trace_hardirqs_on_caller+0x381/0x570
+> [   44.604418]  ? adf_remove+0x110/0x110 [qat_c62x]
+> [   44.604427]  local_pci_probe+0xd4/0x180
+> [   44.604432]  ? pci_device_shutdown+0x110/0x110
+> [   44.617386]  work_for_cpu_fn+0x51/0xa0
+> [   44.621145]  process_one_work+0x8fe/0x16e0
+> [   44.625263]  ? pwq_dec_nr_in_flight+0x2d0/0x2d0
+> [   44.629799]  ? lock_acquire+0x14c/0x400
+> [   44.633645]  ? move_linked_works+0x12e/0x2a0
+> [   44.637928]  worker_thread+0x536/0xb50
+> [   44.641690]  ? __kthread_parkme+0xb6/0x180
+> [   44.645796]  ? process_one_work+0x16e0/0x16e0
+> [   44.650160]  kthread+0x30c/0x3d0
+> [   44.653400]  ? kthread_create_worker_on_cpu+0xc0/0xc0
+> [   44.658457]  ret_from_fork+0x3a/0x50
 > 
-> Fix this by converting the per-chan mutex to a spinlock (it only
-> protects tiny list ops anyway) and rearranging the wait logic so that
-> callbacks are called current->state as TASK_RUNNING. Those callbacks
-> will indeed call blocking ops themselves so this is required.
+> [   44.663557] The buggy address belongs to the page:
+> [   44.668350] page:ffffea0010780bc0 count:0 mapcount:0 mapping:0000000000000000 index:0x0
+> [   44.676356] flags: 0x17ffffc0000000()
+> [   44.680023] raw: 0017ffffc0000000 ffffea0010780bc8 ffffea0010780bc8 0000000000000000
+> [   44.687769] raw: 0000000000000000 0000000000000000 00000000ffffffff 0000000000000000
+> [   44.695510] page dumped because: kasan: bad access detected
 > 
-> Signed-off-by: Leonard Crestez <leonard.crestez@nxp.com>
+> [   44.702578] Memory state around the buggy address:
+> [   44.707372]  ffff88041e02fb00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+> [   44.714593]  ffff88041e02fb80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+> [   44.721810] >ffff88041e02fc00: 00 00 00 00 00 00 f1 f1 f1 f1 04 f2 f2 f2 f2 f2
+> [   44.729028]                                                  ^
+> [   44.734864]  ffff88041e02fc80: f2 f2 00 00 00 00 f3 f3 f3 f3 00 00 00 00 00 00
+> [   44.742082]  ffff88041e02fd00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+> [   44.749299] ==================================================================
+> 
+> Looking into the code:
+> 
+>   int ret, bar_mask;
+>     :
+>   for_each_set_bit(bar_nr, (const unsigned long *)&bar_mask,
+> 
+> It is casting a 32-bit integer pointer to a 64-bit unsigned long
+> pointer. There are two problems here. First, the 32-bit pointer address
+> may not be 64-bit aligned. Secondly, it is accessing an extra 4 bytes.
+> 
+> This is fixed by changing the bar_mask type to unsigned long.
+> 
+> Signed-off-by: Waiman Long <longman@redhat.com>
 
 Patch applied.  Thanks.
 -- 
