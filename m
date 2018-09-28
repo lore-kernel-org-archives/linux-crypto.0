@@ -1,34 +1,27 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH cryptodev-2.6 1/3] crypto: cavium/nitrox - added support
- to identify the NITROX device partname.
-Date: Fri, 28 Sep 2018 13:09:48 +0800
-Message-ID: <20180928050948.qmoul4drqhs3n7cz@gondor.apana.org.au>
-References: <20180921113802.26475-1-Jampala.Srikanth@cavium.com>
+Subject: Re: [PATCH] crypto: cavium: remove redundant null pointer check
+ before kfree
+Date: Fri, 28 Sep 2018 13:09:58 +0800
+Message-ID: <20180928050958.gpbgh7r2canffij6@gondor.apana.org.au>
+References: <1537536615-46814-1-git-send-email-zhongjiang@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, sgadam@cavium.com
-To: Srikanth Jampala <Jampala.Srikanth@cavium.com>
+Cc: davem@davemloft.net, george.cherian@cavium.com,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: zhong jiang <zhongjiang@huawei.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20180921113802.26475-1-Jampala.Srikanth@cavium.com>
+In-Reply-To: <1537536615-46814-1-git-send-email-zhongjiang@huawei.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Sep 21, 2018 at 05:08:00PM +0530, Srikanth Jampala wrote:
-> Get the device partname based on it's capabilities like,
-> core frequency, number of cores and revision id.
+On Fri, Sep 21, 2018 at 09:30:15PM +0800, zhong jiang wrote:
+> kfree has taken the null pointer into account. hence it is safe
+> to remove the redundant null pointer check before kfree.
 > 
-> Signed-off-by: Srikanth Jampala <Jampala.Srikanth@cavium.com>
-> ---
->  drivers/crypto/cavium/nitrox/nitrox_csr.h  | 111 +++++++++++++++++++++
->  drivers/crypto/cavium/nitrox/nitrox_dev.h  |  17 +++-
->  drivers/crypto/cavium/nitrox/nitrox_hal.c  |  57 +++++++++++
->  drivers/crypto/cavium/nitrox/nitrox_hal.h  |   1 +
->  drivers/crypto/cavium/nitrox/nitrox_main.c |  20 ----
->  5 files changed, 184 insertions(+), 22 deletions(-)
+> Signed-off-by: zhong jiang <zhongjiang@huawei.com>
 
-All applied.  Thanks.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
