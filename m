@@ -1,28 +1,31 @@
-From: Kees Cook <keescook@chromium.org>
-Subject: Re: [PATCH crypto-next 00/23] crypto: skcipher - Remove VLA usage
-Date: Fri, 28 Sep 2018 09:13:02 -0700
-Message-ID: <CAGXu5jKBPb64Po2up1FVWoGkUio3zJQuKnpfv7A=F0ci7r4FzA@mail.gmail.com>
-References: <20180919021100.3380-1-keescook@chromium.org> <20180928050823.pggznhgv47wu4pd4@gondor.apana.org.au>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH v3 2/2] crypto: tools: Add cryptostat userspace
+Date: Fri, 28 Sep 2018 19:03:11 +0200
+Message-ID: <CAKv+Gu8jgEyaUA2OOzxNT5nvWoC7qZgf+KazzH1Q5yWj60V2TQ@mail.gmail.com>
+References: <1537351855-16618-1-git-send-email-clabbe@baylibre.com>
+ <1537351855-16618-3-git-send-email-clabbe@baylibre.com> <CAKv+Gu9VCZx=UHSoN7SexZeTzLK6yk9YAe5qMdhhDMUFnqTSCQ@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Eric Biggers <ebiggers@google.com>,
-        linux-crypto <linux-crypto@vger.kernel.org>,
+Cc: "David S. Miller" <davem@davemloft.net>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        nhorman@tuxdriver.com,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+To: Corentin Labbe <clabbe@baylibre.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20180928050823.pggznhgv47wu4pd4@gondor.apana.org.au>
+In-Reply-To: <CAKv+Gu9VCZx=UHSoN7SexZeTzLK6yk9YAe5qMdhhDMUFnqTSCQ@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Sep 27, 2018 at 10:08 PM, Herbert Xu
-<herbert@gondor.apana.org.au> wrote:
-> All applied.  Thanks.
+On 28 September 2018 at 15:13, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
+> On 19 September 2018 at 12:10, Corentin Labbe <clabbe@baylibre.com> wrote:
+>> This patch adds an userspace tool for displaying kernel crypto API
+>> statistics.
+>>
+>> Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
+>
+> How do I actually build this thing?
+>
 
-Awesome! Thanks :)
-
--Kees
-
--- 
-Kees Cook
-Pixel Security
+Never mind.
