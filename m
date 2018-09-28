@@ -1,184 +1,186 @@
-From: Eric Biggers <ebiggers@kernel.org>
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
 Subject: Re: [PATCH net-next v6 00/23] WireGuard: Secure Network Tunnel
-Date: Thu, 27 Sep 2018 18:17:27 -0700
-Message-ID: <20180928011726.GA98113@gmail.com>
+Date: Fri, 28 Sep 2018 04:35:48 +0200
+Message-ID: <20180928023546.GA20765@zx2c4.com>
 References: <20180925145622.29959-1-Jason@zx2c4.com>
  <20180927182944.GA22921@gmail.com>
  <20180927213537.GA27576@zx2c4.com>
+ <20180928011726.GA98113@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
         linux-crypto@vger.kernel.org, davem@davemloft.net,
         gregkh@linuxfoundation.org
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+To: Eric Biggers <ebiggers@kernel.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20180927213537.GA27576@zx2c4.com>
+In-Reply-To: <20180928011726.GA98113@gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Sep 27, 2018 at 11:35:39PM +0200, Jason A. Donenfeld wrote:
-> Hi Eric,
+Hi Eric,
+
+On Thu, Sep 27, 2018 at 06:17:27PM -0700, Eric Biggers wrote:
+> So, Zinc will simultaneously replace the current crypto implementations, *and*
+> be "orthogonal" and "separate" from all the crypto code currently maintained by
+> Herbert?  You can't have your cake and eat it too...
+
+The plan is for it to replace many uses of the crypto API where it makes
+sense, but not replace uses where it doesn't make sense. Perhaps in the
+long run, over time, its usage will grow to cover those cases too, or,
+perhaps instead, Zinc will form a simple basis of software crypto
+algorithms in whatever future API designs crop up. In other words, like
+most changes in kernel development, things happen gradually, starting
+with a few good cases, and gradually growing as the need and design
+arise.
+
+> I'm still concerned you're splitting the community in two.  It will be unclear
+> where new algorithms and implementations should go.  Some people will choose
+> Herbert and the current crypto API and conventions, and some people will choose
+> you and Zinc...  I still don't see clear guidelines for what will go where.
+
+I can try to work out some explicit guidelines and write these up for
+Documentation/, if that'd make a difference for you. I don't think this
+is a matter of "community splitting". On the contrary, I think Zinc will
+bring communities together, inviting the larger cryptography community
+to take an interest in improving the state of crypto in Linux. Either
+way, the litmus test for where code should go remains pretty similar to
+how it's been working so far. Are you tempted to stick it in lib/
+because that fits your programming paradigm and because you think it's
+generally useful? If so, submit it to lib/zinc/. Conversely, is it only
+something used in the large array of options provided by dmcrypt, ipsec,
+afalg, etc? Submit it to the crypto API.
+
+If you think this criteria is lacking, I'm amenable to adjusting that
+and changing it, especially as situations and designs change and morph
+over time. But that seems like a fairly decent starting point.
+
+> Please reach out to Herbert to find a sane solution
+> crypto development without choosing "sides".
+
+Please, don't politicize this. This has nothing to do with "sides". This
+has to do with which paradigm makes sense for implementing a particular
+algorithm. And everything that goes in Zinc gets to be used seamlessly
+by the crypto API anyway, through use of the trivial stub glue code,
+like what I've shown in the two commits in this series. Again, if it's
+something that will work well as a direct function call, then it seems
+like Zinc makes sense as a home for it.
+
+With that said, I've reached out to Herbert, and we'll of course discuss
+and reach a good conclusion together.
+
+> Note that usage can change over time; a user that requires a
+> single cipher could later need multiple, and vice versa.
+
+I think this depends on the design of the driver and the style it's
+implemented in. For example, I could imagine something like this:
+
+   encrypt_stuff_with_morus(obj, key);
+
+evolving over time to:
+
+  if (obj->type == MORUS_TYPE)
+    encrypt_stuff_with_morus(obj, key);
+  else if (obj->type == AEGIS_TYPE)
+    encrypt_stuff_with_aegis(obj, key);
+
+On the other hand, if the developer has good reason to use the crypto
+API's dynamic dispatch and async API and so forth, then perhaps it just
+changes from:
+
+  static const char *cipher_name = "morus";
+
+to
+
+  static const char *cipher_name_type_1 = "morus";
+  static const char *cipher_name_type_2 = "aegis";
+
+I can imagine both programming styles and evolutions being desirable for
+different reasons.
+
+> >   - It matches exactly what Andy Polyakov's code is doing for the exact
+> >     same reason, so this isn't something that's actually "new". (There
+> >     are paths inside his implementation that branch from the vector code
+> >     to the scalar code.)
 > 
-> On Thu, Sep 27, 2018 at 8:29 PM Eric Biggers <ebiggers@kernel.org> wrote:
-> > Why is Herbert Xu's existing crypto tree being circumvented, especially for
-> > future patches (the initial merge isn't quite as important as that's a one-time
-> > event)?  I like being able to check out cryptodev to test upcoming crypto
-> > patches.  And currently, changes to APIs, algorithms, tests, and implementations
-> > all go through cryptodev, which is convenient for crypto developers.
-> >
-> > Apparently, you're proposing that someone adding a new algorithm will now have
-> > to submit the API portion to one maintainer (Herbert Xu) and the implementation
-> > portion to another maintainer (you), and they'll go through separate git trees.
-> > That's inconvenient for developers, and it seems that in practice you and
-> > Herbert will be stepping on each other's toes a lot.
-> >
-> > Can you please reach some kind of sane agreement with Herbert so that the
-> > development process isn't fractured into two?  Perhaps you could review patches,
-> > but Herbert could still apply them?
+> Matches Andy's code, where?  The reason you had to add the radix conversion is
+> because his code does *not* handle it...
+
+For example, check out the avx blocks function. The radix conversion
+happens in a few different places throughout. The reason we need it
+separately here is because, unlike userspace, it's possible the kernel
+code will transition from 2^26 back to 2^64 as a result of the FPU
+context changing.
+
+As well, AndyP seems to like the idea of including this logic in the
+assembly instead of in C, if I understood our discussions correctly, so
+there's a decent chance this will migrate out of the glue code and into
+the assembly properly, which is probably a better place for it.
+
+> >   - It has been discussed at length with Andy, including what kinds of
+> >     proofs we'll need if we want to chop it down further (to remove that
+> >     final reduction), and why we both don't want to do that yet, and so
+> >     we go with the full carrying for the avoidance of risk.
 > 
-> I think you're overthinking it a bit. Zinc will have a few software
-> implementations of primitives that are useful in cases where it's nice to call
-> the primitive directly. Think: various usages of sha2, siphash, the wireguard
-> suite (what this patchset includes), other things in lib/, etc. In so much as
-> this winds up duplicating things within the crypto API, I'll work with Herbert
-> to build one on top of the other -- as I've done in the two commits in this
-> series. But beyond that, think of the two initiatives as orthogonal. I'm
-> working on curating a few primitives that are maximally useful throughout
-> the kernel for various uses, and doing so in a way that I think brings
-> about a certain quality. Meanwhile the crypto API is amassing a huge
-> collection of primitives for some things, and that will continue to exist,
-> and Herbert will continue to maintain that. I expect for the crossover
-> to be fairly isolated and manageable, without too much foreseeable tree-
-> conflicts and such. Therefore, Samuel Neves and I plan to maintain the
-> codebase we've spent quite some time writing, and maintain our own tree for
-> it, which we'll be submitting through Greg. In other words, this is not
-> a matter of "circumvention" or "stepping on toes", but rather separate
-> efforts. I'm quite certain to the extent they overlap we'll be able to work
-> out fairly easily.
-> 
-> Either way, I'll take your suggestion and reach out to Herbert, since at
-> least a discussion between the two of us sounds like it could be productive.
+> Sorry, other people don't know about your private discussions.  For the rest of
+> us, why not add a comment to the code explaining what's going on?
 
-So, Zinc will simultaneously replace the current crypto implementations, *and*
-be "orthogonal" and "separate" from all the crypto code currently maintained by
-Herbert?  You can't have your cake and eat it too...
+That's a good idea. I can include some discussion about this as well in
+the commit message that introduces the glue code, too, I guess? I've
+been hesitant to fill these commit messages up even more, given there
+are already so many walls of text and whatnot, but if you think that'd
+be useful, I'll do that for v7, and also add comments.
 
-I'm still concerned you're splitting the community in two.  It will be unclear
-where new algorithms and implementations should go.  Some people will choose
-Herbert and the current crypto API and conventions, and some people will choose
-you and Zinc...  I still don't see clear guidelines for what will go where.  And
-yes, you and Herbert will step on each others' toes and duplicate stuff, as the
-efforts are *not* separate, as you've even argued yourself.
+> >   - We've proved its correctness with Z3, actually using an even looser
+> >     constraint on digit size than what Andy mentioned to us, thus resulting
+> >     in a stronger proof result. So we're certain this isn't rubbish.
+> AFAICS actually it *is* rubbish, because your C code stores the accumulator as
+> 64-bit integers whereas the asm code (at least, the 32-bit version) reads it as
+> 32-bit integers.  That won't work correctly on big endian ARM.
+> > There's no doubt about it, we've done our due-diligence here. 
+> Apparently not, given that it's broken on big endian ARM.
+> Of course, having bugs in code which you insist was proven correct
+> + fuzzed doesn't exactly inspire trust.
 
-Please reach out to Herbert to find a sane solution, ideally one that involves
-having a single git tree for crypto development and allows people to continue
-crypto development without choosing "sides".
+What's with the snark? It's not rubbish. I'm not sure if you noticed it in
+the development trees (both the WireGuard module tree and my kernel.org
+integration tree for this patch), but the big endian ARM support was fixed
+pretty shortly after I jumped the gun posting v6. Like, super soon after.
+That, and other big endian fixes (on aarch64 as well) are already queued up
+for v7. And now build.wireguard.com has more big endian running in CI.
 
-> 
-> > I'm also wondering about the criteria for making additions and changes to
-> > "Zinc".  You mentioned before that one of the "advantages" of Zinc is that it
-> > doesn't include "cipher modes from 90s cryptographers" -- what does that mean
-> > exactly?  You've also indicated before that you don't want people modifying the
-> > Poly1305 implementations as they are too error-prone.  Useful contributions
-> > could be blocked or discouraged in the future. Can you please elaborate on
-> > your criteria for contributions to Zinc?
-> >
-> > Also, will you allow algorithms that aren't up to modern security standards but
-> > are needed for compatibility reasons, e.g. MD5, SHA-1, and DES?  There are
-> > existing standards, APIs, and data formats that use these "legacy" algorithms;
-> > so implementations of them are often still needed, whether we like it or not.
-> >
-> > And does it matter who designed the algorithms, e.g. do algorithms from Daniel
-> > Bernstein get effectively a free pass, while algorithms from certain countries,
-> > governments, or organizations are not allowed?  E.g. wireless driver developers
-> > may need the SM4 block cipher (which is now supported by the crypto API) as it's
-> > specified in a Chinese wireless standard.  Will you allow SM4 in Zinc?  Or will
-> > people have to submit some algorithms to Herbert and some to you due to
-> > disagreements about what algorithms should be included?
-> 
-> Similarly here, I think you're over-politicizing everything. Stable address
-> generation for IPv6 uses SHA1 -- see net/ipv6/addrconf.c:3203 -- do you think
-> that this should use, say, the SM3 chinese hash function instead? No, of
-> course not, for a variety of interesting reasons. Rather, it should use some
-> simple hash function that's fast in software that we have available in Zinc.
-> On the other hand, it seems like parts of the kernel that have pretty high-
-> levels of cipher agility -- such as dmcrypt, ipsec, wifi apparently, and
-> so on -- will continue to use dynamic-dispatch system like the crypto API,
-> since that's what it was made to do and is effective at doing. And so, your
-> example of SM4 seems to fit perfectly into what the crypto API is well-suited
-> for, and it would fit naturally in there.
-> 
-> In other words, the "political criteria" for what we add to lib/zinc/ will
-> mostly be the same as for the rest of lib/: are there things using it that
-> benefit from it being there in a direct and obvious way, and does the
-> implementation meet certain quality standards.
-> 
+> The details of the correctness proofs and fuzzing you claim to have done aren't
+> explained, even in the cover letter; so for now we just have to trust you on
+> that point.
 
-So, crypto implementations and algorithms will go to different maintainers,
-source locations, and git trees based purely on whether the current users need
-"cipher agility"?  Note that usage can change over time; a user that requires a
-single cipher could later need multiple, and vice versa.
+"Claim to have done", "trust you on that point" -- I think there's no
+reason to doubt the integrity of my "claims", and I don't appreciate the
+phrasing that appears to call that into question.
 
-What if the portion of a wireless driver that needs SM4 doesn't need any other
-cipher in the same place, so static dispatch would suffice?  Would SM4 be
-allowed in Zinc then?
+Regardless, sure, we can expand the "wall-of-text" commit messages even
+further, if you want, and include the verbatim Z3 scripts for reproduction.
 
-> > to change them yourself, e.g. when you added the part that converts the
-> > accumulator from base 26 to base 32.  I worry there may be double standards
-> > here
-> 
-> We do actually appreciate your concern here. However, there's a lot more that
-> went into that short patch than meets the eye:
-> 
->   - It matches exactly what Andy Polyakov's code is doing for the exact
->     same reason, so this isn't something that's actually "new". (There
->     are paths inside his implementation that branch from the vector code
->     to the scalar code.)
+> I understand that your standards are still as high or even higher than
+> Herbert's, which is good; crypto code should be held to high standards!  But
+> based on the evidence, I do worry there's a double standard going on where you
+> get away with things yourself which you won't allow from others in Zinc.  It's
+> just not honest, and it will make people not want to contribute to Zinc.
+> Maintainers are supposed to be unbiased and hold all contributions to the same
+> standard.
 
-Matches Andy's code, where?  The reason you had to add the radix conversion is
-because his code does *not* handle it...
+This is complete and utter garbage, and I find its insinuations insulting
+and ridiculous. There is absolutely no lack of honesty and no double
+standard being applied whatsoever. Your attempt to cast doubt about the
+quality of standards applied and the integrity of the process is wholly
+inappropriate. When I tell you that high standards were applied and that
+due-diligence was done in developing a particular patch, I mean what I
+say.
 
->   - It has been discussed at length with Andy, including what kinds of
->     proofs we'll need if we want to chop it down further (to remove that
->     final reduction), and why we both don't want to do that yet, and so
->     we go with the full carrying for the avoidance of risk.
+> We need "Zinc" to be Linux's crypto library, not "Jason's crypto library".
 
-Sorry, other people don't know about your private discussions.  For the rest of
-us, why not add a comment to the code explaining what's going on?
+This very much is a project directed toward the benefit of the kernel in
+a general sense. It's been this way from the start, and there's nothing
+in its goals or plans to the contrary of that. Please leave this vague
+and unproductive rhetoric aside.
 
->   - We've proved its correctness with Z3, actually using an even looser
->     constraint on digit size than what Andy mentioned to us, thus resulting
->     in a stronger proof result. So we're certain this isn't rubbish.
-
-AFAICS actually it *is* rubbish, because your C code stores the accumulator as
-64-bit integers whereas the asm code (at least, the 32-bit version) reads it as
-32-bit integers.  That won't work correctly on big endian ARM.
-
->   - There's been some considerable computing power sunk into fuzzing it.
-> 
-> There's no doubt about it, we've done our due-diligence here. 
-
-Apparently not, given that it's broken on big endian ARM.
-
-> fact the kind of efforts we require of submissions. You could fault us for
-> not detailing this in "the commit message" -- except as this is still a
-> patch series, we're putting improvements into the 00/XX change log, instead
-> of adding fixes and additions on top of the series. 
-
-The details of the correctness proofs and fuzzing you claim to have done aren't
-explained, even in the cover letter; so for now we just have to trust you on
-that point.  Of course, having bugs in code which you insist was proven correct
-+ fuzzed doesn't exactly inspire trust.
-
-I understand that your standards are still as high or even higher than
-Herbert's, which is good; crypto code should be held to high standards!  But
-based on the evidence, I do worry there's a double standard going on where you
-get away with things yourself which you won't allow from others in Zinc.  It's
-just not honest, and it will make people not want to contribute to Zinc.
-Maintainers are supposed to be unbiased and hold all contributions to the same
-standard.
-
-We need "Zinc" to be Linux's crypto library, not "Jason's crypto library".
-
-- Eric
+Jason
