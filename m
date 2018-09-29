@@ -1,9 +1,9 @@
 From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: Re: [PATCH net-next v6 04/23] zinc: ChaCha20 x86_64 implementation
-Date: Sat, 29 Sep 2018 04:01:53 +0200
-Message-ID: <CAHmME9rc5zgN4HhBy0_oq+EbEXdS8nePzA7qW39nocx_y4ay1Q@mail.gmail.com>
-References: <20180925145622.29959-1-Jason@zx2c4.com> <20180925145622.29959-5-Jason@zx2c4.com>
- <CAKv+Gu9aOiYdEzHHrHFHUFK=hNfeS=zEsvMe9OWD8hEdAYkffg@mail.gmail.com>
+Subject: Re: [PATCH net-next v6 07/23] zinc: ChaCha20 ARM and ARM64 implementations
+Date: Sat, 29 Sep 2018 04:20:24 +0200
+Message-ID: <CAHmME9qtN8kiKnMHTa76r9a_5Ou_s3WhAMT_HnH7-1FeoHUOZg@mail.gmail.com>
+References: <20180925145622.29959-1-Jason@zx2c4.com> <20180925145622.29959-8-Jason@zx2c4.com>
+ <CAKv+Gu8knzzmK4_KouFQWKzMdHFgEsk-CtBrcuAvk0bYkDFO=w@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Cc: LKML <linux-kernel@vger.kernel.org>,
@@ -14,49 +14,85 @@ Cc: LKML <linux-kernel@vger.kernel.org>,
         Samuel Neves <sneves@dei.uc.pt>,
         Andrew Lutomirski <luto@kernel.org>,
         Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
-        Andy Polyakov <appro@openssl.org>,
-        Thomas Gleixner <tglx@linutronix.de>, mingo@redhat.com,
-        X86 ML <x86@kernel.org>
+        Russell King - ARM Linux <linux@armlinux.org.uk>,
+        linux-arm-kernel@lists.infradead.org
 To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAKv+Gu9aOiYdEzHHrHFHUFK=hNfeS=zEsvMe9OWD8hEdAYkffg@mail.gmail.com>
+In-Reply-To: <CAKv+Gu8knzzmK4_KouFQWKzMdHFgEsk-CtBrcuAvk0bYkDFO=w@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
 Hi Ard,
 
-On Fri, Sep 28, 2018 at 5:47 PM Ard Biesheuvel
+On Fri, Sep 28, 2018 at 6:02 PM Ard Biesheuvel
 <ard.biesheuvel@linaro.org> wrote:
-> Please drop this SOB line: SOB is not about (co-)authorship but about
-> who handled the patch on its way into mainline.
+> Please put comments like this below the ---
 
-The s-o-b line is about the DCoO, which is given here by both of us,
-with the code starting in a shared tree that only had that s-o-b. I
-can remove it though if you think it's strange to have two s-o-bs.
+git-notes is nice for this indeed.
 
-> You are sending the
-> patch so your SOB should come last.
+> Are these CONFIG_ symbols defined anywhere at this point?
 
-I was wondering about the ordering of these, actually. I've seen s-o-b
-on top and s-o-b on bottom of the cc list in lots of commits and
-haven't yet divined the One True Position.
+Yes, they're introduced in the first zinc commit. There's no git-blame
+on git.kernel.org, presumably because it's expensive to compute, but
+there is on my personal instance, so this might help:
+https://git.zx2c4.com/linux-dev/blame/lib/zinc/Kconfig?h=jd/wireguard
 
-> You can drop the #ifdefs above ...
+> In any case, I don't think these is a reason for these, at least not
+> on ARM/arm64. The 64-bitness is implied in both cases
 
-Yep. All of those ifdefs in this and in the other primitives are
-already gone, and everything is fully IS_ENABLEDenabled now.
+You mean to say that since these nobs are def_bool y and are
+essentially "depends on ARM", then I should just straight up use
+CONFIG_ARM? I had thought about this, but figured this would make it
+easier to later make these optional or have other options block them
+need be, or even if the dependencies and requirements for having them
+changes (for example, with UML on x86). I think doing it this way
+gives us some flexibility later on. So if that's a compelling enough
+reason, I'd like to keep those.
 
-> > +#ifdef CONFIG_AS_AVX512
+> and the
+> dependency on !CPU_32v3 you introduce (looking at the version of
+> Kconfig at the end of the series) seems spurious to me. Was that added
+> because of some kbuild robot report? (we don't support ARMv3 in the
+> kernel but ARCH_RPC is built in v3 mode because of historical reasons
+> while the actual core is a v4)
+
+I added the !CPU_32v3 in my development tree after posting v6, so good
+to hear you're just looking straight at the updated tree. If you see
+things jump out in there prior to me posting v7, don't hesitate to let
+me know.
+
+The reason it was added was indeed because of:
+https://lists.01.org/pipermail/kbuild-all/2018-September/053114.html
+-- exactly what you suspected, ARCH_RPC. Have a better suggestion than
+!CPU_32v3? It seems to me like so long as the kernel has CPU_32v3 as a
+thing in any form, I should mark Zinc as not supporting it, since
+we'll certainly be at least v4 and up. (Do you guys have any old Acorn
+ARM610 boxes sitting around for old time's sake at LinaroHQ? ;-)
+
+> > +#endif
+> > +
 >
-> ... and use IS_ENABLED(CONFIG_AS_AVX512) here inside the if().
+> No need to make asmlinkage declarations conditional
 
-Already done, per your suggestion a few days ago.
+Yep, addressed in the IS_ENABLED cleanup.
 
-> > -#ifndef HAVE_CHACHA20_ARCH_IMPLEMENTATION
 >
-> As I mentioned in reply to the previous patch, please get rid of this
-> CPP symbol ^^^
+> if (IS_ENABLED())
 
-Ack.
+Sorted.
 
+>
+> """
+> if (!IS_ENABLED(CONFIG_ARM))
+>    return false;
+>
+> hchacha20_arm(x, derived_key);
+> return true;
+> """
+>
+> and drop the #ifdefs
+
+Also sorted.
+
+Regards,
 Jason
