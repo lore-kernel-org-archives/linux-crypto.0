@@ -1,121 +1,118 @@
-From: Willy Tarreau <w@1wt.eu>
-Subject: Re: [PATCH net-next v6 00/23] WireGuard: Secure Network Tunnel
-Date: Sat, 29 Sep 2018 07:35:51 +0200
-Message-ID: <20180929053551.GA13905@1wt.eu>
-References: <20180925145622.29959-1-Jason@zx2c4.com>
- <20180927182944.GA22921@gmail.com>
- <20180927213537.GA27576@zx2c4.com>
- <20180928011726.GA98113@gmail.com>
- <20180928023546.GA20765@zx2c4.com>
- <20180928045542.GA545@zzz.localdomain>
- <CAHmME9rJ4CewfDEqWh00ZowjWg9TaYpksVSzKSSxoKya-M8_LA@mail.gmail.com>
- <CAKv+Gu-8eiMkrJtpnMKzT=m9zGvY5qHVAmLM_rFA3gxk2gV-zw@mail.gmail.com>
- <CAHmME9pPTxx5JP+8WQ0jLVBXxJmRKy2=z5YOSx_ar7JZqBQ1CA@mail.gmail.com>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH net-next v6 07/23] zinc: ChaCha20 ARM and ARM64 implementations
+Date: Sat, 29 Sep 2018 08:16:25 +0200
+Message-ID: <CAKv+Gu9FoFQymp2-=rUeh14CkUKON389OCE7stYCOFwKZpaCrg@mail.gmail.com>
+References: <20180925145622.29959-1-Jason@zx2c4.com> <20180925145622.29959-8-Jason@zx2c4.com>
+ <CAKv+Gu8knzzmK4_KouFQWKzMdHFgEsk-CtBrcuAvk0bYkDFO=w@mail.gmail.com> <CAHmME9qtN8kiKnMHTa76r9a_5Ou_s3WhAMT_HnH7-1FeoHUOZg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Eric Biggers <ebiggers@kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
+Content-Type: text/plain; charset="UTF-8"
+Cc: LKML <linux-kernel@vger.kernel.org>,
         Netdev <netdev@vger.kernel.org>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         David Miller <davem@davemloft.net>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Samuel Neves <sneves@dei.uc.pt>,
+        Andrew Lutomirski <luto@kernel.org>,
+        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
+        Russell King - ARM Linux <linux@armlinux.org.uk>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
 To: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Return-path: <netdev-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <CAHmME9pPTxx5JP+8WQ0jLVBXxJmRKy2=z5YOSx_ar7JZqBQ1CA@mail.gmail.com>
-Sender: netdev-owner@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <CAHmME9qtN8kiKnMHTa76r9a_5Ou_s3WhAMT_HnH7-1FeoHUOZg@mail.gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Sat, Sep 29, 2018 at 04:40:03AM +0200, Jason A. Donenfeld wrote:
-> > CRC32 is another case study that I would like to bring up:
-> > - the current status is a bit of a mess, where we treat crc32() and
-> > crc32c() differently - the latter is exposed by libcrc32.ko as a
-> > wrapper around the crypto API, and there is some networking code (SCTP
-> > iirc) that puts another kludge on top of that to ensure that the code
-> > is not used before the module is loaded
-> > - we have C versions, scalar hw instruction based versions and
-> > carryless multiplication based versions for various architectures
-> > - on ST platforms, we have a synchronous hw accelerator that is 10x
-> > faster than C code on the same platform.
-> >
-> > AFAICT none of its current users rely on the async interface or
-> > runtime dispatch of the 'hash'.
-> 
-> I've added Willy to the CC, as we were actually discussing the crc32
-> case together two days ago. If my understanding was correct, he seemed
-> to think it'd be pretty useful too.
+On 29 September 2018 at 04:20, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+> Hi Ard,
+>
+> On Fri, Sep 28, 2018 at 6:02 PM Ard Biesheuvel
+> <ard.biesheuvel@linaro.org> wrote:
+>> Please put comments like this below the ---
+>
+> git-notes is nice for this indeed.
+>
+>> Are these CONFIG_ symbols defined anywhere at this point?
+>
+> Yes, they're introduced in the first zinc commit. There's no git-blame
+> on git.kernel.org, presumably because it's expensive to compute, but
+> there is on my personal instance, so this might help:
+> https://git.zx2c4.com/linux-dev/blame/lib/zinc/Kconfig?h=jd/wireguard
+>
+>> In any case, I don't think these is a reason for these, at least not
+>> on ARM/arm64. The 64-bitness is implied in both cases
+>
+> You mean to say that since these nobs are def_bool y and are
+> essentially "depends on ARM", then I should just straight up use
+> CONFIG_ARM? I had thought about this, but figured this would make it
+> easier to later make these optional or have other options block them
+> need be, or even if the dependencies and requirements for having them
+> changes (for example, with UML on x86). I think doing it this way
+> gives us some flexibility later on. So if that's a compelling enough
+> reason, I'd like to keep those.
+>
 
-Yep, I've had a hard time finding a suitable implementation when I wrote
-libslz (deflate+gzip compression). Some were totally inefficient in C,
-spending their time negating the value twice for each byte because they
-were using the pre-computed tables found in literature, some were using
-optimized SIMD and I didn't understand them at all. Finally I spent some
-time studying the principle and implemented mine. Later I discovered
-that ARMv8 chips have a crc32 instruction for this which is very fast.
-I tried it and it works much faster than my C implementation. For me
-it's a perfect example of something that could go into a lib like zinc.
+Sure. But probably better to be consistent then, and stop using
+CONFIG_ARM directly in your code.
 
-> It seems like unifying the crc32 implementations at some point would
-> make sense, and since there's no usage of these as part of the crypto
-> api, providing crc32 via a vanilla function call seems reasonable.
-> It's not clear that on some strict formal level, crc32 belongs
-> anywhere near Zinc, since it's not _exactly_ in the same category...
+>> and the
+>> dependency on !CPU_32v3 you introduce (looking at the version of
+>> Kconfig at the end of the series) seems spurious to me. Was that added
+>> because of some kbuild robot report? (we don't support ARMv3 in the
+>> kernel but ARCH_RPC is built in v3 mode because of historical reasons
+>> while the actual core is a v4)
+>
+> I added the !CPU_32v3 in my development tree after posting v6, so good
+> to hear you're just looking straight at the updated tree. If you see
+> things jump out in there prior to me posting v7, don't hesitate to let
+> me know.
+>
+> The reason it was added was indeed because of:
+> https://lists.01.org/pipermail/kbuild-all/2018-September/053114.html
+> -- exactly what you suspected, ARCH_RPC. Have a better suggestion than
+> !CPU_32v3?
 
-Well, it's a hash. Not a cryptographically secure one (32 bits only)
-but definitely a hash usable (and used) for many cases. Those who need
-a hash could start with SHA2 and figure that they don't need something
-that secure since they only use 32 output bits and be fine with CRC32
-instead. So that would make sense.
+Yes, you could just add
 
-> But one could broaden the scope a bit and make the argument that this
-> general idea of accepting some bytes, doing some "pure" arithmetic
-> operations from a particular discipline on them in slightly different
-> ways depending on the architecture, and then returning some other
-> bytes, is what in essence is happening with these all of these
-> function calls, no matter their security or intended use; so if crc32
-> would benefit from being implemented using the exact same design
-> patterns, then it might as well be grouped in with the rest of Zinc.
+asflags-$(CONFIG_CPU_32v3) += -march=armv4
 
-You should avoid suggesting it like this because you may end up
-implementing addition :-) You should stick to the initial intent which
-is to implement painful and boring stuff like crypto. But when you
-see how to implement CRC32, you'll see that it's as painful to
-implement as a crypto function. You start with a reference, you're
-not satisfied and start to optimize various parts of it until you
-break it for some inputs without noticing. I'm pretty sure that it
-reminds you your own experience with some crypto functions because
-I think we've all been in that situation in this domain.
+with a comment stating that we don't actually support ARMv3 but only
+use it as a code generation target for reasons unrelated to the ISA
 
-> On the other hand, this might be a bit of a slippery slope ("are
-> compression functions next?"),
+> It seems to me like so long as the kernel has CPU_32v3 as a
+> thing in any form, I should mark Zinc as not supporting it, since
+> we'll certainly be at least v4 and up. (Do you guys have any old Acorn
+> ARM610 boxes sitting around for old time's sake at LinaroHQ? ;-)
+>
 
-I was thinking about it as well. There's a relation between crypto
-and compression, all transform intelligible information into hidden
-one in a reversable way, so the API is quite similar. One could argue
-that compression usually requires memory allocation and huge states,
-so that's probably not for the same use cases if the functions have
-to deal with memory allocations.
+AFAIK we only support the StrongARM flavor of RiscPC which is ARMv4.
+But yes, some people do care deeply about these antiquated platforms,
+including Russell, and there is no particular to leave this one
+behind.
 
-In my opinion currently we have :
-  - asymmetric crypto whose goal is to reversably encrypt/decrypt
-    in order to protect confidentiality on small data like keys,
-    or to sign in order to authenticate small data like hashes
-
-  - symmetric crypto whose goal is to protect confidentiality on
-    data blocks.
-
-  - hashes whose goal is to provide integrity of data blocks (crc32
-    fall into this category by the way)
-
-It's visible that despite using similar APIs, compression doesn't
-fit into any of these categories.
-
-> and a libcrc32.ko could just as well
-> exist as a standalone thing.
-
-Having it included could simplify exposing it as a static inline
-function when it's a single native instruction on the CPU.
-
-Just my two cents,
-Willy
+>> > +#endif
+>> > +
+>>
+>> No need to make asmlinkage declarations conditional
+>
+> Yep, addressed in the IS_ENABLED cleanup.
+>
+>>
+>> if (IS_ENABLED())
+>
+> Sorted.
+>
+>>
+>> """
+>> if (!IS_ENABLED(CONFIG_ARM))
+>>    return false;
+>>
+>> hchacha20_arm(x, derived_key);
+>> return true;
+>> """
+>>
+>> and drop the #ifdefs
+>
+> Also sorted.
+>
+> Regards,
+> Jason
