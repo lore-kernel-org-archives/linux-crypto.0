@@ -1,52 +1,57 @@
-From: Borislav Petkov <bp@alien8.de>
-Subject: Re: [PATCH net-next v6 04/23] zinc: ChaCha20 x86_64 implementation
-Date: Sat, 29 Sep 2018 10:11:18 +0200
-Message-ID: <20180929081118.GB11115@zn.tnic>
-References: <20180925145622.29959-1-Jason@zx2c4.com>
- <20180925145622.29959-5-Jason@zx2c4.com>
- <CAKv+Gu9aOiYdEzHHrHFHUFK=hNfeS=zEsvMe9OWD8hEdAYkffg@mail.gmail.com>
- <CAHmME9rc5zgN4HhBy0_oq+EbEXdS8nePzA7qW39nocx_y4ay1Q@mail.gmail.com>
- <20180929075601.GA11115@zn.tnic>
- <CAKv+Gu_jawg7R1n0qz75=H16J+WNx4aRhEsAt2WMNUkPAhD2og@mail.gmail.com>
+From: Srikanth Jampala <Jampala.Srikanth@cavium.com>
+Subject: [PATCH cryptodev-2.6 1/4] crypto: cavium/nitrox - fix warnings while printing atomic64_t types
+Date: Sat, 29 Sep 2018 13:49:07 +0530
+Message-ID: <20180929081910.17652-1-Jampala.Srikanth@cavium.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Netdev <netdev@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        David Miller <davem@davemloft.net>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Samuel Neves <sneves@dei.uc.pt>,
-        Andrew Lutomirski <luto@kernel.org>,
-        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
-        Andy Polyakov <appro@openssl.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, X86 ML <x86@kernel.org>
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Return-path: <netdev-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <CAKv+Gu_jawg7R1n0qz75=H16J+WNx4aRhEsAt2WMNUkPAhD2og@mail.gmail.com>
-Sender: netdev-owner@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        sgadam@cavium.com, Jampala.Srikanth@cavium.com,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: herbert@gondor.apana.org.au, davem@davemloft.net
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Sat, Sep 29, 2018 at 10:00:29AM +0200, Ard Biesheuvel wrote:
-> Note that this is the author of the *patch* not necessarily the author
-> of the code.
-> 
-> Anyone is free to submit patches adding code authored by others as
-> long as the author has made it available under a suitable license, and
-> this is actually the whole point of the S-o-B: you are stating to the
-> next guy that the code included in your patch was made available to
-> you under a compatible license.
+fix compilation warnings with nitrox_debugfs.c while printing
+atomic64_t types on arm64. typecast the atomic64_read() value to u64
 
-... and the actual author could be named with Originally-by or
-Co-Developed-by:, and even in free text in the commit message.
+This issue is reported by Ard Biesheuvel
 
-But the correct SOB chain denoting who handled the patch on its way up,
-is important.
+drivers/crypto/cavium/nitrox/nitrox_debugfs.c:62:30:
+warning: format ‘%lld’ expects argument of type ‘long long int’,
+         but argument 3 has type ‘long int’ [-Wformat=]
+  seq_printf(s, "  Posted: %lld\n", atomic64_read(&ndev->stats.posted));
+                              ^
+Fixes: 2a8780be9c26 (crypto: cavium/nitrox - updated debugfs information)
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Reported-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Signed-off-by: Srikanth Jampala <Jampala.Srikanth@cavium.com>
+Reviewed-by: Gadam Sreerama <sgadam@cavium.com>
+---
+ drivers/crypto/cavium/nitrox/nitrox_debugfs.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
+diff --git a/drivers/crypto/cavium/nitrox/nitrox_debugfs.c b/drivers/crypto/cavium/nitrox/nitrox_debugfs.c
+index 2f1e74ea846e..5f3cd5fafe04 100644
+--- a/drivers/crypto/cavium/nitrox/nitrox_debugfs.c
++++ b/drivers/crypto/cavium/nitrox/nitrox_debugfs.c
+@@ -59,10 +59,12 @@ static int stats_show(struct seq_file *s, void *v)
+ 	struct nitrox_device *ndev = s->private;
+ 
+ 	seq_printf(s, "NITROX [%d] Request Statistics\n", ndev->idx);
+-	seq_printf(s, "  Posted: %lld\n", atomic64_read(&ndev->stats.posted));
+-	seq_printf(s, "  Completed: %lld\n",
+-		   atomic64_read(&ndev->stats.completed));
+-	seq_printf(s, "  Dropped: %lld\n", atomic64_read(&ndev->stats.dropped));
++	seq_printf(s, "  Posted: %llu\n",
++		   (u64)atomic64_read(&ndev->stats.posted));
++	seq_printf(s, "  Completed: %llu\n",
++		   (u64)atomic64_read(&ndev->stats.completed));
++	seq_printf(s, "  Dropped: %llu\n",
++		   (u64)atomic64_read(&ndev->stats.dropped));
+ 
+ 	return 0;
+ }
 -- 
-Regards/Gruss,
-    Boris.
-
-Good mailing practices for 400: avoid top-posting and trim the reply.
+2.17.1
