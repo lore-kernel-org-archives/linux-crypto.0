@@ -1,7 +1,7 @@
 From: Srikanth Jampala <Jampala.Srikanth@cavium.com>
-Subject: [PATCH cryptodev-2.6 3/4] crypto: cavium/nitrox - NITROX command queue changes.
-Date: Sat, 29 Sep 2018 13:49:09 +0530
-Message-ID: <20180929081910.17652-3-Jampala.Srikanth@cavium.com>
+Subject: [PATCH cryptodev-2.6 4/4] crypto: cavium/nitrox - use pci_alloc_irq_vectors() while enabling MSI-X.
+Date: Sat, 29 Sep 2018 13:49:10 +0530
+Message-ID: <20180929081910.17652-4-Jampala.Srikanth@cavium.com>
 References: <20180929081910.17652-1-Jampala.Srikanth@cavium.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -13,399 +13,685 @@ In-Reply-To: <20180929081910.17652-1-Jampala.Srikanth@cavium.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Use node based allocations for queues. consider the dma address
-alignment changes, while calculating the queue base address.
-added checks in cleanup functions. Minor changes to queue variable names
+replace pci_enable_msix_exact() with pci_alloc_irq_vectors(). get the
+required vector count from pci_msix_vec_count().
+use struct nitrox_q_vector as the argument to tasklets.
 
 Signed-off-by: Srikanth Jampala <Jampala.Srikanth@cavium.com>
 Reviewed-by: Gadam Sreerama <sgadam@cavium.com>
 ---
- drivers/crypto/cavium/nitrox/nitrox_dev.h    | 55 ++++++------
- drivers/crypto/cavium/nitrox/nitrox_hal.c    |  2 +-
- drivers/crypto/cavium/nitrox/nitrox_isr.c    |  2 +-
- drivers/crypto/cavium/nitrox/nitrox_lib.c    | 90 +++++++++++---------
- drivers/crypto/cavium/nitrox/nitrox_reqmgr.c | 24 +++---
- 5 files changed, 94 insertions(+), 79 deletions(-)
+ drivers/crypto/cavium/nitrox/nitrox_common.h |   5 +-
+ drivers/crypto/cavium/nitrox/nitrox_dev.h    |  44 +--
+ drivers/crypto/cavium/nitrox/nitrox_isr.c    | 336 +++++++------------
+ drivers/crypto/cavium/nitrox/nitrox_isr.h    |  10 +
+ drivers/crypto/cavium/nitrox/nitrox_lib.c    |   4 +
+ drivers/crypto/cavium/nitrox/nitrox_main.c   |   5 +-
+ drivers/crypto/cavium/nitrox/nitrox_reqmgr.c |  16 +-
+ drivers/crypto/cavium/nitrox/nitrox_sriov.c  |   5 +-
+ 8 files changed, 162 insertions(+), 263 deletions(-)
+ create mode 100644 drivers/crypto/cavium/nitrox/nitrox_isr.h
 
+diff --git a/drivers/crypto/cavium/nitrox/nitrox_common.h b/drivers/crypto/cavium/nitrox/nitrox_common.h
+index 00ef931115da..863143a8336b 100644
+--- a/drivers/crypto/cavium/nitrox/nitrox_common.h
++++ b/drivers/crypto/cavium/nitrox/nitrox_common.h
+@@ -12,13 +12,10 @@ void crypto_free_context(void *ctx);
+ struct nitrox_device *nitrox_get_first_device(void);
+ void nitrox_put_device(struct nitrox_device *ndev);
+ 
+-void nitrox_pf_cleanup_isr(struct nitrox_device *ndev);
+-int nitrox_pf_init_isr(struct nitrox_device *ndev);
+-
+ int nitrox_common_sw_init(struct nitrox_device *ndev);
+ void nitrox_common_sw_cleanup(struct nitrox_device *ndev);
+ 
+-void pkt_slc_resp_handler(unsigned long data);
++void pkt_slc_resp_tasklet(unsigned long data);
+ int nitrox_process_se_request(struct nitrox_device *ndev,
+ 			      struct se_crypto_request *req,
+ 			      completion_t cb,
 diff --git a/drivers/crypto/cavium/nitrox/nitrox_dev.h b/drivers/crypto/cavium/nitrox/nitrox_dev.h
-index abb5c8ac54e5..62fb75923bfe 100644
+index 62fb75923bfe..283e252385fb 100644
 --- a/drivers/crypto/cavium/nitrox/nitrox_dev.h
 +++ b/drivers/crypto/cavium/nitrox/nitrox_dev.h
-@@ -9,44 +9,51 @@
- 
- #define VERSION_LEN 32
- 
-+/**
-+ * struct nitrox_cmdq - NITROX command queue
-+ * @cmd_qlock: command queue lock
-+ * @resp_qlock: response queue lock
-+ * @backlog_qlock: backlog queue lock
-+ * @ndev: NITROX device
-+ * @response_head: submitted request list
-+ * @backlog_head: backlog queue
-+ * @dbell_csr_addr: doorbell register address for this queue
-+ * @base: command queue base address
-+ * @dma: dma address of the base
-+ * @pending_count: request pending at device
-+ * @backlog_count: backlog request count
-+ * @write_idx: next write index for the command
-+ * @instr_size: command size
-+ * @qno: command queue number
-+ * @qsize: command queue size
-+ * @unalign_base: unaligned base address
-+ * @unalign_dma: unaligned dma address
-+ */
- struct nitrox_cmdq {
--	/* command queue lock */
--	spinlock_t cmdq_lock;
--	/* response list lock */
--	spinlock_t response_lock;
--	/* backlog list lock */
--	spinlock_t backlog_lock;
--
--	/* request submitted to chip, in progress */
-+	spinlock_t cmd_qlock;
-+	spinlock_t resp_qlock;
-+	spinlock_t backlog_qlock;
-+
-+	struct nitrox_device *ndev;
- 	struct list_head response_head;
--	/* hw queue full, hold in backlog list */
+@@ -18,6 +18,7 @@
+  * @response_head: submitted request list
+  * @backlog_head: backlog queue
+  * @dbell_csr_addr: doorbell register address for this queue
++ * @compl_cnt_csr_addr: completion count register address of the slc port
+  * @base: command queue base address
+  * @dma: dma address of the base
+  * @pending_count: request pending at device
+@@ -39,6 +40,7 @@ struct nitrox_cmdq {
  	struct list_head backlog_head;
  
--	/* doorbell address */
  	u8 __iomem *dbell_csr_addr;
--	/* base address of the queue */
--	u8 *head;
-+	u8 *base;
-+	dma_addr_t dma;
++	u8 __iomem *compl_cnt_csr_addr;
+ 	u8 *base;
+ 	dma_addr_t dma;
  
--	struct nitrox_device *ndev;
--	/* flush pending backlog commands */
- 	struct work_struct backlog_qflush;
- 
--	/* requests posted waiting for completion */
- 	atomic_t pending_count;
--	/* requests in backlog queues */
- 	atomic_t backlog_count;
- 
- 	int write_idx;
--	/* command size 32B/64B */
- 	u8 instr_size;
- 	u8 qno;
- 	u32 qsize;
- 
--	/* unaligned addresses */
--	u8 *head_unaligned;
--	dma_addr_t dma_unaligned;
--	/* dma address of the base */
--	dma_addr_t dma;
-+	u8 *unalign_base;
-+	dma_addr_t unalign_dma;
+@@ -88,30 +90,17 @@ struct nitrox_stats {
+ 	atomic64_t dropped;
  };
  
- /**
-@@ -152,7 +159,7 @@ enum vf_mode {
-  * @nr_queues: Number of command queues
+-#define MAX_MSIX_VECTOR_NAME	20
+-/**
+- * vectors for queues (64 AE, 64 SE and 64 ZIP) and
+- * error condition/mailbox.
+- */
+-#define MAX_MSIX_VECTORS	192
+-
+-struct nitrox_msix {
+-	struct msix_entry *entries;
+-	char **names;
+-	DECLARE_BITMAP(irqs, MAX_MSIX_VECTORS);
+-	u32 nr_entries;
+-};
+-
+-struct bh_data {
+-	/* slc port completion count address */
+-	u8 __iomem *completion_cnt_csr_addr;
+-
+-	struct nitrox_cmdq *cmdq;
+-	struct tasklet_struct resp_handler;
+-};
+-
+-struct nitrox_bh {
+-	struct bh_data *slc;
++#define IRQ_NAMESZ	32
++
++struct nitrox_q_vector {
++	char name[IRQ_NAMESZ];
++	bool valid;
++	int ring;
++	struct tasklet_struct resp_tasklet;
++	union {
++		struct nitrox_cmdq *cmdq;
++		struct nitrox_device *ndev;
++	};
+ };
+ 
+ /*
+@@ -160,8 +149,7 @@ enum vf_mode {
   * @mode: Device mode PF/VF
   * @ctx_pool: DMA pool for crypto context
-- * @pkt_cmdqs: SE Command queues
-+ * @pkt_inq: Packet input rings
-  * @msix: MSI-X information
-  * @bh: post processing work
+  * @pkt_inq: Packet input rings
+- * @msix: MSI-X information
+- * @bh: post processing work
++ * @qvec: MSI-X queue vectors information
   * @hw: hardware information
-@@ -177,7 +184,7 @@ struct nitrox_device {
- 	enum vf_mode mode;
- 
+  * @debugfs_dir: debugfs directory
+  */
+@@ -186,8 +174,8 @@ struct nitrox_device {
  	struct dma_pool *ctx_pool;
--	struct nitrox_cmdq *pkt_cmdqs;
-+	struct nitrox_cmdq *pkt_inq;
+ 	struct nitrox_cmdq *pkt_inq;
  
- 	struct nitrox_msix msix;
- 	struct nitrox_bh bh;
-diff --git a/drivers/crypto/cavium/nitrox/nitrox_hal.c b/drivers/crypto/cavium/nitrox/nitrox_hal.c
-index 4627a1976176..a9b82387cf53 100644
---- a/drivers/crypto/cavium/nitrox/nitrox_hal.c
-+++ b/drivers/crypto/cavium/nitrox/nitrox_hal.c
-@@ -119,7 +119,7 @@ void nitrox_config_pkt_input_rings(struct nitrox_device *ndev)
- 	int i;
+-	struct nitrox_msix msix;
+-	struct nitrox_bh bh;
++	struct nitrox_q_vector *qvec;
++	int num_vecs;
  
- 	for (i = 0; i < ndev->nr_queues; i++) {
--		struct nitrox_cmdq *cmdq = &ndev->pkt_cmdqs[i];
-+		struct nitrox_cmdq *cmdq = &ndev->pkt_inq[i];
- 		union nps_pkt_in_instr_rsize pkt_in_rsize;
- 		u64 offset;
- 
+ 	struct nitrox_stats stats;
+ 	struct nitrox_hw hw;
 diff --git a/drivers/crypto/cavium/nitrox/nitrox_isr.c b/drivers/crypto/cavium/nitrox/nitrox_isr.c
-index 4f4334929f35..baeacacbddbe 100644
+index baeacacbddbe..88a77b8fb3fb 100644
 --- a/drivers/crypto/cavium/nitrox/nitrox_isr.c
 +++ b/drivers/crypto/cavium/nitrox/nitrox_isr.c
-@@ -335,7 +335,7 @@ static int nitrox_setup_pkt_slc_bh(struct nitrox_device *ndev)
- 		offset = NPS_PKT_SLC_CNTSX(i);
- 		/* pre calculate completion count address */
- 		bh->completion_cnt_csr_addr = NITROX_CSR_ADDR(ndev, offset);
--		bh->cmdq = &ndev->pkt_cmdqs[i];
-+		bh->cmdq = &ndev->pkt_inq[i];
+@@ -8,8 +8,14 @@
+ #include "nitrox_common.h"
+ #include "nitrox_hal.h"
  
- 		tasklet_init(&bh->resp_handler, pkt_slc_resp_handler,
- 			     (unsigned long)bh);
-diff --git a/drivers/crypto/cavium/nitrox/nitrox_lib.c b/drivers/crypto/cavium/nitrox/nitrox_lib.c
-index 7a721c7c12a4..ed08aa9380ee 100644
---- a/drivers/crypto/cavium/nitrox/nitrox_lib.c
-+++ b/drivers/crypto/cavium/nitrox/nitrox_lib.c
-@@ -17,30 +17,27 @@
++/**
++ * One vector for each type of ring
++ *  - NPS packet ring, AQMQ ring and ZQMQ ring
++ */
+ #define NR_RING_VECTORS 3
+-#define NPS_CORE_INT_ACTIVE_ENTRY 192
++/* base entry for packet ring/port */
++#define PKT_RING_MSIX_BASE 0
++#define NON_RING_MSIX_BASE 192
  
- #define CRYPTO_CTX_SIZE	256
- 
--/* command queue alignments */
--#define PKT_IN_ALIGN	16
-+/* packet inuput ring alignments */
-+#define PKTIN_Q_ALIGN_BYTES 16
- 
--static int cmdq_common_init(struct nitrox_cmdq *cmdq)
-+static int nitrox_cmdq_init(struct nitrox_cmdq *cmdq, int align_bytes)
+ /**
+  * nps_pkt_slc_isr - IRQ handler for NPS solicit port
+@@ -18,13 +24,14 @@
+  */
+ static irqreturn_t nps_pkt_slc_isr(int irq, void *data)
  {
- 	struct nitrox_device *ndev = cmdq->ndev;
--	u32 qsize;
--
--	qsize = (ndev->qlen) * cmdq->instr_size;
--	cmdq->head_unaligned = dma_zalloc_coherent(DEV(ndev),
--						   (qsize + PKT_IN_ALIGN),
--						   &cmdq->dma_unaligned,
--						   GFP_KERNEL);
--	if (!cmdq->head_unaligned)
-+
-+	cmdq->qsize = (ndev->qlen * cmdq->instr_size) + align_bytes;
-+	cmdq->unalign_base = dma_zalloc_coherent(DEV(ndev), cmdq->qsize,
-+						 &cmdq->unalign_dma,
-+						 GFP_KERNEL);
-+	if (!cmdq->unalign_base)
- 		return -ENOMEM;
+-	struct bh_data *slc = data;
+-	union nps_pkt_slc_cnts pkt_slc_cnts;
++	struct nitrox_q_vector *qvec = data;
++	union nps_pkt_slc_cnts slc_cnts;
++	struct nitrox_cmdq *cmdq = qvec->cmdq;
  
--	cmdq->head = PTR_ALIGN(cmdq->head_unaligned, PKT_IN_ALIGN);
--	cmdq->dma = PTR_ALIGN(cmdq->dma_unaligned, PKT_IN_ALIGN);
--	cmdq->qsize = (qsize + PKT_IN_ALIGN);
-+	cmdq->dma = PTR_ALIGN(cmdq->unalign_dma, align_bytes);
-+	cmdq->base = cmdq->unalign_base + (cmdq->dma - cmdq->unalign_dma);
- 	cmdq->write_idx = 0;
+-	pkt_slc_cnts.value = readq(slc->completion_cnt_csr_addr);
++	slc_cnts.value = readq(cmdq->compl_cnt_csr_addr);
+ 	/* New packet on SLC output port */
+-	if (pkt_slc_cnts.s.slc_int)
+-		tasklet_hi_schedule(&slc->resp_handler);
++	if (slc_cnts.s.slc_int)
++		tasklet_hi_schedule(&qvec->resp_tasklet);
  
--	spin_lock_init(&cmdq->response_lock);
--	spin_lock_init(&cmdq->cmdq_lock);
--	spin_lock_init(&cmdq->backlog_lock);
-+	spin_lock_init(&cmdq->cmd_qlock);
-+	spin_lock_init(&cmdq->resp_qlock);
-+	spin_lock_init(&cmdq->backlog_qlock);
- 
- 	INIT_LIST_HEAD(&cmdq->response_head);
- 	INIT_LIST_HEAD(&cmdq->backlog_head);
-@@ -51,68 +48,79 @@ static int cmdq_common_init(struct nitrox_cmdq *cmdq)
- 	return 0;
+ 	return IRQ_HANDLED;
+ }
+@@ -191,165 +198,92 @@ static void clear_bmi_err_intr(struct nitrox_device *ndev)
+ 	dev_err_ratelimited(DEV(ndev), "BMI_INT  0x%016llx\n", value);
  }
  
--static void cmdq_common_cleanup(struct nitrox_cmdq *cmdq)
-+static void nitrox_cmdq_reset(struct nitrox_cmdq *cmdq)
++static void nps_core_int_tasklet(unsigned long data)
 +{
-+	cmdq->write_idx = 0;
-+	atomic_set(&cmdq->pending_count, 0);
-+	atomic_set(&cmdq->backlog_count, 0);
++	struct nitrox_q_vector *qvec = (void *)(uintptr_t)(data);
++	struct nitrox_device *ndev = qvec->ndev;
++
++	/* if pf mode do queue recovery */
++	if (ndev->mode == __NDEV_MODE_PF) {
++	} else {
++		/**
++		 * if VF(s) enabled communicate the error information
++		 * to VF(s)
++		 */
++	}
 +}
 +
-+static void nitrox_cmdq_cleanup(struct nitrox_cmdq *cmdq)
+ /**
+- * clear_nps_core_int_active - clear NPS_CORE_INT_ACTIVE interrupts
+- * @ndev: NITROX device
++ * nps_core_int_isr - interrupt handler for NITROX errors and
++ *   mailbox communication
+  */
+-static void clear_nps_core_int_active(struct nitrox_device *ndev)
++static irqreturn_t nps_core_int_isr(int irq, void *data)
  {
- 	struct nitrox_device *ndev = cmdq->ndev;
+-	union nps_core_int_active core_int_active;
++	struct nitrox_device *ndev = data;
++	union nps_core_int_active core_int;
  
-+	if (!cmdq->unalign_base)
-+		return;
-+
- 	cancel_work_sync(&cmdq->backlog_qflush);
+-	core_int_active.value = nitrox_read_csr(ndev, NPS_CORE_INT_ACTIVE);
++	core_int.value = nitrox_read_csr(ndev, NPS_CORE_INT_ACTIVE);
  
- 	dma_free_coherent(DEV(ndev), cmdq->qsize,
--			  cmdq->head_unaligned, cmdq->dma_unaligned);
+-	if (core_int_active.s.nps_core)
++	if (core_int.s.nps_core)
+ 		clear_nps_core_err_intr(ndev);
+ 
+-	if (core_int_active.s.nps_pkt)
++	if (core_int.s.nps_pkt)
+ 		clear_nps_pkt_err_intr(ndev);
+ 
+-	if (core_int_active.s.pom)
++	if (core_int.s.pom)
+ 		clear_pom_err_intr(ndev);
+ 
+-	if (core_int_active.s.pem)
++	if (core_int.s.pem)
+ 		clear_pem_err_intr(ndev);
+ 
+-	if (core_int_active.s.lbc)
++	if (core_int.s.lbc)
+ 		clear_lbc_err_intr(ndev);
+ 
+-	if (core_int_active.s.efl)
++	if (core_int.s.efl)
+ 		clear_efl_err_intr(ndev);
+ 
+-	if (core_int_active.s.bmi)
++	if (core_int.s.bmi)
+ 		clear_bmi_err_intr(ndev);
+ 
+ 	/* If more work callback the ISR, set resend */
+-	core_int_active.s.resend = 1;
+-	nitrox_write_csr(ndev, NPS_CORE_INT_ACTIVE, core_int_active.value);
+-}
 -
--	atomic_set(&cmdq->pending_count, 0);
--	atomic_set(&cmdq->backlog_count, 0);
-+			  cmdq->unalign_base, cmdq->unalign_dma);
-+	nitrox_cmdq_reset(cmdq);
+-static irqreturn_t nps_core_int_isr(int irq, void *data)
+-{
+-	struct nitrox_device *ndev = data;
+-
+-	clear_nps_core_int_active(ndev);
++	core_int.s.resend = 1;
++	nitrox_write_csr(ndev, NPS_CORE_INT_ACTIVE, core_int.value);
  
- 	cmdq->dbell_csr_addr = NULL;
--	cmdq->head = NULL;
-+	cmdq->unalign_base = NULL;
-+	cmdq->base = NULL;
-+	cmdq->unalign_dma = 0;
- 	cmdq->dma = 0;
- 	cmdq->qsize = 0;
- 	cmdq->instr_size = 0;
+ 	return IRQ_HANDLED;
  }
  
--static void nitrox_cleanup_pkt_cmdqs(struct nitrox_device *ndev)
-+static void nitrox_free_pktin_queues(struct nitrox_device *ndev)
+-static int nitrox_enable_msix(struct nitrox_device *ndev)
++void nitrox_unregister_interrupts(struct nitrox_device *ndev)
  {
+-	struct msix_entry *entries;
+-	char **names;
+-	int i, nr_entries, ret;
+-
+-	/*
+-	 * PF MSI-X vectors
+-	 *
+-	 * Entry 0: NPS PKT ring 0
+-	 * Entry 1: AQMQ ring 0
+-	 * Entry 2: ZQM ring 0
+-	 * Entry 3: NPS PKT ring 1
+-	 * Entry 4: AQMQ ring 1
+-	 * Entry 5: ZQM ring 1
+-	 * ....
+-	 * Entry 192: NPS_CORE_INT_ACTIVE
+-	 */
+-	nr_entries = (ndev->nr_queues * NR_RING_VECTORS) + 1;
+-	entries = kcalloc_node(nr_entries, sizeof(struct msix_entry),
+-			       GFP_KERNEL, ndev->node);
+-	if (!entries)
+-		return -ENOMEM;
+-
+-	names = kcalloc(nr_entries, sizeof(char *), GFP_KERNEL);
+-	if (!names) {
+-		kfree(entries);
+-		return -ENOMEM;
+-	}
+-
+-	/* fill entires */
+-	for (i = 0; i < (nr_entries - 1); i++)
+-		entries[i].entry = i;
+-
+-	entries[i].entry = NPS_CORE_INT_ACTIVE_ENTRY;
+-
+-	for (i = 0; i < nr_entries; i++) {
+-		*(names + i) = kzalloc(MAX_MSIX_VECTOR_NAME, GFP_KERNEL);
+-		if (!(*(names + i))) {
+-			ret = -ENOMEM;
+-			goto msix_fail;
+-		}
+-	}
+-	ndev->msix.entries = entries;
+-	ndev->msix.names = names;
+-	ndev->msix.nr_entries = nr_entries;
+-
+-	ret = pci_enable_msix_exact(ndev->pdev, ndev->msix.entries,
+-				    ndev->msix.nr_entries);
+-	if (ret) {
+-		dev_err(&ndev->pdev->dev, "Failed to enable MSI-X IRQ(s) %d\n",
+-			ret);
+-		goto msix_fail;
+-	}
+-	return 0;
+-
+-msix_fail:
+-	for (i = 0; i < nr_entries; i++)
+-		kfree(*(names + i));
+-
+-	kfree(entries);
+-	kfree(names);
+-	return ret;
+-}
+-
+-static void nitrox_cleanup_pkt_slc_bh(struct nitrox_device *ndev)
+-{
+-	int i;
+-
+-	if (!ndev->bh.slc)
+-		return;
+-
+-	for (i = 0; i < ndev->nr_queues; i++) {
+-		struct bh_data *bh = &ndev->bh.slc[i];
+-
+-		tasklet_disable(&bh->resp_handler);
+-		tasklet_kill(&bh->resp_handler);
+-	}
+-	kfree(ndev->bh.slc);
+-	ndev->bh.slc = NULL;
+-}
+-
+-static int nitrox_setup_pkt_slc_bh(struct nitrox_device *ndev)
+-{
+-	u32 size;
++	struct pci_dev *pdev = ndev->pdev;
  	int i;
  
- 	for (i = 0; i < ndev->nr_queues; i++) {
--		struct nitrox_cmdq *cmdq = &ndev->pkt_cmdqs[i];
-+		struct nitrox_cmdq *cmdq = &ndev->pkt_inq[i];
+-	size = ndev->nr_queues * sizeof(struct bh_data);
+-	ndev->bh.slc = kzalloc(size, GFP_KERNEL);
+-	if (!ndev->bh.slc)
+-		return -ENOMEM;
++	for (i = 0; i < ndev->num_vecs; i++) {
++		struct nitrox_q_vector *qvec;
++		int vec;
  
--		cmdq_common_cleanup(cmdq);
-+		nitrox_cmdq_cleanup(cmdq);
+-	for (i = 0; i < ndev->nr_queues; i++) {
+-		struct bh_data *bh = &ndev->bh.slc[i];
+-		u64 offset;
++		qvec = ndev->qvec + i;
++		if (!qvec->valid)
++			continue;
+ 
+-		offset = NPS_PKT_SLC_CNTSX(i);
+-		/* pre calculate completion count address */
+-		bh->completion_cnt_csr_addr = NITROX_CSR_ADDR(ndev, offset);
+-		bh->cmdq = &ndev->pkt_inq[i];
++		/* get the vector number */
++		vec = pci_irq_vector(pdev, i);
++		irq_set_affinity_hint(vec, NULL);
++		free_irq(vec, qvec);
+ 
+-		tasklet_init(&bh->resp_handler, pkt_slc_resp_handler,
+-			     (unsigned long)bh);
++		tasklet_disable(&qvec->resp_tasklet);
++		tasklet_kill(&qvec->resp_tasklet);
++		qvec->valid = false;
  	}
--	kfree(ndev->pkt_cmdqs);
--	ndev->pkt_cmdqs = NULL;
-+	kfree(ndev->pkt_inq);
-+	ndev->pkt_inq = NULL;
+-
+-	return 0;
++	kfree(ndev->qvec);
++	pci_free_irq_vectors(pdev);
  }
  
--static int nitrox_init_pkt_cmdqs(struct nitrox_device *ndev)
-+static int nitrox_alloc_pktin_queues(struct nitrox_device *ndev)
+-static int nitrox_request_irqs(struct nitrox_device *ndev)
++int nitrox_register_interrupts(struct nitrox_device *ndev)
  {
--	int i, err, size;
-+	int i, err;
+ 	struct pci_dev *pdev = ndev->pdev;
+-	struct msix_entry *msix_ent = ndev->msix.entries;
+-	int nr_ring_vectors, i = 0, ring, cpu, ret;
+-	char *name;
++	struct nitrox_q_vector *qvec;
++	int nr_vecs, vec, cpu;
++	int ret, i;
  
--	size = ndev->nr_queues * sizeof(struct nitrox_cmdq);
--	ndev->pkt_cmdqs = kzalloc(size, GFP_KERNEL);
--	if (!ndev->pkt_cmdqs)
-+	ndev->pkt_inq = kcalloc_node(ndev->nr_queues,
-+				     sizeof(struct nitrox_cmdq),
-+				     GFP_KERNEL, ndev->node);
-+	if (!ndev->pkt_inq)
- 		return -ENOMEM;
+ 	/*
+ 	 * PF MSI-X vectors
+@@ -358,112 +292,76 @@ static int nitrox_request_irqs(struct nitrox_device *ndev)
+ 	 * Entry 1: AQMQ ring 0
+ 	 * Entry 2: ZQM ring 0
+ 	 * Entry 3: NPS PKT ring 1
++	 * Entry 4: AQMQ ring 1
++	 * Entry 5: ZQM ring 1
+ 	 * ....
+ 	 * Entry 192: NPS_CORE_INT_ACTIVE
+ 	 */
+-	nr_ring_vectors = ndev->nr_queues * NR_RING_VECTORS;
+-
+-	/* request irq for pkt ring/ports only */
+-	while (i < nr_ring_vectors) {
+-		name = *(ndev->msix.names + i);
+-		ring = (i / NR_RING_VECTORS);
+-		snprintf(name, MAX_MSIX_VECTOR_NAME, "n5(%d)-slc-ring%d",
+-			 ndev->idx, ring);
++	nr_vecs = pci_msix_vec_count(pdev);
  
- 	for (i = 0; i < ndev->nr_queues; i++) {
- 		struct nitrox_cmdq *cmdq;
- 		u64 offset;
- 
--		cmdq = &ndev->pkt_cmdqs[i];
-+		cmdq = &ndev->pkt_inq[i];
- 		cmdq->ndev = ndev;
- 		cmdq->qno = i;
- 		cmdq->instr_size = sizeof(struct nps_pkt_instr);
- 
-+		/* packet input ring doorbell address */
- 		offset = NPS_PKT_IN_INSTR_BAOFF_DBELLX(i);
--		/* SE ring doorbell address for this queue */
- 		cmdq->dbell_csr_addr = NITROX_CSR_ADDR(ndev, offset);
- 
--		err = cmdq_common_init(cmdq);
-+		err = nitrox_cmdq_init(cmdq, PKTIN_Q_ALIGN_BYTES);
- 		if (err)
--			goto pkt_cmdq_fail;
-+			goto pktq_fail;
+-		ret = request_irq(msix_ent[i].vector, nps_pkt_slc_isr, 0,
+-				  name, &ndev->bh.slc[ring]);
+-		if (ret) {
+-			dev_err(&pdev->dev, "failed to get irq %d for %s\n",
+-				msix_ent[i].vector, name);
+-			return ret;
+-		}
+-		cpu = ring % num_online_cpus();
+-		irq_set_affinity_hint(msix_ent[i].vector, get_cpu_mask(cpu));
+-
+-		set_bit(i, ndev->msix.irqs);
+-		i += NR_RING_VECTORS;
+-	}
+-
+-	/* Request IRQ for NPS_CORE_INT_ACTIVE */
+-	name = *(ndev->msix.names + i);
+-	snprintf(name, MAX_MSIX_VECTOR_NAME, "n5(%d)-nps-core-int", ndev->idx);
+-	ret = request_irq(msix_ent[i].vector, nps_core_int_isr, 0, name, ndev);
+-	if (ret) {
+-		dev_err(&pdev->dev, "failed to get irq %d for %s\n",
+-			msix_ent[i].vector, name);
++	/* Enable MSI-X */
++	ret = pci_alloc_irq_vectors(pdev, nr_vecs, nr_vecs, PCI_IRQ_MSIX);
++	if (ret < 0) {
++		dev_err(DEV(ndev), "msix vectors %d alloc failed\n", nr_vecs);
+ 		return ret;
  	}
+-	set_bit(i, ndev->msix.irqs);
++	ndev->num_vecs = nr_vecs;
+ 
+-	return 0;
+-}
+-
+-static void nitrox_disable_msix(struct nitrox_device *ndev)
+-{
+-	struct msix_entry *msix_ent = ndev->msix.entries;
+-	char **names = ndev->msix.names;
+-	int i = 0, ring, nr_ring_vectors;
+-
+-	nr_ring_vectors = ndev->msix.nr_entries - 1;
+-
+-	/* clear pkt ring irqs */
+-	while (i < nr_ring_vectors) {
+-		if (test_and_clear_bit(i, ndev->msix.irqs)) {
+-			ring = (i / NR_RING_VECTORS);
+-			irq_set_affinity_hint(msix_ent[i].vector, NULL);
+-			free_irq(msix_ent[i].vector, &ndev->bh.slc[ring]);
+-		}
+-		i += NR_RING_VECTORS;
++	ndev->qvec = kcalloc(nr_vecs, sizeof(*qvec), GFP_KERNEL);
++	if (!ndev->qvec) {
++		pci_free_irq_vectors(pdev);
++		return -ENOMEM;
+ 	}
+-	irq_set_affinity_hint(msix_ent[i].vector, NULL);
+-	free_irq(msix_ent[i].vector, ndev);
+-	clear_bit(i, ndev->msix.irqs);
+ 
+-	kfree(ndev->msix.entries);
+-	for (i = 0; i < ndev->msix.nr_entries; i++)
+-		kfree(*(names + i));
++	/* request irqs for packet rings/ports */
++	for (i = PKT_RING_MSIX_BASE; i < (nr_vecs - 1); i += NR_RING_VECTORS) {
++		qvec = &ndev->qvec[i];
+ 
+-	kfree(names);
+-	pci_disable_msix(ndev->pdev);
+-}
+-
+-/**
+- * nitrox_pf_cleanup_isr: Cleanup PF MSI-X and IRQ
+- * @ndev: NITROX device
+- */
+-void nitrox_pf_cleanup_isr(struct nitrox_device *ndev)
+-{
+-	nitrox_disable_msix(ndev);
+-	nitrox_cleanup_pkt_slc_bh(ndev);
+-}
++		qvec->ring = i / NR_RING_VECTORS;
++		if (qvec->ring >= ndev->nr_queues)
++			break;
+ 
+-/**
+- * nitrox_init_isr - Initialize PF MSI-X vectors and IRQ
+- * @ndev: NITROX device
+- *
+- * Return: 0 on success, a negative value on failure.
+- */
+-int nitrox_pf_init_isr(struct nitrox_device *ndev)
+-{
+-	int err;
++		snprintf(qvec->name, IRQ_NAMESZ, "nitrox-pkt%d", qvec->ring);
++		/* get the vector number */
++		vec = pci_irq_vector(pdev, i);
++		ret = request_irq(vec, nps_pkt_slc_isr, 0, qvec->name, qvec);
++		if (ret) {
++			dev_err(DEV(ndev), "irq failed for pkt ring/port%d\n",
++				qvec->ring);
++			goto irq_fail;
++		}
++		cpu = qvec->ring % num_online_cpus();
++		irq_set_affinity_hint(vec, get_cpu_mask(cpu));
+ 
+-	err = nitrox_setup_pkt_slc_bh(ndev);
+-	if (err)
+-		return err;
++		tasklet_init(&qvec->resp_tasklet, pkt_slc_resp_tasklet,
++			     (unsigned long)qvec);
++		qvec->cmdq = &ndev->pkt_inq[qvec->ring];
++		qvec->valid = true;
++	}
+ 
+-	err = nitrox_enable_msix(ndev);
+-	if (err)
+-		goto msix_fail;
++	/* request irqs for non ring vectors */
++	i = NON_RING_MSIX_BASE;
++	qvec = &ndev->qvec[i];
+ 
+-	err = nitrox_request_irqs(ndev);
+-	if (err)
++	snprintf(qvec->name, IRQ_NAMESZ, "nitrox-core-int%d", i);
++	/* get the vector number */
++	vec = pci_irq_vector(pdev, i);
++	ret = request_irq(vec, nps_core_int_isr, 0, qvec->name, qvec);
++	if (ret) {
++		dev_err(DEV(ndev), "irq failed for nitrox-core-int%d\n", i);
+ 		goto irq_fail;
++	}
++	cpu = num_online_cpus();
++	irq_set_affinity_hint(vec, get_cpu_mask(cpu));
++
++	tasklet_init(&qvec->resp_tasklet, nps_core_int_tasklet,
++		     (unsigned long)qvec);
++	qvec->ndev = ndev;
++	qvec->valid = true;
+ 
  	return 0;
  
--pkt_cmdq_fail:
--	nitrox_cleanup_pkt_cmdqs(ndev);
-+pktq_fail:
-+	nitrox_free_pktin_queues(ndev);
- 	return err;
+ irq_fail:
+-	nitrox_disable_msix(ndev);
+-msix_fail:
+-	nitrox_cleanup_pkt_slc_bh(ndev);
+-	return err;
++	nitrox_unregister_interrupts(ndev);
++	return ret;
  }
+diff --git a/drivers/crypto/cavium/nitrox/nitrox_isr.h b/drivers/crypto/cavium/nitrox/nitrox_isr.h
+new file mode 100644
+index 000000000000..63418a6cc52c
+--- /dev/null
++++ b/drivers/crypto/cavium/nitrox/nitrox_isr.h
+@@ -0,0 +1,10 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#ifndef __NITROX_ISR_H
++#define __NITROX_ISR_H
++
++#include "nitrox_dev.h"
++
++int nitrox_register_interrupts(struct nitrox_device *ndev);
++void nitrox_unregister_interrupts(struct nitrox_device *ndev);
++
++#endif /* __NITROX_ISR_H */
+diff --git a/drivers/crypto/cavium/nitrox/nitrox_lib.c b/drivers/crypto/cavium/nitrox/nitrox_lib.c
+index ed08aa9380ee..2260efa42308 100644
+--- a/drivers/crypto/cavium/nitrox/nitrox_lib.c
++++ b/drivers/crypto/cavium/nitrox/nitrox_lib.c
+@@ -69,6 +69,7 @@ static void nitrox_cmdq_cleanup(struct nitrox_cmdq *cmdq)
+ 	nitrox_cmdq_reset(cmdq);
  
-@@ -194,7 +202,7 @@ int nitrox_common_sw_init(struct nitrox_device *ndev)
+ 	cmdq->dbell_csr_addr = NULL;
++	cmdq->compl_cnt_csr_addr = NULL;
+ 	cmdq->unalign_base = NULL;
+ 	cmdq->base = NULL;
+ 	cmdq->unalign_dma = 0;
+@@ -112,6 +113,9 @@ static int nitrox_alloc_pktin_queues(struct nitrox_device *ndev)
+ 		/* packet input ring doorbell address */
+ 		offset = NPS_PKT_IN_INSTR_BAOFF_DBELLX(i);
+ 		cmdq->dbell_csr_addr = NITROX_CSR_ADDR(ndev, offset);
++		/* packet solicit port completion count address */
++		offset = NPS_PKT_SLC_CNTSX(i);
++		cmdq->compl_cnt_csr_addr = NITROX_CSR_ADDR(ndev, offset);
+ 
+ 		err = nitrox_cmdq_init(cmdq, PKTIN_Q_ALIGN_BYTES);
+ 		if (err)
+diff --git a/drivers/crypto/cavium/nitrox/nitrox_main.c b/drivers/crypto/cavium/nitrox/nitrox_main.c
+index 13436ca98cb5..6595c95af9f1 100644
+--- a/drivers/crypto/cavium/nitrox/nitrox_main.c
++++ b/drivers/crypto/cavium/nitrox/nitrox_main.c
+@@ -12,6 +12,7 @@
+ #include "nitrox_common.h"
+ #include "nitrox_csr.h"
+ #include "nitrox_hal.h"
++#include "nitrox_isr.h"
+ 
+ #define CNN55XX_DEV_ID	0x12
+ #define MAX_PF_QUEUES	64
+@@ -244,7 +245,7 @@ static int nitrox_pf_sw_init(struct nitrox_device *ndev)
  	if (err)
  		return err;
  
--	err = nitrox_init_pkt_cmdqs(ndev);
-+	err = nitrox_alloc_pktin_queues(ndev);
+-	err = nitrox_pf_init_isr(ndev);
++	err = nitrox_register_interrupts(ndev);
  	if (err)
- 		destroy_crypto_dma_pool(ndev);
+ 		nitrox_common_sw_cleanup(ndev);
  
-@@ -207,6 +215,6 @@ int nitrox_common_sw_init(struct nitrox_device *ndev)
-  */
- void nitrox_common_sw_cleanup(struct nitrox_device *ndev)
+@@ -253,7 +254,7 @@ static int nitrox_pf_sw_init(struct nitrox_device *ndev)
+ 
+ static void nitrox_pf_sw_cleanup(struct nitrox_device *ndev)
  {
--	nitrox_cleanup_pkt_cmdqs(ndev);
-+	nitrox_free_pktin_queues(ndev);
- 	destroy_crypto_dma_pool(ndev);
+-	nitrox_pf_cleanup_isr(ndev);
++	nitrox_unregister_interrupts(ndev);
+ 	nitrox_common_sw_cleanup(ndev);
  }
+ 
 diff --git a/drivers/crypto/cavium/nitrox/nitrox_reqmgr.c b/drivers/crypto/cavium/nitrox/nitrox_reqmgr.c
-index f325b48ba904..d606c7af4667 100644
+index d606c7af4667..3987cd84c033 100644
 --- a/drivers/crypto/cavium/nitrox/nitrox_reqmgr.c
 +++ b/drivers/crypto/cavium/nitrox/nitrox_reqmgr.c
-@@ -382,11 +382,11 @@ static inline void backlog_list_add(struct nitrox_softreq *sr,
+@@ -721,18 +721,18 @@ static void process_response_list(struct nitrox_cmdq *cmdq)
+ }
+ 
+ /**
+- * pkt_slc_resp_handler - post processing of SE responses
++ * pkt_slc_resp_tasklet - post processing of SE responses
+  */
+-void pkt_slc_resp_handler(unsigned long data)
++void pkt_slc_resp_tasklet(unsigned long data)
  {
- 	INIT_LIST_HEAD(&sr->backlog);
+-	struct bh_data *bh = (void *)(uintptr_t)(data);
+-	struct nitrox_cmdq *cmdq = bh->cmdq;
+-	union nps_pkt_slc_cnts pkt_slc_cnts;
++	struct nitrox_q_vector *qvec = (void *)(uintptr_t)(data);
++	struct nitrox_cmdq *cmdq = qvec->cmdq;
++	union nps_pkt_slc_cnts slc_cnts;
  
--	spin_lock_bh(&cmdq->backlog_lock);
-+	spin_lock_bh(&cmdq->backlog_qlock);
- 	list_add_tail(&sr->backlog, &cmdq->backlog_head);
- 	atomic_inc(&cmdq->backlog_count);
- 	atomic_set(&sr->status, REQ_BACKLOG);
--	spin_unlock_bh(&cmdq->backlog_lock);
-+	spin_unlock_bh(&cmdq->backlog_qlock);
- }
+ 	/* read completion count */
+-	pkt_slc_cnts.value = readq(bh->completion_cnt_csr_addr);
++	slc_cnts.value = readq(cmdq->compl_cnt_csr_addr);
+ 	/* resend the interrupt if more work to do */
+-	pkt_slc_cnts.s.resend = 1;
++	slc_cnts.s.resend = 1;
  
- static inline void response_list_add(struct nitrox_softreq *sr,
-@@ -394,17 +394,17 @@ static inline void response_list_add(struct nitrox_softreq *sr,
+ 	process_response_list(cmdq);
+ 
+@@ -740,7 +740,7 @@ void pkt_slc_resp_handler(unsigned long data)
+ 	 * clear the interrupt with resend bit enabled,
+ 	 * MSI-X interrupt generates if Completion count > Threshold
+ 	 */
+-	writeq(pkt_slc_cnts.value, bh->completion_cnt_csr_addr);
++	writeq(slc_cnts.value, cmdq->compl_cnt_csr_addr);
+ 	/* order the writes */
+ 	mmiowb();
+ 
+diff --git a/drivers/crypto/cavium/nitrox/nitrox_sriov.c b/drivers/crypto/cavium/nitrox/nitrox_sriov.c
+index 453d920fbd69..30c0aa874583 100644
+--- a/drivers/crypto/cavium/nitrox/nitrox_sriov.c
++++ b/drivers/crypto/cavium/nitrox/nitrox_sriov.c
+@@ -5,6 +5,7 @@
+ #include "nitrox_dev.h"
+ #include "nitrox_hal.h"
+ #include "nitrox_common.h"
++#include "nitrox_isr.h"
+ 
+ static inline bool num_vfs_valid(int num_vfs)
  {
- 	INIT_LIST_HEAD(&sr->response);
+@@ -55,7 +56,7 @@ static void pf_sriov_cleanup(struct nitrox_device *ndev)
+ 	nitrox_crypto_unregister();
  
--	spin_lock_bh(&cmdq->response_lock);
-+	spin_lock_bh(&cmdq->resp_qlock);
- 	list_add_tail(&sr->response, &cmdq->response_head);
--	spin_unlock_bh(&cmdq->response_lock);
-+	spin_unlock_bh(&cmdq->resp_qlock);
+ 	/* cleanup PF resources */
+-	nitrox_pf_cleanup_isr(ndev);
++	nitrox_unregister_interrupts(ndev);
+ 	nitrox_common_sw_cleanup(ndev);
  }
  
- static inline void response_list_del(struct nitrox_softreq *sr,
- 				     struct nitrox_cmdq *cmdq)
- {
--	spin_lock_bh(&cmdq->response_lock);
-+	spin_lock_bh(&cmdq->resp_qlock);
- 	list_del(&sr->response);
--	spin_unlock_bh(&cmdq->response_lock);
-+	spin_unlock_bh(&cmdq->resp_qlock);
- }
+@@ -68,7 +69,7 @@ static int pf_sriov_init(struct nitrox_device *ndev)
+ 	if (err)
+ 		return err;
  
- static struct nitrox_softreq *
-@@ -439,11 +439,11 @@ static void post_se_instr(struct nitrox_softreq *sr,
- 	int idx;
- 	u8 *ent;
- 
--	spin_lock_bh(&cmdq->cmdq_lock);
-+	spin_lock_bh(&cmdq->cmd_qlock);
- 
- 	idx = cmdq->write_idx;
- 	/* copy the instruction */
--	ent = cmdq->head + (idx * cmdq->instr_size);
-+	ent = cmdq->base + (idx * cmdq->instr_size);
- 	memcpy(ent, &sr->instr, cmdq->instr_size);
- 
- 	atomic_set(&sr->status, REQ_POSTED);
-@@ -459,7 +459,7 @@ static void post_se_instr(struct nitrox_softreq *sr,
- 
- 	cmdq->write_idx = incr_index(idx, 1, ndev->qlen);
- 
--	spin_unlock_bh(&cmdq->cmdq_lock);
-+	spin_unlock_bh(&cmdq->cmd_qlock);
- 
- 	/* increment the posted command count */
- 	atomic64_inc(&ndev->stats.posted);
-@@ -474,7 +474,7 @@ static int post_backlog_cmds(struct nitrox_cmdq *cmdq)
- 	if (!atomic_read(&cmdq->backlog_count))
- 		return 0;
- 
--	spin_lock_bh(&cmdq->backlog_lock);
-+	spin_lock_bh(&cmdq->backlog_qlock);
- 
- 	list_for_each_entry_safe(sr, tmp, &cmdq->backlog_head, backlog) {
- 		struct skcipher_request *skreq;
-@@ -497,7 +497,7 @@ static int post_backlog_cmds(struct nitrox_cmdq *cmdq)
- 		/* backlog requests are posted, wakeup with -EINPROGRESS */
- 		skcipher_request_complete(skreq, -EINPROGRESS);
- 	}
--	spin_unlock_bh(&cmdq->backlog_lock);
-+	spin_unlock_bh(&cmdq->backlog_qlock);
- 
- 	return ret;
- }
-@@ -578,7 +578,7 @@ int nitrox_process_se_request(struct nitrox_device *ndev,
- 	/* select the queue */
- 	qno = smp_processor_id() % ndev->nr_queues;
- 
--	sr->cmdq = &ndev->pkt_cmdqs[qno];
-+	sr->cmdq = &ndev->pkt_inq[qno];
- 
- 	/*
- 	 * 64-Byte Instruction Format
+-	err = nitrox_pf_init_isr(ndev);
++	err = nitrox_register_interrupts(ndev);
+ 	if (err) {
+ 		nitrox_common_sw_cleanup(ndev);
+ 		return err;
 -- 
 2.17.1
