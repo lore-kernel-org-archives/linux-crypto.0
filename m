@@ -1,40 +1,52 @@
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: Re: [PATCH net-next v6 04/23] zinc: ChaCha20 x86_64 implementation
-Date: Tue, 2 Oct 2018 03:07:45 +0200
-Message-ID: <CAHmME9pGBnCFCd-dTi932FwR49fRyKt7fdBH9YixbhRQ1a+nhw@mail.gmail.com>
-References: <20180925145622.29959-1-Jason@zx2c4.com> <20180925145622.29959-5-Jason@zx2c4.com>
- <CAKv+Gu9aOiYdEzHHrHFHUFK=hNfeS=zEsvMe9OWD8hEdAYkffg@mail.gmail.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH net-next v6 03/23] zinc: ChaCha20 generic C
+ implementation and selftest
+Date: Tue, 2 Oct 2018 11:15:42 +0800
+Message-ID: <20181002031542.dbxu44gvqrughlgw@gondor.apana.org.au>
+References: <20180925145622.29959-4-Jason@zx2c4.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: LKML <linux-kernel@vger.kernel.org>,
-        Netdev <netdev@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        David Miller <davem@davemloft.net>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Samuel Neves <sneves@dei.uc.pt>,
-        Andrew Lutomirski <luto@kernel.org>,
-        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
-        Andy Polyakov <appro@openssl.org>,
-        Thomas Gleixner <tglx@linutronix.de>, mingo@redhat.com,
-        X86 ML <x86@kernel.org>
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAKv+Gu9aOiYdEzHHrHFHUFK=hNfeS=zEsvMe9OWD8hEdAYkffg@mail.gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+        linux-crypto@vger.kernel.org, davem@davemloft.net,
+        gregkh@linuxfoundation.org, Jason@zx2c4.com, sneves@dei.uc.pt,
+        luto@kernel.org, jeanphilippe.aumasson@gmail.com
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Return-path: <netdev-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20180925145622.29959-4-Jason@zx2c4.com>
+Sender: netdev-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi Ard,
+Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+> This implements the ChaCha20 permutation as a single C statement, by way
+> of the comma operator, which the compiler is able to simplify
+> terrifically.
+> 
+> Information: https://cr.yp.to/chacha.html
+> 
+> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+> Cc: Samuel Neves <sneves@dei.uc.pt>
+> Cc: Andy Lutomirski <luto@kernel.org>
+> Cc: Greg KH <gregkh@linuxfoundation.org>
+> Cc: Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>
 
-On Fri, Sep 28, 2018 at 5:47 PM Ard Biesheuvel
-<ard.biesheuvel@linaro.org> wrote:
-> > While this is CRYPTOGAMS code, the originating code for this happens to
-> > be the same as OpenSSL's commit cded951378069a478391843f5f8653c1eb5128da
-> >
->
-> I'd still prefer the kernel side changes to be presented as a separate
-> followup patch
+I don't have any problems with this interface.
 
-I've restructured things for the MIPS64 and x86_64 and it will be as
-you've asked for v7.
+However, I'm very unhappy about the fact that this adds another
+copy of the chacha20 implementation to the kernel.  Either this
+is better than the one that we already have or it isn't.
 
-Jason
+So if it's better please replace the existing chacha20 C
+implementation with this or otherwise just adapt the existing
+implementation to this interface.
+
+If we're replacing the existing one then you can either replace
+it directly within this patch or in a subsequent patch but please
+do it in the same series because otherwise we could wind up with
+two implementations for years to come.
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
