@@ -1,45 +1,41 @@
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: Re: [PATCH net-next v6 21/23] crypto: port ChaCha20 to Zinc
-Date: Tue, 2 Oct 2018 05:31:36 +0200
-Message-ID: <CAHmME9rfd9wFOFNxaC23nAtGtjOUZGOYUwJKHS35iFwT8DYuwg@mail.gmail.com>
-References: <20180925145622.29959-22-Jason@zx2c4.com> <20181002032609.o5i2hmphuqtkqgc4@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH net-next v6 00/23] WireGuard: Secure Network Tunnel
+Date: Tue, 2 Oct 2018 11:39:08 +0800
+Message-ID: <20181002033908.324yhwqaohfsq65d@gondor.apana.org.au>
+References: <CAKv+Gu-ZMR7zEAKv6_2tyD3OqnjVugOzKHzBEXW3pQs5W-SvLw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: LKML <linux-kernel@vger.kernel.org>,
-        Netdev <netdev@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        David Miller <davem@davemloft.net>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Samuel Neves <sneves@dei.uc.pt>,
-        Andrew Lutomirski <luto@kernel.org>,
-        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
-        Eric Biggers <ebiggers@google.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <netdev-owner@vger.kernel.org>
-In-Reply-To: <20181002032609.o5i2hmphuqtkqgc4@gondor.apana.org.au>
-Sender: netdev-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: Jason@zx2c4.com, ebiggers@kernel.org, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
+        davem@davemloft.net, gregkh@linuxfoundation.org
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <CAKv+Gu-ZMR7zEAKv6_2tyD3OqnjVugOzKHzBEXW3pQs5W-SvLw@mail.gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi Herbert,
-
-On Tue, Oct 2, 2018 at 5:26 AM Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> Oh nice, so you did the conversion of the existing crypto code.
+Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
+> On 28 September 2018 at 07:46, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
 >
-> I presume someone has done the numbers and verified that there
-> is no performance regression?
->
-> If so it would be good to include those numbers somewhere in this
-> submission (within a patch description so that it goes into git).
+>> If an implementation enters Zinc, it will go through my tree. If it
+>> enters the crypto API, it will go through Herbert's tree. If there
+>> wind up being messy tree dependency and merge timing issues, I can
+>> work this out in the usual way with Herbert. I'll be sure to discuss
+>> these edge cases with him when we discuss. I think there's a way to
+>> handle that with minimum friction.
+> 
+> I would also strongly prefer that all crypto work is taken through
+> Herbert's tree, so we have a coherent view of it before it goes
+> upstream.
 
-Indeed I've done a pretty ridiculous amount of benchmarking, and the
-x86_64 numbers are included in those commits because they're pretty
-straightforward to show. The performance is also better on
-arm1176,cortex-a7,8,9,15,53,73. On mips, as well, performance is
-better, since there wasn't any optimized code there at all. Early
-versions of this patchset included a regression on cortex-a7, which
-was particularly problematic because Eric Biggers recent fscrypt work
-requires fast chacha on that hardware, but this v6 (and the future v7)
-contain code that is faster on all platforms across the board.
+I agree.  I don't have any problems with the zinc code living in
+its own git tree.  But any upstream merges should definitely go
+through the crypto tree because the inherent ties between the two
+code-base.
 
-Regards,
-Jason
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
