@@ -1,7 +1,7 @@
 From: Leonard Crestez <leonard.crestez@nxp.com>
-Subject: [PATCH 1/3] crypto: mxs-dcp - Implement sha import/export
-Date: Tue, 2 Oct 2018 19:01:48 +0000
-Message-ID: <8c75f5c5dab117430313e0cfd4f2af88c9ed3d57.1538505573.git.leonard.crestez@nxp.com>
+Subject: [PATCH 3/3] crypto: mxs-dcp - Fix AES issues
+Date: Tue, 2 Oct 2018 19:01:52 +0000
+Message-ID: <a032d88bf4cb620f4a2da17c92eb462eb436f7f7.1538505573.git.leonard.crestez@nxp.com>
 References: <cover.1538505573.git.leonard.crestez@nxp.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="iso-8859-1"
@@ -15,8 +15,7 @@ Cc: Horia Geanta <horia.geanta@nxp.com>,
         dl-linux-imx <linux-imx@nxp.com>,
         "kernel@pengutronix.de" <kernel@pengutronix.de>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Dan Douglass <dan.douglass@freescale.com>,
-        Dan Douglass <dan.douglass@nxp.com>
+        Radu Solea <radu.solea@nxp.com>
 To: Marek Vasut <marek.vasut@gmail.com>,
         Fabio Estevam <fabio.estevam@nxp.com>,
         Herbert Xu <herbert@gondor.apana.org.au>
@@ -26,126 +25,144 @@ Content-Language: en-US
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-From: Dan Douglass <dan.douglass@freescale.com>
+From: Radu Solea <radu.solea@nxp.com>
 
-The mxs-dcp driver fails to probe if sha1/sha256 are supported:
+The DCP driver does not obey cryptlen, when doing android CTS this
+results in passing to hardware input stream lengths which are not
+multiple of block size.
 
-[    2.455404] mxs-dcp 80028000.dcp: Failed to register sha1 hash!
-[    2.464042] mxs-dcp: probe of 80028000.dcp failed with error -22
+Add a check to prevent future erroneous stream lengths from reaching the
+hardware and adjust the scatterlist walking code to obey cryptlen.
 
-This happens because since commit 8996eafdcbad ("crypto: ahash - ensure
-statesize is non-zero") import/export is mandatory and ahash_prepare_alg
-fails on statesize =3D=3D 0.
+Also properly copy-out the IV for chaining.
 
-A set of dummy import/export functions were implemented in commit
-9190b6fd5db9 ("crypto: mxs-dcp - Add empty hash export and import") but
-statesize is still zero and the driver fails to probe. That change was
-apparently part of some unrelated refactoring.
-
-Fix by actually implementing import/export.
-
-Signed-off-by: Dan Douglass <dan.douglass@nxp.com>
+Signed-off-by: Radu Solea <radu.solea@nxp.com>
+Signed-off-by: Franck LENORMAND <franck.lenormand@nxp.com>
 Signed-off-by: Leonard Crestez <leonard.crestez@nxp.com>
 ---
- drivers/crypto/mxs-dcp.c | 41 ++++++++++++++++++++++++++++++++--------
- 1 file changed, 33 insertions(+), 8 deletions(-)
+ drivers/crypto/mxs-dcp.c | 33 +++++++++++++++++++++++++++++++--
+ 1 file changed, 31 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/crypto/mxs-dcp.c b/drivers/crypto/mxs-dcp.c
-index 4b2b8129cf35..b7f41a6b65a5 100644
+index 3821cf971b5e..203c682dda99 100644
 --- a/drivers/crypto/mxs-dcp.c
 +++ b/drivers/crypto/mxs-dcp.c
-@@ -99,10 +99,15 @@ struct dcp_aes_req_ctx {
- struct dcp_sha_req_ctx {
- 	unsigned int	init:1;
- 	unsigned int	fini:1;
- };
+@@ -230,10 +230,16 @@ static int mxs_dcp_run_aes(struct dcp_async_ctx *actx=
+,
+ 	dma_addr_t src_phys =3D dma_map_single(sdcp->dev, sdcp->coh->aes_in_buf,
+ 					     DCP_BUF_SZ, DMA_TO_DEVICE);
+ 	dma_addr_t dst_phys =3D dma_map_single(sdcp->dev, sdcp->coh->aes_out_buf,
+ 					     DCP_BUF_SZ, DMA_FROM_DEVICE);
 =20
-+struct dcp_export_state {
-+	struct dcp_sha_req_ctx req_ctx;
-+	struct dcp_async_ctx async_ctx;
-+};
++	if (actx->fill % AES_BLOCK_SIZE) {
++		dev_err(sdcp->dev, "Invalid block size!\n");
++		ret =3D -EINVAL;
++		goto aes_done_run;
++	}
 +
- /*
-  * There can even be only one instance of the MXS DCP due to the
-  * design of Linux Crypto API.
-  */
- static struct dcp *global_sdcp;
-@@ -766,18 +771,36 @@ static int dcp_sha_digest(struct ahash_request *req)
- 		return ret;
+ 	/* Fill in the DMA descriptor. */
+ 	desc->control0 =3D MXS_DCP_CONTROL0_DECR_SEMAPHORE |
+ 		    MXS_DCP_CONTROL0_INTERRUPT |
+ 		    MXS_DCP_CONTROL0_ENABLE_CIPHER;
 =20
- 	return dcp_sha_finup(req);
+@@ -259,10 +265,11 @@ static int mxs_dcp_run_aes(struct dcp_async_ctx *actx=
+,
+ 	desc->payload =3D key_phys;
+ 	desc->status =3D 0;
+=20
+ 	ret =3D mxs_dcp_start_dma(actx);
+=20
++aes_done_run:
+ 	dma_unmap_single(sdcp->dev, key_phys, 2 * AES_KEYSIZE_128,
+ 			 DMA_TO_DEVICE);
+ 	dma_unmap_single(sdcp->dev, src_phys, DCP_BUF_SZ, DMA_TO_DEVICE);
+ 	dma_unmap_single(sdcp->dev, dst_phys, DCP_BUF_SZ, DMA_FROM_DEVICE);
+=20
+@@ -285,17 +292,19 @@ static int mxs_dcp_aes_block_crypt(struct crypto_asyn=
+c_request *arq)
+ 	uint8_t *in_buf =3D sdcp->coh->aes_in_buf;
+ 	uint8_t *out_buf =3D sdcp->coh->aes_out_buf;
+=20
+ 	uint8_t *out_tmp, *src_buf, *dst_buf =3D NULL;
+ 	uint32_t dst_off =3D 0;
++	uint32_t last_out_len =3D 0;
+=20
+ 	uint8_t *key =3D sdcp->coh->aes_key;
+=20
+ 	int ret =3D 0;
+ 	int split =3D 0;
+-	unsigned int i, len, clen, rem =3D 0;
++	unsigned int i, len, clen, rem =3D 0, tlen =3D 0;
+ 	int init =3D 0;
++	bool limit_hit =3D false;
+=20
+ 	actx->fill =3D 0;
+=20
+ 	/* Copy the key from the temporary location. */
+ 	memcpy(key, actx->key, actx->key_len);
+@@ -310,10 +319,15 @@ static int mxs_dcp_aes_block_crypt(struct crypto_asyn=
+c_request *arq)
+ 	}
+=20
+ 	for_each_sg(req->src, src, nents, i) {
+ 		src_buf =3D sg_virt(src);
+ 		len =3D sg_dma_len(src);
++		tlen +=3D len;
++		limit_hit =3D tlen > req->nbytes;
++
++		if (limit_hit)
++			len =3D req->nbytes - (tlen - len);
+=20
+ 		do {
+ 			if (actx->fill + len > out_off)
+ 				clen =3D out_off - actx->fill;
+ 			else
+@@ -326,17 +340,19 @@ static int mxs_dcp_aes_block_crypt(struct crypto_asyn=
+c_request *arq)
+=20
+ 			/*
+ 			 * If we filled the buffer or this is the last SG,
+ 			 * submit the buffer.
+ 			 */
+-			if (actx->fill =3D=3D out_off || sg_is_last(src)) {
++			if (actx->fill =3D=3D out_off || sg_is_last(src) ||
++				limit_hit) {
+ 				ret =3D mxs_dcp_run_aes(actx, req, init);
+ 				if (ret)
+ 					return ret;
+ 				init =3D 0;
+=20
+ 				out_tmp =3D out_buf;
++				last_out_len =3D actx->fill;
+ 				while (dst && actx->fill) {
+ 					if (!split) {
+ 						dst_buf =3D sg_virt(dst);
+ 						dst_off =3D 0;
+ 					}
+@@ -355,10 +371,23 @@ static int mxs_dcp_aes_block_crypt(struct crypto_asyn=
+c_request *arq)
+ 						split =3D 1;
+ 					}
+ 				}
+ 			}
+ 		} while (len);
++
++		if (limit_hit)
++			break;
++	}
++
++	/* Copy the IV for CBC for chaining */
++	if (!rctx->ecb) {
++		if (rctx->enc)
++			memcpy(req->info, out_buf+(last_out_len-AES_BLOCK_SIZE),
++				AES_BLOCK_SIZE);
++		else
++			memcpy(req->info, in_buf+(last_out_len-AES_BLOCK_SIZE),
++				AES_BLOCK_SIZE);
+ 	}
+=20
+ 	return ret;
  }
 =20
--static int dcp_sha_noimport(struct ahash_request *req, const void *in)
-+static int dcp_sha_import(struct ahash_request *req, const void *in)
- {
--	return -ENOSYS;
-+	struct dcp_sha_req_ctx *rctx =3D ahash_request_ctx(req);
-+	struct crypto_ahash *tfm =3D crypto_ahash_reqtfm(req);
-+	struct dcp_async_ctx *actx =3D crypto_ahash_ctx(tfm);
-+	const struct dcp_export_state *export =3D in;
-+
-+	memset(rctx, 0, sizeof(struct dcp_sha_req_ctx));
-+	memset(actx, 0, sizeof(struct dcp_async_ctx));
-+	memcpy(rctx, &export->req_ctx, sizeof(struct dcp_sha_req_ctx));
-+	memcpy(actx, &export->async_ctx, sizeof(struct dcp_async_ctx));
-+
-+	return 0;
- }
-=20
--static int dcp_sha_noexport(struct ahash_request *req, void *out)
-+static int dcp_sha_export(struct ahash_request *req, void *out)
- {
--	return -ENOSYS;
-+	struct dcp_sha_req_ctx *rctx_state =3D ahash_request_ctx(req);
-+	struct crypto_ahash *tfm =3D crypto_ahash_reqtfm(req);
-+	struct dcp_async_ctx *actx_state =3D crypto_ahash_ctx(tfm);
-+	struct dcp_export_state *export =3D out;
-+
-+	memcpy(&export->req_ctx, rctx_state, sizeof(struct dcp_sha_req_ctx));
-+	memcpy(&export->async_ctx, actx_state, sizeof(struct dcp_async_ctx));
-+
-+	return 0;
- }
-=20
- static int dcp_sha_cra_init(struct crypto_tfm *tfm)
- {
- 	crypto_ahash_set_reqsize(__crypto_ahash_cast(tfm),
-@@ -846,14 +869,15 @@ static struct ahash_alg dcp_sha1_alg =3D {
- 	.init	=3D dcp_sha_init,
- 	.update	=3D dcp_sha_update,
- 	.final	=3D dcp_sha_final,
- 	.finup	=3D dcp_sha_finup,
- 	.digest	=3D dcp_sha_digest,
--	.import =3D dcp_sha_noimport,
--	.export =3D dcp_sha_noexport,
-+	.import =3D dcp_sha_import,
-+	.export =3D dcp_sha_export,
- 	.halg	=3D {
- 		.digestsize	=3D SHA1_DIGEST_SIZE,
-+		.statesize	=3D sizeof(struct dcp_export_state),
- 		.base		=3D {
- 			.cra_name		=3D "sha1",
- 			.cra_driver_name	=3D "sha1-dcp",
- 			.cra_priority		=3D 400,
- 			.cra_alignmask		=3D 63,
-@@ -872,14 +896,15 @@ static struct ahash_alg dcp_sha256_alg =3D {
- 	.init	=3D dcp_sha_init,
- 	.update	=3D dcp_sha_update,
- 	.final	=3D dcp_sha_final,
- 	.finup	=3D dcp_sha_finup,
- 	.digest	=3D dcp_sha_digest,
--	.import =3D dcp_sha_noimport,
--	.export =3D dcp_sha_noexport,
-+	.import =3D dcp_sha_import,
-+	.export =3D dcp_sha_export,
- 	.halg	=3D {
- 		.digestsize	=3D SHA256_DIGEST_SIZE,
-+		.statesize	=3D sizeof(struct dcp_export_state),
- 		.base		=3D {
- 			.cra_name		=3D "sha256",
- 			.cra_driver_name	=3D "sha256-dcp",
- 			.cra_priority		=3D 400,
- 			.cra_alignmask		=3D 63,
 --=20
 2.17.1
