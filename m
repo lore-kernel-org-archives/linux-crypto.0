@@ -1,57 +1,38 @@
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH] crypto: cavium/nitrox - Fix format strings
-Date: Tue,  2 Oct 2018 23:00:03 +0200
-Message-ID: <20181002210022.2369756-1-arnd@arndb.de>
-Cc: Arnd Bergmann <arnd@arndb.de>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>,
+From: Richard Weinberger <richard.weinberger@gmail.com>
+Subject: Re: [PATCH net-next v6 19/23] zinc: Curve25519 ARM implementation
+Date: Tue, 2 Oct 2018 23:35:35 +0200
+Message-ID: <CAFLxGvwUP6+tfOr0NrM6vFs6NGepDz+MKPNnQWA+gO2k2mdPqw@mail.gmail.com>
+References: <20180925145622.29959-1-Jason@zx2c4.com> <20180925145622.29959-20-Jason@zx2c4.com>
+ <CAKv+Gu9FLDRLxHReKcveZYHNYerR5Y2pZd9gn-hWrU0jb2KgfA@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        LKML <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org,
+        linux-crypto@vger.kernel.org,
         "David S. Miller" <davem@davemloft.net>,
-        Srikanth Jampala <Jampala.Srikanth@cavium.com>
+        Greg KH <gregkh@linuxfoundation.org>, sneves@dei.uc.pt,
+        Andy Lutomirski <luto@kernel.org>,
+        jeanphilippe.aumasson@gmail.com,
+        Russell King - ARM Linux <linux@armlinux.org.uk>,
+        linux-arm-kernel@lists.infradead.org
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <CAKv+Gu9FLDRLxHReKcveZYHNYerR5Y2pZd9gn-hWrU0jb2KgfA@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-The return type of atomic64_read() is unfortunately architecture
-specific, it can be 'long', 'long long', or 's64'. When it is 'long',
-we get a build warning:
+Ard,
 
-drivers/crypto/cavium/nitrox/nitrox_debugfs.c: In function 'stats_show':
-drivers/crypto/cavium/nitrox/nitrox_debugfs.c:62:30: error: format '%lld' expects argument of type 'long long int', but argument 3 has type 'long int' [-Werror=format=]
-  seq_printf(s, "  Posted: %lld\n", atomic64_read(&ndev->stats.posted));
-                           ~~~^
-                           %ld
-drivers/crypto/cavium/nitrox/nitrox_debugfs.c:63:33: error: format '%lld' expects argument of type 'long long int', but argument 3 has type 'long int' [-Werror=format=]
-  seq_printf(s, "  Completed: %lld\n",
-                              ~~~^
-                              %ld
-drivers/crypto/cavium/nitrox/nitrox_debugfs.c:65:31: error: format '%lld' expects argument of type 'long long int', but argument 3 has type 'long int' [-Werror=format=]
+On Tue, Oct 2, 2018 at 7:06 PM Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
+> I guess qhasm means generated code, right?
 
-Add an explicit cast to 's64' to get a consistent behavior on all
-architectures here during compile testing.
+Yes.
+Please see: http://cr.yp.to/qhasm.html
 
-Fixes: 2a8780be9c26 ("crypto: cavium/nitrox - updated debugfs information.")
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- drivers/crypto/cavium/nitrox/nitrox_debugfs.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+It generates code from a q-file (the "template").
+Actually it is a rather powerful tool, but as you noticed, sometimes
+the code is not perfect.
 
-diff --git a/drivers/crypto/cavium/nitrox/nitrox_debugfs.c b/drivers/crypto/cavium/nitrox/nitrox_debugfs.c
-index 2f1e74ea846e..c5be91e5034c 100644
---- a/drivers/crypto/cavium/nitrox/nitrox_debugfs.c
-+++ b/drivers/crypto/cavium/nitrox/nitrox_debugfs.c
-@@ -59,10 +59,10 @@ static int stats_show(struct seq_file *s, void *v)
- 	struct nitrox_device *ndev = s->private;
- 
- 	seq_printf(s, "NITROX [%d] Request Statistics\n", ndev->idx);
--	seq_printf(s, "  Posted: %lld\n", atomic64_read(&ndev->stats.posted));
-+	seq_printf(s, "  Posted: %lld\n", (s64)atomic64_read(&ndev->stats.posted));
- 	seq_printf(s, "  Completed: %lld\n",
--		   atomic64_read(&ndev->stats.completed));
--	seq_printf(s, "  Dropped: %lld\n", atomic64_read(&ndev->stats.dropped));
-+		   (s64)atomic64_read(&ndev->stats.completed));
-+	seq_printf(s, "  Dropped: %lld\n", (s64)atomic64_read(&ndev->stats.dropped));
- 
- 	return 0;
- }
 -- 
-2.18.0
+Thanks,
+//richard
