@@ -1,84 +1,69 @@
 From: Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH] crypto: arm64/aes - fix handling sub-block CTS-CBC inputs
-Date: Tue,  2 Oct 2018 22:22:15 -0700
-Message-ID: <20181003052215.22468-1-ebiggers@kernel.org>
+Subject: Re: [PATCH net-next v6 21/23] crypto: port ChaCha20 to Zinc
+Date: Tue, 2 Oct 2018 22:56:00 -0700
+Message-ID: <20181003055559.GA745@sol.localdomain>
+References: <20180925145622.29959-1-Jason@zx2c4.com>
+ <20180925145622.29959-22-Jason@zx2c4.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: linux-arm-kernel@lists.infradead.org,
- Ard Biesheuvel <ard.biesheuvel@linaro.org>
-To: linux-crypto@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+        linux-crypto@vger.kernel.org, davem@davemloft.net,
+        gregkh@linuxfoundation.org, Samuel Neves <sneves@dei.uc.pt>,
+        Andy Lutomirski <luto@kernel.org>,
+        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20180925145622.29959-22-Jason@zx2c4.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-From: Eric Biggers <ebiggers@google.com>
+On Tue, Sep 25, 2018 at 04:56:20PM +0200, Jason A. Donenfeld wrote:
+> diff --git a/crypto/chacha20_zinc.c b/crypto/chacha20_zinc.c
+> new file mode 100644
+> index 000000000000..f7d70b3efc31
+> --- /dev/null
+> +++ b/crypto/chacha20_zinc.c
+> @@ -0,0 +1,90 @@
+> +/* SPDX-License-Identifier: GPL-2.0
+> + *
+> + * Copyright (C) 2018 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
+> + */
+> +
+> +#include <asm/unaligned.h>
+> +#include <crypto/algapi.h>
+> +#include <crypto/internal/skcipher.h>
+> +#include <zinc/chacha20.h>
+> +#include <linux/module.h>
+> +
+> +static int crypto_chacha20_setkey(struct crypto_skcipher *tfm, const u8 *key,
+> +				  unsigned int keysize)
+> +{
+> +	struct chacha20_ctx *ctx = crypto_skcipher_ctx(tfm);
+> +
+> +	if (keysize != CHACHA20_KEY_SIZE)
+> +		return -EINVAL;
+> +	chacha20_init(ctx, key, 0);
+> +	return 0;
+> +}
+> +
+> +static int crypto_chacha20_crypt(struct skcipher_request *req)
+> +{
+> +	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+> +	struct chacha20_ctx *ctx = crypto_skcipher_ctx(tfm);
+> +	struct skcipher_walk walk;
+> +	simd_context_t simd_context;
+> +	int err, i;
+> +
+> +	err = skcipher_walk_virt(&walk, req, true);
+> +	if (unlikely(err))
+> +		return err;
+> +
+> +	for (i = 0; i < ARRAY_SIZE(ctx->counter); ++i)
+> +		ctx->counter[i] = get_unaligned_le32(walk.iv + i * sizeof(u32));
+> +
 
-In the new arm64 CTS-CBC implementation, return an error code rather
-than crashing on inputs shorter than AES_BLOCK_SIZE bytes.  Also set
-cra_blocksize to AES_BLOCK_SIZE (like is done in the cts template) to
-indicate the minimum input size.
+Multiple threads may use the same tfm concurrently, so the tfm context must not
+be used to store per-request information such as the IV.
 
-Fixes: dd597fb33ff0 ("crypto: arm64/aes-blk - add support for CTS-CBC mode")
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- arch/arm64/crypto/aes-glue.c | 13 +++++++++----
- 1 file changed, 9 insertions(+), 4 deletions(-)
-
-diff --git a/arch/arm64/crypto/aes-glue.c b/arch/arm64/crypto/aes-glue.c
-index 26d2b0263ba63..1e676625ef33f 100644
---- a/arch/arm64/crypto/aes-glue.c
-+++ b/arch/arm64/crypto/aes-glue.c
-@@ -243,8 +243,11 @@ static int cts_cbc_encrypt(struct skcipher_request *req)
- 
- 	skcipher_request_set_tfm(&rctx->subreq, tfm);
- 
--	if (req->cryptlen == AES_BLOCK_SIZE)
-+	if (req->cryptlen <= AES_BLOCK_SIZE) {
-+		if (req->cryptlen < AES_BLOCK_SIZE)
-+			return -EINVAL;
- 		cbc_blocks = 1;
-+	}
- 
- 	if (cbc_blocks > 0) {
- 		unsigned int blocks;
-@@ -305,8 +308,11 @@ static int cts_cbc_decrypt(struct skcipher_request *req)
- 
- 	skcipher_request_set_tfm(&rctx->subreq, tfm);
- 
--	if (req->cryptlen == AES_BLOCK_SIZE)
-+	if (req->cryptlen <= AES_BLOCK_SIZE) {
-+		if (req->cryptlen < AES_BLOCK_SIZE)
-+			return -EINVAL;
- 		cbc_blocks = 1;
-+	}
- 
- 	if (cbc_blocks > 0) {
- 		unsigned int blocks;
-@@ -486,14 +492,13 @@ static struct skcipher_alg aes_algs[] = { {
- 		.cra_driver_name	= "__cts-cbc-aes-" MODE,
- 		.cra_priority		= PRIO,
- 		.cra_flags		= CRYPTO_ALG_INTERNAL,
--		.cra_blocksize		= 1,
-+		.cra_blocksize		= AES_BLOCK_SIZE,
- 		.cra_ctxsize		= sizeof(struct crypto_aes_ctx),
- 		.cra_module		= THIS_MODULE,
- 	},
- 	.min_keysize	= AES_MIN_KEY_SIZE,
- 	.max_keysize	= AES_MAX_KEY_SIZE,
- 	.ivsize		= AES_BLOCK_SIZE,
--	.chunksize	= AES_BLOCK_SIZE,
- 	.walksize	= 2 * AES_BLOCK_SIZE,
- 	.setkey		= skcipher_aes_setkey,
- 	.encrypt	= cts_cbc_encrypt,
--- 
-2.19.0
+- Eric
