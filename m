@@ -1,81 +1,90 @@
-From: Logan Gunthorpe <logang@deltatee.com>
-Subject: [PATCH v22 5/6] ntb: ntb_hw_intel: use io-64-nonatomic instead of in-driver hacks
-Date: Tue,  2 Oct 2018 16:41:07 -0600
-Message-ID: <20181002224108.3321-6-logang@deltatee.com>
-References: <20181002224108.3321-1-logang@deltatee.com>
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: Re: [PATCH net-next v6 19/23] zinc: Curve25519 ARM implementation
+Date: Wed, 3 Oct 2018 03:03:09 +0200
+Message-ID: <CAHmME9rp0Fi5ObK5oi8FHj1_nK5hP4T2Bq7_dAmzq4OQ0mp0uw@mail.gmail.com>
+References: <20180925145622.29959-1-Jason@zx2c4.com> <20180925145622.29959-20-Jason@zx2c4.com>
+ <CAKv+Gu9FLDRLxHReKcveZYHNYerR5Y2pZd9gn-hWrU0jb2KgfA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Cc: Arnd Bergmann <arnd@arndb.de>,
+Content-Type: text/plain; charset="UTF-8"
+Cc: LKML <linux-kernel@vger.kernel.org>,
+        Netdev <netdev@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        David Miller <davem@davemloft.net>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Andy Shevchenko <andy.shevchenko@gmail.com>,
-        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
-        Logan Gunthorpe <logang@deltatee.com>
-To: linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
-        linux-ntb@googlegroups.com, linux-crypto@vger.kernel.org,
-        Andrew Morton <akpm@linux-foundation.org>
+        Samuel Neves <sneves@dei.uc.pt>,
+        Andrew Lutomirski <luto@kernel.org>,
+        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
+        Russell King - ARM Linux <linux@armlinux.org.uk>,
+        linux-arm-kernel@lists.infradead.org,
+        Peter Schwabe <peter@cryptojedi.org>,
+        "Daniel J . Bernstein" <djb@cr.yp.to>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20181002224108.3321-1-logang@deltatee.com>
+In-Reply-To: <CAKv+Gu9FLDRLxHReKcveZYHNYerR5Y2pZd9gn-hWrU0jb2KgfA@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Now that ioread64 and iowrite64 are available in io-64-nonatomic,
-we can remove the hack at the top of ntb_hw_intel.c and replace it
-with an include.
+(+Dan,Peter in CC. Replying to:
+<https://lore.kernel.org/lkml/CAKv+Gu9FLDRLxHReKcveZYHNYerR5Y2pZd9gn-hWrU0jb2KgfA@mail.gmail.com/>
+for context.)
 
-Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-Reviewed-by: Andy Shevchenko <andy.shevchenko@gmail.com>
-Acked-by: Dave Jiang <dave.jiang@intel.com>
-Acked-by: Allen Hubbe <Allen.Hubbe@dell.com>
-Acked-by: Jon Mason <jdmason@kudzu.us>
----
- drivers/ntb/hw/intel/ntb_hw_intel.h | 30 +----------------------------
- 1 file changed, 1 insertion(+), 29 deletions(-)
+Hi Ard,
 
-diff --git a/drivers/ntb/hw/intel/ntb_hw_intel.h b/drivers/ntb/hw/intel/ntb_hw_intel.h
-index c49ff8970ce3..e071e28bca3f 100644
---- a/drivers/ntb/hw/intel/ntb_hw_intel.h
-+++ b/drivers/ntb/hw/intel/ntb_hw_intel.h
-@@ -53,6 +53,7 @@
- 
- #include <linux/ntb.h>
- #include <linux/pci.h>
-+#include <linux/io-64-nonatomic-lo-hi.h>
- 
- /* PCI device IDs */
- #define PCI_DEVICE_ID_INTEL_NTB_B2B_JSF	0x3725
-@@ -218,33 +219,4 @@ static inline int pdev_is_gen3(struct pci_dev *pdev)
- 	return 0;
- }
- 
--#ifndef ioread64
--#ifdef readq
--#define ioread64 readq
--#else
--#define ioread64 _ioread64
--static inline u64 _ioread64(void __iomem *mmio)
--{
--	u64 low, high;
--
--	low = ioread32(mmio);
--	high = ioread32(mmio + sizeof(u32));
--	return low | (high << 32);
--}
--#endif
--#endif
--
--#ifndef iowrite64
--#ifdef writeq
--#define iowrite64 writeq
--#else
--#define iowrite64 _iowrite64
--static inline void _iowrite64(u64 val, void __iomem *mmio)
--{
--	iowrite32(val, mmio);
--	iowrite32(val >> 32, mmio + sizeof(u32));
--}
--#endif
--#endif
--
- #endif
--- 
-2.19.0
+On Tue, Oct 2, 2018 at 6:59 PM Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
+> Shouldn't this use the new simd abstraction as well?
+
+Yes, it probably should, thanks.
+
+> I guess qhasm means generated code, right?
+> Because many of these adds are completely redundant ...
+> This looks odd as well.
+> Could you elaborate on what qhasm is exactly? And, as with the other
+> patches, I would prefer it if we could have your changes as a separate
+> patch (although having the qhasm base would be preferred)
+
+Indeed qhasm converts this --
+<https://github.com/floodyberry/supercop/blob/master/crypto_scalarmult/curve25519/neon2/scalarmult.pq>
+-- into this. It's a thing from Dan (CC'd now) --
+<http://cr.yp.to/qhasm.html>. As you've requested, I can layer the
+patches to show our changes on top.
+
+> ... you can drop this add
+> same here
+> and here
+> and here
+> and here
+> and here
+> and here
+> and here
+> redundant add
+> I'll stop here - let me just note that this code does not strike me as
+> particularly well optimized for in-order cores (such as A7).
+> For instance, the sequence
+> can be reordered as
+> and not have every other instruction depend on the output of the previous one.
+> Obviously, the ultimate truth is in the benchmark numbers, but I'd
+> thought I'd mention it anyway.
+
+Yes indeed the output is suboptimal in a lot of places. We can
+gradually clean this up -- slowly and carefully over time -- if you
+want. I can also look into producing a new implementation within HACL*
+so that it's verified. Assurance-wise, though, I feel pretty good
+about this implementation considering its origins, its breadth of use
+(in BoringSSL), the fuzzing hours it's incurred, and the actual
+implementation itself.
+
+ Either way, performance-wise, it's really worth having.
+
+For example, on a Cortex-A7, we get these results (according to get_cycles()):
+
+neon: 23142 cycles per call
+fiat32: 49136 cycles per call
+donna32: 71988 cycles per call
+
+And on a Cortex-A9, we get these results (according to get_cycles()):
+
+neon: 5020 cycles per call
+fiat32: 17326 cycles per call
+donna32: 28076 cycles per call
+
+Jason
