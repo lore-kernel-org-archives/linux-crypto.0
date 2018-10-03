@@ -1,63 +1,94 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [PATCH net-next v6 11/23] zinc: import Andy Polyakov's Poly1305
- ARM and ARM64 implementations
-Date: Wed, 3 Oct 2018 09:58:18 +0200
-Message-ID: <CAKv+Gu8-HoAEyYiPYqMOMy9MGduFLQik2YxdJziqxN_cUs0nCA@mail.gmail.com>
-References: <20180925145622.29959-1-Jason@zx2c4.com> <20180925145622.29959-12-Jason@zx2c4.com>
- <20181003061236.GB745@sol.localdomain>
+Subject: Re: [PATCH] crypto: arm64/aes - fix handling sub-block CTS-CBC inputs
+Date: Wed, 3 Oct 2018 10:02:34 +0200
+Message-ID: <CAKv+Gu-vGYWJy9Q4da0KjBi0qiu+Dh1oA=tTeScKvq=jmwG5yg@mail.gmail.com>
+References: <20181003052215.22468-1-ebiggers@kernel.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Andy Polyakov <appro@openssl.org>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "<netdev@vger.kernel.org>" <netdev@vger.kernel.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Samuel Neves <sneves@dei.uc.pt>,
-        Andy Lutomirski <luto@kernel.org>,
-        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
-        Russell King <linux@armlinux.org.uk>,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+ <linux-crypto@vger.kernel.org>,
+ linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+ Herbert Xu <herbert@gondor.apana.org.au>
 To: Eric Biggers <ebiggers@kernel.org>
-Return-path: <netdev-owner@vger.kernel.org>
-In-Reply-To: <20181003061236.GB745@sol.localdomain>
-Sender: netdev-owner@vger.kernel.org
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <20181003052215.22468-1-ebiggers@kernel.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 3 October 2018 at 08:12, Eric Biggers <ebiggers@kernel.org> wrote:
-> On Tue, Sep 25, 2018 at 04:56:10PM +0200, Jason A. Donenfeld wrote:
->> These NEON and non-NEON implementations come from Andy Polyakov's
->> implementation, and are included here in raw form without modification,
->> so that subsequent commits that fix these up for the kernel can see how
->> it has changed. This awkward commit splitting has been requested for the
->> ARM[64] implementations in particular.
->>
-
-"This awkward commit splitting"
-
-Seriously?!?
-
-So you really think it is fine to import huge chunks of code like this
-from other projects without keeping track of the local changes?
-
->> While this is CRYPTOGAMS code, the originating code for this happens to
->> be the same as OpenSSL's commit 5bb1cd2292b388263a0cc05392bb99141212aa53
+On 3 October 2018 at 07:22, Eric Biggers <ebiggers@kernel.org> wrote:
+> From: Eric Biggers <ebiggers@google.com>
 >
-> Sorry to ruin the fun, but actually there are no Poly1305 implementations in
-> CRYPTOGAMS (https://github.com/dot-asm/cryptogams).  Nor are there any ChaCha20
-> implementations.
+> In the new arm64 CTS-CBC implementation, return an error code rather
+> than crashing on inputs shorter than AES_BLOCK_SIZE bytes.  Also set
+> cra_blocksize to AES_BLOCK_SIZE (like is done in the cts template) to
+> indicate the minimum input size.
 >
+> Fixes: dd597fb33ff0 ("crypto: arm64/aes-blk - add support for CTS-CBC mode")
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
 
-So was this code taken directly from the OpenSSL project then? If so,
-why do the commit messages claim otherwise?
+Thanks Eric
 
-> Andy P., can you please add your Poly1305 and ChaCha20 implementations to the
-> CRYPTOGAMS repository, so that they have a clear kernel-compatible license?
+Reviewed-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+
+> ---
+>  arch/arm64/crypto/aes-glue.c | 13 +++++++++----
+>  1 file changed, 9 insertions(+), 4 deletions(-)
 >
-> It would be great if you'd include a kernel-compatible license directly in the
-> versions in the OpenSSL tree too...
+> diff --git a/arch/arm64/crypto/aes-glue.c b/arch/arm64/crypto/aes-glue.c
+> index 26d2b0263ba63..1e676625ef33f 100644
+> --- a/arch/arm64/crypto/aes-glue.c
+> +++ b/arch/arm64/crypto/aes-glue.c
+> @@ -243,8 +243,11 @@ static int cts_cbc_encrypt(struct skcipher_request *req)
 >
-
-Yes please.
+>         skcipher_request_set_tfm(&rctx->subreq, tfm);
+>
+> -       if (req->cryptlen == AES_BLOCK_SIZE)
+> +       if (req->cryptlen <= AES_BLOCK_SIZE) {
+> +               if (req->cryptlen < AES_BLOCK_SIZE)
+> +                       return -EINVAL;
+>                 cbc_blocks = 1;
+> +       }
+>
+>         if (cbc_blocks > 0) {
+>                 unsigned int blocks;
+> @@ -305,8 +308,11 @@ static int cts_cbc_decrypt(struct skcipher_request *req)
+>
+>         skcipher_request_set_tfm(&rctx->subreq, tfm);
+>
+> -       if (req->cryptlen == AES_BLOCK_SIZE)
+> +       if (req->cryptlen <= AES_BLOCK_SIZE) {
+> +               if (req->cryptlen < AES_BLOCK_SIZE)
+> +                       return -EINVAL;
+>                 cbc_blocks = 1;
+> +       }
+>
+>         if (cbc_blocks > 0) {
+>                 unsigned int blocks;
+> @@ -486,14 +492,13 @@ static struct skcipher_alg aes_algs[] = { {
+>                 .cra_driver_name        = "__cts-cbc-aes-" MODE,
+>                 .cra_priority           = PRIO,
+>                 .cra_flags              = CRYPTO_ALG_INTERNAL,
+> -               .cra_blocksize          = 1,
+> +               .cra_blocksize          = AES_BLOCK_SIZE,
+>                 .cra_ctxsize            = sizeof(struct crypto_aes_ctx),
+>                 .cra_module             = THIS_MODULE,
+>         },
+>         .min_keysize    = AES_MIN_KEY_SIZE,
+>         .max_keysize    = AES_MAX_KEY_SIZE,
+>         .ivsize         = AES_BLOCK_SIZE,
+> -       .chunksize      = AES_BLOCK_SIZE,
+>         .walksize       = 2 * AES_BLOCK_SIZE,
+>         .setkey         = skcipher_aes_setkey,
+>         .encrypt        = cts_cbc_encrypt,
+> --
+> 2.19.0
+>
