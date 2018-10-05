@@ -1,65 +1,126 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [PATCH net-next v6 19/23] zinc: Curve25519 ARM implementation
-Date: Fri, 5 Oct 2018 17:16:08 +0200
-Message-ID: <CAKv+Gu8SFbKXwO_fngymM6Rh6jU4=B14=V0NaCBOTOCoO3M-kA@mail.gmail.com>
-References: <20180925145622.29959-1-Jason@zx2c4.com> <20180925145622.29959-20-Jason@zx2c4.com>
- <CAKv+Gu9FLDRLxHReKcveZYHNYerR5Y2pZd9gn-hWrU0jb2KgfA@mail.gmail.com>
- <CAHmME9rp0Fi5ObK5oi8FHj1_nK5hP4T2Bq7_dAmzq4OQ0mp0uw@mail.gmail.com> <20181005150538.17006.qmail@cr.yp.to>
+Subject: Re: [RFC PATCH 1/9] kernel: add support for patchable function pointers
+Date: Fri, 5 Oct 2018 17:24:03 +0200
+Message-ID: <CAKv+Gu9z503ZJXcsG+9Ys240BZiB-+GB=kNY4VGWpjvdzN4JtA@mail.gmail.com>
+References: <20181005081333.15018-1-ard.biesheuvel@linaro.org>
+ <20181005081333.15018-2-ard.biesheuvel@linaro.org> <20181005141433.GS19272@hirez.programming.kicks-ass.net>
+ <9E0E08C8-0DFC-4E50-A4FA-73208835EF9E@amacapital.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+Content-Transfer-Encoding: quoted-printable
+Cc: Peter Zijlstra <peterz@infradead.org>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "<netdev@vger.kernel.org>" <netdev@vger.kernel.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "Jason A . Donenfeld" <Jason@zx2c4.com>,
+        Eric Biggers <ebiggers@kernel.org>,
         Samuel Neves <sneves@dei.uc.pt>,
         Andy Lutomirski <luto@kernel.org>,
-        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
-        Russell King <linux@armlinux.org.uk>,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        peter@cryptojedi.org
-Return-path: <netdev-owner@vger.kernel.org>
-In-Reply-To: <20181005150538.17006.qmail@cr.yp.to>
-Sender: netdev-owner@vger.kernel.org
+        Arnd Bergmann <arnd@arndb.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will.deacon@arm.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Kees Cook <keescook@chromium.org>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Greg Kroah-Hartman <gregkh@linuxfound
+To: Andy Lutomirski <luto@amacapital.net>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <9E0E08C8-0DFC-4E50-A4FA-73208835EF9E@amacapital.net>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 5 October 2018 at 17:05, D. J. Bernstein <djb@cr.yp.to> wrote:
-> For the in-order ARM Cortex-A8 (the target for this code), adjacent
-> multiply-add instructions forward summands quickly. A simple in-order
-> dot-product computation has no latency problems, while interleaving
-> computations, as suggested in this thread, creates problems. Also, on
-> this microarchitecture, occasional ARM instructions run in parallel with
-> NEON, so trying to manually eliminate ARM instructions through global
-> pointer tracking wouldn't gain speed; it would simply create unnecessary
-> code-maintenance problems.
+On 5 October 2018 at 17:08, Andy Lutomirski <luto@amacapital.net> wrote:
 >
-> See https://cr.yp.to/papers.html#neoncrypto for analysis of the
-> performance of---and remaining bottlenecks in---this code. Further
-> speedups should be possible on this microarchitecture, but, for anyone
-> interested in this, I recommend focusing on building a cycle-accurate
-> simulator (e.g., fixing inaccuracies in the Sobole simulator) first.
 >
-> Of course, there are other ARM microarchitectures, and there are many
-> cases where different microarchitectures prefer different optimizations.
-> The kernel already has boot-time benchmarks for different optimizations
-> for raid6, and should do the same for crypto code, so that implementors
-> can focus on each microarchitecture separately rather than living in the
-> barbaric world of having to choose which CPUs to favor.
+>> On Oct 5, 2018, at 7:14 AM, Peter Zijlstra <peterz@infradead.org> wrote:
+>>
+>>> On Fri, Oct 05, 2018 at 10:13:25AM +0200, Ard Biesheuvel wrote:
+>>> diff --git a/include/linux/ffp.h b/include/linux/ffp.h
+>>> new file mode 100644
+>>> index 000000000000..8fc3b4c9b38f
+>>> --- /dev/null
+>>> +++ b/include/linux/ffp.h
+>>> @@ -0,0 +1,43 @@
+>>> +/* SPDX-License-Identifier: GPL-2.0 */
+>>> +
+>>> +#ifndef __LINUX_FFP_H
+>>> +#define __LINUX_FFP_H
+>>> +
+>>> +#include <linux/types.h>
+>>> +#include <linux/compiler.h>
+>>> +
+>>> +#ifdef CONFIG_HAVE_ARCH_FFP
+>>> +#include <asm/ffp.h>
+>>> +#else
+>>> +
+>>> +struct ffp {
+>>> +    void    (**fn)(void);
+>>> +    void    (*default_fn)(void);
+>>> +};
+>>> +
+>>> +#define DECLARE_FFP(_fn, _def)                        \
+>>> +    extern typeof(_def) *_fn;                    \
+>>> +    extern struct ffp const __ffp_ ## _fn
+>>> +
+>>> +#define DEFINE_FFP(_fn, _def)                        \
+>>> +    typeof(_def) *_fn =3D &_def;                    \
+>>> +    struct ffp const __ffp_ ## _fn                    \
+>>> +        =3D { (void(**)(void))&_fn, (void(*)(void))&_def };    \
+>>> +    EXPORT_SYMBOL(__ffp_ ## _fn)
+>>> +
+>>> +static inline void ffp_set_target(const struct ffp *m, void *new_fn)
+>>> +{
+>>> +    WRITE_ONCE(*m->fn, new_fn);
+>>> +}
+>>> +
+>>> +static inline void ffp_reset_target(const struct ffp *m)
+>>> +{
+>>> +    WRITE_ONCE(*m->fn, m->default_fn);
+>>> +}
+>>> +
+>>> +#endif
+>>> +
+>>> +#define SET_FFP(_fn, _new)    ffp_set_target(&__ffp_ ## _fn, _new)
+>>> +#define RESET_FFP(_fn)        ffp_reset_target(&__ffp_ ## _fn)
+>>> +
+>>> +#endif
+>>
+>> I don't understand this interface. There is no wrapper for the call
+>> site, so how are we going to patch all call-sites when you update the
+>> target?
 >
+> I=E2=80=99m also confused.
+>
+> Anyway, we have patchable functions on x86. They=E2=80=99re called PVOPs,=
+ and they=E2=80=99re way overcomplicated.
+>
+> I=E2=80=99ve proposed a better way that should generate better code, be m=
+ore portable, and be more maintainable.  It goes like this.
+>
+> To call the function, you literally just call  the default implementation=
+.  It *might* be necessary to call a nonexistent wrapper to avoid annoying =
+optimizations. At build time, the kernel is built with relocations, so the =
+object files contain relocation entries for the call. We collect these entr=
+ies into a table. If we=E2=80=99re using the =E2=80=9Cnonexistent wrapper=
+=E2=80=9D approach, we can link in a .S or linker script to alias them to t=
+he default implementation.
+>
+> To patch them, we just patch them. It can=E2=80=99t necessarily be done c=
+oncurrently because nothing forces the right alignment. But we can do it at=
+ boot time and module load time. (Maybe we can patch at runtime on architec=
+tures with appropriate instruction alignment.  Or we ask gcc for an extensi=
+on to align calls to a function.)
+>
+> Most of the machinery already exists: this is roughly how the module load=
+er resolves calls outside of a module.
 
-Thanks Dan for the insight.
+Yeah nothing is ever simple on x86 :-(
 
-We have already established in a separate discussion that Cortex-A7,
-which is main optimization target for future development, does not
-have the microarchitectural peculiarity that you are referring to that
-ARM instructions are essentially free when interleaved with NEON code.
-
-But I take your point re benchmarking (as I already indicated in my
-reply to Jason): if we optimize towards speed, we should ideally reuse
-the existing benchmarking infrastructure we have to select the fastest
-implementation at runtime. For instance, it turns out that scalar
-ChaCha20 is almost as fast as NEON (or even faster?) on A7, and using
-NEON in the kernel has some issues of its own.
+So are you saying the approach i use in patch #2 (which would
+translate to emitting a jmpq instruction pointing to the default
+implementation, and patching it at runtime to point elsewhere) would
+not fly on x86?
