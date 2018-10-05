@@ -1,38 +1,50 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: ccp: Remove forward declaration
-Date: Fri, 5 Oct 2018 10:27:05 +0800
-Message-ID: <20181005022705.v7jcz35oqaq5usao@gondor.apana.org.au>
-References: <20180924172615.25591-1-natechancellor@gmail.com>
+Subject: Re: [PATCH] hwrng: document the quality field
+Date: Fri, 5 Oct 2018 10:27:16 +0800
+Message-ID: <20181005022716.ljqj3kkgu3osntia@gondor.apana.org.au>
+References: <20180925162924.378725-1-mst@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Tom Lendacky <thomas.lendacky@amd.com>,
-        Gary Hook <gary.hook@amd.com>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Nick Desaulniers <ndesaulniers@google.com>
-To: Nathan Chancellor <natechancellor@gmail.com>
+Cc: linux-kernel@vger.kernel.org, Matt Mackall <mpm@selenic.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        matthias.bgg@gmail.com, Liam.Merwick@oracle.com,
+        Jim.Quigley@oracle.com, linux-crypto@vger.kernel.org,
+        Cornelia Huck <cornelia.huck@de.ibm.com>, dgilbert@redhat.com
+To: "Michael S. Tsirkin" <mst@redhat.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20180924172615.25591-1-natechancellor@gmail.com>
+In-Reply-To: <20180925162924.378725-1-mst@redhat.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Sep 24, 2018 at 10:26:15AM -0700, Nathan Chancellor wrote:
-> Clang emits a warning about this construct:
+On Tue, Sep 25, 2018 at 12:35:18PM -0400, Michael S. Tsirkin wrote:
+> quality field is currently documented as being 'per mill'.  In fact the
+> math involved is:
 > 
-> drivers/crypto/ccp/sp-platform.c:36:36: warning: tentative array
-> definition assumed to have one element
-> static const struct acpi_device_id sp_acpi_match[];
->                                    ^
-> 1 warning generated.
+>                 add_hwgenerator_randomness((void *)rng_fillbuf, rc,
+>                                            rc * current_quality * 8 >> 10);
 > 
-> Just remove the forward declarations and move the initializations up
-> so that they can be used in sp_get_of_version and sp_get_acpi_version.
+> thus the actual definition is "bits of entropy per 1024 bits of input".
 > 
-> Reported-by: Nick Desaulniers <ndesaulniers@google.com>
-> Signed-off-by: Nathan Chancellor <natechancellor@gmail.com>
+> The current documentation seems to have confused multiple people
+> in the past, let's fix the documentation to match code.
+> 
+> An alternative is to change core to match driver expectations, replacing
+> 	rc * current_quality * 8 >> 10
+> with
+> 	rc * current_quality / 1000
+> but that has performance costs, so probably isn't a good option.
+> 
+> Fixes: 0f734e6e768 ("hwrng: add per-device entropy derating")
+> Reported-by: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 > ---
->  drivers/crypto/ccp/sp-platform.c | 53 +++++++++++++++-----------------
->  1 file changed, 25 insertions(+), 28 deletions(-)
+> 
+> 
+>  drivers/char/hw_random/core.c | 4 ++--
+>  include/linux/hw_random.h     | 3 ++-
+>  2 files changed, 4 insertions(+), 3 deletions(-)
 
 Patch applied.  Thanks.
 -- 
