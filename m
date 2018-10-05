@@ -1,7 +1,7 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [RFC PATCH 1/9] kernel: add support for patchable function pointers
-Date: Fri,  5 Oct 2018 10:13:25 +0200
-Message-ID: <20181005081333.15018-2-ard.biesheuvel@linaro.org>
+Subject: [RFC PATCH 2/9] arm64: kernel: add arch support for patchable function pointers
+Date: Fri,  5 Oct 2018 10:13:26 +0200
+Message-ID: <20181005081333.15018-3-ard.biesheuvel@linaro.org>
 References: <20181005081333.15018-1-ard.biesheuvel@linaro.org>
 Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
         "Jason A . Donenfeld" <Jason@zx2c4.com>,
@@ -28,85 +28,106 @@ In-Reply-To: <20181005081333.15018-1-ard.biesheuvel@linaro.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Add a function pointer abstraction that can be implemented by the arch
-in a manner that avoids the downsides of function pointers, i.e., the
-fact that they are typically located in a writable data section, and
-their vulnerability to Spectre like defects.
-
-The FFP (or fast function pointer) is callable as a function, since
-the generic incarnation is simply that. However, due to the fact that
-C does not distinguish between functions and function pointers at the
-call site, the architecture can instead emit it as a patchable sequence
-of instructions consisting of ordinary branches.
+Implement arm64 support for patchable function pointers by emitting
+them as branch instructions (and a couple of NOPs in case the new
+target is out of range of a normal branch instruction.)
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- arch/Kconfig        |  3 ++
- include/linux/ffp.h | 43 ++++++++++++++++++++
- 2 files changed, 46 insertions(+)
+ arch/arm64/Kconfig           |  1 +
+ arch/arm64/include/asm/ffp.h | 35 ++++++++++++++++++++
+ arch/arm64/kernel/insn.c     | 22 ++++++++++++
+ 3 files changed, 58 insertions(+)
 
-diff --git a/arch/Kconfig b/arch/Kconfig
-index 6801123932a5..2af3442a61d3 100644
---- a/arch/Kconfig
-+++ b/arch/Kconfig
-@@ -862,6 +862,9 @@ config HAVE_ARCH_PREL32_RELOCATIONS
- 	  architectures, and don't require runtime relocation on relocatable
- 	  kernels.
- 
-+config HAVE_ARCH_FFP
-+	bool
-+
- source "kernel/gcov/Kconfig"
- 
- source "scripts/gcc-plugins/Kconfig"
-diff --git a/include/linux/ffp.h b/include/linux/ffp.h
+diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+index 1b1a0e95c751..db8c9e51c56d 100644
+--- a/arch/arm64/Kconfig
++++ b/arch/arm64/Kconfig
+@@ -102,6 +102,7 @@ config ARM64
+ 	select HAVE_ALIGNED_STRUCT_PAGE if SLUB
+ 	select HAVE_ARCH_AUDITSYSCALL
+ 	select HAVE_ARCH_BITREVERSE
++	select HAVE_ARCH_FFP
+ 	select HAVE_ARCH_HUGE_VMAP
+ 	select HAVE_ARCH_JUMP_LABEL
+ 	select HAVE_ARCH_KASAN if !(ARM64_16K_PAGES && ARM64_VA_BITS_48)
+diff --git a/arch/arm64/include/asm/ffp.h b/arch/arm64/include/asm/ffp.h
 new file mode 100644
-index 000000000000..8fc3b4c9b38f
+index 000000000000..678dc1262218
 --- /dev/null
-+++ b/include/linux/ffp.h
-@@ -0,0 +1,43 @@
++++ b/arch/arm64/include/asm/ffp.h
+@@ -0,0 +1,35 @@
 +/* SPDX-License-Identifier: GPL-2.0 */
 +
-+#ifndef __LINUX_FFP_H
-+#define __LINUX_FFP_H
-+
-+#include <linux/types.h>
-+#include <linux/compiler.h>
-+
-+#ifdef CONFIG_HAVE_ARCH_FFP
-+#include <asm/ffp.h>
-+#else
++#ifndef __ASM_FFP_H
++#define __ASM_FFP_H
 +
 +struct ffp {
-+	void	(**fn)(void);
-+	void	(*default_fn)(void);
++	u32	insn[5];
++	u32	def_branch;
 +};
 +
 +#define DECLARE_FFP(_fn, _def)						\
-+	extern typeof(_def) *_fn;					\
++	extern typeof(_def) _fn;					\
 +	extern struct ffp const __ffp_ ## _fn
 +
 +#define DEFINE_FFP(_fn, _def)						\
-+	typeof(_def) *_fn = &_def;					\
-+	struct ffp const __ffp_ ## _fn					\
-+		= { (void(**)(void))&_fn, (void(*)(void))&_def };	\
++	DECLARE_FFP(_fn, _def);						\
++	asm("	.pushsection	\".text\", \"ax\", %progbits	\n"	\
++	    "	.align		3				\n"	\
++	    "	.globl		" #_fn "			\n"	\
++	    "	.globl		__ffp_" #_fn "			\n"	\
++	    #_fn " :						\n"	\
++	    "__ffp_" #_fn " :					\n"	\
++	    "		b	" #_def "			\n"	\
++	    "		nop					\n"	\
++	    "		nop					\n"	\
++	    "		nop					\n"	\
++	    "		nop					\n"	\
++	    "		b	" #_def "			\n"	\
++	    "	.popsection					\n");	\
 +	EXPORT_SYMBOL(__ffp_ ## _fn)
 +
-+static inline void ffp_set_target(const struct ffp *m, void *new_fn)
-+{
-+	WRITE_ONCE(*m->fn, new_fn);
-+}
-+
-+static inline void ffp_reset_target(const struct ffp *m)
-+{
-+	WRITE_ONCE(*m->fn, m->default_fn);
-+}
++extern void ffp_set_target(const struct ffp *m, void *new_fn);
++extern void ffp_reset_target(const struct ffp *m);
 +
 +#endif
+diff --git a/arch/arm64/kernel/insn.c b/arch/arm64/kernel/insn.c
+index 2b3413549734..a2ed547fd171 100644
+--- a/arch/arm64/kernel/insn.c
++++ b/arch/arm64/kernel/insn.c
+@@ -30,6 +30,7 @@
+ #include <asm/cacheflush.h>
+ #include <asm/debug-monitors.h>
+ #include <asm/fixmap.h>
++#include <asm/ffp.h>
+ #include <asm/insn.h>
+ #include <asm/kprobes.h>
+ 
+@@ -1603,3 +1604,24 @@ u32 aarch64_insn_gen_extr(enum aarch64_insn_variant variant,
+ 	insn = aarch64_insn_encode_register(AARCH64_INSN_REGTYPE_RN, insn, Rn);
+ 	return aarch64_insn_encode_register(AARCH64_INSN_REGTYPE_RM, insn, Rm);
+ }
 +
-+#define SET_FFP(_fn, _new)	ffp_set_target(&__ffp_ ## _fn, _new)
-+#define RESET_FFP(_fn)		ffp_reset_target(&__ffp_ ## _fn)
++void ffp_set_target(const struct ffp *m, void *new_fn)
++{
++	u32 branch = aarch64_insn_gen_branch_imm((u64)m, (u64)new_fn,
++						 AARCH64_INSN_BRANCH_NOLINK);
 +
-+#endif
++	if (branch == AARCH64_BREAK_FAULT) {
++		/* TODO out of range - use a PLT sequence instead */
++	} else {
++		aarch64_insn_patch_text((void *[]){ (void *)m }, &branch, 1);
++	}
++}
++EXPORT_SYMBOL(ffp_set_target);
++
++void ffp_reset_target(const struct ffp *m)
++{
++	u32 branch = le32_to_cpu(m->def_branch);
++
++	aarch64_insn_patch_text((void *[]){ (void *)m }, &branch, 1);
++}
++EXPORT_SYMBOL(ffp_reset_target);
 -- 
 2.11.0
