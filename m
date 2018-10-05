@@ -1,7 +1,7 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [RFC PATCH 2/9] arm64: kernel: add arch support for patchable function pointers
-Date: Fri,  5 Oct 2018 10:13:26 +0200
-Message-ID: <20181005081333.15018-3-ard.biesheuvel@linaro.org>
+Subject: [RFC PATCH 3/9] crypto: crc-t10dif - make crc_t10dif a static inline
+Date: Fri,  5 Oct 2018 10:13:27 +0200
+Message-ID: <20181005081333.15018-4-ard.biesheuvel@linaro.org>
 References: <20181005081333.15018-1-ard.biesheuvel@linaro.org>
 Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
         "Jason A . Donenfeld" <Jason@zx2c4.com>,
@@ -28,106 +28,48 @@ In-Reply-To: <20181005081333.15018-1-ard.biesheuvel@linaro.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Implement arm64 support for patchable function pointers by emitting
-them as branch instructions (and a couple of NOPs in case the new
-target is out of range of a normal branch instruction.)
+crc_t10dif() is a trivial wrapper around crc_t10dif_update() so move
+it into the header file as a static inline function.
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- arch/arm64/Kconfig           |  1 +
- arch/arm64/include/asm/ffp.h | 35 ++++++++++++++++++++
- arch/arm64/kernel/insn.c     | 22 ++++++++++++
- 3 files changed, 58 insertions(+)
+ include/linux/crc-t10dif.h | 6 +++++-
+ lib/crc-t10dif.c           | 6 ------
+ 2 files changed, 5 insertions(+), 7 deletions(-)
 
-diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-index 1b1a0e95c751..db8c9e51c56d 100644
---- a/arch/arm64/Kconfig
-+++ b/arch/arm64/Kconfig
-@@ -102,6 +102,7 @@ config ARM64
- 	select HAVE_ALIGNED_STRUCT_PAGE if SLUB
- 	select HAVE_ARCH_AUDITSYSCALL
- 	select HAVE_ARCH_BITREVERSE
-+	select HAVE_ARCH_FFP
- 	select HAVE_ARCH_HUGE_VMAP
- 	select HAVE_ARCH_JUMP_LABEL
- 	select HAVE_ARCH_KASAN if !(ARM64_16K_PAGES && ARM64_VA_BITS_48)
-diff --git a/arch/arm64/include/asm/ffp.h b/arch/arm64/include/asm/ffp.h
-new file mode 100644
-index 000000000000..678dc1262218
---- /dev/null
-+++ b/arch/arm64/include/asm/ffp.h
-@@ -0,0 +1,35 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+
-+#ifndef __ASM_FFP_H
-+#define __ASM_FFP_H
-+
-+struct ffp {
-+	u32	insn[5];
-+	u32	def_branch;
-+};
-+
-+#define DECLARE_FFP(_fn, _def)						\
-+	extern typeof(_def) _fn;					\
-+	extern struct ffp const __ffp_ ## _fn
-+
-+#define DEFINE_FFP(_fn, _def)						\
-+	DECLARE_FFP(_fn, _def);						\
-+	asm("	.pushsection	\".text\", \"ax\", %progbits	\n"	\
-+	    "	.align		3				\n"	\
-+	    "	.globl		" #_fn "			\n"	\
-+	    "	.globl		__ffp_" #_fn "			\n"	\
-+	    #_fn " :						\n"	\
-+	    "__ffp_" #_fn " :					\n"	\
-+	    "		b	" #_def "			\n"	\
-+	    "		nop					\n"	\
-+	    "		nop					\n"	\
-+	    "		nop					\n"	\
-+	    "		nop					\n"	\
-+	    "		b	" #_def "			\n"	\
-+	    "	.popsection					\n");	\
-+	EXPORT_SYMBOL(__ffp_ ## _fn)
-+
-+extern void ffp_set_target(const struct ffp *m, void *new_fn);
-+extern void ffp_reset_target(const struct ffp *m);
-+
-+#endif
-diff --git a/arch/arm64/kernel/insn.c b/arch/arm64/kernel/insn.c
-index 2b3413549734..a2ed547fd171 100644
---- a/arch/arm64/kernel/insn.c
-+++ b/arch/arm64/kernel/insn.c
-@@ -30,6 +30,7 @@
- #include <asm/cacheflush.h>
- #include <asm/debug-monitors.h>
- #include <asm/fixmap.h>
-+#include <asm/ffp.h>
- #include <asm/insn.h>
- #include <asm/kprobes.h>
+diff --git a/include/linux/crc-t10dif.h b/include/linux/crc-t10dif.h
+index 6bb0c0bf357b..4dfe09ff4cf2 100644
+--- a/include/linux/crc-t10dif.h
++++ b/include/linux/crc-t10dif.h
+@@ -10,7 +10,11 @@
  
-@@ -1603,3 +1604,24 @@ u32 aarch64_insn_gen_extr(enum aarch64_insn_variant variant,
- 	insn = aarch64_insn_encode_register(AARCH64_INSN_REGTYPE_RN, insn, Rn);
- 	return aarch64_insn_encode_register(AARCH64_INSN_REGTYPE_RM, insn, Rm);
+ extern __u16 crc_t10dif_generic(__u16 crc, const unsigned char *buffer,
+ 				size_t len);
+-extern __u16 crc_t10dif(unsigned char const *, size_t);
+ extern __u16 crc_t10dif_update(__u16 crc, unsigned char const *, size_t);
+ 
++static inline __u16 crc_t10dif(const unsigned char *buffer, size_t len)
++{
++	return crc_t10dif_update(0, buffer, len);
++}
++
+ #endif
+diff --git a/lib/crc-t10dif.c b/lib/crc-t10dif.c
+index 4d0d47c1ffbd..036ee664c9e1 100644
+--- a/lib/crc-t10dif.c
++++ b/lib/crc-t10dif.c
+@@ -81,12 +81,6 @@ __u16 crc_t10dif_update(__u16 crc, const unsigned char *buffer, size_t len)
  }
-+
-+void ffp_set_target(const struct ffp *m, void *new_fn)
-+{
-+	u32 branch = aarch64_insn_gen_branch_imm((u64)m, (u64)new_fn,
-+						 AARCH64_INSN_BRANCH_NOLINK);
-+
-+	if (branch == AARCH64_BREAK_FAULT) {
-+		/* TODO out of range - use a PLT sequence instead */
-+	} else {
-+		aarch64_insn_patch_text((void *[]){ (void *)m }, &branch, 1);
-+	}
-+}
-+EXPORT_SYMBOL(ffp_set_target);
-+
-+void ffp_reset_target(const struct ffp *m)
-+{
-+	u32 branch = le32_to_cpu(m->def_branch);
-+
-+	aarch64_insn_patch_text((void *[]){ (void *)m }, &branch, 1);
-+}
-+EXPORT_SYMBOL(ffp_reset_target);
+ EXPORT_SYMBOL(crc_t10dif_update);
+ 
+-__u16 crc_t10dif(const unsigned char *buffer, size_t len)
+-{
+-	return crc_t10dif_update(0, buffer, len);
+-}
+-EXPORT_SYMBOL(crc_t10dif);
+-
+ static int __init crc_t10dif_mod_init(void)
+ {
+ 	crypto_register_notifier(&crc_t10dif_nb);
 -- 
 2.11.0
