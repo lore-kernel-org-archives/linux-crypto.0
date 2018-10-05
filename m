@@ -1,41 +1,32 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: caam/qi2 - add CONFIG_NETDEVICES dependency
-Date: Fri, 5 Oct 2018 10:29:42 +0800
-Message-ID: <20181005022942.gs7shzuagy5ycfct@gondor.apana.org.au>
-References: <20180926130045.2295764-1-arnd@arndb.de>
+Subject: Re: [PATCH] crypto/morus(640,1280) - make crypto_...-algs static
+Date: Fri, 5 Oct 2018 10:29:55 +0800
+Message-ID: <20181005022955.r4osquwg2p3yns4k@gondor.apana.org.au>
+References: <113445.1538002178@turing-police.cc.vt.edu>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        "David S. Miller" <davem@davemloft.net>,
+Cc: "David S. Miller" <davem@davemloft.net>,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Arnd Bergmann <arnd@arndb.de>
+To: valdis.kletnieks@vt.edu
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20180926130045.2295764-1-arnd@arndb.de>
+In-Reply-To: <113445.1538002178@turing-police.cc.vt.edu>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Sep 26, 2018 at 03:00:34PM +0200, Arnd Bergmann wrote:
-> This driver implements a (part of a) network driver, and fails to
-> build if we have turned off networking support:
+On Wed, Sep 26, 2018 at 06:49:38PM -0400, valdis.kletnieks@vt.edu wrote:
+> sparse complains thusly:
 > 
-> drivers/crypto/caam/caamalg_qi2.o: In function `dpaa2_caam_fqdan_cb':
-> caamalg_qi2.c:(.text+0x577c): undefined reference to `napi_schedule_prep'
-> caamalg_qi2.c:(.text+0x578c): undefined reference to `__napi_schedule_irqoff'
-> drivers/crypto/caam/caamalg_qi2.o: In function `dpaa2_dpseci_poll':
-> caamalg_qi2.c:(.text+0x59b8): undefined reference to `napi_complete_done'
-> drivers/crypto/caam/caamalg_qi2.o: In function `dpaa2_caam_remove':
-> caamalg_qi2.c:(.text.unlikely+0x4e0): undefined reference to `napi_disable'
-> caamalg_qi2.c:(.text.unlikely+0x4e8): undefined reference to `netif_napi_del'
-> drivers/crypto/caam/caamalg_qi2.o: In function `dpaa2_dpseci_setup':
-> caamalg_qi2.c:(.text.unlikely+0xc98): undefined reference to `netif_napi_add'
+>   CHECK   arch/x86/crypto/morus640-sse2-glue.c
+> arch/x86/crypto/morus640-sse2-glue.c:38:1: warning: symbol 'crypto_morus640_sse2_algs' was not declared. Should it be static?
+>   CHECK   arch/x86/crypto/morus1280-sse2-glue.c
+> arch/x86/crypto/morus1280-sse2-glue.c:38:1: warning: symbol 'crypto_morus1280_sse2_algs' was not declared. Should it be static?
+>   CHECK   arch/x86/crypto/morus1280-avx2-glue.c
+> arch/x86/crypto/morus1280-avx2-glue.c:38:1: warning: symbol 'crypto_morus1280_avx2_algs' was not declared. Should it be static?
 > 
-> >From what I can tell, CONFIG_NETDEVICES is the correct dependency here,
-> and adding it fixes the randconfig failures.
+> and sparse is correct - these don't need to be global and polluting the namespace.
 > 
-> Fixes: 8d818c105501 ("crypto: caam/qi2 - add DPAA2-CAAM driver")
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> Signed-off-by: Valdis Kletnieks <valdis.kletnieks@vt.edu>
 
 Patch applied.  Thanks.
 -- 
