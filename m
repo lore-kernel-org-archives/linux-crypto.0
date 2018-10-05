@@ -1,50 +1,51 @@
-From: Richard Weinberger <richard@nod.at>
-Subject: Re: [PATCH net-next v6 00/23] WireGuard: Secure Network Tunnel
-Date: Fri, 05 Oct 2018 15:53:07 +0200
-Message-ID: <7854782.OKhPC64esT@blindfold>
-References: <CAKv+Gu-ZMR7zEAKv6_2tyD3OqnjVugOzKHzBEXW3pQs5W-SvLw@mail.gmail.com> <CAFLxGvw154vyOziRKuFf5-XTa1NcQm5ZVmgUy3=F79k=Rw2dvA@mail.gmail.com> <CAHmME9rdkAG6mvkUMy9J5+8U9BQkrym7WmmtmK6o3nudykWLoA@mail.gmail.com>
+From: Peter Zijlstra <peterz@infradead.org>
+Subject: Re: [RFC PATCH 1/9] kernel: add support for patchable function
+ pointers
+Date: Fri, 5 Oct 2018 15:57:28 +0200
+Message-ID: <20181005135728.GR19272@hirez.programming.kicks-ass.net>
+References: <20181005081333.15018-1-ard.biesheuvel@linaro.org>
+ <20181005081333.15018-2-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Richard Weinberger <richard.weinberger@gmail.com>,
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-kernel@vger.kernel.org,
+        "Jason A . Donenfeld" <Jason@zx2c4.com>,
         Eric Biggers <ebiggers@kernel.org>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Samuel Neves <sneves@dei.uc.pt>,
+        Andy Lutomirski <luto@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Netdev <netdev@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        David Miller <davem@davemloft.net>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+        "David S. Miller" <davem@davemloft.net>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will.deacon@arm.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Kees Cook <keescook@chromium.org>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Rich
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAHmME9rdkAG6mvkUMy9J5+8U9BQkrym7WmmtmK6o3nudykWLoA@mail.gmail.com>
+Content-Disposition: inline
+In-Reply-To: <20181005081333.15018-2-ard.biesheuvel@linaro.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Am Freitag, 5. Oktober 2018, 15:46:29 CEST schrieb Jason A. Donenfeld:
-> On Fri, Oct 5, 2018 at 3:38 PM Richard Weinberger
-> <richard.weinberger@gmail.com> wrote:
-> > So we will have two competing crypo stacks in the kernel?
-> > Having a lightweight crypto API is a good thing but I really don't like the idea
-> > of having zinc parallel to the existing crypto stack.
+On Fri, Oct 05, 2018 at 10:13:25AM +0200, Ard Biesheuvel wrote:
+> Add a function pointer abstraction that can be implemented by the arch
+> in a manner that avoids the downsides of function pointers, i.e., the
+> fact that they are typically located in a writable data section, and
+> their vulnerability to Spectre like defects.
 > 
-> No, as you've seen in this patchset, the dynamic dispatch crypto API
-> can trivially be done on top of Zinc. So each time we introduce a new
-> primitive to Zinc that's also in the dynamic dispatch API, we
-> reimplement the current crypto API in terms of Zinc. Check out the two
-> patches in this series that do this; it's quite clean and sleek.
+> The FFP (or fast function pointer) is callable as a function, since
+> the generic incarnation is simply that. However, due to the fact that
+> C does not distinguish between functions and function pointers at the
+> call site, the architecture can instead emit it as a patchable sequence
+> of instructions consisting of ordinary branches.
 
-This is why I was asking. Your statement and the code didn't match for me.
- 
-> > And I strongly vote that Herbert Xu shall remain the maintainer of the whole
-> > crypto system (including zinc!) in the kernel.
-> 
-> No, sorry, we intend to maintain the code we've written. But I am
-> amenable to taking a tree-route into upstream based on whatever makes
-> most sense with merge conflicts and such.
- 
-So, you will be a sub-maintainer below Herbert's crypto, that's fine.
-What you wrote sounded like a parallel world...
-
-Thanks,
-//richard
+This is basically a static_key, except for indirection function calls?
+So why not call the thing static_func or static_call or something like
+that?
