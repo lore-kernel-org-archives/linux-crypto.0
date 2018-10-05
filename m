@@ -1,34 +1,40 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto/morus(640,1280) - make crypto_...-algs static
-Date: Fri, 5 Oct 2018 10:29:55 +0800
-Message-ID: <20181005022955.r4osquwg2p3yns4k@gondor.apana.org.au>
-References: <113445.1538002178@turing-police.cc.vt.edu>
+Subject: Re: [PATCH 2/3] crypto: add output feedback mode
+Date: Fri, 5 Oct 2018 10:31:38 +0800
+Message-ID: <20181005023138.dg22cn4salb3p6zl@gondor.apana.org.au>
+References: <1537449521-16182-1-git-send-email-gilad@benyossef.com>
+ <1537449521-16182-3-git-send-email-gilad@benyossef.com>
+ <CAKv+Gu9T7Z2oV8TEaN8uVdrFxGmmCKLh6ZjDnRnhgCmLwuVf4w@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: valdis.kletnieks@vt.edu
+Cc: Gilad Ben-Yossef <gilad@benyossef.com>,
+        "David S. Miller" <davem@davemloft.net>, ofir.drang@arm.com,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <113445.1538002178@turing-police.cc.vt.edu>
+In-Reply-To: <CAKv+Gu9T7Z2oV8TEaN8uVdrFxGmmCKLh6ZjDnRnhgCmLwuVf4w@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Sep 26, 2018 at 06:49:38PM -0400, valdis.kletnieks@vt.edu wrote:
-> sparse complains thusly:
+On Fri, Sep 28, 2018 at 12:06:29PM +0200, Ard Biesheuvel wrote:
+> On 20 September 2018 at 15:18, Gilad Ben-Yossef <gilad@benyossef.com> wrote:
+> > Add a generic version of output feedback mode. We already have support of
+> > several hardware based transformations of this mode and the needed test
+> > vectors but we somehow missed adding a generic software one. Fix this now.
+> >
+> > Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 > 
->   CHECK   arch/x86/crypto/morus640-sse2-glue.c
-> arch/x86/crypto/morus640-sse2-glue.c:38:1: warning: symbol 'crypto_morus640_sse2_algs' was not declared. Should it be static?
->   CHECK   arch/x86/crypto/morus1280-sse2-glue.c
-> arch/x86/crypto/morus1280-sse2-glue.c:38:1: warning: symbol 'crypto_morus1280_sse2_algs' was not declared. Should it be static?
->   CHECK   arch/x86/crypto/morus1280-avx2-glue.c
-> arch/x86/crypto/morus1280-avx2-glue.c:38:1: warning: symbol 'crypto_morus1280_avx2_algs' was not declared. Should it be static?
-> 
-> and sparse is correct - these don't need to be global and polluting the namespace.
-> 
-> Signed-off-by: Valdis Kletnieks <valdis.kletnieks@vt.edu>
+> I couldn't find any users of OFB in the kernel. Any idea who is using
+> it and for what?
 
-Patch applied.  Thanks.
+Yes this shouldn't have been accepted however the driver did go
+in with OFB and it's been there for a while so that's why I'm
+making this exception.
+
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
