@@ -1,66 +1,104 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [RFC PATCH 1/9] kernel: add support for patchable function pointers
-Date: Fri, 5 Oct 2018 21:13:08 +0200
-Message-ID: <E75F755E-E447-4302-BFBD-095FC45B991E@linaro.org>
-References: <20181005081333.15018-1-ard.biesheuvel@linaro.org> <20181005081333.15018-2-ard.biesheuvel@linaro.org> <20181005141433.GS19272@hirez.programming.kicks-ass.net> <9E0E08C8-0DFC-4E50-A4FA-73208835EF9E@amacapital.net> <CAKv+Gu9z503ZJXcsG+9Ys240BZiB-+GB=kNY4VGWpjvdzN4JtA@mail.gmail.com> <CALCETrWaewXsdJsf3SocgZ0ggnvZk86L+5-LWPRbjdnG2mB7jw@mail.gmail.com> <CAKv+Gu-oHBtgGbWXJu6+z4+BNhBZyY5VvF_v6cJJUGk_5YX1eQ@mail.gmail.com> <CALCETrU=fm+ZG4WZJfG-5GwL7kv5_GS1aZYu=L42d5BuSbhJDQ@mail.gmail.com> <CAKv+Gu8eHPEsUbkhN=61z9FvhdCo2e3VOdemp4g0bzdO1EJFYQ@mail.gmail.com> <CALCETrVMBULVP9qEQDVuisxAMzdheM1qQ97AZFs-xcO0eaXiiA@mail.gmail.com> <CAHmME9pgJ_2GGDUVsbQXcNRfh3yACqFG+5uemFRMZkb8LdH95g@mail.gmail.com> <CALCETrWjCY2Wceiqu99C+g5RdnrZuRujYO_+jBvuJFRB1LTG4w@mail.gmail.com> <CAHmME9pcQF=FvKRuxnqrJ
- 5R1pvtUVbx3DXvXiUX5HywS2Xgj3A@mail.gmail.com>
-Mime-Version: 1.0 (1.0)
-Content-Type: text/plain;
-        charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Cc: Andrew Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Samuel Neves <sneves@dei.uc.pt>, Arnd Bergmann <arnd@arndb.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        David Miller <davem@davemloft.net>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will.deacon@arm.com>, benh@kernel.crashing.org,
-        paulus@samba.org, Michael Ellerman <mpe@ellerman.id.au>,
-        Thomas Gleixner <tglx@linutronix.de>, mingo@redhat.com,
-        Kees Cook <keescook@chromium.org>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Andrew Morton <akpm@linux-foundation.org>, richard@nod.at,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        linux-ar
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+From: Eric Biggers <ebiggers@kernel.org>
+Subject: Re: BUG: unable to handle kernel NULL pointer dereference in
+ sha1_mb_mgr_get_comp_job_avx2
+Date: Fri, 5 Oct 2018 15:32:07 -0700
+Message-ID: <20181005223206.GA184636@gmail.com>
+References: <0000000000002e9bdb0576c70441@google.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: bp@alien8.de, davem@davemloft.net, herbert@gondor.apana.org.au,
+        hpa@zytor.com, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, megha.dey@linux.intel.com,
+        mingo@redhat.com, syzkaller-bugs@googlegroups.com,
+        tglx@linutronix.de, tim.c.chen@linux.intel.com, x86@kernel.org
+To: syzbot <syzbot+87dbe4b17debcec16d71@syzkaller.appspotmail.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAHmME9pcQF=FvKRuxnqrJ5R1pvtUVbx3DXvXiUX5HywS2Xgj3A@mail.gmail.com>
+Content-Disposition: inline
+In-Reply-To: <0000000000002e9bdb0576c70441@google.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
+On Wed, Sep 26, 2018 at 07:27:04AM -0700, syzbot wrote:
+> Hello,
+> 
+> syzbot found the following crash on:
+> 
+> HEAD commit:    a38523185b40 erge tag 'libnvdimm-fixes-4.19-rc6' of git://..
+> git tree:       upstream
+> console output: https://syzkaller.appspot.com/x/log.txt?x=1767b7fa400000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=dfb440e26f0a6f6f
+> dashboard link: https://syzkaller.appspot.com/bug?extid=87dbe4b17debcec16d71
+> compiler:       gcc (GCC) 8.0.1 20180413 (experimental)
+> 
+> Unfortunately, I don't have any reproducer for this crash yet.
+> 
+> IMPORTANT: if you fix the bug, please add the following tag to the commit:
+> Reported-by: syzbot+87dbe4b17debcec16d71@syzkaller.appspotmail.com
+> 
+> BUG: unable to handle kernel NULL pointer dereference at 0000000000000034
+> PGD 1b8b87067 P4D 1b8b87067 PUD 1b8b88067 PMD 0
+> Oops: 0002 [#1] PREEMPT SMP KASAN
+> CPU: 1 PID: 24 Comm: kworker/1:1 Not tainted 4.19.0-rc5+ #32
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS
+> Google 01/01/2011
+> Workqueue: crypto mcryptd_flusher
+> RIP: 0010:sha1_mb_mgr_get_comp_job_avx2+0x62/0xba
+> arch/x86/crypto/sha1-mb/sha1_mb_mgr_flush_avx2.S:256
+> Code: 04 c4 e2 69 3b d3 c4 c1 79 7e d0 49 f7 c0 f0 ff ff ff 75 6e 49 6b d8
+> 08 48 8d 9c 1f 08 01 00 00 48 8b 03 48 c7 03 00 00 00 00 <c7> 40 34 02 00 00
+> 00 48 8b 9f 00 01 00 00 48 c1 e3 04 4c 09 c3 48
+> kobject: 'loop1' (00000000307f8c2f): kobject_uevent_env
+> RSP: 0018:ffff8801d94473c0 EFLAGS: 00010206
+> RAX: 0000000000000000 RBX: ffff8801d4818688 RCX: 1ffff1003b2869e1
+> RDX: 1ffffd1ffffa2591 RSI: ffffffff81454f3a RDI: ffff8801d4818580
+> RBP: ffff8801d9447520 R08: 0000000000000000 R09: 0000000000000006
+> kobject: 'loop1' (00000000307f8c2f): fill_kobj_path: path =
+> '/devices/virtual/block/loop1'
+> R10: 0000000000000000 R11: ffff8801d9434640 R12: ffff8801d94474f8
+> R13: 0000000000000001 R14: ffff8801bb509720 R15: 0000000000000200
+> FS:  0000000000000000(0000) GS:ffff8801dad00000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> kobject: 'loop4' (00000000fa342cfc): kobject_uevent_env
+> CR2: 0000000000000034 CR3: 00000001b8b85000 CR4: 00000000001406e0
+> kobject: 'loop4' (00000000fa342cfc): fill_kobj_path: path =
+> '/devices/virtual/block/loop4'
+> Call Trace:
+>  sha1_mb_flusher+0x2f4/0x60b arch/x86/crypto/sha1-mb/sha1_mb.c:918
+>  mcryptd_flusher+0x3af/0x520 crypto/mcryptd.c:208
+>  process_one_work+0xc90/0x1b90 kernel/workqueue.c:2153
+>  worker_thread+0x17f/0x1390 kernel/workqueue.c:2296
+>  kthread+0x35a/0x420 kernel/kthread.c:246
+>  ret_from_fork+0x3a/0x50 arch/x86/entry/entry_64.S:413
+> Modules linked in:
+> CR2: 0000000000000034
+> ---[ end trace 7d3a48e5625a9543 ]---
+> RIP: 0010:sha1_mb_mgr_get_comp_job_avx2+0x62/0xba
+> arch/x86/crypto/sha1-mb/sha1_mb_mgr_flush_avx2.S:256
+> Code: 04 c4 e2 69 3b d3 c4 c1 79 7e d0 49 f7 c0 f0 ff ff ff 75 6e 49 6b d8
+> 08 48 8d 9c 1f 08 01 00 00 48 8b 03 48 c7 03 00 00 00 00 <c7> 40 34 02 00 00
+> 00 48 8b 9f 00 01 00 00 48 c1 e3 04 4c 09 c3 48
+> RSP: 0018:ffff8801d94473c0 EFLAGS: 00010206
+> RAX: 0000000000000000 RBX: ffff8801d4818688 RCX: 1ffff1003b2869e1
+> RDX: 1ffffd1ffffa2591 RSI: ffffffff81454f3a RDI: ffff8801d4818580
+> RBP: ffff8801d9447520 R08: 0000000000000000 R09: 0000000000000006
+> R10: 0000000000000000 R11: ffff8801d9434640 R12: ffff8801d94474f8
+> R13: 0000000000000001 R14: ffff8801bb509720 R15: 0000000000000200
+> FS:  0000000000000000(0000) GS:ffff8801dad00000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 0000000000000034 CR3: 00000001b8b85000 CR4: 00000000001406e0
+> 
+> 
+> ---
+> This bug is generated by a bot. It may contain errors.
+> See https://goo.gl/tpsmEJ for more information about syzbot.
+> syzbot engineers can be reached at syzkaller@googlegroups.com.
+> 
+> syzbot will keep track of this bug report. See:
+> https://goo.gl/tpsmEJ#bug-status-tracking for how to communicate with
+> syzbot.
 
+The "fix" for this is queued in cryptodev:
 
-> On 5 Oct 2018, at 20:28, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
->=20
-> Hey Andy,
->=20
->> On Fri, Oct 5, 2018 at 7:44 PM Andy Lutomirski <luto@kernel.org> wrote:
->> I *think* the only change to Zinc per se would be that the calls like
->> chacha20_simd() would be static calls or patchable functions or
->> whatever we want to call them.  And there could be a debugfs to
->> override the default selection.
->=20
-> Yea, right, exactly. It turns out this is really easy to do with the
-> way it's structured now. I'd actually experimented considerably with
-> using the static keys a while back, but couldn't find any performance
-> difference on any platform at all (four ARM microarchitectures, three
-> MIPS, various random intel, an old powerpc), so went with the simplest
-> solution. But we can certainly play with more elaborate patching
-> mechanisms later on and see how those turn out. Also, even with the
-> simple bools as we have now, it's quite easy to make all the
-> parameters toggle-able.
->=20
->> Ard, I don't think that sticking this in udev rules makes sense.  The
->> kernel has bascially complete information as to what the right choice
->> is, and that will change over time as the implementation gets tuned,
->> and the udev rules will never get updated in sync.
->=20
-> Yes, I agree with this.
->=20
->=20
+#syz fix: crypto: x86 - remove SHA multibuffer routines and mcryptd
 
-I am not referring to udev rules. I just mean the current way that udev auto=
-loads modules based on CPU features.=
+- Eric
