@@ -1,71 +1,112 @@
-From: Michael Ellerman <mpe@ellerman.id.au>
-Subject: Re: [PATCH v22 3/6] iomap: introduce io{read|write}64_{lo_hi|hi_lo}
-Date: Sat, 06 Oct 2018 21:56:13 +1000
-Message-ID: <877eivjnky.fsf@concordia.ellerman.id.au>
-References: <20181002224108.3321-1-logang@deltatee.com> <20181002224108.3321-4-logang@deltatee.com>
+From: syzbot <syzbot+c5048caf67d09ee24549@syzkaller.appspotmail.com>
+Subject: general protection fault in gcmaes_crypt_by_sg
+Date: Sat, 06 Oct 2018 06:04:03 -0700
+Message-ID: <000000000000b3b10305778f05f5@google.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Andy Shevchenko <andy.shevchenko@gmail.com>,
-        Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        Suresh Warrier <warrier@linux.vnet.ibm.com>,
-        Nicholas Piggin <npiggin@gmail.com>
-To: Logan Gunthorpe <logang@deltatee.com>,
-        linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
-        linux-ntb@googlegroups.com, linux-crypto@vger.kernel.org,
-        Andrew Morton <akpm@linux-foundation.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+Content-Transfer-Encoding: base64
+To: bp@alien8.de, davem@davemloft.net, herbert@gondor.apana.org.au,
+        hpa@zytor.com, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, mingo@redhat.com,
+        syzkaller-bugs@googlegroups.com, tglx@linutronix.de, x86@kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20181002224108.3321-4-logang@deltatee.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Logan Gunthorpe <logang@deltatee.com> writes:
-
-> In order to provide non-atomic functions for io{read|write}64 that will
-> use readq and writeq when appropriate. We define a number of variants
-> of these functions in the generic iomap that will do non-atomic
-> operations on pio but atomic operations on mmio.
->
-> These functions are only defined if readq and writeq are defined. If
-> they are not, then the wrappers that always use non-atomic operations
-> from include/linux/io-64-nonatomic*.h will be used.
->
-> Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-> Reviewed-by: Andy Shevchenko <andy.shevchenko@gmail.com>
-> Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-> Cc: Paul Mackerras <paulus@samba.org>
-> Cc: Michael Ellerman <mpe@ellerman.id.au>
-> Cc: Arnd Bergmann <arnd@arndb.de>
-> Cc: Suresh Warrier <warrier@linux.vnet.ibm.com>
-> Cc: Nicholas Piggin <npiggin@gmail.com>
-> ---
->  arch/powerpc/include/asm/io.h |   2 +
->  include/asm-generic/iomap.h   |  22 ++++++
->  lib/iomap.c                   | 132 ++++++++++++++++++++++++++++++++++
->  3 files changed, 156 insertions(+)
->
-> diff --git a/arch/powerpc/include/asm/io.h b/arch/powerpc/include/asm/io.h
-> index e0331e754568..20fe5d7515db 100644
-> --- a/arch/powerpc/include/asm/io.h
-> +++ b/arch/powerpc/include/asm/io.h
-> @@ -798,8 +798,10 @@ extern void __iounmap_at(void *ea, unsigned long size);
->  
->  #define mmio_read16be(addr)		readw_be(addr)
->  #define mmio_read32be(addr)		readl_be(addr)
-> +#define mmio_read64be(addr)		readq_be(addr)
->  #define mmio_write16be(val, addr)	writew_be(val, addr)
->  #define mmio_write32be(val, addr)	writel_be(val, addr)
-> +#define mmio_write64be(val, addr)	writeq_be(val, addr)
->  #define mmio_insb(addr, dst, count)	readsb(addr, dst, count)
->  #define mmio_insw(addr, dst, count)	readsw(addr, dst, count)
->  #define mmio_insl(addr, dst, count)	readsl(addr, dst, count)
-
-For the powerpc part:
-
-Acked-by: Michael Ellerman <mpe@ellerman.id.au> (powerpc)
-
-cheers
+SGVsbG8sDQoNCnN5emJvdCBmb3VuZCB0aGUgZm9sbG93aW5nIGNyYXNoIG9uOg0KDQpIRUFEIGNv
+bW1pdDogICAgMTJmZmFhMTE5N2Y1IEFkZCBsaW51eC1uZXh0IHNwZWNpZmljIGZpbGVzIGZvciAy
+MDE4MTAwNQ0KZ2l0IHRyZWU6ICAgICAgIGxpbnV4LW5leHQNCmNvbnNvbGUgb3V0cHV0OiBodHRw
+czovL3N5emthbGxlci5hcHBzcG90LmNvbS94L2xvZy50eHQ/eD0xNmNiNzgwNjQwMDAwMA0Ka2Vy
+bmVsIGNvbmZpZzogIGh0dHBzOi8vc3l6a2FsbGVyLmFwcHNwb3QuY29tL3gvLmNvbmZpZz94PWQ2
+YjA1OGE3MjMyMDQ2Zg0KZGFzaGJvYXJkIGxpbms6IGh0dHBzOi8vc3l6a2FsbGVyLmFwcHNwb3Qu
+Y29tL2J1Zz9leHRpZD1jNTA0OGNhZjY3ZDA5ZWUyNDU0OQ0KY29tcGlsZXI6ICAgICAgIGdjYyAo
+R0NDKSA4LjAuMSAyMDE4MDQxMyAoZXhwZXJpbWVudGFsKQ0KDQpVbmZvcnR1bmF0ZWx5LCBJIGRv
+bid0IGhhdmUgYW55IHJlcHJvZHVjZXIgZm9yIHRoaXMgY3Jhc2ggeWV0Lg0KDQpJTVBPUlRBTlQ6
+IGlmIHlvdSBmaXggdGhlIGJ1ZywgcGxlYXNlIGFkZCB0aGUgZm9sbG93aW5nIHRhZyB0byB0aGUg
+Y29tbWl0Og0KUmVwb3J0ZWQtYnk6IHN5emJvdCtjNTA0OGNhZjY3ZDA5ZWUyNDU0OUBzeXprYWxs
+ZXIuYXBwc3BvdG1haWwuY29tDQoNCkAZOiByZW5hbWVkIGZyb20gaXA2Z3JlMA0Ka2FzYW46IENP
+TkZJR19LQVNBTl9JTkxJTkUgZW5hYmxlZA0Ka2FzYW46IEdQRiBjb3VsZCBiZSBjYXVzZWQgYnkg
+TlVMTC1wdHIgZGVyZWYgb3IgdXNlciBtZW1vcnkgYWNjZXNzDQpnZW5lcmFsIHByb3RlY3Rpb24g
+ZmF1bHQ6IDAwMDAgWyMxXSBQUkVFTVBUIFNNUCBLQVNBTg0KQ1BVOiAxIFBJRDogMTUxMCBDb21t
+OiBzeXotZXhlY3V0b3IwIE5vdCB0YWludGVkIDQuMTkuMC1yYzYtbmV4dC0yMDE4MTAwNSsgIA0K
+Izg4DQpIYXJkd2FyZSBuYW1lOiBHb29nbGUgR29vZ2xlIENvbXB1dGUgRW5naW5lL0dvb2dsZSBD
+b21wdXRlIEVuZ2luZSwgQklPUyAgDQpHb29nbGUgMDEvMDEvMjAxMQ0KUklQOiAwMDEwOnNjYXR0
+ZXJ3YWxrX3N0YXJ0IGluY2x1ZGUvY3J5cHRvL3NjYXR0ZXJ3YWxrLmg6NzMgW2lubGluZV0NClJJ
+UDogMDAxMDpnY21hZXNfY3J5cHRfYnlfc2crMHg1NmYvMHgyMTEwICANCmFyY2gveDg2L2NyeXB0
+by9hZXNuaS1pbnRlbF9nbHVlLmM6ODM0DQpDb2RlOiBjMSBlOSAwMyA4MCAzYyAxMSAwMCAwZiA4
+NSBiZiAxOCAwMCAwMCA0OCA4ZCA3OCAwOCA0OCA4OSA4NCAyNCA1MCAwMSAgDQowMCAwMCA0OCBi
+YSAwMCAwMCAwMCAwMCAwMCBmYyBmZiBkZiA0OCA4OSBmOSA0OCBjMSBlOSAwMyA8MGY+IGI2IDE0
+IDExIDg0ICANCmQyIDc0IDA5IDgwIGZhIDAzIDBmIDhlIDZiIDE1IDAwIDAwIDQ0IDhiIDYwIDA4
+IDQ4DQpSU1A6IDAwMTg6ZmZmZjg4MDE4NTJiZjEyMCBFRkxBR1M6IDAwMDEwMjAyDQpSQVg6IDAw
+MDAwMDAwMDAwMDAwMDAgUkJYOiBmZmZmODgwMTkwMjNjNmIwIFJDWDogMDAwMDAwMDAwMDAwMDAw
+MQ0KUkRYOiBkZmZmZmMwMDAwMDAwMDAwIFJTSTogZmZmZmZmZmY4MzU5ZTA2YyBSREk6IDAwMDAw
+MDAwMDAwMDAwMDgNClJCUDogZmZmZjg4MDE4NTJiZjUyMCBSMDg6IGZmZmY4ODAxODUwYzQzMDAg
+UjA5OiBmZmZmODgwMWJlZmIwMDYwDQpSMTA6IGZmZmY4ODAxODUyYmY3YjAgUjExOiBmZmZmODgw
+MTg1MmJmN2RiIFIxMjogMDAwMDAwMDAwMDAwMDAwZA0KUjEzOiAwMDAwMDAwMDAwMDAwMDBkIFIx
+NDogZmZmZjg4MDE4NTJiZjIzOCBSMTU6IGZmZmY4ODAxODUyYmY3ZDANCkZTOiAgMDAwMDAwMDAw
+MjVkMzk0MCgwMDAwKSBHUzpmZmZmODgwMWRhZjAwMDAwKDAwMDApIGtubEdTOjAwMDAwMDAwMDAw
+MDAwMDANCkNTOiAgMDAxMCBEUzogMDAwMCBFUzogMDAwMCBDUjA6IDAwMDAwMDAwODAwNTAwMzMN
+CkNSMjogMDAwMDAwMWIyZDEyODAwMCBDUjM6IDAwMDAwMDAxY2QyNzMwMDAgQ1I0OiAwMDAwMDAw
+MDAwMTQwNmUwDQpEUjA6IDAwMDAwMDAwMjAwMDAwMDAgRFIxOiAwMDAwMDAwMDAwMDAwMDAwIERS
+MjogMDAwMDAwMDAwMDAwMDAwMA0KRFIzOiAwMDAwMDAwMDAwMDAwMDAwIERSNjogMDAwMDAwMDBm
+ZmZlMGZmMCBEUjc6IDAwMDAwMDAwMDAwMDA2MDANCkNhbGwgVHJhY2U6DQogIGdjbWFlc19lbmNy
+eXB0LmNvbnN0cHJvcC4xNysweDdkNy8weDExOTAgIA0KYXJjaC94ODYvY3J5cHRvL2Flc25pLWlu
+dGVsX2dsdWUuYzo5MjkNCiAgZ2VuZXJpY19nY21hZXNfZW5jcnlwdCsweDEyZC8weDE4NiBhcmNo
+L3g4Ni9jcnlwdG8vYWVzbmktaW50ZWxfZ2x1ZS5jOjEyOTQNCiAgY3J5cHRvX2FlYWRfZW5jcnlw
+dCBpbmNsdWRlL2NyeXB0by9hZWFkLmg6MzY0IFtpbmxpbmVdDQogIGdjbWFlc193cmFwcGVyX2Vu
+Y3J5cHQrMHgxNjIvMHgyMDAgYXJjaC94ODYvY3J5cHRvL2Flc25pLWludGVsX2dsdWUuYzoxMTI3
+DQogIGNyeXB0b19hZWFkX2VuY3J5cHQgaW5jbHVkZS9jcnlwdG8vYWVhZC5oOjM2NCBbaW5saW5l
+XQ0KICB0bHNfZG9fZW5jcnlwdGlvbiBuZXQvdGxzL3Rsc19zdy5jOjUzNCBbaW5saW5lXQ0KICB0
+bHNfcHVzaF9yZWNvcmQrMHhjMTIvMHgxN2YwIG5ldC90bHMvdGxzX3N3LmM6NTgzDQogIHRsc19z
+d19wdXNoX3BlbmRpbmdfcmVjb3JkKzB4MjIvMHgzMCBuZXQvdGxzL3Rsc19zdy5jOjU5Nw0KICB0
+bHNfaGFuZGxlX29wZW5fcmVjb3JkIG5ldC90bHMvdGxzX21haW4uYzoxNTUgW2lubGluZV0NCiAg
+dGxzX3NrX3Byb3RvX2Nsb3NlKzB4NDM5LzB4NzUwIG5ldC90bHMvdGxzX21haW4uYzoyNzINCiAg
+aW5ldF9yZWxlYXNlKzB4MTA0LzB4MWYwIG5ldC9pcHY0L2FmX2luZXQuYzo0MjgNCiAgaW5ldDZf
+cmVsZWFzZSsweDUwLzB4NzAgbmV0L2lwdjYvYWZfaW5ldDYuYzo0NTgNCiAgX19zb2NrX3JlbGVh
+c2UrMHhkNy8weDI1MCBuZXQvc29ja2V0LmM6NTgwDQogIHNvY2tfY2xvc2UrMHgxOS8weDIwIG5l
+dC9zb2NrZXQuYzoxMTQyDQogIF9fZnB1dCsweDNiYy8weGE3MCBmcy9maWxlX3RhYmxlLmM6Mjc5
+DQogIF9fX19mcHV0KzB4MTUvMHgyMCBmcy9maWxlX3RhYmxlLmM6MzEyDQogIHRhc2tfd29ya19y
+dW4rMHgxZTgvMHgyYTAga2VybmVsL3Rhc2tfd29yay5jOjExMw0KICB0cmFjZWhvb2tfbm90aWZ5
+X3Jlc3VtZSBpbmNsdWRlL2xpbnV4L3RyYWNlaG9vay5oOjE4OCBbaW5saW5lXQ0KICBleGl0X3Rv
+X3VzZXJtb2RlX2xvb3ArMHgzMTgvMHgzODAgYXJjaC94ODYvZW50cnkvY29tbW9uLmM6MTY2DQog
+IHByZXBhcmVfZXhpdF90b191c2VybW9kZSBhcmNoL3g4Ni9lbnRyeS9jb21tb24uYzoxOTcgW2lu
+bGluZV0NCiAgc3lzY2FsbF9yZXR1cm5fc2xvd3BhdGggYXJjaC94ODYvZW50cnkvY29tbW9uLmM6
+MjY4IFtpbmxpbmVdDQogIGRvX3N5c2NhbGxfNjQrMHg2YmUvMHg4MjAgYXJjaC94ODYvZW50cnkv
+Y29tbW9uLmM6MjkzDQogIGVudHJ5X1NZU0NBTExfNjRfYWZ0ZXJfaHdmcmFtZSsweDQ5LzB4YmUN
+ClJJUDogMDAzMzoweDQxMTA1MQ0KQ29kZTogNzUgMTQgYjggMDMgMDAgMDAgMDAgMGYgMDUgNDgg
+M2QgMDEgZjAgZmYgZmYgMGYgODMgMzQgMTkgMDAgMDAgYzMgNDggIA0KODMgZWMgMDggZTggMGEg
+ZmMgZmYgZmYgNDggODkgMDQgMjQgYjggMDMgMDAgMDAgMDAgMGYgMDUgPDQ4PiA4YiAzYyAyNCA0
+OCAgDQo4OSBjMiBlOCA1MyBmYyBmZiBmZiA0OCA4OSBkMCA0OCA4MyBjNCAwOCA0OCAzZCAwMQ0K
+UlNQOiAwMDJiOjAwMDA3ZmZmNDBmOWE4ZDAgRUZMQUdTOiAwMDAwMDI5MyBPUklHX1JBWDogMDAw
+MDAwMDAwMDAwMDAwMw0KUkFYOiAwMDAwMDAwMDAwMDAwMDAwIFJCWDogMDAwMDAwMDAwMDAwMDAw
+NCBSQ1g6IDAwMDAwMDAwMDA0MTEwNTENClJEWDogMDAwMDAwMWIyZGEyMDAwMCBSU0k6IDAwMDAw
+MDAwMDAwMDAwMDAgUkRJOiAwMDAwMDAwMDAwMDAwMDAzDQpSQlA6IDAwMDAwMDAwMDAwMDAwMDAg
+UjA4OiAwMDAwMDAwMDQ5Y2NkMWVmIFIwOTogMDAwMDAwMDA0OWNjZDFmMw0KUjEwOiAwMDAwN2Zm
+ZjQwZjlhODAwIFIxMTogMDAwMDAwMDAwMDAwMDI5MyBSMTI6IDAwMDAwMDAwMDAwMDAwMDANClIx
+MzogMDAwMDAwMDAwMDAwMDAwMSBSMTQ6IDAwMDAwMDAwMDAwMDAxMGMgUjE1OiAwMDAwMDAwMDAw
+MDAwMDAwDQpNb2R1bGVzIGxpbmtlZCBpbjoNCi0tLVsgZW5kIHRyYWNlIGE4ZjUyMzExMGQ4Y2Ez
+NzUgXS0tLQ0KUklQOiAwMDEwOnNjYXR0ZXJ3YWxrX3N0YXJ0IGluY2x1ZGUvY3J5cHRvL3NjYXR0
+ZXJ3YWxrLmg6NzMgW2lubGluZV0NClJJUDogMDAxMDpnY21hZXNfY3J5cHRfYnlfc2crMHg1NmYv
+MHgyMTEwICANCmFyY2gveDg2L2NyeXB0by9hZXNuaS1pbnRlbF9nbHVlLmM6ODM0DQpDb2RlOiBj
+MSBlOSAwMyA4MCAzYyAxMSAwMCAwZiA4NSBiZiAxOCAwMCAwMCA0OCA4ZCA3OCAwOCA0OCA4OSA4
+NCAyNCA1MCAwMSAgDQowMCAwMCA0OCBiYSAwMCAwMCAwMCAwMCAwMCBmYyBmZiBkZiA0OCA4OSBm
+OSA0OCBjMSBlOSAwMyA8MGY+IGI2IDE0IDExIDg0ICANCmQyIDc0IDA5IDgwIGZhIDAzIDBmIDhl
+IDZiIDE1IDAwIDAwIDQ0IDhiIDYwIDA4IDQ4DQpSU1A6IDAwMTg6ZmZmZjg4MDE4NTJiZjEyMCBF
+RkxBR1M6IDAwMDEwMjAyDQpSQVg6IDAwMDAwMDAwMDAwMDAwMDAgUkJYOiBmZmZmODgwMTkwMjNj
+NmIwIFJDWDogMDAwMDAwMDAwMDAwMDAwMQ0KUkRYOiBkZmZmZmMwMDAwMDAwMDAwIFJTSTogZmZm
+ZmZmZmY4MzU5ZTA2YyBSREk6IDAwMDAwMDAwMDAwMDAwMDgNClJCUDogZmZmZjg4MDE4NTJiZjUy
+MCBSMDg6IGZmZmY4ODAxODUwYzQzMDAgUjA5OiBmZmZmODgwMWJlZmIwMDYwDQpSMTA6IGZmZmY4
+ODAxODUyYmY3YjAgUjExOiBmZmZmODgwMTg1MmJmN2RiIFIxMjogMDAwMDAwMDAwMDAwMDAwZA0K
+UjEzOiAwMDAwMDAwMDAwMDAwMDBkIFIxNDogZmZmZjg4MDE4NTJiZjIzOCBSMTU6IGZmZmY4ODAx
+ODUyYmY3ZDANCkZTOiAgMDAwMDAwMDAwMjVkMzk0MCgwMDAwKSBHUzpmZmZmODgwMWRhZjAwMDAw
+KDAwMDApIGtubEdTOjAwMDAwMDAwMDAwMDAwMDANCkNTOiAgMDAxMCBEUzogMDAwMCBFUzogMDAw
+MCBDUjA6IDAwMDAwMDAwODAwNTAwMzMNCkNSMjogMDAwMDAwMWIyZDEyODAwMCBDUjM6IDAwMDAw
+MDAxY2QyNzMwMDAgQ1I0OiAwMDAwMDAwMDAwMTQwNmUwDQpEUjA6IDAwMDAwMDAwMjAwMDAwMDAg
+RFIxOiAwMDAwMDAwMDAwMDAwMDAwIERSMjogMDAwMDAwMDAwMDAwMDAwMA0KRFIzOiAwMDAwMDAw
+MDAwMDAwMDAwIERSNjogMDAwMDAwMDBmZmZlMGZmMCBEUjc6IDAwMDAwMDAwMDAwMDA2MDANCg0K
+DQotLS0NClRoaXMgYnVnIGlzIGdlbmVyYXRlZCBieSBhIGJvdC4gSXQgbWF5IGNvbnRhaW4gZXJy
+b3JzLg0KU2VlIGh0dHBzOi8vZ29vLmdsL3Rwc21FSiBmb3IgbW9yZSBpbmZvcm1hdGlvbiBhYm91
+dCBzeXpib3QuDQpzeXpib3QgZW5naW5lZXJzIGNhbiBiZSByZWFjaGVkIGF0IHN5emthbGxlckBn
+b29nbGVncm91cHMuY29tLg0KDQpzeXpib3Qgd2lsbCBrZWVwIHRyYWNrIG9mIHRoaXMgYnVnIHJl
+cG9ydC4gU2VlOg0KaHR0cHM6Ly9nb28uZ2wvdHBzbUVKI2J1Zy1zdGF0dXMtdHJhY2tpbmcgZm9y
+IGhvdyB0byBjb21tdW5pY2F0ZSB3aXRoICANCnN5emJvdC4NCg==
