@@ -1,13 +1,16 @@
 From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: [PATCH net-next v7 08/28] zinc: port Andy Polyakov's ChaCha20 ARM and ARM64 implementations
-Date: Sat,  6 Oct 2018 04:56:49 +0200
-Message-ID: <20181006025709.4019-9-Jason@zx2c4.com>
+Subject: [PATCH net-next v7 10/28] zinc: ChaCha20 MIPS32r2 implementation
+Date: Sat,  6 Oct 2018 04:56:51 +0200
+Message-ID: <20181006025709.4019-11-Jason@zx2c4.com>
 References: <20181006025709.4019-1-Jason@zx2c4.com>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Russell King <linux@armlinux.org.uk>,
-        linux-arm-kernel@lists.infradead.org,
+        =?UTF-8?q?Ren=C3=A9=20van=20Dorst?= <opensource@vdorst.com>,
+        Ralf Baechle <ralf@linux-mips.org>,
+        Paul Burton <paul.burton@mips.com>,
+        James Hogan <jhogan@kernel.org>, linux-mips@linux-mips.org,
         Samuel Neves <sneves@dei.uc.pt>,
         Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
         Andy Lutomirski <luto@kernel.org>,
@@ -21,26 +24,16 @@ In-Reply-To: <20181006025709.4019-1-Jason@zx2c4.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-These port and prepare Andy Polyakov's implementations for the kernel,
-but don't actually wire up any of the code yet. The wiring will be done
-in a subsequent commit, since we'll need to merge these implementations
-with another one. We make a few small changes to the assembly:
-
-  - Entries and exits use the proper kernel convention macro.
-  - CPU feature checking is done in C by the glue code, so that has been
-    removed from the assembly.
-  - The function names have been renamed to fit kernel conventions.
-  - Labels have been renamed (prefixed with .L) to fit kernel conventions.
-  - Constants have been rearranged so that they are closer to the code
-    that is using them. [ARM only]
-  - The neon code can jump to the scalar code when it makes sense to do
-    so.
-  - The neon_512 function as a separate function has been removed, leaving
-    the decision up to the main neon entry point. [ARM64 only]
+This MIPS32r2 implementation comes from René van Dorst and me and
+results in a nice speedup on the usual OpenWRT targets.
 
 Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
-Cc: Russell King <linux@armlinux.org.uk>
-Cc: linux-arm-kernel@lists.infradead.org
+Signed-off-by: René van Dorst <opensource@vdorst.com>
+Co-developed-by: René van Dorst <opensource@vdorst.com>
+Cc: Ralf Baechle <ralf@linux-mips.org>
+Cc: Paul Burton <paul.burton@mips.com>
+Cc: James Hogan <jhogan@kernel.org>
+Cc: linux-mips@linux-mips.org
 Cc: Samuel Neves <sneves@dei.uc.pt>
 Cc: Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>
 Cc: Andy Lutomirski <luto@kernel.org>
@@ -50,1079 +43,501 @@ Cc: Linus Torvalds <torvalds@linux-foundation.org>
 Cc: kernel-hardening@lists.openwall.com
 Cc: linux-crypto@vger.kernel.org
 ---
- lib/zinc/chacha20/chacha20-arm-cryptogams.S   | 367 +++++++++---------
- lib/zinc/chacha20/chacha20-arm64-cryptogams.S |  75 ++--
- 2 files changed, 202 insertions(+), 240 deletions(-)
+ lib/zinc/Makefile                      |   2 +
+ lib/zinc/chacha20/chacha20-mips-glue.c |  28 ++
+ lib/zinc/chacha20/chacha20-mips.S      | 424 +++++++++++++++++++++++++
+ lib/zinc/chacha20/chacha20.c           |   2 +
+ 4 files changed, 456 insertions(+)
+ create mode 100644 lib/zinc/chacha20/chacha20-mips-glue.c
+ create mode 100644 lib/zinc/chacha20/chacha20-mips.S
 
-diff --git a/lib/zinc/chacha20/chacha20-arm-cryptogams.S b/lib/zinc/chacha20/chacha20-arm-cryptogams.S
-index 05a3a9e6e93f..770bab469171 100644
---- a/lib/zinc/chacha20/chacha20-arm-cryptogams.S
-+++ b/lib/zinc/chacha20/chacha20-arm-cryptogams.S
-@@ -1,9 +1,12 @@
- /* SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause */
- /*
+diff --git a/lib/zinc/Makefile b/lib/zinc/Makefile
+index e47f64e12bbd..60d568cf5206 100644
+--- a/lib/zinc/Makefile
++++ b/lib/zinc/Makefile
+@@ -6,4 +6,6 @@ zinc_chacha20-y := chacha20/chacha20.o
+ zinc_chacha20-$(CONFIG_ZINC_ARCH_X86_64) += chacha20/chacha20-x86_64.o
+ zinc_chacha20-$(CONFIG_ZINC_ARCH_ARM) += chacha20/chacha20-arm.o
+ zinc_chacha20-$(CONFIG_ZINC_ARCH_ARM64) += chacha20/chacha20-arm64.o
++zinc_chacha20-$(CONFIG_ZINC_ARCH_MIPS) += chacha20/chacha20-mips.o
++AFLAGS_chacha20-mips.o += -O2 # This is required to fill the branch delay slots
+ obj-$(CONFIG_ZINC_CHACHA20) += zinc_chacha20.o
+diff --git a/lib/zinc/chacha20/chacha20-mips-glue.c b/lib/zinc/chacha20/chacha20-mips-glue.c
+new file mode 100644
+index 000000000000..917d8fa8e3f4
+--- /dev/null
++++ b/lib/zinc/chacha20/chacha20-mips-glue.c
+@@ -0,0 +1,28 @@
++// SPDX-License-Identifier: GPL-2.0 OR MIT
++/*
 + * Copyright (C) 2015-2018 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
-  * Copyright (C) 2006-2017 CRYPTOGAMS by <appro@openssl.org>. All Rights Reserved.
-+ *
-+ * This is based in part on Andy Polyakov's implementation from CRYPTOGAMS.
-  */
- 
--#include "arm_arch.h"
-+#include <linux/linkage.h>
- 
- .text
- #if defined(__thumb2__) || defined(__clang__)
-@@ -24,48 +27,25 @@
- .long	0x61707865,0x3320646e,0x79622d32,0x6b206574	@ endian-neutral
- .Lone:
- .long	1,0,0,0
--.Lrot8:
--.long	0x02010003,0x06050407
--#if __ARM_MAX_ARCH__>=7
--.LOPENSSL_armcap:
--.word   OPENSSL_armcap_P-.LChaCha20_ctr32
--#else
- .word	-1
--#endif
- 
--.globl	ChaCha20_ctr32
--.type	ChaCha20_ctr32,%function
- .align	5
--ChaCha20_ctr32:
--.LChaCha20_ctr32:
-+ENTRY(chacha20_arm)
- 	ldr	r12,[sp,#0]		@ pull pointer to counter and nonce
- 	stmdb	sp!,{r0-r2,r4-r11,lr}
--#if __ARM_ARCH__<7 && !defined(__thumb2__)
--	sub	r14,pc,#16		@ ChaCha20_ctr32
--#else
--	adr	r14,.LChaCha20_ctr32
--#endif
- 	cmp	r2,#0			@ len==0?
--#ifdef	__thumb2__
-+#ifdef __thumb2__
- 	itt	eq
- #endif
- 	addeq	sp,sp,#4*3
--	beq	.Lno_data
--#if __ARM_MAX_ARCH__>=7
--	cmp	r2,#192			@ test len
--	bls	.Lshort
--	ldr	r4,[r14,#-24]
--	ldr	r4,[r14,r4]
--# ifdef	__APPLE__
--	ldr	r4,[r4]
--# endif
--	tst	r4,#ARMV7_NEON
--	bne	.LChaCha20_neon
--.Lshort:
--#endif
-+	beq	.Lno_data_arm
- 	ldmia	r12,{r4-r7}		@ load counter and nonce
- 	sub	sp,sp,#4*(16)		@ off-load area
--	sub	r14,r14,#64		@ .Lsigma
-+#if __LINUX_ARM_ARCH__ < 7 && !defined(__thumb2__)
-+	sub	r14,pc,#100		@ .Lsigma
-+#else
-+	adr	r14,.Lsigma		@ .Lsigma
-+#endif
- 	stmdb	sp!,{r4-r7}		@ copy counter and nonce
- 	ldmia	r3,{r4-r11}		@ load key
- 	ldmia	r14,{r0-r3}		@ load sigma
-@@ -191,7 +171,7 @@ ChaCha20_ctr32:
- 	@ rx and second half at sp+4*(16+8)
- 
- 	cmp	r11,#64		@ done yet?
--#ifdef	__thumb2__
-+#ifdef __thumb2__
- 	itete	lo
- #endif
- 	addlo	r12,sp,#4*(0)		@ shortcut or ...
-@@ -202,49 +182,49 @@ ChaCha20_ctr32:
- 	ldr	r8,[sp,#4*(0)]	@ load key material
- 	ldr	r9,[sp,#4*(1)]
- 
--#if __ARM_ARCH__>=6 || !defined(__ARMEB__)
--# if __ARM_ARCH__<7
-+#if __LINUX_ARM_ARCH__ >= 6 || !defined(__ARMEB__)
-+#if __LINUX_ARM_ARCH__ < 7
- 	orr	r10,r12,r14
- 	tst	r10,#3		@ are input and output aligned?
- 	ldr	r10,[sp,#4*(2)]
- 	bne	.Lunaligned
- 	cmp	r11,#64		@ restore flags
--# else
-+#else
- 	ldr	r10,[sp,#4*(2)]
--# endif
-+#endif
- 	ldr	r11,[sp,#4*(3)]
- 
- 	add	r0,r0,r8	@ accumulate key material
- 	add	r1,r1,r9
--# ifdef	__thumb2__
-+#ifdef __thumb2__
- 	itt	hs
--# endif
-+#endif
- 	ldrhs	r8,[r12],#16		@ load input
- 	ldrhs	r9,[r12,#-12]
- 
- 	add	r2,r2,r10
- 	add	r3,r3,r11
--# ifdef	__thumb2__
-+#ifdef __thumb2__
- 	itt	hs
--# endif
-+#endif
- 	ldrhs	r10,[r12,#-8]
- 	ldrhs	r11,[r12,#-4]
--# if __ARM_ARCH__>=6 && defined(__ARMEB__)
-+#if __LINUX_ARM_ARCH__ >= 6 && defined(__ARMEB__)
- 	rev	r0,r0
- 	rev	r1,r1
- 	rev	r2,r2
- 	rev	r3,r3
--# endif
--# ifdef	__thumb2__
-+#endif
-+#ifdef __thumb2__
- 	itt	hs
--# endif
-+#endif
- 	eorhs	r0,r0,r8	@ xor with input
- 	eorhs	r1,r1,r9
- 	 add	r8,sp,#4*(4)
- 	str	r0,[r14],#16		@ store output
--# ifdef	__thumb2__
-+#ifdef __thumb2__
- 	itt	hs
--# endif
-+#endif
- 	eorhs	r2,r2,r10
- 	eorhs	r3,r3,r11
- 	 ldmia	r8,{r8-r11}	@ load key material
-@@ -254,34 +234,34 @@ ChaCha20_ctr32:
- 
- 	add	r4,r8,r4,ror#13 @ accumulate key material
- 	add	r5,r9,r5,ror#13
--# ifdef	__thumb2__
-+#ifdef __thumb2__
- 	itt	hs
--# endif
-+#endif
- 	ldrhs	r8,[r12],#16		@ load input
- 	ldrhs	r9,[r12,#-12]
- 	add	r6,r10,r6,ror#13
- 	add	r7,r11,r7,ror#13
--# ifdef	__thumb2__
-+#ifdef __thumb2__
- 	itt	hs
--# endif
-+#endif
- 	ldrhs	r10,[r12,#-8]
- 	ldrhs	r11,[r12,#-4]
--# if __ARM_ARCH__>=6 && defined(__ARMEB__)
-+#if __LINUX_ARM_ARCH__ >= 6 && defined(__ARMEB__)
- 	rev	r4,r4
- 	rev	r5,r5
- 	rev	r6,r6
- 	rev	r7,r7
--# endif
--# ifdef	__thumb2__
-+#endif
-+#ifdef __thumb2__
- 	itt	hs
--# endif
-+#endif
- 	eorhs	r4,r4,r8
- 	eorhs	r5,r5,r9
- 	 add	r8,sp,#4*(8)
- 	str	r4,[r14],#16		@ store output
--# ifdef	__thumb2__
-+#ifdef __thumb2__
- 	itt	hs
--# endif
-+#endif
- 	eorhs	r6,r6,r10
- 	eorhs	r7,r7,r11
- 	str	r5,[r14,#-12]
-@@ -294,39 +274,39 @@ ChaCha20_ctr32:
- 
- 	add	r0,r0,r8	@ accumulate key material
- 	add	r1,r1,r9
--# ifdef	__thumb2__
-+#ifdef __thumb2__
- 	itt	hs
--# endif
-+#endif
- 	ldrhs	r8,[r12],#16		@ load input
- 	ldrhs	r9,[r12,#-12]
--# ifdef	__thumb2__
-+#ifdef __thumb2__
- 	itt	hi
--# endif
-+#endif
- 	 strhi	r10,[sp,#4*(16+10)]	@ copy "rx" while at it
- 	 strhi	r11,[sp,#4*(16+11)]	@ copy "rx" while at it
- 	add	r2,r2,r10
- 	add	r3,r3,r11
--# ifdef	__thumb2__
-+#ifdef __thumb2__
- 	itt	hs
--# endif
-+#endif
- 	ldrhs	r10,[r12,#-8]
- 	ldrhs	r11,[r12,#-4]
--# if __ARM_ARCH__>=6 && defined(__ARMEB__)
-+#if __LINUX_ARM_ARCH__ >= 6 && defined(__ARMEB__)
- 	rev	r0,r0
- 	rev	r1,r1
- 	rev	r2,r2
- 	rev	r3,r3
--# endif
--# ifdef	__thumb2__
-+#endif
-+#ifdef __thumb2__
- 	itt	hs
--# endif
-+#endif
- 	eorhs	r0,r0,r8
- 	eorhs	r1,r1,r9
- 	 add	r8,sp,#4*(12)
- 	str	r0,[r14],#16		@ store output
--# ifdef	__thumb2__
-+#ifdef __thumb2__
- 	itt	hs
--# endif
-+#endif
- 	eorhs	r2,r2,r10
- 	eorhs	r3,r3,r11
- 	str	r1,[r14,#-12]
-@@ -336,79 +316,79 @@ ChaCha20_ctr32:
- 
- 	add	r4,r8,r4,ror#24 @ accumulate key material
- 	add	r5,r9,r5,ror#24
--# ifdef	__thumb2__
-+#ifdef __thumb2__
- 	itt	hi
--# endif
-+#endif
- 	 addhi	r8,r8,#1		@ next counter value
- 	 strhi	r8,[sp,#4*(12)]	@ save next counter value
--# ifdef	__thumb2__
-+#ifdef __thumb2__
- 	itt	hs
--# endif
-+#endif
- 	ldrhs	r8,[r12],#16		@ load input
- 	ldrhs	r9,[r12,#-12]
- 	add	r6,r10,r6,ror#24
- 	add	r7,r11,r7,ror#24
--# ifdef	__thumb2__
-+#ifdef __thumb2__
- 	itt	hs
--# endif
-+#endif
- 	ldrhs	r10,[r12,#-8]
- 	ldrhs	r11,[r12,#-4]
--# if __ARM_ARCH__>=6 && defined(__ARMEB__)
-+#if __LINUX_ARM_ARCH__ >= 6 && defined(__ARMEB__)
- 	rev	r4,r4
- 	rev	r5,r5
- 	rev	r6,r6
- 	rev	r7,r7
--# endif
--# ifdef	__thumb2__
-+#endif
-+#ifdef __thumb2__
- 	itt	hs
--# endif
-+#endif
- 	eorhs	r4,r4,r8
- 	eorhs	r5,r5,r9
--# ifdef	__thumb2__
-+#ifdef __thumb2__
- 	 it	ne
--# endif
-+#endif
- 	 ldrne	r8,[sp,#4*(32+2)]	@ re-load len
--# ifdef	__thumb2__
-+#ifdef __thumb2__
- 	itt	hs
--# endif
-+#endif
- 	eorhs	r6,r6,r10
- 	eorhs	r7,r7,r11
- 	str	r4,[r14],#16		@ store output
- 	str	r5,[r14,#-12]
--# ifdef	__thumb2__
-+#ifdef __thumb2__
- 	it	hs
--# endif
-+#endif
- 	 subhs	r11,r8,#64		@ len-=64
- 	str	r6,[r14,#-8]
- 	str	r7,[r14,#-4]
- 	bhi	.Loop_outer
- 
- 	beq	.Ldone
--# if __ARM_ARCH__<7
-+#if __LINUX_ARM_ARCH__ < 7
- 	b	.Ltail
- 
- .align	4
- .Lunaligned:				@ unaligned endian-neutral path
- 	cmp	r11,#64		@ restore flags
--# endif
- #endif
--#if __ARM_ARCH__<7
-+#endif
-+#if __LINUX_ARM_ARCH__ < 7
- 	ldr	r11,[sp,#4*(3)]
- 	add	r0,r8,r0	@ accumulate key material
- 	add	r1,r9,r1
- 	add	r2,r10,r2
--# ifdef	__thumb2__
-+#ifdef __thumb2__
- 	itete	lo
--# endif
-+#endif
- 	eorlo	r8,r8,r8		@ zero or ...
- 	ldrhsb	r8,[r12],#16			@ ... load input
- 	eorlo	r9,r9,r9
- 	ldrhsb	r9,[r12,#-12]
- 
- 	add	r3,r11,r3
--# ifdef	__thumb2__
-+#ifdef __thumb2__
- 	itete	lo
--# endif
-+#endif
- 	eorlo	r10,r10,r10
- 	ldrhsb	r10,[r12,#-8]
- 	eorlo	r11,r11,r11
-@@ -416,53 +396,53 @@ ChaCha20_ctr32:
- 
- 	eor	r0,r8,r0		@ xor with input (or zero)
- 	eor	r1,r9,r1
--# ifdef	__thumb2__
-+#ifdef __thumb2__
- 	itt	hs
--# endif
-+#endif
- 	ldrhsb	r8,[r12,#-15]		@ load more input
- 	ldrhsb	r9,[r12,#-11]
- 	eor	r2,r10,r2
- 	 strb	r0,[r14],#16		@ store output
- 	eor	r3,r11,r3
--# ifdef	__thumb2__
-+#ifdef __thumb2__
- 	itt	hs
--# endif
-+#endif
- 	ldrhsb	r10,[r12,#-7]
- 	ldrhsb	r11,[r12,#-3]
- 	 strb	r1,[r14,#-12]
- 	eor	r0,r8,r0,lsr#8
- 	 strb	r2,[r14,#-8]
- 	eor	r1,r9,r1,lsr#8
--# ifdef	__thumb2__
-+#ifdef __thumb2__
- 	itt	hs
--# endif
-+#endif
- 	ldrhsb	r8,[r12,#-14]		@ load more input
- 	ldrhsb	r9,[r12,#-10]
- 	 strb	r3,[r14,#-4]
- 	eor	r2,r10,r2,lsr#8
- 	 strb	r0,[r14,#-15]
- 	eor	r3,r11,r3,lsr#8
--# ifdef	__thumb2__
-+#ifdef __thumb2__
- 	itt	hs
--# endif
-+#endif
- 	ldrhsb	r10,[r12,#-6]
- 	ldrhsb	r11,[r12,#-2]
- 	 strb	r1,[r14,#-11]
- 	eor	r0,r8,r0,lsr#8
- 	 strb	r2,[r14,#-7]
- 	eor	r1,r9,r1,lsr#8
--# ifdef	__thumb2__
-+#ifdef __thumb2__
- 	itt	hs
--# endif
-+#endif
- 	ldrhsb	r8,[r12,#-13]		@ load more input
- 	ldrhsb	r9,[r12,#-9]
- 	 strb	r3,[r14,#-3]
- 	eor	r2,r10,r2,lsr#8
- 	 strb	r0,[r14,#-14]
- 	eor	r3,r11,r3,lsr#8
--# ifdef	__thumb2__
-+#ifdef __thumb2__
- 	itt	hs
--# endif
-+#endif
- 	ldrhsb	r10,[r12,#-5]
- 	ldrhsb	r11,[r12,#-1]
- 	 strb	r1,[r14,#-10]
-@@ -482,18 +462,18 @@ ChaCha20_ctr32:
- 	add	r4,r8,r4,ror#13	@ accumulate key material
- 	add	r5,r9,r5,ror#13
- 	add	r6,r10,r6,ror#13
--# ifdef	__thumb2__
-+#ifdef __thumb2__
- 	itete	lo
--# endif
-+#endif
- 	eorlo	r8,r8,r8		@ zero or ...
- 	ldrhsb	r8,[r12],#16			@ ... load input
- 	eorlo	r9,r9,r9
- 	ldrhsb	r9,[r12,#-12]
- 
- 	add	r7,r11,r7,ror#13
--# ifdef	__thumb2__
-+#ifdef __thumb2__
- 	itete	lo
--# endif
-+#endif
- 	eorlo	r10,r10,r10
- 	ldrhsb	r10,[r12,#-8]
- 	eorlo	r11,r11,r11
-@@ -501,53 +481,53 @@ ChaCha20_ctr32:
- 
- 	eor	r4,r8,r4		@ xor with input (or zero)
- 	eor	r5,r9,r5
--# ifdef	__thumb2__
-+#ifdef __thumb2__
- 	itt	hs
--# endif
-+#endif
- 	ldrhsb	r8,[r12,#-15]		@ load more input
- 	ldrhsb	r9,[r12,#-11]
- 	eor	r6,r10,r6
- 	 strb	r4,[r14],#16		@ store output
- 	eor	r7,r11,r7
--# ifdef	__thumb2__
-+#ifdef __thumb2__
- 	itt	hs
--# endif
-+#endif
- 	ldrhsb	r10,[r12,#-7]
- 	ldrhsb	r11,[r12,#-3]
- 	 strb	r5,[r14,#-12]
- 	eor	r4,r8,r4,lsr#8
- 	 strb	r6,[r14,#-8]
- 	eor	r5,r9,r5,lsr#8
--# ifdef	__thumb2__
-+#ifdef __thumb2__
- 	itt	hs
--# endif
-+#endif
- 	ldrhsb	r8,[r12,#-14]		@ load more input
- 	ldrhsb	r9,[r12,#-10]
- 	 strb	r7,[r14,#-4]
- 	eor	r6,r10,r6,lsr#8
- 	 strb	r4,[r14,#-15]
- 	eor	r7,r11,r7,lsr#8
--# ifdef	__thumb2__
-+#ifdef __thumb2__
- 	itt	hs
--# endif
-+#endif
- 	ldrhsb	r10,[r12,#-6]
- 	ldrhsb	r11,[r12,#-2]
- 	 strb	r5,[r14,#-11]
- 	eor	r4,r8,r4,lsr#8
- 	 strb	r6,[r14,#-7]
- 	eor	r5,r9,r5,lsr#8
--# ifdef	__thumb2__
-+#ifdef __thumb2__
- 	itt	hs
--# endif
-+#endif
- 	ldrhsb	r8,[r12,#-13]		@ load more input
- 	ldrhsb	r9,[r12,#-9]
- 	 strb	r7,[r14,#-3]
- 	eor	r6,r10,r6,lsr#8
- 	 strb	r4,[r14,#-14]
- 	eor	r7,r11,r7,lsr#8
--# ifdef	__thumb2__
-+#ifdef __thumb2__
- 	itt	hs
--# endif
-+#endif
- 	ldrhsb	r10,[r12,#-5]
- 	ldrhsb	r11,[r12,#-1]
- 	 strb	r5,[r14,#-10]
-@@ -564,26 +544,26 @@ ChaCha20_ctr32:
- 	add	r8,sp,#4*(4+4)
- 	ldmia	r8,{r8-r11}		@ load key material
- 	ldmia	r0,{r0-r7}		@ load second half
--# ifdef	__thumb2__
-+#ifdef __thumb2__
- 	itt	hi
--# endif
-+#endif
- 	strhi	r10,[sp,#4*(16+10)]		@ copy "rx"
- 	strhi	r11,[sp,#4*(16+11)]		@ copy "rx"
- 	add	r0,r8,r0	@ accumulate key material
- 	add	r1,r9,r1
- 	add	r2,r10,r2
--# ifdef	__thumb2__
-+#ifdef __thumb2__
- 	itete	lo
--# endif
-+#endif
- 	eorlo	r8,r8,r8		@ zero or ...
- 	ldrhsb	r8,[r12],#16			@ ... load input
- 	eorlo	r9,r9,r9
- 	ldrhsb	r9,[r12,#-12]
- 
- 	add	r3,r11,r3
--# ifdef	__thumb2__
-+#ifdef __thumb2__
- 	itete	lo
--# endif
-+#endif
- 	eorlo	r10,r10,r10
- 	ldrhsb	r10,[r12,#-8]
- 	eorlo	r11,r11,r11
-@@ -591,53 +571,53 @@ ChaCha20_ctr32:
- 
- 	eor	r0,r8,r0		@ xor with input (or zero)
- 	eor	r1,r9,r1
--# ifdef	__thumb2__
-+#ifdef __thumb2__
- 	itt	hs
--# endif
-+#endif
- 	ldrhsb	r8,[r12,#-15]		@ load more input
- 	ldrhsb	r9,[r12,#-11]
- 	eor	r2,r10,r2
- 	 strb	r0,[r14],#16		@ store output
- 	eor	r3,r11,r3
--# ifdef	__thumb2__
-+#ifdef __thumb2__
- 	itt	hs
--# endif
-+#endif
- 	ldrhsb	r10,[r12,#-7]
- 	ldrhsb	r11,[r12,#-3]
- 	 strb	r1,[r14,#-12]
- 	eor	r0,r8,r0,lsr#8
- 	 strb	r2,[r14,#-8]
- 	eor	r1,r9,r1,lsr#8
--# ifdef	__thumb2__
-+#ifdef __thumb2__
- 	itt	hs
--# endif
-+#endif
- 	ldrhsb	r8,[r12,#-14]		@ load more input
- 	ldrhsb	r9,[r12,#-10]
- 	 strb	r3,[r14,#-4]
- 	eor	r2,r10,r2,lsr#8
- 	 strb	r0,[r14,#-15]
- 	eor	r3,r11,r3,lsr#8
--# ifdef	__thumb2__
-+#ifdef __thumb2__
- 	itt	hs
--# endif
-+#endif
- 	ldrhsb	r10,[r12,#-6]
- 	ldrhsb	r11,[r12,#-2]
- 	 strb	r1,[r14,#-11]
- 	eor	r0,r8,r0,lsr#8
- 	 strb	r2,[r14,#-7]
- 	eor	r1,r9,r1,lsr#8
--# ifdef	__thumb2__
-+#ifdef __thumb2__
- 	itt	hs
--# endif
-+#endif
- 	ldrhsb	r8,[r12,#-13]		@ load more input
- 	ldrhsb	r9,[r12,#-9]
- 	 strb	r3,[r14,#-3]
- 	eor	r2,r10,r2,lsr#8
- 	 strb	r0,[r14,#-14]
- 	eor	r3,r11,r3,lsr#8
--# ifdef	__thumb2__
-+#ifdef __thumb2__
- 	itt	hs
--# endif
-+#endif
- 	ldrhsb	r10,[r12,#-5]
- 	ldrhsb	r11,[r12,#-1]
- 	 strb	r1,[r14,#-10]
-@@ -654,25 +634,25 @@ ChaCha20_ctr32:
- 	add	r8,sp,#4*(4+8)
- 	ldmia	r8,{r8-r11}		@ load key material
- 	add	r4,r8,r4,ror#24	@ accumulate key material
--# ifdef	__thumb2__
-+#ifdef __thumb2__
- 	itt	hi
--# endif
-+#endif
- 	addhi	r8,r8,#1			@ next counter value
- 	strhi	r8,[sp,#4*(12)]		@ save next counter value
- 	add	r5,r9,r5,ror#24
- 	add	r6,r10,r6,ror#24
--# ifdef	__thumb2__
-+#ifdef __thumb2__
- 	itete	lo
--# endif
-+#endif
- 	eorlo	r8,r8,r8		@ zero or ...
- 	ldrhsb	r8,[r12],#16			@ ... load input
- 	eorlo	r9,r9,r9
- 	ldrhsb	r9,[r12,#-12]
- 
- 	add	r7,r11,r7,ror#24
--# ifdef	__thumb2__
-+#ifdef __thumb2__
- 	itete	lo
--# endif
-+#endif
- 	eorlo	r10,r10,r10
- 	ldrhsb	r10,[r12,#-8]
- 	eorlo	r11,r11,r11
-@@ -680,53 +660,53 @@ ChaCha20_ctr32:
- 
- 	eor	r4,r8,r4		@ xor with input (or zero)
- 	eor	r5,r9,r5
--# ifdef	__thumb2__
-+#ifdef __thumb2__
- 	itt	hs
--# endif
-+#endif
- 	ldrhsb	r8,[r12,#-15]		@ load more input
- 	ldrhsb	r9,[r12,#-11]
- 	eor	r6,r10,r6
- 	 strb	r4,[r14],#16		@ store output
- 	eor	r7,r11,r7
--# ifdef	__thumb2__
-+#ifdef __thumb2__
- 	itt	hs
--# endif
-+#endif
- 	ldrhsb	r10,[r12,#-7]
- 	ldrhsb	r11,[r12,#-3]
- 	 strb	r5,[r14,#-12]
- 	eor	r4,r8,r4,lsr#8
- 	 strb	r6,[r14,#-8]
- 	eor	r5,r9,r5,lsr#8
--# ifdef	__thumb2__
-+#ifdef __thumb2__
- 	itt	hs
--# endif
-+#endif
- 	ldrhsb	r8,[r12,#-14]		@ load more input
- 	ldrhsb	r9,[r12,#-10]
- 	 strb	r7,[r14,#-4]
- 	eor	r6,r10,r6,lsr#8
- 	 strb	r4,[r14,#-15]
- 	eor	r7,r11,r7,lsr#8
--# ifdef	__thumb2__
-+#ifdef __thumb2__
- 	itt	hs
--# endif
-+#endif
- 	ldrhsb	r10,[r12,#-6]
- 	ldrhsb	r11,[r12,#-2]
- 	 strb	r5,[r14,#-11]
- 	eor	r4,r8,r4,lsr#8
- 	 strb	r6,[r14,#-7]
- 	eor	r5,r9,r5,lsr#8
--# ifdef	__thumb2__
-+#ifdef __thumb2__
- 	itt	hs
--# endif
-+#endif
- 	ldrhsb	r8,[r12,#-13]		@ load more input
- 	ldrhsb	r9,[r12,#-9]
- 	 strb	r7,[r14,#-3]
- 	eor	r6,r10,r6,lsr#8
- 	 strb	r4,[r14,#-14]
- 	eor	r7,r11,r7,lsr#8
--# ifdef	__thumb2__
-+#ifdef __thumb2__
- 	itt	hs
--# endif
-+#endif
- 	ldrhsb	r10,[r12,#-5]
- 	ldrhsb	r11,[r12,#-1]
- 	 strb	r5,[r14,#-10]
-@@ -740,13 +720,13 @@ ChaCha20_ctr32:
- 	eor	r7,r11,r7,lsr#8
- 	 strb	r6,[r14,#-5]
- 	 strb	r7,[r14,#-1]
--# ifdef	__thumb2__
-+#ifdef __thumb2__
- 	it	ne
--# endif
-+#endif
- 	ldrne	r8,[sp,#4*(32+2)]		@ re-load len
--# ifdef	__thumb2__
-+#ifdef __thumb2__
- 	it	hs
--# endif
-+#endif
- 	subhs	r11,r8,#64			@ len-=64
- 	bhi	.Loop_outer
- 
-@@ -768,20 +748,33 @@ ChaCha20_ctr32:
- 
- .Ldone:
- 	add	sp,sp,#4*(32+3)
--.Lno_data:
-+.Lno_data_arm:
- 	ldmia	sp!,{r4-r11,pc}
--.size	ChaCha20_ctr32,.-ChaCha20_ctr32
--#if __ARM_MAX_ARCH__>=7
-+ENDPROC(chacha20_arm)
++ */
 +
-+#ifdef CONFIG_KERNEL_MODE_NEON
-+.align	5
-+.Lsigma2:
-+.long	0x61707865,0x3320646e,0x79622d32,0x6b206574	@ endian-neutral
-+.Lone2:
-+.long	1,0,0,0
-+.word	-1
++asmlinkage void chacha20_mips(u32 state[16], u8 *out, const u8 *in,
++			      const size_t len);
++static bool *const chacha20_nobs[] __initconst = { };
++static void __init chacha20_fpu_init(void)
++{
++}
 +
- .arch	armv7-a
- .fpu	neon
- 
--.type	ChaCha20_neon,%function
- .align	5
--ChaCha20_neon:
-+ENTRY(chacha20_neon)
- 	ldr		r12,[sp,#0]		@ pull pointer to counter and nonce
- 	stmdb		sp!,{r0-r2,r4-r11,lr}
--.LChaCha20_neon:
--	adr		r14,.Lsigma
-+	cmp		r2,#0			@ len==0?
-+#ifdef	__thumb2__
-+	itt		eq
-+#endif
-+	addeq		sp,sp,#4*3
-+	beq		.Lno_data_neon
-+.Lchacha20_neon_begin:
-+	adr		r14,.Lsigma2
- 	vstmdb		sp!,{d8-d15}		@ ABI spec says so
- 	stmdb		sp!,{r0-r3}
- 
-@@ -1121,12 +1114,12 @@ ChaCha20_neon:
- 	ldr		r10,[r12,#-8]
- 	add		r3,r3,r11
- 	ldr		r11,[r12,#-4]
--# ifdef	__ARMEB__
-+#ifdef	__ARMEB__
- 	rev		r0,r0
- 	rev		r1,r1
- 	rev		r2,r2
- 	rev		r3,r3
--# endif
-+#endif
- 	eor		r0,r0,r8	@ xor with input
- 	 add		r8,sp,#4*(4)
- 	eor		r1,r1,r9
-@@ -1146,12 +1139,12 @@ ChaCha20_neon:
- 	ldr		r10,[r12,#-8]
- 	add		r7,r11,r7,ror#13
- 	ldr		r11,[r12,#-4]
--# ifdef	__ARMEB__
-+#ifdef	__ARMEB__
- 	rev		r4,r4
- 	rev		r5,r5
- 	rev		r6,r6
- 	rev		r7,r7
--# endif
-+#endif
- 	eor		r4,r4,r8
- 	 add		r8,sp,#4*(8)
- 	eor		r5,r5,r9
-@@ -1170,24 +1163,24 @@ ChaCha20_neon:
- 	ldr		r8,[r12],#16		@ load input
- 	add		r1,r1,r9
- 	ldr		r9,[r12,#-12]
--# ifdef	__thumb2__
-+#ifdef __thumb2__
- 	it	hi
--# endif
-+#endif
- 	 strhi		r10,[sp,#4*(16+10)]	@ copy "rx" while at it
- 	add		r2,r2,r10
- 	ldr		r10,[r12,#-8]
--# ifdef	__thumb2__
-+#ifdef __thumb2__
- 	it	hi
--# endif
-+#endif
- 	 strhi		r11,[sp,#4*(16+11)]	@ copy "rx" while at it
- 	add		r3,r3,r11
- 	ldr		r11,[r12,#-4]
--# ifdef	__ARMEB__
-+#ifdef	__ARMEB__
- 	rev		r0,r0
- 	rev		r1,r1
- 	rev		r2,r2
- 	rev		r3,r3
--# endif
-+#endif
- 	eor		r0,r0,r8
- 	 add		r8,sp,#4*(12)
- 	eor		r1,r1,r9
-@@ -1210,16 +1203,16 @@ ChaCha20_neon:
- 	add		r7,r11,r7,ror#24
- 	ldr		r10,[r12,#-8]
- 	ldr		r11,[r12,#-4]
--# ifdef	__ARMEB__
-+#ifdef	__ARMEB__
- 	rev		r4,r4
- 	rev		r5,r5
- 	rev		r6,r6
- 	rev		r7,r7
--# endif
-+#endif
- 	eor		r4,r4,r8
--# ifdef	__thumb2__
-+#ifdef __thumb2__
- 	it	hi
--# endif
-+#endif
- 	 ldrhi		r8,[sp,#4*(32+2)]	@ re-load len
- 	eor		r5,r5,r9
- 	eor		r6,r6,r10
-@@ -1379,7 +1372,7 @@ ChaCha20_neon:
- 	add		r6,r10,r6,ror#13
- 	add		r7,r11,r7,ror#13
- 	 ldmia		r8,{r8-r11}	@ load key material
--# ifdef	__ARMEB__
-+#ifdef	__ARMEB__
- 	rev		r0,r0
- 	rev		r1,r1
- 	rev		r2,r2
-@@ -1388,7 +1381,7 @@ ChaCha20_neon:
- 	rev		r5,r5
- 	rev		r6,r6
- 	rev		r7,r7
--# endif
-+#endif
- 	stmia		sp,{r0-r7}
- 	 add		r0,sp,#4*(16+8)
- 
-@@ -1408,7 +1401,7 @@ ChaCha20_neon:
- 	add		r6,r10,r6,ror#24
- 	add		r7,r11,r7,ror#24
- 	 ldr		r11,[sp,#4*(32+2)]	@ re-load len
--# ifdef	__ARMEB__
-+#ifdef	__ARMEB__
- 	rev		r0,r0
- 	rev		r1,r1
- 	rev		r2,r2
-@@ -1417,7 +1410,7 @@ ChaCha20_neon:
- 	rev		r5,r5
- 	rev		r6,r6
- 	rev		r7,r7
--# endif
-+#endif
- 	stmia		r8,{r0-r7}
- 	 add		r10,sp,#4*(0)
- 	 sub		r11,r11,#64*3	@ len-=64*3
-@@ -1434,7 +1427,7 @@ ChaCha20_neon:
- 	add		sp,sp,#4*(32+4)
- 	vldmia		sp,{d8-d15}
- 	add		sp,sp,#4*(16+3)
-+.Lno_data_neon:
- 	ldmia		sp!,{r4-r11,pc}
--.size	ChaCha20_neon,.-ChaCha20_neon
--.comm	OPENSSL_armcap_P,4,4
-+ENDPROC(chacha20_neon)
- #endif
-diff --git a/lib/zinc/chacha20/chacha20-arm64-cryptogams.S b/lib/zinc/chacha20/chacha20-arm64-cryptogams.S
-index 4d029bfdad3a..1ae11a5c5a14 100644
---- a/lib/zinc/chacha20/chacha20-arm64-cryptogams.S
-+++ b/lib/zinc/chacha20/chacha20-arm64-cryptogams.S
-@@ -1,46 +1,24 @@
- /* SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause */
- /*
++static inline bool chacha20_arch(struct chacha20_ctx *ctx, u8 *dst,
++				 const u8 *src, size_t len,
++				 simd_context_t *simd_context)
++{
++	chacha20_mips(ctx->state, dst, src, len);
++	return true;
++}
++
++
++static inline bool hchacha20_arch(u32 derived_key[CHACHA20_KEY_WORDS],
++				  const u8 nonce[HCHACHA20_NONCE_SIZE],
++				  const u8 key[HCHACHA20_KEY_SIZE],
++				  simd_context_t *simd_context)
++{
++	return false;
++}
+diff --git a/lib/zinc/chacha20/chacha20-mips.S b/lib/zinc/chacha20/chacha20-mips.S
+new file mode 100644
+index 000000000000..031ee5e794df
+--- /dev/null
++++ b/lib/zinc/chacha20/chacha20-mips.S
+@@ -0,0 +1,424 @@
++/* SPDX-License-Identifier: GPL-2.0 OR MIT */
++/*
++ * Copyright (C) 2016-2018 René van Dorst <opensource@vdorst.com>. All Rights Reserved.
 + * Copyright (C) 2015-2018 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
-  * Copyright (C) 2006-2017 CRYPTOGAMS by <appro@openssl.org>. All Rights Reserved.
-+ *
-+ * This is based in part on Andy Polyakov's implementation from CRYPTOGAMS.
-  */
- 
--#include "arm_arch.h"
-+#include <linux/linkage.h>
- 
- .text
--
--
--
- .align	5
- .Lsigma:
- .quad	0x3320646e61707865,0x6b20657479622d32		// endian-neutral
- .Lone:
- .long	1,0,0,0
--.LOPENSSL_armcap_P:
--#ifdef	__ILP32__
--.long	OPENSSL_armcap_P-.
--#else
--.quad	OPENSSL_armcap_P-.
--#endif
--.byte	67,104,97,67,104,97,50,48,32,102,111,114,32,65,82,77,118,56,44,32,67,82,89,80,84,79,71,65,77,83,32,98,121,32,60,97,112,112,114,111,64,111,112,101,110,115,115,108,46,111,114,103,62,0
--.align	2
- 
--.globl	ChaCha20_ctr32
--.type	ChaCha20_ctr32,%function
- .align	5
--ChaCha20_ctr32:
-+ENTRY(chacha20_arm)
- 	cbz	x2,.Labort
--	adr	x5,.LOPENSSL_armcap_P
--	cmp	x2,#192
--	b.lo	.Lshort
--#ifdef	__ILP32__
--	ldrsw	x6,[x5]
--#else
--	ldr	x6,[x5]
--#endif
--	ldr	w17,[x6,x5]
--	tst	w17,#ARMV7_NEON
--	b.ne	ChaCha20_neon
- 
--.Lshort:
- 	stp	x29,x30,[sp,#-96]!
- 	add	x29,sp,#0
- 
-@@ -56,7 +34,7 @@ ChaCha20_ctr32:
- 	ldp	x24,x25,[x3]		// load key
- 	ldp	x26,x27,[x3,#16]
- 	ldp	x28,x30,[x4]		// load counter
--#ifdef	__ARMEB__
-+#ifdef	__AARCH64EB__
- 	ror	x24,x24,#32
- 	ror	x25,x25,#32
- 	ror	x26,x26,#32
-@@ -217,7 +195,7 @@ ChaCha20_ctr32:
- 	add	x20,x20,x21,lsl#32
- 	ldp	x19,x21,[x1,#48]
- 	add	x1,x1,#64
--#ifdef	__ARMEB__
-+#ifdef	__AARCH64EB__
- 	rev	x5,x5
- 	rev	x7,x7
- 	rev	x9,x9
-@@ -273,7 +251,7 @@ ChaCha20_ctr32:
- 	add	x15,x15,x16,lsl#32
- 	add	x17,x17,x19,lsl#32
- 	add	x20,x20,x21,lsl#32
--#ifdef	__ARMEB__
-+#ifdef	__AARCH64EB__
- 	rev	x5,x5
- 	rev	x7,x7
- 	rev	x9,x9
-@@ -309,11 +287,13 @@ ChaCha20_ctr32:
- 	ldp	x27,x28,[x29,#80]
- 	ldp	x29,x30,[sp],#96
- 	ret
--.size	ChaCha20_ctr32,.-ChaCha20_ctr32
-+ENDPROC(chacha20_arm)
- 
--.type	ChaCha20_neon,%function
-+#ifdef CONFIG_KERNEL_MODE_NEON
- .align	5
--ChaCha20_neon:
-+ENTRY(chacha20_neon)
-+	cbz	x2,.Labort_neon
++ */
 +
- 	stp	x29,x30,[sp,#-96]!
- 	add	x29,sp,#0
- 
-@@ -336,7 +316,7 @@ ChaCha20_neon:
- 	ldp	x28,x30,[x4]		// load counter
- 	ld1	{v27.4s},[x4]
- 	ld1	{v31.4s},[x5]
--#ifdef	__ARMEB__
-+#ifdef	__AARCH64EB__
- 	rev64	v24.4s,v24.4s
- 	ror	x24,x24,#32
- 	ror	x25,x25,#32
-@@ -634,7 +614,7 @@ ChaCha20_neon:
- 	add	x20,x20,x21,lsl#32
- 	ldp	x19,x21,[x1,#48]
- 	add	x1,x1,#64
--#ifdef	__ARMEB__
-+#ifdef	__AARCH64EB__
- 	rev	x5,x5
- 	rev	x7,x7
- 	rev	x9,x9
-@@ -713,7 +693,7 @@ ChaCha20_neon:
- 	add	x20,x20,x21,lsl#32
- 	ldp	x19,x21,[x1,#48]
- 	add	x1,x1,#64
--#ifdef	__ARMEB__
-+#ifdef	__AARCH64EB__
- 	rev	x5,x5
- 	rev	x7,x7
- 	rev	x9,x9
-@@ -803,19 +783,6 @@ ChaCha20_neon:
- 	ldp	x27,x28,[x29,#80]
- 	ldp	x29,x30,[sp],#96
- 	ret
--.size	ChaCha20_neon,.-ChaCha20_neon
--.type	ChaCha20_512_neon,%function
--.align	5
--ChaCha20_512_neon:
--	stp	x29,x30,[sp,#-96]!
--	add	x29,sp,#0
--
--	adr	x5,.Lsigma
--	stp	x19,x20,[sp,#16]
--	stp	x21,x22,[sp,#32]
--	stp	x23,x24,[sp,#48]
--	stp	x25,x26,[sp,#64]
--	stp	x27,x28,[sp,#80]
- 
- .L512_or_more_neon:
- 	sub	sp,sp,#128+64
-@@ -828,7 +795,7 @@ ChaCha20_512_neon:
- 	ldp	x28,x30,[x4]		// load counter
- 	ld1	{v27.4s},[x4]
- 	ld1	{v31.4s},[x5]
--#ifdef	__ARMEB__
-+#ifdef	__AARCH64EB__
- 	rev64	v24.4s,v24.4s
- 	ror	x24,x24,#32
- 	ror	x25,x25,#32
-@@ -1341,7 +1308,7 @@ ChaCha20_512_neon:
- 	add	x20,x20,x21,lsl#32
- 	ldp	x19,x21,[x1,#48]
- 	add	x1,x1,#64
--#ifdef	__ARMEB__
-+#ifdef	__AARCH64EB__
- 	rev	x5,x5
- 	rev	x7,x7
- 	rev	x9,x9
-@@ -1855,7 +1822,7 @@ ChaCha20_512_neon:
- 	add	x1,x1,#64
- 	add	v21.4s,v21.4s,v25.4s
- 
--#ifdef	__ARMEB__
-+#ifdef	__AARCH64EB__
- 	rev	x5,x5
- 	rev	x7,x7
- 	rev	x9,x9
-@@ -1969,5 +1936,7 @@ ChaCha20_512_neon:
- 	ldp	x25,x26,[x29,#64]
- 	ldp	x27,x28,[x29,#80]
- 	ldp	x29,x30,[sp],#96
-+.Labort_neon:
- 	ret
--.size	ChaCha20_512_neon,.-ChaCha20_512_neon
-+ENDPROC(chacha20_neon)
++#define MASK_U32		0x3c
++#define CHACHA20_BLOCK_SIZE	64
++#define STACK_SIZE		32
++
++#define X0	$t0
++#define X1	$t1
++#define X2	$t2
++#define X3	$t3
++#define X4	$t4
++#define X5	$t5
++#define X6	$t6
++#define X7	$t7
++#define X8	$t8
++#define X9	$t9
++#define X10	$v1
++#define X11	$s6
++#define X12	$s5
++#define X13	$s4
++#define X14	$s3
++#define X15	$s2
++/* Use regs which are overwritten on exit for Tx so we don't leak clear data. */
++#define T0	$s1
++#define T1	$s0
++#define T(n)	T ## n
++#define X(n)	X ## n
++
++/* Input arguments */
++#define STATE		$a0
++#define OUT		$a1
++#define IN		$a2
++#define BYTES		$a3
++
++/* Output argument */
++/* NONCE[0] is kept in a register and not in memory.
++ * We don't want to touch original value in memory.
++ * Must be incremented every loop iteration.
++ */
++#define NONCE_0		$v0
++
++/* SAVED_X and SAVED_CA are set in the jump table.
++ * Use regs which are overwritten on exit else we don't leak clear data.
++ * They are used to handling the last bytes which are not multiple of 4.
++ */
++#define SAVED_X		X15
++#define SAVED_CA	$s7
++
++#define IS_UNALIGNED	$s7
++
++#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
++#define MSB 0
++#define LSB 3
++#define ROTx rotl
++#define ROTR(n) rotr n, 24
++#define	CPU_TO_LE32(n) \
++	wsbh	n; \
++	rotr	n, 16;
++#else
++#define MSB 3
++#define LSB 0
++#define ROTx rotr
++#define CPU_TO_LE32(n)
++#define ROTR(n)
 +#endif
++
++#define FOR_EACH_WORD(x) \
++	x( 0); \
++	x( 1); \
++	x( 2); \
++	x( 3); \
++	x( 4); \
++	x( 5); \
++	x( 6); \
++	x( 7); \
++	x( 8); \
++	x( 9); \
++	x(10); \
++	x(11); \
++	x(12); \
++	x(13); \
++	x(14); \
++	x(15);
++
++#define FOR_EACH_WORD_REV(x) \
++	x(15); \
++	x(14); \
++	x(13); \
++	x(12); \
++	x(11); \
++	x(10); \
++	x( 9); \
++	x( 8); \
++	x( 7); \
++	x( 6); \
++	x( 5); \
++	x( 4); \
++	x( 3); \
++	x( 2); \
++	x( 1); \
++	x( 0);
++
++#define PLUS_ONE_0	 1
++#define PLUS_ONE_1	 2
++#define PLUS_ONE_2	 3
++#define PLUS_ONE_3	 4
++#define PLUS_ONE_4	 5
++#define PLUS_ONE_5	 6
++#define PLUS_ONE_6	 7
++#define PLUS_ONE_7	 8
++#define PLUS_ONE_8	 9
++#define PLUS_ONE_9	10
++#define PLUS_ONE_10	11
++#define PLUS_ONE_11	12
++#define PLUS_ONE_12	13
++#define PLUS_ONE_13	14
++#define PLUS_ONE_14	15
++#define PLUS_ONE_15	16
++#define PLUS_ONE(x)	PLUS_ONE_ ## x
++#define _CONCAT3(a,b,c)	a ## b ## c
++#define CONCAT3(a,b,c)	_CONCAT3(a,b,c)
++
++#define STORE_UNALIGNED(x) \
++CONCAT3(.Lchacha20_mips_xor_unaligned_, PLUS_ONE(x), _b: ;) \
++	.if (x != 12); \
++		lw	T0, (x*4)(STATE); \
++	.endif; \
++	lwl	T1, (x*4)+MSB ## (IN); \
++	lwr	T1, (x*4)+LSB ## (IN); \
++	.if (x == 12); \
++		addu	X ## x, NONCE_0; \
++	.else; \
++		addu	X ## x, T0; \
++	.endif; \
++	CPU_TO_LE32(X ## x); \
++	xor	X ## x, T1; \
++	swl	X ## x, (x*4)+MSB ## (OUT); \
++	swr	X ## x, (x*4)+LSB ## (OUT);
++
++#define STORE_ALIGNED(x) \
++CONCAT3(.Lchacha20_mips_xor_aligned_, PLUS_ONE(x), _b: ;) \
++	.if (x != 12); \
++		lw	T0, (x*4)(STATE); \
++	.endif; \
++	lw	T1, (x*4) ## (IN); \
++	.if (x == 12); \
++		addu	X ## x, NONCE_0; \
++	.else; \
++		addu	X ## x, T0; \
++	.endif; \
++	CPU_TO_LE32(X ## x); \
++	xor	X ## x, T1; \
++	sw	X ## x, (x*4) ## (OUT);
++
++/* Jump table macro.
++ * Used for setup and handling the last bytes, which are not multiple of 4.
++ * X15 is free to store Xn
++ * Every jumptable entry must be equal in size.
++ */
++#define JMPTBL_ALIGNED(x) \
++.Lchacha20_mips_jmptbl_aligned_ ## x: ; \
++	.set	noreorder; \
++	b	.Lchacha20_mips_xor_aligned_ ## x ## _b; \
++	.if (x == 12); \
++		addu	SAVED_X, X ## x, NONCE_0; \
++	.else; \
++		addu	SAVED_X, X ## x, SAVED_CA; \
++	.endif; \
++	.set	reorder
++
++#define JMPTBL_UNALIGNED(x) \
++.Lchacha20_mips_jmptbl_unaligned_ ## x: ; \
++	.set	noreorder; \
++	b	.Lchacha20_mips_xor_unaligned_ ## x ## _b; \
++	.if (x == 12); \
++		addu	SAVED_X, X ## x, NONCE_0; \
++	.else; \
++		addu	SAVED_X, X ## x, SAVED_CA; \
++	.endif; \
++	.set	reorder
++
++#define AXR(A, B, C, D,  K, L, M, N,  V, W, Y, Z,  S) \
++	addu	X(A), X(K); \
++	addu	X(B), X(L); \
++	addu	X(C), X(M); \
++	addu	X(D), X(N); \
++	xor	X(V), X(A); \
++	xor	X(W), X(B); \
++	xor	X(Y), X(C); \
++	xor	X(Z), X(D); \
++	rotl	X(V), S;    \
++	rotl	X(W), S;    \
++	rotl	X(Y), S;    \
++	rotl	X(Z), S;
++
++.text
++.set	reorder
++.set	noat
++.globl	chacha20_mips
++.ent	chacha20_mips
++chacha20_mips:
++	.frame	$sp, STACK_SIZE, $ra
++
++	addiu	$sp, -STACK_SIZE
++
++	/* Return bytes = 0. */
++	beqz	BYTES, .Lchacha20_mips_end
++
++	lw	NONCE_0, 48(STATE)
++
++	/* Save s0-s7 */
++	sw	$s0,  0($sp)
++	sw	$s1,  4($sp)
++	sw	$s2,  8($sp)
++	sw	$s3, 12($sp)
++	sw	$s4, 16($sp)
++	sw	$s5, 20($sp)
++	sw	$s6, 24($sp)
++	sw	$s7, 28($sp)
++
++	/* Test IN or OUT is unaligned.
++	 * IS_UNALIGNED = ( IN | OUT ) & 0x00000003
++	 */
++	or	IS_UNALIGNED, IN, OUT
++	andi	IS_UNALIGNED, 0x3
++
++	/* Set number of rounds */
++	li	$at, 20
++
++	b	.Lchacha20_rounds_start
++
++.align 4
++.Loop_chacha20_rounds:
++	addiu	IN,  CHACHA20_BLOCK_SIZE
++	addiu	OUT, CHACHA20_BLOCK_SIZE
++	addiu	NONCE_0, 1
++
++.Lchacha20_rounds_start:
++	lw	X0,  0(STATE)
++	lw	X1,  4(STATE)
++	lw	X2,  8(STATE)
++	lw	X3,  12(STATE)
++
++	lw	X4,  16(STATE)
++	lw	X5,  20(STATE)
++	lw	X6,  24(STATE)
++	lw	X7,  28(STATE)
++	lw	X8,  32(STATE)
++	lw	X9,  36(STATE)
++	lw	X10, 40(STATE)
++	lw	X11, 44(STATE)
++
++	move	X12, NONCE_0
++	lw	X13, 52(STATE)
++	lw	X14, 56(STATE)
++	lw	X15, 60(STATE)
++
++.Loop_chacha20_xor_rounds:
++	addiu	$at, -2
++	AXR( 0, 1, 2, 3,  4, 5, 6, 7, 12,13,14,15, 16);
++	AXR( 8, 9,10,11, 12,13,14,15,  4, 5, 6, 7, 12);
++	AXR( 0, 1, 2, 3,  4, 5, 6, 7, 12,13,14,15,  8);
++	AXR( 8, 9,10,11, 12,13,14,15,  4, 5, 6, 7,  7);
++	AXR( 0, 1, 2, 3,  5, 6, 7, 4, 15,12,13,14, 16);
++	AXR(10,11, 8, 9, 15,12,13,14,  5, 6, 7, 4, 12);
++	AXR( 0, 1, 2, 3,  5, 6, 7, 4, 15,12,13,14,  8);
++	AXR(10,11, 8, 9, 15,12,13,14,  5, 6, 7, 4,  7);
++	bnez	$at, .Loop_chacha20_xor_rounds
++
++	addiu	BYTES, -(CHACHA20_BLOCK_SIZE)
++
++	/* Is data src/dst unaligned? Jump */
++	bnez	IS_UNALIGNED, .Loop_chacha20_unaligned
++
++	/* Set number rounds here to fill delayslot. */
++	li	$at, 20
++
++	/* BYTES < 0, it has no full block. */
++	bltz	BYTES, .Lchacha20_mips_no_full_block_aligned
++
++	FOR_EACH_WORD_REV(STORE_ALIGNED)
++
++	/* BYTES > 0? Loop again. */
++	bgtz	BYTES, .Loop_chacha20_rounds
++
++	/* Place this here to fill delay slot */
++	addiu	NONCE_0, 1
++
++	/* BYTES < 0? Handle last bytes */
++	bltz	BYTES, .Lchacha20_mips_xor_bytes
++
++.Lchacha20_mips_xor_done:
++	/* Restore used registers */
++	lw	$s0,  0($sp)
++	lw	$s1,  4($sp)
++	lw	$s2,  8($sp)
++	lw	$s3, 12($sp)
++	lw	$s4, 16($sp)
++	lw	$s5, 20($sp)
++	lw	$s6, 24($sp)
++	lw	$s7, 28($sp)
++
++	/* Write NONCE_0 back to right location in state */
++	sw	NONCE_0, 48(STATE)
++
++.Lchacha20_mips_end:
++	addiu	$sp, STACK_SIZE
++	jr	$ra
++
++.Lchacha20_mips_no_full_block_aligned:
++	/* Restore the offset on BYTES */
++	addiu	BYTES, CHACHA20_BLOCK_SIZE
++
++	/* Get number of full WORDS */
++	andi	$at, BYTES, MASK_U32
++
++	/* Load upper half of jump table addr */
++	lui	T0, %hi(.Lchacha20_mips_jmptbl_aligned_0)
++
++	/* Calculate lower half jump table offset */
++	ins	T0, $at, 1, 6
++
++	/* Add offset to STATE */
++	addu	T1, STATE, $at
++
++	/* Add lower half jump table addr */
++	addiu	T0, %lo(.Lchacha20_mips_jmptbl_aligned_0)
++
++	/* Read value from STATE */
++	lw	SAVED_CA, 0(T1)
++
++	/* Store remaining bytecounter as negative value */
++	subu	BYTES, $at, BYTES
++
++	jr	T0
++
++	/* Jump table */
++	FOR_EACH_WORD(JMPTBL_ALIGNED)
++
++
++.Loop_chacha20_unaligned:
++	/* Set number rounds here to fill delayslot. */
++	li	$at, 20
++
++	/* BYTES > 0, it has no full block. */
++	bltz	BYTES, .Lchacha20_mips_no_full_block_unaligned
++
++	FOR_EACH_WORD_REV(STORE_UNALIGNED)
++
++	/* BYTES > 0? Loop again. */
++	bgtz	BYTES, .Loop_chacha20_rounds
++
++	/* Write NONCE_0 back to right location in state */
++	sw	NONCE_0, 48(STATE)
++
++	.set noreorder
++	/* Fall through to byte handling */
++	bgez	BYTES, .Lchacha20_mips_xor_done
++.Lchacha20_mips_xor_unaligned_0_b:
++.Lchacha20_mips_xor_aligned_0_b:
++	/* Place this here to fill delay slot */
++	addiu	NONCE_0, 1
++	.set reorder
++
++.Lchacha20_mips_xor_bytes:
++	addu	IN, $at
++	addu	OUT, $at
++	/* First byte */
++	lbu	T1, 0(IN)
++	addiu	$at, BYTES, 1
++	CPU_TO_LE32(SAVED_X)
++	ROTR(SAVED_X)
++	xor	T1, SAVED_X
++	sb	T1, 0(OUT)
++	beqz	$at, .Lchacha20_mips_xor_done
++	/* Second byte */
++	lbu	T1, 1(IN)
++	addiu	$at, BYTES, 2
++	ROTx	SAVED_X, 8
++	xor	T1, SAVED_X
++	sb	T1, 1(OUT)
++	beqz	$at, .Lchacha20_mips_xor_done
++	/* Third byte */
++	lbu	T1, 2(IN)
++	ROTx	SAVED_X, 8
++	xor	T1, SAVED_X
++	sb	T1, 2(OUT)
++	b	.Lchacha20_mips_xor_done
++
++.Lchacha20_mips_no_full_block_unaligned:
++	/* Restore the offset on BYTES */
++	addiu	BYTES, CHACHA20_BLOCK_SIZE
++
++	/* Get number of full WORDS */
++	andi	$at, BYTES, MASK_U32
++
++	/* Load upper half of jump table addr */
++	lui	T0, %hi(.Lchacha20_mips_jmptbl_unaligned_0)
++
++	/* Calculate lower half jump table offset */
++	ins	T0, $at, 1, 6
++
++	/* Add offset to STATE */
++	addu	T1, STATE, $at
++
++	/* Add lower half jump table addr */
++	addiu	T0, %lo(.Lchacha20_mips_jmptbl_unaligned_0)
++
++	/* Read value from STATE */
++	lw	SAVED_CA, 0(T1)
++
++	/* Store remaining bytecounter as negative value */
++	subu	BYTES, $at, BYTES
++
++	jr	T0
++
++	/* Jump table */
++	FOR_EACH_WORD(JMPTBL_UNALIGNED)
++.end chacha20_mips
++.set at
+diff --git a/lib/zinc/chacha20/chacha20.c b/lib/zinc/chacha20/chacha20.c
+index 3698fcd8ae7f..0b833310a7d8 100644
+--- a/lib/zinc/chacha20/chacha20.c
++++ b/lib/zinc/chacha20/chacha20.c
+@@ -20,6 +20,8 @@
+ #include "chacha20-x86_64-glue.c"
+ #elif defined(CONFIG_ZINC_ARCH_ARM) || defined(CONFIG_ZINC_ARCH_ARM64)
+ #include "chacha20-arm-glue.c"
++#elif defined(CONFIG_ZINC_ARCH_MIPS)
++#include "chacha20-mips-glue.c"
+ #else
+ static bool *const chacha20_nobs[] __initconst = { };
+ static void __init chacha20_fpu_init(void)
 -- 
 2.19.0
