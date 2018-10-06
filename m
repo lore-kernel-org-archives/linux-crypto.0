@@ -1,112 +1,111 @@
-From: syzbot <syzbot+c5048caf67d09ee24549@syzkaller.appspotmail.com>
-Subject: general protection fault in gcmaes_crypt_by_sg
-Date: Sat, 06 Oct 2018 06:04:03 -0700
-Message-ID: <000000000000b3b10305778f05f5@google.com>
+From: Dmitry Vyukov <dvyukov@google.com>
+Subject: Re: BUG: unable to handle kernel NULL pointer dereference in sha1_mb_mgr_get_comp_job_avx2
+Date: Sat, 6 Oct 2018 15:06:30 +0200
+Message-ID: <CACT4Y+aVZTpjzMzPQ2Rtgx_cRjXdwJG7BaAEO78UAitm-AnptA@mail.gmail.com>
+References: <0000000000002e9bdb0576c70441@google.com> <20181005223206.GA184636@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
-Content-Transfer-Encoding: base64
-To: bp@alien8.de, davem@davemloft.net, herbert@gondor.apana.org.au,
-        hpa@zytor.com, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, mingo@redhat.com,
-        syzkaller-bugs@googlegroups.com, tglx@linutronix.de, x86@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Cc: syzbot <syzbot+87dbe4b17debcec16d71@syzkaller.appspotmail.com>,
+        Borislav Petkov <bp@alien8.de>,
+        David Miller <davem@davemloft.net>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>, megha.dey@linux.intel.com,
+        Ingo Molnar <mingo@redhat.com>,
+        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        tim.c.chen@linux.intel.com,
+        "the arch/x86 maintainers" <x86@kernel.org>
+To: Eric Biggers <ebiggers@kernel.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20181005223206.GA184636@gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-SGVsbG8sDQoNCnN5emJvdCBmb3VuZCB0aGUgZm9sbG93aW5nIGNyYXNoIG9uOg0KDQpIRUFEIGNv
-bW1pdDogICAgMTJmZmFhMTE5N2Y1IEFkZCBsaW51eC1uZXh0IHNwZWNpZmljIGZpbGVzIGZvciAy
-MDE4MTAwNQ0KZ2l0IHRyZWU6ICAgICAgIGxpbnV4LW5leHQNCmNvbnNvbGUgb3V0cHV0OiBodHRw
-czovL3N5emthbGxlci5hcHBzcG90LmNvbS94L2xvZy50eHQ/eD0xNmNiNzgwNjQwMDAwMA0Ka2Vy
-bmVsIGNvbmZpZzogIGh0dHBzOi8vc3l6a2FsbGVyLmFwcHNwb3QuY29tL3gvLmNvbmZpZz94PWQ2
-YjA1OGE3MjMyMDQ2Zg0KZGFzaGJvYXJkIGxpbms6IGh0dHBzOi8vc3l6a2FsbGVyLmFwcHNwb3Qu
-Y29tL2J1Zz9leHRpZD1jNTA0OGNhZjY3ZDA5ZWUyNDU0OQ0KY29tcGlsZXI6ICAgICAgIGdjYyAo
-R0NDKSA4LjAuMSAyMDE4MDQxMyAoZXhwZXJpbWVudGFsKQ0KDQpVbmZvcnR1bmF0ZWx5LCBJIGRv
-bid0IGhhdmUgYW55IHJlcHJvZHVjZXIgZm9yIHRoaXMgY3Jhc2ggeWV0Lg0KDQpJTVBPUlRBTlQ6
-IGlmIHlvdSBmaXggdGhlIGJ1ZywgcGxlYXNlIGFkZCB0aGUgZm9sbG93aW5nIHRhZyB0byB0aGUg
-Y29tbWl0Og0KUmVwb3J0ZWQtYnk6IHN5emJvdCtjNTA0OGNhZjY3ZDA5ZWUyNDU0OUBzeXprYWxs
-ZXIuYXBwc3BvdG1haWwuY29tDQoNCkAZOiByZW5hbWVkIGZyb20gaXA2Z3JlMA0Ka2FzYW46IENP
-TkZJR19LQVNBTl9JTkxJTkUgZW5hYmxlZA0Ka2FzYW46IEdQRiBjb3VsZCBiZSBjYXVzZWQgYnkg
-TlVMTC1wdHIgZGVyZWYgb3IgdXNlciBtZW1vcnkgYWNjZXNzDQpnZW5lcmFsIHByb3RlY3Rpb24g
-ZmF1bHQ6IDAwMDAgWyMxXSBQUkVFTVBUIFNNUCBLQVNBTg0KQ1BVOiAxIFBJRDogMTUxMCBDb21t
-OiBzeXotZXhlY3V0b3IwIE5vdCB0YWludGVkIDQuMTkuMC1yYzYtbmV4dC0yMDE4MTAwNSsgIA0K
-Izg4DQpIYXJkd2FyZSBuYW1lOiBHb29nbGUgR29vZ2xlIENvbXB1dGUgRW5naW5lL0dvb2dsZSBD
-b21wdXRlIEVuZ2luZSwgQklPUyAgDQpHb29nbGUgMDEvMDEvMjAxMQ0KUklQOiAwMDEwOnNjYXR0
-ZXJ3YWxrX3N0YXJ0IGluY2x1ZGUvY3J5cHRvL3NjYXR0ZXJ3YWxrLmg6NzMgW2lubGluZV0NClJJ
-UDogMDAxMDpnY21hZXNfY3J5cHRfYnlfc2crMHg1NmYvMHgyMTEwICANCmFyY2gveDg2L2NyeXB0
-by9hZXNuaS1pbnRlbF9nbHVlLmM6ODM0DQpDb2RlOiBjMSBlOSAwMyA4MCAzYyAxMSAwMCAwZiA4
-NSBiZiAxOCAwMCAwMCA0OCA4ZCA3OCAwOCA0OCA4OSA4NCAyNCA1MCAwMSAgDQowMCAwMCA0OCBi
-YSAwMCAwMCAwMCAwMCAwMCBmYyBmZiBkZiA0OCA4OSBmOSA0OCBjMSBlOSAwMyA8MGY+IGI2IDE0
-IDExIDg0ICANCmQyIDc0IDA5IDgwIGZhIDAzIDBmIDhlIDZiIDE1IDAwIDAwIDQ0IDhiIDYwIDA4
-IDQ4DQpSU1A6IDAwMTg6ZmZmZjg4MDE4NTJiZjEyMCBFRkxBR1M6IDAwMDEwMjAyDQpSQVg6IDAw
-MDAwMDAwMDAwMDAwMDAgUkJYOiBmZmZmODgwMTkwMjNjNmIwIFJDWDogMDAwMDAwMDAwMDAwMDAw
-MQ0KUkRYOiBkZmZmZmMwMDAwMDAwMDAwIFJTSTogZmZmZmZmZmY4MzU5ZTA2YyBSREk6IDAwMDAw
-MDAwMDAwMDAwMDgNClJCUDogZmZmZjg4MDE4NTJiZjUyMCBSMDg6IGZmZmY4ODAxODUwYzQzMDAg
-UjA5OiBmZmZmODgwMWJlZmIwMDYwDQpSMTA6IGZmZmY4ODAxODUyYmY3YjAgUjExOiBmZmZmODgw
-MTg1MmJmN2RiIFIxMjogMDAwMDAwMDAwMDAwMDAwZA0KUjEzOiAwMDAwMDAwMDAwMDAwMDBkIFIx
-NDogZmZmZjg4MDE4NTJiZjIzOCBSMTU6IGZmZmY4ODAxODUyYmY3ZDANCkZTOiAgMDAwMDAwMDAw
-MjVkMzk0MCgwMDAwKSBHUzpmZmZmODgwMWRhZjAwMDAwKDAwMDApIGtubEdTOjAwMDAwMDAwMDAw
-MDAwMDANCkNTOiAgMDAxMCBEUzogMDAwMCBFUzogMDAwMCBDUjA6IDAwMDAwMDAwODAwNTAwMzMN
-CkNSMjogMDAwMDAwMWIyZDEyODAwMCBDUjM6IDAwMDAwMDAxY2QyNzMwMDAgQ1I0OiAwMDAwMDAw
-MDAwMTQwNmUwDQpEUjA6IDAwMDAwMDAwMjAwMDAwMDAgRFIxOiAwMDAwMDAwMDAwMDAwMDAwIERS
-MjogMDAwMDAwMDAwMDAwMDAwMA0KRFIzOiAwMDAwMDAwMDAwMDAwMDAwIERSNjogMDAwMDAwMDBm
-ZmZlMGZmMCBEUjc6IDAwMDAwMDAwMDAwMDA2MDANCkNhbGwgVHJhY2U6DQogIGdjbWFlc19lbmNy
-eXB0LmNvbnN0cHJvcC4xNysweDdkNy8weDExOTAgIA0KYXJjaC94ODYvY3J5cHRvL2Flc25pLWlu
-dGVsX2dsdWUuYzo5MjkNCiAgZ2VuZXJpY19nY21hZXNfZW5jcnlwdCsweDEyZC8weDE4NiBhcmNo
-L3g4Ni9jcnlwdG8vYWVzbmktaW50ZWxfZ2x1ZS5jOjEyOTQNCiAgY3J5cHRvX2FlYWRfZW5jcnlw
-dCBpbmNsdWRlL2NyeXB0by9hZWFkLmg6MzY0IFtpbmxpbmVdDQogIGdjbWFlc193cmFwcGVyX2Vu
-Y3J5cHQrMHgxNjIvMHgyMDAgYXJjaC94ODYvY3J5cHRvL2Flc25pLWludGVsX2dsdWUuYzoxMTI3
-DQogIGNyeXB0b19hZWFkX2VuY3J5cHQgaW5jbHVkZS9jcnlwdG8vYWVhZC5oOjM2NCBbaW5saW5l
-XQ0KICB0bHNfZG9fZW5jcnlwdGlvbiBuZXQvdGxzL3Rsc19zdy5jOjUzNCBbaW5saW5lXQ0KICB0
-bHNfcHVzaF9yZWNvcmQrMHhjMTIvMHgxN2YwIG5ldC90bHMvdGxzX3N3LmM6NTgzDQogIHRsc19z
-d19wdXNoX3BlbmRpbmdfcmVjb3JkKzB4MjIvMHgzMCBuZXQvdGxzL3Rsc19zdy5jOjU5Nw0KICB0
-bHNfaGFuZGxlX29wZW5fcmVjb3JkIG5ldC90bHMvdGxzX21haW4uYzoxNTUgW2lubGluZV0NCiAg
-dGxzX3NrX3Byb3RvX2Nsb3NlKzB4NDM5LzB4NzUwIG5ldC90bHMvdGxzX21haW4uYzoyNzINCiAg
-aW5ldF9yZWxlYXNlKzB4MTA0LzB4MWYwIG5ldC9pcHY0L2FmX2luZXQuYzo0MjgNCiAgaW5ldDZf
-cmVsZWFzZSsweDUwLzB4NzAgbmV0L2lwdjYvYWZfaW5ldDYuYzo0NTgNCiAgX19zb2NrX3JlbGVh
-c2UrMHhkNy8weDI1MCBuZXQvc29ja2V0LmM6NTgwDQogIHNvY2tfY2xvc2UrMHgxOS8weDIwIG5l
-dC9zb2NrZXQuYzoxMTQyDQogIF9fZnB1dCsweDNiYy8weGE3MCBmcy9maWxlX3RhYmxlLmM6Mjc5
-DQogIF9fX19mcHV0KzB4MTUvMHgyMCBmcy9maWxlX3RhYmxlLmM6MzEyDQogIHRhc2tfd29ya19y
-dW4rMHgxZTgvMHgyYTAga2VybmVsL3Rhc2tfd29yay5jOjExMw0KICB0cmFjZWhvb2tfbm90aWZ5
-X3Jlc3VtZSBpbmNsdWRlL2xpbnV4L3RyYWNlaG9vay5oOjE4OCBbaW5saW5lXQ0KICBleGl0X3Rv
-X3VzZXJtb2RlX2xvb3ArMHgzMTgvMHgzODAgYXJjaC94ODYvZW50cnkvY29tbW9uLmM6MTY2DQog
-IHByZXBhcmVfZXhpdF90b191c2VybW9kZSBhcmNoL3g4Ni9lbnRyeS9jb21tb24uYzoxOTcgW2lu
-bGluZV0NCiAgc3lzY2FsbF9yZXR1cm5fc2xvd3BhdGggYXJjaC94ODYvZW50cnkvY29tbW9uLmM6
-MjY4IFtpbmxpbmVdDQogIGRvX3N5c2NhbGxfNjQrMHg2YmUvMHg4MjAgYXJjaC94ODYvZW50cnkv
-Y29tbW9uLmM6MjkzDQogIGVudHJ5X1NZU0NBTExfNjRfYWZ0ZXJfaHdmcmFtZSsweDQ5LzB4YmUN
-ClJJUDogMDAzMzoweDQxMTA1MQ0KQ29kZTogNzUgMTQgYjggMDMgMDAgMDAgMDAgMGYgMDUgNDgg
-M2QgMDEgZjAgZmYgZmYgMGYgODMgMzQgMTkgMDAgMDAgYzMgNDggIA0KODMgZWMgMDggZTggMGEg
-ZmMgZmYgZmYgNDggODkgMDQgMjQgYjggMDMgMDAgMDAgMDAgMGYgMDUgPDQ4PiA4YiAzYyAyNCA0
-OCAgDQo4OSBjMiBlOCA1MyBmYyBmZiBmZiA0OCA4OSBkMCA0OCA4MyBjNCAwOCA0OCAzZCAwMQ0K
-UlNQOiAwMDJiOjAwMDA3ZmZmNDBmOWE4ZDAgRUZMQUdTOiAwMDAwMDI5MyBPUklHX1JBWDogMDAw
-MDAwMDAwMDAwMDAwMw0KUkFYOiAwMDAwMDAwMDAwMDAwMDAwIFJCWDogMDAwMDAwMDAwMDAwMDAw
-NCBSQ1g6IDAwMDAwMDAwMDA0MTEwNTENClJEWDogMDAwMDAwMWIyZGEyMDAwMCBSU0k6IDAwMDAw
-MDAwMDAwMDAwMDAgUkRJOiAwMDAwMDAwMDAwMDAwMDAzDQpSQlA6IDAwMDAwMDAwMDAwMDAwMDAg
-UjA4OiAwMDAwMDAwMDQ5Y2NkMWVmIFIwOTogMDAwMDAwMDA0OWNjZDFmMw0KUjEwOiAwMDAwN2Zm
-ZjQwZjlhODAwIFIxMTogMDAwMDAwMDAwMDAwMDI5MyBSMTI6IDAwMDAwMDAwMDAwMDAwMDANClIx
-MzogMDAwMDAwMDAwMDAwMDAwMSBSMTQ6IDAwMDAwMDAwMDAwMDAxMGMgUjE1OiAwMDAwMDAwMDAw
-MDAwMDAwDQpNb2R1bGVzIGxpbmtlZCBpbjoNCi0tLVsgZW5kIHRyYWNlIGE4ZjUyMzExMGQ4Y2Ez
-NzUgXS0tLQ0KUklQOiAwMDEwOnNjYXR0ZXJ3YWxrX3N0YXJ0IGluY2x1ZGUvY3J5cHRvL3NjYXR0
-ZXJ3YWxrLmg6NzMgW2lubGluZV0NClJJUDogMDAxMDpnY21hZXNfY3J5cHRfYnlfc2crMHg1NmYv
-MHgyMTEwICANCmFyY2gveDg2L2NyeXB0by9hZXNuaS1pbnRlbF9nbHVlLmM6ODM0DQpDb2RlOiBj
-MSBlOSAwMyA4MCAzYyAxMSAwMCAwZiA4NSBiZiAxOCAwMCAwMCA0OCA4ZCA3OCAwOCA0OCA4OSA4
-NCAyNCA1MCAwMSAgDQowMCAwMCA0OCBiYSAwMCAwMCAwMCAwMCAwMCBmYyBmZiBkZiA0OCA4OSBm
-OSA0OCBjMSBlOSAwMyA8MGY+IGI2IDE0IDExIDg0ICANCmQyIDc0IDA5IDgwIGZhIDAzIDBmIDhl
-IDZiIDE1IDAwIDAwIDQ0IDhiIDYwIDA4IDQ4DQpSU1A6IDAwMTg6ZmZmZjg4MDE4NTJiZjEyMCBF
-RkxBR1M6IDAwMDEwMjAyDQpSQVg6IDAwMDAwMDAwMDAwMDAwMDAgUkJYOiBmZmZmODgwMTkwMjNj
-NmIwIFJDWDogMDAwMDAwMDAwMDAwMDAwMQ0KUkRYOiBkZmZmZmMwMDAwMDAwMDAwIFJTSTogZmZm
-ZmZmZmY4MzU5ZTA2YyBSREk6IDAwMDAwMDAwMDAwMDAwMDgNClJCUDogZmZmZjg4MDE4NTJiZjUy
-MCBSMDg6IGZmZmY4ODAxODUwYzQzMDAgUjA5OiBmZmZmODgwMWJlZmIwMDYwDQpSMTA6IGZmZmY4
-ODAxODUyYmY3YjAgUjExOiBmZmZmODgwMTg1MmJmN2RiIFIxMjogMDAwMDAwMDAwMDAwMDAwZA0K
-UjEzOiAwMDAwMDAwMDAwMDAwMDBkIFIxNDogZmZmZjg4MDE4NTJiZjIzOCBSMTU6IGZmZmY4ODAx
-ODUyYmY3ZDANCkZTOiAgMDAwMDAwMDAwMjVkMzk0MCgwMDAwKSBHUzpmZmZmODgwMWRhZjAwMDAw
-KDAwMDApIGtubEdTOjAwMDAwMDAwMDAwMDAwMDANCkNTOiAgMDAxMCBEUzogMDAwMCBFUzogMDAw
-MCBDUjA6IDAwMDAwMDAwODAwNTAwMzMNCkNSMjogMDAwMDAwMWIyZDEyODAwMCBDUjM6IDAwMDAw
-MDAxY2QyNzMwMDAgQ1I0OiAwMDAwMDAwMDAwMTQwNmUwDQpEUjA6IDAwMDAwMDAwMjAwMDAwMDAg
-RFIxOiAwMDAwMDAwMDAwMDAwMDAwIERSMjogMDAwMDAwMDAwMDAwMDAwMA0KRFIzOiAwMDAwMDAw
-MDAwMDAwMDAwIERSNjogMDAwMDAwMDBmZmZlMGZmMCBEUjc6IDAwMDAwMDAwMDAwMDA2MDANCg0K
-DQotLS0NClRoaXMgYnVnIGlzIGdlbmVyYXRlZCBieSBhIGJvdC4gSXQgbWF5IGNvbnRhaW4gZXJy
-b3JzLg0KU2VlIGh0dHBzOi8vZ29vLmdsL3Rwc21FSiBmb3IgbW9yZSBpbmZvcm1hdGlvbiBhYm91
-dCBzeXpib3QuDQpzeXpib3QgZW5naW5lZXJzIGNhbiBiZSByZWFjaGVkIGF0IHN5emthbGxlckBn
-b29nbGVncm91cHMuY29tLg0KDQpzeXpib3Qgd2lsbCBrZWVwIHRyYWNrIG9mIHRoaXMgYnVnIHJl
-cG9ydC4gU2VlOg0KaHR0cHM6Ly9nb28uZ2wvdHBzbUVKI2J1Zy1zdGF0dXMtdHJhY2tpbmcgZm9y
-IGhvdyB0byBjb21tdW5pY2F0ZSB3aXRoICANCnN5emJvdC4NCg==
+On Sat, Oct 6, 2018 at 12:32 AM, Eric Biggers <ebiggers@kernel.org> wrote:
+> On Wed, Sep 26, 2018 at 07:27:04AM -0700, syzbot wrote:
+>> Hello,
+>>
+>> syzbot found the following crash on:
+>>
+>> HEAD commit:    a38523185b40 erge tag 'libnvdimm-fixes-4.19-rc6' of git://..
+>> git tree:       upstream
+>> console output: https://syzkaller.appspot.com/x/log.txt?x=1767b7fa400000
+>> kernel config:  https://syzkaller.appspot.com/x/.config?x=dfb440e26f0a6f6f
+>> dashboard link: https://syzkaller.appspot.com/bug?extid=87dbe4b17debcec16d71
+>> compiler:       gcc (GCC) 8.0.1 20180413 (experimental)
+>>
+>> Unfortunately, I don't have any reproducer for this crash yet.
+>>
+>> IMPORTANT: if you fix the bug, please add the following tag to the commit:
+>> Reported-by: syzbot+87dbe4b17debcec16d71@syzkaller.appspotmail.com
+>>
+>> BUG: unable to handle kernel NULL pointer dereference at 0000000000000034
+>> PGD 1b8b87067 P4D 1b8b87067 PUD 1b8b88067 PMD 0
+>> Oops: 0002 [#1] PREEMPT SMP KASAN
+>> CPU: 1 PID: 24 Comm: kworker/1:1 Not tainted 4.19.0-rc5+ #32
+>> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS
+>> Google 01/01/2011
+>> Workqueue: crypto mcryptd_flusher
+>> RIP: 0010:sha1_mb_mgr_get_comp_job_avx2+0x62/0xba
+>> arch/x86/crypto/sha1-mb/sha1_mb_mgr_flush_avx2.S:256
+>> Code: 04 c4 e2 69 3b d3 c4 c1 79 7e d0 49 f7 c0 f0 ff ff ff 75 6e 49 6b d8
+>> 08 48 8d 9c 1f 08 01 00 00 48 8b 03 48 c7 03 00 00 00 00 <c7> 40 34 02 00 00
+>> 00 48 8b 9f 00 01 00 00 48 c1 e3 04 4c 09 c3 48
+>> kobject: 'loop1' (00000000307f8c2f): kobject_uevent_env
+>> RSP: 0018:ffff8801d94473c0 EFLAGS: 00010206
+>> RAX: 0000000000000000 RBX: ffff8801d4818688 RCX: 1ffff1003b2869e1
+>> RDX: 1ffffd1ffffa2591 RSI: ffffffff81454f3a RDI: ffff8801d4818580
+>> RBP: ffff8801d9447520 R08: 0000000000000000 R09: 0000000000000006
+>> kobject: 'loop1' (00000000307f8c2f): fill_kobj_path: path =
+>> '/devices/virtual/block/loop1'
+>> R10: 0000000000000000 R11: ffff8801d9434640 R12: ffff8801d94474f8
+>> R13: 0000000000000001 R14: ffff8801bb509720 R15: 0000000000000200
+>> FS:  0000000000000000(0000) GS:ffff8801dad00000(0000) knlGS:0000000000000000
+>> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>> kobject: 'loop4' (00000000fa342cfc): kobject_uevent_env
+>> CR2: 0000000000000034 CR3: 00000001b8b85000 CR4: 00000000001406e0
+>> kobject: 'loop4' (00000000fa342cfc): fill_kobj_path: path =
+>> '/devices/virtual/block/loop4'
+>> Call Trace:
+>>  sha1_mb_flusher+0x2f4/0x60b arch/x86/crypto/sha1-mb/sha1_mb.c:918
+>>  mcryptd_flusher+0x3af/0x520 crypto/mcryptd.c:208
+>>  process_one_work+0xc90/0x1b90 kernel/workqueue.c:2153
+>>  worker_thread+0x17f/0x1390 kernel/workqueue.c:2296
+>>  kthread+0x35a/0x420 kernel/kthread.c:246
+>>  ret_from_fork+0x3a/0x50 arch/x86/entry/entry_64.S:413
+>> Modules linked in:
+>> CR2: 0000000000000034
+>> ---[ end trace 7d3a48e5625a9543 ]---
+>> RIP: 0010:sha1_mb_mgr_get_comp_job_avx2+0x62/0xba
+>> arch/x86/crypto/sha1-mb/sha1_mb_mgr_flush_avx2.S:256
+>> Code: 04 c4 e2 69 3b d3 c4 c1 79 7e d0 49 f7 c0 f0 ff ff ff 75 6e 49 6b d8
+>> 08 48 8d 9c 1f 08 01 00 00 48 8b 03 48 c7 03 00 00 00 00 <c7> 40 34 02 00 00
+>> 00 48 8b 9f 00 01 00 00 48 c1 e3 04 4c 09 c3 48
+>> RSP: 0018:ffff8801d94473c0 EFLAGS: 00010206
+>> RAX: 0000000000000000 RBX: ffff8801d4818688 RCX: 1ffff1003b2869e1
+>> RDX: 1ffffd1ffffa2591 RSI: ffffffff81454f3a RDI: ffff8801d4818580
+>> RBP: ffff8801d9447520 R08: 0000000000000000 R09: 0000000000000006
+>> R10: 0000000000000000 R11: ffff8801d9434640 R12: ffff8801d94474f8
+>> R13: 0000000000000001 R14: ffff8801bb509720 R15: 0000000000000200
+>> FS:  0000000000000000(0000) GS:ffff8801dad00000(0000) knlGS:0000000000000000
+>> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>> CR2: 0000000000000034 CR3: 00000001b8b85000 CR4: 00000000001406e0
+>>
+>>
+>> ---
+>> This bug is generated by a bot. It may contain errors.
+>> See https://goo.gl/tpsmEJ for more information about syzbot.
+>> syzbot engineers can be reached at syzkaller@googlegroups.com.
+>>
+>> syzbot will keep track of this bug report. See:
+>> https://goo.gl/tpsmEJ#bug-status-tracking for how to communicate with
+>> syzbot.
+>
+> The "fix" for this is queued in cryptodev:
+>
+> #syz fix: crypto: x86 - remove SHA multibuffer routines and mcryptd
+
+That's the best type of fix! :)
