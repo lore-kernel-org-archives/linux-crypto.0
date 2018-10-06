@@ -1,148 +1,283 @@
-From: Eric Biggers <ebiggers@kernel.org>
-Subject: Re: KASAN: use-after-free Read in sha512_ctx_mgr_resubmit
-Date: Fri, 5 Oct 2018 15:33:07 -0700
-Message-ID: <20181005223307.GB184636@gmail.com>
-References: <00000000000072d64d05737b6b8c@google.com>
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: [PATCH net-next v7 03/28] zinc: introduce minimal cryptography library
+Date: Sat,  6 Oct 2018 04:56:44 +0200
+Message-ID: <20181006025709.4019-4-Jason@zx2c4.com>
+References: <20181006025709.4019-1-Jason@zx2c4.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, herbert@gondor.apana.org.au, hpa@zytor.com,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        mingo@redhat.com, syzkaller-bugs@googlegroups.com,
-        tglx@linutronix.de, x86@kernel.org
-To: syzbot <syzbot+d5455bac3ba1ee9114e5@syzkaller.appspotmail.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <00000000000072d64d05737b6b8c@google.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Samuel Neves <sneves@dei.uc.pt>,
+        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        kernel-hardening@lists.openwall.com, linux-crypto@vger.kernel.org
+To: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+        davem@davemloft.net, gregkh@linuxfoundation.org
+Return-path: <netdev-owner@vger.kernel.org>
+In-Reply-To: <20181006025709.4019-1-Jason@zx2c4.com>
+Sender: netdev-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Aug 15, 2018 at 09:00:04AM -0700, syzbot wrote:
-> Hello,
-> 
-> syzbot found the following crash on:
-> 
-> HEAD commit:    7796916146b8 Merge branch 'x86-cpu-for-linus' of git://git..
-> git tree:       upstream
-> console output: https://syzkaller.appspot.com/x/log.txt?x=164b1922400000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=265bef9882cce8d7
-> dashboard link: https://syzkaller.appspot.com/bug?extid=d5455bac3ba1ee9114e5
-> compiler:       gcc (GCC) 8.0.1 20180413 (experimental)
-> syzkaller repro:https://syzkaller.appspot.com/x/repro.syz?x=1013478c400000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1349c8aa400000
-> 
-> IMPORTANT: if you fix the bug, please add the following tag to the commit:
-> Reported-by: syzbot+d5455bac3ba1ee9114e5@syzkaller.appspotmail.com
-> 
-> ==================================================================
-> BUG: KASAN: use-after-free in sha512_ctx_mgr_resubmit.part.3+0x3b1/0x4a0
-> arch/x86/crypto/sha512-mb/sha512_mb.c:136
-> Read of size 4 at addr ffff8801b0b9e838 by task kworker/0:1/13
-> 
-> CPU: 0 PID: 13 Comm: kworker/0:1 Not tainted 4.18.0+ #187
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS
-> Google 01/01/2011
-> Workqueue: crypto mcryptd_flusher
-> Call Trace:
->  __dump_stack lib/dump_stack.c:77 [inline]
->  dump_stack+0x1c9/0x2b4 lib/dump_stack.c:113
->  print_address_description+0x6c/0x20b mm/kasan/report.c:256
->  kasan_report_error mm/kasan/report.c:354 [inline]
->  kasan_report.cold.7+0x242/0x2fe mm/kasan/report.c:412
->  __asan_report_load4_noabort+0x14/0x20 mm/kasan/report.c:432
->  sha512_ctx_mgr_resubmit.part.3+0x3b1/0x4a0
-> arch/x86/crypto/sha512-mb/sha512_mb.c:136
->  sha512_ctx_mgr_resubmit arch/x86/crypto/sha512-mb/sha512_mb.c:135 [inline]
->  sha512_ctx_mgr_flush+0x5c/0xb0 arch/x86/crypto/sha512-mb/sha512_mb.c:367
->  sha512_mb_flusher+0x27b/0x610 arch/x86/crypto/sha512-mb/sha512_mb.c:939
->  mcryptd_flusher+0x342/0x4b0 crypto/mcryptd.c:208
->  process_one_work+0xc73/0x1ba0 kernel/workqueue.c:2153
->  worker_thread+0x189/0x13c0 kernel/workqueue.c:2296
->  kthread+0x35a/0x420 kernel/kthread.c:246
->  ret_from_fork+0x3a/0x50 arch/x86/entry/entry_64.S:413
-> 
-> Allocated by task 23902:
->  save_stack+0x43/0xd0 mm/kasan/kasan.c:448
->  set_track mm/kasan/kasan.c:460 [inline]
->  kasan_kmalloc+0xc4/0xe0 mm/kasan/kasan.c:553
->  __do_kmalloc mm/slab.c:3718 [inline]
->  __kmalloc+0x14e/0x760 mm/slab.c:3727
->  kmalloc include/linux/slab.h:518 [inline]
->  sock_kmalloc+0x156/0x1f0 net/core/sock.c:1996
->  hash_accept_parent_nokey+0x58/0x2e0 crypto/algif_hash.c:438
->  hash_accept_parent+0x5b/0x80 crypto/algif_hash.c:465
->  af_alg_accept+0x127/0x7d0 crypto/af_alg.c:296
->  alg_accept+0x46/0x60 crypto/af_alg.c:332
->  __sys_accept4+0x3b2/0x8a0 net/socket.c:1600
->  __do_sys_accept4 net/socket.c:1635 [inline]
->  __se_sys_accept4 net/socket.c:1632 [inline]
->  __x64_sys_accept4+0x97/0xf0 net/socket.c:1632
->  do_syscall_64+0x1b9/0x820 arch/x86/entry/common.c:290
->  entry_SYSCALL_64_after_hwframe+0x49/0xbe
-> 
-> Freed by task 23902:
->  save_stack+0x43/0xd0 mm/kasan/kasan.c:448
->  set_track mm/kasan/kasan.c:460 [inline]
->  __kasan_slab_free+0x11a/0x170 mm/kasan/kasan.c:521
->  kasan_slab_free+0xe/0x10 mm/kasan/kasan.c:528
->  __cache_free mm/slab.c:3498 [inline]
->  kfree+0xd9/0x260 mm/slab.c:3813
->  __sock_kfree_s net/core/sock.c:2017 [inline]
->  sock_kfree_s+0x29/0x60 net/core/sock.c:2023
->  hash_sock_destruct+0x157/0x1c0 crypto/algif_hash.c:427
->  __sk_destruct+0x107/0xa60 net/core/sock.c:1573
->  sk_destruct+0x78/0x90 net/core/sock.c:1608
->  __sk_free+0xcf/0x300 net/core/sock.c:1619
->  sk_free+0x42/0x50 net/core/sock.c:1630
->  sock_put include/net/sock.h:1667 [inline]
->  af_alg_release+0x6e/0x90 crypto/af_alg.c:126
->  __sock_release+0xd7/0x260 net/socket.c:600
->  sock_close+0x19/0x20 net/socket.c:1151
->  __fput+0x355/0x8b0 fs/file_table.c:209
->  ____fput+0x15/0x20 fs/file_table.c:243
->  task_work_run+0x1e8/0x2a0 kernel/task_work.c:113
->  tracehook_notify_resume include/linux/tracehook.h:192 [inline]
->  exit_to_usermode_loop+0x313/0x370 arch/x86/entry/common.c:166
->  prepare_exit_to_usermode arch/x86/entry/common.c:197 [inline]
->  syscall_return_slowpath arch/x86/entry/common.c:268 [inline]
->  do_syscall_64+0x6be/0x820 arch/x86/entry/common.c:293
->  entry_SYSCALL_64_after_hwframe+0x49/0xbe
-> 
-> The buggy address belongs to the object at ffff8801b0b9e340
->  which belongs to the cache kmalloc-2048 of size 2048
-> The buggy address is located 1272 bytes inside of
->  2048-byte region [ffff8801b0b9e340, ffff8801b0b9eb40)
-> The buggy address belongs to the page:
-> page:ffffea0006c2e780 count:1 mapcount:0 mapping:ffff8801dac00c40 index:0x0
-> compound_mapcount: 0
-> flags: 0x2fffc0000008100(slab|head)
-> raw: 02fffc0000008100 ffffea0007543a88 ffffea000760b188 ffff8801dac00c40
-> raw: 0000000000000000 ffff8801b0b9e340 0000000100000003 0000000000000000
-> page dumped because: kasan: bad access detected
-> 
-> Memory state around the buggy address:
->  ffff8801b0b9e700: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->  ffff8801b0b9e780: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-> > ffff8801b0b9e800: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->                                         ^
->  ffff8801b0b9e880: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->  ffff8801b0b9e900: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-> ==================================================================
-> 
-> 
-> ---
-> This bug is generated by a bot. It may contain errors.
-> See https://goo.gl/tpsmEJ for more information about syzbot.
-> syzbot engineers can be reached at syzkaller@googlegroups.com.
-> 
-> syzbot will keep track of this bug report. See:
-> https://goo.gl/tpsmEJ#bug-status-tracking for how to communicate with
-> syzbot.
-> syzbot can test patches for this bug, for details see:
-> https://goo.gl/tpsmEJ#testing-patches
-> 
+Zinc stands for "Zinc Is Neat Crypto" or "Zinc as IN Crypto". It's also
+short, easy to type, and plays nicely with the recent trend of naming
+crypto libraries after elements. The guiding principle is "don't overdo
+it". It's less of a library and more of a directory tree for organizing
+well-curated direct implementations of cryptography primitives.
 
-The "fix" for this is queued in cryptodev:
+Zinc is a new cryptography API that is much more minimal and lower-level
+than the current one. It intends to complement it and provide a basis
+upon which the current crypto API might build, as the provider of
+software implementations of cryptographic primitives. It is motivated by
+three primary observations in crypto API design:
 
-#syz fix: crypto: x86 - remove SHA multibuffer routines and mcryptd
+  * Highly composable "cipher modes" and related abstractions from
+    90s cryptographers did not turn out to be as terrific an idea as
+    hoped, leading to a host of API misuse problems.
 
-- Eric
+  * Most programmers are afraid of crypto code, and so prefer to
+    integrate it into libraries in a highly abstracted manner, so as to
+    shield themselves from implementation details. Cryptographers, on
+    the other hand, prefer simple direct implementations, which they're
+    able to verify for high assurance and optimize in accordance with
+    their expertise.
+
+  * Overly abstracted and flexible cryptography APIs lead to a host of
+    dangerous problems and performance issues. The kernel is in the
+    business usually not of coming up with new uses of crypto, but
+    rather implementing various constructions, which means it essentially
+    needs a library of primitives, not a highly abstracted enterprise-ready
+    pluggable system, with a few particular exceptions.
+
+This last observation has seen itself play out several times over and
+over again within the kernel:
+
+  * The perennial move of actual primitives away from crypto/ and into
+    lib/, so that users can actually call these functions directly with
+    no overhead and without lots of allocations, function pointers,
+    string specifier parsing, and general clunkiness. For example:
+    sha256, chacha20, siphash, sha1, and so forth live in lib/ rather
+    than in crypto/. Zinc intends to stop the cluttering of lib/ and
+    introduce these direct primitives into their proper place, lib/zinc/.
+
+  * An abundance of misuse bugs with the present crypto API that have
+    been very unpleasant to clean up.
+
+  * A hesitance to even use cryptography, because of the overhead and
+    headaches involved in accessing the routines.
+
+Zinc goes in a rather different direction. Rather than providing a
+thoroughly designed and abstracted API, Zinc gives you simple functions,
+which implement some primitive, or some particular and specific
+construction of primitives. It is not dynamic in the least, though one
+could imagine implementing a complex dynamic dispatch mechanism (such as
+the current crypto API) on top of these basic functions. After all,
+dynamic dispatch is usually needed for applications with cipher agility,
+such as IPsec, dm-crypt, AF_ALG, and so forth, and the existing crypto
+API will continue to play that role. However, Zinc will provide a non-
+haphazard way of directly utilizing crypto routines in applications
+that do have neither the need nor desire for abstraction and dynamic
+dispatch.
+
+It also organizes the implementations in a simple, straight-forward,
+and direct manner, making it enjoyable and intuitive to work on.
+Rather than moving optimized assembly implementations into arch/, it
+keeps them all together in lib/zinc/, making it simple and obvious to
+compare and contrast what's happening. This is, notably, exactly what
+the lib/raid6/ tree does, and that seems to work out rather well. It's
+also the pattern of most successful crypto libraries. The architecture-
+specific glue-code is made a part of each translation unit, rather than
+being in a separate one, so that generic and architecture-optimized code
+are combined at compile-time, and incompatibility branches compiled out by
+the optimizer.
+
+All implementations have been extensively tested and fuzzed, and are
+selected for their quality, trustworthiness, and performance. Wherever
+possible and performant, formally verified implementations are used,
+such as those from HACL* [1] and Fiat-Crypto [2]. The routines also take
+special care to zero out secrets using memzero_explicit (and future work
+is planned to have gcc do this more reliably and performantly with
+compiler plugins). The performance of the selected implementations is
+state-of-the-art and unrivaled on a broad array of hardware, though of
+course we will continue to fine tune these to the hardware demands
+needed by kernel contributors. Each implementation also comes with
+extensive self-tests and crafted test vectors, pulled from various
+places such as Wycheproof [9].
+
+Regularity of function signatures is important, so that users can easily
+"guess" the name of the function they want. Though, individual
+primitives are oftentimes not trivially interchangeable, having been
+designed for different things and requiring different parameters and
+semantics, and so the function signatures they provide will directly
+reflect the realities of the primitives' usages, rather than hiding it
+behind (inevitably leaky) abstractions. Also, in contrast to the current
+crypto API, Zinc functions can work on stack buffers, and can be called
+with different keys, without requiring allocations or locking.
+
+SIMD is used automatically when available, though some routines may
+benefit from either having their SIMD disabled for particular
+invocations, or to have the SIMD initialization calls amortized over
+several invocations of the function, and so Zinc utilizes function
+signatures enabling that in conjunction with the recently introduced
+simd_context_t.
+
+More generally, Zinc provides function signatures that allow just what
+is required by the various callers. This isn't to say that users of the
+functions will be permitted to pollute the function semantics with weird
+particular needs, but we are trying very hard not to overdo it, and that
+means looking carefully at what's actually necessary, and doing just that,
+and not much more than that. Remember: practicality and cleanliness rather
+than over-zealous infrastructure.
+
+Zinc provides also an opening for the best implementers in academia to
+contribute their time and effort to the kernel, by being sufficiently
+simple and inviting. In discussing this commit with some of the best and
+brightest over the last few years, there are many who are eager to
+devote rare talent and energy to this effort.
+
+Following the merging of this, I expect for the primitives that
+currently exist in lib/ to work their way into lib/zinc/, after intense
+scrutiny of each implementation, potentially replacing them with either
+formally-verified implementations, or better studied and faster
+state-of-the-art implementations.
+
+Also following the merging of this, I expect for the old crypto API
+implementations to be ported over to use Zinc for their software-based
+implementations.
+
+As Zinc is simply library code, its config options are un-menued, with
+the exception of CONFIG_ZINC_SELFTEST and CONFIG_ZINC_DEBUG, which enables
+various selftests and debugging conditions.
+
+[1] https://github.com/project-everest/hacl-star
+[2] https://github.com/mit-plv/fiat-crypto
+[3] https://cr.yp.to/ecdh.html
+[4] https://cr.yp.to/chacha.html
+[5] https://cr.yp.to/snuffle/xsalsa-20081128.pdf
+[6] https://cr.yp.to/mac.html
+[7] https://blake2.net/
+[8] https://tools.ietf.org/html/rfc8439
+[9] https://github.com/google/wycheproof
+
+Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+Cc: Samuel Neves <sneves@dei.uc.pt>
+Cc: Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>
+Cc: Andy Lutomirski <luto@kernel.org>
+Cc: Greg KH <gregkh@linuxfoundation.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: kernel-hardening@lists.openwall.com
+Cc: linux-crypto@vger.kernel.org
+---
+ MAINTAINERS       |  8 ++++++++
+ lib/Kconfig       |  2 ++
+ lib/Makefile      |  2 ++
+ lib/zinc/Kconfig  | 41 +++++++++++++++++++++++++++++++++++++++++
+ lib/zinc/Makefile |  3 +++
+ 5 files changed, 56 insertions(+)
+ create mode 100644 lib/zinc/Kconfig
+ create mode 100644 lib/zinc/Makefile
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index bb5f431043f7..ab349f7e8d53 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -16202,6 +16202,14 @@ Q:	https://patchwork.linuxtv.org/project/linux-media/list/
+ S:	Maintained
+ F:	drivers/media/dvb-frontends/zd1301_demod*
+ 
++ZINC CRYPTOGRAPHY LIBRARY
++M:	Jason A. Donenfeld <Jason@zx2c4.com>
++M:	Samuel Neves <sneves@dei.uc.pt>
++S:	Maintained
++F:	lib/zinc/
++F:	include/zinc/
++L:	linux-crypto@vger.kernel.org
++
+ ZPOOL COMPRESSED PAGE STORAGE API
+ M:	Dan Streetman <ddstreet@ieee.org>
+ L:	linux-mm@kvack.org
+diff --git a/lib/Kconfig b/lib/Kconfig
+index a3928d4438b5..3e6848269c66 100644
+--- a/lib/Kconfig
++++ b/lib/Kconfig
+@@ -485,6 +485,8 @@ config GLOB_SELFTEST
+ 	  module load) by a small amount, so you're welcome to play with
+ 	  it, but you probably don't need it.
+ 
++source "lib/zinc/Kconfig"
++
+ #
+ # Netlink attribute parsing support is select'ed if needed
+ #
+diff --git a/lib/Makefile b/lib/Makefile
+index ca3f7ebb900d..571d28d3f143 100644
+--- a/lib/Makefile
++++ b/lib/Makefile
+@@ -214,6 +214,8 @@ obj-$(CONFIG_PERCPU_TEST) += percpu_test.o
+ 
+ obj-$(CONFIG_ASN1) += asn1_decoder.o
+ 
++obj-y += zinc/
++
+ obj-$(CONFIG_FONT_SUPPORT) += fonts/
+ 
+ obj-$(CONFIG_PRIME_NUMBERS) += prime_numbers.o
+diff --git a/lib/zinc/Kconfig b/lib/zinc/Kconfig
+new file mode 100644
+index 000000000000..90e066ea93a0
+--- /dev/null
++++ b/lib/zinc/Kconfig
+@@ -0,0 +1,41 @@
++config ZINC_SELFTEST
++	bool "Zinc cryptography library self-tests"
++	help
++	  This builds a series of self-tests for the Zinc crypto library, which
++	  help diagnose any cryptographic algorithm implementation issues that
++	  might be at the root cause of potential bugs. It also adds various
++	  traps for incorrect usage.
++
++	  Unless you are optimizing for machines without much disk space or for
++	  very slow machines, it is probably a good idea to say Y here, so that
++	  any potential cryptographic bugs translate into easy bug reports
++	  rather than long-lasting security issues.
++
++config ZINC_DEBUG
++	bool "Zinc cryptography library debugging"
++	help
++	  This turns on a series of additional checks and debugging options
++	  that are useful for developers but probably will not provide much
++	  benefit to end users.
++
++	  Most people should say N here.
++
++config ZINC_ARCH_ARM
++	def_bool y
++	depends on ARM
++
++config ZINC_ARCH_ARM64
++	def_bool y
++	depends on ARM64
++
++config ZINC_ARCH_X86_64
++	def_bool y
++	depends on X86_64 && !UML
++
++config ZINC_ARCH_MIPS
++	def_bool y
++	depends on MIPS && CPU_MIPS32_R2 && !64BIT
++
++config ZINC_ARCH_MIPS64
++	def_bool y
++	depends on MIPS && 64BIT
+diff --git a/lib/zinc/Makefile b/lib/zinc/Makefile
+new file mode 100644
+index 000000000000..a61c80d676cb
+--- /dev/null
++++ b/lib/zinc/Makefile
+@@ -0,0 +1,3 @@
++ccflags-y := -O2
++ccflags-y += -D'pr_fmt(fmt)="zinc: " fmt'
++ccflags-$(CONFIG_ZINC_DEBUG) += -DDEBUG
+-- 
+2.19.0
