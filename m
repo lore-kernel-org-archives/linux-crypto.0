@@ -1,38 +1,38 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: caam/qi2 - avoid double export
-Date: Mon, 8 Oct 2018 13:53:01 +0800
-Message-ID: <20181008055301.mngrxpbfye5t4qn2@gondor.apana.org.au>
-References: <20181002205720.2255567-1-arnd@arndb.de>
+Subject: Re: [PATCH] crypto: arm64/aes - fix handling sub-block CTS-CBC inputs
+Date: Mon, 8 Oct 2018 13:53:13 +0800
+Message-ID: <20181008055313.escoye4faoo2qbh5@gondor.apana.org.au>
+References: <20181003052215.22468-1-ebiggers@kernel.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Arnd Bergmann <arnd@arndb.de>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: Eric Biggers <ebiggers@kernel.org>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 Content-Disposition: inline
-In-Reply-To: <20181002205720.2255567-1-arnd@arndb.de>
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <20181003052215.22468-1-ebiggers@kernel.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Oct 02, 2018 at 10:56:19PM +0200, Arnd Bergmann wrote:
-> Both the caam ctrl file and dpaa2_caam export a couple of flags. They
-> use an #ifdef check to make sure that each flag is only built once,
-> but this fails if they are both loadable modules:
+On Tue, Oct 02, 2018 at 10:22:15PM -0700, Eric Biggers wrote:
+> From: Eric Biggers <ebiggers@google.com>
 > 
-> WARNING: drivers/crypto/caam/dpaa2_caam: 'caam_little_end' exported twice. Previous export was in drivers/crypto/caam/caam.ko
-> WARNING: drivers/crypto/caam/dpaa2_caam: 'caam_imx' exported twice. Previous export was in drivers/crypto/caam/caam.ko
+> In the new arm64 CTS-CBC implementation, return an error code rather
+> than crashing on inputs shorter than AES_BLOCK_SIZE bytes.  Also set
+> cra_blocksize to AES_BLOCK_SIZE (like is done in the cts template) to
+> indicate the minimum input size.
 > 
-> Change the #ifdef to an IS_ENABLED() check in order to make it work in
-> all configurations. It may be better to redesign this aspect of the
-> two drivers in a cleaner way.
-> 
-> Fixes: 8d818c105501 ("crypto: caam/qi2 - add DPAA2-CAAM driver")
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> ---
->  drivers/crypto/caam/caamalg_qi2.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> Fixes: dd597fb33ff0 ("crypto: arm64/aes-blk - add support for CTS-CBC mode")
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
 
 Patch applied.  Thanks.
 -- 
