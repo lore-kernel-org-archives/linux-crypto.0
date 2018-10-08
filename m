@@ -1,8 +1,8 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH 1/3] crypto: memneq - use unaligned accessors for aligned fast
- path
-Date: Mon,  8 Oct 2018 23:15:52 +0200
-Message-ID: <20181008211554.5355-2-ard.biesheuvel@linaro.org>
+Subject: [PATCH 2/3] crypto: crypto_xor - use unaligned accessors for aligned
+ fast path
+Date: Mon,  8 Oct 2018 23:15:53 +0200
+Message-ID: <20181008211554.5355-3-ard.biesheuvel@linaro.org>
 References: <20181008211554.5355-1-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -49,63 +49,64 @@ avoids load/store instructions that trigger alignment faults.
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- crypto/memneq.c | 24 ++++++++++++++------
- 1 file changed, 17 insertions(+), 7 deletions(-)
+ crypto/algapi.c         |  7 +++----
+ include/crypto/algapi.h | 11 +++++++++--
+ 2 files changed, 12 insertions(+), 6 deletions(-)
 
-diff --git a/crypto/memneq.c b/crypto/memneq.c
-index afed1bd16aee..0f46a6150f22 100644
---- a/crypto/memneq.c
-+++ b/crypto/memneq.c
-@@ -60,6 +60,7 @@
-  */
+diff --git a/crypto/algapi.c b/crypto/algapi.c
+index 2545c5f89c4c..52ce3c5a0499 100644
+--- a/crypto/algapi.c
++++ b/crypto/algapi.c
+@@ -988,11 +988,10 @@ void crypto_inc(u8 *a, unsigned int size)
+ 	__be32 *b = (__be32 *)(a + size);
+ 	u32 c;
  
- #include <crypto/algapi.h>
+-	if (IS_ENABLED(CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS) ||
+-	    IS_ALIGNED((unsigned long)b, __alignof__(*b)))
++	if (IS_ENABLED(CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS))
+ 		for (; size >= 4; size -= 4) {
+-			c = be32_to_cpu(*--b) + 1;
+-			*b = cpu_to_be32(c);
++			c = get_unaligned_be32(--b) + 1;
++			put_unaligned_be32(c, b);
+ 			if (likely(c))
+ 				return;
+ 		}
+diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
+index 4a5ad10e75f0..86267c232f34 100644
+--- a/include/crypto/algapi.h
++++ b/include/crypto/algapi.h
+@@ -17,6 +17,8 @@
+ #include <linux/kernel.h>
+ #include <linux/skbuff.h>
+ 
 +#include <asm/unaligned.h>
- 
- #ifndef __HAVE_ARCH_CRYPTO_MEMNEQ
- 
-@@ -71,7 +72,10 @@ __crypto_memneq_generic(const void *a, const void *b, size_t size)
- 
- #if defined(CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS)
- 	while (size >= sizeof(unsigned long)) {
--		neq |= *(unsigned long *)a ^ *(unsigned long *)b;
-+		unsigned long const *p = a;
-+		unsigned long const *q = b;
 +
-+		neq |= get_unaligned(p) ^ get_unaligned(q);
- 		OPTIMIZER_HIDE_VAR(neq);
- 		a += sizeof(unsigned long);
- 		b += sizeof(unsigned long);
-@@ -95,18 +99,24 @@ static inline unsigned long __crypto_memneq_16(const void *a, const void *b)
+ /*
+  * Maximum values for blocksize and alignmask, used to allocate
+  * static buffers that are big enough for any combination of
+@@ -212,7 +214,9 @@ static inline void crypto_xor(u8 *dst, const u8 *src, unsigned int size)
+ 		unsigned long *s = (unsigned long *)src;
  
- #ifdef CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS
- 	if (sizeof(unsigned long) == 8) {
--		neq |= *(unsigned long *)(a)   ^ *(unsigned long *)(b);
-+		unsigned long const *p = a;
-+		unsigned long const *q = b;
-+
-+		neq |= get_unaligned(p++) ^ get_unaligned(q++);
- 		OPTIMIZER_HIDE_VAR(neq);
--		neq |= *(unsigned long *)(a+8) ^ *(unsigned long *)(b+8);
-+		neq |= get_unaligned(p) ^ get_unaligned(q);
- 		OPTIMIZER_HIDE_VAR(neq);
- 	} else if (sizeof(unsigned int) == 4) {
--		neq |= *(unsigned int *)(a)    ^ *(unsigned int *)(b);
-+		unsigned int const *p = a;
-+		unsigned int const *q = b;
-+
-+		neq |= get_unaligned(p++) ^ get_unaligned(q++);
- 		OPTIMIZER_HIDE_VAR(neq);
--		neq |= *(unsigned int *)(a+4)  ^ *(unsigned int *)(b+4);
-+		neq |= get_unaligned(p++) ^ get_unaligned(q++);
- 		OPTIMIZER_HIDE_VAR(neq);
--		neq |= *(unsigned int *)(a+8)  ^ *(unsigned int *)(b+8);
-+		neq |= get_unaligned(p++) ^ get_unaligned(q++);
- 		OPTIMIZER_HIDE_VAR(neq);
--		neq |= *(unsigned int *)(a+12) ^ *(unsigned int *)(b+12);
-+		neq |= get_unaligned(p) ^ get_unaligned(q);
- 		OPTIMIZER_HIDE_VAR(neq);
- 	} else
- #endif /* CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS */
+ 		while (size > 0) {
+-			*d++ ^= *s++;
++			put_unaligned(get_unaligned(d) ^ get_unaligned(s), d);
++			d++;
++			s++;
+ 			size -= sizeof(unsigned long);
+ 		}
+ 	} else {
+@@ -231,7 +235,10 @@ static inline void crypto_xor_cpy(u8 *dst, const u8 *src1, const u8 *src2,
+ 		unsigned long *s2 = (unsigned long *)src2;
+ 
+ 		while (size > 0) {
+-			*d++ = *s1++ ^ *s2++;
++			put_unaligned(get_unaligned(s1) ^ get_unaligned(s2), d);
++			d++;
++			s1++;
++			s2++;
+ 			size -= sizeof(unsigned long);
+ 		}
+ 	} else {
 -- 
 2.11.0
