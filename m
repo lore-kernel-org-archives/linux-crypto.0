@@ -1,64 +1,97 @@
-From: Kees Cook <keescook@chromium.org>
-Subject: Re: [PATCH] crypto: inside-secure: safexcel - fix memory allocation
-Date: Mon, 8 Oct 2018 15:20:10 -0700
-Message-ID: <CAGXu5j+a=81mGFrF5igMXe46mv_PsqzUKCzLWj0oCEMk1PY62g@mail.gmail.com>
-References: <20181008191712.GA12892@embeddedor.com>
+From: Eric Biggers <ebiggers@kernel.org>
+Subject: Re: [PATCH net-next v7 25/28] crypto: port Poly1305 to Zinc
+Date: Mon, 8 Oct 2018 16:21:00 -0700
+Message-ID: <20181008232059.GA164708@gmail.com>
+References: <20181006025709.4019-1-Jason@zx2c4.com>
+ <20181006025709.4019-26-Jason@zx2c4.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Cc: Antoine Tenart <antoine.tenart@bootlin.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-To: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20181008191712.GA12892@embeddedor.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+        davem@davemloft.net, gregkh@linuxfoundation.org,
+        Samuel Neves <sneves@dei.uc.pt>,
+        Andy Lutomirski <luto@kernel.org>, linux-crypto@vger.kernel.org
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Return-path: <netdev-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20181006025709.4019-26-Jason@zx2c4.com>
+Sender: netdev-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Oct 8, 2018 at 12:17 PM, Gustavo A. R. Silva
-<gustavo@embeddedor.com> wrote:
-> The original intention is to allocate space for EIP197_DEFAULT_RING_SIZE
-> *pointers* to struct, so sizeof(priv->ring[i].rdr_req) should be
-> sizeof(*priv->ring[i].rdr_req).
->
-> Addresses-Coverity-ID: 1473962 ("Sizeof not portable")
-> Fixes: 9744fec95f06 ("crypto: inside-secure - remove request list to improve performance")
-> Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
+On Sat, Oct 06, 2018 at 04:57:06AM +0200, Jason A. Donenfeld wrote:
+> diff --git a/crypto/poly1305_zinc.c b/crypto/poly1305_zinc.c
+> new file mode 100644
+> index 000000000000..4794442edf26
+> --- /dev/null
+> +++ b/crypto/poly1305_zinc.c
+> @@ -0,0 +1,98 @@
+> +/* SPDX-License-Identifier: GPL-2.0
+> + *
+> + * Copyright (C) 2018 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
+> + */
+> +
+> +#include <crypto/algapi.h>
+> +#include <crypto/internal/hash.h>
+> +#include <zinc/poly1305.h>
+> +#include <linux/crypto.h>
+> +#include <linux/kernel.h>
+> +#include <linux/module.h>
+> +#include <linux/simd.h>
+> +
+> +struct poly1305_desc_ctx {
+> +	struct poly1305_ctx ctx;
+> +	u8 key[POLY1305_KEY_SIZE];
+> +	unsigned int rem_key_bytes;
+> +};
+> +
+> +static int crypto_poly1305_init(struct shash_desc *desc)
+> +{
+> +	struct poly1305_desc_ctx *dctx = shash_desc_ctx(desc);
+> +	dctx->rem_key_bytes = POLY1305_KEY_SIZE;
+> +	return 0;
+> +}
+> +
+> +static int crypto_poly1305_update(struct shash_desc *desc, const u8 *src,
+> +				  unsigned int srclen)
+> +{
+> +	struct poly1305_desc_ctx *dctx = shash_desc_ctx(desc);
+> +	simd_context_t simd_context;
+> +
+> +	if (unlikely(dctx->rem_key_bytes)) {
+> +		unsigned int key_bytes = min(srclen, dctx->rem_key_bytes);
+> +		memcpy(dctx->key + (POLY1305_KEY_SIZE - dctx->rem_key_bytes),
+> +		       src, key_bytes);
+> +		src += key_bytes;
+> +		srclen -= key_bytes;
+> +		dctx->rem_key_bytes -= key_bytes;
+> +		if (!dctx->rem_key_bytes) {
+> +			poly1305_init(&dctx->ctx, dctx->key);
+> +			memzero_explicit(dctx->key, sizeof(dctx->key));
+> +		}
+> +		if (!srclen)
+> +			return 0;
+> +	}
+> +
+> +	simd_get(&simd_context);
+> +	poly1305_update(&dctx->ctx, src, srclen, &simd_context);
+> +	simd_put(&simd_context);
+> +
+> +	return 0;
+> +}
+> +
+> +static int crypto_poly1305_final(struct shash_desc *desc, u8 *dst)
+> +{
+> +	struct poly1305_desc_ctx *dctx = shash_desc_ctx(desc);
+> +	simd_context_t simd_context;
+> +
+> +	simd_get(&simd_context);
+> +	poly1305_final(&dctx->ctx, dst, &simd_context);
+> +	simd_put(&simd_context);
+> +	return 0;
+> +}
 
-Reviewed-by: Kees Cook <keescook@chromium.org>
+This crashes on very short inputs.  crypto_poly1305_final() is missing:
 
-Luckily, this results in the same size, since it's still a pointer:
+	if (dctx->rem_key_bytes)
+		return -ENOKEY;
 
-struct crypto_async_request **rdr_req;
-
-But yes, it should be fixed.
-
--Kees
-
-> ---
->  drivers/crypto/inside-secure/safexcel.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/inside-secure/safexcel.c
-> index 86c699c1..bc6c5cb 100644
-> --- a/drivers/crypto/inside-secure/safexcel.c
-> +++ b/drivers/crypto/inside-secure/safexcel.c
-> @@ -1066,7 +1066,7 @@ static int safexcel_probe(struct platform_device *pdev)
->
->                 priv->ring[i].rdr_req = devm_kcalloc(dev,
->                         EIP197_DEFAULT_RING_SIZE,
-> -                       sizeof(priv->ring[i].rdr_req),
-> +                       sizeof(*priv->ring[i].rdr_req),
->                         GFP_KERNEL);
->                 if (!priv->ring[i].rdr_req) {
->                         ret = -ENOMEM;
-> --
-> 2.7.4
->
-
-
-
--- 
-Kees Cook
-Pixel Security
+- Eric
