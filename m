@@ -1,8 +1,7 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH 2/3] crypto: crypto_xor - use unaligned accessors for aligned
- fast path
-Date: Mon,  8 Oct 2018 23:15:53 +0200
-Message-ID: <20181008211554.5355-3-ard.biesheuvel@linaro.org>
+Subject: [PATCH 3/3] crypto: siphash - drop _aligned variants
+Date: Mon,  8 Oct 2018 23:15:54 +0200
+Message-ID: <20181008211554.5355-4-ard.biesheuvel@linaro.org>
 References: <20181008211554.5355-1-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -42,71 +41,325 @@ architectures that can truly tolerate any kind of misalignment, the
 get_unaligned() accessors resolve to the leXX_to_cpup accessors that
 operate on aligned addresses.
 
-So switch to the unaligned accessors for the aligned fast path. This
-will create the exact same code on architectures that can really
-tolerate any kind of misalignment, and generate code for ARMv6+ that
-avoids load/store instructions that trigger alignment faults.
+Since the compiler will in fact emit ldrd or ldm instructions when
+building this code for ARM v6 or later, the solution is to use the
+unaligned accessors on the aligned code paths. Given the above, this
+either produces the same code, or better in the ARMv6+ case. However,
+since that removes the only difference between the aligned and unaligned
+variants, we can drop the aligned variant entirely.
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- crypto/algapi.c         |  7 +++----
- include/crypto/algapi.h | 11 +++++++++--
- 2 files changed, 12 insertions(+), 6 deletions(-)
+ include/linux/siphash.h | 106 +++++++++-----------
+ lib/siphash.c           | 103 ++-----------------
+ 2 files changed, 54 insertions(+), 155 deletions(-)
 
-diff --git a/crypto/algapi.c b/crypto/algapi.c
-index 2545c5f89c4c..52ce3c5a0499 100644
---- a/crypto/algapi.c
-+++ b/crypto/algapi.c
-@@ -988,11 +988,10 @@ void crypto_inc(u8 *a, unsigned int size)
- 	__be32 *b = (__be32 *)(a + size);
- 	u32 c;
+diff --git a/include/linux/siphash.h b/include/linux/siphash.h
+index fa7a6b9cedbf..ef3c36b0ae0f 100644
+--- a/include/linux/siphash.h
++++ b/include/linux/siphash.h
+@@ -15,16 +15,14 @@
  
--	if (IS_ENABLED(CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS) ||
--	    IS_ALIGNED((unsigned long)b, __alignof__(*b)))
-+	if (IS_ENABLED(CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS))
- 		for (; size >= 4; size -= 4) {
--			c = be32_to_cpu(*--b) + 1;
--			*b = cpu_to_be32(c);
-+			c = get_unaligned_be32(--b) + 1;
-+			put_unaligned_be32(c, b);
- 			if (likely(c))
- 				return;
- 		}
-diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
-index 4a5ad10e75f0..86267c232f34 100644
---- a/include/crypto/algapi.h
-+++ b/include/crypto/algapi.h
-@@ -17,6 +17,8 @@
+ #include <linux/types.h>
  #include <linux/kernel.h>
- #include <linux/skbuff.h>
- 
 +#include <asm/unaligned.h>
-+
- /*
-  * Maximum values for blocksize and alignmask, used to allocate
-  * static buffers that are big enough for any combination of
-@@ -212,7 +214,9 @@ static inline void crypto_xor(u8 *dst, const u8 *src, unsigned int size)
- 		unsigned long *s = (unsigned long *)src;
  
- 		while (size > 0) {
--			*d++ ^= *s++;
-+			put_unaligned(get_unaligned(d) ^ get_unaligned(s), d);
-+			d++;
-+			s++;
- 			size -= sizeof(unsigned long);
- 		}
- 	} else {
-@@ -231,7 +235,10 @@ static inline void crypto_xor_cpy(u8 *dst, const u8 *src1, const u8 *src2,
- 		unsigned long *s2 = (unsigned long *)src2;
+ #define SIPHASH_ALIGNMENT __alignof__(u64)
+ typedef struct {
+ 	u64 key[2];
+ } siphash_key_t;
  
- 		while (size > 0) {
--			*d++ = *s1++ ^ *s2++;
-+			put_unaligned(get_unaligned(s1) ^ get_unaligned(s2), d);
-+			d++;
-+			s1++;
-+			s2++;
- 			size -= sizeof(unsigned long);
- 		}
- 	} else {
+-u64 __siphash_aligned(const void *data, size_t len, const siphash_key_t *key);
+-#ifndef CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS
+-u64 __siphash_unaligned(const void *data, size_t len, const siphash_key_t *key);
+-#endif
++u64 __siphash(const void *data, size_t len, const siphash_key_t *key);
+ 
+ u64 siphash_1u64(const u64 a, const siphash_key_t *key);
+ u64 siphash_2u64(const u64 a, const u64 b, const siphash_key_t *key);
+@@ -48,26 +46,6 @@ static inline u64 siphash_4u32(const u32 a, const u32 b, const u32 c,
+ }
+ 
+ 
+-static inline u64 ___siphash_aligned(const __le64 *data, size_t len,
+-				     const siphash_key_t *key)
+-{
+-	if (__builtin_constant_p(len) && len == 4)
+-		return siphash_1u32(le32_to_cpup((const __le32 *)data), key);
+-	if (__builtin_constant_p(len) && len == 8)
+-		return siphash_1u64(le64_to_cpu(data[0]), key);
+-	if (__builtin_constant_p(len) && len == 16)
+-		return siphash_2u64(le64_to_cpu(data[0]), le64_to_cpu(data[1]),
+-				    key);
+-	if (__builtin_constant_p(len) && len == 24)
+-		return siphash_3u64(le64_to_cpu(data[0]), le64_to_cpu(data[1]),
+-				    le64_to_cpu(data[2]), key);
+-	if (__builtin_constant_p(len) && len == 32)
+-		return siphash_4u64(le64_to_cpu(data[0]), le64_to_cpu(data[1]),
+-				    le64_to_cpu(data[2]), le64_to_cpu(data[3]),
+-				    key);
+-	return __siphash_aligned(data, len, key);
+-}
+-
+ /**
+  * siphash - compute 64-bit siphash PRF value
+  * @data: buffer to hash
+@@ -77,11 +55,30 @@ static inline u64 ___siphash_aligned(const __le64 *data, size_t len,
+ static inline u64 siphash(const void *data, size_t len,
+ 			  const siphash_key_t *key)
+ {
+-#ifndef CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS
+-	if (!IS_ALIGNED((unsigned long)data, SIPHASH_ALIGNMENT))
+-		return __siphash_unaligned(data, len, key);
+-#endif
+-	return ___siphash_aligned(data, len, key);
++	if (IS_ENABLED(CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS)) {
++		if (__builtin_constant_p(len) && len == 4)
++			return siphash_1u32(get_unaligned_le32(data),
++					    key);
++		if (__builtin_constant_p(len) && len == 8)
++			return siphash_1u64(get_unaligned_le64(data),
++					    key);
++		if (__builtin_constant_p(len) && len == 16)
++			return siphash_2u64(get_unaligned_le64(data),
++					    get_unaligned_le64(data + 8),
++					    key);
++		if (__builtin_constant_p(len) && len == 24)
++			return siphash_3u64(get_unaligned_le64(data),
++					    get_unaligned_le64(data + 8),
++					    get_unaligned_le64(data + 16),
++					    key);
++		if (__builtin_constant_p(len) && len == 32)
++			return siphash_4u64(get_unaligned_le64(data),
++					    get_unaligned_le64(data + 8),
++					    get_unaligned_le64(data + 16),
++					    get_unaligned_le64(data + 24),
++					    key);
++	}
++	return __siphash(data, len, key);
+ }
+ 
+ #define HSIPHASH_ALIGNMENT __alignof__(unsigned long)
+@@ -89,12 +86,7 @@ typedef struct {
+ 	unsigned long key[2];
+ } hsiphash_key_t;
+ 
+-u32 __hsiphash_aligned(const void *data, size_t len,
+-		       const hsiphash_key_t *key);
+-#ifndef CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS
+-u32 __hsiphash_unaligned(const void *data, size_t len,
+-			 const hsiphash_key_t *key);
+-#endif
++u32 __hsiphash(const void *data, size_t len, const hsiphash_key_t *key);
+ 
+ u32 hsiphash_1u32(const u32 a, const hsiphash_key_t *key);
+ u32 hsiphash_2u32(const u32 a, const u32 b, const hsiphash_key_t *key);
+@@ -103,24 +95,6 @@ u32 hsiphash_3u32(const u32 a, const u32 b, const u32 c,
+ u32 hsiphash_4u32(const u32 a, const u32 b, const u32 c, const u32 d,
+ 		  const hsiphash_key_t *key);
+ 
+-static inline u32 ___hsiphash_aligned(const __le32 *data, size_t len,
+-				      const hsiphash_key_t *key)
+-{
+-	if (__builtin_constant_p(len) && len == 4)
+-		return hsiphash_1u32(le32_to_cpu(data[0]), key);
+-	if (__builtin_constant_p(len) && len == 8)
+-		return hsiphash_2u32(le32_to_cpu(data[0]), le32_to_cpu(data[1]),
+-				     key);
+-	if (__builtin_constant_p(len) && len == 12)
+-		return hsiphash_3u32(le32_to_cpu(data[0]), le32_to_cpu(data[1]),
+-				     le32_to_cpu(data[2]), key);
+-	if (__builtin_constant_p(len) && len == 16)
+-		return hsiphash_4u32(le32_to_cpu(data[0]), le32_to_cpu(data[1]),
+-				     le32_to_cpu(data[2]), le32_to_cpu(data[3]),
+-				     key);
+-	return __hsiphash_aligned(data, len, key);
+-}
+-
+ /**
+  * hsiphash - compute 32-bit hsiphash PRF value
+  * @data: buffer to hash
+@@ -130,11 +104,27 @@ static inline u32 ___hsiphash_aligned(const __le32 *data, size_t len,
+ static inline u32 hsiphash(const void *data, size_t len,
+ 			   const hsiphash_key_t *key)
+ {
+-#ifndef CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS
+-	if (!IS_ALIGNED((unsigned long)data, HSIPHASH_ALIGNMENT))
+-		return __hsiphash_unaligned(data, len, key);
+-#endif
+-	return ___hsiphash_aligned(data, len, key);
++	if (IS_ENABLED(CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS)) {
++		if (__builtin_constant_p(len) && len == 4)
++			return hsiphash_1u32(get_unaligned_le32(data),
++					     key);
++		if (__builtin_constant_p(len) && len == 8)
++			return hsiphash_2u32(get_unaligned_le32(data),
++					     get_unaligned_le32(data + 4),
++					     key);
++		if (__builtin_constant_p(len) && len == 12)
++			return hsiphash_3u32(get_unaligned_le32(data),
++					     get_unaligned_le32(data + 4),
++					     get_unaligned_le32(data + 8),
++					     key);
++		if (__builtin_constant_p(len) && len == 16)
++			return hsiphash_4u32(get_unaligned_le32(data),
++					     get_unaligned_le32(data + 4),
++					     get_unaligned_le32(data + 8),
++					     get_unaligned_le32(data + 12),
++					     key);
++	}
++	return __hsiphash(data, len, key);
+ }
+ 
+ #endif /* _LINUX_SIPHASH_H */
+diff --git a/lib/siphash.c b/lib/siphash.c
+index 3ae58b4edad6..3b2ba1a10ad9 100644
+--- a/lib/siphash.c
++++ b/lib/siphash.c
+@@ -49,40 +49,7 @@
+ 	SIPROUND; \
+ 	return (v0 ^ v1) ^ (v2 ^ v3);
+ 
+-u64 __siphash_aligned(const void *data, size_t len, const siphash_key_t *key)
+-{
+-	const u8 *end = data + len - (len % sizeof(u64));
+-	const u8 left = len & (sizeof(u64) - 1);
+-	u64 m;
+-	PREAMBLE(len)
+-	for (; data != end; data += sizeof(u64)) {
+-		m = le64_to_cpup(data);
+-		v3 ^= m;
+-		SIPROUND;
+-		SIPROUND;
+-		v0 ^= m;
+-	}
+-#if defined(CONFIG_DCACHE_WORD_ACCESS) && BITS_PER_LONG == 64
+-	if (left)
+-		b |= le64_to_cpu((__force __le64)(load_unaligned_zeropad(data) &
+-						  bytemask_from_count(left)));
+-#else
+-	switch (left) {
+-	case 7: b |= ((u64)end[6]) << 48;
+-	case 6: b |= ((u64)end[5]) << 40;
+-	case 5: b |= ((u64)end[4]) << 32;
+-	case 4: b |= le32_to_cpup(data); break;
+-	case 3: b |= ((u64)end[2]) << 16;
+-	case 2: b |= le16_to_cpup(data); break;
+-	case 1: b |= end[0];
+-	}
+-#endif
+-	POSTAMBLE
+-}
+-EXPORT_SYMBOL(__siphash_aligned);
+-
+-#ifndef CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS
+-u64 __siphash_unaligned(const void *data, size_t len, const siphash_key_t *key)
++u64 __siphash(const void *data, size_t len, const siphash_key_t *key)
+ {
+ 	const u8 *end = data + len - (len % sizeof(u64));
+ 	const u8 left = len & (sizeof(u64) - 1);
+@@ -112,8 +79,7 @@ u64 __siphash_unaligned(const void *data, size_t len, const siphash_key_t *key)
+ #endif
+ 	POSTAMBLE
+ }
+-EXPORT_SYMBOL(__siphash_unaligned);
+-#endif
++EXPORT_SYMBOL(__siphash);
+ 
+ /**
+  * siphash_1u64 - compute 64-bit siphash PRF value of a u64
+@@ -250,39 +216,7 @@ EXPORT_SYMBOL(siphash_3u32);
+ 	HSIPROUND; \
+ 	return (v0 ^ v1) ^ (v2 ^ v3);
+ 
+-u32 __hsiphash_aligned(const void *data, size_t len, const hsiphash_key_t *key)
+-{
+-	const u8 *end = data + len - (len % sizeof(u64));
+-	const u8 left = len & (sizeof(u64) - 1);
+-	u64 m;
+-	HPREAMBLE(len)
+-	for (; data != end; data += sizeof(u64)) {
+-		m = le64_to_cpup(data);
+-		v3 ^= m;
+-		HSIPROUND;
+-		v0 ^= m;
+-	}
+-#if defined(CONFIG_DCACHE_WORD_ACCESS) && BITS_PER_LONG == 64
+-	if (left)
+-		b |= le64_to_cpu((__force __le64)(load_unaligned_zeropad(data) &
+-						  bytemask_from_count(left)));
+-#else
+-	switch (left) {
+-	case 7: b |= ((u64)end[6]) << 48;
+-	case 6: b |= ((u64)end[5]) << 40;
+-	case 5: b |= ((u64)end[4]) << 32;
+-	case 4: b |= le32_to_cpup(data); break;
+-	case 3: b |= ((u64)end[2]) << 16;
+-	case 2: b |= le16_to_cpup(data); break;
+-	case 1: b |= end[0];
+-	}
+-#endif
+-	HPOSTAMBLE
+-}
+-EXPORT_SYMBOL(__hsiphash_aligned);
+-
+-#ifndef CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS
+-u32 __hsiphash_unaligned(const void *data, size_t len,
++u32 __hsiphash(const void *data, size_t len,
+ 			 const hsiphash_key_t *key)
+ {
+ 	const u8 *end = data + len - (len % sizeof(u64));
+@@ -312,8 +246,7 @@ u32 __hsiphash_unaligned(const void *data, size_t len,
+ #endif
+ 	HPOSTAMBLE
+ }
+-EXPORT_SYMBOL(__hsiphash_unaligned);
+-#endif
++EXPORT_SYMBOL(__hsiphash);
+ 
+ /**
+  * hsiphash_1u32 - compute 64-bit hsiphash PRF value of a u32
+@@ -418,30 +351,7 @@ EXPORT_SYMBOL(hsiphash_4u32);
+ 	HSIPROUND; \
+ 	return v1 ^ v3;
+ 
+-u32 __hsiphash_aligned(const void *data, size_t len, const hsiphash_key_t *key)
+-{
+-	const u8 *end = data + len - (len % sizeof(u32));
+-	const u8 left = len & (sizeof(u32) - 1);
+-	u32 m;
+-	HPREAMBLE(len)
+-	for (; data != end; data += sizeof(u32)) {
+-		m = le32_to_cpup(data);
+-		v3 ^= m;
+-		HSIPROUND;
+-		v0 ^= m;
+-	}
+-	switch (left) {
+-	case 3: b |= ((u32)end[2]) << 16;
+-	case 2: b |= le16_to_cpup(data); break;
+-	case 1: b |= end[0];
+-	}
+-	HPOSTAMBLE
+-}
+-EXPORT_SYMBOL(__hsiphash_aligned);
+-
+-#ifndef CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS
+-u32 __hsiphash_unaligned(const void *data, size_t len,
+-			 const hsiphash_key_t *key)
++u32 __hsiphash(const void *data, size_t len, const hsiphash_key_t *key)
+ {
+ 	const u8 *end = data + len - (len % sizeof(u32));
+ 	const u8 left = len & (sizeof(u32) - 1);
+@@ -460,8 +370,7 @@ u32 __hsiphash_unaligned(const void *data, size_t len,
+ 	}
+ 	HPOSTAMBLE
+ }
+-EXPORT_SYMBOL(__hsiphash_unaligned);
+-#endif
++EXPORT_SYMBOL(__hsiphash);
+ 
+ /**
+  * hsiphash_1u32 - compute 32-bit hsiphash PRF value of a u32
 -- 
 2.11.0
