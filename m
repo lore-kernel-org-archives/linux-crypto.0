@@ -1,57 +1,47 @@
-From: Michael Schupikov <michael@schupikov.de>
-Subject: [PATCH] crypto/testmgr.c: fix sizeof() on COMP_BUF_SIZE
-Date: Sun,  7 Oct 2018 13:58:10 +0200
-Message-ID: <20181007115810.27779-1-michael@schupikov.de>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] crypto: cavium/nitrox - Fix format strings
+Date: Mon, 8 Oct 2018 13:47:54 +0800
+Message-ID: <20181008054754.zdt42w6whtpqkpif@gondor.apana.org.au>
+References: <20181002210022.2369756-1-arnd@arndb.de>
 Mime-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Cc: Michael Schupikov <michael@schupikov.de>,
-        "David S. Miller" <davem@davemloft.net>,
+Content-Type: text/plain; charset=us-ascii
+Cc: "David S. Miller" <davem@davemloft.net>,
+        Srikanth Jampala <Jampala.Srikanth@cavium.com>,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+To: Arnd Bergmann <arnd@arndb.de>
 Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20181002210022.2369756-1-arnd@arndb.de>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-After allocation, output and decomp_output both point to memory chunks of
-size COMP_BUF_SIZE. Then, only the first bytes are zeroed out using
-sizeof(COMP_BUF_SIZE) as parameter to memset(), because
-sizeof(COMP_BUF_SIZE) provides the size of the constant and not the size of
-allocated memory.
+On Tue, Oct 02, 2018 at 11:00:03PM +0200, Arnd Bergmann wrote:
+> The return type of atomic64_read() is unfortunately architecture
+> specific, it can be 'long', 'long long', or 's64'. When it is 'long',
+> we get a build warning:
+> 
+> drivers/crypto/cavium/nitrox/nitrox_debugfs.c: In function 'stats_show':
+> drivers/crypto/cavium/nitrox/nitrox_debugfs.c:62:30: error: format '%lld' expects argument of type 'long long int', but argument 3 has type 'long int' [-Werror=format=]
+>   seq_printf(s, "  Posted: %lld\n", atomic64_read(&ndev->stats.posted));
+>                            ~~~^
+>                            %ld
+> drivers/crypto/cavium/nitrox/nitrox_debugfs.c:63:33: error: format '%lld' expects argument of type 'long long int', but argument 3 has type 'long int' [-Werror=format=]
+>   seq_printf(s, "  Completed: %lld\n",
+>                               ~~~^
+>                               %ld
+> drivers/crypto/cavium/nitrox/nitrox_debugfs.c:65:31: error: format '%lld' expects argument of type 'long long int', but argument 3 has type 'long int' [-Werror=format=]
+> 
+> Add an explicit cast to 's64' to get a consistent behavior on all
+> architectures here during compile testing.
+> 
+> Fixes: 2a8780be9c26 ("crypto: cavium/nitrox - updated debugfs information.")
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 
-Instead, the whole allocated memory is meant to be zeroed out. Use
-COMP_BUF_SIZE as parameter to memset() directly in order to accomplish
-this.
+This patch doesn't apply to cryptodev because the bug has already
+been fixed by another patch.
 
-Fixes: 336073840a872 ("crypto: testmgr - Allow different compression results")
-
-Signed-off-by: Michael Schupikov <michael@schupikov.de>
----
- crypto/testmgr.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index a1d42245082a..790aa3536631 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -1400,8 +1400,8 @@ static int test_comp(struct crypto_comp *tfm,
- 		int ilen;
- 		unsigned int dlen = COMP_BUF_SIZE;
- 
--		memset(output, 0, sizeof(COMP_BUF_SIZE));
--		memset(decomp_output, 0, sizeof(COMP_BUF_SIZE));
-+		memset(output, 0, COMP_BUF_SIZE);
-+		memset(decomp_output, 0, COMP_BUF_SIZE);
- 
- 		ilen = ctemplate[i].inlen;
- 		ret = crypto_comp_compress(tfm, ctemplate[i].input,
-@@ -1445,7 +1445,7 @@ static int test_comp(struct crypto_comp *tfm,
- 		int ilen;
- 		unsigned int dlen = COMP_BUF_SIZE;
- 
--		memset(decomp_output, 0, sizeof(COMP_BUF_SIZE));
-+		memset(decomp_output, 0, COMP_BUF_SIZE);
- 
- 		ilen = dtemplate[i].inlen;
- 		ret = crypto_comp_decompress(tfm, dtemplate[i].input,
+Thanks,
 -- 
-2.19.0
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
