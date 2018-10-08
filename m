@@ -1,149 +1,68 @@
-From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
-Subject: [PATCH] crypto: caam/qi - simplify CGR allocation, freeing
-Date: Mon,  8 Oct 2018 14:09:37 +0300
-Message-ID: <20181008110937.29198-1-horia.geanta@nxp.com>
-References: <20181005125443.dfhd2asqktm22ney@linutronix.de>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH] crypto/testmgr.c: fix sizeof() on COMP_BUF_SIZE
+Date: Mon, 8 Oct 2018 13:39:29 +0200
+Message-ID: <CAKv+Gu9s_0xCMvVJoTRRsEkXdDjLdKjj34=1U1y=o=r-OqLm8Q@mail.gmail.com>
+References: <20181007115810.27779-1-michael@schupikov.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+Content-Type: text/plain; charset="UTF-8"
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        Li Yang <leoyang.li@nxp.com>, Roy Pledge <roy.pledge@nxp.com>,
-        Madalin Bucur <madalin.bucur@nxp.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Michael Schupikov <michael@schupikov.de>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20181005125443.dfhd2asqktm22ney@linutronix.de>
+In-Reply-To: <20181007115810.27779-1-michael@schupikov.de>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-CGRs (Congestion Groups) have to be freed by the same CPU that
-initialized them.
-This is why currently the driver takes special measures; however, using
-set_cpus_allowed_ptr() is incorrect - as reported by Sebastian.
+On 7 October 2018 at 13:58, Michael Schupikov <michael@schupikov.de> wrote:
+> After allocation, output and decomp_output both point to memory chunks of
+> size COMP_BUF_SIZE. Then, only the first bytes are zeroed out using
+> sizeof(COMP_BUF_SIZE) as parameter to memset(), because
+> sizeof(COMP_BUF_SIZE) provides the size of the constant and not the size of
+> allocated memory.
+>
+> Instead, the whole allocated memory is meant to be zeroed out. Use
+> COMP_BUF_SIZE as parameter to memset() directly in order to accomplish
+> this.
+>
+> Fixes: 336073840a872 ("crypto: testmgr - Allow different compression results")
+>
+> Signed-off-by: Michael Schupikov <michael@schupikov.de>
 
-Instead of the generic solution of replacing set_cpus_allowed_ptr() with
-work_on_cpu_safe(), we use the qman_delete_cgr_safe() QBMan API instead
-of qman_delete_cgr() - which internally takes care of proper CGR
-deletion.
+Nice catch
 
-Link: https://lkml.kernel.org/r/20181005125443.dfhd2asqktm22ney@linutronix.de
-Reported-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
----
- drivers/crypto/caam/qi.c | 43 ++++---------------------------------------
- drivers/crypto/caam/qi.h |  2 +-
- 2 files changed, 5 insertions(+), 40 deletions(-)
+Reviewed-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-diff --git a/drivers/crypto/caam/qi.c b/drivers/crypto/caam/qi.c
-index 67f7f8c42c93..b84e6c8b1e13 100644
---- a/drivers/crypto/caam/qi.c
-+++ b/drivers/crypto/caam/qi.c
-@@ -83,13 +83,6 @@ EXPORT_SYMBOL(caam_congested);
- static u64 times_congested;
- #endif
- 
--/*
-- * CPU from where the module initialised. This is required because QMan driver
-- * requires CGRs to be removed from same CPU from where they were originally
-- * allocated.
-- */
--static int mod_init_cpu;
--
- /*
-  * This is a a cache of buffers, from which the users of CAAM QI driver
-  * can allocate short (CAAM_QI_MEMCACHE_SIZE) buffers. It's faster than
-@@ -492,12 +485,11 @@ void caam_drv_ctx_rel(struct caam_drv_ctx *drv_ctx)
- }
- EXPORT_SYMBOL(caam_drv_ctx_rel);
- 
--int caam_qi_shutdown(struct device *qidev)
-+void caam_qi_shutdown(struct device *qidev)
- {
--	int i, ret;
-+	int i;
- 	struct caam_qi_priv *priv = dev_get_drvdata(qidev);
- 	const cpumask_t *cpus = qman_affine_cpus();
--	struct cpumask old_cpumask = current->cpus_allowed;
- 
- 	for_each_cpu(i, cpus) {
- 		struct napi_struct *irqtask;
-@@ -510,26 +502,12 @@ int caam_qi_shutdown(struct device *qidev)
- 			dev_err(qidev, "Rsp FQ kill failed, cpu: %d\n", i);
- 	}
- 
--	/*
--	 * QMan driver requires CGRs to be deleted from same CPU from where they
--	 * were instantiated. Hence we get the module removal execute from the
--	 * same CPU from where it was originally inserted.
--	 */
--	set_cpus_allowed_ptr(current, get_cpu_mask(mod_init_cpu));
--
--	ret = qman_delete_cgr(&priv->cgr);
--	if (ret)
--		dev_err(qidev, "Deletion of CGR failed: %d\n", ret);
--	else
--		qman_release_cgrid(priv->cgr.cgrid);
-+	qman_delete_cgr_safe(&priv->cgr);
-+	qman_release_cgrid(priv->cgr.cgrid);
- 
- 	kmem_cache_destroy(qi_cache);
- 
--	/* Now that we're done with the CGRs, restore the cpus allowed mask */
--	set_cpus_allowed_ptr(current, &old_cpumask);
--
- 	platform_device_unregister(priv->qi_pdev);
--	return ret;
- }
- 
- static void cgr_cb(struct qman_portal *qm, struct qman_cgr *cgr, int congested)
-@@ -718,22 +696,11 @@ int caam_qi_init(struct platform_device *caam_pdev)
- 	struct device *ctrldev = &caam_pdev->dev, *qidev;
- 	struct caam_drv_private *ctrlpriv;
- 	const cpumask_t *cpus = qman_affine_cpus();
--	struct cpumask old_cpumask = current->cpus_allowed;
- 	static struct platform_device_info qi_pdev_info = {
- 		.name = "caam_qi",
- 		.id = PLATFORM_DEVID_NONE
- 	};
- 
--	/*
--	 * QMAN requires CGRs to be removed from same CPU+portal from where it
--	 * was originally allocated. Hence we need to note down the
--	 * initialisation CPU and use the same CPU for module exit.
--	 * We select the first CPU to from the list of portal owning CPUs.
--	 * Then we pin module init to this CPU.
--	 */
--	mod_init_cpu = cpumask_first(cpus);
--	set_cpus_allowed_ptr(current, get_cpu_mask(mod_init_cpu));
--
- 	qi_pdev_info.parent = ctrldev;
- 	qi_pdev_info.dma_mask = dma_get_mask(ctrldev);
- 	qi_pdev = platform_device_register_full(&qi_pdev_info);
-@@ -795,8 +762,6 @@ int caam_qi_init(struct platform_device *caam_pdev)
- 		return -ENOMEM;
- 	}
- 
--	/* Done with the CGRs; restore the cpus allowed mask */
--	set_cpus_allowed_ptr(current, &old_cpumask);
- #ifdef CONFIG_DEBUG_FS
- 	debugfs_create_file("qi_congested", 0444, ctrlpriv->ctl,
- 			    &times_congested, &caam_fops_u64_ro);
-diff --git a/drivers/crypto/caam/qi.h b/drivers/crypto/caam/qi.h
-index bc421da5ad8b..f93c9c7ed430 100644
---- a/drivers/crypto/caam/qi.h
-+++ b/drivers/crypto/caam/qi.h
-@@ -173,7 +173,7 @@ int caam_drv_ctx_update(struct caam_drv_ctx *drv_ctx, u32 *sh_desc);
- void caam_drv_ctx_rel(struct caam_drv_ctx *drv_ctx);
- 
- int caam_qi_init(struct platform_device *pdev);
--int caam_qi_shutdown(struct device *dev);
-+void caam_qi_shutdown(struct device *dev);
- 
- /**
-  * qi_cache_alloc - Allocate buffers from CAAM-QI cache
--- 
-2.16.2
+> ---
+>  crypto/testmgr.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+>
+> diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+> index a1d42245082a..790aa3536631 100644
+> --- a/crypto/testmgr.c
+> +++ b/crypto/testmgr.c
+> @@ -1400,8 +1400,8 @@ static int test_comp(struct crypto_comp *tfm,
+>                 int ilen;
+>                 unsigned int dlen = COMP_BUF_SIZE;
+>
+> -               memset(output, 0, sizeof(COMP_BUF_SIZE));
+> -               memset(decomp_output, 0, sizeof(COMP_BUF_SIZE));
+> +               memset(output, 0, COMP_BUF_SIZE);
+> +               memset(decomp_output, 0, COMP_BUF_SIZE);
+>
+>                 ilen = ctemplate[i].inlen;
+>                 ret = crypto_comp_compress(tfm, ctemplate[i].input,
+> @@ -1445,7 +1445,7 @@ static int test_comp(struct crypto_comp *tfm,
+>                 int ilen;
+>                 unsigned int dlen = COMP_BUF_SIZE;
+>
+> -               memset(decomp_output, 0, sizeof(COMP_BUF_SIZE));
+> +               memset(decomp_output, 0, COMP_BUF_SIZE);
+>
+>                 ilen = dtemplate[i].inlen;
+>                 ret = crypto_comp_decompress(tfm, dtemplate[i].input,
+> --
+> 2.19.0
+>
