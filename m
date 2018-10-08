@@ -1,7 +1,9 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH 0/3] crypto: use unaligned accessors in aligned fast paths
-Date: Mon,  8 Oct 2018 23:15:51 +0200
-Message-ID: <20181008211554.5355-1-ard.biesheuvel@linaro.org>
+Subject: [PATCH 1/3] crypto: memneq - use unaligned accessors for aligned fast
+ path
+Date: Mon,  8 Oct 2018 23:15:52 +0200
+Message-ID: <20181008211554.5355-2-ard.biesheuvel@linaro.org>
+References: <20181008211554.5355-1-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
@@ -10,6 +12,7 @@ Cc: jason@zx2c4.com, herbert@gondor.apana.org.au, arnd@arndb.de,
  linux-arm-kernel@lists.infradead.org
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <20181008211554.5355-1-ard.biesheuvel@linaro.org>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -21,39 +24,88 @@ Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS behaves a bit counterintuitively
-on ARM: we set it for architecture revisions v6 and up, which support
-any alignment for load/store instructions that operate on bytes, half
-words or words. However, load/store double word and load store multiple
-instructions still require 32-bit alignment, and using them on unaligned
-quantities results in costly alignment traps that have to be fixed up by
-the kernel's fixup code.
+On ARM v6 and later, we define CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS
+because the ordinary load/store instructions (ldr, ldrh, ldrb) can
+tolerate any misalignment of the memory address. However, load/store
+double and load/store multiple instructions (ldrd, ldm) may still only
+be used on memory addresses that are 32-bit aligned, and so we have to
+use the CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS macro with care, or we
+may end up with a severe performance hit due to alignment traps that
+require fixups by the kernel.
 
-Fortunately, the unaligned accessors do the right thing here: on
-architectures that really tolerate any misalignment, they simply resolve
-to the aligned accessors, while on ARMv6+ (which uses the packed struct
-wrappers for unaligned accesses), they result in load/store sequences
-that avoid the instructions that require 32-bit alignment.
+Fortunately, the get_unaligned() accessors do the right thing: when
+building for ARMv6 or later, the compiler will emit unaligned accesses
+using the ordinary load/store instructions (but avoid the ones that
+require 32-bit alignment). When building for older ARM, those accessors
+will emit the appropriate sequence of ldrb/mov/orr instructions. And on
+architectures that can truly tolerate any kind of misalignment, the
+get_unaligned() accessors resolve to the leXX_to_cpup accessors that
+operate on aligned addresses.
 
-Since there is not really a downside to using the unaligned accessors on
-aligned paths for architectures other than ARM that define
-CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS, let's switch to them in a couple
-of places in the crypto code.
+So switch to the unaligned accessors for the aligned fast path. This
+will create the exact same code on architectures that can really
+tolerate any kind of misalignment, and generate code for ARMv6+ that
+avoids load/store instructions that trigger alignment faults.
 
-Note that all patches are against code that has been observed to be emitted
-with ldm or ldrd instructions when building ARM's multi_v7_defconfig.
+Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+---
+ crypto/memneq.c | 24 ++++++++++++++------
+ 1 file changed, 17 insertions(+), 7 deletions(-)
 
-Ard Biesheuvel (3):
-  crypto: memneq - use unaligned accessors for aligned fast path
-  crypto: crypto_xor - use unaligned accessors for aligned fast path
-  crypto: siphash - drop _aligned variants
-
- crypto/algapi.c         |   7 +-
- crypto/memneq.c         |  24 +++--
- include/crypto/algapi.h |  11 +-
- include/linux/siphash.h | 106 +++++++++-----------
- lib/siphash.c           | 103 ++-----------------
- 5 files changed, 83 insertions(+), 168 deletions(-)
-
+diff --git a/crypto/memneq.c b/crypto/memneq.c
+index afed1bd16aee..0f46a6150f22 100644
+--- a/crypto/memneq.c
++++ b/crypto/memneq.c
+@@ -60,6 +60,7 @@
+  */
+ 
+ #include <crypto/algapi.h>
++#include <asm/unaligned.h>
+ 
+ #ifndef __HAVE_ARCH_CRYPTO_MEMNEQ
+ 
+@@ -71,7 +72,10 @@ __crypto_memneq_generic(const void *a, const void *b, size_t size)
+ 
+ #if defined(CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS)
+ 	while (size >= sizeof(unsigned long)) {
+-		neq |= *(unsigned long *)a ^ *(unsigned long *)b;
++		unsigned long const *p = a;
++		unsigned long const *q = b;
++
++		neq |= get_unaligned(p) ^ get_unaligned(q);
+ 		OPTIMIZER_HIDE_VAR(neq);
+ 		a += sizeof(unsigned long);
+ 		b += sizeof(unsigned long);
+@@ -95,18 +99,24 @@ static inline unsigned long __crypto_memneq_16(const void *a, const void *b)
+ 
+ #ifdef CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS
+ 	if (sizeof(unsigned long) == 8) {
+-		neq |= *(unsigned long *)(a)   ^ *(unsigned long *)(b);
++		unsigned long const *p = a;
++		unsigned long const *q = b;
++
++		neq |= get_unaligned(p++) ^ get_unaligned(q++);
+ 		OPTIMIZER_HIDE_VAR(neq);
+-		neq |= *(unsigned long *)(a+8) ^ *(unsigned long *)(b+8);
++		neq |= get_unaligned(p) ^ get_unaligned(q);
+ 		OPTIMIZER_HIDE_VAR(neq);
+ 	} else if (sizeof(unsigned int) == 4) {
+-		neq |= *(unsigned int *)(a)    ^ *(unsigned int *)(b);
++		unsigned int const *p = a;
++		unsigned int const *q = b;
++
++		neq |= get_unaligned(p++) ^ get_unaligned(q++);
+ 		OPTIMIZER_HIDE_VAR(neq);
+-		neq |= *(unsigned int *)(a+4)  ^ *(unsigned int *)(b+4);
++		neq |= get_unaligned(p++) ^ get_unaligned(q++);
+ 		OPTIMIZER_HIDE_VAR(neq);
+-		neq |= *(unsigned int *)(a+8)  ^ *(unsigned int *)(b+8);
++		neq |= get_unaligned(p++) ^ get_unaligned(q++);
+ 		OPTIMIZER_HIDE_VAR(neq);
+-		neq |= *(unsigned int *)(a+12) ^ *(unsigned int *)(b+12);
++		neq |= get_unaligned(p) ^ get_unaligned(q);
+ 		OPTIMIZER_HIDE_VAR(neq);
+ 	} else
+ #endif /* CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS */
 -- 
 2.11.0
