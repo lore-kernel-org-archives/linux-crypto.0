@@ -1,22 +1,23 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [PATCH 1/3] crypto: memneq - use unaligned accessors for aligned
- fast path
-Date: Tue, 9 Oct 2018 08:01:48 +0200
-Message-ID: <CAKv+Gu89NNOtx7wo_74q6V-WTsWLKeBhYNa8gZMhTH1mjr6NKw@mail.gmail.com>
+From: Jeffrey Walton <noloader@gmail.com>
+Subject: Re: [PATCH 3/3] crypto: siphash - drop _aligned variants
+Date: Tue, 9 Oct 2018 02:10:37 -0400
+Message-ID: <CAH8yC8kqsDAYyTyn3W6oThH5qRX3Qw=2SYr_eA=L03JN0NSBSg@mail.gmail.com>
 References: <20181008211554.5355-1-ard.biesheuvel@linaro.org>
- <20181008211554.5355-2-ard.biesheuvel@linaro.org>
- <20181009033455.GA718@sol.localdomain>
+ <20181008211554.5355-4-ard.biesheuvel@linaro.org>
+ <CAHmME9rDfVbGLpeV9-LDOUo1on2UB7UHd8jBKcWycf9HYkar=g@mail.gmail.com>
+ <CAKv+Gu96PKVnymyJyR-9-3HGTryNT=c2kYfXwmHX-QS6DzWf5Q@mail.gmail.com>
+Reply-To: noloader@gmail.com
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Cc: linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
- "Jason A. Donenfeld" <jason@zx2c4.com>,
- "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
- <linux-crypto@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>,
- Herbert Xu <herbert@gondor.apana.org.au>
-To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-mips@linux-mips.org, "Jason A. Donenfeld" <Jason@zx2c4.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>, Arnd Bergmann <arnd@arndb.de>,
+ Eric Biggers <ebiggers@google.com>, LKML <linux-kernel@vger.kernel.org>,
+ Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+ linux-arm-kernel@lists.infradead.org
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <20181009033455.GA718@sol.localdomain>
+In-Reply-To: <CAKv+Gu96PKVnymyJyR-9-3HGTryNT=c2kYfXwmHX-QS6DzWf5Q@mail.gmail.com>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -28,115 +29,77 @@ Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 9 October 2018 at 05:34, Eric Biggers <ebiggers@kernel.org> wrote:
-> Hi Ard,
+On Tue, Oct 9, 2018 at 2:00 AM Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
 >
-> On Mon, Oct 08, 2018 at 11:15:52PM +0200, Ard Biesheuvel wrote:
->> On ARM v6 and later, we define CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS
->> because the ordinary load/store instructions (ldr, ldrh, ldrb) can
->> tolerate any misalignment of the memory address. However, load/store
->> double and load/store multiple instructions (ldrd, ldm) may still only
->> be used on memory addresses that are 32-bit aligned, and so we have to
->> use the CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS macro with care, or we
->> may end up with a severe performance hit due to alignment traps that
->> require fixups by the kernel.
->>
->> Fortunately, the get_unaligned() accessors do the right thing: when
->> building for ARMv6 or later, the compiler will emit unaligned accesses
->> using the ordinary load/store instructions (but avoid the ones that
->> require 32-bit alignment). When building for older ARM, those accessors
->> will emit the appropriate sequence of ldrb/mov/orr instructions. And on
->> architectures that can truly tolerate any kind of misalignment, the
->> get_unaligned() accessors resolve to the leXX_to_cpup accessors that
->> operate on aligned addresses.
->>
->> So switch to the unaligned accessors for the aligned fast path. This
->> will create the exact same code on architectures that can really
->> tolerate any kind of misalignment, and generate code for ARMv6+ that
->> avoids load/store instructions that trigger alignment faults.
->>
->> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
->> ---
->>  crypto/memneq.c | 24 ++++++++++++++------
->>  1 file changed, 17 insertions(+), 7 deletions(-)
->>
->> diff --git a/crypto/memneq.c b/crypto/memneq.c
->> index afed1bd16aee..0f46a6150f22 100644
->> --- a/crypto/memneq.c
->> +++ b/crypto/memneq.c
->> @@ -60,6 +60,7 @@
->>   */
->>
->>  #include <crypto/algapi.h>
->> +#include <asm/unaligned.h>
->>
->>  #ifndef __HAVE_ARCH_CRYPTO_MEMNEQ
->>
->> @@ -71,7 +72,10 @@ __crypto_memneq_generic(const void *a, const void *b, size_t size)
->>
->>  #if defined(CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS)
->>       while (size >= sizeof(unsigned long)) {
->> -             neq |= *(unsigned long *)a ^ *(unsigned long *)b;
->> +             unsigned long const *p = a;
->> +             unsigned long const *q = b;
->> +
->> +             neq |= get_unaligned(p) ^ get_unaligned(q);
->>               OPTIMIZER_HIDE_VAR(neq);
->>               a += sizeof(unsigned long);
->>               b += sizeof(unsigned long);
->> @@ -95,18 +99,24 @@ static inline unsigned long __crypto_memneq_16(const void *a, const void *b)
->>
->>  #ifdef CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS
->>       if (sizeof(unsigned long) == 8) {
->> -             neq |= *(unsigned long *)(a)   ^ *(unsigned long *)(b);
->> +             unsigned long const *p = a;
->> +             unsigned long const *q = b;
->> +
->> +             neq |= get_unaligned(p++) ^ get_unaligned(q++);
->>               OPTIMIZER_HIDE_VAR(neq);
->> -             neq |= *(unsigned long *)(a+8) ^ *(unsigned long *)(b+8);
->> +             neq |= get_unaligned(p) ^ get_unaligned(q);
->>               OPTIMIZER_HIDE_VAR(neq);
->>       } else if (sizeof(unsigned int) == 4) {
->> -             neq |= *(unsigned int *)(a)    ^ *(unsigned int *)(b);
->> +             unsigned int const *p = a;
->> +             unsigned int const *q = b;
->> +
->> +             neq |= get_unaligned(p++) ^ get_unaligned(q++);
->>               OPTIMIZER_HIDE_VAR(neq);
->> -             neq |= *(unsigned int *)(a+4)  ^ *(unsigned int *)(b+4);
->> +             neq |= get_unaligned(p++) ^ get_unaligned(q++);
->>               OPTIMIZER_HIDE_VAR(neq);
->> -             neq |= *(unsigned int *)(a+8)  ^ *(unsigned int *)(b+8);
->> +             neq |= get_unaligned(p++) ^ get_unaligned(q++);
->>               OPTIMIZER_HIDE_VAR(neq);
->> -             neq |= *(unsigned int *)(a+12) ^ *(unsigned int *)(b+12);
->> +             neq |= get_unaligned(p) ^ get_unaligned(q);
->>               OPTIMIZER_HIDE_VAR(neq);
->>       } else
->>  #endif /* CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS */
+> On 9 October 2018 at 06:11, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+> > Hi Ard,
+> > ...
+> > As you might expect, when compiling in __siphash_unaligned and
+> > __siphash_aligned on the x86 at the same time, __siphash_unaligned is
+> > replaced with just "jmp __siphash_aligned", as gcc recognized that
+> > indeed the same code is generated.
+> >
+> Yeah, I noticed something similar on arm64, although we do get a stack
+> frame there.
 >
-> This looks good, but maybe now we should get rid of the
-> !CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS path too?
-> At least for the 16-byte case:
+> > However, on platforms where get_unaligned_* does do something
+> > different, it looks to me like this patch now always calls the
+> > unaligned code, even when the input data _is_ an aligned address
+> > already, which is worse behaviour than before. While it would be
+> > possible for the get_unaligned_* function headers to also detect this
+> > and fallback to the faster version at compile time, by the time
+> > get_unaligned_* is used in this patch, it's no longer in the header,
+> > but rather in siphash.c, which means the compiler no longer knows that
+> > the address is aligned, and so we hit the slow path. This especially
+> > impacts architectures like MIPS, for example. This is why the original
+> > code, prior to this patch, checks the alignment in the .h and then
+> > selects which codepath afterwards. So while this patch might handle
+> > the ARM use case, it seems like a regression on all other platforms.
+> > See, for example, the struct passing in net/core/secure_seq.c, which
+> > sends intentionally aligned and packed structs to siphash, which then
+> > benefits from using the faster instructions on certain platforms.
+> >
+> > It seems like what you're grappling with on the ARM side of things is
+> > that CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS only half means what it
+> > says on some ISAs, complicating this logic. It seems like the ideal
+> > thing to do, given that, would be to just not set
+> > CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS on those, so that we can fall
+> > back to the unaligned path always, like this patch suggests. Or if
+> > that's _too_ drastic, perhaps introduce another variable like
+> > CONFIG_MOSTLY_EFFICIENT_UNALIGNED_ACCESS.
+> >
+> Perhaps we should clarify better what
+> CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS means.
 >
-> static inline unsigned long __crypto_memneq_16(const void *a, const void *b)
-> {
->         const unsigned long *p = a, *q = b;
->         unsigned long neq = 0;
->
->         BUILD_BUG_ON(sizeof(*p) != 4 && sizeof(*p) != 8);
->         neq |= get_unaligned(p++) ^ get_unaligned(q++);
->         OPTIMIZER_HIDE_VAR(neq);
->         neq |= get_unaligned(p++) ^ get_unaligned(q++);
->         OPTIMIZER_HIDE_VAR(neq);
->         if (sizeof(*p) == 4) {
->                 neq |= get_unaligned(p++) ^ get_unaligned(q++);
->                 OPTIMIZER_HIDE_VAR(neq);
->                 neq |= get_unaligned(p++) ^ get_unaligned(q++);
->                 OPTIMIZER_HIDE_VAR(neq);
->         }
->         return neq;
-> }
+> One could argue that it means there is no point in reorganizing your
+> data to make it appear aligned, because the unaligned accessors are
+> cheap. Instead, it is used as a license to cast unaligned pointers to
+> any type (which C does not permit btw), even in the example.
 
-Yes that makes sense.
+I recommend avoiding this strategy. One of the libraries I help with
+used a similar strategy and was constantly putting out 1-off fires
+when GCC assumed, say, 4- or 8-byte alignments. Integer stuff was
+fine. The problems did not surface until vectorization at -O3 when the
+misaligned buffers started causing exceptions.
+
+To be clear, there were very few problems. It might surface with GCC
+4.9 on ARM in one function; and then surface again with GCC 5.1 on
+x86_64 on another function; and then surface again under Cygwin for
+another function with GCC 6.3.
+
+The pattern was finally gutted in favor of the classic stuff - treat
+the data unaligned an walk the buffer OR'ing in to a datatype. Or,
+memcpy it into aligned datatypes. Modern compilers recognize the
+pattern and it will be optimized they way you hope.
+
+Older GCC's, like say, GCC 4.3, may not do as well. But it is the
+price paid for portability and bug free code. And nowadays those old
+GCC's and Clang's are getting more rare. There's no sense in doing
+something quickly if you can't arrive at the correct result or you
+crash at runtime.
+
+> So in the case of siphash, that would mean always taking the unaligned
+> path if CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS is set, or only for
+> unaligned data if it is not.
+
+Jeff
