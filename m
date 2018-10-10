@@ -1,96 +1,46 @@
-From: syzbot <syzbot+2be67c86b63d3bf6e001@syzkaller.appspotmail.com>
-Subject: BUG: unable to handle kernel NULL pointer dereference in sha256_mb_mgr_get_comp_job_avx2
-Date: Wed, 10 Oct 2018 00:57:04 -0700
-Message-ID: <000000000000323c300577db3338@google.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
-To: bp@alien8.de, davem@davemloft.net, herbert@gondor.apana.org.au,
-        hpa@zytor.com, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, megha.dey@linux.intel.com,
-        mingo@redhat.com, syzkaller-bugs@googlegroups.com,
-        tglx@linutronix.de, tim.c.chen@linux.intel.com, x86@kernel.org
+From: Vitaly Chikunov <vt@altlinux.org>
+Subject: [PATCH v2 0/2] crypto: streebog - add Streebog hash function
+Date: Wed, 10 Oct 2018 15:12:50 +0300
+Message-ID: <20181010121254.12220-1-vt@altlinux.org>
+Cc: Vitaly Chikunov <vt@altlinux.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hello,
+Add GOST/IETF Streebog hash function (GOST R 34.11-2012, RFC 6986)
+generic hash transformation with appropriate testmgr and tcrypt
+tests and vectors.
 
-syzbot found the following crash on:
+Streebog Hash Function (GOST R 34.11-2012, RFC 6986) is one of the Russian
+cryptographic standard algorithms (called GOST algorithms).
 
-HEAD commit:    64c5e530ac2c Merge tag 'arc-4.19-rc8' of git://git.kernel...
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=1294e2d6400000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=88e9a8a39dc0be2d
-dashboard link: https://syzkaller.appspot.com/bug?extid=2be67c86b63d3bf6e001
-compiler:       gcc (GCC) 8.0.1 20180413 (experimental)
+References:
+  https://tc26.ru/upload/iblock/fed/feddbb4d26b685903faa2ba11aea43f6.pdf
+  https://tools.ietf.org/html/rfc6986
 
-Unfortunately, I don't have any reproducer for this crash yet.
+Tested using testmgr and tcrypt on x86_64, arm, arm64, and s390x on qemu.
 
-IMPORTANT: if you fix the bug, please add the following tag to the commit:
-Reported-by: syzbot+2be67c86b63d3bf6e001@syzkaller.appspotmail.com
+Changes from v1:
+- Fix of big-endian problem in add512.
+- More architectures are tested, including big-endian and 32-bit.
 
-audit: type=1804 audit(1539118025.521:29867): pid=31406 uid=0  
-auid=4294967295 ses=4294967295 subj==unconfined op=invalid_pcr  
-cause=open_writers comm="syz-executor2"  
-name="/root/syzkaller-testdir968705726/syzkaller.1KeZRV/124/file0/bus"  
-dev="sda1" ino=16590 res=1
-BUG: unable to handle kernel NULL pointer dereference at 0000000000000040
-PGD 1d82fa067 P4D 1d82fa067 PUD 1d937c067 PMD 0
-Oops: 0002 [#1] PREEMPT SMP KASAN
-CPU: 1 PID: 3868 Comm: kworker/1:1 Not tainted 4.19.0-rc7+ #275
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS  
-Google 01/01/2011
-Workqueue: crypto mcryptd_queue_worker
-RIP: 0010:sha256_mb_mgr_get_comp_job_avx2+0x66/0xe3  
-arch/x86/crypto/sha256-mb/sha256_mb_mgr_flush_avx2.S:255
-Code: 3b d3 c4 c1 79 7e d0 49 f7 c0 f0 ff ff ff 0f 85 93 00 00 00 49 6b d8  
-08 48 8d 9c 1f 68 01 00 00 48 8b 03 48 c7 03 00 00 00 00 <c7> 40 40 02 00  
-00 00 48 8b 9f 60 01 00 00 48 c1 e3 04 4c 09 c3 48
-RSP: 0018:ffff88017c5e7370 EFLAGS: 00010206
-RAX: 0000000000000000 RBX: ffff8801d527f728 RCX: ffffffff8184e1ca
-RDX: 1ffffd1ffffa2534 RSI: ffffffff814593ba RDI: ffff8801d527f5c0
-RBP: ffff88017c5e74d0 R08: 0000000000000000 R09: ffffed0037cd50c7
-R10: ffffed0037cd50c7 R11: ffff8801be6a863b R12: ffff88017c5e74a8
-R13: 0000000000000001 R14: ffff8801be6a86e0 R15: 0000000000000200
-FS:  0000000000000000(0000) GS:ffff8801daf00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000000040 CR3: 00000001d83ec000 CR4: 00000000001406e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
-  sha256_mb_flusher+0x2f4/0x610 arch/x86/crypto/sha256-mb/sha256_mb.c:919
-  mcryptd_opportunistic_flush crypto/mcryptd.c:142 [inline]
-  mcryptd_queue_worker+0x49c/0x71f crypto/mcryptd.c:172
-  process_one_work+0xc90/0x1b90 kernel/workqueue.c:2153
-  worker_thread+0x17f/0x1390 kernel/workqueue.c:2296
-  kthread+0x35a/0x420 kernel/kthread.c:246
-  ret_from_fork+0x3a/0x50 arch/x86/entry/entry_64.S:413
-Modules linked in:
-CR2: 0000000000000040
----[ end trace 8d1a13a59eafe937 ]---
-RIP: 0010:sha256_mb_mgr_get_comp_job_avx2+0x66/0xe3  
-arch/x86/crypto/sha256-mb/sha256_mb_mgr_flush_avx2.S:255
-Code: 3b d3 c4 c1 79 7e d0 49 f7 c0 f0 ff ff ff 0f 85 93 00 00 00 49 6b d8  
-08 48 8d 9c 1f 68 01 00 00 48 8b 03 48 c7 03 00 00 00 00 <c7> 40 40 02 00  
-00 00 48 8b 9f 60 01 00 00 48 c1 e3 04 4c 09 c3 48
-RSP: 0018:ffff88017c5e7370 EFLAGS: 00010206
-RAX: 0000000000000000 RBX: ffff8801d527f728 RCX: ffffffff8184e1ca
-RDX: 1ffffd1ffffa2534 RSI: ffffffff814593ba RDI: ffff8801d527f5c0
-RBP: ffff88017c5e74d0 R08: 0000000000000000 R09: ffffed0037cd50c7
-R10: ffffed0037cd50c7 R11: ffff8801be6a863b R12: ffff88017c5e74a8
-R13: 0000000000000001 R14: ffff8801be6a86e0 R15: 0000000000000200
-FS:  0000000000000000(0000) GS:ffff8801daf00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000000040 CR3: 00000001d83ec000 CR4: 00000000001406e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Vitaly Chikunov (2):
+  crypto: streebog - add Streebog hash function
+  crypto: streebog - add Streebog test vectors
 
+ crypto/Kconfig            |   12 +
+ crypto/Makefile           |    1 +
+ crypto/streebog_generic.c | 1142 +++++++++++++++++++++++++++++++++++++++++++++
+ crypto/tcrypt.c           |   27 ++
+ crypto/testmgr.c          |   12 +
+ crypto/testmgr.h          |   71 +++
+ include/crypto/streebog.h |   34 ++
+ 7 files changed, 1299 insertions(+)
+ create mode 100644 crypto/streebog_generic.c
+ create mode 100644 include/crypto/streebog.h
 
----
-This bug is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this bug report. See:
-https://goo.gl/tpsmEJ#bug-status-tracking for how to communicate with  
-syzbot.
+-- 
+2.11.0
