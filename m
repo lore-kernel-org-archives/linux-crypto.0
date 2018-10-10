@@ -1,60 +1,96 @@
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Subject: Re: [PATCH] crypto: caam/qi - simplify CGR allocation, freeing
-Date: Tue, 9 Oct 2018 19:11:01 +0200
-Message-ID: <20181009171101.jk6lgdx4g5rnq7cm@linutronix.de>
-References: <20181005125443.dfhd2asqktm22ney@linutronix.de>
- <20181008110937.29198-1-horia.geanta@nxp.com>
+From: syzbot <syzbot+2be67c86b63d3bf6e001@syzkaller.appspotmail.com>
+Subject: BUG: unable to handle kernel NULL pointer dereference in sha256_mb_mgr_get_comp_job_avx2
+Date: Wed, 10 Oct 2018 00:57:04 -0700
+Message-ID: <000000000000323c300577db3338@google.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        Li Yang <leoyang.li@nxp.com>, Roy Pledge <roy.pledge@nxp.com>,
-        Madalin Bucur <madalin.bucur@nxp.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+To: bp@alien8.de, davem@davemloft.net, herbert@gondor.apana.org.au,
+        hpa@zytor.com, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, megha.dey@linux.intel.com,
+        mingo@redhat.com, syzkaller-bugs@googlegroups.com,
+        tglx@linutronix.de, tim.c.chen@linux.intel.com, x86@kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20181008110937.29198-1-horia.geanta@nxp.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 2018-10-08 14:09:37 [+0300], Horia Geantă wrote:
-> CGRs (Congestion Groups) have to be freed by the same CPU that
-> initialized them.
-> This is why currently the driver takes special measures; however, using
-> set_cpus_allowed_ptr() is incorrect - as reported by Sebastian.
-> 
-> Instead of the generic solution of replacing set_cpus_allowed_ptr() with
-> work_on_cpu_safe(), we use the qman_delete_cgr_safe() QBMan API instead
-> of qman_delete_cgr() - which internally takes care of proper CGR
-> deletion.
-> 
-> Link: https://lkml.kernel.org/r/20181005125443.dfhd2asqktm22ney@linutronix.de
-> Reported-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-> Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
+Hello,
 
-Oh. No more usage of set_cpus_allowed_ptr(). Wonderful. Thank you.
- Acked-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-for that.
+syzbot found the following crash on:
 
-Now that you shifted my attention to qman_delete_cgr_safe().
-Could you please use work_on_cpu_safe() here instead
-smp_call_function_single() with preempt_disable() around it?
+HEAD commit:    64c5e530ac2c Merge tag 'arc-4.19-rc8' of git://git.kernel...
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1294e2d6400000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=88e9a8a39dc0be2d
+dashboard link: https://syzkaller.appspot.com/bug?extid=2be67c86b63d3bf6e001
+compiler:       gcc (GCC) 8.0.1 20180413 (experimental)
 
-Now, what is the problem with the CPU limitation? Is this a HW
-limitation that you can access the registers from a certain CPU?
+Unfortunately, I don't have any reproducer for this crash yet.
 
-This still fails (silently) if the CPU is missing, right? If you can't
-get around it, you could block the CPU from going offline. You could
-register a HP notifier
-	cpuhp_setup_state(CPUHP_AP_ONLINE_DYN, …
+IMPORTANT: if you fix the bug, please add the following tag to the commit:
+Reported-by: syzbot+2be67c86b63d3bf6e001@syzkaller.appspotmail.com
 
-and the function would return -EINVAL if this is the special CPU. The
-other thing would be forbid rmmod. This *could* work but if I remember
-correctly, an explicit unbind can't be stopped.
+audit: type=1804 audit(1539118025.521:29867): pid=31406 uid=0  
+auid=4294967295 ses=4294967295 subj==unconfined op=invalid_pcr  
+cause=open_writers comm="syz-executor2"  
+name="/root/syzkaller-testdir968705726/syzkaller.1KeZRV/124/file0/bus"  
+dev="sda1" ino=16590 res=1
+BUG: unable to handle kernel NULL pointer dereference at 0000000000000040
+PGD 1d82fa067 P4D 1d82fa067 PUD 1d937c067 PMD 0
+Oops: 0002 [#1] PREEMPT SMP KASAN
+CPU: 1 PID: 3868 Comm: kworker/1:1 Not tainted 4.19.0-rc7+ #275
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS  
+Google 01/01/2011
+Workqueue: crypto mcryptd_queue_worker
+RIP: 0010:sha256_mb_mgr_get_comp_job_avx2+0x66/0xe3  
+arch/x86/crypto/sha256-mb/sha256_mb_mgr_flush_avx2.S:255
+Code: 3b d3 c4 c1 79 7e d0 49 f7 c0 f0 ff ff ff 0f 85 93 00 00 00 49 6b d8  
+08 48 8d 9c 1f 68 01 00 00 48 8b 03 48 c7 03 00 00 00 00 <c7> 40 40 02 00  
+00 00 48 8b 9f 60 01 00 00 48 c1 e3 04 4c 09 c3 48
+RSP: 0018:ffff88017c5e7370 EFLAGS: 00010206
+RAX: 0000000000000000 RBX: ffff8801d527f728 RCX: ffffffff8184e1ca
+RDX: 1ffffd1ffffa2534 RSI: ffffffff814593ba RDI: ffff8801d527f5c0
+RBP: ffff88017c5e74d0 R08: 0000000000000000 R09: ffffed0037cd50c7
+R10: ffffed0037cd50c7 R11: ffff8801be6a863b R12: ffff88017c5e74a8
+R13: 0000000000000001 R14: ffff8801be6a86e0 R15: 0000000000000200
+FS:  0000000000000000(0000) GS:ffff8801daf00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000000000040 CR3: 00000001d83ec000 CR4: 00000000001406e0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+  sha256_mb_flusher+0x2f4/0x610 arch/x86/crypto/sha256-mb/sha256_mb.c:919
+  mcryptd_opportunistic_flush crypto/mcryptd.c:142 [inline]
+  mcryptd_queue_worker+0x49c/0x71f crypto/mcryptd.c:172
+  process_one_work+0xc90/0x1b90 kernel/workqueue.c:2153
+  worker_thread+0x17f/0x1390 kernel/workqueue.c:2296
+  kthread+0x35a/0x420 kernel/kthread.c:246
+  ret_from_fork+0x3a/0x50 arch/x86/entry/entry_64.S:413
+Modules linked in:
+CR2: 0000000000000040
+---[ end trace 8d1a13a59eafe937 ]---
+RIP: 0010:sha256_mb_mgr_get_comp_job_avx2+0x66/0xe3  
+arch/x86/crypto/sha256-mb/sha256_mb_mgr_flush_avx2.S:255
+Code: 3b d3 c4 c1 79 7e d0 49 f7 c0 f0 ff ff ff 0f 85 93 00 00 00 49 6b d8  
+08 48 8d 9c 1f 68 01 00 00 48 8b 03 48 c7 03 00 00 00 00 <c7> 40 40 02 00  
+00 00 48 8b 9f 60 01 00 00 48 c1 e3 04 4c 09 c3 48
+RSP: 0018:ffff88017c5e7370 EFLAGS: 00010206
+RAX: 0000000000000000 RBX: ffff8801d527f728 RCX: ffffffff8184e1ca
+RDX: 1ffffd1ffffa2534 RSI: ffffffff814593ba RDI: ffff8801d527f5c0
+RBP: ffff88017c5e74d0 R08: 0000000000000000 R09: ffffed0037cd50c7
+R10: ffffed0037cd50c7 R11: ffff8801be6a863b R12: ffff88017c5e74a8
+R13: 0000000000000001 R14: ffff8801be6a86e0 R15: 0000000000000200
+FS:  0000000000000000(0000) GS:ffff8801daf00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000000000040 CR3: 00000001d83ec000 CR4: 00000000001406e0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
 
-Sebastian
+
+---
+This bug is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this bug report. See:
+https://goo.gl/tpsmEJ#bug-status-tracking for how to communicate with  
+syzbot.
