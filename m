@@ -1,75 +1,80 @@
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: Re: [PATCH v3 4.4.y 1/3] x86/fpu: Remove use_eager_fpu()
-Date: Thu, 11 Oct 2018 17:10:52 +0200
-Message-ID: <20181011151052.GB31502@kroah.com>
-References: <1531270120-19068-1-git-send-email-daniel.sangorrin@toshiba.co.jp>
- <1531270120-19068-2-git-send-email-daniel.sangorrin@toshiba.co.jp>
+From: Nick Desaulniers <ndesaulniers@google.com>
+Subject: Re: [PATCH] crypto: ccree - avoid implicit enum conversion
+Date: Thu, 11 Oct 2018 13:50:31 -0700
+Message-ID: <CAKwvOdkUnpxJe+zXMWDHsfozi9D-TpPZgmasciRU-nkCA9xOGg@mail.gmail.com>
+References: <20181010214006.21304-1-natechancellor@gmail.com>
+ <CAKwvOdk+JmBP4TBAG+DfhehofM0sO0vWRXbAbEifYy+T+u_SVQ@mail.gmail.com> <CAOtvUMezOMmyE=FW+nRqrR+r2NsNOCCXWwp0fja9gF7j-xQAnw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: stable@vger.kernel.org, Andy Lutomirski <luto@kernel.org>,
-        Rik van Riel <riel@redhat.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Brian Gerst <brgerst@gmail.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Denys Vlasenko <dvlasenk@redhat.com>,
-        Fenghua Yu <fenghua.yu@intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Josh Poimboeuf <jpoimboe@redhat.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Oleg Nesterov <oleg@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Quentin Casasnovas <quentin.casasnovas@oracle.com>,
-        Thomas Gleixner <tglx@linutronix.de>, pbonzini@redhat.com,
-        Ingo Molnar <mingo@kernel.org>,
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Cc: Nathan Chancellor <natechancellor@gmail.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Ingo Molnar <mingo@redhat.com>, x86@kernel.org,
-        Gleb Natapov <
-To: Daniel Sangorrin <daniel.sangorrin@toshiba.co.jp>
-Return-path: <stable-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1531270120-19068-2-git-send-email-daniel.sangorrin@toshiba.co.jp>
-Sender: stable-owner@vger.kernel.org
+        linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
+To: Gilad Ben-Yossef <gilad@benyossef.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <CAOtvUMezOMmyE=FW+nRqrR+r2NsNOCCXWwp0fja9gF7j-xQAnw@mail.gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Jul 11, 2018 at 09:48:38AM +0900, Daniel Sangorrin wrote:
-> From: Andy Lutomirski <luto@kernel.org>
-> 
-> commit c592b57347069abfc0dcad3b3a302cf882602597 upstream
-> 
-> This removes all the obvious code paths that depend on lazy FPU mode.
-> It shouldn't change the generated code at all.
-> 
-> Signed-off-by: Andy Lutomirski <luto@kernel.org>
-> Signed-off-by: Rik van Riel <riel@redhat.com>
-> Cc: Borislav Petkov <bp@alien8.de>
-> Cc: Brian Gerst <brgerst@gmail.com>
-> Cc: Dave Hansen <dave.hansen@linux.intel.com>
-> Cc: Denys Vlasenko <dvlasenk@redhat.com>
-> Cc: Fenghua Yu <fenghua.yu@intel.com>
-> Cc: H. Peter Anvin <hpa@zytor.com>
-> Cc: Josh Poimboeuf <jpoimboe@redhat.com>
-> Cc: Linus Torvalds <torvalds@linux-foundation.org>
-> Cc: Oleg Nesterov <oleg@redhat.com>
-> Cc: Peter Zijlstra <peterz@infradead.org>
-> Cc: Quentin Casasnovas <quentin.casasnovas@oracle.com>
-> Cc: Thomas Gleixner <tglx@linutronix.de>
-> Cc: pbonzini@redhat.com
-> Link: http://lkml.kernel.org/r/1475627678-20788-5-git-send-email-riel@redhat.com
-> Signed-off-by: Ingo Molnar <mingo@kernel.org>
-> Signed-off-by: Daniel Sangorrin <daniel.sangorrin@toshiba.co.jp>
-> ---
->  arch/x86/crypto/crc32c-intel_glue.c | 17 ++++-------------
->  arch/x86/include/asm/fpu/internal.h | 34 +--------------------------------
->  arch/x86/kernel/fpu/core.c          | 38 +++++--------------------------------
->  arch/x86/kernel/fpu/signal.c        |  8 +++-----
->  arch/x86/kvm/cpuid.c                |  4 +---
->  arch/x86/kvm/x86.c                  | 10 ----------
->  6 files changed, 14 insertions(+), 97 deletions(-)
+On Thu, Oct 11, 2018 at 12:47 AM Gilad Ben-Yossef <gilad@benyossef.com> wro=
+te:
+>
+> Hi Nick,
+>
+> On Thu, Oct 11, 2018 at 2:49 AM Nick Desaulniers
+> <ndesaulniers@google.com> wrote:
+> >
+> > $ grep -r set_cipher_config0 -n
+> >
+> > shows a healthy mix of DESC_DIRECTION_ENCRYPT_ENCRYPT,
+> > HASH_DIGEST_RESULT_LITTLE_ENDIAN, and DRV_CRYPTO_DIRECTION_ENCRYPT
+> > (all enumeration values of different enums).
+> >
+> > >
+> > > drivers/crypto/ccree/cc_aead.c:1643:30: warning: implicit conversion
+> > > from enumeration type 'enum drv_hash_hw_mode' to different enumeratio=
+n
+> > > type 'enum drv_cipher_mode' [-Wenum-conversion]
+> > >         set_cipher_mode(&desc[idx], DRV_HASH_HW_GHASH);
+> >
+> > Looks like a lot fewer call sites using DRV_HASH_HW_GHASH; same value
+> > as DRV_CIPHER_OFB (different enum), but can a block cipher mode and a
+> > hash be valid values for pdesc->word[4]?
+> >
+> > >
+> > > Since this fundamentally isn't a problem because these values just
+> > > represent simple integers for a shift operation, make it clear to Cla=
+ng
+> > > that this is okay by making the mode parameter in both functions an i=
+nt.
+> >
+> > This also looks like the simplest fix to me, assuming the values of
+> > all of these enums are valid for whatever pdesc->word[4] is.  Can the
+> > maintainers explain what is CC7x-DESC what the comment makes reference
+> > to?
+>
+> They indeed are. CC7x-DESC is a shorthand for "CryptoCell 7xx
+> Descriptor" used in the hardware documents.
+> These descriptors are comprised of fields with context sensitive
+> meaning, hence this "overloading".
+>
+> Given this overloading of meaning an  "int" type is indeed a better
+> suited type here.
 
-This does not apply to the current 4.4.y tree.  Can you rebase this
-series and resend it?
+Sounds like they're valid values then.  Thanks for the info.
+Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
 
-thanks,
+>
+> Thanks,
+> Gilad
+> --
+> Gilad Ben-Yossef
+> Chief Coffee Drinker
+>
+> values of =CE=B2 will give rise to dom!
 
-greg k-h
+
+
+--=20
+Thanks,
+~Nick Desaulniers
