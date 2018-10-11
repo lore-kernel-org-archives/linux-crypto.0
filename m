@@ -1,62 +1,62 @@
 From: Gilad Ben-Yossef <gilad@benyossef.com>
 Subject: Re: [PATCH] crypto: ccree - avoid implicit enum conversion
-Date: Thu, 11 Oct 2018 10:39:01 +0300
-Message-ID: <CAOtvUMcwR6r24u0XEm4o_C5oPW-8wyuiQ++YHs=gioP9C4Wm1A@mail.gmail.com>
-References: <20181010214006.21304-1-natechancellor@gmail.com>
+Date: Thu, 11 Oct 2018 10:47:20 +0300
+Message-ID: <CAOtvUMezOMmyE=FW+nRqrR+r2NsNOCCXWwp0fja9gF7j-xQAnw@mail.gmail.com>
+References: <20181010214006.21304-1-natechancellor@gmail.com> <CAKwvOdk+JmBP4TBAG+DfhehofM0sO0vWRXbAbEifYy+T+u_SVQ@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+Cc: natechancellor@gmail.com, Herbert Xu <herbert@gondor.apana.org.au>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux kernel mailing list <linux-kernel@vger.kernel.org>,
-        ndesaulniers@google.com, Yael Chemla <Yael.Chemla@arm.com>
-To: natechancellor@gmail.com
+        Linux kernel mailing list <linux-kernel@vger.kernel.org>
+To: ndesaulniers@google.com
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20181010214006.21304-1-natechancellor@gmail.com>
+In-Reply-To: <CAKwvOdk+JmBP4TBAG+DfhehofM0sO0vWRXbAbEifYy+T+u_SVQ@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi Nathan,
+Hi Nick,
 
-On Thu, Oct 11, 2018 at 12:44 AM Nathan Chancellor
-<natechancellor@gmail.com> wrote:
+On Thu, Oct 11, 2018 at 2:49 AM Nick Desaulniers
+<ndesaulniers@google.com> wrote:
 >
-> Clang warns when one enumerated type is implicitly converted to another
-> and this happens in several locations in this driver, ultimately related
-> to the set_cipher_{mode,config0} functions. set_cipher_mode expects a mod=
-e
-> of type drv_cipher_mode and set_cipher_config0 expects a mode of type
-> drv_crypto_direction.
+> $ grep -r set_cipher_config0 -n
 >
-> drivers/crypto/ccree/cc_ivgen.c:58:35: warning: implicit conversion from
-> enumeration type 'enum cc_desc_direction' to different enumeration type
-> 'enum drv_crypto_direction' [-Wenum-conversion]
->         set_cipher_config0(&iv_seq[idx], DESC_DIRECTION_ENCRYPT_ENCRYPT);
+> shows a healthy mix of DESC_DIRECTION_ENCRYPT_ENCRYPT,
+> HASH_DIGEST_RESULT_LITTLE_ENDIAN, and DRV_CRYPTO_DIRECTION_ENCRYPT
+> (all enumeration values of different enums).
 >
-> drivers/crypto/ccree/cc_hash.c:99:28: warning: implicit conversion from
-> enumeration type 'enum cc_hash_conf_pad' to different enumeration type
-> 'enum drv_crypto_direction' [-Wenum-conversion]
->                 set_cipher_config0(desc, HASH_DIGEST_RESULT_LITTLE_ENDIAN=
-);
+> >
+> > drivers/crypto/ccree/cc_aead.c:1643:30: warning: implicit conversion
+> > from enumeration type 'enum drv_hash_hw_mode' to different enumeration
+> > type 'enum drv_cipher_mode' [-Wenum-conversion]
+> >         set_cipher_mode(&desc[idx], DRV_HASH_HW_GHASH);
 >
-> drivers/crypto/ccree/cc_aead.c:1643:30: warning: implicit conversion
-> from enumeration type 'enum drv_hash_hw_mode' to different enumeration
-> type 'enum drv_cipher_mode' [-Wenum-conversion]
->         set_cipher_mode(&desc[idx], DRV_HASH_HW_GHASH);
+> Looks like a lot fewer call sites using DRV_HASH_HW_GHASH; same value
+> as DRV_CIPHER_OFB (different enum), but can a block cipher mode and a
+> hash be valid values for pdesc->word[4]?
 >
-> Since this fundamentally isn't a problem because these values just
-> represent simple integers for a shift operation, make it clear to Clang
-> that this is okay by making the mode parameter in both functions an int.
+> >
+> > Since this fundamentally isn't a problem because these values just
+> > represent simple integers for a shift operation, make it clear to Clang
+> > that this is okay by making the mode parameter in both functions an int=
+.
+>
+> This also looks like the simplest fix to me, assuming the values of
+> all of these enums are valid for whatever pdesc->word[4] is.  Can the
+> maintainers explain what is CC7x-DESC what the comment makes reference
+> to?
 
-Thank you. We actually had a patch fixing this in the pipeline but
-your fix is simpler. :-)
+They indeed are. CC7x-DESC is a shorthand for "CryptoCell 7xx
+Descriptor" used in the hardware documents.
+These descriptors are comprised of fields with context sensitive
+meaning, hence this "overloading".
 
-Acked-by: Gilad Ben-Yossef <gilad@benyossef.com>
+Given this overloading of meaning an  "int" type is indeed a better
+suited type here.
 
+Thanks,
 Gilad
-
-
-
 --=20
 Gilad Ben-Yossef
 Chief Coffee Drinker
