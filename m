@@ -1,8 +1,8 @@
 From: Fabio Estevam <festevam@gmail.com>
-Subject: Re: [PATCH v2 3/4] ARM: dts: imx6ull: Add dcp node
-Date: Mon, 15 Oct 2018 11:03:33 -0300
-Message-ID: <CAOMZO5AMwGakygMT=O9CjN8jyL-FAox3-452C1vpGc9sPCXBHw@mail.gmail.com>
-References: <cover.1539609921.git.leonard.crestez@nxp.com> <9365e24504896e58294fd8786acb3c3d4a1a264d.1539609921.git.leonard.crestez@nxp.com>
+Subject: Re: [PATCH v2 4/4] ARM: imx_v6_v7_defconfig: Enable CRYPTO_DEV_MXS_DCP
+Date: Mon, 15 Oct 2018 11:04:05 -0300
+Message-ID: <CAOMZO5Br5fXGKQAUJ3jPJWzwmXNtb-9NCZEdfhrayYJ1iXZVuA@mail.gmail.com>
+References: <cover.1539609921.git.leonard.crestez@nxp.com> <275ca8850bd5863f79bcafdb11cf9544318a691f.1539609921.git.leonard.crestez@nxp.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Cc: Shawn Guo <shawnguo@kernel.org>,
@@ -26,25 +26,16 @@ Cc: Shawn Guo <shawnguo@kernel.org>,
         linux-kernel <l
 To: Leonard Crestez <leonard.crestez@nxp.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <9365e24504896e58294fd8786acb3c3d4a1a264d.1539609921.git.leonard.crestez@nxp.com>
+In-Reply-To: <275ca8850bd5863f79bcafdb11cf9544318a691f.1539609921.git.leonard.crestez@nxp.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
 On Mon, Oct 15, 2018 at 10:28 AM Leonard Crestez
 <leonard.crestez@nxp.com> wrote:
-
-> diff --git a/arch/arm/boot/dts/imx6ull.dtsi b/arch/arm/boot/dts/imx6ull.dtsi
-> index 796ed35d4ac9..be610339e933 100644
-> --- a/arch/arm/boot/dts/imx6ull.dtsi
-> +++ b/arch/arm/boot/dts/imx6ull.dtsi
-> @@ -37,10 +37,20 @@
->                         #address-cells = <1>;
->                         #size-cells = <1>;
->                         reg = <0x02200000 0x100000>;
->                         ranges;
 >
-> +                       dcp: dcp@2280000 {
+> This block is present in 6sl, 6sll and 6ull so it should be enabled in
+> the default imx kernel config.
+>
+> Signed-off-by: Leonard Crestez <leonard.crestez@nxp.com>
 
-Node names should be generic, so it would be better to use:
-
-dcp: crypto@2280000 {
+Reviewed-by: Fabio Estevam <festevam@gmail.com>
