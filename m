@@ -1,73 +1,100 @@
-Return-Path: <SRS0=Iqog=M5=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-ve1eur01on0040.outbound.protection.outlook.com ([104.47.1.40]:42912
-        "EHLO EUR01-VE1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727040AbeJQUd2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 17 Oct 2018 16:33:28 -0400
-From: Leonard Crestez <leonard.crestez@nxp.com>
-To: Shawn Guo <shawnguo@kernel.org>,
-        Fabio Estevam <fabio.estevam@nxp.com>
-CC: Rob Herring <robh+dt@kernel.org>,
-        Marek Vasut <marek.vasut@gmail.com>,
+Return-Path: <SRS0=18ZD=M3=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:54072 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726821AbeJPBmu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 15 Oct 2018 21:42:50 -0400
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org
+Cc: linux-fscrypt@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Horia Geanta <horia.geanta@nxp.com>,
-        Franck Lenormand <franck.lenormand@nxp.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        "David S . Miller " <davem@davemloft.net>,
-        Mark Rutland <mark.rutland@arm.com>,
-        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-arm-kernel@lists.infradead.org"
-        <linux-arm-kernel@lists.infradead.org>,
-        dl-linux-imx <linux-imx@nxp.com>,
-        "kernel@pengutronix.de" <kernel@pengutronix.de>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: [PATCH v4 3/4] ARM: dts: imx6ull: Add dcp node
-Date: Wed, 17 Oct 2018 12:37:54 +0000
-Message-ID: <f503eea6c702aeff091f4c03d4059b67ec17b2b4.1539779579.git.leonard.crestez@nxp.com>
-References: <cover.1539779579.git.leonard.crestez@nxp.com>
-In-Reply-To: <cover.1539779579.git.leonard.crestez@nxp.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+        Paul Crowley <paulcrowley@google.com>,
+        Greg Kaiser <gkaiser@google.com>,
+        Michael Halcrow <mhalcrow@google.com>,
+        "Jason A . Donenfeld" <Jason@zx2c4.com>,
+        Samuel Neves <samuel.c.p.neves@gmail.com>,
+        Tomer Ashur <tomer.ashur@esat.kuleuven.be>
+Subject: [RFC PATCH v2 07/12] crypto: arm/chacha - add XChaCha12 support
+Date: Mon, 15 Oct 2018 10:54:19 -0700
+Message-Id: <20181015175424.97147-8-ebiggers@kernel.org>
+In-Reply-To: <20181015175424.97147-1-ebiggers@kernel.org>
+References: <20181015175424.97147-1-ebiggers@kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The DCP block on 6ull has no major differences other than requiring
-explicit clock enabling.
+From: Eric Biggers <ebiggers@google.com>
 
-Signed-off-by: Leonard Crestez <leonard.crestez@nxp.com>
-Reviewed-by: Fabio Estevam <festevam@gmail.com>
+Now that the 32-bit ARM NEON implementation of ChaCha20 and XChaCha20
+has been refactored to support varying the number of rounds, add support
+for XChaCha12.  This is identical to XChaCha20 except for the number of
+rounds, which is 12 instead of 20.
+
+XChaCha12 is faster than XChaCha20 but has a lower security margin,
+though still greater than AES-256's since the best known attacks make it
+through only 7 rounds.  See the patch "crypto: chacha - add XChaCha12
+support" for more details about why we need XChaCha12 support.
+
+Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- arch/arm/boot/dts/imx6ull.dtsi | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ arch/arm/crypto/Kconfig            |  2 +-
+ arch/arm/crypto/chacha-neon-glue.c | 21 ++++++++++++++++++++-
+ 2 files changed, 21 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm/boot/dts/imx6ull.dtsi b/arch/arm/boot/dts/imx6ull.dts=
-i
-index 796ed35d4ac9..f3668fe69eac 100644
---- a/arch/arm/boot/dts/imx6ull.dtsi
-+++ b/arch/arm/boot/dts/imx6ull.dtsi
-@@ -37,10 +37,20 @@
- 			#address-cells =3D <1>;
- 			#size-cells =3D <1>;
- 			reg =3D <0x02200000 0x100000>;
- 			ranges;
-=20
-+			dcp: crypto@2280000 {
-+				compatible =3D "fsl,imx6ull-dcp", "fsl,imx28-dcp";
-+				reg =3D <0x02280000 0x4000>;
-+				interrupts =3D <GIC_SPI 46 IRQ_TYPE_LEVEL_HIGH>,
-+					     <GIC_SPI 47 IRQ_TYPE_LEVEL_HIGH>,
-+					     <GIC_SPI 48 IRQ_TYPE_LEVEL_HIGH>;
-+				clocks =3D <&clks IMX6ULL_CLK_DCP_CLK>;
-+				clock-names =3D "dcp";
-+			};
+diff --git a/arch/arm/crypto/Kconfig b/arch/arm/crypto/Kconfig
+index 0aa1471f27d2e..cc932d9bba561 100644
+--- a/arch/arm/crypto/Kconfig
++++ b/arch/arm/crypto/Kconfig
+@@ -117,7 +117,7 @@ config CRYPTO_CRC32_ARM_CE
+ 	select CRYPTO_HASH
+ 
+ config CRYPTO_CHACHA20_NEON
+-	tristate "NEON accelerated ChaCha20 stream cipher algorithms"
++	tristate "NEON accelerated ChaCha stream cipher algorithms"
+ 	depends on KERNEL_MODE_NEON
+ 	select CRYPTO_BLKCIPHER
+ 	select CRYPTO_CHACHA20
+diff --git a/arch/arm/crypto/chacha-neon-glue.c b/arch/arm/crypto/chacha-neon-glue.c
+index b236af4889c61..0b1b238227707 100644
+--- a/arch/arm/crypto/chacha-neon-glue.c
++++ b/arch/arm/crypto/chacha-neon-glue.c
+@@ -1,5 +1,6 @@
+ /*
+- * ChaCha20 (RFC7539) and XChaCha20 stream ciphers, NEON accelerated
++ * ARM NEON accelerated ChaCha and XChaCha stream ciphers,
++ * including ChaCha20 (RFC7539)
+  *
+  * Copyright (C) 2016 Linaro, Ltd. <ard.biesheuvel@linaro.org>
+  *
+@@ -160,6 +161,22 @@ static struct skcipher_alg algs[] = {
+ 		.setkey			= crypto_chacha20_setkey,
+ 		.encrypt		= xchacha_neon,
+ 		.decrypt		= xchacha_neon,
++	}, {
++		.base.cra_name		= "xchacha12",
++		.base.cra_driver_name	= "xchacha12-neon",
++		.base.cra_priority	= 300,
++		.base.cra_blocksize	= 1,
++		.base.cra_ctxsize	= sizeof(struct chacha_ctx),
++		.base.cra_module	= THIS_MODULE,
 +
- 			iomuxc_snvs: iomuxc-snvs@2290000 {
- 				compatible =3D "fsl,imx6ull-iomuxc-snvs";
- 				reg =3D <0x02290000 0x4000>;
- 			};
-=20
---=20
-2.17.1
++		.min_keysize		= CHACHA_KEY_SIZE,
++		.max_keysize		= CHACHA_KEY_SIZE,
++		.ivsize			= XCHACHA_IV_SIZE,
++		.chunksize		= CHACHA_BLOCK_SIZE,
++		.walksize		= 4 * CHACHA_BLOCK_SIZE,
++		.setkey			= crypto_chacha12_setkey,
++		.encrypt		= xchacha_neon,
++		.decrypt		= xchacha_neon,
+ 	}
+ };
+ 
+@@ -186,3 +203,5 @@ MODULE_ALIAS_CRYPTO("chacha20");
+ MODULE_ALIAS_CRYPTO("chacha20-neon");
+ MODULE_ALIAS_CRYPTO("xchacha20");
+ MODULE_ALIAS_CRYPTO("xchacha20-neon");
++MODULE_ALIAS_CRYPTO("xchacha12");
++MODULE_ALIAS_CRYPTO("xchacha12-neon");
+-- 
+2.19.1.331.ge82ca0e54c-goog
