@@ -1,24 +1,12 @@
-Return-Path: <SRS0=BLQr=ND=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-it1-f193.google.com ([209.85.166.193]:39764 "EHLO
-        mail-it1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727757AbeJWTD2 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 23 Oct 2018 15:03:28 -0400
-Received: by mail-it1-f193.google.com with SMTP id m15so1423161itl.4
-        for <linux-crypto@vger.kernel.org>; Tue, 23 Oct 2018 03:40:35 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20181020071206.GE876@sol.localdomain>
-References: <20181015175424.97147-1-ebiggers@kernel.org> <20181015175424.97147-12-ebiggers@kernel.org>
- <CAKv+Gu9wrOOk-LGPYmxgLbv86uXzMeHN6th3mMEDT3Vg893HWw@mail.gmail.com> <20181020071206.GE876@sol.localdomain>
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date: Tue, 23 Oct 2018 07:40:34 -0300
-Message-ID: <CAKv+Gu9zBKK7ughbBAKkHdfgX2KrBXkF6MhH3xrSdLegrjjYJQ@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 11/12] crypto: adiantum - add Adiantum support
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>, linux-fscrypt@vger.kernel.org,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+Return-Path: <SRS0=18ZD=M3=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:54118 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726864AbeJPBmv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 15 Oct 2018 21:42:51 -0400
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org
+Cc: linux-fscrypt@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Paul Crowley <paulcrowley@google.com>,
         Greg Kaiser <gkaiser@google.com>,
@@ -26,119 +14,273 @@ Cc: "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
         "Jason A . Donenfeld" <Jason@zx2c4.com>,
         Samuel Neves <samuel.c.p.neves@gmail.com>,
         Tomer Ashur <tomer.ashur@esat.kuleuven.be>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: [RFC PATCH v2 10/12] crypto: arm/nhpoly1305 - add NEON-accelerated NHPoly1305
+Date: Mon, 15 Oct 2018 10:54:22 -0700
+Message-Id: <20181015175424.97147-11-ebiggers@kernel.org>
+In-Reply-To: <20181015175424.97147-1-ebiggers@kernel.org>
+References: <20181015175424.97147-1-ebiggers@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 20 October 2018 at 15:12, Eric Biggers <ebiggers@kernel.org> wrote:
-> Hi Ard,
->
-> On Sat, Oct 20, 2018 at 12:17:58PM +0800, Ard Biesheuvel wrote:
->> On 16 October 2018 at 01:54, Eric Biggers <ebiggers@kernel.org> wrote:
->> > From: Eric Biggers <ebiggers@google.com>
->> >
->> > Add support for the Adiantum encryption mode.  Adiantum was designed b=
-y
->> > Paul Crowley and is specified by our paper:
->> >
->> >     Adiantum: length-preserving encryption for entry-level processors
->> >     (https://eprint.iacr.org/2018/720.pdf)
->> >
->> > See our paper for full details; this patch only provides an overview.
->> >
->> > Adiantum is a tweakable, length-preserving encryption mode designed fo=
-r
->> > fast and secure disk encryption, especially on CPUs without dedicated
->> > crypto instructions.  Adiantum encrypts each sector using the XChaCha1=
-2
->> > stream cipher, two passes of an =CE=B5-almost-=E2=88=86-universal (=CE=
-=B5A=E2=88=86U) hash
->> > function, and an invocation of the AES-256 block cipher on a single
->> > 16-byte block.  On CPUs without AES instructions, Adiantum is much
->> > faster than AES-XTS; for example, on ARM Cortex-A7, on 4096-byte secto=
-rs
->> > Adiantum encryption is about 4 times faster than AES-256-XTS encryptio=
-n,
->> > and decryption about 5 times faster.
->> >
->> > Adiantum is a specialization of the more general HBSH construction.  O=
-ur
->> > earlier proposal, HPolyC, was also a HBSH specialization, but it used =
-a
->> > different =CE=B5A=E2=88=86U hash function, one based on Poly1305 only.=
-  Adiantum's
->> > =CE=B5A=E2=88=86U hash function, which is based primarily on the "NH" =
-hash function
->> > like that used in UMAC (RFC4418), is about twice as fast as HPolyC's;
->> > consequently, Adiantum is about 20% faster than HPolyC.
->> >
->> > This speed comes with no loss of security: Adiantum is provably just a=
-s
->> > secure as HPolyC, in fact slightly *more* secure.  Like HPolyC,
->> > Adiantum's security is reducible to that of XChaCha12 and AES-256,
->> > subject to a security bound.  XChaCha12 itself has a security reductio=
-n
->> > to ChaCha12.  Therefore, one need not "trust" Adiantum; one need only
->> > trust ChaCha12 and AES-256.  Note that the =CE=B5A=E2=88=86U hash func=
-tion is only
->> > used for its proven combinatorical properties so cannot be "broken".
->> >
->>
->> So what happens if the part of the input covered by the block cipher
->> is identical between different generations of the same disk block
->> (whose sector count is used as the 'outer' IV). How are we not in the
->> same boat as before when using stream ciphers for disk encryption?
->>
->
-> This is the point of the hash step.  The value encrypted with the block c=
-ipher
-> to produce the intermediate value C_M (used as the stream cipher nonce) i=
-s
-> H(T, P_L) + P_R.  (T is the tweak a.k.a the IV, P_L is the plaintext exce=
-pt the
-> last 16 bytes, P_R is the last 16 bytes.)  A collision in this value occu=
-rs iff:
->
->         H(T1, P1_L) + P1_R =3D H(T2, P2_L) + P2_R
-> i.e.
->         H(T1, P1_L) - H(T2, P2_L) =3D P2_R - P1_R
->
-> If (T1, P1_L) =3D (T2, P2_L) then P1_R !=3D P2_R so the equation has no s=
-olutions
-> (since we don't consider queries where the whole input is the same; those
-> unavoidably produce the same ciphertext).  Otherwise (T1, P1_L) !=3D (T2,=
- P2_L),
-> and since the hash function H is =CE=B5-almost-=E2=88=86-universal over i=
-ntegers mod 2^128,
-> the equation is true for at most a very small proportion '=CE=B5' of hash=
- keys.
-> But, the hash key is chosen at random and is unknown to the attacker.
->
-> The same applies in the other direction, for chosen ciphertext attacks.
->
-> Basically, it's very difficult for an attacker to cause the intermediate =
-value
-> C_M to be reused, and the outputs will appear random until they do.
->
-> Of course, all this is explained much more precisely and comprehensively =
-in our
-> paper.  See section 5, "Security reduction".
->
+From: Eric Biggers <ebiggers@google.com>
 
-Thanks for the explanation. I saw that the result of the AES
-encryption was used as the XChaCha nonce, but I failed to spot that
-the result of the nhpoly1305 pass is added/subtracted to/from that
-particular block first.
+Add an ARM NEON implementation of NHPoly1305, an ε-almost-∆-universal
+hash function used in the Adiantum encryption mode.  For now, only the
+NH portion is actually NEON-accelerated; the Poly1305 part is less
+performance-critical so is just implemented in C.
 
-In any case, this looks good to me: as far as I can tell, the code
-implements the algorithm as described in the paper, and the plumbing
-into the crypto API looks correct to me as well.
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ arch/arm/crypto/Kconfig                |   5 ++
+ arch/arm/crypto/Makefile               |   2 +
+ arch/arm/crypto/nh-neon-core.S         | 116 +++++++++++++++++++++++++
+ arch/arm/crypto/nhpoly1305-neon-glue.c |  78 +++++++++++++++++
+ 4 files changed, 201 insertions(+)
+ create mode 100644 arch/arm/crypto/nh-neon-core.S
+ create mode 100644 arch/arm/crypto/nhpoly1305-neon-glue.c
 
-Reviewed-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-
-Whether the paper is correct is a different matter: it looks
-convincing to me but IANAC.
-
-The only request I have is to add a speed test to tcrypt as well so we
-can easily benchmark it.
+diff --git a/arch/arm/crypto/Kconfig b/arch/arm/crypto/Kconfig
+index cc932d9bba561..458562a34aabe 100644
+--- a/arch/arm/crypto/Kconfig
++++ b/arch/arm/crypto/Kconfig
+@@ -122,4 +122,9 @@ config CRYPTO_CHACHA20_NEON
+ 	select CRYPTO_BLKCIPHER
+ 	select CRYPTO_CHACHA20
+ 
++config CRYPTO_NHPOLY1305_NEON
++	tristate "NEON accelerated NHPoly1305 hash function (for Adiantum)"
++	depends on KERNEL_MODE_NEON
++	select CRYPTO_NHPOLY1305
++
+ endif
+diff --git a/arch/arm/crypto/Makefile b/arch/arm/crypto/Makefile
+index 005482ff95047..b65d6bfab8e6b 100644
+--- a/arch/arm/crypto/Makefile
++++ b/arch/arm/crypto/Makefile
+@@ -10,6 +10,7 @@ obj-$(CONFIG_CRYPTO_SHA1_ARM_NEON) += sha1-arm-neon.o
+ obj-$(CONFIG_CRYPTO_SHA256_ARM) += sha256-arm.o
+ obj-$(CONFIG_CRYPTO_SHA512_ARM) += sha512-arm.o
+ obj-$(CONFIG_CRYPTO_CHACHA20_NEON) += chacha-neon.o
++obj-$(CONFIG_CRYPTO_NHPOLY1305_NEON) += nhpoly1305-neon.o
+ 
+ ce-obj-$(CONFIG_CRYPTO_AES_ARM_CE) += aes-arm-ce.o
+ ce-obj-$(CONFIG_CRYPTO_SHA1_ARM_CE) += sha1-arm-ce.o
+@@ -53,6 +54,7 @@ ghash-arm-ce-y	:= ghash-ce-core.o ghash-ce-glue.o
+ crct10dif-arm-ce-y	:= crct10dif-ce-core.o crct10dif-ce-glue.o
+ crc32-arm-ce-y:= crc32-ce-core.o crc32-ce-glue.o
+ chacha-neon-y := chacha-neon-core.o chacha-neon-glue.o
++nhpoly1305-neon-y := nh-neon-core.o nhpoly1305-neon-glue.o
+ 
+ ifdef REGENERATE_ARM_CRYPTO
+ quiet_cmd_perl = PERL    $@
+diff --git a/arch/arm/crypto/nh-neon-core.S b/arch/arm/crypto/nh-neon-core.S
+new file mode 100644
+index 0000000000000..434d80ab531c2
+--- /dev/null
++++ b/arch/arm/crypto/nh-neon-core.S
+@@ -0,0 +1,116 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * NH - ε-almost-universal hash function, NEON accelerated version
++ *
++ * Copyright 2018 Google LLC
++ *
++ * Author: Eric Biggers <ebiggers@google.com>
++ */
++
++#include <linux/linkage.h>
++
++	.text
++	.fpu		neon
++
++	KEY		.req	r0
++	MESSAGE		.req	r1
++	MESSAGE_LEN	.req	r2
++	HASH		.req	r3
++
++	PASS0_SUMS	.req	q0
++	PASS0_SUM_A	.req	d0
++	PASS0_SUM_B	.req	d1
++	PASS1_SUMS	.req	q1
++	PASS1_SUM_A	.req	d2
++	PASS1_SUM_B	.req	d3
++	PASS2_SUMS	.req	q2
++	PASS2_SUM_A	.req	d4
++	PASS2_SUM_B	.req	d5
++	PASS3_SUMS	.req	q3
++	PASS3_SUM_A	.req	d6
++	PASS3_SUM_B	.req	d7
++	K0		.req	q4
++	K1		.req	q5
++	K2		.req	q6
++	K3		.req	q7
++	T0		.req	q8
++	T0_L		.req	d16
++	T0_H		.req	d17
++	T1		.req	q9
++	T1_L		.req	d18
++	T1_H		.req	d19
++	T2		.req	q10
++	T2_L		.req	d20
++	T2_H		.req	d21
++	T3		.req	q11
++	T3_L		.req	d22
++	T3_H		.req	d23
++
++.macro _nh_stride	k0, k1, k2, k3
++
++	// Load next message stride
++	vld1.8		{T3}, [MESSAGE]!
++
++	// Load next key stride
++	vld1.32		{\k3}, [KEY]!
++
++	// Add message words to key words
++	vadd.u32	T0, T3, \k0
++	vadd.u32	T1, T3, \k1
++	vadd.u32	T2, T3, \k2
++	vadd.u32	T3, T3, \k3
++
++	// Multiply 32x32 => 64 and accumulate
++	vmlal.u32	PASS0_SUMS, T0_L, T0_H
++	vmlal.u32	PASS1_SUMS, T1_L, T1_H
++	vmlal.u32	PASS2_SUMS, T2_L, T2_H
++	vmlal.u32	PASS3_SUMS, T3_L, T3_H
++.endm
++
++/*
++ * void nh_neon(const u32 *key, const u8 *message, size_t message_len,
++ *		u8 hash[NH_HASH_BYTES])
++ *
++ * It's guaranteed that message_len % 16 == 0.
++ */
++ENTRY(nh_neon)
++
++	vld1.32		{K0,K1}, [KEY]!
++	  vmov.u64	PASS0_SUMS, #0
++	  vmov.u64	PASS1_SUMS, #0
++	vld1.32		{K2}, [KEY]!
++	  vmov.u64	PASS2_SUMS, #0
++	  vmov.u64	PASS3_SUMS, #0
++
++	subs		MESSAGE_LEN, MESSAGE_LEN, #64
++	blt		.Lloop4_done
++.Lloop4:
++	_nh_stride	K0, K1, K2, K3
++	_nh_stride	K1, K2, K3, K0
++	_nh_stride	K2, K3, K0, K1
++	_nh_stride	K3, K0, K1, K2
++	subs		MESSAGE_LEN, MESSAGE_LEN, #64
++	bge		.Lloop4
++
++.Lloop4_done:
++	ands		MESSAGE_LEN, MESSAGE_LEN, #63
++	beq		.Ldone
++	_nh_stride	K0, K1, K2, K3
++
++	subs		MESSAGE_LEN, MESSAGE_LEN, #16
++	beq		.Ldone
++	_nh_stride	K1, K2, K3, K0
++
++	subs		MESSAGE_LEN, MESSAGE_LEN, #16
++	beq		.Ldone
++	_nh_stride	K2, K3, K0, K1
++
++.Ldone:
++	// Sum the accumulators for each pass, then store the sums to 'hash'
++	vadd.u64	T0_L, PASS0_SUM_A, PASS0_SUM_B
++	vadd.u64	T0_H, PASS1_SUM_A, PASS1_SUM_B
++	vadd.u64	T1_L, PASS2_SUM_A, PASS2_SUM_B
++	vadd.u64	T1_H, PASS3_SUM_A, PASS3_SUM_B
++	vst1.8		{T0-T1}, [HASH]
++	bx		lr
++ENDPROC(nh_neon)
+diff --git a/arch/arm/crypto/nhpoly1305-neon-glue.c b/arch/arm/crypto/nhpoly1305-neon-glue.c
+new file mode 100644
+index 0000000000000..df48a00f4c50f
+--- /dev/null
++++ b/arch/arm/crypto/nhpoly1305-neon-glue.c
+@@ -0,0 +1,78 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * NHPoly1305 - ε-almost-∆-universal hash function for Adiantum
++ * (NEON accelerated version)
++ *
++ * Copyright 2018 Google LLC
++ */
++
++#include <asm/neon.h>
++#include <asm/simd.h>
++#include <crypto/internal/hash.h>
++#include <crypto/nhpoly1305.h>
++#include <linux/module.h>
++
++asmlinkage void nh_neon(const u32 *key, const u8 *message, size_t message_len,
++			u8 hash[NH_HASH_BYTES]);
++
++static void _nh_neon(const u32 *key, const u8 *message, size_t message_len,
++		     __le64 hash[NH_NUM_PASSES])
++{
++	nh_neon(key, message, message_len, (u8 *)hash);
++}
++
++static int nhpoly1305_neon_update(struct shash_desc *desc,
++				  const u8 *src, unsigned int srclen)
++{
++	if (srclen < 64 || !may_use_simd())
++		return crypto_nhpoly1305_update(desc, src, srclen);
++
++	do {
++		unsigned int n = min_t(unsigned int, srclen, PAGE_SIZE);
++
++		kernel_neon_begin();
++		crypto_nhpoly1305_update_helper(desc, src, n, _nh_neon);
++		kernel_neon_end();
++		src += n;
++		srclen -= n;
++	} while (srclen);
++	return 0;
++}
++
++static struct shash_alg nhpoly1305_alg = {
++	.digestsize	= POLY1305_DIGEST_SIZE,
++	.init		= crypto_nhpoly1305_init,
++	.update		= nhpoly1305_neon_update,
++	.final		= crypto_nhpoly1305_final,
++	.setkey		= crypto_nhpoly1305_setkey,
++	.descsize	= sizeof(struct nhpoly1305_state),
++	.base		= {
++		.cra_name		= "nhpoly1305",
++		.cra_driver_name	= "nhpoly1305-neon",
++		.cra_priority		= 200,
++		.cra_ctxsize		= sizeof(struct nhpoly1305_key),
++		.cra_module		= THIS_MODULE,
++	},
++};
++
++static int __init nhpoly1305_mod_init(void)
++{
++	if (!(elf_hwcap & HWCAP_NEON))
++		return -ENODEV;
++
++	return crypto_register_shash(&nhpoly1305_alg);
++}
++
++static void __exit nhpoly1305_mod_exit(void)
++{
++	crypto_unregister_shash(&nhpoly1305_alg);
++}
++
++module_init(nhpoly1305_mod_init);
++module_exit(nhpoly1305_mod_exit);
++
++MODULE_DESCRIPTION("NHPoly1305 ε-almost-∆-universal hash function (NEON-accelerated)");
++MODULE_LICENSE("GPL v2");
++MODULE_AUTHOR("Eric Biggers <ebiggers@google.com>");
++MODULE_ALIAS_CRYPTO("nhpoly1305");
++MODULE_ALIAS_CRYPTO("nhpoly1305-neon");
+-- 
+2.19.1.331.ge82ca0e54c-goog
