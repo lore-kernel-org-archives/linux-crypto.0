@@ -1,59 +1,136 @@
-Return-Path: <SRS0=YnV0=NF=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from imap.thunk.org ([74.207.234.97]:57214 "EHLO imap.thunk.org"
+Return-Path: <SRS0=18ZD=M3=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:53982 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727367AbeJZACX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 25 Oct 2018 20:02:23 -0400
-Date: Thu, 25 Oct 2018 11:28:56 -0400
-From: "Theodore Y. Ts'o" <tytso@mit.edu>
-To: Rob Herring <robh@kernel.org>
-Cc: AnilKumar Chimata <anilc@codeaurora.org>, andy.gross@linaro.org,
-        david.brown@linaro.org, mark.rutland@arm.com,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        linux-soc@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 3/3] crypto: qce: ice: Add support for Inline Crypto
- Engine
-Message-ID: <20181025152856.GD4970@thunk.org>
-References: <1539789476-6098-1-git-send-email-anilc@codeaurora.org>
- <1539789476-6098-4-git-send-email-anilc@codeaurora.org>
- <20181025145548.GA30244@bogus>
+        id S1726639AbeJPBms (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 15 Oct 2018 21:42:48 -0400
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org
+Cc: linux-fscrypt@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Paul Crowley <paulcrowley@google.com>,
+        Greg Kaiser <gkaiser@google.com>,
+        Michael Halcrow <mhalcrow@google.com>,
+        "Jason A . Donenfeld" <Jason@zx2c4.com>,
+        Samuel Neves <samuel.c.p.neves@gmail.com>,
+        Tomer Ashur <tomer.ashur@esat.kuleuven.be>
+Subject: [RFC PATCH v2 01/12] crypto: chacha20-generic - add HChaCha20 library function
+Date: Mon, 15 Oct 2018 10:54:13 -0700
+Message-Id: <20181015175424.97147-2-ebiggers@kernel.org>
+In-Reply-To: <20181015175424.97147-1-ebiggers@kernel.org>
+References: <20181015175424.97147-1-ebiggers@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181025145548.GA30244@bogus>
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Oct 25, 2018 at 09:55:48AM -0500, Rob Herring wrote:
-> > +Introduction:
-> > +=============
-> > +Storage encryption has been one of the most required feature from security
-> > +point of view. QTI based storage encryption solution uses general purpose
-> > +crypto engine. While this kind of solution provide a decent amount of
-> > +performance, it falls short as storage speed is improving significantly
-> > +continuously. To overcome performance degradation, newer chips are going to
-> > +have Inline Crypto Engine (ICE) embedded into storage device. ICE is supposed
-> > +to meet the line speed of storage devices.
-> 
-> Is ICE part of the storage device or part of the host as the binding 
-> suggests?
+From: Eric Biggers <ebiggers@google.com>
 
-My understanding is that for this particular instantiation, the Inline
-Crypto Engine is located on the SOC.
+Refactor the unkeyed permutation part of chacha20_block() into its own
+function, then add hchacha20_block() which is the ChaCha equivalent of
+HSalsa20 and is an intermediate step towards XChaCha20 (see
+https://cr.yp.to/snuffle/xsalsa-20081128.pdf).  HChaCha20 skips the
+final addition of the initial state, and outputs only certain words of
+the state.  It should not be used for streaming directly.
 
-However, from the perspective of generic kernel support, the inline
-crypto support could be implemented on the SOC, or in the host bus
-adaptor, or as a "bump in the wire", or on the storage device.  And
-whatever abstract interface in the block layer should be able to
-support all of these cases.
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ include/crypto/chacha20.h |  2 ++
+ lib/chacha20.c            | 50 ++++++++++++++++++++++++++++++++++-----
+ 2 files changed, 46 insertions(+), 6 deletions(-)
 
-I do not believe it would be wise to assume that inline crypto will
-forever be a mobile-only thing.  I could easily see use cases in the
-data center; for example, if you believe that Nation State Actors
-might be trying to create "implants" that attack hard drive firmware,
-per some of the Snowden leaks, creating an open design ICE engine with
-auditable firmware and a trusted secure key store, and which sits
-between the host CPU and the storage device might be one way to
-mitigate against this threat.
-
-					- Ted
+diff --git a/include/crypto/chacha20.h b/include/crypto/chacha20.h
+index f76302d99e2be..fbec4e6a87890 100644
+--- a/include/crypto/chacha20.h
++++ b/include/crypto/chacha20.h
+@@ -19,6 +19,8 @@ struct chacha20_ctx {
+ };
+ 
+ void chacha20_block(u32 *state, u8 *stream);
++void hchacha20_block(const u32 *in, u32 *out);
++
+ void crypto_chacha20_init(u32 *state, struct chacha20_ctx *ctx, u8 *iv);
+ int crypto_chacha20_setkey(struct crypto_skcipher *tfm, const u8 *key,
+ 			   unsigned int keysize);
+diff --git a/lib/chacha20.c b/lib/chacha20.c
+index d907fec6a9ed1..6a484e16171d1 100644
+--- a/lib/chacha20.c
++++ b/lib/chacha20.c
+@@ -1,5 +1,5 @@
+ /*
+- * ChaCha20 256-bit cipher algorithm, RFC7539
++ * The "hash function" used as the core of the ChaCha20 stream cipher (RFC7539)
+  *
+  * Copyright (C) 2015 Martin Willi
+  *
+@@ -16,14 +16,10 @@
+ #include <asm/unaligned.h>
+ #include <crypto/chacha20.h>
+ 
+-void chacha20_block(u32 *state, u8 *stream)
++static void chacha20_permute(u32 *x)
+ {
+-	u32 x[16];
+ 	int i;
+ 
+-	for (i = 0; i < ARRAY_SIZE(x); i++)
+-		x[i] = state[i];
+-
+ 	for (i = 0; i < 20; i += 2) {
+ 		x[0]  += x[4];    x[12] = rol32(x[12] ^ x[0],  16);
+ 		x[1]  += x[5];    x[13] = rol32(x[13] ^ x[1],  16);
+@@ -65,6 +61,25 @@ void chacha20_block(u32 *state, u8 *stream)
+ 		x[8]  += x[13];   x[7]  = rol32(x[7]  ^ x[8],   7);
+ 		x[9]  += x[14];   x[4]  = rol32(x[4]  ^ x[9],   7);
+ 	}
++}
++
++/**
++ * chacha20_block - generate one keystream block and increment block counter
++ * @state: input state matrix (16 32-bit words)
++ * @stream: output keystream block (64 bytes)
++ *
++ * This is the ChaCha20 core, a function from 64-byte strings to 64-byte
++ * strings.  The caller has already converted the endianness of the input.  This
++ * function also handles incrementing the block counter in the input matrix.
++ */
++void chacha20_block(u32 *state, u8 *stream)
++{
++	u32 x[16];
++	int i;
++
++	memcpy(x, state, 64);
++
++	chacha20_permute(x);
+ 
+ 	for (i = 0; i < ARRAY_SIZE(x); i++)
+ 		put_unaligned_le32(x[i] + state[i], &stream[i * sizeof(u32)]);
+@@ -72,3 +87,26 @@ void chacha20_block(u32 *state, u8 *stream)
+ 	state[12]++;
+ }
+ EXPORT_SYMBOL(chacha20_block);
++
++/**
++ * hchacha20_block - abbreviated ChaCha20 core, for XChaCha20
++ * @in: input state matrix (16 32-bit words)
++ * @out: output (8 32-bit words)
++ *
++ * HChaCha20 is the ChaCha equivalent of HSalsa20 and is an intermediate step
++ * towards XChaCha20 (see https://cr.yp.to/snuffle/xsalsa-20081128.pdf).
++ * HChaCha20 skips the final addition of the initial state, and outputs only
++ * certain words of the state.  It should not be used for streaming directly.
++ */
++void hchacha20_block(const u32 *in, u32 *out)
++{
++	u32 x[16];
++
++	memcpy(x, in, 64);
++
++	chacha20_permute(x);
++
++	memcpy(&out[0], &x[0], 16);
++	memcpy(&out[4], &x[12], 16);
++}
++EXPORT_SYMBOL(hchacha20_block);
+-- 
+2.19.1.331.ge82ca0e54c-goog
