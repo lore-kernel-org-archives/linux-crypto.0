@@ -1,66 +1,71 @@
-Return-Path: <SRS0=YnV0=NF=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-ot1-f68.google.com ([209.85.210.68]:46419 "EHLO
-        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727394AbeJYX3A (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 25 Oct 2018 19:29:00 -0400
-Date: Thu, 25 Oct 2018 09:55:48 -0500
-From: Rob Herring <robh@kernel.org>
-To: AnilKumar Chimata <anilc@codeaurora.org>
-Cc: andy.gross@linaro.org, david.brown@linaro.org,
-        mark.rutland@arm.com, herbert@gondor.apana.org.au,
-        davem@davemloft.net, linux-soc@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 3/3] crypto: qce: ice: Add support for Inline Crypto
- Engine
-Message-ID: <20181025145548.GA30244@bogus>
-References: <1539789476-6098-1-git-send-email-anilc@codeaurora.org>
- <1539789476-6098-4-git-send-email-anilc@codeaurora.org>
+Return-Path: <SRS0=anrJ=M4=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail-eopbgr60080.outbound.protection.outlook.com ([40.107.6.80]:19693
+        "EHLO EUR04-DB3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726986AbeJPXsu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 16 Oct 2018 19:48:50 -0400
+From: Leonard Crestez <leonard.crestez@nxp.com>
+To: Shawn Guo <shawnguo@kernel.org>,
+        Fabio Estevam <fabio.estevam@nxp.com>
+CC: Rob Herring <robh+dt@kernel.org>,
+        Marek Vasut <marek.vasut@gmail.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Horia Geanta <horia.geanta@nxp.com>,
+        Franck Lenormand <franck.lenormand@nxp.com>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        "David S . Miller " <davem@davemloft.net>,
+        Mark Rutland <mark.rutland@arm.com>,
+        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-arm-kernel@lists.infradead.org"
+        <linux-arm-kernel@lists.infradead.org>,
+        dl-linux-imx <linux-imx@nxp.com>,
+        "kernel@pengutronix.de" <kernel@pengutronix.de>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: [PATCH v3 0/4] Port mxs-dcp to imx6ull and imx6sll
+Date: Tue, 16 Oct 2018 15:57:40 +0000
+Message-ID: <cover.1539705285.git.leonard.crestez@nxp.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1539789476-6098-4-git-send-email-anilc@codeaurora.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Oct 17, 2018 at 08:47:56PM +0530, AnilKumar Chimata wrote:
-> This patch adds support for Inline Crypto Engine (ICE), which
-> is embedded into storage device/controller such as UFS/eMMC.
-> ICE is intended for high throughput cryptographic encryption
-> or decryption of storage data.
-> 
-> Signed-off-by: AnilKumar Chimata <anilc@codeaurora.org>
-> ---
->  Documentation/crypto/msm/ice.txt |  235 ++++++
->  drivers/crypto/Kconfig           |   10 +
->  drivers/crypto/qce/Makefile      |    1 +
->  drivers/crypto/qce/ice.c         | 1613 ++++++++++++++++++++++++++++++++++++++
->  drivers/crypto/qce/iceregs.h     |  159 ++++
->  include/crypto/ice.h             |   80 ++
->  6 files changed, 2098 insertions(+)
->  create mode 100644 Documentation/crypto/msm/ice.txt
->  create mode 100644 drivers/crypto/qce/ice.c
->  create mode 100644 drivers/crypto/qce/iceregs.h
->  create mode 100644 include/crypto/ice.h
-> 
-> diff --git a/Documentation/crypto/msm/ice.txt b/Documentation/crypto/msm/ice.txt
-> new file mode 100644
-> index 0000000..58f7081
-> --- /dev/null
-> +++ b/Documentation/crypto/msm/ice.txt
-> @@ -0,0 +1,235 @@
-> +Introduction:
-> +=============
-> +Storage encryption has been one of the most required feature from security
-> +point of view. QTI based storage encryption solution uses general purpose
-> +crypto engine. While this kind of solution provide a decent amount of
-> +performance, it falls short as storage speed is improving significantly
-> +continuously. To overcome performance degradation, newer chips are going to
-> +have Inline Crypto Engine (ICE) embedded into storage device. ICE is supposed
-> +to meet the line speed of storage devices.
+The DCP block is present on 6sll and 6ull but not enabled. The hardware is
+mostly compatible with 6sl, the only important difference is that explicit
+clock enabling is required.
 
-Is ICE part of the storage device or part of the host as the binding 
-suggests?
+There were several issues with the functionality of this driver (it didn't
+even probe properly) but they are fixed in cryptodev/master by this series:
+    https://lore.kernel.org/patchwork/cover/994874/
 
-Rob
+---
+Changes since v2:
+ * Rename 6ull dcp node to crypto@*
+ * Use clk_prepare_enable on probe
+ * Fix not unpreparing on remove
+ * Realign dcp_clk struct member with rest of attributes (using tabs)
+ * Link to v2: https://lore.kernel.org/patchwork/cover/999795/
+
+Changes since v1:
+ * Add devicetree maintainers for dt-bindings
+ * Add a patch enabling in imx_v6_v7_defconfig. Since tcrypt now passes thi=
+s
+shouldn't cause any issues
+ * Link to v1: https://lore.kernel.org/patchwork/cover/994893/
+
+Leonard Crestez (4):
+  dt-bindings: crypto: Mention clocks for mxs-dcp
+  crypto: mxs-dcp - Add support for dcp clk
+  ARM: dts: imx6ull: Add dcp node
+  ARM: imx_v6_v7_defconfig: Enable CRYPTO_DEV_MXS_DCP
+
+ .../devicetree/bindings/crypto/fsl-dcp.txt        |  2 ++
+ arch/arm/boot/dts/imx6ull.dtsi                    | 10 ++++++++++
+ arch/arm/configs/imx_v6_v7_defconfig              |  1 +
+ drivers/crypto/mxs-dcp.c                          | 15 +++++++++++++++
+ 4 files changed, 28 insertions(+)
+
+--=20
+2.17.1
