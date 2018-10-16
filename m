@@ -1,49 +1,47 @@
-Return-Path: <SRS0=GKHD=M7=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:49172 "EHLO mail.kernel.org"
+Return-Path: <SRS0=anrJ=M4=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from foss.arm.com ([217.140.101.70]:36436 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726455AbeJTEii (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 20 Oct 2018 00:38:38 -0400
-Date: Fri, 19 Oct 2018 13:30:58 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc: "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Paul Crowley <paulcrowley@google.com>
-Subject: Re: [PATCH v3 2/2] crypto: arm/aes - add some hardening against
- cache-timing attacks
-Message-ID: <20181019203056.GC246441@gmail.com>
-References: <20181018043759.7669-1-ebiggers@kernel.org>
- <20181018043759.7669-3-ebiggers@kernel.org>
- <CAKv+Gu9XJ0k82ZNPRirs3Qhda3375CUA8uhJmsK85=1a9VmaNQ@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAKv+Gu9XJ0k82ZNPRirs3Qhda3375CUA8uhJmsK85=1a9VmaNQ@mail.gmail.com>
+        id S1727003AbeJPV0S (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 16 Oct 2018 17:26:18 -0400
+From: Gilad Ben-Yossef <gilad@benyossef.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>
+Cc: Ofir Drang <Ofir.Drang@arm.com>, Yael Chemla <Yael.Chemla@arm.com>,
+        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH 2/3] crypto: ccree: add dt bindings for ccree 713
+Date: Tue, 16 Oct 2018 14:35:32 +0100
+Message-Id: <1539696935-4433-3-git-send-email-gilad@benyossef.com>
+In-Reply-To: <1539696935-4433-1-git-send-email-gilad@benyossef.com>
+References: <1539696935-4433-1-git-send-email-gilad@benyossef.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Oct 19, 2018 at 01:41:35PM +0800, Ard Biesheuvel wrote:
-> On 18 October 2018 at 12:37, Eric Biggers <ebiggers@kernel.org> wrote:
-> > From: Eric Biggers <ebiggers@google.com>
-> >
-> > Make the ARM scalar AES implementation closer to constant-time by
-> > disabling interrupts and prefetching the tables into L1 cache.  This is
-> > feasible because due to ARM's "free" rotations, the main tables are only
-> > 1024 bytes instead of the usual 4096 used by most AES implementations.
-> >
-> > On ARM Cortex-A7, the speed loss is only about 5%.  The resulting code
-> > is still over twice as fast as aes_ti.c.  Responsiveness is potentially
-> > a concern, but interrupts are only disabled for a single AES block.
-> >
-> 
-> So that would be in the order of 700 cycles, based on the numbers you
-> shared in v1 of the aes_ti.c patch. Does that sound about right? So
-> that would be around 1 microsecond, which is really not a number to
-> obsess about imo.
-> 
+Add device tree bindings associating Arm TrustZone CryptoCell 713 with the
+ccree driver.
 
-Correct, on ARM Cortex-A7 I'm seeing slightly over 700 cycles per block
-encrypted or decrypted, including the prefetching.
+Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+---
+ Documentation/devicetree/bindings/crypto/arm-cryptocell.txt | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-- Eric
+diff --git a/Documentation/devicetree/bindings/crypto/arm-cryptocell.txt b/Documentation/devicetree/bindings/crypto/arm-cryptocell.txt
+index 999fb2a..880de07 100644
+--- a/Documentation/devicetree/bindings/crypto/arm-cryptocell.txt
++++ b/Documentation/devicetree/bindings/crypto/arm-cryptocell.txt
+@@ -1,8 +1,9 @@
+ Arm TrustZone CryptoCell cryptographic engine
+ 
+ Required properties:
+-- compatible: Should be one of: "arm,cryptocell-712-ree",
+-  "arm,cryptocell-710-ree" or "arm,cryptocell-630p-ree".
++- compatible: Should be one of: "arm,cryptocell-713-ree",
++  "arm,cryptocell-712-ree", "arm,cryptocell-710-ree" or
++  "arm,cryptocell-630p-ree".
+ - reg: Base physical address of the engine and length of memory mapped region.
+ - interrupts: Interrupt number for the device.
+ 
+-- 
+2.7.4
