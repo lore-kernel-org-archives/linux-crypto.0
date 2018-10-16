@@ -1,51 +1,46 @@
 Return-Path: <SRS0=anrJ=M4=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from gateway22.websitewelcome.com ([192.185.46.152]:32215 "EHLO
-        gateway22.websitewelcome.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727165AbeJQD7o (ORCPT
+Received: from mail-ot1-f65.google.com ([209.85.210.65]:42052 "EHLO
+        mail-ot1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726986AbeJPXzX (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 16 Oct 2018 23:59:44 -0400
-Received: from cm15.websitewelcome.com (cm15.websitewelcome.com [100.42.49.9])
-        by gateway22.websitewelcome.com (Postfix) with ESMTP id 9A30110E12
-        for <linux-crypto@vger.kernel.org>; Tue, 16 Oct 2018 14:44:18 -0500 (CDT)
-Subject: Re: [PATCH] crypto: inside-secure: safexcel - fix memory allocation
-To: Kees Cook <keescook@chromium.org>
-Cc: Antoine Tenart <antoine.tenart@bootlin.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-References: <20181008191712.GA12892@embeddedor.com>
- <CAGXu5j+a=81mGFrF5igMXe46mv_PsqzUKCzLWj0oCEMk1PY62g@mail.gmail.com>
-From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-Message-ID: <9fa270bc-502d-5ff5-2acb-88ababcc9262@embeddedor.com>
-Date: Tue, 16 Oct 2018 21:44:02 +0200
+        Tue, 16 Oct 2018 19:55:23 -0400
 MIME-Version: 1.0
-In-Reply-To: <CAGXu5j+a=81mGFrF5igMXe46mv_PsqzUKCzLWj0oCEMk1PY62g@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
+References: <cover.1539705285.git.leonard.crestez@nxp.com> <ef03e230d0bb76d830c123bc47e6bd6e7bf17826.1539705286.git.leonard.crestez@nxp.com>
+In-Reply-To: <ef03e230d0bb76d830c123bc47e6bd6e7bf17826.1539705286.git.leonard.crestez@nxp.com>
+From: Fabio Estevam <festevam@gmail.com>
+Date: Tue, 16 Oct 2018 13:04:24 -0300
+Message-ID: <CAOMZO5A+Uc5in-PXnfe+XoFMtRmCxGOryXE9=mjB+aRHo+ZBEQ@mail.gmail.com>
+Subject: Re: [PATCH v3 3/4] ARM: dts: imx6ull: Add dcp node
+To: Leonard Crestez <leonard.crestez@nxp.com>
+Cc: Shawn Guo <shawnguo@kernel.org>,
+        Fabio Estevam <fabio.estevam@nxp.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Marek Vasut <marek.vasut@gmail.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Horia Geanta Neag <horia.geanta@nxp.com>,
+        Franck LENORMAND <franck.lenormand@nxp.com>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Mark Rutland <mark.rutland@arm.com>,
+        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS"
+        <devicetree@vger.kernel.org>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>,
+        "moderated list:ARM/FREESCALE IMX / MXC ARM ARCHITECTURE"
+        <linux-arm-kernel@lists.infradead.org>,
+        NXP Linux Team <linux-imx@nxp.com>,
+        Sascha Hauer <kernel@pengutronix.de>,
+        linux-kernel <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi all,
+On Tue, Oct 16, 2018 at 12:59 PM Leonard Crestez
+<leonard.crestez@nxp.com> wrote:
+>
+> The DCP block on 6ull has no major differences other than requiring
+> explicit clock enabling.
+>
+> Signed-off-by: Leonard Crestez <leonard.crestez@nxp.com>
 
-On 10/9/18 12:20 AM, Kees Cook wrote:
-> On Mon, Oct 8, 2018 at 12:17 PM, Gustavo A. R. Silva
-> <gustavo@embeddedor.com> wrote:
->> The original intention is to allocate space for EIP197_DEFAULT_RING_SIZE
->> *pointers* to struct, so sizeof(priv->ring[i].rdr_req) should be
->> sizeof(*priv->ring[i].rdr_req).
->>
->> Addresses-Coverity-ID: 1473962 ("Sizeof not portable")
->> Fixes: 9744fec95f06 ("crypto: inside-secure - remove request list to improve performance")
->> Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
-> 
-> Reviewed-by: Kees Cook <keescook@chromium.org>
-> 
-
-
-Friendly ping. Who can take this?
-
-Thanks!
---
-Gustavo
+Reviewed-by: Fabio Estevam <festevam@gmail.com>
