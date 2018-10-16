@@ -1,84 +1,173 @@
-Return-Path: <SRS0=Iqog=M5=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-yw1-f67.google.com ([209.85.161.67]:43982 "EHLO
-        mail-yw1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728202AbeJRCUA (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 17 Oct 2018 22:20:00 -0400
-Received: by mail-yw1-f67.google.com with SMTP id j75-v6so10752060ywj.10
-        for <linux-crypto@vger.kernel.org>; Wed, 17 Oct 2018 11:23:06 -0700 (PDT)
-Received: from mail-yw1-f48.google.com (mail-yw1-f48.google.com. [209.85.161.48])
-        by smtp.gmail.com with ESMTPSA id s15-v6sm6400220ywa.62.2018.10.17.11.23.03
-        for <linux-crypto@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 17 Oct 2018 11:23:03 -0700 (PDT)
-Received: by mail-yw1-f48.google.com with SMTP id d126-v6so10762499ywa.5
-        for <linux-crypto@vger.kernel.org>; Wed, 17 Oct 2018 11:23:03 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <0529a397-f104-5f3a-663e-7ef2d883dcb2@embeddedor.com>
-References: <20181008191712.GA12892@embeddedor.com> <CAGXu5j+a=81mGFrF5igMXe46mv_PsqzUKCzLWj0oCEMk1PY62g@mail.gmail.com>
- <9fa270bc-502d-5ff5-2acb-88ababcc9262@embeddedor.com> <20181017061741.qr23stkwqf36fet6@gondor.apana.org.au>
- <20181017072034.GD28572@kwain> <0529a397-f104-5f3a-663e-7ef2d883dcb2@embeddedor.com>
-From: Kees Cook <keescook@chromium.org>
-Date: Wed, 17 Oct 2018 11:23:02 -0700
-Message-ID: <CAGXu5jKL07_ofMpTbaH2E=JnWEF8Y=36T+sQ5m-aRke5H=3twA@mail.gmail.com>
-Subject: Re: [PATCH] crypto: inside-secure: safexcel - fix memory allocation
-To: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-Cc: Antoine Tenart <antoine.tenart@bootlin.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
+Return-Path: <SRS0=anrJ=M4=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from foss.arm.com ([217.140.101.70]:36446 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727003AbeJPV0X (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 16 Oct 2018 17:26:23 -0400
+From: Gilad Ben-Yossef <gilad@benyossef.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        linux-crypto <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>
+Cc: Ofir Drang <Ofir.Drang@arm.com>, Yael Chemla <Yael.Chemla@arm.com>,
+        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH 3/3] crypto: ccree: add SM4 support
+Date: Tue, 16 Oct 2018 14:35:33 +0100
+Message-Id: <1539696935-4433-4-git-send-email-gilad@benyossef.com>
+In-Reply-To: <1539696935-4433-1-git-send-email-gilad@benyossef.com>
+References: <1539696935-4433-1-git-send-email-gilad@benyossef.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Oct 17, 2018 at 7:41 AM, Gustavo A. R. Silva
-<gustavo@embeddedor.com> wrote:
->
->
-> On 10/17/18 9:20 AM, Antoine Tenart wrote:
->> Hi,
->>
->> On Wed, Oct 17, 2018 at 02:17:41PM +0800, Herbert Xu wrote:
->>> On Tue, Oct 16, 2018 at 09:44:02PM +0200, Gustavo A. R. Silva wrote:
->>>> On 10/9/18 12:20 AM, Kees Cook wrote:
->>>>> On Mon, Oct 8, 2018 at 12:17 PM, Gustavo A. R. Silva
->>>>> <gustavo@embeddedor.com> wrote:
->>>>>> The original intention is to allocate space for EIP197_DEFAULT_RING_SIZE
->>>>>> *pointers* to struct, so sizeof(priv->ring[i].rdr_req) should be
->>>>>> sizeof(*priv->ring[i].rdr_req).
->>>>>>
->>>>>> Addresses-Coverity-ID: 1473962 ("Sizeof not portable")
->>>>>> Fixes: 9744fec95f06 ("crypto: inside-secure - remove request list to improve performance")
->>>>>> Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
->>>>>
->>>>> Reviewed-by: Kees Cook <keescook@chromium.org>
->>>>>
->>>>
->>>>
->>>> Friendly ping. Who can take this?
->>>
->>> Well I tried to take it but it doesn't apply against cryptodev.
->>> So I presume this can go into the tree that carried the change
->>> which it depended on?
->>
->> I would say this should go in cryptodev. The issue is probably because
->> of other changes that got applied in the meantime. Gustavo can probably
->> rebase his patch on top of cryptodev, and re-send it.
->>
->
-> cryptodev is missing the previous commit 329e09893909d409039f6a79757d9b80b67efe39
-> to which this patch applies.
->
-> Kees, did you apply the commit above to your tree?
->
-> If so, could you take this patch?
+Add support for SM4 cipher in CryptoCell 713.
 
-Since this has no functional exposure (the sizes are the same), let's
-just wait until after the merge window to get this into crypto-next.
+Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+---
+ drivers/crypto/Kconfig                  |  1 +
+ drivers/crypto/ccree/cc_cipher.c        | 66 +++++++++++++++++++++++++++++++++
+ drivers/crypto/ccree/cc_hw_queue_defs.h |  3 ++
+ 3 files changed, 70 insertions(+)
 
--Kees
-
+diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+index bea4de6..c7e6f5d 100644
+--- a/drivers/crypto/Kconfig
++++ b/drivers/crypto/Kconfig
+@@ -751,6 +751,7 @@ config CRYPTO_DEV_CCREE
+ 	select CRYPTO_ECB
+ 	select CRYPTO_CTR
+ 	select CRYPTO_XTS
++	select CRYPTO_SM4
+ 	help
+ 	  Say 'Y' to enable a driver for the REE interface of the Arm
+ 	  TrustZone CryptoCell family of processors. Currently the
+diff --git a/drivers/crypto/ccree/cc_cipher.c b/drivers/crypto/ccree/cc_cipher.c
+index 7623b299..989e70f 100644
+--- a/drivers/crypto/ccree/cc_cipher.c
++++ b/drivers/crypto/ccree/cc_cipher.c
+@@ -7,6 +7,7 @@
+ #include <crypto/internal/skcipher.h>
+ #include <crypto/des.h>
+ #include <crypto/xts.h>
++#include <crypto/sm4.h>
+ #include <crypto/scatterwalk.h>
+ 
+ #include "cc_driver.h"
+@@ -83,6 +84,9 @@ static int validate_keys_sizes(struct cc_cipher_ctx *ctx_p, u32 size)
+ 		if (size == DES3_EDE_KEY_SIZE || size == DES_KEY_SIZE)
+ 			return 0;
+ 		break;
++	case S_DIN_to_SM4:
++		if (size == SM4_KEY_SIZE)
++			return 0;
+ 	default:
+ 		break;
+ 	}
+@@ -122,6 +126,17 @@ static int validate_data_size(struct cc_cipher_ctx *ctx_p,
+ 		if (IS_ALIGNED(size, DES_BLOCK_SIZE))
+ 			return 0;
+ 		break;
++	case S_DIN_to_SM4:
++		switch (ctx_p->cipher_mode) {
++		case DRV_CIPHER_CTR:
++			return 0;
++		case DRV_CIPHER_ECB:
++		case DRV_CIPHER_CBC:
++			if (IS_ALIGNED(size, SM4_BLOCK_SIZE))
++				return 0;
++		default:
++			break;
++		}
+ 	default:
+ 		break;
+ 	}
+@@ -522,6 +537,9 @@ static void cc_setup_cipher_data(struct crypto_tfm *tfm,
+ 	case S_DIN_to_DES:
+ 		flow_mode = DIN_DES_DOUT;
+ 		break;
++	case S_DIN_to_SM4:
++		flow_mode = DIN_SM4_DOUT;
++		break;
+ 	default:
+ 		dev_err(dev, "invalid flow mode, flow_mode = %d\n", flow_mode);
+ 		return;
+@@ -1324,6 +1342,54 @@ static const struct cc_alg_template skcipher_algs[] = {
+ 		.flow_mode = S_DIN_to_DES,
+ 		.min_hw_rev = CC_HW_REV_630,
+ 	},
++	{
++		.name = "cbc(sm4)",
++		.driver_name = "cbc-sm4-ccree",
++		.blocksize = SM4_BLOCK_SIZE,
++		.template_skcipher = {
++			.setkey = cc_cipher_setkey,
++			.encrypt = cc_cipher_encrypt,
++			.decrypt = cc_cipher_decrypt,
++			.min_keysize = SM4_KEY_SIZE,
++			.max_keysize = SM4_KEY_SIZE,
++			.ivsize = SM4_BLOCK_SIZE,
++			},
++		.cipher_mode = DRV_CIPHER_CBC,
++		.flow_mode = S_DIN_to_SM4,
++		.min_hw_rev = CC_HW_REV_713,
++	},
++	{
++		.name = "ecb(sm4)",
++		.driver_name = "ecb-sm4-ccree",
++		.blocksize = SM4_BLOCK_SIZE,
++		.template_skcipher = {
++			.setkey = cc_cipher_setkey,
++			.encrypt = cc_cipher_encrypt,
++			.decrypt = cc_cipher_decrypt,
++			.min_keysize = SM4_KEY_SIZE,
++			.max_keysize = SM4_KEY_SIZE,
++			.ivsize = 0,
++			},
++		.cipher_mode = DRV_CIPHER_ECB,
++		.flow_mode = S_DIN_to_SM4,
++		.min_hw_rev = CC_HW_REV_713,
++	},
++	{
++		.name = "ctr(sm4)",
++		.driver_name = "ctr-sm4-ccree",
++		.blocksize = SM4_BLOCK_SIZE,
++		.template_skcipher = {
++			.setkey = cc_cipher_setkey,
++			.encrypt = cc_cipher_encrypt,
++			.decrypt = cc_cipher_decrypt,
++			.min_keysize = SM4_KEY_SIZE,
++			.max_keysize = SM4_KEY_SIZE,
++			.ivsize = SM4_BLOCK_SIZE,
++			},
++		.cipher_mode = DRV_CIPHER_CTR,
++		.flow_mode = S_DIN_to_SM4,
++		.min_hw_rev = CC_HW_REV_713,
++	},
+ };
+ 
+ static struct cc_crypto_alg *cc_create_alg(const struct cc_alg_template *tmpl,
+diff --git a/drivers/crypto/ccree/cc_hw_queue_defs.h b/drivers/crypto/ccree/cc_hw_queue_defs.h
+index a091ae5..6bd1922 100644
+--- a/drivers/crypto/ccree/cc_hw_queue_defs.h
++++ b/drivers/crypto/ccree/cc_hw_queue_defs.h
+@@ -107,6 +107,7 @@ enum cc_flow_mode {
+ 	AES_to_AES_to_HASH_and_DOUT	= 13,
+ 	AES_to_AES_to_HASH	= 14,
+ 	AES_to_HASH_and_AES	= 15,
++	DIN_SM4_DOUT		= 16,
+ 	DIN_AES_AESMAC		= 17,
+ 	HASH_to_DOUT		= 18,
+ 	/* setup flows */
+@@ -114,9 +115,11 @@ enum cc_flow_mode {
+ 	S_DIN_to_AES2		= 33,
+ 	S_DIN_to_DES		= 34,
+ 	S_DIN_to_RC4		= 35,
++	S_DIN_to_SM4		= 36,
+ 	S_DIN_to_HASH		= 37,
+ 	S_AES_to_DOUT		= 38,
+ 	S_AES2_to_DOUT		= 39,
++	S_SM4_to_DOUT		= 40,
+ 	S_RC4_to_DOUT		= 41,
+ 	S_DES_to_DOUT		= 42,
+ 	S_HASH_to_DOUT		= 43,
 -- 
-Kees Cook
-Pixel Security
+2.7.4
