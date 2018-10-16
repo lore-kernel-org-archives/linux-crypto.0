@@ -1,81 +1,63 @@
-Return-Path: <SRS0=schb=NE=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from vmicros1.altlinux.org ([194.107.17.57]:45954 "EHLO
-        vmicros1.altlinux.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725979AbeJXLv2 (ORCPT
+Return-Path: <SRS0=anrJ=M4=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail-oi1-f196.google.com ([209.85.167.196]:38476 "EHLO
+        mail-oi1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726986AbeJPXyr (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 24 Oct 2018 07:51:28 -0400
-From: Vitaly Chikunov <vt@altlinux.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
+        Tue, 16 Oct 2018 19:54:47 -0400
+MIME-Version: 1.0
+References: <cover.1539705285.git.leonard.crestez@nxp.com> <dcbcaf888bbd0a35dcf34228df2d9eb4fd762ea7.1539705286.git.leonard.crestez@nxp.com>
+In-Reply-To: <dcbcaf888bbd0a35dcf34228df2d9eb4fd762ea7.1539705286.git.leonard.crestez@nxp.com>
+From: Fabio Estevam <festevam@gmail.com>
+Date: Tue, 16 Oct 2018 13:03:47 -0300
+Message-ID: <CAOMZO5Ck846zd_Xo=9sVK0EAxNLsUsWiC59H2Ms6x8xoD8iwWw@mail.gmail.com>
+Subject: Re: [PATCH v3 2/4] crypto: mxs-dcp - Add support for dcp clk
+To: Leonard Crestez <leonard.crestez@nxp.com>
+Cc: Shawn Guo <shawnguo@kernel.org>,
+        Fabio Estevam <fabio.estevam@nxp.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Marek Vasut <marek.vasut@gmail.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Horia Geanta Neag <horia.geanta@nxp.com>,
+        Franck LENORMAND <franck.lenormand@nxp.com>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
         "David S. Miller" <davem@davemloft.net>,
-        Philippe Ombredanne <pombredanne@nexb.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Kate Stewart <kstewart@linuxfoundation.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Vitaly Chikunov <vt@altlinux.org>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v3 2/3] crypto: streebog - register Streebog in hash info for IMA
-Date: Wed, 24 Oct 2018 06:23:50 +0300
-Message-Id: <20181024032356.3388-3-vt@altlinux.org>
-In-Reply-To: <20181024032356.3388-1-vt@altlinux.org>
-References: <20181024032356.3388-1-vt@altlinux.org>
+        Mark Rutland <mark.rutland@arm.com>,
+        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS"
+        <devicetree@vger.kernel.org>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>,
+        "moderated list:ARM/FREESCALE IMX / MXC ARM ARCHITECTURE"
+        <linux-arm-kernel@lists.infradead.org>,
+        NXP Linux Team <linux-imx@nxp.com>,
+        Sascha Hauer <kernel@pengutronix.de>,
+        linux-kernel <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Register Streebog hash function in Hash Info arrays to let IMA use
-it for its purposes.
+Hi Leonard,
 
-Signed-off-by: Vitaly Chikunov <vt@altlinux.org>
----
- crypto/hash_info.c             | 4 ++++
- include/crypto/hash_info.h     | 1 +
- include/uapi/linux/hash_info.h | 2 ++
- 3 files changed, 7 insertions(+)
+On Tue, Oct 16, 2018 at 12:58 PM Leonard Crestez
+<leonard.crestez@nxp.com> wrote:
 
-diff --git a/crypto/hash_info.c b/crypto/hash_info.c
-index 7b1e0b188ce6..b0b91eb0973a 100644
---- a/crypto/hash_info.c
-+++ b/crypto/hash_info.c
-@@ -32,6 +32,8 @@ const char *const hash_algo_name[HASH_ALGO__LAST] = {
- 	[HASH_ALGO_TGR_160]	= "tgr160",
- 	[HASH_ALGO_TGR_192]	= "tgr192",
- 	[HASH_ALGO_SM3_256]	= "sm3-256",
-+	[HASH_ALGO_SB256]	= "sb256",
-+	[HASH_ALGO_SB512]	= "sb512",
- };
- EXPORT_SYMBOL_GPL(hash_algo_name);
- 
-@@ -54,5 +56,7 @@ const int hash_digest_size[HASH_ALGO__LAST] = {
- 	[HASH_ALGO_TGR_160]	= TGR160_DIGEST_SIZE,
- 	[HASH_ALGO_TGR_192]	= TGR192_DIGEST_SIZE,
- 	[HASH_ALGO_SM3_256]	= SM3256_DIGEST_SIZE,
-+	[HASH_ALGO_SB256]	= STREEBOG256_DIGEST_SIZE,
-+	[HASH_ALGO_SB512]	= STREEBOG512_DIGEST_SIZE,
- };
- EXPORT_SYMBOL_GPL(hash_digest_size);
-diff --git a/include/crypto/hash_info.h b/include/crypto/hash_info.h
-index 56f217d41f12..91786b68dbdb 100644
---- a/include/crypto/hash_info.h
-+++ b/include/crypto/hash_info.h
-@@ -15,6 +15,7 @@
- 
- #include <crypto/sha.h>
- #include <crypto/md5.h>
-+#include <crypto/streebog.h>
- 
- #include <uapi/linux/hash_info.h>
- 
-diff --git a/include/uapi/linux/hash_info.h b/include/uapi/linux/hash_info.h
-index eea5d02c58de..5e8b8d952ba0 100644
---- a/include/uapi/linux/hash_info.h
-+++ b/include/uapi/linux/hash_info.h
-@@ -33,6 +33,8 @@ enum hash_algo {
- 	HASH_ALGO_TGR_160,
- 	HASH_ALGO_TGR_192,
- 	HASH_ALGO_SM3_256,
-+	HASH_ALGO_SB256,
-+	HASH_ALGO_SB512,
- 	HASH_ALGO__LAST
- };
- 
--- 
-2.11.0
+> +       /* DCP clock is optional, only used on some SOCs */
+> +       sdcp->dcp_clk = devm_clk_get(dev, "dcp");
+> +       if (IS_ERR(sdcp->dcp_clk)) {
+> +               if (sdcp->dcp_clk != ERR_PTR(-ENOENT))
+> +                       return PTR_ERR(sdcp->dcp_clk);
+> +               sdcp->dcp_clk = NULL;
+
+This dcp_clk assignment to NULL does not seem to be necessary.
+
+> +
+> +       ret = clk_prepare_enable(sdcp->dcp_clk);
+> +       if (ret)
+> +               return ret;
+>
+>         ret = devm_request_irq(dev, dcp_vmi_irq, mxs_dcp_irq, 0,
+>                                "dcp-vmi-irq", sdcp);
+>         if (ret) {
+>                 dev_err(dev, "Failed to claim DCP VMI IRQ!\n");
+
+In case of subsequent errors you should call
+clk_disable_unprepare(sdcp->dcp_clk).
