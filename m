@@ -1,47 +1,39 @@
-Return-Path: <SRS0=anrJ=M4=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from foss.arm.com ([217.140.101.70]:36436 "EHLO foss.arm.com"
+Return-Path: <SRS0=Iqog=M5=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:55418 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727003AbeJPV0S (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 16 Oct 2018 17:26:18 -0400
-From: Gilad Ben-Yossef <gilad@benyossef.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>
-Cc: Ofir Drang <Ofir.Drang@arm.com>, Yael Chemla <Yael.Chemla@arm.com>,
-        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH 2/3] crypto: ccree: add dt bindings for ccree 713
-Date: Tue, 16 Oct 2018 14:35:32 +0100
-Message-Id: <1539696935-4433-3-git-send-email-gilad@benyossef.com>
-In-Reply-To: <1539696935-4433-1-git-send-email-gilad@benyossef.com>
-References: <1539696935-4433-1-git-send-email-gilad@benyossef.com>
+        id S1726429AbeJQOMm (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 17 Oct 2018 10:12:42 -0400
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Paul Crowley <paulcrowley@google.com>
+Subject: [PATCH v2 0/2] crypto: some hardening against AES cache-timing attacks
+Date: Tue, 16 Oct 2018 23:18:11 -0700
+Message-Id: <20181017061813.32751-1-ebiggers@kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Add device tree bindings associating Arm TrustZone CryptoCell 713 with the
-ccree driver.
+This series makes the "aes-fixed-time" and "aes-arm" implementations of
+AES more resistant to cache-timing attacks.
 
-Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
----
- Documentation/devicetree/bindings/crypto/arm-cryptocell.txt | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+Note that even after these changes, the implementations still aren't
+necessarily guaranteed to be constant-time; see
+https://cr.yp.to/antiforgery/cachetiming-20050414.pdf for a discussion
+of the many difficulties involved in writing truly constant-time AES
+software.  But it's valuable to make such attacks more difficult.
 
-diff --git a/Documentation/devicetree/bindings/crypto/arm-cryptocell.txt b/Documentation/devicetree/bindings/crypto/arm-cryptocell.txt
-index 999fb2a..880de07 100644
---- a/Documentation/devicetree/bindings/crypto/arm-cryptocell.txt
-+++ b/Documentation/devicetree/bindings/crypto/arm-cryptocell.txt
-@@ -1,8 +1,9 @@
- Arm TrustZone CryptoCell cryptographic engine
- 
- Required properties:
--- compatible: Should be one of: "arm,cryptocell-712-ree",
--  "arm,cryptocell-710-ree" or "arm,cryptocell-630p-ree".
-+- compatible: Should be one of: "arm,cryptocell-713-ree",
-+  "arm,cryptocell-712-ree", "arm,cryptocell-710-ree" or
-+  "arm,cryptocell-630p-ree".
- - reg: Base physical address of the engine and length of memory mapped region.
- - interrupts: Interrupt number for the device.
- 
+Eric Biggers (2):
+  crypto: aes_ti - disable interrupts while accessing S-box
+  crypto: arm/aes - add some hardening against cache-timing attacks
+
+ arch/arm/crypto/aes-cipher-core.S | 26 ++++++++++++++++++++++++++
+ arch/arm/crypto/aes-cipher-glue.c | 13 +++++++++++++
+ crypto/aes_generic.c              |  9 +++++----
+ crypto/aes_ti.c                   | 18 ++++++++++++++++++
+ 4 files changed, 62 insertions(+), 4 deletions(-)
+
 -- 
-2.7.4
+2.19.1
