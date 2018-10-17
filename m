@@ -1,72 +1,109 @@
-Return-Path: <SRS0=anrJ=M4=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-eopbgr60080.outbound.protection.outlook.com ([40.107.6.80]:19693
-        "EHLO EUR04-DB3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727229AbeJPXtO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 16 Oct 2018 19:49:14 -0400
-From: Leonard Crestez <leonard.crestez@nxp.com>
-To: Shawn Guo <shawnguo@kernel.org>,
-        Fabio Estevam <fabio.estevam@nxp.com>
-CC: Rob Herring <robh+dt@kernel.org>,
-        Marek Vasut <marek.vasut@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Horia Geanta <horia.geanta@nxp.com>,
-        Franck Lenormand <franck.lenormand@nxp.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        "David S . Miller " <davem@davemloft.net>,
-        Mark Rutland <mark.rutland@arm.com>,
-        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-arm-kernel@lists.infradead.org"
-        <linux-arm-kernel@lists.infradead.org>,
-        dl-linux-imx <linux-imx@nxp.com>,
-        "kernel@pengutronix.de" <kernel@pengutronix.de>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: [PATCH v3 3/4] ARM: dts: imx6ull: Add dcp node
-Date: Tue, 16 Oct 2018 15:57:44 +0000
-Message-ID: <ef03e230d0bb76d830c123bc47e6bd6e7bf17826.1539705286.git.leonard.crestez@nxp.com>
-References: <cover.1539705285.git.leonard.crestez@nxp.com>
-In-Reply-To: <cover.1539705285.git.leonard.crestez@nxp.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+Return-Path: <SRS0=Iqog=M5=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:55434 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727173AbeJQOMn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 17 Oct 2018 10:12:43 -0400
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Paul Crowley <paulcrowley@google.com>
+Subject: [PATCH v2 1/2] crypto: aes_ti - disable interrupts while accessing S-box
+Date: Tue, 16 Oct 2018 23:18:12 -0700
+Message-Id: <20181017061813.32751-2-ebiggers@kernel.org>
+In-Reply-To: <20181017061813.32751-1-ebiggers@kernel.org>
+References: <20181017061813.32751-1-ebiggers@kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The DCP block on 6ull has no major differences other than requiring
-explicit clock enabling.
+From: Eric Biggers <ebiggers@google.com>
 
-Signed-off-by: Leonard Crestez <leonard.crestez@nxp.com>
+In the "aes-fixed-time" AES implementation, disable interrupts while
+accessing the S-box, in order to make cache-timing attacks more
+difficult.  Previously it was possible for the CPU to be interrupted
+while the S-box was loaded into L1 cache, potentially evicting the
+cachelines and causing later table lookups to be time-variant.
+
+In tests I did on x86 and ARM, this doesn't affect performance
+significantly.  Responsiveness is potentially a concern, but interrupts
+are only disabled for a single AES block.
+
+Note that even after this change, the implementation still isn't
+necessarily guaranteed to be constant-time; see
+https://cr.yp.to/antiforgery/cachetiming-20050414.pdf for a discussion
+of the many difficulties involved in writing truly constant-time AES
+software.  But it's valuable to make such attacks more difficult.
+
+Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- arch/arm/boot/dts/imx6ull.dtsi | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ crypto/aes_ti.c | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-diff --git a/arch/arm/boot/dts/imx6ull.dtsi b/arch/arm/boot/dts/imx6ull.dts=
-i
-index 796ed35d4ac9..f3668fe69eac 100644
---- a/arch/arm/boot/dts/imx6ull.dtsi
-+++ b/arch/arm/boot/dts/imx6ull.dtsi
-@@ -37,10 +37,20 @@
- 			#address-cells =3D <1>;
- 			#size-cells =3D <1>;
- 			reg =3D <0x02200000 0x100000>;
- 			ranges;
-=20
-+			dcp: crypto@2280000 {
-+				compatible =3D "fsl,imx6ull-dcp", "fsl,imx28-dcp";
-+				reg =3D <0x02280000 0x4000>;
-+				interrupts =3D <GIC_SPI 46 IRQ_TYPE_LEVEL_HIGH>,
-+					     <GIC_SPI 47 IRQ_TYPE_LEVEL_HIGH>,
-+					     <GIC_SPI 48 IRQ_TYPE_LEVEL_HIGH>;
-+				clocks =3D <&clks IMX6ULL_CLK_DCP_CLK>;
-+				clock-names =3D "dcp";
-+			};
+diff --git a/crypto/aes_ti.c b/crypto/aes_ti.c
+index 03023b2290e8..1ff9785b30f5 100644
+--- a/crypto/aes_ti.c
++++ b/crypto/aes_ti.c
+@@ -269,6 +269,7 @@ static void aesti_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
+ 	const u32 *rkp = ctx->key_enc + 4;
+ 	int rounds = 6 + ctx->key_length / 4;
+ 	u32 st0[4], st1[4];
++	unsigned long flags;
+ 	int round;
+ 
+ 	st0[0] = ctx->key_enc[0] ^ get_unaligned_le32(in);
+@@ -276,6 +277,12 @@ static void aesti_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
+ 	st0[2] = ctx->key_enc[2] ^ get_unaligned_le32(in + 8);
+ 	st0[3] = ctx->key_enc[3] ^ get_unaligned_le32(in + 12);
+ 
++	/*
++	 * Temporarily disable interrupts to avoid races where cachelines are
++	 * evicted when the CPU is interrupted to do something else.
++	 */
++	local_irq_save(flags);
 +
- 			iomuxc_snvs: iomuxc-snvs@2290000 {
- 				compatible =3D "fsl,imx6ull-iomuxc-snvs";
- 				reg =3D <0x02290000 0x4000>;
- 			};
-=20
---=20
-2.17.1
+ 	st0[0] ^= __aesti_sbox[ 0] ^ __aesti_sbox[128];
+ 	st0[1] ^= __aesti_sbox[32] ^ __aesti_sbox[160];
+ 	st0[2] ^= __aesti_sbox[64] ^ __aesti_sbox[192];
+@@ -300,6 +307,8 @@ static void aesti_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
+ 	put_unaligned_le32(subshift(st1, 1) ^ rkp[5], out + 4);
+ 	put_unaligned_le32(subshift(st1, 2) ^ rkp[6], out + 8);
+ 	put_unaligned_le32(subshift(st1, 3) ^ rkp[7], out + 12);
++
++	local_irq_restore(flags);
+ }
+ 
+ static void aesti_decrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
+@@ -308,6 +317,7 @@ static void aesti_decrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
+ 	const u32 *rkp = ctx->key_dec + 4;
+ 	int rounds = 6 + ctx->key_length / 4;
+ 	u32 st0[4], st1[4];
++	unsigned long flags;
+ 	int round;
+ 
+ 	st0[0] = ctx->key_dec[0] ^ get_unaligned_le32(in);
+@@ -315,6 +325,12 @@ static void aesti_decrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
+ 	st0[2] = ctx->key_dec[2] ^ get_unaligned_le32(in + 8);
+ 	st0[3] = ctx->key_dec[3] ^ get_unaligned_le32(in + 12);
+ 
++	/*
++	 * Temporarily disable interrupts to avoid races where cachelines are
++	 * evicted when the CPU is interrupted to do something else.
++	 */
++	local_irq_save(flags);
++
+ 	st0[0] ^= __aesti_inv_sbox[ 0] ^ __aesti_inv_sbox[128];
+ 	st0[1] ^= __aesti_inv_sbox[32] ^ __aesti_inv_sbox[160];
+ 	st0[2] ^= __aesti_inv_sbox[64] ^ __aesti_inv_sbox[192];
+@@ -339,6 +355,8 @@ static void aesti_decrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
+ 	put_unaligned_le32(inv_subshift(st1, 1) ^ rkp[5], out + 4);
+ 	put_unaligned_le32(inv_subshift(st1, 2) ^ rkp[6], out + 8);
+ 	put_unaligned_le32(inv_subshift(st1, 3) ^ rkp[7], out + 12);
++
++	local_irq_restore(flags);
+ }
+ 
+ static struct crypto_alg aes_alg = {
+-- 
+2.19.1
