@@ -1,67 +1,66 @@
-Return-Path: <SRS0=XFsj=M6=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from pegase1.c-s.fr ([93.17.236.30]:40895 "EHLO pegase1.c-s.fr"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727550AbeJRV6d (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 18 Oct 2018 17:58:33 -0400
-Message-Id: <b587c4952ab56b672383d3657c1bc9b6d31ad0da.1539870727.git.christophe.leroy@c-s.fr>
-From: Christophe Leroy <christophe.leroy@c-s.fr>
-Subject: [PATCH] powerpc/8xx: Add DT node for using the SEC engine of the
- MPC885
-To: Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, devicetree@vger.kernel.org,
-        MAZEYRAT Ludovic <ludovic.mazeyrat@alstomgroup.com>
-Date: Thu, 18 Oct 2018 13:57:22 +0000 (UTC)
+Return-Path: <SRS0=Iqog=M5=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail-eopbgr80055.outbound.protection.outlook.com ([40.107.8.55]:8163
+        "EHLO EUR04-VI1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727292AbeJQUd2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 17 Oct 2018 16:33:28 -0400
+From: Leonard Crestez <leonard.crestez@nxp.com>
+To: Shawn Guo <shawnguo@kernel.org>,
+        Fabio Estevam <fabio.estevam@nxp.com>
+CC: Rob Herring <robh+dt@kernel.org>,
+        Marek Vasut <marek.vasut@gmail.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Horia Geanta <horia.geanta@nxp.com>,
+        Franck Lenormand <franck.lenormand@nxp.com>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        "David S . Miller " <davem@davemloft.net>,
+        Mark Rutland <mark.rutland@arm.com>,
+        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-arm-kernel@lists.infradead.org"
+        <linux-arm-kernel@lists.infradead.org>,
+        dl-linux-imx <linux-imx@nxp.com>,
+        "kernel@pengutronix.de" <kernel@pengutronix.de>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: [PATCH v4 1/4] dt-bindings: crypto: Mention clocks for mxs-dcp
+Date: Wed, 17 Oct 2018 12:37:51 +0000
+Message-ID: <4536b5b5b101ab6a4197fb4891f775ddeb519847.1539779579.git.leonard.crestez@nxp.com>
+References: <cover.1539779579.git.leonard.crestez@nxp.com>
+In-Reply-To: <cover.1539779579.git.leonard.crestez@nxp.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The MPC885 has SEC engine version 1.2 with the following details:
-- Number of Crypto channels: 1
-- Exec Units: DEU, MDEU and AESU
-- Available descriptors: 00010, 00100, 00110, 01000, 11000, 11010
+Explicit clock enabling is required on 6sll and 6ull so mention that
+standard clock bindings are used.
 
-It is also supposed to have descriptor 00000, but it doesn't work
-properly so we keep it out for the moment.
-
-Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
+Signed-off-by: Leonard Crestez <leonard.crestez@nxp.com>
+Reviewed-by: Fabio Estevam <festevam@gmail.com>
 ---
- arch/powerpc/boot/dts/mpc885ads.dts | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
+ Documentation/devicetree/bindings/crypto/fsl-dcp.txt | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/arch/powerpc/boot/dts/mpc885ads.dts b/arch/powerpc/boot/dts/mpc885ads.dts
-index 5b037f51741d..3aa300afbbca 100644
---- a/arch/powerpc/boot/dts/mpc885ads.dts
-+++ b/arch/powerpc/boot/dts/mpc885ads.dts
-@@ -72,7 +72,7 @@
- 		#address-cells = <1>;
- 		#size-cells = <1>;
- 		device_type = "soc";
--		ranges = <0x0 0xff000000 0x4000>;
-+		ranges = <0x0 0xff000000 0x28000>;
- 		bus-frequency = <0>;
- 
- 		// Temporary -- will go away once kernel uses ranges for get_immrbase().
-@@ -224,6 +224,17 @@
- 				#size-cells = <0>;
- 			};
- 		};
-+
-+		crypto@20000 {
-+			compatible = "fsl,sec1.2", "fsl,sec1.0";
-+			reg = <0x20000 0x8000>;
-+			interrupts = <1 1>;
-+			interrupt-parent = <&PIC>;
-+			fsl,num-channels = <1>;
-+			fsl,channel-fifo-len = <24>;
-+			fsl,exec-units-mask = <0x4c>;
-+			fsl,descriptor-types-mask = <0x05000154>;
-+		};
- 	};
- 
- 	chosen {
--- 
-2.13.3
+diff --git a/Documentation/devicetree/bindings/crypto/fsl-dcp.txt b/Documen=
+tation/devicetree/bindings/crypto/fsl-dcp.txt
+index 76a0b4e80e83..4e4d387e38a5 100644
+--- a/Documentation/devicetree/bindings/crypto/fsl-dcp.txt
++++ b/Documentation/devicetree/bindings/crypto/fsl-dcp.txt
+@@ -4,10 +4,12 @@ Required properties:
+ - compatible : Should be "fsl,<soc>-dcp"
+ - reg : Should contain MXS DCP registers location and length
+ - interrupts : Should contain MXS DCP interrupt numbers, VMI IRQ and DCP I=
+RQ
+                must be supplied, optionally Secure IRQ can be present, but
+ 	       is currently not implemented and not used.
++- clocks : Clock reference (only required on some SOCs: 6ull and 6sll).
++- clock-names : Must be "dcp".
+=20
+ Example:
+=20
+ dcp@80028000 {
+ 	compatible =3D "fsl,imx28-dcp", "fsl,imx23-dcp";
+--=20
+2.17.1
