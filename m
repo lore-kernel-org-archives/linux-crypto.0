@@ -4,40 +4,40 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8D70ECDE30
-	for <linux-crypto@archiver.kernel.org>; Wed, 17 Oct 2018 12:38:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7762ECDE30
+	for <linux-crypto@archiver.kernel.org>; Wed, 17 Oct 2018 12:38:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9F55621526
-	for <linux-crypto@archiver.kernel.org>; Wed, 17 Oct 2018 12:38:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 66DC72150D
+	for <linux-crypto@archiver.kernel.org>; Wed, 17 Oct 2018 12:38:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="uj3O1kjE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F55621526
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="Vo7O9Fxq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 66DC72150D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nxp.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-crypto-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727382AbeJQUdb (ORCPT
+        id S1727292AbeJQUd3 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 17 Oct 2018 16:33:31 -0400
-Received: from mail-eopbgr80055.outbound.protection.outlook.com ([40.107.8.55]:8163
-        "EHLO EUR04-VI1-obe.outbound.protection.outlook.com"
+        Wed, 17 Oct 2018 16:33:29 -0400
+Received: from mail-ve1eur01on0040.outbound.protection.outlook.com ([104.47.1.40]:42912
+        "EHLO EUR01-VE1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727331AbeJQUdb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 17 Oct 2018 16:33:31 -0400
+        id S1727040AbeJQUd2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 17 Oct 2018 16:33:28 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YjEsZ3YDpb4PmUooqzUS9/tlVt8PAZjLWajq36Z3dFo=;
- b=uj3O1kjEdO0NsQTnuCpkkbMtQZgTD5RS+WkHHg+SAAoy3iVstbUk/N39TZvbhnE3Nkz4D519SwRHyw1Yal4rFt/Ok1BWtyLfrjYkXfJlFGia3oT2Vx4EnF1BPoIHMU3j4Sx4YfpWDzyxEcMtLe1M/PSJKYFi/X0LOJUEK4Ig4aU=
+ bh=dAAYPuXDPOSu3aPz78kn0hA1A94Sb4d91a3aZRQvqjg=;
+ b=Vo7O9FxqyHFmX70Wj4vAgH07Y/u+rblU5merD0qOa6UaJU7k/QQlB1gtWDJ6pz2DKIUeOBv/eHEPC4NaPYpWq9469O3p0h5HWaWP0mtk+lwp5kpZN7QK79GcNFtrqbR8l1XZ2o89WYYliVx9hcJ429yg7e0X0IEdU6J2CKdHe60=
 Received: from AM0PR04MB4290.eurprd04.prod.outlook.com (52.134.126.145) by
- AM0PR04MB4212.eurprd04.prod.outlook.com (52.134.126.22) with Microsoft SMTP
+ AM0PR04MB4754.eurprd04.prod.outlook.com (20.176.215.11) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1228.26; Wed, 17 Oct 2018 12:37:53 +0000
+ 15.20.1228.26; Wed, 17 Oct 2018 12:37:54 +0000
 Received: from AM0PR04MB4290.eurprd04.prod.outlook.com
  ([fe80::3836:6416:4ebd:34ef]) by AM0PR04MB4290.eurprd04.prod.outlook.com
  ([fe80::3836:6416:4ebd:34ef%3]) with mapi id 15.20.1228.032; Wed, 17 Oct 2018
- 12:37:53 +0000
+ 12:37:54 +0000
 From:   Leonard Crestez <leonard.crestez@nxp.com>
 To:     Shawn Guo <shawnguo@kernel.org>,
         Fabio Estevam <fabio.estevam@nxp.com>
@@ -56,12 +56,12 @@ CC:     Rob Herring <robh+dt@kernel.org>,
         dl-linux-imx <linux-imx@nxp.com>,
         "kernel@pengutronix.de" <kernel@pengutronix.de>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: [PATCH v4 2/4] crypto: mxs-dcp - Add support for dcp clk
-Thread-Topic: [PATCH v4 2/4] crypto: mxs-dcp - Add support for dcp clk
-Thread-Index: AQHUZhY4HefM3c9m50qn78KSFJ8+NA==
-Date:   Wed, 17 Oct 2018 12:37:53 +0000
+Subject: [PATCH v4 3/4] ARM: dts: imx6ull: Add dcp node
+Thread-Topic: [PATCH v4 3/4] ARM: dts: imx6ull: Add dcp node
+Thread-Index: AQHUZhY5woJo4/tT9EuGY7z4RiZhHQ==
+Date:   Wed, 17 Oct 2018 12:37:54 +0000
 Message-ID:
- <95dce7010676581691b1ac9906e9298470e0aa1a.1539779579.git.leonard.crestez@nxp.com>
+ <f503eea6c702aeff091f4c03d4059b67ec17b2b4.1539779579.git.leonard.crestez@nxp.com>
 References: <cover.1539779579.git.leonard.crestez@nxp.com>
 In-Reply-To: <cover.1539779579.git.leonard.crestez@nxp.com>
 Accept-Language: en-US
@@ -73,157 +73,77 @@ x-mailer: git-send-email 2.17.1
 x-clientproxiedby: AM6P191CA0098.EURP191.PROD.OUTLOOK.COM
  (2603:10a6:209:8a::39) To AM0PR04MB4290.eurprd04.prod.outlook.com
  (2603:10a6:208:67::17)
-x-ms-exchange-messagesentrepresentingtype: 1
-x-ms-publictraffictype: Email
-x-microsoft-exchange-diagnostics: 1;AM0PR04MB4212;6:4L5EVe8HIPMLs3VxJ3B0lWCzLUev1du1VX+6/eNjxqhoiBShYoq1C2KLC4ImoAJfcqA74lldlioFfTaQVGYVLUL4oo32r2JMYDtKIezmqb7GgIsZdZxzmqQuKKtqIsqL+Kme96sUQhKy15bmQ29C7d0JfvWOkvHgqBphG5Az1JzXNyehmAiJ3PAKfqfu3FctJpsOTNTqbW8LtlFOCU1wPPQ8mU4Ghaz5mTeH5b/9obqXuKunEpe6kfzqVx/ty9Zhhh2PSQAfHZdmQzpXJ3NRFGm+AHCQs+j8SW79Vsrxqgmle5tQHBa+ERhPXBoKtQZXzxWZopERmjZizW+vr57PsKdZuXu1pBnzHLczh7yQpqAmbk/5/k2juqOFOASFHdIHiyO0poaGlRehL0qSLQlCk2Sx6U+UWvd2ak4HYub8V5GgnUV9PLfT3TnyGp+n3l4h1Y5My03xm5EXiJERhcx1Vg==;5:JJ53mFOhA9oQaVRRKBx+rAFURtDSQQTLjjrDlTI3Q7WJG4ifbtKiUheqU3XyCPbOUQiCb2mmwdIwEh0pl1YjAYaZXD/NIZGV6TS0jPmQrgH2kNwo7CfhEJK6vWCk8HcON4K+26QiB51LmQ2V1uZ1WUEA0IpxxRzccfrSm/ofzvQ=;7:AVNd5SIw9ErmE05Gexck5CmC+fZ31V3x+1seQnD5nLtEdCbbEZr65GOFaRU7v7FrySjekQoPxvaeVob597+rAD4G/krpSPJAzcGMe8R2MbKGDSdsvOoe96Ey1FeAab1fx3ZAQ4kelTdWxhYpmgI71MIEEc3i0+bsvVtsm0/E7y0Ae2EA48FLggYByPLd0d+8/TELzJ4yv6WGgHrmZcqIboTPtkRjVX6+76ASsSIeQElUal2AdrFR6gPfWhcndxo7
-x-ms-office365-filtering-correlation-id: ce36bcb5-2b43-40b7-fb78-08d6342d5b2a
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(7020095)(4652040)(8989299)(5600074)(711020)(4618075)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7153060)(7193020);SRVR:AM0PR04MB4212;
-x-ms-traffictypediagnostic: AM0PR04MB4212:
-x-microsoft-antispam-prvs: <AM0PR04MB4212421C7D0807F8F42B174CEEFF0@AM0PR04MB4212.eurprd04.prod.outlook.com>
-x-exchange-antispam-report-test: UriScan:(185117386973197);
-x-ms-exchange-senderadcheck: 1
-x-exchange-antispam-report-cfa-test: BCL:0;PCL:0;RULEID:(8211001083)(6040522)(2401047)(5005006)(8121501046)(93006095)(93001095)(10201501046)(3002001)(3231355)(944501410)(52105095)(6055026)(149066)(150057)(6041310)(20161123562045)(20161123558120)(20161123564045)(20161123560045)(201703131423095)(201702281528075)(20161123555045)(201703061421075)(201703061406153)(201708071742011)(7699051)(76991095);SRVR:AM0PR04MB4212;BCL:0;PCL:0;RULEID:;SRVR:AM0PR04MB4212;
-x-forefront-prvs: 08286A0BE2
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(136003)(396003)(366004)(346002)(39860400002)(376002)(189003)(199004)(71200400001)(71190400001)(6636002)(446003)(118296001)(11346002)(54906003)(110136005)(52116002)(476003)(2616005)(81166006)(6486002)(81156014)(7736002)(8676002)(50226002)(316002)(256004)(5660300001)(86362001)(305945005)(66066001)(68736007)(53936002)(4326008)(486006)(25786009)(478600001)(44832011)(39060400002)(14454004)(6436002)(6512007)(8936002)(386003)(26005)(76176011)(6346003)(36756003)(97736004)(3846002)(6506007)(6116002)(102836004)(2900100001)(7416002)(2906002)(99286004)(186003)(105586002)(106356001)(5250100002);DIR:OUT;SFP:1101;SCL:1;SRVR:AM0PR04MB4212;H:AM0PR04MB4290.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: nxp.com does not designate
- permitted sender hosts)
 authentication-results: spf=none (sender IP is )
  smtp.mailfrom=leonard.crestez@nxp.com; 
-x-microsoft-antispam-message-info: CKJUZAaEXmueAGRakQfsUbugDTNy/UbhbluN1TRpK3nu4jiw/KSCbrv7HUer9AabSAjJVfi+Pn7/x8jUX/iRciv1ffT80txfkJPD4JYRxA7aqRZHA3LLA20EL4aWZBTHHKFgR0DSHD/6MJYme6dOPQ8ikYDgqfoj608hiiALSks9v6PNgkI9jkaTqeITKQJFmLooBAkSLXI/IuO2LUbXKProm2y8l3T/U/R8ggS9+F0TXTQ8Rs9OjD9D+VmfsJzsMNlLrLLKQPUY98jM4E6cDnEeo69TcVwb/1DqdgWZO74f0GtgTHoXRFsFd5Y3RPGs3B+i71Wp2fu5zW4/TVMlLfLtqmLlf/QkA0VhV0U/oTQ=
+x-ms-exchange-messagesentrepresentingtype: 1
+x-ms-publictraffictype: Email
+x-microsoft-exchange-diagnostics: 1;AM0PR04MB4754;6:f2PZ855v8Z4F60G2hGVVDMwFZGT7lrLNMpFOaeVfpqqPXWaI/zwC7ITk0srHio2aFSosP+i5QLd9PzvHSTrJNBcqj88uHxJ1mkJzp/g+TLyRc0Mzd1prOnlZxdDZp4ZV1HoBDfUYqad1Ja2lhGhrEn0EQQ5DrXiguX+IMAlj8wJ5os9hqTQEaUrg+53NgqnPBuvslRkFZlqNh7uOrM7/zH8EVk4TXl0nt5Bk1lCAyJEu87/7E/4HC/Qo40oLXxP7GCihYguoao2pRgdjFOD/ilX8E30dSD7il1n6qK6C5SdC8AiCkB55iBqfSiKs835f/oqu7lqtlju4/24MNpNQ6d0Pa4YzO3DzW1AJ3hubOfwELVqsXNSNSooaWsUtbJUQHcZuHge3ijvWyU1XBZVhzZKa977AGmNK9opC+a3SFyokuFTKQD1U7pje4mxIAVW0x1bipGP3pICVIXLdYDod+Q==;5:0rvhaHgEX63u7Ex1jiSuPNNELP02JQ0Ju5DxniywPwWdH47GJXAgUwNVQ+ARVPs3PYouwYiDvlLEz75XYRJ9ghjSe5TyZOzAX2BBai67soxaHTnNM/6Ic0UKVlvMX5zSBjducc5MNmJhfAxc9aaKTg508y9bdY7WBNphn3EatmI=;7:jN/M1dAu1wIas1IVR45wRGGIdSJXjNCYA0qftLar63TB1eqmjgRajrL9znRzmF7vk5MKB03JEEqt5cM+m3y5BZHWjVj4E4DXCGUAa5JX7oT15klhv6AqmneWIezP8t5kfmSQ7aEEWP/RU/oWkvmMn5YqvFmy6Lxh+5hHGD3SOY30/LSgH9Ag4lBpb0RaCXYWtXF1fCxejL0G6rMpjSYoUxkFxVJQ8I9C9kjNNCuObuCRch0eOG7Fs8FTdl91KFL8
+x-ms-office365-filtering-correlation-id: fc8c0c5c-78a0-4068-8994-08d6342d5be0
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600074)(711020)(4618075)(2017052603328)(7153060)(7193020);SRVR:AM0PR04MB4754;
+x-ms-traffictypediagnostic: AM0PR04MB4754:
+x-microsoft-antispam-prvs: <AM0PR04MB47543C235018F57522DA6690EEFF0@AM0PR04MB4754.eurprd04.prod.outlook.com>
+x-exchange-antispam-report-test: UriScan:(185117386973197)(85827821059158);
+x-ms-exchange-senderadcheck: 1
+x-exchange-antispam-report-cfa-test: BCL:0;PCL:0;RULEID:(8211001083)(6040522)(2401047)(8121501046)(5005006)(3002001)(3231355)(944501410)(52105095)(10201501046)(93006095)(93001095)(6055026)(149066)(150057)(6041310)(20161123560045)(201703131423095)(201702281528075)(20161123555045)(201703061421075)(201703061406153)(20161123558120)(20161123564045)(20161123562045)(201708071742011)(7699051)(76991095);SRVR:AM0PR04MB4754;BCL:0;PCL:0;RULEID:;SRVR:AM0PR04MB4754;
+x-forefront-prvs: 08286A0BE2
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(39860400002)(366004)(376002)(346002)(136003)(396003)(199004)(189003)(2900100001)(6486002)(71200400001)(66066001)(8936002)(5250100002)(36756003)(53936002)(118296001)(68736007)(8676002)(305945005)(97736004)(81156014)(86362001)(81166006)(7736002)(39060400002)(7416002)(71190400001)(25786009)(4326008)(316002)(14454004)(2616005)(6116002)(76176011)(256004)(6636002)(3846002)(2906002)(478600001)(6436002)(5660300001)(44832011)(54906003)(446003)(106356001)(50226002)(26005)(6512007)(52116002)(105586002)(11346002)(110136005)(476003)(99286004)(102836004)(6506007)(486006)(186003)(386003)(32563001);DIR:OUT;SFP:1101;SCL:1;SRVR:AM0PR04MB4754;H:AM0PR04MB4290.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+received-spf: None (protection.outlook.com: nxp.com does not designate
+ permitted sender hosts)
+x-microsoft-antispam-message-info: CKnqrJWI2YPVbGaoSBtkDoyXEFHKHjN4wLnP3jN82+anoDimwaOPaP9x6DCQpOd820piyMoxjcUqfaTKU7JbdY4wg4oPVLdXEfN7joDjjpgq5bqOlHwkGivO2B4Teo3KzxDe5wBIHu67gskBxcFlmLbiBQ4FicDN5lTJLJr8HUEzf0jyxgakaGKiSJ2/OyDmp/X1qTtiBHrO2n5kcaiMxff+7wLhCJwxof6aMLmwziWLvEZ+ITvao05aueqhFCc8Iytm3Vytu2SAJsD26Mn8YjFB2brkYtZE/Cs9fGJmVqNfCvn606GzfjwkVT6I3Ss53W7KwiG6rQEn1STP4MHpbW9mMuXYJobWStl8gBPtU2A=
 spamdiagnosticoutput: 1:99
 spamdiagnosticmetadata: NSPM
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ce36bcb5-2b43-40b7-fb78-08d6342d5b2a
-X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Oct 2018 12:37:53.0962
+X-MS-Exchange-CrossTenant-Network-Message-Id: fc8c0c5c-78a0-4068-8994-08d6342d5be0
+X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Oct 2018 12:37:54.1960
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR04MB4212
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR04MB4754
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
-Message-ID: <20181017123753.ycIeIcplETfRqbRKCqQpW1W2ZyCINba6Nql3ytw5-TA@z>
+Message-ID: <20181017123754.Crfxoec0OdSKBnSq13jLuMBh7ZjmMUUNMWs131rXsC8@z>
 
-On 6ull and 6sll the DCP block has a clock which needs to be explicitly
-enabled.
-
-Add minimal handling for this at probe/remove time.
+The DCP block on 6ull has no major differences other than requiring
+explicit clock enabling.
 
 Signed-off-by: Leonard Crestez <leonard.crestez@nxp.com>
+Reviewed-by: Fabio Estevam <festevam@gmail.com>
 ---
- drivers/crypto/mxs-dcp.c | 28 +++++++++++++++++++++++++---
- 1 file changed, 25 insertions(+), 3 deletions(-)
+ arch/arm/boot/dts/imx6ull.dtsi | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/drivers/crypto/mxs-dcp.c b/drivers/crypto/mxs-dcp.c
-index 4e6ff32f8a7e..a2105cf33abb 100644
---- a/drivers/crypto/mxs-dcp.c
-+++ b/drivers/crypto/mxs-dcp.c
-@@ -18,10 +18,11 @@
- #include <linux/kthread.h>
- #include <linux/module.h>
- #include <linux/of.h>
- #include <linux/platform_device.h>
- #include <linux/stmp_device.h>
-+#include <linux/clk.h>
+diff --git a/arch/arm/boot/dts/imx6ull.dtsi b/arch/arm/boot/dts/imx6ull.dts=
+i
+index 796ed35d4ac9..f3668fe69eac 100644
+--- a/arch/arm/boot/dts/imx6ull.dtsi
++++ b/arch/arm/boot/dts/imx6ull.dtsi
+@@ -37,10 +37,20 @@
+ 			#address-cells =3D <1>;
+ 			#size-cells =3D <1>;
+ 			reg =3D <0x02200000 0x100000>;
+ 			ranges;
 =20
- #include <crypto/aes.h>
- #include <crypto/sha.h>
- #include <crypto/internal/hash.h>
- #include <crypto/internal/skcipher.h>
-@@ -80,10 +81,11 @@ struct dcp {
-=20
- 	struct completion		completion[DCP_MAX_CHANS];
- 	spinlock_t			lock[DCP_MAX_CHANS];
- 	struct task_struct		*thread[DCP_MAX_CHANS];
- 	struct crypto_queue		queue[DCP_MAX_CHANS];
-+	struct clk			*dcp_clk;
- };
-=20
- enum dcp_chan {
- 	DCP_CHAN_HASH_SHA	=3D 0,
- 	DCP_CHAN_CRYPTO		=3D 2,
-@@ -1051,15 +1053,28 @@ static int mxs_dcp_probe(struct platform_device *pd=
-ev)
- 		return -ENOMEM;
-=20
- 	/* Re-align the structure so it fits the DCP constraints. */
- 	sdcp->coh =3D PTR_ALIGN(sdcp->coh, DCP_ALIGNMENT);
-=20
--	/* Restart the DCP block. */
--	ret =3D stmp_reset_block(sdcp->base);
-+	/* DCP clock is optional, only used on some SOCs */
-+	sdcp->dcp_clk =3D devm_clk_get(dev, "dcp");
-+	if (IS_ERR(sdcp->dcp_clk)) {
-+		if (sdcp->dcp_clk !=3D ERR_PTR(-ENOENT))
-+			return PTR_ERR(sdcp->dcp_clk);
-+		sdcp->dcp_clk =3D NULL;
-+	}
-+	ret =3D clk_prepare_enable(sdcp->dcp_clk);
- 	if (ret)
- 		return ret;
-=20
-+	/* Restart the DCP block. */
-+	ret =3D stmp_reset_block(sdcp->base);
-+	if (ret) {
-+		dev_err(dev, "Failed reset\n");
-+		goto err_disable_unprepare_clk;
-+	}
++			dcp: crypto@2280000 {
++				compatible =3D "fsl,imx6ull-dcp", "fsl,imx28-dcp";
++				reg =3D <0x02280000 0x4000>;
++				interrupts =3D <GIC_SPI 46 IRQ_TYPE_LEVEL_HIGH>,
++					     <GIC_SPI 47 IRQ_TYPE_LEVEL_HIGH>,
++					     <GIC_SPI 48 IRQ_TYPE_LEVEL_HIGH>;
++				clocks =3D <&clks IMX6ULL_CLK_DCP_CLK>;
++				clock-names =3D "dcp";
++			};
 +
- 	/* Initialize control register. */
- 	writel(MXS_DCP_CTRL_GATHER_RESIDUAL_WRITES |
- 	       MXS_DCP_CTRL_ENABLE_CONTEXT_CACHING | 0xf,
- 	       sdcp->base + MXS_DCP_CTRL);
+ 			iomuxc_snvs: iomuxc-snvs@2290000 {
+ 				compatible =3D "fsl,imx6ull-iomuxc-snvs";
+ 				reg =3D <0x02290000 0x4000>;
+ 			};
 =20
-@@ -1092,11 +1107,12 @@ static int mxs_dcp_probe(struct platform_device *pd=
-ev)
- 	/* Create the SHA and AES handler threads. */
- 	sdcp->thread[DCP_CHAN_HASH_SHA] =3D kthread_run(dcp_chan_thread_sha,
- 						      NULL, "mxs_dcp_chan/sha");
- 	if (IS_ERR(sdcp->thread[DCP_CHAN_HASH_SHA])) {
- 		dev_err(dev, "Error starting SHA thread!\n");
--		return PTR_ERR(sdcp->thread[DCP_CHAN_HASH_SHA]);
-+		ret =3D PTR_ERR(sdcp->thread[DCP_CHAN_HASH_SHA]);
-+		goto err_disable_unprepare_clk;
- 	}
-=20
- 	sdcp->thread[DCP_CHAN_CRYPTO] =3D kthread_run(dcp_chan_thread_aes,
- 						    NULL, "mxs_dcp_chan/aes");
- 	if (IS_ERR(sdcp->thread[DCP_CHAN_CRYPTO])) {
-@@ -1149,10 +1165,14 @@ static int mxs_dcp_probe(struct platform_device *pd=
-ev)
- err_destroy_aes_thread:
- 	kthread_stop(sdcp->thread[DCP_CHAN_CRYPTO]);
-=20
- err_destroy_sha_thread:
- 	kthread_stop(sdcp->thread[DCP_CHAN_HASH_SHA]);
-+
-+err_disable_unprepare_clk:
-+	clk_disable_unprepare(sdcp->dcp_clk);
-+
- 	return ret;
- }
-=20
- static int mxs_dcp_remove(struct platform_device *pdev)
- {
-@@ -1168,10 +1188,12 @@ static int mxs_dcp_remove(struct platform_device *p=
-dev)
- 		crypto_unregister_algs(dcp_aes_algs, ARRAY_SIZE(dcp_aes_algs));
-=20
- 	kthread_stop(sdcp->thread[DCP_CHAN_HASH_SHA]);
- 	kthread_stop(sdcp->thread[DCP_CHAN_CRYPTO]);
-=20
-+	clk_disable_unprepare(sdcp->dcp_clk);
-+
- 	platform_set_drvdata(pdev, NULL);
-=20
- 	global_sdcp =3D NULL;
-=20
- 	return 0;
 --=20
 2.17.1
 
