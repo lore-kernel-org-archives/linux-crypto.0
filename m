@@ -1,66 +1,73 @@
-Return-Path: <SRS0=anrJ=M4=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-eopbgr60080.outbound.protection.outlook.com ([40.107.6.80]:19693
-        "EHLO EUR04-DB3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726978AbeJPXsx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 16 Oct 2018 19:48:53 -0400
-From: Leonard Crestez <leonard.crestez@nxp.com>
-To: Shawn Guo <shawnguo@kernel.org>,
-        Fabio Estevam <fabio.estevam@nxp.com>
-CC: Rob Herring <robh+dt@kernel.org>,
-        Marek Vasut <marek.vasut@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Horia Geanta <horia.geanta@nxp.com>,
-        Franck Lenormand <franck.lenormand@nxp.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        "David S . Miller " <davem@davemloft.net>,
-        Mark Rutland <mark.rutland@arm.com>,
-        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-arm-kernel@lists.infradead.org"
-        <linux-arm-kernel@lists.infradead.org>,
-        dl-linux-imx <linux-imx@nxp.com>,
-        "kernel@pengutronix.de" <kernel@pengutronix.de>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: [PATCH v3 1/4] dt-bindings: crypto: Mention clocks for mxs-dcp
-Date: Tue, 16 Oct 2018 15:57:42 +0000
-Message-ID: <1861b16b6e760000ef42b0642c946a14f1fba95f.1539705285.git.leonard.crestez@nxp.com>
-References: <cover.1539705285.git.leonard.crestez@nxp.com>
-In-Reply-To: <cover.1539705285.git.leonard.crestez@nxp.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
+Return-Path: <SRS0=Iqog=M5=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from smtp.codeaurora.org ([198.145.29.96]:45514 "EHLO
+        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727013AbeJQXOx (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 17 Oct 2018 19:14:53 -0400
+From: AnilKumar Chimata <anilc@codeaurora.org>
+To: andy.gross@linaro.org, david.brown@linaro.org, robh+dt@kernel.org,
+        mark.rutland@arm.com, herbert@gondor.apana.org.au,
+        davem@davemloft.net
+Cc: linux-soc@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        AnilKumar Chimata <anilc@codeaurora.org>
+Subject: [PATCH 2/3] dt-bindings: Add ICE device specific parameters
+Date: Wed, 17 Oct 2018 20:47:55 +0530
+Message-Id: <1539789476-6098-3-git-send-email-anilc@codeaurora.org>
+In-Reply-To: <1539789476-6098-1-git-send-email-anilc@codeaurora.org>
+References: <1539789476-6098-1-git-send-email-anilc@codeaurora.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Explicit clock enabling is required on 6sll and 6ull so mention that
-standard clock bindings are used.
+Add dt parameters information specific to the Inline
+Crypto Engine (ICE) device.
 
-Signed-off-by: Leonard Crestez <leonard.crestez@nxp.com>
-Reviewed-by: Fabio Estevam <festevam@gmail.com>
+Signed-off-by: AnilKumar Chimata <anilc@codeaurora.org>
 ---
- Documentation/devicetree/bindings/crypto/fsl-dcp.txt | 2 ++
- 1 file changed, 2 insertions(+)
+ .../devicetree/bindings/crypto/msm/ice.txt         | 34 ++++++++++++++++++++++
+ 1 file changed, 34 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/crypto/msm/ice.txt
 
-diff --git a/Documentation/devicetree/bindings/crypto/fsl-dcp.txt b/Documen=
-tation/devicetree/bindings/crypto/fsl-dcp.txt
-index 76a0b4e80e83..4e4d387e38a5 100644
---- a/Documentation/devicetree/bindings/crypto/fsl-dcp.txt
-+++ b/Documentation/devicetree/bindings/crypto/fsl-dcp.txt
-@@ -4,10 +4,12 @@ Required properties:
- - compatible : Should be "fsl,<soc>-dcp"
- - reg : Should contain MXS DCP registers location and length
- - interrupts : Should contain MXS DCP interrupt numbers, VMI IRQ and DCP I=
-RQ
-                must be supplied, optionally Secure IRQ can be present, but
- 	       is currently not implemented and not used.
-+- clocks : Clock reference (only required on some SOCs: 6ull and 6sll).
-+- clock-names : Must be "dcp".
-=20
- Example:
-=20
- dcp@80028000 {
- 	compatible =3D "fsl,imx28-dcp", "fsl,imx23-dcp";
---=20
-2.17.1
+diff --git a/Documentation/devicetree/bindings/crypto/msm/ice.txt b/Documentation/devicetree/bindings/crypto/msm/ice.txt
+new file mode 100644
+index 0000000..86eed5e
+--- /dev/null
++++ b/Documentation/devicetree/bindings/crypto/msm/ice.txt
+@@ -0,0 +1,34 @@
++* Inline Crypto Engine (ICE)
++
++Required properties:
++  - compatible			: should be "qcom,ice"
++  - reg 			: <register mapping>
++
++Optional properties:
++  - interrupt-names     	: name describing the interrupts for ICE IRQ
++  - interrupts          	: <interrupt mapping for ICE IRQ>
++  - qcom,enable-ice-clk 	: should enable clocks for ICE HW
++  - clocks              	: List of phandle and clock specifier pairs
++  - clock-names         	: List of clock input name strings sorted in the same
++				  order as the clocks property.
++  - qcom,op-freq-hz     	: max clock speed sorted in the same order as the clocks
++				  property.
++  - qcom,instance-type  	: describe the storage type for which ICE node is defined
++				  currently, only "ufs" and "sdcc" are supported storage type
++  - power-domains		: regulator supply to be used by ICE HW
++
++Example:
++	ufs_ice: ufsice@1d90000 {
++		compatible = "qcom,ice";
++		reg = <0x1d90000 0x8000>;
++		qcom,enable-ice-clk;
++		clock-names = "ufs_core_clk", "bus_clk",
++				"iface_clk", "ice_core_clk";
++		clocks = <&gcc GCC_UFS_PHY_AXI_CLK>,
++			 <&gcc GCC_UFS_MEM_CLKREF_CLK>,
++			 <&gcc GCC_UFS_PHY_AHB_CLK>,
++			 <&gcc GCC_UFS_PHY_ICE_CORE_CLK>;
++		qcom,op-freq-hz = <0>, <0>, <0>, <300000000>;
++		power-domains = <&gcc UFS_PHY_GDSC>;
++		qcom,instance-type = "ufs";
++	};
+-- 
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
+a Linux Foundation Collaborative Project
