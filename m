@@ -1,1004 +1,165 @@
-Return-Path: <SRS0=XFsj=M6=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from frisell.zx2c4.com ([192.95.5.64]:55889 "EHLO frisell.zx2c4.com"
+Return-Path: <SRS0=Iqog=M5=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:55444 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728583AbeJRXAM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 18 Oct 2018 19:00:12 -0400
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-To: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        linux-crypto@vger.kernel.org, davem@davemloft.net,
-        gregkh@linuxfoundation.org
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Russell King <linux@armlinux.org.uk>,
-        linux-arm-kernel@lists.infradead.org,
-        Samuel Neves <sneves@dei.uc.pt>,
-        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        kernel-hardening@lists.openwall.com
-Subject: [PATCH net-next v8 24/28] zinc: Curve25519 ARM implementation
-Date: Thu, 18 Oct 2018 16:57:08 +0200
-Message-Id: <20181018145712.7538-25-Jason@zx2c4.com>
-In-Reply-To: <20181018145712.7538-1-Jason@zx2c4.com>
-References: <20181018145712.7538-1-Jason@zx2c4.com>
+        id S1726429AbeJQOMo (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 17 Oct 2018 10:12:44 -0400
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Paul Crowley <paulcrowley@google.com>
+Subject: [PATCH v2 2/2] crypto: arm/aes - add some hardening against cache-timing attacks
+Date: Tue, 16 Oct 2018 23:18:13 -0700
+Message-Id: <20181017061813.32751-3-ebiggers@kernel.org>
+In-Reply-To: <20181017061813.32751-1-ebiggers@kernel.org>
+References: <20181017061813.32751-1-ebiggers@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This ports the SUPERCOP implementation for usage in kernel space. In
-addition to the usual header, macro, and style changes required for
-kernel space, it makes a few small changes to the code:
+From: Eric Biggers <ebiggers@google.com>
 
-  - The stack alignment is relaxed to 16 bytes.
-  - Superfluous mov statements have been removed.
-  - ldr for constants has been replaced with movw.
-  - ldreq has been replaced with moveq.
-  - The str epilogue has been made more idiomatic.
-  - SIMD registers are not pushed and popped at the beginning and end.
-  - The prologue and epilogue have been made idiomatic.
-  - A hole has been removed from the stack, saving 32 bytes.
-  - We write-back the base register whenever possible for vld1.8.
-  - Some multiplications have been reordered for better A7 performance.
+Make the ARM scalar AES implementation closer to constant-time by
+disabling interrupts and prefetching the tables into L1 cache.  This is
+feasible because due to ARM's "free" rotations, the main tables are only
+1024 bytes instead of the usual 4096 used by most AES implementations.
 
-There are more opportunities for cleanup, since this code is from qhasm,
-which doesn't always do the most opportune thing. But even prior to
-extensive hand optimizations, this code delivers significant performance
-improvements (given in get_cycles() per call):
+On ARM Cortex-A7, the speed loss is only about 5%.  The resulting
+implementation is still over twice as fast as aes_ti.c.
 
-		      ----------- -------------
-	             | generic C | this commit |
-	 ------------ ----------- -------------
-	| Cortex-A7  |     49136 |       22395 |
-	 ------------ ----------- -------------
-	| Cortex-A17 |     17326 |        4983 |
-	 ------------ ----------- -------------
+Note that even after these changes, the implementation still isn't
+necessarily guaranteed to be constant-time; see
+https://cr.yp.to/antiforgery/cachetiming-20050414.pdf for a discussion
+of the many difficulties involved in writing truly constant-time AES
+software.  But it's valuable to make such attacks more difficult.
 
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
-Cc: Russell King <linux@armlinux.org.uk>
-Cc: linux-arm-kernel@lists.infradead.org
-Cc: Samuel Neves <sneves@dei.uc.pt>
-Cc: Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>
-Cc: Andy Lutomirski <luto@kernel.org>
-Cc: Greg KH <gregkh@linuxfoundation.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: kernel-hardening@lists.openwall.com
-Cc: linux-crypto@vger.kernel.org
+Suggested-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- lib/zinc/Makefile                             |   1 +
- lib/zinc/curve25519/curve25519-arm-glue.c     |  43 +++
- ...e25519-arm-supercop.S => curve25519-arm.S} | 349 ++++++++----------
- lib/zinc/curve25519/curve25519.c              |   2 +
- 4 files changed, 200 insertions(+), 195 deletions(-)
- create mode 100644 lib/zinc/curve25519/curve25519-arm-glue.c
- rename lib/zinc/curve25519/{curve25519-arm-supercop.S => curve25519-arm.S} (92%)
+ arch/arm/crypto/aes-cipher-core.S | 26 ++++++++++++++++++++++++++
+ arch/arm/crypto/aes-cipher-glue.c | 13 +++++++++++++
+ crypto/aes_generic.c              |  9 +++++----
+ 3 files changed, 44 insertions(+), 4 deletions(-)
 
-diff --git a/lib/zinc/Makefile b/lib/zinc/Makefile
-index 65440438c6e5..be73c342f9ba 100644
---- a/lib/zinc/Makefile
-+++ b/lib/zinc/Makefile
-@@ -27,4 +27,5 @@ zinc_blake2s-$(CONFIG_ZINC_ARCH_X86_64) += blake2s/blake2s-x86_64.o
- obj-$(CONFIG_ZINC_BLAKE2S) += zinc_blake2s.o
+diff --git a/arch/arm/crypto/aes-cipher-core.S b/arch/arm/crypto/aes-cipher-core.S
+index 184d6c2d15d5..ba9d4aefe585 100644
+--- a/arch/arm/crypto/aes-cipher-core.S
++++ b/arch/arm/crypto/aes-cipher-core.S
+@@ -138,6 +138,23 @@
+ 	eor		r7, r7, r11
  
- zinc_curve25519-y := curve25519/curve25519.o
-+zinc_curve25519-$(CONFIG_ZINC_ARCH_ARM) += curve25519/curve25519-arm.o
- obj-$(CONFIG_ZINC_CURVE25519) += zinc_curve25519.o
-diff --git a/lib/zinc/curve25519/curve25519-arm-glue.c b/lib/zinc/curve25519/curve25519-arm-glue.c
-new file mode 100644
-index 000000000000..c71c981c3ba9
---- /dev/null
-+++ b/lib/zinc/curve25519/curve25519-arm-glue.c
-@@ -0,0 +1,43 @@
-+// SPDX-License-Identifier: GPL-2.0 OR MIT
-+/*
-+ * Copyright (C) 2015-2018 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
-+ */
-+
-+#include <linux/simd.h>
-+#include <asm/hwcap.h>
-+#include <asm/neon.h>
-+
-+asmlinkage void curve25519_neon(u8 mypublic[CURVE25519_KEY_SIZE],
-+				const u8 secret[CURVE25519_KEY_SIZE],
-+				const u8 basepoint[CURVE25519_KEY_SIZE]);
-+
-+static bool curve25519_use_neon __ro_after_init;
-+static bool *const curve25519_nobs[] __initconst = { &curve25519_use_neon };
-+static void __init curve25519_fpu_init(void)
-+{
-+	curve25519_use_neon = elf_hwcap & HWCAP_NEON;
-+}
-+
-+static inline bool curve25519_arch(u8 mypublic[CURVE25519_KEY_SIZE],
-+				   const u8 secret[CURVE25519_KEY_SIZE],
-+				   const u8 basepoint[CURVE25519_KEY_SIZE])
-+{
-+	simd_context_t simd_context;
-+	bool used_arch = false;
-+
-+	simd_get(&simd_context);
-+	if (IS_ENABLED(CONFIG_KERNEL_MODE_NEON) &&
-+	    !IS_ENABLED(CONFIG_CPU_BIG_ENDIAN) && curve25519_use_neon &&
-+	    simd_use(&simd_context)) {
-+		curve25519_neon(mypublic, secret, basepoint);
-+		used_arch = true;
-+	}
-+	simd_put(&simd_context);
-+	return used_arch;
-+}
-+
-+static inline bool curve25519_base_arch(u8 pub[CURVE25519_KEY_SIZE],
-+					const u8 secret[CURVE25519_KEY_SIZE])
-+{
-+	return false;
-+}
-diff --git a/lib/zinc/curve25519/curve25519-arm-supercop.S b/lib/zinc/curve25519/curve25519-arm.S
-similarity index 92%
-rename from lib/zinc/curve25519/curve25519-arm-supercop.S
-rename to lib/zinc/curve25519/curve25519-arm.S
-index f33b85fef382..b63ac48e7f8d 100644
---- a/lib/zinc/curve25519/curve25519-arm-supercop.S
-+++ b/lib/zinc/curve25519/curve25519-arm.S
-@@ -1,43 +1,36 @@
-+/* SPDX-License-Identifier: GPL-2.0 OR MIT */
- /*
-- * Public domain code from Daniel J. Bernstein and Peter Schwabe, from
-- * SUPERCOP's curve25519/neon2/scalarmult.s.
-+ * Copyright (C) 2015-2018 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
-+ *
-+ * Based on public domain code from Daniel J. Bernstein and Peter Schwabe. This
-+ * began from SUPERCOP's curve25519/neon2/scalarmult.s, but has subsequently been
-+ * manually reworked for use in kernel space.
-  */
+ 	__adrl		ttab, \ttab
++	/*
++	 * Prefetch the 1024-byte 'ft' or 'it' table into L1 cache, assuming
++	 * cacheline size >= 32.  This, along with the caller disabling
++	 * interrupts, is a hardening measure intended to make cache-timing
++	 * attacks more difficult.  They may not be fully prevented, however;
++	 * see the paper https://cr.yp.to/antiforgery/cachetiming-20050414.pdf
++	 * ("Cache-timing attacks on AES") for a discussion of the many
++	 * difficulties involved in writing truly constant-time AES software.
++	 */
++	.set i, 0
++.rept 1024 / 128
++	ldr		r8, [ttab, #i + 0]
++	ldr		r9, [ttab, #i + 32]
++	ldr		r10, [ttab, #i + 64]
++	ldr		r11, [ttab, #i + 96]
++	.set i, i + 128
++.endr
  
--.fpu neon
-+#if defined(CONFIG_KERNEL_MODE_NEON) && !defined(__ARMEB__)
-+#include <linux/linkage.h>
-+
- .text
-+.fpu neon
-+.arch armv7-a
- .align 4
--.global _crypto_scalarmult_curve25519_neon2
--.global crypto_scalarmult_curve25519_neon2
--.type _crypto_scalarmult_curve25519_neon2 STT_FUNC
--.type crypto_scalarmult_curve25519_neon2 STT_FUNC
--	_crypto_scalarmult_curve25519_neon2:
--	crypto_scalarmult_curve25519_neon2:
--	vpush		{q4, q5, q6, q7}
--	mov		r12, sp
--	sub		sp, sp, #736
--	and		sp, sp, #0xffffffe0
--	strd		r4, [sp, #0]
--	strd		r6, [sp, #8]
--	strd		r8, [sp, #16]
--	strd		r10, [sp, #24]
--	str		r12, [sp, #480]
--	str		r14, [sp, #484]
--	mov		r0, r0
--	mov		r1, r1
--	mov		r2, r2
--	add		r3, sp, #32
--	ldr		r4, =0
--	ldr		r5, =254
-+
-+ENTRY(curve25519_neon)
-+	push		{r4-r11, lr}
-+	mov		ip, sp
-+	sub		r3, sp, #704
-+	and		r3, r3, #0xfffffff0
-+	mov		sp, r3
-+	movw		r4, #0
-+	movw		r5, #254
- 	vmov.i32	q0, #1
- 	vshr.u64	q1, q0, #7
- 	vshr.u64	q0, q0, #8
- 	vmov.i32	d4, #19
- 	vmov.i32	d5, #38
--	add		r6, sp, #512
--	vst1.8		{d2-d3}, [r6, : 128]
--	add		r6, sp, #528
--	vst1.8		{d0-d1}, [r6, : 128]
--	add		r6, sp, #544
-+	add		r6, sp, #480
-+	vst1.8		{d2-d3}, [r6, : 128]!
-+	vst1.8		{d0-d1}, [r6, : 128]!
- 	vst1.8		{d4-d5}, [r6, : 128]
- 	add		r6, r3, #0
- 	vmov.i32	q2, #0
-@@ -45,12 +38,12 @@
- 	vst1.8		{d4-d5}, [r6, : 128]!
- 	vst1.8		d4, [r6, : 64]
- 	add		r6, r3, #0
--	ldr		r7, =960
-+	movw		r7, #960
- 	sub		r7, r7, #2
- 	neg		r7, r7
- 	sub		r7, r7, r7, LSL #7
- 	str		r7, [r6]
--	add		r6, sp, #704
-+	add		r6, sp, #672
- 	vld1.8		{d4-d5}, [r1]!
- 	vld1.8		{d6-d7}, [r1]
- 	vst1.8		{d4-d5}, [r6, : 128]!
-@@ -212,15 +205,15 @@
- 	vst1.8		{d0-d1}, [r6, : 128]!
- 	vst1.8		{d2-d3}, [r6, : 128]!
- 	vst1.8		d4, [r6, : 64]
--._mainloop:
-+.Lmainloop:
- 	mov		r2, r5, LSR #3
- 	and		r6, r5, #7
- 	ldrb		r2, [r1, r2]
- 	mov		r2, r2, LSR r6
- 	and		r2, r2, #1
--	str		r5, [sp, #488]
-+	str		r5, [sp, #456]
- 	eor		r4, r4, r2
--	str		r2, [sp, #492]
-+	str		r2, [sp, #460]
- 	neg		r2, r4
- 	add		r4, r3, #96
- 	add		r5, r3, #192
-@@ -291,7 +284,7 @@
- 	vsub.i32	q0, q1, q3
- 	vst1.8		d4, [r4, : 64]
- 	vst1.8		d0, [r6, : 64]
--	add		r2, sp, #544
-+	add		r2, sp, #512
- 	add		r4, r3, #96
- 	add		r5, r3, #144
- 	vld1.8		{d0-d1}, [r2, : 128]
-@@ -361,14 +354,13 @@
- 	vmlal.s32	q0, d12, d8
- 	vmlal.s32	q0, d13, d17
- 	vmlal.s32	q0, d6, d6
--	add		r2, sp, #512
--	vld1.8		{d18-d19}, [r2, : 128]
-+	add		r2, sp, #480
-+	vld1.8		{d18-d19}, [r2, : 128]!
- 	vmull.s32	q3, d16, d7
- 	vmlal.s32	q3, d10, d15
- 	vmlal.s32	q3, d11, d14
- 	vmlal.s32	q3, d12, d9
- 	vmlal.s32	q3, d13, d8
--	add		r2, sp, #528
- 	vld1.8		{d8-d9}, [r2, : 128]
- 	vadd.i64	q5, q12, q9
- 	vadd.i64	q6, q15, q9
-@@ -502,22 +494,19 @@
- 	vadd.i32	q5, q5, q0
- 	vtrn.32		q11, q14
- 	vadd.i32	q6, q6, q3
--	add		r2, sp, #560
-+	add		r2, sp, #528
- 	vadd.i32	q10, q10, q2
- 	vtrn.32		d24, d25
--	vst1.8		{d12-d13}, [r2, : 128]
-+	vst1.8		{d12-d13}, [r2, : 128]!
- 	vshl.i32	q6, q13, #1
--	add		r2, sp, #576
--	vst1.8		{d20-d21}, [r2, : 128]
-+	vst1.8		{d20-d21}, [r2, : 128]!
- 	vshl.i32	q10, q14, #1
--	add		r2, sp, #592
--	vst1.8		{d12-d13}, [r2, : 128]
-+	vst1.8		{d12-d13}, [r2, : 128]!
- 	vshl.i32	q15, q12, #1
- 	vadd.i32	q8, q8, q4
- 	vext.32		d10, d31, d30, #0
- 	vadd.i32	q7, q7, q1
--	add		r2, sp, #608
--	vst1.8		{d16-d17}, [r2, : 128]
-+	vst1.8		{d16-d17}, [r2, : 128]!
- 	vmull.s32	q8, d18, d5
- 	vmlal.s32	q8, d26, d4
- 	vmlal.s32	q8, d19, d9
-@@ -528,8 +517,7 @@
- 	vmlal.s32	q8, d29, d1
- 	vmlal.s32	q8, d24, d6
- 	vmlal.s32	q8, d25, d0
--	add		r2, sp, #624
--	vst1.8		{d14-d15}, [r2, : 128]
-+	vst1.8		{d14-d15}, [r2, : 128]!
- 	vmull.s32	q2, d18, d4
- 	vmlal.s32	q2, d12, d9
- 	vmlal.s32	q2, d13, d8
-@@ -537,8 +525,7 @@
- 	vmlal.s32	q2, d22, d2
- 	vmlal.s32	q2, d23, d1
- 	vmlal.s32	q2, d24, d0
--	add		r2, sp, #640
--	vst1.8		{d20-d21}, [r2, : 128]
-+	vst1.8		{d20-d21}, [r2, : 128]!
- 	vmull.s32	q7, d18, d9
- 	vmlal.s32	q7, d26, d3
- 	vmlal.s32	q7, d19, d8
-@@ -547,14 +534,12 @@
- 	vmlal.s32	q7, d28, d1
- 	vmlal.s32	q7, d23, d6
- 	vmlal.s32	q7, d29, d0
--	add		r2, sp, #656
--	vst1.8		{d10-d11}, [r2, : 128]
-+	vst1.8		{d10-d11}, [r2, : 128]!
- 	vmull.s32	q5, d18, d3
- 	vmlal.s32	q5, d19, d2
- 	vmlal.s32	q5, d22, d1
- 	vmlal.s32	q5, d23, d0
- 	vmlal.s32	q5, d12, d8
--	add		r2, sp, #672
- 	vst1.8		{d16-d17}, [r2, : 128]
- 	vmull.s32	q4, d18, d8
- 	vmlal.s32	q4, d26, d2
-@@ -566,7 +551,7 @@
- 	vmlal.s32	q8, d26, d1
- 	vmlal.s32	q8, d19, d6
- 	vmlal.s32	q8, d27, d0
--	add		r2, sp, #576
-+	add		r2, sp, #544
- 	vld1.8		{d20-d21}, [r2, : 128]
- 	vmlal.s32	q7, d24, d21
- 	vmlal.s32	q7, d25, d20
-@@ -575,32 +560,30 @@
- 	vmlal.s32	q8, d22, d21
- 	vmlal.s32	q8, d28, d20
- 	vmlal.s32	q5, d24, d20
--	add		r2, sp, #576
- 	vst1.8		{d14-d15}, [r2, : 128]
- 	vmull.s32	q7, d18, d6
- 	vmlal.s32	q7, d26, d0
--	add		r2, sp, #656
-+	add		r2, sp, #624
- 	vld1.8		{d30-d31}, [r2, : 128]
- 	vmlal.s32	q2, d30, d21
- 	vmlal.s32	q7, d19, d21
- 	vmlal.s32	q7, d27, d20
--	add		r2, sp, #624
-+	add		r2, sp, #592
- 	vld1.8		{d26-d27}, [r2, : 128]
- 	vmlal.s32	q4, d25, d27
- 	vmlal.s32	q8, d29, d27
- 	vmlal.s32	q8, d25, d26
- 	vmlal.s32	q7, d28, d27
- 	vmlal.s32	q7, d29, d26
--	add		r2, sp, #608
-+	add		r2, sp, #576
- 	vld1.8		{d28-d29}, [r2, : 128]
- 	vmlal.s32	q4, d24, d29
- 	vmlal.s32	q8, d23, d29
- 	vmlal.s32	q8, d24, d28
- 	vmlal.s32	q7, d22, d29
- 	vmlal.s32	q7, d23, d28
--	add		r2, sp, #608
- 	vst1.8		{d8-d9}, [r2, : 128]
--	add		r2, sp, #560
-+	add		r2, sp, #528
- 	vld1.8		{d8-d9}, [r2, : 128]
- 	vmlal.s32	q7, d24, d9
- 	vmlal.s32	q7, d25, d31
-@@ -621,36 +604,36 @@
- 	vmlal.s32	q0, d23, d26
- 	vmlal.s32	q0, d24, d31
- 	vmlal.s32	q0, d19, d20
--	add		r2, sp, #640
-+	add		r2, sp, #608
- 	vld1.8		{d18-d19}, [r2, : 128]
- 	vmlal.s32	q2, d18, d7
--	vmlal.s32	q2, d19, d6
- 	vmlal.s32	q5, d18, d6
--	vmlal.s32	q5, d19, d21
- 	vmlal.s32	q1, d18, d21
--	vmlal.s32	q1, d19, d29
- 	vmlal.s32	q0, d18, d28
--	vmlal.s32	q0, d19, d9
- 	vmlal.s32	q6, d18, d29
-+	vmlal.s32	q2, d19, d6
-+	vmlal.s32	q5, d19, d21
-+	vmlal.s32	q1, d19, d29
-+	vmlal.s32	q0, d19, d9
- 	vmlal.s32	q6, d19, d28
--	add		r2, sp, #592
-+	add		r2, sp, #560
- 	vld1.8		{d18-d19}, [r2, : 128]
--	add		r2, sp, #512
-+	add		r2, sp, #480
- 	vld1.8		{d22-d23}, [r2, : 128]
- 	vmlal.s32	q5, d19, d7
- 	vmlal.s32	q0, d18, d21
- 	vmlal.s32	q0, d19, d29
- 	vmlal.s32	q6, d18, d6
--	add		r2, sp, #528
-+	add		r2, sp, #496
- 	vld1.8		{d6-d7}, [r2, : 128]
- 	vmlal.s32	q6, d19, d21
--	add		r2, sp, #576
-+	add		r2, sp, #544
- 	vld1.8		{d18-d19}, [r2, : 128]
- 	vmlal.s32	q0, d30, d8
--	add		r2, sp, #672
-+	add		r2, sp, #640
- 	vld1.8		{d20-d21}, [r2, : 128]
- 	vmlal.s32	q5, d30, d29
--	add		r2, sp, #608
-+	add		r2, sp, #576
- 	vld1.8		{d24-d25}, [r2, : 128]
- 	vmlal.s32	q1, d30, d28
- 	vadd.i64	q13, q0, q11
-@@ -823,22 +806,19 @@
- 	vadd.i32	q5, q5, q0
- 	vtrn.32		q11, q14
- 	vadd.i32	q6, q6, q3
--	add		r2, sp, #560
-+	add		r2, sp, #528
- 	vadd.i32	q10, q10, q2
- 	vtrn.32		d24, d25
--	vst1.8		{d12-d13}, [r2, : 128]
-+	vst1.8		{d12-d13}, [r2, : 128]!
- 	vshl.i32	q6, q13, #1
--	add		r2, sp, #576
--	vst1.8		{d20-d21}, [r2, : 128]
-+	vst1.8		{d20-d21}, [r2, : 128]!
- 	vshl.i32	q10, q14, #1
--	add		r2, sp, #592
--	vst1.8		{d12-d13}, [r2, : 128]
-+	vst1.8		{d12-d13}, [r2, : 128]!
- 	vshl.i32	q15, q12, #1
- 	vadd.i32	q8, q8, q4
- 	vext.32		d10, d31, d30, #0
- 	vadd.i32	q7, q7, q1
--	add		r2, sp, #608
--	vst1.8		{d16-d17}, [r2, : 128]
-+	vst1.8		{d16-d17}, [r2, : 128]!
- 	vmull.s32	q8, d18, d5
- 	vmlal.s32	q8, d26, d4
- 	vmlal.s32	q8, d19, d9
-@@ -849,8 +829,7 @@
- 	vmlal.s32	q8, d29, d1
- 	vmlal.s32	q8, d24, d6
- 	vmlal.s32	q8, d25, d0
--	add		r2, sp, #624
--	vst1.8		{d14-d15}, [r2, : 128]
-+	vst1.8		{d14-d15}, [r2, : 128]!
- 	vmull.s32	q2, d18, d4
- 	vmlal.s32	q2, d12, d9
- 	vmlal.s32	q2, d13, d8
-@@ -858,8 +837,7 @@
- 	vmlal.s32	q2, d22, d2
- 	vmlal.s32	q2, d23, d1
- 	vmlal.s32	q2, d24, d0
--	add		r2, sp, #640
--	vst1.8		{d20-d21}, [r2, : 128]
-+	vst1.8		{d20-d21}, [r2, : 128]!
- 	vmull.s32	q7, d18, d9
- 	vmlal.s32	q7, d26, d3
- 	vmlal.s32	q7, d19, d8
-@@ -868,15 +846,13 @@
- 	vmlal.s32	q7, d28, d1
- 	vmlal.s32	q7, d23, d6
- 	vmlal.s32	q7, d29, d0
--	add		r2, sp, #656
--	vst1.8		{d10-d11}, [r2, : 128]
-+	vst1.8		{d10-d11}, [r2, : 128]!
- 	vmull.s32	q5, d18, d3
- 	vmlal.s32	q5, d19, d2
- 	vmlal.s32	q5, d22, d1
- 	vmlal.s32	q5, d23, d0
- 	vmlal.s32	q5, d12, d8
--	add		r2, sp, #672
--	vst1.8		{d16-d17}, [r2, : 128]
-+	vst1.8		{d16-d17}, [r2, : 128]!
- 	vmull.s32	q4, d18, d8
- 	vmlal.s32	q4, d26, d2
- 	vmlal.s32	q4, d19, d7
-@@ -887,7 +863,7 @@
- 	vmlal.s32	q8, d26, d1
- 	vmlal.s32	q8, d19, d6
- 	vmlal.s32	q8, d27, d0
--	add		r2, sp, #576
-+	add		r2, sp, #544
- 	vld1.8		{d20-d21}, [r2, : 128]
- 	vmlal.s32	q7, d24, d21
- 	vmlal.s32	q7, d25, d20
-@@ -896,32 +872,30 @@
- 	vmlal.s32	q8, d22, d21
- 	vmlal.s32	q8, d28, d20
- 	vmlal.s32	q5, d24, d20
--	add		r2, sp, #576
- 	vst1.8		{d14-d15}, [r2, : 128]
- 	vmull.s32	q7, d18, d6
- 	vmlal.s32	q7, d26, d0
--	add		r2, sp, #656
-+	add		r2, sp, #624
- 	vld1.8		{d30-d31}, [r2, : 128]
- 	vmlal.s32	q2, d30, d21
- 	vmlal.s32	q7, d19, d21
- 	vmlal.s32	q7, d27, d20
--	add		r2, sp, #624
-+	add		r2, sp, #592
- 	vld1.8		{d26-d27}, [r2, : 128]
- 	vmlal.s32	q4, d25, d27
- 	vmlal.s32	q8, d29, d27
- 	vmlal.s32	q8, d25, d26
- 	vmlal.s32	q7, d28, d27
- 	vmlal.s32	q7, d29, d26
--	add		r2, sp, #608
-+	add		r2, sp, #576
- 	vld1.8		{d28-d29}, [r2, : 128]
- 	vmlal.s32	q4, d24, d29
- 	vmlal.s32	q8, d23, d29
- 	vmlal.s32	q8, d24, d28
- 	vmlal.s32	q7, d22, d29
- 	vmlal.s32	q7, d23, d28
--	add		r2, sp, #608
- 	vst1.8		{d8-d9}, [r2, : 128]
--	add		r2, sp, #560
-+	add		r2, sp, #528
- 	vld1.8		{d8-d9}, [r2, : 128]
- 	vmlal.s32	q7, d24, d9
- 	vmlal.s32	q7, d25, d31
-@@ -942,36 +916,36 @@
- 	vmlal.s32	q0, d23, d26
- 	vmlal.s32	q0, d24, d31
- 	vmlal.s32	q0, d19, d20
--	add		r2, sp, #640
-+	add		r2, sp, #608
- 	vld1.8		{d18-d19}, [r2, : 128]
- 	vmlal.s32	q2, d18, d7
--	vmlal.s32	q2, d19, d6
- 	vmlal.s32	q5, d18, d6
--	vmlal.s32	q5, d19, d21
- 	vmlal.s32	q1, d18, d21
--	vmlal.s32	q1, d19, d29
- 	vmlal.s32	q0, d18, d28
--	vmlal.s32	q0, d19, d9
- 	vmlal.s32	q6, d18, d29
-+	vmlal.s32	q2, d19, d6
-+	vmlal.s32	q5, d19, d21
-+	vmlal.s32	q1, d19, d29
-+	vmlal.s32	q0, d19, d9
- 	vmlal.s32	q6, d19, d28
--	add		r2, sp, #592
-+	add		r2, sp, #560
- 	vld1.8		{d18-d19}, [r2, : 128]
--	add		r2, sp, #512
-+	add		r2, sp, #480
- 	vld1.8		{d22-d23}, [r2, : 128]
- 	vmlal.s32	q5, d19, d7
- 	vmlal.s32	q0, d18, d21
- 	vmlal.s32	q0, d19, d29
- 	vmlal.s32	q6, d18, d6
--	add		r2, sp, #528
-+	add		r2, sp, #496
- 	vld1.8		{d6-d7}, [r2, : 128]
- 	vmlal.s32	q6, d19, d21
--	add		r2, sp, #576
-+	add		r2, sp, #544
- 	vld1.8		{d18-d19}, [r2, : 128]
- 	vmlal.s32	q0, d30, d8
--	add		r2, sp, #672
-+	add		r2, sp, #640
- 	vld1.8		{d20-d21}, [r2, : 128]
- 	vmlal.s32	q5, d30, d29
--	add		r2, sp, #608
-+	add		r2, sp, #576
- 	vld1.8		{d24-d25}, [r2, : 128]
- 	vmlal.s32	q1, d30, d28
- 	vadd.i64	q13, q0, q11
-@@ -1069,7 +1043,7 @@
- 	sub		r4, r4, #24
- 	vst1.8		d0, [r2, : 64]
- 	vst1.8		d1, [r4, : 64]
--	add		r2, sp, #544
-+	add		r2, sp, #512
- 	add		r4, r3, #144
- 	add		r5, r3, #192
- 	vld1.8		{d0-d1}, [r2, : 128]
-@@ -1139,14 +1113,13 @@
- 	vmlal.s32	q0, d12, d8
- 	vmlal.s32	q0, d13, d17
- 	vmlal.s32	q0, d6, d6
--	add		r2, sp, #512
--	vld1.8		{d18-d19}, [r2, : 128]
-+	add		r2, sp, #480
-+	vld1.8		{d18-d19}, [r2, : 128]!
- 	vmull.s32	q3, d16, d7
- 	vmlal.s32	q3, d10, d15
- 	vmlal.s32	q3, d11, d14
- 	vmlal.s32	q3, d12, d9
- 	vmlal.s32	q3, d13, d8
--	add		r2, sp, #528
- 	vld1.8		{d8-d9}, [r2, : 128]
- 	vadd.i64	q5, q12, q9
- 	vadd.i64	q6, q15, q9
-@@ -1295,22 +1268,19 @@
- 	vadd.i32	q5, q5, q0
- 	vtrn.32		q11, q14
- 	vadd.i32	q6, q6, q3
--	add		r2, sp, #560
-+	add		r2, sp, #528
- 	vadd.i32	q10, q10, q2
- 	vtrn.32		d24, d25
--	vst1.8		{d12-d13}, [r2, : 128]
-+	vst1.8		{d12-d13}, [r2, : 128]!
- 	vshl.i32	q6, q13, #1
--	add		r2, sp, #576
--	vst1.8		{d20-d21}, [r2, : 128]
-+	vst1.8		{d20-d21}, [r2, : 128]!
- 	vshl.i32	q10, q14, #1
--	add		r2, sp, #592
--	vst1.8		{d12-d13}, [r2, : 128]
-+	vst1.8		{d12-d13}, [r2, : 128]!
- 	vshl.i32	q15, q12, #1
- 	vadd.i32	q8, q8, q4
- 	vext.32		d10, d31, d30, #0
- 	vadd.i32	q7, q7, q1
--	add		r2, sp, #608
--	vst1.8		{d16-d17}, [r2, : 128]
-+	vst1.8		{d16-d17}, [r2, : 128]!
- 	vmull.s32	q8, d18, d5
- 	vmlal.s32	q8, d26, d4
- 	vmlal.s32	q8, d19, d9
-@@ -1321,8 +1291,7 @@
- 	vmlal.s32	q8, d29, d1
- 	vmlal.s32	q8, d24, d6
- 	vmlal.s32	q8, d25, d0
--	add		r2, sp, #624
--	vst1.8		{d14-d15}, [r2, : 128]
-+	vst1.8		{d14-d15}, [r2, : 128]!
- 	vmull.s32	q2, d18, d4
- 	vmlal.s32	q2, d12, d9
- 	vmlal.s32	q2, d13, d8
-@@ -1330,8 +1299,7 @@
- 	vmlal.s32	q2, d22, d2
- 	vmlal.s32	q2, d23, d1
- 	vmlal.s32	q2, d24, d0
--	add		r2, sp, #640
--	vst1.8		{d20-d21}, [r2, : 128]
-+	vst1.8		{d20-d21}, [r2, : 128]!
- 	vmull.s32	q7, d18, d9
- 	vmlal.s32	q7, d26, d3
- 	vmlal.s32	q7, d19, d8
-@@ -1340,15 +1308,13 @@
- 	vmlal.s32	q7, d28, d1
- 	vmlal.s32	q7, d23, d6
- 	vmlal.s32	q7, d29, d0
--	add		r2, sp, #656
--	vst1.8		{d10-d11}, [r2, : 128]
-+	vst1.8		{d10-d11}, [r2, : 128]!
- 	vmull.s32	q5, d18, d3
- 	vmlal.s32	q5, d19, d2
- 	vmlal.s32	q5, d22, d1
- 	vmlal.s32	q5, d23, d0
- 	vmlal.s32	q5, d12, d8
--	add		r2, sp, #672
--	vst1.8		{d16-d17}, [r2, : 128]
-+	vst1.8		{d16-d17}, [r2, : 128]!
- 	vmull.s32	q4, d18, d8
- 	vmlal.s32	q4, d26, d2
- 	vmlal.s32	q4, d19, d7
-@@ -1359,7 +1325,7 @@
- 	vmlal.s32	q8, d26, d1
- 	vmlal.s32	q8, d19, d6
- 	vmlal.s32	q8, d27, d0
--	add		r2, sp, #576
-+	add		r2, sp, #544
- 	vld1.8		{d20-d21}, [r2, : 128]
- 	vmlal.s32	q7, d24, d21
- 	vmlal.s32	q7, d25, d20
-@@ -1368,32 +1334,30 @@
- 	vmlal.s32	q8, d22, d21
- 	vmlal.s32	q8, d28, d20
- 	vmlal.s32	q5, d24, d20
--	add		r2, sp, #576
- 	vst1.8		{d14-d15}, [r2, : 128]
- 	vmull.s32	q7, d18, d6
- 	vmlal.s32	q7, d26, d0
--	add		r2, sp, #656
-+	add		r2, sp, #624
- 	vld1.8		{d30-d31}, [r2, : 128]
- 	vmlal.s32	q2, d30, d21
- 	vmlal.s32	q7, d19, d21
- 	vmlal.s32	q7, d27, d20
--	add		r2, sp, #624
-+	add		r2, sp, #592
- 	vld1.8		{d26-d27}, [r2, : 128]
- 	vmlal.s32	q4, d25, d27
- 	vmlal.s32	q8, d29, d27
- 	vmlal.s32	q8, d25, d26
- 	vmlal.s32	q7, d28, d27
- 	vmlal.s32	q7, d29, d26
--	add		r2, sp, #608
-+	add		r2, sp, #576
- 	vld1.8		{d28-d29}, [r2, : 128]
- 	vmlal.s32	q4, d24, d29
- 	vmlal.s32	q8, d23, d29
- 	vmlal.s32	q8, d24, d28
- 	vmlal.s32	q7, d22, d29
- 	vmlal.s32	q7, d23, d28
--	add		r2, sp, #608
- 	vst1.8		{d8-d9}, [r2, : 128]
--	add		r2, sp, #560
-+	add		r2, sp, #528
- 	vld1.8		{d8-d9}, [r2, : 128]
- 	vmlal.s32	q7, d24, d9
- 	vmlal.s32	q7, d25, d31
-@@ -1414,36 +1378,36 @@
- 	vmlal.s32	q0, d23, d26
- 	vmlal.s32	q0, d24, d31
- 	vmlal.s32	q0, d19, d20
--	add		r2, sp, #640
-+	add		r2, sp, #608
- 	vld1.8		{d18-d19}, [r2, : 128]
- 	vmlal.s32	q2, d18, d7
--	vmlal.s32	q2, d19, d6
- 	vmlal.s32	q5, d18, d6
--	vmlal.s32	q5, d19, d21
- 	vmlal.s32	q1, d18, d21
--	vmlal.s32	q1, d19, d29
- 	vmlal.s32	q0, d18, d28
--	vmlal.s32	q0, d19, d9
- 	vmlal.s32	q6, d18, d29
-+	vmlal.s32	q2, d19, d6
-+	vmlal.s32	q5, d19, d21
-+	vmlal.s32	q1, d19, d29
-+	vmlal.s32	q0, d19, d9
- 	vmlal.s32	q6, d19, d28
--	add		r2, sp, #592
-+	add		r2, sp, #560
- 	vld1.8		{d18-d19}, [r2, : 128]
--	add		r2, sp, #512
-+	add		r2, sp, #480
- 	vld1.8		{d22-d23}, [r2, : 128]
- 	vmlal.s32	q5, d19, d7
- 	vmlal.s32	q0, d18, d21
- 	vmlal.s32	q0, d19, d29
- 	vmlal.s32	q6, d18, d6
--	add		r2, sp, #528
-+	add		r2, sp, #496
- 	vld1.8		{d6-d7}, [r2, : 128]
- 	vmlal.s32	q6, d19, d21
--	add		r2, sp, #576
-+	add		r2, sp, #544
- 	vld1.8		{d18-d19}, [r2, : 128]
- 	vmlal.s32	q0, d30, d8
--	add		r2, sp, #672
-+	add		r2, sp, #640
- 	vld1.8		{d20-d21}, [r2, : 128]
- 	vmlal.s32	q5, d30, d29
--	add		r2, sp, #608
-+	add		r2, sp, #576
- 	vld1.8		{d24-d25}, [r2, : 128]
- 	vmlal.s32	q1, d30, d28
- 	vadd.i64	q13, q0, q11
-@@ -1541,10 +1505,10 @@
- 	sub		r4, r4, #24
- 	vst1.8		d0, [r2, : 64]
- 	vst1.8		d1, [r4, : 64]
--	ldr		r2, [sp, #488]
--	ldr		r4, [sp, #492]
-+	ldr		r2, [sp, #456]
-+	ldr		r4, [sp, #460]
- 	subs		r5, r2, #1
--	bge		._mainloop
-+	bge		.Lmainloop
- 	add		r1, r3, #144
- 	add		r2, r3, #336
- 	vld1.8		{d0-d1}, [r1, : 128]!
-@@ -1553,41 +1517,41 @@
- 	vst1.8		{d0-d1}, [r2, : 128]!
- 	vst1.8		{d2-d3}, [r2, : 128]!
- 	vst1.8		d4, [r2, : 64]
--	ldr		r1, =0
--._invertloop:
-+	movw		r1, #0
-+.Linvertloop:
- 	add		r2, r3, #144
--	ldr		r4, =0
--	ldr		r5, =2
-+	movw		r4, #0
-+	movw		r5, #2
- 	cmp		r1, #1
--	ldreq		r5, =1
-+	moveq		r5, #1
- 	addeq		r2, r3, #336
- 	addeq		r4, r3, #48
- 	cmp		r1, #2
--	ldreq		r5, =1
-+	moveq		r5, #1
- 	addeq		r2, r3, #48
- 	cmp		r1, #3
--	ldreq		r5, =5
-+	moveq		r5, #5
- 	addeq		r4, r3, #336
- 	cmp		r1, #4
--	ldreq		r5, =10
-+	moveq		r5, #10
- 	cmp		r1, #5
--	ldreq		r5, =20
-+	moveq		r5, #20
- 	cmp		r1, #6
--	ldreq		r5, =10
-+	moveq		r5, #10
- 	addeq		r2, r3, #336
- 	addeq		r4, r3, #336
- 	cmp		r1, #7
--	ldreq		r5, =50
-+	moveq		r5, #50
- 	cmp		r1, #8
--	ldreq		r5, =100
-+	moveq		r5, #100
- 	cmp		r1, #9
--	ldreq		r5, =50
-+	moveq		r5, #50
- 	addeq		r2, r3, #336
- 	cmp		r1, #10
--	ldreq		r5, =5
-+	moveq		r5, #5
- 	addeq		r2, r3, #48
- 	cmp		r1, #11
--	ldreq		r5, =0
-+	moveq		r5, #0
- 	addeq		r2, r3, #96
- 	add		r6, r3, #144
- 	add		r7, r3, #288
-@@ -1598,8 +1562,8 @@
- 	vst1.8		{d2-d3}, [r7, : 128]!
- 	vst1.8		d4, [r7, : 64]
- 	cmp		r5, #0
--	beq		._skipsquaringloop
--._squaringloop:
-+	beq		.Lskipsquaringloop
-+.Lsquaringloop:
- 	add		r6, r3, #288
- 	add		r7, r3, #288
- 	add		r8, r3, #288
-@@ -1611,7 +1575,7 @@
- 	vld1.8		{d6-d7}, [r7, : 128]!
- 	vld1.8		{d9}, [r7, : 64]
- 	vld1.8		{d10-d11}, [r6, : 128]!
--	add		r7, sp, #416
-+	add		r7, sp, #384
- 	vld1.8		{d12-d13}, [r6, : 128]!
- 	vmul.i32	q7, q2, q0
- 	vld1.8		{d8}, [r6, : 64]
-@@ -1726,7 +1690,7 @@
- 	vext.32		d10, d6, d6, #0
- 	vmov.i32	q1, #0xffffffff
- 	vshl.i64	q4, q1, #25
--	add		r7, sp, #512
-+	add		r7, sp, #480
- 	vld1.8		{d14-d15}, [r7, : 128]
- 	vadd.i64	q9, q2, q7
- 	vshl.i64	q1, q1, #26
-@@ -1735,7 +1699,7 @@
- 	vadd.i64	q5, q5, q10
- 	vand		q9, q9, q1
- 	vld1.8		{d16}, [r6, : 64]!
--	add		r6, sp, #528
-+	add		r6, sp, #496
- 	vld1.8		{d20-d21}, [r6, : 128]
- 	vadd.i64	q11, q5, q10
- 	vsub.i64	q2, q2, q9
-@@ -1789,8 +1753,8 @@
- 	sub		r6, r6, #32
- 	vst1.8		d4, [r6, : 64]
- 	subs		r5, r5, #1
--	bhi		._squaringloop
--._skipsquaringloop:
-+	bhi		.Lsquaringloop
-+.Lskipsquaringloop:
- 	mov		r2, r2
- 	add		r5, r3, #288
- 	add		r6, r3, #144
-@@ -1802,7 +1766,7 @@
- 	vld1.8		{d6-d7}, [r5, : 128]!
- 	vld1.8		{d9}, [r5, : 64]
- 	vld1.8		{d10-d11}, [r2, : 128]!
--	add		r5, sp, #416
-+	add		r5, sp, #384
- 	vld1.8		{d12-d13}, [r2, : 128]!
- 	vmul.i32	q7, q2, q0
- 	vld1.8		{d8}, [r2, : 64]
-@@ -1917,7 +1881,7 @@
- 	vext.32		d10, d6, d6, #0
- 	vmov.i32	q1, #0xffffffff
- 	vshl.i64	q4, q1, #25
--	add		r5, sp, #512
-+	add		r5, sp, #480
- 	vld1.8		{d14-d15}, [r5, : 128]
- 	vadd.i64	q9, q2, q7
- 	vshl.i64	q1, q1, #26
-@@ -1926,7 +1890,7 @@
- 	vadd.i64	q5, q5, q10
- 	vand		q9, q9, q1
- 	vld1.8		{d16}, [r2, : 64]!
--	add		r2, sp, #528
-+	add		r2, sp, #496
- 	vld1.8		{d20-d21}, [r2, : 128]
- 	vadd.i64	q11, q5, q10
- 	vsub.i64	q2, q2, q9
-@@ -1980,7 +1944,7 @@
- 	sub		r2, r2, #32
- 	vst1.8		d4, [r2, : 64]
- 	cmp		r4, #0
--	beq		._skippostcopy
-+	beq		.Lskippostcopy
- 	add		r2, r3, #144
- 	mov		r4, r4
- 	vld1.8		{d0-d1}, [r2, : 128]!
-@@ -1989,9 +1953,9 @@
- 	vst1.8		{d0-d1}, [r4, : 128]!
- 	vst1.8		{d2-d3}, [r4, : 128]!
- 	vst1.8		d4, [r4, : 64]
--._skippostcopy:
-+.Lskippostcopy:
- 	cmp		r1, #1
--	bne		._skipfinalcopy
-+	bne		.Lskipfinalcopy
- 	add		r2, r3, #288
- 	add		r4, r3, #144
- 	vld1.8		{d0-d1}, [r2, : 128]!
-@@ -2000,10 +1964,10 @@
- 	vst1.8		{d0-d1}, [r4, : 128]!
- 	vst1.8		{d2-d3}, [r4, : 128]!
- 	vst1.8		d4, [r4, : 64]
--._skipfinalcopy:
-+.Lskipfinalcopy:
- 	add		r1, r1, #1
- 	cmp		r1, #12
--	blo		._invertloop
-+	blo		.Linvertloop
- 	add		r1, r3, #144
- 	ldr		r2, [r1], #4
- 	ldr		r3, [r1], #4
-@@ -2085,21 +2049,16 @@
- 	add		r8, r8, r10, LSL #12
- 	mov		r9, r10, LSR #20
- 	add		r1, r9, r1, LSL #6
--	str		r2, [r0], #4
--	str		r3, [r0], #4
--	str		r4, [r0], #4
--	str		r5, [r0], #4
--	str		r6, [r0], #4
--	str		r7, [r0], #4
--	str		r8, [r0], #4
--	str		r1, [r0]
--	ldrd		r4, [sp, #0]
--	ldrd		r6, [sp, #8]
--	ldrd		r8, [sp, #16]
--	ldrd		r10, [sp, #24]
--	ldr		r12, [sp, #480]
--	ldr		r14, [sp, #484]
--	ldr		r0, =0
--	mov		sp, r12
--	vpop		{q4, q5, q6, q7}
--	bx		lr
-+	str		r2, [r0]
-+	str		r3, [r0, #4]
-+	str		r4, [r0, #8]
-+	str		r5, [r0, #12]
-+	str		r6, [r0, #16]
-+	str		r7, [r0, #20]
-+	str		r8, [r0, #24]
-+	str		r1, [r0, #28]
-+	movw		r0, #0
-+	mov		sp, ip
-+	pop		{r4-r11, pc}
-+ENDPROC(curve25519_neon)
-+#endif
-diff --git a/lib/zinc/curve25519/curve25519.c b/lib/zinc/curve25519/curve25519.c
-index 074fbb1c2149..0ebe16f8c638 100644
---- a/lib/zinc/curve25519/curve25519.c
-+++ b/lib/zinc/curve25519/curve25519.c
-@@ -22,6 +22,8 @@
+ 	tst		rounds, #2
+ 	bne		1f
+@@ -152,6 +169,15 @@
+ 	b		0b
  
- #if defined(CONFIG_ZINC_ARCH_X86_64)
- #include "curve25519-x86_64-glue.c"
-+#elif defined(CONFIG_ZINC_ARCH_ARM)
-+#include "curve25519-arm-glue.c"
- #else
- static bool *const curve25519_nobs[] __initconst = { };
- static void __init curve25519_fpu_init(void)
+ 2:	__adrl		ttab, \ltab
++.if \bsz == 0
++	/* Prefetch the 256-byte inverse S-box; see explanation above */
++	.set i, 0
++.rept 256 / 64
++	ldr		t0, [ttab, #i + 0]
++	ldr		t1, [ttab, #i + 32]
++	.set i, i + 64
++.endr
++.endif
+ 	\round		r4, r5, r6, r7, r8, r9, r10, r11, \bsz, b
+ 
+ #ifdef CONFIG_CPU_BIG_ENDIAN
+diff --git a/arch/arm/crypto/aes-cipher-glue.c b/arch/arm/crypto/aes-cipher-glue.c
+index c222f6e072ad..f40e35eb22e4 100644
+--- a/arch/arm/crypto/aes-cipher-glue.c
++++ b/arch/arm/crypto/aes-cipher-glue.c
+@@ -23,16 +23,29 @@ static void aes_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
+ {
+ 	struct crypto_aes_ctx *ctx = crypto_tfm_ctx(tfm);
+ 	int rounds = 6 + ctx->key_length / 4;
++	unsigned long flags;
+ 
++	/*
++	 * This AES implementation prefetches the lookup table into L1 cache to
++	 * try to make timing attacks on the table lookups more difficult.
++	 * Temporarily disable interrupts to avoid races where cachelines are
++	 * evicted when the CPU is interrupted to do something else.
++	 */
++	local_irq_save(flags);
+ 	__aes_arm_encrypt(ctx->key_enc, rounds, in, out);
++	local_irq_restore(flags);
+ }
+ 
+ static void aes_decrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
+ {
+ 	struct crypto_aes_ctx *ctx = crypto_tfm_ctx(tfm);
+ 	int rounds = 6 + ctx->key_length / 4;
++	unsigned long flags;
+ 
++	/* Disable interrupts to help mitigate timing attacks, see above */
++	local_irq_save(flags);
+ 	__aes_arm_decrypt(ctx->key_dec, rounds, in, out);
++	local_irq_restore(flags);
+ }
+ 
+ static struct crypto_alg aes_alg = {
+diff --git a/crypto/aes_generic.c b/crypto/aes_generic.c
+index ca554d57d01e..13df33aca463 100644
+--- a/crypto/aes_generic.c
++++ b/crypto/aes_generic.c
+@@ -63,7 +63,8 @@ static inline u8 byte(const u32 x, const unsigned n)
+ 
+ static const u32 rco_tab[10] = { 1, 2, 4, 8, 16, 32, 64, 128, 27, 54 };
+ 
+-__visible const u32 crypto_ft_tab[4][256] = {
++/* cacheline-aligned to facilitate prefetching into cache */
++__visible const u32 crypto_ft_tab[4][256] __cacheline_aligned = {
+ 	{
+ 		0xa56363c6, 0x847c7cf8, 0x997777ee, 0x8d7b7bf6,
+ 		0x0df2f2ff, 0xbd6b6bd6, 0xb16f6fde, 0x54c5c591,
+@@ -327,7 +328,7 @@ __visible const u32 crypto_ft_tab[4][256] = {
+ 	}
+ };
+ 
+-__visible const u32 crypto_fl_tab[4][256] = {
++__visible const u32 crypto_fl_tab[4][256] __cacheline_aligned = {
+ 	{
+ 		0x00000063, 0x0000007c, 0x00000077, 0x0000007b,
+ 		0x000000f2, 0x0000006b, 0x0000006f, 0x000000c5,
+@@ -591,7 +592,7 @@ __visible const u32 crypto_fl_tab[4][256] = {
+ 	}
+ };
+ 
+-__visible const u32 crypto_it_tab[4][256] = {
++__visible const u32 crypto_it_tab[4][256] __cacheline_aligned = {
+ 	{
+ 		0x50a7f451, 0x5365417e, 0xc3a4171a, 0x965e273a,
+ 		0xcb6bab3b, 0xf1459d1f, 0xab58faac, 0x9303e34b,
+@@ -855,7 +856,7 @@ __visible const u32 crypto_it_tab[4][256] = {
+ 	}
+ };
+ 
+-__visible const u32 crypto_il_tab[4][256] = {
++__visible const u32 crypto_il_tab[4][256] __cacheline_aligned = {
+ 	{
+ 		0x00000052, 0x00000009, 0x0000006a, 0x000000d5,
+ 		0x00000030, 0x00000036, 0x000000a5, 0x00000038,
 -- 
 2.19.1
