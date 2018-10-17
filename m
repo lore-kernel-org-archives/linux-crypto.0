@@ -1,145 +1,384 @@
-Return-Path: <SRS0=XFsj=M6=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from stargate.chelsio.com ([12.32.117.8]:59081 "EHLO
-        stargate.chelsio.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727711AbeJRWF5 (ORCPT
+Return-Path: <SRS0=Iqog=M5=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from merlin.infradead.org ([205.233.59.134]:56086 "EHLO
+        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727037AbeJRBf6 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 18 Oct 2018 18:05:57 -0400
-From: Ganesh Goudar <ganeshgr@chelsio.com>
-To: netdev@vger.kernel.org, davem@davemloft.net
-Cc: nirranjan@chelsio.com, indranil@chelsio.com, dt@chelsio.com,
-        harsh@chelsio.com, linux-crypto@vger.kernel.org,
-        Ganesh Goudar <ganeshgr@chelsio.com>
-Subject: [PATCH net-next] cxgb4: fix the error path of cxgb4_uld_register()
-Date: Thu, 18 Oct 2018 19:34:19 +0530
-Message-Id: <1539871459-6921-1-git-send-email-ganeshgr@chelsio.com>
+        Wed, 17 Oct 2018 21:35:58 -0400
+Subject: Re: [PATCH 3/3] crypto: qce: ice: Add support for Inline Crypto
+ Engine
+To: AnilKumar Chimata <anilc@codeaurora.org>, andy.gross@linaro.org,
+        david.brown@linaro.org, robh+dt@kernel.org, mark.rutland@arm.com,
+        herbert@gondor.apana.org.au, davem@davemloft.net
+Cc: linux-soc@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <1539789476-6098-1-git-send-email-anilc@codeaurora.org>
+ <1539789476-6098-4-git-send-email-anilc@codeaurora.org>
+From: Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <48c7da0d-4e57-bc36-a683-94088b3b8319@infradead.org>
+Date: Wed, 17 Oct 2018 10:39:07 -0700
+MIME-Version: 1.0
+In-Reply-To: <1539789476-6098-4-git-send-email-anilc@codeaurora.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On multi adapter setup if the uld registration fails even on
-one adapter, the allocated resources for the uld on all the
-adapters are freed, rendering the functioning adapters unusable.
+On 10/17/18 8:17 AM, AnilKumar Chimata wrote:
+> This patch adds support for Inline Crypto Engine (ICE), which
+> is embedded into storage device/controller such as UFS/eMMC.
+> ICE is intended for high throughput cryptographic encryption
+> or decryption of storage data.
+> 
+> Signed-off-by: AnilKumar Chimata <anilc@codeaurora.org>
+> ---
+>  Documentation/crypto/msm/ice.txt |  235 ++++++
+>  drivers/crypto/Kconfig           |   10 +
+>  drivers/crypto/qce/Makefile      |    1 +
+>  drivers/crypto/qce/ice.c         | 1613 ++++++++++++++++++++++++++++++++++++++
+>  drivers/crypto/qce/iceregs.h     |  159 ++++
+>  include/crypto/ice.h             |   80 ++
+>  6 files changed, 2098 insertions(+)
+>  create mode 100644 Documentation/crypto/msm/ice.txt
+>  create mode 100644 drivers/crypto/qce/ice.c
+>  create mode 100644 drivers/crypto/qce/iceregs.h
+>  create mode 100644 include/crypto/ice.h
+> 
+> diff --git a/Documentation/crypto/msm/ice.txt b/Documentation/crypto/msm/ice.txt
+> new file mode 100644
+> index 0000000..58f7081
+> --- /dev/null
+> +++ b/Documentation/crypto/msm/ice.txt
+> @@ -0,0 +1,235 @@
+> +Introduction:
+> +=============
+> +Storage encryption has been one of the most required feature from security
 
-This commit fixes the issue by freeing the allocated resources
-only for the failed adapter.
+                                                        features
 
-Signed-off-by: Ganesh Goudar <ganeshgr@chelsio.com>
----
- drivers/crypto/chelsio/chcr_core.c             |  4 +--
- drivers/net/ethernet/chelsio/cxgb4/cxgb4_uld.c | 46 ++++++--------------------
- drivers/net/ethernet/chelsio/cxgb4/cxgb4_uld.h |  2 +-
- 3 files changed, 13 insertions(+), 39 deletions(-)
+> +point of view. QTI based storage encryption solution uses general purpose
+> +crypto engine. While this kind of solution provide a decent amount of
 
-diff --git a/drivers/crypto/chelsio/chcr_core.c b/drivers/crypto/chelsio/chcr_core.c
-index 04f277c..62249d4 100644
---- a/drivers/crypto/chelsio/chcr_core.c
-+++ b/drivers/crypto/chelsio/chcr_core.c
-@@ -237,9 +237,7 @@ static int chcr_uld_state_change(void *handle, enum cxgb4_state state)
- 
- static int __init chcr_crypto_init(void)
- {
--	if (cxgb4_register_uld(CXGB4_ULD_CRYPTO, &chcr_uld_info))
--		pr_err("ULD register fail: No chcr crypto support in cxgb4\n");
--
-+	cxgb4_register_uld(CXGB4_ULD_CRYPTO, &chcr_uld_info);
- 	return 0;
- }
- 
-diff --git a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_uld.c b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_uld.c
-index 4bc2110..2673226 100644
---- a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_uld.c
-+++ b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_uld.c
-@@ -702,15 +702,14 @@ static void uld_attach(struct adapter *adap, unsigned int uld)
-  *	about any presently available devices that support its type.  Returns
-  *	%-EBUSY if a ULD of the same type is already registered.
-  */
--int cxgb4_register_uld(enum cxgb4_uld type,
--		       const struct cxgb4_uld_info *p)
-+void cxgb4_register_uld(enum cxgb4_uld type,
-+			const struct cxgb4_uld_info *p)
- {
- 	int ret = 0;
--	unsigned int adap_idx = 0;
- 	struct adapter *adap;
- 
- 	if (type >= CXGB4_ULD_MAX)
--		return -EINVAL;
-+		return;
- 
- 	mutex_lock(&uld_mutex);
- 	list_for_each_entry(adap, &adapter_list, list_node) {
-@@ -733,52 +732,29 @@ int cxgb4_register_uld(enum cxgb4_uld type,
- 		}
- 		if (adap->flags & FULL_INIT_DONE)
- 			enable_rx_uld(adap, type);
--		if (adap->uld[type].add) {
--			ret = -EBUSY;
-+		if (adap->uld[type].add)
- 			goto free_irq;
--		}
- 		ret = setup_sge_txq_uld(adap, type, p);
- 		if (ret)
- 			goto free_irq;
- 		adap->uld[type] = *p;
- 		uld_attach(adap, type);
--		adap_idx++;
--	}
--	mutex_unlock(&uld_mutex);
--	return 0;
--
-+		continue;
- free_irq:
--	if (adap->flags & FULL_INIT_DONE)
--		quiesce_rx_uld(adap, type);
--	if (adap->flags & USING_MSIX)
--		free_msix_queue_irqs_uld(adap, type);
--free_rxq:
--	free_sge_queues_uld(adap, type);
--free_queues:
--	free_queues_uld(adap, type);
--out:
--
--	list_for_each_entry(adap, &adapter_list, list_node) {
--		if ((type == CXGB4_ULD_CRYPTO && !is_pci_uld(adap)) ||
--		    (type != CXGB4_ULD_CRYPTO && !is_offload(adap)))
--			continue;
--		if (type == CXGB4_ULD_ISCSIT && is_t4(adap->params.chip))
--			continue;
--		if (!adap_idx)
--			break;
--		adap->uld[type].handle = NULL;
--		adap->uld[type].add = NULL;
--		release_sge_txq_uld(adap, type);
- 		if (adap->flags & FULL_INIT_DONE)
- 			quiesce_rx_uld(adap, type);
- 		if (adap->flags & USING_MSIX)
- 			free_msix_queue_irqs_uld(adap, type);
-+free_rxq:
- 		free_sge_queues_uld(adap, type);
-+free_queues:
- 		free_queues_uld(adap, type);
--		adap_idx--;
-+out:
-+		dev_warn(adap->pdev_dev,
-+			 "ULD registration failed for uld type %d\n", type);
- 	}
- 	mutex_unlock(&uld_mutex);
--	return ret;
-+	return;
- }
- EXPORT_SYMBOL(cxgb4_register_uld);
- 
-diff --git a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_uld.h b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_uld.h
-index de9ad31..5fa9a2d 100644
---- a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_uld.h
-+++ b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_uld.h
-@@ -384,7 +384,7 @@ struct cxgb4_uld_info {
- 	int (*tx_handler)(struct sk_buff *skb, struct net_device *dev);
- };
- 
--int cxgb4_register_uld(enum cxgb4_uld type, const struct cxgb4_uld_info *p);
-+void cxgb4_register_uld(enum cxgb4_uld type, const struct cxgb4_uld_info *p);
- int cxgb4_unregister_uld(enum cxgb4_uld type);
- int cxgb4_ofld_send(struct net_device *dev, struct sk_buff *skb);
- int cxgb4_immdata_send(struct net_device *dev, unsigned int idx,
+                                              provides
+
+> +performance, it falls short as storage speed is improving significantly
+> +continuously. To overcome performance degradation, newer chips are going to
+> +have Inline Crypto Engine (ICE) embedded into storage device. ICE is supposed
+> +to meet the line speed of storage devices.
+> +
+> +Hardware Description
+> +====================
+> +ICE is a HW block that is embedded into storage device such as UFS/eMMC. By
+
+s/HW/hardware/                                     devices
+
+> +default, ICE works in bypass mode i.e. ICE HW does not perform any crypto
+> +operation on data to be processed by storage device. If required, ICE can be
+> +configured to perform crypto operation in one direction (i.e. either encryption
+> +or decryption) or in both direction(both encryption & decryption).
+
+                             directions (both ...
+
+> +
+> +When a switch between the operation modes(plain to crypto or crypto to plain)
+
+                                       modes (plain ...
+
+> +is desired for a particular partition, SW must complete all transactions for
+
+s/SW/software/
+
+> +that particular partition before switching the crypto mode i.e. no crypto, one
+
+                                                  crypto mode;
+
+> +direction crypto or both direction crypto operation. Requests for other
+
+                            directions
+
+> +partitions are not impacted due to crypto mode switch.
+> +
+> +ICE HW currently supports AES128/256 bit ECB & XTS mode encryption algorithms.
+> +
+> +Keys for crypto operations are loaded from SW. Keys are stored in a lookup
+> +table(LUT) located inside ICE HW. Maximum of 32 keys can be loaded in ICE key
+> +LUT. A Key inside the LUT can be referred using a key index.
+
+                                    referred to using
+
+> +
+> +SW Description
+> +==============
+> +ICE HW has categorized ICE registers in 2 groups: those which can be accessed by
+> +only secure side i.e. TZ and those which can be accessed by non-secure side such
+
+at least tell the reader what TZ and HLOS mean...
+
+> +as HLOS as well. This requires that ICE driver to be split in two pieces: one
+
+                                  that the ICE driver be split into two pieces: one
+
+> +running from TZ space and another from HLOS space.
+> +
+> +ICE driver from TZ would configure keys as requested by HLOS side.
+> +
+> +ICE driver on HLOS side is responsible for initialization of ICE HW.
+> +
+> +SW Architecture Diagram
+> +=======================
+> +Following are all the components involved in the ICE driver for control path:
+> +
+> ++++++++++++++++++++++++++++++++++++++++++
+> ++               App layer               +
+> ++++++++++++++++++++++++++++++++++++++++++
+> ++             System layer              +
+> ++   ++++++++         +++++++            +
+> ++   + VOLD +         + PFM +            +
+> ++   ++++++++         +++++++            +
+> ++         ||         ||                 +
+> ++         ||         ||                 +
+> ++         \/         \/                 +
+> ++     +++++++++++++++++++++++++++       +
+> ++     + LibQSEECom / cryptfs_hw +       +
+> ++     +++++++++++++++++++++++++++       +
+> ++++++++++++++++++++++++++++++++++++++++++
+> ++             Kernel                    +       +++++++++++++++++
+> ++                                       +       +     KMS       +
+> ++  +++++++  +++++++++++  +++++++++++    +       +++++++++++++++++
+> ++  + ICE +  + Storage +  + QSEECom +    +       +   ICE Driver  +
+> ++++++++++++++++++++++++++++++++++++++++++ <===> +++++++++++++++++
+> +               ||                                    ||
+> +               ||                                    ||
+> +               \/                                    \/
+> ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+> ++                      Storage Device                           +
+> ++                      ++++++++++++++                           +
+> ++                      +   ICE HW   +                           +
+> ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+> +
+> +Use Cases:
+> +----------
+> +a) Device bootup
+> +ICE HW is detected during bootup time and corresponding probe function is
+> +called. ICE driver parses its data from device tree node. ICE HW and storage
+> +HW are tightly coupled. Storage device probing is dependent upon ICE device
+> +probing. ICE driver configures all the required registers to put the ICE HW
+> +in bypass mode.
+> +
+> +b) Configuring keys
+> +Currently, there are couple of use cases to configure the keys.
+> +
+> +1) Full Disk Encryption(FDE)
+> +System layer(VOLD) at invocation of apps layer would call libqseecom to create
+> +the encryption key. Libqseecom calls qseecom driver to communicate with KMS
+> +module on the secure side i.e. TZ. KMS would call ICE driver on the TZ side to
+> +create and set the keys in ICE HW. At the end of transaction, VOLD would have
+> +key index of key LUT where encryption key is present.
+> +
+> +2) Per File Encryption (PFE)
+> +Per File Manager(PFM) calls QSEECom api to create the key. PFM has a peer comp-
+
+Preferably don't split (hyphenate) "component."  But if you must, it should be com-
+ponent.
+
+> +onent(PFT) at kernel layer which gets the corresponding key index from PFM.
+> +
+> +Following are all the components involved in the ICE driver for data path:
+> +
+> +       +++++++++++++++++++++++++++++++++++++++++
+> +       +               App layer               +
+> +       +++++++++++++++++++++++++++++++++++++++++
+> +       +              VFS                      +
+> +       +---------------------------------------+
+> +       +         File System (EXT4)            +
+> +       +---------------------------------------+
+> +       +             Block Layer               +
+> +       + --------------------------------------+
+> +       +                              +++++++  +
+> +       +              dm-req-crypt => + PFT +  +
+> +       +                              +++++++  +
+> +       +                                       +
+> +       +---------------------------------------+
+> +       +    +++++++++++           +++++++      +
+> +       +    + Storage +           + ICE +      +
+> +       +++++++++++++++++++++++++++++++++++++++++
+> +       +                  ||                   +
+> +       +                  || (Storage Req with +
+> +       +                  \/  ICE parameters ) +
+> +       +++++++++++++++++++++++++++++++++++++++++
+> +       +          Storage Device               +
+> +       +          ++++++++++++++               +
+> +       +          +   ICE HW   +               +
+> +       +++++++++++++++++++++++++++++++++++++++++
+> +
+> +c) Data transaction
+> +Once the crypto key has been configured, VOLD/PFM creates device mapping for
+> +data partition. As part of device mapping VOLD passes key index, crypto
+> +algorithm, mode and key length to dm layer. In case of PFE, keys are provided
+> +by PFT as and when request is processed by dm-req-crypt. When any application
+> +needs to read/write data, it would go through DM layer which would add crypto
+> +information, provided by VOLD/PFT, to Request. For each Request, Storage driver
+> +would ask ICE driver to configure crypto part of request. ICE driver extracts
+> +crypto data from Request structure and provide it to storage driver which would
+
+                                          provides
+
+> +finally dispatch request to storage device.
+> +
+> +d) Error Handling
+> +Due to issue # 1 mentioned in "Known Issues", ICE driver does not register for
+> +any interrupt. However, it enables sources of interrupt for ICE HW. After each
+> +data transaction, Storage driver receives transaction completion event. As part
+> +of event handling, storage driver calls  ICE driver to check if any of ICE
+> +interrupt status is set. If yes, storage driver returns error to upper layer.
+> +
+> +Error handling would be changed in future chips.
+> +
+> +Interfaces
+> +==========
+> +ICE driver exposes interfaces for storage driver to :
+
+                                                    to:
+
+> +1. Get the global instance of ICE driver
+> +2. Get the implemented interfaces of the particular ice instance
+> +3. Initialize the ICE HW
+> +4. Reset the ICE HW
+> +5. Resume/Suspend the ICE HW
+> +6. Get the Crypto configuration for the data request for storage
+> +7. Check if current data transaction has generated any interrupt
+> +
+> +Driver Parameters
+> +=================
+> +This driver is built and statically linked into the kernel; therefore,
+> +there are no module parameters supported by this driver.
+> +
+> +There are no kernel command line parameters supported by this driver.
+> +
+> +Power Management
+> +================
+> +ICE driver does not do power management on its own as it is part of storage
+> +hardware. Whenever storage driver receives request for power collapse/suspend
+> +resume, it would call ICE driver which exposes APIs for Storage HW. ICE HW
+> +during power collapse or reset, wipes crypto configuration data. When ICE
+
+                                 ^no comma
+
+> +driver receives request to resume, it would ask ICE driver on TZ side to
+> +restore the configuration. ICE driver does not do anything as part of power
+> +collapse or suspend event.
+> +
+> +Interface:
+> +==========
+> +ICE driver exposes following APIs for storage driver to use:
+> +
+> +int (*init)(struct platform_device *, void *, ice_success_cb, ice_error_cb);
+> +	-- This function is invoked by storage controller during initialization of
+> +	storage controller. Storage controller would provide success and error call
+> +	backs which would be invoked asynchronously once ICE HW init is done.
+> +
+> +int (*reset)(struct platform_device *);
+> +	-- ICE HW reset as part of storage controller reset. When storage controller
+> +	received reset command, it would call reset on ICE HW. As of now, ICE HW
+> +	does not need to do anything as part of reset.
+> +
+> +int (*resume)(struct platform_device *);
+> +	-- ICE HW while going to reset, wipes all crypto keys and other data from ICE
+
+                                      ^no comma
+
+> +	HW. ICE driver would reconfigure those data as part of resume operation.
+> +
+> +int (*suspend)(struct platform_device *);
+> +	-- This API would be called by storage driver when storage device is going to
+> +	suspend mode. As of today, ICE driver does not do anything to handle suspend.
+> +
+> +int (*config)(struct platform_device *, struct request* , struct ice_data_setting*);
+> +	-- Storage driver would call this interface to get all crypto data required to
+> +	perform crypto operation.
+> +
+> +int (*status)(struct platform_device *);
+> +	-- Storage driver would call this interface to check if previous data transfer
+> +	generated any error.
+> +
+> +Config options
+> +==============
+> +This driver is enabled by the kernel config option CONFIG_CRYPTO_DEV_MSM_ICE.
+> +
+> +Dependencies
+> +============
+> +ICE driver depends upon corresponding ICE driver on TZ side to function
+> +appropriately.
+> +
+> +Known Issues
+> +============
+> +1. ICE HW emits 0s even if it has generated an interrupt
+
+That statement is unclear.  Emits where?  in a data stream?  in interrupt status?
+
+> +This issue has significant impact on how ICE interrupts are handled. Currently,
+> +ICE driver does not register for any of the ICE interrupts but enables the
+> +sources of interrupt. Once storage driver asks to check the status of interrupt,
+> +it reads and clears the clear status and provide read status to storage driver.
+
+               "clears the clear status"???         s/provide/provides/
+
+> +This mechanism though not optimal but prevents file-system corruption.
+
+mangled sentence above.
+
+> +This issue has been fixed in newer chips.
+> +
+> +2. ICE HW wipes all crypto data during power collapse
+> +This issue necessitate that ICE driver on TZ side store the crypto material
+
+              necessitates
+
+> +which is not required in the case of general purpose crypto engine.
+> +This issue has been fixed in newer chips.
+> +
+> +Further Improvements
+> +====================
+> +Currently, Due to PFE use case, ICE driver is dependent upon dm-req-crypt to
+
+              due
+
+> +provide the keys as part of request structure. This couples ICE driver with
+> +dm-req-crypt based solution. It is under discussion to expose an IOCTL based
+
+                                                       to expose IOCTL based
+
+> +and registration based interface APIs from ICE driver. ICE driver would use
+> +these two interfaces to find out if any key exists for current request. If
+> +yes, choose the right key index received from IOCTL or registration based
+> +APIs. If not, dont set any crypto parameter in the request.
+
+                 don't
+
+> diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+> index a8c4ce0..e40750e 100644
+> --- a/drivers/crypto/Kconfig
+> +++ b/drivers/crypto/Kconfig
+> @@ -596,6 +596,16 @@ config CRYPTO_DEV_QCOM_RNG
+>  	  To compile this driver as a module, choose M here. The
+>            module will be called qcom-rng. If unsure, say N.
+>  
+> +config CRYPTO_DEV_QTI_ICE
+> +	tristate "Qualcomm inline crypto engine accelerator"
+> +	default n
+
+Please drop the redundant "default n" since n is already the default.
+
+> +	depends on (ARCH_QCOM || COMPILE_TEST) && BLK_DEV_DM
+> +	help
+> +	  This driver supports Inline Crypto Engine for QTI chipsets, MSM8994
+> +	  and later, to accelerate crypto operations for storage needs.
+> +	  To compile this driver as a module, choose M here: the
+> +	  module will be called ice.
+> +
+>  config CRYPTO_DEV_VMX
+>  	bool "Support for VMX cryptographic acceleration instructions"
+>  	depends on PPC64 && VSX
+
 -- 
-2.1.0
+~Randy
