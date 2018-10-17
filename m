@@ -1,49 +1,67 @@
-Return-Path: <SRS0=XFsj=M6=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from gateway20.websitewelcome.com ([192.185.48.38]:33997 "EHLO
-        gateway20.websitewelcome.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727357AbeJROnp (ORCPT
+Return-Path: <SRS0=Iqog=M5=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from smtp.codeaurora.org ([198.145.29.96]:44924 "EHLO
+        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727013AbeJQXOm (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 18 Oct 2018 10:43:45 -0400
-Received: from cm11.websitewelcome.com (cm11.websitewelcome.com [100.42.49.5])
-        by gateway20.websitewelcome.com (Postfix) with ESMTP id C6077400DB261
-        for <linux-crypto@vger.kernel.org>; Thu, 18 Oct 2018 01:24:06 -0500 (CDT)
-Subject: Re: [PATCH] crypto: inside-secure: safexcel - fix memory allocation
-To: Kees Cook <keescook@chromium.org>
-Cc: Antoine Tenart <antoine.tenart@bootlin.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-References: <20181008191712.GA12892@embeddedor.com>
- <CAGXu5j+a=81mGFrF5igMXe46mv_PsqzUKCzLWj0oCEMk1PY62g@mail.gmail.com>
- <9fa270bc-502d-5ff5-2acb-88ababcc9262@embeddedor.com>
- <20181017061741.qr23stkwqf36fet6@gondor.apana.org.au>
- <20181017072034.GD28572@kwain>
- <0529a397-f104-5f3a-663e-7ef2d883dcb2@embeddedor.com>
- <CAGXu5jKL07_ofMpTbaH2E=JnWEF8Y=36T+sQ5m-aRke5H=3twA@mail.gmail.com>
-From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-Message-ID: <0077259b-11bb-107c-97ea-ad739e1d2e86@embeddedor.com>
-Date: Thu, 18 Oct 2018 08:24:02 +0200
-MIME-Version: 1.0
-In-Reply-To: <CAGXu5jKL07_ofMpTbaH2E=JnWEF8Y=36T+sQ5m-aRke5H=3twA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
+        Wed, 17 Oct 2018 19:14:42 -0400
+From: AnilKumar Chimata <anilc@codeaurora.org>
+To: andy.gross@linaro.org, david.brown@linaro.org, robh+dt@kernel.org,
+        mark.rutland@arm.com, herbert@gondor.apana.org.au,
+        davem@davemloft.net
+Cc: linux-soc@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        AnilKumar Chimata <anilc@codeaurora.org>
+Subject: [PATCH 0/3] Add Inline Crypto Engine (ICE) driver
+Date: Wed, 17 Oct 2018 20:47:53 +0530
+Message-Id: <1539789476-6098-1-git-send-email-anilc@codeaurora.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+This patch series adds support for QualComm ICE driver which
+is embedded in storage device such as UFS/eMMC.
 
-On 10/17/18 8:23 PM, Kees Cook wrote:
+ICE HW provides high throughputs, which meets the line speed
+of storage devices. ICE works in bypass or non-bypass mode,
+during bypass mode ICE does not perform any crypto operations
+but in non-bypass mode ICE will perform encryption/decryption
+based on the configuration.
 
->>
->> If so, could you take this patch?
-> 
-> Since this has no functional exposure (the sizes are the same), let's
-> just wait until after the merge window to get this into crypto-next.
-> 
+ICE HW supports AES128/256 bit ECB & XTS mode algorithms, which
+is used on many SoCs like msm8916, msm8996, msm8953, sdm845 and
+many more MTPs from QualComm.
 
-Okay. I agree.
+Also adds new functions to firmware driver which are needed to
+request secure OS to restore ICE key config when device reset.
 
-Thanks!
---
-Gustavo
+These patches have been tested on sdm845 MTP using some additional
+patches (a) interconnect changes (b) ufs-ice interface driver
+(c) dtsi changes for device init (d) kernel config changes. Once
+these patches are accepted rest will be posted.
+
+AnilKumar Chimata (3):
+  firmware: qcom: scm: Update qcom_scm_call signature
+  dt-bindings: Add ICE device specific parameters
+  crypto: qce: ice: Add support for Inline Crypto Engine
+
+ Documentation/crypto/msm/ice.txt                   |  235 +++
+ .../devicetree/bindings/crypto/msm/ice.txt         |   34 +
+ drivers/crypto/Kconfig                             |   10 +
+ drivers/crypto/qce/Makefile                        |    1 +
+ drivers/crypto/qce/ice.c                           | 1613 ++++++++++++++++++++
+ drivers/crypto/qce/iceregs.h                       |  159 ++
+ drivers/firmware/qcom_scm-32.c                     |   30 +-
+ drivers/firmware/qcom_scm-64.c                     |   77 +-
+ drivers/firmware/qcom_scm.c                        |    8 +-
+ drivers/firmware/qcom_scm.h                        |    5 +-
+ include/crypto/ice.h                               |   80 +
+ include/linux/qcom_scm.h                           |    5 +
+ 12 files changed, 2213 insertions(+), 44 deletions(-)
+ create mode 100644 Documentation/crypto/msm/ice.txt
+ create mode 100644 Documentation/devicetree/bindings/crypto/msm/ice.txt
+ create mode 100644 drivers/crypto/qce/ice.c
+ create mode 100644 drivers/crypto/qce/iceregs.h
+ create mode 100644 include/crypto/ice.h
+
+-- 
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
+a Linux Foundation Collaborative Project
