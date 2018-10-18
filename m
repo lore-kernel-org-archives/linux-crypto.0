@@ -1,97 +1,145 @@
-Return-Path: <SRS0=rgpc=NK=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from szxga06-in.huawei.com ([45.249.212.32]:50444 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727576AbeJ3WwY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 30 Oct 2018 18:52:24 -0400
-Message-ID: <5BD86392.7070200@huawei.com>
-Date: Tue, 30 Oct 2018 21:58:42 +0800
-From: zhong jiang <zhongjiang@huawei.com>
-MIME-Version: 1.0
-To: Benjamin Coddington <bcodding@redhat.com>,
-        <herbert@gondor.apana.org.au>, <trond.myklebust@hammerspace.com>,
-        <bfields@redhat.com>
-CC: <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>, <linux-nfs@vger.kernel.org>
-Subject: Re: [Qestion] Lots of memory leaks when mounting and unmounting nfs
- client to server continuously.
-References: <5BD85266.6000301@huawei.com> <1DEE371C-69EB-4D92-8F78-535AA5203007@redhat.com>
-In-Reply-To: <1DEE371C-69EB-4D92-8F78-535AA5203007@redhat.com>
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
+Return-Path: <SRS0=XFsj=M6=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from stargate.chelsio.com ([12.32.117.8]:59081 "EHLO
+        stargate.chelsio.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727711AbeJRWF5 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 18 Oct 2018 18:05:57 -0400
+From: Ganesh Goudar <ganeshgr@chelsio.com>
+To: netdev@vger.kernel.org, davem@davemloft.net
+Cc: nirranjan@chelsio.com, indranil@chelsio.com, dt@chelsio.com,
+        harsh@chelsio.com, linux-crypto@vger.kernel.org,
+        Ganesh Goudar <ganeshgr@chelsio.com>
+Subject: [PATCH net-next] cxgb4: fix the error path of cxgb4_uld_register()
+Date: Thu, 18 Oct 2018 19:34:19 +0530
+Message-Id: <1539871459-6921-1-git-send-email-ganeshgr@chelsio.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 2018/10/30 21:06, Benjamin Coddington wrote:
-> Hi zhong jiang,
->
-> Try asking in linux-nfs.. but I'll also note that 3.10-stable may be missing a number of fixes to leaks in the NFS GSS code.
->
-> I can see a more than a few fixes to memory leaks with:
-> git log --grep=leak --oneline net/sunrpc/auth_gss/
->
-Thanks for your reply.  I has tested some of them in the upsteam as you have said.  but It fails to solve the issue completely.
-hence, I turn to the relevant experts whether they have happened to the issue or  can give some suggestion or not.
+On multi adapter setup if the uld registration fails even on
+one adapter, the allocated resources for the uld on all the
+adapters are freed, rendering the functioning adapters unusable.
 
-Thanks,
-zhong jiang
-> Ben
->
-> On 30 Oct 2018, at 8:45, zhong jiang wrote:
->
->> Hi,   Herbert
->>
->> Recently,  I  hit  a memory leak issue when  mounting and unmounting nfs with  the way of  krb5.
->> The issue happens to the linux-3.10-stable.
->>
->> I find that slab-1024 and slab-512 will take up most of the memory.  And it can not be freed.
->> Meanwhile, it result in rpcsec_gss_krb5 can be unregistered as well.
->>
->> nfs-sve1:/home # cat /proc/modules | grep krb5
->> rpcsec_gss_krb5 31477 239730 - Live 0xffffffffa0334000
->> auth_rpcgss 59314 3 rpcsec_gss_krb5,nfsd, Live 0xffffffffa0123000
->> sunrpc 300546 25 rpcsec_gss_krb5,nfsd,auth_rpcgss,nfs_acl,lockd, Live 0xffffffffa013b000
->>
->> I open the slab-1024 trace by enabling /sys/kernel/slab/:t-0001024/trace and get the following
->>
->> [123420.989831] Call Trace:
->> [123420.989834]  [<ffffffff81642d2a>] dump_stack+0x19/0x1b
->> [123420.989837]  [<ffffffff8163f25e>] alloc_debug_processing+0xc5/0x118
->> [123420.989839]  [<ffffffff8163fd4d>] __slab_alloc+0x400/0x48f
->> [123420.989841]  [<ffffffff812b1795>] ? __crypto_alloc_tfm+0x45/0x170
->> [123420.989845]  [<ffffffff812b2307>] ? setkey+0x57/0x110
->> [123420.989847]  [<ffffffff8118b5fd>] ? kzfree+0x2d/0x30
->> [123420.989850]  [<ffffffff811c6e88>] __kmalloc+0x1c8/0x230
->> [123420.989852]  [<ffffffff812b1795>] __crypto_alloc_tfm+0x45/0x170
->> [123420.989854]  [<ffffffff812b2e45>] crypto_spawn_tfm+0x45/0x80
->> [123420.989857]  [<ffffffff811c6eb3>] ? __kmalloc+0x1f3/0x230
->> [123420.989859]  [<ffffffff812c15c7>] crypto_cbc_init_tfm+0x27/0x40
->> [123420.989864]  [<ffffffff812b1851>] __crypto_alloc_tfm+0x101/0x170
->> [123420.989866]  [<ffffffff812b1ffc>] crypto_alloc_base+0x4c/0xb0
->> [123420.989869]  [<ffffffffa033411b>] context_v2_alloc_cipher.isra.2+0x2b/0xc0 [rpcsec_gss_krb5]
->> [123420.989871]  [<ffffffffa0334da8>] gss_import_sec_context_kerberos+0xbf8/0xf00 [rpcsec_gss_krb5]
->> [123420.989875]  [<ffffffffa0126d5d>] gss_import_sec_context+0x7d/0xb0 [auth_rpcgss]
->> [123420.989878]  [<ffffffffa012b35e>] gss_proxy_save_rsc+0x137/0x1b0 [auth_rpcgss]
->> [123420.989884]  [<ffffffffa012b51e>] svcauth_gss_proxy_init+0x147/0x1e4 [auth_rpcgss]
->> [123420.989886]  [<ffffffff810c2ad6>] ? dequeue_entity+0x106/0x520
->> [123420.989890]  [<ffffffffa0128e2a>] svcauth_gss_accept+0x3da/0xb70 [auth_rpcgss]
->> [123420.989892]  [<ffffffff810b6c25>] ? check_preempt_curr+0x85/0xa0
->> [123420.989894]  [<ffffffff810b6c59>] ? ttwu_do_wakeup+0x19/0xd0
->> [123420.989897]  [<ffffffff810b6ded>] ? ttwu_do_activate.constprop.86+0x5d/0x70
->> [123420.989900]  [<ffffffff810b9422>] ? try_to_wake_up+0x162/0x330
->> [123420.989908]  [<ffffffffa014f490>] svc_authenticate+0xc0/0xe0 [sunrpc]
->> [123420.989914]  [<ffffffffa014c04a>] svc_process_common+0x21a/0x6f0 [sunrpc]
->> [123420.989921]  [<ffffffffa014c623>] svc_process+0x103/0x170 [sunrpc]
->> [123420.989928]  [<ffffffffa01baaaf>] nfsd+0xdf/0x150 [nfsd]
->> [123420.989932]  [<ffffffffa01ba9d0>] ? nfsd_destroy+0x80/0x80 [nfsd]
->> [123420.989934]  [<ffffffff810a648f>] kthread+0xcf/0xe0
->> [123420.989936]  [<ffffffff810a63c0>] ? kthread_create_on_node+0x140/0x140
->> [123420.989939]  [<ffffffff81653318>] ret_from_fork+0x58/0x90
->> [123420.989943]  [<ffffffff810a63c0>] ? kthread_create_on_node+0x140/0x140
->>
->> I am unfamiliar with crypto.   I will be appreciated  if you could give me some suggestion.
->>
->> Thanks,
->> zhong jiang
->
-> .
->
+This commit fixes the issue by freeing the allocated resources
+only for the failed adapter.
+
+Signed-off-by: Ganesh Goudar <ganeshgr@chelsio.com>
+---
+ drivers/crypto/chelsio/chcr_core.c             |  4 +--
+ drivers/net/ethernet/chelsio/cxgb4/cxgb4_uld.c | 46 ++++++--------------------
+ drivers/net/ethernet/chelsio/cxgb4/cxgb4_uld.h |  2 +-
+ 3 files changed, 13 insertions(+), 39 deletions(-)
+
+diff --git a/drivers/crypto/chelsio/chcr_core.c b/drivers/crypto/chelsio/chcr_core.c
+index 04f277c..62249d4 100644
+--- a/drivers/crypto/chelsio/chcr_core.c
++++ b/drivers/crypto/chelsio/chcr_core.c
+@@ -237,9 +237,7 @@ static int chcr_uld_state_change(void *handle, enum cxgb4_state state)
+ 
+ static int __init chcr_crypto_init(void)
+ {
+-	if (cxgb4_register_uld(CXGB4_ULD_CRYPTO, &chcr_uld_info))
+-		pr_err("ULD register fail: No chcr crypto support in cxgb4\n");
+-
++	cxgb4_register_uld(CXGB4_ULD_CRYPTO, &chcr_uld_info);
+ 	return 0;
+ }
+ 
+diff --git a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_uld.c b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_uld.c
+index 4bc2110..2673226 100644
+--- a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_uld.c
++++ b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_uld.c
+@@ -702,15 +702,14 @@ static void uld_attach(struct adapter *adap, unsigned int uld)
+  *	about any presently available devices that support its type.  Returns
+  *	%-EBUSY if a ULD of the same type is already registered.
+  */
+-int cxgb4_register_uld(enum cxgb4_uld type,
+-		       const struct cxgb4_uld_info *p)
++void cxgb4_register_uld(enum cxgb4_uld type,
++			const struct cxgb4_uld_info *p)
+ {
+ 	int ret = 0;
+-	unsigned int adap_idx = 0;
+ 	struct adapter *adap;
+ 
+ 	if (type >= CXGB4_ULD_MAX)
+-		return -EINVAL;
++		return;
+ 
+ 	mutex_lock(&uld_mutex);
+ 	list_for_each_entry(adap, &adapter_list, list_node) {
+@@ -733,52 +732,29 @@ int cxgb4_register_uld(enum cxgb4_uld type,
+ 		}
+ 		if (adap->flags & FULL_INIT_DONE)
+ 			enable_rx_uld(adap, type);
+-		if (adap->uld[type].add) {
+-			ret = -EBUSY;
++		if (adap->uld[type].add)
+ 			goto free_irq;
+-		}
+ 		ret = setup_sge_txq_uld(adap, type, p);
+ 		if (ret)
+ 			goto free_irq;
+ 		adap->uld[type] = *p;
+ 		uld_attach(adap, type);
+-		adap_idx++;
+-	}
+-	mutex_unlock(&uld_mutex);
+-	return 0;
+-
++		continue;
+ free_irq:
+-	if (adap->flags & FULL_INIT_DONE)
+-		quiesce_rx_uld(adap, type);
+-	if (adap->flags & USING_MSIX)
+-		free_msix_queue_irqs_uld(adap, type);
+-free_rxq:
+-	free_sge_queues_uld(adap, type);
+-free_queues:
+-	free_queues_uld(adap, type);
+-out:
+-
+-	list_for_each_entry(adap, &adapter_list, list_node) {
+-		if ((type == CXGB4_ULD_CRYPTO && !is_pci_uld(adap)) ||
+-		    (type != CXGB4_ULD_CRYPTO && !is_offload(adap)))
+-			continue;
+-		if (type == CXGB4_ULD_ISCSIT && is_t4(adap->params.chip))
+-			continue;
+-		if (!adap_idx)
+-			break;
+-		adap->uld[type].handle = NULL;
+-		adap->uld[type].add = NULL;
+-		release_sge_txq_uld(adap, type);
+ 		if (adap->flags & FULL_INIT_DONE)
+ 			quiesce_rx_uld(adap, type);
+ 		if (adap->flags & USING_MSIX)
+ 			free_msix_queue_irqs_uld(adap, type);
++free_rxq:
+ 		free_sge_queues_uld(adap, type);
++free_queues:
+ 		free_queues_uld(adap, type);
+-		adap_idx--;
++out:
++		dev_warn(adap->pdev_dev,
++			 "ULD registration failed for uld type %d\n", type);
+ 	}
+ 	mutex_unlock(&uld_mutex);
+-	return ret;
++	return;
+ }
+ EXPORT_SYMBOL(cxgb4_register_uld);
+ 
+diff --git a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_uld.h b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_uld.h
+index de9ad31..5fa9a2d 100644
+--- a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_uld.h
++++ b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_uld.h
+@@ -384,7 +384,7 @@ struct cxgb4_uld_info {
+ 	int (*tx_handler)(struct sk_buff *skb, struct net_device *dev);
+ };
+ 
+-int cxgb4_register_uld(enum cxgb4_uld type, const struct cxgb4_uld_info *p);
++void cxgb4_register_uld(enum cxgb4_uld type, const struct cxgb4_uld_info *p);
+ int cxgb4_unregister_uld(enum cxgb4_uld type);
+ int cxgb4_ofld_send(struct net_device *dev, struct sk_buff *skb);
+ int cxgb4_immdata_send(struct net_device *dev, unsigned int idx,
+-- 
+2.1.0
