@@ -1,1734 +1,3213 @@
-Return-Path: <SRS0=18ZD=M3=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:54102 "EHLO mail.kernel.org"
+Return-Path: <SRS0=XFsj=M6=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from frisell.zx2c4.com ([192.95.5.64]:55889 "EHLO frisell.zx2c4.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726846AbeJPBmx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 15 Oct 2018 21:42:53 -0400
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org
-Cc: linux-fscrypt@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Paul Crowley <paulcrowley@google.com>,
-        Greg Kaiser <gkaiser@google.com>,
-        Michael Halcrow <mhalcrow@google.com>,
-        "Jason A . Donenfeld" <Jason@zx2c4.com>,
-        Samuel Neves <samuel.c.p.neves@gmail.com>,
-        Tomer Ashur <tomer.ashur@esat.kuleuven.be>
-Subject: [RFC PATCH v2 09/12] crypto: nhpoly1305 - add NHPoly1305 support
-Date: Mon, 15 Oct 2018 10:54:21 -0700
-Message-Id: <20181015175424.97147-10-ebiggers@kernel.org>
-In-Reply-To: <20181015175424.97147-1-ebiggers@kernel.org>
-References: <20181015175424.97147-1-ebiggers@kernel.org>
+        id S1728562AbeJRXAJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 18 Oct 2018 19:00:09 -0400
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+To: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+        linux-crypto@vger.kernel.org, davem@davemloft.net,
+        gregkh@linuxfoundation.org
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Karthikeyan Bhargavan <karthik.bhargavan@gmail.com>,
+        Samuel Neves <sneves@dei.uc.pt>,
+        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        kernel-hardening@lists.openwall.com
+Subject: [PATCH net-next v8 21/28] zinc: Curve25519 generic C implementations and selftest
+Date: Thu, 18 Oct 2018 16:57:05 +0200
+Message-Id: <20181018145712.7538-22-Jason@zx2c4.com>
+In-Reply-To: <20181018145712.7538-1-Jason@zx2c4.com>
+References: <20181018145712.7538-1-Jason@zx2c4.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Eric Biggers <ebiggers@google.com>
+This contains two formally verified C implementations of the Curve25519
+scalar multiplication function, one for 32-bit systems, and one for
+64-bit systems whose compiler supports efficient 128-bit integer types.
+Not only are these implementations formally verified, but they are also
+the fastest available C implementations. They have been modified to be
+friendly to kernel space and to be generally less horrendous looking,
+but still an effort has been made to retain their formally verified
+characteristic, and so the C might look slightly unidiomatic.
 
-Add a generic implementation of NHPoly1305, an ε-almost-∆-universal hash
-function used in the Adiantum encryption mode.
+The 64-bit version comes from HACL*: https://github.com/project-everest/hacl-star
+The 32-bit version comes from Fiat: https://github.com/mit-plv/fiat-crypto
 
-CONFIG_NHPOLY1305 is not selectable by itself since there won't be any
-real reason to enable it without also enabling Adiantum support.
+Information: https://cr.yp.to/ecdh.html
 
-Signed-off-by: Eric Biggers <ebiggers@google.com>
+Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+Cc: Karthikeyan Bhargavan <karthik.bhargavan@gmail.com>
+Cc: Samuel Neves <sneves@dei.uc.pt>
+Cc: Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>
+Cc: Andy Lutomirski <luto@kernel.org>
+Cc: Greg KH <gregkh@linuxfoundation.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: kernel-hardening@lists.openwall.com
+Cc: linux-crypto@vger.kernel.org
 ---
- crypto/Kconfig              |    5 +
- crypto/Makefile             |    1 +
- crypto/nhpoly1305.c         |  288 ++++++++
- crypto/testmgr.c            |    6 +
- crypto/testmgr.h            | 1240 ++++++++++++++++++++++++++++++++++-
- include/crypto/nhpoly1305.h |   74 +++
- 6 files changed, 1610 insertions(+), 4 deletions(-)
- create mode 100644 crypto/nhpoly1305.c
- create mode 100644 include/crypto/nhpoly1305.h
+ include/zinc/curve25519.h               |   22 +
+ lib/zinc/Kconfig                        |    4 +
+ lib/zinc/Makefile                       |    3 +
+ lib/zinc/curve25519/curve25519-fiat32.c |  860 +++++++++++++++
+ lib/zinc/curve25519/curve25519-hacl64.c |  784 ++++++++++++++
+ lib/zinc/curve25519/curve25519.c        |  108 ++
+ lib/zinc/selftest/curve25519.c          | 1315 +++++++++++++++++++++++
+ 7 files changed, 3096 insertions(+)
+ create mode 100644 include/zinc/curve25519.h
+ create mode 100644 lib/zinc/curve25519/curve25519-fiat32.c
+ create mode 100644 lib/zinc/curve25519/curve25519-hacl64.c
+ create mode 100644 lib/zinc/curve25519/curve25519.c
+ create mode 100644 lib/zinc/selftest/curve25519.c
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 4fa0a4a0e8615..431beca903623 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -493,6 +493,11 @@ config CRYPTO_KEYWRAP
- 	  Support for key wrapping (NIST SP800-38F / RFC3394) without
- 	  padding.
- 
-+config CRYPTO_NHPOLY1305
-+	tristate
-+	select CRYPTO_HASH
-+	select CRYPTO_POLY1305
-+
- comment "Hash modes"
- 
- config CRYPTO_CMAC
-diff --git a/crypto/Makefile b/crypto/Makefile
-index 7e673f7c71107..87b86f221a2a2 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -84,6 +84,7 @@ obj-$(CONFIG_CRYPTO_LRW) += lrw.o
- obj-$(CONFIG_CRYPTO_XTS) += xts.o
- obj-$(CONFIG_CRYPTO_CTR) += ctr.o
- obj-$(CONFIG_CRYPTO_KEYWRAP) += keywrap.o
-+obj-$(CONFIG_CRYPTO_NHPOLY1305) += nhpoly1305.o
- obj-$(CONFIG_CRYPTO_GCM) += gcm.o
- obj-$(CONFIG_CRYPTO_CCM) += ccm.o
- obj-$(CONFIG_CRYPTO_CHACHA20POLY1305) += chacha20poly1305.o
-diff --git a/crypto/nhpoly1305.c b/crypto/nhpoly1305.c
+diff --git a/include/zinc/curve25519.h b/include/zinc/curve25519.h
 new file mode 100644
-index 0000000000000..087ad7680dd62
+index 000000000000..def173e736fc
 --- /dev/null
-+++ b/crypto/nhpoly1305.c
-@@ -0,0 +1,288 @@
-+// SPDX-License-Identifier: GPL-2.0
++++ b/include/zinc/curve25519.h
+@@ -0,0 +1,22 @@
++/* SPDX-License-Identifier: GPL-2.0 OR MIT */
 +/*
-+ * NHPoly1305 - ε-almost-∆-universal hash function for Adiantum
-+ *
-+ * Copyright 2018 Google LLC
++ * Copyright (C) 2015-2018 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
 + */
 +
++#ifndef _ZINC_CURVE25519_H
++#define _ZINC_CURVE25519_H
++
++#include <linux/types.h>
++
++enum curve25519_lengths {
++	CURVE25519_KEY_SIZE = 32
++};
++
++bool __must_check curve25519(u8 mypublic[CURVE25519_KEY_SIZE],
++			     const u8 secret[CURVE25519_KEY_SIZE],
++			     const u8 basepoint[CURVE25519_KEY_SIZE]);
++void curve25519_generate_secret(u8 secret[CURVE25519_KEY_SIZE]);
++bool __must_check curve25519_generate_public(
++	u8 pub[CURVE25519_KEY_SIZE], const u8 secret[CURVE25519_KEY_SIZE]);
++
++#endif /* _ZINC_CURVE25519_H */
+diff --git a/lib/zinc/Kconfig b/lib/zinc/Kconfig
+index 9fc21f93ee9f..f1840c4e9fde 100644
+--- a/lib/zinc/Kconfig
++++ b/lib/zinc/Kconfig
+@@ -14,6 +14,10 @@ config ZINC_CHACHA20POLY1305
+ config ZINC_BLAKE2S
+ 	tristate
+ 
++config ZINC_CURVE25519
++	tristate
++	select CONFIG_CRYPTO
++
+ config ZINC_SELFTEST
+ 	bool "Zinc cryptography library self-tests"
+ 	help
+diff --git a/lib/zinc/Makefile b/lib/zinc/Makefile
+index 67ad837c822c..65440438c6e5 100644
+--- a/lib/zinc/Makefile
++++ b/lib/zinc/Makefile
+@@ -25,3 +25,6 @@ obj-$(CONFIG_ZINC_CHACHA20POLY1305) += zinc_chacha20poly1305.o
+ zinc_blake2s-y := blake2s/blake2s.o
+ zinc_blake2s-$(CONFIG_ZINC_ARCH_X86_64) += blake2s/blake2s-x86_64.o
+ obj-$(CONFIG_ZINC_BLAKE2S) += zinc_blake2s.o
++
++zinc_curve25519-y := curve25519/curve25519.o
++obj-$(CONFIG_ZINC_CURVE25519) += zinc_curve25519.o
+diff --git a/lib/zinc/curve25519/curve25519-fiat32.c b/lib/zinc/curve25519/curve25519-fiat32.c
+new file mode 100644
+index 000000000000..6076c06f28ed
+--- /dev/null
++++ b/lib/zinc/curve25519/curve25519-fiat32.c
+@@ -0,0 +1,860 @@
++// SPDX-License-Identifier: GPL-2.0 OR MIT
 +/*
-+ * "NHPoly1305" is the main component of Adiantum hashing.
-+ * Specifically, it is the calculation
++ * Copyright (C) 2015-2016 The fiat-crypto Authors.
++ * Copyright (C) 2018 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
 + *
-+ *	H_M ← Poly1305_{K_M}(NH_{K_N}(pad_{128}(M)))
-+ *
-+ * from the procedure in section A.5 of the Adiantum paper [1].  It is an
-+ * ε-almost-∆-universal (εA∆U) hash function for equal-length inputs over
-+ * Z/(2^{128}Z), where the "∆" operation is addition.  It hashes 1024-byte
-+ * chunks of the input with the NH hash function [2], reducing the input length
-+ * by 32x.  The resulting NH digests are evaluated as a polynomial in
-+ * GF(2^{130}-5), like in the Poly1305 MAC [3].  Note that the polynomial
-+ * evaluation by itself would suffice to achieve the εA∆U property; NH is used
-+ * for performance since it's over twice as fast as Poly1305.
-+ *
-+ * This is *not* a cryptographic hash function; do not use it as such!
-+ *
-+ * [1] Adiantum: length-preserving encryption for entry-level processors
-+ *     (https://eprint.iacr.org/2018/720.pdf)
-+ * [2] UMAC: Fast and Secure Message Authentication
-+ *     (https://fastcrypto.org/umac/umac_proc.pdf)
-+ * [3] The Poly1305-AES message-authentication code
-+ *     (https://cr.yp.to/mac/poly1305-20050329.pdf)
++ * This is a machine-generated formally verified implementation of Curve25519
++ * ECDH from: <https://github.com/mit-plv/fiat-crypto>. Though originally
++ * machine generated, it has been tweaked to be suitable for use in the kernel.
++ * It is optimized for 32-bit machines and machines that cannot work efficiently
++ * with 128-bit integer types.
 + */
 +
-+#include <asm/unaligned.h>
-+#include <crypto/algapi.h>
-+#include <crypto/internal/hash.h>
-+#include <crypto/nhpoly1305.h>
-+#include <linux/crypto.h>
-+#include <linux/kernel.h>
-+#include <linux/module.h>
-+
-+#define NH_STRIDE(K0, K1, K2, K3)				\
-+({								\
-+	m_A = get_unaligned_le32(src); src += 4;		\
-+	m_B = get_unaligned_le32(src); src += 4;		\
-+	m_C = get_unaligned_le32(src); src += 4;		\
-+	m_D = get_unaligned_le32(src); src += 4;		\
-+	K3##_A = *key++;					\
-+	K3##_B = *key++;					\
-+	K3##_C = *key++;					\
-+	K3##_D = *key++;					\
-+	sum0 += (u64)(u32)(m_A + K0##_A) * (u32)(m_C + K0##_C);	\
-+	sum1 += (u64)(u32)(m_A + K1##_A) * (u32)(m_C + K1##_C);	\
-+	sum2 += (u64)(u32)(m_A + K2##_A) * (u32)(m_C + K2##_C);	\
-+	sum3 += (u64)(u32)(m_A + K3##_A) * (u32)(m_C + K3##_C);	\
-+	sum0 += (u64)(u32)(m_B + K0##_B) * (u32)(m_D + K0##_D);	\
-+	sum1 += (u64)(u32)(m_B + K1##_B) * (u32)(m_D + K1##_D);	\
-+	sum2 += (u64)(u32)(m_B + K2##_B) * (u32)(m_D + K2##_D);	\
-+	sum3 += (u64)(u32)(m_B + K3##_B) * (u32)(m_D + K3##_D);	\
-+})
-+
-+static void nh_generic(const u32 *key, const u8 *src, size_t srclen,
-+		       __le64 hash[NH_NUM_PASSES])
-+{
-+	u64 sum0 = 0, sum1 = 0, sum2 = 0, sum3 = 0;
-+	u32 k0_A = *key++;
-+	u32 k0_B = *key++;
-+	u32 k0_C = *key++;
-+	u32 k0_D = *key++;
-+	u32 k1_A = *key++;
-+	u32 k1_B = *key++;
-+	u32 k1_C = *key++;
-+	u32 k1_D = *key++;
-+	u32 k2_A = *key++;
-+	u32 k2_B = *key++;
-+	u32 k2_C = *key++;
-+	u32 k2_D = *key++;
-+	u32 k3_A, k3_B, k3_C, k3_D;
-+	u32 m_A, m_B, m_C, m_D;
-+	size_t n = srclen / NH_MESSAGE_UNIT;
-+
-+	BUILD_BUG_ON(NH_PAIR_STRIDE != 2);
-+	BUILD_BUG_ON(NH_NUM_PASSES != 4);
-+
-+	while (n >= 4) {
-+		NH_STRIDE(k0, k1, k2, k3);
-+		NH_STRIDE(k1, k2, k3, k0);
-+		NH_STRIDE(k2, k3, k0, k1);
-+		NH_STRIDE(k3, k0, k1, k2);
-+		n -= 4;
-+	}
-+	if (n) {
-+		NH_STRIDE(k0, k1, k2, k3);
-+		if (--n) {
-+			NH_STRIDE(k1, k2, k3, k0);
-+			if (--n)
-+				NH_STRIDE(k2, k3, k0, k1);
-+		}
-+	}
-+
-+	hash[0] = cpu_to_le64(sum0);
-+	hash[1] = cpu_to_le64(sum1);
-+	hash[2] = cpu_to_le64(sum2);
-+	hash[3] = cpu_to_le64(sum3);
-+}
-+
-+/* Pass the next NH hash value through Poly1305 */
-+static void process_nh_hash_value(struct nhpoly1305_state *state,
-+				  const struct nhpoly1305_key *key)
-+{
-+	BUILD_BUG_ON(NH_HASH_BYTES % POLY1305_BLOCK_SIZE != 0);
-+
-+	poly1305_core_blocks(&state->poly_state, &key->poly_key, state->nh_hash,
-+			     NH_HASH_BYTES / POLY1305_BLOCK_SIZE);
-+}
-+
-+/*
-+ * Feed the next portion of the source data, as a whole number of 16-byte
-+ * "NH message units", through NH and Poly1305.  Each NH hash is taken over
-+ * 1024 bytes, except possibly the final one which is taken over a multiple of
-+ * 16 bytes up to 1024.  Also, in the case where data is passed in misaligned
-+ * chunks, we combine partial hashes; the end result is the same either way.
++/* fe means field element. Here the field is \Z/(2^255-19). An element t,
++ * entries t[0]...t[9], represents the integer t[0]+2^26 t[1]+2^51 t[2]+2^77
++ * t[3]+2^102 t[4]+...+2^230 t[9].
++ * fe limbs are bounded by 1.125*2^26,1.125*2^25,1.125*2^26,1.125*2^25,etc.
++ * Multiplication and carrying produce fe from fe_loose.
 + */
-+static void nhpoly1305_units(struct nhpoly1305_state *state,
-+			     const struct nhpoly1305_key *key,
-+			     const u8 *src, unsigned int srclen, nh_t nh_fn)
++typedef struct fe { u32 v[10]; } fe;
++
++/* fe_loose limbs are bounded by 3.375*2^26,3.375*2^25,3.375*2^26,3.375*2^25,etc
++ * Addition and subtraction produce fe_loose from (fe, fe).
++ */
++typedef struct fe_loose { u32 v[10]; } fe_loose;
++
++static __always_inline void fe_frombytes_impl(u32 h[10], const u8 *s)
 +{
-+	do {
-+		unsigned int bytes;
-+
-+		if (state->nh_remaining == 0) {
-+			/* Starting a new NH message */
-+			bytes = min_t(unsigned int, srclen, NH_MESSAGE_BYTES);
-+			nh_fn(key->nh_key, src, bytes, state->nh_hash);
-+			state->nh_remaining = NH_MESSAGE_BYTES - bytes;
-+		} else {
-+			/* Continuing a previous NH message */
-+			__le64 tmp_hash[NH_NUM_PASSES];
-+			unsigned int pos;
-+			int i;
-+
-+			pos = NH_MESSAGE_BYTES - state->nh_remaining;
-+			bytes = min(srclen, state->nh_remaining);
-+			nh_fn(&key->nh_key[pos / 4], src, bytes, tmp_hash);
-+			for (i = 0; i < NH_NUM_PASSES; i++)
-+				le64_add_cpu(&state->nh_hash[i],
-+					     le64_to_cpu(tmp_hash[i]));
-+			state->nh_remaining -= bytes;
-+		}
-+		if (state->nh_remaining == 0)
-+			process_nh_hash_value(state, key);
-+		src += bytes;
-+		srclen -= bytes;
-+	} while (srclen);
++	/* Ignores top bit of s. */
++	u32 a0 = get_unaligned_le32(s);
++	u32 a1 = get_unaligned_le32(s+4);
++	u32 a2 = get_unaligned_le32(s+8);
++	u32 a3 = get_unaligned_le32(s+12);
++	u32 a4 = get_unaligned_le32(s+16);
++	u32 a5 = get_unaligned_le32(s+20);
++	u32 a6 = get_unaligned_le32(s+24);
++	u32 a7 = get_unaligned_le32(s+28);
++	h[0] = a0&((1<<26)-1);                    /* 26 used, 32-26 left.   26 */
++	h[1] = (a0>>26) | ((a1&((1<<19)-1))<< 6); /* (32-26) + 19 =  6+19 = 25 */
++	h[2] = (a1>>19) | ((a2&((1<<13)-1))<<13); /* (32-19) + 13 = 13+13 = 26 */
++	h[3] = (a2>>13) | ((a3&((1<< 6)-1))<<19); /* (32-13) +  6 = 19+ 6 = 25 */
++	h[4] = (a3>> 6);                          /* (32- 6)              = 26 */
++	h[5] = a4&((1<<25)-1);                    /*                        25 */
++	h[6] = (a4>>25) | ((a5&((1<<19)-1))<< 7); /* (32-25) + 19 =  7+19 = 26 */
++	h[7] = (a5>>19) | ((a6&((1<<12)-1))<<13); /* (32-19) + 12 = 13+12 = 25 */
++	h[8] = (a6>>12) | ((a7&((1<< 6)-1))<<20); /* (32-12) +  6 = 20+ 6 = 26 */
++	h[9] = (a7>> 6)&((1<<25)-1); /*                                     25 */
 +}
 +
-+int crypto_nhpoly1305_setkey(struct crypto_shash *tfm,
-+			     const u8 *key, unsigned int keylen)
++static __always_inline void fe_frombytes(fe *h, const u8 *s)
 +{
-+	struct nhpoly1305_key *ctx = crypto_shash_ctx(tfm);
++	fe_frombytes_impl(h->v, s);
++}
++
++static __always_inline u8 /*bool*/
++addcarryx_u25(u8 /*bool*/ c, u32 a, u32 b, u32 *low)
++{
++	/* This function extracts 25 bits of result and 1 bit of carry
++	 * (26 total), so a 32-bit intermediate is sufficient.
++	 */
++	u32 x = a + b + c;
++	*low = x & ((1 << 25) - 1);
++	return (x >> 25) & 1;
++}
++
++static __always_inline u8 /*bool*/
++addcarryx_u26(u8 /*bool*/ c, u32 a, u32 b, u32 *low)
++{
++	/* This function extracts 26 bits of result and 1 bit of carry
++	 * (27 total), so a 32-bit intermediate is sufficient.
++	 */
++	u32 x = a + b + c;
++	*low = x & ((1 << 26) - 1);
++	return (x >> 26) & 1;
++}
++
++static __always_inline u8 /*bool*/
++subborrow_u25(u8 /*bool*/ c, u32 a, u32 b, u32 *low)
++{
++	/* This function extracts 25 bits of result and 1 bit of borrow
++	 * (26 total), so a 32-bit intermediate is sufficient.
++	 */
++	u32 x = a - b - c;
++	*low = x & ((1 << 25) - 1);
++	return x >> 31;
++}
++
++static __always_inline u8 /*bool*/
++subborrow_u26(u8 /*bool*/ c, u32 a, u32 b, u32 *low)
++{
++	/* This function extracts 26 bits of result and 1 bit of borrow
++	 *(27 total), so a 32-bit intermediate is sufficient.
++	 */
++	u32 x = a - b - c;
++	*low = x & ((1 << 26) - 1);
++	return x >> 31;
++}
++
++static __always_inline u32 cmovznz32(u32 t, u32 z, u32 nz)
++{
++	t = -!!t; /* all set if nonzero, 0 if 0 */
++	return (t&nz) | ((~t)&z);
++}
++
++static __always_inline void fe_freeze(u32 out[10], const u32 in1[10])
++{
++	{ const u32 x17 = in1[9];
++	{ const u32 x18 = in1[8];
++	{ const u32 x16 = in1[7];
++	{ const u32 x14 = in1[6];
++	{ const u32 x12 = in1[5];
++	{ const u32 x10 = in1[4];
++	{ const u32 x8 = in1[3];
++	{ const u32 x6 = in1[2];
++	{ const u32 x4 = in1[1];
++	{ const u32 x2 = in1[0];
++	{ u32 x20; u8/*bool*/ x21 = subborrow_u26(0x0, x2, 0x3ffffed, &x20);
++	{ u32 x23; u8/*bool*/ x24 = subborrow_u25(x21, x4, 0x1ffffff, &x23);
++	{ u32 x26; u8/*bool*/ x27 = subborrow_u26(x24, x6, 0x3ffffff, &x26);
++	{ u32 x29; u8/*bool*/ x30 = subborrow_u25(x27, x8, 0x1ffffff, &x29);
++	{ u32 x32; u8/*bool*/ x33 = subborrow_u26(x30, x10, 0x3ffffff, &x32);
++	{ u32 x35; u8/*bool*/ x36 = subborrow_u25(x33, x12, 0x1ffffff, &x35);
++	{ u32 x38; u8/*bool*/ x39 = subborrow_u26(x36, x14, 0x3ffffff, &x38);
++	{ u32 x41; u8/*bool*/ x42 = subborrow_u25(x39, x16, 0x1ffffff, &x41);
++	{ u32 x44; u8/*bool*/ x45 = subborrow_u26(x42, x18, 0x3ffffff, &x44);
++	{ u32 x47; u8/*bool*/ x48 = subborrow_u25(x45, x17, 0x1ffffff, &x47);
++	{ u32 x49 = cmovznz32(x48, 0x0, 0xffffffff);
++	{ u32 x50 = (x49 & 0x3ffffed);
++	{ u32 x52; u8/*bool*/ x53 = addcarryx_u26(0x0, x20, x50, &x52);
++	{ u32 x54 = (x49 & 0x1ffffff);
++	{ u32 x56; u8/*bool*/ x57 = addcarryx_u25(x53, x23, x54, &x56);
++	{ u32 x58 = (x49 & 0x3ffffff);
++	{ u32 x60; u8/*bool*/ x61 = addcarryx_u26(x57, x26, x58, &x60);
++	{ u32 x62 = (x49 & 0x1ffffff);
++	{ u32 x64; u8/*bool*/ x65 = addcarryx_u25(x61, x29, x62, &x64);
++	{ u32 x66 = (x49 & 0x3ffffff);
++	{ u32 x68; u8/*bool*/ x69 = addcarryx_u26(x65, x32, x66, &x68);
++	{ u32 x70 = (x49 & 0x1ffffff);
++	{ u32 x72; u8/*bool*/ x73 = addcarryx_u25(x69, x35, x70, &x72);
++	{ u32 x74 = (x49 & 0x3ffffff);
++	{ u32 x76; u8/*bool*/ x77 = addcarryx_u26(x73, x38, x74, &x76);
++	{ u32 x78 = (x49 & 0x1ffffff);
++	{ u32 x80; u8/*bool*/ x81 = addcarryx_u25(x77, x41, x78, &x80);
++	{ u32 x82 = (x49 & 0x3ffffff);
++	{ u32 x84; u8/*bool*/ x85 = addcarryx_u26(x81, x44, x82, &x84);
++	{ u32 x86 = (x49 & 0x1ffffff);
++	{ u32 x88; addcarryx_u25(x85, x47, x86, &x88);
++	out[0] = x52;
++	out[1] = x56;
++	out[2] = x60;
++	out[3] = x64;
++	out[4] = x68;
++	out[5] = x72;
++	out[6] = x76;
++	out[7] = x80;
++	out[8] = x84;
++	out[9] = x88;
++	}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
++}
++
++static __always_inline void fe_tobytes(u8 s[32], const fe *f)
++{
++	u32 h[10];
++	fe_freeze(h, f->v);
++	s[0] = h[0] >> 0;
++	s[1] = h[0] >> 8;
++	s[2] = h[0] >> 16;
++	s[3] = (h[0] >> 24) | (h[1] << 2);
++	s[4] = h[1] >> 6;
++	s[5] = h[1] >> 14;
++	s[6] = (h[1] >> 22) | (h[2] << 3);
++	s[7] = h[2] >> 5;
++	s[8] = h[2] >> 13;
++	s[9] = (h[2] >> 21) | (h[3] << 5);
++	s[10] = h[3] >> 3;
++	s[11] = h[3] >> 11;
++	s[12] = (h[3] >> 19) | (h[4] << 6);
++	s[13] = h[4] >> 2;
++	s[14] = h[4] >> 10;
++	s[15] = h[4] >> 18;
++	s[16] = h[5] >> 0;
++	s[17] = h[5] >> 8;
++	s[18] = h[5] >> 16;
++	s[19] = (h[5] >> 24) | (h[6] << 1);
++	s[20] = h[6] >> 7;
++	s[21] = h[6] >> 15;
++	s[22] = (h[6] >> 23) | (h[7] << 3);
++	s[23] = h[7] >> 5;
++	s[24] = h[7] >> 13;
++	s[25] = (h[7] >> 21) | (h[8] << 4);
++	s[26] = h[8] >> 4;
++	s[27] = h[8] >> 12;
++	s[28] = (h[8] >> 20) | (h[9] << 6);
++	s[29] = h[9] >> 2;
++	s[30] = h[9] >> 10;
++	s[31] = h[9] >> 18;
++}
++
++/* h = f */
++static __always_inline void fe_copy(fe *h, const fe *f)
++{
++	memmove(h, f, sizeof(u32) * 10);
++}
++
++static __always_inline void fe_copy_lt(fe_loose *h, const fe *f)
++{
++	memmove(h, f, sizeof(u32) * 10);
++}
++
++/* h = 0 */
++static __always_inline void fe_0(fe *h)
++{
++	memset(h, 0, sizeof(u32) * 10);
++}
++
++/* h = 1 */
++static __always_inline void fe_1(fe *h)
++{
++	memset(h, 0, sizeof(u32) * 10);
++	h->v[0] = 1;
++}
++
++static void fe_add_impl(u32 out[10], const u32 in1[10], const u32 in2[10])
++{
++	{ const u32 x20 = in1[9];
++	{ const u32 x21 = in1[8];
++	{ const u32 x19 = in1[7];
++	{ const u32 x17 = in1[6];
++	{ const u32 x15 = in1[5];
++	{ const u32 x13 = in1[4];
++	{ const u32 x11 = in1[3];
++	{ const u32 x9 = in1[2];
++	{ const u32 x7 = in1[1];
++	{ const u32 x5 = in1[0];
++	{ const u32 x38 = in2[9];
++	{ const u32 x39 = in2[8];
++	{ const u32 x37 = in2[7];
++	{ const u32 x35 = in2[6];
++	{ const u32 x33 = in2[5];
++	{ const u32 x31 = in2[4];
++	{ const u32 x29 = in2[3];
++	{ const u32 x27 = in2[2];
++	{ const u32 x25 = in2[1];
++	{ const u32 x23 = in2[0];
++	out[0] = (x5 + x23);
++	out[1] = (x7 + x25);
++	out[2] = (x9 + x27);
++	out[3] = (x11 + x29);
++	out[4] = (x13 + x31);
++	out[5] = (x15 + x33);
++	out[6] = (x17 + x35);
++	out[7] = (x19 + x37);
++	out[8] = (x21 + x39);
++	out[9] = (x20 + x38);
++	}}}}}}}}}}}}}}}}}}}}
++}
++
++/* h = f + g
++ * Can overlap h with f or g.
++ */
++static __always_inline void fe_add(fe_loose *h, const fe *f, const fe *g)
++{
++	fe_add_impl(h->v, f->v, g->v);
++}
++
++static void fe_sub_impl(u32 out[10], const u32 in1[10], const u32 in2[10])
++{
++	{ const u32 x20 = in1[9];
++	{ const u32 x21 = in1[8];
++	{ const u32 x19 = in1[7];
++	{ const u32 x17 = in1[6];
++	{ const u32 x15 = in1[5];
++	{ const u32 x13 = in1[4];
++	{ const u32 x11 = in1[3];
++	{ const u32 x9 = in1[2];
++	{ const u32 x7 = in1[1];
++	{ const u32 x5 = in1[0];
++	{ const u32 x38 = in2[9];
++	{ const u32 x39 = in2[8];
++	{ const u32 x37 = in2[7];
++	{ const u32 x35 = in2[6];
++	{ const u32 x33 = in2[5];
++	{ const u32 x31 = in2[4];
++	{ const u32 x29 = in2[3];
++	{ const u32 x27 = in2[2];
++	{ const u32 x25 = in2[1];
++	{ const u32 x23 = in2[0];
++	out[0] = ((0x7ffffda + x5) - x23);
++	out[1] = ((0x3fffffe + x7) - x25);
++	out[2] = ((0x7fffffe + x9) - x27);
++	out[3] = ((0x3fffffe + x11) - x29);
++	out[4] = ((0x7fffffe + x13) - x31);
++	out[5] = ((0x3fffffe + x15) - x33);
++	out[6] = ((0x7fffffe + x17) - x35);
++	out[7] = ((0x3fffffe + x19) - x37);
++	out[8] = ((0x7fffffe + x21) - x39);
++	out[9] = ((0x3fffffe + x20) - x38);
++	}}}}}}}}}}}}}}}}}}}}
++}
++
++/* h = f - g
++ * Can overlap h with f or g.
++ */
++static __always_inline void fe_sub(fe_loose *h, const fe *f, const fe *g)
++{
++	fe_sub_impl(h->v, f->v, g->v);
++}
++
++static void fe_mul_impl(u32 out[10], const u32 in1[10], const u32 in2[10])
++{
++	{ const u32 x20 = in1[9];
++	{ const u32 x21 = in1[8];
++	{ const u32 x19 = in1[7];
++	{ const u32 x17 = in1[6];
++	{ const u32 x15 = in1[5];
++	{ const u32 x13 = in1[4];
++	{ const u32 x11 = in1[3];
++	{ const u32 x9 = in1[2];
++	{ const u32 x7 = in1[1];
++	{ const u32 x5 = in1[0];
++	{ const u32 x38 = in2[9];
++	{ const u32 x39 = in2[8];
++	{ const u32 x37 = in2[7];
++	{ const u32 x35 = in2[6];
++	{ const u32 x33 = in2[5];
++	{ const u32 x31 = in2[4];
++	{ const u32 x29 = in2[3];
++	{ const u32 x27 = in2[2];
++	{ const u32 x25 = in2[1];
++	{ const u32 x23 = in2[0];
++	{ u64 x40 = ((u64)x23 * x5);
++	{ u64 x41 = (((u64)x23 * x7) + ((u64)x25 * x5));
++	{ u64 x42 = ((((u64)(0x2 * x25) * x7) + ((u64)x23 * x9)) + ((u64)x27 * x5));
++	{ u64 x43 = (((((u64)x25 * x9) + ((u64)x27 * x7)) + ((u64)x23 * x11)) + ((u64)x29 * x5));
++	{ u64 x44 = (((((u64)x27 * x9) + (0x2 * (((u64)x25 * x11) + ((u64)x29 * x7)))) + ((u64)x23 * x13)) + ((u64)x31 * x5));
++	{ u64 x45 = (((((((u64)x27 * x11) + ((u64)x29 * x9)) + ((u64)x25 * x13)) + ((u64)x31 * x7)) + ((u64)x23 * x15)) + ((u64)x33 * x5));
++	{ u64 x46 = (((((0x2 * ((((u64)x29 * x11) + ((u64)x25 * x15)) + ((u64)x33 * x7))) + ((u64)x27 * x13)) + ((u64)x31 * x9)) + ((u64)x23 * x17)) + ((u64)x35 * x5));
++	{ u64 x47 = (((((((((u64)x29 * x13) + ((u64)x31 * x11)) + ((u64)x27 * x15)) + ((u64)x33 * x9)) + ((u64)x25 * x17)) + ((u64)x35 * x7)) + ((u64)x23 * x19)) + ((u64)x37 * x5));
++	{ u64 x48 = (((((((u64)x31 * x13) + (0x2 * (((((u64)x29 * x15) + ((u64)x33 * x11)) + ((u64)x25 * x19)) + ((u64)x37 * x7)))) + ((u64)x27 * x17)) + ((u64)x35 * x9)) + ((u64)x23 * x21)) + ((u64)x39 * x5));
++	{ u64 x49 = (((((((((((u64)x31 * x15) + ((u64)x33 * x13)) + ((u64)x29 * x17)) + ((u64)x35 * x11)) + ((u64)x27 * x19)) + ((u64)x37 * x9)) + ((u64)x25 * x21)) + ((u64)x39 * x7)) + ((u64)x23 * x20)) + ((u64)x38 * x5));
++	{ u64 x50 = (((((0x2 * ((((((u64)x33 * x15) + ((u64)x29 * x19)) + ((u64)x37 * x11)) + ((u64)x25 * x20)) + ((u64)x38 * x7))) + ((u64)x31 * x17)) + ((u64)x35 * x13)) + ((u64)x27 * x21)) + ((u64)x39 * x9));
++	{ u64 x51 = (((((((((u64)x33 * x17) + ((u64)x35 * x15)) + ((u64)x31 * x19)) + ((u64)x37 * x13)) + ((u64)x29 * x21)) + ((u64)x39 * x11)) + ((u64)x27 * x20)) + ((u64)x38 * x9));
++	{ u64 x52 = (((((u64)x35 * x17) + (0x2 * (((((u64)x33 * x19) + ((u64)x37 * x15)) + ((u64)x29 * x20)) + ((u64)x38 * x11)))) + ((u64)x31 * x21)) + ((u64)x39 * x13));
++	{ u64 x53 = (((((((u64)x35 * x19) + ((u64)x37 * x17)) + ((u64)x33 * x21)) + ((u64)x39 * x15)) + ((u64)x31 * x20)) + ((u64)x38 * x13));
++	{ u64 x54 = (((0x2 * ((((u64)x37 * x19) + ((u64)x33 * x20)) + ((u64)x38 * x15))) + ((u64)x35 * x21)) + ((u64)x39 * x17));
++	{ u64 x55 = (((((u64)x37 * x21) + ((u64)x39 * x19)) + ((u64)x35 * x20)) + ((u64)x38 * x17));
++	{ u64 x56 = (((u64)x39 * x21) + (0x2 * (((u64)x37 * x20) + ((u64)x38 * x19))));
++	{ u64 x57 = (((u64)x39 * x20) + ((u64)x38 * x21));
++	{ u64 x58 = ((u64)(0x2 * x38) * x20);
++	{ u64 x59 = (x48 + (x58 << 0x4));
++	{ u64 x60 = (x59 + (x58 << 0x1));
++	{ u64 x61 = (x60 + x58);
++	{ u64 x62 = (x47 + (x57 << 0x4));
++	{ u64 x63 = (x62 + (x57 << 0x1));
++	{ u64 x64 = (x63 + x57);
++	{ u64 x65 = (x46 + (x56 << 0x4));
++	{ u64 x66 = (x65 + (x56 << 0x1));
++	{ u64 x67 = (x66 + x56);
++	{ u64 x68 = (x45 + (x55 << 0x4));
++	{ u64 x69 = (x68 + (x55 << 0x1));
++	{ u64 x70 = (x69 + x55);
++	{ u64 x71 = (x44 + (x54 << 0x4));
++	{ u64 x72 = (x71 + (x54 << 0x1));
++	{ u64 x73 = (x72 + x54);
++	{ u64 x74 = (x43 + (x53 << 0x4));
++	{ u64 x75 = (x74 + (x53 << 0x1));
++	{ u64 x76 = (x75 + x53);
++	{ u64 x77 = (x42 + (x52 << 0x4));
++	{ u64 x78 = (x77 + (x52 << 0x1));
++	{ u64 x79 = (x78 + x52);
++	{ u64 x80 = (x41 + (x51 << 0x4));
++	{ u64 x81 = (x80 + (x51 << 0x1));
++	{ u64 x82 = (x81 + x51);
++	{ u64 x83 = (x40 + (x50 << 0x4));
++	{ u64 x84 = (x83 + (x50 << 0x1));
++	{ u64 x85 = (x84 + x50);
++	{ u64 x86 = (x85 >> 0x1a);
++	{ u32 x87 = ((u32)x85 & 0x3ffffff);
++	{ u64 x88 = (x86 + x82);
++	{ u64 x89 = (x88 >> 0x19);
++	{ u32 x90 = ((u32)x88 & 0x1ffffff);
++	{ u64 x91 = (x89 + x79);
++	{ u64 x92 = (x91 >> 0x1a);
++	{ u32 x93 = ((u32)x91 & 0x3ffffff);
++	{ u64 x94 = (x92 + x76);
++	{ u64 x95 = (x94 >> 0x19);
++	{ u32 x96 = ((u32)x94 & 0x1ffffff);
++	{ u64 x97 = (x95 + x73);
++	{ u64 x98 = (x97 >> 0x1a);
++	{ u32 x99 = ((u32)x97 & 0x3ffffff);
++	{ u64 x100 = (x98 + x70);
++	{ u64 x101 = (x100 >> 0x19);
++	{ u32 x102 = ((u32)x100 & 0x1ffffff);
++	{ u64 x103 = (x101 + x67);
++	{ u64 x104 = (x103 >> 0x1a);
++	{ u32 x105 = ((u32)x103 & 0x3ffffff);
++	{ u64 x106 = (x104 + x64);
++	{ u64 x107 = (x106 >> 0x19);
++	{ u32 x108 = ((u32)x106 & 0x1ffffff);
++	{ u64 x109 = (x107 + x61);
++	{ u64 x110 = (x109 >> 0x1a);
++	{ u32 x111 = ((u32)x109 & 0x3ffffff);
++	{ u64 x112 = (x110 + x49);
++	{ u64 x113 = (x112 >> 0x19);
++	{ u32 x114 = ((u32)x112 & 0x1ffffff);
++	{ u64 x115 = (x87 + (0x13 * x113));
++	{ u32 x116 = (u32) (x115 >> 0x1a);
++	{ u32 x117 = ((u32)x115 & 0x3ffffff);
++	{ u32 x118 = (x116 + x90);
++	{ u32 x119 = (x118 >> 0x19);
++	{ u32 x120 = (x118 & 0x1ffffff);
++	out[0] = x117;
++	out[1] = x120;
++	out[2] = (x119 + x93);
++	out[3] = x96;
++	out[4] = x99;
++	out[5] = x102;
++	out[6] = x105;
++	out[7] = x108;
++	out[8] = x111;
++	out[9] = x114;
++	}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
++}
++
++static __always_inline void fe_mul_ttt(fe *h, const fe *f, const fe *g)
++{
++	fe_mul_impl(h->v, f->v, g->v);
++}
++
++static __always_inline void fe_mul_tlt(fe *h, const fe_loose *f, const fe *g)
++{
++	fe_mul_impl(h->v, f->v, g->v);
++}
++
++static __always_inline void
++fe_mul_tll(fe *h, const fe_loose *f, const fe_loose *g)
++{
++	fe_mul_impl(h->v, f->v, g->v);
++}
++
++static void fe_sqr_impl(u32 out[10], const u32 in1[10])
++{
++	{ const u32 x17 = in1[9];
++	{ const u32 x18 = in1[8];
++	{ const u32 x16 = in1[7];
++	{ const u32 x14 = in1[6];
++	{ const u32 x12 = in1[5];
++	{ const u32 x10 = in1[4];
++	{ const u32 x8 = in1[3];
++	{ const u32 x6 = in1[2];
++	{ const u32 x4 = in1[1];
++	{ const u32 x2 = in1[0];
++	{ u64 x19 = ((u64)x2 * x2);
++	{ u64 x20 = ((u64)(0x2 * x2) * x4);
++	{ u64 x21 = (0x2 * (((u64)x4 * x4) + ((u64)x2 * x6)));
++	{ u64 x22 = (0x2 * (((u64)x4 * x6) + ((u64)x2 * x8)));
++	{ u64 x23 = ((((u64)x6 * x6) + ((u64)(0x4 * x4) * x8)) + ((u64)(0x2 * x2) * x10));
++	{ u64 x24 = (0x2 * ((((u64)x6 * x8) + ((u64)x4 * x10)) + ((u64)x2 * x12)));
++	{ u64 x25 = (0x2 * (((((u64)x8 * x8) + ((u64)x6 * x10)) + ((u64)x2 * x14)) + ((u64)(0x2 * x4) * x12)));
++	{ u64 x26 = (0x2 * (((((u64)x8 * x10) + ((u64)x6 * x12)) + ((u64)x4 * x14)) + ((u64)x2 * x16)));
++	{ u64 x27 = (((u64)x10 * x10) + (0x2 * ((((u64)x6 * x14) + ((u64)x2 * x18)) + (0x2 * (((u64)x4 * x16) + ((u64)x8 * x12))))));
++	{ u64 x28 = (0x2 * ((((((u64)x10 * x12) + ((u64)x8 * x14)) + ((u64)x6 * x16)) + ((u64)x4 * x18)) + ((u64)x2 * x17)));
++	{ u64 x29 = (0x2 * (((((u64)x12 * x12) + ((u64)x10 * x14)) + ((u64)x6 * x18)) + (0x2 * (((u64)x8 * x16) + ((u64)x4 * x17)))));
++	{ u64 x30 = (0x2 * (((((u64)x12 * x14) + ((u64)x10 * x16)) + ((u64)x8 * x18)) + ((u64)x6 * x17)));
++	{ u64 x31 = (((u64)x14 * x14) + (0x2 * (((u64)x10 * x18) + (0x2 * (((u64)x12 * x16) + ((u64)x8 * x17))))));
++	{ u64 x32 = (0x2 * ((((u64)x14 * x16) + ((u64)x12 * x18)) + ((u64)x10 * x17)));
++	{ u64 x33 = (0x2 * ((((u64)x16 * x16) + ((u64)x14 * x18)) + ((u64)(0x2 * x12) * x17)));
++	{ u64 x34 = (0x2 * (((u64)x16 * x18) + ((u64)x14 * x17)));
++	{ u64 x35 = (((u64)x18 * x18) + ((u64)(0x4 * x16) * x17));
++	{ u64 x36 = ((u64)(0x2 * x18) * x17);
++	{ u64 x37 = ((u64)(0x2 * x17) * x17);
++	{ u64 x38 = (x27 + (x37 << 0x4));
++	{ u64 x39 = (x38 + (x37 << 0x1));
++	{ u64 x40 = (x39 + x37);
++	{ u64 x41 = (x26 + (x36 << 0x4));
++	{ u64 x42 = (x41 + (x36 << 0x1));
++	{ u64 x43 = (x42 + x36);
++	{ u64 x44 = (x25 + (x35 << 0x4));
++	{ u64 x45 = (x44 + (x35 << 0x1));
++	{ u64 x46 = (x45 + x35);
++	{ u64 x47 = (x24 + (x34 << 0x4));
++	{ u64 x48 = (x47 + (x34 << 0x1));
++	{ u64 x49 = (x48 + x34);
++	{ u64 x50 = (x23 + (x33 << 0x4));
++	{ u64 x51 = (x50 + (x33 << 0x1));
++	{ u64 x52 = (x51 + x33);
++	{ u64 x53 = (x22 + (x32 << 0x4));
++	{ u64 x54 = (x53 + (x32 << 0x1));
++	{ u64 x55 = (x54 + x32);
++	{ u64 x56 = (x21 + (x31 << 0x4));
++	{ u64 x57 = (x56 + (x31 << 0x1));
++	{ u64 x58 = (x57 + x31);
++	{ u64 x59 = (x20 + (x30 << 0x4));
++	{ u64 x60 = (x59 + (x30 << 0x1));
++	{ u64 x61 = (x60 + x30);
++	{ u64 x62 = (x19 + (x29 << 0x4));
++	{ u64 x63 = (x62 + (x29 << 0x1));
++	{ u64 x64 = (x63 + x29);
++	{ u64 x65 = (x64 >> 0x1a);
++	{ u32 x66 = ((u32)x64 & 0x3ffffff);
++	{ u64 x67 = (x65 + x61);
++	{ u64 x68 = (x67 >> 0x19);
++	{ u32 x69 = ((u32)x67 & 0x1ffffff);
++	{ u64 x70 = (x68 + x58);
++	{ u64 x71 = (x70 >> 0x1a);
++	{ u32 x72 = ((u32)x70 & 0x3ffffff);
++	{ u64 x73 = (x71 + x55);
++	{ u64 x74 = (x73 >> 0x19);
++	{ u32 x75 = ((u32)x73 & 0x1ffffff);
++	{ u64 x76 = (x74 + x52);
++	{ u64 x77 = (x76 >> 0x1a);
++	{ u32 x78 = ((u32)x76 & 0x3ffffff);
++	{ u64 x79 = (x77 + x49);
++	{ u64 x80 = (x79 >> 0x19);
++	{ u32 x81 = ((u32)x79 & 0x1ffffff);
++	{ u64 x82 = (x80 + x46);
++	{ u64 x83 = (x82 >> 0x1a);
++	{ u32 x84 = ((u32)x82 & 0x3ffffff);
++	{ u64 x85 = (x83 + x43);
++	{ u64 x86 = (x85 >> 0x19);
++	{ u32 x87 = ((u32)x85 & 0x1ffffff);
++	{ u64 x88 = (x86 + x40);
++	{ u64 x89 = (x88 >> 0x1a);
++	{ u32 x90 = ((u32)x88 & 0x3ffffff);
++	{ u64 x91 = (x89 + x28);
++	{ u64 x92 = (x91 >> 0x19);
++	{ u32 x93 = ((u32)x91 & 0x1ffffff);
++	{ u64 x94 = (x66 + (0x13 * x92));
++	{ u32 x95 = (u32) (x94 >> 0x1a);
++	{ u32 x96 = ((u32)x94 & 0x3ffffff);
++	{ u32 x97 = (x95 + x69);
++	{ u32 x98 = (x97 >> 0x19);
++	{ u32 x99 = (x97 & 0x1ffffff);
++	out[0] = x96;
++	out[1] = x99;
++	out[2] = (x98 + x72);
++	out[3] = x75;
++	out[4] = x78;
++	out[5] = x81;
++	out[6] = x84;
++	out[7] = x87;
++	out[8] = x90;
++	out[9] = x93;
++	}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
++}
++
++static __always_inline void fe_sq_tl(fe *h, const fe_loose *f)
++{
++	fe_sqr_impl(h->v, f->v);
++}
++
++static __always_inline void fe_sq_tt(fe *h, const fe *f)
++{
++	fe_sqr_impl(h->v, f->v);
++}
++
++static __always_inline void fe_loose_invert(fe *out, const fe_loose *z)
++{
++	fe t0;
++	fe t1;
++	fe t2;
++	fe t3;
 +	int i;
 +
-+	if (keylen != NHPOLY1305_KEY_SIZE)
-+		return -EINVAL;
-+
-+	poly1305_core_setkey(&ctx->poly_key, key);
-+	key += POLY1305_BLOCK_SIZE;
-+
-+	for (i = 0; i < NH_KEY_WORDS; i++)
-+		ctx->nh_key[i] = get_unaligned_le32(key + i * sizeof(u32));
-+
-+	return 0;
++	fe_sq_tl(&t0, z);
++	fe_sq_tt(&t1, &t0);
++	for (i = 1; i < 2; ++i)
++		fe_sq_tt(&t1, &t1);
++	fe_mul_tlt(&t1, z, &t1);
++	fe_mul_ttt(&t0, &t0, &t1);
++	fe_sq_tt(&t2, &t0);
++	fe_mul_ttt(&t1, &t1, &t2);
++	fe_sq_tt(&t2, &t1);
++	for (i = 1; i < 5; ++i)
++		fe_sq_tt(&t2, &t2);
++	fe_mul_ttt(&t1, &t2, &t1);
++	fe_sq_tt(&t2, &t1);
++	for (i = 1; i < 10; ++i)
++		fe_sq_tt(&t2, &t2);
++	fe_mul_ttt(&t2, &t2, &t1);
++	fe_sq_tt(&t3, &t2);
++	for (i = 1; i < 20; ++i)
++		fe_sq_tt(&t3, &t3);
++	fe_mul_ttt(&t2, &t3, &t2);
++	fe_sq_tt(&t2, &t2);
++	for (i = 1; i < 10; ++i)
++		fe_sq_tt(&t2, &t2);
++	fe_mul_ttt(&t1, &t2, &t1);
++	fe_sq_tt(&t2, &t1);
++	for (i = 1; i < 50; ++i)
++		fe_sq_tt(&t2, &t2);
++	fe_mul_ttt(&t2, &t2, &t1);
++	fe_sq_tt(&t3, &t2);
++	for (i = 1; i < 100; ++i)
++		fe_sq_tt(&t3, &t3);
++	fe_mul_ttt(&t2, &t3, &t2);
++	fe_sq_tt(&t2, &t2);
++	for (i = 1; i < 50; ++i)
++		fe_sq_tt(&t2, &t2);
++	fe_mul_ttt(&t1, &t2, &t1);
++	fe_sq_tt(&t1, &t1);
++	for (i = 1; i < 5; ++i)
++		fe_sq_tt(&t1, &t1);
++	fe_mul_ttt(out, &t1, &t0);
 +}
-+EXPORT_SYMBOL(crypto_nhpoly1305_setkey);
 +
-+int crypto_nhpoly1305_init(struct shash_desc *desc)
++static __always_inline void fe_invert(fe *out, const fe *z)
 +{
-+	struct nhpoly1305_state *state = shash_desc_ctx(desc);
-+
-+	poly1305_core_init(&state->poly_state);
-+	state->buflen = 0;
-+	state->nh_remaining = 0;
-+	return 0;
++	fe_loose l;
++	fe_copy_lt(&l, z);
++	fe_loose_invert(out, &l);
 +}
-+EXPORT_SYMBOL(crypto_nhpoly1305_init);
 +
-+int crypto_nhpoly1305_update_helper(struct shash_desc *desc,
-+				    const u8 *src, unsigned int srclen,
-+				    nh_t nh_fn)
++/* Replace (f,g) with (g,f) if b == 1;
++ * replace (f,g) with (f,g) if b == 0.
++ *
++ * Preconditions: b in {0,1}
++ */
++static __always_inline void fe_cswap(fe *f, fe *g, unsigned int b)
 +{
-+	struct nhpoly1305_state *state = shash_desc_ctx(desc);
-+	const struct nhpoly1305_key *key = crypto_shash_ctx(desc->tfm);
-+	unsigned int bytes;
-+
-+	if (state->buflen) {
-+		bytes = min(srclen, (int)NH_MESSAGE_UNIT - state->buflen);
-+		memcpy(&state->buffer[state->buflen], src, bytes);
-+		state->buflen += bytes;
-+		if (state->buflen < NH_MESSAGE_UNIT)
-+			return 0;
-+		nhpoly1305_units(state, key, state->buffer, NH_MESSAGE_UNIT,
-+				 nh_fn);
-+		state->buflen = 0;
-+		src += bytes;
-+		srclen -= bytes;
++	unsigned i;
++	b = 0-b;
++	for (i = 0; i < 10; i++) {
++		u32 x = f->v[i] ^ g->v[i];
++		x &= b;
++		f->v[i] ^= x;
++		g->v[i] ^= x;
 +	}
++}
 +
-+	if (srclen >= NH_MESSAGE_UNIT) {
-+		bytes = round_down(srclen, NH_MESSAGE_UNIT);
-+		nhpoly1305_units(state, key, src, bytes, nh_fn);
-+		src += bytes;
-+		srclen -= bytes;
++/* NOTE: based on fiat-crypto fe_mul, edited for in2=121666, 0, 0.*/
++static __always_inline void fe_mul_121666_impl(u32 out[10], const u32 in1[10])
++{
++	{ const u32 x20 = in1[9];
++	{ const u32 x21 = in1[8];
++	{ const u32 x19 = in1[7];
++	{ const u32 x17 = in1[6];
++	{ const u32 x15 = in1[5];
++	{ const u32 x13 = in1[4];
++	{ const u32 x11 = in1[3];
++	{ const u32 x9 = in1[2];
++	{ const u32 x7 = in1[1];
++	{ const u32 x5 = in1[0];
++	{ const u32 x38 = 0;
++	{ const u32 x39 = 0;
++	{ const u32 x37 = 0;
++	{ const u32 x35 = 0;
++	{ const u32 x33 = 0;
++	{ const u32 x31 = 0;
++	{ const u32 x29 = 0;
++	{ const u32 x27 = 0;
++	{ const u32 x25 = 0;
++	{ const u32 x23 = 121666;
++	{ u64 x40 = ((u64)x23 * x5);
++	{ u64 x41 = (((u64)x23 * x7) + ((u64)x25 * x5));
++	{ u64 x42 = ((((u64)(0x2 * x25) * x7) + ((u64)x23 * x9)) + ((u64)x27 * x5));
++	{ u64 x43 = (((((u64)x25 * x9) + ((u64)x27 * x7)) + ((u64)x23 * x11)) + ((u64)x29 * x5));
++	{ u64 x44 = (((((u64)x27 * x9) + (0x2 * (((u64)x25 * x11) + ((u64)x29 * x7)))) + ((u64)x23 * x13)) + ((u64)x31 * x5));
++	{ u64 x45 = (((((((u64)x27 * x11) + ((u64)x29 * x9)) + ((u64)x25 * x13)) + ((u64)x31 * x7)) + ((u64)x23 * x15)) + ((u64)x33 * x5));
++	{ u64 x46 = (((((0x2 * ((((u64)x29 * x11) + ((u64)x25 * x15)) + ((u64)x33 * x7))) + ((u64)x27 * x13)) + ((u64)x31 * x9)) + ((u64)x23 * x17)) + ((u64)x35 * x5));
++	{ u64 x47 = (((((((((u64)x29 * x13) + ((u64)x31 * x11)) + ((u64)x27 * x15)) + ((u64)x33 * x9)) + ((u64)x25 * x17)) + ((u64)x35 * x7)) + ((u64)x23 * x19)) + ((u64)x37 * x5));
++	{ u64 x48 = (((((((u64)x31 * x13) + (0x2 * (((((u64)x29 * x15) + ((u64)x33 * x11)) + ((u64)x25 * x19)) + ((u64)x37 * x7)))) + ((u64)x27 * x17)) + ((u64)x35 * x9)) + ((u64)x23 * x21)) + ((u64)x39 * x5));
++	{ u64 x49 = (((((((((((u64)x31 * x15) + ((u64)x33 * x13)) + ((u64)x29 * x17)) + ((u64)x35 * x11)) + ((u64)x27 * x19)) + ((u64)x37 * x9)) + ((u64)x25 * x21)) + ((u64)x39 * x7)) + ((u64)x23 * x20)) + ((u64)x38 * x5));
++	{ u64 x50 = (((((0x2 * ((((((u64)x33 * x15) + ((u64)x29 * x19)) + ((u64)x37 * x11)) + ((u64)x25 * x20)) + ((u64)x38 * x7))) + ((u64)x31 * x17)) + ((u64)x35 * x13)) + ((u64)x27 * x21)) + ((u64)x39 * x9));
++	{ u64 x51 = (((((((((u64)x33 * x17) + ((u64)x35 * x15)) + ((u64)x31 * x19)) + ((u64)x37 * x13)) + ((u64)x29 * x21)) + ((u64)x39 * x11)) + ((u64)x27 * x20)) + ((u64)x38 * x9));
++	{ u64 x52 = (((((u64)x35 * x17) + (0x2 * (((((u64)x33 * x19) + ((u64)x37 * x15)) + ((u64)x29 * x20)) + ((u64)x38 * x11)))) + ((u64)x31 * x21)) + ((u64)x39 * x13));
++	{ u64 x53 = (((((((u64)x35 * x19) + ((u64)x37 * x17)) + ((u64)x33 * x21)) + ((u64)x39 * x15)) + ((u64)x31 * x20)) + ((u64)x38 * x13));
++	{ u64 x54 = (((0x2 * ((((u64)x37 * x19) + ((u64)x33 * x20)) + ((u64)x38 * x15))) + ((u64)x35 * x21)) + ((u64)x39 * x17));
++	{ u64 x55 = (((((u64)x37 * x21) + ((u64)x39 * x19)) + ((u64)x35 * x20)) + ((u64)x38 * x17));
++	{ u64 x56 = (((u64)x39 * x21) + (0x2 * (((u64)x37 * x20) + ((u64)x38 * x19))));
++	{ u64 x57 = (((u64)x39 * x20) + ((u64)x38 * x21));
++	{ u64 x58 = ((u64)(0x2 * x38) * x20);
++	{ u64 x59 = (x48 + (x58 << 0x4));
++	{ u64 x60 = (x59 + (x58 << 0x1));
++	{ u64 x61 = (x60 + x58);
++	{ u64 x62 = (x47 + (x57 << 0x4));
++	{ u64 x63 = (x62 + (x57 << 0x1));
++	{ u64 x64 = (x63 + x57);
++	{ u64 x65 = (x46 + (x56 << 0x4));
++	{ u64 x66 = (x65 + (x56 << 0x1));
++	{ u64 x67 = (x66 + x56);
++	{ u64 x68 = (x45 + (x55 << 0x4));
++	{ u64 x69 = (x68 + (x55 << 0x1));
++	{ u64 x70 = (x69 + x55);
++	{ u64 x71 = (x44 + (x54 << 0x4));
++	{ u64 x72 = (x71 + (x54 << 0x1));
++	{ u64 x73 = (x72 + x54);
++	{ u64 x74 = (x43 + (x53 << 0x4));
++	{ u64 x75 = (x74 + (x53 << 0x1));
++	{ u64 x76 = (x75 + x53);
++	{ u64 x77 = (x42 + (x52 << 0x4));
++	{ u64 x78 = (x77 + (x52 << 0x1));
++	{ u64 x79 = (x78 + x52);
++	{ u64 x80 = (x41 + (x51 << 0x4));
++	{ u64 x81 = (x80 + (x51 << 0x1));
++	{ u64 x82 = (x81 + x51);
++	{ u64 x83 = (x40 + (x50 << 0x4));
++	{ u64 x84 = (x83 + (x50 << 0x1));
++	{ u64 x85 = (x84 + x50);
++	{ u64 x86 = (x85 >> 0x1a);
++	{ u32 x87 = ((u32)x85 & 0x3ffffff);
++	{ u64 x88 = (x86 + x82);
++	{ u64 x89 = (x88 >> 0x19);
++	{ u32 x90 = ((u32)x88 & 0x1ffffff);
++	{ u64 x91 = (x89 + x79);
++	{ u64 x92 = (x91 >> 0x1a);
++	{ u32 x93 = ((u32)x91 & 0x3ffffff);
++	{ u64 x94 = (x92 + x76);
++	{ u64 x95 = (x94 >> 0x19);
++	{ u32 x96 = ((u32)x94 & 0x1ffffff);
++	{ u64 x97 = (x95 + x73);
++	{ u64 x98 = (x97 >> 0x1a);
++	{ u32 x99 = ((u32)x97 & 0x3ffffff);
++	{ u64 x100 = (x98 + x70);
++	{ u64 x101 = (x100 >> 0x19);
++	{ u32 x102 = ((u32)x100 & 0x1ffffff);
++	{ u64 x103 = (x101 + x67);
++	{ u64 x104 = (x103 >> 0x1a);
++	{ u32 x105 = ((u32)x103 & 0x3ffffff);
++	{ u64 x106 = (x104 + x64);
++	{ u64 x107 = (x106 >> 0x19);
++	{ u32 x108 = ((u32)x106 & 0x1ffffff);
++	{ u64 x109 = (x107 + x61);
++	{ u64 x110 = (x109 >> 0x1a);
++	{ u32 x111 = ((u32)x109 & 0x3ffffff);
++	{ u64 x112 = (x110 + x49);
++	{ u64 x113 = (x112 >> 0x19);
++	{ u32 x114 = ((u32)x112 & 0x1ffffff);
++	{ u64 x115 = (x87 + (0x13 * x113));
++	{ u32 x116 = (u32) (x115 >> 0x1a);
++	{ u32 x117 = ((u32)x115 & 0x3ffffff);
++	{ u32 x118 = (x116 + x90);
++	{ u32 x119 = (x118 >> 0x19);
++	{ u32 x120 = (x118 & 0x1ffffff);
++	out[0] = x117;
++	out[1] = x120;
++	out[2] = (x119 + x93);
++	out[3] = x96;
++	out[4] = x99;
++	out[5] = x102;
++	out[6] = x105;
++	out[7] = x108;
++	out[8] = x111;
++	out[9] = x114;
++	}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
++}
++
++static __always_inline void fe_mul121666(fe *h, const fe_loose *f)
++{
++	fe_mul_121666_impl(h->v, f->v);
++}
++
++static void curve25519_generic(u8 out[CURVE25519_KEY_SIZE],
++			       const u8 scalar[CURVE25519_KEY_SIZE],
++			       const u8 point[CURVE25519_KEY_SIZE])
++{
++	fe x1, x2, z2, x3, z3;
++	fe_loose x2l, z2l, x3l;
++	unsigned swap = 0;
++	int pos;
++	u8 e[32];
++
++	memcpy(e, scalar, 32);
++	normalize_secret(e);
++
++	/* The following implementation was transcribed to Coq and proven to
++	 * correspond to unary scalar multiplication in affine coordinates given
++	 * that x1 != 0 is the x coordinate of some point on the curve. It was
++	 * also checked in Coq that doing a ladderstep with x1 = x3 = 0 gives
++	 * z2' = z3' = 0, and z2 = z3 = 0 gives z2' = z3' = 0. The statement was
++	 * quantified over the underlying field, so it applies to Curve25519
++	 * itself and the quadratic twist of Curve25519. It was not proven in
++	 * Coq that prime-field arithmetic correctly simulates extension-field
++	 * arithmetic on prime-field values. The decoding of the byte array
++	 * representation of e was not considered.
++	 *
++	 * Specification of Montgomery curves in affine coordinates:
++	 * <https://github.com/mit-plv/fiat-crypto/blob/2456d821825521f7e03e65882cc3521795b0320f/src/Spec/MontgomeryCurve.v#L27>
++	 *
++	 * Proof that these form a group that is isomorphic to a Weierstrass
++	 * curve:
++	 * <https://github.com/mit-plv/fiat-crypto/blob/2456d821825521f7e03e65882cc3521795b0320f/src/Curves/Montgomery/AffineProofs.v#L35>
++	 *
++	 * Coq transcription and correctness proof of the loop
++	 * (where scalarbits=255):
++	 * <https://github.com/mit-plv/fiat-crypto/blob/2456d821825521f7e03e65882cc3521795b0320f/src/Curves/Montgomery/XZ.v#L118>
++	 * <https://github.com/mit-plv/fiat-crypto/blob/2456d821825521f7e03e65882cc3521795b0320f/src/Curves/Montgomery/XZProofs.v#L278>
++	 * preconditions: 0 <= e < 2^255 (not necessarily e < order),
++	 * fe_invert(0) = 0
++	 */
++	fe_frombytes(&x1, point);
++	fe_1(&x2);
++	fe_0(&z2);
++	fe_copy(&x3, &x1);
++	fe_1(&z3);
++
++	for (pos = 254; pos >= 0; --pos) {
++		fe tmp0, tmp1;
++		fe_loose tmp0l, tmp1l;
++		/* loop invariant as of right before the test, for the case
++		 * where x1 != 0:
++		 *   pos >= -1; if z2 = 0 then x2 is nonzero; if z3 = 0 then x3
++		 *   is nonzero
++		 *   let r := e >> (pos+1) in the following equalities of
++		 *   projective points:
++		 *   to_xz (r*P)     === if swap then (x3, z3) else (x2, z2)
++		 *   to_xz ((r+1)*P) === if swap then (x2, z2) else (x3, z3)
++		 *   x1 is the nonzero x coordinate of the nonzero
++		 *   point (r*P-(r+1)*P)
++		 */
++		unsigned b = 1 & (e[pos / 8] >> (pos & 7));
++		swap ^= b;
++		fe_cswap(&x2, &x3, swap);
++		fe_cswap(&z2, &z3, swap);
++		swap = b;
++		/* Coq transcription of ladderstep formula (called from
++		 * transcribed loop):
++		 * <https://github.com/mit-plv/fiat-crypto/blob/2456d821825521f7e03e65882cc3521795b0320f/src/Curves/Montgomery/XZ.v#L89>
++		 * <https://github.com/mit-plv/fiat-crypto/blob/2456d821825521f7e03e65882cc3521795b0320f/src/Curves/Montgomery/XZProofs.v#L131>
++		 * x1 != 0 <https://github.com/mit-plv/fiat-crypto/blob/2456d821825521f7e03e65882cc3521795b0320f/src/Curves/Montgomery/XZProofs.v#L217>
++		 * x1  = 0 <https://github.com/mit-plv/fiat-crypto/blob/2456d821825521f7e03e65882cc3521795b0320f/src/Curves/Montgomery/XZProofs.v#L147>
++		 */
++		fe_sub(&tmp0l, &x3, &z3);
++		fe_sub(&tmp1l, &x2, &z2);
++		fe_add(&x2l, &x2, &z2);
++		fe_add(&z2l, &x3, &z3);
++		fe_mul_tll(&z3, &tmp0l, &x2l);
++		fe_mul_tll(&z2, &z2l, &tmp1l);
++		fe_sq_tl(&tmp0, &tmp1l);
++		fe_sq_tl(&tmp1, &x2l);
++		fe_add(&x3l, &z3, &z2);
++		fe_sub(&z2l, &z3, &z2);
++		fe_mul_ttt(&x2, &tmp1, &tmp0);
++		fe_sub(&tmp1l, &tmp1, &tmp0);
++		fe_sq_tl(&z2, &z2l);
++		fe_mul121666(&z3, &tmp1l);
++		fe_sq_tl(&x3, &x3l);
++		fe_add(&tmp0l, &tmp0, &z3);
++		fe_mul_ttt(&z3, &x1, &z2);
++		fe_mul_tll(&z2, &tmp1l, &tmp0l);
 +	}
++	/* here pos=-1, so r=e, so to_xz (e*P) === if swap then (x3, z3)
++	 * else (x2, z2)
++	 */
++	fe_cswap(&x2, &x3, swap);
++	fe_cswap(&z2, &z3, swap);
 +
-+	if (srclen) {
-+		memcpy(state->buffer, src, srclen);
-+		state->buflen = srclen;
-+	}
-+	return 0;
++	fe_invert(&z2, &z2);
++	fe_mul_ttt(&x2, &x2, &z2);
++	fe_tobytes(out, &x2);
++
++	memzero_explicit(&x1, sizeof(x1));
++	memzero_explicit(&x2, sizeof(x2));
++	memzero_explicit(&z2, sizeof(z2));
++	memzero_explicit(&x3, sizeof(x3));
++	memzero_explicit(&z3, sizeof(z3));
++	memzero_explicit(&x2l, sizeof(x2l));
++	memzero_explicit(&z2l, sizeof(z2l));
++	memzero_explicit(&x3l, sizeof(x3l));
++	memzero_explicit(&e, sizeof(e));
 +}
-+EXPORT_SYMBOL(crypto_nhpoly1305_update_helper);
-+
-+int crypto_nhpoly1305_update(struct shash_desc *desc,
-+			     const u8 *src, unsigned int srclen)
-+{
-+	return crypto_nhpoly1305_update_helper(desc, src, srclen, nh_generic);
-+}
-+EXPORT_SYMBOL(crypto_nhpoly1305_update);
-+
-+int crypto_nhpoly1305_final_helper(struct shash_desc *desc, u8 *dst, nh_t nh_fn)
-+{
-+	struct nhpoly1305_state *state = shash_desc_ctx(desc);
-+	const struct nhpoly1305_key *key = crypto_shash_ctx(desc->tfm);
-+
-+	if (state->buflen) {
-+		memset(&state->buffer[state->buflen], 0,
-+		       NH_MESSAGE_UNIT - state->buflen);
-+		nhpoly1305_units(state, key, state->buffer, NH_MESSAGE_UNIT,
-+				 nh_fn);
-+	}
-+
-+	if (state->nh_remaining)
-+		process_nh_hash_value(state, key);
-+
-+	poly1305_core_emit(&state->poly_state, dst);
-+	return 0;
-+}
-+EXPORT_SYMBOL(crypto_nhpoly1305_final_helper);
-+
-+int crypto_nhpoly1305_final(struct shash_desc *desc, u8 *dst)
-+{
-+	return crypto_nhpoly1305_final_helper(desc, dst, nh_generic);
-+}
-+EXPORT_SYMBOL(crypto_nhpoly1305_final);
-+
-+static struct shash_alg nhpoly1305_alg = {
-+	.digestsize	= POLY1305_DIGEST_SIZE,
-+	.init		= crypto_nhpoly1305_init,
-+	.update		= crypto_nhpoly1305_update,
-+	.final		= crypto_nhpoly1305_final,
-+	.setkey		= crypto_nhpoly1305_setkey,
-+	.descsize	= sizeof(struct nhpoly1305_state),
-+	.base		= {
-+		.cra_name		= "nhpoly1305",
-+		.cra_driver_name	= "nhpoly1305-generic",
-+		.cra_priority		= 100,
-+		.cra_ctxsize		= sizeof(struct nhpoly1305_key),
-+		.cra_module		= THIS_MODULE,
-+	},
-+};
-+
-+static int __init nhpoly1305_mod_init(void)
-+{
-+	return crypto_register_shash(&nhpoly1305_alg);
-+}
-+
-+static void __exit nhpoly1305_mod_exit(void)
-+{
-+	crypto_unregister_shash(&nhpoly1305_alg);
-+}
-+
-+module_init(nhpoly1305_mod_init);
-+module_exit(nhpoly1305_mod_exit);
-+
-+MODULE_DESCRIPTION("NHPoly1305 ε-almost-∆-universal hash function");
-+MODULE_LICENSE("GPL v2");
-+MODULE_AUTHOR("Eric Biggers <ebiggers@google.com>");
-+MODULE_ALIAS_CRYPTO("nhpoly1305");
-+MODULE_ALIAS_CRYPTO("nhpoly1305-generic");
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 3ff70ebc745cb..039a5d850a29c 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -3291,6 +3291,12 @@ static const struct alg_test_desc alg_test_descs[] = {
- 				.dec = __VECS(morus640_dec_tv_template),
- 			}
- 		}
-+	}, {
-+		.alg = "nhpoly1305",
-+		.test = alg_test_hash,
-+		.suite = {
-+			.hash = __VECS(nhpoly1305_tv_template)
-+		}
- 	}, {
- 		.alg = "ofb(aes)",
- 		.test = alg_test_skcipher,
-diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index 3b57b2701fcb2..40197d74b3d56 100644
---- a/crypto/testmgr.h
-+++ b/crypto/testmgr.h
-@@ -27,7 +27,7 @@
- #define MAX_DIGEST_SIZE		64
- #define MAX_TAP			8
- 
--#define MAX_KEYLEN		160
-+#define MAX_KEYLEN		1088
- #define MAX_IVLEN		32
- 
- struct hash_testvec {
-@@ -35,10 +35,10 @@ struct hash_testvec {
- 	const char *key;
- 	const char *plaintext;
- 	const char *digest;
--	unsigned char tap[MAX_TAP];
-+	unsigned short tap[MAX_TAP];
-+	unsigned short np;
- 	unsigned short psize;
--	unsigned char np;
--	unsigned char ksize;
-+	unsigned short ksize;
- };
- 
- /*
-@@ -5593,6 +5593,1238 @@ static const struct hash_testvec poly1305_tv_template[] = {
- 	},
- };
- 
-+/* NHPoly1305 test vectors from https://github.com/google/adiantum */
-+static const struct hash_testvec nhpoly1305_tv_template[] = {
-+	{
-+		.key	= "\xd2\x5d\x4c\xdd\x8d\x2b\x7f\x7a"
-+			  "\xd9\xbe\x71\xec\xd1\x83\x52\xe3"
-+			  "\xe1\xad\xd7\x5c\x0a\x75\x9d\xec"
-+			  "\x1d\x13\x7e\x5d\x71\x07\xc9\xe4"
-+			  "\x57\x2d\x44\x68\xcf\xd8\xd6\xc5"
-+			  "\x39\x69\x7d\x32\x75\x51\x4f\x7e"
-+			  "\xb2\x4c\xc6\x90\x51\x6e\xd9\xd6"
-+			  "\xa5\x8b\x2d\xf1\x94\xf9\xf7\x5e"
-+			  "\x2c\x84\x7b\x41\x0f\x88\x50\x89"
-+			  "\x30\xd9\xa1\x38\x46\x6c\xc0\x4f"
-+			  "\xe8\xdf\xdc\x66\xab\x24\x43\x41"
-+			  "\x91\x55\x29\x65\x86\x28\x5e\x45"
-+			  "\xd5\x2d\xb7\x80\x08\x9a\xc3\xd4"
-+			  "\x9a\x77\x0a\xd4\xef\x3e\xe6\x3f"
-+			  "\x6f\x2f\x9b\x3a\x7d\x12\x1e\x80"
-+			  "\x6c\x44\xa2\x25\xe1\xf6\x60\xe9"
-+			  "\x0d\xaf\xc5\x3c\xa5\x79\xae\x64"
-+			  "\xbc\xa0\x39\xa3\x4d\x10\xe5\x4d"
-+			  "\xd5\xe7\x89\x7a\x13\xee\x06\x78"
-+			  "\xdc\xa4\xdc\x14\x27\xe6\x49\x38"
-+			  "\xd0\xe0\x45\x25\x36\xc5\xf4\x79"
-+			  "\x2e\x9a\x98\x04\xe4\x2b\x46\x52"
-+			  "\x7c\x33\xca\xe2\x56\x51\x50\xe2"
-+			  "\xa5\x9a\xae\x18\x6a\x13\xf8\xd2"
-+			  "\x21\x31\x66\x02\xe2\xda\x8d\x7e"
-+			  "\x41\x19\xb2\x61\xee\x48\x8f\xf1"
-+			  "\x65\x24\x2e\x1e\x68\xce\x05\xd9"
-+			  "\x2a\xcf\xa5\x3a\x57\xdd\x35\x91"
-+			  "\x93\x01\xca\x95\xfc\x2b\x36\x04"
-+			  "\xe6\x96\x97\x28\xf6\x31\xfe\xa3"
-+			  "\x9d\xf6\x6a\x1e\x80\x8d\xdc\xec"
-+			  "\xaf\x66\x11\x13\x02\x88\xd5\x27"
-+			  "\x33\xb4\x1a\xcd\xa3\xf6\xde\x31"
-+			  "\x8e\xc0\x0e\x6c\xd8\x5a\x97\x5e"
-+			  "\xdd\xfd\x60\x69\x38\x46\x3f\x90"
-+			  "\x5e\x97\xd3\x32\x76\xc7\x82\x49"
-+			  "\xfe\xba\x06\x5f\x2f\xa2\xfd\xff"
-+			  "\x80\x05\x40\xe4\x33\x03\xfb\x10"
-+			  "\xc0\xde\x65\x8c\xc9\x8d\x3a\x9d"
-+			  "\xb5\x7b\x36\x4b\xb5\x0c\xcf\x00"
-+			  "\x9c\x87\xe4\x49\xad\x90\xda\x4a"
-+			  "\xdd\xbd\xff\xe2\x32\x57\xd6\x78"
-+			  "\x36\x39\x6c\xd3\x5b\x9b\x88\x59"
-+			  "\x2d\xf0\x46\xe4\x13\x0e\x2b\x35"
-+			  "\x0d\x0f\x73\x8a\x4f\x26\x84\x75"
-+			  "\x88\x3c\xc5\x58\x66\x18\x1a\xb4"
-+			  "\x64\x51\x34\x27\x1b\xa4\x11\xc9"
-+			  "\x6d\x91\x8a\xfa\x32\x60\x9d\xd7"
-+			  "\x87\xe5\xaa\x43\x72\xf8\xda\xd1"
-+			  "\x48\x44\x13\x61\xdc\x8c\x76\x17"
-+			  "\x0c\x85\x4e\xf3\xdd\xa2\x42\xd2"
-+			  "\x74\xc1\x30\x1b\xeb\x35\x31\x29"
-+			  "\x5b\xd7\x4c\x94\x46\x35\xa1\x23"
-+			  "\x50\xf2\xa2\x8e\x7e\x4f\x23\x4f"
-+			  "\x51\xff\xe2\xc9\xa3\x7d\x56\x8b"
-+			  "\x41\xf2\xd0\xc5\x57\x7e\x59\xac"
-+			  "\xbb\x65\xf3\xfe\xf7\x17\xef\x63"
-+			  "\x7c\x6f\x23\xdd\x22\x8e\xed\x84"
-+			  "\x0e\x3b\x09\xb3\xf3\xf4\x8f\xcd"
-+			  "\x37\xa8\xe1\xa7\x30\xdb\xb1\xa2"
-+			  "\x9c\xa2\xdf\x34\x17\x3e\x68\x44"
-+			  "\xd0\xde\x03\x50\xd1\x48\x6b\x20"
-+			  "\xe2\x63\x45\xa5\xea\x87\xc2\x42"
-+			  "\x95\x03\x49\x05\xed\xe0\x90\x29"
-+			  "\x1a\xb8\xcf\x9b\x43\xcf\x29\x7a"
-+			  "\x63\x17\x41\x9f\xe0\xc9\x10\xfd"
-+			  "\x2c\x56\x8c\x08\x55\xb4\xa9\x27"
-+			  "\x0f\x23\xb1\x05\x6a\x12\x46\xc7"
-+			  "\xe1\xfe\x28\x93\x93\xd7\x2f\xdc"
-+			  "\x98\x30\xdb\x75\x8a\xbe\x97\x7a"
-+			  "\x02\xfb\x8c\xba\xbe\x25\x09\xbe"
-+			  "\xce\xcb\xa2\xef\x79\x4d\x0e\x9d"
-+			  "\x1b\x9d\xb6\x39\x34\x38\xfa\x07"
-+			  "\xec\xe8\xfc\x32\x85\x1d\xf7\x85"
-+			  "\x63\xc3\x3c\xc0\x02\x75\xd7\x3f"
-+			  "\xb2\x68\x60\x66\x65\x81\xc6\xb1"
-+			  "\x42\x65\x4b\x4b\x28\xd7\xc7\xaa"
-+			  "\x9b\xd2\xdc\x1b\x01\xe0\x26\x39"
-+			  "\x01\xc1\x52\x14\xd1\x3f\xb7\xe6"
-+			  "\x61\x41\xc7\x93\xd2\xa2\x67\xc6"
-+			  "\xf7\x11\xb5\xf5\xea\xdd\x19\xfb"
-+			  "\x4d\x21\x12\xd6\x7d\xf1\x10\xb0"
-+			  "\x89\x07\xc7\x5a\x52\x73\x70\x2f"
-+			  "\x32\xef\x65\x2b\x12\xb2\xf0\xf5"
-+			  "\x20\xe0\x90\x59\x7e\x64\xf1\x4c"
-+			  "\x41\xb3\xa5\x91\x08\xe6\x5e\x5f"
-+			  "\x05\x56\x76\xb4\xb0\xcd\x70\x53"
-+			  "\x10\x48\x9c\xff\xc2\x69\x55\x24"
-+			  "\x87\xef\x84\xea\xfb\xa7\xbf\xa0"
-+			  "\x91\x04\xad\x4f\x8b\x57\x54\x4b"
-+			  "\xb6\xe9\xd1\xac\x37\x2f\x1d\x2e"
-+			  "\xab\xa5\xa4\xe8\xff\xfb\xd9\x39"
-+			  "\x2f\xb7\xac\xd1\xfe\x0b\x9a\x80"
-+			  "\x0f\xb6\xf4\x36\x39\x90\x51\xe3"
-+			  "\x0a\x2f\xb6\x45\x76\x89\xcd\x61"
-+			  "\xfe\x48\x5f\x75\x1d\x13\x00\x62"
-+			  "\x80\x24\x47\xe7\xbc\x37\xd7\xe3"
-+			  "\x15\xe8\x68\x22\xaf\x80\x6f\x4b"
-+			  "\xa8\x9f\x01\x10\x48\x14\xc3\x02"
-+			  "\x52\xd2\xc7\x75\x9b\x52\x6d\x30"
-+			  "\xac\x13\x85\xc8\xf7\xa3\x58\x4b"
-+			  "\x49\xf7\x1c\x45\x55\x8c\x39\x9a"
-+			  "\x99\x6d\x97\x27\x27\xe6\xab\xdd"
-+			  "\x2c\x42\x1b\x35\xdd\x9d\x73\xbb"
-+			  "\x6c\xf3\x64\xf1\xfb\xb9\xf7\xe6"
-+			  "\x4a\x3c\xc0\x92\xc0\x2e\xb7\x1a"
-+			  "\xbe\xab\xb3\x5a\xe5\xea\xb1\x48"
-+			  "\x58\x13\x53\x90\xfd\xc3\x8e\x54"
-+			  "\xf9\x18\x16\x73\xe8\xcb\x6d\x39"
-+			  "\x0e\xd7\xe0\xfe\xb6\x9f\x43\x97"
-+			  "\xe8\xd0\x85\x56\x83\x3e\x98\x68"
-+			  "\x7f\xbd\x95\xa8\x9a\x61\x21\x8f"
-+			  "\x06\x98\x34\xa6\xc8\xd6\x1d\xf3"
-+			  "\x3d\x43\xa4\x9a\x8c\xe5\xd3\x5a"
-+			  "\x32\xa2\x04\x22\xa4\x19\x1a\x46"
-+			  "\x42\x7e\x4d\xe5\xe0\xe6\x0e\xca"
-+			  "\xd5\x58\x9d\x2c\xaf\xda\x33\x5c"
-+			  "\xb0\x79\x9e\xc9\xfc\xca\xf0\x2f"
-+			  "\xa8\xb2\x77\xeb\x7a\xa2\xdd\x37"
-+			  "\x35\x83\x07\xd6\x02\x1a\xb6\x6c"
-+			  "\x24\xe2\x59\x08\x0e\xfd\x3e\x46"
-+			  "\xec\x40\x93\xf4\x00\x26\x4f\x2a"
-+			  "\xff\x47\x2f\xeb\x02\x92\x26\x5b"
-+			  "\x53\x17\xc2\x8d\x2a\xc7\xa3\x1b"
-+			  "\xcd\xbc\xa7\xe8\xd1\x76\xe3\x80"
-+			  "\x21\xca\x5d\x3b\xe4\x9c\x8f\xa9"
-+			  "\x5b\x7f\x29\x7f\x7c\xd8\xed\x6d"
-+			  "\x8c\xb2\x86\x85\xe7\x77\xf2\x85"
-+			  "\xab\x38\xa9\x9d\xc1\x4e\xc5\x64"
-+			  "\x33\x73\x8b\x59\x03\xad\x05\xdf"
-+			  "\x25\x98\x31\xde\xef\x13\xf1\x9b"
-+			  "\x3c\x91\x9d\x7b\xb1\xfa\xe6\xbf"
-+			  "\x5b\xed\xa5\x55\xe6\xea\x6c\x74"
-+			  "\xf4\xb9\xe4\x45\x64\x72\x81\xc2"
-+			  "\x4c\x28\xd4\xcd\xac\xe2\xde\xf9"
-+			  "\xeb\x5c\xeb\x61\x60\x5a\xe5\x28",
-+		.ksize	= 1088,
-+		.plaintext	= "",
-+		.psize	= 0,
-+		.digest	= "\x00\x00\x00\x00\x00\x00\x00\x00"
-+			  "\x00\x00\x00\x00\x00\x00\x00\x00",
-+	}, {
-+		.key	= "\x29\x21\x43\xcb\xcb\x13\x07\xde"
-+			  "\xbf\x48\xdf\x8a\x7f\xa2\x84\xde"
-+			  "\x72\x23\x9d\xf5\xf0\x07\xf2\x4c"
-+			  "\x20\x3a\x93\xb9\xcd\x5d\xfe\xcb"
-+			  "\x99\x2c\x2b\x58\xc6\x50\x5f\x94"
-+			  "\x56\xc3\x7c\x0d\x02\x3f\xb8\x5e"
-+			  "\x7b\xc0\x6c\x51\x34\x76\xc0\x0e"
-+			  "\xc6\x22\xc8\x9e\x92\xa0\x21\xc9"
-+			  "\x85\x5c\x7c\xf8\xe2\x64\x47\xc9"
-+			  "\xe4\xa2\x57\x93\xf8\xa2\x69\xcd"
-+			  "\x62\x98\x99\xf4\xd7\x7b\x14\xb1"
-+			  "\xd8\x05\xff\x04\x15\xc9\xe1\x6e"
-+			  "\x9b\xe6\x50\x6b\x0b\x3f\x22\x1f"
-+			  "\x08\xde\x0c\x5b\x08\x7e\xc6\x2f"
-+			  "\x6c\xed\xd6\xb2\x15\xa4\xb3\xf9"
-+			  "\xa7\x46\x38\x2a\xea\x69\xa5\xde"
-+			  "\x02\xc3\x96\x89\x4d\x55\x3b\xed"
-+			  "\x3d\x3a\x85\x77\xbf\x97\x45\x5c"
-+			  "\x9e\x02\x69\xe2\x1b\x68\xbe\x96"
-+			  "\xfb\x64\x6f\x0f\xf6\x06\x40\x67"
-+			  "\xfa\x04\xe3\x55\xfa\xbe\xa4\x60"
-+			  "\xef\x21\x66\x97\xe6\x9d\x5c\x1f"
-+			  "\x62\x37\xaa\x31\xde\xe4\x9c\x28"
-+			  "\x95\xe0\x22\x86\xf4\x4d\xf3\x07"
-+			  "\xfd\x5f\x3a\x54\x2c\x51\x80\x71"
-+			  "\xba\x78\x69\x5b\x65\xab\x1f\x81"
-+			  "\xed\x3b\xff\x34\xa3\xfb\xbc\x73"
-+			  "\x66\x7d\x13\x7f\xdf\x6e\xe2\xe2"
-+			  "\xeb\x4f\x6c\xda\x7d\x33\x57\xd0"
-+			  "\xd3\x7c\x95\x4f\x33\x58\x21\xc7"
-+			  "\xc0\xe5\x6f\x42\x26\xc6\x1f\x5e"
-+			  "\x85\x1b\x98\x9a\xa2\x1e\x55\x77"
-+			  "\x23\xdf\x81\x5e\x79\x55\x05\xfc"
-+			  "\xfb\xda\xee\xba\x5a\xba\xf7\x77"
-+			  "\x7f\x0e\xd3\xe1\x37\xfe\x8d\x2b"
-+			  "\xd5\x3f\xfb\xd0\xc0\x3c\x0b\x3f"
-+			  "\xcf\x3c\x14\xcf\xfb\x46\x72\x4c"
-+			  "\x1f\x39\xe2\xda\x03\x71\x6d\x23"
-+			  "\xef\x93\xcd\x39\xd9\x37\x80\x4d"
-+			  "\x65\x61\xd1\x2c\x03\xa9\x47\x72"
-+			  "\x4d\x1e\x0e\x16\x33\x0f\x21\x17"
-+			  "\xec\x92\xea\x6f\x37\x22\xa4\xd8"
-+			  "\x03\x33\x9e\xd8\x03\x69\x9a\xe8"
-+			  "\xb2\x57\xaf\x78\x99\x05\x12\xab"
-+			  "\x48\x90\x80\xf0\x12\x9b\x20\x64"
-+			  "\x7a\x1d\x47\x5f\xba\x3c\xf9\xc3"
-+			  "\x0a\x0d\x8d\xa1\xf9\x1b\x82\x13"
-+			  "\x3e\x0d\xec\x0a\x83\xc0\x65\xe1"
-+			  "\xe9\x95\xff\x97\xd6\xf2\xe4\xd5"
-+			  "\x86\xc0\x1f\x29\x27\x63\xd7\xde"
-+			  "\xb7\x0a\x07\x99\x04\x2d\xa3\x89"
-+			  "\xa2\x43\xcf\xf3\xe1\x43\xac\x4a"
-+			  "\x06\x97\xd0\x05\x4f\x87\xfa\xf9"
-+			  "\x9b\xbf\x52\x70\xbd\xbc\x6c\xf3"
-+			  "\x03\x13\x60\x41\x28\x09\xec\xcc"
-+			  "\xb1\x1a\xec\xd6\xfb\x6f\x2a\x89"
-+			  "\x5d\x0b\x53\x9c\x59\xc1\x84\x21"
-+			  "\x33\x51\x47\x19\x31\x9c\xd4\x0a"
-+			  "\x4d\x04\xec\x50\x90\x61\xbd\xbc"
-+			  "\x7e\xc8\xd9\x6c\x98\x1d\x45\x41"
-+			  "\x17\x5e\x97\x1c\xc5\xa8\xe8\xea"
-+			  "\x46\x58\x53\xf7\x17\xd5\xad\x11"
-+			  "\xc8\x54\xf5\x7a\x33\x90\xf5\x19"
-+			  "\xba\x36\xb4\xfc\x52\xa5\x72\x3d"
-+			  "\x14\xbb\x55\xa7\xe9\xe3\x12\xf7"
-+			  "\x1c\x30\xa2\x82\x03\xbf\x53\x91"
-+			  "\x2e\x60\x41\x9f\x5b\x69\x39\xf6"
-+			  "\x4d\xc8\xf8\x46\x7a\x7f\xa4\x98"
-+			  "\x36\xff\x06\xcb\xca\xe7\x33\xf2"
-+			  "\xc0\x4a\xf4\x3c\x14\x44\x5f\x6b"
-+			  "\x75\xef\x02\x36\x75\x08\x14\xfd"
-+			  "\x10\x8e\xa5\x58\xd0\x30\x46\x49"
-+			  "\xaf\x3a\xf8\x40\x3d\x35\xdb\x84"
-+			  "\x11\x2e\x97\x6a\xb7\x87\x7f\xad"
-+			  "\xf1\xfa\xa5\x63\x60\xd8\x5e\xbf"
-+			  "\x41\x78\x49\xcf\x77\xbb\x56\xbb"
-+			  "\x7d\x01\x67\x05\x22\xc8\x8f\x41"
-+			  "\xba\x81\xd2\xca\x2c\x38\xac\x76"
-+			  "\x06\xc1\x1a\xc2\xce\xac\x90\x67"
-+			  "\x57\x3e\x20\x12\x5b\xd9\x97\x58"
-+			  "\x65\x05\xb7\x04\x61\x7e\xd8\x3a"
-+			  "\xbf\x55\x3b\x13\xe9\x34\x5a\x37"
-+			  "\x36\xcb\x94\x45\xc5\x32\xb3\xa0"
-+			  "\x0c\x3e\x49\xc5\xd3\xed\xa7\xf0"
-+			  "\x1c\x69\xcc\xea\xcc\x83\xc9\x16"
-+			  "\x95\x72\x4b\xf4\x89\xd5\xb9\x10"
-+			  "\xf6\x2d\x60\x15\xea\x3c\x06\x66"
-+			  "\x9f\x82\xad\x17\xce\xd2\xa4\x48"
-+			  "\x7c\x65\xd9\xf8\x02\x4d\x9b\x4c"
-+			  "\x89\x06\x3a\x34\x85\x48\x89\x86"
-+			  "\xf9\x24\xa9\x54\x72\xdb\x44\x95"
-+			  "\xc7\x44\x1c\x19\x11\x4c\x04\xdc"
-+			  "\x13\xb9\x67\xc8\xc3\x3a\x6a\x50"
-+			  "\xfa\xd1\xfb\xe1\x88\xb6\xf1\xa3"
-+			  "\xc5\x3b\xdc\x38\x45\x16\x26\x02"
-+			  "\x3b\xb8\x8f\x8b\x58\x7d\x23\x04"
-+			  "\x50\x6b\x81\x9f\xae\x66\xac\x6f"
-+			  "\xcf\x2a\x9d\xf1\xfd\x1d\x57\x07"
-+			  "\xbe\x58\xeb\x77\x0c\xe3\xc2\x19"
-+			  "\x14\x74\x1b\x51\x1c\x4f\x41\xf3"
-+			  "\x32\x89\xb3\xe7\xde\x62\xf6\x5f"
-+			  "\xc7\x6a\x4a\x2a\x5b\x0f\x5f\x87"
-+			  "\x9c\x08\xb9\x02\x88\xc8\x29\xb7"
-+			  "\x94\x52\xfa\x52\xfe\xaa\x50\x10"
-+			  "\xba\x48\x75\x5e\x11\x1b\xe6\x39"
-+			  "\xd7\x82\x2c\x87\xf1\x1e\xa4\x38"
-+			  "\x72\x3e\x51\xe7\xd8\x3e\x5b\x7b"
-+			  "\x31\x16\x89\xba\xd6\xad\x18\x5e"
-+			  "\xba\xf8\x12\xb3\xf4\x6c\x47\x30"
-+			  "\xc0\x38\x58\xb3\x10\x8d\x58\x5d"
-+			  "\xb4\xfb\x19\x7e\x41\xc3\x66\xb8"
-+			  "\xd6\x72\x84\xe1\x1a\xc2\x71\x4c"
-+			  "\x0d\x4a\x21\x7a\xab\xa2\xc0\x36"
-+			  "\x15\xc5\xe9\x46\xd7\x29\x17\x76"
-+			  "\x5e\x47\x36\x7f\x72\x05\xa7\xcc"
-+			  "\x36\x63\xf9\x47\x7d\xe6\x07\x3c"
-+			  "\x8b\x79\x1d\x96\x61\x8d\x90\x65"
-+			  "\x7c\xf5\xeb\x4e\x6e\x09\x59\x6d"
-+			  "\x62\x50\x1b\x0f\xe0\xdc\x78\xf2"
-+			  "\x5b\x83\x1a\xa1\x11\x75\xfd\x18"
-+			  "\xd7\xe2\x8d\x65\x14\x21\xce\xbe"
-+			  "\xb5\x87\xe3\x0a\xda\x24\x0a\x64"
-+			  "\xa9\x9f\x03\x8d\x46\x5d\x24\x1a"
-+			  "\x8a\x0c\x42\x01\xca\xb1\x5f\x7c"
-+			  "\xa5\xac\x32\x4a\xb8\x07\x91\x18"
-+			  "\x6f\xb0\x71\x3c\xc9\xb1\xa8\xf8"
-+			  "\x5f\x69\xa5\xa1\xca\x9e\x7a\xaa"
-+			  "\xac\xe9\xc7\x47\x41\x75\x25\xc3"
-+			  "\x73\xe2\x0b\xdd\x6d\x52\x71\xbe"
-+			  "\xc5\xdc\xb4\xe7\x01\x26\x53\x77"
-+			  "\x86\x90\x85\x68\x6b\x7b\x03\x53"
-+			  "\xda\x52\x52\x51\x68\xc8\xf3\xec"
-+			  "\x6c\xd5\x03\x7a\xa3\x0e\xb4\x02"
-+			  "\x5f\x1a\xab\xee\xca\x67\x29\x7b"
-+			  "\xbd\x96\x59\xb3\x8b\x32\x7a\x92"
-+			  "\x9f\xd8\x25\x2b\xdf\xc0\x4c\xda",
-+		.ksize	= 1088,
-+		.plaintext	= "\xbc\xda\x81\xa8\x78\x79\x1c\xbf"
-+			  "\x77\x53\xba\x4c\x30\x5b\xb8\x33",
-+		.psize	= 16,
-+		.digest	= "\x04\xbf\x7f\x6a\xce\x72\xea\x6a"
-+			  "\x79\xdb\xb0\xc9\x60\xf6\x12\xcc",
-+		.np	= 6,
-+		.tap	= { 4, 4, 1, 1, 1, 5 },
-+	}, {
-+		.key	= "\x65\x4d\xe3\xf8\xd2\x4c\xac\x28"
-+			  "\x68\xf5\xb3\x81\x71\x4b\xa1\xfa"
-+			  "\x04\x0e\xd3\x81\x36\xbe\x0c\x81"
-+			  "\x5e\xaf\xbc\x3a\xa4\xc0\x8e\x8b"
-+			  "\x55\x63\xd3\x52\x97\x88\xd6\x19"
-+			  "\xbc\x96\xdf\x49\xff\x04\x63\xf5"
-+			  "\x0c\x11\x13\xaa\x9e\x1f\x5a\xf7"
-+			  "\xdd\xbd\x37\x80\xc3\xd0\xbe\xa7"
-+			  "\x05\xc8\x3c\x98\x1e\x05\x3c\x84"
-+			  "\x39\x61\xc4\xed\xed\x71\x1b\xc4"
-+			  "\x74\x45\x2c\xa1\x56\x70\x97\xfd"
-+			  "\x44\x18\x07\x7d\xca\x60\x1f\x73"
-+			  "\x3b\x6d\x21\xcb\x61\x87\x70\x25"
-+			  "\x46\x21\xf1\x1f\x21\x91\x31\x2d"
-+			  "\x5d\xcc\xb7\xd1\x84\x3e\x3d\xdb"
-+			  "\x03\x53\x2a\x82\xa6\x9a\x95\xbc"
-+			  "\x1a\x1e\x0a\x5e\x07\x43\xab\x43"
-+			  "\xaf\x92\x82\x06\x91\x04\x09\xf4"
-+			  "\x17\x0a\x9a\x2c\x54\xdb\xb8\xf4"
-+			  "\xd0\xf0\x10\x66\x24\x8d\xcd\xda"
-+			  "\xfe\x0e\x45\x9d\x6f\xc4\x4e\xf4"
-+			  "\x96\xaf\x13\xdc\xa9\xd4\x8c\xc4"
-+			  "\xc8\x57\x39\x3c\xc2\xd3\x0a\x76"
-+			  "\x4a\x1f\x75\x83\x44\xc7\xd1\x39"
-+			  "\xd8\xb5\x41\xba\x73\x87\xfa\x96"
-+			  "\xc7\x18\x53\xfb\x9b\xda\xa0\x97"
-+			  "\x1d\xee\x60\x85\x9e\x14\xc3\xce"
-+			  "\xc4\x05\x29\x3b\x95\x30\xa3\xd1"
-+			  "\x9f\x82\x6a\x04\xf5\xa7\x75\x57"
-+			  "\x82\x04\xfe\x71\x51\x71\xb1\x49"
-+			  "\x50\xf8\xe0\x96\xf1\xfa\xa8\x88"
-+			  "\x3f\xa0\x86\x20\xd4\x60\x79\x59"
-+			  "\x17\x2d\xd1\x09\xf4\xec\x05\x57"
-+			  "\xcf\x62\x7e\x0e\x7e\x60\x78\xe6"
-+			  "\x08\x60\x29\xd8\xd5\x08\x1a\x24"
-+			  "\xc4\x6c\x24\xe7\x92\x08\x3d\x8a"
-+			  "\x98\x7a\xcf\x99\x0a\x65\x0e\xdc"
-+			  "\x8c\x8a\xbe\x92\x82\x91\xcc\x62"
-+			  "\x30\xb6\xf4\x3f\xc6\x8a\x7f\x12"
-+			  "\x4a\x8a\x49\xfa\x3f\x5c\xd4\x5a"
-+			  "\xa6\x82\xa3\xe6\xaa\x34\x76\xb2"
-+			  "\xab\x0a\x30\xef\x6c\x77\x58\x3f"
-+			  "\x05\x6b\xcc\x5c\xae\xdc\xd7\xb9"
-+			  "\x51\x7e\x8d\x32\x5b\x24\x25\xbe"
-+			  "\x2b\x24\x01\xcf\x80\xda\x16\xd8"
-+			  "\x90\x72\x2c\xad\x34\x8d\x0c\x74"
-+			  "\x02\xcb\xfd\xcf\x6e\xef\x97\xb5"
-+			  "\x4c\xf2\x68\xca\xde\x43\x9e\x8a"
-+			  "\xc5\x5f\x31\x7f\x14\x71\x38\xec"
-+			  "\xbd\x98\xe5\x71\xc4\xb5\xdb\xef"
-+			  "\x59\xd2\xca\xc0\xc1\x86\x75\x01"
-+			  "\xd4\x15\x0d\x6f\xa4\xf7\x7b\x37"
-+			  "\x47\xda\x18\x93\x63\xda\xbe\x9e"
-+			  "\x07\xfb\xb2\x83\xd5\xc4\x34\x55"
-+			  "\xee\x73\xa1\x42\x96\xf9\x66\x41"
-+			  "\xa4\xcc\xd2\x93\x6e\xe1\x0a\xbb"
-+			  "\xd2\xdd\x18\x23\xe6\x6b\x98\x0b"
-+			  "\x8a\x83\x59\x2c\xc3\xa6\x59\x5b"
-+			  "\x01\x22\x59\xf7\xdc\xb0\x87\x7e"
-+			  "\xdb\x7d\xf4\x71\x41\xab\xbd\xee"
-+			  "\x79\xbe\x3c\x01\x76\x0b\x2d\x0a"
-+			  "\x42\xc9\x77\x8c\xbb\x54\x95\x60"
-+			  "\x43\x2e\xe0\x17\x52\xbd\x90\xc9"
-+			  "\xc2\x2c\xdd\x90\x24\x22\x76\x40"
-+			  "\x5c\xb9\x41\xc9\xa1\xd5\xbd\xe3"
-+			  "\x44\xe0\xa4\xab\xcc\xb8\xe2\x32"
-+			  "\x02\x15\x04\x1f\x8c\xec\x5d\x14"
-+			  "\xac\x18\xaa\xef\x6e\x33\x19\x6e"
-+			  "\xde\xfe\x19\xdb\xeb\x61\xca\x18"
-+			  "\xad\xd8\x3d\xbf\x09\x11\xc7\xa5"
-+			  "\x86\x0b\x0f\xe5\x3e\xde\xe8\xd9"
-+			  "\x0a\x69\x9e\x4c\x20\xff\xf9\xc5"
-+			  "\xfa\xf8\xf3\x7f\xa5\x01\x4b\x5e"
-+			  "\x0f\xf0\x3b\x68\xf0\x46\x8c\x2a"
-+			  "\x7a\xc1\x8f\xa0\xfe\x6a\x5b\x44"
-+			  "\x70\x5c\xcc\x92\x2c\x6f\x0f\xbd"
-+			  "\x25\x3e\xb7\x8e\x73\x58\xda\xc9"
-+			  "\xa5\xaa\x9e\xf3\x9b\xfd\x37\x3e"
-+			  "\xe2\x88\xa4\x7b\xc8\x5c\xa8\x93"
-+			  "\x0e\xe7\x9a\x9c\x2e\x95\x18\x9f"
-+			  "\xc8\x45\x0c\x88\x9e\x53\x4f\x3a"
-+			  "\x76\xc1\x35\xfa\x17\xd8\xac\xa0"
-+			  "\x0c\x2d\x47\x2e\x4f\x69\x9b\xf7"
-+			  "\xd0\xb6\x96\x0c\x19\xb3\x08\x01"
-+			  "\x65\x7a\x1f\xc7\x31\x86\xdb\xc8"
-+			  "\xc1\x99\x8f\xf8\x08\x4a\x9d\x23"
-+			  "\x22\xa8\xcf\x27\x01\x01\x88\x93"
-+			  "\x9c\x86\x45\xbd\xe0\x51\xca\x52"
-+			  "\x84\xba\xfe\x03\xf7\xda\xc5\xce"
-+			  "\x3e\x77\x75\x86\xaf\x84\xc8\x05"
-+			  "\x44\x01\x0f\x02\xf3\x58\xb0\x06"
-+			  "\x5a\xd7\x12\x30\x8d\xdf\x1f\x1f"
-+			  "\x0a\xe6\xd2\xea\xf6\x3a\x7a\x99"
-+			  "\x63\xe8\xd2\xc1\x4a\x45\x8b\x40"
-+			  "\x4d\x0a\xa9\x76\x92\xb3\xda\x87"
-+			  "\x36\x33\xf0\x78\xc3\x2f\x5f\x02"
-+			  "\x1a\x6a\x2c\x32\xcd\x76\xbf\xbd"
-+			  "\x5a\x26\x20\x28\x8c\x8c\xbc\x52"
-+			  "\x3d\x0a\xc9\xcb\xab\xa4\x21\xb0"
-+			  "\x54\x40\x81\x44\xc7\xd6\x1c\x11"
-+			  "\x44\xc6\x02\x92\x14\x5a\xbf\x1a"
-+			  "\x09\x8a\x18\xad\xcd\x64\x3d\x53"
-+			  "\x4a\xb6\xa5\x1b\x57\x0e\xef\xe0"
-+			  "\x8c\x44\x5f\x7d\xbd\x6c\xfd\x60"
-+			  "\xae\x02\x24\xb6\x99\xdd\x8c\xaf"
-+			  "\x59\x39\x75\x3c\xd1\x54\x7b\x86"
-+			  "\xcc\x99\xd9\x28\x0c\xb0\x94\x62"
-+			  "\xf9\x51\xd1\x19\x96\x2d\x66\xf5"
-+			  "\x55\xcf\x9e\x59\xe2\x6b\x2c\x08"
-+			  "\xc0\x54\x48\x24\x45\xc3\x8c\x73"
-+			  "\xea\x27\x6e\x66\x7d\x1d\x0e\x6e"
-+			  "\x13\xe8\x56\x65\x3a\xb0\x81\x5c"
-+			  "\xf0\xe8\xd8\x00\x6b\xcd\x8f\xad"
-+			  "\xdd\x53\xf3\xa4\x6c\x43\xd6\x31"
-+			  "\xaf\xd2\x76\x1e\x91\x12\xdb\x3c"
-+			  "\x8c\xc2\x81\xf0\x49\xdb\xe2\x6b"
-+			  "\x76\x62\x0a\x04\xe4\xaa\x8a\x7c"
-+			  "\x08\x0b\x5d\xd0\xee\x1d\xfb\xc4"
-+			  "\x02\x75\x42\xd6\xba\xa7\x22\xa8"
-+			  "\x47\x29\xb7\x85\x6d\x93\x3a\xdb"
-+			  "\x00\x53\x0b\xa2\xeb\xf8\xfe\x01"
-+			  "\x6f\x8a\x31\xd6\x17\x05\x6f\x67"
-+			  "\x88\x95\x32\xfe\x4f\xa6\x4b\xf8"
-+			  "\x03\xe4\xcd\x9a\x18\xe8\x4e\x2d"
-+			  "\xf7\x97\x9a\x0c\x7d\x9f\x7e\x44"
-+			  "\x69\x51\xe0\x32\x6b\x62\x86\x8f"
-+			  "\xa6\x8e\x0b\x21\x96\xe5\xaf\x77"
-+			  "\xc0\x83\xdf\xa5\x0e\xd0\xa1\x04"
-+			  "\xaf\xc1\x10\xcb\x5a\x40\xe4\xe3"
-+			  "\x38\x7e\x07\xe8\x4d\xfa\xed\xc5"
-+			  "\xf0\x37\xdf\xbb\x8a\xcf\x3d\xdc"
-+			  "\x61\xd2\xc6\x2b\xff\x07\xc9\x2f"
-+			  "\x0c\x2d\x5c\x07\xa8\x35\x6a\xfc"
-+			  "\xae\x09\x03\x45\x74\x51\x4d\xc4"
-+			  "\xb8\x23\x87\x4a\x99\x27\x20\x87"
-+			  "\x62\x44\x0a\x4a\xce\x78\x47\x22",
-+		.ksize	= 1088,
-+		.plaintext	= "\x8e\xb0\x4c\xde\x9c\x4a\x04\x5a"
-+			  "\xf6\xa9\x7f\x45\x25\xa5\x7b\x3a"
-+			  "\xbc\x4d\x73\x39\x81\xb5\xbd\x3d"
-+			  "\x21\x6f\xd7\x37\x50\x3c\x7b\x28"
-+			  "\xd1\x03\x3a\x17\xed\x7b\x7c\x2a"
-+			  "\x16\xbc\xdf\x19\x89\x52\x71\x31"
-+			  "\xb6\xc0\xfd\xb5\xd3\xba\x96\x99"
-+			  "\xb6\x34\x0b\xd0\x99\x93\xfc\x1a"
-+			  "\x01\x3c\x85\xc6\x9b\x78\x5c\x8b"
-+			  "\xfe\xae\xd2\xbf\xb2\x6f\xf9\xed"
-+			  "\xc8\x25\x17\xfe\x10\x3b\x7d\xda"
-+			  "\xf4\x8d\x35\x4b\x7c\x7b\x82\xe7"
-+			  "\xc2\xb3\xee\x60\x4a\x03\x86\xc9"
-+			  "\x4e\xb5\xc4\xbe\xd2\xbd\x66\xf1"
-+			  "\x13\xf1\x09\xab\x5d\xca\x63\x1f"
-+			  "\xfc\xfb\x57\x2a\xfc\xca\x66\xd8"
-+			  "\x77\x84\x38\x23\x1d\xac\xd3\xb3"
-+			  "\x7a\xad\x4c\x70\xfa\x9c\xc9\x61"
-+			  "\xa6\x1b\xba\x33\x4b\x4e\x33\xec"
-+			  "\xa0\xa1\x64\x39\x40\x05\x1c\xc2"
-+			  "\x3f\x49\x9d\xae\xf2\xc5\xf2\xc5"
-+			  "\xfe\xe8\xf4\xc2\xf9\x96\x2d\x28"
-+			  "\x92\x30\x44\xbc\xd2\x7f\xe1\x6e"
-+			  "\x62\x02\x8f\x3d\x1c\x80\xda\x0e"
-+			  "\x6a\x90\x7e\x75\xff\xec\x3e\xc4"
-+			  "\xcd\x16\x34\x3b\x05\x6d\x4d\x20"
-+			  "\x1c\x7b\xf5\x57\x4f\xfa\x3d\xac"
-+			  "\xd0\x13\x55\xe8\xb3\xe1\x1b\x78"
-+			  "\x30\xe6\x9f\x84\xd4\x69\xd1\x08"
-+			  "\x12\x77\xa7\x4a\xbd\xc0\xf2\xd2"
-+			  "\x78\xdd\xa3\x81\x12\xcb\x6c\x14"
-+			  "\x90\x61\xe2\x84\xc6\x2b\x16\xcc"
-+			  "\x40\x99\x50\x88\x01\x09\x64\x4f"
-+			  "\x0a\x80\xbe\x61\xae\x46\xc9\x0a"
-+			  "\x5d\xe0\xfb\x72\x7a\x1a\xdd\x61"
-+			  "\x63\x20\x05\xa0\x4a\xf0\x60\x69"
-+			  "\x7f\x92\xbc\xbf\x4e\x39\x4d\xdd"
-+			  "\x74\xd1\xb7\xc0\x5a\x34\xb7\xae"
-+			  "\x76\x65\x2e\xbc\x36\xb9\x04\x95"
-+			  "\x42\xe9\x6f\xca\x78\xb3\x72\x07"
-+			  "\xa3\xba\x02\x94\x67\x4c\xb1\xd7"
-+			  "\xe9\x30\x0d\xf0\x3b\xb8\x10\x6d"
-+			  "\xea\x2b\x21\xbf\x74\x59\x82\x97"
-+			  "\x85\xaa\xf1\xd7\x54\x39\xeb\x05"
-+			  "\xbd\xf3\x40\xa0\x97\xe6\x74\xfe"
-+			  "\xb4\x82\x5b\xb1\x36\xcb\xe8\x0d"
-+			  "\xce\x14\xd9\xdf\xf1\x94\x22\xcd"
-+			  "\xd6\x00\xba\x04\x4c\x05\x0c\xc0"
-+			  "\xd1\x5a\xeb\x52\xd5\xa8\x8e\xc8"
-+			  "\x97\xa1\xaa\xc1\xea\xc1\xbe\x7c"
-+			  "\x36\xb3\x36\xa0\xc6\x76\x66\xc5"
-+			  "\xe2\xaf\xd6\x5c\xe2\xdb\x2c\xb3"
-+			  "\x6c\xb9\x99\x7f\xff\x9f\x03\x24"
-+			  "\xe1\x51\x44\x66\xd8\x0c\x5d\x7f"
-+			  "\x5c\x85\x22\x2a\xcf\x6d\x79\x28"
-+			  "\xab\x98\x01\x72\xfe\x80\x87\x5f"
-+			  "\x46\xba\xef\x81\x24\xee\xbf\xb0"
-+			  "\x24\x74\xa3\x65\x97\x12\xc4\xaf"
-+			  "\x8b\xa0\x39\xda\x8a\x7e\x74\x6e"
-+			  "\x1b\x42\xb4\x44\x37\xfc\x59\xfd"
-+			  "\x86\xed\xfb\x8c\x66\x33\xda\x63"
-+			  "\x75\xeb\xe1\xa4\x85\x4f\x50\x8f"
-+			  "\x83\x66\x0d\xd3\x37\xfa\xe6\x9c"
-+			  "\x4f\x30\x87\x35\x18\xe3\x0b\xb7"
-+			  "\x6e\x64\x54\xcd\x70\xb3\xde\x54"
-+			  "\xb7\x1d\xe6\x4c\x4d\x55\x12\x12"
-+			  "\xaf\x5f\x7f\x5e\xee\x9d\xe8\x8e"
-+			  "\x32\x9d\x4e\x75\xeb\xc6\xdd\xaa"
-+			  "\x48\x82\xa4\x3f\x3c\xd7\xd3\xa8"
-+			  "\x63\x9e\x64\xfe\xe3\x97\x00\x62"
-+			  "\xe5\x40\x5d\xc3\xad\x72\xe1\x28"
-+			  "\x18\x50\xb7\x75\xef\xcd\x23\xbf"
-+			  "\x3f\xc0\x51\x36\xf8\x41\xc3\x08"
-+			  "\xcb\xf1\x8d\x38\x34\xbd\x48\x45"
-+			  "\x75\xed\xbc\x65\x7b\xb5\x0c\x9b"
-+			  "\xd7\x67\x7d\x27\xb4\xc4\x80\xd7"
-+			  "\xa9\xb9\xc7\x4a\x97\xaa\xda\xc8"
-+			  "\x3c\x74\xcf\x36\x8f\xe4\x41\xe3"
-+			  "\xd4\xd3\x26\xa7\xf3\x23\x9d\x8f"
-+			  "\x6c\x20\x05\x32\x3e\xe0\xc3\xc8"
-+			  "\x56\x3f\xa7\x09\xb7\xfb\xc7\xf7"
-+			  "\xbe\x2a\xdd\x0f\x06\x7b\x0d\xdd"
-+			  "\xb0\xb4\x86\x17\xfd\xb9\x04\xe5"
-+			  "\xc0\x64\x5d\xad\x2a\x36\x38\xdb"
-+			  "\x24\xaf\x5b\xff\xca\xf9\x41\xe8"
-+			  "\xf9\x2f\x1e\x5e\xf9\xf5\xd5\xf2"
-+			  "\xb2\x88\xca\xc9\xa1\x31\xe2\xe8"
-+			  "\x10\x95\x65\xbf\xf1\x11\x61\x7a"
-+			  "\x30\x1a\x54\x90\xea\xd2\x30\xf6"
-+			  "\xa5\xad\x60\xf9\x4d\x84\x21\x1b"
-+			  "\xe4\x42\x22\xc8\x12\x4b\xb0\x58"
-+			  "\x3e\x9c\x2d\x32\x95\x0a\x8e\xb0"
-+			  "\x0a\x7e\x77\x2f\xe8\x97\x31\x6a"
-+			  "\xf5\x59\xb4\x26\xe6\x37\x12\xc9"
-+			  "\xcb\xa0\x58\x33\x6f\xd5\x55\x55"
-+			  "\x3c\xa1\x33\xb1\x0b\x7e\x2e\xb4"
-+			  "\x43\x2a\x84\x39\xf0\x9c\xf4\x69"
-+			  "\x4f\x1e\x79\xa6\x15\x1b\x87\xbb"
-+			  "\xdb\x9b\xe0\xf1\x0b\xba\xe3\x6e"
-+			  "\xcc\x2f\x49\x19\x22\x29\xfc\x71"
-+			  "\xbb\x77\x38\x18\x61\xaf\x85\x76"
-+			  "\xeb\xd1\x09\xcc\x86\x04\x20\x9a"
-+			  "\x66\x53\x2f\x44\x8b\xc6\xa3\xd2"
-+			  "\x5f\xc7\x79\x82\x66\xa8\x6e\x75"
-+			  "\x7d\x94\xd1\x86\x75\x0f\xa5\x4f"
-+			  "\x3c\x7a\x33\xce\xd1\x6e\x9d\x7b"
-+			  "\x1f\x91\x37\xb8\x37\x80\xfb\xe0"
-+			  "\x52\x26\xd0\x9a\xd4\x48\x02\x41"
-+			  "\x05\xe3\x5a\x94\xf1\x65\x61\x19"
-+			  "\xb8\x88\x4e\x2b\xea\xba\x8b\x58"
-+			  "\x8b\x42\x01\x00\xa8\xfe\x00\x5c"
-+			  "\xfe\x1c\xee\x31\x15\x69\xfa\xb3"
-+			  "\x9b\x5f\x22\x8e\x0d\x2c\xe3\xa5"
-+			  "\x21\xb9\x99\x8a\x8e\x94\x5a\xef"
-+			  "\x13\x3e\x99\x96\x79\x6e\xd5\x42"
-+			  "\x36\x03\xa9\xe2\xca\x65\x4e\x8a"
-+			  "\x8a\x30\xd2\x7d\x74\xe7\xf0\xaa"
-+			  "\x23\x26\xdd\xcb\x82\x39\xfc\x9d"
-+			  "\x51\x76\x21\x80\xa2\xbe\x93\x03"
-+			  "\x47\xb0\xc1\xb6\xdc\x63\xfd\x9f"
-+			  "\xca\x9d\xa5\xca\x27\x85\xe2\xd8"
-+			  "\x15\x5b\x7e\x14\x7a\xc4\x89\xcc"
-+			  "\x74\x14\x4b\x46\xd2\xce\xac\x39"
-+			  "\x6b\x6a\x5a\xa4\x0e\xe3\x7b\x15"
-+			  "\x94\x4b\x0f\x74\xcb\x0c\x7f\xa9"
-+			  "\xbe\x09\x39\xa3\xdd\x56\x5c\xc7"
-+			  "\x99\x56\x65\x39\xf4\x0b\x7d\x87"
-+			  "\xec\xaa\xe3\x4d\x22\x65\x39\x4e",
-+		.psize	= 1024,
-+		.digest	= "\x64\x3a\xbc\xc3\x3f\x74\x40\x51"
-+			  "\x6e\x56\x01\x1a\x51\xec\x36\xde",
-+		.np	= 8,
-+		.tap	= { 64, 203, 267, 28, 263, 62, 54, 83 },
-+	}, {
-+		.key	= "\x1b\x82\x2e\x1b\x17\x23\xb9\x6d"
-+			  "\xdc\x9c\xda\x99\x07\xe3\x5f\xd8"
-+			  "\xd2\xf8\x43\x80\x8d\x86\x7d\x80"
-+			  "\x1a\xd0\xcc\x13\xb9\x11\x05\x3f"
-+			  "\x7e\xcf\x7e\x80\x0e\xd8\x25\x48"
-+			  "\x8b\xaa\x63\x83\x92\xd0\x72\xf5"
-+			  "\x4f\x67\x7e\x50\x18\x25\xa4\xd1"
-+			  "\xe0\x7e\x1e\xba\xd8\xa7\x6e\xdb"
-+			  "\x1a\xcc\x0d\xfe\x9f\x6d\x22\x35"
-+			  "\xe1\xe6\xe0\xa8\x7b\x9c\xb1\x66"
-+			  "\xa3\xf8\xff\x4d\x90\x84\x28\xbc"
-+			  "\xdc\x19\xc7\x91\x49\xfc\xf6\x33"
-+			  "\xc9\x6e\x65\x7f\x28\x6f\x68\x2e"
-+			  "\xdf\x1a\x75\xe9\xc2\x0c\x96\xb9"
-+			  "\x31\x22\xc4\x07\xc6\x0a\x2f\xfd"
-+			  "\x36\x06\x5f\x5c\xc5\xb1\x3a\xf4"
-+			  "\x5e\x48\xa4\x45\x2b\x88\xa7\xee"
-+			  "\xa9\x8b\x52\xcc\x99\xd9\x2f\xb8"
-+			  "\xa4\x58\x0a\x13\xeb\x71\x5a\xfa"
-+			  "\xe5\x5e\xbe\xf2\x64\xad\x75\xbc"
-+			  "\x0b\x5b\x34\x13\x3b\x23\x13\x9a"
-+			  "\x69\x30\x1e\x9a\xb8\x03\xb8\x8b"
-+			  "\x3e\x46\x18\x6d\x38\xd9\xb3\xd8"
-+			  "\xbf\xf1\xd0\x28\xe6\x51\x57\x80"
-+			  "\x5e\x99\xfb\xd0\xce\x1e\x83\xf7"
-+			  "\xe9\x07\x5a\x63\xa9\xef\xce\xa5"
-+			  "\xfb\x3f\x37\x17\xfc\x0b\x37\x0e"
-+			  "\xbb\x4b\x21\x62\xb7\x83\x0e\xa9"
-+			  "\x9e\xb0\xc4\xad\x47\xbe\x35\xe7"
-+			  "\x51\xb2\xf2\xac\x2b\x65\x7b\x48"
-+			  "\xe3\x3f\x5f\xb6\x09\x04\x0c\x58"
-+			  "\xce\x99\xa9\x15\x2f\x4e\xc1\xf2"
-+			  "\x24\x48\xc0\xd8\x6c\xd3\x76\x17"
-+			  "\x83\x5d\xe6\xe3\xfd\x01\x8e\xf7"
-+			  "\x42\xa5\x04\x29\x30\xdf\xf9\x00"
-+			  "\x4a\xdc\x71\x22\x1a\x33\x15\xb6"
-+			  "\xd7\x72\xfb\x9a\xb8\xeb\x2b\x38"
-+			  "\xea\xa8\x61\xa8\x90\x11\x9d\x73"
-+			  "\x2e\x6c\xce\x81\x54\x5a\x9f\xcd"
-+			  "\xcf\xd5\xbd\x26\x5d\x66\xdb\xfb"
-+			  "\xdc\x1e\x7c\x10\xfe\x58\x82\x10"
-+			  "\x16\x24\x01\xce\x67\x55\x51\xd1"
-+			  "\xdd\x6b\x44\xa3\x20\x8e\xa9\xa6"
-+			  "\x06\xa8\x29\x77\x6e\x00\x38\x5b"
-+			  "\xde\x4d\x58\xd8\x1f\x34\xdf\xf9"
-+			  "\x2c\xac\x3e\xad\xfb\x92\x0d\x72"
-+			  "\x39\xa4\xac\x44\x10\xc0\x43\xc4"
-+			  "\xa4\x77\x3b\xfc\xc4\x0d\x37\xd3"
-+			  "\x05\x84\xda\x53\x71\xf8\x80\xd3"
-+			  "\x34\x44\xdb\x09\xb4\x2b\x8e\xe3"
-+			  "\x00\x75\x50\x9e\x43\x22\x00\x0b"
-+			  "\x7c\x70\xab\xd4\x41\xf1\x93\xcd"
-+			  "\x25\x2d\x84\x74\xb5\xf2\x92\xcd"
-+			  "\x0a\x28\xea\x9a\x49\x02\x96\xcb"
-+			  "\x85\x9e\x2f\x33\x03\x86\x1d\xdc"
-+			  "\x1d\x31\xd5\xfc\x9d\xaa\xc5\xe9"
-+			  "\x9a\xc4\x57\xf5\x35\xed\xf4\x4b"
-+			  "\x3d\x34\xc2\x29\x13\x86\x36\x42"
-+			  "\x5d\xbf\x90\x86\x13\x77\xe5\xc3"
-+			  "\x62\xb4\xfe\x0b\x70\x39\x35\x65"
-+			  "\x02\xea\xf6\xce\x57\x0c\xbb\x74"
-+			  "\x29\xe3\xfd\x60\x90\xfd\x10\x38"
-+			  "\xd5\x4e\x86\xbd\x37\x70\xf0\x97"
-+			  "\xa6\xab\x3b\x83\x64\x52\xca\x66"
-+			  "\x2f\xf9\xa4\xca\x3a\x55\x6b\xb0"
-+			  "\xe8\x3a\x34\xdb\x9e\x48\x50\x2f"
-+			  "\x3b\xef\xfd\x08\x2d\x5f\xc1\x37"
-+			  "\x5d\xbe\x73\xe4\xd8\xe9\xac\xca"
-+			  "\x8a\xaa\x48\x7c\x5c\xf4\xa6\x96"
-+			  "\x5f\xfa\x70\xa6\xb7\x8b\x50\xcb"
-+			  "\xa6\xf5\xa9\xbd\x7b\x75\x4c\x22"
-+			  "\x0b\x19\x40\x2e\xc9\x39\x39\x32"
-+			  "\x83\x03\xa8\xa4\x98\xe6\x8e\x16"
-+			  "\xb9\xde\x08\xc5\xfc\xbf\xad\x39"
-+			  "\xa8\xc7\x93\x6c\x6f\x23\xaf\xc1"
-+			  "\xab\xe1\xdf\xbb\x39\xae\x93\x29"
-+			  "\x0e\x7d\x80\x8d\x3e\x65\xf3\xfd"
-+			  "\x96\x06\x65\x90\xa1\x28\x64\x4b"
-+			  "\x69\xf9\xa8\x84\x27\x50\xfc\x87"
-+			  "\xf7\xbf\x55\x8e\x56\x13\x58\x7b"
-+			  "\x85\xb4\x6a\x72\x0f\x40\xf1\x4f"
-+			  "\x83\x81\x1f\x76\xde\x15\x64\x7a"
-+			  "\x7a\x80\xe4\xc7\x5e\x63\x01\x91"
-+			  "\xd7\x6b\xea\x0b\x9b\xa2\x99\x3b"
-+			  "\x6c\x88\xd8\xfd\x59\x3c\x8d\x22"
-+			  "\x86\x56\xbe\xab\xa1\x37\x08\x01"
-+			  "\x50\x85\x69\x29\xee\x9f\xdf\x21"
-+			  "\x3e\x20\x20\xf5\xb0\xbb\x6b\xd0"
-+			  "\x9c\x41\x38\xec\x54\x6f\x2d\xbd"
-+			  "\x0f\xe1\xbd\xf1\x2b\x6e\x60\x56"
-+			  "\x29\xe5\x7a\x70\x1c\xe2\xfc\x97"
-+			  "\x82\x68\x67\xd9\x3d\x1f\xfb\xd8"
-+			  "\x07\x9f\xbf\x96\x74\xba\x6a\x0e"
-+			  "\x10\x48\x20\xd8\x13\x1e\xb5\x44"
-+			  "\xf2\xcc\xb1\x8b\xfb\xbb\xec\xd7"
-+			  "\x37\x70\x1f\x7c\x55\xd2\x4b\xb9"
-+			  "\xfd\x70\x5e\xa3\x91\x73\x63\x52"
-+			  "\x13\x47\x5a\x06\xfb\x01\x67\xa5"
-+			  "\xc0\xd0\x49\x19\x56\x66\x9a\x77"
-+			  "\x64\xaf\x8c\x25\x91\x52\x87\x0e"
-+			  "\x18\xf3\x5f\x97\xfd\x71\x13\xf8"
-+			  "\x05\xa5\x39\xcc\x65\xd3\xcc\x63"
-+			  "\x5b\xdb\x5f\x7e\x5f\x6e\xad\xc4"
-+			  "\xf4\xa0\xc5\xc2\x2b\x4d\x97\x38"
-+			  "\x4f\xbc\xfa\x33\x17\xb4\x47\xb9"
-+			  "\x43\x24\x15\x8d\xd2\xed\x80\x68"
-+			  "\x84\xdb\x04\x80\xca\x5e\x6a\x35"
-+			  "\x2c\x2c\xe7\xc5\x03\x5f\x54\xb0"
-+			  "\x5e\x4f\x1d\x40\x54\x3d\x78\x9a"
-+			  "\xac\xda\x80\x27\x4d\x15\x4c\x1a"
-+			  "\x6e\x80\xc9\xc4\x3b\x84\x0e\xd9"
-+			  "\x2e\x93\x01\x8c\xc3\xc8\x91\x4b"
-+			  "\xb3\xaa\x07\x04\x68\x5b\x93\xa5"
-+			  "\xe7\xc4\x9d\xe7\x07\xee\xf5\x3b"
-+			  "\x40\x89\xcc\x60\x34\x9d\xb4\x06"
-+			  "\x1b\xef\x92\xe6\xc1\x2a\x7d\x0f"
-+			  "\x81\xaa\x56\xe3\xd7\xed\xa7\xd4"
-+			  "\xa7\x3a\x49\xc4\xad\x81\x5c\x83"
-+			  "\x55\x8e\x91\x54\xb7\x7d\x65\xa5"
-+			  "\x06\x16\xd5\x9a\x16\xc1\xb0\xa2"
-+			  "\x06\xd8\x98\x47\x73\x7e\x73\xa0"
-+			  "\xb8\x23\xb1\x52\xbf\x68\x74\x5d"
-+			  "\x0b\xcb\xfa\x8c\x46\xe3\x24\xe6"
-+			  "\xab\xd4\x69\x8d\x8c\xf2\x8a\x59"
-+			  "\xbe\x48\x46\x50\x8c\x9a\xe8\xe3"
-+			  "\x31\x55\x0a\x06\xed\x4f\xf8\xb7"
-+			  "\x4f\xe3\x85\x17\x30\xbd\xd5\x20"
-+			  "\xe7\x5b\xb2\x32\xcf\x6b\x16\x44"
-+			  "\xd2\xf5\x7e\xd7\xd1\x2f\xee\x64"
-+			  "\x3e\x9d\x10\xef\x27\x35\x43\x64"
-+			  "\x67\xfb\x7a\x7b\xe0\x62\x31\x9a"
-+			  "\x4d\xdf\xa5\xab\xc0\x20\xbb\x01"
-+			  "\xe9\x7b\x54\xf1\xde\xb2\x79\x50"
-+			  "\x6c\x4b\x91\xdb\x7f\xbb\x50\xc1"
-+			  "\x55\x44\x38\x9a\xe0\x9f\xe8\x29"
-+			  "\x6f\x15\xf8\x4e\xa6\xec\xa0\x60",
-+		.ksize	= 1088,
-+		.plaintext	= "\x15\x68\x9e\x2f\xad\x15\x52\xdf"
-+			  "\xf0\x42\x62\x24\x2a\x2d\xea\xbf"
-+			  "\xc7\xf3\xb4\x1a\xf5\xed\xb2\x08"
-+			  "\x15\x60\x1c\x00\x77\xbf\x0b\x0e"
-+			  "\xb7\x2c\xcf\x32\x3a\xc7\x01\x77"
-+			  "\xef\xa6\x75\xd0\x29\xc7\x68\x20"
-+			  "\xb2\x92\x25\xbf\x12\x34\xe9\xa4"
-+			  "\xfd\x32\x7b\x3f\x7c\xbd\xa5\x02"
-+			  "\x38\x41\xde\xc9\xc1\x09\xd9\xfc"
-+			  "\x6e\x78\x22\x83\x18\xf7\x50\x8d"
-+			  "\x8f\x9c\x2d\x02\xa5\x30\xac\xff"
-+			  "\xea\x63\x2e\x80\x37\x83\xb0\x58"
-+			  "\xda\x2f\xef\x21\x55\xba\x7b\xb1"
-+			  "\xb6\xed\xf5\xd2\x4d\xaa\x8c\xa9"
-+			  "\xdd\xdb\x0f\xb4\xce\xc1\x9a\xb1"
-+			  "\xc1\xdc\xbd\xab\x86\xc2\xdf\x0b"
-+			  "\xe1\x2c\xf9\xbe\xf6\xd8\xda\x62"
-+			  "\x72\xdd\x98\x09\x52\xc0\xc4\xb6"
-+			  "\x7b\x17\x5c\xf5\xd8\x4b\x88\xd6"
-+			  "\x6b\xbf\x84\x4a\x3f\xf5\x4d\xd2"
-+			  "\x94\xe2\x9c\xff\xc7\x3c\xd9\xc8"
-+			  "\x37\x38\xbc\x8c\xf3\xe7\xb7\xd0"
-+			  "\x1d\x78\xc4\x39\x07\xc8\x5e\x79"
-+			  "\xb6\x5a\x90\x5b\x6e\x97\xc9\xd4"
-+			  "\x82\x9c\xf3\x83\x7a\xe7\x97\xfc"
-+			  "\x1d\xbb\xef\xdb\xce\xe0\x82\xad"
-+			  "\xca\x07\x6c\x54\x62\x6f\x81\xe6"
-+			  "\x7a\x5a\x96\x6e\x80\x3a\xa2\x37"
-+			  "\x6f\xc6\xa4\x29\xc3\x9e\x19\x94"
-+			  "\x9f\xb0\x3e\x38\xfb\x3c\x2b\x7d"
-+			  "\xaa\xb8\x74\xda\x54\x23\x51\x12"
-+			  "\x4b\x96\x36\x8f\x91\x4f\x19\x37"
-+			  "\x83\xc9\xdd\xc7\x1a\x32\x2d\xab"
-+			  "\xc7\x89\xe2\x07\x47\x6c\xe8\xa6"
-+			  "\x70\x6b\x8e\x0c\xda\x5c\x6a\x59"
-+			  "\x27\x33\x0e\xe1\xe1\x20\xe8\xc8"
-+			  "\xae\xdc\xd0\xe3\x6d\xa8\xa6\x06"
-+			  "\x41\xb4\xd4\xd4\xcf\x91\x3e\x06"
-+			  "\xb0\x9a\xf7\xf1\xaa\xa6\x23\x92"
-+			  "\x10\x86\xf0\x94\xd1\x7c\x2e\x07"
-+			  "\x30\xfb\xc5\xd8\xf3\x12\xa9\xe8"
-+			  "\x22\x1c\x97\x1a\xad\x96\xb0\xa1"
-+			  "\x72\x6a\x6b\xb4\xfd\xf7\xe8\xfa"
-+			  "\xe2\x74\xd8\x65\x8d\x35\x17\x4b"
-+			  "\x00\x23\x5c\x8c\x70\xad\x71\xa2"
-+			  "\xca\xc5\x6c\x59\xbf\xb4\xc0\x6d"
-+			  "\x86\x98\x3e\x19\x5a\x90\x92\xb1"
-+			  "\x66\x57\x6a\x91\x68\x7c\xbc\xf3"
-+			  "\xf1\xdb\x94\xf8\x48\xf1\x36\xd8"
-+			  "\x78\xac\x1c\xa9\xcc\xd6\x27\xba"
-+			  "\x91\x54\x22\xf5\xe6\x05\x3f\xcc"
-+			  "\xc2\x8f\x2c\x3b\x2b\xc3\x2b\x2b"
-+			  "\x3b\xb8\xb6\x29\xb7\x2f\x94\xb6"
-+			  "\x7b\xfc\x94\x3e\xd0\x7a\x41\x59"
-+			  "\x7b\x1f\x9a\x09\xa6\xed\x4a\x82"
-+			  "\x9d\x34\x1c\xbd\x4e\x1c\x3a\x66"
-+			  "\x80\x74\x0e\x9a\x4f\x55\x54\x47"
-+			  "\x16\xba\x2a\x0a\x03\x35\x99\xa3"
-+			  "\x5c\x63\x8d\xa2\x72\x8b\x17\x15"
-+			  "\x68\x39\x73\xeb\xec\xf2\xe8\xf5"
-+			  "\x95\x32\x27\xd6\xc4\xfe\xb0\x51"
-+			  "\xd5\x0c\x50\xc5\xcd\x6d\x16\xb3"
-+			  "\xa3\x1e\x95\x69\xad\x78\x95\x06"
-+			  "\xb9\x46\xf2\x6d\x24\x5a\x99\x76"
-+			  "\x73\x6a\x91\xa6\xac\x12\xe1\x28"
-+			  "\x79\xbc\x08\x4e\x97\x00\x98\x63"
-+			  "\x07\x1c\x4e\xd1\x68\xf3\xb3\x81"
-+			  "\xa8\xa6\x5f\xf1\x01\xc9\xc1\xaf"
-+			  "\x3a\x96\xf9\x9d\xb5\x5a\x5f\x8f"
-+			  "\x7e\xc1\x7e\x77\x0a\x40\xc8\x8e"
-+			  "\xfc\x0e\xed\xe1\x0d\xb0\xe5\x5e"
-+			  "\x5e\x6f\xf5\x7f\xab\x33\x7d\xcd"
-+			  "\xf0\x09\x4b\xb2\x11\x37\xdc\x65"
-+			  "\x97\x32\x62\x71\x3a\x29\x54\xb9"
-+			  "\xc7\xa4\xbf\x75\x0f\xf9\x40\xa9"
-+			  "\x8d\xd7\x8b\xa7\xe0\x9a\xbe\x15"
-+			  "\xc6\xda\xd8\x00\x14\x69\x1a\xaf"
-+			  "\x5f\x79\xc3\xf5\xbb\x6c\x2a\x9d"
-+			  "\xdd\x3c\x5f\x97\x21\xe1\x3a\x03"
-+			  "\x84\x6a\xe9\x76\x11\x1f\xd3\xd5"
-+			  "\xf0\x54\x20\x4d\xc2\x91\xc3\xa4"
-+			  "\x36\x25\xbe\x1b\x2a\x06\xb7\xf3"
-+			  "\xd1\xd0\x55\x29\x81\x4c\x83\xa3"
-+			  "\xa6\x84\x1e\x5c\xd1\xd0\x6c\x90"
-+			  "\xa4\x11\xf0\xd7\x63\x6a\x48\x05"
-+			  "\xbc\x48\x18\x53\xcd\xb0\x8d\xdb"
-+			  "\xdc\xfe\x55\x11\x5c\x51\xb3\xab"
-+			  "\xab\x63\x3e\x31\x5a\x8b\x93\x63"
-+			  "\x34\xa9\xba\x2b\x69\x1a\xc0\xe3"
-+			  "\xcb\x41\xbc\xd7\xf5\x7f\x82\x3e"
-+			  "\x01\xa3\x3c\x72\xf4\xfe\xdf\xbe"
-+			  "\xb1\x67\x17\x2b\x37\x60\x0d\xca"
-+			  "\x6f\xc3\x94\x2c\xd2\x92\x6d\x9d"
-+			  "\x75\x18\x77\xaa\x29\x38\x96\xed"
-+			  "\x0e\x20\x70\x92\xd5\xd0\xb4\x00"
-+			  "\xc0\x31\xf2\xc9\x43\x0e\x75\x1d"
-+			  "\x4b\x64\xf2\x1f\xf2\x29\x6c\x7b"
-+			  "\x7f\xec\x59\x7d\x8c\x0d\xd4\xd3"
-+			  "\xac\x53\x4c\xa3\xde\x42\x92\x95"
-+			  "\x6d\xa3\x4f\xd0\xe6\x3d\xe7\xec"
-+			  "\x7a\x4d\x68\xf1\xfe\x67\x66\x09"
-+			  "\x83\x22\xb1\x98\x43\x8c\xab\xb8"
-+			  "\x45\xe6\x6d\xdf\x5e\x50\x71\xce"
-+			  "\xf5\x4e\x40\x93\x2b\xfa\x86\x0e"
-+			  "\xe8\x30\xbd\x82\xcc\x1c\x9c\x5f"
-+			  "\xad\xfd\x08\x31\xbe\x52\xe7\xe6"
-+			  "\xf2\x06\x01\x62\x25\x15\x99\x74"
-+			  "\x33\x51\x52\x57\x3f\x57\x87\x61"
-+			  "\xb9\x7f\x29\x3d\xcd\x92\x5e\xa6"
-+			  "\x5c\x3b\xf1\xed\x5f\xeb\x82\xed"
-+			  "\x56\x7b\x61\xe7\xfd\x02\x47\x0e"
-+			  "\x2a\x15\xa4\xce\x43\x86\x9b\xe1"
-+			  "\x2b\x4c\x2a\xd9\x42\x97\xf7\x9a"
-+			  "\xe5\x47\x46\x48\xd3\x55\x6f\x4d"
-+			  "\xd9\xeb\x4b\xdd\x7b\x21\x2f\xb3"
-+			  "\xa8\x36\x28\xdf\xca\xf1\xf6\xd9"
-+			  "\x10\xf6\x1c\xfd\x2e\x0c\x27\xe0"
-+			  "\x01\xb3\xff\x6d\x47\x08\x4d\xd4"
-+			  "\x00\x25\xee\x55\x4a\xe9\xe8\x5b"
-+			  "\xd8\xf7\x56\x12\xd4\x50\xb2\xe5"
-+			  "\x51\x6f\x34\x63\x69\xd2\x4e\x96"
-+			  "\x4e\xbc\x79\xbf\x18\xae\xc6\x13"
-+			  "\x80\x92\x77\xb0\xb4\x0f\x29\x94"
-+			  "\x6f\x4c\xbb\x53\x11\x36\xc3\x9f"
-+			  "\x42\x8e\x96\x8a\x91\xc8\xe9\xfc"
-+			  "\xfe\xbf\x7c\x2d\x6f\xf9\xb8\x44"
-+			  "\x89\x1b\x09\x53\x0a\x2a\x92\xc3"
-+			  "\x54\x7a\x3a\xf9\xe2\xe4\x75\x87"
-+			  "\xa0\x5e\x4b\x03\x7a\x0d\x8a\xf4"
-+			  "\x55\x59\x94\x2b\x63\x96\x0e\xf5",
-+		.psize	= 1040,
-+		.digest	= "\xb5\xb9\x08\xb3\x24\x3e\x03\xf0"
-+			  "\xd6\x0b\x57\xbc\x0a\x6d\x89\x59",
-+	}, {
-+		.key	= "\xf6\x34\x42\x71\x35\x52\x8b\x58"
-+			  "\x02\x3a\x8e\x4a\x8d\x41\x13\xe9"
-+			  "\x7f\xba\xb9\x55\x9d\x73\x4d\xf8"
-+			  "\x3f\x5d\x73\x15\xff\xd3\x9e\x7f"
-+			  "\x20\x2a\x6a\xa8\xd1\xf0\x8f\x12"
-+			  "\x6b\x02\xd8\x6c\xde\xba\x80\x22"
-+			  "\x19\x37\xc8\xd0\x4e\x89\x17\x7c"
-+			  "\x7c\xdd\x88\xfd\x41\xc0\x04\xb7"
-+			  "\x1d\xac\x19\xe3\x20\xc7\x16\xcf"
-+			  "\x58\xee\x1d\x7a\x61\x69\xa9\x12"
-+			  "\x4b\xef\x4f\xb6\x38\xdd\x78\xf8"
-+			  "\x28\xee\x70\x08\xc7\x7c\xcc\xc8"
-+			  "\x1e\x41\xf5\x80\x86\x70\xd0\xf0"
-+			  "\xa3\x87\x6b\x0a\x00\xd2\x41\x28"
-+			  "\x74\x26\xf1\x24\xf3\xd0\x28\x77"
-+			  "\xd7\xcd\xf6\x2d\x61\xf4\xa2\x13"
-+			  "\x77\xb4\x6f\xa0\xf4\xfb\xd6\xb5"
-+			  "\x38\x9d\x5a\x0c\x51\xaf\xad\x63"
-+			  "\x27\x67\x8c\x01\xea\x42\x1a\x66"
-+			  "\xda\x16\x7c\x3c\x30\x0c\x66\x53"
-+			  "\x1c\x88\xa4\x5c\xb2\xe3\x78\x0a"
-+			  "\x13\x05\x6d\xe2\xaf\xb3\xe4\x75"
-+			  "\x00\x99\x58\xee\x76\x09\x64\xaa"
-+			  "\xbb\x2e\xb1\x81\xec\xd8\x0e\xd3"
-+			  "\x0c\x33\x5d\xb7\x98\xef\x36\xb6"
-+			  "\xd2\x65\x69\x41\x70\x12\xdc\x25"
-+			  "\x41\x03\x99\x81\x41\x19\x62\x13"
-+			  "\xd1\x0a\x29\xc5\x8c\xe0\x4c\xf3"
-+			  "\xd6\xef\x4c\xf4\x1d\x83\x2e\x6d"
-+			  "\x8e\x14\x87\xed\x80\xe0\xaa\xd3"
-+			  "\x08\x04\x73\x1a\x84\x40\xf5\x64"
-+			  "\xbd\x61\x32\x65\x40\x42\xfb\xb0"
-+			  "\x40\xf6\x40\x8d\xc7\x7f\x14\xd0"
-+			  "\x83\x99\xaa\x36\x7e\x60\xc6\xbf"
-+			  "\x13\x8a\xf9\x21\xe4\x7e\x68\x87"
-+			  "\xf3\x33\x86\xb4\xe0\x23\x7e\x0a"
-+			  "\x21\xb1\xf5\xad\x67\x3c\x9c\x9d"
-+			  "\x09\xab\xaf\x5f\xba\xe0\xd0\x82"
-+			  "\x48\x22\x70\xb5\x6d\x53\xd6\x0e"
-+			  "\xde\x64\x92\x41\xb0\xd3\xfb\xda"
-+			  "\x21\xfe\xab\xea\x20\xc4\x03\x58"
-+			  "\x18\x2e\x7d\x2f\x03\xa9\x47\x66"
-+			  "\xdf\x7b\xa4\x6b\x34\x6b\x55\x9c"
-+			  "\x4f\xd7\x9c\x47\xfb\xa9\x42\xec"
-+			  "\x5a\x12\xfd\xfe\x76\xa0\x92\x9d"
-+			  "\xfe\x1e\x16\xdd\x24\x2a\xe4\x27"
-+			  "\xd5\xa9\xf2\x05\x4f\x83\xa2\xaf"
-+			  "\xfe\xee\x83\x7a\xad\xde\xdf\x9a"
-+			  "\x80\xd5\x81\x14\x93\x16\x7e\x46"
-+			  "\x47\xc2\x14\xef\x49\x6e\xb9\xdb"
-+			  "\x40\xe8\x06\x6f\x9c\x2a\xfd\x62"
-+			  "\x06\x46\xfd\x15\x1d\x36\x61\x6f"
-+			  "\x77\x77\x5e\x64\xce\x78\x1b\x85"
-+			  "\xbf\x50\x9a\xfd\x67\xa6\x1a\x65"
-+			  "\xad\x5b\x33\x30\xf1\x71\xaa\xd9"
-+			  "\x23\x0d\x92\x24\x5f\xae\x57\xb0"
-+			  "\x24\x37\x0a\x94\x12\xfb\xb5\xb1"
-+			  "\xd3\xb8\x1d\x12\x29\xb0\x80\x24"
-+			  "\x2d\x47\x9f\x96\x1f\x95\xf1\xb1"
-+			  "\xda\x35\xf6\x29\xe0\xe1\x23\x96"
-+			  "\xc7\xe8\x22\x9b\x7c\xac\xf9\x41"
-+			  "\x39\x01\xe5\x73\x15\x5e\x99\xec"
-+			  "\xb4\xc1\xf4\xe7\xa7\x97\x6a\xd5"
-+			  "\x90\x9a\xa0\x1d\xf3\x5a\x8b\x5f"
-+			  "\xdf\x01\x52\xa4\x93\x31\x97\xb0"
-+			  "\x93\x24\xb5\xbc\xb2\x14\x24\x98"
-+			  "\x4a\x8f\x19\x85\xc3\x2d\x0f\x74"
-+			  "\x9d\x16\x13\x80\x5e\x59\x62\x62"
-+			  "\x25\xe0\xd1\x2f\x64\xef\xba\xac"
-+			  "\xcd\x09\x07\x15\x8a\xcf\x73\xb5"
-+			  "\x8b\xc9\xd8\x24\xb0\x53\xd5\x6f"
-+			  "\xe1\x2b\x77\xb1\xc5\xe4\xa7\x0e"
-+			  "\x18\x45\xab\x36\x03\x59\xa8\xbd"
-+			  "\x43\xf0\xd8\x2c\x1a\x69\x96\xbb"
-+			  "\x13\xdf\x6c\x33\x77\xdf\x25\x34"
-+			  "\x5b\xa5\x5b\x8c\xf9\x51\x05\xd4"
-+			  "\x8b\x8b\x44\x87\x49\xfc\xa0\x8f"
-+			  "\x45\x15\x5b\x40\x42\xc4\x09\x92"
-+			  "\x98\x0c\x4d\xf4\x26\x37\x1b\x13"
-+			  "\x76\x01\x93\x8d\x4f\xe6\xed\x18"
-+			  "\xd0\x79\x7b\x3f\x44\x50\xcb\xee"
-+			  "\xf7\x4a\xc9\x9e\xe0\x96\x74\xa7"
-+			  "\xe6\x93\xb2\x53\xca\x55\xa8\xdc"
-+			  "\x1e\x68\x07\x87\xb7\x2e\xc1\x08"
-+			  "\xb2\xa4\x5b\xaf\xc6\xdb\x5c\x66"
-+			  "\x41\x1c\x51\xd9\xb0\x07\x00\x0d"
-+			  "\xf0\x4c\xdc\x93\xde\xa9\x1e\x8e"
-+			  "\xd3\x22\x62\xd8\x8b\x88\x2c\xea"
-+			  "\x5e\xf1\x6e\x14\x40\xc7\xbe\xaa"
-+			  "\x42\x28\xd0\x26\x30\x78\x01\x9b"
-+			  "\x83\x07\xbc\x94\xc7\x57\xa2\x9f"
-+			  "\x03\x07\xff\x16\xff\x3c\x6e\x48"
-+			  "\x0a\xd0\xdd\x4c\xf6\x64\x9a\xf1"
-+			  "\xcd\x30\x12\x82\x2c\x38\xd3\x26"
-+			  "\x83\xdb\xab\x3e\xc6\xf8\xe6\xfa"
-+			  "\x77\x0a\x78\x82\x75\xf8\x63\x51"
-+			  "\x59\xd0\x8d\x24\x9f\x25\xe6\xa3"
-+			  "\x4c\xbc\x34\xfc\xe3\x10\xc7\x62"
-+			  "\xd4\x23\xc8\x3d\xa7\xc6\xa6\x0a"
-+			  "\x4f\x7e\x29\x9d\x6d\xbe\xb5\xf1"
-+			  "\xdf\xa4\x53\xfa\xc0\x23\x0f\x37"
-+			  "\x84\x68\xd0\xb5\xc8\xc6\xae\xf8"
-+			  "\xb7\x8d\xb3\x16\xfe\x8f\x87\xad"
-+			  "\xd0\xc1\x08\xee\x12\x1c\x9b\x1d"
-+			  "\x90\xf8\xd1\x63\xa4\x92\x3c\xf0"
-+			  "\xc7\x34\xd8\xf1\x14\xed\xa3\xbc"
-+			  "\x17\x7e\xd4\x62\x42\x54\x57\x2c"
-+			  "\x3e\x7a\x35\x35\x17\x0f\x0b\x7f"
-+			  "\x81\xa1\x3f\xd0\xcd\xc8\x3b\x96"
-+			  "\xe9\xe0\x4a\x04\xe1\xb6\x3c\xa1"
-+			  "\xd6\xca\xc4\xbd\xb6\xb5\x95\x34"
-+			  "\x12\x9d\xc5\x96\xf2\xdf\xba\x54"
-+			  "\x76\xd1\xb2\x6b\x3b\x39\xe0\xb9"
-+			  "\x18\x62\xfb\xf7\xfc\x12\xf1\x5f"
-+			  "\x7e\xc7\xe3\x59\x4c\xa6\xc2\x3d"
-+			  "\x40\x15\xf9\xa3\x95\x64\x4c\x74"
-+			  "\x8b\x73\x77\x33\x07\xa7\x04\x1d"
-+			  "\x33\x5a\x7e\x8f\xbd\x86\x01\x4f"
-+			  "\x3e\xb9\x27\x6f\xe2\x41\xf7\x09"
-+			  "\x67\xfd\x29\x28\xc5\xe4\xf6\x18"
-+			  "\x4c\x1b\x49\xb2\x9c\x5b\xf6\x81"
-+			  "\x4f\xbb\x5c\xcc\x0b\xdf\x84\x23"
-+			  "\x58\xd6\x28\x34\x93\x3a\x25\x97"
-+			  "\xdf\xb2\xc3\x9e\x97\x38\x0b\x7d"
-+			  "\x10\xb3\x54\x35\x23\x8c\x64\xee"
-+			  "\xf0\xd8\x66\xff\x8b\x22\xd2\x5b"
-+			  "\x05\x16\x3c\x89\xf7\xb1\x75\xaf"
-+			  "\xc0\xae\x6a\x4f\x3f\xaf\x9a\xf4"
-+			  "\xf4\x9a\x24\xd9\x80\x82\xc0\x12"
-+			  "\xde\x96\xd1\xbe\x15\x0b\x8d\x6a"
-+			  "\xd7\x12\xe4\x85\x9f\x83\xc9\xc3"
-+			  "\xff\x0b\xb5\xaf\x3b\xd8\x6d\x67"
-+			  "\x81\x45\xe6\xac\xec\xc1\x7b\x16"
-+			  "\x18\x0a\xce\x4b\xc0\x2e\x76\xbc"
-+			  "\x1b\xfa\xb4\x34\xb8\xfc\x3e\xc8"
-+			  "\x5d\x90\x71\x6d\x7a\x79\xef\x06",
-+		.ksize	= 1088,
-+		.plaintext	= "\xaa\x5d\x54\xcb\xea\x1e\x46\x0f"
-+			  "\x45\x87\x70\x51\x8a\x66\x7a\x33"
-+			  "\xb4\x18\xff\xa9\x82\xf9\x45\x4b"
-+			  "\x93\xae\x2e\x7f\xab\x98\xfe\xbf"
-+			  "\x01\xee\xe5\xa0\x37\x8f\x57\xa6"
-+			  "\xb0\x76\x0d\xa4\xd6\x28\x2b\x5d"
-+			  "\xe1\x03\xd6\x1c\x6f\x34\x0d\xe7"
-+			  "\x61\x2d\x2e\xe5\xae\x5d\x47\xc7"
-+			  "\x80\x4b\x18\x8f\xa8\x99\xbc\x28"
-+			  "\xed\x1d\x9d\x86\x7d\xd7\x41\xd1"
-+			  "\xe0\x2b\xe1\x8c\x93\x2a\xa7\x80"
-+			  "\xe1\x07\xa0\xa9\x9f\x8c\x8d\x1a"
-+			  "\x55\xfc\x6b\x24\x7a\xbd\x3e\x51"
-+			  "\x68\x4b\x26\x59\xc8\xa7\x16\xd9"
-+			  "\xb9\x61\x13\xde\x8b\x63\x1c\xf6"
-+			  "\x60\x01\xfb\x08\xb3\x5b\x0a\xbf"
-+			  "\x34\x73\xda\x87\x87\x3d\x6f\x97"
-+			  "\x4a\x0c\xa3\x58\x20\xa2\xc0\x81"
-+			  "\x5b\x8c\xef\xa9\xc2\x01\x1e\x64"
-+			  "\x83\x8c\xbc\x03\xb6\xd0\x29\x9f"
-+			  "\x54\xe2\xce\x8b\xc2\x07\x85\x78"
-+			  "\x25\x38\x96\x4c\xb4\xbe\x17\x4a"
-+			  "\x65\xa6\xfa\x52\x9d\x66\x9d\x65"
-+			  "\x4a\xd1\x01\x01\xf0\xcb\x13\xcc"
-+			  "\xa5\x82\xf3\xf2\x66\xcd\x3f\x9d"
-+			  "\xd1\xaa\xe4\x67\xea\xf2\xad\x88"
-+			  "\x56\x76\xa7\x9b\x59\x3c\xb1\x5d"
-+			  "\x78\xfd\x69\x79\x74\x78\x43\x26"
-+			  "\x7b\xde\x3f\xf1\xf5\x4e\x14\xd9"
-+			  "\x15\xf5\x75\xb5\x2e\x19\xf3\x0c"
-+			  "\x48\x72\xd6\x71\x6d\x03\x6e\xaa"
-+			  "\xa7\x08\xf9\xaa\x70\xa3\x0f\x4d"
-+			  "\x12\x8a\xdd\xe3\x39\x73\x7e\xa7"
-+			  "\xea\x1f\x6d\x06\x26\x2a\xf2\xc5"
-+			  "\x52\xb4\xbf\xfd\x52\x0c\x06\x60"
-+			  "\x90\xd1\xb2\x7b\x56\xae\xac\x58"
-+			  "\x5a\x6b\x50\x2a\xf5\xe0\x30\x3c"
-+			  "\x2a\x98\x0f\x1b\x5b\x0a\x84\x6c"
-+			  "\x31\xae\x92\xe2\xd4\xbb\x7f\x59"
-+			  "\x26\x10\xb9\x89\x37\x68\x26\xbf"
-+			  "\x41\xc8\x49\xc4\x70\x35\x7d\xff"
-+			  "\x2d\x7f\xf6\x8a\x93\x68\x8c\x78"
-+			  "\x0d\x53\xce\x7d\xff\x7d\xfb\xae"
-+			  "\x13\x1b\x75\xc4\x78\xd7\x71\xd8"
-+			  "\xea\xd3\xf4\x9d\x95\x64\x8e\xb4"
-+			  "\xde\xb8\xe4\xa6\x68\xc8\xae\x73"
-+			  "\x58\xaf\xa8\xb0\x5a\x20\xde\x87"
-+			  "\x43\xb9\x0f\xe3\xad\x41\x4b\xd5"
-+			  "\xb7\xad\x16\x00\xa6\xff\xf6\x74"
-+			  "\xbf\x8c\x9f\xb3\x58\x1b\xb6\x55"
-+			  "\xa9\x90\x56\x28\xf0\xb5\x13\x4e"
-+			  "\x9e\xf7\x25\x86\xe0\x07\x7b\x98"
-+			  "\xd8\x60\x5d\x38\x95\x3c\xe4\x22"
-+			  "\x16\x2f\xb2\xa2\xaf\xe8\x90\x17"
-+			  "\xec\x11\x83\x1a\xf4\xa9\x26\xda"
-+			  "\x39\x72\xf5\x94\x61\x05\x51\xec"
-+			  "\xa8\x30\x8b\x2c\x13\xd0\x72\xac"
-+			  "\xb9\xd2\xa0\x4c\x4b\x78\xe8\x6e"
-+			  "\x04\x85\xe9\x04\x49\x82\x91\xff"
-+			  "\x89\xe5\xab\x4c\xaa\x37\x03\x12"
-+			  "\xca\x8b\x74\x10\xfd\x9e\xd9\x7b"
-+			  "\xcb\xdb\x82\x6e\xce\x2e\x33\x39"
-+			  "\xce\xd2\x84\x6e\x34\x71\x51\x6e"
-+			  "\x0d\xd6\x01\x87\xc7\xfa\x0a\xd3"
-+			  "\xad\x36\xf3\x4c\x9f\x96\x5e\x62"
-+			  "\x62\x54\xc3\x03\x78\xd6\xab\xdd"
-+			  "\x89\x73\x55\x25\x30\xf8\xa7\xe6"
-+			  "\x4f\x11\x0c\x7c\x0a\xa1\x2b\x7b"
-+			  "\x3d\x0d\xde\x81\xd4\x9d\x0b\xae"
-+			  "\xdf\x00\xf9\x4c\xb6\x90\x8e\x16"
-+			  "\xcb\x11\xc8\xd1\x2e\x73\x13\x75"
-+			  "\x75\x3e\xaa\xf5\xee\x02\xb3\x18"
-+			  "\xa6\x2d\xf5\x3b\x51\xd1\x1f\x47"
-+			  "\x6b\x2c\xdb\xc4\x10\xe0\xc8\xba"
-+			  "\x9d\xac\xb1\x9d\x75\xd5\x41\x0e"
-+			  "\x7e\xbe\x18\x5b\xa4\x1f\xf8\x22"
-+			  "\x4c\xc1\x68\xda\x6d\x51\x34\x6c"
-+			  "\x19\x59\xec\xb5\xb1\xec\xa7\x03"
-+			  "\xca\x54\x99\x63\x05\x6c\xb1\xac"
-+			  "\x9c\x31\xd6\xdb\xba\x7b\x14\x12"
-+			  "\x7a\xc3\x2f\xbf\x8d\xdc\x37\x46"
-+			  "\xdb\xd2\xbc\xd4\x2f\xab\x30\xd5"
-+			  "\xed\x34\x99\x8e\x83\x3e\xbe\x4c"
-+			  "\x86\x79\x58\xe0\x33\x8d\x9a\xb8"
-+			  "\xa9\xa6\x90\x46\xa2\x02\xb8\xdd"
-+			  "\xf5\xf9\x1a\x5c\x8c\x01\xaa\x6e"
-+			  "\xb4\x22\x12\xf5\x0c\x1b\x9b\x7a"
-+			  "\xc3\x80\xf3\x06\x00\x5f\x30\xd5"
-+			  "\x06\xdb\x7d\x82\xc2\xd4\x0b\x4c"
-+			  "\x5f\xe9\xc5\xf5\xdf\x97\x12\xbf"
-+			  "\x56\xaf\x9b\x69\xcd\xee\x30\xb4"
-+			  "\xa8\x71\xff\x3e\x7d\x73\x7a\xb4"
-+			  "\x0d\xa5\x46\x7a\xf3\xf4\x15\x87"
-+			  "\x5d\x93\x2b\x8c\x37\x64\xb5\xdd"
-+			  "\x48\xd1\xe5\x8c\xae\xd4\xf1\x76"
-+			  "\xda\xf4\xba\x9e\x25\x0e\xad\xa3"
-+			  "\x0d\x08\x7c\xa8\x82\x16\x8d\x90"
-+			  "\x56\x40\x16\x84\xe7\x22\x53\x3a"
-+			  "\x58\xbc\xb9\x8f\x33\xc8\xc2\x84"
-+			  "\x22\xe6\x0d\xe7\xb3\xdc\x5d\xdf"
-+			  "\xd7\x2a\x36\xe4\x16\x06\x07\xd2"
-+			  "\x97\x60\xb2\xf5\x5e\x14\xc9\xfd"
-+			  "\x8b\x05\xd1\xce\xee\x9a\x65\x99"
-+			  "\xb7\xae\x19\xb7\xc8\xbc\xd5\xa2"
-+			  "\x7b\x95\xe1\xcc\xba\x0d\xdc\x8a"
-+			  "\x1d\x59\x52\x50\xaa\x16\x02\x82"
-+			  "\xdf\x61\x33\x2e\x44\xce\x49\xc7"
-+			  "\xe5\xc6\x2e\x76\xcf\x80\x52\xf0"
-+			  "\x3d\x17\x34\x47\x3f\xd3\x80\x48"
-+			  "\xa2\xba\xd5\xc7\x7b\x02\x28\xdb"
-+			  "\xac\x44\xc7\x6e\x05\x5c\xc2\x79"
-+			  "\xb3\x7d\x6a\x47\x77\x66\xf1\x38"
-+			  "\xf0\xf5\x4f\x27\x1a\x31\xca\x6c"
-+			  "\x72\x95\x92\x8e\x3f\xb0\xec\x1d"
-+			  "\xc7\x2a\xff\x73\xee\xdf\x55\x80"
-+			  "\x93\xd2\xbd\x34\xd3\x9f\x00\x51"
-+			  "\xfb\x2e\x41\xba\x6c\x5a\x7c\x17"
-+			  "\x7f\xe6\x70\xac\x8d\x39\x3f\x77"
-+			  "\xe2\x23\xac\x8f\x72\x4e\xe4\x53"
-+			  "\xcc\xf1\x1b\xf1\x35\xfe\x52\xa4"
-+			  "\xd6\xb8\x40\x6b\xc1\xfd\xa0\xa1"
-+			  "\xf5\x46\x65\xc2\x50\xbb\x43\xe2"
-+			  "\xd1\x43\x28\x34\x74\xf5\x87\xa0"
-+			  "\xf2\x5e\x27\x3b\x59\x2b\x3e\x49"
-+			  "\xdf\x46\xee\xaf\x71\xd7\x32\x36"
-+			  "\xc7\x14\x0b\x58\x6e\x3e\x2d\x41"
-+			  "\xfa\x75\x66\x3a\x54\xe0\xb2\xb9"
-+			  "\xaf\xdd\x04\x80\x15\x19\x3f\x6f"
-+			  "\xce\x12\xb4\xd8\xe8\x89\x3c\x05"
-+			  "\x30\xeb\xf3\x3d\xcd\x27\xec\xdc"
-+			  "\x56\x70\x12\xcf\x78\x2b\x77\xbf"
-+			  "\x22\xf0\x1b\x17\x9c\xcc\xd6\x1b"
-+			  "\x2d\x3d\xa0\x3b\xd8\xc9\x70\xa4"
-+			  "\x7a\x3e\x07\xb9\x06\xc3\xfa\xb0"
-+			  "\x33\xee\xc1\xd8\xf6\xe0\xf0\xb2"
-+			  "\x61\x12\x69\xb0\x5f\x28\x99\xda"
-+			  "\xc3\x61\x48\xfa\x07\x16\x03\xc4"
-+			  "\xa8\xe1\x3c\xe8\x0e\x64\x15\x30"
-+			  "\xc1\x9d\x84\x2f\x73\x98\x0e\x3a"
-+			  "\xf2\x86\x21\xa4\x9e\x1d\xb5\x86"
-+			  "\x16\xdb\x2b\x9a\x06\x64\x8e\x79"
-+			  "\x8d\x76\x3e\xc3\xc2\x64\x44\xe3"
-+			  "\xda\xbc\x1a\x52\xd7\x61\x03\x65"
-+			  "\x54\x32\x77\x01\xed\x9d\x8a\x43"
-+			  "\x25\x24\xe3\xc1\xbe\xb8\x2f\xcb"
-+			  "\x89\x14\x64\xab\xf6\xa0\x6e\x02"
-+			  "\x57\xe4\x7d\xa9\x4e\x9a\x03\x36"
-+			  "\xad\xf1\xb1\xfc\x0b\xe6\x79\x51"
-+			  "\x9f\x81\x77\xc4\x14\x78\x9d\xbf"
-+			  "\xb6\xd6\xa3\x8c\xba\x0b\x26\xe7"
-+			  "\xc8\xb9\x5c\xcc\xe1\x5f\xd5\xc6"
-+			  "\xc4\xca\xc2\xa3\x45\xba\x94\x13"
-+			  "\xb2\x8f\xc3\x54\x01\x09\xe7\x8b"
-+			  "\xda\x2a\x0a\x11\x02\x43\xcb\x57"
-+			  "\xc9\xcc\xb5\x5c\xab\xc4\xec\x54"
-+			  "\x00\x06\x34\xe1\x6e\x03\x89\x7c"
-+			  "\xc6\xfb\x6a\xc7\x60\x43\xd6\xc5"
-+			  "\xb5\x68\x72\x89\x8f\x42\xc3\x74"
-+			  "\xbd\x25\xaa\x9f\x67\xb5\xdf\x26"
-+			  "\x20\xe8\xb7\x01\x3c\xe4\x77\xce"
-+			  "\xc4\x65\xa7\x23\x79\xea\x33\xc7"
-+			  "\x82\x14\x5c\x82\xf2\x4e\x3d\xf6"
-+			  "\xc6\x4a\x0e\x29\xbb\xec\x44\xcd"
-+			  "\x2f\xd1\x4f\x21\x71\xa9\xce\x0f"
-+			  "\x5c\xf2\x72\x5c\x08\x2e\x21\xd2"
-+			  "\xc3\x29\x13\xd8\xac\xc3\xda\x13"
-+			  "\x1a\x9d\xa7\x71\x1d\x27\x1d\x27"
-+			  "\x1d\xea\xab\x44\x79\xad\xe5\xeb"
-+			  "\xef\x1f\x22\x0a\x44\x4f\xcb\x87"
-+			  "\xa7\x58\x71\x0e\x66\xf8\x60\xbf"
-+			  "\x60\x74\x4a\xb4\xec\x2e\xfe\xd3"
-+			  "\xf5\xb8\xfe\x46\x08\x50\x99\x6c"
-+			  "\x66\xa5\xa8\x34\x44\xb5\xe5\xf0"
-+			  "\xdd\x2c\x67\x4e\x35\x96\x8e\x67"
-+			  "\x48\x3f\x5f\x37\x44\x60\x51\x2e"
-+			  "\x14\x91\x5e\x57\xc3\x0e\x79\x77"
-+			  "\x2f\x03\xf4\xe2\x1c\x72\xbf\x85"
-+			  "\x5d\xd3\x17\xdf\x6c\xc5\x70\x24"
-+			  "\x42\xdf\x51\x4e\x2a\xb2\xd2\x5b"
-+			  "\x9e\x69\x83\x41\x11\xfe\x73\x22"
-+			  "\xde\x8a\x9e\xd8\x8a\xfb\x20\x38"
-+			  "\xd8\x47\x6f\xd5\xed\x8f\x41\xfd"
-+			  "\x13\x7a\x18\x03\x7d\x0f\xcd\x7d"
-+			  "\xa6\x7d\x31\x9e\xf1\x8f\x30\xa3"
-+			  "\x8b\x4c\x24\xb7\xf5\x48\xd7\xd9"
-+			  "\x12\xe7\x84\x97\x5c\x31\x6d\xfb"
-+			  "\xdf\xf3\xd3\xd1\xd5\x0c\x30\x06"
-+			  "\x01\x6a\xbc\x6c\x78\x7b\xa6\x50"
-+			  "\xfa\x0f\x3c\x42\x2d\xa5\xa3\x3b"
-+			  "\xcf\x62\x50\xff\x71\x6d\xe7\xda"
-+			  "\x27\xab\xc6\x67\x16\x65\x68\x64"
-+			  "\xc7\xd5\x5f\x81\xa9\xf6\x65\xb3"
-+			  "\x5e\x43\x91\x16\xcd\x3d\x55\x37"
-+			  "\x55\xb3\xf0\x28\xc5\x54\x19\xc0"
-+			  "\xe0\xd6\x2a\x61\xd4\xc8\x72\x51"
-+			  "\xe9\xa1\x7b\x48\x21\xad\x44\x09"
-+			  "\xe4\x01\x61\x3c\x8a\x5b\xf9\xa1"
-+			  "\x6e\x1b\xdf\xc0\x04\xa8\x8b\xf2"
-+			  "\x21\xbe\x34\x7b\xfc\xa1\xcd\xc9"
-+			  "\xa9\x96\xf4\xa4\x4c\xf7\x4e\x8f"
-+			  "\x84\xcc\xd3\xa8\x92\x77\x8f\x36"
-+			  "\xe2\x2e\x8c\x33\xe8\x84\xa6\x0c"
-+			  "\x6c\x8a\xda\x14\x32\xc2\x96\xff"
-+			  "\xc6\x4a\xc2\x9b\x30\x7f\xd1\x29"
-+			  "\xc0\xd5\x78\x41\x00\x80\x80\x03"
-+			  "\x2a\xb1\xde\x26\x03\x48\x49\xee"
-+			  "\x57\x14\x76\x51\x3c\x36\x5d\x0a"
-+			  "\x5c\x9f\xe8\xd8\x53\xdb\x4f\xd4"
-+			  "\x38\xbf\x66\xc9\x75\x12\x18\x75"
-+			  "\x34\x2d\x93\x22\x96\x51\x24\x6e"
-+			  "\x4e\xd9\x30\xea\x67\xff\x92\x1c"
-+			  "\x16\x26\xe9\xb5\x33\xab\x8c\x22"
-+			  "\x47\xdb\xa0\x2c\x08\xf0\x12\x69"
-+			  "\x7e\x93\x52\xda\xa5\xe5\xca\xc1"
-+			  "\x0f\x55\x2a\xbd\x09\x30\x88\x1b"
-+			  "\x9c\xc6\x9f\xe6\xdb\xa6\x92\xeb"
-+			  "\xf4\xbd\x5c\xc4\xdb\xc6\x71\x09"
-+			  "\xab\x5e\x48\x0c\xed\x6f\xda\x8e"
-+			  "\x8d\x0c\x98\x71\x7d\x10\xd0\x9c"
-+			  "\x20\x9b\x79\x53\x26\x5d\xb9\x85"
-+			  "\x8a\x31\xb8\xc5\x1c\x97\xde\x88"
-+			  "\x61\x55\x7f\x7c\x21\x06\xea\xc4"
-+			  "\x5f\xaf\xf2\xf0\xd5\x5e\x7d\xb4"
-+			  "\x6e\xcf\xe9\xae\x1b\x0e\x11\x80"
-+			  "\xc1\x9a\x74\x7e\x52\x6f\xa0\xb7"
-+			  "\x24\xcd\x8d\x0a\x11\x40\x63\x72"
-+			  "\xfa\xe2\xc5\xb3\x94\xef\x29\xa2"
-+			  "\x1a\x23\x43\x04\x37\x55\x0d\xe9"
-+			  "\x83\xb2\x29\x51\x49\x64\xa0\xbd"
-+			  "\xde\x73\xfd\xa5\x7c\x95\x70\x62"
-+			  "\x58\xdc\xe2\xd0\xbf\x98\xf5\x8a"
-+			  "\x6a\xfd\xce\xa8\x0e\x42\x2a\xeb"
-+			  "\xd2\xff\x83\x27\x53\x5c\xa0\x6e"
-+			  "\x93\xef\xe2\xb9\x5d\x35\xd6\x98"
-+			  "\xf6\x71\x19\x7a\x54\xa1\xa7\xe8"
-+			  "\x09\xfe\xf6\x9e\xc7\xbd\x3e\x29"
-+			  "\xbd\x6b\x17\xf4\xe7\x3e\x10\x5c"
-+			  "\xc1\xd2\x59\x4f\x4b\x12\x1a\x5b"
-+			  "\x50\x80\x59\xb9\xec\x13\x66\xa8"
-+			  "\xd2\x31\x7b\x6a\x61\x22\xdd\x7d"
-+			  "\x61\xee\x87\x16\x46\x9f\xf9\xc7"
-+			  "\x41\xee\x74\xf8\xd0\x96\x2c\x76"
-+			  "\x2a\xac\x7d\x6e\x9f\x0e\x7f\x95"
-+			  "\xfe\x50\x16\xb2\x23\xca\x62\xd5"
-+			  "\x68\xcf\x07\x3f\x3f\x97\x85\x2a"
-+			  "\x0c\x25\x45\xba\xdb\x32\xcb\x83"
-+			  "\x8c\x4f\xe0\x6d\x9a\x99\xf9\xc9"
-+			  "\xda\xd4\x19\x31\xc1\x7c\x6d\xd9"
-+			  "\x9c\x56\xd3\xec\xc1\x81\x4c\xed"
-+			  "\x28\x9d\x87\xeb\x19\xd7\x1a\x4f"
-+			  "\x04\x6a\xcb\x1f\xcf\x1f\xa2\x16"
-+			  "\xfc\x2a\x0d\xa1\x14\x2d\xfa\xc5"
-+			  "\x5a\xd2\xc5\xf9\x19\x7c\x20\x1f"
-+			  "\x2d\x10\xc0\x66\x7c\xd9\x2d\xe5"
-+			  "\x88\x70\x59\xa7\x85\xd5\x2e\x7c"
-+			  "\x5c\xe3\xb7\x12\xd6\x97\x3f\x29",
-+		.psize	= 2048,
-+		.digest	= "\x37\x90\x92\xc2\xeb\x01\x87\xd9"
-+			  "\x95\xc7\x91\xc3\x17\x8b\x38\x52",
-+	}
-+};
-+
-+
- /*
-  * DES test vectors.
-  */
-diff --git a/include/crypto/nhpoly1305.h b/include/crypto/nhpoly1305.h
+diff --git a/lib/zinc/curve25519/curve25519-hacl64.c b/lib/zinc/curve25519/curve25519-hacl64.c
 new file mode 100644
-index 0000000000000..06bfb876a1563
+index 000000000000..ce7dfcf064b1
 --- /dev/null
-+++ b/include/crypto/nhpoly1305.h
-@@ -0,0 +1,74 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
++++ b/lib/zinc/curve25519/curve25519-hacl64.c
+@@ -0,0 +1,784 @@
++// SPDX-License-Identifier: GPL-2.0 OR MIT
 +/*
-+ * Common values and helper functions for the NHPoly1305 hash function.
++ * Copyright (C) 2016-2017 INRIA and Microsoft Corporation.
++ * Copyright (C) 2018 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
++ *
++ * This is a machine-generated formally verified implementation of Curve25519
++ * ECDH from: <https://github.com/mitls/hacl-star>. Though originally machine
++ * generated, it has been tweaked to be suitable for use in the kernel. It is
++ * optimized for 64-bit machines that can efficiently work with 128-bit
++ * integer types.
 + */
 +
-+#ifndef _NHPOLY1305_H
-+#define _NHPOLY1305_H
++typedef __uint128_t u128;
 +
-+#include <crypto/hash.h>
-+#include <crypto/poly1305.h>
++static __always_inline u64 u64_eq_mask(u64 a, u64 b)
++{
++	u64 x = a ^ b;
++	u64 minus_x = ~x + (u64)1U;
++	u64 x_or_minus_x = x | minus_x;
++	u64 xnx = x_or_minus_x >> (u32)63U;
++	u64 c = xnx - (u64)1U;
++	return c;
++}
 +
-+/* NH parameterization: */
++static __always_inline u64 u64_gte_mask(u64 a, u64 b)
++{
++	u64 x = a;
++	u64 y = b;
++	u64 x_xor_y = x ^ y;
++	u64 x_sub_y = x - y;
++	u64 x_sub_y_xor_y = x_sub_y ^ y;
++	u64 q = x_xor_y | x_sub_y_xor_y;
++	u64 x_xor_q = x ^ q;
++	u64 x_xor_q_ = x_xor_q >> (u32)63U;
++	u64 c = x_xor_q_ - (u64)1U;
++	return c;
++}
 +
-+/* Endianness: little */
-+/* Word size: 32 bits (works well on NEON, SSE2, AVX2) */
++static __always_inline void modulo_carry_top(u64 *b)
++{
++	u64 b4 = b[4];
++	u64 b0 = b[0];
++	u64 b4_ = b4 & 0x7ffffffffffffLLU;
++	u64 b0_ = b0 + 19 * (b4 >> 51);
++	b[4] = b4_;
++	b[0] = b0_;
++}
 +
-+/* Stride: 2 words (optimal on ARM32 NEON; works okay on other CPUs too) */
-+#define NH_PAIR_STRIDE		2
-+#define NH_MESSAGE_UNIT		(NH_PAIR_STRIDE * 2 * sizeof(u32))
++static __always_inline void fproduct_copy_from_wide_(u64 *output, u128 *input)
++{
++	{
++		u128 xi = input[0];
++		output[0] = ((u64)(xi));
++	}
++	{
++		u128 xi = input[1];
++		output[1] = ((u64)(xi));
++	}
++	{
++		u128 xi = input[2];
++		output[2] = ((u64)(xi));
++	}
++	{
++		u128 xi = input[3];
++		output[3] = ((u64)(xi));
++	}
++	{
++		u128 xi = input[4];
++		output[4] = ((u64)(xi));
++	}
++}
 +
-+/* Num passes (Toeplitz iteration count): 4, to give ε = 2^{-128} */
-+#define NH_NUM_PASSES		4
-+#define NH_HASH_BYTES		(NH_NUM_PASSES * sizeof(u64))
++static __always_inline void
++fproduct_sum_scalar_multiplication_(u128 *output, u64 *input, u64 s)
++{
++	output[0] += (u128)input[0] * s;
++	output[1] += (u128)input[1] * s;
++	output[2] += (u128)input[2] * s;
++	output[3] += (u128)input[3] * s;
++	output[4] += (u128)input[4] * s;
++}
 +
-+/* Max message size: 1024 bytes (32x compression factor) */
-+#define NH_NUM_STRIDES		64
-+#define NH_MESSAGE_WORDS	(NH_PAIR_STRIDE * 2 * NH_NUM_STRIDES)
-+#define NH_MESSAGE_BYTES	(NH_MESSAGE_WORDS * sizeof(u32))
-+#define NH_KEY_WORDS		(NH_MESSAGE_WORDS + \
-+				 NH_PAIR_STRIDE * 2 * (NH_NUM_PASSES - 1))
-+#define NH_KEY_BYTES		(NH_KEY_WORDS * sizeof(u32))
++static __always_inline void fproduct_carry_wide_(u128 *tmp)
++{
++	{
++		u32 ctr = 0;
++		u128 tctr = tmp[ctr];
++		u128 tctrp1 = tmp[ctr + 1];
++		u64 r0 = ((u64)(tctr)) & 0x7ffffffffffffLLU;
++		u128 c = ((tctr) >> (51));
++		tmp[ctr] = ((u128)(r0));
++		tmp[ctr + 1] = ((tctrp1) + (c));
++	}
++	{
++		u32 ctr = 1;
++		u128 tctr = tmp[ctr];
++		u128 tctrp1 = tmp[ctr + 1];
++		u64 r0 = ((u64)(tctr)) & 0x7ffffffffffffLLU;
++		u128 c = ((tctr) >> (51));
++		tmp[ctr] = ((u128)(r0));
++		tmp[ctr + 1] = ((tctrp1) + (c));
++	}
 +
-+#define NHPOLY1305_KEY_SIZE	(POLY1305_BLOCK_SIZE + NH_KEY_BYTES)
++	{
++		u32 ctr = 2;
++		u128 tctr = tmp[ctr];
++		u128 tctrp1 = tmp[ctr + 1];
++		u64 r0 = ((u64)(tctr)) & 0x7ffffffffffffLLU;
++		u128 c = ((tctr) >> (51));
++		tmp[ctr] = ((u128)(r0));
++		tmp[ctr + 1] = ((tctrp1) + (c));
++	}
++	{
++		u32 ctr = 3;
++		u128 tctr = tmp[ctr];
++		u128 tctrp1 = tmp[ctr + 1];
++		u64 r0 = ((u64)(tctr)) & 0x7ffffffffffffLLU;
++		u128 c = ((tctr) >> (51));
++		tmp[ctr] = ((u128)(r0));
++		tmp[ctr + 1] = ((tctrp1) + (c));
++	}
++}
 +
-+struct nhpoly1305_key {
-+	struct poly1305_key poly_key;
-+	u32 nh_key[NH_KEY_WORDS];
++static __always_inline void fmul_shift_reduce(u64 *output)
++{
++	u64 tmp = output[4];
++	u64 b0;
++	{
++		u32 ctr = 5 - 0 - 1;
++		u64 z = output[ctr - 1];
++		output[ctr] = z;
++	}
++	{
++		u32 ctr = 5 - 1 - 1;
++		u64 z = output[ctr - 1];
++		output[ctr] = z;
++	}
++	{
++		u32 ctr = 5 - 2 - 1;
++		u64 z = output[ctr - 1];
++		output[ctr] = z;
++	}
++	{
++		u32 ctr = 5 - 3 - 1;
++		u64 z = output[ctr - 1];
++		output[ctr] = z;
++	}
++	output[0] = tmp;
++	b0 = output[0];
++	output[0] = 19 * b0;
++}
++
++static __always_inline void fmul_mul_shift_reduce_(u128 *output, u64 *input,
++						   u64 *input21)
++{
++	u32 i;
++	u64 input2i;
++	{
++		u64 input2i = input21[0];
++		fproduct_sum_scalar_multiplication_(output, input, input2i);
++		fmul_shift_reduce(input);
++	}
++	{
++		u64 input2i = input21[1];
++		fproduct_sum_scalar_multiplication_(output, input, input2i);
++		fmul_shift_reduce(input);
++	}
++	{
++		u64 input2i = input21[2];
++		fproduct_sum_scalar_multiplication_(output, input, input2i);
++		fmul_shift_reduce(input);
++	}
++	{
++		u64 input2i = input21[3];
++		fproduct_sum_scalar_multiplication_(output, input, input2i);
++		fmul_shift_reduce(input);
++	}
++	i = 4;
++	input2i = input21[i];
++	fproduct_sum_scalar_multiplication_(output, input, input2i);
++}
++
++static __always_inline void fmul_fmul(u64 *output, u64 *input, u64 *input21)
++{
++	u64 tmp[5] = { input[0], input[1], input[2], input[3], input[4] };
++	{
++		u128 b4;
++		u128 b0;
++		u128 b4_;
++		u128 b0_;
++		u64 i0;
++		u64 i1;
++		u64 i0_;
++		u64 i1_;
++		u128 t[5] = { 0 };
++		fmul_mul_shift_reduce_(t, tmp, input21);
++		fproduct_carry_wide_(t);
++		b4 = t[4];
++		b0 = t[0];
++		b4_ = ((b4) & (((u128)(0x7ffffffffffffLLU))));
++		b0_ = ((b0) + (((u128)(19) * (((u64)(((b4) >> (51))))))));
++		t[4] = b4_;
++		t[0] = b0_;
++		fproduct_copy_from_wide_(output, t);
++		i0 = output[0];
++		i1 = output[1];
++		i0_ = i0 & 0x7ffffffffffffLLU;
++		i1_ = i1 + (i0 >> 51);
++		output[0] = i0_;
++		output[1] = i1_;
++	}
++}
++
++static __always_inline void fsquare_fsquare__(u128 *tmp, u64 *output)
++{
++	u64 r0 = output[0];
++	u64 r1 = output[1];
++	u64 r2 = output[2];
++	u64 r3 = output[3];
++	u64 r4 = output[4];
++	u64 d0 = r0 * 2;
++	u64 d1 = r1 * 2;
++	u64 d2 = r2 * 2 * 19;
++	u64 d419 = r4 * 19;
++	u64 d4 = d419 * 2;
++	u128 s0 = ((((((u128)(r0) * (r0))) + (((u128)(d4) * (r1))))) +
++		   (((u128)(d2) * (r3))));
++	u128 s1 = ((((((u128)(d0) * (r1))) + (((u128)(d4) * (r2))))) +
++		   (((u128)(r3 * 19) * (r3))));
++	u128 s2 = ((((((u128)(d0) * (r2))) + (((u128)(r1) * (r1))))) +
++		   (((u128)(d4) * (r3))));
++	u128 s3 = ((((((u128)(d0) * (r3))) + (((u128)(d1) * (r2))))) +
++		   (((u128)(r4) * (d419))));
++	u128 s4 = ((((((u128)(d0) * (r4))) + (((u128)(d1) * (r3))))) +
++		   (((u128)(r2) * (r2))));
++	tmp[0] = s0;
++	tmp[1] = s1;
++	tmp[2] = s2;
++	tmp[3] = s3;
++	tmp[4] = s4;
++}
++
++static __always_inline void fsquare_fsquare_(u128 *tmp, u64 *output)
++{
++	u128 b4;
++	u128 b0;
++	u128 b4_;
++	u128 b0_;
++	u64 i0;
++	u64 i1;
++	u64 i0_;
++	u64 i1_;
++	fsquare_fsquare__(tmp, output);
++	fproduct_carry_wide_(tmp);
++	b4 = tmp[4];
++	b0 = tmp[0];
++	b4_ = ((b4) & (((u128)(0x7ffffffffffffLLU))));
++	b0_ = ((b0) + (((u128)(19) * (((u64)(((b4) >> (51))))))));
++	tmp[4] = b4_;
++	tmp[0] = b0_;
++	fproduct_copy_from_wide_(output, tmp);
++	i0 = output[0];
++	i1 = output[1];
++	i0_ = i0 & 0x7ffffffffffffLLU;
++	i1_ = i1 + (i0 >> 51);
++	output[0] = i0_;
++	output[1] = i1_;
++}
++
++static __always_inline void fsquare_fsquare_times_(u64 *output, u128 *tmp,
++						   u32 count1)
++{
++	u32 i;
++	fsquare_fsquare_(tmp, output);
++	for (i = 1; i < count1; ++i)
++		fsquare_fsquare_(tmp, output);
++}
++
++static __always_inline void fsquare_fsquare_times(u64 *output, u64 *input,
++						  u32 count1)
++{
++	u128 t[5];
++	memcpy(output, input, 5 * sizeof(*input));
++	fsquare_fsquare_times_(output, t, count1);
++}
++
++static __always_inline void fsquare_fsquare_times_inplace(u64 *output,
++							  u32 count1)
++{
++	u128 t[5];
++	fsquare_fsquare_times_(output, t, count1);
++}
++
++static __always_inline void crecip_crecip(u64 *out, u64 *z)
++{
++	u64 buf[20] = { 0 };
++	u64 *a0 = buf;
++	u64 *t00 = buf + 5;
++	u64 *b0 = buf + 10;
++	u64 *t01;
++	u64 *b1;
++	u64 *c0;
++	u64 *a;
++	u64 *t0;
++	u64 *b;
++	u64 *c;
++	fsquare_fsquare_times(a0, z, 1);
++	fsquare_fsquare_times(t00, a0, 2);
++	fmul_fmul(b0, t00, z);
++	fmul_fmul(a0, b0, a0);
++	fsquare_fsquare_times(t00, a0, 1);
++	fmul_fmul(b0, t00, b0);
++	fsquare_fsquare_times(t00, b0, 5);
++	t01 = buf + 5;
++	b1 = buf + 10;
++	c0 = buf + 15;
++	fmul_fmul(b1, t01, b1);
++	fsquare_fsquare_times(t01, b1, 10);
++	fmul_fmul(c0, t01, b1);
++	fsquare_fsquare_times(t01, c0, 20);
++	fmul_fmul(t01, t01, c0);
++	fsquare_fsquare_times_inplace(t01, 10);
++	fmul_fmul(b1, t01, b1);
++	fsquare_fsquare_times(t01, b1, 50);
++	a = buf;
++	t0 = buf + 5;
++	b = buf + 10;
++	c = buf + 15;
++	fmul_fmul(c, t0, b);
++	fsquare_fsquare_times(t0, c, 100);
++	fmul_fmul(t0, t0, c);
++	fsquare_fsquare_times_inplace(t0, 50);
++	fmul_fmul(t0, t0, b);
++	fsquare_fsquare_times_inplace(t0, 5);
++	fmul_fmul(out, t0, a);
++}
++
++static __always_inline void fsum(u64 *a, u64 *b)
++{
++	a[0] += b[0];
++	a[1] += b[1];
++	a[2] += b[2];
++	a[3] += b[3];
++	a[4] += b[4];
++}
++
++static __always_inline void fdifference(u64 *a, u64 *b)
++{
++	u64 tmp[5] = { 0 };
++	u64 b0;
++	u64 b1;
++	u64 b2;
++	u64 b3;
++	u64 b4;
++	memcpy(tmp, b, 5 * sizeof(*b));
++	b0 = tmp[0];
++	b1 = tmp[1];
++	b2 = tmp[2];
++	b3 = tmp[3];
++	b4 = tmp[4];
++	tmp[0] = b0 + 0x3fffffffffff68LLU;
++	tmp[1] = b1 + 0x3ffffffffffff8LLU;
++	tmp[2] = b2 + 0x3ffffffffffff8LLU;
++	tmp[3] = b3 + 0x3ffffffffffff8LLU;
++	tmp[4] = b4 + 0x3ffffffffffff8LLU;
++	{
++		u64 xi = a[0];
++		u64 yi = tmp[0];
++		a[0] = yi - xi;
++	}
++	{
++		u64 xi = a[1];
++		u64 yi = tmp[1];
++		a[1] = yi - xi;
++	}
++	{
++		u64 xi = a[2];
++		u64 yi = tmp[2];
++		a[2] = yi - xi;
++	}
++	{
++		u64 xi = a[3];
++		u64 yi = tmp[3];
++		a[3] = yi - xi;
++	}
++	{
++		u64 xi = a[4];
++		u64 yi = tmp[4];
++		a[4] = yi - xi;
++	}
++}
++
++static __always_inline void fscalar(u64 *output, u64 *b, u64 s)
++{
++	u128 tmp[5];
++	u128 b4;
++	u128 b0;
++	u128 b4_;
++	u128 b0_;
++	{
++		u64 xi = b[0];
++		tmp[0] = ((u128)(xi) * (s));
++	}
++	{
++		u64 xi = b[1];
++		tmp[1] = ((u128)(xi) * (s));
++	}
++	{
++		u64 xi = b[2];
++		tmp[2] = ((u128)(xi) * (s));
++	}
++	{
++		u64 xi = b[3];
++		tmp[3] = ((u128)(xi) * (s));
++	}
++	{
++		u64 xi = b[4];
++		tmp[4] = ((u128)(xi) * (s));
++	}
++	fproduct_carry_wide_(tmp);
++	b4 = tmp[4];
++	b0 = tmp[0];
++	b4_ = ((b4) & (((u128)(0x7ffffffffffffLLU))));
++	b0_ = ((b0) + (((u128)(19) * (((u64)(((b4) >> (51))))))));
++	tmp[4] = b4_;
++	tmp[0] = b0_;
++	fproduct_copy_from_wide_(output, tmp);
++}
++
++static __always_inline void fmul(u64 *output, u64 *a, u64 *b)
++{
++	fmul_fmul(output, a, b);
++}
++
++static __always_inline void crecip(u64 *output, u64 *input)
++{
++	crecip_crecip(output, input);
++}
++
++static __always_inline void point_swap_conditional_step(u64 *a, u64 *b,
++							u64 swap1, u32 ctr)
++{
++	u32 i = ctr - 1;
++	u64 ai = a[i];
++	u64 bi = b[i];
++	u64 x = swap1 & (ai ^ bi);
++	u64 ai1 = ai ^ x;
++	u64 bi1 = bi ^ x;
++	a[i] = ai1;
++	b[i] = bi1;
++}
++
++static __always_inline void point_swap_conditional5(u64 *a, u64 *b, u64 swap1)
++{
++	point_swap_conditional_step(a, b, swap1, 5);
++	point_swap_conditional_step(a, b, swap1, 4);
++	point_swap_conditional_step(a, b, swap1, 3);
++	point_swap_conditional_step(a, b, swap1, 2);
++	point_swap_conditional_step(a, b, swap1, 1);
++}
++
++static __always_inline void point_swap_conditional(u64 *a, u64 *b, u64 iswap)
++{
++	u64 swap1 = 0 - iswap;
++	point_swap_conditional5(a, b, swap1);
++	point_swap_conditional5(a + 5, b + 5, swap1);
++}
++
++static __always_inline void point_copy(u64 *output, u64 *input)
++{
++	memcpy(output, input, 5 * sizeof(*input));
++	memcpy(output + 5, input + 5, 5 * sizeof(*input));
++}
++
++static __always_inline void addanddouble_fmonty(u64 *pp, u64 *ppq, u64 *p,
++						u64 *pq, u64 *qmqp)
++{
++	u64 *qx = qmqp;
++	u64 *x2 = pp;
++	u64 *z2 = pp + 5;
++	u64 *x3 = ppq;
++	u64 *z3 = ppq + 5;
++	u64 *x = p;
++	u64 *z = p + 5;
++	u64 *xprime = pq;
++	u64 *zprime = pq + 5;
++	u64 buf[40] = { 0 };
++	u64 *origx = buf;
++	u64 *origxprime0 = buf + 5;
++	u64 *xxprime0;
++	u64 *zzprime0;
++	u64 *origxprime;
++	xxprime0 = buf + 25;
++	zzprime0 = buf + 30;
++	memcpy(origx, x, 5 * sizeof(*x));
++	fsum(x, z);
++	fdifference(z, origx);
++	memcpy(origxprime0, xprime, 5 * sizeof(*xprime));
++	fsum(xprime, zprime);
++	fdifference(zprime, origxprime0);
++	fmul(xxprime0, xprime, z);
++	fmul(zzprime0, x, zprime);
++	origxprime = buf + 5;
++	{
++		u64 *xx0;
++		u64 *zz0;
++		u64 *xxprime;
++		u64 *zzprime;
++		u64 *zzzprime;
++		xx0 = buf + 15;
++		zz0 = buf + 20;
++		xxprime = buf + 25;
++		zzprime = buf + 30;
++		zzzprime = buf + 35;
++		memcpy(origxprime, xxprime, 5 * sizeof(*xxprime));
++		fsum(xxprime, zzprime);
++		fdifference(zzprime, origxprime);
++		fsquare_fsquare_times(x3, xxprime, 1);
++		fsquare_fsquare_times(zzzprime, zzprime, 1);
++		fmul(z3, zzzprime, qx);
++		fsquare_fsquare_times(xx0, x, 1);
++		fsquare_fsquare_times(zz0, z, 1);
++		{
++			u64 *zzz;
++			u64 *xx;
++			u64 *zz;
++			u64 scalar;
++			zzz = buf + 10;
++			xx = buf + 15;
++			zz = buf + 20;
++			fmul(x2, xx, zz);
++			fdifference(zz, xx);
++			scalar = 121665;
++			fscalar(zzz, zz, scalar);
++			fsum(zzz, xx);
++			fmul(z2, zzz, zz);
++		}
++	}
++}
++
++static __always_inline void
++ladder_smallloop_cmult_small_loop_step(u64 *nq, u64 *nqpq, u64 *nq2, u64 *nqpq2,
++				       u64 *q, u8 byt)
++{
++	u64 bit0 = (u64)(byt >> 7);
++	u64 bit;
++	point_swap_conditional(nq, nqpq, bit0);
++	addanddouble_fmonty(nq2, nqpq2, nq, nqpq, q);
++	bit = (u64)(byt >> 7);
++	point_swap_conditional(nq2, nqpq2, bit);
++}
++
++static __always_inline void
++ladder_smallloop_cmult_small_loop_double_step(u64 *nq, u64 *nqpq, u64 *nq2,
++					      u64 *nqpq2, u64 *q, u8 byt)
++{
++	u8 byt1;
++	ladder_smallloop_cmult_small_loop_step(nq, nqpq, nq2, nqpq2, q, byt);
++	byt1 = byt << 1;
++	ladder_smallloop_cmult_small_loop_step(nq2, nqpq2, nq, nqpq, q, byt1);
++}
++
++static __always_inline void
++ladder_smallloop_cmult_small_loop(u64 *nq, u64 *nqpq, u64 *nq2, u64 *nqpq2,
++				  u64 *q, u8 byt, u32 i)
++{
++	while (i--) {
++		ladder_smallloop_cmult_small_loop_double_step(nq, nqpq, nq2,
++							      nqpq2, q, byt);
++		byt <<= 2;
++	}
++}
++
++static __always_inline void ladder_bigloop_cmult_big_loop(u8 *n1, u64 *nq,
++							  u64 *nqpq, u64 *nq2,
++							  u64 *nqpq2, u64 *q,
++							  u32 i)
++{
++	while (i--) {
++		u8 byte = n1[i];
++		ladder_smallloop_cmult_small_loop(nq, nqpq, nq2, nqpq2, q,
++						  byte, 4);
++	}
++}
++
++static void ladder_cmult(u64 *result, u8 *n1, u64 *q)
++{
++	u64 point_buf[40] = { 0 };
++	u64 *nq = point_buf;
++	u64 *nqpq = point_buf + 10;
++	u64 *nq2 = point_buf + 20;
++	u64 *nqpq2 = point_buf + 30;
++	point_copy(nqpq, q);
++	nq[0] = 1;
++	ladder_bigloop_cmult_big_loop(n1, nq, nqpq, nq2, nqpq2, q, 32);
++	point_copy(result, nq);
++}
++
++static __always_inline void format_fexpand(u64 *output, const u8 *input)
++{
++	const u8 *x00 = input + 6;
++	const u8 *x01 = input + 12;
++	const u8 *x02 = input + 19;
++	const u8 *x0 = input + 24;
++	u64 i0, i1, i2, i3, i4, output0, output1, output2, output3, output4;
++	i0 = get_unaligned_le64(input);
++	i1 = get_unaligned_le64(x00);
++	i2 = get_unaligned_le64(x01);
++	i3 = get_unaligned_le64(x02);
++	i4 = get_unaligned_le64(x0);
++	output0 = i0 & 0x7ffffffffffffLLU;
++	output1 = i1 >> 3 & 0x7ffffffffffffLLU;
++	output2 = i2 >> 6 & 0x7ffffffffffffLLU;
++	output3 = i3 >> 1 & 0x7ffffffffffffLLU;
++	output4 = i4 >> 12 & 0x7ffffffffffffLLU;
++	output[0] = output0;
++	output[1] = output1;
++	output[2] = output2;
++	output[3] = output3;
++	output[4] = output4;
++}
++
++static __always_inline void format_fcontract_first_carry_pass(u64 *input)
++{
++	u64 t0 = input[0];
++	u64 t1 = input[1];
++	u64 t2 = input[2];
++	u64 t3 = input[3];
++	u64 t4 = input[4];
++	u64 t1_ = t1 + (t0 >> 51);
++	u64 t0_ = t0 & 0x7ffffffffffffLLU;
++	u64 t2_ = t2 + (t1_ >> 51);
++	u64 t1__ = t1_ & 0x7ffffffffffffLLU;
++	u64 t3_ = t3 + (t2_ >> 51);
++	u64 t2__ = t2_ & 0x7ffffffffffffLLU;
++	u64 t4_ = t4 + (t3_ >> 51);
++	u64 t3__ = t3_ & 0x7ffffffffffffLLU;
++	input[0] = t0_;
++	input[1] = t1__;
++	input[2] = t2__;
++	input[3] = t3__;
++	input[4] = t4_;
++}
++
++static __always_inline void format_fcontract_first_carry_full(u64 *input)
++{
++	format_fcontract_first_carry_pass(input);
++	modulo_carry_top(input);
++}
++
++static __always_inline void format_fcontract_second_carry_pass(u64 *input)
++{
++	u64 t0 = input[0];
++	u64 t1 = input[1];
++	u64 t2 = input[2];
++	u64 t3 = input[3];
++	u64 t4 = input[4];
++	u64 t1_ = t1 + (t0 >> 51);
++	u64 t0_ = t0 & 0x7ffffffffffffLLU;
++	u64 t2_ = t2 + (t1_ >> 51);
++	u64 t1__ = t1_ & 0x7ffffffffffffLLU;
++	u64 t3_ = t3 + (t2_ >> 51);
++	u64 t2__ = t2_ & 0x7ffffffffffffLLU;
++	u64 t4_ = t4 + (t3_ >> 51);
++	u64 t3__ = t3_ & 0x7ffffffffffffLLU;
++	input[0] = t0_;
++	input[1] = t1__;
++	input[2] = t2__;
++	input[3] = t3__;
++	input[4] = t4_;
++}
++
++static __always_inline void format_fcontract_second_carry_full(u64 *input)
++{
++	u64 i0;
++	u64 i1;
++	u64 i0_;
++	u64 i1_;
++	format_fcontract_second_carry_pass(input);
++	modulo_carry_top(input);
++	i0 = input[0];
++	i1 = input[1];
++	i0_ = i0 & 0x7ffffffffffffLLU;
++	i1_ = i1 + (i0 >> 51);
++	input[0] = i0_;
++	input[1] = i1_;
++}
++
++static __always_inline void format_fcontract_trim(u64 *input)
++{
++	u64 a0 = input[0];
++	u64 a1 = input[1];
++	u64 a2 = input[2];
++	u64 a3 = input[3];
++	u64 a4 = input[4];
++	u64 mask0 = u64_gte_mask(a0, 0x7ffffffffffedLLU);
++	u64 mask1 = u64_eq_mask(a1, 0x7ffffffffffffLLU);
++	u64 mask2 = u64_eq_mask(a2, 0x7ffffffffffffLLU);
++	u64 mask3 = u64_eq_mask(a3, 0x7ffffffffffffLLU);
++	u64 mask4 = u64_eq_mask(a4, 0x7ffffffffffffLLU);
++	u64 mask = (((mask0 & mask1) & mask2) & mask3) & mask4;
++	u64 a0_ = a0 - (0x7ffffffffffedLLU & mask);
++	u64 a1_ = a1 - (0x7ffffffffffffLLU & mask);
++	u64 a2_ = a2 - (0x7ffffffffffffLLU & mask);
++	u64 a3_ = a3 - (0x7ffffffffffffLLU & mask);
++	u64 a4_ = a4 - (0x7ffffffffffffLLU & mask);
++	input[0] = a0_;
++	input[1] = a1_;
++	input[2] = a2_;
++	input[3] = a3_;
++	input[4] = a4_;
++}
++
++static __always_inline void format_fcontract_store(u8 *output, u64 *input)
++{
++	u64 t0 = input[0];
++	u64 t1 = input[1];
++	u64 t2 = input[2];
++	u64 t3 = input[3];
++	u64 t4 = input[4];
++	u64 o0 = t1 << 51 | t0;
++	u64 o1 = t2 << 38 | t1 >> 13;
++	u64 o2 = t3 << 25 | t2 >> 26;
++	u64 o3 = t4 << 12 | t3 >> 39;
++	u8 *b0 = output;
++	u8 *b1 = output + 8;
++	u8 *b2 = output + 16;
++	u8 *b3 = output + 24;
++	put_unaligned_le64(o0, b0);
++	put_unaligned_le64(o1, b1);
++	put_unaligned_le64(o2, b2);
++	put_unaligned_le64(o3, b3);
++}
++
++static __always_inline void format_fcontract(u8 *output, u64 *input)
++{
++	format_fcontract_first_carry_full(input);
++	format_fcontract_second_carry_full(input);
++	format_fcontract_trim(input);
++	format_fcontract_store(output, input);
++}
++
++static __always_inline void format_scalar_of_point(u8 *scalar, u64 *point)
++{
++	u64 *x = point;
++	u64 *z = point + 5;
++	u64 buf[10] __aligned(32) = { 0 };
++	u64 *zmone = buf;
++	u64 *sc = buf + 5;
++	crecip(zmone, z);
++	fmul(sc, x, zmone);
++	format_fcontract(scalar, sc);
++}
++
++static void curve25519_generic(u8 mypublic[CURVE25519_KEY_SIZE],
++			       const u8 secret[CURVE25519_KEY_SIZE],
++			       const u8 basepoint[CURVE25519_KEY_SIZE])
++{
++	u64 buf0[10] __aligned(32) = { 0 };
++	u64 *x0 = buf0;
++	u64 *z = buf0 + 5;
++	u64 *q;
++	format_fexpand(x0, basepoint);
++	z[0] = 1;
++	q = buf0;
++	{
++		u8 e[32] __aligned(32) = { 0 };
++		u8 *scalar;
++		memcpy(e, secret, 32);
++		normalize_secret(e);
++		scalar = e;
++		{
++			u64 buf[15] = { 0 };
++			u64 *nq = buf;
++			u64 *x = nq;
++			x[0] = 1;
++			ladder_cmult(nq, scalar, q);
++			format_scalar_of_point(mypublic, nq);
++			memzero_explicit(buf, sizeof(buf));
++		}
++		memzero_explicit(e, sizeof(e));
++	}
++	memzero_explicit(buf0, sizeof(buf0));
++}
+diff --git a/lib/zinc/curve25519/curve25519.c b/lib/zinc/curve25519/curve25519.c
+new file mode 100644
+index 000000000000..8d9d8fc0ca38
+--- /dev/null
++++ b/lib/zinc/curve25519/curve25519.c
+@@ -0,0 +1,108 @@
++// SPDX-License-Identifier: GPL-2.0 OR MIT
++/*
++ * Copyright (C) 2015-2018 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
++ *
++ * This is an implementation of the Curve25519 ECDH algorithm, using either
++ * a 32-bit implementation or a 64-bit implementation with 128-bit integers,
++ * depending on what is supported by the target compiler.
++ *
++ * Information: https://cr.yp.to/ecdh.html
++ */
++
++#include <zinc/curve25519.h>
++#include "../selftest/run.h"
++
++#include <asm/unaligned.h>
++#include <linux/version.h>
++#include <linux/string.h>
++#include <linux/random.h>
++#include <linux/module.h>
++#include <linux/init.h>
++#include <crypto/algapi.h> // For crypto_memneq.
++
++static bool *const curve25519_nobs[] __initconst = { };
++static void __init curve25519_fpu_init(void)
++{
++}
++static inline bool curve25519_arch(u8 mypublic[CURVE25519_KEY_SIZE],
++				   const u8 secret[CURVE25519_KEY_SIZE],
++				   const u8 basepoint[CURVE25519_KEY_SIZE])
++{
++	return false;
++}
++static inline bool curve25519_base_arch(u8 pub[CURVE25519_KEY_SIZE],
++					const u8 secret[CURVE25519_KEY_SIZE])
++{
++	return false;
++}
++
++static __always_inline void normalize_secret(u8 secret[CURVE25519_KEY_SIZE])
++{
++	secret[0] &= 248;
++	secret[31] &= 127;
++	secret[31] |= 64;
++}
++
++#if defined(CONFIG_ARCH_SUPPORTS_INT128) && defined(__SIZEOF_INT128__)
++#include "curve25519-hacl64.c"
++#else
++#include "curve25519-fiat32.c"
++#endif
++
++static const u8 null_point[CURVE25519_KEY_SIZE] = { 0 };
++
++bool curve25519(u8 mypublic[CURVE25519_KEY_SIZE],
++		const u8 secret[CURVE25519_KEY_SIZE],
++		const u8 basepoint[CURVE25519_KEY_SIZE])
++{
++	if (!curve25519_arch(mypublic, secret, basepoint))
++		curve25519_generic(mypublic, secret, basepoint);
++	return crypto_memneq(mypublic, null_point, CURVE25519_KEY_SIZE);
++}
++EXPORT_SYMBOL(curve25519);
++
++bool curve25519_generate_public(u8 pub[CURVE25519_KEY_SIZE],
++				const u8 secret[CURVE25519_KEY_SIZE])
++{
++	static const u8 basepoint[CURVE25519_KEY_SIZE] __aligned(32) = { 9 };
++
++	if (unlikely(!crypto_memneq(secret, null_point, CURVE25519_KEY_SIZE)))
++		return false;
++
++	if (curve25519_base_arch(pub, secret))
++		return crypto_memneq(pub, null_point, CURVE25519_KEY_SIZE);
++	return curve25519(pub, secret, basepoint);
++}
++EXPORT_SYMBOL(curve25519_generate_public);
++
++void curve25519_generate_secret(u8 secret[CURVE25519_KEY_SIZE])
++{
++	get_random_bytes_wait(secret, CURVE25519_KEY_SIZE);
++	normalize_secret(secret);
++}
++EXPORT_SYMBOL(curve25519_generate_secret);
++
++#include "../selftest/curve25519.c"
++
++static bool nosimd __initdata = false;
++
++static int __init mod_init(void)
++{
++	if (!nosimd)
++		curve25519_fpu_init();
++	if (!selftest_run("curve25519", curve25519_selftest, curve25519_nobs,
++			  ARRAY_SIZE(curve25519_nobs)))
++		return -ENOTRECOVERABLE;
++	return 0;
++}
++
++static void __exit mod_exit(void)
++{
++}
++
++module_param(nosimd, bool, 0);
++module_init(mod_init);
++module_exit(mod_exit);
++MODULE_LICENSE("GPL v2");
++MODULE_DESCRIPTION("Curve25519 scalar multiplication");
++MODULE_AUTHOR("Jason A. Donenfeld <Jason@zx2c4.com>");
+diff --git a/lib/zinc/selftest/curve25519.c b/lib/zinc/selftest/curve25519.c
+new file mode 100644
+index 000000000000..fa653d47df5a
+--- /dev/null
++++ b/lib/zinc/selftest/curve25519.c
+@@ -0,0 +1,1315 @@
++// SPDX-License-Identifier: GPL-2.0 OR MIT
++/*
++ * Copyright (C) 2015-2018 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
++ */
++
++struct curve25519_test_vector {
++	u8 private[CURVE25519_KEY_SIZE];
++	u8 public[CURVE25519_KEY_SIZE];
++	u8 result[CURVE25519_KEY_SIZE];
++	bool valid;
++};
++static const struct curve25519_test_vector curve25519_test_vectors[] __initconst = {
++	{
++		.private = { 0x77, 0x07, 0x6d, 0x0a, 0x73, 0x18, 0xa5, 0x7d,
++			     0x3c, 0x16, 0xc1, 0x72, 0x51, 0xb2, 0x66, 0x45,
++			     0xdf, 0x4c, 0x2f, 0x87, 0xeb, 0xc0, 0x99, 0x2a,
++			     0xb1, 0x77, 0xfb, 0xa5, 0x1d, 0xb9, 0x2c, 0x2a },
++		.public = { 0xde, 0x9e, 0xdb, 0x7d, 0x7b, 0x7d, 0xc1, 0xb4,
++			    0xd3, 0x5b, 0x61, 0xc2, 0xec, 0xe4, 0x35, 0x37,
++			    0x3f, 0x83, 0x43, 0xc8, 0x5b, 0x78, 0x67, 0x4d,
++			    0xad, 0xfc, 0x7e, 0x14, 0x6f, 0x88, 0x2b, 0x4f },
++		.result = { 0x4a, 0x5d, 0x9d, 0x5b, 0xa4, 0xce, 0x2d, 0xe1,
++			    0x72, 0x8e, 0x3b, 0xf4, 0x80, 0x35, 0x0f, 0x25,
++			    0xe0, 0x7e, 0x21, 0xc9, 0x47, 0xd1, 0x9e, 0x33,
++			    0x76, 0xf0, 0x9b, 0x3c, 0x1e, 0x16, 0x17, 0x42 },
++		.valid = true
++	},
++	{
++		.private = { 0x5d, 0xab, 0x08, 0x7e, 0x62, 0x4a, 0x8a, 0x4b,
++			     0x79, 0xe1, 0x7f, 0x8b, 0x83, 0x80, 0x0e, 0xe6,
++			     0x6f, 0x3b, 0xb1, 0x29, 0x26, 0x18, 0xb6, 0xfd,
++			     0x1c, 0x2f, 0x8b, 0x27, 0xff, 0x88, 0xe0, 0xeb },
++		.public = { 0x85, 0x20, 0xf0, 0x09, 0x89, 0x30, 0xa7, 0x54,
++			    0x74, 0x8b, 0x7d, 0xdc, 0xb4, 0x3e, 0xf7, 0x5a,
++			    0x0d, 0xbf, 0x3a, 0x0d, 0x26, 0x38, 0x1a, 0xf4,
++			    0xeb, 0xa4, 0xa9, 0x8e, 0xaa, 0x9b, 0x4e, 0x6a },
++		.result = { 0x4a, 0x5d, 0x9d, 0x5b, 0xa4, 0xce, 0x2d, 0xe1,
++			    0x72, 0x8e, 0x3b, 0xf4, 0x80, 0x35, 0x0f, 0x25,
++			    0xe0, 0x7e, 0x21, 0xc9, 0x47, 0xd1, 0x9e, 0x33,
++			    0x76, 0xf0, 0x9b, 0x3c, 0x1e, 0x16, 0x17, 0x42 },
++		.valid = true
++	},
++	{
++		.private = { 1 },
++		.public = { 0x25, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
++		.result = { 0x3c, 0x77, 0x77, 0xca, 0xf9, 0x97, 0xb2, 0x64,
++			    0x41, 0x60, 0x77, 0x66, 0x5b, 0x4e, 0x22, 0x9d,
++			    0x0b, 0x95, 0x48, 0xdc, 0x0c, 0xd8, 0x19, 0x98,
++			    0xdd, 0xcd, 0xc5, 0xc8, 0x53, 0x3c, 0x79, 0x7f },
++		.valid = true
++	},
++	{
++		.private = { 1 },
++		.public = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff },
++		.result = { 0xb3, 0x2d, 0x13, 0x62, 0xc2, 0x48, 0xd6, 0x2f,
++			    0xe6, 0x26, 0x19, 0xcf, 0xf0, 0x4d, 0xd4, 0x3d,
++			    0xb7, 0x3f, 0xfc, 0x1b, 0x63, 0x08, 0xed, 0xe3,
++			    0x0b, 0x78, 0xd8, 0x73, 0x80, 0xf1, 0xe8, 0x34 },
++		.valid = true
++	},
++	{
++		.private = { 0xa5, 0x46, 0xe3, 0x6b, 0xf0, 0x52, 0x7c, 0x9d,
++			     0x3b, 0x16, 0x15, 0x4b, 0x82, 0x46, 0x5e, 0xdd,
++			     0x62, 0x14, 0x4c, 0x0a, 0xc1, 0xfc, 0x5a, 0x18,
++			     0x50, 0x6a, 0x22, 0x44, 0xba, 0x44, 0x9a, 0xc4 },
++		.public = { 0xe6, 0xdb, 0x68, 0x67, 0x58, 0x30, 0x30, 0xdb,
++			    0x35, 0x94, 0xc1, 0xa4, 0x24, 0xb1, 0x5f, 0x7c,
++			    0x72, 0x66, 0x24, 0xec, 0x26, 0xb3, 0x35, 0x3b,
++			    0x10, 0xa9, 0x03, 0xa6, 0xd0, 0xab, 0x1c, 0x4c },
++		.result = { 0xc3, 0xda, 0x55, 0x37, 0x9d, 0xe9, 0xc6, 0x90,
++			    0x8e, 0x94, 0xea, 0x4d, 0xf2, 0x8d, 0x08, 0x4f,
++			    0x32, 0xec, 0xcf, 0x03, 0x49, 0x1c, 0x71, 0xf7,
++			    0x54, 0xb4, 0x07, 0x55, 0x77, 0xa2, 0x85, 0x52 },
++		.valid = true
++	},
++	{
++		.private = { 1, 2, 3, 4 },
++		.public = { 0 },
++		.result = { 0 },
++		.valid = false
++	},
++	{
++		.private = { 2, 4, 6, 8 },
++		.public = { 0xe0, 0xeb, 0x7a, 0x7c, 0x3b, 0x41, 0xb8, 0xae,
++			    0x16, 0x56, 0xe3, 0xfa, 0xf1, 0x9f, 0xc4, 0x6a,
++			    0xda, 0x09, 0x8d, 0xeb, 0x9c, 0x32, 0xb1, 0xfd,
++			    0x86, 0x62, 0x05, 0x16, 0x5f, 0x49, 0xb8 },
++		.result = { 0 },
++		.valid = false
++	},
++	{
++		.private = { 0xff, 0xff, 0xff, 0xff, 0x0a, 0xff, 0xff, 0xff,
++			     0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			     0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			     0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff },
++		.public = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0x0a, 0x00, 0xfb, 0x9f },
++		.result = { 0x77, 0x52, 0xb6, 0x18, 0xc1, 0x2d, 0x48, 0xd2,
++			    0xc6, 0x93, 0x46, 0x83, 0x81, 0x7c, 0xc6, 0x57,
++			    0xf3, 0x31, 0x03, 0x19, 0x49, 0x48, 0x20, 0x05,
++			    0x42, 0x2b, 0x4e, 0xae, 0x8d, 0x1d, 0x43, 0x23 },
++		.valid = true
++	},
++	{
++		.private = { 0x8e, 0x0a, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
++		.public = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x8e, 0x06 },
++		.result = { 0x5a, 0xdf, 0xaa, 0x25, 0x86, 0x8e, 0x32, 0x3d,
++			    0xae, 0x49, 0x62, 0xc1, 0x01, 0x5c, 0xb3, 0x12,
++			    0xe1, 0xc5, 0xc7, 0x9e, 0x95, 0x3f, 0x03, 0x99,
++			    0xb0, 0xba, 0x16, 0x22, 0xf3, 0xb6, 0xf7, 0x0c },
++		.valid = true
++	},
++	/* wycheproof - normal case */
++	{
++		.private = { 0x48, 0x52, 0x83, 0x4d, 0x9d, 0x6b, 0x77, 0xda,
++			     0xde, 0xab, 0xaa, 0xf2, 0xe1, 0x1d, 0xca, 0x66,
++			     0xd1, 0x9f, 0xe7, 0x49, 0x93, 0xa7, 0xbe, 0xc3,
++			     0x6c, 0x6e, 0x16, 0xa0, 0x98, 0x3f, 0xea, 0xba },
++		.public = { 0x9c, 0x64, 0x7d, 0x9a, 0xe5, 0x89, 0xb9, 0xf5,
++			    0x8f, 0xdc, 0x3c, 0xa4, 0x94, 0x7e, 0xfb, 0xc9,
++			    0x15, 0xc4, 0xb2, 0xe0, 0x8e, 0x74, 0x4a, 0x0e,
++			    0xdf, 0x46, 0x9d, 0xac, 0x59, 0xc8, 0xf8, 0x5a },
++		.result = { 0x87, 0xb7, 0xf2, 0x12, 0xb6, 0x27, 0xf7, 0xa5,
++			    0x4c, 0xa5, 0xe0, 0xbc, 0xda, 0xdd, 0xd5, 0x38,
++			    0x9d, 0x9d, 0xe6, 0x15, 0x6c, 0xdb, 0xcf, 0x8e,
++			    0xbe, 0x14, 0xff, 0xbc, 0xfb, 0x43, 0x65, 0x51 },
++		.valid = true
++	},
++	/* wycheproof - public key on twist */
++	{
++		.private = { 0x58, 0x8c, 0x06, 0x1a, 0x50, 0x80, 0x4a, 0xc4,
++			     0x88, 0xad, 0x77, 0x4a, 0xc7, 0x16, 0xc3, 0xf5,
++			     0xba, 0x71, 0x4b, 0x27, 0x12, 0xe0, 0x48, 0x49,
++			     0x13, 0x79, 0xa5, 0x00, 0x21, 0x19, 0x98, 0xa8 },
++		.public = { 0x63, 0xaa, 0x40, 0xc6, 0xe3, 0x83, 0x46, 0xc5,
++			    0xca, 0xf2, 0x3a, 0x6d, 0xf0, 0xa5, 0xe6, 0xc8,
++			    0x08, 0x89, 0xa0, 0x86, 0x47, 0xe5, 0x51, 0xb3,
++			    0x56, 0x34, 0x49, 0xbe, 0xfc, 0xfc, 0x97, 0x33 },
++		.result = { 0xb1, 0xa7, 0x07, 0x51, 0x94, 0x95, 0xff, 0xff,
++			    0xb2, 0x98, 0xff, 0x94, 0x17, 0x16, 0xb0, 0x6d,
++			    0xfa, 0xb8, 0x7c, 0xf8, 0xd9, 0x11, 0x23, 0xfe,
++			    0x2b, 0xe9, 0xa2, 0x33, 0xdd, 0xa2, 0x22, 0x12 },
++		.valid = true
++	},
++	/* wycheproof - public key on twist */
++	{
++		.private = { 0xb0, 0x5b, 0xfd, 0x32, 0xe5, 0x53, 0x25, 0xd9,
++			     0xfd, 0x64, 0x8c, 0xb3, 0x02, 0x84, 0x80, 0x39,
++			     0x00, 0x0b, 0x39, 0x0e, 0x44, 0xd5, 0x21, 0xe5,
++			     0x8a, 0xab, 0x3b, 0x29, 0xa6, 0x96, 0x0b, 0xa8 },
++		.public = { 0x0f, 0x83, 0xc3, 0x6f, 0xde, 0xd9, 0xd3, 0x2f,
++			    0xad, 0xf4, 0xef, 0xa3, 0xae, 0x93, 0xa9, 0x0b,
++			    0xb5, 0xcf, 0xa6, 0x68, 0x93, 0xbc, 0x41, 0x2c,
++			    0x43, 0xfa, 0x72, 0x87, 0xdb, 0xb9, 0x97, 0x79 },
++		.result = { 0x67, 0xdd, 0x4a, 0x6e, 0x16, 0x55, 0x33, 0x53,
++			    0x4c, 0x0e, 0x3f, 0x17, 0x2e, 0x4a, 0xb8, 0x57,
++			    0x6b, 0xca, 0x92, 0x3a, 0x5f, 0x07, 0xb2, 0xc0,
++			    0x69, 0xb4, 0xc3, 0x10, 0xff, 0x2e, 0x93, 0x5b },
++		.valid = true
++	},
++	/* wycheproof - public key on twist */
++	{
++		.private = { 0x70, 0xe3, 0x4b, 0xcb, 0xe1, 0xf4, 0x7f, 0xbc,
++			     0x0f, 0xdd, 0xfd, 0x7c, 0x1e, 0x1a, 0xa5, 0x3d,
++			     0x57, 0xbf, 0xe0, 0xf6, 0x6d, 0x24, 0x30, 0x67,
++			     0xb4, 0x24, 0xbb, 0x62, 0x10, 0xbe, 0xd1, 0x9c },
++		.public = { 0x0b, 0x82, 0x11, 0xa2, 0xb6, 0x04, 0x90, 0x97,
++			    0xf6, 0x87, 0x1c, 0x6c, 0x05, 0x2d, 0x3c, 0x5f,
++			    0xc1, 0xba, 0x17, 0xda, 0x9e, 0x32, 0xae, 0x45,
++			    0x84, 0x03, 0xb0, 0x5b, 0xb2, 0x83, 0x09, 0x2a },
++		.result = { 0x4a, 0x06, 0x38, 0xcf, 0xaa, 0x9e, 0xf1, 0x93,
++			    0x3b, 0x47, 0xf8, 0x93, 0x92, 0x96, 0xa6, 0xb2,
++			    0x5b, 0xe5, 0x41, 0xef, 0x7f, 0x70, 0xe8, 0x44,
++			    0xc0, 0xbc, 0xc0, 0x0b, 0x13, 0x4d, 0xe6, 0x4a },
++		.valid = true
++	},
++	/* wycheproof - public key on twist */
++	{
++		.private = { 0x68, 0xc1, 0xf3, 0xa6, 0x53, 0xa4, 0xcd, 0xb1,
++			     0xd3, 0x7b, 0xba, 0x94, 0x73, 0x8f, 0x8b, 0x95,
++			     0x7a, 0x57, 0xbe, 0xb2, 0x4d, 0x64, 0x6e, 0x99,
++			     0x4d, 0xc2, 0x9a, 0x27, 0x6a, 0xad, 0x45, 0x8d },
++		.public = { 0x34, 0x3a, 0xc2, 0x0a, 0x3b, 0x9c, 0x6a, 0x27,
++			    0xb1, 0x00, 0x81, 0x76, 0x50, 0x9a, 0xd3, 0x07,
++			    0x35, 0x85, 0x6e, 0xc1, 0xc8, 0xd8, 0xfc, 0xae,
++			    0x13, 0x91, 0x2d, 0x08, 0xd1, 0x52, 0xf4, 0x6c },
++		.result = { 0x39, 0x94, 0x91, 0xfc, 0xe8, 0xdf, 0xab, 0x73,
++			    0xb4, 0xf9, 0xf6, 0x11, 0xde, 0x8e, 0xa0, 0xb2,
++			    0x7b, 0x28, 0xf8, 0x59, 0x94, 0x25, 0x0b, 0x0f,
++			    0x47, 0x5d, 0x58, 0x5d, 0x04, 0x2a, 0xc2, 0x07 },
++		.valid = true
++	},
++	/* wycheproof - public key on twist */
++	{
++		.private = { 0xd8, 0x77, 0xb2, 0x6d, 0x06, 0xdf, 0xf9, 0xd9,
++			     0xf7, 0xfd, 0x4c, 0x5b, 0x37, 0x69, 0xf8, 0xcd,
++			     0xd5, 0xb3, 0x05, 0x16, 0xa5, 0xab, 0x80, 0x6b,
++			     0xe3, 0x24, 0xff, 0x3e, 0xb6, 0x9e, 0xa0, 0xb2 },
++		.public = { 0xfa, 0x69, 0x5f, 0xc7, 0xbe, 0x8d, 0x1b, 0xe5,
++			    0xbf, 0x70, 0x48, 0x98, 0xf3, 0x88, 0xc4, 0x52,
++			    0xba, 0xfd, 0xd3, 0xb8, 0xea, 0xe8, 0x05, 0xf8,
++			    0x68, 0x1a, 0x8d, 0x15, 0xc2, 0xd4, 0xe1, 0x42 },
++		.result = { 0x2c, 0x4f, 0xe1, 0x1d, 0x49, 0x0a, 0x53, 0x86,
++			    0x17, 0x76, 0xb1, 0x3b, 0x43, 0x54, 0xab, 0xd4,
++			    0xcf, 0x5a, 0x97, 0x69, 0x9d, 0xb6, 0xe6, 0xc6,
++			    0x8c, 0x16, 0x26, 0xd0, 0x76, 0x62, 0xf7, 0x58 },
++		.valid = true
++	},
++	/* wycheproof - public key = 0 */
++	{
++		.private = { 0x20, 0x74, 0x94, 0x03, 0x8f, 0x2b, 0xb8, 0x11,
++			     0xd4, 0x78, 0x05, 0xbc, 0xdf, 0x04, 0xa2, 0xac,
++			     0x58, 0x5a, 0xda, 0x7f, 0x2f, 0x23, 0x38, 0x9b,
++			     0xfd, 0x46, 0x58, 0xf9, 0xdd, 0xd4, 0xde, 0xbc },
++		.public = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
++		.result = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
++		.valid = false
++	},
++	/* wycheproof - public key = 1 */
++	{
++		.private = { 0x20, 0x2e, 0x89, 0x72, 0xb6, 0x1c, 0x7e, 0x61,
++			     0x93, 0x0e, 0xb9, 0x45, 0x0b, 0x50, 0x70, 0xea,
++			     0xe1, 0xc6, 0x70, 0x47, 0x56, 0x85, 0x54, 0x1f,
++			     0x04, 0x76, 0x21, 0x7e, 0x48, 0x18, 0xcf, 0xab },
++		.public = { 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
++		.result = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
++		.valid = false
++	},
++	/* wycheproof - edge case on twist */
++	{
++		.private = { 0x38, 0xdd, 0xe9, 0xf3, 0xe7, 0xb7, 0x99, 0x04,
++			     0x5f, 0x9a, 0xc3, 0x79, 0x3d, 0x4a, 0x92, 0x77,
++			     0xda, 0xde, 0xad, 0xc4, 0x1b, 0xec, 0x02, 0x90,
++			     0xf8, 0x1f, 0x74, 0x4f, 0x73, 0x77, 0x5f, 0x84 },
++		.public = { 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
++		.result = { 0x9a, 0x2c, 0xfe, 0x84, 0xff, 0x9c, 0x4a, 0x97,
++			    0x39, 0x62, 0x5c, 0xae, 0x4a, 0x3b, 0x82, 0xa9,
++			    0x06, 0x87, 0x7a, 0x44, 0x19, 0x46, 0xf8, 0xd7,
++			    0xb3, 0xd7, 0x95, 0xfe, 0x8f, 0x5d, 0x16, 0x39 },
++		.valid = true
++	},
++	/* wycheproof - edge case on twist */
++	{
++		.private = { 0x98, 0x57, 0xa9, 0x14, 0xe3, 0xc2, 0x90, 0x36,
++			     0xfd, 0x9a, 0x44, 0x2b, 0xa5, 0x26, 0xb5, 0xcd,
++			     0xcd, 0xf2, 0x82, 0x16, 0x15, 0x3e, 0x63, 0x6c,
++			     0x10, 0x67, 0x7a, 0xca, 0xb6, 0xbd, 0x6a, 0xa5 },
++		.public = { 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
++		.result = { 0x4d, 0xa4, 0xe0, 0xaa, 0x07, 0x2c, 0x23, 0x2e,
++			    0xe2, 0xf0, 0xfa, 0x4e, 0x51, 0x9a, 0xe5, 0x0b,
++			    0x52, 0xc1, 0xed, 0xd0, 0x8a, 0x53, 0x4d, 0x4e,
++			    0xf3, 0x46, 0xc2, 0xe1, 0x06, 0xd2, 0x1d, 0x60 },
++		.valid = true
++	},
++	/* wycheproof - edge case on twist */
++	{
++		.private = { 0x48, 0xe2, 0x13, 0x0d, 0x72, 0x33, 0x05, 0xed,
++			     0x05, 0xe6, 0xe5, 0x89, 0x4d, 0x39, 0x8a, 0x5e,
++			     0x33, 0x36, 0x7a, 0x8c, 0x6a, 0xac, 0x8f, 0xcd,
++			     0xf0, 0xa8, 0x8e, 0x4b, 0x42, 0x82, 0x0d, 0xb7 },
++		.public = { 0xff, 0xff, 0xff, 0x03, 0x00, 0x00, 0xf8, 0xff,
++			    0xff, 0x1f, 0x00, 0x00, 0xc0, 0xff, 0xff, 0xff,
++			    0x00, 0x00, 0x00, 0xfe, 0xff, 0xff, 0x07, 0x00,
++			    0x00, 0xf0, 0xff, 0xff, 0x3f, 0x00, 0x00, 0x00 },
++		.result = { 0x9e, 0xd1, 0x0c, 0x53, 0x74, 0x7f, 0x64, 0x7f,
++			    0x82, 0xf4, 0x51, 0x25, 0xd3, 0xde, 0x15, 0xa1,
++			    0xe6, 0xb8, 0x24, 0x49, 0x6a, 0xb4, 0x04, 0x10,
++			    0xff, 0xcc, 0x3c, 0xfe, 0x95, 0x76, 0x0f, 0x3b },
++		.valid = true
++	},
++	/* wycheproof - edge case on twist */
++	{
++		.private = { 0x28, 0xf4, 0x10, 0x11, 0x69, 0x18, 0x51, 0xb3,
++			     0xa6, 0x2b, 0x64, 0x15, 0x53, 0xb3, 0x0d, 0x0d,
++			     0xfd, 0xdc, 0xb8, 0xff, 0xfc, 0xf5, 0x37, 0x00,
++			     0xa7, 0xbe, 0x2f, 0x6a, 0x87, 0x2e, 0x9f, 0xb0 },
++		.public = { 0x00, 0x00, 0x00, 0xfc, 0xff, 0xff, 0x07, 0x00,
++			    0x00, 0xe0, 0xff, 0xff, 0x3f, 0x00, 0x00, 0x00,
++			    0xff, 0xff, 0xff, 0x01, 0x00, 0x00, 0xf8, 0xff,
++			    0xff, 0x0f, 0x00, 0x00, 0xc0, 0xff, 0xff, 0x7f },
++		.result = { 0xcf, 0x72, 0xb4, 0xaa, 0x6a, 0xa1, 0xc9, 0xf8,
++			    0x94, 0xf4, 0x16, 0x5b, 0x86, 0x10, 0x9a, 0xa4,
++			    0x68, 0x51, 0x76, 0x48, 0xe1, 0xf0, 0xcc, 0x70,
++			    0xe1, 0xab, 0x08, 0x46, 0x01, 0x76, 0x50, 0x6b },
++		.valid = true
++	},
++	/* wycheproof - edge case on twist */
++	{
++		.private = { 0x18, 0xa9, 0x3b, 0x64, 0x99, 0xb9, 0xf6, 0xb3,
++			     0x22, 0x5c, 0xa0, 0x2f, 0xef, 0x41, 0x0e, 0x0a,
++			     0xde, 0xc2, 0x35, 0x32, 0x32, 0x1d, 0x2d, 0x8e,
++			     0xf1, 0xa6, 0xd6, 0x02, 0xa8, 0xc6, 0x5b, 0x83 },
++		.public = { 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff,
++			    0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff,
++			    0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff,
++			    0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0x7f },
++		.result = { 0x5d, 0x50, 0xb6, 0x28, 0x36, 0xbb, 0x69, 0x57,
++			    0x94, 0x10, 0x38, 0x6c, 0xf7, 0xbb, 0x81, 0x1c,
++			    0x14, 0xbf, 0x85, 0xb1, 0xc7, 0xb1, 0x7e, 0x59,
++			    0x24, 0xc7, 0xff, 0xea, 0x91, 0xef, 0x9e, 0x12 },
++		.valid = true
++	},
++	/* wycheproof - edge case on twist */
++	{
++		.private = { 0xc0, 0x1d, 0x13, 0x05, 0xa1, 0x33, 0x8a, 0x1f,
++			     0xca, 0xc2, 0xba, 0x7e, 0x2e, 0x03, 0x2b, 0x42,
++			     0x7e, 0x0b, 0x04, 0x90, 0x31, 0x65, 0xac, 0xa9,
++			     0x57, 0xd8, 0xd0, 0x55, 0x3d, 0x87, 0x17, 0xb0 },
++		.public = { 0xea, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x7f },
++		.result = { 0x19, 0x23, 0x0e, 0xb1, 0x48, 0xd5, 0xd6, 0x7c,
++			    0x3c, 0x22, 0xab, 0x1d, 0xae, 0xff, 0x80, 0xa5,
++			    0x7e, 0xae, 0x42, 0x65, 0xce, 0x28, 0x72, 0x65,
++			    0x7b, 0x2c, 0x80, 0x99, 0xfc, 0x69, 0x8e, 0x50 },
++		.valid = true
++	},
++	/* wycheproof - edge case for public key */
++	{
++		.private = { 0x38, 0x6f, 0x7f, 0x16, 0xc5, 0x07, 0x31, 0xd6,
++			     0x4f, 0x82, 0xe6, 0xa1, 0x70, 0xb1, 0x42, 0xa4,
++			     0xe3, 0x4f, 0x31, 0xfd, 0x77, 0x68, 0xfc, 0xb8,
++			     0x90, 0x29, 0x25, 0xe7, 0xd1, 0xe2, 0x1a, 0xbe },
++		.public = { 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
++		.result = { 0x0f, 0xca, 0xb5, 0xd8, 0x42, 0xa0, 0x78, 0xd7,
++			    0xa7, 0x1f, 0xc5, 0x9b, 0x57, 0xbf, 0xb4, 0xca,
++			    0x0b, 0xe6, 0x87, 0x3b, 0x49, 0xdc, 0xdb, 0x9f,
++			    0x44, 0xe1, 0x4a, 0xe8, 0xfb, 0xdf, 0xa5, 0x42 },
++		.valid = true
++	},
++	/* wycheproof - edge case for public key */
++	{
++		.private = { 0xe0, 0x23, 0xa2, 0x89, 0xbd, 0x5e, 0x90, 0xfa,
++			     0x28, 0x04, 0xdd, 0xc0, 0x19, 0xa0, 0x5e, 0xf3,
++			     0xe7, 0x9d, 0x43, 0x4b, 0xb6, 0xea, 0x2f, 0x52,
++			     0x2e, 0xcb, 0x64, 0x3a, 0x75, 0x29, 0x6e, 0x95 },
++		.public = { 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00,
++			    0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00,
++			    0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00,
++			    0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00 },
++		.result = { 0x54, 0xce, 0x8f, 0x22, 0x75, 0xc0, 0x77, 0xe3,
++			    0xb1, 0x30, 0x6a, 0x39, 0x39, 0xc5, 0xe0, 0x3e,
++			    0xef, 0x6b, 0xbb, 0x88, 0x06, 0x05, 0x44, 0x75,
++			    0x8d, 0x9f, 0xef, 0x59, 0xb0, 0xbc, 0x3e, 0x4f },
++		.valid = true
++	},
++	/* wycheproof - edge case for public key */
++	{
++		.private = { 0x68, 0xf0, 0x10, 0xd6, 0x2e, 0xe8, 0xd9, 0x26,
++			     0x05, 0x3a, 0x36, 0x1c, 0x3a, 0x75, 0xc6, 0xea,
++			     0x4e, 0xbd, 0xc8, 0x60, 0x6a, 0xb2, 0x85, 0x00,
++			     0x3a, 0x6f, 0x8f, 0x40, 0x76, 0xb0, 0x1e, 0x83 },
++		.public = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x03 },
++		.result = { 0xf1, 0x36, 0x77, 0x5c, 0x5b, 0xeb, 0x0a, 0xf8,
++			    0x11, 0x0a, 0xf1, 0x0b, 0x20, 0x37, 0x23, 0x32,
++			    0x04, 0x3c, 0xab, 0x75, 0x24, 0x19, 0x67, 0x87,
++			    0x75, 0xa2, 0x23, 0xdf, 0x57, 0xc9, 0xd3, 0x0d },
++		.valid = true
++	},
++	/* wycheproof - edge case for public key */
++	{
++		.private = { 0x58, 0xeb, 0xcb, 0x35, 0xb0, 0xf8, 0x84, 0x5c,
++			     0xaf, 0x1e, 0xc6, 0x30, 0xf9, 0x65, 0x76, 0xb6,
++			     0x2c, 0x4b, 0x7b, 0x6c, 0x36, 0xb2, 0x9d, 0xeb,
++			     0x2c, 0xb0, 0x08, 0x46, 0x51, 0x75, 0x5c, 0x96 },
++		.public = { 0xff, 0xff, 0xff, 0xfb, 0xff, 0xff, 0xfb, 0xff,
++			    0xff, 0xdf, 0xff, 0xff, 0xdf, 0xff, 0xff, 0xff,
++			    0xfe, 0xff, 0xff, 0xfe, 0xff, 0xff, 0xf7, 0xff,
++			    0xff, 0xf7, 0xff, 0xff, 0xbf, 0xff, 0xff, 0x3f },
++		.result = { 0xbf, 0x9a, 0xff, 0xd0, 0x6b, 0x84, 0x40, 0x85,
++			    0x58, 0x64, 0x60, 0x96, 0x2e, 0xf2, 0x14, 0x6f,
++			    0xf3, 0xd4, 0x53, 0x3d, 0x94, 0x44, 0xaa, 0xb0,
++			    0x06, 0xeb, 0x88, 0xcc, 0x30, 0x54, 0x40, 0x7d },
++		.valid = true
++	},
++	/* wycheproof - edge case for public key */
++	{
++		.private = { 0x18, 0x8c, 0x4b, 0xc5, 0xb9, 0xc4, 0x4b, 0x38,
++			     0xbb, 0x65, 0x8b, 0x9b, 0x2a, 0xe8, 0x2d, 0x5b,
++			     0x01, 0x01, 0x5e, 0x09, 0x31, 0x84, 0xb1, 0x7c,
++			     0xb7, 0x86, 0x35, 0x03, 0xa7, 0x83, 0xe1, 0xbb },
++		.public = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x3f },
++		.result = { 0xd4, 0x80, 0xde, 0x04, 0xf6, 0x99, 0xcb, 0x3b,
++			    0xe0, 0x68, 0x4a, 0x9c, 0xc2, 0xe3, 0x12, 0x81,
++			    0xea, 0x0b, 0xc5, 0xa9, 0xdc, 0xc1, 0x57, 0xd3,
++			    0xd2, 0x01, 0x58, 0xd4, 0x6c, 0xa5, 0x24, 0x6d },
++		.valid = true
++	},
++	/* wycheproof - edge case for public key */
++	{
++		.private = { 0xe0, 0x6c, 0x11, 0xbb, 0x2e, 0x13, 0xce, 0x3d,
++			     0xc7, 0x67, 0x3f, 0x67, 0xf5, 0x48, 0x22, 0x42,
++			     0x90, 0x94, 0x23, 0xa9, 0xae, 0x95, 0xee, 0x98,
++			     0x6a, 0x98, 0x8d, 0x98, 0xfa, 0xee, 0x23, 0xa2 },
++		.public = { 0xff, 0xff, 0xff, 0xff, 0xfe, 0xff, 0xff, 0x7f,
++			    0xff, 0xff, 0xff, 0xff, 0xfe, 0xff, 0xff, 0x7f,
++			    0xff, 0xff, 0xff, 0xff, 0xfe, 0xff, 0xff, 0x7f,
++			    0xff, 0xff, 0xff, 0xff, 0xfe, 0xff, 0xff, 0x7f },
++		.result = { 0x4c, 0x44, 0x01, 0xcc, 0xe6, 0xb5, 0x1e, 0x4c,
++			    0xb1, 0x8f, 0x27, 0x90, 0x24, 0x6c, 0x9b, 0xf9,
++			    0x14, 0xdb, 0x66, 0x77, 0x50, 0xa1, 0xcb, 0x89,
++			    0x06, 0x90, 0x92, 0xaf, 0x07, 0x29, 0x22, 0x76 },
++		.valid = true
++	},
++	/* wycheproof - edge case for public key */
++	{
++		.private = { 0xc0, 0x65, 0x8c, 0x46, 0xdd, 0xe1, 0x81, 0x29,
++			     0x29, 0x38, 0x77, 0x53, 0x5b, 0x11, 0x62, 0xb6,
++			     0xf9, 0xf5, 0x41, 0x4a, 0x23, 0xcf, 0x4d, 0x2c,
++			     0xbc, 0x14, 0x0a, 0x4d, 0x99, 0xda, 0x2b, 0x8f },
++		.public = { 0xeb, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x7f },
++		.result = { 0x57, 0x8b, 0xa8, 0xcc, 0x2d, 0xbd, 0xc5, 0x75,
++			    0xaf, 0xcf, 0x9d, 0xf2, 0xb3, 0xee, 0x61, 0x89,
++			    0xf5, 0x33, 0x7d, 0x68, 0x54, 0xc7, 0x9b, 0x4c,
++			    0xe1, 0x65, 0xea, 0x12, 0x29, 0x3b, 0x3a, 0x0f },
++		.valid = true
++	},
++	/* wycheproof - public key with low order */
++	{
++		.private = { 0x10, 0x25, 0x5c, 0x92, 0x30, 0xa9, 0x7a, 0x30,
++			     0xa4, 0x58, 0xca, 0x28, 0x4a, 0x62, 0x96, 0x69,
++			     0x29, 0x3a, 0x31, 0x89, 0x0c, 0xda, 0x9d, 0x14,
++			     0x7f, 0xeb, 0xc7, 0xd1, 0xe2, 0x2d, 0x6b, 0xb1 },
++		.public = { 0xe0, 0xeb, 0x7a, 0x7c, 0x3b, 0x41, 0xb8, 0xae,
++			    0x16, 0x56, 0xe3, 0xfa, 0xf1, 0x9f, 0xc4, 0x6a,
++			    0xda, 0x09, 0x8d, 0xeb, 0x9c, 0x32, 0xb1, 0xfd,
++			    0x86, 0x62, 0x05, 0x16, 0x5f, 0x49, 0xb8, 0x00 },
++		.result = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
++		.valid = false
++	},
++	/* wycheproof - public key with low order */
++	{
++		.private = { 0x78, 0xf1, 0xe8, 0xed, 0xf1, 0x44, 0x81, 0xb3,
++			     0x89, 0x44, 0x8d, 0xac, 0x8f, 0x59, 0xc7, 0x0b,
++			     0x03, 0x8e, 0x7c, 0xf9, 0x2e, 0xf2, 0xc7, 0xef,
++			     0xf5, 0x7a, 0x72, 0x46, 0x6e, 0x11, 0x52, 0x96 },
++		.public = { 0x5f, 0x9c, 0x95, 0xbc, 0xa3, 0x50, 0x8c, 0x24,
++			    0xb1, 0xd0, 0xb1, 0x55, 0x9c, 0x83, 0xef, 0x5b,
++			    0x04, 0x44, 0x5c, 0xc4, 0x58, 0x1c, 0x8e, 0x86,
++			    0xd8, 0x22, 0x4e, 0xdd, 0xd0, 0x9f, 0x11, 0x57 },
++		.result = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
++		.valid = false
++	},
++	/* wycheproof - public key with low order */
++	{
++		.private = { 0xa0, 0xa0, 0x5a, 0x3e, 0x8f, 0x9f, 0x44, 0x20,
++			     0x4d, 0x5f, 0x80, 0x59, 0xa9, 0x4a, 0xc7, 0xdf,
++			     0xc3, 0x9a, 0x49, 0xac, 0x01, 0x6d, 0xd7, 0x43,
++			     0xdb, 0xfa, 0x43, 0xc5, 0xd6, 0x71, 0xfd, 0x88 },
++		.public = { 0xec, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x7f },
++		.result = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
++		.valid = false
++	},
++	/* wycheproof - public key with low order */
++	{
++		.private = { 0xd0, 0xdb, 0xb3, 0xed, 0x19, 0x06, 0x66, 0x3f,
++			     0x15, 0x42, 0x0a, 0xf3, 0x1f, 0x4e, 0xaf, 0x65,
++			     0x09, 0xd9, 0xa9, 0x94, 0x97, 0x23, 0x50, 0x06,
++			     0x05, 0xad, 0x7c, 0x1c, 0x6e, 0x74, 0x50, 0xa9 },
++		.public = { 0xed, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x7f },
++		.result = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
++		.valid = false
++	},
++	/* wycheproof - public key with low order */
++	{
++		.private = { 0xc0, 0xb1, 0xd0, 0xeb, 0x22, 0xb2, 0x44, 0xfe,
++			     0x32, 0x91, 0x14, 0x00, 0x72, 0xcd, 0xd9, 0xd9,
++			     0x89, 0xb5, 0xf0, 0xec, 0xd9, 0x6c, 0x10, 0x0f,
++			     0xeb, 0x5b, 0xca, 0x24, 0x1c, 0x1d, 0x9f, 0x8f },
++		.public = { 0xee, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x7f },
++		.result = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
++		.valid = false
++	},
++	/* wycheproof - public key with low order */
++	{
++		.private = { 0x48, 0x0b, 0xf4, 0x5f, 0x59, 0x49, 0x42, 0xa8,
++			     0xbc, 0x0f, 0x33, 0x53, 0xc6, 0xe8, 0xb8, 0x85,
++			     0x3d, 0x77, 0xf3, 0x51, 0xf1, 0xc2, 0xca, 0x6c,
++			     0x2d, 0x1a, 0xbf, 0x8a, 0x00, 0xb4, 0x22, 0x9c },
++		.public = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80 },
++		.result = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
++		.valid = false
++	},
++	/* wycheproof - public key with low order */
++	{
++		.private = { 0x30, 0xf9, 0x93, 0xfc, 0xf8, 0x51, 0x4f, 0xc8,
++			     0x9b, 0xd8, 0xdb, 0x14, 0xcd, 0x43, 0xba, 0x0d,
++			     0x4b, 0x25, 0x30, 0xe7, 0x3c, 0x42, 0x76, 0xa0,
++			     0x5e, 0x1b, 0x14, 0x5d, 0x42, 0x0c, 0xed, 0xb4 },
++		.public = { 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80 },
++		.result = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
++		.valid = false
++	},
++	/* wycheproof - public key with low order */
++	{
++		.private = { 0xc0, 0x49, 0x74, 0xb7, 0x58, 0x38, 0x0e, 0x2a,
++			     0x5b, 0x5d, 0xf6, 0xeb, 0x09, 0xbb, 0x2f, 0x6b,
++			     0x34, 0x34, 0xf9, 0x82, 0x72, 0x2a, 0x8e, 0x67,
++			     0x6d, 0x3d, 0xa2, 0x51, 0xd1, 0xb3, 0xde, 0x83 },
++		.public = { 0xe0, 0xeb, 0x7a, 0x7c, 0x3b, 0x41, 0xb8, 0xae,
++			    0x16, 0x56, 0xe3, 0xfa, 0xf1, 0x9f, 0xc4, 0x6a,
++			    0xda, 0x09, 0x8d, 0xeb, 0x9c, 0x32, 0xb1, 0xfd,
++			    0x86, 0x62, 0x05, 0x16, 0x5f, 0x49, 0xb8, 0x80 },
++		.result = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
++		.valid = false
++	},
++	/* wycheproof - public key with low order */
++	{
++		.private = { 0x50, 0x2a, 0x31, 0x37, 0x3d, 0xb3, 0x24, 0x46,
++			     0x84, 0x2f, 0xe5, 0xad, 0xd3, 0xe0, 0x24, 0x02,
++			     0x2e, 0xa5, 0x4f, 0x27, 0x41, 0x82, 0xaf, 0xc3,
++			     0xd9, 0xf1, 0xbb, 0x3d, 0x39, 0x53, 0x4e, 0xb5 },
++		.public = { 0x5f, 0x9c, 0x95, 0xbc, 0xa3, 0x50, 0x8c, 0x24,
++			    0xb1, 0xd0, 0xb1, 0x55, 0x9c, 0x83, 0xef, 0x5b,
++			    0x04, 0x44, 0x5c, 0xc4, 0x58, 0x1c, 0x8e, 0x86,
++			    0xd8, 0x22, 0x4e, 0xdd, 0xd0, 0x9f, 0x11, 0xd7 },
++		.result = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
++		.valid = false
++	},
++	/* wycheproof - public key with low order */
++	{
++		.private = { 0x90, 0xfa, 0x64, 0x17, 0xb0, 0xe3, 0x70, 0x30,
++			     0xfd, 0x6e, 0x43, 0xef, 0xf2, 0xab, 0xae, 0xf1,
++			     0x4c, 0x67, 0x93, 0x11, 0x7a, 0x03, 0x9c, 0xf6,
++			     0x21, 0x31, 0x8b, 0xa9, 0x0f, 0x4e, 0x98, 0xbe },
++		.public = { 0xec, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff },
++		.result = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
++		.valid = false
++	},
++	/* wycheproof - public key with low order */
++	{
++		.private = { 0x78, 0xad, 0x3f, 0x26, 0x02, 0x7f, 0x1c, 0x9f,
++			     0xdd, 0x97, 0x5a, 0x16, 0x13, 0xb9, 0x47, 0x77,
++			     0x9b, 0xad, 0x2c, 0xf2, 0xb7, 0x41, 0xad, 0xe0,
++			     0x18, 0x40, 0x88, 0x5a, 0x30, 0xbb, 0x97, 0x9c },
++		.public = { 0xed, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff },
++		.result = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
++		.valid = false
++	},
++	/* wycheproof - public key with low order */
++	{
++		.private = { 0x98, 0xe2, 0x3d, 0xe7, 0xb1, 0xe0, 0x92, 0x6e,
++			     0xd9, 0xc8, 0x7e, 0x7b, 0x14, 0xba, 0xf5, 0x5f,
++			     0x49, 0x7a, 0x1d, 0x70, 0x96, 0xf9, 0x39, 0x77,
++			     0x68, 0x0e, 0x44, 0xdc, 0x1c, 0x7b, 0x7b, 0x8b },
++		.public = { 0xee, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff },
++		.result = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
++		.valid = false
++	},
++	/* wycheproof - public key >= p */
++	{
++		.private = { 0xf0, 0x1e, 0x48, 0xda, 0xfa, 0xc9, 0xd7, 0xbc,
++			     0xf5, 0x89, 0xcb, 0xc3, 0x82, 0xc8, 0x78, 0xd1,
++			     0x8b, 0xda, 0x35, 0x50, 0x58, 0x9f, 0xfb, 0x5d,
++			     0x50, 0xb5, 0x23, 0xbe, 0xbe, 0x32, 0x9d, 0xae },
++		.public = { 0xef, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x7f },
++		.result = { 0xbd, 0x36, 0xa0, 0x79, 0x0e, 0xb8, 0x83, 0x09,
++			    0x8c, 0x98, 0x8b, 0x21, 0x78, 0x67, 0x73, 0xde,
++			    0x0b, 0x3a, 0x4d, 0xf1, 0x62, 0x28, 0x2c, 0xf1,
++			    0x10, 0xde, 0x18, 0xdd, 0x48, 0x4c, 0xe7, 0x4b },
++		.valid = true
++	},
++	/* wycheproof - public key >= p */
++	{
++		.private = { 0x28, 0x87, 0x96, 0xbc, 0x5a, 0xff, 0x4b, 0x81,
++			     0xa3, 0x75, 0x01, 0x75, 0x7b, 0xc0, 0x75, 0x3a,
++			     0x3c, 0x21, 0x96, 0x47, 0x90, 0xd3, 0x86, 0x99,
++			     0x30, 0x8d, 0xeb, 0xc1, 0x7a, 0x6e, 0xaf, 0x8d },
++		.public = { 0xf0, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x7f },
++		.result = { 0xb4, 0xe0, 0xdd, 0x76, 0xda, 0x7b, 0x07, 0x17,
++			    0x28, 0xb6, 0x1f, 0x85, 0x67, 0x71, 0xaa, 0x35,
++			    0x6e, 0x57, 0xed, 0xa7, 0x8a, 0x5b, 0x16, 0x55,
++			    0xcc, 0x38, 0x20, 0xfb, 0x5f, 0x85, 0x4c, 0x5c },
++		.valid = true
++	},
++	/* wycheproof - public key >= p */
++	{
++		.private = { 0x98, 0xdf, 0x84, 0x5f, 0x66, 0x51, 0xbf, 0x11,
++			     0x38, 0x22, 0x1f, 0x11, 0x90, 0x41, 0xf7, 0x2b,
++			     0x6d, 0xbc, 0x3c, 0x4a, 0xce, 0x71, 0x43, 0xd9,
++			     0x9f, 0xd5, 0x5a, 0xd8, 0x67, 0x48, 0x0d, 0xa8 },
++		.public = { 0xf1, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x7f },
++		.result = { 0x6f, 0xdf, 0x6c, 0x37, 0x61, 0x1d, 0xbd, 0x53,
++			    0x04, 0xdc, 0x0f, 0x2e, 0xb7, 0xc9, 0x51, 0x7e,
++			    0xb3, 0xc5, 0x0e, 0x12, 0xfd, 0x05, 0x0a, 0xc6,
++			    0xde, 0xc2, 0x70, 0x71, 0xd4, 0xbf, 0xc0, 0x34 },
++		.valid = true
++	},
++	/* wycheproof - public key >= p */
++	{
++		.private = { 0xf0, 0x94, 0x98, 0xe4, 0x6f, 0x02, 0xf8, 0x78,
++			     0x82, 0x9e, 0x78, 0xb8, 0x03, 0xd3, 0x16, 0xa2,
++			     0xed, 0x69, 0x5d, 0x04, 0x98, 0xa0, 0x8a, 0xbd,
++			     0xf8, 0x27, 0x69, 0x30, 0xe2, 0x4e, 0xdc, 0xb0 },
++		.public = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x7f },
++		.result = { 0x4c, 0x8f, 0xc4, 0xb1, 0xc6, 0xab, 0x88, 0xfb,
++			    0x21, 0xf1, 0x8f, 0x6d, 0x4c, 0x81, 0x02, 0x40,
++			    0xd4, 0xe9, 0x46, 0x51, 0xba, 0x44, 0xf7, 0xa2,
++			    0xc8, 0x63, 0xce, 0xc7, 0xdc, 0x56, 0x60, 0x2d },
++		.valid = true
++	},
++	/* wycheproof - public key >= p */
++	{
++		.private = { 0x18, 0x13, 0xc1, 0x0a, 0x5c, 0x7f, 0x21, 0xf9,
++			     0x6e, 0x17, 0xf2, 0x88, 0xc0, 0xcc, 0x37, 0x60,
++			     0x7c, 0x04, 0xc5, 0xf5, 0xae, 0xa2, 0xdb, 0x13,
++			     0x4f, 0x9e, 0x2f, 0xfc, 0x66, 0xbd, 0x9d, 0xb8 },
++		.public = { 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80 },
++		.result = { 0x1c, 0xd0, 0xb2, 0x82, 0x67, 0xdc, 0x54, 0x1c,
++			    0x64, 0x2d, 0x6d, 0x7d, 0xca, 0x44, 0xa8, 0xb3,
++			    0x8a, 0x63, 0x73, 0x6e, 0xef, 0x5c, 0x4e, 0x65,
++			    0x01, 0xff, 0xbb, 0xb1, 0x78, 0x0c, 0x03, 0x3c },
++		.valid = true
++	},
++	/* wycheproof - public key >= p */
++	{
++		.private = { 0x78, 0x57, 0xfb, 0x80, 0x86, 0x53, 0x64, 0x5a,
++			     0x0b, 0xeb, 0x13, 0x8a, 0x64, 0xf5, 0xf4, 0xd7,
++			     0x33, 0xa4, 0x5e, 0xa8, 0x4c, 0x3c, 0xda, 0x11,
++			     0xa9, 0xc0, 0x6f, 0x7e, 0x71, 0x39, 0x14, 0x9e },
++		.public = { 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80 },
++		.result = { 0x87, 0x55, 0xbe, 0x01, 0xc6, 0x0a, 0x7e, 0x82,
++			    0x5c, 0xff, 0x3e, 0x0e, 0x78, 0xcb, 0x3a, 0xa4,
++			    0x33, 0x38, 0x61, 0x51, 0x6a, 0xa5, 0x9b, 0x1c,
++			    0x51, 0xa8, 0xb2, 0xa5, 0x43, 0xdf, 0xa8, 0x22 },
++		.valid = true
++	},
++	/* wycheproof - public key >= p */
++	{
++		.private = { 0xe0, 0x3a, 0xa8, 0x42, 0xe2, 0xab, 0xc5, 0x6e,
++			     0x81, 0xe8, 0x7b, 0x8b, 0x9f, 0x41, 0x7b, 0x2a,
++			     0x1e, 0x59, 0x13, 0xc7, 0x23, 0xee, 0xd2, 0x8d,
++			     0x75, 0x2f, 0x8d, 0x47, 0xa5, 0x9f, 0x49, 0x8f },
++		.public = { 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80 },
++		.result = { 0x54, 0xc9, 0xa1, 0xed, 0x95, 0xe5, 0x46, 0xd2,
++			    0x78, 0x22, 0xa3, 0x60, 0x93, 0x1d, 0xda, 0x60,
++			    0xa1, 0xdf, 0x04, 0x9d, 0xa6, 0xf9, 0x04, 0x25,
++			    0x3c, 0x06, 0x12, 0xbb, 0xdc, 0x08, 0x74, 0x76 },
++		.valid = true
++	},
++	/* wycheproof - public key >= p */
++	{
++		.private = { 0xf8, 0xf7, 0x07, 0xb7, 0x99, 0x9b, 0x18, 0xcb,
++			     0x0d, 0x6b, 0x96, 0x12, 0x4f, 0x20, 0x45, 0x97,
++			     0x2c, 0xa2, 0x74, 0xbf, 0xc1, 0x54, 0xad, 0x0c,
++			     0x87, 0x03, 0x8c, 0x24, 0xc6, 0xd0, 0xd4, 0xb2 },
++		.public = { 0xda, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff },
++		.result = { 0xcc, 0x1f, 0x40, 0xd7, 0x43, 0xcd, 0xc2, 0x23,
++			    0x0e, 0x10, 0x43, 0xda, 0xba, 0x8b, 0x75, 0xe8,
++			    0x10, 0xf1, 0xfb, 0xab, 0x7f, 0x25, 0x52, 0x69,
++			    0xbd, 0x9e, 0xbb, 0x29, 0xe6, 0xbf, 0x49, 0x4f },
++		.valid = true
++	},
++	/* wycheproof - public key >= p */
++	{
++		.private = { 0xa0, 0x34, 0xf6, 0x84, 0xfa, 0x63, 0x1e, 0x1a,
++			     0x34, 0x81, 0x18, 0xc1, 0xce, 0x4c, 0x98, 0x23,
++			     0x1f, 0x2d, 0x9e, 0xec, 0x9b, 0xa5, 0x36, 0x5b,
++			     0x4a, 0x05, 0xd6, 0x9a, 0x78, 0x5b, 0x07, 0x96 },
++		.public = { 0xdb, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff },
++		.result = { 0x54, 0x99, 0x8e, 0xe4, 0x3a, 0x5b, 0x00, 0x7b,
++			    0xf4, 0x99, 0xf0, 0x78, 0xe7, 0x36, 0x52, 0x44,
++			    0x00, 0xa8, 0xb5, 0xc7, 0xe9, 0xb9, 0xb4, 0x37,
++			    0x71, 0x74, 0x8c, 0x7c, 0xdf, 0x88, 0x04, 0x12 },
++		.valid = true
++	},
++	/* wycheproof - public key >= p */
++	{
++		.private = { 0x30, 0xb6, 0xc6, 0xa0, 0xf2, 0xff, 0xa6, 0x80,
++			     0x76, 0x8f, 0x99, 0x2b, 0xa8, 0x9e, 0x15, 0x2d,
++			     0x5b, 0xc9, 0x89, 0x3d, 0x38, 0xc9, 0x11, 0x9b,
++			     0xe4, 0xf7, 0x67, 0xbf, 0xab, 0x6e, 0x0c, 0xa5 },
++		.public = { 0xdc, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff },
++		.result = { 0xea, 0xd9, 0xb3, 0x8e, 0xfd, 0xd7, 0x23, 0x63,
++			    0x79, 0x34, 0xe5, 0x5a, 0xb7, 0x17, 0xa7, 0xae,
++			    0x09, 0xeb, 0x86, 0xa2, 0x1d, 0xc3, 0x6a, 0x3f,
++			    0xee, 0xb8, 0x8b, 0x75, 0x9e, 0x39, 0x1e, 0x09 },
++		.valid = true
++	},
++	/* wycheproof - public key >= p */
++	{
++		.private = { 0x90, 0x1b, 0x9d, 0xcf, 0x88, 0x1e, 0x01, 0xe0,
++			     0x27, 0x57, 0x50, 0x35, 0xd4, 0x0b, 0x43, 0xbd,
++			     0xc1, 0xc5, 0x24, 0x2e, 0x03, 0x08, 0x47, 0x49,
++			     0x5b, 0x0c, 0x72, 0x86, 0x46, 0x9b, 0x65, 0x91 },
++		.public = { 0xea, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff },
++		.result = { 0x60, 0x2f, 0xf4, 0x07, 0x89, 0xb5, 0x4b, 0x41,
++			    0x80, 0x59, 0x15, 0xfe, 0x2a, 0x62, 0x21, 0xf0,
++			    0x7a, 0x50, 0xff, 0xc2, 0xc3, 0xfc, 0x94, 0xcf,
++			    0x61, 0xf1, 0x3d, 0x79, 0x04, 0xe8, 0x8e, 0x0e },
++		.valid = true
++	},
++	/* wycheproof - public key >= p */
++	{
++		.private = { 0x80, 0x46, 0x67, 0x7c, 0x28, 0xfd, 0x82, 0xc9,
++			     0xa1, 0xbd, 0xb7, 0x1a, 0x1a, 0x1a, 0x34, 0xfa,
++			     0xba, 0x12, 0x25, 0xe2, 0x50, 0x7f, 0xe3, 0xf5,
++			     0x4d, 0x10, 0xbd, 0x5b, 0x0d, 0x86, 0x5f, 0x8e },
++		.public = { 0xeb, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff },
++		.result = { 0xe0, 0x0a, 0xe8, 0xb1, 0x43, 0x47, 0x12, 0x47,
++			    0xba, 0x24, 0xf1, 0x2c, 0x88, 0x55, 0x36, 0xc3,
++			    0xcb, 0x98, 0x1b, 0x58, 0xe1, 0xe5, 0x6b, 0x2b,
++			    0xaf, 0x35, 0xc1, 0x2a, 0xe1, 0xf7, 0x9c, 0x26 },
++		.valid = true
++	},
++	/* wycheproof - public key >= p */
++	{
++		.private = { 0x60, 0x2f, 0x7e, 0x2f, 0x68, 0xa8, 0x46, 0xb8,
++			     0x2c, 0xc2, 0x69, 0xb1, 0xd4, 0x8e, 0x93, 0x98,
++			     0x86, 0xae, 0x54, 0xfd, 0x63, 0x6c, 0x1f, 0xe0,
++			     0x74, 0xd7, 0x10, 0x12, 0x7d, 0x47, 0x24, 0x91 },
++		.public = { 0xef, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff },
++		.result = { 0x98, 0xcb, 0x9b, 0x50, 0xdd, 0x3f, 0xc2, 0xb0,
++			    0xd4, 0xf2, 0xd2, 0xbf, 0x7c, 0x5c, 0xfd, 0xd1,
++			    0x0c, 0x8f, 0xcd, 0x31, 0xfc, 0x40, 0xaf, 0x1a,
++			    0xd4, 0x4f, 0x47, 0xc1, 0x31, 0x37, 0x63, 0x62 },
++		.valid = true
++	},
++	/* wycheproof - public key >= p */
++	{
++		.private = { 0x60, 0x88, 0x7b, 0x3d, 0xc7, 0x24, 0x43, 0x02,
++			     0x6e, 0xbe, 0xdb, 0xbb, 0xb7, 0x06, 0x65, 0xf4,
++			     0x2b, 0x87, 0xad, 0xd1, 0x44, 0x0e, 0x77, 0x68,
++			     0xfb, 0xd7, 0xe8, 0xe2, 0xce, 0x5f, 0x63, 0x9d },
++		.public = { 0xf0, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff },
++		.result = { 0x38, 0xd6, 0x30, 0x4c, 0x4a, 0x7e, 0x6d, 0x9f,
++			    0x79, 0x59, 0x33, 0x4f, 0xb5, 0x24, 0x5b, 0xd2,
++			    0xc7, 0x54, 0x52, 0x5d, 0x4c, 0x91, 0xdb, 0x95,
++			    0x02, 0x06, 0x92, 0x62, 0x34, 0xc1, 0xf6, 0x33 },
++		.valid = true
++	},
++	/* wycheproof - public key >= p */
++	{
++		.private = { 0x78, 0xd3, 0x1d, 0xfa, 0x85, 0x44, 0x97, 0xd7,
++			     0x2d, 0x8d, 0xef, 0x8a, 0x1b, 0x7f, 0xb0, 0x06,
++			     0xce, 0xc2, 0xd8, 0xc4, 0x92, 0x46, 0x47, 0xc9,
++			     0x38, 0x14, 0xae, 0x56, 0xfa, 0xed, 0xa4, 0x95 },
++		.public = { 0xf1, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff },
++		.result = { 0x78, 0x6c, 0xd5, 0x49, 0x96, 0xf0, 0x14, 0xa5,
++			    0xa0, 0x31, 0xec, 0x14, 0xdb, 0x81, 0x2e, 0xd0,
++			    0x83, 0x55, 0x06, 0x1f, 0xdb, 0x5d, 0xe6, 0x80,
++			    0xa8, 0x00, 0xac, 0x52, 0x1f, 0x31, 0x8e, 0x23 },
++		.valid = true
++	},
++	/* wycheproof - public key >= p */
++	{
++		.private = { 0xc0, 0x4c, 0x5b, 0xae, 0xfa, 0x83, 0x02, 0xdd,
++			     0xde, 0xd6, 0xa4, 0xbb, 0x95, 0x77, 0x61, 0xb4,
++			     0xeb, 0x97, 0xae, 0xfa, 0x4f, 0xc3, 0xb8, 0x04,
++			     0x30, 0x85, 0xf9, 0x6a, 0x56, 0x59, 0xb3, 0xa5 },
++		.public = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff },
++		.result = { 0x29, 0xae, 0x8b, 0xc7, 0x3e, 0x9b, 0x10, 0xa0,
++			    0x8b, 0x4f, 0x68, 0x1c, 0x43, 0xc3, 0xe0, 0xac,
++			    0x1a, 0x17, 0x1d, 0x31, 0xb3, 0x8f, 0x1a, 0x48,
++			    0xef, 0xba, 0x29, 0xae, 0x63, 0x9e, 0xa1, 0x34 },
++		.valid = true
++	},
++	/* wycheproof - RFC 7748 */
++	{
++		.private = { 0xa0, 0x46, 0xe3, 0x6b, 0xf0, 0x52, 0x7c, 0x9d,
++			     0x3b, 0x16, 0x15, 0x4b, 0x82, 0x46, 0x5e, 0xdd,
++			     0x62, 0x14, 0x4c, 0x0a, 0xc1, 0xfc, 0x5a, 0x18,
++			     0x50, 0x6a, 0x22, 0x44, 0xba, 0x44, 0x9a, 0x44 },
++		.public = { 0xe6, 0xdb, 0x68, 0x67, 0x58, 0x30, 0x30, 0xdb,
++			    0x35, 0x94, 0xc1, 0xa4, 0x24, 0xb1, 0x5f, 0x7c,
++			    0x72, 0x66, 0x24, 0xec, 0x26, 0xb3, 0x35, 0x3b,
++			    0x10, 0xa9, 0x03, 0xa6, 0xd0, 0xab, 0x1c, 0x4c },
++		.result = { 0xc3, 0xda, 0x55, 0x37, 0x9d, 0xe9, 0xc6, 0x90,
++			    0x8e, 0x94, 0xea, 0x4d, 0xf2, 0x8d, 0x08, 0x4f,
++			    0x32, 0xec, 0xcf, 0x03, 0x49, 0x1c, 0x71, 0xf7,
++			    0x54, 0xb4, 0x07, 0x55, 0x77, 0xa2, 0x85, 0x52 },
++		.valid = true
++	},
++	/* wycheproof - RFC 7748 */
++	{
++		.private = { 0x48, 0x66, 0xe9, 0xd4, 0xd1, 0xb4, 0x67, 0x3c,
++			     0x5a, 0xd2, 0x26, 0x91, 0x95, 0x7d, 0x6a, 0xf5,
++			     0xc1, 0x1b, 0x64, 0x21, 0xe0, 0xea, 0x01, 0xd4,
++			     0x2c, 0xa4, 0x16, 0x9e, 0x79, 0x18, 0xba, 0x4d },
++		.public = { 0xe5, 0x21, 0x0f, 0x12, 0x78, 0x68, 0x11, 0xd3,
++			    0xf4, 0xb7, 0x95, 0x9d, 0x05, 0x38, 0xae, 0x2c,
++			    0x31, 0xdb, 0xe7, 0x10, 0x6f, 0xc0, 0x3c, 0x3e,
++			    0xfc, 0x4c, 0xd5, 0x49, 0xc7, 0x15, 0xa4, 0x13 },
++		.result = { 0x95, 0xcb, 0xde, 0x94, 0x76, 0xe8, 0x90, 0x7d,
++			    0x7a, 0xad, 0xe4, 0x5c, 0xb4, 0xb8, 0x73, 0xf8,
++			    0x8b, 0x59, 0x5a, 0x68, 0x79, 0x9f, 0xa1, 0x52,
++			    0xe6, 0xf8, 0xf7, 0x64, 0x7a, 0xac, 0x79, 0x57 },
++		.valid = true
++	},
++	/* wycheproof - edge case for shared secret */
++	{
++		.private = { 0xa0, 0xa4, 0xf1, 0x30, 0xb9, 0x8a, 0x5b, 0xe4,
++			     0xb1, 0xce, 0xdb, 0x7c, 0xb8, 0x55, 0x84, 0xa3,
++			     0x52, 0x0e, 0x14, 0x2d, 0x47, 0x4d, 0xc9, 0xcc,
++			     0xb9, 0x09, 0xa0, 0x73, 0xa9, 0x76, 0xbf, 0x63 },
++		.public = { 0x0a, 0xb4, 0xe7, 0x63, 0x80, 0xd8, 0x4d, 0xde,
++			    0x4f, 0x68, 0x33, 0xc5, 0x8f, 0x2a, 0x9f, 0xb8,
++			    0xf8, 0x3b, 0xb0, 0x16, 0x9b, 0x17, 0x2b, 0xe4,
++			    0xb6, 0xe0, 0x59, 0x28, 0x87, 0x74, 0x1a, 0x36 },
++		.result = { 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
++		.valid = true
++	},
++	/* wycheproof - edge case for shared secret */
++	{
++		.private = { 0xa0, 0xa4, 0xf1, 0x30, 0xb9, 0x8a, 0x5b, 0xe4,
++			     0xb1, 0xce, 0xdb, 0x7c, 0xb8, 0x55, 0x84, 0xa3,
++			     0x52, 0x0e, 0x14, 0x2d, 0x47, 0x4d, 0xc9, 0xcc,
++			     0xb9, 0x09, 0xa0, 0x73, 0xa9, 0x76, 0xbf, 0x63 },
++		.public = { 0x89, 0xe1, 0x0d, 0x57, 0x01, 0xb4, 0x33, 0x7d,
++			    0x2d, 0x03, 0x21, 0x81, 0x53, 0x8b, 0x10, 0x64,
++			    0xbd, 0x40, 0x84, 0x40, 0x1c, 0xec, 0xa1, 0xfd,
++			    0x12, 0x66, 0x3a, 0x19, 0x59, 0x38, 0x80, 0x00 },
++		.result = { 0x09, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
++		.valid = true
++	},
++	/* wycheproof - edge case for shared secret */
++	{
++		.private = { 0xa0, 0xa4, 0xf1, 0x30, 0xb9, 0x8a, 0x5b, 0xe4,
++			     0xb1, 0xce, 0xdb, 0x7c, 0xb8, 0x55, 0x84, 0xa3,
++			     0x52, 0x0e, 0x14, 0x2d, 0x47, 0x4d, 0xc9, 0xcc,
++			     0xb9, 0x09, 0xa0, 0x73, 0xa9, 0x76, 0xbf, 0x63 },
++		.public = { 0x2b, 0x55, 0xd3, 0xaa, 0x4a, 0x8f, 0x80, 0xc8,
++			    0xc0, 0xb2, 0xae, 0x5f, 0x93, 0x3e, 0x85, 0xaf,
++			    0x49, 0xbe, 0xac, 0x36, 0xc2, 0xfa, 0x73, 0x94,
++			    0xba, 0xb7, 0x6c, 0x89, 0x33, 0xf8, 0xf8, 0x1d },
++		.result = { 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
++		.valid = true
++	},
++	/* wycheproof - edge case for shared secret */
++	{
++		.private = { 0xa0, 0xa4, 0xf1, 0x30, 0xb9, 0x8a, 0x5b, 0xe4,
++			     0xb1, 0xce, 0xdb, 0x7c, 0xb8, 0x55, 0x84, 0xa3,
++			     0x52, 0x0e, 0x14, 0x2d, 0x47, 0x4d, 0xc9, 0xcc,
++			     0xb9, 0x09, 0xa0, 0x73, 0xa9, 0x76, 0xbf, 0x63 },
++		.public = { 0x63, 0xe5, 0xb1, 0xfe, 0x96, 0x01, 0xfe, 0x84,
++			    0x38, 0x5d, 0x88, 0x66, 0xb0, 0x42, 0x12, 0x62,
++			    0xf7, 0x8f, 0xbf, 0xa5, 0xaf, 0xf9, 0x58, 0x5e,
++			    0x62, 0x66, 0x79, 0xb1, 0x85, 0x47, 0xd9, 0x59 },
++		.result = { 0xfe, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x3f },
++		.valid = true
++	},
++	/* wycheproof - edge case for shared secret */
++	{
++		.private = { 0xa0, 0xa4, 0xf1, 0x30, 0xb9, 0x8a, 0x5b, 0xe4,
++			     0xb1, 0xce, 0xdb, 0x7c, 0xb8, 0x55, 0x84, 0xa3,
++			     0x52, 0x0e, 0x14, 0x2d, 0x47, 0x4d, 0xc9, 0xcc,
++			     0xb9, 0x09, 0xa0, 0x73, 0xa9, 0x76, 0xbf, 0x63 },
++		.public = { 0xe4, 0x28, 0xf3, 0xda, 0xc1, 0x78, 0x09, 0xf8,
++			    0x27, 0xa5, 0x22, 0xce, 0x32, 0x35, 0x50, 0x58,
++			    0xd0, 0x73, 0x69, 0x36, 0x4a, 0xa7, 0x89, 0x02,
++			    0xee, 0x10, 0x13, 0x9b, 0x9f, 0x9d, 0xd6, 0x53 },
++		.result = { 0xfc, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x3f },
++		.valid = true
++	},
++	/* wycheproof - edge case for shared secret */
++	{
++		.private = { 0xa0, 0xa4, 0xf1, 0x30, 0xb9, 0x8a, 0x5b, 0xe4,
++			     0xb1, 0xce, 0xdb, 0x7c, 0xb8, 0x55, 0x84, 0xa3,
++			     0x52, 0x0e, 0x14, 0x2d, 0x47, 0x4d, 0xc9, 0xcc,
++			     0xb9, 0x09, 0xa0, 0x73, 0xa9, 0x76, 0xbf, 0x63 },
++		.public = { 0xb3, 0xb5, 0x0e, 0x3e, 0xd3, 0xa4, 0x07, 0xb9,
++			    0x5d, 0xe9, 0x42, 0xef, 0x74, 0x57, 0x5b, 0x5a,
++			    0xb8, 0xa1, 0x0c, 0x09, 0xee, 0x10, 0x35, 0x44,
++			    0xd6, 0x0b, 0xdf, 0xed, 0x81, 0x38, 0xab, 0x2b },
++		.result = { 0xf9, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x3f },
++		.valid = true
++	},
++	/* wycheproof - edge case for shared secret */
++	{
++		.private = { 0xa0, 0xa4, 0xf1, 0x30, 0xb9, 0x8a, 0x5b, 0xe4,
++			     0xb1, 0xce, 0xdb, 0x7c, 0xb8, 0x55, 0x84, 0xa3,
++			     0x52, 0x0e, 0x14, 0x2d, 0x47, 0x4d, 0xc9, 0xcc,
++			     0xb9, 0x09, 0xa0, 0x73, 0xa9, 0x76, 0xbf, 0x63 },
++		.public = { 0x21, 0x3f, 0xff, 0xe9, 0x3d, 0x5e, 0xa8, 0xcd,
++			    0x24, 0x2e, 0x46, 0x28, 0x44, 0x02, 0x99, 0x22,
++			    0xc4, 0x3c, 0x77, 0xc9, 0xe3, 0xe4, 0x2f, 0x56,
++			    0x2f, 0x48, 0x5d, 0x24, 0xc5, 0x01, 0xa2, 0x0b },
++		.result = { 0xf3, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x3f },
++		.valid = true
++	},
++	/* wycheproof - edge case for shared secret */
++	{
++		.private = { 0xa0, 0xa4, 0xf1, 0x30, 0xb9, 0x8a, 0x5b, 0xe4,
++			     0xb1, 0xce, 0xdb, 0x7c, 0xb8, 0x55, 0x84, 0xa3,
++			     0x52, 0x0e, 0x14, 0x2d, 0x47, 0x4d, 0xc9, 0xcc,
++			     0xb9, 0x09, 0xa0, 0x73, 0xa9, 0x76, 0xbf, 0x63 },
++		.public = { 0x91, 0xb2, 0x32, 0xa1, 0x78, 0xb3, 0xcd, 0x53,
++			    0x09, 0x32, 0x44, 0x1e, 0x61, 0x39, 0x41, 0x8f,
++			    0x72, 0x17, 0x22, 0x92, 0xf1, 0xda, 0x4c, 0x18,
++			    0x34, 0xfc, 0x5e, 0xbf, 0xef, 0xb5, 0x1e, 0x3f },
++		.result = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x03 },
++		.valid = true
++	},
++	/* wycheproof - edge case for shared secret */
++	{
++		.private = { 0xa0, 0xa4, 0xf1, 0x30, 0xb9, 0x8a, 0x5b, 0xe4,
++			     0xb1, 0xce, 0xdb, 0x7c, 0xb8, 0x55, 0x84, 0xa3,
++			     0x52, 0x0e, 0x14, 0x2d, 0x47, 0x4d, 0xc9, 0xcc,
++			     0xb9, 0x09, 0xa0, 0x73, 0xa9, 0x76, 0xbf, 0x63 },
++		.public = { 0x04, 0x5c, 0x6e, 0x11, 0xc5, 0xd3, 0x32, 0x55,
++			    0x6c, 0x78, 0x22, 0xfe, 0x94, 0xeb, 0xf8, 0x9b,
++			    0x56, 0xa3, 0x87, 0x8d, 0xc2, 0x7c, 0xa0, 0x79,
++			    0x10, 0x30, 0x58, 0x84, 0x9f, 0xab, 0xcb, 0x4f },
++		.result = { 0xe5, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x7f },
++		.valid = true
++	},
++	/* wycheproof - edge case for shared secret */
++	{
++		.private = { 0xa0, 0xa4, 0xf1, 0x30, 0xb9, 0x8a, 0x5b, 0xe4,
++			     0xb1, 0xce, 0xdb, 0x7c, 0xb8, 0x55, 0x84, 0xa3,
++			     0x52, 0x0e, 0x14, 0x2d, 0x47, 0x4d, 0xc9, 0xcc,
++			     0xb9, 0x09, 0xa0, 0x73, 0xa9, 0x76, 0xbf, 0x63 },
++		.public = { 0x1c, 0xa2, 0x19, 0x0b, 0x71, 0x16, 0x35, 0x39,
++			    0x06, 0x3c, 0x35, 0x77, 0x3b, 0xda, 0x0c, 0x9c,
++			    0x92, 0x8e, 0x91, 0x36, 0xf0, 0x62, 0x0a, 0xeb,
++			    0x09, 0x3f, 0x09, 0x91, 0x97, 0xb7, 0xf7, 0x4e },
++		.result = { 0xe3, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x7f },
++		.valid = true
++	},
++	/* wycheproof - edge case for shared secret */
++	{
++		.private = { 0xa0, 0xa4, 0xf1, 0x30, 0xb9, 0x8a, 0x5b, 0xe4,
++			     0xb1, 0xce, 0xdb, 0x7c, 0xb8, 0x55, 0x84, 0xa3,
++			     0x52, 0x0e, 0x14, 0x2d, 0x47, 0x4d, 0xc9, 0xcc,
++			     0xb9, 0x09, 0xa0, 0x73, 0xa9, 0x76, 0xbf, 0x63 },
++		.public = { 0xf7, 0x6e, 0x90, 0x10, 0xac, 0x33, 0xc5, 0x04,
++			    0x3b, 0x2d, 0x3b, 0x76, 0xa8, 0x42, 0x17, 0x10,
++			    0x00, 0xc4, 0x91, 0x62, 0x22, 0xe9, 0xe8, 0x58,
++			    0x97, 0xa0, 0xae, 0xc7, 0xf6, 0x35, 0x0b, 0x3c },
++		.result = { 0xdd, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x7f },
++		.valid = true
++	},
++	/* wycheproof - edge case for shared secret */
++	{
++		.private = { 0xa0, 0xa4, 0xf1, 0x30, 0xb9, 0x8a, 0x5b, 0xe4,
++			     0xb1, 0xce, 0xdb, 0x7c, 0xb8, 0x55, 0x84, 0xa3,
++			     0x52, 0x0e, 0x14, 0x2d, 0x47, 0x4d, 0xc9, 0xcc,
++			     0xb9, 0x09, 0xa0, 0x73, 0xa9, 0x76, 0xbf, 0x63 },
++		.public = { 0xbb, 0x72, 0x68, 0x8d, 0x8f, 0x8a, 0xa7, 0xa3,
++			    0x9c, 0xd6, 0x06, 0x0c, 0xd5, 0xc8, 0x09, 0x3c,
++			    0xde, 0xc6, 0xfe, 0x34, 0x19, 0x37, 0xc3, 0x88,
++			    0x6a, 0x99, 0x34, 0x6c, 0xd0, 0x7f, 0xaa, 0x55 },
++		.result = { 0xdb, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x7f },
++		.valid = true
++	},
++	/* wycheproof - edge case for shared secret */
++	{
++		.private = { 0xa0, 0xa4, 0xf1, 0x30, 0xb9, 0x8a, 0x5b, 0xe4,
++			     0xb1, 0xce, 0xdb, 0x7c, 0xb8, 0x55, 0x84, 0xa3,
++			     0x52, 0x0e, 0x14, 0x2d, 0x47, 0x4d, 0xc9, 0xcc,
++			     0xb9, 0x09, 0xa0, 0x73, 0xa9, 0x76, 0xbf, 0x63 },
++		.public = { 0x88, 0xfd, 0xde, 0xa1, 0x93, 0x39, 0x1c, 0x6a,
++			    0x59, 0x33, 0xef, 0x9b, 0x71, 0x90, 0x15, 0x49,
++			    0x44, 0x72, 0x05, 0xaa, 0xe9, 0xda, 0x92, 0x8a,
++			    0x6b, 0x91, 0xa3, 0x52, 0xba, 0x10, 0xf4, 0x1f },
++		.result = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02 },
++		.valid = true
++	},
++	/* wycheproof - edge case for shared secret */
++	{
++		.private = { 0xa0, 0xa4, 0xf1, 0x30, 0xb9, 0x8a, 0x5b, 0xe4,
++			     0xb1, 0xce, 0xdb, 0x7c, 0xb8, 0x55, 0x84, 0xa3,
++			     0x52, 0x0e, 0x14, 0x2d, 0x47, 0x4d, 0xc9, 0xcc,
++			     0xb9, 0x09, 0xa0, 0x73, 0xa9, 0x76, 0xbf, 0x63 },
++		.public = { 0x30, 0x3b, 0x39, 0x2f, 0x15, 0x31, 0x16, 0xca,
++			    0xd9, 0xcc, 0x68, 0x2a, 0x00, 0xcc, 0xc4, 0x4c,
++			    0x95, 0xff, 0x0d, 0x3b, 0xbe, 0x56, 0x8b, 0xeb,
++			    0x6c, 0x4e, 0x73, 0x9b, 0xaf, 0xdc, 0x2c, 0x68 },
++		.result = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80, 0x00 },
++		.valid = true
++	},
++	/* wycheproof - checking for overflow */
++	{
++		.private = { 0xc8, 0x17, 0x24, 0x70, 0x40, 0x00, 0xb2, 0x6d,
++			     0x31, 0x70, 0x3c, 0xc9, 0x7e, 0x3a, 0x37, 0x8d,
++			     0x56, 0xfa, 0xd8, 0x21, 0x93, 0x61, 0xc8, 0x8c,
++			     0xca, 0x8b, 0xd7, 0xc5, 0x71, 0x9b, 0x12, 0xb2 },
++		.public = { 0xfd, 0x30, 0x0a, 0xeb, 0x40, 0xe1, 0xfa, 0x58,
++			    0x25, 0x18, 0x41, 0x2b, 0x49, 0xb2, 0x08, 0xa7,
++			    0x84, 0x2b, 0x1e, 0x1f, 0x05, 0x6a, 0x04, 0x01,
++			    0x78, 0xea, 0x41, 0x41, 0x53, 0x4f, 0x65, 0x2d },
++		.result = { 0xb7, 0x34, 0x10, 0x5d, 0xc2, 0x57, 0x58, 0x5d,
++			    0x73, 0xb5, 0x66, 0xcc, 0xb7, 0x6f, 0x06, 0x27,
++			    0x95, 0xcc, 0xbe, 0xc8, 0x91, 0x28, 0xe5, 0x2b,
++			    0x02, 0xf3, 0xe5, 0x96, 0x39, 0xf1, 0x3c, 0x46 },
++		.valid = true
++	},
++	/* wycheproof - checking for overflow */
++	{
++		.private = { 0xc8, 0x17, 0x24, 0x70, 0x40, 0x00, 0xb2, 0x6d,
++			     0x31, 0x70, 0x3c, 0xc9, 0x7e, 0x3a, 0x37, 0x8d,
++			     0x56, 0xfa, 0xd8, 0x21, 0x93, 0x61, 0xc8, 0x8c,
++			     0xca, 0x8b, 0xd7, 0xc5, 0x71, 0x9b, 0x12, 0xb2 },
++		.public = { 0xc8, 0xef, 0x79, 0xb5, 0x14, 0xd7, 0x68, 0x26,
++			    0x77, 0xbc, 0x79, 0x31, 0xe0, 0x6e, 0xe5, 0xc2,
++			    0x7c, 0x9b, 0x39, 0x2b, 0x4a, 0xe9, 0x48, 0x44,
++			    0x73, 0xf5, 0x54, 0xe6, 0x67, 0x8e, 0xcc, 0x2e },
++		.result = { 0x64, 0x7a, 0x46, 0xb6, 0xfc, 0x3f, 0x40, 0xd6,
++			    0x21, 0x41, 0xee, 0x3c, 0xee, 0x70, 0x6b, 0x4d,
++			    0x7a, 0x92, 0x71, 0x59, 0x3a, 0x7b, 0x14, 0x3e,
++			    0x8e, 0x2e, 0x22, 0x79, 0x88, 0x3e, 0x45, 0x50 },
++		.valid = true
++	},
++	/* wycheproof - checking for overflow */
++	{
++		.private = { 0xc8, 0x17, 0x24, 0x70, 0x40, 0x00, 0xb2, 0x6d,
++			     0x31, 0x70, 0x3c, 0xc9, 0x7e, 0x3a, 0x37, 0x8d,
++			     0x56, 0xfa, 0xd8, 0x21, 0x93, 0x61, 0xc8, 0x8c,
++			     0xca, 0x8b, 0xd7, 0xc5, 0x71, 0x9b, 0x12, 0xb2 },
++		.public = { 0x64, 0xae, 0xac, 0x25, 0x04, 0x14, 0x48, 0x61,
++			    0x53, 0x2b, 0x7b, 0xbc, 0xb6, 0xc8, 0x7d, 0x67,
++			    0xdd, 0x4c, 0x1f, 0x07, 0xeb, 0xc2, 0xe0, 0x6e,
++			    0xff, 0xb9, 0x5a, 0xec, 0xc6, 0x17, 0x0b, 0x2c },
++		.result = { 0x4f, 0xf0, 0x3d, 0x5f, 0xb4, 0x3c, 0xd8, 0x65,
++			    0x7a, 0x3c, 0xf3, 0x7c, 0x13, 0x8c, 0xad, 0xce,
++			    0xcc, 0xe5, 0x09, 0xe4, 0xeb, 0xa0, 0x89, 0xd0,
++			    0xef, 0x40, 0xb4, 0xe4, 0xfb, 0x94, 0x61, 0x55 },
++		.valid = true
++	},
++	/* wycheproof - checking for overflow */
++	{
++		.private = { 0xc8, 0x17, 0x24, 0x70, 0x40, 0x00, 0xb2, 0x6d,
++			     0x31, 0x70, 0x3c, 0xc9, 0x7e, 0x3a, 0x37, 0x8d,
++			     0x56, 0xfa, 0xd8, 0x21, 0x93, 0x61, 0xc8, 0x8c,
++			     0xca, 0x8b, 0xd7, 0xc5, 0x71, 0x9b, 0x12, 0xb2 },
++		.public = { 0xbf, 0x68, 0xe3, 0x5e, 0x9b, 0xdb, 0x7e, 0xee,
++			    0x1b, 0x50, 0x57, 0x02, 0x21, 0x86, 0x0f, 0x5d,
++			    0xcd, 0xad, 0x8a, 0xcb, 0xab, 0x03, 0x1b, 0x14,
++			    0x97, 0x4c, 0xc4, 0x90, 0x13, 0xc4, 0x98, 0x31 },
++		.result = { 0x21, 0xce, 0xe5, 0x2e, 0xfd, 0xbc, 0x81, 0x2e,
++			    0x1d, 0x02, 0x1a, 0x4a, 0xf1, 0xe1, 0xd8, 0xbc,
++			    0x4d, 0xb3, 0xc4, 0x00, 0xe4, 0xd2, 0xa2, 0xc5,
++			    0x6a, 0x39, 0x26, 0xdb, 0x4d, 0x99, 0xc6, 0x5b },
++		.valid = true
++	},
++	/* wycheproof - checking for overflow */
++	{
++		.private = { 0xc8, 0x17, 0x24, 0x70, 0x40, 0x00, 0xb2, 0x6d,
++			     0x31, 0x70, 0x3c, 0xc9, 0x7e, 0x3a, 0x37, 0x8d,
++			     0x56, 0xfa, 0xd8, 0x21, 0x93, 0x61, 0xc8, 0x8c,
++			     0xca, 0x8b, 0xd7, 0xc5, 0x71, 0x9b, 0x12, 0xb2 },
++		.public = { 0x53, 0x47, 0xc4, 0x91, 0x33, 0x1a, 0x64, 0xb4,
++			    0x3d, 0xdc, 0x68, 0x30, 0x34, 0xe6, 0x77, 0xf5,
++			    0x3d, 0xc3, 0x2b, 0x52, 0xa5, 0x2a, 0x57, 0x7c,
++			    0x15, 0xa8, 0x3b, 0xf2, 0x98, 0xe9, 0x9f, 0x19 },
++		.result = { 0x18, 0xcb, 0x89, 0xe4, 0xe2, 0x0c, 0x0c, 0x2b,
++			    0xd3, 0x24, 0x30, 0x52, 0x45, 0x26, 0x6c, 0x93,
++			    0x27, 0x69, 0x0b, 0xbe, 0x79, 0xac, 0xb8, 0x8f,
++			    0x5b, 0x8f, 0xb3, 0xf7, 0x4e, 0xca, 0x3e, 0x52 },
++		.valid = true
++	},
++	/* wycheproof - private key == -1 (mod order) */
++	{
++		.private = { 0xa0, 0x23, 0xcd, 0xd0, 0x83, 0xef, 0x5b, 0xb8,
++			     0x2f, 0x10, 0xd6, 0x2e, 0x59, 0xe1, 0x5a, 0x68,
++			     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++			     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x50 },
++		.public = { 0x25, 0x8e, 0x04, 0x52, 0x3b, 0x8d, 0x25, 0x3e,
++			    0xe6, 0x57, 0x19, 0xfc, 0x69, 0x06, 0xc6, 0x57,
++			    0x19, 0x2d, 0x80, 0x71, 0x7e, 0xdc, 0x82, 0x8f,
++			    0xa0, 0xaf, 0x21, 0x68, 0x6e, 0x2f, 0xaa, 0x75 },
++		.result = { 0x25, 0x8e, 0x04, 0x52, 0x3b, 0x8d, 0x25, 0x3e,
++			    0xe6, 0x57, 0x19, 0xfc, 0x69, 0x06, 0xc6, 0x57,
++			    0x19, 0x2d, 0x80, 0x71, 0x7e, 0xdc, 0x82, 0x8f,
++			    0xa0, 0xaf, 0x21, 0x68, 0x6e, 0x2f, 0xaa, 0x75 },
++		.valid = true
++	},
++	/* wycheproof - private key == 1 (mod order) on twist */
++	{
++		.private = { 0x58, 0x08, 0x3d, 0xd2, 0x61, 0xad, 0x91, 0xef,
++			     0xf9, 0x52, 0x32, 0x2e, 0xc8, 0x24, 0xc6, 0x82,
++			     0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++			     0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x5f },
++		.public = { 0x2e, 0xae, 0x5e, 0xc3, 0xdd, 0x49, 0x4e, 0x9f,
++			    0x2d, 0x37, 0xd2, 0x58, 0xf8, 0x73, 0xa8, 0xe6,
++			    0xe9, 0xd0, 0xdb, 0xd1, 0xe3, 0x83, 0xef, 0x64,
++			    0xd9, 0x8b, 0xb9, 0x1b, 0x3e, 0x0b, 0xe0, 0x35 },
++		.result = { 0x2e, 0xae, 0x5e, 0xc3, 0xdd, 0x49, 0x4e, 0x9f,
++			    0x2d, 0x37, 0xd2, 0x58, 0xf8, 0x73, 0xa8, 0xe6,
++			    0xe9, 0xd0, 0xdb, 0xd1, 0xe3, 0x83, 0xef, 0x64,
++			    0xd9, 0x8b, 0xb9, 0x1b, 0x3e, 0x0b, 0xe0, 0x35 },
++		.valid = true
++	}
 +};
 +
-+struct nhpoly1305_state {
++static bool __init curve25519_selftest(void)
++{
++	bool success = true, ret, ret2;
++	size_t i = 0, j;
++	u8 in[CURVE25519_KEY_SIZE];
++	u8 out[CURVE25519_KEY_SIZE], out2[CURVE25519_KEY_SIZE];
 +
-+	/* Running total of polynomial evaluation */
-+	struct poly1305_state poly_state;
++	for (i = 0; i < ARRAY_SIZE(curve25519_test_vectors); ++i) {
++		memset(out, 0, CURVE25519_KEY_SIZE);
++		ret = curve25519(out, curve25519_test_vectors[i].private,
++				 curve25519_test_vectors[i].public);
++		if (ret != curve25519_test_vectors[i].valid ||
++		    memcmp(out, curve25519_test_vectors[i].result,
++			   CURVE25519_KEY_SIZE)) {
++			pr_err("curve25519 self-test %zu: FAIL\n", i + 1);
++			success = false;
++		}
++	}
 +
-+	/* Partial block buffer */
-+	u8 buffer[NH_MESSAGE_UNIT];
-+	unsigned int buflen;
++	for (i = 0; i < 5; ++i) {
++		get_random_bytes(in, sizeof(in));
++		ret = curve25519_generate_public(out, in);
++		ret2 = curve25519(out2, in, (u8[CURVE25519_KEY_SIZE]){ 9 });
++		if (ret != ret2 || memcmp(out, out2, CURVE25519_KEY_SIZE)) {
++			pr_err("curve25519 basepoint self-test %zu: FAIL: input - 0x",
++			       i + 1);
++			for (j = CURVE25519_KEY_SIZE; j-- > 0;)
++				printk(KERN_CONT "%02x", in[j]);
++			printk(KERN_CONT "\n");
++			success = false;
++		}
++	}
 +
-+	/*
-+	 * Number of bytes remaining until the current NH message reaches
-+	 * NH_MESSAGE_BYTES.  When nonzero, 'nh_hash' holds the partial NH hash.
-+	 */
-+	unsigned int nh_remaining;
-+
-+	__le64 nh_hash[NH_NUM_PASSES];
-+};
-+
-+typedef void (*nh_t)(const u32 *key, const u8 *src, size_t srclen,
-+		     __le64 hash[NH_NUM_PASSES]);
-+
-+int crypto_nhpoly1305_setkey(struct crypto_shash *tfm,
-+			     const u8 *key, unsigned int keylen);
-+
-+int crypto_nhpoly1305_init(struct shash_desc *desc);
-+int crypto_nhpoly1305_update(struct shash_desc *desc,
-+			     const u8 *src, unsigned int srclen);
-+int crypto_nhpoly1305_update_helper(struct shash_desc *desc,
-+				    const u8 *src, unsigned int srclen,
-+				    nh_t nh_fn);
-+int crypto_nhpoly1305_final(struct shash_desc *desc, u8 *dst);
-+int crypto_nhpoly1305_final_helper(struct shash_desc *desc, u8 *dst,
-+				   nh_t nh_fn);
-+
-+#endif /* _NHPOLY1305_H */
++	return success;
++}
 -- 
-2.19.1.331.ge82ca0e54c-goog
+2.19.1
