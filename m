@@ -1,46 +1,30 @@
-Return-Path: <SRS0=anrJ=M4=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-ot1-f65.google.com ([209.85.210.65]:42052 "EHLO
-        mail-ot1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726986AbeJPXzX (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 16 Oct 2018 19:55:23 -0400
+Return-Path: <SRS0=XFsj=M6=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from 822397.com ([185.216.140.104]:54509 "EHLO garyline.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727274AbeJSAX1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 18 Oct 2018 20:23:27 -0400
+To: linux-crypto@vger.kernel.org
+Subject: Photos 40
+Message-ID: <5268c3d7e45c5bf4e2b72e6e4651119d@ustacup.com>
+Date: Thu, 18 Oct 2018 16:12:21 +0200
+From: "Nancy" <cetdeeisnwsuitce@aol.jp>
+Reply-To: haoshoten@aliyun.com
 MIME-Version: 1.0
-References: <cover.1539705285.git.leonard.crestez@nxp.com> <ef03e230d0bb76d830c123bc47e6bd6e7bf17826.1539705286.git.leonard.crestez@nxp.com>
-In-Reply-To: <ef03e230d0bb76d830c123bc47e6bd6e7bf17826.1539705286.git.leonard.crestez@nxp.com>
-From: Fabio Estevam <festevam@gmail.com>
-Date: Tue, 16 Oct 2018 13:04:24 -0300
-Message-ID: <CAOMZO5A+Uc5in-PXnfe+XoFMtRmCxGOryXE9=mjB+aRHo+ZBEQ@mail.gmail.com>
-Subject: Re: [PATCH v3 3/4] ARM: dts: imx6ull: Add dcp node
-To: Leonard Crestez <leonard.crestez@nxp.com>
-Cc: Shawn Guo <shawnguo@kernel.org>,
-        Fabio Estevam <fabio.estevam@nxp.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Marek Vasut <marek.vasut@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Horia Geanta Neag <horia.geanta@nxp.com>,
-        Franck LENORMAND <franck.lenormand@nxp.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Mark Rutland <mark.rutland@arm.com>,
-        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS"
-        <devicetree@vger.kernel.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>,
-        "moderated list:ARM/FREESCALE IMX / MXC ARM ARCHITECTURE"
-        <linux-arm-kernel@lists.infradead.org>,
-        NXP Linux Team <linux-imx@nxp.com>,
-        Sascha Hauer <kernel@pengutronix.de>,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; format=flowed; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Oct 16, 2018 at 12:59 PM Leonard Crestez
-<leonard.crestez@nxp.com> wrote:
->
-> The DCP block on 6ull has no major differences other than requiring
-> explicit clock enabling.
->
-> Signed-off-by: Leonard Crestez <leonard.crestez@nxp.com>
+We are an image team who can process 400+ images each day.
 
-Reviewed-by: Fabio Estevam <festevam@gmail.com>
+If you need any image editing service, please let us know.
+
+Image cut out and clipping path, masking.
+Such as for ecommerce photos, jewelry photos retouching, beauty and skin
+images
+and wedding photos.
+
+We give test editing for your photos if you send us some.
+
+Thanks,
+Nancy
