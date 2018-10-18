@@ -1,184 +1,241 @@
-Return-Path: <SRS0=GKHD=M7=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mta-p7.oit.umn.edu ([134.84.196.207]:38136 "EHLO
-        mta-p7.oit.umn.edu" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725934AbeJSJDV (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 19 Oct 2018 05:03:21 -0400
-Received: from localhost (unknown [127.0.0.1])
-        by mta-p7.oit.umn.edu (Postfix) with ESMTP id 31236C73
-        for <linux-crypto@vger.kernel.org>; Fri, 19 Oct 2018 00:50:56 +0000 (UTC)
-Received: from mta-p7.oit.umn.edu ([127.0.0.1])
-        by localhost (mta-p7.oit.umn.edu [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id K8DcYuke1xvN for <linux-crypto@vger.kernel.org>;
-        Thu, 18 Oct 2018 19:50:56 -0500 (CDT)
-Received: from mail-it1-f197.google.com (mail-it1-f197.google.com [209.85.166.197])
-        (using TLSv1.2 with cipher AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mta-p7.oit.umn.edu (Postfix) with ESMTPS id F1A7D92C
-        for <linux-crypto@vger.kernel.org>; Thu, 18 Oct 2018 19:50:55 -0500 (CDT)
-Received: by mail-it1-f197.google.com with SMTP id 207-v6so2116237itj.6
-        for <linux-crypto@vger.kernel.org>; Thu, 18 Oct 2018 17:50:55 -0700 (PDT)
-From: Wenwen Wang <wang6495@umn.edu>
-To: Wenwen Wang <wang6495@umn.edu>
-Cc: Kangjie Lu <kjlu@umn.edu>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Kate Stewart <kstewart@linuxfoundation.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Philippe Ombredanne <pombredanne@nexb.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jia-Ju Bai <baijiaju1990@gmail.com>,
-        Srikanth Jampala <Jampala.Srikanth@cavium.com>,
-        Gadam Sreerama <sgadam@cavium.com>,
-        linux-crypto@vger.kernel.org (open list:CRYPTO API),
-        linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH] crypto: cavium/nitrox - fix a DMA pool free failure
-Date: Thu, 18 Oct 2018 19:50:43 -0500
-Message-Id: <1539910247-9250-1-git-send-email-wang6495@umn.edu>
+Return-Path: <SRS0=XFsj=M6=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:57376 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727351AbeJRMiu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 18 Oct 2018 08:38:50 -0400
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Paul Crowley <paulcrowley@google.com>
+Subject: [PATCH v3 2/2] crypto: arm/aes - add some hardening against cache-timing attacks
+Date: Wed, 17 Oct 2018 21:37:59 -0700
+Message-Id: <20181018043759.7669-3-ebiggers@kernel.org>
+In-Reply-To: <20181018043759.7669-1-ebiggers@kernel.org>
+References: <20181018043759.7669-1-ebiggers@kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-In crypto_alloc_context(), a DMA pool is allocated through dma_pool_alloc()
-to hold the crypto context. The meta data of the DMA pool, including the
-pool used for the allocation 'ndev->ctx_pool' and the base address of the
-DMA pool used by the device 'dma', are then stored to the beginning of the
-pool. These meta data are eventually used in crypto_free_context() to free
-the DMA pool through dma_pool_free(). However, given that the DMA pool can
-also be accessed by the device, a malicious device can modify these meta
-data, especially when the device is controlled to deploy an attack. This
-can cause an unexpected DMA pool free failure.
+From: Eric Biggers <ebiggers@google.com>
 
-To avoid the above issue, this patch introduces a new structure
-crypto_ctx_hdr and a new field chdr in the structure nitrox_crypto_ctx hold
-the meta data information of the DMA pool after the allocation. Note that
-the original structure ctx_hdr is not changed to ensure the compatibility.
+Make the ARM scalar AES implementation closer to constant-time by
+disabling interrupts and prefetching the tables into L1 cache.  This is
+feasible because due to ARM's "free" rotations, the main tables are only
+1024 bytes instead of the usual 4096 used by most AES implementations.
 
-Signed-off-by: Wenwen Wang <wang6495@umn.edu>
+On ARM Cortex-A7, the speed loss is only about 5%.  The resulting code
+is still over twice as fast as aes_ti.c.  Responsiveness is potentially
+a concern, but interrupts are only disabled for a single AES block.
+
+Note that even after these changes, the implementation still isn't
+necessarily guaranteed to be constant-time; see
+https://cr.yp.to/antiforgery/cachetiming-20050414.pdf for a discussion
+of the many difficulties involved in writing truly constant-time AES
+software.  But it's valuable to make such attacks more difficult.
+
+Much of this patch is based on patches suggested by Ard Biesheuvel.
+
+Suggested-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- drivers/crypto/cavium/nitrox/nitrox_algs.c | 12 +++++++-----
- drivers/crypto/cavium/nitrox/nitrox_lib.c  | 22 +++++++++++++++++-----
- drivers/crypto/cavium/nitrox/nitrox_req.h  |  7 +++++++
- 3 files changed, 31 insertions(+), 10 deletions(-)
+ arch/arm/crypto/Kconfig           |  9 +++++
+ arch/arm/crypto/aes-cipher-core.S | 62 ++++++++++++++++++++++++++-----
+ crypto/aes_generic.c              |  9 +++--
+ 3 files changed, 66 insertions(+), 14 deletions(-)
 
-diff --git a/drivers/crypto/cavium/nitrox/nitrox_algs.c b/drivers/crypto/cavium/nitrox/nitrox_algs.c
-index 2ae6124..5d54ebc 100644
---- a/drivers/crypto/cavium/nitrox/nitrox_algs.c
-+++ b/drivers/crypto/cavium/nitrox/nitrox_algs.c
-@@ -73,7 +73,7 @@ static int flexi_aes_keylen(int keylen)
- static int nitrox_skcipher_init(struct crypto_skcipher *tfm)
- {
- 	struct nitrox_crypto_ctx *nctx = crypto_skcipher_ctx(tfm);
--	void *fctx;
-+	struct crypto_ctx_hdr *chdr;
+diff --git a/arch/arm/crypto/Kconfig b/arch/arm/crypto/Kconfig
+index ef0c7feea6e29..0473a8f683896 100644
+--- a/arch/arm/crypto/Kconfig
++++ b/arch/arm/crypto/Kconfig
+@@ -69,6 +69,15 @@ config CRYPTO_AES_ARM
+ 	help
+ 	  Use optimized AES assembler routines for ARM platforms.
  
- 	/* get the first device */
- 	nctx->ndev = nitrox_get_first_device();
-@@ -81,12 +81,14 @@ static int nitrox_skcipher_init(struct crypto_skcipher *tfm)
- 		return -ENODEV;
- 
- 	/* allocate nitrox crypto context */
--	fctx = crypto_alloc_context(nctx->ndev);
--	if (!fctx) {
-+	chdr = crypto_alloc_context(nctx->ndev);
-+	if (!chdr) {
- 		nitrox_put_device(nctx->ndev);
- 		return -ENOMEM;
- 	}
--	nctx->u.ctx_handle = (uintptr_t)fctx;
-+	nctx->chdr = chdr;
-+	nctx->u.ctx_handle = (uintptr_t)((u8 *)chdr->vaddr +
-+					 sizeof(struct ctx_hdr));
- 	crypto_skcipher_set_reqsize(tfm, crypto_skcipher_reqsize(tfm) +
- 				    sizeof(struct nitrox_kcrypt_request));
- 	return 0;
-@@ -102,7 +104,7 @@ static void nitrox_skcipher_exit(struct crypto_skcipher *tfm)
- 
- 		memset(&fctx->crypto, 0, sizeof(struct crypto_keys));
- 		memset(&fctx->auth, 0, sizeof(struct auth_keys));
--		crypto_free_context((void *)fctx);
-+		crypto_free_context((void *)nctx->chdr);
- 	}
- 	nitrox_put_device(nctx->ndev);
- 
-diff --git a/drivers/crypto/cavium/nitrox/nitrox_lib.c b/drivers/crypto/cavium/nitrox/nitrox_lib.c
-index 4d31df0..28baf1a 100644
---- a/drivers/crypto/cavium/nitrox/nitrox_lib.c
-+++ b/drivers/crypto/cavium/nitrox/nitrox_lib.c
-@@ -146,12 +146,19 @@ static void destroy_crypto_dma_pool(struct nitrox_device *ndev)
- void *crypto_alloc_context(struct nitrox_device *ndev)
- {
- 	struct ctx_hdr *ctx;
-+	struct crypto_ctx_hdr *chdr;
- 	void *vaddr;
- 	dma_addr_t dma;
- 
-+	chdr = kmalloc(sizeof(*chdr), GFP_KERNEL);
-+	if (!chdr)
-+		return NULL;
++	  On ARM processors without the Crypto Extensions, this is the
++	  fastest AES implementation for single blocks.  For multiple
++	  blocks, the NEON bit-sliced implementation is usually faster.
 +
- 	vaddr = dma_pool_alloc(ndev->ctx_pool, (GFP_KERNEL | __GFP_ZERO), &dma);
--	if (!vaddr)
-+	if (!vaddr) {
-+		kfree(chdr);
- 		return NULL;
-+	}
- 
- 	/* fill meta data */
- 	ctx = vaddr;
-@@ -159,7 +166,11 @@ void *crypto_alloc_context(struct nitrox_device *ndev)
- 	ctx->dma = dma;
- 	ctx->ctx_dma = dma + sizeof(struct ctx_hdr);
- 
--	return ((u8 *)vaddr + sizeof(struct ctx_hdr));
-+	chdr->pool = ndev->ctx_pool;
-+	chdr->dma = dma;
-+	chdr->vaddr = vaddr;
++	  This implementation may be vulnerable to cache timing attacks,
++	  since it uses lookup tables.  However, as countermeasures it
++	  disables IRQs and preloads the tables; it is hoped this makes
++	  such attacks very difficult.
 +
-+	return chdr;
- }
- 
- /**
-@@ -168,13 +179,14 @@ void *crypto_alloc_context(struct nitrox_device *ndev)
+ config CRYPTO_AES_ARM_BS
+ 	tristate "Bit sliced AES using NEON instructions"
+ 	depends on KERNEL_MODE_NEON
+diff --git a/arch/arm/crypto/aes-cipher-core.S b/arch/arm/crypto/aes-cipher-core.S
+index 184d6c2d15d5e..f2d67c095e596 100644
+--- a/arch/arm/crypto/aes-cipher-core.S
++++ b/arch/arm/crypto/aes-cipher-core.S
+@@ -10,6 +10,7 @@
   */
- void crypto_free_context(void *ctx)
- {
--	struct ctx_hdr *ctxp;
-+	struct crypto_ctx_hdr *ctxp;
  
- 	if (!ctx)
- 		return;
+ #include <linux/linkage.h>
++#include <asm/assembler.h>
+ #include <asm/cache.h>
  
--	ctxp = (struct ctx_hdr *)((u8 *)ctx - sizeof(struct ctx_hdr));
--	dma_pool_free(ctxp->pool, ctxp, ctxp->dma);
-+	ctxp = ctx;
-+	dma_pool_free(ctxp->pool, ctxp->vaddr, ctxp->dma);
-+	kfree(ctxp);
- }
+ 	.text
+@@ -41,7 +42,7 @@
+ 	.endif
+ 	.endm
  
- /**
-diff --git a/drivers/crypto/cavium/nitrox/nitrox_req.h b/drivers/crypto/cavium/nitrox/nitrox_req.h
-index d091b6f..19f0a20 100644
---- a/drivers/crypto/cavium/nitrox/nitrox_req.h
-+++ b/drivers/crypto/cavium/nitrox/nitrox_req.h
-@@ -181,12 +181,19 @@ struct flexi_crypto_context {
- 	struct auth_keys auth;
- };
+-	.macro		__hround, out0, out1, in0, in1, in2, in3, t3, t4, enc, sz, op
++	.macro		__hround, out0, out1, in0, in1, in2, in3, t3, t4, enc, sz, op, oldcpsr
+ 	__select	\out0, \in0, 0
+ 	__select	t0, \in1, 1
+ 	__load		\out0, \out0, 0, \sz, \op
+@@ -73,6 +74,14 @@
+ 	__load		t0, t0, 3, \sz, \op
+ 	__load		\t4, \t4, 3, \sz, \op
  
-+struct crypto_ctx_hdr {
-+	struct dma_pool *pool;
-+	dma_addr_t dma;
-+	void *vaddr;
-+};
++	.ifnb		\oldcpsr
++	/*
++	 * This is the final round and we're done with all data-dependent table
++	 * lookups, so we can safely re-enable interrupts.
++	 */
++	restore_irqs	\oldcpsr
++	.endif
 +
- struct nitrox_crypto_ctx {
- 	struct nitrox_device *ndev;
- 	union {
- 		u64 ctx_handle;
- 		struct flexi_crypto_context *fctx;
- 	} u;
-+	struct crypto_ctx_hdr *chdr;
+ 	eor		\out1, \out1, t1, ror #24
+ 	eor		\out0, \out0, t2, ror #16
+ 	ldm		rk!, {t1, t2}
+@@ -83,14 +92,14 @@
+ 	eor		\out1, \out1, t2
+ 	.endm
+ 
+-	.macro		fround, out0, out1, out2, out3, in0, in1, in2, in3, sz=2, op
++	.macro		fround, out0, out1, out2, out3, in0, in1, in2, in3, sz=2, op, oldcpsr
+ 	__hround	\out0, \out1, \in0, \in1, \in2, \in3, \out2, \out3, 1, \sz, \op
+-	__hround	\out2, \out3, \in2, \in3, \in0, \in1, \in1, \in2, 1, \sz, \op
++	__hround	\out2, \out3, \in2, \in3, \in0, \in1, \in1, \in2, 1, \sz, \op, \oldcpsr
+ 	.endm
+ 
+-	.macro		iround, out0, out1, out2, out3, in0, in1, in2, in3, sz=2, op
++	.macro		iround, out0, out1, out2, out3, in0, in1, in2, in3, sz=2, op, oldcpsr
+ 	__hround	\out0, \out1, \in0, \in3, \in2, \in1, \out2, \out3, 0, \sz, \op
+-	__hround	\out2, \out3, \in2, \in1, \in0, \in3, \in1, \in0, 0, \sz, \op
++	__hround	\out2, \out3, \in2, \in1, \in0, \in3, \in1, \in0, 0, \sz, \op, \oldcpsr
+ 	.endm
+ 
+ 	.macro		__rev, out, in
+@@ -118,13 +127,14 @@
+ 	.macro		do_crypt, round, ttab, ltab, bsz
+ 	push		{r3-r11, lr}
+ 
++	// Load keys first, to reduce latency in case they're not cached yet.
++	ldm		rk!, {r8-r11}
++
+ 	ldr		r4, [in]
+ 	ldr		r5, [in, #4]
+ 	ldr		r6, [in, #8]
+ 	ldr		r7, [in, #12]
+ 
+-	ldm		rk!, {r8-r11}
+-
+ #ifdef CONFIG_CPU_BIG_ENDIAN
+ 	__rev		r4, r4
+ 	__rev		r5, r5
+@@ -138,6 +148,25 @@
+ 	eor		r7, r7, r11
+ 
+ 	__adrl		ttab, \ttab
++	/*
++	 * Disable interrupts and prefetch the 1024-byte 'ft' or 'it' table into
++	 * L1 cache, assuming cacheline size >= 32.  This is a hardening measure
++	 * intended to make cache-timing attacks more difficult.  They may not
++	 * be fully prevented, however; see the paper
++	 * https://cr.yp.to/antiforgery/cachetiming-20050414.pdf
++	 * ("Cache-timing attacks on AES") for a discussion of the many
++	 * difficulties involved in writing truly constant-time AES software.
++	 */
++	 save_and_disable_irqs	t0
++	.set		i, 0
++	.rept		1024 / 128
++	ldr		r8, [ttab, #i + 0]
++	ldr		r9, [ttab, #i + 32]
++	ldr		r10, [ttab, #i + 64]
++	ldr		r11, [ttab, #i + 96]
++	.set		i, i + 128
++	.endr
++	push		{t0}		// oldcpsr
+ 
+ 	tst		rounds, #2
+ 	bne		1f
+@@ -151,8 +180,21 @@
+ 	\round		r4, r5, r6, r7, r8, r9, r10, r11
+ 	b		0b
+ 
+-2:	__adrl		ttab, \ltab
+-	\round		r4, r5, r6, r7, r8, r9, r10, r11, \bsz, b
++2:	.ifb		\ltab
++	add		ttab, ttab, #1
++	.else
++	__adrl		ttab, \ltab
++	// Prefetch inverse S-box for final round; see explanation above
++	.set		i, 0
++	.rept		256 / 64
++	ldr		t0, [ttab, #i + 0]
++	ldr		t1, [ttab, #i + 32]
++	.set		i, i + 64
++	.endr
++	.endif
++
++	pop		{rounds}	// oldcpsr
++	\round		r4, r5, r6, r7, r8, r9, r10, r11, \bsz, b, rounds
+ 
+ #ifdef CONFIG_CPU_BIG_ENDIAN
+ 	__rev		r4, r4
+@@ -175,7 +217,7 @@
+ 	.endm
+ 
+ ENTRY(__aes_arm_encrypt)
+-	do_crypt	fround, crypto_ft_tab, crypto_ft_tab + 1, 2
++	do_crypt	fround, crypto_ft_tab,, 2
+ ENDPROC(__aes_arm_encrypt)
+ 
+ 	.align		5
+diff --git a/crypto/aes_generic.c b/crypto/aes_generic.c
+index ca554d57d01e9..13df33aca4631 100644
+--- a/crypto/aes_generic.c
++++ b/crypto/aes_generic.c
+@@ -63,7 +63,8 @@ static inline u8 byte(const u32 x, const unsigned n)
+ 
+ static const u32 rco_tab[10] = { 1, 2, 4, 8, 16, 32, 64, 128, 27, 54 };
+ 
+-__visible const u32 crypto_ft_tab[4][256] = {
++/* cacheline-aligned to facilitate prefetching into cache */
++__visible const u32 crypto_ft_tab[4][256] __cacheline_aligned = {
+ 	{
+ 		0xa56363c6, 0x847c7cf8, 0x997777ee, 0x8d7b7bf6,
+ 		0x0df2f2ff, 0xbd6b6bd6, 0xb16f6fde, 0x54c5c591,
+@@ -327,7 +328,7 @@ __visible const u32 crypto_ft_tab[4][256] = {
+ 	}
  };
  
- struct nitrox_kcrypt_request {
+-__visible const u32 crypto_fl_tab[4][256] = {
++__visible const u32 crypto_fl_tab[4][256] __cacheline_aligned = {
+ 	{
+ 		0x00000063, 0x0000007c, 0x00000077, 0x0000007b,
+ 		0x000000f2, 0x0000006b, 0x0000006f, 0x000000c5,
+@@ -591,7 +592,7 @@ __visible const u32 crypto_fl_tab[4][256] = {
+ 	}
+ };
+ 
+-__visible const u32 crypto_it_tab[4][256] = {
++__visible const u32 crypto_it_tab[4][256] __cacheline_aligned = {
+ 	{
+ 		0x50a7f451, 0x5365417e, 0xc3a4171a, 0x965e273a,
+ 		0xcb6bab3b, 0xf1459d1f, 0xab58faac, 0x9303e34b,
+@@ -855,7 +856,7 @@ __visible const u32 crypto_it_tab[4][256] = {
+ 	}
+ };
+ 
+-__visible const u32 crypto_il_tab[4][256] = {
++__visible const u32 crypto_il_tab[4][256] __cacheline_aligned = {
+ 	{
+ 		0x00000052, 0x00000009, 0x0000006a, 0x000000d5,
+ 		0x00000030, 0x00000036, 0x000000a5, 0x00000038,
 -- 
-2.7.4
+2.19.1
