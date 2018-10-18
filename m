@@ -1,421 +1,627 @@
-Return-Path: <SRS0=18ZD=M3=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:54100 "EHLO mail.kernel.org"
+Return-Path: <SRS0=XFsj=M6=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from frisell.zx2c4.com ([192.95.5.64]:46347 "EHLO frisell.zx2c4.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726848AbeJPBmu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 15 Oct 2018 21:42:50 -0400
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org
-Cc: linux-fscrypt@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Paul Crowley <paulcrowley@google.com>,
-        Greg Kaiser <gkaiser@google.com>,
-        Michael Halcrow <mhalcrow@google.com>,
-        "Jason A . Donenfeld" <Jason@zx2c4.com>,
-        Samuel Neves <samuel.c.p.neves@gmail.com>,
-        Tomer Ashur <tomer.ashur@esat.kuleuven.be>
-Subject: [RFC PATCH v2 08/12] crypto: poly1305 - add Poly1305 core API
-Date: Mon, 15 Oct 2018 10:54:20 -0700
-Message-Id: <20181015175424.97147-9-ebiggers@kernel.org>
-In-Reply-To: <20181015175424.97147-1-ebiggers@kernel.org>
-References: <20181015175424.97147-1-ebiggers@kernel.org>
+        id S1726816AbeJRW7C (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 18 Oct 2018 18:59:02 -0400
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+To: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+        linux-crypto@vger.kernel.org, davem@davemloft.net,
+        gregkh@linuxfoundation.org
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Samuel Neves <sneves@dei.uc.pt>,
+        Andy Lutomirski <luto@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        linux-arch@vger.kernel.org
+Subject: [PATCH net-next v8 02/28] asm: simd context helper API
+Date: Thu, 18 Oct 2018 16:56:46 +0200
+Message-Id: <20181018145712.7538-3-Jason@zx2c4.com>
+In-Reply-To: <20181018145712.7538-1-Jason@zx2c4.com>
+References: <20181018145712.7538-1-Jason@zx2c4.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Eric Biggers <ebiggers@google.com>
+Sometimes it's useful to amortize calls to XSAVE/XRSTOR and the related
+FPU/SIMD functions over a number of calls, because FPU restoration is
+quite expensive. This adds a simple header for carrying out this pattern:
 
-Expose a low-level Poly1305 API which implements the
-ε-almost-∆-universal (εA∆U) hash function underlying the Poly1305 MAC
-and supports block-aligned inputs only.
+    simd_context_t simd_context;
 
-This is needed for Adiantum hashing, which builds an εA∆U hash function
-from NH and a polynomial evaluation in GF(2^{130}-5); this polynomial
-evaluation is identical to the one the Poly1305 MAC does.  However, the
-crypto_shash Poly1305 API isn't very appropriate for this because its
-calling convention assumes it is used as a MAC, with a 32-byte
-"one-time key" provided for every digest.
+    simd_get(&simd_context);
+    while ((item = get_item_from_queue()) != NULL) {
+        encrypt_item(item, &simd_context);
+        simd_relax(&simd_context);
+    }
+    simd_put(&simd_context);
 
-But by design, in Adiantum hashing the performance of the polynomial
-evaluation isn't nearly as critical as NH.  So it suffices to just have
-some C helper functions.  Thus, this patch adds such functions.
+The relaxation step ensures that we don't trample over preemption, and
+the get/put API should be a familiar paradigm in the kernel.
 
-Signed-off-by: Eric Biggers <ebiggers@google.com>
+On the other end, code that actually wants to use SIMD instructions can
+accept this as a parameter and check it via:
+
+   void encrypt_item(struct item *item, simd_context_t *simd_context)
+   {
+       if (item->len > LARGE_FOR_SIMD && simd_use(simd_context))
+           wild_simd_code(item);
+       else
+           boring_scalar_code(item);
+   }
+
+The actual XSAVE happens during simd_use (and only on the first time),
+so that if the context is never actually used, no performance penalty is
+hit.
+
+Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+Cc: Samuel Neves <sneves@dei.uc.pt>
+Cc: Andy Lutomirski <luto@kernel.org>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Greg KH <gregkh@linuxfoundation.org>
+Cc: linux-arch@vger.kernel.org
 ---
- arch/x86/crypto/poly1305_glue.c |  20 ++--
- crypto/poly1305_generic.c       | 174 ++++++++++++++++++--------------
- include/crypto/poly1305.h       |  28 ++++-
- 3 files changed, 136 insertions(+), 86 deletions(-)
+ arch/alpha/include/asm/Kbuild      |  1 +
+ arch/arc/include/asm/Kbuild        |  1 +
+ arch/arm/include/asm/Kbuild        |  1 -
+ arch/arm/include/asm/simd.h        | 63 ++++++++++++++++++++++++++++++
+ arch/arm64/include/asm/simd.h      | 51 +++++++++++++++++++++---
+ arch/c6x/include/asm/Kbuild        |  1 +
+ arch/h8300/include/asm/Kbuild      |  1 +
+ arch/hexagon/include/asm/Kbuild    |  1 +
+ arch/ia64/include/asm/Kbuild       |  1 +
+ arch/m68k/include/asm/Kbuild       |  1 +
+ arch/microblaze/include/asm/Kbuild |  1 +
+ arch/mips/include/asm/Kbuild       |  1 +
+ arch/nds32/include/asm/Kbuild      |  1 +
+ arch/nios2/include/asm/Kbuild      |  1 +
+ arch/openrisc/include/asm/Kbuild   |  1 +
+ arch/parisc/include/asm/Kbuild     |  1 +
+ arch/powerpc/include/asm/Kbuild    |  1 +
+ arch/riscv/include/asm/Kbuild      |  1 +
+ arch/s390/include/asm/Kbuild       |  1 +
+ arch/sh/include/asm/Kbuild         |  1 +
+ arch/sparc/include/asm/Kbuild      |  1 +
+ arch/um/include/asm/Kbuild         |  1 +
+ arch/unicore32/include/asm/Kbuild  |  1 +
+ arch/x86/include/asm/simd.h        | 44 ++++++++++++++++++++-
+ arch/xtensa/include/asm/Kbuild     |  1 +
+ include/asm-generic/simd.h         | 20 ++++++++++
+ include/linux/simd.h               | 32 +++++++++++++++
+ 27 files changed, 224 insertions(+), 8 deletions(-)
+ create mode 100644 arch/arm/include/asm/simd.h
+ create mode 100644 include/linux/simd.h
 
-diff --git a/arch/x86/crypto/poly1305_glue.c b/arch/x86/crypto/poly1305_glue.c
-index f012b7e28ad1d..88cc01506c84a 100644
---- a/arch/x86/crypto/poly1305_glue.c
-+++ b/arch/x86/crypto/poly1305_glue.c
-@@ -83,35 +83,37 @@ static unsigned int poly1305_simd_blocks(struct poly1305_desc_ctx *dctx,
- 	if (poly1305_use_avx2 && srclen >= POLY1305_BLOCK_SIZE * 4) {
- 		if (unlikely(!sctx->wset)) {
- 			if (!sctx->uset) {
--				memcpy(sctx->u, dctx->r, sizeof(sctx->u));
--				poly1305_simd_mult(sctx->u, dctx->r);
-+				memcpy(sctx->u, dctx->r.r, sizeof(sctx->u));
-+				poly1305_simd_mult(sctx->u, dctx->r.r);
- 				sctx->uset = true;
- 			}
- 			memcpy(sctx->u + 5, sctx->u, sizeof(sctx->u));
--			poly1305_simd_mult(sctx->u + 5, dctx->r);
-+			poly1305_simd_mult(sctx->u + 5, dctx->r.r);
- 			memcpy(sctx->u + 10, sctx->u + 5, sizeof(sctx->u));
--			poly1305_simd_mult(sctx->u + 10, dctx->r);
-+			poly1305_simd_mult(sctx->u + 10, dctx->r.r);
- 			sctx->wset = true;
- 		}
- 		blocks = srclen / (POLY1305_BLOCK_SIZE * 4);
--		poly1305_4block_avx2(dctx->h, src, dctx->r, blocks, sctx->u);
-+		poly1305_4block_avx2(dctx->h.h, src, dctx->r.r, blocks,
-+				     sctx->u);
- 		src += POLY1305_BLOCK_SIZE * 4 * blocks;
- 		srclen -= POLY1305_BLOCK_SIZE * 4 * blocks;
- 	}
- #endif
- 	if (likely(srclen >= POLY1305_BLOCK_SIZE * 2)) {
- 		if (unlikely(!sctx->uset)) {
--			memcpy(sctx->u, dctx->r, sizeof(sctx->u));
--			poly1305_simd_mult(sctx->u, dctx->r);
-+			memcpy(sctx->u, dctx->r.r, sizeof(sctx->u));
-+			poly1305_simd_mult(sctx->u, dctx->r.r);
- 			sctx->uset = true;
- 		}
- 		blocks = srclen / (POLY1305_BLOCK_SIZE * 2);
--		poly1305_2block_sse2(dctx->h, src, dctx->r, blocks, sctx->u);
-+		poly1305_2block_sse2(dctx->h.h, src, dctx->r.r, blocks,
-+				     sctx->u);
- 		src += POLY1305_BLOCK_SIZE * 2 * blocks;
- 		srclen -= POLY1305_BLOCK_SIZE * 2 * blocks;
- 	}
- 	if (srclen >= POLY1305_BLOCK_SIZE) {
--		poly1305_block_sse2(dctx->h, src, dctx->r, 1);
-+		poly1305_block_sse2(dctx->h.h, src, dctx->r.r, 1);
- 		srclen -= POLY1305_BLOCK_SIZE;
- 	}
- 	return srclen;
-diff --git a/crypto/poly1305_generic.c b/crypto/poly1305_generic.c
-index 47d3a6b83931e..2a06874204e87 100644
---- a/crypto/poly1305_generic.c
-+++ b/crypto/poly1305_generic.c
-@@ -38,7 +38,7 @@ int crypto_poly1305_init(struct shash_desc *desc)
- {
- 	struct poly1305_desc_ctx *dctx = shash_desc_ctx(desc);
+diff --git a/arch/alpha/include/asm/Kbuild b/arch/alpha/include/asm/Kbuild
+index 0580cb8c84b2..220dfd170d45 100644
+--- a/arch/alpha/include/asm/Kbuild
++++ b/arch/alpha/include/asm/Kbuild
+@@ -13,3 +13,4 @@ generic-y += sections.h
+ generic-y += trace_clock.h
+ generic-y += current.h
+ generic-y += kprobes.h
++generic-y += simd.h
+diff --git a/arch/arc/include/asm/Kbuild b/arch/arc/include/asm/Kbuild
+index feed50ce89fa..a7f4255f1649 100644
+--- a/arch/arc/include/asm/Kbuild
++++ b/arch/arc/include/asm/Kbuild
+@@ -22,6 +22,7 @@ generic-y += parport.h
+ generic-y += pci.h
+ generic-y += percpu.h
+ generic-y += preempt.h
++generic-y += simd.h
+ generic-y += topology.h
+ generic-y += trace_clock.h
+ generic-y += user.h
+diff --git a/arch/arm/include/asm/Kbuild b/arch/arm/include/asm/Kbuild
+index 1d66db9c9db5..ebdc9eeb8d39 100644
+--- a/arch/arm/include/asm/Kbuild
++++ b/arch/arm/include/asm/Kbuild
+@@ -16,7 +16,6 @@ generic-y += rwsem.h
+ generic-y += seccomp.h
+ generic-y += segment.h
+ generic-y += serial.h
+-generic-y += simd.h
+ generic-y += sizes.h
+ generic-y += timex.h
+ generic-y += trace_clock.h
+diff --git a/arch/arm/include/asm/simd.h b/arch/arm/include/asm/simd.h
+new file mode 100644
+index 000000000000..264ed84b41d8
+--- /dev/null
++++ b/arch/arm/include/asm/simd.h
+@@ -0,0 +1,63 @@
++/* SPDX-License-Identifier: GPL-2.0
++ *
++ * Copyright (C) 2015-2018 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
++ */
++
++#include <linux/simd.h>
++#ifndef _ASM_SIMD_H
++#define _ASM_SIMD_H
++
++#ifdef CONFIG_KERNEL_MODE_NEON
++#include <asm/neon.h>
++
++static __must_check inline bool may_use_simd(void)
++{
++	return !in_nmi() && !in_irq() && !in_serving_softirq();
++}
++
++static inline void simd_get(simd_context_t *ctx)
++{
++	*ctx = may_use_simd() ? HAVE_FULL_SIMD : HAVE_NO_SIMD;
++}
++
++static inline void simd_put(simd_context_t *ctx)
++{
++	if (*ctx & HAVE_SIMD_IN_USE)
++		kernel_neon_end();
++	*ctx = HAVE_NO_SIMD;
++}
++
++static __must_check inline bool simd_use(simd_context_t *ctx)
++{
++	if (!(*ctx & HAVE_FULL_SIMD))
++		return false;
++	if (*ctx & HAVE_SIMD_IN_USE)
++		return true;
++	kernel_neon_begin();
++	*ctx |= HAVE_SIMD_IN_USE;
++	return true;
++}
++
++#else
++
++static __must_check inline bool may_use_simd(void)
++{
++	return false;
++}
++
++static inline void simd_get(simd_context_t *ctx)
++{
++	*ctx = HAVE_NO_SIMD;
++}
++
++static inline void simd_put(simd_context_t *ctx)
++{
++}
++
++static __must_check inline bool simd_use(simd_context_t *ctx)
++{
++	return false;
++}
++#endif
++
++#endif /* _ASM_SIMD_H */
+diff --git a/arch/arm64/include/asm/simd.h b/arch/arm64/include/asm/simd.h
+index 6495cc51246f..a45ff1600040 100644
+--- a/arch/arm64/include/asm/simd.h
++++ b/arch/arm64/include/asm/simd.h
+@@ -1,11 +1,10 @@
+-/*
+- * Copyright (C) 2017 Linaro Ltd. <ard.biesheuvel@linaro.org>
++/* SPDX-License-Identifier: GPL-2.0
+  *
+- * This program is free software; you can redistribute it and/or modify it
+- * under the terms of the GNU General Public License version 2 as published
+- * by the Free Software Foundation.
++ * Copyright (C) 2017 Linaro Ltd. <ard.biesheuvel@linaro.org>
++ * Copyright (C) 2015-2018 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
+  */
  
--	memset(dctx->h, 0, sizeof(dctx->h));
-+	poly1305_core_init(&dctx->h);
- 	dctx->buflen = 0;
- 	dctx->rset = false;
- 	dctx->sset = false;
-@@ -47,23 +47,16 @@ int crypto_poly1305_init(struct shash_desc *desc)
- }
- EXPORT_SYMBOL_GPL(crypto_poly1305_init);
++#include <linux/simd.h>
+ #ifndef __ASM_SIMD_H
+ #define __ASM_SIMD_H
  
--static void poly1305_setrkey(struct poly1305_desc_ctx *dctx, const u8 *key)
-+void poly1305_core_setkey(struct poly1305_key *key, const u8 *raw_key)
- {
- 	/* r &= 0xffffffc0ffffffc0ffffffc0fffffff */
--	dctx->r[0] = (get_unaligned_le32(key +  0) >> 0) & 0x3ffffff;
--	dctx->r[1] = (get_unaligned_le32(key +  3) >> 2) & 0x3ffff03;
--	dctx->r[2] = (get_unaligned_le32(key +  6) >> 4) & 0x3ffc0ff;
--	dctx->r[3] = (get_unaligned_le32(key +  9) >> 6) & 0x3f03fff;
--	dctx->r[4] = (get_unaligned_le32(key + 12) >> 8) & 0x00fffff;
--}
--
--static void poly1305_setskey(struct poly1305_desc_ctx *dctx, const u8 *key)
--{
--	dctx->s[0] = get_unaligned_le32(key +  0);
--	dctx->s[1] = get_unaligned_le32(key +  4);
--	dctx->s[2] = get_unaligned_le32(key +  8);
--	dctx->s[3] = get_unaligned_le32(key + 12);
-+	key->r[0] = (get_unaligned_le32(raw_key +  0) >> 0) & 0x3ffffff;
-+	key->r[1] = (get_unaligned_le32(raw_key +  3) >> 2) & 0x3ffff03;
-+	key->r[2] = (get_unaligned_le32(raw_key +  6) >> 4) & 0x3ffc0ff;
-+	key->r[3] = (get_unaligned_le32(raw_key +  9) >> 6) & 0x3f03fff;
-+	key->r[4] = (get_unaligned_le32(raw_key + 12) >> 8) & 0x00fffff;
+@@ -16,6 +15,8 @@
+ #include <linux/types.h>
+ 
+ #ifdef CONFIG_KERNEL_MODE_NEON
++#include <asm/neon.h>
++#include <asm/simd.h>
+ 
+ DECLARE_PER_CPU(bool, kernel_neon_busy);
+ 
+@@ -40,9 +41,47 @@ static __must_check inline bool may_use_simd(void)
+ 		!this_cpu_read(kernel_neon_busy);
  }
-+EXPORT_SYMBOL_GPL(poly1305_core_setkey);
+ 
++static inline void simd_get(simd_context_t *ctx)
++{
++	*ctx = may_use_simd() ? HAVE_FULL_SIMD : HAVE_NO_SIMD;
++}
++
++static inline void simd_put(simd_context_t *ctx)
++{
++	if (*ctx & HAVE_SIMD_IN_USE)
++		kernel_neon_end();
++	*ctx = HAVE_NO_SIMD;
++}
++
++static __must_check inline bool simd_use(simd_context_t *ctx)
++{
++	if (!(*ctx & HAVE_FULL_SIMD))
++		return false;
++	if (*ctx & HAVE_SIMD_IN_USE)
++		return true;
++	kernel_neon_begin();
++	*ctx |= HAVE_SIMD_IN_USE;
++	return true;
++}
++
+ #else /* ! CONFIG_KERNEL_MODE_NEON */
+ 
+-static __must_check inline bool may_use_simd(void) {
++static __must_check inline bool may_use_simd(void)
++{
++	return false;
++}
++
++static inline void simd_get(simd_context_t *ctx)
++{
++	*ctx = HAVE_NO_SIMD;
++}
++
++static inline void simd_put(simd_context_t *ctx)
++{
++}
++
++static __must_check inline bool simd_use(simd_context_t *ctx)
++{
+ 	return false;
+ }
+ 
+diff --git a/arch/c6x/include/asm/Kbuild b/arch/c6x/include/asm/Kbuild
+index 33a2c94fed0d..7543c38f7ade 100644
+--- a/arch/c6x/include/asm/Kbuild
++++ b/arch/c6x/include/asm/Kbuild
+@@ -30,6 +30,7 @@ generic-y += pgalloc.h
+ generic-y += preempt.h
+ generic-y += segment.h
+ generic-y += serial.h
++generic-y += simd.h
+ generic-y += tlbflush.h
+ generic-y += topology.h
+ generic-y += trace_clock.h
+diff --git a/arch/h8300/include/asm/Kbuild b/arch/h8300/include/asm/Kbuild
+index a5d0b2991f47..1fcef25ee19d 100644
+--- a/arch/h8300/include/asm/Kbuild
++++ b/arch/h8300/include/asm/Kbuild
+@@ -39,6 +39,7 @@ generic-y += preempt.h
+ generic-y += scatterlist.h
+ generic-y += sections.h
+ generic-y += serial.h
++generic-y += simd.h
+ generic-y += sizes.h
+ generic-y += spinlock.h
+ generic-y += timex.h
+diff --git a/arch/hexagon/include/asm/Kbuild b/arch/hexagon/include/asm/Kbuild
+index dd2fd9c0d292..217d4695fd8a 100644
+--- a/arch/hexagon/include/asm/Kbuild
++++ b/arch/hexagon/include/asm/Kbuild
+@@ -29,6 +29,7 @@ generic-y += rwsem.h
+ generic-y += sections.h
+ generic-y += segment.h
+ generic-y += serial.h
++generic-y += simd.h
+ generic-y += sizes.h
+ generic-y += topology.h
+ generic-y += trace_clock.h
+diff --git a/arch/ia64/include/asm/Kbuild b/arch/ia64/include/asm/Kbuild
+index 557bbc8ba9f5..41c5ebdf79e5 100644
+--- a/arch/ia64/include/asm/Kbuild
++++ b/arch/ia64/include/asm/Kbuild
+@@ -4,6 +4,7 @@ generic-y += irq_work.h
+ generic-y += mcs_spinlock.h
+ generic-y += mm-arch-hooks.h
+ generic-y += preempt.h
++generic-y += simd.h
+ generic-y += trace_clock.h
+ generic-y += vtime.h
+ generic-y += word-at-a-time.h
+diff --git a/arch/m68k/include/asm/Kbuild b/arch/m68k/include/asm/Kbuild
+index a4b8d3331a9e..73898dd1a4d0 100644
+--- a/arch/m68k/include/asm/Kbuild
++++ b/arch/m68k/include/asm/Kbuild
+@@ -19,6 +19,7 @@ generic-y += mm-arch-hooks.h
+ generic-y += percpu.h
+ generic-y += preempt.h
+ generic-y += sections.h
++generic-y += simd.h
+ generic-y += spinlock.h
+ generic-y += topology.h
+ generic-y += trace_clock.h
+diff --git a/arch/microblaze/include/asm/Kbuild b/arch/microblaze/include/asm/Kbuild
+index 569ba9e670c1..7a877eea99d3 100644
+--- a/arch/microblaze/include/asm/Kbuild
++++ b/arch/microblaze/include/asm/Kbuild
+@@ -25,6 +25,7 @@ generic-y += parport.h
+ generic-y += percpu.h
+ generic-y += preempt.h
+ generic-y += serial.h
++generic-y += simd.h
+ generic-y += syscalls.h
+ generic-y += topology.h
+ generic-y += trace_clock.h
+diff --git a/arch/mips/include/asm/Kbuild b/arch/mips/include/asm/Kbuild
+index 58351e48421e..e8868e0fb2c3 100644
+--- a/arch/mips/include/asm/Kbuild
++++ b/arch/mips/include/asm/Kbuild
+@@ -16,6 +16,7 @@ generic-y += qrwlock.h
+ generic-y += qspinlock.h
+ generic-y += sections.h
+ generic-y += segment.h
++generic-y += simd.h
+ generic-y += trace_clock.h
+ generic-y += unaligned.h
+ generic-y += user.h
+diff --git a/arch/nds32/include/asm/Kbuild b/arch/nds32/include/asm/Kbuild
+index dbc4e5422550..fb2f113716ce 100644
+--- a/arch/nds32/include/asm/Kbuild
++++ b/arch/nds32/include/asm/Kbuild
+@@ -46,6 +46,7 @@ generic-y += sections.h
+ generic-y += segment.h
+ generic-y += serial.h
+ generic-y += shmbuf.h
++generic-y += simd.h
+ generic-y += sizes.h
+ generic-y += stat.h
+ generic-y += switch_to.h
+diff --git a/arch/nios2/include/asm/Kbuild b/arch/nios2/include/asm/Kbuild
+index 8fde4fa2c34f..571a9d9ad107 100644
+--- a/arch/nios2/include/asm/Kbuild
++++ b/arch/nios2/include/asm/Kbuild
+@@ -33,6 +33,7 @@ generic-y += preempt.h
+ generic-y += sections.h
+ generic-y += segment.h
+ generic-y += serial.h
++generic-y += simd.h
+ generic-y += spinlock.h
+ generic-y += topology.h
+ generic-y += trace_clock.h
+diff --git a/arch/openrisc/include/asm/Kbuild b/arch/openrisc/include/asm/Kbuild
+index eb87cd8327c8..b6231211bbad 100644
+--- a/arch/openrisc/include/asm/Kbuild
++++ b/arch/openrisc/include/asm/Kbuild
+@@ -34,6 +34,7 @@ generic-y += qrwlock_types.h
+ generic-y += qrwlock.h
+ generic-y += sections.h
+ generic-y += segment.h
++generic-y += simd.h
+ generic-y += string.h
+ generic-y += switch_to.h
+ generic-y += topology.h
+diff --git a/arch/parisc/include/asm/Kbuild b/arch/parisc/include/asm/Kbuild
+index 2013d639e735..97970b4d05ab 100644
+--- a/arch/parisc/include/asm/Kbuild
++++ b/arch/parisc/include/asm/Kbuild
+@@ -17,6 +17,7 @@ generic-y += percpu.h
+ generic-y += preempt.h
+ generic-y += seccomp.h
+ generic-y += segment.h
++generic-y += simd.h
+ generic-y += topology.h
+ generic-y += trace_clock.h
+ generic-y += user.h
+diff --git a/arch/powerpc/include/asm/Kbuild b/arch/powerpc/include/asm/Kbuild
+index 3196d227e351..2337190aaf69 100644
+--- a/arch/powerpc/include/asm/Kbuild
++++ b/arch/powerpc/include/asm/Kbuild
+@@ -8,3 +8,4 @@ generic-y += preempt.h
+ generic-y += rwsem.h
+ generic-y += vtime.h
+ generic-y += msi.h
++generic-y += simd.h
+diff --git a/arch/riscv/include/asm/Kbuild b/arch/riscv/include/asm/Kbuild
+index efdbe311e936..438a11d9c47a 100644
+--- a/arch/riscv/include/asm/Kbuild
++++ b/arch/riscv/include/asm/Kbuild
+@@ -46,6 +46,7 @@ generic-y += setup.h
+ generic-y += shmbuf.h
+ generic-y += shmparam.h
+ generic-y += signal.h
++generic-y += simd.h
+ generic-y += socket.h
+ generic-y += sockios.h
+ generic-y += stat.h
+diff --git a/arch/s390/include/asm/Kbuild b/arch/s390/include/asm/Kbuild
+index e3239772887a..3744c4c61fb5 100644
+--- a/arch/s390/include/asm/Kbuild
++++ b/arch/s390/include/asm/Kbuild
+@@ -22,6 +22,7 @@ generic-y += mcs_spinlock.h
+ generic-y += mm-arch-hooks.h
+ generic-y += preempt.h
+ generic-y += rwsem.h
++generic-y += simd.h
+ generic-y += trace_clock.h
+ generic-y += unaligned.h
+ generic-y += word-at-a-time.h
+diff --git a/arch/sh/include/asm/Kbuild b/arch/sh/include/asm/Kbuild
+index 6a5609a55965..8e64ff35a933 100644
+--- a/arch/sh/include/asm/Kbuild
++++ b/arch/sh/include/asm/Kbuild
+@@ -16,6 +16,7 @@ generic-y += percpu.h
+ generic-y += preempt.h
+ generic-y += rwsem.h
+ generic-y += serial.h
++generic-y += simd.h
+ generic-y += sizes.h
+ generic-y += trace_clock.h
+ generic-y += xor.h
+diff --git a/arch/sparc/include/asm/Kbuild b/arch/sparc/include/asm/Kbuild
+index 410b263ef5c8..72b9e08fb350 100644
+--- a/arch/sparc/include/asm/Kbuild
++++ b/arch/sparc/include/asm/Kbuild
+@@ -17,5 +17,6 @@ generic-y += msi.h
+ generic-y += preempt.h
+ generic-y += rwsem.h
+ generic-y += serial.h
++generic-y += simd.h
+ generic-y += trace_clock.h
+ generic-y += word-at-a-time.h
+diff --git a/arch/um/include/asm/Kbuild b/arch/um/include/asm/Kbuild
+index b10dde6cb793..8c2bfa6e0494 100644
+--- a/arch/um/include/asm/Kbuild
++++ b/arch/um/include/asm/Kbuild
+@@ -22,6 +22,7 @@ generic-y += param.h
+ generic-y += pci.h
+ generic-y += percpu.h
+ generic-y += preempt.h
++generic-y += simd.h
+ generic-y += switch_to.h
+ generic-y += topology.h
+ generic-y += trace_clock.h
+diff --git a/arch/unicore32/include/asm/Kbuild b/arch/unicore32/include/asm/Kbuild
+index bfc7abe77905..98a908720bbd 100644
+--- a/arch/unicore32/include/asm/Kbuild
++++ b/arch/unicore32/include/asm/Kbuild
+@@ -27,6 +27,7 @@ generic-y += preempt.h
+ generic-y += sections.h
+ generic-y += segment.h
+ generic-y += serial.h
++generic-y += simd.h
+ generic-y += sizes.h
+ generic-y += syscalls.h
+ generic-y += topology.h
+diff --git a/arch/x86/include/asm/simd.h b/arch/x86/include/asm/simd.h
+index a341c878e977..4aad7f158dcb 100644
+--- a/arch/x86/include/asm/simd.h
++++ b/arch/x86/include/asm/simd.h
+@@ -1,4 +1,11 @@
+-/* SPDX-License-Identifier: GPL-2.0 */
++/* SPDX-License-Identifier: GPL-2.0
++ *
++ * Copyright (C) 2015-2018 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
++ */
++
++#include <linux/simd.h>
++#ifndef _ASM_SIMD_H
++#define _ASM_SIMD_H
+ 
+ #include <asm/fpu/api.h>
+ 
+@@ -10,3 +17,38 @@ static __must_check inline bool may_use_simd(void)
+ {
+ 	return irq_fpu_usable();
+ }
++
++static inline void simd_get(simd_context_t *ctx)
++{
++#if !defined(CONFIG_UML)
++	*ctx = may_use_simd() ? HAVE_FULL_SIMD : HAVE_NO_SIMD;
++#else
++	*ctx = HAVE_NO_SIMD;
++#endif
++}
++
++static inline void simd_put(simd_context_t *ctx)
++{
++#if !defined(CONFIG_UML)
++	if (*ctx & HAVE_SIMD_IN_USE)
++		kernel_fpu_end();
++#endif
++	*ctx = HAVE_NO_SIMD;
++}
++
++static __must_check inline bool simd_use(simd_context_t *ctx)
++{
++#if !defined(CONFIG_UML)
++	if (!(*ctx & HAVE_FULL_SIMD))
++		return false;
++	if (*ctx & HAVE_SIMD_IN_USE)
++		return true;
++	kernel_fpu_begin();
++	*ctx |= HAVE_SIMD_IN_USE;
++	return true;
++#else
++	return false;
++#endif
++}
++
++#endif /* _ASM_SIMD_H */
+diff --git a/arch/xtensa/include/asm/Kbuild b/arch/xtensa/include/asm/Kbuild
+index 82c756431b49..7950f359649d 100644
+--- a/arch/xtensa/include/asm/Kbuild
++++ b/arch/xtensa/include/asm/Kbuild
+@@ -24,6 +24,7 @@ generic-y += percpu.h
+ generic-y += preempt.h
+ generic-y += rwsem.h
+ generic-y += sections.h
++generic-y += simd.h
+ generic-y += topology.h
+ generic-y += trace_clock.h
+ generic-y += word-at-a-time.h
+diff --git a/include/asm-generic/simd.h b/include/asm-generic/simd.h
+index d0343d58a74a..b3dd61ac010e 100644
+--- a/include/asm-generic/simd.h
++++ b/include/asm-generic/simd.h
+@@ -1,5 +1,9 @@
+ /* SPDX-License-Identifier: GPL-2.0 */
+ 
++#include <linux/simd.h>
++#ifndef _ASM_SIMD_H
++#define _ASM_SIMD_H
++
+ #include <linux/hardirq.h>
  
  /*
-  * Poly1305 requires a unique key for each tag, which implies that we can't set
-@@ -75,13 +68,16 @@ unsigned int crypto_poly1305_setdesckey(struct poly1305_desc_ctx *dctx,
+@@ -13,3 +17,19 @@ static __must_check inline bool may_use_simd(void)
  {
- 	if (!dctx->sset) {
- 		if (!dctx->rset && srclen >= POLY1305_BLOCK_SIZE) {
--			poly1305_setrkey(dctx, src);
-+			poly1305_core_setkey(&dctx->r, src);
- 			src += POLY1305_BLOCK_SIZE;
- 			srclen -= POLY1305_BLOCK_SIZE;
- 			dctx->rset = true;
- 		}
- 		if (srclen >= POLY1305_BLOCK_SIZE) {
--			poly1305_setskey(dctx, src);
-+			dctx->s[0] = get_unaligned_le32(src +  0);
-+			dctx->s[1] = get_unaligned_le32(src +  4);
-+			dctx->s[2] = get_unaligned_le32(src +  8);
-+			dctx->s[3] = get_unaligned_le32(src + 12);
- 			src += POLY1305_BLOCK_SIZE;
- 			srclen -= POLY1305_BLOCK_SIZE;
- 			dctx->sset = true;
-@@ -91,41 +87,37 @@ unsigned int crypto_poly1305_setdesckey(struct poly1305_desc_ctx *dctx,
+ 	return !in_interrupt();
  }
- EXPORT_SYMBOL_GPL(crypto_poly1305_setdesckey);
- 
--static unsigned int poly1305_blocks(struct poly1305_desc_ctx *dctx,
--				    const u8 *src, unsigned int srclen,
--				    u32 hibit)
-+static void poly1305_blocks_internal(struct poly1305_state *state,
-+				     const struct poly1305_key *key,
-+				     const void *src, unsigned int nblocks,
-+				     u32 hibit)
- {
- 	u32 r0, r1, r2, r3, r4;
- 	u32 s1, s2, s3, s4;
- 	u32 h0, h1, h2, h3, h4;
- 	u64 d0, d1, d2, d3, d4;
--	unsigned int datalen;
- 
--	if (unlikely(!dctx->sset)) {
--		datalen = crypto_poly1305_setdesckey(dctx, src, srclen);
--		src += srclen - datalen;
--		srclen = datalen;
--	}
-+	if (!nblocks)
-+		return;
- 
--	r0 = dctx->r[0];
--	r1 = dctx->r[1];
--	r2 = dctx->r[2];
--	r3 = dctx->r[3];
--	r4 = dctx->r[4];
-+	r0 = key->r[0];
-+	r1 = key->r[1];
-+	r2 = key->r[2];
-+	r3 = key->r[3];
-+	r4 = key->r[4];
- 
- 	s1 = r1 * 5;
- 	s2 = r2 * 5;
- 	s3 = r3 * 5;
- 	s4 = r4 * 5;
- 
--	h0 = dctx->h[0];
--	h1 = dctx->h[1];
--	h2 = dctx->h[2];
--	h3 = dctx->h[3];
--	h4 = dctx->h[4];
--
--	while (likely(srclen >= POLY1305_BLOCK_SIZE)) {
-+	h0 = state->h[0];
-+	h1 = state->h[1];
-+	h2 = state->h[2];
-+	h3 = state->h[3];
-+	h4 = state->h[4];
- 
-+	do {
- 		/* h += m[i] */
- 		h0 += (get_unaligned_le32(src +  0) >> 0) & 0x3ffffff;
- 		h1 += (get_unaligned_le32(src +  3) >> 2) & 0x3ffffff;
-@@ -154,16 +146,36 @@ static unsigned int poly1305_blocks(struct poly1305_desc_ctx *dctx,
- 		h1 += h0 >> 26;       h0 = h0 & 0x3ffffff;
- 
- 		src += POLY1305_BLOCK_SIZE;
--		srclen -= POLY1305_BLOCK_SIZE;
--	}
-+	} while (--nblocks);
- 
--	dctx->h[0] = h0;
--	dctx->h[1] = h1;
--	dctx->h[2] = h2;
--	dctx->h[3] = h3;
--	dctx->h[4] = h4;
-+	state->h[0] = h0;
-+	state->h[1] = h1;
-+	state->h[2] = h2;
-+	state->h[3] = h3;
-+	state->h[4] = h4;
-+}
- 
--	return srclen;
-+void poly1305_core_blocks(struct poly1305_state *state,
-+			  const struct poly1305_key *key,
-+			  const void *src, unsigned int nblocks)
++
++static inline void simd_get(simd_context_t *ctx)
 +{
-+	poly1305_blocks_internal(state, key, src, nblocks, 1 << 24);
++	*ctx = HAVE_NO_SIMD;
 +}
-+EXPORT_SYMBOL_GPL(poly1305_core_blocks);
 +
-+static void poly1305_blocks(struct poly1305_desc_ctx *dctx,
-+			    const u8 *src, unsigned int srclen, u32 hibit)
++static inline void simd_put(simd_context_t *ctx)
 +{
-+	unsigned int datalen;
-+
-+	if (unlikely(!dctx->sset)) {
-+		datalen = crypto_poly1305_setdesckey(dctx, src, srclen);
-+		src += srclen - datalen;
-+		srclen = datalen;
-+	}
-+
-+	poly1305_blocks_internal(&dctx->h, &dctx->r,
-+				 src, srclen / POLY1305_BLOCK_SIZE, hibit);
- }
- 
- int crypto_poly1305_update(struct shash_desc *desc,
-@@ -187,9 +199,9 @@ int crypto_poly1305_update(struct shash_desc *desc,
- 	}
- 
- 	if (likely(srclen >= POLY1305_BLOCK_SIZE)) {
--		bytes = poly1305_blocks(dctx, src, srclen, 1 << 24);
--		src += srclen - bytes;
--		srclen = bytes;
-+		poly1305_blocks(dctx, src, srclen, 1 << 24);
-+		src += srclen - (srclen % POLY1305_BLOCK_SIZE);
-+		srclen %= POLY1305_BLOCK_SIZE;
- 	}
- 
- 	if (unlikely(srclen)) {
-@@ -201,30 +213,18 @@ int crypto_poly1305_update(struct shash_desc *desc,
- }
- EXPORT_SYMBOL_GPL(crypto_poly1305_update);
- 
--int crypto_poly1305_final(struct shash_desc *desc, u8 *dst)
-+void poly1305_core_emit(const struct poly1305_state *state, void *dst)
- {
--	struct poly1305_desc_ctx *dctx = shash_desc_ctx(desc);
- 	u32 h0, h1, h2, h3, h4;
- 	u32 g0, g1, g2, g3, g4;
- 	u32 mask;
--	u64 f = 0;
--
--	if (unlikely(!dctx->sset))
--		return -ENOKEY;
--
--	if (unlikely(dctx->buflen)) {
--		dctx->buf[dctx->buflen++] = 1;
--		memset(dctx->buf + dctx->buflen, 0,
--		       POLY1305_BLOCK_SIZE - dctx->buflen);
--		poly1305_blocks(dctx, dctx->buf, POLY1305_BLOCK_SIZE, 0);
--	}
- 
- 	/* fully carry h */
--	h0 = dctx->h[0];
--	h1 = dctx->h[1];
--	h2 = dctx->h[2];
--	h3 = dctx->h[3];
--	h4 = dctx->h[4];
-+	h0 = state->h[0];
-+	h1 = state->h[1];
-+	h2 = state->h[2];
-+	h3 = state->h[3];
-+	h4 = state->h[4];
- 
- 	h2 += (h1 >> 26);     h1 = h1 & 0x3ffffff;
- 	h3 += (h2 >> 26);     h2 = h2 & 0x3ffffff;
-@@ -254,16 +254,40 @@ int crypto_poly1305_final(struct shash_desc *desc, u8 *dst)
- 	h4 = (h4 & mask) | g4;
- 
- 	/* h = h % (2^128) */
--	h0 = (h0 >>  0) | (h1 << 26);
--	h1 = (h1 >>  6) | (h2 << 20);
--	h2 = (h2 >> 12) | (h3 << 14);
--	h3 = (h3 >> 18) | (h4 <<  8);
-+	put_unaligned_le32((h0 >>  0) | (h1 << 26), dst +  0);
-+	put_unaligned_le32((h1 >>  6) | (h2 << 20), dst +  4);
-+	put_unaligned_le32((h2 >> 12) | (h3 << 14), dst +  8);
-+	put_unaligned_le32((h3 >> 18) | (h4 <<  8), dst + 12);
 +}
-+EXPORT_SYMBOL_GPL(poly1305_core_emit);
 +
-+int crypto_poly1305_final(struct shash_desc *desc, u8 *dst)
++static __must_check inline bool simd_use(simd_context_t *ctx)
 +{
-+	struct poly1305_desc_ctx *dctx = shash_desc_ctx(desc);
-+	__le32 digest[4];
-+	u64 f = 0;
++	return false;
++}
 +
-+	if (unlikely(!dctx->sset))
-+		return -ENOKEY;
-+
-+	if (unlikely(dctx->buflen)) {
-+		dctx->buf[dctx->buflen++] = 1;
-+		memset(dctx->buf + dctx->buflen, 0,
-+		       POLY1305_BLOCK_SIZE - dctx->buflen);
-+		poly1305_blocks(dctx, dctx->buf, POLY1305_BLOCK_SIZE, 0);
-+	}
-+
-+	poly1305_core_emit(&dctx->h, digest);
- 
- 	/* mac = (h + s) % (2^128) */
--	f = (f >> 32) + h0 + dctx->s[0]; put_unaligned_le32(f, dst +  0);
--	f = (f >> 32) + h1 + dctx->s[1]; put_unaligned_le32(f, dst +  4);
--	f = (f >> 32) + h2 + dctx->s[2]; put_unaligned_le32(f, dst +  8);
--	f = (f >> 32) + h3 + dctx->s[3]; put_unaligned_le32(f, dst + 12);
-+	f = (f >> 32) + le32_to_cpu(digest[0]) + dctx->s[0];
-+	put_unaligned_le32(f, dst + 0);
-+	f = (f >> 32) + le32_to_cpu(digest[1]) + dctx->s[1];
-+	put_unaligned_le32(f, dst + 4);
-+	f = (f >> 32) + le32_to_cpu(digest[2]) + dctx->s[2];
-+	put_unaligned_le32(f, dst + 8);
-+	f = (f >> 32) + le32_to_cpu(digest[3]) + dctx->s[3];
-+	put_unaligned_le32(f, dst + 12);
- 
- 	return 0;
- }
-diff --git a/include/crypto/poly1305.h b/include/crypto/poly1305.h
-index f718a19da82f7..34317ed2071e6 100644
---- a/include/crypto/poly1305.h
-+++ b/include/crypto/poly1305.h
-@@ -13,13 +13,21 @@
- #define POLY1305_KEY_SIZE	32
- #define POLY1305_DIGEST_SIZE	16
- 
-+struct poly1305_key {
-+	u32 r[5];	/* key, base 2^26 */
-+};
-+
-+struct poly1305_state {
-+	u32 h[5];	/* accumulator, base 2^26 */
-+};
-+
- struct poly1305_desc_ctx {
- 	/* key */
--	u32 r[5];
-+	struct poly1305_key r;
- 	/* finalize key */
- 	u32 s[4];
- 	/* accumulator */
--	u32 h[5];
-+	struct poly1305_state h;
- 	/* partial buffer */
- 	u8 buf[POLY1305_BLOCK_SIZE];
- 	/* bytes used in partial buffer */
-@@ -30,6 +38,22 @@ struct poly1305_desc_ctx {
- 	bool sset;
- };
- 
-+/*
-+ * Poly1305 core functions.  These implement the ε-almost-∆-universal hash
-+ * function underlying the Poly1305 MAC, i.e. they don't add an encrypted nonce
-+ * ("s key") at the end.  They also only support block-aligned inputs.
++#endif /* _ASM_SIMD_H */
+diff --git a/include/linux/simd.h b/include/linux/simd.h
+new file mode 100644
+index 000000000000..4e0b8a9bdc14
+--- /dev/null
++++ b/include/linux/simd.h
+@@ -0,0 +1,32 @@
++/* SPDX-License-Identifier: GPL-2.0
++ *
++ * Copyright (C) 2015-2018 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
 + */
-+void poly1305_core_setkey(struct poly1305_key *key, const u8 *raw_key);
-+static inline void poly1305_core_init(struct poly1305_state *state)
-+{
-+	memset(state->h, 0, sizeof(state->h));
-+}
-+void poly1305_core_blocks(struct poly1305_state *state,
-+			  const struct poly1305_key *key,
-+			  const void *src, unsigned int nblocks);
-+void poly1305_core_emit(const struct poly1305_state *state, void *dst);
 +
-+/* Crypto API helper functions for the Poly1305 MAC */
- int crypto_poly1305_init(struct shash_desc *desc);
- unsigned int crypto_poly1305_setdesckey(struct poly1305_desc_ctx *dctx,
- 					const u8 *src, unsigned int srclen);
++#ifndef _SIMD_H
++#define _SIMD_H
++
++typedef enum {
++	HAVE_NO_SIMD = 1 << 0,
++	HAVE_FULL_SIMD = 1 << 1,
++	HAVE_SIMD_IN_USE = 1 << 31
++} simd_context_t;
++
++#define DONT_USE_SIMD ((simd_context_t []){ HAVE_NO_SIMD })
++
++#include <linux/sched.h>
++#include <asm/simd.h>
++
++static inline bool simd_relax(simd_context_t *ctx)
++{
++#ifdef CONFIG_PREEMPT
++	if ((*ctx & HAVE_SIMD_IN_USE) && need_resched()) {
++		simd_put(ctx);
++		simd_get(ctx);
++		return true;
++	}
++#endif
++	return false;
++}
++
++#endif /* _SIMD_H */
 -- 
-2.19.1.331.ge82ca0e54c-goog
+2.19.1
