@@ -1,241 +1,162 @@
-Return-Path: <SRS0=XFsj=M6=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:57376 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727351AbeJRMiu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 18 Oct 2018 08:38:50 -0400
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Paul Crowley <paulcrowley@google.com>
-Subject: [PATCH v3 2/2] crypto: arm/aes - add some hardening against cache-timing attacks
-Date: Wed, 17 Oct 2018 21:37:59 -0700
-Message-Id: <20181018043759.7669-3-ebiggers@kernel.org>
-In-Reply-To: <20181018043759.7669-1-ebiggers@kernel.org>
-References: <20181018043759.7669-1-ebiggers@kernel.org>
+Return-Path: <SRS0=GKHD=M7=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail-lf1-f67.google.com ([209.85.167.67]:33363 "EHLO
+        mail-lf1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726698AbeJTHKE (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 20 Oct 2018 03:10:04 -0400
+From: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+To: linux-crypto@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        stable@vger.kernel.org
+Subject: [PATCH 2/2] crypto: testmgr: add AES-CFB tests
+Date: Sat, 20 Oct 2018 02:01:53 +0300
+Message-Id: <20181019230153.28201-2-dbaryshkov@gmail.com>
+In-Reply-To: <20181019230153.28201-1-dbaryshkov@gmail.com>
+References: <20181019230153.28201-1-dbaryshkov@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Eric Biggers <ebiggers@google.com>
+Add AES128/192/256-CFB testvectors from NIST SP800-38A.
 
-Make the ARM scalar AES implementation closer to constant-time by
-disabling interrupts and prefetching the tables into L1 cache.  This is
-feasible because due to ARM's "free" rotations, the main tables are only
-1024 bytes instead of the usual 4096 used by most AES implementations.
-
-On ARM Cortex-A7, the speed loss is only about 5%.  The resulting code
-is still over twice as fast as aes_ti.c.  Responsiveness is potentially
-a concern, but interrupts are only disabled for a single AES block.
-
-Note that even after these changes, the implementation still isn't
-necessarily guaranteed to be constant-time; see
-https://cr.yp.to/antiforgery/cachetiming-20050414.pdf for a discussion
-of the many difficulties involved in writing truly constant-time AES
-software.  But it's valuable to make such attacks more difficult.
-
-Much of this patch is based on patches suggested by Ard Biesheuvel.
-
-Suggested-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Signed-off-by: Eric Biggers <ebiggers@google.com>
+Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Cc: stable@vger.kernel.org
+Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
 ---
- arch/arm/crypto/Kconfig           |  9 +++++
- arch/arm/crypto/aes-cipher-core.S | 62 ++++++++++++++++++++++++++-----
- crypto/aes_generic.c              |  9 +++--
- 3 files changed, 66 insertions(+), 14 deletions(-)
+ crypto/tcrypt.c  |  5 ++++
+ crypto/testmgr.c |  7 +++++
+ crypto/testmgr.h | 76 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 88 insertions(+)
 
-diff --git a/arch/arm/crypto/Kconfig b/arch/arm/crypto/Kconfig
-index ef0c7feea6e29..0473a8f683896 100644
---- a/arch/arm/crypto/Kconfig
-+++ b/arch/arm/crypto/Kconfig
-@@ -69,6 +69,15 @@ config CRYPTO_AES_ARM
- 	help
- 	  Use optimized AES assembler routines for ARM platforms.
+diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
+index bdde95e8d369..a6315827d240 100644
+--- a/crypto/tcrypt.c
++++ b/crypto/tcrypt.c
+@@ -1733,6 +1733,7 @@ static int do_test(const char *alg, u32 type, u32 mask, int m, u32 num_mb)
+ 		ret += tcrypt_test("xts(aes)");
+ 		ret += tcrypt_test("ctr(aes)");
+ 		ret += tcrypt_test("rfc3686(ctr(aes))");
++		ret += tcrypt_test("cfb(aes)");
+ 		break;
  
-+	  On ARM processors without the Crypto Extensions, this is the
-+	  fastest AES implementation for single blocks.  For multiple
-+	  blocks, the NEON bit-sliced implementation is usually faster.
-+
-+	  This implementation may be vulnerable to cache timing attacks,
-+	  since it uses lookup tables.  However, as countermeasures it
-+	  disables IRQs and preloads the tables; it is hoped this makes
-+	  such attacks very difficult.
-+
- config CRYPTO_AES_ARM_BS
- 	tristate "Bit sliced AES using NEON instructions"
- 	depends on KERNEL_MODE_NEON
-diff --git a/arch/arm/crypto/aes-cipher-core.S b/arch/arm/crypto/aes-cipher-core.S
-index 184d6c2d15d5e..f2d67c095e596 100644
---- a/arch/arm/crypto/aes-cipher-core.S
-+++ b/arch/arm/crypto/aes-cipher-core.S
-@@ -10,6 +10,7 @@
-  */
+ 	case 11:
+@@ -2059,6 +2060,10 @@ static int do_test(const char *alg, u32 type, u32 mask, int m, u32 num_mb)
+ 				speed_template_16_24_32);
+ 		test_cipher_speed("ctr(aes)", DECRYPT, sec, NULL, 0,
+ 				speed_template_16_24_32);
++		test_cipher_speed("cfb(aes)", ENCRYPT, sec, NULL, 0,
++				speed_template_16_24_32);
++		test_cipher_speed("cfb(aes)", DECRYPT, sec, NULL, 0,
++				speed_template_16_24_32);
+ 		break;
  
- #include <linux/linkage.h>
-+#include <asm/assembler.h>
- #include <asm/cache.h>
- 
- 	.text
-@@ -41,7 +42,7 @@
- 	.endif
- 	.endm
- 
--	.macro		__hround, out0, out1, in0, in1, in2, in3, t3, t4, enc, sz, op
-+	.macro		__hround, out0, out1, in0, in1, in2, in3, t3, t4, enc, sz, op, oldcpsr
- 	__select	\out0, \in0, 0
- 	__select	t0, \in1, 1
- 	__load		\out0, \out0, 0, \sz, \op
-@@ -73,6 +74,14 @@
- 	__load		t0, t0, 3, \sz, \op
- 	__load		\t4, \t4, 3, \sz, \op
- 
-+	.ifnb		\oldcpsr
-+	/*
-+	 * This is the final round and we're done with all data-dependent table
-+	 * lookups, so we can safely re-enable interrupts.
-+	 */
-+	restore_irqs	\oldcpsr
-+	.endif
-+
- 	eor		\out1, \out1, t1, ror #24
- 	eor		\out0, \out0, t2, ror #16
- 	ldm		rk!, {t1, t2}
-@@ -83,14 +92,14 @@
- 	eor		\out1, \out1, t2
- 	.endm
- 
--	.macro		fround, out0, out1, out2, out3, in0, in1, in2, in3, sz=2, op
-+	.macro		fround, out0, out1, out2, out3, in0, in1, in2, in3, sz=2, op, oldcpsr
- 	__hround	\out0, \out1, \in0, \in1, \in2, \in3, \out2, \out3, 1, \sz, \op
--	__hround	\out2, \out3, \in2, \in3, \in0, \in1, \in1, \in2, 1, \sz, \op
-+	__hround	\out2, \out3, \in2, \in3, \in0, \in1, \in1, \in2, 1, \sz, \op, \oldcpsr
- 	.endm
- 
--	.macro		iround, out0, out1, out2, out3, in0, in1, in2, in3, sz=2, op
-+	.macro		iround, out0, out1, out2, out3, in0, in1, in2, in3, sz=2, op, oldcpsr
- 	__hround	\out0, \out1, \in0, \in3, \in2, \in1, \out2, \out3, 0, \sz, \op
--	__hround	\out2, \out3, \in2, \in1, \in0, \in3, \in1, \in0, 0, \sz, \op
-+	__hround	\out2, \out3, \in2, \in1, \in0, \in3, \in1, \in0, 0, \sz, \op, \oldcpsr
- 	.endm
- 
- 	.macro		__rev, out, in
-@@ -118,13 +127,14 @@
- 	.macro		do_crypt, round, ttab, ltab, bsz
- 	push		{r3-r11, lr}
- 
-+	// Load keys first, to reduce latency in case they're not cached yet.
-+	ldm		rk!, {r8-r11}
-+
- 	ldr		r4, [in]
- 	ldr		r5, [in, #4]
- 	ldr		r6, [in, #8]
- 	ldr		r7, [in, #12]
- 
--	ldm		rk!, {r8-r11}
--
- #ifdef CONFIG_CPU_BIG_ENDIAN
- 	__rev		r4, r4
- 	__rev		r5, r5
-@@ -138,6 +148,25 @@
- 	eor		r7, r7, r11
- 
- 	__adrl		ttab, \ttab
-+	/*
-+	 * Disable interrupts and prefetch the 1024-byte 'ft' or 'it' table into
-+	 * L1 cache, assuming cacheline size >= 32.  This is a hardening measure
-+	 * intended to make cache-timing attacks more difficult.  They may not
-+	 * be fully prevented, however; see the paper
-+	 * https://cr.yp.to/antiforgery/cachetiming-20050414.pdf
-+	 * ("Cache-timing attacks on AES") for a discussion of the many
-+	 * difficulties involved in writing truly constant-time AES software.
-+	 */
-+	 save_and_disable_irqs	t0
-+	.set		i, 0
-+	.rept		1024 / 128
-+	ldr		r8, [ttab, #i + 0]
-+	ldr		r9, [ttab, #i + 32]
-+	ldr		r10, [ttab, #i + 64]
-+	ldr		r11, [ttab, #i + 96]
-+	.set		i, i + 128
-+	.endr
-+	push		{t0}		// oldcpsr
- 
- 	tst		rounds, #2
- 	bne		1f
-@@ -151,8 +180,21 @@
- 	\round		r4, r5, r6, r7, r8, r9, r10, r11
- 	b		0b
- 
--2:	__adrl		ttab, \ltab
--	\round		r4, r5, r6, r7, r8, r9, r10, r11, \bsz, b
-+2:	.ifb		\ltab
-+	add		ttab, ttab, #1
-+	.else
-+	__adrl		ttab, \ltab
-+	// Prefetch inverse S-box for final round; see explanation above
-+	.set		i, 0
-+	.rept		256 / 64
-+	ldr		t0, [ttab, #i + 0]
-+	ldr		t1, [ttab, #i + 32]
-+	.set		i, i + 64
-+	.endr
-+	.endif
-+
-+	pop		{rounds}	// oldcpsr
-+	\round		r4, r5, r6, r7, r8, r9, r10, r11, \bsz, b, rounds
- 
- #ifdef CONFIG_CPU_BIG_ENDIAN
- 	__rev		r4, r4
-@@ -175,7 +217,7 @@
- 	.endm
- 
- ENTRY(__aes_arm_encrypt)
--	do_crypt	fround, crypto_ft_tab, crypto_ft_tab + 1, 2
-+	do_crypt	fround, crypto_ft_tab,, 2
- ENDPROC(__aes_arm_encrypt)
- 
- 	.align		5
-diff --git a/crypto/aes_generic.c b/crypto/aes_generic.c
-index ca554d57d01e9..13df33aca4631 100644
---- a/crypto/aes_generic.c
-+++ b/crypto/aes_generic.c
-@@ -63,7 +63,8 @@ static inline u8 byte(const u32 x, const unsigned n)
- 
- static const u32 rco_tab[10] = { 1, 2, 4, 8, 16, 32, 64, 128, 27, 54 };
- 
--__visible const u32 crypto_ft_tab[4][256] = {
-+/* cacheline-aligned to facilitate prefetching into cache */
-+__visible const u32 crypto_ft_tab[4][256] __cacheline_aligned = {
- 	{
- 		0xa56363c6, 0x847c7cf8, 0x997777ee, 0x8d7b7bf6,
- 		0x0df2f2ff, 0xbd6b6bd6, 0xb16f6fde, 0x54c5c591,
-@@ -327,7 +328,7 @@ __visible const u32 crypto_ft_tab[4][256] = {
- 	}
+ 	case 201:
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index a1d42245082a..016d61c419fc 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -2684,6 +2684,13 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 				.dec = __VECS(aes_ccm_dec_tv_template)
+ 			}
+ 		}
++	}, {
++		.alg = "cfb(aes)",
++		.test = alg_test_skcipher,
++		.fips_allowed = 1,
++		.suite = {
++			.cipher = __VECS(aes_cfb_tv_template)
++		},
+ 	}, {
+ 		.alg = "chacha20",
+ 		.test = alg_test_skcipher,
+diff --git a/crypto/testmgr.h b/crypto/testmgr.h
+index 173111c70746..19b6d184c8fb 100644
+--- a/crypto/testmgr.h
++++ b/crypto/testmgr.h
+@@ -12081,6 +12081,82 @@ static const struct cipher_testvec aes_cbc_tv_template[] = {
+ 	},
  };
  
--__visible const u32 crypto_fl_tab[4][256] = {
-+__visible const u32 crypto_fl_tab[4][256] __cacheline_aligned = {
- 	{
- 		0x00000063, 0x0000007c, 0x00000077, 0x0000007b,
- 		0x000000f2, 0x0000006b, 0x0000006f, 0x000000c5,
-@@ -591,7 +592,7 @@ __visible const u32 crypto_fl_tab[4][256] = {
- 	}
- };
- 
--__visible const u32 crypto_it_tab[4][256] = {
-+__visible const u32 crypto_it_tab[4][256] __cacheline_aligned = {
- 	{
- 		0x50a7f451, 0x5365417e, 0xc3a4171a, 0x965e273a,
- 		0xcb6bab3b, 0xf1459d1f, 0xab58faac, 0x9303e34b,
-@@ -855,7 +856,7 @@ __visible const u32 crypto_it_tab[4][256] = {
- 	}
- };
- 
--__visible const u32 crypto_il_tab[4][256] = {
-+__visible const u32 crypto_il_tab[4][256] __cacheline_aligned = {
- 	{
- 		0x00000052, 0x00000009, 0x0000006a, 0x000000d5,
- 		0x00000030, 0x00000036, 0x000000a5, 0x00000038,
++static const struct cipher_testvec aes_cfb_tv_template[] = {
++	{ /* From NIST SP800-38A */
++		.key	= "\x2b\x7e\x15\x16\x28\xae\xd2\xa6"
++			  "\xab\xf7\x15\x88\x09\xcf\x4f\x3c",
++		.klen	= 16,
++		.iv	= "\x00\x01\x02\x03\x04\x05\x06\x07"
++			  "\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f",
++		.ptext	= "\x6b\xc1\xbe\xe2\x2e\x40\x9f\x96"
++			  "\xe9\x3d\x7e\x11\x73\x93\x17\x2a"
++			  "\xae\x2d\x8a\x57\x1e\x03\xac\x9c"
++			  "\x9e\xb7\x6f\xac\x45\xaf\x8e\x51"
++			  "\x30\xc8\x1c\x46\xa3\x5c\xe4\x11"
++			  "\xe5\xfb\xc1\x19\x1a\x0a\x52\xef"
++			  "\xf6\x9f\x24\x45\xdf\x4f\x9b\x17"
++			  "\xad\x2b\x41\x7b\xe6\x6c\x37\x10",
++		.ctext	= "\x3b\x3f\xd9\x2e\xb7\x2d\xad\x20"
++			  "\x33\x34\x49\xf8\xe8\x3c\xfb\x4a"
++			  "\xc8\xa6\x45\x37\xa0\xb3\xa9\x3f"
++			  "\xcd\xe3\xcd\xad\x9f\x1c\xe5\x8b"
++			  "\x26\x75\x1f\x67\xa3\xcb\xb1\x40"
++			  "\xb1\x80\x8c\xf1\x87\xa4\xf4\xdf"
++			  "\xc0\x4b\x05\x35\x7c\x5d\x1c\x0e"
++			  "\xea\xc4\xc6\x6f\x9f\xf7\xf2\xe6",
++		.len	= 64,
++	}, {
++		.key	= "\x8e\x73\xb0\xf7\xda\x0e\x64\x52"
++			  "\xc8\x10\xf3\x2b\x80\x90\x79\xe5"
++			  "\x62\xf8\xea\xd2\x52\x2c\x6b\x7b",
++		.klen	= 24,
++		.iv	= "\x00\x01\x02\x03\x04\x05\x06\x07"
++			  "\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f",
++		.ptext	= "\x6b\xc1\xbe\xe2\x2e\x40\x9f\x96"
++			  "\xe9\x3d\x7e\x11\x73\x93\x17\x2a"
++			  "\xae\x2d\x8a\x57\x1e\x03\xac\x9c"
++			  "\x9e\xb7\x6f\xac\x45\xaf\x8e\x51"
++			  "\x30\xc8\x1c\x46\xa3\x5c\xe4\x11"
++			  "\xe5\xfb\xc1\x19\x1a\x0a\x52\xef"
++			  "\xf6\x9f\x24\x45\xdf\x4f\x9b\x17"
++			  "\xad\x2b\x41\x7b\xe6\x6c\x37\x10",
++		.ctext	= "\xcd\xc8\x0d\x6f\xdd\xf1\x8c\xab"
++			  "\x34\xc2\x59\x09\xc9\x9a\x41\x74"
++			  "\x67\xce\x7f\x7f\x81\x17\x36\x21"
++			  "\x96\x1a\x2b\x70\x17\x1d\x3d\x7a"
++			  "\x2e\x1e\x8a\x1d\xd5\x9b\x88\xb1"
++			  "\xc8\xe6\x0f\xed\x1e\xfa\xc4\xc9"
++			  "\xc0\x5f\x9f\x9c\xa9\x83\x4f\xa0"
++			  "\x42\xae\x8f\xba\x58\x4b\x09\xff",
++		.len	= 64,
++	}, {
++		.key	= "\x60\x3d\xeb\x10\x15\xca\x71\xbe"
++			  "\x2b\x73\xae\xf0\x85\x7d\x77\x81"
++			  "\x1f\x35\x2c\x07\x3b\x61\x08\xd7"
++			  "\x2d\x98\x10\xa3\x09\x14\xdf\xf4",
++		.klen	= 32,
++		.iv	= "\x00\x01\x02\x03\x04\x05\x06\x07"
++			  "\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f",
++		.ptext	= "\x6b\xc1\xbe\xe2\x2e\x40\x9f\x96"
++			  "\xe9\x3d\x7e\x11\x73\x93\x17\x2a"
++			  "\xae\x2d\x8a\x57\x1e\x03\xac\x9c"
++			  "\x9e\xb7\x6f\xac\x45\xaf\x8e\x51"
++			  "\x30\xc8\x1c\x46\xa3\x5c\xe4\x11"
++			  "\xe5\xfb\xc1\x19\x1a\x0a\x52\xef"
++			  "\xf6\x9f\x24\x45\xdf\x4f\x9b\x17"
++			  "\xad\x2b\x41\x7b\xe6\x6c\x37\x10",
++		.ctext	= "\xdc\x7e\x84\xbf\xda\x79\x16\x4b"
++			  "\x7e\xcd\x84\x86\x98\x5d\x38\x60"
++			  "\x39\xff\xed\x14\x3b\x28\xb1\xc8"
++			  "\x32\x11\x3c\x63\x31\xe5\x40\x7b"
++			  "\xdf\x10\x13\x24\x15\xe5\x4b\x92"
++			  "\xa1\x3e\xd0\xa8\x26\x7a\xe2\xf9"
++			  "\x75\xa3\x85\x74\x1a\xb9\xce\xf8"
++			  "\x20\x31\x62\x3d\x55\xb1\xe4\x71",
++		.len	= 64,
++	},
++};
++
+ static const struct aead_testvec hmac_md5_ecb_cipher_null_enc_tv_template[] = {
+ 	{ /* Input data from RFC 2410 Case 1 */
+ #ifdef __LITTLE_ENDIAN
 -- 
 2.19.1
