@@ -1,98 +1,165 @@
-Return-Path: <SRS0=9uPW=NC=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from bedivere.hansenpartnership.com ([66.63.167.143]:49718 "EHLO
-        bedivere.hansenpartnership.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727135AbeJVP5Q (ORCPT
+Return-Path: <SRS0=GKHD=M7=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail-it1-f195.google.com ([209.85.166.195]:37211 "EHLO
+        mail-it1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726690AbeJSR7g (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 22 Oct 2018 11:57:16 -0400
-Message-ID: <1540193990.3202.15.camel@HansenPartnership.com>
-Subject: [PATCH v4 6/7] tpm: add the null key name as a tpm2 sysfs variable
-From: James Bottomley <James.Bottomley@HansenPartnership.com>
-To: linux-integrity@vger.kernel.org
-Cc: linux-crypto@vger.kernel.org,
-        linux-security-module@vger.kernel.org,
-        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date: Mon, 22 Oct 2018 08:39:50 +0100
-In-Reply-To: <1540193596.3202.7.camel@HansenPartnership.com>
-References: <1540193596.3202.7.camel@HansenPartnership.com>
+        Fri, 19 Oct 2018 13:59:36 -0400
+Received: by mail-it1-f195.google.com with SMTP id e74-v6so3813139ita.2
+        for <linux-crypto@vger.kernel.org>; Fri, 19 Oct 2018 02:54:14 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <CAKv+Gu9XJ0k82ZNPRirs3Qhda3375CUA8uhJmsK85=1a9VmaNQ@mail.gmail.com>
+References: <20181018043759.7669-1-ebiggers@kernel.org> <20181018043759.7669-3-ebiggers@kernel.org>
+ <CAKv+Gu9XJ0k82ZNPRirs3Qhda3375CUA8uhJmsK85=1a9VmaNQ@mail.gmail.com>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date: Fri, 19 Oct 2018 17:54:12 +0800
+Message-ID: <CAKv+Gu-qJM4i7EGkUDQwz2ys1G3ZrWDZYnZSBu8OabPm-Q7fFg@mail.gmail.com>
+Subject: Re: [PATCH v3 2/2] crypto: arm/aes - add some hardening against
+ cache-timing attacks
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Paul Crowley <paulcrowley@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This is the last component of encrypted tpm2 session handling that
-allows us to verify from userspace that the key derived from the NULL
-seed genuinely belongs to the TPM and has not been spoofed.
+On 19 October 2018 at 13:41, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
+> On 18 October 2018 at 12:37, Eric Biggers <ebiggers@kernel.org> wrote:
+>> From: Eric Biggers <ebiggers@google.com>
+>>
+>> Make the ARM scalar AES implementation closer to constant-time by
+>> disabling interrupts and prefetching the tables into L1 cache.  This is
+>> feasible because due to ARM's "free" rotations, the main tables are only
+>> 1024 bytes instead of the usual 4096 used by most AES implementations.
+>>
+>> On ARM Cortex-A7, the speed loss is only about 5%.  The resulting code
+>> is still over twice as fast as aes_ti.c.  Responsiveness is potentially
+>> a concern, but interrupts are only disabled for a single AES block.
+>>
+>
+> So that would be in the order of 700 cycles, based on the numbers you
+> shared in v1 of the aes_ti.c patch. Does that sound about right? So
+> that would be around 1 microsecond, which is really not a number to
+> obsess about imo.
+>
+> I considered another option, which is to detect whether an interrupt
+> has been taken (by writing some canary value below that stack pointer
+> in the location where the exception handler will preserve the value of
+> sp, and checking at the end whether it has been modified) and doing a
+> usleep_range(x, y) if that is the case.
+>
+> But this is much simpler so let's only go there if we must.
+>
 
-The procedure for doing this involves creating an attestation identity
-key (which requires verification of the TPM EK certificate) and then
-using that AIK to sign a certification of the Elliptic Curve key over
-the NULL seed.  Userspace must create this EC Key using the parameters
-prescribed in TCG TPM v2.0 Provisioning Guidance for the SRK ECC; if
-this is done correctly the names will match and the TPM can then run a
-TPM2_Certify operation on this derived primary key using the newly
-created AIK.
+I played around a bit and implemented it for discussion purposes, but
+restarting the operation if it gets interrupted, as suggested in the
+paper (whitespace corruption courtesy of Gmail)
 
-Signed-off-by: James Bottomley <James.Bottomley@HansenPartnership.com>
----
- drivers/char/tpm/tpm-sysfs.c | 27 ++++++++++++++++++++++++++-
- 1 file changed, 26 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/char/tpm/tpm-sysfs.c b/drivers/char/tpm/tpm-sysfs.c
-index 83a77a445538..7e901d9e893e 100644
---- a/drivers/char/tpm/tpm-sysfs.c
-+++ b/drivers/char/tpm/tpm-sysfs.c
-@@ -284,6 +284,19 @@ static ssize_t timeouts_show(struct device *dev, struct device_attribute *attr,
- }
- static DEVICE_ATTR_RO(timeouts);
- 
-+static ssize_t null_name_show(struct device *dev, struct device_attribute *attr,
-+			      char *buf)
-+{
-+	struct tpm_chip *chip = to_tpm_chip(dev);
-+	int size = TPM2_NAME_SIZE;
+diff --git a/arch/arm/crypto/aes-cipher-core.S
+b/arch/arm/crypto/aes-cipher-core.S
+index 184d6c2d15d5..2e8a84a47784 100644
+--- a/arch/arm/crypto/aes-cipher-core.S
++++ b/arch/arm/crypto/aes-cipher-core.S
+@@ -10,6 +10,7 @@
+  */
+
+ #include <linux/linkage.h>
++#include <asm/asm-offsets.h>
+ #include <asm/cache.h>
+
+  .text
+@@ -139,6 +140,34 @@
+
+  __adrl ttab, \ttab
+
++ /*
++ * Set a canary that will allow us to tell whether any
++ * interrupts were taken while this function was executing.
++ * The zero value will be overwritten with the process counter
++ * value at the point where the IRQ exception is taken.
++ */
++ mov t0, #0
++ str t0, [sp, #-(SVC_REGS_SIZE - S_PC)]
 +
-+	bin2hex(buf, chip->tpmkeyname, size);
-+	size *= 2;
-+	buf[size++] = '\n';
-+	return size;
-+}
-+static DEVICE_ATTR_RO(null_name);
++ /*
++ * Prefetch the 1024-byte 'ft' or 'it' table into L1 cache,
++ * assuming cacheline size >= 32.  This is a hardening measure
++ * intended to make cache-timing attacks more difficult.
++ * They may not be fully prevented, however; see the paper
++ * https://cr.yp.to/antiforgery/cachetiming-20050414.pdf
++ * ("Cache-timing attacks on AES") for a discussion of the many
++ * difficulties involved in writing truly constant-time AES
++ * software.
++ */
++ .set i, 0
++ .rept 1024 / 128
++ ldr r8, [ttab, #i + 0]
++ ldr r9, [ttab, #i + 32]
++ ldr r10, [ttab, #i + 64]
++ ldr r11, [ttab, #i + 96]
++ .set i, i + 128
++ .endr
 +
- static struct attribute *tpm_dev_attrs[] = {
- 	&dev_attr_pubek.attr,
- 	&dev_attr_pcrs.attr,
-@@ -298,17 +311,29 @@ static struct attribute *tpm_dev_attrs[] = {
- 	NULL,
- };
- 
-+static struct attribute *tpm2_dev_attrs[] = {
-+	&dev_attr_null_name.attr,
-+	NULL,
-+};
+  tst rounds, #2
+  bne 1f
+
+@@ -154,6 +183,8 @@
+ 2: __adrl ttab, \ltab
+  \round r4, r5, r6, r7, r8, r9, r10, r11, \bsz, b
+
++ ldr r0, [sp, #-(SVC_REGS_SIZE - S_PC)] // check canary
 +
- static const struct attribute_group tpm_dev_group = {
- 	.attrs = tpm_dev_attrs,
- };
- 
-+static const struct attribute_group tpm2_dev_group = {
-+	.attrs = tpm2_dev_attrs,
-+};
-+
- void tpm_sysfs_add_device(struct tpm_chip *chip)
+ #ifdef CONFIG_CPU_BIG_ENDIAN
+  __rev r4, r4
+  __rev r5, r5
+diff --git a/arch/arm/crypto/aes-cipher-glue.c
+b/arch/arm/crypto/aes-cipher-glue.c
+index c222f6e072ad..de8f32121511 100644
+--- a/arch/arm/crypto/aes-cipher-glue.c
++++ b/arch/arm/crypto/aes-cipher-glue.c
+@@ -11,28 +11,39 @@
+
+ #include <crypto/aes.h>
+ #include <linux/crypto.h>
++#include <linux/delay.h>
+ #include <linux/module.h>
+
+-asmlinkage void __aes_arm_encrypt(u32 *rk, int rounds, const u8 *in, u8 *out);
++asmlinkage int __aes_arm_encrypt(u32 *rk, int rounds, const u8 *in, u8 *out);
+ EXPORT_SYMBOL(__aes_arm_encrypt);
+
+-asmlinkage void __aes_arm_decrypt(u32 *rk, int rounds, const u8 *in, u8 *out);
++asmlinkage int __aes_arm_decrypt(u32 *rk, int rounds, const u8 *in, u8 *out);
+ EXPORT_SYMBOL(__aes_arm_decrypt);
+
+ static void aes_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
  {
- 	/* XXX: If you wish to remove this restriction, you must first update
- 	 * tpm_sysfs to explicitly lock chip->ops.
- 	 */
--	if (chip->flags & TPM_CHIP_FLAG_TPM2)
-+	if (chip->flags & TPM_CHIP_FLAG_TPM2) {
-+		WARN_ON(chip->groups_cnt != 0);
-+		chip->groups[chip->groups_cnt++] = &tpm2_dev_group;
- 		return;
-+	}
- 
- 	/* The sysfs routines rely on an implicit tpm_try_get_ops, device_del
- 	 * is called before ops is null'd and the sysfs core synchronizes this
--- 
-2.16.4
+  struct crypto_aes_ctx *ctx = crypto_tfm_ctx(tfm);
+  int rounds = 6 + ctx->key_length / 4;
++ u8 buf[AES_BLOCK_SIZE];
+
+- __aes_arm_encrypt(ctx->key_enc, rounds, in, out);
++ if (out == in)
++   in = memcpy(buf, in, AES_BLOCK_SIZE);
++
++ while (unlikely(__aes_arm_encrypt(ctx->key_enc, rounds, in, out)))
++   cpu_relax();
+ }
+
+ static void aes_decrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
+ {
+  struct crypto_aes_ctx *ctx = crypto_tfm_ctx(tfm);
+  int rounds = 6 + ctx->key_length / 4;
++ u8 buf[AES_BLOCK_SIZE];
++
++ if (out == in)
++   in = memcpy(buf, in, AES_BLOCK_SIZE);
+
+- __aes_arm_decrypt(ctx->key_dec, rounds, in, out);
++ while (unlikely(__aes_arm_decrypt(ctx->key_dec, rounds, in, out)))
++   cpu_relax();
+ }
+
+ static struct crypto_alg aes_alg = {
