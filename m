@@ -1,53 +1,108 @@
-Return-Path: <SRS0=Iqog=M5=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:37492 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726429AbeJQOUQ (ORCPT
+Return-Path: <SRS0=GKHD=M7=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:44450 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726931AbeJSUdf (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 17 Oct 2018 10:20:16 -0400
-Date: Wed, 17 Oct 2018 14:21:23 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>
-Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-        "David S. Miller" <davem@davemloft.net>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        Li Yang <leoyang.li@nxp.com>, Roy Pledge <roy.pledge@nxp.com>,
-        Madalin Bucur <madalin.bucur@nxp.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: caam/qi - simplify CGR allocation, freeing
-Message-ID: <20181017062123.fykdj2ixrpfzk7eq@gondor.apana.org.au>
-References: <20181005125443.dfhd2asqktm22ney@linutronix.de>
- <20181008110937.29198-1-horia.geanta@nxp.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20181008110937.29198-1-horia.geanta@nxp.com>
+        Fri, 19 Oct 2018 16:33:35 -0400
+Received: by mail-wr1-f66.google.com with SMTP id q6-v6so912007wrw.11
+        for <linux-crypto@vger.kernel.org>; Fri, 19 Oct 2018 05:27:41 -0700 (PDT)
+From: Corentin Labbe <clabbe@baylibre.com>
+To: dan.carpenter@oracle.com, davem@davemloft.net,
+        herbert@gondor.apana.org.au
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Corentin Labbe <clabbe@baylibre.com>
+Subject: [PATCH] crypto: crypto_user_stat: Zeroize whole structure given to user space
+Date: Fri, 19 Oct 2018 12:27:25 +0000
+Message-Id: <1539952045-18784-1-git-send-email-clabbe@baylibre.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Oct 08, 2018 at 02:09:37PM +0300, Horia Geantă wrote:
-> CGRs (Congestion Groups) have to be freed by the same CPU that
-> initialized them.
-> This is why currently the driver takes special measures; however, using
-> set_cpus_allowed_ptr() is incorrect - as reported by Sebastian.
-> 
-> Instead of the generic solution of replacing set_cpus_allowed_ptr() with
-> work_on_cpu_safe(), we use the qman_delete_cgr_safe() QBMan API instead
-> of qman_delete_cgr() - which internally takes care of proper CGR
-> deletion.
-> 
-> Link: https://lkml.kernel.org/r/20181005125443.dfhd2asqktm22ney@linutronix.de
-> Reported-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-> Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
-> ---
->  drivers/crypto/caam/qi.c | 43 ++++---------------------------------------
->  drivers/crypto/caam/qi.h |  2 +-
->  2 files changed, 5 insertions(+), 40 deletions(-)
+For preventing un-initilized data to be given to user-space (and so leak
+potential useful data), the crypto_stat structure must be correctly
+initialised.
 
-Patch applied.  Thanks.
+Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
+Fixes: cac5818c25d0 ("crypto: user - Implement a generic crypto statistics")
+Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
+---
+ crypto/crypto_user_stat.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/crypto/crypto_user_stat.c b/crypto/crypto_user_stat.c
+index 021ad06bbb62..9990c599f648 100644
+--- a/crypto/crypto_user_stat.c
++++ b/crypto/crypto_user_stat.c
+@@ -37,6 +37,7 @@ static int crypto_report_aead(struct sk_buff *skb, struct crypto_alg *alg)
+ 	u64 v64;
+ 	u32 v32;
+ 
++	memset(&raead, 0, sizeof(struct crypto_stat));
+ 	strncpy(raead.type, "aead", sizeof(raead.type));
+ 
+ 	v32 = atomic_read(&alg->encrypt_cnt);
+@@ -65,6 +66,7 @@ static int crypto_report_cipher(struct sk_buff *skb, struct crypto_alg *alg)
+ 	u64 v64;
+ 	u32 v32;
+ 
++	memset(&rcipher, 0, sizeof(struct crypto_stat));
+ 	strlcpy(rcipher.type, "cipher", sizeof(rcipher.type));
+ 
+ 	v32 = atomic_read(&alg->encrypt_cnt);
+@@ -93,6 +95,7 @@ static int crypto_report_comp(struct sk_buff *skb, struct crypto_alg *alg)
+ 	u64 v64;
+ 	u32 v32;
+ 
++	memset(&rcomp, 0, sizeof(struct crypto_stat));
+ 	strlcpy(rcomp.type, "compression", sizeof(rcomp.type));
+ 	v32 = atomic_read(&alg->compress_cnt);
+ 	rcomp.stat_compress_cnt = v32;
+@@ -120,6 +123,7 @@ static int crypto_report_acomp(struct sk_buff *skb, struct crypto_alg *alg)
+ 	u64 v64;
+ 	u32 v32;
+ 
++	memset(&racomp, 0, sizeof(struct crypto_stat));
+ 	strlcpy(racomp.type, "acomp", sizeof(racomp.type));
+ 	v32 = atomic_read(&alg->compress_cnt);
+ 	racomp.stat_compress_cnt = v32;
+@@ -147,6 +151,7 @@ static int crypto_report_akcipher(struct sk_buff *skb, struct crypto_alg *alg)
+ 	u64 v64;
+ 	u32 v32;
+ 
++	memset(&rakcipher, 0, sizeof(struct crypto_stat));
+ 	strncpy(rakcipher.type, "akcipher", sizeof(rakcipher.type));
+ 	v32 = atomic_read(&alg->encrypt_cnt);
+ 	rakcipher.stat_encrypt_cnt = v32;
+@@ -177,6 +182,7 @@ static int crypto_report_kpp(struct sk_buff *skb, struct crypto_alg *alg)
+ 	struct crypto_stat rkpp;
+ 	u32 v;
+ 
++	memset(&rkpp, 0, sizeof(struct crypto_stat));
+ 	strlcpy(rkpp.type, "kpp", sizeof(rkpp.type));
+ 
+ 	v = atomic_read(&alg->setsecret_cnt);
+@@ -203,6 +209,7 @@ static int crypto_report_ahash(struct sk_buff *skb, struct crypto_alg *alg)
+ 	u64 v64;
+ 	u32 v32;
+ 
++	memset(&rhash, 0, sizeof(struct crypto_stat));
+ 	strncpy(rhash.type, "ahash", sizeof(rhash.type));
+ 
+ 	v32 = atomic_read(&alg->hash_cnt);
+@@ -227,6 +234,7 @@ static int crypto_report_shash(struct sk_buff *skb, struct crypto_alg *alg)
+ 	u64 v64;
+ 	u32 v32;
+ 
++	memset(&rhash, 0, sizeof(struct crypto_stat));
+ 	strncpy(rhash.type, "shash", sizeof(rhash.type));
+ 
+ 	v32 = atomic_read(&alg->hash_cnt);
+@@ -251,6 +259,7 @@ static int crypto_report_rng(struct sk_buff *skb, struct crypto_alg *alg)
+ 	u64 v64;
+ 	u32 v32;
+ 
++	memset(&rrng, 0, sizeof(struct crypto_stat));
+ 	strncpy(rrng.type, "rng", sizeof(rrng.type));
+ 
+ 	v32 = atomic_read(&alg->generate_cnt);
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.18.1
