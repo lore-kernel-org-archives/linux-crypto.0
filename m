@@ -1,57 +1,103 @@
-Return-Path: <SRS0=GKHD=M7=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from frisell.zx2c4.com ([192.95.5.64]:57833 "EHLO frisell.zx2c4.com"
+Return-Path: <SRS0=gnyg=NA=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:39538 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727010AbeJTAFe (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 19 Oct 2018 20:05:34 -0400
-MIME-Version: 1.0
-References: <20181015175424.97147-1-ebiggers@kernel.org>
-In-Reply-To: <20181015175424.97147-1-ebiggers@kernel.org>
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date: Fri, 19 Oct 2018 17:58:35 +0200
-Message-ID: <CAHmME9p1aiqWZ4+viaLscO8+qmixdVhMA1MAtMAFEHPG36DcPg@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 00/12] crypto: Adiantum support
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        linux-fscrypt@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        LKML <linux-kernel@vger.kernel.org>,
+        id S1726261AbeJTPVf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 20 Oct 2018 11:21:35 -0400
+Date: Sat, 20 Oct 2018 00:12:07 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>, linux-fscrypt@vger.kernel.org,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Paul Crowley <paulcrowley@google.com>,
         Greg Kaiser <gkaiser@google.com>,
         Michael Halcrow <mhalcrow@google.com>,
+        "Jason A . Donenfeld" <Jason@zx2c4.com>,
         Samuel Neves <samuel.c.p.neves@gmail.com>,
         Tomer Ashur <tomer.ashur@esat.kuleuven.be>
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [RFC PATCH v2 11/12] crypto: adiantum - add Adiantum support
+Message-ID: <20181020071206.GE876@sol.localdomain>
+References: <20181015175424.97147-1-ebiggers@kernel.org>
+ <20181015175424.97147-12-ebiggers@kernel.org>
+ <CAKv+Gu9wrOOk-LGPYmxgLbv86uXzMeHN6th3mMEDT3Vg893HWw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAKv+Gu9wrOOk-LGPYmxgLbv86uXzMeHN6th3mMEDT3Vg893HWw@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hello Eric,
+Hi Ard,
 
-> As before, some of these patches conflict with the new "Zinc" crypto
-> library.  But I don't know when Zinc will be merged, so for now I've
-> continued to base this patchset on the current 'cryptodev'.
+On Sat, Oct 20, 2018 at 12:17:58PM +0800, Ard Biesheuvel wrote:
+> On 16 October 2018 at 01:54, Eric Biggers <ebiggers@kernel.org> wrote:
+> > From: Eric Biggers <ebiggers@google.com>
+> >
+> > Add support for the Adiantum encryption mode.  Adiantum was designed by
+> > Paul Crowley and is specified by our paper:
+> >
+> >     Adiantum: length-preserving encryption for entry-level processors
+> >     (https://eprint.iacr.org/2018/720.pdf)
+> >
+> > See our paper for full details; this patch only provides an overview.
+> >
+> > Adiantum is a tweakable, length-preserving encryption mode designed for
+> > fast and secure disk encryption, especially on CPUs without dedicated
+> > crypto instructions.  Adiantum encrypts each sector using the XChaCha12
+> > stream cipher, two passes of an ε-almost-∆-universal (εA∆U) hash
+> > function, and an invocation of the AES-256 block cipher on a single
+> > 16-byte block.  On CPUs without AES instructions, Adiantum is much
+> > faster than AES-XTS; for example, on ARM Cortex-A7, on 4096-byte sectors
+> > Adiantum encryption is about 4 times faster than AES-256-XTS encryption,
+> > and decryption about 5 times faster.
+> >
+> > Adiantum is a specialization of the more general HBSH construction.  Our
+> > earlier proposal, HPolyC, was also a HBSH specialization, but it used a
+> > different εA∆U hash function, one based on Poly1305 only.  Adiantum's
+> > εA∆U hash function, which is based primarily on the "NH" hash function
+> > like that used in UMAC (RFC4418), is about twice as fast as HPolyC's;
+> > consequently, Adiantum is about 20% faster than HPolyC.
+> >
+> > This speed comes with no loss of security: Adiantum is provably just as
+> > secure as HPolyC, in fact slightly *more* secure.  Like HPolyC,
+> > Adiantum's security is reducible to that of XChaCha12 and AES-256,
+> > subject to a security bound.  XChaCha12 itself has a security reduction
+> > to ChaCha12.  Therefore, one need not "trust" Adiantum; one need only
+> > trust ChaCha12 and AES-256.  Note that the εA∆U hash function is only
+> > used for its proven combinatorical properties so cannot be "broken".
+> >
+> 
+> So what happens if the part of the input covered by the block cipher
+> is identical between different generations of the same disk block
+> (whose sector count is used as the 'outer' IV). How are we not in the
+> same boat as before when using stream ciphers for disk encryption?
+> 
 
-I'd appreciate it if you waited to merge this until you can rebase it
-on top of Zinc. In fact, if you already want to build it on top of
-Zinc, I'm happy to work with you on that in a shared repo or similar.
-We can also hash out the details of that in person in Vancouver in a
-few weeks. I think pushing this in before will create undesirable
-churn for both of us.
+This is the point of the hash step.  The value encrypted with the block cipher
+to produce the intermediate value C_M (used as the stream cipher nonce) is
+H(T, P_L) + P_R.  (T is the tweak a.k.a the IV, P_L is the plaintext except the
+last 16 bytes, P_R is the last 16 bytes.)  A collision in this value occurs iff:
 
-> Therefore, we (well, Paul Crowley did the real work) designed a new
-> encryption mode, Adiantum.  In essence, Adiantum makes it secure to use
-> the ChaCha stream cipher for disk encryption.  Adiantum is specified by
-> our paper here: https://eprint.iacr.org/2018/720.pdf ("Adiantum:
-> length-preserving encryption for entry-level processors").  Reference
-> code and test vectors are here: https://github.com/google/adiantum.
-> Most of the high-level concepts of Adiantum are not new; similar
-> existing modes include XCB, HCTR, and HCH.  Adiantum and these modes are
-> true wide-block modes (tweakable super-pseudorandom permutations), so
-> they actually provide a stronger notion of security than XTS.
+	H(T1, P1_L) + P1_R = H(T2, P2_L) + P2_R
+i.e.
+	H(T1, P1_L) - H(T2, P2_L) = P2_R - P1_R
+	
+If (T1, P1_L) = (T2, P2_L) then P1_R != P2_R so the equation has no solutions
+(since we don't consider queries where the whole input is the same; those
+unavoidably produce the same ciphertext).  Otherwise (T1, P1_L) != (T2, P2_L),
+and since the hash function H is ε-almost-∆-universal over integers mod 2^128,
+the equation is true for at most a very small proportion 'ε' of hash keys.
+But, the hash key is chosen at random and is unknown to the attacker.
 
-Great, I'm very happy to see you've created such a high performance alternative.
+The same applies in the other direction, for chosen ciphertext attacks.
 
-Before merging this into the kernel, do you want to wait until you've
-received some public review from academia?
+Basically, it's very difficult for an attacker to cause the intermediate value
+C_M to be reused, and the outputs will appear random until they do.
 
-Jason
+Of course, all this is explained much more precisely and comprehensively in our
+paper.  See section 5, "Security reduction".
+
+- Eric
