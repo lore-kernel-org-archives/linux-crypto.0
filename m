@@ -1,179 +1,359 @@
-Return-Path: <SRS0=g7fO=NJ=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mta-p4.oit.umn.edu ([134.84.196.204]:54886 "EHLO
-        mta-p4.oit.umn.edu" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725969AbeJ3D2P (ORCPT
+Return-Path: <SRS0=gnyg=NA=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail-it1-f193.google.com ([209.85.166.193]:55976 "EHLO
+        mail-it1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726604AbeJTKij (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 29 Oct 2018 23:28:15 -0400
+        Sat, 20 Oct 2018 06:38:39 -0400
+Received: by mail-it1-f193.google.com with SMTP id c23-v6so6402727itd.5
+        for <linux-crypto@vger.kernel.org>; Fri, 19 Oct 2018 19:29:53 -0700 (PDT)
 MIME-Version: 1.0
-References: <1539910247-9250-1-git-send-email-wang6495@umn.edu>
-In-Reply-To: <1539910247-9250-1-git-send-email-wang6495@umn.edu>
-From: Wenwen Wang <wang6495@umn.edu>
-Date: Mon, 29 Oct 2018 13:37:45 -0500
-Message-ID: <CAAa=b7eOM+NPNxaanw-mK-i05UfQ7uhCsN2ViiSoe0_YB-ppyA@mail.gmail.com>
-Subject: Re: [PATCH] crypto: cavium/nitrox - fix a DMA pool free failure
-To: Wenwen Wang <wang6495@umn.edu>
-Cc: Kangjie Lu <kjlu@umn.edu>, herbert@gondor.apana.org.au,
-        "David S. Miller" <davem@davemloft.net>,
-        kstewart@linuxfoundation.org, tglx@linutronix.de,
-        pombredanne@nexb.com,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        baijiaju1990@gmail.com, Jampala.Srikanth@cavium.com,
-        sgadam@cavium.com, linux-crypto@vger.kernel.org,
-        open list <linux-kernel@vger.kernel.org>
+In-Reply-To: <20181015175424.97147-6-ebiggers@kernel.org>
+References: <20181015175424.97147-1-ebiggers@kernel.org> <20181015175424.97147-6-ebiggers@kernel.org>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date: Sat, 20 Oct 2018 10:29:52 +0800
+Message-ID: <CAKv+Gu88h8VEVbm-t1QBvNzCxfntivGwgRBb=z5mM-8JfCAY1Q@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 05/12] crypto: arm/chacha20 - add XChaCha20 support
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>,
+        "Jason A . Donenfeld" <Jason@zx2c4.com>,
+        Greg Kaiser <gkaiser@google.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Samuel Neves <samuel.c.p.neves@gmail.com>,
+        Michael Halcrow <mhalcrow@google.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-fscrypt@vger.kernel.org,
+        Tomer Ashur <tomer.ashur@esat.kuleuven.be>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        Paul Crowley <paulcrowley@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hello,
-
-Can anyone confirm this bug? Thanks!
-
-Wenwen
-
-On Thu, Oct 18, 2018 at 7:51 PM Wenwen Wang <wang6495@umn.edu> wrote:
+On 16 October 2018 at 01:54, Eric Biggers <ebiggers@kernel.org> wrote:
+> From: Eric Biggers <ebiggers@google.com>
 >
-> In crypto_alloc_context(), a DMA pool is allocated through dma_pool_alloc()
-> to hold the crypto context. The meta data of the DMA pool, including the
-> pool used for the allocation 'ndev->ctx_pool' and the base address of the
-> DMA pool used by the device 'dma', are then stored to the beginning of the
-> pool. These meta data are eventually used in crypto_free_context() to free
-> the DMA pool through dma_pool_free(). However, given that the DMA pool can
-> also be accessed by the device, a malicious device can modify these meta
-> data, especially when the device is controlled to deploy an attack. This
-> can cause an unexpected DMA pool free failure.
+> Add an XChaCha20 implementation that is hooked up to the ARM NEON
+> implementation of ChaCha20.  This is needed for use in the Adiantum
+> encryption mode; see the generic code patch,
+> "crypto: chacha20-generic - add XChaCha20 support", for more details.
 >
-> To avoid the above issue, this patch introduces a new structure
-> crypto_ctx_hdr and a new field chdr in the structure nitrox_crypto_ctx hold
-> the meta data information of the DMA pool after the allocation. Note that
-> the original structure ctx_hdr is not changed to ensure the compatibility.
+> We also update the NEON code to support HChaCha20 on one block, so we
+> can use that in XChaCha20 rather than calling the generic HChaCha20.
+> This required factoring the permutation out into its own macro.
 >
-> Signed-off-by: Wenwen Wang <wang6495@umn.edu>
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
 > ---
->  drivers/crypto/cavium/nitrox/nitrox_algs.c | 12 +++++++-----
->  drivers/crypto/cavium/nitrox/nitrox_lib.c  | 22 +++++++++++++++++-----
->  drivers/crypto/cavium/nitrox/nitrox_req.h  |  7 +++++++
->  3 files changed, 31 insertions(+), 10 deletions(-)
+>  arch/arm/crypto/Kconfig              |   2 +-
+>  arch/arm/crypto/chacha20-neon-core.S |  68 ++++++++++------
+>  arch/arm/crypto/chacha20-neon-glue.c | 111 ++++++++++++++++++++-------
+>  3 files changed, 130 insertions(+), 51 deletions(-)
 >
-> diff --git a/drivers/crypto/cavium/nitrox/nitrox_algs.c b/drivers/crypto/cavium/nitrox/nitrox_algs.c
-> index 2ae6124..5d54ebc 100644
-> --- a/drivers/crypto/cavium/nitrox/nitrox_algs.c
-> +++ b/drivers/crypto/cavium/nitrox/nitrox_algs.c
-> @@ -73,7 +73,7 @@ static int flexi_aes_keylen(int keylen)
->  static int nitrox_skcipher_init(struct crypto_skcipher *tfm)
+> diff --git a/arch/arm/crypto/Kconfig b/arch/arm/crypto/Kconfig
+> index ef0c7feea6e29..0aa1471f27d2e 100644
+> --- a/arch/arm/crypto/Kconfig
+> +++ b/arch/arm/crypto/Kconfig
+> @@ -117,7 +117,7 @@ config CRYPTO_CRC32_ARM_CE
+>         select CRYPTO_HASH
+>
+>  config CRYPTO_CHACHA20_NEON
+> -       tristate "NEON accelerated ChaCha20 symmetric cipher"
+> +       tristate "NEON accelerated ChaCha20 stream cipher algorithms"
+>         depends on KERNEL_MODE_NEON
+>         select CRYPTO_BLKCIPHER
+>         select CRYPTO_CHACHA20
+> diff --git a/arch/arm/crypto/chacha20-neon-core.S b/arch/arm/crypto/chacha20-neon-core.S
+> index 50e7b98968189..db59f1fbc728b 100644
+> --- a/arch/arm/crypto/chacha20-neon-core.S
+> +++ b/arch/arm/crypto/chacha20-neon-core.S
+> @@ -52,33 +52,22 @@
+>         .fpu            neon
+>         .align          5
+>
+> -ENTRY(chacha20_block_xor_neon)
+> -       // r0: Input state matrix, s
+> -       // r1: 1 data block output, o
+> -       // r2: 1 data block input, i
+> -
+> -       //
+> -       // This function encrypts one ChaCha20 block by loading the state matrix
+> -       // in four NEON registers. It performs matrix operation on four words in
+> -       // parallel, but requireds shuffling to rearrange the words after each
+> -       // round.
+> -       //
+> -
+> -       // x0..3 = s0..3
+> -       add             ip, r0, #0x20
+> -       vld1.32         {q0-q1}, [r0]
+> -       vld1.32         {q2-q3}, [ip]
+> -
+> -       vmov            q8, q0
+> -       vmov            q9, q1
+> -       vmov            q10, q2
+> -       vmov            q11, q3
+> +/*
+> + * _chacha20_permute - permute one block
+> + *
+> + * Permute one 64-byte block where the state matrix is stored in the four NEON
+> + * registers q0-q3.  It performs matrix operation on four words in parallel, but
+
+operations [since you're touching this anyway]
+
+> + * requires shuffling to rearrange the words after each round.
+> + *
+> + * Clobbers: r3, q4-q5
+> + */
+> +.macro _chacha20_permute
+>
+
+As you know, I'd prefer the GAS directives to be indented and their
+arguments to be aligned with the right hand sides of the ordinary
+instructions. However, this entire file may end up getting replaced
+once we move to your scalar version combined with AndyP's NEON
+version, at which point it may no longer matter. [Does that code
+support the alternative xchacha constructions btw?]
+
+>         adr             ip, .Lrol8_table
+>         mov             r3, #10
+>         vld1.8          {d10}, [ip, :64]
+>
+> -.Ldoubleround:
+> +.Ldoubleround_\@:
+>         // x0 += x1, x3 = rotl32(x3 ^ x0, 16)
+>         vadd.i32        q0, q0, q1
+>         veor            q3, q3, q0
+> @@ -140,7 +129,25 @@ ENTRY(chacha20_block_xor_neon)
+>         vext.8          q3, q3, q3, #4
+>
+>         subs            r3, r3, #1
+> -       bne             .Ldoubleround
+> +       bne             .Ldoubleround_\@
+> +.endm
+> +
+
+Since your macro does not take any parameters: could we change this to
+a subroutine?
+
+> +ENTRY(chacha20_block_xor_neon)
+> +       // r0: Input state matrix, s
+> +       // r1: 1 data block output, o
+> +       // r2: 1 data block input, i
+> +
+> +       // x0..3 = s0..3
+> +       add             ip, r0, #0x20
+> +       vld1.32         {q0-q1}, [r0]
+> +       vld1.32         {q2-q3}, [ip]
+> +
+> +       vmov            q8, q0
+> +       vmov            q9, q1
+> +       vmov            q10, q2
+> +       vmov            q11, q3
+> +
+> +       _chacha20_permute
+>
+>         add             ip, r2, #0x20
+>         vld1.8          {q4-q5}, [r2]
+> @@ -169,6 +176,21 @@ ENTRY(chacha20_block_xor_neon)
+>         bx              lr
+>  ENDPROC(chacha20_block_xor_neon)
+>
+> +ENTRY(hchacha20_block_neon)
+> +       // r0: Input state matrix, s
+> +       // r1: output (8 32-bit words)
+> +
+> +       vld1.32         {q0-q1}, [r0]!
+> +       vld1.32         {q2-q3}, [r0]
+> +
+> +       _chacha20_permute
+> +
+> +       vst1.32         {q0}, [r1]!
+> +       vst1.32         {q3}, [r1]
+> +
+> +       bx              lr
+> +ENDPROC(hchacha20_block_neon)
+> +
+>         .align          4
+>  .Lctrinc:      .word   0, 1, 2, 3
+>  .Lrol8_table:  .byte   3, 0, 1, 2, 7, 4, 5, 6
+> diff --git a/arch/arm/crypto/chacha20-neon-glue.c b/arch/arm/crypto/chacha20-neon-glue.c
+> index 7386eb1c1889d..becc7990b1d39 100644
+> --- a/arch/arm/crypto/chacha20-neon-glue.c
+> +++ b/arch/arm/crypto/chacha20-neon-glue.c
+> @@ -1,5 +1,5 @@
+>  /*
+> - * ChaCha20 256-bit cipher algorithm, RFC7539, ARM NEON functions
+> + * ChaCha20 (RFC7539) and XChaCha20 stream ciphers, NEON accelerated
+>   *
+>   * Copyright (C) 2016 Linaro, Ltd. <ard.biesheuvel@linaro.org>
+>   *
+> @@ -30,6 +30,7 @@
+>
+>  asmlinkage void chacha20_block_xor_neon(u32 *state, u8 *dst, const u8 *src);
+>  asmlinkage void chacha20_4block_xor_neon(u32 *state, u8 *dst, const u8 *src);
+> +asmlinkage void hchacha20_block_neon(const u32 *state, u32 *out);
+>
+>  static void chacha20_doneon(u32 *state, u8 *dst, const u8 *src,
+>                             unsigned int bytes)
+> @@ -57,22 +58,17 @@ static void chacha20_doneon(u32 *state, u8 *dst, const u8 *src,
+>         }
+>  }
+>
+> -static int chacha20_neon(struct skcipher_request *req)
+> +static int chacha20_neon_stream_xor(struct skcipher_request *req,
+> +                                   struct chacha_ctx *ctx, u8 *iv)
 >  {
->         struct nitrox_crypto_ctx *nctx = crypto_skcipher_ctx(tfm);
-> -       void *fctx;
-> +       struct crypto_ctx_hdr *chdr;
+> -       struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+> -       struct chacha_ctx *ctx = crypto_skcipher_ctx(tfm);
+>         struct skcipher_walk walk;
+>         u32 state[16];
+>         int err;
 >
->         /* get the first device */
->         nctx->ndev = nitrox_get_first_device();
-> @@ -81,12 +81,14 @@ static int nitrox_skcipher_init(struct crypto_skcipher *tfm)
+> -       if (req->cryptlen <= CHACHA_BLOCK_SIZE || !may_use_simd())
+> -               return crypto_chacha_crypt(req);
+> -
+>         err = skcipher_walk_virt(&walk, req, true);
+>
+
+I am slightly unhappy that we are still using atomic==true here, and
+perform the entire scatterwalk with preemption disabled. Could we
+please try and fix that as well (as a separate patch)? Thanks.
+
+> -       crypto_chacha_init(state, ctx, walk.iv);
+> +       crypto_chacha_init(state, ctx, iv);
+>
+> -       kernel_neon_begin();
+>         while (walk.nbytes > 0) {
+>                 unsigned int nbytes = walk.nbytes;
+>
+> @@ -83,27 +79,85 @@ static int chacha20_neon(struct skcipher_request *req)
+>                                 nbytes);
+>                 err = skcipher_walk_done(&walk, walk.nbytes - nbytes);
+>         }
+> +
+> +       return err;
+> +}
+> +
+> +static int chacha20_neon(struct skcipher_request *req)
+> +{
+> +       struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+> +       struct chacha_ctx *ctx = crypto_skcipher_ctx(tfm);
+> +       int err;
+> +
+> +       if (req->cryptlen <= CHACHA_BLOCK_SIZE || !may_use_simd())
+> +               return crypto_chacha_crypt(req);
+> +
+> +       kernel_neon_begin();
+> +       err = chacha20_neon_stream_xor(req, ctx, req->iv);
+> +       kernel_neon_end();
+> +       return err;
+> +}
+> +
+> +static int xchacha20_neon(struct skcipher_request *req)
+> +{
+> +       struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+> +       struct chacha_ctx *ctx = crypto_skcipher_ctx(tfm);
+> +       struct chacha_ctx subctx;
+> +       u32 state[16];
+> +       u8 real_iv[16];
+> +       int err;
+> +
+> +       if (req->cryptlen <= CHACHA_BLOCK_SIZE || !may_use_simd())
+> +               return crypto_xchacha_crypt(req);
+> +
+> +       crypto_chacha_init(state, ctx, req->iv);
+> +
+> +       kernel_neon_begin();
+> +
+> +       hchacha20_block_neon(state, subctx.key);
+> +       memcpy(&real_iv[0], req->iv + 24, 8);
+> +       memcpy(&real_iv[8], req->iv + 16, 8);
+> +       err = chacha20_neon_stream_xor(req, &subctx, real_iv);
+> +
+>         kernel_neon_end();
+>
+>         return err;
+>  }
+>
+> -static struct skcipher_alg alg = {
+> -       .base.cra_name          = "chacha20",
+> -       .base.cra_driver_name   = "chacha20-neon",
+> -       .base.cra_priority      = 300,
+> -       .base.cra_blocksize     = 1,
+> -       .base.cra_ctxsize       = sizeof(struct chacha_ctx),
+> -       .base.cra_module        = THIS_MODULE,
+> -
+> -       .min_keysize            = CHACHA_KEY_SIZE,
+> -       .max_keysize            = CHACHA_KEY_SIZE,
+> -       .ivsize                 = CHACHA_IV_SIZE,
+> -       .chunksize              = CHACHA_BLOCK_SIZE,
+> -       .walksize               = 4 * CHACHA_BLOCK_SIZE,
+> -       .setkey                 = crypto_chacha20_setkey,
+> -       .encrypt                = chacha20_neon,
+> -       .decrypt                = chacha20_neon,
+> +static struct skcipher_alg algs[] = {
+> +       {
+> +               .base.cra_name          = "chacha20",
+> +               .base.cra_driver_name   = "chacha20-neon",
+> +               .base.cra_priority      = 300,
+> +               .base.cra_blocksize     = 1,
+> +               .base.cra_ctxsize       = sizeof(struct chacha_ctx),
+> +               .base.cra_module        = THIS_MODULE,
+> +
+> +               .min_keysize            = CHACHA_KEY_SIZE,
+> +               .max_keysize            = CHACHA_KEY_SIZE,
+> +               .ivsize                 = CHACHA_IV_SIZE,
+> +               .chunksize              = CHACHA_BLOCK_SIZE,
+> +               .walksize               = 4 * CHACHA_BLOCK_SIZE,
+> +               .setkey                 = crypto_chacha20_setkey,
+> +               .encrypt                = chacha20_neon,
+> +               .decrypt                = chacha20_neon,
+> +       }, {
+> +               .base.cra_name          = "xchacha20",
+> +               .base.cra_driver_name   = "xchacha20-neon",
+> +               .base.cra_priority      = 300,
+> +               .base.cra_blocksize     = 1,
+> +               .base.cra_ctxsize       = sizeof(struct chacha_ctx),
+> +               .base.cra_module        = THIS_MODULE,
+> +
+> +               .min_keysize            = CHACHA_KEY_SIZE,
+> +               .max_keysize            = CHACHA_KEY_SIZE,
+> +               .ivsize                 = XCHACHA_IV_SIZE,
+> +               .chunksize              = CHACHA_BLOCK_SIZE,
+> +               .walksize               = 4 * CHACHA_BLOCK_SIZE,
+> +               .setkey                 = crypto_chacha20_setkey,
+> +               .encrypt                = xchacha20_neon,
+> +               .decrypt                = xchacha20_neon,
+> +       }
+>  };
+>
+>  static int __init chacha20_simd_mod_init(void)
+> @@ -111,12 +165,12 @@ static int __init chacha20_simd_mod_init(void)
+>         if (!(elf_hwcap & HWCAP_NEON))
 >                 return -ENODEV;
 >
->         /* allocate nitrox crypto context */
-> -       fctx = crypto_alloc_context(nctx->ndev);
-> -       if (!fctx) {
-> +       chdr = crypto_alloc_context(nctx->ndev);
-> +       if (!chdr) {
->                 nitrox_put_device(nctx->ndev);
->                 return -ENOMEM;
->         }
-> -       nctx->u.ctx_handle = (uintptr_t)fctx;
-> +       nctx->chdr = chdr;
-> +       nctx->u.ctx_handle = (uintptr_t)((u8 *)chdr->vaddr +
-> +                                        sizeof(struct ctx_hdr));
->         crypto_skcipher_set_reqsize(tfm, crypto_skcipher_reqsize(tfm) +
->                                     sizeof(struct nitrox_kcrypt_request));
->         return 0;
-> @@ -102,7 +104,7 @@ static void nitrox_skcipher_exit(struct crypto_skcipher *tfm)
->
->                 memset(&fctx->crypto, 0, sizeof(struct crypto_keys));
->                 memset(&fctx->auth, 0, sizeof(struct auth_keys));
-> -               crypto_free_context((void *)fctx);
-> +               crypto_free_context((void *)nctx->chdr);
->         }
->         nitrox_put_device(nctx->ndev);
->
-> diff --git a/drivers/crypto/cavium/nitrox/nitrox_lib.c b/drivers/crypto/cavium/nitrox/nitrox_lib.c
-> index 4d31df0..28baf1a 100644
-> --- a/drivers/crypto/cavium/nitrox/nitrox_lib.c
-> +++ b/drivers/crypto/cavium/nitrox/nitrox_lib.c
-> @@ -146,12 +146,19 @@ static void destroy_crypto_dma_pool(struct nitrox_device *ndev)
->  void *crypto_alloc_context(struct nitrox_device *ndev)
->  {
->         struct ctx_hdr *ctx;
-> +       struct crypto_ctx_hdr *chdr;
->         void *vaddr;
->         dma_addr_t dma;
->
-> +       chdr = kmalloc(sizeof(*chdr), GFP_KERNEL);
-> +       if (!chdr)
-> +               return NULL;
-> +
->         vaddr = dma_pool_alloc(ndev->ctx_pool, (GFP_KERNEL | __GFP_ZERO), &dma);
-> -       if (!vaddr)
-> +       if (!vaddr) {
-> +               kfree(chdr);
->                 return NULL;
-> +       }
->
->         /* fill meta data */
->         ctx = vaddr;
-> @@ -159,7 +166,11 @@ void *crypto_alloc_context(struct nitrox_device *ndev)
->         ctx->dma = dma;
->         ctx->ctx_dma = dma + sizeof(struct ctx_hdr);
->
-> -       return ((u8 *)vaddr + sizeof(struct ctx_hdr));
-> +       chdr->pool = ndev->ctx_pool;
-> +       chdr->dma = dma;
-> +       chdr->vaddr = vaddr;
-> +
-> +       return chdr;
+> -       return crypto_register_skcipher(&alg);
+> +       return crypto_register_skciphers(algs, ARRAY_SIZE(algs));
 >  }
 >
->  /**
-> @@ -168,13 +179,14 @@ void *crypto_alloc_context(struct nitrox_device *ndev)
->   */
->  void crypto_free_context(void *ctx)
+>  static void __exit chacha20_simd_mod_fini(void)
 >  {
-> -       struct ctx_hdr *ctxp;
-> +       struct crypto_ctx_hdr *ctxp;
->
->         if (!ctx)
->                 return;
->
-> -       ctxp = (struct ctx_hdr *)((u8 *)ctx - sizeof(struct ctx_hdr));
-> -       dma_pool_free(ctxp->pool, ctxp, ctxp->dma);
-> +       ctxp = ctx;
-> +       dma_pool_free(ctxp->pool, ctxp->vaddr, ctxp->dma);
-> +       kfree(ctxp);
+> -       crypto_unregister_skcipher(&alg);
+> +       crypto_unregister_skciphers(algs, ARRAY_SIZE(algs));
 >  }
 >
->  /**
-> diff --git a/drivers/crypto/cavium/nitrox/nitrox_req.h b/drivers/crypto/cavium/nitrox/nitrox_req.h
-> index d091b6f..19f0a20 100644
-> --- a/drivers/crypto/cavium/nitrox/nitrox_req.h
-> +++ b/drivers/crypto/cavium/nitrox/nitrox_req.h
-> @@ -181,12 +181,19 @@ struct flexi_crypto_context {
->         struct auth_keys auth;
->  };
->
-> +struct crypto_ctx_hdr {
-> +       struct dma_pool *pool;
-> +       dma_addr_t dma;
-> +       void *vaddr;
-> +};
-> +
->  struct nitrox_crypto_ctx {
->         struct nitrox_device *ndev;
->         union {
->                 u64 ctx_handle;
->                 struct flexi_crypto_context *fctx;
->         } u;
-> +       struct crypto_ctx_hdr *chdr;
->  };
->
->  struct nitrox_kcrypt_request {
+>  module_init(chacha20_simd_mod_init);
+> @@ -125,3 +179,6 @@ module_exit(chacha20_simd_mod_fini);
+>  MODULE_AUTHOR("Ard Biesheuvel <ard.biesheuvel@linaro.org>");
+>  MODULE_LICENSE("GPL v2");
+>  MODULE_ALIAS_CRYPTO("chacha20");
+> +MODULE_ALIAS_CRYPTO("chacha20-neon");
+> +MODULE_ALIAS_CRYPTO("xchacha20");
+> +MODULE_ALIAS_CRYPTO("xchacha20-neon");
 > --
-> 2.7.4
+> 2.19.1.331.ge82ca0e54c-goog
 >
+>
+> _______________________________________________
+> linux-arm-kernel mailing list
+> linux-arm-kernel@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
