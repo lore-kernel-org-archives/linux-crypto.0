@@ -1,64 +1,245 @@
-Return-Path: <SRS0=anrJ=M4=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-eopbgr10084.outbound.protection.outlook.com ([40.107.1.84]:20233
-        "EHLO EUR02-HE1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726986AbeJPXsz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 16 Oct 2018 19:48:55 -0400
-From: Leonard Crestez <leonard.crestez@nxp.com>
-To: Shawn Guo <shawnguo@kernel.org>,
-        Fabio Estevam <fabio.estevam@nxp.com>
-CC: Rob Herring <robh+dt@kernel.org>,
-        Marek Vasut <marek.vasut@gmail.com>,
+Return-Path: <SRS0=gnyg=NA=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:37854 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726480AbeJTNru (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 20 Oct 2018 09:47:50 -0400
+Date: Fri, 19 Oct 2018 22:38:35 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>, linux-fscrypt@vger.kernel.org,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Horia Geanta <horia.geanta@nxp.com>,
-        Franck Lenormand <franck.lenormand@nxp.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        "David S . Miller " <davem@davemloft.net>,
-        Mark Rutland <mark.rutland@arm.com>,
-        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-arm-kernel@lists.infradead.org"
-        <linux-arm-kernel@lists.infradead.org>,
-        dl-linux-imx <linux-imx@nxp.com>,
-        "kernel@pengutronix.de" <kernel@pengutronix.de>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: [PATCH v3 4/4] ARM: imx_v6_v7_defconfig: Enable CRYPTO_DEV_MXS_DCP
-Date: Tue, 16 Oct 2018 15:57:45 +0000
-Message-ID: <95c59b59a6fb39e623c8e6d3b08f876670a61a58.1539705286.git.leonard.crestez@nxp.com>
-References: <cover.1539705285.git.leonard.crestez@nxp.com>
-In-Reply-To: <cover.1539705285.git.leonard.crestez@nxp.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+        Paul Crowley <paulcrowley@google.com>,
+        Greg Kaiser <gkaiser@google.com>,
+        Michael Halcrow <mhalcrow@google.com>,
+        "Jason A . Donenfeld" <Jason@zx2c4.com>,
+        Samuel Neves <samuel.c.p.neves@gmail.com>,
+        Tomer Ashur <tomer.ashur@esat.kuleuven.be>
+Subject: Re: [RFC PATCH v2 09/12] crypto: nhpoly1305 - add NHPoly1305 support
+Message-ID: <20181020053834.GC876@sol.localdomain>
+References: <20181015175424.97147-1-ebiggers@kernel.org>
+ <20181015175424.97147-10-ebiggers@kernel.org>
+ <CAKv+Gu-5WM19g5HguDheAADbigKNxokDCFMekkt4OYdEEa8Avw@mail.gmail.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAKv+Gu-5WM19g5HguDheAADbigKNxokDCFMekkt4OYdEEa8Avw@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This block is present in 6sl, 6sll and 6ull so it should be enabled in
-the default imx kernel config.
+Hi Ard,
 
-Signed-off-by: Leonard Crestez <leonard.crestez@nxp.com>
-Reviewed-by: Fabio Estevam <festevam@gmail.com>
----
- arch/arm/configs/imx_v6_v7_defconfig | 1 +
- 1 file changed, 1 insertion(+)
+On Sat, Oct 20, 2018 at 12:00:31PM +0800, Ard Biesheuvel wrote:
+> On 16 October 2018 at 01:54, Eric Biggers <ebiggers@kernel.org> wrote:
+> > From: Eric Biggers <ebiggers@google.com>
+> >
+> > Add a generic implementation of NHPoly1305, an ε-almost-∆-universal hash
+> > function used in the Adiantum encryption mode.
+> >
+> > CONFIG_NHPOLY1305 is not selectable by itself since there won't be any
+> > real reason to enable it without also enabling Adiantum support.
+> >
+> > Signed-off-by: Eric Biggers <ebiggers@google.com>
+> > ---
+> >  crypto/Kconfig              |    5 +
+> >  crypto/Makefile             |    1 +
+> >  crypto/nhpoly1305.c         |  288 ++++++++
+> >  crypto/testmgr.c            |    6 +
+> >  crypto/testmgr.h            | 1240 ++++++++++++++++++++++++++++++++++-
+> >  include/crypto/nhpoly1305.h |   74 +++
+> >  6 files changed, 1610 insertions(+), 4 deletions(-)
+> >  create mode 100644 crypto/nhpoly1305.c
+> >  create mode 100644 include/crypto/nhpoly1305.h
+> >
+> > diff --git a/crypto/Kconfig b/crypto/Kconfig
+> > index 4fa0a4a0e8615..431beca903623 100644
+> > --- a/crypto/Kconfig
+> > +++ b/crypto/Kconfig
+> > @@ -493,6 +493,11 @@ config CRYPTO_KEYWRAP
+> >           Support for key wrapping (NIST SP800-38F / RFC3394) without
+> >           padding.
+> >
+> > +config CRYPTO_NHPOLY1305
+> > +       tristate
+> > +       select CRYPTO_HASH
+> > +       select CRYPTO_POLY1305
+> > +
+> >  comment "Hash modes"
+> >
+> >  config CRYPTO_CMAC
+> > diff --git a/crypto/Makefile b/crypto/Makefile
+> > index 7e673f7c71107..87b86f221a2a2 100644
+> > --- a/crypto/Makefile
+> > +++ b/crypto/Makefile
+> > @@ -84,6 +84,7 @@ obj-$(CONFIG_CRYPTO_LRW) += lrw.o
+> >  obj-$(CONFIG_CRYPTO_XTS) += xts.o
+> >  obj-$(CONFIG_CRYPTO_CTR) += ctr.o
+> >  obj-$(CONFIG_CRYPTO_KEYWRAP) += keywrap.o
+> > +obj-$(CONFIG_CRYPTO_NHPOLY1305) += nhpoly1305.o
+> >  obj-$(CONFIG_CRYPTO_GCM) += gcm.o
+> >  obj-$(CONFIG_CRYPTO_CCM) += ccm.o
+> >  obj-$(CONFIG_CRYPTO_CHACHA20POLY1305) += chacha20poly1305.o
+> > diff --git a/crypto/nhpoly1305.c b/crypto/nhpoly1305.c
+> > new file mode 100644
+> > index 0000000000000..087ad7680dd62
+> > --- /dev/null
+> > +++ b/crypto/nhpoly1305.c
+> > @@ -0,0 +1,288 @@
+> > +// SPDX-License-Identifier: GPL-2.0
+> > +/*
+> > + * NHPoly1305 - ε-almost-∆-universal hash function for Adiantum
+> > + *
+> > + * Copyright 2018 Google LLC
+> > + */
+> > +
+> > +/*
+> > + * "NHPoly1305" is the main component of Adiantum hashing.
+> > + * Specifically, it is the calculation
+> > + *
+> > + *     H_M ← Poly1305_{K_M}(NH_{K_N}(pad_{128}(M)))
+> > + *
+> > + * from the procedure in section A.5 of the Adiantum paper [1].  It is an
+> > + * ε-almost-∆-universal (εA∆U) hash function for equal-length inputs over
+> > + * Z/(2^{128}Z), where the "∆" operation is addition.  It hashes 1024-byte
+> > + * chunks of the input with the NH hash function [2], reducing the input length
+> > + * by 32x.  The resulting NH digests are evaluated as a polynomial in
+> > + * GF(2^{130}-5), like in the Poly1305 MAC [3].  Note that the polynomial
+> > + * evaluation by itself would suffice to achieve the εA∆U property; NH is used
+> > + * for performance since it's over twice as fast as Poly1305.
+> > + *
+> > + * This is *not* a cryptographic hash function; do not use it as such!
+> > + *
+> > + * [1] Adiantum: length-preserving encryption for entry-level processors
+> > + *     (https://eprint.iacr.org/2018/720.pdf)
+> > + * [2] UMAC: Fast and Secure Message Authentication
+> > + *     (https://fastcrypto.org/umac/umac_proc.pdf)
+> > + * [3] The Poly1305-AES message-authentication code
+> > + *     (https://cr.yp.to/mac/poly1305-20050329.pdf)
+> > + */
+> > +
+> > +#include <asm/unaligned.h>
+> > +#include <crypto/algapi.h>
+> > +#include <crypto/internal/hash.h>
+> > +#include <crypto/nhpoly1305.h>
+> > +#include <linux/crypto.h>
+> > +#include <linux/kernel.h>
+> > +#include <linux/module.h>
+> > +
+> > +#define NH_STRIDE(K0, K1, K2, K3)                              \
+> > +({                                                             \
+> > +       m_A = get_unaligned_le32(src); src += 4;                \
+> > +       m_B = get_unaligned_le32(src); src += 4;                \
+> > +       m_C = get_unaligned_le32(src); src += 4;                \
+> > +       m_D = get_unaligned_le32(src); src += 4;                \
+> > +       K3##_A = *key++;                                        \
+> > +       K3##_B = *key++;                                        \
+> > +       K3##_C = *key++;                                        \
+> > +       K3##_D = *key++;                                        \
+> > +       sum0 += (u64)(u32)(m_A + K0##_A) * (u32)(m_C + K0##_C); \
+> > +       sum1 += (u64)(u32)(m_A + K1##_A) * (u32)(m_C + K1##_C); \
+> > +       sum2 += (u64)(u32)(m_A + K2##_A) * (u32)(m_C + K2##_C); \
+> > +       sum3 += (u64)(u32)(m_A + K3##_A) * (u32)(m_C + K3##_C); \
+> > +       sum0 += (u64)(u32)(m_B + K0##_B) * (u32)(m_D + K0##_D); \
+> > +       sum1 += (u64)(u32)(m_B + K1##_B) * (u32)(m_D + K1##_D); \
+> > +       sum2 += (u64)(u32)(m_B + K2##_B) * (u32)(m_D + K2##_D); \
+> > +       sum3 += (u64)(u32)(m_B + K3##_B) * (u32)(m_D + K3##_D); \
+> > +})
+> > +
+> > +static void nh_generic(const u32 *key, const u8 *src, size_t srclen,
+> > +                      __le64 hash[NH_NUM_PASSES])
+> > +{
+> > +       u64 sum0 = 0, sum1 = 0, sum2 = 0, sum3 = 0;
+> > +       u32 k0_A = *key++;
+> > +       u32 k0_B = *key++;
+> > +       u32 k0_C = *key++;
+> > +       u32 k0_D = *key++;
+> > +       u32 k1_A = *key++;
+> > +       u32 k1_B = *key++;
+> > +       u32 k1_C = *key++;
+> > +       u32 k1_D = *key++;
+> > +       u32 k2_A = *key++;
+> > +       u32 k2_B = *key++;
+> > +       u32 k2_C = *key++;
+> > +       u32 k2_D = *key++;
+> > +       u32 k3_A, k3_B, k3_C, k3_D;
+> > +       u32 m_A, m_B, m_C, m_D;
+> > +       size_t n = srclen / NH_MESSAGE_UNIT;
+> > +
+> > +       BUILD_BUG_ON(NH_PAIR_STRIDE != 2);
+> > +       BUILD_BUG_ON(NH_NUM_PASSES != 4);
+> > +
+> > +       while (n >= 4) {
+> > +               NH_STRIDE(k0, k1, k2, k3);
+> > +               NH_STRIDE(k1, k2, k3, k0);
+> > +               NH_STRIDE(k2, k3, k0, k1);
+> > +               NH_STRIDE(k3, k0, k1, k2);
+> > +               n -= 4;
+> > +       }
+> > +       if (n) {
+> > +               NH_STRIDE(k0, k1, k2, k3);
+> > +               if (--n) {
+> > +                       NH_STRIDE(k1, k2, k3, k0);
+> > +                       if (--n)
+> > +                               NH_STRIDE(k2, k3, k0, k1);
+> > +               }
+> > +       }
+> > +
+> 
+> This all looks a bit clunky to me, with the macro, the *key++s in the
+> initializers and these conditionals.
+> 
+> Was it written in this particular way to get GCC to optimize it in the
+> right way?
 
-diff --git a/arch/arm/configs/imx_v6_v7_defconfig b/arch/arm/configs/imx_v6=
-_v7_defconfig
-index 1ad5736c8fa6..57928dff9bce 100644
---- a/arch/arm/configs/imx_v6_v7_defconfig
-+++ b/arch/arm/configs/imx_v6_v7_defconfig
-@@ -428,10 +428,11 @@ CONFIG_NLS_ISO8859_1=3Dy
- CONFIG_NLS_ISO8859_15=3Dm
- CONFIG_NLS_UTF8=3Dy
- CONFIG_SECURITYFS=3Dy
- CONFIG_CRYPTO_DEV_FSL_CAAM=3Dy
- CONFIG_CRYPTO_DEV_SAHARA=3Dy
-+CONFIG_CRYPTO_DEV_MXS_DCP=3Dy
- CONFIG_CRC_CCITT=3Dm
- CONFIG_CRC_T10DIF=3Dy
- CONFIG_CRC7=3Dm
- CONFIG_LIBCRC32C=3Dm
- CONFIG_FONTS=3Dy
---=20
-2.17.1
+This does get compiled into something much faster than a naive version, which
+you can find commented out at
+https://github.com/google/adiantum/blob/master/benchmark/src/nh.c#L14.
+
+Though, I admit that I haven't put a ton of effort into this C implementation of
+NH yet.  Right now it's actually somewhat of a translation of the NEON version.
+I'll do some experiments and see if it can be made into something less ugly
+without losing performance.
+
+> 
+> > +       hash[0] = cpu_to_le64(sum0);
+> > +       hash[1] = cpu_to_le64(sum1);
+> > +       hash[2] = cpu_to_le64(sum2);
+> > +       hash[3] = cpu_to_le64(sum3);
+> > +}
+> > +
+> > +/* Pass the next NH hash value through Poly1305 */
+> > +static void process_nh_hash_value(struct nhpoly1305_state *state,
+> > +                                 const struct nhpoly1305_key *key)
+> > +{
+> > +       BUILD_BUG_ON(NH_HASH_BYTES % POLY1305_BLOCK_SIZE != 0);
+> > +
+> > +       poly1305_core_blocks(&state->poly_state, &key->poly_key, state->nh_hash,
+> > +                            NH_HASH_BYTES / POLY1305_BLOCK_SIZE);
+> > +}
+> > +
+> > +/*
+> > + * Feed the next portion of the source data, as a whole number of 16-byte
+> > + * "NH message units", through NH and Poly1305.  Each NH hash is taken over
+> > + * 1024 bytes, except possibly the final one which is taken over a multiple of
+> > + * 16 bytes up to 1024.  Also, in the case where data is passed in misaligned
+> > + * chunks, we combine partial hashes; the end result is the same either way.
+> > + */
+> > +static void nhpoly1305_units(struct nhpoly1305_state *state,
+> > +                            const struct nhpoly1305_key *key,
+> > +                            const u8 *src, unsigned int srclen, nh_t nh_fn)
+> 
+> Since indirect calls are going out of style: can we get rid of the
+> function pointer? Or is the compiler already inferring that it always
+> refers to nh_generic()?
+> 
+
+At least for now I want to use the same crypto_nhpoly1305_*_helper() functions
+for all nhpoly1305 implementations, and that requires that 'nh' be a function
+pointer.  The helpers could be placed in a header and inlined which would turn
+'nh' into a direct call, but it seemed to be too much code to inline, and
+normally 'nh' is only invoked once per 1024 bytes anyway.
+
+- Eric
