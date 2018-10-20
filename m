@@ -1,105 +1,80 @@
-Return-Path: <SRS0=YnV0=NF=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-ot1-f68.google.com ([209.85.210.68]:45816 "EHLO
-        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727722AbeJZCtw (ORCPT
+Return-Path: <SRS0=gnyg=NA=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:45676 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726817AbeJTSgW (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 25 Oct 2018 22:49:52 -0400
-Date: Thu, 25 Oct 2018 13:15:58 -0500
-From: Rob Herring <robh@kernel.org>
-To: AnilKumar Chimata <anilc@codeaurora.org>
-Cc: andy.gross@linaro.org, david.brown@linaro.org,
-        mark.rutland@arm.com, herbert@gondor.apana.org.au,
-        davem@davemloft.net, linux-soc@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/3] dt-bindings: Add ICE device specific parameters
-Message-ID: <20181025181558.GC30244@bogus>
-References: <1539789476-6098-1-git-send-email-anilc@codeaurora.org>
- <1539789476-6098-3-git-send-email-anilc@codeaurora.org>
+        Sat, 20 Oct 2018 14:36:22 -0400
+Subject: Re: [RFC PATCH v2 00/12] crypto: Adiantum support
+To: Eric Biggers <ebiggers@kernel.org>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        linux-fscrypt@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        LKML <linux-kernel@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Paul Crowley <paulcrowley@google.com>,
+        Greg Kaiser <gkaiser@google.com>,
+        Michael Halcrow <mhalcrow@google.com>,
+        Samuel Neves <samuel.c.p.neves@gmail.com>,
+        Tomer Ashur <tomer.ashur@esat.kuleuven.be>
+References: <20181015175424.97147-1-ebiggers@kernel.org>
+ <CAHmME9p1aiqWZ4+viaLscO8+qmixdVhMA1MAtMAFEHPG36DcPg@mail.gmail.com>
+ <20181019190411.GB246441@gmail.com>
+From: Milan Broz <gmazyland@gmail.com>
+Message-ID: <1f65ce09-93b3-f43e-49d5-9d9d6c0bb9e0@gmail.com>
+Date: Sat, 20 Oct 2018 12:26:20 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1539789476-6098-3-git-send-email-anilc@codeaurora.org>
+In-Reply-To: <20181019190411.GB246441@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Oct 17, 2018 at 08:47:55PM +0530, AnilKumar Chimata wrote:
-> Add dt parameters information specific to the Inline
-> Crypto Engine (ICE) device.
+On 19/10/2018 21:04, Eric Biggers wrote:
+> Hi Jason,
 > 
-> Signed-off-by: AnilKumar Chimata <anilc@codeaurora.org>
-> ---
->  .../devicetree/bindings/crypto/msm/ice.txt         | 34 ++++++++++++++++++++++
->  1 file changed, 34 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/crypto/msm/ice.txt
+> On Fri, Oct 19, 2018 at 05:58:35PM +0200, Jason A. Donenfeld wrote:
+>> Hello Eric,
+>>
+>>> As before, some of these patches conflict with the new "Zinc" crypto
+>>> library.  But I don't know when Zinc will be merged, so for now I've
+>>> continued to base this patchset on the current 'cryptodev'.
+>>
+>> I'd appreciate it if you waited to merge this until you can rebase it
+>> on top of Zinc. In fact, if you already want to build it on top of
+>> Zinc, I'm happy to work with you on that in a shared repo or similar.
+>> We can also hash out the details of that in person in Vancouver in a
+>> few weeks. I think pushing this in before will create undesirable
+>> churn for both of us.
+>>
 > 
-> diff --git a/Documentation/devicetree/bindings/crypto/msm/ice.txt b/Documentation/devicetree/bindings/crypto/msm/ice.txt
-> new file mode 100644
-> index 0000000..86eed5e
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/crypto/msm/ice.txt
-> @@ -0,0 +1,34 @@
-> +* Inline Crypto Engine (ICE)
-> +
-> +Required properties:
-> +  - compatible			: should be "qcom,ice"
-
-Only 1 version ever? Probably not and this needs an SoC specific 
-compatible string. Does this follow any standard or ICE is a QCom thing?
-
-> +  - reg 			: <register mapping>
-
-No need to define standard properties. You need to say how many register 
-ranges.
-
-> +
-> +Optional properties:
-> +  - interrupt-names     	: name describing the interrupts for ICE IRQ
-
-No point to this if there is only 1 IRQ.
-
-> +  - interrupts          	: <interrupt mapping for ICE IRQ>
-> +  - qcom,enable-ice-clk 	: should enable clocks for ICE HW
-
-This shouldn't be needed.
-
-> +  - clocks              	: List of phandle and clock specifier pairs
-> +  - clock-names         	: List of clock input name strings sorted in the same
-> +				  order as the clocks property.
-
-How many?  You need to give the 
-> +  - qcom,op-freq-hz     	: max clock speed sorted in the same order as the clocks
-> +				  property.
-
-Use the assigned-clocks properties for this.
-
-> +  - qcom,instance-type  	: describe the storage type for which ICE node is defined
-> +				  currently, only "ufs" and "sdcc" are supported storage type
-
-What if there is more than one instance of ufs or SD? Do you need to 
-know which ICE goes with which controller?
-
-> +  - power-domains		: regulator supply to be used by ICE HW
-> +
-> +Example:
-> +	ufs_ice: ufsice@1d90000 {
-
-crytpo@...
-
-> +		compatible = "qcom,ice";
-> +		reg = <0x1d90000 0x8000>;
-> +		qcom,enable-ice-clk;
-> +		clock-names = "ufs_core_clk", "bus_clk",
-> +				"iface_clk", "ice_core_clk";
-> +		clocks = <&gcc GCC_UFS_PHY_AXI_CLK>,
-> +			 <&gcc GCC_UFS_MEM_CLKREF_CLK>,
-> +			 <&gcc GCC_UFS_PHY_AHB_CLK>,
-> +			 <&gcc GCC_UFS_PHY_ICE_CORE_CLK>;
-> +		qcom,op-freq-hz = <0>, <0>, <0>, <300000000>;
-> +		power-domains = <&gcc UFS_PHY_GDSC>;
-> +		qcom,instance-type = "ufs";
-> +	};
-> -- 
-> The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
-> a Linux Foundation Collaborative Project
+> I won't be at Plumbers, sorry!  For if/when it's needed, I'll start a version of
+> this based on Zinc.  The basic requirements are that we need (1) xchacha12 and
+> xchacha20 available as 'skciphers' in the crypto API, and (2) the poly1305_core
+> functions (see patch 08/12).  In principle, these can be implemented in Zinc.
+> The Adiantum template and all the NHPoly1305 stuff will be the same either way.
+> (Unless you'll want one or both of those moved to Zinc too.  To be honest, even
+> after your explanations I still don't have a clear idea of what is supposed to
+> go in Zinc and what isn't...)
 > 
+> However, for now I'm hesitant to completely abandon the current approach and bet
+> the farm on Zinc.  Zinc has a large scope and various controversies that haven't
+> yet been fully resolved to everyone's satisfaction, including unclear licenses
+> on some of the essential assembly files.  It's not appropriate to grind kernel
+> crypto development to grind a halt while everyone waits for Zinc.
+> 
+> So if Zinc is ready, then it makes sense for it to go first;
+> otherwise, it doesn't.  It's not yet clear which is the case.
+
+Does it mean, that if Adiantum is based on Zinc, it can be no longer used
+for FDE (dm-crypt)? IOW only file-based encryption is possible?
+
+Adiantum (as in your current git branches on kernel.org) can be used for dm-crypt
+without any changes (yes, I played with it :) and with some easy tricks directly
+through cryptsetup/LUKS as well.
+
+I think we should have this as an alternative to length-preserving wide-block
+cipher modes for FDE.
+
+Milan
