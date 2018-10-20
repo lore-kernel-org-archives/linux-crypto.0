@@ -2,42 +2,42 @@ Return-Path: <SRS0=gnyg=NA=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,USER_AGENT_MUTT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10D4BC67863
-	for <linux-crypto@archiver.kernel.org>; Sat, 20 Oct 2018 05:38:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD4E0C67863
+	for <linux-crypto@archiver.kernel.org>; Sat, 20 Oct 2018 05:51:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A10FD21502
-	for <linux-crypto@archiver.kernel.org>; Sat, 20 Oct 2018 05:38:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7AAEE21502
+	for <linux-crypto@archiver.kernel.org>; Sat, 20 Oct 2018 05:51:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="v1k4j0Fy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A10FD21502
+	dkim=pass (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="FRb2CJc7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7AAEE21502
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-crypto-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726516AbeJTNru (ORCPT
+        id S1726470AbeJTOAy (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 20 Oct 2018 09:47:50 -0400
-Received: from mail.kernel.org ([198.145.29.99]:37854 "EHLO mail.kernel.org"
+        Sat, 20 Oct 2018 10:00:54 -0400
+Received: from mail.kernel.org ([198.145.29.99]:40152 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726480AbeJTNru (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 20 Oct 2018 09:47:50 -0400
+        id S1726261AbeJTOAy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 20 Oct 2018 10:00:54 -0400
 Received: from sol.localdomain (c-67-185-97-198.hsd1.wa.comcast.net [67.185.97.198])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 9F4A0214C2;
-        Sat, 20 Oct 2018 05:38:36 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id C7EDC214C2;
+        Sat, 20 Oct 2018 05:51:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1540013916;
-        bh=LPEC0rYQrL0+fqsQ76C6WOxNZNu1w9TTZZyu9hqkAGA=;
+        s=default; t=1540014699;
+        bh=mMTtveDIsvCFGTKyiMaE3Af4jM69YsVrkZrfzGFm9B8=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=v1k4j0FycxAeJwtpZwj252jUuLj0dhHdR9tSSzlIH62luA2UkYz1Lv40vEs4Jk65X
-         9x9AjKjVzVHXOwIZTdLQzAITVNNazLNsgViBu5db/f2nMRtn+iA8PaQLaD/P9bVJES
-         6rkbTWjnhZazXVN/8eI+lb7GyFvzaXQXxLv77E9s=
-Date:   Fri, 19 Oct 2018 22:38:35 -0700
+        b=FRb2CJc720aWBSro/lCugAbyu1VkF9+HiudOoud4mi2ldrRDJJzV2NsimkuFpN9L4
+         bcCYRkaMrKj5/PSmYn2Tmpm4lBMYC6k6IhVR5byAGb2XlNdj29Qq//rdglPTOC8YfJ
+         Xu9SOi30/AmFYEV5OH/U7K8z4Au4frHhqTEMzBqI=
+Date:   Fri, 19 Oct 2018 22:51:37 -0700
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
@@ -51,233 +51,248 @@ Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
         "Jason A . Donenfeld" <Jason@zx2c4.com>,
         Samuel Neves <samuel.c.p.neves@gmail.com>,
         Tomer Ashur <tomer.ashur@esat.kuleuven.be>
-Subject: Re: [RFC PATCH v2 09/12] crypto: nhpoly1305 - add NHPoly1305 support
-Message-ID: <20181020053834.GC876@sol.localdomain>
+Subject: Re: [RFC PATCH v2 10/12] crypto: arm/nhpoly1305 - add
+ NEON-accelerated NHPoly1305
+Message-ID: <20181020055136.GD876@sol.localdomain>
 References: <20181015175424.97147-1-ebiggers@kernel.org>
- <20181015175424.97147-10-ebiggers@kernel.org>
- <CAKv+Gu-5WM19g5HguDheAADbigKNxokDCFMekkt4OYdEEa8Avw@mail.gmail.com>
+ <20181015175424.97147-11-ebiggers@kernel.org>
+ <CAKv+Gu_HCecGeqFTf-Ys+GiWr98JO_ydZ1cAsMbKM88ZKG=Sog@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAKv+Gu-5WM19g5HguDheAADbigKNxokDCFMekkt4OYdEEa8Avw@mail.gmail.com>
+In-Reply-To: <CAKv+Gu_HCecGeqFTf-Ys+GiWr98JO_ydZ1cAsMbKM88ZKG=Sog@mail.gmail.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
-Message-ID: <20181020053835.oHM-GdTRHwxX3Rh8v1uhX_kxwl0wi97C7Cd9eYFmxsM@z>
+Message-ID: <20181020055137.InEAND2nr7Ipnfxmg-5BaE8G0R5Bgx1Hq8d0zPbRNkg@z>
 
-Hi Ard,
-
-On Sat, Oct 20, 2018 at 12:00:31PM +0800, Ard Biesheuvel wrote:
+On Sat, Oct 20, 2018 at 12:12:56PM +0800, Ard Biesheuvel wrote:
 > On 16 October 2018 at 01:54, Eric Biggers <ebiggers@kernel.org> wrote:
 > > From: Eric Biggers <ebiggers@google.com>
 > >
-> > Add a generic implementation of NHPoly1305, an ε-almost-∆-universal hash
-> > function used in the Adiantum encryption mode.
-> >
-> > CONFIG_NHPOLY1305 is not selectable by itself since there won't be any
-> > real reason to enable it without also enabling Adiantum support.
+> > Add an ARM NEON implementation of NHPoly1305, an ε-almost-∆-universal
+> > hash function used in the Adiantum encryption mode.  For now, only the
+> > NH portion is actually NEON-accelerated; the Poly1305 part is less
+> > performance-critical so is just implemented in C.
 > >
 > > Signed-off-by: Eric Biggers <ebiggers@google.com>
 > > ---
-> >  crypto/Kconfig              |    5 +
-> >  crypto/Makefile             |    1 +
-> >  crypto/nhpoly1305.c         |  288 ++++++++
-> >  crypto/testmgr.c            |    6 +
-> >  crypto/testmgr.h            | 1240 ++++++++++++++++++++++++++++++++++-
-> >  include/crypto/nhpoly1305.h |   74 +++
-> >  6 files changed, 1610 insertions(+), 4 deletions(-)
-> >  create mode 100644 crypto/nhpoly1305.c
-> >  create mode 100644 include/crypto/nhpoly1305.h
+> >  arch/arm/crypto/Kconfig                |   5 ++
+> >  arch/arm/crypto/Makefile               |   2 +
+> >  arch/arm/crypto/nh-neon-core.S         | 116 +++++++++++++++++++++++++
+> >  arch/arm/crypto/nhpoly1305-neon-glue.c |  78 +++++++++++++++++
+> >  4 files changed, 201 insertions(+)
+> >  create mode 100644 arch/arm/crypto/nh-neon-core.S
+> >  create mode 100644 arch/arm/crypto/nhpoly1305-neon-glue.c
 > >
-> > diff --git a/crypto/Kconfig b/crypto/Kconfig
-> > index 4fa0a4a0e8615..431beca903623 100644
-> > --- a/crypto/Kconfig
-> > +++ b/crypto/Kconfig
-> > @@ -493,6 +493,11 @@ config CRYPTO_KEYWRAP
-> >           Support for key wrapping (NIST SP800-38F / RFC3394) without
-> >           padding.
+> > diff --git a/arch/arm/crypto/Kconfig b/arch/arm/crypto/Kconfig
+> > index cc932d9bba561..458562a34aabe 100644
+> > --- a/arch/arm/crypto/Kconfig
+> > +++ b/arch/arm/crypto/Kconfig
+> > @@ -122,4 +122,9 @@ config CRYPTO_CHACHA20_NEON
+> >         select CRYPTO_BLKCIPHER
+> >         select CRYPTO_CHACHA20
 > >
-> > +config CRYPTO_NHPOLY1305
-> > +       tristate
-> > +       select CRYPTO_HASH
-> > +       select CRYPTO_POLY1305
+> > +config CRYPTO_NHPOLY1305_NEON
+> > +       tristate "NEON accelerated NHPoly1305 hash function (for Adiantum)"
+> > +       depends on KERNEL_MODE_NEON
+> > +       select CRYPTO_NHPOLY1305
 > > +
-> >  comment "Hash modes"
+> >  endif
+> > diff --git a/arch/arm/crypto/Makefile b/arch/arm/crypto/Makefile
+> > index 005482ff95047..b65d6bfab8e6b 100644
+> > --- a/arch/arm/crypto/Makefile
+> > +++ b/arch/arm/crypto/Makefile
+> > @@ -10,6 +10,7 @@ obj-$(CONFIG_CRYPTO_SHA1_ARM_NEON) += sha1-arm-neon.o
+> >  obj-$(CONFIG_CRYPTO_SHA256_ARM) += sha256-arm.o
+> >  obj-$(CONFIG_CRYPTO_SHA512_ARM) += sha512-arm.o
+> >  obj-$(CONFIG_CRYPTO_CHACHA20_NEON) += chacha-neon.o
+> > +obj-$(CONFIG_CRYPTO_NHPOLY1305_NEON) += nhpoly1305-neon.o
 > >
-> >  config CRYPTO_CMAC
-> > diff --git a/crypto/Makefile b/crypto/Makefile
-> > index 7e673f7c71107..87b86f221a2a2 100644
-> > --- a/crypto/Makefile
-> > +++ b/crypto/Makefile
-> > @@ -84,6 +84,7 @@ obj-$(CONFIG_CRYPTO_LRW) += lrw.o
-> >  obj-$(CONFIG_CRYPTO_XTS) += xts.o
-> >  obj-$(CONFIG_CRYPTO_CTR) += ctr.o
-> >  obj-$(CONFIG_CRYPTO_KEYWRAP) += keywrap.o
-> > +obj-$(CONFIG_CRYPTO_NHPOLY1305) += nhpoly1305.o
-> >  obj-$(CONFIG_CRYPTO_GCM) += gcm.o
-> >  obj-$(CONFIG_CRYPTO_CCM) += ccm.o
-> >  obj-$(CONFIG_CRYPTO_CHACHA20POLY1305) += chacha20poly1305.o
-> > diff --git a/crypto/nhpoly1305.c b/crypto/nhpoly1305.c
+> >  ce-obj-$(CONFIG_CRYPTO_AES_ARM_CE) += aes-arm-ce.o
+> >  ce-obj-$(CONFIG_CRYPTO_SHA1_ARM_CE) += sha1-arm-ce.o
+> > @@ -53,6 +54,7 @@ ghash-arm-ce-y        := ghash-ce-core.o ghash-ce-glue.o
+> >  crct10dif-arm-ce-y     := crct10dif-ce-core.o crct10dif-ce-glue.o
+> >  crc32-arm-ce-y:= crc32-ce-core.o crc32-ce-glue.o
+> >  chacha-neon-y := chacha-neon-core.o chacha-neon-glue.o
+> > +nhpoly1305-neon-y := nh-neon-core.o nhpoly1305-neon-glue.o
+> >
+> >  ifdef REGENERATE_ARM_CRYPTO
+> >  quiet_cmd_perl = PERL    $@
+> > diff --git a/arch/arm/crypto/nh-neon-core.S b/arch/arm/crypto/nh-neon-core.S
 > > new file mode 100644
-> > index 0000000000000..087ad7680dd62
+> > index 0000000000000..434d80ab531c2
 > > --- /dev/null
-> > +++ b/crypto/nhpoly1305.c
-> > @@ -0,0 +1,288 @@
+> > +++ b/arch/arm/crypto/nh-neon-core.S
+> > @@ -0,0 +1,116 @@
+> > +/* SPDX-License-Identifier: GPL-2.0 */
+> > +/*
+> > + * NH - ε-almost-universal hash function, NEON accelerated version
+> > + *
+> > + * Copyright 2018 Google LLC
+> > + *
+> > + * Author: Eric Biggers <ebiggers@google.com>
+> > + */
+> > +
+> > +#include <linux/linkage.h>
+> > +
+> > +       .text
+> > +       .fpu            neon
+> > +
+> > +       KEY             .req    r0
+> > +       MESSAGE         .req    r1
+> > +       MESSAGE_LEN     .req    r2
+> > +       HASH            .req    r3
+> > +
+> > +       PASS0_SUMS      .req    q0
+> > +       PASS0_SUM_A     .req    d0
+> > +       PASS0_SUM_B     .req    d1
+> > +       PASS1_SUMS      .req    q1
+> > +       PASS1_SUM_A     .req    d2
+> > +       PASS1_SUM_B     .req    d3
+> > +       PASS2_SUMS      .req    q2
+> > +       PASS2_SUM_A     .req    d4
+> > +       PASS2_SUM_B     .req    d5
+> > +       PASS3_SUMS      .req    q3
+> > +       PASS3_SUM_A     .req    d6
+> > +       PASS3_SUM_B     .req    d7
+> > +       K0              .req    q4
+> > +       K1              .req    q5
+> > +       K2              .req    q6
+> > +       K3              .req    q7
+> > +       T0              .req    q8
+> > +       T0_L            .req    d16
+> > +       T0_H            .req    d17
+> > +       T1              .req    q9
+> > +       T1_L            .req    d18
+> > +       T1_H            .req    d19
+> > +       T2              .req    q10
+> > +       T2_L            .req    d20
+> > +       T2_H            .req    d21
+> > +       T3              .req    q11
+> > +       T3_L            .req    d22
+> > +       T3_H            .req    d23
+> > +
+> > +.macro _nh_stride      k0, k1, k2, k3
+> > +
+> > +       // Load next message stride
+> > +       vld1.8          {T3}, [MESSAGE]!
+> > +
+> > +       // Load next key stride
+> > +       vld1.32         {\k3}, [KEY]!
+> > +
+> > +       // Add message words to key words
+> > +       vadd.u32        T0, T3, \k0
+> > +       vadd.u32        T1, T3, \k1
+> > +       vadd.u32        T2, T3, \k2
+> > +       vadd.u32        T3, T3, \k3
+> > +
+> > +       // Multiply 32x32 => 64 and accumulate
+> > +       vmlal.u32       PASS0_SUMS, T0_L, T0_H
+> > +       vmlal.u32       PASS1_SUMS, T1_L, T1_H
+> > +       vmlal.u32       PASS2_SUMS, T2_L, T2_H
+> > +       vmlal.u32       PASS3_SUMS, T3_L, T3_H
+> > +.endm
+> > +
+> 
+> Since we seem to have some spare NEON registers: would it help to have
+> a double round version of this macro?
+> 
+
+It helps a little bit, but not much.  The loads are the only part that can be
+optimized further.  I think I'd rather have the shorter + simpler version,
+unless the loads can be optimized significantly more on other processors.
+
+Also, originally I had it loading the key and message for the next stride while
+doing the current one, but that didn't seem worthwhile either.
+
+> > +/*
+> > + * void nh_neon(const u32 *key, const u8 *message, size_t message_len,
+> > + *             u8 hash[NH_HASH_BYTES])
+> > + *
+> > + * It's guaranteed that message_len % 16 == 0.
+> > + */
+> > +ENTRY(nh_neon)
+> > +
+> > +       vld1.32         {K0,K1}, [KEY]!
+> > +         vmov.u64      PASS0_SUMS, #0
+> > +         vmov.u64      PASS1_SUMS, #0
+> > +       vld1.32         {K2}, [KEY]!
+> > +         vmov.u64      PASS2_SUMS, #0
+> > +         vmov.u64      PASS3_SUMS, #0
+> > +
+> > +       subs            MESSAGE_LEN, MESSAGE_LEN, #64
+> > +       blt             .Lloop4_done
+> > +.Lloop4:
+> > +       _nh_stride      K0, K1, K2, K3
+> > +       _nh_stride      K1, K2, K3, K0
+> > +       _nh_stride      K2, K3, K0, K1
+> > +       _nh_stride      K3, K0, K1, K2
+> > +       subs            MESSAGE_LEN, MESSAGE_LEN, #64
+> > +       bge             .Lloop4
+> > +
+> > +.Lloop4_done:
+> > +       ands            MESSAGE_LEN, MESSAGE_LEN, #63
+> > +       beq             .Ldone
+> > +       _nh_stride      K0, K1, K2, K3
+> > +
+> > +       subs            MESSAGE_LEN, MESSAGE_LEN, #16
+> > +       beq             .Ldone
+> > +       _nh_stride      K1, K2, K3, K0
+> > +
+> > +       subs            MESSAGE_LEN, MESSAGE_LEN, #16
+> > +       beq             .Ldone
+> > +       _nh_stride      K2, K3, K0, K1
+> > +
+> > +.Ldone:
+> > +       // Sum the accumulators for each pass, then store the sums to 'hash'
+> > +       vadd.u64        T0_L, PASS0_SUM_A, PASS0_SUM_B
+> > +       vadd.u64        T0_H, PASS1_SUM_A, PASS1_SUM_B
+> > +       vadd.u64        T1_L, PASS2_SUM_A, PASS2_SUM_B
+> > +       vadd.u64        T1_H, PASS3_SUM_A, PASS3_SUM_B
+> > +       vst1.8          {T0-T1}, [HASH]
+> > +       bx              lr
+> > +ENDPROC(nh_neon)
+> > diff --git a/arch/arm/crypto/nhpoly1305-neon-glue.c b/arch/arm/crypto/nhpoly1305-neon-glue.c
+> > new file mode 100644
+> > index 0000000000000..df48a00f4c50f
+> > --- /dev/null
+> > +++ b/arch/arm/crypto/nhpoly1305-neon-glue.c
+> > @@ -0,0 +1,78 @@
 > > +// SPDX-License-Identifier: GPL-2.0
 > > +/*
 > > + * NHPoly1305 - ε-almost-∆-universal hash function for Adiantum
+> > + * (NEON accelerated version)
 > > + *
 > > + * Copyright 2018 Google LLC
 > > + */
 > > +
-> > +/*
-> > + * "NHPoly1305" is the main component of Adiantum hashing.
-> > + * Specifically, it is the calculation
-> > + *
-> > + *     H_M ← Poly1305_{K_M}(NH_{K_N}(pad_{128}(M)))
-> > + *
-> > + * from the procedure in section A.5 of the Adiantum paper [1].  It is an
-> > + * ε-almost-∆-universal (εA∆U) hash function for equal-length inputs over
-> > + * Z/(2^{128}Z), where the "∆" operation is addition.  It hashes 1024-byte
-> > + * chunks of the input with the NH hash function [2], reducing the input length
-> > + * by 32x.  The resulting NH digests are evaluated as a polynomial in
-> > + * GF(2^{130}-5), like in the Poly1305 MAC [3].  Note that the polynomial
-> > + * evaluation by itself would suffice to achieve the εA∆U property; NH is used
-> > + * for performance since it's over twice as fast as Poly1305.
-> > + *
-> > + * This is *not* a cryptographic hash function; do not use it as such!
-> > + *
-> > + * [1] Adiantum: length-preserving encryption for entry-level processors
-> > + *     (https://eprint.iacr.org/2018/720.pdf)
-> > + * [2] UMAC: Fast and Secure Message Authentication
-> > + *     (https://fastcrypto.org/umac/umac_proc.pdf)
-> > + * [3] The Poly1305-AES message-authentication code
-> > + *     (https://cr.yp.to/mac/poly1305-20050329.pdf)
-> > + */
-> > +
-> > +#include <asm/unaligned.h>
-> > +#include <crypto/algapi.h>
+> > +#include <asm/neon.h>
+> > +#include <asm/simd.h>
 > > +#include <crypto/internal/hash.h>
 > > +#include <crypto/nhpoly1305.h>
-> > +#include <linux/crypto.h>
-> > +#include <linux/kernel.h>
 > > +#include <linux/module.h>
 > > +
-> > +#define NH_STRIDE(K0, K1, K2, K3)                              \
-> > +({                                                             \
-> > +       m_A = get_unaligned_le32(src); src += 4;                \
-> > +       m_B = get_unaligned_le32(src); src += 4;                \
-> > +       m_C = get_unaligned_le32(src); src += 4;                \
-> > +       m_D = get_unaligned_le32(src); src += 4;                \
-> > +       K3##_A = *key++;                                        \
-> > +       K3##_B = *key++;                                        \
-> > +       K3##_C = *key++;                                        \
-> > +       K3##_D = *key++;                                        \
-> > +       sum0 += (u64)(u32)(m_A + K0##_A) * (u32)(m_C + K0##_C); \
-> > +       sum1 += (u64)(u32)(m_A + K1##_A) * (u32)(m_C + K1##_C); \
-> > +       sum2 += (u64)(u32)(m_A + K2##_A) * (u32)(m_C + K2##_C); \
-> > +       sum3 += (u64)(u32)(m_A + K3##_A) * (u32)(m_C + K3##_C); \
-> > +       sum0 += (u64)(u32)(m_B + K0##_B) * (u32)(m_D + K0##_D); \
-> > +       sum1 += (u64)(u32)(m_B + K1##_B) * (u32)(m_D + K1##_D); \
-> > +       sum2 += (u64)(u32)(m_B + K2##_B) * (u32)(m_D + K2##_D); \
-> > +       sum3 += (u64)(u32)(m_B + K3##_B) * (u32)(m_D + K3##_D); \
-> > +})
+> > +asmlinkage void nh_neon(const u32 *key, const u8 *message, size_t message_len,
+> > +                       u8 hash[NH_HASH_BYTES]);
 > > +
-> > +static void nh_generic(const u32 *key, const u8 *src, size_t srclen,
-> > +                      __le64 hash[NH_NUM_PASSES])
+> > +static void _nh_neon(const u32 *key, const u8 *message, size_t message_len,
+> > +                    __le64 hash[NH_NUM_PASSES])
 > > +{
-> > +       u64 sum0 = 0, sum1 = 0, sum2 = 0, sum3 = 0;
-> > +       u32 k0_A = *key++;
-> > +       u32 k0_B = *key++;
-> > +       u32 k0_C = *key++;
-> > +       u32 k0_D = *key++;
-> > +       u32 k1_A = *key++;
-> > +       u32 k1_B = *key++;
-> > +       u32 k1_C = *key++;
-> > +       u32 k1_D = *key++;
-> > +       u32 k2_A = *key++;
-> > +       u32 k2_B = *key++;
-> > +       u32 k2_C = *key++;
-> > +       u32 k2_D = *key++;
-> > +       u32 k3_A, k3_B, k3_C, k3_D;
-> > +       u32 m_A, m_B, m_C, m_D;
-> > +       size_t n = srclen / NH_MESSAGE_UNIT;
-> > +
-> > +       BUILD_BUG_ON(NH_PAIR_STRIDE != 2);
-> > +       BUILD_BUG_ON(NH_NUM_PASSES != 4);
-> > +
-> > +       while (n >= 4) {
-> > +               NH_STRIDE(k0, k1, k2, k3);
-> > +               NH_STRIDE(k1, k2, k3, k0);
-> > +               NH_STRIDE(k2, k3, k0, k1);
-> > +               NH_STRIDE(k3, k0, k1, k2);
-> > +               n -= 4;
-> > +       }
-> > +       if (n) {
-> > +               NH_STRIDE(k0, k1, k2, k3);
-> > +               if (--n) {
-> > +                       NH_STRIDE(k1, k2, k3, k0);
-> > +                       if (--n)
-> > +                               NH_STRIDE(k2, k3, k0, k1);
-> > +               }
-> > +       }
-> > +
-> 
-> This all looks a bit clunky to me, with the macro, the *key++s in the
-> initializers and these conditionals.
-> 
-> Was it written in this particular way to get GCC to optimize it in the
-> right way?
-
-This does get compiled into something much faster than a naive version, which
-you can find commented out at
-https://github.com/google/adiantum/blob/master/benchmark/src/nh.c#L14.
-
-Though, I admit that I haven't put a ton of effort into this C implementation of
-NH yet.  Right now it's actually somewhat of a translation of the NEON version.
-I'll do some experiments and see if it can be made into something less ugly
-without losing performance.
-
-> 
-> > +       hash[0] = cpu_to_le64(sum0);
-> > +       hash[1] = cpu_to_le64(sum1);
-> > +       hash[2] = cpu_to_le64(sum2);
-> > +       hash[3] = cpu_to_le64(sum3);
+> > +       nh_neon(key, message, message_len, (u8 *)hash);
 > > +}
 > > +
-> > +/* Pass the next NH hash value through Poly1305 */
-> > +static void process_nh_hash_value(struct nhpoly1305_state *state,
-> > +                                 const struct nhpoly1305_key *key)
-> > +{
-> > +       BUILD_BUG_ON(NH_HASH_BYTES % POLY1305_BLOCK_SIZE != 0);
-> > +
-> > +       poly1305_core_blocks(&state->poly_state, &key->poly_key, state->nh_hash,
-> > +                            NH_HASH_BYTES / POLY1305_BLOCK_SIZE);
-> > +}
-> > +
-> > +/*
-> > + * Feed the next portion of the source data, as a whole number of 16-byte
-> > + * "NH message units", through NH and Poly1305.  Each NH hash is taken over
-> > + * 1024 bytes, except possibly the final one which is taken over a multiple of
-> > + * 16 bytes up to 1024.  Also, in the case where data is passed in misaligned
-> > + * chunks, we combine partial hashes; the end result is the same either way.
-> > + */
-> > +static void nhpoly1305_units(struct nhpoly1305_state *state,
-> > +                            const struct nhpoly1305_key *key,
-> > +                            const u8 *src, unsigned int srclen, nh_t nh_fn)
 > 
-> Since indirect calls are going out of style: can we get rid of the
-> function pointer? Or is the compiler already inferring that it always
-> refers to nh_generic()?
+> Why do we need this function?
 > 
 
-At least for now I want to use the same crypto_nhpoly1305_*_helper() functions
-for all nhpoly1305 implementations, and that requires that 'nh' be a function
-pointer.  The helpers could be placed in a header and inlined which would turn
-'nh' into a direct call, but it seemed to be too much code to inline, and
-normally 'nh' is only invoked once per 1024 bytes anyway.
+For now it's not needed so I should probably just remove it, but it seems likely
+that indirect calls to assembly functions in the kernel will be going away in
+order to add support for CFI (control flow integrity).  The android-4.9 and
+android-4.14 kernels support CFI on arm64, so you might notice that some of the
+arm64 crypto code had to be patched for this reason.
 
 - Eric
