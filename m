@@ -1,384 +1,103 @@
-Return-Path: <SRS0=Iqog=M5=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from merlin.infradead.org ([205.233.59.134]:56086 "EHLO
-        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727037AbeJRBf6 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 17 Oct 2018 21:35:58 -0400
-Subject: Re: [PATCH 3/3] crypto: qce: ice: Add support for Inline Crypto
- Engine
-To: AnilKumar Chimata <anilc@codeaurora.org>, andy.gross@linaro.org,
-        david.brown@linaro.org, robh+dt@kernel.org, mark.rutland@arm.com,
-        herbert@gondor.apana.org.au, davem@davemloft.net
-Cc: linux-soc@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <1539789476-6098-1-git-send-email-anilc@codeaurora.org>
- <1539789476-6098-4-git-send-email-anilc@codeaurora.org>
-From: Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <48c7da0d-4e57-bc36-a683-94088b3b8319@infradead.org>
-Date: Wed, 17 Oct 2018 10:39:07 -0700
+Return-Path: <SRS0=JV5w=NB=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from frisell.zx2c4.com ([192.95.5.64]:50329 "EHLO frisell.zx2c4.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726950AbeJVHIH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 22 Oct 2018 03:08:07 -0400
 MIME-Version: 1.0
-In-Reply-To: <1539789476-6098-4-git-send-email-anilc@codeaurora.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20181015175424.97147-1-ebiggers@kernel.org> <CAHmME9p1aiqWZ4+viaLscO8+qmixdVhMA1MAtMAFEHPG36DcPg@mail.gmail.com>
+ <20181019190411.GB246441@gmail.com> <20181021222341.GA742@sol.localdomain>
+In-Reply-To: <20181021222341.GA742@sol.localdomain>
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date: Mon, 22 Oct 2018 00:51:56 +0200
+Message-ID: <CAHmME9oEQVTJ0xB+dpi8MKxohRfdogqnV+bN63EWTaoS5dE6Pw@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 00/12] crypto: Adiantum support
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        linux-fscrypt@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        LKML <linux-kernel@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Paul Crowley <paulcrowley@google.com>,
+        Greg Kaiser <gkaiser@google.com>,
+        Michael Halcrow <mhalcrow@google.com>,
+        Samuel Neves <samuel.c.p.neves@gmail.com>,
+        Tomer Ashur <tomer.ashur@esat.kuleuven.be>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 10/17/18 8:17 AM, AnilKumar Chimata wrote:
-> This patch adds support for Inline Crypto Engine (ICE), which
-> is embedded into storage device/controller such as UFS/eMMC.
-> ICE is intended for high throughput cryptographic encryption
-> or decryption of storage data.
-> 
-> Signed-off-by: AnilKumar Chimata <anilc@codeaurora.org>
-> ---
->  Documentation/crypto/msm/ice.txt |  235 ++++++
->  drivers/crypto/Kconfig           |   10 +
->  drivers/crypto/qce/Makefile      |    1 +
->  drivers/crypto/qce/ice.c         | 1613 ++++++++++++++++++++++++++++++++++++++
->  drivers/crypto/qce/iceregs.h     |  159 ++++
->  include/crypto/ice.h             |   80 ++
->  6 files changed, 2098 insertions(+)
->  create mode 100644 Documentation/crypto/msm/ice.txt
->  create mode 100644 drivers/crypto/qce/ice.c
->  create mode 100644 drivers/crypto/qce/iceregs.h
->  create mode 100644 include/crypto/ice.h
-> 
-> diff --git a/Documentation/crypto/msm/ice.txt b/Documentation/crypto/msm/ice.txt
-> new file mode 100644
-> index 0000000..58f7081
-> --- /dev/null
-> +++ b/Documentation/crypto/msm/ice.txt
-> @@ -0,0 +1,235 @@
-> +Introduction:
-> +=============
-> +Storage encryption has been one of the most required feature from security
+Hey Eric,
 
-                                                        features
+On Mon, Oct 22, 2018 at 12:23 AM Eric Biggers <ebiggers@kernel.org> wrote:
+> I started a branch based on Zinc:
 
-> +point of view. QTI based storage encryption solution uses general purpose
-> +crypto engine. While this kind of solution provide a decent amount of
+Nice to see. I'm heading to bed in a second, so I'll give this a
+thorough read-through tomorrow, but some preliminary notes on your
+comments:
 
-                                              provides
+> For Poly1305, for now I decided to just use the existing functions, passing 0
+> for the 16-byte element is added at the end.  This causes some unnecessary
+> overhead, but it's not very much.  It also results in a much larger size of
+> 'struct nhpoly1305_state', but that doesn't matter too much anymore either [1].
+> [1] Originally we were going to define Adiantum's hash function to be
+>     Poly1305(message_length || tweak_length || tweak || NH(message)), which
+>     would have made it desirable to export the Poly1305 state before NH, so that
+>     it could be imported for the second hash step to avoid redundantly hashing
+>     the message length and tweak.  But later we changed it to
+>     Poly1305(message_length || tweak) + Poly1305(NH(message)).
 
-> +performance, it falls short as storage speed is improving significantly
-> +continuously. To overcome performance degradation, newer chips are going to
-> +have Inline Crypto Engine (ICE) embedded into storage device. ICE is supposed
-> +to meet the line speed of storage devices.
-> +
-> +Hardware Description
-> +====================
-> +ICE is a HW block that is embedded into storage device such as UFS/eMMC. By
+Out of curiosity, why this change?
 
-s/HW/hardware/                                     devices
+> For ChaCha, I haven't yet updated all the "Zinc" assembly to support 12 rounds.
+> So far I've updated my ARM scalar implementation.  I still don't see how you
+> expect people to maintain the files like chacha20-x86_64.S from which all
+> comments, register aliases, etc. were removed in comparison to the original
+> OpenSSL code.
 
-> +default, ICE works in bypass mode i.e. ICE HW does not perform any crypto
-> +operation on data to be processed by storage device. If required, ICE can be
-> +configured to perform crypto operation in one direction (i.e. either encryption
-> +or decryption) or in both direction(both encryption & decryption).
+For at least the ARM[64] and MIPS64 code, I think it will be feasible
+to import the .pl eventually. There's an open PR from Andy importing
+some of the necessary changes. For the x86_64, that might be a little
+trickier, but I can take another stab at it.
 
-                             directions (both ...
+> I don't see how dumping thousands of lines of undocumented,
+> generated assembly code into the kernel fits with your goals of "Zinc's focus is
+> on simplicity and clarity" and "inviting collaboration".
 
-> +
-> +When a switch between the operation modes(plain to crypto or crypto to plain)
+It's not totally "undocumented" and totally "dumped"; that's a bit
+hyperbolic. But I can understand it's not as friendly as we'd like.
+I'll try to improve that.
 
-                                       modes (plain ...
+> Note that the
+> OpenSSL-derived assembly files still have an unclear license as well.
 
-> +is desired for a particular partition, SW must complete all transactions for
+Andy's been pretty clear about the CRYPTOGAMS aspect with me. But, as
+you pointed out on lkml and in the private thread, it hasn't yet
+migrated over to the CRYPTOGAMS repo. I don't think this is a cause
+for immediate concern, because it seems pretty certain it will wind up
+there soon enough.
 
-s/SW/software/
+> (I haven't yet gotten around to adding
+> "zinc tests" for XChaCha12, though I did add "crypto tests".  Note that "crypto
+> tests" are much easier to add, since all algorithms of the same type share a
+> common test framework -- not the case for Zinc.)
 
-> +that particular partition before switching the crypto mode i.e. no crypto, one
+Actually the advantage of not working with a winding abstraction layer
+is that specific tests can test particular aspects of particular
+primitives -- for example, by looking at different chunking patterns.
+It also enables you to write tests for internal, non-exported
+functions.
 
-                                                  crypto mode;
+> nor is there a documentation file
+> explaining things.
 
-> +direction crypto or both direction crypto operation. Requests for other
+Sorry, my bad on delaying that one. I'll be sure the Documentation/
+stuff is ready before posting another series.
 
-                            directions
+> So please understand that until it's clear that Zinc is
+> ready, I still have to have Adiantum ready to go without Zinc, just in case.
 
-> +partitions are not impacted due to crypto mode switch.
-> +
-> +ICE HW currently supports AES128/256 bit ECB & XTS mode encryption algorithms.
-> +
-> +Keys for crypto operations are loaded from SW. Keys are stored in a lookup
-> +table(LUT) located inside ICE HW. Maximum of 32 keys can be loaded in ICE key
-> +LUT. A Key inside the LUT can be referred using a key index.
+Makes sense. I do really appreciate you taking the time, though, to
+try this out with Zinc as well. Thanks for that.
 
-                                    referred to using
-
-> +
-> +SW Description
-> +==============
-> +ICE HW has categorized ICE registers in 2 groups: those which can be accessed by
-> +only secure side i.e. TZ and those which can be accessed by non-secure side such
-
-at least tell the reader what TZ and HLOS mean...
-
-> +as HLOS as well. This requires that ICE driver to be split in two pieces: one
-
-                                  that the ICE driver be split into two pieces: one
-
-> +running from TZ space and another from HLOS space.
-> +
-> +ICE driver from TZ would configure keys as requested by HLOS side.
-> +
-> +ICE driver on HLOS side is responsible for initialization of ICE HW.
-> +
-> +SW Architecture Diagram
-> +=======================
-> +Following are all the components involved in the ICE driver for control path:
-> +
-> ++++++++++++++++++++++++++++++++++++++++++
-> ++               App layer               +
-> ++++++++++++++++++++++++++++++++++++++++++
-> ++             System layer              +
-> ++   ++++++++         +++++++            +
-> ++   + VOLD +         + PFM +            +
-> ++   ++++++++         +++++++            +
-> ++         ||         ||                 +
-> ++         ||         ||                 +
-> ++         \/         \/                 +
-> ++     +++++++++++++++++++++++++++       +
-> ++     + LibQSEECom / cryptfs_hw +       +
-> ++     +++++++++++++++++++++++++++       +
-> ++++++++++++++++++++++++++++++++++++++++++
-> ++             Kernel                    +       +++++++++++++++++
-> ++                                       +       +     KMS       +
-> ++  +++++++  +++++++++++  +++++++++++    +       +++++++++++++++++
-> ++  + ICE +  + Storage +  + QSEECom +    +       +   ICE Driver  +
-> ++++++++++++++++++++++++++++++++++++++++++ <===> +++++++++++++++++
-> +               ||                                    ||
-> +               ||                                    ||
-> +               \/                                    \/
-> ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-> ++                      Storage Device                           +
-> ++                      ++++++++++++++                           +
-> ++                      +   ICE HW   +                           +
-> ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-> +
-> +Use Cases:
-> +----------
-> +a) Device bootup
-> +ICE HW is detected during bootup time and corresponding probe function is
-> +called. ICE driver parses its data from device tree node. ICE HW and storage
-> +HW are tightly coupled. Storage device probing is dependent upon ICE device
-> +probing. ICE driver configures all the required registers to put the ICE HW
-> +in bypass mode.
-> +
-> +b) Configuring keys
-> +Currently, there are couple of use cases to configure the keys.
-> +
-> +1) Full Disk Encryption(FDE)
-> +System layer(VOLD) at invocation of apps layer would call libqseecom to create
-> +the encryption key. Libqseecom calls qseecom driver to communicate with KMS
-> +module on the secure side i.e. TZ. KMS would call ICE driver on the TZ side to
-> +create and set the keys in ICE HW. At the end of transaction, VOLD would have
-> +key index of key LUT where encryption key is present.
-> +
-> +2) Per File Encryption (PFE)
-> +Per File Manager(PFM) calls QSEECom api to create the key. PFM has a peer comp-
-
-Preferably don't split (hyphenate) "component."  But if you must, it should be com-
-ponent.
-
-> +onent(PFT) at kernel layer which gets the corresponding key index from PFM.
-> +
-> +Following are all the components involved in the ICE driver for data path:
-> +
-> +       +++++++++++++++++++++++++++++++++++++++++
-> +       +               App layer               +
-> +       +++++++++++++++++++++++++++++++++++++++++
-> +       +              VFS                      +
-> +       +---------------------------------------+
-> +       +         File System (EXT4)            +
-> +       +---------------------------------------+
-> +       +             Block Layer               +
-> +       + --------------------------------------+
-> +       +                              +++++++  +
-> +       +              dm-req-crypt => + PFT +  +
-> +       +                              +++++++  +
-> +       +                                       +
-> +       +---------------------------------------+
-> +       +    +++++++++++           +++++++      +
-> +       +    + Storage +           + ICE +      +
-> +       +++++++++++++++++++++++++++++++++++++++++
-> +       +                  ||                   +
-> +       +                  || (Storage Req with +
-> +       +                  \/  ICE parameters ) +
-> +       +++++++++++++++++++++++++++++++++++++++++
-> +       +          Storage Device               +
-> +       +          ++++++++++++++               +
-> +       +          +   ICE HW   +               +
-> +       +++++++++++++++++++++++++++++++++++++++++
-> +
-> +c) Data transaction
-> +Once the crypto key has been configured, VOLD/PFM creates device mapping for
-> +data partition. As part of device mapping VOLD passes key index, crypto
-> +algorithm, mode and key length to dm layer. In case of PFE, keys are provided
-> +by PFT as and when request is processed by dm-req-crypt. When any application
-> +needs to read/write data, it would go through DM layer which would add crypto
-> +information, provided by VOLD/PFT, to Request. For each Request, Storage driver
-> +would ask ICE driver to configure crypto part of request. ICE driver extracts
-> +crypto data from Request structure and provide it to storage driver which would
-
-                                          provides
-
-> +finally dispatch request to storage device.
-> +
-> +d) Error Handling
-> +Due to issue # 1 mentioned in "Known Issues", ICE driver does not register for
-> +any interrupt. However, it enables sources of interrupt for ICE HW. After each
-> +data transaction, Storage driver receives transaction completion event. As part
-> +of event handling, storage driver calls  ICE driver to check if any of ICE
-> +interrupt status is set. If yes, storage driver returns error to upper layer.
-> +
-> +Error handling would be changed in future chips.
-> +
-> +Interfaces
-> +==========
-> +ICE driver exposes interfaces for storage driver to :
-
-                                                    to:
-
-> +1. Get the global instance of ICE driver
-> +2. Get the implemented interfaces of the particular ice instance
-> +3. Initialize the ICE HW
-> +4. Reset the ICE HW
-> +5. Resume/Suspend the ICE HW
-> +6. Get the Crypto configuration for the data request for storage
-> +7. Check if current data transaction has generated any interrupt
-> +
-> +Driver Parameters
-> +=================
-> +This driver is built and statically linked into the kernel; therefore,
-> +there are no module parameters supported by this driver.
-> +
-> +There are no kernel command line parameters supported by this driver.
-> +
-> +Power Management
-> +================
-> +ICE driver does not do power management on its own as it is part of storage
-> +hardware. Whenever storage driver receives request for power collapse/suspend
-> +resume, it would call ICE driver which exposes APIs for Storage HW. ICE HW
-> +during power collapse or reset, wipes crypto configuration data. When ICE
-
-                                 ^no comma
-
-> +driver receives request to resume, it would ask ICE driver on TZ side to
-> +restore the configuration. ICE driver does not do anything as part of power
-> +collapse or suspend event.
-> +
-> +Interface:
-> +==========
-> +ICE driver exposes following APIs for storage driver to use:
-> +
-> +int (*init)(struct platform_device *, void *, ice_success_cb, ice_error_cb);
-> +	-- This function is invoked by storage controller during initialization of
-> +	storage controller. Storage controller would provide success and error call
-> +	backs which would be invoked asynchronously once ICE HW init is done.
-> +
-> +int (*reset)(struct platform_device *);
-> +	-- ICE HW reset as part of storage controller reset. When storage controller
-> +	received reset command, it would call reset on ICE HW. As of now, ICE HW
-> +	does not need to do anything as part of reset.
-> +
-> +int (*resume)(struct platform_device *);
-> +	-- ICE HW while going to reset, wipes all crypto keys and other data from ICE
-
-                                      ^no comma
-
-> +	HW. ICE driver would reconfigure those data as part of resume operation.
-> +
-> +int (*suspend)(struct platform_device *);
-> +	-- This API would be called by storage driver when storage device is going to
-> +	suspend mode. As of today, ICE driver does not do anything to handle suspend.
-> +
-> +int (*config)(struct platform_device *, struct request* , struct ice_data_setting*);
-> +	-- Storage driver would call this interface to get all crypto data required to
-> +	perform crypto operation.
-> +
-> +int (*status)(struct platform_device *);
-> +	-- Storage driver would call this interface to check if previous data transfer
-> +	generated any error.
-> +
-> +Config options
-> +==============
-> +This driver is enabled by the kernel config option CONFIG_CRYPTO_DEV_MSM_ICE.
-> +
-> +Dependencies
-> +============
-> +ICE driver depends upon corresponding ICE driver on TZ side to function
-> +appropriately.
-> +
-> +Known Issues
-> +============
-> +1. ICE HW emits 0s even if it has generated an interrupt
-
-That statement is unclear.  Emits where?  in a data stream?  in interrupt status?
-
-> +This issue has significant impact on how ICE interrupts are handled. Currently,
-> +ICE driver does not register for any of the ICE interrupts but enables the
-> +sources of interrupt. Once storage driver asks to check the status of interrupt,
-> +it reads and clears the clear status and provide read status to storage driver.
-
-               "clears the clear status"???         s/provide/provides/
-
-> +This mechanism though not optimal but prevents file-system corruption.
-
-mangled sentence above.
-
-> +This issue has been fixed in newer chips.
-> +
-> +2. ICE HW wipes all crypto data during power collapse
-> +This issue necessitate that ICE driver on TZ side store the crypto material
-
-              necessitates
-
-> +which is not required in the case of general purpose crypto engine.
-> +This issue has been fixed in newer chips.
-> +
-> +Further Improvements
-> +====================
-> +Currently, Due to PFE use case, ICE driver is dependent upon dm-req-crypt to
-
-              due
-
-> +provide the keys as part of request structure. This couples ICE driver with
-> +dm-req-crypt based solution. It is under discussion to expose an IOCTL based
-
-                                                       to expose IOCTL based
-
-> +and registration based interface APIs from ICE driver. ICE driver would use
-> +these two interfaces to find out if any key exists for current request. If
-> +yes, choose the right key index received from IOCTL or registration based
-> +APIs. If not, dont set any crypto parameter in the request.
-
-                 don't
-
-> diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-> index a8c4ce0..e40750e 100644
-> --- a/drivers/crypto/Kconfig
-> +++ b/drivers/crypto/Kconfig
-> @@ -596,6 +596,16 @@ config CRYPTO_DEV_QCOM_RNG
->  	  To compile this driver as a module, choose M here. The
->            module will be called qcom-rng. If unsure, say N.
->  
-> +config CRYPTO_DEV_QTI_ICE
-> +	tristate "Qualcomm inline crypto engine accelerator"
-> +	default n
-
-Please drop the redundant "default n" since n is already the default.
-
-> +	depends on (ARCH_QCOM || COMPILE_TEST) && BLK_DEV_DM
-> +	help
-> +	  This driver supports Inline Crypto Engine for QTI chipsets, MSM8994
-> +	  and later, to accelerate crypto operations for storage needs.
-> +	  To compile this driver as a module, choose M here: the
-> +	  module will be called ice.
-> +
->  config CRYPTO_DEV_VMX
->  	bool "Support for VMX cryptographic acceleration instructions"
->  	depends on PPC64 && VSX
-
--- 
-~Randy
+Regards,
+Jason
