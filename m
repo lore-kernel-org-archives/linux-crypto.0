@@ -1,45 +1,80 @@
-Return-Path: <SRS0=GKHD=M7=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-it1-f194.google.com ([209.85.166.194]:55531 "EHLO
-        mail-it1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726976AbeJTC0s (ORCPT
+Return-Path: <SRS0=JV5w=NB=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail-it1-f195.google.com ([209.85.166.195]:50823 "EHLO
+        mail-it1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727363AbeJURVL (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 19 Oct 2018 22:26:48 -0400
-Received: by mail-it1-f194.google.com with SMTP id c23-v6so5329904itd.5
-        for <linux-crypto@vger.kernel.org>; Fri, 19 Oct 2018 11:19:36 -0700 (PDT)
+        Sun, 21 Oct 2018 13:21:11 -0400
+Received: by mail-it1-f195.google.com with SMTP id k206-v6so8785362ite.0
+        for <linux-crypto@vger.kernel.org>; Sun, 21 Oct 2018 02:07:33 -0700 (PDT)
 MIME-Version: 1.0
-References: <20181015175424.97147-1-ebiggers@kernel.org> <CAHmME9p1aiqWZ4+viaLscO8+qmixdVhMA1MAtMAFEHPG36DcPg@mail.gmail.com>
-In-Reply-To: <CAHmME9p1aiqWZ4+viaLscO8+qmixdVhMA1MAtMAFEHPG36DcPg@mail.gmail.com>
-From: Paul Crowley <paulcrowley@google.com>
-Date: Fri, 19 Oct 2018 11:19:24 -0700
-Message-ID: <CA+_SqcDszvqfH7qvEyi8QW2RqkA1kpV6L7VWxhtw5Ogzeovhbg@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 00/12] crypto: Adiantum support
-To: Jason@zx2c4.com
-Cc: ebiggers@kernel.org, linux-crypto@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+In-Reply-To: <dd71f78f-5773-4996-b319-68e7fb78c514@email.android.com>
+References: <20181019230153.28201-1-dbaryshkov@gmail.com> <CAKv+Gu8eiFXoC2MWjGUG_AgDNq5rduWQN0CC4Q4BM0pjWW3B-w@mail.gmail.com>
+ <1540109262.3023.6.camel@HansenPartnership.com> <CAKv+Gu_aUASeSpO4MA0ay2Zko4k6=1avTP4eU-2Ka3YX1-U+Jg@mail.gmail.com>
+ <dd71f78f-5773-4996-b319-68e7fb78c514@email.android.com>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date: Sun, 21 Oct 2018 11:07:32 +0200
+Message-ID: <CAKv+Gu_982Suidfm5wkX4ruz4Jfxk=BH1RUm6hg+J6BXqM7aDw@mail.gmail.com>
+Subject: Re: [PATCH 1/2] crypto: fix cfb mode decryption
+To: James Bottomley <James.Bottomley@hansenpartnership.com>
+Cc: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Greg Kaiser <gkaiser@google.com>,
-        Michael Halcrow <mhalcrow@google.com>,
-        samuel.c.p.neves@gmail.com, tomer.ashur@esat.kuleuven.be
+        stable <stable@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, 19 Oct 2018 at 08:58, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
-> Before merging this into the kernel, do you want to wait until you've
-> received some public review from academia?
+On 21 October 2018 at 11:00, James Bottomley
+<James.Bottomley@hansenpartnership.com> wrote:
+> On October 21, 2018 9:58:04 AM GMT, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
+>>On 21 October 2018 at 10:07, James Bottomley
+>><James.Bottomley@hansenpartnership.com> wrote:
+>>> On Sun, 2018-10-21 at 09:05 +0200, Ard Biesheuvel wrote:
+>>>> (+ James)
+>>>
+>>> Thanks!
+>>>
+>>>> On 20 October 2018 at 01:01, Dmitry Eremin-Solenikov
+>>>> <dbaryshkov@gmail.com> wrote:
+>>>> > crypto_cfb_decrypt_segment() incorrectly XOR'ed generated
+>>keystream
+>>>> > with
+>>>> > IV, rather than with data stream, resulting in incorrect
+>>>> > decryption.
+>>>> > Test vectors will be added in the next patch.
+>>>> >
+>>>> > Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+>>>> > Cc: stable@vger.kernel.org
+>>>> > ---
+>>>> >  crypto/cfb.c | 2 +-
+>>>> >  1 file changed, 1 insertion(+), 1 deletion(-)
+>>>> >
+>>>> > diff --git a/crypto/cfb.c b/crypto/cfb.c
+>>>> > index a0d68c09e1b9..fd4e8500e121 100644
+>>>> > --- a/crypto/cfb.c
+>>>> > +++ b/crypto/cfb.c
+>>>> > @@ -144,7 +144,7 @@ static int crypto_cfb_decrypt_segment(struct
+>>>> > skcipher_walk *walk,
+>>>> >
+>>>> >         do {
+>>>> >                 crypto_cfb_encrypt_one(tfm, iv, dst);
+>>>> > -               crypto_xor(dst, iv, bsize);
+>>>> > +               crypto_xor(dst, src, bsize);
+>>>
+>>> This does look right.  I think the reason the TPM code works is that
+>>it
+>>> always does encrypt/decrypt in-place, which is a separate piece of
+>>the
+>>> code which appears to be correct.
+>>>
+>>
+>>Yeah I figured that.
+>>
+>>So where is the TPM code that actually uses this code?
+>
+> It was posted to the integrity list a while ago.  I'm planning a repost  shortly.
+>
 
-I would prefer not to wait. Unlike a new primitive whose strength can
-only be known through attempts at cryptanalysis, Adiantum is a
-construction based on
-well-understood and trusted primitives; it is secure if the proof
-accompanying it is correct. Given that (outside competitions or
-standardization efforts) no-one ever issues public statements that
-they think algorithms or proofs are good, what I'm expecting from
-academia is silence :) The most we could hope for would be getting the
-paper accepted at a conference, and we're pursuing that but there's a
-good chance that won't happen simply because it's not very novel. It
-basically takes existing ideas and applies them using a stream cipher
-instead of a block cipher, and a faster hashing mode; it's also a
-small update from HPolyC. I've had some private feedback that the
-proof seems correct, and that's all I'm expecting to get.
+OK, found it. Mind cc'ing me on that repost?
