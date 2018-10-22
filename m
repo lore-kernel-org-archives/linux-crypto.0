@@ -1,131 +1,189 @@
-Return-Path: <SRS0=JV5w=NB=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=9uPW=NC=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_PASS,USER_AGENT_MUTT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 420D1ECDE3D
-	for <linux-crypto@archiver.kernel.org>; Sun, 21 Oct 2018 09:07:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 914DCC004D3
+	for <linux-crypto@archiver.kernel.org>; Mon, 22 Oct 2018 18:42:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 021112083E
-	for <linux-crypto@archiver.kernel.org>; Sun, 21 Oct 2018 09:07:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 82FC820663
+	for <linux-crypto@archiver.kernel.org>; Mon, 22 Oct 2018 18:42:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=linaro.org header.i=@linaro.org header.b="k03q5GZK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 021112083E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q+16ONPk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82FC820663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-crypto-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727365AbeJURVL (ORCPT
+        id S1728877AbeJWDCT (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 21 Oct 2018 13:21:11 -0400
-Received: from mail-it1-f195.google.com ([209.85.166.195]:50823 "EHLO
-        mail-it1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727363AbeJURVL (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 21 Oct 2018 13:21:11 -0400
-Received: by mail-it1-f195.google.com with SMTP id k206-v6so8785362ite.0
-        for <linux-crypto@vger.kernel.org>; Sun, 21 Oct 2018 02:07:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:in-reply-to:references:from:date:message-id:subject:to
-         :cc;
-        bh=SmRZi9EzEiqpxJ/Wv0hqJ87C1AX22S7/oLDsuIjPALI=;
-        b=k03q5GZKrG+EHWOj4LbwC+AcKYiXa+ufSFGKeUEsFo1H8WvPob1sGr9J+MunV6bBYq
-         MfZw47k8FB9PIMhi4+BFLmv+pkTIXR6VGA+XPoSDwIlr1yauzlPDU2X4yK0dFPWKUBy2
-         hpKynoPR2oIDT4jULgos9R3qhNkRjjaPR+7Fs=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:in-reply-to:references:from:date
-         :message-id:subject:to:cc;
-        bh=SmRZi9EzEiqpxJ/Wv0hqJ87C1AX22S7/oLDsuIjPALI=;
-        b=bfir4u+Wjn/eMOb/LtZFV5t5yO8/Wve3IWCBdh4WoZafpFopO1TD2YfjfFSXMrWk1B
-         6b0IjRoZP9CrWxTqSDP3sqlDvg7Ew134A27UukpjX17Pb8fBBR+l37BHoJ1cG+EX1yLu
-         EN1O1Ieytly170YQVCPRtW3iI8LCwSOhvqiltsWkJdGmLaz62gBdSSd3npBmA0Ng7bDX
-         6QWi30hMyhHgLTj9vOMDAgUTxJd0nvbJaksE2j/GbDWP6K36R04PcxeWfBblo+EWMkCN
-         EMX2TBMKRZWbjSFJsgiDXEFqXM4eu2P849YuXWn3/B1/4eciwre2SjvByP/d0g8YR+bu
-         t0OA==
-X-Gm-Message-State: ABuFfoi+5yGTi1QlwewjkXav9nRDY//izMr2Za/bgpU65F5HUT7MajPC
-        8954hCA0DqZlD3l2x3YMELC2oGvvrOZ6LzkXok1ZRA==
-X-Google-Smtp-Source: ACcGV60UY08U7uxhXpa7ng8M7yHIxIxgeE8647qGqCn168j3XYOgSx4kWUtmZRu8IPXKIiaXgksy2MXMnRgF01Ox6qg=
-X-Received: by 2002:a24:e08f:: with SMTP id c137-v6mr7393241ith.71.1540112852784;
- Sun, 21 Oct 2018 02:07:32 -0700 (PDT)
-MIME-Version: 1.0
-Received: by 2002:a6b:5910:0:0:0:0:0 with HTTP; Sun, 21 Oct 2018 02:07:32
- -0700 (PDT)
-In-Reply-To: <dd71f78f-5773-4996-b319-68e7fb78c514@email.android.com>
-References: <20181019230153.28201-1-dbaryshkov@gmail.com> <CAKv+Gu8eiFXoC2MWjGUG_AgDNq5rduWQN0CC4Q4BM0pjWW3B-w@mail.gmail.com>
- <1540109262.3023.6.camel@HansenPartnership.com> <CAKv+Gu_aUASeSpO4MA0ay2Zko4k6=1avTP4eU-2Ka3YX1-U+Jg@mail.gmail.com>
- <dd71f78f-5773-4996-b319-68e7fb78c514@email.android.com>
-From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Sun, 21 Oct 2018 11:07:32 +0200
-Message-ID:
- <CAKv+Gu_982Suidfm5wkX4ruz4Jfxk=BH1RUm6hg+J6BXqM7aDw@mail.gmail.com>
-Subject: Re: [PATCH 1/2] crypto: fix cfb mode decryption
-To:     James Bottomley <James.Bottomley@hansenpartnership.com>
-Cc:     Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
+        Mon, 22 Oct 2018 23:02:19 -0400
+Received: from mail.kernel.org ([198.145.29.99]:54178 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728308AbeJWDCT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 22 Oct 2018 23:02:19 -0400
+Received: from gmail.com (unknown [104.132.51.88])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 410BA20651;
+        Mon, 22 Oct 2018 18:42:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1540233760;
+        bh=u86jsqey1mhXoiyi6vqySBd3ZxZS/XnUVZZf1nOrwo8=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Q+16ONPkO0hDOzt4jrGN4VcZbqiMOBoiFcAqy0vOqTo3NS5PalR3jsfV86nGRcCIu
+         +CvBJxWEoaCSfUT4/rppzHuA1vJK+lj1M6+30u6LGSX2Q7okNwuf3L80kMHe3EcJ9h
+         E/FPzvZwf8hqHmNUhsgoZjOoM91dritS9rBJu9Q4=
+Date:   Mon, 22 Oct 2018 11:42:37 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>, linux-fscrypt@vger.kernel.org,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        stable <stable@vger.kernel.org>
+        Paul Crowley <paulcrowley@google.com>,
+        Greg Kaiser <gkaiser@google.com>,
+        Michael Halcrow <mhalcrow@google.com>,
+        "Jason A . Donenfeld" <Jason@zx2c4.com>,
+        Samuel Neves <samuel.c.p.neves@gmail.com>,
+        Tomer Ashur <tomer.ashur@esat.kuleuven.be>
+Subject: Re: [RFC PATCH v2 09/12] crypto: nhpoly1305 - add NHPoly1305 support
+Message-ID: <20181022184236.GA59695@gmail.com>
+References: <20181015175424.97147-1-ebiggers@kernel.org>
+ <20181015175424.97147-10-ebiggers@kernel.org>
+ <CAKv+Gu-5WM19g5HguDheAADbigKNxokDCFMekkt4OYdEEa8Avw@mail.gmail.com>
+ <20181020053834.GC876@sol.localdomain>
+ <CAKv+Gu-A_EhMBXq_nqzBzpgN36foo6hA3Ba3=j+WVM-jph=mrw@mail.gmail.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
+Content-Disposition: inline
+In-Reply-To: <CAKv+Gu-A_EhMBXq_nqzBzpgN36foo6hA3Ba3=j+WVM-jph=mrw@mail.gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
-Message-ID: <20181021090732.hO0z8BoTo4joMN__0t2YitPw3iqwG5r3SJf7OHEltPs@z>
+Message-ID: <20181022184237.WT92Yh-z-PWTSV8X1Ur5midBjxZBdaRYmlddwVrCOTY@z>
 
-On 21 October 2018 at 11:00, James Bottomley
-<James.Bottomley@hansenpartnership.com> wrote:
-> On October 21, 2018 9:58:04 AM GMT, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
->>On 21 October 2018 at 10:07, James Bottomley
->><James.Bottomley@hansenpartnership.com> wrote:
->>> On Sun, 2018-10-21 at 09:05 +0200, Ard Biesheuvel wrote:
->>>> (+ James)
->>>
->>> Thanks!
->>>
->>>> On 20 October 2018 at 01:01, Dmitry Eremin-Solenikov
->>>> <dbaryshkov@gmail.com> wrote:
->>>> > crypto_cfb_decrypt_segment() incorrectly XOR'ed generated
->>keystream
->>>> > with
->>>> > IV, rather than with data stream, resulting in incorrect
->>>> > decryption.
->>>> > Test vectors will be added in the next patch.
->>>> >
->>>> > Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
->>>> > Cc: stable@vger.kernel.org
->>>> > ---
->>>> >  crypto/cfb.c | 2 +-
->>>> >  1 file changed, 1 insertion(+), 1 deletion(-)
->>>> >
->>>> > diff --git a/crypto/cfb.c b/crypto/cfb.c
->>>> > index a0d68c09e1b9..fd4e8500e121 100644
->>>> > --- a/crypto/cfb.c
->>>> > +++ b/crypto/cfb.c
->>>> > @@ -144,7 +144,7 @@ static int crypto_cfb_decrypt_segment(struct
->>>> > skcipher_walk *walk,
->>>> >
->>>> >         do {
->>>> >                 crypto_cfb_encrypt_one(tfm, iv, dst);
->>>> > -               crypto_xor(dst, iv, bsize);
->>>> > +               crypto_xor(dst, src, bsize);
->>>
->>> This does look right.  I think the reason the TPM code works is that
->>it
->>> always does encrypt/decrypt in-place, which is a separate piece of
->>the
->>> code which appears to be correct.
->>>
->>
->>Yeah I figured that.
->>
->>So where is the TPM code that actually uses this code?
->
-> It was posted to the integrity list a while ago.  I'm planning a repost  shortly.
->
+On Sat, Oct 20, 2018 at 11:06:00PM +0800, Ard Biesheuvel wrote:
+> >> > +
+> >> > +#define NH_STRIDE(K0, K1, K2, K3)                              \
+> >> > +({                                                             \
+> >> > +       m_A = get_unaligned_le32(src); src += 4;                \
+> >> > +       m_B = get_unaligned_le32(src); src += 4;                \
+> >> > +       m_C = get_unaligned_le32(src); src += 4;                \
+> >> > +       m_D = get_unaligned_le32(src); src += 4;                \
+> >> > +       K3##_A = *key++;                                        \
+> >> > +       K3##_B = *key++;                                        \
+> >> > +       K3##_C = *key++;                                        \
+> >> > +       K3##_D = *key++;                                        \
+> >> > +       sum0 += (u64)(u32)(m_A + K0##_A) * (u32)(m_C + K0##_C); \
+> >> > +       sum1 += (u64)(u32)(m_A + K1##_A) * (u32)(m_C + K1##_C); \
+> >> > +       sum2 += (u64)(u32)(m_A + K2##_A) * (u32)(m_C + K2##_C); \
+> >> > +       sum3 += (u64)(u32)(m_A + K3##_A) * (u32)(m_C + K3##_C); \
+> >> > +       sum0 += (u64)(u32)(m_B + K0##_B) * (u32)(m_D + K0##_D); \
+> >> > +       sum1 += (u64)(u32)(m_B + K1##_B) * (u32)(m_D + K1##_D); \
+> >> > +       sum2 += (u64)(u32)(m_B + K2##_B) * (u32)(m_D + K2##_D); \
+> >> > +       sum3 += (u64)(u32)(m_B + K3##_B) * (u32)(m_D + K3##_D); \
+> >> > +})
+> >> > +
+> >> > +static void nh_generic(const u32 *key, const u8 *src, size_t srclen,
+> >> > +                      __le64 hash[NH_NUM_PASSES])
+> >> > +{
+> >> > +       u64 sum0 = 0, sum1 = 0, sum2 = 0, sum3 = 0;
+> >> > +       u32 k0_A = *key++;
+> >> > +       u32 k0_B = *key++;
+> >> > +       u32 k0_C = *key++;
+> >> > +       u32 k0_D = *key++;
+> >> > +       u32 k1_A = *key++;
+> >> > +       u32 k1_B = *key++;
+> >> > +       u32 k1_C = *key++;
+> >> > +       u32 k1_D = *key++;
+> >> > +       u32 k2_A = *key++;
+> >> > +       u32 k2_B = *key++;
+> >> > +       u32 k2_C = *key++;
+> >> > +       u32 k2_D = *key++;
+> >> > +       u32 k3_A, k3_B, k3_C, k3_D;
+> >> > +       u32 m_A, m_B, m_C, m_D;
+> >> > +       size_t n = srclen / NH_MESSAGE_UNIT;
+> >> > +
+> >> > +       BUILD_BUG_ON(NH_PAIR_STRIDE != 2);
+> >> > +       BUILD_BUG_ON(NH_NUM_PASSES != 4);
+> >> > +
+> >> > +       while (n >= 4) {
+> >> > +               NH_STRIDE(k0, k1, k2, k3);
+> >> > +               NH_STRIDE(k1, k2, k3, k0);
+> >> > +               NH_STRIDE(k2, k3, k0, k1);
+> >> > +               NH_STRIDE(k3, k0, k1, k2);
+> >> > +               n -= 4;
+> >> > +       }
+> >> > +       if (n) {
+> >> > +               NH_STRIDE(k0, k1, k2, k3);
+> >> > +               if (--n) {
+> >> > +                       NH_STRIDE(k1, k2, k3, k0);
+> >> > +                       if (--n)
+> >> > +                               NH_STRIDE(k2, k3, k0, k1);
+> >> > +               }
+> >> > +       }
+> >> > +
+> >>
+> >> This all looks a bit clunky to me, with the macro, the *key++s in the
+> >> initializers and these conditionals.
+> >>
+> >> Was it written in this particular way to get GCC to optimize it in the
+> >> right way?
+> >
+> > This does get compiled into something much faster than a naive version, which
+> > you can find commented out at
+> > https://github.com/google/adiantum/blob/master/benchmark/src/nh.c#L14.
+> >
+> > Though, I admit that I haven't put a ton of effort into this C implementation of
+> > NH yet.  Right now it's actually somewhat of a translation of the NEON version.
+> > I'll do some experiments and see if it can be made into something less ugly
+> > without losing performance.
+> >
+> 
+> No that's fine but please document it.
+> 
 
-OK, found it. Mind cc'ing me on that repost?
+Hmm, I'm actually leaning towards the following instead.  Unrolling multiple
+strides to try to reduce loads of the keys doesn't seem worthwhile in the C
+implementation; for one, it bloats the code size a lot
+(412 => 2332 bytes on arm32).
+
+static void nh_generic(const u32 *key, const u8 *message, size_t message_len,
+		       __le64 hash[NH_NUM_PASSES])
+{
+	u64 sums[4] = { 0, 0, 0, 0 };
+
+	BUILD_BUG_ON(NH_PAIR_STRIDE != 2);
+	BUILD_BUG_ON(NH_NUM_PASSES != 4);
+
+	while (message_len) {
+		u32 m0 = get_unaligned_le32(message + 0);
+		u32 m1 = get_unaligned_le32(message + 4);
+		u32 m2 = get_unaligned_le32(message + 8);
+		u32 m3 = get_unaligned_le32(message + 12);
+
+		sums[0] += (u64)(u32)(m0 + key[ 0]) * (u32)(m2 + key[ 2]);
+		sums[1] += (u64)(u32)(m0 + key[ 4]) * (u32)(m2 + key[ 6]);
+		sums[2] += (u64)(u32)(m0 + key[ 8]) * (u32)(m2 + key[10]);
+		sums[3] += (u64)(u32)(m0 + key[12]) * (u32)(m2 + key[14]);
+		sums[0] += (u64)(u32)(m1 + key[ 1]) * (u32)(m3 + key[ 3]);
+		sums[1] += (u64)(u32)(m1 + key[ 5]) * (u32)(m3 + key[ 7]);
+		sums[2] += (u64)(u32)(m1 + key[ 9]) * (u32)(m3 + key[11]);
+		sums[3] += (u64)(u32)(m1 + key[13]) * (u32)(m3 + key[15]);
+		key += NH_MESSAGE_UNIT / sizeof(key[0]);
+		message += NH_MESSAGE_UNIT;
+		message_len -= NH_MESSAGE_UNIT;
+	}
+
+	hash[0] = cpu_to_le64(sums[0]);
+	hash[1] = cpu_to_le64(sums[1]);
+	hash[2] = cpu_to_le64(sums[2]);
+	hash[3] = cpu_to_le64(sums[3]);
+}
