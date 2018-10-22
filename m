@@ -1,260 +1,99 @@
-Return-Path: <SRS0=gnyg=NA=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:40152 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726261AbeJTOAy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 20 Oct 2018 10:00:54 -0400
-Date: Fri, 19 Oct 2018 22:51:37 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc: "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>, linux-fscrypt@vger.kernel.org,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Paul Crowley <paulcrowley@google.com>,
-        Greg Kaiser <gkaiser@google.com>,
-        Michael Halcrow <mhalcrow@google.com>,
-        "Jason A . Donenfeld" <Jason@zx2c4.com>,
-        Samuel Neves <samuel.c.p.neves@gmail.com>,
-        Tomer Ashur <tomer.ashur@esat.kuleuven.be>
-Subject: Re: [RFC PATCH v2 10/12] crypto: arm/nhpoly1305 - add
- NEON-accelerated NHPoly1305
-Message-ID: <20181020055136.GD876@sol.localdomain>
-References: <20181015175424.97147-1-ebiggers@kernel.org>
- <20181015175424.97147-11-ebiggers@kernel.org>
- <CAKv+Gu_HCecGeqFTf-Ys+GiWr98JO_ydZ1cAsMbKM88ZKG=Sog@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAKv+Gu_HCecGeqFTf-Ys+GiWr98JO_ydZ1cAsMbKM88ZKG=Sog@mail.gmail.com>
+Return-Path: <SRS0=9uPW=NC=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from bedivere.hansenpartnership.com ([66.63.167.143]:49652 "EHLO
+        bedivere.hansenpartnership.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726843AbeJVPzU (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 22 Oct 2018 11:55:20 -0400
+Message-ID: <1540193875.3202.12.camel@HansenPartnership.com>
+Subject: [PATCH v4 4/7] tpm2: add session encryption protection to
+ tpm2_get_random()
+From: James Bottomley <James.Bottomley@HansenPartnership.com>
+To: linux-integrity@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date: Mon, 22 Oct 2018 08:37:55 +0100
+In-Reply-To: <1540193596.3202.7.camel@HansenPartnership.com>
+References: <1540193596.3202.7.camel@HansenPartnership.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sat, Oct 20, 2018 at 12:12:56PM +0800, Ard Biesheuvel wrote:
-> On 16 October 2018 at 01:54, Eric Biggers <ebiggers@kernel.org> wrote:
-> > From: Eric Biggers <ebiggers@google.com>
-> >
-> > Add an ARM NEON implementation of NHPoly1305, an ε-almost-∆-universal
-> > hash function used in the Adiantum encryption mode.  For now, only the
-> > NH portion is actually NEON-accelerated; the Poly1305 part is less
-> > performance-critical so is just implemented in C.
-> >
-> > Signed-off-by: Eric Biggers <ebiggers@google.com>
-> > ---
-> >  arch/arm/crypto/Kconfig                |   5 ++
-> >  arch/arm/crypto/Makefile               |   2 +
-> >  arch/arm/crypto/nh-neon-core.S         | 116 +++++++++++++++++++++++++
-> >  arch/arm/crypto/nhpoly1305-neon-glue.c |  78 +++++++++++++++++
-> >  4 files changed, 201 insertions(+)
-> >  create mode 100644 arch/arm/crypto/nh-neon-core.S
-> >  create mode 100644 arch/arm/crypto/nhpoly1305-neon-glue.c
-> >
-> > diff --git a/arch/arm/crypto/Kconfig b/arch/arm/crypto/Kconfig
-> > index cc932d9bba561..458562a34aabe 100644
-> > --- a/arch/arm/crypto/Kconfig
-> > +++ b/arch/arm/crypto/Kconfig
-> > @@ -122,4 +122,9 @@ config CRYPTO_CHACHA20_NEON
-> >         select CRYPTO_BLKCIPHER
-> >         select CRYPTO_CHACHA20
-> >
-> > +config CRYPTO_NHPOLY1305_NEON
-> > +       tristate "NEON accelerated NHPoly1305 hash function (for Adiantum)"
-> > +       depends on KERNEL_MODE_NEON
-> > +       select CRYPTO_NHPOLY1305
-> > +
-> >  endif
-> > diff --git a/arch/arm/crypto/Makefile b/arch/arm/crypto/Makefile
-> > index 005482ff95047..b65d6bfab8e6b 100644
-> > --- a/arch/arm/crypto/Makefile
-> > +++ b/arch/arm/crypto/Makefile
-> > @@ -10,6 +10,7 @@ obj-$(CONFIG_CRYPTO_SHA1_ARM_NEON) += sha1-arm-neon.o
-> >  obj-$(CONFIG_CRYPTO_SHA256_ARM) += sha256-arm.o
-> >  obj-$(CONFIG_CRYPTO_SHA512_ARM) += sha512-arm.o
-> >  obj-$(CONFIG_CRYPTO_CHACHA20_NEON) += chacha-neon.o
-> > +obj-$(CONFIG_CRYPTO_NHPOLY1305_NEON) += nhpoly1305-neon.o
-> >
-> >  ce-obj-$(CONFIG_CRYPTO_AES_ARM_CE) += aes-arm-ce.o
-> >  ce-obj-$(CONFIG_CRYPTO_SHA1_ARM_CE) += sha1-arm-ce.o
-> > @@ -53,6 +54,7 @@ ghash-arm-ce-y        := ghash-ce-core.o ghash-ce-glue.o
-> >  crct10dif-arm-ce-y     := crct10dif-ce-core.o crct10dif-ce-glue.o
-> >  crc32-arm-ce-y:= crc32-ce-core.o crc32-ce-glue.o
-> >  chacha-neon-y := chacha-neon-core.o chacha-neon-glue.o
-> > +nhpoly1305-neon-y := nh-neon-core.o nhpoly1305-neon-glue.o
-> >
-> >  ifdef REGENERATE_ARM_CRYPTO
-> >  quiet_cmd_perl = PERL    $@
-> > diff --git a/arch/arm/crypto/nh-neon-core.S b/arch/arm/crypto/nh-neon-core.S
-> > new file mode 100644
-> > index 0000000000000..434d80ab531c2
-> > --- /dev/null
-> > +++ b/arch/arm/crypto/nh-neon-core.S
-> > @@ -0,0 +1,116 @@
-> > +/* SPDX-License-Identifier: GPL-2.0 */
-> > +/*
-> > + * NH - ε-almost-universal hash function, NEON accelerated version
-> > + *
-> > + * Copyright 2018 Google LLC
-> > + *
-> > + * Author: Eric Biggers <ebiggers@google.com>
-> > + */
-> > +
-> > +#include <linux/linkage.h>
-> > +
-> > +       .text
-> > +       .fpu            neon
-> > +
-> > +       KEY             .req    r0
-> > +       MESSAGE         .req    r1
-> > +       MESSAGE_LEN     .req    r2
-> > +       HASH            .req    r3
-> > +
-> > +       PASS0_SUMS      .req    q0
-> > +       PASS0_SUM_A     .req    d0
-> > +       PASS0_SUM_B     .req    d1
-> > +       PASS1_SUMS      .req    q1
-> > +       PASS1_SUM_A     .req    d2
-> > +       PASS1_SUM_B     .req    d3
-> > +       PASS2_SUMS      .req    q2
-> > +       PASS2_SUM_A     .req    d4
-> > +       PASS2_SUM_B     .req    d5
-> > +       PASS3_SUMS      .req    q3
-> > +       PASS3_SUM_A     .req    d6
-> > +       PASS3_SUM_B     .req    d7
-> > +       K0              .req    q4
-> > +       K1              .req    q5
-> > +       K2              .req    q6
-> > +       K3              .req    q7
-> > +       T0              .req    q8
-> > +       T0_L            .req    d16
-> > +       T0_H            .req    d17
-> > +       T1              .req    q9
-> > +       T1_L            .req    d18
-> > +       T1_H            .req    d19
-> > +       T2              .req    q10
-> > +       T2_L            .req    d20
-> > +       T2_H            .req    d21
-> > +       T3              .req    q11
-> > +       T3_L            .req    d22
-> > +       T3_H            .req    d23
-> > +
-> > +.macro _nh_stride      k0, k1, k2, k3
-> > +
-> > +       // Load next message stride
-> > +       vld1.8          {T3}, [MESSAGE]!
-> > +
-> > +       // Load next key stride
-> > +       vld1.32         {\k3}, [KEY]!
-> > +
-> > +       // Add message words to key words
-> > +       vadd.u32        T0, T3, \k0
-> > +       vadd.u32        T1, T3, \k1
-> > +       vadd.u32        T2, T3, \k2
-> > +       vadd.u32        T3, T3, \k3
-> > +
-> > +       // Multiply 32x32 => 64 and accumulate
-> > +       vmlal.u32       PASS0_SUMS, T0_L, T0_H
-> > +       vmlal.u32       PASS1_SUMS, T1_L, T1_H
-> > +       vmlal.u32       PASS2_SUMS, T2_L, T2_H
-> > +       vmlal.u32       PASS3_SUMS, T3_L, T3_H
-> > +.endm
-> > +
-> 
-> Since we seem to have some spare NEON registers: would it help to have
-> a double round version of this macro?
-> 
+If some entity is snooping the TPM bus, they can see the random
+numbers we're extracting from the TPM and do prediction attacks
+against their consumers.  Foil this attack by using response
+encryption to prevent the attacker from seeing the random sequence.
 
-It helps a little bit, but not much.  The loads are the only part that can be
-optimized further.  I think I'd rather have the shorter + simpler version,
-unless the loads can be optimized significantly more on other processors.
+Signed-off-by: James Bottomley <James.Bottomley@HansenPartnership.com>
 
-Also, originally I had it loading the key and message for the next stride while
-doing the current one, but that didn't seem worthwhile either.
+---
 
-> > +/*
-> > + * void nh_neon(const u32 *key, const u8 *message, size_t message_len,
-> > + *             u8 hash[NH_HASH_BYTES])
-> > + *
-> > + * It's guaranteed that message_len % 16 == 0.
-> > + */
-> > +ENTRY(nh_neon)
-> > +
-> > +       vld1.32         {K0,K1}, [KEY]!
-> > +         vmov.u64      PASS0_SUMS, #0
-> > +         vmov.u64      PASS1_SUMS, #0
-> > +       vld1.32         {K2}, [KEY]!
-> > +         vmov.u64      PASS2_SUMS, #0
-> > +         vmov.u64      PASS3_SUMS, #0
-> > +
-> > +       subs            MESSAGE_LEN, MESSAGE_LEN, #64
-> > +       blt             .Lloop4_done
-> > +.Lloop4:
-> > +       _nh_stride      K0, K1, K2, K3
-> > +       _nh_stride      K1, K2, K3, K0
-> > +       _nh_stride      K2, K3, K0, K1
-> > +       _nh_stride      K3, K0, K1, K2
-> > +       subs            MESSAGE_LEN, MESSAGE_LEN, #64
-> > +       bge             .Lloop4
-> > +
-> > +.Lloop4_done:
-> > +       ands            MESSAGE_LEN, MESSAGE_LEN, #63
-> > +       beq             .Ldone
-> > +       _nh_stride      K0, K1, K2, K3
-> > +
-> > +       subs            MESSAGE_LEN, MESSAGE_LEN, #16
-> > +       beq             .Ldone
-> > +       _nh_stride      K1, K2, K3, K0
-> > +
-> > +       subs            MESSAGE_LEN, MESSAGE_LEN, #16
-> > +       beq             .Ldone
-> > +       _nh_stride      K2, K3, K0, K1
-> > +
-> > +.Ldone:
-> > +       // Sum the accumulators for each pass, then store the sums to 'hash'
-> > +       vadd.u64        T0_L, PASS0_SUM_A, PASS0_SUM_B
-> > +       vadd.u64        T0_H, PASS1_SUM_A, PASS1_SUM_B
-> > +       vadd.u64        T1_L, PASS2_SUM_A, PASS2_SUM_B
-> > +       vadd.u64        T1_H, PASS3_SUM_A, PASS3_SUM_B
-> > +       vst1.8          {T0-T1}, [HASH]
-> > +       bx              lr
-> > +ENDPROC(nh_neon)
-> > diff --git a/arch/arm/crypto/nhpoly1305-neon-glue.c b/arch/arm/crypto/nhpoly1305-neon-glue.c
-> > new file mode 100644
-> > index 0000000000000..df48a00f4c50f
-> > --- /dev/null
-> > +++ b/arch/arm/crypto/nhpoly1305-neon-glue.c
-> > @@ -0,0 +1,78 @@
-> > +// SPDX-License-Identifier: GPL-2.0
-> > +/*
-> > + * NHPoly1305 - ε-almost-∆-universal hash function for Adiantum
-> > + * (NEON accelerated version)
-> > + *
-> > + * Copyright 2018 Google LLC
-> > + */
-> > +
-> > +#include <asm/neon.h>
-> > +#include <asm/simd.h>
-> > +#include <crypto/internal/hash.h>
-> > +#include <crypto/nhpoly1305.h>
-> > +#include <linux/module.h>
-> > +
-> > +asmlinkage void nh_neon(const u32 *key, const u8 *message, size_t message_len,
-> > +                       u8 hash[NH_HASH_BYTES]);
-> > +
-> > +static void _nh_neon(const u32 *key, const u8 *message, size_t message_len,
-> > +                    __le64 hash[NH_NUM_PASSES])
-> > +{
-> > +       nh_neon(key, message, message_len, (u8 *)hash);
-> > +}
-> > +
-> 
-> Why do we need this function?
-> 
+v3: add error handling to sessions and redo to be outside loop
+---
+ drivers/char/tpm/tpm2-cmd.c | 24 ++++++++++++++++++------
+ 1 file changed, 18 insertions(+), 6 deletions(-)
 
-For now it's not needed so I should probably just remove it, but it seems likely
-that indirect calls to assembly functions in the kernel will be going away in
-order to add support for CFI (control flow integrity).  The android-4.9 and
-android-4.14 kernels support CFI on arm64, so you might notice that some of the
-arm64 crypto code had to be patched for this reason.
-
-- Eric
+diff --git a/drivers/char/tpm/tpm2-cmd.c b/drivers/char/tpm/tpm2-cmd.c
+index 332b34b347f1..22f1c7bee173 100644
+--- a/drivers/char/tpm/tpm2-cmd.c
++++ b/drivers/char/tpm/tpm2-cmd.c
+@@ -266,7 +266,6 @@ int tpm2_pcr_extend(struct tpm_chip *chip, int pcr_idx, u32 count,
+ 	return rc;
+ }
+ 
+-
+ struct tpm2_get_random_out {
+ 	__be16 size;
+ 	u8 buffer[TPM_MAX_RNG_DATA];
+@@ -293,21 +292,32 @@ int tpm2_get_random(struct tpm_chip *chip, u8 *dest, size_t max)
+ 	int total = 0;
+ 	int retries = 5;
+ 	u8 *dest_ptr = dest;
++	struct tpm2_auth *auth;
+ 
+ 	if (!num_bytes || max > TPM_MAX_RNG_DATA)
+ 		return -EINVAL;
+ 
+-	err = tpm_buf_init(&buf, 0, 0);
++	err = tpm2_start_auth_session(chip, &auth);
+ 	if (err)
+ 		return err;
+ 
++	err = tpm_buf_init(&buf, 0, 0);
++	if (err) {
++		tpm2_end_auth_session(auth);
++		return err;
++	}
++
+ 	do {
+-		tpm_buf_reset(&buf, TPM2_ST_NO_SESSIONS, TPM2_CC_GET_RANDOM);
++		tpm_buf_reset(&buf, TPM2_ST_SESSIONS, TPM2_CC_GET_RANDOM);
++		tpm_buf_append_hmac_session(&buf, auth, TPM2_SA_ENCRYPT
++					    | TPM2_SA_CONTINUE_SESSION,
++					    NULL, 0);
+ 		tpm_buf_append_u16(&buf, num_bytes);
+-		err = tpm_transmit_cmd(chip, NULL, buf.data, PAGE_SIZE,
+-				       offsetof(struct tpm2_get_random_out,
+-						buffer),
++		tpm_buf_fill_hmac_session(&buf, auth);
++		err = tpm_transmit_cmd(chip, &chip->kernel_space, buf.data,
++				       PAGE_SIZE, TPM_HEADER_SIZE + 2,
+ 				       0, "attempting get random");
++		err = tpm_buf_check_hmac_response(&buf, auth, err);
+ 		if (err)
+ 			goto out;
+ 
+@@ -327,6 +337,8 @@ int tpm2_get_random(struct tpm_chip *chip, u8 *dest, size_t max)
+ 	} while (retries-- && total < max);
+ 
+ 	tpm_buf_destroy(&buf);
++	tpm2_end_auth_session(auth);
++
+ 	return total ? total : -EIO;
+ out:
+ 	tpm_buf_destroy(&buf);
+-- 
+2.16.4
