@@ -1,315 +1,109 @@
 Return-Path: <SRS0=9uPW=NC=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from bedivere.hansenpartnership.com ([66.63.167.143]:49674 "EHLO
-        bedivere.hansenpartnership.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727638AbeJVP4F (ORCPT
+Received: from rhcavuit03.kulnet.kuleuven.be ([134.58.240.136]:43629 "EHLO
+        rhcavuit03.kulnet.kuleuven.be" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728361AbeJVTjH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 22 Oct 2018 11:56:05 -0400
-Message-ID: <1540193921.3202.13.camel@HansenPartnership.com>
-Subject: [PATCH v4 5/7] trusted keys: Add session encryption protection to
- the seal/unseal path
-From: James Bottomley <James.Bottomley@HansenPartnership.com>
-To: linux-integrity@vger.kernel.org
-Cc: linux-crypto@vger.kernel.org,
-        linux-security-module@vger.kernel.org,
-        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date: Mon, 22 Oct 2018 08:38:41 +0100
-In-Reply-To: <1540193596.3202.7.camel@HansenPartnership.com>
-References: <1540193596.3202.7.camel@HansenPartnership.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+        Mon, 22 Oct 2018 15:39:07 -0400
+Received: from icts-p-smtps-2.cc.kuleuven.be (icts-p-smtps-2e.kulnet.kuleuven.be [134.58.240.34])
+        by rhcavuit03.kulnet.kuleuven.be (Postfix) with ESMTP id E1823120006
+        for <linux-crypto@vger.kernel.org>; Mon, 22 Oct 2018 13:20:52 +0200 (CEST)
+Subject: Re: [RFC PATCH v2 00/12] crypto: Adiantum support
+From: Tomer Ashur <tomer.ashur@esat.kuleuven.be>
+To: Paul Crowley <paulcrowley@google.com>, Jason@zx2c4.com
+Cc: ebiggers@kernel.org, linux-crypto@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Greg Kaiser <gkaiser@google.com>,
+        Michael Halcrow <mhalcrow@google.com>,
+        samuel.c.p.neves@gmail.com
+References: <20181015175424.97147-1-ebiggers@kernel.org>
+ <CAHmME9p1aiqWZ4+viaLscO8+qmixdVhMA1MAtMAFEHPG36DcPg@mail.gmail.com>
+ <CA+_SqcDszvqfH7qvEyi8QW2RqkA1kpV6L7VWxhtw5Ogzeovhbg@mail.gmail.com>
+ <2395454e-a0dc-408f-4138-9d15ab5f20b8@esat.kuleuven.be>
+Message-ID: <ebd9d96e-4a2c-528d-b8e8-67907f2a8be0@esat.kuleuven.be>
+Date: Mon, 22 Oct 2018 13:20:51 +0200
+MIME-Version: 1.0
+In-Reply-To: <2395454e-a0dc-408f-4138-9d15ab5f20b8@esat.kuleuven.be>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="ZCGfLrfVDy08N23smGRyOzruVLw2UfQ7R"
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-If some entity is snooping the TPM bus, the can see the data going in
-to be sealed and the data coming out as it is unsealed.  Add parameter
-and response encryption to these cases to ensure that no secrets are
-leaked even if the bus is snooped.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--ZCGfLrfVDy08N23smGRyOzruVLw2UfQ7R
+Content-Type: multipart/mixed; boundary="qhDwaa5xkREPzW5outG79AHHk1KOV8i1d";
+ protected-headers="v1"
+X-Kuleuven: This mail passed the K.U.Leuven mailcluster
+From: Tomer Ashur <tomer.ashur@esat.kuleuven.be>
+To: Paul Crowley <paulcrowley@google.com>, Jason@zx2c4.com
+Cc: ebiggers@kernel.org, linux-crypto@vger.kernel.org,
+ linux-fscrypt@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
+ Greg Kaiser <gkaiser@google.com>, Michael Halcrow <mhalcrow@google.com>,
+ samuel.c.p.neves@gmail.com
+Message-ID: <ebd9d96e-4a2c-528d-b8e8-67907f2a8be0@esat.kuleuven.be>
+Subject: Re: [RFC PATCH v2 00/12] crypto: Adiantum support
+References: <20181015175424.97147-1-ebiggers@kernel.org>
+ <CAHmME9p1aiqWZ4+viaLscO8+qmixdVhMA1MAtMAFEHPG36DcPg@mail.gmail.com>
+ <CA+_SqcDszvqfH7qvEyi8QW2RqkA1kpV6L7VWxhtw5Ogzeovhbg@mail.gmail.com>
+ <2395454e-a0dc-408f-4138-9d15ab5f20b8@esat.kuleuven.be>
+In-Reply-To: <2395454e-a0dc-408f-4138-9d15ab5f20b8@esat.kuleuven.be>
 
-As part of doing this conversion it was discovered that policy
-sessions can't work with HMAC protected authority because of missing
-pieces (the tpm Nonce).  I've added code to work the same way as
-before, which will result in potential authority exposure (while still
-adding security for the command and the returned blob), and a fixme to
-redo the API to get rid of this security hole.
+--qhDwaa5xkREPzW5outG79AHHk1KOV8i1d
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
 
-Signed-off-by: James Bottomley <James.Bottomley@HansenPartnership.com>
----
- drivers/char/tpm/tpm2-cmd.c | 155 ++++++++++++++++++++++++++++----------------
- 1 file changed, 98 insertions(+), 57 deletions(-)
+> On 19-Oct-18 8:19 PM, Paul Crowley wrote:
+>> I would prefer not to wait. Unlike a new primitive whose strength can
+>> only be known through attempts at cryptanalysis, Adiantum is a
+>> construction based on
+>> well-understood and trusted primitives; it is secure if the proof
+>> accompanying it is correct. Given that (outside competitions or
+>> standardization efforts) no-one ever issues public statements that
+>> they think algorithms or proofs are good, what I'm expecting from
+>> academia is silence :) The most we could hope for would be getting the=
 
-diff --git a/drivers/char/tpm/tpm2-cmd.c b/drivers/char/tpm/tpm2-cmd.c
-index 22f1c7bee173..a8655cd535d1 100644
---- a/drivers/char/tpm/tpm2-cmd.c
-+++ b/drivers/char/tpm/tpm2-cmd.c
-@@ -425,7 +425,9 @@ int tpm2_seal_trusted(struct tpm_chip *chip,
- {
- 	unsigned int blob_len;
- 	struct tpm_buf buf;
-+	struct tpm_buf t2b;
- 	u32 hash;
-+	struct tpm2_auth *auth;
- 	int i;
- 	int rc;
- 
-@@ -439,45 +441,56 @@ int tpm2_seal_trusted(struct tpm_chip *chip,
- 	if (i == ARRAY_SIZE(tpm2_hash_map))
- 		return -EINVAL;
- 
--	rc = tpm_buf_init(&buf, TPM2_ST_SESSIONS, TPM2_CC_CREATE);
-+	rc = tpm2_start_auth_session(chip, &auth);
- 	if (rc)
- 		return rc;
- 
--	tpm_buf_append_u32(&buf, options->keyhandle);
--	tpm2_buf_append_auth(&buf, TPM2_RS_PW,
--			     NULL /* nonce */, 0,
--			     0 /* session_attributes */,
--			     options->keyauth /* hmac */,
--			     TPM_DIGEST_SIZE);
-+	rc = tpm_buf_init(&buf, TPM2_ST_SESSIONS, TPM2_CC_CREATE);
-+	if (rc) {
-+		tpm2_end_auth_session(auth);
-+		return rc;
-+	}
-+
-+	rc = tpm_buf_init_2b(&t2b);
-+	if (rc) {
-+		tpm_buf_destroy(&buf);
-+		tpm2_end_auth_session(auth);
-+		return rc;
-+	}
- 
-+	tpm_buf_append_name(&buf, auth, options->keyhandle, NULL);
-+	tpm_buf_append_hmac_session(&buf, auth, TPM2_SA_DECRYPT,
-+				    options->keyauth, TPM_DIGEST_SIZE);
- 	/* sensitive */
--	tpm_buf_append_u16(&buf, 4 + TPM_DIGEST_SIZE + payload->key_len + 1);
-+	tpm_buf_append_u16(&t2b, TPM_DIGEST_SIZE);
-+	tpm_buf_append(&t2b, options->blobauth, TPM_DIGEST_SIZE);
-+	tpm_buf_append_u16(&t2b, payload->key_len + 1);
-+	tpm_buf_append(&t2b, payload->key, payload->key_len);
-+	tpm_buf_append_u8(&t2b, payload->migratable);
- 
--	tpm_buf_append_u16(&buf, TPM_DIGEST_SIZE);
--	tpm_buf_append(&buf, options->blobauth, TPM_DIGEST_SIZE);
--	tpm_buf_append_u16(&buf, payload->key_len + 1);
--	tpm_buf_append(&buf, payload->key, payload->key_len);
--	tpm_buf_append_u8(&buf, payload->migratable);
-+	tpm_buf_append_2b(&buf, &t2b);
- 
- 	/* public */
--	tpm_buf_append_u16(&buf, 14 + options->policydigest_len);
--	tpm_buf_append_u16(&buf, TPM2_ALG_KEYEDHASH);
--	tpm_buf_append_u16(&buf, hash);
-+	tpm_buf_append_u16(&t2b, TPM2_ALG_KEYEDHASH);
-+	tpm_buf_append_u16(&t2b, hash);
- 
- 	/* policy */
- 	if (options->policydigest_len) {
--		tpm_buf_append_u32(&buf, 0);
--		tpm_buf_append_u16(&buf, options->policydigest_len);
--		tpm_buf_append(&buf, options->policydigest,
-+		tpm_buf_append_u32(&t2b, 0);
-+		tpm_buf_append_u16(&t2b, options->policydigest_len);
-+		tpm_buf_append(&t2b, options->policydigest,
- 			       options->policydigest_len);
- 	} else {
--		tpm_buf_append_u32(&buf, TPM2_OA_USER_WITH_AUTH);
--		tpm_buf_append_u16(&buf, 0);
-+		tpm_buf_append_u32(&t2b, TPM2_OA_USER_WITH_AUTH);
-+		tpm_buf_append_u16(&t2b, 0);
- 	}
- 
- 	/* public parameters */
--	tpm_buf_append_u16(&buf, TPM2_ALG_NULL);
--	tpm_buf_append_u16(&buf, 0);
-+	tpm_buf_append_u16(&t2b, TPM2_ALG_NULL);
-+	/* unique (zero) */
-+	tpm_buf_append_u16(&t2b, 0);
-+
-+	tpm_buf_append_2b(&buf, &t2b);
- 
- 	/* outside info */
- 	tpm_buf_append_u16(&buf, 0);
-@@ -490,8 +503,11 @@ int tpm2_seal_trusted(struct tpm_chip *chip,
- 		goto out;
- 	}
- 
--	rc = tpm_transmit_cmd(chip, NULL, buf.data, PAGE_SIZE, 4, 0,
--			      "sealing data");
-+	tpm_buf_fill_hmac_session(&buf, auth);
-+
-+	rc = tpm_transmit_cmd(chip, &chip->kernel_space, buf.data,
-+			      PAGE_SIZE, 4, 0, "sealing data");
-+	rc = tpm_buf_check_hmac_response(&buf, auth, rc);
- 	if (rc)
- 		goto out;
- 
-@@ -509,6 +525,7 @@ int tpm2_seal_trusted(struct tpm_chip *chip,
- 	payload->blob_len = blob_len;
- 
- out:
-+	tpm_buf_destroy(&t2b);
- 	tpm_buf_destroy(&buf);
- 
- 	if (rc > 0) {
-@@ -528,7 +545,6 @@ int tpm2_seal_trusted(struct tpm_chip *chip,
-  * @payload: the key data in clear and encrypted form
-  * @options: authentication values and other options
-  * @blob_handle: returned blob handle
-- * @flags: tpm transmit flags
-  *
-  * Return: 0 on success.
-  *        -E2BIG on wrong payload size.
-@@ -538,9 +554,10 @@ int tpm2_seal_trusted(struct tpm_chip *chip,
- static int tpm2_load_cmd(struct tpm_chip *chip,
- 			 struct trusted_key_payload *payload,
- 			 struct trusted_key_options *options,
--			 u32 *blob_handle, unsigned int flags)
-+			 u32 *blob_handle)
- {
- 	struct tpm_buf buf;
-+	struct tpm2_auth *auth;
- 	unsigned int private_len;
- 	unsigned int public_len;
- 	unsigned int blob_len;
-@@ -555,17 +572,18 @@ static int tpm2_load_cmd(struct tpm_chip *chip,
- 	if (blob_len > payload->blob_len)
- 		return -E2BIG;
- 
--	rc = tpm_buf_init(&buf, TPM2_ST_SESSIONS, TPM2_CC_LOAD);
-+	rc = tpm2_start_auth_session(chip, &auth);
- 	if (rc)
- 		return rc;
- 
--	tpm_buf_append_u32(&buf, options->keyhandle);
--	tpm2_buf_append_auth(&buf, TPM2_RS_PW,
--			     NULL /* nonce */, 0,
--			     0 /* session_attributes */,
--			     options->keyauth /* hmac */,
--			     TPM_DIGEST_SIZE);
-+	rc = tpm_buf_init(&buf, TPM2_ST_SESSIONS, TPM2_CC_LOAD);
-+	if (rc) {
-+		tpm2_end_auth_session(auth);
-+		return rc;
-+	}
- 
-+	tpm_buf_append_name(&buf, auth, options->keyhandle, NULL);
-+	tpm_buf_append_hmac_session(&buf, auth, 0, options->keyauth, TPM_DIGEST_SIZE);
- 	tpm_buf_append(&buf, payload->blob, blob_len);
- 
- 	if (buf.flags & TPM_BUF_OVERFLOW) {
-@@ -573,8 +591,10 @@ static int tpm2_load_cmd(struct tpm_chip *chip,
- 		goto out;
- 	}
- 
--	rc = tpm_transmit_cmd(chip, NULL, buf.data, PAGE_SIZE, 4, flags,
--			      "loading blob");
-+	tpm_buf_fill_hmac_session(&buf, auth);
-+	rc = tpm_transmit_cmd(chip, &chip->kernel_space, buf.data, PAGE_SIZE,
-+			      4, 0, "loading blob");
-+	rc = tpm_buf_check_hmac_response(&buf, auth, rc);
- 	if (!rc)
- 		*blob_handle = be32_to_cpup(
- 			(__be32 *) &buf.data[TPM_HEADER_SIZE]);
-@@ -595,7 +615,6 @@ static int tpm2_load_cmd(struct tpm_chip *chip,
-  * @payload: the key data in clear and encrypted form
-  * @options: authentication values and other options
-  * @blob_handle: blob handle
-- * @flags: tpm_transmit_cmd flags
-  *
-  * Return: 0 on success
-  *         -EPERM on tpm error status
-@@ -604,28 +623,54 @@ static int tpm2_load_cmd(struct tpm_chip *chip,
- static int tpm2_unseal_cmd(struct tpm_chip *chip,
- 			   struct trusted_key_payload *payload,
- 			   struct trusted_key_options *options,
--			   u32 blob_handle, unsigned int flags)
-+			   u32 blob_handle)
- {
- 	struct tpm_buf buf;
-+	struct tpm2_auth *auth;
- 	u16 data_len;
- 	u8 *data;
- 	int rc;
- 
--	rc = tpm_buf_init(&buf, TPM2_ST_SESSIONS, TPM2_CC_UNSEAL);
-+	rc = tpm2_start_auth_session(chip, &auth);
- 	if (rc)
- 		return rc;
- 
--	tpm_buf_append_u32(&buf, blob_handle);
--	tpm2_buf_append_auth(&buf,
--			     options->policyhandle ?
--			     options->policyhandle : TPM2_RS_PW,
--			     NULL /* nonce */, 0,
--			     TPM2_SA_CONTINUE_SESSION,
--			     options->blobauth /* hmac */,
--			     TPM_DIGEST_SIZE);
--
--	rc = tpm_transmit_cmd(chip, NULL, buf.data, PAGE_SIZE, 6, flags,
--			      "unsealing");
-+	rc = tpm_buf_init(&buf, TPM2_ST_SESSIONS, TPM2_CC_UNSEAL);
-+	if (rc) {
-+		tpm2_end_auth_session(auth);
-+		return rc;
-+	}
-+
-+	tpm_buf_append_name(&buf, auth, blob_handle, NULL);
-+
-+	if (!options->policyhandle) {
-+		tpm_buf_append_hmac_session(&buf, auth, TPM2_SA_ENCRYPT,
-+					    options->blobauth, TPM_DIGEST_SIZE);
-+	} else {
-+		/*
-+		 * FIXME: the policy can't be used for HMAC protection
-+		 * of the authorization because it must be generated
-+		 * with the initial nonces which isn't passed in, so
-+		 * append a second encryption session to at least HMAC
-+		 * protect the command and encrypt the sealed blob on
-+		 * return so the only thing the attacker can get is
-+		 * the password.
-+		 *
-+		 * We also consume the policy session otherwise it
-+		 * would be absorbed into the kernel space.
-+		 */
-+		tpm2_buf_append_auth(&buf, options->policyhandle,
-+				     NULL /* nonce */, 0, 0,
-+				     options->blobauth /* hmac */,
-+				     TPM_DIGEST_SIZE);
-+		tpm_buf_append_hmac_session(&buf, auth, TPM2_SA_ENCRYPT,
-+					    NULL, 0);
-+	}
-+
-+	tpm_buf_fill_hmac_session(&buf, auth);
-+	rc = tpm_transmit_cmd(chip, &chip->kernel_space, buf.data, PAGE_SIZE,
-+			      6, 0, "unsealing");
-+	rc = tpm_buf_check_hmac_response(&buf, auth, rc);
- 	if (rc > 0)
- 		rc = -EPERM;
- 
-@@ -669,17 +714,13 @@ int tpm2_unseal_trusted(struct tpm_chip *chip,
- 	u32 blob_handle;
- 	int rc;
- 
--	mutex_lock(&chip->tpm_mutex);
--	rc = tpm2_load_cmd(chip, payload, options, &blob_handle,
--			   TPM_TRANSMIT_UNLOCKED);
-+	rc = tpm2_load_cmd(chip, payload, options, &blob_handle);
- 	if (rc)
- 		goto out;
- 
--	rc = tpm2_unseal_cmd(chip, payload, options, blob_handle,
--			     TPM_TRANSMIT_UNLOCKED);
--	tpm2_flush_context_cmd(chip, blob_handle, TPM_TRANSMIT_UNLOCKED);
-+	rc = tpm2_unseal_cmd(chip, payload, options, blob_handle);
-+	tpm2_flush_context_cmd(chip, blob_handle, 0);
- out:
--	mutex_unlock(&chip->tpm_mutex);
- 	return rc;
- }
- 
--- 
-2.16.4
+>> paper accepted at a conference, and we're pursuing that but there's a
+>> good chance that won't happen simply because it's not very novel. It
+>> basically takes existing ideas and applies them using a stream cipher
+>> instead of a block cipher, and a faster hashing mode; it's also a
+>> small update from HPolyC. I've had some private feedback that the
+>> proof seems correct, and that's all I'm expecting to get.
+>
+I tend to agree with Paul on this point. This is a place where academia
+needs to improve. An attempt to do so is the Real World Crypto
+conference (RWC; https://rwc.iacr.org/2019/), but the deadline for
+submissions was October 1st. For HpolyC I asked a few people to take a
+look at the construction and the consensus was that it seems secure but
+that the proof style makes it hard to verify. I haven't had the time yet
+to read the Adiantum paper (and I'm not a provable security person
+anyway) but I suppose Paul took the comments he received on this into
+account and that's the best we can hope for. Academia simply moves in a
+different pace and has different incentives.
+
+=C2=A0Tomer
+
+
+--qhDwaa5xkREPzW5outG79AHHk1KOV8i1d--
+
+--ZCGfLrfVDy08N23smGRyOzruVLw2UfQ7R
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEAzRy0e5O0UZdzbNUni5oBnW4MLcFAlvNspMACgkQni5oBnW4
+MLcIRQf/SqN6tRXG9BL2vpVuxnoCUhohnGRKU41x21akRIDoEOt7MkJBntNIpJ7J
+byG2eTv6FO7CB5J/6Ecc9S8rODO3rKOHTaV3wUNzH7xd6EQFEqI9i3ScBDWCTI7n
+3QPBO25rrGCaWj+cMNBeqzjU6i7Sg3EBE6EYxZZoFnhOBIVpbcGFVXuwPY5Gx5Qt
+/9tA9XrzPbRhCBoCmgNelIcZOBFOhWEmWZA/cdXNaTzAKgDEkBPmMmVakdb32QVs
+DftFGaug1CuYWeDPScQYkthyIpiOV78YrjX7UI0PluD/55VqUOVYsBNy90uBG9eC
+rUhnw6qW7/nVoEyC8tihQT6H6tEKMQ==
+=HeL5
+-----END PGP SIGNATURE-----
+
+--ZCGfLrfVDy08N23smGRyOzruVLw2UfQ7R--
