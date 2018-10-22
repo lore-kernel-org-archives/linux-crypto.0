@@ -1,74 +1,79 @@
-Return-Path: <SRS0=YnV0=NF=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:50735 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727418AbeJYWNA (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 25 Oct 2018 18:13:00 -0400
-Received: by mail-wm1-f66.google.com with SMTP id i8-v6so1598972wmg.0
-        for <linux-crypto@vger.kernel.org>; Thu, 25 Oct 2018 06:40:11 -0700 (PDT)
-Subject: Re: dm-integrity stalls with iMX6q CAAM
-To: Horia Geanta <horia.geanta@nxp.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-References: <fbcca5eb-a301-53f4-3faf-a36a3229300d@baylibre.com>
- <VI1PR0402MB3485278043D883A74ED7AEBD98FF0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
-From: Neil Armstrong <narmstrong@baylibre.com>
-Message-ID: <8f934a82-5078-3cb3-84ba-80298f4dfe09@baylibre.com>
-Date: Thu, 25 Oct 2018 15:40:06 +0200
+Return-Path: <SRS0=9uPW=NC=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:44492 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726889AbeJWHAk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 23 Oct 2018 03:00:40 -0400
+Date: Mon, 22 Oct 2018 15:40:10 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>, linux-fscrypt@vger.kernel.org,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Paul Crowley <paulcrowley@google.com>,
+        Greg Kaiser <gkaiser@google.com>,
+        Michael Halcrow <mhalcrow@google.com>,
+        "Jason A . Donenfeld" <Jason@zx2c4.com>,
+        Samuel Neves <samuel.c.p.neves@gmail.com>,
+        Tomer Ashur <tomer.ashur@esat.kuleuven.be>
+Subject: Re: [RFC PATCH v2 09/12] crypto: nhpoly1305 - add NHPoly1305 support
+Message-ID: <20181022224008.GB59695@gmail.com>
+References: <20181015175424.97147-1-ebiggers@kernel.org>
+ <20181015175424.97147-10-ebiggers@kernel.org>
+ <CAKv+Gu-5WM19g5HguDheAADbigKNxokDCFMekkt4OYdEEa8Avw@mail.gmail.com>
+ <20181020053834.GC876@sol.localdomain>
+ <CAKv+Gu-A_EhMBXq_nqzBzpgN36foo6hA3Ba3=j+WVM-jph=mrw@mail.gmail.com>
+ <20181022184236.GA59695@gmail.com>
+ <CAKv+Gu_vXmfNQT8j=G_Zz5C3-zDPPEQ2ne6ZZQw8mD0rifO8qA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <VI1PR0402MB3485278043D883A74ED7AEBD98FF0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAKv+Gu_vXmfNQT8j=G_Zz5C3-zDPPEQ2ne6ZZQw8mD0rifO8qA@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 17/10/2018 15:35, Horia Geanta wrote:
-> On 9/21/2018 3:06 PM, Neil Armstrong wrote:
->> Hi,
->>
->> I recently configured dm-crypt + dm-integrity on an iMX6q platform with CAAM Hash functions enabled using the following command lines :
->>
->> Linux 4.14.71
->>
->> cryptsetup luksFormat /dev/mmcblk1p3 --cipher aes-xts-plain64 --type luks2 --integrity hmac-sha256 --sector-size 512 --use-urandom
->> cryptsetup open /dev/mmcblk1p3 root
->> mkfs.ext4 -v -F /dev/mapper/root
->>
->> luksFormat and open finishes correctly, luksDump and status reports correct dm and luks properties.
->>
->> but when trying to access the /dev/mapper/root (mkfs, sha256sum or whatever), it blocks without any warning or errors reported by the kernel.
->> I can see a few (~170) interrupts on the jr0 interrupt then nothing.
->>
->> Is there a particular issue with hmac-sha256 with the linux CAAM driver ?
->>
->> When disabling the CAAM hash functions or using another cipher & integrity pair, it works like a charm.
->>
-> The issue you are seeing is most probably related to CAAM driver not
-> implementing correctly the crypto requests "backlogging".
-> See commit c0403ec0bb5a ("Revert "dm crypt: fix deadlock when async crypto
-> algorithm returns -EBUSY"") for a detailed description.
+Hi Ard,
+
+On Mon, Oct 22, 2018 at 07:25:27PM -0300, Ard Biesheuvel wrote:
+> >
+> > Hmm, I'm actually leaning towards the following instead.  Unrolling multiple
+> > strides to try to reduce loads of the keys doesn't seem worthwhile in the C
+> > implementation; for one, it bloats the code size a lot
+> > (412 => 2332 bytes on arm32).
+> >
+> > static void nh_generic(const u32 *key, const u8 *message, size_t message_len,
+> >                        __le64 hash[NH_NUM_PASSES])
+> > {
+> >         u64 sums[4] = { 0, 0, 0, 0 };
+> >
+> >         BUILD_BUG_ON(NH_PAIR_STRIDE != 2);
+> >         BUILD_BUG_ON(NH_NUM_PASSES != 4);
+> >
+> >         while (message_len) {
+> >                 u32 m0 = get_unaligned_le32(message + 0);
+> >                 u32 m1 = get_unaligned_le32(message + 4);
+> >                 u32 m2 = get_unaligned_le32(message + 8);
+> >                 u32 m3 = get_unaligned_le32(message + 12);
+> >
+> >                 sums[0] += (u64)(u32)(m0 + key[ 0]) * (u32)(m2 + key[ 2]);
+> >                 sums[1] += (u64)(u32)(m0 + key[ 4]) * (u32)(m2 + key[ 6]);
+> >                 sums[2] += (u64)(u32)(m0 + key[ 8]) * (u32)(m2 + key[10]);
+> >                 sums[3] += (u64)(u32)(m0 + key[12]) * (u32)(m2 + key[14]);
+> >                 sums[0] += (u64)(u32)(m1 + key[ 1]) * (u32)(m3 + key[ 3]);
+> >                 sums[1] += (u64)(u32)(m1 + key[ 5]) * (u32)(m3 + key[ 7]);
+> >                 sums[2] += (u64)(u32)(m1 + key[ 9]) * (u32)(m3 + key[11]);
+> >                 sums[3] += (u64)(u32)(m1 + key[13]) * (u32)(m3 + key[15]);
 > 
-> Historically, there have been several CAAM backlogging implementations proposed
-> - but all were rejected:
-> v1: https://patchwork.kernel.org/patch/7144701
-> v2: https://patchwork.kernel.org/patch/7199241
-> v3: https://patchwork.kernel.org/patch/7221941
-> v4: https://patchwork.kernel.org/patch/7230241
-> v5: https://patchwork.kernel.org/patch/9033121
-> 
-> Discussion here: https://community.nxp.com/message/1020096
-> mentions v2 as solving the issue.
-> You could try it while we find a solution that would be accepted upstream.
-> 
-> Hope this helps,
-> Horia
+> Are these (u32) casts really necessary? All the addends are u32 types,
+> so I'd expect each (x + y) subexpression to have a u32 type already as
+> well. Or am I missing something?
 > 
 
-Hi Horia,
+The (u32) casts are only necessary when sizeof(int) > sizeof(u32), as then the
+addends will be promoted to 'int'.  Of course, that's never the case for the
+Linux kernel.  But I prefer it to be as robust and well-defined as possible,
+since people might use this as a reference when coding other implementations,
+which could end up finding their way into unusual and/or future platforms.
 
-Thanks for the pointers ! Hopefully you will find a solution soon.
-
-Neil
+- Eric
