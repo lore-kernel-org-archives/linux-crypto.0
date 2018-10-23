@@ -1,934 +1,1701 @@
-Return-Path: <SRS0=GKHD=M7=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-io1-f66.google.com ([209.85.166.66]:38952 "EHLO
-        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727510AbeJSWaw (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 19 Oct 2018 18:30:52 -0400
-Received: by mail-io1-f66.google.com with SMTP id z16-v6so23131955iol.6
-        for <linux-crypto@vger.kernel.org>; Fri, 19 Oct 2018 07:24:30 -0700 (PDT)
+Return-Path: <SRS0=BLQr=ND=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mga17.intel.com ([192.55.52.151]:9515 "EHLO mga17.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726080AbeJXIOx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 24 Oct 2018 04:14:53 -0400
+Date: Wed, 24 Oct 2018 02:48:56 +0300 (EEST)
+From: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
+To: James Bottomley <James.Bottomley@HansenPartnership.com>
+cc: linux-integrity@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH v4 2/7] tpm2-sessions: Add full HMAC and encrypt/decrypt
+ session handling
+In-Reply-To: <1540193787.3202.10.camel@HansenPartnership.com>
+Message-ID: <alpine.DEB.2.21.1810232239140.8524@jsakkine-mobl1>
+References: <1540193596.3202.7.camel@HansenPartnership.com> <1540193787.3202.10.camel@HansenPartnership.com>
 MIME-Version: 1.0
-In-Reply-To: <20181015175424.97147-3-ebiggers@kernel.org>
-References: <20181015175424.97147-1-ebiggers@kernel.org> <20181015175424.97147-3-ebiggers@kernel.org>
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date: Fri, 19 Oct 2018 22:24:28 +0800
-Message-ID: <CAKv+Gu8WnYpSiQuPPSzhxPe5xqwq779o9HWeDaoKxTJR5UFUCA@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 02/12] crypto: chacha20-generic - add XChaCha20 support
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>, linux-fscrypt@vger.kernel.org,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Paul Crowley <paulcrowley@google.com>,
-        Greg Kaiser <gkaiser@google.com>,
-        Michael Halcrow <mhalcrow@google.com>,
-        "Jason A . Donenfeld" <Jason@zx2c4.com>,
-        Samuel Neves <samuel.c.p.neves@gmail.com>,
-        Tomer Ashur <tomer.ashur@esat.kuleuven.be>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII; format=flowed
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 16 October 2018 at 01:54, Eric Biggers <ebiggers@kernel.org> wrote:
-> From: Eric Biggers <ebiggers@google.com>
->
-> Add support for the XChaCha20 stream cipher.  XChaCha20 is the
-> application of the XSalsa20 construction
-> (https://cr.yp.to/snuffle/xsalsa-20081128.pdf) to ChaCha20 rather than
-> to Salsa20.  XChaCha20 extends ChaCha20's nonce length from 64 bits (or
-> 96 bits, depending on convention) to 192 bits, while provably retaining
-> ChaCha20's security.  XChaCha20 uses the ChaCha20 permutation to map the
-> key and first 128 nonce bits to a 256-bit subkey.  Then, it does the
-> ChaCha20 stream cipher with the subkey and remaining 64 bits of nonce.
->
-> We need XChaCha support in order to add support for the Adiantum
-> encryption mode.  Note that to meet our performance requirements, we
-> actually plan to primarily use the variant XChaCha12.  But we believe
-> it's wise to first add XChaCha20 as a baseline with a higher security
-> margin, in case there are any situations where it can be used.
-> Supporting both variants is straightforward.
->
-> Since XChaCha20's subkey differs for each request, XChaCha20 can't be a
-> template that wraps ChaCha20; that would require re-keying the
-> underlying ChaCha20 for every request, which wouldn't be thread-safe.
-> Instead, we make XChaCha20 its own top-level algorithm which calls the
-> ChaCha20 streaming implementation internally.
->
-> Similar to the existing ChaCha20 implementation, we define the IV to be
-> the nonce and stream position concatenated together.  This allows users
-> to seek to any position in the stream.
->
-> I considered splitting the code into separate chacha20-common, chacha20,
-> and xchacha20 modules, so that chacha20 and xchacha20 could be
-> enabled/disabled independently.  However, since nearly all the code is
-> shared anyway, I ultimately decided there would have been little benefit
-> to the added complexity of separate modules.
->
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
+On Mon, 22 Oct 2018, James Bottomley wrote:
+> This code adds true session based HMAC authentication plus parameter
+> decryption and response encryption using AES.
 
-One nit below but that should be fixed separately, so
+In order to reduce complexity it would make sense to split into two
+commits: authentication and parameter encryption.
 
-Reviewed-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+>
+> The basic design of this code is to segregate all the nasty crypto,
+> hash and hmac code into tpm2-sessions.c and export a usable API.
+>
+> The API first of all starts off by gaining a session with
+>
+> tpm2_start_auth_session()
+>
+> Which initiates a session with the TPM and allocates an opaque
+> tpm2_auth structure to handle the session parameters.  Then the use is
+> simply:
+>
+> * tpm_buf_append_name() in place of the tpm_buf_append_u32 for the
+>  handles
 
+Do not understand the description of this function.
+
+>
+> * tpm_buf_append_hmac_session() where tpm2_append_auth() would go
+
+Another fuzzy description.
+
+>
+> * tpm_buf_fill_hmac_session() called after the entire command buffer
+>  is finished but before tpm_transmit_cmd() is called which computes
+>  the correct HMAC and places it in the command at the correct
+>  location.
+
+I would call this simply tpm_buf_insert_hmac(). It is clear and precise
+name what it does.
+
+These all sould be combined with the existing session stuff inside
+tpm2-cmd.c and not have duplicate infrastructures. The file name should
+be tpm2-session.c (we neither have tpm2-cmds.c).
+
+>
+> Finally, after tpm_transmit_cmd() is called,
+> tpm_buf_check_hmac_response() is called to check that the returned
+> HMAC matched and collect the new state for the next use of the
+> session, if any.
+>
+> The features of the session is controlled by the session attributes
+> set in tpm_buf_append_hmac_session().  If TPM2_SA_CONTINUE_SESSION is
+> not specified, the session will be flushed and the tpm2_auth structure
+> freed in tpm_buf_check_hmac_response(); otherwise the session may be
+> used again.  Parameter encryption is specified by or'ing the flag
+> TPM2_SA_DECRYPT and response encryption by or'ing the flag
+> TPM2_SA_ENCRYPT.  the various encryptions will be taken care of by
+> tpm_buf_fill_hmac_session() and tpm_buf_check_hmac_response()
+> respectively.
+>
+> To get all of this to work securely, the Kernel now needs a primary
+> key to encrypt the session salt to, so we derive an EC key from the
+> NULL seed and store it in the tpm_chip structure.  We also make sure
+> that this seed remains for the kernel by using a kernel space to take
+> it out of the TPM when userspace wants to use it.
+>
+> Signed-off-by: James Bottomley <James.Bottomley@HansenPartnership.com>
+>
 > ---
->  crypto/Kconfig            |  14 +-
->  crypto/chacha20_generic.c | 120 +++++---
->  crypto/testmgr.c          |   6 +
->  crypto/testmgr.h          | 577 ++++++++++++++++++++++++++++++++++++++
->  include/crypto/chacha20.h |  14 +-
->  5 files changed, 689 insertions(+), 42 deletions(-)
 >
-> diff --git a/crypto/Kconfig b/crypto/Kconfig
-> index f7a235db56aaa..d9acbce23d4d5 100644
-> --- a/crypto/Kconfig
-> +++ b/crypto/Kconfig
-> @@ -1387,18 +1387,22 @@ config CRYPTO_SALSA20
->           Bernstein <djb@cr.yp.to>. See <http://cr.yp.to/snuffle.html>
+> v2: Added docbook and improved response check API
+> v3: Add readpublic, fix hmac length, add API for close on error
+>    allow for the hmac session not being first in the sessions
+> v4: Make NULL seed template exactly match the SRK ECC template.
+>    Also check the NULL primary key name is what getpublic returns
+>    to prevent spoofing.  Also parametrise the name size for reuse
+> ---
+> drivers/char/tpm/Kconfig         |    3 +
+> drivers/char/tpm/Makefile        |    2 +-
+> drivers/char/tpm/tpm.h           |   32 +
+> drivers/char/tpm/tpm2-cmd.c      |   34 +-
+> drivers/char/tpm/tpm2-sessions.c | 1188 ++++++++++++++++++++++++++++++++++++++
+> drivers/char/tpm/tpm2-sessions.h |   57 ++
+> 6 files changed, 1300 insertions(+), 16 deletions(-)
+> create mode 100644 drivers/char/tpm/tpm2-sessions.c
+> create mode 100644 drivers/char/tpm/tpm2-sessions.h
 >
->  config CRYPTO_CHACHA20
-> -       tristate "ChaCha20 cipher algorithm"
-> +       tristate "ChaCha20 stream cipher algorithms"
->         select CRYPTO_BLKCIPHER
->         help
-> -         ChaCha20 cipher algorithm, RFC7539.
-> +         The ChaCha20 and XChaCha20 stream cipher algorithms.
->
->           ChaCha20 is a 256-bit high-speed stream cipher designed by Daniel J.
->           Bernstein and further specified in RFC7539 for use in IETF protocols.
-> -         This is the portable C implementation of ChaCha20.
-> -
-> -         See also:
-> +         This is the portable C implementation of ChaCha20.  See also:
->           <http://cr.yp.to/chacha/chacha-20080128.pdf>
->
-> +         XChaCha20 is the application of the XSalsa20 construction to ChaCha20
-> +         rather than to Salsa20.  XChaCha20 extends ChaCha20's nonce length
-> +         from 64 bits (or 96 bits using the RFC7539 convention) to 192 bits,
-> +         while provably retaining ChaCha20's security.  See also:
-> +         <https://cr.yp.to/snuffle/xsalsa-20081128.pdf>
-> +
->  config CRYPTO_CHACHA20_X86_64
->         tristate "ChaCha20 cipher algorithm (x86_64/SSSE3/AVX2)"
->         depends on X86 && 64BIT
-> diff --git a/crypto/chacha20_generic.c b/crypto/chacha20_generic.c
-> index 3ae96587caf9a..07902fe37aeb8 100644
-> --- a/crypto/chacha20_generic.c
-> +++ b/crypto/chacha20_generic.c
-> @@ -1,7 +1,8 @@
->  /*
-> - * ChaCha20 256-bit cipher algorithm, RFC7539
-> + * ChaCha20 (RFC7539) and XChaCha20 stream cipher algorithms
->   *
->   * Copyright (C) 2015 Martin Willi
-> + * Copyright (C) 2018 Google LLC
->   *
->   * This program is free software; you can redistribute it and/or modify
->   * it under the terms of the GNU General Public License as published by
-> @@ -36,6 +37,31 @@ static void chacha20_docrypt(u32 *state, u8 *dst, const u8 *src,
->         }
->  }
->
-> +static int chacha20_stream_xor(struct skcipher_request *req,
-> +                              struct chacha20_ctx *ctx, u8 *iv)
-> +{
-> +       struct skcipher_walk walk;
-> +       u32 state[16];
-> +       int err;
-> +
-> +       err = skcipher_walk_virt(&walk, req, true);
-> +
 
-We shouldn't be calling skcipher_walk_virt() here with atomic set to
-true, but that is an existing issue so perhaps you could include a
-separate patch to fix that?
+tpm2-cmd.c changes should be in their own commit e.g.:
 
-> +       crypto_chacha20_init(state, ctx, iv);
+"tpm: add own space for in-kernel TPM communication"
+
+> diff --git a/drivers/char/tpm/Kconfig b/drivers/char/tpm/Kconfig
+> index 0aee88df98d1..8c714d8550c4 100644
+> --- a/drivers/char/tpm/Kconfig
+> +++ b/drivers/char/tpm/Kconfig
+> @@ -8,6 +8,9 @@ menuconfig TCG_TPM
+> 	select SECURITYFS
+> 	select CRYPTO
+> 	select CRYPTO_HASH_INFO
+> +	select CRYPTO_ECDH
+> +	select CRYPTO_AES
+> +	select CRYPTO_CFB
+> 	---help---
+> 	  If you have a TPM security chip in your system, which
+> 	  implements the Trusted Computing Group's specification,
+> diff --git a/drivers/char/tpm/Makefile b/drivers/char/tpm/Makefile
+> index 65d165cce530..1b5f6ccbb86d 100644
+> --- a/drivers/char/tpm/Makefile
+> +++ b/drivers/char/tpm/Makefile
+> @@ -5,7 +5,7 @@
+> obj-$(CONFIG_TCG_TPM) += tpm.o
+> tpm-y := tpm-interface.o tpm-dev.o tpm-sysfs.o tpm-chip.o tpm2-cmd.o \
+> 	 tpm-dev-common.o tpmrm-dev.o eventlog/common.o eventlog/tpm1.o \
+> -	 eventlog/tpm2.o tpm2-space.o tpm-buf.o
+> +	 eventlog/tpm2.o tpm2-space.o tpm-buf.o tpm2-sessions.o
+> tpm-$(CONFIG_ACPI) += tpm_ppi.o eventlog/acpi.o
+> tpm-$(CONFIG_EFI) += eventlog/efi.o
+> tpm-$(CONFIG_OF) += eventlog/of.o
+> diff --git a/drivers/char/tpm/tpm.h b/drivers/char/tpm/tpm.h
+> index d73701e36eba..d39065d9995d 100644
+> --- a/drivers/char/tpm/tpm.h
+> +++ b/drivers/char/tpm/tpm.h
+> @@ -42,6 +42,15 @@
+> #include <asm/intel-family.h>
+> #endif
+>
+> +/* fixed define for the curve we use which is NIST_P256 */
+> +#define EC_PT_SZ	32
 > +
-> +       while (walk.nbytes > 0) {
-> +               unsigned int nbytes = walk.nbytes;
+> +/*
+> + * fixed define for the size of a name.  This is actually HASHALG size
+> + * plus 2, so 32 for SHA256
+> + */
+> +#define TPM2_NAME_SIZE	34
+
+Please, remove this definition completely. It only causes confusion.
+
 > +
-> +               if (nbytes < walk.total)
-> +                       nbytes = round_down(nbytes, walk.stride);
-> +
-> +               chacha20_docrypt(state, walk.dst.virt.addr, walk.src.virt.addr,
-> +                                nbytes);
-> +               err = skcipher_walk_done(&walk, walk.nbytes - nbytes);
-> +       }
-> +
-> +       return err;
-> +}
-> +
->  void crypto_chacha20_init(u32 *state, struct chacha20_ctx *ctx, u8 *iv)
->  {
->         state[0]  = 0x61707865; /* "expa" */
-> @@ -77,54 +103,74 @@ int crypto_chacha20_crypt(struct skcipher_request *req)
->  {
->         struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
->         struct chacha20_ctx *ctx = crypto_skcipher_ctx(tfm);
-> -       struct skcipher_walk walk;
-> -       u32 state[16];
-> -       int err;
-> -
-> -       err = skcipher_walk_virt(&walk, req, true);
+> enum tpm_const {
+> 	TPM_MINOR = 224,	/* officially assigned */
+> 	TPM_BUFSIZE = 4096,
+> @@ -103,6 +112,7 @@ enum tpm2_timeouts {
+> enum tpm2_structures {
+> 	TPM2_ST_NO_SESSIONS	= 0x8001,
+> 	TPM2_ST_SESSIONS	= 0x8002,
+> +	TPM2_ST_CREATION	= 0x8021,
+> };
 >
-> -       crypto_chacha20_init(state, ctx, walk.iv);
-> +       return chacha20_stream_xor(req, ctx, req->iv);
-> +}
-> +EXPORT_SYMBOL_GPL(crypto_chacha20_crypt);
->
-> -       while (walk.nbytes > 0) {
-> -               unsigned int nbytes = walk.nbytes;
-> +int crypto_xchacha20_crypt(struct skcipher_request *req)
-> +{
-> +       struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-> +       struct chacha20_ctx *ctx = crypto_skcipher_ctx(tfm);
-> +       struct chacha20_ctx subctx;
-> +       u32 state[16];
-> +       u8 real_iv[16];
->
-> -               if (nbytes < walk.total)
-> -                       nbytes = round_down(nbytes, walk.stride);
-> +       /* Compute the subkey given the original key and first 128 nonce bits */
-> +       crypto_chacha20_init(state, ctx, req->iv);
-> +       hchacha20_block(state, subctx.key);
->
-> -               chacha20_docrypt(state, walk.dst.virt.addr, walk.src.virt.addr,
-> -                                nbytes);
-> -               err = skcipher_walk_done(&walk, walk.nbytes - nbytes);
-> -       }
-> +       /* Build the real IV */
-> +       memcpy(&real_iv[0], req->iv + 24, 8); /* stream position */
-> +       memcpy(&real_iv[8], req->iv + 16, 8); /* remaining 64 nonce bits */
->
-> -       return err;
-> +       /* Generate the stream and XOR it with the data */
-> +       return chacha20_stream_xor(req, &subctx, real_iv);
->  }
-> -EXPORT_SYMBOL_GPL(crypto_chacha20_crypt);
-> -
-> -static struct skcipher_alg alg = {
-> -       .base.cra_name          = "chacha20",
-> -       .base.cra_driver_name   = "chacha20-generic",
-> -       .base.cra_priority      = 100,
-> -       .base.cra_blocksize     = 1,
-> -       .base.cra_ctxsize       = sizeof(struct chacha20_ctx),
-> -       .base.cra_module        = THIS_MODULE,
-> -
-> -       .min_keysize            = CHACHA20_KEY_SIZE,
-> -       .max_keysize            = CHACHA20_KEY_SIZE,
-> -       .ivsize                 = CHACHA20_IV_SIZE,
-> -       .chunksize              = CHACHA20_BLOCK_SIZE,
-> -       .setkey                 = crypto_chacha20_setkey,
-> -       .encrypt                = crypto_chacha20_crypt,
-> -       .decrypt                = crypto_chacha20_crypt,
-> +EXPORT_SYMBOL_GPL(crypto_xchacha20_crypt);
-> +
-> +static struct skcipher_alg algs[] = {
-> +       {
-> +               .base.cra_name          = "chacha20",
-> +               .base.cra_driver_name   = "chacha20-generic",
-> +               .base.cra_priority      = 100,
-> +               .base.cra_blocksize     = 1,
-> +               .base.cra_ctxsize       = sizeof(struct chacha20_ctx),
-> +               .base.cra_module        = THIS_MODULE,
-> +
-> +               .min_keysize            = CHACHA20_KEY_SIZE,
-> +               .max_keysize            = CHACHA20_KEY_SIZE,
-> +               .ivsize                 = CHACHA20_IV_SIZE,
-> +               .chunksize              = CHACHA20_BLOCK_SIZE,
-> +               .setkey                 = crypto_chacha20_setkey,
-> +               .encrypt                = crypto_chacha20_crypt,
-> +               .decrypt                = crypto_chacha20_crypt,
-> +       }, {
-> +               .base.cra_name          = "xchacha20",
-> +               .base.cra_driver_name   = "xchacha20-generic",
-> +               .base.cra_priority      = 100,
-> +               .base.cra_blocksize     = 1,
-> +               .base.cra_ctxsize       = sizeof(struct chacha20_ctx),
-> +               .base.cra_module        = THIS_MODULE,
-> +
-> +               .min_keysize            = CHACHA20_KEY_SIZE,
-> +               .max_keysize            = CHACHA20_KEY_SIZE,
-> +               .ivsize                 = XCHACHA20_IV_SIZE,
-> +               .chunksize              = CHACHA20_BLOCK_SIZE,
-> +               .setkey                 = crypto_chacha20_setkey,
-> +               .encrypt                = crypto_xchacha20_crypt,
-> +               .decrypt                = crypto_xchacha20_crypt,
-> +       }
->  };
->
->  static int __init chacha20_generic_mod_init(void)
->  {
-> -       return crypto_register_skcipher(&alg);
-> +       return crypto_register_skciphers(algs, ARRAY_SIZE(algs));
->  }
->
->  static void __exit chacha20_generic_mod_fini(void)
->  {
-> -       crypto_unregister_skcipher(&alg);
-> +       crypto_unregister_skciphers(algs, ARRAY_SIZE(algs));
->  }
->
->  module_init(chacha20_generic_mod_init);
-> @@ -132,6 +178,8 @@ module_exit(chacha20_generic_mod_fini);
->
->  MODULE_LICENSE("GPL");
->  MODULE_AUTHOR("Martin Willi <martin@strongswan.org>");
-> -MODULE_DESCRIPTION("chacha20 cipher algorithm");
-> +MODULE_DESCRIPTION("ChaCha20 and XChaCha20 stream ciphers (generic)");
->  MODULE_ALIAS_CRYPTO("chacha20");
->  MODULE_ALIAS_CRYPTO("chacha20-generic");
-> +MODULE_ALIAS_CRYPTO("xchacha20");
-> +MODULE_ALIAS_CRYPTO("xchacha20-generic");
-> diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-> index b1f79c6bf4096..a5512e69c8f31 100644
-> --- a/crypto/testmgr.c
-> +++ b/crypto/testmgr.c
-> @@ -3544,6 +3544,12 @@ static const struct alg_test_desc alg_test_descs[] = {
->                 .suite = {
->                         .hash = __VECS(aes_xcbc128_tv_template)
->                 }
-> +       }, {
-> +               .alg = "xchacha20",
-> +               .test = alg_test_skcipher,
-> +               .suite = {
-> +                       .cipher = __VECS(xchacha20_tv_template)
-> +               },
->         }, {
->                 .alg = "xts(aes)",
->                 .test = alg_test_skcipher,
-> diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-> index 1fe7b97ba03f9..371641c73cf8c 100644
-> --- a/crypto/testmgr.h
-> +++ b/crypto/testmgr.h
-> @@ -30802,6 +30802,583 @@ static const struct cipher_testvec chacha20_tv_template[] = {
->         },
->  };
->
-> +static const struct cipher_testvec xchacha20_tv_template[] = {
-> +       { /* from libsodium test/default/xchacha20.c */
-> +               .key    = "\x79\xc9\x97\x98\xac\x67\x30\x0b"
-> +                         "\xbb\x27\x04\xc9\x5c\x34\x1e\x32"
-> +                         "\x45\xf3\xdc\xb2\x17\x61\xb9\x8e"
-> +                         "\x52\xff\x45\xb2\x4f\x30\x4f\xc4",
-> +               .klen   = 32,
-> +               .iv     = "\xb3\x3f\xfd\x30\x96\x47\x9b\xcf"
-> +                         "\xbc\x9a\xee\x49\x41\x76\x88\xa0"
-> +                         "\xa2\x55\x4f\x8d\x95\x38\x94\x19"
-> +                         "\x00\x00\x00\x00\x00\x00\x00\x00",
-> +               .ptext  = "\x00\x00\x00\x00\x00\x00\x00\x00"
-> +                         "\x00\x00\x00\x00\x00\x00\x00\x00"
-> +                         "\x00\x00\x00\x00\x00\x00\x00\x00"
-> +                         "\x00\x00\x00\x00\x00",
-> +               .ctext  = "\xc6\xe9\x75\x81\x60\x08\x3a\xc6"
-> +                         "\x04\xef\x90\xe7\x12\xce\x6e\x75"
-> +                         "\xd7\x79\x75\x90\x74\x4e\x0c\xf0"
-> +                         "\x60\xf0\x13\x73\x9c",
-> +               .len    = 29,
-> +       }, { /* from libsodium test/default/xchacha20.c */
-> +               .key    = "\x9d\x23\xbd\x41\x49\xcb\x97\x9c"
-> +                         "\xcf\x3c\x5c\x94\xdd\x21\x7e\x98"
-> +                         "\x08\xcb\x0e\x50\xcd\x0f\x67\x81"
-> +                         "\x22\x35\xea\xaf\x60\x1d\x62\x32",
-> +               .klen   = 32,
-> +               .iv     = "\xc0\x47\x54\x82\x66\xb7\xc3\x70"
-> +                         "\xd3\x35\x66\xa2\x42\x5c\xbf\x30"
-> +                         "\xd8\x2d\x1e\xaf\x52\x94\x10\x9e"
-> +                         "\x00\x00\x00\x00\x00\x00\x00\x00",
-> +               .ptext  = "\x00\x00\x00\x00\x00\x00\x00\x00"
-> +                         "\x00\x00\x00\x00\x00\x00\x00\x00"
-> +                         "\x00\x00\x00\x00\x00\x00\x00\x00"
-> +                         "\x00\x00\x00\x00\x00\x00\x00\x00"
-> +                         "\x00\x00\x00\x00\x00\x00\x00\x00"
-> +                         "\x00\x00\x00\x00\x00\x00\x00\x00"
-> +                         "\x00\x00\x00\x00\x00\x00\x00\x00"
-> +                         "\x00\x00\x00\x00\x00\x00\x00\x00"
-> +                         "\x00\x00\x00\x00\x00\x00\x00\x00"
-> +                         "\x00\x00\x00\x00\x00\x00\x00\x00"
-> +                         "\x00\x00\x00\x00\x00\x00\x00\x00"
-> +                         "\x00\x00\x00",
-> +               .ctext  = "\xa2\x12\x09\x09\x65\x94\xde\x8c"
-> +                         "\x56\x67\xb1\xd1\x3a\xd9\x3f\x74"
-> +                         "\x41\x06\xd0\x54\xdf\x21\x0e\x47"
-> +                         "\x82\xcd\x39\x6f\xec\x69\x2d\x35"
-> +                         "\x15\xa2\x0b\xf3\x51\xee\xc0\x11"
-> +                         "\xa9\x2c\x36\x78\x88\xbc\x46\x4c"
-> +                         "\x32\xf0\x80\x7a\xcd\x6c\x20\x3a"
-> +                         "\x24\x7e\x0d\xb8\x54\x14\x84\x68"
-> +                         "\xe9\xf9\x6b\xee\x4c\xf7\x18\xd6"
-> +                         "\x8d\x5f\x63\x7c\xbd\x5a\x37\x64"
-> +                         "\x57\x78\x8e\x6f\xae\x90\xfc\x31"
-> +                         "\x09\x7c\xfc",
-> +               .len    = 91,
-> +       }, { /* Taken from the ChaCha20 test vectors, appended 16 random bytes
-> +               to nonce, and recomputed the ciphertext with libsodium */
-> +               .key    = "\x00\x00\x00\x00\x00\x00\x00\x00"
-> +                         "\x00\x00\x00\x00\x00\x00\x00\x00"
-> +                         "\x00\x00\x00\x00\x00\x00\x00\x00"
-> +                         "\x00\x00\x00\x00\x00\x00\x00\x00",
-> +               .klen   = 32,
-> +               .iv     = "\x00\x00\x00\x00\x00\x00\x00\x00"
-> +                         "\x00\x00\x00\x00\x67\xc6\x69\x73"
-> +                         "\x51\xff\x4a\xec\x29\xcd\xba\xab"
-> +                         "\x00\x00\x00\x00\x00\x00\x00\x00",
-> +               .ptext  = "\x00\x00\x00\x00\x00\x00\x00\x00"
-> +                         "\x00\x00\x00\x00\x00\x00\x00\x00"
-> +                         "\x00\x00\x00\x00\x00\x00\x00\x00"
-> +                         "\x00\x00\x00\x00\x00\x00\x00\x00"
-> +                         "\x00\x00\x00\x00\x00\x00\x00\x00"
-> +                         "\x00\x00\x00\x00\x00\x00\x00\x00"
-> +                         "\x00\x00\x00\x00\x00\x00\x00\x00"
-> +                         "\x00\x00\x00\x00\x00\x00\x00\x00",
-> +               .ctext  = "\x9c\x49\x2a\xe7\x8a\x2f\x93\xc7"
-> +                         "\xb3\x33\x6f\x82\x17\xd8\xc4\x1e"
-> +                         "\xad\x80\x11\x11\x1d\x4c\x16\x18"
-> +                         "\x07\x73\x9b\x4f\xdb\x7c\xcb\x47"
-> +                         "\xfd\xef\x59\x74\xfa\x3f\xe5\x4c"
-> +                         "\x9b\xd0\xea\xbc\xba\x56\xad\x32"
-> +                         "\x03\xdc\xf8\x2b\xc1\xe1\x75\x67"
-> +                         "\x23\x7b\xe6\xfc\xd4\x03\x86\x54",
-> +               .len    = 64,
-> +       }, { /* Taken from the ChaCha20 test vectors, appended 16 random bytes
-> +               to nonce, and recomputed the ciphertext with libsodium */
-> +               .key    = "\x00\x00\x00\x00\x00\x00\x00\x00"
-> +                         "\x00\x00\x00\x00\x00\x00\x00\x00"
-> +                         "\x00\x00\x00\x00\x00\x00\x00\x00"
-> +                         "\x00\x00\x00\x00\x00\x00\x00\x01",
-> +               .klen   = 32,
-> +               .iv     = "\x00\x00\x00\x00\x00\x00\x00\x00"
-> +                         "\x00\x00\x00\x02\xf2\xfb\xe3\x46"
-> +                         "\x7c\xc2\x54\xf8\x1b\xe8\xe7\x8d"
-> +                         "\x01\x00\x00\x00\x00\x00\x00\x00",
-> +               .ptext  = "\x41\x6e\x79\x20\x73\x75\x62\x6d"
-> +                         "\x69\x73\x73\x69\x6f\x6e\x20\x74"
-> +                         "\x6f\x20\x74\x68\x65\x20\x49\x45"
-> +                         "\x54\x46\x20\x69\x6e\x74\x65\x6e"
-> +                         "\x64\x65\x64\x20\x62\x79\x20\x74"
-> +                         "\x68\x65\x20\x43\x6f\x6e\x74\x72"
-> +                         "\x69\x62\x75\x74\x6f\x72\x20\x66"
-> +                         "\x6f\x72\x20\x70\x75\x62\x6c\x69"
-> +                         "\x63\x61\x74\x69\x6f\x6e\x20\x61"
-> +                         "\x73\x20\x61\x6c\x6c\x20\x6f\x72"
-> +                         "\x20\x70\x61\x72\x74\x20\x6f\x66"
-> +                         "\x20\x61\x6e\x20\x49\x45\x54\x46"
-> +                         "\x20\x49\x6e\x74\x65\x72\x6e\x65"
-> +                         "\x74\x2d\x44\x72\x61\x66\x74\x20"
-> +                         "\x6f\x72\x20\x52\x46\x43\x20\x61"
-> +                         "\x6e\x64\x20\x61\x6e\x79\x20\x73"
-> +                         "\x74\x61\x74\x65\x6d\x65\x6e\x74"
-> +                         "\x20\x6d\x61\x64\x65\x20\x77\x69"
-> +                         "\x74\x68\x69\x6e\x20\x74\x68\x65"
-> +                         "\x20\x63\x6f\x6e\x74\x65\x78\x74"
-> +                         "\x20\x6f\x66\x20\x61\x6e\x20\x49"
-> +                         "\x45\x54\x46\x20\x61\x63\x74\x69"
-> +                         "\x76\x69\x74\x79\x20\x69\x73\x20"
-> +                         "\x63\x6f\x6e\x73\x69\x64\x65\x72"
-> +                         "\x65\x64\x20\x61\x6e\x20\x22\x49"
-> +                         "\x45\x54\x46\x20\x43\x6f\x6e\x74"
-> +                         "\x72\x69\x62\x75\x74\x69\x6f\x6e"
-> +                         "\x22\x2e\x20\x53\x75\x63\x68\x20"
-> +                         "\x73\x74\x61\x74\x65\x6d\x65\x6e"
-> +                         "\x74\x73\x20\x69\x6e\x63\x6c\x75"
-> +                         "\x64\x65\x20\x6f\x72\x61\x6c\x20"
-> +                         "\x73\x74\x61\x74\x65\x6d\x65\x6e"
-> +                         "\x74\x73\x20\x69\x6e\x20\x49\x45"
-> +                         "\x54\x46\x20\x73\x65\x73\x73\x69"
-> +                         "\x6f\x6e\x73\x2c\x20\x61\x73\x20"
-> +                         "\x77\x65\x6c\x6c\x20\x61\x73\x20"
-> +                         "\x77\x72\x69\x74\x74\x65\x6e\x20"
-> +                         "\x61\x6e\x64\x20\x65\x6c\x65\x63"
-> +                         "\x74\x72\x6f\x6e\x69\x63\x20\x63"
-> +                         "\x6f\x6d\x6d\x75\x6e\x69\x63\x61"
-> +                         "\x74\x69\x6f\x6e\x73\x20\x6d\x61"
-> +                         "\x64\x65\x20\x61\x74\x20\x61\x6e"
-> +                         "\x79\x20\x74\x69\x6d\x65\x20\x6f"
-> +                         "\x72\x20\x70\x6c\x61\x63\x65\x2c"
-> +                         "\x20\x77\x68\x69\x63\x68\x20\x61"
-> +                         "\x72\x65\x20\x61\x64\x64\x72\x65"
-> +                         "\x73\x73\x65\x64\x20\x74\x6f",
-> +               .ctext  = "\xf9\xab\x7a\x4a\x60\xb8\x5f\xa0"
-> +                         "\x50\xbb\x57\xce\xef\x8c\xc1\xd9"
-> +                         "\x24\x15\xb3\x67\x5e\x7f\x01\xf6"
-> +                         "\x1c\x22\xf6\xe5\x71\xb1\x43\x64"
-> +                         "\x63\x05\xd5\xfc\x5c\x3d\xc0\x0e"
-> +                         "\x23\xef\xd3\x3b\xd9\xdc\x7f\xa8"
-> +                         "\x58\x26\xb3\xd0\xc2\xd5\x04\x3f"
-> +                         "\x0a\x0e\x8f\x17\xe4\xcd\xf7\x2a"
-> +                         "\xb4\x2c\x09\xe4\x47\xec\x8b\xfb"
-> +                         "\x59\x37\x7a\xa1\xd0\x04\x7e\xaa"
-> +                         "\xf1\x98\x5f\x24\x3d\x72\x9a\x43"
-> +                         "\xa4\x36\x51\x92\x22\x87\xff\x26"
-> +                         "\xce\x9d\xeb\x59\x78\x84\x5e\x74"
-> +                         "\x97\x2e\x63\xc0\xef\x29\xf7\x8a"
-> +                         "\xb9\xee\x35\x08\x77\x6a\x35\x9a"
-> +                         "\x3e\xe6\x4f\x06\x03\x74\x1b\xc1"
-> +                         "\x5b\xb3\x0b\x89\x11\x07\xd3\xb7"
-> +                         "\x53\xd6\x25\x04\xd9\x35\xb4\x5d"
-> +                         "\x4c\x33\x5a\xc2\x42\x4c\xe6\xa4"
-> +                         "\x97\x6e\x0e\xd2\xb2\x8b\x2f\x7f"
-> +                         "\x28\xe5\x9f\xac\x4b\x2e\x02\xab"
-> +                         "\x85\xfa\xa9\x0d\x7c\x2d\x10\xe6"
-> +                         "\x91\xab\x55\x63\xf0\xde\x3a\x94"
-> +                         "\x25\x08\x10\x03\xc2\x68\xd1\xf4"
-> +                         "\xaf\x7d\x9c\x99\xf7\x86\x96\x30"
-> +                         "\x60\xfc\x0b\xe6\xa8\x80\x15\xb0"
-> +                         "\x81\xb1\x0c\xbe\xb9\x12\x18\x25"
-> +                         "\xe9\x0e\xb1\xe7\x23\xb2\xef\x4a"
-> +                         "\x22\x8f\xc5\x61\x89\xd4\xe7\x0c"
-> +                         "\x64\x36\x35\x61\xb6\x34\x60\xf7"
-> +                         "\x7b\x61\x37\x37\x12\x10\xa2\xf6"
-> +                         "\x7e\xdb\x7f\x39\x3f\xb6\x8e\x89"
-> +                         "\x9e\xf3\xfe\x13\x98\xbb\x66\x5a"
-> +                         "\xec\xea\xab\x3f\x9c\x87\xc4\x8c"
-> +                         "\x8a\x04\x18\x49\xfc\x77\x11\x50"
-> +                         "\x16\xe6\x71\x2b\xee\xc0\x9c\xb6"
-> +                         "\x87\xfd\x80\xff\x0b\x1d\x73\x38"
-> +                         "\xa4\x1d\x6f\xae\xe4\x12\xd7\x93"
-> +                         "\x9d\xcd\x38\x26\x09\x40\x52\xcd"
-> +                         "\x67\x01\x67\x26\xe0\x3e\x98\xa8"
-> +                         "\xe8\x1a\x13\x41\xbb\x90\x4d\x87"
-> +                         "\xbb\x42\x82\x39\xce\x3a\xd0\x18"
-> +                         "\x6d\x7b\x71\x8f\xbb\x2c\x6a\xd1"
-> +                         "\xbd\xf5\xc7\x8a\x7e\xe1\x1e\x0f"
-> +                         "\x0d\x0d\x13\x7c\xd9\xd8\x3c\x91"
-> +                         "\xab\xff\x1f\x12\xc3\xee\xe5\x65"
-> +                         "\x12\x8d\x7b\x61\xe5\x1f\x98",
-> +               .len    = 375,
-> +               .also_non_np = 1,
-> +               .np     = 3,
-> +               .tap    = { 375 - 20, 4, 16 },
-> +
-> +       }, { /* Taken from the ChaCha20 test vectors, appended 16 random bytes
-> +               to nonce, and recomputed the ciphertext with libsodium */
-> +               .key    = "\x1c\x92\x40\xa5\xeb\x55\xd3\x8a"
-> +                         "\xf3\x33\x88\x86\x04\xf6\xb5\xf0"
-> +                         "\x47\x39\x17\xc1\x40\x2b\x80\x09"
-> +                         "\x9d\xca\x5c\xbc\x20\x70\x75\xc0",
-> +               .klen   = 32,
-> +               .iv     = "\x00\x00\x00\x00\x00\x00\x00\x00"
-> +                         "\x00\x00\x00\x02\x76\x5a\x2e\x63"
-> +                         "\x33\x9f\xc9\x9a\x66\x32\x0d\xb7"
-> +                         "\x2a\x00\x00\x00\x00\x00\x00\x00",
-> +               .ptext  = "\x27\x54\x77\x61\x73\x20\x62\x72"
-> +                         "\x69\x6c\x6c\x69\x67\x2c\x20\x61"
-> +                         "\x6e\x64\x20\x74\x68\x65\x20\x73"
-> +                         "\x6c\x69\x74\x68\x79\x20\x74\x6f"
-> +                         "\x76\x65\x73\x0a\x44\x69\x64\x20"
-> +                         "\x67\x79\x72\x65\x20\x61\x6e\x64"
-> +                         "\x20\x67\x69\x6d\x62\x6c\x65\x20"
-> +                         "\x69\x6e\x20\x74\x68\x65\x20\x77"
-> +                         "\x61\x62\x65\x3a\x0a\x41\x6c\x6c"
-> +                         "\x20\x6d\x69\x6d\x73\x79\x20\x77"
-> +                         "\x65\x72\x65\x20\x74\x68\x65\x20"
-> +                         "\x62\x6f\x72\x6f\x67\x6f\x76\x65"
-> +                         "\x73\x2c\x0a\x41\x6e\x64\x20\x74"
-> +                         "\x68\x65\x20\x6d\x6f\x6d\x65\x20"
-> +                         "\x72\x61\x74\x68\x73\x20\x6f\x75"
-> +                         "\x74\x67\x72\x61\x62\x65\x2e",
-> +               .ctext  = "\x95\xb9\x51\xe7\x8f\xb4\xa4\x03"
-> +                         "\xca\x37\xcc\xde\x60\x1d\x8c\xe2"
-> +                         "\xf1\xbb\x8a\x13\x7f\x61\x85\xcc"
-> +                         "\xad\xf4\xf0\xdc\x86\xa6\x1e\x10"
-> +                         "\xbc\x8e\xcb\x38\x2b\xa5\xc8\x8f"
-> +                         "\xaa\x03\x3d\x53\x4a\x42\xb1\x33"
-> +                         "\xfc\xd3\xef\xf0\x8e\x7e\x10\x9c"
-> +                         "\x6f\x12\x5e\xd4\x96\xfe\x5b\x08"
-> +                         "\xb6\x48\xf0\x14\x74\x51\x18\x7c"
-> +                         "\x07\x92\xfc\xac\x9d\xf1\x94\xc0"
-> +                         "\xc1\x9d\xc5\x19\x43\x1f\x1d\xbb"
-> +                         "\x07\xf0\x1b\x14\x25\x45\xbb\xcb"
-> +                         "\x5c\xe2\x8b\x28\xf3\xcf\x47\x29"
-> +                         "\x27\x79\x67\x24\xa6\x87\xc2\x11"
-> +                         "\x65\x03\xfa\x45\xf7\x9e\x53\x7a"
-> +                         "\x99\xf1\x82\x25\x4f\x8d\x07",
-> +               .len    = 127,
-> +       }, { /* Taken from the ChaCha20 test vectors, appended 16 random bytes
-> +               to nonce, and recomputed the ciphertext with libsodium */
-> +               .key    = "\x1c\x92\x40\xa5\xeb\x55\xd3\x8a"
-> +                         "\xf3\x33\x88\x86\x04\xf6\xb5\xf0"
-> +                         "\x47\x39\x17\xc1\x40\x2b\x80\x09"
-> +                         "\x9d\xca\x5c\xbc\x20\x70\x75\xc0",
-> +               .klen   = 32,
-> +               .iv     = "\x00\x00\x00\x00\x00\x00\x00\x00"
-> +                         "\x00\x00\x00\x01\x31\x58\xa3\x5a"
-> +                         "\x25\x5d\x05\x17\x58\xe9\x5e\xd4"
-> +                         "\x1c\x00\x00\x00\x00\x00\x00\x00",
-> +               .ptext  = "\x49\xee\xe0\xdc\x24\x90\x40\xcd"
-> +                         "\xc5\x40\x8f\x47\x05\xbc\xdd\x81"
-> +                         "\x47\xc6\x8d\xe6\xb1\x8f\xd7\xcb"
-> +                         "\x09\x0e\x6e\x22\x48\x1f\xbf\xb8"
-> +                         "\x5c\xf7\x1e\x8a\xc1\x23\xf2\xd4"
-> +                         "\x19\x4b\x01\x0f\x4e\xa4\x43\xce"
-> +                         "\x01\xc6\x67\xda\x03\x91\x18\x90"
-> +                         "\xa5\xa4\x8e\x45\x03\xb3\x2d\xac"
-> +                         "\x74\x92\xd3\x53\x47\xc8\xdd\x25"
-> +                         "\x53\x6c\x02\x03\x87\x0d\x11\x0c"
-> +                         "\x58\xe3\x12\x18\xfd\x2a\x5b\x40"
-> +                         "\x0c\x30\xf0\xb8\x3f\x43\xce\xae"
-> +                         "\x65\x3a\x7d\x7c\xf4\x54\xaa\xcc"
-> +                         "\x33\x97\xc3\x77\xba\xc5\x70\xde"
-> +                         "\xd7\xd5\x13\xa5\x65\xc4\x5f\x0f"
-> +                         "\x46\x1a\x0d\x97\xb5\xf3\xbb\x3c"
-> +                         "\x84\x0f\x2b\xc5\xaa\xea\xf2\x6c"
-> +                         "\xc9\xb5\x0c\xee\x15\xf3\x7d\xbe"
-> +                         "\x9f\x7b\x5a\xa6\xae\x4f\x83\xb6"
-> +                         "\x79\x49\x41\xf4\x58\x18\xcb\x86"
-> +                         "\x7f\x30\x0e\xf8\x7d\x44\x36\xea"
-> +                         "\x75\xeb\x88\x84\x40\x3c\xad\x4f"
-> +                         "\x6f\x31\x6b\xaa\x5d\xe5\xa5\xc5"
-> +                         "\x21\x66\xe9\xa7\xe3\xb2\x15\x88"
-> +                         "\x78\xf6\x79\xa1\x59\x47\x12\x4e"
-> +                         "\x9f\x9f\x64\x1a\xa0\x22\x5b\x08"
-> +                         "\xbe\x7c\x36\xc2\x2b\x66\x33\x1b"
-> +                         "\xdd\x60\x71\xf7\x47\x8c\x61\xc3"
-> +                         "\xda\x8a\x78\x1e\x16\xfa\x1e\x86"
-> +                         "\x81\xa6\x17\x2a\xa7\xb5\xc2\xe7"
-> +                         "\xa4\xc7\x42\xf1\xcf\x6a\xca\xb4"
-> +                         "\x45\xcf\xf3\x93\xf0\xe7\xea\xf6"
-> +                         "\xf4\xe6\x33\x43\x84\x93\xa5\x67"
-> +                         "\x9b\x16\x58\x58\x80\x0f\x2b\x5c"
-> +                         "\x24\x74\x75\x7f\x95\x81\xb7\x30"
-> +                         "\x7a\x33\xa7\xf7\x94\x87\x32\x27"
-> +                         "\x10\x5d\x14\x4c\x43\x29\xdd\x26"
-> +                         "\xbd\x3e\x3c\x0e\xfe\x0e\xa5\x10"
-> +                         "\xea\x6b\x64\xfd\x73\xc6\xed\xec"
-> +                         "\xa8\xc9\xbf\xb3\xba\x0b\x4d\x07"
-> +                         "\x70\xfc\x16\xfd\x79\x1e\xd7\xc5"
-> +                         "\x49\x4e\x1c\x8b\x8d\x79\x1b\xb1"
-> +                         "\xec\xca\x60\x09\x4c\x6a\xd5\x09"
-> +                         "\x49\x46\x00\x88\x22\x8d\xce\xea"
-> +                         "\xb1\x17\x11\xde\x42\xd2\x23\xc1"
-> +                         "\x72\x11\xf5\x50\x73\x04\x40\x47"
-> +                         "\xf9\x5d\xe7\xa7\x26\xb1\x7e\xb0"
-> +                         "\x3f\x58\xc1\x52\xab\x12\x67\x9d"
-> +                         "\x3f\x43\x4b\x68\xd4\x9c\x68\x38"
-> +                         "\x07\x8a\x2d\x3e\xf3\xaf\x6a\x4b"
-> +                         "\xf9\xe5\x31\x69\x22\xf9\xa6\x69"
-> +                         "\xc6\x9c\x96\x9a\x12\x35\x95\x1d"
-> +                         "\x95\xd5\xdd\xbe\xbf\x93\x53\x24"
-> +                         "\xfd\xeb\xc2\x0a\x64\xb0\x77\x00"
-> +                         "\x6f\x88\xc4\x37\x18\x69\x7c\xd7"
-> +                         "\x41\x92\x55\x4c\x03\xa1\x9a\x4b"
-> +                         "\x15\xe5\xdf\x7f\x37\x33\x72\xc1"
-> +                         "\x8b\x10\x67\xa3\x01\x57\x94\x25"
-> +                         "\x7b\x38\x71\x7e\xdd\x1e\xcc\x73"
-> +                         "\x55\xd2\x8e\xeb\x07\xdd\xf1\xda"
-> +                         "\x58\xb1\x47\x90\xfe\x42\x21\x72"
-> +                         "\xa3\x54\x7a\xa0\x40\xec\x9f\xdd"
-> +                         "\xc6\x84\x6e\xca\xae\xe3\x68\xb4"
-> +                         "\x9d\xe4\x78\xff\x57\xf2\xf8\x1b"
-> +                         "\x03\xa1\x31\xd9\xde\x8d\xf5\x22"
-> +                         "\x9c\xdd\x20\xa4\x1e\x27\xb1\x76"
-> +                         "\x4f\x44\x55\xe2\x9b\xa1\x9c\xfe"
-> +                         "\x54\xf7\x27\x1b\xf4\xde\x02\xf5"
-> +                         "\x1b\x55\x48\x5c\xdc\x21\x4b\x9e"
-> +                         "\x4b\x6e\xed\x46\x23\xdc\x65\xb2"
-> +                         "\xcf\x79\x5f\x28\xe0\x9e\x8b\xe7"
-> +                         "\x4c\x9d\x8a\xff\xc1\xa6\x28\xb8"
-> +                         "\x65\x69\x8a\x45\x29\xef\x74\x85"
-> +                         "\xde\x79\xc7\x08\xae\x30\xb0\xf4"
-> +                         "\xa3\x1d\x51\x41\xab\xce\xcb\xf6"
-> +                         "\xb5\xd8\x6d\xe0\x85\xe1\x98\xb3"
-> +                         "\x43\xbb\x86\x83\x0a\xa0\xf5\xb7"
-> +                         "\x04\x0b\xfa\x71\x1f\xb0\xf6\xd9"
-> +                         "\x13\x00\x15\xf0\xc7\xeb\x0d\x5a"
-> +                         "\x9f\xd7\xb9\x6c\x65\x14\x22\x45"
-> +                         "\x6e\x45\x32\x3e\x7e\x60\x1a\x12"
-> +                         "\x97\x82\x14\xfb\xaa\x04\x22\xfa"
-> +                         "\xa0\xe5\x7e\x8c\x78\x02\x48\x5d"
-> +                         "\x78\x33\x5a\x7c\xad\xdb\x29\xce"
-> +                         "\xbb\x8b\x61\xa4\xb7\x42\xe2\xac"
-> +                         "\x8b\x1a\xd9\x2f\x0b\x8b\x62\x21"
-> +                         "\x83\x35\x7e\xad\x73\xc2\xb5\x6c"
-> +                         "\x10\x26\x38\x07\xe5\xc7\x36\x80"
-> +                         "\xe2\x23\x12\x61\xf5\x48\x4b\x2b"
-> +                         "\xc5\xdf\x15\xd9\x87\x01\xaa\xac"
-> +                         "\x1e\x7c\xad\x73\x78\x18\x63\xe0"
-> +                         "\x8b\x9f\x81\xd8\x12\x6a\x28\x10"
-> +                         "\xbe\x04\x68\x8a\x09\x7c\x1b\x1c"
-> +                         "\x83\x66\x80\x47\x80\xe8\xfd\x35"
-> +                         "\x1c\x97\x6f\xae\x49\x10\x66\xcc"
-> +                         "\xc6\xd8\xcc\x3a\x84\x91\x20\x77"
-> +                         "\x72\xe4\x24\xd2\x37\x9f\xc5\xc9"
-> +                         "\x25\x94\x10\x5f\x40\x00\x64\x99"
-> +                         "\xdc\xae\xd7\x21\x09\x78\x50\x15"
-> +                         "\xac\x5f\xc6\x2c\xa2\x0b\xa9\x39"
-> +                         "\x87\x6e\x6d\xab\xde\x08\x51\x16"
-> +                         "\xc7\x13\xe9\xea\xed\x06\x8e\x2c"
-> +                         "\xf8\x37\x8c\xf0\xa6\x96\x8d\x43"
-> +                         "\xb6\x98\x37\xb2\x43\xed\xde\xdf"
-> +                         "\x89\x1a\xe7\xeb\x9d\xa1\x7b\x0b"
-> +                         "\x77\xb0\xe2\x75\xc0\xf1\x98\xd9"
-> +                         "\x80\x55\xc9\x34\x91\xd1\x59\xe8"
-> +                         "\x4b\x0f\xc1\xa9\x4b\x7a\x84\x06"
-> +                         "\x20\xa8\x5d\xfa\xd1\xde\x70\x56"
-> +                         "\x2f\x9e\x91\x9c\x20\xb3\x24\xd8"
-> +                         "\x84\x3d\xe1\x8c\x7e\x62\x52\xe5"
-> +                         "\x44\x4b\x9f\xc2\x93\x03\xea\x2b"
-> +                         "\x59\xc5\xfa\x3f\x91\x2b\xbb\x23"
-> +                         "\xf5\xb2\x7b\xf5\x38\xaf\xb3\xee"
-> +                         "\x63\xdc\x7b\xd1\xff\xaa\x8b\xab"
-> +                         "\x82\x6b\x37\x04\xeb\x74\xbe\x79"
-> +                         "\xb9\x83\x90\xef\x20\x59\x46\xff"
-> +                         "\xe9\x97\x3e\x2f\xee\xb6\x64\x18"
-> +                         "\x38\x4c\x7a\x4a\xf9\x61\xe8\x9a"
-> +                         "\xa1\xb5\x01\xa6\x47\xd3\x11\xd4"
-> +                         "\xce\xd3\x91\x49\x88\xc7\xb8\x4d"
-> +                         "\xb1\xb9\x07\x6d\x16\x72\xae\x46"
-> +                         "\x5e\x03\xa1\x4b\xb6\x02\x30\xa8"
-> +                         "\x3d\xa9\x07\x2a\x7c\x19\xe7\x62"
-> +                         "\x87\xe3\x82\x2f\x6f\xe1\x09\xd9"
-> +                         "\x94\x97\xea\xdd\x58\x9e\xae\x76"
-> +                         "\x7e\x35\xe5\xb4\xda\x7e\xf4\xde"
-> +                         "\xf7\x32\x87\xcd\x93\xbf\x11\x56"
-> +                         "\x11\xbe\x08\x74\xe1\x69\xad\xe2"
-> +                         "\xd7\xf8\x86\x75\x8a\x3c\xa4\xbe"
-> +                         "\x70\xa7\x1b\xfc\x0b\x44\x2a\x76"
-> +                         "\x35\xea\x5d\x85\x81\xaf\x85\xeb"
-> +                         "\xa0\x1c\x61\xc2\xf7\x4f\xa5\xdc"
-> +                         "\x02\x7f\xf6\x95\x40\x6e\x8a\x9a"
-> +                         "\xf3\x5d\x25\x6e\x14\x3a\x22\xc9"
-> +                         "\x37\x1c\xeb\x46\x54\x3f\xa5\x91"
-> +                         "\xc2\xb5\x8c\xfe\x53\x08\x97\x32"
-> +                         "\x1b\xb2\x30\x27\xfe\x25\x5d\xdc"
-> +                         "\x08\x87\xd0\xe5\x94\x1a\xd4\xf1"
-> +                         "\xfe\xd6\xb4\xa3\xe6\x74\x81\x3c"
-> +                         "\x1b\xb7\x31\xa7\x22\xfd\xd4\xdd"
-> +                         "\x20\x4e\x7c\x51\xb0\x60\x73\xb8"
-> +                         "\x9c\xac\x91\x90\x7e\x01\xb0\xe1"
-> +                         "\x8a\x2f\x75\x1c\x53\x2a\x98\x2a"
-> +                         "\x06\x52\x95\x52\xb2\xe9\x25\x2e"
-> +                         "\x4c\xe2\x5a\x00\xb2\x13\x81\x03"
-> +                         "\x77\x66\x0d\xa5\x99\xda\x4e\x8c"
-> +                         "\xac\xf3\x13\x53\x27\x45\xaf\x64"
-> +                         "\x46\xdc\xea\x23\xda\x97\xd1\xab"
-> +                         "\x7d\x6c\x30\x96\x1f\xbc\x06\x34"
-> +                         "\x18\x0b\x5e\x21\x35\x11\x8d\x4c"
-> +                         "\xe0\x2d\xe9\x50\x16\x74\x81\xa8"
-> +                         "\xb4\x34\xb9\x72\x42\xa6\xcc\xbc"
-> +                         "\xca\x34\x83\x27\x10\x5b\x68\x45"
-> +                         "\x8f\x52\x22\x0c\x55\x3d\x29\x7c"
-> +                         "\xe3\xc0\x66\x05\x42\x91\x5f\x58"
-> +                         "\xfe\x4a\x62\xd9\x8c\xa9\x04\x19"
-> +                         "\x04\xa9\x08\x4b\x57\xfc\x67\x53"
-> +                         "\x08\x7c\xbc\x66\x8a\xb0\xb6\x9f"
-> +                         "\x92\xd6\x41\x7c\x5b\x2a\x00\x79"
-> +                         "\x72",
-> +               .ctext  = "\x3a\x92\xee\x53\x31\xaf\x2b\x60"
-> +                         "\x5f\x55\x8d\x00\x5d\xfc\x74\x97"
-> +                         "\x28\x54\xf4\xa5\x75\xf1\x9b\x25"
-> +                         "\x62\x1c\xc0\xe0\x13\xc8\x87\x53"
-> +                         "\xd0\xf3\xa7\x97\x1f\x3b\x1e\xea"
-> +                         "\xe0\xe5\x2a\xd1\xdd\xa4\x3b\x50"
-> +                         "\x45\xa3\x0d\x7e\x1b\xc9\xa0\xad"
-> +                         "\xb9\x2c\x54\xa6\xc7\x55\x16\xd0"
-> +                         "\xc5\x2e\x02\x44\x35\xd0\x7e\x67"
-> +                         "\xf2\xc4\x9b\xcd\x95\x10\xcc\x29"
-> +                         "\x4b\xfa\x86\x87\xbe\x40\x36\xbe"
-> +                         "\xe1\xa3\x52\x89\x55\x20\x9b\xc2"
-> +                         "\xab\xf2\x31\x34\x16\xad\xc8\x17"
-> +                         "\x65\x24\xc0\xff\x12\x37\xfe\x5a"
-> +                         "\x62\x3b\x59\x47\x6c\x5f\x3a\x8e"
-> +                         "\x3b\xd9\x30\xc8\x7f\x2f\x88\xda"
-> +                         "\x80\xfd\x02\xda\x7f\x9a\x7a\x73"
-> +                         "\x59\xc5\x34\x09\x9a\x11\xcb\xa7"
-> +                         "\xfc\xf6\xa1\xa0\x60\xfb\x43\xbb"
-> +                         "\xf1\xe9\xd7\xc6\x79\x27\x4e\xff"
-> +                         "\x22\xb4\x24\xbf\x76\xee\x47\xb9"
-> +                         "\x6d\x3f\x8b\xb0\x9c\x3c\x43\xdd"
-> +                         "\xff\x25\x2e\x6d\xa4\x2b\xfb\x5d"
-> +                         "\x1b\x97\x6c\x55\x0a\x82\x7a\x7b"
-> +                         "\x94\x34\xc2\xdb\x2f\x1f\xc1\xea"
-> +                         "\xd4\x4d\x17\x46\x3b\x51\x69\x09"
-> +                         "\xe4\x99\x32\x25\xfd\x94\xaf\xfb"
-> +                         "\x10\xf7\x4f\xdd\x0b\x3c\x8b\x41"
-> +                         "\xb3\x6a\xb7\xd1\x33\xa8\x0c\x2f"
-> +                         "\x62\x4c\x72\x11\xd7\x74\xe1\x3b"
-> +                         "\x38\x43\x66\x7b\x6c\x36\x48\xe7"
-> +                         "\xe3\xe7\x9d\xb9\x42\x73\x7a\x2a"
-> +                         "\x89\x20\x1a\x41\x80\x03\xf7\x8f"
-> +                         "\x61\x78\x13\xbf\xfe\x50\xf5\x04"
-> +                         "\x52\xf9\xac\x47\xf8\x62\x4b\xb2"
-> +                         "\x24\xa9\xbf\x64\xb0\x18\x69\xd2"
-> +                         "\xf5\xe4\xce\xc8\xb1\x87\x75\xd6"
-> +                         "\x2c\x24\x79\x00\x7d\x26\xfb\x44"
-> +                         "\xe7\x45\x7a\xee\x58\xa5\x83\xc1"
-> +                         "\xb4\x24\xab\x23\x2f\x4d\xd7\x4f"
-> +                         "\x1c\xc7\xaa\xa9\x50\xf4\xa3\x07"
-> +                         "\x12\x13\x89\x74\xdc\x31\x6a\xb2"
-> +                         "\xf5\x0f\x13\x8b\xb9\xdb\x85\x1f"
-> +                         "\xf5\xbc\x88\xd9\x95\xea\x31\x6c"
-> +                         "\x36\x60\xb6\x49\xdc\xc4\xf7\x55"
-> +                         "\x3f\x21\xc1\xb5\x92\x18\x5e\xbc"
-> +                         "\x9f\x87\x7f\xe7\x79\x25\x40\x33"
-> +                         "\xd6\xb9\x33\xd5\x50\xb3\xc7\x89"
-> +                         "\x1b\x12\xa0\x46\xdd\xa7\xd8\x3e"
-> +                         "\x71\xeb\x6f\x66\xa1\x26\x0c\x67"
-> +                         "\xab\xb2\x38\x58\x17\xd8\x44\x3b"
-> +                         "\x16\xf0\x8e\x62\x8d\x16\x10\x00"
-> +                         "\x32\x8b\xef\xb9\x28\xd3\xc5\xad"
-> +                         "\x0a\x19\xa2\xe4\x03\x27\x7d\x94"
-> +                         "\x06\x18\xcd\xd6\x27\x00\xf9\x1f"
-> +                         "\xb6\xb3\xfe\x96\x35\x5f\xc4\x1c"
-> +                         "\x07\x62\x10\x79\x68\x50\xf1\x7e"
-> +                         "\x29\xe7\xc4\xc4\xe7\xee\x54\xd6"
-> +                         "\x58\x76\x84\x6d\x8d\xe4\x59\x31"
-> +                         "\xe9\xf4\xdc\xa1\x1f\xe5\x1a\xd6"
-> +                         "\xe6\x64\x46\xf5\x77\x9c\x60\x7a"
-> +                         "\x5e\x62\xe3\x0a\xd4\x9f\x7a\x2d"
-> +                         "\x7a\xa5\x0a\x7b\x29\x86\x7a\x74"
-> +                         "\x74\x71\x6b\xca\x7d\x1d\xaa\xba"
-> +                         "\x39\x84\x43\x76\x35\xfe\x4f\x9b"
-> +                         "\xbb\xbb\xb5\x6a\x32\xb5\x5d\x41"
-> +                         "\x51\xf0\x5b\x68\x03\x47\x4b\x8a"
-> +                         "\xca\x88\xf6\x37\xbd\x73\x51\x70"
-> +                         "\x66\xfe\x9e\x5f\x21\x9c\xf3\xdd"
-> +                         "\xc3\xea\x27\xf9\x64\x94\xe1\x19"
-> +                         "\xa0\xa9\xab\x60\xe0\x0e\xf7\x78"
-> +                         "\x70\x86\xeb\xe0\xd1\x5c\x05\xd3"
-> +                         "\xd7\xca\xe0\xc0\x47\x47\x34\xee"
-> +                         "\x11\xa3\xa3\x54\x98\xb7\x49\x8e"
-> +                         "\x84\x28\x70\x2c\x9e\xfb\x55\x54"
-> +                         "\x4d\xf8\x86\xf7\x85\x7c\xbd\xf3"
-> +                         "\x17\xd8\x47\xcb\xac\xf4\x20\x85"
-> +                         "\x34\x66\xad\x37\x2d\x5e\x52\xda"
-> +                         "\x8a\xfe\x98\x55\x30\xe7\x2d\x2b"
-> +                         "\x19\x10\x8e\x7b\x66\x5e\xdc\xe0"
-> +                         "\x45\x1f\x7b\xb4\x08\xfb\x8f\xf6"
-> +                         "\x8c\x89\x21\x34\x55\x27\xb2\x76"
-> +                         "\xb2\x07\xd9\xd6\x68\x9b\xea\x6b"
-> +                         "\x2d\xb4\xc4\x35\xdd\xd2\x79\xae"
-> +                         "\xc7\xd6\x26\x7f\x12\x01\x8c\xa7"
-> +                         "\xe3\xdb\xa8\xf4\xf7\x2b\xec\x99"
-> +                         "\x11\x00\xf1\x35\x8c\xcf\xd5\xc9"
-> +                         "\xbd\x91\x36\x39\x70\xcf\x7d\x70"
-> +                         "\x47\x1a\xfc\x6b\x56\xe0\x3f\x9c"
-> +                         "\x60\x49\x01\x72\xa9\xaf\x2c\x9c"
-> +                         "\xe8\xab\xda\x8c\x14\x19\xf3\x75"
-> +                         "\x07\x17\x9d\x44\x67\x7a\x2e\xef"
-> +                         "\xb7\x83\x35\x4a\xd1\x3d\x1c\x84"
-> +                         "\x32\xdd\xaa\xea\xca\x1d\xdc\x72"
-> +                         "\x2c\xcc\x43\xcd\x5d\xe3\x21\xa4"
-> +                         "\xd0\x8a\x4b\x20\x12\xa3\xd5\x86"
-> +                         "\x76\x96\xff\x5f\x04\x57\x0f\xe6"
-> +                         "\xba\xe8\x76\x50\x0c\x64\x1d\x83"
-> +                         "\x9c\x9b\x9a\x9a\x58\x97\x9c\x5c"
-> +                         "\xb4\xa4\xa6\x3e\x19\xeb\x8f\x5a"
-> +                         "\x61\xb2\x03\x7b\x35\x19\xbe\xa7"
-> +                         "\x63\x0c\xfd\xdd\xf9\x90\x6c\x08"
-> +                         "\x19\x11\xd3\x65\x4a\xf5\x96\x92"
-> +                         "\x59\xaa\x9c\x61\x0c\x29\xa7\xf8"
-> +                         "\x14\x39\x37\xbf\x3c\xf2\x16\x72"
-> +                         "\x02\xfa\xa2\xf3\x18\x67\x5d\xcb"
-> +                         "\xdc\x4d\xbb\x96\xff\x70\x08\x2d"
-> +                         "\xc2\xa8\x52\xe1\x34\x5f\x72\xfe"
-> +                         "\x64\xbf\xca\xa7\x74\x38\xfb\x74"
-> +                         "\x55\x9c\xfa\x8a\xed\xfb\x98\xeb"
-> +                         "\x58\x2e\x6c\xe1\x52\x76\x86\xd7"
-> +                         "\xcf\xa1\xa4\xfc\xb2\x47\x41\x28"
-> +                         "\xa3\xc1\xe5\xfd\x53\x19\x28\x2b"
-> +                         "\x37\x04\x65\x96\x99\x7a\x28\x0f"
-> +                         "\x07\x68\x4b\xc7\x52\x0a\x55\x35"
-> +                         "\x40\x19\x95\x61\xe8\x59\x40\x1f"
-> +                         "\x9d\xbf\x78\x7d\x8f\x84\xff\x6f"
-> +                         "\xd0\xd5\x63\xd2\x22\xbd\xc8\x4e"
-> +                         "\xfb\xe7\x9f\x06\xe6\xe7\x39\x6d"
-> +                         "\x6a\x96\x9f\xf0\x74\x7e\xc9\x35"
-> +                         "\xb7\x26\xb8\x1c\x0a\xa6\x27\x2c"
-> +                         "\xa2\x2b\xfe\xbe\x0f\x07\x73\xae"
-> +                         "\x7f\x7f\x54\xf5\x7c\x6a\x0a\x56"
-> +                         "\x49\xd4\x81\xe5\x85\x53\x99\x1f"
-> +                         "\x95\x05\x13\x58\x8d\x0e\x1b\x90"
-> +                         "\xc3\x75\x48\x64\x58\x98\x67\x84"
-> +                         "\xae\xe2\x21\xa2\x8a\x04\x0a\x0b"
-> +                         "\x61\xaa\xb0\xd4\x28\x60\x7a\xf8"
-> +                         "\xbc\x52\xfb\x24\x7f\xed\x0d\x2a"
-> +                         "\x0a\xb2\xf9\xc6\x95\xb5\x11\xc9"
-> +                         "\xf4\x0f\x26\x11\xcf\x2a\x57\x87"
-> +                         "\x7a\xf3\xe7\x94\x65\xc2\xb5\xb3"
-> +                         "\xab\x98\xe3\xc1\x2b\x59\x19\x7c"
-> +                         "\xd6\xf3\xf9\xbf\xff\x6d\xc6\x82"
-> +                         "\x13\x2f\x4a\x2e\xcd\x26\xfe\x2d"
-> +                         "\x01\x70\xf4\xc2\x7f\x1f\x4c\xcb"
-> +                         "\x47\x77\x0c\xa0\xa3\x03\xec\xda"
-> +                         "\xa9\xbf\x0d\x2d\xae\xe4\xb8\x7b"
-> +                         "\xa9\xbc\x08\xb4\x68\x2e\xc5\x60"
-> +                         "\x8d\x87\x41\x2b\x0f\x69\xf0\xaf"
-> +                         "\x5f\xba\x72\x20\x0f\x33\xcd\x6d"
-> +                         "\x36\x7d\x7b\xd5\x05\xf1\x4b\x05"
-> +                         "\xc4\xfc\x7f\x80\xb9\x4d\xbd\xf7"
-> +                         "\x7c\x84\x07\x01\xc2\x40\x66\x5b"
-> +                         "\x98\xc7\x2c\xe3\x97\xfa\xdf\x87"
-> +                         "\xa0\x1f\xe9\x21\x42\x0f\x3b\xeb"
-> +                         "\x89\x1c\x3b\xca\x83\x61\x77\x68"
-> +                         "\x84\xbb\x60\x87\x38\x2e\x25\xd5"
-> +                         "\x9e\x04\x41\x70\xac\xda\xc0\x9c"
-> +                         "\x9c\x69\xea\x8d\x4e\x55\x2a\x29"
-> +                         "\xed\x05\x4b\x7b\x73\x71\x90\x59"
-> +                         "\x4d\xc8\xd8\x44\xf0\x4c\xe1\x5e"
-> +                         "\x84\x47\x55\xcc\x32\x3f\xe7\x97"
-> +                         "\x42\xc6\x32\xac\x40\xe5\xa5\xc7"
-> +                         "\x8b\xed\xdb\xf7\x83\xd6\xb1\xc2"
-> +                         "\x52\x5e\x34\xb7\xeb\x6e\xd9\xfc"
-> +                         "\xe5\x93\x9a\x97\x3e\xb0\xdc\xd9"
-> +                         "\xd7\x06\x10\xb6\x1d\x80\x59\xdd"
-> +                         "\x0d\xfe\x64\x35\xcd\x5d\xec\xf0"
-> +                         "\xba\xd0\x34\xc9\x2d\x91\xc5\x17"
-> +                         "\x11",
-> +               .len    = 1281,
-> +               .also_non_np = 1,
-> +               .np     = 3,
-> +               .tap    = { 1200, 1, 80 },
-> +       },
+> /* Indicates from what layer of the software stack the error comes from */
+> @@ -125,12 +135,20 @@ enum tpm2_return_codes {
+> enum tpm2_algorithms {
+> 	TPM2_ALG_ERROR		= 0x0000,
+> 	TPM2_ALG_SHA1		= 0x0004,
+> +	TPM2_ALG_AES		= 0x0006,
+> 	TPM2_ALG_KEYEDHASH	= 0x0008,
+> 	TPM2_ALG_SHA256		= 0x000B,
+> 	TPM2_ALG_SHA384		= 0x000C,
+> 	TPM2_ALG_SHA512		= 0x000D,
+> 	TPM2_ALG_NULL		= 0x0010,
+> 	TPM2_ALG_SM3_256	= 0x0012,
+> +	TPM2_ALG_ECC		= 0x0023,
+> +	TPM2_ALG_CFB		= 0x0043,
 > +};
 > +
->  /*
->   * CTS (Cipher Text Stealing) mode tests
->   */
-> diff --git a/include/crypto/chacha20.h b/include/crypto/chacha20.h
-> index fbec4e6a87890..6290d997060ec 100644
-> --- a/include/crypto/chacha20.h
-> +++ b/include/crypto/chacha20.h
-> @@ -1,6 +1,10 @@
->  /* SPDX-License-Identifier: GPL-2.0 */
->  /*
-> - * Common values for the ChaCha20 algorithm
-> + * Common values and helper functions for the ChaCha20 and XChaCha20 algorithms.
+> +enum tpm2_curves {
+> +	TPM2_ECC_NONE		= 0x0000,
+> +	TPM2_ECC_NIST_P256	= 0x0003,
+> };
+>
+> enum tpm2_command_codes {
+> @@ -145,6 +163,8 @@ enum tpm2_command_codes {
+> 	TPM2_CC_CONTEXT_LOAD	= 0x0161,
+> 	TPM2_CC_CONTEXT_SAVE	= 0x0162,
+> 	TPM2_CC_FLUSH_CONTEXT	= 0x0165,
+> +	TPM2_CC_READ_PUBLIC	= 0x0173,
+> +	TPM2_CC_START_AUTH_SESS	= 0x0176,
+> 	TPM2_CC_GET_CAPABILITY	= 0x017A,
+> 	TPM2_CC_GET_RANDOM	= 0x017B,
+> 	TPM2_CC_PCR_READ	= 0x017E,
+> @@ -153,6 +173,7 @@ enum tpm2_command_codes {
+> };
+>
+> enum tpm2_permanent_handles {
+> +	TPM2_RH_NULL		= 0x40000007,
+> 	TPM2_RS_PW		= 0x40000009,
+> };
+>
+> @@ -255,11 +276,18 @@ struct tpm_chip {
+> #endif /* CONFIG_ACPI */
+>
+> 	struct tpm_space work_space;
+> +	struct tpm_space kernel_space;
+> 	u32 nr_commands;
+> 	u32 *cc_attrs_tbl;
+>
+> 	/* active locality */
+> 	int locality;
+> +
+> +	/* details for communication security via sessions */
+> +	u32 tpmkey;
+> +	u8 tpmkeyname[TPM2_NAME_SIZE];
+
+u32 tpm_key_handle;
+u8 tpm_key_name[SHA256_DIGEST_SIZE + 2];
+
+The comment above these variables is complete bogus (tells nothing
+about nothing).
+
+> +	u8 ec_point_x[EC_PT_SZ];
+> +	u8 ec_point_y[EC_PT_SZ];
+
+A comment above these would be good with a description what these are
+and what they are used for.
+
+> };
+>
+> #define to_tpm_chip(d) container_of(d, struct tpm_chip, dev)
+> @@ -441,6 +469,9 @@ u8 tpm_get_inc_u8(const u8 **ptr);
+> u16 tpm_get_inc_u16(const u8 **ptr);
+> u32 tpm_get_inc_u32(const u8 **ptr);
+>
+> +/* opaque structure, holds auth session parameters like the session key */
+> +struct tpm2_auth;
+> +
+> extern struct class *tpm_class;
+> extern struct class *tpmrm_class;
+> extern dev_t tpm_devt;
+> @@ -540,4 +571,5 @@ int tpm2_commit_space(struct tpm_chip *chip, struct tpm_space *space,
+>
+> int tpm_bios_log_setup(struct tpm_chip *chip);
+> void tpm_bios_log_teardown(struct tpm_chip *chip);
+> +int tpm2_sessions_init(struct tpm_chip *chip);
+> #endif
+> diff --git a/drivers/char/tpm/tpm2-cmd.c b/drivers/char/tpm/tpm2-cmd.c
+> index c31b490bd41d..a17e5c573c4e 100644
+> --- a/drivers/char/tpm/tpm2-cmd.c
+> +++ b/drivers/char/tpm/tpm2-cmd.c
+> @@ -16,17 +16,10 @@
+>  */
+>
+> #include "tpm.h"
+> +#include "tpm2-sessions.h"
+> #include <crypto/hash_info.h>
+> #include <keys/trusted-type.h>
+>
+> -enum tpm2_object_attributes {
+> -	TPM2_OA_USER_WITH_AUTH		= BIT(6),
+> -};
+> -
+> -enum tpm2_session_attributes {
+> -	TPM2_SA_CONTINUE_SESSION	= BIT(0),
+> -};
+> -
+> struct tpm2_hash {
+> 	unsigned int crypto_id;
+> 	unsigned int tpm_id;
+> @@ -350,15 +343,19 @@ int tpm2_get_random(struct tpm_chip *chip, u8 *dest, size_t max)
+> /**
+>  * tpm2_flush_context_cmd() - execute a TPM2_FlushContext command
+>  * @chip: TPM chip to use
+> - * @payload: the key data in clear and encrypted form
+> - * @options: authentication values and other options
+> + * @handle: the handle to flush
+> + * @flags: flags for transmit
+>  *
+> + * Note: @flags may be TPM_TRANSMIT_UNLOCKED or 0.  If @flags is 0, we
+> + * assume the flush handle is going through the kernel space.
+> +
+>  * Return: same as with tpm_transmit_cmd
+>  */
+> void tpm2_flush_context_cmd(struct tpm_chip *chip, u32 handle,
+> 			    unsigned int flags)
+> {
+> 	struct tpm_buf buf;
+> +	struct tpm_space *space = NULL;
+> 	int rc;
+>
+> 	rc = tpm_buf_init(&buf, TPM2_ST_NO_SESSIONS, TPM2_CC_FLUSH_CONTEXT);
+> @@ -367,10 +364,12 @@ void tpm2_flush_context_cmd(struct tpm_chip *chip, u32 handle,
+> 			 handle);
+> 		return;
+> 	}
+> +	if (!flags)
+> +		space = &chip->kernel_space;
+>
+> 	tpm_buf_append_u32(&buf, handle);
+>
+> -	(void) tpm_transmit_cmd(chip, NULL, buf.data, PAGE_SIZE, 0, flags,
+> +	(void) tpm_transmit_cmd(chip, space, buf.data, PAGE_SIZE, 0, flags,
+> 				"flushing context");
+>
+> 	tpm_buf_destroy(&buf);
+> @@ -387,10 +386,10 @@ void tpm2_flush_context_cmd(struct tpm_chip *chip, u32 handle,
+>  * @hmac: the session HMAC or password, may be NULL if not used
+>  * @hmac_len: the session HMAC or password length, maybe 0 if not used
+>  */
+> -static void tpm2_buf_append_auth(struct tpm_buf *buf, u32 session_handle,
+> -				 const u8 *nonce, u16 nonce_len,
+> -				 u8 attributes,
+> -				 const u8 *hmac, u16 hmac_len)
+> +void tpm2_buf_append_auth(struct tpm_buf *buf, u32 session_handle,
+> +			  const u8 *nonce, u16 nonce_len,
+> +			  u8 attributes,
+> +			  const u8 *hmac, u16 hmac_len)
+> {
+> 	tpm_buf_append_u32(buf, 9 + nonce_len + hmac_len);
+> 	tpm_buf_append_u32(buf, session_handle);
+> @@ -1015,6 +1014,11 @@ int tpm2_auto_startup(struct tpm_chip *chip)
+>
+> 	rc = tpm2_get_cc_attrs_tbl(chip);
+>
+> +	if (rc)
+
+Remove the newline in-between.
+
+> +		goto out;
+> +
+> +	rc = tpm2_sessions_init(chip);
+> +
+> out:
+> 	if (rc > 0)
+> 		rc = -ENODEV;
+> diff --git a/drivers/char/tpm/tpm2-sessions.c b/drivers/char/tpm/tpm2-sessions.c
+> new file mode 100644
+> index 000000000000..422c3ec64f8c
+> --- /dev/null
+> +++ b/drivers/char/tpm/tpm2-sessions.c
+> @@ -0,0 +1,1188 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +
+> +/*
+> + * Copyright (C) 2018 James.Bottomley@HansenPartnership.com
 > + *
-> + * XChaCha20 extends ChaCha20's nonce to 192 bits, while provably retaining
-> + * ChaCha20's security.  Here they share the same key size, tfm context, and
-> + * setkey function; only their IV size and encrypt/decrypt function differ.
->   */
->
->  #ifndef _CRYPTO_CHACHA20_H
-> @@ -10,10 +14,15 @@
->  #include <linux/types.h>
->  #include <linux/crypto.h>
->
-> +/* 32-bit stream position, then 96-bit nonce (RFC7539 convention) */
->  #define CHACHA20_IV_SIZE       16
+> + * Cryptographic helper routines for handling TPM2 sessions for
+> + * authorization HMAC and request response encryption.
+> + *
+> + * The idea is to ensure that every TPM command is HMAC protected by a
+> + * session, meaning in-flight tampering would be detected and in
+> + * addition all sensitive inputs and responses should be encrypted.
+> + *
+> + * The basic way this works is to use a TPM feature called salted
+> + * sessions where a random secret used in session construction is
+> + * encrypted to the public part of a known TPM key.  The problem is we
+> + * have no known keys, so initially a primary Elliptic Curve key is
+> + * derived from the NULL seed (we use EC because most TPMs generate
+> + * these keys much faster than RSA ones).  The curve used is NIST_P256
+> + * because that's now mandated to be present in 'TCG TPM v2.0
+> + * Provisioning Guidance'
+> + *
+> + * Threat problems: the initial TPM2_CreatePrimary is not (and cannot
+> + * be) session protected, so a clever Man in the Middle could return a
+> + * public key they control to this command and from there intercept
+> + * and decode all subsequent session based transactions.  The kernel
+> + * cannot mitigate this threat but, after boot, userspace can get
+> + * proof this has not happened by asking the TPM to certify the NULL
+> + * key.  This certification would chain back to the TPM Endorsement
+> + * Certificate and prove the NULL seed primary had not been tampered
+> + * with and thus all sessions must have been cryptographically secure.
+> + * To assist with this, the initial NULL seed public key name is made
+> + * available in a sysfs file.
+> + *
+> + * Use of these functions:
+> + *
+> + * The design is all the crypto, hash and hmac gunk is confined in this
+> + * file and never needs to be seen even by the kernel internal user.  To
+> + * the user there's an init function tpm2_sessions_init() that needs to
+> + * be called once per TPM which generates the NULL seed primary key.
+> + *
+> + * Then there are six usage functions:
+> + *
+> + * tpm2_start_auth_session() which allocates the opaque auth structure
+> + *	and gets a session from the TPM.  This must be called before
+> + *	any of the following functions.  The session is protected by a
+> + *	session_key which is derived from a random salt value
+> + *	encrypted to the NULL seed.
+> + * tpm2_end_auth_session() kills the session and frees the resources.
+> + *	Under normal operation this function is done by
+> + *	tpm_buf_check_hmac_response(), so this is only to be used on
+> + *	error legs where the latter is not executed.
+> + * tpm_buf_append_name() to add a handle to the buffer.  This must be
+> + *	used in place of the usual tpm_buf_append_u32() for adding
+> + *	handles because handles have to be processed specially when
+> + *	calculating the HMAC.  In particular, for NV, volatile and
+> + *	permanent objects you now need to provide the name.
+> + * tpm_buf_append_hmac_session() which appends the hmac session to the
+> + *	buf in the same way tpm_buf_append_auth does().
+> + * tpm_buf_fill_hmac_session() This calculates the correct hash and
+> + *	places it in the buffer.  It must be called after the complete
+> + *	command buffer is finalized so it can fill in the correct HMAC
+> + *	based on the parameters.
+> + * tpm_buf_check_hmac_response() which checks the session response in
+> + *	the buffer and calculates what it should be.  If there's a
+> + *	mismatch it will log a warning and return an error.  If
+> + *	tpm_buf_append_hmac_session() did not specify
+> + *	TPM_SA_CONTINUE_SESSION then the session will be closed (if it
+> + *	hasn't been consumed) and the auth structure freed.
+
+Please, move these to the correct places in the file and use kdoc.
+
+> + */
 > +
->  #define CHACHA20_KEY_SIZE      32
->  #define CHACHA20_BLOCK_SIZE    64
->
-> +/* 192-bit nonce, then 64-bit stream position */
-> +#define XCHACHA20_IV_SIZE      32
+> +#include "tpm.h"
+> +#include "tpm2-sessions.h"
 > +
->  struct chacha20_ctx {
->         u32 key[8];
->  };
-> @@ -22,8 +31,11 @@ void chacha20_block(u32 *state, u8 *stream);
->  void hchacha20_block(const u32 *in, u32 *out);
->
->  void crypto_chacha20_init(u32 *state, struct chacha20_ctx *ctx, u8 *iv);
+> +#include <linux/random.h>
+> +#include <linux/scatterlist.h>
 > +
->  int crypto_chacha20_setkey(struct crypto_skcipher *tfm, const u8 *key,
->                            unsigned int keysize);
+> +#include <asm/unaligned.h>
 > +
->  int crypto_chacha20_crypt(struct skcipher_request *req);
-> +int crypto_xchacha20_crypt(struct skcipher_request *req);
+> +#include <crypto/aes.h>
+> +#include <crypto/kpp.h>
+> +#include <crypto/ecdh.h>
+> +#include <crypto/hash.h>
+> +#include <crypto/hmac.h>
+> +#include <crypto/skcipher.h>
+> +
+> +/* if you change to AES256, you only need change this */
+> +#define AES_KEYBYTES	AES_KEYSIZE_128
+> +
+> +#define AES_KEYBITS	(AES_KEYBYTES*8)
+> +#define AUTH_MAX_NAMES	3
+> +
+> +/*
+> + * This is the structure that carries all the auth information (like
+> + * session handle, nonces, session key and auth) from use to use it is
+> + * designed to be opaque to anything outside.
+> + */
+> +struct tpm2_auth {
+> +	u32 handle;
+> +	/*
+> +	 * This has two meanings: before tpm_buf_fill_hmac_session()
+> +	 * it marks the offset in the buffer of the start of the
+> +	 * sessions (i.e. after all the handles).  Once the buffer has
+> +	 * been filled it markes the session number of our auth
+> +	 * session so we can find it again in the response buffer.
+> +	 *
+> +	 * The two cases are distinguished because the first offset
+> +	 * must always be greater than TPM_HEADER_SIZE and the second
+> +	 * must be less than or equal to 5.
+> +	 */
+> +	u32 session;
+> +	/*
+> +	 * the size here is variable and set by the size of our_nonce
+> +	 * which must be between 16 and the name hash length. we set
+> +	 * the maximum sha256 size for the greatest protection
+> +	 */
+> +	u8 our_nonce[SHA256_DIGEST_SIZE];
+> +	u8 tpm_nonce[SHA256_DIGEST_SIZE];
+> +	/*
+> +	 * the salt is only used across the session command/response
+> +	 * after that it can be used as a scratch area
+> +	 */
+> +	union {
+> +		u8 salt[EC_PT_SZ];
+> +		/* scratch for key + IV */
+> +		u8 scratch[AES_KEYBYTES + AES_BLOCK_SIZE];
+> +	};
+> +	/*
+> +	 * the session key and passphrase are the same size as the
+> +	 * name digest (sha256 again).  The session key is constant
+> +	 * for the use of the session and the passphrase can change
+> +	 * with every invocation.
+> +	 *
+> +	 * Note: these fields must be adjacent and in this order
+> +	 * because several HMAC/KDF schemes use the combination of the
+> +	 * session_key and passphrase.
+> +	 */
+> +	u8 session_key[SHA256_DIGEST_SIZE];
+> +	u8 passphrase[SHA256_DIGEST_SIZE];
+> +	int passphraselen;
+> +	/* saved session attributes */
+> +	u8 attrs;
+> +	__be32 ordinal;
+> +	struct crypto_skcipher *aes;
+> +	struct tpm_chip *chip;
+> +	/* 3 names of handles: name_h is handle, name is name of handle */
+> +	u32 name_h[AUTH_MAX_NAMES];
+> +	u8 name[AUTH_MAX_NAMES][2 + SHA256_DIGEST_SIZE];
+> +};
+> +
+> +/*
+> + * this is our static crypto shash.  This is possible because the hash
+> + * is multi-threaded and all the state stored in the desc
+> + */
+> +static struct crypto_shash *sha256_hash;
+> +
+> +/*
+> + * It turns out the crypto hmac(sha256) is hard for us to consume
+> + * because it assumes a fixed key and the TPM seems to change the key
+> + * on every operation, so we weld the hmac init and final functions in
+> + * here to give it the same usage characteristics as a regular hash
+> + */
+> +static void hmac_init(struct shash_desc *desc, u8 *key, int keylen)
+> +{
+> +	u8 pad[SHA256_BLOCK_SIZE];
+> +	int i;
+> +
+> +	desc->tfm = sha256_hash;
+> +	desc->flags = CRYPTO_TFM_REQ_MAY_SLEEP;
+> +	crypto_shash_init(desc);
+> +	for (i = 0; i < sizeof(pad); i++) {
+> +		if (i < keylen)
+> +			pad[i] = key[i];
+> +		else
+> +			pad[i] = 0;
+> +		pad[i] ^= HMAC_IPAD_VALUE;
+> +	}
+> +	crypto_shash_update(desc, pad, sizeof(pad));
+> +}
+> +
+> +static void hmac_final(struct shash_desc *desc, u8 *key, int keylen, u8 *out)
+> +{
+> +	u8 pad[SHA256_BLOCK_SIZE];
+> +	int i;
+> +
+> +	for (i = 0; i < sizeof(pad); i++) {
+> +		if (i < keylen)
+> +			pad[i] = key[i];
+> +		else
+> +			pad[i] = 0;
+> +		pad[i] ^= HMAC_OPAD_VALUE;
+> +	}
+> +
+> +	/* collect the final hash;  use out as temporary storage */
+> +	crypto_shash_final(desc, out);
+> +
+> +	/* reuse the desc */
+> +	crypto_shash_init(desc);
+> +	crypto_shash_update(desc, pad, sizeof(pad));
+> +	crypto_shash_update(desc, out, SHA256_DIGEST_SIZE);
+> +	crypto_shash_final(desc, out);
+> +}
+
+Please, add 'tpm_' prefix to these functions as they are tpm internal and
+it makes tracing TPM internal stuff easier.
+
+> +
+> +/*
+> + * assume hash sha256 and nonces u, v of size SHA256_DIGEST_SIZE but
+> + * otherwise standard KDFa.  Note output is in bytes not bits.
+> + */
+> +static void KDFa(u8 *key, int keylen, const char *label, u8 *u,
+> +		 u8 *v, int bytes, u8 *out)
+
+Should this be in lower case? I would rename it as tpm_kdfa().
+
+> +{
+> +	u32 counter;
+> +	const __be32 bits = cpu_to_be32(bytes * 8);
+> +
+> +	for (counter = 1; bytes > 0; bytes -= SHA256_DIGEST_SIZE, counter++,
+> +		     out += SHA256_DIGEST_SIZE) {
+
+Only one counter is actually used for anything so this is overly
+complicated and IMHO it is ok to call the counter just 'i'. Maybe just:
+
+for (i = 1; (bytes - (i - 1) * SHA256_DIGEST_SIZE) > 0; i++) {
+
+> +		SHASH_DESC_ON_STACK(desc, sha256_hash);
+> +		__be32 c = cpu_to_be32(counter);
+> +
+> +		hmac_init(desc, key, keylen);
+> +		crypto_shash_update(desc, (u8 *)&c, sizeof(c));
+> +		crypto_shash_update(desc, label, strlen(label)+1);
+> +		crypto_shash_update(desc, u, SHA256_DIGEST_SIZE);
+> +		crypto_shash_update(desc, v, SHA256_DIGEST_SIZE);
+> +		crypto_shash_update(desc, (u8 *)&bits, sizeof(bits));
+> +		hmac_final(desc, key, keylen, out);
+> +	}
+> +}
+> +
+> +/*
+> + * Somewhat of a bastardization of the real KDFe.  We're assuming
+> + * we're working with known point sizes for the input parameters and
+> + * the hash algorithm is fixed at sha256.  Because we know that the
+> + * point size is 32 bytes like the hash size, there's no need to loop
+> + * in this KDF.
+> + */
+> +static void KDFe(u8 z[EC_PT_SZ], const char *str, u8 *pt_u, u8 *pt_v,
+> +		 u8 *keyout)
+> +{
+> +	SHASH_DESC_ON_STACK(desc, sha256_hash);
+> +	/*
+> +	 * this should be an iterative counter, but because we know
+> +	 *  we're only taking 32 bytes for the point using a sha256
+> +	 *  hash which is also 32 bytes, there's only one loop
+> +	 */
+> +	__be32 c = cpu_to_be32(1);
+> +
+> +	desc->tfm = sha256_hash;
+> +	desc->flags = CRYPTO_TFM_REQ_MAY_SLEEP;
+> +
+> +	crypto_shash_init(desc);
+> +	/* counter (BE) */
+> +	crypto_shash_update(desc, (u8 *)&c, sizeof(c));
+> +	/* secret value */
+> +	crypto_shash_update(desc, z, EC_PT_SZ);
+> +	/* string including trailing zero */
+> +	crypto_shash_update(desc, str, strlen(str)+1);
+> +	crypto_shash_update(desc, pt_u, EC_PT_SZ);
+> +	crypto_shash_update(desc, pt_v, EC_PT_SZ);
+> +	crypto_shash_final(desc, keyout);
+> +}
+> +
+> +static void tpm_buf_append_salt(struct tpm_buf *buf, struct tpm_chip *chip,
+> +				struct tpm2_auth *auth)
+
+Given the complexity of this function and some not that obvious choices
+in the implementation (coordinates), it would make sense to document
+this function.
+
+> +{
+> +	struct crypto_kpp *kpp;
+> +	struct kpp_request *req;
+> +	struct scatterlist s[2], d[1];
+> +	struct ecdh p = {0};
+> +	u8 encoded_key[EC_PT_SZ], *x, *y;
+
+Why you use one character variable name 'p' and longer name
+'encoded_key'?
+
+> +	unsigned int buf_len;
+> +	u8 *secret;
+> +
+> +	secret = kmalloc(EC_PT_SZ, GFP_KERNEL);
+> +	if (!secret)
+> +		return;
+> +
+> +	p.curve_id = ECC_CURVE_NIST_P256;
+
+Could this be set already in the initialization?
+
+> +
+> +	/* secret is two sized points */
+> +	tpm_buf_append_u16(buf, (EC_PT_SZ + 2)*2);
+
+White space missing. Should be "(EC_PT_SZ + 2) * 2". The comment is a
+bit obscure (maybe, do not have any specific suggestion how to make it
+less obscure).
+
+> +	/*
+> +	 * we cheat here and append uninitialized data to form
+> +	 * the points.  All we care about is getting the two
+> +	 * co-ordinate pointers, which will be used to overwrite
+> +	 * the uninitialized data
+> +	 */
+
+"unitialized data" != "random data"
+
+Why doesn't it matter here?
+
+> +	tpm_buf_append_u16(buf, EC_PT_SZ);
+> +	x = &buf->data[tpm_buf_length(buf)];
+> +	tpm_buf_append(buf, encoded_key, EC_PT_SZ);
+> +	tpm_buf_append_u16(buf, EC_PT_SZ);
+> +	y = &buf->data[tpm_buf_length(buf)];
+> +	tpm_buf_append(buf, encoded_key, EC_PT_SZ);
+
+The points have matching coordinates. Is that ok?
+
+> +	sg_init_table(s, 2);
+> +	sg_set_buf(&s[0], x, EC_PT_SZ);
+> +	sg_set_buf(&s[1], y, EC_PT_SZ);
+> +
+> +	kpp = crypto_alloc_kpp("ecdh", CRYPTO_ALG_INTERNAL, 0);
+> +	if (IS_ERR(kpp)) {
+> +		dev_err(&chip->dev, "crypto ecdh allocation failed\n");
+> +		return;
+> +	}
+> +
+> +	buf_len = crypto_ecdh_key_len(&p);
+> +	if (sizeof(encoded_key) < buf_len) {
+> +		dev_err(&chip->dev, "salt buffer too small needs %d\n",
+> +			buf_len);
+> +		goto out;
+> +	}
+
+In what situation this can happen? Can sizeof(encoded_key) >= buf_len?
+
+> +	crypto_ecdh_encode_key(encoded_key, buf_len, &p);
+> +	/* this generates a random private key */
+> +	crypto_kpp_set_secret(kpp, encoded_key, buf_len);
+> +
+> +	/* salt is now the public point of this private key */
+> +	req = kpp_request_alloc(kpp, GFP_KERNEL);
+> +	if (!req)
+> +		goto out;
+> +	kpp_request_set_input(req, NULL, 0);
+> +	kpp_request_set_output(req, s, EC_PT_SZ*2);
+> +	crypto_kpp_generate_public_key(req);
+> +	/*
+> +	 * we're not done: now we have to compute the shared secret
+> +	 * which is our private key multiplied by the tpm_key public
+> +	 * point, we actually only take the x point and discard the y
+> +	 * point and feed it through KDFe to get the final secret salt
+> +	 */
+> +	sg_set_buf(&s[0], chip->ec_point_x, EC_PT_SZ);
+> +	sg_set_buf(&s[1], chip->ec_point_y, EC_PT_SZ);
+> +	kpp_request_set_input(req, s, EC_PT_SZ*2);
+> +	sg_init_one(d, secret, EC_PT_SZ);
+> +	kpp_request_set_output(req, d, EC_PT_SZ);
+> +	crypto_kpp_compute_shared_secret(req);
+> +	kpp_request_free(req);
+> +
+> +	/* pass the shared secret through KDFe for salt */
+> +	KDFe(secret, "SECRET", x, chip->ec_point_x, auth->salt);
+
+How is the label chosen?
+
+> + out:
+> +	crypto_free_kpp(kpp);
+> +}
+
+In general this function should have a clear explanation what it does
+and maybe less these one character variables but instead variables
+with more documenting names. Explain in high level what algorithms
+are used and how the salt is calculated.
+
+> +
+> +/**
+> + * tpm_buf_append_hmac_session() append a TPM session element
+> + * @buf: The buffer to be appended
+> + * @auth: the auth structure allocated by tpm2_start_auth_session()
+> + * @attributes: The session attributes
+> + * @passphrase: The session authority (NULL if none)
+> + * @passphraselen: The length of the session authority (0 if none)
+
+The alignment.
+
+> + *
+> + * This fills in a session structure in the TPM command buffer, except
+> + * for the HMAC which cannot be computed until the command buffer is
+> + * complete.  The type of session is controlled by the @attributes,
+> + * the main ones of which are TPM2_SA_CONTINUE_SESSION which means the
+> + * session won't terminate after tpm_buf_check_hmac_response(),
+> + * TPM2_SA_DECRYPT which means this buffers first parameter should be
+> + * encrypted with a session key and TPM2_SA_ENCRYPT, which means the
+> + * response buffer's first parameter needs to be decrypted (confusing,
+> + * but the defines are written from the point of view of the TPM).
+
+In the commit message it would be probably relevant to acknowledge that
+only the first parameter can be encrypted/decrypted.
+
+> + *
+> + * Any session appended by this command must be finalized by calling
+> + * tpm_buf_fill_hmac_session() otherwise the HMAC will be incorrect
+> + * and the TPM will reject the command.
+> + *
+> + * As with most tpm_buf operations, success is assumed because failure
+> + * will be caused by an incorrect programming model and indicated by a
+> + * kernel message.
+> + */
+> +void tpm_buf_append_hmac_session(struct tpm_buf *buf, struct tpm2_auth *auth,
+> +				 u8 attributes, u8 *passphrase,
+> +				 int passphraselen)
+
+Would prefer underscore between the words.
+
+> +{
+> +	u8 nonce[SHA256_DIGEST_SIZE];
+> +	u32 len;
+> +
+> +	/*
+> +	 * The Architecture Guide requires us to strip trailing zeros
+> +	 * before computing the HMAC
+> +	 */
+> +	while (passphrase && passphraselen > 0
+> +	       && passphrase[passphraselen - 1] == '\0')
+> +		passphraselen--;
+
+Why there would be trailing zeros?
+
+> +
+> +	auth->attrs = attributes;
+> +	auth->passphraselen = passphraselen;
+> +	if (passphraselen)
+> +		memcpy(auth->passphrase, passphrase, passphraselen);
+> +
+> +	if (auth->session != tpm_buf_length(buf)) {
+> +		/* we're not the first session */
+> +		len = get_unaligned_be32(&buf->data[auth->session]);
+> +		if (4 + len + auth->session != tpm_buf_length(buf)) {
+> +			WARN(1, "session length mismatch, cannot append");
+> +			return;
+> +		}
+> +
+> +		/* add our new session */
+> +		len += 9 + 2 * SHA256_DIGEST_SIZE;
+> +		put_unaligned_be32(len, &buf->data[auth->session]);
+> +	} else {
+> +		tpm_buf_append_u32(buf, 9 + 2 * SHA256_DIGEST_SIZE);
+> +	}
+> +
+> +	/* random number for our nonce */
+> +	get_random_bytes(nonce, sizeof(nonce));
+> +	memcpy(auth->our_nonce, nonce, sizeof(nonce));
+> +	tpm_buf_append_u32(buf, auth->handle);
+> +	/* our new nonce */
+> +	tpm_buf_append_u16(buf, SHA256_DIGEST_SIZE);
+> +	tpm_buf_append(buf, nonce, SHA256_DIGEST_SIZE);
+> +	tpm_buf_append_u8(buf, auth->attrs);
+> +	/* and put a placeholder for the hmac */
+> +	tpm_buf_append_u16(buf, SHA256_DIGEST_SIZE);
+> +	tpm_buf_append(buf, nonce, SHA256_DIGEST_SIZE);
+> +}
+> +EXPORT_SYMBOL(tpm_buf_append_hmac_session);
+> +
+> +/**
+> + * tpm_buf_fill_hmac_session() - finalize the session HMAC
+> + * @buf: The buffer to be appended
+> + * @auth: the auth structure allocated by tpm2_start_auth_session()
+> + *
+> + * This command must not be called until all of the parameters have
+> + * been appended to @buf otherwise the computed HMAC will be
+> + * incorrect.
+> + *
+> + * This function computes and fills in the session HMAC using the
+> + * session key and, if TPM2_SA_DECRYPT was specified, computes the
+> + * encryption key and encrypts the first parameter of the command
+> + * buffer with it.
+> + *
+> + * As with most tpm_buf operations, success is assumed because failure
+> + * will be caused by an incorrect programming model and indicated by a
+> + * kernel message.
+> + */
+> +void tpm_buf_fill_hmac_session(struct tpm_buf *buf, struct tpm2_auth *auth)
+> +{
+> +	u32 cc, handles, val;
+> +	struct tpm_chip *chip = auth->chip;
+> +	int i;
+> +	struct tpm_input_header *head = (struct tpm_input_header *)buf->data;
+> +	const u8 *s, *p;
+> +	u8 *hmac = NULL;
+> +	u32 attrs;
+> +	u8 cphash[SHA256_DIGEST_SIZE];
+> +	SHASH_DESC_ON_STACK(desc, sha256_hash);
+> +
+> +	/* save the command code in BE format */
+> +	auth->ordinal = head->ordinal;
+> +
+> +	desc->tfm = sha256_hash;
+> +	desc->flags = CRYPTO_TFM_REQ_MAY_SLEEP;
+> +
+> +	cc = be32_to_cpu(head->ordinal);
+> +
+> +	i = tpm2_find_cc(chip, cc);
+> +	if (i < 0) {
+> +		dev_err(&chip->dev, "Command 0x%x not found in TPM\n", cc);
+> +		return;
+> +	}
+> +	attrs = chip->cc_attrs_tbl[i];
+> +
+> +	handles = (attrs >> TPM2_CC_ATTR_CHANDLES) & GENMASK(2, 0);
+> +
+> +	s = &buf->data[TPM_HEADER_SIZE];
+> +	/*
+> +	 * just check the names, it's easy to make mistakes.  This
+> +	 * would happen if someone added a handle via
+> +	 * tpm_buf_append_u32() instead of tpm_buf_append_name()
+> +	 */
+> +	for (i = 0; i < handles; i++) {
+> +		u32 handle = tpm_get_inc_u32(&s);
+> +
+> +		if (auth->name_h[i] != handle) {
+> +			dev_err(&chip->dev, "TPM: handle %d wrong for name\n",
+> +				  i);
+> +			return;
+> +		}
+> +	}
+> +	/* point s to the start of the sessions */
+> +	val = tpm_get_inc_u32(&s);
+> +	/* point p to the start of the parameters */
+> +	p = s + val;
+> +	for (i = 1; s < p; i++) {
+> +		u32 handle = tpm_get_inc_u32(&s);
+> +		u16 len;
+> +		u8 a;
+> +
+> +		/* nonce (already in auth) */
+> +		len = tpm_get_inc_u16(&s);
+> +		s += len;
+> +
+> +		a = *s++;
+> +
+> +		len = tpm_get_inc_u16(&s);
+> +		if (handle == auth->handle && auth->attrs == a) {
+> +			hmac = (u8 *)s;
+> +			/*
+> +			 * save our session number so we know which
+> +			 * session in the response belongs to us
+> +			 */
+> +			auth->session = i;
+> +		}
+> +
+> +		s += len;
+> +	}
+> +	if (s != p) {
+> +		dev_err(&chip->dev, "TPM session length is incorrect\n");
+> +		return;
+> +	}
+> +	if (!hmac) {
+> +		dev_err(&chip->dev, "TPM could not find HMAC session\n");
+> +		return;
+> +	}
+> +
+> +	/* encrypt before HMAC */
+> +	if (auth->attrs & TPM2_SA_DECRYPT) {
+> +		struct scatterlist sg[1];
+> +		u16 len;
+> +		SKCIPHER_REQUEST_ON_STACK(req, auth->aes);
+> +
+> +		skcipher_request_set_tfm(req, auth->aes);
+> +		skcipher_request_set_callback(req, CRYPTO_TFM_REQ_MAY_SLEEP,
+> +					      NULL, NULL);
+> +
+> +		/* need key and IV */
+> +		KDFa(auth->session_key, SHA256_DIGEST_SIZE
+> +		     + auth->passphraselen, "CFB", auth->our_nonce,
+> +		     auth->tpm_nonce, AES_KEYBYTES + AES_BLOCK_SIZE,
+> +		     auth->scratch);
+> +		crypto_skcipher_setkey(auth->aes, auth->scratch, AES_KEYBYTES);
+> +		len = tpm_get_inc_u16(&p);
+> +		sg_init_one(sg, p, len);
+> +		skcipher_request_set_crypt(req, sg, sg, len,
+> +					   auth->scratch + AES_KEYBYTES);
+> +		crypto_skcipher_encrypt(req);
+> +		/* reset p to beginning of parameters for HMAC */
+> +		p -= 2;
+> +	}
+> +
+> +	crypto_shash_init(desc);
+> +	/* ordinal is already BE */
+> +	crypto_shash_update(desc, (u8 *)&head->ordinal, sizeof(head->ordinal));
+> +	/* add the handle names */
+> +	for (i = 0; i < handles; i++) {
+> +		u8 mso = auth->name_h[i] >> 24;
+> +
+> +		if (mso == 0x81 || mso == 0x80 || mso == 0x01) {
+> +			crypto_shash_update(desc, auth->name[i],
+> +					    SHA256_DIGEST_SIZE + 2);
+> +		} else {
+> +			__be32 h = cpu_to_be32(auth->name_h[i]);
+> +
+> +			crypto_shash_update(desc, (u8 *)&h, 4);
+> +		}
+> +	}
+> +	if (buf->data - s != tpm_buf_length(buf))
+> +		crypto_shash_update(desc, s, buf->data
+> +				    + tpm_buf_length(buf) - s);
+> +	crypto_shash_final(desc, cphash);
+> +
+> +	/* now calculate the hmac */
+> +	hmac_init(desc, auth->session_key, sizeof(auth->session_key)
+> +		  + auth->passphraselen);
+> +	crypto_shash_update(desc, cphash, sizeof(cphash));
+> +	crypto_shash_update(desc, auth->our_nonce, sizeof(auth->our_nonce));
+> +	crypto_shash_update(desc, auth->tpm_nonce, sizeof(auth->tpm_nonce));
+> +	crypto_shash_update(desc, &auth->attrs, 1);
+> +	hmac_final(desc, auth->session_key, sizeof(auth->session_key)
+> +		   + auth->passphraselen, hmac);
+> +}
+> +EXPORT_SYMBOL(tpm_buf_fill_hmac_session);
+> +
+> +static int parse_read_public(char *name, const u8 *data)
+
+Should have 'tpm_' prefix in order to make it easier to trace.
+
+> +{
+> +	struct tpm_output_header *head = (struct tpm_output_header *)data;
+> +	u32 tot_len = be32_to_cpu(head->length);
+> +	u32 val;
+> +
+> +	data += TPM_HEADER_SIZE;
+> +	/* we're starting after the header so adjust the length */
+> +	tot_len -= TPM_HEADER_SIZE;
+> +
+> +	/* skip public */
+> +	val = tpm_get_inc_u16(&data);
+> +	if (val > tot_len)
+> +		return -EINVAL;
+> +	data += val;
+> +	/* name */
+> +	val = tpm_get_inc_u16(&data);
+> +	if (val != SHA256_DIGEST_SIZE + 2)
+> +		return -EINVAL;
+> +	memcpy(name, data, SHA256_DIGEST_SIZE + 2);
+> +	/* forget the rest */
+> +	return 0;
+> +}
+> +
+> +static int tpm2_readpublic(struct tpm_chip *chip, u32 handle, char *name)
+
+Underscore missing.
+
+> +{
+> +	struct tpm_buf buf;
+> +	int rc;
+> +
+> +	rc = tpm_buf_init(&buf, TPM2_ST_NO_SESSIONS, TPM2_CC_READ_PUBLIC);
+> +	if (rc)
+> +		return rc;
+> +
+> +	tpm_buf_append_u32(&buf, handle);
+> +	rc = tpm_transmit_cmd(chip, &chip->kernel_space, buf.data,
+> +			      PAGE_SIZE, 0, 0, "read public");
+> +	if (rc == TPM2_RC_SUCCESS)
+> +		rc = parse_read_public(name, buf.data);
+
+Here, on the other hand, you have the underscore so the name is very
+incoherent ATM.
+
+> +
+> +	tpm_buf_destroy(&buf);
+> +
+> +	return rc;
+> +}
+> +
+> +/**
+> + * tpm_buf_append_name() - add a handle area to the buffer
+> + * @buf: The buffer to be appended
+> + * @auth: the auth structure allocated by tpm2_start_auth_session()
+> + * @handle: The handle to be appended
+> + * @name: The name of the handle (may be NULL)
+> + *
+> + * In order to compute session HMACs, we need to know the names of the
+> + * objects pointed to by the handles.  For most objects, this is simly
+> + * the actual 4 byte handle or an empty buf (in these cases @name
+> + * should be NULL) but for volatile objects, permanent objects and NV
+> + * areas, the name is defined as the hash (according to the name
+> + * algorithm which should be set to sha256) of the public area to
+> + * which the two byte algorithm id has been appended.  For these
+> + * objects, the @name pointer should point to this.  If a name is
+> + * required but @name is NULL, then TPM2_ReadPublic() will be called
+> + * on the handle to obtain the name.
+> + *
+> + * As with most tpm_buf operations, success is assumed because failure
+> + * will be caused by an incorrect programming model and indicated by a
+> + * kernel message.
+> + */
+> +void tpm_buf_append_name(struct tpm_buf *buf, struct tpm2_auth *auth,
+> +			 u32 handle, u8 *name)
+> +{
+> +	int slot;
+> +	u8 mso = handle >> 24;
+> +
+> +	slot = (tpm_buf_length(buf) - TPM_HEADER_SIZE)/4;
+> +	if (slot >= AUTH_MAX_NAMES) {
+> +		dev_err(&auth->chip->dev, "TPM: too many handles\n");
+> +		return;
+> +	}
+> +	WARN(auth->session != tpm_buf_length(buf),
+> +	     "name added in wrong place\n");
+> +	tpm_buf_append_u32(buf, handle);
+> +	auth->session += 4;
+> +
+> +	if (mso == 0x81 || mso == 0x80 || mso == 0x01) {
+> +		if (!name)
+> +			tpm2_readpublic(auth->chip, handle, auth->name[slot]);
+> +	} else {
+> +		if (name)
+> +			dev_err(&auth->chip->dev, "TPM: Handle does not require name but one is specified\n");
+
+Elsewhere the prefix is in lower case.
+`
+> +	}
+> +
+> +	auth->name_h[slot] = handle;
+> +	if (name)
+> +		memcpy(auth->name[slot], name, SHA256_DIGEST_SIZE + 2);
+> +}
+> +EXPORT_SYMBOL(tpm_buf_append_name);
+> +
+> +/**
+> + * tpm_buf_check_hmac_response() - check the TPM return HMAC for correctness
+> + * @buf: the original command buffer (which now contains the response)
+> + * @auth: the auth structure allocated by tpm2_start_auth_session()
+> + * @rc: the return code from tpm_transmit_cmd
+> + *
+> + * If @rc is non zero, @buf may not contain an actual return, so @rc
+> + * is passed through as the return and the session cleaned up and
+> + * de-allocated if required (this is required if
+> + * TPM2_SA_CONTINUE_SESSION was not specified as a session flag).
+> + *
+> + * If @rc is zero, the response HMAC is computed against the returned
+> + * @buf and matched to the TPM one in the session area.  If there is a
+> + * mismatch, an error is logged and -EINVAL returned.
+> + *
+> + * The reason for this is that the command issue and HMAC check
+> + * sequence should look like:
+> + *
+> + *	rc = tpm_transmit_cmd(...);
+> + *	rc = tpm_buf_check_hmac_response(&buf, auth, rc);
+> + *	if (rc)
+> + *		...
+> + *
+> + * Which is easily layered into the current contrl flow.
+> + *
+> + * Returns: 0 on success or an error.
+> + */
+> +int tpm_buf_check_hmac_response(struct tpm_buf *buf, struct tpm2_auth *auth,
+> +				int rc)
+> +{
+> +	struct tpm_output_header *head = (struct tpm_output_header *)buf->data;
+> +	struct tpm_chip *chip = auth->chip;
+> +	const u8 *s, *p;
+> +	u8 rphash[SHA256_DIGEST_SIZE];
+> +	u32 attrs;
+> +	SHASH_DESC_ON_STACK(desc, sha256_hash);
+> +	u16 tag = be16_to_cpu(head->tag);
+> +	u32 cc = be32_to_cpu(auth->ordinal);
+> +	int parm_len, len, i, handles;
+> +
+> +	if (auth->session >= TPM_HEADER_SIZE) {
+> +		WARN(1, "tpm session not filled correctly\n");
+> +		goto out;
+> +	}
+> +
+> +	if (rc != 0)
+> +		/* pass non success rc through and close the session */
+> +		goto out;
+> +
+> +	rc = -EINVAL;
+> +	if (tag != TPM2_ST_SESSIONS) {
+> +		dev_err(&chip->dev, "TPM: HMAC response check has no sessions tag\n");
+> +		goto out;
+> +	}
+> +
+> +	i = tpm2_find_cc(chip, cc);
+> +	if (i < 0)
+> +		goto out;
+> +	attrs = chip->cc_attrs_tbl[i];
+> +	handles = (attrs >> TPM2_CC_ATTR_RHANDLE) & 1;
+> +
+> +	/* point to area beyond handles */
+> +	s = &buf->data[TPM_HEADER_SIZE + handles * 4];
+> +	parm_len = tpm_get_inc_u32(&s);
+> +	p = s;
+> +	s += parm_len;
+> +	/* skip over any sessions before ours */
+> +	for (i = 0; i < auth->session - 1; i++) {
+> +		len = tpm_get_inc_u16(&s);
+> +		s += len + 1;
+> +		len = tpm_get_inc_u16(&s);
+> +		s += len;
+> +	}
+> +	/* TPM nonce */
+> +	len = tpm_get_inc_u16(&s);
+> +	if (s - buf->data + len > tpm_buf_length(buf))
+> +		goto out;
+> +	if (len != SHA256_DIGEST_SIZE)
+> +		goto out;
+> +	memcpy(auth->tpm_nonce, s, len);
+> +	s += len;
+> +	attrs = *s++;
+> +	len = tpm_get_inc_u16(&s);
+> +	if (s - buf->data + len != tpm_buf_length(buf))
+> +		goto out;
+> +	if (len != SHA256_DIGEST_SIZE)
+> +		goto out;
+> +	/*
+> +	 * s points to the HMAC. now calculate comparison, beginning
+> +	 * with rphash
+> +	 */
+> +	desc->tfm = sha256_hash;
+> +	desc->flags = CRYPTO_TFM_REQ_MAY_SLEEP;
+> +	crypto_shash_init(desc);
+> +	/* yes, I know this is now zero, but it's what the standard says */
+> +	crypto_shash_update(desc, (u8 *)&head->return_code,
+> +			    sizeof(head->return_code));
+> +	/* ordinal is already BE */
+> +	crypto_shash_update(desc, (u8 *)&auth->ordinal, sizeof(auth->ordinal));
+> +	crypto_shash_update(desc, p, parm_len);
+> +	crypto_shash_final(desc, rphash);
+> +
+> +	/* now calculate the hmac */
+> +	hmac_init(desc, auth->session_key, sizeof(auth->session_key)
+> +		  + auth->passphraselen);
+> +	crypto_shash_update(desc, rphash, sizeof(rphash));
+> +	crypto_shash_update(desc, auth->tpm_nonce, sizeof(auth->tpm_nonce));
+> +	crypto_shash_update(desc, auth->our_nonce, sizeof(auth->our_nonce));
+> +	crypto_shash_update(desc, &auth->attrs, 1);
+> +	/* we're done with the rphash, so put our idea of the hmac there */
+> +	hmac_final(desc, auth->session_key, sizeof(auth->session_key)
+> +		   + auth->passphraselen, rphash);
+> +	if (memcmp(rphash, s, SHA256_DIGEST_SIZE) == 0) {
+> +		rc = 0;
+> +	} else {
+> +		dev_err(&auth->chip->dev, "TPM: HMAC check failed\n");
+> +		goto out;
+> +	}
+> +
+> +	/* now do response decryption */
+> +	if (auth->attrs & TPM2_SA_ENCRYPT) {
+> +		struct scatterlist sg[1];
+> +		SKCIPHER_REQUEST_ON_STACK(req, auth->aes);
+> +
+> +		skcipher_request_set_tfm(req, auth->aes);
+> +		skcipher_request_set_callback(req, CRYPTO_TFM_REQ_MAY_SLEEP,
+> +					      NULL, NULL);
+> +
+> +		/* need key and IV */
+> +		KDFa(auth->session_key, SHA256_DIGEST_SIZE
+> +		     + auth->passphraselen, "CFB", auth->tpm_nonce,
+> +		     auth->our_nonce, AES_KEYBYTES + AES_BLOCK_SIZE,
+> +		     auth->scratch);
+> +		crypto_skcipher_setkey(auth->aes, auth->scratch, AES_KEYBYTES);
+> +		len = tpm_get_inc_u16(&p);
+> +		sg_init_one(sg, p, len);
+> +		skcipher_request_set_crypt(req, sg, sg, len,
+> +					   auth->scratch + AES_KEYBYTES);
+> +		crypto_skcipher_decrypt(req);
+> +	}
+> +
+> + out:
+> +	if ((auth->attrs & TPM2_SA_CONTINUE_SESSION) == 0) {
+> +		/* manually close the session if it wasn't consumed */
+> +		if (rc)
+> +			tpm2_flush_context_cmd(chip, auth->handle, 0);
+> +		crypto_free_skcipher(auth->aes);
+> +		kfree(auth);
+> +	} else {
+> +		/* reset for next use  */
+> +		auth->session = TPM_HEADER_SIZE;
+> +	}
+> +
+> +	return rc;
+> +}
+> +EXPORT_SYMBOL(tpm_buf_check_hmac_response);
+> +
+> +/**
+> + * tpm2_end_auth_session - kill the allocated auth session
+> + * @auth: the auth structure allocated by tpm2_start_auth_session()
+> + *
+> + * ends the session started by tpm2_start_auth_session and frees all
+> + * the resources.  Under normal conditions,
+> + * tpm_buf_check_hmac_response() will correctly end the session if
+> + * required, so this function is only for use in error legs that will
+> + * bypass the normal invocation of tpm_buf_check_hmac_respons().
+> + */
+> +void tpm2_end_auth_session(struct tpm2_auth *auth)
+> +{
+> +	tpm2_flush_context_cmd(auth->chip, auth->handle, 0);
+> +	crypto_free_skcipher(auth->aes);
+> +	kfree(auth);
+> +}
+> +EXPORT_SYMBOL(tpm2_end_auth_session);
+> +
+> +static int parse_start_auth_session(struct tpm2_auth *auth, const u8 *data)
+
+The prefix...
+
+> +{
+> +	struct tpm_output_header *head = (struct tpm_output_header *)data;
+> +	u32 tot_len = be32_to_cpu(head->length);
+> +	u32 val;
+> +
+> +	data += TPM_HEADER_SIZE;
+> +	/* we're starting after the header so adjust the length */
+> +	tot_len -= TPM_HEADER_SIZE;
+> +
+> +	/* should have handle plus nonce */
+> +	if (tot_len != 4 + 2 + sizeof(auth->tpm_nonce))
+> +		return -EINVAL;
+> +
+> +	auth->handle = tpm_get_inc_u32(&data);
+> +	val = tpm_get_inc_u16(&data);
+> +	if (val != sizeof(auth->tpm_nonce))
+> +		return -EINVAL;
+> +	memcpy(auth->tpm_nonce, data, sizeof(auth->tpm_nonce));
+> +	/* now compute the session key from the nonces */
+> +	KDFa(auth->salt, sizeof(auth->salt), "ATH", auth->tpm_nonce,
+> +	     auth->our_nonce, sizeof(auth->session_key), auth->session_key);
+> +
+> +	return 0;
+> +}
+> +
+> +/**
+> + * tpm2_start_auth_session - create a HMAC authentication session with the TPM
+> + * @chip: the TPM chip structure to create the session with
+> + * @authp: A pointer to an opaque tpm2_auth structure to be allocated
+> + *
+> + * This function contacts the TPM via the kernel space for an
+> + * authentication session, allocates a tpm2_auth structure to contain
+> + * all the session details necessary for performing the HMAC, encrypt
+> + * and decrypt operations, fills it in and returns.
+> + *
+> + * Return: zero on success or actual error encountered.  If return is
+> + * zero, @authp will be allocated.
+> + */
+> +int tpm2_start_auth_session(struct tpm_chip *chip, struct tpm2_auth **authp)
+
+Not good that we have two disjoint things going on in tpm2-cmd.c and
+here.
+
+> +{
+> +	struct tpm_buf buf;
+> +	struct tpm2_auth *auth;
+> +	int rc;
+> +
+> +	auth = kmalloc(sizeof(**authp), GFP_KERNEL);
+> +	if (!auth)
+> +		return -ENOMEM;
+> +
+> +	auth->chip = chip;
+> +	auth->session = TPM_HEADER_SIZE;
+> +
+> +	rc = tpm_buf_init(&buf, TPM2_ST_NO_SESSIONS, TPM2_CC_START_AUTH_SESS);
+> +	if (rc)
+> +		goto out;
+> +
+> +	/* salt key handle */
+> +	tpm_buf_append_u32(&buf, chip->tpmkey);
+> +	/* bind key handle */
+> +	tpm_buf_append_u32(&buf, TPM2_RH_NULL);
+> +	/* nonce caller */
+> +	get_random_bytes(auth->our_nonce, sizeof(auth->our_nonce));
+> +	tpm_buf_append_u16(&buf, sizeof(auth->our_nonce));
+> +	tpm_buf_append(&buf, auth->our_nonce, sizeof(auth->our_nonce));
+> +
+> +	/* append encrypted salt and squirrel away unencrypted in auth */
+> +	tpm_buf_append_salt(&buf, chip, auth);
+> +	/* session type (HMAC, audit or policy) */
+> +	tpm_buf_append_u8(&buf, TPM2_SE_HMAC);
+> +
+> +	/* symmetric encryption parameters */
+> +	/* symmetric algorithm */
+> +	tpm_buf_append_u16(&buf, TPM2_ALG_AES);
+> +	/* bits for symmetric algorithm */
+> +	tpm_buf_append_u16(&buf, AES_KEYBITS);
+> +	/* symmetric algorithm mode (must be CFB) */
+> +	tpm_buf_append_u16(&buf, TPM2_ALG_CFB);
+> +	/* hash algorithm for session */
+> +	tpm_buf_append_u16(&buf, TPM2_ALG_SHA256);
+> +
+> +	rc = tpm_transmit_cmd(chip, &chip->kernel_space, buf.data, PAGE_SIZE,
+> +			      0, 0, "start auth session");
+> +	if (rc == TPM2_RC_SUCCESS)
+> +		rc = parse_start_auth_session(auth, buf.data);
+> +
+> +	tpm_buf_destroy(&buf);
+> +
+> +	if (rc)
+> +		goto out;
+> +
+> +	auth->aes = crypto_alloc_skcipher("cfb(aes)", 0, 0);
+> +	if (IS_ERR(auth->aes)) {
+> +		rc = PTR_ERR(auth->aes);
+> +		dev_err(&chip->dev, "TPM: error getting cfb(aes): %d\n", rc);
+> +	}
+> + out:
+> +	if (rc)
+> +		kfree(auth);
+> +	else
+> +		*authp = auth;
+> +
+> +	return rc;
+> +}
+> +EXPORT_SYMBOL(tpm2_start_auth_session);
+> +
+> +static int parse_create_primary(struct tpm_chip *chip, u8 *data)
+
+Ugh.
+
+> +{
+> +	struct tpm_output_header *head = (struct tpm_output_header *)data;
+> +	u16 len;
+> +	u32 tot_len = be32_to_cpu(head->length);
+> +	u32 handle, val, parm_len;
+> +	const u8 *resp, *tmp;
+> +	SHASH_DESC_ON_STACK(desc, sha256_hash);
+> +
+> +	data += TPM_HEADER_SIZE;
+> +	/* we're starting after the header so adjust the length */
+> +	tot_len -= TPM_HEADER_SIZE;
+> +
+> +	resp = data;
+> +	handle = tpm_get_inc_u32(&resp);
+> +	parm_len = tpm_get_inc_u32(&resp);
+> +	if (parm_len + 8 > tot_len)
+> +		return -EINVAL;
+> +	len = tpm_get_inc_u16(&resp);
+> +	tmp = resp;
+> +	/* now we have the public area, compute the name of the object */
+> +	desc->tfm = sha256_hash;
+> +	desc->flags = CRYPTO_TFM_REQ_MAY_SLEEP;
+> +	put_unaligned_be16(TPM2_ALG_SHA256, chip->tpmkeyname);
+> +	crypto_shash_init(desc);
+> +	crypto_shash_update(desc, resp, len);
+> +	crypto_shash_final(desc, chip->tpmkeyname + 2);
+> +	/* validate the public key */
+> +	val = tpm_get_inc_u16(&tmp);
+> +	/* key type (must be what we asked for) */
+> +	if (val != TPM2_ALG_ECC)
+> +		return -EINVAL;
+> +	val = tpm_get_inc_u16(&tmp);
+> +	/* name algorithm */
+> +	if (val != TPM2_ALG_SHA256)
+> +		return -EINVAL;
+> +	val = tpm_get_inc_u32(&tmp);
+> +	/* object properties */
+> +	if (val != (TPM2_OA_NO_DA |
+> +		    TPM2_OA_FIXED_TPM |
+> +		    TPM2_OA_FIXED_PARENT |
+> +		    TPM2_OA_SENSITIVE_DATA_ORIGIN |
+> +		    TPM2_OA_USER_WITH_AUTH |
+> +		    TPM2_OA_DECRYPT |
+> +		    TPM2_OA_RESTRICTED))
+> +		return -EINVAL;
+> +	/* auth policy (empty) */
+> +	val = tpm_get_inc_u16(&tmp);
+> +	if (val != 0)
+> +		return -EINVAL;
+> +	val = tpm_get_inc_u16(&tmp);
+> +	/* symmetric key parameters */
+> +	if (val != TPM2_ALG_AES)
+> +		return -EINVAL;
+> +	val = tpm_get_inc_u16(&tmp);
+> +	/* symmetric key length */
+> +	if (val != AES_KEYBITS)
+> +		return -EINVAL;
+> +	val = tpm_get_inc_u16(&tmp);
+> +	/* symmetric encryption scheme */
+> +	if (val != TPM2_ALG_CFB)
+> +		return -EINVAL;
+> +	val = tpm_get_inc_u16(&tmp);
+> +	/* signing scheme */
+> +	if (val != TPM2_ALG_NULL)
+> +		return -EINVAL;
+> +	val = tpm_get_inc_u16(&tmp);
+> +	/* ECC Curve */
+> +	if (val != TPM2_ECC_NIST_P256)
+> +		return -EINVAL;
+> +	val = tpm_get_inc_u16(&tmp);
+> +	/* KDF Scheme */
+> +	if (val != TPM2_ALG_NULL)
+> +		return -EINVAL;
+> +	val = tpm_get_inc_u16(&tmp);
+> +	/* x point */
+> +	if (val != 32)
+> +		return -EINVAL;
+> +	memcpy(chip->ec_point_x, tmp, val);
+> +	tmp += val;
+> +	val = tpm_get_inc_u16(&tmp);
+> +	if (val != 32)
+> +		return -EINVAL;
+> +	memcpy(chip->ec_point_y, tmp, val);
+> +	tmp += val;
+> +	resp += len;
+> +	/* should have exactly consumed the tpm2b public structure */
+> +	if (tmp != resp)
+> +		return -EINVAL;
+> +	if (resp - data > parm_len)
+> +		return -EINVAL;
+> +	/* creation data (skip) */
+> +	len = tpm_get_inc_u16(&resp);
+> +	resp += len;
+> +	if (resp - data > parm_len)
+> +		return -EINVAL;
+> +	/* creation digest (must be sha256) */
+> +	len = tpm_get_inc_u16(&resp);
+> +	resp += len;
+> +	if (len != SHA256_DIGEST_SIZE || resp - data > parm_len)
+> +		return -EINVAL;
+> +	/* TPMT_TK_CREATION follows */
+> +	/* tag, must be TPM_ST_CREATION (0x8021) */
+> +	val = tpm_get_inc_u16(&resp);
+> +	if (val != TPM2_ST_CREATION || resp - data > parm_len)
+> +		return -EINVAL;
+> +	/* hierarchy (must be NULL) */
+> +	val = tpm_get_inc_u32(&resp);
+> +	if (val != TPM2_RH_NULL || resp - data > parm_len)
+> +		return -EINVAL;
+> +	/* the ticket digest HMAC (might not be sha256) */
+> +	len = tpm_get_inc_u16(&resp);
+> +	resp += len;
+> +	if (resp - data > parm_len)
+> +		return -EINVAL;
+> +	/*
+> +	 * finally we have the name, which is a sha256 digest plus a 2
+> +	 * byte algorithm type
+> +	 */
+> +	len = tpm_get_inc_u16(&resp);
+> +	if (resp + len - data != parm_len + 8)
+> +		return -EINVAL;
+> +	if (len != SHA256_DIGEST_SIZE + 2)
+> +		return -EINVAL;
+> +
+> +	if (memcmp(chip->tpmkeyname, resp, SHA256_DIGEST_SIZE + 2) != 0) {
+> +		printk("TPM NULL Seed name comparison failed\n");
+> +		return -EINVAL;
+> +	}
+> +
+> +	chip->tpmkey = handle;
+> +
+> +	return 0;
+> +}
+> +
+> +int tpm2_create_null_primary(struct tpm_chip *chip)
+> +{
+> +	int rc;
+> +	struct tpm_buf buf;
+> +	struct tpm_buf template;
+> +
+> +	rc = tpm_buf_init(&buf, TPM2_ST_SESSIONS, TPM2_CC_CREATE_PRIMARY);
+> +	if (rc)
+> +		return rc;
+> +
+> +	rc = tpm_buf_init_2b(&template);
+> +	if (rc) {
+> +		tpm_buf_destroy(&buf);
+> +		return rc;
+> +	}
+> +
+> +	/*
+> +	 * create the template.  Note: in order for userspace to
+> +	 * verify the security of the system, it will have to create
+> +	 * and certify this NULL primary, meaning all the template
+> +	 * parameters will have to be identical, so conform exactly to
+> +	 * the TCG TPM v2.0 Provisioning Guidance for the SRK ECC
+> +	 * key
+> +	 */
+> +
+> +	/* key type */
+> +	tpm_buf_append_u16(&template, TPM2_ALG_ECC);
+> +	/* name algorithm */
+> +	tpm_buf_append_u16(&template, TPM2_ALG_SHA256);
+> +	/* object properties */
+> +	tpm_buf_append_u32(&template, TPM2_OA_NO_DA |
+> +			   TPM2_OA_FIXED_TPM |
+> +			   TPM2_OA_FIXED_PARENT |
+> +			   TPM2_OA_SENSITIVE_DATA_ORIGIN |
+> +			   TPM2_OA_USER_WITH_AUTH |
+> +			   TPM2_OA_DECRYPT |
+> +			   TPM2_OA_RESTRICTED);
+> +	/* sauth policy (empty) */
+> +	tpm_buf_append_u16(&template, 0);
+> +
+> +	/* BEGIN parameters: key specific; for ECC*/
+> +	/* symmetric algorithm */
+> +	tpm_buf_append_u16(&template, TPM2_ALG_AES);
+> +	/* bits for symmetric algorithm */
+> +	tpm_buf_append_u16(&template, 128);
+> +	/* algorithm mode (must be CFB) */
+> +	tpm_buf_append_u16(&template, TPM2_ALG_CFB);
+> +	/* scheme (NULL means any scheme) */
+> +	tpm_buf_append_u16(&template, TPM2_ALG_NULL);
+> +	/* ECC Curve ID */
+> +	tpm_buf_append_u16(&template, TPM2_ECC_NIST_P256);
+> +	/* KDF Scheme */
+> +	tpm_buf_append_u16(&template, TPM2_ALG_NULL);
+> +	/* unique: key specific; for ECC it is two points */
+> +	tpm_buf_append_u16(&template, 0);
+> +	tpm_buf_append_u16(&template, 0);
+> +	/* END parameters */
+> +
+> +	/* primary handle */
+> +	tpm_buf_append_u32(&buf, TPM2_RH_NULL);
+> +	/* simple authorization for empty auth */
+> +	tpm2_buf_append_auth(&buf, TPM2_RS_PW, NULL, 0, 0, NULL, 0);
+> +	/* sensitive create size is 4 for two empty buffers */
+> +	tpm_buf_append_u16(&buf, 4);
+> +	/* sensitive create auth data (empty) */
+> +	tpm_buf_append_u16(&buf, 0);
+> +	/* sensitive create sensitive data (empty) */
+> +	tpm_buf_append_u16(&buf, 0);
+> +	/* the public template */
+> +	tpm_buf_append_2b(&buf, &template);
+> +	tpm_buf_destroy(&template);
+> +	/* outside info (empty) */
+> +	tpm_buf_append_u16(&buf, 0);
+> +	/* creation PCR (none) */
+> +	tpm_buf_append_u32(&buf, 0);
+> +
+> +	rc = tpm_transmit_cmd(chip, &chip->kernel_space, buf.data, PAGE_SIZE,
+> +			      0, 0, "attempting to create NULL primary");
+> +
+> +	if (rc == TPM2_RC_SUCCESS)
+> +		rc = parse_create_primary(chip, buf.data);
+> +
+> +	tpm_buf_destroy(&buf);
+> +
+> +	return rc;
+> +}
+> +
+> +int tpm2_sessions_init(struct tpm_chip *chip)
+> +{
+> +	int rc;
+> +
+> +	rc = tpm2_init_space(&chip->kernel_space);
+> +	if (rc) {
+> +		dev_err(&chip->dev, "TPM: failed to initialize kernel space\n");
+> +		return -ENOMEM;
+> +	}
+> +	sha256_hash = crypto_alloc_shash("sha256", 0, 0);
+> +	if (!sha256_hash) {
+> +		dev_err(&chip->dev, "TPM: failed to allocate hash\n");
+> +		return -ENOMEM;
+> +	}
+> +
+> +	rc = tpm2_create_null_primary(chip);
+> +	if (rc)
+> +		dev_err(&chip->dev, "TPM: security failed (NULL seed derivation): %d\n", rc);
+> +	return rc;
+> +}
+> +EXPORT_SYMBOL(tpm2_sessions_init);
+> diff --git a/drivers/char/tpm/tpm2-sessions.h b/drivers/char/tpm/tpm2-sessions.h
+> new file mode 100644
+> index 000000000000..cea13f411de7
+> --- /dev/null
+> +++ b/drivers/char/tpm/tpm2-sessions.h
+> @@ -0,0 +1,57 @@
+> +/*
+> + * Defines for TPM2 authentications
+> + */
+> +
+> +#ifndef _TPM2_SESSIONS_H
+> +#define _TPM2_SESSIONS_H
+> +
+> +#include "tpm.h"
+> +
+> +enum tpm2_object_attributes {
+> +	TPM2_OA_FIXED_TPM		= BIT(1),
+> +	TPM2_OA_ST_CLEAR		= BIT(2),
+> +	TPM2_OA_FIXED_PARENT		= BIT(4),
+> +	TPM2_OA_SENSITIVE_DATA_ORIGIN	= BIT(5),
+> +	TPM2_OA_USER_WITH_AUTH		= BIT(6),
+> +	TPM2_OA_ADMIN_WITH_POLICY	= BIT(7),
+> +	TPM2_OA_NO_DA			= BIT(10),
+> +	TPM2_OA_ENCRYPTED_DUPLICATION	= BIT(11),
+> +	TPM2_OA_RESTRICTED		= BIT(16),
+> +	TPM2_OA_DECRYPT			= BIT(17),
+> +	TPM2_OA_SIGN			= BIT(18),
+> +};
+> +
+> +enum tpm2_session_attributes {
+> +	TPM2_SA_CONTINUE_SESSION	= BIT(0),
+> +	TPM2_SA_AUDIT_EXCLUSIVE		= BIT(1),
+> +	TPM2_SA_AUDIT_RESET		= BIT(3),
+> +	TPM2_SA_DECRYPT			= BIT(5),
+> +	TPM2_SA_ENCRYPT			= BIT(6),
+> +	TPM2_SA_AUDIT			= BIT(7),
+> +};
+> +
+> +enum tpm2_session_types {
+> +	TPM2_SE_HMAC	= 0x00,
+> +	TPM2_SE_POLICY	= 0x01,
+> +	TPM2_SE_TRIAL	= 0x02,
+> +};
+> +
+> +struct tpm2_auth;
+> +
+> +void tpm2_buf_append_auth(struct tpm_buf *buf, u32 session_handle,
+> +			  const u8 *nonce, u16 nonce_len,
+> +			  u8 attributes,
+> +			  const u8 *hmac, u16 hmac_len);
+> +
+> +int tpm2_start_auth_session(struct tpm_chip *chip, struct tpm2_auth **authp);
+> +void tpm_buf_append_name(struct tpm_buf *buf, struct tpm2_auth *auth,
+> +			 u32 handle, u8 *name);
+> +void tpm_buf_append_hmac_session(struct tpm_buf *buf, struct tpm2_auth *auth,
+> +				 u8 attributes, u8 *passphrase,
+> +				 int passphraselen);
+> +void tpm_buf_fill_hmac_session(struct tpm_buf *buf, struct tpm2_auth *auth);
+> +int tpm_buf_check_hmac_response(struct tpm_buf *buf, struct tpm2_auth *auth,
+> +				int rc);
+> +void tpm2_end_auth_session(struct tpm2_auth *auth);
+> +
+> +#endif
+> -- 
+> 2.16.4
 >
->  #endif
-> --
-> 2.19.1.331.ge82ca0e54c-goog
 >
+
+Last 1/3-1/2 I did not check that good care anymore because at this
+point it does not make sense and I already had spent a lot of time on
+this. This commit should be split into smaller commits that are easier
+to evaluate as a whole. The overal design is something that I can cope
+with but this needs a lot of polishing before considering to merge.
+
+/Jarkko
