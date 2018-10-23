@@ -1,142 +1,97 @@
-Return-Path: <SRS0=XFsj=M6=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:37518 "EHLO
-        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726758AbeJRVB2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 18 Oct 2018 17:01:28 -0400
-From: Yael Chemla <yael.chemla@foss.arm.com>
-To: Gilad Ben-Yossef <gilad@benyossef.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, Ofir Drang <ofir.drang@arm.com>,
-        linux-kernel@vger.kernel.org
-Cc: Yael Chemla <yael.chemla@foss.arm.com>
-Subject: [PATCH 2/3] crypto: ccree:  modify set_cipher_mode usage from cc_hash
-Date: Thu, 18 Oct 2018 13:59:58 +0100
-Message-Id: <1539867599-20504-3-git-send-email-yael.chemla@foss.arm.com>
-In-Reply-To: <1539867599-20504-1-git-send-email-yael.chemla@foss.arm.com>
-References: <1539867599-20504-1-git-send-email-yael.chemla@foss.arm.com>
+Return-Path: <SRS0=BLQr=ND=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mga05.intel.com ([192.55.52.43]:13774 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726080AbeJXIQt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 24 Oct 2018 04:16:49 -0400
+Date: Wed, 24 Oct 2018 02:51:02 +0300 (EEST)
+From: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
+To: James Bottomley <James.Bottomley@HansenPartnership.com>
+cc: linux-integrity@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH v4 0/7] add integrity and security to TPM2 transactions
+In-Reply-To: <1540193596.3202.7.camel@HansenPartnership.com>
+Message-ID: <alpine.DEB.2.21.1810240249180.8524@jsakkine-mobl1>
+References: <1540193596.3202.7.camel@HansenPartnership.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII; format=flowed
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-encapsulate set_cipher_mode call with another api,
-preparation for specific hash behavior as needed in later patches
-when SM3 introduced.
+I would consider sending first a patch set that would iterate the existing
+session stuff to be ready for this i.e. merge in two iterations 
+(emphasis on the word "consider"). We can probably merge the groundwork
+quite fast.
 
-Signed-off-by: Yael Chemla <yael.chemla@foss.arm.com>
----
- drivers/crypto/ccree/cc_hash.c          | 18 +++++++++---------
- drivers/crypto/ccree/cc_hw_queue_defs.h | 14 ++++++++++++++
- 2 files changed, 23 insertions(+), 9 deletions(-)
+/Jarkko
 
-diff --git a/drivers/crypto/ccree/cc_hash.c b/drivers/crypto/ccree/cc_hash.c
-index 7af5b61..adcd9df 100644
---- a/drivers/crypto/ccree/cc_hash.c
-+++ b/drivers/crypto/ccree/cc_hash.c
-@@ -322,7 +322,7 @@ static int cc_fin_result(struct cc_hw_desc *desc, struct ahash_request *req,
- 
- 	/* Get final MAC result */
- 	hw_desc_init(&desc[idx]);
--	set_cipher_mode(&desc[idx], ctx->hw_mode);
-+	set_hash_cipher_mode(&desc[idx], ctx->hw_mode, ctx->hash_mode);
- 	/* TODO */
- 	set_dout_dlli(&desc[idx], state->digest_result_dma_addr, digestsize,
- 		      NS_BIT, 1);
-@@ -441,7 +441,7 @@ static int cc_hash_digest(struct ahash_request *req)
- 	 * digest
- 	 */
- 	hw_desc_init(&desc[idx]);
--	set_cipher_mode(&desc[idx], ctx->hw_mode);
-+	set_hash_cipher_mode(&desc[idx], ctx->hw_mode, ctx->hash_mode);
- 	if (is_hmac) {
- 		set_din_type(&desc[idx], DMA_DLLI, state->digest_buff_dma_addr,
- 			     ctx->inter_digestsize, NS_BIT);
-@@ -455,7 +455,7 @@ static int cc_hash_digest(struct ahash_request *req)
- 
- 	/* Load the hash current length */
- 	hw_desc_init(&desc[idx]);
--	set_cipher_mode(&desc[idx], ctx->hw_mode);
-+	set_hash_cipher_mode(&desc[idx], ctx->hw_mode, ctx->hash_mode);
- 
- 	if (is_hmac) {
- 		set_din_type(&desc[idx], DMA_DLLI,
-@@ -505,7 +505,7 @@ static int cc_restore_hash(struct cc_hw_desc *desc, struct cc_hash_ctx *ctx,
- {
- 	/* Restore hash digest */
- 	hw_desc_init(&desc[idx]);
--	set_cipher_mode(&desc[idx], ctx->hw_mode);
-+	set_hash_cipher_mode(&desc[idx], ctx->hw_mode, ctx->hash_mode);
- 	set_din_type(&desc[idx], DMA_DLLI, state->digest_buff_dma_addr,
- 		     ctx->inter_digestsize, NS_BIT);
- 	set_flow_mode(&desc[idx], S_DIN_to_HASH);
-@@ -514,7 +514,7 @@ static int cc_restore_hash(struct cc_hw_desc *desc, struct cc_hash_ctx *ctx,
- 
- 	/* Restore hash current length */
- 	hw_desc_init(&desc[idx]);
--	set_cipher_mode(&desc[idx], ctx->hw_mode);
-+	set_hash_cipher_mode(&desc[idx], ctx->hw_mode, ctx->hash_mode);
- 	set_cipher_config1(&desc[idx], HASH_PADDING_DISABLED);
- 	set_din_type(&desc[idx], DMA_DLLI, state->digest_bytes_len_dma_addr,
- 		     ctx->hash_len, NS_BIT);
-@@ -577,7 +577,7 @@ static int cc_hash_update(struct ahash_request *req)
- 
- 	/* store the hash digest result in context */
- 	hw_desc_init(&desc[idx]);
--	set_cipher_mode(&desc[idx], ctx->hw_mode);
-+	set_hash_cipher_mode(&desc[idx], ctx->hw_mode, ctx->hash_mode);
- 	set_dout_dlli(&desc[idx], state->digest_buff_dma_addr,
- 		      ctx->inter_digestsize, NS_BIT, 0);
- 	set_flow_mode(&desc[idx], S_HASH_to_DOUT);
-@@ -586,7 +586,7 @@ static int cc_hash_update(struct ahash_request *req)
- 
- 	/* store current hash length in context */
- 	hw_desc_init(&desc[idx]);
--	set_cipher_mode(&desc[idx], ctx->hw_mode);
-+	set_hash_cipher_mode(&desc[idx], ctx->hw_mode, ctx->hash_mode);
- 	set_dout_dlli(&desc[idx], state->digest_bytes_len_dma_addr,
- 		      ctx->hash_len, NS_BIT, 1);
- 	set_queue_last_ind(ctx->drvdata, &desc[idx]);
-@@ -650,7 +650,7 @@ static int cc_do_finup(struct ahash_request *req, bool update)
- 	/* Pad the hash */
- 	hw_desc_init(&desc[idx]);
- 	set_cipher_do(&desc[idx], DO_PAD);
--	set_cipher_mode(&desc[idx], ctx->hw_mode);
-+	set_hash_cipher_mode(&desc[idx], ctx->hw_mode, ctx->hash_mode);
- 	set_dout_dlli(&desc[idx], state->digest_bytes_len_dma_addr,
- 		      ctx->hash_len, NS_BIT, 0);
- 	set_setup_mode(&desc[idx], SETUP_WRITE_STATE1);
-@@ -2035,7 +2035,7 @@ static void cc_setup_xcbc(struct ahash_request *areq, struct cc_hw_desc desc[],
- 					    XCBC_MAC_K1_OFFSET),
- 		     CC_AES_128_BIT_KEY_SIZE, NS_BIT);
- 	set_setup_mode(&desc[idx], SETUP_LOAD_KEY0);
--	set_cipher_mode(&desc[idx], DRV_CIPHER_XCBC_MAC);
-+	set_hash_cipher_mode(&desc[idx], DRV_CIPHER_XCBC_MAC, ctx->hash_mode);
- 	set_cipher_config0(&desc[idx], DESC_DIRECTION_ENCRYPT_ENCRYPT);
- 	set_key_size_aes(&desc[idx], CC_AES_128_BIT_KEY_SIZE);
- 	set_flow_mode(&desc[idx], S_DIN_to_AES);
-diff --git a/drivers/crypto/ccree/cc_hw_queue_defs.h b/drivers/crypto/ccree/cc_hw_queue_defs.h
-index 45985b9..b367b67 100644
---- a/drivers/crypto/ccree/cc_hw_queue_defs.h
-+++ b/drivers/crypto/ccree/cc_hw_queue_defs.h
-@@ -455,6 +455,20 @@ static inline void set_cipher_mode(struct cc_hw_desc *pdesc, int mode)
- }
- 
- /*
-+ * Set the cipher mode for hash algorithms.
-+ *
-+ * @pdesc: pointer HW descriptor struct
-+ * @cipher_mode:  Any one of the modes defined in [CC7x-DESC]
-+ * @hash_mode: specifies which hash is being handled
-+ */
-+static inline void set_hash_cipher_mode(struct cc_hw_desc *pdesc,
-+					enum drv_cipher_mode cipher_mode,
-+					enum drv_hash_mode hash_mode)
-+{
-+	set_cipher_mode(pdesc, cipher_mode);
-+}
-+
-+/*
-  * Set the cipher configuration fields.
-  *
-  * @pdesc: pointer HW descriptor struct
--- 
-2.7.4
+On Mon, 22 Oct 2018, James Bottomley wrote:
+> By now, everybody knows we have a problem with the TPM2_RS_PW easy
+> button on TPM2 in that transactions on the TPM bus can be intercepted
+> and altered.  The way to fix this is to use real sessions for HMAC
+> capabilities to ensure integrity and to use parameter and response
+> encryption to ensure confidentiality of the data flowing over the TPM
+> bus.
+>
+> This patch series is about adding a simple API which can ensure the
+> above properties as a layered addition to the existing TPM handling
+> code.  This series now includes protections for PCR extend, getting
+> random numbers from the TPM and data sealing and unsealing.  It
+> therefore eliminates all uses of TPM2_RS_PW in the kernel and adds
+> encryption protection to sensitive data flowing into and out of the
+> TPM.
+>
+> In the third version I added data sealing and unsealing protection,
+> apart from one API based problem which means that the way trusted keys
+> were protected it's not currently possible to HMAC protect an authority
+> that comes with a policy, so the API will have to be extended to fix
+> that case
+>
+> In this fourth version, I tidy up some of the code and add more
+> security features, the most notable is that we now calculate the NULL
+> seed name and compare our calculation to the value returned in
+> TPM2_ReadPublic, which means we now can't be spoofed.  This version
+> also gives a sysfs variable for the null seed which userspace can use
+> to run a key certification operation to prove that the TPM was always
+> secure when communicating with the kernel.
+>
+> I've verified this using the test suite in the last patch on a VM
+> connected to a tpm2 emulator.  I also instrumented the emulator to make
+> sure the sensitive data was properly encrypted.
+>
+> James
+>
+> ---
+>
+>
+> James Bottomley (7):
+>  tpm-buf: create new functions for handling TPM buffers
+>  tpm2-sessions: Add full HMAC and encrypt/decrypt session handling
+>  tpm2: add hmac checks to tpm2_pcr_extend()
+>  tpm2: add session encryption protection to tpm2_get_random()
+>  trusted keys: Add session encryption protection to the seal/unseal
+>    path
+>  tpm: add the null key name as a tpm2 sysfs variable
+>  tpm2-sessions: NOT FOR COMMITTING add sessions testing
+>
+> drivers/char/tpm/Kconfig              |    3 +
+> drivers/char/tpm/Makefile             |    3 +-
+> drivers/char/tpm/tpm-buf.c            |  191 ++++++
+> drivers/char/tpm/tpm-chip.c           |    1 +
+> drivers/char/tpm/tpm-sysfs.c          |   27 +-
+> drivers/char/tpm/tpm.h                |  129 ++--
+> drivers/char/tpm/tpm2-cmd.c           |  248 ++++---
+> drivers/char/tpm/tpm2-sessions-test.c |  360 ++++++++++
+> drivers/char/tpm/tpm2-sessions.c      | 1188 +++++++++++++++++++++++++++++++++
+> drivers/char/tpm/tpm2-sessions.h      |   57 ++
+> 10 files changed, 2027 insertions(+), 180 deletions(-)
+> create mode 100644 drivers/char/tpm/tpm-buf.c
+> create mode 100644 drivers/char/tpm/tpm2-sessions-test.c
+> create mode 100644 drivers/char/tpm/tpm2-sessions.c
+> create mode 100644 drivers/char/tpm/tpm2-sessions.h
+>
+> -- 
+> 2.16.4
+>
+>
