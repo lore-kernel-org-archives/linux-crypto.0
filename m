@@ -2,274 +2,194 @@ Return-Path: <SRS0=BLQr=ND=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DBB88C46475
-	for <linux-crypto@archiver.kernel.org>; Tue, 23 Oct 2018 10:08:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10E65C67863
+	for <linux-crypto@archiver.kernel.org>; Tue, 23 Oct 2018 10:40:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8D41920665
-	for <linux-crypto@archiver.kernel.org>; Tue, 23 Oct 2018 10:08:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C7E7A20652
+	for <linux-crypto@archiver.kernel.org>; Tue, 23 Oct 2018 10:40:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=linaro.org header.i=@linaro.org header.b="AkGw8u+v"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D41920665
+	dkim=pass (1024-bit key) header.d=linaro.org header.i=@linaro.org header.b="jRmlsPlM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7E7A20652
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-crypto-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729021AbeJWSbJ (ORCPT
+        id S1727758AbeJWTD2 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 23 Oct 2018 14:31:09 -0400
-Received: from mail-io1-f66.google.com ([209.85.166.66]:38007 "EHLO
-        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728960AbeJWSbJ (ORCPT
+        Tue, 23 Oct 2018 15:03:28 -0400
+Received: from mail-it1-f193.google.com ([209.85.166.193]:39764 "EHLO
+        mail-it1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727757AbeJWTD2 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 23 Oct 2018 14:31:09 -0400
-Received: by mail-io1-f66.google.com with SMTP id q18-v6so498094iod.5
-        for <linux-crypto@vger.kernel.org>; Tue, 23 Oct 2018 03:08:25 -0700 (PDT)
+        Tue, 23 Oct 2018 15:03:28 -0400
+Received: by mail-it1-f193.google.com with SMTP id m15so1423161itl.4
+        for <linux-crypto@vger.kernel.org>; Tue, 23 Oct 2018 03:40:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=mime-version:in-reply-to:references:from:date:message-id:subject:to
-         :cc;
-        bh=4Tv2EGbKZdg+Y7fx+ddBCa34X7mu4KVtVnJFMpnx0Xs=;
-        b=AkGw8u+vUKT55bLIt0y+4HvD9BUQafuVz1OaPVHQHXytLYKVHDNW86rAo3nvsvuiVN
-         CjuVUlXtukmjblDAh5dRofmkFehKD1nFkKkiWh/8W9WHwiJbbuYObGgakejBIYeyYzXQ
-         F4wWkG2GjUdKYpMTyEgacPEGsTNwvlb/Hi50Q=
+         :cc:content-transfer-encoding;
+        bh=umVJRm+Q8LyQ43wRvgLS7GmIknwhy36zd2FIlxnBkSQ=;
+        b=jRmlsPlMqiVzjkb0tVI9qGV4p4VddLjWwnIfzQLhiZjN1SQtgOXI1UUi4/Bwkqwt+x
+         SkvrECsjUkDQUTs7CP//73FG9XMj7eLXSdMcSUjjk3ff7mPgOPWniPgT0nPabFGMZaMd
+         LafKZOaBCx8XlF1gxrZxGgwPAsWxAqa4baCWg=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:in-reply-to:references:from:date
-         :message-id:subject:to:cc;
-        bh=4Tv2EGbKZdg+Y7fx+ddBCa34X7mu4KVtVnJFMpnx0Xs=;
-        b=Wg+cUsxfyxkJmsZxWMXGVHUzo0QCLXmFaOTMvA9EnQgdqkypoa51TPuxECJ/O0hCgH
-         BcHAQUF9gh50NyV8N6zvN2TosuMHVWZRGOgdpn5eOwE4Lzb272JVfRmuJC/hSchvkYwG
-         pWM77TglqoVPg3xgHhSK7o4SRp8vL1qnjPgUNuONftmSlUojAv7cG+9uZJE3KMdMV73L
-         CdB/eLBMPu/rDqL9vUy0qVuyiRc4dmaU0/ZPwUOoHlVGHFAyKkidCi8sBeTGDE4mt+Al
-         S+gobY0Rp0SgNfb3SJW5HNBNzhyTB419GbvCsImcGBsgWp4+G+06IuSSKzNZj3DYKnRZ
-         vkqw==
-X-Gm-Message-State: AGRZ1gKdZdEr8EJwL3lWbUbBbmC6prJOgBz4XPJFcz7ScZzrRPfE0rZ+
-        /V6gOoTF95WdeW33oXk/HEroiu0fm49ijvkcG9sQdg==
-X-Google-Smtp-Source: AJdET5fO+o6NnHi/zF1ym7Bw8/0GcHFMeDQrsXOlOJJ6xQdcSlAVFn18nMAvoJcVxICAxdV5DOmjG7iPBWt+s0sn/+w=
-X-Received: by 2002:a6b:be83:: with SMTP id o125-v6mr11125789iof.173.1540289305349;
- Tue, 23 Oct 2018 03:08:25 -0700 (PDT)
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=umVJRm+Q8LyQ43wRvgLS7GmIknwhy36zd2FIlxnBkSQ=;
+        b=DfSJ2V+ekEaMiIqzI0KtKWf1HHLxr27Dw2J3soAxtL/nUm8OAxn4j8eUQ0DqSXBdbU
+         nszUHZd7VXSr9WVi8q+ntUK7T9qqzGcN7AHxCTSVOpMXWYl5b4SrnINlmYVdSQTcju9M
+         lNYxf5fT2j4cmt2xnNYcJPcpGXYyyMgFhGMg+HcLmtcMQq+XSDKZ4S42ehzf/9VJLSvY
+         WSEtOmNgaiF/6WTexHnvsNmDPD/mzUhTxkUi4rMVHTYo9D9H/KxSCK+5elG7U+Z+bDT3
+         SToLzFoqR3YGYXsmxjUD/oTZ5Q4FguWR4ojvL1D/3DnumoPICvXp3irkNWMcIGFTZG4H
+         FQhA==
+X-Gm-Message-State: ABuFfoiEvFVy7fFBJmyu/b2tGFVgjTkTAeYS1yFYJmB/SrvI3ykRbeue
+        rY22O15cvXA9GmaRByuG4CvRz0bBzJxDjO/Yftt7HQ==
+X-Google-Smtp-Source: ACcGV61mlKSnCfm9NA6BH3hPIrvyvN3u/GTL93HVlTAhpRtz0tdlSjLKRSwCERDLEGCJxwb1AD5y8FgYaKyhO5l4k0s=
+X-Received: by 2002:a05:660c:383:: with SMTP id x3mr10843540itj.121.1540291235318;
+ Tue, 23 Oct 2018 03:40:35 -0700 (PDT)
 MIME-Version: 1.0
-Received: by 2002:a6b:5910:0:0:0:0:0 with HTTP; Tue, 23 Oct 2018 03:08:24
+Received: by 2002:a6b:5910:0:0:0:0:0 with HTTP; Tue, 23 Oct 2018 03:40:34
  -0700 (PDT)
-In-Reply-To: <1540278091.3347.9.camel@HansenPartnership.com>
-References: <1540193596.3202.7.camel@HansenPartnership.com>
- <1540193787.3202.10.camel@HansenPartnership.com> <CAKv+Gu-gYLY1vmtgFC0MTkBfsAkPz658ELaGW78MbD=6ROrLFQ@mail.gmail.com>
- <1540278091.3347.9.camel@HansenPartnership.com>
+In-Reply-To: <20181020071206.GE876@sol.localdomain>
+References: <20181015175424.97147-1-ebiggers@kernel.org> <20181015175424.97147-12-ebiggers@kernel.org>
+ <CAKv+Gu9wrOOk-LGPYmxgLbv86uXzMeHN6th3mMEDT3Vg893HWw@mail.gmail.com> <20181020071206.GE876@sol.localdomain>
 From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Tue, 23 Oct 2018 07:08:24 -0300
+Date:   Tue, 23 Oct 2018 07:40:34 -0300
 Message-ID:
- <CAKv+Gu8T8yGEu2GWWKzLXR=wgd=mYHcTYLrD69_zpaddQK3Zxw@mail.gmail.com>
-Subject: Re: [PATCH v4 2/7] tpm2-sessions: Add full HMAC and encrypt/decrypt
- session handling
-To:     James Bottomley <James.Bottomley@hansenpartnership.com>
-Cc:     linux-integrity <linux-integrity@vger.kernel.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        linux-security-module <linux-security-module@vger.kernel.org>,
-        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
+ <CAKv+Gu9zBKK7ughbBAKkHdfgX2KrBXkF6MhH3xrSdLegrjjYJQ@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 11/12] crypto: adiantum - add Adiantum support
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>, linux-fscrypt@vger.kernel.org,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Paul Crowley <paulcrowley@google.com>,
+        Greg Kaiser <gkaiser@google.com>,
+        Michael Halcrow <mhalcrow@google.com>,
+        "Jason A . Donenfeld" <Jason@zx2c4.com>,
+        Samuel Neves <samuel.c.p.neves@gmail.com>,
+        Tomer Ashur <tomer.ashur@esat.kuleuven.be>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
-Message-ID: <20181023100824.f4j0GBBNyi_utmnnF4APGryYeb_AWzYkQFpuyj59AT0@z>
+Message-ID: <20181023104034.d0LNF0P8Mj4pIbRW4D5hI_exz8g0XgrWbMiWiOSh5RE@z>
 
-On 23 October 2018 at 04:01, James Bottomley
-<James.Bottomley@hansenpartnership.com> wrote:
-> On Mon, 2018-10-22 at 19:19 -0300, Ard Biesheuvel wrote:
-> [...]
->> > +static void hmac_init(struct shash_desc *desc, u8 *key, int
->> > keylen)
->> > +{
->> > +       u8 pad[SHA256_BLOCK_SIZE];
->> > +       int i;
->> > +
->> > +       desc->tfm = sha256_hash;
->> > +       desc->flags = CRYPTO_TFM_REQ_MAY_SLEEP;
->>
->> I don't think this actually does anything in the shash API
->> implementation, so you can drop this.
+On 20 October 2018 at 15:12, Eric Biggers <ebiggers@kernel.org> wrote:
+> Hi Ard,
 >
-> OK, I find crypto somewhat hard to follow.  There were bits I had to
-> understand, like when I wrote the CFB implementation or when I fixed
-> the ECDH scatterlist handling, but I've got to confess, in time
-> honoured tradition I simply copied this from EVM crypto without
-> actually digging into the code to understand why.
+> On Sat, Oct 20, 2018 at 12:17:58PM +0800, Ard Biesheuvel wrote:
+>> On 16 October 2018 at 01:54, Eric Biggers <ebiggers@kernel.org> wrote:
+>> > From: Eric Biggers <ebiggers@google.com>
+>> >
+>> > Add support for the Adiantum encryption mode.  Adiantum was designed b=
+y
+>> > Paul Crowley and is specified by our paper:
+>> >
+>> >     Adiantum: length-preserving encryption for entry-level processors
+>> >     (https://eprint.iacr.org/2018/720.pdf)
+>> >
+>> > See our paper for full details; this patch only provides an overview.
+>> >
+>> > Adiantum is a tweakable, length-preserving encryption mode designed fo=
+r
+>> > fast and secure disk encryption, especially on CPUs without dedicated
+>> > crypto instructions.  Adiantum encrypts each sector using the XChaCha1=
+2
+>> > stream cipher, two passes of an =CE=B5-almost-=E2=88=86-universal (=CE=
+=B5A=E2=88=86U) hash
+>> > function, and an invocation of the AES-256 block cipher on a single
+>> > 16-byte block.  On CPUs without AES instructions, Adiantum is much
+>> > faster than AES-XTS; for example, on ARM Cortex-A7, on 4096-byte secto=
+rs
+>> > Adiantum encryption is about 4 times faster than AES-256-XTS encryptio=
+n,
+>> > and decryption about 5 times faster.
+>> >
+>> > Adiantum is a specialization of the more general HBSH construction.  O=
+ur
+>> > earlier proposal, HPolyC, was also a HBSH specialization, but it used =
+a
+>> > different =CE=B5A=E2=88=86U hash function, one based on Poly1305 only.=
+  Adiantum's
+>> > =CE=B5A=E2=88=86U hash function, which is based primarily on the "NH" =
+hash function
+>> > like that used in UMAC (RFC4418), is about twice as fast as HPolyC's;
+>> > consequently, Adiantum is about 20% faster than HPolyC.
+>> >
+>> > This speed comes with no loss of security: Adiantum is provably just a=
+s
+>> > secure as HPolyC, in fact slightly *more* secure.  Like HPolyC,
+>> > Adiantum's security is reducible to that of XChaCha12 and AES-256,
+>> > subject to a security bound.  XChaCha12 itself has a security reductio=
+n
+>> > to ChaCha12.  Therefore, one need not "trust" Adiantum; one need only
+>> > trust ChaCha12 and AES-256.  Note that the =CE=B5A=E2=88=86U hash func=
+tion is only
+>> > used for its proven combinatorical properties so cannot be "broken".
+>> >
+>>
+>> So what happens if the part of the input covered by the block cipher
+>> is identical between different generations of the same disk block
+>> (whose sector count is used as the 'outer' IV). How are we not in the
+>> same boat as before when using stream ciphers for disk encryption?
+>>
 >
-
-Yeah, it is notoriously hard to use, and we should try to improve that.
-
->>  However, I take it this means that hmac_init() is never called in
->> contexts where sleeping is not allowed? For the relevance of that,
->> please see below.
+> This is the point of the hash step.  The value encrypted with the block c=
+ipher
+> to produce the intermediate value C_M (used as the stream cipher nonce) i=
+s
+> H(T, P_L) + P_R.  (T is the tweak a.k.a the IV, P_L is the plaintext exce=
+pt the
+> last 16 bytes, P_R is the last 16 bytes.)  A collision in this value occu=
+rs iff:
 >
-> Right, these routines are always called as an adjunct to a TPM
-> operation and TPM operations can sleep, so we must at least have kernel
-> thread context.
+>         H(T1, P1_L) + P1_R =3D H(T2, P2_L) + P2_R
+> i.e.
+>         H(T1, P1_L) - H(T2, P2_L) =3D P2_R - P1_R
 >
-> [...]
->> > +       /* encrypt before HMAC */
->> > +       if (auth->attrs & TPM2_SA_DECRYPT) {
->> > +               struct scatterlist sg[1];
->> > +               u16 len;
->> > +               SKCIPHER_REQUEST_ON_STACK(req, auth->aes);
->> > +
->> > +               skcipher_request_set_tfm(req, auth->aes);
->> > +               skcipher_request_set_callback(req,
->> > CRYPTO_TFM_REQ_MAY_SLEEP,
->> > +                                             NULL, NULL);
->> > +
->>
->> Your crypto_alloc_skcipher() call [further down] does not mask out
->> CRYPTO_ALG_ASYNC, and so it permits asynchronous implementations to
->> be selected. Your generic cfb template only permits synchronous
->> implementations, since it wraps the cipher directly (which is always
->> synchronous). However, we have support in the tree for some
->> accelerators that implement cfb(aes), and those will return
->> -EINPROGRESS when invoking crypto_skcipher_en/decrypt(req), which you
->> are not set up to handle.
->>
->> So the simple solution is to call 'crypto_alloc_skcipher("cfb(aes)",
->> 0, CRYPTO_ALG_ASYNC)' below instead.
->>
->> However, I would prefer it if we permit asynchronous skciphers here.
->> The reason is that, on a given platform, the accelerator may be the
->> only truly time invariant AES implementation that is available, and
->> since we are dealing with the TPM, a bit of paranoia does not hurt.
->> It also makes it easier to implement it as a [time invariant] SIMD
->> based asynchronous skcipher, which are simpler than synchronous ones
->> since they don't require a non-SIMD fallback path for calls from
->> contexts where the SIMD unit may not be used.
->>
->> I have already implemented cfb(aes) for arm64/NEON. I will post the
->> patch after the merge window closes.
->>
->> > +               /* need key and IV */
->> > +               KDFa(auth->session_key, SHA256_DIGEST_SIZE
->> > +                    + auth->passphraselen, "CFB", auth->our_nonce,
->> > +                    auth->tpm_nonce, AES_KEYBYTES +
->> > AES_BLOCK_SIZE,
->> > +                    auth->scratch);
->> > +               crypto_skcipher_setkey(auth->aes, auth->scratch,
->> > AES_KEYBYTES);
->> > +               len = tpm_get_inc_u16(&p);
->> > +               sg_init_one(sg, p, len);
->> > +               skcipher_request_set_crypt(req, sg, sg, len,
->> > +                                          auth->scratch +
->> > AES_KEYBYTES);
->> > +               crypto_skcipher_encrypt(req);
->>
->> So please consider replacing this with something like.
->>
->> DECLARE_CRYPTO_WAIT(wait); [further up]
->> skcipher_request_set_callback(req, CRYPTO_TFM_REQ_MAY_SLEEP,
->>                               crypto_req_done, &wait);
->> crypto_wait_req(crypto_skcipher_encrypt(req), &wait);
+> If (T1, P1_L) =3D (T2, P2_L) then P1_R !=3D P2_R so the equation has no s=
+olutions
+> (since we don't consider queries where the whole input is the same; those
+> unavoidably produce the same ciphertext).  Otherwise (T1, P1_L) !=3D (T2,=
+ P2_L),
+> and since the hash function H is =CE=B5-almost-=E2=88=86-universal over i=
+ntegers mod 2^128,
+> the equation is true for at most a very small proportion '=CE=B5' of hash=
+ keys.
+> But, the hash key is chosen at random and is unknown to the attacker.
 >
-> Sure, I can do this ... the crypto skcipher handling was also cut and
-> paste, but I forget where from this time.  So what I think you're
-> asking for is below as the incremental diff?  I've tested this out and
-> it all works fine in my session testing environment (and on my real
-> laptop) ... although since I'm fully sync, I won't really have tested
-> the -EINPROGRESS do the wait case.
+> The same applies in the other direction, for chosen ciphertext attacks.
+>
+> Basically, it's very difficult for an attacker to cause the intermediate =
+value
+> C_M to be reused, and the outputs will appear random until they do.
+>
+> Of course, all this is explained much more precisely and comprehensively =
+in our
+> paper.  See section 5, "Security reduction".
 >
 
-Yes that looks fine. I will try to test this on one of my arm64
-systems, but it may take me some time to get around to it.
+Thanks for the explanation. I saw that the result of the AES
+encryption was used as the XChaCha nonce, but I failed to spot that
+the result of the nhpoly1305 pass is added/subtracted to/from that
+particular block first.
 
-In any case,
+In any case, this looks good to me: as far as I can tell, the code
+implements the algorithm as described in the paper, and the plumbing
+into the crypto API looks correct to me as well.
 
-Reviewed-by: Ard Biesheuvel <ard.biesheuvel@linaro.org> # crypto API parts
+Reviewed-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
->
-> diff --git a/drivers/char/tpm/tpm2-sessions.c b/drivers/char/tpm/tpm2-sessions.c
-> index 422c3ec64f8c..bbd3e8580954 100644
-> --- a/drivers/char/tpm/tpm2-sessions.c
-> +++ b/drivers/char/tpm/tpm2-sessions.c
-> @@ -165,7 +165,6 @@ static void hmac_init(struct shash_desc *desc, u8 *key, int keylen)
->         int i;
->
->         desc->tfm = sha256_hash;
-> -       desc->flags = CRYPTO_TFM_REQ_MAY_SLEEP;
->         crypto_shash_init(desc);
->         for (i = 0; i < sizeof(pad); i++) {
->                 if (i < keylen)
-> @@ -244,7 +243,6 @@ static void KDFe(u8 z[EC_PT_SZ], const char *str, u8 *pt_u, u8 *pt_v,
->         __be32 c = cpu_to_be32(1);
->
->         desc->tfm = sha256_hash;
-> -       desc->flags = CRYPTO_TFM_REQ_MAY_SLEEP;
->
->         crypto_shash_init(desc);
->         /* counter (BE) */
-> @@ -445,7 +443,6 @@ void tpm_buf_fill_hmac_session(struct tpm_buf *buf, struct tpm2_auth *auth)
->         auth->ordinal = head->ordinal;
->
->         desc->tfm = sha256_hash;
-> -       desc->flags = CRYPTO_TFM_REQ_MAY_SLEEP;
->
->         cc = be32_to_cpu(head->ordinal);
->
-> @@ -514,10 +511,11 @@ void tpm_buf_fill_hmac_session(struct tpm_buf *buf, struct tpm2_auth *auth)
->                 struct scatterlist sg[1];
->                 u16 len;
->                 SKCIPHER_REQUEST_ON_STACK(req, auth->aes);
-> +               DECLARE_CRYPTO_WAIT(wait);
->
->                 skcipher_request_set_tfm(req, auth->aes);
->                 skcipher_request_set_callback(req, CRYPTO_TFM_REQ_MAY_SLEEP,
-> -                                             NULL, NULL);
-> +                                             crypto_req_done, &wait);
->
->                 /* need key and IV */
->                 KDFa(auth->session_key, SHA256_DIGEST_SIZE
-> @@ -529,7 +527,7 @@ void tpm_buf_fill_hmac_session(struct tpm_buf *buf, struct tpm2_auth *auth)
->                 sg_init_one(sg, p, len);
->                 skcipher_request_set_crypt(req, sg, sg, len,
->                                            auth->scratch + AES_KEYBYTES);
-> -               crypto_skcipher_encrypt(req);
-> +               crypto_wait_req(crypto_skcipher_encrypt(req), &wait);
->                 /* reset p to beginning of parameters for HMAC */
->                 p -= 2;
->         }
-> @@ -755,7 +753,6 @@ int tpm_buf_check_hmac_response(struct tpm_buf *buf, struct tpm2_auth *auth,
->          * with rphash
->          */
->         desc->tfm = sha256_hash;
-> -       desc->flags = CRYPTO_TFM_REQ_MAY_SLEEP;
->         crypto_shash_init(desc);
->         /* yes, I know this is now zero, but it's what the standard says */
->         crypto_shash_update(desc, (u8 *)&head->return_code,
-> @@ -786,10 +783,11 @@ int tpm_buf_check_hmac_response(struct tpm_buf *buf, struct tpm2_auth *auth,
->         if (auth->attrs & TPM2_SA_ENCRYPT) {
->                 struct scatterlist sg[1];
->                 SKCIPHER_REQUEST_ON_STACK(req, auth->aes);
-> +               DECLARE_CRYPTO_WAIT(wait);
->
->                 skcipher_request_set_tfm(req, auth->aes);
->                 skcipher_request_set_callback(req, CRYPTO_TFM_REQ_MAY_SLEEP,
-> -                                             NULL, NULL);
-> +                                             crypto_req_done, &wait);
->
->                 /* need key and IV */
->                 KDFa(auth->session_key, SHA256_DIGEST_SIZE
-> @@ -801,7 +799,7 @@ int tpm_buf_check_hmac_response(struct tpm_buf *buf, struct tpm2_auth *auth,
->                 sg_init_one(sg, p, len);
->                 skcipher_request_set_crypt(req, sg, sg, len,
->                                            auth->scratch + AES_KEYBYTES);
-> -               crypto_skcipher_decrypt(req);
-> +               crypto_wait_req(crypto_skcipher_decrypt(req), &wait);
->         }
->
->   out:
-> @@ -965,7 +963,6 @@ static int parse_create_primary(struct tpm_chip *chip, u8 *data)
->         tmp = resp;
->         /* now we have the public area, compute the name of the object */
->         desc->tfm = sha256_hash;
-> -       desc->flags = CRYPTO_TFM_REQ_MAY_SLEEP;
->         put_unaligned_be16(TPM2_ALG_SHA256, chip->tpmkeyname);
->         crypto_shash_init(desc);
->         crypto_shash_update(desc, resp, len);
+Whether the paper is correct is a different matter: it looks
+convincing to me but IANAC.
+
+The only request I have is to add a speed test to tcrypt as well so we
+can easily benchmark it.
