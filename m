@@ -1,153 +1,154 @@
-Return-Path: <SRS0=Iqog=M5=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-eopbgr80055.outbound.protection.outlook.com ([40.107.8.55]:8163
-        "EHLO EUR04-VI1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727331AbeJQUdb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 17 Oct 2018 16:33:31 -0400
-From: Leonard Crestez <leonard.crestez@nxp.com>
-To: Shawn Guo <shawnguo@kernel.org>,
-        Fabio Estevam <fabio.estevam@nxp.com>
-CC: Rob Herring <robh+dt@kernel.org>,
-        Marek Vasut <marek.vasut@gmail.com>,
+Return-Path: <SRS0=schb=NE=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:55724 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725829AbeJYGgJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 25 Oct 2018 02:36:09 -0400
+Date: Wed, 24 Oct 2018 15:06:17 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>, linux-fscrypt@vger.kernel.org,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Horia Geanta <horia.geanta@nxp.com>,
-        Franck Lenormand <franck.lenormand@nxp.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        "David S . Miller " <davem@davemloft.net>,
-        Mark Rutland <mark.rutland@arm.com>,
-        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-arm-kernel@lists.infradead.org"
-        <linux-arm-kernel@lists.infradead.org>,
-        dl-linux-imx <linux-imx@nxp.com>,
-        "kernel@pengutronix.de" <kernel@pengutronix.de>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: [PATCH v4 2/4] crypto: mxs-dcp - Add support for dcp clk
-Date: Wed, 17 Oct 2018 12:37:53 +0000
-Message-ID: <95dce7010676581691b1ac9906e9298470e0aa1a.1539779579.git.leonard.crestez@nxp.com>
-References: <cover.1539779579.git.leonard.crestez@nxp.com>
-In-Reply-To: <cover.1539779579.git.leonard.crestez@nxp.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+        Paul Crowley <paulcrowley@google.com>,
+        Greg Kaiser <gkaiser@google.com>,
+        Michael Halcrow <mhalcrow@google.com>,
+        "Jason A . Donenfeld" <Jason@zx2c4.com>,
+        Samuel Neves <samuel.c.p.neves@gmail.com>,
+        Tomer Ashur <tomer.ashur@esat.kuleuven.be>
+Subject: Re: [RFC PATCH v2 11/12] crypto: adiantum - add Adiantum support
+Message-ID: <20181024220614.GA13497@gmail.com>
+References: <20181015175424.97147-1-ebiggers@kernel.org>
+ <20181015175424.97147-12-ebiggers@kernel.org>
+ <CAKv+Gu9wrOOk-LGPYmxgLbv86uXzMeHN6th3mMEDT3Vg893HWw@mail.gmail.com>
+ <20181020071206.GE876@sol.localdomain>
+ <CAKv+Gu9zBKK7ughbBAKkHdfgX2KrBXkF6MhH3xrSdLegrjjYJQ@mail.gmail.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAKv+Gu9zBKK7ughbBAKkHdfgX2KrBXkF6MhH3xrSdLegrjjYJQ@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 6ull and 6sll the DCP block has a clock which needs to be explicitly
-enabled.
+On Tue, Oct 23, 2018 at 07:40:34AM -0300, Ard Biesheuvel wrote:
+> On 20 October 2018 at 15:12, Eric Biggers <ebiggers@kernel.org> wrote:
+> > Hi Ard,
+> >
+> > On Sat, Oct 20, 2018 at 12:17:58PM +0800, Ard Biesheuvel wrote:
+> >> On 16 October 2018 at 01:54, Eric Biggers <ebiggers@kernel.org> wrote:
+> >> > From: Eric Biggers <ebiggers@google.com>
+> >> >
+> >> > Add support for the Adiantum encryption mode.  Adiantum was designed by
+> >> > Paul Crowley and is specified by our paper:
+> >> >
+> >> >     Adiantum: length-preserving encryption for entry-level processors
+> >> >     (https://eprint.iacr.org/2018/720.pdf)
+> >> >
+> >> > See our paper for full details; this patch only provides an overview.
+> >> >
+> >> > Adiantum is a tweakable, length-preserving encryption mode designed for
+> >> > fast and secure disk encryption, especially on CPUs without dedicated
+> >> > crypto instructions.  Adiantum encrypts each sector using the XChaCha12
+> >> > stream cipher, two passes of an ε-almost-∆-universal (εA∆U) hash
+> >> > function, and an invocation of the AES-256 block cipher on a single
+> >> > 16-byte block.  On CPUs without AES instructions, Adiantum is much
+> >> > faster than AES-XTS; for example, on ARM Cortex-A7, on 4096-byte sectors
+> >> > Adiantum encryption is about 4 times faster than AES-256-XTS encryption,
+> >> > and decryption about 5 times faster.
+> >> >
+> >> > Adiantum is a specialization of the more general HBSH construction.  Our
+> >> > earlier proposal, HPolyC, was also a HBSH specialization, but it used a
+> >> > different εA∆U hash function, one based on Poly1305 only.  Adiantum's
+> >> > εA∆U hash function, which is based primarily on the "NH" hash function
+> >> > like that used in UMAC (RFC4418), is about twice as fast as HPolyC's;
+> >> > consequently, Adiantum is about 20% faster than HPolyC.
+> >> >
+> >> > This speed comes with no loss of security: Adiantum is provably just as
+> >> > secure as HPolyC, in fact slightly *more* secure.  Like HPolyC,
+> >> > Adiantum's security is reducible to that of XChaCha12 and AES-256,
+> >> > subject to a security bound.  XChaCha12 itself has a security reduction
+> >> > to ChaCha12.  Therefore, one need not "trust" Adiantum; one need only
+> >> > trust ChaCha12 and AES-256.  Note that the εA∆U hash function is only
+> >> > used for its proven combinatorical properties so cannot be "broken".
+> >> >
+> >>
+> >> So what happens if the part of the input covered by the block cipher
+> >> is identical between different generations of the same disk block
+> >> (whose sector count is used as the 'outer' IV). How are we not in the
+> >> same boat as before when using stream ciphers for disk encryption?
+> >>
+> >
+> > This is the point of the hash step.  The value encrypted with the block cipher
+> > to produce the intermediate value C_M (used as the stream cipher nonce) is
+> > H(T, P_L) + P_R.  (T is the tweak a.k.a the IV, P_L is the plaintext except the
+> > last 16 bytes, P_R is the last 16 bytes.)  A collision in this value occurs iff:
+> >
+> >         H(T1, P1_L) + P1_R = H(T2, P2_L) + P2_R
+> > i.e.
+> >         H(T1, P1_L) - H(T2, P2_L) = P2_R - P1_R
+> >
+> > If (T1, P1_L) = (T2, P2_L) then P1_R != P2_R so the equation has no solutions
+> > (since we don't consider queries where the whole input is the same; those
+> > unavoidably produce the same ciphertext).  Otherwise (T1, P1_L) != (T2, P2_L),
+> > and since the hash function H is ε-almost-∆-universal over integers mod 2^128,
+> > the equation is true for at most a very small proportion 'ε' of hash keys.
+> > But, the hash key is chosen at random and is unknown to the attacker.
+> >
+> > The same applies in the other direction, for chosen ciphertext attacks.
+> >
+> > Basically, it's very difficult for an attacker to cause the intermediate value
+> > C_M to be reused, and the outputs will appear random until they do.
+> >
+> > Of course, all this is explained much more precisely and comprehensively in our
+> > paper.  See section 5, "Security reduction".
+> >
+> 
+> Thanks for the explanation. I saw that the result of the AES
+> encryption was used as the XChaCha nonce, but I failed to spot that
+> the result of the nhpoly1305 pass is added/subtracted to/from that
+> particular block first.
+> 
+> In any case, this looks good to me: as far as I can tell, the code
+> implements the algorithm as described in the paper, and the plumbing
+> into the crypto API looks correct to me as well.
+> 
+> Reviewed-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> 
+> Whether the paper is correct is a different matter: it looks
+> convincing to me but IANAC.
+> 
+> The only request I have is to add a speed test to tcrypt as well so we
+> can easily benchmark it.
 
-Add minimal handling for this at probe/remove time.
+I'll add an Adiantum testing mode to tcrypt, though I have to admit that I
+really dislike tcrypt, so I've actually been using a custom patch instead
+(https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/commit/?h=cryptobench).
 
-Signed-off-by: Leonard Crestez <leonard.crestez@nxp.com>
----
- drivers/crypto/mxs-dcp.c | 28 +++++++++++++++++++++++++---
- 1 file changed, 25 insertions(+), 3 deletions(-)
+FWIW, I mostly dislike tcrypt's lack of flexibility.  Every benchmark setting
+has to be coded explicitly in tcrypt, with a mode number to select it.  It's
+often missing what I want, or what I want is included but comes with a bunch of
+unwanted tests too.  Also tcrypt has to be built as a loadable module, so it
+can't be used with CONFIG_MODULES=n.  And the benchmark results only go directly
+to the kernel log, where they aren't easily retrievable from a script.
 
-diff --git a/drivers/crypto/mxs-dcp.c b/drivers/crypto/mxs-dcp.c
-index 4e6ff32f8a7e..a2105cf33abb 100644
---- a/drivers/crypto/mxs-dcp.c
-+++ b/drivers/crypto/mxs-dcp.c
-@@ -18,10 +18,11 @@
- #include <linux/kthread.h>
- #include <linux/module.h>
- #include <linux/of.h>
- #include <linux/platform_device.h>
- #include <linux/stmp_device.h>
-+#include <linux/clk.h>
-=20
- #include <crypto/aes.h>
- #include <crypto/sha.h>
- #include <crypto/internal/hash.h>
- #include <crypto/internal/skcipher.h>
-@@ -80,10 +81,11 @@ struct dcp {
-=20
- 	struct completion		completion[DCP_MAX_CHANS];
- 	spinlock_t			lock[DCP_MAX_CHANS];
- 	struct task_struct		*thread[DCP_MAX_CHANS];
- 	struct crypto_queue		queue[DCP_MAX_CHANS];
-+	struct clk			*dcp_clk;
- };
-=20
- enum dcp_chan {
- 	DCP_CHAN_HASH_SHA	=3D 0,
- 	DCP_CHAN_CRYPTO		=3D 2,
-@@ -1051,15 +1053,28 @@ static int mxs_dcp_probe(struct platform_device *pd=
-ev)
- 		return -ENOMEM;
-=20
- 	/* Re-align the structure so it fits the DCP constraints. */
- 	sdcp->coh =3D PTR_ALIGN(sdcp->coh, DCP_ALIGNMENT);
-=20
--	/* Restart the DCP block. */
--	ret =3D stmp_reset_block(sdcp->base);
-+	/* DCP clock is optional, only used on some SOCs */
-+	sdcp->dcp_clk =3D devm_clk_get(dev, "dcp");
-+	if (IS_ERR(sdcp->dcp_clk)) {
-+		if (sdcp->dcp_clk !=3D ERR_PTR(-ENOENT))
-+			return PTR_ERR(sdcp->dcp_clk);
-+		sdcp->dcp_clk =3D NULL;
-+	}
-+	ret =3D clk_prepare_enable(sdcp->dcp_clk);
- 	if (ret)
- 		return ret;
-=20
-+	/* Restart the DCP block. */
-+	ret =3D stmp_reset_block(sdcp->base);
-+	if (ret) {
-+		dev_err(dev, "Failed reset\n");
-+		goto err_disable_unprepare_clk;
-+	}
-+
- 	/* Initialize control register. */
- 	writel(MXS_DCP_CTRL_GATHER_RESIDUAL_WRITES |
- 	       MXS_DCP_CTRL_ENABLE_CONTEXT_CACHING | 0xf,
- 	       sdcp->base + MXS_DCP_CTRL);
-=20
-@@ -1092,11 +1107,12 @@ static int mxs_dcp_probe(struct platform_device *pd=
-ev)
- 	/* Create the SHA and AES handler threads. */
- 	sdcp->thread[DCP_CHAN_HASH_SHA] =3D kthread_run(dcp_chan_thread_sha,
- 						      NULL, "mxs_dcp_chan/sha");
- 	if (IS_ERR(sdcp->thread[DCP_CHAN_HASH_SHA])) {
- 		dev_err(dev, "Error starting SHA thread!\n");
--		return PTR_ERR(sdcp->thread[DCP_CHAN_HASH_SHA]);
-+		ret =3D PTR_ERR(sdcp->thread[DCP_CHAN_HASH_SHA]);
-+		goto err_disable_unprepare_clk;
- 	}
-=20
- 	sdcp->thread[DCP_CHAN_CRYPTO] =3D kthread_run(dcp_chan_thread_aes,
- 						    NULL, "mxs_dcp_chan/aes");
- 	if (IS_ERR(sdcp->thread[DCP_CHAN_CRYPTO])) {
-@@ -1149,10 +1165,14 @@ static int mxs_dcp_probe(struct platform_device *pd=
-ev)
- err_destroy_aes_thread:
- 	kthread_stop(sdcp->thread[DCP_CHAN_CRYPTO]);
-=20
- err_destroy_sha_thread:
- 	kthread_stop(sdcp->thread[DCP_CHAN_HASH_SHA]);
-+
-+err_disable_unprepare_clk:
-+	clk_disable_unprepare(sdcp->dcp_clk);
-+
- 	return ret;
- }
-=20
- static int mxs_dcp_remove(struct platform_device *pdev)
- {
-@@ -1168,10 +1188,12 @@ static int mxs_dcp_remove(struct platform_device *p=
-dev)
- 		crypto_unregister_algs(dcp_aes_algs, ARRAY_SIZE(dcp_aes_algs));
-=20
- 	kthread_stop(sdcp->thread[DCP_CHAN_HASH_SHA]);
- 	kthread_stop(sdcp->thread[DCP_CHAN_CRYPTO]);
-=20
-+	clk_disable_unprepare(sdcp->dcp_clk);
-+
- 	platform_set_drvdata(pdev, NULL);
-=20
- 	global_sdcp =3D NULL;
-=20
- 	return 0;
---=20
-2.17.1
+The patch I've been using just exposes a file /proc/cryptobench (note: it maybe
+should be made into a char device instead) to which you can write commands like:
+
+	algtype=skcipher algname=adiantum(xchacha12,aes) keysize=32 bufsize=4096 niter=1000
+
+Then userspace reads back the result:
+
+	SUCCESS algname=adiantum(xchacha12,aes) driver_name=adiantum(xchacha12-software,aes-aesni,nhpoly1305-generic) measurement=0x30a5abd5776e0af enc_time=44831104 dec_time=38303077
+
+It's then pretty straightforward to wrap this API in a userspace script that
+does all the benchmarks you need, and formats the results nicely.
+
+For correctness testing there's also an option 'sgl_fuzz' that randomizes the
+scatterlist division.
+
+Currently the patch is missing some features such as AEAD support, but at some
+point I'd like to get it into a state where it can be included upstream.
+
+- Eric
