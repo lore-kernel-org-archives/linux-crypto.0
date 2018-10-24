@@ -1,223 +1,545 @@
-Return-Path: <SRS0=rgpc=NK=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-eopbgr730061.outbound.protection.outlook.com ([40.107.73.61]:59392
-        "EHLO NAM05-DM3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727719AbeJ3Uu3 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 30 Oct 2018 16:50:29 -0400
-From: "Srikanth, Jampala" <Jampala.Srikanth@cavium.com>
-To: Wenwen Wang <wang6495@umn.edu>
-CC: Kangjie Lu <kjlu@umn.edu>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        "kstewart@linuxfoundation.org" <kstewart@linuxfoundation.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "pombredanne@nexb.com" <pombredanne@nexb.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "baijiaju1990@gmail.com" <baijiaju1990@gmail.com>,
-        "Gadam, Sreerama" <Sreerama.Gadam@cavium.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] crypto: cavium/nitrox - fix a DMA pool free failure
-Date: Tue, 30 Oct 2018 11:56:23 +0000
-Message-ID: <BYAPR07MB46140E96ED4162B33655480BF4CC0@BYAPR07MB4614.namprd07.prod.outlook.com>
-References: <1539910247-9250-1-git-send-email-wang6495@umn.edu>,<CAAa=b7eOM+NPNxaanw-mK-i05UfQ7uhCsN2ViiSoe0_YB-ppyA@mail.gmail.com>
-In-Reply-To: <CAAa=b7eOM+NPNxaanw-mK-i05UfQ7uhCsN2ViiSoe0_YB-ppyA@mail.gmail.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+Return-Path: <SRS0=schb=NE=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from smtp.codeaurora.org ([198.145.29.96]:37322 "EHLO
+        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726901AbeJXXMM (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 24 Oct 2018 19:12:12 -0400
+From: AnilKumar Chimata <anilc@codeaurora.org>
+Subject: Re: [PATCH 3/3] crypto: qce: ice: Add support for Inline Crypto
+ Engine
+To: Randy Dunlap <rdunlap@infradead.org>
+Cc: andy.gross@linaro.org, david.brown@linaro.org, robh+dt@kernel.org,
+        mark.rutland@arm.com, herbert@gondor.apana.org.au,
+        davem@davemloft.net, linux-soc@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <1539789476-6098-1-git-send-email-anilc@codeaurora.org>
+ <1539789476-6098-4-git-send-email-anilc@codeaurora.org>
+ <48c7da0d-4e57-bc36-a683-94088b3b8319@infradead.org>
+Message-ID: <fe8cd0a3-30d9-34ee-d0b9-2f1ddb655d70@codeaurora.org>
+Date: Wed, 24 Oct 2018 20:13:41 +0530
 MIME-Version: 1.0
+In-Reply-To: <48c7da0d-4e57-bc36-a683-94088b3b8319@infradead.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Wenwen,
+Hi Randy,
 
-Thanks for the patch. We can't think of any such scenarios,=20
- where our device can corrupt meta data of the given context pointer as per=
- our usage in the device.=20
-But having meta data in separate pointer prevents unexpected behavior.=20
+Thanks for your comments,
 
-Thanks
-srikanth
+On 2018-10-17 23:09, Randy Dunlap wrote:
+> On 10/17/18 8:17 AM, AnilKumar Chimata wrote:
+>> This patch adds support for Inline Crypto Engine (ICE), which
+>> is embedded into storage device/controller such as UFS/eMMC.
+>> ICE is intended for high throughput cryptographic encryption
+>> or decryption of storage data.
+>> 
+>> Signed-off-by: AnilKumar Chimata <anilc@codeaurora.org>
+>> ---
+>>  Documentation/crypto/msm/ice.txt |  235 ++++++
+>>  drivers/crypto/Kconfig           |   10 +
+>>  drivers/crypto/qce/Makefile      |    1 +
+>>  drivers/crypto/qce/ice.c         | 1613 
+>> ++++++++++++++++++++++++++++++++++++++
+>>  drivers/crypto/qce/iceregs.h     |  159 ++++
+>>  include/crypto/ice.h             |   80 ++
+>>  6 files changed, 2098 insertions(+)
+>>  create mode 100644 Documentation/crypto/msm/ice.txt
+>>  create mode 100644 drivers/crypto/qce/ice.c
+>>  create mode 100644 drivers/crypto/qce/iceregs.h
+>>  create mode 100644 include/crypto/ice.h
+>> 
+>> diff --git a/Documentation/crypto/msm/ice.txt 
+>> b/Documentation/crypto/msm/ice.txt
+>> new file mode 100644
+>> index 0000000..58f7081
+>> --- /dev/null
+>> +++ b/Documentation/crypto/msm/ice.txt
+>> @@ -0,0 +1,235 @@
+>> +Introduction:
+>> +=============
+>> +Storage encryption has been one of the most required feature from 
+>> security
+> 
+>                                                         features
 
-________________________________________
-From: linux-crypto-owner@vger.kernel.org <linux-crypto-owner@vger.kernel.or=
-g> on behalf of Wenwen Wang <wang6495@umn.edu>
-Sent: Tuesday, October 30, 2018 12:07 AM
-To: Wenwen Wang
-Cc: Kangjie Lu; herbert@gondor.apana.org.au; David S. Miller; kstewart@linu=
-xfoundation.org; tglx@linutronix.de; pombredanne@nexb.com; Greg Kroah-Hartm=
-an; baijiaju1990@gmail.com; Srikanth, Jampala; Gadam, Sreerama; linux-crypt=
-o@vger.kernel.org; open list
-Subject: Re: [PATCH] crypto: cavium/nitrox - fix a DMA pool free failure
+changed.
 
-External Email
+> 
+>> +point of view. QTI based storage encryption solution uses general 
+>> purpose
+>> +crypto engine. While this kind of solution provide a decent amount of
+> 
+>                                               provides
 
-Hello,
+changed.
 
-Can anyone confirm this bug? Thanks!
+> 
+>> +performance, it falls short as storage speed is improving 
+>> significantly
+>> +continuously. To overcome performance degradation, newer chips are 
+>> going to
+>> +have Inline Crypto Engine (ICE) embedded into storage device. ICE is 
+>> supposed
+>> +to meet the line speed of storage devices.
+>> +
+>> +Hardware Description
+>> +====================
+>> +ICE is a HW block that is embedded into storage device such as 
+>> UFS/eMMC. By
+> 
+> s/HW/hardware/                                     devices
 
-Wenwen
+changed.
 
-On Thu, Oct 18, 2018 at 7:51 PM Wenwen Wang <wang6495@umn.edu> wrote:
->
-> In crypto_alloc_context(), a DMA pool is allocated through dma_pool_alloc=
-()
-> to hold the crypto context. The meta data of the DMA pool, including the
-> pool used for the allocation 'ndev->ctx_pool' and the base address of the
-> DMA pool used by the device 'dma', are then stored to the beginning of th=
-e
-> pool. These meta data are eventually used in crypto_free_context() to fre=
-e
-> the DMA pool through dma_pool_free(). However, given that the DMA pool ca=
-n
-> also be accessed by the device, a malicious device can modify these meta
-> data, especially when the device is controlled to deploy an attack. This
-> can cause an unexpected DMA pool free failure.
->
-> To avoid the above issue, this patch introduces a new structure
-> crypto_ctx_hdr and a new field chdr in the structure nitrox_crypto_ctx ho=
-ld
-> the meta data information of the DMA pool after the allocation. Note that
-> the original structure ctx_hdr is not changed to ensure the compatibility=
-.
->
-> Signed-off-by: Wenwen Wang <wang6495@umn.edu>
-> ---
->  drivers/crypto/cavium/nitrox/nitrox_algs.c | 12 +++++++-----
->  drivers/crypto/cavium/nitrox/nitrox_lib.c  | 22 +++++++++++++++++-----
->  drivers/crypto/cavium/nitrox/nitrox_req.h  |  7 +++++++
->  3 files changed, 31 insertions(+), 10 deletions(-)
->
-> diff --git a/drivers/crypto/cavium/nitrox/nitrox_algs.c b/drivers/crypto/=
-cavium/nitrox/nitrox_algs.c
-> index 2ae6124..5d54ebc 100644
-> --- a/drivers/crypto/cavium/nitrox/nitrox_algs.c
-> +++ b/drivers/crypto/cavium/nitrox/nitrox_algs.c
-> @@ -73,7 +73,7 @@ static int flexi_aes_keylen(int keylen)
->  static int nitrox_skcipher_init(struct crypto_skcipher *tfm)
->  {
->         struct nitrox_crypto_ctx *nctx =3D crypto_skcipher_ctx(tfm);
-> -       void *fctx;
-> +       struct crypto_ctx_hdr *chdr;
->
->         /* get the first device */
->         nctx->ndev =3D nitrox_get_first_device();
-> @@ -81,12 +81,14 @@ static int nitrox_skcipher_init(struct crypto_skciphe=
-r *tfm)
->                 return -ENODEV;
->
->         /* allocate nitrox crypto context */
-> -       fctx =3D crypto_alloc_context(nctx->ndev);
-> -       if (!fctx) {
-> +       chdr =3D crypto_alloc_context(nctx->ndev);
-> +       if (!chdr) {
->                 nitrox_put_device(nctx->ndev);
->                 return -ENOMEM;
->         }
-> -       nctx->u.ctx_handle =3D (uintptr_t)fctx;
-> +       nctx->chdr =3D chdr;
-> +       nctx->u.ctx_handle =3D (uintptr_t)((u8 *)chdr->vaddr +
-> +                                        sizeof(struct ctx_hdr));
->         crypto_skcipher_set_reqsize(tfm, crypto_skcipher_reqsize(tfm) +
->                                     sizeof(struct nitrox_kcrypt_request))=
-;
->         return 0;
-> @@ -102,7 +104,7 @@ static void nitrox_skcipher_exit(struct crypto_skciph=
-er *tfm)
->
->                 memset(&fctx->crypto, 0, sizeof(struct crypto_keys));
->                 memset(&fctx->auth, 0, sizeof(struct auth_keys));
-> -               crypto_free_context((void *)fctx);
-> +               crypto_free_context((void *)nctx->chdr);
->         }
->         nitrox_put_device(nctx->ndev);
->
-> diff --git a/drivers/crypto/cavium/nitrox/nitrox_lib.c b/drivers/crypto/c=
-avium/nitrox/nitrox_lib.c
-> index 4d31df0..28baf1a 100644
-> --- a/drivers/crypto/cavium/nitrox/nitrox_lib.c
-> +++ b/drivers/crypto/cavium/nitrox/nitrox_lib.c
-> @@ -146,12 +146,19 @@ static void destroy_crypto_dma_pool(struct nitrox_d=
-evice *ndev)
->  void *crypto_alloc_context(struct nitrox_device *ndev)
->  {
->         struct ctx_hdr *ctx;
-> +       struct crypto_ctx_hdr *chdr;
->         void *vaddr;
->         dma_addr_t dma;
->
-> +       chdr =3D kmalloc(sizeof(*chdr), GFP_KERNEL);
-> +       if (!chdr)
-> +               return NULL;
-> +
->         vaddr =3D dma_pool_alloc(ndev->ctx_pool, (GFP_KERNEL | __GFP_ZERO=
-), &dma);
-> -       if (!vaddr)
-> +       if (!vaddr) {
-> +               kfree(chdr);
->                 return NULL;
-> +       }
->
->         /* fill meta data */
->         ctx =3D vaddr;
-> @@ -159,7 +166,11 @@ void *crypto_alloc_context(struct nitrox_device *nde=
-v)
->         ctx->dma =3D dma;
->         ctx->ctx_dma =3D dma + sizeof(struct ctx_hdr);
->
-> -       return ((u8 *)vaddr + sizeof(struct ctx_hdr));
-> +       chdr->pool =3D ndev->ctx_pool;
-> +       chdr->dma =3D dma;
-> +       chdr->vaddr =3D vaddr;
-> +
-> +       return chdr;
->  }
->
->  /**
-> @@ -168,13 +179,14 @@ void *crypto_alloc_context(struct nitrox_device *nd=
-ev)
->   */
->  void crypto_free_context(void *ctx)
->  {
-> -       struct ctx_hdr *ctxp;
-> +       struct crypto_ctx_hdr *ctxp;
->
->         if (!ctx)
->                 return;
->
-> -       ctxp =3D (struct ctx_hdr *)((u8 *)ctx - sizeof(struct ctx_hdr));
-> -       dma_pool_free(ctxp->pool, ctxp, ctxp->dma);
-> +       ctxp =3D ctx;
-> +       dma_pool_free(ctxp->pool, ctxp->vaddr, ctxp->dma);
-> +       kfree(ctxp);
->  }
->
->  /**
-> diff --git a/drivers/crypto/cavium/nitrox/nitrox_req.h b/drivers/crypto/c=
-avium/nitrox/nitrox_req.h
-> index d091b6f..19f0a20 100644
-> --- a/drivers/crypto/cavium/nitrox/nitrox_req.h
-> +++ b/drivers/crypto/cavium/nitrox/nitrox_req.h
-> @@ -181,12 +181,19 @@ struct flexi_crypto_context {
->         struct auth_keys auth;
->  };
->
-> +struct crypto_ctx_hdr {
-> +       struct dma_pool *pool;
-> +       dma_addr_t dma;
-> +       void *vaddr;
-> +};
-> +
->  struct nitrox_crypto_ctx {
->         struct nitrox_device *ndev;
->         union {
->                 u64 ctx_handle;
->                 struct flexi_crypto_context *fctx;
->         } u;
-> +       struct crypto_ctx_hdr *chdr;
->  };
->
->  struct nitrox_kcrypt_request {
-> --
-> 2.7.4
->
+> 
+>> +default, ICE works in bypass mode i.e. ICE HW does not perform any 
+>> crypto
+>> +operation on data to be processed by storage device. If required, ICE 
+>> can be
+>> +configured to perform crypto operation in one direction (i.e. either 
+>> encryption
+>> +or decryption) or in both direction(both encryption & decryption).
+> 
+>                              directions (both ...
+
+changed.
+
+> 
+>> +
+>> +When a switch between the operation modes(plain to crypto or crypto 
+>> to plain)
+> 
+>                                        modes (plain ...
+
+changed.
+
+> 
+>> +is desired for a particular partition, SW must complete all 
+>> transactions for
+> 
+> s/SW/software/
+
+changed.
+
+> 
+>> +that particular partition before switching the crypto mode i.e. no 
+>> crypto, one
+> 
+>                                                   crypto mode;
+
+changed.
+
+> 
+>> +direction crypto or both direction crypto operation. Requests for 
+>> other
+> 
+>                             directions
+
+changed.
+
+> 
+>> +partitions are not impacted due to crypto mode switch.
+>> +
+>> +ICE HW currently supports AES128/256 bit ECB & XTS mode encryption 
+>> algorithms.
+>> +
+>> +Keys for crypto operations are loaded from SW. Keys are stored in a 
+>> lookup
+>> +table(LUT) located inside ICE HW. Maximum of 32 keys can be loaded in 
+>> ICE key
+>> +LUT. A Key inside the LUT can be referred using a key index.
+> 
+>                                     referred to using
+
+changed.
+
+> 
+>> +
+>> +SW Description
+>> +==============
+>> +ICE HW has categorized ICE registers in 2 groups: those which can be 
+>> accessed by
+>> +only secure side i.e. TZ and those which can be accessed by 
+>> non-secure side such
+> 
+> at least tell the reader what TZ and HLOS mean...
+
+changed.
+
+> 
+>> +as HLOS as well. This requires that ICE driver to be split in two 
+>> pieces: one
+> 
+>                                   that the ICE driver be split into
+> two pieces: one
+
+changed.
+
+> 
+>> +running from TZ space and another from HLOS space.
+>> +
+>> +ICE driver from TZ would configure keys as requested by HLOS side.
+>> +
+>> +ICE driver on HLOS side is responsible for initialization of ICE HW.
+>> +
+>> +SW Architecture Diagram
+>> +=======================
+>> +Following are all the components involved in the ICE driver for 
+>> control path:
+>> +
+>> ++++++++++++++++++++++++++++++++++++++++++
+>> ++               App layer               +
+>> ++++++++++++++++++++++++++++++++++++++++++
+>> ++             System layer              +
+>> ++   ++++++++         +++++++            +
+>> ++   + VOLD +         + PFM +            +
+>> ++   ++++++++         +++++++            +
+>> ++         ||         ||                 +
+>> ++         ||         ||                 +
+>> ++         \/         \/                 +
+>> ++     +++++++++++++++++++++++++++       +
+>> ++     + LibQSEECom / cryptfs_hw +       +
+>> ++     +++++++++++++++++++++++++++       +
+>> ++++++++++++++++++++++++++++++++++++++++++
+>> ++             Kernel                    +       +++++++++++++++++
+>> ++                                       +       +     KMS       +
+>> ++  +++++++  +++++++++++  +++++++++++    +       +++++++++++++++++
+>> ++  + ICE +  + Storage +  + QSEECom +    +       +   ICE Driver  +
+>> ++++++++++++++++++++++++++++++++++++++++++ <===> +++++++++++++++++
+>> +               ||                                    ||
+>> +               ||                                    ||
+>> +               \/                                    \/
+>> ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>> ++                      Storage Device                           +
+>> ++                      ++++++++++++++                           +
+>> ++                      +   ICE HW   +                           +
+>> ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>> +
+>> +Use Cases:
+>> +----------
+>> +a) Device bootup
+>> +ICE HW is detected during bootup time and corresponding probe 
+>> function is
+>> +called. ICE driver parses its data from device tree node. ICE HW and 
+>> storage
+>> +HW are tightly coupled. Storage device probing is dependent upon ICE 
+>> device
+>> +probing. ICE driver configures all the required registers to put the 
+>> ICE HW
+>> +in bypass mode.
+>> +
+>> +b) Configuring keys
+>> +Currently, there are couple of use cases to configure the keys.
+>> +
+>> +1) Full Disk Encryption(FDE)
+>> +System layer(VOLD) at invocation of apps layer would call libqseecom 
+>> to create
+>> +the encryption key. Libqseecom calls qseecom driver to communicate 
+>> with KMS
+>> +module on the secure side i.e. TZ. KMS would call ICE driver on the 
+>> TZ side to
+>> +create and set the keys in ICE HW. At the end of transaction, VOLD 
+>> would have
+>> +key index of key LUT where encryption key is present.
+>> +
+>> +2) Per File Encryption (PFE)
+>> +Per File Manager(PFM) calls QSEECom api to create the key. PFM has a 
+>> peer comp-
+> 
+> Preferably don't split (hyphenate) "component."  But if you must, it
+> should be com-
+> ponent.
+
+Taken into account, will follow on future patches. For this patch changed.
+
+> 
+>> +onent(PFT) at kernel layer which gets the corresponding key index 
+>> from PFM.
+>> +
+>> +Following are all the components involved in the ICE driver for data 
+>> path:
+>> +
+>> +       +++++++++++++++++++++++++++++++++++++++++
+>> +       +               App layer               +
+>> +       +++++++++++++++++++++++++++++++++++++++++
+>> +       +              VFS                      +
+>> +       +---------------------------------------+
+>> +       +         File System (EXT4)            +
+>> +       +---------------------------------------+
+>> +       +             Block Layer               +
+>> +       + --------------------------------------+
+>> +       +                              +++++++  +
+>> +       +              dm-req-crypt => + PFT +  +
+>> +       +                              +++++++  +
+>> +       +                                       +
+>> +       +---------------------------------------+
+>> +       +    +++++++++++           +++++++      +
+>> +       +    + Storage +           + ICE +      +
+>> +       +++++++++++++++++++++++++++++++++++++++++
+>> +       +                  ||                   +
+>> +       +                  || (Storage Req with +
+>> +       +                  \/  ICE parameters ) +
+>> +       +++++++++++++++++++++++++++++++++++++++++
+>> +       +          Storage Device               +
+>> +       +          ++++++++++++++               +
+>> +       +          +   ICE HW   +               +
+>> +       +++++++++++++++++++++++++++++++++++++++++
+>> +
+>> +c) Data transaction
+>> +Once the crypto key has been configured, VOLD/PFM creates device 
+>> mapping for
+>> +data partition. As part of device mapping VOLD passes key index, 
+>> crypto
+>> +algorithm, mode and key length to dm layer. In case of PFE, keys are 
+>> provided
+>> +by PFT as and when request is processed by dm-req-crypt. When any 
+>> application
+>> +needs to read/write data, it would go through DM layer which would 
+>> add crypto
+>> +information, provided by VOLD/PFT, to Request. For each Request, 
+>> Storage driver
+>> +would ask ICE driver to configure crypto part of request. ICE driver 
+>> extracts
+>> +crypto data from Request structure and provide it to storage driver 
+>> which would
+> 
+>                                           provides
+
+changed.
+
+> 
+>> +finally dispatch request to storage device.
+>> +
+>> +d) Error Handling
+>> +Due to issue # 1 mentioned in "Known Issues", ICE driver does not 
+>> register for
+>> +any interrupt. However, it enables sources of interrupt for ICE HW. 
+>> After each
+>> +data transaction, Storage driver receives transaction completion 
+>> event. As part
+>> +of event handling, storage driver calls  ICE driver to check if any 
+>> of ICE
+>> +interrupt status is set. If yes, storage driver returns error to 
+>> upper layer.
+>> +
+>> +Error handling would be changed in future chips.
+>> +
+>> +Interfaces
+>> +==========
+>> +ICE driver exposes interfaces for storage driver to :
+> 
+>                                                     to:
+
+changed.
+
+> 
+>> +1. Get the global instance of ICE driver
+>> +2. Get the implemented interfaces of the particular ice instance
+>> +3. Initialize the ICE HW
+>> +4. Reset the ICE HW
+>> +5. Resume/Suspend the ICE HW
+>> +6. Get the Crypto configuration for the data request for storage
+>> +7. Check if current data transaction has generated any interrupt
+>> +
+>> +Driver Parameters
+>> +=================
+>> +This driver is built and statically linked into the kernel; 
+>> therefore,
+>> +there are no module parameters supported by this driver.
+>> +
+>> +There are no kernel command line parameters supported by this driver.
+>> +
+>> +Power Management
+>> +================
+>> +ICE driver does not do power management on its own as it is part of 
+>> storage
+>> +hardware. Whenever storage driver receives request for power 
+>> collapse/suspend
+>> +resume, it would call ICE driver which exposes APIs for Storage HW. 
+>> ICE HW
+>> +during power collapse or reset, wipes crypto configuration data. When 
+>> ICE
+> 
+>                                  ^no comma
+
+changed.
+
+> 
+>> +driver receives request to resume, it would ask ICE driver on TZ side 
+>> to
+>> +restore the configuration. ICE driver does not do anything as part of 
+>> power
+>> +collapse or suspend event.
+>> +
+>> +Interface:
+>> +==========
+>> +ICE driver exposes following APIs for storage driver to use:
+>> +
+>> +int (*init)(struct platform_device *, void *, ice_success_cb, 
+>> ice_error_cb);
+>> +	-- This function is invoked by storage controller during 
+>> initialization of
+>> +	storage controller. Storage controller would provide success and 
+>> error call
+>> +	backs which would be invoked asynchronously once ICE HW init is 
+>> done.
+>> +
+>> +int (*reset)(struct platform_device *);
+>> +	-- ICE HW reset as part of storage controller reset. When storage 
+>> controller
+>> +	received reset command, it would call reset on ICE HW. As of now, 
+>> ICE HW
+>> +	does not need to do anything as part of reset.
+>> +
+>> +int (*resume)(struct platform_device *);
+>> +	-- ICE HW while going to reset, wipes all crypto keys and other data 
+>> from ICE
+> 
+>                                       ^no comma
+
+changed.
+
+> 
+>> +	HW. ICE driver would reconfigure those data as part of resume 
+>> operation.
+>> +
+>> +int (*suspend)(struct platform_device *);
+>> +	-- This API would be called by storage driver when storage device is 
+>> going to
+>> +	suspend mode. As of today, ICE driver does not do anything to handle 
+>> suspend.
+>> +
+>> +int (*config)(struct platform_device *, struct request* , struct 
+>> ice_data_setting*);
+>> +	-- Storage driver would call this interface to get all crypto data 
+>> required to
+>> +	perform crypto operation.
+>> +
+>> +int (*status)(struct platform_device *);
+>> +	-- Storage driver would call this interface to check if previous 
+>> data transfer
+>> +	generated any error.
+>> +
+>> +Config options
+>> +==============
+>> +This driver is enabled by the kernel config option 
+>> CONFIG_CRYPTO_DEV_MSM_ICE.
+>> +
+>> +Dependencies
+>> +============
+>> +ICE driver depends upon corresponding ICE driver on TZ side to 
+>> function
+>> +appropriately.
+>> +
+>> +Known Issues
+>> +============
+>> +1. ICE HW emits 0s even if it has generated an interrupt
+> 
+> That statement is unclear.  Emits where?  in a data stream?  in
+> interrupt status?
+
+Its interrupt status line unchanged, currently its handled on storage driver
+
+> 
+>> +This issue has significant impact on how ICE interrupts are handled. 
+>> Currently,
+>> +ICE driver does not register for any of the ICE interrupts but 
+>> enables the
+>> +sources of interrupt. Once storage driver asks to check the status of 
+>> interrupt,
+>> +it reads and clears the clear status and provide read status to 
+>> storage driver.
+> 
+>                "clears the clear status"???         s/provide/provides/
+
+changed.
+
+> 
+>> +This mechanism though not optimal but prevents file-system 
+>> corruption.
+> 
+> mangled sentence above.
+
+changed.
+
+> 
+>> +This issue has been fixed in newer chips.
+>> +
+>> +2. ICE HW wipes all crypto data during power collapse
+>> +This issue necessitate that ICE driver on TZ side store the crypto 
+>> material
+> 
+>               necessitates
+
+changed.
+
+> 
+>> +which is not required in the case of general purpose crypto engine.
+>> +This issue has been fixed in newer chips.
+>> +
+>> +Further Improvements
+>> +====================
+>> +Currently, Due to PFE use case, ICE driver is dependent upon 
+>> dm-req-crypt to
+> 
+>               due
+
+changed.
+
+> 
+>> +provide the keys as part of request structure. This couples ICE 
+>> driver with
+>> +dm-req-crypt based solution. It is under discussion to expose an 
+>> IOCTL based
+> 
+>                                                        to expose IOCTL 
+> based
+
+changed.
+
+> 
+>> +and registration based interface APIs from ICE driver. ICE driver 
+>> would use
+>> +these two interfaces to find out if any key exists for current 
+>> request. If
+>> +yes, choose the right key index received from IOCTL or registration 
+>> based
+>> +APIs. If not, dont set any crypto parameter in the request.
+> 
+>                  don't
+
+changed.
+
+> 
+>> diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+>> index a8c4ce0..e40750e 100644
+>> --- a/drivers/crypto/Kconfig
+>> +++ b/drivers/crypto/Kconfig
+>> @@ -596,6 +596,16 @@ config CRYPTO_DEV_QCOM_RNG
+>>  	  To compile this driver as a module, choose M here. The
+>>            module will be called qcom-rng. If unsure, say N.
+>> 
+>> +config CRYPTO_DEV_QTI_ICE
+>> +	tristate "Qualcomm inline crypto engine accelerator"
+>> +	default n
+> 
+> Please drop the redundant "default n" since n is already the default.
+
+Agree, will drop this change.
+
+> 
+>> +	depends on (ARCH_QCOM || COMPILE_TEST) && BLK_DEV_DM
+>> +	help
+>> +	  This driver supports Inline Crypto Engine for QTI chipsets, 
+>> MSM8994
+>> +	  and later, to accelerate crypto operations for storage needs.
+>> +	  To compile this driver as a module, choose M here: the
+>> +	  module will be called ice.
+>> +
+>>  config CRYPTO_DEV_VMX
+>>  	bool "Support for VMX cryptographic acceleration instructions"
+>>  	depends on PPC64 && VSX
