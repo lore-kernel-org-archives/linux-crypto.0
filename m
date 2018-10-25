@@ -1,56 +1,48 @@
-Return-Path: <SRS0=XFsj=M6=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from frisell.zx2c4.com ([192.95.5.64]:46347 "EHLO frisell.zx2c4.com"
+Return-Path: <SRS0=YnV0=NF=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from vps0.lunn.ch ([185.16.172.187]:43351 "EHLO vps0.lunn.ch"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726816AbeJRW67 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 18 Oct 2018 18:58:59 -0400
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-To: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        linux-crypto@vger.kernel.org, davem@davemloft.net,
-        gregkh@linuxfoundation.org
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: [PATCH net-next v8 01/28] ARM: makefile: use ARMv3M mode for RiscPC
-Date: Thu, 18 Oct 2018 16:56:45 +0200
-Message-Id: <20181018145712.7538-2-Jason@zx2c4.com>
-In-Reply-To: <20181018145712.7538-1-Jason@zx2c4.com>
+        id S1726448AbeJZHMU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 26 Oct 2018 03:12:20 -0400
+Date: Fri, 26 Oct 2018 00:37:46 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc: LKML <linux-kernel@vger.kernel.org>,
+        Netdev <netdev@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        David Miller <davem@davemloft.net>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: Re: [PATCH net-next v8 28/28] net: WireGuard secure network tunnel
+Message-ID: <20181025223746.GB6276@lunn.ch>
 References: <20181018145712.7538-1-Jason@zx2c4.com>
+ <20181018145712.7538-29-Jason@zx2c4.com>
+ <20181020224706.GC14816@lunn.ch>
+ <CAHmME9qMf=n7mnE-bsx86SVFBs1LrvHoc+nWrpr12vtYAgze+g@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHmME9qMf=n7mnE-bsx86SVFBs1LrvHoc+nWrpr12vtYAgze+g@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The purpose of CONFIG_CPU_32v3 is to avoid ldrh/strh on the RiscPC,
-which is pretty much an ARMv4 device, except its bus will choke on the
-half-words. The way to make the C compiler not output ldrh/strh is with
--march=armv3, which doesn't support them in the ISA. However, this
-prevents certain cryptography code from working that uses instructions
-like umull. Fortunately there's also -march=armv3m that does support
-those, making it possible to continue assembling optimized cryptography
-routines for our beloved RiscPC.
+> > > +             net_dbg_ratelimited("%s: Could not decrypt invalid cookie response\n",
+> > > +                                 wg->dev->name);
+> >
+> > It might be worth adding a netdev_dbg_ratelimited(), which takes a
+> > netdev as its first parameter, just line netdev_dbg().
+> 
+> That sounds like it could be useful. Though, I'm trying hard to make
+> the first patch submission _not_ need to touch any of the rest of the
+> networking stack. I've actually got a small list of interesting
+> networking stack changes that might be useful for WireGuard, but I
+> think I'd prefer to submit these after this is all merged, and each
+> one separately for a separate discussion, if that's okay with you.
 
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
----
+Hi Jason
 
-Notes:
-    This commit has been submitted to the proper ARM tree and is working its
-    way upstream. It's included in this series here so that kbuild 0-day bot
-    doesn't get too nervous about RiscPC, but is already entering the tree
-    through arm-next.
+I can understand that. But on the flip side, CAKE reached something
+like version 19 before it got merged. Wireguard is looking similar.
+An addition like the above, is not controversial. You could submit
+such a single patch in a weeks time when net-next reopens, and
+probably version 1 or 2 will get accepted.
 
- arch/arm/Makefile | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/arch/arm/Makefile b/arch/arm/Makefile
-index d1516f85f25d..7fd4bcaf0721 100644
---- a/arch/arm/Makefile
-+++ b/arch/arm/Makefile
-@@ -74,7 +74,7 @@ endif
- arch-$(CONFIG_CPU_32v5)		=-D__LINUX_ARM_ARCH__=5 $(call cc-option,-march=armv5te,-march=armv4t)
- arch-$(CONFIG_CPU_32v4T)	=-D__LINUX_ARM_ARCH__=4 -march=armv4t
- arch-$(CONFIG_CPU_32v4)		=-D__LINUX_ARM_ARCH__=4 -march=armv4
--arch-$(CONFIG_CPU_32v3)		=-D__LINUX_ARM_ARCH__=3 -march=armv3
-+arch-$(CONFIG_CPU_32v3)		=-D__LINUX_ARM_ARCH__=3 -march=armv3m
- 
- # Evaluate arch cc-option calls now
- arch-y := $(arch-y)
--- 
-2.19.1
+	 Andrew
