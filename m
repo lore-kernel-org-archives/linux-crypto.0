@@ -1,75 +1,60 @@
-Return-Path: <SRS0=Iqog=M5=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from gateway31.websitewelcome.com ([192.185.143.5]:24061 "EHLO
-        gateway31.websitewelcome.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727047AbeJQXB6 (ORCPT
+Return-Path: <SRS0=YnV0=NF=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail-ot1-f67.google.com ([209.85.210.67]:36442 "EHLO
+        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725829AbeJYImh (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 17 Oct 2018 19:01:58 -0400
-Received: from cm11.websitewelcome.com (cm11.websitewelcome.com [100.42.49.5])
-        by gateway31.websitewelcome.com (Postfix) with ESMTP id 44B1C161AED
-        for <linux-crypto@vger.kernel.org>; Wed, 17 Oct 2018 09:41:46 -0500 (CDT)
-To: Antoine Tenart <antoine.tenart@bootlin.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Kees Cook <keescook@chromium.org>,
+        Thu, 25 Oct 2018 04:42:37 -0400
+Date: Wed, 24 Oct 2018 19:12:21 -0500
+From: Rob Herring <robh@kernel.org>
+To: Gilad Ben-Yossef <gilad@benyossef.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        linux-crypto <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-References: <20181008191712.GA12892@embeddedor.com>
- <CAGXu5j+a=81mGFrF5igMXe46mv_PsqzUKCzLWj0oCEMk1PY62g@mail.gmail.com>
- <9fa270bc-502d-5ff5-2acb-88ababcc9262@embeddedor.com>
- <20181017061741.qr23stkwqf36fet6@gondor.apana.org.au>
- <20181017072034.GD28572@kwain>
-From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-Subject: Re: [PATCH] crypto: inside-secure: safexcel - fix memory allocation
-Message-ID: <0529a397-f104-5f3a-663e-7ef2d883dcb2@embeddedor.com>
-Date: Wed, 17 Oct 2018 16:41:23 +0200
+        Mark Rutland <mark.rutland@arm.com>,
+        Ofir Drang <Ofir.Drang@arm.com>,
+        Yael Chemla <Yael.Chemla@arm.com>,
+        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/3] crypto: ccree: add dt bindings for ccree 713
+Message-ID: <20181025001221.GA12740@bogus>
+References: <1539696935-4433-1-git-send-email-gilad@benyossef.com>
+ <1539696935-4433-3-git-send-email-gilad@benyossef.com>
 MIME-Version: 1.0
-In-Reply-To: <20181017072034.GD28572@kwain>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1539696935-4433-3-git-send-email-gilad@benyossef.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+On Tue, Oct 16, 2018 at 02:35:32PM +0100, Gilad Ben-Yossef wrote:
+> Add device tree bindings associating Arm TrustZone CryptoCell 713 with the
+> ccree driver.
 
-
-On 10/17/18 9:20 AM, Antoine Tenart wrote:
-> Hi,
+"dt-bindings: crypto: ..." for the subject.
 > 
-> On Wed, Oct 17, 2018 at 02:17:41PM +0800, Herbert Xu wrote:
->> On Tue, Oct 16, 2018 at 09:44:02PM +0200, Gustavo A. R. Silva wrote:
->>> On 10/9/18 12:20 AM, Kees Cook wrote:
->>>> On Mon, Oct 8, 2018 at 12:17 PM, Gustavo A. R. Silva
->>>> <gustavo@embeddedor.com> wrote:
->>>>> The original intention is to allocate space for EIP197_DEFAULT_RING_SIZE
->>>>> *pointers* to struct, so sizeof(priv->ring[i].rdr_req) should be
->>>>> sizeof(*priv->ring[i].rdr_req).
->>>>>
->>>>> Addresses-Coverity-ID: 1473962 ("Sizeof not portable")
->>>>> Fixes: 9744fec95f06 ("crypto: inside-secure - remove request list to improve performance")
->>>>> Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
->>>>
->>>> Reviewed-by: Kees Cook <keescook@chromium.org>
->>>>
->>>
->>>
->>> Friendly ping. Who can take this?
->>
->> Well I tried to take it but it doesn't apply against cryptodev.
->> So I presume this can go into the tree that carried the change
->> which it depended on?
+> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+> ---
+>  Documentation/devicetree/bindings/crypto/arm-cryptocell.txt | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
 > 
-> I would say this should go in cryptodev. The issue is probably because
-> of other changes that got applied in the meantime. Gustavo can probably
-> rebase his patch on top of cryptodev, and re-send it.
+> diff --git a/Documentation/devicetree/bindings/crypto/arm-cryptocell.txt b/Documentation/devicetree/bindings/crypto/arm-cryptocell.txt
+> index 999fb2a..880de07 100644
+> --- a/Documentation/devicetree/bindings/crypto/arm-cryptocell.txt
+> +++ b/Documentation/devicetree/bindings/crypto/arm-cryptocell.txt
+> @@ -1,8 +1,9 @@
+>  Arm TrustZone CryptoCell cryptographic engine
+>  
+>  Required properties:
+> -- compatible: Should be one of: "arm,cryptocell-712-ree",
+> -  "arm,cryptocell-710-ree" or "arm,cryptocell-630p-ree".
+> +- compatible: Should be one of: "arm,cryptocell-713-ree",
+> +  "arm,cryptocell-712-ree", "arm,cryptocell-710-ree" or
+> +  "arm,cryptocell-630p-ree".
+
+Please format 1 per line.
+
+>  - reg: Base physical address of the engine and length of memory mapped region.
+>  - interrupts: Interrupt number for the device.
+>  
+> -- 
+> 2.7.4
 > 
-
-cryptodev is missing the previous commit 329e09893909d409039f6a79757d9b80b67efe39
-to which this patch applies.
-
-Kees, did you apply the commit above to your tree?
-
-If so, could you take this patch?
-
-Thanks
---
-Gustavo
