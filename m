@@ -1,62 +1,38 @@
-Return-Path: <SRS0=JV5w=NB=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from bedivere.hansenpartnership.com ([66.63.167.143]:42168 "EHLO
-        bedivere.hansenpartnership.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727110AbeJUQVR (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 21 Oct 2018 12:21:17 -0400
-Message-ID: <1540109262.3023.6.camel@HansenPartnership.com>
-Subject: Re: [PATCH 1/2] crypto: fix cfb mode decryption
-From: James Bottomley <James.Bottomley@HansenPartnership.com>
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
-Cc: "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        stable <stable@vger.kernel.org>
-Date: Sun, 21 Oct 2018 09:07:42 +0100
-In-Reply-To: <CAKv+Gu8eiFXoC2MWjGUG_AgDNq5rduWQN0CC4Q4BM0pjWW3B-w@mail.gmail.com>
-References: <20181019230153.28201-1-dbaryshkov@gmail.com>
-         <CAKv+Gu8eiFXoC2MWjGUG_AgDNq5rduWQN0CC4Q4BM0pjWW3B-w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Return-Path: <SRS0=YnV0=NF=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mga18.intel.com ([134.134.136.126]:26201 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727236AbeJZAQF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 25 Oct 2018 20:16:05 -0400
+Date: Thu, 25 Oct 2018 16:42:40 +0100 (IST)
+From: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
+To: James Bottomley <James.Bottomley@HansenPartnership.com>
+cc: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
+        linux-integrity@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH v4 0/7] add integrity and security to TPM2 transactions
+In-Reply-To: <1540367003.3008.13.camel@HansenPartnership.com>
+Message-ID: <alpine.DEB.2.21.1810251640340.4065@jsakkine-mobl1>
+References: <1540193596.3202.7.camel@HansenPartnership.com>  <alpine.DEB.2.21.1810240249180.8524@jsakkine-mobl1> <1540367003.3008.13.camel@HansenPartnership.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII; format=flowed
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, 2018-10-21 at 09:05 +0200, Ard Biesheuvel wrote:
-> (+ James)
+On Wed, 24 Oct 2018, James Bottomley wrote:
+> On Wed, 2018-10-24 at 02:51 +0300, Jarkko Sakkinen wrote:
+>> I would consider sending first a patch set that would iterate the
+>> existing session stuff to be ready for this i.e. merge in two
+>> iterations (emphasis on the word "consider"). We can probably merge
+>> the groundwork quite fast.
+>
+> I realise we're going to have merge conflicts on the later ones, so why
+> don't we do this: I'll still send as one series, but you apply the ones
+> you think are precursors and I'll rebase and resend the rest?
+>
+> James
 
-Thanks!
+Works for me and now I think after yesterdays dicussions etc. that this
+should be merged as one series.
 
-> On 20 October 2018 at 01:01, Dmitry Eremin-Solenikov
-> <dbaryshkov@gmail.com> wrote:
-> > crypto_cfb_decrypt_segment() incorrectly XOR'ed generated keystream
-> > with
-> > IV, rather than with data stream, resulting in incorrect
-> > decryption.
-> > Test vectors will be added in the next patch.
-> > 
-> > Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
-> > Cc: stable@vger.kernel.org
-> > ---
-> >  crypto/cfb.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/crypto/cfb.c b/crypto/cfb.c
-> > index a0d68c09e1b9..fd4e8500e121 100644
-> > --- a/crypto/cfb.c
-> > +++ b/crypto/cfb.c
-> > @@ -144,7 +144,7 @@ static int crypto_cfb_decrypt_segment(struct
-> > skcipher_walk *walk,
-> > 
-> >         do {
-> >                 crypto_cfb_encrypt_one(tfm, iv, dst);
-> > -               crypto_xor(dst, iv, bsize);
-> > +               crypto_xor(dst, src, bsize);
-
-This does look right.  I think the reason the TPM code works is that it
-always does encrypt/decrypt in-place, which is a separate piece of the
-code which appears to be correct.
-
-James
+/Jarkko
