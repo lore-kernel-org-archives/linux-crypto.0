@@ -1,36 +1,50 @@
-Return-Path: <SRS0=XFsj=M6=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from shards.monkeyblade.net ([23.128.96.9]:42674 "EHLO
-        shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726530AbeJSHaL (ORCPT
+Return-Path: <SRS0=YnV0=NF=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail-lj1-f181.google.com ([209.85.208.181]:45714 "EHLO
+        mail-lj1-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727551AbeJZIVV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 19 Oct 2018 03:30:11 -0400
-Date: Thu, 18 Oct 2018 16:26:53 -0700 (PDT)
-Message-Id: <20181018.162653.523093752759551554.davem@davemloft.net>
-To: ganeshgr@chelsio.com
-Cc: netdev@vger.kernel.org, nirranjan@chelsio.com,
-        indranil@chelsio.com, dt@chelsio.com, harsh@chelsio.com,
+        Fri, 26 Oct 2018 04:21:21 -0400
+Received: by mail-lj1-f181.google.com with SMTP id j4-v6so9841822ljc.12
+        for <linux-crypto@vger.kernel.org>; Thu, 25 Oct 2018 16:46:40 -0700 (PDT)
+Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com. [209.85.208.181])
+        by smtp.gmail.com with ESMTPSA id q78-v6sm1073363lfi.44.2018.10.25.16.46.38
+        for <linux-crypto@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 25 Oct 2018 16:46:38 -0700 (PDT)
+Received: by mail-lj1-f181.google.com with SMTP id p1-v6so9851558ljg.6
+        for <linux-crypto@vger.kernel.org>; Thu, 25 Oct 2018 16:46:38 -0700 (PDT)
+MIME-Version: 1.0
+References: <20161119102748.GA4277@gondor.apana.org.au> <20161213132414.GA7898@gondor.apana.org.au>
+ <20170223125141.GA17400@gondor.apana.org.au> <20170904101225.GA12613@gondor.apana.org.au>
+ <20171113074346.GA20245@gondor.apana.org.au> <20181023100958.GA11991@gondor.apana.org.au>
+In-Reply-To: <20181023100958.GA11991@gondor.apana.org.au>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Thu, 25 Oct 2018 16:46:22 -0700
+Message-ID: <CAHk-=whrfStPeB=5_HoaYraL8XnS5qfbGMDdLOw7sxDF4FKgHg@mail.gmail.com>
+Subject: Re: Crypto Update for 4.20
+To: herbert@gondor.apana.org.au
+Cc: David Miller <davem@davemloft.net>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         linux-crypto@vger.kernel.org
-Subject: Re: [PATCH net-next] cxgb4: fix the error path of
- cxgb4_uld_register()
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <1539871459-6921-1-git-send-email-ganeshgr@chelsio.com>
-References: <1539871459-6921-1-git-send-email-ganeshgr@chelsio.com>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Ganesh Goudar <ganeshgr@chelsio.com>
-Date: Thu, 18 Oct 2018 19:34:19 +0530
+On Tue, Oct 23, 2018 at 3:10 AM Herbert Xu <herbert@gondor.apana.org.au> wrote:
+>
+> Here is the crypto update for 4.20:
 
-> On multi adapter setup if the uld registration fails even on
-> one adapter, the allocated resources for the uld on all the
-> adapters are freed, rendering the functioning adapters unusable.
-> 
-> This commit fixes the issue by freeing the allocated resources
-> only for the failed adapter.
-> 
-> Signed-off-by: Ganesh Goudar <ganeshgr@chelsio.com>
+Pulled.
 
-Applied, thank you.
+> Please note that there is a conflict with the compiler-attributes
+> tree as one of the lines that was removed by a patch in the crypto
+> tree was moved to a different file in the compiler-attributes tree.
+> The fix is to remove that line from the moved file.
+
+Thanks for noting that. I haven't pulled the compiler-attributes tree
+yet, but I will hopefully remember this note when I do.
+
+The lib80211 conflicts looked trivial, but I'm building the tree to
+verify that I didn't screw something up..
+
+               Linus
