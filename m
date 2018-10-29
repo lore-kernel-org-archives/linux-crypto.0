@@ -1,67 +1,92 @@
-Return-Path: <SRS0=rgpc=NK=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:35434 "EHLO
-        fornost.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726172AbeJ3RKG (ORCPT
+Return-Path: <SRS0=g7fO=NJ=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from smtp.codeaurora.org ([198.145.29.96]:46756 "EHLO
+        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725964AbeJ2Wfx (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 30 Oct 2018 13:10:06 -0400
-Date: Tue, 30 Oct 2018 19:17:24 +1100
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>, linux-fscrypt@vger.kernel.org,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Paul Crowley <paulcrowley@google.com>,
-        Greg Kaiser <gkaiser@google.com>,
-        Michael Halcrow <mhalcrow@google.com>,
-        "Jason A . Donenfeld" <Jason@zx2c4.com>,
-        Samuel Neves <samuel.c.p.neves@gmail.com>,
-        Tomer Ashur <tomer.ashur@esat.kuleuven.be>
-Subject: Re: [RFC PATCH v2 11/12] crypto: adiantum - add Adiantum support
-Message-ID: <20181030081724.GA2730@gondor.apana.org.au>
-References: <20181015175424.97147-1-ebiggers@kernel.org>
- <20181015175424.97147-12-ebiggers@kernel.org>
- <CAKv+Gu9wrOOk-LGPYmxgLbv86uXzMeHN6th3mMEDT3Vg893HWw@mail.gmail.com>
- <20181020071206.GE876@sol.localdomain>
- <CAKv+Gu9zBKK7ughbBAKkHdfgX2KrBXkF6MhH3xrSdLegrjjYJQ@mail.gmail.com>
- <20181024220614.GA13497@gmail.com>
+        Mon, 29 Oct 2018 18:35:53 -0400
+From: AnilKumar Chimata <anilc@codeaurora.org>
+Subject: Re: [PATCH 3/3] crypto: qce: ice: Add support for Inline Crypto
+ Engine
+To: Rob Herring <robh@kernel.org>
+Cc: andy.gross@linaro.org, david.brown@linaro.org,
+        mark.rutland@arm.com, herbert@gondor.apana.org.au,
+        davem@davemloft.net, linux-soc@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <1539789476-6098-1-git-send-email-anilc@codeaurora.org>
+ <1539789476-6098-4-git-send-email-anilc@codeaurora.org>
+ <20181025145548.GA30244@bogus> <20181025152856.GD4970@thunk.org>
+Message-ID: <a00932da-72a5-42f9-bf82-eb3e611c35b5@codeaurora.org>
+Date: Mon, 29 Oct 2018 19:17:02 +0530
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181024220614.GA13497@gmail.com>
+In-Reply-To: <20181025152856.GD4970@thunk.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Oct 24, 2018 at 03:06:17PM -0700, Eric Biggers wrote:
->
-> The patch I've been using just exposes a file /proc/cryptobench (note: it maybe
-> should be made into a char device instead) to which you can write commands like:
-> 
-> 	algtype=skcipher algname=adiantum(xchacha12,aes) keysize=32 bufsize=4096 niter=1000
-> 
-> Then userspace reads back the result:
-> 
-> 	SUCCESS algname=adiantum(xchacha12,aes) driver_name=adiantum(xchacha12-software,aes-aesni,nhpoly1305-generic) measurement=0x30a5abd5776e0af enc_time=44831104 dec_time=38303077
-> 
-> It's then pretty straightforward to wrap this API in a userspace script that
-> does all the benchmarks you need, and formats the results nicely.
-> 
-> For correctness testing there's also an option 'sgl_fuzz' that randomizes the
-> scatterlist division.
-> 
-> Currently the patch is missing some features such as AEAD support, but at some
-> point I'd like to get it into a state where it can be included upstream.
 
-I completely agree that a new interface would be much better for
-tcrypt.
+Hi Rob,
 
-However, we're trying to avoid using /proc for new APIs.  So perhaps
-netlink would be a better choice given the existing configuration and
-stats APIs that already exist for it.
+Thanks for the comments,
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+On 2018-10-25 20:58, Theodore Y. Ts'o wrote:
+> On Thu, Oct 25, 2018 at 09:55:48AM -0500, Rob Herring wrote:
+>> > +Introduction:
+>> > +=============
+>> > +Storage encryption has been one of the most required feature from security
+>> > +point of view. QTI based storage encryption solution uses general purpose
+>> > +crypto engine. While this kind of solution provide a decent amount of
+>> > +performance, it falls short as storage speed is improving significantly
+>> > +continuously. To overcome performance degradation, newer chips are going to
+>> > +have Inline Crypto Engine (ICE) embedded into storage device. ICE is supposed
+>> > +to meet the line speed of storage devices.
+>> 
+>> Is ICE part of the storage device or part of the host as the binding
+>> suggests?
+> 
+> My understanding is that for this particular instantiation, the Inline
+> Crypto Engine is located on the SOC.
+
+This is part of the Storage controller, illustration below
+
+--------------------
+|            !_ICE_!
+|                  |
+|    UFS/SDCC      |
+|   Controller     |
+|                  |
+|                  |
+--------------------
+
+> 
+> However, from the perspective of generic kernel support, the inline
+> crypto support could be implemented on the SOC, or in the host bus
+> adaptor, or as a "bump in the wire", or on the storage device.  And
+> whatever abstract interface in the block layer should be able to
+> support all of these cases.
+
+As name suggests ICE hardware is inline with the data lines of storage 
+controller that is the reason why throughput is inline with storage 
+speed. Having it out side of the controller kills the purpose of 
+introducing ICE on storage controller. If this ICE hardware is placed 
+outside then its similar to other crypto engines which are used for 
+cryptographic operations. The main reason to keep ICE hardware inline 
+with storage is to avoid extra latency (buffer copy) during read/writes 
+which involves decryption/encryption.
+
+> 
+> I do not believe it would be wise to assume that inline crypto will
+> forever be a mobile-only thing.  I could easily see use cases in the
+> data center; for example, if you believe that Nation State Actors
+> might be trying to create "implants" that attack hard drive firmware,
+> per some of the Snowden leaks, creating an open design ICE engine with
+> auditable firmware and a trusted secure key store, and which sits
+> between the host CPU and the storage device might be one way to
+> mitigate against this threat.
+
+Above comments valid here as well.
+
+> 
+> 					- Ted
