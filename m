@@ -1,105 +1,128 @@
-Return-Path: <SRS0=YnV0=NF=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=g7fO=NJ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 026CBC46475
-	for <linux-crypto@archiver.kernel.org>; Thu, 25 Oct 2018 15:45:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 248B9C2BC61
+	for <linux-crypto@archiver.kernel.org>; Mon, 29 Oct 2018 09:49:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A175720834
-	for <linux-crypto@archiver.kernel.org>; Thu, 25 Oct 2018 15:45:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CAC1C20851
+	for <linux-crypto@archiver.kernel.org>; Mon, 29 Oct 2018 09:49:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="uAjDZ6G0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A175720834
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	dkim=pass (2048-bit key) header.d=benyossef-com.20150623.gappssmtp.com header.i=@benyossef-com.20150623.gappssmtp.com header.b="ICFJACvs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CAC1C20851
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=benyossef.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-crypto-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727411AbeJZAS7 (ORCPT
+        id S1729475AbeJ2Shi (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 25 Oct 2018 20:18:59 -0400
-Received: from mail.kernel.org ([198.145.29.99]:33732 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727399AbeJZAS7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 25 Oct 2018 20:18:59 -0400
-Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 93B6A2085B;
-        Thu, 25 Oct 2018 15:45:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1540482338;
-        bh=s5ORNzyjhQwRuAcy+X8ueZL9DxX3TcueONuZcBa6o9c=;
-        h=References:In-Reply-To:From:Date:Subject:To:From;
-        b=uAjDZ6G08RDf9NOMreAXGaJXpYRLojrK6F8uoA1kvNR8u7fgZF/gDtzOl1kMlb1ky
-         7+zoq4PwJEyaJeIAktMgOZUGfGDW7eecuDZ72Lo/RgcBZxK8c3MNp3+wcun/DIs8KI
-         uaLgxYHr/Icl7P16lkUJAaC/+NioHp5hY/RRDSb4=
-Received: by mail-qt1-f176.google.com with SMTP id p24-v6so4479699qtq.0;
-        Thu, 25 Oct 2018 08:45:38 -0700 (PDT)
-X-Gm-Message-State: AGRZ1gJtWTmA+pVf47Lyd0W2U8hcyPsjCzRxyx3yw53CMmsvq0Owno1c
-        tEWs0c6PrNPe+KXs+KtbyqUe5kfaeknogMYYIg==
-X-Google-Smtp-Source: AJdET5f++OqiyIovvsYh3/noYpbuSvCdh1UgH0Dy4lkrXNuTFD2IoCTb5HZDD1pon95cvIeLUkHCT2RB6f0c8ww+3aI=
-X-Received: by 2002:a0c:8c86:: with SMTP id p6-v6mr2078232qvb.246.1540482337738;
- Thu, 25 Oct 2018 08:45:37 -0700 (PDT)
+        Mon, 29 Oct 2018 14:37:38 -0400
+Received: from mail-ua1-f65.google.com ([209.85.222.65]:46366 "EHLO
+        mail-ua1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729509AbeJ2Shi (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 29 Oct 2018 14:37:38 -0400
+Received: by mail-ua1-f65.google.com with SMTP id z8so2735248uap.13
+        for <linux-crypto@vger.kernel.org>; Mon, 29 Oct 2018 02:49:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=benyossef-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=vD2aM5YFPo6bS2ROTaVOqQdcMrkuUsGl1K13WoGDC6Q=;
+        b=ICFJACvsbcA6FRARfuD3zB7Ncbfvua4+qU1cCZ636QXG8LmMCZqbp4ATmuCOvtPQOx
+         R2jjnu0Cr+1r4cCW4QcP97zwtn/fTcoeSiwMl/lbWoHde/MWU5GlgnNNCK6MUxcoRo71
+         YuVpsu53tmxbCg5GOeQrOK2FI7bUyDLUOt9yj+9I8CN8Q84R6G8O+D2tDk8QVNDm35G6
+         2mDnvpWPdd7x5SeOqrXDSdYr/Udm/kqSFRF7oW3M9pjVUbGEPXPUe7PmYUiZfszSHPsA
+         SpN7AQTOhbrgJsY7QYv8DNdpgA09wPcdKb7YbP0isEVaAXPlurxaeBMyAxwHeCiuDBR1
+         Hu4g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=vD2aM5YFPo6bS2ROTaVOqQdcMrkuUsGl1K13WoGDC6Q=;
+        b=KueXlS/gS4Hx1g9mx+rTP1ZkkwTtqoD3OWhywr6ExoaLAq0Y87NA2FhoH7ZP2sF4CP
+         ErS0YADjKbcSQsFvIsT70ncaYqJg8RIA8olrCnqRAiVG6mszCGjo4+a39Tzwua2xfOaY
+         HVC/lJpNyB2AWsJZEtVdnX97oaWFFUrR9RJvg48KZWXLRZWGn1ZjOylBXEYOfv+tIhSL
+         ZDTTZj6FD4rPnTd9KepebfG9MaROXe0PFCg3z2tvJoQd27rSaa4fmFzK30k5+XfZKkDq
+         JBf0mvHnPYQbbTLcPr3mkp9b3a70PVsfDMc7rBtd5d9l2llie2uUFva0U6rWGoi15qDf
+         9XnA==
+X-Gm-Message-State: AGRZ1gKgixxZMLFgdxwURjFLdyenU9Nhebq0XVKNnWPc8LDnzWvsY98B
+        XYylSdZCJtsNCbHe/SYRVPLRtsa21whYlToNa7SYsY297lArhw==
+X-Google-Smtp-Source: AJdET5e8RYeI5rpFbwauKF8Rinmh7BNsIZV7aUlmGavBmDnpOafcht9svQgQhhrDGRGBhbsqrfw+YB65R/q+LqASJ+Y=
+X-Received: by 2002:ab0:5648:: with SMTP id z8mr5143924uaa.126.1540806582291;
+ Mon, 29 Oct 2018 02:49:42 -0700 (PDT)
 MIME-Version: 1.0
-References: <1539789476-6098-1-git-send-email-anilc@codeaurora.org>
- <1539789476-6098-4-git-send-email-anilc@codeaurora.org> <20181025145548.GA30244@bogus>
- <20181025152856.GD4970@thunk.org>
-In-Reply-To: <20181025152856.GD4970@thunk.org>
-From:   Rob Herring <robh@kernel.org>
-Date:   Thu, 25 Oct 2018 10:45:25 -0500
-X-Gmail-Original-Message-ID: <CAL_Jsq+26Avcb2cQHKKAnrf=H4J=jMfv6sxsqxdMnFZMUdUDLA@mail.gmail.com>
+References: <1539696935-4433-1-git-send-email-gilad@benyossef.com>
+ <1539696935-4433-3-git-send-email-gilad@benyossef.com> <20181025001221.GA12740@bogus>
+In-Reply-To: <20181025001221.GA12740@bogus>
+From:   Gilad Ben-Yossef <gilad@benyossef.com>
+Date:   Mon, 29 Oct 2018 11:49:31 +0200
 Message-ID:
- <CAL_Jsq+26Avcb2cQHKKAnrf=H4J=jMfv6sxsqxdMnFZMUdUDLA@mail.gmail.com>
-Subject: Re: [PATCH 3/3] crypto: qce: ice: Add support for Inline Crypto Engine
-To:     "Theodore Ts'o" <tytso@mit.edu>,
-        AnilKumar Chimata <anilc@codeaurora.org>,
-        Andy Gross <andy.gross@linaro.org>,
-        David Brown <david.brown@linaro.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
+ <CAOtvUMd9W9HvFuXRH=LAyQYLnvL_hmwv703LzE-aA=2OSsVHMQ@mail.gmail.com>
+Subject: Re: [PATCH 2/3] crypto: ccree: add dt bindings for ccree 713
+To:     robh@kernel.org
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
         David Miller <davem@davemloft.net>,
-        "open list:ARM/QUALCOMM SUPPORT" <linux-soc@vger.kernel.org>,
-        devicetree@vger.kernel.org,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+        Mark Rutland <mark.rutland@arm.com>,
+        Ofir Drang <Ofir.Drang@arm.com>,
+        Yael Chemla <Yael.Chemla@arm.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" 
+        <devicetree@vger.kernel.org>,
+        Linux kernel mailing list <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
-Message-ID: <20181025154525.BnpsV1ZQYyE4KtdPGp5ve9JBz_jMfB7n5mO1e2bR4X8@z>
+Message-ID: <20181029094931.wKzAsEOqnAZ_RWsPCbcVH0alL6fLoRnpfl2FLFBzdqE@z>
 
-On Thu, Oct 25, 2018 at 10:29 AM Theodore Y. Ts'o <tytso@mit.edu> wrote:
+On Thu, Oct 25, 2018 at 3:12 AM Rob Herring <robh@kernel.org> wrote:
 >
-> On Thu, Oct 25, 2018 at 09:55:48AM -0500, Rob Herring wrote:
-> > > +Introduction:
-> > > +=============
-> > > +Storage encryption has been one of the most required feature from security
-> > > +point of view. QTI based storage encryption solution uses general purpose
-> > > +crypto engine. While this kind of solution provide a decent amount of
-> > > +performance, it falls short as storage speed is improving significantly
-> > > +continuously. To overcome performance degradation, newer chips are going to
-> > > +have Inline Crypto Engine (ICE) embedded into storage device. ICE is supposed
-> > > +to meet the line speed of storage devices.
+> On Tue, Oct 16, 2018 at 02:35:32PM +0100, Gilad Ben-Yossef wrote:
+> > Add device tree bindings associating Arm TrustZone CryptoCell 713 with =
+the
+> > ccree driver.
+>
+> "dt-bindings: crypto: ..." for the subject.
 > >
-> > Is ICE part of the storage device or part of the host as the binding
-> > suggests?
+> > Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+> > ---
+> >  Documentation/devicetree/bindings/crypto/arm-cryptocell.txt | 5 +++--
+> >  1 file changed, 3 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/Documentation/devicetree/bindings/crypto/arm-cryptocell.tx=
+t b/Documentation/devicetree/bindings/crypto/arm-cryptocell.txt
+> > index 999fb2a..880de07 100644
+> > --- a/Documentation/devicetree/bindings/crypto/arm-cryptocell.txt
+> > +++ b/Documentation/devicetree/bindings/crypto/arm-cryptocell.txt
+> > @@ -1,8 +1,9 @@
+> >  Arm TrustZone CryptoCell cryptographic engine
+> >
+> >  Required properties:
+> > -- compatible: Should be one of: "arm,cryptocell-712-ree",
+> > -  "arm,cryptocell-710-ree" or "arm,cryptocell-630p-ree".
+> > +- compatible: Should be one of: "arm,cryptocell-713-ree",
+> > +  "arm,cryptocell-712-ree", "arm,cryptocell-710-ree" or
+> > +  "arm,cryptocell-630p-ree".
 >
-> My understanding is that for this particular instantiation, the Inline
-> Crypto Engine is located on the SOC.
+> Please format 1 per line.
+>
 
-Mine too, but that is not what this doc says.
+Will do.
+Thanks for the review.
 
-> However, from the perspective of generic kernel support, the inline
-> crypto support could be implemented on the SOC, or in the host bus
-> adaptor, or as a "bump in the wire", or on the storage device.  And
-> whatever abstract interface in the block layer should be able to
-> support all of these cases.
+I will send a corrected patch.
 
-Yes, certainly.
+Gilad
 
-Rob
+
+--=20
+Gilad Ben-Yossef
+Chief Coffee Drinker
+
+values of =CE=B2 will give rise to dom!
