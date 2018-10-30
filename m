@@ -1,162 +1,58 @@
-Return-Path: <SRS0=GKHD=M7=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-lf1-f67.google.com ([209.85.167.67]:33363 "EHLO
-        mail-lf1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726698AbeJTHKE (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 20 Oct 2018 03:10:04 -0400
-From: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
-To: linux-crypto@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        stable@vger.kernel.org
-Subject: [PATCH 2/2] crypto: testmgr: add AES-CFB tests
-Date: Sat, 20 Oct 2018 02:01:53 +0300
-Message-Id: <20181019230153.28201-2-dbaryshkov@gmail.com>
-In-Reply-To: <20181019230153.28201-1-dbaryshkov@gmail.com>
-References: <20181019230153.28201-1-dbaryshkov@gmail.com>
+Return-Path: <SRS0=rgpc=NK=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from szxga06-in.huawei.com ([45.249.212.32]:59098 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728071AbeJ3XX0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 30 Oct 2018 19:23:26 -0400
+Message-ID: <5BD86AD3.1070102@huawei.com>
+Date: Tue, 30 Oct 2018 22:29:39 +0800
+From: zhong jiang <zhongjiang@huawei.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+To: Benjamin Coddington <bcodding@redhat.com>
+CC: <herbert@gondor.apana.org.au>, <trond.myklebust@hammerspace.com>,
+        <bfields@redhat.com>, <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>, <linux-nfs@vger.kernel.org>
+Subject: Re: [Qestion] Lots of memory leaks when mounting and unmounting nfs
+ client to server continuously.
+References: <5BD85266.6000301@huawei.com> <1DEE371C-69EB-4D92-8F78-535AA5203007@redhat.com> <5BD86392.7070200@huawei.com> <8975EA60-7C42-426A-ADA3-DEE0E2CEE964@redhat.com>
+In-Reply-To: <8975EA60-7C42-426A-ADA3-DEE0E2CEE964@redhat.com>
+Content-Type: text/plain; charset="ISO-8859-1"
+Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Add AES128/192/256-CFB testvectors from NIST SP800-38A.
+On 2018/10/30 22:03, Benjamin Coddington wrote:
+> On 30 Oct 2018, at 9:58, zhong jiang wrote:
+>
+>> On 2018/10/30 21:06, Benjamin Coddington wrote:
+>>> Hi zhong jiang,
+>>>
+>>> Try asking in linux-nfs.. but I'll also note that 3.10-stable may be
+>>> missing a number of fixes to leaks in the NFS GSS code.
+>>>
+>>> I can see a more than a few fixes to memory leaks with: git log
+>>> --grep=leak --oneline net/sunrpc/auth_gss/
+>>>
+>> Thanks for your reply.  I has tested some of them in the upsteam as you
+>> have said.  but It fails to solve the issue completely.
+> What have you tested?  It is hard to help without specifics.
+In the latest mainline.  we can filter the following result by the key word "leak"
+in net/sunrpc/auth_gss.
 
-Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
-Cc: stable@vger.kernel.org
-Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
----
- crypto/tcrypt.c  |  5 ++++
- crypto/testmgr.c |  7 +++++
- crypto/testmgr.h | 76 ++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 88 insertions(+)
+0070ed3 Fix 16-byte memory leak in gssp_accept_sec_context_upcall   (has been tested,  Fail to work)
+78794d1 svcrpc: don't leak contexts on PROC_DESTROY     (has been tested,  Fail to work)
+a1d1e9b svcrpc: fix memory leak in gssp_accept_sec_context_upcall  (Not yet)
+e9776d0 SUNRPC: Fix a pipe_version reference leak   (Not yet)
+cdead7c SUNRPC: Fix a potential memory leak in auth_gss (Not yet)
+980e5a4 nfsd: fix rsi_cache reference count leak  (Not yet)
+07a2bf1 SUNRPC: Fix a memory leak in gss_create()  (Not yet)
+3ab9bb7 SUNRPC: Fix a memory leak in the auth credcache code (existed)
+54f9247 knfsd: fix resource leak resulting in module refcount leak for rpcsec_gss_krb5.ko  (existed)
+b797b5b [PATCH] knfsd: svcrpc: fix gss krb5i memory leak  (existed)
+d4a30e7 RPCSEC_GSS: fix leak in krb5 code caused by superfluous kmalloc (Not yet)
 
-diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
-index bdde95e8d369..a6315827d240 100644
---- a/crypto/tcrypt.c
-+++ b/crypto/tcrypt.c
-@@ -1733,6 +1733,7 @@ static int do_test(const char *alg, u32 type, u32 mask, int m, u32 num_mb)
- 		ret += tcrypt_test("xts(aes)");
- 		ret += tcrypt_test("ctr(aes)");
- 		ret += tcrypt_test("rfc3686(ctr(aes))");
-+		ret += tcrypt_test("cfb(aes)");
- 		break;
- 
- 	case 11:
-@@ -2059,6 +2060,10 @@ static int do_test(const char *alg, u32 type, u32 mask, int m, u32 num_mb)
- 				speed_template_16_24_32);
- 		test_cipher_speed("ctr(aes)", DECRYPT, sec, NULL, 0,
- 				speed_template_16_24_32);
-+		test_cipher_speed("cfb(aes)", ENCRYPT, sec, NULL, 0,
-+				speed_template_16_24_32);
-+		test_cipher_speed("cfb(aes)", DECRYPT, sec, NULL, 0,
-+				speed_template_16_24_32);
- 		break;
- 
- 	case 201:
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index a1d42245082a..016d61c419fc 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -2684,6 +2684,13 @@ static const struct alg_test_desc alg_test_descs[] = {
- 				.dec = __VECS(aes_ccm_dec_tv_template)
- 			}
- 		}
-+	}, {
-+		.alg = "cfb(aes)",
-+		.test = alg_test_skcipher,
-+		.fips_allowed = 1,
-+		.suite = {
-+			.cipher = __VECS(aes_cfb_tv_template)
-+		},
- 	}, {
- 		.alg = "chacha20",
- 		.test = alg_test_skcipher,
-diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index 173111c70746..19b6d184c8fb 100644
---- a/crypto/testmgr.h
-+++ b/crypto/testmgr.h
-@@ -12081,6 +12081,82 @@ static const struct cipher_testvec aes_cbc_tv_template[] = {
- 	},
- };
- 
-+static const struct cipher_testvec aes_cfb_tv_template[] = {
-+	{ /* From NIST SP800-38A */
-+		.key	= "\x2b\x7e\x15\x16\x28\xae\xd2\xa6"
-+			  "\xab\xf7\x15\x88\x09\xcf\x4f\x3c",
-+		.klen	= 16,
-+		.iv	= "\x00\x01\x02\x03\x04\x05\x06\x07"
-+			  "\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f",
-+		.ptext	= "\x6b\xc1\xbe\xe2\x2e\x40\x9f\x96"
-+			  "\xe9\x3d\x7e\x11\x73\x93\x17\x2a"
-+			  "\xae\x2d\x8a\x57\x1e\x03\xac\x9c"
-+			  "\x9e\xb7\x6f\xac\x45\xaf\x8e\x51"
-+			  "\x30\xc8\x1c\x46\xa3\x5c\xe4\x11"
-+			  "\xe5\xfb\xc1\x19\x1a\x0a\x52\xef"
-+			  "\xf6\x9f\x24\x45\xdf\x4f\x9b\x17"
-+			  "\xad\x2b\x41\x7b\xe6\x6c\x37\x10",
-+		.ctext	= "\x3b\x3f\xd9\x2e\xb7\x2d\xad\x20"
-+			  "\x33\x34\x49\xf8\xe8\x3c\xfb\x4a"
-+			  "\xc8\xa6\x45\x37\xa0\xb3\xa9\x3f"
-+			  "\xcd\xe3\xcd\xad\x9f\x1c\xe5\x8b"
-+			  "\x26\x75\x1f\x67\xa3\xcb\xb1\x40"
-+			  "\xb1\x80\x8c\xf1\x87\xa4\xf4\xdf"
-+			  "\xc0\x4b\x05\x35\x7c\x5d\x1c\x0e"
-+			  "\xea\xc4\xc6\x6f\x9f\xf7\xf2\xe6",
-+		.len	= 64,
-+	}, {
-+		.key	= "\x8e\x73\xb0\xf7\xda\x0e\x64\x52"
-+			  "\xc8\x10\xf3\x2b\x80\x90\x79\xe5"
-+			  "\x62\xf8\xea\xd2\x52\x2c\x6b\x7b",
-+		.klen	= 24,
-+		.iv	= "\x00\x01\x02\x03\x04\x05\x06\x07"
-+			  "\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f",
-+		.ptext	= "\x6b\xc1\xbe\xe2\x2e\x40\x9f\x96"
-+			  "\xe9\x3d\x7e\x11\x73\x93\x17\x2a"
-+			  "\xae\x2d\x8a\x57\x1e\x03\xac\x9c"
-+			  "\x9e\xb7\x6f\xac\x45\xaf\x8e\x51"
-+			  "\x30\xc8\x1c\x46\xa3\x5c\xe4\x11"
-+			  "\xe5\xfb\xc1\x19\x1a\x0a\x52\xef"
-+			  "\xf6\x9f\x24\x45\xdf\x4f\x9b\x17"
-+			  "\xad\x2b\x41\x7b\xe6\x6c\x37\x10",
-+		.ctext	= "\xcd\xc8\x0d\x6f\xdd\xf1\x8c\xab"
-+			  "\x34\xc2\x59\x09\xc9\x9a\x41\x74"
-+			  "\x67\xce\x7f\x7f\x81\x17\x36\x21"
-+			  "\x96\x1a\x2b\x70\x17\x1d\x3d\x7a"
-+			  "\x2e\x1e\x8a\x1d\xd5\x9b\x88\xb1"
-+			  "\xc8\xe6\x0f\xed\x1e\xfa\xc4\xc9"
-+			  "\xc0\x5f\x9f\x9c\xa9\x83\x4f\xa0"
-+			  "\x42\xae\x8f\xba\x58\x4b\x09\xff",
-+		.len	= 64,
-+	}, {
-+		.key	= "\x60\x3d\xeb\x10\x15\xca\x71\xbe"
-+			  "\x2b\x73\xae\xf0\x85\x7d\x77\x81"
-+			  "\x1f\x35\x2c\x07\x3b\x61\x08\xd7"
-+			  "\x2d\x98\x10\xa3\x09\x14\xdf\xf4",
-+		.klen	= 32,
-+		.iv	= "\x00\x01\x02\x03\x04\x05\x06\x07"
-+			  "\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f",
-+		.ptext	= "\x6b\xc1\xbe\xe2\x2e\x40\x9f\x96"
-+			  "\xe9\x3d\x7e\x11\x73\x93\x17\x2a"
-+			  "\xae\x2d\x8a\x57\x1e\x03\xac\x9c"
-+			  "\x9e\xb7\x6f\xac\x45\xaf\x8e\x51"
-+			  "\x30\xc8\x1c\x46\xa3\x5c\xe4\x11"
-+			  "\xe5\xfb\xc1\x19\x1a\x0a\x52\xef"
-+			  "\xf6\x9f\x24\x45\xdf\x4f\x9b\x17"
-+			  "\xad\x2b\x41\x7b\xe6\x6c\x37\x10",
-+		.ctext	= "\xdc\x7e\x84\xbf\xda\x79\x16\x4b"
-+			  "\x7e\xcd\x84\x86\x98\x5d\x38\x60"
-+			  "\x39\xff\xed\x14\x3b\x28\xb1\xc8"
-+			  "\x32\x11\x3c\x63\x31\xe5\x40\x7b"
-+			  "\xdf\x10\x13\x24\x15\xe5\x4b\x92"
-+			  "\xa1\x3e\xd0\xa8\x26\x7a\xe2\xf9"
-+			  "\x75\xa3\x85\x74\x1a\xb9\xce\xf8"
-+			  "\x20\x31\x62\x3d\x55\xb1\xe4\x71",
-+		.len	= 64,
-+	},
-+};
-+
- static const struct aead_testvec hmac_md5_ecb_cipher_null_enc_tv_template[] = {
- 	{ /* Input data from RFC 2410 Case 1 */
- #ifdef __LITTLE_ENDIAN
--- 
-2.19.1
+
+I suspect that  commit d4a30e7 ("RPCSEC_GSS: fix leak in krb5 code caused by superfluous kmalloc")  will solve
+the issue.  Further,  I will adjust the patch  to 3.10.  and see what it will happen.  Actually I am not sure. :-[
+
+Thanks,
+zhong jiang.
