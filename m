@@ -1,116 +1,72 @@
-Return-Path: <SRS0=g7fO=NJ=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from foss.arm.com ([217.140.101.70]:37772 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729343AbeJ2SiV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 29 Oct 2018 14:38:21 -0400
-From: Gilad Ben-Yossef <gilad@benyossef.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>
-Cc: Ofir Drang <Ofir.Drang@arm.com>, Yael Chemla <Yael.Chemla@arm.com>,
-        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v2 1/3] crypto: ccree: add support for CryptoCell 713
-Date: Mon, 29 Oct 2018 09:50:12 +0000
-Message-Id: <1540806616-5483-2-git-send-email-gilad@benyossef.com>
-In-Reply-To: <1540806616-5483-1-git-send-email-gilad@benyossef.com>
-References: <1540806616-5483-1-git-send-email-gilad@benyossef.com>
+Return-Path: <SRS0=rgpc=NK=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from szxga06-in.huawei.com ([45.249.212.32]:57072 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726761AbeJ3Viu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 30 Oct 2018 17:38:50 -0400
+Message-ID: <5BD85266.6000301@huawei.com>
+Date: Tue, 30 Oct 2018 20:45:26 +0800
+From: zhong jiang <zhongjiang@huawei.com>
+MIME-Version: 1.0
+To: <herbert@gondor.apana.org.au>
+CC: <linux-crypto@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+Subject: [Qestion]  Lots of memory leaks when mounting and unmounting nfs
+ client to server continuously.
+Content-Type: text/plain; charset="ISO-8859-1"
+Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Add support for Arm TrustZone CryptoCell 713.
-Note that this patch just enables using a 713 in backwards compatible mode
-to 712. Newer 713 specific features will follow.
+Hi,   Herbert
 
-Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
----
- drivers/crypto/Kconfig           |  2 +-
- drivers/crypto/ccree/cc_driver.c | 23 +++++++++++++++--------
- drivers/crypto/ccree/cc_driver.h |  5 +++--
- 3 files changed, 19 insertions(+), 11 deletions(-)
+Recently,  I  hit  a memory leak issue when  mounting and unmounting nfs with  the way of  krb5.
+The issue happens to the linux-3.10-stable.
 
-diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-index a8c4ce0..bea4de6 100644
---- a/drivers/crypto/Kconfig
-+++ b/drivers/crypto/Kconfig
-@@ -754,7 +754,7 @@ config CRYPTO_DEV_CCREE
- 	help
- 	  Say 'Y' to enable a driver for the REE interface of the Arm
- 	  TrustZone CryptoCell family of processors. Currently the
--	  CryptoCell 712, 710 and 630 are supported.
-+	  CryptoCell 713, 712, 710 and 630 are supported.
- 	  Choose this if you wish to use hardware acceleration of
- 	  cryptographic operations on the system REE.
- 	  If unsure say Y.
-diff --git a/drivers/crypto/ccree/cc_driver.c b/drivers/crypto/ccree/cc_driver.c
-index 1ff229c..630c598 100644
---- a/drivers/crypto/ccree/cc_driver.c
-+++ b/drivers/crypto/ccree/cc_driver.c
-@@ -43,6 +43,10 @@ struct cc_hw_data {
- 
- /* Hardware revisions defs. */
- 
-+static const struct cc_hw_data cc713_hw = {
-+	.name = "713", .rev = CC_HW_REV_713
-+};
-+
- static const struct cc_hw_data cc712_hw = {
- 	.name = "712", .rev = CC_HW_REV_712, .sig =  0xDCC71200U
- };
-@@ -56,6 +60,7 @@ static const struct cc_hw_data cc630p_hw = {
- };
- 
- static const struct of_device_id arm_ccree_dev_of_match[] = {
-+	{ .compatible = "arm,cryptocell-713-ree", .data = &cc713_hw },
- 	{ .compatible = "arm,cryptocell-712-ree", .data = &cc712_hw },
- 	{ .compatible = "arm,cryptocell-710-ree", .data = &cc710_hw },
- 	{ .compatible = "arm,cryptocell-630p-ree", .data = &cc630p_hw },
-@@ -297,15 +302,17 @@ static int init_cc_resources(struct platform_device *plat_dev)
- 		return rc;
- 	}
- 
--	/* Verify correct mapping */
--	signature_val = cc_ioread(new_drvdata, new_drvdata->sig_offset);
--	if (signature_val != hw_rev->sig) {
--		dev_err(dev, "Invalid CC signature: SIGNATURE=0x%08X != expected=0x%08X\n",
--			signature_val, hw_rev->sig);
--		rc = -EINVAL;
--		goto post_clk_err;
-+	if (hw_rev->rev <= CC_HW_REV_712) {
-+		/* Verify correct mapping */
-+		signature_val = cc_ioread(new_drvdata, new_drvdata->sig_offset);
-+		if (signature_val != hw_rev->sig) {
-+			dev_err(dev, "Invalid CC signature: SIGNATURE=0x%08X != expected=0x%08X\n",
-+				signature_val, hw_rev->sig);
-+			rc = -EINVAL;
-+			goto post_clk_err;
-+		}
-+		dev_dbg(dev, "CC SIGNATURE=0x%08X\n", signature_val);
- 	}
--	dev_dbg(dev, "CC SIGNATURE=0x%08X\n", signature_val);
- 
- 	/* Display HW versions */
- 	dev_info(dev, "ARM CryptoCell %s Driver: HW version 0x%08X, Driver version %s\n",
-diff --git a/drivers/crypto/ccree/cc_driver.h b/drivers/crypto/ccree/cc_driver.h
-index d608a4f..a06e5c9 100644
---- a/drivers/crypto/ccree/cc_driver.h
-+++ b/drivers/crypto/ccree/cc_driver.h
-@@ -36,12 +36,13 @@
- extern bool cc_dump_desc;
- extern bool cc_dump_bytes;
- 
--#define DRV_MODULE_VERSION "4.0"
-+#define DRV_MODULE_VERSION "5.0"
- 
- enum cc_hw_rev {
- 	CC_HW_REV_630 = 630,
- 	CC_HW_REV_710 = 710,
--	CC_HW_REV_712 = 712
-+	CC_HW_REV_712 = 712,
-+	CC_HW_REV_713 = 713
- };
- 
- #define CC_COHERENT_CACHE_PARAMS 0xEEE
--- 
-2.7.4
+I find that slab-1024 and slab-512 will take up most of the memory.  And it can not be freed.
+Meanwhile, it result in rpcsec_gss_krb5 can be unregistered as well.
+
+nfs-sve1:/home # cat /proc/modules | grep krb5
+rpcsec_gss_krb5 31477 239730 - Live 0xffffffffa0334000
+auth_rpcgss 59314 3 rpcsec_gss_krb5,nfsd, Live 0xffffffffa0123000
+sunrpc 300546 25 rpcsec_gss_krb5,nfsd,auth_rpcgss,nfs_acl,lockd, Live 0xffffffffa013b000
+
+I open the slab-1024 trace by enabling /sys/kernel/slab/:t-0001024/trace and get the following
+
+[123420.989831] Call Trace:
+[123420.989834]  [<ffffffff81642d2a>] dump_stack+0x19/0x1b
+[123420.989837]  [<ffffffff8163f25e>] alloc_debug_processing+0xc5/0x118
+[123420.989839]  [<ffffffff8163fd4d>] __slab_alloc+0x400/0x48f
+[123420.989841]  [<ffffffff812b1795>] ? __crypto_alloc_tfm+0x45/0x170
+[123420.989845]  [<ffffffff812b2307>] ? setkey+0x57/0x110
+[123420.989847]  [<ffffffff8118b5fd>] ? kzfree+0x2d/0x30
+[123420.989850]  [<ffffffff811c6e88>] __kmalloc+0x1c8/0x230
+[123420.989852]  [<ffffffff812b1795>] __crypto_alloc_tfm+0x45/0x170
+[123420.989854]  [<ffffffff812b2e45>] crypto_spawn_tfm+0x45/0x80
+[123420.989857]  [<ffffffff811c6eb3>] ? __kmalloc+0x1f3/0x230
+[123420.989859]  [<ffffffff812c15c7>] crypto_cbc_init_tfm+0x27/0x40
+[123420.989864]  [<ffffffff812b1851>] __crypto_alloc_tfm+0x101/0x170
+[123420.989866]  [<ffffffff812b1ffc>] crypto_alloc_base+0x4c/0xb0
+[123420.989869]  [<ffffffffa033411b>] context_v2_alloc_cipher.isra.2+0x2b/0xc0 [rpcsec_gss_krb5]
+[123420.989871]  [<ffffffffa0334da8>] gss_import_sec_context_kerberos+0xbf8/0xf00 [rpcsec_gss_krb5]
+[123420.989875]  [<ffffffffa0126d5d>] gss_import_sec_context+0x7d/0xb0 [auth_rpcgss]
+[123420.989878]  [<ffffffffa012b35e>] gss_proxy_save_rsc+0x137/0x1b0 [auth_rpcgss]
+[123420.989884]  [<ffffffffa012b51e>] svcauth_gss_proxy_init+0x147/0x1e4 [auth_rpcgss]
+[123420.989886]  [<ffffffff810c2ad6>] ? dequeue_entity+0x106/0x520
+[123420.989890]  [<ffffffffa0128e2a>] svcauth_gss_accept+0x3da/0xb70 [auth_rpcgss]
+[123420.989892]  [<ffffffff810b6c25>] ? check_preempt_curr+0x85/0xa0
+[123420.989894]  [<ffffffff810b6c59>] ? ttwu_do_wakeup+0x19/0xd0
+[123420.989897]  [<ffffffff810b6ded>] ? ttwu_do_activate.constprop.86+0x5d/0x70
+[123420.989900]  [<ffffffff810b9422>] ? try_to_wake_up+0x162/0x330
+[123420.989908]  [<ffffffffa014f490>] svc_authenticate+0xc0/0xe0 [sunrpc]
+[123420.989914]  [<ffffffffa014c04a>] svc_process_common+0x21a/0x6f0 [sunrpc]
+[123420.989921]  [<ffffffffa014c623>] svc_process+0x103/0x170 [sunrpc]
+[123420.989928]  [<ffffffffa01baaaf>] nfsd+0xdf/0x150 [nfsd]
+[123420.989932]  [<ffffffffa01ba9d0>] ? nfsd_destroy+0x80/0x80 [nfsd]
+[123420.989934]  [<ffffffff810a648f>] kthread+0xcf/0xe0
+[123420.989936]  [<ffffffff810a63c0>] ? kthread_create_on_node+0x140/0x140
+[123420.989939]  [<ffffffff81653318>] ret_from_fork+0x58/0x90
+[123420.989943]  [<ffffffff810a63c0>] ? kthread_create_on_node+0x140/0x140
+
+I am unfamiliar with crypto.   I will be appreciated  if you could give me some suggestion.
+
+Thanks,
+zhong jiang
