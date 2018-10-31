@@ -1,28 +1,44 @@
-Return-Path: <SRS0=schb=NE=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from sonic305-21.consmr.mail.ir2.yahoo.com ([77.238.177.83]:41588
-        "EHLO sonic305-21.consmr.mail.ir2.yahoo.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727152AbeJYFHn (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 25 Oct 2018 01:07:43 -0400
-Date: Wed, 24 Oct 2018 20:38:04 +0000 (UTC)
-From: FRANK CHRISTOPHER <mr.peteruderika@yahoo.pt>
-Reply-To: FRANK CHRISTOPHER <christopherfranklin429@gmail.com>
-Message-ID: <1397164855.24129511.1540413484654@mail.yahoo.com>
-Subject: For your attention
+Return-Path: <SRS0=nKf/=NL=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:36112 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725992AbeJaQYg (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 31 Oct 2018 12:24:36 -0400
+Date: Wed, 31 Oct 2018 15:27:14 +0800
+From: Shawn Guo <shawnguo@kernel.org>
+To: Leonard Crestez <leonard.crestez@nxp.com>
+Cc: Fabio Estevam <fabio.estevam@nxp.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Horia Geanta <horia.geanta@nxp.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Franck Lenormand <franck.lenormand@nxp.com>,
+        Marek Vasut <marek.vasut@gmail.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "kernel@pengutronix.de" <kernel@pengutronix.de>,
+        "David S . Miller " <davem@davemloft.net>,
+        "linux-arm-kernel@lists.infradead.org"
+        <linux-arm-kernel@lists.infradead.org>,
+        dl-linux-imx <linux-imx@nxp.com>
+Subject: Re: [PATCH v4 4/4] ARM: imx_v6_v7_defconfig: Enable
+ CRYPTO_DEV_MXS_DCP
+Message-ID: <20181031072712.GK10386@tiger>
+References: <cover.1539779579.git.leonard.crestez@nxp.com>
+ <5ba9a89b881f6ce816262ce52f431e32e7fb85a7.1539779579.git.leonard.crestez@nxp.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-References: <1397164855.24129511.1540413484654.ref@mail.yahoo.com>
-To: unlisted-recipients:; (no To-header on input)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5ba9a89b881f6ce816262ce52f431e32e7fb85a7.1539779579.git.leonard.crestez@nxp.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+On Wed, Oct 17, 2018 at 12:37:55PM +0000, Leonard Crestez wrote:
+> This block is present in 6sl, 6sll and 6ull so it should be enabled in
+> the default imx kernel config.
+> 
+> Signed-off-by: Leonard Crestez <leonard.crestez@nxp.com>
+> Reviewed-by: Fabio Estevam <festevam@gmail.com>
 
-
-My name is Mr Frank Christopher, the est. managing director of the Banque Internationale du Benin. I am contacting you in a benevolent spirit;and with utmost confidence and trust to enable us provide a solution to a money transfer of $18Million to your account.
-
- Do get back to me for more details.
-
- Best Regards,
-
-Mr Frank Christopher.
+Applied, thanks.
