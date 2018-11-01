@@ -1,561 +1,158 @@
-Return-Path: <SRS0=HYoH=NT=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from inva021.nxp.com ([92.121.34.21]:36990 "EHLO inva021.nxp.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726618AbeKHXMb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 8 Nov 2018 18:12:31 -0500
-From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        Cristian Stoica <cristian.stoica@microchip.com>,
-        linux-crypto@vger.kernel.org
-Subject: [PATCH 1/5] crypto: caam - add register map changes cf. Era 10
-Date: Thu,  8 Nov 2018 15:36:27 +0200
-Message-Id: <20181108133631.15779-2-horia.geanta@nxp.com>
-In-Reply-To: <20181108133631.15779-1-horia.geanta@nxp.com>
-References: <20181108133631.15779-1-horia.geanta@nxp.com>
+Return-Path: <SRS0=waMk=NM=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail-io1-f72.google.com ([209.85.166.72]:47796 "EHLO
+        mail-io1-f72.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728790AbeKAXgQ (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 1 Nov 2018 19:36:16 -0400
+Received: by mail-io1-f72.google.com with SMTP id y8-v6so17800970ioc.14
+        for <linux-crypto@vger.kernel.org>; Thu, 01 Nov 2018 07:33:03 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Date: Thu, 01 Nov 2018 07:33:02 -0700
+Message-ID: <000000000000d8053d05799b4b86@google.com>
+Subject: KASAN: use-after-free Read in skcipher_recvmsg
+From: syzbot <syzbot+6939a606a5305e9e9799@syzkaller.appspotmail.com>
+To: davem@davemloft.net, herbert@gondor.apana.org.au,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Era 10 changes the register map.
+Hello,
 
-The updates that affect the drivers:
--new version registers are added
--DBG_DBG[deco_state] field is moved to a new register -
-DBG_EXEC[19:16] @ 8_0E3Ch.
+syzbot found the following crash on:
 
-Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
+HEAD commit:    59fc453b21f7 Merge branch 'akpm' (patches from Andrew)
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=14bc682b400000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=ea045471e4c756e8
+dashboard link: https://syzkaller.appspot.com/bug?extid=6939a606a5305e9e9799
+compiler:       gcc (GCC) 8.0.1 20180413 (experimental)
+
+Unfortunately, I don't have any reproducer for this crash yet.
+
+IMPORTANT: if you fix the bug, please add the following tag to the commit:
+Reported-by: syzbot+6939a606a5305e9e9799@syzkaller.appspotmail.com
+
+==================================================================
+BUG: KASAN: use-after-free in crypto_stat_skcipher_decrypt  
+include/crypto/skcipher.h:510 [inline]
+BUG: KASAN: use-after-free in crypto_skcipher_decrypt  
+include/crypto/skcipher.h:559 [inline]
+BUG: KASAN: use-after-free in _skcipher_recvmsg crypto/algif_skcipher.c:131  
+[inline]
+BUG: KASAN: use-after-free in skcipher_recvmsg+0x160f/0x1780  
+crypto/algif_skcipher.c:165
+Read of size 4 at addr ffff8801b69239c0 by task syz-executor3/23539
+
+CPU: 0 PID: 23539 Comm: syz-executor3 Not tainted 4.19.0+ #313
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS  
+Google 01/01/2011
+Call Trace:
+  __dump_stack lib/dump_stack.c:77 [inline]
+  dump_stack+0x244/0x39d lib/dump_stack.c:113
+  print_address_description.cold.7+0x9/0x1ff mm/kasan/report.c:256
+  kasan_report_error mm/kasan/report.c:354 [inline]
+  kasan_report.cold.8+0x242/0x309 mm/kasan/report.c:412
+  __asan_report_load4_noabort+0x14/0x20 mm/kasan/report.c:432
+  crypto_stat_skcipher_decrypt include/crypto/skcipher.h:510 [inline]
+  crypto_skcipher_decrypt include/crypto/skcipher.h:559 [inline]
+  _skcipher_recvmsg crypto/algif_skcipher.c:131 [inline]
+  skcipher_recvmsg+0x160f/0x1780 crypto/algif_skcipher.c:165
+  sock_recvmsg_nosec net/socket.c:794 [inline]
+  sock_recvmsg+0xd0/0x110 net/socket.c:801
+  sock_read_iter+0x39b/0x570 net/socket.c:878
+kvm [23531]: vcpu0, guest rIP: 0xfff0 unimplemented HWCR wrmsr: 0x80000280
+  call_read_iter include/linux/fs.h:1833 [inline]
+  aio_read+0x297/0x490 fs/aio.c:1516
+  io_submit_one+0xac2/0xf80 fs/aio.c:1832
+  __do_sys_io_submit fs/aio.c:1916 [inline]
+  __se_sys_io_submit fs/aio.c:1887 [inline]
+  __x64_sys_io_submit+0x1b7/0x580 fs/aio.c:1887
+  do_syscall_64+0x1b9/0x820 arch/x86/entry/common.c:290
+  entry_SYSCALL_64_after_hwframe+0x49/0xbe
+binder: 23534:23545 ioctl c018620b 20000340 returned -14
+RIP: 0033:0x457569
+Code: fd b3 fb ff c3 66 2e 0f 1f 84 00 00 00 00 00 66 90 48 89 f8 48 89 f7  
+48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff  
+ff 0f 83 cb b3 fb ff c3 66 2e 0f 1f 84 00 00 00 00
+RSP: 002b:00007f351c0cdc78 EFLAGS: 00000246 ORIG_RAX: 00000000000000d1
+RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 0000000000457569
+RDX: 0000000020bd9fe0 RSI: 0000000000000001 RDI: 00007f351c0ad000
+RBP: 000000000072bf00 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 00007f351c0ce6d4
+R13: 00000000004be72d R14: 00000000004ce600 R15: 00000000ffffffff
+
+Allocated by task 23539:
+  save_stack+0x43/0xd0 mm/kasan/kasan.c:448
+  set_track mm/kasan/kasan.c:460 [inline]
+  kasan_kmalloc+0xc7/0xe0 mm/kasan/kasan.c:553
+  __do_kmalloc mm/slab.c:3722 [inline]
+  __kmalloc+0x15b/0x760 mm/slab.c:3731
+  kmalloc include/linux/slab.h:551 [inline]
+  sock_kmalloc+0x15a/0x1f0 net/core/sock.c:1984
+  af_alg_alloc_areq+0x83/0x280 crypto/af_alg.c:1097
+  _skcipher_recvmsg crypto/algif_skcipher.c:75 [inline]
+  skcipher_recvmsg+0x354/0x1780 crypto/algif_skcipher.c:165
+  sock_recvmsg_nosec net/socket.c:794 [inline]
+  sock_recvmsg+0xd0/0x110 net/socket.c:801
+  sock_read_iter+0x39b/0x570 net/socket.c:878
+  call_read_iter include/linux/fs.h:1833 [inline]
+  aio_read+0x297/0x490 fs/aio.c:1516
+  io_submit_one+0xac2/0xf80 fs/aio.c:1832
+  __do_sys_io_submit fs/aio.c:1916 [inline]
+  __se_sys_io_submit fs/aio.c:1887 [inline]
+  __x64_sys_io_submit+0x1b7/0x580 fs/aio.c:1887
+  do_syscall_64+0x1b9/0x820 arch/x86/entry/common.c:290
+  entry_SYSCALL_64_after_hwframe+0x49/0xbe
+
+Freed by task 19019:
+  save_stack+0x43/0xd0 mm/kasan/kasan.c:448
+  set_track mm/kasan/kasan.c:460 [inline]
+  __kasan_slab_free+0x102/0x150 mm/kasan/kasan.c:521
+  kasan_slab_free+0xe/0x10 mm/kasan/kasan.c:528
+  __cache_free mm/slab.c:3498 [inline]
+  kfree+0xcf/0x230 mm/slab.c:3817
+  __sock_kfree_s net/core/sock.c:2005 [inline]
+  sock_kfree_s+0x29/0x60 net/core/sock.c:2011
+  af_alg_free_resources+0x6b/0x80 crypto/af_alg.c:1033
+  af_alg_async_cb+0xbc/0x180 crypto/af_alg.c:1056
+  cryptd_skcipher_complete+0x14c/0x250 crypto/cryptd.c:474
+  cryptd_skcipher_decrypt+0x4e2/0x750 crypto/cryptd.c:534
+  cryptd_queue_worker+0x12d/0x200 crypto/cryptd.c:193
+  process_one_work+0xc90/0x1c40 kernel/workqueue.c:2153
+  worker_thread+0x17f/0x1390 kernel/workqueue.c:2296
+  kthread+0x35a/0x440 kernel/kthread.c:246
+  ret_from_fork+0x3a/0x50 arch/x86/entry/entry_64.S:350
+
+The buggy address belongs to the object at ffff8801b69236c0
+  which belongs to the cache kmalloc-1k of size 1024
+The buggy address is located 768 bytes inside of
+  1024-byte region [ffff8801b69236c0, ffff8801b6923ac0)
+The buggy address belongs to the page:
+page:ffffea0006da4880 count:1 mapcount:0 mapping:ffff8801da800ac0  
+index:0xffff8801b6922940 compound_mapcount: 0
+flags: 0x2fffc0000010200(slab|head)
+raw: 02fffc0000010200 ffffea00070a7b08 ffffea00063a1608 ffff8801da800ac0
+kvm [23547]: vcpu0, guest rIP: 0xfff0 unimplemented HWCR wrmsr: 0x80000280
+raw: ffff8801b6922940 ffff8801b6922040 0000000100000006 0000000000000000
+page dumped because: kasan: bad access detected
+
+Memory state around the buggy address:
+  ffff8801b6923880: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+  ffff8801b6923900: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+> ffff8801b6923980: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+                                            ^
+  ffff8801b6923a00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+  ffff8801b6923a80: fb fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
+==================================================================
+
+
 ---
- drivers/crypto/caam/caamalg.c    | 47 +++++++++++++++++--------
- drivers/crypto/caam/caamalg_qi.c | 37 +++++++++++++++-----
- drivers/crypto/caam/caamhash.c   | 20 ++++++++---
- drivers/crypto/caam/caampkc.c    | 10 ++++--
- drivers/crypto/caam/caamrng.c    | 10 +++++-
- drivers/crypto/caam/ctrl.c       | 28 +++++++++++----
- drivers/crypto/caam/desc.h       |  7 ++++
- drivers/crypto/caam/regs.h       | 74 ++++++++++++++++++++++++++++++++++------
- 8 files changed, 184 insertions(+), 49 deletions(-)
+This bug is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
-index 869f092432de..9f1414030bc2 100644
---- a/drivers/crypto/caam/caamalg.c
-+++ b/drivers/crypto/caam/caamalg.c
-@@ -3135,7 +3135,7 @@ static int __init caam_algapi_init(void)
- 	struct device *ctrldev;
- 	struct caam_drv_private *priv;
- 	int i = 0, err = 0;
--	u32 cha_vid, cha_inst, des_inst, aes_inst, md_inst;
-+	u32 aes_vid, aes_inst, des_inst, md_vid, md_inst;
- 	unsigned int md_limit = SHA512_DIGEST_SIZE;
- 	bool registered = false;
- 
-@@ -3168,14 +3168,34 @@ static int __init caam_algapi_init(void)
- 	 * Register crypto algorithms the device supports.
- 	 * First, detect presence and attributes of DES, AES, and MD blocks.
- 	 */
--	cha_vid = rd_reg32(&priv->ctrl->perfmon.cha_id_ls);
--	cha_inst = rd_reg32(&priv->ctrl->perfmon.cha_num_ls);
--	des_inst = (cha_inst & CHA_ID_LS_DES_MASK) >> CHA_ID_LS_DES_SHIFT;
--	aes_inst = (cha_inst & CHA_ID_LS_AES_MASK) >> CHA_ID_LS_AES_SHIFT;
--	md_inst = (cha_inst & CHA_ID_LS_MD_MASK) >> CHA_ID_LS_MD_SHIFT;
-+	if (priv->era < 10) {
-+		u32 cha_vid, cha_inst;
-+
-+		cha_vid = rd_reg32(&priv->ctrl->perfmon.cha_id_ls);
-+		aes_vid = cha_vid & CHA_ID_LS_AES_MASK;
-+		md_vid = (cha_vid & CHA_ID_LS_MD_MASK) >> CHA_ID_LS_MD_SHIFT;
-+
-+		cha_inst = rd_reg32(&priv->ctrl->perfmon.cha_num_ls);
-+		des_inst = (cha_inst & CHA_ID_LS_DES_MASK) >>
-+			   CHA_ID_LS_DES_SHIFT;
-+		aes_inst = cha_inst & CHA_ID_LS_AES_MASK;
-+		md_inst = (cha_inst & CHA_ID_LS_MD_MASK) >> CHA_ID_LS_MD_SHIFT;
-+	} else {
-+		u32 aesa, mdha;
-+
-+		aesa = rd_reg32(&priv->ctrl->vreg.aesa);
-+		mdha = rd_reg32(&priv->ctrl->vreg.mdha);
-+
-+		aes_vid = (aesa & CHA_VER_VID_MASK) >> CHA_VER_VID_SHIFT;
-+		md_vid = (mdha & CHA_VER_VID_MASK) >> CHA_VER_VID_SHIFT;
-+
-+		des_inst = rd_reg32(&priv->ctrl->vreg.desa) & CHA_VER_NUM_MASK;
-+		aes_inst = aesa & CHA_VER_NUM_MASK;
-+		md_inst = mdha & CHA_VER_NUM_MASK;
-+	}
- 
- 	/* If MD is present, limit digest size based on LP256 */
--	if (md_inst && ((cha_vid & CHA_ID_LS_MD_MASK) == CHA_ID_LS_MD_LP256))
-+	if (md_inst && md_vid  == CHA_VER_VID_MD_LP256)
- 		md_limit = SHA256_DIGEST_SIZE;
- 
- 	for (i = 0; i < ARRAY_SIZE(driver_algs); i++) {
-@@ -3196,10 +3216,10 @@ static int __init caam_algapi_init(void)
- 		 * Check support for AES modes not available
- 		 * on LP devices.
- 		 */
--		if ((cha_vid & CHA_ID_LS_AES_MASK) == CHA_ID_LS_AES_LP)
--			if ((t_alg->caam.class1_alg_type & OP_ALG_AAI_MASK) ==
--			     OP_ALG_AAI_XTS)
--				continue;
-+		if (aes_vid == CHA_VER_VID_AES_LP &&
-+		    (t_alg->caam.class1_alg_type & OP_ALG_AAI_MASK) ==
-+		    OP_ALG_AAI_XTS)
-+			continue;
- 
- 		caam_skcipher_alg_init(t_alg);
- 
-@@ -3236,9 +3256,8 @@ static int __init caam_algapi_init(void)
- 		 * Check support for AES algorithms not available
- 		 * on LP devices.
- 		 */
--		if ((cha_vid & CHA_ID_LS_AES_MASK) == CHA_ID_LS_AES_LP)
--			if (alg_aai == OP_ALG_AAI_GCM)
--				continue;
-+		if (aes_vid  == CHA_VER_VID_AES_LP && alg_aai == OP_ALG_AAI_GCM)
-+			continue;
- 
- 		/*
- 		 * Skip algorithms requiring message digests
-diff --git a/drivers/crypto/caam/caamalg_qi.c b/drivers/crypto/caam/caamalg_qi.c
-index 23c9fc4975f8..c0d55310aade 100644
---- a/drivers/crypto/caam/caamalg_qi.c
-+++ b/drivers/crypto/caam/caamalg_qi.c
-@@ -2462,7 +2462,7 @@ static int __init caam_qi_algapi_init(void)
- 	struct device *ctrldev;
- 	struct caam_drv_private *priv;
- 	int i = 0, err = 0;
--	u32 cha_vid, cha_inst, des_inst, aes_inst, md_inst;
-+	u32 aes_vid, aes_inst, des_inst, md_vid, md_inst;
- 	unsigned int md_limit = SHA512_DIGEST_SIZE;
- 	bool registered = false;
- 
-@@ -2497,14 +2497,34 @@ static int __init caam_qi_algapi_init(void)
- 	 * Register crypto algorithms the device supports.
- 	 * First, detect presence and attributes of DES, AES, and MD blocks.
- 	 */
--	cha_vid = rd_reg32(&priv->ctrl->perfmon.cha_id_ls);
--	cha_inst = rd_reg32(&priv->ctrl->perfmon.cha_num_ls);
--	des_inst = (cha_inst & CHA_ID_LS_DES_MASK) >> CHA_ID_LS_DES_SHIFT;
--	aes_inst = (cha_inst & CHA_ID_LS_AES_MASK) >> CHA_ID_LS_AES_SHIFT;
--	md_inst = (cha_inst & CHA_ID_LS_MD_MASK) >> CHA_ID_LS_MD_SHIFT;
-+	if (priv->era < 10) {
-+		u32 cha_vid, cha_inst;
-+
-+		cha_vid = rd_reg32(&priv->ctrl->perfmon.cha_id_ls);
-+		aes_vid = cha_vid & CHA_ID_LS_AES_MASK;
-+		md_vid = (cha_vid & CHA_ID_LS_MD_MASK) >> CHA_ID_LS_MD_SHIFT;
-+
-+		cha_inst = rd_reg32(&priv->ctrl->perfmon.cha_num_ls);
-+		des_inst = (cha_inst & CHA_ID_LS_DES_MASK) >>
-+			   CHA_ID_LS_DES_SHIFT;
-+		aes_inst = cha_inst & CHA_ID_LS_AES_MASK;
-+		md_inst = (cha_inst & CHA_ID_LS_MD_MASK) >> CHA_ID_LS_MD_SHIFT;
-+	} else {
-+		u32 aesa, mdha;
-+
-+		aesa = rd_reg32(&priv->ctrl->vreg.aesa);
-+		mdha = rd_reg32(&priv->ctrl->vreg.mdha);
-+
-+		aes_vid = (aesa & CHA_VER_VID_MASK) >> CHA_VER_VID_SHIFT;
-+		md_vid = (mdha & CHA_VER_VID_MASK) >> CHA_VER_VID_SHIFT;
-+
-+		des_inst = rd_reg32(&priv->ctrl->vreg.desa) & CHA_VER_NUM_MASK;
-+		aes_inst = aesa & CHA_VER_NUM_MASK;
-+		md_inst = mdha & CHA_VER_NUM_MASK;
-+	}
- 
- 	/* If MD is present, limit digest size based on LP256 */
--	if (md_inst && ((cha_vid & CHA_ID_LS_MD_MASK) == CHA_ID_LS_MD_LP256))
-+	if (md_inst && md_vid  == CHA_VER_VID_MD_LP256)
- 		md_limit = SHA256_DIGEST_SIZE;
- 
- 	for (i = 0; i < ARRAY_SIZE(driver_algs); i++) {
-@@ -2556,8 +2576,7 @@ static int __init caam_qi_algapi_init(void)
- 		 * Check support for AES algorithms not available
- 		 * on LP devices.
- 		 */
--		if (((cha_vid & CHA_ID_LS_AES_MASK) == CHA_ID_LS_AES_LP) &&
--		    (alg_aai == OP_ALG_AAI_GCM))
-+		if (aes_vid  == CHA_VER_VID_AES_LP && alg_aai == OP_ALG_AAI_GCM)
- 			continue;
- 
- 		/*
-diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
-index 46924affa0bd..81712aa5d0f2 100644
---- a/drivers/crypto/caam/caamhash.c
-+++ b/drivers/crypto/caam/caamhash.c
-@@ -3,6 +3,7 @@
-  * caam - Freescale FSL CAAM support for ahash functions of crypto API
-  *
-  * Copyright 2011 Freescale Semiconductor, Inc.
-+ * Copyright 2018 NXP
-  *
-  * Based on caamalg.c crypto API driver.
-  *
-@@ -1801,7 +1802,7 @@ static int __init caam_algapi_hash_init(void)
- 	int i = 0, err = 0;
- 	struct caam_drv_private *priv;
- 	unsigned int md_limit = SHA512_DIGEST_SIZE;
--	u32 cha_inst, cha_vid;
-+	u32 md_inst, md_vid;
- 
- 	dev_node = of_find_compatible_node(NULL, NULL, "fsl,sec-v4.0");
- 	if (!dev_node) {
-@@ -1831,18 +1832,27 @@ static int __init caam_algapi_hash_init(void)
- 	 * Register crypto algorithms the device supports.  First, identify
- 	 * presence and attributes of MD block.
- 	 */
--	cha_vid = rd_reg32(&priv->ctrl->perfmon.cha_id_ls);
--	cha_inst = rd_reg32(&priv->ctrl->perfmon.cha_num_ls);
-+	if (priv->era < 10) {
-+		md_vid = (rd_reg32(&priv->ctrl->perfmon.cha_id_ls) &
-+			  CHA_ID_LS_MD_MASK) >> CHA_ID_LS_MD_SHIFT;
-+		md_inst = (rd_reg32(&priv->ctrl->perfmon.cha_num_ls) &
-+			   CHA_ID_LS_MD_MASK) >> CHA_ID_LS_MD_SHIFT;
-+	} else {
-+		u32 mdha = rd_reg32(&priv->ctrl->vreg.mdha);
-+
-+		md_vid = (mdha & CHA_VER_VID_MASK) >> CHA_VER_VID_SHIFT;
-+		md_inst = mdha & CHA_VER_NUM_MASK;
-+	}
- 
- 	/*
- 	 * Skip registration of any hashing algorithms if MD block
- 	 * is not present.
- 	 */
--	if (!((cha_inst & CHA_ID_LS_MD_MASK) >> CHA_ID_LS_MD_SHIFT))
-+	if (!md_inst)
- 		return -ENODEV;
- 
- 	/* Limit digest size based on LP256 */
--	if ((cha_vid & CHA_ID_LS_MD_MASK) == CHA_ID_LS_MD_LP256)
-+	if (md_vid == CHA_VER_VID_MD_LP256)
- 		md_limit = SHA256_DIGEST_SIZE;
- 
- 	INIT_LIST_HEAD(&hash_list);
-diff --git a/drivers/crypto/caam/caampkc.c b/drivers/crypto/caam/caampkc.c
-index 4fc209cbbeab..77ab28a2811a 100644
---- a/drivers/crypto/caam/caampkc.c
-+++ b/drivers/crypto/caam/caampkc.c
-@@ -3,6 +3,7 @@
-  * caam - Freescale FSL CAAM support for Public Key Cryptography
-  *
-  * Copyright 2016 Freescale Semiconductor, Inc.
-+ * Copyright 2018 NXP
-  *
-  * There is no Shared Descriptor for PKC so that the Job Descriptor must carry
-  * all the desired key parameters, input and output pointers.
-@@ -1017,7 +1018,7 @@ static int __init caam_pkc_init(void)
- 	struct platform_device *pdev;
- 	struct device *ctrldev;
- 	struct caam_drv_private *priv;
--	u32 cha_inst, pk_inst;
-+	u32 pk_inst;
- 	int err;
- 
- 	dev_node = of_find_compatible_node(NULL, NULL, "fsl,sec-v4.0");
-@@ -1045,8 +1046,11 @@ static int __init caam_pkc_init(void)
- 		return -ENODEV;
- 
- 	/* Determine public key hardware accelerator presence. */
--	cha_inst = rd_reg32(&priv->ctrl->perfmon.cha_num_ls);
--	pk_inst = (cha_inst & CHA_ID_LS_PK_MASK) >> CHA_ID_LS_PK_SHIFT;
-+	if (priv->era < 10)
-+		pk_inst = (rd_reg32(&priv->ctrl->perfmon.cha_num_ls) &
-+			   CHA_ID_LS_PK_MASK) >> CHA_ID_LS_PK_SHIFT;
-+	else
-+		pk_inst = rd_reg32(&priv->ctrl->vreg.pkha) & CHA_VER_NUM_MASK;
- 
- 	/* Do not register algorithms if PKHA is not present. */
- 	if (!pk_inst)
-diff --git a/drivers/crypto/caam/caamrng.c b/drivers/crypto/caam/caamrng.c
-index 4318b0aa6fb9..a387c8d49a62 100644
---- a/drivers/crypto/caam/caamrng.c
-+++ b/drivers/crypto/caam/caamrng.c
-@@ -3,6 +3,7 @@
-  * caam - Freescale FSL CAAM support for hw_random
-  *
-  * Copyright 2011 Freescale Semiconductor, Inc.
-+ * Copyright 2018 NXP
-  *
-  * Based on caamalg.c crypto API driver.
-  *
-@@ -309,6 +310,7 @@ static int __init caam_rng_init(void)
- 	struct platform_device *pdev;
- 	struct device *ctrldev;
- 	struct caam_drv_private *priv;
-+	u32 rng_inst;
- 	int err;
- 
- 	dev_node = of_find_compatible_node(NULL, NULL, "fsl,sec-v4.0");
-@@ -336,7 +338,13 @@ static int __init caam_rng_init(void)
- 		return -ENODEV;
- 
- 	/* Check for an instantiated RNG before registration */
--	if (!(rd_reg32(&priv->ctrl->perfmon.cha_num_ls) & CHA_ID_LS_RNG_MASK))
-+	if (priv->era < 10)
-+		rng_inst = (rd_reg32(&priv->ctrl->perfmon.cha_num_ls) &
-+			    CHA_ID_LS_RNG_MASK) >> CHA_ID_LS_RNG_SHIFT;
-+	else
-+		rng_inst = rd_reg32(&priv->ctrl->vreg.rng) & CHA_VER_NUM_MASK;
-+
-+	if (!rng_inst)
- 		return -ENODEV;
- 
- 	dev = caam_jr_alloc();
-diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
-index 3fc793193821..16bbc72f041a 100644
---- a/drivers/crypto/caam/ctrl.c
-+++ b/drivers/crypto/caam/ctrl.c
-@@ -3,6 +3,7 @@
-  * Controller-level driver, kernel property detection, initialization
-  *
-  * Copyright 2008-2012 Freescale Semiconductor, Inc.
-+ * Copyright 2018 NXP
-  */
- 
- #include <linux/device.h>
-@@ -106,7 +107,7 @@ static inline int run_descriptor_deco0(struct device *ctrldev, u32 *desc,
- 	struct caam_ctrl __iomem *ctrl = ctrlpriv->ctrl;
- 	struct caam_deco __iomem *deco = ctrlpriv->deco;
- 	unsigned int timeout = 100000;
--	u32 deco_dbg_reg, flags;
-+	u32 deco_dbg_reg, deco_state, flags;
- 	int i;
- 
- 
-@@ -149,13 +150,22 @@ static inline int run_descriptor_deco0(struct device *ctrldev, u32 *desc,
- 	timeout = 10000000;
- 	do {
- 		deco_dbg_reg = rd_reg32(&deco->desc_dbg);
-+
-+		if (ctrlpriv->era < 10)
-+			deco_state = (deco_dbg_reg & DESC_DBG_DECO_STAT_MASK) >>
-+				     DESC_DBG_DECO_STAT_SHIFT;
-+		else
-+			deco_state = (rd_reg32(&deco->dbg_exec) &
-+				      DESC_DER_DECO_STAT_MASK) >>
-+				     DESC_DER_DECO_STAT_SHIFT;
-+
- 		/*
- 		 * If an error occured in the descriptor, then
- 		 * the DECO status field will be set to 0x0D
- 		 */
--		if ((deco_dbg_reg & DESC_DBG_DECO_STAT_MASK) ==
--		    DESC_DBG_DECO_STAT_HOST_ERR)
-+		if (deco_state == DECO_STAT_HOST_ERR)
- 			break;
-+
- 		cpu_relax();
- 	} while ((deco_dbg_reg & DESC_DBG_DECO_STAT_VALID) && --timeout);
- 
-@@ -491,7 +501,7 @@ static int caam_probe(struct platform_device *pdev)
- 	struct caam_perfmon *perfmon;
- #endif
- 	u32 scfgr, comp_params;
--	u32 cha_vid_ls;
-+	u8 rng_vid;
- 	int pg_size;
- 	int BLOCK_OFFSET = 0;
- 
-@@ -733,15 +743,19 @@ static int caam_probe(struct platform_device *pdev)
- 		goto caam_remove;
- 	}
- 
--	cha_vid_ls = rd_reg32(&ctrl->perfmon.cha_id_ls);
-+	if (ctrlpriv->era < 10)
-+		rng_vid = (rd_reg32(&ctrl->perfmon.cha_id_ls) &
-+			   CHA_ID_LS_RNG_MASK) >> CHA_ID_LS_RNG_SHIFT;
-+	else
-+		rng_vid = (rd_reg32(&ctrl->vreg.rng) & CHA_VER_VID_MASK) >>
-+			   CHA_VER_VID_SHIFT;
- 
- 	/*
- 	 * If SEC has RNG version >= 4 and RNG state handle has not been
- 	 * already instantiated, do RNG instantiation
- 	 * In case of SoCs with Management Complex, RNG is managed by MC f/w.
- 	 */
--	if (!ctrlpriv->mc_en &&
--	    (cha_vid_ls & CHA_ID_LS_RNG_MASK) >> CHA_ID_LS_RNG_SHIFT >= 4) {
-+	if (!ctrlpriv->mc_en && rng_vid >= 4) {
- 		ctrlpriv->rng4_sh_init =
- 			rd_reg32(&ctrl->r4tst[0].rdsta);
- 		/*
-diff --git a/drivers/crypto/caam/desc.h b/drivers/crypto/caam/desc.h
-index f76ff160a02c..ec1ef06049b4 100644
---- a/drivers/crypto/caam/desc.h
-+++ b/drivers/crypto/caam/desc.h
-@@ -4,6 +4,7 @@
-  * Definitions to support CAAM descriptor instruction generation
-  *
-  * Copyright 2008-2011 Freescale Semiconductor, Inc.
-+ * Copyright 2018 NXP
-  */
- 
- #ifndef DESC_H
-@@ -1133,6 +1134,12 @@
- #define OP_ALG_TYPE_CLASS1	(2 << OP_ALG_TYPE_SHIFT)
- #define OP_ALG_TYPE_CLASS2	(4 << OP_ALG_TYPE_SHIFT)
- 
-+/* version register fields */
-+#define OP_VER_CCHA_NUM  0x000000ff /* Number CCHAs instantiated */
-+#define OP_VER_CCHA_MISC 0x0000ff00 /* CCHA Miscellaneous Information */
-+#define OP_VER_CCHA_REV  0x00ff0000 /* CCHA Revision Number */
-+#define OP_VER_CCHA_VID  0xff000000 /* CCHA Version ID */
-+
- #define OP_ALG_ALGSEL_SHIFT	16
- #define OP_ALG_ALGSEL_MASK	(0xff << OP_ALG_ALGSEL_SHIFT)
- #define OP_ALG_ALGSEL_SUBMASK	(0x0f << OP_ALG_ALGSEL_SHIFT)
-diff --git a/drivers/crypto/caam/regs.h b/drivers/crypto/caam/regs.h
-index 457815f965c0..3cd0822ea819 100644
---- a/drivers/crypto/caam/regs.h
-+++ b/drivers/crypto/caam/regs.h
-@@ -3,6 +3,7 @@
-  * CAAM hardware register-level view
-  *
-  * Copyright 2008-2011 Freescale Semiconductor, Inc.
-+ * Copyright 2018 NXP
-  */
- 
- #ifndef REGS_H
-@@ -211,6 +212,47 @@ struct jr_outentry {
- 	u32 jrstatus;	/* Status for completed descriptor */
- } __packed;
- 
-+/* Version registers (Era 10+)	e80-eff */
-+struct version_regs {
-+	u32 crca;	/* CRCA_VERSION */
-+	u32 afha;	/* AFHA_VERSION */
-+	u32 kfha;	/* KFHA_VERSION */
-+	u32 pkha;	/* PKHA_VERSION */
-+	u32 aesa;	/* AESA_VERSION */
-+	u32 mdha;	/* MDHA_VERSION */
-+	u32 desa;	/* DESA_VERSION */
-+	u32 snw8a;	/* SNW8A_VERSION */
-+	u32 snw9a;	/* SNW9A_VERSION */
-+	u32 zuce;	/* ZUCE_VERSION */
-+	u32 zuca;	/* ZUCA_VERSION */
-+	u32 ccha;	/* CCHA_VERSION */
-+	u32 ptha;	/* PTHA_VERSION */
-+	u32 rng;	/* RNG_VERSION */
-+	u32 trng;	/* TRNG_VERSION */
-+	u32 aaha;	/* AAHA_VERSION */
-+	u32 rsvd[10];
-+	u32 sr;		/* SR_VERSION */
-+	u32 dma;	/* DMA_VERSION */
-+	u32 ai;		/* AI_VERSION */
-+	u32 qi;		/* QI_VERSION */
-+	u32 jr;		/* JR_VERSION */
-+	u32 deco;	/* DECO_VERSION */
-+};
-+
-+/* Version registers bitfields */
-+
-+/* Number of CHAs instantiated */
-+#define CHA_VER_NUM_MASK	0xffull
-+/* CHA Miscellaneous Information */
-+#define CHA_VER_MISC_SHIFT	8
-+#define CHA_VER_MISC_MASK	(0xffull << CHA_VER_MISC_SHIFT)
-+/* CHA Revision Number */
-+#define CHA_VER_REV_SHIFT	16
-+#define CHA_VER_REV_MASK	(0xffull << CHA_VER_REV_SHIFT)
-+/* CHA Version ID */
-+#define CHA_VER_VID_SHIFT	24
-+#define CHA_VER_VID_MASK	(0xffull << CHA_VER_VID_SHIFT)
-+
- /*
-  * caam_perfmon - Performance Monitor/Secure Memory Status/
-  *                CAAM Global Status/Component Version IDs
-@@ -223,15 +265,13 @@ struct jr_outentry {
- #define CHA_NUM_MS_DECONUM_MASK	(0xfull << CHA_NUM_MS_DECONUM_SHIFT)
- 
- /*
-- * CHA version IDs / instantiation bitfields
-+ * CHA version IDs / instantiation bitfields (< Era 10)
-  * Defined for use with the cha_id fields in perfmon, but the same shift/mask
-  * selectors can be used to pull out the number of instantiated blocks within
-  * cha_num fields in perfmon because the locations are the same.
-  */
- #define CHA_ID_LS_AES_SHIFT	0
- #define CHA_ID_LS_AES_MASK	(0xfull << CHA_ID_LS_AES_SHIFT)
--#define CHA_ID_LS_AES_LP	(0x3ull << CHA_ID_LS_AES_SHIFT)
--#define CHA_ID_LS_AES_HP	(0x4ull << CHA_ID_LS_AES_SHIFT)
- 
- #define CHA_ID_LS_DES_SHIFT	4
- #define CHA_ID_LS_DES_MASK	(0xfull << CHA_ID_LS_DES_SHIFT)
-@@ -241,9 +281,6 @@ struct jr_outentry {
- 
- #define CHA_ID_LS_MD_SHIFT	12
- #define CHA_ID_LS_MD_MASK	(0xfull << CHA_ID_LS_MD_SHIFT)
--#define CHA_ID_LS_MD_LP256	(0x0ull << CHA_ID_LS_MD_SHIFT)
--#define CHA_ID_LS_MD_LP512	(0x1ull << CHA_ID_LS_MD_SHIFT)
--#define CHA_ID_LS_MD_HP		(0x2ull << CHA_ID_LS_MD_SHIFT)
- 
- #define CHA_ID_LS_RNG_SHIFT	16
- #define CHA_ID_LS_RNG_MASK	(0xfull << CHA_ID_LS_RNG_SHIFT)
-@@ -269,6 +306,13 @@ struct jr_outentry {
- #define CHA_ID_MS_JR_SHIFT	28
- #define CHA_ID_MS_JR_MASK	(0xfull << CHA_ID_MS_JR_SHIFT)
- 
-+/* Specific CHA version IDs */
-+#define CHA_VER_VID_AES_LP	0x3ull
-+#define CHA_VER_VID_AES_HP	0x4ull
-+#define CHA_VER_VID_MD_LP256	0x0ull
-+#define CHA_VER_VID_MD_LP512	0x1ull
-+#define CHA_VER_VID_MD_HP	0x2ull
-+
- struct sec_vid {
- 	u16 ip_id;
- 	u8 maj_rev;
-@@ -479,8 +523,10 @@ struct caam_ctrl {
- 		struct rng4tst r4tst[2];
- 	};
- 
--	u32 rsvd9[448];
-+	u32 rsvd9[416];
- 
-+	/* Version registers - introduced with era 10		e80-eff */
-+	struct version_regs vreg;
- 	/* Performance Monitor                                  f00-fff */
- 	struct caam_perfmon perfmon;
- };
-@@ -570,8 +616,10 @@ struct caam_job_ring {
- 	u32 rsvd11;
- 	u32 jrcommand;	/* JRCRx - JobR command */
- 
--	u32 rsvd12[932];
-+	u32 rsvd12[900];
- 
-+	/* Version registers - introduced with era 10           e80-eff */
-+	struct version_regs vreg;
- 	/* Performance Monitor                                  f00-fff */
- 	struct caam_perfmon perfmon;
- };
-@@ -878,13 +926,19 @@ struct caam_deco {
- 	u32 rsvd29[48];
- 	u32 descbuf[64];	/* DxDESB - Descriptor buffer */
- 	u32 rscvd30[193];
--#define DESC_DBG_DECO_STAT_HOST_ERR	0x00D00000
- #define DESC_DBG_DECO_STAT_VALID	0x80000000
- #define DESC_DBG_DECO_STAT_MASK		0x00F00000
-+#define DESC_DBG_DECO_STAT_SHIFT	20
- 	u32 desc_dbg;		/* DxDDR - DECO Debug Register */
--	u32 rsvd31[126];
-+	u32 rsvd31[13];
-+#define DESC_DER_DECO_STAT_MASK		0x000F0000
-+#define DESC_DER_DECO_STAT_SHIFT	16
-+	u32 dbg_exec;		/* DxDER - DECO Debug Exec Register */
-+	u32 rsvd32[112];
- };
- 
-+#define DECO_STAT_HOST_ERR	0xD
-+
- #define DECO_JQCR_WHL		0x20000000
- #define DECO_JQCR_FOUR		0x10000000
- 
--- 
-2.16.2
+syzbot will keep track of this bug report. See:
+https://goo.gl/tpsmEJ#bug-status-tracking for how to communicate with  
+syzbot.
