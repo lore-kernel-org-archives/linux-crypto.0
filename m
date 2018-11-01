@@ -1,42 +1,38 @@
-Return-Path: <SRS0=45GR=NR=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-pl1-f196.google.com ([209.85.214.196]:46824 "EHLO
-        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726976AbeKFVlQ (ORCPT
+Return-Path: <SRS0=waMk=NM=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:47956 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727879AbeKARnT (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 6 Nov 2018 16:41:16 -0500
-Date: Tue, 6 Nov 2018 17:46:14 +0530
-From: Brajeswar Ghosh <brajeswar.linux@gmail.com>
-To: herbert@gondor.apana.org.au, davem@davemloft.net,
-        linux@armlinux.org.uk
-Cc: jrdr.linux@gmail.com, linux-crypto@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        sabyasachi.linux@gmail.com
-Subject: [PATCH] arm/crypto/aes-ce-glue.c: Remove duplicate header
-Message-ID: <20181106121614.GA1985@hp-pavilion-15-notebook-pc-brajeswar>
+        Thu, 1 Nov 2018 13:43:19 -0400
+Date: Thu, 1 Nov 2018 16:41:09 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Cc: James.Bottomley@hansenpartnership.com, ard.biesheuvel@linaro.org,
+        linux-crypto@vger.kernel.org, David Miller <davem@davemloft.net>,
+        stable@vger.kernel.org
+Subject: Re: [PATCH 1/2] crypto: fix cfb mode decryption
+Message-ID: <20181101084109.lme4cd2x5wfsj2fg@gondor.apana.org.au>
+References: <20181019230153.28201-1-dbaryshkov@gmail.com>
+ <CAKv+Gu8eiFXoC2MWjGUG_AgDNq5rduWQN0CC4Q4BM0pjWW3B-w@mail.gmail.com>
+ <1540109262.3023.6.camel@HansenPartnership.com>
+ <CALT56yNN6N8J040Ce7B-FgGSyO0WngUoePp+3TsVn3PpvEQORw@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <CALT56yNN6N8J040Ce7B-FgGSyO0WngUoePp+3TsVn3PpvEQORw@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Remove asm/hwcap.h which is included more than once
+On Thu, Nov 01, 2018 at 11:32:37AM +0300, Dmitry Eremin-Solenikov wrote:
+>
+> Since 4.20 pull went into Linus'es tree, any change of getting these two patches
+> in crypto tree?
 
-Signed-off-by: Brajeswar Ghosh <brajeswar.linux@gmail.com>
----
- arch/arm/crypto/aes-ce-glue.c | 1 -
- 1 file changed, 1 deletion(-)
+These aren't critical enough for the current mainline so they will
+go in at the next merge window.
 
-diff --git a/arch/arm/crypto/aes-ce-glue.c b/arch/arm/crypto/aes-ce-glue.c
-index d0a9cec73707..5affb8482379 100644
---- a/arch/arm/crypto/aes-ce-glue.c
-+++ b/arch/arm/crypto/aes-ce-glue.c
-@@ -10,7 +10,6 @@
- 
- #include <asm/hwcap.h>
- #include <asm/neon.h>
--#include <asm/hwcap.h>
- #include <crypto/aes.h>
- #include <crypto/internal/simd.h>
- #include <crypto/internal/skcipher.h>
+Cheers,
 -- 
-2.17.1
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
