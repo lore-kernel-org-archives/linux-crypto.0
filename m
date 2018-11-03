@@ -1,108 +1,111 @@
 Return-Path: <SRS0=a5OM=NO=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:56890 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:48298 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726727AbeKDIFS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 4 Nov 2018 03:05:18 -0500
-Date: Sat, 3 Nov 2018 15:52:35 -0700
+        id S1727838AbeKDHJ4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 4 Nov 2018 02:09:56 -0500
 From: Eric Biggers <ebiggers@kernel.org>
-To: Corentin Labbe <clabbe@baylibre.com>
-Cc: davem@davemloft.net, herbert@gondor.apana.org.au,
-        nhorman@tuxdriver.com, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 1/2] crypto: Implement a generic crypto statistics
-Message-ID: <20181103225234.GD808@sol.localdomain>
-References: <1537351855-16618-1-git-send-email-clabbe@baylibre.com>
- <1537351855-16618-2-git-send-email-clabbe@baylibre.com>
+To: linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Corentin Labbe <clabbe@baylibre.com>,
+        Stafford Horne <shorne@gmail.com>, linux-kernel@vger.kernel.org
+Subject: [PATCH 3/4] crypto: crypto_user - remove redundant reporting functions
+Date: Sat,  3 Nov 2018 14:56:02 -0700
+Message-Id: <20181103215603.16250-4-ebiggers@kernel.org>
+In-Reply-To: <20181103215603.16250-1-ebiggers@kernel.org>
+References: <20181103215603.16250-1-ebiggers@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1537351855-16618-2-git-send-email-clabbe@baylibre.com>
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Sep 19, 2018 at 10:10:54AM +0000, Corentin Labbe wrote:
-> diff --git a/include/uapi/linux/cryptouser.h b/include/uapi/linux/cryptouser.h
-> index 19bf0ca6d635..6dafbc3e4414 100644
-> --- a/include/uapi/linux/cryptouser.h
-> +++ b/include/uapi/linux/cryptouser.h
-> @@ -29,6 +29,7 @@ enum {
->  	CRYPTO_MSG_UPDATEALG,
->  	CRYPTO_MSG_GETALG,
->  	CRYPTO_MSG_DELRNG,
-> +	CRYPTO_MSG_GETSTAT,
->  	__CRYPTO_MSG_MAX
->  };
->  #define CRYPTO_MSG_MAX (__CRYPTO_MSG_MAX - 1)
-> @@ -50,6 +51,16 @@ enum crypto_attr_type_t {
->  	CRYPTOCFGA_REPORT_AKCIPHER,	/* struct crypto_report_akcipher */
->  	CRYPTOCFGA_REPORT_KPP,		/* struct crypto_report_kpp */
->  	CRYPTOCFGA_REPORT_ACOMP,	/* struct crypto_report_acomp */
-> +	CRYPTOCFGA_STAT_LARVAL,		/* struct crypto_stat */
-> +	CRYPTOCFGA_STAT_HASH,		/* struct crypto_stat */
-> +	CRYPTOCFGA_STAT_BLKCIPHER,	/* struct crypto_stat */
-> +	CRYPTOCFGA_STAT_AEAD,		/* struct crypto_stat */
-> +	CRYPTOCFGA_STAT_COMPRESS,	/* struct crypto_stat */
-> +	CRYPTOCFGA_STAT_RNG,		/* struct crypto_stat */
-> +	CRYPTOCFGA_STAT_CIPHER,		/* struct crypto_stat */
-> +	CRYPTOCFGA_STAT_AKCIPHER,	/* struct crypto_stat */
-> +	CRYPTOCFGA_STAT_KPP,		/* struct crypto_stat */
-> +	CRYPTOCFGA_STAT_ACOMP,		/* struct crypto_stat */
->  	__CRYPTOCFGA_MAX
->  
->  #define CRYPTOCFGA_MAX (__CRYPTOCFGA_MAX - 1)
-> @@ -65,6 +76,47 @@ struct crypto_user_alg {
->  	__u32 cru_flags;
->  };
->  
-> +struct crypto_stat {
-> +	char type[CRYPTO_MAX_NAME];
-> +	union {
-> +		__u32 stat_encrypt_cnt;
-> +		__u32 stat_compress_cnt;
-> +		__u32 stat_generate_cnt;
-> +		__u32 stat_hash_cnt;
-> +		__u32 stat_setsecret_cnt;
-> +	};
-> +	union {
-> +		__u64 stat_encrypt_tlen;
-> +		__u64 stat_compress_tlen;
-> +		__u64 stat_generate_tlen;
-> +		__u64 stat_hash_tlen;
-> +	};
-> +	union {
-> +		__u32 stat_akcipher_err_cnt;
-> +		__u32 stat_cipher_err_cnt;
-> +		__u32 stat_compress_err_cnt;
-> +		__u32 stat_aead_err_cnt;
-> +		__u32 stat_hash_err_cnt;
-> +		__u32 stat_rng_err_cnt;
-> +		__u32 stat_kpp_err_cnt;
-> +	};
-> +	union {
-> +		__u32 stat_decrypt_cnt;
-> +		__u32 stat_decompress_cnt;
-> +		__u32 stat_seed_cnt;
-> +		__u32 stat_generate_public_key_cnt;
-> +	};
-> +	union {
-> +		__u64 stat_decrypt_tlen;
-> +		__u64 stat_decompress_tlen;
-> +	};
-> +	union {
-> +		__u32 stat_verify_cnt;
-> +		__u32 stat_compute_shared_secret_cnt;
-> +	};
-> +	__u32 stat_sign_cnt;
-> +};
-> +
+From: Eric Biggers <ebiggers@google.com>
 
-All the 32-bit fields need to be 64-bit.  In some cases, UINT32_MAX crypto
-operations can be done in seconds.
+The acomp, akcipher, and kpp algorithm types already have .report
+methods defined, so there's no need to duplicate this functionality in
+crypto_user itself; the duplicate functions are actually never executed.
+Remove the unused code.
 
-It's also weird that everything shares the same crypto_stat structure.  I think
-there should be a different struct for each algorithm type, like there is for
-the existing crypto_user algorithm reporting.  In fact you are kind of already
-doing that since the struct is loaded full of unions.  But it would be much
-cleaner to use actually different structures.
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ crypto/crypto_user_base.c | 59 ---------------------------------------
+ 1 file changed, 59 deletions(-)
 
-- Eric
+diff --git a/crypto/crypto_user_base.c b/crypto/crypto_user_base.c
+index 784748dbb19f0..1ecd9b08e38f4 100644
+--- a/crypto/crypto_user_base.c
++++ b/crypto/crypto_user_base.c
+@@ -113,51 +113,6 @@ static int crypto_report_comp(struct sk_buff *skb, struct crypto_alg *alg)
+ 	return -EMSGSIZE;
+ }
+ 
+-static int crypto_report_acomp(struct sk_buff *skb, struct crypto_alg *alg)
+-{
+-	struct crypto_report_acomp racomp;
+-
+-	strncpy(racomp.type, "acomp", sizeof(racomp.type));
+-
+-	if (nla_put(skb, CRYPTOCFGA_REPORT_ACOMP,
+-		    sizeof(struct crypto_report_acomp), &racomp))
+-		goto nla_put_failure;
+-	return 0;
+-
+-nla_put_failure:
+-	return -EMSGSIZE;
+-}
+-
+-static int crypto_report_akcipher(struct sk_buff *skb, struct crypto_alg *alg)
+-{
+-	struct crypto_report_akcipher rakcipher;
+-
+-	strncpy(rakcipher.type, "akcipher", sizeof(rakcipher.type));
+-
+-	if (nla_put(skb, CRYPTOCFGA_REPORT_AKCIPHER,
+-		    sizeof(struct crypto_report_akcipher), &rakcipher))
+-		goto nla_put_failure;
+-	return 0;
+-
+-nla_put_failure:
+-	return -EMSGSIZE;
+-}
+-
+-static int crypto_report_kpp(struct sk_buff *skb, struct crypto_alg *alg)
+-{
+-	struct crypto_report_kpp rkpp;
+-
+-	strncpy(rkpp.type, "kpp", sizeof(rkpp.type));
+-
+-	if (nla_put(skb, CRYPTOCFGA_REPORT_KPP,
+-		    sizeof(struct crypto_report_kpp), &rkpp))
+-		goto nla_put_failure;
+-	return 0;
+-
+-nla_put_failure:
+-	return -EMSGSIZE;
+-}
+-
+ static int crypto_report_one(struct crypto_alg *alg,
+ 			     struct crypto_user_alg *ualg, struct sk_buff *skb)
+ {
+@@ -202,20 +157,6 @@ static int crypto_report_one(struct crypto_alg *alg,
+ 			goto nla_put_failure;
+ 
+ 		break;
+-	case CRYPTO_ALG_TYPE_ACOMPRESS:
+-		if (crypto_report_acomp(skb, alg))
+-			goto nla_put_failure;
+-
+-		break;
+-	case CRYPTO_ALG_TYPE_AKCIPHER:
+-		if (crypto_report_akcipher(skb, alg))
+-			goto nla_put_failure;
+-
+-		break;
+-	case CRYPTO_ALG_TYPE_KPP:
+-		if (crypto_report_kpp(skb, alg))
+-			goto nla_put_failure;
+-		break;
+ 	}
+ 
+ out:
+-- 
+2.19.1
