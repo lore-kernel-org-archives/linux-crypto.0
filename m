@@ -1,57 +1,47 @@
-Return-Path: <SRS0=IUQn=NU=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:37376 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727532AbeKITb6 (ORCPT
+Return-Path: <SRS0=a5OM=NO=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from vmicros1.altlinux.org ([194.107.17.57]:47206 "EHLO
+        vmicros1.altlinux.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726603AbeKCPB5 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 9 Nov 2018 14:31:58 -0500
-Date: Fri, 9 Nov 2018 17:51:45 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Wenwen Wang <wang6495@umn.edu>
-Cc: Kangjie Lu <kjlu@umn.edu>, "David S. Miller" <davem@davemloft.net>,
-        Kate Stewart <kstewart@linuxfoundation.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Philippe Ombredanne <pombredanne@nexb.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jia-Ju Bai <baijiaju1990@gmail.com>,
-        Srikanth Jampala <Jampala.Srikanth@cavium.com>,
-        Gadam Sreerama <sgadam@cavium.com>,
-        "open list:CRYPTO API" <linux-crypto@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] crypto: cavium/nitrox - fix a DMA pool free failure
-Message-ID: <20181109095145.irclkx232fq3ahqv@gondor.apana.org.au>
-References: <1539910247-9250-1-git-send-email-wang6495@umn.edu>
+        Sat, 3 Nov 2018 11:01:57 -0400
+Date: Sat, 3 Nov 2018 08:51:45 +0300
+From: Vitaly Chikunov <vt@altlinux.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-integrity@vger.kernel.org,
+        Mimi Zohar <zohar@linux.vnet.ibm.com>,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>
+Subject: Re: [PATCH v2 0/2] crypto: streebog - add Streebog hash function
+Message-ID: <20181103055145.ndvxd7nbnoqtwrk5@sole.flsd.net>
+References: <20181010121254.12220-1-vt@altlinux.org>
+ <20181012061659.mextetc3v7urqkzx@gondor.apana.org.au>
+ <20181012064105.bchujbwoaszrcu3l@sole.flsd.net>
+ <20181017060851.r5mxvpq3l2ycvpio@gondor.apana.org.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=koi8-r
 Content-Disposition: inline
-In-Reply-To: <1539910247-9250-1-git-send-email-wang6495@umn.edu>
+In-Reply-To: <20181017060851.r5mxvpq3l2ycvpio@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Oct 18, 2018 at 07:50:43PM -0500, Wenwen Wang wrote:
-> In crypto_alloc_context(), a DMA pool is allocated through dma_pool_alloc()
-> to hold the crypto context. The meta data of the DMA pool, including the
-> pool used for the allocation 'ndev->ctx_pool' and the base address of the
-> DMA pool used by the device 'dma', are then stored to the beginning of the
-> pool. These meta data are eventually used in crypto_free_context() to free
-> the DMA pool through dma_pool_free(). However, given that the DMA pool can
-> also be accessed by the device, a malicious device can modify these meta
-> data, especially when the device is controlled to deploy an attack. This
-> can cause an unexpected DMA pool free failure.
-> 
-> To avoid the above issue, this patch introduces a new structure
-> crypto_ctx_hdr and a new field chdr in the structure nitrox_crypto_ctx hold
-> the meta data information of the DMA pool after the allocation. Note that
-> the original structure ctx_hdr is not changed to ensure the compatibility.
-> 
-> Signed-off-by: Wenwen Wang <wang6495@umn.edu>
-> ---
->  drivers/crypto/cavium/nitrox/nitrox_algs.c | 12 +++++++-----
->  drivers/crypto/cavium/nitrox/nitrox_lib.c  | 22 +++++++++++++++++-----
->  drivers/crypto/cavium/nitrox/nitrox_req.h  |  7 +++++++
->  3 files changed, 31 insertions(+), 10 deletions(-)
+Herbert,
 
-Patch applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+On Wed, Oct 17, 2018 at 02:08:51PM +0800, Herbert Xu wrote:
+> On Fri, Oct 12, 2018 at 09:41:05AM +0300, Vitaly Chikunov wrote:
+> >
+> > It is the first part of attempts to add to the Integrity subsystem
+> > ability of verifying file and module signatures by Russian GOST
+> > algorithms.
+> 
+> It would be better if these patches are posted together.  That
+> way we don't end up with a situation where the algorithm goes into
+> the kernel but the ultimate user is rejected.
+
+IMA does not need any particular patching inside of their subtree to
+support new hash, because it is using any hash registered in Hash Info
+which is still under crypto subtree. I added appropriate patch into v3
+which is already posted a week ago, and tested it to work correctly with
+ima_appraise=fix.
+
+Thanks,
