@@ -1,134 +1,122 @@
-Return-Path: <SRS0=IFNk=NQ=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from szxga04-in.huawei.com ([45.249.212.190]:14595 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727351AbeKEVxY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 5 Nov 2018 16:53:24 -0500
-From: John Garry <john.garry@huawei.com>
-To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
-CC: <Jonathan.Cameron@huawei.com>, <linux-crypto@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linuxarm@huawei.com>,
-        John Garry <john.garry@huawei.com>
-Subject: [PATCH 1/2] crypto: hisilicon -  Fix NULL dereference for same dst and src
-Date: Mon, 5 Nov 2018 20:35:14 +0800
-Message-ID: <1541421315-25623-2-git-send-email-john.garry@huawei.com>
-In-Reply-To: <1541421315-25623-1-git-send-email-john.garry@huawei.com>
-References: <1541421315-25623-1-git-send-email-john.garry@huawei.com>
+Return-Path: <SRS0=a5OM=NO=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:50458 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727191AbeKDHUc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 4 Nov 2018 02:20:32 -0500
+Date: Sat, 3 Nov 2018 15:07:55 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: Corentin Labbe <clabbe@baylibre.com>
+Cc: dan.carpenter@oracle.com, davem@davemloft.net,
+        herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: crypto_user_stat: Zeroize whole structure given
+ to user space
+Message-ID: <20181103220553.GA808@sol.localdomain>
+References: <1539952045-18784-1-git-send-email-clabbe@baylibre.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1539952045-18784-1-git-send-email-clabbe@baylibre.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-When the source and destination addresses for the cipher are the same, we
-will get a NULL dereference from accessing the split destination
-scatterlist memories, as shown:
+On Fri, Oct 19, 2018 at 12:27:25PM +0000, Corentin Labbe wrote:
+> For preventing un-initilized data to be given to user-space (and so leak
+> potential useful data), the crypto_stat structure must be correctly
+> initialised.
+> 
+> Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
+> Fixes: cac5818c25d0 ("crypto: user - Implement a generic crypto statistics")
+> Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
+> ---
+>  crypto/crypto_user_stat.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+> 
+> diff --git a/crypto/crypto_user_stat.c b/crypto/crypto_user_stat.c
+> index 021ad06bbb62..9990c599f648 100644
+> --- a/crypto/crypto_user_stat.c
+> +++ b/crypto/crypto_user_stat.c
+> @@ -37,6 +37,7 @@ static int crypto_report_aead(struct sk_buff *skb, struct crypto_alg *alg)
+>  	u64 v64;
+>  	u32 v32;
+>  
+> +	memset(&raead, 0, sizeof(struct crypto_stat));
+>  	strncpy(raead.type, "aead", sizeof(raead.type));
+>  
+>  	v32 = atomic_read(&alg->encrypt_cnt);
+> @@ -65,6 +66,7 @@ static int crypto_report_cipher(struct sk_buff *skb, struct crypto_alg *alg)
+>  	u64 v64;
+>  	u32 v32;
+>  
+> +	memset(&rcipher, 0, sizeof(struct crypto_stat));
+>  	strlcpy(rcipher.type, "cipher", sizeof(rcipher.type));
+>  
+>  	v32 = atomic_read(&alg->encrypt_cnt);
+> @@ -93,6 +95,7 @@ static int crypto_report_comp(struct sk_buff *skb, struct crypto_alg *alg)
+>  	u64 v64;
+>  	u32 v32;
+>  
+> +	memset(&rcomp, 0, sizeof(struct crypto_stat));
+>  	strlcpy(rcomp.type, "compression", sizeof(rcomp.type));
+>  	v32 = atomic_read(&alg->compress_cnt);
+>  	rcomp.stat_compress_cnt = v32;
+> @@ -120,6 +123,7 @@ static int crypto_report_acomp(struct sk_buff *skb, struct crypto_alg *alg)
+>  	u64 v64;
+>  	u32 v32;
+>  
+> +	memset(&racomp, 0, sizeof(struct crypto_stat));
+>  	strlcpy(racomp.type, "acomp", sizeof(racomp.type));
+>  	v32 = atomic_read(&alg->compress_cnt);
+>  	racomp.stat_compress_cnt = v32;
+> @@ -147,6 +151,7 @@ static int crypto_report_akcipher(struct sk_buff *skb, struct crypto_alg *alg)
+>  	u64 v64;
+>  	u32 v32;
+>  
+> +	memset(&rakcipher, 0, sizeof(struct crypto_stat));
+>  	strncpy(rakcipher.type, "akcipher", sizeof(rakcipher.type));
+>  	v32 = atomic_read(&alg->encrypt_cnt);
+>  	rakcipher.stat_encrypt_cnt = v32;
+> @@ -177,6 +182,7 @@ static int crypto_report_kpp(struct sk_buff *skb, struct crypto_alg *alg)
+>  	struct crypto_stat rkpp;
+>  	u32 v;
+>  
+> +	memset(&rkpp, 0, sizeof(struct crypto_stat));
+>  	strlcpy(rkpp.type, "kpp", sizeof(rkpp.type));
+>  
+>  	v = atomic_read(&alg->setsecret_cnt);
+> @@ -203,6 +209,7 @@ static int crypto_report_ahash(struct sk_buff *skb, struct crypto_alg *alg)
+>  	u64 v64;
+>  	u32 v32;
+>  
+> +	memset(&rhash, 0, sizeof(struct crypto_stat));
+>  	strncpy(rhash.type, "ahash", sizeof(rhash.type));
+>  
+>  	v32 = atomic_read(&alg->hash_cnt);
+> @@ -227,6 +234,7 @@ static int crypto_report_shash(struct sk_buff *skb, struct crypto_alg *alg)
+>  	u64 v64;
+>  	u32 v32;
+>  
+> +	memset(&rhash, 0, sizeof(struct crypto_stat));
+>  	strncpy(rhash.type, "shash", sizeof(rhash.type));
+>  
+>  	v32 = atomic_read(&alg->hash_cnt);
+> @@ -251,6 +259,7 @@ static int crypto_report_rng(struct sk_buff *skb, struct crypto_alg *alg)
+>  	u64 v64;
+>  	u32 v32;
+>  
+> +	memset(&rrng, 0, sizeof(struct crypto_stat));
+>  	strncpy(rrng.type, "rng", sizeof(rrng.type));
+>  
+>  	v32 = atomic_read(&alg->generate_cnt);
+> -- 
+> 2.18.1
+> 
 
-[   56.565719] tcrypt:
-[   56.565719] testing speed of async ecb(aes) (hisi_sec_aes_ecb) encryption
-[   56.574683] tcrypt: test 0 (128 bit key, 16 byte blocks):
-[   56.587585] Unable to handle kernel NULL pointer dereference at virtual address 0000000000000000
-[   56.596361] Mem abort info:
-[   56.599151]   ESR = 0x96000006
-[   56.602196]   Exception class = DABT (current EL), IL = 32 bits
-[   56.608105]   SET = 0, FnV = 0
-[   56.611149]   EA = 0, S1PTW = 0
-[   56.614280] Data abort info:
-[   56.617151]   ISV = 0, ISS = 0x00000006
-[   56.620976]   CM = 0, WnR = 0
-[   56.623930] user pgtable: 4k pages, 48-bit VAs, pgdp = (____ptrval____)
-[   56.630533] [0000000000000000] pgd=0000041fc7e4d003, pud=0000041fcd9bf003, pmd=0000000000000000
-[   56.639224] Internal error: Oops: 96000006 [#1] PREEMPT SMP
-[   56.644782] Modules linked in: tcrypt(+)
-[   56.648695] CPU: 21 PID: 2326 Comm: insmod Tainted: G        W         4.19.0-rc6-00001-g3fabfb8-dirty #716
-[   56.658420] Hardware name: Huawei Taishan 2280 /D05, BIOS Hisilicon D05 IT17 Nemo 2.0 RC0 10/05/2018
-[   56.667537] pstate: 20000005 (nzCv daif -PAN -UAO)
-[   56.672322] pc : sec_alg_skcipher_crypto+0x318/0x748
-[   56.677274] lr : sec_alg_skcipher_crypto+0x178/0x748
-[   56.682224] sp : ffff0000118e3840
-[   56.685525] x29: ffff0000118e3840 x28: ffff841fbb3f8118
-[   56.690825] x27: 0000000000000000 x26: 0000000000000000
-[   56.696125] x25: ffff841fbb3f8080 x24: ffff841fbadc0018
-[   56.701425] x23: ffff000009119000 x22: ffff841fbb24e280
-[   56.706724] x21: ffff841ff212e780 x20: ffff841ff212e700
-[   56.712023] x19: 0000000000000001 x18: ffffffffffffffff
-[   56.717322] x17: 0000000000000000 x16: 0000000000000000
-[   56.722621] x15: ffff0000091196c8 x14: 72635f7265687069
-[   56.727920] x13: 636b735f676c615f x12: ffff000009119940
-[   56.733219] x11: 0000000000000000 x10: 00000000006080c0
-[   56.738519] x9 : 0000000000000000 x8 : ffff841fbb24e480
-[   56.743818] x7 : ffff841fbb24e500 x6 : ffff841ff00cdcc0
-[   56.749117] x5 : 0000000000000010 x4 : 0000000000000000
-[   56.754416] x3 : ffff841fbb24e380 x2 : ffff841fbb24e480
-[   56.759715] x1 : 0000000000000000 x0 : ffff000008f682c8
-[   56.765016] Process insmod (pid: 2326, stack limit = 0x(____ptrval____))
-[   56.771702] Call trace:
-[   56.774136]  sec_alg_skcipher_crypto+0x318/0x748
-[   56.778740]  sec_alg_skcipher_encrypt+0x10/0x18
-[   56.783259]  test_skcipher_speed+0x2a0/0x700 [tcrypt]
-[   56.788298]  do_test+0x18f8/0x48c8 [tcrypt]
-[   56.792469]  tcrypt_mod_init+0x60/0x1000 [tcrypt]
-[   56.797161]  do_one_initcall+0x5c/0x178
-[   56.800985]  do_init_module+0x58/0x1b4
-[   56.804721]  load_module+0x1da4/0x2150
-[   56.808456]  __se_sys_init_module+0x14c/0x1e8
-[   56.812799]  __arm64_sys_init_module+0x18/0x20
-[   56.817231]  el0_svc_common+0x60/0xe8
-[   56.820880]  el0_svc_handler+0x2c/0x80
-[   56.824615]  el0_svc+0x8/0xc
-[   56.827483] Code: a94c87a3 910b2000 f87b7842 f9004ba2 (b87b7821)
-[   56.833564] ---[ end trace 0f63290590e93d94 ]---
-Segmentation fault
+There are two more info leaks in the file that this doesn't fix.  I sent out a
+fixed version here:
 
-Fix this by only accessing these memories when we have different src and
-dst.
+	https://patchwork.kernel.org/patch/10666775/
 
-Fixes: 915e4e8413da ("crypto: hisilicon - SEC security accelerator driver")
-Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Signed-off-by: John Garry <john.garry@huawei.com>
----
- drivers/crypto/hisilicon/sec/sec_algs.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+... as part of the series "crypto: crypto_user reporting fixes and cleanups".
 
-diff --git a/drivers/crypto/hisilicon/sec/sec_algs.c b/drivers/crypto/hisilicon/sec/sec_algs.c
-index f7d6d69..32c6c02 100644
---- a/drivers/crypto/hisilicon/sec/sec_algs.c
-+++ b/drivers/crypto/hisilicon/sec/sec_algs.c
-@@ -732,6 +732,7 @@ static int sec_alg_skcipher_crypto(struct skcipher_request *skreq,
- 	int *splits_in_nents;
- 	int *splits_out_nents = NULL;
- 	struct sec_request_el *el, *temp;
-+	bool split = skreq->src != skreq->dst;
- 
- 	mutex_init(&sec_req->lock);
- 	sec_req->req_base = &skreq->base;
-@@ -750,7 +751,7 @@ static int sec_alg_skcipher_crypto(struct skcipher_request *skreq,
- 	if (ret)
- 		goto err_free_split_sizes;
- 
--	if (skreq->src != skreq->dst) {
-+	if (split) {
- 		sec_req->len_out = sg_nents(skreq->dst);
- 		ret = sec_map_and_split_sg(skreq->dst, split_sizes, steps,
- 					   &splits_out, &splits_out_nents,
-@@ -785,8 +786,9 @@ static int sec_alg_skcipher_crypto(struct skcipher_request *skreq,
- 					       split_sizes[i],
- 					       skreq->src != skreq->dst,
- 					       splits_in[i], splits_in_nents[i],
--					       splits_out[i],
--					       splits_out_nents[i], info);
-+					       split ? splits_out[i] : NULL,
-+					       split ? splits_out_nents[i] : 0,
-+					       info);
- 		if (IS_ERR(el)) {
- 			ret = PTR_ERR(el);
- 			goto err_free_elements;
-@@ -854,7 +856,7 @@ static int sec_alg_skcipher_crypto(struct skcipher_request *skreq,
- 				 crypto_skcipher_ivsize(atfm),
- 				 DMA_BIDIRECTIONAL);
- err_unmap_out_sg:
--	if (skreq->src != skreq->dst)
-+	if (split)
- 		sec_unmap_sg_on_err(skreq->dst, steps, splits_out,
- 				    splits_out_nents, sec_req->len_out,
- 				    info->dev);
--- 
-1.9.1
+- Eric
