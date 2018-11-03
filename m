@@ -1,49 +1,42 @@
-Return-Path: <SRS0=vxh5=N7=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:34424 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726883AbeKTQOV (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 20 Nov 2018 11:14:21 -0500
-Received: by mail-wr1-f65.google.com with SMTP id j2so593528wrw.1
-        for <linux-crypto@vger.kernel.org>; Mon, 19 Nov 2018 21:47:02 -0800 (PST)
-Date: Tue, 20 Nov 2018 06:46:59 +0100
-From: LABBE Corentin <clabbe@baylibre.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Biggers <ebiggers@kernel.org>, nhorman@tuxdriver.com,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2 01/11] crypto: move crypto_alg_get/crypto_alg_put to
- linux/crypto.h
-Message-ID: <20181120054659.GA12679@Red>
-References: <1542657210-37739-1-git-send-email-clabbe@baylibre.com>
- <1542657210-37739-2-git-send-email-clabbe@baylibre.com>
- <CAKv+Gu80ArVHwBOmD3qjKUEP=LsbOEfZrCyO-rPDtpX3AbykoA@mail.gmail.com>
- <20181120031047.diqgmbluclbbkhav@gondor.apana.org.au>
+Return-Path: <SRS0=a5OM=NO=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail.allta.com.ua ([95.67.11.162]:59862 "EHLO mail.allta.com.ua"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726099AbeKCMzd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 3 Nov 2018 08:55:33 -0400
+Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181120031047.diqgmbluclbbkhav@gondor.apana.org.au>
+Content-Transfer-Encoding: quoted-printable
+Content-Description: Mail message body
+Subject: Update
+To: Recipients <sale@allta.com.ua>
+From: "Bruce Blake" <sale@allta.com.ua>
+Date: Sat, 03 Nov 2018 11:20:39 +0800
+Reply-To: drproff300@aol.com
+Message-Id: <20181103032041.E371F142706@mail.allta.com.ua>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Nov 20, 2018 at 11:10:47AM +0800, Herbert Xu wrote:
-> On Mon, Nov 19, 2018 at 12:25:10PM -0800, Ard Biesheuvel wrote:
-> > On Mon, 19 Nov 2018 at 11:53, Corentin Labbe <clabbe@baylibre.com> wrote:
-> > >
-> > > Since we will need crypto_alg_get/crypto_alg_put for "locking"
-> > > crypto_alg when updating stats, we need it to be via linux/crypto.h
-> > >
-> > 
-> > This seems backwards to me. Surely, crypto stats are permitted to use
-> > the internal crypto API?
-> 
-> I agree.
-> 
+Hello Dear
 
-I dont understand what is backwards ? moving or using ?
-What do you suggest for "locking" crypto_alg ?
+how are you doing today? my name is Bruce Blake, the manager foreign affair=
+s in City Finance Bank, we have a customer here in bank that has not access=
+ed his account for the past 18 years, after some research made about him we=
+ found out he was a victim of the crashed mining company in mexico.
+
+ he died a single man no wife One son from his first marriage that he divor=
+ced, his next of kin is that his only son which we can arrange and make you=
+r name his next of kin as his brother, and the mandatory rule of the bank i=
+s that after 25 years of a dormant account, the fund should be moved to Gov=
+ernment Treasury account.
+
+This Customer was my friend because i have known him since he opened an acc=
+ount with us, i can't claim his fund because i am a staff in this bank, tha=
+t is why i want you to come in and claim this fund as my late clients Relat=
+ive.
+
+if you are interested get back to me so we could discuss and make arrangeme=
+nts for the paper work because everything has to be legit and Legal.
 
 Regards
+
+Bruce Blake.
