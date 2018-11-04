@@ -1,577 +1,120 @@
-Return-Path: <SRS0=HYoH=NT=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from inva020.nxp.com ([92.121.34.13]:33318 "EHLO inva020.nxp.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726710AbeKHXMc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 8 Nov 2018 18:12:32 -0500
-From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        Cristian Stoica <cristian.stoica@microchip.com>,
-        linux-crypto@vger.kernel.org,
-        Cristian Stoica <cristian.stoica@nxp.com>
-Subject: [PATCH 4/5] crypto: caam/jr - add support for Chacha20 + Poly1305
-Date: Thu,  8 Nov 2018 15:36:30 +0200
-Message-Id: <20181108133631.15779-5-horia.geanta@nxp.com>
-In-Reply-To: <20181108133631.15779-1-horia.geanta@nxp.com>
-References: <20181108133631.15779-1-horia.geanta@nxp.com>
+Return-Path: <SRS0=8KRZ=NP=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:51910 "EHLO
+        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728901AbeKDS0a (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 4 Nov 2018 13:26:30 -0500
+Received: by mail-wm1-f65.google.com with SMTP id w7-v6so5401342wmc.1
+        for <linux-crypto@vger.kernel.org>; Sun, 04 Nov 2018 01:12:14 -0800 (PST)
+Date: Sun, 4 Nov 2018 10:12:11 +0100
+From: LABBE Corentin <clabbe@baylibre.com>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: davem@davemloft.net, herbert@gondor.apana.org.au,
+        nhorman@tuxdriver.com, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 1/2] crypto: Implement a generic crypto statistics
+Message-ID: <20181104091211.GB6963@Red>
+References: <1537351855-16618-1-git-send-email-clabbe@baylibre.com>
+ <1537351855-16618-2-git-send-email-clabbe@baylibre.com>
+ <20181103225234.GD808@sol.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181103225234.GD808@sol.localdomain>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Add support for Chacha20 + Poly1305 combined AEAD:
--generic (rfc7539)
--IPsec (rfc7634 - known as rfc7539esp in the kernel)
+On Sat, Nov 03, 2018 at 03:52:35PM -0700, Eric Biggers wrote:
+> On Wed, Sep 19, 2018 at 10:10:54AM +0000, Corentin Labbe wrote:
+> > diff --git a/include/uapi/linux/cryptouser.h b/include/uapi/linux/cryptouser.h
+> > index 19bf0ca6d635..6dafbc3e4414 100644
+> > --- a/include/uapi/linux/cryptouser.h
+> > +++ b/include/uapi/linux/cryptouser.h
+> > @@ -29,6 +29,7 @@ enum {
+> >  	CRYPTO_MSG_UPDATEALG,
+> >  	CRYPTO_MSG_GETALG,
+> >  	CRYPTO_MSG_DELRNG,
+> > +	CRYPTO_MSG_GETSTAT,
+> >  	__CRYPTO_MSG_MAX
+> >  };
+> >  #define CRYPTO_MSG_MAX (__CRYPTO_MSG_MAX - 1)
+> > @@ -50,6 +51,16 @@ enum crypto_attr_type_t {
+> >  	CRYPTOCFGA_REPORT_AKCIPHER,	/* struct crypto_report_akcipher */
+> >  	CRYPTOCFGA_REPORT_KPP,		/* struct crypto_report_kpp */
+> >  	CRYPTOCFGA_REPORT_ACOMP,	/* struct crypto_report_acomp */
+> > +	CRYPTOCFGA_STAT_LARVAL,		/* struct crypto_stat */
+> > +	CRYPTOCFGA_STAT_HASH,		/* struct crypto_stat */
+> > +	CRYPTOCFGA_STAT_BLKCIPHER,	/* struct crypto_stat */
+> > +	CRYPTOCFGA_STAT_AEAD,		/* struct crypto_stat */
+> > +	CRYPTOCFGA_STAT_COMPRESS,	/* struct crypto_stat */
+> > +	CRYPTOCFGA_STAT_RNG,		/* struct crypto_stat */
+> > +	CRYPTOCFGA_STAT_CIPHER,		/* struct crypto_stat */
+> > +	CRYPTOCFGA_STAT_AKCIPHER,	/* struct crypto_stat */
+> > +	CRYPTOCFGA_STAT_KPP,		/* struct crypto_stat */
+> > +	CRYPTOCFGA_STAT_ACOMP,		/* struct crypto_stat */
+> >  	__CRYPTOCFGA_MAX
+> >  
+> >  #define CRYPTOCFGA_MAX (__CRYPTOCFGA_MAX - 1)
+> > @@ -65,6 +76,47 @@ struct crypto_user_alg {
+> >  	__u32 cru_flags;
+> >  };
+> >  
+> > +struct crypto_stat {
+> > +	char type[CRYPTO_MAX_NAME];
+> > +	union {
+> > +		__u32 stat_encrypt_cnt;
+> > +		__u32 stat_compress_cnt;
+> > +		__u32 stat_generate_cnt;
+> > +		__u32 stat_hash_cnt;
+> > +		__u32 stat_setsecret_cnt;
+> > +	};
+> > +	union {
+> > +		__u64 stat_encrypt_tlen;
+> > +		__u64 stat_compress_tlen;
+> > +		__u64 stat_generate_tlen;
+> > +		__u64 stat_hash_tlen;
+> > +	};
+> > +	union {
+> > +		__u32 stat_akcipher_err_cnt;
+> > +		__u32 stat_cipher_err_cnt;
+> > +		__u32 stat_compress_err_cnt;
+> > +		__u32 stat_aead_err_cnt;
+> > +		__u32 stat_hash_err_cnt;
+> > +		__u32 stat_rng_err_cnt;
+> > +		__u32 stat_kpp_err_cnt;
+> > +	};
+> > +	union {
+> > +		__u32 stat_decrypt_cnt;
+> > +		__u32 stat_decompress_cnt;
+> > +		__u32 stat_seed_cnt;
+> > +		__u32 stat_generate_public_key_cnt;
+> > +	};
+> > +	union {
+> > +		__u64 stat_decrypt_tlen;
+> > +		__u64 stat_decompress_tlen;
+> > +	};
+> > +	union {
+> > +		__u32 stat_verify_cnt;
+> > +		__u32 stat_compute_shared_secret_cnt;
+> > +	};
+> > +	__u32 stat_sign_cnt;
+> > +};
+> > +
+> 
+> All the 32-bit fields need to be 64-bit.  In some cases, UINT32_MAX crypto
+> operations can be done in seconds.
+> 
+> It's also weird that everything shares the same crypto_stat structure.  I think
+> there should be a different struct for each algorithm type, like there is for
+> the existing crypto_user algorithm reporting.  In fact you are kind of already
+> doing that since the struct is loaded full of unions.  But it would be much
+> cleaner to use actually different structures.
+> 
+> - Eric
 
-Signed-off-by: Cristian Stoica <cristian.stoica@nxp.com>
-Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
----
- drivers/crypto/caam/caamalg.c      | 221 ++++++++++++++++++++++++++++++++++++-
- drivers/crypto/caam/caamalg_desc.c | 111 +++++++++++++++++++
- drivers/crypto/caam/caamalg_desc.h |   4 +
- drivers/crypto/caam/compat.h       |   1 +
- drivers/crypto/caam/desc.h         |  15 +++
- drivers/crypto/caam/desc_constr.h  |   7 +-
- 6 files changed, 354 insertions(+), 5 deletions(-)
+Hello
 
-diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
-index 9f1414030bc2..cbaeb264a261 100644
---- a/drivers/crypto/caam/caamalg.c
-+++ b/drivers/crypto/caam/caamalg.c
-@@ -72,6 +72,8 @@
- #define AUTHENC_DESC_JOB_IO_LEN		(AEAD_DESC_JOB_IO_LEN + \
- 					 CAAM_CMD_SZ * 5)
- 
-+#define CHACHAPOLY_DESC_JOB_IO_LEN	(AEAD_DESC_JOB_IO_LEN + CAAM_CMD_SZ * 6)
-+
- #define DESC_MAX_USED_BYTES		(CAAM_DESC_BYTES_MAX - DESC_JOB_IO_LEN)
- #define DESC_MAX_USED_LEN		(DESC_MAX_USED_BYTES / CAAM_CMD_SZ)
- 
-@@ -513,6 +515,61 @@ static int rfc4543_setauthsize(struct crypto_aead *authenc,
- 	return 0;
- }
- 
-+static int chachapoly_set_sh_desc(struct crypto_aead *aead)
-+{
-+	struct caam_ctx *ctx = crypto_aead_ctx(aead);
-+	struct device *jrdev = ctx->jrdev;
-+	unsigned int ivsize = crypto_aead_ivsize(aead);
-+	u32 *desc;
-+
-+	if (!ctx->cdata.keylen || !ctx->authsize)
-+		return 0;
-+
-+	desc = ctx->sh_desc_enc;
-+	cnstr_shdsc_chachapoly(desc, &ctx->cdata, &ctx->adata, ivsize,
-+			       ctx->authsize, true);
-+	dma_sync_single_for_device(jrdev, ctx->sh_desc_enc_dma,
-+				   desc_bytes(desc), ctx->dir);
-+
-+	desc = ctx->sh_desc_dec;
-+	cnstr_shdsc_chachapoly(desc, &ctx->cdata, &ctx->adata, ivsize,
-+			       ctx->authsize, false);
-+	dma_sync_single_for_device(jrdev, ctx->sh_desc_dec_dma,
-+				   desc_bytes(desc), ctx->dir);
-+
-+	return 0;
-+}
-+
-+static int chachapoly_setauthsize(struct crypto_aead *aead,
-+				  unsigned int authsize)
-+{
-+	struct caam_ctx *ctx = crypto_aead_ctx(aead);
-+
-+	if (authsize != POLY1305_DIGEST_SIZE)
-+		return -EINVAL;
-+
-+	ctx->authsize = authsize;
-+	return chachapoly_set_sh_desc(aead);
-+}
-+
-+static int chachapoly_setkey(struct crypto_aead *aead, const u8 *key,
-+			     unsigned int keylen)
-+{
-+	struct caam_ctx *ctx = crypto_aead_ctx(aead);
-+	unsigned int ivsize = crypto_aead_ivsize(aead);
-+	unsigned int saltlen = CHACHAPOLY_IV_SIZE - ivsize;
-+
-+	if (keylen != CHACHA20_KEY_SIZE + saltlen) {
-+		crypto_aead_set_flags(aead, CRYPTO_TFM_RES_BAD_KEY_LEN);
-+		return -EINVAL;
-+	}
-+
-+	ctx->cdata.key_virt = key;
-+	ctx->cdata.keylen = keylen - saltlen;
-+
-+	return chachapoly_set_sh_desc(aead);
-+}
-+
- static int aead_setkey(struct crypto_aead *aead,
- 			       const u8 *key, unsigned int keylen)
- {
-@@ -1031,6 +1088,40 @@ static void init_gcm_job(struct aead_request *req,
- 	/* End of blank commands */
- }
- 
-+static void init_chachapoly_job(struct aead_request *req,
-+				struct aead_edesc *edesc, bool all_contig,
-+				bool encrypt)
-+{
-+	struct crypto_aead *aead = crypto_aead_reqtfm(req);
-+	unsigned int ivsize = crypto_aead_ivsize(aead);
-+	unsigned int assoclen = req->assoclen;
-+	u32 *desc = edesc->hw_desc;
-+	u32 ctx_iv_off = 4;
-+
-+	init_aead_job(req, edesc, all_contig, encrypt);
-+
-+	if (ivsize != CHACHAPOLY_IV_SIZE) {
-+		/* IPsec specific: CONTEXT1[223:128] = {NONCE, IV} */
-+		ctx_iv_off += 4;
-+
-+		/*
-+		 * The associated data comes already with the IV but we need
-+		 * to skip it when we authenticate or encrypt...
-+		 */
-+		assoclen -= ivsize;
-+	}
-+
-+	append_math_add_imm_u32(desc, REG3, ZERO, IMM, assoclen);
-+
-+	/*
-+	 * For IPsec load the IV further in the same register.
-+	 * For RFC7539 simply load the 12 bytes nonce in a single operation
-+	 */
-+	append_load_as_imm(desc, req->iv, ivsize, LDST_CLASS_1_CCB |
-+			   LDST_SRCDST_BYTE_CONTEXT |
-+			   ctx_iv_off << LDST_OFFSET_SHIFT);
-+}
-+
- static void init_authenc_job(struct aead_request *req,
- 			     struct aead_edesc *edesc,
- 			     bool all_contig, bool encrypt)
-@@ -1289,6 +1380,72 @@ static int gcm_encrypt(struct aead_request *req)
- 	return ret;
- }
- 
-+static int chachapoly_encrypt(struct aead_request *req)
-+{
-+	struct aead_edesc *edesc;
-+	struct crypto_aead *aead = crypto_aead_reqtfm(req);
-+	struct caam_ctx *ctx = crypto_aead_ctx(aead);
-+	struct device *jrdev = ctx->jrdev;
-+	bool all_contig;
-+	u32 *desc;
-+	int ret;
-+
-+	edesc = aead_edesc_alloc(req, CHACHAPOLY_DESC_JOB_IO_LEN, &all_contig,
-+				 true);
-+	if (IS_ERR(edesc))
-+		return PTR_ERR(edesc);
-+
-+	desc = edesc->hw_desc;
-+
-+	init_chachapoly_job(req, edesc, all_contig, true);
-+	print_hex_dump_debug("chachapoly jobdesc@" __stringify(__LINE__)": ",
-+			     DUMP_PREFIX_ADDRESS, 16, 4, desc, desc_bytes(desc),
-+			     1);
-+
-+	ret = caam_jr_enqueue(jrdev, desc, aead_encrypt_done, req);
-+	if (!ret) {
-+		ret = -EINPROGRESS;
-+	} else {
-+		aead_unmap(jrdev, edesc, req);
-+		kfree(edesc);
-+	}
-+
-+	return ret;
-+}
-+
-+static int chachapoly_decrypt(struct aead_request *req)
-+{
-+	struct aead_edesc *edesc;
-+	struct crypto_aead *aead = crypto_aead_reqtfm(req);
-+	struct caam_ctx *ctx = crypto_aead_ctx(aead);
-+	struct device *jrdev = ctx->jrdev;
-+	bool all_contig;
-+	u32 *desc;
-+	int ret;
-+
-+	edesc = aead_edesc_alloc(req, CHACHAPOLY_DESC_JOB_IO_LEN, &all_contig,
-+				 false);
-+	if (IS_ERR(edesc))
-+		return PTR_ERR(edesc);
-+
-+	desc = edesc->hw_desc;
-+
-+	init_chachapoly_job(req, edesc, all_contig, false);
-+	print_hex_dump_debug("chachapoly jobdesc@" __stringify(__LINE__)": ",
-+			     DUMP_PREFIX_ADDRESS, 16, 4, desc, desc_bytes(desc),
-+			     1);
-+
-+	ret = caam_jr_enqueue(jrdev, desc, aead_decrypt_done, req);
-+	if (!ret) {
-+		ret = -EINPROGRESS;
-+	} else {
-+		aead_unmap(jrdev, edesc, req);
-+		kfree(edesc);
-+	}
-+
-+	return ret;
-+}
-+
- static int ipsec_gcm_encrypt(struct aead_request *req)
- {
- 	if (req->assoclen < 8)
-@@ -3002,6 +3159,50 @@ static struct caam_aead_alg driver_aeads[] = {
- 			.geniv = true,
- 		},
- 	},
-+	{
-+		.aead = {
-+			.base = {
-+				.cra_name = "rfc7539(chacha20,poly1305)",
-+				.cra_driver_name = "rfc7539-chacha20-poly1305-"
-+						   "caam",
-+				.cra_blocksize = 1,
-+			},
-+			.setkey = chachapoly_setkey,
-+			.setauthsize = chachapoly_setauthsize,
-+			.encrypt = chachapoly_encrypt,
-+			.decrypt = chachapoly_decrypt,
-+			.ivsize = CHACHAPOLY_IV_SIZE,
-+			.maxauthsize = POLY1305_DIGEST_SIZE,
-+		},
-+		.caam = {
-+			.class1_alg_type = OP_ALG_ALGSEL_CHACHA20 |
-+					   OP_ALG_AAI_AEAD,
-+			.class2_alg_type = OP_ALG_ALGSEL_POLY1305 |
-+					   OP_ALG_AAI_AEAD,
-+		},
-+	},
-+	{
-+		.aead = {
-+			.base = {
-+				.cra_name = "rfc7539esp(chacha20,poly1305)",
-+				.cra_driver_name = "rfc7539esp-chacha20-"
-+						   "poly1305-caam",
-+				.cra_blocksize = 1,
-+			},
-+			.setkey = chachapoly_setkey,
-+			.setauthsize = chachapoly_setauthsize,
-+			.encrypt = chachapoly_encrypt,
-+			.decrypt = chachapoly_decrypt,
-+			.ivsize = 8,
-+			.maxauthsize = POLY1305_DIGEST_SIZE,
-+		},
-+		.caam = {
-+			.class1_alg_type = OP_ALG_ALGSEL_CHACHA20 |
-+					   OP_ALG_AAI_AEAD,
-+			.class2_alg_type = OP_ALG_ALGSEL_POLY1305 |
-+					   OP_ALG_AAI_AEAD,
-+		},
-+	},
- };
- 
- static int caam_init_common(struct caam_ctx *ctx, struct caam_alg_entry *caam,
-@@ -3135,7 +3336,7 @@ static int __init caam_algapi_init(void)
- 	struct device *ctrldev;
- 	struct caam_drv_private *priv;
- 	int i = 0, err = 0;
--	u32 aes_vid, aes_inst, des_inst, md_vid, md_inst;
-+	u32 aes_vid, aes_inst, des_inst, md_vid, md_inst, ccha_inst, ptha_inst;
- 	unsigned int md_limit = SHA512_DIGEST_SIZE;
- 	bool registered = false;
- 
-@@ -3180,6 +3381,8 @@ static int __init caam_algapi_init(void)
- 			   CHA_ID_LS_DES_SHIFT;
- 		aes_inst = cha_inst & CHA_ID_LS_AES_MASK;
- 		md_inst = (cha_inst & CHA_ID_LS_MD_MASK) >> CHA_ID_LS_MD_SHIFT;
-+		ccha_inst = 0;
-+		ptha_inst = 0;
- 	} else {
- 		u32 aesa, mdha;
- 
-@@ -3192,6 +3395,8 @@ static int __init caam_algapi_init(void)
- 		des_inst = rd_reg32(&priv->ctrl->vreg.desa) & CHA_VER_NUM_MASK;
- 		aes_inst = aesa & CHA_VER_NUM_MASK;
- 		md_inst = mdha & CHA_VER_NUM_MASK;
-+		ccha_inst = rd_reg32(&priv->ctrl->vreg.ccha) & CHA_VER_NUM_MASK;
-+		ptha_inst = rd_reg32(&priv->ctrl->vreg.ptha) & CHA_VER_NUM_MASK;
- 	}
- 
- 	/* If MD is present, limit digest size based on LP256 */
-@@ -3252,6 +3457,14 @@ static int __init caam_algapi_init(void)
- 		if (!aes_inst && (c1_alg_sel == OP_ALG_ALGSEL_AES))
- 				continue;
- 
-+		/* Skip CHACHA20 algorithms if not supported by device */
-+		if (c1_alg_sel == OP_ALG_ALGSEL_CHACHA20 && !ccha_inst)
-+			continue;
-+
-+		/* Skip POLY1305 algorithms if not supported by device */
-+		if (c2_alg_sel == OP_ALG_ALGSEL_POLY1305 && !ptha_inst)
-+			continue;
-+
- 		/*
- 		 * Check support for AES algorithms not available
- 		 * on LP devices.
-@@ -3263,9 +3476,9 @@ static int __init caam_algapi_init(void)
- 		 * Skip algorithms requiring message digests
- 		 * if MD or MD size is not supported by device.
- 		 */
--		if (c2_alg_sel &&
--		    (!md_inst || (t_alg->aead.maxauthsize > md_limit)))
--				continue;
-+		if ((c2_alg_sel & ~OP_ALG_ALGSEL_SUBMASK) == 0x40 &&
-+		    (!md_inst || t_alg->aead.maxauthsize > md_limit))
-+			continue;
- 
- 		caam_aead_alg_init(t_alg);
- 
-diff --git a/drivers/crypto/caam/caamalg_desc.c b/drivers/crypto/caam/caamalg_desc.c
-index d850590079a2..0eb2add7e4e2 100644
---- a/drivers/crypto/caam/caamalg_desc.c
-+++ b/drivers/crypto/caam/caamalg_desc.c
-@@ -1213,6 +1213,117 @@ void cnstr_shdsc_rfc4543_decap(u32 * const desc, struct alginfo *cdata,
- }
- EXPORT_SYMBOL(cnstr_shdsc_rfc4543_decap);
- 
-+/**
-+ * cnstr_shdsc_chachapoly - Chacha20 + Poly1305 generic AEAD (rfc7539) and
-+ *                          IPsec ESP (rfc7634, a.k.a. rfc7539esp) shared
-+ *                          descriptor (non-protocol).
-+ * @desc: pointer to buffer used for descriptor construction
-+ * @cdata: pointer to block cipher transform definitions
-+ *         Valid algorithm values - OP_ALG_ALGSEL_CHACHA20 ANDed with
-+ *         OP_ALG_AAI_AEAD.
-+ * @adata: pointer to authentication transform definitions
-+ *         Valid algorithm values - OP_ALG_ALGSEL_POLY1305 ANDed with
-+ *         OP_ALG_AAI_AEAD.
-+ * @ivsize: initialization vector size
-+ * @icvsize: integrity check value (ICV) size (truncated or full)
-+ * @encap: true if encapsulation, false if decapsulation
-+ */
-+void cnstr_shdsc_chachapoly(u32 * const desc, struct alginfo *cdata,
-+			    struct alginfo *adata, unsigned int ivsize,
-+			    unsigned int icvsize, const bool encap)
-+{
-+	u32 *key_jump_cmd, *wait_cmd;
-+	u32 nfifo;
-+	const bool is_ipsec = (ivsize != CHACHAPOLY_IV_SIZE);
-+
-+	/* Note: Context registers are saved. */
-+	init_sh_desc(desc, HDR_SHARE_SERIAL | HDR_SAVECTX);
-+
-+	/* skip key loading if they are loaded due to sharing */
-+	key_jump_cmd = append_jump(desc, JUMP_JSL | JUMP_TEST_ALL |
-+				   JUMP_COND_SHRD);
-+
-+	append_key_as_imm(desc, cdata->key_virt, cdata->keylen, cdata->keylen,
-+			  CLASS_1 | KEY_DEST_CLASS_REG);
-+
-+	/* For IPsec load the salt from keymat in the context register */
-+	if (is_ipsec)
-+		append_load_as_imm(desc, cdata->key_virt + cdata->keylen, 4,
-+				   LDST_CLASS_1_CCB | LDST_SRCDST_BYTE_CONTEXT |
-+				   4 << LDST_OFFSET_SHIFT);
-+
-+	set_jump_tgt_here(desc, key_jump_cmd);
-+
-+	/* Class 2 and 1 operations: Poly & ChaCha */
-+	if (encap) {
-+		append_operation(desc, adata->algtype | OP_ALG_AS_INITFINAL |
-+				 OP_ALG_ENCRYPT);
-+		append_operation(desc, cdata->algtype | OP_ALG_AS_INITFINAL |
-+				 OP_ALG_ENCRYPT);
-+	} else {
-+		append_operation(desc, adata->algtype | OP_ALG_AS_INITFINAL |
-+				 OP_ALG_DECRYPT | OP_ALG_ICV_ON);
-+		append_operation(desc, cdata->algtype | OP_ALG_AS_INITFINAL |
-+				 OP_ALG_DECRYPT);
-+	}
-+
-+	/*
-+	 * MAGIC with NFIFO
-+	 * Read associated data from the input and send them to class1 and
-+	 * class2 alignment blocks. From class1 send data to output fifo and
-+	 * then write it to memory since we don't need to encrypt AD.
-+	 */
-+	nfifo = NFIFOENTRY_DEST_BOTH | NFIFOENTRY_FC1 | NFIFOENTRY_FC2 |
-+		NFIFOENTRY_DTYPE_POLY | NFIFOENTRY_BND;
-+	append_load_imm_u32(desc, nfifo, LDST_CLASS_IND_CCB |
-+			    LDST_SRCDST_WORD_INFO_FIFO_SM | LDLEN_MATH3);
-+
-+	append_math_add(desc, VARSEQINLEN, ZERO, REG3, CAAM_CMD_SZ);
-+	append_math_add(desc, VARSEQOUTLEN, ZERO, REG3, CAAM_CMD_SZ);
-+	append_seq_fifo_load(desc, 0, FIFOLD_TYPE_NOINFOFIFO |
-+			     FIFOLD_CLASS_CLASS1 | LDST_VLF);
-+	append_move_len(desc, MOVE_AUX_LS | MOVE_SRC_AUX_ABLK |
-+			MOVE_DEST_OUTFIFO | MOVELEN_MRSEL_MATH3);
-+	append_seq_fifo_store(desc, 0, FIFOST_TYPE_MESSAGE_DATA | LDST_VLF);
-+
-+	/* IPsec - copy IV at the output */
-+	if (is_ipsec)
-+		append_seq_fifo_store(desc, ivsize, FIFOST_TYPE_METADATA |
-+				      0x2 << 25);
-+
-+	wait_cmd = append_jump(desc, JUMP_JSL | JUMP_TYPE_LOCAL |
-+			       JUMP_COND_NOP | JUMP_TEST_ALL);
-+	set_jump_tgt_here(desc, wait_cmd);
-+
-+	if (encap) {
-+		/* Read and write cryptlen bytes */
-+		append_math_add(desc, VARSEQINLEN, SEQINLEN, REG0, CAAM_CMD_SZ);
-+		append_math_add(desc, VARSEQOUTLEN, SEQINLEN, REG0,
-+				CAAM_CMD_SZ);
-+		aead_append_src_dst(desc, FIFOLD_TYPE_MSG1OUT2);
-+
-+		/* Write ICV */
-+		append_seq_store(desc, icvsize, LDST_CLASS_2_CCB |
-+				 LDST_SRCDST_BYTE_CONTEXT);
-+	} else {
-+		/* Read and write cryptlen bytes */
-+		append_math_add(desc, VARSEQINLEN, SEQOUTLEN, REG0,
-+				CAAM_CMD_SZ);
-+		append_math_add(desc, VARSEQOUTLEN, SEQOUTLEN, REG0,
-+				CAAM_CMD_SZ);
-+		aead_append_src_dst(desc, FIFOLD_TYPE_MSG);
-+
-+		/* Load ICV for verification */
-+		append_seq_fifo_load(desc, icvsize, FIFOLD_CLASS_CLASS2 |
-+				     FIFOLD_TYPE_LAST2 | FIFOLD_TYPE_ICV);
-+	}
-+
-+	print_hex_dump_debug("chachapoly shdesc@" __stringify(__LINE__)": ",
-+			     DUMP_PREFIX_ADDRESS, 16, 4, desc, desc_bytes(desc),
-+			     1);
-+}
-+EXPORT_SYMBOL(cnstr_shdsc_chachapoly);
-+
- /* For skcipher encrypt and decrypt, read from req->src and write to req->dst */
- static inline void skcipher_append_src_dst(u32 *desc)
- {
-diff --git a/drivers/crypto/caam/caamalg_desc.h b/drivers/crypto/caam/caamalg_desc.h
-index 1315c8f6f951..a1a7b0e6889d 100644
---- a/drivers/crypto/caam/caamalg_desc.h
-+++ b/drivers/crypto/caam/caamalg_desc.h
-@@ -96,6 +96,10 @@ void cnstr_shdsc_rfc4543_decap(u32 * const desc, struct alginfo *cdata,
- 			       unsigned int ivsize, unsigned int icvsize,
- 			       const bool is_qi);
- 
-+void cnstr_shdsc_chachapoly(u32 * const desc, struct alginfo *cdata,
-+			    struct alginfo *adata, unsigned int ivsize,
-+			    unsigned int icvsize, const bool encap);
-+
- void cnstr_shdsc_skcipher_encap(u32 * const desc, struct alginfo *cdata,
- 				unsigned int ivsize, const bool is_rfc3686,
- 				const u32 ctx1_iv_off);
-diff --git a/drivers/crypto/caam/compat.h b/drivers/crypto/caam/compat.h
-index a5081b4050b6..8bde903f9f4a 100644
---- a/drivers/crypto/caam/compat.h
-+++ b/drivers/crypto/caam/compat.h
-@@ -37,6 +37,7 @@
- #include <crypto/sha.h>
- #include <crypto/md5.h>
- #include <crypto/chacha20.h>
-+#include <crypto/poly1305.h>
- #include <crypto/internal/aead.h>
- #include <crypto/authenc.h>
- #include <crypto/akcipher.h>
-diff --git a/drivers/crypto/caam/desc.h b/drivers/crypto/caam/desc.h
-index 9d117e51629f..ec10230178c5 100644
---- a/drivers/crypto/caam/desc.h
-+++ b/drivers/crypto/caam/desc.h
-@@ -243,6 +243,7 @@
- #define LDST_SRCDST_WORD_DESCBUF_SHARED	(0x42 << LDST_SRCDST_SHIFT)
- #define LDST_SRCDST_WORD_DESCBUF_JOB_WE	(0x45 << LDST_SRCDST_SHIFT)
- #define LDST_SRCDST_WORD_DESCBUF_SHARED_WE (0x46 << LDST_SRCDST_SHIFT)
-+#define LDST_SRCDST_WORD_INFO_FIFO_SM	(0x71 << LDST_SRCDST_SHIFT)
- #define LDST_SRCDST_WORD_INFO_FIFO	(0x7a << LDST_SRCDST_SHIFT)
- 
- /* Offset in source/destination */
-@@ -285,6 +286,12 @@
- #define LDLEN_SET_OFIFO_OFFSET_SHIFT	0
- #define LDLEN_SET_OFIFO_OFFSET_MASK	(3 << LDLEN_SET_OFIFO_OFFSET_SHIFT)
- 
-+/* Special Length definitions when dst=sm, nfifo-{sm,m} */
-+#define LDLEN_MATH0			0
-+#define LDLEN_MATH1			1
-+#define LDLEN_MATH2			2
-+#define LDLEN_MATH3			3
-+
- /*
-  * FIFO_LOAD/FIFO_STORE/SEQ_FIFO_LOAD/SEQ_FIFO_STORE
-  * Command Constructs
-@@ -409,6 +416,7 @@
- #define FIFOST_TYPE_MESSAGE_DATA (0x30 << FIFOST_TYPE_SHIFT)
- #define FIFOST_TYPE_RNGSTORE	 (0x34 << FIFOST_TYPE_SHIFT)
- #define FIFOST_TYPE_RNGFIFO	 (0x35 << FIFOST_TYPE_SHIFT)
-+#define FIFOST_TYPE_METADATA	 (0x3e << FIFOST_TYPE_SHIFT)
- #define FIFOST_TYPE_SKIP	 (0x3f << FIFOST_TYPE_SHIFT)
- 
- /*
-@@ -1160,6 +1168,7 @@
- #define OP_ALG_ALGSEL_CRC	(0x90 << OP_ALG_ALGSEL_SHIFT)
- #define OP_ALG_ALGSEL_SNOW_F9	(0xA0 << OP_ALG_ALGSEL_SHIFT)
- #define OP_ALG_ALGSEL_CHACHA20	(0xD0 << OP_ALG_ALGSEL_SHIFT)
-+#define OP_ALG_ALGSEL_POLY1305	(0xE0 << OP_ALG_ALGSEL_SHIFT)
- 
- #define OP_ALG_AAI_SHIFT	4
- #define OP_ALG_AAI_MASK		(0x1ff << OP_ALG_AAI_SHIFT)
-@@ -1400,6 +1409,7 @@
- #define MOVE_SRC_MATH3		(0x07 << MOVE_SRC_SHIFT)
- #define MOVE_SRC_INFIFO		(0x08 << MOVE_SRC_SHIFT)
- #define MOVE_SRC_INFIFO_CL	(0x09 << MOVE_SRC_SHIFT)
-+#define MOVE_SRC_AUX_ABLK	(0x0a << MOVE_SRC_SHIFT)
- 
- #define MOVE_DEST_SHIFT		16
- #define MOVE_DEST_MASK		(0x0f << MOVE_DEST_SHIFT)
-@@ -1426,6 +1436,10 @@
- 
- #define MOVELEN_MRSEL_SHIFT	0
- #define MOVELEN_MRSEL_MASK	(0x3 << MOVE_LEN_SHIFT)
-+#define MOVELEN_MRSEL_MATH0	(0 << MOVELEN_MRSEL_SHIFT)
-+#define MOVELEN_MRSEL_MATH1	(1 << MOVELEN_MRSEL_SHIFT)
-+#define MOVELEN_MRSEL_MATH2	(2 << MOVELEN_MRSEL_SHIFT)
-+#define MOVELEN_MRSEL_MATH3	(3 << MOVELEN_MRSEL_SHIFT)
- 
- /*
-  * MATH Command Constructs
-@@ -1602,6 +1616,7 @@
- #define NFIFOENTRY_DTYPE_IV	(0x2 << NFIFOENTRY_DTYPE_SHIFT)
- #define NFIFOENTRY_DTYPE_SAD	(0x3 << NFIFOENTRY_DTYPE_SHIFT)
- #define NFIFOENTRY_DTYPE_ICV	(0xA << NFIFOENTRY_DTYPE_SHIFT)
-+#define NFIFOENTRY_DTYPE_POLY	(0xB << NFIFOENTRY_DTYPE_SHIFT)
- #define NFIFOENTRY_DTYPE_SKIP	(0xE << NFIFOENTRY_DTYPE_SHIFT)
- #define NFIFOENTRY_DTYPE_MSG	(0xF << NFIFOENTRY_DTYPE_SHIFT)
- 
-diff --git a/drivers/crypto/caam/desc_constr.h b/drivers/crypto/caam/desc_constr.h
-index d4256fa4a1d6..2980b8ef1fb1 100644
---- a/drivers/crypto/caam/desc_constr.h
-+++ b/drivers/crypto/caam/desc_constr.h
-@@ -189,6 +189,7 @@ static inline u32 *append_##cmd(u32 * const desc, u32 options) \
- }
- APPEND_CMD_RET(jump, JUMP)
- APPEND_CMD_RET(move, MOVE)
-+APPEND_CMD_RET(move_len, MOVE_LEN)
- 
- static inline void set_jump_tgt_here(u32 * const desc, u32 *jump_cmd)
- {
-@@ -327,7 +328,11 @@ static inline void append_##cmd##_imm_##type(u32 * const desc, type immediate, \
- 					     u32 options) \
- { \
- 	PRINT_POS; \
--	append_cmd(desc, CMD_##op | IMMEDIATE | options | sizeof(type)); \
-+	if (options & LDST_LEN_MASK) \
-+		append_cmd(desc, CMD_##op | IMMEDIATE | options); \
-+	else \
-+		append_cmd(desc, CMD_##op | IMMEDIATE | options | \
-+			   sizeof(type)); \
- 	append_cmd(desc, immediate); \
- }
- APPEND_CMD_RAW_IMM(load, LOAD, u32);
--- 
-2.16.2
+I agree, separate structures will be cleaner.
+I will address this in a followup patch.
+
+Thanks
