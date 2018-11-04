@@ -1,313 +1,194 @@
-Return-Path: <SRS0=r3Tc=N4=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:51788 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730963AbeKQLnh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 17 Nov 2018 06:43:37 -0500
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc: linux-fscrypt@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        Paul Crowley <paulcrowley@google.com>,
-        Greg Kaiser <gkaiser@google.com>,
-        "Jason A . Donenfeld" <Jason@zx2c4.com>,
-        Samuel Neves <samuel.c.p.neves@gmail.com>,
-        Tomer Ashur <tomer.ashur@esat.kuleuven.be>,
-        Eric Biggers <ebiggers@google.com>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v4 07/14] crypto: arm/chacha20 - add XChaCha20 support
-Date: Fri, 16 Nov 2018 17:26:24 -0800
-Message-Id: <20181117012631.23528-8-ebiggers@kernel.org>
-In-Reply-To: <20181117012631.23528-1-ebiggers@kernel.org>
-References: <20181117012631.23528-1-ebiggers@kernel.org>
+Return-Path: <SRS0=8KRZ=NP=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:33463 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726486AbeKDSZZ (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 4 Nov 2018 13:25:25 -0500
+Received: by mail-wm1-f68.google.com with SMTP id f19-v6so4144115wmb.0
+        for <linux-crypto@vger.kernel.org>; Sun, 04 Nov 2018 01:11:08 -0800 (PST)
+Date: Sun, 4 Nov 2018 10:11:04 +0100
+From: LABBE Corentin <clabbe@baylibre.com>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: davem@davemloft.net, herbert@gondor.apana.org.au,
+        nhorman@tuxdriver.com, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 1/2] crypto: Implement a generic crypto statistics
+Message-ID: <20181104091104.GA6963@Red>
+References: <1537351855-16618-1-git-send-email-clabbe@baylibre.com>
+ <1537351855-16618-2-git-send-email-clabbe@baylibre.com>
+ <20181103221935.GB808@sol.localdomain>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181103221935.GB808@sol.localdomain>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Eric Biggers <ebiggers@google.com>
+On Sat, Nov 03, 2018 at 03:19:36PM -0700, Eric Biggers wrote:
+> Hi Corentin,
+> 
+> On Wed, Sep 19, 2018 at 10:10:54AM +0000, Corentin Labbe wrote:
+> > This patch implement a generic way to get statistics about all crypto
+> > usages.
+> > 
+> > Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
+> > ---
+> >  crypto/Kconfig                               |  11 +
+> >  crypto/Makefile                              |   1 +
+> >  crypto/ahash.c                               |  21 +-
+> >  crypto/algapi.c                              |   8 +
+> >  crypto/{crypto_user.c => crypto_user_base.c} |   9 +-
+> >  crypto/crypto_user_stat.c                    | 463 +++++++++++++++++++++++++++
+> >  crypto/rng.c                                 |   1 +
+> >  include/crypto/acompress.h                   |  38 ++-
+> >  include/crypto/aead.h                        |  51 ++-
+> >  include/crypto/akcipher.h                    |  76 ++++-
+> >  include/crypto/hash.h                        |  32 +-
+> >  include/crypto/internal/cryptouser.h         |   8 +
+> >  include/crypto/kpp.h                         |  51 ++-
+> >  include/crypto/rng.h                         |  29 +-
+> >  include/crypto/skcipher.h                    |  44 ++-
+> >  include/linux/crypto.h                       | 110 ++++++-
+> >  include/uapi/linux/cryptouser.h              |  52 +++
+> >  17 files changed, 970 insertions(+), 35 deletions(-)
+> >  rename crypto/{crypto_user.c => crypto_user_base.c} (97%)
+> >  create mode 100644 crypto/crypto_user_stat.c
+> >  create mode 100644 include/crypto/internal/cryptouser.h
+> > 
+> > diff --git a/crypto/Kconfig b/crypto/Kconfig
+> > index 90f2811fac5f..4ef95b0b25a3 100644
+> > --- a/crypto/Kconfig
+> > +++ b/crypto/Kconfig
+> > @@ -1799,6 +1799,17 @@ config CRYPTO_USER_API_AEAD
+> >  	  This option enables the user-spaces interface for AEAD
+> >  	  cipher algorithms.
+> >  
+> > +config CRYPTO_STATS
+> > +	bool "Crypto usage statistics for User-space"
+> > +	help
+> > +	  This option enables the gathering of crypto stats.
+> > +	  This will collect:
+> > +	  - encrypt/decrypt size and numbers of symmeric operations
+> > +	  - compress/decompress size and numbers of compress operations
+> > +	  - size and numbers of hash operations
+> > +	  - encrypt/decrypt/sign/verify numbers for asymmetric operations
+> > +	  - generate/seed numbers for rng operations
+> > +
+> >  config CRYPTO_HASH_INFO
+> >  	bool
+> >  
+> > diff --git a/crypto/Makefile b/crypto/Makefile
+> > index d719843f8b6e..ff5c2bbda04a 100644
+> > --- a/crypto/Makefile
+> > +++ b/crypto/Makefile
+> > @@ -54,6 +54,7 @@ cryptomgr-y := algboss.o testmgr.o
+> >  
+> >  obj-$(CONFIG_CRYPTO_MANAGER2) += cryptomgr.o
+> >  obj-$(CONFIG_CRYPTO_USER) += crypto_user.o
+> > +crypto_user-y := crypto_user_base.o crypto_user_stat.o
+> >  obj-$(CONFIG_CRYPTO_CMAC) += cmac.o
+> >  obj-$(CONFIG_CRYPTO_HMAC) += hmac.o
+> >  obj-$(CONFIG_CRYPTO_VMAC) += vmac.o
+> 
+> Why is crypto_user_stat.c always being compiled when CONFIG_CRYPTO_USER is
+> enabled, even when CONFIG_CRYPTO_STATS is not?
+> 
+> When CONFIG_CRYPTO_STATS is disabled, all the crypto stat stuff should be
+> stubbed out so that crypto_user_stat.c doesn't need to be compiled.
+> 
+> [...]
+> > diff --git a/include/linux/crypto.h b/include/linux/crypto.h
+> > index e8839d3a7559..3634ad6fe202 100644
+> > --- a/include/linux/crypto.h
+> > +++ b/include/linux/crypto.h
+> > @@ -454,6 +454,33 @@ struct compress_alg {
+> >   * @cra_refcnt: internally used
+> >   * @cra_destroy: internally used
+> >   *
+> > + * All following statistics are for this crypto_alg
+> > + * @encrypt_cnt:	number of encrypt requests
+> > + * @decrypt_cnt:	number of decrypt requests
+> > + * @compress_cnt:	number of compress requests
+> > + * @decompress_cnt:	number of decompress requests
+> > + * @generate_cnt:	number of RNG generate requests
+> > + * @seed_cnt:		number of times the rng was seeded
+> > + * @hash_cnt:		number of hash requests
+> > + * @sign_cnt:		number of sign requests
+> > + * @setsecret_cnt:	number of setsecrey operation
+> > + * @generate_public_key_cnt:	number of generate_public_key operation
+> > + * @verify_cnt:			number of verify operation
+> > + * @compute_shared_secret_cnt:	number of compute_shared_secret operation
+> > + * @encrypt_tlen:	total data size handled by encrypt requests
+> > + * @decrypt_tlen:	total data size handled by decrypt requests
+> > + * @compress_tlen:	total data size handled by compress requests
+> > + * @decompress_tlen:	total data size handled by decompress requests
+> > + * @generate_tlen:	total data size of generated data by the RNG
+> > + * @hash_tlen:		total data size hashed
+> > + * @akcipher_err_cnt:	number of error for akcipher requests
+> > + * @cipher_err_cnt:	number of error for akcipher requests
+> > + * @compress_err_cnt:	number of error for akcipher requests
+> > + * @aead_err_cnt:	number of error for akcipher requests
+> > + * @hash_err_cnt:	number of error for akcipher requests
+> > + * @rng_err_cnt:	number of error for akcipher requests
+> > + * @kpp_err_cnt:	number of error for akcipher requests
+> > + *
+> >   * The struct crypto_alg describes a generic Crypto API algorithm and is common
+> >   * for all of the transformations. Any variable not documented here shall not
+> >   * be used by a cipher implementation as it is internal to the Crypto API.
+> > @@ -487,6 +514,45 @@ struct crypto_alg {
+> >  	void (*cra_destroy)(struct crypto_alg *alg);
+> >  	
+> >  	struct module *cra_module;
+> > +
+> > +	union {
+> > +		atomic_t encrypt_cnt;
+> > +		atomic_t compress_cnt;
+> > +		atomic_t generate_cnt;
+> > +		atomic_t hash_cnt;
+> > +		atomic_t setsecret_cnt;
+> > +	};
+> > +	union {
+> > +		atomic64_t encrypt_tlen;
+> > +		atomic64_t compress_tlen;
+> > +		atomic64_t generate_tlen;
+> > +		atomic64_t hash_tlen;
+> > +	};
+> > +	union {
+> > +		atomic_t akcipher_err_cnt;
+> > +		atomic_t cipher_err_cnt;
+> > +		atomic_t compress_err_cnt;
+> > +		atomic_t aead_err_cnt;
+> > +		atomic_t hash_err_cnt;
+> > +		atomic_t rng_err_cnt;
+> > +		atomic_t kpp_err_cnt;
+> > +	};
+> > +	union {
+> > +		atomic_t decrypt_cnt;
+> > +		atomic_t decompress_cnt;
+> > +		atomic_t seed_cnt;
+> > +		atomic_t generate_public_key_cnt;
+> > +	};
+> > +	union {
+> > +		atomic64_t decrypt_tlen;
+> > +		atomic64_t decompress_tlen;
+> > +	};
+> > +	union {
+> > +		atomic_t verify_cnt;
+> > +		atomic_t compute_shared_secret_cnt;
+> > +	};
+> > +	atomic_t sign_cnt;
+> > +
+> >  } CRYPTO_MINALIGN_ATTR;
+> 
+> The new fields here should all be behind CONFIG_CRYPTO_STATS.
+> 
+> Ideally there would be zero overhead when CONFIG_CRYPTO_STATS is disabled.
+> That's not quite the case currently.
+> 
+> - Eric
 
-Add an XChaCha20 implementation that is hooked up to the ARM NEON
-implementation of ChaCha20.  This is needed for use in the Adiantum
-encryption mode; see the generic code patch,
-"crypto: chacha20-generic - add XChaCha20 support", for more details.
+Hello
 
-We also update the NEON code to support HChaCha20 on one block, so we
-can use that in XChaCha20 rather than calling the generic HChaCha20.
-This required factoring the permutation out into its own macro.
+I will address thoses problem in a followup patch.
 
-Reviewed-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- arch/arm/crypto/Kconfig              |   2 +-
- arch/arm/crypto/chacha20-neon-core.S |  70 ++++++++++++------
- arch/arm/crypto/chacha20-neon-glue.c | 103 ++++++++++++++++++++-------
- 3 files changed, 126 insertions(+), 49 deletions(-)
-
-diff --git a/arch/arm/crypto/Kconfig b/arch/arm/crypto/Kconfig
-index 0473a8f68389..a08759c32cb9 100644
---- a/arch/arm/crypto/Kconfig
-+++ b/arch/arm/crypto/Kconfig
-@@ -126,7 +126,7 @@ config CRYPTO_CRC32_ARM_CE
- 	select CRYPTO_HASH
- 
- config CRYPTO_CHACHA20_NEON
--	tristate "NEON accelerated ChaCha20 symmetric cipher"
-+	tristate "NEON accelerated ChaCha20 stream cipher algorithms"
- 	depends on KERNEL_MODE_NEON
- 	select CRYPTO_BLKCIPHER
- 	select CRYPTO_CHACHA20
-diff --git a/arch/arm/crypto/chacha20-neon-core.S b/arch/arm/crypto/chacha20-neon-core.S
-index 50e7b9896818..2335e5055d2b 100644
---- a/arch/arm/crypto/chacha20-neon-core.S
-+++ b/arch/arm/crypto/chacha20-neon-core.S
-@@ -52,27 +52,16 @@
- 	.fpu		neon
- 	.align		5
- 
--ENTRY(chacha20_block_xor_neon)
--	// r0: Input state matrix, s
--	// r1: 1 data block output, o
--	// r2: 1 data block input, i
--
--	//
--	// This function encrypts one ChaCha20 block by loading the state matrix
--	// in four NEON registers. It performs matrix operation on four words in
--	// parallel, but requireds shuffling to rearrange the words after each
--	// round.
--	//
--
--	// x0..3 = s0..3
--	add		ip, r0, #0x20
--	vld1.32		{q0-q1}, [r0]
--	vld1.32		{q2-q3}, [ip]
--
--	vmov		q8, q0
--	vmov		q9, q1
--	vmov		q10, q2
--	vmov		q11, q3
-+/*
-+ * chacha20_permute - permute one block
-+ *
-+ * Permute one 64-byte block where the state matrix is stored in the four NEON
-+ * registers q0-q3.  It performs matrix operations on four words in parallel,
-+ * but requires shuffling to rearrange the words after each round.
-+ *
-+ * Clobbers: r3, ip, q4-q5
-+ */
-+chacha20_permute:
- 
- 	adr		ip, .Lrol8_table
- 	mov		r3, #10
-@@ -142,6 +131,27 @@ ENTRY(chacha20_block_xor_neon)
- 	subs		r3, r3, #1
- 	bne		.Ldoubleround
- 
-+	bx		lr
-+ENDPROC(chacha20_permute)
-+
-+ENTRY(chacha20_block_xor_neon)
-+	// r0: Input state matrix, s
-+	// r1: 1 data block output, o
-+	// r2: 1 data block input, i
-+	push		{lr}
-+
-+	// x0..3 = s0..3
-+	add		ip, r0, #0x20
-+	vld1.32		{q0-q1}, [r0]
-+	vld1.32		{q2-q3}, [ip]
-+
-+	vmov		q8, q0
-+	vmov		q9, q1
-+	vmov		q10, q2
-+	vmov		q11, q3
-+
-+	bl		chacha20_permute
-+
- 	add		ip, r2, #0x20
- 	vld1.8		{q4-q5}, [r2]
- 	vld1.8		{q6-q7}, [ip]
-@@ -166,9 +176,25 @@ ENTRY(chacha20_block_xor_neon)
- 	vst1.8		{q0-q1}, [r1]
- 	vst1.8		{q2-q3}, [ip]
- 
--	bx		lr
-+	pop		{pc}
- ENDPROC(chacha20_block_xor_neon)
- 
-+ENTRY(hchacha20_block_neon)
-+	// r0: Input state matrix, s
-+	// r1: output (8 32-bit words)
-+	push		{lr}
-+
-+	vld1.32		{q0-q1}, [r0]!
-+	vld1.32		{q2-q3}, [r0]
-+
-+	bl		chacha20_permute
-+
-+	vst1.32		{q0}, [r1]!
-+	vst1.32		{q3}, [r1]
-+
-+	pop		{pc}
-+ENDPROC(hchacha20_block_neon)
-+
- 	.align		4
- .Lctrinc:	.word	0, 1, 2, 3
- .Lrol8_table:	.byte	3, 0, 1, 2, 7, 4, 5, 6
-diff --git a/arch/arm/crypto/chacha20-neon-glue.c b/arch/arm/crypto/chacha20-neon-glue.c
-index 2bc035cb8f23..f2d3b0f70a8d 100644
---- a/arch/arm/crypto/chacha20-neon-glue.c
-+++ b/arch/arm/crypto/chacha20-neon-glue.c
-@@ -1,5 +1,5 @@
- /*
-- * ChaCha20 256-bit cipher algorithm, RFC7539, ARM NEON functions
-+ * ChaCha20 (RFC7539) and XChaCha20 stream ciphers, NEON accelerated
-  *
-  * Copyright (C) 2016 Linaro, Ltd. <ard.biesheuvel@linaro.org>
-  *
-@@ -30,6 +30,7 @@
- 
- asmlinkage void chacha20_block_xor_neon(u32 *state, u8 *dst, const u8 *src);
- asmlinkage void chacha20_4block_xor_neon(u32 *state, u8 *dst, const u8 *src);
-+asmlinkage void hchacha20_block_neon(const u32 *state, u32 *out);
- 
- static void chacha20_doneon(u32 *state, u8 *dst, const u8 *src,
- 			    unsigned int bytes)
-@@ -57,20 +58,16 @@ static void chacha20_doneon(u32 *state, u8 *dst, const u8 *src,
- 	}
- }
- 
--static int chacha20_neon(struct skcipher_request *req)
-+static int chacha20_neon_stream_xor(struct skcipher_request *req,
-+				    struct chacha_ctx *ctx, u8 *iv)
- {
--	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
--	struct chacha_ctx *ctx = crypto_skcipher_ctx(tfm);
- 	struct skcipher_walk walk;
- 	u32 state[16];
- 	int err;
- 
--	if (req->cryptlen <= CHACHA_BLOCK_SIZE || !may_use_simd())
--		return crypto_chacha_crypt(req);
--
- 	err = skcipher_walk_virt(&walk, req, false);
- 
--	crypto_chacha_init(state, ctx, walk.iv);
-+	crypto_chacha_init(state, ctx, iv);
- 
- 	while (walk.nbytes > 0) {
- 		unsigned int nbytes = walk.nbytes;
-@@ -88,22 +85,73 @@ static int chacha20_neon(struct skcipher_request *req)
- 	return err;
- }
- 
--static struct skcipher_alg alg = {
--	.base.cra_name		= "chacha20",
--	.base.cra_driver_name	= "chacha20-neon",
--	.base.cra_priority	= 300,
--	.base.cra_blocksize	= 1,
--	.base.cra_ctxsize	= sizeof(struct chacha_ctx),
--	.base.cra_module	= THIS_MODULE,
--
--	.min_keysize		= CHACHA_KEY_SIZE,
--	.max_keysize		= CHACHA_KEY_SIZE,
--	.ivsize			= CHACHA_IV_SIZE,
--	.chunksize		= CHACHA_BLOCK_SIZE,
--	.walksize		= 4 * CHACHA_BLOCK_SIZE,
--	.setkey			= crypto_chacha20_setkey,
--	.encrypt		= chacha20_neon,
--	.decrypt		= chacha20_neon,
-+static int chacha20_neon(struct skcipher_request *req)
-+{
-+	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-+	struct chacha_ctx *ctx = crypto_skcipher_ctx(tfm);
-+
-+	if (req->cryptlen <= CHACHA_BLOCK_SIZE || !may_use_simd())
-+		return crypto_chacha_crypt(req);
-+
-+	return chacha20_neon_stream_xor(req, ctx, req->iv);
-+}
-+
-+static int xchacha20_neon(struct skcipher_request *req)
-+{
-+	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-+	struct chacha_ctx *ctx = crypto_skcipher_ctx(tfm);
-+	struct chacha_ctx subctx;
-+	u32 state[16];
-+	u8 real_iv[16];
-+
-+	if (req->cryptlen <= CHACHA_BLOCK_SIZE || !may_use_simd())
-+		return crypto_xchacha_crypt(req);
-+
-+	crypto_chacha_init(state, ctx, req->iv);
-+
-+	kernel_neon_begin();
-+	hchacha20_block_neon(state, subctx.key);
-+	kernel_neon_end();
-+
-+	memcpy(&real_iv[0], req->iv + 24, 8);
-+	memcpy(&real_iv[8], req->iv + 16, 8);
-+	return chacha20_neon_stream_xor(req, &subctx, real_iv);
-+}
-+
-+static struct skcipher_alg algs[] = {
-+	{
-+		.base.cra_name		= "chacha20",
-+		.base.cra_driver_name	= "chacha20-neon",
-+		.base.cra_priority	= 300,
-+		.base.cra_blocksize	= 1,
-+		.base.cra_ctxsize	= sizeof(struct chacha_ctx),
-+		.base.cra_module	= THIS_MODULE,
-+
-+		.min_keysize		= CHACHA_KEY_SIZE,
-+		.max_keysize		= CHACHA_KEY_SIZE,
-+		.ivsize			= CHACHA_IV_SIZE,
-+		.chunksize		= CHACHA_BLOCK_SIZE,
-+		.walksize		= 4 * CHACHA_BLOCK_SIZE,
-+		.setkey			= crypto_chacha20_setkey,
-+		.encrypt		= chacha20_neon,
-+		.decrypt		= chacha20_neon,
-+	}, {
-+		.base.cra_name		= "xchacha20",
-+		.base.cra_driver_name	= "xchacha20-neon",
-+		.base.cra_priority	= 300,
-+		.base.cra_blocksize	= 1,
-+		.base.cra_ctxsize	= sizeof(struct chacha_ctx),
-+		.base.cra_module	= THIS_MODULE,
-+
-+		.min_keysize		= CHACHA_KEY_SIZE,
-+		.max_keysize		= CHACHA_KEY_SIZE,
-+		.ivsize			= XCHACHA_IV_SIZE,
-+		.chunksize		= CHACHA_BLOCK_SIZE,
-+		.walksize		= 4 * CHACHA_BLOCK_SIZE,
-+		.setkey			= crypto_chacha20_setkey,
-+		.encrypt		= xchacha20_neon,
-+		.decrypt		= xchacha20_neon,
-+	}
- };
- 
- static int __init chacha20_simd_mod_init(void)
-@@ -111,12 +159,12 @@ static int __init chacha20_simd_mod_init(void)
- 	if (!(elf_hwcap & HWCAP_NEON))
- 		return -ENODEV;
- 
--	return crypto_register_skcipher(&alg);
-+	return crypto_register_skciphers(algs, ARRAY_SIZE(algs));
- }
- 
- static void __exit chacha20_simd_mod_fini(void)
- {
--	crypto_unregister_skcipher(&alg);
-+	crypto_unregister_skciphers(algs, ARRAY_SIZE(algs));
- }
- 
- module_init(chacha20_simd_mod_init);
-@@ -125,3 +173,6 @@ module_exit(chacha20_simd_mod_fini);
- MODULE_AUTHOR("Ard Biesheuvel <ard.biesheuvel@linaro.org>");
- MODULE_LICENSE("GPL v2");
- MODULE_ALIAS_CRYPTO("chacha20");
-+MODULE_ALIAS_CRYPTO("chacha20-neon");
-+MODULE_ALIAS_CRYPTO("xchacha20");
-+MODULE_ALIAS_CRYPTO("xchacha20-neon");
--- 
-2.19.1.1215.g8438c0b245-goog
+Thanks
