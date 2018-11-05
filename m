@@ -1,61 +1,134 @@
-Return-Path: <SRS0=vxh5=N7=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from frisell.zx2c4.com ([192.95.5.64]:45373 "EHLO frisell.zx2c4.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725904AbeKUCyw (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 20 Nov 2018 21:54:52 -0500
+Return-Path: <SRS0=IFNk=NQ=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from szxga04-in.huawei.com ([45.249.212.190]:14595 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727351AbeKEVxY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 5 Nov 2018 16:53:24 -0500
+From: John Garry <john.garry@huawei.com>
+To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+CC: <Jonathan.Cameron@huawei.com>, <linux-crypto@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linuxarm@huawei.com>,
+        John Garry <john.garry@huawei.com>
+Subject: [PATCH 1/2] crypto: hisilicon -  Fix NULL dereference for same dst and src
+Date: Mon, 5 Nov 2018 20:35:14 +0800
+Message-ID: <1541421315-25623-2-git-send-email-john.garry@huawei.com>
+In-Reply-To: <1541421315-25623-1-git-send-email-john.garry@huawei.com>
+References: <1541421315-25623-1-git-send-email-john.garry@huawei.com>
 MIME-Version: 1.0
-References: <20181105232526.173947-1-ebiggers@kernel.org> <20181105232526.173947-11-ebiggers@kernel.org>
- <CAKv+Gu-o0khD5=0EOkv2PiczMs5uZ=XP9V=G2ogBNMK8Kb93sw@mail.gmail.com>
- <20181112185816.GA8663@gmail.com> <20181116060227.hwu4igi6bp26ddpi@gondor.apana.org.au>
- <20181117001718.GA175522@gmail.com> <CAHmME9rtsCk8ZLt05xRKMGr4CVRnaUvCaVOS_WX3N22HOat4-A@mail.gmail.com>
- <20181119052451.qttzfgcm4hvbdc4u@gondor.apana.org.au> <20181120060217.t4nccaqpwnxkl4tx@gondor.apana.org.au>
- <CAKv+Gu-SHS2tF665dfqSgmH5EF5vGVtef=3_4WgCE=+8+Jw7Rw@mail.gmail.com> <20181120141850.zjmfwcari5kykk6y@gondor.apana.org.au>
-In-Reply-To: <20181120141850.zjmfwcari5kykk6y@gondor.apana.org.au>
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date: Tue, 20 Nov 2018 17:24:41 +0100
-Message-ID: <CAHmME9oPGkvEmqvfbav-AOf_P=Z4zWYxvqD3a3QhuOSh_OWd_A@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 0/4] Exporting existing crypto API code through zinc
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        linux-fscrypt@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        LKML <linux-kernel@vger.kernel.org>,
-        Paul Crowley <paulcrowley@google.com>,
-        Greg Kaiser <gkaiser@google.com>,
-        Samuel Neves <samuel.c.p.neves@gmail.com>,
-        Tomer Ashur <tomer.ashur@esat.kuleuven.be>,
-        Martin Willi <martin@strongswan.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Nov 20, 2018 at 3:19 PM Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> Yes.  In fact it's used for FIPS certification testing.
-> Sure, nobody sane should be doing it.  But when it comes to
-> government certification... :)
+When the source and destination addresses for the cipher are the same, we
+will get a NULL dereference from accessing the split destination
+scatterlist memories, as shown:
 
-The kernel does not aim toward any FIPS certification, and we're not
-going to start bloating our designs to fulfill this. It's never been a
-goal. Maybe ask Ted to add a FIPS mode to random.c and see what
-happens... When you start arguing "because FIPS!" as your
-justification, you really hit a head scratcher.
+[   56.565719] tcrypt:
+[   56.565719] testing speed of async ecb(aes) (hisi_sec_aes_ecb) encryption
+[   56.574683] tcrypt: test 0 (128 bit key, 16 byte blocks):
+[   56.587585] Unable to handle kernel NULL pointer dereference at virtual address 0000000000000000
+[   56.596361] Mem abort info:
+[   56.599151]   ESR = 0x96000006
+[   56.602196]   Exception class = DABT (current EL), IL = 32 bits
+[   56.608105]   SET = 0, FnV = 0
+[   56.611149]   EA = 0, S1PTW = 0
+[   56.614280] Data abort info:
+[   56.617151]   ISV = 0, ISS = 0x00000006
+[   56.620976]   CM = 0, WnR = 0
+[   56.623930] user pgtable: 4k pages, 48-bit VAs, pgdp = (____ptrval____)
+[   56.630533] [0000000000000000] pgd=0000041fc7e4d003, pud=0000041fcd9bf003, pmd=0000000000000000
+[   56.639224] Internal error: Oops: 96000006 [#1] PREEMPT SMP
+[   56.644782] Modules linked in: tcrypt(+)
+[   56.648695] CPU: 21 PID: 2326 Comm: insmod Tainted: G        W         4.19.0-rc6-00001-g3fabfb8-dirty #716
+[   56.658420] Hardware name: Huawei Taishan 2280 /D05, BIOS Hisilicon D05 IT17 Nemo 2.0 RC0 10/05/2018
+[   56.667537] pstate: 20000005 (nzCv daif -PAN -UAO)
+[   56.672322] pc : sec_alg_skcipher_crypto+0x318/0x748
+[   56.677274] lr : sec_alg_skcipher_crypto+0x178/0x748
+[   56.682224] sp : ffff0000118e3840
+[   56.685525] x29: ffff0000118e3840 x28: ffff841fbb3f8118
+[   56.690825] x27: 0000000000000000 x26: 0000000000000000
+[   56.696125] x25: ffff841fbb3f8080 x24: ffff841fbadc0018
+[   56.701425] x23: ffff000009119000 x22: ffff841fbb24e280
+[   56.706724] x21: ffff841ff212e780 x20: ffff841ff212e700
+[   56.712023] x19: 0000000000000001 x18: ffffffffffffffff
+[   56.717322] x17: 0000000000000000 x16: 0000000000000000
+[   56.722621] x15: ffff0000091196c8 x14: 72635f7265687069
+[   56.727920] x13: 636b735f676c615f x12: ffff000009119940
+[   56.733219] x11: 0000000000000000 x10: 00000000006080c0
+[   56.738519] x9 : 0000000000000000 x8 : ffff841fbb24e480
+[   56.743818] x7 : ffff841fbb24e500 x6 : ffff841ff00cdcc0
+[   56.749117] x5 : 0000000000000010 x4 : 0000000000000000
+[   56.754416] x3 : ffff841fbb24e380 x2 : ffff841fbb24e480
+[   56.759715] x1 : 0000000000000000 x0 : ffff000008f682c8
+[   56.765016] Process insmod (pid: 2326, stack limit = 0x(____ptrval____))
+[   56.771702] Call trace:
+[   56.774136]  sec_alg_skcipher_crypto+0x318/0x748
+[   56.778740]  sec_alg_skcipher_encrypt+0x10/0x18
+[   56.783259]  test_skcipher_speed+0x2a0/0x700 [tcrypt]
+[   56.788298]  do_test+0x18f8/0x48c8 [tcrypt]
+[   56.792469]  tcrypt_mod_init+0x60/0x1000 [tcrypt]
+[   56.797161]  do_one_initcall+0x5c/0x178
+[   56.800985]  do_init_module+0x58/0x1b4
+[   56.804721]  load_module+0x1da4/0x2150
+[   56.808456]  __se_sys_init_module+0x14c/0x1e8
+[   56.812799]  __arm64_sys_init_module+0x18/0x20
+[   56.817231]  el0_svc_common+0x60/0xe8
+[   56.820880]  el0_svc_handler+0x2c/0x80
+[   56.824615]  el0_svc+0x8/0xc
+[   56.827483] Code: a94c87a3 910b2000 f87b7842 f9004ba2 (b87b7821)
+[   56.833564] ---[ end trace 0f63290590e93d94 ]---
+Segmentation fault
 
-> They've already paid for the indirect
-> function call so why make them go through yet another run-time
-> branch?
+Fix this by only accessing these memories when we have different src and
+dst.
 
-The indirect function call in the crypto API is the performance hit.
-The branch in Zinc is not, as the predictor does the correct thing
-every single time. I'm not able to distinguish between the two looking
-at the performance measurements between it being there and the branch
-being commented out.
+Fixes: 915e4e8413da ("crypto: hisilicon - SEC security accelerator driver")
+Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Signed-off-by: John Garry <john.garry@huawei.com>
+---
+ drivers/crypto/hisilicon/sec/sec_algs.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-Give me a few more days to finish v9's latest required changes for
-chacha12, and then I'll submit a revision that I think should address
-the remaining technical objections raised over the last several months
-we've been discussing this.
-
-Regards,
-Jason
+diff --git a/drivers/crypto/hisilicon/sec/sec_algs.c b/drivers/crypto/hisilicon/sec/sec_algs.c
+index f7d6d69..32c6c02 100644
+--- a/drivers/crypto/hisilicon/sec/sec_algs.c
++++ b/drivers/crypto/hisilicon/sec/sec_algs.c
+@@ -732,6 +732,7 @@ static int sec_alg_skcipher_crypto(struct skcipher_request *skreq,
+ 	int *splits_in_nents;
+ 	int *splits_out_nents = NULL;
+ 	struct sec_request_el *el, *temp;
++	bool split = skreq->src != skreq->dst;
+ 
+ 	mutex_init(&sec_req->lock);
+ 	sec_req->req_base = &skreq->base;
+@@ -750,7 +751,7 @@ static int sec_alg_skcipher_crypto(struct skcipher_request *skreq,
+ 	if (ret)
+ 		goto err_free_split_sizes;
+ 
+-	if (skreq->src != skreq->dst) {
++	if (split) {
+ 		sec_req->len_out = sg_nents(skreq->dst);
+ 		ret = sec_map_and_split_sg(skreq->dst, split_sizes, steps,
+ 					   &splits_out, &splits_out_nents,
+@@ -785,8 +786,9 @@ static int sec_alg_skcipher_crypto(struct skcipher_request *skreq,
+ 					       split_sizes[i],
+ 					       skreq->src != skreq->dst,
+ 					       splits_in[i], splits_in_nents[i],
+-					       splits_out[i],
+-					       splits_out_nents[i], info);
++					       split ? splits_out[i] : NULL,
++					       split ? splits_out_nents[i] : 0,
++					       info);
+ 		if (IS_ERR(el)) {
+ 			ret = PTR_ERR(el);
+ 			goto err_free_elements;
+@@ -854,7 +856,7 @@ static int sec_alg_skcipher_crypto(struct skcipher_request *skreq,
+ 				 crypto_skcipher_ivsize(atfm),
+ 				 DMA_BIDIRECTIONAL);
+ err_unmap_out_sg:
+-	if (skreq->src != skreq->dst)
++	if (split)
+ 		sec_unmap_sg_on_err(skreq->dst, steps, splits_out,
+ 				    splits_out_nents, sec_req->len_out,
+ 				    info->dev);
+-- 
+1.9.1
