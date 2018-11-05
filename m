@@ -1,57 +1,66 @@
-Return-Path: <SRS0=vxh5=N7=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from frisell.zx2c4.com ([192.95.5.64]:59785 "EHLO frisell.zx2c4.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726499AbeKUDDK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 20 Nov 2018 22:03:10 -0500
-Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTP id 21acca6c
-        for <linux-crypto@vger.kernel.org>;
-        Tue, 20 Nov 2018 16:27:01 +0000 (UTC)
-Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 7b134e4e (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256:NO)
-        for <linux-crypto@vger.kernel.org>;
-        Tue, 20 Nov 2018 16:27:01 +0000 (UTC)
-Received: by mail-oi1-f179.google.com with SMTP id p82-v6so1981082oih.11
-        for <linux-crypto@vger.kernel.org>; Tue, 20 Nov 2018 08:33:09 -0800 (PST)
+Return-Path: <SRS0=IFNk=NQ=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail-it1-f193.google.com ([209.85.166.193]:51439 "EHLO
+        mail-it1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727440AbeKETj2 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 5 Nov 2018 14:39:28 -0500
+Received: by mail-it1-f193.google.com with SMTP id h13so11907888itl.1
+        for <linux-crypto@vger.kernel.org>; Mon, 05 Nov 2018 02:20:29 -0800 (PST)
 MIME-Version: 1.0
-References: <20181111093630.28107-1-martin@strongswan.org> <20181116022059.aob3ruc7umg32go6@gondor.apana.org.au>
- <CAHmME9ppj_VDFhApxnnTX1ppn5QdzHH9kYNHkKwP8GKLvJ+Z+g@mail.gmail.com>
- <dcf5e17b3d1b86081197cd67a8c617c0eb8017c1.camel@strongswan.org>
- <CAHmME9opX4XOvR3O5SV7Nx5sAJ4TVNtGzZj218j=g1U2aQ2JoA@mail.gmail.com> <71b15365d7bb59295531b6409b85906e648246a6.camel@strongswan.org>
-In-Reply-To: <71b15365d7bb59295531b6409b85906e648246a6.camel@strongswan.org>
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date: Tue, 20 Nov 2018 17:32:57 +0100
-Message-ID: <CAHmME9rDWufV5nMVv7MdSn0mHwoJMrRE_Ggu=+tYO7c8EAe_Fw@mail.gmail.com>
-Subject: Re: [PATCH 0/6] crypto: x86/chacha20 - SIMD performance improvements
-To: Martin Willi <martin@strongswan.org>
-Cc: Eric Biggers <ebiggers@kernel.org>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+In-Reply-To: <CAOtvUMeRth4zrTZbEy6Co=+CR4==5oSDbaf760Yh4fj8UAf8bQ@mail.gmail.com>
+References: <1541325924-14777-1-git-send-email-gilad@benyossef.com>
+ <2578248.XAorIH2ink@tauon.chronox.de> <CAOtvUMeRth4zrTZbEy6Co=+CR4==5oSDbaf760Yh4fj8UAf8bQ@mail.gmail.com>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date: Mon, 5 Nov 2018 11:20:28 +0100
+Message-ID: <CAKv+Gu8x1LRKq4xJTrWfu7vQDPSzxYwEYGXG_o3Xv+Zsch9S-g@mail.gmail.com>
+Subject: Re: [PATCH] crypto: mark cts(cbc(aes)) as FIPS allowed
+To: Gilad Ben-Yossef <gilad@benyossef.com>
+Cc: =?UTF-8?Q?Stephan_M=C3=BCller?= <smueller@chronox.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        David Miller <davem@davemloft.net>,
+        Ofir Drang <Ofir.Drang@arm.com>,
+        Yael Chemla <Yael.Chemla@arm.com>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        X86 ML <x86@kernel.org>, Samuel Neves <sneves@dei.uc.pt>,
-        Herbert Xu <herbert@gondor.apana.org.au>
+        Linux kernel mailing list <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Martin,
-
-On Tue, Nov 20, 2018 at 5:29 PM Martin Willi <martin@strongswan.org> wrote:
-> Thanks for the offer, no need at this time. But I certainly would
-> welcome if you could do some (Wireguard) benching with that code to see
-> if it works for you.
-
-I certainly will test it in a few different network circumstances,
-especially since real testing like this is sometimes more telling than
-busy-loop benchmarks.
-
-> > Actually, similarly here, a 10nm Cannon Lake machine should be
-> > arriving at my house this week, which should make for some
-> > interesting testing ground for non-throttled zmm, if you'd like to
-> > play with it.
+On 5 November 2018 at 10:18, Gilad Ben-Yossef <gilad@benyossef.com> wrote:
+> Hi Stephan,
 >
-> Maybe in a future iteration, thanks. In fact would it be interesting to
-> know if Cannon Lake can handle that throttling better.
+> On Mon, Nov 5, 2018 at 10:50 AM Stephan Mueller <smueller@chronox.de> wrote:
+>>
+>> Am Sonntag, 4. November 2018, 11:05:24 CET schrieb Gilad Ben-Yossef:
+>>
+>> Hi Gilad,
+>>
+>> > As per Sp800-38A addendum from Oct 2010[1], cts(cbc(aes)) is
+>> > allowed as a FIPS mode algorithm. Mark it as such.
+>> >
+>> > [1] https://csrc.nist.gov/publications/detail/sp/800-38a/addendum/final
+>>
+>> There are several types of CTS approaches. Only three of those are listed in
+>> the SP800-38A addendum. The source code only refers to some RFCs.
+>>
+>> Did you check whether the CTS implementation matches one or more of the types
+>> listed in the addendum? If yes, may I suggest to add a small statement in the
+>> code noting this fact?
+>
+> Yes, AFAIK the software implements CBC-CS3 as described in the document.
+> You have a very good point about this not document anywhere. I will
+> send a patch.
+>
 
-Everything I've read on the Internet seems to indicate that's the
-case, so one of the first things I'll be doing is seeing if that's
-true. There are also the AVX512 IFMA instructions to play with!
+I agree that it makes sense to document this.
 
-Jason
+> While we're at it, does someone find it useful if I implemented the
+> other two modes?
+> They are part of the standard as well, although I am not sure that in
+> itself is sufficient cause.
+>
+
+Nope. The linux crypto API is not a general purpose cryptography
+toolkit, it should only offer what we actually use in the kernel, or
+we'll either end up with bitrot or with a disproportionate maintenance
+burden for stuff nobody actually uses.
