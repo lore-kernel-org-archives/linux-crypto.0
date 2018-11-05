@@ -1,84 +1,68 @@
-From: "A.s. Dong" <aisheng.dong@nxp.com>
-Subject: RE: [PATCH v2 0/4] Port mxs-dcp to imx6ull and imx6sll
-Date: Mon, 15 Oct 2018 16:11:54 +0000
-Message-ID: <AM0PR04MB42113CBC474C64ADE3B3D01780FD0@AM0PR04MB4211.eurprd04.prod.outlook.com>
-References: <cover.1539609921.git.leonard.crestez@nxp.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Return-Path: <SRS0=IFNk=NQ=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail-ua1-f66.google.com ([209.85.222.66]:46234 "EHLO
+        mail-ua1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726255AbeKESg4 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 5 Nov 2018 13:36:56 -0500
+Received: by mail-ua1-f66.google.com with SMTP id v24so2894044uap.13
+        for <linux-crypto@vger.kernel.org>; Mon, 05 Nov 2018 01:18:12 -0800 (PST)
+MIME-Version: 1.0
+References: <1541325924-14777-1-git-send-email-gilad@benyossef.com> <2578248.XAorIH2ink@tauon.chronox.de>
+In-Reply-To: <2578248.XAorIH2ink@tauon.chronox.de>
+From: Gilad Ben-Yossef <gilad@benyossef.com>
+Date: Mon, 5 Nov 2018 11:18:00 +0200
+Message-ID: <CAOtvUMeRth4zrTZbEy6Co=+CR4==5oSDbaf760Yh4fj8UAf8bQ@mail.gmail.com>
+Subject: Re: [PATCH] crypto: mark cts(cbc(aes)) as FIPS allowed
+To: =?UTF-8?Q?Stephan_M=C3=BCller?= <smueller@chronox.de>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        David Miller <davem@davemloft.net>,
+        Ofir Drang <Ofir.Drang@arm.com>,
+        Yael Chemla <Yael.Chemla@arm.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux kernel mailing list <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Cc: Rob Herring <robh+dt@kernel.org>,
-        Marek Vasut <marek.vasut@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Horia Geanta <horia.geanta@nxp.com>,
-        Franck Lenormand <franck.lenormand@nxp.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        "David S . Miller " <davem@davemloft.net>,
-        Mark Rutland <mark.rutland@arm.com>,
-        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-arm-kernel@lists.infradead.org"
-        <linux-arm-kernel@lists.infradead.org>,
-        dl-linux-imx <linux-imx@nxp.com>,
-        "kernel@pengutronix.de" <kernel@pengutronix.de>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-To: Leonard Crestez <leonard.crestez@nxp.com>,
-        Shawn Guo <shawnguo@kernel.org>,
-        Fabio Estevam <fabio.estevam@nxp.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <cover.1539609921.git.leonard.crestez@nxp.com>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Leonard,
+Hi Stephan,
 
-> -----Original Message-----
-> From: Leonard Crestez
-> Sent: Monday, October 15, 2018 9:28 PM
+On Mon, Nov 5, 2018 at 10:50 AM Stephan Mueller <smueller@chronox.de> wrote=
+:
+>
+> Am Sonntag, 4. November 2018, 11:05:24 CET schrieb Gilad Ben-Yossef:
+>
+> Hi Gilad,
+>
+> > As per Sp800-38A addendum from Oct 2010[1], cts(cbc(aes)) is
+> > allowed as a FIPS mode algorithm. Mark it as such.
+> >
+> > [1] https://csrc.nist.gov/publications/detail/sp/800-38a/addendum/final
+>
+> There are several types of CTS approaches. Only three of those are listed=
+ in
+> the SP800-38A addendum. The source code only refers to some RFCs.
+>
+> Did you check whether the CTS implementation matches one or more of the t=
+ypes
+> listed in the addendum? If yes, may I suggest to add a small statement in=
+ the
+> code noting this fact?
+
+Yes, AFAIK the software implements CBC-CS3 as described in the document.
+You have a very good point about this not document anywhere. I will
+send a patch.
+
+While we're at it, does someone find it useful if I implemented the
+other two modes?
+They are part of the standard as well, although I am not sure that in
+itself is sufficient cause.
 
 
-[...]
+Gilad
 
-> Subject: [PATCH v2 0/4] Port mxs-dcp to imx6ull and imx6sll
->=20
-> The DCP block is present on 6sll and 6ull but not enabled. The hardware i=
-s
-> mostly compatible with 6sl, the only important difference is that explici=
-t clock
-> enabling is required.
->=20
-> There were several issues with the functionality of this driver (it didn'=
-t even
-> probe properly) but they are fixed in cryptodev/master by this series:
->     https://lore.kernel.org/patchwork/cover/994874/
->=20
+--
+Gilad Ben-Yossef
+Chief Coffee Drinker
 
-Thanks for the work.
-I will be glad to help the test if you provide some test guides. :-)
-
-Regards
-Dong Aisheng
-
-> ---
-> Changes since v1:
->  * Add devicetree maintainers for dt-bindings
->  * Add a patch enabling in imx_v6_v7_defconfig. Since tcrypt now passes t=
-his
-> shouldn't cause any issues
->  * Link to v1: https://lore.kernel.org/patchwork/cover/994893/
->=20
-> Leonard Crestez (4):
->   dt-bindings: crypto: Mention clocks for mxs-dcp
->   crypto: mxs-dcp - Add support for dcp clk
->   ARM: dts: imx6ull: Add dcp node
->   ARM: imx_v6_v7_defconfig: Enable CRYPTO_DEV_MXS_DCP
->=20
->  .../devicetree/bindings/crypto/fsl-dcp.txt     |  2 ++
->  arch/arm/boot/dts/imx6ull.dtsi                 | 10 ++++++++++
->  arch/arm/configs/imx_v6_v7_defconfig           |  1 +
->  drivers/crypto/mxs-dcp.c                       | 18
-> ++++++++++++++++++
->  4 files changed, 31 insertions(+)
->=20
-> --
-> 2.17.1
+values of =CE=B2 will give rise to dom!
