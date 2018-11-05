@@ -1,57 +1,75 @@
-Return-Path: <SRS0=vxh5=N7=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:45638 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726979AbeKTRAt (ORCPT
+Return-Path: <SRS0=IFNk=NQ=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38192 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728850AbeKEWVL (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 20 Nov 2018 12:00:49 -0500
-Date: Tue, 20 Nov 2018 14:33:20 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org
-Subject: Re: [PATCH] crypto: drop mask=CRYPTO_ALG_ASYNC from 'cipher' tfm
- allocations
-Message-ID: <20181120063320.y4dltfpigssjlukc@gondor.apana.org.au>
-References: <20181114201939.97592-1-ebiggers@kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181114201939.97592-1-ebiggers@kernel.org>
+        Mon, 5 Nov 2018 17:21:11 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id wA5CxDRj142213
+        for <linux-crypto@vger.kernel.org>; Mon, 5 Nov 2018 08:01:31 -0500
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2njn6yu6r2-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <linux-crypto@vger.kernel.org>; Mon, 05 Nov 2018 08:01:28 -0500
+Received: from localhost
+        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <linux-crypto@vger.kernel.org> from <zohar@linux.ibm.com>;
+        Mon, 5 Nov 2018 13:01:25 -0000
+Subject: Re: [PATCH v2 0/2] crypto: streebog - add Streebog hash function
+From: Mimi Zohar <zohar@linux.ibm.com>
+To: Vitaly Chikunov <vt@altlinux.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-integrity@vger.kernel.org,
+        Mimi Zohar <zohar@linux.vnet.ibm.com>,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>
+Date: Mon, 05 Nov 2018 08:01:10 -0500
+In-Reply-To: <20181105125537.ux4eehruuncqukli@sole.flsd.net>
+References: <20181010121254.12220-1-vt@altlinux.org>
+         <20181012061659.mextetc3v7urqkzx@gondor.apana.org.au>
+         <20181012064105.bchujbwoaszrcu3l@sole.flsd.net>
+         <20181017060851.r5mxvpq3l2ycvpio@gondor.apana.org.au>
+         <20181103055145.ndvxd7nbnoqtwrk5@sole.flsd.net>
+         <1541422113.21115.44.camel@linux.ibm.com>
+         <20181105125537.ux4eehruuncqukli@sole.flsd.net>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Message-Id: <1541422870.21115.51.camel@linux.ibm.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Nov 14, 2018 at 12:19:39PM -0800, Eric Biggers wrote:
-> From: Eric Biggers <ebiggers@google.com>
+On Mon, 2018-11-05 at 15:55 +0300, Vitaly Chikunov wrote:
+> Mimi,
 > 
-> 'cipher' algorithms (single block ciphers) are always synchronous, so
-> passing CRYPTO_ALG_ASYNC in the mask to crypto_alloc_cipher() has no
-> effect.  Many users therefore already don't pass it, but some still do.
-> This inconsistency can cause confusion, especially since the way the
-> 'mask' argument works is somewhat counterintuitive.
+> On Mon, Nov 05, 2018 at 07:48:33AM -0500, Mimi Zohar wrote:
+> > On Sat, 2018-11-03 at 08:51 +0300, Vitaly Chikunov wrote:
+> > > On Wed, Oct 17, 2018 at 02:08:51PM +0800, Herbert Xu wrote:
+> > > > On Fri, Oct 12, 2018 at 09:41:05AM +0300, Vitaly Chikunov wrote:
+> > > > >
+> > > > > It is the first part of attempts to add to the Integrity subsystem
+> > > > > ability of verifying file and module signatures by Russian GOST
+> > > > > algorithms.
+> > > > 
+> > > > It would be better if these patches are posted together.  That
+> > > > way we don't end up with a situation where the algorithm goes into
+> > > > the kernel but the ultimate user is rejected.
+> > > 
+> > > IMA does not need any particular patching inside of their subtree to
+> > > support new hash, because it is using any hash registered in Hash Info
+> > > which is still under crypto subtree. I added appropriate patch into v3
+> > > which is already posted a week ago, and tested it to work correctly with
+> > > ima_appraise=fix.
+> > 
+> > That's true, but the target subsystem should be made aware of the new
+> > usage.
 > 
-> Thus, just remove the unneeded CRYPTO_ALG_ASYNC flags.
-> 
-> This patch shouldn't change any actual behavior.
-> 
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
-> ---
->  arch/s390/crypto/aes_s390.c                               | 2 +-
->  drivers/crypto/amcc/crypto4xx_alg.c                       | 3 +--
->  drivers/crypto/ccp/ccp-crypto-aes-cmac.c                  | 4 +---
->  drivers/crypto/geode-aes.c                                | 2 +-
->  drivers/md/dm-crypt.c                                     | 2 +-
->  drivers/net/wireless/cisco/airo.c                         | 2 +-
->  drivers/staging/rtl8192e/rtllib_crypt_ccmp.c              | 2 +-
->  drivers/staging/rtl8192u/ieee80211/ieee80211_crypt_ccmp.c | 2 +-
->  drivers/usb/wusbcore/crypto.c                             | 2 +-
->  net/bluetooth/smp.c                                       | 6 +++---
->  net/mac80211/wep.c                                        | 4 ++--
->  net/wireless/lib80211_crypt_ccmp.c                        | 2 +-
->  net/wireless/lib80211_crypt_tkip.c                        | 4 ++--
->  net/wireless/lib80211_crypt_wep.c                         | 4 ++--
->  14 files changed, 19 insertions(+), 22 deletions(-)
+> Did you mean by re-sending the patch with Cc to linux-integrity? Or
+> something more?
 
-Patch applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Just as future reference.  For now, please feel free to add my
+Reviewed-by on the "crypto: streebog - register Streebog in hash info
+for IMA" patch.
+
+Mimi
