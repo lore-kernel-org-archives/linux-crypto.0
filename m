@@ -1,80 +1,93 @@
-Return-Path: <SRS0=Oq1A=OC=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:41623 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2504040AbeKWWqt (ORCPT
+Return-Path: <SRS0=IFNk=NQ=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail-it1-f194.google.com ([209.85.166.194]:33677 "EHLO
+        mail-it1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729342AbeKEWm7 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 23 Nov 2018 17:46:49 -0500
-Received: by mail-wr1-f68.google.com with SMTP id x10so12104611wrs.8
-        for <linux-crypto@vger.kernel.org>; Fri, 23 Nov 2018 04:02:51 -0800 (PST)
-From: Corentin Labbe <clabbe@baylibre.com>
-To: davem@davemloft.net, ebiggers@kernel.org,
-        herbert@gondor.apana.org.au, nhorman@tuxdriver.com
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Corentin Labbe <clabbe@baylibre.com>
-Subject: [PATCH v4 11/11] crypto: crypto_user_stat: Add crypto_stats_init
-Date: Fri, 23 Nov 2018 12:02:21 +0000
-Message-Id: <1542974541-23024-12-git-send-email-clabbe@baylibre.com>
-In-Reply-To: <1542974541-23024-1-git-send-email-clabbe@baylibre.com>
-References: <1542974541-23024-1-git-send-email-clabbe@baylibre.com>
+        Mon, 5 Nov 2018 17:42:59 -0500
+Received: by mail-it1-f194.google.com with SMTP id p11-v6so7706450itf.0
+        for <linux-crypto@vger.kernel.org>; Mon, 05 Nov 2018 05:23:14 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <20181024032356.3388-3-vt@altlinux.org>
+References: <20181024032356.3388-1-vt@altlinux.org> <20181024032356.3388-3-vt@altlinux.org>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date: Mon, 5 Nov 2018 14:23:13 +0100
+Message-ID: <CAKv+Gu-DHURWHZdyLY5Tbw5-Te-e_-89k-R91Vv3xRKchhvkYA@mail.gmail.com>
+Subject: Re: [PATCH v3 2/3] crypto: streebog - register Streebog in hash info
+ for IMA
+To: Vitaly Chikunov <vt@altlinux.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Philippe Ombredanne <pombredanne@nexb.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Kate Stewart <kstewart@linuxfoundation.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch add the crypto_stats_init() function.
-This will permit to remove some ifdef from __crypto_register_alg().
+On 24 October 2018 at 05:23, Vitaly Chikunov <vt@altlinux.org> wrote:
+> Register Streebog hash function in Hash Info arrays to let IMA use
+> it for its purposes.
+>
+> Signed-off-by: Vitaly Chikunov <vt@altlinux.org>
+> ---
+>  crypto/hash_info.c             | 4 ++++
+>  include/crypto/hash_info.h     | 1 +
+>  include/uapi/linux/hash_info.h | 2 ++
+>  3 files changed, 7 insertions(+)
+>
+> diff --git a/crypto/hash_info.c b/crypto/hash_info.c
+> index 7b1e0b188ce6..b0b91eb0973a 100644
+> --- a/crypto/hash_info.c
+> +++ b/crypto/hash_info.c
+> @@ -32,6 +32,8 @@ const char *const hash_algo_name[HASH_ALGO__LAST] = {
+>         [HASH_ALGO_TGR_160]     = "tgr160",
+>         [HASH_ALGO_TGR_192]     = "tgr192",
+>         [HASH_ALGO_SM3_256]     = "sm3-256",
+> +       [HASH_ALGO_SB256]       = "sb256",
+> +       [HASH_ALGO_SB512]       = "sb512",
+>  };
+>  EXPORT_SYMBOL_GPL(hash_algo_name);
+>
+> @@ -54,5 +56,7 @@ const int hash_digest_size[HASH_ALGO__LAST] = {
+>         [HASH_ALGO_TGR_160]     = TGR160_DIGEST_SIZE,
+>         [HASH_ALGO_TGR_192]     = TGR192_DIGEST_SIZE,
+>         [HASH_ALGO_SM3_256]     = SM3256_DIGEST_SIZE,
+> +       [HASH_ALGO_SB256]       = STREEBOG256_DIGEST_SIZE,
+> +       [HASH_ALGO_SB512]       = STREEBOG512_DIGEST_SIZE,
+>  };
+>  EXPORT_SYMBOL_GPL(hash_digest_size);
+> diff --git a/include/crypto/hash_info.h b/include/crypto/hash_info.h
+> index 56f217d41f12..91786b68dbdb 100644
+> --- a/include/crypto/hash_info.h
+> +++ b/include/crypto/hash_info.h
+> @@ -15,6 +15,7 @@
+>
+>  #include <crypto/sha.h>
+>  #include <crypto/md5.h>
+> +#include <crypto/streebog.h>
+>
+>  #include <uapi/linux/hash_info.h>
+>
+> diff --git a/include/uapi/linux/hash_info.h b/include/uapi/linux/hash_info.h
+> index eea5d02c58de..5e8b8d952ba0 100644
+> --- a/include/uapi/linux/hash_info.h
+> +++ b/include/uapi/linux/hash_info.h
+> @@ -33,6 +33,8 @@ enum hash_algo {
+>         HASH_ALGO_TGR_160,
+>         HASH_ALGO_TGR_192,
+>         HASH_ALGO_SM3_256,
+> +       HASH_ALGO_SB256,
+> +       HASH_ALGO_SB512,
 
-Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
----
- crypto/algapi.c        | 11 ++++++++---
- include/linux/crypto.h |  1 +
- 2 files changed, 9 insertions(+), 3 deletions(-)
+Could we make this HASH_ALGO_STREEBOG_xxx please?
 
-diff --git a/crypto/algapi.c b/crypto/algapi.c
-index 84e9b4e5389a..0a76d8464d9f 100644
---- a/crypto/algapi.c
-+++ b/crypto/algapi.c
-@@ -258,9 +258,7 @@ static struct crypto_larval *__crypto_register_alg(struct crypto_alg *alg)
- 	list_add(&alg->cra_list, &crypto_alg_list);
- 	list_add(&larval->alg.cra_list, &crypto_alg_list);
- 
--#ifdef CONFIG_CRYPTO_STATS
--	memset(&alg->stats, 0, sizeof(alg->stats));
--#endif
-+	crypto_stats_init(alg);
- 
- out:
- 	return larval;
-@@ -1073,6 +1071,11 @@ int crypto_type_has_alg(const char *name, const struct crypto_type *frontend,
- EXPORT_SYMBOL_GPL(crypto_type_has_alg);
- 
- #ifdef CONFIG_CRYPTO_STATS
-+void crypto_stats_init(struct crypto_alg *alg)
-+{
-+	memset(&alg->stats, 0, sizeof(alg->stats));
-+}
-+
- void crypto_stats_get(struct crypto_alg *alg)
- {
- 	crypto_alg_get(alg);
-@@ -1284,6 +1287,8 @@ void crypto_stats_skcipher_decrypt(unsigned int cryptlen, int ret,
- 	crypto_alg_put(alg);
- }
- #else
-+void crypto_stats_init(struct crypto_alg *alg)
-+{}
- void crypto_stats_get(struct crypto_alg *alg)
- {}
- void crypto_stats_ablkcipher_encrypt(unsigned int nbytes, int ret,
-diff --git a/include/linux/crypto.h b/include/linux/crypto.h
-index 132a052b3483..4fa9903c0887 100644
---- a/include/linux/crypto.h
-+++ b/include/linux/crypto.h
-@@ -613,6 +613,7 @@ struct crypto_alg {
- 
- } CRYPTO_MINALIGN_ATTR;
- 
-+void crypto_stats_init(struct crypto_alg *alg);
- void crypto_stats_get(struct crypto_alg *alg);
- void crypto_stats_ablkcipher_encrypt(unsigned int nbytes, int ret, struct crypto_alg *alg);
- void crypto_stats_ablkcipher_decrypt(unsigned int nbytes, int ret, struct crypto_alg *alg);
--- 
-2.18.1
+>         HASH_ALGO__LAST
+>  };
+>
+> --
+> 2.11.0
+>
