@@ -1,7 +1,7 @@
 Return-Path: <SRS0=IFNk=NQ=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:54532 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:54494 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725844AbeKFItN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        id S1725878AbeKFItN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
         Tue, 6 Nov 2018 03:49:13 -0500
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
@@ -13,9 +13,9 @@ Cc: linux-fscrypt@vger.kernel.org,
         "Jason A . Donenfeld" <Jason@zx2c4.com>,
         Samuel Neves <samuel.c.p.neves@gmail.com>,
         Tomer Ashur <tomer.ashur@esat.kuleuven.be>
-Subject: [RFC PATCH v3 05/15] crypto: chacha - add XChaCha12 support
-Date: Mon,  5 Nov 2018 15:25:16 -0800
-Message-Id: <20181105232526.173947-6-ebiggers@kernel.org>
+Subject: [RFC PATCH v3 03/15] crypto: chacha20-generic - add XChaCha20 support
+Date: Mon,  5 Nov 2018 15:25:14 -0800
+Message-Id: <20181105232526.173947-4-ebiggers@kernel.org>
 In-Reply-To: <20181105232526.173947-1-ebiggers@kernel.org>
 References: <20181105232526.173947-1-ebiggers@kernel.org>
 MIME-Version: 1.0
@@ -25,139 +25,247 @@ List-ID: <linux-crypto.vger.kernel.org>
 
 From: Eric Biggers <ebiggers@google.com>
 
-Now that the generic implementation of ChaCha20 has been refactored to
-allow varying the number of rounds, add support for XChaCha12, which is
-the XSalsa construction applied to ChaCha12.  ChaCha12 is one of the
-three ciphers specified by the original ChaCha paper
-(https://cr.yp.to/chacha/chacha-20080128.pdf: "ChaCha, a variant of
-Salsa20"), alongside ChaCha8 and ChaCha20.  ChaCha12 is faster than
-ChaCha20 but has a lower, but still large, security margin.
+Add support for the XChaCha20 stream cipher.  XChaCha20 is the
+application of the XSalsa20 construction
+(https://cr.yp.to/snuffle/xsalsa-20081128.pdf) to ChaCha20 rather than
+to Salsa20.  XChaCha20 extends ChaCha20's nonce length from 64 bits (or
+96 bits, depending on convention) to 192 bits, while provably retaining
+ChaCha20's security.  XChaCha20 uses the ChaCha20 permutation to map the
+key and first 128 nonce bits to a 256-bit subkey.  Then, it does the
+ChaCha20 stream cipher with the subkey and remaining 64 bits of nonce.
 
-We need XChaCha12 support so that it can be used in the Adiantum
-encryption mode, which enables disk/file encryption on low-end mobile
-devices where AES-XTS is too slow as the CPUs lack AES instructions.
+We need XChaCha support in order to add support for the Adiantum
+encryption mode.  Note that to meet our performance requirements, we
+actually plan to primarily use the variant XChaCha12.  But we believe
+it's wise to first add XChaCha20 as a baseline with a higher security
+margin, in case there are any situations where it can be used.
+Supporting both variants is straightforward.
 
-We'd prefer XChaCha20 (the more popular variant), but it's too slow on
-some of our target devices, so at least in some cases we do need the
-XChaCha12-based version.  In more detail, the problem is that Adiantum
-is still much slower than we're happy with, and encryption still has a
-quite noticeable effect on the feel of low-end devices.  Users and
-vendors push back hard against encryption that degrades the user
-experience, which always risks encryption being disabled entirely.  So
-we need to choose the fastest option that gives us a solid margin of
-security, and here that's XChaCha12.  The best known attack on ChaCha
-breaks only 7 rounds and has 2^235 time complexity, so ChaCha12's
-security margin is still better than AES-256's.  Much has been learned
-about cryptanalysis of ARX ciphers since Salsa20 was originally designed
-in 2005, and it now seems we can be comfortable with a smaller number of
-rounds.  The eSTREAM project also suggests the 12-round version of
-Salsa20 as providing the best balance among the different variants:
-combining very good performance with a "comfortable margin of security".
+Since XChaCha20's subkey differs for each request, XChaCha20 can't be a
+template that wraps ChaCha20; that would require re-keying the
+underlying ChaCha20 for every request, which wouldn't be thread-safe.
+Instead, we make XChaCha20 its own top-level algorithm which calls the
+ChaCha20 streaming implementation internally.
 
-Note that it would be trivial to add vanilla ChaCha12 in addition to
-XChaCha12.  However, it's unneeded for now and therefore is omitted.
+Similar to the existing ChaCha20 implementation, we define the IV to be
+the nonce and stream position concatenated together.  This allows users
+to seek to any position in the stream.
 
-As discussed in the patch that introduced XChaCha20 support, I
-considered splitting the code into separate chacha-common, chacha20,
-xchacha20, and xchacha12 modules, so that these algorithms could be
+I considered splitting the code into separate chacha20-common, chacha20,
+and xchacha20 modules, so that chacha20 and xchacha20 could be
 enabled/disabled independently.  However, since nearly all the code is
 shared anyway, I ultimately decided there would have been little benefit
-to the added complexity.
+to the added complexity of separate modules.
 
 Reviewed-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- crypto/Kconfig          |   8 +-
- crypto/chacha_generic.c |  26 +-
- crypto/testmgr.c        |   6 +
- crypto/testmgr.h        | 578 ++++++++++++++++++++++++++++++++++++++++
- include/crypto/chacha.h |   7 +
- lib/chacha.c            |   6 +-
- 6 files changed, 625 insertions(+), 6 deletions(-)
+ crypto/Kconfig            |  14 +-
+ crypto/chacha20_generic.c | 120 +++++---
+ crypto/testmgr.c          |   6 +
+ crypto/testmgr.h          | 577 ++++++++++++++++++++++++++++++++++++++
+ include/crypto/chacha20.h |  14 +-
+ 5 files changed, 689 insertions(+), 42 deletions(-)
 
 diff --git a/crypto/Kconfig b/crypto/Kconfig
-index d9acbce23d4d..4fa0a4a0e861 100644
+index f7a235db56aa..d9acbce23d4d 100644
 --- a/crypto/Kconfig
 +++ b/crypto/Kconfig
-@@ -1387,10 +1387,10 @@ config CRYPTO_SALSA20
+@@ -1387,18 +1387,22 @@ config CRYPTO_SALSA20
  	  Bernstein <djb@cr.yp.to>. See <http://cr.yp.to/snuffle.html>
  
  config CRYPTO_CHACHA20
--	tristate "ChaCha20 stream cipher algorithms"
-+	tristate "ChaCha stream cipher algorithms"
+-	tristate "ChaCha20 cipher algorithm"
++	tristate "ChaCha20 stream cipher algorithms"
  	select CRYPTO_BLKCIPHER
  	help
--	  The ChaCha20 and XChaCha20 stream cipher algorithms.
-+	  The ChaCha20, XChaCha20, and XChaCha12 stream cipher algorithms.
+-	  ChaCha20 cipher algorithm, RFC7539.
++	  The ChaCha20 and XChaCha20 stream cipher algorithms.
  
  	  ChaCha20 is a 256-bit high-speed stream cipher designed by Daniel J.
  	  Bernstein and further specified in RFC7539 for use in IETF protocols.
-@@ -1403,6 +1403,10 @@ config CRYPTO_CHACHA20
- 	  while provably retaining ChaCha20's security.  See also:
- 	  <https://cr.yp.to/snuffle/xsalsa-20081128.pdf>
+-	  This is the portable C implementation of ChaCha20.
+-
+-	  See also:
++	  This is the portable C implementation of ChaCha20.  See also:
+ 	  <http://cr.yp.to/chacha/chacha-20080128.pdf>
  
-+	  XChaCha12 is XChaCha20 reduced to 12 rounds, with correspondingly
-+	  reduced security margin but increased performance.  It can be needed
-+	  in some performance-sensitive scenarios.
++	  XChaCha20 is the application of the XSalsa20 construction to ChaCha20
++	  rather than to Salsa20.  XChaCha20 extends ChaCha20's nonce length
++	  from 64 bits (or 96 bits using the RFC7539 convention) to 192 bits,
++	  while provably retaining ChaCha20's security.  See also:
++	  <https://cr.yp.to/snuffle/xsalsa-20081128.pdf>
 +
  config CRYPTO_CHACHA20_X86_64
  	tristate "ChaCha20 cipher algorithm (x86_64/SSSE3/AVX2)"
  	depends on X86 && 64BIT
-diff --git a/crypto/chacha_generic.c b/crypto/chacha_generic.c
-index 438f15a14054..35b583101f4f 100644
---- a/crypto/chacha_generic.c
-+++ b/crypto/chacha_generic.c
-@@ -1,5 +1,5 @@
+diff --git a/crypto/chacha20_generic.c b/crypto/chacha20_generic.c
+index 3529521d72a4..4305b1b62b16 100644
+--- a/crypto/chacha20_generic.c
++++ b/crypto/chacha20_generic.c
+@@ -1,7 +1,8 @@
  /*
-- * ChaCha20 (RFC7539) and XChaCha20 stream cipher algorithms
-+ * ChaCha and XChaCha stream ciphers, including ChaCha20 (RFC7539)
+- * ChaCha20 256-bit cipher algorithm, RFC7539
++ * ChaCha20 (RFC7539) and XChaCha20 stream cipher algorithms
   *
   * Copyright (C) 2015 Martin Willi
-  * Copyright (C) 2018 Google LLC
-@@ -106,6 +106,13 @@ int crypto_chacha20_setkey(struct crypto_skcipher *tfm, const u8 *key,
++ * Copyright (C) 2018 Google LLC
+  *
+  * This program is free software; you can redistribute it and/or modify
+  * it under the terms of the GNU General Public License as published by
+@@ -36,6 +37,31 @@ static void chacha20_docrypt(u32 *state, u8 *dst, const u8 *src,
+ 	}
  }
- EXPORT_SYMBOL_GPL(crypto_chacha20_setkey);
  
-+int crypto_chacha12_setkey(struct crypto_skcipher *tfm, const u8 *key,
-+			   unsigned int keysize)
++static int chacha20_stream_xor(struct skcipher_request *req,
++			       struct chacha20_ctx *ctx, u8 *iv)
 +{
-+	return chacha_setkey(tfm, key, keysize, 12);
-+}
-+EXPORT_SYMBOL_GPL(crypto_chacha12_setkey);
++	struct skcipher_walk walk;
++	u32 state[16];
++	int err;
 +
- int crypto_chacha_crypt(struct skcipher_request *req)
++	err = skcipher_walk_virt(&walk, req, false);
++
++	crypto_chacha20_init(state, ctx, iv);
++
++	while (walk.nbytes > 0) {
++		unsigned int nbytes = walk.nbytes;
++
++		if (nbytes < walk.total)
++			nbytes = round_down(nbytes, walk.stride);
++
++		chacha20_docrypt(state, walk.dst.virt.addr, walk.src.virt.addr,
++				 nbytes);
++		err = skcipher_walk_done(&walk, walk.nbytes - nbytes);
++	}
++
++	return err;
++}
++
+ void crypto_chacha20_init(u32 *state, struct chacha20_ctx *ctx, u8 *iv)
+ {
+ 	state[0]  = 0x61707865; /* "expa" */
+@@ -77,54 +103,74 @@ int crypto_chacha20_crypt(struct skcipher_request *req)
  {
  	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-@@ -168,6 +175,21 @@ static struct skcipher_alg algs[] = {
- 		.setkey			= crypto_chacha20_setkey,
- 		.encrypt		= crypto_xchacha_crypt,
- 		.decrypt		= crypto_xchacha_crypt,
-+	}, {
-+		.base.cra_name		= "xchacha12",
-+		.base.cra_driver_name	= "xchacha12-generic",
+ 	struct chacha20_ctx *ctx = crypto_skcipher_ctx(tfm);
+-	struct skcipher_walk walk;
+-	u32 state[16];
+-	int err;
+-
+-	err = skcipher_walk_virt(&walk, req, false);
+ 
+-	crypto_chacha20_init(state, ctx, walk.iv);
++	return chacha20_stream_xor(req, ctx, req->iv);
++}
++EXPORT_SYMBOL_GPL(crypto_chacha20_crypt);
+ 
+-	while (walk.nbytes > 0) {
+-		unsigned int nbytes = walk.nbytes;
++int crypto_xchacha20_crypt(struct skcipher_request *req)
++{
++	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
++	struct chacha20_ctx *ctx = crypto_skcipher_ctx(tfm);
++	struct chacha20_ctx subctx;
++	u32 state[16];
++	u8 real_iv[16];
+ 
+-		if (nbytes < walk.total)
+-			nbytes = round_down(nbytes, walk.stride);
++	/* Compute the subkey given the original key and first 128 nonce bits */
++	crypto_chacha20_init(state, ctx, req->iv);
++	hchacha20_block(state, subctx.key);
+ 
+-		chacha20_docrypt(state, walk.dst.virt.addr, walk.src.virt.addr,
+-				 nbytes);
+-		err = skcipher_walk_done(&walk, walk.nbytes - nbytes);
+-	}
++	/* Build the real IV */
++	memcpy(&real_iv[0], req->iv + 24, 8); /* stream position */
++	memcpy(&real_iv[8], req->iv + 16, 8); /* remaining 64 nonce bits */
+ 
+-	return err;
++	/* Generate the stream and XOR it with the data */
++	return chacha20_stream_xor(req, &subctx, real_iv);
+ }
+-EXPORT_SYMBOL_GPL(crypto_chacha20_crypt);
+-
+-static struct skcipher_alg alg = {
+-	.base.cra_name		= "chacha20",
+-	.base.cra_driver_name	= "chacha20-generic",
+-	.base.cra_priority	= 100,
+-	.base.cra_blocksize	= 1,
+-	.base.cra_ctxsize	= sizeof(struct chacha20_ctx),
+-	.base.cra_module	= THIS_MODULE,
+-
+-	.min_keysize		= CHACHA20_KEY_SIZE,
+-	.max_keysize		= CHACHA20_KEY_SIZE,
+-	.ivsize			= CHACHA20_IV_SIZE,
+-	.chunksize		= CHACHA20_BLOCK_SIZE,
+-	.setkey			= crypto_chacha20_setkey,
+-	.encrypt		= crypto_chacha20_crypt,
+-	.decrypt		= crypto_chacha20_crypt,
++EXPORT_SYMBOL_GPL(crypto_xchacha20_crypt);
++
++static struct skcipher_alg algs[] = {
++	{
++		.base.cra_name		= "chacha20",
++		.base.cra_driver_name	= "chacha20-generic",
 +		.base.cra_priority	= 100,
 +		.base.cra_blocksize	= 1,
-+		.base.cra_ctxsize	= sizeof(struct chacha_ctx),
++		.base.cra_ctxsize	= sizeof(struct chacha20_ctx),
 +		.base.cra_module	= THIS_MODULE,
 +
-+		.min_keysize		= CHACHA_KEY_SIZE,
-+		.max_keysize		= CHACHA_KEY_SIZE,
-+		.ivsize			= XCHACHA_IV_SIZE,
-+		.chunksize		= CHACHA_BLOCK_SIZE,
-+		.setkey			= crypto_chacha12_setkey,
-+		.encrypt		= crypto_xchacha_crypt,
-+		.decrypt		= crypto_xchacha_crypt,
- 	}
++		.min_keysize		= CHACHA20_KEY_SIZE,
++		.max_keysize		= CHACHA20_KEY_SIZE,
++		.ivsize			= CHACHA20_IV_SIZE,
++		.chunksize		= CHACHA20_BLOCK_SIZE,
++		.setkey			= crypto_chacha20_setkey,
++		.encrypt		= crypto_chacha20_crypt,
++		.decrypt		= crypto_chacha20_crypt,
++	}, {
++		.base.cra_name		= "xchacha20",
++		.base.cra_driver_name	= "xchacha20-generic",
++		.base.cra_priority	= 100,
++		.base.cra_blocksize	= 1,
++		.base.cra_ctxsize	= sizeof(struct chacha20_ctx),
++		.base.cra_module	= THIS_MODULE,
++
++		.min_keysize		= CHACHA20_KEY_SIZE,
++		.max_keysize		= CHACHA20_KEY_SIZE,
++		.ivsize			= XCHACHA20_IV_SIZE,
++		.chunksize		= CHACHA20_BLOCK_SIZE,
++		.setkey			= crypto_chacha20_setkey,
++		.encrypt		= crypto_xchacha20_crypt,
++		.decrypt		= crypto_xchacha20_crypt,
++	}
  };
  
-@@ -191,3 +213,5 @@ MODULE_ALIAS_CRYPTO("chacha20");
+ static int __init chacha20_generic_mod_init(void)
+ {
+-	return crypto_register_skcipher(&alg);
++	return crypto_register_skciphers(algs, ARRAY_SIZE(algs));
+ }
+ 
+ static void __exit chacha20_generic_mod_fini(void)
+ {
+-	crypto_unregister_skcipher(&alg);
++	crypto_unregister_skciphers(algs, ARRAY_SIZE(algs));
+ }
+ 
+ module_init(chacha20_generic_mod_init);
+@@ -132,6 +178,8 @@ module_exit(chacha20_generic_mod_fini);
+ 
+ MODULE_LICENSE("GPL");
+ MODULE_AUTHOR("Martin Willi <martin@strongswan.org>");
+-MODULE_DESCRIPTION("chacha20 cipher algorithm");
++MODULE_DESCRIPTION("ChaCha20 and XChaCha20 stream ciphers (generic)");
+ MODULE_ALIAS_CRYPTO("chacha20");
  MODULE_ALIAS_CRYPTO("chacha20-generic");
- MODULE_ALIAS_CRYPTO("xchacha20");
- MODULE_ALIAS_CRYPTO("xchacha20-generic");
-+MODULE_ALIAS_CRYPTO("xchacha12");
-+MODULE_ALIAS_CRYPTO("xchacha12-generic");
++MODULE_ALIAS_CRYPTO("xchacha20");
++MODULE_ALIAS_CRYPTO("xchacha20-generic");
 diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index a5512e69c8f3..3ff70ebc745c 100644
+index b1f79c6bf409..a5512e69c8f3 100644
 --- a/crypto/testmgr.c
 +++ b/crypto/testmgr.c
 @@ -3544,6 +3544,12 @@ static const struct alg_test_desc alg_test_descs[] = {
@@ -165,28 +273,24 @@ index a5512e69c8f3..3ff70ebc745c 100644
  			.hash = __VECS(aes_xcbc128_tv_template)
  		}
 +	}, {
-+		.alg = "xchacha12",
++		.alg = "xchacha20",
 +		.test = alg_test_skcipher,
 +		.suite = {
-+			.cipher = __VECS(xchacha12_tv_template)
++			.cipher = __VECS(xchacha20_tv_template)
 +		},
  	}, {
- 		.alg = "xchacha20",
+ 		.alg = "xts(aes)",
  		.test = alg_test_skcipher,
 diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index 371641c73cf8..3b57b2701fcb 100644
+index 1fe7b97ba03f..371641c73cf8 100644
 --- a/crypto/testmgr.h
 +++ b/crypto/testmgr.h
-@@ -31379,6 +31379,584 @@ static const struct cipher_testvec xchacha20_tv_template[] = {
+@@ -30802,6 +30802,583 @@ static const struct cipher_testvec chacha20_tv_template[] = {
  	},
  };
  
-+/*
-+ * Same as XChaCha20 test vectors above, but recomputed the ciphertext with
-+ * XChaCha12, using a modified libsodium.
-+ */
-+static const struct cipher_testvec xchacha12_tv_template[] = {
-+	{
++static const struct cipher_testvec xchacha20_tv_template[] = {
++	{ /* from libsodium test/default/xchacha20.c */
 +		.key	= "\x79\xc9\x97\x98\xac\x67\x30\x0b"
 +			  "\xbb\x27\x04\xc9\x5c\x34\x1e\x32"
 +			  "\x45\xf3\xdc\xb2\x17\x61\xb9\x8e"
@@ -200,12 +304,12 @@ index 371641c73cf8..3b57b2701fcb 100644
 +			  "\x00\x00\x00\x00\x00\x00\x00\x00"
 +			  "\x00\x00\x00\x00\x00\x00\x00\x00"
 +			  "\x00\x00\x00\x00\x00",
-+		.ctext	= "\x1b\x78\x7f\xd7\xa1\x41\x68\xab"
-+			  "\x3d\x3f\xd1\x7b\x69\x56\xb2\xd5"
-+			  "\x43\xce\xeb\xaf\x36\xf0\x29\x9d"
-+			  "\x3a\xfb\x18\xae\x1b",
++		.ctext	= "\xc6\xe9\x75\x81\x60\x08\x3a\xc6"
++			  "\x04\xef\x90\xe7\x12\xce\x6e\x75"
++			  "\xd7\x79\x75\x90\x74\x4e\x0c\xf0"
++			  "\x60\xf0\x13\x73\x9c",
 +		.len	= 29,
-+	}, {
++	}, { /* from libsodium test/default/xchacha20.c */
 +		.key	= "\x9d\x23\xbd\x41\x49\xcb\x97\x9c"
 +			  "\xcf\x3c\x5c\x94\xdd\x21\x7e\x98"
 +			  "\x08\xcb\x0e\x50\xcd\x0f\x67\x81"
@@ -227,20 +331,21 @@ index 371641c73cf8..3b57b2701fcb 100644
 +			  "\x00\x00\x00\x00\x00\x00\x00\x00"
 +			  "\x00\x00\x00\x00\x00\x00\x00\x00"
 +			  "\x00\x00\x00",
-+		.ctext	= "\xfb\x32\x09\x1d\x83\x05\xae\x4c"
-+			  "\x13\x1f\x12\x71\xf2\xca\xb2\xeb"
-+			  "\x5b\x83\x14\x7d\x83\xf6\x57\x77"
-+			  "\x2e\x40\x1f\x92\x2c\xf9\xec\x35"
-+			  "\x34\x1f\x93\xdf\xfb\x30\xd7\x35"
-+			  "\x03\x05\x78\xc1\x20\x3b\x7a\xe3"
-+			  "\x62\xa3\x89\xdc\x11\x11\x45\xa8"
-+			  "\x82\x89\xa0\xf1\x4e\xc7\x0f\x11"
-+			  "\x69\xdd\x0c\x84\x2b\x89\x5c\xdc"
-+			  "\xf0\xde\x01\xef\xc5\x65\x79\x23"
-+			  "\x87\x67\xd6\x50\xd9\x8d\xd9\x92"
-+			  "\x54\x5b\x0e",
++		.ctext	= "\xa2\x12\x09\x09\x65\x94\xde\x8c"
++			  "\x56\x67\xb1\xd1\x3a\xd9\x3f\x74"
++			  "\x41\x06\xd0\x54\xdf\x21\x0e\x47"
++			  "\x82\xcd\x39\x6f\xec\x69\x2d\x35"
++			  "\x15\xa2\x0b\xf3\x51\xee\xc0\x11"
++			  "\xa9\x2c\x36\x78\x88\xbc\x46\x4c"
++			  "\x32\xf0\x80\x7a\xcd\x6c\x20\x3a"
++			  "\x24\x7e\x0d\xb8\x54\x14\x84\x68"
++			  "\xe9\xf9\x6b\xee\x4c\xf7\x18\xd6"
++			  "\x8d\x5f\x63\x7c\xbd\x5a\x37\x64"
++			  "\x57\x78\x8e\x6f\xae\x90\xfc\x31"
++			  "\x09\x7c\xfc",
 +		.len	= 91,
-+	}, {
++	}, { /* Taken from the ChaCha20 test vectors, appended 16 random bytes
++		to nonce, and recomputed the ciphertext with libsodium */
 +		.key	= "\x00\x00\x00\x00\x00\x00\x00\x00"
 +			  "\x00\x00\x00\x00\x00\x00\x00\x00"
 +			  "\x00\x00\x00\x00\x00\x00\x00\x00"
@@ -258,16 +363,17 @@ index 371641c73cf8..3b57b2701fcb 100644
 +			  "\x00\x00\x00\x00\x00\x00\x00\x00"
 +			  "\x00\x00\x00\x00\x00\x00\x00\x00"
 +			  "\x00\x00\x00\x00\x00\x00\x00\x00",
-+		.ctext	= "\xdf\x2d\xc6\x21\x2a\x9d\xa1\xbb"
-+			  "\xc2\x77\x66\x0c\x5c\x46\xef\xa7"
-+			  "\x79\x1b\xb9\xdf\x55\xe2\xf9\x61"
-+			  "\x4c\x7b\xa4\x52\x24\xaf\xa2\xda"
-+			  "\xd1\x8f\x8f\xa2\x9e\x53\x4d\xc4"
-+			  "\xb8\x55\x98\x08\x7c\x08\xd4\x18"
-+			  "\x67\x8f\xef\x50\xb1\x5f\xa5\x77"
-+			  "\x4c\x25\xe7\x86\x26\x42\xca\x44",
++		.ctext	= "\x9c\x49\x2a\xe7\x8a\x2f\x93\xc7"
++			  "\xb3\x33\x6f\x82\x17\xd8\xc4\x1e"
++			  "\xad\x80\x11\x11\x1d\x4c\x16\x18"
++			  "\x07\x73\x9b\x4f\xdb\x7c\xcb\x47"
++			  "\xfd\xef\x59\x74\xfa\x3f\xe5\x4c"
++			  "\x9b\xd0\xea\xbc\xba\x56\xad\x32"
++			  "\x03\xdc\xf8\x2b\xc1\xe1\x75\x67"
++			  "\x23\x7b\xe6\xfc\xd4\x03\x86\x54",
 +		.len	= 64,
-+	}, {
++	}, { /* Taken from the ChaCha20 test vectors, appended 16 random bytes
++		to nonce, and recomputed the ciphertext with libsodium */
 +		.key	= "\x00\x00\x00\x00\x00\x00\x00\x00"
 +			  "\x00\x00\x00\x00\x00\x00\x00\x00"
 +			  "\x00\x00\x00\x00\x00\x00\x00\x00"
@@ -324,60 +430,60 @@ index 371641c73cf8..3b57b2701fcb 100644
 +			  "\x20\x77\x68\x69\x63\x68\x20\x61"
 +			  "\x72\x65\x20\x61\x64\x64\x72\x65"
 +			  "\x73\x73\x65\x64\x20\x74\x6f",
-+		.ctext	= "\xe4\xa6\xc8\x30\xc4\x23\x13\xd6"
-+			  "\x08\x4d\xc9\xb7\xa5\x64\x7c\xb9"
-+			  "\x71\xe2\xab\x3e\xa8\x30\x8a\x1c"
-+			  "\x4a\x94\x6d\x9b\xe0\xb3\x6f\xf1"
-+			  "\xdc\xe3\x1b\xb3\xa9\x6d\x0d\xd6"
-+			  "\xd0\xca\x12\xef\xe7\x5f\xd8\x61"
-+			  "\x3c\x82\xd3\x99\x86\x3c\x6f\x66"
-+			  "\x02\x06\xdc\x55\xf9\xed\xdf\x38"
-+			  "\xb4\xa6\x17\x00\x7f\xef\xbf\x4f"
-+			  "\xf8\x36\xf1\x60\x7e\x47\xaf\xdb"
-+			  "\x55\x9b\x12\xcb\x56\x44\xa7\x1f"
-+			  "\xd3\x1a\x07\x3b\x00\xec\xe6\x4c"
-+			  "\xa2\x43\x27\xdf\x86\x19\x4f\x16"
-+			  "\xed\xf9\x4a\xf3\x63\x6f\xfa\x7f"
-+			  "\x78\x11\xf6\x7d\x97\x6f\xec\x6f"
-+			  "\x85\x0f\x5c\x36\x13\x8d\x87\xe0"
-+			  "\x80\xb1\x69\x0b\x98\x89\x9c\x4e"
-+			  "\xf8\xdd\xee\x5c\x0a\x85\xce\xd4"
-+			  "\xea\x1b\x48\xbe\x08\xf8\xe2\xa8"
-+			  "\xa5\xb0\x3c\x79\xb1\x15\xb4\xb9"
-+			  "\x75\x10\x95\x35\x81\x7e\x26\xe6"
-+			  "\x78\xa4\x88\xcf\xdb\x91\x34\x18"
-+			  "\xad\xd7\x8e\x07\x7d\xab\x39\xf9"
-+			  "\xa3\x9e\xa5\x1d\xbb\xed\x61\xfd"
-+			  "\xdc\xb7\x5a\x27\xfc\xb5\xc9\x10"
-+			  "\xa8\xcc\x52\x7f\x14\x76\x90\xe7"
-+			  "\x1b\x29\x60\x74\xc0\x98\x77\xbb"
-+			  "\xe0\x54\xbb\x27\x49\x59\x1e\x62"
-+			  "\x3d\xaf\x74\x06\xa4\x42\x6f\xc6"
-+			  "\x52\x97\xc4\x1d\xc4\x9f\xe2\xe5"
-+			  "\x38\x57\x91\xd1\xa2\x28\xcc\x40"
-+			  "\xcc\x70\x59\x37\xfc\x9f\x4b\xda"
-+			  "\xa0\xeb\x97\x9a\x7d\xed\x14\x5c"
-+			  "\x9c\xb7\x93\x26\x41\xa8\x66\xdd"
-+			  "\x87\x6a\xc0\xd3\xc2\xa9\x3e\xae"
-+			  "\xe9\x72\xfe\xd1\xb3\xac\x38\xea"
-+			  "\x4d\x15\xa9\xd5\x36\x61\xe9\x96"
-+			  "\x6c\x23\xf8\x43\xe4\x92\x29\xd9"
-+			  "\x8b\x78\xf7\x0a\x52\xe0\x19\x5b"
-+			  "\x59\x69\x5b\x5d\xa1\x53\xc4\x68"
-+			  "\xe1\xbb\xac\x89\x14\xe2\xe2\x85"
-+			  "\x41\x18\xf5\xb3\xd1\xfa\x68\x19"
-+			  "\x44\x78\xdc\xcf\xe7\x88\x2d\x52"
-+			  "\x5f\x40\xb5\x7e\xf8\x88\xa2\xae"
-+			  "\x4a\xb2\x07\x35\x9d\x9b\x07\x88"
-+			  "\xb7\x00\xd0\x0c\xb6\xa0\x47\x59"
-+			  "\xda\x4e\xc9\xab\x9b\x8a\x7b",
-+
++		.ctext	= "\xf9\xab\x7a\x4a\x60\xb8\x5f\xa0"
++			  "\x50\xbb\x57\xce\xef\x8c\xc1\xd9"
++			  "\x24\x15\xb3\x67\x5e\x7f\x01\xf6"
++			  "\x1c\x22\xf6\xe5\x71\xb1\x43\x64"
++			  "\x63\x05\xd5\xfc\x5c\x3d\xc0\x0e"
++			  "\x23\xef\xd3\x3b\xd9\xdc\x7f\xa8"
++			  "\x58\x26\xb3\xd0\xc2\xd5\x04\x3f"
++			  "\x0a\x0e\x8f\x17\xe4\xcd\xf7\x2a"
++			  "\xb4\x2c\x09\xe4\x47\xec\x8b\xfb"
++			  "\x59\x37\x7a\xa1\xd0\x04\x7e\xaa"
++			  "\xf1\x98\x5f\x24\x3d\x72\x9a\x43"
++			  "\xa4\x36\x51\x92\x22\x87\xff\x26"
++			  "\xce\x9d\xeb\x59\x78\x84\x5e\x74"
++			  "\x97\x2e\x63\xc0\xef\x29\xf7\x8a"
++			  "\xb9\xee\x35\x08\x77\x6a\x35\x9a"
++			  "\x3e\xe6\x4f\x06\x03\x74\x1b\xc1"
++			  "\x5b\xb3\x0b\x89\x11\x07\xd3\xb7"
++			  "\x53\xd6\x25\x04\xd9\x35\xb4\x5d"
++			  "\x4c\x33\x5a\xc2\x42\x4c\xe6\xa4"
++			  "\x97\x6e\x0e\xd2\xb2\x8b\x2f\x7f"
++			  "\x28\xe5\x9f\xac\x4b\x2e\x02\xab"
++			  "\x85\xfa\xa9\x0d\x7c\x2d\x10\xe6"
++			  "\x91\xab\x55\x63\xf0\xde\x3a\x94"
++			  "\x25\x08\x10\x03\xc2\x68\xd1\xf4"
++			  "\xaf\x7d\x9c\x99\xf7\x86\x96\x30"
++			  "\x60\xfc\x0b\xe6\xa8\x80\x15\xb0"
++			  "\x81\xb1\x0c\xbe\xb9\x12\x18\x25"
++			  "\xe9\x0e\xb1\xe7\x23\xb2\xef\x4a"
++			  "\x22\x8f\xc5\x61\x89\xd4\xe7\x0c"
++			  "\x64\x36\x35\x61\xb6\x34\x60\xf7"
++			  "\x7b\x61\x37\x37\x12\x10\xa2\xf6"
++			  "\x7e\xdb\x7f\x39\x3f\xb6\x8e\x89"
++			  "\x9e\xf3\xfe\x13\x98\xbb\x66\x5a"
++			  "\xec\xea\xab\x3f\x9c\x87\xc4\x8c"
++			  "\x8a\x04\x18\x49\xfc\x77\x11\x50"
++			  "\x16\xe6\x71\x2b\xee\xc0\x9c\xb6"
++			  "\x87\xfd\x80\xff\x0b\x1d\x73\x38"
++			  "\xa4\x1d\x6f\xae\xe4\x12\xd7\x93"
++			  "\x9d\xcd\x38\x26\x09\x40\x52\xcd"
++			  "\x67\x01\x67\x26\xe0\x3e\x98\xa8"
++			  "\xe8\x1a\x13\x41\xbb\x90\x4d\x87"
++			  "\xbb\x42\x82\x39\xce\x3a\xd0\x18"
++			  "\x6d\x7b\x71\x8f\xbb\x2c\x6a\xd1"
++			  "\xbd\xf5\xc7\x8a\x7e\xe1\x1e\x0f"
++			  "\x0d\x0d\x13\x7c\xd9\xd8\x3c\x91"
++			  "\xab\xff\x1f\x12\xc3\xee\xe5\x65"
++			  "\x12\x8d\x7b\x61\xe5\x1f\x98",
 +		.len	= 375,
 +		.also_non_np = 1,
 +		.np	= 3,
 +		.tap	= { 375 - 20, 4, 16 },
 +
-+	}, {
++	}, { /* Taken from the ChaCha20 test vectors, appended 16 random bytes
++		to nonce, and recomputed the ciphertext with libsodium */
 +		.key	= "\x1c\x92\x40\xa5\xeb\x55\xd3\x8a"
 +			  "\xf3\x33\x88\x86\x04\xf6\xb5\xf0"
 +			  "\x47\x39\x17\xc1\x40\x2b\x80\x09"
@@ -403,24 +509,25 @@ index 371641c73cf8..3b57b2701fcb 100644
 +			  "\x68\x65\x20\x6d\x6f\x6d\x65\x20"
 +			  "\x72\x61\x74\x68\x73\x20\x6f\x75"
 +			  "\x74\x67\x72\x61\x62\x65\x2e",
-+		.ctext	= "\xb9\x68\xbc\x6a\x24\xbc\xcc\xd8"
-+			  "\x9b\x2a\x8d\x5b\x96\xaf\x56\xe3"
-+			  "\x11\x61\xe7\xa7\x9b\xce\x4e\x7d"
-+			  "\x60\x02\x48\xac\xeb\xd5\x3a\x26"
-+			  "\x9d\x77\x3b\xb5\x32\x13\x86\x8e"
-+			  "\x20\x82\x26\x72\xae\x64\x1b\x7e"
-+			  "\x2e\x01\x68\xb4\x87\x45\xa1\x24"
-+			  "\xe4\x48\x40\xf0\xaa\xac\xee\xa9"
-+			  "\xfc\x31\xad\x9d\x89\xa3\xbb\xd2"
-+			  "\xe4\x25\x13\xad\x0f\x5e\xdf\x3c"
-+			  "\x27\xab\xb8\x62\x46\x22\x30\x48"
-+			  "\x55\x2c\x4e\x84\x78\x1d\x0d\x34"
-+			  "\x8d\x3c\x91\x0a\x7f\x5b\x19\x9f"
-+			  "\x97\x05\x4c\xa7\x62\x47\x8b\xc5"
-+			  "\x44\x2e\x20\x33\xdd\xa0\x82\xa9"
-+			  "\x25\x76\x37\xe6\x3c\x67\x5b",
++		.ctext	= "\x95\xb9\x51\xe7\x8f\xb4\xa4\x03"
++			  "\xca\x37\xcc\xde\x60\x1d\x8c\xe2"
++			  "\xf1\xbb\x8a\x13\x7f\x61\x85\xcc"
++			  "\xad\xf4\xf0\xdc\x86\xa6\x1e\x10"
++			  "\xbc\x8e\xcb\x38\x2b\xa5\xc8\x8f"
++			  "\xaa\x03\x3d\x53\x4a\x42\xb1\x33"
++			  "\xfc\xd3\xef\xf0\x8e\x7e\x10\x9c"
++			  "\x6f\x12\x5e\xd4\x96\xfe\x5b\x08"
++			  "\xb6\x48\xf0\x14\x74\x51\x18\x7c"
++			  "\x07\x92\xfc\xac\x9d\xf1\x94\xc0"
++			  "\xc1\x9d\xc5\x19\x43\x1f\x1d\xbb"
++			  "\x07\xf0\x1b\x14\x25\x45\xbb\xcb"
++			  "\x5c\xe2\x8b\x28\xf3\xcf\x47\x29"
++			  "\x27\x79\x67\x24\xa6\x87\xc2\x11"
++			  "\x65\x03\xfa\x45\xf7\x9e\x53\x7a"
++			  "\x99\xf1\x82\x25\x4f\x8d\x07",
 +		.len	= 127,
-+	}, {
++	}, { /* Taken from the ChaCha20 test vectors, appended 16 random bytes
++		to nonce, and recomputed the ciphertext with libsodium */
 +		.key	= "\x1c\x92\x40\xa5\xeb\x55\xd3\x8a"
 +			  "\xf3\x33\x88\x86\x04\xf6\xb5\xf0"
 +			  "\x47\x39\x17\xc1\x40\x2b\x80\x09"
@@ -591,167 +698,167 @@ index 371641c73cf8..3b57b2701fcb 100644
 +			  "\x08\x7c\xbc\x66\x8a\xb0\xb6\x9f"
 +			  "\x92\xd6\x41\x7c\x5b\x2a\x00\x79"
 +			  "\x72",
-+		.ctext	= "\xe1\xb6\x8b\x5c\x80\xb8\xcc\x08"
-+			  "\x1b\x84\xb2\xd1\xad\xa4\x70\xac"
-+			  "\x67\xa9\x39\x27\xac\xb4\x5b\xb7"
-+			  "\x4c\x26\x77\x23\x1d\xce\x0a\xbe"
-+			  "\x18\x9e\x42\x8b\xbd\x7f\xd6\xf1"
-+			  "\xf1\x6b\xe2\x6d\x7f\x92\x0e\xcb"
-+			  "\xb8\x79\xba\xb4\xac\x7e\x2d\xc0"
-+			  "\x9e\x83\x81\x91\xd5\xea\xc3\x12"
-+			  "\x8d\xa4\x26\x70\xa4\xf9\x71\x0b"
-+			  "\xbd\x2e\xe1\xb3\x80\x42\x25\xb3"
-+			  "\x0b\x31\x99\xe1\x0d\xde\xa6\x90"
-+			  "\xf2\xa3\x10\xf7\xe5\xf3\x83\x1e"
-+			  "\x2c\xfb\x4d\xf0\x45\x3d\x28\x3c"
-+			  "\xb8\xf1\xcb\xbf\x67\xd8\x43\x5a"
-+			  "\x9d\x7b\x73\x29\x88\x0f\x13\x06"
-+			  "\x37\x50\x0d\x7c\xe6\x9b\x07\xdd"
-+			  "\x7e\x01\x1f\x81\x90\x10\x69\xdb"
-+			  "\xa4\xad\x8a\x5e\xac\x30\x72\xf2"
-+			  "\x36\xcd\xe3\x23\x49\x02\x93\xfa"
-+			  "\x3d\xbb\xe2\x98\x83\xeb\xe9\x8d"
-+			  "\xb3\x8f\x11\xaa\x53\xdb\xaf\x2e"
-+			  "\x95\x13\x99\x3d\x71\xbd\x32\x92"
-+			  "\xdd\xfc\x9d\x5e\x6f\x63\x2c\xee"
-+			  "\x91\x1f\x4c\x64\x3d\x87\x55\x0f"
-+			  "\xcc\x3d\x89\x61\x53\x02\x57\x8f"
-+			  "\xe4\x77\x29\x32\xaf\xa6\x2f\x0a"
-+			  "\xae\x3c\x3f\x3f\xf4\xfb\x65\x52"
-+			  "\xc5\xc1\x78\x78\x53\x28\xad\xed"
-+			  "\xd1\x67\x37\xc7\x59\x70\xcd\x0a"
-+			  "\xb8\x0f\x80\x51\x9f\xc0\x12\x5e"
-+			  "\x06\x0a\x7e\xec\x24\x5f\x73\x00"
-+			  "\xb1\x0b\x31\x47\x4f\x73\x8d\xb4"
-+			  "\xce\xf3\x55\x45\x6c\x84\x27\xba"
-+			  "\xb9\x6f\x03\x4a\xeb\x98\x88\x6e"
-+			  "\x53\xed\x25\x19\x0d\x8f\xfe\xca"
-+			  "\x60\xe5\x00\x93\x6e\x3c\xff\x19"
-+			  "\xae\x08\x3b\x8a\xa6\x84\x05\xfe"
-+			  "\x9b\x59\xa0\x8c\xc8\x05\x45\xf5"
-+			  "\x05\x37\xdc\x45\x6f\x8b\x95\x8c"
-+			  "\x4e\x11\x45\x7a\xce\x21\xa5\xf7"
-+			  "\x71\x67\xb9\xce\xd7\xf9\xe9\x5e"
-+			  "\x60\xf5\x53\x7a\xa8\x85\x14\x03"
-+			  "\xa0\x92\xec\xf3\x51\x80\x84\xc4"
-+			  "\xdc\x11\x9e\x57\xce\x4b\x45\xcf"
-+			  "\x90\x95\x85\x0b\x96\xe9\xee\x35"
-+			  "\x10\xb8\x9b\xf2\x59\x4a\xc6\x7e"
-+			  "\x85\xe5\x6f\x38\x51\x93\x40\x0c"
-+			  "\x99\xd7\x7f\x32\xa8\x06\x27\xd1"
-+			  "\x2b\xd5\xb5\x3a\x1a\xe1\x5e\xda"
-+			  "\xcd\x5a\x50\x30\x3c\xc7\xe7\x65"
-+			  "\xa6\x07\x0b\x98\x91\xc6\x20\x27"
-+			  "\x2a\x03\x63\x1b\x1e\x3d\xaf\xc8"
-+			  "\x71\x48\x46\x6a\x64\x28\xf9\x3d"
-+			  "\xd1\x1d\xab\xc8\x40\x76\xc2\x39"
-+			  "\x4e\x00\x75\xd2\x0e\x82\x58\x8c"
-+			  "\xd3\x73\x5a\xea\x46\x89\xbe\xfd"
-+			  "\x4e\x2c\x0d\x94\xaa\x9b\x68\xac"
-+			  "\x86\x87\x30\x7e\xa9\x16\xcd\x59"
-+			  "\xd2\xa6\xbe\x0a\xd8\xf5\xfd\x2d"
-+			  "\x49\x69\xd2\x1a\x90\xd2\x1b\xed"
-+			  "\xff\x71\x04\x87\x87\x21\xc4\xb8"
-+			  "\x1f\x5b\x51\x33\xd0\xd6\x59\x9a"
-+			  "\x03\x0e\xd3\x8b\xfb\x57\x73\xfd"
-+			  "\x5a\x52\x63\x82\xc8\x85\x2f\xcb"
-+			  "\x74\x6d\x4e\xd9\x68\x37\x85\x6a"
-+			  "\xd4\xfb\x94\xed\x8d\xd1\x1a\xaf"
-+			  "\x76\xa7\xb7\x88\xd0\x2b\x4e\xda"
-+			  "\xec\x99\x94\x27\x6f\x87\x8c\xdf"
-+			  "\x4b\x5e\xa6\x66\xdd\xcb\x33\x7b"
-+			  "\x64\x94\x31\xa8\x37\xa6\x1d\xdb"
-+			  "\x0d\x5c\x93\xa4\x40\xf9\x30\x53"
-+			  "\x4b\x74\x8d\xdd\xf6\xde\x3c\xac"
-+			  "\x5c\x80\x01\x3a\xef\xb1\x9a\x02"
-+			  "\x0c\x22\x8e\xe7\x44\x09\x74\x4c"
-+			  "\xf2\x9a\x27\x69\x7f\x12\x32\x36"
-+			  "\xde\x92\xdf\xde\x8f\x5b\x31\xab"
-+			  "\x4a\x01\x26\xe0\xb1\xda\xe8\x37"
-+			  "\x21\x64\xe8\xff\x69\xfc\x9e\x41"
-+			  "\xd2\x96\x2d\x18\x64\x98\x33\x78"
-+			  "\x24\x61\x73\x9b\x47\x29\xf1\xa7"
-+			  "\xcb\x27\x0f\xf0\x85\x6d\x8c\x9d"
-+			  "\x2c\x95\x9e\xe5\xb2\x8e\x30\x29"
-+			  "\x78\x8a\x9d\x65\xb4\x8e\xde\x7b"
-+			  "\xd9\x00\x50\xf5\x7f\x81\xc3\x1b"
-+			  "\x25\x85\xeb\xc2\x8c\x33\x22\x1e"
-+			  "\x68\x38\x22\x30\xd8\x2e\x00\x98"
-+			  "\x85\x16\x06\x56\xb4\x81\x74\x20"
-+			  "\x95\xdb\x1c\x05\x19\xe8\x23\x4d"
-+			  "\x65\x5d\xcc\xd8\x7f\xc4\x2d\x0f"
-+			  "\x57\x26\x71\x07\xad\xaa\x71\x9f"
-+			  "\x19\x76\x2f\x25\x51\x88\xe4\xc0"
-+			  "\x82\x6e\x08\x05\x37\x04\xee\x25"
-+			  "\x23\x90\xe9\x4e\xce\x9b\x16\xc1"
-+			  "\x31\xe7\x6e\x2c\x1b\xe1\x85\x9a"
-+			  "\x0c\x8c\xbb\x12\x1e\x68\x7b\x93"
-+			  "\xa9\x3c\x39\x56\x23\x3e\x6e\xc7"
-+			  "\x77\x84\xd3\xe0\x86\x59\xaa\xb9"
-+			  "\xd5\x53\x58\xc9\x0a\x83\x5f\x85"
-+			  "\xd8\x47\x14\x67\x8a\x3c\x17\xe0"
-+			  "\xab\x02\x51\xea\xf1\xf0\x4f\x30"
-+			  "\x7d\xe0\x92\xc2\x5f\xfb\x19\x5a"
-+			  "\x3f\xbd\xf4\x39\xa4\x31\x0c\x39"
-+			  "\xd1\xae\x4e\xf7\x65\x7f\x1f\xce"
-+			  "\xc2\x39\xd1\x84\xd4\xe5\x02\xe0"
-+			  "\x58\xaa\xf1\x5e\x81\xaf\x7f\x72"
-+			  "\x0f\x08\x99\x43\xb9\xd8\xac\x41"
-+			  "\x35\x55\xf2\xb2\xd4\x98\xb8\x3b"
-+			  "\x2b\x3c\x3e\x16\x06\x31\xfc\x79"
-+			  "\x47\x38\x63\x51\xc5\xd0\x26\xd7"
-+			  "\x43\xb4\x2b\xd9\xc5\x05\xf2\x9d"
-+			  "\x18\xc9\x26\x82\x56\xd2\x11\x05"
-+			  "\xb6\x89\xb4\x43\x9c\xb5\x9d\x11"
-+			  "\x6c\x83\x37\x71\x27\x1c\xae\xbf"
-+			  "\xcd\x57\xd2\xee\x0d\x5a\x15\x26"
-+			  "\x67\x88\x80\x80\x1b\xdc\xc1\x62"
-+			  "\xdd\x4c\xff\x92\x5c\x6c\xe1\xa0"
-+			  "\xe3\x79\xa9\x65\x8c\x8c\x14\x42"
-+			  "\xe5\x11\xd2\x1a\xad\xa9\x56\x6f"
-+			  "\x98\xfc\x8a\x7b\x56\x1f\xc6\xc1"
-+			  "\x52\x12\x92\x9b\x41\x0f\x4b\xae"
-+			  "\x1b\x4a\xbc\xfe\x23\xb6\x94\x70"
-+			  "\x04\x30\x9e\x69\x47\xbe\xb8\x8f"
-+			  "\xca\x45\xd7\x8a\xf4\x78\x3e\xaa"
-+			  "\x71\x17\xd8\x1e\xb8\x11\x8f\xbc"
-+			  "\xc8\x1a\x65\x7b\x41\x89\x72\xc7"
-+			  "\x5f\xbe\xc5\x2a\xdb\x5c\x54\xf9"
-+			  "\x25\xa3\x7a\x80\x56\x9c\x8c\xab"
-+			  "\x26\x19\x10\x36\xa6\xf3\x14\x79"
-+			  "\x40\x98\x70\x68\xb7\x35\xd9\xb9"
-+			  "\x27\xd4\xe7\x74\x5b\x3d\x97\xb4"
-+			  "\xd9\xaa\xd9\xf2\xb5\x14\x84\x1f"
-+			  "\xa9\xde\x12\x44\x5b\x00\xc0\xbc"
-+			  "\xc8\x11\x25\x1b\x67\x7a\x15\x72"
-+			  "\xa6\x31\x6f\xf4\x68\x7a\x86\x9d"
-+			  "\x43\x1c\x5f\x16\xd3\xad\x2e\x52"
-+			  "\xf3\xb4\xc3\xfa\x27\x2e\x68\x6c"
-+			  "\x06\xe7\x4c\x4f\xa2\xe0\xe4\x21"
-+			  "\x5d\x9e\x33\x58\x8d\xbf\xd5\x70"
-+			  "\xf8\x80\xa5\xdd\xe7\x18\x79\xfa"
-+			  "\x7b\xfd\x09\x69\x2c\x37\x32\xa8"
-+			  "\x65\xfa\x8d\x8b\x5c\xcc\xe8\xf3"
-+			  "\x37\xf6\xa6\xc6\x5c\xa2\x66\x79"
-+			  "\xfa\x8a\xa7\xd1\x0b\x2e\x1b\x5e"
-+			  "\x95\x35\x00\x76\xae\x42\xf7\x50"
-+			  "\x51\x78\xfb\xb4\x28\x24\xde\x1a"
-+			  "\x70\x8b\xed\xca\x3c\x5e\xe4\xbd"
-+			  "\x28\xb5\xf3\x76\x4f\x67\x5d\x81"
-+			  "\xb2\x60\x87\xd9\x7b\x19\x1a\xa7"
-+			  "\x79\xa2\xfa\x3f\x9e\xa9\xd7\x25"
-+			  "\x61\xe1\x74\x31\xa2\x77\xa0\x1b"
-+			  "\xf6\xf7\xcb\xc5\xaa\x9e\xce\xf9"
-+			  "\x9b\x96\xef\x51\xc3\x1a\x44\x96"
-+			  "\xae\x17\x50\xab\x29\x08\xda\xcc"
-+			  "\x1a\xb3\x12\xd0\x24\xe4\xe2\xe0"
-+			  "\xc6\xe3\xcc\x82\xd0\xba\x47\x4c"
-+			  "\x3f\x49\xd7\xe8\xb6\x61\xaa\x65"
-+			  "\x25\x18\x40\x2d\x62\x25\x02\x71"
-+			  "\x61\xa2\xc1\xb2\x13\xd2\x71\x3f"
-+			  "\x43\x1a\xc9\x09\x92\xff\xd5\x57"
-+			  "\xf0\xfc\x5e\x1c\xf1\xf5\xf9\xf3"
-+			  "\x5b",
++		.ctext	= "\x3a\x92\xee\x53\x31\xaf\x2b\x60"
++			  "\x5f\x55\x8d\x00\x5d\xfc\x74\x97"
++			  "\x28\x54\xf4\xa5\x75\xf1\x9b\x25"
++			  "\x62\x1c\xc0\xe0\x13\xc8\x87\x53"
++			  "\xd0\xf3\xa7\x97\x1f\x3b\x1e\xea"
++			  "\xe0\xe5\x2a\xd1\xdd\xa4\x3b\x50"
++			  "\x45\xa3\x0d\x7e\x1b\xc9\xa0\xad"
++			  "\xb9\x2c\x54\xa6\xc7\x55\x16\xd0"
++			  "\xc5\x2e\x02\x44\x35\xd0\x7e\x67"
++			  "\xf2\xc4\x9b\xcd\x95\x10\xcc\x29"
++			  "\x4b\xfa\x86\x87\xbe\x40\x36\xbe"
++			  "\xe1\xa3\x52\x89\x55\x20\x9b\xc2"
++			  "\xab\xf2\x31\x34\x16\xad\xc8\x17"
++			  "\x65\x24\xc0\xff\x12\x37\xfe\x5a"
++			  "\x62\x3b\x59\x47\x6c\x5f\x3a\x8e"
++			  "\x3b\xd9\x30\xc8\x7f\x2f\x88\xda"
++			  "\x80\xfd\x02\xda\x7f\x9a\x7a\x73"
++			  "\x59\xc5\x34\x09\x9a\x11\xcb\xa7"
++			  "\xfc\xf6\xa1\xa0\x60\xfb\x43\xbb"
++			  "\xf1\xe9\xd7\xc6\x79\x27\x4e\xff"
++			  "\x22\xb4\x24\xbf\x76\xee\x47\xb9"
++			  "\x6d\x3f\x8b\xb0\x9c\x3c\x43\xdd"
++			  "\xff\x25\x2e\x6d\xa4\x2b\xfb\x5d"
++			  "\x1b\x97\x6c\x55\x0a\x82\x7a\x7b"
++			  "\x94\x34\xc2\xdb\x2f\x1f\xc1\xea"
++			  "\xd4\x4d\x17\x46\x3b\x51\x69\x09"
++			  "\xe4\x99\x32\x25\xfd\x94\xaf\xfb"
++			  "\x10\xf7\x4f\xdd\x0b\x3c\x8b\x41"
++			  "\xb3\x6a\xb7\xd1\x33\xa8\x0c\x2f"
++			  "\x62\x4c\x72\x11\xd7\x74\xe1\x3b"
++			  "\x38\x43\x66\x7b\x6c\x36\x48\xe7"
++			  "\xe3\xe7\x9d\xb9\x42\x73\x7a\x2a"
++			  "\x89\x20\x1a\x41\x80\x03\xf7\x8f"
++			  "\x61\x78\x13\xbf\xfe\x50\xf5\x04"
++			  "\x52\xf9\xac\x47\xf8\x62\x4b\xb2"
++			  "\x24\xa9\xbf\x64\xb0\x18\x69\xd2"
++			  "\xf5\xe4\xce\xc8\xb1\x87\x75\xd6"
++			  "\x2c\x24\x79\x00\x7d\x26\xfb\x44"
++			  "\xe7\x45\x7a\xee\x58\xa5\x83\xc1"
++			  "\xb4\x24\xab\x23\x2f\x4d\xd7\x4f"
++			  "\x1c\xc7\xaa\xa9\x50\xf4\xa3\x07"
++			  "\x12\x13\x89\x74\xdc\x31\x6a\xb2"
++			  "\xf5\x0f\x13\x8b\xb9\xdb\x85\x1f"
++			  "\xf5\xbc\x88\xd9\x95\xea\x31\x6c"
++			  "\x36\x60\xb6\x49\xdc\xc4\xf7\x55"
++			  "\x3f\x21\xc1\xb5\x92\x18\x5e\xbc"
++			  "\x9f\x87\x7f\xe7\x79\x25\x40\x33"
++			  "\xd6\xb9\x33\xd5\x50\xb3\xc7\x89"
++			  "\x1b\x12\xa0\x46\xdd\xa7\xd8\x3e"
++			  "\x71\xeb\x6f\x66\xa1\x26\x0c\x67"
++			  "\xab\xb2\x38\x58\x17\xd8\x44\x3b"
++			  "\x16\xf0\x8e\x62\x8d\x16\x10\x00"
++			  "\x32\x8b\xef\xb9\x28\xd3\xc5\xad"
++			  "\x0a\x19\xa2\xe4\x03\x27\x7d\x94"
++			  "\x06\x18\xcd\xd6\x27\x00\xf9\x1f"
++			  "\xb6\xb3\xfe\x96\x35\x5f\xc4\x1c"
++			  "\x07\x62\x10\x79\x68\x50\xf1\x7e"
++			  "\x29\xe7\xc4\xc4\xe7\xee\x54\xd6"
++			  "\x58\x76\x84\x6d\x8d\xe4\x59\x31"
++			  "\xe9\xf4\xdc\xa1\x1f\xe5\x1a\xd6"
++			  "\xe6\x64\x46\xf5\x77\x9c\x60\x7a"
++			  "\x5e\x62\xe3\x0a\xd4\x9f\x7a\x2d"
++			  "\x7a\xa5\x0a\x7b\x29\x86\x7a\x74"
++			  "\x74\x71\x6b\xca\x7d\x1d\xaa\xba"
++			  "\x39\x84\x43\x76\x35\xfe\x4f\x9b"
++			  "\xbb\xbb\xb5\x6a\x32\xb5\x5d\x41"
++			  "\x51\xf0\x5b\x68\x03\x47\x4b\x8a"
++			  "\xca\x88\xf6\x37\xbd\x73\x51\x70"
++			  "\x66\xfe\x9e\x5f\x21\x9c\xf3\xdd"
++			  "\xc3\xea\x27\xf9\x64\x94\xe1\x19"
++			  "\xa0\xa9\xab\x60\xe0\x0e\xf7\x78"
++			  "\x70\x86\xeb\xe0\xd1\x5c\x05\xd3"
++			  "\xd7\xca\xe0\xc0\x47\x47\x34\xee"
++			  "\x11\xa3\xa3\x54\x98\xb7\x49\x8e"
++			  "\x84\x28\x70\x2c\x9e\xfb\x55\x54"
++			  "\x4d\xf8\x86\xf7\x85\x7c\xbd\xf3"
++			  "\x17\xd8\x47\xcb\xac\xf4\x20\x85"
++			  "\x34\x66\xad\x37\x2d\x5e\x52\xda"
++			  "\x8a\xfe\x98\x55\x30\xe7\x2d\x2b"
++			  "\x19\x10\x8e\x7b\x66\x5e\xdc\xe0"
++			  "\x45\x1f\x7b\xb4\x08\xfb\x8f\xf6"
++			  "\x8c\x89\x21\x34\x55\x27\xb2\x76"
++			  "\xb2\x07\xd9\xd6\x68\x9b\xea\x6b"
++			  "\x2d\xb4\xc4\x35\xdd\xd2\x79\xae"
++			  "\xc7\xd6\x26\x7f\x12\x01\x8c\xa7"
++			  "\xe3\xdb\xa8\xf4\xf7\x2b\xec\x99"
++			  "\x11\x00\xf1\x35\x8c\xcf\xd5\xc9"
++			  "\xbd\x91\x36\x39\x70\xcf\x7d\x70"
++			  "\x47\x1a\xfc\x6b\x56\xe0\x3f\x9c"
++			  "\x60\x49\x01\x72\xa9\xaf\x2c\x9c"
++			  "\xe8\xab\xda\x8c\x14\x19\xf3\x75"
++			  "\x07\x17\x9d\x44\x67\x7a\x2e\xef"
++			  "\xb7\x83\x35\x4a\xd1\x3d\x1c\x84"
++			  "\x32\xdd\xaa\xea\xca\x1d\xdc\x72"
++			  "\x2c\xcc\x43\xcd\x5d\xe3\x21\xa4"
++			  "\xd0\x8a\x4b\x20\x12\xa3\xd5\x86"
++			  "\x76\x96\xff\x5f\x04\x57\x0f\xe6"
++			  "\xba\xe8\x76\x50\x0c\x64\x1d\x83"
++			  "\x9c\x9b\x9a\x9a\x58\x97\x9c\x5c"
++			  "\xb4\xa4\xa6\x3e\x19\xeb\x8f\x5a"
++			  "\x61\xb2\x03\x7b\x35\x19\xbe\xa7"
++			  "\x63\x0c\xfd\xdd\xf9\x90\x6c\x08"
++			  "\x19\x11\xd3\x65\x4a\xf5\x96\x92"
++			  "\x59\xaa\x9c\x61\x0c\x29\xa7\xf8"
++			  "\x14\x39\x37\xbf\x3c\xf2\x16\x72"
++			  "\x02\xfa\xa2\xf3\x18\x67\x5d\xcb"
++			  "\xdc\x4d\xbb\x96\xff\x70\x08\x2d"
++			  "\xc2\xa8\x52\xe1\x34\x5f\x72\xfe"
++			  "\x64\xbf\xca\xa7\x74\x38\xfb\x74"
++			  "\x55\x9c\xfa\x8a\xed\xfb\x98\xeb"
++			  "\x58\x2e\x6c\xe1\x52\x76\x86\xd7"
++			  "\xcf\xa1\xa4\xfc\xb2\x47\x41\x28"
++			  "\xa3\xc1\xe5\xfd\x53\x19\x28\x2b"
++			  "\x37\x04\x65\x96\x99\x7a\x28\x0f"
++			  "\x07\x68\x4b\xc7\x52\x0a\x55\x35"
++			  "\x40\x19\x95\x61\xe8\x59\x40\x1f"
++			  "\x9d\xbf\x78\x7d\x8f\x84\xff\x6f"
++			  "\xd0\xd5\x63\xd2\x22\xbd\xc8\x4e"
++			  "\xfb\xe7\x9f\x06\xe6\xe7\x39\x6d"
++			  "\x6a\x96\x9f\xf0\x74\x7e\xc9\x35"
++			  "\xb7\x26\xb8\x1c\x0a\xa6\x27\x2c"
++			  "\xa2\x2b\xfe\xbe\x0f\x07\x73\xae"
++			  "\x7f\x7f\x54\xf5\x7c\x6a\x0a\x56"
++			  "\x49\xd4\x81\xe5\x85\x53\x99\x1f"
++			  "\x95\x05\x13\x58\x8d\x0e\x1b\x90"
++			  "\xc3\x75\x48\x64\x58\x98\x67\x84"
++			  "\xae\xe2\x21\xa2\x8a\x04\x0a\x0b"
++			  "\x61\xaa\xb0\xd4\x28\x60\x7a\xf8"
++			  "\xbc\x52\xfb\x24\x7f\xed\x0d\x2a"
++			  "\x0a\xb2\xf9\xc6\x95\xb5\x11\xc9"
++			  "\xf4\x0f\x26\x11\xcf\x2a\x57\x87"
++			  "\x7a\xf3\xe7\x94\x65\xc2\xb5\xb3"
++			  "\xab\x98\xe3\xc1\x2b\x59\x19\x7c"
++			  "\xd6\xf3\xf9\xbf\xff\x6d\xc6\x82"
++			  "\x13\x2f\x4a\x2e\xcd\x26\xfe\x2d"
++			  "\x01\x70\xf4\xc2\x7f\x1f\x4c\xcb"
++			  "\x47\x77\x0c\xa0\xa3\x03\xec\xda"
++			  "\xa9\xbf\x0d\x2d\xae\xe4\xb8\x7b"
++			  "\xa9\xbc\x08\xb4\x68\x2e\xc5\x60"
++			  "\x8d\x87\x41\x2b\x0f\x69\xf0\xaf"
++			  "\x5f\xba\x72\x20\x0f\x33\xcd\x6d"
++			  "\x36\x7d\x7b\xd5\x05\xf1\x4b\x05"
++			  "\xc4\xfc\x7f\x80\xb9\x4d\xbd\xf7"
++			  "\x7c\x84\x07\x01\xc2\x40\x66\x5b"
++			  "\x98\xc7\x2c\xe3\x97\xfa\xdf\x87"
++			  "\xa0\x1f\xe9\x21\x42\x0f\x3b\xeb"
++			  "\x89\x1c\x3b\xca\x83\x61\x77\x68"
++			  "\x84\xbb\x60\x87\x38\x2e\x25\xd5"
++			  "\x9e\x04\x41\x70\xac\xda\xc0\x9c"
++			  "\x9c\x69\xea\x8d\x4e\x55\x2a\x29"
++			  "\xed\x05\x4b\x7b\x73\x71\x90\x59"
++			  "\x4d\xc8\xd8\x44\xf0\x4c\xe1\x5e"
++			  "\x84\x47\x55\xcc\x32\x3f\xe7\x97"
++			  "\x42\xc6\x32\xac\x40\xe5\xa5\xc7"
++			  "\x8b\xed\xdb\xf7\x83\xd6\xb1\xc2"
++			  "\x52\x5e\x34\xb7\xeb\x6e\xd9\xfc"
++			  "\xe5\x93\x9a\x97\x3e\xb0\xdc\xd9"
++			  "\xd7\x06\x10\xb6\x1d\x80\x59\xdd"
++			  "\x0d\xfe\x64\x35\xcd\x5d\xec\xf0"
++			  "\xba\xd0\x34\xc9\x2d\x91\xc5\x17"
++			  "\x11",
 +		.len	= 1281,
 +		.also_non_np = 1,
 +		.np	= 3,
@@ -762,61 +869,49 @@ index 371641c73cf8..3b57b2701fcb 100644
  /*
   * CTS (Cipher Text Stealing) mode tests
   */
-diff --git a/include/crypto/chacha.h b/include/crypto/chacha.h
-index ae79e9983c72..3d261f5cd156 100644
---- a/include/crypto/chacha.h
-+++ b/include/crypto/chacha.h
-@@ -5,6 +5,11 @@
-  * XChaCha extends ChaCha's nonce to 192 bits, while provably retaining ChaCha's
-  * security.  Here they share the same key size, tfm context, and setkey
-  * function; only their IV size and encrypt/decrypt function differ.
+diff --git a/include/crypto/chacha20.h b/include/crypto/chacha20.h
+index fbec4e6a8789..6290d997060e 100644
+--- a/include/crypto/chacha20.h
++++ b/include/crypto/chacha20.h
+@@ -1,6 +1,10 @@
+ /* SPDX-License-Identifier: GPL-2.0 */
+ /*
+- * Common values for the ChaCha20 algorithm
++ * Common values and helper functions for the ChaCha20 and XChaCha20 algorithms.
 + *
-+ * The ChaCha paper specifies 20, 12, and 8-round variants.  In general, it is
-+ * recommended to use the 20-round variant ChaCha20.  However, the other
-+ * variants can be needed in some performance-sensitive scenarios.  The generic
-+ * ChaCha code currently allows only the 20 and 12-round variants.
++ * XChaCha20 extends ChaCha20's nonce to 192 bits, while provably retaining
++ * ChaCha20's security.  Here they share the same key size, tfm context, and
++ * setkey function; only their IV size and encrypt/decrypt function differ.
   */
  
- #ifndef _CRYPTO_CHACHA_H
-@@ -39,6 +44,8 @@ void crypto_chacha_init(u32 *state, struct chacha_ctx *ctx, u8 *iv);
+ #ifndef _CRYPTO_CHACHA20_H
+@@ -10,10 +14,15 @@
+ #include <linux/types.h>
+ #include <linux/crypto.h>
  
++/* 32-bit stream position, then 96-bit nonce (RFC7539 convention) */
+ #define CHACHA20_IV_SIZE	16
++
+ #define CHACHA20_KEY_SIZE	32
+ #define CHACHA20_BLOCK_SIZE	64
+ 
++/* 192-bit nonce, then 64-bit stream position */
++#define XCHACHA20_IV_SIZE	32
++
+ struct chacha20_ctx {
+ 	u32 key[8];
+ };
+@@ -22,8 +31,11 @@ void chacha20_block(u32 *state, u8 *stream);
+ void hchacha20_block(const u32 *in, u32 *out);
+ 
+ void crypto_chacha20_init(u32 *state, struct chacha20_ctx *ctx, u8 *iv);
++
  int crypto_chacha20_setkey(struct crypto_skcipher *tfm, const u8 *key,
  			   unsigned int keysize);
-+int crypto_chacha12_setkey(struct crypto_skcipher *tfm, const u8 *key,
-+			   unsigned int keysize);
++
+ int crypto_chacha20_crypt(struct skcipher_request *req);
++int crypto_xchacha20_crypt(struct skcipher_request *req);
  
- int crypto_chacha_crypt(struct skcipher_request *req);
- int crypto_xchacha_crypt(struct skcipher_request *req);
-diff --git a/lib/chacha.c b/lib/chacha.c
-index 1bdc688c18df..a46d2832dbab 100644
---- a/lib/chacha.c
-+++ b/lib/chacha.c
-@@ -21,7 +21,7 @@ static void chacha_permute(u32 *x, int nrounds)
- 	int i;
- 
- 	/* whitelist the allowed round counts */
--	WARN_ON_ONCE(nrounds != 20);
-+	WARN_ON_ONCE(nrounds != 20 && nrounds != 12);
- 
- 	for (i = 0; i < nrounds; i += 2) {
- 		x[0]  += x[4];    x[12] = rol32(x[12] ^ x[0],  16);
-@@ -70,7 +70,7 @@ static void chacha_permute(u32 *x, int nrounds)
-  * chacha_block - generate one keystream block and increment block counter
-  * @state: input state matrix (16 32-bit words)
-  * @stream: output keystream block (64 bytes)
-- * @nrounds: number of rounds (currently must be 20)
-+ * @nrounds: number of rounds (20 or 12; 20 is recommended)
-  *
-  * This is the ChaCha core, a function from 64-byte strings to 64-byte strings.
-  * The caller has already converted the endianness of the input.  This function
-@@ -96,7 +96,7 @@ EXPORT_SYMBOL(chacha_block);
-  * hchacha_block - abbreviated ChaCha core, for XChaCha
-  * @in: input state matrix (16 32-bit words)
-  * @out: output (8 32-bit words)
-- * @nrounds: number of rounds (currently must be 20)
-+ * @nrounds: number of rounds (20 or 12; 20 is recommended)
-  *
-  * HChaCha is the ChaCha equivalent of HSalsa and is an intermediate step
-  * towards XChaCha (see https://cr.yp.to/snuffle/xsalsa-20081128.pdf).  HChaCha
+ #endif
 -- 
 2.19.1.930.g4563a0d9d0-goog
