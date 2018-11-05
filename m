@@ -2,339 +2,92 @@ Return-Path: <SRS0=IFNk=NQ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_NEOMUTT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D253FC0044C
-	for <linux-crypto@archiver.kernel.org>; Mon,  5 Nov 2018 13:24:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF82EC0044C
+	for <linux-crypto@archiver.kernel.org>; Mon,  5 Nov 2018 18:24:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 872202086A
-	for <linux-crypto@archiver.kernel.org>; Mon,  5 Nov 2018 13:24:51 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=linaro.org header.i=@linaro.org header.b="DLxQlj8n"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 872202086A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTP id C702220862
+	for <linux-crypto@archiver.kernel.org>; Mon,  5 Nov 2018 18:23:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C702220862
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-crypto-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387395AbeKEWoe (ORCPT
+        id S1729871AbeKFDoN (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 5 Nov 2018 17:44:34 -0500
-Received: from mail-it1-f195.google.com ([209.85.166.195]:39848 "EHLO
-        mail-it1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729810AbeKEWoe (ORCPT
+        Mon, 5 Nov 2018 22:44:13 -0500
+Received: from vmicros1.altlinux.org ([194.107.17.57]:55708 "EHLO
+        vmicros1.altlinux.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729559AbeKFDoN (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 5 Nov 2018 17:44:34 -0500
-Received: by mail-it1-f195.google.com with SMTP id m15so12477871itl.4
-        for <linux-crypto@vger.kernel.org>; Mon, 05 Nov 2018 05:24:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:in-reply-to:references:from:date:message-id:subject:to
-         :cc;
-        bh=n0RSetrvHCija6+v00eMn1qOrXVOdsyJd79oIUM5nmg=;
-        b=DLxQlj8nP7ptRmqHbbmU9n19YvLZhOAU+DD8Dqys27HCbo6xrEQPtEWo4ME2swMUk/
-         Ck7xbogHAVJcwXO3S1hcDsSnpzhn2fVEqBbPY7JpOyxLRIffhyUbQ7NvuX1qp8RYrFna
-         RSTgXi5RIL0jZ9fbAiKqP5W32X+cbny/0TaWs=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:in-reply-to:references:from:date
-         :message-id:subject:to:cc;
-        bh=n0RSetrvHCija6+v00eMn1qOrXVOdsyJd79oIUM5nmg=;
-        b=fbcxmmYFddoXEsDHPRIL8IbXRts9U/ZdK6kwptyzSXgaKB5GU/CcFsyh/aSKu71mKh
-         8KPj19o6Z/6mn7wilXMVSkkH2w16i9Fy421vGvfJ88toa/xoVmkebcjh3lwItZ4Ii9Or
-         ZgQIHGEwAUvQ3aNiJDWuBFiv8dOKoSLaxuF+7Vkuq1Qa4/o4Nimqz1lvDMEVUZNyQKKc
-         PK3lF2J3H+F9gcWp3B6e8/NlO6L0u2aGGkPreLtrpm9ObtZdgc3trapeLXIG8QGmNPnY
-         P4/Qlj7knfLyuv6hndxZT0HnAJH8ZHe3xsq1wJ6SUYJrRvcaS0huMpNd7zcPg1sPCAfX
-         1t5g==
-X-Gm-Message-State: AGRZ1gJ8Kre09AkEFHuHws/NXmGP3YNS9im8+AfTd6ViwUSoFyfBLtU8
-        A/3NabULYDCkhCujuux1jMqAtLYVkXHaCM0ARYuvwQ==
-X-Google-Smtp-Source: AJdET5dCCBfl4uheyKguUAll65PqxvNoZXOZrTxwKTEgzCoBkr+qwmQDtWL3aH6W6yJMKBfnrE6dHlwp2H9lIVW60Tg=
-X-Received: by 2002:a02:8449:: with SMTP id l9-v6mr7592451jah.130.1541424287735;
- Mon, 05 Nov 2018 05:24:47 -0800 (PST)
-MIME-Version: 1.0
-Received: by 2002:a6b:4f16:0:0:0:0:0 with HTTP; Mon, 5 Nov 2018 05:24:47 -0800 (PST)
-In-Reply-To: <20181024032356.3388-4-vt@altlinux.org>
-References: <20181024032356.3388-1-vt@altlinux.org> <20181024032356.3388-4-vt@altlinux.org>
-From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Mon, 5 Nov 2018 14:24:47 +0100
-Message-ID:
- <CAKv+Gu9owgNdrxufxJcboYpfgT3=t1Kcw9D1aHYMjSGKdbhdcQ@mail.gmail.com>
-Subject: Re: [PATCH v3 3/3] crypto: streebog - add Streebog test vectors
-To:     Vitaly Chikunov <vt@altlinux.org>
+        Mon, 5 Nov 2018 22:44:13 -0500
+Received: from imap.altlinux.org (imap.altlinux.org [194.107.17.38])
+        by vmicros1.altlinux.org (Postfix) with ESMTP id D0FC672CC68;
+        Mon,  5 Nov 2018 21:23:15 +0300 (MSK)
+Received: from sole.flsd.net (sole.flsd.net [185.75.180.6])
+        by imap.altlinux.org (Postfix) with ESMTPSA id B81624A4A29;
+        Mon,  5 Nov 2018 21:23:15 +0300 (MSK)
+Date:   Mon, 5 Nov 2018 21:23:14 +0300
+From:   Vitaly Chikunov <vt@altlinux.org>
+To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Kate Stewart <kstewart@linuxfoundation.org>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
         Philippe Ombredanne <pombredanne@nexb.com>,
+        Kate Stewart <kstewart@linuxfoundation.org>,
         "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
         <linux-crypto@vger.kernel.org>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v3 1/3] crypto: streebog - add Streebog hash function
+Message-ID: <20181105182314.c7xdsolvxr2iyd5n@sole.flsd.net>
+Mail-Followup-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Philippe Ombredanne <pombredanne@nexb.com>,
+        Kate Stewart <kstewart@linuxfoundation.org>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" <linux-crypto@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+References: <20181024032356.3388-1-vt@altlinux.org>
+ <20181024032356.3388-2-vt@altlinux.org>
+ <CAKv+Gu9LSUNwW_3E3QtxV123u=mU-B+p6FFRAkWq8_e9Jsgb2w@mail.gmail.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
+Content-Disposition: inline
+In-Reply-To: <CAKv+Gu9LSUNwW_3E3QtxV123u=mU-B+p6FFRAkWq8_e9Jsgb2w@mail.gmail.com>
+User-Agent: NeoMutt/20171215-106-ac61c7
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
-Message-ID: <20181105132447.zsGRXeheBa69s6Y2BnV4eRR_R6lkqni-VdCx555wg6k@z>
+Message-ID: <20181105182314.O9_3BDR2YY7AjarEvPyFUIV46FQ92oqdFRh2BiGJkWc@z>
 
-On 24 October 2018 at 05:23, Vitaly Chikunov <vt@altlinux.org> wrote:
-> Add testmgr and tcrypt tests and vectors for Streebog hash function
-> from RFC 6986 and GOST R 34.11-2012, for HMAC-Streebog vectors are
-> from R 50.1.113-2016.
->
-> Signed-off-by: Vitaly Chikunov <vt@altlinux.org>
-> ---
->  crypto/tcrypt.c  |  35 +++++++++++++++++
->  crypto/testmgr.c |  24 ++++++++++++
->  crypto/testmgr.h | 114 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  3 files changed, 173 insertions(+)
->
-> diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
-> index bdde95e8d369..5dae2eb16c8d 100644
-> --- a/crypto/tcrypt.c
-> +++ b/crypto/tcrypt.c
-> @@ -77,6 +77,7 @@ static char *check[] = {
->         "khazad", "wp512", "wp384", "wp256", "tnepres", "xeta",  "fcrypt",
->         "camellia", "seed", "salsa20", "rmd128", "rmd160", "rmd256", "rmd320",
->         "lzo", "cts", "zlib", "sha3-224", "sha3-256", "sha3-384", "sha3-512",
-> +       "sb256", "sb512",
+Ard,
 
-After changing this to "streebog256", "streebog512"
+On Mon, Nov 05, 2018 at 02:22:21PM +0100, Ard Biesheuvel wrote:
+> 
+> > +static const struct streebog_uint512 buffer512 = { {
+> > +       cpu_to_le64(0x200ULL),
+> 
+> Can we keep the memory representation in native endianness, and only
+> swab the in/output [where needed]?
 
-Acked-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+I hope you do not insist on that?
 
->         NULL
->  };
->
-> @@ -1914,6 +1915,14 @@ static int do_test(const char *alg, u32 type, u32 mask, int m, u32 num_mb)
->                 ret += tcrypt_test("sm3");
->                 break;
->
-> +       case 53:
-> +               ret += tcrypt_test("sb256");
-> +               break;
-> +
-> +       case 54:
-> +               ret += tcrypt_test("sb512");
-> +               break;
-> +
->         case 100:
->                 ret += tcrypt_test("hmac(md5)");
->                 break;
-> @@ -1970,6 +1979,14 @@ static int do_test(const char *alg, u32 type, u32 mask, int m, u32 num_mb)
->                 ret += tcrypt_test("hmac(sha3-512)");
->                 break;
->
-> +       case 115:
-> +               ret += tcrypt_test("hmac(sb256)");
-> +               break;
-> +
-> +       case 116:
-> +               ret += tcrypt_test("hmac(sb512)");
-> +               break;
-> +
->         case 150:
->                 ret += tcrypt_test("ansi_cprng");
->                 break;
-> @@ -2392,6 +2409,14 @@ static int do_test(const char *alg, u32 type, u32 mask, int m, u32 num_mb)
->                 test_hash_speed("sm3", sec, generic_hash_speed_template);
->                 if (mode > 300 && mode < 400) break;
->                 /* fall through */
-> +       case 327:
-> +               test_hash_speed("sb256", sec, generic_hash_speed_template);
-> +               if (mode > 300 && mode < 400) break;
-> +               /* fall through */
-> +       case 328:
-> +               test_hash_speed("sb512", sec, generic_hash_speed_template);
-> +               if (mode > 300 && mode < 400) break;
-> +               /* fall through */
->         case 399:
->                 break;
->
-> @@ -2505,6 +2530,16 @@ static int do_test(const char *alg, u32 type, u32 mask, int m, u32 num_mb)
->                                     num_mb);
->                 if (mode > 400 && mode < 500) break;
->                 /* fall through */
-> +       case 426:
-> +               test_mb_ahash_speed("sb256", sec, generic_hash_speed_template,
-> +                                   num_mb);
-> +               if (mode > 400 && mode < 500) break;
-> +               /* fall through */
-> +       case 427:
-> +               test_mb_ahash_speed("sb512", sec, generic_hash_speed_template,
-> +                                   num_mb);
-> +               if (mode > 400 && mode < 500) break;
-> +               /* fall through */
->         case 499:
->                 break;
->
-> diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-> index a1d42245082a..6f3f0379260b 100644
-> --- a/crypto/testmgr.c
-> +++ b/crypto/testmgr.c
-> @@ -3122,6 +3122,18 @@ static const struct alg_test_desc alg_test_descs[] = {
->                         .hash = __VECS(hmac_rmd160_tv_template)
->                 }
->         }, {
-> +               .alg = "hmac(sb256)",
-> +               .test = alg_test_hash,
-> +               .suite = {
-> +                       .hash = __VECS(hmac_sb256_tv_template)
-> +               }
-> +       }, {
-> +               .alg = "hmac(sb512)",
-> +               .test = alg_test_hash,
-> +               .suite = {
-> +                       .hash = __VECS(hmac_sb512_tv_template)
-> +               }
-> +       }, {
->                 .alg = "hmac(sha1)",
->                 .test = alg_test_hash,
->                 .fips_allowed = 1,
-> @@ -3428,6 +3440,18 @@ static const struct alg_test_desc alg_test_descs[] = {
->                         .cipher = __VECS(salsa20_stream_tv_template)
->                 }
->         }, {
-> +               .alg = "sb256",
-> +               .test = alg_test_hash,
-> +               .suite = {
-> +                       .hash = __VECS(sb256_tv_template)
-> +               }
-> +       }, {
-> +               .alg = "sb512",
-> +               .test = alg_test_hash,
-> +               .suite = {
-> +                       .hash = __VECS(sb512_tv_template)
-> +               }
-> +       }, {
->                 .alg = "sha1",
->                 .test = alg_test_hash,
->                 .fips_allowed = 1,
-> diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-> index 173111c70746..a48ba2945093 100644
-> --- a/crypto/testmgr.h
-> +++ b/crypto/testmgr.h
-> @@ -2309,6 +2309,120 @@ static const struct hash_testvec crct10dif_tv_template[] = {
->         }
->  };
->
-> +/*
-> + * Streebog test vectors from RFC 6986 and GOST R 34.11-2012
-> + */
-> +static const struct hash_testvec sb256_tv_template[] = {
-> +       { /* M1 */
-> +               .plaintext = "012345678901234567890123456789012345678901234567890123456789012",
-> +               .psize = 63,
-> +               .digest =
-> +                       "\x9d\x15\x1e\xef\xd8\x59\x0b\x89"
-> +                       "\xda\xa6\xba\x6c\xb7\x4a\xf9\x27"
-> +                       "\x5d\xd0\x51\x02\x6b\xb1\x49\xa4"
-> +                       "\x52\xfd\x84\xe5\xe5\x7b\x55\x00",
-> +       },
-> +       { /* M2 */
-> +               .plaintext =
-> +                       "\xd1\xe5\x20\xe2\xe5\xf2\xf0\xe8"
-> +                       "\x2c\x20\xd1\xf2\xf0\xe8\xe1\xee"
-> +                       "\xe6\xe8\x20\xe2\xed\xf3\xf6\xe8"
-> +                       "\x2c\x20\xe2\xe5\xfe\xf2\xfa\x20"
-> +                       "\xf1\x20\xec\xee\xf0\xff\x20\xf1"
-> +                       "\xf2\xf0\xe5\xeb\xe0\xec\xe8\x20"
-> +                       "\xed\xe0\x20\xf5\xf0\xe0\xe1\xf0"
-> +                       "\xfb\xff\x20\xef\xeb\xfa\xea\xfb"
-> +                       "\x20\xc8\xe3\xee\xf0\xe5\xe2\xfb",
-> +               .psize = 72,
-> +               .digest =
-> +                       "\x9d\xd2\xfe\x4e\x90\x40\x9e\x5d"
-> +                       "\xa8\x7f\x53\x97\x6d\x74\x05\xb0"
-> +                       "\xc0\xca\xc6\x28\xfc\x66\x9a\x74"
-> +                       "\x1d\x50\x06\x3c\x55\x7e\x8f\x50",
-> +       },
-> +};
-> +
-> +static const struct hash_testvec sb512_tv_template[] = {
-> +       { /* M1 */
-> +               .plaintext = "012345678901234567890123456789012345678901234567890123456789012",
-> +               .psize = 63,
-> +               .digest =
-> +                       "\x1b\x54\xd0\x1a\x4a\xf5\xb9\xd5"
-> +                       "\xcc\x3d\x86\xd6\x8d\x28\x54\x62"
-> +                       "\xb1\x9a\xbc\x24\x75\x22\x2f\x35"
-> +                       "\xc0\x85\x12\x2b\xe4\xba\x1f\xfa"
-> +                       "\x00\xad\x30\xf8\x76\x7b\x3a\x82"
-> +                       "\x38\x4c\x65\x74\xf0\x24\xc3\x11"
-> +                       "\xe2\xa4\x81\x33\x2b\x08\xef\x7f"
-> +                       "\x41\x79\x78\x91\xc1\x64\x6f\x48",
-> +       },
-> +       { /* M2 */
-> +               .plaintext =
-> +                       "\xd1\xe5\x20\xe2\xe5\xf2\xf0\xe8"
-> +                       "\x2c\x20\xd1\xf2\xf0\xe8\xe1\xee"
-> +                       "\xe6\xe8\x20\xe2\xed\xf3\xf6\xe8"
-> +                       "\x2c\x20\xe2\xe5\xfe\xf2\xfa\x20"
-> +                       "\xf1\x20\xec\xee\xf0\xff\x20\xf1"
-> +                       "\xf2\xf0\xe5\xeb\xe0\xec\xe8\x20"
-> +                       "\xed\xe0\x20\xf5\xf0\xe0\xe1\xf0"
-> +                       "\xfb\xff\x20\xef\xeb\xfa\xea\xfb"
-> +                       "\x20\xc8\xe3\xee\xf0\xe5\xe2\xfb",
-> +               .psize = 72,
-> +               .digest =
-> +                       "\x1e\x88\xe6\x22\x26\xbf\xca\x6f"
-> +                       "\x99\x94\xf1\xf2\xd5\x15\x69\xe0"
-> +                       "\xda\xf8\x47\x5a\x3b\x0f\xe6\x1a"
-> +                       "\x53\x00\xee\xe4\x6d\x96\x13\x76"
-> +                       "\x03\x5f\xe8\x35\x49\xad\xa2\xb8"
-> +                       "\x62\x0f\xcd\x7c\x49\x6c\xe5\xb3"
-> +                       "\x3f\x0c\xb9\xdd\xdc\x2b\x64\x60"
-> +                       "\x14\x3b\x03\xda\xba\xc9\xfb\x28",
-> +       },
-> +};
-> +
-> +/* Two HMAC-Streebog test vectors from R 50.1.113-2016 A */
-> +static const struct hash_testvec hmac_sb256_tv_template[] = {
-> +       {
-> +               .key =  "\x00\x01\x02\x03\x04\x05\x06\x07"
-> +                       "\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
-> +                       "\x10\x11\x12\x13\x14\x15\x16\x17"
-> +                       "\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f",
-> +               .ksize  = 32,
-> +               .plaintext =
-> +                       "\x01\x26\xbd\xb8\x78\x00\xaf\x21"
-> +                       "\x43\x41\x45\x65\x63\x78\x01\x00",
-> +               .psize  = 16,
-> +               .digest =
-> +                       "\xa1\xaa\x5f\x7d\xe4\x02\xd7\xb3"
-> +                       "\xd3\x23\xf2\x99\x1c\x8d\x45\x34"
-> +                       "\x01\x31\x37\x01\x0a\x83\x75\x4f"
-> +                       "\xd0\xaf\x6d\x7c\xd4\x92\x2e\xd9",
-> +       },
-> +};
-> +
-> +static const struct hash_testvec hmac_sb512_tv_template[] = {
-> +       {
-> +               .key =  "\x00\x01\x02\x03\x04\x05\x06\x07"
-> +                       "\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
-> +                       "\x10\x11\x12\x13\x14\x15\x16\x17"
-> +                       "\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f",
-> +               .ksize  = 32,
-> +               .plaintext =
-> +                       "\x01\x26\xbd\xb8\x78\x00\xaf\x21"
-> +                       "\x43\x41\x45\x65\x63\x78\x01\x00",
-> +               .psize  = 16,
-> +               .digest =
-> +                       "\xa5\x9b\xab\x22\xec\xae\x19\xc6"
-> +                       "\x5f\xbd\xe6\xe5\xf4\xe9\xf5\xd8"
-> +                       "\x54\x9d\x31\xf0\x37\xf9\xdf\x9b"
-> +                       "\x90\x55\x00\xe1\x71\x92\x3a\x77"
-> +                       "\x3d\x5f\x15\x30\xf2\xed\x7e\x96"
-> +                       "\x4c\xb2\xee\xdc\x29\xe9\xad\x2f"
-> +                       "\x3a\xfe\x93\xb2\x81\x4f\x79\xf5"
-> +                       "\x00\x0f\xfc\x03\x66\xc2\x51\xe6",
-> +       },
-> +};
-> +
->  /* Example vectors below taken from
->   * http://www.oscca.gov.cn/UpFile/20101222141857786.pdf
->   *
-> --
-> 2.11.0
->
+The code is using same primitives to add/xor/permute with data from
+these arrays (buffer512[] and C[], those which use cpu_to_le64), and
+from generic data buffers. Having these arrays in native endianness will
+cause complexities - code split and duplications. For example, XLPS
+permutation will require two versions, with one accessing (y) as is and
+another as cpu_to_le64(y).
+
+The code is based on canonical implementation by RFC 6986 ("GOST R
+34.11-2012: Hash Function") author, and I don't want it do deviate that
+much from the original, which would complicate algorithm reviews.
+
+Thanks,
+
