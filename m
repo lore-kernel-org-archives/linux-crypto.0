@@ -1,110 +1,58 @@
-Return-Path: <SRS0=r3Tc=N4=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:38205 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725854AbeKQUpm (ORCPT
+Return-Path: <SRS0=IFNk=NQ=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from vmicros1.altlinux.org ([194.107.17.57]:54088 "EHLO
+        vmicros1.altlinux.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728136AbeKEWPS (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 17 Nov 2018 15:45:42 -0500
-Subject: Re: [RFC PATCH v2 00/12] crypto: Adiantum support
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        linux-fscrypt@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        LKML <linux-kernel@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Paul Crowley <paulcrowley@google.com>,
-        Greg Kaiser <gkaiser@google.com>,
-        Michael Halcrow <mhalcrow@google.com>,
-        Samuel Neves <samuel.c.p.neves@gmail.com>,
-        Tomer Ashur <tomer.ashur@esat.kuleuven.be>
-References: <20181015175424.97147-1-ebiggers@kernel.org>
- <CAHmME9p1aiqWZ4+viaLscO8+qmixdVhMA1MAtMAFEHPG36DcPg@mail.gmail.com>
- <20181019190411.GB246441@gmail.com>
- <1f65ce09-93b3-f43e-49d5-9d9d6c0bb9e0@gmail.com>
- <20181116215249.GA27149@gmail.com>
-From: Milan Broz <gmazyland@gmail.com>
-Message-ID: <56883f08-26cb-ecef-5698-1c2948714773@gmail.com>
-Date: Sat, 17 Nov 2018 11:29:23 +0100
+        Mon, 5 Nov 2018 17:15:18 -0500
+Date: Mon, 5 Nov 2018 15:55:37 +0300
+From: Vitaly Chikunov <vt@altlinux.org>
+To: Mimi Zohar <zohar@linux.ibm.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-integrity@vger.kernel.org,
+        Mimi Zohar <zohar@linux.vnet.ibm.com>,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>
+Subject: Re: [PATCH v2 0/2] crypto: streebog - add Streebog hash function
+Message-ID: <20181105125537.ux4eehruuncqukli@sole.flsd.net>
+References: <20181010121254.12220-1-vt@altlinux.org>
+ <20181012061659.mextetc3v7urqkzx@gondor.apana.org.au>
+ <20181012064105.bchujbwoaszrcu3l@sole.flsd.net>
+ <20181017060851.r5mxvpq3l2ycvpio@gondor.apana.org.au>
+ <20181103055145.ndvxd7nbnoqtwrk5@sole.flsd.net>
+ <1541422113.21115.44.camel@linux.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20181116215249.GA27149@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=koi8-r
+Content-Disposition: inline
+In-Reply-To: <1541422113.21115.44.camel@linux.ibm.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 16/11/2018 22:52, Eric Biggers wrote:
-> Hi Milan,
+Mimi,
+
+On Mon, Nov 05, 2018 at 07:48:33AM -0500, Mimi Zohar wrote:
+> On Sat, 2018-11-03 at 08:51 +0300, Vitaly Chikunov wrote:
+> > On Wed, Oct 17, 2018 at 02:08:51PM +0800, Herbert Xu wrote:
+> > > On Fri, Oct 12, 2018 at 09:41:05AM +0300, Vitaly Chikunov wrote:
+> > > >
+> > > > It is the first part of attempts to add to the Integrity subsystem
+> > > > ability of verifying file and module signatures by Russian GOST
+> > > > algorithms.
+> > > 
+> > > It would be better if these patches are posted together.  That
+> > > way we don't end up with a situation where the algorithm goes into
+> > > the kernel but the ultimate user is rejected.
+> > 
+> > IMA does not need any particular patching inside of their subtree to
+> > support new hash, because it is using any hash registered in Hash Info
+> > which is still under crypto subtree. I added appropriate patch into v3
+> > which is already posted a week ago, and tested it to work correctly with
+> > ima_appraise=fix.
 > 
-> On Sat, Oct 20, 2018 at 12:26:20PM +0200, Milan Broz wrote:
->>
->> Adiantum (as in your current git branches on kernel.org) can be used for dm-crypt
->> without any changes (yes, I played with it :) and with some easy tricks directly
->> through cryptsetup/LUKS as well.
->>
->> I think we should have this as an alternative to length-preserving wide-block
->> cipher modes for FDE.
->>
-> 
-> Yes, dm-crypt can use Adiantum by specifying the cipher as
-> "capi:adiantum(xchacha12,aes)-plain64".
-> 
-> But, I'm having trouble getting cryptsetup/LUKS to use Adiantum.
-> Using LUKS1, the following works:
-> 
->     cryptsetup luksFormat /dev/$partition --cipher='capi:adiantum(xchacha12,aes)-plain64' --key-size 256
-> 
-> However, when possible we'd like people to use 4K sectors for better
-> performance, which I understand requires using the LUKS2 format along with
-> cryptsetup v2.0.0+ and Linux v4.12+.  But the following does *not* work:
-> 
->     cryptsetup luksFormat /dev/$partition --cipher='capi:adiantum(xchacha12,aes)-plain64' --key-size 256 --type luks2 --sector-size 4096
+> That's true, but the target subsystem should be made aware of the new
+> usage.
 
-Hi Eric,
+Did you mean by re-sending the patch with Cc to linux-integrity? Or
+something more?
 
-actually I planned to test it and then reply to these patches with example cryptsetup
-commands, but did not have time for it yet.
-So thanks for a reminder ;-)
-
-Recent cryptsetup supports sector-size even for plain device.
-
-You actually do not need to use capi: prefix, Adiantum is a composition,
-so "xchacha20,aes-adiantum-plain64" works as well (and it should work even for old cryptsetup).
-(It is ugly, but it should be compatible.)
-
-# cryptsetup open --type plain -c xchacha20,aes-adiantum-plain64 -s 256 --sector-size 4096 /dev/sdb test
-
-For LUKS and benchmark, Adiantum need to use 32 bytes IV. And we have these parameter,
-unfortunately, hardcoded...
-(I guess there is already a way how to get this dynamically from userspace crypto API now.)
-
-So, I already added patch to devel branch patch for benchmark to support Adiantum few days ago
-https://gitlab.com/cryptsetup/cryptsetup/commit/bce567db461e558af7d735c694a50146db899709
-
-This allows trivial benchmark (but it just encrypts one big blob of data):
-
-#  cryptsetup benchmark -c xchacha20,aes-adiantum -s 256
-# Tests are approximate using memory only (no storage IO).
-#            Algorithm |       Key |      Encryption |      Decryption
-xchacha20,aes-adiantum        256b       146.6 MiB/s       148.0 MiB/s
-...
-
-# ./cryptsetup benchmark -c xchacha12,aes-adiantum -s 256
-xchacha12,aes-adiantum        256b       181.7 MiB/s       184.6 MiB/s
-
-For LUKS2, we need a similar change to cryptoAPI IV size (unfortunately it does not
-fallback to old keyslot handling, so LUKS2 does not work currently now).
-
-I quickly added a workaround that fallbacks to default keyslot encryption for keyslots
-in this case
-https://gitlab.com/cryptsetup/cryptsetup/commit/29e87add5aac9d5eb0087881146988d9c4280915
-
-then you can use LUKS2
-# cryptsetup luksFormat --type luks2 --sector-size 4096 -c xchacha20,aes-adiantum-plain64 -s 256 /dev/sdb
-
-(Example above will encrypt keyslots with AES-XTS and use Aviantum for data only.)
-
-So, unfortunately yes, we need some small changes in cryptsetup for LUKS;
-plain mode should work out of the box (with the syntax above).
-
-Milan
+Thanks,
