@@ -1,242 +1,240 @@
-Return-Path: <SRS0=WCFZ=OI=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:54258 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726740AbeK2VSQ (ORCPT
+Return-Path: <SRS0=IFNk=NQ=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:36055 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729105AbeKEWLF (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 29 Nov 2018 16:18:16 -0500
-Date: Thu, 29 Nov 2018 18:13:21 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Martin Willi <martin@strongswan.org>
-Cc: linux-crypto@vger.kernel.org, x86@kernel.org
-Subject: Re: [PATCH 0/3] crypto: x86/chacha20 - AVX-512VL block functions
-Message-ID: <20181129101321.em2wttqz4g72vitz@gondor.apana.org.au>
-References: <20181120163050.22251-1-martin@strongswan.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181120163050.22251-1-martin@strongswan.org>
+        Mon, 5 Nov 2018 17:11:05 -0500
+Received: by mail-wr1-f68.google.com with SMTP id z13-v6so7004689wrs.3
+        for <linux-crypto@vger.kernel.org>; Mon, 05 Nov 2018 04:51:28 -0800 (PST)
+From: Corentin Labbe <clabbe@baylibre.com>
+To: davem@davemloft.net, ebiggers@kernel.org,
+        herbert@gondor.apana.org.au
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Corentin Labbe <clabbe@baylibre.com>
+Subject: [PATCH 3/5] crypto: crypto_user_stat: split user space crypto stat structures
+Date: Mon,  5 Nov 2018 12:51:12 +0000
+Message-Id: <1541422274-40060-4-git-send-email-clabbe@baylibre.com>
+In-Reply-To: <1541422274-40060-1-git-send-email-clabbe@baylibre.com>
+References: <1541422274-40060-1-git-send-email-clabbe@baylibre.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Nov 20, 2018 at 05:30:47PM +0100, Martin Willi wrote:
-> In the quest for pushing the limits of chacha20 encryption for both IPsec
-> and Wireguard, this small series adds AVX-512VL block functions. The VL
-> variant works on 256-bit ymm registers, but compared to AVX2 can benefit
-> from the new instructions.
-> 
-> Compared to the AVX2 version, these block functions bring an overall
-> speed improvement across encryption lengths of ~20%. Below the tcrypt
-> results for additional block sizes in kOps/s, for the current AVX2
-> code path, the new AVX-512VL code path and the comparison to Zinc in
-> AVX2 and AVX-512VL. All numbers from a Xeon Platinum 8168 (2.7GHz).
-> 
-> These numbers result in a very nice chart, available at:
->   https://download.strongswan.org/misc/chacha-avx-512vl.svg
-> 
->                      zinc   zinc
->  len   avx2  512vl   avx2  512vl
->    8   5719   5672   5468   5612
->   16   5675   5627   5355   5621
->   24   5687   5601   5322   5633
->   32   5667   5622   5244   5564
->   40   5603   5582   5337   5578
->   48   5638   5539   5400   5556
->   56   5624   5566   5375   5482
->   64   5590   5573   5352   5531
->   72   4841   5467   3365   3457
->   80   5316   5761   3310   3381
->   88   4798   5470   3239   3343
->   96   5324   5723   3197   3281
->  104   4819   5460   3155   3232
->  112   5266   5749   3020   3195
->  120   4776   5391   2959   3145
->  128   5291   5723   3398   3489
->  136   4122   4837   3321   3423
->  144   4507   5057   3247   3389
->  152   4139   4815   3233   3329
->  160   4482   5043   3159   3256
->  168   4142   4766   3131   3224
->  176   4506   5028   3073   3162
->  184   4119   4772   3010   3109
->  192   4499   5016   3402   3502
->  200   4127   4766   3329   3448
->  208   4452   5012   3276   3371
->  216   4128   4744   3243   3334
->  224   4484   5008   3203   3298
->  232   4103   4772   3141   3237
->  240   4458   4963   3115   3217
->  248   4121   4751   3085   3177
->  256   4461   4987   3364   4046
->  264   3406   4282   3270   4006
->  272   3408   4287   3207   3961
->  280   3371   4271   3203   3825
->  288   3625   4301   3129   3751
->  296   3402   4283   3093   3688
->  304   3401   4247   3062   3637
->  312   3382   4282   2995   3614
->  320   3611   4279   3305   4070
->  328   3386   4260   3276   3968
->  336   3369   4288   3171   3929
->  344   3389   4289   3134   3847
->  352   3609   4266   3127   3720
->  360   3355   4252   3076   3692
->  368   3387   4264   3048   3650
->  376   3387   4238   2967   3553
->  384   3568   4265   3277   4035
->  392   3369   4262   3299   3973
->  400   3362   4235   3239   3899
->  408   3352   4269   3196   3843
->  416   3585   4243   3127   3736
->  424   3364   4216   3092   3672
->  432   3341   4246   3067   3628
->  440   3353   4235   3018   3593
->  448   3538   4245   3327   4035
->  456   3322   4244   3275   3900
->  464   3340   4237   3212   3880
->  472   3330   4242   3054   3802
->  480   3530   4234   3078   3707
->  488   3337   4228   3094   3664
->  496   3330   4223   3015   3591
->  504   3317   4214   3002   3517
->  512   3531   4197   3339   4016
->  520   2511   3101   2030   2682
->  528   2627   3087   2027   2641
->  536   2508   3102   2001   2601
->  544   2638   3090   1964   2564
->  552   2494   3077   1962   2516
->  560   2625   3064   1941   2515
->  568   2500   3086   1922   2493
->  576   2611   3074   2050   2689
->  584   2482   3062   2041   2680
->  592   2595   3074   2026   2644
->  600   2470   3060   1985   2595
->  608   2581   3039   1961   2555
->  616   2478   3062   1956   2521
->  624   2587   3066   1930   2493
->  632   2457   3053   1923   2486
->  640   2581   3050   2059   2712
->  648   2296   2839   2024   2655
->  656   2389   2845   2019   2642
->  664   2292   2842   2002   2610
->  672   2404   2838   1959   2537
->  680   2273   2827   1956   2527
->  688   2389   2840   1938   2510
->  696   2280   2837   1911   2463
->  704   2370   2819   2055   2702
->  712   2277   2834   2029   2663
->  720   2369   2829   2020   2625
->  728   2255   2820   2001   2600
->  736   2373   2819   1958   2543
->  744   2269   2827   1956   2524
->  752   2364   2817   1937   2492
->  760   2270   2805   1909   2483
->  768   2378   2820   2050   2696
->  776   2053   2700   2002   2643
->  784   2066   2693   1922   2640
->  792   2065   2703   1928   2602
->  800   2138   2706   1962   2535
->  808   2065   2679   1938   2528
->  816   2063   2699   1929   2500
->  824   2053   2676   1915   2468
->  832   2149   2692   2036   2693
->  840   2055   2689   2024   2659
->  848   2049   2689   2006   2610
->  856   2057   2702   1979   2585
->  864   2144   2703   1960   2547
->  872   2047   2685   1945   2501
->  880   2055   2683   1902   2497
->  888   2060   2689   1897   2478
->  896   2139   2693   2023   2663
->  904   2049   2686   1970   2644
->  912   2055   2688   1925   2621
->  920   2047   2685   1911   2572
->  928   2114   2695   1907   2545
->  936   2055   2681   1927   2492
->  944   2055   2693   1930   2478
->  952   2042   2688   1909   2471
->  960   2136   2682   2014   2672
->  968   2054   2687   1999   2626
->  976   2040   2682   1982   2598
->  984   2055   2687   1943   2569
->  992   2138   2694   1884   2522
-> 1000   2036   2681   1929   2506
-> 1008   2052   2676   1926   2475
-> 1016   2050   2686   1889   2430
-> 1024   2125   2670   2039   2656
-> 1032   1717   2175   1470   1995
-> 1040   1768   2186   1456   1983
-> 1048   1704   2185   1451   1950
-> 1056   1770   2176   1410   1927
-> 1064   1710   2178   1418   1918
-> 1072   1753   2168   1394   1892
-> 1080   1696   2170   1400   1892
-> 1088   1761   2174   1472   2014
-> 1096   1681   2158   1464   1968
-> 1104   1746   2172   1457   1978
-> 1112   1689   2167   1445   1955
-> 1120   1738   2160   1431   1919
-> 1128   1689   2155   1428   1915
-> 1136   1747   2169   1415   1899
-> 1144   1678   2161   1403   1881
-> 1152   1749   2159   1474   2007
-> 1160   1601   2050   1470   1991
-> 1168   1648   2057   1461   1969
-> 1176   1605   2043   1439   1948
-> 1184   1654   2057   1428   1926
-> 1192   1595   2051   1427   1899
-> 1200   1647   2036   1419   1902
-> 1208   1598   2048   1402   1888
-> 1216   1643   2053   1471   1991
-> 1224   1595   2043   1469   1987
-> 1232   1649   2048   1456   1971
-> 1240   1599   2040   1436   1939
-> 1248   1644   2042   1433   1918
-> 1256   1602   2045   1424   1900
-> 1264   1648   2048   1413   1878
-> 1272   1591   2034   1401   1878
-> 1280   1649   2044   1475   2002
-> 1288   1493   1984   1461   1972
-> 1296   1484   1971   1438   1962
-> 1304   1490   1985   1443   1947
-> 1312   1535   1987   1425   1913
-> 1320   1481   1965   1410   1901
-> 1328   1493   1984   1407   1900
-> 1336   1493   1979   1396   1882
-> 1344   1526   1980   1465   1988
-> 1352   1492   1970   1463   1983
-> 1360   1487   1974   1452   1966
-> 1368   1481   1977   1439   1937
-> 1376   1535   1970   1428   1915
-> 1384   1489   1973   1417   1905
-> 1392   1483   1974   1415   1881
-> 1400   1485   1963   1403   1882
-> 1408   1523   1976   1466   1988
-> 1416   1477   1969   1459   1964
-> 1424   1487   1975   1455   1966
-> 1432   1488   1972   1438   1941
-> 1440   1518   1958   1432   1908
-> 1448   1484   1972   1421   1905
-> 1456   1485   1973   1398   1888
-> 1464   1476   1962   1399   1870
-> 1472   1530   1975   1471   1998
-> 1480   1478   1967   1452   1979
-> 1488   1478   1963   1453   1947
-> 1496   1477   1963   1438   1930
-> 
-> 
-> Martin Willi (3):
->   crypto: x86/chacha20 - Add a 8-block AVX-512VL variant
->   crypto: x86/chacha20 - Add a 2-block AVX-512VL variant
->   crypto: x86/chacha20 - Add a 4-block AVX-512VL variant
-> 
->  arch/x86/crypto/Makefile                   |   5 +
->  arch/x86/crypto/chacha20-avx512vl-x86_64.S | 839 +++++++++++++++++++++
->  arch/x86/crypto/chacha20_glue.c            |  40 +
->  3 files changed, 884 insertions(+)
->  create mode 100644 arch/x86/crypto/chacha20-avx512vl-x86_64.S
+It is cleaner to have each stat in their own structures.
 
-All applied.  Thanks.
+Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
+---
+ crypto/crypto_user_stat.c       |  20 +++----
+ include/uapi/linux/cryptouser.h | 101 ++++++++++++++++++++------------
+ 2 files changed, 73 insertions(+), 48 deletions(-)
+
+diff --git a/crypto/crypto_user_stat.c b/crypto/crypto_user_stat.c
+index 352569f378a0..3c14be2f7a1b 100644
+--- a/crypto/crypto_user_stat.c
++++ b/crypto/crypto_user_stat.c
+@@ -33,7 +33,7 @@ struct crypto_dump_info {
+ 
+ static int crypto_report_aead(struct sk_buff *skb, struct crypto_alg *alg)
+ {
+-	struct crypto_stat raead;
++	struct crypto_stat_aead raead;
+ 	u64 v64;
+ 
+ 	memset(&raead, 0, sizeof(raead));
+@@ -56,7 +56,7 @@ static int crypto_report_aead(struct sk_buff *skb, struct crypto_alg *alg)
+ 
+ static int crypto_report_cipher(struct sk_buff *skb, struct crypto_alg *alg)
+ {
+-	struct crypto_stat rcipher;
++	struct crypto_stat_cipher rcipher;
+ 	u64 v64;
+ 
+ 	memset(&rcipher, 0, sizeof(rcipher));
+@@ -79,7 +79,7 @@ static int crypto_report_cipher(struct sk_buff *skb, struct crypto_alg *alg)
+ 
+ static int crypto_report_comp(struct sk_buff *skb, struct crypto_alg *alg)
+ {
+-	struct crypto_stat rcomp;
++	struct crypto_stat_compress rcomp;
+ 	u64 v64;
+ 
+ 	memset(&rcomp, 0, sizeof(rcomp));
+@@ -101,7 +101,7 @@ static int crypto_report_comp(struct sk_buff *skb, struct crypto_alg *alg)
+ 
+ static int crypto_report_acomp(struct sk_buff *skb, struct crypto_alg *alg)
+ {
+-	struct crypto_stat racomp;
++	struct crypto_stat_compress racomp;
+ 	u64 v64;
+ 
+ 	memset(&racomp, 0, sizeof(racomp));
+@@ -123,7 +123,7 @@ static int crypto_report_acomp(struct sk_buff *skb, struct crypto_alg *alg)
+ 
+ static int crypto_report_akcipher(struct sk_buff *skb, struct crypto_alg *alg)
+ {
+-	struct crypto_stat rakcipher;
++	struct crypto_stat_akcipher rakcipher;
+ 	u64 v64;
+ 
+ 	memset(&rakcipher, 0, sizeof(rakcipher));
+@@ -150,7 +150,7 @@ static int crypto_report_akcipher(struct sk_buff *skb, struct crypto_alg *alg)
+ 
+ static int crypto_report_kpp(struct sk_buff *skb, struct crypto_alg *alg)
+ {
+-	struct crypto_stat rkpp;
++	struct crypto_stat_kpp rkpp;
+ 	u64 v;
+ 
+ 	memset(&rkpp, 0, sizeof(rkpp));
+@@ -171,7 +171,7 @@ static int crypto_report_kpp(struct sk_buff *skb, struct crypto_alg *alg)
+ 
+ static int crypto_report_ahash(struct sk_buff *skb, struct crypto_alg *alg)
+ {
+-	struct crypto_stat rhash;
++	struct crypto_stat_hash rhash;
+ 	u64 v64;
+ 
+ 	memset(&rhash, 0, sizeof(rhash));
+@@ -190,7 +190,7 @@ static int crypto_report_ahash(struct sk_buff *skb, struct crypto_alg *alg)
+ 
+ static int crypto_report_shash(struct sk_buff *skb, struct crypto_alg *alg)
+ {
+-	struct crypto_stat rhash;
++	struct crypto_stat_hash rhash;
+ 	u64 v64;
+ 
+ 	memset(&rhash, 0, sizeof(rhash));
+@@ -209,7 +209,7 @@ static int crypto_report_shash(struct sk_buff *skb, struct crypto_alg *alg)
+ 
+ static int crypto_report_rng(struct sk_buff *skb, struct crypto_alg *alg)
+ {
+-	struct crypto_stat rrng;
++	struct crypto_stat_rng rrng;
+ 	u64 v64;
+ 
+ 	memset(&rrng, 0, sizeof(rrng));
+@@ -248,7 +248,7 @@ static int crypto_reportstat_one(struct crypto_alg *alg,
+ 	if (nla_put_u32(skb, CRYPTOCFGA_PRIORITY_VAL, alg->cra_priority))
+ 		goto nla_put_failure;
+ 	if (alg->cra_flags & CRYPTO_ALG_LARVAL) {
+-		struct crypto_stat rl;
++		struct crypto_stat_larval rl;
+ 
+ 		memset(&rl, 0, sizeof(rl));
+ 		strscpy(rl.type, "larval", sizeof(rl.type));
+diff --git a/include/uapi/linux/cryptouser.h b/include/uapi/linux/cryptouser.h
+index 9f8187077ce4..790b5c6511e5 100644
+--- a/include/uapi/linux/cryptouser.h
++++ b/include/uapi/linux/cryptouser.h
+@@ -76,47 +76,72 @@ struct crypto_user_alg {
+ 	__u32 cru_flags;
+ };
+ 
+-struct crypto_stat {
+-	char type[CRYPTO_MAX_NAME];
+-	union {
+-		__u64 stat_encrypt_cnt;
+-		__u64 stat_compress_cnt;
+-		__u64 stat_generate_cnt;
+-		__u64 stat_hash_cnt;
+-		__u64 stat_setsecret_cnt;
+-	};
+-	union {
+-		__u64 stat_encrypt_tlen;
+-		__u64 stat_compress_tlen;
+-		__u64 stat_generate_tlen;
+-		__u64 stat_hash_tlen;
+-	};
+-	union {
+-		__u64 stat_akcipher_err_cnt;
+-		__u64 stat_cipher_err_cnt;
+-		__u64 stat_compress_err_cnt;
+-		__u64 stat_aead_err_cnt;
+-		__u64 stat_hash_err_cnt;
+-		__u64 stat_rng_err_cnt;
+-		__u64 stat_kpp_err_cnt;
+-	};
+-	union {
+-		__u64 stat_decrypt_cnt;
+-		__u64 stat_decompress_cnt;
+-		__u64 stat_seed_cnt;
+-		__u64 stat_generate_public_key_cnt;
+-	};
+-	union {
+-		__u64 stat_decrypt_tlen;
+-		__u64 stat_decompress_tlen;
+-	};
+-	union {
+-		__u64 stat_verify_cnt;
+-		__u64 stat_compute_shared_secret_cnt;
+-	};
++struct crypto_stat_cipher {
++	char type[CRYPTO_MAX_NAME];
++	__u64 stat_encrypt_cnt;
++	__u64 stat_encrypt_tlen;
++	__u64 stat_decrypt_cnt;
++	__u64 stat_decrypt_tlen;
++	__u64 stat_cipher_err_cnt;
++};
++
++struct crypto_stat_aead {
++	char type[CRYPTO_MAX_NAME];
++	__u64 stat_encrypt_cnt;
++	__u64 stat_encrypt_tlen;
++	__u64 stat_decrypt_cnt;
++	__u64 stat_decrypt_tlen;
++	__u64 stat_cipher_err_cnt;
++	__u64 stat_aead_err_cnt;
++};
++
++struct crypto_stat_akcipher {
++	char type[CRYPTO_MAX_NAME];
++	__u64 stat_encrypt_cnt;
++	__u64 stat_encrypt_tlen;
++	__u64 stat_decrypt_cnt;
++	__u64 stat_decrypt_tlen;
++	__u64 stat_akcipher_err_cnt;
++	__u64 stat_verify_cnt;
+ 	__u64 stat_sign_cnt;
+ };
+ 
++struct crypto_stat_compress {
++	char type[CRYPTO_MAX_NAME];
++	__u64 stat_compress_cnt;
++	__u64 stat_compress_tlen;
++	__u64 stat_decompress_cnt;
++	__u64 stat_decompress_tlen;
++	__u64 stat_compress_err_cnt;
++};
++
++struct crypto_stat_rng {
++	char type[CRYPTO_MAX_NAME];
++	__u64 stat_generate_cnt;
++	__u64 stat_generate_tlen;
++	__u64 stat_rng_err_cnt;
++	__u64 stat_seed_cnt;
++};
++
++struct crypto_stat_hash {
++	char type[CRYPTO_MAX_NAME];
++	__u64 stat_hash_cnt;
++	__u64 stat_hash_tlen;
++	__u64 stat_hash_err_cnt;
++};
++
++struct crypto_stat_kpp {
++	char type[CRYPTO_MAX_NAME];
++	__u64 stat_setsecret_cnt;
++	__u64 stat_kpp_err_cnt;
++	__u64 stat_generate_public_key_cnt;
++	__u64 stat_compute_shared_secret_cnt;
++};
++
++struct crypto_stat_larval {
++	char type[CRYPTO_MAX_NAME];
++};
++
+ struct crypto_report_larval {
+ 	char type[CRYPTO_MAX_NAME];
+ };
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.18.1
