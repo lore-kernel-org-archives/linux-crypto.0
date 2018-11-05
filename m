@@ -1,47 +1,94 @@
-Return-Path: <SRS0=WCFZ=OI=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from m12-18.163.com ([220.181.12.18]:53103 "EHLO m12-18.163.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726639AbeK2Swh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 29 Nov 2018 13:52:37 -0500
-Date: Thu, 29 Nov 2018 15:47:56 +0800
-From: PanBian <bianpan2016@163.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: do not free algorithm before using
-Message-ID: <20181129074756.GA73370@bp>
-Reply-To: PanBian <bianpan2016@163.com>
-References: <1542880816-63838-1-git-send-email-bianpan2016@163.com>
- <20181129065711.7renu7xnxzp7sr2d@gondor.apana.org.au>
+Return-Path: <SRS0=IFNk=NQ=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from szxga04-in.huawei.com ([45.249.212.190]:14594 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1729047AbeKEVxY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 5 Nov 2018 16:53:24 -0500
+From: John Garry <john.garry@huawei.com>
+To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+CC: <Jonathan.Cameron@huawei.com>, <linux-crypto@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linuxarm@huawei.com>,
+        John Garry <john.garry@huawei.com>
+Subject: [PATCH 2/2] crypto: hisilicon -  Fix reference after free of memories on error path
+Date: Mon, 5 Nov 2018 20:35:15 +0800
+Message-ID: <1541421315-25623-3-git-send-email-john.garry@huawei.com>
+In-Reply-To: <1541421315-25623-1-git-send-email-john.garry@huawei.com>
+References: <1541421315-25623-1-git-send-email-john.garry@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181129065711.7renu7xnxzp7sr2d@gondor.apana.org.au>
+Content-Type: text/plain
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Nov 29, 2018 at 02:57:11PM +0800, Herbert Xu wrote:
-> On Thu, Nov 22, 2018 at 06:00:16PM +0800, Pan Bian wrote:
-> > In multiple functions, the algorithm fields are read after its reference
-> > is dropped through crypto_mod_put. In this case, the algorithm memory
-> > may be freed, resulting in use-after-free bugs. This patch delays the
-> > put operation until the algorithm is never used.
-> > 
-> > Signed-off-by: Pan Bian <bianpan2016@163.com>
-> 
-> Patch applied.  Thanks!
-> 
-> BTW, this problem exists in almost every other skcipher template,
-> e.g., in ctr.  Are you working on a fix for them too?
+coccicheck currently warns of the following issues in the driver:
+drivers/crypto/hisilicon/sec/sec_algs.c:864:51-66: ERROR: reference preceded by free on line 812
+drivers/crypto/hisilicon/sec/sec_algs.c:864:40-49: ERROR: reference preceded by free on line 813
+drivers/crypto/hisilicon/sec/sec_algs.c:861:8-24: ERROR: reference preceded by free on line 814
+drivers/crypto/hisilicon/sec/sec_algs.c:860:41-51: ERROR: reference preceded by free on line 815
+drivers/crypto/hisilicon/sec/sec_algs.c:867:7-18: ERROR: reference preceded by free on line 816
 
-Probably not. Could you please provide patches to fix them?
+It would appear than on certain error paths that we may attempt reference-
+after-free some memories.
 
-Thanks,
-Pan
+This patch fixes those issues. The solution doesn't look perfect, but
+having same memories free'd possibly from separate functions makes it
+tricky.
 
-> 
-> Cheers,
-> -- 
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Fixes: 915e4e8413da ("crypto: hisilicon - SEC security accelerator driver")
+Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Signed-off-by: John Garry <john.garry@huawei.com>
+---
+ drivers/crypto/hisilicon/sec/sec_algs.c | 21 +++++++++++----------
+ 1 file changed, 11 insertions(+), 10 deletions(-)
+
+diff --git a/drivers/crypto/hisilicon/sec/sec_algs.c b/drivers/crypto/hisilicon/sec/sec_algs.c
+index 32c6c02..cdc4f9a 100644
+--- a/drivers/crypto/hisilicon/sec/sec_algs.c
++++ b/drivers/crypto/hisilicon/sec/sec_algs.c
+@@ -808,13 +808,6 @@ static int sec_alg_skcipher_crypto(struct skcipher_request *skreq,
+ 	 * more refined but this is unlikely to happen so no need.
+ 	 */
+ 
+-	/* Cleanup - all elements in pointer arrays have been coppied */
+-	kfree(splits_in_nents);
+-	kfree(splits_in);
+-	kfree(splits_out_nents);
+-	kfree(splits_out);
+-	kfree(split_sizes);
+-
+ 	/* Grab a big lock for a long time to avoid concurrency issues */
+ 	mutex_lock(&queue->queuelock);
+ 
+@@ -829,13 +822,13 @@ static int sec_alg_skcipher_crypto(struct skcipher_request *skreq,
+ 	     (!queue->havesoftqueue ||
+ 	      kfifo_avail(&queue->softqueue) > steps)) ||
+ 	    !list_empty(&ctx->backlog)) {
++		ret = -EBUSY;
+ 		if ((skreq->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG)) {
+ 			list_add_tail(&sec_req->backlog_head, &ctx->backlog);
+ 			mutex_unlock(&queue->queuelock);
+-			return -EBUSY;
++			goto out;
+ 		}
+ 
+-		ret = -EBUSY;
+ 		mutex_unlock(&queue->queuelock);
+ 		goto err_free_elements;
+ 	}
+@@ -844,7 +837,15 @@ static int sec_alg_skcipher_crypto(struct skcipher_request *skreq,
+ 	if (ret)
+ 		goto err_free_elements;
+ 
+-	return -EINPROGRESS;
++	ret = -EINPROGRESS;
++out:
++	/* Cleanup - all elements in pointer arrays have been copied */
++	kfree(splits_in_nents);
++	kfree(splits_in);
++	kfree(splits_out_nents);
++	kfree(splits_out);
++	kfree(split_sizes);
++	return ret;
+ 
+ err_free_elements:
+ 	list_for_each_entry_safe(el, temp, &sec_req->elements, head) {
+-- 
+1.9.1
