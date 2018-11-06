@@ -1,43 +1,197 @@
-Return-Path: <SRS0=WCFZ=OI=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:52892 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727568AbeK2Rqs (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 29 Nov 2018 12:46:48 -0500
-Date: Thu, 29 Nov 2018 14:42:18 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Gilad Ben-Yossef <gilad@benyossef.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Yael Chemla <yael.chemla@foss.arm.com>,
-        Ofir Drang <Ofir.Drang@arm.com>, linux-crypto@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/3] dt-bindings: crypto: ccree: add dt bindings for
- ccree 703
-Message-ID: <20181129064218.53qc33vus5anla76@gondor.apana.org.au>
-References: <1542102039-22256-1-git-send-email-gilad@benyossef.com>
- <1542102039-22256-3-git-send-email-gilad@benyossef.com>
+Return-Path: <SRS0=45GR=NR=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from ale.deltatee.com ([207.54.116.67]:39568 "EHLO ale.deltatee.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2388547AbeKGGTp (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 7 Nov 2018 01:19:45 -0500
+From: Logan Gunthorpe <logang@deltatee.com>
+To: linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
+        linux-ntb@googlegroups.com, linux-crypto@vger.kernel.org,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc: Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Andy Shevchenko <andy.shevchenko@gmail.com>,
+        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Alan Cox <gnomes@lxorguk.ukuu.org.uk>
+Date: Tue,  6 Nov 2018 13:52:32 -0700
+Message-Id: <20181106205234.25792-5-logang@deltatee.com>
+In-Reply-To: <20181106205234.25792-1-logang@deltatee.com>
+References: <20181106205234.25792-1-logang@deltatee.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1542102039-22256-3-git-send-email-gilad@benyossef.com>
+Content-Transfer-Encoding: 8bit
+Subject: [PATCH v23 4/6] io-64-nonatomic: add io{read|write}64[be]{_lo_hi|_hi_lo} macros
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Nov 13, 2018 at 09:40:36AM +0000, Gilad Ben-Yossef wrote:
-> Add device tree bindings associating Arm TrustZone CryptoCell 703 with the
-> ccree driver.
-> 
-> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
-> ---
->  Documentation/devicetree/bindings/crypto/arm-cryptocell.txt | 1 +
->  1 file changed, 1 insertion(+)
+This patch adds generic io{read|write}64[be]{_lo_hi|_hi_lo} macros if
+they are not already defined by the architecture. (As they are provided
+by the generic iomap library).
 
-Which tree is this patch meant to go through?
+The patch also points io{read|write}64[be] to the variant specified by the
+header name.
 
-Thanks,
+This is because new drivers are encouraged to use ioreadXX, et al instead
+of readX[1], et al -- and mixing ioreadXX with readq is pretty ugly.
+
+[1] LDD3: section 9.4.2
+
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+Reviewed-by: Andy Shevchenko <andy.shevchenko@gmail.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Arnd Bergmann <arnd@arndb.de>
+Cc: Alan Cox <gnomes@lxorguk.ukuu.org.uk>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ include/linux/io-64-nonatomic-hi-lo.h | 64 +++++++++++++++++++++++++++
+ include/linux/io-64-nonatomic-lo-hi.h | 64 +++++++++++++++++++++++++++
+ 2 files changed, 128 insertions(+)
+
+diff --git a/include/linux/io-64-nonatomic-hi-lo.h b/include/linux/io-64-nonatomic-hi-lo.h
+index 862d786a904f..ae21b72cce85 100644
+--- a/include/linux/io-64-nonatomic-hi-lo.h
++++ b/include/linux/io-64-nonatomic-hi-lo.h
+@@ -55,4 +55,68 @@ static inline void hi_lo_writeq_relaxed(__u64 val, volatile void __iomem *addr)
+ #define writeq_relaxed hi_lo_writeq_relaxed
+ #endif
+ 
++#ifndef ioread64_hi_lo
++#define ioread64_hi_lo ioread64_hi_lo
++static inline u64 ioread64_hi_lo(void __iomem *addr)
++{
++	u32 low, high;
++
++	high = ioread32(addr + sizeof(u32));
++	low = ioread32(addr);
++
++	return low + ((u64)high << 32);
++}
++#endif
++
++#ifndef iowrite64_hi_lo
++#define iowrite64_hi_lo iowrite64_hi_lo
++static inline void iowrite64_hi_lo(u64 val, void __iomem *addr)
++{
++	iowrite32(val >> 32, addr + sizeof(u32));
++	iowrite32(val, addr);
++}
++#endif
++
++#ifndef ioread64be_hi_lo
++#define ioread64be_hi_lo ioread64be_hi_lo
++static inline u64 ioread64be_hi_lo(void __iomem *addr)
++{
++	u32 low, high;
++
++	high = ioread32be(addr);
++	low = ioread32be(addr + sizeof(u32));
++
++	return low + ((u64)high << 32);
++}
++#endif
++
++#ifndef iowrite64be_hi_lo
++#define iowrite64be_hi_lo iowrite64be_hi_lo
++static inline void iowrite64be_hi_lo(u64 val, void __iomem *addr)
++{
++	iowrite32be(val >> 32, addr);
++	iowrite32be(val, addr + sizeof(u32));
++}
++#endif
++
++#ifndef ioread64
++#define ioread64_is_nonatomic
++#define ioread64 ioread64_hi_lo
++#endif
++
++#ifndef iowrite64
++#define iowrite64_is_nonatomic
++#define iowrite64 iowrite64_hi_lo
++#endif
++
++#ifndef ioread64be
++#define ioread64be_is_nonatomic
++#define ioread64be ioread64be_hi_lo
++#endif
++
++#ifndef iowrite64be
++#define iowrite64be_is_nonatomic
++#define iowrite64be iowrite64be_hi_lo
++#endif
++
+ #endif	/* _LINUX_IO_64_NONATOMIC_HI_LO_H_ */
+diff --git a/include/linux/io-64-nonatomic-lo-hi.h b/include/linux/io-64-nonatomic-lo-hi.h
+index d042e7bb5adb..faaa842dbdb9 100644
+--- a/include/linux/io-64-nonatomic-lo-hi.h
++++ b/include/linux/io-64-nonatomic-lo-hi.h
+@@ -55,4 +55,68 @@ static inline void lo_hi_writeq_relaxed(__u64 val, volatile void __iomem *addr)
+ #define writeq_relaxed lo_hi_writeq_relaxed
+ #endif
+ 
++#ifndef ioread64_lo_hi
++#define ioread64_lo_hi ioread64_lo_hi
++static inline u64 ioread64_lo_hi(void __iomem *addr)
++{
++	u32 low, high;
++
++	low = ioread32(addr);
++	high = ioread32(addr + sizeof(u32));
++
++	return low + ((u64)high << 32);
++}
++#endif
++
++#ifndef iowrite64_lo_hi
++#define iowrite64_lo_hi iowrite64_lo_hi
++static inline void iowrite64_lo_hi(u64 val, void __iomem *addr)
++{
++	iowrite32(val, addr);
++	iowrite32(val >> 32, addr + sizeof(u32));
++}
++#endif
++
++#ifndef ioread64be_lo_hi
++#define ioread64be_lo_hi ioread64be_lo_hi
++static inline u64 ioread64be_lo_hi(void __iomem *addr)
++{
++	u32 low, high;
++
++	low = ioread32be(addr + sizeof(u32));
++	high = ioread32be(addr);
++
++	return low + ((u64)high << 32);
++}
++#endif
++
++#ifndef iowrite64be_lo_hi
++#define iowrite64be_lo_hi iowrite64be_lo_hi
++static inline void iowrite64be_lo_hi(u64 val, void __iomem *addr)
++{
++	iowrite32be(val, addr + sizeof(u32));
++	iowrite32be(val >> 32, addr);
++}
++#endif
++
++#ifndef ioread64
++#define ioread64_is_nonatomic
++#define ioread64 ioread64_lo_hi
++#endif
++
++#ifndef iowrite64
++#define iowrite64_is_nonatomic
++#define iowrite64 iowrite64_lo_hi
++#endif
++
++#ifndef ioread64be
++#define ioread64be_is_nonatomic
++#define ioread64be ioread64be_lo_hi
++#endif
++
++#ifndef iowrite64be
++#define iowrite64be_is_nonatomic
++#define iowrite64be iowrite64be_lo_hi
++#endif
++
+ #endif	/* _LINUX_IO_64_NONATOMIC_LO_HI_H_ */
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.19.0
