@@ -1,69 +1,202 @@
-Return-Path: <SRS0=IFNk=NQ=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:54536 "EHLO mail.kernel.org"
+Return-Path: <SRS0=45GR=NR=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from ale.deltatee.com ([207.54.116.67]:39550 "EHLO ale.deltatee.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727560AbeKFItM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 6 Nov 2018 03:49:12 -0500
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org
-Cc: linux-fscrypt@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Paul Crowley <paulcrowley@google.com>,
-        Greg Kaiser <gkaiser@google.com>,
-        "Jason A . Donenfeld" <Jason@zx2c4.com>,
-        Samuel Neves <samuel.c.p.neves@gmail.com>,
-        Tomer Ashur <tomer.ashur@esat.kuleuven.be>
-Subject: [RFC PATCH v3 06/15] crypto: arm/chacha20 - limit the preemption-disabled section
-Date: Mon,  5 Nov 2018 15:25:17 -0800
-Message-Id: <20181105232526.173947-7-ebiggers@kernel.org>
-In-Reply-To: <20181105232526.173947-1-ebiggers@kernel.org>
-References: <20181105232526.173947-1-ebiggers@kernel.org>
+        id S2388549AbeKGGTo (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 7 Nov 2018 01:19:44 -0500
+From: Logan Gunthorpe <logang@deltatee.com>
+To: linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
+        linux-ntb@googlegroups.com, linux-crypto@vger.kernel.org,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc: Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Andy Shevchenko <andy.shevchenko@gmail.com>,
+        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        "James E.J. Bottomley" <jejb@parisc-linux.org>,
+        Philippe Ombredanne <pombredanne@nexb.com>,
+        Kate Stewart <kstewart@linuxfoundation.org>,
+        Thomas Gleixner <tglx@linutronix.de>
+Date: Tue,  6 Nov 2018 13:52:30 -0700
+Message-Id: <20181106205234.25792-3-logang@deltatee.com>
+In-Reply-To: <20181106205234.25792-1-logang@deltatee.com>
+References: <20181106205234.25792-1-logang@deltatee.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: [PATCH v23 2/6] parisc: iomap: introduce io{read|write}64
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Eric Biggers <ebiggers@google.com>
+Add support for io{read|write}64() functions in parisc architecture.
+These are pretty straightforward copies of similar functions which
+make use of readq and writeq.
 
-To improve responsivesess, disable preemption for each step of the walk
-(which is at most PAGE_SIZE) rather than for the entire
-encryption/decryption operation.
+Also, indicate that the lo_hi and hi_lo variants of these functions
+are not provided by this architecture.
 
-Suggested-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Signed-off-by: Eric Biggers <ebiggers@google.com>
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+Reviewed-by: Andy Shevchenko <andy.shevchenko@gmail.com>
+Acked-by: Helge Deller <deller@gmx.de>
+Cc: "James E.J. Bottomley" <jejb@parisc-linux.org>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Philippe Ombredanne <pombredanne@nexb.com>
+Cc: Kate Stewart <kstewart@linuxfoundation.org>
+Cc: Thomas Gleixner <tglx@linutronix.de>
 ---
- arch/arm/crypto/chacha20-neon-glue.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ arch/parisc/include/asm/io.h |  9 +++++
+ arch/parisc/lib/iomap.c      | 64 ++++++++++++++++++++++++++++++++++++
+ 2 files changed, 73 insertions(+)
 
-diff --git a/arch/arm/crypto/chacha20-neon-glue.c b/arch/arm/crypto/chacha20-neon-glue.c
-index 7386eb1c1889..2bc035cb8f23 100644
---- a/arch/arm/crypto/chacha20-neon-glue.c
-+++ b/arch/arm/crypto/chacha20-neon-glue.c
-@@ -68,22 +68,22 @@ static int chacha20_neon(struct skcipher_request *req)
- 	if (req->cryptlen <= CHACHA_BLOCK_SIZE || !may_use_simd())
- 		return crypto_chacha_crypt(req);
+diff --git a/arch/parisc/include/asm/io.h b/arch/parisc/include/asm/io.h
+index afe493b23d04..30a8315d5c07 100644
+--- a/arch/parisc/include/asm/io.h
++++ b/arch/parisc/include/asm/io.h
+@@ -311,6 +311,15 @@ extern void outsl (unsigned long port, const void *src, unsigned long count);
+  * value for either 32 or 64 bit mode */
+ #define F_EXTEND(x) ((unsigned long)((x) | (0xffffffff00000000ULL)))
  
--	err = skcipher_walk_virt(&walk, req, true);
-+	err = skcipher_walk_virt(&walk, req, false);
++#define ioread64 ioread64
++#define ioread64be ioread64be
++#define iowrite64 iowrite64
++#define iowrite64be iowrite64be
++extern u64 ioread64(void __iomem *addr);
++extern u64 ioread64be(void __iomem *addr);
++extern void iowrite64(u64 val, void __iomem *addr);
++extern void iowrite64be(u64 val, void __iomem *addr);
++
+ #include <asm-generic/iomap.h>
  
- 	crypto_chacha_init(state, ctx, walk.iv);
- 
--	kernel_neon_begin();
- 	while (walk.nbytes > 0) {
- 		unsigned int nbytes = walk.nbytes;
- 
- 		if (nbytes < walk.total)
- 			nbytes = round_down(nbytes, walk.stride);
- 
-+		kernel_neon_begin();
- 		chacha20_doneon(state, walk.dst.virt.addr, walk.src.virt.addr,
- 				nbytes);
-+		kernel_neon_end();
- 		err = skcipher_walk_done(&walk, walk.nbytes - nbytes);
- 	}
--	kernel_neon_end();
- 
- 	return err;
+ /*
+diff --git a/arch/parisc/lib/iomap.c b/arch/parisc/lib/iomap.c
+index 4b19e6e64fb7..0195aec657e2 100644
+--- a/arch/parisc/lib/iomap.c
++++ b/arch/parisc/lib/iomap.c
+@@ -48,11 +48,15 @@ struct iomap_ops {
+ 	unsigned int (*read16be)(void __iomem *);
+ 	unsigned int (*read32)(void __iomem *);
+ 	unsigned int (*read32be)(void __iomem *);
++	u64 (*read64)(void __iomem *);
++	u64 (*read64be)(void __iomem *);
+ 	void (*write8)(u8, void __iomem *);
+ 	void (*write16)(u16, void __iomem *);
+ 	void (*write16be)(u16, void __iomem *);
+ 	void (*write32)(u32, void __iomem *);
+ 	void (*write32be)(u32, void __iomem *);
++	void (*write64)(u64, void __iomem *);
++	void (*write64be)(u64, void __iomem *);
+ 	void (*read8r)(void __iomem *, void *, unsigned long);
+ 	void (*read16r)(void __iomem *, void *, unsigned long);
+ 	void (*read32r)(void __iomem *, void *, unsigned long);
+@@ -171,6 +175,16 @@ static unsigned int iomem_read32be(void __iomem *addr)
+ 	return __raw_readl(addr);
  }
+ 
++static u64 iomem_read64(void __iomem *addr)
++{
++	return readq(addr);
++}
++
++static u64 iomem_read64be(void __iomem *addr)
++{
++	return __raw_readq(addr);
++}
++
+ static void iomem_write8(u8 datum, void __iomem *addr)
+ {
+ 	writeb(datum, addr);
+@@ -196,6 +210,16 @@ static void iomem_write32be(u32 datum, void __iomem *addr)
+ 	__raw_writel(datum, addr);
+ }
+ 
++static void iomem_write64(u64 datum, void __iomem *addr)
++{
++	writel(datum, addr);
++}
++
++static void iomem_write64be(u64 datum, void __iomem *addr)
++{
++	__raw_writel(datum, addr);
++}
++
+ static void iomem_read8r(void __iomem *addr, void *dst, unsigned long count)
+ {
+ 	while (count--) {
+@@ -250,11 +274,15 @@ static const struct iomap_ops iomem_ops = {
+ 	.read16be = iomem_read16be,
+ 	.read32 = iomem_read32,
+ 	.read32be = iomem_read32be,
++	.read64 = iomem_read64,
++	.read64be = iomem_read64be,
+ 	.write8 = iomem_write8,
+ 	.write16 = iomem_write16,
+ 	.write16be = iomem_write16be,
+ 	.write32 = iomem_write32,
+ 	.write32be = iomem_write32be,
++	.write64 = iomem_write64,
++	.write64be = iomem_write64be,
+ 	.read8r = iomem_read8r,
+ 	.read16r = iomem_read16r,
+ 	.read32r = iomem_read32r,
+@@ -304,6 +332,20 @@ unsigned int ioread32be(void __iomem *addr)
+ 	return *((u32 *)addr);
+ }
+ 
++u64 ioread64(void __iomem *addr)
++{
++	if (unlikely(INDIRECT_ADDR(addr)))
++		return iomap_ops[ADDR_TO_REGION(addr)]->read64(addr);
++	return le64_to_cpup((u64 *)addr);
++}
++
++u64 ioread64be(void __iomem *addr)
++{
++	if (unlikely(INDIRECT_ADDR(addr)))
++		return iomap_ops[ADDR_TO_REGION(addr)]->read64be(addr);
++	return *((u64 *)addr);
++}
++
+ void iowrite8(u8 datum, void __iomem *addr)
+ {
+ 	if (unlikely(INDIRECT_ADDR(addr))) {
+@@ -349,6 +391,24 @@ void iowrite32be(u32 datum, void __iomem *addr)
+ 	}
+ }
+ 
++void iowrite64(u64 datum, void __iomem *addr)
++{
++	if (unlikely(INDIRECT_ADDR(addr))) {
++		iomap_ops[ADDR_TO_REGION(addr)]->write64(datum, addr);
++	} else {
++		*((u64 *)addr) = cpu_to_le64(datum);
++	}
++}
++
++void iowrite64be(u64 datum, void __iomem *addr)
++{
++	if (unlikely(INDIRECT_ADDR(addr))) {
++		iomap_ops[ADDR_TO_REGION(addr)]->write64be(datum, addr);
++	} else {
++		*((u64 *)addr) = datum;
++	}
++}
++
+ /* Repeating interfaces */
+ 
+ void ioread8_rep(void __iomem *addr, void *dst, unsigned long count)
+@@ -449,11 +509,15 @@ EXPORT_SYMBOL(ioread16);
+ EXPORT_SYMBOL(ioread16be);
+ EXPORT_SYMBOL(ioread32);
+ EXPORT_SYMBOL(ioread32be);
++EXPORT_SYMBOL(ioread64);
++EXPORT_SYMBOL(ioread64be);
+ EXPORT_SYMBOL(iowrite8);
+ EXPORT_SYMBOL(iowrite16);
+ EXPORT_SYMBOL(iowrite16be);
+ EXPORT_SYMBOL(iowrite32);
+ EXPORT_SYMBOL(iowrite32be);
++EXPORT_SYMBOL(iowrite64);
++EXPORT_SYMBOL(iowrite64be);
+ EXPORT_SYMBOL(ioread8_rep);
+ EXPORT_SYMBOL(ioread16_rep);
+ EXPORT_SYMBOL(ioread32_rep);
 -- 
-2.19.1.930.g4563a0d9d0-goog
+2.19.0
