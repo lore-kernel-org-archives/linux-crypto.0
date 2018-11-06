@@ -1,204 +1,320 @@
-Return-Path: <SRS0=r3Tc=N4=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:51728 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729894AbeKQLne (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 17 Nov 2018 06:43:34 -0500
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc: linux-fscrypt@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+Return-Path: <SRS0=45GR=NR=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail-it1-f195.google.com ([209.85.166.195]:33940 "EHLO
+        mail-it1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387685AbeKFWGq (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 6 Nov 2018 17:06:46 -0500
+Received: by mail-it1-f195.google.com with SMTP id t189-v6so10335867itf.1
+        for <linux-crypto@vger.kernel.org>; Tue, 06 Nov 2018 04:41:43 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <20181105232526.173947-8-ebiggers@kernel.org>
+References: <20181105232526.173947-1-ebiggers@kernel.org> <20181105232526.173947-8-ebiggers@kernel.org>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date: Tue, 6 Nov 2018 13:41:42 +0100
+Message-ID: <CAKv+Gu8XRDqv+S8oA3AScHpC6LQv7bcfSi0Ynzu6LWOCds7Qog@mail.gmail.com>
+Subject: Re: [RFC PATCH v3 07/15] crypto: arm/chacha20 - add XChaCha20 support
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>, linux-fscrypt@vger.kernel.org,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
         Paul Crowley <paulcrowley@google.com>,
         Greg Kaiser <gkaiser@google.com>,
         "Jason A . Donenfeld" <Jason@zx2c4.com>,
         Samuel Neves <samuel.c.p.neves@gmail.com>,
-        Tomer Ashur <tomer.ashur@esat.kuleuven.be>,
-        Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH v4 00/14] crypto: Adiantum support
-Date: Fri, 16 Nov 2018 17:26:17 -0800
-Message-Id: <20181117012631.23528-1-ebiggers@kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+        Tomer Ashur <tomer.ashur@esat.kuleuven.be>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hello,
+On 6 November 2018 at 00:25, Eric Biggers <ebiggers@kernel.org> wrote:
+> From: Eric Biggers <ebiggers@google.com>
+>
+> Add an XChaCha20 implementation that is hooked up to the ARM NEON
+> implementation of ChaCha20.  This is needed for use in the Adiantum
+> encryption mode; see the generic code patch,
+> "crypto: chacha20-generic - add XChaCha20 support", for more details.
+>
+> We also update the NEON code to support HChaCha20 on one block, so we
+> can use that in XChaCha20 rather than calling the generic HChaCha20.
+> This required factoring the permutation out into its own macro.
+>
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
 
-We've been working to find a way to bring storage encryption to
-entry-level Android devices like the inexpensive "Android Go" devices
-sold in developing countries, and some smartwatches.  Unfortunately,
-often these devices still ship with no encryption, since for cost
-reasons they have to use older CPUs like ARM Cortex-A7; and these CPUs
-lack the ARMv8 Cryptography Extensions, making AES-XTS much too slow.
+Reviewed-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-We're trying to change this, since we believe encryption is for
-everyone, not just those who can afford it.  And while it's unknown how
-long CPUs without AES support will be around, there will likely always
-be a "low end"; and in any case it's immensely valuable to provide a
-software-optimized cipher that doesn't depend on hardware support.
-Lack of hardware support should not be an excuse for no encryption.
-
-But after an extensive search (e.g. see [1]) we were unable to find an
-existing cipher that simultaneously meets the very strict performance
-requirements on ARM processors, is secure (including having sufficient
-security parameters as well as sufficient cryptanalysis of any
-primitive(s) used), is suitable for practical use in dm-crypt and
-fscrypt, *and* avoids any particularly controversial primitive.
-
-Therefore, we (well, Paul Crowley did the real work) designed a new
-encryption mode, Adiantum.  In essence, Adiantum makes it secure to use
-the ChaCha stream cipher for disk encryption.  Adiantum is specified by
-our paper here: https://eprint.iacr.org/2018/720.pdf ("Adiantum:
-length-preserving encryption for entry-level processors").  Reference
-code and test vectors are here: https://github.com/google/adiantum.
-Most of the high-level concepts of Adiantum are not new; similar
-existing modes include XCB, HCTR, and HCH.  Adiantum and these modes are
-true wide-block modes (tweakable super-pseudorandom permutations), so
-they actually provide a stronger notion of security than XTS.
-
-Adiantum is an improved version of our previous algorithm, HPolyC [2].
-Like HPolyC, Adiantum uses XChaCha12, two passes of an
-ε-almost-∆-universal (εA∆U) hash function, and one AES-256 encryption of
-a single 16-byte block.  On ARM Cortex-A7, on 4096-byte messages
-Adiantum is about 4x faster than AES-256-XTS (about 5x for decryption),
-and about 30% faster than Speck128/256-XTS.
-
-Adiantum is a construction, not a primitive.  Its security is reducible
-to that of XChaCha12 and AES-256, subject to a security bound; the proof
-is in Section 5 of our paper.  Therefore, one need not "trust" Adiantum;
-they only need trust XChaCha12 and AES-256.  Note that of these two
-primitives, AES-256 currently has the lower security margin.
-
-Adiantum is ~20% faster than HPolyC, with no loss of security; in fact,
-Adiantum's security bound is slightly better than HPolyC's.  It does
-this by choosing a faster εA∆U hash function: it still uses Poly1305's
-εA∆U hash function, but now a hash function from the "NH" family of hash
-functions is used to "compress" the message by 32x first.  NH is εAU (as
-shown in the UMAC paper[3]) but is over twice as fast as Poly1305.  Key
-agility is reduced, but that's acceptable for disk encryption.
-
-NH is also very simple, and it's easy to implement in SIMD assembly,
-e.g. in ARM NEON.  Now, to get good performance only a SIMD
-implementation of NH is required, not Poly1305.  Therefore, Adiantum can
-be easier to port to new platforms than HPolyC, despite Adiantum's
-slightly increased complexity.  For now this patchset only includes an
-ARM32 NEON implementation of NH, but as a proof of concept I've also
-written SSE2, AVX2, and ARM64 NEON implementations of NH; see
-https://github.com/google/adiantum/tree/master/benchmark/src.
-
-This patchset adds Adiantum to Linux's crypto API, focusing on generic
-and ARM32 implementations.  Patches 1-9 add support for XChaCha20 and
-XChaCha12.  Patches 10-13 add NHPoly1305 support, needed for Adiantum
-hashing.  Patch 14 adds Adiantum support as a skcipher template.
-
-This patchset applies to cryptodev.  It can also be found in git at
-branch "adiantum-v4" of:
-https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git
-
-With this patchset, Adiantum is already usable in dm-crypt via the
-"capi:" cipher syntax.  I'll also be adding Adiantum support to fscrypt
-via the patch https://patchwork.kernel.org/patch/10669339/, but I
-dropped it from this series for now since it will be taken through the
-fscrypt git tree instead.  Note that in fscrypt, Adiantum will also fix
-an information leak in filenames encryption when filenames share a
-common prefix, and Adiantum's long IV support make it safe to use the
-same key for many files, improving performance even more.
-
-Again, for more details please read our paper:
-
-    Adiantum: length-preserving encryption for entry-level processors
-    (https://eprint.iacr.org/2018/720.pdf)
-
-References:
-  [1] https://www.spinics.net/lists/linux-crypto/msg33000.html
-  [2] https://patchwork.kernel.org/cover/10558059/
-  [3] https://fastcrypto.org/umac/umac_proc.pdf
-
-Changed since v3:
-  - Rebase onto cryptodev because of recent ChaCha20 changes.
-  - Drop fscrypt patch; I'm sending it as a standalone patch.
-
-Changed since v2:
-  - Simplify the generic NH implementation.
-  - Add patches to reduce atomic walks and disabling preemption.
-  - Split Poly1305 changes into two patches.
-  - Add tcrypt test mode for Adiantum.
-  - Make NEON 'chacha_permute' a function rather than a macro.
-  - Use .base.* style when declaring algorithms.
-  - Replace BUG_ON() in chacha_permute() with WARN_ON_ONCE().
-  - Set Adiantum instance {min,max}_keysize correctly in all cases.
-  - Make the Adiantum template take the nhpoly1305 driver name as
-    optional third argument (useful for testing).
-
-  Thanks to Ard Biesheuvel for reviewing the patches.
-
-Changed since v1:
-  - Replace HPolyC with Adiantum (uses a faster hash function).
-  - Drop ARM accelerated Poly1305.
-  - Add fscrypt patch.
-
-Eric Biggers (14):
-  crypto: chacha20-generic - add HChaCha20 library function
-  crypto: chacha20-generic - don't unnecessarily use atomic walk
-  crypto: chacha20-generic - add XChaCha20 support
-  crypto: chacha20-generic - refactor to allow varying number of rounds
-  crypto: chacha - add XChaCha12 support
-  crypto: arm/chacha20 - limit the preemption-disabled section
-  crypto: arm/chacha20 - add XChaCha20 support
-  crypto: arm/chacha20 - refactor to allow varying number of rounds
-  crypto: arm/chacha - add XChaCha12 support
-  crypto: poly1305 - use structures for key and accumulator
-  crypto: poly1305 - add Poly1305 core API
-  crypto: nhpoly1305 - add NHPoly1305 support
-  crypto: arm/nhpoly1305 - add NEON-accelerated NHPoly1305
-  crypto: adiantum - add Adiantum support
-
- arch/arm/crypto/Kconfig                       |    7 +-
- arch/arm/crypto/Makefile                      |    6 +-
- ...hacha20-neon-core.S => chacha-neon-core.S} |   98 +-
- arch/arm/crypto/chacha-neon-glue.c            |  201 ++
- arch/arm/crypto/chacha20-neon-glue.c          |  127 -
- arch/arm/crypto/nh-neon-core.S                |  116 +
- arch/arm/crypto/nhpoly1305-neon-glue.c        |   77 +
- arch/arm64/crypto/chacha20-neon-glue.c        |   40 +-
- arch/x86/crypto/chacha20_glue.c               |   48 +-
- arch/x86/crypto/poly1305_glue.c               |   20 +-
- crypto/Kconfig                                |   46 +-
- crypto/Makefile                               |    4 +-
- crypto/adiantum.c                             |  658 ++++
- crypto/chacha20_generic.c                     |  137 -
- crypto/chacha20poly1305.c                     |   10 +-
- crypto/chacha_generic.c                       |  217 ++
- crypto/nhpoly1305.c                           |  254 ++
- crypto/poly1305_generic.c                     |  174 +-
- crypto/tcrypt.c                               |   12 +
- crypto/testmgr.c                              |   30 +
- crypto/testmgr.h                              | 2856 ++++++++++++++++-
- drivers/char/random.c                         |   51 +-
- drivers/crypto/caam/caamalg.c                 |    2 +-
- drivers/crypto/caam/caamalg_qi2.c             |    8 +-
- drivers/crypto/caam/compat.h                  |    2 +-
- include/crypto/chacha.h                       |   54 +
- include/crypto/chacha20.h                     |   28 -
- include/crypto/nhpoly1305.h                   |   74 +
- include/crypto/poly1305.h                     |   28 +-
- lib/Makefile                                  |    2 +-
- lib/{chacha20.c => chacha.c}                  |   59 +-
- 31 files changed, 4931 insertions(+), 515 deletions(-)
- rename arch/arm/crypto/{chacha20-neon-core.S => chacha-neon-core.S} (90%)
- create mode 100644 arch/arm/crypto/chacha-neon-glue.c
- delete mode 100644 arch/arm/crypto/chacha20-neon-glue.c
- create mode 100644 arch/arm/crypto/nh-neon-core.S
- create mode 100644 arch/arm/crypto/nhpoly1305-neon-glue.c
- create mode 100644 crypto/adiantum.c
- delete mode 100644 crypto/chacha20_generic.c
- create mode 100644 crypto/chacha_generic.c
- create mode 100644 crypto/nhpoly1305.c
- create mode 100644 include/crypto/chacha.h
- delete mode 100644 include/crypto/chacha20.h
- create mode 100644 include/crypto/nhpoly1305.h
- rename lib/{chacha20.c => chacha.c} (58%)
-
--- 
-2.19.1.1215.g8438c0b245-goog
+> ---
+>  arch/arm/crypto/Kconfig              |   2 +-
+>  arch/arm/crypto/chacha20-neon-core.S |  70 ++++++++++++------
+>  arch/arm/crypto/chacha20-neon-glue.c | 103 ++++++++++++++++++++-------
+>  3 files changed, 126 insertions(+), 49 deletions(-)
+>
+> diff --git a/arch/arm/crypto/Kconfig b/arch/arm/crypto/Kconfig
+> index ef0c7feea6e2..0aa1471f27d2 100644
+> --- a/arch/arm/crypto/Kconfig
+> +++ b/arch/arm/crypto/Kconfig
+> @@ -117,7 +117,7 @@ config CRYPTO_CRC32_ARM_CE
+>         select CRYPTO_HASH
+>
+>  config CRYPTO_CHACHA20_NEON
+> -       tristate "NEON accelerated ChaCha20 symmetric cipher"
+> +       tristate "NEON accelerated ChaCha20 stream cipher algorithms"
+>         depends on KERNEL_MODE_NEON
+>         select CRYPTO_BLKCIPHER
+>         select CRYPTO_CHACHA20
+> diff --git a/arch/arm/crypto/chacha20-neon-core.S b/arch/arm/crypto/chacha20-neon-core.S
+> index 50e7b9896818..2335e5055d2b 100644
+> --- a/arch/arm/crypto/chacha20-neon-core.S
+> +++ b/arch/arm/crypto/chacha20-neon-core.S
+> @@ -52,27 +52,16 @@
+>         .fpu            neon
+>         .align          5
+>
+> -ENTRY(chacha20_block_xor_neon)
+> -       // r0: Input state matrix, s
+> -       // r1: 1 data block output, o
+> -       // r2: 1 data block input, i
+> -
+> -       //
+> -       // This function encrypts one ChaCha20 block by loading the state matrix
+> -       // in four NEON registers. It performs matrix operation on four words in
+> -       // parallel, but requireds shuffling to rearrange the words after each
+> -       // round.
+> -       //
+> -
+> -       // x0..3 = s0..3
+> -       add             ip, r0, #0x20
+> -       vld1.32         {q0-q1}, [r0]
+> -       vld1.32         {q2-q3}, [ip]
+> -
+> -       vmov            q8, q0
+> -       vmov            q9, q1
+> -       vmov            q10, q2
+> -       vmov            q11, q3
+> +/*
+> + * chacha20_permute - permute one block
+> + *
+> + * Permute one 64-byte block where the state matrix is stored in the four NEON
+> + * registers q0-q3.  It performs matrix operations on four words in parallel,
+> + * but requires shuffling to rearrange the words after each round.
+> + *
+> + * Clobbers: r3, ip, q4-q5
+> + */
+> +chacha20_permute:
+>
+>         adr             ip, .Lrol8_table
+>         mov             r3, #10
+> @@ -142,6 +131,27 @@ ENTRY(chacha20_block_xor_neon)
+>         subs            r3, r3, #1
+>         bne             .Ldoubleround
+>
+> +       bx              lr
+> +ENDPROC(chacha20_permute)
+> +
+> +ENTRY(chacha20_block_xor_neon)
+> +       // r0: Input state matrix, s
+> +       // r1: 1 data block output, o
+> +       // r2: 1 data block input, i
+> +       push            {lr}
+> +
+> +       // x0..3 = s0..3
+> +       add             ip, r0, #0x20
+> +       vld1.32         {q0-q1}, [r0]
+> +       vld1.32         {q2-q3}, [ip]
+> +
+> +       vmov            q8, q0
+> +       vmov            q9, q1
+> +       vmov            q10, q2
+> +       vmov            q11, q3
+> +
+> +       bl              chacha20_permute
+> +
+>         add             ip, r2, #0x20
+>         vld1.8          {q4-q5}, [r2]
+>         vld1.8          {q6-q7}, [ip]
+> @@ -166,9 +176,25 @@ ENTRY(chacha20_block_xor_neon)
+>         vst1.8          {q0-q1}, [r1]
+>         vst1.8          {q2-q3}, [ip]
+>
+> -       bx              lr
+> +       pop             {pc}
+>  ENDPROC(chacha20_block_xor_neon)
+>
+> +ENTRY(hchacha20_block_neon)
+> +       // r0: Input state matrix, s
+> +       // r1: output (8 32-bit words)
+> +       push            {lr}
+> +
+> +       vld1.32         {q0-q1}, [r0]!
+> +       vld1.32         {q2-q3}, [r0]
+> +
+> +       bl              chacha20_permute
+> +
+> +       vst1.32         {q0}, [r1]!
+> +       vst1.32         {q3}, [r1]
+> +
+> +       pop             {pc}
+> +ENDPROC(hchacha20_block_neon)
+> +
+>         .align          4
+>  .Lctrinc:      .word   0, 1, 2, 3
+>  .Lrol8_table:  .byte   3, 0, 1, 2, 7, 4, 5, 6
+> diff --git a/arch/arm/crypto/chacha20-neon-glue.c b/arch/arm/crypto/chacha20-neon-glue.c
+> index 2bc035cb8f23..f2d3b0f70a8d 100644
+> --- a/arch/arm/crypto/chacha20-neon-glue.c
+> +++ b/arch/arm/crypto/chacha20-neon-glue.c
+> @@ -1,5 +1,5 @@
+>  /*
+> - * ChaCha20 256-bit cipher algorithm, RFC7539, ARM NEON functions
+> + * ChaCha20 (RFC7539) and XChaCha20 stream ciphers, NEON accelerated
+>   *
+>   * Copyright (C) 2016 Linaro, Ltd. <ard.biesheuvel@linaro.org>
+>   *
+> @@ -30,6 +30,7 @@
+>
+>  asmlinkage void chacha20_block_xor_neon(u32 *state, u8 *dst, const u8 *src);
+>  asmlinkage void chacha20_4block_xor_neon(u32 *state, u8 *dst, const u8 *src);
+> +asmlinkage void hchacha20_block_neon(const u32 *state, u32 *out);
+>
+>  static void chacha20_doneon(u32 *state, u8 *dst, const u8 *src,
+>                             unsigned int bytes)
+> @@ -57,20 +58,16 @@ static void chacha20_doneon(u32 *state, u8 *dst, const u8 *src,
+>         }
+>  }
+>
+> -static int chacha20_neon(struct skcipher_request *req)
+> +static int chacha20_neon_stream_xor(struct skcipher_request *req,
+> +                                   struct chacha_ctx *ctx, u8 *iv)
+>  {
+> -       struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+> -       struct chacha_ctx *ctx = crypto_skcipher_ctx(tfm);
+>         struct skcipher_walk walk;
+>         u32 state[16];
+>         int err;
+>
+> -       if (req->cryptlen <= CHACHA_BLOCK_SIZE || !may_use_simd())
+> -               return crypto_chacha_crypt(req);
+> -
+>         err = skcipher_walk_virt(&walk, req, false);
+>
+> -       crypto_chacha_init(state, ctx, walk.iv);
+> +       crypto_chacha_init(state, ctx, iv);
+>
+>         while (walk.nbytes > 0) {
+>                 unsigned int nbytes = walk.nbytes;
+> @@ -88,22 +85,73 @@ static int chacha20_neon(struct skcipher_request *req)
+>         return err;
+>  }
+>
+> -static struct skcipher_alg alg = {
+> -       .base.cra_name          = "chacha20",
+> -       .base.cra_driver_name   = "chacha20-neon",
+> -       .base.cra_priority      = 300,
+> -       .base.cra_blocksize     = 1,
+> -       .base.cra_ctxsize       = sizeof(struct chacha_ctx),
+> -       .base.cra_module        = THIS_MODULE,
+> -
+> -       .min_keysize            = CHACHA_KEY_SIZE,
+> -       .max_keysize            = CHACHA_KEY_SIZE,
+> -       .ivsize                 = CHACHA_IV_SIZE,
+> -       .chunksize              = CHACHA_BLOCK_SIZE,
+> -       .walksize               = 4 * CHACHA_BLOCK_SIZE,
+> -       .setkey                 = crypto_chacha20_setkey,
+> -       .encrypt                = chacha20_neon,
+> -       .decrypt                = chacha20_neon,
+> +static int chacha20_neon(struct skcipher_request *req)
+> +{
+> +       struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+> +       struct chacha_ctx *ctx = crypto_skcipher_ctx(tfm);
+> +
+> +       if (req->cryptlen <= CHACHA_BLOCK_SIZE || !may_use_simd())
+> +               return crypto_chacha_crypt(req);
+> +
+> +       return chacha20_neon_stream_xor(req, ctx, req->iv);
+> +}
+> +
+> +static int xchacha20_neon(struct skcipher_request *req)
+> +{
+> +       struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+> +       struct chacha_ctx *ctx = crypto_skcipher_ctx(tfm);
+> +       struct chacha_ctx subctx;
+> +       u32 state[16];
+> +       u8 real_iv[16];
+> +
+> +       if (req->cryptlen <= CHACHA_BLOCK_SIZE || !may_use_simd())
+> +               return crypto_xchacha_crypt(req);
+> +
+> +       crypto_chacha_init(state, ctx, req->iv);
+> +
+> +       kernel_neon_begin();
+> +       hchacha20_block_neon(state, subctx.key);
+> +       kernel_neon_end();
+> +
+> +       memcpy(&real_iv[0], req->iv + 24, 8);
+> +       memcpy(&real_iv[8], req->iv + 16, 8);
+> +       return chacha20_neon_stream_xor(req, &subctx, real_iv);
+> +}
+> +
+> +static struct skcipher_alg algs[] = {
+> +       {
+> +               .base.cra_name          = "chacha20",
+> +               .base.cra_driver_name   = "chacha20-neon",
+> +               .base.cra_priority      = 300,
+> +               .base.cra_blocksize     = 1,
+> +               .base.cra_ctxsize       = sizeof(struct chacha_ctx),
+> +               .base.cra_module        = THIS_MODULE,
+> +
+> +               .min_keysize            = CHACHA_KEY_SIZE,
+> +               .max_keysize            = CHACHA_KEY_SIZE,
+> +               .ivsize                 = CHACHA_IV_SIZE,
+> +               .chunksize              = CHACHA_BLOCK_SIZE,
+> +               .walksize               = 4 * CHACHA_BLOCK_SIZE,
+> +               .setkey                 = crypto_chacha20_setkey,
+> +               .encrypt                = chacha20_neon,
+> +               .decrypt                = chacha20_neon,
+> +       }, {
+> +               .base.cra_name          = "xchacha20",
+> +               .base.cra_driver_name   = "xchacha20-neon",
+> +               .base.cra_priority      = 300,
+> +               .base.cra_blocksize     = 1,
+> +               .base.cra_ctxsize       = sizeof(struct chacha_ctx),
+> +               .base.cra_module        = THIS_MODULE,
+> +
+> +               .min_keysize            = CHACHA_KEY_SIZE,
+> +               .max_keysize            = CHACHA_KEY_SIZE,
+> +               .ivsize                 = XCHACHA_IV_SIZE,
+> +               .chunksize              = CHACHA_BLOCK_SIZE,
+> +               .walksize               = 4 * CHACHA_BLOCK_SIZE,
+> +               .setkey                 = crypto_chacha20_setkey,
+> +               .encrypt                = xchacha20_neon,
+> +               .decrypt                = xchacha20_neon,
+> +       }
+>  };
+>
+>  static int __init chacha20_simd_mod_init(void)
+> @@ -111,12 +159,12 @@ static int __init chacha20_simd_mod_init(void)
+>         if (!(elf_hwcap & HWCAP_NEON))
+>                 return -ENODEV;
+>
+> -       return crypto_register_skcipher(&alg);
+> +       return crypto_register_skciphers(algs, ARRAY_SIZE(algs));
+>  }
+>
+>  static void __exit chacha20_simd_mod_fini(void)
+>  {
+> -       crypto_unregister_skcipher(&alg);
+> +       crypto_unregister_skciphers(algs, ARRAY_SIZE(algs));
+>  }
+>
+>  module_init(chacha20_simd_mod_init);
+> @@ -125,3 +173,6 @@ module_exit(chacha20_simd_mod_fini);
+>  MODULE_AUTHOR("Ard Biesheuvel <ard.biesheuvel@linaro.org>");
+>  MODULE_LICENSE("GPL v2");
+>  MODULE_ALIAS_CRYPTO("chacha20");
+> +MODULE_ALIAS_CRYPTO("chacha20-neon");
+> +MODULE_ALIAS_CRYPTO("xchacha20");
+> +MODULE_ALIAS_CRYPTO("xchacha20-neon");
+> --
+> 2.19.1.930.g4563a0d9d0-goog
+>
