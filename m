@@ -1,88 +1,86 @@
-Return-Path: <SRS0=9Ofa=N6=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:43368 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730417AbeKTGaf (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 20 Nov 2018 01:30:35 -0500
-Subject: Re: [RFC PATCH v2 00/12] crypto: Adiantum support
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        linux-fscrypt@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        LKML <linux-kernel@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Paul Crowley <paulcrowley@google.com>,
-        Greg Kaiser <gkaiser@google.com>,
-        Michael Halcrow <mhalcrow@google.com>,
-        Samuel Neves <samuel.c.p.neves@gmail.com>,
-        Tomer Ashur <tomer.ashur@esat.kuleuven.be>
-References: <20181015175424.97147-1-ebiggers@kernel.org>
- <CAHmME9p1aiqWZ4+viaLscO8+qmixdVhMA1MAtMAFEHPG36DcPg@mail.gmail.com>
- <20181019190411.GB246441@gmail.com>
- <1f65ce09-93b3-f43e-49d5-9d9d6c0bb9e0@gmail.com>
- <20181116215249.GA27149@gmail.com>
- <56883f08-26cb-ecef-5698-1c2948714773@gmail.com>
- <20181119192821.GA258711@gmail.com>
-From: Milan Broz <gmazyland@gmail.com>
-Message-ID: <1e9ec59a-6a2c-3536-0722-c6d96d6714b2@gmail.com>
-Date: Mon, 19 Nov 2018 21:05:18 +0100
+Return-Path: <SRS0=45GR=NR=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from ale.deltatee.com ([207.54.116.67]:39538 "EHLO ale.deltatee.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726739AbeKGGTn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 7 Nov 2018 01:19:43 -0500
+From: Logan Gunthorpe <logang@deltatee.com>
+To: linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
+        linux-ntb@googlegroups.com, linux-crypto@vger.kernel.org,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc: Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Andy Shevchenko <andy.shevchenko@gmail.com>,
+        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Kate Stewart <kstewart@linuxfoundation.org>,
+        Philippe Ombredanne <pombredanne@nexb.com>
+Date: Tue,  6 Nov 2018 13:52:29 -0700
+Message-Id: <20181106205234.25792-2-logang@deltatee.com>
+In-Reply-To: <20181106205234.25792-1-logang@deltatee.com>
+References: <20181106205234.25792-1-logang@deltatee.com>
 MIME-Version: 1.0
-In-Reply-To: <20181119192821.GA258711@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: [PATCH v23 1/6] iomap: Use non-raw io functions for io{read|write}XXbe
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
+Fix an asymmetry in the io{read|write}XXbe functions in that the
+big-endian variants make use of the raw io accessors while the
+little-endian variants use the regular accessors. Some architectures
+implement barriers to order against both spinlocks and DMA accesses
+and for these case, the big-endian variant of the API would not be
+protected.
 
-On 19/11/2018 20:28, Eric Biggers wrote:
-> Note that Adiantum benchmarks on x86 are misleading at the moment, since the
-> initial kernel patchset doesn't include SSE2 and AVX2 optimized XChaCha and
-> NHPoly1305.  To start, only C and arm32 NEON implementations are included.
-> Hence, on x86 Adiantum will appear much slower than it should be.  But I'm
-> planning to add the x86 and arm64 implementations, so it will get much faster.
+Thus, change the mmio_XXXXbe macros to use the appropriate swab() function
+wrapping the regular accessor. This is similar to what was done for PIO.
 
-The posted benchmark was just an example (it was 32bit virtual machine on my
-old laptop so numbers are misleading).
+When this code was originally written, barriers in the IO accessors were
+not common and the accessors simply wrapped the raw functions in a
+conversion to CPU endianness. Since then, barriers have been added in
+some architectures and are now missing in the big endian variant of the
+API.
 
-If Adiantum is going to be merged, I expect it can be used as an alternative
-even on x86, so I expect more optimizations.
+This also manages to silence a few sparse warnings that check
+for using the correct endian types which the original code did
+not annotate correctly.
 
-...
-> I think that when using AF_ALG, cryptsetup should get the IV size from
-> /proc/crypto, or else have it hardcoded that "adiantum" uses 32-byte IVs.
-> (Actually Adiantum can formally can use any size IV, but we had to choose a
-> fixed size for Linux's crypto API.)
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Kate Stewart <kstewart@linuxfoundation.org>
+Cc: Philippe Ombredanne <pombredanne@nexb.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Arnd Bergmann <arnd@arndb.de>
+Link: http://lkml.kernel.org/r/CAK8P3a25zQDxyaY3iVv+JmSSzs7F6ssGc+HdBkGs54ZfViX+Fg@mail.gmail.com
+---
+ lib/iomap.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-I do not want to parse /proc/crypto (it needs to load the module first anyway)
-and proper API was not yet here when I wrote this code (I think we were the first
-real user of userspace crypto api...)
-
-> Getting the IV size via CRYPTO_MSG_GETALG via NETLINK_CRYPTO is also an option,
-> but that requires the kconfig option CONFIG_CRYPTO_USER which isn't guaranteed
-> to be enabled even if CONFIG_CRYPTO_USER_API_SKCIPHER is.
-
-Yes. For now, I hardcode Adiantum IV size in cryptsetup and later we will try to
-find a more generic way.
-
-> Also: why is cryptsetup's default keyslot encryption AES-128-XTS instead of
-> AES-256-XTS?  People can choose a cipher with a 256-bit key strength such as
-> AES-256-XTS or Adiantum, so the keyslots should use at least that strength too.
-
-It was inherited from 256bit default key (so 2xAES-128 in XTS).
-It is still the default for LUKS1, but we should perhaps change it to double key
-it for XTS mode (at least for fallback keyslot encryption).
-
-Anyway, we will release cryptsetup 2.0.6 very soon to fix one problem
-in LUKS2, so I'll add the Adiantum IV size there as well so people can play with it.
-
-Thanks,
-Milan
-
-p.s.
-Reading the discussion about Zinc/Adiantum - I would perhaps prefer to merge
-Adiantum first (if it is ready).
-It is a new feature, I see it as useful cipher alternative for dm-crypt and it can be
-esily backported without Zinc to older kernels (I am testing it actually this way).
+diff --git a/lib/iomap.c b/lib/iomap.c
+index 541d926da95e..2c293b22569f 100644
+--- a/lib/iomap.c
++++ b/lib/iomap.c
+@@ -65,8 +65,8 @@ static void bad_io_access(unsigned long port, const char *access)
+ #endif
+ 
+ #ifndef mmio_read16be
+-#define mmio_read16be(addr) be16_to_cpu(__raw_readw(addr))
+-#define mmio_read32be(addr) be32_to_cpu(__raw_readl(addr))
++#define mmio_read16be(addr) swab16(readw(addr))
++#define mmio_read32be(addr) swab32(readl(addr))
+ #endif
+ 
+ unsigned int ioread8(void __iomem *addr)
+@@ -106,8 +106,8 @@ EXPORT_SYMBOL(ioread32be);
+ #endif
+ 
+ #ifndef mmio_write16be
+-#define mmio_write16be(val,port) __raw_writew(be16_to_cpu(val),port)
+-#define mmio_write32be(val,port) __raw_writel(be32_to_cpu(val),port)
++#define mmio_write16be(val,port) writew(swab16(val),port)
++#define mmio_write32be(val,port) writel(swab32(val),port)
+ #endif
+ 
+ void iowrite8(u8 val, void __iomem *addr)
+-- 
+2.19.0
