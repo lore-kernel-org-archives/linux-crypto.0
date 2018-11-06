@@ -1,197 +1,59 @@
 Return-Path: <SRS0=45GR=NR=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from ale.deltatee.com ([207.54.116.67]:39568 "EHLO ale.deltatee.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388547AbeKGGTp (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 7 Nov 2018 01:19:45 -0500
-From: Logan Gunthorpe <logang@deltatee.com>
-To: linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
-        linux-ntb@googlegroups.com, linux-crypto@vger.kernel.org,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc: Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Andy Shevchenko <andy.shevchenko@gmail.com>,
-        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Alan Cox <gnomes@lxorguk.ukuu.org.uk>
-Date: Tue,  6 Nov 2018 13:52:32 -0700
-Message-Id: <20181106205234.25792-5-logang@deltatee.com>
-In-Reply-To: <20181106205234.25792-1-logang@deltatee.com>
-References: <20181106205234.25792-1-logang@deltatee.com>
+Received: from mail-vs1-f68.google.com ([209.85.217.68]:33236 "EHLO
+        mail-vs1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727481AbeKFMrv (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 6 Nov 2018 07:47:51 -0500
+Received: by mail-vs1-f68.google.com with SMTP id p74so6491243vsc.0
+        for <linux-crypto@vger.kernel.org>; Mon, 05 Nov 2018 19:24:49 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [PATCH v23 4/6] io-64-nonatomic: add io{read|write}64[be]{_lo_hi|_hi_lo} macros
+Reply-To: ibrahimrahman3048@gmail.com
+From: Mr ibrahim Rahman <ibrahimrahman084@gmail.com>
+Date: Tue, 6 Nov 2018 03:24:47 +0000
+Message-ID: <CAOC8ejfZZiVSJfCb_kjYJ90n9LrjCTX89_3BcNVo+DH6z05+nQ@mail.gmail.com>
+Subject: Dear Sir/Madam!
+To: undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch adds generic io{read|write}64[be]{_lo_hi|_hi_lo} macros if
-they are not already defined by the architecture. (As they are provided
-by the generic iomap library).
+Dear how are you,
 
-The patch also points io{read|write}64[be] to the variant specified by the
-header name.
+How Are You? I Know That This Mail May Come To You Almost A Surprise
+As We Never Met Before And Please Before You Proceed Reading This
+mail,This Is True and not An Well I Saw Your Contact Email From Yahoo
+Search when I Was Looking For a Foreign Partner, please I don=E2=80=99t now=
+ if
+you can keep secret? A word of your own as a human-being? As I have
+gone through your profile.Well I have a deal worth 15.5m$ from the
+dormant account in the bank where I am working.so Please if you can
+keep secret, I will give you more details and the nest thing to do,
 
-This is because new drivers are encouraged to use ioreadXX, et al instead
-of readX[1], et al -- and mixing ioreadXX with readq is pretty ugly.
+Also all the documents that will back you up must send to you.
+Meanwhile before I contact you I have done every underground work
+through the documents of the deceases person, I have put or attachment
+his file to our favor. Also with my position every thing works
+successfully.
 
-[1] LDD3: section 9.4.2
+Your Full Name,
+Phone No=E2=80=A6.,
+Receiver Country..,
+Occupation..,
 
-Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-Reviewed-by: Andy Shevchenko <andy.shevchenko@gmail.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Arnd Bergmann <arnd@arndb.de>
-Cc: Alan Cox <gnomes@lxorguk.ukuu.org.uk>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
----
- include/linux/io-64-nonatomic-hi-lo.h | 64 +++++++++++++++++++++++++++
- include/linux/io-64-nonatomic-lo-hi.h | 64 +++++++++++++++++++++++++++
- 2 files changed, 128 insertions(+)
+thanks for your understand please contact me base if you can control
+this fund once it transfer into your account before my family and I
+will arriver in your country for the sharing, 40% for you. 10% for the
+poorest, rest is for me.
+Give me your Phone number Let me call you so that we can talk one and one=
+=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6
 
-diff --git a/include/linux/io-64-nonatomic-hi-lo.h b/include/linux/io-64-nonatomic-hi-lo.h
-index 862d786a904f..ae21b72cce85 100644
---- a/include/linux/io-64-nonatomic-hi-lo.h
-+++ b/include/linux/io-64-nonatomic-hi-lo.h
-@@ -55,4 +55,68 @@ static inline void hi_lo_writeq_relaxed(__u64 val, volatile void __iomem *addr)
- #define writeq_relaxed hi_lo_writeq_relaxed
- #endif
- 
-+#ifndef ioread64_hi_lo
-+#define ioread64_hi_lo ioread64_hi_lo
-+static inline u64 ioread64_hi_lo(void __iomem *addr)
-+{
-+	u32 low, high;
-+
-+	high = ioread32(addr + sizeof(u32));
-+	low = ioread32(addr);
-+
-+	return low + ((u64)high << 32);
-+}
-+#endif
-+
-+#ifndef iowrite64_hi_lo
-+#define iowrite64_hi_lo iowrite64_hi_lo
-+static inline void iowrite64_hi_lo(u64 val, void __iomem *addr)
-+{
-+	iowrite32(val >> 32, addr + sizeof(u32));
-+	iowrite32(val, addr);
-+}
-+#endif
-+
-+#ifndef ioread64be_hi_lo
-+#define ioread64be_hi_lo ioread64be_hi_lo
-+static inline u64 ioread64be_hi_lo(void __iomem *addr)
-+{
-+	u32 low, high;
-+
-+	high = ioread32be(addr);
-+	low = ioread32be(addr + sizeof(u32));
-+
-+	return low + ((u64)high << 32);
-+}
-+#endif
-+
-+#ifndef iowrite64be_hi_lo
-+#define iowrite64be_hi_lo iowrite64be_hi_lo
-+static inline void iowrite64be_hi_lo(u64 val, void __iomem *addr)
-+{
-+	iowrite32be(val >> 32, addr);
-+	iowrite32be(val, addr + sizeof(u32));
-+}
-+#endif
-+
-+#ifndef ioread64
-+#define ioread64_is_nonatomic
-+#define ioread64 ioread64_hi_lo
-+#endif
-+
-+#ifndef iowrite64
-+#define iowrite64_is_nonatomic
-+#define iowrite64 iowrite64_hi_lo
-+#endif
-+
-+#ifndef ioread64be
-+#define ioread64be_is_nonatomic
-+#define ioread64be ioread64be_hi_lo
-+#endif
-+
-+#ifndef iowrite64be
-+#define iowrite64be_is_nonatomic
-+#define iowrite64be iowrite64be_hi_lo
-+#endif
-+
- #endif	/* _LINUX_IO_64_NONATOMIC_HI_LO_H_ */
-diff --git a/include/linux/io-64-nonatomic-lo-hi.h b/include/linux/io-64-nonatomic-lo-hi.h
-index d042e7bb5adb..faaa842dbdb9 100644
---- a/include/linux/io-64-nonatomic-lo-hi.h
-+++ b/include/linux/io-64-nonatomic-lo-hi.h
-@@ -55,4 +55,68 @@ static inline void lo_hi_writeq_relaxed(__u64 val, volatile void __iomem *addr)
- #define writeq_relaxed lo_hi_writeq_relaxed
- #endif
- 
-+#ifndef ioread64_lo_hi
-+#define ioread64_lo_hi ioread64_lo_hi
-+static inline u64 ioread64_lo_hi(void __iomem *addr)
-+{
-+	u32 low, high;
-+
-+	low = ioread32(addr);
-+	high = ioread32(addr + sizeof(u32));
-+
-+	return low + ((u64)high << 32);
-+}
-+#endif
-+
-+#ifndef iowrite64_lo_hi
-+#define iowrite64_lo_hi iowrite64_lo_hi
-+static inline void iowrite64_lo_hi(u64 val, void __iomem *addr)
-+{
-+	iowrite32(val, addr);
-+	iowrite32(val >> 32, addr + sizeof(u32));
-+}
-+#endif
-+
-+#ifndef ioread64be_lo_hi
-+#define ioread64be_lo_hi ioread64be_lo_hi
-+static inline u64 ioread64be_lo_hi(void __iomem *addr)
-+{
-+	u32 low, high;
-+
-+	low = ioread32be(addr + sizeof(u32));
-+	high = ioread32be(addr);
-+
-+	return low + ((u64)high << 32);
-+}
-+#endif
-+
-+#ifndef iowrite64be_lo_hi
-+#define iowrite64be_lo_hi iowrite64be_lo_hi
-+static inline void iowrite64be_lo_hi(u64 val, void __iomem *addr)
-+{
-+	iowrite32be(val, addr + sizeof(u32));
-+	iowrite32be(val >> 32, addr);
-+}
-+#endif
-+
-+#ifndef ioread64
-+#define ioread64_is_nonatomic
-+#define ioread64 ioread64_lo_hi
-+#endif
-+
-+#ifndef iowrite64
-+#define iowrite64_is_nonatomic
-+#define iowrite64 iowrite64_lo_hi
-+#endif
-+
-+#ifndef ioread64be
-+#define ioread64be_is_nonatomic
-+#define ioread64be ioread64be_lo_hi
-+#endif
-+
-+#ifndef iowrite64be
-+#define iowrite64be_is_nonatomic
-+#define iowrite64be iowrite64be_lo_hi
-+#endif
-+
- #endif	/* _LINUX_IO_64_NONATOMIC_LO_HI_H_ */
--- 
-2.19.0
+You should contact me immediately as soon as you receive this
+letter,if only you are interested and ready to help On this Contact
+me. through my private email address (ibrahimrahman3048@gmail.com)
+Trusting to hear from you immediately. Do keep this a top secret for
+security reasons.
+
+Yours faithfully,
+
+>From Mr.Ibrahim Rahman.
