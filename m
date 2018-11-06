@@ -1,154 +1,273 @@
-Return-Path: <SRS0=1iZj=N3=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54696 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725804AbeKQGW1 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 17 Nov 2018 01:22:27 -0500
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id wAGK4Gtx090045
-        for <linux-crypto@vger.kernel.org>; Fri, 16 Nov 2018 15:08:38 -0500
-Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2nt11897xw-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <linux-crypto@vger.kernel.org>; Fri, 16 Nov 2018 15:08:38 -0500
-Received: from localhost
-        by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-crypto@vger.kernel.org> from <bauerman@linux.ibm.com>;
-        Fri, 16 Nov 2018 20:08:37 -0000
-From: Thiago Jung Bauermann <bauerman@linux.ibm.com>
-To: linux-integrity@vger.kernel.org
-Cc: linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        David Howells <dhowells@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Jessica Yu <jeyu@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jonathan Corbet <corbet@lwn.net>,
-        "AKASHI, Takahiro" <takahiro.akashi@linaro.org>,
-        Thiago Jung Bauermann <bauerman@linux.ibm.com>
-Subject: [PATCH v8 04/14] integrity: Introduce struct evm_xattr
-Date: Fri, 16 Nov 2018 18:07:02 -0200
-In-Reply-To: <20181116200712.14154-1-bauerman@linux.ibm.com>
-References: <20181116200712.14154-1-bauerman@linux.ibm.com>
-Message-Id: <20181116200712.14154-5-bauerman@linux.ibm.com>
+Return-Path: <SRS0=45GR=NR=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from ale.deltatee.com ([207.54.116.67]:39622 "EHLO ale.deltatee.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2388724AbeKGGTs (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 7 Nov 2018 01:19:48 -0500
+From: Logan Gunthorpe <logang@deltatee.com>
+To: linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
+        linux-ntb@googlegroups.com, linux-crypto@vger.kernel.org,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc: Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Andy Shevchenko <andy.shevchenko@gmail.com>,
+        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Suresh Warrier <warrier@linux.vnet.ibm.com>,
+        Nicholas Piggin <npiggin@gmail.com>
+Date: Tue,  6 Nov 2018 13:52:31 -0700
+Message-Id: <20181106205234.25792-4-logang@deltatee.com>
+In-Reply-To: <20181106205234.25792-1-logang@deltatee.com>
+References: <20181106205234.25792-1-logang@deltatee.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: [PATCH v23 3/6] iomap: introduce io{read|write}64_{lo_hi|hi_lo}
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Even though struct evm_ima_xattr_data includes a fixed-size array to hold a
-SHA1 digest, most of the code ignores the array and uses the struct to mean
-"type indicator followed by data of unspecified size" and tracks the real
-size of what the struct represents in a separate length variable.
+In order to provide non-atomic functions for io{read|write}64 that will
+use readq and writeq when appropriate. We define a number of variants
+of these functions in the generic iomap that will do non-atomic
+operations on pio but atomic operations on mmio.
 
-The only exception to that is the EVM code, which correctly uses the
-definition of struct evm_ima_xattr_data.
+These functions are only defined if readq and writeq are defined. If
+they are not, then the wrappers that always use non-atomic operations
+from include/linux/io-64-nonatomic*.h will be used.
 
-So make this explicit in the code by removing the length specification from
-the array in struct evm_ima_xattr_data. Also, change the name of the
-element from digest to data since in most places the array doesn't hold a
-digest.
-
-A separate struct evm_xattr is introduced, with the original definition of
-evm_ima_xattr_data to be used in the places that actually expect that
-definition.
-
-Signed-off-by: Thiago Jung Bauermann <bauerman@linux.ibm.com>
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+Reviewed-by: Andy Shevchenko <andy.shevchenko@gmail.com>
+Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Cc: Paul Mackerras <paulus@samba.org>
+Cc: Michael Ellerman <mpe@ellerman.id.au>
+Cc: Arnd Bergmann <arnd@arndb.de>
+Cc: Suresh Warrier <warrier@linux.vnet.ibm.com>
+Cc: Nicholas Piggin <npiggin@gmail.com>
 ---
- security/integrity/evm/evm_main.c     | 8 ++++----
- security/integrity/ima/ima_appraise.c | 7 ++++---
- security/integrity/integrity.h        | 5 +++++
- 3 files changed, 13 insertions(+), 7 deletions(-)
+ arch/powerpc/include/asm/io.h |   2 +
+ include/asm-generic/iomap.h   |  22 ++++++
+ lib/iomap.c                   | 132 ++++++++++++++++++++++++++++++++++
+ 3 files changed, 156 insertions(+)
 
-diff --git a/security/integrity/evm/evm_main.c b/security/integrity/evm/evm_main.c
-index 7f3f54d89a6e..a1b42d10efc7 100644
---- a/security/integrity/evm/evm_main.c
-+++ b/security/integrity/evm/evm_main.c
-@@ -169,7 +169,7 @@ static enum integrity_status evm_verify_hmac(struct dentry *dentry,
- 	/* check value type */
- 	switch (xattr_data->type) {
- 	case EVM_XATTR_HMAC:
--		if (xattr_len != sizeof(struct evm_ima_xattr_data)) {
-+		if (xattr_len != sizeof(struct evm_xattr)) {
- 			evm_status = INTEGRITY_FAIL;
- 			goto out;
- 		}
-@@ -179,7 +179,7 @@ static enum integrity_status evm_verify_hmac(struct dentry *dentry,
- 				   xattr_value_len, &digest);
- 		if (rc)
- 			break;
--		rc = crypto_memneq(xattr_data->digest, digest.digest,
-+		rc = crypto_memneq(xattr_data->data, digest.digest,
- 				   SHA1_DIGEST_SIZE);
- 		if (rc)
- 			rc = -EINVAL;
-@@ -523,7 +523,7 @@ int evm_inode_init_security(struct inode *inode,
- 				 const struct xattr *lsm_xattr,
- 				 struct xattr *evm_xattr)
- {
--	struct evm_ima_xattr_data *xattr_data;
-+	struct evm_xattr *xattr_data;
- 	int rc;
+diff --git a/arch/powerpc/include/asm/io.h b/arch/powerpc/include/asm/io.h
+index 3ef40b703c4a..fe76ea99ad0d 100644
+--- a/arch/powerpc/include/asm/io.h
++++ b/arch/powerpc/include/asm/io.h
+@@ -787,8 +787,10 @@ extern void __iounmap_at(void *ea, unsigned long size);
  
- 	if (!evm_key_loaded() || !evm_protected_xattr(lsm_xattr->name))
-@@ -533,7 +533,7 @@ int evm_inode_init_security(struct inode *inode,
- 	if (!xattr_data)
- 		return -ENOMEM;
+ #define mmio_read16be(addr)		readw_be(addr)
+ #define mmio_read32be(addr)		readl_be(addr)
++#define mmio_read64be(addr)		readq_be(addr)
+ #define mmio_write16be(val, addr)	writew_be(val, addr)
+ #define mmio_write32be(val, addr)	writel_be(val, addr)
++#define mmio_write64be(val, addr)	writeq_be(val, addr)
+ #define mmio_insb(addr, dst, count)	readsb(addr, dst, count)
+ #define mmio_insw(addr, dst, count)	readsw(addr, dst, count)
+ #define mmio_insl(addr, dst, count)	readsl(addr, dst, count)
+diff --git a/include/asm-generic/iomap.h b/include/asm-generic/iomap.h
+index 5b63b94ef6b5..a008f504a2d0 100644
+--- a/include/asm-generic/iomap.h
++++ b/include/asm-generic/iomap.h
+@@ -36,6 +36,17 @@ extern u64 ioread64(void __iomem *);
+ extern u64 ioread64be(void __iomem *);
+ #endif
  
--	xattr_data->type = EVM_XATTR_HMAC;
-+	xattr_data->data.type = EVM_XATTR_HMAC;
- 	rc = evm_init_hmac(inode, lsm_xattr, xattr_data->digest);
- 	if (rc < 0)
- 		goto out;
-diff --git a/security/integrity/ima/ima_appraise.c b/security/integrity/ima/ima_appraise.c
-index deec1804a00a..8bcef90939f8 100644
---- a/security/integrity/ima/ima_appraise.c
-+++ b/security/integrity/ima/ima_appraise.c
-@@ -167,7 +167,8 @@ enum hash_algo ima_get_hash_algo(struct evm_ima_xattr_data *xattr_value,
- 		return sig->hash_algo;
- 		break;
- 	case IMA_XATTR_DIGEST_NG:
--		ret = xattr_value->digest[0];
-+		/* first byte contains algorithm id */
-+		ret = xattr_value->data[0];
- 		if (ret < HASH_ALGO__LAST)
- 			return ret;
- 		break;
-@@ -175,7 +176,7 @@ enum hash_algo ima_get_hash_algo(struct evm_ima_xattr_data *xattr_value,
- 		/* this is for backward compatibility */
- 		if (xattr_len == 21) {
- 			unsigned int zero = 0;
--			if (!memcmp(&xattr_value->digest[16], &zero, 4))
-+			if (!memcmp(&xattr_value->data[16], &zero, 4))
- 				return HASH_ALGO_MD5;
- 			else
- 				return HASH_ALGO_SHA1;
-@@ -274,7 +275,7 @@ int ima_appraise_measurement(enum ima_hooks func,
- 			/* xattr length may be longer. md5 hash in previous
- 			   version occupied 20 bytes in xattr, instead of 16
- 			 */
--			rc = memcmp(&xattr_value->digest[hash_start],
-+			rc = memcmp(&xattr_value->data[hash_start],
- 				    iint->ima_hash->digest,
- 				    iint->ima_hash->length);
- 		else
-diff --git a/security/integrity/integrity.h b/security/integrity/integrity.h
-index e60473b13a8d..20ac02bf1b84 100644
---- a/security/integrity/integrity.h
-+++ b/security/integrity/integrity.h
-@@ -79,6 +79,11 @@ enum evm_ima_xattr_type {
- 
- struct evm_ima_xattr_data {
- 	u8 type;
-+	u8 data[];
-+} __packed;
++#ifdef readq
++#define ioread64_lo_hi ioread64_lo_hi
++#define ioread64_hi_lo ioread64_hi_lo
++#define ioread64be_lo_hi ioread64be_lo_hi
++#define ioread64be_hi_lo ioread64be_hi_lo
++extern u64 ioread64_lo_hi(void __iomem *addr);
++extern u64 ioread64_hi_lo(void __iomem *addr);
++extern u64 ioread64be_lo_hi(void __iomem *addr);
++extern u64 ioread64be_hi_lo(void __iomem *addr);
++#endif
 +
-+struct evm_xattr {
-+	struct evm_ima_xattr_data data;
- 	u8 digest[SHA1_DIGEST_SIZE];
- } __packed;
+ extern void iowrite8(u8, void __iomem *);
+ extern void iowrite16(u16, void __iomem *);
+ extern void iowrite16be(u16, void __iomem *);
+@@ -46,6 +57,17 @@ extern void iowrite64(u64, void __iomem *);
+ extern void iowrite64be(u64, void __iomem *);
+ #endif
  
++#ifdef writeq
++#define iowrite64_lo_hi iowrite64_lo_hi
++#define iowrite64_hi_lo iowrite64_hi_lo
++#define iowrite64be_lo_hi iowrite64be_lo_hi
++#define iowrite64be_hi_lo iowrite64be_hi_lo
++extern void iowrite64_lo_hi(u64 val, void __iomem *addr);
++extern void iowrite64_hi_lo(u64 val, void __iomem *addr);
++extern void iowrite64be_lo_hi(u64 val, void __iomem *addr);
++extern void iowrite64be_hi_lo(u64 val, void __iomem *addr);
++#endif
++
+ /*
+  * "string" versions of the above. Note that they
+  * use native byte ordering for the accesses (on
+diff --git a/lib/iomap.c b/lib/iomap.c
+index 2c293b22569f..e909ab71e995 100644
+--- a/lib/iomap.c
++++ b/lib/iomap.c
+@@ -67,6 +67,7 @@ static void bad_io_access(unsigned long port, const char *access)
+ #ifndef mmio_read16be
+ #define mmio_read16be(addr) swab16(readw(addr))
+ #define mmio_read32be(addr) swab32(readl(addr))
++#define mmio_read64be(addr) swab64(readq(addr))
+ #endif
+ 
+ unsigned int ioread8(void __iomem *addr)
+@@ -100,6 +101,80 @@ EXPORT_SYMBOL(ioread16be);
+ EXPORT_SYMBOL(ioread32);
+ EXPORT_SYMBOL(ioread32be);
+ 
++#ifdef readq
++static u64 pio_read64_lo_hi(unsigned long port)
++{
++	u64 lo, hi;
++
++	lo = inl(port);
++	hi = inl(port + sizeof(u32));
++
++	return lo | (hi << 32);
++}
++
++static u64 pio_read64_hi_lo(unsigned long port)
++{
++	u64 lo, hi;
++
++	hi = inl(port + sizeof(u32));
++	lo = inl(port);
++
++	return lo | (hi << 32);
++}
++
++static u64 pio_read64be_lo_hi(unsigned long port)
++{
++	u64 lo, hi;
++
++	lo = pio_read32be(port + sizeof(u32));
++	hi = pio_read32be(port);
++
++	return lo | (hi << 32);
++}
++
++static u64 pio_read64be_hi_lo(unsigned long port)
++{
++	u64 lo, hi;
++
++	hi = pio_read32be(port);
++	lo = pio_read32be(port + sizeof(u32));
++
++	return lo | (hi << 32);
++}
++
++u64 ioread64_lo_hi(void __iomem *addr)
++{
++	IO_COND(addr, return pio_read64_lo_hi(port), return readq(addr));
++	return 0xffffffffffffffffULL;
++}
++
++u64 ioread64_hi_lo(void __iomem *addr)
++{
++	IO_COND(addr, return pio_read64_hi_lo(port), return readq(addr));
++	return 0xffffffffffffffffULL;
++}
++
++u64 ioread64be_lo_hi(void __iomem *addr)
++{
++	IO_COND(addr, return pio_read64be_lo_hi(port),
++		return mmio_read64be(addr));
++	return 0xffffffffffffffffULL;
++}
++
++u64 ioread64be_hi_lo(void __iomem *addr)
++{
++	IO_COND(addr, return pio_read64be_hi_lo(port),
++		return mmio_read64be(addr));
++	return 0xffffffffffffffffULL;
++}
++
++EXPORT_SYMBOL(ioread64_lo_hi);
++EXPORT_SYMBOL(ioread64_hi_lo);
++EXPORT_SYMBOL(ioread64be_lo_hi);
++EXPORT_SYMBOL(ioread64be_hi_lo);
++
++#endif /* readq */
++
+ #ifndef pio_write16be
+ #define pio_write16be(val,port) outw(swab16(val),port)
+ #define pio_write32be(val,port) outl(swab32(val),port)
+@@ -108,6 +183,7 @@ EXPORT_SYMBOL(ioread32be);
+ #ifndef mmio_write16be
+ #define mmio_write16be(val,port) writew(swab16(val),port)
+ #define mmio_write32be(val,port) writel(swab32(val),port)
++#define mmio_write64be(val,port) writeq(swab64(val),port)
+ #endif
+ 
+ void iowrite8(u8 val, void __iomem *addr)
+@@ -136,6 +212,62 @@ EXPORT_SYMBOL(iowrite16be);
+ EXPORT_SYMBOL(iowrite32);
+ EXPORT_SYMBOL(iowrite32be);
+ 
++#ifdef writeq
++static void pio_write64_lo_hi(u64 val, unsigned long port)
++{
++	outl(val, port);
++	outl(val >> 32, port + sizeof(u32));
++}
++
++static void pio_write64_hi_lo(u64 val, unsigned long port)
++{
++	outl(val >> 32, port + sizeof(u32));
++	outl(val, port);
++}
++
++static void pio_write64be_lo_hi(u64 val, unsigned long port)
++{
++	pio_write32be(val, port + sizeof(u32));
++	pio_write32be(val >> 32, port);
++}
++
++static void pio_write64be_hi_lo(u64 val, unsigned long port)
++{
++	pio_write32be(val >> 32, port);
++	pio_write32be(val, port + sizeof(u32));
++}
++
++void iowrite64_lo_hi(u64 val, void __iomem *addr)
++{
++	IO_COND(addr, pio_write64_lo_hi(val, port),
++		writeq(val, addr));
++}
++
++void iowrite64_hi_lo(u64 val, void __iomem *addr)
++{
++	IO_COND(addr, pio_write64_hi_lo(val, port),
++		writeq(val, addr));
++}
++
++void iowrite64be_lo_hi(u64 val, void __iomem *addr)
++{
++	IO_COND(addr, pio_write64be_lo_hi(val, port),
++		mmio_write64be(val, addr));
++}
++
++void iowrite64be_hi_lo(u64 val, void __iomem *addr)
++{
++	IO_COND(addr, pio_write64be_hi_lo(val, port),
++		mmio_write64be(val, addr));
++}
++
++EXPORT_SYMBOL(iowrite64_lo_hi);
++EXPORT_SYMBOL(iowrite64_hi_lo);
++EXPORT_SYMBOL(iowrite64be_lo_hi);
++EXPORT_SYMBOL(iowrite64be_hi_lo);
++
++#endif /* readq */
++
+ /*
+  * These are the "repeat MMIO read/write" functions.
+  * Note the "__raw" accesses, since we don't want to
+-- 
+2.19.0
