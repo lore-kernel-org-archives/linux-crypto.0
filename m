@@ -1,94 +1,98 @@
-Return-Path: <SRS0=dtph=N5=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-it1-f198.google.com ([209.85.166.198]:37908 "EHLO
-        mail-it1-f198.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725904AbeKSFoK (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 19 Nov 2018 00:44:10 -0500
-Received: by mail-it1-f198.google.com with SMTP id j190-v6so5706457itj.3
-        for <linux-crypto@vger.kernel.org>; Sun, 18 Nov 2018 11:23:03 -0800 (PST)
+Return-Path: <SRS0=45GR=NR=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from ale.deltatee.com ([207.54.116.67]:39546 "EHLO ale.deltatee.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2388547AbeKGGTn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 7 Nov 2018 01:19:43 -0500
+From: Logan Gunthorpe <logang@deltatee.com>
+To: linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
+        linux-ntb@googlegroups.com, linux-crypto@vger.kernel.org,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc: Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Andy Shevchenko <andy.shevchenko@gmail.com>,
+        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Jon Mason <jdmason@kudzu.us>
+Date: Tue,  6 Nov 2018 13:52:34 -0700
+Message-Id: <20181106205234.25792-7-logang@deltatee.com>
+In-Reply-To: <20181106205234.25792-1-logang@deltatee.com>
+References: <20181106205234.25792-1-logang@deltatee.com>
 MIME-Version: 1.0
-Date: Sun, 18 Nov 2018 11:23:03 -0800
-Message-ID: <0000000000004ae11b057af5543f@google.com>
-Subject: BUG: unable to handle kernel paging request in aead_geniv_alloc
-From: syzbot <syzbot+cd50d1708db841432d8a@syzkaller.appspotmail.com>
-To: davem@davemloft.net, herbert@gondor.apana.org.au,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+Content-Transfer-Encoding: 8bit
+Subject: [PATCH v23 6/6] ntb: ntb_hw_switchtec: Cleanup 64bit IO defines to use the common header
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hello,
+Clean up the ifdefs which conditionally defined the io{read|write}64
+functions in favour of the new common io-64-nonatomic-lo-hi header.
 
-syzbot found the following crash on:
+Per a nit from Andy Shevchenko, the include list is also made
+alphabetical.
 
-HEAD commit:    9c549a6b0573 selftests: add explicit test for multiple con..
-git tree:       net-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=13a46f7b400000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=d86f24333880b605
-dashboard link: https://syzkaller.appspot.com/bug?extid=cd50d1708db841432d8a
-compiler:       gcc (GCC) 8.0.1 20180413 (experimental)
-
-Unfortunately, I don't have any reproducer for this crash yet.
-
-IMPORTANT: if you fix the bug, please add the following tag to the commit:
-Reported-by: syzbot+cd50d1708db841432d8a@syzkaller.appspotmail.com
-
-BUG: unable to handle kernel paging request at fffffffffffffff0
-PGD 946d067 P4D 946d067 PUD 946f067 PMD 0
-Oops: 0000 [#1] PREEMPT SMP KASAN
-CPU: 1 PID: 9032 Comm: cryptomgr_probe Not tainted 4.20.0-rc2+ #300
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS  
-Google 01/01/2011
-kobject: 'loop1' (00000000f780ed70): kobject_uevent_env
-RIP: 0010:aead_geniv_alloc+0x2de/0x780 crypto/aead.c:240
-Code: 00 00 fc ff df 49 8d 7c 24 f0 48 89 fa 48 c1 ea 03 0f b6 14 02 48 89  
-f8 83 e0 07 83 c0 03 38 d0 7c 08 84 d2 0f 85 ea 03 00 00 <45> 8b 74 24 f0  
-bf 07 00 00 00 48 c7 c3 ea ff ff ff 44 89 f6 e8 59
-RSP: 0018:ffff8881946b7e40 EFLAGS: 00010246
-kobject: 'loop1' (00000000f780ed70): fill_kobj_path: path  
-= '/devices/virtual/block/loop1'
-RAX: 0000000000000003 RBX: 0000000000000000 RCX: ffffffff835c1711
-RDX: 0000000000000000 RSI: ffffffff835c171e RDI: fffffffffffffff0
-RBP: ffff8881946b7e80 R08: ffff8881975da540 R09: ffffed10328d6fa3
-R10: ffffed10328d6fa3 R11: 0000000000000003 R12: 0000000000000000
-R13: ffff8881d3ee66b0 R14: 0000000000000000 R15: 0000000000000000
-FS:  0000000000000000(0000) GS:ffff8881daf00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: fffffffffffffff0 CR3: 000000019a8d0000 CR4: 00000000001406e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
-  seqiv_aead_create crypto/seqiv.c:149 [inline]
-  seqiv_create+0x99/0x290 crypto/seqiv.c:190
-  cryptomgr_probe+0x6d/0x280 crypto/algboss.c:75
-  kthread+0x35a/0x440 kernel/kthread.c:246
-  ret_from_fork+0x3a/0x50 arch/x86/entry/entry_64.S:352
-Modules linked in:
-CR2: fffffffffffffff0
----[ end trace e6ac52e6f5849122 ]---
-RIP: 0010:aead_geniv_alloc+0x2de/0x780 crypto/aead.c:240
-Code: 00 00 fc ff df 49 8d 7c 24 f0 48 89 fa 48 c1 ea 03 0f b6 14 02 48 89  
-f8 83 e0 07 83 c0 03 38 d0 7c 08 84 d2 0f 85 ea 03 00 00 <45> 8b 74 24 f0  
-bf 07 00 00 00 48 c7 c3 ea ff ff ff 44 89 f6 e8 59
-RSP: 0018:ffff8881946b7e40 EFLAGS: 00010246
-RAX: 0000000000000003 RBX: 0000000000000000 RCX: ffffffff835c1711
-RDX: 0000000000000000 RSI: ffffffff835c171e RDI: fffffffffffffff0
-RBP: ffff8881946b7e80 R08: ffff8881975da540 R09: ffffed10328d6fa3
-R10: ffffed10328d6fa3 R11: 0000000000000003 R12: 0000000000000000
-R13: ffff8881d3ee66b0 R14: 0000000000000000 R15: 0000000000000000
-FS:  0000000000000000(0000) GS:ffff8881daf00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: fffffffffffffff0 CR3: 000000019a8d0000 CR4: 00000000001406e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-
-
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+Reviewed-by: Andy Shevchenko <andy.shevchenko@gmail.com>
+Cc: Jon Mason <jdmason@kudzu.us>
 ---
-This bug is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ drivers/ntb/hw/mscc/ntb_hw_switchtec.c | 36 +++-----------------------
+ 1 file changed, 4 insertions(+), 32 deletions(-)
 
-syzbot will keep track of this bug report. See:
-https://goo.gl/tpsmEJ#bug-status-tracking for how to communicate with  
-syzbot.
+diff --git a/drivers/ntb/hw/mscc/ntb_hw_switchtec.c b/drivers/ntb/hw/mscc/ntb_hw_switchtec.c
+index 5ee5f40b4dfc..c0b97699169d 100644
+--- a/drivers/ntb/hw/mscc/ntb_hw_switchtec.c
++++ b/drivers/ntb/hw/mscc/ntb_hw_switchtec.c
+@@ -13,13 +13,14 @@
+  *
+  */
+ 
+-#include <linux/switchtec.h>
+-#include <linux/module.h>
++#include <linux/interrupt.h>
++#include <linux/io-64-nonatomic-lo-hi.h>
+ #include <linux/delay.h>
+ #include <linux/kthread.h>
+-#include <linux/interrupt.h>
++#include <linux/module.h>
+ #include <linux/ntb.h>
+ #include <linux/pci.h>
++#include <linux/switchtec.h>
+ 
+ MODULE_DESCRIPTION("Microsemi Switchtec(tm) NTB Driver");
+ MODULE_VERSION("0.1");
+@@ -36,35 +37,6 @@ module_param(use_lut_mws, bool, 0644);
+ MODULE_PARM_DESC(use_lut_mws,
+ 		 "Enable the use of the LUT based memory windows");
+ 
+-#ifndef ioread64
+-#ifdef readq
+-#define ioread64 readq
+-#else
+-#define ioread64 _ioread64
+-static inline u64 _ioread64(void __iomem *mmio)
+-{
+-	u64 low, high;
+-
+-	low = ioread32(mmio);
+-	high = ioread32(mmio + sizeof(u32));
+-	return low | (high << 32);
+-}
+-#endif
+-#endif
+-
+-#ifndef iowrite64
+-#ifdef writeq
+-#define iowrite64 writeq
+-#else
+-#define iowrite64 _iowrite64
+-static inline void _iowrite64(u64 val, void __iomem *mmio)
+-{
+-	iowrite32(val, mmio);
+-	iowrite32(val >> 32, mmio + sizeof(u32));
+-}
+-#endif
+-#endif
+-
+ #define SWITCHTEC_NTB_MAGIC 0x45CC0001
+ #define MAX_MWS     128
+ 
+-- 
+2.19.0
