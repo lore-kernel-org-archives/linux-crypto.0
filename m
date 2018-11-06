@@ -1,82 +1,250 @@
-Return-Path: <SRS0=WCFZ=OI=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:35490 "EHLO mail.kernel.org"
+Return-Path: <SRS0=45GR=NR=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:55024 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727833AbeK2Rjf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 29 Nov 2018 12:39:35 -0500
+        id S1726228AbeKFLHC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 6 Nov 2018 06:07:02 -0500
+Date: Mon, 5 Nov 2018 17:44:19 -0800
 From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org
-Cc: Paul Crowley <paulcrowley@google.com>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        "Jason A . Donenfeld" <Jason@zx2c4.com>,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 4/4] crypto: arm64/chacha - add XChaCha12 support
-Date: Wed, 28 Nov 2018 22:34:22 -0800
-Message-Id: <20181129063422.24307-5-ebiggers@kernel.org>
-In-Reply-To: <20181129063422.24307-1-ebiggers@kernel.org>
-References: <20181129063422.24307-1-ebiggers@kernel.org>
+To: Corentin Labbe <clabbe@baylibre.com>
+Cc: davem@davemloft.net, herbert@gondor.apana.org.au,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 3/5] crypto: crypto_user_stat: split user space crypto
+ stat structures
+Message-ID: <20181106014419.GE28490@gmail.com>
+References: <1541422274-40060-1-git-send-email-clabbe@baylibre.com>
+ <1541422274-40060-4-git-send-email-clabbe@baylibre.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1541422274-40060-4-git-send-email-clabbe@baylibre.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Eric Biggers <ebiggers@google.com>
+Hi Corentin,
 
-Now that the ARM64 NEON implementation of ChaCha20 and XChaCha20 has
-been refactored to support varying the number of rounds, add support for
-XChaCha12.  This is identical to XChaCha20 except for the number of
-rounds, which is 12 instead of 20.  This can be used by Adiantum.
+On Mon, Nov 05, 2018 at 12:51:12PM +0000, Corentin Labbe wrote:
+> It is cleaner to have each stat in their own structures.
+> 
+> Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
+> ---
+>  crypto/crypto_user_stat.c       |  20 +++----
+>  include/uapi/linux/cryptouser.h | 101 ++++++++++++++++++++------------
+>  2 files changed, 73 insertions(+), 48 deletions(-)
+> 
+> diff --git a/crypto/crypto_user_stat.c b/crypto/crypto_user_stat.c
+> index 352569f378a0..3c14be2f7a1b 100644
+> --- a/crypto/crypto_user_stat.c
+> +++ b/crypto/crypto_user_stat.c
+> @@ -33,7 +33,7 @@ struct crypto_dump_info {
+>  
+>  static int crypto_report_aead(struct sk_buff *skb, struct crypto_alg *alg)
+>  {
+> -	struct crypto_stat raead;
+> +	struct crypto_stat_aead raead;
+>  	u64 v64;
+>  
+>  	memset(&raead, 0, sizeof(raead));
+> @@ -56,7 +56,7 @@ static int crypto_report_aead(struct sk_buff *skb, struct crypto_alg *alg)
+>  
+>  static int crypto_report_cipher(struct sk_buff *skb, struct crypto_alg *alg)
+>  {
+> -	struct crypto_stat rcipher;
+> +	struct crypto_stat_cipher rcipher;
+>  	u64 v64;
+>  
+>  	memset(&rcipher, 0, sizeof(rcipher));
+> @@ -79,7 +79,7 @@ static int crypto_report_cipher(struct sk_buff *skb, struct crypto_alg *alg)
+>  
+>  static int crypto_report_comp(struct sk_buff *skb, struct crypto_alg *alg)
+>  {
+> -	struct crypto_stat rcomp;
+> +	struct crypto_stat_compress rcomp;
+>  	u64 v64;
+>  
+>  	memset(&rcomp, 0, sizeof(rcomp));
+> @@ -101,7 +101,7 @@ static int crypto_report_comp(struct sk_buff *skb, struct crypto_alg *alg)
+>  
+>  static int crypto_report_acomp(struct sk_buff *skb, struct crypto_alg *alg)
+>  {
+> -	struct crypto_stat racomp;
+> +	struct crypto_stat_compress racomp;
+>  	u64 v64;
+>  
+>  	memset(&racomp, 0, sizeof(racomp));
+> @@ -123,7 +123,7 @@ static int crypto_report_acomp(struct sk_buff *skb, struct crypto_alg *alg)
+>  
+>  static int crypto_report_akcipher(struct sk_buff *skb, struct crypto_alg *alg)
+>  {
+> -	struct crypto_stat rakcipher;
+> +	struct crypto_stat_akcipher rakcipher;
+>  	u64 v64;
+>  
+>  	memset(&rakcipher, 0, sizeof(rakcipher));
+> @@ -150,7 +150,7 @@ static int crypto_report_akcipher(struct sk_buff *skb, struct crypto_alg *alg)
+>  
+>  static int crypto_report_kpp(struct sk_buff *skb, struct crypto_alg *alg)
+>  {
+> -	struct crypto_stat rkpp;
+> +	struct crypto_stat_kpp rkpp;
+>  	u64 v;
+>  
+>  	memset(&rkpp, 0, sizeof(rkpp));
+> @@ -171,7 +171,7 @@ static int crypto_report_kpp(struct sk_buff *skb, struct crypto_alg *alg)
+>  
+>  static int crypto_report_ahash(struct sk_buff *skb, struct crypto_alg *alg)
+>  {
+> -	struct crypto_stat rhash;
+> +	struct crypto_stat_hash rhash;
+>  	u64 v64;
+>  
+>  	memset(&rhash, 0, sizeof(rhash));
+> @@ -190,7 +190,7 @@ static int crypto_report_ahash(struct sk_buff *skb, struct crypto_alg *alg)
+>  
+>  static int crypto_report_shash(struct sk_buff *skb, struct crypto_alg *alg)
+>  {
+> -	struct crypto_stat rhash;
+> +	struct crypto_stat_hash rhash;
+>  	u64 v64;
+>  
+>  	memset(&rhash, 0, sizeof(rhash));
+> @@ -209,7 +209,7 @@ static int crypto_report_shash(struct sk_buff *skb, struct crypto_alg *alg)
+>  
+>  static int crypto_report_rng(struct sk_buff *skb, struct crypto_alg *alg)
+>  {
+> -	struct crypto_stat rrng;
+> +	struct crypto_stat_rng rrng;
+>  	u64 v64;
+>  
+>  	memset(&rrng, 0, sizeof(rrng));
+> @@ -248,7 +248,7 @@ static int crypto_reportstat_one(struct crypto_alg *alg,
+>  	if (nla_put_u32(skb, CRYPTOCFGA_PRIORITY_VAL, alg->cra_priority))
+>  		goto nla_put_failure;
+>  	if (alg->cra_flags & CRYPTO_ALG_LARVAL) {
+> -		struct crypto_stat rl;
+> +		struct crypto_stat_larval rl;
+>  
+>  		memset(&rl, 0, sizeof(rl));
+>  		strscpy(rl.type, "larval", sizeof(rl.type));
+> diff --git a/include/uapi/linux/cryptouser.h b/include/uapi/linux/cryptouser.h
+> index 9f8187077ce4..790b5c6511e5 100644
+> --- a/include/uapi/linux/cryptouser.h
+> +++ b/include/uapi/linux/cryptouser.h
+> @@ -76,47 +76,72 @@ struct crypto_user_alg {
+>  	__u32 cru_flags;
+>  };
+>  
+> -struct crypto_stat {
+> -	char type[CRYPTO_MAX_NAME];
+> -	union {
+> -		__u64 stat_encrypt_cnt;
+> -		__u64 stat_compress_cnt;
+> -		__u64 stat_generate_cnt;
+> -		__u64 stat_hash_cnt;
+> -		__u64 stat_setsecret_cnt;
+> -	};
+> -	union {
+> -		__u64 stat_encrypt_tlen;
+> -		__u64 stat_compress_tlen;
+> -		__u64 stat_generate_tlen;
+> -		__u64 stat_hash_tlen;
+> -	};
+> -	union {
+> -		__u64 stat_akcipher_err_cnt;
+> -		__u64 stat_cipher_err_cnt;
+> -		__u64 stat_compress_err_cnt;
+> -		__u64 stat_aead_err_cnt;
+> -		__u64 stat_hash_err_cnt;
+> -		__u64 stat_rng_err_cnt;
+> -		__u64 stat_kpp_err_cnt;
+> -	};
+> -	union {
+> -		__u64 stat_decrypt_cnt;
+> -		__u64 stat_decompress_cnt;
+> -		__u64 stat_seed_cnt;
+> -		__u64 stat_generate_public_key_cnt;
+> -	};
+> -	union {
+> -		__u64 stat_decrypt_tlen;
+> -		__u64 stat_decompress_tlen;
+> -	};
+> -	union {
+> -		__u64 stat_verify_cnt;
+> -		__u64 stat_compute_shared_secret_cnt;
+> -	};
+> +struct crypto_stat_cipher {
+> +	char type[CRYPTO_MAX_NAME];
+> +	__u64 stat_encrypt_cnt;
+> +	__u64 stat_encrypt_tlen;
+> +	__u64 stat_decrypt_cnt;
+> +	__u64 stat_decrypt_tlen;
+> +	__u64 stat_cipher_err_cnt;
+> +};
+> +
+> +struct crypto_stat_aead {
+> +	char type[CRYPTO_MAX_NAME];
+> +	__u64 stat_encrypt_cnt;
+> +	__u64 stat_encrypt_tlen;
+> +	__u64 stat_decrypt_cnt;
+> +	__u64 stat_decrypt_tlen;
+> +	__u64 stat_cipher_err_cnt;
+> +	__u64 stat_aead_err_cnt;
+> +};
+> +
+> +struct crypto_stat_akcipher {
+> +	char type[CRYPTO_MAX_NAME];
+> +	__u64 stat_encrypt_cnt;
+> +	__u64 stat_encrypt_tlen;
+> +	__u64 stat_decrypt_cnt;
+> +	__u64 stat_decrypt_tlen;
+> +	__u64 stat_akcipher_err_cnt;
+> +	__u64 stat_verify_cnt;
+>  	__u64 stat_sign_cnt;
+>  };
+>  
+> +struct crypto_stat_compress {
+> +	char type[CRYPTO_MAX_NAME];
+> +	__u64 stat_compress_cnt;
+> +	__u64 stat_compress_tlen;
+> +	__u64 stat_decompress_cnt;
+> +	__u64 stat_decompress_tlen;
+> +	__u64 stat_compress_err_cnt;
+> +};
+> +
+> +struct crypto_stat_rng {
+> +	char type[CRYPTO_MAX_NAME];
+> +	__u64 stat_generate_cnt;
+> +	__u64 stat_generate_tlen;
+> +	__u64 stat_rng_err_cnt;
+> +	__u64 stat_seed_cnt;
+> +};
+> +
+> +struct crypto_stat_hash {
+> +	char type[CRYPTO_MAX_NAME];
+> +	__u64 stat_hash_cnt;
+> +	__u64 stat_hash_tlen;
+> +	__u64 stat_hash_err_cnt;
+> +};
+> +
+> +struct crypto_stat_kpp {
+> +	char type[CRYPTO_MAX_NAME];
+> +	__u64 stat_setsecret_cnt;
+> +	__u64 stat_kpp_err_cnt;
+> +	__u64 stat_generate_public_key_cnt;
+> +	__u64 stat_compute_shared_secret_cnt;
+> +};
+> +
+> +struct crypto_stat_larval {
+> +	char type[CRYPTO_MAX_NAME];
+> +};
+> +
+>  struct crypto_report_larval {
+>  	char type[CRYPTO_MAX_NAME];
+>  };
+> -- 
+> 2.18.1
+> 
 
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- arch/arm64/crypto/Kconfig            |  2 +-
- arch/arm64/crypto/chacha-neon-glue.c | 18 ++++++++++++++++++
- 2 files changed, 19 insertions(+), 1 deletion(-)
+Is there any particular reason this patch only changes the UAPI structures, 
+not the internal structures in 'struct crypto_alg'?
 
-diff --git a/arch/arm64/crypto/Kconfig b/arch/arm64/crypto/Kconfig
-index d54ddb8468ef5..d9a523ecdd836 100644
---- a/arch/arm64/crypto/Kconfig
-+++ b/arch/arm64/crypto/Kconfig
-@@ -101,7 +101,7 @@ config CRYPTO_AES_ARM64_NEON_BLK
- 	select CRYPTO_SIMD
- 
- config CRYPTO_CHACHA20_NEON
--	tristate "ChaCha20 and XChaCha20 stream ciphers using NEON instructions"
-+	tristate "ChaCha20, XChaCha20, and XChaCha12 stream ciphers using NEON instructions"
- 	depends on KERNEL_MODE_NEON
- 	select CRYPTO_BLKCIPHER
- 	select CRYPTO_CHACHA20
-diff --git a/arch/arm64/crypto/chacha-neon-glue.c b/arch/arm64/crypto/chacha-neon-glue.c
-index 4d992029b9121..346eb85498a1e 100644
---- a/arch/arm64/crypto/chacha-neon-glue.c
-+++ b/arch/arm64/crypto/chacha-neon-glue.c
-@@ -161,6 +161,22 @@ static struct skcipher_alg algs[] = {
- 		.setkey			= crypto_chacha20_setkey,
- 		.encrypt		= xchacha_neon,
- 		.decrypt		= xchacha_neon,
-+	}, {
-+		.base.cra_name		= "xchacha12",
-+		.base.cra_driver_name	= "xchacha12-neon",
-+		.base.cra_priority	= 300,
-+		.base.cra_blocksize	= 1,
-+		.base.cra_ctxsize	= sizeof(struct chacha_ctx),
-+		.base.cra_module	= THIS_MODULE,
-+
-+		.min_keysize		= CHACHA_KEY_SIZE,
-+		.max_keysize		= CHACHA_KEY_SIZE,
-+		.ivsize			= XCHACHA_IV_SIZE,
-+		.chunksize		= CHACHA_BLOCK_SIZE,
-+		.walksize		= 4 * CHACHA_BLOCK_SIZE,
-+		.setkey			= crypto_chacha12_setkey,
-+		.encrypt		= xchacha_neon,
-+		.decrypt		= xchacha_neon,
- 	}
- };
- 
-@@ -187,3 +203,5 @@ MODULE_ALIAS_CRYPTO("chacha20");
- MODULE_ALIAS_CRYPTO("chacha20-neon");
- MODULE_ALIAS_CRYPTO("xchacha20");
- MODULE_ALIAS_CRYPTO("xchacha20-neon");
-+MODULE_ALIAS_CRYPTO("xchacha12");
-+MODULE_ALIAS_CRYPTO("xchacha12-neon");
--- 
-2.19.2
+- Eric
