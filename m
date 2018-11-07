@@ -1,324 +1,161 @@
-Return-Path: <SRS0=p+N9=OH=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:49570 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727218AbeK1Rrz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 28 Nov 2018 12:47:55 -0500
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org
-Cc: Paul Crowley <paulcrowley@google.com>,
-        Martin Willi <martin@strongswan.org>,
-        Milan Broz <gmazyland@gmail.com>,
-        "Jason A . Donenfeld" <Jason@zx2c4.com>,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH 4/6] crypto: x86/chacha20 - add XChaCha20 support
-Date: Tue, 27 Nov 2018 22:44:43 -0800
-Message-Id: <20181128064445.3813-5-ebiggers@kernel.org>
-In-Reply-To: <20181128064445.3813-1-ebiggers@kernel.org>
-References: <20181128064445.3813-1-ebiggers@kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Return-Path: <SRS0=rMEF=NS=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:47506 "EHLO
+        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726097AbeKGTJ6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 7 Nov 2018 14:09:58 -0500
+From: Vladimir Murzin <vladimir.murzin@arm.com>
+To: linux-arm-kernel@lists.infradead.org
+Cc: yamada.masahiro@socionext.com, linux-crypto@vger.kernel.org,
+        linux-kbuild@vger.kernel.org, kbuild-all@01.org,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: [RFC PATCH 4/4] ARM: crypto: expose dependency on gas via Kconfig
+Date: Wed,  7 Nov 2018 09:40:08 +0000
+Message-Id: <1541583608-26375-5-git-send-email-vladimir.murzin@arm.com>
+In-Reply-To: <1541583608-26375-1-git-send-email-vladimir.murzin@arm.com>
+References: <1541583608-26375-1-git-send-email-vladimir.murzin@arm.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Eric Biggers <ebiggers@google.com>
+So we can advertise only those entries which dependency is satisfied.
 
-Add an XChaCha20 implementation that is hooked up to the x86_64 SIMD
-implementation of ChaCha20.  This can be used by Adiantum.
-
-An SSSE3 implementation of single-block HChaCha20 is also added so that
-XChaCha20 can use it rather than the generic implementation.  This
-required refactoring the ChaCha permutation into its own function.
-
-Signed-off-by: Eric Biggers <ebiggers@google.com>
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Signed-off-by: Vladimir Murzin <vladimir.murzin@arm.com>
 ---
- arch/x86/crypto/chacha20-ssse3-x86_64.S |  76 ++++++++++++------
- arch/x86/crypto/chacha20_glue.c         | 101 ++++++++++++++++++------
- crypto/Kconfig                          |  12 +--
- 3 files changed, 130 insertions(+), 59 deletions(-)
+ arch/arm/crypto/Kconfig  | 31 +++++++++++++++++++++----------
+ arch/arm/crypto/Makefile | 31 ++++++-------------------------
+ 2 files changed, 27 insertions(+), 35 deletions(-)
 
-diff --git a/arch/x86/crypto/chacha20-ssse3-x86_64.S b/arch/x86/crypto/chacha20-ssse3-x86_64.S
-index d8ac75bb448f9..45e4ccdd9c98b 100644
---- a/arch/x86/crypto/chacha20-ssse3-x86_64.S
-+++ b/arch/x86/crypto/chacha20-ssse3-x86_64.S
-@@ -23,37 +23,24 @@ CTRINC:	.octa 0x00000003000000020000000100000000
+diff --git a/arch/arm/crypto/Kconfig b/arch/arm/crypto/Kconfig
+index ef0c7fe..f437a91f 100644
+--- a/arch/arm/crypto/Kconfig
++++ b/arch/arm/crypto/Kconfig
+@@ -9,6 +9,12 @@ menuconfig ARM_CRYPTO
  
- .text
+ if ARM_CRYPTO
  
--ENTRY(chacha20_block_xor_ssse3)
--	# %rdi: Input state matrix, s
--	# %rsi: up to 1 data block output, o
--	# %rdx: up to 1 data block input, i
--	# %rcx: input/output length in bytes
--
--	# This function encrypts one ChaCha20 block by loading the state matrix
--	# in four SSE registers. It performs matrix operation on four words in
--	# parallel, but requires shuffling to rearrange the words after each
--	# round. 8/16-bit word rotation is done with the slightly better
--	# performing SSSE3 byte shuffling, 7/12-bit word rotation uses
--	# traditional shift+OR.
--
--	# x0..3 = s0..3
--	movdqa		0x00(%rdi),%xmm0
--	movdqa		0x10(%rdi),%xmm1
--	movdqa		0x20(%rdi),%xmm2
--	movdqa		0x30(%rdi),%xmm3
--	movdqa		%xmm0,%xmm8
--	movdqa		%xmm1,%xmm9
--	movdqa		%xmm2,%xmm10
--	movdqa		%xmm3,%xmm11
-+/*
-+ * chacha20_permute - permute one block
-+ *
-+ * Permute one 64-byte block where the state matrix is in %xmm0-%xmm3.  This
-+ * function performs matrix operations on four words in parallel, but requires
-+ * shuffling to rearrange the words after each round.  8/16-bit word rotation is
-+ * done with the slightly better performing SSSE3 byte shuffling, 7/12-bit word
-+ * rotation uses traditional shift+OR.
-+ *
-+ * Clobbers: %ecx, %xmm4-%xmm7
-+ */
-+chacha20_permute:
++config ARM_AS_HAS_CE
++	def_bool $(as-instr,.fpu crypto-neon-fp-armv8)
++
++config ARM_AS_HAS_CRC
++	def_bool $(as-instr,.arch armv8-a\n.arch_extension crc)
++
+ config CRYPTO_SHA1_ARM
+ 	tristate "SHA1 digest algorithm (ARM-asm)"
+ 	select CRYPTO_SHA1
+@@ -30,21 +36,21 @@ config CRYPTO_SHA1_ARM_NEON
  
- 	movdqa		ROT8(%rip),%xmm4
- 	movdqa		ROT16(%rip),%xmm5
--
--	mov		%rcx,%rax
- 	mov		$10,%ecx
- 
- .Ldoubleround:
--
- 	# x0 += x1, x3 = rotl32(x3 ^ x0, 16)
- 	paddd		%xmm1,%xmm0
- 	pxor		%xmm0,%xmm3
-@@ -123,6 +110,28 @@ ENTRY(chacha20_block_xor_ssse3)
- 	dec		%ecx
- 	jnz		.Ldoubleround
- 
-+	ret
-+ENDPROC(chacha20_permute)
-+
-+ENTRY(chacha20_block_xor_ssse3)
-+	# %rdi: Input state matrix, s
-+	# %rsi: up to 1 data block output, o
-+	# %rdx: up to 1 data block input, i
-+	# %rcx: input/output length in bytes
-+
-+	# x0..3 = s0..3
-+	movdqa		0x00(%rdi),%xmm0
-+	movdqa		0x10(%rdi),%xmm1
-+	movdqa		0x20(%rdi),%xmm2
-+	movdqa		0x30(%rdi),%xmm3
-+	movdqa		%xmm0,%xmm8
-+	movdqa		%xmm1,%xmm9
-+	movdqa		%xmm2,%xmm10
-+	movdqa		%xmm3,%xmm11
-+
-+	mov		%rcx,%rax
-+	call		chacha20_permute
-+
- 	# o0 = i0 ^ (x0 + s0)
- 	paddd		%xmm8,%xmm0
- 	cmp		$0x10,%rax
-@@ -189,6 +198,23 @@ ENTRY(chacha20_block_xor_ssse3)
- 
- ENDPROC(chacha20_block_xor_ssse3)
- 
-+ENTRY(hchacha20_block_ssse3)
-+	# %rdi: Input state matrix, s
-+	# %rsi: output (8 32-bit words)
-+
-+	movdqa		0x00(%rdi),%xmm0
-+	movdqa		0x10(%rdi),%xmm1
-+	movdqa		0x20(%rdi),%xmm2
-+	movdqa		0x30(%rdi),%xmm3
-+
-+	call		chacha20_permute
-+
-+	movdqu		%xmm0,0x00(%rsi)
-+	movdqu		%xmm3,0x10(%rsi)
-+
-+	ret
-+ENDPROC(hchacha20_block_ssse3)
-+
- ENTRY(chacha20_4block_xor_ssse3)
- 	# %rdi: Input state matrix, s
- 	# %rsi: up to 4 data blocks output, o
-diff --git a/arch/x86/crypto/chacha20_glue.c b/arch/x86/crypto/chacha20_glue.c
-index 5928fee7acdd4..ca85b5d2c4751 100644
---- a/arch/x86/crypto/chacha20_glue.c
-+++ b/arch/x86/crypto/chacha20_glue.c
-@@ -23,6 +23,7 @@ asmlinkage void chacha20_block_xor_ssse3(u32 *state, u8 *dst, const u8 *src,
- 					 unsigned int len);
- asmlinkage void chacha20_4block_xor_ssse3(u32 *state, u8 *dst, const u8 *src,
- 					  unsigned int len);
-+asmlinkage void hchacha20_block_ssse3(const u32 *state, u32 *out);
- #ifdef CONFIG_AS_AVX2
- asmlinkage void chacha20_2block_xor_avx2(u32 *state, u8 *dst, const u8 *src,
- 					 unsigned int len);
-@@ -86,23 +87,19 @@ static void chacha20_dosimd(u32 *state, u8 *dst, const u8 *src,
- 	}
- }
- 
--static int chacha20_simd(struct skcipher_request *req)
-+static int chacha20_simd_stream_xor(struct skcipher_request *req,
-+				    struct chacha_ctx *ctx, u8 *iv)
- {
--	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
--	struct chacha_ctx *ctx = crypto_skcipher_ctx(tfm);
--	u32 *state, state_buf[16 + 2] __aligned(8);
- 	struct skcipher_walk walk;
-+	u32 *state, state_buf[16 + 2] __aligned(8);
- 	int err;
- 
- 	BUILD_BUG_ON(CHACHA20_STATE_ALIGN != 16);
- 	state = PTR_ALIGN(state_buf + 0, CHACHA20_STATE_ALIGN);
- 
--	if (req->cryptlen <= CHACHA_BLOCK_SIZE || !may_use_simd())
--		return crypto_chacha_crypt(req);
--
- 	err = skcipher_walk_virt(&walk, req, false);
- 
--	crypto_chacha_init(state, ctx, walk.iv);
-+	crypto_chacha_init(state, ctx, iv);
- 
- 	while (walk.nbytes > 0) {
- 		unsigned int nbytes = walk.nbytes;
-@@ -121,21 +118,73 @@ static int chacha20_simd(struct skcipher_request *req)
- 	return err;
- }
- 
--static struct skcipher_alg alg = {
--	.base.cra_name		= "chacha20",
--	.base.cra_driver_name	= "chacha20-simd",
--	.base.cra_priority	= 300,
--	.base.cra_blocksize	= 1,
--	.base.cra_ctxsize	= sizeof(struct chacha_ctx),
--	.base.cra_module	= THIS_MODULE,
--
--	.min_keysize		= CHACHA_KEY_SIZE,
--	.max_keysize		= CHACHA_KEY_SIZE,
--	.ivsize			= CHACHA_IV_SIZE,
--	.chunksize		= CHACHA_BLOCK_SIZE,
--	.setkey			= crypto_chacha20_setkey,
--	.encrypt		= chacha20_simd,
--	.decrypt		= chacha20_simd,
-+static int chacha20_simd(struct skcipher_request *req)
-+{
-+	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-+	struct chacha_ctx *ctx = crypto_skcipher_ctx(tfm);
-+
-+	if (req->cryptlen <= CHACHA_BLOCK_SIZE || !irq_fpu_usable())
-+		return crypto_chacha_crypt(req);
-+
-+	return chacha20_simd_stream_xor(req, ctx, req->iv);
-+}
-+
-+static int xchacha20_simd(struct skcipher_request *req)
-+{
-+	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-+	struct chacha_ctx *ctx = crypto_skcipher_ctx(tfm);
-+	struct chacha_ctx subctx;
-+	u32 *state, state_buf[16 + 2] __aligned(8);
-+	u8 real_iv[16];
-+
-+	if (req->cryptlen <= CHACHA_BLOCK_SIZE || !irq_fpu_usable())
-+		return crypto_xchacha_crypt(req);
-+
-+	BUILD_BUG_ON(CHACHA20_STATE_ALIGN != 16);
-+	state = PTR_ALIGN(state_buf + 0, CHACHA20_STATE_ALIGN);
-+	crypto_chacha_init(state, ctx, req->iv);
-+
-+	kernel_fpu_begin();
-+	hchacha20_block_ssse3(state, subctx.key);
-+	kernel_fpu_end();
-+
-+	memcpy(&real_iv[0], req->iv + 24, 8);
-+	memcpy(&real_iv[8], req->iv + 16, 8);
-+	return chacha20_simd_stream_xor(req, &subctx, real_iv);
-+}
-+
-+static struct skcipher_alg algs[] = {
-+	{
-+		.base.cra_name		= "chacha20",
-+		.base.cra_driver_name	= "chacha20-simd",
-+		.base.cra_priority	= 300,
-+		.base.cra_blocksize	= 1,
-+		.base.cra_ctxsize	= sizeof(struct chacha_ctx),
-+		.base.cra_module	= THIS_MODULE,
-+
-+		.min_keysize		= CHACHA_KEY_SIZE,
-+		.max_keysize		= CHACHA_KEY_SIZE,
-+		.ivsize			= CHACHA_IV_SIZE,
-+		.chunksize		= CHACHA_BLOCK_SIZE,
-+		.setkey			= crypto_chacha20_setkey,
-+		.encrypt		= chacha20_simd,
-+		.decrypt		= chacha20_simd,
-+	}, {
-+		.base.cra_name		= "xchacha20",
-+		.base.cra_driver_name	= "xchacha20-simd",
-+		.base.cra_priority	= 300,
-+		.base.cra_blocksize	= 1,
-+		.base.cra_ctxsize	= sizeof(struct chacha_ctx),
-+		.base.cra_module	= THIS_MODULE,
-+
-+		.min_keysize		= CHACHA_KEY_SIZE,
-+		.max_keysize		= CHACHA_KEY_SIZE,
-+		.ivsize			= XCHACHA_IV_SIZE,
-+		.chunksize		= CHACHA_BLOCK_SIZE,
-+		.setkey			= crypto_chacha20_setkey,
-+		.encrypt		= xchacha20_simd,
-+		.decrypt		= xchacha20_simd,
-+	},
- };
- 
- static int __init chacha20_simd_mod_init(void)
-@@ -148,12 +197,12 @@ static int __init chacha20_simd_mod_init(void)
- 			    boot_cpu_has(X86_FEATURE_AVX2) &&
- 			    cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM, NULL);
- #endif
--	return crypto_register_skcipher(&alg);
-+	return crypto_register_skciphers(algs, ARRAY_SIZE(algs));
- }
- 
- static void __exit chacha20_simd_mod_fini(void)
- {
--	crypto_unregister_skcipher(&alg);
-+	crypto_unregister_skciphers(algs, ARRAY_SIZE(algs));
- }
- 
- module_init(chacha20_simd_mod_init);
-@@ -164,3 +213,5 @@ MODULE_AUTHOR("Martin Willi <martin@strongswan.org>");
- MODULE_DESCRIPTION("chacha20 cipher algorithm, SIMD accelerated");
- MODULE_ALIAS_CRYPTO("chacha20");
- MODULE_ALIAS_CRYPTO("chacha20-simd");
-+MODULE_ALIAS_CRYPTO("xchacha20");
-+MODULE_ALIAS_CRYPTO("xchacha20-simd");
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index e084e2fb6743b..ecfc10a3e9f3e 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -1468,19 +1468,13 @@ config CRYPTO_CHACHA20
- 	  in some performance-sensitive scenarios.
- 
- config CRYPTO_CHACHA20_X86_64
--	tristate "ChaCha20 cipher algorithm (x86_64/SSSE3/AVX2)"
-+	tristate "ChaCha stream cipher algorithms (x86_64/SSSE3/AVX2)"
- 	depends on X86 && 64BIT
- 	select CRYPTO_BLKCIPHER
- 	select CRYPTO_CHACHA20
+ config CRYPTO_SHA1_ARM_CE
+ 	tristate "SHA1 digest algorithm (ARM v8 Crypto Extensions)"
+-	depends on KERNEL_MODE_NEON
++	depends on KERNEL_MODE_NEON && ARM_AS_HAS_CE
+ 	select CRYPTO_SHA1_ARM
+ 	select CRYPTO_HASH
  	help
--	  ChaCha20 cipher algorithm, RFC7539.
--
--	  ChaCha20 is a 256-bit high-speed stream cipher designed by Daniel J.
--	  Bernstein and further specified in RFC7539 for use in IETF protocols.
--	  This is the x86_64 assembler implementation using SIMD instructions.
--
--	  See also:
--	  <http://cr.yp.to/chacha/chacha-20080128.pdf>
-+	  SSSE3 and AVX2 optimized implementations of the ChaCha20 and XChaCha20
-+	  stream ciphers.
+ 	  SHA-1 secure hash standard (FIPS 180-1/DFIPS 180-2) implemented
+-	  using special ARMv8 Crypto Extensions.
++	  using special ARMv8 Crypto Extensions (need binutils 2.23 or higher).
  
- config CRYPTO_SEED
- 	tristate "SEED cipher algorithm"
+ config CRYPTO_SHA2_ARM_CE
+ 	tristate "SHA-224/256 digest algorithm (ARM v8 Crypto Extensions)"
+-	depends on KERNEL_MODE_NEON
++	depends on KERNEL_MODE_NEON && ARM_AS_HAS_CE
+ 	select CRYPTO_SHA256_ARM
+ 	select CRYPTO_HASH
+ 	help
+ 	  SHA-256 secure hash standard (DFIPS 180-2) implemented
+-	  using special ARMv8 Crypto Extensions.
++	  using special ARMv8 Crypto Extensions (need binutils 2.23 or higher).
+ 
+ config CRYPTO_SHA256_ARM
+ 	tristate "SHA-224/256 digest algorithm (ARM-asm and NEON)"
+@@ -87,16 +93,16 @@ config CRYPTO_AES_ARM_BS
+ 
+ config CRYPTO_AES_ARM_CE
+ 	tristate "Accelerated AES using ARMv8 Crypto Extensions"
+-	depends on KERNEL_MODE_NEON
++	depends on KERNEL_MODE_NEON && ARM_AS_HAS_CE
+ 	select CRYPTO_BLKCIPHER
+ 	select CRYPTO_SIMD
+ 	help
+ 	  Use an implementation of AES in CBC, CTR and XTS modes that uses
+-	  ARMv8 Crypto Extensions
++	  ARMv8 Crypto Extensions (need binutils 2.23 or higher)
+ 
+ config CRYPTO_GHASH_ARM_CE
+ 	tristate "PMULL-accelerated GHASH using NEON/ARMv8 Crypto Extensions"
+-	depends on KERNEL_MODE_NEON
++	depends on KERNEL_MODE_NEON && ARM_AS_HAS_CE
+ 	select CRYPTO_HASH
+ 	select CRYPTO_CRYPTD
+ 	select CRYPTO_GF128MUL
+@@ -104,17 +110,22 @@ config CRYPTO_GHASH_ARM_CE
+ 	  Use an implementation of GHASH (used by the GCM AEAD chaining mode)
+ 	  that uses the 64x64 to 128 bit polynomial multiplication (vmull.p64)
+ 	  that is part of the ARMv8 Crypto Extensions, or a slower variant that
+-	  uses the vmull.p8 instruction that is part of the basic NEON ISA.
++	  uses the vmull.p8 instruction that is part of the basic NEON ISA (need
++	  binutils 2.23 or higher).
+ 
+ config CRYPTO_CRCT10DIF_ARM_CE
+ 	tristate "CRCT10DIF digest algorithm using PMULL instructions"
+-	depends on KERNEL_MODE_NEON && CRC_T10DIF
++	depends on KERNEL_MODE_NEON && CRC_T10DIF  && ARM_AS_HAS_CE
+ 	select CRYPTO_HASH
++	help
++	  Need binutils 2.23 or higher
+ 
+ config CRYPTO_CRC32_ARM_CE
+ 	tristate "CRC32(C) digest algorithm using CRC and/or PMULL instructions"
+-	depends on KERNEL_MODE_NEON && CRC32
++	depends on KERNEL_MODE_NEON && CRC32 && ARM_AS_HAS_CRC
+ 	select CRYPTO_HASH
++	help
++	  Need binutils 2.23 or higher
+ 
+ config CRYPTO_CHACHA20_NEON
+ 	tristate "NEON accelerated ChaCha20 symmetric cipher"
+diff --git a/arch/arm/crypto/Makefile b/arch/arm/crypto/Makefile
+index bd5bcee..e897327 100644
+--- a/arch/arm/crypto/Makefile
++++ b/arch/arm/crypto/Makefile
+@@ -11,32 +11,13 @@ obj-$(CONFIG_CRYPTO_SHA256_ARM) += sha256-arm.o
+ obj-$(CONFIG_CRYPTO_SHA512_ARM) += sha512-arm.o
+ obj-$(CONFIG_CRYPTO_CHACHA20_NEON) += chacha20-neon.o
+ 
+-ce-obj-$(CONFIG_CRYPTO_AES_ARM_CE) += aes-arm-ce.o
+-ce-obj-$(CONFIG_CRYPTO_SHA1_ARM_CE) += sha1-arm-ce.o
+-ce-obj-$(CONFIG_CRYPTO_SHA2_ARM_CE) += sha2-arm-ce.o
+-ce-obj-$(CONFIG_CRYPTO_GHASH_ARM_CE) += ghash-arm-ce.o
+-ce-obj-$(CONFIG_CRYPTO_CRCT10DIF_ARM_CE) += crct10dif-arm-ce.o
+-crc-obj-$(CONFIG_CRYPTO_CRC32_ARM_CE) += crc32-arm-ce.o
++obj-$(CONFIG_CRYPTO_AES_ARM_CE) += aes-arm-ce.o
++obj-$(CONFIG_CRYPTO_SHA1_ARM_CE) += sha1-arm-ce.o
++obj-$(CONFIG_CRYPTO_SHA2_ARM_CE) += sha2-arm-ce.o
++obj-$(CONFIG_CRYPTO_GHASH_ARM_CE) += ghash-arm-ce.o
++obj-$(CONFIG_CRYPTO_CRCT10DIF_ARM_CE) += crct10dif-arm-ce.o
+ 
+-ifneq ($(crc-obj-y)$(crc-obj-m),)
+-ifeq ($(call as-instr,.arch armv8-a\n.arch_extension crc,y,n),y)
+-ce-obj-y += $(crc-obj-y)
+-ce-obj-m += $(crc-obj-m)
+-else
+-$(warning These CRC Extensions modules need binutils 2.23 or higher)
+-$(warning $(crc-obj-y) $(crc-obj-m))
+-endif
+-endif
+-
+-ifneq ($(ce-obj-y)$(ce-obj-m),)
+-ifeq ($(call as-instr,.fpu crypto-neon-fp-armv8,y,n),y)
+-obj-y += $(ce-obj-y)
+-obj-m += $(ce-obj-m)
+-else
+-$(warning These ARMv8 Crypto Extensions modules need binutils 2.23 or higher)
+-$(warning $(ce-obj-y) $(ce-obj-m))
+-endif
+-endif
++obj-$(CONFIG_CRYPTO_CRC32_ARM_CE) += crc32-arm-ce.o
+ 
+ aes-arm-y	:= aes-cipher-core.o aes-cipher-glue.o
+ aes-arm-bs-y	:= aes-neonbs-core.o aes-neonbs-glue.o
 -- 
-2.19.2
+1.9.1
