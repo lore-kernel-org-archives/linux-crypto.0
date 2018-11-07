@@ -1,57 +1,95 @@
-Return-Path: <SRS0=IFNk=NQ=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-it1-f193.google.com ([209.85.166.193]:38852 "EHLO
-        mail-it1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387873AbeKFETI (ORCPT
+Return-Path: <SRS0=rMEF=NS=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:38643 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726938AbeKHE1Y (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 5 Nov 2018 23:19:08 -0500
-Received: by mail-it1-f193.google.com with SMTP id k141-v6so12375103itk.3
-        for <linux-crypto@vger.kernel.org>; Mon, 05 Nov 2018 10:58:06 -0800 (PST)
+        Wed, 7 Nov 2018 23:27:24 -0500
+Received: by mail-wr1-f67.google.com with SMTP id d10-v6so18561605wrs.5
+        for <linux-crypto@vger.kernel.org>; Wed, 07 Nov 2018 10:55:45 -0800 (PST)
+Date: Wed, 7 Nov 2018 19:55:41 +0100
+From: LABBE Corentin <clabbe@baylibre.com>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: davem@davemloft.net, herbert@gondor.apana.org.au,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/5] crypto: crypto_user_stat: made crypto_user_stat
+ optional
+Message-ID: <20181107185541.GB5133@Red>
+References: <1541422274-40060-1-git-send-email-clabbe@baylibre.com>
+ <1541422274-40060-2-git-send-email-clabbe@baylibre.com>
+ <20181106014126.GC28490@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20181105182314.c7xdsolvxr2iyd5n@sole.flsd.net>
-References: <20181024032356.3388-1-vt@altlinux.org> <20181024032356.3388-2-vt@altlinux.org>
- <CAKv+Gu9LSUNwW_3E3QtxV123u=mU-B+p6FFRAkWq8_e9Jsgb2w@mail.gmail.com> <20181105182314.c7xdsolvxr2iyd5n@sole.flsd.net>
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date: Mon, 5 Nov 2018 19:58:05 +0100
-Message-ID: <CAKv+Gu_uahQEP-4mc10KQThQM6rTF4o5xqi6YgEq8Od87x3KgQ@mail.gmail.com>
-Subject: Re: [PATCH v3 1/3] crypto: streebog - add Streebog hash function
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Philippe Ombredanne <pombredanne@nexb.com>,
-        Kate Stewart <kstewart@linuxfoundation.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181106014126.GC28490@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 5 November 2018 at 19:23, Vitaly Chikunov <vt@altlinux.org> wrote:
-> Ard,
->
-> On Mon, Nov 05, 2018 at 02:22:21PM +0100, Ard Biesheuvel wrote:
->>
->> > +static const struct streebog_uint512 buffer512 = { {
->> > +       cpu_to_le64(0x200ULL),
->>
->> Can we keep the memory representation in native endianness, and only
->> swab the in/output [where needed]?
->
-> I hope you do not insist on that?
->
-> The code is using same primitives to add/xor/permute with data from
-> these arrays (buffer512[] and C[], those which use cpu_to_le64), and
-> from generic data buffers. Having these arrays in native endianness will
-> cause complexities - code split and duplications. For example, XLPS
-> permutation will require two versions, with one accessing (y) as is and
-> another as cpu_to_le64(y).
->
-> The code is based on canonical implementation by RFC 6986 ("GOST R
-> 34.11-2012: Hash Function") author, and I don't want it do deviate that
-> much from the original, which would complicate algorithm reviews.
->
+On Mon, Nov 05, 2018 at 05:41:27PM -0800, Eric Biggers wrote:
+> Hi Corentin,
+> 
+> On Mon, Nov 05, 2018 at 12:51:10PM +0000, Corentin Labbe wrote:
+> > Even if CRYPTO_STATS is set to n, some part of CRYPTO_STATS are
+> > compiled.
+> > This patch made all part of crypto_user_stat uncompiled in that case.
+> > 
+> > Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
+> > ---
+> >  crypto/Makefile                      |  3 ++-
+> >  crypto/algapi.c                      |  2 ++
+> >  include/crypto/internal/cryptouser.h | 17 +++++++++++++++++
+> >  include/linux/crypto.h               |  2 ++
+> >  4 files changed, 23 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/crypto/Makefile b/crypto/Makefile
+> > index 5c207c76abf7..1e9e5960946a 100644
+> > --- a/crypto/Makefile
+> > +++ b/crypto/Makefile
+> > @@ -54,7 +54,8 @@ cryptomgr-y := algboss.o testmgr.o
+> >  
+> >  obj-$(CONFIG_CRYPTO_MANAGER2) += cryptomgr.o
+> >  obj-$(CONFIG_CRYPTO_USER) += crypto_user.o
+> > -crypto_user-y := crypto_user_base.o crypto_user_stat.o
+> > +crypto_user-y := crypto_user_base.o
+> > +crypto_user-$(CONFIG_CRYPTO_STATS) += crypto_user_stat.o
+> >  obj-$(CONFIG_CRYPTO_CMAC) += cmac.o
+> >  obj-$(CONFIG_CRYPTO_HMAC) += hmac.o
+> >  obj-$(CONFIG_CRYPTO_VMAC) += vmac.o
+> 
+> Doesn't CONFIG_CRYPTO_STATS also need to depend on CONFIG_CRYPTO_USER?
+> Currently you can enable it but without CRYPTO_USER the API won't be available.
+> 
+> config CRYPTO_STATS
+> 	bool "Crypto usage statistics for User-space"
+> 
+> should be:
+> 
+> config CRYPTO_STATS
+> 	bool "Crypto usage statistics for User-space"
+> 	depends on CRYPTO_USER
+> 
+> > diff --git a/include/linux/crypto.h b/include/linux/crypto.h
+> > index 3634ad6fe202..35de61d99cd5 100644
+> > --- a/include/linux/crypto.h
+> > +++ b/include/linux/crypto.h
+> > @@ -515,6 +515,7 @@ struct crypto_alg {
+> >  	
+> >  	struct module *cra_module;
+> >  
+> > +#ifdef CONFIG_CRYPTO_STATS
+> >  	union {
+> >  		atomic_t encrypt_cnt;
+> >  		atomic_t compress_cnt;
+> > @@ -552,6 +553,7 @@ struct crypto_alg {
+> >  		atomic_t compute_shared_secret_cnt;
+> >  	};
+> >  	atomic_t sign_cnt;
+> > +#endif
+> 
+> This is a long ifdef, so use:
+> 
+> #endif /* CONFIG_CRYPTO_STATS */
+> 
+> - Eric
 
-That is a very good reason, so unless anyone has concerns about the
-performance on BE systems, let's leave it as is.
+I will fix that
+Thanks
