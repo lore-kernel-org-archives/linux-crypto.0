@@ -1,39 +1,49 @@
-Return-Path: <SRS0=IUQn=NU=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:37258 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727537AbeKITXd (ORCPT
+Return-Path: <SRS0=rMEF=NS=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mailgw01.mediatek.com ([210.61.82.183]:14819 "EHLO
+        mailgw01.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726544AbeKGQje (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 9 Nov 2018 14:23:33 -0500
-Date: Fri, 9 Nov 2018 17:43:42 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: John Garry <john.garry@huawei.com>
-Cc: davem@davemloft.net, Jonathan.Cameron@huawei.com,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linuxarm@huawei.com
-Subject: Re: [PATCH 0/2] crypto: hisilicon - A couple of fixes
-Message-ID: <20181109094342.vp52m6ckyhiya3yz@gondor.apana.org.au>
-References: <1541421315-25623-1-git-send-email-john.garry@huawei.com>
+        Wed, 7 Nov 2018 11:39:34 -0500
+From: Ryder Lee <ryder.lee@mediatek.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        Rob Herring <robh+dt@kernel.org>
+CC: Matthias Brugger <matthias.bgg@gmail.com>,
+        <linux-crypto@vger.kernel.org>,
+        Weijie Gao <weijie.gao@mediatek.com>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-mediatek@lists.infradead.org>,
+        Ryder Lee <ryder.lee@mediatek.com>
+Subject: [PATCH] dt-bindings: rng: update bindings for MT7629 SoC
+Date: Wed, 7 Nov 2018 15:10:16 +0800
+Message-ID: <0f5fe0d5b6a9c81b3f4395a1007ed0ba2239ae45.1541574485.git.ryder.lee@mediatek.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1541421315-25623-1-git-send-email-john.garry@huawei.com>
+Content-Type: text/plain
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Nov 05, 2018 at 08:35:13PM +0800, John Garry wrote:
-> This patchset fixes a couple of issues I discovered while attempting to
-> bringup the driver.
-> 
-> John Garry (2):
->   crypto: hisilicon -  Fix NULL dereference for same dst and src
->   crypto: hisilicon -  Fix reference after free of memories on error
->  path
-> 
->  drivers/crypto/hisilicon/sec/sec_algs.c | 31 +++++++++++++++++--------------
->  1 file changed, 17 insertions(+), 14 deletions(-)
+This updates bindings for MT7629 RNG driver.
 
-All applied.  Thanks.
+Signed-off-by: Ryder Lee <ryder.lee@mediatek.com>
+---
+ Documentation/devicetree/bindings/rng/mtk-rng.txt | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/Documentation/devicetree/bindings/rng/mtk-rng.txt b/Documentation/devicetree/bindings/rng/mtk-rng.txt
+index 366b99b..ffa6a66 100644
+--- a/Documentation/devicetree/bindings/rng/mtk-rng.txt
++++ b/Documentation/devicetree/bindings/rng/mtk-rng.txt
+@@ -1,9 +1,10 @@
+ Device-Tree bindings for Mediatek random number generator
+-found in Mediatek SoC family
++found in MediaTek SoC family
+ 
+ Required properties:
+ - compatible	    : Should be
+ 			"mediatek,mt7622-rng", 	"mediatek,mt7623-rng" : for MT7622
++			"mediatek,mt7629-rng",  "mediatek,mt7623-rng" : for MT7629
+ 			"mediatek,mt7623-rng" : for MT7623
+ - clocks	    : list of clock specifiers, corresponding to
+ 		      entries in clock-names property;
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1.9.1
