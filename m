@@ -1,233 +1,168 @@
-Return-Path: <SRS0=vxh5=N7=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from sitav-80046.hsr.ch ([152.96.80.46]:39052 "EHLO
-        mail.strongswan.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725902AbeKUDBA (ORCPT
+Return-Path: <SRS0=rMEF=NS=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:55951 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725953AbeKHFGT (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 20 Nov 2018 22:01:00 -0500
-From: Martin Willi <martin@strongswan.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: linux-crypto@vger.kernel.org, x86@kernel.org
-Subject: [PATCH 0/3] crypto: x86/chacha20 - AVX-512VL block functions
-Date: Tue, 20 Nov 2018 17:30:47 +0100
-Message-Id: <20181120163050.22251-1-martin@strongswan.org>
+        Thu, 8 Nov 2018 00:06:19 -0500
+Received: by mail-wm1-f67.google.com with SMTP id s10-v6so15267517wmc.5
+        for <linux-crypto@vger.kernel.org>; Wed, 07 Nov 2018 11:34:32 -0800 (PST)
+Date: Wed, 7 Nov 2018 20:34:28 +0100
+From: LABBE Corentin <clabbe@baylibre.com>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: davem@davemloft.net, herbert@gondor.apana.org.au,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 5/5] crypto: crypto_user_stat: fix use_after_free of
+ struct xxx_request
+Message-ID: <20181107193428.GE5133@Red>
+References: <1541422274-40060-1-git-send-email-clabbe@baylibre.com>
+ <1541422274-40060-6-git-send-email-clabbe@baylibre.com>
+ <20181106014905.GF28490@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181106014905.GF28490@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-In the quest for pushing the limits of chacha20 encryption for both IPsec
-and Wireguard, this small series adds AVX-512VL block functions. The VL
-variant works on 256-bit ymm registers, but compared to AVX2 can benefit
-from the new instructions.
+On Mon, Nov 05, 2018 at 05:49:06PM -0800, Eric Biggers wrote:
+> Hi Corentin,
+> 
+> On Mon, Nov 05, 2018 at 12:51:14PM +0000, Corentin Labbe wrote:
+> > All crypto_stats functions use the struct xxx_request for feeding stats,
+> > but in some case this structure could already be freed.
+> > 
+> > For fixing this, the needed parameters (len and alg) will be stored
+> > before the request being executed.
+> > Fixes: cac5818c25d0 ("crypto: user - Implement a generic crypto statistics")
+> > Reported-by: syzbot <syzbot+6939a606a5305e9e9799@syzkaller.appspotmail.com>
+> > 
+> > Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
+> > ---
+> >  crypto/ahash.c             | 14 ++++++++--
+> >  include/crypto/acompress.h | 30 ++++++++++----------
+> >  include/crypto/aead.h      | 30 ++++++++++----------
+> >  include/crypto/akcipher.h  | 56 ++++++++++++++++++--------------------
+> >  include/crypto/hash.h      | 25 +++++++++--------
+> >  include/crypto/kpp.h       | 22 +++++++--------
+> >  include/crypto/skcipher.h  | 16 +++++++----
+> >  include/linux/crypto.h     | 34 +++++++++++------------
+> >  8 files changed, 118 insertions(+), 109 deletions(-)
+> > 
+> > diff --git a/crypto/ahash.c b/crypto/ahash.c
+> > index 3a348fbcf8f9..3f4c44c1e80f 100644
+> > --- a/crypto/ahash.c
+> > +++ b/crypto/ahash.c
+> > @@ -364,20 +364,26 @@ static int crypto_ahash_op(struct ahash_request *req,
+> >  
+> >  int crypto_ahash_final(struct ahash_request *req)
+> >  {
+> > +	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
+> > +	struct crypto_alg *alg = tfm->base.__crt_alg;
+> > +	unsigned int nbytes = req->nbytes;
+> >  	int ret;
+> >  
+> >  	ret = crypto_ahash_op(req, crypto_ahash_reqtfm(req)->final);
+> > -	crypto_stat_ahash_final(req, ret);
+> > +	crypto_stat_ahash_final(nbytes, ret, alg);
+> >  	return ret;
+> >  }
+> >  EXPORT_SYMBOL_GPL(crypto_ahash_final);
+> 
+> I'm not confident this is enough.  If the request is being processed
+> asynchronously, the completion callback could be used to signal another thread
+> to go ahead and free the resources, including not only the request but also the
+> 'tfm', which could even result in the last reference to the 'alg' being dropped
+> and therefore the 'alg' being freed.  If I'm wrong, then please explain why :-)
+> 
+> Note: I'd also prefer a solution that is more obviously zero-overhead in the
+> !CONFIG_CRYPTO_STATS case.
+> 
+> - Eric
+> 
 
-Compared to the AVX2 version, these block functions bring an overall
-speed improvement across encryption lengths of ~20%. Below the tcrypt
-results for additional block sizes in kOps/s, for the current AVX2
-code path, the new AVX-512VL code path and the comparison to Zinc in
-AVX2 and AVX-512VL. All numbers from a Xeon Platinum 8168 (2.7GHz).
+I think the best solution is to grab a crypto_alg refcnt before the operation and release it after.
+So for example this will lead to:
+--- a/include/crypto/skcipher.h
++++ b/include/crypto/skcipher.h
+@@ -486,7 +486,7 @@ static inline struct crypto_sync_skcipher *crypto_sync_skcipher_reqtfm(
+ 	return container_of(tfm, struct crypto_sync_skcipher, base);
+ }
+ 
+-static inline void crypto_stat_skcipher_encrypt(struct skcipher_request *req,
++static inline void crypto_stat_skcipher_encrypt(unsigned int cryptlen,
+ 						int ret, struct crypto_alg *alg)
+ {
+ #ifdef CONFIG_CRYPTO_STATS
+@@ -494,12 +494,13 @@ static inline void crypto_stat_skcipher_encrypt(struct skcipher_request *req,
+ 		atomic64_inc(&alg->cipher_err_cnt);
+ 	} else {
+ 		atomic64_inc(&alg->encrypt_cnt);
+-		atomic64_add(req->cryptlen, &alg->encrypt_tlen);
++		atomic64_add(cryptlen, &alg->encrypt_tlen);
+ 	}
++	crypto_alg_put(alg);
+ #endif
+ }
+ 
+-static inline void crypto_stat_skcipher_decrypt(struct skcipher_request *req,
++static inline void crypto_stat_skcipher_decrypt(unsigned int cryptlen,
+ 						int ret, struct crypto_alg *alg)
+ {
+ #ifdef CONFIG_CRYPTO_STATS
+@@ -507,8 +508,9 @@ static inline void crypto_stat_skcipher_decrypt(struct skcipher_request *req,
+ 		atomic64_inc(&alg->cipher_err_cnt);
+ 	} else {
+ 		atomic64_inc(&alg->decrypt_cnt);
+-		atomic64_add(req->cryptlen, &alg->decrypt_tlen);
++		atomic64_add(cryptlen, &alg->decrypt_tlen);
+ 	}
++	crypto_alg_put(alg);
+ #endif
+ }
+ 
+@@ -526,13 +528,18 @@ static inline void crypto_stat_skcipher_decrypt(struct skcipher_request *req,
+ static inline int crypto_skcipher_encrypt(struct skcipher_request *req)
+ {
+ 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
++	struct crypto_alg *alg = tfm->base.__crt_alg;
++	unsigned int cryptlen = req->cryptlen;
+ 	int ret;
+ 
++#ifdef CONFIG_CRYPTO_STATS
++	crypto_alg_get(alg);
++#endif
+ 	if (crypto_skcipher_get_flags(tfm) & CRYPTO_TFM_NEED_KEY)
+ 		ret = -ENOKEY;
+ 	else
+ 		ret = tfm->encrypt(req);
+-	crypto_stat_skcipher_encrypt(req, ret, tfm->base.__crt_alg);
++	crypto_stat_skcipher_encrypt(cryptlen, ret, alg);
+ 	return ret;
+ }
+ 
+@@ -550,13 +557,18 @@ static inline int crypto_skcipher_encrypt(struct skcipher_request *req)
+ static inline int crypto_skcipher_decrypt(struct skcipher_request *req)
+ {
+ 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
++	struct crypto_alg *alg = tfm->base.__crt_alg;
++	unsigned int cryptlen = req->cryptlen;
+ 	int ret;
+ 
++#ifdef CONFIG_CRYPTO_STATS
++	crypto_alg_get(alg);
++#endif
+ 	if (crypto_skcipher_get_flags(tfm) & CRYPTO_TFM_NEED_KEY)
+ 		ret = -ENOKEY;
+ 	else
+ 		ret = tfm->decrypt(req);
+-	crypto_stat_skcipher_decrypt(req, ret, tfm->base.__crt_alg);
++	crypto_stat_skcipher_decrypt(cryptlen, ret, alg);
+ 	return ret;
+ }
 
-These numbers result in a very nice chart, available at:
-  https://download.strongswan.org/misc/chacha-avx-512vl.svg
+This should not have any overhead with !CONFIG_CRYPTO_STATS
+The only drawback is that crypto_alg_get/crypto_alg_put need to be moved out of crypto/internal.h to include/linux/crypto.h
 
-                     zinc   zinc
- len   avx2  512vl   avx2  512vl
-   8   5719   5672   5468   5612
-  16   5675   5627   5355   5621
-  24   5687   5601   5322   5633
-  32   5667   5622   5244   5564
-  40   5603   5582   5337   5578
-  48   5638   5539   5400   5556
-  56   5624   5566   5375   5482
-  64   5590   5573   5352   5531
-  72   4841   5467   3365   3457
-  80   5316   5761   3310   3381
-  88   4798   5470   3239   3343
-  96   5324   5723   3197   3281
- 104   4819   5460   3155   3232
- 112   5266   5749   3020   3195
- 120   4776   5391   2959   3145
- 128   5291   5723   3398   3489
- 136   4122   4837   3321   3423
- 144   4507   5057   3247   3389
- 152   4139   4815   3233   3329
- 160   4482   5043   3159   3256
- 168   4142   4766   3131   3224
- 176   4506   5028   3073   3162
- 184   4119   4772   3010   3109
- 192   4499   5016   3402   3502
- 200   4127   4766   3329   3448
- 208   4452   5012   3276   3371
- 216   4128   4744   3243   3334
- 224   4484   5008   3203   3298
- 232   4103   4772   3141   3237
- 240   4458   4963   3115   3217
- 248   4121   4751   3085   3177
- 256   4461   4987   3364   4046
- 264   3406   4282   3270   4006
- 272   3408   4287   3207   3961
- 280   3371   4271   3203   3825
- 288   3625   4301   3129   3751
- 296   3402   4283   3093   3688
- 304   3401   4247   3062   3637
- 312   3382   4282   2995   3614
- 320   3611   4279   3305   4070
- 328   3386   4260   3276   3968
- 336   3369   4288   3171   3929
- 344   3389   4289   3134   3847
- 352   3609   4266   3127   3720
- 360   3355   4252   3076   3692
- 368   3387   4264   3048   3650
- 376   3387   4238   2967   3553
- 384   3568   4265   3277   4035
- 392   3369   4262   3299   3973
- 400   3362   4235   3239   3899
- 408   3352   4269   3196   3843
- 416   3585   4243   3127   3736
- 424   3364   4216   3092   3672
- 432   3341   4246   3067   3628
- 440   3353   4235   3018   3593
- 448   3538   4245   3327   4035
- 456   3322   4244   3275   3900
- 464   3340   4237   3212   3880
- 472   3330   4242   3054   3802
- 480   3530   4234   3078   3707
- 488   3337   4228   3094   3664
- 496   3330   4223   3015   3591
- 504   3317   4214   3002   3517
- 512   3531   4197   3339   4016
- 520   2511   3101   2030   2682
- 528   2627   3087   2027   2641
- 536   2508   3102   2001   2601
- 544   2638   3090   1964   2564
- 552   2494   3077   1962   2516
- 560   2625   3064   1941   2515
- 568   2500   3086   1922   2493
- 576   2611   3074   2050   2689
- 584   2482   3062   2041   2680
- 592   2595   3074   2026   2644
- 600   2470   3060   1985   2595
- 608   2581   3039   1961   2555
- 616   2478   3062   1956   2521
- 624   2587   3066   1930   2493
- 632   2457   3053   1923   2486
- 640   2581   3050   2059   2712
- 648   2296   2839   2024   2655
- 656   2389   2845   2019   2642
- 664   2292   2842   2002   2610
- 672   2404   2838   1959   2537
- 680   2273   2827   1956   2527
- 688   2389   2840   1938   2510
- 696   2280   2837   1911   2463
- 704   2370   2819   2055   2702
- 712   2277   2834   2029   2663
- 720   2369   2829   2020   2625
- 728   2255   2820   2001   2600
- 736   2373   2819   1958   2543
- 744   2269   2827   1956   2524
- 752   2364   2817   1937   2492
- 760   2270   2805   1909   2483
- 768   2378   2820   2050   2696
- 776   2053   2700   2002   2643
- 784   2066   2693   1922   2640
- 792   2065   2703   1928   2602
- 800   2138   2706   1962   2535
- 808   2065   2679   1938   2528
- 816   2063   2699   1929   2500
- 824   2053   2676   1915   2468
- 832   2149   2692   2036   2693
- 840   2055   2689   2024   2659
- 848   2049   2689   2006   2610
- 856   2057   2702   1979   2585
- 864   2144   2703   1960   2547
- 872   2047   2685   1945   2501
- 880   2055   2683   1902   2497
- 888   2060   2689   1897   2478
- 896   2139   2693   2023   2663
- 904   2049   2686   1970   2644
- 912   2055   2688   1925   2621
- 920   2047   2685   1911   2572
- 928   2114   2695   1907   2545
- 936   2055   2681   1927   2492
- 944   2055   2693   1930   2478
- 952   2042   2688   1909   2471
- 960   2136   2682   2014   2672
- 968   2054   2687   1999   2626
- 976   2040   2682   1982   2598
- 984   2055   2687   1943   2569
- 992   2138   2694   1884   2522
-1000   2036   2681   1929   2506
-1008   2052   2676   1926   2475
-1016   2050   2686   1889   2430
-1024   2125   2670   2039   2656
-1032   1717   2175   1470   1995
-1040   1768   2186   1456   1983
-1048   1704   2185   1451   1950
-1056   1770   2176   1410   1927
-1064   1710   2178   1418   1918
-1072   1753   2168   1394   1892
-1080   1696   2170   1400   1892
-1088   1761   2174   1472   2014
-1096   1681   2158   1464   1968
-1104   1746   2172   1457   1978
-1112   1689   2167   1445   1955
-1120   1738   2160   1431   1919
-1128   1689   2155   1428   1915
-1136   1747   2169   1415   1899
-1144   1678   2161   1403   1881
-1152   1749   2159   1474   2007
-1160   1601   2050   1470   1991
-1168   1648   2057   1461   1969
-1176   1605   2043   1439   1948
-1184   1654   2057   1428   1926
-1192   1595   2051   1427   1899
-1200   1647   2036   1419   1902
-1208   1598   2048   1402   1888
-1216   1643   2053   1471   1991
-1224   1595   2043   1469   1987
-1232   1649   2048   1456   1971
-1240   1599   2040   1436   1939
-1248   1644   2042   1433   1918
-1256   1602   2045   1424   1900
-1264   1648   2048   1413   1878
-1272   1591   2034   1401   1878
-1280   1649   2044   1475   2002
-1288   1493   1984   1461   1972
-1296   1484   1971   1438   1962
-1304   1490   1985   1443   1947
-1312   1535   1987   1425   1913
-1320   1481   1965   1410   1901
-1328   1493   1984   1407   1900
-1336   1493   1979   1396   1882
-1344   1526   1980   1465   1988
-1352   1492   1970   1463   1983
-1360   1487   1974   1452   1966
-1368   1481   1977   1439   1937
-1376   1535   1970   1428   1915
-1384   1489   1973   1417   1905
-1392   1483   1974   1415   1881
-1400   1485   1963   1403   1882
-1408   1523   1976   1466   1988
-1416   1477   1969   1459   1964
-1424   1487   1975   1455   1966
-1432   1488   1972   1438   1941
-1440   1518   1958   1432   1908
-1448   1484   1972   1421   1905
-1456   1485   1973   1398   1888
-1464   1476   1962   1399   1870
-1472   1530   1975   1471   1998
-1480   1478   1967   1452   1979
-1488   1478   1963   1453   1947
-1496   1477   1963   1438   1930
+Herbert what do you think about that ?
 
-
-Martin Willi (3):
-  crypto: x86/chacha20 - Add a 8-block AVX-512VL variant
-  crypto: x86/chacha20 - Add a 2-block AVX-512VL variant
-  crypto: x86/chacha20 - Add a 4-block AVX-512VL variant
-
- arch/x86/crypto/Makefile                   |   5 +
- arch/x86/crypto/chacha20-avx512vl-x86_64.S | 839 +++++++++++++++++++++
- arch/x86/crypto/chacha20_glue.c            |  40 +
- 3 files changed, 884 insertions(+)
- create mode 100644 arch/x86/crypto/chacha20-avx512vl-x86_64.S
-
--- 
-2.17.1
+Regards
