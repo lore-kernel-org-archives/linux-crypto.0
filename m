@@ -1,272 +1,114 @@
-Return-Path: <SRS0=9Ofa=N6=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:46884 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730583AbeKTGS5 (ORCPT
+Return-Path: <SRS0=rMEF=NS=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail-qk1-f196.google.com ([209.85.222.196]:35469 "EHLO
+        mail-qk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727592AbeKHFVP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 20 Nov 2018 01:18:57 -0500
-Received: by mail-wr1-f65.google.com with SMTP id l9so20478328wrt.13
-        for <linux-crypto@vger.kernel.org>; Mon, 19 Nov 2018 11:53:45 -0800 (PST)
-From: Corentin Labbe <clabbe@baylibre.com>
-To: davem@davemloft.net, ebiggers@kernel.org,
-        herbert@gondor.apana.org.au, nhorman@tuxdriver.com
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Corentin Labbe <clabbe@baylibre.com>
-Subject: [PATCH v2 09/11] crypto: crypto_user_stat: remove intermediate variable
-Date: Mon, 19 Nov 2018 19:53:28 +0000
-Message-Id: <1542657210-37739-10-git-send-email-clabbe@baylibre.com>
-In-Reply-To: <1542657210-37739-1-git-send-email-clabbe@baylibre.com>
-References: <1542657210-37739-1-git-send-email-clabbe@baylibre.com>
+        Thu, 8 Nov 2018 00:21:15 -0500
+Received: by mail-qk1-f196.google.com with SMTP id v68-v6so22592233qka.2
+        for <linux-crypto@vger.kernel.org>; Wed, 07 Nov 2018 11:49:24 -0800 (PST)
+Message-ID: <1541620162.4051.5.camel@redhat.com>
+Subject: Re: [Qestion] Lots of memory leaks when mounting and unmounting nfs
+ client to server continuously.
+From: Dave Wysochanski <dwysocha@redhat.com>
+To: zhong jiang <zhongjiang@huawei.com>,
+        Benjamin Coddington <bcodding@redhat.com>,
+        herbert@gondor.apana.org.au, trond.myklebust@hammerspace.com,
+        bfields@redhat.com
+Cc: linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+        linux-nfs@vger.kernel.org
+Date: Wed, 07 Nov 2018 14:49:22 -0500
+In-Reply-To: <5BD86392.7070200@huawei.com>
+References: <5BD85266.6000301@huawei.com>
+         <1DEE371C-69EB-4D92-8F78-535AA5203007@redhat.com>
+         <5BD86392.7070200@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The use of the v64 intermediate variable is useless, and removing it
-bring to much readable code.
+On Tue, 2018-10-30 at 21:58 +0800, zhong jiang wrote:
+> On 2018/10/30 21:06, Benjamin Coddington wrote:
+> > Hi zhong jiang,
+> > 
+> > Try asking in linux-nfs.. but I'll also note that 3.10-stable may
+> > be missing a number of fixes to leaks in the NFS GSS code.
+> > 
+> > I can see a more than a few fixes to memory leaks with:
+> > git log --grep=leak --oneline net/sunrpc/auth_gss/
+> > 
+> 
+> Thanks for your reply.  I has tested some of them in the upsteam as
+> you have said.  but It fails to solve the issue completely.
+> hence, I turn to the relevant experts whether they have happened to
+> the issue or  can give some suggestion or not.
+> 
+> Thanks,
+> zhong jiang
+> > Ben
+> > 
+> > On 30 Oct 2018, at 8:45, zhong jiang wrote:
+> > 
+> > > Hi,   Herbert
+> > > 
+> > > Recently,  I  hit  a memory leak issue when  mounting and
+> > > unmounting nfs with  the way of  krb5.
+> > > The issue happens to the linux-3.10-stable.
+> > > 
+> > > I find that slab-1024 and slab-512 will take up most of the
+> > > memory.  And it can not be freed.
+> > > Meanwhile, it result in rpcsec_gss_krb5 can be unregistered as
+> > > well.
+> > > 
+> > > 
 
-Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
----
- crypto/crypto_user_stat.c | 132 ++++++++++++--------------------------
- 1 file changed, 41 insertions(+), 91 deletions(-)
+Are you running the latest 3.10-stable?
 
-diff --git a/crypto/crypto_user_stat.c b/crypto/crypto_user_stat.c
-index 838123758423..7b668c659122 100644
---- a/crypto/crypto_user_stat.c
-+++ b/crypto/crypto_user_stat.c
-@@ -34,22 +34,16 @@ struct crypto_dump_info {
- static int crypto_report_aead(struct sk_buff *skb, struct crypto_alg *alg)
- {
- 	struct crypto_stat_aead raead;
--	u64 v64;
- 
- 	memset(&raead, 0, sizeof(raead));
- 
- 	strscpy(raead.type, "aead", sizeof(raead.type));
- 
--	v64 = atomic64_read(&alg->encrypt_cnt);
--	raead.stat_encrypt_cnt = v64;
--	v64 = atomic64_read(&alg->encrypt_tlen);
--	raead.stat_encrypt_tlen = v64;
--	v64 = atomic64_read(&alg->decrypt_cnt);
--	raead.stat_decrypt_cnt = v64;
--	v64 = atomic64_read(&alg->decrypt_tlen);
--	raead.stat_decrypt_tlen = v64;
--	v64 = atomic64_read(&alg->aead_err_cnt);
--	raead.stat_aead_err_cnt = v64;
-+	raead.stat_encrypt_cnt = atomic64_read(&alg->encrypt_cnt);
-+	raead.stat_encrypt_tlen = atomic64_read(&alg->encrypt_tlen);
-+	raead.stat_decrypt_cnt = atomic64_read(&alg->decrypt_cnt);
-+	raead.stat_decrypt_tlen = atomic64_read(&alg->decrypt_tlen);
-+	raead.stat_aead_err_cnt = atomic64_read(&alg->aead_err_cnt);
- 
- 	return nla_put(skb, CRYPTOCFGA_STAT_AEAD, sizeof(raead), &raead);
- }
-@@ -57,22 +51,16 @@ static int crypto_report_aead(struct sk_buff *skb, struct crypto_alg *alg)
- static int crypto_report_cipher(struct sk_buff *skb, struct crypto_alg *alg)
- {
- 	struct crypto_stat_cipher rcipher;
--	u64 v64;
- 
- 	memset(&rcipher, 0, sizeof(rcipher));
- 
- 	strscpy(rcipher.type, "cipher", sizeof(rcipher.type));
- 
--	v64 = atomic64_read(&alg->encrypt_cnt);
--	rcipher.stat_encrypt_cnt = v64;
--	v64 = atomic64_read(&alg->encrypt_tlen);
--	rcipher.stat_encrypt_tlen = v64;
--	v64 = atomic64_read(&alg->decrypt_cnt);
--	rcipher.stat_decrypt_cnt = v64;
--	v64 = atomic64_read(&alg->decrypt_tlen);
--	rcipher.stat_decrypt_tlen = v64;
--	v64 = atomic64_read(&alg->cipher_err_cnt);
--	rcipher.stat_cipher_err_cnt = v64;
-+	rcipher.stat_encrypt_cnt = atomic64_read(&alg->encrypt_cnt);
-+	rcipher.stat_encrypt_tlen = atomic64_read(&alg->encrypt_tlen);
-+	rcipher.stat_decrypt_cnt =  atomic64_read(&alg->decrypt_cnt);
-+	rcipher.stat_decrypt_tlen = atomic64_read(&alg->decrypt_tlen);
-+	rcipher.stat_cipher_err_cnt =  atomic64_read(&alg->cipher_err_cnt);
- 
- 	return nla_put(skb, CRYPTOCFGA_STAT_CIPHER, sizeof(rcipher), &rcipher);
- }
-@@ -80,21 +68,15 @@ static int crypto_report_cipher(struct sk_buff *skb, struct crypto_alg *alg)
- static int crypto_report_comp(struct sk_buff *skb, struct crypto_alg *alg)
- {
- 	struct crypto_stat_compress rcomp;
--	u64 v64;
- 
- 	memset(&rcomp, 0, sizeof(rcomp));
- 
- 	strscpy(rcomp.type, "compression", sizeof(rcomp.type));
--	v64 = atomic64_read(&alg->compress_cnt);
--	rcomp.stat_compress_cnt = v64;
--	v64 = atomic64_read(&alg->compress_tlen);
--	rcomp.stat_compress_tlen = v64;
--	v64 = atomic64_read(&alg->decompress_cnt);
--	rcomp.stat_decompress_cnt = v64;
--	v64 = atomic64_read(&alg->decompress_tlen);
--	rcomp.stat_decompress_tlen = v64;
--	v64 = atomic64_read(&alg->compress_err_cnt);
--	rcomp.stat_compress_err_cnt = v64;
-+	rcomp.stat_compress_cnt = atomic64_read(&alg->compress_cnt);
-+	rcomp.stat_compress_tlen = atomic64_read(&alg->compress_tlen);
-+	rcomp.stat_decompress_cnt = atomic64_read(&alg->decompress_cnt);
-+	rcomp.stat_decompress_tlen = atomic64_read(&alg->decompress_tlen);
-+	rcomp.stat_compress_err_cnt = atomic64_read(&alg->compress_err_cnt);
- 
- 	return nla_put(skb, CRYPTOCFGA_STAT_COMPRESS, sizeof(rcomp), &rcomp);
- }
-@@ -102,21 +84,15 @@ static int crypto_report_comp(struct sk_buff *skb, struct crypto_alg *alg)
- static int crypto_report_acomp(struct sk_buff *skb, struct crypto_alg *alg)
- {
- 	struct crypto_stat_compress racomp;
--	u64 v64;
- 
- 	memset(&racomp, 0, sizeof(racomp));
- 
- 	strscpy(racomp.type, "acomp", sizeof(racomp.type));
--	v64 = atomic64_read(&alg->compress_cnt);
--	racomp.stat_compress_cnt = v64;
--	v64 = atomic64_read(&alg->compress_tlen);
--	racomp.stat_compress_tlen = v64;
--	v64 = atomic64_read(&alg->decompress_cnt);
--	racomp.stat_decompress_cnt = v64;
--	v64 = atomic64_read(&alg->decompress_tlen);
--	racomp.stat_decompress_tlen = v64;
--	v64 = atomic64_read(&alg->compress_err_cnt);
--	racomp.stat_compress_err_cnt = v64;
-+	racomp.stat_compress_cnt = atomic64_read(&alg->compress_cnt);
-+	racomp.stat_compress_tlen = atomic64_read(&alg->compress_tlen);
-+	racomp.stat_decompress_cnt =  atomic64_read(&alg->decompress_cnt);
-+	racomp.stat_decompress_tlen = atomic64_read(&alg->decompress_tlen);
-+	racomp.stat_compress_err_cnt = atomic64_read(&alg->compress_err_cnt);
- 
- 	return nla_put(skb, CRYPTOCFGA_STAT_ACOMP, sizeof(racomp), &racomp);
- }
-@@ -124,25 +100,17 @@ static int crypto_report_acomp(struct sk_buff *skb, struct crypto_alg *alg)
- static int crypto_report_akcipher(struct sk_buff *skb, struct crypto_alg *alg)
- {
- 	struct crypto_stat_akcipher rakcipher;
--	u64 v64;
- 
- 	memset(&rakcipher, 0, sizeof(rakcipher));
- 
- 	strscpy(rakcipher.type, "akcipher", sizeof(rakcipher.type));
--	v64 = atomic64_read(&alg->encrypt_cnt);
--	rakcipher.stat_encrypt_cnt = v64;
--	v64 = atomic64_read(&alg->encrypt_tlen);
--	rakcipher.stat_encrypt_tlen = v64;
--	v64 = atomic64_read(&alg->decrypt_cnt);
--	rakcipher.stat_decrypt_cnt = v64;
--	v64 = atomic64_read(&alg->decrypt_tlen);
--	rakcipher.stat_decrypt_tlen = v64;
--	v64 = atomic64_read(&alg->sign_cnt);
--	rakcipher.stat_sign_cnt = v64;
--	v64 = atomic64_read(&alg->verify_cnt);
--	rakcipher.stat_verify_cnt = v64;
--	v64 = atomic64_read(&alg->akcipher_err_cnt);
--	rakcipher.stat_akcipher_err_cnt = v64;
-+	rakcipher.stat_encrypt_cnt = atomic64_read(&alg->encrypt_cnt);
-+	rakcipher.stat_encrypt_tlen = atomic64_read(&alg->encrypt_tlen);
-+	rakcipher.stat_decrypt_cnt = atomic64_read(&alg->decrypt_cnt);
-+	rakcipher.stat_decrypt_tlen = atomic64_read(&alg->decrypt_tlen);
-+	rakcipher.stat_sign_cnt = atomic64_read(&alg->sign_cnt);
-+	rakcipher.stat_verify_cnt = atomic64_read(&alg->verify_cnt);
-+	rakcipher.stat_akcipher_err_cnt = atomic64_read(&alg->akcipher_err_cnt);
- 
- 	return nla_put(skb, CRYPTOCFGA_STAT_AKCIPHER,
- 		       sizeof(rakcipher), &rakcipher);
-@@ -151,20 +119,15 @@ static int crypto_report_akcipher(struct sk_buff *skb, struct crypto_alg *alg)
- static int crypto_report_kpp(struct sk_buff *skb, struct crypto_alg *alg)
- {
- 	struct crypto_stat_kpp rkpp;
--	u64 v;
- 
- 	memset(&rkpp, 0, sizeof(rkpp));
- 
- 	strscpy(rkpp.type, "kpp", sizeof(rkpp.type));
- 
--	v = atomic64_read(&alg->setsecret_cnt);
--	rkpp.stat_setsecret_cnt = v;
--	v = atomic64_read(&alg->generate_public_key_cnt);
--	rkpp.stat_generate_public_key_cnt = v;
--	v = atomic64_read(&alg->compute_shared_secret_cnt);
--	rkpp.stat_compute_shared_secret_cnt = v;
--	v = atomic64_read(&alg->kpp_err_cnt);
--	rkpp.stat_kpp_err_cnt = v;
-+	rkpp.stat_setsecret_cnt = atomic64_read(&alg->setsecret_cnt);
-+	rkpp.stat_generate_public_key_cnt = atomic64_read(&alg->generate_public_key_cnt);
-+	rkpp.stat_compute_shared_secret_cnt = atomic64_read(&alg->compute_shared_secret_cnt);
-+	rkpp.stat_kpp_err_cnt = atomic64_read(&alg->kpp_err_cnt);
- 
- 	return nla_put(skb, CRYPTOCFGA_STAT_KPP, sizeof(rkpp), &rkpp);
- }
-@@ -172,18 +135,14 @@ static int crypto_report_kpp(struct sk_buff *skb, struct crypto_alg *alg)
- static int crypto_report_ahash(struct sk_buff *skb, struct crypto_alg *alg)
- {
- 	struct crypto_stat_hash rhash;
--	u64 v64;
- 
- 	memset(&rhash, 0, sizeof(rhash));
- 
- 	strscpy(rhash.type, "ahash", sizeof(rhash.type));
- 
--	v64 = atomic64_read(&alg->hash_cnt);
--	rhash.stat_hash_cnt = v64;
--	v64 = atomic64_read(&alg->hash_tlen);
--	rhash.stat_hash_tlen = v64;
--	v64 = atomic64_read(&alg->hash_err_cnt);
--	rhash.stat_hash_err_cnt = v64;
-+	rhash.stat_hash_cnt = atomic64_read(&alg->hash_cnt);
-+	rhash.stat_hash_tlen = atomic64_read(&alg->hash_tlen);
-+	rhash.stat_hash_err_cnt = atomic64_read(&alg->hash_err_cnt);
- 
- 	return nla_put(skb, CRYPTOCFGA_STAT_HASH, sizeof(rhash), &rhash);
- }
-@@ -191,18 +150,14 @@ static int crypto_report_ahash(struct sk_buff *skb, struct crypto_alg *alg)
- static int crypto_report_shash(struct sk_buff *skb, struct crypto_alg *alg)
- {
- 	struct crypto_stat_hash rhash;
--	u64 v64;
- 
- 	memset(&rhash, 0, sizeof(rhash));
- 
- 	strscpy(rhash.type, "shash", sizeof(rhash.type));
- 
--	v64 = atomic64_read(&alg->hash_cnt);
--	rhash.stat_hash_cnt = v64;
--	v64 = atomic64_read(&alg->hash_tlen);
--	rhash.stat_hash_tlen = v64;
--	v64 = atomic64_read(&alg->hash_err_cnt);
--	rhash.stat_hash_err_cnt = v64;
-+	rhash.stat_hash_cnt =  atomic64_read(&alg->hash_cnt);
-+	rhash.stat_hash_tlen = atomic64_read(&alg->hash_tlen);
-+	rhash.stat_hash_err_cnt = atomic64_read(&alg->hash_err_cnt);
- 
- 	return nla_put(skb, CRYPTOCFGA_STAT_HASH, sizeof(rhash), &rhash);
- }
-@@ -210,20 +165,15 @@ static int crypto_report_shash(struct sk_buff *skb, struct crypto_alg *alg)
- static int crypto_report_rng(struct sk_buff *skb, struct crypto_alg *alg)
- {
- 	struct crypto_stat_rng rrng;
--	u64 v64;
- 
- 	memset(&rrng, 0, sizeof(rrng));
- 
- 	strscpy(rrng.type, "rng", sizeof(rrng.type));
- 
--	v64 = atomic64_read(&alg->generate_cnt);
--	rrng.stat_generate_cnt = v64;
--	v64 = atomic64_read(&alg->generate_tlen);
--	rrng.stat_generate_tlen = v64;
--	v64 = atomic64_read(&alg->seed_cnt);
--	rrng.stat_seed_cnt = v64;
--	v64 = atomic64_read(&alg->rng_err_cnt);
--	rrng.stat_rng_err_cnt = v64;
-+	rrng.stat_generate_cnt = atomic64_read(&alg->generate_cnt);
-+	rrng.stat_generate_tlen = atomic64_read(&alg->generate_tlen);
-+	rrng.stat_seed_cnt = atomic64_read(&alg->seed_cnt);
-+	rrng.stat_rng_err_cnt = atomic64_read(&alg->rng_err_cnt);
- 
- 	return nla_put(skb, CRYPTOCFGA_STAT_RNG, sizeof(rrng), &rrng);
- }
--- 
-2.18.1
+This sounds very familiar to something I encountered a while ago and it
+was a sunrpc cache related problem.  The patch that fixed it for me is
+in 3.10.106 though.
+
+Can you check if this cache is growing indefinitely?
+/proc/net/rpc/auth.rpcsec.context
+
+If it is large, try to flush explicitly with:
+date +%s  > /proc/net/rpc/auth.rpcsec.context/flush
+
+If all that checks out, you may need the below upstream fix, but it
+went into v3.10.106 as
+6a4a5fd svcrpc: don't leak contexts on PROC_DESTROY
+
+commit 6a4a5fd4c7bc6a06ca26ad7327d046d8d3c0932a
+Author: J. Bruce Fields <bfields@redhat.com>
+Date:   Mon Jan 9 17:15:18 2017 -0500
+
+    svcrpc: don't leak contexts on PROC_DESTROY
+    
+    commit 78794d1890708cf94e3961261e52dcec2cc34722 upstream.
+    
+    Context expiry times are in units of seconds since boot, not unix time.
+    
+    The use of get_seconds() here therefore sets the expiry time decades in
+    the future.  This prevents timely freeing of contexts destroyed by
+    client RPC_GSS_PROC_DESTROY requests.  We'd still free them eventually
+    (when the module is unloaded or the container shut down), but a lot of
+    contexts could pile up before then.
+    
+    Fixes: c5b29f885afe "sunrpc: use seconds since boot in expiry cache"
+    Reported-by: Andy Adamson <andros@netapp.com>
+    Signed-off-by: J. Bruce Fields <bfields@redhat.com>
+    Signed-off-by: Willy Tarreau <w@1wt.eu>
+
+diff --git a/net/sunrpc/auth_gss/svcauth_gss.c b/net/sunrpc/auth_gss/svcauth_gss.c
+index 62663a0..e625efe 100644
+--- a/net/sunrpc/auth_gss/svcauth_gss.c
++++ b/net/sunrpc/auth_gss/svcauth_gss.c
+@@ -1518,7 +1518,7 @@ static void destroy_use_gss_proxy_proc_entry(struct net *net) {}
+        case RPC_GSS_PROC_DESTROY:
+                if (gss_write_verf(rqstp, rsci->mechctx, gc->gc_seq))
+                        goto auth_err;
+-               rsci->h.expiry_time = get_seconds();
++               rsci->h.expiry_time = seconds_since_boot();
+                set_bit(CACHE_NEGATIVE, &rsci->h.flags);
+                if (resv->iov_len + 4 > PAGE_SIZE)
+                        goto drop;
