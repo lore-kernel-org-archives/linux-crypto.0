@@ -1,78 +1,61 @@
-Return-Path: <SRS0=9Ofa=N6=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:55450 "EHLO
-        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730116AbeKTGSs (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 20 Nov 2018 01:18:48 -0500
-Received: by mail-wm1-f67.google.com with SMTP id y139so6547573wmc.5
-        for <linux-crypto@vger.kernel.org>; Mon, 19 Nov 2018 11:53:38 -0800 (PST)
-From: Corentin Labbe <clabbe@baylibre.com>
-To: davem@davemloft.net, ebiggers@kernel.org,
-        herbert@gondor.apana.org.au, nhorman@tuxdriver.com
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Corentin Labbe <clabbe@baylibre.com>
-Subject: [PATCH v2 01/11] crypto: move crypto_alg_get/crypto_alg_put to linux/crypto.h
-Date: Mon, 19 Nov 2018 19:53:20 +0000
-Message-Id: <1542657210-37739-2-git-send-email-clabbe@baylibre.com>
-In-Reply-To: <1542657210-37739-1-git-send-email-clabbe@baylibre.com>
-References: <1542657210-37739-1-git-send-email-clabbe@baylibre.com>
+Return-Path: <SRS0=rMEF=NS=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail-eopbgr40073.outbound.protection.outlook.com ([40.107.4.73]:2145
+        "EHLO EUR03-DB5-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727203AbeKHBEZ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 7 Nov 2018 20:04:25 -0500
+From: Leonard Crestez <leonard.crestez@nxp.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller " <davem@davemloft.net>,
+        Marek Vasut <marek.vasut@gmail.com>
+CC: Horia Geanta <horia.geanta@nxp.com>,
+        Franck Lenormand <franck.lenormand@nxp.com>,
+        Fabio Estevam <fabio.estevam@nxp.com>,
+        Shawn Guo <shawnguo@kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        dl-linux-imx <linux-imx@nxp.com>,
+        "kernel@pengutronix.de" <kernel@pengutronix.de>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: [RESEND 1/2] dt-bindings: crypto: Mention clocks for mxs-dcp
+Date: Wed, 7 Nov 2018 15:33:31 +0000
+Message-ID: <e745d22e342726be9a96c2993d8a279d6c5dac6a.1541604742.git.leonard.crestez@nxp.com>
+References: <cover.1541604742.git.leonard.crestez@nxp.com>
+In-Reply-To: <cover.1541604742.git.leonard.crestez@nxp.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Since we will need crypto_alg_get/crypto_alg_put for "locking"
-crypto_alg when updating stats, we need it to be via linux/crypto.h
+Explicit clock enabling is required on 6sll and 6ull so mention that
+standard clock bindings are used.
 
-Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
+Signed-off-by: Leonard Crestez <leonard.crestez@nxp.com>
+Reviewed-by: Fabio Estevam <festevam@gmail.com>
+Reviewed-by: Rob Herring <robh@kernel.org>
 ---
- crypto/internal.h      | 12 ------------
- include/linux/crypto.h | 12 ++++++++++++
- 2 files changed, 12 insertions(+), 12 deletions(-)
+ Documentation/devicetree/bindings/crypto/fsl-dcp.txt | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/crypto/internal.h b/crypto/internal.h
-index ef769b5e8ad3..d81f033aeb5c 100644
---- a/crypto/internal.h
-+++ b/crypto/internal.h
-@@ -91,18 +91,6 @@ unsigned int crypto_alg_extsize(struct crypto_alg *alg);
- int crypto_type_has_alg(const char *name, const struct crypto_type *frontend,
- 			u32 type, u32 mask);
- 
--static inline struct crypto_alg *crypto_alg_get(struct crypto_alg *alg)
--{
--	refcount_inc(&alg->cra_refcnt);
--	return alg;
--}
--
--static inline void crypto_alg_put(struct crypto_alg *alg)
--{
--	if (refcount_dec_and_test(&alg->cra_refcnt) && alg->cra_destroy)
--		alg->cra_destroy(alg);
--}
--
- static inline int crypto_tmpl_get(struct crypto_template *tmpl)
- {
- 	return try_module_get(tmpl->module);
-diff --git a/include/linux/crypto.h b/include/linux/crypto.h
-index 3634ad6fe202..ac8f4168a831 100644
---- a/include/linux/crypto.h
-+++ b/include/linux/crypto.h
-@@ -607,6 +607,18 @@ int crypto_unregister_algs(struct crypto_alg *algs, int count);
-  */
- int crypto_has_alg(const char *name, u32 type, u32 mask);
- 
-+static inline struct crypto_alg *crypto_alg_get(struct crypto_alg *alg)
-+{
-+	refcount_inc(&alg->cra_refcnt);
-+	return alg;
-+}
-+
-+static inline void crypto_alg_put(struct crypto_alg *alg)
-+{
-+	if (refcount_dec_and_test(&alg->cra_refcnt) && alg->cra_destroy)
-+		alg->cra_destroy(alg);
-+}
-+
- /*
-  * Transforms: user-instantiated objects which encapsulate algorithms
-  * and core processing logic.  Managed via crypto_alloc_*() and
--- 
-2.18.1
+diff --git a/Documentation/devicetree/bindings/crypto/fsl-dcp.txt b/Documen=
+tation/devicetree/bindings/crypto/fsl-dcp.txt
+index 76a0b4e80e83..4e4d387e38a5 100644
+--- a/Documentation/devicetree/bindings/crypto/fsl-dcp.txt
++++ b/Documentation/devicetree/bindings/crypto/fsl-dcp.txt
+@@ -4,10 +4,12 @@ Required properties:
+ - compatible : Should be "fsl,<soc>-dcp"
+ - reg : Should contain MXS DCP registers location and length
+ - interrupts : Should contain MXS DCP interrupt numbers, VMI IRQ and DCP I=
+RQ
+                must be supplied, optionally Secure IRQ can be present, but
+ 	       is currently not implemented and not used.
++- clocks : Clock reference (only required on some SOCs: 6ull and 6sll).
++- clock-names : Must be "dcp".
+=20
+ Example:
+=20
+ dcp@80028000 {
+ 	compatible =3D "fsl,imx28-dcp", "fsl,imx23-dcp";
+--=20
+2.17.1
