@@ -1,135 +1,93 @@
-Return-Path: <SRS0=9Ofa=N6=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:48672 "EHLO mx1.redhat.com"
+Return-Path: <SRS0=HYoH=NT=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mout.gmx.net ([212.227.15.15]:50305 "EHLO mout.gmx.net"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2389110AbeKTDNQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 19 Nov 2018 22:13:16 -0500
-Date: Mon, 19 Nov 2018 11:48:54 -0500
-From: Jerome Glisse <jglisse@redhat.com>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Kenneth Lee <liguozhu@hisilicon.com>,
-        Tim Sell <timothy.sell@unisys.com>, linux-doc@vger.kernel.org,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Zaibo Xu <xuzaibo@huawei.com>, zhangfei.gao@foxmail.com,
-        linuxarm@huawei.com, haojian.zhuang@linaro.org,
-        Christoph Lameter <cl@linux.com>,
-        Hao Fang <fanghao11@huawei.com>,
-        Gavin Schenk <g.schenk@eckelmann.de>,
-        RDMA mailing list <linux-rdma@vger.kernel.org>,
-        Zhou Wang <wangzhou1@hisilicon.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Doug Ledford <dledford@redhat.com>,
-        Uwe =?iso-8859-1?Q?Kleine-K=F6nig?=
-        <u.kleine-koenig@pengutronix.de>,
-        David Kershner <david.kershner@unisys.com>,
-        Kenneth Lee <nek.in.cn@gmail.com>,
-        Johan Hovold <johan@kernel.org>,
-        Cyrille Pitchen <cyrille.pitchen@free-electrons.com>,
-        Sagar Dharia <sdharia@codeaurora.org>,
-        Jens Axboe <axboe@kernel.dk>, guodong.xu@linaro.org,
-        linux-netdev <netdev@vger.kernel.org>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        linux-kernel@vger.kernel.org, Vinod Koul <vkoul@kernel.org>,
-        linux-crypto@vger.kernel.org,
-        Philippe Ombredanne <pombredanne@nexb.com>,
-        Sanyog Kale <sanyog.r.kale@intel.com>,
+        id S1725723AbeKIGD0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 9 Nov 2018 01:03:26 -0500
+Message-ID: <1541708719.12945.2.camel@gmx.us>
+Subject: BUG: KASAN: slab-out-of-bounds in cts_cbc_encrypt+0xec/0x3c0
+From: Qian Cai <cai@gmx.us>
+To: linux-kernel@vger.kernel.org
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        linux-accelerators@lists.ozlabs.org
-Subject: Re: [RFCv3 PATCH 1/6] uacce: Add documents for WarpDrive/uacce
-Message-ID: <20181119164853.GA4593@redhat.com>
-References: <20181112075807.9291-1-nek.in.cn@gmail.com>
- <20181112075807.9291-2-nek.in.cn@gmail.com>
- <20181113002354.GO3695@mtr-leonro.mtl.com>
- <95310df4-b32c-42f0-c750-3ad5eb89b3dd@gmail.com>
- <20181114160017.GI3759@mtr-leonro.mtl.com>
- <20181115085109.GD157308@Turing-Arch-b>
- <20181115145455.GN3759@mtr-leonro.mtl.com>
- <20181119091405.GE157308@Turing-Arch-b>
- <20181119091910.GF157308@Turing-Arch-b>
- <20181119104801.GF8268@mtr-leonro.mtl.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+        linux-crypto@vger.kernel.org
+Date: Thu, 08 Nov 2018 15:25:19 -0500
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20181119104801.GF8268@mtr-leonro.mtl.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Nov 19, 2018 at 12:48:01PM +0200, Leon Romanovsky wrote:
-> On Mon, Nov 19, 2018 at 05:19:10PM +0800, Kenneth Lee wrote:
-> > On Mon, Nov 19, 2018 at 05:14:05PM +0800, Kenneth Lee wrote:
-> > > On Thu, Nov 15, 2018 at 04:54:55PM +0200, Leon Romanovsky wrote:
-> > > > On Thu, Nov 15, 2018 at 04:51:09PM +0800, Kenneth Lee wrote:
-> > > > > On Wed, Nov 14, 2018 at 06:00:17PM +0200, Leon Romanovsky wrote:
-> > > > > > On Wed, Nov 14, 2018 at 10:58:09AM +0800, Kenneth Lee wrote:
-> > > > > > > > On Mon, Nov 12, 2018 at 03:58:02PM +0800, Kenneth Lee wrote:
+Just booting up the latest git master (b00d209) on an aarch64 server and saw
+this.
 
-[...]
+[   42.448373] BUG: KASAN: slab-out-of-bounds in cts_cbc_encrypt+0xec/0x3c0
+[   42.455157] Write of size 8 at addr ffff801dd06aaa40 by task
+cryptomgr_test/409
 
-> > > > memory exposed to user is properly protected from security point of view.
-> > > > 3. "stop using the page for a while for the copying" - I'm not fully
-> > > > understand this claim, maybe this article will help you to better
-> > > > describe : https://lwn.net/Articles/753027/
-> > >
-> > > This topic was being discussed in RFCv2. The key problem here is that:
-> > >
-> > > The device need to hold the memory for its own calculation, but the CPU/software
-> > > want to stop it for a while for synchronizing with disk or COW.
-> > >
-> > > If the hardware support SVM/SVA (Shared Virtual Memory/Address), it is easy, the
-> > > device share page table with CPU, the device will raise a page fault when the
-> > > CPU downgrade the PTE to read-only.
-> > >
-> > > If the hardware cannot share page table with the CPU, we then need to have
-> > > some way to change the device page table. This is what happen in ODP. It
-> > > invalidates the page table in device upon mmu_notifier call back. But this cannot
-> > > solve the COW problem: if the user process A share a page P with device, and A
-> > > forks a new process B, and it continue to write to the page. By COW, the
-> > > process B will keep the page P, while A will get a new page P'. But you have
-> > > no way to let the device know it should use P' rather than P.
-> 
-> I didn't hear about such issue and we supported fork for a long time.
-> 
+[   42.464065] CPU: 3 PID: 409 Comm: cryptomgr_test Tainted: G        W       T
+4.20.0-rc1+ #6
+[   42.472517] Hardware name: Huawei TaiShan 2280 /BC11SPCD, BIOS 1.50
+06/01/2018
+[   42.479826] Call trace:
+[   42.482306]  dump_backtrace+0x0/0x248
+[   42.486014]  show_stack+0x24/0x30
+[   42.489372]  dump_stack+0xb8/0xf4
+[   42.492730]  print_address_description+0x68/0x2b8
+[   42.497492]  kasan_report+0x22c/0x340
+[   42.501199]  __asan_store8+0x90/0xa0
+[   42.504818]  cts_cbc_encrypt+0xec/0x3c0
+[   42.508703]  simd_skcipher_encrypt+0xc4/0x198
+[   42.513115]  __test_skcipher+0x6d4/0x1030
+[   42.517173]  test_skcipher+0x48/0xf0
+[   42.520793]  alg_test_skcipher+0x78/0x110
+[   42.524852]  alg_test.part.6+0x238/0x4e8
+[   42.528823]  alg_test+0x60/0xa8
+[   42.532002]  cryptomgr_test+0x5c/0x68
+[   42.535710]  kthread+0x18c/0x1d0
+[   42.538977]  ret_from_fork+0x10/0x18
 
-Just to comment on this, any infiniband driver which use umem and do
-not have ODP (here ODP for me means listening to mmu notifier so all
-infiniband driver except mlx5) will be affected by same issue AFAICT.
+[   42.544102] Allocated by task 409:
+[   42.547547]  kasan_kmalloc+0xd8/0x188
+[   42.551254]  __kmalloc+0x1f8/0x470
+[   42.554698]  __test_skcipher+0x18c/0x1030
+[   42.558757]  test_skcipher+0x48/0xf0
+[   42.562376]  alg_test_skcipher+0x78/0x110
+[   42.566435]  alg_test.part.6+0x238/0x4e8
+[   42.570406]  alg_test+0x60/0xa8
+[   42.573586]  cryptomgr_test+0x5c/0x68
+[   42.577293]  kthread+0x18c/0x1d0
+[   42.580560]  ret_from_fork+0x10/0x18
 
-AFAICT there is no special thing happening after fork() inside any of
-those driver. So if parent create a umem mr before fork() and program
-hardware with it then after fork() the parent might start using new
-page for the umem range while the old memory is use by the child. The
-reverse is also true (parent using old memory and child new memory)
-bottom line you can not predict which memory the child or the parent
-will use for the range after fork().
+[   42.585684] Freed by task 0:
+[   42.588597] (stack is not available)
 
-So no matter what you consider the child or the parent, what the hw
-will use for the mr is unlikely to match what the CPU use for the
-same virtual address. In other word:
+[   42.593722] The buggy address belongs to the object at ffff801dd06aa880
+ which belongs to the cache kmalloc-512 of size 512
+[   42.606397] The buggy address is located 448 bytes inside of
+ 512-byte region [ffff801dd06aa880, ffff801dd06aaa80)
+[   42.618277] The buggy address belongs to the page:
+[   42.623127] page:ffff7fe007741a80 count:1 mapcount:0 mapping:ffff801dc0010880
+index:0xffff801dd06a5880
+[   42.632548] flags: 0x1fffff0000000200(slab)
+[   42.636785] raw: 1fffff0000000200 ffff801dc000fac0 ffff801dc000fac0
+ffff801dc0010880
+[   42.644625] raw: ffff801dd06a5880 000000000040002c 00000001ffffffff
+0000000000000000
+[   42.652461] page dumped because: kasan: bad access detected
 
-Before fork:
-    CPU parent: virtual addr ptr1 -> physical address = 0xCAFE
-    HARDWARE:   virtual addr ptr1 -> physical address = 0xCAFE
+[   42.659606] Memory state around the buggy address:
+[   42.664455]  ffff801dd06aa900: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00
+[   42.671765]  ffff801dd06aa980: 00 fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+fc
+[   42.679075] >ffff801dd06aaa00: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+fc
+[   42.686383]                                            ^
+[   42.691759]  ffff801dd06aaa80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+fc
+[   42.699069]  ffff801dd06aab00: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+fc
+[   42.706377]
+==================================================================
 
-Case 1:
-    CPU parent: virtual addr ptr1 -> physical address = 0xCAFE
-    CPU child:  virtual addr ptr1 -> physical address = 0xDEAD
-    HARDWARE:   virtual addr ptr1 -> physical address = 0xCAFE
-
-Case 2:
-    CPU parent: virtual addr ptr1 -> physical address = 0xBEEF
-    CPU child:  virtual addr ptr1 -> physical address = 0xCAFE
-    HARDWARE:   virtual addr ptr1 -> physical address = 0xCAFE
-
-
-This apply for every single page and is not predictable. This only
-apply to private memory (mmap() with MAP_PRIVATE)
-
-I am not familiar enough with RDMA user space API contract to know
-if this is an issue or not.
-
-Note that this can not be fix, no one should have done umem without
-ODP like mlx5. For this to work properly you need sane hardware like
-mlx5.
-
-Cheers,
-J�r�me
+Any idea?
