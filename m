@@ -1,305 +1,577 @@
-Return-Path: <SRS0=1iZj=N3=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:37220 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725804AbeKQGWG (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 17 Nov 2018 01:22:06 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id wAGK4CQk026125
-        for <linux-crypto@vger.kernel.org>; Fri, 16 Nov 2018 15:08:16 -0500
-Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2nt24t62j0-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <linux-crypto@vger.kernel.org>; Fri, 16 Nov 2018 15:08:16 -0500
-Received: from localhost
-        by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-crypto@vger.kernel.org> from <bauerman@linux.ibm.com>;
-        Fri, 16 Nov 2018 20:08:15 -0000
-From: Thiago Jung Bauermann <bauerman@linux.ibm.com>
-To: linux-integrity@vger.kernel.org
-Cc: linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        David Howells <dhowells@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Jessica Yu <jeyu@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jonathan Corbet <corbet@lwn.net>,
-        "AKASHI, Takahiro" <takahiro.akashi@linaro.org>,
-        Thiago Jung Bauermann <bauerman@linux.ibm.com>
-Subject: [PATCH v8 00/14] Appended signatures support for IMA appraisal
-Date: Fri, 16 Nov 2018 18:06:58 -0200
-Message-Id: <20181116200712.14154-1-bauerman@linux.ibm.com>
+Return-Path: <SRS0=HYoH=NT=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from inva020.nxp.com ([92.121.34.13]:33318 "EHLO inva020.nxp.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726710AbeKHXMc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 8 Nov 2018 18:12:32 -0500
+From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        Cristian Stoica <cristian.stoica@microchip.com>,
+        linux-crypto@vger.kernel.org,
+        Cristian Stoica <cristian.stoica@nxp.com>
+Subject: [PATCH 4/5] crypto: caam/jr - add support for Chacha20 + Poly1305
+Date: Thu,  8 Nov 2018 15:36:30 +0200
+Message-Id: <20181108133631.15779-5-horia.geanta@nxp.com>
+In-Reply-To: <20181108133631.15779-1-horia.geanta@nxp.com>
+References: <20181108133631.15779-1-horia.geanta@nxp.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hello,
+Add support for Chacha20 + Poly1305 combined AEAD:
+-generic (rfc7539)
+-IPsec (rfc7634 - known as rfc7539esp in the kernel)
 
-v8 is just a rebase on top of today's linux-integrity/next-integrity.
-There aren't any noteworthy changes since v7, which is why I'm keeping its
-description below:
+Signed-off-by: Cristian Stoica <cristian.stoica@nxp.com>
+Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
+---
+ drivers/crypto/caam/caamalg.c      | 221 ++++++++++++++++++++++++++++++++++++-
+ drivers/crypto/caam/caamalg_desc.c | 111 +++++++++++++++++++
+ drivers/crypto/caam/caamalg_desc.h |   4 +
+ drivers/crypto/caam/compat.h       |   1 +
+ drivers/crypto/caam/desc.h         |  15 +++
+ drivers/crypto/caam/desc_constr.h  |   7 +-
+ 6 files changed, 354 insertions(+), 5 deletions(-)
 
-The main difference in v7 is the addition of the last patch, which ensures
-that there will always be a measurement entry containing the appended
-modsig if one was used to appraise the file. The patch description and
-comments in the code should explain in which circumstances the patch proved
-necessary.
-
-Apart from that, there was some small cleaning up of the code, and merging
-and splitting of patches. The changelog below has the details.
-
-Original cover letter:
-
-On the OpenPOWER platform, secure boot and trusted boot are being
-implemented using IMA for taking measurements and verifying signatures.
-Since the kernel image on Power servers is an ELF binary, kernels are
-signed using the scripts/sign-file tool and thus use the same signature
-format as signed kernel modules.
-
-This patch series adds support in IMA for verifying those signatures.
-It adds flexibility to OpenPOWER secure boot, because it allows it to boot
-kernels with the signature appended to them as well as kernels where the
-signature is stored in the IMA extended attribute.
-
-Changes since v7:
-- Patch "MODSIGN: Export module signature definitions"
-  - Added module name parameter to validate_module_sig() so that it can be
-    shown in error messages.
-
-- Patch "integrity: Introduce struct evm_xattr"
-  - Dropped use of struct evm_xattr in evm_update_evmxattr() and
-    evm_verify_hmac(). It's not needed there anymore because of changes
-    to support portable EVM signatures.
-
-Changes since v6:
-
-- Patch "PKCS#7: Introduce pkcs7_get_message_sig() and verify_pkcs7_message_sig()"
-  - Retitled to "PKCS#7: Refactor verify_pkcs7_signature() and
-    add pkcs7_get_message_sig()"
-  - Reworded description to clarify why the refactoring is needed.
-    The code is unchanged. (Suggested by Mimi Zohar)
-  - Added Mimi Zohar's Reviewed-by.
-
-- Patch "PKCS#7: Introduce pkcs7_get_digest()"
-  - Added Mimi Zohar's Reviewed-by.
-
-- Patch "integrity: Introduce integrity_keyring_from_id"
-  - Added Mimi Zohar's Signed-off-by.
-
-- Patch "integrity: Introduce asymmetric_sig_has_known_key()"
-  - Added Mimi Zohar's Signed-off-by.
-
-- Patch "integrity: Select CONFIG_KEYS instead of depending on it"
-  - Added Mimi Zohar's Signed-off-by.
-
-- Patch "ima: Introduce is_ima_sig()"
-  - Renamed function to is_signed() (suggested by Mimi Zohar).
-
-- Patch "ima: Add functions to read and verify a modsig signature"
-  - Changed stubs for the !CONFIG_IMA_APPRAISE_MODSIG to return -EOPNOTSUPP
-    instead of -ENOTSUPP, since the latter isn't defined in uapi headers.
-  - Moved functions to the patches which use them and dropped this patch
-    (suggested by Mimi Zohar).
-
-- Patch "ima: Implement support for module-style appended signatures"
-  - Prevent reading and writing of IMA_MODSIG xattr in ima_read_xattr()
-    and ima_inode_setxattr().
-  - Simplify code in process_measurement() which decides whether to try
-    reading a modsig (suggested by Mimi Zohar).
-  - Moved some functions from patch "ima: Add functions to read and verify
-    a modsig signature" into this patch.
-
-- Patch "ima: Add new "d-sig" template field"
-  - New patch containing code from patch "ima: Write modsig to the measurement list"
-    (Suggested by Mimi Zohar).
-
-- Patch "ima: Write modsig to the measurement list"
-  - Moved some functions from patch "ima: Add functions to read and verify
-    a modsig signature" into this patch.
-  - Moved code related to d-sig support to new patch.
-
-- Patch "ima: Store the measurement again when appraising a modsig"
-  - New patch.
-
-Changes since v5:
-- Patch "ima: Remove some superfluous parentheses"
-  - Dropped.
-
-- Patch "evm, ima: Remove superfluous parentheses"
-  - Dropped.
-
-- Patch "evm, ima: Remove more superfluous parentheses"
-  - Dropped.
-
-- Patch "ima: Don't pass xattr value to EVM xattr verification."
-  - Dropped.
-
-- Patch "ima: Store measurement after appraisal"
-  - Dropped.
-
-- Patch "MODSIGN: Export module signature definitions"
-  - Reduced changes to the code that was moved into validate_module_sig()
-    to the minimum necessary (suggested by Mimi Zohar).
-  - Added SPDX license identifier.
-
-- Patch "PKCS#7: Introduce pkcs7_get_message_sig() and verify_pkcs7_message_sig()"
-  - In the hypothetical case that there's more than one sinfo, changed
-    pkcs7_get_message_sig() to return NULL instead of the first sinfo's sig.
-  - Dropped Mimi's Reviewed-by because of the code change above.
-
-- Patch "PKCS#7: Introduce pkcs7_get_digest()"
-  - New patch.
-
-- Patch "integrity: Introduce integrity_keyring_from_id"
-  - Add stub in case CONFIG_INTEGRITY_SIGNATURE isn't set.
-
-- Patch "integrity: Introduce asymmetric_sig_has_known_key()"
-  - New patch.
-
-- Patch "ima: Introduce is_ima_sig"
-  - New patch, with code from "ima: Improvements in ima_appraise_measurement"
-
-- Patch "ima: Add modsig appraise_type option for module-style appended signatures"
-  - Changed appraise_type to accept "imasig|modsig" instead of
-    "modsig|imasig" to reflect the fact that now IMA only looks for
-    the modsig after failing to find a suitable imasig stored in the xattr.
-  - Added SPDX license identifier.
-
-- Patch "ima: Add functions to read and verify a modsig signature"
-  - Changed ima_read_modsig() to abort loading the modsig if it uses a key
-    which isn't known to IMA.
-  - Changed ima_get_modsig_hash() to use pkcs7_get_digest().
-
-- Patch "ima: Implement support for module-style appended signatures"
-  - Added ima_xattr_sig_known_key() auxiliary function.
-  - Call ima_read_modsig() directly from process_measurement() instead of
-    from ima_appraise_measurement(), and only if there's no xattr signature
-    or if the xattr signature uses a key which isn't known to IMA.
-  - hash_algo in process_measurement() is always obtained from the xattr
-    signature, never from the modsig.
-  - Changes to ima_appraise_measurement() are a lot simpler now, and don't
-    involve going back to the main switch statement a second time.
-  - Pass xattr_value to evm_verifyxattr() unless xattr_value is a modsig.
-
-- Patch "ima: Write modsig to the measurement list"
-  - Since now we determine whether we'll use an xattr sig or a modsig
-    at the time they are read, there's no need to store a measurement
-    again in the modsig case. Thus, this patch doesn't need to change
-    ima_store_measurement() nor process_measurement() anymore.
-  - Define new "d-sig" template field which holds the digest that is
-    expected to match the one contained in the modsig.
-  - Moved addition of ima_modsig_serialize_data() to patch "ima: Add
-    functions to read and verify a modsig signature".
-  - Increase MAX_TEMPLATE_NAME_LEN to 24.
-
-Changes since v4:
-- Patch "ima: Remove redundant conditional operator"
-  - New patch.
-
-- Patch "ima: Remove some superfluous parentheses"
-  - New patch.
-
-- Patch "evm, ima: Remove superfluous parentheses"
-  - New patch.
-
-- Patch "evm, ima: Remove more superfluous parentheses"
-  - New patch.
-
-- Patch "ima: Simplify ima_eventsig_init"
-  - New patch.
-
-- Patch "ima: Improvements in ima_appraise_measurement"
-  - New patch.
-
-- Patch "ima: Don't pass xattr value to EVM xattr verification."
-  - New patch.
-
-- Patch "ima: Export func_tokens"
-  - Split from patch "ima: Support module-style appended signatures for
-    appraisal".
-
-- Patch "ima: Add modsig appraise_type option for module-style appended
-         signatures"
-  - Split from patch "ima: Support module-style appended signatures for
-    appraisal".
-  - Mention modsig option in Documentation/ABI/testing/ima_policy
-    (suggested by Mimi Zohar).
-
-- Patch "ima: Add functions to read and verify a modsig signature"
-  - Split from patch "ima: Support module-style appended signatures for
-    appraisal".
-
-- Patch "ima: Implement support for module-style appended signatures"
-  - Split from patch "ima: Support module-style appended signatures for
-    appraisal".
-  - In ima_appraise_measurement, change the logic of dealing with xattr
-    errors in case the modsig verification fails. With this,
-    process_xattr_error isn't needed anymore.
-
-- Patch "ima: Write modsig to the measurement list"
-  - Split from patch "ima: Support module-style appended signatures for
-    appraisal".
-  - Added ima_current_template_has_sig function.
-  - Removed hdr parameter from ima_modsig_serialize_data.
-  - In ima_store_measurement, continue processing even if the given PCR
-    is already measured if it's for a modsig.
-  - In process_measurement, add exception to store measurement even if
-    IMA_MEASURE is not set when appraising a modsig (suggested by
-    Mimi Zohar).
-  - Call is_ima_sig in ima_eventsig_init.
-
-Thiago Jung Bauermann (14):
-  MODSIGN: Export module signature definitions
-  PKCS#7: Refactor verify_pkcs7_signature() and add
-    pkcs7_get_message_sig()
-  PKCS#7: Introduce pkcs7_get_digest()
-  integrity: Introduce struct evm_xattr
-  integrity: Introduce integrity_keyring_from_id()
-  integrity: Introduce asymmetric_sig_has_known_key()
-  integrity: Select CONFIG_KEYS instead of depending on it
-  ima: Introduce is_signed()
-  ima: Export func_tokens
-  ima: Add modsig appraise_type option for module-style appended
-    signatures
-  ima: Implement support for module-style appended signatures
-  ima: Add new "d-sig" template field
-  ima: Write modsig to the measurement list
-  ima: Store the measurement again when appraising a modsig
-
- Documentation/ABI/testing/ima_policy      |   6 +-
- Documentation/security/IMA-templates.rst  |   5 +
- certs/system_keyring.c                    |  61 +++++--
- crypto/asymmetric_keys/pkcs7_parser.c     |  16 ++
- crypto/asymmetric_keys/pkcs7_verify.c     |  25 +++
- include/crypto/pkcs7.h                    |   5 +
- include/linux/module.h                    |   3 -
- include/linux/module_signature.h          |  47 +++++
- include/linux/verification.h              |  10 +
- init/Kconfig                              |   6 +-
- kernel/Makefile                           |   2 +-
- kernel/module.c                           |   1 +
- kernel/module_signing.c                   |  82 ++++-----
- security/integrity/Kconfig                |   2 +-
- security/integrity/digsig.c               |  28 ++-
- security/integrity/digsig_asymmetric.c    |  44 +++--
- security/integrity/evm/evm_main.c         |   8 +-
- security/integrity/ima/Kconfig            |  13 ++
- security/integrity/ima/Makefile           |   1 +
- security/integrity/ima/ima.h              |  67 +++++++
- security/integrity/ima/ima_api.c          |   8 +-
- security/integrity/ima/ima_appraise.c     |  79 ++++++--
- security/integrity/ima/ima_main.c         |  33 +++-
- security/integrity/ima/ima_modsig.c       | 212 ++++++++++++++++++++++
- security/integrity/ima/ima_policy.c       |  81 +++++++--
- security/integrity/ima/ima_template.c     |  31 +++-
- security/integrity/ima/ima_template_lib.c |  49 ++++-
- security/integrity/ima/ima_template_lib.h |   2 +
- security/integrity/integrity.h            |  30 ++-
- 29 files changed, 829 insertions(+), 128 deletions(-)
- create mode 100644 include/linux/module_signature.h
- create mode 100644 security/integrity/ima/ima_modsig.c
+diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
+index 9f1414030bc2..cbaeb264a261 100644
+--- a/drivers/crypto/caam/caamalg.c
++++ b/drivers/crypto/caam/caamalg.c
+@@ -72,6 +72,8 @@
+ #define AUTHENC_DESC_JOB_IO_LEN		(AEAD_DESC_JOB_IO_LEN + \
+ 					 CAAM_CMD_SZ * 5)
+ 
++#define CHACHAPOLY_DESC_JOB_IO_LEN	(AEAD_DESC_JOB_IO_LEN + CAAM_CMD_SZ * 6)
++
+ #define DESC_MAX_USED_BYTES		(CAAM_DESC_BYTES_MAX - DESC_JOB_IO_LEN)
+ #define DESC_MAX_USED_LEN		(DESC_MAX_USED_BYTES / CAAM_CMD_SZ)
+ 
+@@ -513,6 +515,61 @@ static int rfc4543_setauthsize(struct crypto_aead *authenc,
+ 	return 0;
+ }
+ 
++static int chachapoly_set_sh_desc(struct crypto_aead *aead)
++{
++	struct caam_ctx *ctx = crypto_aead_ctx(aead);
++	struct device *jrdev = ctx->jrdev;
++	unsigned int ivsize = crypto_aead_ivsize(aead);
++	u32 *desc;
++
++	if (!ctx->cdata.keylen || !ctx->authsize)
++		return 0;
++
++	desc = ctx->sh_desc_enc;
++	cnstr_shdsc_chachapoly(desc, &ctx->cdata, &ctx->adata, ivsize,
++			       ctx->authsize, true);
++	dma_sync_single_for_device(jrdev, ctx->sh_desc_enc_dma,
++				   desc_bytes(desc), ctx->dir);
++
++	desc = ctx->sh_desc_dec;
++	cnstr_shdsc_chachapoly(desc, &ctx->cdata, &ctx->adata, ivsize,
++			       ctx->authsize, false);
++	dma_sync_single_for_device(jrdev, ctx->sh_desc_dec_dma,
++				   desc_bytes(desc), ctx->dir);
++
++	return 0;
++}
++
++static int chachapoly_setauthsize(struct crypto_aead *aead,
++				  unsigned int authsize)
++{
++	struct caam_ctx *ctx = crypto_aead_ctx(aead);
++
++	if (authsize != POLY1305_DIGEST_SIZE)
++		return -EINVAL;
++
++	ctx->authsize = authsize;
++	return chachapoly_set_sh_desc(aead);
++}
++
++static int chachapoly_setkey(struct crypto_aead *aead, const u8 *key,
++			     unsigned int keylen)
++{
++	struct caam_ctx *ctx = crypto_aead_ctx(aead);
++	unsigned int ivsize = crypto_aead_ivsize(aead);
++	unsigned int saltlen = CHACHAPOLY_IV_SIZE - ivsize;
++
++	if (keylen != CHACHA20_KEY_SIZE + saltlen) {
++		crypto_aead_set_flags(aead, CRYPTO_TFM_RES_BAD_KEY_LEN);
++		return -EINVAL;
++	}
++
++	ctx->cdata.key_virt = key;
++	ctx->cdata.keylen = keylen - saltlen;
++
++	return chachapoly_set_sh_desc(aead);
++}
++
+ static int aead_setkey(struct crypto_aead *aead,
+ 			       const u8 *key, unsigned int keylen)
+ {
+@@ -1031,6 +1088,40 @@ static void init_gcm_job(struct aead_request *req,
+ 	/* End of blank commands */
+ }
+ 
++static void init_chachapoly_job(struct aead_request *req,
++				struct aead_edesc *edesc, bool all_contig,
++				bool encrypt)
++{
++	struct crypto_aead *aead = crypto_aead_reqtfm(req);
++	unsigned int ivsize = crypto_aead_ivsize(aead);
++	unsigned int assoclen = req->assoclen;
++	u32 *desc = edesc->hw_desc;
++	u32 ctx_iv_off = 4;
++
++	init_aead_job(req, edesc, all_contig, encrypt);
++
++	if (ivsize != CHACHAPOLY_IV_SIZE) {
++		/* IPsec specific: CONTEXT1[223:128] = {NONCE, IV} */
++		ctx_iv_off += 4;
++
++		/*
++		 * The associated data comes already with the IV but we need
++		 * to skip it when we authenticate or encrypt...
++		 */
++		assoclen -= ivsize;
++	}
++
++	append_math_add_imm_u32(desc, REG3, ZERO, IMM, assoclen);
++
++	/*
++	 * For IPsec load the IV further in the same register.
++	 * For RFC7539 simply load the 12 bytes nonce in a single operation
++	 */
++	append_load_as_imm(desc, req->iv, ivsize, LDST_CLASS_1_CCB |
++			   LDST_SRCDST_BYTE_CONTEXT |
++			   ctx_iv_off << LDST_OFFSET_SHIFT);
++}
++
+ static void init_authenc_job(struct aead_request *req,
+ 			     struct aead_edesc *edesc,
+ 			     bool all_contig, bool encrypt)
+@@ -1289,6 +1380,72 @@ static int gcm_encrypt(struct aead_request *req)
+ 	return ret;
+ }
+ 
++static int chachapoly_encrypt(struct aead_request *req)
++{
++	struct aead_edesc *edesc;
++	struct crypto_aead *aead = crypto_aead_reqtfm(req);
++	struct caam_ctx *ctx = crypto_aead_ctx(aead);
++	struct device *jrdev = ctx->jrdev;
++	bool all_contig;
++	u32 *desc;
++	int ret;
++
++	edesc = aead_edesc_alloc(req, CHACHAPOLY_DESC_JOB_IO_LEN, &all_contig,
++				 true);
++	if (IS_ERR(edesc))
++		return PTR_ERR(edesc);
++
++	desc = edesc->hw_desc;
++
++	init_chachapoly_job(req, edesc, all_contig, true);
++	print_hex_dump_debug("chachapoly jobdesc@" __stringify(__LINE__)": ",
++			     DUMP_PREFIX_ADDRESS, 16, 4, desc, desc_bytes(desc),
++			     1);
++
++	ret = caam_jr_enqueue(jrdev, desc, aead_encrypt_done, req);
++	if (!ret) {
++		ret = -EINPROGRESS;
++	} else {
++		aead_unmap(jrdev, edesc, req);
++		kfree(edesc);
++	}
++
++	return ret;
++}
++
++static int chachapoly_decrypt(struct aead_request *req)
++{
++	struct aead_edesc *edesc;
++	struct crypto_aead *aead = crypto_aead_reqtfm(req);
++	struct caam_ctx *ctx = crypto_aead_ctx(aead);
++	struct device *jrdev = ctx->jrdev;
++	bool all_contig;
++	u32 *desc;
++	int ret;
++
++	edesc = aead_edesc_alloc(req, CHACHAPOLY_DESC_JOB_IO_LEN, &all_contig,
++				 false);
++	if (IS_ERR(edesc))
++		return PTR_ERR(edesc);
++
++	desc = edesc->hw_desc;
++
++	init_chachapoly_job(req, edesc, all_contig, false);
++	print_hex_dump_debug("chachapoly jobdesc@" __stringify(__LINE__)": ",
++			     DUMP_PREFIX_ADDRESS, 16, 4, desc, desc_bytes(desc),
++			     1);
++
++	ret = caam_jr_enqueue(jrdev, desc, aead_decrypt_done, req);
++	if (!ret) {
++		ret = -EINPROGRESS;
++	} else {
++		aead_unmap(jrdev, edesc, req);
++		kfree(edesc);
++	}
++
++	return ret;
++}
++
+ static int ipsec_gcm_encrypt(struct aead_request *req)
+ {
+ 	if (req->assoclen < 8)
+@@ -3002,6 +3159,50 @@ static struct caam_aead_alg driver_aeads[] = {
+ 			.geniv = true,
+ 		},
+ 	},
++	{
++		.aead = {
++			.base = {
++				.cra_name = "rfc7539(chacha20,poly1305)",
++				.cra_driver_name = "rfc7539-chacha20-poly1305-"
++						   "caam",
++				.cra_blocksize = 1,
++			},
++			.setkey = chachapoly_setkey,
++			.setauthsize = chachapoly_setauthsize,
++			.encrypt = chachapoly_encrypt,
++			.decrypt = chachapoly_decrypt,
++			.ivsize = CHACHAPOLY_IV_SIZE,
++			.maxauthsize = POLY1305_DIGEST_SIZE,
++		},
++		.caam = {
++			.class1_alg_type = OP_ALG_ALGSEL_CHACHA20 |
++					   OP_ALG_AAI_AEAD,
++			.class2_alg_type = OP_ALG_ALGSEL_POLY1305 |
++					   OP_ALG_AAI_AEAD,
++		},
++	},
++	{
++		.aead = {
++			.base = {
++				.cra_name = "rfc7539esp(chacha20,poly1305)",
++				.cra_driver_name = "rfc7539esp-chacha20-"
++						   "poly1305-caam",
++				.cra_blocksize = 1,
++			},
++			.setkey = chachapoly_setkey,
++			.setauthsize = chachapoly_setauthsize,
++			.encrypt = chachapoly_encrypt,
++			.decrypt = chachapoly_decrypt,
++			.ivsize = 8,
++			.maxauthsize = POLY1305_DIGEST_SIZE,
++		},
++		.caam = {
++			.class1_alg_type = OP_ALG_ALGSEL_CHACHA20 |
++					   OP_ALG_AAI_AEAD,
++			.class2_alg_type = OP_ALG_ALGSEL_POLY1305 |
++					   OP_ALG_AAI_AEAD,
++		},
++	},
+ };
+ 
+ static int caam_init_common(struct caam_ctx *ctx, struct caam_alg_entry *caam,
+@@ -3135,7 +3336,7 @@ static int __init caam_algapi_init(void)
+ 	struct device *ctrldev;
+ 	struct caam_drv_private *priv;
+ 	int i = 0, err = 0;
+-	u32 aes_vid, aes_inst, des_inst, md_vid, md_inst;
++	u32 aes_vid, aes_inst, des_inst, md_vid, md_inst, ccha_inst, ptha_inst;
+ 	unsigned int md_limit = SHA512_DIGEST_SIZE;
+ 	bool registered = false;
+ 
+@@ -3180,6 +3381,8 @@ static int __init caam_algapi_init(void)
+ 			   CHA_ID_LS_DES_SHIFT;
+ 		aes_inst = cha_inst & CHA_ID_LS_AES_MASK;
+ 		md_inst = (cha_inst & CHA_ID_LS_MD_MASK) >> CHA_ID_LS_MD_SHIFT;
++		ccha_inst = 0;
++		ptha_inst = 0;
+ 	} else {
+ 		u32 aesa, mdha;
+ 
+@@ -3192,6 +3395,8 @@ static int __init caam_algapi_init(void)
+ 		des_inst = rd_reg32(&priv->ctrl->vreg.desa) & CHA_VER_NUM_MASK;
+ 		aes_inst = aesa & CHA_VER_NUM_MASK;
+ 		md_inst = mdha & CHA_VER_NUM_MASK;
++		ccha_inst = rd_reg32(&priv->ctrl->vreg.ccha) & CHA_VER_NUM_MASK;
++		ptha_inst = rd_reg32(&priv->ctrl->vreg.ptha) & CHA_VER_NUM_MASK;
+ 	}
+ 
+ 	/* If MD is present, limit digest size based on LP256 */
+@@ -3252,6 +3457,14 @@ static int __init caam_algapi_init(void)
+ 		if (!aes_inst && (c1_alg_sel == OP_ALG_ALGSEL_AES))
+ 				continue;
+ 
++		/* Skip CHACHA20 algorithms if not supported by device */
++		if (c1_alg_sel == OP_ALG_ALGSEL_CHACHA20 && !ccha_inst)
++			continue;
++
++		/* Skip POLY1305 algorithms if not supported by device */
++		if (c2_alg_sel == OP_ALG_ALGSEL_POLY1305 && !ptha_inst)
++			continue;
++
+ 		/*
+ 		 * Check support for AES algorithms not available
+ 		 * on LP devices.
+@@ -3263,9 +3476,9 @@ static int __init caam_algapi_init(void)
+ 		 * Skip algorithms requiring message digests
+ 		 * if MD or MD size is not supported by device.
+ 		 */
+-		if (c2_alg_sel &&
+-		    (!md_inst || (t_alg->aead.maxauthsize > md_limit)))
+-				continue;
++		if ((c2_alg_sel & ~OP_ALG_ALGSEL_SUBMASK) == 0x40 &&
++		    (!md_inst || t_alg->aead.maxauthsize > md_limit))
++			continue;
+ 
+ 		caam_aead_alg_init(t_alg);
+ 
+diff --git a/drivers/crypto/caam/caamalg_desc.c b/drivers/crypto/caam/caamalg_desc.c
+index d850590079a2..0eb2add7e4e2 100644
+--- a/drivers/crypto/caam/caamalg_desc.c
++++ b/drivers/crypto/caam/caamalg_desc.c
+@@ -1213,6 +1213,117 @@ void cnstr_shdsc_rfc4543_decap(u32 * const desc, struct alginfo *cdata,
+ }
+ EXPORT_SYMBOL(cnstr_shdsc_rfc4543_decap);
+ 
++/**
++ * cnstr_shdsc_chachapoly - Chacha20 + Poly1305 generic AEAD (rfc7539) and
++ *                          IPsec ESP (rfc7634, a.k.a. rfc7539esp) shared
++ *                          descriptor (non-protocol).
++ * @desc: pointer to buffer used for descriptor construction
++ * @cdata: pointer to block cipher transform definitions
++ *         Valid algorithm values - OP_ALG_ALGSEL_CHACHA20 ANDed with
++ *         OP_ALG_AAI_AEAD.
++ * @adata: pointer to authentication transform definitions
++ *         Valid algorithm values - OP_ALG_ALGSEL_POLY1305 ANDed with
++ *         OP_ALG_AAI_AEAD.
++ * @ivsize: initialization vector size
++ * @icvsize: integrity check value (ICV) size (truncated or full)
++ * @encap: true if encapsulation, false if decapsulation
++ */
++void cnstr_shdsc_chachapoly(u32 * const desc, struct alginfo *cdata,
++			    struct alginfo *adata, unsigned int ivsize,
++			    unsigned int icvsize, const bool encap)
++{
++	u32 *key_jump_cmd, *wait_cmd;
++	u32 nfifo;
++	const bool is_ipsec = (ivsize != CHACHAPOLY_IV_SIZE);
++
++	/* Note: Context registers are saved. */
++	init_sh_desc(desc, HDR_SHARE_SERIAL | HDR_SAVECTX);
++
++	/* skip key loading if they are loaded due to sharing */
++	key_jump_cmd = append_jump(desc, JUMP_JSL | JUMP_TEST_ALL |
++				   JUMP_COND_SHRD);
++
++	append_key_as_imm(desc, cdata->key_virt, cdata->keylen, cdata->keylen,
++			  CLASS_1 | KEY_DEST_CLASS_REG);
++
++	/* For IPsec load the salt from keymat in the context register */
++	if (is_ipsec)
++		append_load_as_imm(desc, cdata->key_virt + cdata->keylen, 4,
++				   LDST_CLASS_1_CCB | LDST_SRCDST_BYTE_CONTEXT |
++				   4 << LDST_OFFSET_SHIFT);
++
++	set_jump_tgt_here(desc, key_jump_cmd);
++
++	/* Class 2 and 1 operations: Poly & ChaCha */
++	if (encap) {
++		append_operation(desc, adata->algtype | OP_ALG_AS_INITFINAL |
++				 OP_ALG_ENCRYPT);
++		append_operation(desc, cdata->algtype | OP_ALG_AS_INITFINAL |
++				 OP_ALG_ENCRYPT);
++	} else {
++		append_operation(desc, adata->algtype | OP_ALG_AS_INITFINAL |
++				 OP_ALG_DECRYPT | OP_ALG_ICV_ON);
++		append_operation(desc, cdata->algtype | OP_ALG_AS_INITFINAL |
++				 OP_ALG_DECRYPT);
++	}
++
++	/*
++	 * MAGIC with NFIFO
++	 * Read associated data from the input and send them to class1 and
++	 * class2 alignment blocks. From class1 send data to output fifo and
++	 * then write it to memory since we don't need to encrypt AD.
++	 */
++	nfifo = NFIFOENTRY_DEST_BOTH | NFIFOENTRY_FC1 | NFIFOENTRY_FC2 |
++		NFIFOENTRY_DTYPE_POLY | NFIFOENTRY_BND;
++	append_load_imm_u32(desc, nfifo, LDST_CLASS_IND_CCB |
++			    LDST_SRCDST_WORD_INFO_FIFO_SM | LDLEN_MATH3);
++
++	append_math_add(desc, VARSEQINLEN, ZERO, REG3, CAAM_CMD_SZ);
++	append_math_add(desc, VARSEQOUTLEN, ZERO, REG3, CAAM_CMD_SZ);
++	append_seq_fifo_load(desc, 0, FIFOLD_TYPE_NOINFOFIFO |
++			     FIFOLD_CLASS_CLASS1 | LDST_VLF);
++	append_move_len(desc, MOVE_AUX_LS | MOVE_SRC_AUX_ABLK |
++			MOVE_DEST_OUTFIFO | MOVELEN_MRSEL_MATH3);
++	append_seq_fifo_store(desc, 0, FIFOST_TYPE_MESSAGE_DATA | LDST_VLF);
++
++	/* IPsec - copy IV at the output */
++	if (is_ipsec)
++		append_seq_fifo_store(desc, ivsize, FIFOST_TYPE_METADATA |
++				      0x2 << 25);
++
++	wait_cmd = append_jump(desc, JUMP_JSL | JUMP_TYPE_LOCAL |
++			       JUMP_COND_NOP | JUMP_TEST_ALL);
++	set_jump_tgt_here(desc, wait_cmd);
++
++	if (encap) {
++		/* Read and write cryptlen bytes */
++		append_math_add(desc, VARSEQINLEN, SEQINLEN, REG0, CAAM_CMD_SZ);
++		append_math_add(desc, VARSEQOUTLEN, SEQINLEN, REG0,
++				CAAM_CMD_SZ);
++		aead_append_src_dst(desc, FIFOLD_TYPE_MSG1OUT2);
++
++		/* Write ICV */
++		append_seq_store(desc, icvsize, LDST_CLASS_2_CCB |
++				 LDST_SRCDST_BYTE_CONTEXT);
++	} else {
++		/* Read and write cryptlen bytes */
++		append_math_add(desc, VARSEQINLEN, SEQOUTLEN, REG0,
++				CAAM_CMD_SZ);
++		append_math_add(desc, VARSEQOUTLEN, SEQOUTLEN, REG0,
++				CAAM_CMD_SZ);
++		aead_append_src_dst(desc, FIFOLD_TYPE_MSG);
++
++		/* Load ICV for verification */
++		append_seq_fifo_load(desc, icvsize, FIFOLD_CLASS_CLASS2 |
++				     FIFOLD_TYPE_LAST2 | FIFOLD_TYPE_ICV);
++	}
++
++	print_hex_dump_debug("chachapoly shdesc@" __stringify(__LINE__)": ",
++			     DUMP_PREFIX_ADDRESS, 16, 4, desc, desc_bytes(desc),
++			     1);
++}
++EXPORT_SYMBOL(cnstr_shdsc_chachapoly);
++
+ /* For skcipher encrypt and decrypt, read from req->src and write to req->dst */
+ static inline void skcipher_append_src_dst(u32 *desc)
+ {
+diff --git a/drivers/crypto/caam/caamalg_desc.h b/drivers/crypto/caam/caamalg_desc.h
+index 1315c8f6f951..a1a7b0e6889d 100644
+--- a/drivers/crypto/caam/caamalg_desc.h
++++ b/drivers/crypto/caam/caamalg_desc.h
+@@ -96,6 +96,10 @@ void cnstr_shdsc_rfc4543_decap(u32 * const desc, struct alginfo *cdata,
+ 			       unsigned int ivsize, unsigned int icvsize,
+ 			       const bool is_qi);
+ 
++void cnstr_shdsc_chachapoly(u32 * const desc, struct alginfo *cdata,
++			    struct alginfo *adata, unsigned int ivsize,
++			    unsigned int icvsize, const bool encap);
++
+ void cnstr_shdsc_skcipher_encap(u32 * const desc, struct alginfo *cdata,
+ 				unsigned int ivsize, const bool is_rfc3686,
+ 				const u32 ctx1_iv_off);
+diff --git a/drivers/crypto/caam/compat.h b/drivers/crypto/caam/compat.h
+index a5081b4050b6..8bde903f9f4a 100644
+--- a/drivers/crypto/caam/compat.h
++++ b/drivers/crypto/caam/compat.h
+@@ -37,6 +37,7 @@
+ #include <crypto/sha.h>
+ #include <crypto/md5.h>
+ #include <crypto/chacha20.h>
++#include <crypto/poly1305.h>
+ #include <crypto/internal/aead.h>
+ #include <crypto/authenc.h>
+ #include <crypto/akcipher.h>
+diff --git a/drivers/crypto/caam/desc.h b/drivers/crypto/caam/desc.h
+index 9d117e51629f..ec10230178c5 100644
+--- a/drivers/crypto/caam/desc.h
++++ b/drivers/crypto/caam/desc.h
+@@ -243,6 +243,7 @@
+ #define LDST_SRCDST_WORD_DESCBUF_SHARED	(0x42 << LDST_SRCDST_SHIFT)
+ #define LDST_SRCDST_WORD_DESCBUF_JOB_WE	(0x45 << LDST_SRCDST_SHIFT)
+ #define LDST_SRCDST_WORD_DESCBUF_SHARED_WE (0x46 << LDST_SRCDST_SHIFT)
++#define LDST_SRCDST_WORD_INFO_FIFO_SM	(0x71 << LDST_SRCDST_SHIFT)
+ #define LDST_SRCDST_WORD_INFO_FIFO	(0x7a << LDST_SRCDST_SHIFT)
+ 
+ /* Offset in source/destination */
+@@ -285,6 +286,12 @@
+ #define LDLEN_SET_OFIFO_OFFSET_SHIFT	0
+ #define LDLEN_SET_OFIFO_OFFSET_MASK	(3 << LDLEN_SET_OFIFO_OFFSET_SHIFT)
+ 
++/* Special Length definitions when dst=sm, nfifo-{sm,m} */
++#define LDLEN_MATH0			0
++#define LDLEN_MATH1			1
++#define LDLEN_MATH2			2
++#define LDLEN_MATH3			3
++
+ /*
+  * FIFO_LOAD/FIFO_STORE/SEQ_FIFO_LOAD/SEQ_FIFO_STORE
+  * Command Constructs
+@@ -409,6 +416,7 @@
+ #define FIFOST_TYPE_MESSAGE_DATA (0x30 << FIFOST_TYPE_SHIFT)
+ #define FIFOST_TYPE_RNGSTORE	 (0x34 << FIFOST_TYPE_SHIFT)
+ #define FIFOST_TYPE_RNGFIFO	 (0x35 << FIFOST_TYPE_SHIFT)
++#define FIFOST_TYPE_METADATA	 (0x3e << FIFOST_TYPE_SHIFT)
+ #define FIFOST_TYPE_SKIP	 (0x3f << FIFOST_TYPE_SHIFT)
+ 
+ /*
+@@ -1160,6 +1168,7 @@
+ #define OP_ALG_ALGSEL_CRC	(0x90 << OP_ALG_ALGSEL_SHIFT)
+ #define OP_ALG_ALGSEL_SNOW_F9	(0xA0 << OP_ALG_ALGSEL_SHIFT)
+ #define OP_ALG_ALGSEL_CHACHA20	(0xD0 << OP_ALG_ALGSEL_SHIFT)
++#define OP_ALG_ALGSEL_POLY1305	(0xE0 << OP_ALG_ALGSEL_SHIFT)
+ 
+ #define OP_ALG_AAI_SHIFT	4
+ #define OP_ALG_AAI_MASK		(0x1ff << OP_ALG_AAI_SHIFT)
+@@ -1400,6 +1409,7 @@
+ #define MOVE_SRC_MATH3		(0x07 << MOVE_SRC_SHIFT)
+ #define MOVE_SRC_INFIFO		(0x08 << MOVE_SRC_SHIFT)
+ #define MOVE_SRC_INFIFO_CL	(0x09 << MOVE_SRC_SHIFT)
++#define MOVE_SRC_AUX_ABLK	(0x0a << MOVE_SRC_SHIFT)
+ 
+ #define MOVE_DEST_SHIFT		16
+ #define MOVE_DEST_MASK		(0x0f << MOVE_DEST_SHIFT)
+@@ -1426,6 +1436,10 @@
+ 
+ #define MOVELEN_MRSEL_SHIFT	0
+ #define MOVELEN_MRSEL_MASK	(0x3 << MOVE_LEN_SHIFT)
++#define MOVELEN_MRSEL_MATH0	(0 << MOVELEN_MRSEL_SHIFT)
++#define MOVELEN_MRSEL_MATH1	(1 << MOVELEN_MRSEL_SHIFT)
++#define MOVELEN_MRSEL_MATH2	(2 << MOVELEN_MRSEL_SHIFT)
++#define MOVELEN_MRSEL_MATH3	(3 << MOVELEN_MRSEL_SHIFT)
+ 
+ /*
+  * MATH Command Constructs
+@@ -1602,6 +1616,7 @@
+ #define NFIFOENTRY_DTYPE_IV	(0x2 << NFIFOENTRY_DTYPE_SHIFT)
+ #define NFIFOENTRY_DTYPE_SAD	(0x3 << NFIFOENTRY_DTYPE_SHIFT)
+ #define NFIFOENTRY_DTYPE_ICV	(0xA << NFIFOENTRY_DTYPE_SHIFT)
++#define NFIFOENTRY_DTYPE_POLY	(0xB << NFIFOENTRY_DTYPE_SHIFT)
+ #define NFIFOENTRY_DTYPE_SKIP	(0xE << NFIFOENTRY_DTYPE_SHIFT)
+ #define NFIFOENTRY_DTYPE_MSG	(0xF << NFIFOENTRY_DTYPE_SHIFT)
+ 
+diff --git a/drivers/crypto/caam/desc_constr.h b/drivers/crypto/caam/desc_constr.h
+index d4256fa4a1d6..2980b8ef1fb1 100644
+--- a/drivers/crypto/caam/desc_constr.h
++++ b/drivers/crypto/caam/desc_constr.h
+@@ -189,6 +189,7 @@ static inline u32 *append_##cmd(u32 * const desc, u32 options) \
+ }
+ APPEND_CMD_RET(jump, JUMP)
+ APPEND_CMD_RET(move, MOVE)
++APPEND_CMD_RET(move_len, MOVE_LEN)
+ 
+ static inline void set_jump_tgt_here(u32 * const desc, u32 *jump_cmd)
+ {
+@@ -327,7 +328,11 @@ static inline void append_##cmd##_imm_##type(u32 * const desc, type immediate, \
+ 					     u32 options) \
+ { \
+ 	PRINT_POS; \
+-	append_cmd(desc, CMD_##op | IMMEDIATE | options | sizeof(type)); \
++	if (options & LDST_LEN_MASK) \
++		append_cmd(desc, CMD_##op | IMMEDIATE | options); \
++	else \
++		append_cmd(desc, CMD_##op | IMMEDIATE | options | \
++			   sizeof(type)); \
+ 	append_cmd(desc, immediate); \
+ }
+ APPEND_CMD_RAW_IMM(load, LOAD, u32);
+-- 
+2.16.2
