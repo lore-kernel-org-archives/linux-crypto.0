@@ -1,126 +1,59 @@
-Return-Path: <SRS0=KYvO=NY=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from szxga04-in.huawei.com ([45.249.212.190]:15093 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1730921AbeKMQg4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 13 Nov 2018 11:36:56 -0500
-Message-ID: <5BEA71CB.3090003@huawei.com>
-Date: Tue, 13 Nov 2018 14:40:11 +0800
-From: zhong jiang <zhongjiang@huawei.com>
+Return-Path: <SRS0=HYoH=NT=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail-io1-f45.google.com ([209.85.166.45]:36852 "EHLO
+        mail-io1-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726823AbeKIJUB (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 9 Nov 2018 04:20:01 -0500
+Received: by mail-io1-f45.google.com with SMTP id o19-v6so41425iod.3
+        for <linux-crypto@vger.kernel.org>; Thu, 08 Nov 2018 15:42:06 -0800 (PST)
 MIME-Version: 1.0
-To: Dave Wysochanski <dwysocha@redhat.com>
-CC: Benjamin Coddington <bcodding@redhat.com>,
-        <herbert@gondor.apana.org.au>, <trond.myklebust@hammerspace.com>,
-        <bfields@redhat.com>, <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>, <linux-nfs@vger.kernel.org>
-Subject: Re: [Qestion] Lots of memory leaks when mounting and unmounting nfs
- client to server continuously.
-References: <5BD85266.6000301@huawei.com>  <1DEE371C-69EB-4D92-8F78-535AA5203007@redhat.com>  <5BD86392.7070200@huawei.com> <1541620162.4051.5.camel@redhat.com>
-In-Reply-To: <1541620162.4051.5.camel@redhat.com>
+In-Reply-To: <CAHmME9r=Zm4QzoRRdA88R0R56e3EJb+Psm7YeX6y2+ZhEjwYQg@mail.gmail.com>
+References: <CAHmME9r=Zm4QzoRRdA88R0R56e3EJb+Psm7YeX6y2+ZhEjwYQg@mail.gmail.com>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date: Fri, 9 Nov 2018 00:42:05 +0100
+Message-ID: <CAKv+Gu8VDT0Z7j3dFAnWA_ruBHdQ9S7dZe=6Nym=sLsftLozYg@mail.gmail.com>
+Subject: Re: .S_shipped unnecessary?
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Masahiro Yamada <yamada.masahiro@socionext.com>,
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc: Eric Biggers <ebiggers@google.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 2018/11/8 3:49, Dave Wysochanski wrote:
-> On Tue, 2018-10-30 at 21:58 +0800, zhong jiang wrote:
->> On 2018/10/30 21:06, Benjamin Coddington wrote:
->>> Hi zhong jiang,
->>>
->>> Try asking in linux-nfs.. but I'll also note that 3.10-stable may
->>> be missing a number of fixes to leaks in the NFS GSS code.
->>>
->>> I can see a more than a few fixes to memory leaks with:
->>> git log --grep=leak --oneline net/sunrpc/auth_gss/
->>>
->> Thanks for your reply.  I has tested some of them in the upsteam as
->> you have said.  but It fails to solve the issue completely.
->> hence, I turn to the relevant experts whether they have happened to
->> the issue or  can give some suggestion or not.
->>
->> Thanks,
->> zhong jiang
->>> Ben
->>>
->>> On 30 Oct 2018, at 8:45, zhong jiang wrote:
->>>
->>>> Hi,   Herbert
->>>>
->>>> Recently,  I  hit  a memory leak issue when  mounting and
->>>> unmounting nfs with  the way of  krb5.
->>>> The issue happens to the linux-3.10-stable.
->>>>
->>>> I find that slab-1024 and slab-512 will take up most of the
->>>> memory.  And it can not be freed.
->>>> Meanwhile, it result in rpcsec_gss_krb5 can be unregistered as
->>>> well.
->>>>
->>>>
-> Are you running the latest 3.10-stable?
->
-> This sounds very familiar to something I encountered a while ago and it
-> was a sunrpc cache related problem.  The patch that fixed it for me is
-> in 3.10.106 though.
->
-> Can you check if this cache is growing indefinitely?
-> /proc/net/rpc/auth.rpcsec.context
->
-> If it is large, try to flush explicitly with:
-> date +%s  > /proc/net/rpc/auth.rpcsec.context/flush
->
-> If all that checks out, you may need the below upstream fix, but it
-> went into v3.10.106 as
-> 6a4a5fd svcrpc: don't leak contexts on PROC_DESTROY
->
-> commit 6a4a5fd4c7bc6a06ca26ad7327d046d8d3c0932a
-> Author: J. Bruce Fields <bfields@redhat.com>
-> Date:   Mon Jan 9 17:15:18 2017 -0500
->
->     svcrpc: don't leak contexts on PROC_DESTROY
->     
->     commit 78794d1890708cf94e3961261e52dcec2cc34722 upstream.
->     
->     Context expiry times are in units of seconds since boot, not unix time.
->     
->     The use of get_seconds() here therefore sets the expiry time decades in
->     the future.  This prevents timely freeing of contexts destroyed by
->     client RPC_GSS_PROC_DESTROY requests.  We'd still free them eventually
->     (when the module is unloaded or the container shut down), but a lot of
->     contexts could pile up before then.
->     
->     Fixes: c5b29f885afe "sunrpc: use seconds since boot in expiry cache"
->     Reported-by: Andy Adamson <andros@netapp.com>
->     Signed-off-by: J. Bruce Fields <bfields@redhat.com>
->     Signed-off-by: Willy Tarreau <w@1wt.eu>
->
-> diff --git a/net/sunrpc/auth_gss/svcauth_gss.c b/net/sunrpc/auth_gss/svcauth_gss.c
-> index 62663a0..e625efe 100644
-> --- a/net/sunrpc/auth_gss/svcauth_gss.c
-> +++ b/net/sunrpc/auth_gss/svcauth_gss.c
-> @@ -1518,7 +1518,7 @@ static void destroy_use_gss_proxy_proc_entry(struct net *net) {}
->         case RPC_GSS_PROC_DESTROY:
->                 if (gss_write_verf(rqstp, rsci->mechctx, gc->gc_seq))
->                         goto auth_err;
-> -               rsci->h.expiry_time = get_seconds();
-> +               rsci->h.expiry_time = seconds_since_boot();
->                 set_bit(CACHE_NEGATIVE, &rsci->h.flags);
->                 if (resv->iov_len + 4 > PAGE_SIZE)
->                         goto drop;
->
-> .
->
-Hi, Dave
+(+ Masahiro, kbuild ml)
 
-Thank you for kindly help and reply. and sorry for late reply.
+On 8 November 2018 at 21:37, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+> Hi Ard, Eric, and others,
+>
+> As promised, the next Zinc patchset will have less generated code! After a
+> bit of work with Andy and Samuel, I'll be bundling the perlasm.
+>
 
-Because I just test the patch. It will not work thoroughly.
+Wonderful! Any problems doing that for x86_64 ?
 
-but I unite the following three patches from upstream, the issue will not occur.
+> One thing I'm wondering about, though, is the wisdom behind the current
+> .S_shipped pattern. Usually the _shipped is for big firmware blobs that are
+> hard (or impossible) to build independently. But in this case, the .S is
+> generated from the .pl significantly faster than gcc even compiles a basic
+> C file. And, since perl is needed to build the kernel anyway, it's not like
+> it will be impossible to find the right tools. Rather than clutter up commits
+> with the .pl _and_ the .S_shipped, what would you think if I just generated
+> the .S each time as an ordinary build artifact. AFAICT, this is fairly usual,
+> and it's hard to see downsides. Hence, why I'm writing this email: are there
+> any downsides to that?
+>
 
-0070ed3 Fix 16-byte memory leak in gssp_accept_sec_context_upcall
-78794d1 svcrpc: don't leak contexts on PROC_DESTROY
-a1d1e9b svcrpc: fix memory leak in gssp_accept_sec_context_upcall
+I agree 100%. When I added this the first time, it was at the request
+of the ARM maintainer, who was reluctant to rely on Perl for some
+reason.
 
-I think we should backport the relevant patches to stable-3.10.
+Recently, we have had to add a kludge to prevent spurious rebuilds of
+the .S_shipped files as well.
 
-Thanks,
-zhong jiang
+I'd be perfectly happy to get rid of this entirely, and always
+generate the .S from the .pl, which to me is kind of the point of
+carrying these files in the first place.
+
+Masahiro: do you see any problems with this?
