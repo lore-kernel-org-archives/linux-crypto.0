@@ -1,46 +1,44 @@
 Return-Path: <SRS0=IUQn=NU=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:37394 "EHLO
+Received: from orcrist.hmeau.com ([104.223.48.154]:37352 "EHLO
         deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727552AbeKITdc (ORCPT
+        with ESMTP id S1727532AbeKITbC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 9 Nov 2018 14:33:32 -0500
-Date: Fri, 9 Nov 2018 17:53:32 +0800
+        Fri, 9 Nov 2018 14:31:02 -0500
+Date: Fri, 9 Nov 2018 17:51:08 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Colin King <colin.king@canonical.com>
-Cc: Steffen Klassert <steffen.klassert@secunet.com>,
+To: Yael Chemla <yael.chemla@foss.arm.com>
+Cc: Gilad Ben-Yossef <gilad@benyossef.com>,
         "David S . Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org,
+        linux-crypto@vger.kernel.org, Ofir Drang <ofir.drang@arm.com>,
         linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] pcrypt: use format specifier in kobject_add
-Message-ID: <20181109095332.e6nu33okzpt4wpji@gondor.apana.org.au>
-References: <20181027144926.8433-1-colin.king@canonical.com>
+Subject: Re: [PATCH 0/3] crypto: ccree: add SM3 support
+Message-ID: <20181109095108.4txbedqhdxn7bz4r@gondor.apana.org.au>
+References: <1539867599-20504-1-git-send-email-yael.chemla@foss.arm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20181027144926.8433-1-colin.king@canonical.com>
+In-Reply-To: <1539867599-20504-1-git-send-email-yael.chemla@foss.arm.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sat, Oct 27, 2018 at 03:49:26PM +0100, Colin King wrote:
-> From: Colin Ian King <colin.king@canonical.com>
+On Thu, Oct 18, 2018 at 01:59:56PM +0100, Yael Chemla wrote:
+> Add support for SM3 in CryptoCell 713.
 > 
-> Passing string 'name' as the format specifier is potentially hazardous
-> because name could (although very unlikely to) have a format specifier
-> embedded in it causing issues when parsing the non-existent arguments
-> to these.  Follow best practice by using the "%s" format string for
-> the string 'name'.
+> Yael Chemla (3):
+>   crypto: ccree: adjust hash length to suit certain context specifics
+>   crypto: ccree:  modify set_cipher_mode usage from cc_hash
+>   crypto: ccree: add SM3 support
 > 
-> Cleans up clang warning:
-> crypto/pcrypt.c:397:40: warning: format string is not a string literal
-> (potentially insecure) [-Wformat-security]
-> 
-> Fixes: a3fb1e330dd2 ("pcrypt: Added sysfs interface to pcrypt")
-> Signed-off-by: Colin Ian King <colin.king@canonical.com>
-> ---
->  crypto/pcrypt.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  drivers/crypto/Kconfig                  |   1 +
+>  drivers/crypto/ccree/cc_aead.c          |  19 +++-
+>  drivers/crypto/ccree/cc_crypto_ctx.h    |   4 +-
+>  drivers/crypto/ccree/cc_driver.c        |  10 +-
+>  drivers/crypto/ccree/cc_driver.h        |   2 +-
+>  drivers/crypto/ccree/cc_hash.c          | 175 +++++++++++++++++++++++---------
+>  drivers/crypto/ccree/cc_hw_queue_defs.h |  27 +++++
+>  7 files changed, 182 insertions(+), 56 deletions(-)
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
