@@ -1,69 +1,58 @@
-Return-Path: <SRS0=WCFZ=OI=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:44908 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726403AbeK3KKe (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 30 Nov 2018 05:10:34 -0500
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org
-Cc: Paul Crowley <paulcrowley@google.com>,
-        Martin Willi <martin@strongswan.org>,
-        Milan Broz <gmazyland@gmail.com>,
-        "Jason A . Donenfeld" <Jason@zx2c4.com>,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v2 3/6] crypto: x86/chacha20 - limit the preemption-disabled section
-Date: Thu, 29 Nov 2018 15:02:14 -0800
-Message-Id: <20181129230217.158038-4-ebiggers@kernel.org>
-In-Reply-To: <20181129230217.158038-1-ebiggers@kernel.org>
-References: <20181129230217.158038-1-ebiggers@kernel.org>
+Return-Path: <SRS0=IUQn=NU=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:37302 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727560AbeKIT0V (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 9 Nov 2018 14:26:21 -0500
+Date: Fri, 9 Nov 2018 17:46:28 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org, Corentin Labbe <clabbe@baylibre.com>,
+        Stafford Horne <shorne@gmail.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 0/4] crypto: crypto_user reporting fixes and cleanups
+Message-ID: <20181109094628.qdpiykue7eogzcx5@gondor.apana.org.au>
+References: <20181103215603.16250-1-ebiggers@kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181103215603.16250-1-ebiggers@kernel.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Eric Biggers <ebiggers@google.com>
+On Sat, Nov 03, 2018 at 02:55:59PM -0700, Eric Biggers wrote:
+> This series fixes all the information leaks in crypto_user reporting,
+> removes some redundant reporting functions, and makes some changes to
+> reduce the chance of similar information leaks in the future.  Patch 2
+> is based on a patch already sent by Corentin Labbe, but it was
+> incomplete so I fixed it.
+> 
+> Corentin Labbe (1):
+>   crypto: crypto_user_stat - Zeroize whole structure given to user space
+> 
+> Eric Biggers (3):
+>   crypto: crypto_user - fix leaking uninitialized memory to userspace
+>   crypto: crypto_user - remove redundant reporting functions
+>   crypto: crypto_user - clean up report structure copying
+> 
+>  crypto/ablkcipher.c       |  32 ++++------
+>  crypto/acompress.c        |  10 +---
+>  crypto/aead.c             |  14 ++---
+>  crypto/ahash.c            |  12 ++--
+>  crypto/akcipher.c         |  11 ++--
+>  crypto/blkcipher.c        |  16 ++---
+>  crypto/crypto_user_base.c |  95 +++++------------------------
+>  crypto/crypto_user_stat.c | 123 ++++++++++++++------------------------
+>  crypto/kpp.c              |  10 +---
+>  crypto/rng.c              |  12 ++--
+>  crypto/scompress.c        |  11 ++--
+>  crypto/shash.c            |  12 ++--
+>  crypto/skcipher.c         |  15 ++---
+>  13 files changed, 116 insertions(+), 257 deletions(-)
 
-To improve responsiveness, disable preemption for each step of the walk
-(which is at most PAGE_SIZE) rather than for the entire
-encryption/decryption operation.
+All applied.  Patches 1-2 went into crypto and 3-4 are in cryptodev.
 
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- arch/x86/crypto/chacha20_glue.c | 8 +++-----
- 1 file changed, 3 insertions(+), 5 deletions(-)
-
-diff --git a/arch/x86/crypto/chacha20_glue.c b/arch/x86/crypto/chacha20_glue.c
-index 773d075a1483..036de144aab6 100644
---- a/arch/x86/crypto/chacha20_glue.c
-+++ b/arch/x86/crypto/chacha20_glue.c
-@@ -135,26 +135,24 @@ static int chacha20_simd(struct skcipher_request *req)
- 	if (req->cryptlen <= CHACHA_BLOCK_SIZE || !may_use_simd())
- 		return crypto_chacha_crypt(req);
- 
--	err = skcipher_walk_virt(&walk, req, true);
-+	err = skcipher_walk_virt(&walk, req, false);
- 
- 	crypto_chacha_init(state, ctx, walk.iv);
- 
--	kernel_fpu_begin();
--
- 	while (walk.nbytes > 0) {
- 		unsigned int nbytes = walk.nbytes;
- 
- 		if (nbytes < walk.total)
- 			nbytes = round_down(nbytes, walk.stride);
- 
-+		kernel_fpu_begin();
- 		chacha20_dosimd(state, walk.dst.virt.addr, walk.src.virt.addr,
- 				nbytes);
-+		kernel_fpu_end();
- 
- 		err = skcipher_walk_done(&walk, walk.nbytes - nbytes);
- 	}
- 
--	kernel_fpu_end();
--
- 	return err;
- }
- 
+Thanks,
 -- 
-2.20.0.rc0.387.gc7a69e6b6c-goog
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
