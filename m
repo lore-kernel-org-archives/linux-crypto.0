@@ -1,26 +1,39 @@
-Return-Path: <SRS0=dtph=N5=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from sv2113.xserver.jp ([183.90.242.14]:33870 "EHLO
-        sv2113.xserver.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726095AbeKSHN4 (ORCPT
+Return-Path: <SRS0=IUQn=NU=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:37414 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727552AbeKITdz (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 19 Nov 2018 02:13:56 -0500
-Reply-To: <reem51531593@gmail.com>
-From: "Reem Al-Hashimi" <zjruibang@chemnet.com>
-Subject: Important
-Date: Mon, 19 Nov 2018 02:45:57 +0700
+        Fri, 9 Nov 2018 14:33:55 -0500
+Date: Fri, 9 Nov 2018 17:54:01 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Gilad Ben-Yossef <gilad@benyossef.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+        Ofir Drang <Ofir.Drang@arm.com>,
+        Yael Chemla <Yael.Chemla@arm.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: mark cts(cbc(aes)) as FIPS allowed
+Message-ID: <20181109095401.aof4j52ootfac5mr@gondor.apana.org.au>
+References: <1541325924-14777-1-git-send-email-gilad@benyossef.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-        charset="Windows-1251"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20181118194615.3E021418DC918F@sv2113.xserver.jp>
-To: unlisted-recipients:; (no To-header on input)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1541325924-14777-1-git-send-email-gilad@benyossef.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hello,
+On Sun, Nov 04, 2018 at 10:05:24AM +0000, Gilad Ben-Yossef wrote:
+> As per Sp800-38A addendum from Oct 2010[1], cts(cbc(aes)) is
+> allowed as a FIPS mode algorithm. Mark it as such.
+> 
+> [1] https://csrc.nist.gov/publications/detail/sp/800-38a/addendum/final
+> 
+> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+> ---
+>  crypto/testmgr.c | 1 +
+>  1 file changed, 1 insertion(+)
 
-My name is ms. Reem Al-Hashimi. The UAE minister of state for international cooparation. I got your contact from a certain email database from your country while i was looking for someone to handle a huge financial transaction for me in confidence. Can you receive and invest on behalf of my only son. Please reply to reem2018@daum.net, for more details if you are interested.
-
-Regards,
-
-Ms. Reem Al-Hashimy
+Patch applied.  Thanks.
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
