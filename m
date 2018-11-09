@@ -1,84 +1,57 @@
-Return-Path: <SRS0=p+N9=OH=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:49600 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727341AbeK1Rr4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 28 Nov 2018 12:47:56 -0500
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org
-Cc: Paul Crowley <paulcrowley@google.com>,
-        Martin Willi <martin@strongswan.org>,
-        Milan Broz <gmazyland@gmail.com>,
-        "Jason A . Donenfeld" <Jason@zx2c4.com>,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH 6/6] crypto: x86/chacha - add XChaCha12 support
-Date: Tue, 27 Nov 2018 22:44:45 -0800
-Message-Id: <20181128064445.3813-7-ebiggers@kernel.org>
-In-Reply-To: <20181128064445.3813-1-ebiggers@kernel.org>
-References: <20181128064445.3813-1-ebiggers@kernel.org>
+Return-Path: <SRS0=IUQn=NU=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:37268 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727560AbeKITYi (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 9 Nov 2018 14:24:38 -0500
+Date: Fri, 9 Nov 2018 17:44:47 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>, Qian Cai <cai@gmx.us>
+Subject: Re: [PATCH] crypto/simd: correctly take reqsize of wrapped skcipher
+ into account
+Message-ID: <20181109094447.v4fqirpmx7owayr7@gondor.apana.org.au>
+References: <20181108225516.9967-1-ard.biesheuvel@linaro.org>
+ <CAKv+Gu_7M+A5OiCOsOd7_e5+GH7VkrOZ33iSexd2oacyzUNKEA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAKv+Gu_7M+A5OiCOsOd7_e5+GH7VkrOZ33iSexd2oacyzUNKEA@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Eric Biggers <ebiggers@google.com>
+On Fri, Nov 09, 2018 at 12:33:23AM +0100, Ard Biesheuvel wrote:
+>
+> This should be
+> 
+> reqsize += max(crypto_skcipher_reqsize(&cryptd_tfm->base);
+>        crypto_skcipher_reqsize(cryptd_skcipher_child(cryptd_tfm)));
+> 
+> since the cryptd path in simd still needs some space in the subreq for
+> the completion.
 
-Now that the x86_64 SIMD implementations of ChaCha20 and XChaCha20 have
-been refactored to support varying the number of rounds, add support for
-XChaCha12.  This is identical to XChaCha20 except for the number of
-rounds, which is 12 instead of 20.  This can be used by Adiantum.
+OK this is what I applied to the cryptodev tree, please double-check
+to see if I did anything silly:
 
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- arch/x86/crypto/chacha_glue.c | 17 +++++++++++++++++
- crypto/Kconfig                |  4 ++--
- 2 files changed, 19 insertions(+), 2 deletions(-)
-
-diff --git a/arch/x86/crypto/chacha_glue.c b/arch/x86/crypto/chacha_glue.c
-index c643993a29c9f..1aa43cdd5f7cb 100644
---- a/arch/x86/crypto/chacha_glue.c
-+++ b/arch/x86/crypto/chacha_glue.c
-@@ -186,6 +186,21 @@ static struct skcipher_alg algs[] = {
- 		.setkey			= crypto_chacha20_setkey,
- 		.encrypt		= xchacha_simd,
- 		.decrypt		= xchacha_simd,
-+	}, {
-+		.base.cra_name		= "xchacha12",
-+		.base.cra_driver_name	= "xchacha12-simd",
-+		.base.cra_priority	= 300,
-+		.base.cra_blocksize	= 1,
-+		.base.cra_ctxsize	= sizeof(struct chacha_ctx),
-+		.base.cra_module	= THIS_MODULE,
-+
-+		.min_keysize		= CHACHA_KEY_SIZE,
-+		.max_keysize		= CHACHA_KEY_SIZE,
-+		.ivsize			= XCHACHA_IV_SIZE,
-+		.chunksize		= CHACHA_BLOCK_SIZE,
-+		.setkey			= crypto_chacha12_setkey,
-+		.encrypt		= xchacha_simd,
-+		.decrypt		= xchacha_simd,
- 	},
- };
+diff --git a/crypto/simd.c b/crypto/simd.c
+index ea7240be3001..78e8d037ae2b 100644
+--- a/crypto/simd.c
++++ b/crypto/simd.c
+@@ -124,8 +124,9 @@ static int simd_skcipher_init(struct crypto_skcipher *tfm)
  
-@@ -217,3 +232,5 @@ MODULE_ALIAS_CRYPTO("chacha20");
- MODULE_ALIAS_CRYPTO("chacha20-simd");
- MODULE_ALIAS_CRYPTO("xchacha20");
- MODULE_ALIAS_CRYPTO("xchacha20-simd");
-+MODULE_ALIAS_CRYPTO("xchacha12");
-+MODULE_ALIAS_CRYPTO("xchacha12-simd");
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index ecfc10a3e9f3e..a3ee51a711447 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -1473,8 +1473,8 @@ config CRYPTO_CHACHA20_X86_64
- 	select CRYPTO_BLKCIPHER
- 	select CRYPTO_CHACHA20
- 	help
--	  SSSE3 and AVX2 optimized implementations of the ChaCha20 and XChaCha20
--	  stream ciphers.
-+	  SSSE3 and AVX2 optimized implementations of the ChaCha20, XChaCha20,
-+	  and XChaCha12 stream ciphers.
+ 	ctx->cryptd_tfm = cryptd_tfm;
  
- config CRYPTO_SEED
- 	tristate "SEED cipher algorithm"
+-	reqsize = sizeof(struct skcipher_request);
+-	reqsize += crypto_skcipher_reqsize(&cryptd_tfm->base);
++	reqsize = crypto_skcipher_reqsize(cryptd_skcipher_child(cryptd_tfm));
++	reqsize = max(reqsize, crypto_skcipher_reqsize(&cryptd_tfm->base));
++	reqsize += sizeof(struct skcipher_request);
+ 
+ 	crypto_skcipher_set_reqsize(tfm, reqsize);
+ 
+Thanks,
 -- 
-2.19.2
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
