@@ -1,70 +1,44 @@
-Return-Path: <SRS0=9Ofa=N6=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from a9-99.smtp-out.amazonses.com ([54.240.9.99]:47942 "EHLO
-        a9-99.smtp-out.amazonses.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725987AbeKTFoF (ORCPT
+Return-Path: <SRS0=IUQn=NU=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail-it1-f196.google.com ([209.85.166.196]:36887 "EHLO
+        mail-it1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727560AbeKIT0N (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 20 Nov 2018 00:44:05 -0500
-Date: Mon, 19 Nov 2018 19:19:04 +0000
-From: Christopher Lameter <cl@linux.com>
-To: Jerome Glisse <jglisse@redhat.com>
-cc: Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
-        Kenneth Lee <liguozhu@hisilicon.com>,
-        Tim Sell <timothy.sell@unisys.com>, linux-doc@vger.kernel.org,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Zaibo Xu <xuzaibo@huawei.com>, zhangfei.gao@foxmail.com,
-        linuxarm@huawei.com, haojian.zhuang@linaro.org,
-        Hao Fang <fanghao11@huawei.com>,
-        Gavin Schenk <g.schenk@eckelmann.de>,
-        RDMA mailing list <linux-rdma@vger.kernel.org>,
-        Zhou Wang <wangzhou1@hisilicon.com>,
-        Doug Ledford <dledford@redhat.com>,
-        =?ISO-8859-15?Q?Uwe_Kleine-K=F6nig?=
-        <u.kleine-koenig@pengutronix.de>,
-        David Kershner <david.kershner@unisys.com>,
-        Kenneth Lee <nek.in.cn@gmail.com>,
-        Johan Hovold <johan@kernel.org>,
-        Cyrille Pitchen <cyrille.pitchen@free-electrons.com>,
-        Sagar Dharia <sdharia@codeaurora.org>,
-        Jens Axboe <axboe@kernel.dk>, guodong.xu@linaro.org,
-        linux-netdev <netdev@vger.kernel.org>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        linux-kernel@vger.kernel.org, Vinod Koul <vkoul@kernel.org>,
-        linux-crypto@vger.kernel.org,
-        Philippe Ombredanne <pombredanne@nexb.com>,
-        Sanyog Kale <sanyog.r.kale@intel.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-accelerators@lists.ozlabs.org
-Subject: Re: [RFCv3 PATCH 1/6] uacce: Add documents for WarpDrive/uacce
-In-Reply-To: <20181119184215.GB4593@redhat.com>
-Message-ID: <010001672d69716a-743e5098-eb2f-41ca-bf98-6e17eaaba00f-000000@email.amazonses.com>
-References: <20181113002354.GO3695@mtr-leonro.mtl.com> <95310df4-b32c-42f0-c750-3ad5eb89b3dd@gmail.com> <20181114160017.GI3759@mtr-leonro.mtl.com> <20181115085109.GD157308@Turing-Arch-b> <20181115145455.GN3759@mtr-leonro.mtl.com> <20181119091405.GE157308@Turing-Arch-b>
- <20181119091910.GF157308@Turing-Arch-b> <20181119104801.GF8268@mtr-leonro.mtl.com> <20181119164853.GA4593@redhat.com> <20181119182752.GA4890@ziepe.ca> <20181119184215.GB4593@redhat.com>
+        Fri, 9 Nov 2018 14:26:13 -0500
+Received: by mail-it1-f196.google.com with SMTP id j79-v6so2339289itb.2
+        for <linux-crypto@vger.kernel.org>; Fri, 09 Nov 2018 01:46:26 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20181109094525.3shpcmj4uqxfx33z@gondor.apana.org.au>
+References: <20181108225516.9967-1-ard.biesheuvel@linaro.org>
+ <CAKv+Gu_7M+A5OiCOsOd7_e5+GH7VkrOZ33iSexd2oacyzUNKEA@mail.gmail.com>
+ <20181109094447.v4fqirpmx7owayr7@gondor.apana.org.au> <20181109094525.3shpcmj4uqxfx33z@gondor.apana.org.au>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date: Fri, 9 Nov 2018 10:46:25 +0100
+Message-ID: <CAKv+Gu_iNsRCK31aGnb3F=y63WqKLXg=NskWkZ7VYGHEB0NRAg@mail.gmail.com>
+Subject: Re: [PATCH] crypto/simd: correctly take reqsize of wrapped skcipher
+ into account
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>, Qian Cai <cai@gmx.us>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, 19 Nov 2018, Jerome Glisse wrote:
-
-> > IIRC this is solved in IB by automatically calling
-> > madvise(MADV_DONTFORK) before creating the MR.
-> >
-> > MADV_DONTFORK
-> >   .. This is useful to prevent copy-on-write semantics from changing the
-> >   physical location of a page if the parent writes to it after a
-> >   fork(2) ..
+On 9 November 2018 at 10:45, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> On Fri, Nov 09, 2018 at 05:44:47PM +0800, Herbert Xu wrote:
+>> On Fri, Nov 09, 2018 at 12:33:23AM +0100, Ard Biesheuvel wrote:
+>> >
+>> > This should be
+>> >
+>> > reqsize += max(crypto_skcipher_reqsize(&cryptd_tfm->base);
+>> >        crypto_skcipher_reqsize(cryptd_skcipher_child(cryptd_tfm)));
+>> >
+>> > since the cryptd path in simd still needs some space in the subreq for
+>> > the completion.
+>>
+>> OK this is what I applied to the cryptodev tree, please double-check
+>> to see if I did anything silly:
 >
-> This would work around the issue but this is not transparent ie
-> range marked with DONTFORK no longer behave as expected from the
-> application point of view.
+> I meant the crypto tree rather than cryptodev.
+>
 
-Why would anyone expect a range registered via MR behave as normal? Device
-I/O is going on into that range. Memory is already special.
-
-
-> Also it relies on userspace doing the right thing (which is not
-> something i usualy trust :)).
-
-This has been established practice for 15 or so years in a couple of use
-cases. Again user space already has to be doing special things in order to
-handle RDMA is that area.
+That looks fine. Thanks Herbert.
