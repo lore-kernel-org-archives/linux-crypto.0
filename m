@@ -1,47 +1,47 @@
-Return-Path: <SRS0=KYvO=NY=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from frisell.zx2c4.com ([192.95.5.64]:41147 "EHLO frisell.zx2c4.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725991AbeKMKIz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 13 Nov 2018 05:08:55 -0500
-MIME-Version: 1.0
-References: <20180925145622.29959-1-Jason@zx2c4.com> <20180925145622.29959-24-Jason@zx2c4.com>
- <7830522a-968e-0880-beb7-44904466cf14@labo.rs> <CAHmME9oQJ9y51Pv7U=+=5uDA_tb+U1zWZdsLcyNMhdcFZmjM8Q@mail.gmail.com>
- <e4b500e9-f24a-43c5-c2df-834dafc3aae5@labo.rs> <CAHmME9q8tp3Ch43o3D6zYTVujcjBWLVpNdzVw6RqYqHisd_suQ@mail.gmail.com>
- <CAA93jw7e61mbbLMoDwshxpWWK+oGUz71pGrsUYVX8uWM-s5Krg@mail.gmail.com>
-In-Reply-To: <CAA93jw7e61mbbLMoDwshxpWWK+oGUz71pGrsUYVX8uWM-s5Krg@mail.gmail.com>
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date: Mon, 12 Nov 2018 19:13:13 -0500
-Message-ID: <CAHmME9rOhBwsGhFXP8qmfX-0XooJ+CLekLZ7+mNpy3kw9oq0jQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v6 23/23] net: WireGuard secure network tunnel
-To: Dave Taht <dave.taht@gmail.com>
-Cc: labokml@labo.rs, LKML <linux-kernel@vger.kernel.org>,
-        Netdev <netdev@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        David Miller <davem@davemloft.net>,
+Return-Path: <SRS0=6FdY=NV=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mout.kundenserver.de ([217.72.192.73]:48763 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726038AbeKKAhf (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 10 Nov 2018 19:37:35 -0500
+From: Stefan Wahren <stefan.wahren@i2se.com>
+To: Eric Anholt <eric@anholt.net>, Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Content-Type: text/plain; charset="UTF-8"
+Cc: linux-rpi-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        Stefan Wahren <stefan.wahren@i2se.com>,
+        Lubomir Rintel <lkundrak@v3.sk>
+Subject: [PATCH 03/17] hw_random: bcm2835-rng: Switch to SPDX identifier
+Date: Sat, 10 Nov 2018 15:51:16 +0100
+Message-Id: <1541861476-6778-1-git-send-email-stefan.wahren@i2se.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Nov 12, 2018 at 7:10 PM Dave Taht <dave.taht@gmail.com> wrote:
-> you have a speling error (ECM). :)
+Adopt the SPDX license identifier headers to ease license compliance
+management. While we are at this fix the comment style, too.
 
-Thanks.
+Cc: Lubomir Rintel <lkundrak@v3.sk>
+Signed-off-by: Stefan Wahren <stefan.wahren@i2se.com>
+---
+ drivers/char/hw_random/bcm2835-rng.c | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
 
->
-> side note:
->
-> I have to say that wireguard works really well with ecn and non-ecn marked flows
-> against codel and fq_codel on the bottleneck router.
-
-Yup!
-
-> I'd still rather like it if wireguard focused a bit more on
-> interleaving multiple flows better
-> rather than on single stream benchmarks, one day.
-
-We're working on it, actually. Toke has been running some tests on
-some beefy 100gbps hardware he recently acquired, and after v1 lands
-we'll probably have a few interesting ideas for this.
-
-Jason
+diff --git a/drivers/char/hw_random/bcm2835-rng.c b/drivers/char/hw_random/bcm2835-rng.c
+index 6767d96..256b0b1 100644
+--- a/drivers/char/hw_random/bcm2835-rng.c
++++ b/drivers/char/hw_random/bcm2835-rng.c
+@@ -1,10 +1,7 @@
+-/**
++// SPDX-License-Identifier: GPL-2.0
++/*
+  * Copyright (c) 2010-2012 Broadcom. All rights reserved.
+  * Copyright (c) 2013 Lubomir Rintel
+- *
+- * This program is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU General Public License ("GPL")
+- * version 2, as published by the Free Software Foundation.
+  */
+ 
+ #include <linux/hw_random.h>
+-- 
+2.7.4
