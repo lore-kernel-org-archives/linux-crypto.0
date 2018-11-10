@@ -1,73 +1,107 @@
-Return-Path: <SRS0=Oq1A=OC=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:34660 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2394340AbeKWWq1 (ORCPT
+Return-Path: <SRS0=6FdY=NV=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mout.kundenserver.de ([212.227.126.130]:33453 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726038AbeKKAFV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 23 Nov 2018 17:46:27 -0500
-Received: by mail-wr1-f66.google.com with SMTP id j2so12126006wrw.1
-        for <linux-crypto@vger.kernel.org>; Fri, 23 Nov 2018 04:02:30 -0800 (PST)
-From: Corentin Labbe <clabbe@baylibre.com>
-To: davem@davemloft.net, ebiggers@kernel.org,
-        herbert@gondor.apana.org.au, nhorman@tuxdriver.com
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Corentin Labbe <clabbe@baylibre.com>
-Subject: [PATCH v4 00/11] crypto: crypto_user_stat: misc enhancement
-Date: Fri, 23 Nov 2018 12:02:10 +0000
-Message-Id: <1542974541-23024-1-git-send-email-clabbe@baylibre.com>
+        Sat, 10 Nov 2018 19:05:21 -0500
+From: Stefan Wahren <stefan.wahren@i2se.com>
+To: Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        Ray Jui <rjui@broadcom.com>,
+        Scott Branden <sbranden@broadcom.com>,
+        Eric Anholt <eric@anholt.net>, Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Michael Turquette <mturquette@baylibre.com>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Vinod Koul <vkoul@kernel.org>,
+        Jason Cooper <jason@lakedaemon.net>,
+        Marc Zyngier <marc.zyngier@arm.com>,
+        Jassi Brar <jassisinghbrar@gmail.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        Mark Brown <broonie@kernel.org>,
+        Zhang Rui <rui.zhang@intel.com>,
+        Eduardo Valentin <edubezval@gmail.com>,
+        Liam Girdwood <lgirdwood@gmail.com>,
+        Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>
+Cc: bcm-kernel-feedback-list@broadcom.com,
+        linux-rpi-kernel@lists.infradead.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-clk@vger.kernel.org,
+        dmaengine@vger.kernel.org, linux-i2c@vger.kernel.org,
+        linux-mmc@vger.kernel.org, linux-gpio@vger.kernel.org,
+        linux-pwm@vger.kernel.org, linux-spi@vger.kernel.org,
+        linux-pm@vger.kernel.org, alsa-devel@alsa-project.org,
+        Stefan Wahren <stefan.wahren@i2se.com>
+Subject: [PATCH 00/17] bcm2835: Treewide switch to SPDX identifier
+Date: Sat, 10 Nov 2018 15:17:56 +0100
+Message-Id: <1541859476-6210-1-git-send-email-stefan.wahren@i2se.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hello
+After fixing the module license of some bcm2835 drivers in "Fix MODULE_LICENSE
+of bcm2835 drivers", we can finally switch all outstanding bcm2835 /
+Raspberry Pi drivers to SPDX identifier and drop the unnecessary license text.
+I omit the staging area, because there are proposed a lot of changes for
+vc04_services. 
 
-This patchset fixes all reported problem by Eric biggers.
+I hope it is okay to have the binding header integrated in the tree-wise
+patches instead of a separate one. This should avoid conflicts while merging.
 
-Regards
+Stefan Wahren (17):
+  ARM: dts: bcm2835-rpi-zero: Switch to SPDX identifier
+  ARM: mach-bcm: Switch bcm2835 and platsmp to SPDX identifier
+  hw_random: bcm2835-rng: Switch to SPDX identifier
+  clk: bcm2835: Switch to SPDX identifier
+  clocksource: bcm2835: Switch to SPDX identifier
+  dma: bcm2835: Switch to SPDX identifier
+  firmware: raspberrypi: Switch to SPDX identifier
+  i2c: bcm2835: Switch to SPDX identifier
+  irqchip: bcm283x: Switch to SPDX identifier
+  mailbox: bcm2835: Switch to SPDX identifier
+  mmc: bcm2835: Switch to SPDX identifier
+  pinctrl: bcm2835: Switch to SPDX identifier
+  pwm: bcm2835: Switch to SPDX identifier
+  soc: bcm: Switch raspberrypi-power to SPDX identifier
+  spi: bcm2835: Switch to SPDX identifier
+  thermal: bcm2835: Switch to SPDX identifier
+  ASoc: bcm2835-i2s: Switch to SPDX identifier
 
-Changes since v3:
-- Added a crypto_stats_init as asked vy Neil Horman
-- Fixed some checkpatch complaints
-
-Changes since v2:
-- moved all crypto_stats functions from header to algapi.c for using
-  crypto_alg_get/put
-
-Changes since v1:
-- Better locking of crypto_alg via crypto_alg_get/crypto_alg_put
-- remove all intermediate variables in crypto/crypto_user_stat.c
-- splited all internal stats variables into different structures
-
-Corentin Labbe (11):
-  crypto: crypto_user_stat: made crypto_user_stat optional
-  crypto: CRYPTO_STATS should depend on CRYPTO_USER
-  crypto: crypto_user_stat: convert all stats from u32 to u64
-  crypto: crypto_user_stat: split user space crypto stat structures
-  crypto: tool: getstat: convert user space example to the new
-    crypto_user_stat uapi
-  crypto: crypto_user_stat: fix use_after_free of struct xxx_request
-  crypto: crypto_user_stat: Fix invalid stat reporting
-  crypto: crypto_user_stat: remove intermediate variable
-  crypto: crypto_user_stat: Split stats in multiple structures
-  crypto: crypto_user_stat: rename err_cnt parameter
-  crypto: crypto_user_stat: Add crypto_stats_init
-
- crypto/Kconfig                       |   1 +
- crypto/Makefile                      |   3 +-
- crypto/ahash.c                       |  17 +-
- crypto/algapi.c                      | 300 ++++++++++++++++++++++++++-
- crypto/crypto_user_stat.c            | 160 +++++---------
- crypto/rng.c                         |   4 +-
- include/crypto/acompress.h           |  38 +---
- include/crypto/aead.h                |  38 +---
- include/crypto/akcipher.h            |  74 ++-----
- include/crypto/hash.h                |  32 +--
- include/crypto/internal/cryptouser.h |  17 ++
- include/crypto/kpp.h                 |  48 +----
- include/crypto/rng.h                 |  27 +--
- include/crypto/skcipher.h            |  36 +---
- include/linux/crypto.h               | 246 +++++++++++++---------
- include/uapi/linux/cryptouser.h      | 102 +++++----
- tools/crypto/getstat.c               |  72 +++----
- 17 files changed, 685 insertions(+), 530 deletions(-)
+ arch/arm/boot/dts/bcm2835-rpi-zero-w.dts      |  8 +-------
+ arch/arm/boot/dts/bcm2835-rpi-zero.dts        |  8 +-------
+ arch/arm/mach-bcm/board_bcm2835.c             | 11 +----------
+ arch/arm/mach-bcm/platsmp.c                   | 10 +---------
+ arch/arm/mach-bcm/platsmp.h                   |  6 +-----
+ drivers/char/hw_random/bcm2835-rng.c          |  7 ++-----
+ drivers/clk/bcm/clk-bcm2835-aux.c             | 11 +----------
+ drivers/clk/bcm/clk-bcm2835.c                 | 12 +-----------
+ drivers/clocksource/bcm2835_timer.c           | 15 +--------------
+ drivers/dma/bcm2835-dma.c                     | 11 +----------
+ drivers/firmware/raspberrypi.c                |  5 +----
+ drivers/i2c/busses/i2c-bcm2835.c              | 10 +---------
+ drivers/irqchip/irq-bcm2835.c                 | 11 +----------
+ drivers/irqchip/irq-bcm2836.c                 | 11 +----------
+ drivers/mailbox/bcm2835-mailbox.c             |  8 +-------
+ drivers/mmc/host/bcm2835.c                    | 13 +------------
+ drivers/pinctrl/bcm/pinctrl-bcm2835.c         | 11 +----------
+ drivers/pwm/pwm-bcm2835.c                     |  5 +----
+ drivers/soc/bcm/raspberrypi-power.c           |  5 +----
+ drivers/spi/spi-bcm2835.c                     | 11 +----------
+ drivers/spi/spi-bcm2835aux.c                  | 11 +----------
+ drivers/thermal/broadcom/bcm2835_thermal.c    | 11 +----------
+ include/dt-bindings/clock/bcm2835-aux.h       | 10 +---------
+ include/dt-bindings/clock/bcm2835.h           | 10 +---------
+ include/dt-bindings/pinctrl/bcm2835.h         |  8 +-------
+ include/dt-bindings/power/raspberrypi-power.h |  5 +----
+ include/soc/bcm2835/raspberrypi-firmware.h    |  5 +----
+ sound/soc/bcm/bcm2835-i2s.c                   | 10 +---------
+ 28 files changed, 29 insertions(+), 230 deletions(-)
 
 -- 
-2.18.1
+2.7.4
