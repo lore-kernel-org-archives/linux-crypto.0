@@ -1,52 +1,105 @@
-Return-Path: <SRS0=9Ofa=N6=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from frisell.zx2c4.com ([192.95.5.64]:36635 "EHLO frisell.zx2c4.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388694AbeKTDKJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 19 Nov 2018 22:10:09 -0500
-Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTP id c65a04e3
-        for <linux-crypto@vger.kernel.org>;
-        Mon, 19 Nov 2018 16:39:56 +0000 (UTC)
-Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id fc91a10f (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256:NO)
-        for <linux-crypto@vger.kernel.org>;
-        Mon, 19 Nov 2018 16:39:56 +0000 (UTC)
-Received: by mail-ot1-f45.google.com with SMTP id a11so24580853otr.10
-        for <linux-crypto@vger.kernel.org>; Mon, 19 Nov 2018 08:45:56 -0800 (PST)
+Return-Path: <SRS0=oFif=NX=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from lhrrgout.huawei.com ([185.176.76.210]:32743 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727204AbeKLU0y (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 12 Nov 2018 15:26:54 -0500
+From: Roberto Sassu <roberto.sassu@huawei.com>
+To: <dhowells@redhat.com>, <dwmw2@infradead.org>,
+        <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+CC: <keyrings@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <linux-integrity@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <silviu.vlasceanu@huawei.com>,
+        Roberto Sassu <roberto.sassu@huawei.com>
+Subject: [RFC][PATCH 09/12] verification: introduce verify_pgp_signature()
+Date: Mon, 12 Nov 2018 11:24:20 +0100
+Message-ID: <20181112102423.30415-10-roberto.sassu@huawei.com>
+In-Reply-To: <20181112102423.30415-1-roberto.sassu@huawei.com>
+References: <20181112102423.30415-1-roberto.sassu@huawei.com>
 MIME-Version: 1.0
-References: <20181111093630.28107-1-martin@strongswan.org> <20181116022059.aob3ruc7umg32go6@gondor.apana.org.au>
- <CAHmME9ppj_VDFhApxnnTX1ppn5QdzHH9kYNHkKwP8GKLvJ+Z+g@mail.gmail.com> <dcf5e17b3d1b86081197cd67a8c617c0eb8017c1.camel@strongswan.org>
-In-Reply-To: <dcf5e17b3d1b86081197cd67a8c617c0eb8017c1.camel@strongswan.org>
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date: Mon, 19 Nov 2018 17:45:44 +0100
-Message-ID: <CAHmME9opX4XOvR3O5SV7Nx5sAJ4TVNtGzZj218j=g1U2aQ2JoA@mail.gmail.com>
-Subject: Re: [PATCH 0/6] crypto: x86/chacha20 - SIMD performance improvements
-To: Martin Willi <martin@strongswan.org>
-Cc: Eric Biggers <ebiggers@kernel.org>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        X86 ML <x86@kernel.org>, Samuel Neves <sneves@dei.uc.pt>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Martin,
+Introduce verify_pgp_signature() to to verify PGP signatures from data or
+a digest. One user of this function would be IMA, that can verify the
+signature of RPM headers when appraisal is enabled.
 
-On Mon, Nov 19, 2018 at 8:52 AM Martin Willi <martin@strongswan.org> wrote:
->
-> Adding AVX-512VL support is relatively simple. I have a patchset mostly
-> ready that is more than competitive with the code from Zinc. I'll clean
-> that up and do more testing before posting it later this week.
+Signed-off-by: Roberto Sassu <roberto.sassu@huawei.com>
+---
+ certs/system_keyring.c       | 39 ++++++++++++++++++++++++++++++++++++
+ include/linux/verification.h |  5 +++++
+ 2 files changed, 44 insertions(+)
 
-Terrific. Depending on how it turns out, it'll be nice to try
-integrating this into Zinc. I have a massive Xeon Gold 5120 machine
-that I can give you access to if you'd like to do some testing and
-benching. Poke me on IRC -- I'm zx2c4.
-
-> I don't think that having AVX-512F is that important until it is really
-> usable on CPUs in the market.
-
-Actually, similarly here, a 10nm Cannon Lake machine should be
-arriving at my house this week, which should make for some interesting
-testing ground for non-throttled zmm, if you'd like to play with it.
-
-Jason
+diff --git a/certs/system_keyring.c b/certs/system_keyring.c
+index 81728717523d..e4c59a5c7a9d 100644
+--- a/certs/system_keyring.c
++++ b/certs/system_keyring.c
+@@ -19,6 +19,7 @@
+ #include <keys/asymmetric-type.h>
+ #include <keys/system_keyring.h>
+ #include <crypto/pkcs7.h>
++#include <linux/pgp_sig.h>
+ 
+ static struct key *builtin_trusted_keys;
+ #ifdef CONFIG_SECONDARY_TRUSTED_KEYRING
+@@ -265,4 +266,42 @@ int verify_pkcs7_signature(const void *data, size_t len,
+ }
+ EXPORT_SYMBOL_GPL(verify_pkcs7_signature);
+ 
++/**
++ * verify_pgp_signature - Verify a PGP-based signature on system data.
++ * @data: The data to be verified (NULL if expecting internal data).
++ * @len: Size of @data.
++ * @digest: Digest for signature verification.
++ * @digest_size: Size of @digest.
++ * @raw_pgp: The PGP message that is the signature.
++ * @pgp_len: Size of @raw_pgp.
++ * @trusted_keys: Trusted keys to use (NULL for builtin trusted keys only,
++ *				       (void *)1UL for all trusted keys).
++ */
++int verify_pgp_signature(const void *data, size_t len,
++			 const void *digest, size_t digest_size,
++			 const void *raw_pgp, size_t pgp_len,
++			 struct key *trusted_keys)
++{
++	int ret = -ENOTSUPP;
++
++#ifdef CONFIG_PGP_KEY_PARSER
++	if (!trusted_keys) {
++		trusted_keys = builtin_trusted_keys;
++	} else if (trusted_keys == (void *)1UL) {
++#ifdef CONFIG_SECONDARY_TRUSTED_KEYRING
++		trusted_keys = secondary_trusted_keys;
++#else
++		trusted_keys = builtin_trusted_keys;
++#endif
++	}
++
++	ret = pgp_verify_sig(trusted_keys, data, len, digest, digest_size,
++			     raw_pgp, pgp_len);
++
++#endif /* CONFIG_PGP_KEY_PARSER */
++
++	return ret;
++}
++EXPORT_SYMBOL_GPL(verify_pgp_signature);
++
+ #endif /* CONFIG_SYSTEM_DATA_VERIFICATION */
+diff --git a/include/linux/verification.h b/include/linux/verification.h
+index cfa4730d607a..6fd7bf60efaa 100644
+--- a/include/linux/verification.h
++++ b/include/linux/verification.h
+@@ -45,6 +45,11 @@ extern int verify_pkcs7_signature(const void *data, size_t len,
+ 						      size_t asn1hdrlen),
+ 				  void *ctx);
+ 
++extern int verify_pgp_signature(const void *data, size_t len,
++				const void *digest, size_t digest_size,
++				const void *raw_pgp, size_t pgp_len,
++				struct key *trusted_keys);
++
+ #ifdef CONFIG_SIGNED_PE_FILE_VERIFICATION
+ extern int verify_pefile_signature(const void *pebuf, unsigned pelen,
+ 				   struct key *trusted_keys,
+-- 
+2.17.1
