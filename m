@@ -1,440 +1,1111 @@
-Return-Path: <SRS0=qsBZ=OA=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from stargate.chelsio.com ([12.32.117.8]:63117 "EHLO
-        stargate.chelsio.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726195AbeKUSoW (ORCPT
+Return-Path: <SRS0=oFif=NX=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:34788 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728237AbeKLRwQ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 21 Nov 2018 13:44:22 -0500
-From: Ganesh Goudar <ganeshgr@chelsio.com>
-To: netdev@vger.kernel.org, davem@davemloft.net
-Cc: nirranjan@chelsio.com, indranil@chelsio.com, dt@chelsio.com,
-        linux-rdma@vger.kernel.org, swise@opengridcomputing.com,
-        linux-crypto@vger.kernel.org, atul.gupta@chelsio.com,
-        linux-scsi@vger.kernel.org, varun@chelsio.com,
-        Santosh Rastapur <santosh@chelsio.com>,
-        Ganesh Goudar <ganeshgr@chelsio.com>
-Subject: [PATCH net-next] cxgb4: use new fw interface to get the VIN and smt index
-Date: Wed, 21 Nov 2018 13:40:24 +0530
-Message-Id: <1542787824-4731-1-git-send-email-ganeshgr@chelsio.com>
+        Mon, 12 Nov 2018 12:52:16 -0500
+From: Kenneth Lee <nek.in.cn@gmail.com>
+To: Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Tim Sell <timothy.sell@unisys.com>,
+        Sanyog Kale <sanyog.r.kale@intel.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?=
+        <u.kleine-koenig@pengutronix.de>, Vinod Koul <vkoul@kernel.org>,
+        David Kershner <david.kershner@unisys.com>,
+        Sagar Dharia <sdharia@codeaurora.org>,
+        Gavin Schenk <g.schenk@eckelmann.de>,
+        Jens Axboe <axboe@kernel.dk>,
+        Philippe Ombredanne <pombredanne@nexb.com>,
+        Cyrille Pitchen <cyrille.pitchen@free-electrons.com>,
+        Johan Hovold <johan@kernel.org>,
+        Zhou Wang <wangzhou1@hisilicon.com>,
+        Hao Fang <fanghao11@huawei.com>,
+        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+        Zaibo Xu <xuzaibo@huawei.com>, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-accelerators@lists.ozlabs.org
+Cc: linuxarm@huawei.com, guodong.xu@linaro.org,
+        zhangfei.gao@foxmail.com, haojian.zhuang@linaro.org,
+        Kenneth Lee <liguozhu@hisilicon.com>
+Subject: [RFCv3 PATCH 3/6] crypto/hisilicon: add hisilicon Queue Manager driver
+Date: Mon, 12 Nov 2018 15:58:04 +0800
+Message-Id: <20181112075807.9291-4-nek.in.cn@gmail.com>
+In-Reply-To: <20181112075807.9291-1-nek.in.cn@gmail.com>
+References: <20181112075807.9291-1-nek.in.cn@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Santosh Rastapur <santosh@chelsio.com>
+From: Kenneth Lee <liguozhu@hisilicon.com>
 
-If the fw supports returning VIN/VIVLD in FW_VI_CMD save it
-in port_info structure else retrieve these from viid and save
-them  in port_info structure. Do the same for smt_idx from
-FW_VI_MAC_CMD
+Hisilicon QM is a general IP used by some Hisilicon accelerators. It
+provides a general PCIE device interface for the CPU and the accelerator
+to share a group of queues.
 
-Signed-off-by: Santosh Rastapur <santosh@chelsio.com>
-Signed-off-by: Ganesh Goudar <ganeshgr@chelsio.com>
+QM is implemented as an End Point of the virtual PCI-E bus in Hisilicon
+SoC. It is actually a interface wrapper of ARM SMMU and GIC standard.
+
+A QM provides 1024 channels, namely queue pairs, to the CPU. It also
+support SR-IOV with maximum 64 VFs. The queue pairs can be distributed
+to the PF or VFs according to configuration to the PF. The hardware
+configuration and notification is done in the VF/PF BAR space, while the
+queue elements are stored in memory.  Software application sends
+requests as messages to the accelerator via the queue protocol, which is
+FIFO ring buffer protocol based on share memory.
+
+The accelerator integrating a QM, has its own vendor, device ID, and
+message format. The QM just forwards the message accordingly. Every QM
+has its own SMMU (Unit) for address translation. It does not support
+ATS/PRI, but it support SMMU stall mode. So it can do page fault from
+the devices side.
+
+This patch includes a library used by the accelerator driver to access
+the QM hardware.
+
+Signed-off-by: Kenneth Lee <liguozhu@hisilicon.com>
+Signed-off-by: Zhou Wang <wangzhou1@hisilicon.com>
+Signed-off-by: Hao Fang <fanghao11@huawei.com>
 ---
- drivers/crypto/chelsio/chtls/chtls_cm.c         |  3 +-
- drivers/infiniband/hw/cxgb4/cm.c                |  6 +--
- drivers/net/ethernet/chelsio/cxgb4/cxgb4.h      | 12 ++++-
- drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c | 58 ++++++++++++-------------
- drivers/net/ethernet/chelsio/cxgb4/l2t.c        | 13 +++---
- drivers/net/ethernet/chelsio/cxgb4/t4_hw.c      | 46 ++++++++++++++++++--
- drivers/net/ethernet/chelsio/cxgb4/t4fw_api.h   | 20 +++++++++
- drivers/scsi/cxgbi/cxgb4i/cxgb4i.c              |  3 +-
- drivers/target/iscsi/cxgbit/cxgbit_cm.c         |  8 ++--
- 9 files changed, 114 insertions(+), 55 deletions(-)
+ drivers/crypto/hisilicon/Kconfig     |   5 +-
+ drivers/crypto/hisilicon/Makefile    |   1 +
+ drivers/crypto/hisilicon/qm.c        | 743 +++++++++++++++++++++++++++
+ drivers/crypto/hisilicon/qm.h        | 213 ++++++++
+ drivers/crypto/hisilicon/qm_usr_if.h |  32 ++
+ 5 files changed, 993 insertions(+), 1 deletion(-)
+ create mode 100644 drivers/crypto/hisilicon/qm.c
+ create mode 100644 drivers/crypto/hisilicon/qm.h
+ create mode 100644 drivers/crypto/hisilicon/qm_usr_if.h
 
-diff --git a/drivers/crypto/chelsio/chtls/chtls_cm.c b/drivers/crypto/chelsio/chtls/chtls_cm.c
-index 20209e2..228b91b 100644
---- a/drivers/crypto/chelsio/chtls/chtls_cm.c
-+++ b/drivers/crypto/chelsio/chtls/chtls_cm.c
-@@ -1074,8 +1074,7 @@ static struct sock *chtls_recv_sock(struct sock *lsk,
- 	csk->txq_idx = (rxq_idx < cdev->lldi->ntxq) ? rxq_idx :
- 			port_id * step;
- 	csk->sndbuf = newsk->sk_sndbuf;
--	csk->smac_idx = cxgb4_tp_smt_idx(cdev->lldi->adapter_type,
--					 cxgb4_port_viid(ndev));
-+	csk->smac_idx = ((struct port_info *)netdev_priv(ndev))->smt_idx;
- 	tp->rcv_wnd = select_rcv_wnd(csk);
- 	RCV_WSCALE(tp) = select_rcv_wscale(tcp_full_space(newsk),
- 					   WSCALE_OK(tp),
-diff --git a/drivers/infiniband/hw/cxgb4/cm.c b/drivers/infiniband/hw/cxgb4/cm.c
-index 8ed01e0..97ecc8c 100644
---- a/drivers/infiniband/hw/cxgb4/cm.c
-+++ b/drivers/infiniband/hw/cxgb4/cm.c
-@@ -2058,8 +2058,7 @@ static int import_ep(struct c4iw_ep *ep, int iptype, __u8 *peer_ip,
- 		}
- 		ep->mtu = pdev->mtu;
- 		ep->tx_chan = cxgb4_port_chan(pdev);
--		ep->smac_idx = cxgb4_tp_smt_idx(adapter_type,
--						cxgb4_port_viid(pdev));
-+		ep->smac_idx = ((struct port_info *)netdev_priv(pdev))->smt_idx;
- 		step = cdev->rdev.lldi.ntxq /
- 			cdev->rdev.lldi.nchan;
- 		ep->txq_idx = cxgb4_port_idx(pdev) * step;
-@@ -2078,8 +2077,7 @@ static int import_ep(struct c4iw_ep *ep, int iptype, __u8 *peer_ip,
- 			goto out;
- 		ep->mtu = dst_mtu(dst);
- 		ep->tx_chan = cxgb4_port_chan(pdev);
--		ep->smac_idx = cxgb4_tp_smt_idx(adapter_type,
--						cxgb4_port_viid(pdev));
-+		ep->smac_idx = ((struct port_info *)netdev_priv(pdev))->smt_idx;
- 		step = cdev->rdev.lldi.ntxq /
- 			cdev->rdev.lldi.nchan;
- 		ep->txq_idx = cxgb4_port_idx(pdev) * step;
-diff --git a/drivers/net/ethernet/chelsio/cxgb4/cxgb4.h b/drivers/net/ethernet/chelsio/cxgb4/cxgb4.h
-index b16f4b3e..2d1ca92 100644
---- a/drivers/net/ethernet/chelsio/cxgb4/cxgb4.h
-+++ b/drivers/net/ethernet/chelsio/cxgb4/cxgb4.h
-@@ -404,6 +404,7 @@ struct adapter_params {
- 	bool fr_nsmr_tpte_wr_support;	  /* FW support for FR_NSMR_TPTE_WR */
- 	u8 fw_caps_support;		/* 32-bit Port Capabilities */
- 	bool filter2_wr_support;	/* FW support for FILTER2_WR */
-+	unsigned int viid_smt_extn_support:1; /* FW returns vin and smt index */
- 
- 	/* MPS Buffer Group Map[per Port].  Bit i is set if buffer group i is
- 	 * used by the Port
-@@ -592,6 +593,13 @@ struct port_info {
- 	bool ptp_enable;
- 	struct sched_table *sched_tbl;
- 	u32 eth_flags;
-+
-+	/* viid and smt fields either returned by fw
-+	 * or decoded by parsing viid by driver.
-+	 */
-+	u8 vin;
-+	u8 vivld;
-+	u8 smt_idx;
- };
- 
- struct dentry;
-@@ -1757,7 +1765,7 @@ int t4_cfg_pfvf(struct adapter *adap, unsigned int mbox, unsigned int pf,
- 		unsigned int nexact, unsigned int rcaps, unsigned int wxcaps);
- int t4_alloc_vi(struct adapter *adap, unsigned int mbox, unsigned int port,
- 		unsigned int pf, unsigned int vf, unsigned int nmac, u8 *mac,
--		unsigned int *rss_size);
-+		unsigned int *rss_size, u8 *vivld, u8 *vin);
- int t4_free_vi(struct adapter *adap, unsigned int mbox,
- 	       unsigned int pf, unsigned int vf,
- 	       unsigned int viid);
-@@ -1783,7 +1791,7 @@ int t4_free_mac_filt(struct adapter *adap, unsigned int mbox,
- 		     unsigned int viid, unsigned int naddr,
- 		     const u8 **addr, bool sleep_ok);
- int t4_change_mac(struct adapter *adap, unsigned int mbox, unsigned int viid,
--		  int idx, const u8 *addr, bool persist, bool add_smt);
-+		  int idx, const u8 *addr, bool persist, u8 *smt_idx);
- int t4_set_addr_hash(struct adapter *adap, unsigned int mbox, unsigned int viid,
- 		     bool ucast, u64 vec, bool sleep_ok);
- int t4_enable_vi_params(struct adapter *adap, unsigned int mbox,
-diff --git a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c
-index 956e708..d35985f 100644
---- a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c
-+++ b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c
-@@ -453,7 +453,7 @@ static int link_start(struct net_device *dev)
- 	if (ret == 0) {
- 		ret = t4_change_mac(pi->adapter, mb, pi->viid,
- 				    pi->xact_addr_filt, dev->dev_addr, true,
--				    true);
-+				    &pi->smt_idx);
- 		if (ret >= 0) {
- 			pi->xact_addr_filt = ret;
- 			ret = 0;
-@@ -1585,28 +1585,6 @@ unsigned int cxgb4_best_aligned_mtu(const unsigned short *mtus,
- EXPORT_SYMBOL(cxgb4_best_aligned_mtu);
- 
- /**
-- *	cxgb4_tp_smt_idx - Get the Source Mac Table index for this VI
-- *	@chip: chip type
-- *	@viid: VI id of the given port
-- *
-- *	Return the SMT index for this VI.
-- */
--unsigned int cxgb4_tp_smt_idx(enum chip_type chip, unsigned int viid)
--{
--	/* In T4/T5, SMT contains 256 SMAC entries organized in
--	 * 128 rows of 2 entries each.
--	 * In T6, SMT contains 256 SMAC entries in 256 rows.
--	 * TODO: The below code needs to be updated when we add support
--	 * for 256 VFs.
--	 */
--	if (CHELSIO_CHIP_VERSION(chip) <= CHELSIO_T5)
--		return ((viid & 0x7f) << 1);
--	else
--		return (viid & 0x7f);
--}
--EXPORT_SYMBOL(cxgb4_tp_smt_idx);
+diff --git a/drivers/crypto/hisilicon/Kconfig b/drivers/crypto/hisilicon/Kconfig
+index 8ca9c503bcb0..0e40f4a6666b 100644
+--- a/drivers/crypto/hisilicon/Kconfig
++++ b/drivers/crypto/hisilicon/Kconfig
+@@ -1,5 +1,4 @@
+ # SPDX-License-Identifier: GPL-2.0
 -
--/**
-  *	cxgb4_port_chan - get the HW channel of a port
-  *	@dev: the net device for the port
-  *
-@@ -2871,7 +2849,8 @@ static int cxgb_set_mac_addr(struct net_device *dev, void *p)
- 		return -EADDRNOTAVAIL;
+ config CRYPTO_DEV_HISI_SEC
+ 	tristate "Support for Hisilicon SEC crypto block cipher accelerator"
+ 	select CRYPTO_BLKCIPHER
+@@ -12,3 +11,7 @@ config CRYPTO_DEV_HISI_SEC
  
- 	ret = t4_change_mac(pi->adapter, pi->adapter->pf, pi->viid,
--			    pi->xact_addr_filt, addr->sa_data, true, true);
-+			    pi->xact_addr_filt, addr->sa_data, true,
-+			    &pi->smt_idx);
- 	if (ret < 0)
- 		return ret;
- 
-@@ -4475,6 +4454,15 @@ static int adap_init0(struct adapter *adap)
- 		adap->params.filter2_wr_support = (ret == 0 && val[0] != 0);
- 	}
- 
-+	/* Check if FW supports returning vin and smt index.
-+	 * If this is not supported, driver will interpret
-+	 * these values from viid.
-+	 */
-+	params[0] = FW_PARAM_DEV(OPAQUE_VIID_SMT_EXTN);
-+	ret = t4_query_params(adap, adap->mbox, adap->pf, 0,
-+			      1, params, val);
-+	adap->params.viid_smt_extn_support = (ret == 0 && val[0] != 0);
+ 	  To compile this as a module, choose M here: the module
+ 	  will be called hisi_sec.
 +
- 	/*
- 	 * Get device capabilities so we can determine what resources we need
- 	 * to manage.
-@@ -4785,14 +4773,26 @@ static pci_ers_result_t eeh_slot_reset(struct pci_dev *pdev)
- 		return PCI_ERS_RESULT_DISCONNECT;
- 
- 	for_each_port(adap, i) {
--		struct port_info *p = adap2pinfo(adap, i);
-+		struct port_info *pi = adap2pinfo(adap, i);
-+		u8 vivld = 0, vin = 0;
- 
--		ret = t4_alloc_vi(adap, adap->mbox, p->tx_chan, adap->pf, 0, 1,
--				  NULL, NULL);
-+		ret = t4_alloc_vi(adap, adap->mbox, pi->tx_chan, adap->pf, 0, 1,
-+				  NULL, NULL, &vivld, &vin);
- 		if (ret < 0)
- 			return PCI_ERS_RESULT_DISCONNECT;
--		p->viid = ret;
--		p->xact_addr_filt = -1;
-+		pi->viid = ret;
-+		pi->xact_addr_filt = -1;
-+		/* If fw supports returning the VIN as part of FW_VI_CMD,
-+		 * save the returned values.
-+		 */
-+		if (adap->params.viid_smt_extn_support) {
-+			pi->vivld = vivld;
-+			pi->vin = vin;
-+		} else {
-+			/* Retrieve the values from VIID */
-+			pi->vivld = FW_VIID_VIVLD_G(pi->viid);
-+			pi->vin = FW_VIID_VIN_G(pi->viid);
-+		}
- 	}
- 
- 	t4_load_mtus(adap, adap->params.mtus, adap->params.a_wnd,
-diff --git a/drivers/net/ethernet/chelsio/cxgb4/l2t.c b/drivers/net/ethernet/chelsio/cxgb4/l2t.c
-index 99022c0..4852feb 100644
---- a/drivers/net/ethernet/chelsio/cxgb4/l2t.c
-+++ b/drivers/net/ethernet/chelsio/cxgb4/l2t.c
-@@ -495,14 +495,11 @@ u64 cxgb4_select_ntuple(struct net_device *dev,
- 		ntuple |= (u64)IPPROTO_TCP << tp->protocol_shift;
- 
- 	if (tp->vnic_shift >= 0 && (tp->ingress_config & VNIC_F)) {
--		u32 viid = cxgb4_port_viid(dev);
--		u32 vf = FW_VIID_VIN_G(viid);
--		u32 pf = FW_VIID_PFN_G(viid);
--		u32 vld = FW_VIID_VIVLD_G(viid);
--
--		ntuple |= (u64)(FT_VNID_ID_VF_V(vf) |
--				FT_VNID_ID_PF_V(pf) |
--				FT_VNID_ID_VLD_V(vld)) << tp->vnic_shift;
-+		struct port_info *pi = (struct port_info *)netdev_priv(dev);
++config CRYPTO_DEV_HISI_QM
++	tristate
++	depends on ARM64 && PCI
+diff --git a/drivers/crypto/hisilicon/Makefile b/drivers/crypto/hisilicon/Makefile
+index 463f46ace182..05e9052e0f52 100644
+--- a/drivers/crypto/hisilicon/Makefile
++++ b/drivers/crypto/hisilicon/Makefile
+@@ -1,2 +1,3 @@
+ # SPDX-License-Identifier: GPL-2.0
+ obj-$(CONFIG_CRYPTO_DEV_HISI_SEC) += sec/
++obj-$(CONFIG_CRYPTO_DEV_HISI_QM) += qm.o
+diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
+new file mode 100644
+index 000000000000..5b810a6f4dd5
+--- /dev/null
++++ b/drivers/crypto/hisilicon/qm.c
+@@ -0,0 +1,743 @@
++// SPDX-License-Identifier: GPL-2.0+
++#include <asm/page.h>
++#include <linux/bitmap.h>
++#include <linux/dma-mapping.h>
++#include <linux/io.h>
++#include <linux/irqreturn.h>
++#include <linux/log2.h>
++#include "qm.h"
 +
-+		ntuple |= (u64)(FT_VNID_ID_VF_V(pi->vin) |
-+				FT_VNID_ID_PF_V(adap->pf) |
-+				FT_VNID_ID_VLD_V(pi->vivld)) << tp->vnic_shift;
- 	}
- 
- 	return ntuple;
-diff --git a/drivers/net/ethernet/chelsio/cxgb4/t4_hw.c b/drivers/net/ethernet/chelsio/cxgb4/t4_hw.c
-index cb52394..7f484c6 100644
---- a/drivers/net/ethernet/chelsio/cxgb4/t4_hw.c
-+++ b/drivers/net/ethernet/chelsio/cxgb4/t4_hw.c
-@@ -7488,7 +7488,7 @@ int t4_cfg_pfvf(struct adapter *adap, unsigned int mbox, unsigned int pf,
-  */
- int t4_alloc_vi(struct adapter *adap, unsigned int mbox, unsigned int port,
- 		unsigned int pf, unsigned int vf, unsigned int nmac, u8 *mac,
--		unsigned int *rss_size)
-+		unsigned int *rss_size, u8 *vivld, u8 *vin)
- {
- 	int ret;
- 	struct fw_vi_cmd c;
-@@ -7523,6 +7523,13 @@ int t4_alloc_vi(struct adapter *adap, unsigned int mbox, unsigned int port,
- 	}
- 	if (rss_size)
- 		*rss_size = FW_VI_CMD_RSSSIZE_G(be16_to_cpu(c.rsssize_pkd));
++#define QM_DEF_Q_NUM			128
 +
-+	if (vivld)
-+		*vivld = FW_VI_CMD_VFVLD_G(be32_to_cpu(c.alloc_to_len16));
++/* eq/aeq irq enable */
++#define QM_VF_AEQ_INT_SOURCE		0x0
++#define QM_VF_AEQ_INT_MASK		0x4
++#define QM_VF_EQ_INT_SOURCE		0x8
++#define QM_VF_EQ_INT_MASK		0xc
 +
-+	if (vin)
-+		*vin = FW_VI_CMD_VIN_G(be32_to_cpu(c.alloc_to_len16));
++/* mailbox */
++#define MAILBOX_CMD_SQC			0x0
++#define MAILBOX_CMD_CQC			0x1
++#define MAILBOX_CMD_EQC			0x2
++#define MAILBOX_CMD_AEQC		0x3
++#define MAILBOX_CMD_SQC_BT		0x4
++#define MAILBOX_CMD_CQC_BT		0x5
 +
- 	return FW_VI_CMD_VIID_G(be16_to_cpu(c.type_viid));
- }
- 
-@@ -7980,7 +7987,7 @@ int t4_free_mac_filt(struct adapter *adap, unsigned int mbox,
-  *	MAC value.
-  */
- int t4_change_mac(struct adapter *adap, unsigned int mbox, unsigned int viid,
--		  int idx, const u8 *addr, bool persist, bool add_smt)
-+		  int idx, const u8 *addr, bool persist, u8 *smt_idx)
- {
- 	int ret, mode;
- 	struct fw_vi_mac_cmd c;
-@@ -7989,7 +7996,7 @@ int t4_change_mac(struct adapter *adap, unsigned int mbox, unsigned int viid,
- 
- 	if (idx < 0)                             /* new allocation */
- 		idx = persist ? FW_VI_MAC_ADD_PERSIST_MAC : FW_VI_MAC_ADD_MAC;
--	mode = add_smt ? FW_VI_MAC_SMT_AND_MPSTCAM : FW_VI_MAC_MPS_TCAM_ENTRY;
-+	mode = smt_idx ? FW_VI_MAC_SMT_AND_MPSTCAM : FW_VI_MAC_MPS_TCAM_ENTRY;
- 
- 	memset(&c, 0, sizeof(c));
- 	c.op_to_viid = cpu_to_be32(FW_CMD_OP_V(FW_VI_MAC_CMD) |
-@@ -8006,6 +8013,23 @@ int t4_change_mac(struct adapter *adap, unsigned int mbox, unsigned int viid,
- 		ret = FW_VI_MAC_CMD_IDX_G(be16_to_cpu(p->valid_to_idx));
- 		if (ret >= max_mac_addr)
- 			ret = -ENOMEM;
-+		if (smt_idx) {
-+			if (adap->params.viid_smt_extn_support) {
-+				*smt_idx = FW_VI_MAC_CMD_SMTID_G
-+						    (be32_to_cpu(c.op_to_viid));
-+			} else {
-+				/* In T4/T5, SMT contains 256 SMAC entries
-+				 * organized in 128 rows of 2 entries each.
-+				 * In T6, SMT contains 256 SMAC entries in
-+				 * 256 rows.
-+				 */
-+				if (CHELSIO_CHIP_VERSION(adap->params.chip) <=
-+								     CHELSIO_T5)
-+					*smt_idx = (viid & FW_VIID_VIN_M) << 1;
-+				else
-+					*smt_idx = (viid & FW_VIID_VIN_M);
-+			}
-+		}
- 	}
- 	return ret;
- }
-@@ -9374,6 +9398,7 @@ int t4_init_portinfo(struct port_info *pi, int mbox,
- 	enum fw_port_type port_type;
- 	int mdio_addr;
- 	fw_port_cap32_t pcaps, acaps;
-+	u8 vivld = 0, vin = 0;
- 	int ret;
- 
- 	/* If we haven't yet determined whether we're talking to Firmware
-@@ -9428,7 +9453,8 @@ int t4_init_portinfo(struct port_info *pi, int mbox,
- 		acaps = be32_to_cpu(cmd.u.info32.acaps32);
- 	}
- 
--	ret = t4_alloc_vi(pi->adapter, mbox, port, pf, vf, 1, mac, &rss_size);
-+	ret = t4_alloc_vi(pi->adapter, mbox, port, pf, vf, 1, mac, &rss_size,
-+			  &vivld, &vin);
- 	if (ret < 0)
- 		return ret;
- 
-@@ -9437,6 +9463,18 @@ int t4_init_portinfo(struct port_info *pi, int mbox,
- 	pi->lport = port;
- 	pi->rss_size = rss_size;
- 
-+	/* If fw supports returning the VIN as part of FW_VI_CMD,
-+	 * save the returned values.
-+	 */
-+	if (adapter->params.viid_smt_extn_support) {
-+		pi->vivld = vivld;
-+		pi->vin = vin;
++#define MAILBOX_CMD_SEND_BASE		0x300
++#define MAILBOX_EVENT_SHIFT		8
++#define MAILBOX_STATUS_SHIFT		9
++#define MAILBOX_BUSY_SHIFT		13
++#define MAILBOX_OP_SHIFT		14
++#define MAILBOX_QUEUE_SHIFT		16
++
++/* sqc shift */
++#define SQ_HEAD_SHIFT			0
++#define SQ_TAIL_SHIFT			16
++#define SQ_HOP_NUM_SHIFT		0
++#define SQ_PAGE_SIZE_SHIFT		4
++#define SQ_BUF_SIZE_SHIFT		8
++#define SQ_SQE_SIZE_SHIFT		12
++#define SQ_HEAD_IDX_SIG_SHIFT		0
++#define SQ_TAIL_IDX_SIG_SHIFT		0
++#define SQ_CQN_SHIFT			0
++#define SQ_PRIORITY_SHIFT		0
++#define SQ_ORDERS_SHIFT			4
++#define SQ_TYPE_SHIFT			8
++
++#define SQ_TYPE_MASK			0xf
++
++/* cqc shift */
++#define CQ_HEAD_SHIFT			0
++#define CQ_TAIL_SHIFT			16
++#define CQ_HOP_NUM_SHIFT		0
++#define CQ_PAGE_SIZE_SHIFT		4
++#define CQ_BUF_SIZE_SHIFT		8
++#define CQ_SQE_SIZE_SHIFT		12
++#define CQ_PASID			0
++#define CQ_HEAD_IDX_SIG_SHIFT		0
++#define CQ_TAIL_IDX_SIG_SHIFT		0
++#define CQ_CQN_SHIFT			0
++#define CQ_PRIORITY_SHIFT		16
++#define CQ_ORDERS_SHIFT			0
++#define CQ_TYPE_SHIFT			0
++#define CQ_PHASE_SHIFT			0
++#define CQ_FLAG_SHIFT			1
++
++#define CQC_HEAD_INDEX(cqc)		((cqc)->cq_head)
++#define CQC_PHASE(cqc)			(((cqc)->dw6) & 0x1)
++#define CQC_CQ_ADDRESS(cqc)		(((u64)((cqc)->cq_base_h) << 32) | \
++					 ((cqc)->cq_base_l))
++#define CQC_PHASE_BIT			0x1
++
++/* eqc shift */
++#define MB_EQC_EQE_SHIFT		12
++#define MB_EQC_PHASE_SHIFT		16
++
++#define EQC_HEAD_INDEX(eqc)		((eqc)->eq_head)
++#define EQC_TAIL_INDEX(eqc)		((eqc)->eq_tail)
++#define EQC_PHASE(eqc)			((((eqc)->dw6) >> 16) & 0x1)
++
++#define EQC_PHASE_BIT			0x00010000
++
++/* aeqc shift */
++#define MB_AEQC_AEQE_SHIFT		12
++#define MB_AEQC_PHASE_SHIFT		16
++
++/* cqe shift */
++#define CQE_PHASE(cqe)			((cqe)->w7 & 0x1)
++
++/* eqe shift */
++#define EQE_PHASE(eqe)			(((eqe)->dw0 >> 16) & 0x1)
++#define EQE_CQN(eqe)			(((eqe)->dw0) & 0xffff)
++
++#define QM_EQE_CQN_MASK			0xffff
++
++/* doorbell */
++#define DOORBELL_CMD_SQ			0
++#define DOORBELL_CMD_CQ			1
++#define DOORBELL_CMD_EQ			2
++#define DOORBELL_CMD_AEQ		3
++
++#define DOORBELL_CMD_SEND_BASE		0x340
++
++#define QM_MEM_START_INIT		0x100040
++#define QM_MEM_INIT_DONE		0x100044
++#define QM_VFT_CFG_RDY			0x10006c
++#define QM_VFT_CFG_OP_WR		0x100058
++#define QM_VFT_CFG_TYPE			0x10005c
++#define QM_SQC_VFT			0x0
++#define QM_CQC_VFT			0x1
++#define QM_VFT_CFG_ADDRESS		0x100060
++#define QM_VFT_CFG_OP_ENABLE		0x100054
++
++#define QM_VFT_CFG_DATA_L		0x100064
++#define QM_VFT_CFG_DATA_H		0x100068
++#define QM_SQC_VFT_BUF_SIZE		(7ULL << 8)
++#define QM_SQC_VFT_SQC_SIZE		(5ULL << 12)
++#define QM_SQC_VFT_INDEX_NUMBER		(1ULL << 16)
++#define QM_SQC_VFT_BT_INDEX_SHIFT	22
++#define QM_SQC_VFT_START_SQN_SHIFT	28
++#define QM_SQC_VFT_VALID		(1ULL << 44)
++#define QM_CQC_VFT_BUF_SIZE		(7ULL << 8)
++#define QM_CQC_VFT_SQC_SIZE		(5ULL << 12)
++#define QM_CQC_VFT_INDEX_NUMBER		(1ULL << 16)
++#define QM_CQC_VFT_BT_INDEX_SHIFT	22
++#define QM_CQC_VFT_VALID		(1ULL << 28)
++
++
++#define QM_MK_SQC_DW3(hop_num, page_sz, buf_sz, sqe_sz) \
++	((hop_num << SQ_HOP_NUM_SHIFT) | \
++	 (page_sz << SQ_PAGE_SIZE_SHIFT) | \
++	 (buf_sz << SQ_BUF_SIZE_SHIFT) | \
++	 (sqe_sz << SQ_SQE_SIZE_SHIFT))
++#define QM_MK_SQC_W13(priority, orders, type) \
++	((priority << SQ_PRIORITY_SHIFT) | \
++	 (orders << SQ_ORDERS_SHIFT) | \
++	 ((type & SQ_TYPE_MASK) << SQ_TYPE_SHIFT))
++#define QM_MK_CQC_DW3(hop_num, page_sz, buf_sz, sqe_sz) \
++	((hop_num << CQ_HOP_NUM_SHIFT) | \
++	 (page_sz << CQ_PAGE_SIZE_SHIFT) | \
++	 (buf_sz << CQ_BUF_SIZE_SHIFT) | \
++	 (sqe_sz << CQ_SQE_SIZE_SHIFT))
++#define QM_MK_CQC_DW6(phase, flag) \
++	((phase << CQ_PHASE_SHIFT) | (flag << CQ_FLAG_SHIFT))
++
++static inline void qm_writel(struct qm_info *qm, u32 val, u32 offset)
++{
++	writel(val, qm->io_base + offset);
++}
++
++struct qm_info;
++
++struct hisi_acc_qm_hw_ops {
++	int (*vft_config)(struct qm_info *qm, u16 base, u32 number);
++};
++
++static inline int hacc_qm_mb_is_busy(struct qm_info *qm)
++{
++	u32 val;
++
++	return readl_relaxed_poll_timeout(QM_ADDR(qm, MAILBOX_CMD_SEND_BASE),
++		val, !((val >> MAILBOX_BUSY_SHIFT) & 0x1), 10, 1000);
++}
++
++static inline void qm_mb_write(struct qm_info *qm, void *src)
++{
++	void __iomem *fun_base = QM_ADDR(qm, MAILBOX_CMD_SEND_BASE);
++	unsigned long tmp0 = 0, tmp1 = 0;
++
++	asm volatile("ldp %0, %1, %3\n"
++		     "stp %0, %1, %2\n"
++		     "dsb sy\n"
++		     : "=&r" (tmp0),
++		       "=&r" (tmp1),
++		       "+Q" (*((char *)fun_base))
++		     : "Q" (*((char *)src))
++		     : "memory");
++}
++
++static int qm_mb(struct qm_info *qm, u8 cmd, phys_addr_t phys_addr, u16 queue,
++		   bool op, bool event)
++{
++	struct mailbox mailbox;
++	int ret;
++
++	dev_dbg(&qm->pdev->dev, "QM HW request to q-%u: %d-%llx\n", queue, cmd,
++		phys_addr);
++
++	mailbox.w0 = cmd |
++		     (event ? 0x1 << MAILBOX_EVENT_SHIFT : 0) |
++		     (op ? 0x1 << MAILBOX_OP_SHIFT : 0) |
++		     (0x1 << MAILBOX_BUSY_SHIFT);
++	mailbox.queue_num = queue;
++	mailbox.base_l = lower_32_bits(phys_addr);
++	mailbox.base_h = upper_32_bits(phys_addr);
++	mailbox.rsvd = 0;
++
++	mutex_lock(&qm->mailbox_lock);
++
++	ret = hacc_qm_mb_is_busy(qm);
++	if (unlikely(ret))
++		goto out_with_lock;
++
++	qm_mb_write(qm, &mailbox);
++	ret = hacc_qm_mb_is_busy(qm);
++	if (unlikely(ret))
++		goto out_with_lock;
++
++out_with_lock:
++	mutex_unlock(&qm->mailbox_lock);
++	return ret;
++}
++
++static void qm_db(struct qm_info *qm, u16 qn, u8 cmd, u16 index, u8 priority)
++{
++	u64 doorbell = 0;
++
++	dev_dbg(&qm->pdev->dev, "doorbell(qn=%d, cmd=%d, index=%d, pri=%d)\n",
++		qn, cmd, index, priority);
++
++	doorbell = qn | (cmd << 16) | ((u64)((index | (priority << 16)))) << 32;
++	writeq(doorbell, QM_ADDR(qm, DOORBELL_CMD_SEND_BASE));
++}
++
++/* @return 0 - cq/eq event, 1 - async event, 2 - abnormal error */
++static u32 qm_get_irq_source(struct qm_info *qm)
++{
++	return readl(QM_ADDR(qm, QM_VF_EQ_INT_SOURCE));
++}
++
++static inline struct hisi_qp *to_hisi_qp(struct qm_info *qm, struct eqe *eqe)
++{
++	u16 cqn = eqe->dw0 & QM_EQE_CQN_MASK;
++	struct hisi_qp *qp;
++
++	read_lock(&qm->qps_lock);
++	qp = qm->qp_array[cqn];
++	read_unlock(&qm->qps_lock);
++
++	return qp;
++}
++
++static inline void qm_cq_head_update(struct hisi_qp *qp)
++{
++	if (qp->qp_status.cq_head == QM_Q_DEPTH - 1) {
++		qp->cqc->dw6 = qp->cqc->dw6 ^ CQC_PHASE_BIT;
++		qp->qp_status.cq_head = 0;
 +	} else {
-+		/* Retrieve the values from VIID */
-+		pi->vivld = FW_VIID_VIVLD_G(pi->viid);
-+		pi->vin =  FW_VIID_VIN_G(pi->viid);
++		qp->qp_status.cq_head++;
++	}
++}
++
++static inline void qm_poll_qp(struct hisi_qp *qp, struct qm_info *qm)
++{
++	struct cqe *cqe;
++
++	cqe = qp->cqe + qp->qp_status.cq_head;
++
++	if (qp->req_cb) {
++		while (CQE_PHASE(cqe) == CQC_PHASE(qp->cqc)) {
++			dma_rmb();
++			qp->req_cb(qp, (unsigned long)(qp->sqe +
++				   qm->sqe_size * cqe->sq_head));
++			qm_cq_head_update(qp);
++			cqe = qp->cqe + qp->qp_status.cq_head;
++		}
++	} else if (qp->event_cb) {
++		qp->event_cb(qp);
++		qm_cq_head_update(qp);
++		cqe = qp->cqe + qp->qp_status.cq_head;
 +	}
 +
- 	pi->port_type = port_type;
- 	pi->mdio_addr = mdio_addr;
- 	pi->mod_type = FW_PORT_MOD_TYPE_NA;
-diff --git a/drivers/net/ethernet/chelsio/cxgb4/t4fw_api.h b/drivers/net/ethernet/chelsio/cxgb4/t4fw_api.h
-index 57584ab..1d9b3e1 100644
---- a/drivers/net/ethernet/chelsio/cxgb4/t4fw_api.h
-+++ b/drivers/net/ethernet/chelsio/cxgb4/t4fw_api.h
-@@ -1253,6 +1253,7 @@ enum fw_params_param_dev {
- 	FW_PARAMS_PARAM_DEV_HMA_SIZE	= 0x20,
- 	FW_PARAMS_PARAM_DEV_RDMA_WRITE_WITH_IMM = 0x21,
- 	FW_PARAMS_PARAM_DEV_RI_WRITE_CMPL_WR    = 0x24,
-+	FW_PARAMS_PARAM_DEV_OPAQUE_VIID_SMT_EXTN = 0x27,
- };
- 
- /*
-@@ -2109,6 +2110,19 @@ struct fw_vi_cmd {
- #define FW_VI_CMD_FREE_V(x)	((x) << FW_VI_CMD_FREE_S)
- #define FW_VI_CMD_FREE_F	FW_VI_CMD_FREE_V(1U)
- 
-+#define FW_VI_CMD_VFVLD_S	24
-+#define FW_VI_CMD_VFVLD_M	0x1
-+#define FW_VI_CMD_VFVLD_V(x)	((x) << FW_VI_CMD_VFVLD_S)
-+#define FW_VI_CMD_VFVLD_G(x)	\
-+	(((x) >> FW_VI_CMD_VFVLD_S) & FW_VI_CMD_VFVLD_M)
-+#define FW_VI_CMD_VFVLD_F	FW_VI_CMD_VFVLD_V(1U)
++	qm_db(qm, qp->queue_id, DOORBELL_CMD_CQ, qp->qp_status.cq_head, 0);
++	qm_db(qm, qp->queue_id, DOORBELL_CMD_CQ, qp->qp_status.cq_head, 1);
++}
 +
-+#define FW_VI_CMD_VIN_S		16
-+#define FW_VI_CMD_VIN_M		0xff
-+#define FW_VI_CMD_VIN_V(x)	((x) << FW_VI_CMD_VIN_S)
-+#define FW_VI_CMD_VIN_G(x)	\
-+	(((x) >> FW_VI_CMD_VIN_S) & FW_VI_CMD_VIN_M)
++static irqreturn_t qm_irq_thread(int irq, void *data)
++{
++	struct qm_info *qm = data;
++	struct eqe *eqe = qm->eqe + qm->eq_head;
++	struct eqc *eqc = qm->eqc;
++	struct hisi_qp *qp;
 +
- #define FW_VI_CMD_VIID_S	0
- #define FW_VI_CMD_VIID_M	0xfff
- #define FW_VI_CMD_VIID_V(x)	((x) << FW_VI_CMD_VIID_S)
-@@ -2182,6 +2196,12 @@ struct fw_vi_mac_cmd {
- 	} u;
- };
- 
-+#define FW_VI_MAC_CMD_SMTID_S		12
-+#define FW_VI_MAC_CMD_SMTID_M		0xff
-+#define FW_VI_MAC_CMD_SMTID_V(x)	((x) << FW_VI_MAC_CMD_SMTID_S)
-+#define FW_VI_MAC_CMD_SMTID_G(x)	\
-+	(((x) >> FW_VI_MAC_CMD_SMTID_S) & FW_VI_MAC_CMD_SMTID_M)
++	while (EQE_PHASE(eqe) == EQC_PHASE(eqc)) {
++		qp = to_hisi_qp(qm, eqe);
++		if (qp)
++			qm_poll_qp(qp, qm);
 +
- #define FW_VI_MAC_CMD_VIID_S	0
- #define FW_VI_MAC_CMD_VIID_V(x)	((x) << FW_VI_MAC_CMD_VIID_S)
- 
-diff --git a/drivers/scsi/cxgbi/cxgb4i/cxgb4i.c b/drivers/scsi/cxgbi/cxgb4i/cxgb4i.c
-index 064ef57..907dd87 100644
---- a/drivers/scsi/cxgbi/cxgb4i/cxgb4i.c
-+++ b/drivers/scsi/cxgbi/cxgb4i/cxgb4i.c
-@@ -1767,8 +1767,7 @@ static int init_act_open(struct cxgbi_sock *csk)
- 		csk->mtu = dst_mtu(csk->dst);
- 	cxgb4_best_mtu(lldi->mtus, csk->mtu, &csk->mss_idx);
- 	csk->tx_chan = cxgb4_port_chan(ndev);
--	csk->smac_idx = cxgb4_tp_smt_idx(lldi->adapter_type,
--					 cxgb4_port_viid(ndev));
-+	csk->smac_idx = ((struct port_info *)netdev_priv(ndev))->smt_idx;
- 	step = lldi->ntxq / lldi->nchan;
- 	csk->txq_idx = cxgb4_port_idx(ndev) * step;
- 	step = lldi->nrxq / lldi->nchan;
-diff --git a/drivers/target/iscsi/cxgbit/cxgbit_cm.c b/drivers/target/iscsi/cxgbit/cxgbit_cm.c
-index 71888b9..0376d73 100644
---- a/drivers/target/iscsi/cxgbit/cxgbit_cm.c
-+++ b/drivers/target/iscsi/cxgbit/cxgbit_cm.c
-@@ -932,8 +932,8 @@ cxgbit_offload_init(struct cxgbit_sock *csk, int iptype, __u8 *peer_ip,
- 			goto out;
- 		csk->mtu = ndev->mtu;
- 		csk->tx_chan = cxgb4_port_chan(ndev);
--		csk->smac_idx = cxgb4_tp_smt_idx(cdev->lldi.adapter_type,
--						 cxgb4_port_viid(ndev));
-+		csk->smac_idx =
-+			       ((struct port_info *)netdev_priv(ndev))->smt_idx;
- 		step = cdev->lldi.ntxq /
- 			cdev->lldi.nchan;
- 		csk->txq_idx = cxgb4_port_idx(ndev) * step;
-@@ -968,8 +968,8 @@ cxgbit_offload_init(struct cxgbit_sock *csk, int iptype, __u8 *peer_ip,
- 		port_id = cxgb4_port_idx(ndev);
- 		csk->mtu = dst_mtu(dst);
- 		csk->tx_chan = cxgb4_port_chan(ndev);
--		csk->smac_idx = cxgb4_tp_smt_idx(cdev->lldi.adapter_type,
--						 cxgb4_port_viid(ndev));
-+		csk->smac_idx =
-+			       ((struct port_info *)netdev_priv(ndev))->smt_idx;
- 		step = cdev->lldi.ntxq /
- 			cdev->lldi.nports;
- 		csk->txq_idx = (port_id * step) +
++		if (qm->eq_head == QM_Q_DEPTH - 1) {
++			eqc->dw6 = eqc->dw6 ^ EQC_PHASE_BIT;
++			eqe = qm->eqe;
++			qm->eq_head = 0;
++		} else {
++			eqe++;
++			qm->eq_head++;
++		}
++	}
++
++	qm_db(qm, 0, DOORBELL_CMD_EQ, qm->eq_head, 0);
++
++	return IRQ_HANDLED;
++}
++
++static void qm_init_qp_status(struct hisi_qp *qp)
++{
++	struct hisi_acc_qp_status *qp_status = &qp->qp_status;
++
++	qp_status->sq_tail = 0;
++	qp_status->sq_head = 0;
++	qp_status->cq_head = 0;
++	qp_status->sqn = 0;
++	qp_status->cqc_phase = 1;
++	qp_status->is_sq_full = 0;
++}
++
++/* check if bit in regs is 1 */
++static inline int qm_reg_wait_bit(struct qm_info *qm, u32 offset, u32 bit)
++{
++	int val;
++
++	return readl_relaxed_poll_timeout(QM_ADDR(qm, offset), val,
++					  val & BIT(bit), 10, 1000);
++}
++
++/* the config should be conducted after hisi_acc_init_qm_mem() */
++static int qm_vft_common_config(struct qm_info *qm, u16 base, u32 number)
++{
++	u64 tmp;
++	int ret;
++
++	ret = qm_reg_wait_bit(qm, QM_VFT_CFG_RDY, 0);
++	if (ret)
++		return ret;
++	qm_writel(qm, 0x0, QM_VFT_CFG_OP_WR);
++	qm_writel(qm, QM_SQC_VFT, QM_VFT_CFG_TYPE);
++	qm_writel(qm, qm->pdev->devfn, QM_VFT_CFG_ADDRESS);
++
++	tmp = QM_SQC_VFT_BUF_SIZE			|
++	      QM_SQC_VFT_SQC_SIZE			|
++	      QM_SQC_VFT_INDEX_NUMBER			|
++	      QM_SQC_VFT_VALID				|
++	      (u64)base << QM_SQC_VFT_START_SQN_SHIFT;
++
++	qm_writel(qm, tmp & 0xffffffff, QM_VFT_CFG_DATA_L);
++	qm_writel(qm, tmp >> 32, QM_VFT_CFG_DATA_H);
++
++	qm_writel(qm, 0x0, QM_VFT_CFG_RDY);
++	qm_writel(qm, 0x1, QM_VFT_CFG_OP_ENABLE);
++	ret = qm_reg_wait_bit(qm, QM_VFT_CFG_RDY, 0);
++	if (ret)
++		return ret;
++	tmp = 0;
++
++	qm_writel(qm, 0x0, QM_VFT_CFG_OP_WR);
++	qm_writel(qm, QM_CQC_VFT, QM_VFT_CFG_TYPE);
++	qm_writel(qm, qm->pdev->devfn, QM_VFT_CFG_ADDRESS);
++
++	tmp = QM_CQC_VFT_BUF_SIZE			|
++	      QM_CQC_VFT_SQC_SIZE			|
++	      QM_CQC_VFT_INDEX_NUMBER			|
++	      QM_CQC_VFT_VALID;
++
++	qm_writel(qm, tmp & 0xffffffff, QM_VFT_CFG_DATA_L);
++	qm_writel(qm, tmp >> 32, QM_VFT_CFG_DATA_H);
++
++	qm_writel(qm, 0x0, QM_VFT_CFG_RDY);
++	qm_writel(qm, 0x1, QM_VFT_CFG_OP_ENABLE);
++	ret = qm_reg_wait_bit(qm, QM_VFT_CFG_RDY, 0);
++	if (ret)
++		return ret;
++	return 0;
++}
++
++/*
++ * v1: For Hi1620ES
++ * v2: For Hi1620CS (Not implemented yet)
++ */
++static struct hisi_acc_qm_hw_ops qm_hw_ops_v1 = {
++	.vft_config = qm_vft_common_config,
++};
++
++struct hisi_qp *hisi_qm_create_qp(struct qm_info *qm, u8 alg_type)
++{
++	struct hisi_qp *qp;
++	int qp_index;
++	int ret;
++
++	write_lock(&qm->qps_lock);
++	qp_index = find_first_zero_bit(qm->qp_bitmap, qm->qp_num);
++	if (qp_index >= qm->qp_num) {
++		write_unlock(&qm->qps_lock);
++		return ERR_PTR(-EBUSY);
++	}
++
++	qp = kzalloc(sizeof(*qp), GFP_KERNEL);
++	if (!qp) {
++		ret = -ENOMEM;
++		write_unlock(&qm->qps_lock);
++		goto err_with_bitset;
++	}
++
++	qp->queue_id = qp_index;
++	qp->qm = qm;
++	qp->alg_type = alg_type;
++	qm_init_qp_status(qp);
++	set_bit(qp_index, qm->qp_bitmap);
++
++	write_unlock(&qm->qps_lock);
++	return qp;
++
++err_with_bitset:
++	write_unlock(&qm->qps_lock);
++	return ERR_PTR(ret);
++}
++EXPORT_SYMBOL_GPL(hisi_qm_create_qp);
++
++int hisi_qm_start_qp(struct hisi_qp *qp, unsigned long arg)
++{
++	struct qm_info *qm = qp->qm;
++	struct device *dev = &qm->pdev->dev;
++	int ret;
++	struct sqc *sqc;
++	struct cqc *cqc;
++	int qp_index = qp->queue_id;
++	int pasid = arg;
++	size_t off = 0;
++
++#define QP_INIT_BUF(qp, type, size) do { \
++	(qp)->type = (struct type *)((void *)(qp)->qdma.va + (off)); \
++	(qp)->type##_dma = (qp)->qdma.dma + (off); \
++	off += size; \
++} while (0)
++
++	sqc = qp->sqc = qm->sqc + qp_index;
++	cqc = qp->cqc = qm->cqc + qp_index;
++	qp->sqc_dma = qm->sqc_dma + qp_index * sizeof(struct sqc);
++	qp->cqc_dma = qm->cqc_dma + qp_index * sizeof(struct cqc);
++
++	qp->qdma.size = qm->sqe_size * QM_Q_DEPTH +
++			sizeof(struct cqe) * QM_Q_DEPTH,
++	qp->qdma.va = dma_alloc_coherent(dev, qp->qdma.size,
++					 &qp->qdma.dma,
++					 GFP_KERNEL | __GFP_ZERO);
++	dev_dbg(dev, "allocate qp dma buf(va=%p, dma=%pad, size=%lx)\n",
++		qp->qdma.va, &qp->qdma.dma, qp->qdma.size);
++
++	if (!qp->qdma.va) {
++		dev_err(dev, "cannot get qm dma buffer\n");
++		return -ENOMEM;
++	}
++
++	QP_INIT_BUF(qp, sqe, qm->sqe_size * QM_Q_DEPTH);
++	QP_INIT_BUF(qp, cqe, sizeof(struct cqe) * QM_Q_DEPTH);
++
++	INIT_QC(sqc, qp->sqe_dma);
++	sqc->pasid = pasid;
++	sqc->dw3 = QM_MK_SQC_DW3(0, 0, 0, ilog2(qm->sqe_size));
++	sqc->cq_num = qp_index;
++	sqc->w13 = QM_MK_SQC_W13(0, 1, qp->alg_type);
++
++	ret = qm_mb(qm, MAILBOX_CMD_SQC, qp->sqc_dma, qp_index, 0, 0);
++	if (ret)
++		return ret;
++
++	INIT_QC(cqc, qp->cqe_dma);
++	cqc->dw3 = QM_MK_CQC_DW3(0, 0, 0, 4);
++	cqc->dw6 = QM_MK_CQC_DW6(1, 1);
++	ret = qm_mb(qm, MAILBOX_CMD_CQC, (u64)qp->cqc_dma, qp_index, 0, 0);
++	if (ret)
++		return ret;
++
++	write_lock(&qm->qps_lock);
++	qm->qp_array[qp_index] = qp;
++	init_completion(&qp->completion);
++	write_unlock(&qm->qps_lock);
++
++	dev_dbg(&qm->pdev->dev, "qp %d started\n", qp_index);
++
++	return 0;
++}
++EXPORT_SYMBOL_GPL(hisi_qm_start_qp);
++
++void hisi_qm_release_qp(struct hisi_qp *qp)
++{
++	struct qm_info *qm = qp->qm;
++	struct qm_dma *qdma = &qp->qdma;
++	struct device *dev = &qm->pdev->dev;
++	int qid = qp->queue_id;
++
++	write_lock(&qm->qps_lock);
++	qm->qp_array[qp->queue_id] = NULL;
++	bitmap_clear(qm->qp_bitmap, qid, 1);
++	write_unlock(&qm->qps_lock);
++
++	dma_free_coherent(dev, qdma->size, qdma->va, qdma->dma);
++
++	kfree(qp);
++}
++EXPORT_SYMBOL_GPL(hisi_qm_release_qp);
++
++static void *qm_get_avail_sqe(struct hisi_qp *qp)
++{
++	struct hisi_acc_qp_status *qp_status = &qp->qp_status;
++	u16 sq_tail = qp_status->sq_tail;
++
++	if (qp_status->is_sq_full == 1)
++		return NULL;
++
++	return qp->sqe + sq_tail * qp->qm->sqe_size;
++}
++
++int hisi_qp_send(struct hisi_qp *qp, void *msg)
++{
++	struct hisi_acc_qp_status *qp_status = &qp->qp_status;
++	u16 sq_tail = qp_status->sq_tail;
++	u16 sq_tail_next = (sq_tail + 1) % QM_Q_DEPTH;
++	unsigned long timeout = 100;
++	void *sqe = qm_get_avail_sqe(qp);
++
++	if (!sqe)
++		return -EBUSY;
++
++	memcpy(sqe, msg, qp->qm->sqe_size);
++
++	qm_db(qp->qm, qp->queue_id, DOORBELL_CMD_SQ, sq_tail_next, 0);
++
++	/* wait until job finished */
++	wait_for_completion_timeout(&qp->completion, timeout);
++
++	qp_status->sq_tail = sq_tail_next;
++
++	if (qp_status->sq_tail == qp_status->sq_head)
++		qp_status->is_sq_full = 1;
++
++	return 0;
++}
++EXPORT_SYMBOL_GPL(hisi_qp_send);
++
++static irqreturn_t qm_irq(int irq, void *data)
++{
++	struct qm_info *qm = data;
++	u32 int_source;
++
++	int_source = qm_get_irq_source(qm);
++	if (int_source)
++		return IRQ_WAKE_THREAD;
++
++	dev_err(&qm->pdev->dev, "invalid int source %d\n", int_source);
++
++	return IRQ_HANDLED;
++}
++
++/* put qm into init state, so the acce config become available */
++static int hisi_qm_mem_start(struct qm_info *qm)
++{
++	u32 val;
++
++	qm_writel(qm, 0x1, QM_MEM_START_INIT);
++	return readl_relaxed_poll_timeout(QM_ADDR(qm, QM_MEM_INIT_DONE), val,
++					  val & BIT(0), 10, 1000);
++}
++
++/* todo: The VF case is not considerred carefullly */
++int hisi_qm_init(struct qm_info *qm)
++{
++	int ret;
++	u16 ecam_val16;
++	struct pci_dev *pdev = qm->pdev;
++	struct device *dev = &pdev->dev;
++
++	pci_set_power_state(pdev, PCI_D0);
++	ecam_val16 = PCI_COMMAND_MASTER | PCI_COMMAND_MEMORY;
++	pci_write_config_word(pdev, PCI_COMMAND, ecam_val16);
++
++	ret = pci_enable_device_mem(pdev);
++	if (ret < 0) {
++		dev_err(dev, "Can't enable device mem!\n");
++		return ret;
++	}
++
++	ret = pci_request_mem_regions(pdev, dev_name(dev));
++	if (ret < 0) {
++		dev_err(dev, "Can't request mem regions!\n");
++		goto err_with_pcidev;
++	}
++
++	qm->phys_base = pci_resource_start(pdev, 2);
++	qm->size = pci_resource_len(qm->pdev, 2);
++	qm->io_base = devm_ioremap(dev, qm->phys_base, qm->size);
++	if (!qm->io_base) {
++		dev_err(dev, "Map IO space fail!\n");
++		ret = -EIO;
++		goto err_with_mem_regions;
++	}
++
++	dma_set_mask_and_coherent(dev, DMA_BIT_MASK(64));
++	pci_set_master(pdev);
++
++	ret = pci_alloc_irq_vectors(pdev, 1, 1, PCI_IRQ_MSI);
++	if (ret < 0) {
++		dev_err(dev, "Enable MSI vectors fail!\n");
++		goto err_with_mem_regions;
++	}
++
++	qm->eq_head = 0;
++	mutex_init(&qm->mailbox_lock);
++	rwlock_init(&qm->qps_lock);
++
++	if (qm->ver == 1)
++		qm->ops = &qm_hw_ops_v1;
++	else {
++		dev_err(dev, "qm version not support %d\n", qm->ver);
++		return -EINVAL;
++	}
++
++	ret = devm_request_threaded_irq(dev, pci_irq_vector(pdev, 0),
++					qm_irq, qm_irq_thread, IRQF_SHARED,
++					dev_name(dev), qm);
++	if (ret)
++		goto err_with_irq_vec;
++
++	qm->qp_bitmap = devm_kcalloc(dev, BITS_TO_LONGS(qm->qp_num),
++				     sizeof(long), GFP_KERNEL);
++	qm->qp_array = devm_kcalloc(dev, qm->qp_num,
++				    sizeof(struct hisi_qp *), GFP_KERNEL);
++	if (!qm->qp_bitmap || !qm->qp_array) {
++		ret = -ENOMEM;
++		goto err_with_irq;
++	}
++
++	if (pdev->is_physfn) {
++		ret = hisi_qm_mem_start(qm);
++		if (ret) {
++			dev_err(dev, "mem start fail\n");
++			goto err_with_irq;
++		}
++	}
++
++	qm->qdma.size = max_t(size_t, sizeof(struct eqc),
++			      sizeof(struct aeqc)) +
++			sizeof(struct eqe) * QM_Q_DEPTH +
++			sizeof(struct sqc) * qm->qp_num +
++			sizeof(struct cqc) * qm->qp_num;
++	qm->qdma.va = dma_alloc_coherent(dev, qm->qdma.size,
++					 &qm->qdma.dma,
++					 GFP_KERNEL | __GFP_ZERO);
++	dev_dbg(dev, "allocate qm dma buf(va=%p, dma=%pad, size=%lx)\n",
++		qm->qdma.va, &qm->qdma.dma, qm->qdma.size);
++	ret = qm->qdma.va ? 0 : -ENOMEM;
++
++	if (ret)
++		goto err_with_irq;
++
++	return 0;
++
++err_with_irq:
++	/* even for devm, it should be removed for the irq vec to be freed */
++	devm_free_irq(dev, pci_irq_vector(pdev, 0), qm);
++err_with_irq_vec:
++	pci_free_irq_vectors(pdev);
++err_with_mem_regions:
++	pci_release_mem_regions(pdev);
++err_with_pcidev:
++	pci_disable_device(pdev);
++	return ret;
++}
++EXPORT_SYMBOL_GPL(hisi_qm_init);
++
++void hisi_qm_uninit(struct qm_info *qm)
++{
++	struct pci_dev *pdev = qm->pdev;
++
++	dma_free_coherent(&pdev->dev, qm->qdma.size, qm->qdma.va, qm->qdma.dma);
++
++	devm_free_irq(&pdev->dev, pci_irq_vector(pdev, 0), qm);
++	pci_free_irq_vectors(pdev);
++	pci_release_mem_regions(pdev);
++	pci_disable_device(pdev);
++}
++EXPORT_SYMBOL_GPL(hisi_qm_uninit);
++
++int hisi_qm_start(struct qm_info *qm)
++{
++	size_t off = 0;
++	int ret;
++
++#define QM_INIT_BUF(qm, type, size) do { \
++	(qm)->type = (struct type *)((void *)(qm)->qdma.va + (off)); \
++	(qm)->type##_dma = (qm)->qdma.dma + (off); \
++	off += size; \
++} while (0)
++
++	if (!qm->qdma.va)
++		return -EINVAL;
++
++	if (qm->pdev->is_physfn)
++		qm->ops->vft_config(qm, qm->qp_base, qm->qp_num);
++
++	/*
++	 * notes: the order is important because the buffer should be stay in
++	 * alignment boundary
++	 */
++	QM_INIT_BUF(qm, eqe, sizeof(struct eqe) * QM_Q_DEPTH);
++	QM_INIT_BUF(qm, sqc, sizeof(struct sqc) * qm->qp_num);
++	QM_INIT_BUF(qm, cqc, sizeof(struct cqc) * qm->qp_num);
++	QM_INIT_BUF(qm, eqc,
++		    max_t(size_t, sizeof(struct eqc), sizeof(struct aeqc)));
++
++	qm->eqc->base_l = lower_32_bits(qm->eqe_dma);
++	qm->eqc->base_h = upper_32_bits(qm->eqe_dma);
++	qm->eqc->dw3 = 2 << MB_EQC_EQE_SHIFT;
++	qm->eqc->dw6 = (QM_Q_DEPTH - 1) | (1 << MB_EQC_PHASE_SHIFT);
++	ret = qm_mb(qm, MAILBOX_CMD_EQC, qm->eqc_dma, 0, 0, 0);
++	if (ret)
++		return ret;
++
++	ret = qm_mb(qm, MAILBOX_CMD_SQC_BT, qm->sqc_dma, 0, 0, 0);
++	if (ret)
++		return ret;
++
++	ret = qm_mb(qm, MAILBOX_CMD_CQC_BT, qm->cqc_dma, 0, 0, 0);
++	if (ret)
++		return ret;
++
++	writel(0x0, QM_ADDR(qm, QM_VF_EQ_INT_MASK));
++
++	dev_dbg(&qm->pdev->dev, "qm started\n");
++
++	return 0;
++}
++EXPORT_SYMBOL_GPL(hisi_qm_start);
++
++
++void hisi_qm_stop(struct qm_info *qm)
++{
++	/* todo: recheck if this is the right way to disable the hw irq */
++	writel(0x1, QM_ADDR(qm, QM_VF_EQ_INT_MASK));
++
++}
++EXPORT_SYMBOL_GPL(hisi_qm_stop);
++
++MODULE_LICENSE("GPL v2");
++MODULE_AUTHOR("Zhou Wang <wangzhou1@hisilicon.com>");
++MODULE_DESCRIPTION("HiSilicon Accelerator queue manager driver");
+diff --git a/drivers/crypto/hisilicon/qm.h b/drivers/crypto/hisilicon/qm.h
+new file mode 100644
+index 000000000000..6d124d948738
+--- /dev/null
++++ b/drivers/crypto/hisilicon/qm.h
+@@ -0,0 +1,213 @@
++/* SPDX-License-Identifier: GPL-2.0+ */
++#ifndef HISI_ACC_QM_H
++#define HISI_ACC_QM_H
++
++#include <linux/dmapool.h>
++#include <linux/iopoll.h>
++#include <linux/module.h>
++#include <linux/pci.h>
++#include <linux/slab.h>
++#include "qm_usr_if.h"
++
++/* qm user domain */
++#define QM_ARUSER_M_CFG_1		0x100088
++#define QM_ARUSER_M_CFG_ENABLE		0x100090
++#define QM_AWUSER_M_CFG_1		0x100098
++#define QM_AWUSER_M_CFG_ENABLE		0x1000a0
++#define QM_WUSER_M_CFG_ENABLE		0x1000a8
++
++/* qm cache */
++#define QM_CACHE_CTL			0x100050
++#define QM_AXI_M_CFG			0x1000ac
++#define QM_AXI_M_CFG_ENABLE		0x1000b0
++#define QM_PEH_AXUSER_CFG		0x1000cc
++#define QM_PEH_AXUSER_CFG_ENABLE	0x1000d0
++
++struct eqe {
++	__le32 dw0;
++};
++
++struct aeqe {
++	__le32 dw0;
++};
++
++struct sqc {
++	__le16 head;
++	__le16 tail;
++	__le32 base_l;
++	__le32 base_h;
++	__le32 dw3;
++	__le16 qes;
++	__le16 rsvd0;
++	__le16 pasid;
++	__le16 w11;
++	__le16 cq_num;
++	__le16 w13;
++	__le32 rsvd1;
++};
++
++struct cqc {
++	__le16 head;
++	__le16 tail;
++	__le32 base_l;
++	__le32 base_h;
++	__le32 dw3;
++	__le16 qes;
++	__le16 rsvd0;
++	__le16 pasid;
++	__le16 w11;
++	__le32 dw6;
++	__le32 rsvd1;
++};
++
++#define INIT_QC(qc, base) do { \
++	(qc)->head = 0; \
++	(qc)->tail = 0; \
++	(qc)->base_l = lower_32_bits((unsigned long)base); \
++	(qc)->base_h = upper_32_bits((unsigned long)base); \
++	(qc)->pasid = 0; \
++	(qc)->w11 = 0; \
++	(qc)->rsvd1 = 0; \
++	(qc)->qes = QM_Q_DEPTH - 1; \
++} while (0)
++
++struct eqc {
++	__le16 head;
++	__le16 tail;
++	__le32 base_l;
++	__le32 base_h;
++	__le32 dw3;
++	__le32 rsvd[2];
++	__le32 dw6;
++};
++
++struct aeqc {
++	__le16 head;
++	__le16 tail;
++	__le32 base_l;
++	__le32 base_h;
++	__le32 rsvd[3];
++	__le32 dw6;
++};
++
++struct mailbox {
++	__le16 w0;
++	__le16 queue_num;
++	__le32 base_l;
++	__le32 base_h;
++	__le32 rsvd;
++};
++
++struct doorbell {
++	__le16 queue_num;
++	__le16 cmd;
++	__le16 index;
++	__le16 priority;
++};
++
++struct qm_dma {
++	void *va;
++	dma_addr_t dma;
++	size_t size;
++};
++
++struct qm_info {
++	int ver;
++	struct pci_dev *pdev;
++
++	resource_size_t phys_base;
++	resource_size_t size;
++	void __iomem *io_base;
++
++	u32 sqe_size;
++	u32 qp_base;
++	u32 qp_num;
++
++	struct qm_dma qdma;
++	struct sqc *sqc;
++	struct cqc *cqc;
++	struct eqc *eqc;
++	struct eqe *eqe;
++	struct aeqc *aeqc;
++	struct aeqe *aeqe;
++	unsigned long sqc_dma,
++		      cqc_dma,
++		      eqc_dma,
++		      eqe_dma,
++		      aeqc_dma,
++		      aeqe_dma;
++
++	u32 eq_head;
++
++	rwlock_t qps_lock;
++	unsigned long *qp_bitmap;
++	struct hisi_qp **qp_array;
++
++	struct mutex mailbox_lock;
++
++	struct hisi_acc_qm_hw_ops *ops;
++};
++#define QM_ADDR(qm, off) ((qm)->io_base + off)
++
++struct hisi_acc_qp_status {
++	u16 sq_tail;
++	u16 sq_head;
++	u16 cq_head;
++	u16 sqn;
++	bool cqc_phase;
++	int is_sq_full;
++};
++
++struct hisi_qp;
++
++struct hisi_qp_ops {
++	int (*fill_sqe)(void *sqe, void *q_parm, void *d_parm);
++};
++
++struct hisi_qp {
++	/* sq number in this function */
++	u32 queue_id;
++	u8 alg_type;
++	u8 req_type;
++	int pasid;
++
++	struct qm_dma qdma;
++	struct sqc *sqc;
++	struct cqc *cqc;
++	void *sqe;
++	struct cqe *cqe;
++
++	unsigned long sqc_dma,
++		      cqc_dma,
++		      sqe_dma,
++		      cqe_dma;
++
++	struct hisi_acc_qp_status qp_status;
++
++	struct qm_info *qm;
++
++	/* for crypto sync API */
++	struct completion completion;
++
++	struct hisi_qp_ops *hw_ops;
++	void *qp_ctx;
++	void (*event_cb)(struct hisi_qp *qp);
++	void (*req_cb)(struct hisi_qp *qp, unsigned long data);
++};
++
++/* QM external interface for accelerator driver.
++ * To use qm:
++ * 1. Set qm with pdev, and sqe_size set accordingly
++ * 2. hisi_qm_init()
++ * 3. config the accelerator hardware
++ * 4. hisi_qm_start()
++ */
++extern int hisi_qm_init(struct qm_info *qm);
++extern void hisi_qm_uninit(struct qm_info *qm);
++extern int hisi_qm_start(struct qm_info *qm);
++extern void hisi_qm_stop(struct qm_info *qm);
++extern struct hisi_qp *hisi_qm_create_qp(struct qm_info *qm, u8 alg_type);
++extern int hisi_qm_start_qp(struct hisi_qp *qp, unsigned long arg);
++extern void hisi_qm_release_qp(struct hisi_qp *qp);
++extern int hisi_qp_send(struct hisi_qp *qp, void *msg);
++#endif
+diff --git a/drivers/crypto/hisilicon/qm_usr_if.h b/drivers/crypto/hisilicon/qm_usr_if.h
+new file mode 100644
+index 000000000000..13aab94adb05
+--- /dev/null
++++ b/drivers/crypto/hisilicon/qm_usr_if.h
+@@ -0,0 +1,32 @@
++/* SPDX-License-Identifier: GPL-2.0+ */
++#ifndef HISI_QM_USR_IF_H
++#define HISI_QM_USR_IF_H
++
++#define QM_CQE_SIZE			16
++
++/* default queue depth for sq/cq/eq */
++#define QM_Q_DEPTH			1024
++
++/* page number for queue file region */
++#define QM_DOORBELL_PAGE_NR	1
++#define QM_DKO_PAGE_NR		3
++#define QM_DUS_PAGE_NR		36
++
++#define QM_DOORBELL_PG_START 0
++#define QM_DKO_PAGE_START (QM_DOORBELL_PG_START + QM_DOORBELL_PAGE_NR)
++#define QM_DUS_PAGE_START (QM_DKO_PAGE_START + QM_DKO_PAGE_NR)
++#define QM_SS_PAGE_START (QM_DUS_PAGE_START + QM_DUS_PAGE_NR)
++
++#define QM_DOORBELL_OFFSET      0x340
++
++struct cqe {
++	__le32 rsvd0;
++	__le16 cmd_id;
++	__le16 rsvd1;
++	__le16 sq_head;
++	__le16 sq_num;
++	__le16 rsvd2;
++	__le16 w7;
++};
++
++#endif
 -- 
-2.1.0
+2.17.1
