@@ -1,43 +1,33 @@
-Return-Path: <SRS0=IUQn=NU=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from youngberry.canonical.com ([91.189.89.112]:55863 "EHLO
-        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727725AbeKIW5Q (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 9 Nov 2018 17:57:16 -0500
-From: Colin King <colin.king@canonical.com>
-To: Steffen Klassert <steffen.klassert@secunet.com>,
-        linux-crypto@vger.kernel.org
-Cc: kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] padata: clean an indentation issue, remove extraneous space
-Date: Fri,  9 Nov 2018 13:16:39 +0000
-Message-Id: <20181109131639.20739-1-colin.king@canonical.com>
+Return-Path: <SRS0=oFif=NX=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:46326 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729266AbeKLWZF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 12 Nov 2018 17:25:05 -0500
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <20181112102423.30415-5-roberto.sassu@huawei.com>
+References: <20181112102423.30415-5-roberto.sassu@huawei.com> <20181112102423.30415-1-roberto.sassu@huawei.com>
+To: Roberto Sassu <roberto.sassu@huawei.com>
+Cc: dhowells@redhat.com, dwmw2@infradead.org,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-integrity@vger.kernel.org, linux-kernel@vger.kernel.org,
+        silviu.vlasceanu@huawei.com
+Subject: Re: [RFC][PATCH 04/12] PGPLIB: Basic packet parser
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <19256.1542025917.1@warthog.procyon.org.uk>
+Date: Mon, 12 Nov 2018 12:31:57 +0000
+Message-ID: <19257.1542025917@warthog.procyon.org.uk>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Colin Ian King <colin.king@canonical.com>
+Roberto Sassu <roberto.sassu@huawei.com> wrote:
 
-Trivial fix to clean up an indentation issue
+> +	size_t size, datalen = *_datalen;
+> ...
+> +	if ((int)size < 0)
+> +		goto too_big;
 
-Signed-off-by: Colin Ian King <colin.king@canonical.com>
----
- kernel/padata.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Hmmm...  "if (size > INT_MAX)" is probably better.
 
-diff --git a/kernel/padata.c b/kernel/padata.c
-index d568cc56405f..3e2633ae3bca 100644
---- a/kernel/padata.c
-+++ b/kernel/padata.c
-@@ -720,7 +720,7 @@ int padata_start(struct padata_instance *pinst)
- 	if (pinst->flags & PADATA_INVALID)
- 		err = -EINVAL;
- 
--	 __padata_start(pinst);
-+	__padata_start(pinst);
- 
- 	mutex_unlock(&pinst->lock);
- 
--- 
-2.19.1
+David
