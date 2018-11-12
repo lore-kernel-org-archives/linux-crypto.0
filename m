@@ -1,170 +1,228 @@
-Return-Path: <SRS0=p+N9=OH=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-oi1-f195.google.com ([209.85.167.195]:38952 "EHLO
-        mail-oi1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725994AbeK2Gjq (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 29 Nov 2018 01:39:46 -0500
+Return-Path: <SRS0=oFif=NX=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from lhrrgout.huawei.com ([185.176.76.210]:32745 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727156AbeKLU2f (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 12 Nov 2018 15:28:35 -0500
+From: Roberto Sassu <roberto.sassu@huawei.com>
+To: <dhowells@redhat.com>, <dwmw2@infradead.org>,
+        <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+CC: <keyrings@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <linux-integrity@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <silviu.vlasceanu@huawei.com>
+Subject: [RFC][PATCH 11/12] KEYS: Provide a function to load keys from a PGP keyring blob
+Date: Mon, 12 Nov 2018 11:24:22 +0100
+Message-ID: <20181112102423.30415-12-roberto.sassu@huawei.com>
+In-Reply-To: <20181112102423.30415-1-roberto.sassu@huawei.com>
+References: <20181112102423.30415-1-roberto.sassu@huawei.com>
 MIME-Version: 1.0
-From: David CARLIER <devnexen@gmail.com>
-Date: Wed, 28 Nov 2018 19:36:50 +0000
-Message-ID: <CA+XhMqz7ZaGVNpkrRM-t4h2f9UZVQPjLVB5Txco4bKGRm8k=mA@mail.gmail.com>
-Subject: [PATCH] crypto: use memzero_explicit instead of memset to clear contexts.
-To: linux-kernel@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-There might be a little performance drop but to make sure it stands
-by it comments, we really wipe the whole context after usage.
+From: David Howells <dhowells@redhat.com>
+
+Provide a function to load keys from a PGP keyring blob for use in
+initialising the module signing key keyring:
+
+	int preload_pgp_keys(const u8 *pgpdata, size_t pgpdatalen,
+			     struct key *keyring);
+
+Descriptions are generated from user ID notes and key fingerprints.  The
+keys will actually be identified by the ID calculated from the PGP data
+rather than by the description, so this shouldn't be a problem.
+
+The keys are attached to the keyring supplied.
+
+Looking as root in /proc/keys after the module signing keyring has been
+loaded:
+
+383a00c1 I------     1 perm 1f030000     0     0 asymmetri \
+				Red Hat, Inc. dbeca166: PGP.DSA dbeca166 []
+
+Thanks to Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp> for some
+pointing out some errors.
+
+Changelog
+
+v0:
+- avoid Kconfig circular dependency (Roberto Sassu)
+- modify flags passed to key_create_or_update() (Roberto Sassu)
+- don't process Public-Subkey packets (Roberto Sassu)
+
+Signed-off-by: David Howells <dhowells@redhat.com>
+Co-developed-by: Roberto Sassu <roberto.sassu@huawei.com>
 ---
- crypto/chacha20poly1305.c | 3 ++-
- crypto/md5.c              | 2 +-
- crypto/rmd128.c           | 3 ++-
- crypto/rmd160.c           | 3 ++-
- crypto/rmd256.c           | 3 ++-
- crypto/rmd320.c           | 3 ++-
- crypto/sha3_generic.c     | 3 ++-
- 7 files changed, 13 insertions(+), 7 deletions(-)
+ crypto/asymmetric_keys/Kconfig       |   8 ++
+ crypto/asymmetric_keys/Makefile      |   1 +
+ crypto/asymmetric_keys/pgp_preload.c | 118 +++++++++++++++++++++++++++
+ include/linux/pgp_sig.h              |   3 +
+ 4 files changed, 130 insertions(+)
+ create mode 100644 crypto/asymmetric_keys/pgp_preload.c
 
-diff --git a/crypto/chacha20poly1305.c b/crypto/chacha20poly1305.c
-index 600afa99941f..6e93d998109e 100644
---- a/crypto/chacha20poly1305.c
-+++ b/crypto/chacha20poly1305.c
-@@ -19,6 +19,7 @@
- #include <linux/init.h>
- #include <linux/kernel.h>
- #include <linux/module.h>
-+#include <linux/string.h>
-
- #include "internal.h"
-
-@@ -388,7 +389,7 @@ static int poly_genkey(struct aead_request *req)
-        }
-
-        sg_init_table(creq->src, 1);
--       memset(rctx->key, 0, sizeof(rctx->key));
-+       memzero_explicit(rctx->key, sizeof(rctx->key));
-        sg_set_buf(creq->src, rctx->key, sizeof(rctx->key));
-
-        chacha_iv(creq->iv, req, 0);
-diff --git a/crypto/md5.c b/crypto/md5.c
-index 94dd78144ba3..00d384e8784c 100644
---- a/crypto/md5.c
-+++ b/crypto/md5.c
-@@ -197,7 +197,7 @@ static int md5_final(struct shash_desc *desc, u8 *out)
-        md5_transform(mctx->hash, mctx->block);
-        cpu_to_le32_array(mctx->hash, sizeof(mctx->hash) / sizeof(u32));
-        memcpy(out, mctx->hash, sizeof(mctx->hash));
--       memset(mctx, 0, sizeof(*mctx));
-+       memzero_explicit(mctx, sizeof(*mctx));
-
-        return 0;
- }
-diff --git a/crypto/rmd128.c b/crypto/rmd128.c
-index 5f4472256e27..5e01cd7130c7 100644
---- a/crypto/rmd128.c
-+++ b/crypto/rmd128.c
-@@ -17,6 +17,7 @@
- #include <linux/init.h>
- #include <linux/module.h>
- #include <linux/mm.h>
-+#include <linux/string.h>
- #include <linux/types.h>
- #include <asm/byteorder.h>
-
-@@ -290,7 +291,7 @@ static int rmd128_final(struct shash_desc *desc, u8 *out)
-                dst[i] = cpu_to_le32p(&rctx->state[i]);
-
-        /* Wipe context */
--       memset(rctx, 0, sizeof(*rctx));
-+       memzero_explicit(rctx, sizeof(*rctx));
-
-        return 0;
- }
-diff --git a/crypto/rmd160.c b/crypto/rmd160.c
-index 737645344d1c..2381d134443c 100644
---- a/crypto/rmd160.c
-+++ b/crypto/rmd160.c
-@@ -17,6 +17,7 @@
- #include <linux/init.h>
- #include <linux/module.h>
- #include <linux/mm.h>
-+#include <linux/string.h>
- #include <linux/types.h>
- #include <asm/byteorder.h>
-
-@@ -334,7 +335,7 @@ static int rmd160_final(struct shash_desc *desc, u8 *out)
-                dst[i] = cpu_to_le32p(&rctx->state[i]);
-
-        /* Wipe context */
--       memset(rctx, 0, sizeof(*rctx));
-+       memzero_explicit(rctx, sizeof(*rctx));
-
-        return 0;
- }
-diff --git a/crypto/rmd256.c b/crypto/rmd256.c
-index 0e9d30676a01..3db0f6653607 100644
---- a/crypto/rmd256.c
-+++ b/crypto/rmd256.c
-@@ -17,6 +17,7 @@
- #include <linux/init.h>
- #include <linux/module.h>
- #include <linux/mm.h>
-+#include <linux/string.h>
- #include <linux/types.h>
- #include <asm/byteorder.h>
-
-@@ -309,7 +310,7 @@ static int rmd256_final(struct shash_desc *desc, u8 *out)
-                dst[i] = cpu_to_le32p(&rctx->state[i]);
-
-        /* Wipe context */
--       memset(rctx, 0, sizeof(*rctx));
-+       memzero_explicit(rctx, sizeof(*rctx));
-
-        return 0;
- }
-diff --git a/crypto/rmd320.c b/crypto/rmd320.c
-index 3ae1df5bb48c..e0e1a71d0144 100644
---- a/crypto/rmd320.c
-+++ b/crypto/rmd320.c
-@@ -17,6 +17,7 @@
- #include <linux/init.h>
- #include <linux/module.h>
- #include <linux/mm.h>
-+#include <linux/string.h>
- #include <linux/types.h>
- #include <asm/byteorder.h>
-
-@@ -358,7 +359,7 @@ static int rmd320_final(struct shash_desc *desc, u8 *out)
-                dst[i] = cpu_to_le32p(&rctx->state[i]);
-
-        /* Wipe context */
--       memset(rctx, 0, sizeof(*rctx));
-+       memzero_explicit(rctx, sizeof(*rctx));
-
-        return 0;
- }
-diff --git a/crypto/sha3_generic.c b/crypto/sha3_generic.c
-index 7ed98367d4fb..ae30a035d371 100644
---- a/crypto/sha3_generic.c
-+++ b/crypto/sha3_generic.c
-@@ -17,6 +17,7 @@
- #include <linux/init.h>
- #include <linux/module.h>
- #include <linux/types.h>
-+#include <linux/string.h>
- #include <crypto/sha3.h>
- #include <asm/unaligned.h>
-
-@@ -237,7 +238,7 @@ int crypto_sha3_final(struct shash_desc *desc, u8 *out)
-        if (digest_size & 4)
-                put_unaligned_le32(sctx->st[i], (__le32 *)digest);
-
--       memset(sctx, 0, sizeof(*sctx));
-+       memzero_explicit(sctx, sizeof(*sctx));
-        return 0;
- }
- EXPORT_SYMBOL(crypto_sha3_final);
+diff --git a/crypto/asymmetric_keys/Kconfig b/crypto/asymmetric_keys/Kconfig
+index 8226d06fe1e0..f0b4e3ccf1b8 100644
+--- a/crypto/asymmetric_keys/Kconfig
++++ b/crypto/asymmetric_keys/Kconfig
+@@ -123,4 +123,12 @@ config PGP_TEST_KEY
+ 
+ 	  This is intended for testing the PGP parser.
+ 
++config PGP_PRELOAD
++	bool "PGP public key preloading facility"
++	select PGP_KEY_PARSER
++	help
++	  This option provides a facility for the kernel to preload PGP-wrapped
++	  bundles of keys during boot.  It is used by module signing to load
++	  the module signing keys for example.
++
+ endif # ASYMMETRIC_KEY_TYPE
+diff --git a/crypto/asymmetric_keys/Makefile b/crypto/asymmetric_keys/Makefile
+index 48bbe2b1d446..c04a103a99c5 100644
+--- a/crypto/asymmetric_keys/Makefile
++++ b/crypto/asymmetric_keys/Makefile
+@@ -91,6 +91,7 @@ $(obj)/tpm.asn1.o: $(obj)/tpm.asn1.c $(obj)/tpm.asn1.h
+ # PGP handling
+ #
+ obj-$(CONFIG_PGP_LIBRARY) += pgp_library.o
++obj-$(CONFIG_PGP_PRELOAD) += pgp_preload.o
+ 
+ obj-$(CONFIG_PGP_KEY_PARSER) += pgp_key_parser.o
+ pgp_key_parser-y := \
+diff --git a/crypto/asymmetric_keys/pgp_preload.c b/crypto/asymmetric_keys/pgp_preload.c
+new file mode 100644
+index 000000000000..7cabade16780
+--- /dev/null
++++ b/crypto/asymmetric_keys/pgp_preload.c
+@@ -0,0 +1,118 @@
++/* Cryptographic key request handling
++ *
++ * Copyright (C) 2011 Red Hat, Inc. All Rights Reserved.
++ * Written by David Howells (dhowells@redhat.com)
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public Licence
++ * as published by the Free Software Foundation; either version
++ * 2 of the Licence, or (at your option) any later version.
++ *
++ * See Documentation/security/keys-crypto.txt
++ */
++
++#include <linux/module.h>
++#include <linux/key.h>
++#include <linux/pgp_sig.h>
++#include <linux/pgplib.h>
++#include <linux/err.h>
++#include <keys/asymmetric-type.h>
++
++struct preload_pgp_keys_context {
++	struct pgp_parse_context pgp;
++	key_ref_t keyring;
++	const u8 *key_start;
++	const u8 *key_end;
++	bool found_key;
++};
++
++/*
++ * Create a key.
++ */
++static int __init create_pgp_key(struct preload_pgp_keys_context *ctx)
++{
++	key_ref_t key;
++
++	key = key_create_or_update(ctx->keyring,
++				   "asymmetric",
++				   NULL,
++				   ctx->key_start,
++				   ctx->key_end - ctx->key_start,
++				   ((KEY_POS_ALL & ~KEY_POS_SETATTR) |
++				    KEY_USR_VIEW | KEY_USR_READ),
++				   KEY_ALLOC_NOT_IN_QUOTA |
++				   KEY_ALLOC_BUILT_IN |
++				   KEY_ALLOC_BYPASS_RESTRICTION);
++	if (IS_ERR(key))
++		return PTR_ERR(key);
++
++	pr_notice("Loaded PGP key '%s'\n",
++		  key_ref_to_ptr(key)->description);
++
++	key_ref_put(key);
++	return 0;
++}
++
++/*
++ * Extract a public key or subkey from the PGP stream.
++ */
++static int __init found_pgp_key(struct pgp_parse_context *context,
++				enum pgp_packet_tag type, u8 headerlen,
++				const u8 *data, size_t datalen)
++{
++	struct preload_pgp_keys_context *ctx =
++		container_of(context, struct preload_pgp_keys_context, pgp);
++	int ret;
++
++	if (ctx->found_key) {
++		ctx->key_end = data - headerlen;
++		ret = create_pgp_key(ctx);
++		if (ret < 0)
++			return ret;
++	}
++
++	ctx->key_start = data - headerlen;
++	ctx->found_key = true;
++	return 0;
++}
++
++/**
++ * preload_pgp_keys - Load keys from a PGP keyring blob
++ * @pgpdata: The PGP keyring blob containing the keys.
++ * @pgpdatalen: The size of the @pgpdata blob.
++ * @keyring: The keyring to add the new keys to.
++ *
++ * Preload a pack of keys from a PGP keyring blob.
++ *
++ * The keys have their descriptions generated from the user ID and fingerprint
++ * in the PGP stream.  Since keys can be matched on their key IDs independently
++ * of the key description, the description is mostly irrelevant apart from the
++ * fact that keys of the same description displace one another from a keyring.
++ *
++ * The caller should override the current creds if they want the keys to be
++ * owned by someone other than the current process's owner.  Keys will not be
++ * accounted towards the owner's quota.
++ *
++ * This function may only be called whilst the kernel is booting.
++ */
++int __init preload_pgp_keys(const u8 *pgpdata, size_t pgpdatalen,
++			    struct key *keyring)
++{
++	struct preload_pgp_keys_context ctx;
++	int ret;
++
++	ctx.pgp.types_of_interest = (1 << PGP_PKT_PUBLIC_KEY);
++	ctx.pgp.process_packet = found_pgp_key;
++	ctx.keyring = make_key_ref(keyring, 1);
++	ctx.found_key = false;
++
++	ret = pgp_parse_packets(pgpdata, pgpdatalen, &ctx.pgp);
++	if (ret < 0)
++		return ret;
++
++	if (ctx.found_key) {
++		ctx.key_end = pgpdata + pgpdatalen;
++		return create_pgp_key(&ctx);
++	}
++	return 0;
++}
+diff --git a/include/linux/pgp_sig.h b/include/linux/pgp_sig.h
+index d7c6fb6c61aa..c0114cfc2f20 100644
+--- a/include/linux/pgp_sig.h
++++ b/include/linux/pgp_sig.h
+@@ -18,4 +18,7 @@ int pgp_verify_sig(struct key *keyring, const u8 *raw_data, size_t raw_datalen,
+ 		   const u8 *digest, size_t digest_size, const u8 *sig_data,
+ 		   size_t sig_datalen);
+ 
++int __init preload_pgp_keys(const u8 *pgpdata, size_t pgpdatalen,
++			    struct key *keyring);
++
+ #endif /* _LINUX_PGP_SIG_H */
+-- 
+2.17.1
