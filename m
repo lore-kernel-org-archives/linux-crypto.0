@@ -1,43 +1,133 @@
-Return-Path: <SRS0=HYoH=NT=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from frisell.zx2c4.com ([192.95.5.64]:52017 "EHLO frisell.zx2c4.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725922AbeKIGPL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 9 Nov 2018 01:15:11 -0500
-Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTP id 14d1e7b0
-        for <linux-crypto@vger.kernel.org>;
-        Thu, 8 Nov 2018 20:33:21 +0000 (UTC)
-Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id d7266c2c (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256:NO)
-        for <linux-crypto@vger.kernel.org>;
-        Thu, 8 Nov 2018 20:33:21 +0000 (UTC)
-Received: by mail-ot1-f54.google.com with SMTP id g27so19428804oth.6
-        for <linux-crypto@vger.kernel.org>; Thu, 08 Nov 2018 12:37:59 -0800 (PST)
+Return-Path: <SRS0=oFif=NX=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from lhrrgout.huawei.com ([185.176.76.210]:32741 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725873AbeKLUYE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 12 Nov 2018 15:24:04 -0500
+From: Roberto Sassu <roberto.sassu@huawei.com>
+To: <dhowells@redhat.com>, <dwmw2@infradead.org>,
+        <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+CC: <keyrings@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <linux-integrity@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <silviu.vlasceanu@huawei.com>
+Subject: [RFC][PATCH 07/12] KEYS: Provide PGP key description autogeneration
+Date: Mon, 12 Nov 2018 11:24:18 +0100
+Message-ID: <20181112102423.30415-8-roberto.sassu@huawei.com>
+In-Reply-To: <20181112102423.30415-1-roberto.sassu@huawei.com>
+References: <20181112102423.30415-1-roberto.sassu@huawei.com>
 MIME-Version: 1.0
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date: Thu, 8 Nov 2018 21:37:48 +0100
-Message-ID: <CAHmME9r=Zm4QzoRRdA88R0R56e3EJb+Psm7YeX6y2+ZhEjwYQg@mail.gmail.com>
-Subject: .S_shipped unnecessary?
-To: Eric Biggers <ebiggers@google.com>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Ard, Eric, and others,
+From: David Howells <dhowells@redhat.com>
 
-As promised, the next Zinc patchset will have less generated code! After a
-bit of work with Andy and Samuel, I'll be bundling the perlasm.
+Provide a facility to autogenerate the name of PGP keys from the contents
+of the payload.  If add_key() is given a blank description, a description
+is constructed from the last user ID packet in the payload data plus the
+last 8 hex digits of the key ID.  For instance:
 
-One thing I'm wondering about, though, is the wisdom behind the current
-.S_shipped pattern. Usually the _shipped is for big firmware blobs that are
-hard (or impossible) to build independently. But in this case, the .S is
-generated from the .pl significantly faster than gcc even compiles a basic
-C file. And, since perl is needed to build the kernel anyway, it's not like
-it will be impossible to find the right tools. Rather than clutter up commits
-with the .pl _and_ the .S_shipped, what would you think if I just generated
-the .S each time as an ordinary build artifact. AFAICT, this is fairly usual,
-and it's hard to see downsides. Hence, why I'm writing this email: are there
-any downsides to that?
+	keyctl padd asymmetric "" @s </tmp/key.pub
 
-Thanks,
-Jason
+might create a key with a constructed description that can be seen in
+/proc/keys:
+
+2f674b96 I--Q---     1 perm 39390000     0     0 crypto    \
+			Sample kernel key 31f0ae93: PGP.RSA 31f0ae93 []
+
+Changelog
+
+v0:
+- fix style issues (Roberto Sassu)
+
+Signed-off-by: David Howells <dhowells@redhat.com>
+Co-developed-by: Roberto Sassu <roberto.sassu@huawei.com>
+---
+ crypto/asymmetric_keys/pgp_public_key.c | 46 ++++++++++++++++++++++++-
+ 1 file changed, 45 insertions(+), 1 deletion(-)
+
+diff --git a/crypto/asymmetric_keys/pgp_public_key.c b/crypto/asymmetric_keys/pgp_public_key.c
+index a5ce146a1250..371a3e721f69 100644
+--- a/crypto/asymmetric_keys/pgp_public_key.c
++++ b/crypto/asymmetric_keys/pgp_public_key.c
+@@ -35,6 +35,9 @@ struct pgp_key_data_parse_context {
+ 	struct public_key *pub;
+ 	unsigned char *raw_fingerprint;
+ 	char *fingerprint;
++	const char *user_id;
++	size_t user_id_len;
++	size_t fingerprint_len;
+ };
+ 
+ /*
+@@ -155,6 +158,7 @@ static int pgp_generate_fingerprint(struct pgp_key_data_parse_context *ctx,
+ 	if (ret < 0)
+ 		goto cleanup_raw_fingerprint;
+ 
++	ctx->fingerprint_len = digest_size * 2;
+ 	fingerprint = kmalloc(digest_size * 2 + 1, GFP_KERNEL);
+ 	if (!fingerprint)
+ 		goto cleanup_raw_fingerprint;
+@@ -199,6 +203,13 @@ static int pgp_process_public_key(struct pgp_parse_context *context,
+ 
+ 	kenter(",%u,%u,,%zu", type, headerlen, datalen);
+ 
++	if (type == PGP_PKT_USER_ID) {
++		ctx->user_id = data;
++		ctx->user_id_len = datalen;
++		kleave(" = 0 [user ID]");
++		return 0;
++	}
++
+ 	if (ctx->fingerprint) {
+ 		kleave(" = -ENOKEY [already]");
+ 		return -EBADMSG;
+@@ -291,13 +302,46 @@ static int pgp_key_parse(struct key_preparsed_payload *prep)
+ 	kenter("");
+ 
+ 	memset(&ctx, 0, sizeof(ctx));
+-	ctx.pgp.types_of_interest = (1 << PGP_PKT_PUBLIC_KEY);
++	ctx.pgp.types_of_interest = (1 << PGP_PKT_PUBLIC_KEY) |
++				    (1 << PGP_PKT_USER_ID);
+ 	ctx.pgp.process_packet = pgp_process_public_key;
+ 
+ 	ret = pgp_parse_packets(prep->data, prep->datalen, &ctx.pgp);
+ 	if (ret < 0)
+ 		goto error;
+ 
++	if (ctx.user_id && ctx.user_id_len > 0) {
++		/* Propose a description for the key
++		 * (user ID without the comment)
++		 */
++		size_t ulen = ctx.user_id_len, flen = ctx.fingerprint_len;
++		const char *p;
++
++		p = memchr(ctx.user_id, '(', ulen);
++		if (p) {
++			/* Remove the comment */
++			do {
++				p--;
++			} while (*p == ' ' && p > ctx.user_id);
++			if (*p != ' ')
++				p++;
++			ulen = p - ctx.user_id;
++		}
++
++		if (ulen > 255 - 9)
++			ulen = 255 - 9;
++		prep->description = kmalloc(ulen + 1 + 8 + 1, GFP_KERNEL);
++		ret = -ENOMEM;
++		if (!prep->description)
++			goto error;
++		memcpy(prep->description, ctx.user_id, ulen);
++		prep->description[ulen] = ' ';
++		memcpy(prep->description + ulen + 1,
++		       ctx.fingerprint + flen - 8, 8);
++		prep->description[ulen + 9] = 0;
++		pr_debug("desc '%s'\n", prep->description);
++	}
++
+ 	/* We're pinning the module by being linked against it */
+ 	__module_get(public_key_subtype.owner);
+ 	prep->payload.data[asym_subtype] = &public_key_subtype;
+-- 
+2.17.1
