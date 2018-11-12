@@ -1,94 +1,456 @@
-Return-Path: <SRS0=IFNk=NQ=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from szxga04-in.huawei.com ([45.249.212.190]:14594 "EHLO huawei.com"
+Return-Path: <SRS0=oFif=NX=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from lhrrgout.huawei.com ([185.176.76.210]:32738 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1729047AbeKEVxY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 5 Nov 2018 16:53:24 -0500
-From: John Garry <john.garry@huawei.com>
-To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
-CC: <Jonathan.Cameron@huawei.com>, <linux-crypto@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linuxarm@huawei.com>,
-        John Garry <john.garry@huawei.com>
-Subject: [PATCH 2/2] crypto: hisilicon -  Fix reference after free of memories on error path
-Date: Mon, 5 Nov 2018 20:35:15 +0800
-Message-ID: <1541421315-25623-3-git-send-email-john.garry@huawei.com>
-In-Reply-To: <1541421315-25623-1-git-send-email-john.garry@huawei.com>
-References: <1541421315-25623-1-git-send-email-john.garry@huawei.com>
+        id S1725873AbeKLUWb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 12 Nov 2018 15:22:31 -0500
+From: Roberto Sassu <roberto.sassu@huawei.com>
+To: <dhowells@redhat.com>, <dwmw2@infradead.org>,
+        <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+CC: <keyrings@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <linux-integrity@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <silviu.vlasceanu@huawei.com>
+Subject: [RFC][PATCH 04/12] PGPLIB: Basic packet parser
+Date: Mon, 12 Nov 2018 11:24:15 +0100
+Message-ID: <20181112102423.30415-5-roberto.sassu@huawei.com>
+In-Reply-To: <20181112102423.30415-1-roberto.sassu@huawei.com>
+References: <20181112102423.30415-1-roberto.sassu@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-coccicheck currently warns of the following issues in the driver:
-drivers/crypto/hisilicon/sec/sec_algs.c:864:51-66: ERROR: reference preceded by free on line 812
-drivers/crypto/hisilicon/sec/sec_algs.c:864:40-49: ERROR: reference preceded by free on line 813
-drivers/crypto/hisilicon/sec/sec_algs.c:861:8-24: ERROR: reference preceded by free on line 814
-drivers/crypto/hisilicon/sec/sec_algs.c:860:41-51: ERROR: reference preceded by free on line 815
-drivers/crypto/hisilicon/sec/sec_algs.c:867:7-18: ERROR: reference preceded by free on line 816
+From: David Howells <dhowells@redhat.com>
 
-It would appear than on certain error paths that we may attempt reference-
-after-free some memories.
+Provide a simple parser that extracts the packets from a PGP packet blob
+and passes the desirous ones to the given processor function:
 
-This patch fixes those issues. The solution doesn't look perfect, but
-having same memories free'd possibly from separate functions makes it
-tricky.
+	struct pgp_parse_context {
+		u64 types_of_interest;
+		int (*process_packet)(struct pgp_parse_context *context,
+				      enum pgp_packet_tag type,
+				      u8 headerlen,
+				      const u8 *data,
+				      size_t datalen);
+	};
 
-Fixes: 915e4e8413da ("crypto: hisilicon - SEC security accelerator driver")
-Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Signed-off-by: John Garry <john.garry@huawei.com>
+	int pgp_parse_packets(const u8 *data, size_t datalen,
+			      struct pgp_parse_context *ctx);
+
+This is configured on with CONFIG_PGP_LIBRARY.
+
+Changelog
+
+v0:
+- fix style issues (Roberto Sassu)
+- declare pgp_to_public_key_algo (Roberto Sassu)
+
+Signed-off-by: David Howells <dhowells@redhat.com>
+Co-developed-by: Roberto Sassu <roberto.sassu@huawei.com>
 ---
- drivers/crypto/hisilicon/sec/sec_algs.c | 21 +++++++++++----------
- 1 file changed, 11 insertions(+), 10 deletions(-)
+ crypto/asymmetric_keys/Kconfig       |   6 +
+ crypto/asymmetric_keys/Makefile      |   5 +
+ crypto/asymmetric_keys/pgp_library.c | 280 +++++++++++++++++++++++++++
+ crypto/asymmetric_keys/pgp_parser.h  |  22 +++
+ include/linux/pgplib.h               |  47 +++++
+ 5 files changed, 360 insertions(+)
+ create mode 100644 crypto/asymmetric_keys/pgp_library.c
+ create mode 100644 crypto/asymmetric_keys/pgp_parser.h
+ create mode 100644 include/linux/pgplib.h
 
-diff --git a/drivers/crypto/hisilicon/sec/sec_algs.c b/drivers/crypto/hisilicon/sec/sec_algs.c
-index 32c6c02..cdc4f9a 100644
---- a/drivers/crypto/hisilicon/sec/sec_algs.c
-+++ b/drivers/crypto/hisilicon/sec/sec_algs.c
-@@ -808,13 +808,6 @@ static int sec_alg_skcipher_crypto(struct skcipher_request *skreq,
- 	 * more refined but this is unlikely to happen so no need.
- 	 */
+diff --git a/crypto/asymmetric_keys/Kconfig b/crypto/asymmetric_keys/Kconfig
+index be70ca6c85d3..38c36c14d712 100644
+--- a/crypto/asymmetric_keys/Kconfig
++++ b/crypto/asymmetric_keys/Kconfig
+@@ -93,4 +93,10 @@ config SIGNED_PE_FILE_VERIFICATION
+ 	  This option provides support for verifying the signature(s) on a
+ 	  signed PE binary.
  
--	/* Cleanup - all elements in pointer arrays have been coppied */
--	kfree(splits_in_nents);
--	kfree(splits_in);
--	kfree(splits_out_nents);
--	kfree(splits_out);
--	kfree(split_sizes);
--
- 	/* Grab a big lock for a long time to avoid concurrency issues */
- 	mutex_lock(&queue->queuelock);
++config PGP_LIBRARY
++	tristate "PGP parsing library"
++	help
++	  This option enables a library that provides a number of simple
++	  utility functions for parsing PGP (RFC 4880) packet-based messages.
++
+ endif # ASYMMETRIC_KEY_TYPE
+diff --git a/crypto/asymmetric_keys/Makefile b/crypto/asymmetric_keys/Makefile
+index 28b91adba2ae..55a67ebfe8e1 100644
+--- a/crypto/asymmetric_keys/Makefile
++++ b/crypto/asymmetric_keys/Makefile
+@@ -86,3 +86,8 @@ tpm_key_parser-y := \
  
-@@ -829,13 +822,13 @@ static int sec_alg_skcipher_crypto(struct skcipher_request *skreq,
- 	     (!queue->havesoftqueue ||
- 	      kfifo_avail(&queue->softqueue) > steps)) ||
- 	    !list_empty(&ctx->backlog)) {
-+		ret = -EBUSY;
- 		if ((skreq->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG)) {
- 			list_add_tail(&sec_req->backlog_head, &ctx->backlog);
- 			mutex_unlock(&queue->queuelock);
--			return -EBUSY;
-+			goto out;
- 		}
- 
--		ret = -EBUSY;
- 		mutex_unlock(&queue->queuelock);
- 		goto err_free_elements;
- 	}
-@@ -844,7 +837,15 @@ static int sec_alg_skcipher_crypto(struct skcipher_request *skreq,
- 	if (ret)
- 		goto err_free_elements;
- 
--	return -EINPROGRESS;
-+	ret = -EINPROGRESS;
-+out:
-+	/* Cleanup - all elements in pointer arrays have been copied */
-+	kfree(splits_in_nents);
-+	kfree(splits_in);
-+	kfree(splits_out_nents);
-+	kfree(splits_out);
-+	kfree(split_sizes);
-+	return ret;
- 
- err_free_elements:
- 	list_for_each_entry_safe(el, temp, &sec_req->elements, head) {
+ $(obj)/tpm_parser.o: $(obj)/tpm.asn1.h
+ $(obj)/tpm.asn1.o: $(obj)/tpm.asn1.c $(obj)/tpm.asn1.h
++
++#
++# PGP handling
++#
++obj-$(CONFIG_PGP_LIBRARY) += pgp_library.o
+diff --git a/crypto/asymmetric_keys/pgp_library.c b/crypto/asymmetric_keys/pgp_library.c
+new file mode 100644
+index 000000000000..0ab702ffe173
+--- /dev/null
++++ b/crypto/asymmetric_keys/pgp_library.c
+@@ -0,0 +1,280 @@
++/* PGP packet parser (RFC 4880)
++ *
++ * Copyright (C) 2011 Red Hat, Inc. All Rights Reserved.
++ * Written by David Howells (dhowells@redhat.com)
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public Licence
++ * as published by the Free Software Foundation; either version
++ * 2 of the Licence, or (at your option) any later version.
++ */
++
++#define pr_fmt(fmt) "PGPL: "fmt
++#include <linux/pgplib.h>
++#include <linux/errno.h>
++#include <linux/kernel.h>
++#include <linux/module.h>
++
++MODULE_LICENSE("GPL");
++
++const char *const pgp_hash_algorithms[PGP_HASH__LAST] = {
++	[PGP_HASH_MD5]			= "md5",
++	[PGP_HASH_SHA1]			= "sha1",
++	[PGP_HASH_RIPE_MD_160]		= "rmd160",
++	[PGP_HASH_SHA256]		= "sha256",
++	[PGP_HASH_SHA384]		= "sha384",
++	[PGP_HASH_SHA512]		= "sha512",
++	[PGP_HASH_SHA224]		= "sha224",
++};
++EXPORT_SYMBOL_GPL(pgp_hash_algorithms);
++
++const char *pgp_to_public_key_algo[PGP_PUBKEY__LAST] = {
++	[PGP_PUBKEY_RSA_ENC_OR_SIG]	= "rsa",
++	[PGP_PUBKEY_RSA_ENC_ONLY]	= "rsa",
++	[PGP_PUBKEY_RSA_SIG_ONLY]	= "rsa",
++	[PGP_PUBKEY_ELGAMAL]		= NULL,
++	[PGP_PUBKEY_DSA]		= NULL,
++};
++EXPORT_SYMBOL_GPL(pgp_to_public_key_algo);
++
++/**
++ * pgp_parse_packet_header - Parse a PGP packet header
++ * @_data: Start of the PGP packet (updated to PGP packet data)
++ * @_datalen: Amount of data remaining in buffer (decreased)
++ * @_type: Where the packet type will be returned
++ * @_headerlen: Where the header length will be returned
++ *
++ * Parse a set of PGP packet header [RFC 4880: 4.2].
++ *
++ * Returns packet data size on success; non-zero on error.  If successful,
++ * *_data and *_datalen will have been updated and *_headerlen will be set to
++ * hold the length of the packet header.
++ */
++static ssize_t pgp_parse_packet_header(const u8 **_data, size_t *_datalen,
++				       enum pgp_packet_tag *_type,
++				       u8 *_headerlen)
++{
++	enum pgp_packet_tag type;
++	const u8 *data = *_data;
++	size_t size, datalen = *_datalen;
++
++	pr_devel("-->%s(,%zu,,)\n", __func__, datalen);
++
++	if (datalen < 2)
++		goto short_packet;
++
++	pr_devel("pkthdr %02x, %02x\n", data[0], data[1]);
++
++	type = *data++;
++	datalen--;
++	if (!(type & 0x80)) {
++		pr_debug("Packet type does not have MSB set\n");
++		return -EBADMSG;
++	}
++	type &= ~0x80;
++
++	if (type & 0x40) {
++		/* New packet length format */
++		type &= ~0x40;
++		pr_devel("new format: t=%u\n", type);
++		switch (data[0]) {
++		case 0x00 ... 0xbf:
++			/* One-byte length */
++			size = data[0];
++			data++;
++			datalen--;
++			*_headerlen = 2;
++			break;
++		case 0xc0 ... 0xdf:
++			/* Two-byte length */
++			if (datalen < 2)
++				goto short_packet;
++			size = (data[0] - 192) * 256;
++			size += data[1] + 192;
++			data += 2;
++			datalen -= 2;
++			*_headerlen = 3;
++			break;
++		case 0xff:
++			/* Five-byte length */
++			if (datalen < 5)
++				goto short_packet;
++			size =  data[1] << 24;
++			size |= data[2] << 16;
++			size |= data[3] << 8;
++			size |= data[4];
++			data += 5;
++			datalen -= 5;
++			*_headerlen = 6;
++			break;
++		default:
++			pr_debug("Partial body length packet not supported\n");
++			return -EBADMSG;
++		}
++	} else {
++		/* Old packet length format */
++		u8 length_type = type & 0x03;
++
++		type >>= 2;
++		pr_devel("old format: t=%u lt=%u\n", type, length_type);
++
++		switch (length_type) {
++		case 0:
++			/* One-byte length */
++			size = data[0];
++			data++;
++			datalen--;
++			*_headerlen = 2;
++			break;
++		case 1:
++			/* Two-byte length */
++			if (datalen < 2)
++				goto short_packet;
++			size  = data[0] << 8;
++			size |= data[1];
++			data += 2;
++			datalen -= 2;
++			*_headerlen = 3;
++			break;
++		case 2:
++			/* Four-byte length */
++			if (datalen < 4)
++				goto short_packet;
++			size  = data[0] << 24;
++			size |= data[1] << 16;
++			size |= data[2] << 8;
++			size |= data[3];
++			data += 4;
++			datalen -= 4;
++			*_headerlen = 5;
++			break;
++		default:
++			pr_debug("Indefinite length packet not supported\n");
++			return -EBADMSG;
++		}
++	}
++
++	pr_devel("datalen=%zu size=%zu", datalen, size);
++	if (datalen < size)
++		goto short_packet;
++	if ((int)size < 0)
++		goto too_big;
++
++	*_data = data;
++	*_datalen = datalen;
++	*_type = type;
++	pr_devel("Found packet type=%u size=%zd\n", type, size);
++	return size;
++
++short_packet:
++	pr_debug("Attempt to parse short packet\n");
++	return -EBADMSG;
++too_big:
++	pr_debug("Signature subpacket size >2G\n");
++	return -EMSGSIZE;
++}
++
++/**
++ * pgp_parse_packets - Parse a set of PGP packets
++ * @_data: Data to be parsed (updated)
++ * @_datalen: Amount of data (updated)
++ * @ctx: Parsing context
++ *
++ * Parse a set of PGP packets [RFC 4880: 4].
++ */
++int pgp_parse_packets(const u8 *data, size_t datalen,
++		      struct pgp_parse_context *ctx)
++{
++	enum pgp_packet_tag type;
++	ssize_t pktlen;
++	u8 headerlen;
++	int ret;
++
++	while (datalen > 2) {
++		pktlen = pgp_parse_packet_header(&data, &datalen, &type,
++						 &headerlen);
++		if (pktlen < 0)
++			return pktlen;
++
++		if ((ctx->types_of_interest >> type) & 1) {
++			ret = ctx->process_packet(ctx, type, headerlen,
++						  data, pktlen);
++			if (ret < 0)
++				return ret;
++		}
++		data += pktlen;
++		datalen -= pktlen;
++	}
++
++	if (datalen != 0) {
++		pr_debug("Excess octets in packet stream\n");
++		return -EBADMSG;
++	}
++
++	return 0;
++}
++EXPORT_SYMBOL_GPL(pgp_parse_packets);
++
++/**
++ * pgp_parse_public_key - Parse the common part of a PGP pubkey packet
++ * @_data: Content of packet (updated)
++ * @_datalen: Length of packet remaining (updated)
++ * @pk: Public key data
++ *
++ * Parse the common data struct for a PGP pubkey packet [RFC 4880: 5.5.2].
++ */
++int pgp_parse_public_key(const u8 **_data, size_t *_datalen,
++			 struct pgp_parse_pubkey *pk)
++{
++	const u8 *data = *_data;
++	size_t datalen = *_datalen;
++	unsigned int tmp;
++
++	if (datalen < 12) {
++		pr_debug("Public key packet too short\n");
++		return -EBADMSG;
++	}
++
++	pk->version = *data++;
++	switch (pk->version) {
++	case PGP_KEY_VERSION_2:
++	case PGP_KEY_VERSION_3:
++	case PGP_KEY_VERSION_4:
++		break;
++	default:
++		pr_debug("Public key packet with unhandled version %d\n",
++			   pk->version);
++		return -EBADMSG;
++	}
++
++	tmp  = *data++ << 24;
++	tmp |= *data++ << 16;
++	tmp |= *data++ << 8;
++	tmp |= *data++;
++	pk->creation_time = tmp;
++	if (pk->version == PGP_KEY_VERSION_4) {
++		pk->expires_at = 0; /* Have to get it from the selfsignature */
++	} else {
++		unsigned short ndays;
++
++		ndays  = *data++ << 8;
++		ndays |= *data++;
++		if (ndays)
++			pk->expires_at = pk->creation_time + ndays * 86400UL;
++		else
++			pk->expires_at = 0;
++		datalen -= 2;
++	}
++
++	pk->pubkey_algo = *data++;
++	datalen -= 6;
++
++	pr_devel("%x,%x,%lx,%lx\n",
++		 pk->version, pk->pubkey_algo, pk->creation_time,
++		 pk->expires_at);
++
++	*_data = data;
++	*_datalen = datalen;
++	return 0;
++}
++EXPORT_SYMBOL_GPL(pgp_parse_public_key);
+diff --git a/crypto/asymmetric_keys/pgp_parser.h b/crypto/asymmetric_keys/pgp_parser.h
+new file mode 100644
+index 000000000000..5dfd68a88229
+--- /dev/null
++++ b/crypto/asymmetric_keys/pgp_parser.h
+@@ -0,0 +1,22 @@
++/* PGP crypto data parser internal definitions
++ *
++ * Copyright (C) 2011 Red Hat, Inc. All Rights Reserved.
++ * Written by David Howells (dhowells@redhat.com)
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public Licence
++ * as published by the Free Software Foundation; either version
++ * 2 of the Licence, or (at your option) any later version.
++ */
++
++#include <linux/pgp.h>
++
++#define kenter(FMT, ...) \
++	pr_devel("==> %s("FMT")\n", __func__, ##__VA_ARGS__)
++#define kleave(FMT, ...) \
++	pr_devel("<== %s()"FMT"\n", __func__, ##__VA_ARGS__)
++
++/*
++ * pgp_library.c
++ */
++extern const char *pgp_to_public_key_algo[PGP_PUBKEY__LAST];
+diff --git a/include/linux/pgplib.h b/include/linux/pgplib.h
+new file mode 100644
+index 000000000000..7db21b69a6fe
+--- /dev/null
++++ b/include/linux/pgplib.h
+@@ -0,0 +1,47 @@
++/* PGP library definitions (RFC 4880)
++ *
++ * Copyright (C) 2012 Red Hat, Inc. All Rights Reserved.
++ * Written by David Howells (dhowells@redhat.com)
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public Licence
++ * as published by the Free Software Foundation; either version
++ * 2 of the Licence, or (at your option) any later version.
++ */
++
++#ifndef _LINUX_PGPLIB_H
++#define _LINUX_PGPLIB_H
++
++#if IS_ENABLED(CONFIG_PGP_LIBRARY) || IS_ENABLED(CONFIG_PGP_LIBRARY_MODULE)
++
++#include <linux/pgp.h>
++
++/*
++ * PGP library packet parser
++ */
++struct pgp_parse_context {
++	u64 types_of_interest;
++	int (*process_packet)(struct pgp_parse_context *context,
++			      enum pgp_packet_tag type,
++			      u8 headerlen,
++			      const u8 *data,
++			      size_t datalen);
++};
++
++extern int pgp_parse_packets(const u8 *data, size_t datalen,
++			     struct pgp_parse_context *ctx);
++
++struct pgp_parse_pubkey {
++	enum pgp_key_version version : 8;
++	enum pgp_pubkey_algo pubkey_algo : 8;
++	time_t		creation_time;
++	time_t		expires_at;
++};
++
++extern int pgp_parse_public_key(const u8 **_data, size_t *_datalen,
++				struct pgp_parse_pubkey *pk);
++
++
++#endif /* CONFIG_PGP_LIBRARY */
++
++#endif /* _LINUX_PGPLIB_H */
 -- 
-1.9.1
+2.17.1
