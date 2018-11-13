@@ -1,42 +1,81 @@
-Return-Path: <SRS0=a5OM=NO=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail.allta.com.ua ([95.67.11.162]:59862 "EHLO mail.allta.com.ua"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726099AbeKCMzd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 3 Nov 2018 08:55:33 -0400
-Content-Type: text/plain; charset="iso-8859-1"
+Return-Path: <SRS0=KYvO=NY=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail-qk1-f182.google.com ([209.85.222.182]:38943 "EHLO
+        mail-qk1-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725991AbeKMKGR (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 13 Nov 2018 05:06:17 -0500
 MIME-Version: 1.0
+References: <20180925145622.29959-1-Jason@zx2c4.com> <20180925145622.29959-24-Jason@zx2c4.com>
+ <7830522a-968e-0880-beb7-44904466cf14@labo.rs> <CAHmME9oQJ9y51Pv7U=+=5uDA_tb+U1zWZdsLcyNMhdcFZmjM8Q@mail.gmail.com>
+ <e4b500e9-f24a-43c5-c2df-834dafc3aae5@labo.rs> <CAHmME9q8tp3Ch43o3D6zYTVujcjBWLVpNdzVw6RqYqHisd_suQ@mail.gmail.com>
+In-Reply-To: <CAHmME9q8tp3Ch43o3D6zYTVujcjBWLVpNdzVw6RqYqHisd_suQ@mail.gmail.com>
+From: Dave Taht <dave.taht@gmail.com>
+Date: Mon, 12 Nov 2018 16:10:36 -0800
+Message-ID: <CAA93jw7e61mbbLMoDwshxpWWK+oGUz71pGrsUYVX8uWM-s5Krg@mail.gmail.com>
+Subject: Re: [PATCH net-next v6 23/23] net: WireGuard secure network tunnel
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc: labokml@labo.rs, linux-kernel@vger.kernel.org,
+        Linux Kernel Network Developers <netdev@vger.kernel.org>,
+        linux-crypto@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Description: Mail message body
-Subject: Update
-To: Recipients <sale@allta.com.ua>
-From: "Bruce Blake" <sale@allta.com.ua>
-Date: Sat, 03 Nov 2018 11:20:39 +0800
-Reply-To: drproff300@aol.com
-Message-Id: <20181103032041.E371F142706@mail.allta.com.ua>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hello Dear
+On Mon, Nov 12, 2018 at 3:54 PM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+>
+> Hey Ivan,
+>
+> Sorry for not getting back to you sooner.
+>
+> On Mon, Nov 5, 2018 at 8:06 AM Ivan Lab=C3=A1th <labokml@labo.rs> wrote:
+> > Any news on this?
+> >
+> > To be clear, question is not about an insignificant documentation
+> > oversight. It is about copying bits from inner packets to outer packets
+>
+> The short answer is RFC6040 with DSCP fixed to 0 so as not to leak
+> anything. I've added a description of this to
+> <wireguard.com/protocol/>.
 
-how are you doing today? my name is Bruce Blake, the manager foreign affair=
-s in City Finance Bank, we have a customer here in bank that has not access=
-ed his account for the past 18 years, after some research made about him we=
- found out he was a victim of the crashed mining company in mexico.
+you have a speling error (ECM). :)
 
- he died a single man no wife One son from his first marriage that he divor=
-ced, his next of kin is that his only son which we can arrange and make you=
-r name his next of kin as his brother, and the mandatory rule of the bank i=
-s that after 25 years of a dormant account, the fund should be moved to Gov=
-ernment Treasury account.
+side note:
 
-This Customer was my friend because i have known him since he opened an acc=
-ount with us, i can't claim his fund because i am a staff in this bank, tha=
-t is why i want you to come in and claim this fund as my late clients Relat=
-ive.
+I have to say that wireguard works really well with ecn and non-ecn marked =
+flows
+against codel and fq_codel on the bottleneck router.
 
-if you are interested get back to me so we could discuss and make arrangeme=
-nts for the paper work because everything has to be legit and Legal.
+I'd still rather like it if wireguard focused a bit more on
+interleaving multiple flows better
+rather than on single stream benchmarks, one day.
 
-Regards
+In this case, codel is managing things not fq and we could possibly
+shave a few ms of induced latency off of it in this particular test series:
 
-Bruce Blake.
+http://tun.taht.net/~d/wireguard/rrul_-_comcast_v6.png
+
+vs wireguard (doing it ivp6 over that ipv6)
+
+http://tun.taht.net/~d/wireguard/rrul_-_wireguard.png
+
+That said, I've been deploying wireguard widely in replacement of my
+old tinc network particularly on machines that were formerly cpu
+bottlenecked
+and am insanely pleased with it. what's a few extra ms of latency
+between friends?
+
+>
+> Regards,
+> Jason
+
+
+
+--=20
+
+Dave T=C3=A4ht
+CTO, TekLibre, LLC
+http://www.teklibre.com
+Tel: 1-831-205-9740
