@@ -1,49 +1,74 @@
-Return-Path: <SRS0=rMEF=NS=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mailgw01.mediatek.com ([210.61.82.183]:14819 "EHLO
-        mailgw01.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726544AbeKGQje (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 7 Nov 2018 11:39:34 -0500
-From: Ryder Lee <ryder.lee@mediatek.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        Rob Herring <robh+dt@kernel.org>
-CC: Matthias Brugger <matthias.bgg@gmail.com>,
-        <linux-crypto@vger.kernel.org>,
-        Weijie Gao <weijie.gao@mediatek.com>,
-        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-mediatek@lists.infradead.org>,
-        Ryder Lee <ryder.lee@mediatek.com>
-Subject: [PATCH] dt-bindings: rng: update bindings for MT7629 SoC
-Date: Wed, 7 Nov 2018 15:10:16 +0800
-Message-ID: <0f5fe0d5b6a9c81b3f4395a1007ed0ba2239ae45.1541574485.git.ryder.lee@mediatek.com>
+Return-Path: <SRS0=/v7T=NZ=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:52768 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725757AbeKOFQO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 15 Nov 2018 00:16:14 -0500
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Antoine Tenart <antoine.tenart@bootlin.com>
+Subject: [PATCH] crypto: inside-secure - remove useless setting of type flags
+Date: Wed, 14 Nov 2018 11:10:53 -0800
+Message-Id: <20181114191053.3534-1-ebiggers@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This updates bindings for MT7629 RNG driver.
+From: Eric Biggers <ebiggers@google.com>
 
-Signed-off-by: Ryder Lee <ryder.lee@mediatek.com>
+Remove the unnecessary setting of CRYPTO_ALG_TYPE_SKCIPHER.
+Commit 2c95e6d97892 ("crypto: skcipher - remove useless setting of type
+flags") took care of this everywhere else, but a few more instances made
+it into the tree at about the same time.  Squash them before they get
+copy+pasted around again.
+
+This patch shouldn't change any actual behavior.
+
+Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- Documentation/devicetree/bindings/rng/mtk-rng.txt | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ drivers/crypto/inside-secure/safexcel_cipher.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/Documentation/devicetree/bindings/rng/mtk-rng.txt b/Documentation/devicetree/bindings/rng/mtk-rng.txt
-index 366b99b..ffa6a66 100644
---- a/Documentation/devicetree/bindings/rng/mtk-rng.txt
-+++ b/Documentation/devicetree/bindings/rng/mtk-rng.txt
-@@ -1,9 +1,10 @@
- Device-Tree bindings for Mediatek random number generator
--found in Mediatek SoC family
-+found in MediaTek SoC family
- 
- Required properties:
- - compatible	    : Should be
- 			"mediatek,mt7622-rng", 	"mediatek,mt7623-rng" : for MT7622
-+			"mediatek,mt7629-rng",  "mediatek,mt7623-rng" : for MT7629
- 			"mediatek,mt7623-rng" : for MT7623
- - clocks	    : list of clock specifiers, corresponding to
- 		      entries in clock-names property;
+diff --git a/drivers/crypto/inside-secure/safexcel_cipher.c b/drivers/crypto/inside-secure/safexcel_cipher.c
+index 3aef1d43e4351..d531c14020dcb 100644
+--- a/drivers/crypto/inside-secure/safexcel_cipher.c
++++ b/drivers/crypto/inside-secure/safexcel_cipher.c
+@@ -970,7 +970,7 @@ struct safexcel_alg_template safexcel_alg_cbc_des = {
+ 			.cra_name = "cbc(des)",
+ 			.cra_driver_name = "safexcel-cbc-des",
+ 			.cra_priority = 300,
+-			.cra_flags = CRYPTO_ALG_TYPE_SKCIPHER | CRYPTO_ALG_ASYNC |
++			.cra_flags = CRYPTO_ALG_ASYNC |
+ 				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 			.cra_blocksize = DES_BLOCK_SIZE,
+ 			.cra_ctxsize = sizeof(struct safexcel_cipher_ctx),
+@@ -1010,7 +1010,7 @@ struct safexcel_alg_template safexcel_alg_ecb_des = {
+ 			.cra_name = "ecb(des)",
+ 			.cra_driver_name = "safexcel-ecb-des",
+ 			.cra_priority = 300,
+-			.cra_flags = CRYPTO_ALG_TYPE_SKCIPHER | CRYPTO_ALG_ASYNC |
++			.cra_flags = CRYPTO_ALG_ASYNC |
+ 				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 			.cra_blocksize = DES_BLOCK_SIZE,
+ 			.cra_ctxsize = sizeof(struct safexcel_cipher_ctx),
+@@ -1074,7 +1074,7 @@ struct safexcel_alg_template safexcel_alg_cbc_des3_ede = {
+ 			.cra_name = "cbc(des3_ede)",
+ 			.cra_driver_name = "safexcel-cbc-des3_ede",
+ 			.cra_priority = 300,
+-			.cra_flags = CRYPTO_ALG_TYPE_SKCIPHER | CRYPTO_ALG_ASYNC |
++			.cra_flags = CRYPTO_ALG_ASYNC |
+ 				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 			.cra_blocksize = DES3_EDE_BLOCK_SIZE,
+ 			.cra_ctxsize = sizeof(struct safexcel_cipher_ctx),
+@@ -1114,7 +1114,7 @@ struct safexcel_alg_template safexcel_alg_ecb_des3_ede = {
+ 			.cra_name = "ecb(des3_ede)",
+ 			.cra_driver_name = "safexcel-ecb-des3_ede",
+ 			.cra_priority = 300,
+-			.cra_flags = CRYPTO_ALG_TYPE_SKCIPHER | CRYPTO_ALG_ASYNC |
++			.cra_flags = CRYPTO_ALG_ASYNC |
+ 				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 			.cra_blocksize = DES3_EDE_BLOCK_SIZE,
+ 			.cra_ctxsize = sizeof(struct safexcel_cipher_ctx),
 -- 
-1.9.1
+2.19.1.930.g4563a0d9d0-goog
