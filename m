@@ -1,58 +1,95 @@
-Return-Path: <SRS0=qsBZ=OA=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:48308 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726149AbeKUQe1 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 21 Nov 2018 11:34:27 -0500
-Date: Wed, 21 Nov 2018 14:01:03 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc: Eric Biggers <ebiggers@kernel.org>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        linux-fscrypt@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        LKML <linux-kernel@vger.kernel.org>,
-        Paul Crowley <paulcrowley@google.com>,
-        Greg Kaiser <gkaiser@google.com>,
-        Samuel Neves <samuel.c.p.neves@gmail.com>,
-        Tomer Ashur <tomer.ashur@esat.kuleuven.be>,
-        Martin Willi <martin@strongswan.org>
-Subject: Re: [RFC PATCH v2 0/4] Exporting existing crypto API code through
- zinc
-Message-ID: <20181121060103.4s2byjn2fh2mglno@gondor.apana.org.au>
-References: <20181105232526.173947-1-ebiggers@kernel.org>
- <20181105232526.173947-11-ebiggers@kernel.org>
- <CAKv+Gu-o0khD5=0EOkv2PiczMs5uZ=XP9V=G2ogBNMK8Kb93sw@mail.gmail.com>
- <20181112185816.GA8663@gmail.com>
- <20181116060227.hwu4igi6bp26ddpi@gondor.apana.org.au>
- <20181117001718.GA175522@gmail.com>
- <CAHmME9rtsCk8ZLt05xRKMGr4CVRnaUvCaVOS_WX3N22HOat4-A@mail.gmail.com>
- <20181119052451.qttzfgcm4hvbdc4u@gondor.apana.org.au>
- <20181120060217.t4nccaqpwnxkl4tx@gondor.apana.org.au>
- <CAHmME9qOFA2hEe-8hb3CxEPsLbwNm8oev4SO5WBDhA+pxqadGA@mail.gmail.com>
+Return-Path: <SRS0=/v7T=NZ=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail.bootlin.com ([62.4.15.54]:51063 "EHLO mail.bootlin.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725952AbeKOJpV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 15 Nov 2018 04:45:21 -0500
+Date: Thu, 15 Nov 2018 00:39:47 +0100
+From: Antoine Tenart <antoine.tenart@bootlin.com>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Antoine Tenart <antoine.tenart@bootlin.com>
+Subject: Re: [PATCH] crypto: inside-secure - remove useless setting of type
+ flags
+Message-ID: <20181114233947.GA4767@kwain>
+References: <20181114191053.3534-1-ebiggers@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <CAHmME9qOFA2hEe-8hb3CxEPsLbwNm8oev4SO5WBDhA+pxqadGA@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20181114191053.3534-1-ebiggers@kernel.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Nov 20, 2018 at 05:18:24PM +0100, Jason A. Donenfeld wrote:
->
-> N'ack. As I mentioned in the last email, this really isn't okay, and
-> mostly defeats the purpose of Zinc in the first place, adding
-> complexity in a discombobulated half-baked way. Your proposal seems to
-> be the worst of all worlds. Having talked to lots of people about the
-> design of Zinc at this point to very positive reception, I'm going to
-> move forward with submitting v9, once I rebase with the required
-> changes for Eric's latest merge.
+Hi Eric,
 
-Do you have any actual technical reasons for rejecting this apart
-from your apparent hatred of the existing crypto API?
+On Wed, Nov 14, 2018 at 11:10:53AM -0800, Eric Biggers wrote:
+> From: Eric Biggers <ebiggers@google.com>
+> 
+> Remove the unnecessary setting of CRYPTO_ALG_TYPE_SKCIPHER.
+> Commit 2c95e6d97892 ("crypto: skcipher - remove useless setting of type
+> flags") took care of this everywhere else, but a few more instances made
+> it into the tree at about the same time.  Squash them before they get
+> copy+pasted around again.
+> 
+> This patch shouldn't change any actual behavior.
+> 
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
 
-Cheers,
+Acked-by: Antoine Tenart <antoine.tenart@bootlin.com>
+
+Thanks!
+Antoine
+
+> ---
+>  drivers/crypto/inside-secure/safexcel_cipher.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/crypto/inside-secure/safexcel_cipher.c b/drivers/crypto/inside-secure/safexcel_cipher.c
+> index 3aef1d43e4351..d531c14020dcb 100644
+> --- a/drivers/crypto/inside-secure/safexcel_cipher.c
+> +++ b/drivers/crypto/inside-secure/safexcel_cipher.c
+> @@ -970,7 +970,7 @@ struct safexcel_alg_template safexcel_alg_cbc_des = {
+>  			.cra_name = "cbc(des)",
+>  			.cra_driver_name = "safexcel-cbc-des",
+>  			.cra_priority = 300,
+> -			.cra_flags = CRYPTO_ALG_TYPE_SKCIPHER | CRYPTO_ALG_ASYNC |
+> +			.cra_flags = CRYPTO_ALG_ASYNC |
+>  				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+>  			.cra_blocksize = DES_BLOCK_SIZE,
+>  			.cra_ctxsize = sizeof(struct safexcel_cipher_ctx),
+> @@ -1010,7 +1010,7 @@ struct safexcel_alg_template safexcel_alg_ecb_des = {
+>  			.cra_name = "ecb(des)",
+>  			.cra_driver_name = "safexcel-ecb-des",
+>  			.cra_priority = 300,
+> -			.cra_flags = CRYPTO_ALG_TYPE_SKCIPHER | CRYPTO_ALG_ASYNC |
+> +			.cra_flags = CRYPTO_ALG_ASYNC |
+>  				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+>  			.cra_blocksize = DES_BLOCK_SIZE,
+>  			.cra_ctxsize = sizeof(struct safexcel_cipher_ctx),
+> @@ -1074,7 +1074,7 @@ struct safexcel_alg_template safexcel_alg_cbc_des3_ede = {
+>  			.cra_name = "cbc(des3_ede)",
+>  			.cra_driver_name = "safexcel-cbc-des3_ede",
+>  			.cra_priority = 300,
+> -			.cra_flags = CRYPTO_ALG_TYPE_SKCIPHER | CRYPTO_ALG_ASYNC |
+> +			.cra_flags = CRYPTO_ALG_ASYNC |
+>  				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+>  			.cra_blocksize = DES3_EDE_BLOCK_SIZE,
+>  			.cra_ctxsize = sizeof(struct safexcel_cipher_ctx),
+> @@ -1114,7 +1114,7 @@ struct safexcel_alg_template safexcel_alg_ecb_des3_ede = {
+>  			.cra_name = "ecb(des3_ede)",
+>  			.cra_driver_name = "safexcel-ecb-des3_ede",
+>  			.cra_priority = 300,
+> -			.cra_flags = CRYPTO_ALG_TYPE_SKCIPHER | CRYPTO_ALG_ASYNC |
+> +			.cra_flags = CRYPTO_ALG_ASYNC |
+>  				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+>  			.cra_blocksize = DES3_EDE_BLOCK_SIZE,
+>  			.cra_ctxsize = sizeof(struct safexcel_cipher_ctx),
+> -- 
+> 2.19.1.930.g4563a0d9d0-goog
+> 
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Antoine Ténart, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
