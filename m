@@ -1,82 +1,59 @@
-Return-Path: <SRS0=1iZj=N3=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:37612 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727353AbeKPQ3k (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 16 Nov 2018 11:29:40 -0500
-Date: Fri, 16 Nov 2018 14:18:35 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Vitaly Chikunov <vt@altlinux.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-        Mimi Zohar <zohar@linux.ibm.com>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-integrity@vger.kernel.org
-Subject: Re: [PATCH v4 0/3] crypto: streebog - add Streebog hash function
-Message-ID: <20181116061835.cxrsjiktoawt3nof@gondor.apana.org.au>
-References: <20181106210008.11241-1-vt@altlinux.org>
+Return-Path: <SRS0=OCay=N2=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:56228 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725741AbeKPFM2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 16 Nov 2018 00:12:28 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181106210008.11241-1-vt@altlinux.org>
+References: <0f5fe0d5b6a9c81b3f4395a1007ed0ba2239ae45.1541574485.git.ryder.lee@mediatek.com>
+In-Reply-To: <0f5fe0d5b6a9c81b3f4395a1007ed0ba2239ae45.1541574485.git.ryder.lee@mediatek.com>
+From: Sean Wang <sean.wang@kernel.org>
+Date: Thu, 15 Nov 2018 11:03:16 -0800
+Message-ID: <CAGp9LzofO3SPXcXsqj2pheKAP-fNSDupiR3WzW5_0_LDesLzdg@mail.gmail.com>
+Subject: Re: [PATCH] dt-bindings: rng: update bindings for MT7629 SoC
+To: ryder.lee@mediatek.com
+Cc: herbert@gondor.apana.org.au, robh+dt@kernel.org,
+        devicetree@vger.kernel.org, weijie.gao@mediatek.com,
+        linux-kernel@vger.kernel.org, linux-mediatek@lists.infradead.org,
+        linux-crypto@vger.kernel.org,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Nov 07, 2018 at 12:00:00AM +0300, Vitaly Chikunov wrote:
-> Add GOST/IETF Streebog hash function (GOST R 34.11-2012, RFC 6986)
-> generic hash transformation with appropriate testmgr and tcrypt
-> tests and vectors.
-> 
-> Streebog Hash Function (GOST R 34.11-2012, RFC 6986) is one of the Russian
-> cryptographic standard algorithms (called GOST algorithms).
-> 
-> Intended user is the IMA subsystem, which does not need any particular
-> patching besides adding the hash names into Hash Info arrays, this is also
-> done in this patchset.
-> 
-> References:
->   https://tc26.ru/upload/iblock/fed/feddbb4d26b685903faa2ba11aea43f6.pdf
->   https://tools.ietf.org/html/rfc6986
-> 
-> Tested using testmgr and tcrypt on (LE) x86_64, arm, arm64, and (BE) s390x
-> in qemu.
-> 
-> Changes from v1:
-> - Fix of big-endian problem in add512.
-> - More architectures are tested, including big-endian and 32-bit.
-> 
-> Changes from v2:
-> - Register hash in Hash Info for use by IMA.
-> - Add hmac() tests.
-> 
-> Changes from v3:
-> - Remove not needed includes, and register, inline, const, ULL, and
->   __aligned specifiers.
-> - Covert define macros into functions.
-> - Use block size define instead of a number.
-> - Rename algorithm names sb256, sb512 to streebog256, streebog512.
-> - Rename bufsize to a more meaningful name (fillsize).
-> - Prefix all static functions names with streebog_.
-> 
-> Vitaly Chikunov (3):
->   crypto: streebog - add Streebog hash function
->   crypto: streebog - register Streebog in hash info for IMA
->   crypto: streebog - add Streebog test vectors
-> 
->  crypto/Kconfig                 |   12 +
->  crypto/Makefile                |    1 +
->  crypto/hash_info.c             |    4 +
->  crypto/streebog_generic.c      | 1140 ++++++++++++++++++++++++++++++++++++++++
->  crypto/tcrypt.c                |   37 ++
->  crypto/testmgr.c               |   24 +
->  crypto/testmgr.h               |  116 ++++
->  include/crypto/hash_info.h     |    1 +
->  include/crypto/streebog.h      |   34 ++
->  include/uapi/linux/hash_info.h |    2 +
->  10 files changed, 1371 insertions(+)
->  create mode 100644 crypto/streebog_generic.c
->  create mode 100644 include/crypto/streebog.h
+On Tue, Nov 6, 2018 at 11:11 PM Ryder Lee <ryder.lee@mediatek.com> wrote:
+>
+> This updates bindings for MT7629 RNG driver.
+>
+> Signed-off-by: Ryder Lee <ryder.lee@mediatek.com>
 
-All applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Acked-by: Sean Wang <sean.wang@kernel.org>
+
+> ---
+>  Documentation/devicetree/bindings/rng/mtk-rng.txt | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/Documentation/devicetree/bindings/rng/mtk-rng.txt b/Documentation/devicetree/bindings/rng/mtk-rng.txt
+> index 366b99b..ffa6a66 100644
+> --- a/Documentation/devicetree/bindings/rng/mtk-rng.txt
+> +++ b/Documentation/devicetree/bindings/rng/mtk-rng.txt
+> @@ -1,9 +1,10 @@
+>  Device-Tree bindings for Mediatek random number generator
+> -found in Mediatek SoC family
+> +found in MediaTek SoC family
+>
+>  Required properties:
+>  - compatible       : Should be
+>                         "mediatek,mt7622-rng",  "mediatek,mt7623-rng" : for MT7622
+> +                       "mediatek,mt7629-rng",  "mediatek,mt7623-rng" : for MT7629
+>                         "mediatek,mt7623-rng" : for MT7623
+>  - clocks           : list of clock specifiers, corresponding to
+>                       entries in clock-names property;
+> --
+> 1.9.1
+>
+>
+> _______________________________________________
+> Linux-mediatek mailing list
+> Linux-mediatek@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/linux-mediatek
