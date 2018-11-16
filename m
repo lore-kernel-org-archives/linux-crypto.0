@@ -1,52 +1,70 @@
-Return-Path: <SRS0=rMEF=NS=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from foss.arm.com ([217.140.101.70]:52200 "EHLO foss.arm.com"
+Return-Path: <SRS0=1iZj=N3=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:40914 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387733AbeKHA0h (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 7 Nov 2018 19:26:37 -0500
-Date: Wed, 7 Nov 2018 14:55:54 +0000
-From: Will Deacon <will.deacon@arm.com>
-To: Vladimir Murzin <vladimir.murzin@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org,
-        yamada.masahiro@socionext.com, linux-crypto@vger.kernel.org,
-        linux-kbuild@vger.kernel.org, kbuild-all@01.org,
-        Marc Zyngier <marc.zyngier@arm.com>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [RFC PATCH 1/4] kconfig: add as-instr macro to
- scripts/Kconfig.include
-Message-ID: <20181107145552.GC2623@brain-police>
-References: <1541583608-26375-1-git-send-email-vladimir.murzin@arm.com>
- <1541583608-26375-2-git-send-email-vladimir.murzin@arm.com>
+        id S1725819AbeKQIHA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 17 Nov 2018 03:07:00 -0500
+Date: Fri, 16 Nov 2018 13:52:50 -0800
+From: Eric Biggers <ebiggers@kernel.org>
+To: Milan Broz <gmazyland@gmail.com>
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        linux-fscrypt@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        LKML <linux-kernel@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Paul Crowley <paulcrowley@google.com>,
+        Greg Kaiser <gkaiser@google.com>,
+        Michael Halcrow <mhalcrow@google.com>,
+        Samuel Neves <samuel.c.p.neves@gmail.com>,
+        Tomer Ashur <tomer.ashur@esat.kuleuven.be>
+Subject: Re: [RFC PATCH v2 00/12] crypto: Adiantum support
+Message-ID: <20181116215249.GA27149@gmail.com>
+References: <20181015175424.97147-1-ebiggers@kernel.org>
+ <CAHmME9p1aiqWZ4+viaLscO8+qmixdVhMA1MAtMAFEHPG36DcPg@mail.gmail.com>
+ <20181019190411.GB246441@gmail.com>
+ <1f65ce09-93b3-f43e-49d5-9d9d6c0bb9e0@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1541583608-26375-2-git-send-email-vladimir.murzin@arm.com>
+In-Reply-To: <1f65ce09-93b3-f43e-49d5-9d9d6c0bb9e0@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Nov 07, 2018 at 09:40:05AM +0000, Vladimir Murzin wrote:
-> There are cases where the whole feature, for instance arm64/lse or
-> arm/crypto, can depend on assembler. Current practice is to report
-> buildtime that selected feature is not supported, which can be quite
-> annoying...
+Hi Milan,
 
-Why is it annoying? You still end up with a working kernel.
-
-> It'd nicer if we can check assembler first and opt-in feature
-> visibility in Kconfig.
+On Sat, Oct 20, 2018 at 12:26:20PM +0200, Milan Broz wrote:
 > 
-> Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
-> Cc: Will Deacon <will.deacon@arm.com>
-> Cc: Marc Zyngier <marc.zyngier@arm.com>
-> Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> Signed-off-by: Vladimir Murzin <vladimir.murzin@arm.com>
-> ---
->  scripts/Kconfig.include | 4 ++++
->  1 file changed, 4 insertions(+)
+> Adiantum (as in your current git branches on kernel.org) can be used for dm-crypt
+> without any changes (yes, I played with it :) and with some easy tricks directly
+> through cryptsetup/LUKS as well.
+> 
+> I think we should have this as an alternative to length-preserving wide-block
+> cipher modes for FDE.
+> 
 
-One issue I have with doing the check like this is that if somebody sends
-you a .config with e.g. ARM64_LSE_ATOMICS=y and you try to build a kernel
-using that .config and an old toolchain, the option is silently dropped.
+Yes, dm-crypt can use Adiantum by specifying the cipher as
+"capi:adiantum(xchacha12,aes)-plain64".
 
-I think the diagnostic is actually useful in this case.
+But, I'm having trouble getting cryptsetup/LUKS to use Adiantum.
+Using LUKS1, the following works:
 
-Will
+    cryptsetup luksFormat /dev/$partition --cipher='capi:adiantum(xchacha12,aes)-plain64' --key-size 256
+
+However, when possible we'd like people to use 4K sectors for better
+performance, which I understand requires using the LUKS2 format along with
+cryptsetup v2.0.0+ and Linux v4.12+.  But the following does *not* work:
+
+    cryptsetup luksFormat /dev/$partition --cipher='capi:adiantum(xchacha12,aes)-plain64' --key-size 256 --type luks2 --sector-size 4096
+
+The problem seems to be that when cryptsetup tries to encrypt the keyslot in
+luks2_encrypt_to_storage(), it tries to use the algorithm via AF_ALG, but it
+incorrectly requests "plain64(capi:adiantum(xchacha12,aes))" which fails.
+It should request just "adiantum(xchacha12,aes)".
+
+What are the "easy tricks" you had in mind -- do you mean there's already a way
+to use Adiantum with cryptsetup, or do you mean that cryptsetup still needs to
+be updated to fully support algorithms using the crypto API syntax?
+
+Thanks,
+
+- Eric
