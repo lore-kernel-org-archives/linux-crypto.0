@@ -1,1191 +1,367 @@
-Return-Path: <SRS0=oFif=NX=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:33516 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727953AbeKLRvq (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 12 Nov 2018 12:51:46 -0500
-From: Kenneth Lee <nek.in.cn@gmail.com>
-To: Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Tim Sell <timothy.sell@unisys.com>,
-        Sanyog Kale <sanyog.r.kale@intel.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?=
-        <u.kleine-koenig@pengutronix.de>, Vinod Koul <vkoul@kernel.org>,
-        David Kershner <david.kershner@unisys.com>,
-        Sagar Dharia <sdharia@codeaurora.org>,
-        Gavin Schenk <g.schenk@eckelmann.de>,
-        Jens Axboe <axboe@kernel.dk>,
-        Philippe Ombredanne <pombredanne@nexb.com>,
-        Cyrille Pitchen <cyrille.pitchen@free-electrons.com>,
-        Johan Hovold <johan@kernel.org>,
-        Zhou Wang <wangzhou1@hisilicon.com>,
-        Hao Fang <fanghao11@huawei.com>,
-        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-        Zaibo Xu <xuzaibo@huawei.com>, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-accelerators@lists.ozlabs.org
-Cc: linuxarm@huawei.com, guodong.xu@linaro.org,
-        zhangfei.gao@foxmail.com, haojian.zhuang@linaro.org,
-        Kenneth Lee <liguozhu@hisilicon.com>
-Subject: [RFCv3 PATCH 2/6] uacce: add uacce module
-Date: Mon, 12 Nov 2018 15:58:03 +0800
-Message-Id: <20181112075807.9291-3-nek.in.cn@gmail.com>
-In-Reply-To: <20181112075807.9291-1-nek.in.cn@gmail.com>
-References: <20181112075807.9291-1-nek.in.cn@gmail.com>
+Return-Path: <SRS0=1iZj=N3=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from frisell.zx2c4.com ([192.95.5.64]:53393 "EHLO frisell.zx2c4.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726714AbeKPM6n (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 16 Nov 2018 07:58:43 -0500
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTP id 358e1c43
+        for <linux-crypto@vger.kernel.org>;
+        Fri, 16 Nov 2018 02:42:34 +0000 (UTC)
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id a3a1fcff (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256:NO)
+        for <linux-crypto@vger.kernel.org>;
+        Fri, 16 Nov 2018 02:42:33 +0000 (UTC)
+Received: by mail-ot1-f50.google.com with SMTP id 32so19514409ota.12
+        for <linux-crypto@vger.kernel.org>; Thu, 15 Nov 2018 18:48:06 -0800 (PST)
+MIME-Version: 1.0
+References: <20181111093630.28107-1-martin@strongswan.org> <20181116022059.aob3ruc7umg32go6@gondor.apana.org.au>
+In-Reply-To: <20181116022059.aob3ruc7umg32go6@gondor.apana.org.au>
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date: Thu, 15 Nov 2018 18:47:54 -0800
+Message-ID: <CAHmME9ppj_VDFhApxnnTX1ppn5QdzHH9kYNHkKwP8GKLvJ+Z+g@mail.gmail.com>
+Subject: Re: [PATCH 0/6] crypto: x86/chacha20 - SIMD performance improvements
+To: Martin Willi <martin@strongswan.org>
+Cc: Eric Biggers <ebiggers@kernel.org>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        X86 ML <x86@kernel.org>, Samuel Neves <sneves@dei.uc.pt>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Kenneth Lee <liguozhu@hisilicon.com>
+Hi Martin,
 
-Uacce is the kernel component to support WarpDrive accelerator
-framework. It provides register/unregister interface for device drivers
-to expose their hardware resource to the user space. The resource is
-taken as "queue" in WarpDrive.
+This is nice work, and given that it's quite clean -- and that it's
+usually hard to screw up chacha in subtle ways when test vectors pass
+(unlike, say, poly1305 or curve25519), I'd be inclined to roll with
+your implementation if it can eventually become competitive with Andy
+Polyakov's, which I'm currently working on for Zinc (which no longer
+has pre-generated code, addressing the biggest hurdle; v9 will be sent
+shortly). Specifically, I'm not quite sure the improvements here tip
+the balance apply to all avx2 microarchitectures, and most
+importantly, there are still no AVX-512 paths, which means it's
+considerably slower on all newer generation Intel chips. Andy's has
+the AVX-512VL implementation for Skylake (using ymm, so as not to hit
+throttling) and AVX-512F for Cannon Lake and beyond (using zmm). I've
+attached some measurements below showing how stark the difference is.
 
-Uacce create a chrdev for every registration, the queue is allocated to
-the process when the chrdev is opened. Then the process can access the
-hardware resource by interact with the queue file. By mmap the queue
-file space to user space, the process can directly put requests to the
-hardware without syscall to the kernel space.
+The take away is that while Andy's implementation is still ahead in
+terms of performance today, I'd certainly encourage your efforts to
+gain parity with that, and I'd be happy have that when the performance
+and fuzzing time is right for it. So please do keep chipping away at
+it; I think it's a potentially useful effort.
 
-Uacce also manages unify addresses between the hardware and user space
-of the process. So they can share the same virtual address in the
-communication.
+Regards,
+Jason
 
-Please see Documentation/warpdrive/warpdrive.rst for detail.
+size old zinc
+---- ---- ----
+0 64 54
+16 386 372
+32 388 396
+48 388 420
+64 366 350
+80 708 666
+96 708 692
+112 706 736
+128 692 648
+144 1036 682
+160 1036 708
+176 1036 730
+192 1016 658
+208 1360 684
+224 1362 708
+240 1360 732
+256 644 500
+272 990 526
+288 988 556
+304 988 576
+320 972 500
+336 1314 532
+352 1316 558
+368 1318 578
+384 1308 506
+400 1644 532
+416 1644 556
+432 1644 594
+448 1624 508
+464 1970 534
+480 1970 556
+496 1968 582
+512 660 624
+528 1016 682
+544 1016 702
+560 1018 728
+576 998 654
+592 1344 680
+608 1344 708
+624 1344 730
+640 1326 654
+656 1670 686
+672 1670 708
+688 1670 732
+704 1652 658
+720 1998 682
+736 1998 710
+752 1996 734
+768 1256 662
+784 1606 688
+800 1606 714
+816 1606 736
+832 1584 660
+848 1948 688
+864 1950 714
+880 1948 736
+896 1912 688
+912 2258 718
+928 2258 744
+944 2256 768
+960 2238 692
+976 2584 718
+992 2584 744
+1008 2584 770
 
-Signed-off-by: Kenneth Lee <liguozhu@hisilicon.com>
-Signed-off-by: Zaibo Xu <xuzaibo@huawei.com>
-Signed-off-by: Zhou Wang <wangzhou1@hisilicon.com>
----
- drivers/Kconfig            |   2 +
- drivers/Makefile           |   1 +
- drivers/uacce/Kconfig      |  11 +
- drivers/uacce/Makefile     |   2 +
- drivers/uacce/uacce.c      | 902 +++++++++++++++++++++++++++++++++++++
- include/linux/uacce.h      | 117 +++++
- include/uapi/linux/uacce.h |  33 ++
- 7 files changed, 1068 insertions(+)
- create mode 100644 drivers/uacce/Kconfig
- create mode 100644 drivers/uacce/Makefile
- create mode 100644 drivers/uacce/uacce.c
- create mode 100644 include/linux/uacce.h
- create mode 100644 include/uapi/linux/uacce.h
 
-diff --git a/drivers/Kconfig b/drivers/Kconfig
-index ab4d43923c4d..b8782be0e7e5 100644
---- a/drivers/Kconfig
-+++ b/drivers/Kconfig
-@@ -219,4 +219,6 @@ source "drivers/siox/Kconfig"
- 
- source "drivers/slimbus/Kconfig"
- 
-+source "drivers/uacce/Kconfig"
-+
- endmenu
-diff --git a/drivers/Makefile b/drivers/Makefile
-index 578f469f72fb..9416c49b7501 100644
---- a/drivers/Makefile
-+++ b/drivers/Makefile
-@@ -186,3 +186,4 @@ obj-$(CONFIG_MULTIPLEXER)	+= mux/
- obj-$(CONFIG_UNISYS_VISORBUS)	+= visorbus/
- obj-$(CONFIG_SIOX)		+= siox/
- obj-$(CONFIG_GNSS)		+= gnss/
-+obj-y				+= uacce/
-diff --git a/drivers/uacce/Kconfig b/drivers/uacce/Kconfig
-new file mode 100644
-index 000000000000..e0e6462f6a42
---- /dev/null
-+++ b/drivers/uacce/Kconfig
-@@ -0,0 +1,11 @@
-+menuconfig UACCE
-+	tristate "Accelerator Framework for User Land"
-+	depends on IOMMU_API
-+	select ANON_INODES
-+	help
-+	  UACCE provides interface for the user process to access the hardware
-+	  without interaction with the kernel space in data path.
-+
-+	  See Documentation/warpdrive/warpdrive.rst for more details.
-+
-+	  If you don't know what to do here, say N.
-diff --git a/drivers/uacce/Makefile b/drivers/uacce/Makefile
-new file mode 100644
-index 000000000000..5b4374e8b5f2
---- /dev/null
-+++ b/drivers/uacce/Makefile
-@@ -0,0 +1,2 @@
-+# SPDX-License-Identifier: GPL-2.0-or-later
-+obj-$(CONFIG_UACCE) += uacce.o
-diff --git a/drivers/uacce/uacce.c b/drivers/uacce/uacce.c
-new file mode 100644
-index 000000000000..07e3b9887f28
---- /dev/null
-+++ b/drivers/uacce/uacce.c
-@@ -0,0 +1,902 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+#include <linux/compat.h>
-+#include <linux/file.h>
-+#include <linux/idr.h>
-+#include <linux/list.h>
-+#include <linux/module.h>
-+#include <linux/poll.h>
-+#include <linux/sched/signal.h>
-+#include <linux/slab.h>
-+#include <linux/uacce.h>
-+#include <linux/wait.h>
-+
-+static struct class *uacce_class;
-+static DEFINE_IDR(uacce_idr);
-+static dev_t uacce_devt;
-+static DEFINE_MUTEX(uacce_mutex); /* mutex to protect uacce */
-+static DEFINE_RWLOCK(uacce_lock); /* lock to protect all queues management */
-+
-+static const struct file_operations uacce_fops;
-+
-+static const char *const qfrt_str[] = {
-+	"dko",
-+	"dus",
-+	"ss",
-+	"mmio",
-+	"invalid"
-+};
-+
-+const char *uacce_qfrt_str(struct uacce_qfile_region *qfr)
-+{
-+	enum uacce_qfrt type = qfr->type;
-+
-+	if (type >= UACCE_QFRT_INVALID)
-+		type = UACCE_QFRT_INVALID;
-+
-+	return qfrt_str[type];
-+}
-+EXPORT_SYMBOL_GPL(uacce_qfrt_str);
-+
-+/**
-+ * uacce_wake_up - Wake up the process who is waiting this queue
-+ * @q the accelerator queue to wake up
-+ */
-+void uacce_wake_up(struct uacce_queue *q)
-+{
-+	dev_dbg(q->uacce->dev, "wake up\n");
-+	wake_up_interruptible(&q->wait);
-+}
-+EXPORT_SYMBOL_GPL(uacce_wake_up);
-+
-+static void uacce_cls_release(struct device *dev) { }
-+
-+static inline int uacce_iommu_map_qfr(struct uacce_queue *q,
-+				      struct uacce_qfile_region *qfr)
-+{
-+	struct device *dev = q->uacce->dev;
-+	struct iommu_domain *domain = iommu_get_domain_for_dev(dev);
-+	int i, j, ret;
-+
-+	if (!domain)
-+		return -ENODEV;
-+
-+	for (i = 0; i < qfr->nr_pages; i++) {
-+		get_page(qfr->pages[i]);
-+		ret = iommu_map(domain, qfr->iova + i * PAGE_SIZE,
-+				page_to_phys(qfr->pages[i]),
-+				PAGE_SIZE, qfr->prot | q->uacce->prot);
-+		if (ret) {
-+			dev_err(dev, "iommu_map page %i fail %d\n", i, ret);
-+			goto err_with_map_pages;
-+		}
-+	}
-+
-+	return 0;
-+
-+err_with_map_pages:
-+	for (j = i-1; j >= 0; j--) {
-+		iommu_unmap(domain, qfr->iova + j * PAGE_SIZE, PAGE_SIZE);
-+		put_page(qfr->pages[j]);
-+	}
-+	return ret;
-+}
-+
-+static inline void uacce_iommu_unmap_qfr(struct uacce_queue *q,
-+					       struct uacce_qfile_region *qfr)
-+{
-+	struct device *dev = q->uacce->dev;
-+	struct iommu_domain *domain = iommu_get_domain_for_dev(dev);
-+	int i;
-+
-+	if (!domain || !qfr)
-+		return;
-+
-+	for (i = qfr->nr_pages-1; i >= 0; i--) {
-+		iommu_unmap(domain, qfr->iova + i * PAGE_SIZE, PAGE_SIZE);
-+		put_page(qfr->pages[i]);
-+	}
-+}
-+
-+static int uacce_queue_map_qfr(struct uacce_queue *q,
-+			       struct uacce_qfile_region *qfr)
-+{
-+	if (!(qfr->flags & UACCE_QFRF_MAP))
-+		return 0;
-+
-+	dev_dbg(q->uacce->dev, "queue map %s qfr(npage=%d, iova=%lx)\n",
-+		uacce_qfrt_str(qfr), qfr->nr_pages, qfr->iova);
-+
-+	if (q->uacce->ops->flags & UACCE_DEV_NOIOMMU)
-+		return q->uacce->ops->map(q, qfr);
-+
-+	return uacce_iommu_map_qfr(q, qfr);
-+}
-+
-+static void uacce_queue_unmap_qfr(struct uacce_queue *q,
-+				  struct uacce_qfile_region *qfr)
-+{
-+	if (!(qfr->flags & UACCE_QFRF_MAP))
-+		return;
-+
-+	if (q->uacce->ops->flags & UACCE_DEV_NOIOMMU)
-+		q->uacce->ops->unmap(q, qfr);
-+	else
-+		uacce_iommu_unmap_qfr(q, qfr);
-+}
-+
-+static vm_fault_t uacce_shm_vm_fault(struct vm_fault *vmf)
-+{
-+	struct vm_area_struct *vma = vmf->vma;
-+	struct uacce_qfile_region *qfr;
-+	pgoff_t page_offset = (vmf->address - vma->vm_start) >> PAGE_SHIFT;
-+	int ret;
-+
-+	read_lock_irq(&uacce_lock);
-+
-+	qfr = vma->vm_private_data;
-+	if (!qfr) {
-+		pr_info("this page is not valid to user space\n");
-+		ret = VM_FAULT_SIGBUS;
-+		goto out;
-+	}
-+
-+	pr_debug("uacce: fault on %s qfr page %ld/%d\n", uacce_qfrt_str(qfr),
-+		 page_offset, qfr->nr_pages);
-+
-+	if (page_offset >= qfr->nr_pages) {
-+		ret = VM_FAULT_SIGBUS;
-+		goto out;
-+	}
-+
-+	get_page(qfr->pages[page_offset]);
-+	vmf->page = qfr->pages[page_offset];
-+	ret = 0;
-+
-+out:
-+	read_unlock_irq(&uacce_lock);
-+	return ret;
-+}
-+
-+static const struct vm_operations_struct uacce_shm_vm_ops = {
-+	.fault = uacce_shm_vm_fault,
-+};
-+
-+static struct uacce_qfile_region *uacce_create_region(struct uacce_queue *q,
-+	struct vm_area_struct *vma, enum uacce_qfrt type, int flags)
-+{
-+	struct uacce_qfile_region *qfr;
-+	int i, j, ret = -ENOMEM;
-+
-+	qfr = kzalloc(sizeof(*qfr), GFP_KERNEL | GFP_ATOMIC);
-+	if (!qfr)
-+		return ERR_PTR(-ENOMEM);
-+
-+	qfr->type = type;
-+	qfr->flags = flags;
-+	qfr->iova = vma->vm_start;
-+	qfr->nr_pages = vma_pages(vma);
-+
-+	if (vma->vm_flags & VM_READ)
-+		qfr->prot |= IOMMU_READ;
-+
-+	if (vma->vm_flags & VM_WRITE)
-+		qfr->prot |= IOMMU_WRITE;
-+
-+	qfr->pages = kcalloc(qfr->nr_pages, sizeof(*qfr->pages),
-+			       GFP_KERNEL | GFP_ATOMIC);
-+	if (!qfr->pages)
-+		goto err_with_qfr;
-+
-+	for (i = 0; i < qfr->nr_pages; i++) {
-+		qfr->pages[i] = alloc_page(GFP_KERNEL | GFP_ATOMIC |
-+					   __GFP_ZERO);
-+		if (!qfr->pages[i])
-+			goto err_with_pages;
-+	}
-+
-+	ret = uacce_queue_map_qfr(q, qfr);
-+	if (ret)
-+		goto err_with_pages;
-+
-+	if (flags & UACCE_QFRF_KMAP) {
-+		qfr->kaddr = vmap(qfr->pages, qfr->nr_pages, VM_MAP,
-+				  PAGE_KERNEL);
-+		if (!qfr->kaddr) {
-+			ret = -ENOMEM;
-+			goto err_with_q_map;
-+		}
-+
-+		dev_dbg(q->uacce->dev, "kmap %s qfr to %p\n",
-+			uacce_qfrt_str(qfr), qfr->kaddr);
-+	}
-+
-+	if (flags & UACCE_QFRF_MMAP) {
-+		vma->vm_private_data = qfr;
-+		vma->vm_ops = &uacce_shm_vm_ops;
-+	}
-+
-+	return qfr;
-+
-+err_with_q_map:
-+	uacce_queue_unmap_qfr(q, qfr);
-+err_with_pages:
-+	for (j = i-1; j >= 0; j--)
-+		put_page(qfr->pages[j]);
-+
-+	kfree(qfr->pages);
-+err_with_qfr:
-+	kfree(qfr);
-+
-+	return ERR_PTR(ret);
-+}
-+
-+static void uacce_destroy_region(struct uacce_qfile_region *qfr)
-+{
-+	int i;
-+
-+	if (qfr->pages) {
-+		for (i = 0; i < qfr->nr_pages; i++)
-+			put_page(qfr->pages[i]);
-+
-+		if (qfr->flags & UACCE_QFRF_KMAP)
-+			vunmap(qfr->kaddr);
-+
-+		kfree(qfr->pages);
-+	}
-+	kfree(qfr);
-+}
-+
-+static long uacce_cmd_share_qfr(struct uacce_queue *tgt, int fd)
-+{
-+	struct file *filep = fget(fd);
-+	struct uacce_queue *src;
-+	int ret;
-+
-+	if (!filep || filep->f_op != &uacce_fops)
-+		return -EINVAL;
-+
-+	src = (struct uacce_queue *)filep->private_data;
-+	if (!src)
-+		return -EINVAL;
-+
-+	/* no ssva is needed if the dev can do fault-from-dev */
-+	if (tgt->uacce->ops->flags | UACCE_DEV_FAULT_FROM_DEV)
-+		return -EINVAL;
-+
-+	write_lock(&uacce_lock);
-+	if (!src->qfrs[UACCE_QFRT_SS] || tgt->qfrs[UACCE_QFRT_SS]) {
-+		ret = -EINVAL;
-+		goto out_with_lock;
-+	}
-+
-+	ret = uacce_queue_map_qfr(tgt, src->qfrs[UACCE_QFRT_SS]);
-+	if (ret)
-+		goto out_with_lock;
-+
-+	tgt->qfrs[UACCE_QFRT_SS] = src->qfrs[UACCE_QFRT_SS];
-+	list_add(&tgt->list, &src->qfrs[UACCE_QFRT_SS]->qs);
-+
-+out_with_lock:
-+	write_unlock(&uacce_lock);
-+	return ret;
-+}
-+
-+static long uacce_fops_unl_ioctl(struct file *filep,
-+				unsigned int cmd, unsigned long arg)
-+{
-+	struct uacce_queue *q = (struct uacce_queue *)filep->private_data;
-+	struct uacce *uacce = q->uacce;
-+
-+	switch (cmd) {
-+	case UACCE_CMD_SHARE_SVAS:
-+		return uacce_cmd_share_qfr(q, arg);
-+
-+	default:
-+		if (uacce->ops->ioctl)
-+			return uacce->ops->ioctl(q, cmd, arg);
-+
-+		dev_err(uacce->dev, "ioctl cmd (%d) is not supported!\n", cmd);
-+		return -EINVAL;
-+	}
-+}
-+
-+#ifdef CONFIG_COMPAT
-+static long uacce_fops_compat_ioctl(struct file *filep,
-+				   unsigned int cmd, unsigned long arg)
-+{
-+	arg = (unsigned long)compat_ptr(arg);
-+	return uacce_fops_unl_ioctl(filep, cmd, arg);
-+}
-+#endif
-+
-+static int uacce_dev_check(struct uacce *uacce)
-+{
-+	if (uacce->ops->flags & UACCE_DEV_NOIOMMU)
-+		return 0;
-+
-+	/*
-+	 * The device can be opened once if it dose not support multiple page
-+	 * table. The better way to check this is count it per iommu_domain,
-+	 * this is just a temporary solution
-+	 */
-+	if (!(uacce->ops->flags & UACCE_DEV_PASID))
-+		if (atomic_cmpxchg(&uacce->state,
-+				   UACCE_ST_INIT, UACCE_ST_OPENNED))
-+			return -EBUSY;
-+
-+	return 0;
-+}
-+
-+static int uacce_start_queue(struct uacce_queue *q)
-+{
-+	int ret;
-+
-+	ret = q->uacce->ops->start_queue(q);
-+	if (ret)
-+		return ret;
-+
-+	dev_dbg(q->uacce->dev, "queue started\n");
-+	atomic_set(&q->uacce->state, UACCE_ST_STARTED);
-+	return 0;
-+}
-+
-+static int uacce_fops_open(struct inode *inode, struct file *filep)
-+{
-+	struct uacce_queue *q;
-+	struct uacce *uacce;
-+	int ret;
-+	int pasid = 0;
-+
-+	uacce = idr_find(&uacce_idr, iminor(inode));
-+	if (!uacce)
-+		return -ENODEV;
-+
-+	if (!uacce->ops->get_queue)
-+		return -EINVAL;
-+
-+	ret = uacce_dev_check(uacce);
-+
-+#ifdef CONFIG_IOMMU_SVA
-+	if (uacce->ops->flags & UACCE_DEV_PASID)
-+		ret = __iommu_sva_bind_device(uacce->dev, current->mm, &pasid,
-+					      IOMMU_SVA_FEAT_IOPF, NULL);
-+#endif
-+
-+	if (ret)
-+		return ret;
-+
-+	ret = uacce->ops->get_queue(uacce, pasid, &q);
-+	if (ret < 0)
-+		return ret;
-+
-+	q->uacce = uacce;
-+	q->mm = current->mm;
-+	init_waitqueue_head(&q->wait);
-+	filep->private_data = q;
-+
-+	/* if DKO or DSU is set, the q is started when they are ready */
-+	if (uacce->ops->qf_pg_start[UACCE_QFRT_DKO] == UACCE_QFR_NA &&
-+	    uacce->ops->qf_pg_start[UACCE_QFRT_DUS] == UACCE_QFR_NA) {
-+		ret = uacce_start_queue(q);
-+		if (ret)
-+			goto err_with_queue;
-+	}
-+
-+	__module_get(uacce->ops->owner);
-+
-+	return 0;
-+
-+err_with_queue:
-+	if (uacce->ops->put_queue)
-+		uacce->ops->put_queue(q);
-+	atomic_set(&uacce->state, UACCE_ST_INIT);
-+	return ret;
-+}
-+
-+static int uacce_fops_release(struct inode *inode, struct file *filep)
-+{
-+	struct uacce_queue *q = (struct uacce_queue *)filep->private_data;
-+	struct uacce *uacce;
-+	int i;
-+	bool is_to_free_region;
-+	int free_pages = 0;
-+
-+	uacce = q->uacce;
-+
-+	if (atomic_read(&uacce->state) == UACCE_ST_STARTED &&
-+	    uacce->ops->stop_queue)
-+		uacce->ops->stop_queue(q);
-+
-+	write_lock_irq(&uacce_lock);
-+
-+	for (i = 0; i < UACCE_QFRT_MAX; i++) {
-+		is_to_free_region = false;
-+		if (q->qfrs[i]) {
-+			uacce_queue_unmap_qfr(q, q->qfrs[i]);
-+			if (i == UACCE_QFRT_SS) {
-+				list_del(&q->list);
-+				if (list_empty(&q->qfrs[i]->qs))
-+					is_to_free_region = true;
-+			} else
-+				is_to_free_region = true;
-+		}
-+
-+		if (is_to_free_region) {
-+			free_pages += q->qfrs[i]->nr_pages;
-+			uacce_destroy_region(q->qfrs[i]);
-+		}
-+
-+		q->qfrs[i] = NULL;
-+	}
-+
-+	write_unlock_irq(&uacce_lock);
-+
-+	down_write(&q->mm->mmap_sem);
-+	q->mm->data_vm -= free_pages;
-+	up_write(&q->mm->mmap_sem);
-+
-+#ifdef CONFIG_IOMMU_SVA
-+	if (uacce->ops->flags & UACCE_DEV_SVA)
-+		iommu_sva_unbind_device(uacce->dev, q->pasid);
-+#endif
-+
-+	if (uacce->ops->put_queue)
-+		uacce->ops->put_queue(q);
-+
-+	module_put(uacce->ops->owner);
-+	atomic_set(&uacce->state, UACCE_ST_INIT);
-+
-+	return 0;
-+}
-+
-+static enum uacce_qfrt uacce_get_region_type(struct uacce *uacce,
-+					     struct vm_area_struct *vma)
-+{
-+	enum uacce_qfrt type = UACCE_QFRT_MAX;
-+	int i;
-+	size_t next_size = UACCE_QFR_NA;
-+
-+	for (i = UACCE_QFRT_MAX - 1; i >= 0; i--) {
-+		if (vma->vm_pgoff >= uacce->ops->qf_pg_start[i]) {
-+			type = i;
-+			break;
-+		}
-+	}
-+
-+	switch (type) {
-+	case UACCE_QFRT_MMIO:
-+		if (!uacce->ops->mmap) {
-+			dev_err(uacce->dev, "no driver mmap!\n");
-+			return UACCE_QFRT_INVALID;
-+		}
-+		break;
-+
-+	case UACCE_QFRT_DKO:
-+		if (uacce->ops->flags & UACCE_DEV_PASID)
-+			return UACCE_QFRT_INVALID;
-+		break;
-+
-+	case UACCE_QFRT_DUS:
-+		if (uacce->ops->flags & UACCE_DEV_FAULT_FROM_DEV)
-+			return UACCE_QFRT_INVALID;
-+		break;
-+
-+	case UACCE_QFRT_SS:
-+		if (uacce->ops->flags & UACCE_DEV_FAULT_FROM_DEV)
-+			return UACCE_QFRT_INVALID;
-+		break;
-+
-+	default:
-+		dev_err(uacce->dev, "uacce bug (%d)!\n", type);
-+		break;
-+	}
-+
-+	if (type < UACCE_QFRT_SS) {
-+		for (i = type + 1; i < UACCE_QFRT_MAX; i++)
-+			if (uacce->ops->qf_pg_start[i] != UACCE_QFR_NA) {
-+				next_size = uacce->ops->qf_pg_start[i];
-+				break;
-+			}
-+
-+		if (next_size == UACCE_QFR_NA) {
-+			dev_err(uacce->dev, "uacce config error. \
-+				make sure setting SS offset properly\n");
-+			return UACCE_QFRT_INVALID;
-+		}
-+
-+		if (vma_pages(vma) !=
-+		    next_size - uacce->ops->qf_pg_start[type]) {
-+			dev_err(uacce->dev,
-+				"invalid mmap size (%ld page) for region %s.\n",
-+				vma_pages(vma), qfrt_str[type]);
-+			return UACCE_QFRT_INVALID;
-+		}
-+	}
-+
-+	return type;
-+}
-+
-+static int uacce_fops_mmap(struct file *filep, struct vm_area_struct *vma)
-+{
-+	struct uacce_queue *q = (struct uacce_queue *)filep->private_data;
-+	struct uacce *uacce = q->uacce;
-+	enum uacce_qfrt type = uacce_get_region_type(uacce, vma);
-+	struct uacce_qfile_region *qfr;
-+	int flags, ret;
-+	bool to_start = false;
-+
-+	dev_dbg(uacce->dev, "mmap q file(t=%s, off=%lx, start=%lx, end=%lx)\n",
-+		 qfrt_str[type], vma->vm_pgoff, vma->vm_start, vma->vm_end);
-+
-+	if (type == UACCE_QFRT_INVALID)
-+		return -EINVAL;
-+
-+	vma->vm_flags |= VM_DONTCOPY | VM_DONTEXPAND;
-+
-+	write_lock_irq(&uacce_lock);
-+
-+	if (q->mm->data_vm + vma_pages(vma) >
-+	    rlimit(RLIMIT_DATA) >> PAGE_SHIFT) {
-+		ret = -ENOMEM;
-+		goto out_with_lock;
-+	}
-+
-+	if (type == UACCE_QFRT_MMIO) {
-+		ret = uacce->ops->mmap(q, vma);
-+		goto out_with_lock;
-+	}
-+
-+	if (q->qfrs[type]) {
-+		ret = -EBUSY;
-+		goto out_with_lock;
-+	}
-+
-+	switch (type) {
-+	case UACCE_QFRT_SS:
-+		if ((q->uacce->ops->flags & UACCE_DEV_FAULT_FROM_DEV) ||
-+		    (atomic_read(&uacce->state) != UACCE_ST_STARTED)) {
-+			ret = -EINVAL;
-+			goto out_with_lock;
-+		}
-+
-+		flags = UACCE_QFRF_MAP | UACCE_QFRF_MMAP;
-+		break;
-+
-+	case UACCE_QFRT_DKO:
-+		flags = UACCE_QFRF_MAP | UACCE_QFRF_KMAP;
-+		break;
-+
-+	case UACCE_QFRT_DUS:
-+		flags = UACCE_QFRF_MAP | UACCE_QFRF_MMAP;
-+		if (q->uacce->ops->flags & UACCE_DEV_KMAP_DUS)
-+			flags |= UACCE_QFRF_KMAP;
-+		break;
-+
-+	default:
-+		dev_err(uacce->dev, "bug\n");
-+		break;
-+	}
-+
-+	qfr = q->qfrs[type] = uacce_create_region(q, vma, type, flags);
-+	if (IS_ERR(qfr)) {
-+		ret = PTR_ERR(qfr);
-+		goto out_with_lock;
-+	}
-+
-+	switch (type) {
-+	case UACCE_QFRT_SS:
-+		INIT_LIST_HEAD(&qfr->qs);
-+		list_add(&q->list, &q->qfrs[type]->qs);
-+		break;
-+
-+	case UACCE_QFRT_DKO:
-+	case UACCE_QFRT_DUS:
-+		if (q->uacce->ops->qf_pg_start[UACCE_QFRT_DUS] == UACCE_QFR_NA
-+		    &&
-+		    q->uacce->ops->qf_pg_start[UACCE_QFRT_DKO] == UACCE_QFR_NA)
-+			break;
-+
-+		if ((q->uacce->ops->qf_pg_start[UACCE_QFRT_DUS] == UACCE_QFR_NA
-+			|| q->qfrs[UACCE_QFRT_DUS]) &&
-+		    (q->uacce->ops->qf_pg_start[UACCE_QFRT_DKO] == UACCE_QFR_NA
-+			|| q->qfrs[UACCE_QFRT_DKO]))
-+			to_start = true;
-+
-+		break;
-+
-+	default:
-+		break;
-+	}
-+
-+	write_unlock_irq(&uacce_lock);
-+
-+	if (to_start) {
-+		ret = uacce_start_queue(q);
-+		if (ret) {
-+			write_lock_irq(&uacce_lock);
-+			goto err_with_region;
-+		}
-+	}
-+
-+	q->mm->data_vm += qfr->nr_pages;
-+	return 0;
-+
-+err_with_region:
-+	uacce_destroy_region(q->qfrs[type]);
-+	q->qfrs[type] = NULL;
-+out_with_lock:
-+	write_unlock_irq(&uacce_lock);
-+	return ret;
-+}
-+
-+static __poll_t uacce_fops_poll(struct file *file, poll_table *wait)
-+{
-+	struct uacce_queue *q = (struct uacce_queue *)file->private_data;
-+	struct uacce *uacce = q->uacce;
-+
-+	poll_wait(file, &q->wait, wait);
-+	if (uacce->ops->is_q_updated && uacce->ops->is_q_updated(q))
-+		return EPOLLIN | EPOLLRDNORM;
-+	else
-+		return 0;
-+}
-+
-+static const struct file_operations uacce_fops = {
-+	.owner		= THIS_MODULE,
-+	.open		= uacce_fops_open,
-+	.release	= uacce_fops_release,
-+	.unlocked_ioctl	= uacce_fops_unl_ioctl,
-+#ifdef CONFIG_COMPAT
-+	.compat_ioctl	= uacce_fops_compat_ioctl,
-+#endif
-+	.mmap		= uacce_fops_mmap,
-+	.poll		= uacce_fops_poll,
-+};
-+
-+static int uacce_create_chrdev(struct uacce *uacce)
-+{
-+	int ret;
-+
-+	ret = idr_alloc(&uacce_idr, uacce, 0, 0, GFP_KERNEL);
-+	if (ret < 0)
-+		return ret;
-+
-+	uacce->dev_id = ret;
-+	uacce->cdev = cdev_alloc();
-+	if (!uacce->cdev) {
-+		ret = -ENOMEM;
-+		goto err_with_idr;
-+	}
-+
-+	uacce->cdev->ops = &uacce_fops;
-+	uacce->cdev->owner = uacce->ops->owner;
-+	ret = cdev_add(uacce->cdev, MKDEV(MAJOR(uacce_devt), uacce->dev_id), 1);
-+	if (ret)
-+		goto err_with_cdev;
-+
-+	dev_dbg(uacce->dev, "create uacce minior=%d\n", uacce->dev_id);
-+	return 0;
-+
-+err_with_cdev:
-+	cdev_del(uacce->cdev);
-+err_with_idr:
-+	idr_remove(&uacce_idr, uacce->dev_id);
-+	return ret;
-+}
-+
-+static void uacce_destroy_chrdev(struct uacce *uacce)
-+{
-+	cdev_del(uacce->cdev);
-+	idr_remove(&uacce_idr, uacce->dev_id);
-+}
-+
-+static int uacce_default_map(struct uacce_queue *q,
-+			     struct uacce_qfile_region *qfr)
-+{
-+	dev_dbg(q->uacce->dev, "fake map %s qfr(npage=%d, iova=%lx)\n",
-+		uacce_qfrt_str(qfr), qfr->nr_pages, qfr->iova);
-+	return -ENODEV;
-+}
-+
-+static int uacce_default_start_queue(struct uacce_queue *q)
-+{
-+	dev_dbg(q->uacce->dev, "fake start queue");
-+	return 0;
-+}
-+
-+static void uacce_default_unmap(struct uacce_queue *q,
-+				struct uacce_qfile_region *qfr)
-+{
-+	dev_dbg(q->uacce->dev, "fake unmap %s qfr(npage=%d, iova=%lx)\n",
-+		uacce_qfrt_str(qfr), qfr->nr_pages, qfr->iova);
-+}
-+
-+static int uacce_dev_match(struct device *dev, void *data)
-+{
-+	if (dev->parent == data)
-+		return -EBUSY;
-+
-+	return 0;
-+}
-+
-+static int uacce_set_iommu_domain(struct uacce *uacce)
-+{
-+	struct iommu_domain *domain;
-+	int ret;
-+
-+	if (uacce->ops->flags & UACCE_DEV_NOIOMMU)
-+		return 0;
-+
-+	/*
-+	 * We don't support multiple register for the same dev in RFC version ,
-+	 * will add it in formal version
-+	 */
-+	ret = class_for_each_device(uacce_class, NULL, uacce->dev,
-+				    uacce_dev_match);
-+	if (ret)
-+		return ret;
-+
-+	/* allocate and attach a unmanged domain */
-+	domain = iommu_domain_alloc(uacce->dev->bus);
-+	if (!domain)
-+		return -ENODEV;
-+
-+	ret = iommu_attach_device(domain, uacce->dev);
-+	if (ret)
-+		goto err_with_domain;
-+
-+	if (iommu_capable(uacce->dev->bus, IOMMU_CAP_CACHE_COHERENCY)) {
-+		uacce->prot |= IOMMU_CACHE;
-+		dev_dbg(uacce->dev, "Enable uacce with c-coherent capa\n");
-+	} else {
-+		dev_dbg(uacce->dev, "Enable uacce without c-coherent cap\n");
-+	}
-+
-+	return 0;
-+
-+err_with_domain:
-+	iommu_domain_free(domain);
-+	return ret;
-+}
-+
-+void uacce_unset_iommu_domain(struct uacce *uacce)
-+{
-+	struct iommu_domain *domain;
-+
-+	domain = iommu_get_domain_for_dev(uacce->dev);
-+	if (domain) {
-+		iommu_detach_device(domain, uacce->dev);
-+		iommu_domain_free(domain);
-+	} else
-+		dev_err(uacce->dev, "bug: no domain attached to device\n");
-+}
-+
-+/**
-+ *	uacce_register - register an accelerator
-+ *	@uacce: the accelerator structure
-+ */
-+int uacce_register(struct uacce *uacce)
-+{
-+	int ret;
-+
-+	if (!uacce->dev)
-+		return -ENODEV;
-+
-+	/* if dev support fault-from-dev, it should support pasid */
-+	if ((uacce->ops->flags & UACCE_DEV_FAULT_FROM_DEV) &&
-+	    !(uacce->ops->flags & UACCE_DEV_PASID)) {
-+		dev_warn(uacce->dev, "SVM/SAV device should support PASID\n");
-+		return -EINVAL;
-+	}
-+
-+	if (!uacce->ops->map)
-+		uacce->ops->map = uacce_default_map;
-+
-+	if (!uacce->ops->unmap)
-+		uacce->ops->unmap = uacce_default_unmap;
-+
-+	if (!uacce->ops->start_queue)
-+		uacce->ops->start_queue = uacce_default_start_queue;
-+
-+	ret = uacce_set_iommu_domain(uacce);
-+	if (ret)
-+		return ret;
-+
-+	mutex_lock(&uacce_mutex);
-+
-+	ret = uacce_create_chrdev(uacce);
-+	if (ret)
-+		goto err_with_lock;
-+
-+	uacce->cls_dev.parent = uacce->dev;
-+	uacce->cls_dev.class = uacce_class;
-+	uacce->cls_dev.release = uacce_cls_release;
-+	dev_set_name(&uacce->cls_dev, "%s", dev_name(uacce->dev));
-+	ret = device_register(&uacce->cls_dev);
-+	if (ret)
-+		goto err_with_chrdev;
-+
-+#ifdef CONFIG_IOMMU_SVA
-+	ret = iommu_sva_init_device(uacce->dev, IOMMU_SVA_FEAT_IOPF, 0, 0,
-+				    NULL);
-+	if (ret) {
-+		device_unregister(&uacce->cls_dev);
-+		goto err_with_chrdev;
-+	}
-+#else
-+	if (uacce->ops->flags & UACCE_DEV_PASID)
-+		uacce->ops->flags &=
-+			~(UACCE_DEV_FAULT_FROM_DEV | UACCE_DEV_PASID);
-+#endif
-+
-+	atomic_set(&uacce->state, UACCE_ST_INIT);
-+	mutex_unlock(&uacce_mutex);
-+	return 0;
-+
-+err_with_chrdev:
-+	uacce_destroy_chrdev(uacce);
-+err_with_lock:
-+	mutex_unlock(&uacce_mutex);
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(uacce_register);
-+
-+/**
-+ * uacce_unregister - unregisters a uacce
-+ * @uacce: the accelerator to unregister
-+ *
-+ * Unregister an accelerator that wat previously successully registered with
-+ * uacce_register().
-+ */
-+void uacce_unregister(struct uacce *uacce)
-+{
-+	mutex_lock(&uacce_mutex);
-+
-+#ifdef CONFIG_IOMMU_SVA
-+	iommu_sva_shutdown_device(uacce->dev);
-+#endif
-+	device_unregister(&uacce->cls_dev);
-+	uacce_destroy_chrdev(uacce);
-+	uacce_unset_iommu_domain(uacce);
-+
-+	mutex_unlock(&uacce_mutex);
-+}
-+EXPORT_SYMBOL_GPL(uacce_unregister);
-+
-+static int __init uacce_init(void)
-+{
-+	int ret;
-+
-+	uacce_class = class_create(THIS_MODULE, UACCE_CLASS_NAME);
-+	if (IS_ERR(uacce_class)) {
-+		ret = PTR_ERR(uacce_class);
-+		goto err;
-+	}
-+
-+	ret = alloc_chrdev_region(&uacce_devt, 0, MINORMASK, "uacce");
-+	if (ret)
-+		goto err_with_class;
-+
-+	pr_info("uacce init with major number:%d\n", MAJOR(uacce_devt));
-+
-+	return 0;
-+
-+err_with_class:
-+	class_destroy(uacce_class);
-+err:
-+	return ret;
-+}
-+
-+static __exit void uacce_exit(void)
-+{
-+	unregister_chrdev_region(uacce_devt, MINORMASK);
-+	class_destroy(uacce_class);
-+	idr_destroy(&uacce_idr);
-+}
-+
-+subsys_initcall(uacce_init);
-+module_exit(uacce_exit);
-+
-+MODULE_LICENSE("GPL");
-+MODULE_AUTHOR("Hisilicon Tech. Co., Ltd.");
-+MODULE_DESCRIPTION("Accelerator interface for Userland applications");
-diff --git a/include/linux/uacce.h b/include/linux/uacce.h
-new file mode 100644
-index 000000000000..7b7bc5821811
---- /dev/null
-+++ b/include/linux/uacce.h
-@@ -0,0 +1,117 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+#ifndef __UACCE_H
-+#define __UACCE_H
-+
-+#include <linux/cdev.h>
-+#include <linux/device.h>
-+#include <linux/list.h>
-+#include <linux/iommu.h>
-+#include <uapi/linux/uacce.h>
-+
-+struct uacce_queue;
-+struct uacce;
-+
-+#define UACCE_QFRF_MAP	(1<<0)	/* map to current queue */
-+#define UACCE_QFRF_MMAP	(1<<1)	/* map to user space */
-+#define UACCE_QFRF_KMAP (1<<2)	/* map to kernel space */
-+
-+#define UACCE_QFR_NA ((unsigned long)-1)
-+enum uacce_qfrt {
-+	UACCE_QFRT_DKO = 0,	/* device kernel-only */
-+	UACCE_QFRT_DUS,		/* device user share */
-+	UACCE_QFRT_SS,		/* static share memory */
-+	UACCE_QFRT_MAX,		/* used also for IO region */
-+	UACCE_QFRT_INVALID
-+};
-+#define UACCE_QFRT_MMIO (UACCE_QFRT_MAX)
-+
-+struct uacce_qfile_region {
-+	enum uacce_qfrt type;
-+	unsigned long iova;
-+	struct page **pages;
-+	int nr_pages;
-+	unsigned long prot;
-+	int flags;
-+	union {
-+		struct list_head qs; /* qs sharing the same region, for ss */
-+		void *kaddr; /* kernel addr, for dko */
-+	};
-+};
-+
-+/**
-+ * struct uacce_ops - WD device operations
-+ * @get_queue: get a queue from the device according to algorithm
-+ * @put_queue: free a queue to the device
-+ * @start_queue: make the queue start work after get_queue
-+ * @stop_queue: make the queue stop work before put_queue
-+ * @is_q_updated: check whether the task is finished
-+ * @mask_notify: mask the task irq of queue
-+ * @mmap: mmap addresses of queue to user space
-+ * @map: map queue to device (for NOIOMMU device)
-+ * @unmap: unmap queue to device (for NOIOMMU device)
-+ * @reset: reset the WD device
-+ * @reset_queue: reset the queue
-+ * @ioctl:   ioctl for user space users of the queue
-+ */
-+struct uacce_ops {
-+	struct module *owner;
-+	const char *api_ver;
-+	int flags;
-+	unsigned long qf_pg_start[UACCE_QFRT_MAX];
-+
-+	int (*get_queue)(struct uacce *uacce, unsigned long arg,
-+		struct uacce_queue **q);
-+	void (*put_queue)(struct uacce_queue *q);
-+	int (*start_queue)(struct uacce_queue *q);
-+	void (*stop_queue)(struct uacce_queue *q);
-+	int (*is_q_updated)(struct uacce_queue *q);
-+	void (*mask_notify)(struct uacce_queue *q, int event_mask);
-+	int (*mmap)(struct uacce_queue *q, struct vm_area_struct *vma);
-+	int (*map)(struct uacce_queue *q, struct uacce_qfile_region *qfr);
-+	void (*unmap)(struct uacce_queue *q, struct uacce_qfile_region *qfr);
-+	int (*reset)(struct uacce *uacce);
-+	int (*reset_queue)(struct uacce_queue *q);
-+	long (*ioctl)(struct uacce_queue *q, unsigned int cmd,
-+			unsigned long arg);
-+};
-+
-+struct uacce_queue {
-+	struct uacce *uacce;
-+	__u32 flags;
-+	void *priv;
-+	wait_queue_head_t wait;
-+
-+#ifdef CONFIG_IOMMU_SVA
-+	int pasid;
-+#endif
-+	struct list_head list; /* as list for as->qs */
-+
-+	struct mm_struct *mm;
-+
-+	struct uacce_qfile_region *qfrs[UACCE_QFRT_MAX];
-+};
-+
-+#define	UACCE_ST_INIT 0
-+#define UACCE_ST_OPENNED 1
-+#define UACCE_ST_STARTED 2
-+
-+struct uacce {
-+	const char *name;
-+	int status;
-+	struct uacce_ops *ops;
-+	struct device *dev;
-+	struct device cls_dev;
-+	bool is_vf;
-+	u32 dev_id;
-+	struct cdev *cdev;
-+	void *priv;
-+	atomic_t state;
-+	int prot;
-+};
-+
-+int uacce_register(struct uacce *uacce);
-+void uacce_unregister(struct uacce *uacce);
-+void uacce_wake_up(struct uacce_queue *q);
-+const char *uacce_qfrt_str(struct uacce_qfile_region *qfr);
-+
-+#endif
-diff --git a/include/uapi/linux/uacce.h b/include/uapi/linux/uacce.h
-new file mode 100644
-index 000000000000..b30fd92dc07e
---- /dev/null
-+++ b/include/uapi/linux/uacce.h
-@@ -0,0 +1,33 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+#ifndef _UAPIUUACCE_H
-+#define _UAPIUUACCE_H
-+
-+#include <linux/types.h>
-+#include <linux/ioctl.h>
-+
-+#define UACCE_CLASS_NAME		"uacce"
-+
-+#define UACCE_CMD_SHARE_SVAS   _IO('W', 0)
-+
-+/**
-+ * UACCE Device Attributes:
-+ *
-+ * NOIOMMU: the device has no IOMMU support
-+ *	can do ssva, but no map to the dev
-+ * PASID: the device has IOMMU which support PASID setting
-+ *	can do ssva, mapped to dev per process
-+ * FAULT_FROM_DEV: the device has IOMMU which can do page fault request
-+ *	no need for ssva, should be used with PASID
-+ * KMAP_DUS: map the Device user-shared space to kernel
-+ * SVA: full function device
-+ * SHARE_DOMAIN: no PASID, can do ssva only for one process and the kernel
-+ */
-+#define UACCE_DEV_NOIOMMU		(1<<0)
-+#define UACCE_DEV_PASID			(1<<1)
-+#define UACCE_DEV_FAULT_FROM_DEV	(1<<2)
-+#define UACCE_DEV_KMAP_DUS		(1<<3)
-+
-+#define UACCE_DEV_SVA		(UACCE_DEV_PASID | UACCE_DEV_FAULT_FROM_DEV)
-+#define UACCE_DEV_SHARE_DOMAIN	(0)
-+
-+#endif
--- 
-2.17.1
+
+On Thu, Nov 15, 2018 at 6:21 PM Herbert Xu <herbert@gondor.apana.org.au> wrote:
+>
+> On Sun, Nov 11, 2018 at 10:36:24AM +0100, Martin Willi wrote:
+> > This patchset improves performance of the ChaCha20 SIMD implementations
+> > for x86_64. For some specific encryption lengths, performance is more
+> > than doubled. Two mechanisms are used to achieve this:
+> >
+> > * Instead of calculating the minimal number of required blocks for a
+> >   given encryption length, functions producing more blocks are used
+> >   more aggressively. Calculating a 4-block function can be faster than
+> >   calculating a 2-block and a 1-block function, even if only three
+> >   blocks are actually required.
+> >
+> > * In addition to the 8-block AVX2 function, a 4-block and a 2-block
+> >   function are introduced.
+> >
+> > Patches 1-3 add support for partial lengths to the existing 1-, 4- and
+> > 8-block functions. Patch 4 makes use of that by engaging the next higher
+> > level block functions more aggressively. Patch 5 and 6 add the new AVX2
+> > functions for 2 and 4 blocks. Patches are based on cryptodev and would
+> > need adjustments to apply on top of the Adiantum patchset.
+> >
+> > Note that the more aggressive use of larger block functions calculate
+> > blocks that may get discarded. This may have a negative impact on energy
+> > usage or the processors thermal budget. However, with the new block
+> > functions we can avoid this over-calculation for many lengths, so the
+> > performance win can be considered more important.
+> >
+> > Below are performance numbers measured with tcrypt using additional
+> > encryption lengths; numbers in kOps/s, on my i7-5557U. old is the
+> > existing, new the implementation with this patchset. As comparison
+> > the numbers for zinc in v6:
+> >
+> >  len  old  new zinc
+> >    8 5908 5818 5818
+> >   16 5917 5828 5726
+> >   24 5916 5869 5757
+> >   32 5920 5789 5813
+> >   40 5868 5799 5710
+> >   48 5877 5761 5761
+> >   56 5869 5797 5742
+> >   64 5897 5862 5685
+> >   72 3381 4979 3520
+> >   80 3364 5541 3475
+> >   88 3350 4977 3424
+> >   96 3342 5530 3371
+> >  104 3328 4923 3313
+> >  112 3317 5528 3207
+> >  120 3313 4970 3150
+> >  128 3492 5535 3568
+> >  136 2487 4570 3690
+> >  144 2481 5047 3599
+> >  152 2473 4565 3566
+> >  160 2459 5022 3515
+> >  168 2461 4550 3437
+> >  176 2454 5020 3325
+> >  184 2449 4535 3279
+> >  192 2538 5011 3762
+> >  200 1962 4537 3702
+> >  208 1962 4971 3622
+> >  216 1954 4487 3518
+> >  224 1949 4936 3445
+> >  232 1948 4497 3422
+> >  240 1941 4947 3317
+> >  248 1940 4481 3279
+> >  256 3798 4964 3723
+> >  264 2638 3577 3639
+> >  272 2637 3567 3597
+> >  280 2628 3563 3565
+> >  288 2630 3795 3484
+> >  296 2621 3580 3422
+> >  304 2612 3569 3352
+> >  312 2602 3599 3308
+> >  320 2694 3821 3694
+> >  328 2060 3538 3681
+> >  336 2054 3565 3599
+> >  344 2054 3553 3523
+> >  352 2049 3809 3419
+> >  360 2045 3575 3403
+> >  368 2035 3560 3334
+> >  376 2036 3555 3257
+> >  384 2092 3785 3715
+> >  392 1691 3505 3612
+> >  400 1684 3527 3553
+> >  408 1686 3527 3496
+> >  416 1684 3804 3430
+> >  424 1681 3555 3402
+> >  432 1675 3559 3311
+> >  440 1672 3558 3275
+> >  448 1710 3780 3689
+> >  456 1431 3541 3618
+> >  464 1428 3538 3576
+> >  472 1430 3527 3509
+> >  480 1426 3788 3405
+> >  488 1423 3502 3397
+> >  496 1423 3519 3298
+> >  504 1418 3519 3277
+> >  512 3694 3736 3735
+> >  520 2601 2571 2209
+> >  528 2601 2677 2148
+> >  536 2587 2534 2164
+> >  544 2578 2659 2138
+> >  552 2570 2552 2126
+> >  560 2566 2661 2035
+> >  568 2567 2542 2041
+> >  576 2639 2674 2199
+> >  584 2031 2531 2183
+> >  592 2027 2660 2145
+> >  600 2016 2513 2155
+> >  608 2009 2638 2133
+> >  616 2006 2522 2115
+> >  624 2000 2649 2064
+> >  632 1996 2518 2045
+> >  640 2053 2651 2188
+> >  648 1666 2402 2182
+> >  656 1663 2517 2158
+> >  664 1659 2397 2147
+> >  672 1657 2510 2139
+> >  680 1656 2394 2114
+> >  688 1653 2497 2077
+> >  696 1646 2393 2043
+> >  704 1678 2510 2208
+> >  712 1414 2391 2189
+> >  720 1412 2506 2169
+> >  728 1411 2384 2145
+> >  736 1408 2494 2142
+> >  744 1408 2379 2081
+> >  752 1405 2485 2064
+> >  760 1403 2376 2043
+> >  768 2189 2498 2211
+> >  776 1756 2137 2192
+> >  784 1746 2145 2146
+> >  792 1744 2141 2141
+> >  800 1743 2222 2094
+> >  808 1742 2140 2100
+> >  816 1735 2134 2061
+> >  824 1731 2135 2045
+> >  832 1778 2222 2223
+> >  840 1480 2132 2184
+> >  848 1480 2134 2173
+> >  856 1476 2124 2145
+> >  864 1474 2210 2126
+> >  872 1472 2127 2105
+> >  880 1463 2123 2056
+> >  888 1468 2123 2043
+> >  896 1494 2208 2219
+> >  904 1278 2120 2192
+> >  912 1277 2121 2170
+> >  920 1273 2118 2149
+> >  928 1272 2207 2125
+> >  936 1267 2125 2098
+> >  944 1265 2127 2060
+> >  952 1267 2126 2049
+> >  960 1289 2213 2204
+> >  968 1125 2123 2187
+> >  976 1122 2127 2166
+> >  984 1120 2123 2136
+> >  992 1118 2207 2119
+> > 1000 1118 2120 2101
+> > 1008 1117 2122 2042
+> > 1016 1115 2121 2048
+> > 1024 2174 2191 2195
+> > 1032 1748 1724 1565
+> > 1040 1745 1782 1544
+> > 1048 1736 1737 1554
+> > 1056 1738 1802 1541
+> > 1064 1735 1728 1523
+> > 1072 1730 1780 1507
+> > 1080 1729 1724 1497
+> > 1088 1757 1783 1592
+> > 1096 1475 1723 1575
+> > 1104 1474 1778 1563
+> > 1112 1472 1708 1544
+> > 1120 1468 1774 1521
+> > 1128 1466 1718 1521
+> > 1136 1462 1780 1501
+> > 1144 1460 1719 1491
+> > 1152 1481 1782 1575
+> > 1160 1271 1647 1558
+> > 1168 1271 1706 1554
+> > 1176 1268 1645 1545
+> > 1184 1265 1711 1538
+> > 1192 1265 1648 1530
+> > 1200 1264 1705 1493
+> > 1208 1262 1647 1498
+> > 1216 1277 1695 1581
+> > 1224 1120 1642 1563
+> > 1232 1115 1702 1549
+> > 1240 1121 1646 1538
+> > 1248 1119 1703 1527
+> > 1256 1115 1640 1520
+> > 1264 1114 1693 1505
+> > 1272 1112 1642 1492
+> > 1280 1552 1699 1574
+> > 1288 1314 1525 1573
+> > 1296 1315 1522 1551
+> > 1304 1312 1521 1548
+> > 1312 1311 1564 1535
+> > 1320 1309 1518 1524
+> > 1328 1302 1527 1508
+> > 1336 1303 1521 1500
+> > 1344 1333 1561 1579
+> > 1352 1157 1524 1573
+> > 1360 1152 1520 1546
+> > 1368 1154 1522 1545
+> > 1376 1153 1562 1536
+> > 1384 1151 1525 1526
+> > 1392 1149 1523 1504
+> > 1400 1148 1517 1480
+> > 1408 1167 1561 1589
+> > 1416 1030 1516 1558
+> > 1424 1028 1516 1546
+> > 1432 1027 1522 1537
+> > 1440 1027 1564 1523
+> > 1448 1026 1507 1512
+> > 1456 1025 1515 1491
+> > 1464 1023 1522 1481
+> > 1472 1037 1559 1577
+> > 1480  927 1518 1559
+> > 1488  926 1514 1548
+> > 1496  926 1513 1534
+>
+> Nice work Martin!
+>
+> In light of this, and the grumblings over the wholesale replacment
+> of the existing chacha20 implementations, could we add the zinc
+> interface in a piecemeal fashion?
+>
+> That is, instead of adding a bunch of new implementations through
+> zinc and then converting the crypto users over, we instead convert
+> the existing implementations over to zinc in-place.  This would
+> also resolve the complaints over not being able to choose different
+> implementations through the crypto API and leaving that choice
+> solely up to zinc.
+>
+> After that is done, wireguard could then proceed in parallel with
+> replacing any implementations should the need arise.
+>
+> Cheers,
+> --
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
