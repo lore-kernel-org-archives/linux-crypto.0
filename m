@@ -1,128 +1,296 @@
-Return-Path: <SRS0=vxh5=N7=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from szxga03-in.huawei.com ([45.249.212.189]:6058 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726840AbeKTRhl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 20 Nov 2018 12:37:41 -0500
-Received: from DGGEML401-HUB.china.huawei.com (unknown [172.30.72.55])
-        by Forcepoint Email with ESMTP id 8C18890781B72
-        for <linux-crypto@vger.kernel.org>; Tue, 20 Nov 2018 15:09:59 +0800 (CST)
-From: "gongchen (E)" <gongchen4@huawei.com>
-To: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-CC: Herbert Xu <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "Chencheng (J)" <beyond.chen@huawei.com>,
-        "Yangjie (R)" <yangjie234@huawei.com>,
-        Fengzhiqiang <fengzhiqiang.feng@huawei.com>,
-        "shengyong (A)" <shengyong1@huawei.com>,
-        "Luoxinqiang (CBG)" <luoxinqiang2@huawei.com>,
-        "lipengcheng (C)" <lipengcheng8@huawei.com>
-Subject: [Help] Null pointer exception in scatterwalk_start() in kernel-4.9
-Date: Tue, 20 Nov 2018 07:09:53 +0000
-Message-ID: <780FCA0995E39E408348187D2462E36A01557596@dggeml509-mbx.china.huawei.com>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="gb2312"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
+Return-Path: <SRS0=1iZj=N3=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39808 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725851AbeKQGWJ (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 17 Nov 2018 01:22:09 -0500
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id wAGK4BlC102378
+        for <linux-crypto@vger.kernel.org>; Fri, 16 Nov 2018 15:08:20 -0500
+Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2nt4970x5d-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <linux-crypto@vger.kernel.org>; Fri, 16 Nov 2018 15:08:20 -0500
+Received: from localhost
+        by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <linux-crypto@vger.kernel.org> from <bauerman@linux.ibm.com>;
+        Fri, 16 Nov 2018 20:08:19 -0000
+From: Thiago Jung Bauermann <bauerman@linux.ibm.com>
+To: linux-integrity@vger.kernel.org
+Cc: linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        David Howells <dhowells@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Jessica Yu <jeyu@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jonathan Corbet <corbet@lwn.net>,
+        "AKASHI, Takahiro" <takahiro.akashi@linaro.org>,
+        Thiago Jung Bauermann <bauerman@linux.ibm.com>
+Subject: [PATCH v8 01/14] MODSIGN: Export module signature definitions
+Date: Fri, 16 Nov 2018 18:06:59 -0200
+In-Reply-To: <20181116200712.14154-1-bauerman@linux.ibm.com>
+References: <20181116200712.14154-1-bauerman@linux.ibm.com>
+Message-Id: <20181116200712.14154-2-bauerman@linux.ibm.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-SGkgRGVhciBIZXJiZXJ0LA0KDQogICAgICAgICAgICBTb3JyeSB0byBib3RoZXIgeW91ICwgYnV0
-IHdloa92ZSBtZXQgYSBwcm9ibGVtIGluIGNyeXB0byBtb2R1bGUsIHdvdWxkIHlvdSBwbGVhc2Ug
-a2luZGx5IGhlbHAgdXMgbG9vayBpbnRvIGl0ID8gVGhhbmsgeW91IHZlcnkgbXVjaC4NCg0KICAg
-ICAgICAgICAgIEluIHRoZSBiZWxvdyBmdW5jdGlvbiBjaGFpbiwgc2NhdHRlcndhbGtfc3RhcnQo
-KSBkb2Vzbid0IGNoZWNrIHRoZSByZXN1bHQgb2Ygc2dfbmV4dCgpLCBzbyB0aGUga2VybmVsIHdp
-bGwgY3Jhc2ggaWYgc2dfbmV4dCgpIHJldHVybnMgYSBudWxsIHBvaW50ZXIsIHdoaWNoIGlzIG91
-ciBjYXNlLiAoVGhlIGZ1bGwgc3RhY2sgaXMgYXQgdGhlIGVuZCBvZiBsZXR0ZXIpDQogICAgICAg
-ICAgICAgYmxrY2lwaGVyX3dhbGtfZG9uZSgpLT5zY2F0dGVyd2Fsa19kb25lKCktPnNjYXR0ZXJ3
-YWxrX3BhZ2Vkb25lKCktPnNjYXR0ZXJ3YWxrX3N0YXJ0KHdhbGssIHNnX25leHQod2Fsay0+c2cp
-KTsNCiAgICAgICAgICAgIA0KICAgICAgICAgICAgU2hvdWxkIHdlIGFkZCBhIG51bGwtcG9pbnRl
-ci1jaGVjayBpbiBzY2F0dGVyd2Fsa19zdGFydCgpPyBPciBpcyB0aGVyZSBhbnkgcHJvY2VzcyBj
-YW4gZW5zdXJlIHRoYXQgdGhlcmUgc2hvdWxkIGJlIGEgdmFsaWQgc2cgcG9pbnRlciBpZiB0aGUg
-Y29uZGl0aW9uICh3YWxrLT5vZmZzZXQgPj0gd2Fsay0+c2ctPm9mZnNldCArIHdhbGstPnNnLT5s
-ZW5ndGgpIGlzIHRydWU/DQogICAgICAgICAgICAgICAgICAgICAgDQogICAgICAgICAgICBXZSBh
-cmUgcmVhbGx5IGxvb2tpbmcgZm9yd2FyZCB0byB5b3VyIHJlcGx5LCBhbnkgaW5mb3JtYXRpb24g
-d2lsbCBiZSBhcHByZWNpYXRlZCAsIHRoYW5rcyBhZ2Fpbi4NCiAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgDQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgQmVzdCBy
-ZWdhcmRzDQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIENoZW4gR29uZw0KICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgMjAxOC4xMS4yMA0KDQotLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQpGdWxsIFN0YWNro7oN
-CjwxPlszOTU0OTEuMTc4MDA5c11bcGlkOjI5NTAxLGNwdTQsQmluZGVyOjcwOF9BXVVuYWJsZSB0
-byBoYW5kbGUga2VybmVsIE5VTEwgcG9pbnRlciBkZXJlZmVyZW5jZSBhdCB2aXJ0dWFsIGFkZHJl
-c3MgMDAwMDAwMDgNCjwxPlszOTU0OTEuMTc4MDM5c11bcGlkOjI5NTAxLGNwdTQsQmluZGVyOjcw
-OF9BXXBnZCA9IGZmZmZmZmMxMTJjMjcwMDANCjwxPlszOTU0OTEuMTc4MDM5c11bcGlkOjI5NTAx
-LGNwdTQsQmluZGVyOjcwOF9BXVswMDAwMDAwOF0gKnBnZD0wMDAwMDAwMDAwMDAwMDAwLCAqcHVk
-PTAwMDAwMDAwMDAwMDAwMDANCjwwPlszOTU0OTEuMTc4MDcwc11bcGlkOjI5NTAxLGNwdTQsQmlu
-ZGVyOjcwOF9BXUludGVybmFsIGVycm9yOiBPb3BzOiA5NjAwMDAwNSBbIzFdIFBSRUVNUFQgU01Q
-DQo8ND5bMzk1NDkxLjE3ODA3MHNdW3BpZDoyOTUwMSxjcHU0LEJpbmRlcjo3MDhfQV1Nb2R1bGVz
-IGxpbmtlZCBpbjogaGlzaV9kdW1teV9rbw0KPDQ+WzM5NTQ5MS4xNzgxMDBzXVtwaWQ6Mjk1MDEs
-Y3B1NCxCaW5kZXI6NzA4X0FdQ1BVOiA0IFBJRDogMjk1MDEgQ29tbTogQmluZGVyOjcwOF9BIFZJ
-UDogMDAgVGFpbnRlZDogRyAgICAgICAgVyAgICAgICA0LjkuMTExICMxDQo8ND5bMzk1NDkxLjE3
-ODEwMHNdW3BpZDoyOTUwMSxjcHU0LEJpbmRlcjo3MDhfQV1UR0lEOiA3MDggQ29tbTogQmluZGVy
-OjcwOF8yDQo8ND5bMzk1NDkxLjE3ODEwMHNdW3BpZDoyOTUwMSxjcHU0LEJpbmRlcjo3MDhfQV1I
-YXJkd2FyZSBuYW1lOiBoaTM2NjAgKERUKQ0KPDQ+WzM5NTQ5MS4xNzgxMDBzXVtwaWQ6Mjk1MDEs
-Y3B1NCxCaW5kZXI6NzA4X0FddGFzazogZmZmZmZmYzFkNDNlYzg4MCB0YXNrLnN0YWNrOiBmZmZm
-ZmZjMzAwN2UwMDAwDQo8ND5bMzk1NDkxLjE3ODEwMHNdW3BpZDoyOTUwMSxjcHU0LEJpbmRlcjo3
-MDhfQV1QQyBpcyBhdCBibGtjaXBoZXJfd2Fsa19kb25lKzB4MjEwLzB4MzU0DQo8ND5bMzk1NDkx
-LjE3ODEzMXNdW3BpZDoyOTUwMSxjcHU0LEJpbmRlcjo3MDhfQV1MUiBpcyBhdCBibGtjaXBoZXJf
-d2Fsa19kb25lKzB4MjBjLzB4MzU0DQo8ND5bMzk1NDkxLjE3ODEzMXNdW3BpZDoyOTUwMSxjcHU0
-LEJpbmRlcjo3MDhfQV1wYyA6IFs8ZmZmZmZmOWMxYjIzYWJmYz5dIGxyIDogWzxmZmZmZmY5YzFi
-MjNhYmY4Pl0gcHN0YXRlOiA2MDAwMDE0NQ0KPDQ+WzM5NTQ5MS4xNzgxMzFzXVtwaWQ6Mjk1MDEs
-Y3B1NCxCaW5kZXI6NzA4X0Fdc3AgOiBmZmZmZmZjMzAwN2UzOTUwDQo8ND5bMzk1NDkxLjE3ODEz
-MXNdW3BpZDoyOTUwMSxjcHU0LEJpbmRlcjo3MDhfQV14Mjk6IGZmZmZmZmMzMDA3ZTM5NTAgeDI4
-OiAwMDAwMDAwMDAwMDAwMDAwIA0KPDQ+WzM5NTQ5MS4xNzgxNjFzXVtwaWQ6Mjk1MDEsY3B1NCxC
-aW5kZXI6NzA4X0FdeDI3OiBmZmZmZmZjMWM2ZWY1MDFlIHgyNjogMDAwMDAwMDAwMDAwMDEwMCAN
-Cjw0PlszOTU0OTEuMTc4MTYxc11bcGlkOjI5NTAxLGNwdTQsQmluZGVyOjcwOF9BXXgyNTogZmZm
-ZmZmYzMwMDdlM2I0MCB4MjQ6IGZmZmZmZmMzMDA3ZTNiZTggDQo8ND5bMzk1NDkxLjE3ODE2MXNd
-W3BpZDoyOTUwMSxjcHU0LEJpbmRlcjo3MDhfQV14MjM6IDAwMDAwMDAwMDAwMDAwMDEgeDIyOiAw
-MDAwMDAwMDAwMDAwNTAwIA0KPDQ+WzM5NTQ5MS4xNzgxNjFzXVtwaWQ6Mjk1MDEsY3B1NCxCaW5k
-ZXI6NzA4X0FdeDIxOiBmZmZmZmZjMzAwN2UzYTkwIHgyMDogZmZmZmZmYzMwMDdlM2ExMCANCjw0
-PlszOTU0OTEuMTc4MTkyc11bcGlkOjI5NTAxLGNwdTQsQmluZGVyOjcwOF9BXXgxOTogZmZmZmZm
-YzMwMDdlMzlkOCB4MTg6IDAwMDAwMDAwMDAwMDAwMDEgDQo8ND5bMzk1NDkxLjE3ODE5MnNdW3Bp
-ZDoyOTUwMSxjcHU0LEJpbmRlcjo3MDhfQV14MTc6IDAwMDAwMDc1YWNhMDY5MzQgeDE2OiBmZmZm
-ZmY5YzFiMDMyZDEwIA0KPDQ+WzM5NTQ5MS4xNzgxOTJzXVtwaWQ6Mjk1MDEsY3B1NCxCaW5kZXI6
-NzA4X0FdeDE1OiAwMDAwMDA3NWFhZmZlNWI4IHgxNDogMDAwMDAwMDAwMDAwMDAwMCANCjw0Plsz
-OTU0OTEuMTc4MjIyc11bcGlkOjI5NTAxLGNwdTQsQmluZGVyOjcwOF9BXXgxMzogMDAwMDAwNzVh
-YzA4NjQyZCB4MTI6IDAwMDAwMDAwMDAwMDAwMDEgDQo8ND5bMzk1NDkxLjE3ODIyMnNdW3BpZDoy
-OTUwMSxjcHU0LEJpbmRlcjo3MDhfQV14MTE6IDAwMDAwMDAwMDAwMDAwMDAgeDEwOiBmZmZmZmZj
-MzE3NWUxNjgwIA0KPDQ+WzM5NTQ5MS4xNzgyMjJzXVtwaWQ6Mjk1MDEsY3B1NCxCaW5kZXI6NzA4
-X0FdeDkgOiBmZmZmZmY5YzFkNDA4MDAwIHg4IDogMDAwMDAwMDAwMDAwMDAwMCANCjw0PlszOTU0
-OTEuMTc4MjUzc11bcGlkOjI5NTAxLGNwdTQsQmluZGVyOjcwOF9BXXg3IDogZmZmZmZmOWMxYzI4
-MDAwMCB4NiA6IDAwMDAwMDAwMDAwMDAwMDEgDQo8ND5bMzk1NDkxLjE3ODI1M3NdW3BpZDoyOTUw
-MSxjcHU0LEJpbmRlcjo3MDhfQV14NSA6IGZmZmZmZmMzMDA3ZTNiZTggeDQgOiAwMDAwMDAwMDAw
-MDAwMDAwIA0KPDQ+WzM5NTQ5MS4xNzgyNTNzXVtwaWQ6Mjk1MDEsY3B1NCxCaW5kZXI6NzA4X0Fd
-eDMgOiAwMDAwMDAwMDAwMDAwMTAwIHgyIDogMDAwMDAwMDAwMDAwMDUwMCANCjw0PlszOTU0OTEu
-MTc4MjUzc11bcGlkOjI5NTAxLGNwdTQsQmluZGVyOjcwOF9BXXgxIDogZmZmZmZmYzMxYWE5MzRj
-MiB4MCA6IDAwMDAwMDAwMDAwMDAwMDAgDQo8ND5bMzk1NDkxLjE4MDcyNXNdW3BpZDoyOTUwMSxj
-cHU0LEJpbmRlcjo3MDhfQV1bPGZmZmZmZjljMWIyM2FiZmM+XSBibGtjaXBoZXJfd2Fsa19kb25l
-KzB4MjEwLzB4MzU0DQo8ND5bMzk1NDkxLjE4MDc1NXNdW3BpZDoyOTUwMSxjcHU0LEJpbmRlcjo3
-MDhfQV1bPGZmZmZmZjljMWFlOWZjYjA+XSBjYmNfZGVjcnlwdCsweGEwLzB4ZTgNCjw0PlszOTU0
-OTEuMTgwNzU1c11bcGlkOjI5NTAxLGNwdTQsQmluZGVyOjcwOF9BXVs8ZmZmZmZmOWMxYjI2M2E2
-MD5dIGFibGtfZGVjcnlwdCsweDc4LzB4ZjQNCjw0PlszOTU0OTEuMTgwNzU1c11bcGlkOjI5NTAx
-LGNwdTQsQmluZGVyOjcwOF9BXVs8ZmZmZmZmOWMxYjIzYjVlMD5dIHNrY2lwaGVyX2RlY3J5cHRf
-YWJsa2NpcGhlcisweDcwLzB4ODANCjw0PlszOTU0OTEuMTgwNzg2c11bcGlkOjI5NTAxLGNwdTQs
-QmluZGVyOjcwOF9BXVs8ZmZmZmZmOWMxYjI0YTY5OD5dIGNyeXB0b19jdHNfZGVjcnlwdCsweGYw
-LzB4MTg0DQo8ND5bMzk1NDkxLjE4MDc4NnNdW3BpZDoyOTUwMSxjcHU0LEJpbmRlcjo3MDhfQV1b
-PGZmZmZmZjljMWIwNzQwZjA+XSBmbmFtZV9kZWNyeXB0LmlzcmEuMSsweDExMC8weDFkOA0KPDQ+
-WzM5NTQ5MS4xODA3ODZzXVtwaWQ6Mjk1MDEsY3B1NCxCaW5kZXI6NzA4X0FdWzxmZmZmZmY5YzFi
-MDc0NDI4Pl0gZnNjcnlwdF9mbmFtZV9kaXNrX3RvX3VzcisweDFkOC8weDI2NA0KPDQ+WzM5NTQ5
-MS4xODA4MTZzXVtwaWQ6Mjk1MDEsY3B1NCxCaW5kZXI6NzA4X0FdWzxmZmZmZmY5YzFiMTk4ZjI0
-Pl0gZjJmc19maWxsX2RlbnRyaWVzKzB4MTNjLzB4MWQ0DQo8ND5bMzk1NDkxLjE4MDgxNnNdW3Bp
-ZDoyOTUwMSxjcHU0LEJpbmRlcjo3MDhfQV1bPGZmZmZmZjljMWIxOTkxOTA+XSBmMmZzX3JlYWRk
-aXIrMHgxZDQvMHg2ODQNCjw0PlszOTU0OTEuMTgwODE2c11bcGlkOjI5NTAxLGNwdTQsQmluZGVy
-OjcwOF9BXVs8ZmZmZmZmOWMxYjAzMjdjOD5dIGl0ZXJhdGVfZGlyKzB4ODQvMHgxYzQNCjw0Plsz
-OTU0OTEuMTgwODE2c11bcGlkOjI5NTAxLGNwdTQsQmluZGVyOjcwOF9BXVs8ZmZmZmZmOWMxYjAz
-MmQ5ND5dIFN5U19nZXRkZW50czY0KzB4ODQvMHgxMjANCjw0PlszOTU0OTEuMTgwODQ3c11bcGlk
-OjI5NTAxLGNwdTQsQmluZGVyOjcwOF9BXVs8ZmZmZmZmOWMxYWU4MzkwMD5dIGVsMF9zdmNfbmFr
-ZWQrMHgzNC8weDM4DQo8MD5bMzk1NDkxLjE4MDg0N3NdW3BpZDoyOTUwMSxjcHU0LEJpbmRlcjo3
-MDhfQV1Db2RlOiA2YjAxMDA1ZiA1NGZmZmNlMyA5NDAyMDA0YiBmOTAwMWU2MCAoYjk0MDA4MDAp
-DQo=
+IMA will use the module_signature format for append signatures, so export
+the relevant definitions and factor out the code which verifies that the
+appended signature trailer is valid.
+
+Also, create a CONFIG_MODULE_SIG_FORMAT option so that IMA can select it
+and be able to use validate_module_sig() without having to depend on
+CONFIG_MODULE_SIG.
+
+Signed-off-by: Thiago Jung Bauermann <bauerman@linux.ibm.com>
+Reviewed-by: Mimi Zohar <zohar@linux.vnet.ibm.com>
+Cc: Jessica Yu <jeyu@kernel.org>
+---
+ include/linux/module.h           |  3 --
+ include/linux/module_signature.h | 47 ++++++++++++++++++
+ init/Kconfig                     |  6 ++-
+ kernel/Makefile                  |  2 +-
+ kernel/module.c                  |  1 +
+ kernel/module_signing.c          | 82 ++++++++++++++------------------
+ 6 files changed, 91 insertions(+), 50 deletions(-)
+
+diff --git a/include/linux/module.h b/include/linux/module.h
+index fce6b4335e36..e49bbc5c66ef 100644
+--- a/include/linux/module.h
++++ b/include/linux/module.h
+@@ -25,9 +25,6 @@
+ #include <linux/percpu.h>
+ #include <asm/module.h>
+ 
+-/* In stripped ARM and x86-64 modules, ~ is surprisingly rare. */
+-#define MODULE_SIG_STRING "~Module signature appended~\n"
+-
+ /* Not Yet Implemented */
+ #define MODULE_SUPPORTED_DEVICE(name)
+ 
+diff --git a/include/linux/module_signature.h b/include/linux/module_signature.h
+new file mode 100644
+index 000000000000..862ddc25dbd1
+--- /dev/null
++++ b/include/linux/module_signature.h
+@@ -0,0 +1,47 @@
++/* SPDX-License-Identifier: GPL-2.0+ */
++/*
++ * Module signature handling.
++ *
++ * Copyright (C) 2012 Red Hat, Inc. All Rights Reserved.
++ * Written by David Howells (dhowells@redhat.com)
++ */
++
++#ifndef _LINUX_MODULE_SIGNATURE_H
++#define _LINUX_MODULE_SIGNATURE_H
++
++/* In stripped ARM and x86-64 modules, ~ is surprisingly rare. */
++#define MODULE_SIG_STRING "~Module signature appended~\n"
++
++enum pkey_id_type {
++	PKEY_ID_PGP,		/* OpenPGP generated key ID */
++	PKEY_ID_X509,		/* X.509 arbitrary subjectKeyIdentifier */
++	PKEY_ID_PKCS7,		/* Signature in PKCS#7 message */
++};
++
++/*
++ * Module signature information block.
++ *
++ * The constituents of the signature section are, in order:
++ *
++ *	- Signer's name
++ *	- Key identifier
++ *	- Signature data
++ *	- Information block
++ */
++struct module_signature {
++	u8	algo;		/* Public-key crypto algorithm [0] */
++	u8	hash;		/* Digest algorithm [0] */
++	u8	id_type;	/* Key identifier type [PKEY_ID_PKCS7] */
++	u8	signer_len;	/* Length of signer's name [0] */
++	u8	key_id_len;	/* Length of key identifier [0] */
++	u8	__pad[3];
++	__be32	sig_len;	/* Length of signature data */
++};
++
++struct load_info;
++
++int validate_module_sig(const struct module_signature *ms, size_t file_len,
++			const char *name);
++int mod_verify_sig(const void *mod, struct load_info *info);
++
++#endif /* _LINUX_MODULE_SIGNATURE_H */
+diff --git a/init/Kconfig b/init/Kconfig
+index a4112e95724a..cd31593525ee 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -1864,7 +1864,7 @@ config MODULE_SRCVERSION_ALL
+ config MODULE_SIG
+ 	bool "Module signature verification"
+ 	depends on MODULES
+-	select SYSTEM_DATA_VERIFICATION
++	select MODULE_SIG_FORMAT
+ 	help
+ 	  Check modules for valid signatures upon load: the signature
+ 	  is simply appended to the module. For more information see
+@@ -1879,6 +1879,10 @@ config MODULE_SIG
+ 	  debuginfo strip done by some packagers (such as rpmbuild) and
+ 	  inclusion into an initramfs that wants the module size reduced.
+ 
++config MODULE_SIG_FORMAT
++	def_bool n
++	select SYSTEM_DATA_VERIFICATION
++
+ config MODULE_SIG_FORCE
+ 	bool "Require modules to be validly signed"
+ 	depends on MODULE_SIG
+diff --git a/kernel/Makefile b/kernel/Makefile
+index 7343b3a9bff0..e56842571348 100644
+--- a/kernel/Makefile
++++ b/kernel/Makefile
+@@ -59,7 +59,7 @@ obj-y += up.o
+ endif
+ obj-$(CONFIG_UID16) += uid16.o
+ obj-$(CONFIG_MODULES) += module.o
+-obj-$(CONFIG_MODULE_SIG) += module_signing.o
++obj-$(CONFIG_MODULE_SIG_FORMAT) += module_signing.o
+ obj-$(CONFIG_KALLSYMS) += kallsyms.o
+ obj-$(CONFIG_BSD_PROCESS_ACCT) += acct.o
+ obj-$(CONFIG_CRASH_CORE) += crash_core.o
+diff --git a/kernel/module.c b/kernel/module.c
+index 49a405891587..205c9eefd08d 100644
+--- a/kernel/module.c
++++ b/kernel/module.c
+@@ -19,6 +19,7 @@
+ #include <linux/export.h>
+ #include <linux/extable.h>
+ #include <linux/moduleloader.h>
++#include <linux/module_signature.h>
+ #include <linux/trace_events.h>
+ #include <linux/init.h>
+ #include <linux/kallsyms.h>
+diff --git a/kernel/module_signing.c b/kernel/module_signing.c
+index f2075ce8e4b3..2912b7b1e814 100644
+--- a/kernel/module_signing.c
++++ b/kernel/module_signing.c
+@@ -11,36 +11,44 @@
+ 
+ #include <linux/kernel.h>
+ #include <linux/errno.h>
++#include <linux/module_signature.h>
+ #include <linux/string.h>
+ #include <linux/verification.h>
+ #include <crypto/public_key.h>
+ #include "module-internal.h"
+ 
+-enum pkey_id_type {
+-	PKEY_ID_PGP,		/* OpenPGP generated key ID */
+-	PKEY_ID_X509,		/* X.509 arbitrary subjectKeyIdentifier */
+-	PKEY_ID_PKCS7,		/* Signature in PKCS#7 message */
+-};
+-
+-/*
+- * Module signature information block.
++/**
++ * validate_module_sig - validate that the given signature is sane
+  *
+- * The constituents of the signature section are, in order:
+- *
+- *	- Signer's name
+- *	- Key identifier
+- *	- Signature data
+- *	- Information block
++ * @ms:		Signature to validate.
++ * @file_len:	Size of the file to which @ms is appended.
+  */
+-struct module_signature {
+-	u8	algo;		/* Public-key crypto algorithm [0] */
+-	u8	hash;		/* Digest algorithm [0] */
+-	u8	id_type;	/* Key identifier type [PKEY_ID_PKCS7] */
+-	u8	signer_len;	/* Length of signer's name [0] */
+-	u8	key_id_len;	/* Length of key identifier [0] */
+-	u8	__pad[3];
+-	__be32	sig_len;	/* Length of signature data */
+-};
++int validate_module_sig(const struct module_signature *ms, size_t file_len,
++			const char *name)
++{
++	if (be32_to_cpu(ms->sig_len) >= file_len - sizeof(*ms))
++		return -EBADMSG;
++
++	if (ms->id_type != PKEY_ID_PKCS7) {
++		pr_err("%s: Module is not signed with expected PKCS#7 message\n",
++		       name);
++		return -ENOPKG;
++	}
++
++	if (ms->algo != 0 ||
++	    ms->hash != 0 ||
++	    ms->signer_len != 0 ||
++	    ms->key_id_len != 0 ||
++	    ms->__pad[0] != 0 ||
++	    ms->__pad[1] != 0 ||
++	    ms->__pad[2] != 0) {
++		pr_err("%s: PKCS#7 signature info has unexpected non-zero params\n",
++		       name);
++		return -EBADMSG;
++	}
++
++	return 0;
++}
+ 
+ /*
+  * Verify the signature on a module.
+@@ -49,6 +57,7 @@ int mod_verify_sig(const void *mod, struct load_info *info)
+ {
+ 	struct module_signature ms;
+ 	size_t sig_len, modlen = info->len;
++	int ret;
+ 
+ 	pr_devel("==>%s(,%zu)\n", __func__, modlen);
+ 
+@@ -56,32 +65,15 @@ int mod_verify_sig(const void *mod, struct load_info *info)
+ 		return -EBADMSG;
+ 
+ 	memcpy(&ms, mod + (modlen - sizeof(ms)), sizeof(ms));
+-	modlen -= sizeof(ms);
++
++	ret = validate_module_sig(&ms, modlen, info->name);
++	if (ret)
++		return ret;
+ 
+ 	sig_len = be32_to_cpu(ms.sig_len);
+-	if (sig_len >= modlen)
+-		return -EBADMSG;
+-	modlen -= sig_len;
++	modlen -= sig_len + sizeof(ms);
+ 	info->len = modlen;
+ 
+-	if (ms.id_type != PKEY_ID_PKCS7) {
+-		pr_err("%s: Module is not signed with expected PKCS#7 message\n",
+-		       info->name);
+-		return -ENOPKG;
+-	}
+-
+-	if (ms.algo != 0 ||
+-	    ms.hash != 0 ||
+-	    ms.signer_len != 0 ||
+-	    ms.key_id_len != 0 ||
+-	    ms.__pad[0] != 0 ||
+-	    ms.__pad[1] != 0 ||
+-	    ms.__pad[2] != 0) {
+-		pr_err("%s: PKCS#7 signature info has unexpected non-zero params\n",
+-		       info->name);
+-		return -EBADMSG;
+-	}
+-
+ 	return verify_pkcs7_signature(mod, modlen, mod + modlen, sig_len,
+ 				      NULL, VERIFYING_MODULE_SIGNATURE,
+ 				      NULL, NULL);
