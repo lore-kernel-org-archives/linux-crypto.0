@@ -1,436 +1,310 @@
-Return-Path: <SRS0=oFif=NX=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from lhrrgout.huawei.com ([185.176.76.210]:32740 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725873AbeKLUXd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 12 Nov 2018 15:23:33 -0500
-From: Roberto Sassu <roberto.sassu@huawei.com>
-To: <dhowells@redhat.com>, <dwmw2@infradead.org>,
-        <herbert@gondor.apana.org.au>, <davem@davemloft.net>
-CC: <keyrings@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <linux-integrity@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <silviu.vlasceanu@huawei.com>
-Subject: [RFC][PATCH 06/12] KEYS: PGP data parser
-Date: Mon, 12 Nov 2018 11:24:17 +0100
-Message-ID: <20181112102423.30415-7-roberto.sassu@huawei.com>
-In-Reply-To: <20181112102423.30415-1-roberto.sassu@huawei.com>
-References: <20181112102423.30415-1-roberto.sassu@huawei.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Return-Path: <SRS0=1iZj=N3=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38966 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1730634AbeKQGXW (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 17 Nov 2018 01:23:22 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id wAGK8wWX020330
+        for <linux-crypto@vger.kernel.org>; Fri, 16 Nov 2018 15:09:34 -0500
+Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2nt1kmfgyd-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <linux-crypto@vger.kernel.org>; Fri, 16 Nov 2018 15:09:33 -0500
+Received: from localhost
+        by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <linux-crypto@vger.kernel.org> from <bauerman@linux.ibm.com>;
+        Fri, 16 Nov 2018 20:09:32 -0000
+From: Thiago Jung Bauermann <bauerman@linux.ibm.com>
+To: linux-integrity@vger.kernel.org
+Cc: linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        David Howells <dhowells@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Jessica Yu <jeyu@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jonathan Corbet <corbet@lwn.net>,
+        "AKASHI, Takahiro" <takahiro.akashi@linaro.org>,
+        Thiago Jung Bauermann <bauerman@linux.ibm.com>
+Subject: [PATCH v8 14/14] ima: Store the measurement again when appraising a modsig
+Date: Fri, 16 Nov 2018 18:07:12 -0200
+In-Reply-To: <20181116200712.14154-1-bauerman@linux.ibm.com>
+References: <20181116200712.14154-1-bauerman@linux.ibm.com>
+Message-Id: <20181116200712.14154-15-bauerman@linux.ibm.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: David Howells <dhowells@redhat.com>
+If the IMA template contains the 'sig' field, then the modsig should be
+added to the measurement list when the file is appraised, and that is what
+normally happens.
 
-Implement a PGP data parser for the crypto key type to use when
-instantiating a key.
+But If a measurement rule caused a file containing a modsig to be measured
+before a different rule causes it to be appraised, the resulting
+measurement entry will not contain the modsig because it is only fetched
+during appraisal. When the appraisal rule triggers, it won't store a new
+measurement containing the modsig because the file was already measured.
 
-This parser attempts to parse the instantiation data as a PGP packet
-sequence (RFC 4880) and if it parses okay, attempts to extract a public-key
-algorithm key or subkey from it.
+We need to detect that situation and store an additional measurement with
+the modsig. This is done by defining the appraise subaction flag
+IMA_READ_MEASURE and testing for it in process_measurement().
 
-If it finds such a key, it will set up a public_key subtype payload with
-appropriate handler routines (DSA or RSA) and attach it to the key.
-
-Thanks to Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp> for pointing
-out some errors.
-
-Changelog
-
-v0:
-- remove declaration of pgp_to_public_key_algo (Roberto Sassu)
-- replace prep->type_data with prep->payload.data (Roberto Sassu)
-- replace public_key_destroy() with public_key_free() (Roberto Sassu)
-- use asymmetric_key_generate_id() to generate the key identifiers
-  (Roberto Sassu)
-- add raw_fingerprint to pgp_key_data_parse_context structure
-  (Roberto Sassu)
-- replace algorithm identifiers with strings (Roberto Sassu)
-- don't parse MPIs (Roberto Sassu)
-- don't process Public-Subkey packets (only one key will be created)
-  (Roberto Sassu)
-
-Signed-off-by: David Howells <dhowells@redhat.com>
-Co-developed-by: Roberto Sassu <roberto.sassu@huawei.com>
+Suggested-by: Mimi Zohar <zohar@linux.vnet.ibm.com>
+Signed-off-by: Thiago Jung Bauermann <bauerman@linux.ibm.com>
 ---
- crypto/asymmetric_keys/Kconfig          |  11 +
- crypto/asymmetric_keys/Makefile         |   4 +
- crypto/asymmetric_keys/pgp_public_key.c | 336 ++++++++++++++++++++++++
- 3 files changed, 351 insertions(+)
- create mode 100644 crypto/asymmetric_keys/pgp_public_key.c
+ security/integrity/ima/ima.h          |  1 +
+ security/integrity/ima/ima_api.c      |  8 +++-
+ security/integrity/ima/ima_main.c     | 16 +++++++-
+ security/integrity/ima/ima_policy.c   | 59 ++++++++++++++++++++++++---
+ security/integrity/ima/ima_template.c | 27 ++++++++++++
+ security/integrity/integrity.h        |  9 ++--
+ 6 files changed, 110 insertions(+), 10 deletions(-)
 
-diff --git a/crypto/asymmetric_keys/Kconfig b/crypto/asymmetric_keys/Kconfig
-index 38c36c14d712..356b85fc34bd 100644
---- a/crypto/asymmetric_keys/Kconfig
-+++ b/crypto/asymmetric_keys/Kconfig
-@@ -99,4 +99,15 @@ config PGP_LIBRARY
- 	  This option enables a library that provides a number of simple
- 	  utility functions for parsing PGP (RFC 4880) packet-based messages.
+diff --git a/security/integrity/ima/ima.h b/security/integrity/ima/ima.h
+index 8e1b1ddbe14f..c39bed55f6d2 100644
+--- a/security/integrity/ima/ima.h
++++ b/security/integrity/ima/ima.h
+@@ -147,6 +147,7 @@ int ima_init_crypto(void);
+ void ima_putc(struct seq_file *m, void *data, int datalen);
+ void ima_print_digest(struct seq_file *m, u8 *digest, u32 size);
+ struct ima_template_desc *ima_template_desc_current(void);
++bool ima_current_template_has_sig(void);
+ int ima_restore_measurement_entry(struct ima_template_entry *entry);
+ int ima_restore_measurement_list(loff_t bufsize, void *buf);
+ int ima_measurements_show(struct seq_file *m, void *v);
+diff --git a/security/integrity/ima/ima_api.c b/security/integrity/ima/ima_api.c
+index 99dd1d53fc35..a7af114bc6b4 100644
+--- a/security/integrity/ima/ima_api.c
++++ b/security/integrity/ima/ima_api.c
+@@ -289,7 +289,13 @@ void ima_store_measurement(struct integrity_iint_cache *iint,
+ 					    xattr_len, NULL};
+ 	int violation = 0;
  
-+config PGP_KEY_PARSER
-+	tristate "PGP key parser"
-+	depends on ASYMMETRIC_PUBLIC_KEY_SUBTYPE
-+	select PGP_LIBRARY
-+	select MD5 # V3 fingerprint generation
-+	select SHA1 # V4 fingerprint generation
-+	help
-+	  This option provides support for parsing PGP (RFC 4880) format blobs
-+	  for key data and provides the ability to instantiate a crypto key
-+	  from a public key packet found inside the blob.
-+
- endif # ASYMMETRIC_KEY_TYPE
-diff --git a/crypto/asymmetric_keys/Makefile b/crypto/asymmetric_keys/Makefile
-index 55a67ebfe8e1..a68f9a5d1746 100644
---- a/crypto/asymmetric_keys/Makefile
-+++ b/crypto/asymmetric_keys/Makefile
-@@ -91,3 +91,7 @@ $(obj)/tpm.asn1.o: $(obj)/tpm.asn1.c $(obj)/tpm.asn1.h
- # PGP handling
- #
- obj-$(CONFIG_PGP_LIBRARY) += pgp_library.o
-+
-+obj-$(CONFIG_PGP_KEY_PARSER) += pgp_key_parser.o
-+pgp_key_parser-y := \
-+	pgp_public_key.o
-diff --git a/crypto/asymmetric_keys/pgp_public_key.c b/crypto/asymmetric_keys/pgp_public_key.c
-new file mode 100644
-index 000000000000..a5ce146a1250
---- /dev/null
-+++ b/crypto/asymmetric_keys/pgp_public_key.c
-@@ -0,0 +1,336 @@
-+/* Instantiate a public key crypto key from PGP format data [RFC 4880]
-+ *
-+ * Copyright (C) 2011 Red Hat, Inc. All Rights Reserved.
-+ * Written by David Howells (dhowells@redhat.com)
-+ *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU General Public Licence
-+ * as published by the Free Software Foundation; either version
-+ * 2 of the Licence, or (at your option) any later version.
+-	if (iint->measured_pcrs & (0x1 << pcr))
++	/*
++	 * We still need to store the measurement in the case of MODSIG because
++	 * we only have its contents to put in the list at the time of
++	 * appraisal. See comment in store_measurement_again() for more details.
++	 */
++	if (iint->measured_pcrs & (0x1 << pcr) &&
++	    (!xattr_value || xattr_value->type != IMA_MODSIG))
+ 		return;
+ 
+ 	result = ima_alloc_init_template(&event_data, &entry);
+diff --git a/security/integrity/ima/ima_main.c b/security/integrity/ima/ima_main.c
+index d5abd22d502a..807b9b77b813 100644
+--- a/security/integrity/ima/ima_main.c
++++ b/security/integrity/ima/ima_main.c
+@@ -166,6 +166,20 @@ void ima_file_free(struct file *file)
+ 	ima_check_last_writer(iint, inode, file);
+ }
+ 
++/*
++ * A file measurement might already exist in the measurement list. Based on
++ * policy, include an additional file measurement containing the appended
++ * signature and file hash, without the appended signature (i.e., the 'd-sig'
++ * field).
 + */
-+
-+#define pr_fmt(fmt) "PGP: "fmt
-+#include <linux/module.h>
-+#include <linux/kernel.h>
-+#include <linux/slab.h>
-+#include <linux/mpi.h>
-+#include <linux/pgplib.h>
-+#include <keys/asymmetric-subtype.h>
-+#include <keys/asymmetric-parser.h>
-+#include <crypto/hash.h>
-+#include <crypto/public_key.h>
-+#include "pgp_parser.h"
-+
-+#define MAX_MPI 5
-+
-+MODULE_LICENSE("GPL");
-+
-+static inline void digest_putc(struct shash_desc *digest, uint8_t ch)
++static bool store_measurement_again(struct integrity_iint_cache *iint,
++				    struct evm_ima_xattr_data *xattr_value)
 +{
-+	crypto_shash_update(digest, &ch, 1);
++	return iint->flags & IMA_READ_MEASURE && xattr_value &&
++		xattr_value->type == IMA_MODSIG &&
++		ima_current_template_has_sig();
 +}
 +
-+struct pgp_key_data_parse_context {
-+	struct pgp_parse_context pgp;
-+	struct public_key *pub;
-+	unsigned char *raw_fingerprint;
-+	char *fingerprint;
-+};
+ static int process_measurement(struct file *file, const struct cred *cred,
+ 			       u32 secid, char *buf, loff_t size, int mask,
+ 			       enum ima_hooks func)
+@@ -299,7 +313,7 @@ static int process_measurement(struct file *file, const struct cred *cred,
+ 	if (!pathbuf)	/* ima_rdwr_violation possibly pre-fetched */
+ 		pathname = ima_d_path(&file->f_path, &pathbuf, filename);
+ 
+-	if (action & IMA_MEASURE)
++	if (action & IMA_MEASURE || store_measurement_again(iint, xattr_value))
+ 		ima_store_measurement(iint, file, pathname,
+ 				      xattr_value, xattr_len, pcr);
+ 	if (rc == 0 && (action & IMA_APPRAISE_SUBMASK)) {
+diff --git a/security/integrity/ima/ima_policy.c b/security/integrity/ima/ima_policy.c
+index 3e5a64053aa8..c0b39802e988 100644
+--- a/security/integrity/ima/ima_policy.c
++++ b/security/integrity/ima/ima_policy.c
+@@ -10,6 +10,9 @@
+  *	- initialize default measure policy rules
+  *
+  */
 +
-+/*
-+ * Calculate the public key ID (RFC4880 12.2)
-+ */
-+static int pgp_calc_pkey_keyid(struct shash_desc *digest,
-+			       struct pgp_parse_pubkey *pgp,
-+			       struct public_key *pub)
++#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
++
+ #include <linux/module.h>
+ #include <linux/list.h>
+ #include <linux/fs.h>
+@@ -367,7 +370,8 @@ static bool ima_match_rules(struct ima_rule_entry *rule, struct inode *inode,
+  * In addition to knowing that we need to appraise the file in general,
+  * we need to differentiate between calling hooks, for hook specific rules.
+  */
+-static int get_subaction(struct ima_rule_entry *rule, enum ima_hooks func)
++static int get_appraise_subaction(struct ima_rule_entry *rule,
++				  enum ima_hooks func)
+ {
+ 	if (!(rule->flags & IMA_FUNC))
+ 		return IMA_FILE_APPRAISE;
+@@ -388,6 +392,15 @@ static int get_subaction(struct ima_rule_entry *rule, enum ima_hooks func)
+ 	}
+ }
+ 
++static int get_measure_subaction(struct ima_rule_entry *rule,
++				 enum ima_hooks func)
 +{
-+	unsigned int nb[MAX_MPI];
-+	unsigned int nn[MAX_MPI];
-+	unsigned int n;
-+	size_t keylen = pub->keylen;
-+	u8 *key_ptr = pub->key;
-+	u8 *pp[MAX_MPI];
-+	u32 a32;
-+	int npkey;
-+	int i, ret;
++	if (rule->flags & IMA_FUNC && ima_hook_supports_modsig(func))
++		return IMA_READ_MEASURE;
++	else
++		return 0;
++}
 +
-+	kenter("");
+ /**
+  * ima_match_policy - decision based on LSM and other conditions
+  * @inode: pointer to an inode for which the policy decision is being made
+@@ -424,11 +437,12 @@ int ima_match_policy(struct inode *inode, const struct cred *cred, u32 secid,
+ 
+ 		action |= entry->action & IMA_DO_MASK;
+ 		if (entry->action & IMA_APPRAISE) {
+-			action |= get_subaction(entry, func);
++			action |= get_appraise_subaction(entry, func);
+ 			action &= ~IMA_HASH;
+ 			if (ima_fail_unverifiable_sigs)
+ 				action |= IMA_FAIL_UNVERIFIABLE_SIGS;
+-		}
++		} else if (entry->action & IMA_MEASURE)
++			action |= get_measure_subaction(entry, func);
+ 
+ 		if (entry->action & IMA_DO_MASK)
+ 			actmask &= ~(entry->action | entry->action << 1);
+@@ -756,6 +770,40 @@ static void ima_log_string(struct audit_buffer *ab, char *key, char *value)
+ 	ima_log_string_op(ab, key, value, NULL);
+ }
+ 
++/*
++ * To validate the appended signature included in the measurement list requires
++ * the file hash, without the appended signature (i.e., the 'd-sig' field).
++ * Therefore, notify the user if they have the 'sig' field but not the 'd-sig'
++ * field in the template.
++ */
++static void check_current_template_modsig(void)
++{
++#define MSG "template with 'sig' field also needs 'd-sig' field when modsig is allowed\n"
++	struct ima_template_desc *template;
++	bool has_sig, has_dsig;
++	static bool checked;
++	int i;
 +
-+	n = (pgp->version < PGP_KEY_VERSION_4) ? 8 : 6;
-+	for (i = 0; i < MAX_MPI && keylen > 0; i++) {
-+		ret = mpi_key_length(key_ptr, keylen, nb + i, nn + i);
-+		if (ret < 0)
-+			return ret;
++	/* We only need to notify the user once. */
++	if (checked)
++		return;
 +
-+		pp[i] = key_ptr + 2;
-+		key_ptr += 2 + nn[i];
-+		keylen -= 2 + nn[i];
-+		n += 2 + nn[i];
++	has_sig = has_dsig = false;
++	template = ima_template_desc_current();
++	for (i = 0; i < template->num_fields; i++) {
++		if (!strcmp(template->fields[i]->field_id, "sig"))
++			has_sig = true;
++		else if (!strcmp(template->fields[i]->field_id, "d-sig"))
++			has_dsig = true;
 +	}
 +
-+	if (keylen != 0) {
-+		pr_debug("excess %zu\n", keylen);
-+		return -EBADMSG;
++	if (has_sig && !has_dsig)
++		pr_notice(MSG);
++
++	checked = true;
++#undef MSG
++}
++
+ static int ima_parse_rule(char *rule, struct ima_rule_entry *entry)
+ {
+ 	struct audit_buffer *ab;
+@@ -1035,10 +1083,11 @@ static int ima_parse_rule(char *rule, struct ima_rule_entry *entry)
+ 			if ((strcmp(args[0].from, "imasig")) == 0)
+ 				entry->flags |= IMA_DIGSIG_REQUIRED;
+ 			else if (ima_hook_supports_modsig(entry->func) &&
+-				 strcmp(args[0].from, "imasig|modsig") == 0)
++				 strcmp(args[0].from, "imasig|modsig") == 0) {
+ 				entry->flags |= IMA_DIGSIG_REQUIRED
+ 						| IMA_MODSIG_ALLOWED;
+-			else
++				check_current_template_modsig();
++			} else
+ 				result = -EINVAL;
+ 			break;
+ 		case Opt_permit_directio:
+diff --git a/security/integrity/ima/ima_template.c b/security/integrity/ima/ima_template.c
+index 045ad508cbb8..a58b55e7c1c6 100644
+--- a/security/integrity/ima/ima_template.c
++++ b/security/integrity/ima/ima_template.c
+@@ -231,6 +231,33 @@ struct ima_template_desc *ima_template_desc_current(void)
+ 	return ima_template;
+ }
+ 
++/*
++ * Tells whether the current template has fields which reference a file's
++ * signature.
++ */
++bool ima_current_template_has_sig(void)
++{
++	static int ima_template_has_sig = -1;
++
++	if (ima_template_has_sig < 0) {
++		struct ima_template_desc *template;
++		int i;
++
++		template = ima_template_desc_current();
++		for (i = 0; i < template->num_fields; i++)
++			if (!strcmp(template->fields[i]->field_id, "sig") ||
++			    !strcmp(template->fields[i]->field_id, "d-sig")) {
++				ima_template_has_sig = 1;
++				break;
++			}
++
++		if (ima_template_has_sig < 0)
++			ima_template_has_sig = 0;
 +	}
 +
-+	npkey = i;
-+
-+	digest_putc(digest, 0x99);     /* ctb */
-+	digest_putc(digest, n >> 8);   /* 16-bit header length */
-+	digest_putc(digest, n);
-+	digest_putc(digest, pgp->version);
-+
-+	a32 = pgp->creation_time;
-+	digest_putc(digest, a32 >> 24);
-+	digest_putc(digest, a32 >> 16);
-+	digest_putc(digest, a32 >>  8);
-+	digest_putc(digest, a32 >>  0);
-+
-+	if (pgp->version < PGP_KEY_VERSION_4) {
-+		u16 a16;
-+
-+		if (pgp->expires_at)
-+			a16 = (pgp->expires_at - pgp->creation_time) / 86400UL;
-+		else
-+			a16 = 0;
-+		digest_putc(digest, a16 >> 8);
-+		digest_putc(digest, a16 >> 0);
-+	}
-+
-+	digest_putc(digest, pgp->pubkey_algo);
-+
-+	for (i = 0; i < npkey; i++) {
-+		digest_putc(digest, nb[i] >> 8);
-+		digest_putc(digest, nb[i]);
-+		crypto_shash_update(digest, pp[i], nn[i]);
-+	}
-+	ret = 0;
-+
-+	kleave(" = %d", ret);
-+	return ret;
++	return ima_template_has_sig;
 +}
 +
-+/*
-+ * Calculate the public key ID fingerprint
-+ */
-+static int pgp_generate_fingerprint(struct pgp_key_data_parse_context *ctx,
-+				    struct pgp_parse_pubkey *pgp,
-+				    struct public_key *pub)
-+{
-+	struct crypto_shash *tfm;
-+	struct shash_desc *digest;
-+	char *fingerprint;
-+	u8 *raw_fingerprint;
-+	int digest_size, offset;
-+	int ret, i;
-+
-+	ret = -ENOMEM;
-+	tfm = crypto_alloc_shash(pgp->version < PGP_KEY_VERSION_4 ?
-+				 "md5" : "sha1", 0, 0);
-+	if (!tfm)
-+		goto cleanup;
-+
-+	digest = kmalloc(sizeof(*digest) + crypto_shash_descsize(tfm),
-+			 GFP_KERNEL);
-+	if (!digest)
-+		goto cleanup_tfm;
-+
-+	digest->tfm = tfm;
-+	digest->flags = CRYPTO_TFM_REQ_MAY_SLEEP;
-+	ret = crypto_shash_init(digest);
-+	if (ret < 0)
-+		goto cleanup_hash;
-+
-+	ret = pgp_calc_pkey_keyid(digest, pgp, pub);
-+	if (ret < 0)
-+		goto cleanup_hash;
-+
-+	digest_size = crypto_shash_digestsize(tfm);
-+
-+	raw_fingerprint = kmalloc(digest_size, GFP_KERNEL);
-+	if (!raw_fingerprint)
-+		goto cleanup_hash;
-+
-+	ret = crypto_shash_final(digest, raw_fingerprint);
-+	if (ret < 0)
-+		goto cleanup_raw_fingerprint;
-+
-+	fingerprint = kmalloc(digest_size * 2 + 1, GFP_KERNEL);
-+	if (!fingerprint)
-+		goto cleanup_raw_fingerprint;
-+
-+	offset = digest_size - 8;
-+	pr_debug("offset %u/%u\n", offset, digest_size);
-+
-+	for (i = 0; i < digest_size; i++)
-+		sprintf(fingerprint + i * 2, "%02x", raw_fingerprint[i]);
-+	pr_debug("fingerprint %s\n", fingerprint);
-+
-+	ctx->raw_fingerprint = raw_fingerprint;
-+	ctx->fingerprint = fingerprint;
-+	ret = 0;
-+cleanup_raw_fingerprint:
-+	if (ret < 0)
-+		kfree(raw_fingerprint);
-+cleanup_hash:
-+	kfree(digest);
-+cleanup_tfm:
-+	crypto_free_shash(tfm);
-+cleanup:
-+	kleave(" = %d", ret);
-+	return ret;
-+}
-+
-+/*
-+ * Extract a public key or public subkey from the PGP stream.
-+ */
-+static int pgp_process_public_key(struct pgp_parse_context *context,
-+				  enum pgp_packet_tag type,
-+				  u8 headerlen,
-+				  const u8 *data,
-+				  size_t datalen)
-+{
-+	const char *algo;
-+	struct pgp_key_data_parse_context *ctx =
-+		container_of(context, struct pgp_key_data_parse_context, pgp);
-+	struct pgp_parse_pubkey pgp;
-+	struct public_key *pub;
-+	int ret;
-+
-+	kenter(",%u,%u,,%zu", type, headerlen, datalen);
-+
-+	if (ctx->fingerprint) {
-+		kleave(" = -ENOKEY [already]");
-+		return -EBADMSG;
-+	}
-+
-+	pub = kzalloc(sizeof(struct public_key), GFP_KERNEL);
-+	if (!pub)
-+		return -ENOMEM;
-+	pub->id_type = "PGP";
-+
-+	ret = pgp_parse_public_key(&data, &datalen, &pgp);
-+	if (ret < 0)
-+		goto cleanup;
-+
-+	if (pgp.pubkey_algo >= PGP_PUBKEY__LAST)
-+		goto cleanup_unsupported_pkey_algo;
-+	algo = pgp_to_public_key_algo[pgp.pubkey_algo];
-+	if (!algo)
-+		goto cleanup_unsupported_pkey_algo;
-+	pub->pkey_algo = algo;
-+
-+	pub->key = kmemdup(data, datalen, GFP_KERNEL);
-+	if (!pub->key)
-+		goto cleanup_nomem;
-+
-+	pub->keylen = datalen;
-+
-+	ret = pgp_generate_fingerprint(ctx, &pgp, pub);
-+	if (ret < 0)
-+		goto cleanup;
-+
-+	ctx->pub = pub;
-+	kleave(" = 0 [use]");
-+	return 0;
-+
-+cleanup_unsupported_pkey_algo:
-+	pr_debug("Unsupported public key algorithm %u\n",
-+		 pgp.pubkey_algo);
-+	ret = -ENOPKG;
-+	goto cleanup;
-+cleanup_nomem:
-+	ret = -ENOMEM;
-+	goto cleanup;
-+cleanup:
-+	pr_devel("cleanup");
-+	kfree(pub->key);
-+	kfree(pub);
-+	kleave(" = %d", ret);
-+	return ret;
-+}
-+
-+static struct asymmetric_key_ids *pgp_key_generate_id(
-+					struct pgp_key_data_parse_context *ctx)
-+{
-+	struct asymmetric_key_ids *kids;
-+	struct asymmetric_key_id *kid;
-+	int fingerprint_len = strlen(ctx->fingerprint) / 2;
-+
-+	kids = kzalloc(sizeof(struct asymmetric_key_ids), GFP_KERNEL);
-+	if (!kids)
-+		return kids;
-+
-+	kid = asymmetric_key_generate_id(ctx->raw_fingerprint, fingerprint_len,
-+					 NULL, 0);
-+	if (IS_ERR(kid))
-+		goto error;
-+
-+	kids->id[0] = kid;
-+	kids->id[1] = kmemdup(kid, sizeof(kid) + fingerprint_len, GFP_KERNEL);
-+	if (!kids->id[1])
-+		goto error;
-+
-+	return kids;
-+error:
-+	kfree(kids->id[0]);
-+	kfree(kids);
-+
-+	return NULL;
-+}
-+
-+/*
-+ * Attempt to parse the instantiation data blob for a key as a PGP packet
-+ * message holding a key.
-+ */
-+static int pgp_key_parse(struct key_preparsed_payload *prep)
-+{
-+	struct pgp_key_data_parse_context ctx;
-+	int ret;
-+
-+	kenter("");
-+
-+	memset(&ctx, 0, sizeof(ctx));
-+	ctx.pgp.types_of_interest = (1 << PGP_PKT_PUBLIC_KEY);
-+	ctx.pgp.process_packet = pgp_process_public_key;
-+
-+	ret = pgp_parse_packets(prep->data, prep->datalen, &ctx.pgp);
-+	if (ret < 0)
-+		goto error;
-+
-+	/* We're pinning the module by being linked against it */
-+	__module_get(public_key_subtype.owner);
-+	prep->payload.data[asym_subtype] = &public_key_subtype;
-+	prep->payload.data[asym_key_ids] = pgp_key_generate_id(&ctx);
-+	prep->payload.data[asym_crypto] = ctx.pub;
-+	prep->quotalen = 100;
-+	return 0;
-+
-+error:
-+	public_key_free(ctx.pub);
-+	kfree(ctx.fingerprint);
-+	kfree(ctx.raw_fingerprint);
-+	return ret;
-+}
-+
-+static struct asymmetric_key_parser pgp_key_parser = {
-+	.owner		= THIS_MODULE,
-+	.name		= "pgp",
-+	.parse		= pgp_key_parse,
-+};
-+
-+/*
-+ * Module stuff
-+ */
-+static int __init pgp_key_init(void)
-+{
-+	return register_asymmetric_key_parser(&pgp_key_parser);
-+}
-+
-+static void __exit pgp_key_exit(void)
-+{
-+	unregister_asymmetric_key_parser(&pgp_key_parser);
-+}
-+
-+module_init(pgp_key_init);
-+module_exit(pgp_key_exit);
--- 
-2.17.1
+ int __init ima_init_template(void)
+ {
+ 	struct ima_template_desc *template = ima_template_desc_current();
+diff --git a/security/integrity/integrity.h b/security/integrity/integrity.h
+index e8c379211a96..9d7cefa5c999 100644
+--- a/security/integrity/integrity.h
++++ b/security/integrity/integrity.h
+@@ -39,12 +39,13 @@
+ #define IMA_MODSIG_ALLOWED	0x20000000
+ 
+ #define IMA_DO_MASK		(IMA_MEASURE | IMA_APPRAISE | IMA_AUDIT | \
+-				 IMA_HASH | IMA_APPRAISE_SUBMASK)
++				 IMA_HASH | IMA_APPRAISE_SUBMASK | \
++				 IMA_READ_MEASURE)
+ #define IMA_DONE_MASK		(IMA_MEASURED | IMA_APPRAISED | IMA_AUDITED | \
+ 				 IMA_HASHED | IMA_COLLECTED | \
+-				 IMA_APPRAISED_SUBMASK)
++				 IMA_APPRAISED_SUBMASK | IMA_READ_MEASURED)
+ 
+-/* iint subaction appraise cache flags */
++/* iint subaction appraise and measure cache flags */
+ #define IMA_FILE_APPRAISE	0x00001000
+ #define IMA_FILE_APPRAISED	0x00002000
+ #define IMA_MMAP_APPRAISE	0x00004000
+@@ -55,6 +56,8 @@
+ #define IMA_READ_APPRAISED	0x00080000
+ #define IMA_CREDS_APPRAISE	0x00100000
+ #define IMA_CREDS_APPRAISED	0x00200000
++#define IMA_READ_MEASURE	0x00400000
++#define IMA_READ_MEASURED	0x00800000
+ #define IMA_APPRAISE_SUBMASK	(IMA_FILE_APPRAISE | IMA_MMAP_APPRAISE | \
+ 				 IMA_BPRM_APPRAISE | IMA_READ_APPRAISE | \
+ 				 IMA_CREDS_APPRAISE)
