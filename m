@@ -1,37 +1,36 @@
-Return-Path: <SRS0=waMk=NM=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:47956 "EHLO
+Return-Path: <SRS0=1iZj=N3=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:37624 "EHLO
         deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727879AbeKARnT (ORCPT
+        with ESMTP id S1727353AbeKPQaB (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 1 Nov 2018 13:43:19 -0400
-Date: Thu, 1 Nov 2018 16:41:09 +0800
+        Fri, 16 Nov 2018 11:30:01 -0500
+Date: Fri, 16 Nov 2018 14:18:54 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
-Cc: James.Bottomley@hansenpartnership.com, ard.biesheuvel@linaro.org,
-        linux-crypto@vger.kernel.org, David Miller <davem@davemloft.net>,
-        stable@vger.kernel.org
-Subject: Re: [PATCH 1/2] crypto: fix cfb mode decryption
-Message-ID: <20181101084109.lme4cd2x5wfsj2fg@gondor.apana.org.au>
-References: <20181019230153.28201-1-dbaryshkov@gmail.com>
- <CAKv+Gu8eiFXoC2MWjGUG_AgDNq5rduWQN0CC4Q4BM0pjWW3B-w@mail.gmail.com>
- <1540109262.3023.6.camel@HansenPartnership.com>
- <CALT56yNN6N8J040Ce7B-FgGSyO0WngUoePp+3TsVn3PpvEQORw@mail.gmail.com>
+To: Ryder Lee <ryder.lee@mediatek.com>
+Cc: Rob Herring <robh+dt@kernel.org>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        linux-crypto@vger.kernel.org, Weijie Gao <weijie.gao@mediatek.com>,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH] dt-bindings: rng: update bindings for MT7629 SoC
+Message-ID: <20181116061854.ahs6jz7bmztoi3w7@gondor.apana.org.au>
+References: <0f5fe0d5b6a9c81b3f4395a1007ed0ba2239ae45.1541574485.git.ryder.lee@mediatek.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CALT56yNN6N8J040Ce7B-FgGSyO0WngUoePp+3TsVn3PpvEQORw@mail.gmail.com>
+In-Reply-To: <0f5fe0d5b6a9c81b3f4395a1007ed0ba2239ae45.1541574485.git.ryder.lee@mediatek.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Nov 01, 2018 at 11:32:37AM +0300, Dmitry Eremin-Solenikov wrote:
->
-> Since 4.20 pull went into Linus'es tree, any change of getting these two patches
-> in crypto tree?
+On Wed, Nov 07, 2018 at 03:10:16PM +0800, Ryder Lee wrote:
+> This updates bindings for MT7629 RNG driver.
+> 
+> Signed-off-by: Ryder Lee <ryder.lee@mediatek.com>
 
-These aren't critical enough for the current mainline so they will
-go in at the next merge window.
+Who is meant to take this patch?
 
-Cheers,
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
