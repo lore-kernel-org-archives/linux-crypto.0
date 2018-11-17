@@ -1,348 +1,309 @@
-Return-Path: <SRS0=qsBZ=OA=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-eopbgr690052.outbound.protection.outlook.com ([40.107.69.52]:62592
-        "EHLO NAM04-CO1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726001AbeKUU0T (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 21 Nov 2018 15:26:19 -0500
-From: "Srikanth, Jampala" <Jampala.Srikanth@cavium.com>
-To: "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>
-CC: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Srikanth, Jampala" <Jampala.Srikanth@cavium.com>
-Subject: [PATCH 1/1] crypto: cavium/nitrox - Enable interrups for PF in SR-IOV
- mode.
-Date: Wed, 21 Nov 2018 09:52:24 +0000
-Message-ID: <20181121095200.6036-1-Jampala.Srikanth@cavium.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+Return-Path: <SRS0=r3Tc=N4=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail-it1-f194.google.com ([209.85.166.194]:40279 "EHLO
+        mail-it1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729793AbeKQMPw (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 17 Nov 2018 07:15:52 -0500
+Received: by mail-it1-f194.google.com with SMTP id h193so43879ita.5
+        for <linux-crypto@vger.kernel.org>; Fri, 16 Nov 2018 18:01:00 -0800 (PST)
 MIME-Version: 1.0
+References: <20181117012631.23528-1-ebiggers@kernel.org> <20181117012631.23528-14-ebiggers@kernel.org>
+In-Reply-To: <20181117012631.23528-14-ebiggers@kernel.org>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date: Fri, 16 Nov 2018 18:00:49 -0800
+Message-ID: <CAKv+Gu92imD=X-4ExxQH-KOkitUr04GGenYb59yDwBPRhLf3dw@mail.gmail.com>
+Subject: Re: [PATCH v4 13/14] crypto: arm/nhpoly1305 - add NEON-accelerated NHPoly1305
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-fscrypt@vger.kernel.org,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Paul Crowley <paulcrowley@google.com>,
+        Greg Kaiser <gkaiser@google.com>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Samuel Neves <samuel.c.p.neves@gmail.com>,
+        Tomer Ashur <tomer.ashur@esat.kuleuven.be>,
+        Eric Biggers <ebiggers@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Enable the available interrupt vectors for PF in SR-IOV Mode.
-Only single vector entry 192 is valid of PF. This is used to
-notify any hardware errors and mailbox messages from VF(s).
+On Fri, 16 Nov 2018 at 17:29, Eric Biggers <ebiggers@kernel.org> wrote:
+>
+> From: Eric Biggers <ebiggers@google.com>
+>
+> Add an ARM NEON implementation of NHPoly1305, an =CE=B5-almost-=E2=88=86-=
+universal
+> hash function used in the Adiantum encryption mode.  For now, only the
+> NH portion is actually NEON-accelerated; the Poly1305 part is less
+> performance-critical so is just implemented in C.
+>
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
 
-Signed-off-by: Srikanth Jampala <Jampala.Srikanth@cavium.com>
----
- drivers/crypto/cavium/nitrox/nitrox_dev.h   | 15 +++-
- drivers/crypto/cavium/nitrox/nitrox_isr.c   | 84 ++++++++++++++++++++-
- drivers/crypto/cavium/nitrox/nitrox_isr.h   |  2 +
- drivers/crypto/cavium/nitrox/nitrox_sriov.c | 51 +++++++++++--
- 4 files changed, 142 insertions(+), 10 deletions(-)
+Reviewed-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-diff --git a/drivers/crypto/cavium/nitrox/nitrox_dev.h b/drivers/crypto/cav=
-ium/nitrox/nitrox_dev.h
-index 283e252385fb..247df32f687c 100644
---- a/drivers/crypto/cavium/nitrox/nitrox_dev.h
-+++ b/drivers/crypto/cavium/nitrox/nitrox_dev.h
-@@ -103,6 +103,16 @@ struct nitrox_q_vector {
- 	};
- };
-=20
-+/**
-+ * struct nitrox_iov - SR-IOV information
-+ * @num_vfs: number of VF(s) enabled
-+ * @msix: MSI-X for PF in SR-IOV case
-+ */
-+struct nitrox_iov {
-+	int num_vfs;
-+	struct msix_entry msix;
-+};
-+
- /*
-  * NITROX Device states
-  */
-@@ -150,6 +160,9 @@ enum vf_mode {
-  * @ctx_pool: DMA pool for crypto context
-  * @pkt_inq: Packet input rings
-  * @qvec: MSI-X queue vectors information
-+ * @iov: SR-IOV informatin
-+ * @num_vecs: number of MSI-X vectors
-+ * @stats: request statistics
-  * @hw: hardware information
-  * @debugfs_dir: debugfs directory
-  */
-@@ -168,13 +181,13 @@ struct nitrox_device {
- 	int node;
- 	u16 qlen;
- 	u16 nr_queues;
--	int num_vfs;
- 	enum vf_mode mode;
-=20
- 	struct dma_pool *ctx_pool;
- 	struct nitrox_cmdq *pkt_inq;
-=20
- 	struct nitrox_q_vector *qvec;
-+	struct nitrox_iov iov;
- 	int num_vecs;
-=20
- 	struct nitrox_stats stats;
-diff --git a/drivers/crypto/cavium/nitrox/nitrox_isr.c b/drivers/crypto/cav=
-ium/nitrox/nitrox_isr.c
-index 88a77b8fb3fb..c5b797808680 100644
---- a/drivers/crypto/cavium/nitrox/nitrox_isr.c
-+++ b/drivers/crypto/cavium/nitrox/nitrox_isr.c
-@@ -13,6 +13,7 @@
-  *  - NPS packet ring, AQMQ ring and ZQMQ ring
-  */
- #define NR_RING_VECTORS 3
-+#define NR_NON_RING_VECTORS 1
- /* base entry for packet ring/port */
- #define PKT_RING_MSIX_BASE 0
- #define NON_RING_MSIX_BASE 192
-@@ -275,6 +276,7 @@ void nitrox_unregister_interrupts(struct nitrox_device =
-*ndev)
- 		qvec->valid =3D false;
- 	}
- 	kfree(ndev->qvec);
-+	ndev->qvec =3D NULL;
- 	pci_free_irq_vectors(pdev);
- }
-=20
-@@ -321,6 +323,7 @@ int nitrox_register_interrupts(struct nitrox_device *nd=
-ev)
- 		if (qvec->ring >=3D ndev->nr_queues)
- 			break;
-=20
-+		qvec->cmdq =3D &ndev->pkt_inq[qvec->ring];
- 		snprintf(qvec->name, IRQ_NAMESZ, "nitrox-pkt%d", qvec->ring);
- 		/* get the vector number */
- 		vec =3D pci_irq_vector(pdev, i);
-@@ -335,13 +338,13 @@ int nitrox_register_interrupts(struct nitrox_device *=
-ndev)
-=20
- 		tasklet_init(&qvec->resp_tasklet, pkt_slc_resp_tasklet,
- 			     (unsigned long)qvec);
--		qvec->cmdq =3D &ndev->pkt_inq[qvec->ring];
- 		qvec->valid =3D true;
- 	}
-=20
- 	/* request irqs for non ring vectors */
- 	i =3D NON_RING_MSIX_BASE;
- 	qvec =3D &ndev->qvec[i];
-+	qvec->ndev =3D ndev;
-=20
- 	snprintf(qvec->name, IRQ_NAMESZ, "nitrox-core-int%d", i);
- 	/* get the vector number */
-@@ -356,7 +359,6 @@ int nitrox_register_interrupts(struct nitrox_device *nd=
-ev)
-=20
- 	tasklet_init(&qvec->resp_tasklet, nps_core_int_tasklet,
- 		     (unsigned long)qvec);
--	qvec->ndev =3D ndev;
- 	qvec->valid =3D true;
-=20
- 	return 0;
-@@ -365,3 +367,81 @@ int nitrox_register_interrupts(struct nitrox_device *n=
-dev)
- 	nitrox_unregister_interrupts(ndev);
- 	return ret;
- }
-+
-+void nitrox_sriov_unregister_interrupts(struct nitrox_device *ndev)
-+{
-+	struct pci_dev *pdev =3D ndev->pdev;
-+	int i;
-+
-+	for (i =3D 0; i < ndev->num_vecs; i++) {
-+		struct nitrox_q_vector *qvec;
-+		int vec;
-+
-+		qvec =3D ndev->qvec + i;
-+		if (!qvec->valid)
-+			continue;
-+
-+		vec =3D ndev->iov.msix.vector;
-+		irq_set_affinity_hint(vec, NULL);
-+		free_irq(vec, qvec);
-+
-+		tasklet_disable(&qvec->resp_tasklet);
-+		tasklet_kill(&qvec->resp_tasklet);
-+		qvec->valid =3D false;
-+	}
-+	kfree(ndev->qvec);
-+	ndev->qvec =3D NULL;
-+	pci_disable_msix(pdev);
-+}
-+
-+int nitrox_sriov_register_interupts(struct nitrox_device *ndev)
-+{
-+	struct pci_dev *pdev =3D ndev->pdev;
-+	struct nitrox_q_vector *qvec;
-+	int vec, cpu;
-+	int ret;
-+
-+	/**
-+	 * only non ring vectors i.e Entry 192 is available
-+	 * for PF in SR-IOV mode.
-+	 */
-+	ndev->iov.msix.entry =3D NON_RING_MSIX_BASE;
-+	ret =3D pci_enable_msix_exact(pdev, &ndev->iov.msix, NR_NON_RING_VECTORS)=
+> ---
+>  arch/arm/crypto/Kconfig                |   5 ++
+>  arch/arm/crypto/Makefile               |   2 +
+>  arch/arm/crypto/nh-neon-core.S         | 116 +++++++++++++++++++++++++
+>  arch/arm/crypto/nhpoly1305-neon-glue.c |  77 ++++++++++++++++
+>  4 files changed, 200 insertions(+)
+>  create mode 100644 arch/arm/crypto/nh-neon-core.S
+>  create mode 100644 arch/arm/crypto/nhpoly1305-neon-glue.c
+>
+> diff --git a/arch/arm/crypto/Kconfig b/arch/arm/crypto/Kconfig
+> index 59c674cf08ef..a95322b59799 100644
+> --- a/arch/arm/crypto/Kconfig
+> +++ b/arch/arm/crypto/Kconfig
+> @@ -131,4 +131,9 @@ config CRYPTO_CHACHA20_NEON
+>         select CRYPTO_BLKCIPHER
+>         select CRYPTO_CHACHA20
+>
+> +config CRYPTO_NHPOLY1305_NEON
+> +       tristate "NEON accelerated NHPoly1305 hash function (for Adiantum=
+)"
+> +       depends on KERNEL_MODE_NEON
+> +       select CRYPTO_NHPOLY1305
+> +
+>  endif
+> diff --git a/arch/arm/crypto/Makefile b/arch/arm/crypto/Makefile
+> index 005482ff9504..b65d6bfab8e6 100644
+> --- a/arch/arm/crypto/Makefile
+> +++ b/arch/arm/crypto/Makefile
+> @@ -10,6 +10,7 @@ obj-$(CONFIG_CRYPTO_SHA1_ARM_NEON) +=3D sha1-arm-neon.o
+>  obj-$(CONFIG_CRYPTO_SHA256_ARM) +=3D sha256-arm.o
+>  obj-$(CONFIG_CRYPTO_SHA512_ARM) +=3D sha512-arm.o
+>  obj-$(CONFIG_CRYPTO_CHACHA20_NEON) +=3D chacha-neon.o
+> +obj-$(CONFIG_CRYPTO_NHPOLY1305_NEON) +=3D nhpoly1305-neon.o
+>
+>  ce-obj-$(CONFIG_CRYPTO_AES_ARM_CE) +=3D aes-arm-ce.o
+>  ce-obj-$(CONFIG_CRYPTO_SHA1_ARM_CE) +=3D sha1-arm-ce.o
+> @@ -53,6 +54,7 @@ ghash-arm-ce-y        :=3D ghash-ce-core.o ghash-ce-glu=
+e.o
+>  crct10dif-arm-ce-y     :=3D crct10dif-ce-core.o crct10dif-ce-glue.o
+>  crc32-arm-ce-y:=3D crc32-ce-core.o crc32-ce-glue.o
+>  chacha-neon-y :=3D chacha-neon-core.o chacha-neon-glue.o
+> +nhpoly1305-neon-y :=3D nh-neon-core.o nhpoly1305-neon-glue.o
+>
+>  ifdef REGENERATE_ARM_CRYPTO
+>  quiet_cmd_perl =3D PERL    $@
+> diff --git a/arch/arm/crypto/nh-neon-core.S b/arch/arm/crypto/nh-neon-cor=
+e.S
+> new file mode 100644
+> index 000000000000..434d80ab531c
+> --- /dev/null
+> +++ b/arch/arm/crypto/nh-neon-core.S
+> @@ -0,0 +1,116 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * NH - =CE=B5-almost-universal hash function, NEON accelerated version
+> + *
+> + * Copyright 2018 Google LLC
+> + *
+> + * Author: Eric Biggers <ebiggers@google.com>
+> + */
+> +
+> +#include <linux/linkage.h>
+> +
+> +       .text
+> +       .fpu            neon
+> +
+> +       KEY             .req    r0
+> +       MESSAGE         .req    r1
+> +       MESSAGE_LEN     .req    r2
+> +       HASH            .req    r3
+> +
+> +       PASS0_SUMS      .req    q0
+> +       PASS0_SUM_A     .req    d0
+> +       PASS0_SUM_B     .req    d1
+> +       PASS1_SUMS      .req    q1
+> +       PASS1_SUM_A     .req    d2
+> +       PASS1_SUM_B     .req    d3
+> +       PASS2_SUMS      .req    q2
+> +       PASS2_SUM_A     .req    d4
+> +       PASS2_SUM_B     .req    d5
+> +       PASS3_SUMS      .req    q3
+> +       PASS3_SUM_A     .req    d6
+> +       PASS3_SUM_B     .req    d7
+> +       K0              .req    q4
+> +       K1              .req    q5
+> +       K2              .req    q6
+> +       K3              .req    q7
+> +       T0              .req    q8
+> +       T0_L            .req    d16
+> +       T0_H            .req    d17
+> +       T1              .req    q9
+> +       T1_L            .req    d18
+> +       T1_H            .req    d19
+> +       T2              .req    q10
+> +       T2_L            .req    d20
+> +       T2_H            .req    d21
+> +       T3              .req    q11
+> +       T3_L            .req    d22
+> +       T3_H            .req    d23
+> +
+> +.macro _nh_stride      k0, k1, k2, k3
+> +
+> +       // Load next message stride
+> +       vld1.8          {T3}, [MESSAGE]!
+> +
+> +       // Load next key stride
+> +       vld1.32         {\k3}, [KEY]!
+> +
+> +       // Add message words to key words
+> +       vadd.u32        T0, T3, \k0
+> +       vadd.u32        T1, T3, \k1
+> +       vadd.u32        T2, T3, \k2
+> +       vadd.u32        T3, T3, \k3
+> +
+> +       // Multiply 32x32 =3D> 64 and accumulate
+> +       vmlal.u32       PASS0_SUMS, T0_L, T0_H
+> +       vmlal.u32       PASS1_SUMS, T1_L, T1_H
+> +       vmlal.u32       PASS2_SUMS, T2_L, T2_H
+> +       vmlal.u32       PASS3_SUMS, T3_L, T3_H
+> +.endm
+> +
+> +/*
+> + * void nh_neon(const u32 *key, const u8 *message, size_t message_len,
+> + *             u8 hash[NH_HASH_BYTES])
+> + *
+> + * It's guaranteed that message_len % 16 =3D=3D 0.
+> + */
+> +ENTRY(nh_neon)
+> +
+> +       vld1.32         {K0,K1}, [KEY]!
+> +         vmov.u64      PASS0_SUMS, #0
+> +         vmov.u64      PASS1_SUMS, #0
+> +       vld1.32         {K2}, [KEY]!
+> +         vmov.u64      PASS2_SUMS, #0
+> +         vmov.u64      PASS3_SUMS, #0
+> +
+> +       subs            MESSAGE_LEN, MESSAGE_LEN, #64
+> +       blt             .Lloop4_done
+> +.Lloop4:
+> +       _nh_stride      K0, K1, K2, K3
+> +       _nh_stride      K1, K2, K3, K0
+> +       _nh_stride      K2, K3, K0, K1
+> +       _nh_stride      K3, K0, K1, K2
+> +       subs            MESSAGE_LEN, MESSAGE_LEN, #64
+> +       bge             .Lloop4
+> +
+> +.Lloop4_done:
+> +       ands            MESSAGE_LEN, MESSAGE_LEN, #63
+> +       beq             .Ldone
+> +       _nh_stride      K0, K1, K2, K3
+> +
+> +       subs            MESSAGE_LEN, MESSAGE_LEN, #16
+> +       beq             .Ldone
+> +       _nh_stride      K1, K2, K3, K0
+> +
+> +       subs            MESSAGE_LEN, MESSAGE_LEN, #16
+> +       beq             .Ldone
+> +       _nh_stride      K2, K3, K0, K1
+> +
+> +.Ldone:
+> +       // Sum the accumulators for each pass, then store the sums to 'ha=
+sh'
+> +       vadd.u64        T0_L, PASS0_SUM_A, PASS0_SUM_B
+> +       vadd.u64        T0_H, PASS1_SUM_A, PASS1_SUM_B
+> +       vadd.u64        T1_L, PASS2_SUM_A, PASS2_SUM_B
+> +       vadd.u64        T1_H, PASS3_SUM_A, PASS3_SUM_B
+> +       vst1.8          {T0-T1}, [HASH]
+> +       bx              lr
+> +ENDPROC(nh_neon)
+> diff --git a/arch/arm/crypto/nhpoly1305-neon-glue.c b/arch/arm/crypto/nhp=
+oly1305-neon-glue.c
+> new file mode 100644
+> index 000000000000..49aae87cb2bc
+> --- /dev/null
+> +++ b/arch/arm/crypto/nhpoly1305-neon-glue.c
+> @@ -0,0 +1,77 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * NHPoly1305 - =CE=B5-almost-=E2=88=86-universal hash function for Adia=
+ntum
+> + * (NEON accelerated version)
+> + *
+> + * Copyright 2018 Google LLC
+> + */
+> +
+> +#include <asm/neon.h>
+> +#include <asm/simd.h>
+> +#include <crypto/internal/hash.h>
+> +#include <crypto/nhpoly1305.h>
+> +#include <linux/module.h>
+> +
+> +asmlinkage void nh_neon(const u32 *key, const u8 *message, size_t messag=
+e_len,
+> +                       u8 hash[NH_HASH_BYTES]);
+> +
+> +/* wrapper to avoid indirect call to assembly, which doesn't work with C=
+FI */
+> +static void _nh_neon(const u32 *key, const u8 *message, size_t message_l=
+en,
+> +                    __le64 hash[NH_NUM_PASSES])
+> +{
+> +       nh_neon(key, message, message_len, (u8 *)hash);
+> +}
+> +
+> +static int nhpoly1305_neon_update(struct shash_desc *desc,
+> +                                 const u8 *src, unsigned int srclen)
+> +{
+> +       if (srclen < 64 || !may_use_simd())
+> +               return crypto_nhpoly1305_update(desc, src, srclen);
+> +
+> +       do {
+> +               unsigned int n =3D min_t(unsigned int, srclen, PAGE_SIZE)=
 ;
-+	if (ret) {
-+		dev_err(DEV(ndev), "failed to allocate nps-core-int%d\n",
-+			NON_RING_MSIX_BASE);
-+		return ret;
-+	}
-+
-+	qvec =3D kcalloc(NR_NON_RING_VECTORS, sizeof(*qvec), GFP_KERNEL);
-+	if (!qvec) {
-+		pci_disable_msix(pdev);
-+		return -ENOMEM;
-+	}
-+	qvec->ndev =3D ndev;
-+
-+	ndev->qvec =3D qvec;
-+	ndev->num_vecs =3D NR_NON_RING_VECTORS;
-+	snprintf(qvec->name, IRQ_NAMESZ, "nitrox-core-int%d",
-+		 NON_RING_MSIX_BASE);
-+
-+	vec =3D ndev->iov.msix.vector;
-+	ret =3D request_irq(vec, nps_core_int_isr, 0, qvec->name, qvec);
-+	if (ret) {
-+		dev_err(DEV(ndev), "irq failed for nitrox-core-int%d\n",
-+			NON_RING_MSIX_BASE);
-+		goto iov_irq_fail;
-+	}
-+	cpu =3D num_online_cpus();
-+	irq_set_affinity_hint(vec, get_cpu_mask(cpu));
-+
-+	tasklet_init(&qvec->resp_tasklet, nps_core_int_tasklet,
-+		     (unsigned long)qvec);
-+	qvec->valid =3D true;
-+
-+	return 0;
-+
-+iov_irq_fail:
-+	nitrox_sriov_unregister_interrupts(ndev);
-+	return ret;
-+}
-diff --git a/drivers/crypto/cavium/nitrox/nitrox_isr.h b/drivers/crypto/cav=
-ium/nitrox/nitrox_isr.h
-index 63418a6cc52c..1062c9336c1f 100644
---- a/drivers/crypto/cavium/nitrox/nitrox_isr.h
-+++ b/drivers/crypto/cavium/nitrox/nitrox_isr.h
-@@ -6,5 +6,7 @@
-=20
- int nitrox_register_interrupts(struct nitrox_device *ndev);
- void nitrox_unregister_interrupts(struct nitrox_device *ndev);
-+int nitrox_sriov_register_interupts(struct nitrox_device *ndev);
-+void nitrox_sriov_unregister_interrupts(struct nitrox_device *ndev);
-=20
- #endif /* __NITROX_ISR_H */
-diff --git a/drivers/crypto/cavium/nitrox/nitrox_sriov.c b/drivers/crypto/c=
-avium/nitrox/nitrox_sriov.c
-index 30c0aa874583..7ba0cc5d6d02 100644
---- a/drivers/crypto/cavium/nitrox/nitrox_sriov.c
-+++ b/drivers/crypto/cavium/nitrox/nitrox_sriov.c
-@@ -7,6 +7,10 @@
- #include "nitrox_common.h"
- #include "nitrox_isr.h"
-=20
-+/**
-+ * num_vfs_valid - validate VF count
-+ * @num_vfs: number of VF(s)
-+ */
- static inline bool num_vfs_valid(int num_vfs)
- {
- 	bool valid =3D false;
-@@ -48,7 +52,7 @@ static inline enum vf_mode num_vfs_to_mode(int num_vfs)
- 	return mode;
- }
-=20
--static void pf_sriov_cleanup(struct nitrox_device *ndev)
-+static void nitrox_pf_cleanup(struct nitrox_device *ndev)
- {
- 	 /* PF has no queues in SR-IOV mode */
- 	atomic_set(&ndev->state, __NDEV_NOT_READY);
-@@ -60,7 +64,11 @@ static void pf_sriov_cleanup(struct nitrox_device *ndev)
- 	nitrox_common_sw_cleanup(ndev);
- }
-=20
--static int pf_sriov_init(struct nitrox_device *ndev)
-+/**
-+ * nitrox_pf_reinit - re-initialize PF resources once SR-IOV is disabled
-+ * @ndev: NITROX device
-+ */
-+static int nitrox_pf_reinit(struct nitrox_device *ndev)
- {
- 	int err;
-=20
-@@ -86,6 +94,18 @@ static int pf_sriov_init(struct nitrox_device *ndev)
- 	return nitrox_crypto_register();
- }
-=20
-+static int nitrox_sriov_init(struct nitrox_device *ndev)
-+{
-+	/* register interrupts for PF in SR-IOV */
-+	return nitrox_sriov_register_interupts(ndev);
-+}
-+
-+static void nitrox_sriov_cleanup(struct nitrox_device *ndev)
-+{
-+	/* unregister interrupts for PF in SR-IOV */
-+	nitrox_sriov_unregister_interrupts(ndev);
-+}
-+
- static int nitrox_sriov_enable(struct pci_dev *pdev, int num_vfs)
- {
- 	struct nitrox_device *ndev =3D pci_get_drvdata(pdev);
-@@ -106,17 +126,31 @@ static int nitrox_sriov_enable(struct pci_dev *pdev, =
-int num_vfs)
- 	}
- 	dev_info(DEV(ndev), "Enabled VF(s) %d\n", num_vfs);
-=20
--	ndev->num_vfs =3D num_vfs;
-+	ndev->iov.num_vfs =3D num_vfs;
- 	ndev->mode =3D num_vfs_to_mode(num_vfs);
- 	/* set bit in flags */
- 	set_bit(__NDEV_SRIOV_BIT, &ndev->flags);
-=20
- 	/* cleanup PF resources */
--	pf_sriov_cleanup(ndev);
-+	nitrox_pf_cleanup(ndev);
-=20
--	config_nps_core_vfcfg_mode(ndev, ndev->mode);
-+	/* PF SR-IOV mode initialization */
-+	err =3D nitrox_sriov_init(ndev);
-+	if (err)
-+		goto iov_fail;
-=20
-+	config_nps_core_vfcfg_mode(ndev, ndev->mode);
- 	return num_vfs;
-+
-+iov_fail:
-+	pci_disable_sriov(pdev);
-+	/* clear bit in flags */
-+	clear_bit(__NDEV_SRIOV_BIT, &ndev->flags);
-+	ndev->iov.num_vfs =3D 0;
-+	ndev->mode =3D __NDEV_MODE_PF;
-+	/* reset back to working mode in PF */
-+	nitrox_pf_reinit(ndev);
-+	return err;
- }
-=20
- static int nitrox_sriov_disable(struct pci_dev *pdev)
-@@ -134,12 +168,15 @@ static int nitrox_sriov_disable(struct pci_dev *pdev)
- 	/* clear bit in flags */
- 	clear_bit(__NDEV_SRIOV_BIT, &ndev->flags);
-=20
--	ndev->num_vfs =3D 0;
-+	ndev->iov.num_vfs =3D 0;
- 	ndev->mode =3D __NDEV_MODE_PF;
-=20
-+	/* cleanup PF SR-IOV resources */
-+	nitrox_sriov_cleanup(ndev);
-+
- 	config_nps_core_vfcfg_mode(ndev, ndev->mode);
-=20
--	return pf_sriov_init(ndev);
-+	return nitrox_pf_reinit(ndev);
- }
-=20
- int nitrox_sriov_configure(struct pci_dev *pdev, int num_vfs)
---=20
-2.17.1
+> +
+> +               kernel_neon_begin();
+> +               crypto_nhpoly1305_update_helper(desc, src, n, _nh_neon);
+> +               kernel_neon_end();
+> +               src +=3D n;
+> +               srclen -=3D n;
+> +       } while (srclen);
+> +       return 0;
+> +}
+> +
+> +static struct shash_alg nhpoly1305_alg =3D {
+> +       .base.cra_name          =3D "nhpoly1305",
+> +       .base.cra_driver_name   =3D "nhpoly1305-neon",
+> +       .base.cra_priority      =3D 200,
+> +       .base.cra_ctxsize       =3D sizeof(struct nhpoly1305_key),
+> +       .base.cra_module        =3D THIS_MODULE,
+> +       .digestsize             =3D POLY1305_DIGEST_SIZE,
+> +       .init                   =3D crypto_nhpoly1305_init,
+> +       .update                 =3D nhpoly1305_neon_update,
+> +       .final                  =3D crypto_nhpoly1305_final,
+> +       .setkey                 =3D crypto_nhpoly1305_setkey,
+> +       .descsize               =3D sizeof(struct nhpoly1305_state),
+> +};
+> +
+> +static int __init nhpoly1305_mod_init(void)
+> +{
+> +       if (!(elf_hwcap & HWCAP_NEON))
+> +               return -ENODEV;
+> +
+> +       return crypto_register_shash(&nhpoly1305_alg);
+> +}
+> +
+> +static void __exit nhpoly1305_mod_exit(void)
+> +{
+> +       crypto_unregister_shash(&nhpoly1305_alg);
+> +}
+> +
+> +module_init(nhpoly1305_mod_init);
+> +module_exit(nhpoly1305_mod_exit);
+> +
+> +MODULE_DESCRIPTION("NHPoly1305 =CE=B5-almost-=E2=88=86-universal hash fu=
+nction (NEON-accelerated)");
+> +MODULE_LICENSE("GPL v2");
+> +MODULE_AUTHOR("Eric Biggers <ebiggers@google.com>");
+> +MODULE_ALIAS_CRYPTO("nhpoly1305");
+> +MODULE_ALIAS_CRYPTO("nhpoly1305-neon");
+> --
+> 2.19.1.1215.g8438c0b245-goog
+>
