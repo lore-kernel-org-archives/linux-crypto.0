@@ -1,27 +1,82 @@
-Return-Path: <SRS0=oFif=NX=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from [206.189.131.98] ([206.189.131.98]:36744 "EHLO mail.hanqfast.cf"
-        rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
-        id S1725834AbeKMFgl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 13 Nov 2018 00:36:41 -0500
-To: linux-crypto@vger.kernel.org
-Subject: Price Inquiry
-From: Daniel Murray <sinara-group@bk.ru>
-Reply-To: sinara-group@list.ru
+Return-Path: <SRS0=r3Tc=N4=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail-it1-f194.google.com ([209.85.166.194]:50642 "EHLO
+        mail-it1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730013AbeKQKpG (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 17 Nov 2018 05:45:06 -0500
+Received: by mail-it1-f194.google.com with SMTP id k206-v6so500977ite.0
+        for <linux-crypto@vger.kernel.org>; Fri, 16 Nov 2018 16:30:32 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7BIT
-Message-Id: <20181111162024.3CB806208B1@mail.hanqfast.cf>
-Date: Sun, 11 Nov 2018 15:34:59 +0000 (UTC)
+References: <20181105232526.173947-1-ebiggers@kernel.org> <20181105232526.173947-11-ebiggers@kernel.org>
+ <CAKv+Gu-o0khD5=0EOkv2PiczMs5uZ=XP9V=G2ogBNMK8Kb93sw@mail.gmail.com>
+ <20181112185816.GA8663@gmail.com> <20181116060227.hwu4igi6bp26ddpi@gondor.apana.org.au>
+ <20181117001718.GA175522@gmail.com>
+In-Reply-To: <20181117001718.GA175522@gmail.com>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date: Fri, 16 Nov 2018 16:30:20 -0800
+Message-ID: <CAKv+Gu9KU9pviBsmAJUoSdBDK6Sk-7TdM0avgFdz-0AaOwaD9Q@mail.gmail.com>
+Subject: Re: [RFC PATCH v3 10/15] crypto: poly1305 - use structures for key
+ and accumulator
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>, linux-fscrypt@vger.kernel.org,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Paul Crowley <paulcrowley@google.com>,
+        Greg Kaiser <gkaiser@google.com>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Samuel Neves <samuel.c.p.neves@gmail.com>,
+        Tomer Ashur <tomer.ashur@esat.kuleuven.be>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,friend,
- 
-This is Daniel Murray and i am from Sinara Group Co.Ltd Group Co.,LTD in Russia.
-We are glad to know about your company from the web and we are interested in your products.
-Could you kindly send us your Latest catalog and price list for our trial order.
- 
-Best Regards,
- 
-Daniel Murray
-Purchasing Manager
+On Fri, 16 Nov 2018 at 16:17, Eric Biggers <ebiggers@kernel.org> wrote:
+>
+> Hi Herbert,
+>
+> On Fri, Nov 16, 2018 at 02:02:27PM +0800, Herbert Xu wrote:
+> > Hi Eric:
+> >
+> > On Mon, Nov 12, 2018 at 10:58:17AM -0800, Eric Biggers wrote:
+> > >
+> > > I prefer separate types so that the type system enforces that a key is never
+> > > accidentally used as an accumulator, and vice versa.  Then the poly1305_core_*
+> > > functions will be harder to misuse, and the Poly1305 MAC implementations harder
+> > > to get wrong.
+> > >
+> > > The key also has certain bits clear whereas the accumulator does not.  In the
+> > > future, the Poly1305 C implementation might use base 2^32 and take advantage of
+> > > this.  In that case, the two inputs to each multiplication won't be
+> > > interchangeable, so using the same type for both would be extra confusing.
+> > >
+> > > Having a poly1305_val nested inside poly1305_key and poly1305_state would work,
+> > > but seemed excessive.
+> >
+> > So it looks like there are no more unresolved issues with this
+> > patch series.  Please let me know when you want it to go in.
+> >
+>
+> I believe it's ready to go in.  I'll need to rebase it onto cryptodev, to
+> resolve some small conflicts with the recent ChaCha20-related changes.  Also
+> I'll probably omit the fscrypt patch (patch 15/15) so that that patch can be
+> taken through the fscrypt tree instead.
+>
+> Do you prefer that this be merged before or after Zinc?  It seems it may still
+> be a while before the community is satisfied with Zinc (and Wireguard which is
+> in the same patchset), and I don't want this blocked unnecessarily...  So on my
+> part I'd prefer to just have this merged as-is.
+>
+> Of course, it's always possible to change the xchacha12 and xchacha20
+> implementations later, whether that's to use "Zinc" or otherwise.  And
+> NHPoly1305 and Adiantum itself will be the same either way, except that the
+> Poly1305 helpers may change slightly.
+>
+> What do you think?
+>
+
+I think this is ready to go in. Most of Zinc itself will not be
+blocked by this, only the changes to the crypto API ChaCha20
+implementation will have to wait until the Zinc version gains support
+for the reduced round variant, but that will not block WireGuard.
