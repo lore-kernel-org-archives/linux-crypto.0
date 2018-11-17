@@ -2,64 +2,63 @@ Return-Path: <SRS0=r3Tc=N4=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 887D7C43441
-	for <linux-crypto@archiver.kernel.org>; Sat, 17 Nov 2018 01:44:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AAB48C43441
+	for <linux-crypto@archiver.kernel.org>; Sat, 17 Nov 2018 01:51:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3AE0E2089D
-	for <linux-crypto@archiver.kernel.org>; Sat, 17 Nov 2018 01:44:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5E8AA2089D
+	for <linux-crypto@archiver.kernel.org>; Sat, 17 Nov 2018 01:51:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=linaro.org header.i=@linaro.org header.b="TLYPtuDr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3AE0E2089D
+	dkim=pass (1024-bit key) header.d=linaro.org header.i=@linaro.org header.b="P5j8CB8Z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E8AA2089D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-crypto-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727116AbeKQL6r (ORCPT
+        id S1730286AbeKQMF5 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 17 Nov 2018 06:58:47 -0500
-Received: from mail-io1-f66.google.com ([209.85.166.66]:42422 "EHLO
-        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729714AbeKQL6q (ORCPT
+        Sat, 17 Nov 2018 07:05:57 -0500
+Received: from mail-it1-f196.google.com ([209.85.166.196]:36284 "EHLO
+        mail-it1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730378AbeKQMF5 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 17 Nov 2018 06:58:46 -0500
-Received: by mail-io1-f66.google.com with SMTP id h19-v6so18470345iog.9
-        for <linux-crypto@vger.kernel.org>; Fri, 16 Nov 2018 17:43:58 -0800 (PST)
+        Sat, 17 Nov 2018 07:05:57 -0500
+Received: by mail-it1-f196.google.com with SMTP id c9so567823itj.1
+        for <linux-crypto@vger.kernel.org>; Fri, 16 Nov 2018 17:51:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=reuX2Q8Cvblb2xw9l3m0U+1Y4ltN5kAXvU7GJOAr6dU=;
-        b=TLYPtuDr1ouHzsq7LS/IViJ1nFE/d0GA5SwlpBrLQOea7SICBJl/MdhbYssKX/gBLi
-         gY728qSilLf82BPyhnQbkijrYc2rLO59gbBsvlrGoxnHwqkwiBrpweNCIj6VWrZaP4TV
-         AX19cQA86mPsNt+BHvnu31+unY2imrX+l69Pc=
+        bh=ycuo47DcdIyVxcWRHg64i/Y1sXk5HFv3kYE+fCxWqNw=;
+        b=P5j8CB8ZqvaV+jsaLIlI/z5HCbjt+LfqB1/HG1MEeDWJBYIoj072dBxT4MJFZ7okGi
+         x+cbRlJBYKFyOQmH+ly3WeqIQrym9jvM9WaYaRFIcJyYs32yTgQ6oQK6CaXuhx0Y0ZCF
+         6OjvKMx1a/J+ogCcNHl3NLpcyd6obCaaIAV2k=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=reuX2Q8Cvblb2xw9l3m0U+1Y4ltN5kAXvU7GJOAr6dU=;
-        b=VmxTvqgQUc3p7rcC5avFT6EOIQ2tQEXi5Irnnz/HFtWwPll9N3mLjCIGoLVWeu6qOh
-         Kk3Z7yNU65ZsfoE3vp6H9KUQRqtFCqBzD4iGYSUOf3fzO59UU82q0Oy9EODP36VoHumx
-         tkOo0NyK5+aQAiUd/yAq6l5Kuy1NaOtGVj9EgQX+7gK4lt8YOKP/38/ABrEzXf8+xq/q
-         KhBrJFbsRdGG+sNxknCW6xS3ov5wYN/wyFM12RV6zvkib2x2B/qqesa1QrgPlPVoKg1E
-         vGnzYGYCw7QFThPPzimduus6B7o2K9TSqu2Q4CiYPuqyjsMtl80rdeRikEpZGjDf0cRS
-         B82w==
-X-Gm-Message-State: AA+aEWa2WxxoCY0988Y2Hxj9WOW7CgcuzbL/1jq2oMyF0k2uYxydH1Cm
-        M9lKB/zFRomdzPL011VrDem54S7Zqi5d/pY/IzHWiA==
-X-Google-Smtp-Source: AJdET5d/JVkc4Q6GUUbyMhjXM52V8ZRqdyskI4WXRfJ7kX9TZTcNaXvhLZAIAWCT/s6KvEm4lYkgpOhOpHLWKIjWXGU=
-X-Received: by 2002:a6b:5d01:: with SMTP id r1mr10229796iob.170.1542419037778;
- Fri, 16 Nov 2018 17:43:57 -0800 (PST)
+        bh=ycuo47DcdIyVxcWRHg64i/Y1sXk5HFv3kYE+fCxWqNw=;
+        b=NnEARwN3TdqHnCUZ8IE5G1BLkW8sUeA6sAPUoBvMJ++Hp2yvhe3vxFoIb2sCkP8yYz
+         /fJIUk2IxZ5QYPoS8aERZS6biBLBtNHule1LzC+BHGROI8ozpmdnssKTyiWRTHQaNFEq
+         sYXFxk6zuU9+I8g7Vtq2XQlSEVVR8DQezaXnxXOCExBspPe7jrru2cE6Syq5HQIFSnYf
+         7jK4wpcCZcHHRM2/jWWNwmhmOxqG6zaAnmMsaL9CHqV6xz/SM6Ifbl7VnYW4mmROGBDt
+         Jbrs4UMDjzLEFPtAukwYbJhaQHEGiqY+2zpY0a8r7Oa/lXMS88yyc92JbSh/2nKn634H
+         2/tA==
+X-Gm-Message-State: AGRZ1gLEdqL3zvjG3GlrwPPPNy6RBmEq5Ew/fCsTZOWs7zty3pxhJ4rz
+        7d/3lklhuKE9o9IlEGJ4L33Oh7ImKCG/EK8vBzf+FQ==
+X-Google-Smtp-Source: AFSGD/WYYALv4WLPEz/VZE9GqTgWQrz9G+7hT99UvERdelmjQF6iKsVQWnw2PQ3UV3Mhh+FpMORl6bhxRyEfTRNo8Jg=
+X-Received: by 2002:a24:2190:: with SMTP id e138-v6mr610664ita.71.1542419466986;
+ Fri, 16 Nov 2018 17:51:06 -0800 (PST)
 MIME-Version: 1.0
-References: <20181117012631.23528-1-ebiggers@kernel.org> <20181117012631.23528-11-ebiggers@kernel.org>
-In-Reply-To: <20181117012631.23528-11-ebiggers@kernel.org>
+References: <20181117012631.23528-1-ebiggers@kernel.org> <20181117012631.23528-12-ebiggers@kernel.org>
+In-Reply-To: <20181117012631.23528-12-ebiggers@kernel.org>
 From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Fri, 16 Nov 2018 17:43:46 -0800
+Date:   Fri, 16 Nov 2018 17:50:55 -0800
 Message-ID:
- <CAKv+Gu8=VXiK8MJSB=Np1jmj7=K1cfGJdSkfAR-Supkw5aZTvA@mail.gmail.com>
-Subject: Re: [PATCH v4 10/14] crypto: poly1305 - use structures for key and accumulator
+ <CAKv+Gu-VicDdZqa=4nbo4EY5r2qTNngYuGyO-MymyoJ0NQP8tA@mail.gmail.com>
+Subject: Re: [PATCH v4 11/14] crypto: poly1305 - add Poly1305 core API
 To:     Eric Biggers <ebiggers@kernel.org>
 Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
         <linux-crypto@vger.kernel.org>,
@@ -80,21 +79,28 @@ Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
-Message-ID: <20181117014346.y6eowGBoBcYmS_MhbfMGWcB4GhuNbPCyQIh-ML_uK-g@z>
+Message-ID: <20181117015055.J1fnQjqe9ZQpd2_2i3uILWzAWKK8TWVijl_feKvfKoQ@z>
 
 On Fri, 16 Nov 2018 at 17:29, Eric Biggers <ebiggers@kernel.org> wrote:
 >
 > From: Eric Biggers <ebiggers@google.com>
 >
-> In preparation for exposing a low-level Poly1305 API which implements
-> the =CE=B5-almost-=E2=88=86-universal (=CE=B5A=E2=88=86U) hash function u=
-nderlying the Poly1305
-> MAC and supports block-aligned inputs only, create structures
-> poly1305_key and poly1305_state which hold the limbs of the Poly1305
-> "r" key and accumulator, respectively.
+> Expose a low-level Poly1305 API which implements the
+> =CE=B5-almost-=E2=88=86-universal (=CE=B5A=E2=88=86U) hash function under=
+lying the Poly1305 MAC
+> and supports block-aligned inputs only.
 >
-> These structures could actually have the same type (e.g. poly1305_val),
-> but different types are preferable, to prevent misuse.
+> This is needed for Adiantum hashing, which builds an =CE=B5A=E2=88=86U ha=
+sh function
+> from NH and a polynomial evaluation in GF(2^{130}-5); this polynomial
+> evaluation is identical to the one the Poly1305 MAC does.  However, the
+> crypto_shash Poly1305 API isn't very appropriate for this because its
+> calling convention assumes it is used as a MAC, with a 32-byte "one-time
+> key" provided for every digest.
+>
+> But by design, in Adiantum hashing the performance of the polynomial
+> evaluation isn't nearly as critical as NH.  So it suffices to just have
+> some C helper functions.  Thus, this patch adds such functions.
 >
 > Acked-by: Martin Willi <martin@strongswan.org>
 > Signed-off-by: Eric Biggers <ebiggers@google.com>
@@ -102,199 +108,327 @@ nderlying the Poly1305
 Acked-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
 > ---
->  arch/x86/crypto/poly1305_glue.c | 20 +++++++------
->  crypto/poly1305_generic.c       | 52 ++++++++++++++++-----------------
->  include/crypto/poly1305.h       | 12 ++++++--
->  3 files changed, 47 insertions(+), 37 deletions(-)
+>  crypto/poly1305_generic.c | 174 ++++++++++++++++++++++----------------
+>  include/crypto/poly1305.h |  16 ++++
+>  2 files changed, 115 insertions(+), 75 deletions(-)
 >
-> diff --git a/arch/x86/crypto/poly1305_glue.c b/arch/x86/crypto/poly1305_g=
-lue.c
-> index f012b7e28ad1..88cc01506c84 100644
-> --- a/arch/x86/crypto/poly1305_glue.c
-> +++ b/arch/x86/crypto/poly1305_glue.c
-> @@ -83,35 +83,37 @@ static unsigned int poly1305_simd_blocks(struct poly1=
-305_desc_ctx *dctx,
->         if (poly1305_use_avx2 && srclen >=3D POLY1305_BLOCK_SIZE * 4) {
->                 if (unlikely(!sctx->wset)) {
->                         if (!sctx->uset) {
-> -                               memcpy(sctx->u, dctx->r, sizeof(sctx->u))=
-;
-> -                               poly1305_simd_mult(sctx->u, dctx->r);
-> +                               memcpy(sctx->u, dctx->r.r, sizeof(sctx->u=
-));
-> +                               poly1305_simd_mult(sctx->u, dctx->r.r);
->                                 sctx->uset =3D true;
->                         }
->                         memcpy(sctx->u + 5, sctx->u, sizeof(sctx->u));
-> -                       poly1305_simd_mult(sctx->u + 5, dctx->r);
-> +                       poly1305_simd_mult(sctx->u + 5, dctx->r.r);
->                         memcpy(sctx->u + 10, sctx->u + 5, sizeof(sctx->u)=
-);
-> -                       poly1305_simd_mult(sctx->u + 10, dctx->r);
-> +                       poly1305_simd_mult(sctx->u + 10, dctx->r.r);
->                         sctx->wset =3D true;
->                 }
->                 blocks =3D srclen / (POLY1305_BLOCK_SIZE * 4);
-> -               poly1305_4block_avx2(dctx->h, src, dctx->r, blocks, sctx-=
->u);
-> +               poly1305_4block_avx2(dctx->h.h, src, dctx->r.r, blocks,
-> +                                    sctx->u);
->                 src +=3D POLY1305_BLOCK_SIZE * 4 * blocks;
->                 srclen -=3D POLY1305_BLOCK_SIZE * 4 * blocks;
->         }
->  #endif
->         if (likely(srclen >=3D POLY1305_BLOCK_SIZE * 2)) {
->                 if (unlikely(!sctx->uset)) {
-> -                       memcpy(sctx->u, dctx->r, sizeof(sctx->u));
-> -                       poly1305_simd_mult(sctx->u, dctx->r);
-> +                       memcpy(sctx->u, dctx->r.r, sizeof(sctx->u));
-> +                       poly1305_simd_mult(sctx->u, dctx->r.r);
->                         sctx->uset =3D true;
->                 }
->                 blocks =3D srclen / (POLY1305_BLOCK_SIZE * 2);
-> -               poly1305_2block_sse2(dctx->h, src, dctx->r, blocks, sctx-=
->u);
-> +               poly1305_2block_sse2(dctx->h.h, src, dctx->r.r, blocks,
-> +                                    sctx->u);
->                 src +=3D POLY1305_BLOCK_SIZE * 2 * blocks;
->                 srclen -=3D POLY1305_BLOCK_SIZE * 2 * blocks;
->         }
->         if (srclen >=3D POLY1305_BLOCK_SIZE) {
-> -               poly1305_block_sse2(dctx->h, src, dctx->r, 1);
-> +               poly1305_block_sse2(dctx->h.h, src, dctx->r.r, 1);
->                 srclen -=3D POLY1305_BLOCK_SIZE;
->         }
->         return srclen;
 > diff --git a/crypto/poly1305_generic.c b/crypto/poly1305_generic.c
-> index 47d3a6b83931..a23173f351b7 100644
+> index a23173f351b7..2a06874204e8 100644
 > --- a/crypto/poly1305_generic.c
 > +++ b/crypto/poly1305_generic.c
 > @@ -38,7 +38,7 @@ int crypto_poly1305_init(struct shash_desc *desc)
 >  {
 >         struct poly1305_desc_ctx *dctx =3D shash_desc_ctx(desc);
 >
-> -       memset(dctx->h, 0, sizeof(dctx->h));
-> +       memset(dctx->h.h, 0, sizeof(dctx->h.h));
+> -       memset(dctx->h.h, 0, sizeof(dctx->h.h));
+> +       poly1305_core_init(&dctx->h);
 >         dctx->buflen =3D 0;
 >         dctx->rset =3D false;
 >         dctx->sset =3D false;
-> @@ -50,11 +50,11 @@ EXPORT_SYMBOL_GPL(crypto_poly1305_init);
->  static void poly1305_setrkey(struct poly1305_desc_ctx *dctx, const u8 *k=
+> @@ -47,23 +47,16 @@ int crypto_poly1305_init(struct shash_desc *desc)
+>  }
+>  EXPORT_SYMBOL_GPL(crypto_poly1305_init);
+>
+> -static void poly1305_setrkey(struct poly1305_desc_ctx *dctx, const u8 *k=
 ey)
+> +void poly1305_core_setkey(struct poly1305_key *key, const u8 *raw_key)
 >  {
 >         /* r &=3D 0xffffffc0ffffffc0ffffffc0fffffff */
-> -       dctx->r[0] =3D (get_unaligned_le32(key +  0) >> 0) & 0x3ffffff;
-> -       dctx->r[1] =3D (get_unaligned_le32(key +  3) >> 2) & 0x3ffff03;
-> -       dctx->r[2] =3D (get_unaligned_le32(key +  6) >> 4) & 0x3ffc0ff;
-> -       dctx->r[3] =3D (get_unaligned_le32(key +  9) >> 6) & 0x3f03fff;
-> -       dctx->r[4] =3D (get_unaligned_le32(key + 12) >> 8) & 0x00fffff;
-> +       dctx->r.r[0] =3D (get_unaligned_le32(key +  0) >> 0) & 0x3ffffff;
-> +       dctx->r.r[1] =3D (get_unaligned_le32(key +  3) >> 2) & 0x3ffff03;
-> +       dctx->r.r[2] =3D (get_unaligned_le32(key +  6) >> 4) & 0x3ffc0ff;
-> +       dctx->r.r[3] =3D (get_unaligned_le32(key +  9) >> 6) & 0x3f03fff;
-> +       dctx->r.r[4] =3D (get_unaligned_le32(key + 12) >> 8) & 0x00fffff;
->  }
->
->  static void poly1305_setskey(struct poly1305_desc_ctx *dctx, const u8 *k=
+> -       dctx->r.r[0] =3D (get_unaligned_le32(key +  0) >> 0) & 0x3ffffff;
+> -       dctx->r.r[1] =3D (get_unaligned_le32(key +  3) >> 2) & 0x3ffff03;
+> -       dctx->r.r[2] =3D (get_unaligned_le32(key +  6) >> 4) & 0x3ffc0ff;
+> -       dctx->r.r[3] =3D (get_unaligned_le32(key +  9) >> 6) & 0x3f03fff;
+> -       dctx->r.r[4] =3D (get_unaligned_le32(key + 12) >> 8) & 0x00fffff;
+> -}
+> -
+> -static void poly1305_setskey(struct poly1305_desc_ctx *dctx, const u8 *k=
 ey)
-> @@ -107,22 +107,22 @@ static unsigned int poly1305_blocks(struct poly1305=
-_desc_ctx *dctx,
->                 srclen =3D datalen;
->         }
+> -{
+> -       dctx->s[0] =3D get_unaligned_le32(key +  0);
+> -       dctx->s[1] =3D get_unaligned_le32(key +  4);
+> -       dctx->s[2] =3D get_unaligned_le32(key +  8);
+> -       dctx->s[3] =3D get_unaligned_le32(key + 12);
+> +       key->r[0] =3D (get_unaligned_le32(raw_key +  0) >> 0) & 0x3ffffff=
+;
+> +       key->r[1] =3D (get_unaligned_le32(raw_key +  3) >> 2) & 0x3ffff03=
+;
+> +       key->r[2] =3D (get_unaligned_le32(raw_key +  6) >> 4) & 0x3ffc0ff=
+;
+> +       key->r[3] =3D (get_unaligned_le32(raw_key +  9) >> 6) & 0x3f03fff=
+;
+> +       key->r[4] =3D (get_unaligned_le32(raw_key + 12) >> 8) & 0x00fffff=
+;
+>  }
+> +EXPORT_SYMBOL_GPL(poly1305_core_setkey);
 >
-> -       r0 =3D dctx->r[0];
-> -       r1 =3D dctx->r[1];
-> -       r2 =3D dctx->r[2];
-> -       r3 =3D dctx->r[3];
-> -       r4 =3D dctx->r[4];
-> +       r0 =3D dctx->r.r[0];
-> +       r1 =3D dctx->r.r[1];
-> +       r2 =3D dctx->r.r[2];
-> +       r3 =3D dctx->r.r[3];
-> +       r4 =3D dctx->r.r[4];
+>  /*
+>   * Poly1305 requires a unique key for each tag, which implies that we ca=
+n't set
+> @@ -75,13 +68,16 @@ unsigned int crypto_poly1305_setdesckey(struct poly13=
+05_desc_ctx *dctx,
+>  {
+>         if (!dctx->sset) {
+>                 if (!dctx->rset && srclen >=3D POLY1305_BLOCK_SIZE) {
+> -                       poly1305_setrkey(dctx, src);
+> +                       poly1305_core_setkey(&dctx->r, src);
+>                         src +=3D POLY1305_BLOCK_SIZE;
+>                         srclen -=3D POLY1305_BLOCK_SIZE;
+>                         dctx->rset =3D true;
+>                 }
+>                 if (srclen >=3D POLY1305_BLOCK_SIZE) {
+> -                       poly1305_setskey(dctx, src);
+> +                       dctx->s[0] =3D get_unaligned_le32(src +  0);
+> +                       dctx->s[1] =3D get_unaligned_le32(src +  4);
+> +                       dctx->s[2] =3D get_unaligned_le32(src +  8);
+> +                       dctx->s[3] =3D get_unaligned_le32(src + 12);
+>                         src +=3D POLY1305_BLOCK_SIZE;
+>                         srclen -=3D POLY1305_BLOCK_SIZE;
+>                         dctx->sset =3D true;
+> @@ -91,41 +87,37 @@ unsigned int crypto_poly1305_setdesckey(struct poly13=
+05_desc_ctx *dctx,
+>  }
+>  EXPORT_SYMBOL_GPL(crypto_poly1305_setdesckey);
+>
+> -static unsigned int poly1305_blocks(struct poly1305_desc_ctx *dctx,
+> -                                   const u8 *src, unsigned int srclen,
+> -                                   u32 hibit)
+> +static void poly1305_blocks_internal(struct poly1305_state *state,
+> +                                    const struct poly1305_key *key,
+> +                                    const void *src, unsigned int nblock=
+s,
+> +                                    u32 hibit)
+>  {
+>         u32 r0, r1, r2, r3, r4;
+>         u32 s1, s2, s3, s4;
+>         u32 h0, h1, h2, h3, h4;
+>         u64 d0, d1, d2, d3, d4;
+> -       unsigned int datalen;
+>
+> -       if (unlikely(!dctx->sset)) {
+> -               datalen =3D crypto_poly1305_setdesckey(dctx, src, srclen)=
+;
+> -               src +=3D srclen - datalen;
+> -               srclen =3D datalen;
+> -       }
+> +       if (!nblocks)
+> +               return;
+>
+> -       r0 =3D dctx->r.r[0];
+> -       r1 =3D dctx->r.r[1];
+> -       r2 =3D dctx->r.r[2];
+> -       r3 =3D dctx->r.r[3];
+> -       r4 =3D dctx->r.r[4];
+> +       r0 =3D key->r[0];
+> +       r1 =3D key->r[1];
+> +       r2 =3D key->r[2];
+> +       r3 =3D key->r[3];
+> +       r4 =3D key->r[4];
 >
 >         s1 =3D r1 * 5;
 >         s2 =3D r2 * 5;
 >         s3 =3D r3 * 5;
 >         s4 =3D r4 * 5;
 >
-> -       h0 =3D dctx->h[0];
-> -       h1 =3D dctx->h[1];
-> -       h2 =3D dctx->h[2];
-> -       h3 =3D dctx->h[3];
-> -       h4 =3D dctx->h[4];
-> +       h0 =3D dctx->h.h[0];
-> +       h1 =3D dctx->h.h[1];
-> +       h2 =3D dctx->h.h[2];
-> +       h3 =3D dctx->h.h[3];
-> +       h4 =3D dctx->h.h[4];
+> -       h0 =3D dctx->h.h[0];
+> -       h1 =3D dctx->h.h[1];
+> -       h2 =3D dctx->h.h[2];
+> -       h3 =3D dctx->h.h[3];
+> -       h4 =3D dctx->h.h[4];
+> -
+> -       while (likely(srclen >=3D POLY1305_BLOCK_SIZE)) {
+> +       h0 =3D state->h[0];
+> +       h1 =3D state->h[1];
+> +       h2 =3D state->h[2];
+> +       h3 =3D state->h[3];
+> +       h4 =3D state->h[4];
 >
->         while (likely(srclen >=3D POLY1305_BLOCK_SIZE)) {
->
-> @@ -157,11 +157,11 @@ static unsigned int poly1305_blocks(struct poly1305=
+> +       do {
+>                 /* h +=3D m[i] */
+>                 h0 +=3D (get_unaligned_le32(src +  0) >> 0) & 0x3ffffff;
+>                 h1 +=3D (get_unaligned_le32(src +  3) >> 2) & 0x3ffffff;
+> @@ -154,16 +146,36 @@ static unsigned int poly1305_blocks(struct poly1305=
 _desc_ctx *dctx,
->                 srclen -=3D POLY1305_BLOCK_SIZE;
->         }
+>                 h1 +=3D h0 >> 26;       h0 =3D h0 & 0x3ffffff;
 >
-> -       dctx->h[0] =3D h0;
-> -       dctx->h[1] =3D h1;
-> -       dctx->h[2] =3D h2;
-> -       dctx->h[3] =3D h3;
-> -       dctx->h[4] =3D h4;
-> +       dctx->h.h[0] =3D h0;
-> +       dctx->h.h[1] =3D h1;
-> +       dctx->h.h[2] =3D h2;
-> +       dctx->h.h[3] =3D h3;
-> +       dctx->h.h[4] =3D h4;
+>                 src +=3D POLY1305_BLOCK_SIZE;
+> -               srclen -=3D POLY1305_BLOCK_SIZE;
+> -       }
+> +       } while (--nblocks);
 >
->         return srclen;
+> -       dctx->h.h[0] =3D h0;
+> -       dctx->h.h[1] =3D h1;
+> -       dctx->h.h[2] =3D h2;
+> -       dctx->h.h[3] =3D h3;
+> -       dctx->h.h[4] =3D h4;
+> +       state->h[0] =3D h0;
+> +       state->h[1] =3D h1;
+> +       state->h[2] =3D h2;
+> +       state->h[3] =3D h3;
+> +       state->h[4] =3D h4;
+> +}
+>
+> -       return srclen;
+> +void poly1305_core_blocks(struct poly1305_state *state,
+> +                         const struct poly1305_key *key,
+> +                         const void *src, unsigned int nblocks)
+> +{
+> +       poly1305_blocks_internal(state, key, src, nblocks, 1 << 24);
+> +}
+> +EXPORT_SYMBOL_GPL(poly1305_core_blocks);
+> +
+> +static void poly1305_blocks(struct poly1305_desc_ctx *dctx,
+> +                           const u8 *src, unsigned int srclen, u32 hibit=
+)
+> +{
+> +       unsigned int datalen;
+> +
+> +       if (unlikely(!dctx->sset)) {
+> +               datalen =3D crypto_poly1305_setdesckey(dctx, src, srclen)=
+;
+> +               src +=3D srclen - datalen;
+> +               srclen =3D datalen;
+> +       }
+> +
+> +       poly1305_blocks_internal(&dctx->h, &dctx->r,
+> +                                src, srclen / POLY1305_BLOCK_SIZE, hibit=
+);
 >  }
-> @@ -220,11 +220,11 @@ int crypto_poly1305_final(struct shash_desc *desc, =
-u8 *dst)
+>
+>  int crypto_poly1305_update(struct shash_desc *desc,
+> @@ -187,9 +199,9 @@ int crypto_poly1305_update(struct shash_desc *desc,
 >         }
+>
+>         if (likely(srclen >=3D POLY1305_BLOCK_SIZE)) {
+> -               bytes =3D poly1305_blocks(dctx, src, srclen, 1 << 24);
+> -               src +=3D srclen - bytes;
+> -               srclen =3D bytes;
+> +               poly1305_blocks(dctx, src, srclen, 1 << 24);
+> +               src +=3D srclen - (srclen % POLY1305_BLOCK_SIZE);
+> +               srclen %=3D POLY1305_BLOCK_SIZE;
+>         }
+>
+>         if (unlikely(srclen)) {
+> @@ -201,30 +213,18 @@ int crypto_poly1305_update(struct shash_desc *desc,
+>  }
+>  EXPORT_SYMBOL_GPL(crypto_poly1305_update);
+>
+> -int crypto_poly1305_final(struct shash_desc *desc, u8 *dst)
+> +void poly1305_core_emit(const struct poly1305_state *state, void *dst)
+>  {
+> -       struct poly1305_desc_ctx *dctx =3D shash_desc_ctx(desc);
+>         u32 h0, h1, h2, h3, h4;
+>         u32 g0, g1, g2, g3, g4;
+>         u32 mask;
+> -       u64 f =3D 0;
+> -
+> -       if (unlikely(!dctx->sset))
+> -               return -ENOKEY;
+> -
+> -       if (unlikely(dctx->buflen)) {
+> -               dctx->buf[dctx->buflen++] =3D 1;
+> -               memset(dctx->buf + dctx->buflen, 0,
+> -                      POLY1305_BLOCK_SIZE - dctx->buflen);
+> -               poly1305_blocks(dctx, dctx->buf, POLY1305_BLOCK_SIZE, 0);
+> -       }
 >
 >         /* fully carry h */
-> -       h0 =3D dctx->h[0];
-> -       h1 =3D dctx->h[1];
-> -       h2 =3D dctx->h[2];
-> -       h3 =3D dctx->h[3];
-> -       h4 =3D dctx->h[4];
-> +       h0 =3D dctx->h.h[0];
-> +       h1 =3D dctx->h.h[1];
-> +       h2 =3D dctx->h.h[2];
-> +       h3 =3D dctx->h.h[3];
-> +       h4 =3D dctx->h.h[4];
+> -       h0 =3D dctx->h.h[0];
+> -       h1 =3D dctx->h.h[1];
+> -       h2 =3D dctx->h.h[2];
+> -       h3 =3D dctx->h.h[3];
+> -       h4 =3D dctx->h.h[4];
+> +       h0 =3D state->h[0];
+> +       h1 =3D state->h[1];
+> +       h2 =3D state->h[2];
+> +       h3 =3D state->h[3];
+> +       h4 =3D state->h[4];
 >
 >         h2 +=3D (h1 >> 26);     h1 =3D h1 & 0x3ffffff;
 >         h3 +=3D (h2 >> 26);     h2 =3D h2 & 0x3ffffff;
+> @@ -254,16 +254,40 @@ int crypto_poly1305_final(struct shash_desc *desc, =
+u8 *dst)
+>         h4 =3D (h4 & mask) | g4;
+>
+>         /* h =3D h % (2^128) */
+> -       h0 =3D (h0 >>  0) | (h1 << 26);
+> -       h1 =3D (h1 >>  6) | (h2 << 20);
+> -       h2 =3D (h2 >> 12) | (h3 << 14);
+> -       h3 =3D (h3 >> 18) | (h4 <<  8);
+> +       put_unaligned_le32((h0 >>  0) | (h1 << 26), dst +  0);
+> +       put_unaligned_le32((h1 >>  6) | (h2 << 20), dst +  4);
+> +       put_unaligned_le32((h2 >> 12) | (h3 << 14), dst +  8);
+> +       put_unaligned_le32((h3 >> 18) | (h4 <<  8), dst + 12);
+> +}
+> +EXPORT_SYMBOL_GPL(poly1305_core_emit);
+> +
+> +int crypto_poly1305_final(struct shash_desc *desc, u8 *dst)
+> +{
+> +       struct poly1305_desc_ctx *dctx =3D shash_desc_ctx(desc);
+> +       __le32 digest[4];
+> +       u64 f =3D 0;
+> +
+> +       if (unlikely(!dctx->sset))
+> +               return -ENOKEY;
+> +
+> +       if (unlikely(dctx->buflen)) {
+> +               dctx->buf[dctx->buflen++] =3D 1;
+> +               memset(dctx->buf + dctx->buflen, 0,
+> +                      POLY1305_BLOCK_SIZE - dctx->buflen);
+> +               poly1305_blocks(dctx, dctx->buf, POLY1305_BLOCK_SIZE, 0);
+> +       }
+> +
+> +       poly1305_core_emit(&dctx->h, digest);
+>
+>         /* mac =3D (h + s) % (2^128) */
+> -       f =3D (f >> 32) + h0 + dctx->s[0]; put_unaligned_le32(f, dst +  0=
+);
+> -       f =3D (f >> 32) + h1 + dctx->s[1]; put_unaligned_le32(f, dst +  4=
+);
+> -       f =3D (f >> 32) + h2 + dctx->s[2]; put_unaligned_le32(f, dst +  8=
+);
+> -       f =3D (f >> 32) + h3 + dctx->s[3]; put_unaligned_le32(f, dst + 12=
+);
+> +       f =3D (f >> 32) + le32_to_cpu(digest[0]) + dctx->s[0];
+> +       put_unaligned_le32(f, dst + 0);
+> +       f =3D (f >> 32) + le32_to_cpu(digest[1]) + dctx->s[1];
+> +       put_unaligned_le32(f, dst + 4);
+> +       f =3D (f >> 32) + le32_to_cpu(digest[2]) + dctx->s[2];
+> +       put_unaligned_le32(f, dst + 8);
+> +       f =3D (f >> 32) + le32_to_cpu(digest[3]) + dctx->s[3];
+> +       put_unaligned_le32(f, dst + 12);
+>
+>         return 0;
+>  }
 > diff --git a/include/crypto/poly1305.h b/include/crypto/poly1305.h
-> index f718a19da82f..493244c46664 100644
+> index 493244c46664..34317ed2071e 100644
 > --- a/include/crypto/poly1305.h
 > +++ b/include/crypto/poly1305.h
-> @@ -13,13 +13,21 @@
->  #define POLY1305_KEY_SIZE      32
->  #define POLY1305_DIGEST_SIZE   16
+> @@ -38,6 +38,22 @@ struct poly1305_desc_ctx {
+>         bool sset;
+>  };
 >
-> +struct poly1305_key {
-> +       u32 r[5];       /* key, base 2^26 */
-> +};
+> +/*
+> + * Poly1305 core functions.  These implement the =CE=B5-almost-=E2=88=86=
+-universal hash
+> + * function underlying the Poly1305 MAC, i.e. they don't add an encrypte=
+d nonce
+> + * ("s key") at the end.  They also only support block-aligned inputs.
+> + */
+> +void poly1305_core_setkey(struct poly1305_key *key, const u8 *raw_key);
+> +static inline void poly1305_core_init(struct poly1305_state *state)
+> +{
+> +       memset(state->h, 0, sizeof(state->h));
+> +}
+> +void poly1305_core_blocks(struct poly1305_state *state,
+> +                         const struct poly1305_key *key,
+> +                         const void *src, unsigned int nblocks);
+> +void poly1305_core_emit(const struct poly1305_state *state, void *dst);
 > +
-> +struct poly1305_state {
-> +       u32 h[5];       /* accumulator, base 2^26 */
-> +};
-> +
->  struct poly1305_desc_ctx {
->         /* key */
-> -       u32 r[5];
-> +       struct poly1305_key r;
->         /* finalize key */
->         u32 s[4];
->         /* accumulator */
-> -       u32 h[5];
-> +       struct poly1305_state h;
->         /* partial buffer */
->         u8 buf[POLY1305_BLOCK_SIZE];
->         /* bytes used in partial buffer */
+> +/* Crypto API helper functions for the Poly1305 MAC */
+>  int crypto_poly1305_init(struct shash_desc *desc);
+>  unsigned int crypto_poly1305_setdesckey(struct poly1305_desc_ctx *dctx,
+>                                         const u8 *src, unsigned int srcle=
+n);
 > --
 > 2.19.1.1215.g8438c0b245-goog
 >
