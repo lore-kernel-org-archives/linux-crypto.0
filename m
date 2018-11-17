@@ -1,185 +1,347 @@
-Return-Path: <SRS0=vxh5=N7=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:39615 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730148AbeKTN4k (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 20 Nov 2018 08:56:40 -0500
-Received: by mail-pg1-f193.google.com with SMTP id w6so255647pgl.6
-        for <linux-crypto@vger.kernel.org>; Mon, 19 Nov 2018 19:29:42 -0800 (PST)
-Date: Mon, 19 Nov 2018 20:29:39 -0700
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Kenneth Lee <liguozhu@hisilicon.com>
-Cc: Leon Romanovsky <leon@kernel.org>,
-        Kenneth Lee <nek.in.cn@gmail.com>,
-        Tim Sell <timothy.sell@unisys.com>, linux-doc@vger.kernel.org,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Zaibo Xu <xuzaibo@huawei.com>, zhangfei.gao@foxmail.com,
-        linuxarm@huawei.com, haojian.zhuang@linaro.org,
-        Christoph Lameter <cl@linux.com>,
-        Hao Fang <fanghao11@huawei.com>,
-        Gavin Schenk <g.schenk@eckelmann.de>,
-        RDMA mailing list <linux-rdma@vger.kernel.org>,
-        Zhou Wang <wangzhou1@hisilicon.com>,
-        Doug Ledford <dledford@redhat.com>,
-        Uwe =?utf-8?Q?Kleine-K=C3=B6nig?=
-        <u.kleine-koenig@pengutronix.de>,
-        David Kershner <david.kershner@unisys.com>,
-        Johan Hovold <johan@kernel.org>,
-        Cyrille Pitchen <cyrille.pitchen@free-electrons.com>,
-        Sagar Dharia <sdharia@codeaurora.org>,
-        Jens Axboe <axboe@kernel.dk>, guodong.xu@linaro.org,
-        linux-netdev <netdev@vger.kernel.org>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        linux-kernel@vger.kernel.org, Vinod Koul <vkoul@kernel.org>,
-        linux-crypto@vger.kernel.org,
-        Philippe Ombredanne <pombredanne@nexb.com>,
-        Sanyog Kale <sanyog.r.kale@intel.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-accelerators@lists.ozlabs.org
-Subject: Re: [RFCv3 PATCH 1/6] uacce: Add documents for WarpDrive/uacce
-Message-ID: <20181120032939.GR4890@ziepe.ca>
-References: <20181112075807.9291-1-nek.in.cn@gmail.com>
- <20181112075807.9291-2-nek.in.cn@gmail.com>
- <20181113002354.GO3695@mtr-leonro.mtl.com>
- <95310df4-b32c-42f0-c750-3ad5eb89b3dd@gmail.com>
- <20181114160017.GI3759@mtr-leonro.mtl.com>
- <20181115085109.GD157308@Turing-Arch-b>
- <20181115145455.GN3759@mtr-leonro.mtl.com>
- <20181119091405.GE157308@Turing-Arch-b>
- <20181119184954.GB4890@ziepe.ca>
- <20181120030702.GH157308@Turing-Arch-b>
+Return-Path: <SRS0=r3Tc=N4=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:51814 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730378AbeKQLnj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 17 Nov 2018 06:43:39 -0500
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Cc: linux-fscrypt@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        Paul Crowley <paulcrowley@google.com>,
+        Greg Kaiser <gkaiser@google.com>,
+        "Jason A . Donenfeld" <Jason@zx2c4.com>,
+        Samuel Neves <samuel.c.p.neves@gmail.com>,
+        Tomer Ashur <tomer.ashur@esat.kuleuven.be>,
+        Eric Biggers <ebiggers@google.com>,
+        Martin Willi <martin@strongswan.org>
+Subject: [PATCH v4 11/14] crypto: poly1305 - add Poly1305 core API
+Date: Fri, 16 Nov 2018 17:26:28 -0800
+Message-Id: <20181117012631.23528-12-ebiggers@kernel.org>
+In-Reply-To: <20181117012631.23528-1-ebiggers@kernel.org>
+References: <20181117012631.23528-1-ebiggers@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20181120030702.GH157308@Turing-Arch-b>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Nov 20, 2018 at 11:07:02AM +0800, Kenneth Lee wrote:
-> On Mon, Nov 19, 2018 at 11:49:54AM -0700, Jason Gunthorpe wrote:
-> > Date: Mon, 19 Nov 2018 11:49:54 -0700
-> > From: Jason Gunthorpe <jgg@ziepe.ca>
-> > To: Kenneth Lee <liguozhu@hisilicon.com>
-> > CC: Leon Romanovsky <leon@kernel.org>, Kenneth Lee <nek.in.cn@gmail.com>,
-> >  Tim Sell <timothy.sell@unisys.com>, linux-doc@vger.kernel.org, Alexander
-> >  Shishkin <alexander.shishkin@linux.intel.com>, Zaibo Xu
-> >  <xuzaibo@huawei.com>, zhangfei.gao@foxmail.com, linuxarm@huawei.com,
-> >  haojian.zhuang@linaro.org, Christoph Lameter <cl@linux.com>, Hao Fang
-> >  <fanghao11@huawei.com>, Gavin Schenk <g.schenk@eckelmann.de>, RDMA mailing
-> >  list <linux-rdma@vger.kernel.org>, Zhou Wang <wangzhou1@hisilicon.com>,
-> >  Doug Ledford <dledford@redhat.com>, Uwe Kleine-König
-> >  <u.kleine-koenig@pengutronix.de>, David Kershner
-> >  <david.kershner@unisys.com>, Johan Hovold <johan@kernel.org>, Cyrille
-> >  Pitchen <cyrille.pitchen@free-electrons.com>, Sagar Dharia
-> >  <sdharia@codeaurora.org>, Jens Axboe <axboe@kernel.dk>,
-> >  guodong.xu@linaro.org, linux-netdev <netdev@vger.kernel.org>, Randy Dunlap
-> >  <rdunlap@infradead.org>, linux-kernel@vger.kernel.org, Vinod Koul
-> >  <vkoul@kernel.org>, linux-crypto@vger.kernel.org, Philippe Ombredanne
-> >  <pombredanne@nexb.com>, Sanyog Kale <sanyog.r.kale@intel.com>, "David S.
-> >  Miller" <davem@davemloft.net>, linux-accelerators@lists.ozlabs.org
-> > Subject: Re: [RFCv3 PATCH 1/6] uacce: Add documents for WarpDrive/uacce
-> > User-Agent: Mutt/1.9.4 (2018-02-28)
-> > Message-ID: <20181119184954.GB4890@ziepe.ca>
-> > 
-> > On Mon, Nov 19, 2018 at 05:14:05PM +0800, Kenneth Lee wrote:
-> >  
-> > > If the hardware cannot share page table with the CPU, we then need to have
-> > > some way to change the device page table. This is what happen in ODP. It
-> > > invalidates the page table in device upon mmu_notifier call back. But this cannot
-> > > solve the COW problem: if the user process A share a page P with device, and A 
-> > > forks a new process B, and it continue to write to the page. By COW, the
-> > > process B will keep the page P, while A will get a new page P'. But you have
-> > > no way to let the device know it should use P' rather than P.
-> > 
-> > Is this true? I thought mmu_notifiers covered all these cases.
-> > 
-> > The mm_notifier for A should fire if B causes the physical address of
-> > A's pages to change via COW. 
-> > 
-> > And this causes the device page tables to re-synchronize.
-> 
-> I don't see such code. The current do_cow_fault() implemenation has nothing to
-> do with mm_notifer.
+From: Eric Biggers <ebiggers@google.com>
 
-Well, that sure sounds like it would be a bug in mmu_notifiers..
+Expose a low-level Poly1305 API which implements the
+ε-almost-∆-universal (εA∆U) hash function underlying the Poly1305 MAC
+and supports block-aligned inputs only.
 
-But considering Jean's SVA stuff seems based on mmu notifiers, I have
-a hard time believing that it has any different behavior from RDMA's
-ODP, and if it does have different behavior, then it is probably just
-a bug in the ODP implementation.
+This is needed for Adiantum hashing, which builds an εA∆U hash function
+from NH and a polynomial evaluation in GF(2^{130}-5); this polynomial
+evaluation is identical to the one the Poly1305 MAC does.  However, the
+crypto_shash Poly1305 API isn't very appropriate for this because its
+calling convention assumes it is used as a MAC, with a 32-byte "one-time
+key" provided for every digest.
 
-> > > In WarpDrive/uacce, we make this simple. If you support IOMMU and it support
-> > > SVM/SVA. Everything will be fine just like ODP implicit mode. And you don't need
-> > > to write any code for that. Because it has been done by IOMMU framework. If it
-> > 
-> > Looks like the IOMMU code uses mmu_notifier, so it is identical to
-> > IB's ODP. The only difference is that IB tends to have the IOMMU page
-> > table in the device, not in the CPU.
-> > 
-> > The only case I know if that is different is the new-fangled CAPI
-> > stuff where the IOMMU can directly use the CPU's page table and the
-> > IOMMU page table (in device or CPU) is eliminated.
->
-> Yes. We are not focusing on the current implementation. As mentioned in the
-> cover letter. We are expecting Jean Philips' SVA patch:
-> git://linux-arm.org/linux-jpb.
+But by design, in Adiantum hashing the performance of the polynomial
+evaluation isn't nearly as critical as NH.  So it suffices to just have
+some C helper functions.  Thus, this patch adds such functions.
 
-This SVA stuff does not look comparable to CAPI as it still requires
-maintaining seperate IOMMU page tables.
+Acked-by: Martin Willi <martin@strongswan.org>
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ crypto/poly1305_generic.c | 174 ++++++++++++++++++++++----------------
+ include/crypto/poly1305.h |  16 ++++
+ 2 files changed, 115 insertions(+), 75 deletions(-)
 
-Also, those patches from Jean have a lot of references to
-mmu_notifiers (ie look at iommu_mmu_notifier).
-
-Are you really sure it is actually any different at all?
-
-> > Anyhow, I don't think a single instance of hardware should justify an
-> > entire new subsystem. Subsystems are hard to make and without multiple
-> > hardware examples there is no way to expect that it would cover any
-> > future use cases.
-> 
-> Yes. That's our first expectation. We can keep it with our driver. But because
-> there is no user driver support for any accelerator in mainline kernel. Even the
-> well known QuickAssit has to be maintained out of tree. So we try to see if
-> people is interested in working together to solve the problem.
-
-Well, you should come with patches ack'ed by these other groups.
-
-> > If all your driver needs is to mmap some PCI bar space, route
-> > interrupts and do DMA mapping then mediated VFIO is probably a good
-> > choice. 
-> 
-> Yes. That is what is done in our RFCv1/v2. But we accepted Jerome's opinion and
-> try not to add complexity to the mm subsystem.
-
-Why would a mediated VFIO driver touch the mm subsystem? Sounds like
-you don't have a VFIO driver if it needs to do stuff like that...
-
-> > If it needs to do a bunch of other stuff, not related to PCI bar
-> > space, interrupts and DMA mapping (ie special code for compression,
-> > crypto, AI, whatever) then you should probably do what Jerome said and
-> > make a drivers/char/hisillicon_foo_bar.c that exposes just what your
-> > hardware does.
-> 
-> Yes. If no other accelerator driver writer is interested. That is the
-> expectation:)
-
-I don't think it matters what other drivers do. 
-
-If your driver does not need any other kernel code then VFIO is
-sensible. In this kind of world you will probably have a RDMA-like
-userspace driver that can bring this to a common user space API, even
-if one driver use VFIO and a different driver uses something else.
-
-> You create some connections (queues) to NIC, RSA, and AI engine. Then you got
-> data direct from the NIC and pass the pointer to RSA engine for decryption. The
-> CPU then finish some data taking or operation and then pass through to the AI
-> engine for CNN calculation....This will need a place to maintain the same
-> address space by some means.
-
-How is this any different from what we have today? 
-
-SVA is not something even remotely new, IB has been doing various
-versions of it for 20 years.
-
-Jason
+diff --git a/crypto/poly1305_generic.c b/crypto/poly1305_generic.c
+index a23173f351b7..2a06874204e8 100644
+--- a/crypto/poly1305_generic.c
++++ b/crypto/poly1305_generic.c
+@@ -38,7 +38,7 @@ int crypto_poly1305_init(struct shash_desc *desc)
+ {
+ 	struct poly1305_desc_ctx *dctx = shash_desc_ctx(desc);
+ 
+-	memset(dctx->h.h, 0, sizeof(dctx->h.h));
++	poly1305_core_init(&dctx->h);
+ 	dctx->buflen = 0;
+ 	dctx->rset = false;
+ 	dctx->sset = false;
+@@ -47,23 +47,16 @@ int crypto_poly1305_init(struct shash_desc *desc)
+ }
+ EXPORT_SYMBOL_GPL(crypto_poly1305_init);
+ 
+-static void poly1305_setrkey(struct poly1305_desc_ctx *dctx, const u8 *key)
++void poly1305_core_setkey(struct poly1305_key *key, const u8 *raw_key)
+ {
+ 	/* r &= 0xffffffc0ffffffc0ffffffc0fffffff */
+-	dctx->r.r[0] = (get_unaligned_le32(key +  0) >> 0) & 0x3ffffff;
+-	dctx->r.r[1] = (get_unaligned_le32(key +  3) >> 2) & 0x3ffff03;
+-	dctx->r.r[2] = (get_unaligned_le32(key +  6) >> 4) & 0x3ffc0ff;
+-	dctx->r.r[3] = (get_unaligned_le32(key +  9) >> 6) & 0x3f03fff;
+-	dctx->r.r[4] = (get_unaligned_le32(key + 12) >> 8) & 0x00fffff;
+-}
+-
+-static void poly1305_setskey(struct poly1305_desc_ctx *dctx, const u8 *key)
+-{
+-	dctx->s[0] = get_unaligned_le32(key +  0);
+-	dctx->s[1] = get_unaligned_le32(key +  4);
+-	dctx->s[2] = get_unaligned_le32(key +  8);
+-	dctx->s[3] = get_unaligned_le32(key + 12);
++	key->r[0] = (get_unaligned_le32(raw_key +  0) >> 0) & 0x3ffffff;
++	key->r[1] = (get_unaligned_le32(raw_key +  3) >> 2) & 0x3ffff03;
++	key->r[2] = (get_unaligned_le32(raw_key +  6) >> 4) & 0x3ffc0ff;
++	key->r[3] = (get_unaligned_le32(raw_key +  9) >> 6) & 0x3f03fff;
++	key->r[4] = (get_unaligned_le32(raw_key + 12) >> 8) & 0x00fffff;
+ }
++EXPORT_SYMBOL_GPL(poly1305_core_setkey);
+ 
+ /*
+  * Poly1305 requires a unique key for each tag, which implies that we can't set
+@@ -75,13 +68,16 @@ unsigned int crypto_poly1305_setdesckey(struct poly1305_desc_ctx *dctx,
+ {
+ 	if (!dctx->sset) {
+ 		if (!dctx->rset && srclen >= POLY1305_BLOCK_SIZE) {
+-			poly1305_setrkey(dctx, src);
++			poly1305_core_setkey(&dctx->r, src);
+ 			src += POLY1305_BLOCK_SIZE;
+ 			srclen -= POLY1305_BLOCK_SIZE;
+ 			dctx->rset = true;
+ 		}
+ 		if (srclen >= POLY1305_BLOCK_SIZE) {
+-			poly1305_setskey(dctx, src);
++			dctx->s[0] = get_unaligned_le32(src +  0);
++			dctx->s[1] = get_unaligned_le32(src +  4);
++			dctx->s[2] = get_unaligned_le32(src +  8);
++			dctx->s[3] = get_unaligned_le32(src + 12);
+ 			src += POLY1305_BLOCK_SIZE;
+ 			srclen -= POLY1305_BLOCK_SIZE;
+ 			dctx->sset = true;
+@@ -91,41 +87,37 @@ unsigned int crypto_poly1305_setdesckey(struct poly1305_desc_ctx *dctx,
+ }
+ EXPORT_SYMBOL_GPL(crypto_poly1305_setdesckey);
+ 
+-static unsigned int poly1305_blocks(struct poly1305_desc_ctx *dctx,
+-				    const u8 *src, unsigned int srclen,
+-				    u32 hibit)
++static void poly1305_blocks_internal(struct poly1305_state *state,
++				     const struct poly1305_key *key,
++				     const void *src, unsigned int nblocks,
++				     u32 hibit)
+ {
+ 	u32 r0, r1, r2, r3, r4;
+ 	u32 s1, s2, s3, s4;
+ 	u32 h0, h1, h2, h3, h4;
+ 	u64 d0, d1, d2, d3, d4;
+-	unsigned int datalen;
+ 
+-	if (unlikely(!dctx->sset)) {
+-		datalen = crypto_poly1305_setdesckey(dctx, src, srclen);
+-		src += srclen - datalen;
+-		srclen = datalen;
+-	}
++	if (!nblocks)
++		return;
+ 
+-	r0 = dctx->r.r[0];
+-	r1 = dctx->r.r[1];
+-	r2 = dctx->r.r[2];
+-	r3 = dctx->r.r[3];
+-	r4 = dctx->r.r[4];
++	r0 = key->r[0];
++	r1 = key->r[1];
++	r2 = key->r[2];
++	r3 = key->r[3];
++	r4 = key->r[4];
+ 
+ 	s1 = r1 * 5;
+ 	s2 = r2 * 5;
+ 	s3 = r3 * 5;
+ 	s4 = r4 * 5;
+ 
+-	h0 = dctx->h.h[0];
+-	h1 = dctx->h.h[1];
+-	h2 = dctx->h.h[2];
+-	h3 = dctx->h.h[3];
+-	h4 = dctx->h.h[4];
+-
+-	while (likely(srclen >= POLY1305_BLOCK_SIZE)) {
++	h0 = state->h[0];
++	h1 = state->h[1];
++	h2 = state->h[2];
++	h3 = state->h[3];
++	h4 = state->h[4];
+ 
++	do {
+ 		/* h += m[i] */
+ 		h0 += (get_unaligned_le32(src +  0) >> 0) & 0x3ffffff;
+ 		h1 += (get_unaligned_le32(src +  3) >> 2) & 0x3ffffff;
+@@ -154,16 +146,36 @@ static unsigned int poly1305_blocks(struct poly1305_desc_ctx *dctx,
+ 		h1 += h0 >> 26;       h0 = h0 & 0x3ffffff;
+ 
+ 		src += POLY1305_BLOCK_SIZE;
+-		srclen -= POLY1305_BLOCK_SIZE;
+-	}
++	} while (--nblocks);
+ 
+-	dctx->h.h[0] = h0;
+-	dctx->h.h[1] = h1;
+-	dctx->h.h[2] = h2;
+-	dctx->h.h[3] = h3;
+-	dctx->h.h[4] = h4;
++	state->h[0] = h0;
++	state->h[1] = h1;
++	state->h[2] = h2;
++	state->h[3] = h3;
++	state->h[4] = h4;
++}
+ 
+-	return srclen;
++void poly1305_core_blocks(struct poly1305_state *state,
++			  const struct poly1305_key *key,
++			  const void *src, unsigned int nblocks)
++{
++	poly1305_blocks_internal(state, key, src, nblocks, 1 << 24);
++}
++EXPORT_SYMBOL_GPL(poly1305_core_blocks);
++
++static void poly1305_blocks(struct poly1305_desc_ctx *dctx,
++			    const u8 *src, unsigned int srclen, u32 hibit)
++{
++	unsigned int datalen;
++
++	if (unlikely(!dctx->sset)) {
++		datalen = crypto_poly1305_setdesckey(dctx, src, srclen);
++		src += srclen - datalen;
++		srclen = datalen;
++	}
++
++	poly1305_blocks_internal(&dctx->h, &dctx->r,
++				 src, srclen / POLY1305_BLOCK_SIZE, hibit);
+ }
+ 
+ int crypto_poly1305_update(struct shash_desc *desc,
+@@ -187,9 +199,9 @@ int crypto_poly1305_update(struct shash_desc *desc,
+ 	}
+ 
+ 	if (likely(srclen >= POLY1305_BLOCK_SIZE)) {
+-		bytes = poly1305_blocks(dctx, src, srclen, 1 << 24);
+-		src += srclen - bytes;
+-		srclen = bytes;
++		poly1305_blocks(dctx, src, srclen, 1 << 24);
++		src += srclen - (srclen % POLY1305_BLOCK_SIZE);
++		srclen %= POLY1305_BLOCK_SIZE;
+ 	}
+ 
+ 	if (unlikely(srclen)) {
+@@ -201,30 +213,18 @@ int crypto_poly1305_update(struct shash_desc *desc,
+ }
+ EXPORT_SYMBOL_GPL(crypto_poly1305_update);
+ 
+-int crypto_poly1305_final(struct shash_desc *desc, u8 *dst)
++void poly1305_core_emit(const struct poly1305_state *state, void *dst)
+ {
+-	struct poly1305_desc_ctx *dctx = shash_desc_ctx(desc);
+ 	u32 h0, h1, h2, h3, h4;
+ 	u32 g0, g1, g2, g3, g4;
+ 	u32 mask;
+-	u64 f = 0;
+-
+-	if (unlikely(!dctx->sset))
+-		return -ENOKEY;
+-
+-	if (unlikely(dctx->buflen)) {
+-		dctx->buf[dctx->buflen++] = 1;
+-		memset(dctx->buf + dctx->buflen, 0,
+-		       POLY1305_BLOCK_SIZE - dctx->buflen);
+-		poly1305_blocks(dctx, dctx->buf, POLY1305_BLOCK_SIZE, 0);
+-	}
+ 
+ 	/* fully carry h */
+-	h0 = dctx->h.h[0];
+-	h1 = dctx->h.h[1];
+-	h2 = dctx->h.h[2];
+-	h3 = dctx->h.h[3];
+-	h4 = dctx->h.h[4];
++	h0 = state->h[0];
++	h1 = state->h[1];
++	h2 = state->h[2];
++	h3 = state->h[3];
++	h4 = state->h[4];
+ 
+ 	h2 += (h1 >> 26);     h1 = h1 & 0x3ffffff;
+ 	h3 += (h2 >> 26);     h2 = h2 & 0x3ffffff;
+@@ -254,16 +254,40 @@ int crypto_poly1305_final(struct shash_desc *desc, u8 *dst)
+ 	h4 = (h4 & mask) | g4;
+ 
+ 	/* h = h % (2^128) */
+-	h0 = (h0 >>  0) | (h1 << 26);
+-	h1 = (h1 >>  6) | (h2 << 20);
+-	h2 = (h2 >> 12) | (h3 << 14);
+-	h3 = (h3 >> 18) | (h4 <<  8);
++	put_unaligned_le32((h0 >>  0) | (h1 << 26), dst +  0);
++	put_unaligned_le32((h1 >>  6) | (h2 << 20), dst +  4);
++	put_unaligned_le32((h2 >> 12) | (h3 << 14), dst +  8);
++	put_unaligned_le32((h3 >> 18) | (h4 <<  8), dst + 12);
++}
++EXPORT_SYMBOL_GPL(poly1305_core_emit);
++
++int crypto_poly1305_final(struct shash_desc *desc, u8 *dst)
++{
++	struct poly1305_desc_ctx *dctx = shash_desc_ctx(desc);
++	__le32 digest[4];
++	u64 f = 0;
++
++	if (unlikely(!dctx->sset))
++		return -ENOKEY;
++
++	if (unlikely(dctx->buflen)) {
++		dctx->buf[dctx->buflen++] = 1;
++		memset(dctx->buf + dctx->buflen, 0,
++		       POLY1305_BLOCK_SIZE - dctx->buflen);
++		poly1305_blocks(dctx, dctx->buf, POLY1305_BLOCK_SIZE, 0);
++	}
++
++	poly1305_core_emit(&dctx->h, digest);
+ 
+ 	/* mac = (h + s) % (2^128) */
+-	f = (f >> 32) + h0 + dctx->s[0]; put_unaligned_le32(f, dst +  0);
+-	f = (f >> 32) + h1 + dctx->s[1]; put_unaligned_le32(f, dst +  4);
+-	f = (f >> 32) + h2 + dctx->s[2]; put_unaligned_le32(f, dst +  8);
+-	f = (f >> 32) + h3 + dctx->s[3]; put_unaligned_le32(f, dst + 12);
++	f = (f >> 32) + le32_to_cpu(digest[0]) + dctx->s[0];
++	put_unaligned_le32(f, dst + 0);
++	f = (f >> 32) + le32_to_cpu(digest[1]) + dctx->s[1];
++	put_unaligned_le32(f, dst + 4);
++	f = (f >> 32) + le32_to_cpu(digest[2]) + dctx->s[2];
++	put_unaligned_le32(f, dst + 8);
++	f = (f >> 32) + le32_to_cpu(digest[3]) + dctx->s[3];
++	put_unaligned_le32(f, dst + 12);
+ 
+ 	return 0;
+ }
+diff --git a/include/crypto/poly1305.h b/include/crypto/poly1305.h
+index 493244c46664..34317ed2071e 100644
+--- a/include/crypto/poly1305.h
++++ b/include/crypto/poly1305.h
+@@ -38,6 +38,22 @@ struct poly1305_desc_ctx {
+ 	bool sset;
+ };
+ 
++/*
++ * Poly1305 core functions.  These implement the ε-almost-∆-universal hash
++ * function underlying the Poly1305 MAC, i.e. they don't add an encrypted nonce
++ * ("s key") at the end.  They also only support block-aligned inputs.
++ */
++void poly1305_core_setkey(struct poly1305_key *key, const u8 *raw_key);
++static inline void poly1305_core_init(struct poly1305_state *state)
++{
++	memset(state->h, 0, sizeof(state->h));
++}
++void poly1305_core_blocks(struct poly1305_state *state,
++			  const struct poly1305_key *key,
++			  const void *src, unsigned int nblocks);
++void poly1305_core_emit(const struct poly1305_state *state, void *dst);
++
++/* Crypto API helper functions for the Poly1305 MAC */
+ int crypto_poly1305_init(struct shash_desc *desc);
+ unsigned int crypto_poly1305_setdesckey(struct poly1305_desc_ctx *dctx,
+ 					const u8 *src, unsigned int srclen);
+-- 
+2.19.1.1215.g8438c0b245-goog
