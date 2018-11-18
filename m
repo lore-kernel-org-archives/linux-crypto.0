@@ -1,76 +1,58 @@
-Return-Path: <SRS0=WCFZ=OI=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:37056 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729463AbeK3BsK (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 29 Nov 2018 20:48:10 -0500
-Received: by mail-wm1-f68.google.com with SMTP id g67so2487387wmd.2
-        for <linux-crypto@vger.kernel.org>; Thu, 29 Nov 2018 06:42:34 -0800 (PST)
-From: Corentin Labbe <clabbe@baylibre.com>
-To: davem@davemloft.net, ebiggers@kernel.org,
-        herbert@gondor.apana.org.au, nhorman@tuxdriver.com
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Corentin Labbe <clabbe@baylibre.com>
-Subject: [PATCH v5 00/11] crypto: crypto_user_stat: misc enhancement
-Date: Thu, 29 Nov 2018 14:42:15 +0000
-Message-Id: <1543502546-23870-1-git-send-email-clabbe@baylibre.com>
+Return-Path: <SRS0=dtph=N5=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from frisell.zx2c4.com ([192.95.5.64]:44301 "EHLO frisell.zx2c4.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726269AbeKSAHG (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 18 Nov 2018 19:07:06 -0500
+MIME-Version: 1.0
+References: <20181105232526.173947-1-ebiggers@kernel.org> <20181105232526.173947-11-ebiggers@kernel.org>
+ <CAKv+Gu-o0khD5=0EOkv2PiczMs5uZ=XP9V=G2ogBNMK8Kb93sw@mail.gmail.com>
+ <20181112185816.GA8663@gmail.com> <20181116060227.hwu4igi6bp26ddpi@gondor.apana.org.au>
+ <20181117001718.GA175522@gmail.com>
+In-Reply-To: <20181117001718.GA175522@gmail.com>
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date: Sun, 18 Nov 2018 14:46:30 +0100
+Message-ID: <CAHmME9rtsCk8ZLt05xRKMGr4CVRnaUvCaVOS_WX3N22HOat4-A@mail.gmail.com>
+Subject: Re: [RFC PATCH v3 10/15] crypto: poly1305 - use structures for key
+ and accumulator
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        linux-fscrypt@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        LKML <linux-kernel@vger.kernel.org>,
+        Paul Crowley <paulcrowley@google.com>,
+        Greg Kaiser <gkaiser@google.com>,
+        Samuel Neves <samuel.c.p.neves@gmail.com>,
+        Tomer Ashur <tomer.ashur@esat.kuleuven.be>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hello
+Hi Eric,
 
-This patchset fixes all reported problem by Eric biggers.
+On Sat, Nov 17, 2018 at 1:17 AM Eric Biggers <ebiggers@kernel.org> wrote:
+> Do you prefer that this be merged before or after Zinc?  It seems it may still
+> be a while before the community is satisfied with Zinc (and Wireguard which is
+> in the same patchset), and I don't want this blocked unnecessarily...  So on my
+> part I'd prefer to just have this merged as-is.
 
-Regards
+Personally I'd prefer this be merged after Zinc, since there's work to
+be done on adjusting the 20->12 in chacha20. That's not really much of
+a reason though. But maybe we can just sidestep the ordering concern
+all together:
 
-Changes since v4:
-- Inlined functions when !CRYPTO_STATS
+What I suspect we should do is make the initial Zinc merge _without_
+those top two patches that replace the crypto api's implementations
+with Zinc, and defer those until after the initial merges. Those
+commits are already written -- so there's no chance it won't happen
+due to laziness or something -- and I think the general merge will go
+a bit more smoothly if we wait until after. (Somebody suggested we do
+it this way at Plumbers, and was actually a bit surprised I had
+already ported the crypto API stuff to Zinc.) This way, Adiantum and
+Zinc aren't potentially co-dependent in their initial merges and we
+can work on the details carefully with each other after both have
+landed. I figure this might make things a little bit less stressful
+for both of us. How would you feel about doing it that?
 
-Changes since v3:
-- Added a crypto_stats_init as asked vy Neil Horman
-- Fixed some checkpatch complaints
-
-Changes since v2:
-- moved all crypto_stats functions from header to algapi.c for using
-  crypto_alg_get/put
-
-Changes since v1:
-- Better locking of crypto_alg via crypto_alg_get/crypto_alg_put
-- remove all intermediate variables in crypto/crypto_user_stat.c
-- splited all internal stats variables into different structures
-
-Corentin Labbe (11):
-  crypto: crypto_user_stat: made crypto_user_stat optional
-  crypto: CRYPTO_STATS should depend on CRYPTO_USER
-  crypto: crypto_user_stat: convert all stats from u32 to u64
-  crypto: crypto_user_stat: split user space crypto stat structures
-  crypto: tool: getstat: convert user space example to the new
-    crypto_user_stat uapi
-  crypto: crypto_user_stat: fix use_after_free of struct xxx_request
-  crypto: crypto_user_stat: Fix invalid stat reporting
-  crypto: crypto_user_stat: remove intermediate variable
-  crypto: crypto_user_stat: Split stats in multiple structures
-  crypto: crypto_user_stat: rename err_cnt parameter
-  crypto: crypto_user_stat: Add crypto_stats_init
-
- crypto/Kconfig                       |   1 +
- crypto/Makefile                      |   3 +-
- crypto/ahash.c                       |  17 +-
- crypto/algapi.c                      | 247 ++++++++++++++++++++++-
- crypto/crypto_user_stat.c            | 160 +++++----------
- crypto/rng.c                         |   4 +-
- include/crypto/acompress.h           |  38 +---
- include/crypto/aead.h                |  38 +---
- include/crypto/akcipher.h            |  74 ++-----
- include/crypto/hash.h                |  32 +--
- include/crypto/internal/cryptouser.h |  17 ++
- include/crypto/kpp.h                 |  48 +----
- include/crypto/rng.h                 |  27 +--
- include/crypto/skcipher.h            |  36 +---
- include/linux/crypto.h               | 290 ++++++++++++++++++---------
- include/uapi/linux/cryptouser.h      | 102 ++++++----
- tools/crypto/getstat.c               |  72 +++----
- 17 files changed, 676 insertions(+), 530 deletions(-)
-
--- 
-2.18.1
+Jason
