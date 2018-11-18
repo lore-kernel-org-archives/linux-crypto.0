@@ -1,82 +1,94 @@
-Return-Path: <SRS0=8KRZ=NP=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from vmicros1.altlinux.org ([194.107.17.57]:44590 "EHLO
-        vmicros1.altlinux.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728897AbeKDWtg (ORCPT
+Return-Path: <SRS0=dtph=N5=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail-it1-f198.google.com ([209.85.166.198]:37908 "EHLO
+        mail-it1-f198.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725904AbeKSFoK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 4 Nov 2018 17:49:36 -0500
-From: Vitaly Chikunov <vt@altlinux.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Vitaly Chikunov <vt@altlinux.org>
-Subject: [PATCH] crypto: ecc - regularize scalar for scalar multiplication
-Date: Sun,  4 Nov 2018 16:34:20 +0300
-Message-Id: <20181104133420.15783-1-vt@altlinux.org>
+        Mon, 19 Nov 2018 00:44:10 -0500
+Received: by mail-it1-f198.google.com with SMTP id j190-v6so5706457itj.3
+        for <linux-crypto@vger.kernel.org>; Sun, 18 Nov 2018 11:23:03 -0800 (PST)
+MIME-Version: 1.0
+Date: Sun, 18 Nov 2018 11:23:03 -0800
+Message-ID: <0000000000004ae11b057af5543f@google.com>
+Subject: BUG: unable to handle kernel paging request in aead_geniv_alloc
+From: syzbot <syzbot+cd50d1708db841432d8a@syzkaller.appspotmail.com>
+To: davem@davemloft.net, herbert@gondor.apana.org.au,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-ecc_point_mult is supposed to be used with a regularized scalar,
-otherwise, it's possible to deduce the position of the top bit of the
-scalar with timing attack.
+Hello,
 
-ecc_point_mult is already using a regular algorithm (i.e. having an
-operation flow independent of the input scalar) but regularization step
-is forgotten.
+syzbot found the following crash on:
 
-Regularization step is based on micro-ecc by Kenneth MacKay.
+HEAD commit:    9c549a6b0573 selftests: add explicit test for multiple con..
+git tree:       net-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=13a46f7b400000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=d86f24333880b605
+dashboard link: https://syzkaller.appspot.com/bug?extid=cd50d1708db841432d8a
+compiler:       gcc (GCC) 8.0.1 20180413 (experimental)
 
-Signed-off-by: Vitaly Chikunov <vt@altlinux.org>
+Unfortunately, I don't have any reproducer for this crash yet.
+
+IMPORTANT: if you fix the bug, please add the following tag to the commit:
+Reported-by: syzbot+cd50d1708db841432d8a@syzkaller.appspotmail.com
+
+BUG: unable to handle kernel paging request at fffffffffffffff0
+PGD 946d067 P4D 946d067 PUD 946f067 PMD 0
+Oops: 0000 [#1] PREEMPT SMP KASAN
+CPU: 1 PID: 9032 Comm: cryptomgr_probe Not tainted 4.20.0-rc2+ #300
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS  
+Google 01/01/2011
+kobject: 'loop1' (00000000f780ed70): kobject_uevent_env
+RIP: 0010:aead_geniv_alloc+0x2de/0x780 crypto/aead.c:240
+Code: 00 00 fc ff df 49 8d 7c 24 f0 48 89 fa 48 c1 ea 03 0f b6 14 02 48 89  
+f8 83 e0 07 83 c0 03 38 d0 7c 08 84 d2 0f 85 ea 03 00 00 <45> 8b 74 24 f0  
+bf 07 00 00 00 48 c7 c3 ea ff ff ff 44 89 f6 e8 59
+RSP: 0018:ffff8881946b7e40 EFLAGS: 00010246
+kobject: 'loop1' (00000000f780ed70): fill_kobj_path: path  
+= '/devices/virtual/block/loop1'
+RAX: 0000000000000003 RBX: 0000000000000000 RCX: ffffffff835c1711
+RDX: 0000000000000000 RSI: ffffffff835c171e RDI: fffffffffffffff0
+RBP: ffff8881946b7e80 R08: ffff8881975da540 R09: ffffed10328d6fa3
+R10: ffffed10328d6fa3 R11: 0000000000000003 R12: 0000000000000000
+R13: ffff8881d3ee66b0 R14: 0000000000000000 R15: 0000000000000000
+FS:  0000000000000000(0000) GS:ffff8881daf00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: fffffffffffffff0 CR3: 000000019a8d0000 CR4: 00000000001406e0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+  seqiv_aead_create crypto/seqiv.c:149 [inline]
+  seqiv_create+0x99/0x290 crypto/seqiv.c:190
+  cryptomgr_probe+0x6d/0x280 crypto/algboss.c:75
+  kthread+0x35a/0x440 kernel/kthread.c:246
+  ret_from_fork+0x3a/0x50 arch/x86/entry/entry_64.S:352
+Modules linked in:
+CR2: fffffffffffffff0
+---[ end trace e6ac52e6f5849122 ]---
+RIP: 0010:aead_geniv_alloc+0x2de/0x780 crypto/aead.c:240
+Code: 00 00 fc ff df 49 8d 7c 24 f0 48 89 fa 48 c1 ea 03 0f b6 14 02 48 89  
+f8 83 e0 07 83 c0 03 38 d0 7c 08 84 d2 0f 85 ea 03 00 00 <45> 8b 74 24 f0  
+bf 07 00 00 00 48 c7 c3 ea ff ff ff 44 89 f6 e8 59
+RSP: 0018:ffff8881946b7e40 EFLAGS: 00010246
+RAX: 0000000000000003 RBX: 0000000000000000 RCX: ffffffff835c1711
+RDX: 0000000000000000 RSI: ffffffff835c171e RDI: fffffffffffffff0
+RBP: ffff8881946b7e80 R08: ffff8881975da540 R09: ffffed10328d6fa3
+R10: ffffed10328d6fa3 R11: 0000000000000003 R12: 0000000000000000
+R13: ffff8881d3ee66b0 R14: 0000000000000000 R15: 0000000000000000
+FS:  0000000000000000(0000) GS:ffff8881daf00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: fffffffffffffff0 CR3: 000000019a8d0000 CR4: 00000000001406e0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+
+
 ---
- crypto/ecc.c | 16 ++++++++++++----
- 1 file changed, 12 insertions(+), 4 deletions(-)
+This bug is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/crypto/ecc.c b/crypto/ecc.c
-index 8facafd67802..adcce310f646 100644
---- a/crypto/ecc.c
-+++ b/crypto/ecc.c
-@@ -842,15 +842,23 @@ static void xycz_add_c(u64 *x1, u64 *y1, u64 *x2, u64 *y2, u64 *curve_prime,
- 
- static void ecc_point_mult(struct ecc_point *result,
- 			   const struct ecc_point *point, const u64 *scalar,
--			   u64 *initial_z, u64 *curve_prime,
-+			   u64 *initial_z, const struct ecc_curve *curve,
- 			   unsigned int ndigits)
- {
- 	/* R0 and R1 */
- 	u64 rx[2][ECC_MAX_DIGITS];
- 	u64 ry[2][ECC_MAX_DIGITS];
- 	u64 z[ECC_MAX_DIGITS];
-+	u64 sk[2][ECC_MAX_DIGITS];
-+	u64 *curve_prime = curve->p;
- 	int i, nb;
--	int num_bits = vli_num_bits(scalar, ndigits);
-+	int num_bits;
-+	int carry;
-+
-+	carry = vli_add(sk[0], scalar, curve->n, ndigits);
-+	vli_add(sk[1], sk[0], curve->n, ndigits);
-+	scalar = sk[!carry];
-+	num_bits = sizeof(u64) * ndigits * 8 + 1;
- 
- 	vli_set(rx[1], point->x, ndigits);
- 	vli_set(ry[1], point->y, ndigits);
-@@ -1004,7 +1012,7 @@ int ecc_make_pub_key(unsigned int curve_id, unsigned int ndigits,
- 		goto out;
- 	}
- 
--	ecc_point_mult(pk, &curve->g, priv, NULL, curve->p, ndigits);
-+	ecc_point_mult(pk, &curve->g, priv, NULL, curve, ndigits);
- 	if (ecc_point_is_zero(pk)) {
- 		ret = -EAGAIN;
- 		goto err_free_point;
-@@ -1090,7 +1098,7 @@ int crypto_ecdh_shared_secret(unsigned int curve_id, unsigned int ndigits,
- 		goto err_alloc_product;
- 	}
- 
--	ecc_point_mult(product, pk, priv, rand_z, curve->p, ndigits);
-+	ecc_point_mult(product, pk, priv, rand_z, curve, ndigits);
- 
- 	ecc_swap_digits(product->x, secret, ndigits);
- 
--- 
-2.11.0
+syzbot will keep track of this bug report. See:
+https://goo.gl/tpsmEJ#bug-status-tracking for how to communicate with  
+syzbot.
