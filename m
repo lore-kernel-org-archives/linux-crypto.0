@@ -1,240 +1,121 @@
-Return-Path: <SRS0=IFNk=NQ=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:36055 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729105AbeKEWLF (ORCPT
+Return-Path: <SRS0=9Ofa=N6=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:36764 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731181AbeKTHwO (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 5 Nov 2018 17:11:05 -0500
-Received: by mail-wr1-f68.google.com with SMTP id z13-v6so7004689wrs.3
-        for <linux-crypto@vger.kernel.org>; Mon, 05 Nov 2018 04:51:28 -0800 (PST)
-From: Corentin Labbe <clabbe@baylibre.com>
-To: davem@davemloft.net, ebiggers@kernel.org,
-        herbert@gondor.apana.org.au
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Corentin Labbe <clabbe@baylibre.com>
-Subject: [PATCH 3/5] crypto: crypto_user_stat: split user space crypto stat structures
-Date: Mon,  5 Nov 2018 12:51:12 +0000
-Message-Id: <1541422274-40060-4-git-send-email-clabbe@baylibre.com>
-In-Reply-To: <1541422274-40060-1-git-send-email-clabbe@baylibre.com>
-References: <1541422274-40060-1-git-send-email-clabbe@baylibre.com>
+        Tue, 20 Nov 2018 02:52:14 -0500
+Received: by mail-pf1-f195.google.com with SMTP id b85so8629947pfc.3
+        for <linux-crypto@vger.kernel.org>; Mon, 19 Nov 2018 13:26:41 -0800 (PST)
+Date: Mon, 19 Nov 2018 14:26:38 -0700
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Jerome Glisse <jglisse@redhat.com>
+Cc: Tim Sell <timothy.sell@unisys.com>, linux-doc@vger.kernel.org,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Zaibo Xu <xuzaibo@huawei.com>, zhangfei.gao@foxmail.com,
+        linuxarm@huawei.com, haojian.zhuang@linaro.org,
+        Christoph Lameter <cl@linux.com>,
+        Hao Fang <fanghao11@huawei.com>,
+        Gavin Schenk <g.schenk@eckelmann.de>,
+        Leon Romanovsky <leon@kernel.org>,
+        RDMA mailing list <linux-rdma@vger.kernel.org>,
+        Vinod Koul <vkoul@kernel.org>,
+        Doug Ledford <dledford@redhat.com>,
+        Uwe =?utf-8?Q?Kleine-K=C3=B6nig?=
+        <u.kleine-koenig@pengutronix.de>,
+        David Kershner <david.kershner@unisys.com>,
+        Kenneth Lee <nek.in.cn@gmail.com>,
+        Johan Hovold <johan@kernel.org>,
+        Cyrille Pitchen <cyrille.pitchen@free-electrons.com>,
+        Sagar Dharia <sdharia@codeaurora.org>,
+        Jens Axboe <axboe@kernel.dk>, guodong.xu@linaro.org,
+        linux-netdev <netdev@vger.kernel.org>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        linux-kernel@vger.kernel.org, Zhou Wang <wangzhou1@hisilicon.com>,
+        linux-crypto@vger.kernel.org,
+        Philippe Ombredanne <pombredanne@nexb.com>,
+        Sanyog Kale <sanyog.r.kale@intel.com>,
+        Kenneth Lee <liguozhu@hisilicon.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-accelerators@lists.ozlabs.org
+Subject: Re: [RFCv3 PATCH 1/6] uacce: Add documents for WarpDrive/uacce
+Message-ID: <20181119212638.GI4890@ziepe.ca>
+References: <20181119104801.GF8268@mtr-leonro.mtl.com>
+ <20181119164853.GA4593@redhat.com>
+ <20181119182752.GA4890@ziepe.ca>
+ <20181119184215.GB4593@redhat.com>
+ <20181119185333.GC4890@ziepe.ca>
+ <20181119191721.GC4593@redhat.com>
+ <20181119192702.GD4890@ziepe.ca>
+ <20181119194631.GE4593@redhat.com>
+ <20181119201156.GG4890@ziepe.ca>
+ <20181119202614.GF4593@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181119202614.GF4593@redhat.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-It is cleaner to have each stat in their own structures.
+On Mon, Nov 19, 2018 at 03:26:15PM -0500, Jerome Glisse wrote:
+> On Mon, Nov 19, 2018 at 01:11:56PM -0700, Jason Gunthorpe wrote:
+> > On Mon, Nov 19, 2018 at 02:46:32PM -0500, Jerome Glisse wrote:
+> > 
+> > > > ?? How can O_DIRECT be fine but RDMA not? They use exactly the same
+> > > > get_user_pages flow, right? Can we do what O_DIRECT does in RDMA and
+> > > > be fine too?
+> > > > 
+> > > > AFAIK the only difference is the length of the race window. You'd have
+> > > > to fork and fault during the shorter time O_DIRECT has get_user_pages
+> > > > open.
+> > > 
+> > > Well in O_DIRECT case there is only one page table, the CPU
+> > > page table and it gets updated during fork() so there is an
+> > > ordering there and the race window is small.
+> > 
+> > Not really, in O_DIRECT case there is another 'page table', we just
+> > call it a DMA scatter/gather list and it is sent directly to the block
+> > device's DMA HW. The sgl plays exactly the same role as the various HW
+> > page list data structures that underly RDMA MRs.
+> > 
+> > It is not a page table that matters here, it is if the DMA address of
+> > the page is active for DMA on HW.
+> > 
+> > Like you say, the only difference is that the race is hopefully small
+> > with O_DIRECT (though that is not really small, NVMeof for instance
+> > has windows as large as connection timeouts, if you try hard enough)
+> > 
+> > So we probably can trigger this trouble with O_DIRECT and fork(), and
+> > I would call it a bug :(
+> 
+> I can not think of any scenario that would be a bug with O_DIRECT.
+> Do you have one in mind ? When you fork() and do other syscall that
+> affect the memory of your process in another thread you should
+> expect non consistant results. Kernel is not here to provide a fully
+> safe environement to user, user can shoot itself in the foot and
+> that's fine as long as it only affect the process itself and no one
+> else. We should not be in the business of making everything baby
+> proof :)
 
-Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
----
- crypto/crypto_user_stat.c       |  20 +++----
- include/uapi/linux/cryptouser.h | 101 ++++++++++++++++++++------------
- 2 files changed, 73 insertions(+), 48 deletions(-)
+Sure, I setup AIO with O_DIRECT and launch a read.
 
-diff --git a/crypto/crypto_user_stat.c b/crypto/crypto_user_stat.c
-index 352569f378a0..3c14be2f7a1b 100644
---- a/crypto/crypto_user_stat.c
-+++ b/crypto/crypto_user_stat.c
-@@ -33,7 +33,7 @@ struct crypto_dump_info {
- 
- static int crypto_report_aead(struct sk_buff *skb, struct crypto_alg *alg)
- {
--	struct crypto_stat raead;
-+	struct crypto_stat_aead raead;
- 	u64 v64;
- 
- 	memset(&raead, 0, sizeof(raead));
-@@ -56,7 +56,7 @@ static int crypto_report_aead(struct sk_buff *skb, struct crypto_alg *alg)
- 
- static int crypto_report_cipher(struct sk_buff *skb, struct crypto_alg *alg)
- {
--	struct crypto_stat rcipher;
-+	struct crypto_stat_cipher rcipher;
- 	u64 v64;
- 
- 	memset(&rcipher, 0, sizeof(rcipher));
-@@ -79,7 +79,7 @@ static int crypto_report_cipher(struct sk_buff *skb, struct crypto_alg *alg)
- 
- static int crypto_report_comp(struct sk_buff *skb, struct crypto_alg *alg)
- {
--	struct crypto_stat rcomp;
-+	struct crypto_stat_compress rcomp;
- 	u64 v64;
- 
- 	memset(&rcomp, 0, sizeof(rcomp));
-@@ -101,7 +101,7 @@ static int crypto_report_comp(struct sk_buff *skb, struct crypto_alg *alg)
- 
- static int crypto_report_acomp(struct sk_buff *skb, struct crypto_alg *alg)
- {
--	struct crypto_stat racomp;
-+	struct crypto_stat_compress racomp;
- 	u64 v64;
- 
- 	memset(&racomp, 0, sizeof(racomp));
-@@ -123,7 +123,7 @@ static int crypto_report_acomp(struct sk_buff *skb, struct crypto_alg *alg)
- 
- static int crypto_report_akcipher(struct sk_buff *skb, struct crypto_alg *alg)
- {
--	struct crypto_stat rakcipher;
-+	struct crypto_stat_akcipher rakcipher;
- 	u64 v64;
- 
- 	memset(&rakcipher, 0, sizeof(rakcipher));
-@@ -150,7 +150,7 @@ static int crypto_report_akcipher(struct sk_buff *skb, struct crypto_alg *alg)
- 
- static int crypto_report_kpp(struct sk_buff *skb, struct crypto_alg *alg)
- {
--	struct crypto_stat rkpp;
-+	struct crypto_stat_kpp rkpp;
- 	u64 v;
- 
- 	memset(&rkpp, 0, sizeof(rkpp));
-@@ -171,7 +171,7 @@ static int crypto_report_kpp(struct sk_buff *skb, struct crypto_alg *alg)
- 
- static int crypto_report_ahash(struct sk_buff *skb, struct crypto_alg *alg)
- {
--	struct crypto_stat rhash;
-+	struct crypto_stat_hash rhash;
- 	u64 v64;
- 
- 	memset(&rhash, 0, sizeof(rhash));
-@@ -190,7 +190,7 @@ static int crypto_report_ahash(struct sk_buff *skb, struct crypto_alg *alg)
- 
- static int crypto_report_shash(struct sk_buff *skb, struct crypto_alg *alg)
- {
--	struct crypto_stat rhash;
-+	struct crypto_stat_hash rhash;
- 	u64 v64;
- 
- 	memset(&rhash, 0, sizeof(rhash));
-@@ -209,7 +209,7 @@ static int crypto_report_shash(struct sk_buff *skb, struct crypto_alg *alg)
- 
- static int crypto_report_rng(struct sk_buff *skb, struct crypto_alg *alg)
- {
--	struct crypto_stat rrng;
-+	struct crypto_stat_rng rrng;
- 	u64 v64;
- 
- 	memset(&rrng, 0, sizeof(rrng));
-@@ -248,7 +248,7 @@ static int crypto_reportstat_one(struct crypto_alg *alg,
- 	if (nla_put_u32(skb, CRYPTOCFGA_PRIORITY_VAL, alg->cra_priority))
- 		goto nla_put_failure;
- 	if (alg->cra_flags & CRYPTO_ALG_LARVAL) {
--		struct crypto_stat rl;
-+		struct crypto_stat_larval rl;
- 
- 		memset(&rl, 0, sizeof(rl));
- 		strscpy(rl.type, "larval", sizeof(rl.type));
-diff --git a/include/uapi/linux/cryptouser.h b/include/uapi/linux/cryptouser.h
-index 9f8187077ce4..790b5c6511e5 100644
---- a/include/uapi/linux/cryptouser.h
-+++ b/include/uapi/linux/cryptouser.h
-@@ -76,47 +76,72 @@ struct crypto_user_alg {
- 	__u32 cru_flags;
- };
- 
--struct crypto_stat {
--	char type[CRYPTO_MAX_NAME];
--	union {
--		__u64 stat_encrypt_cnt;
--		__u64 stat_compress_cnt;
--		__u64 stat_generate_cnt;
--		__u64 stat_hash_cnt;
--		__u64 stat_setsecret_cnt;
--	};
--	union {
--		__u64 stat_encrypt_tlen;
--		__u64 stat_compress_tlen;
--		__u64 stat_generate_tlen;
--		__u64 stat_hash_tlen;
--	};
--	union {
--		__u64 stat_akcipher_err_cnt;
--		__u64 stat_cipher_err_cnt;
--		__u64 stat_compress_err_cnt;
--		__u64 stat_aead_err_cnt;
--		__u64 stat_hash_err_cnt;
--		__u64 stat_rng_err_cnt;
--		__u64 stat_kpp_err_cnt;
--	};
--	union {
--		__u64 stat_decrypt_cnt;
--		__u64 stat_decompress_cnt;
--		__u64 stat_seed_cnt;
--		__u64 stat_generate_public_key_cnt;
--	};
--	union {
--		__u64 stat_decrypt_tlen;
--		__u64 stat_decompress_tlen;
--	};
--	union {
--		__u64 stat_verify_cnt;
--		__u64 stat_compute_shared_secret_cnt;
--	};
-+struct crypto_stat_cipher {
-+	char type[CRYPTO_MAX_NAME];
-+	__u64 stat_encrypt_cnt;
-+	__u64 stat_encrypt_tlen;
-+	__u64 stat_decrypt_cnt;
-+	__u64 stat_decrypt_tlen;
-+	__u64 stat_cipher_err_cnt;
-+};
-+
-+struct crypto_stat_aead {
-+	char type[CRYPTO_MAX_NAME];
-+	__u64 stat_encrypt_cnt;
-+	__u64 stat_encrypt_tlen;
-+	__u64 stat_decrypt_cnt;
-+	__u64 stat_decrypt_tlen;
-+	__u64 stat_cipher_err_cnt;
-+	__u64 stat_aead_err_cnt;
-+};
-+
-+struct crypto_stat_akcipher {
-+	char type[CRYPTO_MAX_NAME];
-+	__u64 stat_encrypt_cnt;
-+	__u64 stat_encrypt_tlen;
-+	__u64 stat_decrypt_cnt;
-+	__u64 stat_decrypt_tlen;
-+	__u64 stat_akcipher_err_cnt;
-+	__u64 stat_verify_cnt;
- 	__u64 stat_sign_cnt;
- };
- 
-+struct crypto_stat_compress {
-+	char type[CRYPTO_MAX_NAME];
-+	__u64 stat_compress_cnt;
-+	__u64 stat_compress_tlen;
-+	__u64 stat_decompress_cnt;
-+	__u64 stat_decompress_tlen;
-+	__u64 stat_compress_err_cnt;
-+};
-+
-+struct crypto_stat_rng {
-+	char type[CRYPTO_MAX_NAME];
-+	__u64 stat_generate_cnt;
-+	__u64 stat_generate_tlen;
-+	__u64 stat_rng_err_cnt;
-+	__u64 stat_seed_cnt;
-+};
-+
-+struct crypto_stat_hash {
-+	char type[CRYPTO_MAX_NAME];
-+	__u64 stat_hash_cnt;
-+	__u64 stat_hash_tlen;
-+	__u64 stat_hash_err_cnt;
-+};
-+
-+struct crypto_stat_kpp {
-+	char type[CRYPTO_MAX_NAME];
-+	__u64 stat_setsecret_cnt;
-+	__u64 stat_kpp_err_cnt;
-+	__u64 stat_generate_public_key_cnt;
-+	__u64 stat_compute_shared_secret_cnt;
-+};
-+
-+struct crypto_stat_larval {
-+	char type[CRYPTO_MAX_NAME];
-+};
-+
- struct crypto_report_larval {
- 	char type[CRYPTO_MAX_NAME];
- };
--- 
-2.18.1
+Then I fork and dirty the READ target memory using the CPU in the
+child.
+
+As you described in this case the fork will retain the physical page
+that is undergoing O_DIRECT DMA, and the parent gets a new copy'd page.
+
+The DMA completes, and the child gets the DMA'd to page. The parent
+gets an unchanged copy'd page.
+
+The parent gets the AIO completion, but can't see the data.
+
+I'd call that a bug with O_DIRECT. The only correct outcome is that
+the parent will always see the O_DIRECT data. Fork should not cause
+the *parent* to malfunction. I agree the child cannot make any
+prediction what memory it will see.
+
+I assume the same flow is possible using threads and read()..
+
+It is really no different than the RDMA bug with fork.
+
+Jason
