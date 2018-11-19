@@ -1,161 +1,53 @@
-Return-Path: <SRS0=rMEF=NS=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:47506 "EHLO
-        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726097AbeKGTJ6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 7 Nov 2018 14:09:58 -0500
-From: Vladimir Murzin <vladimir.murzin@arm.com>
-To: linux-arm-kernel@lists.infradead.org
-Cc: yamada.masahiro@socionext.com, linux-crypto@vger.kernel.org,
-        linux-kbuild@vger.kernel.org, kbuild-all@01.org,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [RFC PATCH 4/4] ARM: crypto: expose dependency on gas via Kconfig
-Date: Wed,  7 Nov 2018 09:40:08 +0000
-Message-Id: <1541583608-26375-5-git-send-email-vladimir.murzin@arm.com>
-In-Reply-To: <1541583608-26375-1-git-send-email-vladimir.murzin@arm.com>
-References: <1541583608-26375-1-git-send-email-vladimir.murzin@arm.com>
+Return-Path: <SRS0=9Ofa=N6=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from frisell.zx2c4.com ([192.95.5.64]:48171 "EHLO frisell.zx2c4.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726262AbeKTJ5U (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 20 Nov 2018 04:57:20 -0500
+MIME-Version: 1.0
+References: <20181105232526.173947-11-ebiggers@kernel.org> <CAKv+Gu-o0khD5=0EOkv2PiczMs5uZ=XP9V=G2ogBNMK8Kb93sw@mail.gmail.com>
+ <20181112185816.GA8663@gmail.com> <20181116060227.hwu4igi6bp26ddpi@gondor.apana.org.au>
+ <20181117001718.GA175522@gmail.com> <CAHmME9rtsCk8ZLt05xRKMGr4CVRnaUvCaVOS_WX3N22HOat4-A@mail.gmail.com>
+ <20181119052451.qttzfgcm4hvbdc4u@gondor.apana.org.au> <CAHmME9oXAnD0sbO2cKeTtotCMohX2Hu6P=uzA_6u0EWECU9Bpg@mail.gmail.com>
+ <20181119225414.GB258711@gmail.com> <CAHmME9okRjuYUiL0D=6ZmtMX6rvxU+0xvy2tva+LetjU9itx8Q@mail.gmail.com>
+ <20181119232345.GC258711@gmail.com>
+In-Reply-To: <20181119232345.GC258711@gmail.com>
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date: Tue, 20 Nov 2018 00:31:02 +0100
+Message-ID: <CAHmME9o9N0r55i4zHu5p-9wcKPsfVVhRC+kbzx0TYxSTZG5kbQ@mail.gmail.com>
+Subject: Re: [RFC PATCH] zinc chacha20 generic implementation using crypto API code
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        linux-fscrypt@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        LKML <linux-kernel@vger.kernel.org>,
+        Paul Crowley <paulcrowley@google.com>,
+        Greg Kaiser <gkaiser@google.com>,
+        Samuel Neves <samuel.c.p.neves@gmail.com>,
+        Tomer Ashur <tomer.ashur@esat.kuleuven.be>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-So we can advertise only those entries which dependency is satisfied.
+Hi Eric,
 
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Signed-off-by: Vladimir Murzin <vladimir.murzin@arm.com>
----
- arch/arm/crypto/Kconfig  | 31 +++++++++++++++++++++----------
- arch/arm/crypto/Makefile | 31 ++++++-------------------------
- 2 files changed, 27 insertions(+), 35 deletions(-)
+On Tue, Nov 20, 2018 at 12:23 AM Eric Biggers <ebiggers@kernel.org> wrote:
+> It's much better to have the documentation in a permanent location.
 
-diff --git a/arch/arm/crypto/Kconfig b/arch/arm/crypto/Kconfig
-index ef0c7fe..f437a91f 100644
---- a/arch/arm/crypto/Kconfig
-+++ b/arch/arm/crypto/Kconfig
-@@ -9,6 +9,12 @@ menuconfig ARM_CRYPTO
- 
- if ARM_CRYPTO
- 
-+config ARM_AS_HAS_CE
-+	def_bool $(as-instr,.fpu crypto-neon-fp-armv8)
-+
-+config ARM_AS_HAS_CRC
-+	def_bool $(as-instr,.arch armv8-a\n.arch_extension crc)
-+
- config CRYPTO_SHA1_ARM
- 	tristate "SHA1 digest algorithm (ARM-asm)"
- 	select CRYPTO_SHA1
-@@ -30,21 +36,21 @@ config CRYPTO_SHA1_ARM_NEON
- 
- config CRYPTO_SHA1_ARM_CE
- 	tristate "SHA1 digest algorithm (ARM v8 Crypto Extensions)"
--	depends on KERNEL_MODE_NEON
-+	depends on KERNEL_MODE_NEON && ARM_AS_HAS_CE
- 	select CRYPTO_SHA1_ARM
- 	select CRYPTO_HASH
- 	help
- 	  SHA-1 secure hash standard (FIPS 180-1/DFIPS 180-2) implemented
--	  using special ARMv8 Crypto Extensions.
-+	  using special ARMv8 Crypto Extensions (need binutils 2.23 or higher).
- 
- config CRYPTO_SHA2_ARM_CE
- 	tristate "SHA-224/256 digest algorithm (ARM v8 Crypto Extensions)"
--	depends on KERNEL_MODE_NEON
-+	depends on KERNEL_MODE_NEON && ARM_AS_HAS_CE
- 	select CRYPTO_SHA256_ARM
- 	select CRYPTO_HASH
- 	help
- 	  SHA-256 secure hash standard (DFIPS 180-2) implemented
--	  using special ARMv8 Crypto Extensions.
-+	  using special ARMv8 Crypto Extensions (need binutils 2.23 or higher).
- 
- config CRYPTO_SHA256_ARM
- 	tristate "SHA-224/256 digest algorithm (ARM-asm and NEON)"
-@@ -87,16 +93,16 @@ config CRYPTO_AES_ARM_BS
- 
- config CRYPTO_AES_ARM_CE
- 	tristate "Accelerated AES using ARMv8 Crypto Extensions"
--	depends on KERNEL_MODE_NEON
-+	depends on KERNEL_MODE_NEON && ARM_AS_HAS_CE
- 	select CRYPTO_BLKCIPHER
- 	select CRYPTO_SIMD
- 	help
- 	  Use an implementation of AES in CBC, CTR and XTS modes that uses
--	  ARMv8 Crypto Extensions
-+	  ARMv8 Crypto Extensions (need binutils 2.23 or higher)
- 
- config CRYPTO_GHASH_ARM_CE
- 	tristate "PMULL-accelerated GHASH using NEON/ARMv8 Crypto Extensions"
--	depends on KERNEL_MODE_NEON
-+	depends on KERNEL_MODE_NEON && ARM_AS_HAS_CE
- 	select CRYPTO_HASH
- 	select CRYPTO_CRYPTD
- 	select CRYPTO_GF128MUL
-@@ -104,17 +110,22 @@ config CRYPTO_GHASH_ARM_CE
- 	  Use an implementation of GHASH (used by the GCM AEAD chaining mode)
- 	  that uses the 64x64 to 128 bit polynomial multiplication (vmull.p64)
- 	  that is part of the ARMv8 Crypto Extensions, or a slower variant that
--	  uses the vmull.p8 instruction that is part of the basic NEON ISA.
-+	  uses the vmull.p8 instruction that is part of the basic NEON ISA (need
-+	  binutils 2.23 or higher).
- 
- config CRYPTO_CRCT10DIF_ARM_CE
- 	tristate "CRCT10DIF digest algorithm using PMULL instructions"
--	depends on KERNEL_MODE_NEON && CRC_T10DIF
-+	depends on KERNEL_MODE_NEON && CRC_T10DIF  && ARM_AS_HAS_CE
- 	select CRYPTO_HASH
-+	help
-+	  Need binutils 2.23 or higher
- 
- config CRYPTO_CRC32_ARM_CE
- 	tristate "CRC32(C) digest algorithm using CRC and/or PMULL instructions"
--	depends on KERNEL_MODE_NEON && CRC32
-+	depends on KERNEL_MODE_NEON && CRC32 && ARM_AS_HAS_CRC
- 	select CRYPTO_HASH
-+	help
-+	  Need binutils 2.23 or higher
- 
- config CRYPTO_CHACHA20_NEON
- 	tristate "NEON accelerated ChaCha20 symmetric cipher"
-diff --git a/arch/arm/crypto/Makefile b/arch/arm/crypto/Makefile
-index bd5bcee..e897327 100644
---- a/arch/arm/crypto/Makefile
-+++ b/arch/arm/crypto/Makefile
-@@ -11,32 +11,13 @@ obj-$(CONFIG_CRYPTO_SHA256_ARM) += sha256-arm.o
- obj-$(CONFIG_CRYPTO_SHA512_ARM) += sha512-arm.o
- obj-$(CONFIG_CRYPTO_CHACHA20_NEON) += chacha20-neon.o
- 
--ce-obj-$(CONFIG_CRYPTO_AES_ARM_CE) += aes-arm-ce.o
--ce-obj-$(CONFIG_CRYPTO_SHA1_ARM_CE) += sha1-arm-ce.o
--ce-obj-$(CONFIG_CRYPTO_SHA2_ARM_CE) += sha2-arm-ce.o
--ce-obj-$(CONFIG_CRYPTO_GHASH_ARM_CE) += ghash-arm-ce.o
--ce-obj-$(CONFIG_CRYPTO_CRCT10DIF_ARM_CE) += crct10dif-arm-ce.o
--crc-obj-$(CONFIG_CRYPTO_CRC32_ARM_CE) += crc32-arm-ce.o
-+obj-$(CONFIG_CRYPTO_AES_ARM_CE) += aes-arm-ce.o
-+obj-$(CONFIG_CRYPTO_SHA1_ARM_CE) += sha1-arm-ce.o
-+obj-$(CONFIG_CRYPTO_SHA2_ARM_CE) += sha2-arm-ce.o
-+obj-$(CONFIG_CRYPTO_GHASH_ARM_CE) += ghash-arm-ce.o
-+obj-$(CONFIG_CRYPTO_CRCT10DIF_ARM_CE) += crct10dif-arm-ce.o
- 
--ifneq ($(crc-obj-y)$(crc-obj-m),)
--ifeq ($(call as-instr,.arch armv8-a\n.arch_extension crc,y,n),y)
--ce-obj-y += $(crc-obj-y)
--ce-obj-m += $(crc-obj-m)
--else
--$(warning These CRC Extensions modules need binutils 2.23 or higher)
--$(warning $(crc-obj-y) $(crc-obj-m))
--endif
--endif
--
--ifneq ($(ce-obj-y)$(ce-obj-m),)
--ifeq ($(call as-instr,.fpu crypto-neon-fp-armv8,y,n),y)
--obj-y += $(ce-obj-y)
--obj-m += $(ce-obj-m)
--else
--$(warning These ARMv8 Crypto Extensions modules need binutils 2.23 or higher)
--$(warning $(ce-obj-y) $(ce-obj-m))
--endif
--endif
-+obj-$(CONFIG_CRYPTO_CRC32_ARM_CE) += crc32-arm-ce.o
- 
- aes-arm-y	:= aes-cipher-core.o aes-cipher-glue.o
- aes-arm-bs-y	:= aes-neonbs-core.o aes-neonbs-glue.o
--- 
-1.9.1
+Agreed.
+
+> I actually did add ChaCha12 support to most of the Zinc assembly in
+> "[WIP] crypto: assembly support for ChaCha12"
+> (https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/commit/?h=adiantum-zinc&id=0a7787a515a977e11b680f1752b430ca1744e399).
+> But I skipped AVX-512 and MIPS since I didn't have a way to test those yet,
+> and I haven't ported the changes to your new perl scripts yet.
+
+Oh, great. If you're playing with this in the context of the WireGuard
+repo, you can run `ARCH=mips make test-qemu -j$(nproc)` (which is
+what's running on https://www.wireguard.com/build-status/ ). For
+AVX-512 testing, I've got a box I'm happy to give you access to, if
+you want to send an SSH key and your employer allows for that kind of
+thing etc. I can have a stab at all of this too if you like.
+
+Jason
