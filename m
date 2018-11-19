@@ -1,272 +1,135 @@
-Return-Path: <SRS0=vxh5=N7=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:40046 "EHLO
-        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729632AbeKTXCX (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 20 Nov 2018 18:02:23 -0500
-Received: by mail-wm1-f67.google.com with SMTP id q26so2031745wmf.5
-        for <linux-crypto@vger.kernel.org>; Tue, 20 Nov 2018 04:33:28 -0800 (PST)
-From: Corentin Labbe <clabbe@baylibre.com>
-To: davem@davemloft.net, ebiggers@kernel.org,
-        herbert@gondor.apana.org.au, nhorman@tuxdriver.com
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Corentin Labbe <clabbe@baylibre.com>
-Subject: [PATCH v3 08/10] crypto: crypto_user_stat: remove intermediate variable
-Date: Tue, 20 Nov 2018 12:32:24 +0000
-Message-Id: <1542717146-34917-9-git-send-email-clabbe@baylibre.com>
-In-Reply-To: <1542717146-34917-1-git-send-email-clabbe@baylibre.com>
-References: <1542717146-34917-1-git-send-email-clabbe@baylibre.com>
+Return-Path: <SRS0=9Ofa=N6=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:48672 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2389110AbeKTDNQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 19 Nov 2018 22:13:16 -0500
+Date: Mon, 19 Nov 2018 11:48:54 -0500
+From: Jerome Glisse <jglisse@redhat.com>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Kenneth Lee <liguozhu@hisilicon.com>,
+        Tim Sell <timothy.sell@unisys.com>, linux-doc@vger.kernel.org,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Zaibo Xu <xuzaibo@huawei.com>, zhangfei.gao@foxmail.com,
+        linuxarm@huawei.com, haojian.zhuang@linaro.org,
+        Christoph Lameter <cl@linux.com>,
+        Hao Fang <fanghao11@huawei.com>,
+        Gavin Schenk <g.schenk@eckelmann.de>,
+        RDMA mailing list <linux-rdma@vger.kernel.org>,
+        Zhou Wang <wangzhou1@hisilicon.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Doug Ledford <dledford@redhat.com>,
+        Uwe =?iso-8859-1?Q?Kleine-K=F6nig?=
+        <u.kleine-koenig@pengutronix.de>,
+        David Kershner <david.kershner@unisys.com>,
+        Kenneth Lee <nek.in.cn@gmail.com>,
+        Johan Hovold <johan@kernel.org>,
+        Cyrille Pitchen <cyrille.pitchen@free-electrons.com>,
+        Sagar Dharia <sdharia@codeaurora.org>,
+        Jens Axboe <axboe@kernel.dk>, guodong.xu@linaro.org,
+        linux-netdev <netdev@vger.kernel.org>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        linux-kernel@vger.kernel.org, Vinod Koul <vkoul@kernel.org>,
+        linux-crypto@vger.kernel.org,
+        Philippe Ombredanne <pombredanne@nexb.com>,
+        Sanyog Kale <sanyog.r.kale@intel.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-accelerators@lists.ozlabs.org
+Subject: Re: [RFCv3 PATCH 1/6] uacce: Add documents for WarpDrive/uacce
+Message-ID: <20181119164853.GA4593@redhat.com>
+References: <20181112075807.9291-1-nek.in.cn@gmail.com>
+ <20181112075807.9291-2-nek.in.cn@gmail.com>
+ <20181113002354.GO3695@mtr-leonro.mtl.com>
+ <95310df4-b32c-42f0-c750-3ad5eb89b3dd@gmail.com>
+ <20181114160017.GI3759@mtr-leonro.mtl.com>
+ <20181115085109.GD157308@Turing-Arch-b>
+ <20181115145455.GN3759@mtr-leonro.mtl.com>
+ <20181119091405.GE157308@Turing-Arch-b>
+ <20181119091910.GF157308@Turing-Arch-b>
+ <20181119104801.GF8268@mtr-leonro.mtl.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20181119104801.GF8268@mtr-leonro.mtl.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The use of the v64 intermediate variable is useless, and removing it
-bring to much readable code.
+On Mon, Nov 19, 2018 at 12:48:01PM +0200, Leon Romanovsky wrote:
+> On Mon, Nov 19, 2018 at 05:19:10PM +0800, Kenneth Lee wrote:
+> > On Mon, Nov 19, 2018 at 05:14:05PM +0800, Kenneth Lee wrote:
+> > > On Thu, Nov 15, 2018 at 04:54:55PM +0200, Leon Romanovsky wrote:
+> > > > On Thu, Nov 15, 2018 at 04:51:09PM +0800, Kenneth Lee wrote:
+> > > > > On Wed, Nov 14, 2018 at 06:00:17PM +0200, Leon Romanovsky wrote:
+> > > > > > On Wed, Nov 14, 2018 at 10:58:09AM +0800, Kenneth Lee wrote:
+> > > > > > > > On Mon, Nov 12, 2018 at 03:58:02PM +0800, Kenneth Lee wrote:
 
-Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
----
- crypto/crypto_user_stat.c | 132 ++++++++++++--------------------------
- 1 file changed, 41 insertions(+), 91 deletions(-)
+[...]
 
-diff --git a/crypto/crypto_user_stat.c b/crypto/crypto_user_stat.c
-index 838123758423..7b668c659122 100644
---- a/crypto/crypto_user_stat.c
-+++ b/crypto/crypto_user_stat.c
-@@ -34,22 +34,16 @@ struct crypto_dump_info {
- static int crypto_report_aead(struct sk_buff *skb, struct crypto_alg *alg)
- {
- 	struct crypto_stat_aead raead;
--	u64 v64;
- 
- 	memset(&raead, 0, sizeof(raead));
- 
- 	strscpy(raead.type, "aead", sizeof(raead.type));
- 
--	v64 = atomic64_read(&alg->encrypt_cnt);
--	raead.stat_encrypt_cnt = v64;
--	v64 = atomic64_read(&alg->encrypt_tlen);
--	raead.stat_encrypt_tlen = v64;
--	v64 = atomic64_read(&alg->decrypt_cnt);
--	raead.stat_decrypt_cnt = v64;
--	v64 = atomic64_read(&alg->decrypt_tlen);
--	raead.stat_decrypt_tlen = v64;
--	v64 = atomic64_read(&alg->aead_err_cnt);
--	raead.stat_aead_err_cnt = v64;
-+	raead.stat_encrypt_cnt = atomic64_read(&alg->encrypt_cnt);
-+	raead.stat_encrypt_tlen = atomic64_read(&alg->encrypt_tlen);
-+	raead.stat_decrypt_cnt = atomic64_read(&alg->decrypt_cnt);
-+	raead.stat_decrypt_tlen = atomic64_read(&alg->decrypt_tlen);
-+	raead.stat_aead_err_cnt = atomic64_read(&alg->aead_err_cnt);
- 
- 	return nla_put(skb, CRYPTOCFGA_STAT_AEAD, sizeof(raead), &raead);
- }
-@@ -57,22 +51,16 @@ static int crypto_report_aead(struct sk_buff *skb, struct crypto_alg *alg)
- static int crypto_report_cipher(struct sk_buff *skb, struct crypto_alg *alg)
- {
- 	struct crypto_stat_cipher rcipher;
--	u64 v64;
- 
- 	memset(&rcipher, 0, sizeof(rcipher));
- 
- 	strscpy(rcipher.type, "cipher", sizeof(rcipher.type));
- 
--	v64 = atomic64_read(&alg->encrypt_cnt);
--	rcipher.stat_encrypt_cnt = v64;
--	v64 = atomic64_read(&alg->encrypt_tlen);
--	rcipher.stat_encrypt_tlen = v64;
--	v64 = atomic64_read(&alg->decrypt_cnt);
--	rcipher.stat_decrypt_cnt = v64;
--	v64 = atomic64_read(&alg->decrypt_tlen);
--	rcipher.stat_decrypt_tlen = v64;
--	v64 = atomic64_read(&alg->cipher_err_cnt);
--	rcipher.stat_cipher_err_cnt = v64;
-+	rcipher.stat_encrypt_cnt = atomic64_read(&alg->encrypt_cnt);
-+	rcipher.stat_encrypt_tlen = atomic64_read(&alg->encrypt_tlen);
-+	rcipher.stat_decrypt_cnt =  atomic64_read(&alg->decrypt_cnt);
-+	rcipher.stat_decrypt_tlen = atomic64_read(&alg->decrypt_tlen);
-+	rcipher.stat_cipher_err_cnt =  atomic64_read(&alg->cipher_err_cnt);
- 
- 	return nla_put(skb, CRYPTOCFGA_STAT_CIPHER, sizeof(rcipher), &rcipher);
- }
-@@ -80,21 +68,15 @@ static int crypto_report_cipher(struct sk_buff *skb, struct crypto_alg *alg)
- static int crypto_report_comp(struct sk_buff *skb, struct crypto_alg *alg)
- {
- 	struct crypto_stat_compress rcomp;
--	u64 v64;
- 
- 	memset(&rcomp, 0, sizeof(rcomp));
- 
- 	strscpy(rcomp.type, "compression", sizeof(rcomp.type));
--	v64 = atomic64_read(&alg->compress_cnt);
--	rcomp.stat_compress_cnt = v64;
--	v64 = atomic64_read(&alg->compress_tlen);
--	rcomp.stat_compress_tlen = v64;
--	v64 = atomic64_read(&alg->decompress_cnt);
--	rcomp.stat_decompress_cnt = v64;
--	v64 = atomic64_read(&alg->decompress_tlen);
--	rcomp.stat_decompress_tlen = v64;
--	v64 = atomic64_read(&alg->compress_err_cnt);
--	rcomp.stat_compress_err_cnt = v64;
-+	rcomp.stat_compress_cnt = atomic64_read(&alg->compress_cnt);
-+	rcomp.stat_compress_tlen = atomic64_read(&alg->compress_tlen);
-+	rcomp.stat_decompress_cnt = atomic64_read(&alg->decompress_cnt);
-+	rcomp.stat_decompress_tlen = atomic64_read(&alg->decompress_tlen);
-+	rcomp.stat_compress_err_cnt = atomic64_read(&alg->compress_err_cnt);
- 
- 	return nla_put(skb, CRYPTOCFGA_STAT_COMPRESS, sizeof(rcomp), &rcomp);
- }
-@@ -102,21 +84,15 @@ static int crypto_report_comp(struct sk_buff *skb, struct crypto_alg *alg)
- static int crypto_report_acomp(struct sk_buff *skb, struct crypto_alg *alg)
- {
- 	struct crypto_stat_compress racomp;
--	u64 v64;
- 
- 	memset(&racomp, 0, sizeof(racomp));
- 
- 	strscpy(racomp.type, "acomp", sizeof(racomp.type));
--	v64 = atomic64_read(&alg->compress_cnt);
--	racomp.stat_compress_cnt = v64;
--	v64 = atomic64_read(&alg->compress_tlen);
--	racomp.stat_compress_tlen = v64;
--	v64 = atomic64_read(&alg->decompress_cnt);
--	racomp.stat_decompress_cnt = v64;
--	v64 = atomic64_read(&alg->decompress_tlen);
--	racomp.stat_decompress_tlen = v64;
--	v64 = atomic64_read(&alg->compress_err_cnt);
--	racomp.stat_compress_err_cnt = v64;
-+	racomp.stat_compress_cnt = atomic64_read(&alg->compress_cnt);
-+	racomp.stat_compress_tlen = atomic64_read(&alg->compress_tlen);
-+	racomp.stat_decompress_cnt =  atomic64_read(&alg->decompress_cnt);
-+	racomp.stat_decompress_tlen = atomic64_read(&alg->decompress_tlen);
-+	racomp.stat_compress_err_cnt = atomic64_read(&alg->compress_err_cnt);
- 
- 	return nla_put(skb, CRYPTOCFGA_STAT_ACOMP, sizeof(racomp), &racomp);
- }
-@@ -124,25 +100,17 @@ static int crypto_report_acomp(struct sk_buff *skb, struct crypto_alg *alg)
- static int crypto_report_akcipher(struct sk_buff *skb, struct crypto_alg *alg)
- {
- 	struct crypto_stat_akcipher rakcipher;
--	u64 v64;
- 
- 	memset(&rakcipher, 0, sizeof(rakcipher));
- 
- 	strscpy(rakcipher.type, "akcipher", sizeof(rakcipher.type));
--	v64 = atomic64_read(&alg->encrypt_cnt);
--	rakcipher.stat_encrypt_cnt = v64;
--	v64 = atomic64_read(&alg->encrypt_tlen);
--	rakcipher.stat_encrypt_tlen = v64;
--	v64 = atomic64_read(&alg->decrypt_cnt);
--	rakcipher.stat_decrypt_cnt = v64;
--	v64 = atomic64_read(&alg->decrypt_tlen);
--	rakcipher.stat_decrypt_tlen = v64;
--	v64 = atomic64_read(&alg->sign_cnt);
--	rakcipher.stat_sign_cnt = v64;
--	v64 = atomic64_read(&alg->verify_cnt);
--	rakcipher.stat_verify_cnt = v64;
--	v64 = atomic64_read(&alg->akcipher_err_cnt);
--	rakcipher.stat_akcipher_err_cnt = v64;
-+	rakcipher.stat_encrypt_cnt = atomic64_read(&alg->encrypt_cnt);
-+	rakcipher.stat_encrypt_tlen = atomic64_read(&alg->encrypt_tlen);
-+	rakcipher.stat_decrypt_cnt = atomic64_read(&alg->decrypt_cnt);
-+	rakcipher.stat_decrypt_tlen = atomic64_read(&alg->decrypt_tlen);
-+	rakcipher.stat_sign_cnt = atomic64_read(&alg->sign_cnt);
-+	rakcipher.stat_verify_cnt = atomic64_read(&alg->verify_cnt);
-+	rakcipher.stat_akcipher_err_cnt = atomic64_read(&alg->akcipher_err_cnt);
- 
- 	return nla_put(skb, CRYPTOCFGA_STAT_AKCIPHER,
- 		       sizeof(rakcipher), &rakcipher);
-@@ -151,20 +119,15 @@ static int crypto_report_akcipher(struct sk_buff *skb, struct crypto_alg *alg)
- static int crypto_report_kpp(struct sk_buff *skb, struct crypto_alg *alg)
- {
- 	struct crypto_stat_kpp rkpp;
--	u64 v;
- 
- 	memset(&rkpp, 0, sizeof(rkpp));
- 
- 	strscpy(rkpp.type, "kpp", sizeof(rkpp.type));
- 
--	v = atomic64_read(&alg->setsecret_cnt);
--	rkpp.stat_setsecret_cnt = v;
--	v = atomic64_read(&alg->generate_public_key_cnt);
--	rkpp.stat_generate_public_key_cnt = v;
--	v = atomic64_read(&alg->compute_shared_secret_cnt);
--	rkpp.stat_compute_shared_secret_cnt = v;
--	v = atomic64_read(&alg->kpp_err_cnt);
--	rkpp.stat_kpp_err_cnt = v;
-+	rkpp.stat_setsecret_cnt = atomic64_read(&alg->setsecret_cnt);
-+	rkpp.stat_generate_public_key_cnt = atomic64_read(&alg->generate_public_key_cnt);
-+	rkpp.stat_compute_shared_secret_cnt = atomic64_read(&alg->compute_shared_secret_cnt);
-+	rkpp.stat_kpp_err_cnt = atomic64_read(&alg->kpp_err_cnt);
- 
- 	return nla_put(skb, CRYPTOCFGA_STAT_KPP, sizeof(rkpp), &rkpp);
- }
-@@ -172,18 +135,14 @@ static int crypto_report_kpp(struct sk_buff *skb, struct crypto_alg *alg)
- static int crypto_report_ahash(struct sk_buff *skb, struct crypto_alg *alg)
- {
- 	struct crypto_stat_hash rhash;
--	u64 v64;
- 
- 	memset(&rhash, 0, sizeof(rhash));
- 
- 	strscpy(rhash.type, "ahash", sizeof(rhash.type));
- 
--	v64 = atomic64_read(&alg->hash_cnt);
--	rhash.stat_hash_cnt = v64;
--	v64 = atomic64_read(&alg->hash_tlen);
--	rhash.stat_hash_tlen = v64;
--	v64 = atomic64_read(&alg->hash_err_cnt);
--	rhash.stat_hash_err_cnt = v64;
-+	rhash.stat_hash_cnt = atomic64_read(&alg->hash_cnt);
-+	rhash.stat_hash_tlen = atomic64_read(&alg->hash_tlen);
-+	rhash.stat_hash_err_cnt = atomic64_read(&alg->hash_err_cnt);
- 
- 	return nla_put(skb, CRYPTOCFGA_STAT_HASH, sizeof(rhash), &rhash);
- }
-@@ -191,18 +150,14 @@ static int crypto_report_ahash(struct sk_buff *skb, struct crypto_alg *alg)
- static int crypto_report_shash(struct sk_buff *skb, struct crypto_alg *alg)
- {
- 	struct crypto_stat_hash rhash;
--	u64 v64;
- 
- 	memset(&rhash, 0, sizeof(rhash));
- 
- 	strscpy(rhash.type, "shash", sizeof(rhash.type));
- 
--	v64 = atomic64_read(&alg->hash_cnt);
--	rhash.stat_hash_cnt = v64;
--	v64 = atomic64_read(&alg->hash_tlen);
--	rhash.stat_hash_tlen = v64;
--	v64 = atomic64_read(&alg->hash_err_cnt);
--	rhash.stat_hash_err_cnt = v64;
-+	rhash.stat_hash_cnt =  atomic64_read(&alg->hash_cnt);
-+	rhash.stat_hash_tlen = atomic64_read(&alg->hash_tlen);
-+	rhash.stat_hash_err_cnt = atomic64_read(&alg->hash_err_cnt);
- 
- 	return nla_put(skb, CRYPTOCFGA_STAT_HASH, sizeof(rhash), &rhash);
- }
-@@ -210,20 +165,15 @@ static int crypto_report_shash(struct sk_buff *skb, struct crypto_alg *alg)
- static int crypto_report_rng(struct sk_buff *skb, struct crypto_alg *alg)
- {
- 	struct crypto_stat_rng rrng;
--	u64 v64;
- 
- 	memset(&rrng, 0, sizeof(rrng));
- 
- 	strscpy(rrng.type, "rng", sizeof(rrng.type));
- 
--	v64 = atomic64_read(&alg->generate_cnt);
--	rrng.stat_generate_cnt = v64;
--	v64 = atomic64_read(&alg->generate_tlen);
--	rrng.stat_generate_tlen = v64;
--	v64 = atomic64_read(&alg->seed_cnt);
--	rrng.stat_seed_cnt = v64;
--	v64 = atomic64_read(&alg->rng_err_cnt);
--	rrng.stat_rng_err_cnt = v64;
-+	rrng.stat_generate_cnt = atomic64_read(&alg->generate_cnt);
-+	rrng.stat_generate_tlen = atomic64_read(&alg->generate_tlen);
-+	rrng.stat_seed_cnt = atomic64_read(&alg->seed_cnt);
-+	rrng.stat_rng_err_cnt = atomic64_read(&alg->rng_err_cnt);
- 
- 	return nla_put(skb, CRYPTOCFGA_STAT_RNG, sizeof(rrng), &rrng);
- }
--- 
-2.18.1
+> > > > memory exposed to user is properly protected from security point of view.
+> > > > 3. "stop using the page for a while for the copying" - I'm not fully
+> > > > understand this claim, maybe this article will help you to better
+> > > > describe : https://lwn.net/Articles/753027/
+> > >
+> > > This topic was being discussed in RFCv2. The key problem here is that:
+> > >
+> > > The device need to hold the memory for its own calculation, but the CPU/software
+> > > want to stop it for a while for synchronizing with disk or COW.
+> > >
+> > > If the hardware support SVM/SVA (Shared Virtual Memory/Address), it is easy, the
+> > > device share page table with CPU, the device will raise a page fault when the
+> > > CPU downgrade the PTE to read-only.
+> > >
+> > > If the hardware cannot share page table with the CPU, we then need to have
+> > > some way to change the device page table. This is what happen in ODP. It
+> > > invalidates the page table in device upon mmu_notifier call back. But this cannot
+> > > solve the COW problem: if the user process A share a page P with device, and A
+> > > forks a new process B, and it continue to write to the page. By COW, the
+> > > process B will keep the page P, while A will get a new page P'. But you have
+> > > no way to let the device know it should use P' rather than P.
+> 
+> I didn't hear about such issue and we supported fork for a long time.
+> 
+
+Just to comment on this, any infiniband driver which use umem and do
+not have ODP (here ODP for me means listening to mmu notifier so all
+infiniband driver except mlx5) will be affected by same issue AFAICT.
+
+AFAICT there is no special thing happening after fork() inside any of
+those driver. So if parent create a umem mr before fork() and program
+hardware with it then after fork() the parent might start using new
+page for the umem range while the old memory is use by the child. The
+reverse is also true (parent using old memory and child new memory)
+bottom line you can not predict which memory the child or the parent
+will use for the range after fork().
+
+So no matter what you consider the child or the parent, what the hw
+will use for the mr is unlikely to match what the CPU use for the
+same virtual address. In other word:
+
+Before fork:
+    CPU parent: virtual addr ptr1 -> physical address = 0xCAFE
+    HARDWARE:   virtual addr ptr1 -> physical address = 0xCAFE
+
+Case 1:
+    CPU parent: virtual addr ptr1 -> physical address = 0xCAFE
+    CPU child:  virtual addr ptr1 -> physical address = 0xDEAD
+    HARDWARE:   virtual addr ptr1 -> physical address = 0xCAFE
+
+Case 2:
+    CPU parent: virtual addr ptr1 -> physical address = 0xBEEF
+    CPU child:  virtual addr ptr1 -> physical address = 0xCAFE
+    HARDWARE:   virtual addr ptr1 -> physical address = 0xCAFE
+
+
+This apply for every single page and is not predictable. This only
+apply to private memory (mmap() with MAP_PRIVATE)
+
+I am not familiar enough with RDMA user space API contract to know
+if this is an issue or not.
+
+Note that this can not be fix, no one should have done umem without
+ODP like mlx5. For this to work properly you need sane hardware like
+mlx5.
+
+Cheers,
+Jérôme
