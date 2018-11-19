@@ -1,98 +1,69 @@
-Return-Path: <SRS0=r27M=OJ=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from ale.deltatee.com ([207.54.116.67]:41074 "EHLO ale.deltatee.com"
+Return-Path: <SRS0=9Ofa=N6=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from frisell.zx2c4.com ([192.95.5.64]:40925 "EHLO frisell.zx2c4.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726788AbeLAEQK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 30 Nov 2018 23:16:10 -0500
-From: Logan Gunthorpe <logang@deltatee.com>
-To: linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
-        linux-ntb@googlegroups.com, linux-crypto@vger.kernel.org,
-        linux-mm@kvack.org, Andrew Morton <akpm@linux-foundation.org>
-Cc: Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Andy Shevchenko <andy.shevchenko@gmail.com>,
-        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Jon Mason <jdmason@kudzu.us>
-Date: Fri, 30 Nov 2018 10:06:06 -0700
-Message-Id: <20181130170606.17252-7-logang@deltatee.com>
-In-Reply-To: <20181130170606.17252-1-logang@deltatee.com>
-References: <20181130170606.17252-1-logang@deltatee.com>
+        id S1730692AbeKTJlb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 20 Nov 2018 04:41:31 -0500
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [PATCH v24 6/6] ntb: ntb_hw_switchtec: Cleanup 64bit IO defines to use the common header
+References: <20181105232526.173947-1-ebiggers@kernel.org> <20181105232526.173947-11-ebiggers@kernel.org>
+ <CAKv+Gu-o0khD5=0EOkv2PiczMs5uZ=XP9V=G2ogBNMK8Kb93sw@mail.gmail.com>
+ <20181112185816.GA8663@gmail.com> <20181116060227.hwu4igi6bp26ddpi@gondor.apana.org.au>
+ <20181117001718.GA175522@gmail.com> <CAHmME9rtsCk8ZLt05xRKMGr4CVRnaUvCaVOS_WX3N22HOat4-A@mail.gmail.com>
+ <20181119052451.qttzfgcm4hvbdc4u@gondor.apana.org.au> <CAHmME9oXAnD0sbO2cKeTtotCMohX2Hu6P=uzA_6u0EWECU9Bpg@mail.gmail.com>
+ <20181119225414.GB258711@gmail.com>
+In-Reply-To: <20181119225414.GB258711@gmail.com>
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date: Tue, 20 Nov 2018 00:15:17 +0100
+Message-ID: <CAHmME9okRjuYUiL0D=6ZmtMX6rvxU+0xvy2tva+LetjU9itx8Q@mail.gmail.com>
+Subject: Re: [RFC PATCH] zinc chacha20 generic implementation using crypto API code
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        linux-fscrypt@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        LKML <linux-kernel@vger.kernel.org>,
+        Paul Crowley <paulcrowley@google.com>,
+        Greg Kaiser <gkaiser@google.com>,
+        Samuel Neves <samuel.c.p.neves@gmail.com>,
+        Tomer Ashur <tomer.ashur@esat.kuleuven.be>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Clean up the ifdefs which conditionally defined the io{read|write}64
-functions in favour of the new common io-64-nonatomic-lo-hi header.
+Hi Eric,
 
-Per a nit from Andy Shevchenko, the include list is also made
-alphabetical.
+On Mon, Nov 19, 2018 at 11:54 PM Eric Biggers <ebiggers@kernel.org> wrote:
+> Will v9 include a documentation file for Zinc in Documentation/crypto/?
+> That's been suggested several times.
 
-Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-Reviewed-by: Andy Shevchenko <andy.shevchenko@gmail.com>
-Cc: Jon Mason <jdmason@kudzu.us>
----
- drivers/ntb/hw/mscc/ntb_hw_switchtec.c | 36 +++-----------------------
- 1 file changed, 4 insertions(+), 32 deletions(-)
+I had started writing that there, but then thought that the requested
+information could go in the commit message instead. But I'm guessing
+you're asking again now because you poked into the repo and didn't
+find the Documentation/, so presumably you still want it. I can
+reorganize the presentation of that to be more suitable for
+Documentation/, and I'll have that for v9.
 
-diff --git a/drivers/ntb/hw/mscc/ntb_hw_switchtec.c b/drivers/ntb/hw/mscc/ntb_hw_switchtec.c
-index 5ee5f40b4dfc..c0b97699169d 100644
---- a/drivers/ntb/hw/mscc/ntb_hw_switchtec.c
-+++ b/drivers/ntb/hw/mscc/ntb_hw_switchtec.c
-@@ -13,13 +13,14 @@
-  *
-  */
- 
--#include <linux/switchtec.h>
--#include <linux/module.h>
-+#include <linux/interrupt.h>
-+#include <linux/io-64-nonatomic-lo-hi.h>
- #include <linux/delay.h>
- #include <linux/kthread.h>
--#include <linux/interrupt.h>
-+#include <linux/module.h>
- #include <linux/ntb.h>
- #include <linux/pci.h>
-+#include <linux/switchtec.h>
- 
- MODULE_DESCRIPTION("Microsemi Switchtec(tm) NTB Driver");
- MODULE_VERSION("0.1");
-@@ -36,35 +37,6 @@ module_param(use_lut_mws, bool, 0644);
- MODULE_PARM_DESC(use_lut_mws,
- 		 "Enable the use of the LUT based memory windows");
- 
--#ifndef ioread64
--#ifdef readq
--#define ioread64 readq
--#else
--#define ioread64 _ioread64
--static inline u64 _ioread64(void __iomem *mmio)
--{
--	u64 low, high;
--
--	low = ioread32(mmio);
--	high = ioread32(mmio + sizeof(u32));
--	return low | (high << 32);
--}
--#endif
--#endif
--
--#ifndef iowrite64
--#ifdef writeq
--#define iowrite64 writeq
--#else
--#define iowrite64 _iowrite64
--static inline void _iowrite64(u64 val, void __iomem *mmio)
--{
--	iowrite32(val, mmio);
--	iowrite32(val >> 32, mmio + sizeof(u32));
--}
--#endif
--#endif
--
- #define SWITCHTEC_NTB_MAGIC 0x45CC0001
- #define MAX_MWS     128
- 
--- 
-2.19.0
+> I'd still prefer to see the conversion patches included.  Skipping them would be
+> kicking the can down the road and avoiding issues that will need to be addressed
+> anyway.  Like you, I don't want a "half-baked concoction that will be maybe
+> possibly be replaced 'later'" :-)
+
+Okay, fair enough. Will do.
+
+> Either way though, it would make things much easier if you at least named the
+> files, structures, constants, etc. "ChaCha" rather than "ChaCha20" from the
+> start where appropriate.  For an example, see the commit "crypto: chacha -
+> prepare for supporting non-20-round variants" on my "adiantum-zinc" branch:
+> https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/commit/?h=adiantum-zinc&id=754af8d7d39f31238114426e39786c84d7cc0f98
+> Then the actual introduction of the 12-round variant is much less noisy.
+
+That's a good idea. I'll do it like that. I'll likely order it as what
+we have now (renamed to omit the 20), and then put the 12 stuff on top
+of that, so it's easier to see what's changed in the process. I
+noticed in that branch, you didn't port the assembly to support fewer
+rounds. Shall I follow suite, and then expect patches from you later
+doing that? Or were you expecting me to also port the architecture
+implementations to chacha12 as well?
+
+Regards,
+Jason
