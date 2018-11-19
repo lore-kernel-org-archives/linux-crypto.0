@@ -1,145 +1,27 @@
-Return-Path: <SRS0=IFNk=NQ=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:34533 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729791AbeKEWLG (ORCPT
+Return-Path: <SRS0=vxh5=N7=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from server.clasiuruguay.com.ar ([200.61.136.143]:45796 "EHLO
+        server.clasiuruguay.com.ar" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1730276AbeKTPTh (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 5 Nov 2018 17:11:06 -0500
-Received: by mail-wr1-f67.google.com with SMTP id j26-v6so9416273wre.1
-        for <linux-crypto@vger.kernel.org>; Mon, 05 Nov 2018 04:51:29 -0800 (PST)
-From: Corentin Labbe <clabbe@baylibre.com>
-To: davem@davemloft.net, ebiggers@kernel.org,
-        herbert@gondor.apana.org.au
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Corentin Labbe <clabbe@baylibre.com>
-Subject: [PATCH 4/5] crypto: tool: getstat: convert user space example to the new crypto_user_stat uapi
-Date: Mon,  5 Nov 2018 12:51:13 +0000
-Message-Id: <1541422274-40060-5-git-send-email-clabbe@baylibre.com>
-In-Reply-To: <1541422274-40060-1-git-send-email-clabbe@baylibre.com>
-References: <1541422274-40060-1-git-send-email-clabbe@baylibre.com>
+        Tue, 20 Nov 2018 10:19:37 -0500
+Message-Id: <201811192334.wAJLmc4P019691@server.clasiuruguay.com.ar>
+Content-Type: text/plain; charset="iso-8859-1"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8BIT
+Content-Description: Mail message body
+Subject: Spende
+To: Recipients <daniel@clasientrerriano.com.ar>
+From: daniel@clasientrerriano.com.ar
+Date: Tue, 20 Nov 2018 01:15:46 +0200
+Reply-To: jane.doee@zoho.com
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch converts the getstat example tool to the recent changes done in crypto_user_stat
-- changed all stats to u64
-- separated struct stats for each crypto alg
+Hallo,
 
-Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
----
- tools/crypto/getstat.c | 54 +++++++++++++++++++++---------------------
- 1 file changed, 27 insertions(+), 27 deletions(-)
+Sie haben eine wohltätige Spende in Höhe von 4.800, 000.00EUR, ich der Amerika-Lotterie Wert $ 560 Millionen gewonnen und ich bin einen Teil davon fünf glückliche Menschen und Altersheimen Spenden.Kontaktieren Sie mich für diesen Gott Gelegenheit per e-Mail: jane.doee@zoho.com
 
-diff --git a/tools/crypto/getstat.c b/tools/crypto/getstat.c
-index 24115173a483..57fbb94608d4 100644
---- a/tools/crypto/getstat.c
-+++ b/tools/crypto/getstat.c
-@@ -152,53 +152,53 @@ static int get_stat(const char *drivername)
- 
- 	if (tb[CRYPTOCFGA_STAT_HASH]) {
- 		struct rtattr *rta = tb[CRYPTOCFGA_STAT_HASH];
--		struct crypto_stat *rhash =
--			(struct crypto_stat *)RTA_DATA(rta);
--		printf("%s\tHash\n\tHash: %u bytes: %llu\n\tErrors: %u\n",
-+		struct crypto_stat_hash *rhash =
-+			(struct crypto_stat_hash *)RTA_DATA(rta);
-+		printf("%s\tHash\n\tHash: %llu bytes: %llu\n\tErrors: %llu\n",
- 			drivername,
- 			rhash->stat_hash_cnt, rhash->stat_hash_tlen,
- 			rhash->stat_hash_err_cnt);
- 	} else if (tb[CRYPTOCFGA_STAT_COMPRESS]) {
- 		struct rtattr *rta = tb[CRYPTOCFGA_STAT_COMPRESS];
--		struct crypto_stat *rblk =
--			(struct crypto_stat *)RTA_DATA(rta);
--		printf("%s\tCompress\n\tCompress: %u bytes: %llu\n\tDecompress: %u bytes: %llu\n\tErrors: %u\n",
-+		struct crypto_stat_compress *rblk =
-+			(struct crypto_stat_compress *)RTA_DATA(rta);
-+		printf("%s\tCompress\n\tCompress: %llu bytes: %llu\n\tDecompress: %llu bytes: %llu\n\tErrors: %llu\n",
- 			drivername,
- 			rblk->stat_compress_cnt, rblk->stat_compress_tlen,
- 			rblk->stat_decompress_cnt, rblk->stat_decompress_tlen,
- 			rblk->stat_compress_err_cnt);
- 	} else if (tb[CRYPTOCFGA_STAT_ACOMP]) {
- 		struct rtattr *rta = tb[CRYPTOCFGA_STAT_ACOMP];
--		struct crypto_stat *rcomp =
--			(struct crypto_stat *)RTA_DATA(rta);
--		printf("%s\tACompress\n\tCompress: %u bytes: %llu\n\tDecompress: %u bytes: %llu\n\tErrors: %u\n",
-+		struct crypto_stat_compress *rcomp =
-+			(struct crypto_stat_compress *)RTA_DATA(rta);
-+		printf("%s\tACompress\n\tCompress: %llu bytes: %llu\n\tDecompress: %llu bytes: %llu\n\tErrors: %llu\n",
- 			drivername,
- 			rcomp->stat_compress_cnt, rcomp->stat_compress_tlen,
- 			rcomp->stat_decompress_cnt, rcomp->stat_decompress_tlen,
- 			rcomp->stat_compress_err_cnt);
- 	} else if (tb[CRYPTOCFGA_STAT_AEAD]) {
- 		struct rtattr *rta = tb[CRYPTOCFGA_STAT_AEAD];
--		struct crypto_stat *raead =
--			(struct crypto_stat *)RTA_DATA(rta);
--		printf("%s\tAEAD\n\tEncrypt: %u bytes: %llu\n\tDecrypt: %u bytes: %llu\n\tErrors: %u\n",
-+		struct crypto_stat_aead *raead =
-+			(struct crypto_stat_aead *)RTA_DATA(rta);
-+		printf("%s\tAEAD\n\tEncrypt: %llu bytes: %llu\n\tDecrypt: %llu bytes: %llu\n\tErrors: %llu\n",
- 			drivername,
- 			raead->stat_encrypt_cnt, raead->stat_encrypt_tlen,
- 			raead->stat_decrypt_cnt, raead->stat_decrypt_tlen,
- 			raead->stat_aead_err_cnt);
- 	} else if (tb[CRYPTOCFGA_STAT_BLKCIPHER]) {
- 		struct rtattr *rta = tb[CRYPTOCFGA_STAT_BLKCIPHER];
--		struct crypto_stat *rblk =
--			(struct crypto_stat *)RTA_DATA(rta);
--		printf("%s\tCipher\n\tEncrypt: %u bytes: %llu\n\tDecrypt: %u bytes: %llu\n\tErrors: %u\n",
-+		struct crypto_stat_cipher *rblk =
-+			(struct crypto_stat_cipher *)RTA_DATA(rta);
-+		printf("%s\tCipher\n\tEncrypt: %llu bytes: %llu\n\tDecrypt: %llu bytes: %llu\n\tErrors: %llu\n",
- 			drivername,
- 			rblk->stat_encrypt_cnt, rblk->stat_encrypt_tlen,
- 			rblk->stat_decrypt_cnt, rblk->stat_decrypt_tlen,
- 			rblk->stat_cipher_err_cnt);
- 	} else if (tb[CRYPTOCFGA_STAT_AKCIPHER]) {
- 		struct rtattr *rta = tb[CRYPTOCFGA_STAT_AKCIPHER];
--		struct crypto_stat *rblk =
--			(struct crypto_stat *)RTA_DATA(rta);
--		printf("%s\tAkcipher\n\tEncrypt: %u bytes: %llu\n\tDecrypt: %u bytes: %llu\n\tSign: %u\n\tVerify: %u\n\tErrors: %u\n",
-+		struct crypto_stat_akcipher *rblk =
-+			(struct crypto_stat_akcipher *)RTA_DATA(rta);
-+		printf("%s\tAkcipher\n\tEncrypt: %llu bytes: %llu\n\tDecrypt: %llu bytes: %llu\n\tSign: %llu\n\tVerify: %llu\n\tErrors: %llu\n",
- 			drivername,
- 			rblk->stat_encrypt_cnt, rblk->stat_encrypt_tlen,
- 			rblk->stat_decrypt_cnt, rblk->stat_decrypt_tlen,
-@@ -206,27 +206,27 @@ static int get_stat(const char *drivername)
- 			rblk->stat_akcipher_err_cnt);
- 	} else if (tb[CRYPTOCFGA_STAT_CIPHER]) {
- 		struct rtattr *rta = tb[CRYPTOCFGA_STAT_CIPHER];
--		struct crypto_stat *rblk =
--			(struct crypto_stat *)RTA_DATA(rta);
--		printf("%s\tcipher\n\tEncrypt: %u bytes: %llu\n\tDecrypt: %u bytes: %llu\n\tErrors: %u\n",
-+		struct crypto_stat_cipher *rblk =
-+			(struct crypto_stat_cipher *)RTA_DATA(rta);
-+		printf("%s\tcipher\n\tEncrypt: %llu bytes: %llu\n\tDecrypt: %llu bytes: %llu\n\tErrors: %llu\n",
- 			drivername,
- 			rblk->stat_encrypt_cnt, rblk->stat_encrypt_tlen,
- 			rblk->stat_decrypt_cnt, rblk->stat_decrypt_tlen,
- 			rblk->stat_cipher_err_cnt);
- 	} else if (tb[CRYPTOCFGA_STAT_RNG]) {
- 		struct rtattr *rta = tb[CRYPTOCFGA_STAT_RNG];
--		struct crypto_stat *rrng =
--			(struct crypto_stat *)RTA_DATA(rta);
--		printf("%s\tRNG\n\tSeed: %u\n\tGenerate: %u bytes: %llu\n\tErrors: %u\n",
-+		struct crypto_stat_rng *rrng =
-+			(struct crypto_stat_rng *)RTA_DATA(rta);
-+		printf("%s\tRNG\n\tSeed: %llu\n\tGenerate: %llu bytes: %llu\n\tErrors: %llu\n",
- 			drivername,
- 			rrng->stat_seed_cnt,
- 			rrng->stat_generate_cnt, rrng->stat_generate_tlen,
- 			rrng->stat_rng_err_cnt);
- 	} else if (tb[CRYPTOCFGA_STAT_KPP]) {
- 		struct rtattr *rta = tb[CRYPTOCFGA_STAT_KPP];
--		struct crypto_stat *rkpp =
--			(struct crypto_stat *)RTA_DATA(rta);
--		printf("%s\tKPP\n\tSetsecret: %u\n\tGenerate public key: %u\n\tCompute_shared_secret: %u\n\tErrors: %u\n",
-+		struct crypto_stat_kpp *rkpp =
-+			(struct crypto_stat_kpp *)RTA_DATA(rta);
-+		printf("%s\tKPP\n\tSetsecret: %llu\n\tGenerate public key: %llu\n\tCompute_shared_secret: %llu\n\tErrors: %llu\n",
- 			drivername,
- 			rkpp->stat_setsecret_cnt,
- 			rkpp->stat_generate_public_key_cnt,
 -- 
-2.18.1
+This message has been scanned for viruses and
+dangerous content by MailScanner, and is
+believed to be clean.
