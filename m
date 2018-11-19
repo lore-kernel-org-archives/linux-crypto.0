@@ -1,59 +1,107 @@
-Return-Path: <SRS0=HYoH=NT=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-io1-f45.google.com ([209.85.166.45]:36852 "EHLO
-        mail-io1-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726823AbeKIJUB (ORCPT
+Return-Path: <SRS0=9Ofa=N6=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:44879 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729991AbeKTFOs (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 9 Nov 2018 04:20:01 -0500
-Received: by mail-io1-f45.google.com with SMTP id o19-v6so41425iod.3
-        for <linux-crypto@vger.kernel.org>; Thu, 08 Nov 2018 15:42:06 -0800 (PST)
+        Tue, 20 Nov 2018 00:14:48 -0500
+Received: by mail-pf1-f195.google.com with SMTP id u6so2816720pfh.11
+        for <linux-crypto@vger.kernel.org>; Mon, 19 Nov 2018 10:49:57 -0800 (PST)
+Date: Mon, 19 Nov 2018 11:49:54 -0700
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Kenneth Lee <liguozhu@hisilicon.com>
+Cc: Leon Romanovsky <leon@kernel.org>,
+        Kenneth Lee <nek.in.cn@gmail.com>,
+        Tim Sell <timothy.sell@unisys.com>, linux-doc@vger.kernel.org,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Zaibo Xu <xuzaibo@huawei.com>, zhangfei.gao@foxmail.com,
+        linuxarm@huawei.com, haojian.zhuang@linaro.org,
+        Christoph Lameter <cl@linux.com>,
+        Hao Fang <fanghao11@huawei.com>,
+        Gavin Schenk <g.schenk@eckelmann.de>,
+        RDMA mailing list <linux-rdma@vger.kernel.org>,
+        Zhou Wang <wangzhou1@hisilicon.com>,
+        Doug Ledford <dledford@redhat.com>,
+        Uwe =?utf-8?Q?Kleine-K=C3=B6nig?=
+        <u.kleine-koenig@pengutronix.de>,
+        David Kershner <david.kershner@unisys.com>,
+        Johan Hovold <johan@kernel.org>,
+        Cyrille Pitchen <cyrille.pitchen@free-electrons.com>,
+        Sagar Dharia <sdharia@codeaurora.org>,
+        Jens Axboe <axboe@kernel.dk>, guodong.xu@linaro.org,
+        linux-netdev <netdev@vger.kernel.org>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        linux-kernel@vger.kernel.org, Vinod Koul <vkoul@kernel.org>,
+        linux-crypto@vger.kernel.org,
+        Philippe Ombredanne <pombredanne@nexb.com>,
+        Sanyog Kale <sanyog.r.kale@intel.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-accelerators@lists.ozlabs.org
+Subject: Re: [RFCv3 PATCH 1/6] uacce: Add documents for WarpDrive/uacce
+Message-ID: <20181119184954.GB4890@ziepe.ca>
+References: <20181112075807.9291-1-nek.in.cn@gmail.com>
+ <20181112075807.9291-2-nek.in.cn@gmail.com>
+ <20181113002354.GO3695@mtr-leonro.mtl.com>
+ <95310df4-b32c-42f0-c750-3ad5eb89b3dd@gmail.com>
+ <20181114160017.GI3759@mtr-leonro.mtl.com>
+ <20181115085109.GD157308@Turing-Arch-b>
+ <20181115145455.GN3759@mtr-leonro.mtl.com>
+ <20181119091405.GE157308@Turing-Arch-b>
 MIME-Version: 1.0
-In-Reply-To: <CAHmME9r=Zm4QzoRRdA88R0R56e3EJb+Psm7YeX6y2+ZhEjwYQg@mail.gmail.com>
-References: <CAHmME9r=Zm4QzoRRdA88R0R56e3EJb+Psm7YeX6y2+ZhEjwYQg@mail.gmail.com>
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date: Fri, 9 Nov 2018 00:42:05 +0100
-Message-ID: <CAKv+Gu8VDT0Z7j3dFAnWA_ruBHdQ9S7dZe=6Nym=sLsftLozYg@mail.gmail.com>
-Subject: Re: .S_shipped unnecessary?
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Masahiro Yamada <yamada.masahiro@socionext.com>,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: Eric Biggers <ebiggers@google.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181119091405.GE157308@Turing-Arch-b>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-(+ Masahiro, kbuild ml)
+On Mon, Nov 19, 2018 at 05:14:05PM +0800, Kenneth Lee wrote:
+ 
+> If the hardware cannot share page table with the CPU, we then need to have
+> some way to change the device page table. This is what happen in ODP. It
+> invalidates the page table in device upon mmu_notifier call back. But this cannot
+> solve the COW problem: if the user process A share a page P with device, and A 
+> forks a new process B, and it continue to write to the page. By COW, the
+> process B will keep the page P, while A will get a new page P'. But you have
+> no way to let the device know it should use P' rather than P.
 
-On 8 November 2018 at 21:37, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
-> Hi Ard, Eric, and others,
->
-> As promised, the next Zinc patchset will have less generated code! After a
-> bit of work with Andy and Samuel, I'll be bundling the perlasm.
->
+Is this true? I thought mmu_notifiers covered all these cases.
 
-Wonderful! Any problems doing that for x86_64 ?
+The mm_notifier for A should fire if B causes the physical address of
+A's pages to change via COW. 
 
-> One thing I'm wondering about, though, is the wisdom behind the current
-> .S_shipped pattern. Usually the _shipped is for big firmware blobs that are
-> hard (or impossible) to build independently. But in this case, the .S is
-> generated from the .pl significantly faster than gcc even compiles a basic
-> C file. And, since perl is needed to build the kernel anyway, it's not like
-> it will be impossible to find the right tools. Rather than clutter up commits
-> with the .pl _and_ the .S_shipped, what would you think if I just generated
-> the .S each time as an ordinary build artifact. AFAICT, this is fairly usual,
-> and it's hard to see downsides. Hence, why I'm writing this email: are there
-> any downsides to that?
->
+And this causes the device page tables to re-synchronize.
 
-I agree 100%. When I added this the first time, it was at the request
-of the ARM maintainer, who was reluctant to rely on Perl for some
-reason.
+> In WarpDrive/uacce, we make this simple. If you support IOMMU and it support
+> SVM/SVA. Everything will be fine just like ODP implicit mode. And you don't need
+> to write any code for that. Because it has been done by IOMMU framework. If it
 
-Recently, we have had to add a kludge to prevent spurious rebuilds of
-the .S_shipped files as well.
+Looks like the IOMMU code uses mmu_notifier, so it is identical to
+IB's ODP. The only difference is that IB tends to have the IOMMU page
+table in the device, not in the CPU.
 
-I'd be perfectly happy to get rid of this entirely, and always
-generate the .S from the .pl, which to me is kind of the point of
-carrying these files in the first place.
+The only case I know if that is different is the new-fangled CAPI
+stuff where the IOMMU can directly use the CPU's page table and the
+IOMMU page table (in device or CPU) is eliminated.
 
-Masahiro: do you see any problems with this?
+Anyhow, I don't think a single instance of hardware should justify an
+entire new subsystem. Subsystems are hard to make and without multiple
+hardware examples there is no way to expect that it would cover any
+future use cases.
+
+If all your driver needs is to mmap some PCI bar space, route
+interrupts and do DMA mapping then mediated VFIO is probably a good
+choice. 
+
+If it needs to do a bunch of other stuff, not related to PCI bar
+space, interrupts and DMA mapping (ie special code for compression,
+crypto, AI, whatever) then you should probably do what Jerome said and
+make a drivers/char/hisillicon_foo_bar.c that exposes just what your
+hardware does.
+
+If you have networking involved in here then consider RDMA,
+particularly if this functionality is already part of the same
+hardware that the hns infiniband driver is servicing.
+
+'computational MRs' are a reasonable approach to a side-car offload of
+already existing RDMA support.
+
+Jason
