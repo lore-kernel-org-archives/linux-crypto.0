@@ -1,61 +1,272 @@
-Return-Path: <SRS0=HYoH=NT=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from inva020.nxp.com ([92.121.34.13]:33300 "EHLO inva020.nxp.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726690AbeKHXMa (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 8 Nov 2018 18:12:30 -0500
-From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        Cristian Stoica <cristian.stoica@microchip.com>,
-        linux-crypto@vger.kernel.org,
-        Cristian Stoica <cristian.stoica@nxp.com>
-Subject: [PATCH 3/5] crypto: export CHACHAPOLY_IV_SIZE
-Date: Thu,  8 Nov 2018 15:36:29 +0200
-Message-Id: <20181108133631.15779-4-horia.geanta@nxp.com>
-In-Reply-To: <20181108133631.15779-1-horia.geanta@nxp.com>
-References: <20181108133631.15779-1-horia.geanta@nxp.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Return-Path: <SRS0=9Ofa=N6=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:46884 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730583AbeKTGS5 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 20 Nov 2018 01:18:57 -0500
+Received: by mail-wr1-f65.google.com with SMTP id l9so20478328wrt.13
+        for <linux-crypto@vger.kernel.org>; Mon, 19 Nov 2018 11:53:45 -0800 (PST)
+From: Corentin Labbe <clabbe@baylibre.com>
+To: davem@davemloft.net, ebiggers@kernel.org,
+        herbert@gondor.apana.org.au, nhorman@tuxdriver.com
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Corentin Labbe <clabbe@baylibre.com>
+Subject: [PATCH v2 09/11] crypto: crypto_user_stat: remove intermediate variable
+Date: Mon, 19 Nov 2018 19:53:28 +0000
+Message-Id: <1542657210-37739-10-git-send-email-clabbe@baylibre.com>
+In-Reply-To: <1542657210-37739-1-git-send-email-clabbe@baylibre.com>
+References: <1542657210-37739-1-git-send-email-clabbe@baylibre.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Cristian Stoica <cristian.stoica@nxp.com>
+The use of the v64 intermediate variable is useless, and removing it
+bring to much readable code.
 
-Move CHACHAPOLY_IV_SIZE to header file, so it can be reused.
-
-Signed-off-by: Cristian Stoica <cristian.stoica@nxp.com>
-Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
+Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
 ---
- crypto/chacha20poly1305.c | 2 --
- include/crypto/chacha20.h | 1 +
- 2 files changed, 1 insertion(+), 2 deletions(-)
+ crypto/crypto_user_stat.c | 132 ++++++++++++--------------------------
+ 1 file changed, 41 insertions(+), 91 deletions(-)
 
-diff --git a/crypto/chacha20poly1305.c b/crypto/chacha20poly1305.c
-index 600afa99941f..f9dd5453046a 100644
---- a/crypto/chacha20poly1305.c
-+++ b/crypto/chacha20poly1305.c
-@@ -22,8 +22,6 @@
+diff --git a/crypto/crypto_user_stat.c b/crypto/crypto_user_stat.c
+index 838123758423..7b668c659122 100644
+--- a/crypto/crypto_user_stat.c
++++ b/crypto/crypto_user_stat.c
+@@ -34,22 +34,16 @@ struct crypto_dump_info {
+ static int crypto_report_aead(struct sk_buff *skb, struct crypto_alg *alg)
+ {
+ 	struct crypto_stat_aead raead;
+-	u64 v64;
  
- #include "internal.h"
+ 	memset(&raead, 0, sizeof(raead));
  
--#define CHACHAPOLY_IV_SIZE	12
--
- struct chachapoly_instance_ctx {
- 	struct crypto_skcipher_spawn chacha;
- 	struct crypto_ahash_spawn poly;
-diff --git a/include/crypto/chacha20.h b/include/crypto/chacha20.h
-index f76302d99e2b..2d3129442a52 100644
---- a/include/crypto/chacha20.h
-+++ b/include/crypto/chacha20.h
-@@ -13,6 +13,7 @@
- #define CHACHA20_IV_SIZE	16
- #define CHACHA20_KEY_SIZE	32
- #define CHACHA20_BLOCK_SIZE	64
-+#define CHACHAPOLY_IV_SIZE	12
+ 	strscpy(raead.type, "aead", sizeof(raead.type));
  
- struct chacha20_ctx {
- 	u32 key[8];
+-	v64 = atomic64_read(&alg->encrypt_cnt);
+-	raead.stat_encrypt_cnt = v64;
+-	v64 = atomic64_read(&alg->encrypt_tlen);
+-	raead.stat_encrypt_tlen = v64;
+-	v64 = atomic64_read(&alg->decrypt_cnt);
+-	raead.stat_decrypt_cnt = v64;
+-	v64 = atomic64_read(&alg->decrypt_tlen);
+-	raead.stat_decrypt_tlen = v64;
+-	v64 = atomic64_read(&alg->aead_err_cnt);
+-	raead.stat_aead_err_cnt = v64;
++	raead.stat_encrypt_cnt = atomic64_read(&alg->encrypt_cnt);
++	raead.stat_encrypt_tlen = atomic64_read(&alg->encrypt_tlen);
++	raead.stat_decrypt_cnt = atomic64_read(&alg->decrypt_cnt);
++	raead.stat_decrypt_tlen = atomic64_read(&alg->decrypt_tlen);
++	raead.stat_aead_err_cnt = atomic64_read(&alg->aead_err_cnt);
+ 
+ 	return nla_put(skb, CRYPTOCFGA_STAT_AEAD, sizeof(raead), &raead);
+ }
+@@ -57,22 +51,16 @@ static int crypto_report_aead(struct sk_buff *skb, struct crypto_alg *alg)
+ static int crypto_report_cipher(struct sk_buff *skb, struct crypto_alg *alg)
+ {
+ 	struct crypto_stat_cipher rcipher;
+-	u64 v64;
+ 
+ 	memset(&rcipher, 0, sizeof(rcipher));
+ 
+ 	strscpy(rcipher.type, "cipher", sizeof(rcipher.type));
+ 
+-	v64 = atomic64_read(&alg->encrypt_cnt);
+-	rcipher.stat_encrypt_cnt = v64;
+-	v64 = atomic64_read(&alg->encrypt_tlen);
+-	rcipher.stat_encrypt_tlen = v64;
+-	v64 = atomic64_read(&alg->decrypt_cnt);
+-	rcipher.stat_decrypt_cnt = v64;
+-	v64 = atomic64_read(&alg->decrypt_tlen);
+-	rcipher.stat_decrypt_tlen = v64;
+-	v64 = atomic64_read(&alg->cipher_err_cnt);
+-	rcipher.stat_cipher_err_cnt = v64;
++	rcipher.stat_encrypt_cnt = atomic64_read(&alg->encrypt_cnt);
++	rcipher.stat_encrypt_tlen = atomic64_read(&alg->encrypt_tlen);
++	rcipher.stat_decrypt_cnt =  atomic64_read(&alg->decrypt_cnt);
++	rcipher.stat_decrypt_tlen = atomic64_read(&alg->decrypt_tlen);
++	rcipher.stat_cipher_err_cnt =  atomic64_read(&alg->cipher_err_cnt);
+ 
+ 	return nla_put(skb, CRYPTOCFGA_STAT_CIPHER, sizeof(rcipher), &rcipher);
+ }
+@@ -80,21 +68,15 @@ static int crypto_report_cipher(struct sk_buff *skb, struct crypto_alg *alg)
+ static int crypto_report_comp(struct sk_buff *skb, struct crypto_alg *alg)
+ {
+ 	struct crypto_stat_compress rcomp;
+-	u64 v64;
+ 
+ 	memset(&rcomp, 0, sizeof(rcomp));
+ 
+ 	strscpy(rcomp.type, "compression", sizeof(rcomp.type));
+-	v64 = atomic64_read(&alg->compress_cnt);
+-	rcomp.stat_compress_cnt = v64;
+-	v64 = atomic64_read(&alg->compress_tlen);
+-	rcomp.stat_compress_tlen = v64;
+-	v64 = atomic64_read(&alg->decompress_cnt);
+-	rcomp.stat_decompress_cnt = v64;
+-	v64 = atomic64_read(&alg->decompress_tlen);
+-	rcomp.stat_decompress_tlen = v64;
+-	v64 = atomic64_read(&alg->compress_err_cnt);
+-	rcomp.stat_compress_err_cnt = v64;
++	rcomp.stat_compress_cnt = atomic64_read(&alg->compress_cnt);
++	rcomp.stat_compress_tlen = atomic64_read(&alg->compress_tlen);
++	rcomp.stat_decompress_cnt = atomic64_read(&alg->decompress_cnt);
++	rcomp.stat_decompress_tlen = atomic64_read(&alg->decompress_tlen);
++	rcomp.stat_compress_err_cnt = atomic64_read(&alg->compress_err_cnt);
+ 
+ 	return nla_put(skb, CRYPTOCFGA_STAT_COMPRESS, sizeof(rcomp), &rcomp);
+ }
+@@ -102,21 +84,15 @@ static int crypto_report_comp(struct sk_buff *skb, struct crypto_alg *alg)
+ static int crypto_report_acomp(struct sk_buff *skb, struct crypto_alg *alg)
+ {
+ 	struct crypto_stat_compress racomp;
+-	u64 v64;
+ 
+ 	memset(&racomp, 0, sizeof(racomp));
+ 
+ 	strscpy(racomp.type, "acomp", sizeof(racomp.type));
+-	v64 = atomic64_read(&alg->compress_cnt);
+-	racomp.stat_compress_cnt = v64;
+-	v64 = atomic64_read(&alg->compress_tlen);
+-	racomp.stat_compress_tlen = v64;
+-	v64 = atomic64_read(&alg->decompress_cnt);
+-	racomp.stat_decompress_cnt = v64;
+-	v64 = atomic64_read(&alg->decompress_tlen);
+-	racomp.stat_decompress_tlen = v64;
+-	v64 = atomic64_read(&alg->compress_err_cnt);
+-	racomp.stat_compress_err_cnt = v64;
++	racomp.stat_compress_cnt = atomic64_read(&alg->compress_cnt);
++	racomp.stat_compress_tlen = atomic64_read(&alg->compress_tlen);
++	racomp.stat_decompress_cnt =  atomic64_read(&alg->decompress_cnt);
++	racomp.stat_decompress_tlen = atomic64_read(&alg->decompress_tlen);
++	racomp.stat_compress_err_cnt = atomic64_read(&alg->compress_err_cnt);
+ 
+ 	return nla_put(skb, CRYPTOCFGA_STAT_ACOMP, sizeof(racomp), &racomp);
+ }
+@@ -124,25 +100,17 @@ static int crypto_report_acomp(struct sk_buff *skb, struct crypto_alg *alg)
+ static int crypto_report_akcipher(struct sk_buff *skb, struct crypto_alg *alg)
+ {
+ 	struct crypto_stat_akcipher rakcipher;
+-	u64 v64;
+ 
+ 	memset(&rakcipher, 0, sizeof(rakcipher));
+ 
+ 	strscpy(rakcipher.type, "akcipher", sizeof(rakcipher.type));
+-	v64 = atomic64_read(&alg->encrypt_cnt);
+-	rakcipher.stat_encrypt_cnt = v64;
+-	v64 = atomic64_read(&alg->encrypt_tlen);
+-	rakcipher.stat_encrypt_tlen = v64;
+-	v64 = atomic64_read(&alg->decrypt_cnt);
+-	rakcipher.stat_decrypt_cnt = v64;
+-	v64 = atomic64_read(&alg->decrypt_tlen);
+-	rakcipher.stat_decrypt_tlen = v64;
+-	v64 = atomic64_read(&alg->sign_cnt);
+-	rakcipher.stat_sign_cnt = v64;
+-	v64 = atomic64_read(&alg->verify_cnt);
+-	rakcipher.stat_verify_cnt = v64;
+-	v64 = atomic64_read(&alg->akcipher_err_cnt);
+-	rakcipher.stat_akcipher_err_cnt = v64;
++	rakcipher.stat_encrypt_cnt = atomic64_read(&alg->encrypt_cnt);
++	rakcipher.stat_encrypt_tlen = atomic64_read(&alg->encrypt_tlen);
++	rakcipher.stat_decrypt_cnt = atomic64_read(&alg->decrypt_cnt);
++	rakcipher.stat_decrypt_tlen = atomic64_read(&alg->decrypt_tlen);
++	rakcipher.stat_sign_cnt = atomic64_read(&alg->sign_cnt);
++	rakcipher.stat_verify_cnt = atomic64_read(&alg->verify_cnt);
++	rakcipher.stat_akcipher_err_cnt = atomic64_read(&alg->akcipher_err_cnt);
+ 
+ 	return nla_put(skb, CRYPTOCFGA_STAT_AKCIPHER,
+ 		       sizeof(rakcipher), &rakcipher);
+@@ -151,20 +119,15 @@ static int crypto_report_akcipher(struct sk_buff *skb, struct crypto_alg *alg)
+ static int crypto_report_kpp(struct sk_buff *skb, struct crypto_alg *alg)
+ {
+ 	struct crypto_stat_kpp rkpp;
+-	u64 v;
+ 
+ 	memset(&rkpp, 0, sizeof(rkpp));
+ 
+ 	strscpy(rkpp.type, "kpp", sizeof(rkpp.type));
+ 
+-	v = atomic64_read(&alg->setsecret_cnt);
+-	rkpp.stat_setsecret_cnt = v;
+-	v = atomic64_read(&alg->generate_public_key_cnt);
+-	rkpp.stat_generate_public_key_cnt = v;
+-	v = atomic64_read(&alg->compute_shared_secret_cnt);
+-	rkpp.stat_compute_shared_secret_cnt = v;
+-	v = atomic64_read(&alg->kpp_err_cnt);
+-	rkpp.stat_kpp_err_cnt = v;
++	rkpp.stat_setsecret_cnt = atomic64_read(&alg->setsecret_cnt);
++	rkpp.stat_generate_public_key_cnt = atomic64_read(&alg->generate_public_key_cnt);
++	rkpp.stat_compute_shared_secret_cnt = atomic64_read(&alg->compute_shared_secret_cnt);
++	rkpp.stat_kpp_err_cnt = atomic64_read(&alg->kpp_err_cnt);
+ 
+ 	return nla_put(skb, CRYPTOCFGA_STAT_KPP, sizeof(rkpp), &rkpp);
+ }
+@@ -172,18 +135,14 @@ static int crypto_report_kpp(struct sk_buff *skb, struct crypto_alg *alg)
+ static int crypto_report_ahash(struct sk_buff *skb, struct crypto_alg *alg)
+ {
+ 	struct crypto_stat_hash rhash;
+-	u64 v64;
+ 
+ 	memset(&rhash, 0, sizeof(rhash));
+ 
+ 	strscpy(rhash.type, "ahash", sizeof(rhash.type));
+ 
+-	v64 = atomic64_read(&alg->hash_cnt);
+-	rhash.stat_hash_cnt = v64;
+-	v64 = atomic64_read(&alg->hash_tlen);
+-	rhash.stat_hash_tlen = v64;
+-	v64 = atomic64_read(&alg->hash_err_cnt);
+-	rhash.stat_hash_err_cnt = v64;
++	rhash.stat_hash_cnt = atomic64_read(&alg->hash_cnt);
++	rhash.stat_hash_tlen = atomic64_read(&alg->hash_tlen);
++	rhash.stat_hash_err_cnt = atomic64_read(&alg->hash_err_cnt);
+ 
+ 	return nla_put(skb, CRYPTOCFGA_STAT_HASH, sizeof(rhash), &rhash);
+ }
+@@ -191,18 +150,14 @@ static int crypto_report_ahash(struct sk_buff *skb, struct crypto_alg *alg)
+ static int crypto_report_shash(struct sk_buff *skb, struct crypto_alg *alg)
+ {
+ 	struct crypto_stat_hash rhash;
+-	u64 v64;
+ 
+ 	memset(&rhash, 0, sizeof(rhash));
+ 
+ 	strscpy(rhash.type, "shash", sizeof(rhash.type));
+ 
+-	v64 = atomic64_read(&alg->hash_cnt);
+-	rhash.stat_hash_cnt = v64;
+-	v64 = atomic64_read(&alg->hash_tlen);
+-	rhash.stat_hash_tlen = v64;
+-	v64 = atomic64_read(&alg->hash_err_cnt);
+-	rhash.stat_hash_err_cnt = v64;
++	rhash.stat_hash_cnt =  atomic64_read(&alg->hash_cnt);
++	rhash.stat_hash_tlen = atomic64_read(&alg->hash_tlen);
++	rhash.stat_hash_err_cnt = atomic64_read(&alg->hash_err_cnt);
+ 
+ 	return nla_put(skb, CRYPTOCFGA_STAT_HASH, sizeof(rhash), &rhash);
+ }
+@@ -210,20 +165,15 @@ static int crypto_report_shash(struct sk_buff *skb, struct crypto_alg *alg)
+ static int crypto_report_rng(struct sk_buff *skb, struct crypto_alg *alg)
+ {
+ 	struct crypto_stat_rng rrng;
+-	u64 v64;
+ 
+ 	memset(&rrng, 0, sizeof(rrng));
+ 
+ 	strscpy(rrng.type, "rng", sizeof(rrng.type));
+ 
+-	v64 = atomic64_read(&alg->generate_cnt);
+-	rrng.stat_generate_cnt = v64;
+-	v64 = atomic64_read(&alg->generate_tlen);
+-	rrng.stat_generate_tlen = v64;
+-	v64 = atomic64_read(&alg->seed_cnt);
+-	rrng.stat_seed_cnt = v64;
+-	v64 = atomic64_read(&alg->rng_err_cnt);
+-	rrng.stat_rng_err_cnt = v64;
++	rrng.stat_generate_cnt = atomic64_read(&alg->generate_cnt);
++	rrng.stat_generate_tlen = atomic64_read(&alg->generate_tlen);
++	rrng.stat_seed_cnt = atomic64_read(&alg->seed_cnt);
++	rrng.stat_rng_err_cnt = atomic64_read(&alg->rng_err_cnt);
+ 
+ 	return nla_put(skb, CRYPTOCFGA_STAT_RNG, sizeof(rrng), &rrng);
+ }
 -- 
-2.16.2
+2.18.1
