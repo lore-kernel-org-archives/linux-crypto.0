@@ -1,102 +1,128 @@
-Return-Path: <SRS0=r3Tc=N4=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:51838 "EHLO mail.kernel.org"
+Return-Path: <SRS0=9Ofa=N6=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:48213 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731124AbeKQLni (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 17 Nov 2018 06:43:38 -0500
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc: linux-fscrypt@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        Paul Crowley <paulcrowley@google.com>,
-        Greg Kaiser <gkaiser@google.com>,
-        "Jason A . Donenfeld" <Jason@zx2c4.com>,
-        Samuel Neves <samuel.c.p.neves@gmail.com>,
-        Tomer Ashur <tomer.ashur@esat.kuleuven.be>,
-        Eric Biggers <ebiggers@google.com>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v4 09/14] crypto: arm/chacha - add XChaCha12 support
-Date: Fri, 16 Nov 2018 17:26:26 -0800
-Message-Id: <20181117012631.23528-10-ebiggers@kernel.org>
-In-Reply-To: <20181117012631.23528-1-ebiggers@kernel.org>
-References: <20181117012631.23528-1-ebiggers@kernel.org>
+        id S1725898AbeKTH7C (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 20 Nov 2018 02:59:02 -0500
+Date: Mon, 19 Nov 2018 16:33:20 -0500
+From: Jerome Glisse <jglisse@redhat.com>
+To: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: Tim Sell <timothy.sell@unisys.com>, linux-doc@vger.kernel.org,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Zaibo Xu <xuzaibo@huawei.com>, zhangfei.gao@foxmail.com,
+        linuxarm@huawei.com, haojian.zhuang@linaro.org,
+        Christoph Lameter <cl@linux.com>,
+        Hao Fang <fanghao11@huawei.com>,
+        Gavin Schenk <g.schenk@eckelmann.de>,
+        Leon Romanovsky <leon@kernel.org>,
+        RDMA mailing list <linux-rdma@vger.kernel.org>,
+        Vinod Koul <vkoul@kernel.org>,
+        Doug Ledford <dledford@redhat.com>,
+        Uwe =?iso-8859-1?Q?Kleine-K=F6nig?=
+        <u.kleine-koenig@pengutronix.de>,
+        David Kershner <david.kershner@unisys.com>,
+        Kenneth Lee <nek.in.cn@gmail.com>,
+        Johan Hovold <johan@kernel.org>,
+        Cyrille Pitchen <cyrille.pitchen@free-electrons.com>,
+        Sagar Dharia <sdharia@codeaurora.org>,
+        Jens Axboe <axboe@kernel.dk>, guodong.xu@linaro.org,
+        linux-netdev <netdev@vger.kernel.org>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        linux-kernel@vger.kernel.org, Zhou Wang <wangzhou1@hisilicon.com>,
+        linux-crypto@vger.kernel.org,
+        Philippe Ombredanne <pombredanne@nexb.com>,
+        Sanyog Kale <sanyog.r.kale@intel.com>,
+        Kenneth Lee <liguozhu@hisilicon.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-accelerators@lists.ozlabs.org
+Subject: Re: [RFCv3 PATCH 1/6] uacce: Add documents for WarpDrive/uacce
+Message-ID: <20181119213320.GG4593@redhat.com>
+References: <20181119164853.GA4593@redhat.com>
+ <20181119182752.GA4890@ziepe.ca>
+ <20181119184215.GB4593@redhat.com>
+ <20181119185333.GC4890@ziepe.ca>
+ <20181119191721.GC4593@redhat.com>
+ <20181119192702.GD4890@ziepe.ca>
+ <20181119194631.GE4593@redhat.com>
+ <20181119201156.GG4890@ziepe.ca>
+ <20181119202614.GF4593@redhat.com>
+ <20181119212638.GI4890@ziepe.ca>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20181119212638.GI4890@ziepe.ca>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Eric Biggers <ebiggers@google.com>
+On Mon, Nov 19, 2018 at 02:26:38PM -0700, Jason Gunthorpe wrote:
+> On Mon, Nov 19, 2018 at 03:26:15PM -0500, Jerome Glisse wrote:
+> > On Mon, Nov 19, 2018 at 01:11:56PM -0700, Jason Gunthorpe wrote:
+> > > On Mon, Nov 19, 2018 at 02:46:32PM -0500, Jerome Glisse wrote:
+> > > 
+> > > > > ?? How can O_DIRECT be fine but RDMA not? They use exactly the same
+> > > > > get_user_pages flow, right? Can we do what O_DIRECT does in RDMA and
+> > > > > be fine too?
+> > > > > 
+> > > > > AFAIK the only difference is the length of the race window. You'd have
+> > > > > to fork and fault during the shorter time O_DIRECT has get_user_pages
+> > > > > open.
+> > > > 
+> > > > Well in O_DIRECT case there is only one page table, the CPU
+> > > > page table and it gets updated during fork() so there is an
+> > > > ordering there and the race window is small.
+> > > 
+> > > Not really, in O_DIRECT case there is another 'page table', we just
+> > > call it a DMA scatter/gather list and it is sent directly to the block
+> > > device's DMA HW. The sgl plays exactly the same role as the various HW
+> > > page list data structures that underly RDMA MRs.
+> > > 
+> > > It is not a page table that matters here, it is if the DMA address of
+> > > the page is active for DMA on HW.
+> > > 
+> > > Like you say, the only difference is that the race is hopefully small
+> > > with O_DIRECT (though that is not really small, NVMeof for instance
+> > > has windows as large as connection timeouts, if you try hard enough)
+> > > 
+> > > So we probably can trigger this trouble with O_DIRECT and fork(), and
+> > > I would call it a bug :(
+> > 
+> > I can not think of any scenario that would be a bug with O_DIRECT.
+> > Do you have one in mind ? When you fork() and do other syscall that
+> > affect the memory of your process in another thread you should
+> > expect non consistant results. Kernel is not here to provide a fully
+> > safe environement to user, user can shoot itself in the foot and
+> > that's fine as long as it only affect the process itself and no one
+> > else. We should not be in the business of making everything baby
+> > proof :)
+> 
+> Sure, I setup AIO with O_DIRECT and launch a read.
+> 
+> Then I fork and dirty the READ target memory using the CPU in the
+> child.
+> 
+> As you described in this case the fork will retain the physical page
+> that is undergoing O_DIRECT DMA, and the parent gets a new copy'd page.
+> 
+> The DMA completes, and the child gets the DMA'd to page. The parent
+> gets an unchanged copy'd page.
+> 
+> The parent gets the AIO completion, but can't see the data.
+> 
+> I'd call that a bug with O_DIRECT. The only correct outcome is that
+> the parent will always see the O_DIRECT data. Fork should not cause
+> the *parent* to malfunction. I agree the child cannot make any
+> prediction what memory it will see.
+> 
+> I assume the same flow is possible using threads and read()..
+> 
+> It is really no different than the RDMA bug with fork.
+> 
 
-Now that the 32-bit ARM NEON implementation of ChaCha20 and XChaCha20
-has been refactored to support varying the number of rounds, add support
-for XChaCha12.  This is identical to XChaCha20 except for the number of
-rounds, which is 12 instead of 20.
+Yes and that's expected behavior :) If you fork() and have anything
+still in flight at time of fork that can change your process address
+space (including data in it) then all bets are of.
 
-XChaCha12 is faster than XChaCha20 but has a lower security margin,
-though still greater than AES-256's since the best known attacks make it
-through only 7 rounds.  See the patch "crypto: chacha - add XChaCha12
-support" for more details about why we need XChaCha12 support.
+At least this is my reading of fork() syscall.
 
-Reviewed-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- arch/arm/crypto/Kconfig            |  2 +-
- arch/arm/crypto/chacha-neon-glue.c | 21 ++++++++++++++++++++-
- 2 files changed, 21 insertions(+), 2 deletions(-)
-
-diff --git a/arch/arm/crypto/Kconfig b/arch/arm/crypto/Kconfig
-index a08759c32cb9..59c674cf08ef 100644
---- a/arch/arm/crypto/Kconfig
-+++ b/arch/arm/crypto/Kconfig
-@@ -126,7 +126,7 @@ config CRYPTO_CRC32_ARM_CE
- 	select CRYPTO_HASH
- 
- config CRYPTO_CHACHA20_NEON
--	tristate "NEON accelerated ChaCha20 stream cipher algorithms"
-+	tristate "NEON accelerated ChaCha stream cipher algorithms"
- 	depends on KERNEL_MODE_NEON
- 	select CRYPTO_BLKCIPHER
- 	select CRYPTO_CHACHA20
-diff --git a/arch/arm/crypto/chacha-neon-glue.c b/arch/arm/crypto/chacha-neon-glue.c
-index 385557d38634..9d6fda81986d 100644
---- a/arch/arm/crypto/chacha-neon-glue.c
-+++ b/arch/arm/crypto/chacha-neon-glue.c
-@@ -1,5 +1,6 @@
- /*
-- * ChaCha20 (RFC7539) and XChaCha20 stream ciphers, NEON accelerated
-+ * ARM NEON accelerated ChaCha and XChaCha stream ciphers,
-+ * including ChaCha20 (RFC7539)
-  *
-  * Copyright (C) 2016 Linaro, Ltd. <ard.biesheuvel@linaro.org>
-  *
-@@ -154,6 +155,22 @@ static struct skcipher_alg algs[] = {
- 		.setkey			= crypto_chacha20_setkey,
- 		.encrypt		= xchacha_neon,
- 		.decrypt		= xchacha_neon,
-+	}, {
-+		.base.cra_name		= "xchacha12",
-+		.base.cra_driver_name	= "xchacha12-neon",
-+		.base.cra_priority	= 300,
-+		.base.cra_blocksize	= 1,
-+		.base.cra_ctxsize	= sizeof(struct chacha_ctx),
-+		.base.cra_module	= THIS_MODULE,
-+
-+		.min_keysize		= CHACHA_KEY_SIZE,
-+		.max_keysize		= CHACHA_KEY_SIZE,
-+		.ivsize			= XCHACHA_IV_SIZE,
-+		.chunksize		= CHACHA_BLOCK_SIZE,
-+		.walksize		= 4 * CHACHA_BLOCK_SIZE,
-+		.setkey			= crypto_chacha12_setkey,
-+		.encrypt		= xchacha_neon,
-+		.decrypt		= xchacha_neon,
- 	}
- };
- 
-@@ -180,3 +197,5 @@ MODULE_ALIAS_CRYPTO("chacha20");
- MODULE_ALIAS_CRYPTO("chacha20-neon");
- MODULE_ALIAS_CRYPTO("xchacha20");
- MODULE_ALIAS_CRYPTO("xchacha20-neon");
-+MODULE_ALIAS_CRYPTO("xchacha12");
-+MODULE_ALIAS_CRYPTO("xchacha12-neon");
--- 
-2.19.1.1215.g8438c0b245-goog
+Cheers,
+Jérôme
