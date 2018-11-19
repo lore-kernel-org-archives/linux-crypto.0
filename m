@@ -1,49 +1,94 @@
-Return-Path: <SRS0=waMk=NM=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from szxga06-in.huawei.com ([45.249.212.32]:51371 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728198AbeKAXVg (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 1 Nov 2018 19:21:36 -0400
-Message-ID: <5BDB0B28.6010106@huawei.com>
-Date: Thu, 1 Nov 2018 22:18:16 +0800
-From: zhong jiang <zhongjiang@huawei.com>
+Return-Path: <SRS0=9Ofa=N6=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:34010 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725987AbeKTFuX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 20 Nov 2018 00:50:23 -0500
+Date: Mon, 19 Nov 2018 14:25:13 -0500
+From: Jerome Glisse <jglisse@redhat.com>
+To: Christopher Lameter <cl@linux.com>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
+        Kenneth Lee <liguozhu@hisilicon.com>,
+        Tim Sell <timothy.sell@unisys.com>, linux-doc@vger.kernel.org,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Zaibo Xu <xuzaibo@huawei.com>, zhangfei.gao@foxmail.com,
+        linuxarm@huawei.com, haojian.zhuang@linaro.org,
+        Hao Fang <fanghao11@huawei.com>,
+        Gavin Schenk <g.schenk@eckelmann.de>,
+        RDMA mailing list <linux-rdma@vger.kernel.org>,
+        Zhou Wang <wangzhou1@hisilicon.com>,
+        Doug Ledford <dledford@redhat.com>,
+        Uwe =?iso-8859-1?Q?Kleine-K=F6nig?=
+        <u.kleine-koenig@pengutronix.de>,
+        David Kershner <david.kershner@unisys.com>,
+        Kenneth Lee <nek.in.cn@gmail.com>,
+        Johan Hovold <johan@kernel.org>,
+        Cyrille Pitchen <cyrille.pitchen@free-electrons.com>,
+        Sagar Dharia <sdharia@codeaurora.org>,
+        Jens Axboe <axboe@kernel.dk>, guodong.xu@linaro.org,
+        linux-netdev <netdev@vger.kernel.org>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        linux-kernel@vger.kernel.org, Vinod Koul <vkoul@kernel.org>,
+        linux-crypto@vger.kernel.org,
+        Philippe Ombredanne <pombredanne@nexb.com>,
+        Sanyog Kale <sanyog.r.kale@intel.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-accelerators@lists.ozlabs.org
+Subject: Re: [RFCv3 PATCH 1/6] uacce: Add documents for WarpDrive/uacce
+Message-ID: <20181119192512.GD4593@redhat.com>
+References: <20181114160017.GI3759@mtr-leonro.mtl.com>
+ <20181115085109.GD157308@Turing-Arch-b>
+ <20181115145455.GN3759@mtr-leonro.mtl.com>
+ <20181119091405.GE157308@Turing-Arch-b>
+ <20181119091910.GF157308@Turing-Arch-b>
+ <20181119104801.GF8268@mtr-leonro.mtl.com>
+ <20181119164853.GA4593@redhat.com>
+ <20181119182752.GA4890@ziepe.ca>
+ <20181119184215.GB4593@redhat.com>
+ <010001672d69716a-743e5098-eb2f-41ca-bf98-6e17eaaba00f-000000@email.amazonses.com>
 MIME-Version: 1.0
-To: Benjamin Coddington <bcodding@redhat.com>
-CC: <herbert@gondor.apana.org.au>, <trond.myklebust@hammerspace.com>,
-        <bfields@redhat.com>, <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>, <linux-nfs@vger.kernel.org>
-Subject: Re: [Qestion] Lots of memory leaks when mounting and unmounting nfs
- client to server continuously.
-References: <5BD85266.6000301@huawei.com> <1DEE371C-69EB-4D92-8F78-535AA5203007@redhat.com> <5BD86392.7070200@huawei.com> <8975EA60-7C42-426A-ADA3-DEE0E2CEE964@redhat.com>
-In-Reply-To: <8975EA60-7C42-426A-ADA3-DEE0E2CEE964@redhat.com>
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <010001672d69716a-743e5098-eb2f-41ca-bf98-6e17eaaba00f-000000@email.amazonses.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 2018/10/30 22:03, Benjamin Coddington wrote:
-> On 30 Oct 2018, at 9:58, zhong jiang wrote:
->
->> On 2018/10/30 21:06, Benjamin Coddington wrote:
->>> Hi zhong jiang,
->>>
->>> Try asking in linux-nfs.. but I'll also note that 3.10-stable may be
->>> missing a number of fixes to leaks in the NFS GSS code.
->>>
->>> I can see a more than a few fixes to memory leaks with: git log
->>> --grep=leak --oneline net/sunrpc/auth_gss/
->>>
->> Thanks for your reply.  I has tested some of them in the upsteam as you
->> have said.  but It fails to solve the issue completely.
-> What have you tested?  It is hard to help without specifics.
-Hi,  Benjamin
+On Mon, Nov 19, 2018 at 07:19:04PM +0000, Christopher Lameter wrote:
+> On Mon, 19 Nov 2018, Jerome Glisse wrote:
+> 
+> > > IIRC this is solved in IB by automatically calling
+> > > madvise(MADV_DONTFORK) before creating the MR.
+> > >
+> > > MADV_DONTFORK
+> > >   .. This is useful to prevent copy-on-write semantics from changing the
+> > >   physical location of a page if the parent writes to it after a
+> > >   fork(2) ..
+> >
+> > This would work around the issue but this is not transparent ie
+> > range marked with DONTFORK no longer behave as expected from the
+> > application point of view.
+> 
+> Why would anyone expect a range registered via MR behave as normal? Device
+> I/O is going on into that range. Memory is already special.
+> 
+> 
+> > Also it relies on userspace doing the right thing (which is not
+> > something i usualy trust :)).
+> 
+> This has been established practice for 15 or so years in a couple of use
+> cases. Again user space already has to be doing special things in order to
+> handle RDMA is that area.
 
-I have tested all of the the following patches in the latest mainline.
+Yes RDMA as an existing historical track record and thus people
+should now be aware of its limitation. What i am fighting against
+is new addition to kernel that pretend to do SVA (share virtual
+address) while their hardware is not realy doing SVA. SVA with
+IOMMU and ATS/PASID is fine, SVA in software with device driver
+that abide to mmu notifier is fine. Anything else is not.
 
-git log --grep=leak --oneline net/sunrpc/auth_gss/
+So i am just worrying about new user and making sure they under-
+stand what is happening and not sell to their user something
+false.
 
-Unfortunately,  None of the patches works. 
-
-Could you give some clues?
-
-Thanks,
-zhong jiang
+Cheers,
+Jérôme
