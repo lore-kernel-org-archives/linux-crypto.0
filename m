@@ -1,280 +1,52 @@
-Return-Path: <SRS0=7Tml=NW=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from sitav-80046.hsr.ch ([152.96.80.46]:33518 "EHLO
-        mail.strongswan.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727386AbeKKTYs (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 11 Nov 2018 14:24:48 -0500
-From: Martin Willi <martin@strongswan.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: linux-crypto@vger.kernel.org, x86@kernel.org
-Subject: [PATCH 3/6] crypto: x86/chacha20 - Support partial lengths in 8-block AVX2 variant
-Date: Sun, 11 Nov 2018 10:36:27 +0100
-Message-Id: <20181111093630.28107-4-martin@strongswan.org>
-In-Reply-To: <20181111093630.28107-1-martin@strongswan.org>
-References: <20181111093630.28107-1-martin@strongswan.org>
+Return-Path: <SRS0=9Ofa=N6=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from frisell.zx2c4.com ([192.95.5.64]:36635 "EHLO frisell.zx2c4.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2388694AbeKTDKJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 19 Nov 2018 22:10:09 -0500
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTP id c65a04e3
+        for <linux-crypto@vger.kernel.org>;
+        Mon, 19 Nov 2018 16:39:56 +0000 (UTC)
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id fc91a10f (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256:NO)
+        for <linux-crypto@vger.kernel.org>;
+        Mon, 19 Nov 2018 16:39:56 +0000 (UTC)
+Received: by mail-ot1-f45.google.com with SMTP id a11so24580853otr.10
+        for <linux-crypto@vger.kernel.org>; Mon, 19 Nov 2018 08:45:56 -0800 (PST)
+MIME-Version: 1.0
+References: <20181111093630.28107-1-martin@strongswan.org> <20181116022059.aob3ruc7umg32go6@gondor.apana.org.au>
+ <CAHmME9ppj_VDFhApxnnTX1ppn5QdzHH9kYNHkKwP8GKLvJ+Z+g@mail.gmail.com> <dcf5e17b3d1b86081197cd67a8c617c0eb8017c1.camel@strongswan.org>
+In-Reply-To: <dcf5e17b3d1b86081197cd67a8c617c0eb8017c1.camel@strongswan.org>
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date: Mon, 19 Nov 2018 17:45:44 +0100
+Message-ID: <CAHmME9opX4XOvR3O5SV7Nx5sAJ4TVNtGzZj218j=g1U2aQ2JoA@mail.gmail.com>
+Subject: Re: [PATCH 0/6] crypto: x86/chacha20 - SIMD performance improvements
+To: Martin Willi <martin@strongswan.org>
+Cc: Eric Biggers <ebiggers@kernel.org>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        X86 ML <x86@kernel.org>, Samuel Neves <sneves@dei.uc.pt>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Add a length argument to the eight block function for AVX2, so the
-block function may XOR only a partial length of eight blocks.
+Hi Martin,
 
-To avoid unnecessary operations, we integrate XORing of the first four
-blocks in the final lane interleaving; this also avoids some work in
-the partial lengths path.
+On Mon, Nov 19, 2018 at 8:52 AM Martin Willi <martin@strongswan.org> wrote:
+>
+> Adding AVX-512VL support is relatively simple. I have a patchset mostly
+> ready that is more than competitive with the code from Zinc. I'll clean
+> that up and do more testing before posting it later this week.
 
-Signed-off-by: Martin Willi <martin@strongswan.org>
----
- arch/x86/crypto/chacha20-avx2-x86_64.S | 189 +++++++++++++++++--------
- arch/x86/crypto/chacha20_glue.c        |   5 +-
- 2 files changed, 133 insertions(+), 61 deletions(-)
+Terrific. Depending on how it turns out, it'll be nice to try
+integrating this into Zinc. I have a massive Xeon Gold 5120 machine
+that I can give you access to if you'd like to do some testing and
+benching. Poke me on IRC -- I'm zx2c4.
 
-diff --git a/arch/x86/crypto/chacha20-avx2-x86_64.S b/arch/x86/crypto/chacha20-avx2-x86_64.S
-index f3cd26f48332..7b62d55bee3d 100644
---- a/arch/x86/crypto/chacha20-avx2-x86_64.S
-+++ b/arch/x86/crypto/chacha20-avx2-x86_64.S
-@@ -30,8 +30,9 @@ CTRINC:	.octa 0x00000003000000020000000100000000
- 
- ENTRY(chacha20_8block_xor_avx2)
- 	# %rdi: Input state matrix, s
--	# %rsi: 8 data blocks output, o
--	# %rdx: 8 data blocks input, i
-+	# %rsi: up to 8 data blocks output, o
-+	# %rdx: up to 8 data blocks input, i
-+	# %rcx: input/output length in bytes
- 
- 	# This function encrypts eight consecutive ChaCha20 blocks by loading
- 	# the state matrix in AVX registers eight times. As we need some
-@@ -48,6 +49,7 @@ ENTRY(chacha20_8block_xor_avx2)
- 	lea		8(%rsp),%r10
- 	and		$~31, %rsp
- 	sub		$0x80, %rsp
-+	mov		%rcx,%rax
- 
- 	# x0..15[0-7] = s[0..15]
- 	vpbroadcastd	0x00(%rdi),%ymm0
-@@ -375,74 +377,143 @@ ENTRY(chacha20_8block_xor_avx2)
- 	vpunpckhqdq	%ymm15,%ymm0,%ymm15
- 
- 	# interleave 128-bit words in state n, n+4
--	vmovdqa		0x00(%rsp),%ymm0
--	vperm2i128	$0x20,%ymm4,%ymm0,%ymm1
--	vperm2i128	$0x31,%ymm4,%ymm0,%ymm4
--	vmovdqa		%ymm1,0x00(%rsp)
--	vmovdqa		0x20(%rsp),%ymm0
--	vperm2i128	$0x20,%ymm5,%ymm0,%ymm1
--	vperm2i128	$0x31,%ymm5,%ymm0,%ymm5
--	vmovdqa		%ymm1,0x20(%rsp)
--	vmovdqa		0x40(%rsp),%ymm0
--	vperm2i128	$0x20,%ymm6,%ymm0,%ymm1
--	vperm2i128	$0x31,%ymm6,%ymm0,%ymm6
--	vmovdqa		%ymm1,0x40(%rsp)
--	vmovdqa		0x60(%rsp),%ymm0
--	vperm2i128	$0x20,%ymm7,%ymm0,%ymm1
--	vperm2i128	$0x31,%ymm7,%ymm0,%ymm7
--	vmovdqa		%ymm1,0x60(%rsp)
-+	# xor/write first four blocks
-+	vmovdqa		0x00(%rsp),%ymm1
-+	vperm2i128	$0x20,%ymm4,%ymm1,%ymm0
-+	cmp		$0x0020,%rax
-+	jl		.Lxorpart8
-+	vpxor		0x0000(%rdx),%ymm0,%ymm0
-+	vmovdqu		%ymm0,0x0000(%rsi)
-+	vperm2i128	$0x31,%ymm4,%ymm1,%ymm4
-+
- 	vperm2i128	$0x20,%ymm12,%ymm8,%ymm0
-+	cmp		$0x0040,%rax
-+	jl		.Lxorpart8
-+	vpxor		0x0020(%rdx),%ymm0,%ymm0
-+	vmovdqu		%ymm0,0x0020(%rsi)
- 	vperm2i128	$0x31,%ymm12,%ymm8,%ymm12
--	vmovdqa		%ymm0,%ymm8
--	vperm2i128	$0x20,%ymm13,%ymm9,%ymm0
--	vperm2i128	$0x31,%ymm13,%ymm9,%ymm13
--	vmovdqa		%ymm0,%ymm9
-+
-+	vmovdqa		0x40(%rsp),%ymm1
-+	vperm2i128	$0x20,%ymm6,%ymm1,%ymm0
-+	cmp		$0x0060,%rax
-+	jl		.Lxorpart8
-+	vpxor		0x0040(%rdx),%ymm0,%ymm0
-+	vmovdqu		%ymm0,0x0040(%rsi)
-+	vperm2i128	$0x31,%ymm6,%ymm1,%ymm6
-+
- 	vperm2i128	$0x20,%ymm14,%ymm10,%ymm0
-+	cmp		$0x0080,%rax
-+	jl		.Lxorpart8
-+	vpxor		0x0060(%rdx),%ymm0,%ymm0
-+	vmovdqu		%ymm0,0x0060(%rsi)
- 	vperm2i128	$0x31,%ymm14,%ymm10,%ymm14
--	vmovdqa		%ymm0,%ymm10
--	vperm2i128	$0x20,%ymm15,%ymm11,%ymm0
--	vperm2i128	$0x31,%ymm15,%ymm11,%ymm15
--	vmovdqa		%ymm0,%ymm11
- 
--	# xor with corresponding input, write to output
--	vmovdqa		0x00(%rsp),%ymm0
--	vpxor		0x0000(%rdx),%ymm0,%ymm0
--	vmovdqu		%ymm0,0x0000(%rsi)
--	vmovdqa		0x20(%rsp),%ymm0
-+	vmovdqa		0x20(%rsp),%ymm1
-+	vperm2i128	$0x20,%ymm5,%ymm1,%ymm0
-+	cmp		$0x00a0,%rax
-+	jl		.Lxorpart8
- 	vpxor		0x0080(%rdx),%ymm0,%ymm0
- 	vmovdqu		%ymm0,0x0080(%rsi)
--	vmovdqa		0x40(%rsp),%ymm0
--	vpxor		0x0040(%rdx),%ymm0,%ymm0
--	vmovdqu		%ymm0,0x0040(%rsi)
--	vmovdqa		0x60(%rsp),%ymm0
-+	vperm2i128	$0x31,%ymm5,%ymm1,%ymm5
-+
-+	vperm2i128	$0x20,%ymm13,%ymm9,%ymm0
-+	cmp		$0x00c0,%rax
-+	jl		.Lxorpart8
-+	vpxor		0x00a0(%rdx),%ymm0,%ymm0
-+	vmovdqu		%ymm0,0x00a0(%rsi)
-+	vperm2i128	$0x31,%ymm13,%ymm9,%ymm13
-+
-+	vmovdqa		0x60(%rsp),%ymm1
-+	vperm2i128	$0x20,%ymm7,%ymm1,%ymm0
-+	cmp		$0x00e0,%rax
-+	jl		.Lxorpart8
- 	vpxor		0x00c0(%rdx),%ymm0,%ymm0
- 	vmovdqu		%ymm0,0x00c0(%rsi)
--	vpxor		0x0100(%rdx),%ymm4,%ymm4
--	vmovdqu		%ymm4,0x0100(%rsi)
--	vpxor		0x0180(%rdx),%ymm5,%ymm5
--	vmovdqu		%ymm5,0x00180(%rsi)
--	vpxor		0x0140(%rdx),%ymm6,%ymm6
--	vmovdqu		%ymm6,0x0140(%rsi)
--	vpxor		0x01c0(%rdx),%ymm7,%ymm7
--	vmovdqu		%ymm7,0x01c0(%rsi)
--	vpxor		0x0020(%rdx),%ymm8,%ymm8
--	vmovdqu		%ymm8,0x0020(%rsi)
--	vpxor		0x00a0(%rdx),%ymm9,%ymm9
--	vmovdqu		%ymm9,0x00a0(%rsi)
--	vpxor		0x0060(%rdx),%ymm10,%ymm10
--	vmovdqu		%ymm10,0x0060(%rsi)
--	vpxor		0x00e0(%rdx),%ymm11,%ymm11
--	vmovdqu		%ymm11,0x00e0(%rsi)
--	vpxor		0x0120(%rdx),%ymm12,%ymm12
--	vmovdqu		%ymm12,0x0120(%rsi)
--	vpxor		0x01a0(%rdx),%ymm13,%ymm13
--	vmovdqu		%ymm13,0x01a0(%rsi)
--	vpxor		0x0160(%rdx),%ymm14,%ymm14
--	vmovdqu		%ymm14,0x0160(%rsi)
--	vpxor		0x01e0(%rdx),%ymm15,%ymm15
--	vmovdqu		%ymm15,0x01e0(%rsi)
-+	vperm2i128	$0x31,%ymm7,%ymm1,%ymm7
-+
-+	vperm2i128	$0x20,%ymm15,%ymm11,%ymm0
-+	cmp		$0x0100,%rax
-+	jl		.Lxorpart8
-+	vpxor		0x00e0(%rdx),%ymm0,%ymm0
-+	vmovdqu		%ymm0,0x00e0(%rsi)
-+	vperm2i128	$0x31,%ymm15,%ymm11,%ymm15
-+
-+	# xor remaining blocks, write to output
-+	vmovdqa		%ymm4,%ymm0
-+	cmp		$0x0120,%rax
-+	jl		.Lxorpart8
-+	vpxor		0x0100(%rdx),%ymm0,%ymm0
-+	vmovdqu		%ymm0,0x0100(%rsi)
- 
-+	vmovdqa		%ymm12,%ymm0
-+	cmp		$0x0140,%rax
-+	jl		.Lxorpart8
-+	vpxor		0x0120(%rdx),%ymm0,%ymm0
-+	vmovdqu		%ymm0,0x0120(%rsi)
-+
-+	vmovdqa		%ymm6,%ymm0
-+	cmp		$0x0160,%rax
-+	jl		.Lxorpart8
-+	vpxor		0x0140(%rdx),%ymm0,%ymm0
-+	vmovdqu		%ymm0,0x0140(%rsi)
-+
-+	vmovdqa		%ymm14,%ymm0
-+	cmp		$0x0180,%rax
-+	jl		.Lxorpart8
-+	vpxor		0x0160(%rdx),%ymm0,%ymm0
-+	vmovdqu		%ymm0,0x0160(%rsi)
-+
-+	vmovdqa		%ymm5,%ymm0
-+	cmp		$0x01a0,%rax
-+	jl		.Lxorpart8
-+	vpxor		0x0180(%rdx),%ymm0,%ymm0
-+	vmovdqu		%ymm0,0x0180(%rsi)
-+
-+	vmovdqa		%ymm13,%ymm0
-+	cmp		$0x01c0,%rax
-+	jl		.Lxorpart8
-+	vpxor		0x01a0(%rdx),%ymm0,%ymm0
-+	vmovdqu		%ymm0,0x01a0(%rsi)
-+
-+	vmovdqa		%ymm7,%ymm0
-+	cmp		$0x01e0,%rax
-+	jl		.Lxorpart8
-+	vpxor		0x01c0(%rdx),%ymm0,%ymm0
-+	vmovdqu		%ymm0,0x01c0(%rsi)
-+
-+	vmovdqa		%ymm15,%ymm0
-+	cmp		$0x0200,%rax
-+	jl		.Lxorpart8
-+	vpxor		0x01e0(%rdx),%ymm0,%ymm0
-+	vmovdqu		%ymm0,0x01e0(%rsi)
-+
-+.Ldone8:
- 	vzeroupper
- 	lea		-8(%r10),%rsp
- 	ret
-+
-+.Lxorpart8:
-+	# xor remaining bytes from partial register into output
-+	mov		%rax,%r9
-+	and		$0x1f,%r9
-+	jz		.Ldone8
-+	and		$~0x1f,%rax
-+
-+	mov		%rsi,%r11
-+
-+	lea		(%rdx,%rax),%rsi
-+	mov		%rsp,%rdi
-+	mov		%r9,%rcx
-+	rep movsb
-+
-+	vpxor		0x00(%rsp),%ymm0,%ymm0
-+	vmovdqa		%ymm0,0x00(%rsp)
-+
-+	mov		%rsp,%rsi
-+	lea		(%r11,%rax),%rdi
-+	mov		%r9,%rcx
-+	rep movsb
-+
-+	jmp		.Ldone8
-+
- ENDPROC(chacha20_8block_xor_avx2)
-diff --git a/arch/x86/crypto/chacha20_glue.c b/arch/x86/crypto/chacha20_glue.c
-index 8f1ef1a9ce5c..882e8bf5965a 100644
---- a/arch/x86/crypto/chacha20_glue.c
-+++ b/arch/x86/crypto/chacha20_glue.c
-@@ -24,7 +24,8 @@ asmlinkage void chacha20_block_xor_ssse3(u32 *state, u8 *dst, const u8 *src,
- asmlinkage void chacha20_4block_xor_ssse3(u32 *state, u8 *dst, const u8 *src,
- 					  unsigned int len);
- #ifdef CONFIG_AS_AVX2
--asmlinkage void chacha20_8block_xor_avx2(u32 *state, u8 *dst, const u8 *src);
-+asmlinkage void chacha20_8block_xor_avx2(u32 *state, u8 *dst, const u8 *src,
-+					 unsigned int len);
- static bool chacha20_use_avx2;
- #endif
- 
-@@ -34,7 +35,7 @@ static void chacha20_dosimd(u32 *state, u8 *dst, const u8 *src,
- #ifdef CONFIG_AS_AVX2
- 	if (chacha20_use_avx2) {
- 		while (bytes >= CHACHA20_BLOCK_SIZE * 8) {
--			chacha20_8block_xor_avx2(state, dst, src);
-+			chacha20_8block_xor_avx2(state, dst, src, bytes);
- 			bytes -= CHACHA20_BLOCK_SIZE * 8;
- 			src += CHACHA20_BLOCK_SIZE * 8;
- 			dst += CHACHA20_BLOCK_SIZE * 8;
--- 
-2.17.1
+> I don't think that having AVX-512F is that important until it is really
+> usable on CPUs in the market.
+
+Actually, similarly here, a 10nm Cannon Lake machine should be
+arriving at my house this week, which should make for some interesting
+testing ground for non-throttled zmm, if you'd like to play with it.
+
+Jason
