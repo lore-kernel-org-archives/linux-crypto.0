@@ -1,364 +1,47 @@
-Return-Path: <SRS0=r27M=OJ=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from stargate.chelsio.com ([12.32.117.8]:63966 "EHLO
-        stargate.chelsio.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726551AbeK3UK4 (ORCPT
+Return-Path: <SRS0=vxh5=N7=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from sitav-80046.hsr.ch ([152.96.80.46]:39018 "EHLO
+        mail.strongswan.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725902AbeKUC7m (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 30 Nov 2018 15:10:56 -0500
-From: Atul Gupta <atul.gupta@chelsio.com>
-To: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
-Subject: [crypto chcr 2/2] ESN for Inline IPSec Tx
-Date: Fri, 30 Nov 2018 14:32:09 +0530
-Message-Id: <1543568529-23675-1-git-send-email-atul.gupta@chelsio.com>
+        Tue, 20 Nov 2018 21:59:42 -0500
+Message-ID: <71b15365d7bb59295531b6409b85906e648246a6.camel@strongswan.org>
+Subject: Re: [PATCH 0/6] crypto: x86/chacha20 - SIMD performance improvements
+From: Martin Willi <martin@strongswan.org>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc: Eric Biggers <ebiggers@kernel.org>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        X86 ML <x86@kernel.org>, Samuel Neves <sneves@dei.uc.pt>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Date: Tue, 20 Nov 2018 17:29:40 +0100
+In-Reply-To: <CAHmME9opX4XOvR3O5SV7Nx5sAJ4TVNtGzZj218j=g1U2aQ2JoA@mail.gmail.com>
+References: <20181111093630.28107-1-martin@strongswan.org>
+         <20181116022059.aob3ruc7umg32go6@gondor.apana.org.au>
+         <CAHmME9ppj_VDFhApxnnTX1ppn5QdzHH9kYNHkKwP8GKLvJ+Z+g@mail.gmail.com>
+         <dcf5e17b3d1b86081197cd67a8c617c0eb8017c1.camel@strongswan.org>
+         <CAHmME9opX4XOvR3O5SV7Nx5sAJ4TVNtGzZj218j=g1U2aQ2JoA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Send SPI, 64b seq nos and 64b IV with aadiv drop for inline crypto.
-This information is added in outgoing packet after the CPL TX PKT XT
-and removed by hardware.
-The aad, auth and cipher offsets are then adjusted for ESN enabled tunnel.
+Hi Jason,
 
-Signed-off-by: Atul Gupta <atul.gupta@chelsio.com>
----
- drivers/crypto/chelsio/chcr_core.h  |   9 ++
- drivers/crypto/chelsio/chcr_ipsec.c | 175 ++++++++++++++++++++++++++++--------
- 2 files changed, 148 insertions(+), 36 deletions(-)
+> [...] I have a massive Xeon Gold 5120 machine that I can give you
+> access to if you'd like to do some testing and benching.
 
-diff --git a/drivers/crypto/chelsio/chcr_core.h b/drivers/crypto/chelsio/chcr_core.h
-index de3a9c0..4616663 100644
---- a/drivers/crypto/chelsio/chcr_core.h
-+++ b/drivers/crypto/chelsio/chcr_core.h
-@@ -159,8 +159,17 @@ struct chcr_ipsec_wr {
- 	struct chcr_ipsec_req req;
- };
- 
-+#define ESN_IV_INSERT_OFFSET 12
-+struct chcr_ipsec_aadiv {
-+	__be32 spi;
-+	u8 seq_no[8];
-+	u8 iv[8];
-+};
-+
- struct ipsec_sa_entry {
- 	int hmac_ctrl;
-+	u16 esn;
-+	u16 imm;
- 	unsigned int enckey_len;
- 	unsigned int kctx_len;
- 	unsigned int authsize;
-diff --git a/drivers/crypto/chelsio/chcr_ipsec.c b/drivers/crypto/chelsio/chcr_ipsec.c
-index 1ff8738..9321d2b 100644
---- a/drivers/crypto/chelsio/chcr_ipsec.c
-+++ b/drivers/crypto/chelsio/chcr_ipsec.c
-@@ -76,12 +76,14 @@
- static void chcr_xfrm_del_state(struct xfrm_state *x);
- static void chcr_xfrm_free_state(struct xfrm_state *x);
- static bool chcr_ipsec_offload_ok(struct sk_buff *skb, struct xfrm_state *x);
-+static void chcr_advance_esn_state(struct xfrm_state *x);
- 
- static const struct xfrmdev_ops chcr_xfrmdev_ops = {
- 	.xdo_dev_state_add      = chcr_xfrm_add_state,
- 	.xdo_dev_state_delete   = chcr_xfrm_del_state,
- 	.xdo_dev_state_free     = chcr_xfrm_free_state,
- 	.xdo_dev_offload_ok     = chcr_ipsec_offload_ok,
-+	.xdo_dev_state_advance_esn = chcr_advance_esn_state,
- };
- 
- /* Add offload xfrms to Chelsio Interface */
-@@ -210,10 +212,6 @@ static int chcr_xfrm_add_state(struct xfrm_state *x)
- 		pr_debug("CHCR: Cannot offload compressed xfrm states\n");
- 		return -EINVAL;
- 	}
--	if (x->props.flags & XFRM_STATE_ESN) {
--		pr_debug("CHCR: Cannot offload ESN xfrm states\n");
--		return -EINVAL;
--	}
- 	if (x->props.family != AF_INET &&
- 	    x->props.family != AF_INET6) {
- 		pr_debug("CHCR: Only IPv4/6 xfrm state offloaded\n");
-@@ -266,6 +264,8 @@ static int chcr_xfrm_add_state(struct xfrm_state *x)
- 	}
- 
- 	sa_entry->hmac_ctrl = chcr_ipsec_setauthsize(x, sa_entry);
-+	if (x->props.flags & XFRM_STATE_ESN)
-+		sa_entry->esn = 1;
- 	chcr_ipsec_setkey(x, sa_entry);
- 	x->xso.offload_handle = (unsigned long)sa_entry;
- 	try_module_get(THIS_MODULE);
-@@ -294,31 +294,57 @@ static void chcr_xfrm_free_state(struct xfrm_state *x)
- 
- static bool chcr_ipsec_offload_ok(struct sk_buff *skb, struct xfrm_state *x)
- {
--	/* Offload with IP options is not supported yet */
--	if (ip_hdr(skb)->ihl > 5)
--		return false;
--
-+	if (x->props.family == AF_INET) {
-+		/* Offload with IP options is not supported yet */
-+		if (ip_hdr(skb)->ihl > 5)
-+			return false;
-+	} else {
-+		/* Offload with IPv6 extension headers is not support yet */
-+		if (ipv6_ext_hdr(ipv6_hdr(skb)->nexthdr))
-+			return false;
-+	}
- 	return true;
- }
- 
--static inline int is_eth_imm(const struct sk_buff *skb, unsigned int kctx_len)
-+static void chcr_advance_esn_state(struct xfrm_state *x)
-+{
-+	/* do nothing */
-+	if (!x->xso.offload_handle)
-+		return;
-+}
-+
-+static inline int is_eth_imm(const struct sk_buff *skb,
-+			     struct ipsec_sa_entry *sa_entry)
- {
-+	unsigned int kctx_len;
- 	int hdrlen;
- 
-+	kctx_len = sa_entry->kctx_len;
- 	hdrlen = sizeof(struct fw_ulptx_wr) +
- 		 sizeof(struct chcr_ipsec_req) + kctx_len;
- 
- 	hdrlen += sizeof(struct cpl_tx_pkt);
-+	if (sa_entry->esn)
-+		hdrlen += (DIV_ROUND_UP(sizeof(struct chcr_ipsec_aadiv), 16)
-+			   << 4);
- 	if (skb->len <= MAX_IMM_TX_PKT_LEN - hdrlen)
- 		return hdrlen;
- 	return 0;
- }
- 
- static inline unsigned int calc_tx_sec_flits(const struct sk_buff *skb,
--					     unsigned int kctx_len)
-+					     struct ipsec_sa_entry *sa_entry)
- {
-+	unsigned int kctx_len;
- 	unsigned int flits;
--	int hdrlen = is_eth_imm(skb, kctx_len);
-+	int aadivlen;
-+	int hdrlen;
-+
-+	kctx_len = sa_entry->kctx_len;
-+	hdrlen = is_eth_imm(skb, sa_entry);
-+	aadivlen = sa_entry->esn ? DIV_ROUND_UP(sizeof(struct chcr_ipsec_aadiv),
-+						16) : 0;
-+	aadivlen <<= 4;
- 
- 	/* If the skb is small enough, we can pump it out as a work request
- 	 * with only immediate data.  In that case we just have to have the
-@@ -341,13 +367,69 @@ static inline unsigned int calc_tx_sec_flits(const struct sk_buff *skb,
- 	flits += (sizeof(struct fw_ulptx_wr) +
- 		  sizeof(struct chcr_ipsec_req) +
- 		  kctx_len +
--		  sizeof(struct cpl_tx_pkt_core)) / sizeof(__be64);
-+		  sizeof(struct cpl_tx_pkt_core) +
-+		  aadivlen) / sizeof(__be64);
- 	return flits;
- }
- 
-+inline void *copy_esn_pktxt(struct sk_buff *skb,
-+			    struct net_device *dev,
-+			    void *pos,
-+			    struct ipsec_sa_entry *sa_entry)
-+{
-+	struct chcr_ipsec_aadiv *aadiv;
-+	struct ulptx_idata *sc_imm;
-+	struct ip_esp_hdr *esphdr;
-+	struct xfrm_offload *xo;
-+	struct sge_eth_txq *q;
-+	struct adapter *adap;
-+	struct port_info *pi;
-+	__be64 seqno;
-+	u32 qidx;
-+	u32 seqlo;
-+	u8 *iv;
-+	int eoq;
-+	int len;
-+
-+	pi = netdev_priv(dev);
-+	adap = pi->adapter;
-+	qidx = skb->queue_mapping;
-+	q = &adap->sge.ethtxq[qidx + pi->first_qset];
-+
-+	/* end of queue, reset pos to start of queue */
-+	eoq = (void *)q->q.stat - pos;
-+	if (!eoq)
-+		pos = q->q.desc;
-+
-+	len = DIV_ROUND_UP(sizeof(struct chcr_ipsec_aadiv), 16) << 4;
-+	memset(pos, 0, len);
-+	aadiv = (struct chcr_ipsec_aadiv *)pos;
-+	esphdr = (struct ip_esp_hdr *)skb_transport_header(skb);
-+	iv = skb_transport_header(skb) + sizeof(struct ip_esp_hdr);
-+	xo = xfrm_offload(skb);
-+
-+	aadiv->spi = (esphdr->spi);
-+	seqlo = htonl(esphdr->seq_no);
-+	seqno = cpu_to_be64(seqlo + ((u64)xo->seq.hi << 32));
-+	memcpy(aadiv->seq_no, &seqno, 8);
-+	iv = skb_transport_header(skb) + sizeof(struct ip_esp_hdr);
-+	memcpy(aadiv->iv, iv, 8);
-+
-+	if (sa_entry->imm) {
-+		sc_imm = (struct ulptx_idata *)(pos +
-+			  (DIV_ROUND_UP(sizeof(struct chcr_ipsec_aadiv),
-+					sizeof(__be64)) << 3));
-+		sc_imm->cmd_more = FILL_CMD_MORE(!sa_entry->imm);
-+		sc_imm->len = cpu_to_be32(sa_entry->imm);
-+	}
-+	pos += len;
-+	return pos;
-+}
-+
- inline void *copy_cpltx_pktxt(struct sk_buff *skb,
--				struct net_device *dev,
--				void *pos)
-+			      struct net_device *dev,
-+			      void *pos,
-+			      struct ipsec_sa_entry *sa_entry)
- {
- 	struct cpl_tx_pkt_core *cpl;
- 	struct sge_eth_txq *q;
-@@ -382,6 +464,9 @@ inline void *copy_cpltx_pktxt(struct sk_buff *skb,
- 	cpl->ctrl1 = cpu_to_be64(cntrl);
- 
- 	pos += sizeof(struct cpl_tx_pkt_core);
-+	/* Copy ESN info for HW */
-+	if (sa_entry->esn)
-+		pos = copy_esn_pktxt(skb, dev, pos, sa_entry);
- 	return pos;
- }
- 
-@@ -428,7 +513,7 @@ inline void *copy_key_cpltx_pktxt(struct sk_buff *skb,
- 		pos = (u8 *)q->q.desc + (key_len - left);
- 	}
- 	/* Copy CPL TX PKT XT */
--	pos = copy_cpltx_pktxt(skb, dev, pos);
-+	pos = copy_cpltx_pktxt(skb, dev, pos, sa_entry);
- 
- 	return pos;
- }
-@@ -441,10 +526,16 @@ inline void *chcr_crypto_wreq(struct sk_buff *skb,
- {
- 	struct port_info *pi = netdev_priv(dev);
- 	struct adapter *adap = pi->adapter;
--	unsigned int immdatalen = 0;
- 	unsigned int ivsize = GCM_ESP_IV_SIZE;
- 	struct chcr_ipsec_wr *wr;
-+	u16 immdatalen = 0;
- 	unsigned int flits;
-+	u32 ivinoffset;
-+	u32 aadstart;
-+	u32 aadstop;
-+	u32 ciphstart;
-+	u32 ivdrop = 0;
-+	u32 esnlen = 0;
- 	u32 wr_mid;
- 	int qidx = skb_get_queue_mapping(skb);
- 	struct sge_eth_txq *q = &adap->sge.ethtxq[qidx + pi->first_qset];
-@@ -453,10 +544,17 @@ inline void *chcr_crypto_wreq(struct sk_buff *skb,
- 
- 	atomic_inc(&adap->chcr_stats.ipsec_cnt);
- 
--	flits = calc_tx_sec_flits(skb, kctx_len);
-+	flits = calc_tx_sec_flits(skb, sa_entry);
-+	if (sa_entry->esn)
-+		ivdrop = 1;
- 
--	if (is_eth_imm(skb, kctx_len))
-+	if (is_eth_imm(skb, sa_entry)) {
- 		immdatalen = skb->len;
-+		sa_entry->imm = immdatalen;
-+	}
-+
-+	if (sa_entry->esn)
-+		esnlen = sizeof(struct chcr_ipsec_aadiv);
- 
- 	/* WR Header */
- 	wr = (struct chcr_ipsec_wr *)pos;
-@@ -481,33 +579,38 @@ inline void *chcr_crypto_wreq(struct sk_buff *skb,
- 					 sizeof(wr->req.key_ctx) +
- 					 kctx_len +
- 					 sizeof(struct cpl_tx_pkt_core) +
--					 immdatalen);
-+					 esnlen +
-+					 (esnlen ? 0 : immdatalen));
- 
- 	/* CPL_SEC_PDU */
-+	ivinoffset = sa_entry->esn ? (ESN_IV_INSERT_OFFSET + 1) :
-+				     (skb_transport_offset(skb) +
-+				      sizeof(struct ip_esp_hdr) + 1);
- 	wr->req.sec_cpl.op_ivinsrtofst = htonl(
- 				CPL_TX_SEC_PDU_OPCODE_V(CPL_TX_SEC_PDU) |
- 				CPL_TX_SEC_PDU_CPLLEN_V(2) |
- 				CPL_TX_SEC_PDU_PLACEHOLDER_V(1) |
- 				CPL_TX_SEC_PDU_IVINSRTOFST_V(
--				(skb_transport_offset(skb) +
--				sizeof(struct ip_esp_hdr) + 1)));
-+							     ivinoffset));
- 
--	wr->req.sec_cpl.pldlen = htonl(skb->len);
-+	wr->req.sec_cpl.pldlen = htonl(skb->len + esnlen);
-+	aadstart = sa_entry->esn ? 1 : (skb_transport_offset(skb) + 1);
-+	aadstop = sa_entry->esn ? ESN_IV_INSERT_OFFSET :
-+				  (skb_transport_offset(skb) +
-+				   sizeof(struct ip_esp_hdr));
-+	ciphstart = skb_transport_offset(skb) + sizeof(struct ip_esp_hdr) +
-+		    GCM_ESP_IV_SIZE + 1;
-+	ciphstart += sa_entry->esn ?  esnlen : 0;
- 
- 	wr->req.sec_cpl.aadstart_cipherstop_hi = FILL_SEC_CPL_CIPHERSTOP_HI(
--				(skb_transport_offset(skb) + 1),
--				(skb_transport_offset(skb) +
--				 sizeof(struct ip_esp_hdr)),
--				(skb_transport_offset(skb) +
--				 sizeof(struct ip_esp_hdr) +
--				 GCM_ESP_IV_SIZE + 1), 0);
-+							aadstart,
-+							aadstop,
-+							ciphstart, 0);
- 
- 	wr->req.sec_cpl.cipherstop_lo_authinsert =
--		FILL_SEC_CPL_AUTHINSERT(0, skb_transport_offset(skb) +
--					   sizeof(struct ip_esp_hdr) +
--					   GCM_ESP_IV_SIZE + 1,
--					   sa_entry->authsize,
--					   sa_entry->authsize);
-+		FILL_SEC_CPL_AUTHINSERT(0, ciphstart,
-+					sa_entry->authsize,
-+					 sa_entry->authsize);
- 	wr->req.sec_cpl.seqno_numivs =
- 		FILL_SEC_CPL_SCMD0_SEQNO(CHCR_ENCRYPT_OP, 1,
- 					 CHCR_SCMD_CIPHER_MODE_AES_GCM,
-@@ -515,7 +618,7 @@ inline void *chcr_crypto_wreq(struct sk_buff *skb,
- 					 sa_entry->hmac_ctrl,
- 					 ivsize >> 1);
- 	wr->req.sec_cpl.ivgen_hdrlen =  FILL_SEC_CPL_IVGEN_HDRLEN(0, 0, 1,
--								  0, 0, 0);
-+								  0, ivdrop, 0);
- 
- 	pos += sizeof(struct fw_ulptx_wr) +
- 	       sizeof(struct ulp_txpkt) +
-@@ -593,7 +696,7 @@ int chcr_ipsec_xmit(struct sk_buff *skb, struct net_device *dev)
- 
- 	cxgb4_reclaim_completed_tx(adap, &q->q, true);
- 
--	flits = calc_tx_sec_flits(skb, sa_entry->kctx_len);
-+	flits = calc_tx_sec_flits(skb, sa_entry);
- 	ndesc = flits_to_desc(flits);
- 	credits = txq_avail(&q->q) - ndesc;
- 
-@@ -606,7 +709,7 @@ int chcr_ipsec_xmit(struct sk_buff *skb, struct net_device *dev)
- 		return NETDEV_TX_BUSY;
- 	}
- 
--	if (is_eth_imm(skb, kctx_len))
-+	if (is_eth_imm(skb, sa_entry))
- 		immediate = true;
- 
- 	if (!immediate &&
--- 
-1.8.3.1
+Thanks for the offer, no need at this time. But I certainly would
+welcome if you could do some (Wireguard) benching with that code to see
+if it works for you.
+
+> Actually, similarly here, a 10nm Cannon Lake machine should be
+> arriving at my house this week, which should make for some
+> interesting testing ground for non-throttled zmm, if you'd like to
+> play with it.
+
+Maybe in a future iteration, thanks. In fact would it be interesting to
+know if Cannon Lake can handle that throttling better.
+
+Regards
+Martin
