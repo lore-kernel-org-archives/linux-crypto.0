@@ -1,56 +1,128 @@
-Return-Path: <SRS0=unN5=OB=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:33262 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2438433AbeKWGeN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 23 Nov 2018 01:34:13 -0500
-From: Sasha Levin <sashal@kernel.org>
-To: stable@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 14/36] crypto: simd - correctly take reqsize of wrapped skcipher into account
-Date: Thu, 22 Nov 2018 14:52:18 -0500
-Message-Id: <20181122195240.13123-14-sashal@kernel.org>
-In-Reply-To: <20181122195240.13123-1-sashal@kernel.org>
-References: <20181122195240.13123-1-sashal@kernel.org>
+Return-Path: <SRS0=vxh5=N7=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from szxga03-in.huawei.com ([45.249.212.189]:6058 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726840AbeKTRhl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 20 Nov 2018 12:37:41 -0500
+Received: from DGGEML401-HUB.china.huawei.com (unknown [172.30.72.55])
+        by Forcepoint Email with ESMTP id 8C18890781B72
+        for <linux-crypto@vger.kernel.org>; Tue, 20 Nov 2018 15:09:59 +0800 (CST)
+From: "gongchen (E)" <gongchen4@huawei.com>
+To: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+CC: Herbert Xu <herbert@gondor.apana.org.au>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "Chencheng (J)" <beyond.chen@huawei.com>,
+        "Yangjie (R)" <yangjie234@huawei.com>,
+        Fengzhiqiang <fengzhiqiang.feng@huawei.com>,
+        "shengyong (A)" <shengyong1@huawei.com>,
+        "Luoxinqiang (CBG)" <luoxinqiang2@huawei.com>,
+        "lipengcheng (C)" <lipengcheng8@huawei.com>
+Subject: [Help] Null pointer exception in scatterwalk_start() in kernel-4.9
+Date: Tue, 20 Nov 2018 07:09:53 +0000
+Message-ID: <780FCA0995E39E408348187D2462E36A01557596@dggeml509-mbx.china.huawei.com>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="gb2312"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-
-[ Upstream commit 508a1c4df085a547187eed346f1bfe5e381797f1 ]
-
-The simd wrapper's skcipher request context structure consists
-of a single subrequest whose size is taken from the subordinate
-skcipher. However, in simd_skcipher_init(), the reqsize that is
-retrieved is not from the subordinate skcipher but from the
-cryptd request structure, whose size is completely unrelated to
-the actual wrapped skcipher.
-
-Reported-by: Qian Cai <cai@gmx.us>
-Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Tested-by: Qian Cai <cai@gmx.us>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- crypto/simd.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/crypto/simd.c b/crypto/simd.c
-index ea7240be3001..78e8d037ae2b 100644
---- a/crypto/simd.c
-+++ b/crypto/simd.c
-@@ -124,8 +124,9 @@ static int simd_skcipher_init(struct crypto_skcipher *tfm)
- 
- 	ctx->cryptd_tfm = cryptd_tfm;
- 
--	reqsize = sizeof(struct skcipher_request);
--	reqsize += crypto_skcipher_reqsize(&cryptd_tfm->base);
-+	reqsize = crypto_skcipher_reqsize(cryptd_skcipher_child(cryptd_tfm));
-+	reqsize = max(reqsize, crypto_skcipher_reqsize(&cryptd_tfm->base));
-+	reqsize += sizeof(struct skcipher_request);
- 
- 	crypto_skcipher_set_reqsize(tfm, reqsize);
- 
--- 
-2.17.1
+SGkgRGVhciBIZXJiZXJ0LA0KDQogICAgICAgICAgICBTb3JyeSB0byBib3RoZXIgeW91ICwgYnV0
+IHdloa92ZSBtZXQgYSBwcm9ibGVtIGluIGNyeXB0byBtb2R1bGUsIHdvdWxkIHlvdSBwbGVhc2Ug
+a2luZGx5IGhlbHAgdXMgbG9vayBpbnRvIGl0ID8gVGhhbmsgeW91IHZlcnkgbXVjaC4NCg0KICAg
+ICAgICAgICAgIEluIHRoZSBiZWxvdyBmdW5jdGlvbiBjaGFpbiwgc2NhdHRlcndhbGtfc3RhcnQo
+KSBkb2Vzbid0IGNoZWNrIHRoZSByZXN1bHQgb2Ygc2dfbmV4dCgpLCBzbyB0aGUga2VybmVsIHdp
+bGwgY3Jhc2ggaWYgc2dfbmV4dCgpIHJldHVybnMgYSBudWxsIHBvaW50ZXIsIHdoaWNoIGlzIG91
+ciBjYXNlLiAoVGhlIGZ1bGwgc3RhY2sgaXMgYXQgdGhlIGVuZCBvZiBsZXR0ZXIpDQogICAgICAg
+ICAgICAgYmxrY2lwaGVyX3dhbGtfZG9uZSgpLT5zY2F0dGVyd2Fsa19kb25lKCktPnNjYXR0ZXJ3
+YWxrX3BhZ2Vkb25lKCktPnNjYXR0ZXJ3YWxrX3N0YXJ0KHdhbGssIHNnX25leHQod2Fsay0+c2cp
+KTsNCiAgICAgICAgICAgIA0KICAgICAgICAgICAgU2hvdWxkIHdlIGFkZCBhIG51bGwtcG9pbnRl
+ci1jaGVjayBpbiBzY2F0dGVyd2Fsa19zdGFydCgpPyBPciBpcyB0aGVyZSBhbnkgcHJvY2VzcyBj
+YW4gZW5zdXJlIHRoYXQgdGhlcmUgc2hvdWxkIGJlIGEgdmFsaWQgc2cgcG9pbnRlciBpZiB0aGUg
+Y29uZGl0aW9uICh3YWxrLT5vZmZzZXQgPj0gd2Fsay0+c2ctPm9mZnNldCArIHdhbGstPnNnLT5s
+ZW5ndGgpIGlzIHRydWU/DQogICAgICAgICAgICAgICAgICAgICAgDQogICAgICAgICAgICBXZSBh
+cmUgcmVhbGx5IGxvb2tpbmcgZm9yd2FyZCB0byB5b3VyIHJlcGx5LCBhbnkgaW5mb3JtYXRpb24g
+d2lsbCBiZSBhcHByZWNpYXRlZCAsIHRoYW5rcyBhZ2Fpbi4NCiAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgDQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgQmVzdCBy
+ZWdhcmRzDQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIENoZW4gR29uZw0KICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgMjAxOC4xMS4yMA0KDQotLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQpGdWxsIFN0YWNro7oN
+CjwxPlszOTU0OTEuMTc4MDA5c11bcGlkOjI5NTAxLGNwdTQsQmluZGVyOjcwOF9BXVVuYWJsZSB0
+byBoYW5kbGUga2VybmVsIE5VTEwgcG9pbnRlciBkZXJlZmVyZW5jZSBhdCB2aXJ0dWFsIGFkZHJl
+c3MgMDAwMDAwMDgNCjwxPlszOTU0OTEuMTc4MDM5c11bcGlkOjI5NTAxLGNwdTQsQmluZGVyOjcw
+OF9BXXBnZCA9IGZmZmZmZmMxMTJjMjcwMDANCjwxPlszOTU0OTEuMTc4MDM5c11bcGlkOjI5NTAx
+LGNwdTQsQmluZGVyOjcwOF9BXVswMDAwMDAwOF0gKnBnZD0wMDAwMDAwMDAwMDAwMDAwLCAqcHVk
+PTAwMDAwMDAwMDAwMDAwMDANCjwwPlszOTU0OTEuMTc4MDcwc11bcGlkOjI5NTAxLGNwdTQsQmlu
+ZGVyOjcwOF9BXUludGVybmFsIGVycm9yOiBPb3BzOiA5NjAwMDAwNSBbIzFdIFBSRUVNUFQgU01Q
+DQo8ND5bMzk1NDkxLjE3ODA3MHNdW3BpZDoyOTUwMSxjcHU0LEJpbmRlcjo3MDhfQV1Nb2R1bGVz
+IGxpbmtlZCBpbjogaGlzaV9kdW1teV9rbw0KPDQ+WzM5NTQ5MS4xNzgxMDBzXVtwaWQ6Mjk1MDEs
+Y3B1NCxCaW5kZXI6NzA4X0FdQ1BVOiA0IFBJRDogMjk1MDEgQ29tbTogQmluZGVyOjcwOF9BIFZJ
+UDogMDAgVGFpbnRlZDogRyAgICAgICAgVyAgICAgICA0LjkuMTExICMxDQo8ND5bMzk1NDkxLjE3
+ODEwMHNdW3BpZDoyOTUwMSxjcHU0LEJpbmRlcjo3MDhfQV1UR0lEOiA3MDggQ29tbTogQmluZGVy
+OjcwOF8yDQo8ND5bMzk1NDkxLjE3ODEwMHNdW3BpZDoyOTUwMSxjcHU0LEJpbmRlcjo3MDhfQV1I
+YXJkd2FyZSBuYW1lOiBoaTM2NjAgKERUKQ0KPDQ+WzM5NTQ5MS4xNzgxMDBzXVtwaWQ6Mjk1MDEs
+Y3B1NCxCaW5kZXI6NzA4X0FddGFzazogZmZmZmZmYzFkNDNlYzg4MCB0YXNrLnN0YWNrOiBmZmZm
+ZmZjMzAwN2UwMDAwDQo8ND5bMzk1NDkxLjE3ODEwMHNdW3BpZDoyOTUwMSxjcHU0LEJpbmRlcjo3
+MDhfQV1QQyBpcyBhdCBibGtjaXBoZXJfd2Fsa19kb25lKzB4MjEwLzB4MzU0DQo8ND5bMzk1NDkx
+LjE3ODEzMXNdW3BpZDoyOTUwMSxjcHU0LEJpbmRlcjo3MDhfQV1MUiBpcyBhdCBibGtjaXBoZXJf
+d2Fsa19kb25lKzB4MjBjLzB4MzU0DQo8ND5bMzk1NDkxLjE3ODEzMXNdW3BpZDoyOTUwMSxjcHU0
+LEJpbmRlcjo3MDhfQV1wYyA6IFs8ZmZmZmZmOWMxYjIzYWJmYz5dIGxyIDogWzxmZmZmZmY5YzFi
+MjNhYmY4Pl0gcHN0YXRlOiA2MDAwMDE0NQ0KPDQ+WzM5NTQ5MS4xNzgxMzFzXVtwaWQ6Mjk1MDEs
+Y3B1NCxCaW5kZXI6NzA4X0Fdc3AgOiBmZmZmZmZjMzAwN2UzOTUwDQo8ND5bMzk1NDkxLjE3ODEz
+MXNdW3BpZDoyOTUwMSxjcHU0LEJpbmRlcjo3MDhfQV14Mjk6IGZmZmZmZmMzMDA3ZTM5NTAgeDI4
+OiAwMDAwMDAwMDAwMDAwMDAwIA0KPDQ+WzM5NTQ5MS4xNzgxNjFzXVtwaWQ6Mjk1MDEsY3B1NCxC
+aW5kZXI6NzA4X0FdeDI3OiBmZmZmZmZjMWM2ZWY1MDFlIHgyNjogMDAwMDAwMDAwMDAwMDEwMCAN
+Cjw0PlszOTU0OTEuMTc4MTYxc11bcGlkOjI5NTAxLGNwdTQsQmluZGVyOjcwOF9BXXgyNTogZmZm
+ZmZmYzMwMDdlM2I0MCB4MjQ6IGZmZmZmZmMzMDA3ZTNiZTggDQo8ND5bMzk1NDkxLjE3ODE2MXNd
+W3BpZDoyOTUwMSxjcHU0LEJpbmRlcjo3MDhfQV14MjM6IDAwMDAwMDAwMDAwMDAwMDEgeDIyOiAw
+MDAwMDAwMDAwMDAwNTAwIA0KPDQ+WzM5NTQ5MS4xNzgxNjFzXVtwaWQ6Mjk1MDEsY3B1NCxCaW5k
+ZXI6NzA4X0FdeDIxOiBmZmZmZmZjMzAwN2UzYTkwIHgyMDogZmZmZmZmYzMwMDdlM2ExMCANCjw0
+PlszOTU0OTEuMTc4MTkyc11bcGlkOjI5NTAxLGNwdTQsQmluZGVyOjcwOF9BXXgxOTogZmZmZmZm
+YzMwMDdlMzlkOCB4MTg6IDAwMDAwMDAwMDAwMDAwMDEgDQo8ND5bMzk1NDkxLjE3ODE5MnNdW3Bp
+ZDoyOTUwMSxjcHU0LEJpbmRlcjo3MDhfQV14MTc6IDAwMDAwMDc1YWNhMDY5MzQgeDE2OiBmZmZm
+ZmY5YzFiMDMyZDEwIA0KPDQ+WzM5NTQ5MS4xNzgxOTJzXVtwaWQ6Mjk1MDEsY3B1NCxCaW5kZXI6
+NzA4X0FdeDE1OiAwMDAwMDA3NWFhZmZlNWI4IHgxNDogMDAwMDAwMDAwMDAwMDAwMCANCjw0Plsz
+OTU0OTEuMTc4MjIyc11bcGlkOjI5NTAxLGNwdTQsQmluZGVyOjcwOF9BXXgxMzogMDAwMDAwNzVh
+YzA4NjQyZCB4MTI6IDAwMDAwMDAwMDAwMDAwMDEgDQo8ND5bMzk1NDkxLjE3ODIyMnNdW3BpZDoy
+OTUwMSxjcHU0LEJpbmRlcjo3MDhfQV14MTE6IDAwMDAwMDAwMDAwMDAwMDAgeDEwOiBmZmZmZmZj
+MzE3NWUxNjgwIA0KPDQ+WzM5NTQ5MS4xNzgyMjJzXVtwaWQ6Mjk1MDEsY3B1NCxCaW5kZXI6NzA4
+X0FdeDkgOiBmZmZmZmY5YzFkNDA4MDAwIHg4IDogMDAwMDAwMDAwMDAwMDAwMCANCjw0PlszOTU0
+OTEuMTc4MjUzc11bcGlkOjI5NTAxLGNwdTQsQmluZGVyOjcwOF9BXXg3IDogZmZmZmZmOWMxYzI4
+MDAwMCB4NiA6IDAwMDAwMDAwMDAwMDAwMDEgDQo8ND5bMzk1NDkxLjE3ODI1M3NdW3BpZDoyOTUw
+MSxjcHU0LEJpbmRlcjo3MDhfQV14NSA6IGZmZmZmZmMzMDA3ZTNiZTggeDQgOiAwMDAwMDAwMDAw
+MDAwMDAwIA0KPDQ+WzM5NTQ5MS4xNzgyNTNzXVtwaWQ6Mjk1MDEsY3B1NCxCaW5kZXI6NzA4X0Fd
+eDMgOiAwMDAwMDAwMDAwMDAwMTAwIHgyIDogMDAwMDAwMDAwMDAwMDUwMCANCjw0PlszOTU0OTEu
+MTc4MjUzc11bcGlkOjI5NTAxLGNwdTQsQmluZGVyOjcwOF9BXXgxIDogZmZmZmZmYzMxYWE5MzRj
+MiB4MCA6IDAwMDAwMDAwMDAwMDAwMDAgDQo8ND5bMzk1NDkxLjE4MDcyNXNdW3BpZDoyOTUwMSxj
+cHU0LEJpbmRlcjo3MDhfQV1bPGZmZmZmZjljMWIyM2FiZmM+XSBibGtjaXBoZXJfd2Fsa19kb25l
+KzB4MjEwLzB4MzU0DQo8ND5bMzk1NDkxLjE4MDc1NXNdW3BpZDoyOTUwMSxjcHU0LEJpbmRlcjo3
+MDhfQV1bPGZmZmZmZjljMWFlOWZjYjA+XSBjYmNfZGVjcnlwdCsweGEwLzB4ZTgNCjw0PlszOTU0
+OTEuMTgwNzU1c11bcGlkOjI5NTAxLGNwdTQsQmluZGVyOjcwOF9BXVs8ZmZmZmZmOWMxYjI2M2E2
+MD5dIGFibGtfZGVjcnlwdCsweDc4LzB4ZjQNCjw0PlszOTU0OTEuMTgwNzU1c11bcGlkOjI5NTAx
+LGNwdTQsQmluZGVyOjcwOF9BXVs8ZmZmZmZmOWMxYjIzYjVlMD5dIHNrY2lwaGVyX2RlY3J5cHRf
+YWJsa2NpcGhlcisweDcwLzB4ODANCjw0PlszOTU0OTEuMTgwNzg2c11bcGlkOjI5NTAxLGNwdTQs
+QmluZGVyOjcwOF9BXVs8ZmZmZmZmOWMxYjI0YTY5OD5dIGNyeXB0b19jdHNfZGVjcnlwdCsweGYw
+LzB4MTg0DQo8ND5bMzk1NDkxLjE4MDc4NnNdW3BpZDoyOTUwMSxjcHU0LEJpbmRlcjo3MDhfQV1b
+PGZmZmZmZjljMWIwNzQwZjA+XSBmbmFtZV9kZWNyeXB0LmlzcmEuMSsweDExMC8weDFkOA0KPDQ+
+WzM5NTQ5MS4xODA3ODZzXVtwaWQ6Mjk1MDEsY3B1NCxCaW5kZXI6NzA4X0FdWzxmZmZmZmY5YzFi
+MDc0NDI4Pl0gZnNjcnlwdF9mbmFtZV9kaXNrX3RvX3VzcisweDFkOC8weDI2NA0KPDQ+WzM5NTQ5
+MS4xODA4MTZzXVtwaWQ6Mjk1MDEsY3B1NCxCaW5kZXI6NzA4X0FdWzxmZmZmZmY5YzFiMTk4ZjI0
+Pl0gZjJmc19maWxsX2RlbnRyaWVzKzB4MTNjLzB4MWQ0DQo8ND5bMzk1NDkxLjE4MDgxNnNdW3Bp
+ZDoyOTUwMSxjcHU0LEJpbmRlcjo3MDhfQV1bPGZmZmZmZjljMWIxOTkxOTA+XSBmMmZzX3JlYWRk
+aXIrMHgxZDQvMHg2ODQNCjw0PlszOTU0OTEuMTgwODE2c11bcGlkOjI5NTAxLGNwdTQsQmluZGVy
+OjcwOF9BXVs8ZmZmZmZmOWMxYjAzMjdjOD5dIGl0ZXJhdGVfZGlyKzB4ODQvMHgxYzQNCjw0Plsz
+OTU0OTEuMTgwODE2c11bcGlkOjI5NTAxLGNwdTQsQmluZGVyOjcwOF9BXVs8ZmZmZmZmOWMxYjAz
+MmQ5ND5dIFN5U19nZXRkZW50czY0KzB4ODQvMHgxMjANCjw0PlszOTU0OTEuMTgwODQ3c11bcGlk
+OjI5NTAxLGNwdTQsQmluZGVyOjcwOF9BXVs8ZmZmZmZmOWMxYWU4MzkwMD5dIGVsMF9zdmNfbmFr
+ZWQrMHgzNC8weDM4DQo8MD5bMzk1NDkxLjE4MDg0N3NdW3BpZDoyOTUwMSxjcHU0LEJpbmRlcjo3
+MDhfQV1Db2RlOiA2YjAxMDA1ZiA1NGZmZmNlMyA5NDAyMDA0YiBmOTAwMWU2MCAoYjk0MDA4MDAp
+DQo=
