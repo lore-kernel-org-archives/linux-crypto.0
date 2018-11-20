@@ -1,360 +1,345 @@
-Return-Path: <SRS0=WCFZ=OI=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:35460 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727568AbeK2Rjf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 29 Nov 2018 12:39:35 -0500
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org
-Cc: Paul Crowley <paulcrowley@google.com>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        "Jason A . Donenfeld" <Jason@zx2c4.com>,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 3/4] crypto: arm64/chacha20 - refactor to allow varying number of rounds
-Date: Wed, 28 Nov 2018 22:34:21 -0800
-Message-Id: <20181129063422.24307-4-ebiggers@kernel.org>
-In-Reply-To: <20181129063422.24307-1-ebiggers@kernel.org>
-References: <20181129063422.24307-1-ebiggers@kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Return-Path: <SRS0=vxh5=N7=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from sitav-80046.hsr.ch ([152.96.80.46]:39062 "EHLO
+        mail.strongswan.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729117AbeKUDBB (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 20 Nov 2018 22:01:01 -0500
+From: Martin Willi <martin@strongswan.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: linux-crypto@vger.kernel.org, x86@kernel.org
+Subject: [PATCH 3/3] crypto: x86/chacha20 - Add a 4-block AVX-512VL variant
+Date: Tue, 20 Nov 2018 17:30:50 +0100
+Message-Id: <20181120163050.22251-4-martin@strongswan.org>
+In-Reply-To: <20181120163050.22251-1-martin@strongswan.org>
+References: <20181120163050.22251-1-martin@strongswan.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Eric Biggers <ebiggers@google.com>
+This version uses the same principle as the AVX2 version by scheduling the
+operations for two block pairs in parallel. It benefits from the AVX-512VL
+rotate instructions and the more efficient partial block handling using
+"vmovdqu8", resulting in a speedup of the raw block function of ~20%.
 
-In preparation for adding XChaCha12 support, rename/refactor the ARM64
-NEON implementation of ChaCha20 to support different numbers of rounds.
-
-Signed-off-by: Eric Biggers <ebiggers@google.com>
+Signed-off-by: Martin Willi <martin@strongswan.org>
 ---
- arch/arm64/crypto/Makefile                    |  4 +-
- ...hacha20-neon-core.S => chacha-neon-core.S} | 45 ++++++++-------
- ...hacha20-neon-glue.c => chacha-neon-glue.c} | 57 ++++++++++---------
- 3 files changed, 57 insertions(+), 49 deletions(-)
- rename arch/arm64/crypto/{chacha20-neon-core.S => chacha-neon-core.S} (94%)
- rename arch/arm64/crypto/{chacha20-neon-glue.c => chacha-neon-glue.c} (71%)
+ arch/x86/crypto/chacha20-avx512vl-x86_64.S | 272 +++++++++++++++++++++
+ arch/x86/crypto/chacha20_glue.c            |   7 +
+ 2 files changed, 279 insertions(+)
 
-diff --git a/arch/arm64/crypto/Makefile b/arch/arm64/crypto/Makefile
-index 125dbb10a93ed..a4ffd9fe32650 100644
---- a/arch/arm64/crypto/Makefile
-+++ b/arch/arm64/crypto/Makefile
-@@ -50,8 +50,8 @@ sha256-arm64-y := sha256-glue.o sha256-core.o
- obj-$(CONFIG_CRYPTO_SHA512_ARM64) += sha512-arm64.o
- sha512-arm64-y := sha512-glue.o sha512-core.o
+diff --git a/arch/x86/crypto/chacha20-avx512vl-x86_64.S b/arch/x86/crypto/chacha20-avx512vl-x86_64.S
+index 261097578715..55d34de29e3e 100644
+--- a/arch/x86/crypto/chacha20-avx512vl-x86_64.S
++++ b/arch/x86/crypto/chacha20-avx512vl-x86_64.S
+@@ -12,6 +12,11 @@
+ CTR2BL:	.octa 0x00000000000000000000000000000000
+ 	.octa 0x00000000000000000000000000000001
  
--obj-$(CONFIG_CRYPTO_CHACHA20_NEON) += chacha20-neon.o
--chacha20-neon-y := chacha20-neon-core.o chacha20-neon-glue.o
-+obj-$(CONFIG_CRYPTO_CHACHA20_NEON) += chacha-neon.o
-+chacha-neon-y := chacha-neon-core.o chacha-neon-glue.o
++.section	.rodata.cst32.CTR4BL, "aM", @progbits, 32
++.align 32
++CTR4BL:	.octa 0x00000000000000000000000000000002
++	.octa 0x00000000000000000000000000000003
++
+ .section	.rodata.cst32.CTR8BL, "aM", @progbits, 32
+ .align 32
+ CTR8BL:	.octa 0x00000003000000020000000100000000
+@@ -185,6 +190,273 @@ ENTRY(chacha20_2block_xor_avx512vl)
  
- obj-$(CONFIG_CRYPTO_NHPOLY1305_NEON) += nhpoly1305-neon.o
- nhpoly1305-neon-y := nh-neon-core.o nhpoly1305-neon-glue.o
-diff --git a/arch/arm64/crypto/chacha20-neon-core.S b/arch/arm64/crypto/chacha-neon-core.S
-similarity index 94%
-rename from arch/arm64/crypto/chacha20-neon-core.S
-rename to arch/arm64/crypto/chacha-neon-core.S
-index 378850505c0ae..75b4e06cee79f 100644
---- a/arch/arm64/crypto/chacha20-neon-core.S
-+++ b/arch/arm64/crypto/chacha-neon-core.S
-@@ -1,5 +1,5 @@
- /*
-- * ChaCha20 256-bit cipher algorithm, RFC7539, arm64 NEON functions
-+ * ChaCha/XChaCha NEON helper functions
-  *
-  * Copyright (C) 2016 Linaro, Ltd. <ard.biesheuvel@linaro.org>
-  *
-@@ -24,17 +24,18 @@
- 	.align		6
+ ENDPROC(chacha20_2block_xor_avx512vl)
  
- /*
-- * chacha20_permute - permute one block
-+ * chacha_permute - permute one block
-  *
-  * Permute one 64-byte block where the state matrix is stored in the four NEON
-  * registers v0-v3.  It performs matrix operations on four words in parallel,
-  * but requires shuffling to rearrange the words after each round.
-  *
-- * Clobbers: x3, x10, v4, v12
-+ * The round count is given in w3.
-+ *
-+ * Clobbers: w3, x10, v4, v12
-  */
--chacha20_permute:
-+chacha_permute:
- 
--	mov		x3, #10
- 	adr		x10, ROT8
- 	ld1		{v12.4s}, [x10]
- 
-@@ -97,16 +98,17 @@ chacha20_permute:
- 	// x3 = shuffle32(x3, MASK(0, 3, 2, 1))
- 	ext		v3.16b, v3.16b, v3.16b, #4
- 
--	subs		x3, x3, #1
-+	subs		w3, w3, #2
- 	b.ne		.Ldoubleround
- 
- 	ret
--ENDPROC(chacha20_permute)
-+ENDPROC(chacha_permute)
- 
--ENTRY(chacha20_block_xor_neon)
-+ENTRY(chacha_block_xor_neon)
- 	// x0: Input state matrix, s
- 	// x1: 1 data block output, o
- 	// x2: 1 data block input, i
-+	// w3: nrounds
- 
- 	mov		x9, lr
- 
-@@ -114,7 +116,7 @@ ENTRY(chacha20_block_xor_neon)
- 	ld1		{v0.4s-v3.4s}, [x0]
- 	ld1		{v8.4s-v11.4s}, [x0]
- 
--	bl		chacha20_permute
-+	bl		chacha_permute
- 
- 	ld1		{v4.16b-v7.16b}, [x2]
- 
-@@ -137,39 +139,42 @@ ENTRY(chacha20_block_xor_neon)
- 	st1		{v0.16b-v3.16b}, [x1]
- 
- 	ret		x9
--ENDPROC(chacha20_block_xor_neon)
-+ENDPROC(chacha_block_xor_neon)
- 
--ENTRY(hchacha20_block_neon)
-+ENTRY(hchacha_block_neon)
- 	// x0: Input state matrix, s
- 	// x1: output (8 32-bit words)
-+	// w2: nrounds
- 	mov		x9, lr
- 
- 	ld1		{v0.4s-v3.4s}, [x0]
- 
--	bl		chacha20_permute
-+	mov		w3, w2
-+	bl		chacha_permute
- 
- 	st1		{v0.16b}, [x1], #16
- 	st1		{v3.16b}, [x1]
- 
- 	ret		x9
--ENDPROC(hchacha20_block_neon)
-+ENDPROC(hchacha_block_neon)
- 
- 	.align		6
--ENTRY(chacha20_4block_xor_neon)
-+ENTRY(chacha_4block_xor_neon)
- 	// x0: Input state matrix, s
- 	// x1: 4 data blocks output, o
- 	// x2: 4 data blocks input, i
-+	// w3: nrounds
- 
- 	//
--	// This function encrypts four consecutive ChaCha20 blocks by loading
-+	// This function encrypts four consecutive ChaCha blocks by loading
- 	// the state matrix in NEON registers four times. The algorithm performs
- 	// each operation on the corresponding word of each state matrix, hence
- 	// requires no word shuffling. For final XORing step we transpose the
- 	// matrix by interleaving 32- and then 64-bit words, which allows us to
- 	// do XOR in NEON registers.
- 	//
--	adr		x3, CTRINC		// ... and ROT8
--	ld1		{v30.4s-v31.4s}, [x3]
-+	adr		x9, CTRINC		// ... and ROT8
-+	ld1		{v30.4s-v31.4s}, [x9]
- 
- 	// x0..15[0-3] = s0..3[0..3]
- 	mov		x4, x0
-@@ -181,8 +186,6 @@ ENTRY(chacha20_4block_xor_neon)
- 	// x12 += counter values 0-3
- 	add		v12.4s, v12.4s, v30.4s
- 
--	mov		x3, #10
--
- .Ldoubleround4:
- 	// x0 += x4, x12 = rotl32(x12 ^ x0, 16)
- 	// x1 += x5, x13 = rotl32(x13 ^ x1, 16)
-@@ -356,7 +359,7 @@ ENTRY(chacha20_4block_xor_neon)
- 	sri		v7.4s, v18.4s, #25
- 	sri		v4.4s, v19.4s, #25
- 
--	subs		x3, x3, #1
-+	subs		w3, w3, #2
- 	b.ne		.Ldoubleround4
- 
- 	ld4r		{v16.4s-v19.4s}, [x0], #16
-@@ -470,7 +473,7 @@ ENTRY(chacha20_4block_xor_neon)
- 	st1		{v28.16b-v31.16b}, [x1]
- 
- 	ret
--ENDPROC(chacha20_4block_xor_neon)
-+ENDPROC(chacha_4block_xor_neon)
- 
- CTRINC:	.word		0, 1, 2, 3
- ROT8:	.word		0x02010003, 0x06050407, 0x0a09080b, 0x0e0d0c0f
-diff --git a/arch/arm64/crypto/chacha20-neon-glue.c b/arch/arm64/crypto/chacha-neon-glue.c
-similarity index 71%
-rename from arch/arm64/crypto/chacha20-neon-glue.c
-rename to arch/arm64/crypto/chacha-neon-glue.c
-index a5b9cbc0c4de4..4d992029b9121 100644
---- a/arch/arm64/crypto/chacha20-neon-glue.c
-+++ b/arch/arm64/crypto/chacha-neon-glue.c
-@@ -1,5 +1,6 @@
- /*
-- * ChaCha20 256-bit cipher algorithm, RFC7539, arm64 NEON functions
-+ * ARM NEON accelerated ChaCha and XChaCha stream ciphers,
-+ * including ChaCha20 (RFC7539)
-  *
-  * Copyright (C) 2016 - 2017 Linaro, Ltd. <ard.biesheuvel@linaro.org>
-  *
-@@ -28,18 +29,20 @@
- #include <asm/neon.h>
- #include <asm/simd.h>
- 
--asmlinkage void chacha20_block_xor_neon(u32 *state, u8 *dst, const u8 *src);
--asmlinkage void chacha20_4block_xor_neon(u32 *state, u8 *dst, const u8 *src);
--asmlinkage void hchacha20_block_neon(const u32 *state, u32 *out);
-+asmlinkage void chacha_block_xor_neon(u32 *state, u8 *dst, const u8 *src,
-+				      int nrounds);
-+asmlinkage void chacha_4block_xor_neon(u32 *state, u8 *dst, const u8 *src,
-+				       int nrounds);
-+asmlinkage void hchacha_block_neon(const u32 *state, u32 *out, int nrounds);
- 
--static void chacha20_doneon(u32 *state, u8 *dst, const u8 *src,
--			    unsigned int bytes)
-+static void chacha_doneon(u32 *state, u8 *dst, const u8 *src,
-+			  unsigned int bytes, int nrounds)
- {
- 	u8 buf[CHACHA_BLOCK_SIZE];
- 
- 	while (bytes >= CHACHA_BLOCK_SIZE * 4) {
- 		kernel_neon_begin();
--		chacha20_4block_xor_neon(state, dst, src);
-+		chacha_4block_xor_neon(state, dst, src, nrounds);
- 		kernel_neon_end();
- 		bytes -= CHACHA_BLOCK_SIZE * 4;
- 		src += CHACHA_BLOCK_SIZE * 4;
-@@ -52,7 +55,7 @@ static void chacha20_doneon(u32 *state, u8 *dst, const u8 *src,
- 
- 	kernel_neon_begin();
- 	while (bytes >= CHACHA_BLOCK_SIZE) {
--		chacha20_block_xor_neon(state, dst, src);
-+		chacha_block_xor_neon(state, dst, src, nrounds);
- 		bytes -= CHACHA_BLOCK_SIZE;
- 		src += CHACHA_BLOCK_SIZE;
- 		dst += CHACHA_BLOCK_SIZE;
-@@ -60,14 +63,14 @@ static void chacha20_doneon(u32 *state, u8 *dst, const u8 *src,
- 	}
- 	if (bytes) {
- 		memcpy(buf, src, bytes);
--		chacha20_block_xor_neon(state, buf, buf);
-+		chacha_block_xor_neon(state, buf, buf, nrounds);
- 		memcpy(dst, buf, bytes);
- 	}
- 	kernel_neon_end();
- }
- 
--static int chacha20_neon_stream_xor(struct skcipher_request *req,
--				    struct chacha_ctx *ctx, u8 *iv)
-+static int chacha_neon_stream_xor(struct skcipher_request *req,
-+				  struct chacha_ctx *ctx, u8 *iv)
- {
- 	struct skcipher_walk walk;
- 	u32 state[16];
-@@ -83,15 +86,15 @@ static int chacha20_neon_stream_xor(struct skcipher_request *req,
- 		if (nbytes < walk.total)
- 			nbytes = round_down(nbytes, walk.stride);
- 
--		chacha20_doneon(state, walk.dst.virt.addr, walk.src.virt.addr,
--				nbytes);
-+		chacha_doneon(state, walk.dst.virt.addr, walk.src.virt.addr,
-+			      nbytes, ctx->nrounds);
- 		err = skcipher_walk_done(&walk, walk.nbytes - nbytes);
- 	}
- 
- 	return err;
- }
- 
--static int chacha20_neon(struct skcipher_request *req)
-+static int chacha_neon(struct skcipher_request *req)
- {
- 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
- 	struct chacha_ctx *ctx = crypto_skcipher_ctx(tfm);
-@@ -99,10 +102,10 @@ static int chacha20_neon(struct skcipher_request *req)
- 	if (req->cryptlen <= CHACHA_BLOCK_SIZE || !may_use_simd())
- 		return crypto_chacha_crypt(req);
- 
--	return chacha20_neon_stream_xor(req, ctx, req->iv);
-+	return chacha_neon_stream_xor(req, ctx, req->iv);
- }
- 
--static int xchacha20_neon(struct skcipher_request *req)
-+static int xchacha_neon(struct skcipher_request *req)
- {
- 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
- 	struct chacha_ctx *ctx = crypto_skcipher_ctx(tfm);
-@@ -116,12 +119,13 @@ static int xchacha20_neon(struct skcipher_request *req)
- 	crypto_chacha_init(state, ctx, req->iv);
- 
- 	kernel_neon_begin();
--	hchacha20_block_neon(state, subctx.key);
-+	hchacha_block_neon(state, subctx.key, ctx->nrounds);
- 	kernel_neon_end();
-+	subctx.nrounds = ctx->nrounds;
- 
- 	memcpy(&real_iv[0], req->iv + 24, 8);
- 	memcpy(&real_iv[8], req->iv + 16, 8);
--	return chacha20_neon_stream_xor(req, &subctx, real_iv);
-+	return chacha_neon_stream_xor(req, &subctx, real_iv);
- }
- 
- static struct skcipher_alg algs[] = {
-@@ -139,8 +143,8 @@ static struct skcipher_alg algs[] = {
- 		.chunksize		= CHACHA_BLOCK_SIZE,
- 		.walksize		= 4 * CHACHA_BLOCK_SIZE,
- 		.setkey			= crypto_chacha20_setkey,
--		.encrypt		= chacha20_neon,
--		.decrypt		= chacha20_neon,
-+		.encrypt		= chacha_neon,
-+		.decrypt		= chacha_neon,
- 	}, {
- 		.base.cra_name		= "xchacha20",
- 		.base.cra_driver_name	= "xchacha20-neon",
-@@ -155,12 +159,12 @@ static struct skcipher_alg algs[] = {
- 		.chunksize		= CHACHA_BLOCK_SIZE,
- 		.walksize		= 4 * CHACHA_BLOCK_SIZE,
- 		.setkey			= crypto_chacha20_setkey,
--		.encrypt		= xchacha20_neon,
--		.decrypt		= xchacha20_neon,
-+		.encrypt		= xchacha_neon,
-+		.decrypt		= xchacha_neon,
- 	}
- };
- 
--static int __init chacha20_simd_mod_init(void)
-+static int __init chacha_simd_mod_init(void)
- {
- 	if (!(elf_hwcap & HWCAP_ASIMD))
- 		return -ENODEV;
-@@ -168,14 +172,15 @@ static int __init chacha20_simd_mod_init(void)
- 	return crypto_register_skciphers(algs, ARRAY_SIZE(algs));
- }
- 
--static void __exit chacha20_simd_mod_fini(void)
-+static void __exit chacha_simd_mod_fini(void)
- {
- 	crypto_unregister_skciphers(algs, ARRAY_SIZE(algs));
- }
- 
--module_init(chacha20_simd_mod_init);
--module_exit(chacha20_simd_mod_fini);
-+module_init(chacha_simd_mod_init);
-+module_exit(chacha_simd_mod_fini);
- 
-+MODULE_DESCRIPTION("ChaCha and XChaCha stream ciphers (NEON accelerated)");
- MODULE_AUTHOR("Ard Biesheuvel <ard.biesheuvel@linaro.org>");
- MODULE_LICENSE("GPL v2");
- MODULE_ALIAS_CRYPTO("chacha20");
++ENTRY(chacha20_4block_xor_avx512vl)
++	# %rdi: Input state matrix, s
++	# %rsi: up to 4 data blocks output, o
++	# %rdx: up to 4 data blocks input, i
++	# %rcx: input/output length in bytes
++
++	# This function encrypts four ChaCha20 block by loading the state
++	# matrix four times across eight AVX registers. It performs matrix
++	# operations on four words in two matrices in parallel, sequentially
++	# to the operations on the four words of the other two matrices. The
++	# required word shuffling has a rather high latency, we can do the
++	# arithmetic on two matrix-pairs without much slowdown.
++
++	vzeroupper
++
++	# x0..3[0-4] = s0..3
++	vbroadcasti128	0x00(%rdi),%ymm0
++	vbroadcasti128	0x10(%rdi),%ymm1
++	vbroadcasti128	0x20(%rdi),%ymm2
++	vbroadcasti128	0x30(%rdi),%ymm3
++
++	vmovdqa		%ymm0,%ymm4
++	vmovdqa		%ymm1,%ymm5
++	vmovdqa		%ymm2,%ymm6
++	vmovdqa		%ymm3,%ymm7
++
++	vpaddd		CTR2BL(%rip),%ymm3,%ymm3
++	vpaddd		CTR4BL(%rip),%ymm7,%ymm7
++
++	vmovdqa		%ymm0,%ymm11
++	vmovdqa		%ymm1,%ymm12
++	vmovdqa		%ymm2,%ymm13
++	vmovdqa		%ymm3,%ymm14
++	vmovdqa		%ymm7,%ymm15
++
++	mov		$10,%rax
++
++.Ldoubleround4:
++
++	# x0 += x1, x3 = rotl32(x3 ^ x0, 16)
++	vpaddd		%ymm1,%ymm0,%ymm0
++	vpxord		%ymm0,%ymm3,%ymm3
++	vprold		$16,%ymm3,%ymm3
++
++	vpaddd		%ymm5,%ymm4,%ymm4
++	vpxord		%ymm4,%ymm7,%ymm7
++	vprold		$16,%ymm7,%ymm7
++
++	# x2 += x3, x1 = rotl32(x1 ^ x2, 12)
++	vpaddd		%ymm3,%ymm2,%ymm2
++	vpxord		%ymm2,%ymm1,%ymm1
++	vprold		$12,%ymm1,%ymm1
++
++	vpaddd		%ymm7,%ymm6,%ymm6
++	vpxord		%ymm6,%ymm5,%ymm5
++	vprold		$12,%ymm5,%ymm5
++
++	# x0 += x1, x3 = rotl32(x3 ^ x0, 8)
++	vpaddd		%ymm1,%ymm0,%ymm0
++	vpxord		%ymm0,%ymm3,%ymm3
++	vprold		$8,%ymm3,%ymm3
++
++	vpaddd		%ymm5,%ymm4,%ymm4
++	vpxord		%ymm4,%ymm7,%ymm7
++	vprold		$8,%ymm7,%ymm7
++
++	# x2 += x3, x1 = rotl32(x1 ^ x2, 7)
++	vpaddd		%ymm3,%ymm2,%ymm2
++	vpxord		%ymm2,%ymm1,%ymm1
++	vprold		$7,%ymm1,%ymm1
++
++	vpaddd		%ymm7,%ymm6,%ymm6
++	vpxord		%ymm6,%ymm5,%ymm5
++	vprold		$7,%ymm5,%ymm5
++
++	# x1 = shuffle32(x1, MASK(0, 3, 2, 1))
++	vpshufd		$0x39,%ymm1,%ymm1
++	vpshufd		$0x39,%ymm5,%ymm5
++	# x2 = shuffle32(x2, MASK(1, 0, 3, 2))
++	vpshufd		$0x4e,%ymm2,%ymm2
++	vpshufd		$0x4e,%ymm6,%ymm6
++	# x3 = shuffle32(x3, MASK(2, 1, 0, 3))
++	vpshufd		$0x93,%ymm3,%ymm3
++	vpshufd		$0x93,%ymm7,%ymm7
++
++	# x0 += x1, x3 = rotl32(x3 ^ x0, 16)
++	vpaddd		%ymm1,%ymm0,%ymm0
++	vpxord		%ymm0,%ymm3,%ymm3
++	vprold		$16,%ymm3,%ymm3
++
++	vpaddd		%ymm5,%ymm4,%ymm4
++	vpxord		%ymm4,%ymm7,%ymm7
++	vprold		$16,%ymm7,%ymm7
++
++	# x2 += x3, x1 = rotl32(x1 ^ x2, 12)
++	vpaddd		%ymm3,%ymm2,%ymm2
++	vpxord		%ymm2,%ymm1,%ymm1
++	vprold		$12,%ymm1,%ymm1
++
++	vpaddd		%ymm7,%ymm6,%ymm6
++	vpxord		%ymm6,%ymm5,%ymm5
++	vprold		$12,%ymm5,%ymm5
++
++	# x0 += x1, x3 = rotl32(x3 ^ x0, 8)
++	vpaddd		%ymm1,%ymm0,%ymm0
++	vpxord		%ymm0,%ymm3,%ymm3
++	vprold		$8,%ymm3,%ymm3
++
++	vpaddd		%ymm5,%ymm4,%ymm4
++	vpxord		%ymm4,%ymm7,%ymm7
++	vprold		$8,%ymm7,%ymm7
++
++	# x2 += x3, x1 = rotl32(x1 ^ x2, 7)
++	vpaddd		%ymm3,%ymm2,%ymm2
++	vpxord		%ymm2,%ymm1,%ymm1
++	vprold		$7,%ymm1,%ymm1
++
++	vpaddd		%ymm7,%ymm6,%ymm6
++	vpxord		%ymm6,%ymm5,%ymm5
++	vprold		$7,%ymm5,%ymm5
++
++	# x1 = shuffle32(x1, MASK(2, 1, 0, 3))
++	vpshufd		$0x93,%ymm1,%ymm1
++	vpshufd		$0x93,%ymm5,%ymm5
++	# x2 = shuffle32(x2, MASK(1, 0, 3, 2))
++	vpshufd		$0x4e,%ymm2,%ymm2
++	vpshufd		$0x4e,%ymm6,%ymm6
++	# x3 = shuffle32(x3, MASK(0, 3, 2, 1))
++	vpshufd		$0x39,%ymm3,%ymm3
++	vpshufd		$0x39,%ymm7,%ymm7
++
++	dec		%rax
++	jnz		.Ldoubleround4
++
++	# o0 = i0 ^ (x0 + s0), first block
++	vpaddd		%ymm11,%ymm0,%ymm10
++	cmp		$0x10,%rcx
++	jl		.Lxorpart4
++	vpxord		0x00(%rdx),%xmm10,%xmm9
++	vmovdqu		%xmm9,0x00(%rsi)
++	vextracti128	$1,%ymm10,%xmm0
++	# o1 = i1 ^ (x1 + s1), first block
++	vpaddd		%ymm12,%ymm1,%ymm10
++	cmp		$0x20,%rcx
++	jl		.Lxorpart4
++	vpxord		0x10(%rdx),%xmm10,%xmm9
++	vmovdqu		%xmm9,0x10(%rsi)
++	vextracti128	$1,%ymm10,%xmm1
++	# o2 = i2 ^ (x2 + s2), first block
++	vpaddd		%ymm13,%ymm2,%ymm10
++	cmp		$0x30,%rcx
++	jl		.Lxorpart4
++	vpxord		0x20(%rdx),%xmm10,%xmm9
++	vmovdqu		%xmm9,0x20(%rsi)
++	vextracti128	$1,%ymm10,%xmm2
++	# o3 = i3 ^ (x3 + s3), first block
++	vpaddd		%ymm14,%ymm3,%ymm10
++	cmp		$0x40,%rcx
++	jl		.Lxorpart4
++	vpxord		0x30(%rdx),%xmm10,%xmm9
++	vmovdqu		%xmm9,0x30(%rsi)
++	vextracti128	$1,%ymm10,%xmm3
++
++	# xor and write second block
++	vmovdqa		%xmm0,%xmm10
++	cmp		$0x50,%rcx
++	jl		.Lxorpart4
++	vpxord		0x40(%rdx),%xmm10,%xmm9
++	vmovdqu		%xmm9,0x40(%rsi)
++
++	vmovdqa		%xmm1,%xmm10
++	cmp		$0x60,%rcx
++	jl		.Lxorpart4
++	vpxord		0x50(%rdx),%xmm10,%xmm9
++	vmovdqu		%xmm9,0x50(%rsi)
++
++	vmovdqa		%xmm2,%xmm10
++	cmp		$0x70,%rcx
++	jl		.Lxorpart4
++	vpxord		0x60(%rdx),%xmm10,%xmm9
++	vmovdqu		%xmm9,0x60(%rsi)
++
++	vmovdqa		%xmm3,%xmm10
++	cmp		$0x80,%rcx
++	jl		.Lxorpart4
++	vpxord		0x70(%rdx),%xmm10,%xmm9
++	vmovdqu		%xmm9,0x70(%rsi)
++
++	# o0 = i0 ^ (x0 + s0), third block
++	vpaddd		%ymm11,%ymm4,%ymm10
++	cmp		$0x90,%rcx
++	jl		.Lxorpart4
++	vpxord		0x80(%rdx),%xmm10,%xmm9
++	vmovdqu		%xmm9,0x80(%rsi)
++	vextracti128	$1,%ymm10,%xmm4
++	# o1 = i1 ^ (x1 + s1), third block
++	vpaddd		%ymm12,%ymm5,%ymm10
++	cmp		$0xa0,%rcx
++	jl		.Lxorpart4
++	vpxord		0x90(%rdx),%xmm10,%xmm9
++	vmovdqu		%xmm9,0x90(%rsi)
++	vextracti128	$1,%ymm10,%xmm5
++	# o2 = i2 ^ (x2 + s2), third block
++	vpaddd		%ymm13,%ymm6,%ymm10
++	cmp		$0xb0,%rcx
++	jl		.Lxorpart4
++	vpxord		0xa0(%rdx),%xmm10,%xmm9
++	vmovdqu		%xmm9,0xa0(%rsi)
++	vextracti128	$1,%ymm10,%xmm6
++	# o3 = i3 ^ (x3 + s3), third block
++	vpaddd		%ymm15,%ymm7,%ymm10
++	cmp		$0xc0,%rcx
++	jl		.Lxorpart4
++	vpxord		0xb0(%rdx),%xmm10,%xmm9
++	vmovdqu		%xmm9,0xb0(%rsi)
++	vextracti128	$1,%ymm10,%xmm7
++
++	# xor and write fourth block
++	vmovdqa		%xmm4,%xmm10
++	cmp		$0xd0,%rcx
++	jl		.Lxorpart4
++	vpxord		0xc0(%rdx),%xmm10,%xmm9
++	vmovdqu		%xmm9,0xc0(%rsi)
++
++	vmovdqa		%xmm5,%xmm10
++	cmp		$0xe0,%rcx
++	jl		.Lxorpart4
++	vpxord		0xd0(%rdx),%xmm10,%xmm9
++	vmovdqu		%xmm9,0xd0(%rsi)
++
++	vmovdqa		%xmm6,%xmm10
++	cmp		$0xf0,%rcx
++	jl		.Lxorpart4
++	vpxord		0xe0(%rdx),%xmm10,%xmm9
++	vmovdqu		%xmm9,0xe0(%rsi)
++
++	vmovdqa		%xmm7,%xmm10
++	cmp		$0x100,%rcx
++	jl		.Lxorpart4
++	vpxord		0xf0(%rdx),%xmm10,%xmm9
++	vmovdqu		%xmm9,0xf0(%rsi)
++
++.Ldone4:
++	vzeroupper
++	ret
++
++.Lxorpart4:
++	# xor remaining bytes from partial register into output
++	mov		%rcx,%rax
++	and		$0xf,%rcx
++	jz		.Ldone8
++	mov		%rax,%r9
++	and		$~0xf,%r9
++
++	mov		$1,%rax
++	shld		%cl,%rax,%rax
++	sub		$1,%rax
++	kmovq		%rax,%k1
++
++	vmovdqu8	(%rdx,%r9),%xmm1{%k1}{z}
++	vpxord		%xmm10,%xmm1,%xmm1
++	vmovdqu8	%xmm1,(%rsi,%r9){%k1}
++
++	jmp		.Ldone4
++
++ENDPROC(chacha20_4block_xor_avx512vl)
++
+ ENTRY(chacha20_8block_xor_avx512vl)
+ 	# %rdi: Input state matrix, s
+ 	# %rsi: up to 8 data blocks output, o
+diff --git a/arch/x86/crypto/chacha20_glue.c b/arch/x86/crypto/chacha20_glue.c
+index d6a95a6a324e..773d075a1483 100644
+--- a/arch/x86/crypto/chacha20_glue.c
++++ b/arch/x86/crypto/chacha20_glue.c
+@@ -34,6 +34,8 @@ static bool chacha20_use_avx2;
+ #ifdef CONFIG_AS_AVX512
+ asmlinkage void chacha20_2block_xor_avx512vl(u32 *state, u8 *dst, const u8 *src,
+ 					     unsigned int len);
++asmlinkage void chacha20_4block_xor_avx512vl(u32 *state, u8 *dst, const u8 *src,
++					     unsigned int len);
+ asmlinkage void chacha20_8block_xor_avx512vl(u32 *state, u8 *dst, const u8 *src,
+ 					     unsigned int len);
+ static bool chacha20_use_avx512vl;
+@@ -64,6 +66,11 @@ static void chacha20_dosimd(u32 *state, u8 *dst, const u8 *src,
+ 			state[12] += chacha20_advance(bytes, 8);
+ 			return;
+ 		}
++		if (bytes > CHACHA_BLOCK_SIZE * 2) {
++			chacha20_4block_xor_avx512vl(state, dst, src, bytes);
++			state[12] += chacha20_advance(bytes, 4);
++			return;
++		}
+ 		if (bytes) {
+ 			chacha20_2block_xor_avx512vl(state, dst, src, bytes);
+ 			state[12] += chacha20_advance(bytes, 2);
 -- 
-2.19.2
+2.17.1
