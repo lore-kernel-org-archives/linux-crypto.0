@@ -1,44 +1,65 @@
-Return-Path: <SRS0=IUQn=NU=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-it1-f196.google.com ([209.85.166.196]:36887 "EHLO
-        mail-it1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727560AbeKIT0N (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 9 Nov 2018 14:26:13 -0500
-Received: by mail-it1-f196.google.com with SMTP id j79-v6so2339289itb.2
-        for <linux-crypto@vger.kernel.org>; Fri, 09 Nov 2018 01:46:26 -0800 (PST)
+Return-Path: <SRS0=vxh5=N7=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from imap.thunk.org ([74.207.234.97]:59366 "EHLO imap.thunk.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725885AbeKUFZW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 21 Nov 2018 00:25:22 -0500
+Date: Tue, 20 Nov 2018 13:51:54 -0500
+From: "Theodore Y. Ts'o" <tytso@mit.edu>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        linux-fscrypt@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        LKML <linux-kernel@vger.kernel.org>,
+        Paul Crowley <paulcrowley@google.com>,
+        Greg Kaiser <gkaiser@google.com>,
+        Samuel Neves <samuel.c.p.neves@gmail.com>,
+        Tomer Ashur <tomer.ashur@esat.kuleuven.be>,
+        Martin Willi <martin@strongswan.org>
+Subject: Re: [RFC PATCH v2 0/4] Exporting existing crypto API code through
+ zinc
+Message-ID: <20181120185154.GB6401@thunk.org>
+References: <CAKv+Gu-o0khD5=0EOkv2PiczMs5uZ=XP9V=G2ogBNMK8Kb93sw@mail.gmail.com>
+ <20181112185816.GA8663@gmail.com>
+ <20181116060227.hwu4igi6bp26ddpi@gondor.apana.org.au>
+ <20181117001718.GA175522@gmail.com>
+ <CAHmME9rtsCk8ZLt05xRKMGr4CVRnaUvCaVOS_WX3N22HOat4-A@mail.gmail.com>
+ <20181119052451.qttzfgcm4hvbdc4u@gondor.apana.org.au>
+ <20181120060217.t4nccaqpwnxkl4tx@gondor.apana.org.au>
+ <CAKv+Gu-SHS2tF665dfqSgmH5EF5vGVtef=3_4WgCE=+8+Jw7Rw@mail.gmail.com>
+ <20181120141850.zjmfwcari5kykk6y@gondor.apana.org.au>
+ <CAHmME9oPGkvEmqvfbav-AOf_P=Z4zWYxvqD3a3QhuOSh_OWd_A@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20181109094525.3shpcmj4uqxfx33z@gondor.apana.org.au>
-References: <20181108225516.9967-1-ard.biesheuvel@linaro.org>
- <CAKv+Gu_7M+A5OiCOsOd7_e5+GH7VkrOZ33iSexd2oacyzUNKEA@mail.gmail.com>
- <20181109094447.v4fqirpmx7owayr7@gondor.apana.org.au> <20181109094525.3shpcmj4uqxfx33z@gondor.apana.org.au>
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date: Fri, 9 Nov 2018 10:46:25 +0100
-Message-ID: <CAKv+Gu_iNsRCK31aGnb3F=y63WqKLXg=NskWkZ7VYGHEB0NRAg@mail.gmail.com>
-Subject: Re: [PATCH] crypto/simd: correctly take reqsize of wrapped skcipher
- into account
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>, Qian Cai <cai@gmx.us>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHmME9oPGkvEmqvfbav-AOf_P=Z4zWYxvqD3a3QhuOSh_OWd_A@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 9 November 2018 at 10:45, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> On Fri, Nov 09, 2018 at 05:44:47PM +0800, Herbert Xu wrote:
->> On Fri, Nov 09, 2018 at 12:33:23AM +0100, Ard Biesheuvel wrote:
->> >
->> > This should be
->> >
->> > reqsize += max(crypto_skcipher_reqsize(&cryptd_tfm->base);
->> >        crypto_skcipher_reqsize(cryptd_skcipher_child(cryptd_tfm)));
->> >
->> > since the cryptd path in simd still needs some space in the subreq for
->> > the completion.
->>
->> OK this is what I applied to the cryptodev tree, please double-check
->> to see if I did anything silly:
->
-> I meant the crypto tree rather than cryptodev.
->
+On Tue, Nov 20, 2018 at 05:24:41PM +0100, Jason A. Donenfeld wrote:
+> On Tue, Nov 20, 2018 at 3:19 PM Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> > Yes.  In fact it's used for FIPS certification testing.
+> > Sure, nobody sane should be doing it.  But when it comes to
+> > government certification... :)
+> 
+> The kernel does not aim toward any FIPS certification, and we're not
+> going to start bloating our designs to fulfill this. It's never been a
+> goal. Maybe ask Ted to add a FIPS mode to random.c and see what
+> happens... When you start arguing "because FIPS!" as your
+> justification, you really hit a head scratcher.
 
-That looks fine. Thanks Herbert.
+There are crazy people who go for FIPS certification for the kernel.
+That's why crypto/drbg.c exists.  There is a crazy fips mode in
+drivers/char/random.c which causes the kernel to panic with a 1 in
+2**80 probability each time _extract_entropy is called.  It's not the
+default, and I have no idea if any one uses it, or if it's like the
+NIST OSI mandate, which forced everyone to buy an OSI networking stack
+--- and then put it on the shelf and use TCP/IP instead.
+
+Press release from March 2018:
+
+https://www.redhat.com/en/about/press-releases/red-hat-completes-fips-140-2-re-certification-red-hat-enterprise-linux-7
+
+    	     	       	   	     	 	- Ted
