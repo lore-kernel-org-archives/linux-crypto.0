@@ -1,191 +1,238 @@
-Return-Path: <SRS0=7Tml=NW=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from sitav-80046.hsr.ch ([152.96.80.46]:33514 "EHLO
-        mail.strongswan.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727376AbeKKTYs (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 11 Nov 2018 14:24:48 -0500
-From: Martin Willi <martin@strongswan.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: linux-crypto@vger.kernel.org, x86@kernel.org
-Subject: [PATCH 1/6] crypto: x86/chacha20 - Support partial lengths in 1-block SSSE3 variant
-Date: Sun, 11 Nov 2018 10:36:25 +0100
-Message-Id: <20181111093630.28107-2-martin@strongswan.org>
-In-Reply-To: <20181111093630.28107-1-martin@strongswan.org>
-References: <20181111093630.28107-1-martin@strongswan.org>
+Return-Path: <SRS0=vxh5=N7=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:47816 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726902AbeKTPpE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 20 Nov 2018 10:45:04 -0500
+Date: Tue, 20 Nov 2018 07:17:44 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Kenneth Lee <liguozhu@hisilicon.com>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>, Kenneth Lee <nek.in.cn@gmail.com>,
+        Tim Sell <timothy.sell@unisys.com>, linux-doc@vger.kernel.org,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Zaibo Xu <xuzaibo@huawei.com>, zhangfei.gao@foxmail.com,
+        linuxarm@huawei.com, haojian.zhuang@linaro.org,
+        Christoph Lameter <cl@linux.com>,
+        Hao Fang <fanghao11@huawei.com>,
+        Gavin Schenk <g.schenk@eckelmann.de>,
+        RDMA mailing list <linux-rdma@vger.kernel.org>,
+        Zhou Wang <wangzhou1@hisilicon.com>,
+        Doug Ledford <dledford@redhat.com>,
+        Uwe =?iso-8859-1?Q?Kleine-K=F6nig?=
+        <u.kleine-koenig@pengutronix.de>,
+        David Kershner <david.kershner@unisys.com>,
+        Johan Hovold <johan@kernel.org>,
+        Cyrille Pitchen <cyrille.pitchen@free-electrons.com>,
+        Sagar Dharia <sdharia@codeaurora.org>,
+        Jens Axboe <axboe@kernel.dk>, guodong.xu@linaro.org,
+        linux-netdev <netdev@vger.kernel.org>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        linux-kernel@vger.kernel.org, Vinod Koul <vkoul@kernel.org>,
+        linux-crypto@vger.kernel.org,
+        Philippe Ombredanne <pombredanne@nexb.com>,
+        Sanyog Kale <sanyog.r.kale@intel.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-accelerators@lists.ozlabs.org
+Subject: Re: [RFCv3 PATCH 1/6] uacce: Add documents for WarpDrive/uacce
+Message-ID: <20181120051743.GD25178@mtr-leonro.mtl.com>
+References: <20181112075807.9291-1-nek.in.cn@gmail.com>
+ <20181112075807.9291-2-nek.in.cn@gmail.com>
+ <20181113002354.GO3695@mtr-leonro.mtl.com>
+ <95310df4-b32c-42f0-c750-3ad5eb89b3dd@gmail.com>
+ <20181114160017.GI3759@mtr-leonro.mtl.com>
+ <20181115085109.GD157308@Turing-Arch-b>
+ <20181115145455.GN3759@mtr-leonro.mtl.com>
+ <20181119091405.GE157308@Turing-Arch-b>
+ <20181119184954.GB4890@ziepe.ca>
+ <20181120030702.GH157308@Turing-Arch-b>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+        protocol="application/pgp-signature"; boundary="g7w8+K/95kPelPD2"
+Content-Disposition: inline
+In-Reply-To: <20181120030702.GH157308@Turing-Arch-b>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Add a length argument to the single block function for SSSE3, so the
-block function may XOR only a partial length of the full block. Given
-that the setup code is rather cheap, the function does not process more
-than one block; this allows us to keep the block function selection in
-the C glue code.
 
-The required branching does not negatively affect performance for full
-block sizes. The partial XORing uses simple "rep movsb" to copy the
-data before and after doing XOR in SSE. This is rather efficient on
-modern processors; movsw can be slightly faster, but the additional
-complexity is probably not worth it.
+--g7w8+K/95kPelPD2
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Martin Willi <martin@strongswan.org>
----
- arch/x86/crypto/chacha20-ssse3-x86_64.S | 74 ++++++++++++++++++++-----
- arch/x86/crypto/chacha20_glue.c         | 11 ++--
- 2 files changed, 63 insertions(+), 22 deletions(-)
+On Tue, Nov 20, 2018 at 11:07:02AM +0800, Kenneth Lee wrote:
+> On Mon, Nov 19, 2018 at 11:49:54AM -0700, Jason Gunthorpe wrote:
+> > Date: Mon, 19 Nov 2018 11:49:54 -0700
+> > From: Jason Gunthorpe <jgg@ziepe.ca>
+> > To: Kenneth Lee <liguozhu@hisilicon.com>
+> > CC: Leon Romanovsky <leon@kernel.org>, Kenneth Lee <nek.in.cn@gmail.com=
+>,
+> >  Tim Sell <timothy.sell@unisys.com>, linux-doc@vger.kernel.org, Alexand=
+er
+> >  Shishkin <alexander.shishkin@linux.intel.com>, Zaibo Xu
+> >  <xuzaibo@huawei.com>, zhangfei.gao@foxmail.com, linuxarm@huawei.com,
+> >  haojian.zhuang@linaro.org, Christoph Lameter <cl@linux.com>, Hao Fang
+> >  <fanghao11@huawei.com>, Gavin Schenk <g.schenk@eckelmann.de>, RDMA mai=
+ling
+> >  list <linux-rdma@vger.kernel.org>, Zhou Wang <wangzhou1@hisilicon.com>,
+> >  Doug Ledford <dledford@redhat.com>, Uwe Kleine-K=F6nig
+> >  <u.kleine-koenig@pengutronix.de>, David Kershner
+> >  <david.kershner@unisys.com>, Johan Hovold <johan@kernel.org>, Cyrille
+> >  Pitchen <cyrille.pitchen@free-electrons.com>, Sagar Dharia
+> >  <sdharia@codeaurora.org>, Jens Axboe <axboe@kernel.dk>,
+> >  guodong.xu@linaro.org, linux-netdev <netdev@vger.kernel.org>, Randy Du=
+nlap
+> >  <rdunlap@infradead.org>, linux-kernel@vger.kernel.org, Vinod Koul
+> >  <vkoul@kernel.org>, linux-crypto@vger.kernel.org, Philippe Ombredanne
+> >  <pombredanne@nexb.com>, Sanyog Kale <sanyog.r.kale@intel.com>, "David =
+S.
+> >  Miller" <davem@davemloft.net>, linux-accelerators@lists.ozlabs.org
+> > Subject: Re: [RFCv3 PATCH 1/6] uacce: Add documents for WarpDrive/uacce
+> > User-Agent: Mutt/1.9.4 (2018-02-28)
+> > Message-ID: <20181119184954.GB4890@ziepe.ca>
+> >
+> > On Mon, Nov 19, 2018 at 05:14:05PM +0800, Kenneth Lee wrote:
+> >
+> > > If the hardware cannot share page table with the CPU, we then need to=
+ have
+> > > some way to change the device page table. This is what happen in ODP.=
+ It
+> > > invalidates the page table in device upon mmu_notifier call back. But=
+ this cannot
+> > > solve the COW problem: if the user process A share a page P with devi=
+ce, and A
+> > > forks a new process B, and it continue to write to the page. By COW, =
+the
+> > > process B will keep the page P, while A will get a new page P'. But y=
+ou have
+> > > no way to let the device know it should use P' rather than P.
+> >
+> > Is this true? I thought mmu_notifiers covered all these cases.
+> >
+> > The mm_notifier for A should fire if B causes the physical address of
+> > A's pages to change via COW.
+> >
+> > And this causes the device page tables to re-synchronize.
+>
+> I don't see such code. The current do_cow_fault() implemenation has nothi=
+ng to
+> do with mm_notifer.
+>
+> >
+> > > In WarpDrive/uacce, we make this simple. If you support IOMMU and it =
+support
+> > > SVM/SVA. Everything will be fine just like ODP implicit mode. And you=
+ don't need
+> > > to write any code for that. Because it has been done by IOMMU framewo=
+rk. If it
+> >
+> > Looks like the IOMMU code uses mmu_notifier, so it is identical to
+> > IB's ODP. The only difference is that IB tends to have the IOMMU page
+> > table in the device, not in the CPU.
+> >
+> > The only case I know if that is different is the new-fangled CAPI
+> > stuff where the IOMMU can directly use the CPU's page table and the
+> > IOMMU page table (in device or CPU) is eliminated.
+> >
+>
+> Yes. We are not focusing on the current implementation. As mentioned in t=
+he
+> cover letter. We are expecting Jean Philips' SVA patch:
+> git://linux-arm.org/linux-jpb.
+>
+> > Anyhow, I don't think a single instance of hardware should justify an
+> > entire new subsystem. Subsystems are hard to make and without multiple
+> > hardware examples there is no way to expect that it would cover any
+> > future use cases.
+>
+> Yes. That's our first expectation. We can keep it with our driver. But be=
+cause
+> there is no user driver support for any accelerator in mainline kernel. E=
+ven the
+> well known QuickAssit has to be maintained out of tree. So we try to see =
+if
+> people is interested in working together to solve the problem.
+>
+> >
+> > If all your driver needs is to mmap some PCI bar space, route
+> > interrupts and do DMA mapping then mediated VFIO is probably a good
+> > choice.
+>
+> Yes. That is what is done in our RFCv1/v2. But we accepted Jerome's opini=
+on and
+> try not to add complexity to the mm subsystem.
+>
+> >
+> > If it needs to do a bunch of other stuff, not related to PCI bar
+> > space, interrupts and DMA mapping (ie special code for compression,
+> > crypto, AI, whatever) then you should probably do what Jerome said and
+> > make a drivers/char/hisillicon_foo_bar.c that exposes just what your
+> > hardware does.
+>
+> Yes. If no other accelerator driver writer is interested. That is the
+> expectation:)
+>
+> But we really like to have a public solution here. Consider this scenario:
+>
+> You create some connections (queues) to NIC, RSA, and AI engine. Then you=
+ got
+> data direct from the NIC and pass the pointer to RSA engine for decryptio=
+n. The
+> CPU then finish some data taking or operation and then pass through to th=
+e AI
+> engine for CNN calculation....This will need a place to maintain the same
+> address space by some means.
 
-diff --git a/arch/x86/crypto/chacha20-ssse3-x86_64.S b/arch/x86/crypto/chacha20-ssse3-x86_64.S
-index 512a2b500fd1..98d130b5e4ab 100644
---- a/arch/x86/crypto/chacha20-ssse3-x86_64.S
-+++ b/arch/x86/crypto/chacha20-ssse3-x86_64.S
-@@ -25,12 +25,13 @@ CTRINC:	.octa 0x00000003000000020000000100000000
- 
- ENTRY(chacha20_block_xor_ssse3)
- 	# %rdi: Input state matrix, s
--	# %rsi: 1 data block output, o
--	# %rdx: 1 data block input, i
-+	# %rsi: up to 1 data block output, o
-+	# %rdx: up to 1 data block input, i
-+	# %rcx: input/output length in bytes
- 
- 	# This function encrypts one ChaCha20 block by loading the state matrix
- 	# in four SSE registers. It performs matrix operation on four words in
--	# parallel, but requireds shuffling to rearrange the words after each
-+	# parallel, but requires shuffling to rearrange the words after each
- 	# round. 8/16-bit word rotation is done with the slightly better
- 	# performing SSSE3 byte shuffling, 7/12-bit word rotation uses
- 	# traditional shift+OR.
-@@ -48,7 +49,8 @@ ENTRY(chacha20_block_xor_ssse3)
- 	movdqa		ROT8(%rip),%xmm4
- 	movdqa		ROT16(%rip),%xmm5
- 
--	mov	$10,%ecx
-+	mov		%rcx,%rax
-+	mov		$10,%ecx
- 
- .Ldoubleround:
- 
-@@ -122,27 +124,69 @@ ENTRY(chacha20_block_xor_ssse3)
- 	jnz		.Ldoubleround
- 
- 	# o0 = i0 ^ (x0 + s0)
--	movdqu		0x00(%rdx),%xmm4
- 	paddd		%xmm8,%xmm0
-+	cmp		$0x10,%rax
-+	jl		.Lxorpart
-+	movdqu		0x00(%rdx),%xmm4
- 	pxor		%xmm4,%xmm0
- 	movdqu		%xmm0,0x00(%rsi)
- 	# o1 = i1 ^ (x1 + s1)
--	movdqu		0x10(%rdx),%xmm5
- 	paddd		%xmm9,%xmm1
--	pxor		%xmm5,%xmm1
--	movdqu		%xmm1,0x10(%rsi)
-+	movdqa		%xmm1,%xmm0
-+	cmp		$0x20,%rax
-+	jl		.Lxorpart
-+	movdqu		0x10(%rdx),%xmm0
-+	pxor		%xmm1,%xmm0
-+	movdqu		%xmm0,0x10(%rsi)
- 	# o2 = i2 ^ (x2 + s2)
--	movdqu		0x20(%rdx),%xmm6
- 	paddd		%xmm10,%xmm2
--	pxor		%xmm6,%xmm2
--	movdqu		%xmm2,0x20(%rsi)
-+	movdqa		%xmm2,%xmm0
-+	cmp		$0x30,%rax
-+	jl		.Lxorpart
-+	movdqu		0x20(%rdx),%xmm0
-+	pxor		%xmm2,%xmm0
-+	movdqu		%xmm0,0x20(%rsi)
- 	# o3 = i3 ^ (x3 + s3)
--	movdqu		0x30(%rdx),%xmm7
- 	paddd		%xmm11,%xmm3
--	pxor		%xmm7,%xmm3
--	movdqu		%xmm3,0x30(%rsi)
--
-+	movdqa		%xmm3,%xmm0
-+	cmp		$0x40,%rax
-+	jl		.Lxorpart
-+	movdqu		0x30(%rdx),%xmm0
-+	pxor		%xmm3,%xmm0
-+	movdqu		%xmm0,0x30(%rsi)
-+
-+.Ldone:
- 	ret
-+
-+.Lxorpart:
-+	# xor remaining bytes from partial register into output
-+	mov		%rax,%r9
-+	and		$0x0f,%r9
-+	jz		.Ldone
-+	and		$~0x0f,%rax
-+
-+	mov		%rsi,%r11
-+
-+	lea		8(%rsp),%r10
-+	sub		$0x10,%rsp
-+	and		$~31,%rsp
-+
-+	lea		(%rdx,%rax),%rsi
-+	mov		%rsp,%rdi
-+	mov		%r9,%rcx
-+	rep movsb
-+
-+	pxor		0x00(%rsp),%xmm0
-+	movdqa		%xmm0,0x00(%rsp)
-+
-+	mov		%rsp,%rsi
-+	lea		(%r11,%rax),%rdi
-+	mov		%r9,%rcx
-+	rep movsb
-+
-+	lea		-8(%r10),%rsp
-+	jmp		.Ldone
-+
- ENDPROC(chacha20_block_xor_ssse3)
- 
- ENTRY(chacha20_4block_xor_ssse3)
-diff --git a/arch/x86/crypto/chacha20_glue.c b/arch/x86/crypto/chacha20_glue.c
-index dce7c5d39c2f..cc4571736ce8 100644
---- a/arch/x86/crypto/chacha20_glue.c
-+++ b/arch/x86/crypto/chacha20_glue.c
-@@ -19,7 +19,8 @@
- 
- #define CHACHA20_STATE_ALIGN 16
- 
--asmlinkage void chacha20_block_xor_ssse3(u32 *state, u8 *dst, const u8 *src);
-+asmlinkage void chacha20_block_xor_ssse3(u32 *state, u8 *dst, const u8 *src,
-+					 unsigned int len);
- asmlinkage void chacha20_4block_xor_ssse3(u32 *state, u8 *dst, const u8 *src);
- #ifdef CONFIG_AS_AVX2
- asmlinkage void chacha20_8block_xor_avx2(u32 *state, u8 *dst, const u8 *src);
-@@ -29,8 +30,6 @@ static bool chacha20_use_avx2;
- static void chacha20_dosimd(u32 *state, u8 *dst, const u8 *src,
- 			    unsigned int bytes)
- {
--	u8 buf[CHACHA20_BLOCK_SIZE];
--
- #ifdef CONFIG_AS_AVX2
- 	if (chacha20_use_avx2) {
- 		while (bytes >= CHACHA20_BLOCK_SIZE * 8) {
-@@ -50,16 +49,14 @@ static void chacha20_dosimd(u32 *state, u8 *dst, const u8 *src,
- 		state[12] += 4;
- 	}
- 	while (bytes >= CHACHA20_BLOCK_SIZE) {
--		chacha20_block_xor_ssse3(state, dst, src);
-+		chacha20_block_xor_ssse3(state, dst, src, bytes);
- 		bytes -= CHACHA20_BLOCK_SIZE;
- 		src += CHACHA20_BLOCK_SIZE;
- 		dst += CHACHA20_BLOCK_SIZE;
- 		state[12]++;
- 	}
- 	if (bytes) {
--		memcpy(buf, src, bytes);
--		chacha20_block_xor_ssse3(state, buf, buf);
--		memcpy(dst, buf, bytes);
-+		chacha20_block_xor_ssse3(state, dst, src, bytes);
- 	}
- }
- 
--- 
-2.17.1
+You are using NIC terminology, in the documentation, you wrote that it is n=
+eeded
+for DPDK use and I don't really understand, why do we need another shiny new
+interface for DPDK.
+
+>
+> It is not complex, but it is helpful.
+>
+> >
+> > If you have networking involved in here then consider RDMA,
+> > particularly if this functionality is already part of the same
+> > hardware that the hns infiniband driver is servicing.
+> >
+> > 'computational MRs' are a reasonable approach to a side-car offload of
+> > already existing RDMA support.
+>
+> OK. Thanks. I will spend some time on it. But personally, I really don't =
+like
+> RDMA's complexity. I cannot even try one single function without a...some
+> expensive hardwares and complexity connection in the lab. This is not lik=
+e a
+> open source way.
+
+It is not very accurate. We have RXE driver which is virtual RDMA device
+which is implemented purely in SW. It struggles from bad performance and
+sporadic failures, but it is enough to try RDMA on your laptop in VM.
+
+Thanks
+
+>
+> >
+> > Jason
+>
+
+--g7w8+K/95kPelPD2
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBAgAGBQJb85j3AAoJEORje4g2clinCzcQALTEmtC5tWhaxj2FyJvJYyOv
+S1bTcT7nO5VNULTjooacNWtFUJpuoSfUCQOEguiB/37F2G27Qd8uR8tBnVheBCeh
+Gho5oBNDOJNfgGGJ09SWbTZVOycfUyWAl4cMeLCSNJ6lb3iAmu5EAE0dySZf2dJW
+PMtnzuQM9hiqSeqWnSna9BJRtQI8Y8oWmoaT0aYVkTwsnB1Blw+g/r1FsQI1gTt3
+3lYbmOf1EgdU3WHsd3FTRrvkmkkkCDPl/6cCwo9ilNbMmAzFf7H/Fi+yNwYzhAs5
+3BN5EKv4ZdImI654067p2z9K5CjvEC24mGSGNBWPTESK3UYR9r+sdSzeSJNesDMi
+mVpk2dmqsvnn/JX78whbhsuvvFWyOk0xEfawzPQio8Ya2tnrJD8nW+6i58Lok1EF
+/FKd2XkvDrE2Y21UVUtDyPFHYdAsiBZCL/VX/Vo/eBYsYOzkZW69npCI9dnSNFbO
+yGrnpTpsc2iG8YwwKzPbVtGxjOGmEOauPJo4O5aj+xcnsrg7RKJ9sncw94ltEtoJ
+U4cKaWXB/okFbBi7WHWfvYGo6dsa3NV2ULX5V1vF9iEkCDU+ECQSSrtJeAGwdyd6
+KMJZHHUKiF816glIcJCzNI3wqDBOe5GxZqHPnlLOkL/N114Ka+g0X+AlFmoXj3bZ
+JtoStRrcGOTsZsGDKwdx
+=gp0U
+-----END PGP SIGNATURE-----
+
+--g7w8+K/95kPelPD2--
