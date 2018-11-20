@@ -1,111 +1,132 @@
-Return-Path: <SRS0=a5OM=NO=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:48298 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727838AbeKDHJ4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 4 Nov 2018 02:09:56 -0500
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Corentin Labbe <clabbe@baylibre.com>,
-        Stafford Horne <shorne@gmail.com>, linux-kernel@vger.kernel.org
-Subject: [PATCH 3/4] crypto: crypto_user - remove redundant reporting functions
-Date: Sat,  3 Nov 2018 14:56:02 -0700
-Message-Id: <20181103215603.16250-4-ebiggers@kernel.org>
-In-Reply-To: <20181103215603.16250-1-ebiggers@kernel.org>
-References: <20181103215603.16250-1-ebiggers@kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Return-Path: <SRS0=vxh5=N7=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:45412 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726883AbeKTQcP (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 20 Nov 2018 11:32:15 -0500
+Subject: [v2 PATCH 3/4] zinc: Add x86 accelerated ChaCha20
+References: <20181120060217.t4nccaqpwnxkl4tx@gondor.apana.org.au>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        linux-fscrypt@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        LKML <linux-kernel@vger.kernel.org>,
+        Paul Crowley <paulcrowley@google.com>,
+        Greg Kaiser <gkaiser@google.com>,
+        Samuel Neves <samuel.c.p.neves@gmail.com>,
+        Tomer Ashur <tomer.ashur@esat.kuleuven.be>,
+        Martin Willi <martin@strongswan.org>
+Message-Id: <E1gOz9T-00066y-BK@gondobar>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Date: Tue, 20 Nov 2018 14:04:47 +0800
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Eric Biggers <ebiggers@google.com>
+This patch exposes the crypto API x86 chacha20 implementation through
+zinc.
 
-The acomp, akcipher, and kpp algorithm types already have .report
-methods defined, so there's no need to duplicate this functionality in
-crypto_user itself; the duplicate functions are actually never executed.
-Remove the unused code.
-
-Signed-off-by: Eric Biggers <ebiggers@google.com>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
- crypto/crypto_user_base.c | 59 ---------------------------------------
- 1 file changed, 59 deletions(-)
 
-diff --git a/crypto/crypto_user_base.c b/crypto/crypto_user_base.c
-index 784748dbb19f0..1ecd9b08e38f4 100644
---- a/crypto/crypto_user_base.c
-+++ b/crypto/crypto_user_base.c
-@@ -113,51 +113,6 @@ static int crypto_report_comp(struct sk_buff *skb, struct crypto_alg *alg)
- 	return -EMSGSIZE;
- }
+ lib/zinc/Kconfig                         |    1 
+ lib/zinc/chacha20/chacha20-x86_64-glue.c |   55 +++++++++++++++++++++++++++++++
+ lib/zinc/chacha20/chacha20.c             |    4 ++
+ 3 files changed, 60 insertions(+)
+
+diff --git a/lib/zinc/Kconfig b/lib/zinc/Kconfig
+index 1fffd0a1a74c..010547fa6c9d 100644
+--- a/lib/zinc/Kconfig
++++ b/lib/zinc/Kconfig
+@@ -1,6 +1,7 @@
+ config ZINC_CHACHA20
+ 	tristate
+ 	select CRYPTO_CHACHA20
++	select CRYPTO_CHACHA20_X86_64 if ZINC_ARCH_X86_64
  
--static int crypto_report_acomp(struct sk_buff *skb, struct crypto_alg *alg)
--{
--	struct crypto_report_acomp racomp;
--
--	strncpy(racomp.type, "acomp", sizeof(racomp.type));
--
--	if (nla_put(skb, CRYPTOCFGA_REPORT_ACOMP,
--		    sizeof(struct crypto_report_acomp), &racomp))
--		goto nla_put_failure;
--	return 0;
--
--nla_put_failure:
--	return -EMSGSIZE;
--}
--
--static int crypto_report_akcipher(struct sk_buff *skb, struct crypto_alg *alg)
--{
--	struct crypto_report_akcipher rakcipher;
--
--	strncpy(rakcipher.type, "akcipher", sizeof(rakcipher.type));
--
--	if (nla_put(skb, CRYPTOCFGA_REPORT_AKCIPHER,
--		    sizeof(struct crypto_report_akcipher), &rakcipher))
--		goto nla_put_failure;
--	return 0;
--
--nla_put_failure:
--	return -EMSGSIZE;
--}
--
--static int crypto_report_kpp(struct sk_buff *skb, struct crypto_alg *alg)
--{
--	struct crypto_report_kpp rkpp;
--
--	strncpy(rkpp.type, "kpp", sizeof(rkpp.type));
--
--	if (nla_put(skb, CRYPTOCFGA_REPORT_KPP,
--		    sizeof(struct crypto_report_kpp), &rkpp))
--		goto nla_put_failure;
--	return 0;
--
--nla_put_failure:
--	return -EMSGSIZE;
--}
--
- static int crypto_report_one(struct crypto_alg *alg,
- 			     struct crypto_user_alg *ualg, struct sk_buff *skb)
+ config ZINC_SELFTEST
+ 	bool "Zinc cryptography library self-tests"
+diff --git a/lib/zinc/chacha20/chacha20-x86_64-glue.c b/lib/zinc/chacha20/chacha20-x86_64-glue.c
+new file mode 100644
+index 000000000000..07f72729a64e
+--- /dev/null
++++ b/lib/zinc/chacha20/chacha20-x86_64-glue.c
+@@ -0,0 +1,55 @@
++// SPDX-License-Identifier: GPL-2.0 OR MIT
++/*
++ * Copyright (C) 2015-2018 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
++ */
++
++#include <asm/fpu/api.h>
++#include <asm/cpufeature.h>
++#include <asm/processor.h>
++#include <asm/intel-family.h>
++#include <crypto/chacha20.h>
++
++static bool chacha20_use_ssse3 __ro_after_init;
++static bool *const chacha20_nobs[] __initconst = {
++	&chacha20_use_ssse3 };
++
++static void __init chacha20_fpu_init(void)
++{
++	chacha20_use_ssse3 = boot_cpu_has(X86_FEATURE_SSSE3);
++}
++
++static inline bool chacha20_arch(struct chacha20_ctx *ctx, u8 *dst,
++				 const u8 *src, size_t len,
++				 simd_context_t *simd_context)
++{
++	/* SIMD disables preemption, so relax after processing each page. */
++	BUILD_BUG_ON(PAGE_SIZE < CHACHA20_BLOCK_SIZE ||
++		     PAGE_SIZE % CHACHA20_BLOCK_SIZE);
++
++	if (!IS_ENABLED(CONFIG_AS_SSSE3) || !chacha20_use_ssse3 ||
++	    len <= CHACHA20_BLOCK_SIZE || !simd_use(simd_context))
++		return false;
++
++	for (;;) {
++		const size_t bytes = min_t(size_t, len, PAGE_SIZE);
++
++		crypto_chacha20_dosimd(ctx->state, dst, src, bytes);
++
++		len -= bytes;
++		if (!len)
++			break;
++		dst += bytes;
++		src += bytes;
++		simd_relax(simd_context);
++	}
++
++	return true;
++}
++
++static inline bool hchacha20_arch(u32 derived_key[CHACHA20_KEY_WORDS],
++				  const u8 nonce[HCHACHA20_NONCE_SIZE],
++				  const u8 key[HCHACHA20_KEY_SIZE],
++				  simd_context_t *simd_context)
++{
++	return false;
++}
+diff --git a/lib/zinc/chacha20/chacha20.c b/lib/zinc/chacha20/chacha20.c
+index 132850d19e39..480d304cd917 100644
+--- a/lib/zinc/chacha20/chacha20.c
++++ b/lib/zinc/chacha20/chacha20.c
+@@ -17,6 +17,9 @@
+ #include <crypto/algapi.h> // For crypto_xor_cpy.
+ #include <crypto/chacha20.h>
+ 
++#if defined(CONFIG_ZINC_ARCH_X86_64)
++#include "chacha20-x86_64-glue.c"
++#else
+ static bool *const chacha20_nobs[] __initconst = { };
+ static void __init chacha20_fpu_init(void)
  {
-@@ -202,20 +157,6 @@ static int crypto_report_one(struct crypto_alg *alg,
- 			goto nla_put_failure;
+@@ -34,6 +37,7 @@ static inline bool hchacha20_arch(u32 derived_key[CHACHA20_KEY_WORDS],
+ {
+ 	return false;
+ }
++#endif
  
- 		break;
--	case CRYPTO_ALG_TYPE_ACOMPRESS:
--		if (crypto_report_acomp(skb, alg))
--			goto nla_put_failure;
--
--		break;
--	case CRYPTO_ALG_TYPE_AKCIPHER:
--		if (crypto_report_akcipher(skb, alg))
--			goto nla_put_failure;
--
--		break;
--	case CRYPTO_ALG_TYPE_KPP:
--		if (crypto_report_kpp(skb, alg))
--			goto nla_put_failure;
--		break;
- 	}
- 
- out:
--- 
-2.19.1
+ void chacha20(struct chacha20_ctx *ctx, u8 *dst, const u8 *src, u32 len,
+ 	      simd_context_t *simd_context)
