@@ -1,81 +1,145 @@
-Return-Path: <SRS0=KYvO=NY=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-qk1-f182.google.com ([209.85.222.182]:38943 "EHLO
-        mail-qk1-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725991AbeKMKGR (ORCPT
+Return-Path: <SRS0=vxh5=N7=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:38131 "EHLO
+        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729580AbeKTXCU (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 13 Nov 2018 05:06:17 -0500
-MIME-Version: 1.0
-References: <20180925145622.29959-1-Jason@zx2c4.com> <20180925145622.29959-24-Jason@zx2c4.com>
- <7830522a-968e-0880-beb7-44904466cf14@labo.rs> <CAHmME9oQJ9y51Pv7U=+=5uDA_tb+U1zWZdsLcyNMhdcFZmjM8Q@mail.gmail.com>
- <e4b500e9-f24a-43c5-c2df-834dafc3aae5@labo.rs> <CAHmME9q8tp3Ch43o3D6zYTVujcjBWLVpNdzVw6RqYqHisd_suQ@mail.gmail.com>
-In-Reply-To: <CAHmME9q8tp3Ch43o3D6zYTVujcjBWLVpNdzVw6RqYqHisd_suQ@mail.gmail.com>
-From: Dave Taht <dave.taht@gmail.com>
-Date: Mon, 12 Nov 2018 16:10:36 -0800
-Message-ID: <CAA93jw7e61mbbLMoDwshxpWWK+oGUz71pGrsUYVX8uWM-s5Krg@mail.gmail.com>
-Subject: Re: [PATCH net-next v6 23/23] net: WireGuard secure network tunnel
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc: labokml@labo.rs, linux-kernel@vger.kernel.org,
-        Linux Kernel Network Developers <netdev@vger.kernel.org>,
-        linux-crypto@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        Tue, 20 Nov 2018 18:02:20 -0500
+Received: by mail-wm1-f66.google.com with SMTP id k198so2058537wmd.3
+        for <linux-crypto@vger.kernel.org>; Tue, 20 Nov 2018 04:33:25 -0800 (PST)
+From: Corentin Labbe <clabbe@baylibre.com>
+To: davem@davemloft.net, ebiggers@kernel.org,
+        herbert@gondor.apana.org.au, nhorman@tuxdriver.com
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Corentin Labbe <clabbe@baylibre.com>
+Subject: [PATCH v3 05/10] crypto: tool: getstat: convert user space example to the new crypto_user_stat uapi
+Date: Tue, 20 Nov 2018 12:32:21 +0000
+Message-Id: <1542717146-34917-6-git-send-email-clabbe@baylibre.com>
+In-Reply-To: <1542717146-34917-1-git-send-email-clabbe@baylibre.com>
+References: <1542717146-34917-1-git-send-email-clabbe@baylibre.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Nov 12, 2018 at 3:54 PM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
->
-> Hey Ivan,
->
-> Sorry for not getting back to you sooner.
->
-> On Mon, Nov 5, 2018 at 8:06 AM Ivan Lab=C3=A1th <labokml@labo.rs> wrote:
-> > Any news on this?
-> >
-> > To be clear, question is not about an insignificant documentation
-> > oversight. It is about copying bits from inner packets to outer packets
->
-> The short answer is RFC6040 with DSCP fixed to 0 so as not to leak
-> anything. I've added a description of this to
-> <wireguard.com/protocol/>.
+This patch converts the getstat example tool to the recent changes done in crypto_user_stat
+- changed all stats to u64
+- separated struct stats for each crypto alg
 
-you have a speling error (ECM). :)
+Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
+---
+ tools/crypto/getstat.c | 54 +++++++++++++++++++++---------------------
+ 1 file changed, 27 insertions(+), 27 deletions(-)
 
-side note:
-
-I have to say that wireguard works really well with ecn and non-ecn marked =
-flows
-against codel and fq_codel on the bottleneck router.
-
-I'd still rather like it if wireguard focused a bit more on
-interleaving multiple flows better
-rather than on single stream benchmarks, one day.
-
-In this case, codel is managing things not fq and we could possibly
-shave a few ms of induced latency off of it in this particular test series:
-
-http://tun.taht.net/~d/wireguard/rrul_-_comcast_v6.png
-
-vs wireguard (doing it ivp6 over that ipv6)
-
-http://tun.taht.net/~d/wireguard/rrul_-_wireguard.png
-
-That said, I've been deploying wireguard widely in replacement of my
-old tinc network particularly on machines that were formerly cpu
-bottlenecked
-and am insanely pleased with it. what's a few extra ms of latency
-between friends?
-
->
-> Regards,
-> Jason
-
-
-
---=20
-
-Dave T=C3=A4ht
-CTO, TekLibre, LLC
-http://www.teklibre.com
-Tel: 1-831-205-9740
+diff --git a/tools/crypto/getstat.c b/tools/crypto/getstat.c
+index 24115173a483..57fbb94608d4 100644
+--- a/tools/crypto/getstat.c
++++ b/tools/crypto/getstat.c
+@@ -152,53 +152,53 @@ static int get_stat(const char *drivername)
+ 
+ 	if (tb[CRYPTOCFGA_STAT_HASH]) {
+ 		struct rtattr *rta = tb[CRYPTOCFGA_STAT_HASH];
+-		struct crypto_stat *rhash =
+-			(struct crypto_stat *)RTA_DATA(rta);
+-		printf("%s\tHash\n\tHash: %u bytes: %llu\n\tErrors: %u\n",
++		struct crypto_stat_hash *rhash =
++			(struct crypto_stat_hash *)RTA_DATA(rta);
++		printf("%s\tHash\n\tHash: %llu bytes: %llu\n\tErrors: %llu\n",
+ 			drivername,
+ 			rhash->stat_hash_cnt, rhash->stat_hash_tlen,
+ 			rhash->stat_hash_err_cnt);
+ 	} else if (tb[CRYPTOCFGA_STAT_COMPRESS]) {
+ 		struct rtattr *rta = tb[CRYPTOCFGA_STAT_COMPRESS];
+-		struct crypto_stat *rblk =
+-			(struct crypto_stat *)RTA_DATA(rta);
+-		printf("%s\tCompress\n\tCompress: %u bytes: %llu\n\tDecompress: %u bytes: %llu\n\tErrors: %u\n",
++		struct crypto_stat_compress *rblk =
++			(struct crypto_stat_compress *)RTA_DATA(rta);
++		printf("%s\tCompress\n\tCompress: %llu bytes: %llu\n\tDecompress: %llu bytes: %llu\n\tErrors: %llu\n",
+ 			drivername,
+ 			rblk->stat_compress_cnt, rblk->stat_compress_tlen,
+ 			rblk->stat_decompress_cnt, rblk->stat_decompress_tlen,
+ 			rblk->stat_compress_err_cnt);
+ 	} else if (tb[CRYPTOCFGA_STAT_ACOMP]) {
+ 		struct rtattr *rta = tb[CRYPTOCFGA_STAT_ACOMP];
+-		struct crypto_stat *rcomp =
+-			(struct crypto_stat *)RTA_DATA(rta);
+-		printf("%s\tACompress\n\tCompress: %u bytes: %llu\n\tDecompress: %u bytes: %llu\n\tErrors: %u\n",
++		struct crypto_stat_compress *rcomp =
++			(struct crypto_stat_compress *)RTA_DATA(rta);
++		printf("%s\tACompress\n\tCompress: %llu bytes: %llu\n\tDecompress: %llu bytes: %llu\n\tErrors: %llu\n",
+ 			drivername,
+ 			rcomp->stat_compress_cnt, rcomp->stat_compress_tlen,
+ 			rcomp->stat_decompress_cnt, rcomp->stat_decompress_tlen,
+ 			rcomp->stat_compress_err_cnt);
+ 	} else if (tb[CRYPTOCFGA_STAT_AEAD]) {
+ 		struct rtattr *rta = tb[CRYPTOCFGA_STAT_AEAD];
+-		struct crypto_stat *raead =
+-			(struct crypto_stat *)RTA_DATA(rta);
+-		printf("%s\tAEAD\n\tEncrypt: %u bytes: %llu\n\tDecrypt: %u bytes: %llu\n\tErrors: %u\n",
++		struct crypto_stat_aead *raead =
++			(struct crypto_stat_aead *)RTA_DATA(rta);
++		printf("%s\tAEAD\n\tEncrypt: %llu bytes: %llu\n\tDecrypt: %llu bytes: %llu\n\tErrors: %llu\n",
+ 			drivername,
+ 			raead->stat_encrypt_cnt, raead->stat_encrypt_tlen,
+ 			raead->stat_decrypt_cnt, raead->stat_decrypt_tlen,
+ 			raead->stat_aead_err_cnt);
+ 	} else if (tb[CRYPTOCFGA_STAT_BLKCIPHER]) {
+ 		struct rtattr *rta = tb[CRYPTOCFGA_STAT_BLKCIPHER];
+-		struct crypto_stat *rblk =
+-			(struct crypto_stat *)RTA_DATA(rta);
+-		printf("%s\tCipher\n\tEncrypt: %u bytes: %llu\n\tDecrypt: %u bytes: %llu\n\tErrors: %u\n",
++		struct crypto_stat_cipher *rblk =
++			(struct crypto_stat_cipher *)RTA_DATA(rta);
++		printf("%s\tCipher\n\tEncrypt: %llu bytes: %llu\n\tDecrypt: %llu bytes: %llu\n\tErrors: %llu\n",
+ 			drivername,
+ 			rblk->stat_encrypt_cnt, rblk->stat_encrypt_tlen,
+ 			rblk->stat_decrypt_cnt, rblk->stat_decrypt_tlen,
+ 			rblk->stat_cipher_err_cnt);
+ 	} else if (tb[CRYPTOCFGA_STAT_AKCIPHER]) {
+ 		struct rtattr *rta = tb[CRYPTOCFGA_STAT_AKCIPHER];
+-		struct crypto_stat *rblk =
+-			(struct crypto_stat *)RTA_DATA(rta);
+-		printf("%s\tAkcipher\n\tEncrypt: %u bytes: %llu\n\tDecrypt: %u bytes: %llu\n\tSign: %u\n\tVerify: %u\n\tErrors: %u\n",
++		struct crypto_stat_akcipher *rblk =
++			(struct crypto_stat_akcipher *)RTA_DATA(rta);
++		printf("%s\tAkcipher\n\tEncrypt: %llu bytes: %llu\n\tDecrypt: %llu bytes: %llu\n\tSign: %llu\n\tVerify: %llu\n\tErrors: %llu\n",
+ 			drivername,
+ 			rblk->stat_encrypt_cnt, rblk->stat_encrypt_tlen,
+ 			rblk->stat_decrypt_cnt, rblk->stat_decrypt_tlen,
+@@ -206,27 +206,27 @@ static int get_stat(const char *drivername)
+ 			rblk->stat_akcipher_err_cnt);
+ 	} else if (tb[CRYPTOCFGA_STAT_CIPHER]) {
+ 		struct rtattr *rta = tb[CRYPTOCFGA_STAT_CIPHER];
+-		struct crypto_stat *rblk =
+-			(struct crypto_stat *)RTA_DATA(rta);
+-		printf("%s\tcipher\n\tEncrypt: %u bytes: %llu\n\tDecrypt: %u bytes: %llu\n\tErrors: %u\n",
++		struct crypto_stat_cipher *rblk =
++			(struct crypto_stat_cipher *)RTA_DATA(rta);
++		printf("%s\tcipher\n\tEncrypt: %llu bytes: %llu\n\tDecrypt: %llu bytes: %llu\n\tErrors: %llu\n",
+ 			drivername,
+ 			rblk->stat_encrypt_cnt, rblk->stat_encrypt_tlen,
+ 			rblk->stat_decrypt_cnt, rblk->stat_decrypt_tlen,
+ 			rblk->stat_cipher_err_cnt);
+ 	} else if (tb[CRYPTOCFGA_STAT_RNG]) {
+ 		struct rtattr *rta = tb[CRYPTOCFGA_STAT_RNG];
+-		struct crypto_stat *rrng =
+-			(struct crypto_stat *)RTA_DATA(rta);
+-		printf("%s\tRNG\n\tSeed: %u\n\tGenerate: %u bytes: %llu\n\tErrors: %u\n",
++		struct crypto_stat_rng *rrng =
++			(struct crypto_stat_rng *)RTA_DATA(rta);
++		printf("%s\tRNG\n\tSeed: %llu\n\tGenerate: %llu bytes: %llu\n\tErrors: %llu\n",
+ 			drivername,
+ 			rrng->stat_seed_cnt,
+ 			rrng->stat_generate_cnt, rrng->stat_generate_tlen,
+ 			rrng->stat_rng_err_cnt);
+ 	} else if (tb[CRYPTOCFGA_STAT_KPP]) {
+ 		struct rtattr *rta = tb[CRYPTOCFGA_STAT_KPP];
+-		struct crypto_stat *rkpp =
+-			(struct crypto_stat *)RTA_DATA(rta);
+-		printf("%s\tKPP\n\tSetsecret: %u\n\tGenerate public key: %u\n\tCompute_shared_secret: %u\n\tErrors: %u\n",
++		struct crypto_stat_kpp *rkpp =
++			(struct crypto_stat_kpp *)RTA_DATA(rta);
++		printf("%s\tKPP\n\tSetsecret: %llu\n\tGenerate public key: %llu\n\tCompute_shared_secret: %llu\n\tErrors: %llu\n",
+ 			drivername,
+ 			rkpp->stat_setsecret_cnt,
+ 			rkpp->stat_generate_public_key_cnt,
+-- 
+2.18.1
