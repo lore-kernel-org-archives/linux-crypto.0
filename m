@@ -1,56 +1,129 @@
-Return-Path: <SRS0=unN5=OB=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:35008 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1733189AbeKWGgE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 23 Nov 2018 01:36:04 -0500
-From: Sasha Levin <sashal@kernel.org>
-To: stable@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.14 06/21] crypto: simd - correctly take reqsize of wrapped skcipher into account
-Date: Thu, 22 Nov 2018 14:54:37 -0500
-Message-Id: <20181122195452.13520-6-sashal@kernel.org>
-In-Reply-To: <20181122195452.13520-1-sashal@kernel.org>
-References: <20181122195452.13520-1-sashal@kernel.org>
+Return-Path: <SRS0=vxh5=N7=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from charlotte.tuxdriver.com ([70.61.120.58]:38015 "EHLO
+        smtp.tuxdriver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725995AbeKUAnJ (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 20 Nov 2018 19:43:09 -0500
+Date: Tue, 20 Nov 2018 09:13:29 -0500
+From: Neil Horman <nhorman@tuxdriver.com>
+To: Corentin Labbe <clabbe@baylibre.com>
+Cc: davem@davemloft.net, ebiggers@kernel.org,
+        herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 01/10] crypto: crypto_user_stat: made crypto_user_stat
+ optional
+Message-ID: <20181120141329.GC20562@hmswarspite.think-freely.org>
+References: <1542717146-34917-1-git-send-email-clabbe@baylibre.com>
+ <1542717146-34917-2-git-send-email-clabbe@baylibre.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1542717146-34917-2-git-send-email-clabbe@baylibre.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+On Tue, Nov 20, 2018 at 12:32:17PM +0000, Corentin Labbe wrote:
+> Even if CRYPTO_STATS is set to n, some part of CRYPTO_STATS are
+> compiled.
+> This patch made all part of crypto_user_stat uncompiled in that case.
+> 
+> Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
+> ---
+>  crypto/Makefile                      |  3 ++-
+>  crypto/algapi.c                      |  2 ++
+>  include/crypto/internal/cryptouser.h | 17 +++++++++++++++++
+>  include/linux/crypto.h               |  2 ++
+>  4 files changed, 23 insertions(+), 1 deletion(-)
+> 
+> diff --git a/crypto/Makefile b/crypto/Makefile
+> index abbd86fdbad2..22f9f84f961d 100644
+> --- a/crypto/Makefile
+> +++ b/crypto/Makefile
+> @@ -54,7 +54,8 @@ cryptomgr-y := algboss.o testmgr.o
+>  
+>  obj-$(CONFIG_CRYPTO_MANAGER2) += cryptomgr.o
+>  obj-$(CONFIG_CRYPTO_USER) += crypto_user.o
+> -crypto_user-y := crypto_user_base.o crypto_user_stat.o
+> +crypto_user-y := crypto_user_base.o
+> +crypto_user-$(CONFIG_CRYPTO_STATS) += crypto_user_stat.o
+>  obj-$(CONFIG_CRYPTO_CMAC) += cmac.o
+>  obj-$(CONFIG_CRYPTO_HMAC) += hmac.o
+>  obj-$(CONFIG_CRYPTO_VMAC) += vmac.o
+> diff --git a/crypto/algapi.c b/crypto/algapi.c
+> index 2545c5f89c4c..f5396c88e8cd 100644
+> --- a/crypto/algapi.c
+> +++ b/crypto/algapi.c
+> @@ -258,6 +258,7 @@ static struct crypto_larval *__crypto_register_alg(struct crypto_alg *alg)
+>  	list_add(&alg->cra_list, &crypto_alg_list);
+>  	list_add(&larval->alg.cra_list, &crypto_alg_list);
+>  
+> +#ifdef CONFIG_CRYPTO_STATS
+>  	atomic_set(&alg->encrypt_cnt, 0);
+>  	atomic_set(&alg->decrypt_cnt, 0);
+>  	atomic64_set(&alg->encrypt_tlen, 0);
+> @@ -265,6 +266,7 @@ static struct crypto_larval *__crypto_register_alg(struct crypto_alg *alg)
+>  	atomic_set(&alg->verify_cnt, 0);
+>  	atomic_set(&alg->cipher_err_cnt, 0);
+>  	atomic_set(&alg->sign_cnt, 0);
+> +#endif
+>  
+If you created a helper function in crypto_user_stat.c to initalize all the
+stats, you could ifdef it in the cryptouser.h header if unconfigured, and avoid
+the ifdef leakage to this file above.
 
-[ Upstream commit 508a1c4df085a547187eed346f1bfe5e381797f1 ]
+Neil
 
-The simd wrapper's skcipher request context structure consists
-of a single subrequest whose size is taken from the subordinate
-skcipher. However, in simd_skcipher_init(), the reqsize that is
-retrieved is not from the subordinate skcipher but from the
-cryptd request structure, whose size is completely unrelated to
-the actual wrapped skcipher.
-
-Reported-by: Qian Cai <cai@gmx.us>
-Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Tested-by: Qian Cai <cai@gmx.us>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- crypto/simd.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/crypto/simd.c b/crypto/simd.c
-index 88203370a62f..894c62944106 100644
---- a/crypto/simd.c
-+++ b/crypto/simd.c
-@@ -126,8 +126,9 @@ static int simd_skcipher_init(struct crypto_skcipher *tfm)
- 
- 	ctx->cryptd_tfm = cryptd_tfm;
- 
--	reqsize = sizeof(struct skcipher_request);
--	reqsize += crypto_skcipher_reqsize(&cryptd_tfm->base);
-+	reqsize = crypto_skcipher_reqsize(cryptd_skcipher_child(cryptd_tfm));
-+	reqsize = max(reqsize, crypto_skcipher_reqsize(&cryptd_tfm->base));
-+	reqsize += sizeof(struct skcipher_request);
- 
- 	crypto_skcipher_set_reqsize(tfm, reqsize);
- 
--- 
-2.17.1
+>  out:
+>  	return larval;
+> diff --git a/include/crypto/internal/cryptouser.h b/include/crypto/internal/cryptouser.h
+> index 8db299c25566..3492ab42eefb 100644
+> --- a/include/crypto/internal/cryptouser.h
+> +++ b/include/crypto/internal/cryptouser.h
+> @@ -3,6 +3,23 @@
+>  
+>  struct crypto_alg *crypto_alg_match(struct crypto_user_alg *p, int exact);
+>  
+> +#ifdef CONFIG_CRYPTO_STATS
+>  int crypto_dump_reportstat(struct sk_buff *skb, struct netlink_callback *cb);
+>  int crypto_reportstat(struct sk_buff *in_skb, struct nlmsghdr *in_nlh, struct nlattr **attrs);
+>  int crypto_dump_reportstat_done(struct netlink_callback *cb);
+> +#else
+> +static int crypto_dump_reportstat(struct sk_buff *skb, struct netlink_callback *cb)
+> +{
+> +	return -ENOTSUPP;
+> +}
+> +
+> +static int crypto_reportstat(struct sk_buff *in_skb, struct nlmsghdr *in_nlh, struct nlattr **attrs)
+> +{
+> +	return -ENOTSUPP;
+> +}
+> +
+> +static int crypto_dump_reportstat_done(struct netlink_callback *cb)
+> +{
+> +	return -ENOTSUPP;
+> +}
+> +#endif
+> diff --git a/include/linux/crypto.h b/include/linux/crypto.h
+> index 3634ad6fe202..3e05053b8d57 100644
+> --- a/include/linux/crypto.h
+> +++ b/include/linux/crypto.h
+> @@ -515,6 +515,7 @@ struct crypto_alg {
+>  	
+>  	struct module *cra_module;
+>  
+> +#ifdef CONFIG_CRYPTO_STATS
+>  	union {
+>  		atomic_t encrypt_cnt;
+>  		atomic_t compress_cnt;
+> @@ -552,6 +553,7 @@ struct crypto_alg {
+>  		atomic_t compute_shared_secret_cnt;
+>  	};
+>  	atomic_t sign_cnt;
+> +#endif /* CONFIG_CRYPTO_STATS */
+>  
+>  } CRYPTO_MINALIGN_ATTR;
+>  
+> -- 
+> 2.18.1
+> 
+> 
