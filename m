@@ -1,45 +1,185 @@
-Return-Path: <SRS0=IUQn=NU=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:37352 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727532AbeKITbC (ORCPT
+Return-Path: <SRS0=vxh5=N7=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:39615 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730148AbeKTN4k (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 9 Nov 2018 14:31:02 -0500
-Date: Fri, 9 Nov 2018 17:51:08 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Yael Chemla <yael.chemla@foss.arm.com>
-Cc: Gilad Ben-Yossef <gilad@benyossef.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, Ofir Drang <ofir.drang@arm.com>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/3] crypto: ccree: add SM3 support
-Message-ID: <20181109095108.4txbedqhdxn7bz4r@gondor.apana.org.au>
-References: <1539867599-20504-1-git-send-email-yael.chemla@foss.arm.com>
+        Tue, 20 Nov 2018 08:56:40 -0500
+Received: by mail-pg1-f193.google.com with SMTP id w6so255647pgl.6
+        for <linux-crypto@vger.kernel.org>; Mon, 19 Nov 2018 19:29:42 -0800 (PST)
+Date: Mon, 19 Nov 2018 20:29:39 -0700
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Kenneth Lee <liguozhu@hisilicon.com>
+Cc: Leon Romanovsky <leon@kernel.org>,
+        Kenneth Lee <nek.in.cn@gmail.com>,
+        Tim Sell <timothy.sell@unisys.com>, linux-doc@vger.kernel.org,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Zaibo Xu <xuzaibo@huawei.com>, zhangfei.gao@foxmail.com,
+        linuxarm@huawei.com, haojian.zhuang@linaro.org,
+        Christoph Lameter <cl@linux.com>,
+        Hao Fang <fanghao11@huawei.com>,
+        Gavin Schenk <g.schenk@eckelmann.de>,
+        RDMA mailing list <linux-rdma@vger.kernel.org>,
+        Zhou Wang <wangzhou1@hisilicon.com>,
+        Doug Ledford <dledford@redhat.com>,
+        Uwe =?utf-8?Q?Kleine-K=C3=B6nig?=
+        <u.kleine-koenig@pengutronix.de>,
+        David Kershner <david.kershner@unisys.com>,
+        Johan Hovold <johan@kernel.org>,
+        Cyrille Pitchen <cyrille.pitchen@free-electrons.com>,
+        Sagar Dharia <sdharia@codeaurora.org>,
+        Jens Axboe <axboe@kernel.dk>, guodong.xu@linaro.org,
+        linux-netdev <netdev@vger.kernel.org>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        linux-kernel@vger.kernel.org, Vinod Koul <vkoul@kernel.org>,
+        linux-crypto@vger.kernel.org,
+        Philippe Ombredanne <pombredanne@nexb.com>,
+        Sanyog Kale <sanyog.r.kale@intel.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-accelerators@lists.ozlabs.org
+Subject: Re: [RFCv3 PATCH 1/6] uacce: Add documents for WarpDrive/uacce
+Message-ID: <20181120032939.GR4890@ziepe.ca>
+References: <20181112075807.9291-1-nek.in.cn@gmail.com>
+ <20181112075807.9291-2-nek.in.cn@gmail.com>
+ <20181113002354.GO3695@mtr-leonro.mtl.com>
+ <95310df4-b32c-42f0-c750-3ad5eb89b3dd@gmail.com>
+ <20181114160017.GI3759@mtr-leonro.mtl.com>
+ <20181115085109.GD157308@Turing-Arch-b>
+ <20181115145455.GN3759@mtr-leonro.mtl.com>
+ <20181119091405.GE157308@Turing-Arch-b>
+ <20181119184954.GB4890@ziepe.ca>
+ <20181120030702.GH157308@Turing-Arch-b>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1539867599-20504-1-git-send-email-yael.chemla@foss.arm.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20181120030702.GH157308@Turing-Arch-b>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Oct 18, 2018 at 01:59:56PM +0100, Yael Chemla wrote:
-> Add support for SM3 in CryptoCell 713.
+On Tue, Nov 20, 2018 at 11:07:02AM +0800, Kenneth Lee wrote:
+> On Mon, Nov 19, 2018 at 11:49:54AM -0700, Jason Gunthorpe wrote:
+> > Date: Mon, 19 Nov 2018 11:49:54 -0700
+> > From: Jason Gunthorpe <jgg@ziepe.ca>
+> > To: Kenneth Lee <liguozhu@hisilicon.com>
+> > CC: Leon Romanovsky <leon@kernel.org>, Kenneth Lee <nek.in.cn@gmail.com>,
+> >  Tim Sell <timothy.sell@unisys.com>, linux-doc@vger.kernel.org, Alexander
+> >  Shishkin <alexander.shishkin@linux.intel.com>, Zaibo Xu
+> >  <xuzaibo@huawei.com>, zhangfei.gao@foxmail.com, linuxarm@huawei.com,
+> >  haojian.zhuang@linaro.org, Christoph Lameter <cl@linux.com>, Hao Fang
+> >  <fanghao11@huawei.com>, Gavin Schenk <g.schenk@eckelmann.de>, RDMA mailing
+> >  list <linux-rdma@vger.kernel.org>, Zhou Wang <wangzhou1@hisilicon.com>,
+> >  Doug Ledford <dledford@redhat.com>, Uwe Kleine-König
+> >  <u.kleine-koenig@pengutronix.de>, David Kershner
+> >  <david.kershner@unisys.com>, Johan Hovold <johan@kernel.org>, Cyrille
+> >  Pitchen <cyrille.pitchen@free-electrons.com>, Sagar Dharia
+> >  <sdharia@codeaurora.org>, Jens Axboe <axboe@kernel.dk>,
+> >  guodong.xu@linaro.org, linux-netdev <netdev@vger.kernel.org>, Randy Dunlap
+> >  <rdunlap@infradead.org>, linux-kernel@vger.kernel.org, Vinod Koul
+> >  <vkoul@kernel.org>, linux-crypto@vger.kernel.org, Philippe Ombredanne
+> >  <pombredanne@nexb.com>, Sanyog Kale <sanyog.r.kale@intel.com>, "David S.
+> >  Miller" <davem@davemloft.net>, linux-accelerators@lists.ozlabs.org
+> > Subject: Re: [RFCv3 PATCH 1/6] uacce: Add documents for WarpDrive/uacce
+> > User-Agent: Mutt/1.9.4 (2018-02-28)
+> > Message-ID: <20181119184954.GB4890@ziepe.ca>
+> > 
+> > On Mon, Nov 19, 2018 at 05:14:05PM +0800, Kenneth Lee wrote:
+> >  
+> > > If the hardware cannot share page table with the CPU, we then need to have
+> > > some way to change the device page table. This is what happen in ODP. It
+> > > invalidates the page table in device upon mmu_notifier call back. But this cannot
+> > > solve the COW problem: if the user process A share a page P with device, and A 
+> > > forks a new process B, and it continue to write to the page. By COW, the
+> > > process B will keep the page P, while A will get a new page P'. But you have
+> > > no way to let the device know it should use P' rather than P.
+> > 
+> > Is this true? I thought mmu_notifiers covered all these cases.
+> > 
+> > The mm_notifier for A should fire if B causes the physical address of
+> > A's pages to change via COW. 
+> > 
+> > And this causes the device page tables to re-synchronize.
 > 
-> Yael Chemla (3):
->   crypto: ccree: adjust hash length to suit certain context specifics
->   crypto: ccree:  modify set_cipher_mode usage from cc_hash
->   crypto: ccree: add SM3 support
-> 
->  drivers/crypto/Kconfig                  |   1 +
->  drivers/crypto/ccree/cc_aead.c          |  19 +++-
->  drivers/crypto/ccree/cc_crypto_ctx.h    |   4 +-
->  drivers/crypto/ccree/cc_driver.c        |  10 +-
->  drivers/crypto/ccree/cc_driver.h        |   2 +-
->  drivers/crypto/ccree/cc_hash.c          | 175 +++++++++++++++++++++++---------
->  drivers/crypto/ccree/cc_hw_queue_defs.h |  27 +++++
->  7 files changed, 182 insertions(+), 56 deletions(-)
+> I don't see such code. The current do_cow_fault() implemenation has nothing to
+> do with mm_notifer.
 
-All applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Well, that sure sounds like it would be a bug in mmu_notifiers..
+
+But considering Jean's SVA stuff seems based on mmu notifiers, I have
+a hard time believing that it has any different behavior from RDMA's
+ODP, and if it does have different behavior, then it is probably just
+a bug in the ODP implementation.
+
+> > > In WarpDrive/uacce, we make this simple. If you support IOMMU and it support
+> > > SVM/SVA. Everything will be fine just like ODP implicit mode. And you don't need
+> > > to write any code for that. Because it has been done by IOMMU framework. If it
+> > 
+> > Looks like the IOMMU code uses mmu_notifier, so it is identical to
+> > IB's ODP. The only difference is that IB tends to have the IOMMU page
+> > table in the device, not in the CPU.
+> > 
+> > The only case I know if that is different is the new-fangled CAPI
+> > stuff where the IOMMU can directly use the CPU's page table and the
+> > IOMMU page table (in device or CPU) is eliminated.
+>
+> Yes. We are not focusing on the current implementation. As mentioned in the
+> cover letter. We are expecting Jean Philips' SVA patch:
+> git://linux-arm.org/linux-jpb.
+
+This SVA stuff does not look comparable to CAPI as it still requires
+maintaining seperate IOMMU page tables.
+
+Also, those patches from Jean have a lot of references to
+mmu_notifiers (ie look at iommu_mmu_notifier).
+
+Are you really sure it is actually any different at all?
+
+> > Anyhow, I don't think a single instance of hardware should justify an
+> > entire new subsystem. Subsystems are hard to make and without multiple
+> > hardware examples there is no way to expect that it would cover any
+> > future use cases.
+> 
+> Yes. That's our first expectation. We can keep it with our driver. But because
+> there is no user driver support for any accelerator in mainline kernel. Even the
+> well known QuickAssit has to be maintained out of tree. So we try to see if
+> people is interested in working together to solve the problem.
+
+Well, you should come with patches ack'ed by these other groups.
+
+> > If all your driver needs is to mmap some PCI bar space, route
+> > interrupts and do DMA mapping then mediated VFIO is probably a good
+> > choice. 
+> 
+> Yes. That is what is done in our RFCv1/v2. But we accepted Jerome's opinion and
+> try not to add complexity to the mm subsystem.
+
+Why would a mediated VFIO driver touch the mm subsystem? Sounds like
+you don't have a VFIO driver if it needs to do stuff like that...
+
+> > If it needs to do a bunch of other stuff, not related to PCI bar
+> > space, interrupts and DMA mapping (ie special code for compression,
+> > crypto, AI, whatever) then you should probably do what Jerome said and
+> > make a drivers/char/hisillicon_foo_bar.c that exposes just what your
+> > hardware does.
+> 
+> Yes. If no other accelerator driver writer is interested. That is the
+> expectation:)
+
+I don't think it matters what other drivers do. 
+
+If your driver does not need any other kernel code then VFIO is
+sensible. In this kind of world you will probably have a RDMA-like
+userspace driver that can bring this to a common user space API, even
+if one driver use VFIO and a different driver uses something else.
+
+> You create some connections (queues) to NIC, RSA, and AI engine. Then you got
+> data direct from the NIC and pass the pointer to RSA engine for decryption. The
+> CPU then finish some data taking or operation and then pass through to the AI
+> engine for CNN calculation....This will need a place to maintain the same
+> address space by some means.
+
+How is this any different from what we have today? 
+
+SVA is not something even remotely new, IB has been doing various
+versions of it for 20 years.
+
+Jason
