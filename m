@@ -1,75 +1,73 @@
-Return-Path: <SRS0=45GR=NR=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from vmicros1.altlinux.org ([194.107.17.57]:53762 "EHLO
-        vmicros1.altlinux.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726724AbeKGG2c (ORCPT
+Return-Path: <SRS0=vxh5=N7=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:45136 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726559AbeKTNdo (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 7 Nov 2018 01:28:32 -0500
-From: Vitaly Chikunov <vt@altlinux.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        Vitaly Chikunov <vt@altlinux.org>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: linux-integrity@vger.kernel.org
-Subject: [PATCH v4 0/3] crypto: streebog - add Streebog hash function
-Date: Wed,  7 Nov 2018 00:00:00 +0300
-Message-Id: <20181106210008.11241-1-vt@altlinux.org>
+        Tue, 20 Nov 2018 08:33:44 -0500
+Date: Tue, 20 Nov 2018 11:06:35 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        linux-fscrypt@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        LKML <linux-kernel@vger.kernel.org>,
+        Paul Crowley <paulcrowley@google.com>,
+        Greg Kaiser <gkaiser@google.com>,
+        Samuel Neves <samuel.c.p.neves@gmail.com>,
+        Tomer Ashur <tomer.ashur@esat.kuleuven.be>
+Subject: Re: [RFC PATCH] zinc chacha20 generic implementation using crypto
+ API code
+Message-ID: <20181120030635.xfr543j5nngxfnxk@gondor.apana.org.au>
+References: <20181105232526.173947-1-ebiggers@kernel.org>
+ <20181105232526.173947-11-ebiggers@kernel.org>
+ <CAKv+Gu-o0khD5=0EOkv2PiczMs5uZ=XP9V=G2ogBNMK8Kb93sw@mail.gmail.com>
+ <20181112185816.GA8663@gmail.com>
+ <20181116060227.hwu4igi6bp26ddpi@gondor.apana.org.au>
+ <20181117001718.GA175522@gmail.com>
+ <CAHmME9rtsCk8ZLt05xRKMGr4CVRnaUvCaVOS_WX3N22HOat4-A@mail.gmail.com>
+ <20181119052451.qttzfgcm4hvbdc4u@gondor.apana.org.au>
+ <CAHmME9oXAnD0sbO2cKeTtotCMohX2Hu6P=uzA_6u0EWECU9Bpg@mail.gmail.com>
+ <20181119225414.GB258711@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181119225414.GB258711@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Add GOST/IETF Streebog hash function (GOST R 34.11-2012, RFC 6986)
-generic hash transformation with appropriate testmgr and tcrypt
-tests and vectors.
+On Mon, Nov 19, 2018 at 02:54:15PM -0800, Eric Biggers wrote:
+>
+> > I think the remaining issue right now is how to order my series and
+> > Eric's series. If Eric's goes in first, it means that I can either a)
+> > spend some time developing Zinc further _now_ to support chacha12 and
+> > keep the top two conversion patches, or b) just drop the top two
+> > conversion patches and work that out carefully with Eric after. I
+> > think (b) would be better, but I'm happy to do (a) if you disagree.
+> > And as I mentioned in the last email, I'd prefer Eric's work to go in
+> > after Zinc, but I don't think the reasoning for that is particularly
+> > strong, so it seems fine to merge Eric's work first.
+> > 
+> > I'll post v9 pretty soon and you can see how things are shaping up.
+> > Hopefully before then Eric/Ard/you can provide some feedback on
+> > whether you'd prefer (a) or (b) above.
+> > 
+> 
+> I'd still prefer to see the conversion patches included.  Skipping them would be
+> kicking the can down the road and avoiding issues that will need to be addressed
+> anyway.  Like you, I don't want a "half-baked concoction that will be maybe
+> possibly be replaced 'later'" :-)
 
-Streebog Hash Function (GOST R 34.11-2012, RFC 6986) is one of the Russian
-cryptographic standard algorithms (called GOST algorithms).
+Are you guys talking about the conversion patches to eliminate the
+two copies of chacha code that would otherwise exist in crypto as
+well as in zinc?
 
-Intended user is the IMA subsystem, which does not need any particular
-patching besides adding the hash names into Hash Info arrays, this is also
-done in this patchset.
+If so I think that's not negotiable.  Having two copies of the same
+code is just not acceptable.
 
-References:
-  https://tc26.ru/upload/iblock/fed/feddbb4d26b685903faa2ba11aea43f6.pdf
-  https://tools.ietf.org/html/rfc6986
-
-Tested using testmgr and tcrypt on (LE) x86_64, arm, arm64, and (BE) s390x
-in qemu.
-
-Changes from v1:
-- Fix of big-endian problem in add512.
-- More architectures are tested, including big-endian and 32-bit.
-
-Changes from v2:
-- Register hash in Hash Info for use by IMA.
-- Add hmac() tests.
-
-Changes from v3:
-- Remove not needed includes, and register, inline, const, ULL, and
-  __aligned specifiers.
-- Covert define macros into functions.
-- Use block size define instead of a number.
-- Rename algorithm names sb256, sb512 to streebog256, streebog512.
-- Rename bufsize to a more meaningful name (fillsize).
-- Prefix all static functions names with streebog_.
-
-Vitaly Chikunov (3):
-  crypto: streebog - add Streebog hash function
-  crypto: streebog - register Streebog in hash info for IMA
-  crypto: streebog - add Streebog test vectors
-
- crypto/Kconfig                 |   12 +
- crypto/Makefile                |    1 +
- crypto/hash_info.c             |    4 +
- crypto/streebog_generic.c      | 1140 ++++++++++++++++++++++++++++++++++++++++
- crypto/tcrypt.c                |   37 ++
- crypto/testmgr.c               |   24 +
- crypto/testmgr.h               |  116 ++++
- include/crypto/hash_info.h     |    1 +
- include/crypto/streebog.h      |   34 ++
- include/uapi/linux/hash_info.h |    2 +
- 10 files changed, 1371 insertions(+)
- create mode 100644 crypto/streebog_generic.c
- create mode 100644 include/crypto/streebog.h
-
+Cheers,
 -- 
-2.11.0
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
