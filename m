@@ -1,107 +1,272 @@
-Return-Path: <SRS0=6FdY=NV=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mout.kundenserver.de ([212.227.126.130]:33453 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726038AbeKKAFV (ORCPT
+Return-Path: <SRS0=vxh5=N7=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:40046 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729632AbeKTXCX (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 10 Nov 2018 19:05:21 -0500
-From: Stefan Wahren <stefan.wahren@i2se.com>
-To: Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        Ray Jui <rjui@broadcom.com>,
-        Scott Branden <sbranden@broadcom.com>,
-        Eric Anholt <eric@anholt.net>, Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Michael Turquette <mturquette@baylibre.com>,
-        Stephen Boyd <sboyd@kernel.org>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Vinod Koul <vkoul@kernel.org>,
-        Jason Cooper <jason@lakedaemon.net>,
-        Marc Zyngier <marc.zyngier@arm.com>,
-        Jassi Brar <jassisinghbrar@gmail.com>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Thierry Reding <thierry.reding@gmail.com>,
-        Mark Brown <broonie@kernel.org>,
-        Zhang Rui <rui.zhang@intel.com>,
-        Eduardo Valentin <edubezval@gmail.com>,
-        Liam Girdwood <lgirdwood@gmail.com>,
-        Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>
-Cc: bcm-kernel-feedback-list@broadcom.com,
-        linux-rpi-kernel@lists.infradead.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-clk@vger.kernel.org,
-        dmaengine@vger.kernel.org, linux-i2c@vger.kernel.org,
-        linux-mmc@vger.kernel.org, linux-gpio@vger.kernel.org,
-        linux-pwm@vger.kernel.org, linux-spi@vger.kernel.org,
-        linux-pm@vger.kernel.org, alsa-devel@alsa-project.org,
-        Stefan Wahren <stefan.wahren@i2se.com>
-Subject: [PATCH 00/17] bcm2835: Treewide switch to SPDX identifier
-Date: Sat, 10 Nov 2018 15:17:56 +0100
-Message-Id: <1541859476-6210-1-git-send-email-stefan.wahren@i2se.com>
+        Tue, 20 Nov 2018 18:02:23 -0500
+Received: by mail-wm1-f67.google.com with SMTP id q26so2031745wmf.5
+        for <linux-crypto@vger.kernel.org>; Tue, 20 Nov 2018 04:33:28 -0800 (PST)
+From: Corentin Labbe <clabbe@baylibre.com>
+To: davem@davemloft.net, ebiggers@kernel.org,
+        herbert@gondor.apana.org.au, nhorman@tuxdriver.com
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Corentin Labbe <clabbe@baylibre.com>
+Subject: [PATCH v3 08/10] crypto: crypto_user_stat: remove intermediate variable
+Date: Tue, 20 Nov 2018 12:32:24 +0000
+Message-Id: <1542717146-34917-9-git-send-email-clabbe@baylibre.com>
+In-Reply-To: <1542717146-34917-1-git-send-email-clabbe@baylibre.com>
+References: <1542717146-34917-1-git-send-email-clabbe@baylibre.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-After fixing the module license of some bcm2835 drivers in "Fix MODULE_LICENSE
-of bcm2835 drivers", we can finally switch all outstanding bcm2835 /
-Raspberry Pi drivers to SPDX identifier and drop the unnecessary license text.
-I omit the staging area, because there are proposed a lot of changes for
-vc04_services. 
+The use of the v64 intermediate variable is useless, and removing it
+bring to much readable code.
 
-I hope it is okay to have the binding header integrated in the tree-wise
-patches instead of a separate one. This should avoid conflicts while merging.
+Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
+---
+ crypto/crypto_user_stat.c | 132 ++++++++++++--------------------------
+ 1 file changed, 41 insertions(+), 91 deletions(-)
 
-Stefan Wahren (17):
-  ARM: dts: bcm2835-rpi-zero: Switch to SPDX identifier
-  ARM: mach-bcm: Switch bcm2835 and platsmp to SPDX identifier
-  hw_random: bcm2835-rng: Switch to SPDX identifier
-  clk: bcm2835: Switch to SPDX identifier
-  clocksource: bcm2835: Switch to SPDX identifier
-  dma: bcm2835: Switch to SPDX identifier
-  firmware: raspberrypi: Switch to SPDX identifier
-  i2c: bcm2835: Switch to SPDX identifier
-  irqchip: bcm283x: Switch to SPDX identifier
-  mailbox: bcm2835: Switch to SPDX identifier
-  mmc: bcm2835: Switch to SPDX identifier
-  pinctrl: bcm2835: Switch to SPDX identifier
-  pwm: bcm2835: Switch to SPDX identifier
-  soc: bcm: Switch raspberrypi-power to SPDX identifier
-  spi: bcm2835: Switch to SPDX identifier
-  thermal: bcm2835: Switch to SPDX identifier
-  ASoc: bcm2835-i2s: Switch to SPDX identifier
-
- arch/arm/boot/dts/bcm2835-rpi-zero-w.dts      |  8 +-------
- arch/arm/boot/dts/bcm2835-rpi-zero.dts        |  8 +-------
- arch/arm/mach-bcm/board_bcm2835.c             | 11 +----------
- arch/arm/mach-bcm/platsmp.c                   | 10 +---------
- arch/arm/mach-bcm/platsmp.h                   |  6 +-----
- drivers/char/hw_random/bcm2835-rng.c          |  7 ++-----
- drivers/clk/bcm/clk-bcm2835-aux.c             | 11 +----------
- drivers/clk/bcm/clk-bcm2835.c                 | 12 +-----------
- drivers/clocksource/bcm2835_timer.c           | 15 +--------------
- drivers/dma/bcm2835-dma.c                     | 11 +----------
- drivers/firmware/raspberrypi.c                |  5 +----
- drivers/i2c/busses/i2c-bcm2835.c              | 10 +---------
- drivers/irqchip/irq-bcm2835.c                 | 11 +----------
- drivers/irqchip/irq-bcm2836.c                 | 11 +----------
- drivers/mailbox/bcm2835-mailbox.c             |  8 +-------
- drivers/mmc/host/bcm2835.c                    | 13 +------------
- drivers/pinctrl/bcm/pinctrl-bcm2835.c         | 11 +----------
- drivers/pwm/pwm-bcm2835.c                     |  5 +----
- drivers/soc/bcm/raspberrypi-power.c           |  5 +----
- drivers/spi/spi-bcm2835.c                     | 11 +----------
- drivers/spi/spi-bcm2835aux.c                  | 11 +----------
- drivers/thermal/broadcom/bcm2835_thermal.c    | 11 +----------
- include/dt-bindings/clock/bcm2835-aux.h       | 10 +---------
- include/dt-bindings/clock/bcm2835.h           | 10 +---------
- include/dt-bindings/pinctrl/bcm2835.h         |  8 +-------
- include/dt-bindings/power/raspberrypi-power.h |  5 +----
- include/soc/bcm2835/raspberrypi-firmware.h    |  5 +----
- sound/soc/bcm/bcm2835-i2s.c                   | 10 +---------
- 28 files changed, 29 insertions(+), 230 deletions(-)
-
+diff --git a/crypto/crypto_user_stat.c b/crypto/crypto_user_stat.c
+index 838123758423..7b668c659122 100644
+--- a/crypto/crypto_user_stat.c
++++ b/crypto/crypto_user_stat.c
+@@ -34,22 +34,16 @@ struct crypto_dump_info {
+ static int crypto_report_aead(struct sk_buff *skb, struct crypto_alg *alg)
+ {
+ 	struct crypto_stat_aead raead;
+-	u64 v64;
+ 
+ 	memset(&raead, 0, sizeof(raead));
+ 
+ 	strscpy(raead.type, "aead", sizeof(raead.type));
+ 
+-	v64 = atomic64_read(&alg->encrypt_cnt);
+-	raead.stat_encrypt_cnt = v64;
+-	v64 = atomic64_read(&alg->encrypt_tlen);
+-	raead.stat_encrypt_tlen = v64;
+-	v64 = atomic64_read(&alg->decrypt_cnt);
+-	raead.stat_decrypt_cnt = v64;
+-	v64 = atomic64_read(&alg->decrypt_tlen);
+-	raead.stat_decrypt_tlen = v64;
+-	v64 = atomic64_read(&alg->aead_err_cnt);
+-	raead.stat_aead_err_cnt = v64;
++	raead.stat_encrypt_cnt = atomic64_read(&alg->encrypt_cnt);
++	raead.stat_encrypt_tlen = atomic64_read(&alg->encrypt_tlen);
++	raead.stat_decrypt_cnt = atomic64_read(&alg->decrypt_cnt);
++	raead.stat_decrypt_tlen = atomic64_read(&alg->decrypt_tlen);
++	raead.stat_aead_err_cnt = atomic64_read(&alg->aead_err_cnt);
+ 
+ 	return nla_put(skb, CRYPTOCFGA_STAT_AEAD, sizeof(raead), &raead);
+ }
+@@ -57,22 +51,16 @@ static int crypto_report_aead(struct sk_buff *skb, struct crypto_alg *alg)
+ static int crypto_report_cipher(struct sk_buff *skb, struct crypto_alg *alg)
+ {
+ 	struct crypto_stat_cipher rcipher;
+-	u64 v64;
+ 
+ 	memset(&rcipher, 0, sizeof(rcipher));
+ 
+ 	strscpy(rcipher.type, "cipher", sizeof(rcipher.type));
+ 
+-	v64 = atomic64_read(&alg->encrypt_cnt);
+-	rcipher.stat_encrypt_cnt = v64;
+-	v64 = atomic64_read(&alg->encrypt_tlen);
+-	rcipher.stat_encrypt_tlen = v64;
+-	v64 = atomic64_read(&alg->decrypt_cnt);
+-	rcipher.stat_decrypt_cnt = v64;
+-	v64 = atomic64_read(&alg->decrypt_tlen);
+-	rcipher.stat_decrypt_tlen = v64;
+-	v64 = atomic64_read(&alg->cipher_err_cnt);
+-	rcipher.stat_cipher_err_cnt = v64;
++	rcipher.stat_encrypt_cnt = atomic64_read(&alg->encrypt_cnt);
++	rcipher.stat_encrypt_tlen = atomic64_read(&alg->encrypt_tlen);
++	rcipher.stat_decrypt_cnt =  atomic64_read(&alg->decrypt_cnt);
++	rcipher.stat_decrypt_tlen = atomic64_read(&alg->decrypt_tlen);
++	rcipher.stat_cipher_err_cnt =  atomic64_read(&alg->cipher_err_cnt);
+ 
+ 	return nla_put(skb, CRYPTOCFGA_STAT_CIPHER, sizeof(rcipher), &rcipher);
+ }
+@@ -80,21 +68,15 @@ static int crypto_report_cipher(struct sk_buff *skb, struct crypto_alg *alg)
+ static int crypto_report_comp(struct sk_buff *skb, struct crypto_alg *alg)
+ {
+ 	struct crypto_stat_compress rcomp;
+-	u64 v64;
+ 
+ 	memset(&rcomp, 0, sizeof(rcomp));
+ 
+ 	strscpy(rcomp.type, "compression", sizeof(rcomp.type));
+-	v64 = atomic64_read(&alg->compress_cnt);
+-	rcomp.stat_compress_cnt = v64;
+-	v64 = atomic64_read(&alg->compress_tlen);
+-	rcomp.stat_compress_tlen = v64;
+-	v64 = atomic64_read(&alg->decompress_cnt);
+-	rcomp.stat_decompress_cnt = v64;
+-	v64 = atomic64_read(&alg->decompress_tlen);
+-	rcomp.stat_decompress_tlen = v64;
+-	v64 = atomic64_read(&alg->compress_err_cnt);
+-	rcomp.stat_compress_err_cnt = v64;
++	rcomp.stat_compress_cnt = atomic64_read(&alg->compress_cnt);
++	rcomp.stat_compress_tlen = atomic64_read(&alg->compress_tlen);
++	rcomp.stat_decompress_cnt = atomic64_read(&alg->decompress_cnt);
++	rcomp.stat_decompress_tlen = atomic64_read(&alg->decompress_tlen);
++	rcomp.stat_compress_err_cnt = atomic64_read(&alg->compress_err_cnt);
+ 
+ 	return nla_put(skb, CRYPTOCFGA_STAT_COMPRESS, sizeof(rcomp), &rcomp);
+ }
+@@ -102,21 +84,15 @@ static int crypto_report_comp(struct sk_buff *skb, struct crypto_alg *alg)
+ static int crypto_report_acomp(struct sk_buff *skb, struct crypto_alg *alg)
+ {
+ 	struct crypto_stat_compress racomp;
+-	u64 v64;
+ 
+ 	memset(&racomp, 0, sizeof(racomp));
+ 
+ 	strscpy(racomp.type, "acomp", sizeof(racomp.type));
+-	v64 = atomic64_read(&alg->compress_cnt);
+-	racomp.stat_compress_cnt = v64;
+-	v64 = atomic64_read(&alg->compress_tlen);
+-	racomp.stat_compress_tlen = v64;
+-	v64 = atomic64_read(&alg->decompress_cnt);
+-	racomp.stat_decompress_cnt = v64;
+-	v64 = atomic64_read(&alg->decompress_tlen);
+-	racomp.stat_decompress_tlen = v64;
+-	v64 = atomic64_read(&alg->compress_err_cnt);
+-	racomp.stat_compress_err_cnt = v64;
++	racomp.stat_compress_cnt = atomic64_read(&alg->compress_cnt);
++	racomp.stat_compress_tlen = atomic64_read(&alg->compress_tlen);
++	racomp.stat_decompress_cnt =  atomic64_read(&alg->decompress_cnt);
++	racomp.stat_decompress_tlen = atomic64_read(&alg->decompress_tlen);
++	racomp.stat_compress_err_cnt = atomic64_read(&alg->compress_err_cnt);
+ 
+ 	return nla_put(skb, CRYPTOCFGA_STAT_ACOMP, sizeof(racomp), &racomp);
+ }
+@@ -124,25 +100,17 @@ static int crypto_report_acomp(struct sk_buff *skb, struct crypto_alg *alg)
+ static int crypto_report_akcipher(struct sk_buff *skb, struct crypto_alg *alg)
+ {
+ 	struct crypto_stat_akcipher rakcipher;
+-	u64 v64;
+ 
+ 	memset(&rakcipher, 0, sizeof(rakcipher));
+ 
+ 	strscpy(rakcipher.type, "akcipher", sizeof(rakcipher.type));
+-	v64 = atomic64_read(&alg->encrypt_cnt);
+-	rakcipher.stat_encrypt_cnt = v64;
+-	v64 = atomic64_read(&alg->encrypt_tlen);
+-	rakcipher.stat_encrypt_tlen = v64;
+-	v64 = atomic64_read(&alg->decrypt_cnt);
+-	rakcipher.stat_decrypt_cnt = v64;
+-	v64 = atomic64_read(&alg->decrypt_tlen);
+-	rakcipher.stat_decrypt_tlen = v64;
+-	v64 = atomic64_read(&alg->sign_cnt);
+-	rakcipher.stat_sign_cnt = v64;
+-	v64 = atomic64_read(&alg->verify_cnt);
+-	rakcipher.stat_verify_cnt = v64;
+-	v64 = atomic64_read(&alg->akcipher_err_cnt);
+-	rakcipher.stat_akcipher_err_cnt = v64;
++	rakcipher.stat_encrypt_cnt = atomic64_read(&alg->encrypt_cnt);
++	rakcipher.stat_encrypt_tlen = atomic64_read(&alg->encrypt_tlen);
++	rakcipher.stat_decrypt_cnt = atomic64_read(&alg->decrypt_cnt);
++	rakcipher.stat_decrypt_tlen = atomic64_read(&alg->decrypt_tlen);
++	rakcipher.stat_sign_cnt = atomic64_read(&alg->sign_cnt);
++	rakcipher.stat_verify_cnt = atomic64_read(&alg->verify_cnt);
++	rakcipher.stat_akcipher_err_cnt = atomic64_read(&alg->akcipher_err_cnt);
+ 
+ 	return nla_put(skb, CRYPTOCFGA_STAT_AKCIPHER,
+ 		       sizeof(rakcipher), &rakcipher);
+@@ -151,20 +119,15 @@ static int crypto_report_akcipher(struct sk_buff *skb, struct crypto_alg *alg)
+ static int crypto_report_kpp(struct sk_buff *skb, struct crypto_alg *alg)
+ {
+ 	struct crypto_stat_kpp rkpp;
+-	u64 v;
+ 
+ 	memset(&rkpp, 0, sizeof(rkpp));
+ 
+ 	strscpy(rkpp.type, "kpp", sizeof(rkpp.type));
+ 
+-	v = atomic64_read(&alg->setsecret_cnt);
+-	rkpp.stat_setsecret_cnt = v;
+-	v = atomic64_read(&alg->generate_public_key_cnt);
+-	rkpp.stat_generate_public_key_cnt = v;
+-	v = atomic64_read(&alg->compute_shared_secret_cnt);
+-	rkpp.stat_compute_shared_secret_cnt = v;
+-	v = atomic64_read(&alg->kpp_err_cnt);
+-	rkpp.stat_kpp_err_cnt = v;
++	rkpp.stat_setsecret_cnt = atomic64_read(&alg->setsecret_cnt);
++	rkpp.stat_generate_public_key_cnt = atomic64_read(&alg->generate_public_key_cnt);
++	rkpp.stat_compute_shared_secret_cnt = atomic64_read(&alg->compute_shared_secret_cnt);
++	rkpp.stat_kpp_err_cnt = atomic64_read(&alg->kpp_err_cnt);
+ 
+ 	return nla_put(skb, CRYPTOCFGA_STAT_KPP, sizeof(rkpp), &rkpp);
+ }
+@@ -172,18 +135,14 @@ static int crypto_report_kpp(struct sk_buff *skb, struct crypto_alg *alg)
+ static int crypto_report_ahash(struct sk_buff *skb, struct crypto_alg *alg)
+ {
+ 	struct crypto_stat_hash rhash;
+-	u64 v64;
+ 
+ 	memset(&rhash, 0, sizeof(rhash));
+ 
+ 	strscpy(rhash.type, "ahash", sizeof(rhash.type));
+ 
+-	v64 = atomic64_read(&alg->hash_cnt);
+-	rhash.stat_hash_cnt = v64;
+-	v64 = atomic64_read(&alg->hash_tlen);
+-	rhash.stat_hash_tlen = v64;
+-	v64 = atomic64_read(&alg->hash_err_cnt);
+-	rhash.stat_hash_err_cnt = v64;
++	rhash.stat_hash_cnt = atomic64_read(&alg->hash_cnt);
++	rhash.stat_hash_tlen = atomic64_read(&alg->hash_tlen);
++	rhash.stat_hash_err_cnt = atomic64_read(&alg->hash_err_cnt);
+ 
+ 	return nla_put(skb, CRYPTOCFGA_STAT_HASH, sizeof(rhash), &rhash);
+ }
+@@ -191,18 +150,14 @@ static int crypto_report_ahash(struct sk_buff *skb, struct crypto_alg *alg)
+ static int crypto_report_shash(struct sk_buff *skb, struct crypto_alg *alg)
+ {
+ 	struct crypto_stat_hash rhash;
+-	u64 v64;
+ 
+ 	memset(&rhash, 0, sizeof(rhash));
+ 
+ 	strscpy(rhash.type, "shash", sizeof(rhash.type));
+ 
+-	v64 = atomic64_read(&alg->hash_cnt);
+-	rhash.stat_hash_cnt = v64;
+-	v64 = atomic64_read(&alg->hash_tlen);
+-	rhash.stat_hash_tlen = v64;
+-	v64 = atomic64_read(&alg->hash_err_cnt);
+-	rhash.stat_hash_err_cnt = v64;
++	rhash.stat_hash_cnt =  atomic64_read(&alg->hash_cnt);
++	rhash.stat_hash_tlen = atomic64_read(&alg->hash_tlen);
++	rhash.stat_hash_err_cnt = atomic64_read(&alg->hash_err_cnt);
+ 
+ 	return nla_put(skb, CRYPTOCFGA_STAT_HASH, sizeof(rhash), &rhash);
+ }
+@@ -210,20 +165,15 @@ static int crypto_report_shash(struct sk_buff *skb, struct crypto_alg *alg)
+ static int crypto_report_rng(struct sk_buff *skb, struct crypto_alg *alg)
+ {
+ 	struct crypto_stat_rng rrng;
+-	u64 v64;
+ 
+ 	memset(&rrng, 0, sizeof(rrng));
+ 
+ 	strscpy(rrng.type, "rng", sizeof(rrng.type));
+ 
+-	v64 = atomic64_read(&alg->generate_cnt);
+-	rrng.stat_generate_cnt = v64;
+-	v64 = atomic64_read(&alg->generate_tlen);
+-	rrng.stat_generate_tlen = v64;
+-	v64 = atomic64_read(&alg->seed_cnt);
+-	rrng.stat_seed_cnt = v64;
+-	v64 = atomic64_read(&alg->rng_err_cnt);
+-	rrng.stat_rng_err_cnt = v64;
++	rrng.stat_generate_cnt = atomic64_read(&alg->generate_cnt);
++	rrng.stat_generate_tlen = atomic64_read(&alg->generate_tlen);
++	rrng.stat_seed_cnt = atomic64_read(&alg->seed_cnt);
++	rrng.stat_rng_err_cnt = atomic64_read(&alg->rng_err_cnt);
+ 
+ 	return nla_put(skb, CRYPTOCFGA_STAT_RNG, sizeof(rrng), &rrng);
+ }
 -- 
-2.7.4
+2.18.1
