@@ -1,63 +1,51 @@
 Return-Path: <SRS0=vxh5=N7=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:35114 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729616AbeKTXCW (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 20 Nov 2018 18:02:22 -0500
-Received: by mail-wm1-f66.google.com with SMTP id c126so2053414wmh.0
-        for <linux-crypto@vger.kernel.org>; Tue, 20 Nov 2018 04:33:26 -0800 (PST)
-From: Corentin Labbe <clabbe@baylibre.com>
-To: davem@davemloft.net, ebiggers@kernel.org,
-        herbert@gondor.apana.org.au, nhorman@tuxdriver.com
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Corentin Labbe <clabbe@baylibre.com>
-Subject: [PATCH v3 07/10] crypto: crypto_user_stat: Fix invalid stat reporting
-Date: Tue, 20 Nov 2018 12:32:23 +0000
-Message-Id: <1542717146-34917-8-git-send-email-clabbe@baylibre.com>
-In-Reply-To: <1542717146-34917-1-git-send-email-clabbe@baylibre.com>
-References: <1542717146-34917-1-git-send-email-clabbe@baylibre.com>
+Received: from frisell.zx2c4.com ([192.95.5.64]:52291 "EHLO frisell.zx2c4.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726559AbeKTNf1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 20 Nov 2018 08:35:27 -0500
+MIME-Version: 1.0
+References: <20181105232526.173947-1-ebiggers@kernel.org> <20181105232526.173947-11-ebiggers@kernel.org>
+ <CAKv+Gu-o0khD5=0EOkv2PiczMs5uZ=XP9V=G2ogBNMK8Kb93sw@mail.gmail.com>
+ <20181112185816.GA8663@gmail.com> <20181116060227.hwu4igi6bp26ddpi@gondor.apana.org.au>
+ <20181117001718.GA175522@gmail.com> <CAHmME9rtsCk8ZLt05xRKMGr4CVRnaUvCaVOS_WX3N22HOat4-A@mail.gmail.com>
+ <20181119052451.qttzfgcm4hvbdc4u@gondor.apana.org.au> <CAHmME9oXAnD0sbO2cKeTtotCMohX2Hu6P=uzA_6u0EWECU9Bpg@mail.gmail.com>
+ <20181119225414.GB258711@gmail.com> <20181120030635.xfr543j5nngxfnxk@gondor.apana.org.au>
+In-Reply-To: <20181120030635.xfr543j5nngxfnxk@gondor.apana.org.au>
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date: Tue, 20 Nov 2018 04:08:19 +0100
+Message-ID: <CAHmME9qxY-LRiik8p3xJGskVAEM2UQj1KdzJnwNGnKghuGvrkw@mail.gmail.com>
+Subject: Re: [RFC PATCH] zinc chacha20 generic implementation using crypto API code
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Eric Biggers <ebiggers@kernel.org>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        linux-fscrypt@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        LKML <linux-kernel@vger.kernel.org>,
+        Paul Crowley <paulcrowley@google.com>,
+        Greg Kaiser <gkaiser@google.com>,
+        Samuel Neves <samuel.c.p.neves@gmail.com>,
+        Tomer Ashur <tomer.ashur@esat.kuleuven.be>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Some error count use the wrong name for getting this data.
-But this had not caused any reporting problem, since all error count are shared in the same
-union.
+Hi Herbert,
 
-Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
----
- crypto/crypto_user_stat.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+On Tue, Nov 20, 2018 at 4:06 AM Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> > I'd still prefer to see the conversion patches included.  Skipping them would be
+> > kicking the can down the road and avoiding issues that will need to be addressed
+> > anyway.  Like you, I don't want a "half-baked concoction that will be maybe
+> > possibly be replaced 'later'" :-)
+>
+> Are you guys talking about the conversion patches to eliminate the
+> two copies of chacha code that would otherwise exist in crypto as
+> well as in zinc?
+>
+> If so I think that's not negotiable.  Having two copies of the same
+> code is just not acceptable.
 
-diff --git a/crypto/crypto_user_stat.c b/crypto/crypto_user_stat.c
-index 3c14be2f7a1b..838123758423 100644
---- a/crypto/crypto_user_stat.c
-+++ b/crypto/crypto_user_stat.c
-@@ -93,7 +93,7 @@ static int crypto_report_comp(struct sk_buff *skb, struct crypto_alg *alg)
- 	rcomp.stat_decompress_cnt = v64;
- 	v64 = atomic64_read(&alg->decompress_tlen);
- 	rcomp.stat_decompress_tlen = v64;
--	v64 = atomic64_read(&alg->cipher_err_cnt);
-+	v64 = atomic64_read(&alg->compress_err_cnt);
- 	rcomp.stat_compress_err_cnt = v64;
- 
- 	return nla_put(skb, CRYPTOCFGA_STAT_COMPRESS, sizeof(rcomp), &rcomp);
-@@ -115,7 +115,7 @@ static int crypto_report_acomp(struct sk_buff *skb, struct crypto_alg *alg)
- 	racomp.stat_decompress_cnt = v64;
- 	v64 = atomic64_read(&alg->decompress_tlen);
- 	racomp.stat_decompress_tlen = v64;
--	v64 = atomic64_read(&alg->cipher_err_cnt);
-+	v64 = atomic64_read(&alg->compress_err_cnt);
- 	racomp.stat_compress_err_cnt = v64;
- 
- 	return nla_put(skb, CRYPTOCFGA_STAT_ACOMP, sizeof(racomp), &racomp);
-@@ -222,7 +222,7 @@ static int crypto_report_rng(struct sk_buff *skb, struct crypto_alg *alg)
- 	rrng.stat_generate_tlen = v64;
- 	v64 = atomic64_read(&alg->seed_cnt);
- 	rrng.stat_seed_cnt = v64;
--	v64 = atomic64_read(&alg->hash_err_cnt);
-+	v64 = atomic64_read(&alg->rng_err_cnt);
- 	rrng.stat_rng_err_cnt = v64;
- 
- 	return nla_put(skb, CRYPTOCFGA_STAT_RNG, sizeof(rrng), &rrng);
--- 
-2.18.1
+Yes, that's the topic. Eric already expressed his preference to keep
+them, and I agreed, so the plan is to keep them.
+
+Jason
