@@ -1,42 +1,55 @@
-Return-Path: <SRS0=IUQn=NU=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:37278 "EHLO
+Return-Path: <SRS0=qsBZ=OA=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:48308 "EHLO
         deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727736AbeKITZN (ORCPT
+        with ESMTP id S1726149AbeKUQe1 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 9 Nov 2018 14:25:13 -0500
-Date: Fri, 9 Nov 2018 17:45:26 +0800
+        Wed, 21 Nov 2018 11:34:27 -0500
+Date: Wed, 21 Nov 2018 14:01:03 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc: "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>, Qian Cai <cai@gmx.us>
-Subject: Re: [PATCH] crypto/simd: correctly take reqsize of wrapped skcipher
- into account
-Message-ID: <20181109094525.3shpcmj4uqxfx33z@gondor.apana.org.au>
-References: <20181108225516.9967-1-ard.biesheuvel@linaro.org>
- <CAKv+Gu_7M+A5OiCOsOd7_e5+GH7VkrOZ33iSexd2oacyzUNKEA@mail.gmail.com>
- <20181109094447.v4fqirpmx7owayr7@gondor.apana.org.au>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc: Eric Biggers <ebiggers@kernel.org>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        linux-fscrypt@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        LKML <linux-kernel@vger.kernel.org>,
+        Paul Crowley <paulcrowley@google.com>,
+        Greg Kaiser <gkaiser@google.com>,
+        Samuel Neves <samuel.c.p.neves@gmail.com>,
+        Tomer Ashur <tomer.ashur@esat.kuleuven.be>,
+        Martin Willi <martin@strongswan.org>
+Subject: Re: [RFC PATCH v2 0/4] Exporting existing crypto API code through
+ zinc
+Message-ID: <20181121060103.4s2byjn2fh2mglno@gondor.apana.org.au>
+References: <20181105232526.173947-1-ebiggers@kernel.org>
+ <20181105232526.173947-11-ebiggers@kernel.org>
+ <CAKv+Gu-o0khD5=0EOkv2PiczMs5uZ=XP9V=G2ogBNMK8Kb93sw@mail.gmail.com>
+ <20181112185816.GA8663@gmail.com>
+ <20181116060227.hwu4igi6bp26ddpi@gondor.apana.org.au>
+ <20181117001718.GA175522@gmail.com>
+ <CAHmME9rtsCk8ZLt05xRKMGr4CVRnaUvCaVOS_WX3N22HOat4-A@mail.gmail.com>
+ <20181119052451.qttzfgcm4hvbdc4u@gondor.apana.org.au>
+ <20181120060217.t4nccaqpwnxkl4tx@gondor.apana.org.au>
+ <CAHmME9qOFA2hEe-8hb3CxEPsLbwNm8oev4SO5WBDhA+pxqadGA@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20181109094447.v4fqirpmx7owayr7@gondor.apana.org.au>
+In-Reply-To: <CAHmME9qOFA2hEe-8hb3CxEPsLbwNm8oev4SO5WBDhA+pxqadGA@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Nov 09, 2018 at 05:44:47PM +0800, Herbert Xu wrote:
-> On Fri, Nov 09, 2018 at 12:33:23AM +0100, Ard Biesheuvel wrote:
-> >
-> > This should be
-> > 
-> > reqsize += max(crypto_skcipher_reqsize(&cryptd_tfm->base);
-> >        crypto_skcipher_reqsize(cryptd_skcipher_child(cryptd_tfm)));
-> > 
-> > since the cryptd path in simd still needs some space in the subreq for
-> > the completion.
-> 
-> OK this is what I applied to the cryptodev tree, please double-check
-> to see if I did anything silly:
+On Tue, Nov 20, 2018 at 05:18:24PM +0100, Jason A. Donenfeld wrote:
+>
+> N'ack. As I mentioned in the last email, this really isn't okay, and
+> mostly defeats the purpose of Zinc in the first place, adding
+> complexity in a discombobulated half-baked way. Your proposal seems to
+> be the worst of all worlds. Having talked to lots of people about the
+> design of Zinc at this point to very positive reception, I'm going to
+> move forward with submitting v9, once I rebase with the required
+> changes for Eric's latest merge.
 
-I meant the crypto tree rather than cryptodev.
+Do you have any actual technical reasons for rejecting this apart
+from your apparent hatred of the existing crypto API?
 
 Cheers,
 -- 
