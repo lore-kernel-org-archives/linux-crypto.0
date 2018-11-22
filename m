@@ -1,131 +1,55 @@
-Return-Path: <SRS0=1iZj=N3=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33172 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726451AbeKQGYQ (ORCPT
+Return-Path: <SRS0=unN5=OB=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from shards.monkeyblade.net ([23.128.96.9]:38182 "EHLO
+        shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2392136AbeKWFeg (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 17 Nov 2018 01:24:16 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id wAGKAMNT122770
-        for <linux-crypto@vger.kernel.org>; Fri, 16 Nov 2018 15:10:26 -0500
-Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2nt2cjwjd8-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <linux-crypto@vger.kernel.org>; Fri, 16 Nov 2018 15:10:22 -0500
-Received: from localhost
-        by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-crypto@vger.kernel.org> from <bauerman@linux.ibm.com>;
-        Fri, 16 Nov 2018 20:09:28 -0000
-From: Thiago Jung Bauermann <bauerman@linux.ibm.com>
-To: linux-integrity@vger.kernel.org
-Cc: linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        David Howells <dhowells@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Jessica Yu <jeyu@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jonathan Corbet <corbet@lwn.net>,
-        "AKASHI, Takahiro" <takahiro.akashi@linaro.org>,
-        Thiago Jung Bauermann <bauerman@linux.ibm.com>
-Subject: [PATCH v8 13/14] ima: Write modsig to the measurement list
-Date: Fri, 16 Nov 2018 18:07:11 -0200
-In-Reply-To: <20181116200712.14154-1-bauerman@linux.ibm.com>
-References: <20181116200712.14154-1-bauerman@linux.ibm.com>
-Message-Id: <20181116200712.14154-14-bauerman@linux.ibm.com>
+        Fri, 23 Nov 2018 00:34:36 -0500
+Date: Thu, 22 Nov 2018 10:53:49 -0800 (PST)
+Message-Id: <20181122.105349.1035544140286401266.davem@davemloft.net>
+To: jgg@ziepe.ca
+Cc: ganeshgr@chelsio.com, netdev@vger.kernel.org,
+        nirranjan@chelsio.com, indranil@chelsio.com, dt@chelsio.com,
+        linux-rdma@vger.kernel.org, swise@opengridcomputing.com,
+        linux-crypto@vger.kernel.org, atul.gupta@chelsio.com,
+        linux-scsi@vger.kernel.org, varun@chelsio.com, santosh@chelsio.com
+Subject: Re: [PATCH net-next] cxgb4: use new fw interface to get the VIN
+ and smt index
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <20181122024624.GA28494@ziepe.ca>
+References: <1542787824-4731-1-git-send-email-ganeshgr@chelsio.com>
+        <20181122024624.GA28494@ziepe.ca>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Add modsig support to the "sig" template field, allowing the the contents
-of the modsig to be included in the measurement list.
+From: Jason Gunthorpe <jgg@ziepe.ca>
+Date: Wed, 21 Nov 2018 19:46:24 -0700
 
-Suggested-by: Mimi Zohar <zohar@linux.vnet.ibm.com>
-Signed-off-by: Thiago Jung Bauermann <bauerman@linux.ibm.com>
----
- security/integrity/ima/ima.h              |  7 +++++++
- security/integrity/ima/ima_modsig.c       | 13 +++++++++++++
- security/integrity/ima/ima_template_lib.c | 15 ++++++++++++++-
- 3 files changed, 34 insertions(+), 1 deletion(-)
+> On Wed, Nov 21, 2018 at 01:40:24PM +0530, Ganesh Goudar wrote:
+>> From: Santosh Rastapur <santosh@chelsio.com>
+>> 
+>> If the fw supports returning VIN/VIVLD in FW_VI_CMD save it
+>> in port_info structure else retrieve these from viid and save
+>> them  in port_info structure. Do the same for smt_idx from
+>> FW_VI_MAC_CMD
+>> 
+>> Signed-off-by: Santosh Rastapur <santosh@chelsio.com>
+>> Signed-off-by: Ganesh Goudar <ganeshgr@chelsio.com>
+>>  drivers/crypto/chelsio/chtls/chtls_cm.c         |  3 +-
+>>  drivers/infiniband/hw/cxgb4/cm.c                |  6 +--
+>>  drivers/net/ethernet/chelsio/cxgb4/cxgb4.h      | 12 ++++-
+>>  drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c | 58 ++++++++++++-------------
+>>  drivers/net/ethernet/chelsio/cxgb4/l2t.c        | 13 +++---
+>>  drivers/net/ethernet/chelsio/cxgb4/t4_hw.c      | 46 ++++++++++++++++++--
+>>  drivers/net/ethernet/chelsio/cxgb4/t4fw_api.h   | 20 +++++++++
+>>  drivers/scsi/cxgbi/cxgb4i/cxgb4i.c              |  3 +-
+>>  drivers/target/iscsi/cxgbit/cxgbit_cm.c         |  8 ++--
+>>  9 files changed, 114 insertions(+), 55 deletions(-)
+> 
+> Applied to for-next, but please try to write better commit messages in
+> future, explain what benifit your change is bringing.
 
-diff --git a/security/integrity/ima/ima.h b/security/integrity/ima/ima.h
-index 7f88e4b86156..8e1b1ddbe14f 100644
---- a/security/integrity/ima/ima.h
-+++ b/security/integrity/ima/ima.h
-@@ -315,6 +315,7 @@ int ima_read_modsig(enum ima_hooks func, const void *buf, loff_t buf_len,
- 		    int *xattr_len);
- int ima_get_modsig_hash(struct evm_ima_xattr_data *hdr, enum hash_algo *algo,
- 			const u8 **hash, u8 *len);
-+int ima_modsig_serialize_data(struct evm_ima_xattr_data **data, int *data_len);
- int ima_modsig_verify(const unsigned int keyring_id,
- 		      struct evm_ima_xattr_data *hdr);
- void ima_free_xattr_data(struct evm_ima_xattr_data *hdr);
-@@ -339,6 +340,12 @@ static inline int ima_get_modsig_hash(struct evm_ima_xattr_data *hdr,
- 	return -EOPNOTSUPP;
- }
- 
-+static inline int ima_modsig_serialize_data(struct evm_ima_xattr_data **data,
-+					    int *data_len)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
- static inline int ima_modsig_verify(const unsigned int keyring_id,
- 				    struct evm_ima_xattr_data *hdr)
- {
-diff --git a/security/integrity/ima/ima_modsig.c b/security/integrity/ima/ima_modsig.c
-index 584d9d77b2c4..e31ab7dc11db 100644
---- a/security/integrity/ima/ima_modsig.c
-+++ b/security/integrity/ima/ima_modsig.c
-@@ -167,6 +167,19 @@ int ima_get_modsig_hash(struct evm_ima_xattr_data *hdr, enum hash_algo *algo,
- 	return pkcs7_get_digest(modsig->pkcs7_msg, hash, len);
- }
- 
-+int ima_modsig_serialize_data(struct evm_ima_xattr_data **data, int *data_len)
-+{
-+	struct modsig_hdr *modsig = (struct modsig_hdr *) *data;
-+
-+	if (!*data || (*data)->type != IMA_MODSIG)
-+		return -EINVAL;
-+
-+	*data = &modsig->raw_pkcs7;
-+	*data_len = modsig->raw_pkcs7_len;
-+
-+	return 0;
-+}
-+
- int ima_modsig_verify(const unsigned int keyring_id,
- 		      struct evm_ima_xattr_data *hdr)
- {
-diff --git a/security/integrity/ima/ima_template_lib.c b/security/integrity/ima/ima_template_lib.c
-index 36d175816894..417cd153ba60 100644
---- a/security/integrity/ima/ima_template_lib.c
-+++ b/security/integrity/ima/ima_template_lib.c
-@@ -411,10 +411,23 @@ int ima_eventsig_init(struct ima_event_data *event_data,
- 		      struct ima_field_data *field_data)
- {
- 	struct evm_ima_xattr_data *xattr_value = event_data->xattr_value;
-+	int xattr_len = event_data->xattr_len;
- 
- 	if (!is_signed(xattr_value))
- 		return 0;
- 
--	return ima_write_template_field_data(xattr_value, event_data->xattr_len,
-+	/*
-+	 * The xattr_value for IMA_MODSIG is a runtime structure containing
-+	 * pointers. Get its raw data instead.
-+	 */
-+	if (xattr_value->type == IMA_MODSIG) {
-+		int rc;
-+
-+		rc = ima_modsig_serialize_data(&xattr_value, &xattr_len);
-+		if (rc)
-+			return rc;
-+	}
-+
-+	return ima_write_template_field_data(xattr_value, xattr_len,
- 					     DATA_FMT_HEX, field_data);
- }
+The subject line indicates this is targetting my net-next tree, therefore
+why did you apply it to your's?
