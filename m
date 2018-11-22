@@ -1,69 +1,52 @@
-Return-Path: <SRS0=1iZj=N3=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:37684 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727370AbeKPQm7 (ORCPT
+Return-Path: <SRS0=unN5=OB=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:46887 "EHLO
+        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731067AbeKVNXl (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 16 Nov 2018 11:42:59 -0500
-Date: Fri, 16 Nov 2018 14:31:46 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: Crypto Fixes for 4.20
-Message-ID: <20181116063146.e7a3mep3ghnfltxe@gondor.apana.org.au>
-References: <20170223125141.GA17400@gondor.apana.org.au>
- <20170714141855.GA29426@gondor.apana.org.au>
- <20170922084401.GA15541@gondor.apana.org.au>
- <20171128230929.GA17783@gondor.apana.org.au>
- <20171222064931.GA27068@gondor.apana.org.au>
- <20180105073808.GA14405@gondor.apana.org.au>
- <20180212031702.GA26153@gondor.apana.org.au>
- <20180428080517.haxgpvqrwgotakyo@gondor.apana.org.au>
- <20180622145403.6ltjip7che227fuo@gondor.apana.org.au>
- <20180829033353.agnzxra3jk2r2mzg@gondor.apana.org.au>
+        Thu, 22 Nov 2018 08:23:41 -0500
+Received: by mail-pl1-f196.google.com with SMTP id t13so8193966ply.13
+        for <linux-crypto@vger.kernel.org>; Wed, 21 Nov 2018 18:46:27 -0800 (PST)
+Date: Wed, 21 Nov 2018 19:46:24 -0700
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Ganesh Goudar <ganeshgr@chelsio.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, nirranjan@chelsio.com,
+        indranil@chelsio.com, dt@chelsio.com, linux-rdma@vger.kernel.org,
+        swise@opengridcomputing.com, linux-crypto@vger.kernel.org,
+        atul.gupta@chelsio.com, linux-scsi@vger.kernel.org,
+        varun@chelsio.com, Santosh Rastapur <santosh@chelsio.com>
+Subject: Re: [PATCH net-next] cxgb4: use new fw interface to get the VIN and
+ smt index
+Message-ID: <20181122024624.GA28494@ziepe.ca>
+References: <1542787824-4731-1-git-send-email-ganeshgr@chelsio.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180829033353.agnzxra3jk2r2mzg@gondor.apana.org.au>
+In-Reply-To: <1542787824-4731-1-git-send-email-ganeshgr@chelsio.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Linus: 
+On Wed, Nov 21, 2018 at 01:40:24PM +0530, Ganesh Goudar wrote:
+> From: Santosh Rastapur <santosh@chelsio.com>
+> 
+> If the fw supports returning VIN/VIVLD in FW_VI_CMD save it
+> in port_info structure else retrieve these from viid and save
+> them  in port_info structure. Do the same for smt_idx from
+> FW_VI_MAC_CMD
+> 
+> Signed-off-by: Santosh Rastapur <santosh@chelsio.com>
+> Signed-off-by: Ganesh Goudar <ganeshgr@chelsio.com>
+>  drivers/crypto/chelsio/chtls/chtls_cm.c         |  3 +-
+>  drivers/infiniband/hw/cxgb4/cm.c                |  6 +--
+>  drivers/net/ethernet/chelsio/cxgb4/cxgb4.h      | 12 ++++-
+>  drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c | 58 ++++++++++++-------------
+>  drivers/net/ethernet/chelsio/cxgb4/l2t.c        | 13 +++---
+>  drivers/net/ethernet/chelsio/cxgb4/t4_hw.c      | 46 ++++++++++++++++++--
+>  drivers/net/ethernet/chelsio/cxgb4/t4fw_api.h   | 20 +++++++++
+>  drivers/scsi/cxgbi/cxgb4i/cxgb4i.c              |  3 +-
+>  drivers/target/iscsi/cxgbit/cxgbit_cm.c         |  8 ++--
+>  9 files changed, 114 insertions(+), 55 deletions(-)
 
-This push fixes the following issues:
+Applied to for-next, but please try to write better commit messages in
+future, explain what benifit your change is bringing.
 
-- Potential memory overwrite in simd.
-- Kernel info leaks in crypto_user.
-- NULL dereference and use-after-free in hisilicon.
-
-
-Please pull from
-
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
-
-
-Ard Biesheuvel (1):
-      crypto: simd - correctly take reqsize of wrapped skcipher into account
-
-Corentin Labbe (1):
-      crypto: user - Zeroize whole structure given to user space
-
-Eric Biggers (1):
-      crypto: user - fix leaking uninitialized memory to userspace
-
-John Garry (2):
-      crypto: hisilicon - Fix NULL dereference for same dst and src
-      crypto: hisilicon - Fix reference after free of memories on error path
-
- crypto/crypto_user_base.c               | 18 +++++++++---------
- crypto/crypto_user_stat.c               | 21 +++++++++++++++++++++
- crypto/simd.c                           |  5 +++--
- drivers/crypto/hisilicon/sec/sec_algs.c | 31 +++++++++++++++++--------------
- 4 files changed, 50 insertions(+), 25 deletions(-)
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Jason
