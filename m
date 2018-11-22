@@ -1,38 +1,56 @@
-Return-Path: <SRS0=KYvO=NY=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:50258 "EHLO
-        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731399AbeKMTi3 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 13 Nov 2018 14:38:29 -0500
-From: Gilad Ben-Yossef <gilad@benyossef.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Yael Chemla <yael.chemla@foss.arm.com>
-Cc: Ofir Drang <Ofir.Drang@arm.com>, linux-crypto@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 0/3] new HW version and co-maintainer
-Date: Tue, 13 Nov 2018 09:40:34 +0000
-Message-Id: <1542102039-22256-1-git-send-email-gilad@benyossef.com>
+Return-Path: <SRS0=unN5=OB=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:35008 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1733189AbeKWGgE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 23 Nov 2018 01:36:04 -0500
+From: Sasha Levin <sashal@kernel.org>
+To: stable@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.14 06/21] crypto: simd - correctly take reqsize of wrapped skcipher into account
+Date: Thu, 22 Nov 2018 14:54:37 -0500
+Message-Id: <20181122195452.13520-6-sashal@kernel.org>
+In-Reply-To: <20181122195452.13520-1-sashal@kernel.org>
+References: <20181122195452.13520-1-sashal@kernel.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Add support for CryptoCell 703 HW revision and a new co-maintainer.
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-Gilad Ben-Yossef (3):
-  crypto: ccree: add support for CryptoCell 703
-  dt-bindings: crypto: ccree: add dt bindings for ccree 703
-  MAINTAINERS: ccree: add co-maintainer
+[ Upstream commit 508a1c4df085a547187eed346f1bfe5e381797f1 ]
 
- .../devicetree/bindings/crypto/arm-cryptocell.txt  |  1 +
- MAINTAINERS                                        |  1 +
- drivers/crypto/Kconfig                             |  2 +-
- drivers/crypto/ccree/cc_aead.c                     | 16 ++++++++-
- drivers/crypto/ccree/cc_cipher.c                   | 38 +++++++++++++++++++++-
- drivers/crypto/ccree/cc_driver.c                   | 19 ++++++++---
- drivers/crypto/ccree/cc_driver.h                   |  8 +++++
- drivers/crypto/ccree/cc_hash.c                     | 16 +++++++--
- 8 files changed, 92 insertions(+), 9 deletions(-)
+The simd wrapper's skcipher request context structure consists
+of a single subrequest whose size is taken from the subordinate
+skcipher. However, in simd_skcipher_init(), the reqsize that is
+retrieved is not from the subordinate skcipher but from the
+cryptd request structure, whose size is completely unrelated to
+the actual wrapped skcipher.
 
+Reported-by: Qian Cai <cai@gmx.us>
+Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Tested-by: Qian Cai <cai@gmx.us>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ crypto/simd.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/crypto/simd.c b/crypto/simd.c
+index 88203370a62f..894c62944106 100644
+--- a/crypto/simd.c
++++ b/crypto/simd.c
+@@ -126,8 +126,9 @@ static int simd_skcipher_init(struct crypto_skcipher *tfm)
+ 
+ 	ctx->cryptd_tfm = cryptd_tfm;
+ 
+-	reqsize = sizeof(struct skcipher_request);
+-	reqsize += crypto_skcipher_reqsize(&cryptd_tfm->base);
++	reqsize = crypto_skcipher_reqsize(cryptd_skcipher_child(cryptd_tfm));
++	reqsize = max(reqsize, crypto_skcipher_reqsize(&cryptd_tfm->base));
++	reqsize += sizeof(struct skcipher_request);
+ 
+ 	crypto_skcipher_set_reqsize(tfm, reqsize);
+ 
 -- 
-2.7.4
+2.17.1
