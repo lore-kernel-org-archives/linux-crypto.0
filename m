@@ -1,40 +1,39 @@
-Return-Path: <SRS0=8KRZ=NP=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:58086 "EHLO
-        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726556AbeKDTUi (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 4 Nov 2018 14:20:38 -0500
-From: Gilad Ben-Yossef <gilad@benyossef.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Cc: Ofir Drang <Ofir.Drang@arm.com>, Yael Chemla <Yael.Chemla@arm.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: mark cts(cbc(aes)) as FIPS allowed
-Date: Sun,  4 Nov 2018 10:05:24 +0000
-Message-Id: <1541325924-14777-1-git-send-email-gilad@benyossef.com>
+Return-Path: <SRS0=Oq1A=OC=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from shards.monkeyblade.net ([23.128.96.9]:32898 "EHLO
+        shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2437213AbeKXF5C (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 24 Nov 2018 00:57:02 -0500
+Date: Fri, 23 Nov 2018 11:11:27 -0800 (PST)
+Message-Id: <20181123.111127.1107043881210783525.davem@davemloft.net>
+To: ganeshgr@chelsio.com
+Cc: netdev@vger.kernel.org, nirranjan@chelsio.com,
+        indranil@chelsio.com, dt@chelsio.com, linux-rdma@vger.kernel.org,
+        swise@opengridcomputing.com, linux-crypto@vger.kernel.org,
+        atul.gupta@chelsio.com, linux-scsi@vger.kernel.org,
+        varun@chelsio.com, santosh@chelsio.com
+Subject: Re: [PATCH net-next] cxgb4: use new fw interface to get the VIN
+ and smt index
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <1542787824-4731-1-git-send-email-ganeshgr@chelsio.com>
+References: <1542787824-4731-1-git-send-email-ganeshgr@chelsio.com>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-As per Sp800-38A addendum from Oct 2010[1], cts(cbc(aes)) is
-allowed as a FIPS mode algorithm. Mark it as such.
+From: Ganesh Goudar <ganeshgr@chelsio.com>
+Date: Wed, 21 Nov 2018 13:40:24 +0530
 
-[1] https://csrc.nist.gov/publications/detail/sp/800-38a/addendum/final
+> From: Santosh Rastapur <santosh@chelsio.com>
+> 
+> If the fw supports returning VIN/VIVLD in FW_VI_CMD save it
+> in port_info structure else retrieve these from viid and save
+> them  in port_info structure. Do the same for smt_idx from
+> FW_VI_MAC_CMD
+> 
+> Signed-off-by: Santosh Rastapur <santosh@chelsio.com>
+> Signed-off-by: Ganesh Goudar <ganeshgr@chelsio.com>
 
-Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
----
- crypto/testmgr.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index b1f79c6..1a371d01 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -2805,6 +2805,7 @@ static const struct alg_test_desc alg_test_descs[] = {
- 	}, {
- 		.alg = "cts(cbc(aes))",
- 		.test = alg_test_skcipher,
-+		.fips_allowed = 1,
- 		.suite = {
- 			.cipher = __VECS(cts_mode_tv_template)
- 		}
--- 
-2.7.4
+Applied to net-next.
