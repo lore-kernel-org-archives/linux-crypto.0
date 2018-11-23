@@ -1,107 +1,237 @@
-Return-Path: <SRS0=unN5=OB=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-pl1-f194.google.com ([209.85.214.194]:35667 "EHLO
-        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2391796AbeKVNf7 (ORCPT
+Return-Path: <SRS0=Oq1A=OC=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:35593 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2503954AbeKWWqg (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 22 Nov 2018 08:35:59 -0500
-Received: by mail-pl1-f194.google.com with SMTP id v1-v6so8254186plo.2
-        for <linux-crypto@vger.kernel.org>; Wed, 21 Nov 2018 18:58:42 -0800 (PST)
-Date: Wed, 21 Nov 2018 19:58:40 -0700
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Kenneth Lee <liguozhu@hisilicon.com>
-Cc: Leon Romanovsky <leon@kernel.org>,
-        Kenneth Lee <nek.in.cn@gmail.com>,
-        Tim Sell <timothy.sell@unisys.com>, linux-doc@vger.kernel.org,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Zaibo Xu <xuzaibo@huawei.com>, zhangfei.gao@foxmail.com,
-        linuxarm@huawei.com, haojian.zhuang@linaro.org,
-        Christoph Lameter <cl@linux.com>,
-        Hao Fang <fanghao11@huawei.com>,
-        Gavin Schenk <g.schenk@eckelmann.de>,
-        RDMA mailing list <linux-rdma@vger.kernel.org>,
-        Zhou Wang <wangzhou1@hisilicon.com>,
-        Doug Ledford <dledford@redhat.com>,
-        Uwe =?utf-8?Q?Kleine-K=C3=B6nig?=
-        <u.kleine-koenig@pengutronix.de>,
-        David Kershner <david.kershner@unisys.com>,
-        Johan Hovold <johan@kernel.org>,
-        Cyrille Pitchen <cyrille.pitchen@free-electrons.com>,
-        Sagar Dharia <sdharia@codeaurora.org>,
-        Jens Axboe <axboe@kernel.dk>, guodong.xu@linaro.org,
-        linux-netdev <netdev@vger.kernel.org>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        linux-kernel@vger.kernel.org, Vinod Koul <vkoul@kernel.org>,
-        linux-crypto@vger.kernel.org,
-        Philippe Ombredanne <pombredanne@nexb.com>,
-        Sanyog Kale <sanyog.r.kale@intel.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-accelerators@lists.ozlabs.org
-Subject: Re: [RFCv3 PATCH 1/6] uacce: Add documents for WarpDrive/uacce
-Message-ID: <20181122025840.GB19938@ziepe.ca>
-References: <20181113002354.GO3695@mtr-leonro.mtl.com>
- <95310df4-b32c-42f0-c750-3ad5eb89b3dd@gmail.com>
- <20181114160017.GI3759@mtr-leonro.mtl.com>
- <20181115085109.GD157308@Turing-Arch-b>
- <20181115145455.GN3759@mtr-leonro.mtl.com>
- <20181119091405.GE157308@Turing-Arch-b>
- <20181119184954.GB4890@ziepe.ca>
- <20181120030702.GH157308@Turing-Arch-b>
- <20181120032939.GR4890@ziepe.ca>
- <20181121060805.GJ157308@Turing-Arch-b>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181121060805.GJ157308@Turing-Arch-b>
+        Fri, 23 Nov 2018 17:46:36 -0500
+Received: by mail-wr1-f65.google.com with SMTP id 96so12129616wrb.2
+        for <linux-crypto@vger.kernel.org>; Fri, 23 Nov 2018 04:02:38 -0800 (PST)
+From: Corentin Labbe <clabbe@baylibre.com>
+To: davem@davemloft.net, ebiggers@kernel.org,
+        herbert@gondor.apana.org.au, nhorman@tuxdriver.com
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Corentin Labbe <clabbe@baylibre.com>
+Subject: [PATCH v4 04/11] crypto: crypto_user_stat: split user space crypto stat structures
+Date: Fri, 23 Nov 2018 12:02:14 +0000
+Message-Id: <1542974541-23024-5-git-send-email-clabbe@baylibre.com>
+In-Reply-To: <1542974541-23024-1-git-send-email-clabbe@baylibre.com>
+References: <1542974541-23024-1-git-send-email-clabbe@baylibre.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Nov 21, 2018 at 02:08:05PM +0800, Kenneth Lee wrote:
+It is cleaner to have each stat in their own structures.
 
-> > But considering Jean's SVA stuff seems based on mmu notifiers, I have
-> > a hard time believing that it has any different behavior from RDMA's
-> > ODP, and if it does have different behavior, then it is probably just
-> > a bug in the ODP implementation.
-> 
-> As Jean has explained, his solution is based on page table sharing. I think ODP
-> should also consider this new feature.
+Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
+---
+ crypto/crypto_user_stat.c       |  20 +++----
+ include/uapi/linux/cryptouser.h | 100 ++++++++++++++++++++------------
+ 2 files changed, 72 insertions(+), 48 deletions(-)
 
-Shared page tables would require the HW to walk the page table format
-of the CPU directly, not sure how that would be possible for ODP?
-
-Presumably the implementation for ARM relies on the IOMMU hardware
-doing this?
-
-> > > > If all your driver needs is to mmap some PCI bar space, route
-> > > > interrupts and do DMA mapping then mediated VFIO is probably a good
-> > > > choice. 
-> > > 
-> > > Yes. That is what is done in our RFCv1/v2. But we accepted Jerome's opinion and
-> > > try not to add complexity to the mm subsystem.
-> > 
-> > Why would a mediated VFIO driver touch the mm subsystem? Sounds like
-> > you don't have a VFIO driver if it needs to do stuff like that...
-> 
-> VFIO has no ODP-like solution, and if we want to solve the fork problem, we have
-> to make some change to iommu and the fork procedure. Further, VFIO takes every
-> queue as a independent device. This create a lot of trouble on resource
-> management. For example, you will need a manager process to withdraw the unused
-> device and you need to let the user process know about PASID of the queue, and
-> so on.
-
-Well, I would think you'd add SVA support to the VFIO driver as a
-generic capability - it seems pretty useful for any VFIO user as it
-avoids all the kernel upcalls to do memory pinning and DMA address
-translation.
-
-Once the VFIO driver knows about this as a generic capability then the
-device it exposes to userspace would use CPU addresses instead of DMA
-addresses.
-
-The question is if your driver needs much more than the device
-agnostic generic services VFIO provides.
-
-I'm not sure what you have in mind with resource management.. It is
-hard to revoke resources from userspace, unless you are doing
-kernel syscalls, but then why do all this?
-
-Jason
+diff --git a/crypto/crypto_user_stat.c b/crypto/crypto_user_stat.c
+index 352569f378a0..3c14be2f7a1b 100644
+--- a/crypto/crypto_user_stat.c
++++ b/crypto/crypto_user_stat.c
+@@ -33,7 +33,7 @@ struct crypto_dump_info {
+ 
+ static int crypto_report_aead(struct sk_buff *skb, struct crypto_alg *alg)
+ {
+-	struct crypto_stat raead;
++	struct crypto_stat_aead raead;
+ 	u64 v64;
+ 
+ 	memset(&raead, 0, sizeof(raead));
+@@ -56,7 +56,7 @@ static int crypto_report_aead(struct sk_buff *skb, struct crypto_alg *alg)
+ 
+ static int crypto_report_cipher(struct sk_buff *skb, struct crypto_alg *alg)
+ {
+-	struct crypto_stat rcipher;
++	struct crypto_stat_cipher rcipher;
+ 	u64 v64;
+ 
+ 	memset(&rcipher, 0, sizeof(rcipher));
+@@ -79,7 +79,7 @@ static int crypto_report_cipher(struct sk_buff *skb, struct crypto_alg *alg)
+ 
+ static int crypto_report_comp(struct sk_buff *skb, struct crypto_alg *alg)
+ {
+-	struct crypto_stat rcomp;
++	struct crypto_stat_compress rcomp;
+ 	u64 v64;
+ 
+ 	memset(&rcomp, 0, sizeof(rcomp));
+@@ -101,7 +101,7 @@ static int crypto_report_comp(struct sk_buff *skb, struct crypto_alg *alg)
+ 
+ static int crypto_report_acomp(struct sk_buff *skb, struct crypto_alg *alg)
+ {
+-	struct crypto_stat racomp;
++	struct crypto_stat_compress racomp;
+ 	u64 v64;
+ 
+ 	memset(&racomp, 0, sizeof(racomp));
+@@ -123,7 +123,7 @@ static int crypto_report_acomp(struct sk_buff *skb, struct crypto_alg *alg)
+ 
+ static int crypto_report_akcipher(struct sk_buff *skb, struct crypto_alg *alg)
+ {
+-	struct crypto_stat rakcipher;
++	struct crypto_stat_akcipher rakcipher;
+ 	u64 v64;
+ 
+ 	memset(&rakcipher, 0, sizeof(rakcipher));
+@@ -150,7 +150,7 @@ static int crypto_report_akcipher(struct sk_buff *skb, struct crypto_alg *alg)
+ 
+ static int crypto_report_kpp(struct sk_buff *skb, struct crypto_alg *alg)
+ {
+-	struct crypto_stat rkpp;
++	struct crypto_stat_kpp rkpp;
+ 	u64 v;
+ 
+ 	memset(&rkpp, 0, sizeof(rkpp));
+@@ -171,7 +171,7 @@ static int crypto_report_kpp(struct sk_buff *skb, struct crypto_alg *alg)
+ 
+ static int crypto_report_ahash(struct sk_buff *skb, struct crypto_alg *alg)
+ {
+-	struct crypto_stat rhash;
++	struct crypto_stat_hash rhash;
+ 	u64 v64;
+ 
+ 	memset(&rhash, 0, sizeof(rhash));
+@@ -190,7 +190,7 @@ static int crypto_report_ahash(struct sk_buff *skb, struct crypto_alg *alg)
+ 
+ static int crypto_report_shash(struct sk_buff *skb, struct crypto_alg *alg)
+ {
+-	struct crypto_stat rhash;
++	struct crypto_stat_hash rhash;
+ 	u64 v64;
+ 
+ 	memset(&rhash, 0, sizeof(rhash));
+@@ -209,7 +209,7 @@ static int crypto_report_shash(struct sk_buff *skb, struct crypto_alg *alg)
+ 
+ static int crypto_report_rng(struct sk_buff *skb, struct crypto_alg *alg)
+ {
+-	struct crypto_stat rrng;
++	struct crypto_stat_rng rrng;
+ 	u64 v64;
+ 
+ 	memset(&rrng, 0, sizeof(rrng));
+@@ -248,7 +248,7 @@ static int crypto_reportstat_one(struct crypto_alg *alg,
+ 	if (nla_put_u32(skb, CRYPTOCFGA_PRIORITY_VAL, alg->cra_priority))
+ 		goto nla_put_failure;
+ 	if (alg->cra_flags & CRYPTO_ALG_LARVAL) {
+-		struct crypto_stat rl;
++		struct crypto_stat_larval rl;
+ 
+ 		memset(&rl, 0, sizeof(rl));
+ 		strscpy(rl.type, "larval", sizeof(rl.type));
+diff --git a/include/uapi/linux/cryptouser.h b/include/uapi/linux/cryptouser.h
+index 9f8187077ce4..3a70f025e27d 100644
+--- a/include/uapi/linux/cryptouser.h
++++ b/include/uapi/linux/cryptouser.h
+@@ -76,45 +76,69 @@ struct crypto_user_alg {
+ 	__u32 cru_flags;
+ };
+ 
+-struct crypto_stat {
+-	char type[CRYPTO_MAX_NAME];
+-	union {
+-		__u64 stat_encrypt_cnt;
+-		__u64 stat_compress_cnt;
+-		__u64 stat_generate_cnt;
+-		__u64 stat_hash_cnt;
+-		__u64 stat_setsecret_cnt;
+-	};
+-	union {
+-		__u64 stat_encrypt_tlen;
+-		__u64 stat_compress_tlen;
+-		__u64 stat_generate_tlen;
+-		__u64 stat_hash_tlen;
+-	};
+-	union {
+-		__u64 stat_akcipher_err_cnt;
+-		__u64 stat_cipher_err_cnt;
+-		__u64 stat_compress_err_cnt;
+-		__u64 stat_aead_err_cnt;
+-		__u64 stat_hash_err_cnt;
+-		__u64 stat_rng_err_cnt;
+-		__u64 stat_kpp_err_cnt;
+-	};
+-	union {
+-		__u64 stat_decrypt_cnt;
+-		__u64 stat_decompress_cnt;
+-		__u64 stat_seed_cnt;
+-		__u64 stat_generate_public_key_cnt;
+-	};
+-	union {
+-		__u64 stat_decrypt_tlen;
+-		__u64 stat_decompress_tlen;
+-	};
+-	union {
+-		__u64 stat_verify_cnt;
+-		__u64 stat_compute_shared_secret_cnt;
+-	};
++struct crypto_stat_aead {
++	char type[CRYPTO_MAX_NAME];
++	__u64 stat_encrypt_cnt;
++	__u64 stat_encrypt_tlen;
++	__u64 stat_decrypt_cnt;
++	__u64 stat_decrypt_tlen;
++	__u64 stat_aead_err_cnt;
++};
++
++struct crypto_stat_akcipher {
++	char type[CRYPTO_MAX_NAME];
++	__u64 stat_encrypt_cnt;
++	__u64 stat_encrypt_tlen;
++	__u64 stat_decrypt_cnt;
++	__u64 stat_decrypt_tlen;
++	__u64 stat_verify_cnt;
+ 	__u64 stat_sign_cnt;
++	__u64 stat_akcipher_err_cnt;
++};
++
++struct crypto_stat_cipher {
++	char type[CRYPTO_MAX_NAME];
++	__u64 stat_encrypt_cnt;
++	__u64 stat_encrypt_tlen;
++	__u64 stat_decrypt_cnt;
++	__u64 stat_decrypt_tlen;
++	__u64 stat_cipher_err_cnt;
++};
++
++struct crypto_stat_compress {
++	char type[CRYPTO_MAX_NAME];
++	__u64 stat_compress_cnt;
++	__u64 stat_compress_tlen;
++	__u64 stat_decompress_cnt;
++	__u64 stat_decompress_tlen;
++	__u64 stat_compress_err_cnt;
++};
++
++struct crypto_stat_hash {
++	char type[CRYPTO_MAX_NAME];
++	__u64 stat_hash_cnt;
++	__u64 stat_hash_tlen;
++	__u64 stat_hash_err_cnt;
++};
++
++struct crypto_stat_kpp {
++	char type[CRYPTO_MAX_NAME];
++	__u64 stat_setsecret_cnt;
++	__u64 stat_generate_public_key_cnt;
++	__u64 stat_compute_shared_secret_cnt;
++	__u64 stat_kpp_err_cnt;
++};
++
++struct crypto_stat_rng {
++	char type[CRYPTO_MAX_NAME];
++	__u64 stat_generate_cnt;
++	__u64 stat_generate_tlen;
++	__u64 stat_seed_cnt;
++	__u64 stat_rng_err_cnt;
++};
++
++struct crypto_stat_larval {
++	char type[CRYPTO_MAX_NAME];
+ };
+ 
+ struct crypto_report_larval {
+-- 
+2.18.1
