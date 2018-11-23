@@ -1,310 +1,565 @@
-Return-Path: <SRS0=1iZj=N3=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38966 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1730634AbeKQGXW (ORCPT
+Return-Path: <SRS0=Oq1A=OC=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:43691 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2504038AbeKWWqt (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 17 Nov 2018 01:23:22 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id wAGK8wWX020330
-        for <linux-crypto@vger.kernel.org>; Fri, 16 Nov 2018 15:09:34 -0500
-Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2nt1kmfgyd-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <linux-crypto@vger.kernel.org>; Fri, 16 Nov 2018 15:09:33 -0500
-Received: from localhost
-        by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-crypto@vger.kernel.org> from <bauerman@linux.ibm.com>;
-        Fri, 16 Nov 2018 20:09:32 -0000
-From: Thiago Jung Bauermann <bauerman@linux.ibm.com>
-To: linux-integrity@vger.kernel.org
-Cc: linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        David Howells <dhowells@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Jessica Yu <jeyu@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jonathan Corbet <corbet@lwn.net>,
-        "AKASHI, Takahiro" <takahiro.akashi@linaro.org>,
-        Thiago Jung Bauermann <bauerman@linux.ibm.com>
-Subject: [PATCH v8 14/14] ima: Store the measurement again when appraising a modsig
-Date: Fri, 16 Nov 2018 18:07:12 -0200
-In-Reply-To: <20181116200712.14154-1-bauerman@linux.ibm.com>
-References: <20181116200712.14154-1-bauerman@linux.ibm.com>
-Message-Id: <20181116200712.14154-15-bauerman@linux.ibm.com>
+        Fri, 23 Nov 2018 17:46:49 -0500
+Received: by mail-wr1-f68.google.com with SMTP id r10so12083427wrs.10
+        for <linux-crypto@vger.kernel.org>; Fri, 23 Nov 2018 04:02:50 -0800 (PST)
+From: Corentin Labbe <clabbe@baylibre.com>
+To: davem@davemloft.net, ebiggers@kernel.org,
+        herbert@gondor.apana.org.au, nhorman@tuxdriver.com
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Corentin Labbe <clabbe@baylibre.com>
+Subject: [PATCH v4 10/11] crypto: crypto_user_stat: rename err_cnt parameter
+Date: Fri, 23 Nov 2018 12:02:20 +0000
+Message-Id: <1542974541-23024-11-git-send-email-clabbe@baylibre.com>
+In-Reply-To: <1542974541-23024-1-git-send-email-clabbe@baylibre.com>
+References: <1542974541-23024-1-git-send-email-clabbe@baylibre.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-If the IMA template contains the 'sig' field, then the modsig should be
-added to the measurement list when the file is appraised, and that is what
-normally happens.
+Since now all crypto stats are on their own structures, it is now
+useless to have the algorithm name in the err_cnt member.
 
-But If a measurement rule caused a file containing a modsig to be measured
-before a different rule causes it to be appraised, the resulting
-measurement entry will not contain the modsig because it is only fetched
-during appraisal. When the appraisal rule triggers, it won't store a new
-measurement containing the modsig because the file was already measured.
-
-We need to detect that situation and store an additional measurement with
-the modsig. This is done by defining the appraise subaction flag
-IMA_READ_MEASURE and testing for it in process_measurement().
-
-Suggested-by: Mimi Zohar <zohar@linux.vnet.ibm.com>
-Signed-off-by: Thiago Jung Bauermann <bauerman@linux.ibm.com>
+Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
 ---
- security/integrity/ima/ima.h          |  1 +
- security/integrity/ima/ima_api.c      |  8 +++-
- security/integrity/ima/ima_main.c     | 16 +++++++-
- security/integrity/ima/ima_policy.c   | 59 ++++++++++++++++++++++++---
- security/integrity/ima/ima_template.c | 27 ++++++++++++
- security/integrity/integrity.h        |  9 ++--
- 6 files changed, 110 insertions(+), 10 deletions(-)
+ crypto/algapi.c                 | 38 ++++++++++++++++-----------------
+ crypto/crypto_user_stat.c       | 18 ++++++++--------
+ include/linux/crypto.h          | 28 ++++++++++++------------
+ include/uapi/linux/cryptouser.h | 14 ++++++------
+ tools/crypto/getstat.c          | 18 ++++++++--------
+ 5 files changed, 58 insertions(+), 58 deletions(-)
 
-diff --git a/security/integrity/ima/ima.h b/security/integrity/ima/ima.h
-index 8e1b1ddbe14f..c39bed55f6d2 100644
---- a/security/integrity/ima/ima.h
-+++ b/security/integrity/ima/ima.h
-@@ -147,6 +147,7 @@ int ima_init_crypto(void);
- void ima_putc(struct seq_file *m, void *data, int datalen);
- void ima_print_digest(struct seq_file *m, u8 *digest, u32 size);
- struct ima_template_desc *ima_template_desc_current(void);
-+bool ima_current_template_has_sig(void);
- int ima_restore_measurement_entry(struct ima_template_entry *entry);
- int ima_restore_measurement_list(loff_t bufsize, void *buf);
- int ima_measurements_show(struct seq_file *m, void *v);
-diff --git a/security/integrity/ima/ima_api.c b/security/integrity/ima/ima_api.c
-index 99dd1d53fc35..a7af114bc6b4 100644
---- a/security/integrity/ima/ima_api.c
-+++ b/security/integrity/ima/ima_api.c
-@@ -289,7 +289,13 @@ void ima_store_measurement(struct integrity_iint_cache *iint,
- 					    xattr_len, NULL};
- 	int violation = 0;
- 
--	if (iint->measured_pcrs & (0x1 << pcr))
-+	/*
-+	 * We still need to store the measurement in the case of MODSIG because
-+	 * we only have its contents to put in the list at the time of
-+	 * appraisal. See comment in store_measurement_again() for more details.
-+	 */
-+	if (iint->measured_pcrs & (0x1 << pcr) &&
-+	    (!xattr_value || xattr_value->type != IMA_MODSIG))
- 		return;
- 
- 	result = ima_alloc_init_template(&event_data, &entry);
-diff --git a/security/integrity/ima/ima_main.c b/security/integrity/ima/ima_main.c
-index d5abd22d502a..807b9b77b813 100644
---- a/security/integrity/ima/ima_main.c
-+++ b/security/integrity/ima/ima_main.c
-@@ -166,6 +166,20 @@ void ima_file_free(struct file *file)
- 	ima_check_last_writer(iint, inode, file);
- }
- 
-+/*
-+ * A file measurement might already exist in the measurement list. Based on
-+ * policy, include an additional file measurement containing the appended
-+ * signature and file hash, without the appended signature (i.e., the 'd-sig'
-+ * field).
-+ */
-+static bool store_measurement_again(struct integrity_iint_cache *iint,
-+				    struct evm_ima_xattr_data *xattr_value)
-+{
-+	return iint->flags & IMA_READ_MEASURE && xattr_value &&
-+		xattr_value->type == IMA_MODSIG &&
-+		ima_current_template_has_sig();
-+}
-+
- static int process_measurement(struct file *file, const struct cred *cred,
- 			       u32 secid, char *buf, loff_t size, int mask,
- 			       enum ima_hooks func)
-@@ -299,7 +313,7 @@ static int process_measurement(struct file *file, const struct cred *cred,
- 	if (!pathbuf)	/* ima_rdwr_violation possibly pre-fetched */
- 		pathname = ima_d_path(&file->f_path, &pathbuf, filename);
- 
--	if (action & IMA_MEASURE)
-+	if (action & IMA_MEASURE || store_measurement_again(iint, xattr_value))
- 		ima_store_measurement(iint, file, pathname,
- 				      xattr_value, xattr_len, pcr);
- 	if (rc == 0 && (action & IMA_APPRAISE_SUBMASK)) {
-diff --git a/security/integrity/ima/ima_policy.c b/security/integrity/ima/ima_policy.c
-index 3e5a64053aa8..c0b39802e988 100644
---- a/security/integrity/ima/ima_policy.c
-+++ b/security/integrity/ima/ima_policy.c
-@@ -10,6 +10,9 @@
-  *	- initialize default measure policy rules
-  *
-  */
-+
-+#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
-+
- #include <linux/module.h>
- #include <linux/list.h>
- #include <linux/fs.h>
-@@ -367,7 +370,8 @@ static bool ima_match_rules(struct ima_rule_entry *rule, struct inode *inode,
-  * In addition to knowing that we need to appraise the file in general,
-  * we need to differentiate between calling hooks, for hook specific rules.
-  */
--static int get_subaction(struct ima_rule_entry *rule, enum ima_hooks func)
-+static int get_appraise_subaction(struct ima_rule_entry *rule,
-+				  enum ima_hooks func)
+diff --git a/crypto/algapi.c b/crypto/algapi.c
+index 62a275b6d352..84e9b4e5389a 100644
+--- a/crypto/algapi.c
++++ b/crypto/algapi.c
+@@ -1082,7 +1082,7 @@ void crypto_stats_ablkcipher_encrypt(unsigned int nbytes, int ret,
+ 				     struct crypto_alg *alg)
  {
- 	if (!(rule->flags & IMA_FUNC))
- 		return IMA_FILE_APPRAISE;
-@@ -388,6 +392,15 @@ static int get_subaction(struct ima_rule_entry *rule, enum ima_hooks func)
+ 	if (ret && ret != -EINPROGRESS && ret != -EBUSY) {
+-		atomic64_inc(&alg->stats.cipher.cipher_err_cnt);
++		atomic64_inc(&alg->stats.cipher.err_cnt);
+ 	} else {
+ 		atomic64_inc(&alg->stats.cipher.encrypt_cnt);
+ 		atomic64_add(nbytes, &alg->stats.cipher.encrypt_tlen);
+@@ -1094,7 +1094,7 @@ void crypto_stats_ablkcipher_decrypt(unsigned int nbytes, int ret,
+ 				     struct crypto_alg *alg)
+ {
+ 	if (ret && ret != -EINPROGRESS && ret != -EBUSY) {
+-		atomic64_inc(&alg->stats.cipher.cipher_err_cnt);
++		atomic64_inc(&alg->stats.cipher.err_cnt);
+ 	} else {
+ 		atomic64_inc(&alg->stats.cipher.decrypt_cnt);
+ 		atomic64_add(nbytes, &alg->stats.cipher.decrypt_tlen);
+@@ -1106,7 +1106,7 @@ void crypto_stats_aead_encrypt(unsigned int cryptlen, struct crypto_alg *alg,
+ 			       int ret)
+ {
+ 	if (ret && ret != -EINPROGRESS && ret != -EBUSY) {
+-		atomic64_inc(&alg->stats.aead.aead_err_cnt);
++		atomic64_inc(&alg->stats.aead.err_cnt);
+ 	} else {
+ 		atomic64_inc(&alg->stats.aead.encrypt_cnt);
+ 		atomic64_add(cryptlen, &alg->stats.aead.encrypt_tlen);
+@@ -1118,7 +1118,7 @@ void crypto_stats_aead_decrypt(unsigned int cryptlen, struct crypto_alg *alg,
+ 			       int ret)
+ {
+ 	if (ret && ret != -EINPROGRESS && ret != -EBUSY) {
+-		atomic64_inc(&alg->stats.aead.aead_err_cnt);
++		atomic64_inc(&alg->stats.aead.err_cnt);
+ 	} else {
+ 		atomic64_inc(&alg->stats.aead.decrypt_cnt);
+ 		atomic64_add(cryptlen, &alg->stats.aead.decrypt_tlen);
+@@ -1130,7 +1130,7 @@ void crypto_stats_akcipher_encrypt(unsigned int src_len, int ret,
+ 				   struct crypto_alg *alg)
+ {
+ 	if (ret && ret != -EINPROGRESS && ret != -EBUSY) {
+-		atomic64_inc(&alg->stats.akcipher.akcipher_err_cnt);
++		atomic64_inc(&alg->stats.akcipher.err_cnt);
+ 	} else {
+ 		atomic64_inc(&alg->stats.akcipher.encrypt_cnt);
+ 		atomic64_add(src_len, &alg->stats.akcipher.encrypt_tlen);
+@@ -1142,7 +1142,7 @@ void crypto_stats_akcipher_decrypt(unsigned int src_len, int ret,
+ 				   struct crypto_alg *alg)
+ {
+ 	if (ret && ret != -EINPROGRESS && ret != -EBUSY) {
+-		atomic64_inc(&alg->stats.akcipher.akcipher_err_cnt);
++		atomic64_inc(&alg->stats.akcipher.err_cnt);
+ 	} else {
+ 		atomic64_inc(&alg->stats.akcipher.decrypt_cnt);
+ 		atomic64_add(src_len, &alg->stats.akcipher.decrypt_tlen);
+@@ -1153,7 +1153,7 @@ void crypto_stats_akcipher_decrypt(unsigned int src_len, int ret,
+ void crypto_stats_akcipher_sign(int ret, struct crypto_alg *alg)
+ {
+ 	if (ret && ret != -EINPROGRESS && ret != -EBUSY)
+-		atomic64_inc(&alg->stats.akcipher.akcipher_err_cnt);
++		atomic64_inc(&alg->stats.akcipher.err_cnt);
+ 	else
+ 		atomic64_inc(&alg->stats.akcipher.sign_cnt);
+ 	crypto_alg_put(alg);
+@@ -1162,7 +1162,7 @@ void crypto_stats_akcipher_sign(int ret, struct crypto_alg *alg)
+ void crypto_stats_akcipher_verify(int ret, struct crypto_alg *alg)
+ {
+ 	if (ret && ret != -EINPROGRESS && ret != -EBUSY)
+-		atomic64_inc(&alg->stats.akcipher.akcipher_err_cnt);
++		atomic64_inc(&alg->stats.akcipher.err_cnt);
+ 	else
+ 		atomic64_inc(&alg->stats.akcipher.verify_cnt);
+ 	crypto_alg_put(alg);
+@@ -1171,7 +1171,7 @@ void crypto_stats_akcipher_verify(int ret, struct crypto_alg *alg)
+ void crypto_stats_compress(unsigned int slen, int ret, struct crypto_alg *alg)
+ {
+ 	if (ret && ret != -EINPROGRESS && ret != -EBUSY) {
+-		atomic64_inc(&alg->stats.compress.compress_err_cnt);
++		atomic64_inc(&alg->stats.compress.err_cnt);
+ 	} else {
+ 		atomic64_inc(&alg->stats.compress.compress_cnt);
+ 		atomic64_add(slen, &alg->stats.compress.compress_tlen);
+@@ -1182,7 +1182,7 @@ void crypto_stats_compress(unsigned int slen, int ret, struct crypto_alg *alg)
+ void crypto_stats_decompress(unsigned int slen, int ret, struct crypto_alg *alg)
+ {
+ 	if (ret && ret != -EINPROGRESS && ret != -EBUSY) {
+-		atomic64_inc(&alg->stats.compress.compress_err_cnt);
++		atomic64_inc(&alg->stats.compress.err_cnt);
+ 	} else {
+ 		atomic64_inc(&alg->stats.compress.decompress_cnt);
+ 		atomic64_add(slen, &alg->stats.compress.decompress_tlen);
+@@ -1194,7 +1194,7 @@ void crypto_stats_ahash_update(unsigned int nbytes, int ret,
+ 			       struct crypto_alg *alg)
+ {
+ 	if (ret && ret != -EINPROGRESS && ret != -EBUSY)
+-		atomic64_inc(&alg->stats.hash.hash_err_cnt);
++		atomic64_inc(&alg->stats.hash.err_cnt);
+ 	else
+ 		atomic64_add(nbytes, &alg->stats.hash.hash_tlen);
+ 	crypto_alg_put(alg);
+@@ -1204,7 +1204,7 @@ void crypto_stats_ahash_final(unsigned int nbytes, int ret,
+ 			      struct crypto_alg *alg)
+ {
+ 	if (ret && ret != -EINPROGRESS && ret != -EBUSY) {
+-		atomic64_inc(&alg->stats.hash.hash_err_cnt);
++		atomic64_inc(&alg->stats.hash.err_cnt);
+ 	} else {
+ 		atomic64_inc(&alg->stats.hash.hash_cnt);
+ 		atomic64_add(nbytes, &alg->stats.hash.hash_tlen);
+@@ -1215,7 +1215,7 @@ void crypto_stats_ahash_final(unsigned int nbytes, int ret,
+ void crypto_stats_kpp_set_secret(struct crypto_alg *alg, int ret)
+ {
+ 	if (ret)
+-		atomic64_inc(&alg->stats.kpp.kpp_err_cnt);
++		atomic64_inc(&alg->stats.kpp.err_cnt);
+ 	else
+ 		atomic64_inc(&alg->stats.kpp.setsecret_cnt);
+ 	crypto_alg_put(alg);
+@@ -1224,7 +1224,7 @@ void crypto_stats_kpp_set_secret(struct crypto_alg *alg, int ret)
+ void crypto_stats_kpp_generate_public_key(struct crypto_alg *alg, int ret)
+ {
+ 	if (ret)
+-		atomic64_inc(&alg->stats.kpp.kpp_err_cnt);
++		atomic64_inc(&alg->stats.kpp.err_cnt);
+ 	else
+ 		atomic64_inc(&alg->stats.kpp.generate_public_key_cnt);
+ 	crypto_alg_put(alg);
+@@ -1233,7 +1233,7 @@ void crypto_stats_kpp_generate_public_key(struct crypto_alg *alg, int ret)
+ void crypto_stats_kpp_compute_shared_secret(struct crypto_alg *alg, int ret)
+ {
+ 	if (ret)
+-		atomic64_inc(&alg->stats.kpp.kpp_err_cnt);
++		atomic64_inc(&alg->stats.kpp.err_cnt);
+ 	else
+ 		atomic64_inc(&alg->stats.kpp.compute_shared_secret_cnt);
+ 	crypto_alg_put(alg);
+@@ -1242,7 +1242,7 @@ void crypto_stats_kpp_compute_shared_secret(struct crypto_alg *alg, int ret)
+ void crypto_stats_rng_seed(struct crypto_alg *alg, int ret)
+ {
+ 	if (ret && ret != -EINPROGRESS && ret != -EBUSY)
+-		atomic64_inc(&alg->stats.rng.rng_err_cnt);
++		atomic64_inc(&alg->stats.rng.err_cnt);
+ 	else
+ 		atomic64_inc(&alg->stats.rng.seed_cnt);
+ 	crypto_alg_put(alg);
+@@ -1252,7 +1252,7 @@ void crypto_stats_rng_generate(struct crypto_alg *alg, unsigned int dlen,
+ 			       int ret)
+ {
+ 	if (ret && ret != -EINPROGRESS && ret != -EBUSY) {
+-		atomic64_inc(&alg->stats.rng.rng_err_cnt);
++		atomic64_inc(&alg->stats.rng.err_cnt);
+ 	} else {
+ 		atomic64_inc(&alg->stats.rng.generate_cnt);
+ 		atomic64_add(dlen, &alg->stats.rng.generate_tlen);
+@@ -1264,7 +1264,7 @@ void crypto_stats_skcipher_encrypt(unsigned int cryptlen, int ret,
+ 				   struct crypto_alg *alg)
+ {
+ 	if (ret && ret != -EINPROGRESS && ret != -EBUSY) {
+-		atomic64_inc(&alg->stats.cipher.cipher_err_cnt);
++		atomic64_inc(&alg->stats.cipher.err_cnt);
+ 	} else {
+ 		atomic64_inc(&alg->stats.cipher.encrypt_cnt);
+ 		atomic64_add(cryptlen, &alg->stats.cipher.encrypt_tlen);
+@@ -1276,7 +1276,7 @@ void crypto_stats_skcipher_decrypt(unsigned int cryptlen, int ret,
+ 				   struct crypto_alg *alg)
+ {
+ 	if (ret && ret != -EINPROGRESS && ret != -EBUSY) {
+-		atomic64_inc(&alg->stats.cipher.cipher_err_cnt);
++		atomic64_inc(&alg->stats.cipher.err_cnt);
+ 	} else {
+ 		atomic64_inc(&alg->stats.cipher.decrypt_cnt);
+ 		atomic64_add(cryptlen, &alg->stats.cipher.decrypt_tlen);
+diff --git a/crypto/crypto_user_stat.c b/crypto/crypto_user_stat.c
+index 113bf1691560..0ba00aaeb810 100644
+--- a/crypto/crypto_user_stat.c
++++ b/crypto/crypto_user_stat.c
+@@ -43,7 +43,7 @@ static int crypto_report_aead(struct sk_buff *skb, struct crypto_alg *alg)
+ 	raead.stat_encrypt_tlen = atomic64_read(&alg->stats.aead.encrypt_tlen);
+ 	raead.stat_decrypt_cnt = atomic64_read(&alg->stats.aead.decrypt_cnt);
+ 	raead.stat_decrypt_tlen = atomic64_read(&alg->stats.aead.decrypt_tlen);
+-	raead.stat_aead_err_cnt = atomic64_read(&alg->stats.aead.aead_err_cnt);
++	raead.stat_err_cnt = atomic64_read(&alg->stats.aead.err_cnt);
+ 
+ 	return nla_put(skb, CRYPTOCFGA_STAT_AEAD, sizeof(raead), &raead);
+ }
+@@ -60,7 +60,7 @@ static int crypto_report_cipher(struct sk_buff *skb, struct crypto_alg *alg)
+ 	rcipher.stat_encrypt_tlen = atomic64_read(&alg->stats.cipher.encrypt_tlen);
+ 	rcipher.stat_decrypt_cnt =  atomic64_read(&alg->stats.cipher.decrypt_cnt);
+ 	rcipher.stat_decrypt_tlen = atomic64_read(&alg->stats.cipher.decrypt_tlen);
+-	rcipher.stat_cipher_err_cnt =  atomic64_read(&alg->stats.cipher.cipher_err_cnt);
++	rcipher.stat_err_cnt =  atomic64_read(&alg->stats.cipher.err_cnt);
+ 
+ 	return nla_put(skb, CRYPTOCFGA_STAT_CIPHER, sizeof(rcipher), &rcipher);
+ }
+@@ -76,7 +76,7 @@ static int crypto_report_comp(struct sk_buff *skb, struct crypto_alg *alg)
+ 	rcomp.stat_compress_tlen = atomic64_read(&alg->stats.compress.compress_tlen);
+ 	rcomp.stat_decompress_cnt = atomic64_read(&alg->stats.compress.decompress_cnt);
+ 	rcomp.stat_decompress_tlen = atomic64_read(&alg->stats.compress.decompress_tlen);
+-	rcomp.stat_compress_err_cnt = atomic64_read(&alg->stats.compress.compress_err_cnt);
++	rcomp.stat_err_cnt = atomic64_read(&alg->stats.compress.err_cnt);
+ 
+ 	return nla_put(skb, CRYPTOCFGA_STAT_COMPRESS, sizeof(rcomp), &rcomp);
+ }
+@@ -92,7 +92,7 @@ static int crypto_report_acomp(struct sk_buff *skb, struct crypto_alg *alg)
+ 	racomp.stat_compress_tlen = atomic64_read(&alg->stats.compress.compress_tlen);
+ 	racomp.stat_decompress_cnt =  atomic64_read(&alg->stats.compress.decompress_cnt);
+ 	racomp.stat_decompress_tlen = atomic64_read(&alg->stats.compress.decompress_tlen);
+-	racomp.stat_compress_err_cnt = atomic64_read(&alg->stats.compress.compress_err_cnt);
++	racomp.stat_err_cnt = atomic64_read(&alg->stats.compress.err_cnt);
+ 
+ 	return nla_put(skb, CRYPTOCFGA_STAT_ACOMP, sizeof(racomp), &racomp);
+ }
+@@ -110,7 +110,7 @@ static int crypto_report_akcipher(struct sk_buff *skb, struct crypto_alg *alg)
+ 	rakcipher.stat_decrypt_tlen = atomic64_read(&alg->stats.akcipher.decrypt_tlen);
+ 	rakcipher.stat_sign_cnt = atomic64_read(&alg->stats.akcipher.sign_cnt);
+ 	rakcipher.stat_verify_cnt = atomic64_read(&alg->stats.akcipher.verify_cnt);
+-	rakcipher.stat_akcipher_err_cnt = atomic64_read(&alg->stats.akcipher.akcipher_err_cnt);
++	rakcipher.stat_err_cnt = atomic64_read(&alg->stats.akcipher.err_cnt);
+ 
+ 	return nla_put(skb, CRYPTOCFGA_STAT_AKCIPHER,
+ 		       sizeof(rakcipher), &rakcipher);
+@@ -127,7 +127,7 @@ static int crypto_report_kpp(struct sk_buff *skb, struct crypto_alg *alg)
+ 	rkpp.stat_setsecret_cnt = atomic64_read(&alg->stats.kpp.setsecret_cnt);
+ 	rkpp.stat_generate_public_key_cnt = atomic64_read(&alg->stats.kpp.generate_public_key_cnt);
+ 	rkpp.stat_compute_shared_secret_cnt = atomic64_read(&alg->stats.kpp.compute_shared_secret_cnt);
+-	rkpp.stat_kpp_err_cnt = atomic64_read(&alg->stats.kpp.kpp_err_cnt);
++	rkpp.stat_err_cnt = atomic64_read(&alg->stats.kpp.err_cnt);
+ 
+ 	return nla_put(skb, CRYPTOCFGA_STAT_KPP, sizeof(rkpp), &rkpp);
+ }
+@@ -142,7 +142,7 @@ static int crypto_report_ahash(struct sk_buff *skb, struct crypto_alg *alg)
+ 
+ 	rhash.stat_hash_cnt = atomic64_read(&alg->stats.hash.hash_cnt);
+ 	rhash.stat_hash_tlen = atomic64_read(&alg->stats.hash.hash_tlen);
+-	rhash.stat_hash_err_cnt = atomic64_read(&alg->stats.hash.hash_err_cnt);
++	rhash.stat_err_cnt = atomic64_read(&alg->stats.hash.err_cnt);
+ 
+ 	return nla_put(skb, CRYPTOCFGA_STAT_HASH, sizeof(rhash), &rhash);
+ }
+@@ -157,7 +157,7 @@ static int crypto_report_shash(struct sk_buff *skb, struct crypto_alg *alg)
+ 
+ 	rhash.stat_hash_cnt =  atomic64_read(&alg->stats.hash.hash_cnt);
+ 	rhash.stat_hash_tlen = atomic64_read(&alg->stats.hash.hash_tlen);
+-	rhash.stat_hash_err_cnt = atomic64_read(&alg->stats.hash.hash_err_cnt);
++	rhash.stat_err_cnt = atomic64_read(&alg->stats.hash.err_cnt);
+ 
+ 	return nla_put(skb, CRYPTOCFGA_STAT_HASH, sizeof(rhash), &rhash);
+ }
+@@ -173,7 +173,7 @@ static int crypto_report_rng(struct sk_buff *skb, struct crypto_alg *alg)
+ 	rrng.stat_generate_cnt = atomic64_read(&alg->stats.rng.generate_cnt);
+ 	rrng.stat_generate_tlen = atomic64_read(&alg->stats.rng.generate_tlen);
+ 	rrng.stat_seed_cnt = atomic64_read(&alg->stats.rng.seed_cnt);
+-	rrng.stat_rng_err_cnt = atomic64_read(&alg->stats.rng.rng_err_cnt);
++	rrng.stat_err_cnt = atomic64_read(&alg->stats.rng.err_cnt);
+ 
+ 	return nla_put(skb, CRYPTOCFGA_STAT_RNG, sizeof(rrng), &rrng);
+ }
+diff --git a/include/linux/crypto.h b/include/linux/crypto.h
+index e5616b311104..132a052b3483 100644
+--- a/include/linux/crypto.h
++++ b/include/linux/crypto.h
+@@ -376,14 +376,14 @@ struct compress_alg {
+  * @encrypt_tlen:	total data size handled by encrypt requests
+  * @decrypt_cnt:	number of decrypt requests
+  * @decrypt_tlen:	total data size handled by decrypt requests
+- * @aead_err_cnt:	number of error for AEAD requests
++ * @err_cnt:		number of error for AEAD requests
+  */
+ struct crypto_istat_aead {
+ 	atomic64_t encrypt_cnt;
+ 	atomic64_t encrypt_tlen;
+ 	atomic64_t decrypt_cnt;
+ 	atomic64_t decrypt_tlen;
+-	atomic64_t aead_err_cnt;
++	atomic64_t err_cnt;
+ };
+ 
+ /*
+@@ -394,7 +394,7 @@ struct crypto_istat_aead {
+  * @decrypt_tlen:	total data size handled by decrypt requests
+  * @verify_cnt:		number of verify operation
+  * @sign_cnt:		number of sign requests
+- * @akcipher_err_cnt:	number of error for akcipher requests
++ * @err_cnt:		number of error for akcipher requests
+  */
+ struct crypto_istat_akcipher {
+ 	atomic64_t encrypt_cnt;
+@@ -403,7 +403,7 @@ struct crypto_istat_akcipher {
+ 	atomic64_t decrypt_tlen;
+ 	atomic64_t verify_cnt;
+ 	atomic64_t sign_cnt;
+-	atomic64_t akcipher_err_cnt;
++	atomic64_t err_cnt;
+ };
+ 
+ /*
+@@ -412,14 +412,14 @@ struct crypto_istat_akcipher {
+  * @encrypt_tlen:	total data size handled by encrypt requests
+  * @decrypt_cnt:	number of decrypt requests
+  * @decrypt_tlen:	total data size handled by decrypt requests
+- * @cipher_err_cnt:	number of error for cipher requests
++ * @err_cnt:		number of error for cipher requests
+  */
+ struct crypto_istat_cipher {
+ 	atomic64_t encrypt_cnt;
+ 	atomic64_t encrypt_tlen;
+ 	atomic64_t decrypt_cnt;
+ 	atomic64_t decrypt_tlen;
+-	atomic64_t cipher_err_cnt;
++	atomic64_t err_cnt;
+ };
+ 
+ /*
+@@ -428,26 +428,26 @@ struct crypto_istat_cipher {
+  * @compress_tlen:	total data size handled by compress requests
+  * @decompress_cnt:	number of decompress requests
+  * @decompress_tlen:	total data size handled by decompress requests
+- * @compress_err_cnt:	number of error for compress requests
++ * @err_cnt:		number of error for compress requests
+  */
+ struct crypto_istat_compress {
+ 	atomic64_t compress_cnt;
+ 	atomic64_t compress_tlen;
+ 	atomic64_t decompress_cnt;
+ 	atomic64_t decompress_tlen;
+-	atomic64_t compress_err_cnt;
++	atomic64_t err_cnt;
+ };
+ 
+ /*
+  * struct crypto_istat_hash - statistics for has algorithm
+  * @hash_cnt:		number of hash requests
+  * @hash_tlen:		total data size hashed
+- * @hash_err_cnt:	number of error for hash requests
++ * @err_cnt:		number of error for hash requests
+  */
+ struct crypto_istat_hash {
+ 	atomic64_t hash_cnt;
+ 	atomic64_t hash_tlen;
+-	atomic64_t hash_err_cnt;
++	atomic64_t err_cnt;
+ };
+ 
+ /*
+@@ -455,13 +455,13 @@ struct crypto_istat_hash {
+  * @setsecret_cnt:		number of setsecrey operation
+  * @generate_public_key_cnt:	number of generate_public_key operation
+  * @compute_shared_secret_cnt:	number of compute_shared_secret operation
+- * @kpp_err_cnt:		number of error for KPP requests
++ * @err_cnt:			number of error for KPP requests
+  */
+ struct crypto_istat_kpp {
+ 	atomic64_t setsecret_cnt;
+ 	atomic64_t generate_public_key_cnt;
+ 	atomic64_t compute_shared_secret_cnt;
+-	atomic64_t kpp_err_cnt;
++	atomic64_t err_cnt;
+ };
+ 
+ /*
+@@ -469,13 +469,13 @@ struct crypto_istat_kpp {
+  * @generate_cnt:	number of RNG generate requests
+  * @generate_tlen:	total data size of generated data by the RNG
+  * @seed_cnt:		number of times the RNG was seeded
+- * @rng_err_cnt:	number of error for RNG requests
++ * @err_cnt:		number of error for RNG requests
+  */
+ struct crypto_istat_rng {
+ 	atomic64_t generate_cnt;
+ 	atomic64_t generate_tlen;
+ 	atomic64_t seed_cnt;
+-	atomic64_t rng_err_cnt;
++	atomic64_t err_cnt;
+ };
+ #endif /* CONFIG_CRYPTO_STATS */
+ 
+diff --git a/include/uapi/linux/cryptouser.h b/include/uapi/linux/cryptouser.h
+index 3a70f025e27d..4dc1603919ce 100644
+--- a/include/uapi/linux/cryptouser.h
++++ b/include/uapi/linux/cryptouser.h
+@@ -82,7 +82,7 @@ struct crypto_stat_aead {
+ 	__u64 stat_encrypt_tlen;
+ 	__u64 stat_decrypt_cnt;
+ 	__u64 stat_decrypt_tlen;
+-	__u64 stat_aead_err_cnt;
++	__u64 stat_err_cnt;
+ };
+ 
+ struct crypto_stat_akcipher {
+@@ -93,7 +93,7 @@ struct crypto_stat_akcipher {
+ 	__u64 stat_decrypt_tlen;
+ 	__u64 stat_verify_cnt;
+ 	__u64 stat_sign_cnt;
+-	__u64 stat_akcipher_err_cnt;
++	__u64 stat_err_cnt;
+ };
+ 
+ struct crypto_stat_cipher {
+@@ -102,7 +102,7 @@ struct crypto_stat_cipher {
+ 	__u64 stat_encrypt_tlen;
+ 	__u64 stat_decrypt_cnt;
+ 	__u64 stat_decrypt_tlen;
+-	__u64 stat_cipher_err_cnt;
++	__u64 stat_err_cnt;
+ };
+ 
+ struct crypto_stat_compress {
+@@ -111,14 +111,14 @@ struct crypto_stat_compress {
+ 	__u64 stat_compress_tlen;
+ 	__u64 stat_decompress_cnt;
+ 	__u64 stat_decompress_tlen;
+-	__u64 stat_compress_err_cnt;
++	__u64 stat_err_cnt;
+ };
+ 
+ struct crypto_stat_hash {
+ 	char type[CRYPTO_MAX_NAME];
+ 	__u64 stat_hash_cnt;
+ 	__u64 stat_hash_tlen;
+-	__u64 stat_hash_err_cnt;
++	__u64 stat_err_cnt;
+ };
+ 
+ struct crypto_stat_kpp {
+@@ -126,7 +126,7 @@ struct crypto_stat_kpp {
+ 	__u64 stat_setsecret_cnt;
+ 	__u64 stat_generate_public_key_cnt;
+ 	__u64 stat_compute_shared_secret_cnt;
+-	__u64 stat_kpp_err_cnt;
++	__u64 stat_err_cnt;
+ };
+ 
+ struct crypto_stat_rng {
+@@ -134,7 +134,7 @@ struct crypto_stat_rng {
+ 	__u64 stat_generate_cnt;
+ 	__u64 stat_generate_tlen;
+ 	__u64 stat_seed_cnt;
+-	__u64 stat_rng_err_cnt;
++	__u64 stat_err_cnt;
+ };
+ 
+ struct crypto_stat_larval {
+diff --git a/tools/crypto/getstat.c b/tools/crypto/getstat.c
+index 57fbb94608d4..9e8ff76420fa 100644
+--- a/tools/crypto/getstat.c
++++ b/tools/crypto/getstat.c
+@@ -157,7 +157,7 @@ static int get_stat(const char *drivername)
+ 		printf("%s\tHash\n\tHash: %llu bytes: %llu\n\tErrors: %llu\n",
+ 			drivername,
+ 			rhash->stat_hash_cnt, rhash->stat_hash_tlen,
+-			rhash->stat_hash_err_cnt);
++			rhash->stat_err_cnt);
+ 	} else if (tb[CRYPTOCFGA_STAT_COMPRESS]) {
+ 		struct rtattr *rta = tb[CRYPTOCFGA_STAT_COMPRESS];
+ 		struct crypto_stat_compress *rblk =
+@@ -166,7 +166,7 @@ static int get_stat(const char *drivername)
+ 			drivername,
+ 			rblk->stat_compress_cnt, rblk->stat_compress_tlen,
+ 			rblk->stat_decompress_cnt, rblk->stat_decompress_tlen,
+-			rblk->stat_compress_err_cnt);
++			rblk->stat_err_cnt);
+ 	} else if (tb[CRYPTOCFGA_STAT_ACOMP]) {
+ 		struct rtattr *rta = tb[CRYPTOCFGA_STAT_ACOMP];
+ 		struct crypto_stat_compress *rcomp =
+@@ -175,7 +175,7 @@ static int get_stat(const char *drivername)
+ 			drivername,
+ 			rcomp->stat_compress_cnt, rcomp->stat_compress_tlen,
+ 			rcomp->stat_decompress_cnt, rcomp->stat_decompress_tlen,
+-			rcomp->stat_compress_err_cnt);
++			rcomp->stat_err_cnt);
+ 	} else if (tb[CRYPTOCFGA_STAT_AEAD]) {
+ 		struct rtattr *rta = tb[CRYPTOCFGA_STAT_AEAD];
+ 		struct crypto_stat_aead *raead =
+@@ -184,7 +184,7 @@ static int get_stat(const char *drivername)
+ 			drivername,
+ 			raead->stat_encrypt_cnt, raead->stat_encrypt_tlen,
+ 			raead->stat_decrypt_cnt, raead->stat_decrypt_tlen,
+-			raead->stat_aead_err_cnt);
++			raead->stat_err_cnt);
+ 	} else if (tb[CRYPTOCFGA_STAT_BLKCIPHER]) {
+ 		struct rtattr *rta = tb[CRYPTOCFGA_STAT_BLKCIPHER];
+ 		struct crypto_stat_cipher *rblk =
+@@ -193,7 +193,7 @@ static int get_stat(const char *drivername)
+ 			drivername,
+ 			rblk->stat_encrypt_cnt, rblk->stat_encrypt_tlen,
+ 			rblk->stat_decrypt_cnt, rblk->stat_decrypt_tlen,
+-			rblk->stat_cipher_err_cnt);
++			rblk->stat_err_cnt);
+ 	} else if (tb[CRYPTOCFGA_STAT_AKCIPHER]) {
+ 		struct rtattr *rta = tb[CRYPTOCFGA_STAT_AKCIPHER];
+ 		struct crypto_stat_akcipher *rblk =
+@@ -203,7 +203,7 @@ static int get_stat(const char *drivername)
+ 			rblk->stat_encrypt_cnt, rblk->stat_encrypt_tlen,
+ 			rblk->stat_decrypt_cnt, rblk->stat_decrypt_tlen,
+ 			rblk->stat_sign_cnt, rblk->stat_verify_cnt,
+-			rblk->stat_akcipher_err_cnt);
++			rblk->stat_err_cnt);
+ 	} else if (tb[CRYPTOCFGA_STAT_CIPHER]) {
+ 		struct rtattr *rta = tb[CRYPTOCFGA_STAT_CIPHER];
+ 		struct crypto_stat_cipher *rblk =
+@@ -212,7 +212,7 @@ static int get_stat(const char *drivername)
+ 			drivername,
+ 			rblk->stat_encrypt_cnt, rblk->stat_encrypt_tlen,
+ 			rblk->stat_decrypt_cnt, rblk->stat_decrypt_tlen,
+-			rblk->stat_cipher_err_cnt);
++			rblk->stat_err_cnt);
+ 	} else if (tb[CRYPTOCFGA_STAT_RNG]) {
+ 		struct rtattr *rta = tb[CRYPTOCFGA_STAT_RNG];
+ 		struct crypto_stat_rng *rrng =
+@@ -221,7 +221,7 @@ static int get_stat(const char *drivername)
+ 			drivername,
+ 			rrng->stat_seed_cnt,
+ 			rrng->stat_generate_cnt, rrng->stat_generate_tlen,
+-			rrng->stat_rng_err_cnt);
++			rrng->stat_err_cnt);
+ 	} else if (tb[CRYPTOCFGA_STAT_KPP]) {
+ 		struct rtattr *rta = tb[CRYPTOCFGA_STAT_KPP];
+ 		struct crypto_stat_kpp *rkpp =
+@@ -231,7 +231,7 @@ static int get_stat(const char *drivername)
+ 			rkpp->stat_setsecret_cnt,
+ 			rkpp->stat_generate_public_key_cnt,
+ 			rkpp->stat_compute_shared_secret_cnt,
+-			rkpp->stat_kpp_err_cnt);
++			rkpp->stat_err_cnt);
+ 	} else {
+ 		fprintf(stderr, "%s is of an unknown algorithm\n", drivername);
  	}
- }
- 
-+static int get_measure_subaction(struct ima_rule_entry *rule,
-+				 enum ima_hooks func)
-+{
-+	if (rule->flags & IMA_FUNC && ima_hook_supports_modsig(func))
-+		return IMA_READ_MEASURE;
-+	else
-+		return 0;
-+}
-+
- /**
-  * ima_match_policy - decision based on LSM and other conditions
-  * @inode: pointer to an inode for which the policy decision is being made
-@@ -424,11 +437,12 @@ int ima_match_policy(struct inode *inode, const struct cred *cred, u32 secid,
- 
- 		action |= entry->action & IMA_DO_MASK;
- 		if (entry->action & IMA_APPRAISE) {
--			action |= get_subaction(entry, func);
-+			action |= get_appraise_subaction(entry, func);
- 			action &= ~IMA_HASH;
- 			if (ima_fail_unverifiable_sigs)
- 				action |= IMA_FAIL_UNVERIFIABLE_SIGS;
--		}
-+		} else if (entry->action & IMA_MEASURE)
-+			action |= get_measure_subaction(entry, func);
- 
- 		if (entry->action & IMA_DO_MASK)
- 			actmask &= ~(entry->action | entry->action << 1);
-@@ -756,6 +770,40 @@ static void ima_log_string(struct audit_buffer *ab, char *key, char *value)
- 	ima_log_string_op(ab, key, value, NULL);
- }
- 
-+/*
-+ * To validate the appended signature included in the measurement list requires
-+ * the file hash, without the appended signature (i.e., the 'd-sig' field).
-+ * Therefore, notify the user if they have the 'sig' field but not the 'd-sig'
-+ * field in the template.
-+ */
-+static void check_current_template_modsig(void)
-+{
-+#define MSG "template with 'sig' field also needs 'd-sig' field when modsig is allowed\n"
-+	struct ima_template_desc *template;
-+	bool has_sig, has_dsig;
-+	static bool checked;
-+	int i;
-+
-+	/* We only need to notify the user once. */
-+	if (checked)
-+		return;
-+
-+	has_sig = has_dsig = false;
-+	template = ima_template_desc_current();
-+	for (i = 0; i < template->num_fields; i++) {
-+		if (!strcmp(template->fields[i]->field_id, "sig"))
-+			has_sig = true;
-+		else if (!strcmp(template->fields[i]->field_id, "d-sig"))
-+			has_dsig = true;
-+	}
-+
-+	if (has_sig && !has_dsig)
-+		pr_notice(MSG);
-+
-+	checked = true;
-+#undef MSG
-+}
-+
- static int ima_parse_rule(char *rule, struct ima_rule_entry *entry)
- {
- 	struct audit_buffer *ab;
-@@ -1035,10 +1083,11 @@ static int ima_parse_rule(char *rule, struct ima_rule_entry *entry)
- 			if ((strcmp(args[0].from, "imasig")) == 0)
- 				entry->flags |= IMA_DIGSIG_REQUIRED;
- 			else if (ima_hook_supports_modsig(entry->func) &&
--				 strcmp(args[0].from, "imasig|modsig") == 0)
-+				 strcmp(args[0].from, "imasig|modsig") == 0) {
- 				entry->flags |= IMA_DIGSIG_REQUIRED
- 						| IMA_MODSIG_ALLOWED;
--			else
-+				check_current_template_modsig();
-+			} else
- 				result = -EINVAL;
- 			break;
- 		case Opt_permit_directio:
-diff --git a/security/integrity/ima/ima_template.c b/security/integrity/ima/ima_template.c
-index 045ad508cbb8..a58b55e7c1c6 100644
---- a/security/integrity/ima/ima_template.c
-+++ b/security/integrity/ima/ima_template.c
-@@ -231,6 +231,33 @@ struct ima_template_desc *ima_template_desc_current(void)
- 	return ima_template;
- }
- 
-+/*
-+ * Tells whether the current template has fields which reference a file's
-+ * signature.
-+ */
-+bool ima_current_template_has_sig(void)
-+{
-+	static int ima_template_has_sig = -1;
-+
-+	if (ima_template_has_sig < 0) {
-+		struct ima_template_desc *template;
-+		int i;
-+
-+		template = ima_template_desc_current();
-+		for (i = 0; i < template->num_fields; i++)
-+			if (!strcmp(template->fields[i]->field_id, "sig") ||
-+			    !strcmp(template->fields[i]->field_id, "d-sig")) {
-+				ima_template_has_sig = 1;
-+				break;
-+			}
-+
-+		if (ima_template_has_sig < 0)
-+			ima_template_has_sig = 0;
-+	}
-+
-+	return ima_template_has_sig;
-+}
-+
- int __init ima_init_template(void)
- {
- 	struct ima_template_desc *template = ima_template_desc_current();
-diff --git a/security/integrity/integrity.h b/security/integrity/integrity.h
-index e8c379211a96..9d7cefa5c999 100644
---- a/security/integrity/integrity.h
-+++ b/security/integrity/integrity.h
-@@ -39,12 +39,13 @@
- #define IMA_MODSIG_ALLOWED	0x20000000
- 
- #define IMA_DO_MASK		(IMA_MEASURE | IMA_APPRAISE | IMA_AUDIT | \
--				 IMA_HASH | IMA_APPRAISE_SUBMASK)
-+				 IMA_HASH | IMA_APPRAISE_SUBMASK | \
-+				 IMA_READ_MEASURE)
- #define IMA_DONE_MASK		(IMA_MEASURED | IMA_APPRAISED | IMA_AUDITED | \
- 				 IMA_HASHED | IMA_COLLECTED | \
--				 IMA_APPRAISED_SUBMASK)
-+				 IMA_APPRAISED_SUBMASK | IMA_READ_MEASURED)
- 
--/* iint subaction appraise cache flags */
-+/* iint subaction appraise and measure cache flags */
- #define IMA_FILE_APPRAISE	0x00001000
- #define IMA_FILE_APPRAISED	0x00002000
- #define IMA_MMAP_APPRAISE	0x00004000
-@@ -55,6 +56,8 @@
- #define IMA_READ_APPRAISED	0x00080000
- #define IMA_CREDS_APPRAISE	0x00100000
- #define IMA_CREDS_APPRAISED	0x00200000
-+#define IMA_READ_MEASURE	0x00400000
-+#define IMA_READ_MEASURED	0x00800000
- #define IMA_APPRAISE_SUBMASK	(IMA_FILE_APPRAISE | IMA_MMAP_APPRAISE | \
- 				 IMA_BPRM_APPRAISE | IMA_READ_APPRAISE | \
- 				 IMA_CREDS_APPRAISE)
+-- 
+2.18.1
