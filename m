@@ -1,77 +1,42 @@
-Return-Path: <SRS0=r3Tc=N4=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:34136 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729957AbeKQKbx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 17 Nov 2018 05:31:53 -0500
-Date: Fri, 16 Nov 2018 16:17:19 -0800
-From: Eric Biggers <ebiggers@kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>, linux-fscrypt@vger.kernel.org,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Paul Crowley <paulcrowley@google.com>,
-        Greg Kaiser <gkaiser@google.com>,
-        "Jason A . Donenfeld" <Jason@zx2c4.com>,
-        Samuel Neves <samuel.c.p.neves@gmail.com>,
-        Tomer Ashur <tomer.ashur@esat.kuleuven.be>
-Subject: Re: [RFC PATCH v3 10/15] crypto: poly1305 - use structures for key
- and accumulator
-Message-ID: <20181117001718.GA175522@gmail.com>
-References: <20181105232526.173947-1-ebiggers@kernel.org>
- <20181105232526.173947-11-ebiggers@kernel.org>
- <CAKv+Gu-o0khD5=0EOkv2PiczMs5uZ=XP9V=G2ogBNMK8Kb93sw@mail.gmail.com>
- <20181112185816.GA8663@gmail.com>
- <20181116060227.hwu4igi6bp26ddpi@gondor.apana.org.au>
+Return-Path: <SRS0=Oq1A=OC=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:43264 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727343AbeKWNSp (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 23 Nov 2018 08:18:45 -0500
+Date: Fri, 23 Nov 2018 10:36:25 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: PanBian <bianpan2016@163.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: do not free algorithm before using
+Message-ID: <20181123023625.oguwfmhhi2su6etr@gondor.apana.org.au>
+References: <1542880816-63838-1-git-send-email-bianpan2016@163.com>
+ <20181122144441.tkfmrq3lzibq2g3y@gondor.apana.org.au>
+ <20181123010555.GA83154@bp>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20181116060227.hwu4igi6bp26ddpi@gondor.apana.org.au>
+In-Reply-To: <20181123010555.GA83154@bp>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Herbert,
+On Fri, Nov 23, 2018 at 09:05:55AM +0800, PanBian wrote:
+>
+> Thanks for your explanation! But I find that the function
+> crypto_init_spawn just lets spawn->alg point to the algorithm without 
+> increasing the reference count, i.e., alg->cra_refcnt. So I am confused
+> about how this can protect the algorithm from being freed. Maybe I
+> missed some key points. Could you please explain it in more details?
 
-On Fri, Nov 16, 2018 at 02:02:27PM +0800, Herbert Xu wrote:
-> Hi Eric:
-> 
-> On Mon, Nov 12, 2018 at 10:58:17AM -0800, Eric Biggers wrote:
-> >
-> > I prefer separate types so that the type system enforces that a key is never
-> > accidentally used as an accumulator, and vice versa.  Then the poly1305_core_*
-> > functions will be harder to misuse, and the Poly1305 MAC implementations harder
-> > to get wrong.
-> > 
-> > The key also has certain bits clear whereas the accumulator does not.  In the
-> > future, the Poly1305 C implementation might use base 2^32 and take advantage of
-> > this.  In that case, the two inputs to each multiplication won't be
-> > interchangeable, so using the same type for both would be extra confusing.
-> > 
-> > Having a poly1305_val nested inside poly1305_key and poly1305_state would work,
-> > but seemed excessive.
-> 
-> So it looks like there are no more unresolved issues with this
-> patch series.  Please let me know when you want it to go in.
-> 
+Oh you're right! This bug was introduced during the skcipher
+conversion.  The spawns are not meant to carry a reference count
+with them because they are not supposed to stop the underlying
+algorithm from being removed.  So yes we do need to hold a reference
+count on alg until the instance is registered.
 
-I believe it's ready to go in.  I'll need to rebase it onto cryptodev, to
-resolve some small conflicts with the recent ChaCha20-related changes.  Also
-I'll probably omit the fscrypt patch (patch 15/15) so that that patch can be
-taken through the fscrypt tree instead.
-
-Do you prefer that this be merged before or after Zinc?  It seems it may still
-be a while before the community is satisfied with Zinc (and Wireguard which is
-in the same patchset), and I don't want this blocked unnecessarily...  So on my
-part I'd prefer to just have this merged as-is.
-
-Of course, it's always possible to change the xchacha12 and xchacha20
-implementations later, whether that's to use "Zinc" or otherwise.  And
-NHPoly1305 and Adiantum itself will be the same either way, except that the
-Poly1305 helpers may change slightly.
-
-What do you think?
-
-Thanks!
-
-- Eric
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
