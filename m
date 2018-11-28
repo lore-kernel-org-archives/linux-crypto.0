@@ -1,237 +1,170 @@
-Return-Path: <SRS0=Oq1A=OC=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:35593 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2503954AbeKWWqg (ORCPT
+Return-Path: <SRS0=p+N9=OH=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail-oi1-f195.google.com ([209.85.167.195]:38952 "EHLO
+        mail-oi1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725994AbeK2Gjq (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 23 Nov 2018 17:46:36 -0500
-Received: by mail-wr1-f65.google.com with SMTP id 96so12129616wrb.2
-        for <linux-crypto@vger.kernel.org>; Fri, 23 Nov 2018 04:02:38 -0800 (PST)
-From: Corentin Labbe <clabbe@baylibre.com>
-To: davem@davemloft.net, ebiggers@kernel.org,
-        herbert@gondor.apana.org.au, nhorman@tuxdriver.com
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Corentin Labbe <clabbe@baylibre.com>
-Subject: [PATCH v4 04/11] crypto: crypto_user_stat: split user space crypto stat structures
-Date: Fri, 23 Nov 2018 12:02:14 +0000
-Message-Id: <1542974541-23024-5-git-send-email-clabbe@baylibre.com>
-In-Reply-To: <1542974541-23024-1-git-send-email-clabbe@baylibre.com>
-References: <1542974541-23024-1-git-send-email-clabbe@baylibre.com>
+        Thu, 29 Nov 2018 01:39:46 -0500
+MIME-Version: 1.0
+From: David CARLIER <devnexen@gmail.com>
+Date: Wed, 28 Nov 2018 19:36:50 +0000
+Message-ID: <CA+XhMqz7ZaGVNpkrRM-t4h2f9UZVQPjLVB5Txco4bKGRm8k=mA@mail.gmail.com>
+Subject: [PATCH] crypto: use memzero_explicit instead of memset to clear contexts.
+To: linux-kernel@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-It is cleaner to have each stat in their own structures.
-
-Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
+There might be a little performance drop but to make sure it stands
+by it comments, we really wipe the whole context after usage.
 ---
- crypto/crypto_user_stat.c       |  20 +++----
- include/uapi/linux/cryptouser.h | 100 ++++++++++++++++++++------------
- 2 files changed, 72 insertions(+), 48 deletions(-)
+ crypto/chacha20poly1305.c | 3 ++-
+ crypto/md5.c              | 2 +-
+ crypto/rmd128.c           | 3 ++-
+ crypto/rmd160.c           | 3 ++-
+ crypto/rmd256.c           | 3 ++-
+ crypto/rmd320.c           | 3 ++-
+ crypto/sha3_generic.c     | 3 ++-
+ 7 files changed, 13 insertions(+), 7 deletions(-)
 
-diff --git a/crypto/crypto_user_stat.c b/crypto/crypto_user_stat.c
-index 352569f378a0..3c14be2f7a1b 100644
---- a/crypto/crypto_user_stat.c
-+++ b/crypto/crypto_user_stat.c
-@@ -33,7 +33,7 @@ struct crypto_dump_info {
- 
- static int crypto_report_aead(struct sk_buff *skb, struct crypto_alg *alg)
- {
--	struct crypto_stat raead;
-+	struct crypto_stat_aead raead;
- 	u64 v64;
- 
- 	memset(&raead, 0, sizeof(raead));
-@@ -56,7 +56,7 @@ static int crypto_report_aead(struct sk_buff *skb, struct crypto_alg *alg)
- 
- static int crypto_report_cipher(struct sk_buff *skb, struct crypto_alg *alg)
- {
--	struct crypto_stat rcipher;
-+	struct crypto_stat_cipher rcipher;
- 	u64 v64;
- 
- 	memset(&rcipher, 0, sizeof(rcipher));
-@@ -79,7 +79,7 @@ static int crypto_report_cipher(struct sk_buff *skb, struct crypto_alg *alg)
- 
- static int crypto_report_comp(struct sk_buff *skb, struct crypto_alg *alg)
- {
--	struct crypto_stat rcomp;
-+	struct crypto_stat_compress rcomp;
- 	u64 v64;
- 
- 	memset(&rcomp, 0, sizeof(rcomp));
-@@ -101,7 +101,7 @@ static int crypto_report_comp(struct sk_buff *skb, struct crypto_alg *alg)
- 
- static int crypto_report_acomp(struct sk_buff *skb, struct crypto_alg *alg)
- {
--	struct crypto_stat racomp;
-+	struct crypto_stat_compress racomp;
- 	u64 v64;
- 
- 	memset(&racomp, 0, sizeof(racomp));
-@@ -123,7 +123,7 @@ static int crypto_report_acomp(struct sk_buff *skb, struct crypto_alg *alg)
- 
- static int crypto_report_akcipher(struct sk_buff *skb, struct crypto_alg *alg)
- {
--	struct crypto_stat rakcipher;
-+	struct crypto_stat_akcipher rakcipher;
- 	u64 v64;
- 
- 	memset(&rakcipher, 0, sizeof(rakcipher));
-@@ -150,7 +150,7 @@ static int crypto_report_akcipher(struct sk_buff *skb, struct crypto_alg *alg)
- 
- static int crypto_report_kpp(struct sk_buff *skb, struct crypto_alg *alg)
- {
--	struct crypto_stat rkpp;
-+	struct crypto_stat_kpp rkpp;
- 	u64 v;
- 
- 	memset(&rkpp, 0, sizeof(rkpp));
-@@ -171,7 +171,7 @@ static int crypto_report_kpp(struct sk_buff *skb, struct crypto_alg *alg)
- 
- static int crypto_report_ahash(struct sk_buff *skb, struct crypto_alg *alg)
- {
--	struct crypto_stat rhash;
-+	struct crypto_stat_hash rhash;
- 	u64 v64;
- 
- 	memset(&rhash, 0, sizeof(rhash));
-@@ -190,7 +190,7 @@ static int crypto_report_ahash(struct sk_buff *skb, struct crypto_alg *alg)
- 
- static int crypto_report_shash(struct sk_buff *skb, struct crypto_alg *alg)
- {
--	struct crypto_stat rhash;
-+	struct crypto_stat_hash rhash;
- 	u64 v64;
- 
- 	memset(&rhash, 0, sizeof(rhash));
-@@ -209,7 +209,7 @@ static int crypto_report_shash(struct sk_buff *skb, struct crypto_alg *alg)
- 
- static int crypto_report_rng(struct sk_buff *skb, struct crypto_alg *alg)
- {
--	struct crypto_stat rrng;
-+	struct crypto_stat_rng rrng;
- 	u64 v64;
- 
- 	memset(&rrng, 0, sizeof(rrng));
-@@ -248,7 +248,7 @@ static int crypto_reportstat_one(struct crypto_alg *alg,
- 	if (nla_put_u32(skb, CRYPTOCFGA_PRIORITY_VAL, alg->cra_priority))
- 		goto nla_put_failure;
- 	if (alg->cra_flags & CRYPTO_ALG_LARVAL) {
--		struct crypto_stat rl;
-+		struct crypto_stat_larval rl;
- 
- 		memset(&rl, 0, sizeof(rl));
- 		strscpy(rl.type, "larval", sizeof(rl.type));
-diff --git a/include/uapi/linux/cryptouser.h b/include/uapi/linux/cryptouser.h
-index 9f8187077ce4..3a70f025e27d 100644
---- a/include/uapi/linux/cryptouser.h
-+++ b/include/uapi/linux/cryptouser.h
-@@ -76,45 +76,69 @@ struct crypto_user_alg {
- 	__u32 cru_flags;
- };
- 
--struct crypto_stat {
--	char type[CRYPTO_MAX_NAME];
--	union {
--		__u64 stat_encrypt_cnt;
--		__u64 stat_compress_cnt;
--		__u64 stat_generate_cnt;
--		__u64 stat_hash_cnt;
--		__u64 stat_setsecret_cnt;
--	};
--	union {
--		__u64 stat_encrypt_tlen;
--		__u64 stat_compress_tlen;
--		__u64 stat_generate_tlen;
--		__u64 stat_hash_tlen;
--	};
--	union {
--		__u64 stat_akcipher_err_cnt;
--		__u64 stat_cipher_err_cnt;
--		__u64 stat_compress_err_cnt;
--		__u64 stat_aead_err_cnt;
--		__u64 stat_hash_err_cnt;
--		__u64 stat_rng_err_cnt;
--		__u64 stat_kpp_err_cnt;
--	};
--	union {
--		__u64 stat_decrypt_cnt;
--		__u64 stat_decompress_cnt;
--		__u64 stat_seed_cnt;
--		__u64 stat_generate_public_key_cnt;
--	};
--	union {
--		__u64 stat_decrypt_tlen;
--		__u64 stat_decompress_tlen;
--	};
--	union {
--		__u64 stat_verify_cnt;
--		__u64 stat_compute_shared_secret_cnt;
--	};
-+struct crypto_stat_aead {
-+	char type[CRYPTO_MAX_NAME];
-+	__u64 stat_encrypt_cnt;
-+	__u64 stat_encrypt_tlen;
-+	__u64 stat_decrypt_cnt;
-+	__u64 stat_decrypt_tlen;
-+	__u64 stat_aead_err_cnt;
-+};
-+
-+struct crypto_stat_akcipher {
-+	char type[CRYPTO_MAX_NAME];
-+	__u64 stat_encrypt_cnt;
-+	__u64 stat_encrypt_tlen;
-+	__u64 stat_decrypt_cnt;
-+	__u64 stat_decrypt_tlen;
-+	__u64 stat_verify_cnt;
- 	__u64 stat_sign_cnt;
-+	__u64 stat_akcipher_err_cnt;
-+};
-+
-+struct crypto_stat_cipher {
-+	char type[CRYPTO_MAX_NAME];
-+	__u64 stat_encrypt_cnt;
-+	__u64 stat_encrypt_tlen;
-+	__u64 stat_decrypt_cnt;
-+	__u64 stat_decrypt_tlen;
-+	__u64 stat_cipher_err_cnt;
-+};
-+
-+struct crypto_stat_compress {
-+	char type[CRYPTO_MAX_NAME];
-+	__u64 stat_compress_cnt;
-+	__u64 stat_compress_tlen;
-+	__u64 stat_decompress_cnt;
-+	__u64 stat_decompress_tlen;
-+	__u64 stat_compress_err_cnt;
-+};
-+
-+struct crypto_stat_hash {
-+	char type[CRYPTO_MAX_NAME];
-+	__u64 stat_hash_cnt;
-+	__u64 stat_hash_tlen;
-+	__u64 stat_hash_err_cnt;
-+};
-+
-+struct crypto_stat_kpp {
-+	char type[CRYPTO_MAX_NAME];
-+	__u64 stat_setsecret_cnt;
-+	__u64 stat_generate_public_key_cnt;
-+	__u64 stat_compute_shared_secret_cnt;
-+	__u64 stat_kpp_err_cnt;
-+};
-+
-+struct crypto_stat_rng {
-+	char type[CRYPTO_MAX_NAME];
-+	__u64 stat_generate_cnt;
-+	__u64 stat_generate_tlen;
-+	__u64 stat_seed_cnt;
-+	__u64 stat_rng_err_cnt;
-+};
-+
-+struct crypto_stat_larval {
-+	char type[CRYPTO_MAX_NAME];
- };
- 
- struct crypto_report_larval {
--- 
-2.18.1
+diff --git a/crypto/chacha20poly1305.c b/crypto/chacha20poly1305.c
+index 600afa99941f..6e93d998109e 100644
+--- a/crypto/chacha20poly1305.c
++++ b/crypto/chacha20poly1305.c
+@@ -19,6 +19,7 @@
+ #include <linux/init.h>
+ #include <linux/kernel.h>
+ #include <linux/module.h>
++#include <linux/string.h>
+
+ #include "internal.h"
+
+@@ -388,7 +389,7 @@ static int poly_genkey(struct aead_request *req)
+        }
+
+        sg_init_table(creq->src, 1);
+-       memset(rctx->key, 0, sizeof(rctx->key));
++       memzero_explicit(rctx->key, sizeof(rctx->key));
+        sg_set_buf(creq->src, rctx->key, sizeof(rctx->key));
+
+        chacha_iv(creq->iv, req, 0);
+diff --git a/crypto/md5.c b/crypto/md5.c
+index 94dd78144ba3..00d384e8784c 100644
+--- a/crypto/md5.c
++++ b/crypto/md5.c
+@@ -197,7 +197,7 @@ static int md5_final(struct shash_desc *desc, u8 *out)
+        md5_transform(mctx->hash, mctx->block);
+        cpu_to_le32_array(mctx->hash, sizeof(mctx->hash) / sizeof(u32));
+        memcpy(out, mctx->hash, sizeof(mctx->hash));
+-       memset(mctx, 0, sizeof(*mctx));
++       memzero_explicit(mctx, sizeof(*mctx));
+
+        return 0;
+ }
+diff --git a/crypto/rmd128.c b/crypto/rmd128.c
+index 5f4472256e27..5e01cd7130c7 100644
+--- a/crypto/rmd128.c
++++ b/crypto/rmd128.c
+@@ -17,6 +17,7 @@
+ #include <linux/init.h>
+ #include <linux/module.h>
+ #include <linux/mm.h>
++#include <linux/string.h>
+ #include <linux/types.h>
+ #include <asm/byteorder.h>
+
+@@ -290,7 +291,7 @@ static int rmd128_final(struct shash_desc *desc, u8 *out)
+                dst[i] = cpu_to_le32p(&rctx->state[i]);
+
+        /* Wipe context */
+-       memset(rctx, 0, sizeof(*rctx));
++       memzero_explicit(rctx, sizeof(*rctx));
+
+        return 0;
+ }
+diff --git a/crypto/rmd160.c b/crypto/rmd160.c
+index 737645344d1c..2381d134443c 100644
+--- a/crypto/rmd160.c
++++ b/crypto/rmd160.c
+@@ -17,6 +17,7 @@
+ #include <linux/init.h>
+ #include <linux/module.h>
+ #include <linux/mm.h>
++#include <linux/string.h>
+ #include <linux/types.h>
+ #include <asm/byteorder.h>
+
+@@ -334,7 +335,7 @@ static int rmd160_final(struct shash_desc *desc, u8 *out)
+                dst[i] = cpu_to_le32p(&rctx->state[i]);
+
+        /* Wipe context */
+-       memset(rctx, 0, sizeof(*rctx));
++       memzero_explicit(rctx, sizeof(*rctx));
+
+        return 0;
+ }
+diff --git a/crypto/rmd256.c b/crypto/rmd256.c
+index 0e9d30676a01..3db0f6653607 100644
+--- a/crypto/rmd256.c
++++ b/crypto/rmd256.c
+@@ -17,6 +17,7 @@
+ #include <linux/init.h>
+ #include <linux/module.h>
+ #include <linux/mm.h>
++#include <linux/string.h>
+ #include <linux/types.h>
+ #include <asm/byteorder.h>
+
+@@ -309,7 +310,7 @@ static int rmd256_final(struct shash_desc *desc, u8 *out)
+                dst[i] = cpu_to_le32p(&rctx->state[i]);
+
+        /* Wipe context */
+-       memset(rctx, 0, sizeof(*rctx));
++       memzero_explicit(rctx, sizeof(*rctx));
+
+        return 0;
+ }
+diff --git a/crypto/rmd320.c b/crypto/rmd320.c
+index 3ae1df5bb48c..e0e1a71d0144 100644
+--- a/crypto/rmd320.c
++++ b/crypto/rmd320.c
+@@ -17,6 +17,7 @@
+ #include <linux/init.h>
+ #include <linux/module.h>
+ #include <linux/mm.h>
++#include <linux/string.h>
+ #include <linux/types.h>
+ #include <asm/byteorder.h>
+
+@@ -358,7 +359,7 @@ static int rmd320_final(struct shash_desc *desc, u8 *out)
+                dst[i] = cpu_to_le32p(&rctx->state[i]);
+
+        /* Wipe context */
+-       memset(rctx, 0, sizeof(*rctx));
++       memzero_explicit(rctx, sizeof(*rctx));
+
+        return 0;
+ }
+diff --git a/crypto/sha3_generic.c b/crypto/sha3_generic.c
+index 7ed98367d4fb..ae30a035d371 100644
+--- a/crypto/sha3_generic.c
++++ b/crypto/sha3_generic.c
+@@ -17,6 +17,7 @@
+ #include <linux/init.h>
+ #include <linux/module.h>
+ #include <linux/types.h>
++#include <linux/string.h>
+ #include <crypto/sha3.h>
+ #include <asm/unaligned.h>
+
+@@ -237,7 +238,7 @@ int crypto_sha3_final(struct shash_desc *desc, u8 *out)
+        if (digest_size & 4)
+                put_unaligned_le32(sctx->st[i], (__le32 *)digest);
+
+-       memset(sctx, 0, sizeof(*sctx));
++       memzero_explicit(sctx, sizeof(*sctx));
+        return 0;
+ }
+ EXPORT_SYMBOL(crypto_sha3_final);
