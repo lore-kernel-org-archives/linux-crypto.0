@@ -1,470 +1,584 @@
-Return-Path: <SRS0=NopL=OG=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from szxga05-in.huawei.com ([45.249.212.191]:15163 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727741AbeK0NrZ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 27 Nov 2018 08:47:25 -0500
-Date: Tue, 27 Nov 2018 10:52:30 +0800
-From: Kenneth Lee <liguozhu@hisilicon.com>
-To: Leon Romanovsky <leon@kernel.org>
-CC: Tim Sell <timothy.sell@unisys.com>, <linux-doc@vger.kernel.org>,
-        "Alexander Shishkin" <alexander.shishkin@linux.intel.com>,
-        Zaibo Xu <xuzaibo@huawei.com>, <zhangfei.gao@foxmail.com>,
-        <linuxarm@huawei.com>, <haojian.zhuang@linaro.org>,
-        Christoph Lameter <cl@linux.com>,
-        Hao Fang <fanghao11@huawei.com>,
-        Gavin Schenk <g.schenk@eckelmann.de>,
-        "RDMA mailing list" <linux-rdma@vger.kernel.org>,
-        Zhou Wang <wangzhou1@hisilicon.com>,
-        "Jason Gunthorpe" <jgg@ziepe.ca>,
-        Doug Ledford <dledford@redhat.com>,
-        Uwe =?iso-8859-1?Q?Kleine-K=F6nig?=
-        <u.kleine-koenig@pengutronix.de>,
-        "David Kershner" <david.kershner@unisys.com>,
-        Kenneth Lee <nek.in.cn@gmail.com>,
-        Johan Hovold <johan@kernel.org>,
-        Jerome Glisse <jglisse@redhat.com>,
-        "Cyrille Pitchen" <cyrille.pitchen@free-electrons.com>,
-        Sagar Dharia <sdharia@codeaurora.org>,
-        Jens Axboe <axboe@kernel.dk>, <guodong.xu@linaro.org>,
-        linux-netdev <netdev@vger.kernel.org>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        <linux-kernel@vger.kernel.org>, Vinod Koul <vkoul@kernel.org>,
-        <linux-crypto@vger.kernel.org>,
-        Philippe Ombredanne <pombredanne@nexb.com>,
-        Sanyog Kale <sanyog.r.kale@intel.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        <linux-accelerators@lists.ozlabs.org>
-Subject: Re: [RFCv3 PATCH 1/6] uacce: Add documents for WarpDrive/uacce
-Message-ID: <20181127025230.GM157308@Turing-Arch-b>
-References: <20181112075807.9291-2-nek.in.cn@gmail.com>
- <20181113002354.GO3695@mtr-leonro.mtl.com>
- <95310df4-b32c-42f0-c750-3ad5eb89b3dd@gmail.com>
- <20181114160017.GI3759@mtr-leonro.mtl.com>
- <20181115085109.GD157308@Turing-Arch-b>
- <20181115145455.GN3759@mtr-leonro.mtl.com>
- <20181119091405.GE157308@Turing-Arch-b>
- <20181119091910.GF157308@Turing-Arch-b>
- <20181119104801.GF8268@mtr-leonro.mtl.com>
- <20181120023055.GG157308@Turing-Arch-b>
+Return-Path: <SRS0=p+N9=OH=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:49584 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727382AbeK1Rr4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 28 Nov 2018 12:47:56 -0500
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org
+Cc: Paul Crowley <paulcrowley@google.com>,
+        Martin Willi <martin@strongswan.org>,
+        Milan Broz <gmazyland@gmail.com>,
+        "Jason A . Donenfeld" <Jason@zx2c4.com>,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH 5/6] crypto: x86/chacha20 - refactor to allow varying number of rounds
+Date: Tue, 27 Nov 2018 22:44:44 -0800
+Message-Id: <20181128064445.3813-6-ebiggers@kernel.org>
+In-Reply-To: <20181128064445.3813-1-ebiggers@kernel.org>
+References: <20181128064445.3813-1-ebiggers@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20181120023055.GG157308@Turing-Arch-b>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Nov 20, 2018 at 10:30:55AM +0800, Kenneth Lee wrote:
-> Date: Tue, 20 Nov 2018 10:30:55 +0800
-> From: Kenneth Lee <liguozhu@hisilicon.com>
-> To: Leon Romanovsky <leon@kernel.org>
-> CC: Tim Sell <timothy.sell@unisys.com>, linux-doc@vger.kernel.org,
->  Alexander Shishkin <alexander.shishkin@linux.intel.com>, Zaibo Xu
->  <xuzaibo@huawei.com>, zhangfei.gao@foxmail.com, linuxarm@huawei.com,
->  haojian.zhuang@linaro.org, Christoph Lameter <cl@linux.com>, Hao Fang
->  <fanghao11@huawei.com>, Gavin Schenk <g.schenk@eckelmann.de>, RDMA mailing
->  list <linux-rdma@vger.kernel.org>, Zhou Wang <wangzhou1@hisilicon.com>,
->  Jason Gunthorpe <jgg@ziepe.ca>, Doug Ledford <dledford@redhat.com>, Uwe
->  Kleine-König <u.kleine-koenig@pengutronix.de>, David Kershner
->  <david.kershner@unisys.com>, Kenneth Lee <nek.in.cn@gmail.com>, Johan
->  Hovold <johan@kernel.org>, Jerome Glisse <jglisse@redhat.com>, Cyrille
->  Pitchen <cyrille.pitchen@free-electrons.com>, Sagar Dharia
->  <sdharia@codeaurora.org>, Jens Axboe <axboe@kernel.dk>,
->  guodong.xu@linaro.org, linux-netdev <netdev@vger.kernel.org>, Randy Dunlap
->  <rdunlap@infradead.org>, linux-kernel@vger.kernel.org, Vinod Koul
->  <vkoul@kernel.org>, linux-crypto@vger.kernel.org, Philippe Ombredanne
->  <pombredanne@nexb.com>, Sanyog Kale <sanyog.r.kale@intel.com>, "David S.
->  Miller" <davem@davemloft.net>, linux-accelerators@lists.ozlabs.org
-> Subject: Re: [RFCv3 PATCH 1/6] uacce: Add documents for WarpDrive/uacce
-> User-Agent: Mutt/1.5.21 (2010-09-15)
-> Message-ID: <20181120023055.GG157308@Turing-Arch-b>
-> 
-> On Mon, Nov 19, 2018 at 12:48:01PM +0200, Leon Romanovsky wrote:
-> > Date: Mon, 19 Nov 2018 12:48:01 +0200
-> > From: Leon Romanovsky <leon@kernel.org>
-> > To: Kenneth Lee <liguozhu@hisilicon.com>
-> > CC: Tim Sell <timothy.sell@unisys.com>, linux-doc@vger.kernel.org,
-> >  Alexander Shishkin <alexander.shishkin@linux.intel.com>, Zaibo Xu
-> >  <xuzaibo@huawei.com>, zhangfei.gao@foxmail.com, linuxarm@huawei.com,
-> >  haojian.zhuang@linaro.org, Christoph Lameter <cl@linux.com>, Hao Fang
-> >  <fanghao11@huawei.com>, Gavin Schenk <g.schenk@eckelmann.de>, RDMA mailing
-> >  list <linux-rdma@vger.kernel.org>, Vinod Koul <vkoul@kernel.org>, Jason
-> >  Gunthorpe <jgg@ziepe.ca>, Doug Ledford <dledford@redhat.com>, Uwe
-> >  Kleine-König <u.kleine-koenig@pengutronix.de>, David Kershner
-> >  <david.kershner@unisys.com>, Kenneth Lee <nek.in.cn@gmail.com>, Johan
-> >  Hovold <johan@kernel.org>, Cyrille Pitchen
-> >  <cyrille.pitchen@free-electrons.com>, Sagar Dharia
-> >  <sdharia@codeaurora.org>, Jens Axboe <axboe@kernel.dk>,
-> >  guodong.xu@linaro.org, linux-netdev <netdev@vger.kernel.org>, Randy Dunlap
-> >  <rdunlap@infradead.org>, linux-kernel@vger.kernel.org, Zhou Wang
-> >  <wangzhou1@hisilicon.com>, linux-crypto@vger.kernel.org, Philippe
-> >  Ombredanne <pombredanne@nexb.com>, Sanyog Kale <sanyog.r.kale@intel.com>,
-> >  "David S. Miller" <davem@davemloft.net>,
-> >  linux-accelerators@lists.ozlabs.org, Jerome Glisse <jglisse@redhat.com>
-> > Subject: Re: [RFCv3 PATCH 1/6] uacce: Add documents for WarpDrive/uacce
-> > User-Agent: Mutt/1.10.1 (2018-07-13)
-> > Message-ID: <20181119104801.GF8268@mtr-leonro.mtl.com>
-> > 
-> > On Mon, Nov 19, 2018 at 05:19:10PM +0800, Kenneth Lee wrote:
-> > > On Mon, Nov 19, 2018 at 05:14:05PM +0800, Kenneth Lee wrote:
-> > > > Date: Mon, 19 Nov 2018 17:14:05 +0800
-> > > > From: Kenneth Lee <liguozhu@hisilicon.com>
-> > > > To: Leon Romanovsky <leon@kernel.org>
-> > > > CC: Tim Sell <timothy.sell@unisys.com>, linux-doc@vger.kernel.org,
-> > > >  Alexander Shishkin <alexander.shishkin@linux.intel.com>, Zaibo Xu
-> > > >  <xuzaibo@huawei.com>, zhangfei.gao@foxmail.com, linuxarm@huawei.com,
-> > > >  haojian.zhuang@linaro.org, Christoph Lameter <cl@linux.com>, Hao Fang
-> > > >  <fanghao11@huawei.com>, Gavin Schenk <g.schenk@eckelmann.de>, RDMA mailing
-> > > >  list <linux-rdma@vger.kernel.org>, Vinod Koul <vkoul@kernel.org>, Jason
-> > > >  Gunthorpe <jgg@ziepe.ca>, Doug Ledford <dledford@redhat.com>, Uwe
-> > > >  Kleine-König <u.kleine-koenig@pengutronix.de>, David Kershner
-> > > >  <david.kershner@unisys.com>, Kenneth Lee <nek.in.cn@gmail.com>, Johan
-> > > >  Hovold <johan@kernel.org>, Cyrille Pitchen
-> > > >  <cyrille.pitchen@free-electrons.com>, Sagar Dharia
-> > > >  <sdharia@codeaurora.org>, Jens Axboe <axboe@kernel.dk>,
-> > > >  guodong.xu@linaro.org, linux-netdev <netdev@vger.kernel.org>, Randy Dunlap
-> > > >  <rdunlap@infradead.org>, linux-kernel@vger.kernel.org, Zhou Wang
-> > > >  <wangzhou1@hisilicon.com>, linux-crypto@vger.kernel.org, Philippe
-> > > >  Ombredanne <pombredanne@nexb.com>, Sanyog Kale <sanyog.r.kale@intel.com>,
-> > > >  "David S. Miller" <davem@davemloft.net>,
-> > > >  linux-accelerators@lists.ozlabs.org
-> > > > Subject: Re: [RFCv3 PATCH 1/6] uacce: Add documents for WarpDrive/uacce
-> > > > User-Agent: Mutt/1.5.21 (2010-09-15)
-> > > > Message-ID: <20181119091405.GE157308@Turing-Arch-b>
-> > > >
-> > > > On Thu, Nov 15, 2018 at 04:54:55PM +0200, Leon Romanovsky wrote:
-> > > > > Date: Thu, 15 Nov 2018 16:54:55 +0200
-> > > > > From: Leon Romanovsky <leon@kernel.org>
-> > > > > To: Kenneth Lee <liguozhu@hisilicon.com>
-> > > > > CC: Kenneth Lee <nek.in.cn@gmail.com>, Tim Sell <timothy.sell@unisys.com>,
-> > > > >  linux-doc@vger.kernel.org, Alexander Shishkin
-> > > > >  <alexander.shishkin@linux.intel.com>, Zaibo Xu <xuzaibo@huawei.com>,
-> > > > >  zhangfei.gao@foxmail.com, linuxarm@huawei.com, haojian.zhuang@linaro.org,
-> > > > >  Christoph Lameter <cl@linux.com>, Hao Fang <fanghao11@huawei.com>, Gavin
-> > > > >  Schenk <g.schenk@eckelmann.de>, RDMA mailing list
-> > > > >  <linux-rdma@vger.kernel.org>, Zhou Wang <wangzhou1@hisilicon.com>, Jason
-> > > > >  Gunthorpe <jgg@ziepe.ca>, Doug Ledford <dledford@redhat.com>, Uwe
-> > > > >  Kleine-König <u.kleine-koenig@pengutronix.de>, David Kershner
-> > > > >  <david.kershner@unisys.com>, Johan Hovold <johan@kernel.org>, Cyrille
-> > > > >  Pitchen <cyrille.pitchen@free-electrons.com>, Sagar Dharia
-> > > > >  <sdharia@codeaurora.org>, Jens Axboe <axboe@kernel.dk>,
-> > > > >  guodong.xu@linaro.org, linux-netdev <netdev@vger.kernel.org>, Randy Dunlap
-> > > > >  <rdunlap@infradead.org>, linux-kernel@vger.kernel.org, Vinod Koul
-> > > > >  <vkoul@kernel.org>, linux-crypto@vger.kernel.org, Philippe Ombredanne
-> > > > >  <pombredanne@nexb.com>, Sanyog Kale <sanyog.r.kale@intel.com>, "David S.
-> > > > >  Miller" <davem@davemloft.net>, linux-accelerators@lists.ozlabs.org
-> > > > > Subject: Re: [RFCv3 PATCH 1/6] uacce: Add documents for WarpDrive/uacce
-> > > > > User-Agent: Mutt/1.10.1 (2018-07-13)
-> > > > > Message-ID: <20181115145455.GN3759@mtr-leonro.mtl.com>
-> > > > >
-> > > > > On Thu, Nov 15, 2018 at 04:51:09PM +0800, Kenneth Lee wrote:
-> > > > > > On Wed, Nov 14, 2018 at 06:00:17PM +0200, Leon Romanovsky wrote:
-> > > > > > > Date: Wed, 14 Nov 2018 18:00:17 +0200
-> > > > > > > From: Leon Romanovsky <leon@kernel.org>
-> > > > > > > To: Kenneth Lee <nek.in.cn@gmail.com>
-> > > > > > > CC: Tim Sell <timothy.sell@unisys.com>, linux-doc@vger.kernel.org,
-> > > > > > >  Alexander Shishkin <alexander.shishkin@linux.intel.com>, Zaibo Xu
-> > > > > > >  <xuzaibo@huawei.com>, zhangfei.gao@foxmail.com, linuxarm@huawei.com,
-> > > > > > >  haojian.zhuang@linaro.org, Christoph Lameter <cl@linux.com>, Hao Fang
-> > > > > > >  <fanghao11@huawei.com>, Gavin Schenk <g.schenk@eckelmann.de>, RDMA mailing
-> > > > > > >  list <linux-rdma@vger.kernel.org>, Zhou Wang <wangzhou1@hisilicon.com>,
-> > > > > > >  Jason Gunthorpe <jgg@ziepe.ca>, Doug Ledford <dledford@redhat.com>, Uwe
-> > > > > > >  Kleine-König <u.kleine-koenig@pengutronix.de>, David Kershner
-> > > > > > >  <david.kershner@unisys.com>, Johan Hovold <johan@kernel.org>, Cyrille
-> > > > > > >  Pitchen <cyrille.pitchen@free-electrons.com>, Sagar Dharia
-> > > > > > >  <sdharia@codeaurora.org>, Jens Axboe <axboe@kernel.dk>,
-> > > > > > >  guodong.xu@linaro.org, linux-netdev <netdev@vger.kernel.org>, Randy Dunlap
-> > > > > > >  <rdunlap@infradead.org>, linux-kernel@vger.kernel.org, Vinod Koul
-> > > > > > >  <vkoul@kernel.org>, linux-crypto@vger.kernel.org, Philippe Ombredanne
-> > > > > > >  <pombredanne@nexb.com>, Sanyog Kale <sanyog.r.kale@intel.com>, Kenneth Lee
-> > > > > > >  <liguozhu@hisilicon.com>, "David S. Miller" <davem@davemloft.net>,
-> > > > > > >  linux-accelerators@lists.ozlabs.org
-> > > > > > > Subject: Re: [RFCv3 PATCH 1/6] uacce: Add documents for WarpDrive/uacce
-> > > > > > > User-Agent: Mutt/1.10.1 (2018-07-13)
-> > > > > > > Message-ID: <20181114160017.GI3759@mtr-leonro.mtl.com>
-> > > > > > >
-> > > > > > > On Wed, Nov 14, 2018 at 10:58:09AM +0800, Kenneth Lee wrote:
-> > > > > > > >
-> > > > > > > > 在 2018/11/13 上午8:23, Leon Romanovsky 写道:
-> > > > > > > > > On Mon, Nov 12, 2018 at 03:58:02PM +0800, Kenneth Lee wrote:
-> > > > > > > > > > From: Kenneth Lee <liguozhu@hisilicon.com>
-> > > > > > > > > >
-> > > > > > > > > > WarpDrive is a general accelerator framework for the user application to
-> > > > > > > > > > access the hardware without going through the kernel in data path.
-> > > > > > > > > >
-> > > > > > > > > > The kernel component to provide kernel facility to driver for expose the
-> > > > > > > > > > user interface is called uacce. It a short name for
-> > > > > > > > > > "Unified/User-space-access-intended Accelerator Framework".
-> > > > > > > > > >
-> > > > > > > > > > This patch add document to explain how it works.
-> > > > > > > > > + RDMA and netdev folks
-> > > > > > > > >
-> > > > > > > > > Sorry, to be late in the game, I don't see other patches, but from
-> > > > > > > > > the description below it seems like you are reinventing RDMA verbs
-> > > > > > > > > model. I have hard time to see the differences in the proposed
-> > > > > > > > > framework to already implemented in drivers/infiniband/* for the kernel
-> > > > > > > > > space and for the https://github.com/linux-rdma/rdma-core/ for the user
-> > > > > > > > > space parts.
-> > > > > > > >
-> > > > > > > > Thanks Leon,
-> > > > > > > >
-> > > > > > > > Yes, we tried to solve similar problem in RDMA. We also learned a lot from
-> > > > > > > > the exist code of RDMA. But we we have to make a new one because we cannot
-> > > > > > > > register accelerators such as AI operation, encryption or compression to the
-> > > > > > > > RDMA framework:)
-> > > > > > >
-> > > > > > > Assuming that you did everything right and still failed to use RDMA
-> > > > > > > framework, you was supposed to fix it and not to reinvent new exactly
-> > > > > > > same one. It is how we develop kernel, by reusing existing code.
-> > > > > >
-> > > > > > Yes, but we don't force other system such as NIC or GPU into RDMA, do we?
-> > > > >
-> > > > > You don't introduce new NIC or GPU, but proposing another interface to
-> > > > > directly access HW memory and bypass kernel for the data path. This is
-> > > > > whole idea of RDMA and this is why it is already present in the kernel.
-> > > > >
-> > > > > Various hardware devices are supported in our stack allow a ton of crazy
-> > > > > stuff, including GPUs interconnections and NIC functionalities.
-> > > >
-> > > > Yes. We don't want to invent new wheel. That is why we did it behind VFIO in RFC
-> > > > v1 and v2. But finally we were persuaded by Mr. Jerome Glisse that VFIO was not
-> > > > a good place to solve the problem.
-> > 
-> > I saw a couple of his responses, he constantly said to you that you are
-> > reinventing the wheel.
-> > https://lore.kernel.org/lkml/20180904150019.GA4024@redhat.com/
-> > 
-> 
-> No. I think he asked me did not create trouble in VFIO but just use common
-> interface from dma_buf and iommu itself. That is exactly what I am doing.
-> 
-> > > >
-> > > > And currently, as you see, IB is bound with devices doing RDMA. The register
-> > > > function, ib_register_device() hint that it is a netdev (get_netdev() callback), it know
-> > > > about gid, pkey, and Memory Window. IB is not simply a address space management
-> > > > framework. And verbs to IB are not transparent. If we start to add
-> > > > compression/decompression, AI (RNN, CNN stuff) operations, and encryption/decryption
-> > > > to the verbs set. It will become very complexity. Or maybe I misunderstand the
-> > > > IB idea? But I don't see compression hardware is integrated in the mainline
-> > > > Kernel. Could you directly point out which one I can used as a reference?
-> > > >
-> > 
-> > I strongly advise you to read the code, not all drivers are implementing
-> > gids, pkeys and get_netdev() callback.
-> > 
-> > Yes, you are misunderstanding drivers/infiniband subsystem. We have
-> > plenty options to expose APIs to the user space applications, starting
-> > from standard verbs API and ending with private objects which are
-> > understandable by specific device/driver.
-> > 
-> > IB stack provides secure FD to access device, by creating context,
-> > after that you can send direct commands to the FW (see mlx5 DEVX
-> > or hfi1) in sane way.
-> > 
-> > So actually, you will need to register your device, declare your own
-> > set of objects (similar to mlx5 include/uapi/rdma/mlx5_user_ioctl_*.h).
-> > 
-> > In regards to reference of compression hardware, I don't have.
-> > But there is an example of how T10-DIF can be implemented in verbs
-> > layer:
-> > https://www.openfabrics.org/images/2018workshop/presentations/307_TOved_T10-DIFOffload.pdf
-> > Or IPsec crypto:
-> > https://www.spinics.net/lists/linux-rdma/msg48906.html
-> > 
-> 
-> OK. I will spend some time on it first. But according to current discussion,
-> Don't you think I should avoid all these complexities but simply use SVM/SVA on
-> iommu or let the user application use the kernel-allocated VMA and page? It
-> does not create anything new. Just a new user of IOMMU and its SVM/SVA
-> capability.
-> 
+From: Eric Biggers <ebiggers@google.com>
 
-Hi, Leon,
+In preparation for adding XChaCha12 support, rename/refactor the x86_64
+SIMD implementations of ChaCha20 to support different numbers of rounds.
 
-I have done some architecture and code study to the IB solution these days. Now
-I understand why you said WarpDrive was another wheel of IB. At the very
-beginning when I understood the verbs concept, I had the same feeling.  But when
-I considered to merge them together, I finally found that it would be a disaster
-to both of them if we do so.
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ arch/x86/crypto/Makefile                      |   6 +-
+ ...a20-avx2-x86_64.S => chacha-avx2-x86_64.S} |  33 +++---
+ ...0-ssse3-x86_64.S => chacha-ssse3-x86_64.S} |  41 ++++---
+ .../crypto/{chacha20_glue.c => chacha_glue.c} | 110 +++++++++---------
+ 4 files changed, 97 insertions(+), 93 deletions(-)
+ rename arch/x86/crypto/{chacha20-avx2-x86_64.S => chacha-avx2-x86_64.S} (97%)
+ rename arch/x86/crypto/{chacha20-ssse3-x86_64.S => chacha-ssse3-x86_64.S} (96%)
+ rename arch/x86/crypto/{chacha20_glue.c => chacha_glue.c} (56%)
 
-As my understanding, the idea of IB is to manage share memory among "peers".
-Verbs are to help the peers to communicate to each other with these share
-memory, which is wrapped as MRs. The benefit of IB framework itself is to
-provide the communication channel in most efficiency way. To do so, it let the
-user process send the communicating data to the hardware directly.
-
-While the idea of WD is simply to provide a channel between the process and the
-LOCAL devices and let them share "address space", rather than "memory region".
-
-We can take the device of WD accelerator as a "peer" in IB. But then most of the
-semantics in verbs will become worthless, e.g. IBV_WR_RDMA_READ/WRITE. As a
-local system, you just need to read or write to it, you don't need to "tell" you
-are writing to it:). The semantics of verbs hint MRs are remote.
-
-We can also invent a new "local dma" semantics to the original MRs  semantic
-space. But it is worthless, because it has already provided.  Further, it bring
-no benefit to the current IB users.
-
-In another way, WD get very few benefit by integrating into IB framework
-either. The verb interface provides a standard interface for memory operation.
-But WD only need a pure message channel between the process and the device, it
-dose not intercept between them. The ODP feature will be provided by IOMMU
-framework if Jean's patchset is upstreamed, we don't need to get it from IB.
-Moreover, ODP simply provides the "fault from device" feature. But WD can also be
-benefit from the "share page table" feature, but which does no good to IB.
-
-Please understand I have no any motivation to reinvent anything. As a software
-architect for 10+ years and coder for 20+ years. I fully understand how hard to
-make a module mature. It is not simply the problem of effort. But I also
-understand that what is going to happen if we merge improper requirement to a
-exist module. I don't think it is wise to merge WD into IB. It hurts both.
-
-So would you change your previous conclusion?
-
-Cheers
--Kenneth
-
-> > > > >
-> > > > > >
-> > > > > > I assume you would not agree to register a zip accelerator to infiniband? :)
-> > > > >
-> > > > > "infiniband" name in the "drivers/infiniband/" is legacy one and the
-> > > > > current code supports IB, RoCE, iWARP and OmniPath as a transport layers.
-> > > > > For a lone time, we wanted to rename that folder to be "drivers/rdma",
-> > > > > but didn't find enough brave men/women to do it, due to backport mess
-> > > > > for such move.
-> > > > >
-> > > > > The addition of zip accelerator to RDMA is possible and depends on how
-> > > > > you will model such new functionality - new driver, or maybe new ULP.
-> > > > >
-> > > > > >
-> > > > > > Further, I don't think it is wise to break an exist system (RDMA) to fulfill a
-> > > > > > totally new scenario. The better choice is to let them run in parallel for some
-> > > > > > time and try to merge them accordingly.
-> > > > >
-> > > > > Awesome, so please run your code out-of-tree for now and once you are ready
-> > > > > for submission let's try to merge it.
-> > > >
-> > > > Yes, yes. We know trust need time to gain. But the fact is that there is no
-> > > > accelerator user driver can be added to mainline kernel. We should raise the
-> > > > topic time to time. So to help the communication to fix the gap, right?
-> > > >
-> > > > We are also opened to cooperate with IB to do it within the IB framework. But
-> > > > please let me know where to start. I feel it is quite wired to make a
-> > > > ib_register_device for a zip or RSA accelerator.
-> > 
-> > Most of ib_ prefixes in drivers/infinband/ are legacy names. You can
-> > rename them to be rdma_register_device() if it helps.
-> > 
-> > So from implementation point of view, as I wrote above.
-> > Create minimal driver to register, expose MR to user space, add your own
-> > objects and capabilities through our new KABI and implement user space part
-> > in github.com/linux-rdma/rdma-core.
-> 
-> I don't think it is just a name. But anyway, let me spend some time to try the
-> possibility.
-> 
-> > 
-> > > >
-> > > > >
-> > > > > >
-> > > > > > >
-> > > > > > > >
-> > > > > > > > Another problem we tried to address is the way to pin the memory for dma
-> > > > > > > > operation. The RDMA way to pin the memory cannot avoid the page lost due to
-> > > > > > > > copy-on-write operation during the memory is used by the device. This may
-> > > > > > > > not be important to RDMA library. But it is important to accelerator.
-> > > > > > >
-> > > > > > > Such support exists in drivers/infiniband/ from late 2014 and
-> > > > > > > it is called ODP (on demand paging).
-> > > > > >
-> > > > > > I reviewed ODP and I think it is a solution bound to infiniband. It is part of
-> > > > > > MR semantics and required a infiniband specific hook
-> > > > > > (ucontext->invalidate_range()). And the hook requires the device to be able to
-> > > > > > stop using the page for a while for the copying. It is ok for infiniband
-> > > > > > (actually, only mlx5 uses it). I don't think most accelerators can support
-> > > > > > this mode. But WarpDrive works fully on top of IOMMU interface, it has no this
-> > > > > > limitation.
-> > > > >
-> > > > > 1. It has nothing to do with infiniband.
-> > > >
-> > > > But it must be a ib_dev first.
-> > 
-> > It is just a name.
-> > 
-> > > >
-> > > > > 2. MR and uncontext are verbs semantics and needed to ensure that host
-> > > > > memory exposed to user is properly protected from security point of view.
-> > > > > 3. "stop using the page for a while for the copying" - I'm not fully
-> > > > > understand this claim, maybe this article will help you to better
-> > > > > describe : https://lwn.net/Articles/753027/
-> > > >
-> > > > This topic was being discussed in RFCv2. The key problem here is that:
-> > > >
-> > > > The device need to hold the memory for its own calculation, but the CPU/software
-> > > > want to stop it for a while for synchronizing with disk or COW.
-> > > >
-> > > > If the hardware support SVM/SVA (Shared Virtual Memory/Address), it is easy, the
-> > > > device share page table with CPU, the device will raise a page fault when the
-> > > > CPU downgrade the PTE to read-only.
-> > > >
-> > > > If the hardware cannot share page table with the CPU, we then need to have
-> > > > some way to change the device page table. This is what happen in ODP. It
-> > > > invalidates the page table in device upon mmu_notifier call back. But this cannot
-> > > > solve the COW problem: if the user process A share a page P with device, and A
-> > > > forks a new process B, and it continue to write to the page. By COW, the
-> > > > process B will keep the page P, while A will get a new page P'. But you have
-> > > > no way to let the device know it should use P' rather than P.
-> > 
-> > I didn't hear about such issue and we supported fork for a long time.
-> > 
-> > > >
-> > > > This may be OK for RDMA application. Because RDMA is a big thing and we can ask
-> > > > the programmer to avoid the situation. But for a accelerator, I don't think we
-> > > > can ask a programmer to care for this when use a zlib.
-> > > >
-> > > > In WarpDrive/uacce, we make this simple. If you support IOMMU and it support
-> > > > SVM/SVA. Everything will be fine just like ODP implicit mode. And you don't need
-> > > > to write any code for that. Because it has been done by IOMMU framework. If it
-> > > > dose not, you have to use the kernel allocated memory which has the same IOVA as
-> > > > the VA in user space. So we can still maintain a unify address space among the
-> > > > devices and the applicatin.
-> > > >
-> > > > > 4. mlx5 supports ODP not because of being partially IB device,
-> > > > > but because HW performance oriented implementation is not an easy task.
-> > > > >
-> > > > > >
-> > > > > > >
-> > > > > > > >
-> > > > > > > > Hope this can help the understanding.
-> > > > > > >
-> > > > > > > Yes, it helped me a lot.
-> > > > > > > Now, I'm more than before convinced that this whole patchset shouldn't
-> > > > > > > exist in the first place.
-> > > > > >
-> > > > > > Then maybe you can tell me how I can register my accelerator to the user space?
-> > > > >
-> > > > > Write kernel driver and write user space part of it.
-> > > > > https://github.com/linux-rdma/rdma-core/
-> > > > >
-> > > > > I have no doubts that your colleagues who wrote and maintain
-> > > > > drivers/infiniband/hw/hns driver know best how to do it.
-> > > > > They did it very successfully.
-> > > > >
-> > > > > Thanks
-> > > > >
-> > > > > >
-> > > > > > >
-> > > > > > > To be clear, NAK.
-> > > > > > >
-> > > > > > > Thanks
-> > > > > > >
-> > > > > > > >
-> > > > > > > > Cheers
-> > > > > > > >
-> > > > > > > > >
-> > > > > > > > > Hard NAK from RDMA side.
-> > > > > > > > >
-> > > > > > > > > Thanks
-> > > > > > > > >
-[...]
+diff --git a/arch/x86/crypto/Makefile b/arch/x86/crypto/Makefile
+index 006433da45f8c..164b4e792e8d2 100644
+--- a/arch/x86/crypto/Makefile
++++ b/arch/x86/crypto/Makefile
+@@ -23,7 +23,7 @@ obj-$(CONFIG_CRYPTO_CAMELLIA_X86_64) += camellia-x86_64.o
+ obj-$(CONFIG_CRYPTO_BLOWFISH_X86_64) += blowfish-x86_64.o
+ obj-$(CONFIG_CRYPTO_TWOFISH_X86_64) += twofish-x86_64.o
+ obj-$(CONFIG_CRYPTO_TWOFISH_X86_64_3WAY) += twofish-x86_64-3way.o
+-obj-$(CONFIG_CRYPTO_CHACHA20_X86_64) += chacha20-x86_64.o
++obj-$(CONFIG_CRYPTO_CHACHA20_X86_64) += chacha-x86_64.o
+ obj-$(CONFIG_CRYPTO_SERPENT_SSE2_X86_64) += serpent-sse2-x86_64.o
+ obj-$(CONFIG_CRYPTO_AES_NI_INTEL) += aesni-intel.o
+ obj-$(CONFIG_CRYPTO_GHASH_CLMUL_NI_INTEL) += ghash-clmulni-intel.o
+@@ -77,7 +77,7 @@ camellia-x86_64-y := camellia-x86_64-asm_64.o camellia_glue.o
+ blowfish-x86_64-y := blowfish-x86_64-asm_64.o blowfish_glue.o
+ twofish-x86_64-y := twofish-x86_64-asm_64.o twofish_glue.o
+ twofish-x86_64-3way-y := twofish-x86_64-asm_64-3way.o twofish_glue_3way.o
+-chacha20-x86_64-y := chacha20-ssse3-x86_64.o chacha20_glue.o
++chacha-x86_64-y := chacha-ssse3-x86_64.o chacha_glue.o
+ serpent-sse2-x86_64-y := serpent-sse2-x86_64-asm_64.o serpent_sse2_glue.o
+ 
+ aegis128-aesni-y := aegis128-aesni-asm.o aegis128-aesni-glue.o
+@@ -102,7 +102,7 @@ endif
+ 
+ ifeq ($(avx2_supported),yes)
+ 	camellia-aesni-avx2-y := camellia-aesni-avx2-asm_64.o camellia_aesni_avx2_glue.o
+-	chacha20-x86_64-y += chacha20-avx2-x86_64.o
++	chacha-x86_64-y += chacha-avx2-x86_64.o
+ 	serpent-avx2-y := serpent-avx2-asm_64.o serpent_avx2_glue.o
+ 
+ 	morus1280-avx2-y := morus1280-avx2-asm.o morus1280-avx2-glue.o
+diff --git a/arch/x86/crypto/chacha20-avx2-x86_64.S b/arch/x86/crypto/chacha-avx2-x86_64.S
+similarity index 97%
+rename from arch/x86/crypto/chacha20-avx2-x86_64.S
+rename to arch/x86/crypto/chacha-avx2-x86_64.S
+index b6ab082be6572..32da1be9a3550 100644
+--- a/arch/x86/crypto/chacha20-avx2-x86_64.S
++++ b/arch/x86/crypto/chacha-avx2-x86_64.S
+@@ -1,5 +1,5 @@
+ /*
+- * ChaCha20 256-bit cipher algorithm, RFC7539, x64 AVX2 functions
++ * ChaCha 256-bit cipher algorithm, x64 AVX2 functions
+  *
+  * Copyright (C) 2015 Martin Willi
+  *
+@@ -38,13 +38,14 @@ CTR4BL:	.octa 0x00000000000000000000000000000002
+ 
+ .text
+ 
+-ENTRY(chacha20_2block_xor_avx2)
++ENTRY(chacha_2block_xor_avx2)
+ 	# %rdi: Input state matrix, s
+ 	# %rsi: up to 2 data blocks output, o
+ 	# %rdx: up to 2 data blocks input, i
+ 	# %rcx: input/output length in bytes
++	# %r8d: nrounds
+ 
+-	# This function encrypts two ChaCha20 blocks by loading the state
++	# This function encrypts two ChaCha blocks by loading the state
+ 	# matrix twice across four AVX registers. It performs matrix operations
+ 	# on four words in each matrix in parallel, but requires shuffling to
+ 	# rearrange the words after each round.
+@@ -68,7 +69,6 @@ ENTRY(chacha20_2block_xor_avx2)
+ 	vmovdqa		ROT16(%rip),%ymm5
+ 
+ 	mov		%rcx,%rax
+-	mov		$10,%ecx
+ 
+ .Ldoubleround:
+ 
+@@ -138,7 +138,7 @@ ENTRY(chacha20_2block_xor_avx2)
+ 	# x3 = shuffle32(x3, MASK(0, 3, 2, 1))
+ 	vpshufd		$0x39,%ymm3,%ymm3
+ 
+-	dec		%ecx
++	sub		$2,%r8d
+ 	jnz		.Ldoubleround
+ 
+ 	# o0 = i0 ^ (x0 + s0)
+@@ -228,15 +228,16 @@ ENTRY(chacha20_2block_xor_avx2)
+ 	lea		-8(%r10),%rsp
+ 	jmp		.Ldone2
+ 
+-ENDPROC(chacha20_2block_xor_avx2)
++ENDPROC(chacha_2block_xor_avx2)
+ 
+-ENTRY(chacha20_4block_xor_avx2)
++ENTRY(chacha_4block_xor_avx2)
+ 	# %rdi: Input state matrix, s
+ 	# %rsi: up to 4 data blocks output, o
+ 	# %rdx: up to 4 data blocks input, i
+ 	# %rcx: input/output length in bytes
++	# %r8d: nrounds
+ 
+-	# This function encrypts four ChaCha20 block by loading the state
++	# This function encrypts four ChaCha block by loading the state
+ 	# matrix four times across eight AVX registers. It performs matrix
+ 	# operations on four words in two matrices in parallel, sequentially
+ 	# to the operations on the four words of the other two matrices. The
+@@ -269,7 +270,6 @@ ENTRY(chacha20_4block_xor_avx2)
+ 	vmovdqa		ROT16(%rip),%ymm9
+ 
+ 	mov		%rcx,%rax
+-	mov		$10,%ecx
+ 
+ .Ldoubleround4:
+ 
+@@ -389,7 +389,7 @@ ENTRY(chacha20_4block_xor_avx2)
+ 	vpshufd		$0x39,%ymm3,%ymm3
+ 	vpshufd		$0x39,%ymm7,%ymm7
+ 
+-	dec		%ecx
++	sub		$2,%r8d
+ 	jnz		.Ldoubleround4
+ 
+ 	# o0 = i0 ^ (x0 + s0), first block
+@@ -533,15 +533,16 @@ ENTRY(chacha20_4block_xor_avx2)
+ 	lea		-8(%r10),%rsp
+ 	jmp		.Ldone4
+ 
+-ENDPROC(chacha20_4block_xor_avx2)
++ENDPROC(chacha_4block_xor_avx2)
+ 
+-ENTRY(chacha20_8block_xor_avx2)
++ENTRY(chacha_8block_xor_avx2)
+ 	# %rdi: Input state matrix, s
+ 	# %rsi: up to 8 data blocks output, o
+ 	# %rdx: up to 8 data blocks input, i
+ 	# %rcx: input/output length in bytes
++	# %r8d: nrounds
+ 
+-	# This function encrypts eight consecutive ChaCha20 blocks by loading
++	# This function encrypts eight consecutive ChaCha blocks by loading
+ 	# the state matrix in AVX registers eight times. As we need some
+ 	# scratch registers, we save the first four registers on the stack. The
+ 	# algorithm performs each operation on the corresponding word of each
+@@ -588,8 +589,6 @@ ENTRY(chacha20_8block_xor_avx2)
+ 	# x12 += counter values 0-3
+ 	vpaddd		%ymm1,%ymm12,%ymm12
+ 
+-	mov		$10,%ecx
+-
+ .Ldoubleround8:
+ 	# x0 += x4, x12 = rotl32(x12 ^ x0, 16)
+ 	vpaddd		0x00(%rsp),%ymm4,%ymm0
+@@ -775,7 +774,7 @@ ENTRY(chacha20_8block_xor_avx2)
+ 	vpsrld		$25,%ymm4,%ymm4
+ 	vpor		%ymm0,%ymm4,%ymm4
+ 
+-	dec		%ecx
++	sub		$2,%r8d
+ 	jnz		.Ldoubleround8
+ 
+ 	# x0..15[0-3] += s[0..15]
+@@ -1023,4 +1022,4 @@ ENTRY(chacha20_8block_xor_avx2)
+ 
+ 	jmp		.Ldone8
+ 
+-ENDPROC(chacha20_8block_xor_avx2)
++ENDPROC(chacha_8block_xor_avx2)
+diff --git a/arch/x86/crypto/chacha20-ssse3-x86_64.S b/arch/x86/crypto/chacha-ssse3-x86_64.S
+similarity index 96%
+rename from arch/x86/crypto/chacha20-ssse3-x86_64.S
+rename to arch/x86/crypto/chacha-ssse3-x86_64.S
+index 45e4ccdd9c98b..613f80ae98576 100644
+--- a/arch/x86/crypto/chacha20-ssse3-x86_64.S
++++ b/arch/x86/crypto/chacha-ssse3-x86_64.S
+@@ -1,5 +1,5 @@
+ /*
+- * ChaCha20 256-bit cipher algorithm, RFC7539, x64 SSSE3 functions
++ * ChaCha 256-bit cipher algorithm, x64 SSSE3 functions
+  *
+  * Copyright (C) 2015 Martin Willi
+  *
+@@ -24,7 +24,7 @@ CTRINC:	.octa 0x00000003000000020000000100000000
+ .text
+ 
+ /*
+- * chacha20_permute - permute one block
++ * chacha_permute - permute one block
+  *
+  * Permute one 64-byte block where the state matrix is in %xmm0-%xmm3.  This
+  * function performs matrix operations on four words in parallel, but requires
+@@ -32,13 +32,14 @@ CTRINC:	.octa 0x00000003000000020000000100000000
+  * done with the slightly better performing SSSE3 byte shuffling, 7/12-bit word
+  * rotation uses traditional shift+OR.
+  *
+- * Clobbers: %ecx, %xmm4-%xmm7
++ * The round count is given in %r8d.
++ *
++ * Clobbers: %r8d, %xmm4-%xmm7
+  */
+-chacha20_permute:
++chacha_permute:
+ 
+ 	movdqa		ROT8(%rip),%xmm4
+ 	movdqa		ROT16(%rip),%xmm5
+-	mov		$10,%ecx
+ 
+ .Ldoubleround:
+ 	# x0 += x1, x3 = rotl32(x3 ^ x0, 16)
+@@ -107,17 +108,18 @@ chacha20_permute:
+ 	# x3 = shuffle32(x3, MASK(0, 3, 2, 1))
+ 	pshufd		$0x39,%xmm3,%xmm3
+ 
+-	dec		%ecx
++	sub		$2,%r8d
+ 	jnz		.Ldoubleround
+ 
+ 	ret
+-ENDPROC(chacha20_permute)
++ENDPROC(chacha_permute)
+ 
+-ENTRY(chacha20_block_xor_ssse3)
++ENTRY(chacha_block_xor_ssse3)
+ 	# %rdi: Input state matrix, s
+ 	# %rsi: up to 1 data block output, o
+ 	# %rdx: up to 1 data block input, i
+ 	# %rcx: input/output length in bytes
++	# %r8d: nrounds
+ 
+ 	# x0..3 = s0..3
+ 	movdqa		0x00(%rdi),%xmm0
+@@ -130,7 +132,7 @@ ENTRY(chacha20_block_xor_ssse3)
+ 	movdqa		%xmm3,%xmm11
+ 
+ 	mov		%rcx,%rax
+-	call		chacha20_permute
++	call		chacha_permute
+ 
+ 	# o0 = i0 ^ (x0 + s0)
+ 	paddd		%xmm8,%xmm0
+@@ -196,32 +198,35 @@ ENTRY(chacha20_block_xor_ssse3)
+ 	lea		-8(%r10),%rsp
+ 	jmp		.Ldone
+ 
+-ENDPROC(chacha20_block_xor_ssse3)
++ENDPROC(chacha_block_xor_ssse3)
+ 
+-ENTRY(hchacha20_block_ssse3)
++ENTRY(hchacha_block_ssse3)
+ 	# %rdi: Input state matrix, s
+ 	# %rsi: output (8 32-bit words)
++	# %edx: nrounds
+ 
+ 	movdqa		0x00(%rdi),%xmm0
+ 	movdqa		0x10(%rdi),%xmm1
+ 	movdqa		0x20(%rdi),%xmm2
+ 	movdqa		0x30(%rdi),%xmm3
+ 
+-	call		chacha20_permute
++	mov		%edx,%r8d
++	call		chacha_permute
+ 
+ 	movdqu		%xmm0,0x00(%rsi)
+ 	movdqu		%xmm3,0x10(%rsi)
+ 
+ 	ret
+-ENDPROC(hchacha20_block_ssse3)
++ENDPROC(hchacha_block_ssse3)
+ 
+-ENTRY(chacha20_4block_xor_ssse3)
++ENTRY(chacha_4block_xor_ssse3)
+ 	# %rdi: Input state matrix, s
+ 	# %rsi: up to 4 data blocks output, o
+ 	# %rdx: up to 4 data blocks input, i
+ 	# %rcx: input/output length in bytes
++	# %r8d: nrounds
+ 
+-	# This function encrypts four consecutive ChaCha20 blocks by loading the
++	# This function encrypts four consecutive ChaCha blocks by loading the
+ 	# the state matrix in SSE registers four times. As we need some scratch
+ 	# registers, we save the first four registers on the stack. The
+ 	# algorithm performs each operation on the corresponding word of each
+@@ -274,8 +279,6 @@ ENTRY(chacha20_4block_xor_ssse3)
+ 	# x12 += counter values 0-3
+ 	paddd		%xmm1,%xmm12
+ 
+-	mov		$10,%ecx
+-
+ .Ldoubleround4:
+ 	# x0 += x4, x12 = rotl32(x12 ^ x0, 16)
+ 	movdqa		0x00(%rsp),%xmm0
+@@ -493,7 +496,7 @@ ENTRY(chacha20_4block_xor_ssse3)
+ 	psrld		$25,%xmm4
+ 	por		%xmm0,%xmm4
+ 
+-	dec		%ecx
++	sub		$2,%r8d
+ 	jnz		.Ldoubleround4
+ 
+ 	# x0[0-3] += s0[0]
+@@ -784,4 +787,4 @@ ENTRY(chacha20_4block_xor_ssse3)
+ 
+ 	jmp		.Ldone4
+ 
+-ENDPROC(chacha20_4block_xor_ssse3)
++ENDPROC(chacha_4block_xor_ssse3)
+diff --git a/arch/x86/crypto/chacha20_glue.c b/arch/x86/crypto/chacha_glue.c
+similarity index 56%
+rename from arch/x86/crypto/chacha20_glue.c
+rename to arch/x86/crypto/chacha_glue.c
+index ca85b5d2c4751..c643993a29c9f 100644
+--- a/arch/x86/crypto/chacha20_glue.c
++++ b/arch/x86/crypto/chacha_glue.c
+@@ -1,5 +1,6 @@
+ /*
+- * ChaCha20 256-bit cipher algorithm, RFC7539, SIMD glue code
++ * x64 SIMD accelerated ChaCha and XChaCha stream ciphers,
++ * including ChaCha20 (RFC7539)
+  *
+  * Copyright (C) 2015 Martin Willi
+  *
+@@ -17,85 +18,85 @@
+ #include <asm/fpu/api.h>
+ #include <asm/simd.h>
+ 
+-#define CHACHA20_STATE_ALIGN 16
++#define CHACHA_STATE_ALIGN 16
+ 
+-asmlinkage void chacha20_block_xor_ssse3(u32 *state, u8 *dst, const u8 *src,
+-					 unsigned int len);
+-asmlinkage void chacha20_4block_xor_ssse3(u32 *state, u8 *dst, const u8 *src,
+-					  unsigned int len);
+-asmlinkage void hchacha20_block_ssse3(const u32 *state, u32 *out);
++asmlinkage void chacha_block_xor_ssse3(u32 *state, u8 *dst, const u8 *src,
++				       unsigned int len, int nrounds);
++asmlinkage void chacha_4block_xor_ssse3(u32 *state, u8 *dst, const u8 *src,
++					unsigned int len, int nrounds);
++asmlinkage void hchacha_block_ssse3(const u32 *state, u32 *out, int nrounds);
+ #ifdef CONFIG_AS_AVX2
+-asmlinkage void chacha20_2block_xor_avx2(u32 *state, u8 *dst, const u8 *src,
+-					 unsigned int len);
+-asmlinkage void chacha20_4block_xor_avx2(u32 *state, u8 *dst, const u8 *src,
+-					 unsigned int len);
+-asmlinkage void chacha20_8block_xor_avx2(u32 *state, u8 *dst, const u8 *src,
+-					 unsigned int len);
+-static bool chacha20_use_avx2;
++asmlinkage void chacha_2block_xor_avx2(u32 *state, u8 *dst, const u8 *src,
++				       unsigned int len, int nrounds);
++asmlinkage void chacha_4block_xor_avx2(u32 *state, u8 *dst, const u8 *src,
++				       unsigned int len, int nrounds);
++asmlinkage void chacha_8block_xor_avx2(u32 *state, u8 *dst, const u8 *src,
++				       unsigned int len, int nrounds);
++static bool chacha_use_avx2;
+ #endif
+ 
+-static unsigned int chacha20_advance(unsigned int len, unsigned int maxblocks)
++static unsigned int chacha_advance(unsigned int len, unsigned int maxblocks)
+ {
+ 	len = min(len, maxblocks * CHACHA_BLOCK_SIZE);
+ 	return round_up(len, CHACHA_BLOCK_SIZE) / CHACHA_BLOCK_SIZE;
+ }
+ 
+-static void chacha20_dosimd(u32 *state, u8 *dst, const u8 *src,
+-			    unsigned int bytes)
++static void chacha_dosimd(u32 *state, u8 *dst, const u8 *src,
++			  unsigned int bytes, int nrounds)
+ {
+ #ifdef CONFIG_AS_AVX2
+-	if (chacha20_use_avx2) {
++	if (chacha_use_avx2) {
+ 		while (bytes >= CHACHA_BLOCK_SIZE * 8) {
+-			chacha20_8block_xor_avx2(state, dst, src, bytes);
++			chacha_8block_xor_avx2(state, dst, src, bytes, nrounds);
+ 			bytes -= CHACHA_BLOCK_SIZE * 8;
+ 			src += CHACHA_BLOCK_SIZE * 8;
+ 			dst += CHACHA_BLOCK_SIZE * 8;
+ 			state[12] += 8;
+ 		}
+ 		if (bytes > CHACHA_BLOCK_SIZE * 4) {
+-			chacha20_8block_xor_avx2(state, dst, src, bytes);
+-			state[12] += chacha20_advance(bytes, 8);
++			chacha_8block_xor_avx2(state, dst, src, bytes, nrounds);
++			state[12] += chacha_advance(bytes, 8);
+ 			return;
+ 		}
+ 		if (bytes > CHACHA_BLOCK_SIZE * 2) {
+-			chacha20_4block_xor_avx2(state, dst, src, bytes);
+-			state[12] += chacha20_advance(bytes, 4);
++			chacha_4block_xor_avx2(state, dst, src, bytes, nrounds);
++			state[12] += chacha_advance(bytes, 4);
+ 			return;
+ 		}
+ 		if (bytes > CHACHA_BLOCK_SIZE) {
+-			chacha20_2block_xor_avx2(state, dst, src, bytes);
+-			state[12] += chacha20_advance(bytes, 2);
++			chacha_2block_xor_avx2(state, dst, src, bytes, nrounds);
++			state[12] += chacha_advance(bytes, 2);
+ 			return;
+ 		}
+ 	}
+ #endif
+ 	while (bytes >= CHACHA_BLOCK_SIZE * 4) {
+-		chacha20_4block_xor_ssse3(state, dst, src, bytes);
++		chacha_4block_xor_ssse3(state, dst, src, bytes, nrounds);
+ 		bytes -= CHACHA_BLOCK_SIZE * 4;
+ 		src += CHACHA_BLOCK_SIZE * 4;
+ 		dst += CHACHA_BLOCK_SIZE * 4;
+ 		state[12] += 4;
+ 	}
+ 	if (bytes > CHACHA_BLOCK_SIZE) {
+-		chacha20_4block_xor_ssse3(state, dst, src, bytes);
+-		state[12] += chacha20_advance(bytes, 4);
++		chacha_4block_xor_ssse3(state, dst, src, bytes, nrounds);
++		state[12] += chacha_advance(bytes, 4);
+ 		return;
+ 	}
+ 	if (bytes) {
+-		chacha20_block_xor_ssse3(state, dst, src, bytes);
++		chacha_block_xor_ssse3(state, dst, src, bytes, nrounds);
+ 		state[12]++;
+ 	}
+ }
+ 
+-static int chacha20_simd_stream_xor(struct skcipher_request *req,
+-				    struct chacha_ctx *ctx, u8 *iv)
++static int chacha_simd_stream_xor(struct skcipher_request *req,
++				  struct chacha_ctx *ctx, u8 *iv)
+ {
+ 	struct skcipher_walk walk;
+ 	u32 *state, state_buf[16 + 2] __aligned(8);
+ 	int err;
+ 
+-	BUILD_BUG_ON(CHACHA20_STATE_ALIGN != 16);
+-	state = PTR_ALIGN(state_buf + 0, CHACHA20_STATE_ALIGN);
++	BUILD_BUG_ON(CHACHA_STATE_ALIGN != 16);
++	state = PTR_ALIGN(state_buf + 0, CHACHA_STATE_ALIGN);
+ 
+ 	err = skcipher_walk_virt(&walk, req, false);
+ 
+@@ -108,8 +109,8 @@ static int chacha20_simd_stream_xor(struct skcipher_request *req,
+ 			nbytes = round_down(nbytes, walk.stride);
+ 
+ 		kernel_fpu_begin();
+-		chacha20_dosimd(state, walk.dst.virt.addr, walk.src.virt.addr,
+-				nbytes);
++		chacha_dosimd(state, walk.dst.virt.addr, walk.src.virt.addr,
++			      nbytes, ctx->nrounds);
+ 		kernel_fpu_end();
+ 
+ 		err = skcipher_walk_done(&walk, walk.nbytes - nbytes);
+@@ -118,7 +119,7 @@ static int chacha20_simd_stream_xor(struct skcipher_request *req,
+ 	return err;
+ }
+ 
+-static int chacha20_simd(struct skcipher_request *req)
++static int chacha_simd(struct skcipher_request *req)
+ {
+ 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+ 	struct chacha_ctx *ctx = crypto_skcipher_ctx(tfm);
+@@ -126,10 +127,10 @@ static int chacha20_simd(struct skcipher_request *req)
+ 	if (req->cryptlen <= CHACHA_BLOCK_SIZE || !irq_fpu_usable())
+ 		return crypto_chacha_crypt(req);
+ 
+-	return chacha20_simd_stream_xor(req, ctx, req->iv);
++	return chacha_simd_stream_xor(req, ctx, req->iv);
+ }
+ 
+-static int xchacha20_simd(struct skcipher_request *req)
++static int xchacha_simd(struct skcipher_request *req)
+ {
+ 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+ 	struct chacha_ctx *ctx = crypto_skcipher_ctx(tfm);
+@@ -140,17 +141,18 @@ static int xchacha20_simd(struct skcipher_request *req)
+ 	if (req->cryptlen <= CHACHA_BLOCK_SIZE || !irq_fpu_usable())
+ 		return crypto_xchacha_crypt(req);
+ 
+-	BUILD_BUG_ON(CHACHA20_STATE_ALIGN != 16);
+-	state = PTR_ALIGN(state_buf + 0, CHACHA20_STATE_ALIGN);
++	BUILD_BUG_ON(CHACHA_STATE_ALIGN != 16);
++	state = PTR_ALIGN(state_buf + 0, CHACHA_STATE_ALIGN);
+ 	crypto_chacha_init(state, ctx, req->iv);
+ 
+ 	kernel_fpu_begin();
+-	hchacha20_block_ssse3(state, subctx.key);
++	hchacha_block_ssse3(state, subctx.key, ctx->nrounds);
+ 	kernel_fpu_end();
++	subctx.nrounds = ctx->nrounds;
+ 
+ 	memcpy(&real_iv[0], req->iv + 24, 8);
+ 	memcpy(&real_iv[8], req->iv + 16, 8);
+-	return chacha20_simd_stream_xor(req, &subctx, real_iv);
++	return chacha_simd_stream_xor(req, &subctx, real_iv);
+ }
+ 
+ static struct skcipher_alg algs[] = {
+@@ -167,8 +169,8 @@ static struct skcipher_alg algs[] = {
+ 		.ivsize			= CHACHA_IV_SIZE,
+ 		.chunksize		= CHACHA_BLOCK_SIZE,
+ 		.setkey			= crypto_chacha20_setkey,
+-		.encrypt		= chacha20_simd,
+-		.decrypt		= chacha20_simd,
++		.encrypt		= chacha_simd,
++		.decrypt		= chacha_simd,
+ 	}, {
+ 		.base.cra_name		= "xchacha20",
+ 		.base.cra_driver_name	= "xchacha20-simd",
+@@ -182,35 +184,35 @@ static struct skcipher_alg algs[] = {
+ 		.ivsize			= XCHACHA_IV_SIZE,
+ 		.chunksize		= CHACHA_BLOCK_SIZE,
+ 		.setkey			= crypto_chacha20_setkey,
+-		.encrypt		= xchacha20_simd,
+-		.decrypt		= xchacha20_simd,
++		.encrypt		= xchacha_simd,
++		.decrypt		= xchacha_simd,
+ 	},
+ };
+ 
+-static int __init chacha20_simd_mod_init(void)
++static int __init chacha_simd_mod_init(void)
+ {
+ 	if (!boot_cpu_has(X86_FEATURE_SSSE3))
+ 		return -ENODEV;
+ 
+ #ifdef CONFIG_AS_AVX2
+-	chacha20_use_avx2 = boot_cpu_has(X86_FEATURE_AVX) &&
+-			    boot_cpu_has(X86_FEATURE_AVX2) &&
+-			    cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM, NULL);
++	chacha_use_avx2 = boot_cpu_has(X86_FEATURE_AVX) &&
++			  boot_cpu_has(X86_FEATURE_AVX2) &&
++			  cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM, NULL);
+ #endif
+ 	return crypto_register_skciphers(algs, ARRAY_SIZE(algs));
+ }
+ 
+-static void __exit chacha20_simd_mod_fini(void)
++static void __exit chacha_simd_mod_fini(void)
+ {
+ 	crypto_unregister_skciphers(algs, ARRAY_SIZE(algs));
+ }
+ 
+-module_init(chacha20_simd_mod_init);
+-module_exit(chacha20_simd_mod_fini);
++module_init(chacha_simd_mod_init);
++module_exit(chacha_simd_mod_fini);
+ 
+ MODULE_LICENSE("GPL");
+ MODULE_AUTHOR("Martin Willi <martin@strongswan.org>");
+-MODULE_DESCRIPTION("chacha20 cipher algorithm, SIMD accelerated");
++MODULE_DESCRIPTION("ChaCha and XChaCha stream ciphers (x64 SIMD accelerated)");
+ MODULE_ALIAS_CRYPTO("chacha20");
+ MODULE_ALIAS_CRYPTO("chacha20-simd");
+ MODULE_ALIAS_CRYPTO("xchacha20");
+-- 
+2.19.2
