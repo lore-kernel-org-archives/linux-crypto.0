@@ -1,166 +1,324 @@
-Return-Path: <SRS0=r27M=OJ=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from ale.deltatee.com ([207.54.116.67]:41070 "EHLO ale.deltatee.com"
+Return-Path: <SRS0=p+N9=OH=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:49570 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726840AbeLAEQK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 30 Nov 2018 23:16:10 -0500
-From: Logan Gunthorpe <logang@deltatee.com>
-To: linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
-        linux-ntb@googlegroups.com, linux-crypto@vger.kernel.org,
-        linux-mm@kvack.org, Andrew Morton <akpm@linux-foundation.org>
-Cc: Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Andy Shevchenko <andy.shevchenko@gmail.com>,
-        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
-        Logan Gunthorpe <logang@deltatee.com>
-Date: Fri, 30 Nov 2018 10:06:00 -0700
-Message-Id: <20181130170606.17252-1-logang@deltatee.com>
+        id S1727218AbeK1Rrz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 28 Nov 2018 12:47:55 -0500
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org
+Cc: Paul Crowley <paulcrowley@google.com>,
+        Martin Willi <martin@strongswan.org>,
+        Milan Broz <gmazyland@gmail.com>,
+        "Jason A . Donenfeld" <Jason@zx2c4.com>,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH 4/6] crypto: x86/chacha20 - add XChaCha20 support
+Date: Tue, 27 Nov 2018 22:44:43 -0800
+Message-Id: <20181128064445.3813-5-ebiggers@kernel.org>
+In-Reply-To: <20181128064445.3813-1-ebiggers@kernel.org>
+References: <20181128064445.3813-1-ebiggers@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: [PATCH v24 0/6] Add io{read|write}64 to io-64-atomic headers
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This is resend number 5. In June, Andrew picked this up and it was in
-linux-next for a couple weeks. There were a couple problems that were
-identified and solved back then and I'd like to get the ball rolling
-again.
+From: Eric Biggers <ebiggers@google.com>
 
-Andrew, can you please pick this set up again so it can get into
-linux-next? Or let me know if there's something else I should do.
+Add an XChaCha20 implementation that is hooked up to the x86_64 SIMD
+implementation of ChaCha20.  This can be used by Adiantum.
 
-I've been try to get this in for 15 months and I'm getting a bit tired of
-submitting it repeatedly with no responses.
+An SSSE3 implementation of single-block HChaCha20 is also added so that
+XChaCha20 can use it rather than the generic implementation.  This
+required refactoring the ChaCha permutation into its own function.
 
-Thanks,
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ arch/x86/crypto/chacha20-ssse3-x86_64.S |  76 ++++++++++++------
+ arch/x86/crypto/chacha20_glue.c         | 101 ++++++++++++++++++------
+ crypto/Kconfig                          |  12 +--
+ 3 files changed, 130 insertions(+), 59 deletions(-)
 
-Logan
-
---
-
-Changes since v23:
-- Rebased onto v4.20-rc4 (No Changes)
-
-Changes since v22:
-- Rebased onto v4.20-rc1 (No Changes)
-
-Changes since v21:
-- Rebased onto v4.19-rc6 (No Changes)
-
-Changes since v20:
-- Rebased onto v4.19-rc3 (No Changes)
-
-Changes since v19:
-- Rebased onto v4.19-rc1 (No Changes)
-
-Changes since v18:
-- Dropped the CAAM patch as it was subtly wrong and broke when people
-  tested it in linux-next. Seeing the code is much trickier than it
-  appears, we'll leave it to its maintainers to clean it up,
-  should they chose.
-- Restored the ioread64/iowrite64 extern prototypes as despite
-  appearing to be unusued, they are in fact used in a rare corner case
-  by the caam driver on 64bit powerpc. This was reported by Guenter testing
-  on linux-next.
-- Rebased onto v4.18-rc4 (No Changes)
-
-Changes since v17:
-- Rebased onto v4.18-rc1 (No Changes)
-
-Changes since v16:
-- Rebased onto v4.17-rc4 (No Changes)
-
-Changes since v15:
-- Rebased onto v4.17-rc1, dropping the powerpc patches which were
-  picked up by Michael
-
-Changes since v14:
-- Rebased onto v4.16-rc7
-- Replace the first two patches so that instead of correcting the
-  endianness annotations we change to using writeX() and readX() with
-  swabX() calls. This makes the big-endian functions more symmetric
-  with the little-endian versions (with respect to barriers that are
-  not included in the raw functions). As a side effect, it also fixes
-  the kbuild warnings that the first two patches tried to address.
-
-Changes since v13:
-- Changed the subject of patch 0001 to correct a nit pointed out by Luc
-
-Changes since v12:
-- Rebased onto v4.16-rc6
-- Split patch 0001 into two and reworked the commit log as requested
-  by Luc Van Oostenryck
-
-Changes since v11:
-- Rebased onto v4.16-rc5
-- Added a patch (0001) to fix some old and new sparse warnings
-  that the kbuild robot warned about this cycle. The latest version
-  of sparse was required to reproduce these.
-- Added a patch (0002) to add io{read|write}64 to parisc which the kbuild
-  robot also found errors for this cycle
-
-Changes since v10:
-- Rebased onto v4.16-rc4, this droped the drm/tilcdc patch which was
-  picked up by that tree and is already in 4.16.
-
-Changes since v9:
-- Rebased onto v4.15-rc6
-- Fixed a couple of issues in the new version of the CAAM patch as
-  pointed out by Horia
-
-Changes since v8:
-- Rebased onto v4.15-rc2, as a result rewrote patch 7 seeing someone did
-  some similar cleanup in that area.
-- Added a patch to clean up the Switchtec NTB driver which landed in
-  v4.15-rc1
-
-Changes since v7:
-- Fix minor nits from Andy Shevchenko
-- Rebased onto v4.14-rc1
-
-Changes since v6:
- ** none **
-
-Changes since v5:
-- Added a fix to the tilcdc driver to ensure it doesn't use the
-  non-atomic operation. (This includes adding io{read|write}64[be]_is_nonatomic
-  defines).
-
-Changes since v4:
-- Add functions so the powerpc implementation of iomap.c compiles. (As
-  noticed by Horia)
-
-Changes since v3:
-
-- I noticed powerpc didn't use the appropriate functions seeing
-  readq/writeq were not defined when iomap.h was included. Thus I've
-  included a patch to adjust this
-- Fixed some mistakes with a couple of the defines in io-64-nonatomic*
-  headers
-- Fixed a typo noticed by Horia.
-
-(earlier versions were drastically different)
-
---
-
-Logan Gunthorpe (6):
-  iomap: Use non-raw io functions for io{read|write}XXbe
-  parisc: iomap: introduce io{read|write}64
-  iomap: introduce io{read|write}64_{lo_hi|hi_lo}
-  io-64-nonatomic: add io{read|write}64[be]{_lo_hi|_hi_lo} macros
-  ntb: ntb_hw_intel: use io-64-nonatomic instead of in-driver hacks
-  ntb: ntb_hw_switchtec: Cleanup 64bit IO defines to use the common
-    header
-
- arch/parisc/include/asm/io.h           |   9 ++
- arch/parisc/lib/iomap.c                |  64 +++++++++++
- arch/powerpc/include/asm/io.h          |   2 +
- drivers/ntb/hw/intel/ntb_hw_intel.h    |  30 +-----
- drivers/ntb/hw/mscc/ntb_hw_switchtec.c |  36 +------
- include/asm-generic/iomap.h            |  22 ++++
- include/linux/io-64-nonatomic-hi-lo.h  |  64 +++++++++++
- include/linux/io-64-nonatomic-lo-hi.h  |  64 +++++++++++
- lib/iomap.c                            | 140 ++++++++++++++++++++++++-
- 9 files changed, 366 insertions(+), 65 deletions(-)
-
---
-2.19.0
+diff --git a/arch/x86/crypto/chacha20-ssse3-x86_64.S b/arch/x86/crypto/chacha20-ssse3-x86_64.S
+index d8ac75bb448f9..45e4ccdd9c98b 100644
+--- a/arch/x86/crypto/chacha20-ssse3-x86_64.S
++++ b/arch/x86/crypto/chacha20-ssse3-x86_64.S
+@@ -23,37 +23,24 @@ CTRINC:	.octa 0x00000003000000020000000100000000
+ 
+ .text
+ 
+-ENTRY(chacha20_block_xor_ssse3)
+-	# %rdi: Input state matrix, s
+-	# %rsi: up to 1 data block output, o
+-	# %rdx: up to 1 data block input, i
+-	# %rcx: input/output length in bytes
+-
+-	# This function encrypts one ChaCha20 block by loading the state matrix
+-	# in four SSE registers. It performs matrix operation on four words in
+-	# parallel, but requires shuffling to rearrange the words after each
+-	# round. 8/16-bit word rotation is done with the slightly better
+-	# performing SSSE3 byte shuffling, 7/12-bit word rotation uses
+-	# traditional shift+OR.
+-
+-	# x0..3 = s0..3
+-	movdqa		0x00(%rdi),%xmm0
+-	movdqa		0x10(%rdi),%xmm1
+-	movdqa		0x20(%rdi),%xmm2
+-	movdqa		0x30(%rdi),%xmm3
+-	movdqa		%xmm0,%xmm8
+-	movdqa		%xmm1,%xmm9
+-	movdqa		%xmm2,%xmm10
+-	movdqa		%xmm3,%xmm11
++/*
++ * chacha20_permute - permute one block
++ *
++ * Permute one 64-byte block where the state matrix is in %xmm0-%xmm3.  This
++ * function performs matrix operations on four words in parallel, but requires
++ * shuffling to rearrange the words after each round.  8/16-bit word rotation is
++ * done with the slightly better performing SSSE3 byte shuffling, 7/12-bit word
++ * rotation uses traditional shift+OR.
++ *
++ * Clobbers: %ecx, %xmm4-%xmm7
++ */
++chacha20_permute:
+ 
+ 	movdqa		ROT8(%rip),%xmm4
+ 	movdqa		ROT16(%rip),%xmm5
+-
+-	mov		%rcx,%rax
+ 	mov		$10,%ecx
+ 
+ .Ldoubleround:
+-
+ 	# x0 += x1, x3 = rotl32(x3 ^ x0, 16)
+ 	paddd		%xmm1,%xmm0
+ 	pxor		%xmm0,%xmm3
+@@ -123,6 +110,28 @@ ENTRY(chacha20_block_xor_ssse3)
+ 	dec		%ecx
+ 	jnz		.Ldoubleround
+ 
++	ret
++ENDPROC(chacha20_permute)
++
++ENTRY(chacha20_block_xor_ssse3)
++	# %rdi: Input state matrix, s
++	# %rsi: up to 1 data block output, o
++	# %rdx: up to 1 data block input, i
++	# %rcx: input/output length in bytes
++
++	# x0..3 = s0..3
++	movdqa		0x00(%rdi),%xmm0
++	movdqa		0x10(%rdi),%xmm1
++	movdqa		0x20(%rdi),%xmm2
++	movdqa		0x30(%rdi),%xmm3
++	movdqa		%xmm0,%xmm8
++	movdqa		%xmm1,%xmm9
++	movdqa		%xmm2,%xmm10
++	movdqa		%xmm3,%xmm11
++
++	mov		%rcx,%rax
++	call		chacha20_permute
++
+ 	# o0 = i0 ^ (x0 + s0)
+ 	paddd		%xmm8,%xmm0
+ 	cmp		$0x10,%rax
+@@ -189,6 +198,23 @@ ENTRY(chacha20_block_xor_ssse3)
+ 
+ ENDPROC(chacha20_block_xor_ssse3)
+ 
++ENTRY(hchacha20_block_ssse3)
++	# %rdi: Input state matrix, s
++	# %rsi: output (8 32-bit words)
++
++	movdqa		0x00(%rdi),%xmm0
++	movdqa		0x10(%rdi),%xmm1
++	movdqa		0x20(%rdi),%xmm2
++	movdqa		0x30(%rdi),%xmm3
++
++	call		chacha20_permute
++
++	movdqu		%xmm0,0x00(%rsi)
++	movdqu		%xmm3,0x10(%rsi)
++
++	ret
++ENDPROC(hchacha20_block_ssse3)
++
+ ENTRY(chacha20_4block_xor_ssse3)
+ 	# %rdi: Input state matrix, s
+ 	# %rsi: up to 4 data blocks output, o
+diff --git a/arch/x86/crypto/chacha20_glue.c b/arch/x86/crypto/chacha20_glue.c
+index 5928fee7acdd4..ca85b5d2c4751 100644
+--- a/arch/x86/crypto/chacha20_glue.c
++++ b/arch/x86/crypto/chacha20_glue.c
+@@ -23,6 +23,7 @@ asmlinkage void chacha20_block_xor_ssse3(u32 *state, u8 *dst, const u8 *src,
+ 					 unsigned int len);
+ asmlinkage void chacha20_4block_xor_ssse3(u32 *state, u8 *dst, const u8 *src,
+ 					  unsigned int len);
++asmlinkage void hchacha20_block_ssse3(const u32 *state, u32 *out);
+ #ifdef CONFIG_AS_AVX2
+ asmlinkage void chacha20_2block_xor_avx2(u32 *state, u8 *dst, const u8 *src,
+ 					 unsigned int len);
+@@ -86,23 +87,19 @@ static void chacha20_dosimd(u32 *state, u8 *dst, const u8 *src,
+ 	}
+ }
+ 
+-static int chacha20_simd(struct skcipher_request *req)
++static int chacha20_simd_stream_xor(struct skcipher_request *req,
++				    struct chacha_ctx *ctx, u8 *iv)
+ {
+-	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+-	struct chacha_ctx *ctx = crypto_skcipher_ctx(tfm);
+-	u32 *state, state_buf[16 + 2] __aligned(8);
+ 	struct skcipher_walk walk;
++	u32 *state, state_buf[16 + 2] __aligned(8);
+ 	int err;
+ 
+ 	BUILD_BUG_ON(CHACHA20_STATE_ALIGN != 16);
+ 	state = PTR_ALIGN(state_buf + 0, CHACHA20_STATE_ALIGN);
+ 
+-	if (req->cryptlen <= CHACHA_BLOCK_SIZE || !may_use_simd())
+-		return crypto_chacha_crypt(req);
+-
+ 	err = skcipher_walk_virt(&walk, req, false);
+ 
+-	crypto_chacha_init(state, ctx, walk.iv);
++	crypto_chacha_init(state, ctx, iv);
+ 
+ 	while (walk.nbytes > 0) {
+ 		unsigned int nbytes = walk.nbytes;
+@@ -121,21 +118,73 @@ static int chacha20_simd(struct skcipher_request *req)
+ 	return err;
+ }
+ 
+-static struct skcipher_alg alg = {
+-	.base.cra_name		= "chacha20",
+-	.base.cra_driver_name	= "chacha20-simd",
+-	.base.cra_priority	= 300,
+-	.base.cra_blocksize	= 1,
+-	.base.cra_ctxsize	= sizeof(struct chacha_ctx),
+-	.base.cra_module	= THIS_MODULE,
+-
+-	.min_keysize		= CHACHA_KEY_SIZE,
+-	.max_keysize		= CHACHA_KEY_SIZE,
+-	.ivsize			= CHACHA_IV_SIZE,
+-	.chunksize		= CHACHA_BLOCK_SIZE,
+-	.setkey			= crypto_chacha20_setkey,
+-	.encrypt		= chacha20_simd,
+-	.decrypt		= chacha20_simd,
++static int chacha20_simd(struct skcipher_request *req)
++{
++	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
++	struct chacha_ctx *ctx = crypto_skcipher_ctx(tfm);
++
++	if (req->cryptlen <= CHACHA_BLOCK_SIZE || !irq_fpu_usable())
++		return crypto_chacha_crypt(req);
++
++	return chacha20_simd_stream_xor(req, ctx, req->iv);
++}
++
++static int xchacha20_simd(struct skcipher_request *req)
++{
++	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
++	struct chacha_ctx *ctx = crypto_skcipher_ctx(tfm);
++	struct chacha_ctx subctx;
++	u32 *state, state_buf[16 + 2] __aligned(8);
++	u8 real_iv[16];
++
++	if (req->cryptlen <= CHACHA_BLOCK_SIZE || !irq_fpu_usable())
++		return crypto_xchacha_crypt(req);
++
++	BUILD_BUG_ON(CHACHA20_STATE_ALIGN != 16);
++	state = PTR_ALIGN(state_buf + 0, CHACHA20_STATE_ALIGN);
++	crypto_chacha_init(state, ctx, req->iv);
++
++	kernel_fpu_begin();
++	hchacha20_block_ssse3(state, subctx.key);
++	kernel_fpu_end();
++
++	memcpy(&real_iv[0], req->iv + 24, 8);
++	memcpy(&real_iv[8], req->iv + 16, 8);
++	return chacha20_simd_stream_xor(req, &subctx, real_iv);
++}
++
++static struct skcipher_alg algs[] = {
++	{
++		.base.cra_name		= "chacha20",
++		.base.cra_driver_name	= "chacha20-simd",
++		.base.cra_priority	= 300,
++		.base.cra_blocksize	= 1,
++		.base.cra_ctxsize	= sizeof(struct chacha_ctx),
++		.base.cra_module	= THIS_MODULE,
++
++		.min_keysize		= CHACHA_KEY_SIZE,
++		.max_keysize		= CHACHA_KEY_SIZE,
++		.ivsize			= CHACHA_IV_SIZE,
++		.chunksize		= CHACHA_BLOCK_SIZE,
++		.setkey			= crypto_chacha20_setkey,
++		.encrypt		= chacha20_simd,
++		.decrypt		= chacha20_simd,
++	}, {
++		.base.cra_name		= "xchacha20",
++		.base.cra_driver_name	= "xchacha20-simd",
++		.base.cra_priority	= 300,
++		.base.cra_blocksize	= 1,
++		.base.cra_ctxsize	= sizeof(struct chacha_ctx),
++		.base.cra_module	= THIS_MODULE,
++
++		.min_keysize		= CHACHA_KEY_SIZE,
++		.max_keysize		= CHACHA_KEY_SIZE,
++		.ivsize			= XCHACHA_IV_SIZE,
++		.chunksize		= CHACHA_BLOCK_SIZE,
++		.setkey			= crypto_chacha20_setkey,
++		.encrypt		= xchacha20_simd,
++		.decrypt		= xchacha20_simd,
++	},
+ };
+ 
+ static int __init chacha20_simd_mod_init(void)
+@@ -148,12 +197,12 @@ static int __init chacha20_simd_mod_init(void)
+ 			    boot_cpu_has(X86_FEATURE_AVX2) &&
+ 			    cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM, NULL);
+ #endif
+-	return crypto_register_skcipher(&alg);
++	return crypto_register_skciphers(algs, ARRAY_SIZE(algs));
+ }
+ 
+ static void __exit chacha20_simd_mod_fini(void)
+ {
+-	crypto_unregister_skcipher(&alg);
++	crypto_unregister_skciphers(algs, ARRAY_SIZE(algs));
+ }
+ 
+ module_init(chacha20_simd_mod_init);
+@@ -164,3 +213,5 @@ MODULE_AUTHOR("Martin Willi <martin@strongswan.org>");
+ MODULE_DESCRIPTION("chacha20 cipher algorithm, SIMD accelerated");
+ MODULE_ALIAS_CRYPTO("chacha20");
+ MODULE_ALIAS_CRYPTO("chacha20-simd");
++MODULE_ALIAS_CRYPTO("xchacha20");
++MODULE_ALIAS_CRYPTO("xchacha20-simd");
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index e084e2fb6743b..ecfc10a3e9f3e 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -1468,19 +1468,13 @@ config CRYPTO_CHACHA20
+ 	  in some performance-sensitive scenarios.
+ 
+ config CRYPTO_CHACHA20_X86_64
+-	tristate "ChaCha20 cipher algorithm (x86_64/SSSE3/AVX2)"
++	tristate "ChaCha stream cipher algorithms (x86_64/SSSE3/AVX2)"
+ 	depends on X86 && 64BIT
+ 	select CRYPTO_BLKCIPHER
+ 	select CRYPTO_CHACHA20
+ 	help
+-	  ChaCha20 cipher algorithm, RFC7539.
+-
+-	  ChaCha20 is a 256-bit high-speed stream cipher designed by Daniel J.
+-	  Bernstein and further specified in RFC7539 for use in IETF protocols.
+-	  This is the x86_64 assembler implementation using SIMD instructions.
+-
+-	  See also:
+-	  <http://cr.yp.to/chacha/chacha-20080128.pdf>
++	  SSSE3 and AVX2 optimized implementations of the ChaCha20 and XChaCha20
++	  stream ciphers.
+ 
+ config CRYPTO_SEED
+ 	tristate "SEED cipher algorithm"
+-- 
+2.19.2
