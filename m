@@ -1,145 +1,54 @@
-Return-Path: <SRS0=vxh5=N7=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:38131 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729580AbeKTXCU (ORCPT
+Return-Path: <SRS0=WCFZ=OI=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:52898 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727406AbeK2RtH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 20 Nov 2018 18:02:20 -0500
-Received: by mail-wm1-f66.google.com with SMTP id k198so2058537wmd.3
-        for <linux-crypto@vger.kernel.org>; Tue, 20 Nov 2018 04:33:25 -0800 (PST)
-From: Corentin Labbe <clabbe@baylibre.com>
-To: davem@davemloft.net, ebiggers@kernel.org,
-        herbert@gondor.apana.org.au, nhorman@tuxdriver.com
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Corentin Labbe <clabbe@baylibre.com>
-Subject: [PATCH v3 05/10] crypto: tool: getstat: convert user space example to the new crypto_user_stat uapi
-Date: Tue, 20 Nov 2018 12:32:21 +0000
-Message-Id: <1542717146-34917-6-git-send-email-clabbe@baylibre.com>
-In-Reply-To: <1542717146-34917-1-git-send-email-clabbe@baylibre.com>
-References: <1542717146-34917-1-git-send-email-clabbe@baylibre.com>
+        Thu, 29 Nov 2018 12:49:07 -0500
+Date: Thu, 29 Nov 2018 14:44:46 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: "gongchen (E)" <gongchen4@huawei.com>
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "Chencheng (J)" <beyond.chen@huawei.com>,
+        "Yangjie (R)" <yangjie234@huawei.com>,
+        Fengzhiqiang <fengzhiqiang.feng@huawei.com>,
+        "shengyong (A)" <shengyong1@huawei.com>,
+        "Luoxinqiang (CBG)" <luoxinqiang2@huawei.com>,
+        "lipengcheng (C)" <lipengcheng8@huawei.com>
+Subject: Re: [Help] Null pointer exception in scatterwalk_start() in
+ kernel-4.9
+Message-ID: <20181129064445.x5pkqjqe5uy5wnsy@gondor.apana.org.au>
+References: <780FCA0995E39E408348187D2462E36A01557596@dggeml509-mbx.china.huawei.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <780FCA0995E39E408348187D2462E36A01557596@dggeml509-mbx.china.huawei.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch converts the getstat example tool to the recent changes done in crypto_user_stat
-- changed all stats to u64
-- separated struct stats for each crypto alg
+On Tue, Nov 20, 2018 at 07:09:53AM +0000, gongchen (E) wrote:
+> Hi Dear Herbert,
+> 
+>             Sorry to bother you , but we’ve met a problem in crypto module, would you please kindly help us look into it ? Thank you very much.
+> 
+>              In the below function chain, scatterwalk_start() doesn't check the result of sg_next(), so the kernel will crash if sg_next() returns a null pointer, which is our case. (The full stack is at the end of letter)
+>              blkcipher_walk_done()->scatterwalk_done()->scatterwalk_pagedone()->scatterwalk_start(walk, sg_next(walk->sg));
+>             
+>             Should we add a null-pointer-check in scatterwalk_start()? Or is there any process can ensure that there should be a valid sg pointer if the condition (walk->offset >= walk->sg->offset + walk->sg->length) is true?
+>                       
+>             We are really looking forward to your reply, any information will be appreciated , thanks again.
 
-Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
----
- tools/crypto/getstat.c | 54 +++++++++++++++++++++---------------------
- 1 file changed, 27 insertions(+), 27 deletions(-)
+Did you apply the following patch?
 
-diff --git a/tools/crypto/getstat.c b/tools/crypto/getstat.c
-index 24115173a483..57fbb94608d4 100644
---- a/tools/crypto/getstat.c
-+++ b/tools/crypto/getstat.c
-@@ -152,53 +152,53 @@ static int get_stat(const char *drivername)
- 
- 	if (tb[CRYPTOCFGA_STAT_HASH]) {
- 		struct rtattr *rta = tb[CRYPTOCFGA_STAT_HASH];
--		struct crypto_stat *rhash =
--			(struct crypto_stat *)RTA_DATA(rta);
--		printf("%s\tHash\n\tHash: %u bytes: %llu\n\tErrors: %u\n",
-+		struct crypto_stat_hash *rhash =
-+			(struct crypto_stat_hash *)RTA_DATA(rta);
-+		printf("%s\tHash\n\tHash: %llu bytes: %llu\n\tErrors: %llu\n",
- 			drivername,
- 			rhash->stat_hash_cnt, rhash->stat_hash_tlen,
- 			rhash->stat_hash_err_cnt);
- 	} else if (tb[CRYPTOCFGA_STAT_COMPRESS]) {
- 		struct rtattr *rta = tb[CRYPTOCFGA_STAT_COMPRESS];
--		struct crypto_stat *rblk =
--			(struct crypto_stat *)RTA_DATA(rta);
--		printf("%s\tCompress\n\tCompress: %u bytes: %llu\n\tDecompress: %u bytes: %llu\n\tErrors: %u\n",
-+		struct crypto_stat_compress *rblk =
-+			(struct crypto_stat_compress *)RTA_DATA(rta);
-+		printf("%s\tCompress\n\tCompress: %llu bytes: %llu\n\tDecompress: %llu bytes: %llu\n\tErrors: %llu\n",
- 			drivername,
- 			rblk->stat_compress_cnt, rblk->stat_compress_tlen,
- 			rblk->stat_decompress_cnt, rblk->stat_decompress_tlen,
- 			rblk->stat_compress_err_cnt);
- 	} else if (tb[CRYPTOCFGA_STAT_ACOMP]) {
- 		struct rtattr *rta = tb[CRYPTOCFGA_STAT_ACOMP];
--		struct crypto_stat *rcomp =
--			(struct crypto_stat *)RTA_DATA(rta);
--		printf("%s\tACompress\n\tCompress: %u bytes: %llu\n\tDecompress: %u bytes: %llu\n\tErrors: %u\n",
-+		struct crypto_stat_compress *rcomp =
-+			(struct crypto_stat_compress *)RTA_DATA(rta);
-+		printf("%s\tACompress\n\tCompress: %llu bytes: %llu\n\tDecompress: %llu bytes: %llu\n\tErrors: %llu\n",
- 			drivername,
- 			rcomp->stat_compress_cnt, rcomp->stat_compress_tlen,
- 			rcomp->stat_decompress_cnt, rcomp->stat_decompress_tlen,
- 			rcomp->stat_compress_err_cnt);
- 	} else if (tb[CRYPTOCFGA_STAT_AEAD]) {
- 		struct rtattr *rta = tb[CRYPTOCFGA_STAT_AEAD];
--		struct crypto_stat *raead =
--			(struct crypto_stat *)RTA_DATA(rta);
--		printf("%s\tAEAD\n\tEncrypt: %u bytes: %llu\n\tDecrypt: %u bytes: %llu\n\tErrors: %u\n",
-+		struct crypto_stat_aead *raead =
-+			(struct crypto_stat_aead *)RTA_DATA(rta);
-+		printf("%s\tAEAD\n\tEncrypt: %llu bytes: %llu\n\tDecrypt: %llu bytes: %llu\n\tErrors: %llu\n",
- 			drivername,
- 			raead->stat_encrypt_cnt, raead->stat_encrypt_tlen,
- 			raead->stat_decrypt_cnt, raead->stat_decrypt_tlen,
- 			raead->stat_aead_err_cnt);
- 	} else if (tb[CRYPTOCFGA_STAT_BLKCIPHER]) {
- 		struct rtattr *rta = tb[CRYPTOCFGA_STAT_BLKCIPHER];
--		struct crypto_stat *rblk =
--			(struct crypto_stat *)RTA_DATA(rta);
--		printf("%s\tCipher\n\tEncrypt: %u bytes: %llu\n\tDecrypt: %u bytes: %llu\n\tErrors: %u\n",
-+		struct crypto_stat_cipher *rblk =
-+			(struct crypto_stat_cipher *)RTA_DATA(rta);
-+		printf("%s\tCipher\n\tEncrypt: %llu bytes: %llu\n\tDecrypt: %llu bytes: %llu\n\tErrors: %llu\n",
- 			drivername,
- 			rblk->stat_encrypt_cnt, rblk->stat_encrypt_tlen,
- 			rblk->stat_decrypt_cnt, rblk->stat_decrypt_tlen,
- 			rblk->stat_cipher_err_cnt);
- 	} else if (tb[CRYPTOCFGA_STAT_AKCIPHER]) {
- 		struct rtattr *rta = tb[CRYPTOCFGA_STAT_AKCIPHER];
--		struct crypto_stat *rblk =
--			(struct crypto_stat *)RTA_DATA(rta);
--		printf("%s\tAkcipher\n\tEncrypt: %u bytes: %llu\n\tDecrypt: %u bytes: %llu\n\tSign: %u\n\tVerify: %u\n\tErrors: %u\n",
-+		struct crypto_stat_akcipher *rblk =
-+			(struct crypto_stat_akcipher *)RTA_DATA(rta);
-+		printf("%s\tAkcipher\n\tEncrypt: %llu bytes: %llu\n\tDecrypt: %llu bytes: %llu\n\tSign: %llu\n\tVerify: %llu\n\tErrors: %llu\n",
- 			drivername,
- 			rblk->stat_encrypt_cnt, rblk->stat_encrypt_tlen,
- 			rblk->stat_decrypt_cnt, rblk->stat_decrypt_tlen,
-@@ -206,27 +206,27 @@ static int get_stat(const char *drivername)
- 			rblk->stat_akcipher_err_cnt);
- 	} else if (tb[CRYPTOCFGA_STAT_CIPHER]) {
- 		struct rtattr *rta = tb[CRYPTOCFGA_STAT_CIPHER];
--		struct crypto_stat *rblk =
--			(struct crypto_stat *)RTA_DATA(rta);
--		printf("%s\tcipher\n\tEncrypt: %u bytes: %llu\n\tDecrypt: %u bytes: %llu\n\tErrors: %u\n",
-+		struct crypto_stat_cipher *rblk =
-+			(struct crypto_stat_cipher *)RTA_DATA(rta);
-+		printf("%s\tcipher\n\tEncrypt: %llu bytes: %llu\n\tDecrypt: %llu bytes: %llu\n\tErrors: %llu\n",
- 			drivername,
- 			rblk->stat_encrypt_cnt, rblk->stat_encrypt_tlen,
- 			rblk->stat_decrypt_cnt, rblk->stat_decrypt_tlen,
- 			rblk->stat_cipher_err_cnt);
- 	} else if (tb[CRYPTOCFGA_STAT_RNG]) {
- 		struct rtattr *rta = tb[CRYPTOCFGA_STAT_RNG];
--		struct crypto_stat *rrng =
--			(struct crypto_stat *)RTA_DATA(rta);
--		printf("%s\tRNG\n\tSeed: %u\n\tGenerate: %u bytes: %llu\n\tErrors: %u\n",
-+		struct crypto_stat_rng *rrng =
-+			(struct crypto_stat_rng *)RTA_DATA(rta);
-+		printf("%s\tRNG\n\tSeed: %llu\n\tGenerate: %llu bytes: %llu\n\tErrors: %llu\n",
- 			drivername,
- 			rrng->stat_seed_cnt,
- 			rrng->stat_generate_cnt, rrng->stat_generate_tlen,
- 			rrng->stat_rng_err_cnt);
- 	} else if (tb[CRYPTOCFGA_STAT_KPP]) {
- 		struct rtattr *rta = tb[CRYPTOCFGA_STAT_KPP];
--		struct crypto_stat *rkpp =
--			(struct crypto_stat *)RTA_DATA(rta);
--		printf("%s\tKPP\n\tSetsecret: %u\n\tGenerate public key: %u\n\tCompute_shared_secret: %u\n\tErrors: %u\n",
-+		struct crypto_stat_kpp *rkpp =
-+			(struct crypto_stat_kpp *)RTA_DATA(rta);
-+		printf("%s\tKPP\n\tSetsecret: %llu\n\tGenerate public key: %llu\n\tCompute_shared_secret: %llu\n\tErrors: %llu\n",
- 			drivername,
- 			rkpp->stat_setsecret_cnt,
- 			rkpp->stat_generate_public_key_cnt,
+commit 0868def3e4100591e7a1fdbf3eed1439cc8f7ca3
+Author: Eric Biggers <ebiggers@google.com>
+Date:   Mon Jul 23 10:54:57 2018 -0700
+
+    crypto: blkcipher - fix crash flushing dcache in error path
+
+Cheers,
 -- 
-2.18.1
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
