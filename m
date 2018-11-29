@@ -1,56 +1,42 @@
-Return-Path: <SRS0=r3Tc=N4=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:51770 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729948AbeKQLne (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 17 Nov 2018 06:43:34 -0500
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc: linux-fscrypt@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        Paul Crowley <paulcrowley@google.com>,
-        Greg Kaiser <gkaiser@google.com>,
-        "Jason A . Donenfeld" <Jason@zx2c4.com>,
-        Samuel Neves <samuel.c.p.neves@gmail.com>,
-        Tomer Ashur <tomer.ashur@esat.kuleuven.be>,
-        Eric Biggers <ebiggers@google.com>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Martin Willi <martin@strongswan.org>
-Subject: [PATCH v4 02/14] crypto: chacha20-generic - don't unnecessarily use atomic walk
-Date: Fri, 16 Nov 2018 17:26:19 -0800
-Message-Id: <20181117012631.23528-3-ebiggers@kernel.org>
-In-Reply-To: <20181117012631.23528-1-ebiggers@kernel.org>
-References: <20181117012631.23528-1-ebiggers@kernel.org>
+Return-Path: <SRS0=WCFZ=OI=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:54264 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727814AbeK2VS0 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 29 Nov 2018 16:18:26 -0500
+Date: Thu, 29 Nov 2018 18:13:32 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: "Nagadheeraj, Rottela" <Rottela.Nagadheeraj@cavium.com>
+Cc: "davem@davemloft.net" <davem@davemloft.net>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Srikanth, Jampala" <Jampala.Srikanth@cavium.com>
+Subject: Re: [PATCH 1/1] crypto: cavium/nitrox - crypto request format changes
+Message-ID: <20181129101332.ungdx2lqijadq7ql@gondor.apana.org.au>
+References: <20181121073628.17039-1-rottela.nagadheeraj@cavium.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181121073628.17039-1-rottela.nagadheeraj@cavium.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Eric Biggers <ebiggers@google.com>
+On Wed, Nov 21, 2018 at 07:36:58AM +0000, Nagadheeraj, Rottela wrote:
+> nitrox_skcipher_crypt() will do the necessary formatting/ordering of
+> input and output sglists based on the algorithm requirements.
+> It will also accommodate the mandatory output buffers required for
+> NITROX hardware like Output request headers (ORH) and Completion headers.
+> 
+> Signed-off-by: Nagadheeraj Rottela <rottela.nagadheeraj@cavium.com>
+> Reviewed-by: Srikanth Jampala <Jampala.Srikanth@cavium.com>
+> ---
+>  drivers/crypto/cavium/nitrox/nitrox_algs.c   | 111 ++++++++++-
+>  drivers/crypto/cavium/nitrox/nitrox_req.h    |  94 ++++++----
+>  drivers/crypto/cavium/nitrox/nitrox_reqmgr.c | 266 ++++++---------------------
+>  3 files changed, 227 insertions(+), 244 deletions(-)
 
-chacha20-generic doesn't use SIMD instructions or otherwise disable
-preemption, so passing atomic=true to skcipher_walk_virt() is
-unnecessary.
-
-Suggested-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Acked-by: Martin Willi <martin@strongswan.org>
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- crypto/chacha20_generic.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/crypto/chacha20_generic.c b/crypto/chacha20_generic.c
-index 3ae96587caf9..3529521d72a4 100644
---- a/crypto/chacha20_generic.c
-+++ b/crypto/chacha20_generic.c
-@@ -81,7 +81,7 @@ int crypto_chacha20_crypt(struct skcipher_request *req)
- 	u32 state[16];
- 	int err;
- 
--	err = skcipher_walk_virt(&walk, req, true);
-+	err = skcipher_walk_virt(&walk, req, false);
- 
- 	crypto_chacha20_init(state, ctx, walk.iv);
- 
+Patch applied.  Thanks.
 -- 
-2.19.1.1215.g8438c0b245-goog
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
