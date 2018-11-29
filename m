@@ -1,66 +1,98 @@
-Return-Path: <SRS0=IFNk=NQ=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-it1-f193.google.com ([209.85.166.193]:51439 "EHLO
-        mail-it1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727440AbeKETj2 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 5 Nov 2018 14:39:28 -0500
-Received: by mail-it1-f193.google.com with SMTP id h13so11907888itl.1
-        for <linux-crypto@vger.kernel.org>; Mon, 05 Nov 2018 02:20:29 -0800 (PST)
+Return-Path: <SRS0=WCFZ=OI=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:44870 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726403AbeK3KKd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 30 Nov 2018 05:10:33 -0500
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org
+Cc: Paul Crowley <paulcrowley@google.com>,
+        Martin Willi <martin@strongswan.org>,
+        Milan Broz <gmazyland@gmail.com>,
+        "Jason A . Donenfeld" <Jason@zx2c4.com>,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v2 0/6] crypto: x86_64 optimized XChaCha and NHPoly1305 (for Adiantum)
+Date: Thu, 29 Nov 2018 15:02:11 -0800
+Message-Id: <20181129230217.158038-1-ebiggers@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAOtvUMeRth4zrTZbEy6Co=+CR4==5oSDbaf760Yh4fj8UAf8bQ@mail.gmail.com>
-References: <1541325924-14777-1-git-send-email-gilad@benyossef.com>
- <2578248.XAorIH2ink@tauon.chronox.de> <CAOtvUMeRth4zrTZbEy6Co=+CR4==5oSDbaf760Yh4fj8UAf8bQ@mail.gmail.com>
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date: Mon, 5 Nov 2018 11:20:28 +0100
-Message-ID: <CAKv+Gu8x1LRKq4xJTrWfu7vQDPSzxYwEYGXG_o3Xv+Zsch9S-g@mail.gmail.com>
-Subject: Re: [PATCH] crypto: mark cts(cbc(aes)) as FIPS allowed
-To: Gilad Ben-Yossef <gilad@benyossef.com>
-Cc: =?UTF-8?Q?Stephan_M=C3=BCller?= <smueller@chronox.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        David Miller <davem@davemloft.net>,
-        Ofir Drang <Ofir.Drang@arm.com>,
-        Yael Chemla <Yael.Chemla@arm.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux kernel mailing list <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 5 November 2018 at 10:18, Gilad Ben-Yossef <gilad@benyossef.com> wrote:
-> Hi Stephan,
->
-> On Mon, Nov 5, 2018 at 10:50 AM Stephan Mueller <smueller@chronox.de> wrote:
->>
->> Am Sonntag, 4. November 2018, 11:05:24 CET schrieb Gilad Ben-Yossef:
->>
->> Hi Gilad,
->>
->> > As per Sp800-38A addendum from Oct 2010[1], cts(cbc(aes)) is
->> > allowed as a FIPS mode algorithm. Mark it as such.
->> >
->> > [1] https://csrc.nist.gov/publications/detail/sp/800-38a/addendum/final
->>
->> There are several types of CTS approaches. Only three of those are listed in
->> the SP800-38A addendum. The source code only refers to some RFCs.
->>
->> Did you check whether the CTS implementation matches one or more of the types
->> listed in the addendum? If yes, may I suggest to add a small statement in the
->> code noting this fact?
->
-> Yes, AFAIK the software implements CBC-CS3 as described in the document.
-> You have a very good point about this not document anywhere. I will
-> send a patch.
->
+Hello,
 
-I agree that it makes sense to document this.
+This series optimizes the Adiantum encryption mode for x86_64 by adding
+SSE2 and AVX2 accelerated implementations of NHPoly1305, specifically
+the NH part; and by modifying the existing x86_64 SSSE3/AVX2/AVX-512VL
+ChaCha20 implementation to support XChaCha20 and XChaCha12.
 
-> While we're at it, does someone find it useful if I implemented the
-> other two modes?
-> They are part of the standard as well, although I am not sure that in
-> itself is sufficient cause.
->
+This greatly improves Adiantum performance on x86_64.  
 
-Nope. The linux crypto API is not a general purpose cryptography
-toolkit, it should only offer what we actually use in the kernel, or
-we'll either end up with bitrot or with a disproportionate maintenance
-burden for stuff nobody actually uses.
+For example, encrypting 4096-byte messages (single-threaded) on a
+Skylake-based processor (Intel Xeon, supports AVX-512VL and AVX2):
+
+                           Before                After
+                           --------              ---------
+adiantum(xchacha12,aes)    348 MB/s              1458 MB/s
+adiantum(xchacha20,aes)    265 MB/s              1240 MB/s
+
+And on a Zen-based processor (Threadripper 1950X, supports AVX2):
+
+                           Before                After
+                           --------              ---------
+adiantum(xchacha12,aes)    505 MB/s              1250 MB/s
+adiantum(xchacha20,aes)    387 MB/s              989 MB/s
+
+Decryption is almost exactly the same speed as encryption.
+
+The biggest benefit comes from accelerating XChaCha.  Accelerating NH
+gives a somewhat smaller, but still significant benefit.
+
+Performance on 512-byte inputs is also improved, though that is much
+slower in the first place.  When Adiantium is used with dm-crypt (or
+cryptsetup), we recommend using a 4096-byte sector size.
+
+For comparison, AES-256-XTS is 2699 MB/s on the Skylake CPU and
+4140 MB/s on the Zen CPU.  However, AES has the benefit of direct AES-NI
+hardware support whereas Adiantum is implemented entirely with
+general-purpose instructions (scalar and SIMD).  Adiantum is also a
+super-pseudorandom permutation over the entire sector, unlike XTS.
+
+Note that XChaCha20 and XChaCha12 can be used for other purposes too.
+
+Changed since v1:
+  - Rebase on top of latest cryptodev with the AVX-512VL accelerated
+    ChaCha20 from Martin Willi.
+
+Eric Biggers (6):
+  crypto: x86/nhpoly1305 - add SSE2 accelerated NHPoly1305
+  crypto: x86/nhpoly1305 - add AVX2 accelerated NHPoly1305
+  crypto: x86/chacha20 - limit the preemption-disabled section
+  crypto: x86/chacha20 - add XChaCha20 support
+  crypto: x86/chacha20 - refactor to allow varying number of rounds
+  crypto: x86/chacha - add XChaCha12 support
+
+ arch/x86/crypto/Makefile                      |  15 +-
+ ...a20-avx2-x86_64.S => chacha-avx2-x86_64.S} |  33 +--
+ ...12vl-x86_64.S => chacha-avx512vl-x86_64.S} |  35 +--
+ ...0-ssse3-x86_64.S => chacha-ssse3-x86_64.S} |  99 ++++---
+ arch/x86/crypto/chacha20_glue.c               | 208 -------------
+ arch/x86/crypto/chacha_glue.c                 | 280 ++++++++++++++++++
+ arch/x86/crypto/nh-avx2-x86_64.S              | 157 ++++++++++
+ arch/x86/crypto/nh-sse2-x86_64.S              | 123 ++++++++
+ arch/x86/crypto/nhpoly1305-avx2-glue.c        |  77 +++++
+ arch/x86/crypto/nhpoly1305-sse2-glue.c        |  76 +++++
+ crypto/Kconfig                                |  28 +-
+ 11 files changed, 839 insertions(+), 292 deletions(-)
+ rename arch/x86/crypto/{chacha20-avx2-x86_64.S => chacha-avx2-x86_64.S} (97%)
+ rename arch/x86/crypto/{chacha20-avx512vl-x86_64.S => chacha-avx512vl-x86_64.S} (97%)
+ rename arch/x86/crypto/{chacha20-ssse3-x86_64.S => chacha-ssse3-x86_64.S} (93%)
+ delete mode 100644 arch/x86/crypto/chacha20_glue.c
+ create mode 100644 arch/x86/crypto/chacha_glue.c
+ create mode 100644 arch/x86/crypto/nh-avx2-x86_64.S
+ create mode 100644 arch/x86/crypto/nh-sse2-x86_64.S
+ create mode 100644 arch/x86/crypto/nhpoly1305-avx2-glue.c
+ create mode 100644 arch/x86/crypto/nhpoly1305-sse2-glue.c
+
+-- 
+2.20.0.rc0.387.gc7a69e6b6c-goog
