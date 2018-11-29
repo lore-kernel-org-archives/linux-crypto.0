@@ -1,261 +1,263 @@
-Return-Path: <SRS0=1iZj=N3=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:37652 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727380AbeKPQar (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 16 Nov 2018 11:30:47 -0500
-Date: Fri, 16 Nov 2018 14:19:44 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Martin Willi <martin@strongswan.org>
-Cc: linux-crypto@vger.kernel.org, x86@kernel.org
-Subject: Re: [PATCH 0/6] crypto: x86/chacha20 - SIMD performance improvements
-Message-ID: <20181116061944.joboxtuzsj5mqpot@gondor.apana.org.au>
-References: <20181111093630.28107-1-martin@strongswan.org>
+Return-Path: <SRS0=WCFZ=OI=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:35436 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727643AbeK2Rje (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 29 Nov 2018 12:39:34 -0500
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org
+Cc: Paul Crowley <paulcrowley@google.com>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        "Jason A . Donenfeld" <Jason@zx2c4.com>,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: [PATCH 1/4] crypto: arm64/nhpoly1305 - add NEON-accelerated NHPoly1305
+Date: Wed, 28 Nov 2018 22:34:19 -0800
+Message-Id: <20181129063422.24307-2-ebiggers@kernel.org>
+In-Reply-To: <20181129063422.24307-1-ebiggers@kernel.org>
+References: <20181129063422.24307-1-ebiggers@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181111093630.28107-1-martin@strongswan.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Nov 11, 2018 at 10:36:24AM +0100, Martin Willi wrote:
-> This patchset improves performance of the ChaCha20 SIMD implementations
-> for x86_64. For some specific encryption lengths, performance is more
-> than doubled. Two mechanisms are used to achieve this:
-> 
-> * Instead of calculating the minimal number of required blocks for a
->   given encryption length, functions producing more blocks are used
->   more aggressively. Calculating a 4-block function can be faster than
->   calculating a 2-block and a 1-block function, even if only three
->   blocks are actually required.
-> 
-> * In addition to the 8-block AVX2 function, a 4-block and a 2-block
->   function are introduced.
-> 
-> Patches 1-3 add support for partial lengths to the existing 1-, 4- and
-> 8-block functions. Patch 4 makes use of that by engaging the next higher
-> level block functions more aggressively. Patch 5 and 6 add the new AVX2
-> functions for 2 and 4 blocks. Patches are based on cryptodev and would
-> need adjustments to apply on top of the Adiantum patchset.
-> 
-> Note that the more aggressive use of larger block functions calculate
-> blocks that may get discarded. This may have a negative impact on energy
-> usage or the processors thermal budget. However, with the new block
-> functions we can avoid this over-calculation for many lengths, so the
-> performance win can be considered more important.
-> 
-> Below are performance numbers measured with tcrypt using additional
-> encryption lengths; numbers in kOps/s, on my i7-5557U. old is the
-> existing, new the implementation with this patchset. As comparison
-> the numbers for zinc in v6:
-> 
->  len  old  new zinc
->    8 5908 5818 5818
->   16 5917 5828 5726
->   24 5916 5869 5757
->   32 5920 5789 5813
->   40 5868 5799 5710
->   48 5877 5761 5761
->   56 5869 5797 5742
->   64 5897 5862 5685
->   72 3381 4979 3520
->   80 3364 5541 3475
->   88 3350 4977 3424
->   96 3342 5530 3371
->  104 3328 4923 3313
->  112 3317 5528 3207
->  120 3313 4970 3150
->  128 3492 5535 3568
->  136 2487 4570 3690
->  144 2481 5047 3599
->  152 2473 4565 3566
->  160 2459 5022 3515
->  168 2461 4550 3437
->  176 2454 5020 3325
->  184 2449 4535 3279
->  192 2538 5011 3762
->  200 1962 4537 3702
->  208 1962 4971 3622
->  216 1954 4487 3518
->  224 1949 4936 3445
->  232 1948 4497 3422
->  240 1941 4947 3317
->  248 1940 4481 3279
->  256 3798 4964 3723
->  264 2638 3577 3639
->  272 2637 3567 3597
->  280 2628 3563 3565
->  288 2630 3795 3484
->  296 2621 3580 3422
->  304 2612 3569 3352
->  312 2602 3599 3308
->  320 2694 3821 3694
->  328 2060 3538 3681
->  336 2054 3565 3599
->  344 2054 3553 3523
->  352 2049 3809 3419
->  360 2045 3575 3403
->  368 2035 3560 3334
->  376 2036 3555 3257
->  384 2092 3785 3715
->  392 1691 3505 3612
->  400 1684 3527 3553
->  408 1686 3527 3496
->  416 1684 3804 3430
->  424 1681 3555 3402
->  432 1675 3559 3311
->  440 1672 3558 3275
->  448 1710 3780 3689
->  456 1431 3541 3618
->  464 1428 3538 3576
->  472 1430 3527 3509
->  480 1426 3788 3405
->  488 1423 3502 3397
->  496 1423 3519 3298
->  504 1418 3519 3277
->  512 3694 3736 3735
->  520 2601 2571 2209
->  528 2601 2677 2148
->  536 2587 2534 2164
->  544 2578 2659 2138
->  552 2570 2552 2126
->  560 2566 2661 2035
->  568 2567 2542 2041
->  576 2639 2674 2199
->  584 2031 2531 2183
->  592 2027 2660 2145
->  600 2016 2513 2155
->  608 2009 2638 2133
->  616 2006 2522 2115
->  624 2000 2649 2064
->  632 1996 2518 2045
->  640 2053 2651 2188
->  648 1666 2402 2182
->  656 1663 2517 2158
->  664 1659 2397 2147
->  672 1657 2510 2139
->  680 1656 2394 2114
->  688 1653 2497 2077
->  696 1646 2393 2043
->  704 1678 2510 2208
->  712 1414 2391 2189
->  720 1412 2506 2169
->  728 1411 2384 2145
->  736 1408 2494 2142
->  744 1408 2379 2081
->  752 1405 2485 2064
->  760 1403 2376 2043
->  768 2189 2498 2211
->  776 1756 2137 2192
->  784 1746 2145 2146
->  792 1744 2141 2141
->  800 1743 2222 2094
->  808 1742 2140 2100
->  816 1735 2134 2061
->  824 1731 2135 2045
->  832 1778 2222 2223
->  840 1480 2132 2184
->  848 1480 2134 2173
->  856 1476 2124 2145
->  864 1474 2210 2126
->  872 1472 2127 2105
->  880 1463 2123 2056
->  888 1468 2123 2043
->  896 1494 2208 2219
->  904 1278 2120 2192
->  912 1277 2121 2170
->  920 1273 2118 2149
->  928 1272 2207 2125
->  936 1267 2125 2098
->  944 1265 2127 2060
->  952 1267 2126 2049
->  960 1289 2213 2204
->  968 1125 2123 2187
->  976 1122 2127 2166
->  984 1120 2123 2136
->  992 1118 2207 2119
-> 1000 1118 2120 2101
-> 1008 1117 2122 2042
-> 1016 1115 2121 2048
-> 1024 2174 2191 2195
-> 1032 1748 1724 1565
-> 1040 1745 1782 1544
-> 1048 1736 1737 1554
-> 1056 1738 1802 1541
-> 1064 1735 1728 1523
-> 1072 1730 1780 1507
-> 1080 1729 1724 1497
-> 1088 1757 1783 1592
-> 1096 1475 1723 1575
-> 1104 1474 1778 1563
-> 1112 1472 1708 1544
-> 1120 1468 1774 1521
-> 1128 1466 1718 1521
-> 1136 1462 1780 1501
-> 1144 1460 1719 1491
-> 1152 1481 1782 1575
-> 1160 1271 1647 1558
-> 1168 1271 1706 1554
-> 1176 1268 1645 1545
-> 1184 1265 1711 1538
-> 1192 1265 1648 1530
-> 1200 1264 1705 1493
-> 1208 1262 1647 1498
-> 1216 1277 1695 1581
-> 1224 1120 1642 1563
-> 1232 1115 1702 1549
-> 1240 1121 1646 1538
-> 1248 1119 1703 1527
-> 1256 1115 1640 1520
-> 1264 1114 1693 1505
-> 1272 1112 1642 1492
-> 1280 1552 1699 1574
-> 1288 1314 1525 1573
-> 1296 1315 1522 1551
-> 1304 1312 1521 1548
-> 1312 1311 1564 1535
-> 1320 1309 1518 1524
-> 1328 1302 1527 1508
-> 1336 1303 1521 1500
-> 1344 1333 1561 1579
-> 1352 1157 1524 1573
-> 1360 1152 1520 1546
-> 1368 1154 1522 1545
-> 1376 1153 1562 1536
-> 1384 1151 1525 1526
-> 1392 1149 1523 1504
-> 1400 1148 1517 1480
-> 1408 1167 1561 1589
-> 1416 1030 1516 1558
-> 1424 1028 1516 1546
-> 1432 1027 1522 1537
-> 1440 1027 1564 1523
-> 1448 1026 1507 1512
-> 1456 1025 1515 1491
-> 1464 1023 1522 1481
-> 1472 1037 1559 1577
-> 1480  927 1518 1559
-> 1488  926 1514 1548
-> 1496  926 1513 1534
-> 
-> 
-> Martin Willi (6):
->   crypto: x86/chacha20 - Support partial lengths in 1-block SSSE3
->     variant
->   crypto: x86/chacha20 - Support partial lengths in 4-block SSSE3
->     variant
->   crypto: x86/chacha20 - Support partial lengths in 8-block AVX2 variant
->   crypto: x86/chacha20 - Use larger block functions more aggressively
->   crypto: x86/chacha20 - Add a 2-block AVX2 variant
->   crypto: x86/chacha20 - Add a 4-block AVX2 variant
-> 
->  arch/x86/crypto/chacha20-avx2-x86_64.S  | 696 ++++++++++++++++++++++--
->  arch/x86/crypto/chacha20-ssse3-x86_64.S | 237 ++++++--
->  arch/x86/crypto/chacha20_glue.c         |  72 ++-
->  3 files changed, 868 insertions(+), 137 deletions(-)
+From: Eric Biggers <ebiggers@google.com>
 
-All applied.  Thanks.
+Add an ARM64 NEON implementation of NHPoly1305, an ε-almost-∆-universal
+hash function used in the Adiantum encryption mode.  For now, only the
+NH portion is actually NEON-accelerated; the Poly1305 part is less
+performance-critical so is just implemented in C.
+
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ arch/arm64/crypto/Kconfig                |   5 ++
+ arch/arm64/crypto/Makefile               |   3 +
+ arch/arm64/crypto/nh-neon-core.S         | 103 +++++++++++++++++++++++
+ arch/arm64/crypto/nhpoly1305-neon-glue.c |  77 +++++++++++++++++
+ 4 files changed, 188 insertions(+)
+ create mode 100644 arch/arm64/crypto/nh-neon-core.S
+ create mode 100644 arch/arm64/crypto/nhpoly1305-neon-glue.c
+
+diff --git a/arch/arm64/crypto/Kconfig b/arch/arm64/crypto/Kconfig
+index a5606823ed4da..3f5aeb786192b 100644
+--- a/arch/arm64/crypto/Kconfig
++++ b/arch/arm64/crypto/Kconfig
+@@ -106,6 +106,11 @@ config CRYPTO_CHACHA20_NEON
+ 	select CRYPTO_BLKCIPHER
+ 	select CRYPTO_CHACHA20
+ 
++config CRYPTO_NHPOLY1305_NEON
++	tristate "NHPoly1305 hash function using NEON instructions (for Adiantum)"
++	depends on KERNEL_MODE_NEON
++	select CRYPTO_NHPOLY1305
++
+ config CRYPTO_AES_ARM64_BS
+ 	tristate "AES in ECB/CBC/CTR/XTS modes using bit-sliced NEON algorithm"
+ 	depends on KERNEL_MODE_NEON
+diff --git a/arch/arm64/crypto/Makefile b/arch/arm64/crypto/Makefile
+index f476fede09ba4..125dbb10a93ed 100644
+--- a/arch/arm64/crypto/Makefile
++++ b/arch/arm64/crypto/Makefile
+@@ -53,6 +53,9 @@ sha512-arm64-y := sha512-glue.o sha512-core.o
+ obj-$(CONFIG_CRYPTO_CHACHA20_NEON) += chacha20-neon.o
+ chacha20-neon-y := chacha20-neon-core.o chacha20-neon-glue.o
+ 
++obj-$(CONFIG_CRYPTO_NHPOLY1305_NEON) += nhpoly1305-neon.o
++nhpoly1305-neon-y := nh-neon-core.o nhpoly1305-neon-glue.o
++
+ obj-$(CONFIG_CRYPTO_AES_ARM64) += aes-arm64.o
+ aes-arm64-y := aes-cipher-core.o aes-cipher-glue.o
+ 
+diff --git a/arch/arm64/crypto/nh-neon-core.S b/arch/arm64/crypto/nh-neon-core.S
+new file mode 100644
+index 0000000000000..e08d57676127a
+--- /dev/null
++++ b/arch/arm64/crypto/nh-neon-core.S
+@@ -0,0 +1,103 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * NH - ε-almost-universal hash function, ARM64 NEON accelerated version
++ *
++ * Copyright 2018 Google LLC
++ *
++ * Author: Eric Biggers <ebiggers@google.com>
++ */
++
++#include <linux/linkage.h>
++
++	KEY		.req	x0
++	MESSAGE		.req	x1
++	MESSAGE_LEN	.req	x2
++	HASH		.req	x3
++
++	PASS0_SUMS	.req	v0
++	PASS1_SUMS	.req	v1
++	PASS2_SUMS	.req	v2
++	PASS3_SUMS	.req	v3
++	K0		.req	v4
++	K1		.req	v5
++	K2		.req	v6
++	K3		.req	v7
++	T0		.req	v8
++	T1		.req	v9
++	T2		.req	v10
++	T3		.req	v11
++	T4		.req	v12
++	T5		.req	v13
++	T6		.req	v14
++	T7		.req	v15
++
++.macro _nh_stride	k0, k1, k2, k3
++
++	// Load next message stride
++	ld1		{T3.16b}, [MESSAGE], #16
++
++	// Load next key stride
++	ld1		{\k3\().4s}, [KEY], #16
++
++	// Add message words to key words
++	add		T0.4s, T3.4s, \k0\().4s
++	add		T1.4s, T3.4s, \k1\().4s
++	add		T2.4s, T3.4s, \k2\().4s
++	add		T3.4s, T3.4s, \k3\().4s
++
++	// Multiply 32x32 => 64 and accumulate
++	mov             T4.d[0], T0.d[1]
++	mov             T5.d[0], T1.d[1]
++	mov             T6.d[0], T2.d[1]
++	mov             T7.d[0], T3.d[1]
++	umlal		PASS0_SUMS.2d, T0.2s, T4.2s
++	umlal		PASS1_SUMS.2d, T1.2s, T5.2s
++	umlal		PASS2_SUMS.2d, T2.2s, T6.2s
++	umlal		PASS3_SUMS.2d, T3.2s, T7.2s
++.endm
++
++/*
++ * void nh_neon(const u32 *key, const u8 *message, size_t message_len,
++ *		u8 hash[NH_HASH_BYTES])
++ *
++ * It's guaranteed that message_len % 16 == 0.
++ */
++ENTRY(nh_neon)
++
++	ld1		{K0.4s,K1.4s}, [KEY], #32
++	  movi		PASS0_SUMS.2d, #0
++	  movi		PASS1_SUMS.2d, #0
++	ld1		{K2.4s}, [KEY], #16
++	  movi		PASS2_SUMS.2d, #0
++	  movi		PASS3_SUMS.2d, #0
++
++	subs		MESSAGE_LEN, MESSAGE_LEN, #64
++	blt		.Lloop4_done
++.Lloop4:
++	_nh_stride	K0, K1, K2, K3
++	_nh_stride	K1, K2, K3, K0
++	_nh_stride	K2, K3, K0, K1
++	_nh_stride	K3, K0, K1, K2
++	subs		MESSAGE_LEN, MESSAGE_LEN, #64
++	bge		.Lloop4
++
++.Lloop4_done:
++	ands		MESSAGE_LEN, MESSAGE_LEN, #63
++	beq		.Ldone
++	_nh_stride	K0, K1, K2, K3
++
++	subs		MESSAGE_LEN, MESSAGE_LEN, #16
++	beq		.Ldone
++	_nh_stride	K1, K2, K3, K0
++
++	subs		MESSAGE_LEN, MESSAGE_LEN, #16
++	beq		.Ldone
++	_nh_stride	K2, K3, K0, K1
++
++.Ldone:
++	// Sum the accumulators for each pass, then store the sums to 'hash'
++	addp		T0.2d, PASS0_SUMS.2d, PASS1_SUMS.2d
++	addp		T1.2d, PASS2_SUMS.2d, PASS3_SUMS.2d
++	st1		{T0.16b,T1.16b}, [HASH]
++	ret
++ENDPROC(nh_neon)
+diff --git a/arch/arm64/crypto/nhpoly1305-neon-glue.c b/arch/arm64/crypto/nhpoly1305-neon-glue.c
+new file mode 100644
+index 0000000000000..22cc32ac9448d
+--- /dev/null
++++ b/arch/arm64/crypto/nhpoly1305-neon-glue.c
+@@ -0,0 +1,77 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * NHPoly1305 - ε-almost-∆-universal hash function for Adiantum
++ * (ARM64 NEON accelerated version)
++ *
++ * Copyright 2018 Google LLC
++ */
++
++#include <asm/neon.h>
++#include <asm/simd.h>
++#include <crypto/internal/hash.h>
++#include <crypto/nhpoly1305.h>
++#include <linux/module.h>
++
++asmlinkage void nh_neon(const u32 *key, const u8 *message, size_t message_len,
++			u8 hash[NH_HASH_BYTES]);
++
++/* wrapper to avoid indirect call to assembly, which doesn't work with CFI */
++static void _nh_neon(const u32 *key, const u8 *message, size_t message_len,
++		     __le64 hash[NH_NUM_PASSES])
++{
++	nh_neon(key, message, message_len, (u8 *)hash);
++}
++
++static int nhpoly1305_neon_update(struct shash_desc *desc,
++				  const u8 *src, unsigned int srclen)
++{
++	if (srclen < 64 || !may_use_simd())
++		return crypto_nhpoly1305_update(desc, src, srclen);
++
++	do {
++		unsigned int n = min_t(unsigned int, srclen, PAGE_SIZE);
++
++		kernel_neon_begin();
++		crypto_nhpoly1305_update_helper(desc, src, n, _nh_neon);
++		kernel_neon_end();
++		src += n;
++		srclen -= n;
++	} while (srclen);
++	return 0;
++}
++
++static struct shash_alg nhpoly1305_alg = {
++	.base.cra_name		= "nhpoly1305",
++	.base.cra_driver_name	= "nhpoly1305-neon",
++	.base.cra_priority	= 200,
++	.base.cra_ctxsize	= sizeof(struct nhpoly1305_key),
++	.base.cra_module	= THIS_MODULE,
++	.digestsize		= POLY1305_DIGEST_SIZE,
++	.init			= crypto_nhpoly1305_init,
++	.update			= nhpoly1305_neon_update,
++	.final			= crypto_nhpoly1305_final,
++	.setkey			= crypto_nhpoly1305_setkey,
++	.descsize		= sizeof(struct nhpoly1305_state),
++};
++
++static int __init nhpoly1305_mod_init(void)
++{
++	if (!(elf_hwcap & HWCAP_ASIMD))
++		return -ENODEV;
++
++	return crypto_register_shash(&nhpoly1305_alg);
++}
++
++static void __exit nhpoly1305_mod_exit(void)
++{
++	crypto_unregister_shash(&nhpoly1305_alg);
++}
++
++module_init(nhpoly1305_mod_init);
++module_exit(nhpoly1305_mod_exit);
++
++MODULE_DESCRIPTION("NHPoly1305 ε-almost-∆-universal hash function (NEON-accelerated)");
++MODULE_LICENSE("GPL v2");
++MODULE_AUTHOR("Eric Biggers <ebiggers@google.com>");
++MODULE_ALIAS_CRYPTO("nhpoly1305");
++MODULE_ALIAS_CRYPTO("nhpoly1305-neon");
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.19.2
