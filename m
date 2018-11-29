@@ -1,53 +1,76 @@
-Return-Path: <SRS0=7Tml=NW=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from shell.v3.sk ([90.176.6.54]:53667 "EHLO shell.v3.sk"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727427AbeKKVPH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 11 Nov 2018 16:15:07 -0500
-Message-ID: <7e4e2c4ee692f4dff7ce7fb447e4990429b6b9b8.camel@v3.sk>
-Subject: Re: [PATCH 03/17] hw_random: bcm2835-rng: Switch to SPDX identifier
-From: Lubomir Rintel <lkundrak@v3.sk>
-To: Stefan Wahren <stefan.wahren@i2se.com>,
-        Eric Anholt <eric@anholt.net>, Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: linux-rpi-kernel@lists.infradead.org, linux-crypto@vger.kernel.org
-Date: Sun, 11 Nov 2018 12:26:43 +0100
-In-Reply-To: <1541861476-6778-1-git-send-email-stefan.wahren@i2se.com>
-References: <1541861476-6778-1-git-send-email-stefan.wahren@i2se.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Return-Path: <SRS0=WCFZ=OI=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:37056 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729463AbeK3BsK (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 29 Nov 2018 20:48:10 -0500
+Received: by mail-wm1-f68.google.com with SMTP id g67so2487387wmd.2
+        for <linux-crypto@vger.kernel.org>; Thu, 29 Nov 2018 06:42:34 -0800 (PST)
+From: Corentin Labbe <clabbe@baylibre.com>
+To: davem@davemloft.net, ebiggers@kernel.org,
+        herbert@gondor.apana.org.au, nhorman@tuxdriver.com
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Corentin Labbe <clabbe@baylibre.com>
+Subject: [PATCH v5 00/11] crypto: crypto_user_stat: misc enhancement
+Date: Thu, 29 Nov 2018 14:42:15 +0000
+Message-Id: <1543502546-23870-1-git-send-email-clabbe@baylibre.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sat, 2018-11-10 at 15:51 +0100, Stefan Wahren wrote:
-> Adopt the SPDX license identifier headers to ease license compliance
-> management. While we are at this fix the comment style, too.
-> 
-> Cc: Lubomir Rintel <lkundrak@v3.sk>
-> Signed-off-by: Stefan Wahren <stefan.wahren@i2se.com>
-> ---
->  drivers/char/hw_random/bcm2835-rng.c | 7 ++-----
->  1 file changed, 2 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/char/hw_random/bcm2835-rng.c
-> b/drivers/char/hw_random/bcm2835-rng.c
-> index 6767d96..256b0b1 100644
-> --- a/drivers/char/hw_random/bcm2835-rng.c
-> +++ b/drivers/char/hw_random/bcm2835-rng.c
-> @@ -1,10 +1,7 @@
-> -/**
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
->   * Copyright (c) 2010-2012 Broadcom. All rights reserved.
->   * Copyright (c) 2013 Lubomir Rintel
-> - *
-> - * This program is free software; you can redistribute it and/or
-> - * modify it under the terms of the GNU General Public License
-> ("GPL")
-> - * version 2, as published by the Free Software Foundation.
->   */
->  
->  #include <linux/hw_random.h>
+Hello
 
-Acked-by: Lubomir Rintel <lkundrak@v3.sk>
+This patchset fixes all reported problem by Eric biggers.
+
+Regards
+
+Changes since v4:
+- Inlined functions when !CRYPTO_STATS
+
+Changes since v3:
+- Added a crypto_stats_init as asked vy Neil Horman
+- Fixed some checkpatch complaints
+
+Changes since v2:
+- moved all crypto_stats functions from header to algapi.c for using
+  crypto_alg_get/put
+
+Changes since v1:
+- Better locking of crypto_alg via crypto_alg_get/crypto_alg_put
+- remove all intermediate variables in crypto/crypto_user_stat.c
+- splited all internal stats variables into different structures
+
+Corentin Labbe (11):
+  crypto: crypto_user_stat: made crypto_user_stat optional
+  crypto: CRYPTO_STATS should depend on CRYPTO_USER
+  crypto: crypto_user_stat: convert all stats from u32 to u64
+  crypto: crypto_user_stat: split user space crypto stat structures
+  crypto: tool: getstat: convert user space example to the new
+    crypto_user_stat uapi
+  crypto: crypto_user_stat: fix use_after_free of struct xxx_request
+  crypto: crypto_user_stat: Fix invalid stat reporting
+  crypto: crypto_user_stat: remove intermediate variable
+  crypto: crypto_user_stat: Split stats in multiple structures
+  crypto: crypto_user_stat: rename err_cnt parameter
+  crypto: crypto_user_stat: Add crypto_stats_init
+
+ crypto/Kconfig                       |   1 +
+ crypto/Makefile                      |   3 +-
+ crypto/ahash.c                       |  17 +-
+ crypto/algapi.c                      | 247 ++++++++++++++++++++++-
+ crypto/crypto_user_stat.c            | 160 +++++----------
+ crypto/rng.c                         |   4 +-
+ include/crypto/acompress.h           |  38 +---
+ include/crypto/aead.h                |  38 +---
+ include/crypto/akcipher.h            |  74 ++-----
+ include/crypto/hash.h                |  32 +--
+ include/crypto/internal/cryptouser.h |  17 ++
+ include/crypto/kpp.h                 |  48 +----
+ include/crypto/rng.h                 |  27 +--
+ include/crypto/skcipher.h            |  36 +---
+ include/linux/crypto.h               | 290 ++++++++++++++++++---------
+ include/uapi/linux/cryptouser.h      | 102 ++++++----
+ tools/crypto/getstat.c               |  72 +++----
+ 17 files changed, 676 insertions(+), 530 deletions(-)
+
+-- 
+2.18.1
