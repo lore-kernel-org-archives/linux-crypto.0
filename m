@@ -1,25 +1,19 @@
-Return-Path: <SRS0=r3Tc=N4=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:51866 "EHLO mail.kernel.org"
+Return-Path: <SRS0=WCFZ=OI=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:35490 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730960AbeKQLng (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 17 Nov 2018 06:43:36 -0500
+        id S1727833AbeK2Rjf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 29 Nov 2018 12:39:35 -0500
 From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc: linux-fscrypt@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        Paul Crowley <paulcrowley@google.com>,
-        Greg Kaiser <gkaiser@google.com>,
+To: linux-crypto@vger.kernel.org
+Cc: Paul Crowley <paulcrowley@google.com>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
         "Jason A . Donenfeld" <Jason@zx2c4.com>,
-        Samuel Neves <samuel.c.p.neves@gmail.com>,
-        Tomer Ashur <tomer.ashur@esat.kuleuven.be>,
-        Eric Biggers <ebiggers@google.com>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v4 06/14] crypto: arm/chacha20 - limit the preemption-disabled section
-Date: Fri, 16 Nov 2018 17:26:23 -0800
-Message-Id: <20181117012631.23528-7-ebiggers@kernel.org>
-In-Reply-To: <20181117012631.23528-1-ebiggers@kernel.org>
-References: <20181117012631.23528-1-ebiggers@kernel.org>
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: [PATCH 4/4] crypto: arm64/chacha - add XChaCha12 support
+Date: Wed, 28 Nov 2018 22:34:22 -0800
+Message-Id: <20181129063422.24307-5-ebiggers@kernel.org>
+In-Reply-To: <20181129063422.24307-1-ebiggers@kernel.org>
+References: <20181129063422.24307-1-ebiggers@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
@@ -27,45 +21,62 @@ List-ID: <linux-crypto.vger.kernel.org>
 
 From: Eric Biggers <ebiggers@google.com>
 
-To improve responsivesess, disable preemption for each step of the walk
-(which is at most PAGE_SIZE) rather than for the entire
-encryption/decryption operation.
+Now that the ARM64 NEON implementation of ChaCha20 and XChaCha20 has
+been refactored to support varying the number of rounds, add support for
+XChaCha12.  This is identical to XChaCha20 except for the number of
+rounds, which is 12 instead of 20.  This can be used by Adiantum.
 
-Suggested-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- arch/arm/crypto/chacha20-neon-glue.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ arch/arm64/crypto/Kconfig            |  2 +-
+ arch/arm64/crypto/chacha-neon-glue.c | 18 ++++++++++++++++++
+ 2 files changed, 19 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm/crypto/chacha20-neon-glue.c b/arch/arm/crypto/chacha20-neon-glue.c
-index 7386eb1c1889..2bc035cb8f23 100644
---- a/arch/arm/crypto/chacha20-neon-glue.c
-+++ b/arch/arm/crypto/chacha20-neon-glue.c
-@@ -68,22 +68,22 @@ static int chacha20_neon(struct skcipher_request *req)
- 	if (req->cryptlen <= CHACHA_BLOCK_SIZE || !may_use_simd())
- 		return crypto_chacha_crypt(req);
+diff --git a/arch/arm64/crypto/Kconfig b/arch/arm64/crypto/Kconfig
+index d54ddb8468ef5..d9a523ecdd836 100644
+--- a/arch/arm64/crypto/Kconfig
++++ b/arch/arm64/crypto/Kconfig
+@@ -101,7 +101,7 @@ config CRYPTO_AES_ARM64_NEON_BLK
+ 	select CRYPTO_SIMD
  
--	err = skcipher_walk_virt(&walk, req, true);
-+	err = skcipher_walk_virt(&walk, req, false);
- 
- 	crypto_chacha_init(state, ctx, walk.iv);
- 
--	kernel_neon_begin();
- 	while (walk.nbytes > 0) {
- 		unsigned int nbytes = walk.nbytes;
- 
- 		if (nbytes < walk.total)
- 			nbytes = round_down(nbytes, walk.stride);
- 
-+		kernel_neon_begin();
- 		chacha20_doneon(state, walk.dst.virt.addr, walk.src.virt.addr,
- 				nbytes);
-+		kernel_neon_end();
- 		err = skcipher_walk_done(&walk, walk.nbytes - nbytes);
+ config CRYPTO_CHACHA20_NEON
+-	tristate "ChaCha20 and XChaCha20 stream ciphers using NEON instructions"
++	tristate "ChaCha20, XChaCha20, and XChaCha12 stream ciphers using NEON instructions"
+ 	depends on KERNEL_MODE_NEON
+ 	select CRYPTO_BLKCIPHER
+ 	select CRYPTO_CHACHA20
+diff --git a/arch/arm64/crypto/chacha-neon-glue.c b/arch/arm64/crypto/chacha-neon-glue.c
+index 4d992029b9121..346eb85498a1e 100644
+--- a/arch/arm64/crypto/chacha-neon-glue.c
++++ b/arch/arm64/crypto/chacha-neon-glue.c
+@@ -161,6 +161,22 @@ static struct skcipher_alg algs[] = {
+ 		.setkey			= crypto_chacha20_setkey,
+ 		.encrypt		= xchacha_neon,
+ 		.decrypt		= xchacha_neon,
++	}, {
++		.base.cra_name		= "xchacha12",
++		.base.cra_driver_name	= "xchacha12-neon",
++		.base.cra_priority	= 300,
++		.base.cra_blocksize	= 1,
++		.base.cra_ctxsize	= sizeof(struct chacha_ctx),
++		.base.cra_module	= THIS_MODULE,
++
++		.min_keysize		= CHACHA_KEY_SIZE,
++		.max_keysize		= CHACHA_KEY_SIZE,
++		.ivsize			= XCHACHA_IV_SIZE,
++		.chunksize		= CHACHA_BLOCK_SIZE,
++		.walksize		= 4 * CHACHA_BLOCK_SIZE,
++		.setkey			= crypto_chacha12_setkey,
++		.encrypt		= xchacha_neon,
++		.decrypt		= xchacha_neon,
  	}
--	kernel_neon_end();
+ };
  
- 	return err;
- }
+@@ -187,3 +203,5 @@ MODULE_ALIAS_CRYPTO("chacha20");
+ MODULE_ALIAS_CRYPTO("chacha20-neon");
+ MODULE_ALIAS_CRYPTO("xchacha20");
+ MODULE_ALIAS_CRYPTO("xchacha20-neon");
++MODULE_ALIAS_CRYPTO("xchacha12");
++MODULE_ALIAS_CRYPTO("xchacha12-neon");
 -- 
-2.19.1.1215.g8438c0b245-goog
+2.19.2
