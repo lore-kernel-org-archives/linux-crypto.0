@@ -1,51 +1,98 @@
-Return-Path: <SRS0=IUQn=NU=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:37340 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727560AbeKITai (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 9 Nov 2018 14:30:38 -0500
-Date: Fri, 9 Nov 2018 17:50:40 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Gilad Ben-Yossef <gilad@benyossef.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Ofir Drang <Ofir.Drang@arm.com>,
-        Yael Chemla <Yael.Chemla@arm.com>,
-        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 0/3] crypto: ccree: add CryptoCell 713 baseline support
-Message-ID: <20181109095040.6wkjifw7hwlvoqq3@gondor.apana.org.au>
-References: <1540806616-5483-1-git-send-email-gilad@benyossef.com>
+Return-Path: <SRS0=r27M=OJ=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from ale.deltatee.com ([207.54.116.67]:41074 "EHLO ale.deltatee.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726788AbeLAEQK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 30 Nov 2018 23:16:10 -0500
+From: Logan Gunthorpe <logang@deltatee.com>
+To: linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
+        linux-ntb@googlegroups.com, linux-crypto@vger.kernel.org,
+        linux-mm@kvack.org, Andrew Morton <akpm@linux-foundation.org>
+Cc: Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Andy Shevchenko <andy.shevchenko@gmail.com>,
+        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Jon Mason <jdmason@kudzu.us>
+Date: Fri, 30 Nov 2018 10:06:06 -0700
+Message-Id: <20181130170606.17252-7-logang@deltatee.com>
+In-Reply-To: <20181130170606.17252-1-logang@deltatee.com>
+References: <20181130170606.17252-1-logang@deltatee.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1540806616-5483-1-git-send-email-gilad@benyossef.com>
+Content-Transfer-Encoding: 8bit
+Subject: [PATCH v24 6/6] ntb: ntb_hw_switchtec: Cleanup 64bit IO defines to use the common header
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Oct 29, 2018 at 09:50:11AM +0000, Gilad Ben-Yossef wrote:
-> Add first batch of patches for support of Arm TrustZone CryptoCell 713.
-> 
-> Changes from v1:
-> - Format dt bindings document one version per line and correct the heading
->   as indicated by Rob Herring.
-> 
-> Gilad Ben-Yossef (3):
->   crypto: ccree: add support for CryptoCell 713
->   dt-bindings: crypto: ccree: add ccree 713
->   crypto: ccree: add SM4 support
-> 
->  .../devicetree/bindings/crypto/arm-cryptocell.txt  |  7 ++-
->  drivers/crypto/Kconfig                             |  3 +-
->  drivers/crypto/ccree/cc_cipher.c                   | 66 ++++++++++++++++++++++
->  drivers/crypto/ccree/cc_driver.c                   | 23 +++++---
->  drivers/crypto/ccree/cc_driver.h                   |  5 +-
->  drivers/crypto/ccree/cc_hw_queue_defs.h            |  3 +
->  6 files changed, 94 insertions(+), 13 deletions(-)
+Clean up the ifdefs which conditionally defined the io{read|write}64
+functions in favour of the new common io-64-nonatomic-lo-hi header.
 
-All applied.  Thanks.
+Per a nit from Andy Shevchenko, the include list is also made
+alphabetical.
+
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+Reviewed-by: Andy Shevchenko <andy.shevchenko@gmail.com>
+Cc: Jon Mason <jdmason@kudzu.us>
+---
+ drivers/ntb/hw/mscc/ntb_hw_switchtec.c | 36 +++-----------------------
+ 1 file changed, 4 insertions(+), 32 deletions(-)
+
+diff --git a/drivers/ntb/hw/mscc/ntb_hw_switchtec.c b/drivers/ntb/hw/mscc/ntb_hw_switchtec.c
+index 5ee5f40b4dfc..c0b97699169d 100644
+--- a/drivers/ntb/hw/mscc/ntb_hw_switchtec.c
++++ b/drivers/ntb/hw/mscc/ntb_hw_switchtec.c
+@@ -13,13 +13,14 @@
+  *
+  */
+ 
+-#include <linux/switchtec.h>
+-#include <linux/module.h>
++#include <linux/interrupt.h>
++#include <linux/io-64-nonatomic-lo-hi.h>
+ #include <linux/delay.h>
+ #include <linux/kthread.h>
+-#include <linux/interrupt.h>
++#include <linux/module.h>
+ #include <linux/ntb.h>
+ #include <linux/pci.h>
++#include <linux/switchtec.h>
+ 
+ MODULE_DESCRIPTION("Microsemi Switchtec(tm) NTB Driver");
+ MODULE_VERSION("0.1");
+@@ -36,35 +37,6 @@ module_param(use_lut_mws, bool, 0644);
+ MODULE_PARM_DESC(use_lut_mws,
+ 		 "Enable the use of the LUT based memory windows");
+ 
+-#ifndef ioread64
+-#ifdef readq
+-#define ioread64 readq
+-#else
+-#define ioread64 _ioread64
+-static inline u64 _ioread64(void __iomem *mmio)
+-{
+-	u64 low, high;
+-
+-	low = ioread32(mmio);
+-	high = ioread32(mmio + sizeof(u32));
+-	return low | (high << 32);
+-}
+-#endif
+-#endif
+-
+-#ifndef iowrite64
+-#ifdef writeq
+-#define iowrite64 writeq
+-#else
+-#define iowrite64 _iowrite64
+-static inline void _iowrite64(u64 val, void __iomem *mmio)
+-{
+-	iowrite32(val, mmio);
+-	iowrite32(val >> 32, mmio + sizeof(u32));
+-}
+-#endif
+-#endif
+-
+ #define SWITCHTEC_NTB_MAGIC 0x45CC0001
+ #define MAX_MWS     128
+ 
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.19.0
