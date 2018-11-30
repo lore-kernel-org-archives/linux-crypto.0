@@ -1,43 +1,44 @@
-Return-Path: <SRS0=r3Tc=N4=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:41466 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726804AbeKRJ0O (ORCPT
+Return-Path: <SRS0=r27M=OJ=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from stargate.chelsio.com ([12.32.117.8]:47014 "EHLO
+        stargate.chelsio.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726551AbeK3UKt (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 18 Nov 2018 04:26:14 -0500
-Date: Sun, 18 Nov 2018 07:07:46 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Rob Herring <robh@kernel.org>
-Cc: Ryder Lee <ryder.lee@mediatek.com>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        linux-crypto@vger.kernel.org, Weijie Gao <weijie.gao@mediatek.com>,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH] dt-bindings: rng: update bindings for MT7629 SoC
-Message-ID: <20181117230746.r6xsnqqo5nd6fxts@gondor.apana.org.au>
-References: <0f5fe0d5b6a9c81b3f4395a1007ed0ba2239ae45.1541574485.git.ryder.lee@mediatek.com>
- <20181116061854.ahs6jz7bmztoi3w7@gondor.apana.org.au>
- <20181116223110.GA19271@bogus>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181116223110.GA19271@bogus>
+        Fri, 30 Nov 2018 15:10:49 -0500
+From: Atul Gupta <atul.gupta@chelsio.com>
+To: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
+Cc: stable@vger.kernel.org
+Subject: [crypto chcr 1/2] small packet Tx stalls the queue
+Date: Fri, 30 Nov 2018 14:31:48 +0530
+Message-Id: <1543568508-23639-1-git-send-email-atul.gupta@chelsio.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Nov 16, 2018 at 04:31:10PM -0600, Rob Herring wrote:
-> On Fri, Nov 16, 2018 at 02:18:54PM +0800, Herbert Xu wrote:
-> > On Wed, Nov 07, 2018 at 03:10:16PM +0800, Ryder Lee wrote:
-> > > This updates bindings for MT7629 RNG driver.
-> > > 
-> > > Signed-off-by: Ryder Lee <ryder.lee@mediatek.com>
-> > 
-> > Who is meant to take this patch?
-> 
-> I've applied it.
+Immediate packets sent to hardware should include the work
+request length in calculating the flits. WR occupy one flit and
+if not accounted result in invalid request which stalls the HW
+queue.
 
-Thanks Rob!
+Cc: stable@vger.kernel.org
+Signed-off-by: Atul Gupta <atul.gupta@chelsio.com>
+---
+ drivers/crypto/chelsio/chcr_ipsec.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/crypto/chelsio/chcr_ipsec.c b/drivers/crypto/chelsio/chcr_ipsec.c
+index 461b97e..1ff8738 100644
+--- a/drivers/crypto/chelsio/chcr_ipsec.c
++++ b/drivers/crypto/chelsio/chcr_ipsec.c
+@@ -303,7 +303,10 @@ static bool chcr_ipsec_offload_ok(struct sk_buff *skb, struct xfrm_state *x)
+ 
+ static inline int is_eth_imm(const struct sk_buff *skb, unsigned int kctx_len)
+ {
+-	int hdrlen = sizeof(struct chcr_ipsec_req) + kctx_len;
++	int hdrlen;
++
++	hdrlen = sizeof(struct fw_ulptx_wr) +
++		 sizeof(struct chcr_ipsec_req) + kctx_len;
+ 
+ 	hdrlen += sizeof(struct cpl_tx_pkt);
+ 	if (skb->len <= MAX_IMM_TX_PKT_LEN - hdrlen)
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1.8.3.1
