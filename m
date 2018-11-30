@@ -1,138 +1,197 @@
-Return-Path: <SRS0=9Ofa=N6=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:48324 "EHLO mail.kernel.org"
+Return-Path: <SRS0=r27M=OJ=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from ale.deltatee.com ([207.54.116.67]:41084 "EHLO ale.deltatee.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726350AbeKTFx2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 20 Nov 2018 00:53:28 -0500
-Date: Mon, 19 Nov 2018 11:28:23 -0800
-From: Eric Biggers <ebiggers@kernel.org>
-To: Milan Broz <gmazyland@gmail.com>
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        linux-fscrypt@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        LKML <linux-kernel@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Paul Crowley <paulcrowley@google.com>,
-        Greg Kaiser <gkaiser@google.com>,
-        Michael Halcrow <mhalcrow@google.com>,
-        Samuel Neves <samuel.c.p.neves@gmail.com>,
-        Tomer Ashur <tomer.ashur@esat.kuleuven.be>
-Subject: Re: [RFC PATCH v2 00/12] crypto: Adiantum support
-Message-ID: <20181119192821.GA258711@gmail.com>
-References: <20181015175424.97147-1-ebiggers@kernel.org>
- <CAHmME9p1aiqWZ4+viaLscO8+qmixdVhMA1MAtMAFEHPG36DcPg@mail.gmail.com>
- <20181019190411.GB246441@gmail.com>
- <1f65ce09-93b3-f43e-49d5-9d9d6c0bb9e0@gmail.com>
- <20181116215249.GA27149@gmail.com>
- <56883f08-26cb-ecef-5698-1c2948714773@gmail.com>
+        id S1726752AbeLAEQK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 30 Nov 2018 23:16:10 -0500
+From: Logan Gunthorpe <logang@deltatee.com>
+To: linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
+        linux-ntb@googlegroups.com, linux-crypto@vger.kernel.org,
+        linux-mm@kvack.org, Andrew Morton <akpm@linux-foundation.org>
+Cc: Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Andy Shevchenko <andy.shevchenko@gmail.com>,
+        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Alan Cox <gnomes@lxorguk.ukuu.org.uk>
+Date: Fri, 30 Nov 2018 10:06:04 -0700
+Message-Id: <20181130170606.17252-5-logang@deltatee.com>
+In-Reply-To: <20181130170606.17252-1-logang@deltatee.com>
+References: <20181130170606.17252-1-logang@deltatee.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <56883f08-26cb-ecef-5698-1c2948714773@gmail.com>
+Content-Transfer-Encoding: 8bit
+Subject: [PATCH v24 4/6] io-64-nonatomic: add io{read|write}64[be]{_lo_hi|_hi_lo} macros
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Milan,
+This patch adds generic io{read|write}64[be]{_lo_hi|_hi_lo} macros if
+they are not already defined by the architecture. (As they are provided
+by the generic iomap library).
 
-On Sat, Nov 17, 2018 at 11:29:23AM +0100, Milan Broz wrote:
-> On 16/11/2018 22:52, Eric Biggers wrote:
-> > Hi Milan,
-> > 
-> > On Sat, Oct 20, 2018 at 12:26:20PM +0200, Milan Broz wrote:
-> >>
-> >> Adiantum (as in your current git branches on kernel.org) can be used for dm-crypt
-> >> without any changes (yes, I played with it :) and with some easy tricks directly
-> >> through cryptsetup/LUKS as well.
-> >>
-> >> I think we should have this as an alternative to length-preserving wide-block
-> >> cipher modes for FDE.
-> >>
-> > 
-> > Yes, dm-crypt can use Adiantum by specifying the cipher as
-> > "capi:adiantum(xchacha12,aes)-plain64".
-> > 
-> > But, I'm having trouble getting cryptsetup/LUKS to use Adiantum.
-> > Using LUKS1, the following works:
-> > 
-> >     cryptsetup luksFormat /dev/$partition --cipher='capi:adiantum(xchacha12,aes)-plain64' --key-size 256
-> > 
-> > However, when possible we'd like people to use 4K sectors for better
-> > performance, which I understand requires using the LUKS2 format along with
-> > cryptsetup v2.0.0+ and Linux v4.12+.  But the following does *not* work:
-> > 
-> >     cryptsetup luksFormat /dev/$partition --cipher='capi:adiantum(xchacha12,aes)-plain64' --key-size 256 --type luks2 --sector-size 4096
-> 
-> Hi Eric,
-> 
-> actually I planned to test it and then reply to these patches with example cryptsetup
-> commands, but did not have time for it yet.
-> So thanks for a reminder ;-)
-> 
-> Recent cryptsetup supports sector-size even for plain device.
-> 
-> You actually do not need to use capi: prefix, Adiantum is a composition,
-> so "xchacha20,aes-adiantum-plain64" works as well (and it should work even for old cryptsetup).
-> (It is ugly, but it should be compatible.)
+The patch also points io{read|write}64[be] to the variant specified by the
+header name.
 
-Okay, good to know the "capi:" prefix is not needed.
-That makes things slightly easier for us.
+This is because new drivers are encouraged to use ioreadXX, et al instead
+of readX[1], et al -- and mixing ioreadXX with readq is pretty ugly.
 
-> 
-> # cryptsetup open --type plain -c xchacha20,aes-adiantum-plain64 -s 256 --sector-size 4096 /dev/sdb test
-> 
-> For LUKS and benchmark, Adiantum need to use 32 bytes IV. And we have these parameter,
-> unfortunately, hardcoded...
-> (I guess there is already a way how to get this dynamically from userspace crypto API now.)
-> 
-> So, I already added patch to devel branch patch for benchmark to support Adiantum few days ago
-> https://gitlab.com/cryptsetup/cryptsetup/commit/bce567db461e558af7d735c694a50146db899709
-> 
-> This allows trivial benchmark (but it just encrypts one big blob of data):
-> 
-> #  cryptsetup benchmark -c xchacha20,aes-adiantum -s 256
-> # Tests are approximate using memory only (no storage IO).
-> #            Algorithm |       Key |      Encryption |      Decryption
-> xchacha20,aes-adiantum        256b       146.6 MiB/s       148.0 MiB/s
-> ...
-> 
-> # ./cryptsetup benchmark -c xchacha12,aes-adiantum -s 256
-> xchacha12,aes-adiantum        256b       181.7 MiB/s       184.6 MiB/s
+[1] LDD3: section 9.4.2
 
-Note that Adiantum benchmarks on x86 are misleading at the moment, since the
-initial kernel patchset doesn't include SSE2 and AVX2 optimized XChaCha and
-NHPoly1305.  To start, only C and arm32 NEON implementations are included.
-Hence, on x86 Adiantum will appear much slower than it should be.  But I'm
-planning to add the x86 and arm64 implementations, so it will get much faster.
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+Reviewed-by: Andy Shevchenko <andy.shevchenko@gmail.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Arnd Bergmann <arnd@arndb.de>
+Cc: Alan Cox <gnomes@lxorguk.ukuu.org.uk>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ include/linux/io-64-nonatomic-hi-lo.h | 64 +++++++++++++++++++++++++++
+ include/linux/io-64-nonatomic-lo-hi.h | 64 +++++++++++++++++++++++++++
+ 2 files changed, 128 insertions(+)
 
-> 
-> For LUKS2, we need a similar change to cryptoAPI IV size (unfortunately it does not
-> fallback to old keyslot handling, so LUKS2 does not work currently now).
-> 
-> I quickly added a workaround that fallbacks to default keyslot encryption for keyslots
-> in this case
-> https://gitlab.com/cryptsetup/cryptsetup/commit/29e87add5aac9d5eb0087881146988d9c4280915
-> 
-> then you can use LUKS2
-> # cryptsetup luksFormat --type luks2 --sector-size 4096 -c xchacha20,aes-adiantum-plain64 -s 256 /dev/sdb
-> 
-> (Example above will encrypt keyslots with AES-XTS and use Aviantum for data only.)
-> 
-> So, unfortunately yes, we need some small changes in cryptsetup for LUKS;
-> plain mode should work out of the box (with the syntax above).
-
-I think that when using AF_ALG, cryptsetup should get the IV size from
-/proc/crypto, or else have it hardcoded that "adiantum" uses 32-byte IVs.
-(Actually Adiantum can formally can use any size IV, but we had to choose a
-fixed size for Linux's crypto API.)
-
-Getting the IV size via CRYPTO_MSG_GETALG via NETLINK_CRYPTO is also an option,
-but that requires the kconfig option CONFIG_CRYPTO_USER which isn't guaranteed
-to be enabled even if CONFIG_CRYPTO_USER_API_SKCIPHER is.
-
-Also: why is cryptsetup's default keyslot encryption AES-128-XTS instead of
-AES-256-XTS?  People can choose a cipher with a 256-bit key strength such as
-AES-256-XTS or Adiantum, so the keyslots should use at least that strength too.
-
-Thanks,
-
-- Eric
+diff --git a/include/linux/io-64-nonatomic-hi-lo.h b/include/linux/io-64-nonatomic-hi-lo.h
+index 862d786a904f..ae21b72cce85 100644
+--- a/include/linux/io-64-nonatomic-hi-lo.h
++++ b/include/linux/io-64-nonatomic-hi-lo.h
+@@ -55,4 +55,68 @@ static inline void hi_lo_writeq_relaxed(__u64 val, volatile void __iomem *addr)
+ #define writeq_relaxed hi_lo_writeq_relaxed
+ #endif
+ 
++#ifndef ioread64_hi_lo
++#define ioread64_hi_lo ioread64_hi_lo
++static inline u64 ioread64_hi_lo(void __iomem *addr)
++{
++	u32 low, high;
++
++	high = ioread32(addr + sizeof(u32));
++	low = ioread32(addr);
++
++	return low + ((u64)high << 32);
++}
++#endif
++
++#ifndef iowrite64_hi_lo
++#define iowrite64_hi_lo iowrite64_hi_lo
++static inline void iowrite64_hi_lo(u64 val, void __iomem *addr)
++{
++	iowrite32(val >> 32, addr + sizeof(u32));
++	iowrite32(val, addr);
++}
++#endif
++
++#ifndef ioread64be_hi_lo
++#define ioread64be_hi_lo ioread64be_hi_lo
++static inline u64 ioread64be_hi_lo(void __iomem *addr)
++{
++	u32 low, high;
++
++	high = ioread32be(addr);
++	low = ioread32be(addr + sizeof(u32));
++
++	return low + ((u64)high << 32);
++}
++#endif
++
++#ifndef iowrite64be_hi_lo
++#define iowrite64be_hi_lo iowrite64be_hi_lo
++static inline void iowrite64be_hi_lo(u64 val, void __iomem *addr)
++{
++	iowrite32be(val >> 32, addr);
++	iowrite32be(val, addr + sizeof(u32));
++}
++#endif
++
++#ifndef ioread64
++#define ioread64_is_nonatomic
++#define ioread64 ioread64_hi_lo
++#endif
++
++#ifndef iowrite64
++#define iowrite64_is_nonatomic
++#define iowrite64 iowrite64_hi_lo
++#endif
++
++#ifndef ioread64be
++#define ioread64be_is_nonatomic
++#define ioread64be ioread64be_hi_lo
++#endif
++
++#ifndef iowrite64be
++#define iowrite64be_is_nonatomic
++#define iowrite64be iowrite64be_hi_lo
++#endif
++
+ #endif	/* _LINUX_IO_64_NONATOMIC_HI_LO_H_ */
+diff --git a/include/linux/io-64-nonatomic-lo-hi.h b/include/linux/io-64-nonatomic-lo-hi.h
+index d042e7bb5adb..faaa842dbdb9 100644
+--- a/include/linux/io-64-nonatomic-lo-hi.h
++++ b/include/linux/io-64-nonatomic-lo-hi.h
+@@ -55,4 +55,68 @@ static inline void lo_hi_writeq_relaxed(__u64 val, volatile void __iomem *addr)
+ #define writeq_relaxed lo_hi_writeq_relaxed
+ #endif
+ 
++#ifndef ioread64_lo_hi
++#define ioread64_lo_hi ioread64_lo_hi
++static inline u64 ioread64_lo_hi(void __iomem *addr)
++{
++	u32 low, high;
++
++	low = ioread32(addr);
++	high = ioread32(addr + sizeof(u32));
++
++	return low + ((u64)high << 32);
++}
++#endif
++
++#ifndef iowrite64_lo_hi
++#define iowrite64_lo_hi iowrite64_lo_hi
++static inline void iowrite64_lo_hi(u64 val, void __iomem *addr)
++{
++	iowrite32(val, addr);
++	iowrite32(val >> 32, addr + sizeof(u32));
++}
++#endif
++
++#ifndef ioread64be_lo_hi
++#define ioread64be_lo_hi ioread64be_lo_hi
++static inline u64 ioread64be_lo_hi(void __iomem *addr)
++{
++	u32 low, high;
++
++	low = ioread32be(addr + sizeof(u32));
++	high = ioread32be(addr);
++
++	return low + ((u64)high << 32);
++}
++#endif
++
++#ifndef iowrite64be_lo_hi
++#define iowrite64be_lo_hi iowrite64be_lo_hi
++static inline void iowrite64be_lo_hi(u64 val, void __iomem *addr)
++{
++	iowrite32be(val, addr + sizeof(u32));
++	iowrite32be(val >> 32, addr);
++}
++#endif
++
++#ifndef ioread64
++#define ioread64_is_nonatomic
++#define ioread64 ioread64_lo_hi
++#endif
++
++#ifndef iowrite64
++#define iowrite64_is_nonatomic
++#define iowrite64 iowrite64_lo_hi
++#endif
++
++#ifndef ioread64be
++#define ioread64be_is_nonatomic
++#define ioread64be ioread64be_lo_hi
++#endif
++
++#ifndef iowrite64be
++#define iowrite64be_is_nonatomic
++#define iowrite64be iowrite64be_lo_hi
++#endif
++
+ #endif	/* _LINUX_IO_64_NONATOMIC_LO_HI_H_ */
+-- 
+2.19.0
