@@ -1,565 +1,313 @@
-Return-Path: <SRS0=Oq1A=OC=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:43691 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2504038AbeKWWqt (ORCPT
+Return-Path: <SRS0=r27M=OJ=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail-io1-f68.google.com ([209.85.166.68]:43187 "EHLO
+        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726270AbeLAALc (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 23 Nov 2018 17:46:49 -0500
-Received: by mail-wr1-f68.google.com with SMTP id r10so12083427wrs.10
-        for <linux-crypto@vger.kernel.org>; Fri, 23 Nov 2018 04:02:50 -0800 (PST)
-From: Corentin Labbe <clabbe@baylibre.com>
-To: davem@davemloft.net, ebiggers@kernel.org,
-        herbert@gondor.apana.org.au, nhorman@tuxdriver.com
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Corentin Labbe <clabbe@baylibre.com>
-Subject: [PATCH v4 10/11] crypto: crypto_user_stat: rename err_cnt parameter
-Date: Fri, 23 Nov 2018 12:02:20 +0000
-Message-Id: <1542974541-23024-11-git-send-email-clabbe@baylibre.com>
-In-Reply-To: <1542974541-23024-1-git-send-email-clabbe@baylibre.com>
-References: <1542974541-23024-1-git-send-email-clabbe@baylibre.com>
+        Fri, 30 Nov 2018 19:11:32 -0500
+Received: by mail-io1-f68.google.com with SMTP id g8so4413369iop.10
+        for <linux-crypto@vger.kernel.org>; Fri, 30 Nov 2018 05:02:17 -0800 (PST)
+MIME-Version: 1.0
+References: <20181129063422.24307-1-ebiggers@kernel.org> <20181129063422.24307-3-ebiggers@kernel.org>
+In-Reply-To: <20181129063422.24307-3-ebiggers@kernel.org>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date: Fri, 30 Nov 2018 14:02:05 +0100
+Message-ID: <CAKv+Gu_NqwJV4JTaTS3WR-ex2gGaO_Ji2T+W6T6UKa8UQvvuyw@mail.gmail.com>
+Subject: Re: [PATCH 2/4] crypto: arm64/chacha20 - add XChaCha20 support
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>,
+        Paul Crowley <paulcrowley@google.com>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Since now all crypto stats are on their own structures, it is now
-useless to have the algorithm name in the err_cnt member.
+On Thu, 29 Nov 2018 at 07:35, Eric Biggers <ebiggers@kernel.org> wrote:
+>
+> From: Eric Biggers <ebiggers@google.com>
+>
+> Add an XChaCha20 implementation that is hooked up to the ARM64 NEON
+> implementation of ChaCha20.  This can be used by Adiantum.
+>
+> A NEON implementation of single-block HChaCha20 is also added so that
+> XChaCha20 can use it rather than the generic implementation.  This
+> required refactoring the ChaCha permutation into its own function.
+>
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> ---
+>  arch/arm64/crypto/Kconfig              |   2 +-
+>  arch/arm64/crypto/chacha20-neon-core.S |  62 ++++++++++-----
+>  arch/arm64/crypto/chacha20-neon-glue.c | 101 +++++++++++++++++++------
+>  3 files changed, 121 insertions(+), 44 deletions(-)
+>
+> diff --git a/arch/arm64/crypto/Kconfig b/arch/arm64/crypto/Kconfig
+> index 3f5aeb786192b..d54ddb8468ef5 100644
+> --- a/arch/arm64/crypto/Kconfig
+> +++ b/arch/arm64/crypto/Kconfig
+> @@ -101,7 +101,7 @@ config CRYPTO_AES_ARM64_NEON_BLK
+>         select CRYPTO_SIMD
+>
+>  config CRYPTO_CHACHA20_NEON
+> -       tristate "NEON accelerated ChaCha20 symmetric cipher"
+> +       tristate "ChaCha20 and XChaCha20 stream ciphers using NEON instructions"
+>         depends on KERNEL_MODE_NEON
+>         select CRYPTO_BLKCIPHER
+>         select CRYPTO_CHACHA20
+> diff --git a/arch/arm64/crypto/chacha20-neon-core.S b/arch/arm64/crypto/chacha20-neon-core.S
+> index 13c85e272c2a1..378850505c0ae 100644
+> --- a/arch/arm64/crypto/chacha20-neon-core.S
+> +++ b/arch/arm64/crypto/chacha20-neon-core.S
+> @@ -23,25 +23,20 @@
+>         .text
+>         .align          6
+>
+> -ENTRY(chacha20_block_xor_neon)
+> -       // x0: Input state matrix, s
+> -       // x1: 1 data block output, o
+> -       // x2: 1 data block input, i
+> -
+> -       //
+> -       // This function encrypts one ChaCha20 block by loading the state matrix
+> -       // in four NEON registers. It performs matrix operation on four words in
+> -       // parallel, but requires shuffling to rearrange the words after each
+> -       // round.
+> -       //
+> -
+> -       // x0..3 = s0..3
+> -       adr             x3, ROT8
+> -       ld1             {v0.4s-v3.4s}, [x0]
+> -       ld1             {v8.4s-v11.4s}, [x0]
+> -       ld1             {v12.4s}, [x3]
+> +/*
+> + * chacha20_permute - permute one block
+> + *
+> + * Permute one 64-byte block where the state matrix is stored in the four NEON
+> + * registers v0-v3.  It performs matrix operations on four words in parallel,
+> + * but requires shuffling to rearrange the words after each round.
+> + *
+> + * Clobbers: x3, x10, v4, v12
+> + */
+> +chacha20_permute:
+>
+>         mov             x3, #10
+> +       adr             x10, ROT8
+> +       ld1             {v12.4s}, [x10]
+>
+>  .Ldoubleround:
+>         // x0 += x1, x3 = rotl32(x3 ^ x0, 16)
+> @@ -105,6 +100,22 @@ ENTRY(chacha20_block_xor_neon)
+>         subs            x3, x3, #1
+>         b.ne            .Ldoubleround
+>
+> +       ret
+> +ENDPROC(chacha20_permute)
+> +
+> +ENTRY(chacha20_block_xor_neon)
+> +       // x0: Input state matrix, s
+> +       // x1: 1 data block output, o
+> +       // x2: 1 data block input, i
+> +
+> +       mov             x9, lr
 
-Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
----
- crypto/algapi.c                 | 38 ++++++++++++++++-----------------
- crypto/crypto_user_stat.c       | 18 ++++++++--------
- include/linux/crypto.h          | 28 ++++++++++++------------
- include/uapi/linux/cryptouser.h | 14 ++++++------
- tools/crypto/getstat.c          | 18 ++++++++--------
- 5 files changed, 58 insertions(+), 58 deletions(-)
+please use x30 not lr. The latter is not supported by all assemblers
 
-diff --git a/crypto/algapi.c b/crypto/algapi.c
-index 62a275b6d352..84e9b4e5389a 100644
---- a/crypto/algapi.c
-+++ b/crypto/algapi.c
-@@ -1082,7 +1082,7 @@ void crypto_stats_ablkcipher_encrypt(unsigned int nbytes, int ret,
- 				     struct crypto_alg *alg)
- {
- 	if (ret && ret != -EINPROGRESS && ret != -EBUSY) {
--		atomic64_inc(&alg->stats.cipher.cipher_err_cnt);
-+		atomic64_inc(&alg->stats.cipher.err_cnt);
- 	} else {
- 		atomic64_inc(&alg->stats.cipher.encrypt_cnt);
- 		atomic64_add(nbytes, &alg->stats.cipher.encrypt_tlen);
-@@ -1094,7 +1094,7 @@ void crypto_stats_ablkcipher_decrypt(unsigned int nbytes, int ret,
- 				     struct crypto_alg *alg)
- {
- 	if (ret && ret != -EINPROGRESS && ret != -EBUSY) {
--		atomic64_inc(&alg->stats.cipher.cipher_err_cnt);
-+		atomic64_inc(&alg->stats.cipher.err_cnt);
- 	} else {
- 		atomic64_inc(&alg->stats.cipher.decrypt_cnt);
- 		atomic64_add(nbytes, &alg->stats.cipher.decrypt_tlen);
-@@ -1106,7 +1106,7 @@ void crypto_stats_aead_encrypt(unsigned int cryptlen, struct crypto_alg *alg,
- 			       int ret)
- {
- 	if (ret && ret != -EINPROGRESS && ret != -EBUSY) {
--		atomic64_inc(&alg->stats.aead.aead_err_cnt);
-+		atomic64_inc(&alg->stats.aead.err_cnt);
- 	} else {
- 		atomic64_inc(&alg->stats.aead.encrypt_cnt);
- 		atomic64_add(cryptlen, &alg->stats.aead.encrypt_tlen);
-@@ -1118,7 +1118,7 @@ void crypto_stats_aead_decrypt(unsigned int cryptlen, struct crypto_alg *alg,
- 			       int ret)
- {
- 	if (ret && ret != -EINPROGRESS && ret != -EBUSY) {
--		atomic64_inc(&alg->stats.aead.aead_err_cnt);
-+		atomic64_inc(&alg->stats.aead.err_cnt);
- 	} else {
- 		atomic64_inc(&alg->stats.aead.decrypt_cnt);
- 		atomic64_add(cryptlen, &alg->stats.aead.decrypt_tlen);
-@@ -1130,7 +1130,7 @@ void crypto_stats_akcipher_encrypt(unsigned int src_len, int ret,
- 				   struct crypto_alg *alg)
- {
- 	if (ret && ret != -EINPROGRESS && ret != -EBUSY) {
--		atomic64_inc(&alg->stats.akcipher.akcipher_err_cnt);
-+		atomic64_inc(&alg->stats.akcipher.err_cnt);
- 	} else {
- 		atomic64_inc(&alg->stats.akcipher.encrypt_cnt);
- 		atomic64_add(src_len, &alg->stats.akcipher.encrypt_tlen);
-@@ -1142,7 +1142,7 @@ void crypto_stats_akcipher_decrypt(unsigned int src_len, int ret,
- 				   struct crypto_alg *alg)
- {
- 	if (ret && ret != -EINPROGRESS && ret != -EBUSY) {
--		atomic64_inc(&alg->stats.akcipher.akcipher_err_cnt);
-+		atomic64_inc(&alg->stats.akcipher.err_cnt);
- 	} else {
- 		atomic64_inc(&alg->stats.akcipher.decrypt_cnt);
- 		atomic64_add(src_len, &alg->stats.akcipher.decrypt_tlen);
-@@ -1153,7 +1153,7 @@ void crypto_stats_akcipher_decrypt(unsigned int src_len, int ret,
- void crypto_stats_akcipher_sign(int ret, struct crypto_alg *alg)
- {
- 	if (ret && ret != -EINPROGRESS && ret != -EBUSY)
--		atomic64_inc(&alg->stats.akcipher.akcipher_err_cnt);
-+		atomic64_inc(&alg->stats.akcipher.err_cnt);
- 	else
- 		atomic64_inc(&alg->stats.akcipher.sign_cnt);
- 	crypto_alg_put(alg);
-@@ -1162,7 +1162,7 @@ void crypto_stats_akcipher_sign(int ret, struct crypto_alg *alg)
- void crypto_stats_akcipher_verify(int ret, struct crypto_alg *alg)
- {
- 	if (ret && ret != -EINPROGRESS && ret != -EBUSY)
--		atomic64_inc(&alg->stats.akcipher.akcipher_err_cnt);
-+		atomic64_inc(&alg->stats.akcipher.err_cnt);
- 	else
- 		atomic64_inc(&alg->stats.akcipher.verify_cnt);
- 	crypto_alg_put(alg);
-@@ -1171,7 +1171,7 @@ void crypto_stats_akcipher_verify(int ret, struct crypto_alg *alg)
- void crypto_stats_compress(unsigned int slen, int ret, struct crypto_alg *alg)
- {
- 	if (ret && ret != -EINPROGRESS && ret != -EBUSY) {
--		atomic64_inc(&alg->stats.compress.compress_err_cnt);
-+		atomic64_inc(&alg->stats.compress.err_cnt);
- 	} else {
- 		atomic64_inc(&alg->stats.compress.compress_cnt);
- 		atomic64_add(slen, &alg->stats.compress.compress_tlen);
-@@ -1182,7 +1182,7 @@ void crypto_stats_compress(unsigned int slen, int ret, struct crypto_alg *alg)
- void crypto_stats_decompress(unsigned int slen, int ret, struct crypto_alg *alg)
- {
- 	if (ret && ret != -EINPROGRESS && ret != -EBUSY) {
--		atomic64_inc(&alg->stats.compress.compress_err_cnt);
-+		atomic64_inc(&alg->stats.compress.err_cnt);
- 	} else {
- 		atomic64_inc(&alg->stats.compress.decompress_cnt);
- 		atomic64_add(slen, &alg->stats.compress.decompress_tlen);
-@@ -1194,7 +1194,7 @@ void crypto_stats_ahash_update(unsigned int nbytes, int ret,
- 			       struct crypto_alg *alg)
- {
- 	if (ret && ret != -EINPROGRESS && ret != -EBUSY)
--		atomic64_inc(&alg->stats.hash.hash_err_cnt);
-+		atomic64_inc(&alg->stats.hash.err_cnt);
- 	else
- 		atomic64_add(nbytes, &alg->stats.hash.hash_tlen);
- 	crypto_alg_put(alg);
-@@ -1204,7 +1204,7 @@ void crypto_stats_ahash_final(unsigned int nbytes, int ret,
- 			      struct crypto_alg *alg)
- {
- 	if (ret && ret != -EINPROGRESS && ret != -EBUSY) {
--		atomic64_inc(&alg->stats.hash.hash_err_cnt);
-+		atomic64_inc(&alg->stats.hash.err_cnt);
- 	} else {
- 		atomic64_inc(&alg->stats.hash.hash_cnt);
- 		atomic64_add(nbytes, &alg->stats.hash.hash_tlen);
-@@ -1215,7 +1215,7 @@ void crypto_stats_ahash_final(unsigned int nbytes, int ret,
- void crypto_stats_kpp_set_secret(struct crypto_alg *alg, int ret)
- {
- 	if (ret)
--		atomic64_inc(&alg->stats.kpp.kpp_err_cnt);
-+		atomic64_inc(&alg->stats.kpp.err_cnt);
- 	else
- 		atomic64_inc(&alg->stats.kpp.setsecret_cnt);
- 	crypto_alg_put(alg);
-@@ -1224,7 +1224,7 @@ void crypto_stats_kpp_set_secret(struct crypto_alg *alg, int ret)
- void crypto_stats_kpp_generate_public_key(struct crypto_alg *alg, int ret)
- {
- 	if (ret)
--		atomic64_inc(&alg->stats.kpp.kpp_err_cnt);
-+		atomic64_inc(&alg->stats.kpp.err_cnt);
- 	else
- 		atomic64_inc(&alg->stats.kpp.generate_public_key_cnt);
- 	crypto_alg_put(alg);
-@@ -1233,7 +1233,7 @@ void crypto_stats_kpp_generate_public_key(struct crypto_alg *alg, int ret)
- void crypto_stats_kpp_compute_shared_secret(struct crypto_alg *alg, int ret)
- {
- 	if (ret)
--		atomic64_inc(&alg->stats.kpp.kpp_err_cnt);
-+		atomic64_inc(&alg->stats.kpp.err_cnt);
- 	else
- 		atomic64_inc(&alg->stats.kpp.compute_shared_secret_cnt);
- 	crypto_alg_put(alg);
-@@ -1242,7 +1242,7 @@ void crypto_stats_kpp_compute_shared_secret(struct crypto_alg *alg, int ret)
- void crypto_stats_rng_seed(struct crypto_alg *alg, int ret)
- {
- 	if (ret && ret != -EINPROGRESS && ret != -EBUSY)
--		atomic64_inc(&alg->stats.rng.rng_err_cnt);
-+		atomic64_inc(&alg->stats.rng.err_cnt);
- 	else
- 		atomic64_inc(&alg->stats.rng.seed_cnt);
- 	crypto_alg_put(alg);
-@@ -1252,7 +1252,7 @@ void crypto_stats_rng_generate(struct crypto_alg *alg, unsigned int dlen,
- 			       int ret)
- {
- 	if (ret && ret != -EINPROGRESS && ret != -EBUSY) {
--		atomic64_inc(&alg->stats.rng.rng_err_cnt);
-+		atomic64_inc(&alg->stats.rng.err_cnt);
- 	} else {
- 		atomic64_inc(&alg->stats.rng.generate_cnt);
- 		atomic64_add(dlen, &alg->stats.rng.generate_tlen);
-@@ -1264,7 +1264,7 @@ void crypto_stats_skcipher_encrypt(unsigned int cryptlen, int ret,
- 				   struct crypto_alg *alg)
- {
- 	if (ret && ret != -EINPROGRESS && ret != -EBUSY) {
--		atomic64_inc(&alg->stats.cipher.cipher_err_cnt);
-+		atomic64_inc(&alg->stats.cipher.err_cnt);
- 	} else {
- 		atomic64_inc(&alg->stats.cipher.encrypt_cnt);
- 		atomic64_add(cryptlen, &alg->stats.cipher.encrypt_tlen);
-@@ -1276,7 +1276,7 @@ void crypto_stats_skcipher_decrypt(unsigned int cryptlen, int ret,
- 				   struct crypto_alg *alg)
- {
- 	if (ret && ret != -EINPROGRESS && ret != -EBUSY) {
--		atomic64_inc(&alg->stats.cipher.cipher_err_cnt);
-+		atomic64_inc(&alg->stats.cipher.err_cnt);
- 	} else {
- 		atomic64_inc(&alg->stats.cipher.decrypt_cnt);
- 		atomic64_add(cryptlen, &alg->stats.cipher.decrypt_tlen);
-diff --git a/crypto/crypto_user_stat.c b/crypto/crypto_user_stat.c
-index 113bf1691560..0ba00aaeb810 100644
---- a/crypto/crypto_user_stat.c
-+++ b/crypto/crypto_user_stat.c
-@@ -43,7 +43,7 @@ static int crypto_report_aead(struct sk_buff *skb, struct crypto_alg *alg)
- 	raead.stat_encrypt_tlen = atomic64_read(&alg->stats.aead.encrypt_tlen);
- 	raead.stat_decrypt_cnt = atomic64_read(&alg->stats.aead.decrypt_cnt);
- 	raead.stat_decrypt_tlen = atomic64_read(&alg->stats.aead.decrypt_tlen);
--	raead.stat_aead_err_cnt = atomic64_read(&alg->stats.aead.aead_err_cnt);
-+	raead.stat_err_cnt = atomic64_read(&alg->stats.aead.err_cnt);
- 
- 	return nla_put(skb, CRYPTOCFGA_STAT_AEAD, sizeof(raead), &raead);
- }
-@@ -60,7 +60,7 @@ static int crypto_report_cipher(struct sk_buff *skb, struct crypto_alg *alg)
- 	rcipher.stat_encrypt_tlen = atomic64_read(&alg->stats.cipher.encrypt_tlen);
- 	rcipher.stat_decrypt_cnt =  atomic64_read(&alg->stats.cipher.decrypt_cnt);
- 	rcipher.stat_decrypt_tlen = atomic64_read(&alg->stats.cipher.decrypt_tlen);
--	rcipher.stat_cipher_err_cnt =  atomic64_read(&alg->stats.cipher.cipher_err_cnt);
-+	rcipher.stat_err_cnt =  atomic64_read(&alg->stats.cipher.err_cnt);
- 
- 	return nla_put(skb, CRYPTOCFGA_STAT_CIPHER, sizeof(rcipher), &rcipher);
- }
-@@ -76,7 +76,7 @@ static int crypto_report_comp(struct sk_buff *skb, struct crypto_alg *alg)
- 	rcomp.stat_compress_tlen = atomic64_read(&alg->stats.compress.compress_tlen);
- 	rcomp.stat_decompress_cnt = atomic64_read(&alg->stats.compress.decompress_cnt);
- 	rcomp.stat_decompress_tlen = atomic64_read(&alg->stats.compress.decompress_tlen);
--	rcomp.stat_compress_err_cnt = atomic64_read(&alg->stats.compress.compress_err_cnt);
-+	rcomp.stat_err_cnt = atomic64_read(&alg->stats.compress.err_cnt);
- 
- 	return nla_put(skb, CRYPTOCFGA_STAT_COMPRESS, sizeof(rcomp), &rcomp);
- }
-@@ -92,7 +92,7 @@ static int crypto_report_acomp(struct sk_buff *skb, struct crypto_alg *alg)
- 	racomp.stat_compress_tlen = atomic64_read(&alg->stats.compress.compress_tlen);
- 	racomp.stat_decompress_cnt =  atomic64_read(&alg->stats.compress.decompress_cnt);
- 	racomp.stat_decompress_tlen = atomic64_read(&alg->stats.compress.decompress_tlen);
--	racomp.stat_compress_err_cnt = atomic64_read(&alg->stats.compress.compress_err_cnt);
-+	racomp.stat_err_cnt = atomic64_read(&alg->stats.compress.err_cnt);
- 
- 	return nla_put(skb, CRYPTOCFGA_STAT_ACOMP, sizeof(racomp), &racomp);
- }
-@@ -110,7 +110,7 @@ static int crypto_report_akcipher(struct sk_buff *skb, struct crypto_alg *alg)
- 	rakcipher.stat_decrypt_tlen = atomic64_read(&alg->stats.akcipher.decrypt_tlen);
- 	rakcipher.stat_sign_cnt = atomic64_read(&alg->stats.akcipher.sign_cnt);
- 	rakcipher.stat_verify_cnt = atomic64_read(&alg->stats.akcipher.verify_cnt);
--	rakcipher.stat_akcipher_err_cnt = atomic64_read(&alg->stats.akcipher.akcipher_err_cnt);
-+	rakcipher.stat_err_cnt = atomic64_read(&alg->stats.akcipher.err_cnt);
- 
- 	return nla_put(skb, CRYPTOCFGA_STAT_AKCIPHER,
- 		       sizeof(rakcipher), &rakcipher);
-@@ -127,7 +127,7 @@ static int crypto_report_kpp(struct sk_buff *skb, struct crypto_alg *alg)
- 	rkpp.stat_setsecret_cnt = atomic64_read(&alg->stats.kpp.setsecret_cnt);
- 	rkpp.stat_generate_public_key_cnt = atomic64_read(&alg->stats.kpp.generate_public_key_cnt);
- 	rkpp.stat_compute_shared_secret_cnt = atomic64_read(&alg->stats.kpp.compute_shared_secret_cnt);
--	rkpp.stat_kpp_err_cnt = atomic64_read(&alg->stats.kpp.kpp_err_cnt);
-+	rkpp.stat_err_cnt = atomic64_read(&alg->stats.kpp.err_cnt);
- 
- 	return nla_put(skb, CRYPTOCFGA_STAT_KPP, sizeof(rkpp), &rkpp);
- }
-@@ -142,7 +142,7 @@ static int crypto_report_ahash(struct sk_buff *skb, struct crypto_alg *alg)
- 
- 	rhash.stat_hash_cnt = atomic64_read(&alg->stats.hash.hash_cnt);
- 	rhash.stat_hash_tlen = atomic64_read(&alg->stats.hash.hash_tlen);
--	rhash.stat_hash_err_cnt = atomic64_read(&alg->stats.hash.hash_err_cnt);
-+	rhash.stat_err_cnt = atomic64_read(&alg->stats.hash.err_cnt);
- 
- 	return nla_put(skb, CRYPTOCFGA_STAT_HASH, sizeof(rhash), &rhash);
- }
-@@ -157,7 +157,7 @@ static int crypto_report_shash(struct sk_buff *skb, struct crypto_alg *alg)
- 
- 	rhash.stat_hash_cnt =  atomic64_read(&alg->stats.hash.hash_cnt);
- 	rhash.stat_hash_tlen = atomic64_read(&alg->stats.hash.hash_tlen);
--	rhash.stat_hash_err_cnt = atomic64_read(&alg->stats.hash.hash_err_cnt);
-+	rhash.stat_err_cnt = atomic64_read(&alg->stats.hash.err_cnt);
- 
- 	return nla_put(skb, CRYPTOCFGA_STAT_HASH, sizeof(rhash), &rhash);
- }
-@@ -173,7 +173,7 @@ static int crypto_report_rng(struct sk_buff *skb, struct crypto_alg *alg)
- 	rrng.stat_generate_cnt = atomic64_read(&alg->stats.rng.generate_cnt);
- 	rrng.stat_generate_tlen = atomic64_read(&alg->stats.rng.generate_tlen);
- 	rrng.stat_seed_cnt = atomic64_read(&alg->stats.rng.seed_cnt);
--	rrng.stat_rng_err_cnt = atomic64_read(&alg->stats.rng.rng_err_cnt);
-+	rrng.stat_err_cnt = atomic64_read(&alg->stats.rng.err_cnt);
- 
- 	return nla_put(skb, CRYPTOCFGA_STAT_RNG, sizeof(rrng), &rrng);
- }
-diff --git a/include/linux/crypto.h b/include/linux/crypto.h
-index e5616b311104..132a052b3483 100644
---- a/include/linux/crypto.h
-+++ b/include/linux/crypto.h
-@@ -376,14 +376,14 @@ struct compress_alg {
-  * @encrypt_tlen:	total data size handled by encrypt requests
-  * @decrypt_cnt:	number of decrypt requests
-  * @decrypt_tlen:	total data size handled by decrypt requests
-- * @aead_err_cnt:	number of error for AEAD requests
-+ * @err_cnt:		number of error for AEAD requests
-  */
- struct crypto_istat_aead {
- 	atomic64_t encrypt_cnt;
- 	atomic64_t encrypt_tlen;
- 	atomic64_t decrypt_cnt;
- 	atomic64_t decrypt_tlen;
--	atomic64_t aead_err_cnt;
-+	atomic64_t err_cnt;
- };
- 
- /*
-@@ -394,7 +394,7 @@ struct crypto_istat_aead {
-  * @decrypt_tlen:	total data size handled by decrypt requests
-  * @verify_cnt:		number of verify operation
-  * @sign_cnt:		number of sign requests
-- * @akcipher_err_cnt:	number of error for akcipher requests
-+ * @err_cnt:		number of error for akcipher requests
-  */
- struct crypto_istat_akcipher {
- 	atomic64_t encrypt_cnt;
-@@ -403,7 +403,7 @@ struct crypto_istat_akcipher {
- 	atomic64_t decrypt_tlen;
- 	atomic64_t verify_cnt;
- 	atomic64_t sign_cnt;
--	atomic64_t akcipher_err_cnt;
-+	atomic64_t err_cnt;
- };
- 
- /*
-@@ -412,14 +412,14 @@ struct crypto_istat_akcipher {
-  * @encrypt_tlen:	total data size handled by encrypt requests
-  * @decrypt_cnt:	number of decrypt requests
-  * @decrypt_tlen:	total data size handled by decrypt requests
-- * @cipher_err_cnt:	number of error for cipher requests
-+ * @err_cnt:		number of error for cipher requests
-  */
- struct crypto_istat_cipher {
- 	atomic64_t encrypt_cnt;
- 	atomic64_t encrypt_tlen;
- 	atomic64_t decrypt_cnt;
- 	atomic64_t decrypt_tlen;
--	atomic64_t cipher_err_cnt;
-+	atomic64_t err_cnt;
- };
- 
- /*
-@@ -428,26 +428,26 @@ struct crypto_istat_cipher {
-  * @compress_tlen:	total data size handled by compress requests
-  * @decompress_cnt:	number of decompress requests
-  * @decompress_tlen:	total data size handled by decompress requests
-- * @compress_err_cnt:	number of error for compress requests
-+ * @err_cnt:		number of error for compress requests
-  */
- struct crypto_istat_compress {
- 	atomic64_t compress_cnt;
- 	atomic64_t compress_tlen;
- 	atomic64_t decompress_cnt;
- 	atomic64_t decompress_tlen;
--	atomic64_t compress_err_cnt;
-+	atomic64_t err_cnt;
- };
- 
- /*
-  * struct crypto_istat_hash - statistics for has algorithm
-  * @hash_cnt:		number of hash requests
-  * @hash_tlen:		total data size hashed
-- * @hash_err_cnt:	number of error for hash requests
-+ * @err_cnt:		number of error for hash requests
-  */
- struct crypto_istat_hash {
- 	atomic64_t hash_cnt;
- 	atomic64_t hash_tlen;
--	atomic64_t hash_err_cnt;
-+	atomic64_t err_cnt;
- };
- 
- /*
-@@ -455,13 +455,13 @@ struct crypto_istat_hash {
-  * @setsecret_cnt:		number of setsecrey operation
-  * @generate_public_key_cnt:	number of generate_public_key operation
-  * @compute_shared_secret_cnt:	number of compute_shared_secret operation
-- * @kpp_err_cnt:		number of error for KPP requests
-+ * @err_cnt:			number of error for KPP requests
-  */
- struct crypto_istat_kpp {
- 	atomic64_t setsecret_cnt;
- 	atomic64_t generate_public_key_cnt;
- 	atomic64_t compute_shared_secret_cnt;
--	atomic64_t kpp_err_cnt;
-+	atomic64_t err_cnt;
- };
- 
- /*
-@@ -469,13 +469,13 @@ struct crypto_istat_kpp {
-  * @generate_cnt:	number of RNG generate requests
-  * @generate_tlen:	total data size of generated data by the RNG
-  * @seed_cnt:		number of times the RNG was seeded
-- * @rng_err_cnt:	number of error for RNG requests
-+ * @err_cnt:		number of error for RNG requests
-  */
- struct crypto_istat_rng {
- 	atomic64_t generate_cnt;
- 	atomic64_t generate_tlen;
- 	atomic64_t seed_cnt;
--	atomic64_t rng_err_cnt;
-+	atomic64_t err_cnt;
- };
- #endif /* CONFIG_CRYPTO_STATS */
- 
-diff --git a/include/uapi/linux/cryptouser.h b/include/uapi/linux/cryptouser.h
-index 3a70f025e27d..4dc1603919ce 100644
---- a/include/uapi/linux/cryptouser.h
-+++ b/include/uapi/linux/cryptouser.h
-@@ -82,7 +82,7 @@ struct crypto_stat_aead {
- 	__u64 stat_encrypt_tlen;
- 	__u64 stat_decrypt_cnt;
- 	__u64 stat_decrypt_tlen;
--	__u64 stat_aead_err_cnt;
-+	__u64 stat_err_cnt;
- };
- 
- struct crypto_stat_akcipher {
-@@ -93,7 +93,7 @@ struct crypto_stat_akcipher {
- 	__u64 stat_decrypt_tlen;
- 	__u64 stat_verify_cnt;
- 	__u64 stat_sign_cnt;
--	__u64 stat_akcipher_err_cnt;
-+	__u64 stat_err_cnt;
- };
- 
- struct crypto_stat_cipher {
-@@ -102,7 +102,7 @@ struct crypto_stat_cipher {
- 	__u64 stat_encrypt_tlen;
- 	__u64 stat_decrypt_cnt;
- 	__u64 stat_decrypt_tlen;
--	__u64 stat_cipher_err_cnt;
-+	__u64 stat_err_cnt;
- };
- 
- struct crypto_stat_compress {
-@@ -111,14 +111,14 @@ struct crypto_stat_compress {
- 	__u64 stat_compress_tlen;
- 	__u64 stat_decompress_cnt;
- 	__u64 stat_decompress_tlen;
--	__u64 stat_compress_err_cnt;
-+	__u64 stat_err_cnt;
- };
- 
- struct crypto_stat_hash {
- 	char type[CRYPTO_MAX_NAME];
- 	__u64 stat_hash_cnt;
- 	__u64 stat_hash_tlen;
--	__u64 stat_hash_err_cnt;
-+	__u64 stat_err_cnt;
- };
- 
- struct crypto_stat_kpp {
-@@ -126,7 +126,7 @@ struct crypto_stat_kpp {
- 	__u64 stat_setsecret_cnt;
- 	__u64 stat_generate_public_key_cnt;
- 	__u64 stat_compute_shared_secret_cnt;
--	__u64 stat_kpp_err_cnt;
-+	__u64 stat_err_cnt;
- };
- 
- struct crypto_stat_rng {
-@@ -134,7 +134,7 @@ struct crypto_stat_rng {
- 	__u64 stat_generate_cnt;
- 	__u64 stat_generate_tlen;
- 	__u64 stat_seed_cnt;
--	__u64 stat_rng_err_cnt;
-+	__u64 stat_err_cnt;
- };
- 
- struct crypto_stat_larval {
-diff --git a/tools/crypto/getstat.c b/tools/crypto/getstat.c
-index 57fbb94608d4..9e8ff76420fa 100644
---- a/tools/crypto/getstat.c
-+++ b/tools/crypto/getstat.c
-@@ -157,7 +157,7 @@ static int get_stat(const char *drivername)
- 		printf("%s\tHash\n\tHash: %llu bytes: %llu\n\tErrors: %llu\n",
- 			drivername,
- 			rhash->stat_hash_cnt, rhash->stat_hash_tlen,
--			rhash->stat_hash_err_cnt);
-+			rhash->stat_err_cnt);
- 	} else if (tb[CRYPTOCFGA_STAT_COMPRESS]) {
- 		struct rtattr *rta = tb[CRYPTOCFGA_STAT_COMPRESS];
- 		struct crypto_stat_compress *rblk =
-@@ -166,7 +166,7 @@ static int get_stat(const char *drivername)
- 			drivername,
- 			rblk->stat_compress_cnt, rblk->stat_compress_tlen,
- 			rblk->stat_decompress_cnt, rblk->stat_decompress_tlen,
--			rblk->stat_compress_err_cnt);
-+			rblk->stat_err_cnt);
- 	} else if (tb[CRYPTOCFGA_STAT_ACOMP]) {
- 		struct rtattr *rta = tb[CRYPTOCFGA_STAT_ACOMP];
- 		struct crypto_stat_compress *rcomp =
-@@ -175,7 +175,7 @@ static int get_stat(const char *drivername)
- 			drivername,
- 			rcomp->stat_compress_cnt, rcomp->stat_compress_tlen,
- 			rcomp->stat_decompress_cnt, rcomp->stat_decompress_tlen,
--			rcomp->stat_compress_err_cnt);
-+			rcomp->stat_err_cnt);
- 	} else if (tb[CRYPTOCFGA_STAT_AEAD]) {
- 		struct rtattr *rta = tb[CRYPTOCFGA_STAT_AEAD];
- 		struct crypto_stat_aead *raead =
-@@ -184,7 +184,7 @@ static int get_stat(const char *drivername)
- 			drivername,
- 			raead->stat_encrypt_cnt, raead->stat_encrypt_tlen,
- 			raead->stat_decrypt_cnt, raead->stat_decrypt_tlen,
--			raead->stat_aead_err_cnt);
-+			raead->stat_err_cnt);
- 	} else if (tb[CRYPTOCFGA_STAT_BLKCIPHER]) {
- 		struct rtattr *rta = tb[CRYPTOCFGA_STAT_BLKCIPHER];
- 		struct crypto_stat_cipher *rblk =
-@@ -193,7 +193,7 @@ static int get_stat(const char *drivername)
- 			drivername,
- 			rblk->stat_encrypt_cnt, rblk->stat_encrypt_tlen,
- 			rblk->stat_decrypt_cnt, rblk->stat_decrypt_tlen,
--			rblk->stat_cipher_err_cnt);
-+			rblk->stat_err_cnt);
- 	} else if (tb[CRYPTOCFGA_STAT_AKCIPHER]) {
- 		struct rtattr *rta = tb[CRYPTOCFGA_STAT_AKCIPHER];
- 		struct crypto_stat_akcipher *rblk =
-@@ -203,7 +203,7 @@ static int get_stat(const char *drivername)
- 			rblk->stat_encrypt_cnt, rblk->stat_encrypt_tlen,
- 			rblk->stat_decrypt_cnt, rblk->stat_decrypt_tlen,
- 			rblk->stat_sign_cnt, rblk->stat_verify_cnt,
--			rblk->stat_akcipher_err_cnt);
-+			rblk->stat_err_cnt);
- 	} else if (tb[CRYPTOCFGA_STAT_CIPHER]) {
- 		struct rtattr *rta = tb[CRYPTOCFGA_STAT_CIPHER];
- 		struct crypto_stat_cipher *rblk =
-@@ -212,7 +212,7 @@ static int get_stat(const char *drivername)
- 			drivername,
- 			rblk->stat_encrypt_cnt, rblk->stat_encrypt_tlen,
- 			rblk->stat_decrypt_cnt, rblk->stat_decrypt_tlen,
--			rblk->stat_cipher_err_cnt);
-+			rblk->stat_err_cnt);
- 	} else if (tb[CRYPTOCFGA_STAT_RNG]) {
- 		struct rtattr *rta = tb[CRYPTOCFGA_STAT_RNG];
- 		struct crypto_stat_rng *rrng =
-@@ -221,7 +221,7 @@ static int get_stat(const char *drivername)
- 			drivername,
- 			rrng->stat_seed_cnt,
- 			rrng->stat_generate_cnt, rrng->stat_generate_tlen,
--			rrng->stat_rng_err_cnt);
-+			rrng->stat_err_cnt);
- 	} else if (tb[CRYPTOCFGA_STAT_KPP]) {
- 		struct rtattr *rta = tb[CRYPTOCFGA_STAT_KPP];
- 		struct crypto_stat_kpp *rkpp =
-@@ -231,7 +231,7 @@ static int get_stat(const char *drivername)
- 			rkpp->stat_setsecret_cnt,
- 			rkpp->stat_generate_public_key_cnt,
- 			rkpp->stat_compute_shared_secret_cnt,
--			rkpp->stat_kpp_err_cnt);
-+			rkpp->stat_err_cnt);
- 	} else {
- 		fprintf(stderr, "%s is of an unknown algorithm\n", drivername);
- 	}
--- 
-2.18.1
+Also, I'd prefer it if we could create a full stack frame here, i.e.,
+
+stp x29, x30, [sp, #-16]!
+mov x29, sp
+
+(same for the other caller)
+
+Otherwise, this will look like a tail call to the unwinder,
+potentially creating problems with features that need reliable
+backtraces, such as livepatch.
+
+> +
+> +       // x0..3 = s0..3
+> +       ld1             {v0.4s-v3.4s}, [x0]
+> +       ld1             {v8.4s-v11.4s}, [x0]
+> +
+> +       bl              chacha20_permute
+> +
+>         ld1             {v4.16b-v7.16b}, [x2]
+>
+>         // o0 = i0 ^ (x0 + s0)
+> @@ -125,9 +136,24 @@ ENTRY(chacha20_block_xor_neon)
+>
+>         st1             {v0.16b-v3.16b}, [x1]
+>
+> -       ret
+> +       ret             x9
+>  ENDPROC(chacha20_block_xor_neon)
+>
+> +ENTRY(hchacha20_block_neon)
+> +       // x0: Input state matrix, s
+> +       // x1: output (8 32-bit words)
+> +       mov             x9, lr
+> +
+> +       ld1             {v0.4s-v3.4s}, [x0]
+> +
+> +       bl              chacha20_permute
+> +
+> +       st1             {v0.16b}, [x1], #16
+> +       st1             {v3.16b}, [x1]
+> +
+> +       ret             x9
+> +ENDPROC(hchacha20_block_neon)
+> +
+>         .align          6
+>  ENTRY(chacha20_4block_xor_neon)
+>         // x0: Input state matrix, s
+> diff --git a/arch/arm64/crypto/chacha20-neon-glue.c b/arch/arm64/crypto/chacha20-neon-glue.c
+> index 96e0cfb8c3f5b..a5b9cbc0c4de4 100644
+> --- a/arch/arm64/crypto/chacha20-neon-glue.c
+> +++ b/arch/arm64/crypto/chacha20-neon-glue.c
+> @@ -30,6 +30,7 @@
+>
+>  asmlinkage void chacha20_block_xor_neon(u32 *state, u8 *dst, const u8 *src);
+>  asmlinkage void chacha20_4block_xor_neon(u32 *state, u8 *dst, const u8 *src);
+> +asmlinkage void hchacha20_block_neon(const u32 *state, u32 *out);
+>
+>  static void chacha20_doneon(u32 *state, u8 *dst, const u8 *src,
+>                             unsigned int bytes)
+> @@ -65,20 +66,16 @@ static void chacha20_doneon(u32 *state, u8 *dst, const u8 *src,
+>         kernel_neon_end();
+>  }
+>
+> -static int chacha20_neon(struct skcipher_request *req)
+> +static int chacha20_neon_stream_xor(struct skcipher_request *req,
+> +                                   struct chacha_ctx *ctx, u8 *iv)
+>  {
+> -       struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+> -       struct chacha_ctx *ctx = crypto_skcipher_ctx(tfm);
+>         struct skcipher_walk walk;
+>         u32 state[16];
+>         int err;
+>
+> -       if (!may_use_simd() || req->cryptlen <= CHACHA_BLOCK_SIZE)
+> -               return crypto_chacha_crypt(req);
+> -
+>         err = skcipher_walk_virt(&walk, req, false);
+>
+> -       crypto_chacha_init(state, ctx, walk.iv);
+> +       crypto_chacha_init(state, ctx, iv);
+>
+>         while (walk.nbytes > 0) {
+>                 unsigned int nbytes = walk.nbytes;
+> @@ -94,22 +91,73 @@ static int chacha20_neon(struct skcipher_request *req)
+>         return err;
+>  }
+>
+> -static struct skcipher_alg alg = {
+> -       .base.cra_name          = "chacha20",
+> -       .base.cra_driver_name   = "chacha20-neon",
+> -       .base.cra_priority      = 300,
+> -       .base.cra_blocksize     = 1,
+> -       .base.cra_ctxsize       = sizeof(struct chacha_ctx),
+> -       .base.cra_module        = THIS_MODULE,
+> -
+> -       .min_keysize            = CHACHA_KEY_SIZE,
+> -       .max_keysize            = CHACHA_KEY_SIZE,
+> -       .ivsize                 = CHACHA_IV_SIZE,
+> -       .chunksize              = CHACHA_BLOCK_SIZE,
+> -       .walksize               = 4 * CHACHA_BLOCK_SIZE,
+> -       .setkey                 = crypto_chacha20_setkey,
+> -       .encrypt                = chacha20_neon,
+> -       .decrypt                = chacha20_neon,
+> +static int chacha20_neon(struct skcipher_request *req)
+> +{
+> +       struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+> +       struct chacha_ctx *ctx = crypto_skcipher_ctx(tfm);
+> +
+> +       if (req->cryptlen <= CHACHA_BLOCK_SIZE || !may_use_simd())
+> +               return crypto_chacha_crypt(req);
+> +
+> +       return chacha20_neon_stream_xor(req, ctx, req->iv);
+> +}
+> +
+> +static int xchacha20_neon(struct skcipher_request *req)
+> +{
+> +       struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+> +       struct chacha_ctx *ctx = crypto_skcipher_ctx(tfm);
+> +       struct chacha_ctx subctx;
+> +       u32 state[16];
+> +       u8 real_iv[16];
+> +
+> +       if (req->cryptlen <= CHACHA_BLOCK_SIZE || !may_use_simd())
+> +               return crypto_xchacha_crypt(req);
+> +
+> +       crypto_chacha_init(state, ctx, req->iv);
+> +
+> +       kernel_neon_begin();
+> +       hchacha20_block_neon(state, subctx.key);
+> +       kernel_neon_end();
+> +
+> +       memcpy(&real_iv[0], req->iv + 24, 8);
+> +       memcpy(&real_iv[8], req->iv + 16, 8);
+> +       return chacha20_neon_stream_xor(req, &subctx, real_iv);
+> +}
+> +
+> +static struct skcipher_alg algs[] = {
+> +       {
+> +               .base.cra_name          = "chacha20",
+> +               .base.cra_driver_name   = "chacha20-neon",
+> +               .base.cra_priority      = 300,
+> +               .base.cra_blocksize     = 1,
+> +               .base.cra_ctxsize       = sizeof(struct chacha_ctx),
+> +               .base.cra_module        = THIS_MODULE,
+> +
+> +               .min_keysize            = CHACHA_KEY_SIZE,
+> +               .max_keysize            = CHACHA_KEY_SIZE,
+> +               .ivsize                 = CHACHA_IV_SIZE,
+> +               .chunksize              = CHACHA_BLOCK_SIZE,
+> +               .walksize               = 4 * CHACHA_BLOCK_SIZE,
+> +               .setkey                 = crypto_chacha20_setkey,
+> +               .encrypt                = chacha20_neon,
+> +               .decrypt                = chacha20_neon,
+> +       }, {
+> +               .base.cra_name          = "xchacha20",
+> +               .base.cra_driver_name   = "xchacha20-neon",
+> +               .base.cra_priority      = 300,
+> +               .base.cra_blocksize     = 1,
+> +               .base.cra_ctxsize       = sizeof(struct chacha_ctx),
+> +               .base.cra_module        = THIS_MODULE,
+> +
+> +               .min_keysize            = CHACHA_KEY_SIZE,
+> +               .max_keysize            = CHACHA_KEY_SIZE,
+> +               .ivsize                 = XCHACHA_IV_SIZE,
+> +               .chunksize              = CHACHA_BLOCK_SIZE,
+> +               .walksize               = 4 * CHACHA_BLOCK_SIZE,
+> +               .setkey                 = crypto_chacha20_setkey,
+> +               .encrypt                = xchacha20_neon,
+> +               .decrypt                = xchacha20_neon,
+> +       }
+>  };
+>
+>  static int __init chacha20_simd_mod_init(void)
+> @@ -117,12 +165,12 @@ static int __init chacha20_simd_mod_init(void)
+>         if (!(elf_hwcap & HWCAP_ASIMD))
+>                 return -ENODEV;
+>
+> -       return crypto_register_skcipher(&alg);
+> +       return crypto_register_skciphers(algs, ARRAY_SIZE(algs));
+>  }
+>
+>  static void __exit chacha20_simd_mod_fini(void)
+>  {
+> -       crypto_unregister_skcipher(&alg);
+> +       crypto_unregister_skciphers(algs, ARRAY_SIZE(algs));
+>  }
+>
+>  module_init(chacha20_simd_mod_init);
+> @@ -131,3 +179,6 @@ module_exit(chacha20_simd_mod_fini);
+>  MODULE_AUTHOR("Ard Biesheuvel <ard.biesheuvel@linaro.org>");
+>  MODULE_LICENSE("GPL v2");
+>  MODULE_ALIAS_CRYPTO("chacha20");
+> +MODULE_ALIAS_CRYPTO("chacha20-neon");
+> +MODULE_ALIAS_CRYPTO("xchacha20");
+> +MODULE_ALIAS_CRYPTO("xchacha20-neon");
+> --
+> 2.19.2
+>
