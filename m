@@ -1,256 +1,294 @@
-Return-Path: <SRS0=oFif=NX=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:55704 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727530AbeKMEwu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 12 Nov 2018 23:52:50 -0500
-Date: Mon, 12 Nov 2018 10:58:17 -0800
-From: Eric Biggers <ebiggers@kernel.org>
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc: "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>, linux-fscrypt@vger.kernel.org,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Paul Crowley <paulcrowley@google.com>,
-        Greg Kaiser <gkaiser@google.com>,
-        "Jason A . Donenfeld" <Jason@zx2c4.com>,
-        Samuel Neves <samuel.c.p.neves@gmail.com>,
-        Tomer Ashur <tomer.ashur@esat.kuleuven.be>
-Subject: Re: [RFC PATCH v3 10/15] crypto: poly1305 - use structures for key
- and accumulator
-Message-ID: <20181112185816.GA8663@gmail.com>
-References: <20181105232526.173947-1-ebiggers@kernel.org>
- <20181105232526.173947-11-ebiggers@kernel.org>
- <CAKv+Gu-o0khD5=0EOkv2PiczMs5uZ=XP9V=G2ogBNMK8Kb93sw@mail.gmail.com>
+Return-Path: <SRS0=r27M=OJ=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail-it1-f193.google.com ([209.85.166.193]:39813 "EHLO
+        mail-it1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726127AbeLAAHh (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 30 Nov 2018 19:07:37 -0500
+Received: by mail-it1-f193.google.com with SMTP id a6so9004179itl.4
+        for <linux-crypto@vger.kernel.org>; Fri, 30 Nov 2018 04:58:22 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAKv+Gu-o0khD5=0EOkv2PiczMs5uZ=XP9V=G2ogBNMK8Kb93sw@mail.gmail.com>
+References: <20181129063422.24307-1-ebiggers@kernel.org> <20181129063422.24307-2-ebiggers@kernel.org>
+In-Reply-To: <20181129063422.24307-2-ebiggers@kernel.org>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date: Fri, 30 Nov 2018 13:58:09 +0100
+Message-ID: <CAKv+Gu_PqnwYGfjEaG8Fh8bgbPWA+ymG27ky1uaScr9OohZUzw@mail.gmail.com>
+Subject: Re: [PATCH 1/4] crypto: arm64/nhpoly1305 - add NEON-accelerated NHPoly1305
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>,
+        Paul Crowley <paulcrowley@google.com>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Ard,
+On Thu, 29 Nov 2018 at 07:35, Eric Biggers <ebiggers@kernel.org> wrote:
+>
+> From: Eric Biggers <ebiggers@google.com>
+>
+> Add an ARM64 NEON implementation of NHPoly1305, an =CE=B5-almost-=E2=88=
+=86-universal
+> hash function used in the Adiantum encryption mode.  For now, only the
+> NH portion is actually NEON-accelerated; the Poly1305 part is less
+> performance-critical so is just implemented in C.
+>
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> ---
+>  arch/arm64/crypto/Kconfig                |   5 ++
+>  arch/arm64/crypto/Makefile               |   3 +
+>  arch/arm64/crypto/nh-neon-core.S         | 103 +++++++++++++++++++++++
+>  arch/arm64/crypto/nhpoly1305-neon-glue.c |  77 +++++++++++++++++
+>  4 files changed, 188 insertions(+)
+>  create mode 100644 arch/arm64/crypto/nh-neon-core.S
+>  create mode 100644 arch/arm64/crypto/nhpoly1305-neon-glue.c
+>
+> diff --git a/arch/arm64/crypto/Kconfig b/arch/arm64/crypto/Kconfig
+> index a5606823ed4da..3f5aeb786192b 100644
+> --- a/arch/arm64/crypto/Kconfig
+> +++ b/arch/arm64/crypto/Kconfig
+> @@ -106,6 +106,11 @@ config CRYPTO_CHACHA20_NEON
+>         select CRYPTO_BLKCIPHER
+>         select CRYPTO_CHACHA20
+>
+> +config CRYPTO_NHPOLY1305_NEON
+> +       tristate "NHPoly1305 hash function using NEON instructions (for A=
+diantum)"
+> +       depends on KERNEL_MODE_NEON
+> +       select CRYPTO_NHPOLY1305
+> +
+>  config CRYPTO_AES_ARM64_BS
+>         tristate "AES in ECB/CBC/CTR/XTS modes using bit-sliced NEON algo=
+rithm"
+>         depends on KERNEL_MODE_NEON
+> diff --git a/arch/arm64/crypto/Makefile b/arch/arm64/crypto/Makefile
+> index f476fede09ba4..125dbb10a93ed 100644
+> --- a/arch/arm64/crypto/Makefile
+> +++ b/arch/arm64/crypto/Makefile
+> @@ -53,6 +53,9 @@ sha512-arm64-y :=3D sha512-glue.o sha512-core.o
+>  obj-$(CONFIG_CRYPTO_CHACHA20_NEON) +=3D chacha20-neon.o
+>  chacha20-neon-y :=3D chacha20-neon-core.o chacha20-neon-glue.o
+>
+> +obj-$(CONFIG_CRYPTO_NHPOLY1305_NEON) +=3D nhpoly1305-neon.o
+> +nhpoly1305-neon-y :=3D nh-neon-core.o nhpoly1305-neon-glue.o
+> +
+>  obj-$(CONFIG_CRYPTO_AES_ARM64) +=3D aes-arm64.o
+>  aes-arm64-y :=3D aes-cipher-core.o aes-cipher-glue.o
+>
+> diff --git a/arch/arm64/crypto/nh-neon-core.S b/arch/arm64/crypto/nh-neon=
+-core.S
+> new file mode 100644
+> index 0000000000000..e08d57676127a
+> --- /dev/null
+> +++ b/arch/arm64/crypto/nh-neon-core.S
+> @@ -0,0 +1,103 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * NH - =CE=B5-almost-universal hash function, ARM64 NEON accelerated ve=
+rsion
+> + *
+> + * Copyright 2018 Google LLC
+> + *
+> + * Author: Eric Biggers <ebiggers@google.com>
+> + */
+> +
+> +#include <linux/linkage.h>
+> +
+> +       KEY             .req    x0
+> +       MESSAGE         .req    x1
+> +       MESSAGE_LEN     .req    x2
+> +       HASH            .req    x3
+> +
+> +       PASS0_SUMS      .req    v0
+> +       PASS1_SUMS      .req    v1
+> +       PASS2_SUMS      .req    v2
+> +       PASS3_SUMS      .req    v3
+> +       K0              .req    v4
+> +       K1              .req    v5
+> +       K2              .req    v6
+> +       K3              .req    v7
+> +       T0              .req    v8
+> +       T1              .req    v9
+> +       T2              .req    v10
+> +       T3              .req    v11
+> +       T4              .req    v12
+> +       T5              .req    v13
+> +       T6              .req    v14
+> +       T7              .req    v15
+> +
+> +.macro _nh_stride      k0, k1, k2, k3
+> +
+> +       // Load next message stride
+> +       ld1             {T3.16b}, [MESSAGE], #16
+> +
+> +       // Load next key stride
+> +       ld1             {\k3\().4s}, [KEY], #16
+> +
+> +       // Add message words to key words
+> +       add             T0.4s, T3.4s, \k0\().4s
+> +       add             T1.4s, T3.4s, \k1\().4s
+> +       add             T2.4s, T3.4s, \k2\().4s
+> +       add             T3.4s, T3.4s, \k3\().4s
+> +
+> +       // Multiply 32x32 =3D> 64 and accumulate
+> +       mov             T4.d[0], T0.d[1]
+> +       mov             T5.d[0], T1.d[1]
+> +       mov             T6.d[0], T2.d[1]
+> +       mov             T7.d[0], T3.d[1]
 
-On Tue, Nov 06, 2018 at 03:28:24PM +0100, Ard Biesheuvel wrote:
-> On 6 November 2018 at 00:25, Eric Biggers <ebiggers@kernel.org> wrote:
-> > From: Eric Biggers <ebiggers@google.com>
-> >
-> > In preparation for exposing a low-level Poly1305 API which implements
-> > the ε-almost-∆-universal (εA∆U) hash function underlying the Poly1305
-> > MAC and supports block-aligned inputs only, create structures
-> > poly1305_key and poly1305_state which hold the limbs of the Poly1305
-> > "r" key and accumulator, respectively.
-> >
-> > Signed-off-by: Eric Biggers <ebiggers@google.com>
-> > ---
-> >  arch/x86/crypto/poly1305_glue.c | 20 +++++++------
-> >  crypto/poly1305_generic.c       | 52 ++++++++++++++++-----------------
-> >  include/crypto/poly1305.h       | 12 ++++++--
-> >  3 files changed, 47 insertions(+), 37 deletions(-)
-> >
-> > diff --git a/arch/x86/crypto/poly1305_glue.c b/arch/x86/crypto/poly1305_glue.c
-> > index f012b7e28ad1..88cc01506c84 100644
-> > --- a/arch/x86/crypto/poly1305_glue.c
-> > +++ b/arch/x86/crypto/poly1305_glue.c
-> > @@ -83,35 +83,37 @@ static unsigned int poly1305_simd_blocks(struct poly1305_desc_ctx *dctx,
-> >         if (poly1305_use_avx2 && srclen >= POLY1305_BLOCK_SIZE * 4) {
-> >                 if (unlikely(!sctx->wset)) {
-> >                         if (!sctx->uset) {
-> > -                               memcpy(sctx->u, dctx->r, sizeof(sctx->u));
-> > -                               poly1305_simd_mult(sctx->u, dctx->r);
-> > +                               memcpy(sctx->u, dctx->r.r, sizeof(sctx->u));
-> > +                               poly1305_simd_mult(sctx->u, dctx->r.r);
-> >                                 sctx->uset = true;
-> >                         }
-> >                         memcpy(sctx->u + 5, sctx->u, sizeof(sctx->u));
-> > -                       poly1305_simd_mult(sctx->u + 5, dctx->r);
-> > +                       poly1305_simd_mult(sctx->u + 5, dctx->r.r);
-> >                         memcpy(sctx->u + 10, sctx->u + 5, sizeof(sctx->u));
-> > -                       poly1305_simd_mult(sctx->u + 10, dctx->r);
-> > +                       poly1305_simd_mult(sctx->u + 10, dctx->r.r);
-> >                         sctx->wset = true;
-> >                 }
-> >                 blocks = srclen / (POLY1305_BLOCK_SIZE * 4);
-> > -               poly1305_4block_avx2(dctx->h, src, dctx->r, blocks, sctx->u);
-> > +               poly1305_4block_avx2(dctx->h.h, src, dctx->r.r, blocks,
-> > +                                    sctx->u);
-> >                 src += POLY1305_BLOCK_SIZE * 4 * blocks;
-> >                 srclen -= POLY1305_BLOCK_SIZE * 4 * blocks;
-> >         }
-> >  #endif
-> >         if (likely(srclen >= POLY1305_BLOCK_SIZE * 2)) {
-> >                 if (unlikely(!sctx->uset)) {
-> > -                       memcpy(sctx->u, dctx->r, sizeof(sctx->u));
-> > -                       poly1305_simd_mult(sctx->u, dctx->r);
-> > +                       memcpy(sctx->u, dctx->r.r, sizeof(sctx->u));
-> > +                       poly1305_simd_mult(sctx->u, dctx->r.r);
-> >                         sctx->uset = true;
-> >                 }
-> >                 blocks = srclen / (POLY1305_BLOCK_SIZE * 2);
-> > -               poly1305_2block_sse2(dctx->h, src, dctx->r, blocks, sctx->u);
-> > +               poly1305_2block_sse2(dctx->h.h, src, dctx->r.r, blocks,
-> > +                                    sctx->u);
-> >                 src += POLY1305_BLOCK_SIZE * 2 * blocks;
-> >                 srclen -= POLY1305_BLOCK_SIZE * 2 * blocks;
-> >         }
-> >         if (srclen >= POLY1305_BLOCK_SIZE) {
-> > -               poly1305_block_sse2(dctx->h, src, dctx->r, 1);
-> > +               poly1305_block_sse2(dctx->h.h, src, dctx->r.r, 1);
-> >                 srclen -= POLY1305_BLOCK_SIZE;
-> >         }
-> >         return srclen;
-> > diff --git a/crypto/poly1305_generic.c b/crypto/poly1305_generic.c
-> > index 47d3a6b83931..a23173f351b7 100644
-> > --- a/crypto/poly1305_generic.c
-> > +++ b/crypto/poly1305_generic.c
-> > @@ -38,7 +38,7 @@ int crypto_poly1305_init(struct shash_desc *desc)
-> >  {
-> >         struct poly1305_desc_ctx *dctx = shash_desc_ctx(desc);
-> >
-> > -       memset(dctx->h, 0, sizeof(dctx->h));
-> > +       memset(dctx->h.h, 0, sizeof(dctx->h.h));
-> >         dctx->buflen = 0;
-> >         dctx->rset = false;
-> >         dctx->sset = false;
-> > @@ -50,11 +50,11 @@ EXPORT_SYMBOL_GPL(crypto_poly1305_init);
-> >  static void poly1305_setrkey(struct poly1305_desc_ctx *dctx, const u8 *key)
-> >  {
-> >         /* r &= 0xffffffc0ffffffc0ffffffc0fffffff */
-> > -       dctx->r[0] = (get_unaligned_le32(key +  0) >> 0) & 0x3ffffff;
-> > -       dctx->r[1] = (get_unaligned_le32(key +  3) >> 2) & 0x3ffff03;
-> > -       dctx->r[2] = (get_unaligned_le32(key +  6) >> 4) & 0x3ffc0ff;
-> > -       dctx->r[3] = (get_unaligned_le32(key +  9) >> 6) & 0x3f03fff;
-> > -       dctx->r[4] = (get_unaligned_le32(key + 12) >> 8) & 0x00fffff;
-> > +       dctx->r.r[0] = (get_unaligned_le32(key +  0) >> 0) & 0x3ffffff;
-> > +       dctx->r.r[1] = (get_unaligned_le32(key +  3) >> 2) & 0x3ffff03;
-> > +       dctx->r.r[2] = (get_unaligned_le32(key +  6) >> 4) & 0x3ffc0ff;
-> > +       dctx->r.r[3] = (get_unaligned_le32(key +  9) >> 6) & 0x3f03fff;
-> > +       dctx->r.r[4] = (get_unaligned_le32(key + 12) >> 8) & 0x00fffff;
-> >  }
-> >
-> >  static void poly1305_setskey(struct poly1305_desc_ctx *dctx, const u8 *key)
-> > @@ -107,22 +107,22 @@ static unsigned int poly1305_blocks(struct poly1305_desc_ctx *dctx,
-> >                 srclen = datalen;
-> >         }
-> >
-> > -       r0 = dctx->r[0];
-> > -       r1 = dctx->r[1];
-> > -       r2 = dctx->r[2];
-> > -       r3 = dctx->r[3];
-> > -       r4 = dctx->r[4];
-> > +       r0 = dctx->r.r[0];
-> > +       r1 = dctx->r.r[1];
-> > +       r2 = dctx->r.r[2];
-> > +       r3 = dctx->r.r[3];
-> > +       r4 = dctx->r.r[4];
-> >
-> >         s1 = r1 * 5;
-> >         s2 = r2 * 5;
-> >         s3 = r3 * 5;
-> >         s4 = r4 * 5;
-> >
-> > -       h0 = dctx->h[0];
-> > -       h1 = dctx->h[1];
-> > -       h2 = dctx->h[2];
-> > -       h3 = dctx->h[3];
-> > -       h4 = dctx->h[4];
-> > +       h0 = dctx->h.h[0];
-> > +       h1 = dctx->h.h[1];
-> > +       h2 = dctx->h.h[2];
-> > +       h3 = dctx->h.h[3];
-> > +       h4 = dctx->h.h[4];
-> >
-> >         while (likely(srclen >= POLY1305_BLOCK_SIZE)) {
-> >
-> > @@ -157,11 +157,11 @@ static unsigned int poly1305_blocks(struct poly1305_desc_ctx *dctx,
-> >                 srclen -= POLY1305_BLOCK_SIZE;
-> >         }
-> >
-> > -       dctx->h[0] = h0;
-> > -       dctx->h[1] = h1;
-> > -       dctx->h[2] = h2;
-> > -       dctx->h[3] = h3;
-> > -       dctx->h[4] = h4;
-> > +       dctx->h.h[0] = h0;
-> > +       dctx->h.h[1] = h1;
-> > +       dctx->h.h[2] = h2;
-> > +       dctx->h.h[3] = h3;
-> > +       dctx->h.h[4] = h4;
-> >
-> >         return srclen;
-> >  }
-> > @@ -220,11 +220,11 @@ int crypto_poly1305_final(struct shash_desc *desc, u8 *dst)
-> >         }
-> >
-> >         /* fully carry h */
-> > -       h0 = dctx->h[0];
-> > -       h1 = dctx->h[1];
-> > -       h2 = dctx->h[2];
-> > -       h3 = dctx->h[3];
-> > -       h4 = dctx->h[4];
-> > +       h0 = dctx->h.h[0];
-> > +       h1 = dctx->h.h[1];
-> > +       h2 = dctx->h.h[2];
-> > +       h3 = dctx->h.h[3];
-> > +       h4 = dctx->h.h[4];
-> >
-> >         h2 += (h1 >> 26);     h1 = h1 & 0x3ffffff;
-> >         h3 += (h2 >> 26);     h2 = h2 & 0x3ffffff;
-> > diff --git a/include/crypto/poly1305.h b/include/crypto/poly1305.h
-> > index f718a19da82f..493244c46664 100644
-> > --- a/include/crypto/poly1305.h
-> > +++ b/include/crypto/poly1305.h
-> > @@ -13,13 +13,21 @@
-> >  #define POLY1305_KEY_SIZE      32
-> >  #define POLY1305_DIGEST_SIZE   16
-> >
-> > +struct poly1305_key {
-> > +       u32 r[5];       /* key, base 2^26 */
-> > +};
-> > +
-> > +struct poly1305_state {
-> > +       u32 h[5];       /* accumulator, base 2^26 */
-> > +};
-> > +
-> 
-> Sorry to bikeshed, but wouldn't it make more sense to have single definition
-> 
-> struct poly1305_val {
->     u32  v[5]; /* base 2^26 */
-> };
-> 
-> and have 'key' and 'accum[ulator]' fields of type struct poly1305_val
-> in the struct below?
-> 
+Nit: gmail mangles the whitespace anyway, but in the patch, there is
+some whitespace damage here
 
-I prefer separate types so that the type system enforces that a key is never
-accidentally used as an accumulator, and vice versa.  Then the poly1305_core_*
-functions will be harder to misuse, and the Poly1305 MAC implementations harder
-to get wrong.
+With that fixed,
 
-The key also has certain bits clear whereas the accumulator does not.  In the
-future, the Poly1305 C implementation might use base 2^32 and take advantage of
-this.  In that case, the two inputs to each multiplication won't be
-interchangeable, so using the same type for both would be extra confusing.
+Reviewed-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Tested-by: Ard Biesheuvel <ard.biesheuvel@linaro.org> # big-endian
 
-Having a poly1305_val nested inside poly1305_key and poly1305_state would work,
-but seemed excessive.
 
-> >  struct poly1305_desc_ctx {
-> >         /* key */
-> > -       u32 r[5];
-> > +       struct poly1305_key r;
-> >         /* finalize key */
-> >         u32 s[4];
-> >         /* accumulator */
-> > -       u32 h[5];
-> > +       struct poly1305_state h;
-> >         /* partial buffer */
-> >         u8 buf[POLY1305_BLOCK_SIZE];
-> >         /* bytes used in partial buffer */
-> > --
-
-Thanks,
-
-- Eric
+> +       umlal           PASS0_SUMS.2d, T0.2s, T4.2s
+> +       umlal           PASS1_SUMS.2d, T1.2s, T5.2s
+> +       umlal           PASS2_SUMS.2d, T2.2s, T6.2s
+> +       umlal           PASS3_SUMS.2d, T3.2s, T7.2s
+> +.endm
+> +
+> +/*
+> + * void nh_neon(const u32 *key, const u8 *message, size_t message_len,
+> + *             u8 hash[NH_HASH_BYTES])
+> + *
+> + * It's guaranteed that message_len % 16 =3D=3D 0.
+> + */
+> +ENTRY(nh_neon)
+> +
+> +       ld1             {K0.4s,K1.4s}, [KEY], #32
+> +         movi          PASS0_SUMS.2d, #0
+> +         movi          PASS1_SUMS.2d, #0
+> +       ld1             {K2.4s}, [KEY], #16
+> +         movi          PASS2_SUMS.2d, #0
+> +         movi          PASS3_SUMS.2d, #0
+> +
+> +       subs            MESSAGE_LEN, MESSAGE_LEN, #64
+> +       blt             .Lloop4_done
+> +.Lloop4:
+> +       _nh_stride      K0, K1, K2, K3
+> +       _nh_stride      K1, K2, K3, K0
+> +       _nh_stride      K2, K3, K0, K1
+> +       _nh_stride      K3, K0, K1, K2
+> +       subs            MESSAGE_LEN, MESSAGE_LEN, #64
+> +       bge             .Lloop4
+> +
+> +.Lloop4_done:
+> +       ands            MESSAGE_LEN, MESSAGE_LEN, #63
+> +       beq             .Ldone
+> +       _nh_stride      K0, K1, K2, K3
+> +
+> +       subs            MESSAGE_LEN, MESSAGE_LEN, #16
+> +       beq             .Ldone
+> +       _nh_stride      K1, K2, K3, K0
+> +
+> +       subs            MESSAGE_LEN, MESSAGE_LEN, #16
+> +       beq             .Ldone
+> +       _nh_stride      K2, K3, K0, K1
+> +
+> +.Ldone:
+> +       // Sum the accumulators for each pass, then store the sums to 'ha=
+sh'
+> +       addp            T0.2d, PASS0_SUMS.2d, PASS1_SUMS.2d
+> +       addp            T1.2d, PASS2_SUMS.2d, PASS3_SUMS.2d
+> +       st1             {T0.16b,T1.16b}, [HASH]
+> +       ret
+> +ENDPROC(nh_neon)
+> diff --git a/arch/arm64/crypto/nhpoly1305-neon-glue.c b/arch/arm64/crypto=
+/nhpoly1305-neon-glue.c
+> new file mode 100644
+> index 0000000000000..22cc32ac9448d
+> --- /dev/null
+> +++ b/arch/arm64/crypto/nhpoly1305-neon-glue.c
+> @@ -0,0 +1,77 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * NHPoly1305 - =CE=B5-almost-=E2=88=86-universal hash function for Adia=
+ntum
+> + * (ARM64 NEON accelerated version)
+> + *
+> + * Copyright 2018 Google LLC
+> + */
+> +
+> +#include <asm/neon.h>
+> +#include <asm/simd.h>
+> +#include <crypto/internal/hash.h>
+> +#include <crypto/nhpoly1305.h>
+> +#include <linux/module.h>
+> +
+> +asmlinkage void nh_neon(const u32 *key, const u8 *message, size_t messag=
+e_len,
+> +                       u8 hash[NH_HASH_BYTES]);
+> +
+> +/* wrapper to avoid indirect call to assembly, which doesn't work with C=
+FI */
+> +static void _nh_neon(const u32 *key, const u8 *message, size_t message_l=
+en,
+> +                    __le64 hash[NH_NUM_PASSES])
+> +{
+> +       nh_neon(key, message, message_len, (u8 *)hash);
+> +}
+> +
+> +static int nhpoly1305_neon_update(struct shash_desc *desc,
+> +                                 const u8 *src, unsigned int srclen)
+> +{
+> +       if (srclen < 64 || !may_use_simd())
+> +               return crypto_nhpoly1305_update(desc, src, srclen);
+> +
+> +       do {
+> +               unsigned int n =3D min_t(unsigned int, srclen, PAGE_SIZE)=
+;
+> +
+> +               kernel_neon_begin();
+> +               crypto_nhpoly1305_update_helper(desc, src, n, _nh_neon);
+> +               kernel_neon_end();
+> +               src +=3D n;
+> +               srclen -=3D n;
+> +       } while (srclen);
+> +       return 0;
+> +}
+> +
+> +static struct shash_alg nhpoly1305_alg =3D {
+> +       .base.cra_name          =3D "nhpoly1305",
+> +       .base.cra_driver_name   =3D "nhpoly1305-neon",
+> +       .base.cra_priority      =3D 200,
+> +       .base.cra_ctxsize       =3D sizeof(struct nhpoly1305_key),
+> +       .base.cra_module        =3D THIS_MODULE,
+> +       .digestsize             =3D POLY1305_DIGEST_SIZE,
+> +       .init                   =3D crypto_nhpoly1305_init,
+> +       .update                 =3D nhpoly1305_neon_update,
+> +       .final                  =3D crypto_nhpoly1305_final,
+> +       .setkey                 =3D crypto_nhpoly1305_setkey,
+> +       .descsize               =3D sizeof(struct nhpoly1305_state),
+> +};
+> +
+> +static int __init nhpoly1305_mod_init(void)
+> +{
+> +       if (!(elf_hwcap & HWCAP_ASIMD))
+> +               return -ENODEV;
+> +
+> +       return crypto_register_shash(&nhpoly1305_alg);
+> +}
+> +
+> +static void __exit nhpoly1305_mod_exit(void)
+> +{
+> +       crypto_unregister_shash(&nhpoly1305_alg);
+> +}
+> +
+> +module_init(nhpoly1305_mod_init);
+> +module_exit(nhpoly1305_mod_exit);
+> +
+> +MODULE_DESCRIPTION("NHPoly1305 =CE=B5-almost-=E2=88=86-universal hash fu=
+nction (NEON-accelerated)");
+> +MODULE_LICENSE("GPL v2");
+> +MODULE_AUTHOR("Eric Biggers <ebiggers@google.com>");
+> +MODULE_ALIAS_CRYPTO("nhpoly1305");
+> +MODULE_ALIAS_CRYPTO("nhpoly1305-neon");
+> --
+> 2.19.2
+>
