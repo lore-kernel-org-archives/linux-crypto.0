@@ -1,89 +1,76 @@
-Return-Path: <SRS0=edWn=O6=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from inva020.nxp.com ([92.121.34.13]:52880 "EHLO inva020.nxp.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731724AbeLUMrz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 21 Dec 2018 07:47:55 -0500
-From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        linux-crypto@vger.kernel.org, linux-imx@nxp.com
-Subject: [PATCH v2] crypto: caam - fix SHA support detection
-Date: Fri, 21 Dec 2018 14:47:46 +0200
-Message-Id: <20181221124746.32670-1-horia.geanta@nxp.com>
-In-Reply-To: <20181221124316.23572-1-horia.geanta@nxp.com>
-References: <20181221124316.23572-1-horia.geanta@nxp.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Return-Path: <SRS0=BBPV=OK=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from sitav-80046.hsr.ch ([152.96.80.46]:41214 "EHLO
+        mail.strongswan.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726778AbeLBDxh (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 1 Dec 2018 22:53:37 -0500
+Message-ID: <99ed681fa4d3233b18ae9328a14f9e23971073cb.camel@strongswan.org>
+Subject: Re: [PATCH v2 4/6] crypto: x86/chacha20 - add XChaCha20 support
+From: Martin Willi <martin@strongswan.org>
+To: Eric Biggers <ebiggers@kernel.org>, linux-crypto@vger.kernel.org
+Cc: Paul Crowley <paulcrowley@google.com>,
+        Milan Broz <gmazyland@gmail.com>,
+        "Jason A . Donenfeld" <Jason@zx2c4.com>,
+        linux-kernel@vger.kernel.org
+Date: Sat, 01 Dec 2018 17:40:40 +0100
+In-Reply-To: <20181129230217.158038-5-ebiggers@kernel.org>
+References: <20181129230217.158038-1-ebiggers@kernel.org>
+         <20181129230217.158038-5-ebiggers@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The addition of Chacha20 + Poly1305 authenc support inadvertently broke
-detection of algorithms supported by MDHA (Message Digest Hardware
-Accelerator), fix it.
 
-Cc: <stable@vger.kernel.org>
-Fixes: d6bbd4eea243 ("crypto: caam/jr - add support for Chacha20 + Poly1305")
-Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
----
+> An SSSE3 implementation of single-block HChaCha20 is also added so
+> that XChaCha20 can use it rather than the generic
+> implementation.  This required refactoring the ChaCha permutation
+> into its own function. 
 
-v2: fixed include of desc.h
+> [...]
 
- drivers/crypto/caam/caamalg.c | 2 +-
- drivers/crypto/caam/desc.h    | 1 +
- drivers/crypto/caam/error.h   | 9 +++++++++
- 3 files changed, 11 insertions(+), 1 deletion(-)
+> +ENTRY(chacha20_block_xor_ssse3)
+> +	# %rdi: Input state matrix, s
+> +	# %rsi: up to 1 data block output, o
+> +	# %rdx: up to 1 data block input, i
+> +	# %rcx: input/output length in bytes
+> +
+> +	# x0..3 = s0..3
+> +	movdqa		0x00(%rdi),%xmm0
+> +	movdqa		0x10(%rdi),%xmm1
+> +	movdqa		0x20(%rdi),%xmm2
+> +	movdqa		0x30(%rdi),%xmm3
+> +	movdqa		%xmm0,%xmm8
+> +	movdqa		%xmm1,%xmm9
+> +	movdqa		%xmm2,%xmm10
+> +	movdqa		%xmm3,%xmm11
+> +
+> +	mov		%rcx,%rax
+> +	call		chacha20_permute
+> +
+>  	# o0 = i0 ^ (x0 + s0)
+>  	paddd		%xmm8,%xmm0
+>  	cmp		$0x10,%rax
+> @@ -189,6 +198,23 @@ ENTRY(chacha20_block_xor_ssse3)
+>  
+>  ENDPROC(chacha20_block_xor_ssse3)
+>  
+> +ENTRY(hchacha20_block_ssse3)
+> +	# %rdi: Input state matrix, s
+> +	# %rsi: output (8 32-bit words)
+> +
+> +	movdqa		0x00(%rdi),%xmm0
+> +	movdqa		0x10(%rdi),%xmm1
+> +	movdqa		0x20(%rdi),%xmm2
+> +	movdqa		0x30(%rdi),%xmm3
+> +
+> +	call		chacha20_permute
 
-diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
-index 92e593e2069a..80ae69f906fb 100644
---- a/drivers/crypto/caam/caamalg.c
-+++ b/drivers/crypto/caam/caamalg.c
-@@ -3476,7 +3476,7 @@ static int __init caam_algapi_init(void)
- 		 * Skip algorithms requiring message digests
- 		 * if MD or MD size is not supported by device.
- 		 */
--		if ((c2_alg_sel & ~OP_ALG_ALGSEL_SUBMASK) == 0x40 &&
-+		if (is_mdha(c2_alg_sel) &&
- 		    (!md_inst || t_alg->aead.maxauthsize > md_limit))
- 			continue;
- 
-diff --git a/drivers/crypto/caam/desc.h b/drivers/crypto/caam/desc.h
-index ec10230178c5..4b6854bf896a 100644
---- a/drivers/crypto/caam/desc.h
-+++ b/drivers/crypto/caam/desc.h
-@@ -1155,6 +1155,7 @@
- #define OP_ALG_ALGSEL_DES	(0x20 << OP_ALG_ALGSEL_SHIFT)
- #define OP_ALG_ALGSEL_3DES	(0x21 << OP_ALG_ALGSEL_SHIFT)
- #define OP_ALG_ALGSEL_ARC4	(0x30 << OP_ALG_ALGSEL_SHIFT)
-+#define OP_ALG_CHA_MDHA		(0x40 << OP_ALG_ALGSEL_SHIFT)
- #define OP_ALG_ALGSEL_MD5	(0x40 << OP_ALG_ALGSEL_SHIFT)
- #define OP_ALG_ALGSEL_SHA1	(0x41 << OP_ALG_ALGSEL_SHIFT)
- #define OP_ALG_ALGSEL_SHA224	(0x42 << OP_ALG_ALGSEL_SHIFT)
-diff --git a/drivers/crypto/caam/error.h b/drivers/crypto/caam/error.h
-index 67ea94079837..8c6b83e02a70 100644
---- a/drivers/crypto/caam/error.h
-+++ b/drivers/crypto/caam/error.h
-@@ -7,6 +7,9 @@
- 
- #ifndef CAAM_ERROR_H
- #define CAAM_ERROR_H
-+
-+#include "desc.h"
-+
- #define CAAM_ERROR_STR_MAX 302
- 
- void caam_strstatus(struct device *dev, u32 status, bool qi_v2);
-@@ -17,4 +20,10 @@ void caam_strstatus(struct device *dev, u32 status, bool qi_v2);
- void caam_dump_sg(const char *level, const char *prefix_str, int prefix_type,
- 		  int rowsize, int groupsize, struct scatterlist *sg,
- 		  size_t tlen, bool ascii);
-+
-+static inline bool is_mdha(u32 algtype)
-+{
-+	return (algtype & OP_ALG_ALGSEL_MASK & ~OP_ALG_ALGSEL_SUBMASK) ==
-+	       OP_ALG_CHA_MDHA;
-+}
- #endif /* CAAM_ERROR_H */
--- 
-2.16.2
+AFAIK, the general convention is to create proper stack frames using
+FRAME_BEGIN/END for non leaf-functions. Should chacha20_permute()
+callers do so?
+
+For the other parts:
+
+Reviewed-by: Martin Willi <martin@strongswan.org>
