@@ -1,54 +1,57 @@
-Return-Path: <SRS0=9Gyh=PA=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:38938 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731793AbeLWEBU (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 22 Dec 2018 23:01:20 -0500
-Date: Sun, 23 Dec 2018 12:01:18 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Nathan Chancellor <natechancellor@gmail.com>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Nick Desaulniers <ndesaulniers@google.com>
-Subject: Re: [PATCH] crypto: ux500 - Use proper enum in cryp_set_dma_transfer
-Message-ID: <20181223040118.qzk4flxswf5xvckp@gondor.apana.org.au>
-References: <20181210234929.5729-1-natechancellor@gmail.com>
+Return-Path: <SRS0=wDfx=ON=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from namei.org ([65.99.196.166]:57642 "EHLO namei.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725880AbeLDWAh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 4 Dec 2018 17:00:37 -0500
+Date: Wed, 5 Dec 2018 08:59:45 +1100 (AEDT)
+From: James Morris <jmorris@namei.org>
+To: Thiago Jung Bauermann <bauerman@linux.ibm.com>
+cc: linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        David Howells <dhowells@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Jessica Yu <jeyu@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jonathan Corbet <corbet@lwn.net>,
+        "AKASHI, Takahiro" <takahiro.akashi@linaro.org>
+Subject: Re: [PATCH v8 00/14] Appended signatures support for IMA appraisal
+In-Reply-To: <20181116200712.14154-1-bauerman@linux.ibm.com>
+Message-ID: <alpine.LRH.2.21.1812050855270.22148@namei.org>
+References: <20181116200712.14154-1-bauerman@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181210234929.5729-1-natechancellor@gmail.com>
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Dec 10, 2018 at 04:49:29PM -0700, Nathan Chancellor wrote:
-> Clang warns when one enumerated type is implicitly converted to another:
-> 
-> drivers/crypto/ux500/cryp/cryp_core.c:559:5: warning: implicit
-> conversion from enumeration type 'enum dma_data_direction' to different
-> enumeration type 'enum dma_transfer_direction' [-Wenum-conversion]
->                                 direction, DMA_CTRL_ACK);
->                                 ^~~~~~~~~
-> drivers/crypto/ux500/cryp/cryp_core.c:583:5: warning: implicit
-> conversion from enumeration type 'enum dma_data_direction' to different
-> enumeration type 'enum dma_transfer_direction' [-Wenum-conversion]
->                                 direction,
->                                 ^~~~~~~~~
-> 2 warnings generated.
-> 
-> dmaengine_prep_slave_sg expects an enum from dma_transfer_direction.
-> Because we know the value of the dma_data_direction enum from the
-> switch statement, we can just use the proper value from
-> dma_transfer_direction so there is no more conversion.
-> 
-> DMA_TO_DEVICE = DMA_MEM_TO_DEV = 1
-> DMA_FROM_DEVICE = DMA_DEV_TO_MEM = 2
-> 
-> Signed-off-by: Nathan Chancellor <natechancellor@gmail.com>
-> ---
->  drivers/crypto/ux500/cryp/cryp_core.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+On Fri, 16 Nov 2018, Thiago Jung Bauermann wrote:
 
-Patch applied.  Thanks.
+> On the OpenPOWER platform, secure boot and trusted boot are being
+> implemented using IMA for taking measurements and verifying signatures.
+> Since the kernel image on Power servers is an ELF binary, kernels are
+> signed using the scripts/sign-file tool and thus use the same signature
+> format as signed kernel modules.
+> 
+> This patch series adds support in IMA for verifying those signatures.
+
+Are you saying you use IMA to verify kernels during boot?  From a Linux 
+bootloader?
+
+> It adds flexibility to OpenPOWER secure boot, because it allows it to boot
+> kernels with the signature appended to them as well as kernels where the
+> signature is stored in the IMA extended attribute.
+
+Just to clarify, with these patches, IMA will be able to verify the 
+native form of signed kernel modules?  i.e. without xattrs at all, and 
+this will work with existing signed modules?
+
+
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+James Morris
+<jmorris@namei.org>
