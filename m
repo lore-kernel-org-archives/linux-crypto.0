@@ -1,71 +1,83 @@
-Return-Path: <SRS0=sHEo=PF=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from szxga06-in.huawei.com ([45.249.212.32]:38856 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726064AbeL1DhH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 27 Dec 2018 22:37:07 -0500
-From: YueHaibing <yuehaibing@huawei.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        Eric Biggers <ebiggers@google.com>,
-        Gilad Ben-Yossef <gilad@benyossef.com>,
-        "Raveendra Padasalagi" <raveendra.padasalagi@broadcom.com>,
-        Stefan Agner <stefan@agner.ch>
-CC: YueHaibing <yuehaibing@huawei.com>, <linux-crypto@vger.kernel.org>,
-        <kernel-janitors@vger.kernel.org>
-Subject: [PATCH -next] crypto: brcm - Fix some set-but-not-used warning
-Date: Fri, 28 Dec 2018 03:44:04 +0000
-Message-ID: <1545968644-191671-1-git-send-email-yuehaibing@huawei.com>
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
+Return-Path: <SRS0=wDfx=ON=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:55320 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725962AbeLDD4K (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 3 Dec 2018 22:56:10 -0500
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org
+Cc: Paul Crowley <paulcrowley@google.com>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        "Jason A . Donenfeld" <Jason@zx2c4.com>,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: [PATCH v2 4/4] crypto: arm64/chacha - add XChaCha12 support
+Date: Mon,  3 Dec 2018 19:52:52 -0800
+Message-Id: <20181204035252.14853-5-ebiggers@kernel.org>
+In-Reply-To: <20181204035252.14853-1-ebiggers@kernel.org>
+References: <20181204035252.14853-1-ebiggers@kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Fixes gcc '-Wunused-but-set-variable' warning:
+From: Eric Biggers <ebiggers@google.com>
 
-drivers/crypto/bcm/cipher.c: In function 'handle_ahash_req':
-drivers/crypto/bcm/cipher.c:720:15: warning:
- variable 'chunk_start' set but not used [-Wunused-but-set-variable]
+Now that the ARM64 NEON implementation of ChaCha20 and XChaCha20 has
+been refactored to support varying the number of rounds, add support for
+XChaCha12.  This is identical to XChaCha20 except for the number of
+rounds, which is 12 instead of 20.  This can be used by Adiantum.
 
-drivers/crypto/bcm/cipher.c: In function 'spu_rx_callback':
-drivers/crypto/bcm/cipher.c:1679:31: warning:
- variable 'areq' set but not used [-Wunused-but-set-variable]
-
-drivers/crypto/bcm/cipher.c:1678:22: warning:
- variable 'ctx' set but not used [-Wunused-but-set-variable]
-
-Signed-off-by: YueHaibing <yuehaibing@huawei.com>
+Reviewed-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- drivers/crypto/bcm/cipher.c | 6 +-----
- 1 file changed, 1 insertion(+), 5 deletions(-)
+ arch/arm64/crypto/Kconfig            |  2 +-
+ arch/arm64/crypto/chacha-neon-glue.c | 18 ++++++++++++++++++
+ 2 files changed, 19 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/bcm/cipher.c b/drivers/crypto/bcm/cipher.c
-index c9393ff..9a66c29 100644
---- a/drivers/crypto/bcm/cipher.c
-+++ b/drivers/crypto/bcm/cipher.c
-@@ -717,7 +717,7 @@ static int handle_ahash_req(struct iproc_reqctx_s *rctx)
- 	 */
- 	unsigned int new_data_len;
+diff --git a/arch/arm64/crypto/Kconfig b/arch/arm64/crypto/Kconfig
+index d54ddb8468ef..d9a523ecdd83 100644
+--- a/arch/arm64/crypto/Kconfig
++++ b/arch/arm64/crypto/Kconfig
+@@ -101,7 +101,7 @@ config CRYPTO_AES_ARM64_NEON_BLK
+ 	select CRYPTO_SIMD
  
--	unsigned int chunk_start = 0;
-+	unsigned int __maybe_unused chunk_start = 0;
- 	u32 db_size;	 /* Length of data field, incl gcm and hash padding */
- 	int pad_len = 0; /* total pad len, including gcm, hash, stat padding */
- 	u32 data_pad_len = 0;	/* length of GCM/CCM padding */
-@@ -1675,8 +1675,6 @@ static void spu_rx_callback(struct mbox_client *cl, void *msg)
- 	struct spu_hw *spu = &iproc_priv.spu;
- 	struct brcm_message *mssg = msg;
- 	struct iproc_reqctx_s *rctx;
--	struct iproc_ctx_s *ctx;
--	struct crypto_async_request *areq;
- 	int err = 0;
- 
- 	rctx = mssg->ctx;
-@@ -1686,8 +1684,6 @@ static void spu_rx_callback(struct mbox_client *cl, void *msg)
- 		err = -EFAULT;
- 		goto cb_finish;
+ config CRYPTO_CHACHA20_NEON
+-	tristate "ChaCha20 and XChaCha20 stream ciphers using NEON instructions"
++	tristate "ChaCha20, XChaCha20, and XChaCha12 stream ciphers using NEON instructions"
+ 	depends on KERNEL_MODE_NEON
+ 	select CRYPTO_BLKCIPHER
+ 	select CRYPTO_CHACHA20
+diff --git a/arch/arm64/crypto/chacha-neon-glue.c b/arch/arm64/crypto/chacha-neon-glue.c
+index 4d992029b912..346eb85498a1 100644
+--- a/arch/arm64/crypto/chacha-neon-glue.c
++++ b/arch/arm64/crypto/chacha-neon-glue.c
+@@ -161,6 +161,22 @@ static struct skcipher_alg algs[] = {
+ 		.setkey			= crypto_chacha20_setkey,
+ 		.encrypt		= xchacha_neon,
+ 		.decrypt		= xchacha_neon,
++	}, {
++		.base.cra_name		= "xchacha12",
++		.base.cra_driver_name	= "xchacha12-neon",
++		.base.cra_priority	= 300,
++		.base.cra_blocksize	= 1,
++		.base.cra_ctxsize	= sizeof(struct chacha_ctx),
++		.base.cra_module	= THIS_MODULE,
++
++		.min_keysize		= CHACHA_KEY_SIZE,
++		.max_keysize		= CHACHA_KEY_SIZE,
++		.ivsize			= XCHACHA_IV_SIZE,
++		.chunksize		= CHACHA_BLOCK_SIZE,
++		.walksize		= 4 * CHACHA_BLOCK_SIZE,
++		.setkey			= crypto_chacha12_setkey,
++		.encrypt		= xchacha_neon,
++		.decrypt		= xchacha_neon,
  	}
--	areq = rctx->parent;
--	ctx = rctx->ctx;
+ };
  
- 	/* process the SPU status */
- 	err = spu->spu_status_process(rctx->msg_buf.rx_stat);
+@@ -187,3 +203,5 @@ MODULE_ALIAS_CRYPTO("chacha20");
+ MODULE_ALIAS_CRYPTO("chacha20-neon");
+ MODULE_ALIAS_CRYPTO("xchacha20");
+ MODULE_ALIAS_CRYPTO("xchacha20-neon");
++MODULE_ALIAS_CRYPTO("xchacha12");
++MODULE_ALIAS_CRYPTO("xchacha12-neon");
+-- 
+2.19.2
