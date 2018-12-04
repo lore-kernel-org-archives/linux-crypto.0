@@ -1,107 +1,100 @@
-Return-Path: <SRS0=o+Is=OM=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=wDfx=ON=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56734C04EBF
-	for <linux-crypto@archiver.kernel.org>; Mon,  3 Dec 2018 14:13:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19D48C04EB8
+	for <linux-crypto@archiver.kernel.org>; Tue,  4 Dec 2018 08:38:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1C7C62082F
-	for <linux-crypto@archiver.kernel.org>; Mon,  3 Dec 2018 14:13:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D312920850
+	for <linux-crypto@archiver.kernel.org>; Tue,  4 Dec 2018 08:38:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=linaro.org header.i=@linaro.org header.b="P6RgvDhs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C7C62082F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (2048-bit key) header.d=benyossef-com.20150623.gappssmtp.com header.i=@benyossef-com.20150623.gappssmtp.com header.b="lM4BoZJ3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D312920850
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=benyossef.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-crypto-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725897AbeLCOPA (ORCPT
+        id S1725857AbeLDIik (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 3 Dec 2018 09:15:00 -0500
-Received: from mail-io1-f67.google.com ([209.85.166.67]:40955 "EHLO
-        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726457AbeLCOPA (ORCPT
+        Tue, 4 Dec 2018 03:38:40 -0500
+Received: from mail-vk1-f193.google.com ([209.85.221.193]:37898 "EHLO
+        mail-vk1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725468AbeLDIik (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 3 Dec 2018 09:15:00 -0500
-Received: by mail-io1-f67.google.com with SMTP id n9so10558854ioh.7
-        for <linux-crypto@vger.kernel.org>; Mon, 03 Dec 2018 06:13:49 -0800 (PST)
+        Tue, 4 Dec 2018 03:38:40 -0500
+Received: by mail-vk1-f193.google.com with SMTP id w72so3595225vkd.5
+        for <linux-crypto@vger.kernel.org>; Tue, 04 Dec 2018 00:38:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
+        d=benyossef-com.20150623.gappssmtp.com; s=20150623;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=rOAp832YU39L1SFpsJBacojfl0uFYgFOIfzrHiBHEL8=;
-        b=P6RgvDhsluF6FVojEfnCPpcxaRNKpP56V0pIDOdN9dVlz9ms9E+BimPHfna4pRrnAt
-         miL8K5FM70ZjrYC5wOa7pdpn3a1ny9D0wjVYqUPR67Imq9CKQnqL+VNMSJTuLYZ0pfNI
-         uADB5dNhxBtgt1rvuOQbMiNttleHFwol8kGnM=
+        bh=dnvYEhSL31NE2LZ9t0/Dvcct6en1iyjOs84XyLkWDYc=;
+        b=lM4BoZJ3LdIbkVdqC95FQXd8V2lr6GOYRo5TVIJsG/dh4m+MKvNQuLDdpJtLnqlb4o
+         LjBl+WAJUgDq4IjSzn2uwG7MKKgRYUjRBo5RdmWxzQDqCmWCvTGkI92PKey0VjBi2Sii
+         Ev+gLLRT6adpJKyFblquOq6fGvpgO2eNoVKw86CCINY+5IyCy66XVOspFGmgs0zWUdy7
+         M30kr1YOxqm8N6Io4Xr4UZMCPlRxjZ2YMZXutBaP3bA0fLLQlEd8WCQBiOzku91+we4q
+         SEezga3+5rdN2z2flYlI5MAdSFCPFMKxHvlFBSOmKdhC4XpLs9ux9iDHxYxESPHjnoHj
+         YFkw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=rOAp832YU39L1SFpsJBacojfl0uFYgFOIfzrHiBHEL8=;
-        b=IB/bWYd/LH8QG6QDP9Jo6r6a72z9TYEP6fKlo9uiy3+bS6P4qRZNfrDzjHwvljnVmj
-         Srmp9KYxUWrf5qDNrrGgfzl9WLyuR5tc4ENgVPzeWNflrVmfAShTIuLTyYHZN4fl+kgZ
-         6jXjUSE9XKTD12ompztb48a5T1P6CT6+zWYP5JflMrI7VbLvbBD9QdAlgycn/sXzK6rN
-         HWqGkrMmb2HoP1VJZk7pGi6ov807BIVALVvjDLevE9ALI9awxSH+v3jrP//P5fSgStJW
-         zW2MQoIACF2ZVW31+S8njMVFNDRbd3tbjR9VOu55UE4itMxdA5GLTWzbMQw5JoomIizq
-         CVKA==
-X-Gm-Message-State: AA+aEWbM+ouG/4/7qX2onsCE6+xKH/N8rHGZNhunlOZ7zijDBkvHqc2G
-        QYRM2wEQhzALbRvh2KbmjsVCQuV5bBxzLDregj/YXg==
-X-Google-Smtp-Source: AFSGD/WJqlvYvi26ifqbde4WmOEZDZbFLslPRv6329u2zpE489n4IlSS1W1jWMX9TX8E6tW7X/PY9VhUwPOzvi9WZUY=
-X-Received: by 2002:a5e:cb42:: with SMTP id h2mr7987761iok.60.1543846429531;
- Mon, 03 Dec 2018 06:13:49 -0800 (PST)
+        bh=dnvYEhSL31NE2LZ9t0/Dvcct6en1iyjOs84XyLkWDYc=;
+        b=WvXWVD/RO17/9qHyr4Ds2dmByIC0abSNp3nkwckSYcCgLGbSU7/m30VqLcam3YRMX/
+         zGZfCkBNnLodtDr7cTmLI/WPMKapVJhFFuEL9EKPJD3GeOPMlA66PDGmRdLIUJO+OuNx
+         08Sb6P42srcbCDWe4CK5Sm4gRq9ba4gtO8M6WS8pbLm8J+tYV78oGv137zB3/eCLw5CS
+         lvrtQ/VjBivzQvthuHPAimf+KjnMFBiOES1gFUcokVfbvf5GAjWdYTDGYOlmkjpYETiE
+         PbOyGQGJT0UblDxNF5qjPzA2vK0EubmEdy7hb6E7FvJjwPGFXeaZtNT+LHiPUzRgOgqO
+         +4qw==
+X-Gm-Message-State: AA+aEWadwoFIxLC+hgGNfJRPZe5wFRzSa1s5r6RrGy+gKIvSzfPMS1sL
+        6Nquhz8NYJ8if/Zoo5c/CgXFb8wmuc0n4WbvuiV5dg==
+X-Google-Smtp-Source: AFSGD/VaQiOmLuqIORljjwqHVtxjn7t+vCfUWYaf90PuTypdeCghoVeLUTdGgMWG6aI63jWoiBjR6shTV274id2ZgN0=
+X-Received: by 2002:a1f:a147:: with SMTP id k68mr8269149vke.1.1543912718076;
+ Tue, 04 Dec 2018 00:38:38 -0800 (PST)
 MIME-Version: 1.0
-References: <20181129230217.158038-1-ebiggers@kernel.org> <20181129230217.158038-4-ebiggers@kernel.org>
- <acad781e9981c49b83b6dfdc8cefed6246df469a.camel@strongswan.org>
-In-Reply-To: <acad781e9981c49b83b6dfdc8cefed6246df469a.camel@strongswan.org>
-From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Mon, 3 Dec 2018 15:13:37 +0100
+References: <1542102039-22256-1-git-send-email-gilad@benyossef.com>
+ <1542102039-22256-3-git-send-email-gilad@benyossef.com> <20181129064218.53qc33vus5anla76@gondor.apana.org.au>
+In-Reply-To: <20181129064218.53qc33vus5anla76@gondor.apana.org.au>
+From:   Gilad Ben-Yossef <gilad@benyossef.com>
+Date:   Tue, 4 Dec 2018 10:38:26 +0200
 Message-ID:
- <CAKv+Gu89RiDBx35rtGS2uOZ+TwPt6P8UjwpqE17xm7dtMx-nNQ@mail.gmail.com>
-Subject: Re: [PATCH v2 3/6] crypto: x86/chacha20 - limit the
- preemption-disabled section
-To:     Martin Willi <martin@strongswan.org>
-Cc:     Eric Biggers <ebiggers@kernel.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        Paul Crowley <paulcrowley@google.com>,
-        Milan Broz <gmazyland@gmail.com>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+ <CAOtvUMepGR89J-5SQXnReRiHanrOhp52cEKKm58Ej2uoHFAcyA@mail.gmail.com>
+Subject: Re: [PATCH 2/3] dt-bindings: crypto: ccree: add dt bindings for ccree 703
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     David Miller <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        yaeceh01 <yael.chemla@foss.arm.com>,
+        Ofir Drang <Ofir.Drang@arm.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" 
+        <devicetree@vger.kernel.org>,
+        Linux kernel mailing list <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
-Message-ID: <20181203141337.RxpqkJ-3v754D-Su1uScFZ7BdHjDPT8X9Cl3kg8YQ9k@z>
+Message-ID: <20181204083826.qMOAunrdBwu3o9iuFas0_AkuuGywJ6n5nyGSNNOpaJI@z>
 
-On Sun, 2 Dec 2018 at 11:47, Martin Willi <martin@strongswan.org> wrote:
+On Thu, Nov 29, 2018 at 8:42 AM Herbert Xu <herbert@gondor.apana.org.au> wrote:
 >
+> On Tue, Nov 13, 2018 at 09:40:36AM +0000, Gilad Ben-Yossef wrote:
+> > Add device tree bindings associating Arm TrustZone CryptoCell 703 with the
+> > ccree driver.
+> >
+> > Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+> > ---
+> >  Documentation/devicetree/bindings/crypto/arm-cryptocell.txt | 1 +
+> >  1 file changed, 1 insertion(+)
 >
-> > To improve responsiveness, disable preemption for each step of the
-> > walk (which is at most PAGE_SIZE) rather than for the entire
-> > encryption/decryption operation.
->
-> It seems that it is not that uncommon for IPsec to get small inputs
-> scattered over multiple blocks. Doing FPU context saving for each walk
-> step then can slow down things.
->
-> An alternative approach could be to re-enable preemption not based on
-> the walk steps, but on the amount of bytes processed. This would
-> satisfy both users, I guess.
->
-> In the long run we probably need a better approach for FPU context
-> saving, as this really hurts performance-wise. For IPsec we should find
-> a way to avoid the (multiple) per-packet FPU save/restores in softirq
-> context, but I guess this requires support from process context
-> switching.
->
+> Which tree is this patch meant to go through?
 
-At Jason's Zinc talk at plumbers, this came up, and apparently someone
-is working on this, i.e., to ensure that on x86, the FPU restore only
-occurs lazily, when returning to userland rather than every time you
-call kernel_fpu_end() [like we do on arm64 as well]
+I'm not sure the question was addressed to me but if it did - either
+going through the device tree or the crypto tree is fine by me.
 
-Not sure what the ETA for that work is, though, nor did I get the name
-of the guy working on it.
+Thanks,
+Gilad
