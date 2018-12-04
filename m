@@ -1,1732 +1,729 @@
-Return-Path: <SRS0=ErXm=O7=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from szxga05-in.huawei.com ([45.249.212.191]:16653 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S2387416AbeLVXgG (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 22 Dec 2018 18:36:06 -0500
-From: Zhou Wang <wangzhou1@hisilicon.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        <linux-crypto@vger.kernel.org>
-CC: <linux-kernel@vger.kernel.org>, <linuxarm@huawei.com>,
-        Zhou Wang <wangzhou1@hisilicon.com>,
-        Shiju Jose <shiju.jose@huawei.com>,
-        Kenneth Lee <liguozhu@hisilicon.com>,
-        Hao Fang <fanghao11@huawei.com>
-Subject: [PATCH 3/4] crypto: hisilicon: Add HiSilicon ZIP accelerator support
-Date: Sat, 22 Dec 2018 15:51:44 +0800
-Message-ID: <1545465105-133138-4-git-send-email-wangzhou1@hisilicon.com>
-In-Reply-To: <1545465105-133138-1-git-send-email-wangzhou1@hisilicon.com>
-References: <1545465105-133138-1-git-send-email-wangzhou1@hisilicon.com>
+Return-Path: <SRS0=wDfx=ON=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:41348 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726391AbeLDNNq (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 4 Dec 2018 08:13:46 -0500
+Received: by mail-wr1-f68.google.com with SMTP id x10so15900596wrs.8
+        for <linux-crypto@vger.kernel.org>; Tue, 04 Dec 2018 05:13:43 -0800 (PST)
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: linux-crypto@vger.kernel.org
+Cc: herbert@gondor.apana.org.au,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Martin Willi <martin@strongswan.org>
+Subject: [PATCH v2 3/3] crypto: arm64/chacha - use combined SIMD/ALU routine for more speed
+Date: Tue,  4 Dec 2018 14:13:33 +0100
+Message-Id: <20181204131333.15046-4-ard.biesheuvel@linaro.org>
+In-Reply-To: <20181204131333.15046-1-ard.biesheuvel@linaro.org>
+References: <20181204131333.15046-1-ard.biesheuvel@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The HiSilicon ZIP accelerator implements the zlib and gzip algorithm. It
-uses Hisilicon QM as the interface to the CPU.
+To some degree, most known AArch64 micro-architectures appear to be
+able to issue ALU instructions in parellel to SIMD instructions
+without affecting the SIMD throughput. This means we can use the ALU
+to process a fifth ChaCha block while the SIMD is processing four
+blocks in parallel.
 
-This patch provides PCIe driver to the accelerator and register it to
-the crypto subsystem.
-
-Signed-off-by: Zhou Wang <wangzhou1@hisilicon.com>
-Signed-off-by: Shiju Jose <shiju.jose@huawei.com>
-Signed-off-by: Kenneth Lee <liguozhu@hisilicon.com>
-Signed-off-by: Hao Fang <fanghao11@huawei.com>
-Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Reviewed-by: John Garry <john.garry@huawei.com>
+Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- drivers/crypto/hisilicon/Kconfig          |    7 +
- drivers/crypto/hisilicon/Makefile         |    1 +
- drivers/crypto/hisilicon/zip/Makefile     |    2 +
- drivers/crypto/hisilicon/zip/zip.h        |   60 ++
- drivers/crypto/hisilicon/zip/zip_crypto.c |  410 ++++++++++
- drivers/crypto/hisilicon/zip/zip_main.c   | 1161 +++++++++++++++++++++++++++++
- 6 files changed, 1641 insertions(+)
- create mode 100644 drivers/crypto/hisilicon/zip/Makefile
- create mode 100644 drivers/crypto/hisilicon/zip/zip.h
- create mode 100644 drivers/crypto/hisilicon/zip/zip_crypto.c
- create mode 100644 drivers/crypto/hisilicon/zip/zip_main.c
+ arch/arm64/crypto/chacha-neon-core.S | 235 ++++++++++++++++++--
+ arch/arm64/crypto/chacha-neon-glue.c |  39 ++--
+ 2 files changed, 239 insertions(+), 35 deletions(-)
 
-diff --git a/drivers/crypto/hisilicon/Kconfig b/drivers/crypto/hisilicon/Kconfig
-index 993a98d..338a70a 100644
---- a/drivers/crypto/hisilicon/Kconfig
-+++ b/drivers/crypto/hisilicon/Kconfig
-@@ -16,3 +16,10 @@ config CRYPTO_DEV_HISI_SEC
- config CRYPTO_DEV_HISI_QM
- 	tristate
- 	depends on ARM64 && PCI && PCI_MSI
-+
-+config CRYPTO_DEV_HISI_ZIP
-+	tristate "Support for HiSilicon ZIP accelerator"
-+	depends on ARM64
-+	select CRYPTO_DEV_HISI_QM
-+	help
-+	  Support for HiSilicon ZIP Driver
-diff --git a/drivers/crypto/hisilicon/Makefile b/drivers/crypto/hisilicon/Makefile
-index 05e9052..c97c5b2 100644
---- a/drivers/crypto/hisilicon/Makefile
-+++ b/drivers/crypto/hisilicon/Makefile
-@@ -1,3 +1,4 @@
- # SPDX-License-Identifier: GPL-2.0
- obj-$(CONFIG_CRYPTO_DEV_HISI_SEC) += sec/
- obj-$(CONFIG_CRYPTO_DEV_HISI_QM) += qm.o
-+obj-$(CONFIG_CRYPTO_DEV_HISI_ZIP) += zip/
-diff --git a/drivers/crypto/hisilicon/zip/Makefile b/drivers/crypto/hisilicon/zip/Makefile
-new file mode 100644
-index 0000000..a936f09
---- /dev/null
-+++ b/drivers/crypto/hisilicon/zip/Makefile
-@@ -0,0 +1,2 @@
-+obj-$(CONFIG_CRYPTO_DEV_HISI_ZIP) += hisi_zip.o
-+hisi_zip-objs = zip_main.o zip_crypto.o
-diff --git a/drivers/crypto/hisilicon/zip/zip.h b/drivers/crypto/hisilicon/zip/zip.h
-new file mode 100644
-index 0000000..44a9e27
---- /dev/null
-+++ b/drivers/crypto/hisilicon/zip/zip.h
-@@ -0,0 +1,60 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright (c) 2018 Hisilicon Limited. */
-+#ifndef HISI_ZIP_H
-+#define HISI_ZIP_H
-+
-+#include <linux/list.h>
-+#include "../qm.h"
-+
-+#undef pr_fmt
-+#define pr_fmt(fmt)	"hisi_zip: " fmt
-+
-+enum hisi_zip_error_type {
-+	/* negative compression */
-+	HZIP_NC_ERR = 0x0d,
-+};
-+
-+struct hisi_zip_ctrl;
-+
-+struct hisi_zip {
-+	struct hisi_qm qm;
-+	struct list_head list;
-+	struct hisi_zip_ctrl *ctrl;
-+};
-+
-+struct hisi_zip_sqe {
-+	__u32 consumed;
-+	__u32 produced;
-+	__u32 comp_data_length;
-+	__u32 dw3;
-+	__u32 input_data_length;
-+	__u32 lba_l;
-+	__u32 lba_h;
-+	__u32 dw7;
-+	__u32 dw8;
-+	__u32 dw9;
-+	__u32 dw10;
-+	__u32 priv_info;
-+	__u32 dw12;
-+	__u32 tag;
-+	__u32 dest_avail_out;
-+	__u32 rsvd0;
-+	__u32 comp_head_addr_l;
-+	__u32 comp_head_addr_h;
-+	__u32 source_addr_l;
-+	__u32 source_addr_h;
-+	__u32 dest_addr_l;
-+	__u32 dest_addr_h;
-+	__u32 stream_ctx_addr_l;
-+	__u32 stream_ctx_addr_h;
-+	__u32 cipher_key1_addr_l;
-+	__u32 cipher_key1_addr_h;
-+	__u32 cipher_key2_addr_l;
-+	__u32 cipher_key2_addr_h;
-+	__u32 rsvd1[4];
-+};
-+
-+struct hisi_zip *find_zip_device(int node);
-+int hisi_zip_register_to_crypto(void);
-+void hisi_zip_unregister_from_crypto(void);
-+#endif
-diff --git a/drivers/crypto/hisilicon/zip/zip_crypto.c b/drivers/crypto/hisilicon/zip/zip_crypto.c
-new file mode 100644
-index 0000000..172d237
---- /dev/null
-+++ b/drivers/crypto/hisilicon/zip/zip_crypto.c
-@@ -0,0 +1,410 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright (c) 2018 Hisilicon Limited. */
-+#include <linux/crypto.h>
-+#include <linux/dma-mapping.h>
-+#include "zip.h"
-+
-+#define HZIP_INPUT_BUFFER_SIZE			SZ_4M
-+#define HZIP_OUTPUT_BUFFER_SIZE			SZ_4M
-+
-+#define HZIP_ALG_TYPE_ZLIB			0x02
-+#define HZIP_ALG_TYPE_GZIP			0x03
-+
-+const u8 zlib_head[2] = {0x78, 0x9c};
-+const u8 gzip_head[10] = {0x1f, 0x8b, 0x08, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x03};
-+
-+#define COMP_NAME_TO_TYPE(alg_name)					\
-+	(!strcmp((alg_name), "zlib-deflate") ? HZIP_ALG_TYPE_ZLIB :	\
-+	 !strcmp((alg_name), "gzip") ? HZIP_ALG_TYPE_GZIP : 0)		\
-+
-+#define TO_HEAD_SIZE(req_type)						\
-+	(((req_type) == HZIP_ALG_TYPE_ZLIB) ? sizeof(zlib_head) :	\
-+	 ((req_type) == HZIP_ALG_TYPE_GZIP) ? sizeof(gzip_head) : 0)	\
-+
-+#define TO_HEAD(req_type)						\
-+	(((req_type) == HZIP_ALG_TYPE_ZLIB) ? zlib_head :		\
-+	 ((req_type) == HZIP_ALG_TYPE_GZIP) ? gzip_head : 0)		\
-+
-+struct hisi_zip_buffer {
-+	u8 *input;
-+	dma_addr_t input_dma;
-+	u8 *output;
-+	dma_addr_t output_dma;
-+};
-+
-+struct hisi_zip_qp_ctx {
-+	struct hisi_zip_buffer buffer;
-+	struct hisi_qp *qp;
-+	struct hisi_zip_sqe zip_sqe;
-+};
-+
-+struct hisi_zip_ctx {
-+#define QPC_COMP	0
-+#define QPC_DECOMP	1
-+	struct hisi_zip_qp_ctx qp_ctx[2];
-+};
-+
-+static void hisi_zip_fill_sqe(void *sqe, void *q_parm, u32 len)
-+{
-+	struct hisi_zip_sqe *zip_sqe = sqe;
-+	struct hisi_zip_qp_ctx *qp_ctx = q_parm;
-+	struct hisi_zip_buffer *buffer = &qp_ctx->buffer;
-+
-+	memset(zip_sqe, 0, sizeof(struct hisi_zip_sqe));
-+
-+	zip_sqe->input_data_length = len;
-+	zip_sqe->dw9 = qp_ctx->qp->req_type;
-+	zip_sqe->dest_avail_out = HZIP_OUTPUT_BUFFER_SIZE;
-+	zip_sqe->source_addr_l = lower_32_bits(buffer->input_dma);
-+	zip_sqe->source_addr_h = upper_32_bits(buffer->input_dma);
-+	zip_sqe->dest_addr_l = lower_32_bits(buffer->output_dma);
-+	zip_sqe->dest_addr_h = upper_32_bits(buffer->output_dma);
-+}
-+
-+/* let's allocate one buffer now, may have problem in async case */
-+static int hisi_zip_alloc_qp_buffer(struct hisi_zip_qp_ctx *hisi_zip_qp_ctx)
-+{
-+	struct hisi_zip_buffer *buffer = &hisi_zip_qp_ctx->buffer;
-+	struct hisi_qp *qp = hisi_zip_qp_ctx->qp;
-+	struct device *dev = &qp->qm->pdev->dev;
-+	int ret;
-+
-+	buffer->input = dma_alloc_coherent(dev, HZIP_INPUT_BUFFER_SIZE,
-+					   &buffer->input_dma, GFP_KERNEL);
-+	if (!buffer->input)
-+		return -ENOMEM;
-+
-+	buffer->output = dma_alloc_coherent(dev, HZIP_OUTPUT_BUFFER_SIZE,
-+					    &buffer->output_dma, GFP_KERNEL);
-+	if (!buffer->output) {
-+		ret = -ENOMEM;
-+		goto err_alloc_output_buffer;
-+	}
-+
-+	return 0;
-+
-+err_alloc_output_buffer:
-+	dma_free_coherent(dev, HZIP_INPUT_BUFFER_SIZE, buffer->input,
-+			  buffer->input_dma);
-+	return ret;
-+}
-+
-+static void hisi_zip_free_qp_buffer(struct hisi_zip_qp_ctx *hisi_zip_qp_ctx)
-+{
-+	struct hisi_zip_buffer *buffer = &hisi_zip_qp_ctx->buffer;
-+	struct hisi_qp *qp = hisi_zip_qp_ctx->qp;
-+	struct device *dev = &qp->qm->pdev->dev;
-+
-+	dma_free_coherent(dev, HZIP_INPUT_BUFFER_SIZE, buffer->input,
-+			  buffer->input_dma);
-+	dma_free_coherent(dev, HZIP_OUTPUT_BUFFER_SIZE, buffer->output,
-+			  buffer->output_dma);
-+}
-+
-+static int hisi_zip_create_qp(struct hisi_qm *qm, struct hisi_zip_qp_ctx *ctx,
-+			      int alg_type, int req_type)
-+{
-+	struct hisi_qp *qp;
-+	int ret;
-+
-+	qp = hisi_qm_create_qp(qm, alg_type);
-+	if (IS_ERR(qp))
-+		return PTR_ERR(qp);
-+
-+	qp->req_type = req_type;
-+	qp->qp_ctx = ctx;
-+	ctx->qp = qp;
-+
-+	ret = hisi_zip_alloc_qp_buffer(ctx);
-+	if (ret)
-+		goto err_release_qp;
-+
-+	ret = hisi_qm_start_qp(qp, 0);
-+	if (ret < 0)
-+		goto err_free_qp_buffer;
-+
-+	return 0;
-+
-+err_free_qp_buffer:
-+	hisi_zip_free_qp_buffer(ctx);
-+err_release_qp:
-+	hisi_qm_release_qp(qp);
-+	return ret;
-+}
-+
-+static void hisi_zip_release_qp(struct hisi_zip_qp_ctx *ctx)
-+{
-+	hisi_qm_stop_qp(ctx->qp);
-+	hisi_zip_free_qp_buffer(ctx);
-+	hisi_qm_release_qp(ctx->qp);
-+}
-+
-+static int hisi_zip_alloc_comp_ctx(struct crypto_tfm *tfm)
-+{
-+	struct hisi_zip_ctx *hisi_zip_ctx = crypto_tfm_ctx(tfm);
-+	const char *alg_name = crypto_tfm_alg_name(tfm);
-+	struct hisi_zip *hisi_zip;
-+	struct hisi_qm *qm;
-+	int ret, i, j;
-+
-+	u8 req_type = COMP_NAME_TO_TYPE(alg_name);
-+
-+	/* find the proper zip device */
-+	hisi_zip = find_zip_device(cpu_to_node(smp_processor_id()));
-+	if (!hisi_zip) {
-+		pr_err("Failed to find a proper ZIP device!\n");
-+		return -ENODEV;
-+	}
-+	qm = &hisi_zip->qm;
-+
-+	for (i = 0; i < 2; i++) {
-+	/* it is just happen that 0 is compress, 1 is decompress on alg_type */
-+		ret = hisi_zip_create_qp(qm, &hisi_zip_ctx->qp_ctx[i], i,
-+					 req_type);
-+		if (ret)
-+			goto err;
-+	}
-+
-+	return 0;
-+err:
-+	for (j = i - 1; j >= 0; j--)
-+		hisi_zip_release_qp(&hisi_zip_ctx->qp_ctx[j]);
-+
-+	return ret;
-+}
-+
-+static void hisi_zip_free_comp_ctx(struct crypto_tfm *tfm)
-+{
-+	struct hisi_zip_ctx *hisi_zip_ctx = crypto_tfm_ctx(tfm);
-+	int i;
-+
-+	/* release the qp */
-+	for (i = 1; i >= 0; i--)
-+		hisi_zip_release_qp(&hisi_zip_ctx->qp_ctx[i]);
-+}
-+
-+static int hisi_zip_copy_data_to_buffer(struct hisi_zip_qp_ctx *qp_ctx,
-+					const u8 *src, unsigned int slen)
-+{
-+	struct hisi_zip_buffer *buffer = &qp_ctx->buffer;
-+
-+	if (slen > HZIP_INPUT_BUFFER_SIZE)
-+		return -ENOSPC;
-+
-+	memcpy(buffer->input, src, slen);
-+
-+	return 0;
-+}
-+
-+static struct hisi_zip_sqe *hisi_zip_get_writeback_sqe(struct hisi_qp *qp)
-+{
-+	struct hisi_qp_status *qp_status = &qp->qp_status;
-+	struct hisi_zip_sqe *sq_base = qp->scqe.addr;
-+	u16 sq_head = qp_status->sq_head;
-+
-+	return sq_base + sq_head;
-+}
-+
-+static void hisi_zip_add_comp_head(struct hisi_qp *qp, u8 *dst)
-+{
-+	u8 head_size = TO_HEAD_SIZE(qp->req_type);
-+	const u8 *head = TO_HEAD(qp->req_type);
-+
-+	memcpy(dst, head, head_size);
-+}
-+
-+static void hisi_zip_copy_data_from_buffer(struct hisi_zip_qp_ctx *qp_ctx,
-+					   u8 *dst)
-+{
-+	struct hisi_zip_buffer *buffer = &qp_ctx->buffer;
-+	struct hisi_qp *qp = qp_ctx->qp;
-+	struct hisi_zip_sqe *zip_sqe = hisi_zip_get_writeback_sqe(qp);
-+	u16 sq_head;
-+
-+	memcpy(dst, buffer->output, zip_sqe->produced);
-+
-+	sq_head = qp->qp_status.sq_head;
-+	if (sq_head == QM_Q_DEPTH - 1)
-+		qp->qp_status.sq_head = 0;
-+	else
-+		qp->qp_status.sq_head++;
-+
-+	if (unlikely(test_bit(QP_FULL, &qp->qp_status.flags)))
-+		clear_bit(QP_FULL, &qp->qp_status.flags);
-+}
-+
-+static int hisi_zip_compress_data_output(struct hisi_zip_qp_ctx *qp_ctx,
-+					 u8 *dst, unsigned int *dlen)
-+{
-+	struct hisi_qp *qp = qp_ctx->qp;
-+	struct hisi_zip_sqe *zip_sqe = hisi_zip_get_writeback_sqe(qp);
-+	u32 status = zip_sqe->dw3 & 0xff;
-+	u8 head_size = TO_HEAD_SIZE(qp->req_type);
-+
-+	if (status != 0 && status != HZIP_NC_ERR) {
-+		dev_err(&qp->qm->pdev->dev, "Compression failed in qp%d!\n",
-+			qp->qp_id);
-+		return status;
-+	}
-+
-+	if (zip_sqe->produced + head_size > *dlen)
-+		return -ENOMEM;
-+
-+	hisi_zip_add_comp_head(qp, dst);
-+	hisi_zip_copy_data_from_buffer(qp_ctx, dst + head_size);
-+
-+	*dlen = zip_sqe->produced + head_size;
-+
-+	return 0;
-+}
-+
-+static int hisi_zip_compress(struct crypto_tfm *tfm, const u8 *src,
-+			     unsigned int slen, u8 *dst, unsigned int *dlen)
-+{
-+	struct hisi_zip_ctx *hisi_zip_ctx = crypto_tfm_ctx(tfm);
-+	struct hisi_zip_qp_ctx *qp_ctx = &hisi_zip_ctx->qp_ctx[QPC_COMP];
-+	struct hisi_qp *qp = qp_ctx->qp;
-+	struct hisi_zip_sqe *zip_sqe = &qp_ctx->zip_sqe;
-+	int ret;
-+
-+	if (!src || !slen || !dst || !dlen)
-+		return -ENOMEM;
-+
-+	ret = hisi_zip_copy_data_to_buffer(qp_ctx, src, slen);
-+	if (ret < 0)
-+		return ret;
-+
-+	hisi_zip_fill_sqe(zip_sqe, qp_ctx, slen);
-+
-+	/* send command to start the compress job */
-+	ret = hisi_qp_send(qp, zip_sqe);
-+	if (ret < 0)
-+		return ret;
-+
-+	ret = hisi_qp_wait(qp);
-+	if (ret < 0)
-+		return ret;
-+
-+	return hisi_zip_compress_data_output(qp_ctx, dst, dlen);
-+}
-+
-+static int hisi_zip_get_comp_head_size(struct hisi_qp *qp)
-+{
-+	return TO_HEAD_SIZE(qp->req_type);
-+}
-+
-+static int hisi_zip_decompress_data_output(struct hisi_zip_qp_ctx *qp_ctx,
-+					   u8 *dst, unsigned int *dlen)
-+{
-+	struct hisi_qp *qp = qp_ctx->qp;
-+	struct hisi_zip_sqe *zip_sqe = hisi_zip_get_writeback_sqe(qp);
-+	u32 status = zip_sqe->dw3 & 0xff;
-+
-+	if (status != 0) {
-+		dev_err(&qp->qm->pdev->dev, "Decompression fail in qp%u!\n",
-+			qp->qp_id);
-+		return status;
-+	}
-+
-+	if (zip_sqe->produced > *dlen)
-+		return -ENOMEM;
-+
-+	hisi_zip_copy_data_from_buffer(qp_ctx, dst);
-+
-+	*dlen = zip_sqe->produced;
-+
-+	return 0;
-+}
-+
-+static int hisi_zip_decompress(struct crypto_tfm *tfm, const u8 *src,
-+			       unsigned int slen, u8 *dst, unsigned int *dlen)
-+{
-+	struct hisi_zip_ctx *hisi_zip_ctx = crypto_tfm_ctx(tfm);
-+	struct hisi_zip_qp_ctx *qp_ctx = &hisi_zip_ctx->qp_ctx[QPC_DECOMP];
-+	struct hisi_qp *qp = qp_ctx->qp;
-+	struct hisi_zip_sqe *zip_sqe = &qp_ctx->zip_sqe;
-+	u16 size = hisi_zip_get_comp_head_size(qp);
-+	int ret;
-+
-+	if (!src || !slen || !dst || !dlen)
-+		return -ENOMEM;
-+
-+	ret = hisi_zip_copy_data_to_buffer(qp_ctx, src + size, slen - size);
-+	if (ret < 0)
-+		return ret;
-+
-+	hisi_zip_fill_sqe(zip_sqe, qp_ctx, slen - size);
-+
-+	/* send command to start the decompress job */
-+	ret = hisi_qp_send(qp, zip_sqe);
-+	if (ret < 0)
-+		return ret;
-+
-+	ret = hisi_qp_wait(qp);
-+	if (ret < 0)
-+		return ret;
-+
-+	return hisi_zip_decompress_data_output(qp_ctx, dst, dlen);
-+}
-+
-+static struct crypto_alg hisi_zip_zlib = {
-+	.cra_name		= "zlib-deflate",
-+	.cra_flags		= CRYPTO_ALG_TYPE_COMPRESS,
-+	.cra_ctxsize		= sizeof(struct hisi_zip_ctx),
-+	.cra_priority           = 300,
-+	.cra_module		= THIS_MODULE,
-+	.cra_init		= hisi_zip_alloc_comp_ctx,
-+	.cra_exit		= hisi_zip_free_comp_ctx,
-+	.cra_u			= {
-+		.compress = {
-+			.coa_compress	= hisi_zip_compress,
-+			.coa_decompress	= hisi_zip_decompress
-+		}
-+	}
-+};
-+
-+static struct crypto_alg hisi_zip_gzip = {
-+	.cra_name		= "gzip",
-+	.cra_flags		= CRYPTO_ALG_TYPE_COMPRESS,
-+	.cra_ctxsize		= sizeof(struct hisi_zip_ctx),
-+	.cra_priority           = 300,
-+	.cra_module		= THIS_MODULE,
-+	.cra_init		= hisi_zip_alloc_comp_ctx,
-+	.cra_exit		= hisi_zip_free_comp_ctx,
-+	.cra_u			= {
-+		.compress = {
-+			.coa_compress	= hisi_zip_compress,
-+			.coa_decompress	= hisi_zip_decompress
-+		}
-+	}
-+};
-+
-+int hisi_zip_register_to_crypto(void)
-+{
-+	int ret;
-+
-+	ret = crypto_register_alg(&hisi_zip_zlib);
-+	if (ret < 0) {
-+		pr_err("Zlib algorithm registration failed\n");
-+		return ret;
-+	}
-+
-+	ret = crypto_register_alg(&hisi_zip_gzip);
-+	if (ret < 0) {
-+		pr_err("Gzip algorithm registration failed\n");
-+		goto err_unregister_zlib;
-+	}
-+
-+	return 0;
-+
-+err_unregister_zlib:
-+	crypto_unregister_alg(&hisi_zip_zlib);
-+
-+	return ret;
-+}
-+
-+void hisi_zip_unregister_from_crypto(void)
-+{
-+	crypto_unregister_alg(&hisi_zip_gzip);
-+	crypto_unregister_alg(&hisi_zip_zlib);
-+}
-diff --git a/drivers/crypto/hisilicon/zip/zip_main.c b/drivers/crypto/hisilicon/zip/zip_main.c
-new file mode 100644
-index 0000000..54bb800
---- /dev/null
-+++ b/drivers/crypto/hisilicon/zip/zip_main.c
-@@ -0,0 +1,1161 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright (c) 2018 Hisilicon Limited. */
-+#include <linux/acpi.h>
-+#include <linux/aer.h>
-+#include <linux/bitops.h>
-+#include <linux/debugfs.h>
-+#include <linux/init.h>
-+#include <linux/io.h>
-+#include <linux/kernel.h>
-+#include <linux/module.h>
-+#include <linux/pci.h>
-+#include <linux/seq_file.h>
-+#include <linux/topology.h>
-+#include "zip.h"
-+
-+#define HZIP_VF_NUM			63
-+#define HZIP_QUEUE_NUM_V1		4096
-+#define HZIP_QUEUE_NUM_V2		1024
-+
-+#define HZIP_FSM_MAX_CNT		0x301008
-+
-+#define HZIP_PORT_ARCA_CHE_0		0x301040
-+#define HZIP_PORT_ARCA_CHE_1		0x301044
-+#define HZIP_PORT_AWCA_CHE_0		0x301060
-+#define HZIP_PORT_AWCA_CHE_1		0x301064
-+
-+#define HZIP_BD_RUSER_32_63		0x301110
-+#define HZIP_SGL_RUSER_32_63		0x30111c
-+#define HZIP_DATA_RUSER_32_63		0x301128
-+#define HZIP_DATA_WUSER_32_63		0x301134
-+#define HZIP_BD_WUSER_32_63		0x301140
-+
-+#define HZIP_QM_IDEL_STATUS		0x3040e4
-+#define HZIP_MASTER_GLOBAL_CTRL		0x300000
-+#define MASTER_GLOBAL_CTRL_SHUTDOWN	0x1
-+#define HZIP_MASTER_TRANS_RETURN	0x300150
-+#define MASTER_TRANS_RETURN_RW		0x3
-+
-+#define HZIP_CORE_DEBUG_COMP_0		0x302000
-+#define HZIP_CORE_DEBUG_COMP_1		0x303000
-+#define HZIP_CORE_DEBUG_DECOMP_0	0x304000
-+#define HZIP_CORE_DEBUG_DECOMP_1	0x305000
-+#define HZIP_CORE_DEBUG_DECOMP_2	0x306000
-+#define HZIP_CORE_DEBUG_DECOMP_3	0x307000
-+#define HZIP_CORE_DEBUG_DECOMP_4	0x308000
-+#define HZIP_CORE_DEBUG_DECOMP_5	0x309000
-+
-+#define HZIP_CORE_INT_SOURCE		0x3010A0
-+#define HZIP_CORE_INT_MASK		0x3010A4
-+#define HZIP_CORE_INT_STATUS		0x3010AC
-+#define HZIP_CORE_INT_STATUS_M_ECC	BIT(1)
-+#define HZIP_CORE_SRAM_ECC_ERR_INFO	0x301148
-+#define HZIP_CORE_INT_DISABLE		0x000007FF
-+#define HZIP_COMP_CORE_NUM		2
-+#define HZIP_DECOMP_CORE_NUM		6
-+#define HZIP_CORE_NUM			(HZIP_COMP_CORE_NUM + \
-+					 HZIP_DECOMP_CORE_NUM)
-+#define HZIP_SQE_SIZE			128
-+#define HZIP_SQ_SIZE			(HZIP_SQE_SIZE * QM_Q_DEPTH)
-+#define HZIP_PF_DEF_Q_NUM		64
-+#define HZIP_PF_DEF_Q_BASE		0
-+
-+#define HZIP_SOFT_CTRL_CNT_CLR_CE	0x301000
-+#define SOFT_CTRL_CNT_CLR_CE_BIT	BIT(0)
-+
-+static const char hisi_zip_name[] = "hisi_zip";
-+static struct dentry *hzip_debugfs_root;
-+LIST_HEAD(hisi_zip_list);
-+DEFINE_MUTEX(hisi_zip_list_lock);
-+
-+struct hisi_zip *find_zip_device(int node)
-+{
-+	struct hisi_zip *ret = NULL;
-+#ifdef CONFIG_NUMA
-+	struct hisi_zip *hisi_zip;
-+	int min_distance = 100;
-+	struct device *dev;
-+
-+	mutex_lock(&hisi_zip_list_lock);
-+
-+	list_for_each_entry(hisi_zip, &hisi_zip_list, list) {
-+		dev = &hisi_zip->qm.pdev->dev;
-+		if (node_distance(dev->numa_node, node) < min_distance) {
-+			ret = hisi_zip;
-+			min_distance = node_distance(dev->numa_node, node);
-+		}
-+	}
-+#else
-+	mutex_lock(&hisi_zip_list_lock);
-+
-+	ret = list_first_entry(&hisi_zip_list, struct hisi_zip, list);
-+#endif
-+	mutex_unlock(&hisi_zip_list_lock);
-+
-+	return ret;
-+}
-+
-+struct hisi_zip_hw_error {
-+	u32 int_msk;
-+	const char *msg;
-+};
-+
-+static const struct hisi_zip_hw_error zip_hw_error[] = {
-+	{ .int_msk = BIT(0), .msg = "zip_ecc_1bitt_err" },
-+	{ .int_msk = BIT(1), .msg = "zip_ecc_2bit_err" },
-+	{ .int_msk = BIT(2), .msg = "zip_axi_rresp_err" },
-+	{ .int_msk = BIT(3), .msg = "zip_axi_bresp_err" },
-+	{ .int_msk = BIT(4), .msg = "zip_src_addr_parse_err" },
-+	{ .int_msk = BIT(5), .msg = "zip_dst_addr_parse_err" },
-+	{ .int_msk = BIT(6), .msg = "zip_pre_in_addr_err" },
-+	{ .int_msk = BIT(7), .msg = "zip_pre_in_data_err" },
-+	{ .int_msk = BIT(8), .msg = "zip_com_inf_err" },
-+	{ .int_msk = BIT(9), .msg = "zip_enc_inf_err" },
-+	{ .int_msk = BIT(10), .msg = "zip_pre_out_err" },
-+	{ /* sentinel */ }
-+};
-+
-+enum ctrl_debug_file_index {
-+	HZIP_CURRENT_QM,
-+	HZIP_CLEAR_ENABLE,
-+	HZIP_DEBUG_FILE_NUM,
-+};
-+
-+static const char * const ctrl_debug_file_name[] = {
-+	[HZIP_CURRENT_QM]   = "current_qm",
-+	[HZIP_CLEAR_ENABLE] = "clear_enable",
-+};
-+
-+struct ctrl_debug_file {
-+	enum ctrl_debug_file_index index;
-+	spinlock_t lock;
-+	struct hisi_zip_ctrl *ctrl;
-+};
-+
-+/*
-+ * One ZIP controller has one PF and multiple VFs, some global configurations
-+ * which PF has need this structure.
-+ *
-+ * Just relevant for PF.
-+ */
-+struct hisi_zip_ctrl {
-+	u32 ctrl_q_num;
-+	u32 num_vfs;
-+	struct hisi_zip *hisi_zip;
-+	struct dentry *debug_root;
-+	struct ctrl_debug_file files[HZIP_DEBUG_FILE_NUM];
-+};
-+
-+enum {
-+	HZIP_COMP_CORE0,
-+	HZIP_COMP_CORE1,
-+	HZIP_DECOMP_CORE0,
-+	HZIP_DECOMP_CORE1,
-+	HZIP_DECOMP_CORE2,
-+	HZIP_DECOMP_CORE3,
-+	HZIP_DECOMP_CORE4,
-+	HZIP_DECOMP_CORE5,
-+};
-+
-+static const u64 core_offsets[] = {
-+	[HZIP_COMP_CORE0]   = 0x302000,
-+	[HZIP_COMP_CORE1]   = 0x303000,
-+	[HZIP_DECOMP_CORE0] = 0x304000,
-+	[HZIP_DECOMP_CORE1] = 0x305000,
-+	[HZIP_DECOMP_CORE2] = 0x306000,
-+	[HZIP_DECOMP_CORE3] = 0x307000,
-+	[HZIP_DECOMP_CORE4] = 0x308000,
-+	[HZIP_DECOMP_CORE5] = 0x309000,
-+};
-+
-+static struct debugfs_reg32 hzip_dfx_regs[] = {
-+	{"HZIP_GET_BD_NUM                ",  0x00ull},
-+	{"HZIP_GET_RIGHT_BD              ",  0x04ull},
-+	{"HZIP_GET_ERROR_BD              ",  0x08ull},
-+	{"HZIP_DONE_BD_NUM               ",  0x0cull},
-+	{"HZIP_WORK_CYCLE                ",  0x10ull},
-+	{"HZIP_IDLE_CYCLE                ",  0x18ull},
-+	{"HZIP_MAX_DELAY                 ",  0x20ull},
-+	{"HZIP_MIN_DELAY                 ",  0x24ull},
-+	{"HZIP_AVG_DELAY                 ",  0x28ull},
-+	{"HZIP_MEM_VISIBLE_DATA          ",  0x30ull},
-+	{"HZIP_MEM_VISIBLE_ADDR          ",  0x34ull},
-+	{"HZIP_COMSUMED_BYTE             ",  0x38ull},
-+	{"HZIP_PRODUCED_BYTE             ",  0x40ull},
-+	{"HZIP_COMP_INF                  ",  0x70ull},
-+	{"HZIP_PRE_OUT                   ",  0x78ull},
-+	{"HZIP_BD_RD                     ",  0x7cull},
-+	{"HZIP_BD_WR                     ",  0x80ull},
-+	{"HZIP_GET_BD_AXI_ERR_NUM        ",  0x84ull},
-+	{"HZIP_GET_BD_PARSE_ERR_NUM      ",  0x88ull},
-+	{"HZIP_ADD_BD_AXI_ERR_NUM        ",  0x8cull},
-+	{"HZIP_DECOMP_STF_RELOAD_CURR_ST ",  0x94ull},
-+	{"HZIP_DECOMP_LZ77_CURR_ST       ",  0x9cull},
-+};
-+
-+static int pf_q_num_set(const char *val, const struct kernel_param *kp)
-+{
-+	struct pci_dev *pdev = pci_get_device(PCI_VENDOR_ID_HUAWEI, 0xa250,
-+					      NULL);
-+	u32 n, q_num;
-+	u8 rev_id;
-+	int ret;
-+
-+	if (unlikely(!pdev)) {
-+		q_num = min_t(u32, HZIP_QUEUE_NUM_V1, HZIP_QUEUE_NUM_V2);
-+		pr_info("No device found currently, suppose queue number is %d\n",
-+			q_num);
-+	} else {
-+		rev_id = pdev->revision;
-+		switch (rev_id) {
-+		case 0x20:
-+			q_num = HZIP_QUEUE_NUM_V1;
+diff --git a/arch/arm64/crypto/chacha-neon-core.S b/arch/arm64/crypto/chacha-neon-core.S
+index 32086709e6b3..534e0a3fafa4 100644
+--- a/arch/arm64/crypto/chacha-neon-core.S
++++ b/arch/arm64/crypto/chacha-neon-core.S
+@@ -1,13 +1,13 @@
+ /*
+  * ChaCha/XChaCha NEON helper functions
+  *
+- * Copyright (C) 2016 Linaro, Ltd. <ard.biesheuvel@linaro.org>
++ * Copyright (C) 2016-2018 Linaro, Ltd. <ard.biesheuvel@linaro.org>
+  *
+  * This program is free software; you can redistribute it and/or modify
+  * it under the terms of the GNU General Public License version 2 as
+  * published by the Free Software Foundation.
+  *
+- * Based on:
++ * Originally based on:
+  * ChaCha20 256-bit cipher algorithm, RFC7539, x64 SSSE3 functions
+  *
+  * Copyright (C) 2015 Martin Willi
+@@ -160,8 +160,27 @@ ENTRY(hchacha_block_neon)
+ 	ret		x9
+ ENDPROC(hchacha_block_neon)
+ 
++	a0		.req	w12
++	a1		.req	w13
++	a2		.req	w14
++	a3		.req	w15
++	a4		.req	w16
++	a5		.req	w17
++	a6		.req	w19
++	a7		.req	w20
++	a8		.req	w21
++	a9		.req	w22
++	a10		.req	w23
++	a11		.req	w24
++	a12		.req	w25
++	a13		.req	w26
++	a14		.req	w27
++	a15		.req	w28
++
+ 	.align		6
+ ENTRY(chacha_4block_xor_neon)
++	frame_push	10
++
+ 	// x0: Input state matrix, s
+ 	// x1: 4 data blocks output, o
+ 	// x2: 4 data blocks input, i
+@@ -181,6 +200,9 @@ ENTRY(chacha_4block_xor_neon)
+ 	// matrix by interleaving 32- and then 64-bit words, which allows us to
+ 	// do XOR in NEON registers.
+ 	//
++	// At the same time, a fifth block is encrypted in parallel using
++	// scalar registers
++	//
+ 	adr_l		x9, CTRINC		// ... and ROT8
+ 	ld1		{v30.4s-v31.4s}, [x9]
+ 
+@@ -191,7 +213,24 @@ ENTRY(chacha_4block_xor_neon)
+ 	ld4r		{ v8.4s-v11.4s}, [x8], #16
+ 	ld4r		{v12.4s-v15.4s}, [x8]
+ 
+-	// x12 += counter values 0-3
++	mov		a0, v0.s[0]
++	mov		a1, v1.s[0]
++	mov		a2, v2.s[0]
++	mov		a3, v3.s[0]
++	mov		a4, v4.s[0]
++	mov		a5, v5.s[0]
++	mov		a6, v6.s[0]
++	mov		a7, v7.s[0]
++	mov		a8, v8.s[0]
++	mov		a9, v9.s[0]
++	mov		a10, v10.s[0]
++	mov		a11, v11.s[0]
++	mov		a12, v12.s[0]
++	mov		a13, v13.s[0]
++	mov		a14, v14.s[0]
++	mov		a15, v15.s[0]
++
++	// x12 += counter values 1-4
+ 	add		v12.4s, v12.4s, v30.4s
+ 
+ .Ldoubleround4:
+@@ -200,33 +239,53 @@ ENTRY(chacha_4block_xor_neon)
+ 	// x2 += x6, x14 = rotl32(x14 ^ x2, 16)
+ 	// x3 += x7, x15 = rotl32(x15 ^ x3, 16)
+ 	add		v0.4s, v0.4s, v4.4s
++	  add		a0, a0, a4
+ 	add		v1.4s, v1.4s, v5.4s
++	  add		a1, a1, a5
+ 	add		v2.4s, v2.4s, v6.4s
++	  add		a2, a2, a6
+ 	add		v3.4s, v3.4s, v7.4s
++	  add		a3, a3, a7
+ 
+ 	eor		v12.16b, v12.16b, v0.16b
++	  eor		a12, a12, a0
+ 	eor		v13.16b, v13.16b, v1.16b
++	  eor		a13, a13, a1
+ 	eor		v14.16b, v14.16b, v2.16b
++	  eor		a14, a14, a2
+ 	eor		v15.16b, v15.16b, v3.16b
++	  eor		a15, a15, a3
+ 
+ 	rev32		v12.8h, v12.8h
++	  ror		a12, a12, #16
+ 	rev32		v13.8h, v13.8h
++	  ror		a13, a13, #16
+ 	rev32		v14.8h, v14.8h
++	  ror		a14, a14, #16
+ 	rev32		v15.8h, v15.8h
++	  ror		a15, a15, #16
+ 
+ 	// x8 += x12, x4 = rotl32(x4 ^ x8, 12)
+ 	// x9 += x13, x5 = rotl32(x5 ^ x9, 12)
+ 	// x10 += x14, x6 = rotl32(x6 ^ x10, 12)
+ 	// x11 += x15, x7 = rotl32(x7 ^ x11, 12)
+ 	add		v8.4s, v8.4s, v12.4s
++	  add		a8, a8, a12
+ 	add		v9.4s, v9.4s, v13.4s
++	  add		a9, a9, a13
+ 	add		v10.4s, v10.4s, v14.4s
++	  add		a10, a10, a14
+ 	add		v11.4s, v11.4s, v15.4s
++	  add		a11, a11, a15
+ 
+ 	eor		v16.16b, v4.16b, v8.16b
++	  eor		a4, a4, a8
+ 	eor		v17.16b, v5.16b, v9.16b
++	  eor		a5, a5, a9
+ 	eor		v18.16b, v6.16b, v10.16b
++	  eor		a6, a6, a10
+ 	eor		v19.16b, v7.16b, v11.16b
++	  eor		a7, a7, a11
+ 
+ 	shl		v4.4s, v16.4s, #12
+ 	shl		v5.4s, v17.4s, #12
+@@ -234,42 +293,66 @@ ENTRY(chacha_4block_xor_neon)
+ 	shl		v7.4s, v19.4s, #12
+ 
+ 	sri		v4.4s, v16.4s, #20
++	  ror		a4, a4, #20
+ 	sri		v5.4s, v17.4s, #20
++	  ror		a5, a5, #20
+ 	sri		v6.4s, v18.4s, #20
++	  ror		a6, a6, #20
+ 	sri		v7.4s, v19.4s, #20
++	  ror		a7, a7, #20
+ 
+ 	// x0 += x4, x12 = rotl32(x12 ^ x0, 8)
+ 	// x1 += x5, x13 = rotl32(x13 ^ x1, 8)
+ 	// x2 += x6, x14 = rotl32(x14 ^ x2, 8)
+ 	// x3 += x7, x15 = rotl32(x15 ^ x3, 8)
+ 	add		v0.4s, v0.4s, v4.4s
++	  add		a0, a0, a4
+ 	add		v1.4s, v1.4s, v5.4s
++	  add		a1, a1, a5
+ 	add		v2.4s, v2.4s, v6.4s
++	  add		a2, a2, a6
+ 	add		v3.4s, v3.4s, v7.4s
++	  add		a3, a3, a7
+ 
+ 	eor		v12.16b, v12.16b, v0.16b
++	  eor		a12, a12, a0
+ 	eor		v13.16b, v13.16b, v1.16b
++	  eor		a13, a13, a1
+ 	eor		v14.16b, v14.16b, v2.16b
++	  eor		a14, a14, a2
+ 	eor		v15.16b, v15.16b, v3.16b
++	  eor		a15, a15, a3
+ 
+ 	tbl		v12.16b, {v12.16b}, v31.16b
++	  ror		a12, a12, #24
+ 	tbl		v13.16b, {v13.16b}, v31.16b
++	  ror		a13, a13, #24
+ 	tbl		v14.16b, {v14.16b}, v31.16b
++	  ror		a14, a14, #24
+ 	tbl		v15.16b, {v15.16b}, v31.16b
++	  ror		a15, a15, #24
+ 
+ 	// x8 += x12, x4 = rotl32(x4 ^ x8, 7)
+ 	// x9 += x13, x5 = rotl32(x5 ^ x9, 7)
+ 	// x10 += x14, x6 = rotl32(x6 ^ x10, 7)
+ 	// x11 += x15, x7 = rotl32(x7 ^ x11, 7)
+ 	add		v8.4s, v8.4s, v12.4s
++	  add		a8, a8, a12
+ 	add		v9.4s, v9.4s, v13.4s
++	  add		a9, a9, a13
+ 	add		v10.4s, v10.4s, v14.4s
++	  add		a10, a10, a14
+ 	add		v11.4s, v11.4s, v15.4s
++	  add		a11, a11, a15
+ 
+ 	eor		v16.16b, v4.16b, v8.16b
++	  eor		a4, a4, a8
+ 	eor		v17.16b, v5.16b, v9.16b
++	  eor		a5, a5, a9
+ 	eor		v18.16b, v6.16b, v10.16b
++	  eor		a6, a6, a10
+ 	eor		v19.16b, v7.16b, v11.16b
++	  eor		a7, a7, a11
+ 
+ 	shl		v4.4s, v16.4s, #7
+ 	shl		v5.4s, v17.4s, #7
+@@ -277,42 +360,66 @@ ENTRY(chacha_4block_xor_neon)
+ 	shl		v7.4s, v19.4s, #7
+ 
+ 	sri		v4.4s, v16.4s, #25
++	  ror		a4, a4, #25
+ 	sri		v5.4s, v17.4s, #25
++	  ror		a5, a5, #25
+ 	sri		v6.4s, v18.4s, #25
++	 ror		a6, a6, #25
+ 	sri		v7.4s, v19.4s, #25
++	  ror		a7, a7, #25
+ 
+ 	// x0 += x5, x15 = rotl32(x15 ^ x0, 16)
+ 	// x1 += x6, x12 = rotl32(x12 ^ x1, 16)
+ 	// x2 += x7, x13 = rotl32(x13 ^ x2, 16)
+ 	// x3 += x4, x14 = rotl32(x14 ^ x3, 16)
+ 	add		v0.4s, v0.4s, v5.4s
++	  add		a0, a0, a5
+ 	add		v1.4s, v1.4s, v6.4s
++	  add		a1, a1, a6
+ 	add		v2.4s, v2.4s, v7.4s
++	  add		a2, a2, a7
+ 	add		v3.4s, v3.4s, v4.4s
++	  add		a3, a3, a4
+ 
+ 	eor		v15.16b, v15.16b, v0.16b
++	  eor		a15, a15, a0
+ 	eor		v12.16b, v12.16b, v1.16b
++	  eor		a12, a12, a1
+ 	eor		v13.16b, v13.16b, v2.16b
++	  eor		a13, a13, a2
+ 	eor		v14.16b, v14.16b, v3.16b
++	  eor		a14, a14, a3
+ 
+ 	rev32		v15.8h, v15.8h
++	  ror		a15, a15, #16
+ 	rev32		v12.8h, v12.8h
++	  ror		a12, a12, #16
+ 	rev32		v13.8h, v13.8h
++	  ror		a13, a13, #16
+ 	rev32		v14.8h, v14.8h
++	  ror		a14, a14, #16
+ 
+ 	// x10 += x15, x5 = rotl32(x5 ^ x10, 12)
+ 	// x11 += x12, x6 = rotl32(x6 ^ x11, 12)
+ 	// x8 += x13, x7 = rotl32(x7 ^ x8, 12)
+ 	// x9 += x14, x4 = rotl32(x4 ^ x9, 12)
+ 	add		v10.4s, v10.4s, v15.4s
++	  add		a10, a10, a15
+ 	add		v11.4s, v11.4s, v12.4s
++	  add		a11, a11, a12
+ 	add		v8.4s, v8.4s, v13.4s
++	  add		a8, a8, a13
+ 	add		v9.4s, v9.4s, v14.4s
++	  add		a9, a9, a14
+ 
+ 	eor		v16.16b, v5.16b, v10.16b
++	  eor		a5, a5, a10
+ 	eor		v17.16b, v6.16b, v11.16b
++	  eor		a6, a6, a11
+ 	eor		v18.16b, v7.16b, v8.16b
++	  eor		a7, a7, a8
+ 	eor		v19.16b, v4.16b, v9.16b
++	  eor		a4, a4, a9
+ 
+ 	shl		v5.4s, v16.4s, #12
+ 	shl		v6.4s, v17.4s, #12
+@@ -320,42 +427,66 @@ ENTRY(chacha_4block_xor_neon)
+ 	shl		v4.4s, v19.4s, #12
+ 
+ 	sri		v5.4s, v16.4s, #20
++	  ror		a5, a5, #20
+ 	sri		v6.4s, v17.4s, #20
++	  ror		a6, a6, #20
+ 	sri		v7.4s, v18.4s, #20
++	  ror		a7, a7, #20
+ 	sri		v4.4s, v19.4s, #20
++	  ror		a4, a4, #20
+ 
+ 	// x0 += x5, x15 = rotl32(x15 ^ x0, 8)
+ 	// x1 += x6, x12 = rotl32(x12 ^ x1, 8)
+ 	// x2 += x7, x13 = rotl32(x13 ^ x2, 8)
+ 	// x3 += x4, x14 = rotl32(x14 ^ x3, 8)
+ 	add		v0.4s, v0.4s, v5.4s
++	  add		a0, a0, a5
+ 	add		v1.4s, v1.4s, v6.4s
++	  add		a1, a1, a6
+ 	add		v2.4s, v2.4s, v7.4s
++	  add		a2, a2, a7
+ 	add		v3.4s, v3.4s, v4.4s
++	  add		a3, a3, a4
+ 
+ 	eor		v15.16b, v15.16b, v0.16b
++	  eor		a15, a15, a0
+ 	eor		v12.16b, v12.16b, v1.16b
++	  eor		a12, a12, a1
+ 	eor		v13.16b, v13.16b, v2.16b
++	  eor		a13, a13, a2
+ 	eor		v14.16b, v14.16b, v3.16b
++	  eor		a14, a14, a3
+ 
+ 	tbl		v15.16b, {v15.16b}, v31.16b
++	  ror		a15, a15, #24
+ 	tbl		v12.16b, {v12.16b}, v31.16b
++	  ror		a12, a12, #24
+ 	tbl		v13.16b, {v13.16b}, v31.16b
++	  ror		a13, a13, #24
+ 	tbl		v14.16b, {v14.16b}, v31.16b
++	  ror		a14, a14, #24
+ 
+ 	// x10 += x15, x5 = rotl32(x5 ^ x10, 7)
+ 	// x11 += x12, x6 = rotl32(x6 ^ x11, 7)
+ 	// x8 += x13, x7 = rotl32(x7 ^ x8, 7)
+ 	// x9 += x14, x4 = rotl32(x4 ^ x9, 7)
+ 	add		v10.4s, v10.4s, v15.4s
++	  add		a10, a10, a15
+ 	add		v11.4s, v11.4s, v12.4s
++	  add		a11, a11, a12
+ 	add		v8.4s, v8.4s, v13.4s
++	  add		a8, a8, a13
+ 	add		v9.4s, v9.4s, v14.4s
++	  add		a9, a9, a14
+ 
+ 	eor		v16.16b, v5.16b, v10.16b
++	  eor		a5, a5, a10
+ 	eor		v17.16b, v6.16b, v11.16b
++	  eor		a6, a6, a11
+ 	eor		v18.16b, v7.16b, v8.16b
++	  eor		a7, a7, a8
+ 	eor		v19.16b, v4.16b, v9.16b
++	  eor		a4, a4, a9
+ 
+ 	shl		v5.4s, v16.4s, #7
+ 	shl		v6.4s, v17.4s, #7
+@@ -363,9 +494,13 @@ ENTRY(chacha_4block_xor_neon)
+ 	shl		v4.4s, v19.4s, #7
+ 
+ 	sri		v5.4s, v16.4s, #25
++	  ror		a5, a5, #25
+ 	sri		v6.4s, v17.4s, #25
++	  ror		a6, a6, #25
+ 	sri		v7.4s, v18.4s, #25
++	  ror		a7, a7, #25
+ 	sri		v4.4s, v19.4s, #25
++	  ror		a4, a4, #25
+ 
+ 	subs		w3, w3, #2
+ 	b.ne		.Ldoubleround4
+@@ -381,9 +516,17 @@ ENTRY(chacha_4block_xor_neon)
+ 	// x2[0-3] += s0[2]
+ 	// x3[0-3] += s0[3]
+ 	add		v0.4s, v0.4s, v16.4s
++	  mov		w6, v16.s[0]
++	  mov		w7, v17.s[0]
+ 	add		v1.4s, v1.4s, v17.4s
++	  mov		w8, v18.s[0]
++	  mov		w9, v19.s[0]
+ 	add		v2.4s, v2.4s, v18.4s
++	  add		a0, a0, w6
++	  add		a1, a1, w7
+ 	add		v3.4s, v3.4s, v19.4s
++	  add		a2, a2, w8
++	  add		a3, a3, w9
+ 
+ 	ld4r		{v24.4s-v27.4s}, [x0], #16
+ 	ld4r		{v28.4s-v31.4s}, [x0]
+@@ -393,48 +536,96 @@ ENTRY(chacha_4block_xor_neon)
+ 	// x6[0-3] += s1[2]
+ 	// x7[0-3] += s1[3]
+ 	add		v4.4s, v4.4s, v20.4s
++	  mov		w6, v20.s[0]
++	  mov		w7, v21.s[0]
+ 	add		v5.4s, v5.4s, v21.4s
++	  mov		w8, v22.s[0]
++	  mov		w9, v23.s[0]
+ 	add		v6.4s, v6.4s, v22.4s
++	  add		a4, a4, w6
++	  add		a5, a5, w7
+ 	add		v7.4s, v7.4s, v23.4s
++	  add		a6, a6, w8
++	  add		a7, a7, w9
+ 
+ 	// x8[0-3] += s2[0]
+ 	// x9[0-3] += s2[1]
+ 	// x10[0-3] += s2[2]
+ 	// x11[0-3] += s2[3]
+ 	add		v8.4s, v8.4s, v24.4s
++	  mov		w6, v24.s[0]
++	  mov		w7, v25.s[0]
+ 	add		v9.4s, v9.4s, v25.4s
++	  mov		w8, v26.s[0]
++	  mov		w9, v27.s[0]
+ 	add		v10.4s, v10.4s, v26.4s
++	  add		a8, a8, w6
++	  add		a9, a9, w7
+ 	add		v11.4s, v11.4s, v27.4s
++	  add		a10, a10, w8
++	  add		a11, a11, w9
+ 
+ 	// x12[0-3] += s3[0]
+ 	// x13[0-3] += s3[1]
+ 	// x14[0-3] += s3[2]
+ 	// x15[0-3] += s3[3]
+ 	add		v12.4s, v12.4s, v28.4s
++	  mov		w6, v28.s[0]
++	  mov		w7, v29.s[0]
+ 	add		v13.4s, v13.4s, v29.4s
++	  mov		w8, v30.s[0]
++	  mov		w9, v31.s[0]
+ 	add		v14.4s, v14.4s, v30.4s
++	  add		a12, a12, w6
++	  add		a13, a13, w7
+ 	add		v15.4s, v15.4s, v31.4s
++	  add		a14, a14, w8
++	  add		a15, a15, w9
+ 
+ 	// interleave 32-bit words in state n, n+1
++	  ldp		w6, w7, [x2], #64
+ 	zip1		v16.4s, v0.4s, v1.4s
++	  ldp		w8, w9, [x2, #-56]
++	  eor		a0, a0, w6
+ 	zip2		v17.4s, v0.4s, v1.4s
++	  eor		a1, a1, w7
+ 	zip1		v18.4s, v2.4s, v3.4s
++	  eor		a2, a2, w8
+ 	zip2		v19.4s, v2.4s, v3.4s
++	  eor		a3, a3, w9
++	  ldp		w6, w7, [x2, #-48]
+ 	zip1		v20.4s, v4.4s, v5.4s
++	  ldp		w8, w9, [x2, #-40]
++	  eor		a4, a4, w6
+ 	zip2		v21.4s, v4.4s, v5.4s
++	  eor		a5, a5, w7
+ 	zip1		v22.4s, v6.4s, v7.4s
++	  eor		a6, a6, w8
+ 	zip2		v23.4s, v6.4s, v7.4s
++	  eor		a7, a7, w9
++	  ldp		w6, w7, [x2, #-32]
+ 	zip1		v24.4s, v8.4s, v9.4s
++	  ldp		w8, w9, [x2, #-24]
++	  eor		a8, a8, w6
+ 	zip2		v25.4s, v8.4s, v9.4s
++	  eor		a9, a9, w7
+ 	zip1		v26.4s, v10.4s, v11.4s
++	  eor		a10, a10, w8
+ 	zip2		v27.4s, v10.4s, v11.4s
++	  eor		a11, a11, w9
++	  ldp		w6, w7, [x2, #-16]
+ 	zip1		v28.4s, v12.4s, v13.4s
++	  ldp		w8, w9, [x2, #-8]
++	  eor		a12, a12, w6
+ 	zip2		v29.4s, v12.4s, v13.4s
++	  eor		a13, a13, w7
+ 	zip1		v30.4s, v14.4s, v15.4s
++	  eor		a14, a14, w8
+ 	zip2		v31.4s, v14.4s, v15.4s
++	  eor		a15, a15, w9
+ 
+ 	mov		x3, #64
+-	subs		x5, x4, #64
++	subs		x5, x4, #128
+ 	add		x6, x5, x2
+ 	csel		x3, x3, xzr, ge
+ 	csel		x2, x2, x6, ge
+@@ -442,11 +633,13 @@ ENTRY(chacha_4block_xor_neon)
+ 	// interleave 64-bit words in state n, n+2
+ 	zip1		v0.2d, v16.2d, v18.2d
+ 	zip2		v4.2d, v16.2d, v18.2d
++	  stp		a0, a1, [x1], #64
+ 	zip1		v8.2d, v17.2d, v19.2d
+ 	zip2		v12.2d, v17.2d, v19.2d
++	  stp		a2, a3, [x1, #-56]
+ 	ld1		{v16.16b-v19.16b}, [x2], x3
+ 
+-	subs		x6, x4, #128
++	subs		x6, x4, #192
+ 	ccmp		x3, xzr, #4, lt
+ 	add		x7, x6, x2
+ 	csel		x3, x3, xzr, eq
+@@ -454,11 +647,13 @@ ENTRY(chacha_4block_xor_neon)
+ 
+ 	zip1		v1.2d, v20.2d, v22.2d
+ 	zip2		v5.2d, v20.2d, v22.2d
++	  stp		a4, a5, [x1, #-48]
+ 	zip1		v9.2d, v21.2d, v23.2d
+ 	zip2		v13.2d, v21.2d, v23.2d
++	  stp		a6, a7, [x1, #-40]
+ 	ld1		{v20.16b-v23.16b}, [x2], x3
+ 
+-	subs		x7, x4, #192
++	subs		x7, x4, #256
+ 	ccmp		x3, xzr, #4, lt
+ 	add		x8, x7, x2
+ 	csel		x3, x3, xzr, eq
+@@ -466,19 +661,23 @@ ENTRY(chacha_4block_xor_neon)
+ 
+ 	zip1		v2.2d, v24.2d, v26.2d
+ 	zip2		v6.2d, v24.2d, v26.2d
++	  stp		a8, a9, [x1, #-32]
+ 	zip1		v10.2d, v25.2d, v27.2d
+ 	zip2		v14.2d, v25.2d, v27.2d
++	  stp		a10, a11, [x1, #-24]
+ 	ld1		{v24.16b-v27.16b}, [x2], x3
+ 
+-	subs		x8, x4, #256
++	subs		x8, x4, #320
+ 	ccmp		x3, xzr, #4, lt
+ 	add		x9, x8, x2
+ 	csel		x2, x2, x9, eq
+ 
+ 	zip1		v3.2d, v28.2d, v30.2d
+ 	zip2		v7.2d, v28.2d, v30.2d
++	  stp		a12, a13, [x1, #-16]
+ 	zip1		v11.2d, v29.2d, v31.2d
+ 	zip2		v15.2d, v29.2d, v31.2d
++	  stp		a14, a15, [x1, #-8]
+ 	ld1		{v28.16b-v31.16b}, [x2]
+ 
+ 	// xor with corresponding input, write to output
+@@ -488,6 +687,7 @@ ENTRY(chacha_4block_xor_neon)
+ 	eor		v18.16b, v18.16b, v2.16b
+ 	eor		v19.16b, v19.16b, v3.16b
+ 	st1		{v16.16b-v19.16b}, [x1], #64
++	cbz		x5, .Lout
+ 
+ 	tbnz		x6, #63, 1f
+ 	eor		v20.16b, v20.16b, v4.16b
+@@ -495,6 +695,7 @@ ENTRY(chacha_4block_xor_neon)
+ 	eor		v22.16b, v22.16b, v6.16b
+ 	eor		v23.16b, v23.16b, v7.16b
+ 	st1		{v20.16b-v23.16b}, [x1], #64
++	cbz		x6, .Lout
+ 
+ 	tbnz		x7, #63, 2f
+ 	eor		v24.16b, v24.16b, v8.16b
+@@ -502,6 +703,7 @@ ENTRY(chacha_4block_xor_neon)
+ 	eor		v26.16b, v26.16b, v10.16b
+ 	eor		v27.16b, v27.16b, v11.16b
+ 	st1		{v24.16b-v27.16b}, [x1], #64
++	cbz		x7, .Lout
+ 
+ 	tbnz		x8, #63, 3f
+ 	eor		v28.16b, v28.16b, v12.16b
+@@ -510,9 +712,10 @@ ENTRY(chacha_4block_xor_neon)
+ 	eor		v31.16b, v31.16b, v15.16b
+ 	st1		{v28.16b-v31.16b}, [x1]
+ 
++.Lout:	frame_pop
+ 	ret
+ 
+-	// fewer than 64 bytes of in/output
++	// fewer than 128 bytes of in/output
+ 0:	ld1		{v8.16b}, [x10]
+ 	ld1		{v9.16b}, [x11]
+ 	movi		v10.16b, #16
+@@ -539,9 +742,9 @@ ENTRY(chacha_4block_xor_neon)
+ 	eor		v22.16b, v22.16b, v6.16b
+ 	eor		v23.16b, v23.16b, v7.16b
+ 	st1		{v20.16b-v23.16b}, [x1]
+-	ret
++	b		.Lout
+ 
+-	// fewer than 128 bytes of in/output
++	// fewer than 192 bytes of in/output
+ 1:	ld1		{v8.16b}, [x10]
+ 	ld1		{v9.16b}, [x11]
+ 	movi		v10.16b, #16
+@@ -566,9 +769,9 @@ ENTRY(chacha_4block_xor_neon)
+ 	eor		v22.16b, v22.16b, v2.16b
+ 	eor		v23.16b, v23.16b, v3.16b
+ 	st1		{v20.16b-v23.16b}, [x1]
+-	ret
++	b		.Lout
+ 
+-	// fewer than 192 bytes of in/output
++	// fewer than 256 bytes of in/output
+ 2:	ld1		{v4.16b}, [x10]
+ 	ld1		{v5.16b}, [x11]
+ 	movi		v6.16b, #16
+@@ -593,9 +796,9 @@ ENTRY(chacha_4block_xor_neon)
+ 	eor		v26.16b, v26.16b, v2.16b
+ 	eor		v27.16b, v27.16b, v3.16b
+ 	st1		{v24.16b-v27.16b}, [x1]
+-	ret
++	b		.Lout
+ 
+-	// fewer than 256 bytes of in/output
++	// fewer than 320 bytes of in/output
+ 3:	ld1		{v4.16b}, [x10]
+ 	ld1		{v5.16b}, [x11]
+ 	movi		v6.16b, #16
+@@ -620,7 +823,7 @@ ENTRY(chacha_4block_xor_neon)
+ 	eor		v30.16b, v30.16b, v2.16b
+ 	eor		v31.16b, v31.16b, v3.16b
+ 	st1		{v28.16b-v31.16b}, [x1]
+-	ret
++	b		.Lout
+ ENDPROC(chacha_4block_xor_neon)
+ 
+ 	.section	".rodata", "a", %progbits
+@@ -632,5 +835,5 @@ ENDPROC(chacha_4block_xor_neon)
+ 	.set		.Li, .Li + 1
+ 	.endr
+ 
+-CTRINC:	.word		0, 1, 2, 3
++CTRINC:	.word		1, 2, 3, 4
+ ROT8:	.word		0x02010003, 0x06050407, 0x0a09080b, 0x0e0d0c0f
+diff --git a/arch/arm64/crypto/chacha-neon-glue.c b/arch/arm64/crypto/chacha-neon-glue.c
+index 67f8feb0c717..bece1d85bd81 100644
+--- a/arch/arm64/crypto/chacha-neon-glue.c
++++ b/arch/arm64/crypto/chacha-neon-glue.c
+@@ -38,22 +38,23 @@ asmlinkage void hchacha_block_neon(const u32 *state, u32 *out, int nrounds);
+ static void chacha_doneon(u32 *state, u8 *dst, const u8 *src,
+ 			  int bytes, int nrounds)
+ {
+-	u8 buf[CHACHA_BLOCK_SIZE];
+-
+-	if (bytes < CHACHA_BLOCK_SIZE) {
+-		memcpy(buf, src, bytes);
+-		chacha_block_xor_neon(state, buf, buf, nrounds);
+-		memcpy(dst, buf, bytes);
+-		return;
+-	}
+-
+ 	while (bytes > 0) {
+-		chacha_4block_xor_neon(state, dst, src, nrounds,
+-				       min(bytes, CHACHA_BLOCK_SIZE * 4));
+-		bytes -= CHACHA_BLOCK_SIZE * 4;
+-		src += CHACHA_BLOCK_SIZE * 4;
+-		dst += CHACHA_BLOCK_SIZE * 4;
+-		state[12] += 4;
++		int l = min(bytes, CHACHA_BLOCK_SIZE * 5);
++
++		if (l <= CHACHA_BLOCK_SIZE) {
++			u8 buf[CHACHA_BLOCK_SIZE];
++
++			memcpy(buf, src, l);
++			chacha_block_xor_neon(state, buf, buf, nrounds);
++			memcpy(dst, buf, l);
++			state[12] += 1;
 +			break;
-+		case 0x21:
-+			q_num = HZIP_QUEUE_NUM_V2;
-+			break;
-+		default:
-+			return -EINVAL;
 +		}
-+	}
-+
-+	ret = kstrtou32(val, 10, &n);
-+	if (ret != 0 || n > q_num)
-+		return -EINVAL;
-+
-+	return param_set_int(val, kp);
-+}
-+
-+static const struct kernel_param_ops pf_q_num_ops = {
-+	.set = pf_q_num_set,
-+	.get = param_get_int,
-+};
-+
-+static u32 pf_q_num = HZIP_PF_DEF_Q_NUM;
-+module_param_cb(pf_q_num, &pf_q_num_ops, &pf_q_num, 0444);
-+MODULE_PARM_DESC(pf_q_num, "Number of queues in PF(v1 0-4096, v2 0-1024)");
-+
-+static const struct pci_device_id hisi_zip_dev_ids[] = {
-+	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, 0xa250) },
-+	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, 0xa251) },
-+	{ 0, }
-+};
-+MODULE_DEVICE_TABLE(pci, hisi_zip_dev_ids);
-+
-+static inline void hisi_zip_add_to_list(struct hisi_zip *hisi_zip)
-+{
-+	mutex_lock(&hisi_zip_list_lock);
-+	list_add_tail(&hisi_zip->list, &hisi_zip_list);
-+	mutex_unlock(&hisi_zip_list_lock);
-+}
-+
-+static inline void hisi_zip_remove_from_list(struct hisi_zip *hisi_zip)
-+{
-+	mutex_lock(&hisi_zip_list_lock);
-+	list_del(&hisi_zip->list);
-+	mutex_unlock(&hisi_zip_list_lock);
-+}
-+
-+static void hisi_zip_set_user_domain_and_cache(struct hisi_zip *hisi_zip)
-+{
-+	u32 val;
-+
-+	/* qm user domain */
-+	writel(0x40001070, hisi_zip->qm.io_base + QM_ARUSER_M_CFG_1);
-+	writel(0xfffffffe, hisi_zip->qm.io_base + QM_ARUSER_M_CFG_ENABLE);
-+	writel(0x40001070, hisi_zip->qm.io_base + QM_AWUSER_M_CFG_1);
-+	writel(0xfffffffe, hisi_zip->qm.io_base + QM_AWUSER_M_CFG_ENABLE);
-+	writel(0xffffffff, hisi_zip->qm.io_base + QM_WUSER_M_CFG_ENABLE);
-+
-+	val = readl(hisi_zip->qm.io_base + QM_PEH_AXUSER_CFG);
-+	val |= (1 << 11);
-+	writel(val, hisi_zip->qm.io_base + QM_PEH_AXUSER_CFG);
-+
-+	/* qm cache */
-+	writel(0xffff,     hisi_zip->qm.io_base + QM_AXI_M_CFG);
-+	writel(0xffffffff, hisi_zip->qm.io_base + QM_AXI_M_CFG_ENABLE);
-+	writel(0xffffffff, hisi_zip->qm.io_base + QM_PEH_AXUSER_CFG_ENABLE);
-+
-+	/* cache */
-+	writel(0xffffffff, hisi_zip->qm.io_base + HZIP_PORT_ARCA_CHE_0);
-+	writel(0xffffffff, hisi_zip->qm.io_base + HZIP_PORT_ARCA_CHE_1);
-+	writel(0xffffffff, hisi_zip->qm.io_base + HZIP_PORT_AWCA_CHE_0);
-+	writel(0xffffffff, hisi_zip->qm.io_base + HZIP_PORT_AWCA_CHE_1);
-+	/* user domain configurations */
-+	writel(0x40001070, hisi_zip->qm.io_base + HZIP_BD_RUSER_32_63);
-+	writel(0x40001070, hisi_zip->qm.io_base + HZIP_SGL_RUSER_32_63);
-+	writel(0x40001070, hisi_zip->qm.io_base + HZIP_DATA_RUSER_32_63);
-+	writel(0x40001070, hisi_zip->qm.io_base + HZIP_DATA_WUSER_32_63);
-+	writel(0x40001070, hisi_zip->qm.io_base + HZIP_BD_WUSER_32_63);
-+
-+	/* fsm count */
-+	writel(0xfffffff, hisi_zip->qm.io_base + HZIP_FSM_MAX_CNT);
-+
-+	/* let's open all compression/decompression cores */
-+	writel(0x100ff, hisi_zip->qm.io_base + 0x301004);
-+}
-+
-+static void hisi_zip_hw_error_set_state(struct hisi_zip *hisi_zip, bool state)
-+{
-+	struct hisi_qm *qm = &hisi_zip->qm;
-+
-+	if (qm->ver == QM_HW_V1) {
-+		writel(HZIP_CORE_INT_DISABLE, qm->io_base + HZIP_CORE_INT_MASK);
-+		dev_info(&qm->pdev->dev, "ZIP v%d does not support hw error handle\n",
-+			 qm->ver);
-+		return;
-+	}
-+
-+	if (state)
-+		/* enable ZIP hw error interrupts */
-+		writel(0, hisi_zip->qm.io_base + HZIP_CORE_INT_MASK);
-+	else
-+		/* disable ZIP hw error interrupts */
-+		writel(HZIP_CORE_INT_DISABLE,
-+		       hisi_zip->qm.io_base + HZIP_CORE_INT_MASK);
-+}
-+
-+static inline struct hisi_qm *file_to_qm(struct ctrl_debug_file *file)
-+{
-+	struct hisi_zip *hisi_zip = file->ctrl->hisi_zip;
-+
-+	return &hisi_zip->qm;
-+}
-+
-+static u32 current_qm_read(struct ctrl_debug_file *file)
-+{
-+	struct hisi_qm *qm = file_to_qm(file);
-+
-+	return readl(qm->io_base + QM_DFX_MB_CNT_VF);
-+}
-+
-+static int current_qm_write(struct ctrl_debug_file *file, u32 val)
-+{
-+	struct hisi_qm *qm = file_to_qm(file);
-+	struct hisi_zip_ctrl *ctrl = file->ctrl;
-+
-+	if (val > ctrl->num_vfs)
-+		return -EINVAL;
-+
-+	writel(val, qm->io_base + QM_DFX_MB_CNT_VF);
-+	writel(val, qm->io_base + QM_DFX_DB_CNT_VF);
-+
-+	return  0;
-+}
-+
-+static u32 clear_enable_read(struct ctrl_debug_file *file)
-+{
-+	struct hisi_qm *qm = file_to_qm(file);
-+
-+	return readl(qm->io_base + HZIP_SOFT_CTRL_CNT_CLR_CE) &
-+	       SOFT_CTRL_CNT_CLR_CE_BIT;
-+}
-+
-+static int clear_enable_write(struct ctrl_debug_file *file, u32 val)
-+{
-+	struct hisi_qm *qm = file_to_qm(file);
-+
-+	if (val != 1 && val != 0)
-+		return -EINVAL;
-+
-+	val |= readl(qm->io_base + HZIP_SOFT_CTRL_CNT_CLR_CE) &
-+	       ~SOFT_CTRL_CNT_CLR_CE_BIT;
-+	writel(val, qm->io_base + HZIP_SOFT_CTRL_CNT_CLR_CE);
-+
-+	return  0;
-+}
-+
-+static ssize_t ctrl_debug_read(struct file *filp, char __user *buf,
-+			     size_t count, loff_t *pos)
-+{
-+	struct ctrl_debug_file *file = filp->private_data;
-+	char tbuf[20];
-+	u32 val;
-+	int ret;
-+
-+	spin_lock_irq(&file->lock);
-+	switch (file->index) {
-+	case HZIP_CURRENT_QM:
-+		val = current_qm_read(file);
-+		break;
-+	case HZIP_CLEAR_ENABLE:
-+		val = clear_enable_read(file);
-+		break;
-+	default:
-+		spin_unlock_irq(&file->lock);
-+		return -EINVAL;
-+	}
-+	spin_unlock_irq(&file->lock);
-+	ret = sprintf(tbuf, "%u\n", val);
-+	return simple_read_from_buffer(buf, count, pos, tbuf, ret);
-+}
-+
-+static ssize_t ctrl_debug_write(struct file *filp, const char __user *buf,
-+			      size_t count, loff_t *pos)
-+{
-+	struct ctrl_debug_file *file = filp->private_data;
-+	char tbuf[20];
-+	unsigned long val;
-+	int len, ret;
-+
-+	if (*pos != 0)
-+		return 0;
-+
-+	if (count >= 20)
-+		return -ENOSPC;
-+
-+	len = simple_write_to_buffer(tbuf, 20 - 1, pos, buf, count);
-+	if (len < 0)
-+		return len;
-+
-+	tbuf[len] = '\0';
-+	if (kstrtoul(tbuf, 0, &val))
-+		return -EFAULT;
-+
-+	spin_lock_irq(&file->lock);
-+	switch (file->index) {
-+	case HZIP_CURRENT_QM:
-+		ret = current_qm_write(file, val);
-+		if (ret)
-+			goto err_input;
-+		break;
-+	case HZIP_CLEAR_ENABLE:
-+		ret = clear_enable_write(file, val);
-+		if (ret)
-+			goto err_input;
-+		break;
-+	default:
-+		ret = -EINVAL;
-+		goto err_input;
-+	}
-+	spin_unlock_irq(&file->lock);
-+
-+	return count;
-+
-+err_input:
-+	spin_unlock_irq(&file->lock);
-+	return ret;
-+}
-+
-+static const struct file_operations ctrl_debug_fops = {
-+	.owner = THIS_MODULE,
-+	.open = simple_open,
-+	.read = ctrl_debug_read,
-+	.write = ctrl_debug_write,
-+};
-+
-+static int hisi_zip_core_debug_init(struct hisi_zip_ctrl *ctrl)
-+{
-+	struct hisi_zip *hisi_zip = ctrl->hisi_zip;
-+	struct hisi_qm *qm = &hisi_zip->qm;
-+	struct device *dev = &qm->pdev->dev;
-+	struct debugfs_regset32 *regset;
-+	struct dentry *tmp_d, *tmp;
-+	char buf[20];
-+	int i;
-+
-+	for (i = 0; i < HZIP_CORE_NUM; i++) {
-+		if (i < HZIP_COMP_CORE_NUM)
-+			sprintf(buf, "comp_core%d", i);
-+		else
-+			sprintf(buf, "decomp_core%d", i - HZIP_COMP_CORE_NUM);
-+
-+		tmp_d = debugfs_create_dir(buf, ctrl->debug_root);
-+		if (!tmp_d)
-+			return -ENOENT;
-+
-+		regset = devm_kzalloc(dev, sizeof(*regset), GFP_KERNEL);
-+		if (!regset)
-+			return -ENOENT;
-+
-+		regset->regs = hzip_dfx_regs;
-+		regset->nregs = ARRAY_SIZE(hzip_dfx_regs);
-+		regset->base = qm->io_base + core_offsets[i];
-+
-+		tmp = debugfs_create_regset32("regs", 0444, tmp_d, regset);
-+		if (!tmp)
-+			return -ENOENT;
-+	}
-+
-+	return 0;
-+}
-+
-+static int hisi_zip_ctrl_debug_init(struct hisi_zip_ctrl *ctrl)
-+{
-+	struct dentry *tmp;
-+	int i;
-+
-+	for (i = HZIP_CURRENT_QM; i < HZIP_DEBUG_FILE_NUM; i++) {
-+		spin_lock_init(&ctrl->files[i].lock);
-+		ctrl->files[i].ctrl = ctrl;
-+		ctrl->files[i].index = i;
-+
-+		tmp = debugfs_create_file(ctrl_debug_file_name[i], 0600,
-+					  ctrl->debug_root, ctrl->files + i,
-+					  &ctrl_debug_fops);
-+		if (!tmp)
-+			return -ENOENT;
-+	}
-+
-+	return hisi_zip_core_debug_init(ctrl);
-+}
-+
-+static int hisi_zip_debugfs_init(struct hisi_zip *hisi_zip)
-+{
-+	struct hisi_qm *qm = &hisi_zip->qm;
-+	struct device *dev = &qm->pdev->dev;
-+	struct dentry *dev_d;
-+	int ret;
-+
-+	dev_d = debugfs_create_dir(dev_name(dev), hzip_debugfs_root);
-+	if (!dev_d)
-+		return -ENOENT;
-+
-+	qm->debug.debug_root = dev_d;
-+	ret = hisi_qm_debug_init(qm);
-+	if (ret)
-+		goto failed_to_create;
-+
-+	if (qm->pdev->device == 0xa250) {
-+		hisi_zip->ctrl->debug_root = dev_d;
-+		ret = hisi_zip_ctrl_debug_init(hisi_zip->ctrl);
-+		if (ret)
-+			goto failed_to_create;
-+	}
-+
-+	return 0;
-+
-+failed_to_create:
-+	debugfs_remove_recursive(hzip_debugfs_root);
-+	return ret;
-+}
-+
-+static int hisi_zip_probe(struct pci_dev *pdev, const struct pci_device_id *id)
-+{
-+	struct hisi_zip_ctrl *ctrl;
-+	struct hisi_zip *hisi_zip;
-+	enum qm_hw_ver rev_id;
-+	struct hisi_qm *qm;
-+	u32 nfe_flag;
-+	int ret;
-+
-+	rev_id = hisi_qm_get_hw_version(pdev);
-+	if (rev_id == QM_HW_UNKNOWN)
-+		return -EINVAL;
-+
-+	hisi_zip = devm_kzalloc(&pdev->dev, sizeof(*hisi_zip), GFP_KERNEL);
-+	if (!hisi_zip)
-+		return -ENOMEM;
-+
-+	ctrl = devm_kzalloc(&pdev->dev, sizeof(*ctrl), GFP_KERNEL);
-+	if (!ctrl)
-+		return -ENOMEM;
-+
-+	hisi_zip->ctrl = ctrl;
-+	ctrl->hisi_zip = hisi_zip;
-+	pci_set_drvdata(pdev, hisi_zip);
-+
-+	hisi_zip_add_to_list(hisi_zip);
-+
-+	qm = &hisi_zip->qm;
-+	qm->pdev = pdev;
-+	qm->ver = rev_id;
-+
-+	switch (qm->ver) {
-+	case QM_HW_V1:
-+		ctrl->ctrl_q_num = HZIP_QUEUE_NUM_V1;
-+		break;
-+	case QM_HW_V2:
-+		ctrl->ctrl_q_num = HZIP_QUEUE_NUM_V2;
-+		break;
-+	case QM_HW_UNKNOWN:
-+		break;
-+	}
-+
-+	qm->sqe_size = HZIP_SQE_SIZE;
-+	qm->dev_name = hisi_zip_name;
-+	qm->fun_type = (pdev->device == 0xa250) ? QM_HW_PF : QM_HW_VF;
-+
-+	ret = hisi_qm_init(qm);
-+	if (ret) {
-+		dev_err(&pdev->dev, "Failed to init qm!\n");
-+		goto err_remove_from_list;
-+	}
-+
-+	if (qm->fun_type == QM_HW_PF) {
-+		ret = hisi_qm_mem_start(qm);
-+		if (ret)
-+			goto err_qm_uninit;
-+
-+		hisi_zip_set_user_domain_and_cache(hisi_zip);
-+
-+		nfe_flag = QM_BASE_NFE | QM_ACC_WB_NOT_READY_TIMEOUT;
-+		hisi_qm_hw_error_init(qm, QM_BASE_CE, nfe_flag, 0,
-+				      QM_DB_RANDOM_INVALID);
-+		hisi_zip_hw_error_set_state(hisi_zip, true);
-+
-+		qm->qp_base = HZIP_PF_DEF_Q_BASE;
-+		qm->qp_num = pf_q_num;
-+	} else if (qm->fun_type == QM_HW_VF) {
-+		/*
-+		 * have no way to get qm configure in VM in v1 hardware,
-+		 * so currently force PF to uses HZIP_PF_DEF_Q_NUM, and force
-+		 * to trigger only one VF in v1 hardware.
-+		 *
-+		 * v2 hardware has no such bug.
-+		 */
-+		if (qm->ver == QM_HW_V1) {
-+			qm->qp_base = HZIP_PF_DEF_Q_NUM;
-+			qm->qp_num = HZIP_QUEUE_NUM_V1 - HZIP_PF_DEF_Q_NUM;
-+		} else if (qm->ver == QM_HW_V2)
-+			/* v2 starts to support get vft by mailbox */
-+			hisi_qm_get_vft(qm, &qm->qp_base, &qm->qp_num);
-+	}
-+
-+	ret = hisi_qm_mem_init(qm);
-+	if (ret)
-+		goto err_qm_uninit;
-+
-+	ret = hisi_qm_start(qm);
-+	if (ret)
-+		goto err_qm_mem_uninit;
-+
-+	hisi_zip_debugfs_init(hisi_zip);
-+
-+	return 0;
-+
-+err_qm_mem_uninit:
-+	hisi_qm_mem_uninit(qm);
-+err_qm_uninit:
-+	hisi_qm_uninit(qm);
-+err_remove_from_list:
-+	hisi_zip_remove_from_list(hisi_zip);
-+	return ret;
-+}
-+
-+static void hisi_zip_debugfs_exit(struct hisi_zip *hisi_zip)
-+{
-+	struct hisi_qm *qm = &hisi_zip->qm;
-+
-+	debugfs_remove_recursive(qm->debug.debug_root);
-+}
-+
-+static void hisi_zip_remove(struct pci_dev *pdev)
-+{
-+	struct hisi_zip *hisi_zip = pci_get_drvdata(pdev);
-+	struct hisi_qm *qm = &hisi_zip->qm;
-+
-+	hisi_zip_debugfs_exit(hisi_zip);
-+	hisi_qm_stop(qm);
-+	hisi_qm_mem_uninit(qm);
-+
-+	if (pdev->device == 0xa250)
-+		hisi_zip_hw_error_set_state(hisi_zip, false);
-+
-+	hisi_qm_uninit(qm);
-+	hisi_zip_remove_from_list(hisi_zip);
-+}
-+
-+/* now we only support equal assignment */
-+static int hisi_zip_vf_q_assign(struct hisi_zip *hisi_zip, int num_vfs)
-+{
-+	struct hisi_zip_ctrl *ctrl = hisi_zip->ctrl;
-+	struct hisi_qm *qm = &hisi_zip->qm;
-+	u32 qp_num = qm->qp_num;
-+	u32 q_base = qp_num;
-+	u32 q_num, remain_q_num, i;
-+	int ret;
-+
-+	remain_q_num = ctrl->ctrl_q_num - qp_num;
-+	q_num = remain_q_num / num_vfs;
-+
-+	for (i = 1; i <= num_vfs; i++) {
-+		if (i == num_vfs)
-+			q_num += remain_q_num % num_vfs;
-+		ret = hisi_qm_set_vft(qm, i, q_base, q_num);
-+		if (ret)
-+			return ret;
-+		q_base += q_num;
-+	}
-+
-+	return 0;
-+}
-+
-+static int hisi_zip_clear_vft_config(struct hisi_zip *hisi_zip)
-+{
-+	struct hisi_zip_ctrl *ctrl = hisi_zip->ctrl;
-+	struct hisi_qm *qm = &hisi_zip->qm;
-+	u32 i, num_vfs = ctrl->num_vfs;
-+	int ret;
-+
-+	for (i = 1; i <= num_vfs; i++) {
-+		ret = hisi_qm_set_vft(qm, i, 0, 0);
-+		if (ret)
-+			return ret;
-+	}
-+
-+	ctrl->num_vfs = 0;
-+
-+	return 0;
-+}
-+
-+static int hisi_zip_sriov_enable(struct pci_dev *pdev, int max_vfs)
-+{
-+#ifdef CONFIG_PCI_IOV
-+	struct hisi_zip *hisi_zip = pci_get_drvdata(pdev);
-+	int pre_existing_vfs, num_vfs, ret;
-+
-+	pre_existing_vfs = pci_num_vf(pdev);
-+
-+	if (pre_existing_vfs) {
-+		dev_err(&pdev->dev,
-+			"Can't enable VF. Please disable pre-enabled VFs!\n");
-+		return 0;
-+	}
-+
-+	num_vfs = min_t(int, max_vfs, HZIP_VF_NUM);
-+
-+	ret = hisi_zip_vf_q_assign(hisi_zip, num_vfs);
-+	if (ret) {
-+		dev_err(&pdev->dev, "Can't assign queues for VF!\n");
-+		return ret;
-+	}
-+
-+	hisi_zip->ctrl->num_vfs = num_vfs;
-+
-+	ret = pci_enable_sriov(pdev, num_vfs);
-+	if (ret) {
-+		dev_err(&pdev->dev, "Can't enable VF!\n");
-+		hisi_zip_clear_vft_config(hisi_zip);
-+		return ret;
-+	}
-+
-+	return num_vfs;
-+#else
-+	return 0;
-+#endif
-+}
-+
-+static int hisi_zip_sriov_disable(struct pci_dev *pdev)
-+{
-+	struct hisi_zip *hisi_zip = pci_get_drvdata(pdev);
-+
-+	if (pci_vfs_assigned(pdev)) {
-+		dev_err(&pdev->dev,
-+			"Can't disable VFs while VFs are assigned!\n");
-+		return -EPERM;
-+	}
-+
-+	/* remove in hisi_zip_pci_driver will be called to free VF resources */
-+	pci_disable_sriov(pdev);
-+
-+	return hisi_zip_clear_vft_config(hisi_zip);
-+}
-+
-+static int hisi_zip_sriov_configure(struct pci_dev *pdev, int num_vfs)
-+{
-+	if (num_vfs == 0)
-+		return hisi_zip_sriov_disable(pdev);
-+	else
-+		return hisi_zip_sriov_enable(pdev, num_vfs);
-+}
-+
-+static void hisi_zip_log_hw_error(struct hisi_zip *hisi_zip, u32 err_sts)
-+{
-+	const struct hisi_zip_hw_error *err = zip_hw_error;
-+	struct device *dev = &hisi_zip->qm.pdev->dev;
-+	u32 err_val;
-+
-+	while (err->msg) {
-+		if (err->int_msk & err_sts) {
-+			dev_warn(dev, "%s [error status=0x%x] found\n",
-+				 err->msg, err->int_msk);
-+
-+			if (HZIP_CORE_INT_STATUS_M_ECC & err_sts) {
-+				err_val = readl(hisi_zip->qm.io_base +
-+						HZIP_CORE_SRAM_ECC_ERR_INFO);
-+				dev_warn(dev, "hisi-zip multi ecc sram num=0x%x\n",
-+					 ((err_val >> 16) & 0xFF));
-+				dev_warn(dev, "hisi-zip multi ecc sram addr=0x%x\n",
-+					 (err_val >> 24));
-+			}
-+		}
-+		err++;
-+	}
-+}
-+
-+static pci_ers_result_t hisi_zip_hw_error_handle(struct hisi_zip *hisi_zip)
-+{
-+	u32 err_sts;
-+
-+	/* read err sts */
-+	err_sts = readl(hisi_zip->qm.io_base + HZIP_CORE_INT_STATUS);
-+
-+	if (err_sts) {
-+		hisi_zip_log_hw_error(hisi_zip, err_sts);
-+		/* clear error interrupts */
-+		writel(err_sts, hisi_zip->qm.io_base + HZIP_CORE_INT_SOURCE);
-+
-+		return PCI_ERS_RESULT_NEED_RESET;
-+	}
-+
-+	return PCI_ERS_RESULT_RECOVERED;
-+}
-+
-+static pci_ers_result_t hisi_zip_process_hw_error(struct pci_dev *pdev)
-+{
-+	struct hisi_zip *hisi_zip = pci_get_drvdata(pdev);
-+	struct device *dev = &pdev->dev;
-+	pci_ers_result_t qm_ret, zip_ret;
-+
-+	if (!hisi_zip) {
-+		dev_err(dev,
-+			"Can't recover ZIP-error occurred during device init\n");
-+		return PCI_ERS_RESULT_NONE;
-+	}
-+
-+	/* log qm error */
-+	qm_ret = hisi_qm_hw_error_handle(&hisi_zip->qm);
-+
-+	/* log zip error */
-+	zip_ret = hisi_zip_hw_error_handle(hisi_zip);
-+
-+	return (qm_ret == PCI_ERS_RESULT_NEED_RESET ||
-+		zip_ret == PCI_ERS_RESULT_NEED_RESET) ?
-+	       PCI_ERS_RESULT_NEED_RESET : PCI_ERS_RESULT_RECOVERED;
-+}
-+
-+static pci_ers_result_t hisi_zip_error_detected(struct pci_dev *pdev,
-+						pci_channel_state_t state)
-+{
-+	dev_info(&pdev->dev, "PCI error detected, state(=%d)!!\n", state);
-+	if (state == pci_channel_io_perm_failure)
-+		return PCI_ERS_RESULT_DISCONNECT;
-+
-+	return hisi_zip_process_hw_error(pdev);
-+}
-+
-+static int hisi_zip_controller_reset_prepare(struct hisi_zip *hisi_zip)
-+{
-+	struct hisi_qm *qm = &hisi_zip->qm;
-+	struct pci_dev *pdev = qm->pdev;
-+	int ret;
-+
-+	ret = hisi_qm_stop(qm);
-+	if (ret) {
-+		dev_err(&pdev->dev, "Fails to stop QM!\n");
-+		return ret;
-+	}
-+
-+	if (test_and_set_bit(QM_RESET, &qm->flags)) {
-+		dev_warn(&pdev->dev, "Failed to set reset flag!");
-+		return -EPERM;
-+	}
-+
-+	/* If having VFs enable, let's disable them firstly */
-+	if (hisi_zip->ctrl->num_vfs) {
-+		ret = hisi_zip_sriov_disable(pdev);
-+		if (ret) {
-+			dev_err(&pdev->dev, "Fails to disable VFs!\n");
-+			return ret;
-+		}
-+	}
-+
-+	return 0;
-+}
-+
-+static void hisi_zip_set_mse(struct hisi_zip *hisi_zip, bool set)
-+{
-+	struct pci_dev *pdev = hisi_zip->qm.pdev;
-+	u16 sriov_ctrl;
-+	int pos;
-+
-+	pos = pci_find_ext_capability(pdev, PCI_EXT_CAP_ID_SRIOV);
-+	pci_read_config_word(pdev, pos + PCI_SRIOV_CTRL, &sriov_ctrl);
-+	if (set)
-+		sriov_ctrl |= PCI_SRIOV_CTRL_MSE;
-+	else
-+		sriov_ctrl &= ~PCI_SRIOV_CTRL_MSE;
-+	pci_write_config_word(pdev, pos + PCI_SRIOV_CTRL, sriov_ctrl);
-+}
-+
-+static int hisi_zip_soft_reset(struct hisi_zip *hisi_zip)
-+{
-+	struct hisi_qm *qm = &hisi_zip->qm;
-+	struct device *dev = &qm->pdev->dev;
-+	int ret;
-+	u32 val;
-+
-+	/* Set VF MSE bit */
-+	hisi_zip_set_mse(hisi_zip, 1);
-+
-+	/* OOO register set and check */
-+	writel(MASTER_GLOBAL_CTRL_SHUTDOWN,
-+	       hisi_zip->qm.io_base + HZIP_MASTER_GLOBAL_CTRL);
-+
-+	/* If bus lock, reset chip */
-+	ret = readl_relaxed_poll_timeout(hisi_zip->qm.io_base +
-+					 HZIP_MASTER_TRANS_RETURN, val,
-+					 (val == MASTER_TRANS_RETURN_RW), 10,
-+					 1000);
-+	if (ret) {
-+		dev_emerg(dev, "Bus lock! Please reset system.\n");
-+		return ret;
-+	}
-+
-+	/* The reset related sub-control registers are not in PCI BAR */
-+	if (ACPI_HANDLE(dev)) {
-+		acpi_status s;
-+
-+		s = acpi_evaluate_object(ACPI_HANDLE(dev), "_RST", NULL, NULL);
-+		if (ACPI_FAILURE(s)) {
-+			dev_err(dev, "Controller reset fails\n");
-+			return -EIO;
-+		}
-+	} else {
-+		dev_err(dev, "No reset method!\n");
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+static int hisi_zip_controller_reset_done(struct hisi_zip *hisi_zip)
-+{
-+	struct hisi_qm *qm = &hisi_zip->qm;
-+	struct pci_dev *pdev = qm->pdev;
-+	struct hisi_qp *qp;
-+	int i, ret;
-+
-+	hisi_qm_clear_queues(qm);
-+
-+	ret = hisi_qm_mem_start(qm);
-+	if (ret)
-+		return ret;
-+
-+	hisi_zip_set_user_domain_and_cache(hisi_zip);
-+
-+	ret = hisi_qm_start(qm);
-+	if (ret) {
-+		dev_err(&pdev->dev, "Failed to start QM!\n");
-+		return -EPERM;
-+	}
-+
-+	for (i = 0; i < qm->qp_num; i++) {
-+		qp = qm->qp_array[i];
-+		if (qp) {
-+			ret = hisi_qm_start_qp(qp, 0);
-+			if (ret < 0) {
-+				dev_err(&pdev->dev, "Start qp%d failed\n", i);
-+				return -EPERM;
-+			}
-+		}
-+	}
-+
-+	ret = hisi_zip_sriov_enable(pdev, pci_num_vf(pdev));
-+	if (ret) {
-+		dev_err(&pdev->dev, "Can't enable VFs!\n");
-+		return ret;
-+	}
-+
-+	/* Clear VF MSE bit */
-+	hisi_zip_set_mse(hisi_zip, 0);
-+
-+	return 0;
-+}
-+
-+static int hisi_zip_controller_reset(struct hisi_zip *hisi_zip)
-+{
-+	struct device *dev = &hisi_zip->qm.pdev->dev;
-+	int ret;
-+
-+	dev_info(dev, "Controller resetting...\n");
-+
-+	ret = hisi_zip_controller_reset_prepare(hisi_zip);
-+	if (ret)
-+		return ret;
-+
-+	ret = hisi_zip_soft_reset(hisi_zip);
-+	if (ret) {
-+		dev_err(dev, "Controller reset failed (%d)\n", ret);
-+		return ret;
-+	}
-+
-+	ret = hisi_zip_controller_reset_done(hisi_zip);
-+	if (ret)
-+		return ret;
-+
-+	dev_info(dev, "Controller reset complete\n");
-+	clear_bit(QM_RESET, &hisi_zip->qm.flags);
-+
-+	return 0;
-+}
-+
-+static pci_ers_result_t hisi_zip_slot_reset(struct pci_dev *pdev)
-+{
-+	struct hisi_zip *hisi_zip = pci_get_drvdata(pdev);
-+	int ret;
-+
-+	dev_info(&pdev->dev, "Requesting reset due to PCI error\n");
-+
-+	pci_cleanup_aer_uncorrect_error_status(pdev);
-+
-+	/* reset zip controller */
-+	ret = hisi_zip_controller_reset(hisi_zip);
-+	if (ret) {
-+		dev_warn(&pdev->dev, "hisi_zip controller reset failed (%d)\n",
-+			 ret);
-+		return PCI_ERS_RESULT_DISCONNECT;
-+	}
-+
-+	return PCI_ERS_RESULT_RECOVERED;
-+}
-+
-+static void hisi_zip_reset_prepare(struct pci_dev *pdev)
-+{
-+	struct hisi_zip *hisi_zip = pci_get_drvdata(pdev);
-+	struct hisi_qm *qm = &hisi_zip->qm;
-+	struct device *dev = &pdev->dev;
-+	int ret;
-+
-+	ret = hisi_qm_stop(qm);
-+	if (ret) {
-+		dev_err(&pdev->dev, "Fails to stop QM!\n");
-+		return;
-+	}
-+
-+	if (test_and_set_bit(QM_RESET, &qm->flags)) {
-+		dev_warn(dev, "Failed to set reset flag!");
-+		return;
-+	}
-+
-+	/* If having VFs in PF, disable VFs before PF FLR */
-+	if (pdev->is_physfn && hisi_zip->ctrl->num_vfs) {
-+		ret = hisi_zip_sriov_disable(pdev);
-+		if (ret) {
-+			dev_err(dev, "Fails to disable VFs\n");
-+			return;
-+		}
-+	}
-+
-+	dev_info(dev, "FLR resetting...\n");
-+}
-+
-+static void hisi_zip_reset_done(struct pci_dev *pdev)
-+{
-+	struct hisi_zip *hisi_zip = pci_get_drvdata(pdev);
-+	struct hisi_qm *qm = &hisi_zip->qm;
-+	struct device *dev = &pdev->dev;
-+	struct hisi_qp *qp;
-+	int i, ret;
-+
-+	if (pdev->is_physfn) {
-+		hisi_qm_clear_queues(qm);
-+
-+		ret = hisi_qm_mem_start(qm);
-+		if (ret) {
-+			dev_err(dev, "QM can't init memory\n");
-+			return;
-+		}
-+
-+		hisi_zip_set_user_domain_and_cache(hisi_zip);
-+
-+		ret = hisi_qm_start(qm);
-+		if (ret) {
-+			dev_err(dev, "Failed to start QM!\n");
-+			return;
-+		}
-+
-+		for (i = 0; i < qm->qp_num; i++) {
-+			qp = qm->qp_array[i];
-+			if (qp) {
-+				ret = hisi_qm_start_qp(qp, 0);
-+				if (ret < 0) {
-+					dev_err(dev, "Start qp%d failed\n", i);
-+					return;
-+				}
-+			}
-+		}
-+
-+		ret = hisi_zip_sriov_enable(pdev, pci_num_vf(pdev));
-+		if (ret) {
-+			dev_err(dev, "Can't enable VFs!\n");
-+			return;
-+		}
-+
-+		dev_info(dev, "FLR reset complete\n");
-+	}
-+}
-+
-+static const struct pci_error_handlers hisi_zip_err_handler = {
-+	.error_detected	= hisi_zip_error_detected,
-+	.slot_reset	= hisi_zip_slot_reset,
-+	.reset_prepare	= hisi_zip_reset_prepare,
-+	.reset_done	= hisi_zip_reset_done,
-+};
-+
-+static struct pci_driver hisi_zip_pci_driver = {
-+	.name		= "hisi_zip",
-+	.id_table	= hisi_zip_dev_ids,
-+	.probe		= hisi_zip_probe,
-+	.remove		= hisi_zip_remove,
-+	.sriov_configure = hisi_zip_sriov_configure,
-+	.err_handler	= &hisi_zip_err_handler,
-+};
-+
-+static void hisi_zip_register_debugfs(void)
-+{
-+	if (!debugfs_initialized())
-+		return;
-+
-+	hzip_debugfs_root = debugfs_create_dir("hisi_zip", NULL);
-+	if (IS_ERR_OR_NULL(hzip_debugfs_root))
-+		hzip_debugfs_root = NULL;
-+}
-+
-+static void hisi_zip_unregister_debugfs(void)
-+{
-+	debugfs_remove_recursive(hzip_debugfs_root);
-+}
-+
-+static int __init hisi_zip_init(void)
-+{
-+	int ret;
-+
-+	hisi_zip_register_debugfs();
-+
-+	ret = pci_register_driver(&hisi_zip_pci_driver);
-+	if (ret < 0) {
-+		pr_err("Failed to register pci driver.\n");
-+		goto err_pci;
-+	}
-+
-+	ret = hisi_zip_register_to_crypto();
-+	if (ret < 0) {
-+		pr_err("Failed to register driver to crypto.\n");
-+		goto err_crypto;
-+	}
-+
-+	return 0;
-+
-+err_crypto:
-+	pci_unregister_driver(&hisi_zip_pci_driver);
-+err_pci:
-+	hisi_zip_unregister_debugfs();
-+
-+	return ret;
-+}
-+
-+static void __exit hisi_zip_exit(void)
-+{
-+	hisi_zip_unregister_from_crypto();
-+	pci_unregister_driver(&hisi_zip_pci_driver);
-+	hisi_zip_unregister_debugfs();
-+}
-+
-+module_init(hisi_zip_init);
-+module_exit(hisi_zip_exit);
-+
-+MODULE_LICENSE("GPL v2");
-+MODULE_AUTHOR("Zhou Wang <wangzhou1@hisilicon.com>");
-+MODULE_DESCRIPTION("Driver for HiSilicon ZIP accelerator");
++		chacha_4block_xor_neon(state, dst, src, nrounds, l);
++		bytes -= CHACHA_BLOCK_SIZE * 5;
++		src += CHACHA_BLOCK_SIZE * 5;
++		dst += CHACHA_BLOCK_SIZE * 5;
++		state[12] += 5;
+ 	}
+ }
+ 
+@@ -72,7 +73,7 @@ static int chacha_neon_stream_xor(struct skcipher_request *req,
+ 		unsigned int nbytes = walk.nbytes;
+ 
+ 		if (nbytes < walk.total)
+-			nbytes = round_down(nbytes, walk.stride);
++			nbytes = rounddown(nbytes, walk.stride);
+ 
+ 		kernel_neon_begin();
+ 		chacha_doneon(state, walk.dst.virt.addr, walk.src.virt.addr,
+@@ -131,7 +132,7 @@ static struct skcipher_alg algs[] = {
+ 		.max_keysize		= CHACHA_KEY_SIZE,
+ 		.ivsize			= CHACHA_IV_SIZE,
+ 		.chunksize		= CHACHA_BLOCK_SIZE,
+-		.walksize		= 4 * CHACHA_BLOCK_SIZE,
++		.walksize		= 5 * CHACHA_BLOCK_SIZE,
+ 		.setkey			= crypto_chacha20_setkey,
+ 		.encrypt		= chacha_neon,
+ 		.decrypt		= chacha_neon,
+@@ -147,7 +148,7 @@ static struct skcipher_alg algs[] = {
+ 		.max_keysize		= CHACHA_KEY_SIZE,
+ 		.ivsize			= XCHACHA_IV_SIZE,
+ 		.chunksize		= CHACHA_BLOCK_SIZE,
+-		.walksize		= 4 * CHACHA_BLOCK_SIZE,
++		.walksize		= 5 * CHACHA_BLOCK_SIZE,
+ 		.setkey			= crypto_chacha20_setkey,
+ 		.encrypt		= xchacha_neon,
+ 		.decrypt		= xchacha_neon,
+@@ -163,7 +164,7 @@ static struct skcipher_alg algs[] = {
+ 		.max_keysize		= CHACHA_KEY_SIZE,
+ 		.ivsize			= XCHACHA_IV_SIZE,
+ 		.chunksize		= CHACHA_BLOCK_SIZE,
+-		.walksize		= 4 * CHACHA_BLOCK_SIZE,
++		.walksize		= 5 * CHACHA_BLOCK_SIZE,
+ 		.setkey			= crypto_chacha12_setkey,
+ 		.encrypt		= xchacha_neon,
+ 		.decrypt		= xchacha_neon,
 -- 
-2.8.1
+2.19.2
