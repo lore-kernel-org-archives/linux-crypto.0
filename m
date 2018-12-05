@@ -1,46 +1,81 @@
-Return-Path: <SRS0=9Gyh=PA=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:38966 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731793AbeLWEB5 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 22 Dec 2018 23:01:57 -0500
-Date: Sun, 23 Dec 2018 12:01:55 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Harsh Jain <harsh@chelsio.com>
-Cc: linux-crypto@vger.kernel.org, atul.gupta@chelsio.com,
-        indranil@chelsio.com
-Subject: Re: [PATCH 0/6] crypto:chelsio: Bug Fixes
-Message-ID: <20181223040155.tptao3ftqm66xwcc@gondor.apana.org.au>
-References: <cover.1544520025.git.harsh@chelsio.com>
+Return-Path: <SRS0=adZj=OO=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:39394 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726092AbeLEGK6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 5 Dec 2018 01:10:58 -0500
+Date: Tue, 4 Dec 2018 22:10:55 -0800
+From: Eric Biggers <ebiggers@kernel.org>
+To: Martin Willi <martin@strongswan.org>
+Cc: linux-crypto@vger.kernel.org,
+        Paul Crowley <paulcrowley@google.com>,
+        Milan Broz <gmazyland@gmail.com>,
+        "Jason A . Donenfeld" <Jason@zx2c4.com>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 4/6] crypto: x86/chacha20 - add XChaCha20 support
+Message-ID: <20181205061054.GA26750@sol.localdomain>
+References: <20181129230217.158038-1-ebiggers@kernel.org>
+ <20181129230217.158038-5-ebiggers@kernel.org>
+ <99ed681fa4d3233b18ae9328a14f9e23971073cb.camel@strongswan.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <cover.1544520025.git.harsh@chelsio.com>
+In-Reply-To: <99ed681fa4d3233b18ae9328a14f9e23971073cb.camel@strongswan.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Dec 11, 2018 at 04:21:36PM +0530, Harsh Jain wrote:
-> It includes Bug Fixes
-> 
-> Harsh Jain (5):
->   crypto:chcr: Swap location of AAD and IV sent in WR
->   crypto:chcr:Use same value for both channel in single WR
->   crypto:chcr: cleanup:send addr as value in function argument
->   crypto:chelsio: Fix wrong error counter increments
->   Crypto:Chelsio:Handle PCI shutdown event
-> 
-> Atul Gupta (5):
->   crypto:chelsio: Reset counters on cxgb4 Detach
-> 
->  drivers/crypto/chelsio/chcr_algo.c   | 401 +++++++++++++++++++++--------------
->  drivers/crypto/chelsio/chcr_algo.h   |   2 +-
->  drivers/crypto/chelsio/chcr_core.c   | 195 +++++++++++------
->  drivers/crypto/chelsio/chcr_core.h   |  35 ++-
->  drivers/crypto/chelsio/chcr_crypto.h |  10 +-
->  5 files changed, 407 insertions(+), 236 deletions(-)
+Hi Martin,
 
-All applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+On Sat, Dec 01, 2018 at 05:40:40PM +0100, Martin Willi wrote:
+> 
+> > An SSSE3 implementation of single-block HChaCha20 is also added so
+> > that XChaCha20 can use it rather than the generic
+> > implementation.  This required refactoring the ChaCha permutation
+> > into its own function. 
+> 
+> > [...]
+> 
+> > +ENTRY(chacha20_block_xor_ssse3)
+> > +	# %rdi: Input state matrix, s
+> > +	# %rsi: up to 1 data block output, o
+> > +	# %rdx: up to 1 data block input, i
+> > +	# %rcx: input/output length in bytes
+> > +
+> > +	# x0..3 = s0..3
+> > +	movdqa		0x00(%rdi),%xmm0
+> > +	movdqa		0x10(%rdi),%xmm1
+> > +	movdqa		0x20(%rdi),%xmm2
+> > +	movdqa		0x30(%rdi),%xmm3
+> > +	movdqa		%xmm0,%xmm8
+> > +	movdqa		%xmm1,%xmm9
+> > +	movdqa		%xmm2,%xmm10
+> > +	movdqa		%xmm3,%xmm11
+> > +
+> > +	mov		%rcx,%rax
+> > +	call		chacha20_permute
+> > +
+> >  	# o0 = i0 ^ (x0 + s0)
+> >  	paddd		%xmm8,%xmm0
+> >  	cmp		$0x10,%rax
+> > @@ -189,6 +198,23 @@ ENTRY(chacha20_block_xor_ssse3)
+> >  
+> >  ENDPROC(chacha20_block_xor_ssse3)
+> >  
+> > +ENTRY(hchacha20_block_ssse3)
+> > +	# %rdi: Input state matrix, s
+> > +	# %rsi: output (8 32-bit words)
+> > +
+> > +	movdqa		0x00(%rdi),%xmm0
+> > +	movdqa		0x10(%rdi),%xmm1
+> > +	movdqa		0x20(%rdi),%xmm2
+> > +	movdqa		0x30(%rdi),%xmm3
+> > +
+> > +	call		chacha20_permute
+> 
+> AFAIK, the general convention is to create proper stack frames using
+> FRAME_BEGIN/END for non leaf-functions. Should chacha20_permute()
+> callers do so?
+> 
+
+Yes, I'll do that.  (Ard suggested similarly in the arm64 version too.)
+
+- Eric
