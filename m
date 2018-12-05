@@ -1,119 +1,104 @@
-Return-Path: <SRS0=wDfx=ON=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=adZj=OO=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.7 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8473C04EB8
-	for <linux-crypto@archiver.kernel.org>; Tue,  4 Dec 2018 23:45:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AC82C04EB9
+	for <linux-crypto@archiver.kernel.org>; Wed,  5 Dec 2018 06:15:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 98AAA206B6
-	for <linux-crypto@archiver.kernel.org>; Tue,  4 Dec 2018 23:45:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0169520850
+	for <linux-crypto@archiver.kernel.org>; Wed,  5 Dec 2018 06:15:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="rD6MxdnJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 98AAA206B6
+	dkim=pass (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="cbGfMFfi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0169520850
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-crypto-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725905AbeLDXpJ (ORCPT
+        id S1726866AbeLEGPQ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 4 Dec 2018 18:45:09 -0500
-Received: from mail.kernel.org ([198.145.29.99]:45984 "EHLO mail.kernel.org"
+        Wed, 5 Dec 2018 01:15:16 -0500
+Received: from mail.kernel.org ([198.145.29.99]:40988 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725875AbeLDXpJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 4 Dec 2018 18:45:09 -0500
-Received: from gmail.com (unknown [104.132.1.85])
+        id S1726853AbeLEGPQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 5 Dec 2018 01:15:16 -0500
+Received: from sol.localdomain (c-24-23-142-8.hsd1.ca.comcast.net [24.23.142.8])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id AB1CD206B6;
-        Tue,  4 Dec 2018 23:45:08 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 832472084C;
+        Wed,  5 Dec 2018 06:15:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1543967108;
-        bh=d4SxL0JSbjSaH2lWJM7qnIzpMidnCOP5TOHZHmRPfEQ=;
+        s=default; t=1543990515;
+        bh=HQ7Wh7LgPhqcMGTkr6mXgXPw29SZy7Zp7vMTIe5lqkI=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=rD6MxdnJukbVM8ZVLNIs7f2myNBqhgMaFfMo+UEVJdnxAT51pt5eFzC8Kr3F3nGSQ
-         wAXgQoUEliy2q2ncunC8f4irD2p+FEQGVfOdNmOvRkHjSs7l95gM2EZUCz0TJZcges
-         x/XeACPLMyS4eMjESi7d2fr08SApK+mNstr74cog=
-Date:   Tue, 4 Dec 2018 15:45:07 -0800
+        b=cbGfMFfi45BsvD7JawUvmjCfWqYalDh67O1wDlwBIgJAm6IqcU5pG+/Ltz5IdXqIM
+         Ym1tsTL1HOnhm5PDvWEJxwqgc+Sle0Hi84YFXgFekgvTdWMurtqB2prWNEX9A2q3bF
+         q5CyvrpS2Oz0IqyVP1zn+4dh/logvvf1J/Iu9feo=
+Date:   Tue, 4 Dec 2018 22:15:14 -0800
 From:   Eric Biggers <ebiggers@kernel.org>
-To:     "Theodore Y . Ts'o" <tytso@mit.edu>, linux-fscrypt@vger.kernel.org
-Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
+To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc:     Martin Willi <martin@strongswan.org>,
         "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>
-Subject: Re: [PATCH] fscrypt: remove CRYPTO_CTR dependency
-Message-ID: <20181204234506.GD70682@gmail.com>
-References: <20180905192400.71160-1-ebiggers@kernel.org>
- <CAKv+Gu8=dDk+bes8O7oOQ3zTgPHyVi49-gwH1btwdys-vgfyqg@mail.gmail.com>
+        <linux-crypto@vger.kernel.org>,
+        Paul Crowley <paulcrowley@google.com>,
+        Milan Broz <gmazyland@gmail.com>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2 3/6] crypto: x86/chacha20 - limit the
+ preemption-disabled section
+Message-ID: <20181205061513.GB26750@sol.localdomain>
+References: <20181129230217.158038-1-ebiggers@kernel.org>
+ <20181129230217.158038-4-ebiggers@kernel.org>
+ <acad781e9981c49b83b6dfdc8cefed6246df469a.camel@strongswan.org>
+ <CAKv+Gu89RiDBx35rtGS2uOZ+TwPt6P8UjwpqE17xm7dtMx-nNQ@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Disposition: inline
-In-Reply-To: <CAKv+Gu8=dDk+bes8O7oOQ3zTgPHyVi49-gwH1btwdys-vgfyqg@mail.gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <CAKv+Gu89RiDBx35rtGS2uOZ+TwPt6P8UjwpqE17xm7dtMx-nNQ@mail.gmail.com>
+User-Agent: Mutt/1.11.0 (2018-11-25)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
-Message-ID: <20181204234507.RCMzFAq8A28CwXiTN4MPyM1qk_m_B4I7jYVGRDfi4hw@z>
+Message-ID: <20181205061514.LE3assUOnZ-YlipjjPUTtVUUMKLd7_Yfv0HrAoGfmWs@z>
 
-On Thu, Sep 06, 2018 at 12:43:41PM +0200, Ard Biesheuvel wrote:
-> On 5 September 2018 at 21:24, Eric Biggers <ebiggers@kernel.org> wrote:
-> > From: Eric Biggers <ebiggers@google.com>
+On Mon, Dec 03, 2018 at 03:13:37PM +0100, Ard Biesheuvel wrote:
+> On Sun, 2 Dec 2018 at 11:47, Martin Willi <martin@strongswan.org> wrote:
 > >
-> > fscrypt doesn't use the CTR mode of operation for anything, so there's
-> > no need to select CRYPTO_CTR.  It was added by commit 71dea01ea2ed
-> > ("ext4 crypto: require CONFIG_CRYPTO_CTR if ext4 encryption is
-> > enabled").  But, I've been unable to identify the arm64 crypto bug it
-> > was supposedly working around.
 > >
-> > I suspect the issue was seen only on some old Android device kernel
-> > (circa 3.10?).  So if the fix wasn't mistaken, the real bug is probably
-> > already fixed.  Or maybe it was actually a bug in a non-upstream crypto
-> > driver.
+> > > To improve responsiveness, disable preemption for each step of the
+> > > walk (which is at most PAGE_SIZE) rather than for the entire
+> > > encryption/decryption operation.
 > >
-> > So, remove the dependency.  If it turns out there's actually still a
-> > bug, we'll fix it properly.
+> > It seems that it is not that uncommon for IPsec to get small inputs
+> > scattered over multiple blocks. Doing FPU context saving for each walk
+> > step then can slow down things.
 > >
-> > Signed-off-by: Eric Biggers <ebiggers@google.com>
-> 
-> Acked-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> 
-> This may be related to
-> 
-> 11e3b725cfc2 crypto: arm64/aes-blk - honour iv_out requirement in CBC
-> and CTR modes
-> 
-> given that the commit in question mentions CTS. How it actually works
-> around the issue is unclear to me, though.
-> 
-> 
-> 
-> 
-> > ---
-> >  fs/crypto/Kconfig | 1 -
-> >  1 file changed, 1 deletion(-)
+> > An alternative approach could be to re-enable preemption not based on
+> > the walk steps, but on the amount of bytes processed. This would
+> > satisfy both users, I guess.
 > >
-> > diff --git a/fs/crypto/Kconfig b/fs/crypto/Kconfig
-> > index 02b7d91c92310..284b589b4774d 100644
-> > --- a/fs/crypto/Kconfig
-> > +++ b/fs/crypto/Kconfig
-> > @@ -6,7 +6,6 @@ config FS_ENCRYPTION
-> >         select CRYPTO_ECB
-> >         select CRYPTO_XTS
-> >         select CRYPTO_CTS
-> > -       select CRYPTO_CTR
-> >         select CRYPTO_SHA256
-> >         select KEYS
-> >         help
-> > --
-> > 2.19.0.rc2.392.g5ba43deb5a-goog
+> > In the long run we probably need a better approach for FPU context
+> > saving, as this really hurts performance-wise. For IPsec we should find
+> > a way to avoid the (multiple) per-packet FPU save/restores in softirq
+> > context, but I guess this requires support from process context
+> > switching.
 > >
+> 
+> At Jason's Zinc talk at plumbers, this came up, and apparently someone
+> is working on this, i.e., to ensure that on x86, the FPU restore only
+> occurs lazily, when returning to userland rather than every time you
+> call kernel_fpu_end() [like we do on arm64 as well]
+> 
+> Not sure what the ETA for that work is, though, nor did I get the name
+> of the guy working on it.
 
-Ping.  Ted, can you consider applying this to the fscrypt tree for 4.21?
-
-Thanks,
+Thanks for the suggestion; I'll replace this with a patch that re-enables
+preemption every 4 KiB encrypted.  That also avoids having to do a
+kernel_fpu_begin(), kernel_fpu_end() pair just for hchacha_block_ssse3().  But
+yes, I'd definitely like repeated kernel_fpu_begin(), kernel_fpu_end() to not be
+incredibly slow.  That would help in a lot of other places too.
 
 - Eric
