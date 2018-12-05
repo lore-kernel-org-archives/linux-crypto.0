@@ -1,108 +1,46 @@
-Return-Path: <SRS0=al0q=O3=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-eopbgr780077.outbound.protection.outlook.com ([40.107.78.77]:65264
-        "EHLO NAM03-BY2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726422AbeLRPsn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 18 Dec 2018 10:48:43 -0500
-From: "Hook, Gary" <Gary.Hook@amd.com>
-To: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-CC: "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>
-Subject: [PATCH] crypto/ccp: Update copyright notices and dates
-Date: Tue, 18 Dec 2018 15:48:29 +0000
-Message-ID: <154514810757.7167.14162358906458327597.stgit@taos>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <DBCB5EB1E37D6943B7F0638D0B59BE6E@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+Return-Path: <SRS0=adZj=OO=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:58120 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726001AbeLEAu1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 4 Dec 2018 19:50:27 -0500
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Subject: [PATCH] crypto: adiantum - propagate CRYPTO_ALG_ASYNC flag to instance
+Date: Tue,  4 Dec 2018 16:46:54 -0800
+Message-Id: <20181205004654.242204-1-ebiggers@kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Q29ycmVjdCBjb3B5cmlnaHQgZGF0ZXMgZm9yIGZpbGVzIHRoYXQgaGF2ZSBoYWQgY29kZSBhZGRl
-ZA0KdG8gdGhlbSBpbiAyMDE4Lg0KDQpTaWduZWQtb2ZmLWJ5OiBHYXJ5IFIgSG9vayA8Z2FyeS5o
-b29rQGFtZC5jb20+DQotLS0NCiBkcml2ZXJzL2NyeXB0by9jY3AvY2NwLWNyeXB0by1hZXMtY21h
-Yy5jIHwgICAgMiArLQ0KIGRyaXZlcnMvY3J5cHRvL2NjcC9jY3AtY3J5cHRvLXNoYS5jICAgICAg
-fCAgICAyICstDQogZHJpdmVycy9jcnlwdG8vY2NwL2NjcC1vcHMuYyAgICAgICAgICAgICB8ICAg
-IDIgKy0NCiBkcml2ZXJzL2NyeXB0by9jY3AvcHNwLWRldi5jICAgICAgICAgICAgIHwgICAgMiAr
-LQ0KIGRyaXZlcnMvY3J5cHRvL2NjcC9wc3AtZGV2LmggICAgICAgICAgICAgfCAgICAyICstDQog
-ZHJpdmVycy9jcnlwdG8vY2NwL3NwLWRldi5jICAgICAgICAgICAgICB8ICAgIDIgKy0NCiBkcml2
-ZXJzL2NyeXB0by9jY3Avc3AtZGV2LmggICAgICAgICAgICAgIHwgICAgMiArLQ0KIGRyaXZlcnMv
-Y3J5cHRvL2NjcC9zcC1wY2kuYyAgICAgICAgICAgICAgfCAgICAyICstDQogZHJpdmVycy9jcnlw
-dG8vY2NwL3NwLXBsYXRmb3JtLmMgICAgICAgICB8ICAgIDIgKy0NCiA5IGZpbGVzIGNoYW5nZWQs
-IDkgaW5zZXJ0aW9ucygrKSwgOSBkZWxldGlvbnMoLSkNCg0KZGlmZiAtLWdpdCBhL2RyaXZlcnMv
-Y3J5cHRvL2NjcC9jY3AtY3J5cHRvLWFlcy1jbWFjLmMgYi9kcml2ZXJzL2NyeXB0by9jY3AvY2Nw
-LWNyeXB0by1hZXMtY21hYy5jDQppbmRleCA5MTA4MDE1ZTU2Y2MuLmY2ZTI1MmMxZDZmYiAxMDA2
-NDQNCi0tLSBhL2RyaXZlcnMvY3J5cHRvL2NjcC9jY3AtY3J5cHRvLWFlcy1jbWFjLmMNCisrKyBi
-L2RyaXZlcnMvY3J5cHRvL2NjcC9jY3AtY3J5cHRvLWFlcy1jbWFjLmMNCkBAIC0xLDcgKzEsNyBA
-QA0KIC8qDQogICogQU1EIENyeXB0b2dyYXBoaWMgQ29wcm9jZXNzb3IgKENDUCkgQUVTIENNQUMg
-Y3J5cHRvIEFQSSBzdXBwb3J0DQogICoNCi0gKiBDb3B5cmlnaHQgKEMpIDIwMTMgQWR2YW5jZWQg
-TWljcm8gRGV2aWNlcywgSW5jLg0KKyAqIENvcHlyaWdodCAoQykgMjAxMywyMDE4IEFkdmFuY2Vk
-IE1pY3JvIERldmljZXMsIEluYy4NCiAgKg0KICAqIEF1dGhvcjogVG9tIExlbmRhY2t5IDx0aG9t
-YXMubGVuZGFja3lAYW1kLmNvbT4NCiAgKg0KZGlmZiAtLWdpdCBhL2RyaXZlcnMvY3J5cHRvL2Nj
-cC9jY3AtY3J5cHRvLXNoYS5jIGIvZHJpdmVycy9jcnlwdG8vY2NwL2NjcC1jcnlwdG8tc2hhLmMN
-CmluZGV4IDJjYTY0YmI1N2QyZS4uMTBhNjFjZDU0ZmNlIDEwMDY0NA0KLS0tIGEvZHJpdmVycy9j
-cnlwdG8vY2NwL2NjcC1jcnlwdG8tc2hhLmMNCisrKyBiL2RyaXZlcnMvY3J5cHRvL2NjcC9jY3At
-Y3J5cHRvLXNoYS5jDQpAQCAtMSw3ICsxLDcgQEANCiAvKg0KICAqIEFNRCBDcnlwdG9ncmFwaGlj
-IENvcHJvY2Vzc29yIChDQ1ApIFNIQSBjcnlwdG8gQVBJIHN1cHBvcnQNCiAgKg0KLSAqIENvcHly
-aWdodCAoQykgMjAxMywyMDE3IEFkdmFuY2VkIE1pY3JvIERldmljZXMsIEluYy4NCisgKiBDb3B5
-cmlnaHQgKEMpIDIwMTMsMjAxOCBBZHZhbmNlZCBNaWNybyBEZXZpY2VzLCBJbmMuDQogICoNCiAg
-KiBBdXRob3I6IFRvbSBMZW5kYWNreSA8dGhvbWFzLmxlbmRhY2t5QGFtZC5jb20+DQogICogQXV0
-aG9yOiBHYXJ5IFIgSG9vayA8Z2FyeS5ob29rQGFtZC5jb20+DQpkaWZmIC0tZ2l0IGEvZHJpdmVy
-cy9jcnlwdG8vY2NwL2NjcC1vcHMuYyBiL2RyaXZlcnMvY3J5cHRvL2NjcC9jY3Atb3BzLmMNCmlu
-ZGV4IDBlYTQzY2RlYjA1Zi4uMjY3YTM2N2JkMDc2IDEwMDY0NA0KLS0tIGEvZHJpdmVycy9jcnlw
-dG8vY2NwL2NjcC1vcHMuYw0KKysrIGIvZHJpdmVycy9jcnlwdG8vY2NwL2NjcC1vcHMuYw0KQEAg
-LTEsNyArMSw3IEBADQogLyoNCiAgKiBBTUQgQ3J5cHRvZ3JhcGhpYyBDb3Byb2Nlc3NvciAoQ0NQ
-KSBkcml2ZXINCiAgKg0KLSAqIENvcHlyaWdodCAoQykgMjAxMywyMDE3IEFkdmFuY2VkIE1pY3Jv
-IERldmljZXMsIEluYy4NCisgKiBDb3B5cmlnaHQgKEMpIDIwMTMsMjAxOCBBZHZhbmNlZCBNaWNy
-byBEZXZpY2VzLCBJbmMuDQogICoNCiAgKiBBdXRob3I6IFRvbSBMZW5kYWNreSA8dGhvbWFzLmxl
-bmRhY2t5QGFtZC5jb20+DQogICogQXV0aG9yOiBHYXJ5IFIgSG9vayA8Z2FyeS5ob29rQGFtZC5j
-b20+DQpkaWZmIC0tZ2l0IGEvZHJpdmVycy9jcnlwdG8vY2NwL3BzcC1kZXYuYyBiL2RyaXZlcnMv
-Y3J5cHRvL2NjcC9wc3AtZGV2LmMNCmluZGV4IGQ2NGE3OGNjYzAzZS4uN2Y2NjA1NjVhMWQ2IDEw
-MDY0NA0KLS0tIGEvZHJpdmVycy9jcnlwdG8vY2NwL3BzcC1kZXYuYw0KKysrIGIvZHJpdmVycy9j
-cnlwdG8vY2NwL3BzcC1kZXYuYw0KQEAgLTEsNyArMSw3IEBADQogLyoNCiAgKiBBTUQgUGxhdGZv
-cm0gU2VjdXJpdHkgUHJvY2Vzc29yIChQU1ApIGludGVyZmFjZQ0KICAqDQotICogQ29weXJpZ2h0
-IChDKSAyMDE2LTIwMTcgQWR2YW5jZWQgTWljcm8gRGV2aWNlcywgSW5jLg0KKyAqIENvcHlyaWdo
-dCAoQykgMjAxNiwyMDE4IEFkdmFuY2VkIE1pY3JvIERldmljZXMsIEluYy4NCiAgKg0KICAqIEF1
-dGhvcjogQnJpamVzaCBTaW5naCA8YnJpamVzaC5zaW5naEBhbWQuY29tPg0KICAqDQpkaWZmIC0t
-Z2l0IGEvZHJpdmVycy9jcnlwdG8vY2NwL3BzcC1kZXYuaCBiL2RyaXZlcnMvY3J5cHRvL2NjcC9w
-c3AtZGV2LmgNCmluZGV4IDhiNTNhOTY3NGVjYi4uZjVhZmVjY2Y0MmExIDEwMDY0NA0KLS0tIGEv
-ZHJpdmVycy9jcnlwdG8vY2NwL3BzcC1kZXYuaA0KKysrIGIvZHJpdmVycy9jcnlwdG8vY2NwL3Bz
-cC1kZXYuaA0KQEAgLTEsNyArMSw3IEBADQogLyoNCiAgKiBBTUQgUGxhdGZvcm0gU2VjdXJpdHkg
-UHJvY2Vzc29yIChQU1ApIGludGVyZmFjZSBkcml2ZXINCiAgKg0KLSAqIENvcHlyaWdodCAoQykg
-MjAxNyBBZHZhbmNlZCBNaWNybyBEZXZpY2VzLCBJbmMuDQorICogQ29weXJpZ2h0IChDKSAyMDE3
-LTIwMTggQWR2YW5jZWQgTWljcm8gRGV2aWNlcywgSW5jLg0KICAqDQogICogQXV0aG9yOiBCcmlq
-ZXNoIFNpbmdoIDxicmlqZXNoLnNpbmdoQGFtZC5jb20+DQogICoNCmRpZmYgLS1naXQgYS9kcml2
-ZXJzL2NyeXB0by9jY3Avc3AtZGV2LmMgYi9kcml2ZXJzL2NyeXB0by9jY3Avc3AtZGV2LmMNCmlu
-ZGV4IGUwNDU5MDAyZWI3MS4uYjI4Nzk3NjdmYzk4IDEwMDY0NA0KLS0tIGEvZHJpdmVycy9jcnlw
-dG8vY2NwL3NwLWRldi5jDQorKysgYi9kcml2ZXJzL2NyeXB0by9jY3Avc3AtZGV2LmMNCkBAIC0x
-LDcgKzEsNyBAQA0KIC8qDQogICogQU1EIFNlY3VyZSBQcm9jZXNzb3IgZHJpdmVyDQogICoNCi0g
-KiBDb3B5cmlnaHQgKEMpIDIwMTcgQWR2YW5jZWQgTWljcm8gRGV2aWNlcywgSW5jLg0KKyAqIENv
-cHlyaWdodCAoQykgMjAxNy0yMDE4IEFkdmFuY2VkIE1pY3JvIERldmljZXMsIEluYy4NCiAgKg0K
-ICAqIEF1dGhvcjogVG9tIExlbmRhY2t5IDx0aG9tYXMubGVuZGFja3lAYW1kLmNvbT4NCiAgKiBB
-dXRob3I6IEdhcnkgUiBIb29rIDxnYXJ5Lmhvb2tAYW1kLmNvbT4NCmRpZmYgLS1naXQgYS9kcml2
-ZXJzL2NyeXB0by9jY3Avc3AtZGV2LmggYi9kcml2ZXJzL2NyeXB0by9jY3Avc3AtZGV2LmgNCmlu
-ZGV4IDE0Mzk4Y2FkMTYyNS4uNWIwNzkwMDI1ZGIzIDEwMDY0NA0KLS0tIGEvZHJpdmVycy9jcnlw
-dG8vY2NwL3NwLWRldi5oDQorKysgYi9kcml2ZXJzL2NyeXB0by9jY3Avc3AtZGV2LmgNCkBAIC0x
-LDcgKzEsNyBAQA0KIC8qDQogICogQU1EIFNlY3VyZSBQcm9jZXNzb3IgZHJpdmVyDQogICoNCi0g
-KiBDb3B5cmlnaHQgKEMpIDIwMTcgQWR2YW5jZWQgTWljcm8gRGV2aWNlcywgSW5jLg0KKyAqIENv
-cHlyaWdodCAoQykgMjAxNy0yMDE4IEFkdmFuY2VkIE1pY3JvIERldmljZXMsIEluYy4NCiAgKg0K
-ICAqIEF1dGhvcjogVG9tIExlbmRhY2t5IDx0aG9tYXMubGVuZGFja3lAYW1kLmNvbT4NCiAgKiBB
-dXRob3I6IEdhcnkgUiBIb29rIDxnYXJ5Lmhvb2tAYW1kLmNvbT4NCmRpZmYgLS1naXQgYS9kcml2
-ZXJzL2NyeXB0by9jY3Avc3AtcGNpLmMgYi9kcml2ZXJzL2NyeXB0by9jY3Avc3AtcGNpLmMNCmlu
-ZGV4IDdkYTkzZTliZWJlZC4uNmQ3MzBkM2UzZjZmIDEwMDY0NA0KLS0tIGEvZHJpdmVycy9jcnlw
-dG8vY2NwL3NwLXBjaS5jDQorKysgYi9kcml2ZXJzL2NyeXB0by9jY3Avc3AtcGNpLmMNCkBAIC0x
-LDcgKzEsNyBAQA0KIC8qDQogICogQU1EIFNlY3VyZSBQcm9jZXNzb3IgZGV2aWNlIGRyaXZlcg0K
-ICAqDQotICogQ29weXJpZ2h0IChDKSAyMDEzLDIwMTYgQWR2YW5jZWQgTWljcm8gRGV2aWNlcywg
-SW5jLg0KKyAqIENvcHlyaWdodCAoQykgMjAxMywyMDE4IEFkdmFuY2VkIE1pY3JvIERldmljZXMs
-IEluYy4NCiAgKg0KICAqIEF1dGhvcjogVG9tIExlbmRhY2t5IDx0aG9tYXMubGVuZGFja3lAYW1k
-LmNvbT4NCiAgKiBBdXRob3I6IEdhcnkgUiBIb29rIDxnYXJ5Lmhvb2tAYW1kLmNvbT4NCmRpZmYg
-LS1naXQgYS9kcml2ZXJzL2NyeXB0by9jY3Avc3AtcGxhdGZvcm0uYyBiL2RyaXZlcnMvY3J5cHRv
-L2NjcC9zcC1wbGF0Zm9ybS5jDQppbmRleCBiNzVkYzdkYjJkNGEuLmQyNDIyOGVmYmFhYSAxMDA2
-NDQNCi0tLSBhL2RyaXZlcnMvY3J5cHRvL2NjcC9zcC1wbGF0Zm9ybS5jDQorKysgYi9kcml2ZXJz
-L2NyeXB0by9jY3Avc3AtcGxhdGZvcm0uYw0KQEAgLTEsNyArMSw3IEBADQogLyoNCiAgKiBBTUQg
-U2VjdXJlIFByb2Nlc3NvciBkZXZpY2UgZHJpdmVyDQogICoNCi0gKiBDb3B5cmlnaHQgKEMpIDIw
-MTQsMjAxNiBBZHZhbmNlZCBNaWNybyBEZXZpY2VzLCBJbmMuDQorICogQ29weXJpZ2h0IChDKSAy
-MDE0LDIwMTggQWR2YW5jZWQgTWljcm8gRGV2aWNlcywgSW5jLg0KICAqDQogICogQXV0aG9yOiBU
-b20gTGVuZGFja3kgPHRob21hcy5sZW5kYWNreUBhbWQuY29tPg0KICAqDQoNCg==
+From: Eric Biggers <ebiggers@google.com>
+
+If the stream cipher implementation is asynchronous, then the Adiantum
+instance must be flagged as asynchronous as well.  Otherwise someone
+asking for a synchronous algorithm can get an asynchronous algorithm.
+
+There are no asynchronous xchacha12 or xchacha20 implementations yet
+which makes this largely a theoretical issue, but it should be fixed.
+
+Fixes: 059c2a4d8e16 ("crypto: adiantum - add Adiantum support")
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ crypto/adiantum.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/crypto/adiantum.c b/crypto/adiantum.c
+index 2dfcf12fd4529..ca27e0dc2958c 100644
+--- a/crypto/adiantum.c
++++ b/crypto/adiantum.c
+@@ -590,6 +590,8 @@ static int adiantum_create(struct crypto_template *tmpl, struct rtattr **tb)
+ 		     hash_alg->base.cra_driver_name) >= CRYPTO_MAX_ALG_NAME)
+ 		goto out_drop_hash;
+ 
++	inst->alg.base.cra_flags = streamcipher_alg->base.cra_flags &
++				   CRYPTO_ALG_ASYNC;
+ 	inst->alg.base.cra_blocksize = BLOCKCIPHER_BLOCK_SIZE;
+ 	inst->alg.base.cra_ctxsize = sizeof(struct adiantum_tfm_ctx);
+ 	inst->alg.base.cra_alignmask = streamcipher_alg->base.cra_alignmask |
+-- 
+2.20.0.rc1.387.gf8505762e3-goog
